@@ -14,7 +14,7 @@
   "toolDef.updateSettings.timezone": "时区",
   "toolDef.updateSettings.timezoneDesc": "IANA 时区（如 Asia/Shanghai）",
   "toolDef.updateSettings.bridgeMediaPublicBaseUrl": "Bridge 文件公网 URL",
-  "toolDef.updateSettings.bridgeMediaPublicBaseUrlDesc": "外部平台拉取本地暂存文件时使用的公网 HTTP/HTTPS 基址，通常由反向代理或隧道提供。留空则回退到 HANA_BRIDGE_PUBLIC_BASE_URL。",
+  "toolDef.updateSettings.bridgeMediaPublicBaseUrlDesc": "外部平台拉取本地暂存文件时使用的公网 HTTP/HTTPS 基址，通常由反向代理或隧道提供。留空则回退到 LINGXI_BRIDGE_PUBLIC_BASE_URL。",
   "toolDef.updateSettings.computerUse": "Computer Use",
   "toolDef.updateSettings.computerUseDesc": "开启后，新对话会向主 Agent 暴露 computer 工具；关闭后新对话不可见，旧对话若调用会被拒绝。",
   "toolDef.updateSettings.thinkingBudget": "思考深度",

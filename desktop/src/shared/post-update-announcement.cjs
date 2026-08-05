@@ -2,14 +2,14 @@
  * post-update-announcement.cjs — 升级后首启公告的触发决策与合订本切片
  *
  * 契约：
- * - lastSeenVersion 记录在 {HANA_HOME}/user/last-seen-version.json，只在
+ * - lastSeenVersion 记录在 {LINGXI_HOME}/user/last-seen-version.json，只在
  *   用户确认公告（ack）或全新安装播种（seed）时写入。它同时就是累积
  *   更新摘要（合订本）的书签——"看到哪一版"只有一个语义，只有这一个
  *   状态归属，禁止另设第二个书签文件。
  * - 全新安装（未完成 onboarding 且无记录）静默播种当前版本，永不为
  *   "从无到有"弹公告；已完成 onboarding 却无记录 = 从没有此功能的老版本
  *   升级而来，视为升级后首启。
- * - 非打包环境不弹也不写（HANA_FORCE_ANNOUNCEMENT=1 可在开发期强制视为打包）。
+ * - 非打包环境不弹也不写（LINGXI_FORCE_ANNOUNCEMENT=1 可在开发期强制视为打包）。
  * - 弹窗内容来自随包 release digest 史册（release-digest.v2.json，v1 单版
  *   文件作 read-time 兜底），按 (书签, 当前] 区间切片、新→旧展示。
  */

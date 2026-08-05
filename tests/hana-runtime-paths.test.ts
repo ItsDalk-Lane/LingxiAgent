@@ -13,7 +13,7 @@ import {
 } from "../shared/hana-runtime-paths.ts";
 
 describe("Hana runtime path contracts", () => {
-  it("derives Hana-owned Pi SDK runtime paths from HANA_HOME", () => {
+  it("derives Hana-owned Pi SDK runtime paths from LINGXI_HOME", () => {
     const hanakoHome = path.join(os.tmpdir(), "hana-runtime-paths", ".hanako-dev");
     const runtimeRoot = path.join(hanakoHome, "runtime", "pi-sdk");
 
@@ -23,7 +23,7 @@ describe("Hana runtime path contracts", () => {
     expect(resolveHanaPiSdkResourceLoaderAgentDir(hanakoHome)).toBe(path.join(runtimeRoot, "resource-loader", "agent"));
   });
 
-  it("normalizes HANA_HOME before deriving Pi SDK paths", () => {
+  it("normalizes LINGXI_HOME before deriving Pi SDK paths", () => {
     const homeDir = path.join(os.tmpdir(), "hana-runtime-home");
 
     expect(resolveHanakoHome("~/.hanako-dev", homeDir)).toBe(path.join(homeDir, ".hanako-dev"));

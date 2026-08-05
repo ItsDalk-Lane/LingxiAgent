@@ -39,15 +39,15 @@ Scheduled automation `plugin_action` jobs reuse plugin tools in v0. The schedule
 ## EventBus helpers
 
 ```ts
-import { defineBusHandler, HANA_BUS_SKIP, requestBus } from '@hana/plugin-runtime';
+import { defineBusHandler, LINGXI_BUS_SKIP, requestBus } from '@hana/plugin-runtime';
 
 export const bridgeSend = defineBusHandler<
   { platform: string; text: string },
-  { sent: boolean } | typeof HANA_BUS_SKIP
+  { sent: boolean } | typeof LINGXI_BUS_SKIP
 >({
   type: 'bridge:send',
   async handle(payload) {
-    if (payload.platform !== 'telegram') return HANA_BUS_SKIP;
+    if (payload.platform !== 'telegram') return LINGXI_BUS_SKIP;
     return { sent: true };
   },
 });
@@ -76,7 +76,7 @@ export default definePlugin({
 });
 ```
 
-`HANA_BUS_SKIP` is the shared skip sentinel used by the host `EventBus.SKIP`, so SDK-authored handlers can participate in chained handlers without importing host internals.
+`LINGXI_BUS_SKIP` is the shared skip sentinel used by the host `EventBus.SKIP`, so SDK-authored handlers can participate in chained handlers without importing host internals.
 
 Use `ctx.bus.listCapabilities?.()` or `ctx.bus.getCapability?.(type)` to inspect
 the host EventBus capability directory before making optional requests.

@@ -49,28 +49,28 @@ export async function runPackagedStandaloneRuntimeSmoke({
   if (process.platform !== "win32") {
     throw new Error("[standalone-exec-smoke] this probe requires Windows");
   }
-  const workDir = requiredEnv(env, "HANA_STANDALONE_EXEC_WORK");
-  const hanakoHome = requiredEnv(env, "HANA_HOME");
-  const expectedHelper = requiredEnv(env, "HANA_STANDALONE_EXPECTED_HELPER");
-  const expectedRoot = requiredEnv(env, "HANA_STANDALONE_EXPECTED_ROOT");
+  const workDir = requiredEnv(env, "LINGXI_STANDALONE_EXEC_WORK");
+  const hanakoHome = requiredEnv(env, "LINGXI_HOME");
+  const expectedHelper = requiredEnv(env, "LINGXI_STANDALONE_EXPECTED_HELPER");
+  const expectedRoot = requiredEnv(env, "LINGXI_STANDALONE_EXPECTED_ROOT");
   const expectedEntry = path.win32.join(expectedRoot, "bundle", "index.js");
   const resolvedHelper = resolveWin32SandboxHelper({ env });
 
-  if (!env.HANA_ROOT || normalizeWindowsPath(env.HANA_ROOT) !== normalizeWindowsPath(expectedRoot)) {
-    throw new Error(`[standalone-exec-smoke] hana-server.cmd did not set HANA_ROOT: ${String(env.HANA_ROOT || "")}`);
+  if (!env.LINGXI_ROOT || normalizeWindowsPath(env.LINGXI_ROOT) !== normalizeWindowsPath(expectedRoot)) {
+    throw new Error(`[standalone-exec-smoke] hana-server.cmd did not set LINGXI_ROOT: ${String(env.LINGXI_ROOT || "")}`);
   }
-  if (!env.HANA_SERVER_ENTRY || normalizeWindowsPath(env.HANA_SERVER_ENTRY) !== normalizeWindowsPath(expectedEntry)) {
+  if (!env.LINGXI_SERVER_ENTRY || normalizeWindowsPath(env.LINGXI_SERVER_ENTRY) !== normalizeWindowsPath(expectedEntry)) {
     throw new Error(
-      `[standalone-exec-smoke] hana-server.cmd did not set HANA_SERVER_ENTRY: ${String(env.HANA_SERVER_ENTRY || "")}`,
+      `[standalone-exec-smoke] hana-server.cmd did not set LINGXI_SERVER_ENTRY: ${String(env.LINGXI_SERVER_ENTRY || "")}`,
     );
   }
   if (
-    !env.HANA_WIN32_SANDBOX_HELPER
-    || normalizeWindowsPath(env.HANA_WIN32_SANDBOX_HELPER) !== normalizeWindowsPath(expectedHelper)
+    !env.LINGXI_WIN32_SANDBOX_HELPER
+    || normalizeWindowsPath(env.LINGXI_WIN32_SANDBOX_HELPER) !== normalizeWindowsPath(expectedHelper)
   ) {
     throw new Error(
-      "[standalone-exec-smoke] hana-server.cmd did not set HANA_WIN32_SANDBOX_HELPER: "
-        + String(env.HANA_WIN32_SANDBOX_HELPER || ""),
+      "[standalone-exec-smoke] hana-server.cmd did not set LINGXI_WIN32_SANDBOX_HELPER: "
+        + String(env.LINGXI_WIN32_SANDBOX_HELPER || ""),
     );
   }
   if (!resolvedHelper || normalizeWindowsPath(resolvedHelper) !== normalizeWindowsPath(expectedHelper)) {
@@ -114,19 +114,19 @@ export async function runPackagedStandaloneRuntimeSmoke({
   );
   const cmd = assertExecResult(
     await invoke("standalone-cmd", {
-      cmd: "echo HANA_EXEC_COMMAND_OK",
+      cmd: "echo LINGXI_EXEC_COMMAND_OK",
     }),
     "exec_command default cmd route",
-    "HANA_EXEC_COMMAND_OK",
+    "LINGXI_EXEC_COMMAND_OK",
   );
 
   const receipt = {
     ok: true,
-    hanaRoot: env.HANA_ROOT,
+    hanaRoot: env.LINGXI_ROOT,
     helper: resolvedHelper,
     git,
     cmd,
   };
-  process.stdout.write(`HANA_STANDALONE_EXEC_RECEIPT=${JSON.stringify(receipt)}\n`);
+  process.stdout.write(`LINGXI_STANDALONE_EXEC_RECEIPT=${JSON.stringify(receipt)}\n`);
   return receipt;
 }

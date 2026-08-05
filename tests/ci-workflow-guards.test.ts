@@ -105,8 +105,8 @@ describe("ci.yml: Windows restricted-token helper is exercised before release bu
       expect(steps[index]?.if).toBe("runner.os == 'Windows'");
     }
     expect(stepRun(steps[keyIndex])).toContain("$RUNNER_TEMP/hana-ci-sign-key.pem");
-    expect(stepRun(steps[keyIndex])).toContain("HANA_SIGN_KEYSET=$RUNNER_TEMP/hana-ci-keyset.json");
-    expect(stepRun(steps[keyIndex])).not.toContain("secrets.HANA_SIGN_KEY");
+    expect(stepRun(steps[keyIndex])).toContain("LINGXI_SIGN_KEYSET=$RUNNER_TEMP/hana-ci-keyset.json");
+    expect(stepRun(steps[keyIndex])).not.toContain("secrets.LINGXI_SIGN_KEY");
   });
 });
 

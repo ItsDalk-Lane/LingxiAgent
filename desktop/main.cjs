@@ -158,8 +158,8 @@ function safeReadJSON(filePath, fallback = null) {
   }
 }
 
-const hanakoHome = resolveHanakoHome(process.env.HANA_HOME);
-process.env.HANA_HOME = hanakoHome;
+const hanakoHome = resolveHanakoHome(process.env.LINGXI_HOME);
+process.env.LINGXI_HOME = hanakoHome;
 
 const keepAwakeManager = createKeepAwakeManager({ powerSaveBlocker });
 
@@ -269,7 +269,7 @@ async function serverEnvironmentForNetworkProxy(baseEnv) {
   }, baseEnv, config);
 }
 
-// 按 HANA_HOME 隔离 Electron userData（localStorage / cache / session）
+// 按 LINGXI_HOME 隔离 Electron userData（localStorage / cache / session）
 // 生产: ~/Library/Application Support/Hanako（历史目录，随 HanaAgent 显示名保留）
 // 开发: ~/Library/Application Support/Hanako-dev
 const defaultHome = path.join(os.homedir(), ".hanako");
@@ -935,7 +935,7 @@ const {
   shouldKeepWaitingForServerInfo,
 } = require("./src/shared/server-readiness.cjs");
 // 打包模式 server 的版本化启动：安装包携带签名 seed 归档，
-// 首启验签解压到 HANA_HOME/artifacts 后从版本化目录 spawn。dev 模式不经过它。
+// 首启验签解压到 LINGXI_HOME/artifacts 后从版本化目录 spawn。dev 模式不经过它。
 const artifactBoot = require("./src/shared/artifact-boot.cjs");
 // 后台静默 OTA 下载器：主窗口 shown 后台检查/下载/暂存
 // 新 train，只写 next 指针——真正的 promote(next→current) 仍然只发生在下次
@@ -949,12 +949,12 @@ const artifactGc = require("./src/shared/artifact-gc.cjs");
 // 旗标共用同一份清理实现，只清 artifacts/ 下的已知子路径，保留 rollout-id。
 const artifactRepair = require("./src/shared/artifact-repair.cjs");
 // pinned keyset 随主进程 bundle 内联（vite.config.main.js 负责
-// HANA_SIGN_KEYSET 的构建期替换），运行时没有旁路。
+// LINGXI_SIGN_KEYSET 的构建期替换），运行时没有旁路。
 const { loadPinnedKeyset } = require("../shared/artifact-core/keyset.cjs");
 const { resolveStaleServerInfoDisposition } = require("./src/shared/stale-server-info.cjs");
 const { probeServerInfo, isForeignServerBlocking, describeForeignServerBlock } = require("../shared/server-info-probe.cjs");
 // 数据 epoch 拒启对话框：识别 server 打到 stderr 的机读标记
-// （HANA_DATA_EPOCH_BLOCKED / HANA_DATA_EPOCH_TRANSITION_INCOMPLETE），
+// （LINGXI_DATA_EPOCH_BLOCKED / LINGXI_DATA_EPOCH_TRANSITION_INCOMPLETE），
 // 再自行经这两个只读 CJS API 重新读取印章/checkpoint 目录来渲染专属文案 ——
 // 绝不跨进程反序列化 server 端的 epochResult 对象，也绝不直接 fs 读印章/journal。
 const { readDataEpochStamp } = require("../shared/data-epoch.cjs");
@@ -1239,7 +1239,7 @@ async function startServer() {
           err.code = "STALE_SERVER_UNCLEANED";
           throw err;
         }
-        // 端口不冲突不等于"可以安全共存"：残留进程可能是同一 HANA_HOME 上
+        // 端口不冲突不等于"可以安全共存"：残留进程可能是同一 LINGXI_HOME 上
         // 监听在别的端口的另一个内核（典型触发路径：`hana serve` 先起、桌面
         // 后启动）。用 token 认证探测确认它是否仍然是同一个家，是则拒绝
         // spawn 第二个内核；探测不通（not-hana / dead）才继续走原有 spawn。
@@ -1265,7 +1265,7 @@ async function startServer() {
 
   // ── 2. 打包模式：解析版本化 server + renderer 目录（必要时首启解压两只箱子）──
   // 安装包只携带签名 seed 归档（Resources/seed/），server/renderer 树在
-  // HANA_HOME/artifacts 下按版本落盘；这里经 artifact-boot 决策出可 spawn
+  // LINGXI_HOME/artifacts 下按版本落盘；这里经 artifact-boot 决策出可 spawn
   // 的 server 目录，同时把 `_distRenderer` 重指向 renderer 的激活目录。
   // dev 模式（无 seed）返回 null，走原有 source server 路径，`_distRenderer`
   // 维持默认值不变。
@@ -1682,19 +1682,19 @@ async function _spawnServerOnce(serverInfoPath, artifactBootContext) {
 
   let serverEnv = {
     ...process.env,
-    HANA_HOME: hanakoHome,
-    HANA_SERVER_OWNER: "desktop",
-    HANA_SERVER_OWNER_PID: String(process.pid),
-    HANA_DESKTOP_EXEC_PATH: process.execPath,
-    HANA_DESKTOP_APP_PATH: app.getAppPath(),
-    HANA_DESKTOP_IS_PACKAGED: app.isPackaged ? "1" : "0",
+    LINGXI_HOME: hanakoHome,
+    LINGXI_SERVER_OWNER: "desktop",
+    LINGXI_SERVER_OWNER_PID: String(process.pid),
+    LINGXI_DESKTOP_EXEC_PATH: process.execPath,
+    LINGXI_DESKTOP_APP_PATH: app.getAppPath(),
+    LINGXI_DESKTOP_IS_PACKAGED: app.isPackaged ? "1" : "0",
   };
   if (
     app.isPackaged
     && typeof process.resourcesPath === "string"
     && path.isAbsolute(process.resourcesPath)
   ) {
-    serverEnv.HANA_DESKTOP_RESOURCES_PATH = process.resourcesPath;
+    serverEnv.LINGXI_DESKTOP_RESOURCES_PATH = process.resourcesPath;
   }
   // The server receives every ordinary desktop environment variable, but it
   // must not inherit Pi's global agent directory. Hana supplies all SDK paths
@@ -1713,7 +1713,7 @@ async function _spawnServerOnce(serverInfoPath, artifactBootContext) {
   // 议一次，不逐请求判断"的语义一致，重启进程后两者自然重新对齐，不在
   // 本次修复范围内。
   if (artifactBootContext) {
-    serverEnv.HANA_RENDERER_DIST = _distRenderer;
+    serverEnv.LINGXI_RENDERER_DIST = _distRenderer;
   }
   serverEnv = await serverEnvironmentForNetworkProxy(serverEnv);
   serverEnv = withWindowsSystemCaEnv(serverEnv);
@@ -1736,7 +1736,7 @@ async function _spawnServerOnce(serverInfoPath, artifactBootContext) {
   // 选择 server 启动方式
   let serverBin, serverArgs, serverCwd;
   if (artifactBootContext) {
-    // 打包模式：从 HANA_HOME/artifacts 的版本化目录启动（首启已由
+    // 打包模式：从 LINGXI_HOME/artifacts 的版本化目录启动（首启已由
     // resolvePackagedArtifactBoot 解压 seed；目录布局与旧 Resources/server 一致）
     // macOS/Linux：hana-server 是 shell wrapper，内部调用 bootstrap.js，无需额外参数
     // Windows：hana-server.exe 是裸 Node 二进制（改名），需要显式传入 bootstrap.js
@@ -1749,27 +1749,27 @@ async function _spawnServerOnce(serverInfoPath, artifactBootContext) {
     serverArgs = process.platform === "win32"
       ? [path.join(versionedServerRoot, "bootstrap.js")]
       : [];
-    serverEnv.HANA_ROOT = versionedServerRoot;
-    serverEnv.HANA_SERVER_ENTRY = entry;
+    serverEnv.LINGXI_ROOT = versionedServerRoot;
+    serverEnv.LINGXI_SERVER_ENTRY = entry;
     // Desktop renderer starts in pending-new-session mode; chat session warmup
     // must not block the HTTP server readiness handshake.
-    serverEnv.HANA_CREATE_STARTUP_SESSION = "0";
+    serverEnv.LINGXI_CREATE_STARTUP_SESSION = "0";
   } else {
     // 开发模式：沿用 launch.js 传下来的独立 Node runtime 跑 source server，
     // 让源码模式和 BUILD 文档保持同一 ABI 合同，避免本地 npm install 的
     // native addon 被 Electron 自带 Node 误加载。
     const devRoot = path.join(__dirname, "..");
-    serverBin = process.env.HANA_DEV_NODE_BIN || process.env.npm_node_execpath || "node";
+    serverBin = process.env.LINGXI_DEV_NODE_BIN || process.env.npm_node_execpath || "node";
     serverCwd = devRoot;
     serverArgs = [path.join(devRoot, "server", "bootstrap.ts")];
-    serverEnv.HANA_ROOT = devRoot;
+    serverEnv.LINGXI_ROOT = devRoot;
     // server/main-full.ts is the thin closed composition entry: it
     // statically imports server/index.ts's startServer() plus
     // server/composition/full-root.ts's registerClosedRoutes hook.
     // server/index.ts itself no longer boots anything on its own.
-    serverEnv.HANA_SERVER_ENTRY = path.join(devRoot, "server", "main-full.ts");
+    serverEnv.LINGXI_SERVER_ENTRY = path.join(devRoot, "server", "main-full.ts");
     // Keep dev and packaged startup contracts identical.
-    serverEnv.HANA_CREATE_STARTUP_SESSION = "0";
+    serverEnv.LINGXI_CREATE_STARTUP_SESSION = "0";
     delete serverEnv.ELECTRON_RUN_AS_NODE;
   }
 
@@ -1795,7 +1795,7 @@ async function _spawnServerOnce(serverInfoPath, artifactBootContext) {
         "WINDOWS_SERVER_GUARDIAN_MISSING: hana-win-sandbox.exe is required to supervise the server process tree. Rebuild or reinstall HanaAgent."
       );
     }
-    serverEnv.HANA_WIN32_SANDBOX_HELPER = guardianBin;
+    serverEnv.LINGXI_WIN32_SANDBOX_HELPER = guardianBin;
     launcherBin = guardianBin;
     launcherArgs = buildWindowsServerGuardianArgs({
       parentPid: process.pid,
@@ -2044,10 +2044,10 @@ function createTray() {
 }
 
 /**
- * 将崩溃日志写入 HANA_HOME/crash.log（默认 ~/.hanako/crash.log）并返回日志内容
+ * 将崩溃日志写入 LINGXI_HOME/crash.log（默认 ~/.hanako/crash.log）并返回日志内容
  */
 function buildServerCrashDiagnostics() {
-  // production 时 server 在 HANA_HOME/artifacts 的版本化目录（以最近一次
+  // production 时 server 在 LINGXI_HOME/artifacts 的版本化目录（以最近一次
   // spawn 的 command 所在目录为准），dev 时在 __dirname/../server/
   const isPackaged = app.isPackaged;
   const serverDir = isPackaged
@@ -2060,7 +2060,7 @@ function buildServerCrashDiagnostics() {
   const items = [
     ``,
     `--- Diagnostics ---`,
-    `HANA_HOME: ${hanakoHome}`,
+    `LINGXI_HOME: ${hanakoHome}`,
     `Server dir: ${serverDir}`,
     `Packaged: ${!!isPackaged}`,
     `bundle/index.js exists: ${fs.existsSync(bundlePath)}`,
@@ -2121,9 +2121,9 @@ function formatPortInUseStartupError(conflict) {
  */
 function detectDataEpochLaunchMarker(crashInfo) {
   if (typeof crashInfo !== "string" || !crashInfo) return null;
-  const blocked = crashInfo.match(/HANA_DATA_EPOCH_BLOCKED reason=(\S+)/);
+  const blocked = crashInfo.match(/LINGXI_DATA_EPOCH_BLOCKED reason=(\S+)/);
   if (blocked) return { kind: "blocked", reason: blocked[1] };
-  const incomplete = crashInfo.match(/HANA_DATA_EPOCH_TRANSITION_INCOMPLETE reason=(\S+)/);
+  const incomplete = crashInfo.match(/LINGXI_DATA_EPOCH_TRANSITION_INCOMPLETE reason=(\S+)/);
   if (incomplete) return { kind: "incomplete", reason: incomplete[1] };
   return null;
 }
@@ -2204,7 +2204,7 @@ function buildDataEpochBlockedDetail(homeDir) {
 /**
  * TRANSITION_INCOMPLETE: covers every non-"blocked" data-epoch startup
  * refusal (an interrupted migration, or a corrupt stamp/journal — see
- * server/index.ts's HANA_DATA_EPOCH_TRANSITION_INCOMPLETE marker and
+ * server/index.ts's LINGXI_DATA_EPOCH_TRANSITION_INCOMPLETE marker and
  * core/data-epoch-coordinator.ts's DataEpochFailureReason union).
  * Deliberately generic per this slice's spec: none of these states are
  * corruption from the user's point of view, and none of them are safe for
@@ -2346,7 +2346,7 @@ function computePendingAnnouncement() {
     // 上车的用户会被"壳版本没变"骗过，永远看不到该版本的公告。
     currentVersion: getCurrentContentVersion(),
     lastSeenVersion,
-    isPackagedLike: app.isPackaged || process.env.HANA_FORCE_ANNOUNCEMENT === "1",
+    isPackagedLike: app.isPackaged || process.env.LINGXI_FORCE_ANNOUNCEMENT === "1",
     setupComplete: isSetupComplete(),
   });
   if (seedVersion) {
@@ -2712,7 +2712,7 @@ function broadcastToAllWindows(channel, payload) {
  *
  * 门槛：`app.isPackaged` 时才跑（dev 模式没有 artifact-boot 建立的版本化
  * 目录/指针，跑这个调度器对真实用户无意义，也会给纯本地开发平白多一条
- * 后台网络请求）；唯一的例外是显式配置了 `HANA_ARTIFACT_MANIFEST` 排练
+ * 后台网络请求）；唯一的例外是显式配置了 `LINGXI_ARTIFACT_MANIFEST` 排练
  * 开关时——`hasDevOverrideConfigured()` 是间接读取（本文件永远不直接引用
  * 那个环境变量名，读取逻辑只活在唯一一处 artifact-ota-dev-bypass.cjs，
  * 该文件在生产 bundle 里被 vite.config.main.js 无条件替换成恒返回 false

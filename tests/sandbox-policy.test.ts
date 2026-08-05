@@ -73,7 +73,7 @@ describe("sandbox workspace roots", () => {
     expect(guard.check(sessionFile, "stage").allowed).toBe(false);
   });
 
-  it("honors read-all semantics for non-secret HANA_HOME paths while keeping writes scoped", () => {
+  it("honors read-all semantics for non-secret LINGXI_HOME paths while keeping writes scoped", () => {
     const agentDir = path.join(tempRoot, "home", "agents", "hana");
     const hanakoHome = path.join(tempRoot, "home");
     const workspace = path.join(tempRoot, "project");

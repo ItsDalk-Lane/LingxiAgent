@@ -139,7 +139,7 @@ static void fail(const std::wstring& message) {
 
 static void debug(const std::wstring& message) {
     wchar_t enabled[8] = {};
-    DWORD n = GetEnvironmentVariableW(L"HANA_WIN32_SANDBOX_DEBUG", enabled, 8);
+    DWORD n = GetEnvironmentVariableW(L"LINGXI_WIN32_SANDBOX_DEBUG", enabled, 8);
     if (n > 0 && enabled[0] != L'\0' && enabled[0] != L'0') {
         std::wcerr << L"hana-win-sandbox: " << message << std::endl;
     }

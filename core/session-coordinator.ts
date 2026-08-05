@@ -356,7 +356,7 @@ function isPathInsideDir(parentDir: any, childPath: any) {
 }
 
 function cacheContractDebugEnabled() {
-  return process.env.HANA_CACHE_CONTRACT_DEBUG === "1";
+  return process.env.LINGXI_CACHE_CONTRACT_DEBUG === "1";
 }
 
 function assertVideoInputSupported(model: any, videos: any) {

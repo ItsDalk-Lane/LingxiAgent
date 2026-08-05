@@ -77,7 +77,7 @@
  *        this train's renderer needs a preload API version this shell
  *        doesn't expose yet; reported through the same "minshell-blocked"
  *        outcome, see `isPreloadContractSatisfied`)
- *     -> rollout bucket (dedicated random UUID in HANA_HOME)
+ *     -> rollout bucket (dedicated random UUID in LINGXI_HOME)
  *     -> quarantine short-circuit (train permanently blacklisted)
  *     -> [downloadAndApplyArtifacts only] acquire the artifacts directory
  *        lock (the loser fails this call — someone else is already

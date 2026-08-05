@@ -27,7 +27,7 @@ describe("Hana computer-use helper cursor integration", () => {
   it("applies Hana runtime cursor overrides inside the helper process", () => {
     const main = fs.readFileSync(path.join(helperSourceDir, "main.swift"), "utf8");
 
-    expect(main).toContain("HANA_AGENT_CURSOR_CONFIG_JSON");
+    expect(main).toContain("LINGXI_AGENT_CURSOR_CONFIG_JSON");
     expect(main).toContain("applyHanaCursorRuntimeConfig");
     expect(main).toContain("AgentCursor.shared.glideDurationSeconds");
     expect(main).toContain("AgentCursor.shared.dwellAfterClickSeconds");

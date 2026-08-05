@@ -72,7 +72,7 @@ describe("assertExecutionCwd", () => {
     expect(assertExecutionCwd(tmpDir)).toBe(tmpDir);
   });
 
-  it("throws HANA_EXEC_CWD_MISSING with the cwd in the message for a missing directory", () => {
+  it("throws LINGXI_EXEC_CWD_MISSING with the cwd in the message for a missing directory", () => {
     const gone = path.join(tmpDir, "gone");
     let caught: any;
     try {
@@ -81,29 +81,29 @@ describe("assertExecutionCwd", () => {
       caught = err;
     }
     expect(caught).toBeTruthy();
-    expect(caught.code).toBe("HANA_EXEC_CWD_MISSING");
+    expect(caught.code).toBe("LINGXI_EXEC_CWD_MISSING");
     expect(caught.cwd).toBe(gone);
     expect(caught.message).toContain(gone);
     expect(caught.message.toLowerCase()).toContain("working directory");
   });
 
-  it("throws HANA_EXEC_CWD_NOT_DIRECTORY for a file path", () => {
+  it("throws LINGXI_EXEC_CWD_NOT_DIRECTORY for a file path", () => {
     const file = path.join(tmpDir, "file.txt");
     fs.writeFileSync(file, "x");
     expect(() => assertExecutionCwd(file)).toThrowError(
-      expect.objectContaining({ code: "HANA_EXEC_CWD_NOT_DIRECTORY" }),
+      expect.objectContaining({ code: "LINGXI_EXEC_CWD_NOT_DIRECTORY" }),
     );
   });
 
-  it("throws HANA_EXEC_CWD_INVALID for empty input", () => {
+  it("throws LINGXI_EXEC_CWD_INVALID for empty input", () => {
     expect(() => assertExecutionCwd("")).toThrowError(
-      expect.objectContaining({ code: "HANA_EXEC_CWD_INVALID" }),
+      expect.objectContaining({ code: "LINGXI_EXEC_CWD_INVALID" }),
     );
   });
 
-  it("throws HANA_EXEC_CWD_RELATIVE for relative paths", () => {
+  it("throws LINGXI_EXEC_CWD_RELATIVE for relative paths", () => {
     expect(() => assertExecutionCwd("rel/dir")).toThrowError(
-      expect.objectContaining({ code: "HANA_EXEC_CWD_RELATIVE" }),
+      expect.objectContaining({ code: "LINGXI_EXEC_CWD_RELATIVE" }),
     );
   });
 

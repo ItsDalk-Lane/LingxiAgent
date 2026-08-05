@@ -36,9 +36,9 @@
  * native 依赖被误拷进 dist-renderer 时静默把未签名二进制带进箱）。
  *
  * 签名密钥纪律：
- * - `HANA_SIGN_KEY=<private-key-path>` 必须设置；未设置时硬报错，绝不静默
+ * - `LINGXI_SIGN_KEY=<private-key-path>` 必须设置；未设置时硬报错，绝不静默
  *   跳过或降级（一个没有签名 seed 的安装包是坏的安装包）。
- * - `HANA_SIGN_KEYSET=<path>` 是构建期输入：替换"打进当次构建"的 keyset
+ * - `LINGXI_SIGN_KEYSET=<path>` 是构建期输入：替换"打进当次构建"的 keyset
  *   文件（默认 repo 的 shared/artifact-core/pinned-keyset.json）。这不是
  *   运行期校验旁路——运行时永远读被打包进 bundle 的 keyset
  *  （vite.config.main.js 在 bundle 期做同一替换）。正式发版不设置此变量。
@@ -180,7 +180,7 @@ export function buildCodesignArgs({ identity, file, entitlementsPath }) {
 
 /**
  * 默认 darwin 签名器：装箱前对树内每个 Mach-O 签名（顺序铁律见文件头注释）。
- * 签名模式由 `env.HANA_MACHO_SIGN_IDENTITY` 决定：CI（release workflow）由 build.yml 的
+ * 签名模式由 `env.LINGXI_MACHO_SIGN_IDENTITY` 决定：CI（release workflow）由 build.yml 的
  * keychain 前置步骤导出 Developer ID 证书 identity；本地未设置 → ad-hoc，
  * 行为与之前完全一致。参数组装见 buildCodesignArgs。
  * @param {string} outDir
@@ -188,7 +188,7 @@ export function buildCodesignArgs({ identity, file, entitlementsPath }) {
  * @param {NodeJS.ProcessEnv | Record<string, string | undefined>} env
  */
 async function defaultSignMachOFiles(outDir, log, env = process.env) {
-  const identity = env.HANA_MACHO_SIGN_IDENTITY;
+  const identity = env.LINGXI_MACHO_SIGN_IDENTITY;
   // Developer ID 模式下 hardened runtime 文件必须携带 JIT entitlements
   //（缺了它 node 在 arm64 上启动即崩，见 buildCodesignArgs 注释）。plist
   // 缺失必须硬报错——静默退回"无 entitlements 签名"正是当初的事故。
@@ -207,7 +207,7 @@ async function defaultSignMachOFiles(outDir, log, env = process.env) {
   for (const file of machoFiles) {
     execFileSync("codesign", buildCodesignArgs({ identity, file, entitlementsPath }), { stdio: "pipe" });
   }
-  const mode = identity ? "Developer ID (HANA_MACHO_SIGN_IDENTITY)" : "ad-hoc";
+  const mode = identity ? "Developer ID (LINGXI_MACHO_SIGN_IDENTITY)" : "ad-hoc";
   log(`[build-server] seed: ${mode} signed ${machoFiles.length} Mach-O file(s) before packing`);
 }
 
@@ -259,19 +259,19 @@ function defaultSignManifestFile({ manifestPath, signKeyPath }) {
 }
 
 /**
- * 解析"打进当次构建"的 keyset：HANA_SIGN_KEYSET 覆盖文件，或 repo 默认
+ * 解析"打进当次构建"的 keyset：LINGXI_SIGN_KEYSET 覆盖文件，或 repo 默认
  * pinned keyset。覆盖文件缺失/畸形一律硬报错。
  * @param {NodeJS.ProcessEnv | Record<string, string | undefined>} env
  * @returns {{keysetPath: string | null, keyset: Array<{keyId: string, publicKey: string}>}}
  */
 export function resolveBuildKeyset(env) {
-  const override = env.HANA_SIGN_KEYSET;
+  const override = env.LINGXI_SIGN_KEYSET;
   if (!override) {
     return { keysetPath: null, keyset: loadPinnedKeyset() };
   }
   const keysetPath = path.resolve(override);
   if (!fs.existsSync(keysetPath)) {
-    throw new Error(`[build-server] HANA_SIGN_KEYSET points at a missing file: ${keysetPath}`);
+    throw new Error(`[build-server] LINGXI_SIGN_KEYSET points at a missing file: ${keysetPath}`);
   }
   const value = JSON.parse(fs.readFileSync(keysetPath, "utf8"));
   if (
@@ -279,29 +279,29 @@ export function resolveBuildKeyset(env) {
     value.length === 0 ||
     !value.every((e) => e && typeof e.keyId === "string" && typeof e.publicKey === "string")
   ) {
-    throw new Error(`[build-server] HANA_SIGN_KEYSET file must be a non-empty array of {keyId, publicKey}: ${keysetPath}`);
+    throw new Error(`[build-server] LINGXI_SIGN_KEYSET file must be a non-empty array of {keyId, publicKey}: ${keysetPath}`);
   }
   return { keysetPath, keyset: value };
 }
 
 /**
- * 校验签名密钥就位：HANA_SIGN_KEY 必须设置且指向真实文件。硬报错，绝不
+ * 校验签名密钥就位：LINGXI_SIGN_KEY 必须设置且指向真实文件。硬报错，绝不
  * 静默跳过或降级（一个没有签名 seed 的安装包是坏的安装包）。
  * @param {NodeJS.ProcessEnv | Record<string, string | undefined>} env
  * @returns {string} signKeyPath
  */
 function requireSignKeyPath(env) {
-  const signKeyPath = env.HANA_SIGN_KEY;
+  const signKeyPath = env.LINGXI_SIGN_KEY;
   if (!signKeyPath) {
     throw new Error(
-      "[build-server] HANA_SIGN_KEY is not set. The installer seed MUST be signed; "
-        + "building an unsigned seed is not a thing. Set HANA_SIGN_KEY=<private-key-path> "
+      "[build-server] LINGXI_SIGN_KEY is not set. The installer seed MUST be signed; "
+        + "building an unsigned seed is not a thing. Set LINGXI_SIGN_KEY=<private-key-path> "
         + "(local validation: generate a throwaway pair with scripts/artifact-keygen.mjs "
-        + "and point HANA_SIGN_KEYSET at its matching keyset file).",
+        + "and point LINGXI_SIGN_KEYSET at its matching keyset file).",
     );
   }
   if (!fs.existsSync(signKeyPath)) {
-    throw new Error(`[build-server] HANA_SIGN_KEY points at a missing file: ${signKeyPath}`);
+    throw new Error(`[build-server] LINGXI_SIGN_KEY points at a missing file: ${signKeyPath}`);
   }
   return signKeyPath;
 }
@@ -339,7 +339,7 @@ export async function packServerArchive({ outDir, artifactOutDir, version, platf
 
   // ── 先签名（铁律见文件头注释）：darwin 树内 Mach-O 装箱前必须带签名 ──
   // æ­£å¼ CI 的 Developer ID 签名同样必须发生在这一行语义位置之前/之处。
-  // env 显式传参（不在签名器里抓 process.env），HANA_MACHO_SIGN_IDENTITY
+  // env 显式传参（不在签名器里抓 process.env），LINGXI_MACHO_SIGN_IDENTITY
   // 决定 ad-hoc / Developer ID 双模式，见 defaultSignMachOFiles。
   if (platform === "darwin") {
     await signMachOFiles(outDir, log, env);
@@ -465,7 +465,7 @@ async function usePrebuiltRendererArchive({ archivePath, rendererArtifactOutDir,
   if (!fs.existsSync(archivePath)) {
     throw new Error(
       `[build-server] prebuilt renderer archive path invalid: ${archivePath} does not exist. `
-        + "HANA_PREBUILT_RENDERER_BOX (or the prebuiltRendererArchive option) must point at the renderer "
+        + "LINGXI_PREBUILT_RENDERER_BOX (or the prebuiltRendererArchive option) must point at the renderer "
         + "box produced by the shared CI job (see scripts/pack-renderer-box.mjs).",
     );
   }
@@ -574,11 +574,11 @@ export async function packDualKindSeed({
   deps = {},
   // CI 的四个平台 job 各自现场打包 renderer 树会产生同内容不同字节的四份
   // 归档（tar 头里的 mtime 不同），而发布货架只上传其中一份。设置这个参数
-  // （或环境变量 HANA_PREBUILT_RENDERER_BOX）指向共享 job 已经打好的箱子，
+  // （或环境变量 LINGXI_PREBUILT_RENDERER_BOX）指向共享 job 已经打好的箱子，
   // 就跳过现场打包，直接复用那份字节——四个平台安装包内嵌的种子从此和货架
   // 上的归档字节完全一致。留空（本地开发者手跑 / 未设置该环境变量）时行为
   // 与过去完全一致：现场从 rendererDistDir 打包。
-  prebuiltRendererArchive = env.HANA_PREBUILT_RENDERER_BOX || undefined,
+  prebuiltRendererArchive = env.LINGXI_PREBUILT_RENDERER_BOX || undefined,
 }) {
   const { signManifestFile = defaultSignManifestFile, verifyManifest = manifestModule.verifyManifest } = deps;
 
@@ -586,7 +586,7 @@ export async function packDualKindSeed({
   const signKeyPath = requireSignKeyPath(env);
   const { keysetPath, keyset } = resolveBuildKeyset(env);
   if (keysetPath) {
-    log(`[build-server] seed: using HANA_SIGN_KEYSET override for THIS build: ${keysetPath}`);
+    log(`[build-server] seed: using LINGXI_SIGN_KEYSET override for THIS build: ${keysetPath}`);
   }
 
   // ── 两个归档都打完 ──

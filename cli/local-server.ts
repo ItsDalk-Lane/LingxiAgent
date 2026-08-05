@@ -3,7 +3,7 @@ import os from "os";
 import path from "path";
 
 export function resolveCliHanaHome(env = process.env) {
-  return resolveHomePath(env.HANA_HOME || path.join(os.homedir(), ".hanako"));
+  return resolveHomePath(env.LINGXI_HOME || path.join(os.homedir(), ".hanako"));
 }
 
 function resolveHomePath(value) {

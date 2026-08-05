@@ -16,8 +16,8 @@ function isolatedPathEnv(directory) {
       delete env[key];
     }
   }
-  delete env.HANA_SKILL_CREATOR_PYTHON;
-  delete env.HANA_PLUGIN_CREATOR_PYTHON;
+  delete env.LINGXI_SKILL_CREATOR_PYTHON;
+  delete env.LINGXI_PLUGIN_CREATOR_PYTHON;
   return env;
 }
 
@@ -100,7 +100,7 @@ describe("skill-creator environment check", () => {
 
     const result = runCheck(skillCreatorCheck, ["--capability", "package-skill"], {
       ...isolatedPathEnv(root),
-      HANA_SKILL_CREATOR_PYTHON: JSON.stringify([process.execPath, fakePython]),
+      LINGXI_SKILL_CREATOR_PYTHON: JSON.stringify([process.execPath, fakePython]),
       FAKE_MISSING_PACKAGES: "pyyaml",
     });
 
@@ -119,7 +119,7 @@ describe("skill-creator environment check", () => {
 
     const result = runCheck(skillCreatorCheck, ["--capability", "run-eval"], {
       ...isolatedPathEnv(root),
-      HANA_SKILL_CREATOR_PYTHON: JSON.stringify([process.execPath, fakePython]),
+      LINGXI_SKILL_CREATOR_PYTHON: JSON.stringify([process.execPath, fakePython]),
     });
 
     expect(result.status).toBe(1);
@@ -160,7 +160,7 @@ describe("hana-plugin-creator environment check", () => {
 
     const result = runCheck(pluginCreatorCheck, ["--capability", "scaffold"], {
       ...isolatedPathEnv(root),
-      HANA_PLUGIN_CREATOR_PYTHON: JSON.stringify([process.execPath, fakePython]),
+      LINGXI_PLUGIN_CREATOR_PYTHON: JSON.stringify([process.execPath, fakePython]),
     });
 
     expect(result.status).toBe(0);
@@ -178,7 +178,7 @@ describe("hana-plugin-creator environment check", () => {
 
     const result = runCheck(pluginCreatorCheck, ["--capability", "scaffold"], {
       ...isolatedPathEnv(root),
-      HANA_PLUGIN_CREATOR_PYTHON: JSON.stringify([process.execPath, fakePython]),
+      LINGXI_PLUGIN_CREATOR_PYTHON: JSON.stringify([process.execPath, fakePython]),
       FAKE_PYTHON_VERSION: "3.9.6",
     });
 

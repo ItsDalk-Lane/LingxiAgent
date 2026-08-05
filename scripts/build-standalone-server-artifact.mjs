@@ -94,9 +94,9 @@ export function standaloneWrapperContents() {
   const common = [
     "@echo off",
     "setlocal",
-    'set "HANA_ROOT=%~dp0server"',
-    'set "HANA_SERVER_ENTRY=%~dp0server\\bundle\\index.js"',
-    'set "HANA_WIN32_SANDBOX_HELPER=%~dp0sandbox\\windows\\hana-win-sandbox.exe"',
+    'set "LINGXI_ROOT=%~dp0server"',
+    'set "LINGXI_SERVER_ENTRY=%~dp0server\\bundle\\index.js"',
+    'set "LINGXI_WIN32_SANDBOX_HELPER=%~dp0sandbox\\windows\\hana-win-sandbox.exe"',
     'set "PATH=%~dp0git\\cmd;%~dp0git\\usr\\bin;%~dp0git\\mingw64\\bin;%PATH%"',
   ];
   return {

@@ -17,14 +17,14 @@ function spawnServerBootstrap(hanaHome: string, extraEnv: Record<string, string>
     cwd: root,
     env: {
       ...process.env,
-      HANA_HOME: hanaHome,
-      HANA_PORT: "0",
-      HANA_ROOT: root,
+      LINGXI_HOME: hanaHome,
+      LINGXI_PORT: "0",
+      LINGXI_ROOT: root,
       // server/main-full.ts is the thin closed composition entry:
       // server/index.ts itself only exports startServer() and boots
       // nothing on mere import.
-      HANA_SERVER_ENTRY: path.join(root, "server", "main-full.ts"),
-      HANA_CREATE_STARTUP_SESSION: "0",
+      LINGXI_SERVER_ENTRY: path.join(root, "server", "main-full.ts"),
+      LINGXI_CREATE_STARTUP_SESSION: "0",
       ...extraEnv,
     },
     stdio: ["ignore", "pipe", "pipe"],
@@ -124,8 +124,8 @@ describe("server/index.ts source-order contract: home guards run before any stor
     expect(source).toContain("fs.unlinkSync(serverInfoPath)");
   });
 
-  it("reads the data-epoch override from HANA_ALLOW_DATA_DOWNGRADE and uses the shared DATA_EPOCH constant", () => {
-    expect(source).toContain('process.env.HANA_ALLOW_DATA_DOWNGRADE === "1"');
+  it("reads the data-epoch override from LINGXI_ALLOW_DATA_DOWNGRADE and uses the shared DATA_EPOCH constant", () => {
+    expect(source).toContain('process.env.LINGXI_ALLOW_DATA_DOWNGRADE === "1"');
     expect(source).toContain("ownEpoch: DATA_EPOCH");
   });
 });
@@ -218,7 +218,7 @@ describe("server home guards — real spawn behavior (fast failure paths, before
 
       expect(result).toMatchObject({ code: 1, signal: null });
       expect(result.stderr).toContain("epoch=999999");
-      expect(result.stderr).toContain("HANA_ALLOW_DATA_DOWNGRADE=1");
+      expect(result.stderr).toContain("LINGXI_ALLOW_DATA_DOWNGRADE=1");
       expect(result.stdout + result.stderr).not.toContain("ensureFirstRun");
       expect(result.stdout + result.stderr).not.toContain("HanaEngine");
       expectNoPiRuntimeTrees(hanaHome);
@@ -227,7 +227,7 @@ describe("server home guards — real spawn behavior (fast failure paths, before
     }
   }, 20000);
 
-  it("prints a HANA_DATA_EPOCH_BLOCKED machine-readable marker ahead of the human-readable text when a higher stamp blocks startup", async () => {
+  it("prints a LINGXI_DATA_EPOCH_BLOCKED machine-readable marker ahead of the human-readable text when a higher stamp blocks startup", async () => {
     const hanaHome = fs.mkdtempSync(path.join(os.tmpdir(), "hana-epoch-blocked-marker-test-"));
     try {
       fs.writeFileSync(
@@ -240,14 +240,14 @@ describe("server home guards — real spawn behavior (fast failure paths, before
       const result = await waitForExit(child);
 
       expect(result).toMatchObject({ code: 1, signal: null });
-      expect(result.stderr).toContain("HANA_DATA_EPOCH_BLOCKED reason=epoch-downgrade-blocked");
+      expect(result.stderr).toContain("LINGXI_DATA_EPOCH_BLOCKED reason=epoch-downgrade-blocked");
       // Machine-readable marker line must come before the human-readable
       // bilingual block text (desktop's dialog logic scans the full crash
       // log, but the ordering itself documents the contract).
-      expect(result.stderr.indexOf("HANA_DATA_EPOCH_BLOCKED")).toBeLessThan(result.stderr.indexOf("此数据目录要求数据"));
+      expect(result.stderr.indexOf("LINGXI_DATA_EPOCH_BLOCKED")).toBeLessThan(result.stderr.indexOf("此数据目录要求数据"));
       // Human-readable text (bilingual, existing behavior) is unchanged.
       expect(result.stderr).toContain("epoch=999999");
-      expect(result.stderr).toContain("HANA_ALLOW_DATA_DOWNGRADE=1");
+      expect(result.stderr).toContain("LINGXI_ALLOW_DATA_DOWNGRADE=1");
       expectNoPiRuntimeTrees(hanaHome);
     } finally {
       fs.rmSync(hanaHome, { recursive: true, force: true });
@@ -262,14 +262,14 @@ describe("server home guards — real spawn behavior (fast failure paths, before
       const child = spawnServerBootstrap(hanaHome);
       const result = await waitForStartupProgress(child);
 
-      expect(result.stderr).toContain("HANA_DATA_EPOCH_BASELINE_WARNING reason=corrupt-stamp");
-      expect(result.stderr).not.toContain("HANA_DATA_EPOCH_TRANSITION_INCOMPLETE");
+      expect(result.stderr).toContain("LINGXI_DATA_EPOCH_BASELINE_WARNING reason=corrupt-stamp");
+      expect(result.stderr).not.toContain("LINGXI_DATA_EPOCH_TRANSITION_INCOMPLETE");
     } finally {
       fs.rmSync(hanaHome, { recursive: true, force: true });
     }
   }, 20000);
 
-  it("continues a stable-era upgrade when HANA_HOME is a linked directory without an epoch stamp", async () => {
+  it("continues a stable-era upgrade when LINGXI_HOME is a linked directory without an epoch stamp", async () => {
     const container = fs.mkdtempSync(path.join(os.tmpdir(), "hana-linked-stable-upgrade-test-"));
     const realHome = path.join(container, "real-home");
     const linkedHome = path.join(container, "linked-home");
@@ -295,8 +295,8 @@ describe("server home guards — real spawn behavior (fast failure paths, before
       // registry has finished writing its per-step receipts before shutdown.
       const result = await waitForStartupProgress(child, "[init] 1/5 Pi SDK 初始化...");
 
-      expect(result.stderr).toContain("HANA_DATA_EPOCH_BASELINE_WARNING reason=ambiguous-unstamped-home");
-      expect(result.stderr).not.toContain("HANA_DATA_EPOCH_TRANSITION_INCOMPLETE");
+      expect(result.stderr).toContain("LINGXI_DATA_EPOCH_BASELINE_WARNING reason=ambiguous-unstamped-home");
+      expect(result.stderr).not.toContain("LINGXI_DATA_EPOCH_TRANSITION_INCOMPLETE");
       expect(JSON.parse(fs.readFileSync(path.join(realHome, "user", "preferences.json"), "utf-8"))._dataVersion)
         .toBeGreaterThan(43);
     } finally {
@@ -312,8 +312,8 @@ describe("server home guards — real spawn behavior (fast failure paths, before
       const child = spawnServerBootstrap(hanaHome);
       const result = await waitForStartupProgress(child);
 
-      expect(result.stderr).toContain("HANA_DATA_EPOCH_BASELINE_WARNING reason=corrupt-journal");
-      expect(result.stderr).not.toContain("HANA_DATA_EPOCH_TRANSITION_INCOMPLETE");
+      expect(result.stderr).toContain("LINGXI_DATA_EPOCH_BASELINE_WARNING reason=corrupt-journal");
+      expect(result.stderr).not.toContain("LINGXI_DATA_EPOCH_TRANSITION_INCOMPLETE");
     } finally {
       fs.rmSync(hanaHome, { recursive: true, force: true });
     }
@@ -336,15 +336,15 @@ describe("server home guards — real spawn behavior (fast failure paths, before
       const result = await waitForExit(child);
 
       expect(result).toMatchObject({ code: 1, signal: null });
-      expect(result.stderr).toContain("HANA_DATA_EPOCH_TRANSITION_INCOMPLETE reason=corrupt-journal");
-      expect(result.stderr).not.toContain("HANA_DATA_EPOCH_BASELINE_WARNING");
+      expect(result.stderr).toContain("LINGXI_DATA_EPOCH_TRANSITION_INCOMPLETE reason=corrupt-journal");
+      expect(result.stderr).not.toContain("LINGXI_DATA_EPOCH_BASELINE_WARNING");
       expectNoPiRuntimeTrees(hanaHome);
     } finally {
       fs.rmSync(hanaHome, { recursive: true, force: true });
     }
   }, 20000);
 
-  it("does not let HANA_ALLOW_DATA_DOWNGRADE bypass an incomplete transition", async () => {
+  it("does not let LINGXI_ALLOW_DATA_DOWNGRADE bypass an incomplete transition", async () => {
     const hanaHome = fs.mkdtempSync(path.join(os.tmpdir(), "hana-epoch-journal-incomplete-test-"));
     try {
       fs.writeFileSync(path.join(hanaHome, "data-epoch.json"), JSON.stringify({
@@ -371,7 +371,7 @@ describe("server home guards — real spawn behavior (fast failure paths, before
         checkpointReceipt: { id: "checkpoint-1-2" },
       }), "utf-8");
 
-      const child = spawnServerBootstrap(hanaHome, { HANA_ALLOW_DATA_DOWNGRADE: "1" });
+      const child = spawnServerBootstrap(hanaHome, { LINGXI_ALLOW_DATA_DOWNGRADE: "1" });
       const result = await waitForExit(child);
 
       expect(result).toMatchObject({ code: 1, signal: null });
@@ -385,7 +385,7 @@ describe("server home guards — real spawn behavior (fast failure paths, before
     }
   }, 20000);
 
-  it("prints a HANA_DATA_EPOCH_TRANSITION_INCOMPLETE machine-readable marker ahead of the human-readable text for an incomplete transition", async () => {
+  it("prints a LINGXI_DATA_EPOCH_TRANSITION_INCOMPLETE machine-readable marker ahead of the human-readable text for an incomplete transition", async () => {
     const hanaHome = fs.mkdtempSync(path.join(os.tmpdir(), "hana-epoch-incomplete-marker-test-"));
     try {
       fs.writeFileSync(path.join(hanaHome, "data-epoch.json"), JSON.stringify({
@@ -416,8 +416,8 @@ describe("server home guards — real spawn behavior (fast failure paths, before
       const result = await waitForExit(child);
 
       expect(result).toMatchObject({ code: 1, signal: null });
-      expect(result.stderr).toContain("HANA_DATA_EPOCH_TRANSITION_INCOMPLETE reason=incomplete-transition");
-      expect(result.stderr.indexOf("HANA_DATA_EPOCH_TRANSITION_INCOMPLETE")).toBeLessThan(result.stderr.indexOf("[data-epoch]"));
+      expect(result.stderr).toContain("LINGXI_DATA_EPOCH_TRANSITION_INCOMPLETE reason=incomplete-transition");
+      expect(result.stderr.indexOf("LINGXI_DATA_EPOCH_TRANSITION_INCOMPLETE")).toBeLessThan(result.stderr.indexOf("[data-epoch]"));
       expect(result.stderr).toContain("incomplete-transition");
       expect(result.stderr).toContain("migrating");
       expectNoPiRuntimeTrees(hanaHome);
@@ -434,15 +434,15 @@ describe("server home guards — real spawn behavior (fast failure paths, before
       const child = spawnServerBootstrap(hanaHome);
       const result = await waitForStartupProgress(child);
 
-      expect(result.stderr).toContain("HANA_DATA_EPOCH_BASELINE_WARNING reason=corrupt-stamp");
-      expect(result.stderr).not.toContain("HANA_DATA_EPOCH_TRANSITION_INCOMPLETE");
-      expect(result.stderr).not.toContain("HANA_DATA_EPOCH_BLOCKED");
+      expect(result.stderr).toContain("LINGXI_DATA_EPOCH_BASELINE_WARNING reason=corrupt-stamp");
+      expect(result.stderr).not.toContain("LINGXI_DATA_EPOCH_TRANSITION_INCOMPLETE");
+      expect(result.stderr).not.toContain("LINGXI_DATA_EPOCH_BLOCKED");
     } finally {
       fs.rmSync(hanaHome, { recursive: true, force: true });
     }
   }, 20000);
 
-  it("proceeds past a higher epoch stamp when HANA_ALLOW_DATA_DOWNGRADE=1 is set (does not fail on the epoch gate)", async () => {
+  it("proceeds past a higher epoch stamp when LINGXI_ALLOW_DATA_DOWNGRADE=1 is set (does not fail on the epoch gate)", async () => {
     const hanaHome = fs.mkdtempSync(path.join(os.tmpdir(), "hana-epoch-override-test-"));
     try {
       fs.writeFileSync(
@@ -456,7 +456,7 @@ describe("server home guards — real spawn behavior (fast failure paths, before
       // negative — the epoch-block message must NOT appear — while letting
       // the process continue in the background and killing it once we've
       // observed enough stdout to know it moved past the gate, or timeout.
-      const child = spawnServerBootstrap(hanaHome, { HANA_ALLOW_DATA_DOWNGRADE: "1" });
+      const child = spawnServerBootstrap(hanaHome, { LINGXI_ALLOW_DATA_DOWNGRADE: "1" });
       const childClosed = new Promise<void>((resolve) => child.once("close", () => resolve()));
       let stdout = "";
       let stderr = "";
@@ -494,7 +494,7 @@ describe("server home guards — real spawn behavior (fast failure paths, before
       await childClosed;
       // The gate must not have blocked: no rejection instructions, and a
       // loud (but non-blocking) warning is expected instead.
-      expect(stderr).not.toContain("HANA_ALLOW_DATA_DOWNGRADE=1"); // that's the *rejection* message's remedy text
+      expect(stderr).not.toContain("LINGXI_ALLOW_DATA_DOWNGRADE=1"); // that's the *rejection* message's remedy text
       expect(stderr).toContain("[data-epoch] WARNING");
       expect(stderr).toContain("警告");
       expect(stdout).toContain("ensureFirstRun");

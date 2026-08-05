@@ -11,7 +11,7 @@ jobs:
   # 各平台各自现场打包出"内容相同、字节不同、sha256 不同"的四份归档（packTree
   # 在 tar 头里写入真实文件 mtime）。见 scripts/pack-renderer-box.mjs 与
   # scripts/build-server-artifact.mjs 的 packDualKindSeed prebuiltRendererArchive
-  # / HANA_PREBUILT_RENDERER_BOX 入参。
+  # / LINGXI_PREBUILT_RENDERER_BOX 入参。
   renderer-box:
     runs-on: ubuntu-latest
     steps:
@@ -95,23 +95,23 @@ jobs:
         run: npm run build:client
 
       # 三平台：materialize seed 列车签名私钥。
-      # build-server.mjs 末尾的 packDualKindSeed 硬性要求 HANA_SIGN_KEY 指向
-      # PKCS8 PEM 私钥文件。secret HANA_SIGN_KEY 的内容是 PEM 文本本体（不是
+      # build-server.mjs 末尾的 packDualKindSeed 硬性要求 LINGXI_SIGN_KEY 指向
+      # PKCS8 PEM 私钥文件。secret LINGXI_SIGN_KEY 的内容是 PEM 文本本体（不是
       # 路径），这里落到 $RUNNER_TEMP（绝不写进 workspace，防止被打进包），
-      # 再把文件路径导出为 HANA_SIGN_KEY 环境变量。secret 缺失 → 硬失败，
+      # 再把文件路径导出为 LINGXI_SIGN_KEY 环境变量。secret 缺失 → 硬失败，
       # 禁止静默出无签名 seed 的包（本 workflow 只在 tag push / 手动 dispatch
       # 触发，无 fork PR 无 secrets 的场景，硬失败是安全的）。
       - name: Materialize seed signing key
         shell: bash
         env:
-          HANA_SIGN_KEY_PEM: ${{ secrets.HANA_SIGN_KEY }}
+          LINGXI_SIGN_KEY_PEM: ${{ secrets.LINGXI_SIGN_KEY }}
         run: |
-          if [ -z "$HANA_SIGN_KEY_PEM" ]; then
-            echo "::error::HANA_SIGN_KEY secret is missing; the seed archive MUST be signed"
+          if [ -z "$LINGXI_SIGN_KEY_PEM" ]; then
+            echo "::error::LINGXI_SIGN_KEY secret is missing; the seed archive MUST be signed"
             exit 1
           fi
-          printf '%s\n' "$HANA_SIGN_KEY_PEM" > "$RUNNER_TEMP/hana-train-sign-key.pem"
-          echo "HANA_SIGN_KEY=$RUNNER_TEMP/hana-train-sign-key.pem" >> "$GITHUB_ENV"
+          printf '%s\n' "$LINGXI_SIGN_KEY_PEM" > "$RUNNER_TEMP/hana-train-sign-key.pem"
+          echo "LINGXI_SIGN_KEY=$RUNNER_TEMP/hana-train-sign-key.pem" >> "$GITHUB_ENV"
           echo "Seed signing key materialized."
 
       # macOS: 手动配置签名 keychain + partition-list
@@ -156,7 +156,7 @@ jobs:
       # 这里在所有签名步骤之前从证书读取 identity 并 ::add-mask::，之后整个 job 日志里该串都变 ***。
       # identity 不硬编码进本 public 文件，证书是唯一来源，保证 mask 串与 electron-builder
       # 实际打印的串一致、永不漏配；读取不到就 fail（report，不静默降级）。
-      # 同时导出 HANA_MACHO_SIGN_IDENTITY：build-server.mjs 的 seed 签名器
+      # 同时导出 LINGXI_MACHO_SIGN_IDENTITY：build-server.mjs 的 seed 签名器
       # （scripts/build-server-artifact.mjs defaultSignMachOFiles）据此从
       # ad-hoc 切换为 Developer ID + hardened runtime + secure timestamp
       # Apple notary 会递归验签箱内 Mach-O，ad-hoc 签名无法通过公证。
@@ -176,7 +176,7 @@ jobs:
           fi
           echo "::add-mask::$IDENTITY_NAME"   # 遮 identity 名称部分（TeamID 可能已被遮成 ***，名称部分不会）
           echo "::add-mask::$IDENTITY"        # 附带：遮完整 identity 串（覆盖我们自己 echo 含真 TeamID 的整行）
-          echo "HANA_MACHO_SIGN_IDENTITY=$IDENTITY" >> "$GITHUB_ENV"
+          echo "LINGXI_MACHO_SIGN_IDENTITY=$IDENTITY" >> "$GITHUB_ENV"
           echo "Signing identity registered for log masking and exported for seed signing."
 
       # 下载 renderer-box job 单点构建好的共享归档，让四个平台复用同一份字节
@@ -187,7 +187,7 @@ jobs:
           name: renderer-box
           path: prebuilt-renderer
 
-      # 把共享归档的绝对路径通过 HANA_PREBUILT_RENDERER_BOX 环境变量透传给
+      # 把共享归档的绝对路径通过 LINGXI_PREBUILT_RENDERER_BOX 环境变量透传给
       # scripts/build-server.mjs 末尾调用的 packDualKindSeed（该函数默认从
       # process.env 读取这个变量，见 scripts/build-server-artifact.mjs）。
       # 这个变量之后由 Node（fs 原生 API）读取，不是再喂给另一个 bash 命令，
@@ -208,7 +208,7 @@ jobs:
           else
             BOX_DIR=$(pwd)
           fi
-          echo "HANA_PREBUILT_RENDERER_BOX=$BOX_DIR/$BOX" >> "$GITHUB_ENV"
+          echo "LINGXI_PREBUILT_RENDERER_BOX=$BOX_DIR/$BOX" >> "$GITHUB_ENV"
           echo "Using shared renderer box: $BOX_DIR/$BOX"
 
       - name: Build server bundle
@@ -226,7 +226,7 @@ jobs:
         if: runner.os == 'macOS'
         shell: bash
         run: |
-          HANA_COMPUTER_USE_HELPER_ARCH=${{ matrix.arch }} node scripts/build-computer-use-helper.mjs ${{ matrix.arch }}
+          LINGXI_COMPUTER_USE_HELPER_ARCH=${{ matrix.arch }} node scripts/build-computer-use-helper.mjs ${{ matrix.arch }}
 
       - name: Build Windows sandbox helper
         if: runner.os == 'Windows'
@@ -313,7 +313,7 @@ jobs:
       # dist-server-artifact/*/server-*.tar.gz and dist-renderer-artifact/renderer-*.tar.gz
       # are the hot-update boxes packed by packDualKindSeed (see scripts/build-server-artifact.mjs).
       # The renderer box here is just this platform's copy of the SAME bytes downloaded from
-      # the renderer-box job (packDualKindSeed reuses it via HANA_PREBUILT_RENDERER_BOX rather
+      # the renderer-box job (packDualKindSeed reuses it via LINGXI_PREBUILT_RENDERER_BOX rather
       # than packing dist-renderer/ on the spot) — all four uploads are byte-identical now.
       # dist-server-artifact/*/seed-train-*.json(.sig) IS uploaded here (platform-qualified
       # filename, see seedManifestFileName in build-server-artifact.mjs — each matrix job's
@@ -428,7 +428,7 @@ jobs:
           # Renderer archive is platform-independent AND now byte-identical across all four
           # matrix jobs: it is built once by the renderer-box job and downloaded/reused by
           # every platform (see scripts/pack-renderer-box.mjs and packDualKindSeed's
-          # prebuiltRendererArchive / HANA_PREBUILT_RENDERER_BOX). Which platform's copy we
+          # prebuiltRendererArchive / LINGXI_PREBUILT_RENDERER_BOX). Which platform's copy we
           # publish here no longer matters for correctness — macOS arm64 is kept only to
           # avoid widening this step's diff.
           echo "=== Uploading renderer hot-update archive (macOS arm64 build only) ==="
@@ -543,19 +543,19 @@ jobs:
           node-version: "24.15.0"
 
       # Same materialization as the build job's "Materialize seed signing key" step:
-      # HANA_SIGN_KEY secret content is the PEM text itself, written to a runner-temp
+      # LINGXI_SIGN_KEY secret content is the PEM text itself, written to a runner-temp
       # file and exported as a path (never written into the workspace).
       - name: Materialize train signing key
         shell: bash
         env:
-          HANA_SIGN_KEY_PEM: ${{ secrets.HANA_SIGN_KEY }}
+          LINGXI_SIGN_KEY_PEM: ${{ secrets.LINGXI_SIGN_KEY }}
         run: |
-          if [ -z "$HANA_SIGN_KEY_PEM" ]; then
-            echo "::error::HANA_SIGN_KEY secret is missing; the train manifest MUST be signed"
+          if [ -z "$LINGXI_SIGN_KEY_PEM" ]; then
+            echo "::error::LINGXI_SIGN_KEY secret is missing; the train manifest MUST be signed"
             exit 1
           fi
-          printf '%s\n' "$HANA_SIGN_KEY_PEM" > "$RUNNER_TEMP/hana-train-sign-key.pem"
-          echo "HANA_SIGN_KEY=$RUNNER_TEMP/hana-train-sign-key.pem" >> "$GITHUB_ENV"
+          printf '%s\n' "$LINGXI_SIGN_KEY_PEM" > "$RUNNER_TEMP/hana-train-sign-key.pem"
+          echo "LINGXI_SIGN_KEY=$RUNNER_TEMP/hana-train-sign-key.pem" >> "$GITHUB_ENV"
 
       # The automatic publisher classifies the source installer Release before choosing
       # channels. A prerelease advances beta only; stable requires a non-prerelease source

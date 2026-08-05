@@ -2425,8 +2425,8 @@ describe("chat route model switch guard", () => {
 
   it("aborts a streaming session only after the turn has been idle past the stall timeout", async () => {
     vi.useFakeTimers();
-    const prevTimeout = process.env.HANA_TURN_STALL_ABORT_MS;
-    process.env.HANA_TURN_STALL_ABORT_MS = "100";
+    const prevTimeout = process.env.LINGXI_TURN_STALL_ABORT_MS;
+    process.env.LINGXI_TURN_STALL_ABORT_MS = "100";
     try {
       let createHandlers;
       let subscriber;
@@ -2476,8 +2476,8 @@ describe("chat route model switch guard", () => {
 
       handlers.onClose({}, ws);
     } finally {
-      if (prevTimeout === undefined) delete process.env.HANA_TURN_STALL_ABORT_MS;
-      else process.env.HANA_TURN_STALL_ABORT_MS = prevTimeout;
+      if (prevTimeout === undefined) delete process.env.LINGXI_TURN_STALL_ABORT_MS;
+      else process.env.LINGXI_TURN_STALL_ABORT_MS = prevTimeout;
       vi.useRealTimers();
     }
   });

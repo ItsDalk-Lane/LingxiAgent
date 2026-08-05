@@ -110,7 +110,7 @@ const migrations = {
   16: migrateVideoCapabilityProjection,
   // bridge sessionKey 引入 @agentId 后，修补旧 index 中无 agent 维度的 key
   17: migrateBridgeSessionKeysToAgentScoped,
-  // Studio 基础身份：为旧 HANA_HOME 补齐 server / legacy owner / default Studio registry
+  // Studio 基础身份：为旧 LINGXI_HOME 补齐 server / legacy owner / default Studio registry
   18: migrateLocalIdentityRegistries,
   // API-key provider 凭证真相源迁移：auth.json → added-models.yaml
   19: migrateLegacyApiKeyAuthEntriesToProviders,
@@ -1970,7 +1970,7 @@ function migrationWalkRealFiles(hanakoHome, root, accept, log) {
   const walk = (directory) => {
     for (const entry of migrationReadDirectoryEntries(hanakoHome, directory, log)) {
       // Never follow directory or file symlinks. A user-managed link may point
-      // outside HANA_HOME, and migration discovery must remain read-only there.
+      // outside LINGXI_HOME, and migration discovery must remain read-only there.
       if (entry.isSymbolicLink()) continue;
       const entryPath = path.join(directory, entry.name);
       if (entry.isDirectory()) {
@@ -3091,7 +3091,7 @@ function enableSkillForAgentConfig(configPath, skillNames) {
  *
  * 旧结构把 Agent 自学技能放在 `agents/<id>/learned-skills/`，这会让“经验”、
  * “反省”和“技能安装”混在一起，也让列表刷新出现多条来源链。新结构只有一个
- * 全局 skill pool：迁移时复制旧技能到 `{HANA_HOME}/skills`，并只把复制后的
+ * 全局 skill pool：迁移时复制旧技能到 `{LINGXI_HOME}/skills`，并只把复制后的
  * skill name 写入来源 Agent 的 enabled 列表。为避免未来新 Agent 默认打开这些
  * 个性化技能，迁移出的 SKILL.md 会显式写入 `default-enabled: false`。
  */

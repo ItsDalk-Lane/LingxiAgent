@@ -18,7 +18,7 @@ const UPDATE_CHANNEL_FILE_NAME = "update-channel.json";
 const UPDATE_CHANNEL_VERSION = 1;
 // 邀请核销服务地址。内置默认值刻意留空：留空即"通道未配置"，设置页不渲染
 // 任何邀请入口，正式构建在服务上线前不会露出半个按钮。上线后填这里，
-// 或用 HANA_INVITE_API_URL 覆盖。
+// 或用 LINGXI_INVITE_API_URL 覆盖。
 const DEFAULT_INVITE_API_URL = "";
 const DEFAULT_GITHUB_OWNER = "liliMozi";
 const DEFAULT_GITHUB_REPO = "openhanako";
@@ -74,7 +74,7 @@ function createInviteChannelFeedConfig(rawFeedUrl, digestBaseUrl = "") {
   };
 }
 
-// ── 更新通道状态文件（{HANA_HOME}/update-channel.json）──
+// ── 更新通道状态文件（{LINGXI_HOME}/update-channel.json）──
 
 function updateChannelFilePathOrNull() {
   if (!_hanakoHome) return null;
@@ -149,9 +149,9 @@ function hashDeviceId(deviceId) {
 }
 
 function resolveUpdateFeedConfig(env = process.env) {
-  const explicitFeedUrl = env.HANA_UPDATE_FEED_URL || "";
-  const source = String(env.HANA_UPDATE_SOURCE || env.HANA_UPDATE_PROVIDER || "").trim().toLowerCase();
-  const digestBaseUrl = env.HANA_UPDATE_DIGEST_BASE_URL || "";
+  const explicitFeedUrl = env.LINGXI_UPDATE_FEED_URL || "";
+  const source = String(env.LINGXI_UPDATE_SOURCE || env.LINGXI_UPDATE_PROVIDER || "").trim().toLowerCase();
+  const digestBaseUrl = env.LINGXI_UPDATE_DIGEST_BASE_URL || "";
 
   // 显式环境变量最优先：它是运维/调试的直接指令，压过任何持久化状态。
   if (explicitFeedUrl) {
@@ -657,7 +657,7 @@ function setupAutoUpdater() {
 // ── 邀请码核销 ──
 
 function resolveInviteApiUrl(env = process.env) {
-  return trimTrailingSlash(env.HANA_INVITE_API_URL || DEFAULT_INVITE_API_URL);
+  return trimTrailingSlash(env.LINGXI_INVITE_API_URL || DEFAULT_INVITE_API_URL);
 }
 
 function inviteStatus() {

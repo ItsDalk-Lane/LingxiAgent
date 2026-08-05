@@ -630,7 +630,7 @@ async function downloadMarketplaceRelease({ engine, plugin }: { engine: any; plu
     throw err;
   }
   if (!engine.hanakoHome) {
-    const err = new Error("HANA_HOME is unavailable for plugin release installation") as Error & { status: number };
+    const err = new Error("LINGXI_HOME is unavailable for plugin release installation") as Error & { status: number };
     err.status = 500;
     throw err;
   }

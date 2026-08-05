@@ -48,7 +48,7 @@ describe("resolveShellProfile", () => {
   it("uses an explicit Windows PowerShell executable when configured", () => {
     const profile = resolveShellProfile({
       platform: "win32",
-      env: { HANA_POWERSHELL: "C:\\Program Files\\PowerShell\\7\\pwsh.exe" },
+      env: { LINGXI_POWERSHELL: "C:\\Program Files\\PowerShell\\7\\pwsh.exe" },
     });
     expect(profile.executable).toBe("C:\\Program Files\\PowerShell\\7\\pwsh.exe");
     expect(profileLabel(profile)).toBe("pwsh");
@@ -90,12 +90,12 @@ describe("resolveShellProfile", () => {
         args: ["-lc"],
         label: `bundled:${preferBundled}:${env.PATH}`,
       }),
-      getWin32ShellEnvForRuntime: (env, shellInfo) => ({ ...env, HANA_SHELL_LABEL: shellInfo.label }),
+      getWin32ShellEnvForRuntime: (env, shellInfo) => ({ ...env, LINGXI_SHELL_LABEL: shellInfo.label }),
     });
     expect(profile.id).toBe("windows-git-bash");
     expect(profile.family).toBe("posix");
     expect(profile.executable).toBe("C:\\Hanako\\resources\\git\\bin\\bash.exe");
     expect(profile.argsForCommand("pwd")).toEqual(["-lc", "pwd"]);
-    expect(profile.env.HANA_SHELL_LABEL).toBe("bundled:true:C:\\Hanako\\bin");
+    expect(profile.env.LINGXI_SHELL_LABEL).toBe("bundled:true:C:\\Hanako\\bin");
   });
 });

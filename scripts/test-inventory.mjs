@@ -74,7 +74,7 @@ function analyzeFile(file) {
   const hasAcceptanceLanguage = /验收测试|acceptance test|issue-specific|临时验收|Provider 兼容层架构统一 plan 收尾/i.test(text);
   const flags = {
     hasSnapshot: text.includes("toMatchSnapshot") || text.includes("toMatchInlineSnapshot"),
-    hasFsTmp: /\bmkdtemp(?:Sync)?\b|\btmpdir\b|\bHANA_HOME\b|\.hanako(?:-dev)?/.test(haystack),
+    hasFsTmp: /\bmkdtemp(?:Sync)?\b|\btmpdir\b|\bLINGXI_HOME\b|\.hanako(?:-dev)?/.test(haystack),
     hasRoute: /\bHono\b|\bfetch\s*\(|route\b|server\/routes|\bHTTP\b/i.test(haystack),
     hasSecurity: /security|auth|capability|permission|credential|secret|route-security|access|principal|grant|cors|sandbox/i.test(haystack),
     hasBuild: /build|bundle|pack|runtime|native|electron|preload|server|installer|asar|nft/i.test(rel),
@@ -82,7 +82,7 @@ function analyzeFile(file) {
     hasResource: /resource|session[-_ ]?file|mediaitem|sidecar|artifact-tool|managed_cache/i.test(haystack),
     hasProvider: /provider|model payload|reasoning_content|thinking|deepseek|openai|qwen|mimo|zhipu|llm-client/i.test(haystack),
     hasPlatform: /win32|windows|linux|macos|darwin|cross[-_ ]?platform|path separator|shell|seatbelt|bwrap|appcontainer|sandbox/i.test(haystack),
-    hasPersistence: /migration|persist|store|registry|sidecar|sqlite|jsonl|yaml|atomic|write|read|cache|HANA_HOME|mkdtemp/i.test(haystack),
+    hasPersistence: /migration|persist|store|registry|sidecar|sqlite|jsonl|yaml|atomic|write|read|cache|LINGXI_HOME|mkdtemp/i.test(haystack),
     hasUiState: /desktop\/src\/react|zustand|selector|slice|store|app-events|window\.dispatchEvent|localStorage|sessionStorage/i.test(haystack),
     hasIssueRef: issueRefs.length > 0,
     isIssueNamed,
@@ -174,7 +174,7 @@ function deleteOrMergeCandidate(flags, category, decision) {
   if (category.startsWith("regression")) candidates.push("merge into permanent behavior-named contract if coverage is still unique");
   if (decision === "QUARANTINE") candidates.push("review for implementation detail, duplicate coverage, or obsolete scaffold value");
   if (flags.touchesPrivateMock) candidates.push("rewrite away from private-field/mock coupling if kept");
-  if (flags.hardcodesHanaHome) candidates.push("replace hardcoded Hana data directory with injected temp HANA_HOME");
+  if (flags.hardcodesHanaHome) candidates.push("replace hardcoded Hana data directory with injected temp LINGXI_HOME");
   if (!candidates.length) candidates.push("none in first-pass inventory");
   return candidates.join("; ");
 }

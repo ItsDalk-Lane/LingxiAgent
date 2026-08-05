@@ -5,7 +5,7 @@
  *
  * Positive direction: spawns the built open-composition server (via its
  * packaged Node runtime + bootstrap.js, the same two files the shell/cmd
- * wrapper execs into) under a throwaway HANA_HOME, waits for it to bind and
+ * wrapper execs into) under a throwaway LINGXI_HOME, waits for it to bind and
  * publish server-info.json, then makes one authenticated loopback HTTP
  * request to `/api/server/identity` and asserts a 200 with the expected
  * shape. This is the actual proof the open build boots and serves traffic
@@ -101,9 +101,9 @@ function spawnOpenServer({ serverDir, isWin, hanakoHome, extraEnv = {} }) {
     cwd: serverDir,
     env: {
       ...process.env,
-      HANA_ROOT: serverDir,
-      HANA_SERVER_ENTRY: path.join(serverDir, "bundle", "index.js"),
-      HANA_HOME: hanakoHome,
+      LINGXI_ROOT: serverDir,
+      LINGXI_SERVER_ENTRY: path.join(serverDir, "bundle", "index.js"),
+      LINGXI_HOME: hanakoHome,
       ...extraEnv,
     },
     stdio: ["ignore", "pipe", "pipe"],

@@ -54,8 +54,8 @@ python3 skills2set/hana-plugin-creator/scripts/create_hana_plugin.py "My Plugin"
 
 当 Hana / Codex 这类 Agent 直接帮用户开发插件时，优先走 dev loop，而不是把半成品复制到正式插件目录：
 
-1. 插件源码放在当前工作区，或 `${HANA_HOME}/plugin-dev-sources/`。
-2. 调用 EventBus `plugin.dev.install` 或 HTTP `POST /api/plugins/dev/install`，把源码复制到 `${HANA_HOME}/plugins-dev/<pluginId>` 并加载。
+1. 插件源码放在当前工作区，或 `${LINGXI_HOME}/plugin-dev-sources/`。
+2. 调用 EventBus `plugin.dev.install` 或 HTTP `POST /api/plugins/dev/install`，把源码复制到 `${LINGXI_HOME}/plugins-dev/<pluginId>` 并加载。
 3. 修改源码后调用 `plugin.dev.reload` 或 `POST /api/plugins/dev/:id/reload`。
 4. 需要控制生命周期时调用 `plugin.dev.disable`、`plugin.dev.enable`、`plugin.dev.reset`、`plugin.dev.uninstall`，或对应 HTTP：`PUT /api/plugins/dev/:id/enabled`、`POST /api/plugins/dev/:id/reset`、`DELETE /api/plugins/dev/:id`。
 5. 工具插件用 `plugin.dev.invokeTool` 或 `POST /api/plugins/dev/:id/tools/:toolName/invoke` 做 smoke test。调用体优先传 `sessionId` 或 `sessionRef`；`sessionPath` 只作为旧插件兼容 locator。
@@ -63,7 +63,7 @@ python3 skills2set/hana-plugin-creator/scripts/create_hana_plugin.py "My Plugin"
 
 Agent 可见的 dev 工具默认关闭。用户需要在设置 → 插件 → 权限中开启"允许 Agent 插件开发工具"，开启后 Agent 才会看到 `plugin_dev_install`、`plugin_dev_reload`、`plugin_dev_disable`、`plugin_dev_enable`、`plugin_dev_reset`、`plugin_dev_uninstall`、`plugin_dev_invoke_tool`、`plugin_dev_diagnostics`、`plugin_dev_list_surfaces`、`plugin_dev_describe_surface`、`plugin_dev_run_scenario`。
 
-开发态权限来自 Hana 记住的 dev slot，而不是 manifest 自己声明。`devRunId` 是一次 dev install/reload 的运行护栏，调用 enable/disable/reset/uninstall 时建议带上，避免旧上下文误操作新的开发槽。dev 操作只允许作用于 `${HANA_HOME}/plugins-dev/` 中的 runtime copy，不会写入 `${HANA_HOME}/plugins/`，也不会污染正式插件的禁用偏好。
+开发态权限来自 Hana 记住的 dev slot，而不是 manifest 自己声明。`devRunId` 是一次 dev install/reload 的运行护栏，调用 enable/disable/reset/uninstall 时建议带上，避免旧上下文误操作新的开发槽。dev 操作只允许作用于 `${LINGXI_HOME}/plugins-dev/` 中的 runtime copy，不会写入 `${LINGXI_HOME}/plugins/`，也不会污染正式插件的禁用偏好。
 
 `full-access` dev 插件必须显式传 `allowFullAccess: true`，全局社区插件开关不会自动授权开发态插件。
 
@@ -97,7 +97,7 @@ UI 插件调试时，先用 `plugin.dev.listSurfaces` 找到 page / widget，再
 
 - **拖拽安装**：将插件文件夹或 .zip 拖入设置 → 插件页面的安装区
 - **文件选择器**：点击安装区，通过文件选择器选择插件文件夹或 .zip
-- **手动安装**：将插件目录放到 `${HANA_HOME}/plugins/`。实际目录可在设置 → 插件页面或 `/api/plugins/settings` 的 `plugins_dir` 查看
+- **手动安装**：将插件目录放到 `${LINGXI_HOME}/plugins/`。实际目录可在设置 → 插件页面或 `/api/plugins/settings` 的 `plugins_dir` 查看
 
 ### 管理操作
 
@@ -109,7 +109,7 @@ UI 插件调试时，先用 `plugin.dev.listSurfaces` 找到 page / widget，再
 
 ### 插件数据
 
-插件私有数据自动存放在 `${HANA_HOME}/plugin-data/{pluginId}/`。删除插件时此目录保留，重新安装后配置还在。
+插件私有数据自动存放在 `${LINGXI_HOME}/plugin-data/{pluginId}/`。删除插件时此目录保留，重新安装后配置还在。
 
 ## 目录结构
 
@@ -926,7 +926,7 @@ export default definePlugin({
 也可以继续使用传统 class 形式：
 
 ```js
-import { HANA_BUS_SKIP } from "@hana/plugin-runtime";
+import { LINGXI_BUS_SKIP } from "@hana/plugin-runtime";
 
 export default class MyPlugin {
   async onload() {
@@ -942,7 +942,7 @@ export default class MyPlugin {
     // register() 注册的资源在卸载时自动清理（逆序）
     this.register(
       this.ctx.bus.handle("bridge:send", async (payload) => {
-        if (payload.platform !== "feishu") return HANA_BUS_SKIP;
+        if (payload.platform !== "feishu") return LINGXI_BUS_SKIP;
         await this.sendToFeishu(payload);
         return { sent: true };
       })
@@ -961,16 +961,16 @@ export default class MyPlugin {
 
 ## 总线通信（bus.request / bus.handle）
 
-Plugin 间通信通过 EventBus 的请求-响应机制。`bus.handle` 需要 full-access 权限，`bus.request` 所有插件都可以用。`bus.listCapabilities()` / `bus.getCapability(type)` 可以读取当前稳定能力目录，目录记录能力名、输入输出 schema、权限要求、错误码、稳定性和当前是否有 handler 可用。新插件建议用 `@hana/plugin-runtime` 的 `defineBusHandler()`、`requestBus()` 和 `HANA_BUS_SKIP`，这样 handler 类型、请求参数和链式跳过语义都来自 SDK，而不是手写约定。
+Plugin 间通信通过 EventBus 的请求-响应机制。`bus.handle` 需要 full-access 权限，`bus.request` 所有插件都可以用。`bus.listCapabilities()` / `bus.getCapability(type)` 可以读取当前稳定能力目录，目录记录能力名、输入输出 schema、权限要求、错误码、稳定性和当前是否有 handler 可用。新插件建议用 `@hana/plugin-runtime` 的 `defineBusHandler()`、`requestBus()` 和 `LINGXI_BUS_SKIP`，这样 handler 类型、请求参数和链式跳过语义都来自 SDK，而不是手写约定。
 
 ```js
-import { defineBusHandler, HANA_BUS_SKIP, requestBus } from "@hana/plugin-runtime";
+import { defineBusHandler, LINGXI_BUS_SKIP, requestBus } from "@hana/plugin-runtime";
 
 // Plugin A（full-access）: 注册能力
 const bridgeSend = defineBusHandler({
   type: "bridge:send",
   async handle(payload) {
-    if (payload.platform !== "telegram") return HANA_BUS_SKIP;
+    if (payload.platform !== "telegram") return LINGXI_BUS_SKIP;
     await telegramBot.send(payload.chatId, payload.text);
     return { sent: true };
   },
@@ -1014,12 +1014,12 @@ if (capability?.available) {
 
 **命名规范**：`领域:动作`，冒号分隔。如 `bridge:send`、`memory:query`、`timer:schedule`。
 
-**SKIP 链**：同一事件类型可以注册多个 handler。系统按注册顺序调用，直到某个 handler 返回非 `HANA_BUS_SKIP` 的值。返回 `HANA_BUS_SKIP` 表示"我不处理，交给下一个"：
+**SKIP 链**：同一事件类型可以注册多个 handler。系统按注册顺序调用，直到某个 handler 返回非 `LINGXI_BUS_SKIP` 的值。返回 `LINGXI_BUS_SKIP` 表示"我不处理，交给下一个"：
 
 ```js
 this.register(
   this.ctx.bus.handle("bridge:send", async (payload) => {
-    if (payload.platform !== "telegram") return HANA_BUS_SKIP;
+    if (payload.platform !== "telegram") return LINGXI_BUS_SKIP;
     await telegramBot.send(payload.chatId, payload.text);
     return { sent: true };
   })
@@ -1270,10 +1270,10 @@ https://raw.githubusercontent.com/liliMozi/OH-Plugins/main/marketplace.json
 
 开发调试仍可用环境变量覆盖：
 
-- `HANA_PLUGIN_MARKETPLACE_FILE=/path/to/marketplace.json`
-- `HANA_PLUGIN_MARKETPLACE_URL=https://.../marketplace.json`
+- `LINGXI_PLUGIN_MARKETPLACE_FILE=/path/to/marketplace.json`
+- `LINGXI_PLUGIN_MARKETPLACE_URL=https://.../marketplace.json`
 
-没有配置环境变量时，Hana 会先尝试读取 `${HANA_HOME}/plugin-marketplace/marketplace.json`（本地开发覆盖），如果不存在则读取官方 `OH-Plugins` URL。市场 index 的基本形状与 `OH-Plugins` 仓库一致：
+没有配置环境变量时，Hana 会先尝试读取 `${LINGXI_HOME}/plugin-marketplace/marketplace.json`（本地开发覆盖），如果不存在则读取官方 `OH-Plugins` URL。市场 index 的基本形状与 `OH-Plugins` 仓库一致：
 
 ```json
 {
@@ -1315,7 +1315,7 @@ https://raw.githubusercontent.com/liliMozi/OH-Plugins/main/marketplace.json
 
 市场版本管理以 `versions[]` 为长期契约：每一项声明 `version`、该版本的 `compatibility.minAppVersion` 和对应的 `distribution`。没有 `versions[]` 时，Hana 会把根级 `version` / `compatibility` / `distribution` 视为单版本条目。客户端会按 SemVer 选择“当前 app 能运行的最高版本”，同时保留 `latestVersion`、`selectedVersion`、`installedVersion`、`updateAvailable`、`downgrade`、`reinstall`、`compatible`、`installAction` 和 `canInstall` 给 UI 展示。
 
-如果已安装版本高于当前 app 可兼容的最高市场版本，安装动作会被标记为 `downgrade`，必须显式传 `allowDowngrade: true` 才能继续。拖拽 / 本地路径安装同样会阻止隐式降级。更新安装会先备份旧目录到 `${HANA_HOME}/plugin-backups/<pluginId>/`，新版本加载失败时恢复旧目录并重新加载；成功后 `${HANA_HOME}/plugin-installs.json` 会记录来源、版本、release URL 和 sha256，供后续市场状态判断。
+如果已安装版本高于当前 app 可兼容的最高市场版本，安装动作会被标记为 `downgrade`，必须显式传 `allowDowngrade: true` 才能继续。拖拽 / 本地路径安装同样会阻止隐式降级。更新安装会先备份旧目录到 `${LINGXI_HOME}/plugin-backups/<pluginId>/`，新版本加载失败时恢复旧目录并重新加载；成功后 `${LINGXI_HOME}/plugin-installs.json` 会记录来源、版本、release URL 和 sha256，供后续市场状态判断。
 
 ## 前向兼容
 

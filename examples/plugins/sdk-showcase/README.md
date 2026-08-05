@@ -7,7 +7,7 @@ This example demonstrates the four SDK layers together:
 - `@hana/plugin-components` for Hana-styled React iframe UI.
 - `@hana/plugin-protocol` indirectly through the iframe SDK.
 
-The `routes/page.js` file serves a minimal iframe shell. In a real plugin, bundle the UI from `ui/Panel.tsx` into `assets/panel.js` and `assets/panel.css`, then copy this directory into `${HANA_HOME}/plugins/sdk-showcase`.
+The `routes/page.js` file serves a minimal iframe shell. In a real plugin, bundle the UI from `ui/Panel.tsx` into `assets/panel.js` and `assets/panel.css`, then copy this directory into `${LINGXI_HOME}/plugins/sdk-showcase`.
 
 Hana serves plugin static files through `/api/plugins/{pluginId}/assets/...` with a path-scoped asset session cookie. Keep only built UI files and public media under `assets/`; use `hana.assets.url(path)` from browser code for images, JSON, wasm, or other static files referenced after the iframe has loaded.
 

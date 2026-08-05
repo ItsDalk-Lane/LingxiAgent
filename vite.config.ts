@@ -19,7 +19,7 @@ interface DevWebClientConfig {
  * 做法：在 HTML 处理前把旧 CSS link 替换成占位符，build 后再还原。
  */
 function preserveLegacyCss(): Plugin {
-  const CSS_PLACEHOLDER_RE = /<!--HANA_CSS:(.*?)-->/g;
+  const CSS_PLACEHOLDER_RE = /<!--LINGXI_CSS:(.*?)-->/g;
   return {
     name: 'hana-preserve-legacy-css',
     enforce: 'pre',
@@ -30,7 +30,7 @@ function preserveLegacyCss(): Plugin {
         // 保留 id 等属性
         return html.replace(
           /<link\s+rel="stylesheet"\s+href="([^"]+)"([^>]*)>/g,
-          (_match, href, rest) => `<!--HANA_CSS:${href}${rest}-->`
+          (_match, href, rest) => `<!--LINGXI_CSS:${href}${rest}-->`
         );
       },
     },
@@ -46,7 +46,7 @@ function restoreLegacyCss(): Plugin {
       handler(html) {
         // 把占位符还原为 <link> 标签
         return html.replace(
-          /<!--HANA_CSS:(.*?)-->/g,
+          /<!--LINGXI_CSS:(.*?)-->/g,
           (_match, content) => {
             // content 是 "styles.css" 或 "themes/warm-paper.css" id="themeSheet"
             const parts = content.split(/\s+/);
@@ -81,15 +81,15 @@ function useSourceThemeInDev(): Plugin {
 }
 
 function readDevWebClientConfig(): DevWebClientConfig | null {
-  if (process.env.HANA_DEV_WEB !== '1') return null;
-  const apiBaseUrl = process.env.HANA_DEV_WEB_API_BASE_URL?.trim();
+  if (process.env.LINGXI_DEV_WEB !== '1') return null;
+  const apiBaseUrl = process.env.LINGXI_DEV_WEB_API_BASE_URL?.trim();
   if (!apiBaseUrl) {
-    throw new Error('HANA_DEV_WEB requires HANA_DEV_WEB_API_BASE_URL');
+    throw new Error('LINGXI_DEV_WEB requires LINGXI_DEV_WEB_API_BASE_URL');
   }
   const parsed = new URL(apiBaseUrl);
-  const serverPort = process.env.HANA_DEV_WEB_CLIENT_PORT?.trim() || parsed.port;
+  const serverPort = process.env.LINGXI_DEV_WEB_CLIENT_PORT?.trim() || parsed.port;
   if (!serverPort) {
-    throw new Error('HANA_DEV_WEB requires HANA_DEV_WEB_CLIENT_PORT or a port in HANA_DEV_WEB_API_BASE_URL');
+    throw new Error('LINGXI_DEV_WEB requires LINGXI_DEV_WEB_CLIENT_PORT or a port in LINGXI_DEV_WEB_API_BASE_URL');
   }
   return { serverPort, apiBaseUrl };
 }
@@ -97,7 +97,7 @@ function readDevWebClientConfig(): DevWebClientConfig | null {
 /**
  * Browser-only dev entry for Codex Preview.
  * Electron keeps using preload; this injects only the Vite-facing browser
- * endpoint when scripts/dev-web.js starts Vite with HANA_DEV_WEB=1. The
+ * endpoint when scripts/dev-web.js starts Vite with LINGXI_DEV_WEB=1. The
  * loopback owner token stays in the Vite proxy environment.
  */
 function injectDevWebConfig(): Plugin {
@@ -113,7 +113,7 @@ function injectDevWebConfig(): Plugin {
         const payload = JSON.stringify(config).replace(/</g, '\\u003c');
         return html.replace(
           '</head>',
-          `<script>window.__HANA_DEV_WEB__=${payload};</script>\n</head>`,
+          `<script>window.__LINGXI_DEV_WEB__=${payload};</script>\n</head>`,
         );
       },
     },
@@ -218,11 +218,11 @@ function serveMobilePwaStaticFiles(): Plugin {
 }
 
 function createDevWebProxy(): Record<string, ProxyOptions> | undefined {
-  if (process.env.HANA_DEV_WEB !== '1') return undefined;
-  const target = process.env.HANA_DEV_WEB_SERVER_URL?.trim();
-  const token = process.env.HANA_DEV_WEB_SERVER_TOKEN?.trim();
+  if (process.env.LINGXI_DEV_WEB !== '1') return undefined;
+  const target = process.env.LINGXI_DEV_WEB_SERVER_URL?.trim();
+  const token = process.env.LINGXI_DEV_WEB_SERVER_TOKEN?.trim();
   if (!target || !token) {
-    throw new Error('HANA_DEV_WEB proxy requires HANA_DEV_WEB_SERVER_URL and HANA_DEV_WEB_SERVER_TOKEN');
+    throw new Error('LINGXI_DEV_WEB proxy requires LINGXI_DEV_WEB_SERVER_URL and LINGXI_DEV_WEB_SERVER_TOKEN');
   }
   const auth = `Bearer ${token}`;
   const targetUrl = new URL(target);

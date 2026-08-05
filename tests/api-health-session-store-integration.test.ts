@@ -64,11 +64,11 @@ async function spawnOpenServer(hanaHome: string) {
     cwd: root,
     env: {
       ...process.env,
-      HANA_HOME: hanaHome,
-      HANA_PORT: "0",
-      HANA_ROOT: root,
-      HANA_SERVER_ENTRY: path.join(root, "server", "main-open.ts"),
-      HANA_CREATE_STARTUP_SESSION: "0",
+      LINGXI_HOME: hanaHome,
+      LINGXI_PORT: "0",
+      LINGXI_ROOT: root,
+      LINGXI_SERVER_ENTRY: path.join(root, "server", "main-open.ts"),
+      LINGXI_CREATE_STARTUP_SESSION: "0",
     },
     stdio: ["ignore", "pipe", "pipe"],
   });
@@ -79,7 +79,7 @@ async function spawnOpenServer(hanaHome: string) {
 }
 
 describe("/api/health sessionStore block (real spawned server)", () => {
-  it("fresh HANA_HOME → sessionStore reports not degraded", async () => {
+  it("fresh LINGXI_HOME → sessionStore reports not degraded", async () => {
     const hanaHome = fs.mkdtempSync(path.join(os.tmpdir(), "hana-health-sessionstore-fresh-"));
     let child: ReturnType<typeof spawn> | null = null;
     try {
@@ -101,7 +101,7 @@ describe("/api/health sessionStore block (real spawned server)", () => {
     }
   }, 60000);
 
-  it("corrupt session-manifest.db present at boot → sessionStore reports degraded with store_quarantined, and detail never leaks the HANA_HOME absolute path", async () => {
+  it("corrupt session-manifest.db present at boot → sessionStore reports degraded with store_quarantined, and detail never leaks the LINGXI_HOME absolute path", async () => {
     const hanaHome = fs.mkdtempSync(path.join(os.tmpdir(), "hana-health-sessionstore-corrupt-"));
     // 复现 session-manifest-engine.test.ts 的"损坏 db → 隔离重建"路径：预置一个
     // 非 sqlite 内容的 session-manifest.db，engine 构造时会隔离它、重新建库，

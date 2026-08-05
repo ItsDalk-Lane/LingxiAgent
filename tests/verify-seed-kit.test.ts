@@ -77,7 +77,7 @@ async function buildValidKit(root: string, opts: { platform?: string; arch?: str
     version: "0.381.0",
     platform,
     arch,
-    env: { HANA_SIGN_KEY: identity.keyPath, HANA_SIGN_KEYSET: identity.keysetPath },
+    env: { LINGXI_SIGN_KEY: identity.keyPath, LINGXI_SIGN_KEYSET: identity.keysetPath },
     log: () => {},
   });
   return { artifactOutDir, platformArch: `${platform}-${arch}`, identity };

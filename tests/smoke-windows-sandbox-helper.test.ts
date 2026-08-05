@@ -45,11 +45,11 @@ describe("Windows sandbox helper CI smoke", () => {
       env: { SystemRoot: "C:\\Windows" },
     });
 
-    expect(spec.env.HANA_WIN32_SANDBOX_DEBUG).toBe("1");
+    expect(spec.env.LINGXI_WIN32_SANDBOX_DEBUG).toBe("1");
     expect(spec.args).not.toContain("--current-desktop");
     expect(spec.args).not.toContain("--verbatim-last-arg");
     expect(spec.args).toContain("C:\\Windows\\System32\\cmd.exe");
-    expect(spec.args.at(-1)).toContain("HANA_RESTRICTED_TOKEN_OK");
+    expect(spec.args.at(-1)).toContain("LINGXI_RESTRICTED_TOKEN_OK");
   });
 
   it("keeps restricted helper smoke stdin closed like production one-shot execution", () => {

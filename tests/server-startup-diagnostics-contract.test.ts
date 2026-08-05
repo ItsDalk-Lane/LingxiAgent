@@ -77,9 +77,9 @@ describe("server startup diagnostics contract", () => {
 
   it("passes validated desktop resources and the resolved guardian to the server before spawn", () => {
     const mainSource = fs.readFileSync(path.join(root, "desktop", "main.cjs"), "utf-8");
-    const resourcesIndex = mainSource.indexOf("serverEnv.HANA_DESKTOP_RESOURCES_PATH = process.resourcesPath;");
+    const resourcesIndex = mainSource.indexOf("serverEnv.LINGXI_DESKTOP_RESOURCES_PATH = process.resourcesPath;");
     const guardianIndex = mainSource.indexOf("const guardianBin = resolveWindowsServerGuardian({");
-    const helperContractIndex = mainSource.indexOf("serverEnv.HANA_WIN32_SANDBOX_HELPER = guardianBin;", guardianIndex);
+    const helperContractIndex = mainSource.indexOf("serverEnv.LINGXI_WIN32_SANDBOX_HELPER = guardianBin;", guardianIndex);
     const spawnIndex = mainSource.indexOf("serverProcess = spawn(launcherBin, launcherArgs", guardianIndex);
 
     expect(resourcesIndex).toBeGreaterThan(-1);
@@ -419,11 +419,11 @@ describe("server startup diagnostics contract", () => {
     expect(bootstrapSource).toContain("[server-bootstrap] server entry import completed");
 
     expect(mainSource).toContain("bootstrap.js");
-    expect(mainSource).toContain("HANA_SERVER_ENTRY");
+    expect(mainSource).toContain("LINGXI_SERVER_ENTRY");
     expect(phasesSource).toContain('path.join(outDir, "bootstrap.js")');
     expect(phasesSource).toContain('"$DIR/bootstrap.js"');
 
-    // The Windows wrapper's HANA_SERVER_ENTRY path used to be a hardcoded
+    // The Windows wrapper's LINGXI_SERVER_ENTRY path used to be a hardcoded
     // "bundle\\index.js" literal; writeServerWrapperScripts now derives it
     // from a parameterized serverEntryRelPath (default "bundle/index.js"),
     // so the backslash form is verified by actually generating the .cmd
@@ -452,8 +452,8 @@ describe("server startup diagnostics contract", () => {
       );
 
       const env = { ...process.env };
-      delete env.HANA_ROOT;
-      delete env.HANA_SERVER_ENTRY;
+      delete env.LINGXI_ROOT;
+      delete env.LINGXI_SERVER_ENTRY;
       const result = spawnSync(process.execPath, [path.join(serverRoot, "bootstrap.js")], {
         env,
         encoding: "utf-8",
@@ -473,9 +473,9 @@ describe("server startup diagnostics contract", () => {
     const mainSource = fs.readFileSync(path.join(root, "desktop", "main.cjs"), "utf-8");
     const serverSource = fs.readFileSync(path.join(root, "server", "index.ts"), "utf-8");
 
-    expect(mainSource).toContain("HANA_CREATE_STARTUP_SESSION");
+    expect(mainSource).toContain("LINGXI_CREATE_STARTUP_SESSION");
     expect(mainSource).toContain('"0"');
-    expect(serverSource).toContain('process.env.HANA_CREATE_STARTUP_SESSION !== "0"');
+    expect(serverSource).toContain('process.env.LINGXI_CREATE_STARTUP_SESSION !== "0"');
     expect(serverSource).toContain("③ 跳过启动期 session 创建");
   });
 
@@ -533,9 +533,9 @@ describe("server startup diagnostics contract", () => {
     const mainSource = fs.readFileSync(path.join(root, "desktop", "main.cjs"), "utf-8");
     const serverSource = fs.readFileSync(path.join(root, "server", "index.ts"), "utf-8");
 
-    expect(serverSource).toContain('ownerKind: process.env.HANA_SERVER_OWNER === "desktop" ? "desktop" : "standalone"');
-    expect(mainSource).toContain('HANA_SERVER_OWNER: "desktop"');
-    expect(mainSource).toContain("HANA_SERVER_OWNER_PID: String(process.pid)");
+    expect(serverSource).toContain('ownerKind: process.env.LINGXI_SERVER_OWNER === "desktop" ? "desktop" : "standalone"');
+    expect(mainSource).toContain('LINGXI_SERVER_OWNER: "desktop"');
+    expect(mainSource).toContain("LINGXI_SERVER_OWNER_PID: String(process.pid)");
     expect(mainSource).toContain("let reusedServerOwned = false");
     expect(mainSource).toContain("reusedServerOwned = isDesktopOwnedServerInfo(existingInfo)");
     expect(mainSource).toContain("if (!reusedServerOwned)");
@@ -612,13 +612,13 @@ describe("desktop launch failure dialog: data-epoch dedicated branches (C7 E4)",
     return fs.mkdtempSync(path.join(os.tmpdir(), "hana-desktop-epoch-dialog-"));
   }
 
-  it("recognizes the HANA_DATA_EPOCH_BLOCKED marker and ignores unrelated crash text", () => {
+  it("recognizes the LINGXI_DATA_EPOCH_BLOCKED marker and ignores unrelated crash text", () => {
     const context = buildDataEpochDialogContext(makeHomeDir());
-    expect(context.detectDataEpochLaunchMarker("[stderr] HANA_DATA_EPOCH_BLOCKED reason=epoch-downgrade-blocked\n")).toMatchObject({
+    expect(context.detectDataEpochLaunchMarker("[stderr] LINGXI_DATA_EPOCH_BLOCKED reason=epoch-downgrade-blocked\n")).toMatchObject({
       kind: "blocked",
       reason: "epoch-downgrade-blocked",
     });
-    expect(context.detectDataEpochLaunchMarker("[stderr] HANA_DATA_EPOCH_TRANSITION_INCOMPLETE reason=incomplete-transition\n")).toMatchObject({
+    expect(context.detectDataEpochLaunchMarker("[stderr] LINGXI_DATA_EPOCH_TRANSITION_INCOMPLETE reason=incomplete-transition\n")).toMatchObject({
       kind: "incomplete",
       reason: "incomplete-transition",
     });
@@ -632,7 +632,7 @@ describe("desktop launch failure dialog: data-epoch dedicated branches (C7 E4)",
       await writeDataEpochStamp(homeDir, { minimumReaderEpoch: 5, committedDataEpoch: 5, lastVersion: "9.9.9" });
       const context = buildDataEpochDialogContext(homeDir);
 
-      const crashInfo = `=== HanaAgent Crash Log ===\n--- Server Output ---\n[stderr] HANA_DATA_EPOCH_BLOCKED reason=epoch-downgrade-blocked\n[stderr] [data-epoch] 数据安全闸拒绝启动\n`;
+      const crashInfo = `=== HanaAgent Crash Log ===\n--- Server Output ---\n[stderr] LINGXI_DATA_EPOCH_BLOCKED reason=epoch-downgrade-blocked\n[stderr] [data-epoch] 数据安全闸拒绝启动\n`;
       const detail = context.buildLaunchFailureDialogDetail({ code: undefined, message: "" }, crashInfo);
 
       expect(detail).toContain("数据已被更新的版本使用");
@@ -646,7 +646,7 @@ describe("desktop launch failure dialog: data-epoch dedicated branches (C7 E4)",
       expect(detail).toContain("恢复工具");
       // Full stderr tail is still appended for diagnosability, same pattern
       // as the STALE_SERVER_UNCLEANED / FOREIGN_SERVER_RUNNING branches.
-      expect(detail).toContain("HANA_DATA_EPOCH_BLOCKED reason=epoch-downgrade-blocked");
+      expect(detail).toContain("LINGXI_DATA_EPOCH_BLOCKED reason=epoch-downgrade-blocked");
     } finally {
       fs.rmSync(homeDir, { recursive: true, force: true });
     }
@@ -656,7 +656,7 @@ describe("desktop launch failure dialog: data-epoch dedicated branches (C7 E4)",
     const homeDir = makeHomeDir();
     try {
       const context = buildDataEpochDialogContext(homeDir); // no stamp written: status "missing"
-      const crashInfo = "HANA_DATA_EPOCH_BLOCKED reason=epoch-downgrade-blocked\n";
+      const crashInfo = "LINGXI_DATA_EPOCH_BLOCKED reason=epoch-downgrade-blocked\n";
       const detail = context.buildLaunchFailureDialogDetail({}, crashInfo);
 
       expect(detail).toContain("数据当前纪元：未知/unknown");
@@ -679,7 +679,7 @@ describe("desktop launch failure dialog: data-epoch dedicated branches (C7 E4)",
       fs.mkdirSync(path.join(homeDir, "data-epoch-checkpoints", "t-dialog.tmp-999"), { recursive: true });
 
       const context = buildDataEpochDialogContext(homeDir);
-      const detail = context.buildLaunchFailureDialogDetail({}, "HANA_DATA_EPOCH_BLOCKED reason=epoch-downgrade-blocked\n");
+      const detail = context.buildLaunchFailureDialogDetail({}, "LINGXI_DATA_EPOCH_BLOCKED reason=epoch-downgrade-blocked\n");
 
       expect(detail).toContain("可用恢复点：有，共 1 个");
       expect(detail).toContain("Recovery point available: Available, 1 found");
@@ -690,7 +690,7 @@ describe("desktop launch failure dialog: data-epoch dedicated branches (C7 E4)",
 
   it("renders a generic bilingual TRANSITION_INCOMPLETE detail without epoch/version fields", () => {
     const context = buildDataEpochDialogContext(makeHomeDir());
-    const detail = context.buildLaunchFailureDialogDetail({}, "HANA_DATA_EPOCH_TRANSITION_INCOMPLETE reason=incomplete-transition\n");
+    const detail = context.buildLaunchFailureDialogDetail({}, "LINGXI_DATA_EPOCH_TRANSITION_INCOMPLETE reason=incomplete-transition\n");
 
     expect(detail).toContain("数据迁移未完成");
     expect(detail).toContain("A data migration did not finish");

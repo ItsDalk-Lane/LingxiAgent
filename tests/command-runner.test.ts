@@ -127,7 +127,7 @@ describe("createCommandRunner", () => {
     }));
     const getWin32ShellEnvForRuntime = vi.fn((env, shellInfo) => ({
       ...env,
-      HANA_SHELL_LABEL: shellInfo.label,
+      LINGXI_SHELL_LABEL: shellInfo.label,
     }));
     const run = createCommandRunner({
       platform: "win32",
@@ -150,7 +150,7 @@ describe("createCommandRunner", () => {
       args: ["-lc", "pwd"],
       env: {
         PATH: "C:\\Windows\\System32",
-        HANA_SHELL_LABEL: "bundled",
+        LINGXI_SHELL_LABEL: "bundled",
       },
     }));
   });

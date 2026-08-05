@@ -4,16 +4,16 @@ import path from "path";
 import { COMPUTER_USE_ERRORS, computerUseError } from "../errors.ts";
 import { createCommandRunner } from "./command-runner.ts";
 
-const HANA_CURSOR_BLOOM_COLOR = "#537D96";
-const HANA_CURSOR_GRADIENT_COLORS = Object.freeze(["#FFFDF8", "#8FAABD", "#2F4A56"]);
-const HANA_CUA_CURSOR_STYLE = Object.freeze({
-  gradient_colors: HANA_CURSOR_GRADIENT_COLORS,
-  bloom_color: HANA_CURSOR_BLOOM_COLOR,
+const LINGXI_CURSOR_BLOOM_COLOR = "#537D96";
+const LINGXI_CURSOR_GRADIENT_COLORS = Object.freeze(["#FFFDF8", "#8FAABD", "#2F4A56"]);
+const LINGXI_CUA_CURSOR_STYLE = Object.freeze({
+  gradient_colors: LINGXI_CURSOR_GRADIENT_COLORS,
+  bloom_color: LINGXI_CURSOR_BLOOM_COLOR,
   image_path: "",
 });
-const HANA_AGENT_CURSOR_CONFIG_ENV = "HANA_AGENT_CURSOR_CONFIG_JSON";
-const HANA_AGENT_SOCKET_PATH_ENV = "HANA_COMPUTER_USE_SOCKET_PATH";
-const HANA_CURSOR_MOTION = Object.freeze({
+const LINGXI_AGENT_CURSOR_CONFIG_ENV = "LINGXI_AGENT_CURSOR_CONFIG_JSON";
+const LINGXI_AGENT_SOCKET_PATH_ENV = "LINGXI_COMPUTER_USE_SOCKET_PATH";
+const LINGXI_CURSOR_MOTION = Object.freeze({
   start_handle: 0.38,
   end_handle: 0.28,
   arc_size: 0.08,
@@ -99,10 +99,10 @@ function pushUniquePosixPath(out: string[], value: any) {
 
 function packagedHelperCandidates({ env, hanaRoot }: any) {
   const roots: string[] = [];
-  if (env.HANA_DESKTOP_IS_PACKAGED === "1") {
-    pushUniquePosixPath(roots, macAppResourcesRoot(env.HANA_DESKTOP_RESOURCES_PATH));
-    pushUniquePosixPath(roots, resourcesRootFromPackagedAppPath(env.HANA_DESKTOP_APP_PATH));
-    pushUniquePosixPath(roots, resourcesRootFromPackagedExecPath(env.HANA_DESKTOP_EXEC_PATH));
+  if (env.LINGXI_DESKTOP_IS_PACKAGED === "1") {
+    pushUniquePosixPath(roots, macAppResourcesRoot(env.LINGXI_DESKTOP_RESOURCES_PATH));
+    pushUniquePosixPath(roots, resourcesRootFromPackagedAppPath(env.LINGXI_DESKTOP_APP_PATH));
+    pushUniquePosixPath(roots, resourcesRootFromPackagedExecPath(env.LINGXI_DESKTOP_EXEC_PATH));
   }
   // Shells predating the desktop path contract launched the server directly
   // from Contents/Resources/server. Accept only that exact app-bundle shape;
@@ -112,7 +112,7 @@ function packagedHelperCandidates({ env, hanaRoot }: any) {
 }
 
 function developmentHelperCandidates({ env, hanaRoot, cwd, arch }: any) {
-  if (env.HANA_DESKTOP_IS_PACKAGED === "1") return [];
+  if (env.LINGXI_DESKTOP_IS_PACKAGED === "1") return [];
   const candidates: string[] = [];
   const normalizedHanaRoot = normalizedAbsolutePosixPath(hanaRoot);
   const normalizedCwd = normalizedAbsolutePosixPath(cwd);
@@ -135,14 +135,14 @@ export function resolveCuaDriverCommand({
   env = process.env,
   homeDir = os.homedir(),
   existsSync = fs.existsSync,
-  hanaRoot = env.HANA_ROOT,
+  hanaRoot = env.LINGXI_ROOT,
   cwd = process.cwd(),
   arch = process.arch,
 } = {}) {
-  const explicitHelper = expandHome(env.HANA_COMPUTER_USE_HELPER_PATH, homeDir);
+  const explicitHelper = expandHome(env.LINGXI_COMPUTER_USE_HELPER_PATH, homeDir);
   if (explicitHelper) return explicitHelper;
 
-  const explicitRuntimeRoot = expandHome(env.HANA_COMPUTER_USE_RUNTIME_ROOT, homeDir);
+  const explicitRuntimeRoot = expandHome(env.LINGXI_COMPUTER_USE_RUNTIME_ROOT, homeDir);
   if (explicitRuntimeRoot) return helperPath(explicitRuntimeRoot);
 
   const packagedCandidates = packagedHelperCandidates({ env, hanaRoot });
@@ -156,7 +156,7 @@ export function resolveCuaDriverCommand({
 
   const candidates = [
     ...developmentHelperCandidates({ env, hanaRoot, cwd, arch }),
-    env.HANA_CUA_DRIVER_PATH,
+    env.LINGXI_CUA_DRIVER_PATH,
     "~/.local/bin/cua-driver",
     "/usr/local/bin/cua-driver",
     "/Applications/CuaDriver.app/Contents/MacOS/cua-driver",
@@ -562,16 +562,16 @@ export function createMacosCuaProvider({
   providerId = "macos:cua",
   platform = process.platform,
   command = resolveCuaDriverCommand(),
-  cursorStyle = HANA_CUA_CURSOR_STYLE,
+  cursorStyle = LINGXI_CUA_CURSOR_STYLE,
   cursorImagePath = null,
-  cursorBloomColor = HANA_CURSOR_BLOOM_COLOR,
+  cursorBloomColor = LINGXI_CURSOR_BLOOM_COLOR,
   cursorEnabled = true,
-  cursorMotion = HANA_CURSOR_MOTION,
+  cursorMotion = LINGXI_CURSOR_MOTION,
   runner = createCommandRunner(),
   timeoutMs = 30000,
   launchRetryAttempts = 3,
   launchRetryDelayMs = 350,
-  socketPath = process.env[HANA_AGENT_SOCKET_PATH_ENV] || defaultHanaComputerUseSocketPath(),
+  socketPath = process.env[LINGXI_AGENT_SOCKET_PATH_ENV] || defaultHanaComputerUseSocketPath(),
   autoStartDaemon = null,
   daemonStartupTimeoutMs = 5000,
 } = {}) {
@@ -596,9 +596,9 @@ export function createMacosCuaProvider({
   function runEnv(baseEnv: any) {
     return {
       ...(baseEnv || process.env),
-      [HANA_AGENT_SOCKET_PATH_ENV]: socketPath,
+      [LINGXI_AGENT_SOCKET_PATH_ENV]: socketPath,
       ...(hanaCursorRuntimeConfig
-        ? { [HANA_AGENT_CURSOR_CONFIG_ENV]: JSON.stringify(hanaCursorRuntimeConfig) }
+        ? { [LINGXI_AGENT_CURSOR_CONFIG_ENV]: JSON.stringify(hanaCursorRuntimeConfig) }
         : {}),
     };
   }

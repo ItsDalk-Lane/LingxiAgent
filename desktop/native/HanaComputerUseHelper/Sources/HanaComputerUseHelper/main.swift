@@ -277,8 +277,8 @@ private enum AppKitBootstrap {
     }
 }
 
-private let hanaAgentCursorConfigEnvKey = "HANA_AGENT_CURSOR_CONFIG_JSON"
-private let hanaAgentSocketPathEnvKey = "HANA_COMPUTER_USE_SOCKET_PATH"
+private let hanaAgentCursorConfigEnvKey = "LINGXI_AGENT_CURSOR_CONFIG_JSON"
+private let hanaAgentSocketPathEnvKey = "LINGXI_COMPUTER_USE_SOCKET_PATH"
 
 private struct HanaCursorRuntimeConfig: Decodable {
     let enabled: Bool?

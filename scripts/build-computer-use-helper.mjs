@@ -21,7 +21,7 @@ export function resolveComputerUseHelperBuildArch({
   arch = process.arch,
 } = {}) {
   const explicitArg = Array.isArray(argv) ? argv[2] : null;
-  return explicitArg || env.HANA_COMPUTER_USE_HELPER_ARCH || arch;
+  return explicitArg || env.LINGXI_COMPUTER_USE_HELPER_ARCH || arch;
 }
 
 export function computerUseHelperOutputDir({
@@ -413,7 +413,7 @@ export function buildComputerUseHelper({
   rootDir = path.resolve(__dirname, ".."),
   platform = process.platform,
   env = process.env,
-  arch = env.HANA_COMPUTER_USE_HELPER_ARCH || process.arch,
+  arch = env.LINGXI_COMPUTER_USE_HELPER_ARCH || process.arch,
 } = {}) {
   if (!shouldBuildComputerUseHelper({ platform })) {
     console.log(`[computer-use-helper] skipped on ${platform}`);

@@ -144,8 +144,8 @@ function maybeHealWin32InstallAcl({
 } = {}) {
   if (!hanakoHome) throw new Error("maybeHealWin32InstallAcl requires hanakoHome");
   if (platform !== "win32") return { status: "skipped", reason: "platform" };
-  if (envFlag(env?.HANA_DISABLE_INSTALL_ACL_HEAL)) return { status: "skipped", reason: "disabled" };
-  if (!isPackaged && !envFlag(env?.HANA_FORCE_INSTALL_ACL_HEAL)) {
+  if (envFlag(env?.LINGXI_DISABLE_INSTALL_ACL_HEAL)) return { status: "skipped", reason: "disabled" };
+  if (!isPackaged && !envFlag(env?.LINGXI_FORCE_INSTALL_ACL_HEAL)) {
     return { status: "skipped", reason: "not-packaged" };
   }
   if (!installDir || !appVersion) {
@@ -211,7 +211,7 @@ function buildInstallAclHealDiagnostics({ hanakoHome } = {}) {
     `Heal state: ${JSON.stringify(state.heal || null)}`,
     `Ineffective probe count: ${state.ineffectiveCount || 0}`,
     `Manual fix (electron/electron#51761): icacls "<installDir>" /grant ${SANDBOX_ACE_GRANT}`,
-    "Env switches: HANA_DISABLE_INSTALL_ACL_HEAL=1 disables the heal; HANA_FORCE_INSTALL_ACL_HEAL=1 forces it in unpackaged builds",
+    "Env switches: LINGXI_DISABLE_INSTALL_ACL_HEAL=1 disables the heal; LINGXI_FORCE_INSTALL_ACL_HEAL=1 forces it in unpackaged builds",
   ].join("\n");
 }
 

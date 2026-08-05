@@ -58,10 +58,10 @@ function spawnServer() {
   removeStaleServerInfo();
 
   const serverEnv = applyDevEnvironment({ ...process.env });
-  serverEnv.HANA_ROOT = rootDir;
-  serverEnv.HANA_SERVER_ENTRY = path.join(rootDir, "server", "main-full.ts");
-  serverEnv.HANA_CREATE_STARTUP_SESSION = "0";
-  serverEnv.HANA_PORT = process.env.HANA_PORT || "0";
+  serverEnv.LINGXI_ROOT = rootDir;
+  serverEnv.LINGXI_SERVER_ENTRY = path.join(rootDir, "server", "main-full.ts");
+  serverEnv.LINGXI_CREATE_STARTUP_SESSION = "0";
+  serverEnv.LINGXI_PORT = process.env.LINGXI_PORT || "0";
   delete serverEnv.ELECTRON_RUN_AS_NODE;
 
   serverProcess = spawn(process.execPath, [path.join(rootDir, "server", "bootstrap.ts")], {
@@ -81,11 +81,11 @@ function spawnServer() {
 function spawnVite(clientConfig, serverInfo) {
   const viteBin = resolveViteCommand(rootDir);
   const viteEnv = applyDevEnvironment({ ...process.env });
-  viteEnv.HANA_DEV_WEB = "1";
-  viteEnv.HANA_DEV_WEB_CLIENT_PORT = clientConfig.serverPort;
-  viteEnv.HANA_DEV_WEB_API_BASE_URL = clientConfig.apiBaseUrl;
-  viteEnv.HANA_DEV_WEB_SERVER_URL = `http://127.0.0.1:${serverInfo.port}`;
-  viteEnv.HANA_DEV_WEB_SERVER_TOKEN = serverInfo.token;
+  viteEnv.LINGXI_DEV_WEB = "1";
+  viteEnv.LINGXI_DEV_WEB_CLIENT_PORT = clientConfig.serverPort;
+  viteEnv.LINGXI_DEV_WEB_API_BASE_URL = clientConfig.apiBaseUrl;
+  viteEnv.LINGXI_DEV_WEB_SERVER_URL = `http://127.0.0.1:${serverInfo.port}`;
+  viteEnv.LINGXI_DEV_WEB_SERVER_TOKEN = serverInfo.token;
   delete viteEnv.ELECTRON_RUN_AS_NODE;
 
   viteProcess = spawn(viteBin, [

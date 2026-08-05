@@ -3323,7 +3323,7 @@
       "timezone": "タイムゾーン",
       "timezoneDesc": "IANA タイムゾーン（例: Asia/Tokyo）",
       "bridgeMediaPublicBaseUrl": "Bridge ファイル公開 URL",
-      "bridgeMediaPublicBaseUrlDesc": "外部プラットフォームがローカルのステージングファイルを取得するために使用する公開 HTTP/HTTPS ベース URL。通常はリバースプロキシまたはトンネルで提供します。空の場合は HANA_BRIDGE_PUBLIC_BASE_URL にフォールバックします。",
+      "bridgeMediaPublicBaseUrlDesc": "外部プラットフォームがローカルのステージングファイルを取得するために使用する公開 HTTP/HTTPS ベース URL。通常はリバースプロキシまたはトンネルで提供します。空の場合は LINGXI_BRIDGE_PUBLIC_BASE_URL にフォールバックします。",
       "computerUse": "Computer Use",
       "computerUseDesc": "有効にすると、新しい会話でプライマリ Agent に computer ツールが公開されます。無効にすると新しい会話では表示されず、凍結された古い会話が呼び出した場合は拒否されます。",
       "thinkingBudget": "思考の深さ",

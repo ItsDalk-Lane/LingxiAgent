@@ -30,13 +30,13 @@ function readYaml() {
 beforeEach(() => {
   fs.mkdirSync(tmpDir, { recursive: true });
   fs.mkdirSync(hanakoHome, { recursive: true });
-  process.env.HANA_HOME = hanakoHome;
+  process.env.LINGXI_HOME = hanakoHome;
   clearConfigCache();
 });
 
 afterEach(() => {
   clearConfigCache();
-  delete process.env.HANA_HOME;
+  delete process.env.LINGXI_HOME;
   fs.rmSync(tmpDir, { recursive: true, force: true });
 });
 

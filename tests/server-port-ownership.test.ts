@@ -80,14 +80,14 @@ describe("server transport ownership", () => {
       cwd: root,
       env: {
         ...process.env,
-        HANA_HOME: hanaHome,
-        HANA_PORT: String(port),
-        HANA_ROOT: root,
+        LINGXI_HOME: hanaHome,
+        LINGXI_PORT: String(port),
+        LINGXI_ROOT: root,
         // server/main-full.ts is the thin closed composition entry:
         // server/index.ts itself only exports startServer() and boots
         // nothing on mere import.
-        HANA_SERVER_ENTRY: path.join(root, "server", "main-full.ts"),
-        HANA_CREATE_STARTUP_SESSION: "0",
+        LINGXI_SERVER_ENTRY: path.join(root, "server", "main-full.ts"),
+        LINGXI_CREATE_STARTUP_SESSION: "0",
       },
       stdio: ["ignore", "pipe", "pipe"],
     });

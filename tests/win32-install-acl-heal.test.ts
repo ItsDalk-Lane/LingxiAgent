@@ -67,24 +67,24 @@ describe("win32 install ACL heal", () => {
     expect(fs.existsSync(healStatePath(hanakoHome))).toBe(false);
   });
 
-  it("skips when not packaged unless HANA_FORCE_INSTALL_ACL_HEAL is set", () => {
+  it("skips when not packaged unless LINGXI_FORCE_INSTALL_ACL_HEAL is set", () => {
     const hanakoHome = makeHome();
     const input = baseInput(hanakoHome, { isPackaged: false });
     expect(maybeHealWin32InstallAcl(input)).toEqual({ status: "skipped", reason: "not-packaged" });
 
     const forced = baseInput(hanakoHome, {
       isPackaged: false,
-      env: { SystemRoot: "C:\\Windows", HANA_FORCE_INSTALL_ACL_HEAL: "1" },
+      env: { SystemRoot: "C:\\Windows", LINGXI_FORCE_INSTALL_ACL_HEAL: "1" },
     });
     const result = maybeHealWin32InstallAcl(forced);
     expect(result.status).toBe("healed");
     expect(forced.execFileSync).toHaveBeenCalledTimes(1);
   });
 
-  it("skips when HANA_DISABLE_INSTALL_ACL_HEAL is set", () => {
+  it("skips when LINGXI_DISABLE_INSTALL_ACL_HEAL is set", () => {
     const hanakoHome = makeHome();
     const input = baseInput(hanakoHome, {
-      env: { SystemRoot: "C:\\Windows", HANA_DISABLE_INSTALL_ACL_HEAL: "1" },
+      env: { SystemRoot: "C:\\Windows", LINGXI_DISABLE_INSTALL_ACL_HEAL: "1" },
     });
     expect(maybeHealWin32InstallAcl(input)).toEqual({ status: "skipped", reason: "disabled" });
     expect(input.execFileSync).not.toHaveBeenCalled();
@@ -302,6 +302,6 @@ describe("win32 install ACL heal", () => {
     const text = buildInstallAclHealDiagnostics({ hanakoHome });
     expect(text).toContain("--- Install ACL Heal ---");
     expect(text).toContain("S-1-15-2-2:(OI)(CI)(RX)");
-    expect(text).toContain("HANA_DISABLE_INSTALL_ACL_HEAL");
+    expect(text).toContain("LINGXI_DISABLE_INSTALL_ACL_HEAL");
   });
 });

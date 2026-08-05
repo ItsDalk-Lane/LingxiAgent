@@ -27,7 +27,7 @@ Plugin server code is installed and loaded by the Studio server. Plugin WebView/
 
 ## Production Install Checklist
 
-A plugin installed under `${HANA_HOME}/plugins`, `${HANA_HOME}/plugins-dev`, or a marketplace release is imported from that plugin directory. Bare package imports in server-side plugin code resolve from the plugin package, not from the Hana repository, the desktop renderer, or the packaged server root. A `package.json` beside the plugin is only metadata unless the dependency files are also present or the code has been bundled.
+A plugin installed under `${LINGXI_HOME}/plugins`, `${LINGXI_HOME}/plugins-dev`, or a marketplace release is imported from that plugin directory. Bare package imports in server-side plugin code resolve from the plugin package, not from the Hana repository, the desktop renderer, or the packaged server root. A `package.json` beside the plugin is only metadata unless the dependency files are also present or the code has been bundled.
 
 Before copying or zipping a plugin outside the monorepo, inspect every server-side entry point:
 
@@ -44,9 +44,9 @@ If any of those files import `@hana/plugin-runtime`, `@hana/plugin-sdk`, `@hana/
 - Ship a plugin directory or release zip that already contains the installed dependencies needed by Node's resolver. Do not assume Hana will run `npm install` during plugin installation.
 - Avoid the SDK helper for that entry point and use the host objects already passed by the plugin manager, such as `ctx` for lifecycle, tool, and route code.
 
-`--sdk-mode workspace` is only for source development inside the Hana monorepo. Do not drag a workspace-mode plugin directory into `${HANA_HOME}/plugins` or publish it as a release package. `--sdk-mode bundled` copies SDK tarballs for the plugin's own install or build step; the final installed directory must still be smoke-tested as an extracted plugin, with no dependency on the repo root `node_modules`.
+`--sdk-mode workspace` is only for source development inside the Hana monorepo. Do not drag a workspace-mode plugin directory into `${LINGXI_HOME}/plugins` or publish it as a release package. `--sdk-mode bundled` copies SDK tarballs for the plugin's own install or build step; the final installed directory must still be smoke-tested as an extracted plugin, with no dependency on the repo root `node_modules`.
 
-The production smoke test is: install the exact folder or zip that users will receive, then check plugin diagnostics and server logs for `Cannot find package` or other import errors. A plugin that loads in the repo but fails from `${HANA_HOME}/plugins` has crossed the runtime boundary incorrectly.
+The production smoke test is: install the exact folder or zip that users will receive, then check plugin diagnostics and server logs for `Cannot find package` or other import errors. A plugin that loads in the repo but fails from `${LINGXI_HOME}/plugins` has crossed the runtime boundary incorrectly.
 
 ## Plugin Shape Guide
 
@@ -55,14 +55,14 @@ The production smoke test is: install the exact folder or zip that users will re
 - UI plugins use WebView/iframe routes plus `@hana/plugin-sdk` and, for React UI, `@hana/plugin-components`. They require `trust: "full-access"` and explicit `ui.hostCapabilities` grants for host calls such as `external.open`, `clipboard.writeText`, `resource.open`, `resource.pick`, or `resource.requestAccess`. Native `chat.surface` cards are declarative transcript surfaces for plugin-owned private sessions and use `createChatSurfaceCard()`. Rich native card composition is not part of the public SDK contract yet.
 - Provider contribution plugins use `providers/*.js` declarations. They require `trust: "full-access"` and should declare `capabilities.chat` separately from `capabilities.media.*` so chat selectors stay clean while image, video, or speech tools discover media providers. Provider declarations, `listMediaProviders()`, and `resolveMediaModel()` are the stable discovery entrypoints; media adapter / executor authoring remains a separate API surface. Legacy `media-gen:*` adapter/runtime events remain compatibility-only for older image generation plugins.
 - Pi SDK extension plugins use `extensions/*.js` factories. They require `trust: "full-access"` because they run inside the LLM request pipeline. Hana reloads idle sessions after full-access plugin install/enable/reload so existing chats can pick up new extension handlers without requiring an app restart; busy sessions are not reloaded and will retain old extension handlers until the session is naturally rebuilt.
-- Marketplace metadata lives outside the app repo in `OH-Plugins`, the official community plugin catalog. The app reads the generated catalog URL by default, installs `distribution.kind = "release"` entries by downloading the zip package and verifying `sha256`, and keeps `distribution.kind = "source"` for local file marketplace development only. `versions[]` lets the catalog keep multiple SemVer releases; Hana selects the highest app-compatible version, blocks implicit downgrades, backs up old installs, and records successful installs in `${HANA_HOME}/plugin-installs.json`. `readmePath` is resolved relative to the catalog when the official URL is used.
+- Marketplace metadata lives outside the app repo in `OH-Plugins`, the official community plugin catalog. The app reads the generated catalog URL by default, installs `distribution.kind = "release"` entries by downloading the zip package and verifying `sha256`, and keeps `distribution.kind = "source"` for local file marketplace development only. `versions[]` lets the catalog keep multiple SemVer releases; Hana selects the highest app-compatible version, blocks implicit downgrades, backs up old installs, and records successful installs in `${LINGXI_HOME}/plugin-installs.json`. `readmePath` is resolved relative to the catalog when the official URL is used.
 
 ## Agent Dev Loop
 
 Agent-assisted plugin work should use Hana's dev loop instead of copying work-in-progress code into the production plugin directory.
 
-- Source stays in the workspace or `${HANA_HOME}/plugin-dev-sources/`.
-- `plugin.dev.install` copies the source into `${HANA_HOME}/plugins-dev/<pluginId>` and loads it through the normal `PluginManager`.
+- Source stays in the workspace or `${LINGXI_HOME}/plugin-dev-sources/`.
+- `plugin.dev.install` copies the source into `${LINGXI_HOME}/plugins-dev/<pluginId>` and loads it through the normal `PluginManager`.
 - `plugin.dev.reload` replaces the dev copy from the same source slot.
 - `plugin.dev.disable`, `plugin.dev.enable`, `plugin.dev.reset`, and `plugin.dev.uninstall` control only the remembered dev slot. They do not write normal plugin preferences and do not remove community installs.
 - `plugin.dev.invokeTool` runs a tool smoke test with explicit input. Pass `sessionId` or `sessionRef` for session-scoped tools; `sessionPath` remains a legacy locator compatibility field.
@@ -71,7 +71,7 @@ Agent-assisted plugin work should use Hana's dev loop instead of copying work-in
 
 Agent-callable dev tools are opt-in. The user must enable "Allow Agent plugin dev tools" in Settings -> Plugins before the Agent sees `plugin_dev_install`, `plugin_dev_reload`, `plugin_dev_disable`, `plugin_dev_enable`, `plugin_dev_reset`, `plugin_dev_uninstall`, `plugin_dev_invoke_tool`, `plugin_dev_diagnostics`, `plugin_dev_list_surfaces`, `plugin_dev_describe_surface`, or `plugin_dev_run_scenario`.
 
-The trusted development identity comes from Hana's install record and the `${HANA_HOME}/plugins-dev/` slot, not from a manifest field. Pass `devRunId` when controlling lifecycle if the Agent has one, so stale tool calls cannot accidentally act on a newer dev run.
+The trusted development identity comes from Hana's install record and the `${LINGXI_HOME}/plugins-dev/` slot, not from a manifest field. Pass `devRunId` when controlling lifecycle if the Agent has one, so stale tool calls cannot accidentally act on a newer dev run.
 
 UI debugging is element-first. A capable Agent should inspect accessible elements, text, roles, labels, and stable locators before asking for screenshots. Screenshots are still useful for visual polish, clipping, theme contrast, and blank-state checks, but they are no longer the first source of truth when Hana can expose semantic UI structure.
 

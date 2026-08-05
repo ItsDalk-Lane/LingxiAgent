@@ -80,9 +80,9 @@ describe("shell utils", () => {
     })).toBe("C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe");
   });
 
-  it("keeps HANA_POWERSHELL above automatic pwsh detection", () => {
+  it("keeps LINGXI_POWERSHELL above automatic pwsh detection", () => {
     expect(resolveWin32DefaultPowerShellExecutable({
-      HANA_POWERSHELL: "E:\\Tools\\pwsh-custom.exe",
+      LINGXI_POWERSHELL: "E:\\Tools\\pwsh-custom.exe",
       SystemRoot: "C:\\Windows",
     }, {
       spawn: () => { throw new Error("automatic detection should not run"); },

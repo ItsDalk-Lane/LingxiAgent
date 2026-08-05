@@ -18,7 +18,7 @@ export type RendererDistPointer = { distDir: string; version: string | null; val
 
 /**
  * Resolves which already-activated renderer directory `hana serve` should
- * inject into the server as `HANA_RENDERER_DIST`. Reuses
+ * inject into the server as `LINGXI_RENDERER_DIST`. Reuses
  * `activation.resolveBoot` for the "pointer -> validated version
  * directory" judgment (current first, previous as fallback; both require
  * a `.verified` receipt whose sha256 matches and a directory that still
@@ -32,7 +32,7 @@ export type RendererDistPointer = { distDir: string; version: string | null; val
  * "nothing injected" — that would dress up "content is broken" as "never
  * pulled", and an operator would go looking for the wrong problem. In
  * that case this still returns the `current` pointer's recorded
- * `versionDir` (`valid: false`); the caller sets `HANA_RENDERER_DIST` to
+ * `versionDir` (`valid: false`); the caller sets `LINGXI_RENDERER_DIST` to
  * it anyway, so the server's own decision function lands in its explicit
  * error mode — damage has to be visible, not silently downgraded to the
  * guide page.
@@ -65,8 +65,8 @@ export async function resolveServerSpawnSpec({
   channel = "stable",
 }: { projectRoot?: string; env?: NodeJS.ProcessEnv; extraArgs?: string[]; channel?: string } = {}) {
   const root = projectRoot || path.resolve(import.meta.dirname, "..");
-  const explicitRoot = env.HANA_ROOT && fs.existsSync(path.join(env.HANA_ROOT, "bootstrap.js"))
-    ? env.HANA_ROOT
+  const explicitRoot = env.LINGXI_ROOT && fs.existsSync(path.join(env.LINGXI_ROOT, "bootstrap.js"))
+    ? env.LINGXI_ROOT
     : null;
   const packagedRoot = explicitRoot || (
     fs.existsSync(path.join(root, "bootstrap.js"))
@@ -80,10 +80,10 @@ export async function resolveServerSpawnSpec({
   if (packagedRoot) {
     const spawnEnv: NodeJS.ProcessEnv = {
       ...env,
-      HANA_ROOT: packagedRoot,
-      HANA_SERVER_ENTRY: path.join(packagedRoot, "bundle", "index.js"),
+      LINGXI_ROOT: packagedRoot,
+      LINGXI_SERVER_ENTRY: path.join(packagedRoot, "bundle", "index.js"),
     };
-    if (rendererDist) spawnEnv.HANA_RENDERER_DIST = rendererDist.distDir;
+    if (rendererDist) spawnEnv.LINGXI_RENDERER_DIST = rendererDist.distDir;
     return {
       mode: "packaged",
       command: process.execPath,
@@ -94,7 +94,7 @@ export async function resolveServerSpawnSpec({
   }
 
   const spawnEnv: NodeJS.ProcessEnv = { ...env };
-  if (rendererDist) spawnEnv.HANA_RENDERER_DIST = rendererDist.distDir;
+  if (rendererDist) spawnEnv.LINGXI_RENDERER_DIST = rendererDist.distDir;
   return {
     mode: "source",
     command: process.execPath,
@@ -138,7 +138,7 @@ export async function guardAgainstForeignServer({
 /**
  * Builds the env object `hana serve` spawns its server child with, applying
  * the `--allow-data-downgrade` override (threaded to the child as
- * `HANA_ALLOW_DATA_DOWNGRADE=1`, which server/index.ts's data-epoch gate
+ * `LINGXI_ALLOW_DATA_DOWNGRADE=1`, which server/index.ts's data-epoch gate
  * reads) and printing the accompanying warning. Pure aside from the `warn`
  * side channel, which is injectable so this is testable without capturing
  * real stdout.
@@ -150,7 +150,7 @@ export function buildServeSpawnEnv({
 }: { env: NodeJS.ProcessEnv; allowDataDowngrade: boolean; warn?: (msg: string) => void }): NodeJS.ProcessEnv {
   const spawnEnv: NodeJS.ProcessEnv = { ...env };
   if (allowDataDowngrade) {
-    spawnEnv.HANA_ALLOW_DATA_DOWNGRADE = "1";
+    spawnEnv.LINGXI_ALLOW_DATA_DOWNGRADE = "1";
     warn(
       `${ansi.yellow}--allow-data-downgrade: 已显式接受数据损坏风险，旧内核将放行打开被更高数据 epoch 触碰过的目录。\n`
       + `--allow-data-downgrade: explicitly accepting the data-corruption risk — this older kernel will be `

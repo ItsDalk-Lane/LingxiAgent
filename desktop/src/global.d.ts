@@ -19,7 +19,7 @@ declare global {
     __hanaLog: (level: string, module: string, message: string) => void;
 
     // ── Dev-only browser preview bootstrap（scripts/dev-web.js 注入） ──
-    __HANA_DEV_WEB__?: {
+    __LINGXI_DEV_WEB__?: {
       serverPort?: string | number;
       apiBaseUrl?: string;
     };

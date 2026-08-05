@@ -144,11 +144,11 @@ describe("server/main-open.ts: open composition entry (static check)", () => {
   });
 });
 
-describe("build-server-open.mjs: never imports build-server-artifact.mjs or reads HANA_SIGN_KEY", () => {
+describe("build-server-open.mjs: never imports build-server-artifact.mjs or reads LINGXI_SIGN_KEY", () => {
   const rawSource = fs.readFileSync(path.join(ROOT, "scripts", "build-server-open.mjs"), "utf-8");
   // The module docstring explains, in prose, everything this file
   // deliberately does NOT do (naming build-server-artifact.mjs,
-  // HANA_SIGN_KEY, plugins/, skills2set/ to say so) — check comment-stripped
+  // LINGXI_SIGN_KEY, plugins/, skills2set/ to say so) — check comment-stripped
   // code so that explanation doesn't trip its own check.
   const source = stripComments(rawSource);
 
@@ -156,8 +156,8 @@ describe("build-server-open.mjs: never imports build-server-artifact.mjs or read
     expect(source).not.toMatch(/build-server-artifact\.mjs/);
   });
 
-  it("does not reference HANA_SIGN_KEY or HANA_SIGN_KEYSET", () => {
-    expect(source).not.toMatch(/HANA_SIGN_KEY/);
+  it("does not reference LINGXI_SIGN_KEY or LINGXI_SIGN_KEYSET", () => {
+    expect(source).not.toMatch(/LINGXI_SIGN_KEY/);
   });
 
   it("does not copy plugins/, skills2set/, or desktop runtime brand/renderer assets", () => {

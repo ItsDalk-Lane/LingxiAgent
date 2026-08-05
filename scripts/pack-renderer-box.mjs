@@ -11,7 +11,7 @@
  * 修法：由这个独立脚本在 CI 的单点 renderer-box job 里跑一次，产出唯一一份
  * renderer-<version>.tar.gz，四个平台的构建 job 下载同一份字节复用（见
  * scripts/build-server-artifact.mjs 的 packDualKindSeed 的 prebuiltRendererArchive /
- * HANA_PREBUILT_RENDERER_BOX 入参）。本脚本只做"打包 + 打印摘要"，不做签名——
+ * LINGXI_PREBUILT_RENDERER_BOX 入参）。本脚本只做"打包 + 打印摘要"，不做签名——
  * renderer 归档的签名对象是 seed manifest（各平台各自生成、各自签），不是归档
  * 本身。
  *

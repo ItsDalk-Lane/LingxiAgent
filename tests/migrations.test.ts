@@ -1033,7 +1033,7 @@ describe("migration #45: recover persisted Codex OAuth model references", () => 
     expect(fs.readFileSync(path.join(tmpDir, "provider-catalog.json")).equals(before)).toBe(true);
   });
 
-  it.skipIf(process.platform === "win32")("does not follow session symlinks outside HANA_HOME", () => {
+  it.skipIf(process.platform === "win32")("does not follow session symlinks outside LINGXI_HOME", () => {
     const prefs = makePrefs(userDir);
     prefs.savePreferences({ _dataVersion: 44 });
     writeCatalog({ models: ["existing"] });

@@ -119,7 +119,7 @@ describe("createWin32Exec", () => {
         timeout: 5,
         env: { PATH: "C:\\Windows\\System32" },
       }),
-    ).rejects.toMatchObject({ code: "HANA_EXEC_CWD_MISSING", cwd: "C:\\gone" });
+    ).rejects.toMatchObject({ code: "LINGXI_EXEC_CWD_MISSING", cwd: "C:\\gone" });
     expect(spawnAndStream).not.toHaveBeenCalled();
   });
 
@@ -375,7 +375,7 @@ describe("createWin32Exec", () => {
       signal: undefined,
       timeout: 5,
       env: { PATH: "C:\\Windows\\System32" },
-    })).rejects.toMatchObject({ code: "HANA_WIN32_SANDBOX_TERMINATION_FAILED", win32Error: 5 });
+    })).rejects.toMatchObject({ code: "LINGXI_WIN32_SANDBOX_TERMINATION_FAILED", win32Error: 5 });
     expect(chunks).toEqual([]);
     expect(spawnAndStream).toHaveBeenCalledTimes(1);
   });
@@ -390,7 +390,7 @@ describe("createWin32Exec", () => {
 
     await expect(exec("echo ok", "C:\\work", {
       onData: () => {}, signal: undefined, timeout: 5, env: { PATH: "C:\\Windows\\System32" },
-    })).rejects.toMatchObject({ code: "HANA_WIN32_SANDBOX_TERMINAL_PROTOCOL" });
+    })).rejects.toMatchObject({ code: "LINGXI_WIN32_SANDBOX_TERMINAL_PROTOCOL" });
     expect(spawnAndStream).toHaveBeenCalledTimes(1);
   });
 
@@ -649,12 +649,12 @@ describe("createWin32Exec", () => {
       signal: undefined,
       timeout: 5,
       env: {
-        HANA_POWERSHELL: configuredPowerShell,
+        LINGXI_POWERSHELL: configuredPowerShell,
         PATH: "C:\\Windows\\System32",
         SystemRoot: "C:\\Windows",
       },
     })).rejects.toMatchObject({
-      code: "HANA_WIN32_SANDBOX_POWERSHELL_UNSUPPORTED",
+      code: "LINGXI_WIN32_SANDBOX_POWERSHELL_UNSUPPORTED",
       message: expect.stringContaining('sandbox_permissions="require_escalated"'),
     });
     // Only the probe ran; the explicitly requested shell never got a chance
@@ -749,7 +749,7 @@ describe("createWin32Exec", () => {
       timeout: 5,
       env: { PATH: "D:\\PowerShell\\7;C:\\Windows\\System32", SystemRoot: "C:\\Windows" },
     })).rejects.toMatchObject({
-      code: "HANA_WIN32_SANDBOX_POWERSHELL_UNSUPPORTED",
+      code: "LINGXI_WIN32_SANDBOX_POWERSHELL_UNSUPPORTED",
       message: expect.stringContaining('sandbox_permissions="require_escalated"'),
     });
     // pwsh probe, then legacy probe; both fail, route fails fast without
@@ -1734,7 +1734,7 @@ describe("createWin32Exec", () => {
     expect(diagnostic).toContain("STATUS_DLL_INIT_FAILED");
     expect(diagnostic).toContain("Executable: present=true length=");
     expect(diagnostic).toContain("Runtime root: present=true length=");
-    expect(diagnostic).toContain("HANA_HOME: present=true length=");
+    expect(diagnostic).toContain("LINGXI_HOME: present=true length=");
     expect(diagnostic).not.toContain("C:\\Users\\Hana");
     expect(diagnostic).not.toContain(cachedShell);
     expect(diagnostic).not.toContain(cachedRoot);
@@ -1801,8 +1801,8 @@ describe("createWin32Exec", () => {
         TMP: `${customerRoot}\\tmp`,
         LOCALAPPDATA: `${customerRoot}\\local`,
         APPDATA: `${customerRoot}\\roaming`,
-        HANA_ROOT: `${customerRoot}\\hana`,
-        HANA_SERVER_ENTRY: `${customerRoot}\\server.mjs`,
+        LINGXI_ROOT: `${customerRoot}\\hana`,
+        LINGXI_SERVER_ENTRY: `${customerRoot}\\server.mjs`,
       },
     });
 
@@ -1848,7 +1848,7 @@ describe("createWin32Exec", () => {
         PATH: "C:\\Windows\\System32",
         COMSPEC: systemCmdExe,
         SystemRoot: "C:\\Windows",
-        HANA_HOME: "C:\\Users\\Hana\\.hanako",
+        LINGXI_HOME: "C:\\Users\\Hana\\.hanako",
       },
     });
 
@@ -1856,7 +1856,7 @@ describe("createWin32Exec", () => {
     const diagnostic = chunks.join("");
     expect(diagnostic).toContain("Route: runner=cmd reason=cmd-builtin mode=sandbox-helper sandbox=true");
     expect(diagnostic).toContain("Helper: present=true length=");
-    expect(diagnostic).toContain("HANA_HOME: present=true length=");
+    expect(diagnostic).toContain("LINGXI_HOME: present=true length=");
     expect(diagnostic).not.toContain("C:\\Users\\Hana");
     expect(spawnAndStream).toHaveBeenCalledTimes(1);
   });
@@ -1895,7 +1895,7 @@ describe("createWin32Exec", () => {
         PATH: "C:\\Windows\\System32",
         COMSPEC: systemCmdExe,
         SystemRoot: "C:\\Windows",
-        HANA_HOME: "C:\\Users\\Hana\\.hanako",
+        LINGXI_HOME: "C:\\Users\\Hana\\.hanako",
         USERPROFILE: "C:\\Users\\Hana",
       },
     });
@@ -1988,7 +1988,7 @@ describe("createWin32Exec", () => {
         PATH: "C:\\Windows\\System32",
         SystemRoot: "C:\\Windows",
       },
-    })).rejects.toMatchObject({ code: "HANA_WIN32_SANDBOX_POWERSHELL_UNSUPPORTED" });
+    })).rejects.toMatchObject({ code: "LINGXI_WIN32_SANDBOX_POWERSHELL_UNSUPPORTED" });
 
     // The probe ran (and failed) but the caller's own onData never saw any
     // of the probe's internal stdio; the failed command itself never spawned.

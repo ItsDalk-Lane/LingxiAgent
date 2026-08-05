@@ -159,7 +159,7 @@ describe("composition boundary behavior lock: builtin media adapter injection", 
     expect(mainFullSource).toMatch(/registerClosedRoutes,\s*builtinMediaAdapters/);
     expect(mainFullSource).toMatch(/startServer\(\{\s*registerClosedRoutes,\s*builtinMediaAdapters\s*\}\)/);
     expect(mainFullSource).toContain('from "./standalone-runtime-smoke.ts"');
-    expect(mainFullSource).toContain('process.env.HANA_INTERNAL_STANDALONE_RUNTIME_SMOKE === "1"');
+    expect(mainFullSource).toContain('process.env.LINGXI_INTERNAL_STANDALONE_RUNTIME_SMOKE === "1"');
     expect(mainFullSource).toContain("await runPackagedStandaloneRuntimeSmoke();");
   });
 });
@@ -179,7 +179,7 @@ describe("composition boundary behavior lock: bootstrap contract (no silent non-
         ["--input-type=module", "-e", 'import("./server/index.ts").then((m) => { process.stdout.write(`exports: ${Object.keys(m).sort().join(",")}\\n`); process.exit(0); })'],
         {
           cwd: root,
-          env: { ...process.env, HANA_HOME: hanaHome },
+          env: { ...process.env, LINGXI_HOME: hanaHome },
           stdio: ["ignore", "pipe", "pipe"],
         },
       );
@@ -221,7 +221,7 @@ describe("composition boundary behavior lock: bootstrap contract (no silent non-
 // Windows cleanup contract for tests that SIGKILL a spawned server: kill() is
 // TerminateProcess and returns before the process dies, and the dying process
 // (plus antivirus/search-indexer scans) can briefly hold handles inside the
-// temp HANA_HOME without FILE_SHARE_DELETE. Removing the directory therefore
+// temp LINGXI_HOME without FILE_SHARE_DELETE. Removing the directory therefore
 // has to happen after the real exit event, with retries for transient
 // EPERM/EBUSY — otherwise cleanup itself fails the test on Windows CI.
 const TEMP_HOME_RM_OPTIONS = { recursive: true, force: true, maxRetries: 20, retryDelay: 250 } as const;
@@ -276,11 +276,11 @@ describe("composition boundary behavior lock: real request smoke against the ful
       cwd: root,
       env: {
         ...process.env,
-        HANA_HOME: hanaHome,
-        HANA_PORT: "0",
-        HANA_ROOT: root,
-        HANA_SERVER_ENTRY: path.join(root, "server", "main-full.ts"),
-        HANA_CREATE_STARTUP_SESSION: "0",
+        LINGXI_HOME: hanaHome,
+        LINGXI_PORT: "0",
+        LINGXI_ROOT: root,
+        LINGXI_SERVER_ENTRY: path.join(root, "server", "main-full.ts"),
+        LINGXI_CREATE_STARTUP_SESSION: "0",
       },
       stdio: ["ignore", "pipe", "pipe"],
     });
@@ -324,7 +324,7 @@ describe("composition boundary behavior lock: real request smoke against the ful
       child.kill("SIGKILL");
       await waitForExit(child);
       fs.rmSync(hanaHome, TEMP_HOME_RM_OPTIONS);
-      if (process.env.HANA_TEST_DEBUG) process.stderr.write(stderr);
+      if (process.env.LINGXI_TEST_DEBUG) process.stderr.write(stderr);
     }
   }, 60000);
 });

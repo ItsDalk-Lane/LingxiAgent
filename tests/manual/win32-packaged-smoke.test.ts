@@ -1,6 +1,6 @@
 /**
  * Windows manual smoke test:
- *   $env:HANA_WIN32_SMOKE="1"; npx vitest run tests/manual/win32-packaged-smoke.test.ts
+ *   $env:LINGXI_WIN32_SMOKE="1"; npx vitest run tests/manual/win32-packaged-smoke.test.ts
  *
  * Run from a development tree or unpacked install tree to verify the real Windows
  * process-launch paths. Non-Windows hosts and normal test runs skip this suite.
@@ -10,7 +10,7 @@ import os from "os";
 import path from "path";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
-const SMOKE_ENABLED = process.platform === "win32" && process.env.HANA_WIN32_SMOKE === "1";
+const SMOKE_ENABLED = process.platform === "win32" && process.env.LINGXI_WIN32_SMOKE === "1";
 const smokeDescribe = SMOKE_ENABLED ? describe : describe.skip;
 
 smokeDescribe("win32 packaged smoke", () => {
@@ -124,6 +124,6 @@ smokeDescribe("win32 packaged smoke", () => {
         timeout: 30,
         env: process.env,
       }),
-    ).rejects.toMatchObject({ code: "HANA_EXEC_CWD_MISSING" });
+    ).rejects.toMatchObject({ code: "LINGXI_EXEC_CWD_MISSING" });
   });
 });

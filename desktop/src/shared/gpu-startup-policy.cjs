@@ -132,23 +132,23 @@ function hasArg(argv, name) {
 }
 
 function isExplicitSafeMode(argv, env) {
-  if (boolFromSetting(env?.HANA_GPU_SAFE_MODE, false)) return true;
-  if (boolFromSetting(env?.HANA_DISABLE_HARDWARE_ACCELERATION, false)) return true;
+  if (boolFromSetting(env?.LINGXI_GPU_SAFE_MODE, false)) return true;
+  if (boolFromSetting(env?.LINGXI_DISABLE_HARDWARE_ACCELERATION, false)) return true;
   return hasArg(argv, "hana-gpu-safe-mode") || hasArg(argv, "hana-disable-hardware-acceleration");
 }
 
 function isExplicitGpuSandboxCompatibility(argv, env) {
-  if (boolFromSetting(env?.HANA_GPU_SANDBOX_COMPAT, false)) return true;
+  if (boolFromSetting(env?.LINGXI_GPU_SANDBOX_COMPAT, false)) return true;
   return hasArg(argv, "hana-gpu-sandbox-compat");
 }
 
 function isExplicitGpuBackendCompatibility(argv, env) {
-  if (boolFromSetting(env?.HANA_GPU_BACKEND_COMPAT, false)) return true;
+  if (boolFromSetting(env?.LINGXI_GPU_BACKEND_COMPAT, false)) return true;
   return hasArg(argv, "hana-gpu-backend-compat");
 }
 
 function isExplicitUnsafeNoSandbox(argv, env) {
-  if (boolFromSetting(env?.HANA_GPU_UNSAFE_NO_SANDBOX, false)) return true;
+  if (boolFromSetting(env?.LINGXI_GPU_UNSAFE_NO_SANDBOX, false)) return true;
   return hasArg(argv, "hana-gpu-unsafe-no-sandbox");
 }
 

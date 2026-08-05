@@ -158,7 +158,7 @@
   "toolDef.updateSettings.timezone": "시간대",
   "toolDef.updateSettings.timezoneDesc": "IANA 시간대 (예: Asia/Seoul)",
   "toolDef.updateSettings.bridgeMediaPublicBaseUrl": "Bridge 파일 공개 URL",
-  "toolDef.updateSettings.bridgeMediaPublicBaseUrlDesc": "외부 플랫폼이 로컬 스테이징 파일을 가져올 때 사용하는 공개 HTTP/HTTPS 기본 URL이에요. 보통 리버스 프록시나 터널이 제공해요. 비워 두면 HANA_BRIDGE_PUBLIC_BASE_URL로 대체돼요.",
+  "toolDef.updateSettings.bridgeMediaPublicBaseUrlDesc": "외부 플랫폼이 로컬 스테이징 파일을 가져올 때 사용하는 공개 HTTP/HTTPS 기본 URL이에요. 보통 리버스 프록시나 터널이 제공해요. 비워 두면 LINGXI_BRIDGE_PUBLIC_BASE_URL로 대체돼요.",
   "toolDef.updateSettings.computerUse": "Computer Use",
   "toolDef.updateSettings.computerUseDesc": "활성화하면 새 대화에서 주 Agent에 computer 도구가 노출돼요. 비활성화하면 새 대화에서 볼 수 없고, 고정된 이전 대화에서 호출하면 거부돼요.",
   "toolDef.updateSettings.thinkingBudget": "사고 깊이",

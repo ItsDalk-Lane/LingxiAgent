@@ -12,7 +12,7 @@ describe("Windows server guardian desktop contract", () => {
   it("prefers explicit guardian and resolves packaged/dev helper locations", () => {
     const explicit = "C:\\custom\\guardian.exe";
     expect(resolveWindowsServerGuardian({
-      env: { HANA_WIN32_SERVER_GUARDIAN: explicit },
+      env: { LINGXI_WIN32_SERVER_GUARDIAN: explicit },
       resourcesPath: "C:\\Hana\\resources",
       appRoot: "C:\\repo",
       arch: "x64",

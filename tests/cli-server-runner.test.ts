@@ -65,10 +65,10 @@ describe("CLI server runner", () => {
 
   it("runs the source server entry in development", async () => {
     tmpDir = makeTmpDir();
-    hanaHome = makeTmpDir(); // isolated HANA_HOME — never touch the real user home's pointers
+    hanaHome = makeTmpDir(); // isolated LINGXI_HOME — never touch the real user home's pointers
     const spec = await resolveServerSpawnSpec({
       projectRoot: tmpDir,
-      env: { HANA_HOME: hanaHome },
+      env: { LINGXI_HOME: hanaHome },
       extraArgs: ["--chat"],
     });
 
@@ -77,10 +77,10 @@ describe("CLI server runner", () => {
       command: process.execPath,
     });
     expect(spec.args).toEqual([path.join(tmpDir, "server", "main-full.ts"), "--chat"]);
-    expect(spec.env.HANA_RENDERER_DIST).toBeUndefined();
+    expect(spec.env.LINGXI_RENDERER_DIST).toBeUndefined();
   });
 
-  it("runs the packaged bootstrap entry when HANA_ROOT is available", async () => {
+  it("runs the packaged bootstrap entry when LINGXI_ROOT is available", async () => {
     tmpDir = makeTmpDir();
     hanaHome = makeTmpDir();
     fs.mkdirSync(path.join(tmpDir, "bundle"), { recursive: true });
@@ -89,28 +89,28 @@ describe("CLI server runner", () => {
 
     const spec = await resolveServerSpawnSpec({
       projectRoot: "/source/project",
-      env: { HANA_ROOT: tmpDir, HANA_HOME: hanaHome },
+      env: { LINGXI_ROOT: tmpDir, LINGXI_HOME: hanaHome },
       extraArgs: [],
     });
 
     expect(spec.mode).toBe("packaged");
     expect(spec.args).toEqual([path.join(tmpDir, "bootstrap.js")]);
-    expect(spec.env.HANA_ROOT).toBe(tmpDir);
-    expect(spec.env.HANA_SERVER_ENTRY).toBe(path.join(tmpDir, "bundle", "index.js"));
+    expect(spec.env.LINGXI_ROOT).toBe(tmpDir);
+    expect(spec.env.LINGXI_SERVER_ENTRY).toBe(path.join(tmpDir, "bundle", "index.js"));
   });
 
-  it("injects HANA_RENDERER_DIST into the spawn env when a valid renderer pointer exists", async () => {
+  it("injects LINGXI_RENDERER_DIST into the spawn env when a valid renderer pointer exists", async () => {
     tmpDir = makeTmpDir();
     hanaHome = makeTmpDir();
     const versionDir = await writeRendererPointer(hanaHome, "stable", { withReceipt: true });
 
     const spec = await resolveServerSpawnSpec({
       projectRoot: tmpDir,
-      env: { HANA_HOME: hanaHome },
+      env: { LINGXI_HOME: hanaHome },
       extraArgs: [],
     });
 
-    expect(spec.env.HANA_RENDERER_DIST).toBe(versionDir);
+    expect(spec.env.LINGXI_RENDERER_DIST).toBe(versionDir);
     expect(spec.rendererDist).toEqual({ distDir: versionDir, version: "9.9.9", valid: true });
   });
 });
@@ -200,7 +200,7 @@ describe("spawnServerForeground — blocked path never spawns", () => {
 
     const result = await spawnServerForeground({
       projectRoot: "/nonexistent/project/root/that/must/never/be/touched",
-      env: { HANA_HOME: hanaHome },
+      env: { LINGXI_HOME: hanaHome },
       probeImpl,
       exit,
     });
@@ -217,14 +217,14 @@ describe("buildServeSpawnEnv", () => {
     const warn = vi.fn();
     const result = buildServeSpawnEnv({ env: { FOO: "bar" }, allowDataDowngrade: false, warn });
     expect(result).toEqual({ FOO: "bar" });
-    expect(result.HANA_ALLOW_DATA_DOWNGRADE).toBeUndefined();
+    expect(result.LINGXI_ALLOW_DATA_DOWNGRADE).toBeUndefined();
     expect(warn).not.toHaveBeenCalled();
   });
 
-  it("sets HANA_ALLOW_DATA_DOWNGRADE=1 and warns when allowDataDowngrade is true", () => {
+  it("sets LINGXI_ALLOW_DATA_DOWNGRADE=1 and warns when allowDataDowngrade is true", () => {
     const warn = vi.fn();
     const result = buildServeSpawnEnv({ env: { FOO: "bar" }, allowDataDowngrade: true, warn });
-    expect(result).toEqual({ FOO: "bar", HANA_ALLOW_DATA_DOWNGRADE: "1" });
+    expect(result).toEqual({ FOO: "bar", LINGXI_ALLOW_DATA_DOWNGRADE: "1" });
     expect(warn).toHaveBeenCalledTimes(1);
     expect(warn.mock.calls[0][0]).toContain("--allow-data-downgrade");
   });
@@ -258,7 +258,7 @@ describe("resolveRendererDistPointer (CLI pointer resolution layer)", () => {
     const versionDir = await writeRendererPointer(hanaHome, "stable", { withReceipt: false });
 
     const result = await resolveRendererDistPointer({ hanaHome, channel: "stable" });
-    // Damage must stay visible: the caller sets HANA_RENDERER_DIST to this
+    // Damage must stay visible: the caller sets LINGXI_RENDERER_DIST to this
     // broken path anyway so the server lands in its explicit error mode,
     // instead of this function silently reporting "nothing to inject"
     // (which would masquerade as the guide-mode "never installed" case).

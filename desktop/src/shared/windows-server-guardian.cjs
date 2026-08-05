@@ -16,8 +16,8 @@ function resolveWindowsServerGuardian({
     existsSync = require("fs").existsSync;
   }
   const candidates = [
-    env.HANA_WIN32_SERVER_GUARDIAN,
-    env.HANA_WIN32_SANDBOX_HELPER,
+    env.LINGXI_WIN32_SERVER_GUARDIAN,
+    env.LINGXI_WIN32_SANDBOX_HELPER,
     resourcesPath ? path.join(resourcesPath, "sandbox", "windows", WINDOWS_HELPER_NAME) : null,
     appRoot ? path.join(appRoot, "dist-sandbox", `win-${arch}`, WINDOWS_HELPER_NAME) : null,
   ].filter(Boolean);

@@ -416,7 +416,7 @@
       "affectedByEpochMigration": false,
       "bootstrapSafety": null,
       "preCoordinatorReadProjection": null,
-      "identityContract": "transitionId identifies one published or in-progress checkpoint directory for one canonical HANA_HOME; provider-internal .tmp-/.invalid- suffixes on that name are staging, not separate identities.",
+      "identityContract": "transitionId identifies one published or in-progress checkpoint directory for one canonical LINGXI_HOME; provider-internal .tmp-/.invalid- suffixes on that name are staging, not separate identities.",
       "exemption": null
     },
     {
@@ -453,7 +453,7 @@
       "affectedByEpochMigration": false,
       "bootstrapSafety": null,
       "preCoordinatorReadProjection": null,
-      "identityContract": "restoreId identifies one restore transaction's quarantined bytes for one canonical HANA_HOME; data-epoch-restores.log is one shared append-only audit trail across every restore for that home.",
+      "identityContract": "restoreId identifies one restore transaction's quarantined bytes for one canonical LINGXI_HOME; data-epoch-restores.log is one shared append-only audit trail across every restore for that home.",
       "exemption": null
     },
     {
@@ -494,7 +494,7 @@
         "unstampedHomeSafePaths": []
       },
       "preCoordinatorReadProjection": null,
-      "identityContract": "One high-water stamp belongs to one canonical HANA_HOME.",
+      "identityContract": "One high-water stamp belongs to one canonical LINGXI_HOME.",
       "exemption": null
     },
     {
@@ -536,7 +536,7 @@
       "affectedByEpochMigration": false,
       "bootstrapSafety": null,
       "preCoordinatorReadProjection": null,
-      "identityContract": "transitionId identifies one in-progress transition for one canonical HANA_HOME.",
+      "identityContract": "transitionId identifies one in-progress transition for one canonical LINGXI_HOME.",
       "exemption": null
     },
     {
@@ -1138,7 +1138,7 @@
       "affectedByEpochMigration": true,
       "bootstrapSafety": null,
       "preCoordinatorReadProjection": null,
-      "identityContract": "The credential belongs to the local userId in the same HANA_HOME.",
+      "identityContract": "The credential belongs to the local userId in the same LINGXI_HOME.",
       "exemption": null
     },
     {
@@ -1721,7 +1721,7 @@
       "affectedByEpochMigration": true,
       "bootstrapSafety": null,
       "preCoordinatorReadProjection": null,
-      "identityContract": "One network configuration belongs to one HANA_HOME server.",
+      "identityContract": "One network configuration belongs to one LINGXI_HOME server.",
       "exemption": null
     },
     {
@@ -1753,12 +1753,12 @@
       "firstPossibleOpenPhase": "identity_seed",
       "firstPossibleWritePhase": "identity_seed",
       "epochPolicy": "epoch-managed",
-      "checkpointPolicy": "Include with the identity registries for the same HANA_HOME.",
+      "checkpointPolicy": "Include with the identity registries for the same LINGXI_HOME.",
       "restorePolicy": "Restore before remote transport accepts identity-bound requests.",
       "affectedByEpochMigration": true,
       "bootstrapSafety": null,
       "preCoordinatorReadProjection": null,
-      "identityContract": "serverNodeId is the stable identity of one HANA_HOME server node.",
+      "identityContract": "serverNodeId is the stable identity of one LINGXI_HOME server node.",
       "exemption": null
     },
     {
@@ -1798,7 +1798,7 @@
         "unstampedHomeSafePaths": []
       },
       "preCoordinatorReadProjection": null,
-      "identityContract": "At most one current server discovery record per HANA_HOME.",
+      "identityContract": "At most one current server discovery record per LINGXI_HOME.",
       "exemption": null
     },
     {
@@ -2280,7 +2280,7 @@
       "affectedByEpochMigration": true,
       "bootstrapSafety": null,
       "preCoordinatorReadProjection": null,
-      "identityContract": "Usage buckets are keyed by their runtime dimensions inside one HANA_HOME ledger.",
+      "identityContract": "Usage buckets are keyed by their runtime dimensions inside one LINGXI_HOME ledger.",
       "exemption": null
     },
     {
@@ -2334,7 +2334,7 @@
         ],
         "reason": "Desktop startup reads only these named optional fields before the epoch transition; removal or semantic reinterpretation requires moving the read behind the coordinator."
       },
-      "identityContract": "One preferences document belongs to the local user in one HANA_HOME.",
+      "identityContract": "One preferences document belongs to the local user in one LINGXI_HOME.",
       "exemption": null
     },
     {
@@ -2449,7 +2449,7 @@
       "affectedByEpochMigration": false,
       "bootstrapSafety": null,
       "preCoordinatorReadProjection": null,
-      "identityContract": "Each fixed marker records completion for one HANA_HOME.",
+      "identityContract": "Each fixed marker records completion for one LINGXI_HOME.",
       "exemption": null
     },
     {
@@ -4180,7 +4180,7 @@
       "sourceFile": "core/mount-aware-file-service.ts",
       "kind": "mkdir",
       "excerpt": "fs.mkdirSync(rootPath, { recursive: true })",
-      "reason": "Creates user-selected workspace or mounted roots whose ownership is recorded by studio-mounts.json rather than by HANA_HOME path inventory.",
+      "reason": "Creates user-selected workspace or mounted roots whose ownership is recorded by studio-mounts.json rather than by LINGXI_HOME path inventory.",
       "storeId": null,
       "exemptionId": "external-mount-writes",
       "ordinal": 0
@@ -4189,7 +4189,7 @@
       "sourceFile": "core/mount-aware-file-service.ts",
       "kind": "mkdir",
       "excerpt": "fs.mkdirSync(this._defaultRoot, { recursive: true })",
-      "reason": "Creates user-selected workspace or mounted roots whose ownership is recorded by studio-mounts.json rather than by HANA_HOME path inventory.",
+      "reason": "Creates user-selected workspace or mounted roots whose ownership is recorded by studio-mounts.json rather than by LINGXI_HOME path inventory.",
       "storeId": null,
       "exemptionId": "external-mount-writes",
       "ordinal": 0
@@ -5134,7 +5134,7 @@
       "sourceFile": "desktop/auto-updater.cjs",
       "kind": "remove-path",
       "excerpt": "fs.rmdirSync(wrongDir)",
-      "reason": "Deletes the exact legacy last-update-version source and its now-empty legacy directory outside the active HANA_HOME.",
+      "reason": "Deletes the exact legacy last-update-version source and its now-empty legacy directory outside the active LINGXI_HOME.",
       "storeId": null,
       "exemptionId": "desktop-legacy-update-path-cleanup",
       "ordinal": 0
@@ -5143,7 +5143,7 @@
       "sourceFile": "desktop/auto-updater.cjs",
       "kind": "remove-path",
       "excerpt": "fs.unlinkSync(wrongFile)",
-      "reason": "Deletes the exact legacy last-update-version source and its now-empty legacy directory outside the active HANA_HOME.",
+      "reason": "Deletes the exact legacy last-update-version source and its now-empty legacy directory outside the active LINGXI_HOME.",
       "storeId": null,
       "exemptionId": "desktop-legacy-update-path-cleanup",
       "ordinal": 0
@@ -5224,7 +5224,7 @@
       "sourceFile": "desktop/file-text-io.cjs",
       "kind": "write-file",
       "excerpt": "fs.writeFileSync(filePath, content, \"utf-8\")",
-      "reason": "Writes an absolute artifact/editor path explicitly selected by the caller, outside any implied HANA_HOME store.",
+      "reason": "Writes an absolute artifact/editor path explicitly selected by the caller, outside any implied LINGXI_HOME store.",
       "storeId": null,
       "exemptionId": "desktop-external-text-file",
       "ordinal": 0
@@ -5242,7 +5242,7 @@
       "sourceFile": "desktop/main.cjs",
       "kind": "copy-file",
       "excerpt": "fs.copyFileSync(sourcePath, destinationPath)",
-      "reason": "Writes an absolute path selected by the renderer or a screenshot directory selected by the user; no HANA_HOME store is implied.",
+      "reason": "Writes an absolute path selected by the renderer or a screenshot directory selected by the user; no LINGXI_HOME store is implied.",
       "storeId": null,
       "exemptionId": "desktop-caller-selected-output",
       "ordinal": 0
@@ -5251,7 +5251,7 @@
       "sourceFile": "desktop/main.cjs",
       "kind": "mkdir",
       "excerpt": "fs.mkdirSync(dir, { recursive: true })",
-      "reason": "Writes an absolute path selected by the renderer or a screenshot directory selected by the user; no HANA_HOME store is implied.",
+      "reason": "Writes an absolute path selected by the renderer or a screenshot directory selected by the user; no LINGXI_HOME store is implied.",
       "storeId": null,
       "exemptionId": "desktop-caller-selected-output",
       "ordinal": 0
@@ -5269,7 +5269,7 @@
       "sourceFile": "desktop/main.cjs",
       "kind": "mkdir",
       "excerpt": "fs.mkdirSync(path.dirname(destinationPath), { recursive: true })",
-      "reason": "Writes an absolute path selected by the renderer or a screenshot directory selected by the user; no HANA_HOME store is implied.",
+      "reason": "Writes an absolute path selected by the renderer or a screenshot directory selected by the user; no LINGXI_HOME store is implied.",
       "storeId": null,
       "exemptionId": "desktop-caller-selected-output",
       "ordinal": 0
@@ -5287,7 +5287,7 @@
       "sourceFile": "desktop/main.cjs",
       "kind": "mkdir",
       "excerpt": "fs.mkdirSync(path.dirname(resolved), { recursive: true })",
-      "reason": "Writes an absolute path selected by the renderer or a screenshot directory selected by the user; no HANA_HOME store is implied.",
+      "reason": "Writes an absolute path selected by the renderer or a screenshot directory selected by the user; no LINGXI_HOME store is implied.",
       "storeId": null,
       "exemptionId": "desktop-caller-selected-output",
       "ordinal": 0
@@ -5386,7 +5386,7 @@
       "sourceFile": "desktop/main.cjs",
       "kind": "write-file",
       "excerpt": "fs.writeFileSync(filePath, content, \"utf-8\")",
-      "reason": "Writes an absolute path selected by the renderer or a screenshot directory selected by the user; no HANA_HOME store is implied.",
+      "reason": "Writes an absolute path selected by the renderer or a screenshot directory selected by the user; no LINGXI_HOME store is implied.",
       "storeId": null,
       "exemptionId": "desktop-caller-selected-output",
       "ordinal": 0
@@ -5395,7 +5395,7 @@
       "sourceFile": "desktop/main.cjs",
       "kind": "write-file",
       "excerpt": "fs.writeFileSync(filePath, pngBuffer)",
-      "reason": "Writes an absolute path selected by the renderer or a screenshot directory selected by the user; no HANA_HOME store is implied.",
+      "reason": "Writes an absolute path selected by the renderer or a screenshot directory selected by the user; no LINGXI_HOME store is implied.",
       "storeId": null,
       "exemptionId": "desktop-caller-selected-output",
       "ordinal": 0
@@ -5413,7 +5413,7 @@
       "sourceFile": "desktop/main.cjs",
       "kind": "write-file",
       "excerpt": "fs.writeFileSync(resolved, Buffer.from(base64Data, \"base64\"))",
-      "reason": "Writes an absolute path selected by the renderer or a screenshot directory selected by the user; no HANA_HOME store is implied.",
+      "reason": "Writes an absolute path selected by the renderer or a screenshot directory selected by the user; no LINGXI_HOME store is implied.",
       "storeId": null,
       "exemptionId": "desktop-caller-selected-output",
       "ordinal": 0
@@ -6016,7 +6016,7 @@
       "sourceFile": "lib/compat/checks/dirs.ts",
       "kind": "mkdir",
       "excerpt": "fs.mkdirSync(full, { recursive: true })",
-      "reason": "Compatibility check creates a fixed set of registered HANA_HOME roots; flow attribution remains with the first-run coordinator.",
+      "reason": "Compatibility check creates a fixed set of registered LINGXI_HOME roots; flow attribution remains with the first-run coordinator.",
       "storeId": null,
       "exemptionId": "compat-directory-seeding",
       "ordinal": 0
@@ -6421,7 +6421,7 @@
       "sourceFile": "lib/file-ref/resource-io.ts",
       "kind": "copy-file",
       "excerpt": "fs.copyFileSync(resolved.filePath, finalTargetPath)",
-      "reason": "Writes an explicit tool output path supplied by the caller; no HANA_HOME store is implied.",
+      "reason": "Writes an explicit tool output path supplied by the caller; no LINGXI_HOME store is implied.",
       "storeId": null,
       "exemptionId": "external-file-ref-io",
       "ordinal": 0
@@ -6430,7 +6430,7 @@
       "sourceFile": "lib/file-ref/resource-io.ts",
       "kind": "mkdir",
       "excerpt": "fs.mkdirSync(path.dirname(finalTargetPath), { recursive: true })",
-      "reason": "Writes an explicit tool output path supplied by the caller; no HANA_HOME store is implied.",
+      "reason": "Writes an explicit tool output path supplied by the caller; no LINGXI_HOME store is implied.",
       "storeId": null,
       "exemptionId": "external-file-ref-io",
       "ordinal": 0
@@ -8410,7 +8410,7 @@
       "sourceFile": "server/routes/plugins.ts",
       "kind": "remove-path",
       "excerpt": "fs.rmSync(cleanupPath, { recursive: true, force: true })",
-      "reason": "One bounded cleanup list contains both HANA_HOME .installing staging and operating-system extraction temp; flow-sensitive attribution must replace this exact conditional site.",
+      "reason": "One bounded cleanup list contains both LINGXI_HOME .installing staging and operating-system extraction temp; flow-sensitive attribution must replace this exact conditional site.",
       "storeId": null,
       "exemptionId": "conditional-plugin-install-cleanup",
       "ordinal": 0
@@ -8419,7 +8419,7 @@
       "sourceFile": "server/routes/plugins.ts",
       "kind": "remove-path",
       "excerpt": "fs.rmSync(cleanupPath, { recursive: true, force: true })",
-      "reason": "One bounded cleanup list contains both HANA_HOME .installing staging and operating-system extraction temp; flow-sensitive attribution must replace this exact conditional site.",
+      "reason": "One bounded cleanup list contains both LINGXI_HOME .installing staging and operating-system extraction temp; flow-sensitive attribution must replace this exact conditional site.",
       "storeId": null,
       "exemptionId": "conditional-plugin-install-cleanup",
       "ordinal": 1
@@ -9175,7 +9175,7 @@
       "sourceFile": "shared/default-workspace.ts",
       "kind": "mkdir",
       "excerpt": "fs.mkdirSync(defaultPath, { recursive: true })",
-      "reason": "Creates the user-selected default workspace outside HANA_HOME.",
+      "reason": "Creates the user-selected default workspace outside LINGXI_HOME.",
       "storeId": null,
       "exemptionId": "external-default-workspace",
       "ordinal": 0
@@ -9184,7 +9184,7 @@
       "sourceFile": "shared/default-workspace.ts",
       "kind": "mkdir",
       "excerpt": "fs.mkdirSync(workspacePath, { recursive: true })",
-      "reason": "Creates the user-selected default workspace outside HANA_HOME.",
+      "reason": "Creates the user-selected default workspace outside LINGXI_HOME.",
       "storeId": null,
       "exemptionId": "external-default-workspace",
       "ordinal": 0
@@ -9396,7 +9396,7 @@
       "id": "compat-directory-seeding",
       "ownerModule": "lib/compat/checks/dirs.ts",
       "sourceFile": "lib/compat/checks/dirs.ts",
-      "reason": "Compatibility check creates a fixed set of registered HANA_HOME roots; flow attribution remains with the first-run coordinator.",
+      "reason": "Compatibility check creates a fixed set of registered LINGXI_HOME roots; flow attribution remains with the first-run coordinator.",
       "expiresOn": "2026-10-31",
       "kinds": [
         "database-open",
@@ -9416,7 +9416,7 @@
       "id": "conditional-plugin-install-cleanup",
       "ownerModule": "server/routes/plugins.ts",
       "sourceFile": "server/routes/plugins.ts",
-      "reason": "One bounded cleanup list contains both HANA_HOME .installing staging and operating-system extraction temp; flow-sensitive attribution must replace this exact conditional site.",
+      "reason": "One bounded cleanup list contains both LINGXI_HOME .installing staging and operating-system extraction temp; flow-sensitive attribution must replace this exact conditional site.",
       "expiresOn": "2026-10-31",
       "kinds": [
         "remove-path"
@@ -9513,7 +9513,7 @@
       "id": "desktop-caller-selected-output",
       "ownerModule": "desktop/main.cjs",
       "sourceFile": "desktop/main.cjs",
-      "reason": "Writes an absolute path selected by the renderer or a screenshot directory selected by the user; no HANA_HOME store is implied.",
+      "reason": "Writes an absolute path selected by the renderer or a screenshot directory selected by the user; no LINGXI_HOME store is implied.",
       "expiresOn": "2027-01-31",
       "kinds": [
         "mkdir",
@@ -9537,7 +9537,7 @@
       "id": "desktop-external-text-file",
       "ownerModule": "desktop/file-text-io.cjs",
       "sourceFile": "desktop/file-text-io.cjs",
-      "reason": "Writes an absolute artifact/editor path explicitly selected by the caller, outside any implied HANA_HOME store.",
+      "reason": "Writes an absolute artifact/editor path explicitly selected by the caller, outside any implied LINGXI_HOME store.",
       "expiresOn": "2027-01-31",
       "kinds": [
         "database-open",
@@ -9570,7 +9570,7 @@
       "id": "desktop-legacy-update-path-cleanup",
       "ownerModule": "desktop/auto-updater.cjs",
       "sourceFile": "desktop/auto-updater.cjs",
-      "reason": "Deletes the exact legacy last-update-version source and its now-empty legacy directory outside the active HANA_HOME.",
+      "reason": "Deletes the exact legacy last-update-version source and its now-empty legacy directory outside the active LINGXI_HOME.",
       "expiresOn": "2026-10-31",
       "kinds": [
         "remove-path"
@@ -9644,7 +9644,7 @@
       "id": "external-default-workspace",
       "ownerModule": "shared/default-workspace.ts",
       "sourceFile": "shared/default-workspace.ts",
-      "reason": "Creates the user-selected default workspace outside HANA_HOME.",
+      "reason": "Creates the user-selected default workspace outside LINGXI_HOME.",
       "expiresOn": "2027-01-31",
       "kinds": [
         "database-open",
@@ -9675,7 +9675,7 @@
       "id": "external-file-ref-io",
       "ownerModule": "lib/file-ref/resource-io.ts",
       "sourceFile": "lib/file-ref/resource-io.ts",
-      "reason": "Writes an explicit tool output path supplied by the caller; no HANA_HOME store is implied.",
+      "reason": "Writes an explicit tool output path supplied by the caller; no LINGXI_HOME store is implied.",
       "expiresOn": "2027-01-31",
       "kinds": [
         "database-open",
@@ -9715,7 +9715,7 @@
       "id": "external-mount-writes",
       "ownerModule": "core/mount-aware-file-service.ts",
       "sourceFile": "core/mount-aware-file-service.ts",
-      "reason": "Creates user-selected workspace or mounted roots whose ownership is recorded by studio-mounts.json rather than by HANA_HOME path inventory.",
+      "reason": "Creates user-selected workspace or mounted roots whose ownership is recorded by studio-mounts.json rather than by LINGXI_HOME path inventory.",
       "expiresOn": "2027-01-31",
       "kinds": [
         "database-open",

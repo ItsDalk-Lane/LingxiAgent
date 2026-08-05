@@ -117,11 +117,11 @@ export function createRestrictedTokenSmokeRuntimeEnv({
     APPDATA: appDataDir,
     USERPROFILE: profileDir,
     HOME: profileDir,
-    HANA_HOME: hanaHome,
-    HANA_ROOT: path.win32.join(layoutRoot, "server"),
-    HANA_SERVER_ENTRY: path.win32.join(layoutRoot, "server", "bundle", "index.js"),
-    HANA_WIN32_SANDBOX_HELPER: helperPath,
-    HANA_WIN32_SANDBOX_DEBUG: "1",
+    LINGXI_HOME: hanaHome,
+    LINGXI_ROOT: path.win32.join(layoutRoot, "server"),
+    LINGXI_SERVER_ENTRY: path.win32.join(layoutRoot, "server", "bundle", "index.js"),
+    LINGXI_WIN32_SANDBOX_HELPER: helperPath,
+    LINGXI_WIN32_SANDBOX_DEBUG: "1",
   };
 
   // Carry the small set of host identity/system keys production inherits, but
@@ -172,11 +172,11 @@ export function standaloneRestrictedTokenSmokeSpec({
   // proof. Sandboxed Git startup is covered by the exec_command smoke below,
   // which reaches it through the production exec chain.
   const shellCommand =
-    `echo HANA_RESTRICTED_TOKEN_OK>${markerFileName}`
+    `echo LINGXI_RESTRICTED_TOKEN_OK>${markerFileName}`
     + ` && type ${markerFileName}`
     + ` && (echo SHOULD_NOT_WRITE>${blockedDirName}\\${deniedFileName})`
     + " && exit 73"
-    + " || echo HANA_DENY_WRITE_OK";
+    + " || echo LINGXI_DENY_WRITE_OK";
   return {
     helperPath,
     markerPath: path.win32.join(workDir, markerFileName),
@@ -225,10 +225,10 @@ export function runRestrictedTokenHelperSmoke({
   }
   const smokeStdout = String(sandboxResult.stdout || "");
   const smokeStderr = String(sandboxResult.stderr || "");
-  if (!smokeStdout.includes("HANA_RESTRICTED_TOKEN_OK")) {
+  if (!smokeStdout.includes("LINGXI_RESTRICTED_TOKEN_OK")) {
     throw new Error("[verify-standalone] restricted-token sandbox smoke did not emit its success marker");
   }
-  if (!smokeStdout.includes("HANA_DENY_WRITE_OK")) {
+  if (!smokeStdout.includes("LINGXI_DENY_WRITE_OK")) {
     throw new Error("[verify-standalone] restricted-token sandbox smoke did not prove deny-write enforcement");
   }
   const terminalRecord = 'hana-win-sandbox: terminal-v1 status="exited" exitCode="0" timeoutMs="30000" win32Error="0"';
@@ -239,7 +239,7 @@ export function runRestrictedTokenHelperSmoke({
   }
   expectEqual(
     fs.readFileSync(spec.markerPath, "utf8").trim(),
-    "HANA_RESTRICTED_TOKEN_OK",
+    "LINGXI_RESTRICTED_TOKEN_OK",
     "restricted-token writable-root marker",
   );
   if (fs.existsSync(spec.deniedMarkerPath)) {
@@ -281,16 +281,16 @@ export function standaloneExecCommandSmokeSpec({ layoutRoot, workDir, hanaHome, 
     windowsVerbatimArguments: true,
     env: {
       ...baseEnv,
-      HANA_HOME: hanaHome,
+      LINGXI_HOME: hanaHome,
       // Poison values prove the extracted wrapper, rather than the verifier,
       // owns the packaged runtime contract before Node imports the probe.
-      HANA_ROOT: "Z:\\hana-poison\\server",
-      HANA_SERVER_ENTRY: "Z:\\hana-poison\\server\\bundle\\index.js",
-      HANA_WIN32_SANDBOX_HELPER: "Z:\\hana-poison\\sandbox\\hana-win-sandbox.exe",
-      HANA_INTERNAL_STANDALONE_RUNTIME_SMOKE: "1",
-      HANA_STANDALONE_EXEC_WORK: workDir,
-      HANA_STANDALONE_EXPECTED_HELPER: helperPath,
-      HANA_STANDALONE_EXPECTED_ROOT: serverRoot,
+      LINGXI_ROOT: "Z:\\hana-poison\\server",
+      LINGXI_SERVER_ENTRY: "Z:\\hana-poison\\server\\bundle\\index.js",
+      LINGXI_WIN32_SANDBOX_HELPER: "Z:\\hana-poison\\sandbox\\hana-win-sandbox.exe",
+      LINGXI_INTERNAL_STANDALONE_RUNTIME_SMOKE: "1",
+      LINGXI_STANDALONE_EXEC_WORK: workDir,
+      LINGXI_STANDALONE_EXPECTED_HELPER: helperPath,
+      LINGXI_STANDALONE_EXPECTED_ROOT: serverRoot,
     },
   };
 }
@@ -337,7 +337,7 @@ function smokeExtractedRuntime({ rootDir, layoutRoot }) {
           + (execResult.stderr ? `\nstderr: ${execResult.stderr.trim()}` : ""),
       );
     }
-    const receiptPrefix = "HANA_STANDALONE_EXEC_RECEIPT=";
+    const receiptPrefix = "LINGXI_STANDALONE_EXEC_RECEIPT=";
     const receiptLine = String(execResult.stdout || "")
       .split(/\r?\n/)
       .find((line) => line.startsWith(receiptPrefix));

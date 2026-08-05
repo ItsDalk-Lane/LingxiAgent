@@ -53,6 +53,6 @@ describe("Computer Use packaging contract", () => {
 
     expect(helperBuild).toBeGreaterThanOrEqual(0);
     expect(helperBuild).toBeLessThan(macBuilder);
-    expect(workflow).toContain("HANA_COMPUTER_USE_HELPER_ARCH=${{ matrix.arch }}");
+    expect(workflow).toContain("LINGXI_COMPUTER_USE_HELPER_ARCH=${{ matrix.arch }}");
   });
 });

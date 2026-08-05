@@ -709,7 +709,7 @@ export class BridgeManager {
     this._messageLogs = new Map();
     this._messageLogMax = 200;
     this.mediaPublisher = new MediaPublisher({
-      baseUrl: engine.getBridgeMediaPublicBaseUrl?.() || process.env.HANA_BRIDGE_PUBLIC_BASE_URL || "",
+      baseUrl: engine.getBridgeMediaPublicBaseUrl?.() || process.env.LINGXI_BRIDGE_PUBLIC_BASE_URL || "",
       allowedRoots: roots,
     });
     this._mediaDelivery = new MediaDeliveryService({ engine, mediaPublisher: this.mediaPublisher });

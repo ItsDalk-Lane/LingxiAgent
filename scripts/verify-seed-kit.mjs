@@ -146,7 +146,7 @@ async function main() {
 
   const { keysetPath, keyset } = resolveBuildKeyset(process.env);
   if (keysetPath) {
-    console.log(`[verify-seed-kit] using HANA_SIGN_KEYSET override: ${keysetPath}`);
+    console.log(`[verify-seed-kit] using LINGXI_SIGN_KEYSET override: ${keysetPath}`);
   }
 
   console.log(`[verify-seed-kit] verifying ${artifactOutDir} (platformArch=${platformArch})...`);

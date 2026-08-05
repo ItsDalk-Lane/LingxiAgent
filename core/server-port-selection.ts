@@ -8,7 +8,7 @@
  *   Windows 保留端口段（Hyper-V/WinNAT excludedportrange）也时常覆盖它；
  *   固定整数端口会让全部安装共享同一枚地雷。
  * - LAN / custom_remote 的端口是对外契约（配对设备、防火墙规则），永不自动改。
- * - 占用者是另一个 Hana server 时禁止 fallback：同 HANA_HOME 双开会并发写坏
+ * - 占用者是另一个 Hana server 时禁止 fallback：同 LINGXI_HOME 双开会并发写坏
  *   SQLite 与 session 文件，同 home 复用/终止由桌面端启动链负责。
  */
 import fs from "fs";

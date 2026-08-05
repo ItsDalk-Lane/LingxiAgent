@@ -324,14 +324,14 @@ export function toAgentActivityWsMessage(event: any, sessionPath: any) {
 export const DEFAULT_DISCONNECT_ABORT_GRACE_MS = 5 * 60_000;
 export const DEFAULT_TURN_STALL_ABORT_MS = 20 * 60_000;
 
-export function resolveDisconnectAbortGraceMs(value = process.env.HANA_WS_DISCONNECT_ABORT_GRACE_MS) {
+export function resolveDisconnectAbortGraceMs(value = process.env.LINGXI_WS_DISCONNECT_ABORT_GRACE_MS) {
   if (value === undefined || value === null || value === "") return DEFAULT_DISCONNECT_ABORT_GRACE_MS;
   const parsed = Number(value);
   if (!Number.isFinite(parsed) || parsed < 0) return DEFAULT_DISCONNECT_ABORT_GRACE_MS;
   return Math.floor(parsed);
 }
 
-export function resolveTurnStallAbortMs(value = process.env.HANA_TURN_STALL_ABORT_MS) {
+export function resolveTurnStallAbortMs(value = process.env.LINGXI_TURN_STALL_ABORT_MS) {
   if (value === undefined || value === null || value === "") return DEFAULT_TURN_STALL_ABORT_MS;
   const parsed = Number(value);
   if (!Number.isFinite(parsed) || parsed < 0) return DEFAULT_TURN_STALL_ABORT_MS;

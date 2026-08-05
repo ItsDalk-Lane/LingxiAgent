@@ -78,11 +78,11 @@ describe("auto-updater", () => {
     mockAutoUpdater.allowPrerelease = false;
     mockAutoUpdater.installDirectory = undefined;
     mockExePath = "/Applications/HanaAgent.app/Contents/MacOS/HanaAgent";
-    delete process.env.HANA_UPDATE_FEED_URL;
-    delete process.env.HANA_UPDATE_SOURCE;
-    delete process.env.HANA_UPDATE_PROVIDER;
-    delete process.env.HANA_UPDATE_DIGEST_BASE_URL;
-    delete process.env.HANA_INVITE_API_URL;
+    delete process.env.LINGXI_UPDATE_FEED_URL;
+    delete process.env.LINGXI_UPDATE_SOURCE;
+    delete process.env.LINGXI_UPDATE_PROVIDER;
+    delete process.env.LINGXI_UPDATE_DIGEST_BASE_URL;
+    delete process.env.LINGXI_INVITE_API_URL;
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue({
       ok: false,
       status: 404,
@@ -147,7 +147,7 @@ describe("auto-updater", () => {
   });
 
   it.each(["gitcode", "atomgit"])("ignores legacy public source selector %s and keeps GitHub", (source) => {
-    const config = mod.resolveUpdateFeedConfig({ HANA_UPDATE_SOURCE: source });
+    const config = mod.resolveUpdateFeedConfig({ LINGXI_UPDATE_SOURCE: source });
     expect(config.feedURL).toEqual({
       provider: "github",
       owner: "liliMozi",
@@ -159,7 +159,7 @@ describe("auto-updater", () => {
   });
 
   it("can force GitHub as the only update feed", () => {
-    const config = mod.resolveUpdateFeedConfig({ HANA_UPDATE_SOURCE: "github" });
+    const config = mod.resolveUpdateFeedConfig({ LINGXI_UPDATE_SOURCE: "github" });
     expect(config.feedURL).toEqual({
       provider: "github",
       owner: "liliMozi",
@@ -169,7 +169,7 @@ describe("auto-updater", () => {
   });
 
   it("loads digest from the generic feed directory when an explicit feed URL is configured", () => {
-    const config = mod.resolveUpdateFeedConfig({ HANA_UPDATE_FEED_URL: "https://updates.example.com/hana/stable" });
+    const config = mod.resolveUpdateFeedConfig({ LINGXI_UPDATE_FEED_URL: "https://updates.example.com/hana/stable" });
     expect(config.feedURL).toEqual({
       provider: "generic",
       url: "https://updates.example.com/hana/stable/",
@@ -483,7 +483,7 @@ describe("auto-updater", () => {
     });
     initWithMockWindow({ hanakoHome: home });
 
-    const config = mod.resolveUpdateFeedConfig({ HANA_UPDATE_FEED_URL: "https://updates.example.com/pinned" });
+    const config = mod.resolveUpdateFeedConfig({ LINGXI_UPDATE_FEED_URL: "https://updates.example.com/pinned" });
     expect(config.feedURL).toEqual({
       provider: "generic",
       url: "https://updates.example.com/pinned/",
@@ -545,7 +545,7 @@ describe("auto-updater", () => {
   });
 
   it("reports the invite channel as configured and active once a channel file is activated", async () => {
-    process.env.HANA_INVITE_API_URL = "https://invite.example.com";
+    process.env.LINGXI_INVITE_API_URL = "https://invite.example.com";
     const home = createTempHome();
     writeChannelFile(home, {
       version: 1,
@@ -565,7 +565,7 @@ describe("auto-updater", () => {
   });
 
   it("redeems an invite code with a hashed device id and never sends the raw device id", async () => {
-    process.env.HANA_INVITE_API_URL = "https://invite.example.com";
+    process.env.LINGXI_INVITE_API_URL = "https://invite.example.com";
     const home = createTempHome();
     const fetchMock = vi.fn().mockResolvedValue({
       ok: true,
@@ -602,7 +602,7 @@ describe("auto-updater", () => {
   });
 
   it("reports an invalid or exhausted invite code separately from a network failure", async () => {
-    process.env.HANA_INVITE_API_URL = "https://invite.example.com";
+    process.env.LINGXI_INVITE_API_URL = "https://invite.example.com";
     const home = createTempHome();
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue({
       ok: false,
@@ -619,7 +619,7 @@ describe("auto-updater", () => {
   });
 
   it("reports a redemption transport failure as a network error with the original message", async () => {
-    process.env.HANA_INVITE_API_URL = "https://invite.example.com";
+    process.env.LINGXI_INVITE_API_URL = "https://invite.example.com";
     const home = createTempHome();
     vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error("getaddrinfo ENOTFOUND")));
     initWithMockWindow({ hanakoHome: home });
@@ -645,7 +645,7 @@ describe("auto-updater", () => {
   });
 
   it("activates the invite channel only when explicitly asked, and switches the live feed", async () => {
-    process.env.HANA_INVITE_API_URL = "https://invite.example.com";
+    process.env.LINGXI_INVITE_API_URL = "https://invite.example.com";
     const home = createTempHome();
     initWithMockWindow({ hanakoHome: home });
 
@@ -676,7 +676,7 @@ describe("auto-updater", () => {
   });
 
   it("refuses to activate a channel without an https feed address", async () => {
-    process.env.HANA_INVITE_API_URL = "https://invite.example.com";
+    process.env.LINGXI_INVITE_API_URL = "https://invite.example.com";
     const home = createTempHome();
     initWithMockWindow({ hanakoHome: home });
 

@@ -15,7 +15,7 @@ afterEach(() => {
   for (const dir of tempDirs.splice(0)) {
     fs.rmSync(dir, { recursive: true, force: true });
   }
-  delete process.env.HANA_SIGN_KEYSET;
+  delete process.env.LINGXI_SIGN_KEYSET;
   vi.resetModules();
 });
 
@@ -25,19 +25,19 @@ async function loadConfig() {
   return mod.default as { resolve?: { alias?: Array<{ find: RegExp; replacement: string }> } };
 }
 
-describe("vite.config.main.js HANA_SIGN_KEYSET build-time substitution", () => {
+describe("vite.config.main.js LINGXI_SIGN_KEYSET build-time substitution", () => {
   it("adds no keyset alias by default (repo pinned-keyset.json gets inlined)", async () => {
-    delete process.env.HANA_SIGN_KEYSET;
+    delete process.env.LINGXI_SIGN_KEYSET;
     const config = await loadConfig();
     const aliases = config.resolve?.alias ?? [];
     expect(aliases.some((a) => String(a.find).includes("pinned-keyset"))).toBe(false);
   });
 
-  it("aliases the pinned keyset module to the override file when HANA_SIGN_KEYSET is set", async () => {
+  it("aliases the pinned keyset module to the override file when LINGXI_SIGN_KEYSET is set", async () => {
     const dir = makeTempDir();
     const overridePath = path.join(dir, "override-keyset.json");
     fs.writeFileSync(overridePath, JSON.stringify([{ keyId: "t1", publicKey: "pem" }]));
-    process.env.HANA_SIGN_KEYSET = overridePath;
+    process.env.LINGXI_SIGN_KEYSET = overridePath;
 
     const config = await loadConfig();
     const aliases = config.resolve?.alias ?? [];
@@ -50,8 +50,8 @@ describe("vite.config.main.js HANA_SIGN_KEYSET build-time substitution", () => {
     expect("./manifest.cjs".match(entry!.find)).toBeNull();
   });
 
-  it("hard-errors at config load when HANA_SIGN_KEYSET points at a missing file", async () => {
-    process.env.HANA_SIGN_KEYSET = "/nonexistent/override-keyset.json";
-    await expect(loadConfig()).rejects.toThrow(/HANA_SIGN_KEYSET/);
+  it("hard-errors at config load when LINGXI_SIGN_KEYSET points at a missing file", async () => {
+    process.env.LINGXI_SIGN_KEYSET = "/nonexistent/override-keyset.json";
+    await expect(loadConfig()).rejects.toThrow(/LINGXI_SIGN_KEYSET/);
   });
 });

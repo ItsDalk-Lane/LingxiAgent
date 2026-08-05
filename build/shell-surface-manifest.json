@@ -72,7 +72,7 @@
       "kind": "buildOutputGlob",
       "producedBy": "build:splash",
       "buildConfig": "vite.config.splash.ts",
-      "note": "vite build entry desktop/src/splash.html, plus a closeBundle plugin (copySplashRuntimeAssets -> scripts/splash-assets.mjs copySplashAssets) that copies modules/platform.js, all locales/*.json, and the yuan-avatar PNGs named by shared/yuan-visuals.ts YUAN_VISUALS into dist-splash/. splash is the one shell-owned HTML surface: it must render before any HANA_HOME artifact is unpacked, so it cannot depend on dist-renderer build output.",
+      "note": "vite build entry desktop/src/splash.html, plus a closeBundle plugin (copySplashRuntimeAssets -> scripts/splash-assets.mjs copySplashAssets) that copies modules/platform.js, all locales/*.json, and the yuan-avatar PNGs named by shared/yuan-visuals.ts YUAN_VISUALS into dist-splash/. splash is the one shell-owned HTML surface: it must render before any LINGXI_HOME artifact is unpacked, so it cannot depend on dist-renderer build output.",
       "sourcePaths": [
         "desktop/src/splash.html",
         "scripts/splash-assets.mjs",
@@ -134,9 +134,9 @@
       "builderEntry": "dist-server-artifact/${os}-${arch}/ -> seed/",
       "platform": "all",
       "kind": "signedSeedKit",
-      "producedBy": "build:server (scripts/build-server.mjs -> scripts/build-server-artifact.mjs), signed against HANA_SIGN_KEY",
+      "producedBy": "build:server (scripts/build-server.mjs -> scripts/build-server-artifact.mjs), signed against LINGXI_SIGN_KEY",
       "consumedNotBuiltBy": "build:shell",
-      "note": "build:shell never runs build:server and never reads HANA_SIGN_KEY. It only runs scripts/verify-seed-kit.mjs (fail-closed) against whatever already exists at dist-server-artifact/{os}-{arch}/; a missing/mismatched kit is a hard build:shell failure with a message pointing at `npm run build:server` or fetching an already-signed artifact."
+      "note": "build:shell never runs build:server and never reads LINGXI_SIGN_KEY. It only runs scripts/verify-seed-kit.mjs (fail-closed) against whatever already exists at dist-server-artifact/{os}-{arch}/; a missing/mismatched kit is a hard build:shell failure with a message pointing at `npm run build:server` or fetching an already-signed artifact."
     },
     {
       "builderEntry": "desktop/src/screenshot-themes/ -> screenshot-themes/",
@@ -186,7 +186,7 @@
       "hook": "afterPack",
       "script": "scripts/fix-modules.cjs",
       "readsSignKey": false,
-      "note": "Validates the seed/ four-piece kit landed in extraResources and patches asar production deps / node_modules/.bin symlinks. Does not read HANA_SIGN_KEY."
+      "note": "Validates the seed/ four-piece kit landed in extraResources and patches asar production deps / node_modules/.bin symlinks. Does not read LINGXI_SIGN_KEY."
     },
     {
       "hook": "afterSign",
@@ -217,7 +217,7 @@
   "excludedFromShell": [
     {
       "script": "build:renderer",
-      "reason": "Renderer is not shipped inside the shell asar. It's a separately versioned artifact that build:server packs into the signed seed kit (dist-server-artifact/{os}-{arch}/); the shell resolves an activated renderer directory at runtime from HANA_HOME/artifacts, never from Resources directly except via the seed archive. build:shell never invokes build:renderer."
+      "reason": "Renderer is not shipped inside the shell asar. It's a separately versioned artifact that build:server packs into the signed seed kit (dist-server-artifact/{os}-{arch}/); the shell resolves an activated renderer directory at runtime from LINGXI_HOME/artifacts, never from Resources directly except via the seed archive. build:shell never invokes build:renderer."
     },
     {
       "script": "build:server",

@@ -54,20 +54,20 @@ function pushUniqueRuntimePath(candidates, candidate) {
 }
 
 function legacyPackagedDesktopResourceRoots(env) {
-  if (env.HANA_DESKTOP_IS_PACKAGED !== "1") return [];
+  if (env.LINGXI_DESKTOP_IS_PACKAGED !== "1") return [];
 
   const roots = [];
-  const appPath = env.HANA_DESKTOP_APP_PATH;
+  const appPath = env.LINGXI_DESKTOP_APP_PATH;
   // Existing packaged shells use asar and pass app.getAppPath(). Accept only
   // that exact layout so a source/dev directory cannot become an install root.
   if (appPath && basenameRuntimePath(appPath).toLowerCase() === "app.asar") {
     pushUniqueRuntimePath(roots, dirnameRuntimePath(appPath));
   }
 
-  const execPath = env.HANA_DESKTOP_EXEC_PATH;
+  const execPath = env.LINGXI_DESKTOP_EXEC_PATH;
   // Windows Electron keeps resources/ beside the packaged executable. This is
   // a bounded compatibility candidate for shells released before the explicit
-  // HANA_DESKTOP_RESOURCES_PATH contract existed.
+  // LINGXI_DESKTOP_RESOURCES_PATH contract existed.
   if (execPath && basenameRuntimePath(execPath).toLowerCase().endsWith(".exe")) {
     pushUniqueRuntimePath(roots, joinRuntimePath(dirnameRuntimePath(execPath), "resources"));
   }
@@ -76,13 +76,13 @@ function legacyPackagedDesktopResourceRoots(env) {
 
 function resourceSiblingCandidates(segments, { env, resourcesPath }) {
   const roots = [];
-  pushUniqueRuntimePath(roots, env.HANA_DESKTOP_RESOURCES_PATH);
+  pushUniqueRuntimePath(roots, env.LINGXI_DESKTOP_RESOURCES_PATH);
   pushUniqueRuntimePath(roots, resourcesPath);
   for (const root of legacyPackagedDesktopResourceRoots(env)) {
     pushUniqueRuntimePath(roots, root);
   }
-  if (env.HANA_ROOT) {
-    pushUniqueRuntimePath(roots, resolveRuntimePath(env.HANA_ROOT, ".."));
+  if (env.LINGXI_ROOT) {
+    pushUniqueRuntimePath(roots, resolveRuntimePath(env.LINGXI_ROOT, ".."));
   }
   return roots.map((root) => joinRuntimePath(root, ...segments));
 }
@@ -107,7 +107,7 @@ export function resolveWin32SandboxHelper({
   existsSync = defaultExistsSync,
 } = {}) {
   const candidates = [
-    env.HANA_WIN32_SANDBOX_HELPER,
+    env.LINGXI_WIN32_SANDBOX_HELPER,
     ...resourceSiblingCandidates(
       ["sandbox", "windows", WIN32_SANDBOX_HELPER_NAME],
       { env, resourcesPath },

@@ -3214,7 +3214,7 @@
       "timezone": "Timezone",
       "timezoneDesc": "IANA timezone (e.g. Asia/Shanghai)",
       "bridgeMediaPublicBaseUrl": "Bridge File Public URL",
-      "bridgeMediaPublicBaseUrlDesc": "Public HTTP/HTTPS base URL used by external platforms to fetch local staged files. Usually provided by a reverse proxy or tunnel. Leave empty to fall back to HANA_BRIDGE_PUBLIC_BASE_URL.",
+      "bridgeMediaPublicBaseUrlDesc": "Public HTTP/HTTPS base URL used by external platforms to fetch local staged files. Usually provided by a reverse proxy or tunnel. Leave empty to fall back to LINGXI_BRIDGE_PUBLIC_BASE_URL.",
       "computerUse": "Computer Use",
       "computerUseDesc": "When enabled, new conversations expose the computer tool to the primary Agent. When disabled, new conversations cannot see it, and frozen old conversations are rejected if they call it.",
       "thinkingBudget": "Thinking Depth",

@@ -11,7 +11,7 @@
  * Bundling note: the shell main process is bundled by Vite
  * (`vite.config.main.js`), which INLINES the required JSON at bundle
  * time — the keyset travels inside the codesigned main bundle, not as a
- * loose resource file. `HANA_SIGN_KEYSET=<path>` is honored by the BUILD
+ * loose resource file. `LINGXI_SIGN_KEYSET=<path>` is honored by the BUILD
  * (vite alias swaps which file gets inlined); this module never reads
  * env at runtime — there is no runtime verification bypass.
  */

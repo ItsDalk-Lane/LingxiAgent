@@ -15,7 +15,7 @@ const CUSTOM_WORDS = [
   "OpenClaw 1000 eng",
   "Cherry 1000 eng",
   "Studio 1000 eng",
-  "HANA_HOME 1000 eng",
+  "LINGXI_HOME 1000 eng",
   "Bridge 1000 eng",
   "MCP 1000 eng",
   "RC 1000 eng",

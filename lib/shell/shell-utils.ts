@@ -145,7 +145,7 @@ export function findWin32PowerShell7Executable(env = process.env, {
 }
 
 export function resolveWin32DefaultPowerShellExecutable(env = process.env, options = {}) {
-  const configured = envValue(env, "HANA_POWERSHELL");
+  const configured = envValue(env, "LINGXI_POWERSHELL");
   if (configured) return configured;
   return findWin32PowerShell7Executable(env, options) || win32PowerShell51Executable(env);
 }
@@ -156,7 +156,7 @@ export function resolveWin32PowerShellExecutable(token = "powershell.exe", env =
   const raw = String(token || "powershell.exe");
   if (isWin32PathLike(raw) || raw.includes("\\") || raw.includes("/")) return raw;
   const base = baseNameForShellPath(raw, { stripExe: false }).toLowerCase();
-  const configured = envValue(env, "HANA_POWERSHELL");
+  const configured = envValue(env, "LINGXI_POWERSHELL");
   if (configured) return configured;
   if (base === "pwsh" || base === "pwsh.exe") {
     return typeof resolveOnPath === "function" ? resolveOnPath("pwsh.exe") || "pwsh.exe" : "pwsh.exe";

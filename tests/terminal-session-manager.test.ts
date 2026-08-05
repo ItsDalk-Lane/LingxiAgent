@@ -107,7 +107,7 @@ describe("TerminalSessionManager", () => {
 
     await expect(
       manager.start({ sessionPath, agentId: "hana", cwd: gone }),
-    ).rejects.toMatchObject({ code: "HANA_EXEC_CWD_MISSING", cwd: gone });
+    ).rejects.toMatchObject({ code: "LINGXI_EXEC_CWD_MISSING", cwd: gone });
 
     expect(backend.spawn).not.toHaveBeenCalled();
     expect(manager.list(sessionPath).terminals).toEqual([]);

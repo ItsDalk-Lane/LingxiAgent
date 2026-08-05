@@ -54,7 +54,7 @@ describe("Windows system CA wiring", () => {
       NODE_USE_SYSTEM_CA: "0",
       NODE_EXTRA_CA_CERTS: "C:\\certs\\company.pem",
       NODE_OPTIONS: "--trace-warnings",
-      HANA_HOME: "C:\\Users\\hana",
+      LINGXI_HOME: "C:\\Users\\hana",
     };
     expect(withWindowsSystemCaEnv(input, { platform: "win32" })).toEqual({
       ...input,

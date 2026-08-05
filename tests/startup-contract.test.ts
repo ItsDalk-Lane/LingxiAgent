@@ -23,11 +23,11 @@ describe("local startup contract", () => {
 
     expect(launchJs).toContain('from "./dev-env.js"');
     expect(launchJs).toContain("applyDevEnvironment(process.env)");
-    expect(devEnvJs).toContain("HANA_DEV_NODE_BIN");
-    expect(mainCjs).toContain("HANA_DEV_NODE_BIN");
+    expect(devEnvJs).toContain("LINGXI_DEV_NODE_BIN");
+    expect(mainCjs).toContain("LINGXI_DEV_NODE_BIN");
 
     const env = applyDevEnvironment({}, { nodeBin: "/tmp/hana-node" });
-    expect(env.HANA_DEV_NODE_BIN).toBe("/tmp/hana-node");
+    expect(env.LINGXI_DEV_NODE_BIN).toBe("/tmp/hana-node");
   });
 
   it("server keeps Pi SDK runtime paths explicit and CLI stays server-first", () => {

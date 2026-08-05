@@ -111,7 +111,7 @@ describe("plugin SDK examples and docs", () => {
 
     expect(index).toContain("definePlugin");
     expect(index).toContain("defineBusHandler");
-    expect(index).toContain("HANA_BUS_SKIP");
+    expect(index).toContain("LINGXI_BUS_SKIP");
     expect(tool).toContain("defineTool");
     expect(tool).toContain("createMediaDetails");
     expect(tool).toContain("sessionPermission");

@@ -30,7 +30,7 @@ function isSafeAgentId(agentId) {
 }
 
 /**
- * @param {string|null|undefined} hanakoHome - resolved HANA_HOME data root
+ * @param {string|null|undefined} hanakoHome - resolved LINGXI_HOME data root
  * @param {string|null|undefined} agentId - id of the agent that triggered the notification
  * @returns {string|null} absolute path to the avatar file, or null when none/unsafe
  */

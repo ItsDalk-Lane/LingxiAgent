@@ -99,7 +99,7 @@ function browserError(rawMsg: any, details: Record<string, any> = {}) {
  * @param {(sessionPath:string|null) => object|null} [options.getSessionModel] - 返回执行 session 的模型对象
  * @param {() => { prepare?: Function }|null} [options.getVisionBridge] - 视觉辅助桥
  * @param {() => boolean} [options.isVisionAuxiliaryEnabled] - 视觉辅助总开关
- * @param {() => string|null} [options.getHanakoHome] - 返回 HANA_HOME
+ * @param {() => string|null} [options.getHanakoHome] - 返回 LINGXI_HOME
  * @param {(sessionPath:string|null) => string|null} [options.getSessionIdForPath] - 返回 sessionId
  * @param {(entry: object) => object} [options.registerSessionFile] - 注册 session 文件
  * @param {boolean} [options.screenshotEnabled] - false 时从 schema 屏蔽 screenshot

@@ -19,7 +19,7 @@ const root = process.cwd();
  * behavioral coverage in tests/server-info-probe.test.ts — this file only
  * proves desktop/main.cjs actually calls into it at the right spot.
  */
-describe("desktop foreign-server guard (same-HANA_HOME mutual exclusion, desktop pre-spawn)", () => {
+describe("desktop foreign-server guard (same-LINGXI_HOME mutual exclusion, desktop pre-spawn)", () => {
   const mainSource = fs.readFileSync(path.join(root, "desktop", "main.cjs"), "utf-8");
 
   it("requires the shared token-authenticated probe module", () => {

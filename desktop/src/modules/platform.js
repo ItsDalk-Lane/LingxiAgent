@@ -15,7 +15,7 @@
 
   // Web / 非 Electron 环境 — HTTP fallback
   const params = new URLSearchParams(location.search);
-  const devWeb = normalizeDevWebConfig(window.__HANA_DEV_WEB__);
+  const devWeb = normalizeDevWebConfig(window.__LINGXI_DEV_WEB__);
   const token = params.get("token") || localStorage.getItem("hana-token") || "";
   const baseUrl = devWeb.apiBaseUrl || `${location.protocol}//${location.host}`;
   const serverPort = devWeb.serverPort || safePortFromBaseUrl(baseUrl) || location.port || "3000";

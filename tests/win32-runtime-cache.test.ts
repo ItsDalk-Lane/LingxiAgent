@@ -31,7 +31,7 @@ describe("win32 sandbox runtime cache", () => {
     }
   });
 
-  it("mirrors bundled Git under HANA_HOME and rewrites all runtime paths", () => {
+  it("mirrors bundled Git under LINGXI_HOME and rewrites all runtime paths", () => {
     const tempRoot = makeTempRoot();
     const hanakoHome = path.join(tempRoot, "home");
     const sourceRoot = path.join(tempRoot, "Program Files", "Hanako", "resources", "git");
@@ -55,7 +55,7 @@ describe("win32 sandbox runtime cache", () => {
     expect(path.relative(hanakoHome, prepared.git).startsWith("..")).toBe(false);
   });
 
-  it("mirrors the Node executable directory under HANA_HOME", () => {
+  it("mirrors the Node executable directory under LINGXI_HOME", () => {
     const tempRoot = makeTempRoot();
     const hanakoHome = path.join(tempRoot, "home");
     const sourceRoot = path.join(tempRoot, "Program Files", "Hanako", "resources", "server");

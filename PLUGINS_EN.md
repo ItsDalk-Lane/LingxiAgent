@@ -56,8 +56,8 @@ When an Agent such as Hana or Codex is building a plugin on the user's behalf,
 prefer the dev loop over copying a half-finished plugin into the real plugin
 directory:
 
-1. Keep the plugin source in the current workspace, or in `${HANA_HOME}/plugin-dev-sources/`.
-2. Call the EventBus `plugin.dev.install` or HTTP `POST /api/plugins/dev/install` to copy the source into `${HANA_HOME}/plugins-dev/<pluginId>` and load it.
+1. Keep the plugin source in the current workspace, or in `${LINGXI_HOME}/plugin-dev-sources/`.
+2. Call the EventBus `plugin.dev.install` or HTTP `POST /api/plugins/dev/install` to copy the source into `${LINGXI_HOME}/plugins-dev/<pluginId>` and load it.
 3. After editing the source, call `plugin.dev.reload` or `POST /api/plugins/dev/:id/reload`.
 4. To control the lifecycle, call `plugin.dev.disable`, `plugin.dev.enable`, `plugin.dev.reset`, `plugin.dev.uninstall`, or their HTTP counterparts: `PUT /api/plugins/dev/:id/enabled`, `POST /api/plugins/dev/:id/reset`, `DELETE /api/plugins/dev/:id`.
 5. Smoke-test tool plugins with `plugin.dev.invokeTool` or `POST /api/plugins/dev/:id/tools/:toolName/invoke`. Prefer passing `sessionId` or `sessionRef` in the call body; `sessionPath` is only a legacy locator kept for older plugins.
@@ -75,8 +75,8 @@ Dev-mode permissions come from the dev slot Hana remembers, not from what the
 manifest declares for itself. `devRunId` is the run guard for one dev
 install/reload cycle; pass it to enable/disable/reset/uninstall so a stale
 context cannot act on a newer dev slot. Dev operations may only touch the
-runtime copy under `${HANA_HOME}/plugins-dev/`. They never write to
-`${HANA_HOME}/plugins/` and never pollute the disable preferences of a real
+runtime copy under `${LINGXI_HOME}/plugins-dev/`. They never write to
+`${LINGXI_HOME}/plugins/` and never pollute the disable preferences of a real
 installed plugin.
 
 A `full-access` dev plugin must pass `allowFullAccess: true` explicitly. The
@@ -124,7 +124,7 @@ compatibility. The first phase supports `invokeTool`, `expectToolText` and
 
 - **Drag-and-drop**: Drag a plugin folder or .zip into Settings → Plugins install area
 - **File picker**: Click the install area and select a plugin folder or .zip via the file picker
-- **Manual**: Place the plugin directory in `${HANA_HOME}/plugins/`. The actual path is shown in Settings → Plugins or via `/api/plugins/settings` as `plugins_dir`
+- **Manual**: Place the plugin directory in `${LINGXI_HOME}/plugins/`. The actual path is shown in Settings → Plugins or via `/api/plugins/settings` as `plugins_dir`
 
 ### Management
 
@@ -136,7 +136,7 @@ All operations take effect immediately, no restart required:
 
 ### Plugin Data
 
-Plugin private data is stored in `${HANA_HOME}/plugin-data/{pluginId}/`. This directory is preserved when the plugin is deleted, so config persists across reinstalls.
+Plugin private data is stored in `${LINGXI_HOME}/plugin-data/{pluginId}/`. This directory is preserved when the plugin is deleted, so config persists across reinstalls.
 
 ## Directory Structure
 
@@ -903,7 +903,7 @@ export default definePlugin({
 The traditional class form is still supported:
 
 ```js
-import { HANA_BUS_SKIP } from "@hana/plugin-runtime";
+import { LINGXI_BUS_SKIP } from "@hana/plugin-runtime";
 
 export default class MyPlugin {
   async onload() {
@@ -919,7 +919,7 @@ export default class MyPlugin {
     // Resources registered via register() are auto-cleaned on unload (reverse order)
     this.register(
       this.ctx.bus.handle("bridge:send", async (payload) => {
-        if (payload.platform !== "feishu") return HANA_BUS_SKIP;
+        if (payload.platform !== "feishu") return LINGXI_BUS_SKIP;
         await this.sendToFeishu(payload);
         return { sent: true };
       })
@@ -938,16 +938,16 @@ export default class MyPlugin {
 
 ## Bus Communication (bus.request / bus.handle)
 
-Inter-plugin communication uses EventBus request-response. `bus.handle` requires full-access permission; `bus.request` is available to all plugins. `bus.listCapabilities()` / `bus.getCapability(type)` can read the current stable capability directory, which records the capability name, input/output schema, permission requirements, error codes, stability, and whether a handler is currently available. New plugins should use `defineBusHandler()`, `requestBus()`, and `HANA_BUS_SKIP` from `@hana/plugin-runtime` so handler types, request arguments, and chained skip semantics come from the SDK instead of hand-written conventions.
+Inter-plugin communication uses EventBus request-response. `bus.handle` requires full-access permission; `bus.request` is available to all plugins. `bus.listCapabilities()` / `bus.getCapability(type)` can read the current stable capability directory, which records the capability name, input/output schema, permission requirements, error codes, stability, and whether a handler is currently available. New plugins should use `defineBusHandler()`, `requestBus()`, and `LINGXI_BUS_SKIP` from `@hana/plugin-runtime` so handler types, request arguments, and chained skip semantics come from the SDK instead of hand-written conventions.
 
 ```js
-import { defineBusHandler, HANA_BUS_SKIP, requestBus } from "@hana/plugin-runtime";
+import { defineBusHandler, LINGXI_BUS_SKIP, requestBus } from "@hana/plugin-runtime";
 
 // Plugin A (full-access): register a capability
 const bridgeSend = defineBusHandler({
   type: "bridge:send",
   async handle(payload) {
-    if (payload.platform !== "telegram") return HANA_BUS_SKIP;
+    if (payload.platform !== "telegram") return LINGXI_BUS_SKIP;
     await telegramBot.send(payload.chatId, payload.text);
     return { sent: true };
   },
@@ -991,12 +991,12 @@ if (capability?.available) {
 
 **Naming convention**: `domain:action`, colon-separated. E.g. `bridge:send`, `memory:query`, `timer:schedule`.
 
-**SKIP chain**: Multiple handlers can be registered for the same event type. The system calls them in registration order until one returns a value other than `HANA_BUS_SKIP`. Returning `HANA_BUS_SKIP` means "I don't handle this, pass it on":
+**SKIP chain**: Multiple handlers can be registered for the same event type. The system calls them in registration order until one returns a value other than `LINGXI_BUS_SKIP`. Returning `LINGXI_BUS_SKIP` means "I don't handle this, pass it on":
 
 ```js
 this.register(
   this.ctx.bus.handle("bridge:send", async (payload) => {
-    if (payload.platform !== "telegram") return HANA_BUS_SKIP;
+    if (payload.platform !== "telegram") return LINGXI_BUS_SKIP;
     await telegramBot.send(payload.chatId, payload.text);
     return { sent: true };
   })
@@ -1172,10 +1172,10 @@ https://raw.githubusercontent.com/liliMozi/OH-Plugins/main/marketplace.json
 
 Developer overrides remain available:
 
-- `HANA_PLUGIN_MARKETPLACE_FILE=/path/to/marketplace.json`
-- `HANA_PLUGIN_MARKETPLACE_URL=https://.../marketplace.json`
+- `LINGXI_PLUGIN_MARKETPLACE_FILE=/path/to/marketplace.json`
+- `LINGXI_PLUGIN_MARKETPLACE_URL=https://.../marketplace.json`
 
-Without either environment variable, Hana first tries `${HANA_HOME}/plugin-marketplace/marketplace.json` for local development. If it does not exist, Hana reads the official `OH-Plugins` URL. The marketplace index shape matches the `OH-Plugins` repository:
+Without either environment variable, Hana first tries `${LINGXI_HOME}/plugin-marketplace/marketplace.json` for local development. If it does not exist, Hana reads the official `OH-Plugins` URL. The marketplace index shape matches the `OH-Plugins` repository:
 
 ```json
 {
@@ -1217,7 +1217,7 @@ The marketplace UI shows the plugin list and README in a wider settings subpage.
 
 Marketplace version management uses `versions[]` as the long-term contract: each item declares `version`, that version's `compatibility.minAppVersion`, and its own `distribution`. If `versions[]` is absent, Hana treats the root-level `version` / `compatibility` / `distribution` as a single version entry. The client chooses the highest SemVer version compatible with the current app, while exposing `latestVersion`, `selectedVersion`, `installedVersion`, `updateAvailable`, `downgrade`, `reinstall`, `compatible`, `installAction`, and `canInstall` for UI state.
 
-If the installed version is newer than the highest compatible marketplace version, the action is marked as `downgrade` and install requires explicit `allowDowngrade: true`. Drag-and-drop / local path installs also reject implicit downgrades. Updates back up the previous plugin directory under `${HANA_HOME}/plugin-backups/<pluginId>/`; if the new version fails to load, Hana restores and reloads the old directory. Successful installs are recorded in `${HANA_HOME}/plugin-installs.json` with source, version, release URL, and sha256 so later marketplace state is explicit.
+If the installed version is newer than the highest compatible marketplace version, the action is marked as `downgrade` and install requires explicit `allowDowngrade: true`. Drag-and-drop / local path installs also reject implicit downgrades. Updates back up the previous plugin directory under `${LINGXI_HOME}/plugin-backups/<pluginId>/`; if the new version fails to load, Hana restores and reloads the old directory. Successful installs are recorded in `${LINGXI_HOME}/plugin-installs.json` with source, version, release URL, and sha256 so later marketplace state is explicit.
 
 ## Forward Compatibility
 

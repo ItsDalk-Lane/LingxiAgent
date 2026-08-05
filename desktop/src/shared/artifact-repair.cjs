@@ -10,7 +10,7 @@
  * confirmation).
  *
  * Resets ONLY the artifact pipeline's own on-disk state under
- * `{HANA_HOME}/artifacts/` — pointers, both kinds' extracted version
+ * `{LINGXI_HOME}/artifacts/` — pointers, both kinds' extracted version
  * directories, in-progress staging, the quarantine list, both boot
  * sentinels, and OTA bookkeeping — so the next launch takes the exact
  * same "no current pointer resolves" path a brand-new install takes: seed

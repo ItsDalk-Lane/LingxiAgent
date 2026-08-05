@@ -127,8 +127,8 @@ process.on("unhandledRejection", (reason) => {
 let hanakoHome = null;
 try {
   const { resolveHanakoHome } = require("../shared/hana-runtime-paths.cjs");
-  hanakoHome = resolveHanakoHome(process.env.HANA_HOME);
-  process.env.HANA_HOME = hanakoHome;
+  hanakoHome = resolveHanakoHome(process.env.LINGXI_HOME);
+  process.env.LINGXI_HOME = hanakoHome;
   diagnosticsDir = path.join(hanakoHome, "diagnostics", "desktop-launch");
 } catch (err) {
   const diagnosticPath = writeDiagnostic("hana-home-resolve-failed.json", "hana-home-resolve-failed", {
@@ -137,7 +137,7 @@ try {
   });
   showBootstrapError(
     "HanaAgent Launch Failed",
-    `HanaAgent failed before HANA_HOME could be resolved.\n\n${err?.message || err}\n\nDiagnostic file:\n${diagnosticPath || diagnosticsDir}`,
+    `HanaAgent failed before LINGXI_HOME could be resolved.\n\n${err?.message || err}\n\nDiagnostic file:\n${diagnosticPath || diagnosticsDir}`,
   );
   exitAfterBootstrapFailure();
 }

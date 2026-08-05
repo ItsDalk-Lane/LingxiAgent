@@ -99,8 +99,8 @@ export class PluginMarketplace {
 }
 
 export function createDefaultPluginMarketplace({ hanakoHome, env = process.env, fetchImpl }: any = {}) {
-  const envPath = normalizeOptionalText(env.HANA_PLUGIN_MARKETPLACE_FILE);
-  const envUrl = normalizeOptionalText(env.HANA_PLUGIN_MARKETPLACE_URL);
+  const envPath = normalizeOptionalText(env.LINGXI_PLUGIN_MARKETPLACE_FILE);
+  const envUrl = normalizeOptionalText(env.LINGXI_PLUGIN_MARKETPLACE_URL);
   const localIndex = hanakoHome ? path.join(hanakoHome, "plugin-marketplace", "marketplace.json") : null;
   return new PluginMarketplace({
     indexPath: envPath || (localIndex && fs.existsSync(localIndex) ? localIndex : null),

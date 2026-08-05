@@ -5,7 +5,7 @@
  *   npm run server                              （独立运行，经 launch.js）
  *   Electron main.cjs spawn server/bootstrap.ts （桌面应用内嵌）
  *
- * 无 IPC 通道：就绪与端口写入 HANA_HOME/server-info.json，桌面端轮询该文件。
+ * 无 IPC 通道：就绪与端口写入 LINGXI_HOME/server-info.json，桌面端轮询该文件。
  */
 import crypto from "crypto";
 import fs from "fs";
@@ -249,9 +249,9 @@ export async function startServer(root: CompositionRoot = {}): Promise<void> {
   }
 
   // 用户数据存放在 ~/.hanako/（打包后与产品代码分离）
-  // 开发时可通过 HANA_HOME 环境变量隔离数据目录，如：HANA_HOME=~/.hanako-dev node server/index.js
-  const hanakoHome = resolveHanakoHome(process.env.HANA_HOME);
-  process.env.HANA_HOME = hanakoHome;
+  // 开发时可通过 LINGXI_HOME 环境变量隔离数据目录，如：LINGXI_HOME=~/.hanako-dev node server/index.js
+  const hanakoHome = resolveHanakoHome(process.env.LINGXI_HOME);
+  process.env.LINGXI_HOME = hanakoHome;
 
   // 读取版本号
   let appVersion = "?";
@@ -260,8 +260,8 @@ export async function startServer(root: CompositionRoot = {}): Promise<void> {
     appVersion = pkg.version || "?";
   } catch {}
 
-  // ── 同宅互斥闸（同一 HANA_HOME 的内核互斥）──
-  // 必须在任何端口监听、任何 store 打开之前跑：一台机器上的同一 HANA_HOME
+  // ── 同宅互斥闸（同一 LINGXI_HOME 的内核互斥）──
+  // 必须在任何端口监听、任何 store 打开之前跑：一台机器上的同一 LINGXI_HOME
   // 可能被两个内核并发打开（`hana serve` 先起、桌面后启动是最常见的触发
   // 路径），并发读写同一批 SQLite / session 文件会互相覆盖。这里用 token
   // 认证探测（shared/server-info-probe.cjs）确认 server-info.json 记录的
@@ -296,7 +296,7 @@ export async function startServer(root: CompositionRoot = {}): Promise<void> {
   // 降级覆盖：半途迁移只能由显式维护流程处理，普通启动不会自动续跑、回滚
   // 或猜测数据处于哪个版本。
   {
-    const allowDataDowngrade = process.env.HANA_ALLOW_DATA_DOWNGRADE === "1";
+    const allowDataDowngrade = process.env.LINGXI_ALLOW_DATA_DOWNGRADE === "1";
     const epochResult = await coordinateDataEpochStartup({
       homeDir: hanakoHome,
       ownEpoch: DATA_EPOCH,
@@ -330,7 +330,7 @@ export async function startServer(root: CompositionRoot = {}): Promise<void> {
       const mustBlock = DATA_EPOCH > 1 || hasHigherStamp || hasHigherTransition;
       if (!mustBlock) {
         console.warn(
-          `HANA_DATA_EPOCH_BASELINE_WARNING reason=${epochResult.reason}\n`
+          `LINGXI_DATA_EPOCH_BASELINE_WARNING reason=${epochResult.reason}\n`
           + `[data-epoch] epoch=1 baseline metadata could not be trusted (${epochResult.detail}); `
           + "no higher-epoch evidence was found, so ordinary startup will continue.",
         );
@@ -340,8 +340,8 @@ export async function startServer(root: CompositionRoot = {}): Promise<void> {
         // blocked = 旧内核撞上更高印章;其余 reason(incomplete-transition /
         // corrupt-* 等)统一归入 transition-incomplete 分支。人读文案不变。
         const marker = epochResult.reason === "epoch-downgrade-blocked"
-          ? "HANA_DATA_EPOCH_BLOCKED"
-          : "HANA_DATA_EPOCH_TRANSITION_INCOMPLETE";
+          ? "LINGXI_DATA_EPOCH_BLOCKED"
+          : "LINGXI_DATA_EPOCH_TRANSITION_INCOMPLETE";
         console.error(`${marker} reason=${epochResult.reason}`);
         console.error(describeDataEpochStartupBlock(epochResult));
         process.exit(1);
@@ -349,8 +349,8 @@ export async function startServer(root: CompositionRoot = {}): Promise<void> {
     }
   }
 
-  const SERVER_TOKEN = process.env.HANA_TOKEN || crypto.randomBytes(16).toString("hex");
-  const envPort = Number.parseInt(process.env.HANA_PORT || "", 10);
+  const SERVER_TOKEN = process.env.LINGXI_TOKEN || crypto.randomBytes(16).toString("hex");
+  const envPort = Number.parseInt(process.env.LINGXI_PORT || "", 10);
   const envPortPinned = Number.isInteger(envPort) && envPort >= 0;
   if (!envPortPinned) {
     await ensureServerNetworkConfigWithPortSelection(hanakoHome, { log: (msg) => log.log(msg) });
@@ -579,8 +579,8 @@ export async function startServer(root: CompositionRoot = {}): Promise<void> {
   const app = new Hono();
   const { injectWebSocket, upgradeWebSocket } = createNodeWebSocket({ app });
 
-  // CORS（默认允许 localhost 开发前端和 production Electron file:// 前端；HANA_CORS_ORIGIN 可收紧到单一来源）+ 鉴权
-  const corsAllowedOrigin = process.env.HANA_CORS_ORIGIN;
+  // CORS（默认允许 localhost 开发前端和 production Electron file:// 前端；LINGXI_CORS_ORIGIN 可收紧到单一来源）+ 鉴权
+  const corsAllowedOrigin = process.env.LINGXI_CORS_ORIGIN;
   app.use("*", async (c: any, next: any) => {
     const origin = c.req.header("origin") || "";
     const isAllowed = isCorsOriginAllowed({
@@ -837,7 +837,7 @@ export async function startServer(root: CompositionRoot = {}): Promise<void> {
   // 时序要求：所有 framework extension + plugin extension 都注册完之后再 create，
   // 否则 pi SDK ExtensionRunner 构造时拿不到这些 factory，extension 不会挂到
   // startup session 上（Codex 评审发现的 issue#437 部分失效场景）。
-  const shouldCreateStartupSession = process.env.HANA_CREATE_STARTUP_SESSION !== "0";
+  const shouldCreateStartupSession = process.env.LINGXI_CREATE_STARTUP_SESSION !== "0";
   if (shouldCreateStartupSession && engine.currentModel) {
     log.log("③ 创建 session...");
     await engine.createSession();
@@ -950,7 +950,7 @@ export async function startServer(root: CompositionRoot = {}): Promise<void> {
   registerLoopBusHandlers(hub.eventBus, () => engine.loopController);
   engine.loopController?.recoverAtBoot();
 
-  // `/mobile`、`/desktop` 网页客户端入口的供货模式判定（HANA_RENDERER_DIST /
+  // `/mobile`、`/desktop` 网页客户端入口的供货模式判定（LINGXI_RENDERER_DIST /
   // desktop/dist-renderer / guide 三分支）已随路由挂载移入
   // composition/open-root.ts 的 decideMobileStaticRouteOptions；这里不再重复。
 
@@ -1160,8 +1160,8 @@ export async function startServer(root: CompositionRoot = {}): Promise<void> {
       const bm = BrowserManager.instance();
       bm.setWsTransport(ws);
 
-      // 调试：记录浏览器 WS 消息往返（异步写入 + 缓冲，仅 HANA_DEBUG=1 时启用）
-      const _bwsEnabled = process.env.HANA_DEBUG === "1";
+      // 调试：记录浏览器 WS 消息往返（异步写入 + 缓冲，仅 LINGXI_DEBUG=1 时启用）
+      const _bwsEnabled = process.env.LINGXI_DEBUG === "1";
       let _bwsBuf = "";
       let _bwsFlushTimer = null;
       const _bwsLogPath = path.join(hanakoHome, "browser-ws.log");
@@ -1243,8 +1243,8 @@ export async function startServer(root: CompositionRoot = {}): Promise<void> {
         network: createServerRuntimeNetworkSummary(),
         token: SERVER_TOKEN,
         version: appVersion,
-        ownerKind: process.env.HANA_SERVER_OWNER === "desktop" ? "desktop" : "standalone",
-        ownerPid: Number.parseInt(process.env.HANA_SERVER_OWNER_PID || "", 10) || null,
+        ownerKind: process.env.LINGXI_SERVER_OWNER === "desktop" ? "desktop" : "standalone",
+        ownerPid: Number.parseInt(process.env.LINGXI_SERVER_OWNER_PID || "", 10) || null,
         serverId: runtimeContext.serverId || null,
         serverNodeId: runtimeContext.serverNodeId || runtimeContext.serverId || null,
         studioId: runtimeContext.studioId || null,

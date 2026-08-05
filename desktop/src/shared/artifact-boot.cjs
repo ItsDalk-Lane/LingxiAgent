@@ -45,7 +45,7 @@
  *   re-export；desktop/src/shared/artifact-ota.cjs（及其下沉后的
  *   shared/artifact-core/ota-core.cjs 核心）也从同一处取值，不重复拼接
  *   `${channel}.renderer` 这条字符串规则。
- * - HANA_HOME 纪律：homeDir 由调用方（main.cjs 的入口注入）传入，本模块
+ * - LINGXI_HOME 纪律：homeDir 由调用方（main.cjs 的入口注入）传入，本模块
  *   不读环境变量、不拼 `.hanako*` 字面量。
  */
 

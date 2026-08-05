@@ -12,19 +12,19 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const nodeBuiltins = builtinModules.flatMap((m) => [m, `node:${m}`]);
 
-// ── HANA_SIGN_KEYSET：构建期 keyset 替换（签名 seed 管线）──
+// ── LINGXI_SIGN_KEYSET：构建期 keyset 替换（签名 seed 管线）──
 // keyset.cjs 里 `require("./pinned-keyset.json")` 会被本 bundle 内联——
 // keyset 随主进程 bundle 一起被 codesign，不作为松散资源存在。设置
-// HANA_SIGN_KEYSET=<path> 时，把该 JSON 模块替换为指定文件（本地验证用
+// LINGXI_SIGN_KEYSET=<path> 时，把该 JSON 模块替换为指定文件（本地验证用
 // 一次性测试密钥对时，让打进构建的 keyset 与 seed 签名自洽）。这是构建期
 // 输入，不是运行期校验旁路：运行时永远读被内联进 bundle 的那份。正式发版
 // 不设置此变量，默认内联 repo 的 shared/artifact-core/pinned-keyset.json。
-const signKeysetOverride = process.env.HANA_SIGN_KEYSET;
+const signKeysetOverride = process.env.LINGXI_SIGN_KEYSET;
 const mainAliases = [];
 if (signKeysetOverride) {
   const overridePath = path.resolve(signKeysetOverride);
   if (!fs.existsSync(overridePath)) {
-    throw new Error(`[vite.config.main] HANA_SIGN_KEYSET points at a missing file: ${overridePath}`);
+    throw new Error(`[vite.config.main] LINGXI_SIGN_KEYSET points at a missing file: ${overridePath}`);
   }
   // 匹配以 pinned-keyset.json 结尾的完整 specifier（keyset.cjs 内的相对
   // require 以及任何已解析的绝对形态），整串替换为覆盖文件的绝对路径——
@@ -33,13 +33,13 @@ if (signKeysetOverride) {
 }
 
 // ── OTA dev-bypass 常量折叠（后台 OTA）──
-// artifact-ota.cjs 的 HANA_ARTIFACT_MANIFEST 排练开关只活在
+// artifact-ota.cjs 的 LINGXI_ARTIFACT_MANIFEST 排练开关只活在
 // artifact-ota-dev-bypass.cjs 一个文件里（该文件自己的头注释解释了为什么
 // 这条 require 必须是静态字面量）。这条别名对*任何一次* `vite build` 都无
-// 条件生效——不像上面的 keysetAlias 只在设了 HANA_SIGN_KEYSET 时才替换：
+// 条件生效——不像上面的 keysetAlias 只在设了 LINGXI_SIGN_KEYSET 时才替换：
 // 一次用测试密钥的本地 pack 构建仍然是同一条能被启动、能被公证、理论上能
 // 被分发的构建管线产出，dev-bypass 必须在这条管线的*任何*产物里都不可见
-// （`grep HANA_ARTIFACT_MANIFEST desktop/main.bundle.cjs` 必须查无此文件）。
+// （`grep LINGXI_ARTIFACT_MANIFEST desktop/main.bundle.cjs` 必须查无此文件）。
 // 想排练 OTA 全流程只能跑未打包的 `desktop/main.cjs`（dev 模式，
 // `app.isPackaged === false`，bootstrap.cjs 走源文件而不是这份 bundle，
 // 这条别名完全不适用）。

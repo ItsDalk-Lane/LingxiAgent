@@ -49,7 +49,7 @@ describe("Windows NSIS installer contract", () => {
     const macro = extractMacro(source, "hanakoStopInstallDirProcesses");
     const cleaner = extractMacro(source, "hanakoWriteInstallDirProcessCleaner");
 
-    expect(macro).toContain("HANA_INSTALL_DIR");
+    expect(macro).toContain("LINGXI_INSTALL_DIR");
     expect(macro).toContain("hanakoWriteInstallDirProcessCleaner");
     expect(cleaner).toContain("Get-CimInstance Win32_Process");
     expect(cleaner).toContain("CommandLine");

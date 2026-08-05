@@ -30,7 +30,7 @@
         "persistent-store-constructor"
       ],
       "ownerModule": "lib/compat/checks/dirs.ts",
-      "reason": "Compatibility check creates a fixed set of registered HANA_HOME roots; flow attribution remains with the first-run coordinator.",
+      "reason": "Compatibility check creates a fixed set of registered LINGXI_HOME roots; flow attribution remains with the first-run coordinator.",
       "sourceFile": "lib/compat/checks/dirs.ts"
     },
     {
@@ -41,7 +41,7 @@
       ],
       "linePattern": "cleanupPath",
       "ownerModule": "server/routes/plugins.ts",
-      "reason": "One bounded cleanup list contains both HANA_HOME .installing staging and operating-system extraction temp; flow-sensitive attribution must replace this exact conditional site.",
+      "reason": "One bounded cleanup list contains both LINGXI_HOME .installing staging and operating-system extraction temp; flow-sensitive attribution must replace this exact conditional site.",
       "sourceFile": "server/routes/plugins.ts"
     },
     {
@@ -140,7 +140,7 @@
       ],
       "linePattern": "(?:filePath, content|path[.]dirname\\(resolved\\)|resolved, Buffer|path[.]dirname\\(destinationPath\\)|sourcePath, destinationPath|mkdirSync\\(dir|filePath, pngBuffer)",
       "ownerModule": "desktop/main.cjs",
-      "reason": "Writes an absolute path selected by the renderer or a screenshot directory selected by the user; no HANA_HOME store is implied.",
+      "reason": "Writes an absolute path selected by the renderer or a screenshot directory selected by the user; no LINGXI_HOME store is implied.",
       "sourceFile": "desktop/main.cjs"
     },
     {
@@ -171,7 +171,7 @@
         "persistent-store-constructor"
       ],
       "ownerModule": "desktop/file-text-io.cjs",
-      "reason": "Writes an absolute artifact/editor path explicitly selected by the caller, outside any implied HANA_HOME store.",
+      "reason": "Writes an absolute artifact/editor path explicitly selected by the caller, outside any implied LINGXI_HOME store.",
       "sourceFile": "desktop/file-text-io.cjs"
     },
     {
@@ -195,7 +195,7 @@
       ],
       "linePattern": "(?:wrongFile|wrongDir)",
       "ownerModule": "desktop/auto-updater.cjs",
-      "reason": "Deletes the exact legacy last-update-version source and its now-empty legacy directory outside the active HANA_HOME.",
+      "reason": "Deletes the exact legacy last-update-version source and its now-empty legacy directory outside the active LINGXI_HOME.",
       "sourceFile": "desktop/auto-updater.cjs"
     },
     {
@@ -278,7 +278,7 @@
         "persistent-store-constructor"
       ],
       "ownerModule": "shared/default-workspace.ts",
-      "reason": "Creates the user-selected default workspace outside HANA_HOME.",
+      "reason": "Creates the user-selected default workspace outside LINGXI_HOME.",
       "sourceFile": "shared/default-workspace.ts"
     },
     {
@@ -309,7 +309,7 @@
         "persistent-store-constructor"
       ],
       "ownerModule": "lib/file-ref/resource-io.ts",
-      "reason": "Writes an explicit tool output path supplied by the caller; no HANA_HOME store is implied.",
+      "reason": "Writes an explicit tool output path supplied by the caller; no LINGXI_HOME store is implied.",
       "sourceFile": "lib/file-ref/resource-io.ts"
     },
     {
@@ -349,7 +349,7 @@
         "persistent-store-constructor"
       ],
       "ownerModule": "core/mount-aware-file-service.ts",
-      "reason": "Creates user-selected workspace or mounted roots whose ownership is recorded by studio-mounts.json rather than by HANA_HOME path inventory.",
+      "reason": "Creates user-selected workspace or mounted roots whose ownership is recorded by studio-mounts.json rather than by LINGXI_HOME path inventory.",
       "sourceFile": "core/mount-aware-file-service.ts"
     },
     {
@@ -668,7 +668,7 @@
     ],
     "version": 3
   },
-  "payloadFingerprint": "sha256:41d44d4d8cef7ccb696783b70d354d6a78b30741317b40c4f37a5278c2ed6799",
+  "payloadFingerprint": "sha256:a888d8bfcd5e1a2e691391805fe1c16c1c234d62ea543565f34b8c7c9dff0c4c",
   "registry": [
     {
       "affectedByEpochMigration": true,
@@ -1016,7 +1016,7 @@
       "firstPossibleWritePhase": "epoch_transition",
       "format": "mixed-directory",
       "id": "data-epoch-checkpoints",
-      "identityContract": "transitionId identifies one published or in-progress checkpoint directory for one canonical HANA_HOME; provider-internal .tmp-/.invalid- suffixes on that name are staging, not separate identities.",
+      "identityContract": "transitionId identifies one published or in-progress checkpoint directory for one canonical LINGXI_HOME; provider-internal .tmp-/.invalid- suffixes on that name are staging, not separate identities.",
       "migrationEntry": [],
       "openEntry": [
         "createDataEpochCheckpointProvider",
@@ -1053,7 +1053,7 @@
       "firstPossibleWritePhase": "epoch_transition",
       "format": "mixed-directory",
       "id": "data-epoch-restore-quarantine",
-      "identityContract": "restoreId identifies one restore transaction's quarantined bytes for one canonical HANA_HOME; data-epoch-restores.log is one shared append-only audit trail across every restore for that home.",
+      "identityContract": "restoreId identifies one restore transaction's quarantined bytes for one canonical LINGXI_HOME; data-epoch-restores.log is one shared append-only audit trail across every restore for that home.",
       "migrationEntry": [],
       "openEntry": [
         "restoreDataEpochCheckpoint"
@@ -1094,7 +1094,7 @@
       "firstPossibleWritePhase": "epoch_transition",
       "format": "json",
       "id": "data-epoch-stamp",
-      "identityContract": "One high-water stamp belongs to one canonical HANA_HOME.",
+      "identityContract": "One high-water stamp belongs to one canonical LINGXI_HOME.",
       "migrationEntry": [],
       "openEntry": [
         "coordinateDataEpochStartup",
@@ -1131,7 +1131,7 @@
       "firstPossibleWritePhase": "epoch_transition",
       "format": "json",
       "id": "data-epoch-transition-journal",
-      "identityContract": "transitionId identifies one in-progress transition for one canonical HANA_HOME.",
+      "identityContract": "transitionId identifies one in-progress transition for one canonical LINGXI_HOME.",
       "migrationEntry": [
         "core/data-epoch-migrations.ts DATA_EPOCH_MIGRATIONS"
       ],
@@ -1738,7 +1738,7 @@
       "firstPossibleWritePhase": "identity_seed",
       "format": "json",
       "id": "local-user-auth",
-      "identityContract": "The credential belongs to the local userId in the same HANA_HOME.",
+      "identityContract": "The credential belongs to the local userId in the same LINGXI_HOME.",
       "migrationEntry": [],
       "openEntry": [
         "ensureLocalUserAccount",
@@ -2321,7 +2321,7 @@
       "firstPossibleWritePhase": "post_epoch_pre_bind",
       "format": "json",
       "id": "server-network-config",
-      "identityContract": "One network configuration belongs to one HANA_HOME server.",
+      "identityContract": "One network configuration belongs to one LINGXI_HOME server.",
       "migrationEntry": [],
       "openEntry": [
         "ensureServerNetworkConfig",
@@ -2351,14 +2351,14 @@
     {
       "affectedByEpochMigration": true,
       "bootstrapSafety": null,
-      "checkpointPolicy": "Include with the identity registries for the same HANA_HOME.",
+      "checkpointPolicy": "Include with the identity registries for the same LINGXI_HOME.",
       "epochPolicy": "epoch-managed",
       "exemption": null,
       "firstPossibleOpenPhase": "identity_seed",
       "firstPossibleWritePhase": "identity_seed",
       "format": "json",
       "id": "server-node-identity",
-      "identityContract": "serverNodeId is the stable identity of one HANA_HOME server node.",
+      "identityContract": "serverNodeId is the stable identity of one LINGXI_HOME server node.",
       "migrationEntry": [],
       "openEntry": [
         "loadServerIdentity",
@@ -2399,7 +2399,7 @@
       "firstPossibleWritePhase": "home_guard",
       "format": "json",
       "id": "server-runtime-info",
-      "identityContract": "At most one current server discovery record per HANA_HOME.",
+      "identityContract": "At most one current server discovery record per LINGXI_HOME.",
       "migrationEntry": [],
       "openEntry": [
         "server/index.ts bootstrap"
@@ -2881,7 +2881,7 @@
       "firstPossibleWritePhase": "runtime_ready",
       "format": "json",
       "id": "usage-ledger",
-      "identityContract": "Usage buckets are keyed by their runtime dimensions inside one HANA_HOME ledger.",
+      "identityContract": "Usage buckets are keyed by their runtime dimensions inside one LINGXI_HOME ledger.",
       "migrationEntry": [],
       "openEntry": [
         "new UsageLedger"
@@ -2917,7 +2917,7 @@
       "firstPossibleWritePhase": "first_run_seed",
       "format": "json",
       "id": "user-preferences",
-      "identityContract": "One preferences document belongs to the local user in one HANA_HOME.",
+      "identityContract": "One preferences document belongs to the local user in one LINGXI_HOME.",
       "migrationEntry": [
         "core/preferences-manager.ts unreadable-source preservation",
         "core/migrations.ts runMigrations"
@@ -3049,7 +3049,7 @@
       "firstPossibleWritePhase": "runtime_ready",
       "format": "json",
       "id": "windows-sandbox-migration-state",
-      "identityContract": "Each fixed marker records completion for one HANA_HOME.",
+      "identityContract": "Each fixed marker records completion for one LINGXI_HOME.",
       "migrationEntry": [],
       "openEntry": [
         "Windows sandbox legacy migration"
@@ -3118,8 +3118,8 @@
   ],
   "review": {
     "classification": "compatible",
-    "compatibilityReason": "yuan persona identifier renamed hanako to lingxi; data format unchanged",
-    "payloadFingerprint": "sha256:41d44d4d8cef7ccb696783b70d354d6a78b30741317b40c4f37a5278c2ed6799"
+    "compatibilityReason": "HANA_ env var prefix renamed to LINGXI_; data format unchanged",
+    "payloadFingerprint": "sha256:a888d8bfcd5e1a2e691391805fe1c16c1c234d62ea543565f34b8c7c9dff0c4c"
   },
   "schemas": [
     {
@@ -3243,7 +3243,7 @@
       "contract": "DATA_EPOCH stamp parser and atomic writer",
       "kind": "runtime-contract",
       "module": "shared/data-epoch.cjs",
-      "sourceHash": "sha256:7fdbf842c5c0d417c2c45764c35a230637c1584a6eb59321aec6f9d11fecce6f",
+      "sourceHash": "sha256:47a8c8cbe962118ce1ade1e2f034c8298bd59611f0b94a3cbeb8b9bdab28e0e3",
       "storeId": "data-epoch-stamp"
     },
     {
@@ -3260,7 +3260,7 @@
           "sourceHash": "sha256:78f8fb4631008a61a46bac4a802d59f10a6a866cc3bd9b15eed59ac217ea5585"
         }
       ],
-      "sourceHash": "sha256:7fdbf842c5c0d417c2c45764c35a230637c1584a6eb59321aec6f9d11fecce6f",
+      "sourceHash": "sha256:47a8c8cbe962118ce1ade1e2f034c8298bd59611f0b94a3cbeb8b9bdab28e0e3",
       "storeId": "data-epoch-transition-journal"
     },
     {
@@ -3295,28 +3295,28 @@
       "contract": "GPU startup state version, crash evidence, recovery mode, and legacy migration markers",
       "kind": "runtime-contract",
       "module": "desktop/src/shared/gpu-startup-policy.cjs",
-      "sourceHash": "sha256:5cab554e6252fa24be8102c4a4da333a8f7b18c762d1aa4856850c2b206103da",
+      "sourceHash": "sha256:2ab434748c21dc1e1e051d0ace3b37d8568042cd0ef2e8e489c134eb371ddb5c",
       "storeId": "desktop-gpu-startup-state"
     },
     {
       "contract": "update channel record version, device identifier, activation flag, update feed address, activation time, and held invite codes",
       "kind": "runtime-contract",
       "module": "desktop/auto-updater.cjs",
-      "sourceHash": "sha256:739190e68c9f0a66775c72424e335f3182abec97c91dc932179be8aabf46a591",
+      "sourceHash": "sha256:ba5b4e84938dc05cf821c72c01606587791c9b9b3befc8b1d60ad5a67f0da8f8",
       "storeId": "desktop-update-channel"
     },
     {
       "contract": "install ACL heal state version, per install-identity grant bookkeeping, recovery probe result, and ineffective probe count",
       "kind": "runtime-contract",
       "module": "desktop/src/shared/win32-install-acl-heal.cjs",
-      "sourceHash": "sha256:27c84465992fa66823ea676ad15f7fb591ea3381c60e86827cc6f492a638c9ea",
+      "sourceHash": "sha256:0c97bdae6d38db92d34573d487e868c59fb4a1ab2f904e4493f803aafc949af7",
       "storeId": "desktop-win32-install-acl-heal-state"
     },
     {
       "contract": "desktop window bounds, release announcement bookmark, and update cache version marker readers",
       "kind": "directory-contract",
       "module": "desktop/main.cjs",
-      "sourceHash": "sha256:f0b28d3fd438a35b23371f5315e9331ae982d421a6873d2cd8f01f4c4256fff4",
+      "sourceHash": "sha256:5616b36289e173e20772308be1408617b7b21f2db10d19b63b4f0168874d097a",
       "storeId": "desktop-window-version-state"
     },
     {
@@ -3428,7 +3428,7 @@
       "contract": "job.json/input.html request contract and generated PDF output lifecycle",
       "kind": "directory-contract",
       "module": "plugins/office/lib/html-to-pdf.ts",
-      "sourceHash": "sha256:096a7dc9eac668a6803c0f6cd5ce93316294e48405fb0e908c602b7cf33d0bef",
+      "sourceHash": "sha256:3d1d27ffef162f14a0ae5fd34eb609ef076ca89e610de6756f00ebcd918980e4",
       "storeId": "office-render-jobs"
     },
     {
@@ -3449,7 +3449,7 @@
       "contract": "verified plugin release ZIP naming by pluginId/version and expected sha256",
       "kind": "directory-contract",
       "module": "server/routes/plugins.ts",
-      "sourceHash": "sha256:7aca9bf305209962b8db0710cd36df12ff761c41715c85b0965b5088a6a97bac",
+      "sourceHash": "sha256:3f736cb8199f9dac0ee412feb2612bbd163343399c1f43fac06f6c0a2d4688e4",
       "storeId": "plugin-download-cache"
     },
     {
@@ -3518,7 +3518,7 @@
       "contract": "server-info writer and desktop bootstrap reader",
       "kind": "runtime-contract",
       "module": "server/index.ts",
-      "sourceHash": "sha256:57fee15a12cf3be2e0207d4457251fbfa71312780144d091870673643533bf5f",
+      "sourceHash": "sha256:8af6559233dda945103b68649619491fe8436fe6cc1ed52711600fd832c079a6",
       "storeId": "server-runtime-info"
     },
     {
@@ -3540,7 +3540,7 @@
         {
           "contract": "core/session-coordinator.ts Hana metadata extensions",
           "module": "core/session-coordinator.ts",
-          "sourceHash": "sha256:9291ba90a08340f0b4071d0935e4d4abf55103bf9257296f7acedd32ae14b83e"
+          "sourceHash": "sha256:de5e59e0951009ac2da0389fad63db1a02e6d066d3d2f7daa966f475a2945fab"
         },
         {
           "contract": "core/session-jsonl-file.ts repair contract",
@@ -5227,7 +5227,7 @@
       "exemptionId": "external-mount-writes",
       "kind": "mkdir",
       "ordinal": 0,
-      "reason": "Creates user-selected workspace or mounted roots whose ownership is recorded by studio-mounts.json rather than by HANA_HOME path inventory.",
+      "reason": "Creates user-selected workspace or mounted roots whose ownership is recorded by studio-mounts.json rather than by LINGXI_HOME path inventory.",
       "sourceFile": "core/mount-aware-file-service.ts",
       "storeId": null
     },
@@ -5235,7 +5235,7 @@
       "exemptionId": "external-mount-writes",
       "kind": "mkdir",
       "ordinal": 0,
-      "reason": "Creates user-selected workspace or mounted roots whose ownership is recorded by studio-mounts.json rather than by HANA_HOME path inventory.",
+      "reason": "Creates user-selected workspace or mounted roots whose ownership is recorded by studio-mounts.json rather than by LINGXI_HOME path inventory.",
       "sourceFile": "core/mount-aware-file-service.ts",
       "storeId": null
     },
@@ -6075,7 +6075,7 @@
       "exemptionId": "desktop-legacy-update-path-cleanup",
       "kind": "remove-path",
       "ordinal": 0,
-      "reason": "Deletes the exact legacy last-update-version source and its now-empty legacy directory outside the active HANA_HOME.",
+      "reason": "Deletes the exact legacy last-update-version source and its now-empty legacy directory outside the active LINGXI_HOME.",
       "sourceFile": "desktop/auto-updater.cjs",
       "storeId": null
     },
@@ -6083,7 +6083,7 @@
       "exemptionId": "desktop-legacy-update-path-cleanup",
       "kind": "remove-path",
       "ordinal": 0,
-      "reason": "Deletes the exact legacy last-update-version source and its now-empty legacy directory outside the active HANA_HOME.",
+      "reason": "Deletes the exact legacy last-update-version source and its now-empty legacy directory outside the active LINGXI_HOME.",
       "sourceFile": "desktop/auto-updater.cjs",
       "storeId": null
     },
@@ -6155,7 +6155,7 @@
       "exemptionId": "desktop-external-text-file",
       "kind": "write-file",
       "ordinal": 0,
-      "reason": "Writes an absolute artifact/editor path explicitly selected by the caller, outside any implied HANA_HOME store.",
+      "reason": "Writes an absolute artifact/editor path explicitly selected by the caller, outside any implied LINGXI_HOME store.",
       "sourceFile": "desktop/file-text-io.cjs",
       "storeId": null
     },
@@ -6171,7 +6171,7 @@
       "exemptionId": "desktop-caller-selected-output",
       "kind": "copy-file",
       "ordinal": 0,
-      "reason": "Writes an absolute path selected by the renderer or a screenshot directory selected by the user; no HANA_HOME store is implied.",
+      "reason": "Writes an absolute path selected by the renderer or a screenshot directory selected by the user; no LINGXI_HOME store is implied.",
       "sourceFile": "desktop/main.cjs",
       "storeId": null
     },
@@ -6179,7 +6179,7 @@
       "exemptionId": "desktop-caller-selected-output",
       "kind": "mkdir",
       "ordinal": 0,
-      "reason": "Writes an absolute path selected by the renderer or a screenshot directory selected by the user; no HANA_HOME store is implied.",
+      "reason": "Writes an absolute path selected by the renderer or a screenshot directory selected by the user; no LINGXI_HOME store is implied.",
       "sourceFile": "desktop/main.cjs",
       "storeId": null
     },
@@ -6195,7 +6195,7 @@
       "exemptionId": "desktop-caller-selected-output",
       "kind": "mkdir",
       "ordinal": 0,
-      "reason": "Writes an absolute path selected by the renderer or a screenshot directory selected by the user; no HANA_HOME store is implied.",
+      "reason": "Writes an absolute path selected by the renderer or a screenshot directory selected by the user; no LINGXI_HOME store is implied.",
       "sourceFile": "desktop/main.cjs",
       "storeId": null
     },
@@ -6211,7 +6211,7 @@
       "exemptionId": "desktop-caller-selected-output",
       "kind": "mkdir",
       "ordinal": 0,
-      "reason": "Writes an absolute path selected by the renderer or a screenshot directory selected by the user; no HANA_HOME store is implied.",
+      "reason": "Writes an absolute path selected by the renderer or a screenshot directory selected by the user; no LINGXI_HOME store is implied.",
       "sourceFile": "desktop/main.cjs",
       "storeId": null
     },
@@ -6299,7 +6299,7 @@
       "exemptionId": "desktop-caller-selected-output",
       "kind": "write-file",
       "ordinal": 0,
-      "reason": "Writes an absolute path selected by the renderer or a screenshot directory selected by the user; no HANA_HOME store is implied.",
+      "reason": "Writes an absolute path selected by the renderer or a screenshot directory selected by the user; no LINGXI_HOME store is implied.",
       "sourceFile": "desktop/main.cjs",
       "storeId": null
     },
@@ -6307,7 +6307,7 @@
       "exemptionId": "desktop-caller-selected-output",
       "kind": "write-file",
       "ordinal": 0,
-      "reason": "Writes an absolute path selected by the renderer or a screenshot directory selected by the user; no HANA_HOME store is implied.",
+      "reason": "Writes an absolute path selected by the renderer or a screenshot directory selected by the user; no LINGXI_HOME store is implied.",
       "sourceFile": "desktop/main.cjs",
       "storeId": null
     },
@@ -6323,7 +6323,7 @@
       "exemptionId": "desktop-caller-selected-output",
       "kind": "write-file",
       "ordinal": 0,
-      "reason": "Writes an absolute path selected by the renderer or a screenshot directory selected by the user; no HANA_HOME store is implied.",
+      "reason": "Writes an absolute path selected by the renderer or a screenshot directory selected by the user; no LINGXI_HOME store is implied.",
       "sourceFile": "desktop/main.cjs",
       "storeId": null
     },
@@ -6859,7 +6859,7 @@
       "exemptionId": "compat-directory-seeding",
       "kind": "mkdir",
       "ordinal": 0,
-      "reason": "Compatibility check creates a fixed set of registered HANA_HOME roots; flow attribution remains with the first-run coordinator.",
+      "reason": "Compatibility check creates a fixed set of registered LINGXI_HOME roots; flow attribution remains with the first-run coordinator.",
       "sourceFile": "lib/compat/checks/dirs.ts",
       "storeId": null
     },
@@ -7219,7 +7219,7 @@
       "exemptionId": "external-file-ref-io",
       "kind": "copy-file",
       "ordinal": 0,
-      "reason": "Writes an explicit tool output path supplied by the caller; no HANA_HOME store is implied.",
+      "reason": "Writes an explicit tool output path supplied by the caller; no LINGXI_HOME store is implied.",
       "sourceFile": "lib/file-ref/resource-io.ts",
       "storeId": null
     },
@@ -7227,7 +7227,7 @@
       "exemptionId": "external-file-ref-io",
       "kind": "mkdir",
       "ordinal": 0,
-      "reason": "Writes an explicit tool output path supplied by the caller; no HANA_HOME store is implied.",
+      "reason": "Writes an explicit tool output path supplied by the caller; no LINGXI_HOME store is implied.",
       "sourceFile": "lib/file-ref/resource-io.ts",
       "storeId": null
     },
@@ -8987,7 +8987,7 @@
       "exemptionId": "conditional-plugin-install-cleanup",
       "kind": "remove-path",
       "ordinal": 0,
-      "reason": "One bounded cleanup list contains both HANA_HOME .installing staging and operating-system extraction temp; flow-sensitive attribution must replace this exact conditional site.",
+      "reason": "One bounded cleanup list contains both LINGXI_HOME .installing staging and operating-system extraction temp; flow-sensitive attribution must replace this exact conditional site.",
       "sourceFile": "server/routes/plugins.ts",
       "storeId": null
     },
@@ -9011,7 +9011,7 @@
       "exemptionId": "conditional-plugin-install-cleanup",
       "kind": "remove-path",
       "ordinal": 1,
-      "reason": "One bounded cleanup list contains both HANA_HOME .installing staging and operating-system extraction temp; flow-sensitive attribution must replace this exact conditional site.",
+      "reason": "One bounded cleanup list contains both LINGXI_HOME .installing staging and operating-system extraction temp; flow-sensitive attribution must replace this exact conditional site.",
       "sourceFile": "server/routes/plugins.ts",
       "storeId": null
     },
@@ -9667,7 +9667,7 @@
       "exemptionId": "external-default-workspace",
       "kind": "mkdir",
       "ordinal": 0,
-      "reason": "Creates the user-selected default workspace outside HANA_HOME.",
+      "reason": "Creates the user-selected default workspace outside LINGXI_HOME.",
       "sourceFile": "shared/default-workspace.ts",
       "storeId": null
     },
@@ -9675,7 +9675,7 @@
       "exemptionId": "external-default-workspace",
       "kind": "mkdir",
       "ordinal": 0,
-      "reason": "Creates the user-selected default workspace outside HANA_HOME.",
+      "reason": "Creates the user-selected default workspace outside LINGXI_HOME.",
       "sourceFile": "shared/default-workspace.ts",
       "storeId": null
     },

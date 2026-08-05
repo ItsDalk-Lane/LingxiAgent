@@ -64,7 +64,7 @@ node skills2set/hana-plugin-creator/scripts/check_env.mjs --capability scaffold
 Behavior:
 
 - The preflight itself is JavaScript and uses only Node built-ins.
-- It finds Python through `HANA_PLUGIN_CREATOR_PYTHON`, `python3`, `python`, or Windows `py -3`.
+- It finds Python through `LINGXI_PLUGIN_CREATOR_PYTHON`, `python3`, `python`, or Windows `py -3`.
 - It requires Python 3.9+ because the scaffold script uses modern stdlib typing syntax.
 - If it returns `ok: false`, stop and show the user the `message` or `installGuidance`. Do not auto-install dependencies.
 - Use the same Python command that passed preflight for the scaffold examples below. The examples use `python3`.
@@ -85,7 +85,7 @@ Behavior:
 5. Pick the target location:
    - Built-in plugin shipped with Hana: `plugins/<plugin-id>`.
    - Example or template plugin: `examples/plugins/<plugin-id>`.
-   - User-installed plugin: the directory reported by `/api/plugins/settings` or `${HANA_HOME}/plugins`.
+   - User-installed plugin: the directory reported by `/api/plugins/settings` or `${LINGXI_HOME}/plugins`.
 6. Generate the scaffold with the bundled script, then adjust names, descriptions, tools, routes, capabilities, and UI to the user's request.
    - When converting an existing website or single-page app into a Hana iframe plugin, rewrite same-plugin browser `fetch('/api/...')` calls to `hana.api.fetch(...)`, move static files under `assets/`, and use `hana.assets.url(...)` for browser-side asset references.
    - If the website depends on live third-party data, create a plugin route and call `ctx.network.fetch(...)` from that route. Add `network.fetch` and `network.allowedHosts` to the manifest instead of calling the third-party API directly from iframe JavaScript.
@@ -144,7 +144,7 @@ python3 skills2set/hana-plugin-creator/scripts/create_hana_plugin.py "Jimeng Pro
 - React templates may use `@hana/plugin-runtime`, `@hana/plugin-sdk`, and `@hana/plugin-components`.
 - Static iframe resources belong under `assets/` and should be referenced with `hana.assets.url(path)` from browser code or the official `/api/plugins/{pluginId}/assets/...` path from the route shell. This includes CSS, JS, images, fonts, JSON, wasm, and browser-playable videos such as MP4/WebM/MOV. Do not inline large assets as a workaround.
 - Do not create custom plugin routes only to serve static files, such as `/api/video`, `/api/file`, or `/assets/*`, in new Agent-generated code. Existing plugins with static-file compatibility handlers may continue to run; if editing them, prefer adding the official `assets/` references without removing the existing handler unless the user explicitly asks for cleanup.
-- Dev authority is not a manifest permission. Hana grants it from the remembered dev install slot under `${HANA_HOME}/plugins-dev/`, and Agent dev tools are hidden until the user enables the dev tools setting.
+- Dev authority is not a manifest permission. Hana grants it from the remembered dev install slot under `${LINGXI_HOME}/plugins-dev/`, and Agent dev tools are hidden until the user enables the dev tools setting.
 - Declare ordinary SDK needs in manifest `capabilities`, such as `session`, `agent`, `model.sample`, and `media.generate`. Put future high-risk needs in `sensitiveCapabilities`.
 - For external HTTP APIs, declare `"network.fetch"` in `capabilities` and add a top-level `network` object with `allowedHosts`, `methods`, `defaultTimeoutMs`, and `maxResponseBytes`. Use `ctx.network.fetch(url, { cacheTtlMs })` from Node-side tools, routes, or lifecycle code.
 - Iframe browser code must not call third-party APIs directly. It should call a same-plugin route with `hana.api.fetch(...)`; the route reads config/secrets server-side and calls `ctx.network.fetch(...)`.
@@ -172,7 +172,7 @@ python3 skills2set/hana-plugin-creator/scripts/create_hana_plugin.py "Jimeng Pro
 - Pi SDK extension factories under `extensions/*.js` require `"trust": "full-access"`. They are for provider request rewriting, context filtering, and tool-call observation; use ordinary `tools/*.js` for Agent-callable actions.
 - After full-access plugin install, enable, or reload, Hana rebinds extension runners for idle sessions. Busy sessions pick up the change on the next safe rebuild, so do not promise that an in-flight reply will use freshly edited extension code.
 - Declare only the iframe host capabilities actually used.
-- EventBus handlers should return `HANA_BUS_SKIP` for payloads that do not belong to them.
+- EventBus handlers should return `LINGXI_BUS_SKIP` for payloads that do not belong to them.
 - Keep WebView/iframe UI self-contained. Do not import renderer internals from `desktop/src/react`.
 - Provider declarations live in `providers/*.js` and require `"trust": "full-access"`.
 - Keep `capabilities.chat` separate from `capabilities.media.*`. Media-only providers must set `chat.projection = "none"` so they never appear in chat model selectors.
@@ -208,4 +208,4 @@ python3 skills2set/hana-plugin-creator/scripts/create_hana_plugin.py "Jimeng Pro
 - First paint must not auto-call LLM APIs. Trigger model calls only from an explicit user action, then call a plugin backend route with `hana.api.fetch(...)`; the backend route may use `sampleText()` or other runtime helpers.
 - After generating or editing a UI plugin, check for disallowed patterns before installing: `pluginIframeTicket` in asset/API URLs, hard-coded `/api/plugins/{pluginId}` in browser code, direct third-party `fetch()` from iframe assets, custom static-file routes in new code, missing `assets/` files, and page-load LLM calls.
 - If the user asks to turn a login-backed or browser-operated website into a plugin, explain that the stable API today is WebView/iframe UI plus route-backed data APIs. Do not create ad hoc browser-control interfaces; note that a future web-session capability should own persistent cookies, navigation, and user-mediated external site interaction.
-- Use the dev loop first. Install source into `${HANA_HOME}/plugins-dev/`, reload after edits, run diagnostics and scenarios, then package or install into the normal plugin directory only after the dev copy works. Existing installed plugins may include compatibility handlers; treat them as cleanup candidates, not broken plugins.
+- Use the dev loop first. Install source into `${LINGXI_HOME}/plugins-dev/`, reload after edits, run diagnostics and scenarios, then package or install into the normal plugin directory only after the dev copy works. Existing installed plugins may include compatibility handlers; treat them as cleanup candidates, not broken plugins.

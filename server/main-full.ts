@@ -4,7 +4,7 @@
  * The thin entry every current boot path spawns/imports to start the real
  * product server: `scripts/launch.js` (`npm run server`),
  * `scripts/dev-web.js` (`npm run dev:web`), `cli/server-runner.ts`'s
- * source-mode spawn, `desktop/main.cjs`'s dev-mode `HANA_SERVER_ENTRY`, and
+ * source-mode spawn, `desktop/main.cjs`'s dev-mode `LINGXI_SERVER_ENTRY`, and
  * `vite.config.server.js`'s build entry (packaged `bundle/index.js`, which
  * `server/bootstrap.ts` imports at runtime).
  *
@@ -18,7 +18,7 @@ import { startServer } from "./index.ts";
 import { registerClosedRoutes, builtinMediaAdapters } from "./composition/full-root.ts";
 import { runPackagedStandaloneRuntimeSmoke } from "./standalone-runtime-smoke.ts";
 
-if (process.env.HANA_INTERNAL_STANDALONE_RUNTIME_SMOKE === "1") {
+if (process.env.LINGXI_INTERNAL_STANDALONE_RUNTIME_SMOKE === "1") {
   await runPackagedStandaloneRuntimeSmoke();
 } else {
   await startServer({ registerClosedRoutes, builtinMediaAdapters });

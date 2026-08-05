@@ -31,7 +31,7 @@ function makeRunner(handler: any) {
 describe("macos Cua provider", () => {
   it("resolves a configured Cua Driver command before common locations", () => {
     const command = resolveCuaDriverCommand({
-      env: { HANA_CUA_DRIVER_PATH: "/opt/cua-driver" },
+      env: { LINGXI_CUA_DRIVER_PATH: "/opt/cua-driver" },
       existsSync: (p) => p === "/opt/cua-driver",
       homeDir: "/Users/hana",
     });
@@ -42,9 +42,9 @@ describe("macos Cua provider", () => {
   it("treats an explicit Hana helper path as authoritative", () => {
     const command = resolveCuaDriverCommand({
       env: {
-        HANA_COMPUTER_USE_HELPER_PATH: "~/bin/custom-hana-helper",
-        HANA_COMPUTER_USE_RUNTIME_ROOT: "/opt/hana-runtime",
-        HANA_CUA_DRIVER_PATH: "/opt/cua-driver",
+        LINGXI_COMPUTER_USE_HELPER_PATH: "~/bin/custom-hana-helper",
+        LINGXI_COMPUTER_USE_RUNTIME_ROOT: "/opt/hana-runtime",
+        LINGXI_CUA_DRIVER_PATH: "/opt/cua-driver",
       },
       existsSync: (p) => p === "/opt/cua-driver",
       homeDir: "/Users/hana",
@@ -56,9 +56,9 @@ describe("macos Cua provider", () => {
   it("treats an explicit Hana runtime root as authoritative", () => {
     const command = resolveCuaDriverCommand({
       env: {
-        HANA_COMPUTER_USE_RUNTIME_ROOT: "/opt/hana-runtime",
-        HANA_DESKTOP_IS_PACKAGED: "1",
-        HANA_DESKTOP_RESOURCES_PATH: "/Applications/HanaAgent.app/Contents/Resources",
+        LINGXI_COMPUTER_USE_RUNTIME_ROOT: "/opt/hana-runtime",
+        LINGXI_DESKTOP_IS_PACKAGED: "1",
+        LINGXI_DESKTOP_RESOURCES_PATH: "/Applications/HanaAgent.app/Contents/Resources",
       },
       existsSync: () => false,
       homeDir: "/Users/hana",
@@ -71,10 +71,10 @@ describe("macos Cua provider", () => {
     const helper = "/Applications/HanaAgent.app/Contents/Resources/computer-use/macos/hana-computer-use-helper";
     const command = resolveCuaDriverCommand({
       env: {
-        HANA_DESKTOP_IS_PACKAGED: "1",
-        HANA_DESKTOP_RESOURCES_PATH: "/Applications/HanaAgent.app/Contents/Resources",
-        HANA_ROOT: "/Users/hana/.hanako/artifacts/server/0.415.9-darwin-arm64",
-        HANA_CUA_DRIVER_PATH: "/opt/cua-driver",
+        LINGXI_DESKTOP_IS_PACKAGED: "1",
+        LINGXI_DESKTOP_RESOURCES_PATH: "/Applications/HanaAgent.app/Contents/Resources",
+        LINGXI_ROOT: "/Users/hana/.hanako/artifacts/server/0.415.9-darwin-arm64",
+        LINGXI_CUA_DRIVER_PATH: "/opt/cua-driver",
       },
       existsSync: (p) => p === helper || p === "/opt/cua-driver",
       homeDir: "/Users/hana",
@@ -88,20 +88,20 @@ describe("macos Cua provider", () => {
   it("recovers old packaged shells from app.asar and executable paths", () => {
     const helper = "/Applications/HanaAgent.app/Contents/Resources/computer-use/macos/hana-computer-use-helper";
     const baseEnv = {
-      HANA_DESKTOP_IS_PACKAGED: "1",
-      HANA_ROOT: "/Users/hana/.hanako/artifacts/server/0.412.7-darwin-arm64",
+      LINGXI_DESKTOP_IS_PACKAGED: "1",
+      LINGXI_ROOT: "/Users/hana/.hanako/artifacts/server/0.412.7-darwin-arm64",
     };
     const fromAppPath = resolveCuaDriverCommand({
       env: {
         ...baseEnv,
-        HANA_DESKTOP_APP_PATH: "/Applications/HanaAgent.app/Contents/Resources/app.asar",
+        LINGXI_DESKTOP_APP_PATH: "/Applications/HanaAgent.app/Contents/Resources/app.asar",
       },
       existsSync: (p) => p === helper,
     });
     const fromExecPath = resolveCuaDriverCommand({
       env: {
         ...baseEnv,
-        HANA_DESKTOP_EXEC_PATH: "/Applications/HanaAgent.app/Contents/MacOS/HanaAgent",
+        LINGXI_DESKTOP_EXEC_PATH: "/Applications/HanaAgent.app/Contents/MacOS/HanaAgent",
       },
       existsSync: (p) => p === helper,
     });
@@ -114,8 +114,8 @@ describe("macos Cua provider", () => {
     const helper = "/Applications/HanaAgent.app/Contents/Resources/computer-use/macos/hana-computer-use-helper";
     const command = resolveCuaDriverCommand({
       env: {
-        HANA_ROOT: "/Applications/HanaAgent.app/Contents/Resources/server",
-        HANA_CUA_DRIVER_PATH: "/opt/cua-driver",
+        LINGXI_ROOT: "/Applications/HanaAgent.app/Contents/Resources/server",
+        LINGXI_CUA_DRIVER_PATH: "/opt/cua-driver",
       },
       existsSync: (p) => p === helper || p === "/opt/cua-driver",
       homeDir: "/Users/hana",
@@ -131,12 +131,12 @@ describe("macos Cua provider", () => {
     const cwdHelper = "/tmp/runtime/dist-computer-use/mac-arm64/hana-computer-use-helper";
     const command = resolveCuaDriverCommand({
       env: {
-        HANA_DESKTOP_IS_PACKAGED: "1",
-        HANA_ROOT: "/Users/hana/.hanako/artifacts/server/0.415.9-darwin-arm64",
-        HANA_DESKTOP_RESOURCES_PATH: "relative/fake-resources",
-        HANA_DESKTOP_APP_PATH: "/tmp/app.asar",
-        HANA_DESKTOP_EXEC_PATH: "/tmp/HanaAgent",
-        HANA_CUA_DRIVER_PATH: "/opt/cua-driver",
+        LINGXI_DESKTOP_IS_PACKAGED: "1",
+        LINGXI_ROOT: "/Users/hana/.hanako/artifacts/server/0.415.9-darwin-arm64",
+        LINGXI_DESKTOP_RESOURCES_PATH: "relative/fake-resources",
+        LINGXI_DESKTOP_APP_PATH: "/tmp/app.asar",
+        LINGXI_DESKTOP_EXEC_PATH: "/tmp/HanaAgent",
+        LINGXI_CUA_DRIVER_PATH: "/opt/cua-driver",
       },
       existsSync: (p) => p === artifactHelper || p === cwdHelper || p === "/opt/cua-driver",
       homeDir: "/Users/hana",
@@ -151,9 +151,9 @@ describe("macos Cua provider", () => {
     const expectedHelper = "/Applications/HanaAgent.app/Contents/Resources/computer-use/macos/hana-computer-use-helper";
     const command = resolveCuaDriverCommand({
       env: {
-        HANA_DESKTOP_IS_PACKAGED: "1",
-        HANA_DESKTOP_RESOURCES_PATH: "/Applications/HanaAgent.app/Contents/Resources",
-        HANA_CUA_DRIVER_PATH: "/opt/cua-driver",
+        LINGXI_DESKTOP_IS_PACKAGED: "1",
+        LINGXI_DESKTOP_RESOURCES_PATH: "/Applications/HanaAgent.app/Contents/Resources",
+        LINGXI_CUA_DRIVER_PATH: "/opt/cua-driver",
       },
       existsSync: (p) => p === "/opt/cua-driver",
       homeDir: "/Users/hana",
@@ -164,7 +164,7 @@ describe("macos Cua provider", () => {
 
   it("resolves the development helper build output before falling back to PATH", () => {
     const command = resolveCuaDriverCommand({
-      env: { HANA_ROOT: "/Users/hana/project-hana" },
+      env: { LINGXI_ROOT: "/Users/hana/project-hana" },
       existsSync: (p) => p === "/Users/hana/project-hana/dist-computer-use/mac-arm64/hana-computer-use-helper",
       homeDir: "/Users/hana",
       arch: "arm64",
@@ -689,8 +689,8 @@ describe("macos Cua provider", () => {
     await provider.performAction({}, lease, { type: "click_element", elementId: "14" });
 
     const clickCall = calls.find((call) => call.command === "/tmp/hana-computer-use-helper" && call.args[0] === "click");
-    expect(clickCall?.options?.env?.HANA_AGENT_CURSOR_CONFIG_JSON).toBeTruthy();
-    const cursorConfig = JSON.parse(clickCall.options.env.HANA_AGENT_CURSOR_CONFIG_JSON);
+    expect(clickCall?.options?.env?.LINGXI_AGENT_CURSOR_CONFIG_JSON).toBeTruthy();
+    const cursorConfig = JSON.parse(clickCall.options.env.LINGXI_AGENT_CURSOR_CONFIG_JSON);
     expect(cursorConfig).toMatchObject({
       enabled: true,
       style: {
