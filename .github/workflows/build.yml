@@ -45,8 +45,11 @@ jobs:
           echo "MEM_BEFORE:"; free -m || true
           if ! npm run build:renderer > /tmp/renderer-build.log 2>&1; then
             echo "::error::==== FULL BUILD LOG ($(wc -c < /tmp/renderer-build.log) bytes) ===="
-            # 单条 ::error:: 塞入完整日志（GitHub 每条 annotation 上限 64KB）
-            echo "::error::$(cat /tmp/renderer-build.log | head -c 30000)"
+            # base64（无换行）塞入 annotation，规避 ::error:: 单行限制
+            B64=$(base64 < /tmp/renderer-build.log | tr -d '\n')
+            echo "::error::LOG_B64_START"
+            echo "::error::$B64"
+            echo "::error::LOG_B64_END"
             echo "MEM_AFTER:"; free -m || true
             exit 1
           fi
