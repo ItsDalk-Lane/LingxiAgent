@@ -84,7 +84,7 @@ describe("screenshot pipeline", () => {
     const mainSource = fs.readFileSync(path.join(root, "desktop", "main.cjs"), "utf-8");
 
     expect(mainSource).toContain('path.join(__dirname, "src", "icon.png")');
-    expect(mainSource).not.toContain('path.join(__dirname, "src", "assets", "Hanako.png")');
+    expect(mainSource).not.toContain('path.join(__dirname, "src", "assets", "Lingxi.png")');
   });
 
   it("pins screenshot image width by layout", () => {

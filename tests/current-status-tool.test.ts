@@ -183,7 +183,7 @@ describe("current_status tool", () => {
     const userDir = path.join(root, "user");
     const agentDir = path.join(root, "agents", "hana");
     fs.mkdirSync(path.join(root, "desktop", "src", "assets"), { recursive: true });
-    fs.writeFileSync(path.join(root, "desktop", "src", "assets", "Hanako.png"), Buffer.from("yuan-default"));
+    fs.writeFileSync(path.join(root, "desktop", "src", "assets", "Lingxi.png"), Buffer.from("yuan-default"));
 
     const tool = createCurrentStatusTool({
       getAgent: () => ({

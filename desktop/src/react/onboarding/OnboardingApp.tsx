@@ -27,7 +27,7 @@ export function OnboardingApp({ preview, skipToTutorial }: OnboardingAppProps) {
   const [step, setStep] = useState(skipToTutorial ? 5 : 0);
   const [stepKey, setStepKey] = useState(0);
   const [agentName, setAgentName] = useState('Lingxi');
-  const [avatarSrc, setAvatarSrc] = useState('assets/Hanako.png');
+  const [avatarSrc, setAvatarSrc] = useState('assets/Lingxi.png');
   const [locale, setLocale] = useState('zh-CN');
   const [i18nReady, setI18nReady] = useState(false);
 

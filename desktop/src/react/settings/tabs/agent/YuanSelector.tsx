@@ -30,7 +30,7 @@ export function YuanSelector({ currentYuan, onChange }: { currentYuan: string; o
             >
               <img
                 className="yuan-chip-avatar"
-                src={`assets/${meta.avatar || 'Hanako.png'}`}
+                src={`assets/${meta.avatar || 'Lingxi.png'}`}
                 draggable={false}
               />
               <div className="yuan-chip-info">

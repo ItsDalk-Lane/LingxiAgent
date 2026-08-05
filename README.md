@@ -1,9 +1,9 @@
 <p align="center">
-  <img src=".github/assets/banner.jpg" width="100%" alt="LingxiAgent Banner">
+  <img src=".github/assets/banner.jpg" width="100%" alt="灵犀 Lingxi Banner">
 </p>
 
 <p align="center">
-  <img src=".github/assets/LingxiAgent-280.png" width="80" alt="LingxiAgent">
+  <img src=".github/assets/Lingxi-280.png" width="80" alt="灵犀 Lingxi">
 </p>
 
 <h1 align="center">LingxiAgent</h1>
@@ -64,7 +64,7 @@ LingxiAgent 是一个更加易用的 AI agent，有记忆，有性格，会主�
 ## 截图
 
 <p align="center">
-  <img src=".github/assets/screenshot-main.jpg" width="100%" alt="LingxiAgent 主界面">
+  <img src=".github/assets/screenshot-main.jpg" width="100%" alt="灵犀 Lingxi 主界面">
 </p>
 
 ## 快速开始

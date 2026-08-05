@@ -322,7 +322,7 @@ describe('screenshot utils', () => {
     const pngBlob = new Blob([new Uint8Array([137, 80, 78, 71])], { type: 'image/png' });
     const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
       const url = String(input);
-      if (url.includes('assets/Hanako.png')) {
+      if (url.includes('assets/Lingxi.png')) {
         return new Response(pngBlob, { status: 200, headers: { 'Content-Type': 'image/png' } });
       }
       return new Response('', { status: 404 });
@@ -340,7 +340,7 @@ describe('screenshot utils', () => {
     expect(payload.messages[0].avatarDataUrl).toMatch(/^data:image\/svg\+xml/);
     expect(decodeURIComponent(payload.messages[0].avatarDataUrl)).toContain('唐');
     expect(payload.messages[1].avatarDataUrl).toMatch(/^data:image\/png;base64,/);
-    expect(fetchMock).toHaveBeenCalledWith(expect.stringContaining('assets/Hanako.png'));
+    expect(fetchMock).toHaveBeenCalledWith(expect.stringContaining('assets/Lingxi.png'));
   });
 
   it('用户消息截图 payload 保留非图片附件的语义块', async () => {

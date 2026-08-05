@@ -28,7 +28,7 @@ export function resolvePreparingText(data: SplashLocaleData, locale: string, age
 }
 
 export function SplashApp() {
-  const [avatarSrc, setAvatarSrc] = useState('assets/Hanako.png');
+  const [avatarSrc, setAvatarSrc] = useState('assets/Lingxi.png');
   const [text, setText] = useState('');
   const [switching, setSwitching] = useState(false);
   const [symbol, setSymbol] = useState(DEFAULT_VISUAL.symbol);

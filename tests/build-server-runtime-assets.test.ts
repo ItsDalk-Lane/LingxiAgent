@@ -84,7 +84,7 @@ describe("server runtime assets", () => {
       "utf-8",
     )).toBe("cover-gallery\n");
     expect(copied).toEqual(expect.arrayContaining([
-      path.join("desktop", "src", "assets", "Hanako.png"),
+      path.join("desktop", "src", "assets", "Lingxi.png"),
       path.join("desktop", "src", "assets", "character-cards") + path.sep,
       path.join("desktop", "src", "assets", "cover-gallery") + path.sep,
     ]));
