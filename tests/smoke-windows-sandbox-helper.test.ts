@@ -38,10 +38,10 @@ describe("Windows sandbox helper CI smoke", () => {
 
   it("runs cmd directly with the restricted helper on the private desktop", () => {
     const spec = standaloneRestrictedTokenSmokeSpec({
-      layoutRoot: "C:\\HanaCore",
+      layoutRoot: "C:\\LingxiCore",
       workDir: "C:\\smoke\\work",
-      hanaHome: "C:\\smoke\\home",
-      helperPath: "C:\\HanaCore\\sandbox\\windows\\lingxi-win-sandbox.exe",
+      lingxiHome: "C:\\smoke\\home",
+      helperPath: "C:\\LingxiCore\\sandbox\\windows\\lingxi-win-sandbox.exe",
       env: { SystemRoot: "C:\\Windows" },
     });
 

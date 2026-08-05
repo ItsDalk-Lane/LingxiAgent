@@ -10,7 +10,7 @@ export function collectBridgeMediaAllowedRoots(engine, { agentId = null, agent =
     if (normalized && !roots.includes(normalized)) roots.push(normalized);
   };
 
-  add(engine?.hanakoHome);
+  add(engine?.lingxiHome);
 
   const targetAgent = agent || resolveAgent(engine, agentId);
   addAgentHome(targetAgent, add);

@@ -90,7 +90,7 @@ describe("Windows legacy sandbox migration", () => {
 
     const targets = collectWin32LegacySandboxMigrationTargets({
       platform: "win32",
-      hanakoHome: "C:\\Users\\Hana\\.hanako",
+      lingxiHome: "C:\\Users\\Hana\\.hanako",
       workspaceRoots: ["D:\\workspace"],
       env: {
         USERPROFILE: "C:\\Users\\Hana",

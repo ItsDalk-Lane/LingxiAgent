@@ -5,7 +5,7 @@
  * 运行期间追加写入，关闭后下次启动写新的。
  *
  * 格式：[HH:MM:SS.mmm] [LEVEL] [MODULE] message
- * 路径：~/.hanako/logs/YYYY-MM-DD_HH-MM-SS.log
+ * 路径：~/.lingxi/logs/YYYY-MM-DD_HH-MM-SS.log
  */
 
 import fs from "fs";
@@ -21,7 +21,7 @@ class DebugLog {
   declare _size: any;
   declare _truncated: any;
   /**
-   * @param {string} logDir - 日志目录路径（如 ~/.hanako/logs）
+   * @param {string} logDir - 日志目录路径（如 ~/.lingxi/logs）
    */
   constructor(logDir) {
     fs.mkdirSync(logDir, { recursive: true });

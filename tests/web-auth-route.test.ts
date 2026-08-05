@@ -46,13 +46,13 @@ describe("web auth route", () => {
       now: "2026-05-16T00:00:00.000Z",
     });
     const authService = createServerAuthService({
-      hanakoHome: tmpDir,
+      lingxiHome: tmpDir,
       loopbackToken: "local-secret",
       runtimeContext,
     });
     const app = new Hono();
     app.route("/api", createWebAuthRoute({
-      hanakoHome: tmpDir,
+      lingxiHome: tmpDir,
       authService,
       getConnectionKind: () => "lan",
       secureCookies: false,
@@ -115,14 +115,14 @@ describe("web auth route", () => {
       now: "2026-05-16T00:00:00.000Z",
     });
     const authService = createServerAuthService({
-      hanakoHome: tmpDir,
+      lingxiHome: tmpDir,
       loopbackToken: "local-secret",
       runtimeContext,
     });
     const app = new Hono();
     let connectionKind = "lan";
     app.route("/api", createWebAuthRoute({
-      hanakoHome: tmpDir,
+      lingxiHome: tmpDir,
       authService,
       getConnectionKind: () => connectionKind,
       getRuntimeContext: runtimeContext,

@@ -52,16 +52,16 @@ function atomicWriteJSON(filePath: string, data: any) {
 /**
  * 将旧数据整合到 added-models.yaml（幂等，只跑一次）
  *
- * @param {string} hanakoHome - 用户数据根目录（~/.hanako-dev）
+ * @param {string} lingxiHome - 用户数据根目录（~/.lingxi-dev）
  * @param {string} agentsDir  - agents 目录
  * @param {(msg: string) => void} log - 日志回调
  */
-export function migrateToProvidersYaml(hanakoHome: string, agentsDir: string, log: (msg: string) => void = () => {}) {
-  const providersPath = path.join(hanakoHome, "added-models.yaml");
-  const prefsPath = path.join(hanakoHome, "user", "preferences.json");
+export function migrateToProvidersYaml(lingxiHome: string, agentsDir: string, log: (msg: string) => void = () => {}) {
+  const providersPath = path.join(lingxiHome, "added-models.yaml");
+  const prefsPath = path.join(lingxiHome, "user", "preferences.json");
 
   // ── 文件改名迁移：providers.yaml → added-models.yaml ──
-  const oldPath = path.join(hanakoHome, "providers.yaml");
+  const oldPath = path.join(lingxiHome, "providers.yaml");
   if (fs.existsSync(oldPath) && !fs.existsSync(providersPath)) {
     fs.renameSync(oldPath, providersPath);
     log("[migrate-providers] providers.yaml → added-models.yaml 重命名完成");

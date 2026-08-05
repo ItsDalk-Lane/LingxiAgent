@@ -31,14 +31,14 @@ function cleanupBackups(pluginBackupRoot, maxBackups) {
 }
 
 export function createPluginInstallBackup({
-  hanakoHome,
+  lingxiHome,
   pluginId,
   pluginDir,
   version,
   maxBackups = DEFAULT_MAX_BACKUPS_PER_PLUGIN,
-}: { hanakoHome?: string; pluginId?: string; pluginDir?: string; version?: string; maxBackups?: number } = {}) {
-  if (!hanakoHome || !pluginId || !pluginDir || !fs.existsSync(pluginDir)) return null;
-  const backupRoot = path.join(hanakoHome, "plugin-backups", safeSegment(pluginId));
+}: { lingxiHome?: string; pluginId?: string; pluginDir?: string; version?: string; maxBackups?: number } = {}) {
+  if (!lingxiHome || !pluginId || !pluginDir || !fs.existsSync(pluginDir)) return null;
+  const backupRoot = path.join(lingxiHome, "plugin-backups", safeSegment(pluginId));
   fs.mkdirSync(backupRoot, { recursive: true });
   const stamp = new Date().toISOString().replace(/[:.]/g, "-");
   const backupDir = path.join(backupRoot, `${stamp}-v${safeSegment(version, "0.0.0")}`);

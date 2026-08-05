@@ -59,10 +59,10 @@ describe("studio workspaces route", () => {
     tmpDir = makeTmpDir();
     const workspace = path.join(tmpDir, "workspace");
     const mountRoot = path.join(tmpDir, "design-assets");
-    const hanakoHome = path.join(tmpDir, "hana");
+    const lingxiHome = path.join(tmpDir, "hana");
     fs.mkdirSync(workspace, { recursive: true });
     fs.mkdirSync(mountRoot, { recursive: true });
-    upsertStudioMount(hanakoHome, {
+    upsertStudioMount(lingxiHome, {
       mountId: "mount_design",
       hostStudioId: "studio_1",
       sourceKind: "storage",
@@ -73,7 +73,7 @@ describe("studio workspaces route", () => {
       capabilities: ["list", "read", "write"],
     });
     const app = await makeApp({
-      hanakoHome,
+      lingxiHome,
       homeCwd: workspace,
       deskCwd: workspace,
       getRuntimeContext: () => localRuntime(),
@@ -115,10 +115,10 @@ describe("studio workspaces route", () => {
     tmpDir = makeTmpDir();
     const workspace = path.join(tmpDir, "workspace");
     const mountRoot = path.join(tmpDir, "design-assets");
-    const hanakoHome = path.join(tmpDir, "hana");
+    const lingxiHome = path.join(tmpDir, "hana");
     fs.mkdirSync(workspace, { recursive: true });
     fs.mkdirSync(mountRoot, { recursive: true });
-    upsertStudioMount(hanakoHome, {
+    upsertStudioMount(lingxiHome, {
       mountId: "mount_design",
       hostStudioId: "studio_1",
       sourceKind: "storage",
@@ -129,7 +129,7 @@ describe("studio workspaces route", () => {
       capabilities: ["list", "read", "write"],
     });
     const app = await makeApp({
-      hanakoHome,
+      lingxiHome,
       homeCwd: workspace,
       deskCwd: workspace,
       getRuntimeContext: () => localRuntime(),
@@ -153,12 +153,12 @@ describe("studio workspaces route", () => {
     tmpDir = makeTmpDir();
     const workspace = path.join(tmpDir, "workspace");
     const mountRoot = path.join(tmpDir, "client-project");
-    const hanakoHome = path.join(tmpDir, "hana");
+    const lingxiHome = path.join(tmpDir, "hana");
     fs.mkdirSync(workspace, { recursive: true });
     fs.mkdirSync(mountRoot, { recursive: true });
     fs.writeFileSync(path.join(mountRoot, "brief.md"), "brief", "utf-8");
     const app = await makeApp({
-      hanakoHome,
+      lingxiHome,
       homeCwd: workspace,
       deskCwd: workspace,
       getRuntimeContext: () => localRuntime(),
@@ -195,11 +195,11 @@ describe("studio workspaces route", () => {
     tmpDir = makeTmpDir();
     const workspace = path.join(tmpDir, "workspace");
     const mountRoot = path.join(tmpDir, "server-secret");
-    const hanakoHome = path.join(tmpDir, "hana");
+    const lingxiHome = path.join(tmpDir, "hana");
     fs.mkdirSync(workspace, { recursive: true });
     fs.mkdirSync(mountRoot, { recursive: true });
     const app = await makeApp({
-      hanakoHome,
+      lingxiHome,
       homeCwd: workspace,
       deskCwd: workspace,
       getRuntimeContext: () => localRuntime(),
@@ -222,11 +222,11 @@ describe("studio workspaces route", () => {
     tmpDir = makeTmpDir();
     const workspace = path.join(tmpDir, "workspace");
     const mountRoot = path.join(tmpDir, "client-project");
-    const hanakoHome = path.join(tmpDir, "hana");
+    const lingxiHome = path.join(tmpDir, "hana");
     fs.mkdirSync(workspace, { recursive: true });
     fs.mkdirSync(mountRoot, { recursive: true });
     fs.writeFileSync(path.join(mountRoot, "brief.md"), "brief", "utf-8");
-    upsertStudioMount(hanakoHome, {
+    upsertStudioMount(lingxiHome, {
       mountId: "mount_client",
       hostStudioId: "studio_1",
       sourceKind: "storage",
@@ -237,7 +237,7 @@ describe("studio workspaces route", () => {
       capabilities: ["list", "read", "write"],
     });
     const app = await makeApp({
-      hanakoHome,
+      lingxiHome,
       homeCwd: workspace,
       deskCwd: workspace,
       getRuntimeContext: () => localRuntime(),
@@ -261,10 +261,10 @@ describe("studio workspaces route", () => {
     tmpDir = makeTmpDir();
     const workspace = path.join(tmpDir, "workspace");
     const mountRoot = path.join(tmpDir, "client-project");
-    const hanakoHome = path.join(tmpDir, "hana");
+    const lingxiHome = path.join(tmpDir, "hana");
     fs.mkdirSync(workspace, { recursive: true });
     fs.mkdirSync(mountRoot, { recursive: true });
-    upsertStudioMount(hanakoHome, {
+    upsertStudioMount(lingxiHome, {
       mountId: "mount_client",
       hostStudioId: "studio_1",
       sourceKind: "storage",
@@ -275,7 +275,7 @@ describe("studio workspaces route", () => {
       capabilities: ["list", "read", "write"],
     });
     const app = await makeApp({
-      hanakoHome,
+      lingxiHome,
       homeCwd: workspace,
       deskCwd: workspace,
       getRuntimeContext: () => localRuntime(),

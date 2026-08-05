@@ -265,7 +265,7 @@ describe("Windows standalone server artifact", () => {
     const spec = standaloneRestrictedTokenSmokeSpec({
       layoutRoot: "C:\\downloads\\LingxiCore",
       workDir,
-      hanaHome: "C:\\Temp\\hana home",
+      lingxiHome: "C:\\Temp\\hana home",
       env: {
         SystemRoot: "C:\\Windows",
         PATH: "C:\\Program Files\\Git\\cmd;C:\\Windows\\System32",
@@ -292,7 +292,7 @@ describe("Windows standalone server artifact", () => {
     expect(spec.env.Path).toBe("C:\\Windows\\System32");
     expect(spec.env.Path).not.toMatch(/git|usr\\bin|mingw/i);
     // Match production win32-exec: TEMP/LOCALAPPDATA/APPDATA/HOME all live inside
-    // the writable root the helper grants, not beside it under hanaHome.
+    // the writable root the helper grants, not beside it under lingxiHome.
     expect(spec.env.TEMP).toBe(`${runtimeEnvRoot}\\Temp`);
     expect(spec.env.TMP).toBe(`${runtimeEnvRoot}\\Temp`);
     expect(spec.env.LOCALAPPDATA).toBe(`${runtimeEnvRoot}\\LocalAppData`);
@@ -323,7 +323,7 @@ describe("Windows standalone server artifact", () => {
     const spec = standaloneExecCommandSmokeSpec({
       layoutRoot: "C:\\downloads\\LingxiCore",
       workDir: "C:\\Temp\\hana smoke",
-      hanaHome: "C:\\Temp\\hana home",
+      lingxiHome: "C:\\Temp\\hana home",
       env: {
         SystemRoot: "C:\\Windows",
         PATH: "C:\\Program Files\\Git\\cmd;C:\\host-tools",

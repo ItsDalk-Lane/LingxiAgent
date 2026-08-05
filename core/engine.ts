@@ -238,7 +238,7 @@ export function runBestEffortStartupMigrationStep(label, operation, log: any = (
 
 // getSessionMetadataRecoveryStatus() 聚合三源 meta 恢复信号供 /api/health 消费。
 // detail 只保留"所属 agent 目录名 / 文件 basename"两段，绝不透传绝对路径或
-// 底层 error.message（两者都可能带 hanaHome 绝对路径前缀）——/api/health 可能
+// 底层 error.message（两者都可能带 lingxiHome 绝对路径前缀）——/api/health 可能
 // 被远程前端（mobile PWA / Bridge）读取，隐私边界比调试可读性优先。
 function describeMetaSourcePath(filePath: any) {
   const base = path.basename(String(filePath || ""));
@@ -329,13 +329,13 @@ export class LingxiEngine {
   declare agentsDir: any;
   declare appVersion: any;
   declare channelsDir: any;
-  declare hanakoHome: any;
+  declare lingxiHome: any;
   declare _inputDrafts: any;
   declare productDir: any;
   declare userDir: any;
   /**
    * @param {object} dirs
-   * @param {string} dirs.hanakoHome
+   * @param {string} dirs.lingxiHome
    * @param {string} dirs.productDir
    * @param {string} [dirs.agentId]
    * @param {string} [dirs.appVersion]
@@ -344,8 +344,8 @@ export class LingxiEngine {
    *   root. Absent/empty means an open composition: the media runtime
    *   constructs with zero built-in adapters, never an implicit import.
    */
-  constructor({ hanakoHome, productDir, agentId, appVersion, builtinMediaAdapters }) {
-    this.hanakoHome = hanakoHome;
+  constructor({ lingxiHome, productDir, agentId, appVersion, builtinMediaAdapters }) {
+    this.lingxiHome = lingxiHome;
     this.productDir = productDir;
     this.appVersion = appVersion || "0.0.0";
     this._runtimeContext = null;
@@ -353,12 +353,12 @@ export class LingxiEngine {
     this._resourceAccess = null;
     this._resourceIO = null;
     this._resourceEventBus = null;
-    this.agentsDir = path.join(hanakoHome, "agents");
-    this.userDir = path.join(hanakoHome, "user");
-    this.channelsDir = path.join(hanakoHome, "channels");
+    this.agentsDir = path.join(lingxiHome, "agents");
+    this.userDir = path.join(lingxiHome, "user");
+    this.channelsDir = path.join(lingxiHome, "channels");
     fs.mkdirSync(this.channelsDir, { recursive: true });
     this._studioCronService = new StudioCronService({
-      hanakoHome: this.hanakoHome,
+      lingxiHome: this.lingxiHome,
       agentsDir: this.agentsDir,
       getStudioId: () => {
         const studioId = this._runtimeContext?.studioId;
@@ -367,7 +367,7 @@ export class LingxiEngine {
       },
     });
     this._sessionFiles = new SessionFileRegistry({
-      managedCacheRoot: path.join(hanakoHome, "session-files"),
+      managedCacheRoot: path.join(lingxiHome, "session-files"),
       getSessionIdForPath: (sessionPath) => this.getSessionIdForPath(sessionPath),
     });
     this._resourceWatchRegistry = new ResourceWatchRegistry({
@@ -375,7 +375,7 @@ export class LingxiEngine {
       resolveWatchTarget: (resource) => this.getResourceIO().resolveWatchTarget(resource),
     });
     this._fileHistory = new FileHistoryService({
-      historyRoot: path.join(hanakoHome, "file-history"),
+      historyRoot: path.join(lingxiHome, "file-history"),
       log: (message) => console.warn(`[file-history] ${message}`),
     });
     this._sessionManifestStoreRecovery = null;
@@ -385,7 +385,7 @@ export class LingxiEngine {
       : null;
     this._sessionManifestMigration = this._runSessionManifestStartupMigration();
     this._currentTurnNativeMedia = createCurrentTurnNativeMediaStore();
-    this._pluginInstallRecords = new PluginInstallRecords({ hanakoHome });
+    this._pluginInstallRecords = new PluginInstallRecords({ lingxiHome });
     this._automationSuggestionStore = new AutomationSuggestionStore();
     this._sessionCollabDraftStore = new SessionCollabDraftStore();
     this._approvalGateway = createApprovalGateway({
@@ -407,8 +407,8 @@ export class LingxiEngine {
 
     // ── Core managers ──
     this._prefs = new PreferencesManager({ userDir: this.userDir, agentsDir: this.agentsDir });
-    this._inputDrafts = new InputDraftsStore({ hanakoHome: this.hanakoHome });
-    this._models = new ModelManager({ hanakoHome });
+    this._inputDrafts = new InputDraftsStore({ lingxiHome: this.lingxiHome });
+    this._models = new ModelManager({ lingxiHome });
     this._speechRecognition = new SpeechRecognitionService({
       providerRegistry: this._models.providerRegistry,
       preferences: this._prefs,
@@ -416,7 +416,7 @@ export class LingxiEngine {
       emitEvent: (event, sessionPath) => this._emitEvent(event, sessionPath),
     });
     this._media = new UniversalMediaManager({
-      hanakoHome: this.hanakoHome,
+      lingxiHome: this.lingxiHome,
       providerRegistry: this._models.providerRegistry,
       preferences: this._prefs,
       speechRecognition: this._speechRecognition,
@@ -428,7 +428,7 @@ export class LingxiEngine {
     // The data directory keeps the historical `plugin-data/mcp` location: it is
     // where existing installs already store their connector config.
     this._mcp = new McpManager({
-      dataDir: path.join(this.hanakoHome, PLUGIN_DATA_DIRNAME, "mcp"),
+      dataDir: path.join(this.lingxiHome, PLUGIN_DATA_DIRNAME, "mcp"),
       log: mcpLog,
     }, {
       // A connector tool may come back asking the user a question. The store is
@@ -474,7 +474,7 @@ export class LingxiEngine {
 
     // ── Agent Manager ──
     this._agentMgr = new AgentManager({
-      hanakoHome: this.hanakoHome,
+      lingxiHome: this.lingxiHome,
       agentsDir: this.agentsDir,
       productDir: this.productDir,
       userDir: this.userDir,
@@ -596,7 +596,7 @@ export class LingxiEngine {
 
     // ── Config Coordinator ──
     this._configCoord = new ConfigCoordinator({
-      hanakoHome,
+      lingxiHome,
       agentsDir: this.agentsDir,
       getAgent: () => this.agent,
       getAgentById: (id) => this._agentMgr.getAgent(id),
@@ -633,7 +633,7 @@ export class LingxiEngine {
       getHomeCwd: (agentId) => this.getHomeCwd(agentId),
       getVisionBridge: () => this._visionBridge,
       isVisionAuxiliaryEnabled: () => this.isVisionAuxiliaryEnabled(),
-      getHanakoHome: () => this.hanakoHome,
+      getHanakoHome: () => this.lingxiHome,
       registerSessionFile: (entry) => this.registerSessionFile(entry),
       getSessionFile: (fileId, options) => this.getSessionFile(fileId, options),
       getSessionFileByPath: (filePath, options) => this.getSessionFileByPath(filePath, options),
@@ -671,7 +671,7 @@ export class LingxiEngine {
 
     // 任务注册表（外部 abort 用）；handler 是运行时函数，任务元数据持久化供插件重启恢复和诊断使用。
     this._taskRegistry = new TaskRegistry({
-      persistencePath: path.join(this.hanakoHome, ".ephemeral", "plugin-tasks.json"),
+      persistencePath: path.join(this.lingxiHome, ".ephemeral", "plugin-tasks.json"),
       getSessionIdForPath: (sessionPath) => this.getSessionIdForPath(sessionPath),
     });
 
@@ -692,14 +692,14 @@ export class LingxiEngine {
     });
 
     this._terminalSessions = new TerminalSessionManager({
-      hanakoHome: this.hanakoHome,
+      lingxiHome: this.lingxiHome,
       getSessionIdForPath: (sessionPath) => this.getSessionIdForPath(sessionPath),
       emitEvent: (event, sessionPath) => this._emitEvent(event, sessionPath),
     });
 
     // Checkpoint 备份存储
     this._checkpointStore = new CheckpointStore(
-      path.join(this.hanakoHome, "checkpoints")
+      path.join(this.lingxiHome, "checkpoints")
     );
 
     // Computer Use runtime is deliberately lazy. Constructing the provider
@@ -724,7 +724,7 @@ export class LingxiEngine {
     this._listeners = new Set();
     this._eventBus = null;
     this._usageLedger = createUsageLedger({
-      storagePath: path.join(this.hanakoHome, "usage-ledger.json"),
+      storagePath: path.join(this.lingxiHome, "usage-ledger.json"),
       eventBus: {
         emit: (event, sessionPath) => this._emitEvent(event, sessionPath),
       },
@@ -748,7 +748,7 @@ export class LingxiEngine {
     this._outboundProxyRuntime = null;
     this._win32LegacySandboxCleanupQueue = process.platform === "win32"
       ? new Win32LegacySandboxCleanupQueue({
-          hanakoHome: this.hanakoHome,
+          lingxiHome: this.lingxiHome,
           log: win32SandboxCleanupLog,
         })
       : null;
@@ -1223,7 +1223,7 @@ export class LingxiEngine {
         workspace: null,
         workspaceFolders: [],
         authorizedFolders: [],
-        hanakoHome: this.hanakoHome,
+        lingxiHome: this.lingxiHome,
         getSandboxEnabled: () => false,
         getSessionPath: () => this.currentSessionPath || null,
         emitEvent: (event, sessionPath) => this._emitEvent(event, sessionPath),
@@ -1434,7 +1434,7 @@ export class LingxiEngine {
   }
 
   _openSessionManifestStore() {
-    const dbPath = path.join(this.hanakoHome, "session-manifest.db");
+    const dbPath = path.join(this.lingxiHome, "session-manifest.db");
     try {
       return new SessionManifestStore({ dbPath });
     } catch (error) {
@@ -1442,7 +1442,7 @@ export class LingxiEngine {
       let moved = [];
       try {
         moved = moveSessionManifestDbFilesAside({
-          hanaHome: this.hanakoHome,
+          lingxiHome: this.lingxiHome,
           suffix: `quarantine-${sanitizeSessionManifestFileSuffix(new Date().toISOString())}`,
         });
       } catch (moveError) {
@@ -1478,7 +1478,7 @@ export class LingxiEngine {
     }
     try {
       const result = ensureLegacySessionManifestMigration({
-        hanaHome: this.hanakoHome,
+        lingxiHome: this.lingxiHome,
         store: this._sessionManifestStore,
         appVersion: this.appVersion,
       });
@@ -1750,8 +1750,8 @@ export class LingxiEngine {
     return this._configCoord.getExplicitHomeFolder(agentId || this.currentAgentId) || null;
   }
   _createResourceLoaderOptions(skillsDir) {
-    const cwd = resolveLingxiPiSdkResourceLoaderCwd(this.hanakoHome);
-    const agentDir = resolveLingxiPiSdkResourceLoaderAgentDir(this.hanakoHome);
+    const cwd = resolveLingxiPiSdkResourceLoaderCwd(this.lingxiHome);
+    const agentDir = resolveLingxiPiSdkResourceLoaderAgentDir(this.lingxiHome);
     if (!cwd || typeof cwd !== "string") {
       throw new Error("ResourceLoader init: cwd is required");
     }
@@ -2365,7 +2365,7 @@ export class LingxiEngine {
 
     // 0b. Provider 迁移（旧数据 → added-models.yaml，只跑一次）
     const providerSourceStep = runBestEffortStartupMigrationStep("provider-source", () => {
-      migrateToProvidersYaml(this.hanakoHome, this.agentsDir, log);
+      migrateToProvidersYaml(this.lingxiHome, this.agentsDir, log);
     }, log);
 
     let providerMediaStep = { ok: false };
@@ -2373,7 +2373,7 @@ export class LingxiEngine {
     if (providerSourceStep.ok) {
       // 0b2. Provider media 迁移（旧 type:image 模型 → media.image_generation）
       providerMediaStep = runBestEffortStartupMigrationStep("provider-media", () => {
-        migrateProviderMediaConfig(this.hanakoHome, log);
+        migrateProviderMediaConfig(this.lingxiHome, log);
       }, log);
 
       if (providerMediaStep.ok) {
@@ -2395,7 +2395,7 @@ export class LingxiEngine {
       && providerOverridesStep.ok;
     if (legacyPrerequisitesReady) {
       const registryStep = runBestEffortStartupMigrationStep("migration-registry", () => runMigrations({
-        hanakoHome: this.hanakoHome,
+        lingxiHome: this.lingxiHome,
         agentsDir: this.agentsDir,
         prefs: this._prefs,
         providerRegistry: this._models.providerRegistry,
@@ -2417,17 +2417,17 @@ export class LingxiEngine {
     // 只跑一次的迁移覆盖不到这些情况。
     // 拆成两步：清理和矫正互不依赖，任一步出意外都不该连累另一步
     runBestEffortStartupMigrationStep("credential-backup-retention", () => {
-      pruneStaleCredentialBackups({ hanakoHome: this.hanakoHome, log });
+      pruneStaleCredentialBackups({ lingxiHome: this.lingxiHome, log });
     }, log);
     runBestEffortStartupMigrationStep("credential-custody", () => {
-      const healed = healCredentialFileModes({ hanakoHome: this.hanakoHome, log });
+      const healed = healCredentialFileModes({ lingxiHome: this.lingxiHome, log });
       if (healed.failed.length > 0) {
         log(`[credential-custody] ${healed.failed.length} 个文件未能收紧权限，已记录；应用继续启动`);
       }
     }, log);
 
     this._runtimeContext = createServerRuntimeContext({
-      hanakoHome: this.hanakoHome,
+      lingxiHome: this.lingxiHome,
       appVersion: this.appVersion,
     });
     this._resources = new ResourceService({
@@ -2437,7 +2437,7 @@ export class LingxiEngine {
     });
     this._resourceAccess = new ResourceAccessService({
       resourceService: this._resources,
-      audit: (event) => appendSecurityAuditEvent(this.hanakoHome, event),
+      audit: (event) => appendSecurityAuditEvent(this.lingxiHome, event),
     });
 
     // 频道初始化和 agent 构造会调用 server-side i18n。locale 是 global
@@ -2465,7 +2465,7 @@ export class LingxiEngine {
     // 3. ResourceLoader + Skills
     log(`[init] 3/5 ResourceLoader 初始化...`);
     const t_rl = Date.now();
-    const skillsDir = path.join(this.hanakoHome, "skills");
+    const skillsDir = path.join(this.lingxiHome, "skills");
     fs.mkdirSync(skillsDir, { recursive: true });
 
     // 解析外部兼容技能路径
@@ -2704,11 +2704,11 @@ export class LingxiEngine {
     this._media?.start?.(bus);
     await this._mcp?.start?.(bus);
     const builtinPluginsDir = path.join(this.productDir, "..", "plugins");
-    const userPluginsDir = path.join(this.hanakoHome, "plugins");
-    const devPluginsDir = path.join(this.hanakoHome, "plugins-dev");
-    const pluginDevRunsDir = path.join(this.hanakoHome, "plugin-dev-runs");
-    const pluginDevSourcesDir = path.join(this.hanakoHome, "plugin-dev-sources");
-    const pluginDataDir = path.join(this.hanakoHome, PLUGIN_DATA_DIRNAME);
+    const userPluginsDir = path.join(this.lingxiHome, "plugins");
+    const devPluginsDir = path.join(this.lingxiHome, "plugins-dev");
+    const pluginDevRunsDir = path.join(this.lingxiHome, "plugin-dev-runs");
+    const pluginDevSourcesDir = path.join(this.lingxiHome, "plugin-dev-sources");
+    const pluginDataDir = path.join(this.lingxiHome, PLUGIN_DATA_DIRNAME);
     fs.mkdirSync(pluginDevSourcesDir, { recursive: true });
 
     // Read app version for plugin compatibility check
@@ -3134,7 +3134,7 @@ export class LingxiEngine {
         : [];
       return externalReadPathsFromSessionFiles(files, {
         workspaceRoots: workspaceRootsForSandbox(effectiveWorkspace, workspaceFolders, getAuthorizedFolders()),
-        hanakoHome: this.hanakoHome,
+        lingxiHome: this.lingxiHome,
       });
     };
 
@@ -3145,7 +3145,7 @@ export class LingxiEngine {
       workspaceFolders,
       authorizedFolders: staticAuthorizedFolders,
       getAuthorizedFolders,
-      hanakoHome: this.hanakoHome,
+      lingxiHome: this.lingxiHome,
       getSandboxEnabled: () => this._readPreferences().sandbox !== false,
       getExternalReadPaths,
       getSessionPath,
@@ -3161,7 +3161,7 @@ export class LingxiEngine {
       workspaceFolders,
       authorizedFolders: staticAuthorizedFolders,
       getAuthorizedFolders,
-      hanakoHome: this.hanakoHome,
+      lingxiHome: this.lingxiHome,
       executionBoundary,
       getSandboxEnabled: () => this._readPreferences().sandbox !== false,
       getSandboxNetworkEnabled: () => process.platform === "win32"
@@ -3439,7 +3439,7 @@ export class LingxiEngine {
       ? opts.skills
       : (opts.agentId ? this.getAllSkills(opts.agentId) : []);
     return translateSkillNamesWithCache({
-      cachePath: getSkillNameTranslationCachePath(this.hanakoHome),
+      cachePath: getSkillNameTranslationCachePath(this.lingxiHome),
       skills,
       names,
       lang,

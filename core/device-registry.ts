@@ -12,7 +12,7 @@ const SCHEMA_VERSION = 1;
 const SECRET_PREFIX_LENGTH = 18;
 const DEFAULT_PAIRING_TTL_MS = 10 * 60 * 1000;
 
-export function ensureDeviceAccessRegistries(hanakoHome, { now = new Date().toISOString() } = {}) {
+export function ensureDeviceAccessRegistries(lingxiHome, { now = new Date().toISOString() } = {}) {
   const created = [];
   const registries: [string, any, (value: any, label: any) => void][] = [
     [DEVICES_FILE, createEmptyDevicesRegistry(now), validateDevicesRegistry],
@@ -21,7 +21,7 @@ export function ensureDeviceAccessRegistries(hanakoHome, { now = new Date().toIS
   ];
 
   for (const [file, emptyRegistry, validate] of registries) {
-    const filePath = path.join(hanakoHome, file);
+    const filePath = path.join(lingxiHome, file);
     const current = readJsonIfPresent(filePath, file);
     if (current) {
       validate(current, file);
@@ -34,28 +34,28 @@ export function ensureDeviceAccessRegistries(hanakoHome, { now = new Date().toIS
   return { created };
 }
 
-export function loadDeviceAccessRegistries(hanakoHome) {
-  ensureDeviceAccessRegistries(hanakoHome);
-  const devices = readJsonRequired(path.join(hanakoHome, DEVICES_FILE), DEVICES_FILE);
-  const credentials = readJsonRequired(path.join(hanakoHome, DEVICE_CREDENTIALS_FILE), DEVICE_CREDENTIALS_FILE);
-  const pairingSessions = readJsonRequired(path.join(hanakoHome, PAIRING_SESSIONS_FILE), PAIRING_SESSIONS_FILE);
+export function loadDeviceAccessRegistries(lingxiHome) {
+  ensureDeviceAccessRegistries(lingxiHome);
+  const devices = readJsonRequired(path.join(lingxiHome, DEVICES_FILE), DEVICES_FILE);
+  const credentials = readJsonRequired(path.join(lingxiHome, DEVICE_CREDENTIALS_FILE), DEVICE_CREDENTIALS_FILE);
+  const pairingSessions = readJsonRequired(path.join(lingxiHome, PAIRING_SESSIONS_FILE), PAIRING_SESSIONS_FILE);
   validateDevicesRegistry(devices, DEVICES_FILE);
   validateCredentialsRegistry(credentials, DEVICE_CREDENTIALS_FILE);
   validatePairingSessionsRegistry(pairingSessions, PAIRING_SESSIONS_FILE);
   return { devices, credentials, pairingSessions };
 }
 
-export function createDeviceCredential(hanakoHome, input) {
+export function createDeviceCredential(lingxiHome, input) {
   const now = input?.now || new Date().toISOString();
-  const registries = loadDeviceAccessRegistries(hanakoHome);
+  const registries = loadDeviceAccessRegistries(lingxiHome);
   const issued = issueDeviceCredential(registries, input, { now });
-  persistDeviceAccessRegistries(hanakoHome, registries);
+  persistDeviceAccessRegistries(lingxiHome, registries);
   return cloneIssuedCredential(issued);
 }
 
-export function authenticateDeviceCredential(hanakoHome, secret, { now = new Date().toISOString() } = {}) {
+export function authenticateDeviceCredential(lingxiHome, secret, { now = new Date().toISOString() } = {}) {
   if (!isNonEmptyString(secret)) return null;
-  const registries = loadDeviceAccessRegistries(hanakoHome);
+  const registries = loadDeviceAccessRegistries(lingxiHome);
   const credential = registries.credentials.credentials.find((item) => (
     item.status === "active"
     && isNonEmptyString(item.secretPrefix)
@@ -70,7 +70,7 @@ export function authenticateDeviceCredential(hanakoHome, secret, { now = new Dat
 
   credential.lastUsedAt = now;
   device.lastSeenAt = now;
-  persistDeviceAccessRegistries(hanakoHome, registries);
+  persistDeviceAccessRegistries(lingxiHome, registries);
 
   const trustState = device.trustState || "lan";
   return normalizePrincipal({
@@ -88,21 +88,21 @@ export function authenticateDeviceCredential(hanakoHome, secret, { now = new Dat
   });
 }
 
-export function revokeDeviceCredential(hanakoHome, credentialId, { now = new Date().toISOString() } = {}) {
+export function revokeDeviceCredential(lingxiHome, credentialId, { now = new Date().toISOString() } = {}) {
   if (!isNonEmptyString(credentialId)) throw new Error("credentialId required");
-  const registries = loadDeviceAccessRegistries(hanakoHome);
+  const registries = loadDeviceAccessRegistries(lingxiHome);
   const credential = registries.credentials.credentials.find((item) => item.credentialId === credentialId);
   if (!credential) throw new Error(`device credential not found: ${credentialId}`);
   credential.status = "revoked";
   credential.revokedAt = now;
   registries.credentials.updatedAt = now;
-  persistDeviceAccessRegistries(hanakoHome, registries);
+  persistDeviceAccessRegistries(lingxiHome, registries);
   return clonePlain(credential);
 }
 
-export function revokeDevice(hanakoHome, deviceId, { now = new Date().toISOString() } = {}) {
+export function revokeDevice(lingxiHome, deviceId, { now = new Date().toISOString() } = {}) {
   if (!isNonEmptyString(deviceId)) throw new Error("deviceId required");
-  const registries = loadDeviceAccessRegistries(hanakoHome);
+  const registries = loadDeviceAccessRegistries(lingxiHome);
   const device = registries.devices.devices.find((item) => item.deviceId === deviceId);
   if (!device) throw new Error(`device not found: ${deviceId}`);
   device.status = "revoked";
@@ -116,11 +116,11 @@ export function revokeDevice(hanakoHome, deviceId, { now = new Date().toISOStrin
   }
   registries.devices.updatedAt = now;
   registries.credentials.updatedAt = now;
-  persistDeviceAccessRegistries(hanakoHome, registries);
+  persistDeviceAccessRegistries(lingxiHome, registries);
   return clonePlain(device);
 }
 
-export function createPairingSession(hanakoHome, input) {
+export function createPairingSession(lingxiHome, input) {
   const now = input?.now || new Date().toISOString();
   const ttlMs = Number.isFinite(input?.ttlMs) ? input.ttlMs : DEFAULT_PAIRING_TTL_MS;
   if (ttlMs <= 0) throw new Error("ttlMs must be positive");
@@ -142,21 +142,21 @@ export function createPairingSession(hanakoHome, input) {
     expiresAt: new Date(Date.parse(now) + ttlMs).toISOString(),
   };
 
-  const registries = loadDeviceAccessRegistries(hanakoHome);
+  const registries = loadDeviceAccessRegistries(lingxiHome);
   registries.pairingSessions.pairingSessions.push(pairingSession);
   registries.pairingSessions.updatedAt = now;
-  persistDeviceAccessRegistries(hanakoHome, registries);
+  persistDeviceAccessRegistries(lingxiHome, registries);
   return {
     pairingSession: clonePlain(pairingSession),
     userCode,
   };
 }
 
-export function approvePairingSession(hanakoHome, input) {
+export function approvePairingSession(lingxiHome, input) {
   const now = input?.now || new Date().toISOString();
   assertNonEmptyString(input?.pairingSessionId, "pairingSessionId");
   assertNonEmptyString(input?.userCode, "userCode");
-  const registries = loadDeviceAccessRegistries(hanakoHome);
+  const registries = loadDeviceAccessRegistries(lingxiHome);
   const session = registries.pairingSessions.pairingSessions
     .find((item) => item.pairingSessionId === input.pairingSessionId);
   if (!session) throw new Error(`pairing session not found: ${input.pairingSessionId}`);
@@ -165,7 +165,7 @@ export function approvePairingSession(hanakoHome, input) {
     session.status = "expired";
     session.expiredAt = now;
     registries.pairingSessions.updatedAt = now;
-    persistDeviceAccessRegistries(hanakoHome, registries);
+    persistDeviceAccessRegistries(lingxiHome, registries);
     throw new Error("pairing session expired");
   }
   if (!verifySecret(normalizeUserCode(input.userCode), session.userCodeSalt, session.userCodeHash)) {
@@ -189,7 +189,7 @@ export function approvePairingSession(hanakoHome, input) {
   session.deviceId = issued.device.deviceId;
   session.credentialId = issued.credential.credentialId;
   registries.pairingSessions.updatedAt = now;
-  persistDeviceAccessRegistries(hanakoHome, registries);
+  persistDeviceAccessRegistries(lingxiHome, registries);
   return cloneIssuedCredential({
     ...issued,
     pairingSession: session,
@@ -248,13 +248,13 @@ function issueDeviceCredential(registries, input, { now }) {
   return { device, credential, secret };
 }
 
-function persistDeviceAccessRegistries(hanakoHome, registries) {
+function persistDeviceAccessRegistries(lingxiHome, registries) {
   validateDevicesRegistry(registries.devices, DEVICES_FILE);
   validateCredentialsRegistry(registries.credentials, DEVICE_CREDENTIALS_FILE);
   validatePairingSessionsRegistry(registries.pairingSessions, PAIRING_SESSIONS_FILE);
-  writeSecretJson(path.join(hanakoHome, DEVICES_FILE), registries.devices);
-  writeSecretJson(path.join(hanakoHome, DEVICE_CREDENTIALS_FILE), registries.credentials);
-  writeSecretJson(path.join(hanakoHome, PAIRING_SESSIONS_FILE), registries.pairingSessions);
+  writeSecretJson(path.join(lingxiHome, DEVICES_FILE), registries.devices);
+  writeSecretJson(path.join(lingxiHome, DEVICE_CREDENTIALS_FILE), registries.credentials);
+  writeSecretJson(path.join(lingxiHome, PAIRING_SESSIONS_FILE), registries.pairingSessions);
 }
 
 function createEmptyDevicesRegistry(now) {

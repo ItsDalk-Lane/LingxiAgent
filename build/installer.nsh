@@ -1,7 +1,7 @@
-; installer.nsh - NSIS custom hooks for HanaAgent installer
+; installer.nsh - NSIS custom hooks for Lingxi installer
 ;
-; Owns the Windows overlay boundary for HanaAgent installs. The installer may
-; replace HanaAgent-owned program files, while user/runtime state stays outside
+; Owns the Windows overlay boundary for Lingxi installs. The installer may
+; replace Lingxi-owned program files, while user/runtime state stays outside
 ; $INSTDIR.
 
 ; Disable CRC integrity check. electron-builder's post-compilation PE editing

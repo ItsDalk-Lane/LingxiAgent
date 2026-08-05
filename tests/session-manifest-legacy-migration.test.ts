@@ -10,15 +10,15 @@ import {
 import { SessionManifestStore } from "../core/session-manifest/store.ts";
 
 describe("session manifest legacy migration", () => {
-  let hanaHome;
+  let lingxiHome;
   let store;
   let nextId;
 
   beforeEach(() => {
-    hanaHome = fs.mkdtempSync(path.join(os.tmpdir(), "hana-manifest-migration-"));
+    lingxiHome = fs.mkdtempSync(path.join(os.tmpdir(), "hana-manifest-migration-"));
     nextId = 1;
     store = new SessionManifestStore({
-      dbPath: path.join(hanaHome, "session-manifest.db"),
+      dbPath: path.join(lingxiHome, "session-manifest.db"),
       idGenerator: () => `sess_migrate_${String(nextId++).padStart(4, "0")}`,
       now: () => "2026-06-18T03:00:00.000Z",
     });
@@ -26,27 +26,27 @@ describe("session manifest legacy migration", () => {
 
   afterEach(() => {
     store?.close();
-    fs.rmSync(hanaHome, { recursive: true, force: true });
+    fs.rmSync(lingxiHome, { recursive: true, force: true });
   });
 
   function writeSession(agentId, fileName, { archived = false } = {}) {
-    const sessionDir = path.join(hanaHome, "agents", agentId, "sessions");
+    const sessionDir = path.join(lingxiHome, "agents", agentId, "sessions");
     const targetDir = archived ? path.join(sessionDir, "archived") : sessionDir;
     const sessionPath = path.join(targetDir, fileName);
     fs.mkdirSync(targetDir, { recursive: true });
     fs.writeFileSync(sessionPath, [
-      JSON.stringify({ type: "session", version: 3, id: fileName, timestamp: "2026-06-18T03:00:00.000Z", cwd: hanaHome }),
+      JSON.stringify({ type: "session", version: 3, id: fileName, timestamp: "2026-06-18T03:00:00.000Z", cwd: lingxiHome }),
       "",
     ].join("\n"));
     return { sessionDir, sessionPath };
   }
 
   function writeSubagentSession(agentId, fileName) {
-    const sessionDir = path.join(hanaHome, "agents", agentId, "subagent-sessions");
+    const sessionDir = path.join(lingxiHome, "agents", agentId, "subagent-sessions");
     const sessionPath = path.join(sessionDir, fileName);
     fs.mkdirSync(sessionDir, { recursive: true });
     fs.writeFileSync(sessionPath, [
-      JSON.stringify({ type: "session", version: 3, id: fileName, timestamp: "2026-06-18T03:00:00.000Z", cwd: hanaHome }),
+      JSON.stringify({ type: "session", version: 3, id: fileName, timestamp: "2026-06-18T03:00:00.000Z", cwd: lingxiHome }),
       "",
     ].join("\n"));
     return { sessionDir, sessionPath };
@@ -55,7 +55,7 @@ describe("session manifest legacy migration", () => {
   function writeJsonl(sessionPath) {
     fs.mkdirSync(path.dirname(sessionPath), { recursive: true });
     fs.writeFileSync(sessionPath, [
-      JSON.stringify({ type: "session", version: 3, id: path.basename(sessionPath), timestamp: "2026-06-18T03:00:00.000Z", cwd: hanaHome }),
+      JSON.stringify({ type: "session", version: 3, id: path.basename(sessionPath), timestamp: "2026-06-18T03:00:00.000Z", cwd: lingxiHome }),
       "",
     ].join("\n"));
     return sessionPath;
@@ -109,7 +109,7 @@ describe("session manifest legacy migration", () => {
     }, null, 2));
 
     const result = migrateLegacySessions({
-      hanaHome,
+      lingxiHome,
       store,
       migratedAt: "2026-06-18T03:02:00.000Z",
     });
@@ -192,7 +192,7 @@ describe("session manifest legacy migration", () => {
     }, null, 2));
 
     const result = migrateLegacySessions({
-      hanaHome,
+      lingxiHome,
       store,
       migratedAt: "2026-06-18T03:02:00.000Z",
     });
@@ -228,7 +228,7 @@ describe("session manifest legacy migration", () => {
     }, null, 2));
 
     const result = migrateLegacySessions({
-      hanaHome,
+      lingxiHome,
       store,
       migratedAt: "2026-06-18T03:02:00.000Z",
     });
@@ -253,7 +253,7 @@ describe("session manifest legacy migration", () => {
   });
 
   it("migrates bridge, activity, phone, direct-subagent, and workflow-node sources with explicit classification", () => {
-    const agentDir = path.join(hanaHome, "agents", "hana");
+    const agentDir = path.join(lingxiHome, "agents", "hana");
     const bridgeDir = path.join(agentDir, "sessions", "bridge");
     const bridgeOwner = writeJsonl(path.join(bridgeDir, "owner", "owner.jsonl"));
     const bridgeGuest = writeJsonl(path.join(bridgeDir, "guests", "guest.jsonl"));
@@ -294,7 +294,7 @@ describe("session manifest legacy migration", () => {
 
     const directPath = writeJsonl(path.join(agentDir, "subagent-sessions", "direct", "child.jsonl"));
     const workflowPath = writeJsonl(path.join(agentDir, "workflow-sessions", "workflow-1", "node.jsonl"));
-    fs.writeFileSync(path.join(hanaHome, "subagent-threads.json"), JSON.stringify({
+    fs.writeFileSync(path.join(lingxiHome, "subagent-threads.json"), JSON.stringify({
       schemaVersion: 1,
       threads: {
         "thread-direct": {
@@ -316,7 +316,7 @@ describe("session manifest legacy migration", () => {
     }, null, 2));
 
     const result = migrateLegacySessions({
-      hanaHome,
+      lingxiHome,
       store,
       migratedAt: "2026-06-18T03:02:00.000Z",
     });
@@ -386,8 +386,8 @@ describe("session manifest legacy migration", () => {
   });
 
   it("preserves sessionId while repairing manifests misclassified by the previous legacy scan", () => {
-    const directPath = writeJsonl(path.join(hanaHome, "agents", "hana", "subagent-sessions", "direct", "legacy-child.jsonl"));
-    fs.writeFileSync(path.join(hanaHome, "subagent-threads.json"), JSON.stringify({
+    const directPath = writeJsonl(path.join(lingxiHome, "agents", "hana", "subagent-sessions", "direct", "legacy-child.jsonl"));
+    fs.writeFileSync(path.join(lingxiHome, "subagent-threads.json"), JSON.stringify({
       schemaVersion: 1,
       threads: {
         "legacy-thread": {
@@ -406,8 +406,8 @@ describe("session manifest legacy migration", () => {
       migration: { source: "legacy_scan", legacySessionPath: directPath },
     });
 
-    const first = migrateLegacySessions({ hanaHome, store, migratedAt: "2026-06-18T03:02:00.000Z" });
-    const second = migrateLegacySessions({ hanaHome, store, migratedAt: "2026-06-18T03:03:00.000Z" });
+    const first = migrateLegacySessions({ lingxiHome, store, migratedAt: "2026-06-18T03:02:00.000Z" });
+    const second = migrateLegacySessions({ lingxiHome, store, migratedAt: "2026-06-18T03:03:00.000Z" });
 
     expect(first).toEqual({ scanned: 1, created: 0, existing: 1, skipped: 0, skippedDetails: [], skippedMetaSources: [] });
     expect(second).toEqual({ scanned: 1, created: 0, existing: 1, skipped: 0, skippedDetails: [], skippedMetaSources: [] });
@@ -424,8 +424,8 @@ describe("session manifest legacy migration", () => {
   it("is idempotent when rerun over the same legacy files", () => {
     const active = writeSession("hana", "active.jsonl");
 
-    const first = migrateLegacySessions({ hanaHome, store, migratedAt: "2026-06-18T03:02:00.000Z" });
-    const second = migrateLegacySessions({ hanaHome, store, migratedAt: "2026-06-18T03:03:00.000Z" });
+    const first = migrateLegacySessions({ lingxiHome, store, migratedAt: "2026-06-18T03:02:00.000Z" });
+    const second = migrateLegacySessions({ lingxiHome, store, migratedAt: "2026-06-18T03:03:00.000Z" });
 
     expect(first).toEqual({ scanned: 1, created: 1, existing: 0, skipped: 0, skippedDetails: [], skippedMetaSources: [] });
     expect(second).toEqual({ scanned: 1, created: 0, existing: 1, skipped: 0, skippedDetails: [], skippedMetaSources: [] });
@@ -441,7 +441,7 @@ describe("session manifest legacy migration", () => {
       [existing.sessionId]: "Current title",
     }, null, 2));
 
-    const result = migrateLegacySessions({ hanaHome, store, migratedAt: "2026-06-18T03:02:00.000Z" });
+    const result = migrateLegacySessions({ lingxiHome, store, migratedAt: "2026-06-18T03:02:00.000Z" });
 
     expect(result).toEqual({ scanned: 1, created: 0, existing: 1, skipped: 0, skippedDetails: [], skippedMetaSources: [] });
     const titles = JSON.parse(fs.readFileSync(path.join(active.sessionDir, "session-titles.json"), "utf-8"));
@@ -449,8 +449,8 @@ describe("session manifest legacy migration", () => {
   });
 
   it("scans legacy sessions through symlinked agent directories", () => {
-    const realAgentDir = path.join(hanaHome, "real-hana-agent");
-    const linkedAgentDir = path.join(hanaHome, "agents", "hana");
+    const realAgentDir = path.join(lingxiHome, "real-hana-agent");
+    const linkedAgentDir = path.join(lingxiHome, "agents", "hana");
     fs.mkdirSync(path.join(realAgentDir, "sessions"), { recursive: true });
     fs.mkdirSync(path.dirname(linkedAgentDir), { recursive: true });
     linkDirectory(realAgentDir, linkedAgentDir);
@@ -461,7 +461,7 @@ describe("session manifest legacy migration", () => {
       timestamp: "2026-06-18T03:00:00.000Z",
     })}\n`);
 
-    const result = migrateLegacySessions({ hanaHome, store, migratedAt: "2026-06-18T03:02:00.000Z" });
+    const result = migrateLegacySessions({ lingxiHome, store, migratedAt: "2026-06-18T03:02:00.000Z" });
 
     expect(result).toEqual({ scanned: 1, created: 1, existing: 0, skipped: 0, skippedDetails: [], skippedMetaSources: [] });
     expect(store.resolveByLocatorPath(logicalSessionPath)).toMatchObject({
@@ -480,7 +480,7 @@ describe("session manifest legacy migration", () => {
     const secondManifest = store.createForPath({ sessionPath: second.sessionPath, ownerAgentId: "hana" });
     insertConflictingHistoryLocator(first.sessionPath, secondManifest.sessionId);
 
-    const result = migrateLegacySessions({ hanaHome, store, migratedAt: "2026-06-18T03:02:00.000Z" });
+    const result = migrateLegacySessions({ lingxiHome, store, migratedAt: "2026-06-18T03:02:00.000Z" });
 
     expect(result).toMatchObject({ scanned: 2, created: 0, existing: 1, skipped: 1 });
     expect(result.skippedDetails).toHaveLength(1);
@@ -495,7 +495,7 @@ describe("session manifest legacy migration", () => {
     // 模拟历史缺失写入：manifest 已存在但 ownerAgentId 为 null
     store.createForPath({ sessionPath, domain: "desktop", kind: "chat" });
 
-    const result = migrateLegacySessions({ hanaHome, store });
+    const result = migrateLegacySessions({ lingxiHome, store });
 
     expect(result.existing).toBe(1);
     expect(store.resolveByLocatorPath(sessionPath)).toMatchObject({
@@ -507,7 +507,7 @@ describe("session manifest legacy migration", () => {
     const { sessionPath } = writeSession("hana", "owned-elsewhere.jsonl");
     store.createForPath({ sessionPath, ownerAgentId: "bob", domain: "desktop", kind: "chat" });
 
-    migrateLegacySessions({ hanaHome, store });
+    migrateLegacySessions({ lingxiHome, store });
 
     expect(store.resolveByLocatorPath(sessionPath)).toMatchObject({
       ownerAgentId: "bob",
@@ -515,8 +515,8 @@ describe("session manifest legacy migration", () => {
   });
 
   it("repairs realpath locator paths back to the app-facing legacy path during rescan", () => {
-    const realSessionsDir = path.join(hanaHome, "real-sessions");
-    const logicalSessionsDir = path.join(hanaHome, "agents", "hana", "sessions");
+    const realSessionsDir = path.join(lingxiHome, "real-sessions");
+    const logicalSessionsDir = path.join(lingxiHome, "agents", "hana", "sessions");
     fs.mkdirSync(realSessionsDir, { recursive: true });
     fs.mkdirSync(path.dirname(logicalSessionsDir), { recursive: true });
     linkDirectory(realSessionsDir, logicalSessionsDir);
@@ -529,7 +529,7 @@ describe("session manifest legacy migration", () => {
     })}\n`);
     const existing = store.createForPath({ sessionPath: realSessionPath, ownerAgentId: "hana" });
 
-    const result = migrateLegacySessions({ hanaHome, store, migratedAt: "2026-06-18T03:02:00.000Z" });
+    const result = migrateLegacySessions({ lingxiHome, store, migratedAt: "2026-06-18T03:02:00.000Z" });
 
     expect(result).toEqual({ scanned: 1, created: 0, existing: 1, skipped: 0, skippedDetails: [], skippedMetaSources: [] });
     expect(store.getBySessionId(existing.sessionId)?.currentLocator.path).toBe(path.resolve(logicalSessionPath));
@@ -550,7 +550,7 @@ describe("session manifest legacy migration", () => {
       fs.writeFileSync(backupMetaPath, backupPayload);
 
       const result = migrateLegacySessions({
-        hanaHome,
+        lingxiHome,
         store,
         migratedAt: "2026-06-18T03:02:00.000Z",
         // 强制一切超过闸门，验证跳过路径，不需要真的造 64MB 文件
@@ -586,14 +586,14 @@ describe("session manifest legacy migration", () => {
       const brokenPayload = "{not valid json";
       fs.writeFileSync(metaPath, brokenPayload);
 
-      const first = migrateLegacySessions({ hanaHome, store, migratedAt: "2026-06-18T03:02:00.000Z" });
+      const first = migrateLegacySessions({ lingxiHome, store, migratedAt: "2026-06-18T03:02:00.000Z" });
       expect(first.created).toBe(1);
       expect(first.skippedMetaSources).toEqual([
         { path: metaPath, reason: "parse_error", size: Buffer.byteLength(brokenPayload) },
       ]);
 
       const readSpy = vi.spyOn(fs, "readFileSync");
-      const second = migrateLegacySessions({ hanaHome, store, migratedAt: "2026-06-18T03:03:00.000Z" });
+      const second = migrateLegacySessions({ lingxiHome, store, migratedAt: "2026-06-18T03:03:00.000Z" });
       const metaPathReadCount = readSpy.mock.calls.filter((call) => call[0] === metaPath).length;
       readSpy.mockRestore();
 
@@ -612,14 +612,14 @@ describe("session manifest legacy migration", () => {
         "steady.jsonl": { pinnedAt: "2026-06-18T03:01:00.000Z" },
       }, null, 2));
 
-      const first = migrateLegacySessions({ hanaHome, store, migratedAt: "2026-06-18T03:02:00.000Z" });
+      const first = migrateLegacySessions({ lingxiHome, store, migratedAt: "2026-06-18T03:02:00.000Z" });
       expect(first.skippedMetaSources).toEqual([]);
       expect(store.resolveByLocatorPath(active.sessionPath)).toMatchObject({
         pinnedAt: "2026-06-18T03:01:00.000Z",
       });
 
       const readSpy = vi.spyOn(fs, "readFileSync");
-      const second = migrateLegacySessions({ hanaHome, store, migratedAt: "2026-06-18T03:03:00.000Z" });
+      const second = migrateLegacySessions({ lingxiHome, store, migratedAt: "2026-06-18T03:03:00.000Z" });
       const metaPathReadCount = readSpy.mock.calls.filter((call) => call[0] === metaPath).length;
       readSpy.mockRestore();
 
@@ -655,14 +655,14 @@ describe("session manifest legacy migration", () => {
         return realCreateForPath(input);
       });
 
-      const first = migrateLegacySessions({ hanaHome, store, migratedAt: "2026-06-18T03:02:00.000Z" });
+      const first = migrateLegacySessions({ lingxiHome, store, migratedAt: "2026-06-18T03:02:00.000Z" });
       expect(first.created).toBe(1);
       expect(first.skipped).toBe(1);
       expect(first.skippedDetails).toContainEqual(expect.objectContaining({ sessionPath: b.sessionPath }));
       expect(store.resolveByLocatorPath(a.sessionPath)).toMatchObject({ pinnedAt: "2026-06-18T03:01:00.000Z" });
       expect(store.resolveByLocatorPath(b.sessionPath)).toBeNull();
 
-      const second = migrateLegacySessions({ hanaHome, store, migratedAt: "2026-06-18T03:03:00.000Z" });
+      const second = migrateLegacySessions({ lingxiHome, store, migratedAt: "2026-06-18T03:03:00.000Z" });
       createForPathSpy.mockRestore();
 
       expect(second.created).toBe(1);
@@ -681,12 +681,12 @@ describe("session manifest legacy migration", () => {
         "vanishing.jsonl": { pinnedAt: "2026-06-18T03:01:00.000Z" },
       }, null, 2));
 
-      migrateLegacySessions({ hanaHome, store, migratedAt: "2026-06-18T03:02:00.000Z" });
+      migrateLegacySessions({ lingxiHome, store, migratedAt: "2026-06-18T03:02:00.000Z" });
       const ledgerAfterFirst: any = store.getState(LEGACY_META_SCAN_LEDGER_KEY);
       expect(ledgerAfterFirst[metaPath]).toMatchObject({ status: "consumed" });
 
       fs.unlinkSync(metaPath);
-      migrateLegacySessions({ hanaHome, store, migratedAt: "2026-06-18T03:03:00.000Z" });
+      migrateLegacySessions({ lingxiHome, store, migratedAt: "2026-06-18T03:03:00.000Z" });
 
       const ledgerAfterSecond: any = store.getState(LEGACY_META_SCAN_LEDGER_KEY);
       expect(ledgerAfterSecond[metaPath]).toBeUndefined();
@@ -699,7 +699,7 @@ describe("session manifest legacy migration", () => {
         "capability-refresh.jsonl": { toolNames: ["read"] },
       }, null, 2));
 
-      const first = migrateLegacySessions({ hanaHome, store, migratedAt: "2026-06-18T03:02:00.000Z" });
+      const first = migrateLegacySessions({ lingxiHome, store, migratedAt: "2026-06-18T03:02:00.000Z" });
       expect(first.skippedMetaSources).toEqual([]);
       const manifest = store.resolveByLocatorPath(active.sessionPath);
       expect(store.getCapabilitySnapshot(manifest.sessionId)).toMatchObject({ toolNames: ["read"] });
@@ -710,7 +710,7 @@ describe("session manifest legacy migration", () => {
       const futureMtime = new Date(Date.now() + 5000);
       fs.utimesSync(metaPath, futureMtime, futureMtime);
 
-      const second = migrateLegacySessions({ hanaHome, store, migratedAt: "2026-06-18T03:03:00.000Z" });
+      const second = migrateLegacySessions({ lingxiHome, store, migratedAt: "2026-06-18T03:03:00.000Z" });
 
       expect(second.skippedMetaSources).toEqual([]);
       expect(store.getCapabilitySnapshot(manifest.sessionId)).toMatchObject({
@@ -728,7 +728,7 @@ describe("session manifest legacy migration", () => {
 
       let result;
       expect(() => {
-        result = migrateLegacySessions({ hanaHome, store, migratedAt: "2026-06-18T03:02:00.000Z" });
+        result = migrateLegacySessions({ lingxiHome, store, migratedAt: "2026-06-18T03:02:00.000Z" });
       }).not.toThrow();
 
       expect(result.created).toBe(1);
@@ -747,7 +747,7 @@ describe("session manifest legacy migration", () => {
       fs.writeFileSync(oversizedMetaPath, oversizedPayload);
 
       migrateLegacySessions({
-        hanaHome,
+        lingxiHome,
         store,
         migratedAt: "2026-06-18T03:02:00.000Z",
         metaSourceMaxBytes: 4,
@@ -758,7 +758,7 @@ describe("session manifest legacy migration", () => {
       const brokenPayload = "{not valid json";
       fs.writeFileSync(brokenMetaPath, brokenPayload);
 
-      migrateLegacySessions({ hanaHome, store, migratedAt: "2026-06-18T03:03:00.000Z" });
+      migrateLegacySessions({ lingxiHome, store, migratedAt: "2026-06-18T03:03:00.000Z" });
 
       const entries = listSkippedMetaSources(store);
       expect(entries).toEqual(expect.arrayContaining([

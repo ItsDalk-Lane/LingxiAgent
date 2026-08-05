@@ -18,10 +18,10 @@ const USERS_FILE = "users.json";
 const STUDIOS_FILE = "studios.json";
 const LEGACY_SPACES_FILE = "spaces.json";
 
-export function loadServerIdentity(hanakoHome) {
-  const serverNode = readRequiredIdentityJson(path.join(hanakoHome, SERVER_NODE_FILE), SERVER_NODE_FILE);
-  const users = readRequiredIdentityJson(path.join(hanakoHome, USERS_FILE), USERS_FILE);
-  const studios = readRequiredStudioRegistry(hanakoHome);
+export function loadServerIdentity(lingxiHome) {
+  const serverNode = readRequiredIdentityJson(path.join(lingxiHome, SERVER_NODE_FILE), SERVER_NODE_FILE);
+  const users = readRequiredIdentityJson(path.join(lingxiHome, USERS_FILE), USERS_FILE);
+  const studios = readRequiredStudioRegistry(lingxiHome);
 
   validateServerNodeIdentity(serverNode, SERVER_NODE_FILE);
   validateUsersIdentity(users, USERS_FILE);
@@ -47,11 +47,11 @@ export function loadServerIdentity(hanakoHome) {
   };
 }
 
-export function ensureLocalIdentityRegistries(hanakoHome) {
-  const serverNodePath = path.join(hanakoHome, SERVER_NODE_FILE);
-  const usersPath = path.join(hanakoHome, USERS_FILE);
-  const studiosPath = path.join(hanakoHome, STUDIOS_FILE);
-  const legacySpacesPath = path.join(hanakoHome, LEGACY_SPACES_FILE);
+export function ensureLocalIdentityRegistries(lingxiHome) {
+  const serverNodePath = path.join(lingxiHome, SERVER_NODE_FILE);
+  const usersPath = path.join(lingxiHome, USERS_FILE);
+  const studiosPath = path.join(lingxiHome, STUDIOS_FILE);
+  const legacySpacesPath = path.join(lingxiHome, LEGACY_SPACES_FILE);
 
   const existingServerNode = readIdentityJsonIfPresent(serverNodePath, SERVER_NODE_FILE);
   const existingUsers = readIdentityJsonIfPresent(usersPath, USERS_FILE);
@@ -91,7 +91,7 @@ export function ensureLocalIdentityRegistries(hanakoHome) {
   if (!existingStudios) writeJsonAtomic(studiosPath, studios);
   else if (repairedIdentityLinks.studios) writeJsonAtomic(studiosPath, studios);
 
-  const foundationRegistries = ensureRemoteAccessFoundationRegistries(hanakoHome, { now });
+  const foundationRegistries = ensureRemoteAccessFoundationRegistries(lingxiHome, { now });
 
   return {
     created: [
@@ -125,36 +125,36 @@ function repairLocalIdentityRegistryLinks(users, studios, { now }) {
   return repaired;
 }
 
-export function ensureRemoteAccessFoundationRegistries(hanakoHome, { now = new Date().toISOString() } = {}) {
+export function ensureRemoteAccessFoundationRegistries(lingxiHome, { now = new Date().toISOString() } = {}) {
   return {
     created: [
-      ...ensureDeviceAccessRegistries(hanakoHome, { now }).created,
-      ...ensureServerNetworkConfig(hanakoHome, { now }).created,
-      ...ensureStudioMountRegistry(hanakoHome, { now }).created,
-      ...ensureSecurityRegistries(hanakoHome, { now }).created,
+      ...ensureDeviceAccessRegistries(lingxiHome, { now }).created,
+      ...ensureServerNetworkConfig(lingxiHome, { now }).created,
+      ...ensureStudioMountRegistry(lingxiHome, { now }).created,
+      ...ensureSecurityRegistries(lingxiHome, { now }).created,
     ],
   };
 }
 
-function ensureSecurityRegistries(hanakoHome, { now }) {
+function ensureSecurityRegistries(lingxiHome, { now }) {
   const created = [];
-  const grantPath = grantRegistryPath(hanakoHome);
-  const leasePath = executionLeaseRegistryPath(hanakoHome);
+  const grantPath = grantRegistryPath(lingxiHome);
+  const leasePath = executionLeaseRegistryPath(lingxiHome);
   const hadGrant = fs.existsSync(grantPath);
   const hadLease = fs.existsSync(leasePath);
-  ensureGrantRegistry(hanakoHome, { now });
-  ensureExecutionLeaseRegistry(hanakoHome, { now });
+  ensureGrantRegistry(lingxiHome, { now });
+  ensureExecutionLeaseRegistry(lingxiHome, { now });
   if (!hadGrant) created.push(path.join(SECURITY_DIR, GRANTS_FILE));
   if (!hadLease) created.push(path.join(SECURITY_DIR, EXECUTION_LEASES_FILE));
   return { created };
 }
 
-function readRequiredStudioRegistry(hanakoHome) {
-  const studiosPath = path.join(hanakoHome, STUDIOS_FILE);
+function readRequiredStudioRegistry(lingxiHome) {
+  const studiosPath = path.join(lingxiHome, STUDIOS_FILE);
   const studios = readIdentityJsonIfPresent(studiosPath, STUDIOS_FILE);
   if (studios) return studios;
 
-  const legacySpacesPath = path.join(hanakoHome, LEGACY_SPACES_FILE);
+  const legacySpacesPath = path.join(lingxiHome, LEGACY_SPACES_FILE);
   const legacySpaces = readIdentityJsonIfPresent(legacySpacesPath, LEGACY_SPACES_FILE);
   if (legacySpaces) {
     validateLegacySpacesIdentity(legacySpaces, LEGACY_SPACES_FILE);

@@ -106,7 +106,7 @@ describe("wrapReadOfficeMedia", () => {
       status: "available",
     }));
     const wrapped = wrapReadOfficeMedia(base, tmpDir, {
-      hanakoHome: tmpDir,
+      lingxiHome: tmpDir,
       getSessionPath: () => sessionPath,
       recordFileOperation,
       getVisionBridge: () => null,
@@ -158,7 +158,7 @@ describe("wrapReadOfficeMedia", () => {
       status: "available",
     }));
     const wrapped = wrapReadOfficeMedia(makeReadTool({ content: [{ type: "text", text: "Doc text" }] }), tmpDir, {
-      hanakoHome: tmpDir,
+      lingxiHome: tmpDir,
       getSessionPath: () => sessionPath,
       recordFileOperation,
       getVisionBridge: () => ({ prepareResources }),
@@ -210,7 +210,7 @@ describe("wrapReadOfficeMedia", () => {
       status: "available",
     }));
     const wrapped = wrapReadOfficeMedia(makeReadTool({ content: [{ type: "text", text: "Doc text" }] }), tmpDir, {
-      hanakoHome: tmpDir,
+      lingxiHome: tmpDir,
       recordFileOperation,
       getSessionIdForPath: (sessionPath) => (
         sessionPath === originalPath || sessionPath === movedPath ? sessionId : null

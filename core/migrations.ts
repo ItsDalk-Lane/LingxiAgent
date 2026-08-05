@@ -275,7 +275,7 @@ export function getMigrationStatus(prefsOrPreferences) {
 
 /**
  * @param {object} ctx
- * @param {string}   ctx.hanakoHome
+ * @param {string}   ctx.lingxiHome
  * @param {string}   ctx.agentsDir
  * @param {import('./preferences-manager.ts').PreferencesManager} ctx.prefs
  * @param {import('./provider-registry.ts').ProviderRegistry}     ctx.providerRegistry
@@ -537,7 +537,7 @@ function migrateBridgeToPerAgent(ctx) {
 }
 
 function migrateSubagentExecutorMetadata(ctx) {
-  const { agentsDir, hanakoHome, log } = ctx;
+  const { agentsDir, lingxiHome, log } = ctx;
   const agentSnapshots = new Map();
   const childSessionCandidates = new Map();
 
@@ -696,7 +696,7 @@ function migrateSubagentExecutorMetadata(ctx) {
     log(`[migrations] subagent session sidecar patched: ${metaPath}`);
   }
 
-  const deferredTasksPath = path.join(hanakoHome, ".ephemeral", "deferred-tasks.json");
+  const deferredTasksPath = path.join(lingxiHome, ".ephemeral", "deferred-tasks.json");
   try {
     if (!fs.existsSync(deferredTasksPath)) return;
     const deferredTasks = JSON.parse(fs.readFileSync(deferredTasksPath, "utf-8"));
@@ -1376,8 +1376,8 @@ function normalizeProviderUrlForMigration(value) {
  * 代理或非官方 URL 时不猜测。
  */
 function migrateMiniMaxTokenPlanAnthropicEndpoint(ctx) {
-  const { hanakoHome, log } = ctx;
-  const ymlPath = path.join(hanakoHome, "added-models.yaml");
+  const { lingxiHome, log } = ctx;
+  const ymlPath = path.join(lingxiHome, "added-models.yaml");
   const raw = safeReadYAMLSync(ymlPath, null, YAML);
   if (!raw?.providers || typeof raw.providers !== "object") {
     log?.("[migrations] #35: MiniMax Token Plan endpoint migration skipped (no providers)");
@@ -1432,19 +1432,19 @@ function migrateMiniMaxTokenPlanAnthropicEndpoint(ctx) {
  * 运行时层只保留 input 数组。
  *
  * 覆盖位置：
- *   1. ~/.hanako/added-models.yaml 的 providers.*.models[] 数组（用户主战场）
- *   2. ~/.hanako/agents/*\/config.yaml 的 models.overrides（历史残留兜底）
+ *   1. ~/.lingxi/added-models.yaml 的 providers.*.models[] 数组（用户主战场）
+ *   2. ~/.lingxi/agents/*\/config.yaml 的 models.overrides（历史残留兜底）
  *
  * 幂等：只在发现 vision 字段时改写；image 已存在时保留不覆盖。
  * 配合读时兼容（model-sync.js、provider-registry.js）形成双保险。
  */
 function migrateVisionToImage(ctx) {
-  const { hanakoHome, agentsDir, log } = ctx;
+  const { lingxiHome, agentsDir, log } = ctx;
   let ymlCount = 0;
   let overrideCount = 0;
 
   // ── 1. added-models.yaml ──
-  const ymlPath = path.join(hanakoHome, "added-models.yaml");
+  const ymlPath = path.join(lingxiHome, "added-models.yaml");
   const raw = safeReadYAMLSync(ymlPath, null, YAML);
   if (raw?.providers && typeof raw.providers === "object") {
     let changed = false;
@@ -1617,10 +1617,10 @@ function repairCronJobModelRefs(ctx) {
  * trigger + executor。迁移只补字段，不删除 type / schedule / prompt 等旧字段。
  */
 function migrateCronJobsToAutomationReadModel(ctx) {
-  const { hanakoHome, agentsDir, log } = ctx;
+  const { lingxiHome, agentsDir, log } = ctx;
   const paths = [];
 
-  const studiosDir = path.join(hanakoHome, "studios");
+  const studiosDir = path.join(lingxiHome, "studios");
   try {
     for (const entry of fs.readdirSync(studiosDir, { withFileTypes: true })) {
       if (!entry.isDirectory()) continue;
@@ -1671,8 +1671,8 @@ function patchCronJobsFileForAutomation(jobsPath, log) {
 }
 
 function migrateProviderCatalogV2Cutover(ctx) {
-  const { hanakoHome, providerRegistry, log } = ctx;
-  const store = providerRegistry?._catalog || new ProviderCatalogStore(hanakoHome);
+  const { lingxiHome, providerRegistry, log } = ctx;
+  const store = providerRegistry?._catalog || new ProviderCatalogStore(lingxiHome);
   const catalog = store.cutoverFromLegacy();
   if (providerRegistry) {
     providerRegistry._addedModelsCache = null;
@@ -1685,7 +1685,7 @@ function migrateProviderCatalogV2Cutover(ctx) {
 const CODEX_IMAGE_PROVIDER_ID = "openai-codex-oauth";
 
 function migrateCodexImageGenerationDefaultsToResolutionSchema(ctx) {
-  const { hanakoHome, prefs, log } = ctx;
+  const { lingxiHome, prefs, log } = ctx;
   const preferences = prefs.getPreferences();
   const prefsChanged = removeCodexImageSizeDefault(
     preferences?.imageGeneration?.providerDefaults,
@@ -1694,7 +1694,7 @@ function migrateCodexImageGenerationDefaultsToResolutionSchema(ctx) {
     prefs.savePreferences(preferences);
   }
 
-  const pluginChanged = removeCodexImageSizeDefaultFromPluginConfig(hanakoHome, log);
+  const pluginChanged = removeCodexImageSizeDefaultFromPluginConfig(lingxiHome, log);
   log?.(`[migrations] #43: Codex stale image size defaults removed (preferences=${prefsChanged}, pluginConfig=${pluginChanged})`);
 }
 
@@ -1738,8 +1738,8 @@ function nonEmptyMigrationModels(config) {
 }
 
 function migrateOAuthModelsToProviderCatalog(ctx) {
-  const { hanakoHome, prefs, providerRegistry, log } = ctx;
-  const store = providerRegistry?._catalog || new ProviderCatalogStore(hanakoHome);
+  const { lingxiHome, prefs, providerRegistry, log } = ctx;
+  const store = providerRegistry?._catalog || new ProviderCatalogStore(lingxiHome);
   const catalog = store.load();
   const providers = structuredClone(catalog.providers || {});
   const preferences = prefs.getPreferences();
@@ -1931,32 +1931,32 @@ function migrationCodexModelIdFromQualifiedRef(value) {
   return null;
 }
 
-function migrationPathIsInsideHome(hanakoHome, candidatePath) {
-  const homeKey = filesystemIdentityKeySync(hanakoHome);
+function migrationPathIsInsideHome(lingxiHome, candidatePath) {
+  const homeKey = filesystemIdentityKeySync(lingxiHome);
   const candidateKey = filesystemIdentityKeySync(candidatePath);
   return candidateKey === homeKey || candidateKey.startsWith(homeKey + path.sep);
 }
 
-function migrationRealDirectory(hanakoHome, directory) {
+function migrationRealDirectory(lingxiHome, directory) {
   try {
     return fs.lstatSync(directory).isDirectory()
-      && migrationPathIsInsideHome(hanakoHome, directory);
+      && migrationPathIsInsideHome(lingxiHome, directory);
   } catch {
     return false;
   }
 }
 
-function migrationRealFile(hanakoHome, filePath) {
+function migrationRealFile(lingxiHome, filePath) {
   try {
     return fs.lstatSync(filePath).isFile()
-      && migrationPathIsInsideHome(hanakoHome, filePath);
+      && migrationPathIsInsideHome(lingxiHome, filePath);
   } catch {
     return false;
   }
 }
 
-function migrationReadDirectoryEntries(hanakoHome, directory, log) {
-  if (!migrationRealDirectory(hanakoHome, directory)) return [];
+function migrationReadDirectoryEntries(lingxiHome, directory, log) {
+  if (!migrationRealDirectory(lingxiHome, directory)) return [];
   try {
     return fs.readdirSync(directory, { withFileTypes: true });
   } catch (err) {
@@ -1965,10 +1965,10 @@ function migrationReadDirectoryEntries(hanakoHome, directory, log) {
   }
 }
 
-function migrationWalkRealFiles(hanakoHome, root, accept, log) {
+function migrationWalkRealFiles(lingxiHome, root, accept, log) {
   const files = [];
   const walk = (directory) => {
-    for (const entry of migrationReadDirectoryEntries(hanakoHome, directory, log)) {
+    for (const entry of migrationReadDirectoryEntries(lingxiHome, directory, log)) {
       // Never follow directory or file symlinks. A user-managed link may point
       // outside LINGXI_HOME, and migration discovery must remain read-only there.
       if (entry.isSymbolicLink()) continue;
@@ -1980,7 +1980,7 @@ function migrationWalkRealFiles(hanakoHome, root, accept, log) {
       }
     }
   };
-  if (migrationRealDirectory(hanakoHome, root)) walk(root);
+  if (migrationRealDirectory(lingxiHome, root)) walk(root);
   return files;
 }
 
@@ -2033,18 +2033,18 @@ function migrationFrontmatter(raw) {
 }
 
 function collectCodexModelsFromLegacyPersistence(ctx) {
-  const { hanakoHome, agentsDir, prefs, log } = ctx;
+  const { lingxiHome, agentsDir, prefs, log } = ctx;
   const modelIds = new Set();
   const preferences = prefs.getPreferences();
   collectCodexModelReference(preferences.utility_model, modelIds);
   collectCodexModelReference(preferences.utility_large_model, modelIds);
 
-  const agentEntries = migrationReadDirectoryEntries(hanakoHome, agentsDir, log)
+  const agentEntries = migrationReadDirectoryEntries(lingxiHome, agentsDir, log)
     .filter((entry) => entry.isDirectory() && !entry.isSymbolicLink());
   for (const agentEntry of agentEntries) {
     const agentDir = path.join(agentsDir, agentEntry.name);
     const configPath = path.join(agentDir, "config.yaml");
-    if (migrationRealFile(hanakoHome, configPath)) {
+    if (migrationRealFile(lingxiHome, configPath)) {
       const config = migrationReadStructuredFile(configPath, YAML.load, modelIds, log, "agent config.yaml");
       for (const role of ["chat", "utility", "utility_large"]) {
         collectCodexModelReference(config?.models?.[role], modelIds);
@@ -2052,7 +2052,7 @@ function collectCodexModelsFromLegacyPersistence(ctx) {
     }
 
     const dmDir = path.join(agentDir, "dm");
-    for (const entry of migrationReadDirectoryEntries(hanakoHome, dmDir, log)) {
+    for (const entry of migrationReadDirectoryEntries(lingxiHome, dmDir, log)) {
       if (entry.isSymbolicLink() || !entry.isFile() || !entry.name.endsWith(".md")) continue;
       const dmPath = path.join(dmDir, entry.name);
       const frontmatter = migrationReadStructuredFile(dmPath, migrationFrontmatter, modelIds, log, "DM frontmatter");
@@ -2060,14 +2060,14 @@ function collectCodexModelsFromLegacyPersistence(ctx) {
     }
 
     const cronPath = path.join(agentDir, "desk", "cron-jobs.json");
-    if (migrationRealFile(hanakoHome, cronPath)) {
+    if (migrationRealFile(lingxiHome, cronPath)) {
       const cron = migrationReadStructuredFile(cronPath, JSON.parse, modelIds, log, "agent cron-jobs.json");
       collectCodexModelsFromCronJobs(cron, modelIds);
     }
   }
 
   for (const sessionPath of migrationWalkRealFiles(
-    hanakoHome,
+    lingxiHome,
     agentsDir,
     (filePath) => filePath.endsWith(".jsonl"),
     log,
@@ -2075,18 +2075,18 @@ function collectCodexModelsFromLegacyPersistence(ctx) {
     migrationReadSessionJsonl(sessionPath, modelIds, log);
   }
 
-  const studiosDir = path.join(hanakoHome, "studios");
-  for (const studioEntry of migrationReadDirectoryEntries(hanakoHome, studiosDir, log)) {
+  const studiosDir = path.join(lingxiHome, "studios");
+  for (const studioEntry of migrationReadDirectoryEntries(lingxiHome, studiosDir, log)) {
     if (studioEntry.isSymbolicLink() || !studioEntry.isDirectory()) continue;
     const cronPath = path.join(studiosDir, studioEntry.name, "desk", "cron-jobs.json");
-    if (migrationRealFile(hanakoHome, cronPath)) {
+    if (migrationRealFile(lingxiHome, cronPath)) {
       const cron = migrationReadStructuredFile(cronPath, JSON.parse, modelIds, log, "Studio cron-jobs.json");
       collectCodexModelsFromCronJobs(cron, modelIds);
     }
   }
 
-  const channelsDir = path.join(hanakoHome, "channels");
-  for (const entry of migrationReadDirectoryEntries(hanakoHome, channelsDir, log)) {
+  const channelsDir = path.join(lingxiHome, "channels");
+  for (const entry of migrationReadDirectoryEntries(lingxiHome, channelsDir, log)) {
     if (entry.isSymbolicLink() || !entry.isFile() || !entry.name.endsWith(".md")) continue;
     const channelPath = path.join(channelsDir, entry.name);
     const frontmatter = migrationReadStructuredFile(channelPath, migrationFrontmatter, modelIds, log, "channel frontmatter");
@@ -2105,14 +2105,14 @@ function collectCodexModelsFromCronJobs(cron, modelIds) {
 }
 
 function recoverReferencedCodexOAuthModels(ctx) {
-  const { hanakoHome, providerRegistry, log } = ctx;
+  const { lingxiHome, providerRegistry, log } = ctx;
   const referencedModels = collectCodexModelsFromLegacyPersistence(ctx);
   if (referencedModels.length === 0) {
     log?.("[migrations] #45: no persisted Codex OAuth model references found");
     return;
   }
 
-  const store = providerRegistry?._catalog || new ProviderCatalogStore(hanakoHome);
+  const store = providerRegistry?._catalog || new ProviderCatalogStore(lingxiHome);
   const catalog = store.load();
   const providers = structuredClone(catalog.providers || {});
   const current = providers[CODEX_OAUTH_PROVIDER_ID] || {};
@@ -2149,12 +2149,12 @@ function recoverReferencedCodexOAuthModels(ctx) {
   log?.(`[migrations] #45: recovered persisted Codex OAuth models (references=${referencedModels.length}, models=${nextModels.length})`);
 }
 
-function writeProviderModelMetadataMigrationBackup({ store, hanakoHome, repairs }) {
+function writeProviderModelMetadataMigrationBackup({ store, lingxiHome, repairs }) {
   if (!fs.existsSync(store.catalogPath)) {
     throw new Error("provider catalog source is missing before metadata repair");
   }
 
-  const backupRoot = migrationBackupsRoot(hanakoHome);
+  const backupRoot = migrationBackupsRoot(lingxiHome);
   fs.mkdirSync(backupRoot, { recursive: true });
   ensureSecretDirModeSync(backupRoot);
   const backupDir = fs.mkdtempSync(path.join(backupRoot, "provider-model-metadata-v46-"));
@@ -2177,8 +2177,8 @@ function writeProviderModelMetadataMigrationBackup({ store, hanakoHome, repairs 
 }
 
 function repairLegacyProviderModelMetadata(ctx) {
-  const { hanakoHome, providerRegistry, log } = ctx;
-  const store = providerRegistry?._catalog || new ProviderCatalogStore(hanakoHome);
+  const { lingxiHome, providerRegistry, log } = ctx;
+  const store = providerRegistry?._catalog || new ProviderCatalogStore(lingxiHome);
   const catalog = store.load();
   const result = repairProviderModelMetadata(catalog.providers || {});
   if (!result.changed) {
@@ -2188,7 +2188,7 @@ function repairLegacyProviderModelMetadata(ctx) {
 
   const backupDir = writeProviderModelMetadataMigrationBackup({
     store,
-    hanakoHome,
+    lingxiHome,
     repairs: result.repairs,
   });
   store.saveProviders(result.providers);
@@ -2221,11 +2221,11 @@ function repairLegacyProviderModelMetadata(ctx) {
  * 保留不删。禁止按"八位十六进制"之类的形状特征直接匹配删除。
  */
 function collectPreFixPollutedCodexEventIds(ctx) {
-  const { hanakoHome, agentsDir, log } = ctx;
+  const { lingxiHome, agentsDir, log } = ctx;
   const wrongIds = new Set();
 
   for (const sessionPath of migrationWalkRealFiles(
-    hanakoHome,
+    lingxiHome,
     agentsDir,
     (filePath) => filePath.endsWith(".jsonl"),
     log,
@@ -2267,12 +2267,12 @@ function collectPreFixPollutedCodexEventIds(ctx) {
   return wrongIds;
 }
 
-function writeCodexEventIdPollutionRepairBackup({ store, hanakoHome, removed }) {
+function writeCodexEventIdPollutionRepairBackup({ store, lingxiHome, removed }) {
   if (!fs.existsSync(store.catalogPath)) {
     throw new Error("provider catalog source is missing before Codex event-id pollution repair");
   }
 
-  const backupRoot = migrationBackupsRoot(hanakoHome);
+  const backupRoot = migrationBackupsRoot(lingxiHome);
   fs.mkdirSync(backupRoot, { recursive: true });
   ensureSecretDirModeSync(backupRoot);
   const backupDir = fs.mkdtempSync(path.join(backupRoot, "codex-model-id-pollution-v49-"));
@@ -2295,8 +2295,8 @@ function writeCodexEventIdPollutionRepairBackup({ store, hanakoHome, removed }) 
 }
 
 function repairPollutedCodexEventIdModels(ctx) {
-  const { hanakoHome, providerRegistry, log } = ctx;
-  const store = providerRegistry?._catalog || new ProviderCatalogStore(hanakoHome);
+  const { lingxiHome, providerRegistry, log } = ctx;
+  const store = providerRegistry?._catalog || new ProviderCatalogStore(lingxiHome);
 
   let catalog;
   try {
@@ -2344,7 +2344,7 @@ function repairPollutedCodexEventIdModels(ctx) {
     return;
   }
 
-  const backupDir = writeCodexEventIdPollutionRepairBackup({ store, hanakoHome, removed });
+  const backupDir = writeCodexEventIdPollutionRepairBackup({ store, lingxiHome, removed });
   providers[CODEX_OAUTH_PROVIDER_ID] = { ...current, models: nextModels };
   store.saveProviders(providers);
   if (providerRegistry) {
@@ -2554,8 +2554,8 @@ function removeCodexImageSizeDefault(providerDefaults) {
   return true;
 }
 
-function removeCodexImageSizeDefaultFromPluginConfig(hanakoHome, log) {
-  const configPath = path.join(hanakoHome, "plugin-data", "image-gen", "config.json");
+function removeCodexImageSizeDefaultFromPluginConfig(lingxiHome, log) {
+  const configPath = path.join(lingxiHome, "plugin-data", "image-gen", "config.json");
   if (!fs.existsSync(configPath)) return false;
 
   let config;
@@ -2689,8 +2689,8 @@ function migrateGeminiCatalogProvider(provider) {
   return JSON.stringify(record) !== before;
 }
 
-function migrateGeminiPersistedTasks(hanakoHome, log) {
-  const tasksPath = path.join(hanakoHome, "plugin-data", "image-gen", "tasks.json");
+function migrateGeminiPersistedTasks(lingxiHome, log) {
+  const tasksPath = path.join(lingxiHome, "plugin-data", "image-gen", "tasks.json");
   if (!fs.existsSync(tasksPath)) return false;
   let tasks;
   try {
@@ -2719,8 +2719,8 @@ function migrateGeminiPersistedTasks(hanakoHome, log) {
   return true;
 }
 
-function migrateGeminiPluginConfig(hanakoHome, log) {
-  const configPath = path.join(hanakoHome, "plugin-data", "image-gen", "config.json");
+function migrateGeminiPluginConfig(lingxiHome, log) {
+  const configPath = path.join(lingxiHome, "plugin-data", "image-gen", "config.json");
   if (!fs.existsSync(configPath)) return false;
   let config;
   try {
@@ -2736,15 +2736,15 @@ function migrateGeminiPluginConfig(hanakoHome, log) {
 }
 
 function migrateGeminiImagePreviewIdsToStable(ctx) {
-  const { hanakoHome, prefs, providerRegistry, log } = ctx;
+  const { lingxiHome, prefs, providerRegistry, log } = ctx;
   const preferences = prefs.getPreferences();
   const preferencesChanged = migrateGeminiImageConfigRecord(preferences.imageGeneration);
   if (preferencesChanged) prefs.savePreferences(preferences);
 
-  const pluginConfigChanged = migrateGeminiPluginConfig(hanakoHome, log);
-  const tasksChanged = migrateGeminiPersistedTasks(hanakoHome, log);
+  const pluginConfigChanged = migrateGeminiPluginConfig(lingxiHome, log);
+  const tasksChanged = migrateGeminiPersistedTasks(lingxiHome, log);
 
-  const store = providerRegistry?._catalog || new ProviderCatalogStore(hanakoHome);
+  const store = providerRegistry?._catalog || new ProviderCatalogStore(lingxiHome);
   const catalog = store.load();
   const providers = structuredClone(catalog.providers || {});
   const catalogChanged = migrateGeminiCatalogProvider(providers.gemini);
@@ -2765,10 +2765,10 @@ function migrateGeminiImagePreviewIdsToStable(ctx) {
 }
 
 function migrateDirectNotifyAutomationsToAgentRuns(ctx) {
-  const { hanakoHome, agentsDir, log } = ctx;
+  const { lingxiHome, agentsDir, log } = ctx;
   const paths = [];
 
-  const studiosDir = path.join(hanakoHome, "studios");
+  const studiosDir = path.join(lingxiHome, "studios");
   try {
     for (const entry of fs.readdirSync(studiosDir, { withFileTypes: true })) {
       if (!entry.isDirectory()) continue;
@@ -2795,10 +2795,10 @@ function migrateDirectNotifyAutomationsToAgentRuns(ctx) {
 }
 
 function repairAutomationOwnershipAfterAgentRunConsolidation(ctx) {
-  const { hanakoHome, agentsDir, log } = ctx;
+  const { lingxiHome, agentsDir, log } = ctx;
   const stores = [];
 
-  const studiosDir = path.join(hanakoHome, "studios");
+  const studiosDir = path.join(lingxiHome, "studios");
   try {
     for (const entry of fs.readdirSync(studiosDir, { withFileTypes: true })) {
       if (!entry.isDirectory()) continue;
@@ -3096,8 +3096,8 @@ function enableSkillForAgentConfig(configPath, skillNames) {
  * 个性化技能，迁移出的 SKILL.md 会显式写入 `default-enabled: false`。
  */
 function migrateLearnedSkillsToGlobalSkillPool(ctx) {
-  const { hanakoHome, agentsDir, log } = ctx;
-  const skillsDir = path.join(hanakoHome, "skills");
+  const { lingxiHome, agentsDir, log } = ctx;
+  const skillsDir = path.join(lingxiHome, "skills");
   fs.mkdirSync(skillsDir, { recursive: true });
 
   let migrated = 0;
@@ -3324,11 +3324,11 @@ function cleanupSummarizerCompilerRemnants(ctx) {
  * path 回填 block 的生命周期字段。
  */
 function backfillLegacySessionFiles(ctx) {
-  const { hanakoHome, agentsDir, log } = ctx;
-  if (!hanakoHome || !agentsDir) return;
+  const { lingxiHome, agentsDir, log } = ctx;
+  if (!lingxiHome || !agentsDir) return;
 
   const registry = new SessionFileRegistry({
-    managedCacheRoot: path.join(hanakoHome, "session-files"),
+    managedCacheRoot: path.join(lingxiHome, "session-files"),
   });
   const sessionPaths = collectLegacySessionJsonlPaths(agentsDir);
   let registered = 0;
@@ -3358,7 +3358,7 @@ function backfillLegacySessionFiles(ctx) {
       if (entry?.type !== "message" || msg?.role !== "toolResult") continue;
 
       for (const ref of legacySessionFileRefs(msg)) {
-        const ok = registerLegacySessionFile({ registry, sessionId, sessionPath, ref, hanakoHome, log });
+        const ok = registerLegacySessionFile({ registry, sessionId, sessionPath, ref, lingxiHome, log });
         if (ok) registered++;
         else skipped++;
       }
@@ -3367,7 +3367,7 @@ function backfillLegacySessionFiles(ctx) {
       if (screenshot?.base64) {
         try {
           persistBrowserScreenshotFileSync({
-            hanakoHome,
+            lingxiHome,
             sessionId,
             sessionPath,
             base64: screenshot.base64,
@@ -3423,8 +3423,8 @@ function classifyOfficialGeminiBaseUrl(value) {
 }
 
 function migrateGeminiOpenAICompatToNative(ctx) {
-  const { hanakoHome, log } = ctx;
-  const ymlPath = path.join(hanakoHome, "added-models.yaml");
+  const { lingxiHome, log } = ctx;
+  const ymlPath = path.join(lingxiHome, "added-models.yaml");
   const raw = safeReadYAMLSync(ymlPath, null, YAML);
   if (!raw?.providers || typeof raw.providers !== "object") {
     log?.("[migrations] #14: Gemini native API migration skipped (no providers)");
@@ -3668,7 +3668,7 @@ function serializeBridgeIndexEntryForMigration(previousRaw, entry) {
 }
 
 function repairModelsJsonPiInputSchema(ctx) {
-  const modelsJsonPath = path.join(ctx.hanakoHome, "models.json");
+  const modelsJsonPath = path.join(ctx.lingxiHome, "models.json");
   let raw;
   try {
     raw = JSON.parse(fs.readFileSync(modelsJsonPath, "utf-8"));
@@ -3758,8 +3758,8 @@ function ensureLingxiVideoInputCompat(record) {
 }
 
 function promoteAgentVideoOverrides(ctx) {
-  const { hanakoHome, agentsDir } = ctx;
-  const ymlPath = path.join(hanakoHome, "added-models.yaml");
+  const { lingxiHome, agentsDir } = ctx;
+  const ymlPath = path.join(lingxiHome, "added-models.yaml");
   const raw = safeReadYAMLSync(ymlPath, null, YAML);
   if (!raw?.providers || typeof raw.providers !== "object") return 0;
 
@@ -4109,8 +4109,8 @@ function defaultDeepSeekModelsForMigration(ctx, providerId) {
 }
 
 function repairLegacyDeepSeekProviderModelIds(ctx) {
-  const { hanakoHome, log } = ctx;
-  const ymlPath = path.join(hanakoHome, "added-models.yaml");
+  const { lingxiHome, log } = ctx;
+  const ymlPath = path.join(lingxiHome, "added-models.yaml");
   const raw = safeReadYAMLSync(ymlPath, null, YAML);
   if (!raw?.providers || typeof raw.providers !== "object") return 0;
 
@@ -4345,7 +4345,7 @@ function pushLegacyFileRef(refs, candidate, defaults: any = {}) {
   });
 }
 
-function registerLegacySessionFile({ registry, sessionId = null, sessionPath, ref, hanakoHome, log }) {
+function registerLegacySessionFile({ registry, sessionId = null, sessionPath, ref, lingxiHome, log }) {
   if (!ref?.filePath || !path.isAbsolute(ref.filePath)) return false;
   if (!fs.existsSync(ref.filePath)) return false;
 
@@ -4356,7 +4356,7 @@ function registerLegacySessionFile({ registry, sessionId = null, sessionPath, re
       filePath: ref.filePath,
       label: ref.label || path.basename(ref.filePath),
       origin: ref.origin || "unknown",
-      storageKind: normalizeLegacyStorageKind(ref, hanakoHome),
+      storageKind: normalizeLegacyStorageKind(ref, lingxiHome),
     });
     return true;
   } catch (err) {
@@ -4365,11 +4365,11 @@ function registerLegacySessionFile({ registry, sessionId = null, sessionPath, re
   }
 }
 
-function normalizeLegacyStorageKind(ref, hanakoHome) {
+function normalizeLegacyStorageKind(ref, lingxiHome) {
   const storageKind = ref.storageKind || "external";
   if (storageKind !== "managed_cache") return storageKind;
 
-  const managedRoot = path.join(hanakoHome, "session-files");
+  const managedRoot = path.join(lingxiHome, "session-files");
   // 纯比较，两侧都走共享身份键。
   const resolved = filesystemIdentityKeySync(ref.filePath);
   const root = filesystemIdentityKeySync(managedRoot);
@@ -4395,28 +4395,28 @@ function legacyBrowserScreenshot(msg) {
 }
 
 function migrateLocalIdentityRegistries(ctx) {
-  const { hanakoHome, log } = ctx;
-  const { created, migratedFromLegacySpaces } = ensureLocalIdentityRegistries(hanakoHome);
+  const { lingxiHome, log } = ctx;
+  const { created, migratedFromLegacySpaces } = ensureLocalIdentityRegistries(lingxiHome);
   log?.(`[migrations] #18: local identity registries ready${created.length ? ` (created=${created.join(",")})` : ""}`);
   if (migratedFromLegacySpaces) log?.("[migrations] #18: legacy spaces.json mapped to studios.json");
 }
 
 function migrateStudioIdentityRegistries(ctx) {
-  const { hanakoHome, log } = ctx;
-  const { created, migratedFromLegacySpaces } = ensureLocalIdentityRegistries(hanakoHome);
+  const { lingxiHome, log } = ctx;
+  const { created, migratedFromLegacySpaces } = ensureLocalIdentityRegistries(lingxiHome);
   log?.(`[migrations] #26: studio identity registries ready${created.length ? ` (created=${created.join(",")})` : ""}`);
   if (migratedFromLegacySpaces) log?.("[migrations] #26: legacy spaces.json mapped to studios.json");
 }
 
 function migrateRemoteAccessFoundationRegistries(ctx) {
-  const { hanakoHome, log } = ctx;
-  const { created } = ensureRemoteAccessFoundationRegistries(hanakoHome);
+  const { lingxiHome, log } = ctx;
+  const { created } = ensureRemoteAccessFoundationRegistries(lingxiHome);
   log?.(`[migrations] #27: remote access foundation registries ready${created.length ? ` (created=${created.join(",")})` : ""}`);
 }
 
 function migrateDurableSubagentRunRegistry(ctx) {
-  const { hanakoHome, agentsDir, log } = ctx;
-  const store = new SubagentRunStore(path.join(hanakoHome, "subagent-runs.json"));
+  const { lingxiHome, agentsDir, log } = ctx;
+  const store = new SubagentRunStore(path.join(lingxiHome, "subagent-runs.json"));
   let imported = 0;
 
   for (const sessionPath of collectAgentParentSessionJsonlPaths(agentsDir)) {
@@ -4459,7 +4459,7 @@ function migrateDurableSubagentRunRegistry(ctx) {
     }
   }
 
-  const deferredTasksPath = path.join(hanakoHome, ".ephemeral", "deferred-tasks.json");
+  const deferredTasksPath = path.join(lingxiHome, ".ephemeral", "deferred-tasks.json");
   try {
     if (fs.existsSync(deferredTasksPath)) {
       const deferredTasks = JSON.parse(fs.readFileSync(deferredTasksPath, "utf-8"));
@@ -4508,9 +4508,9 @@ function normalizeMigratedRunStatus(status) {
 }
 
 function migrateSubagentThreadRegistry(ctx) {
-  const { hanakoHome, log } = ctx;
-  const threadStore = new SubagentThreadStore(path.join(hanakoHome, "subagent-threads.json"));
-  const runStore = new SubagentRunStore(path.join(hanakoHome, "subagent-runs.json"));
+  const { lingxiHome, log } = ctx;
+  const threadStore = new SubagentThreadStore(path.join(lingxiHome, "subagent-threads.json"));
+  const runStore = new SubagentRunStore(path.join(lingxiHome, "subagent-runs.json"));
   let importedRuns = 0;
   let importedReusable = 0;
 
@@ -4540,7 +4540,7 @@ function migrateSubagentThreadRegistry(ctx) {
     importedRuns += 1;
   }
 
-  const reusableRaw = readJsonForMigration(path.join(hanakoHome, "reusable-subagents.json"));
+  const reusableRaw = readJsonForMigration(path.join(lingxiHome, "reusable-subagents.json"));
   const instances = reusableRaw?.instances && typeof reusableRaw.instances === "object"
     ? reusableRaw.instances
     : {};
@@ -4578,9 +4578,9 @@ function pickLegacySubagentLabel(rec) {
 }
 
 function migrateSubagentDirectThreadSemantics(ctx) {
-  const { hanakoHome, log } = ctx;
-  const threadsPath = path.join(hanakoHome, "subagent-threads.json");
-  const runsPath = path.join(hanakoHome, "subagent-runs.json");
+  const { lingxiHome, log } = ctx;
+  const threadsPath = path.join(lingxiHome, "subagent-threads.json");
+  const runsPath = path.join(lingxiHome, "subagent-runs.json");
   let threadCount = 0;
   let runCount = 0;
 
@@ -4634,8 +4634,8 @@ function migrateLegacyApiKeyAuthEntriesToProviders(ctx) {
 }
 
 function migrateChannelPhoneSettingsDefaults(ctx) {
-  const { hanakoHome, log } = ctx;
-  const channelsDir = path.join(hanakoHome, "channels");
+  const { lingxiHome, log } = ctx;
+  const channelsDir = path.join(lingxiHome, "channels");
   if (!fs.existsSync(channelsDir)) {
     log?.("[migrations] #22: no channels dir");
     return;
@@ -4658,7 +4658,7 @@ function migrateChannelPhoneSettingsDefaults(ctx) {
 }
 
 function removeAgentPhoneReplyInstructions(ctx) {
-  const { hanakoHome, agentsDir, log } = ctx;
+  const { lingxiHome, agentsDir, log } = ctx;
   let channelPatched = 0;
   let projectionPatched = 0;
 
@@ -4672,7 +4672,7 @@ function removeAgentPhoneReplyInstructions(ctx) {
     return true;
   };
 
-  const channelsDir = path.join(hanakoHome, "channels");
+  const channelsDir = path.join(lingxiHome, "channels");
   if (fs.existsSync(channelsDir)) {
     for (const entry of fs.readdirSync(channelsDir, { withFileTypes: true })) {
       if (!entry.isFile() || !entry.name.endsWith(".md")) continue;
@@ -4699,8 +4699,8 @@ function removeAgentPhoneReplyInstructions(ctx) {
 }
 
 function migrateChannelPhoneGuardLimitDefaults(ctx) {
-  const { hanakoHome, log } = ctx;
-  const channelsDir = path.join(hanakoHome, "channels");
+  const { lingxiHome, log } = ctx;
+  const channelsDir = path.join(lingxiHome, "channels");
   if (!fs.existsSync(channelsDir)) {
     log?.("[migrations] #24: no channels dir");
     return;
@@ -4723,8 +4723,8 @@ function migrateChannelPhoneGuardLimitDefaults(ctx) {
 }
 
 function migrateChannelPhoneProactiveDefaults(ctx) {
-  const { hanakoHome, log } = ctx;
-  const channelsDir = path.join(hanakoHome, "channels");
+  const { lingxiHome, log } = ctx;
+  const channelsDir = path.join(lingxiHome, "channels");
   if (!fs.existsSync(channelsDir)) {
     log?.("[migrations] #25: no channels dir");
     return;

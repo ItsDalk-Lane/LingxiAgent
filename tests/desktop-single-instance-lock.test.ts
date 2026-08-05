@@ -31,7 +31,7 @@ describe("desktop client single instance lock", () => {
     const devHome = path.join("C:", "Users", "me", ".hanako-dev");
 
     const acquired = configureClientSingleInstance(app, {
-      hanakoHome: devHome,
+      lingxiHome: devHome,
       defaultHome,
       onSecondInstance: vi.fn(),
     });
@@ -51,7 +51,7 @@ describe("desktop client single instance lock", () => {
     const defaultHome = path.join("C:", "Users", "me", ".hanako");
 
     const acquired = configureClientSingleInstance(app, {
-      hanakoHome: defaultHome,
+      lingxiHome: defaultHome,
       defaultHome,
       onSecondInstance: vi.fn(),
     });
@@ -68,7 +68,7 @@ describe("desktop client single instance lock", () => {
     const { app } = makeApp({ gotLock: false });
 
     const acquired = configureClientSingleInstance(app, {
-      hanakoHome: path.join("C:", "Users", "me", ".hanako"),
+      lingxiHome: path.join("C:", "Users", "me", ".hanako"),
       defaultHome: path.join("C:", "Users", "me", ".hanako"),
       onSecondInstance: vi.fn(),
     });
@@ -84,7 +84,7 @@ describe("desktop client single instance lock", () => {
     const onSecondInstance = vi.fn();
 
     configureClientSingleInstance(app, {
-      hanakoHome: path.join("C:", "Users", "me", ".hanako"),
+      lingxiHome: path.join("C:", "Users", "me", ".hanako"),
       defaultHome: path.join("C:", "Users", "me", ".hanako"),
       onSecondInstance,
     });

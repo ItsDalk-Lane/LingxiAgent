@@ -457,7 +457,7 @@ function makeBridge() {
   const engine = {
     getAgent: vi.fn(() => ({ agentName: "Hana", config: {} })),
     agentName: "Hana",
-    hanakoHome: os.tmpdir(),
+    lingxiHome: os.tmpdir(),
     getBridgeMediaPublicBaseUrl: () => "",
   };
   const hub = { eventBus: { emit: vi.fn() }, subscribe: vi.fn(() => null) };

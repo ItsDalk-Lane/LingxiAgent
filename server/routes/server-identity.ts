@@ -3,14 +3,14 @@ import { createServerRuntimeContext, toServerIdentityResponse } from "../../core
 import { readAuthPrincipal } from "../http/capability-guard.ts";
 import { SERVER_PROTOCOL_VERSION } from "../../shared/contract-versions.cjs";
 
-export function createServerIdentityRoute({ hanakoHome, appVersion = "?", getRuntimeContext }: { hanakoHome?: string; appVersion?: string; getRuntimeContext?: () => any } = {}) {
+export function createServerIdentityRoute({ lingxiHome, appVersion = "?", getRuntimeContext }: { lingxiHome?: string; appVersion?: string; getRuntimeContext?: () => any } = {}) {
   const route = new Hono();
 
   route.get("/server/identity", (c) => {
     try {
       const runtimeContext = typeof getRuntimeContext === "function"
         ? getRuntimeContext()
-        : createServerRuntimeContext({ hanakoHome, appVersion });
+        : createServerRuntimeContext({ lingxiHome, appVersion });
       // Additive field, not part of toServerIdentityResponse's own shape:
       // the protocol version is a fixed property of this server build (like
       // its own source constant), not something derived from identity

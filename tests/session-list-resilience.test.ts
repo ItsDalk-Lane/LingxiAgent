@@ -190,22 +190,22 @@ describe("T2: projection cache single-file stat isolation", () => {
 });
 
 describe("T3: legacy migration skip diagnostics", () => {
-  let hanaHome: string;
+  let lingxiHome: string;
 
   beforeEach(() => {
-    hanaHome = fs.mkdtempSync(path.join(os.tmpdir(), "hana-migration-resilience-"));
+    lingxiHome = fs.mkdtempSync(path.join(os.tmpdir(), "hana-migration-resilience-"));
   });
 
   afterEach(() => {
-    fs.rmSync(hanaHome, { recursive: true, force: true });
+    fs.rmSync(lingxiHome, { recursive: true, force: true });
   });
 
   function writeSession(agentId: string, fileName: string) {
-    const sessionDir = path.join(hanaHome, "agents", agentId, "sessions");
+    const sessionDir = path.join(lingxiHome, "agents", agentId, "sessions");
     const sessionPath = path.join(sessionDir, fileName);
     fs.mkdirSync(sessionDir, { recursive: true });
     fs.writeFileSync(sessionPath, [
-      JSON.stringify({ type: "session", version: 3, id: fileName, timestamp: "2026-07-08T00:00:00.000Z", cwd: hanaHome }),
+      JSON.stringify({ type: "session", version: 3, id: fileName, timestamp: "2026-07-08T00:00:00.000Z", cwd: lingxiHome }),
       "",
     ].join("\n"));
     return sessionPath;
@@ -221,7 +221,7 @@ describe("T3: legacy migration skip diagnostics", () => {
     };
 
     const result: any = migrateLegacySessions({
-      hanaHome,
+      lingxiHome,
       store: stubStore,
       migratedAt: "2026-07-08T00:01:00.000Z",
     });

@@ -80,39 +80,39 @@ function writeJson(filePath, value) {
   fs.renameSync(tmpPath, filePath);
 }
 
-function getGpuStartupStatePath(hanakoHome) {
-  return path.join(hanakoHome, STATE_FILE);
+function getGpuStartupStatePath(lingxiHome) {
+  return path.join(lingxiHome, STATE_FILE);
 }
 
-function getPreferencesPath(hanakoHome) {
-  return path.join(hanakoHome, PREFERENCES_FILE);
+function getPreferencesPath(lingxiHome) {
+  return path.join(lingxiHome, PREFERENCES_FILE);
 }
 
-function readState(hanakoHome) {
-  return readJson(getGpuStartupStatePath(hanakoHome), { version: STATE_VERSION });
+function readState(lingxiHome) {
+  return readJson(getGpuStartupStatePath(lingxiHome), { version: STATE_VERSION });
 }
 
-function readStateStrict(hanakoHome) {
+function readStateStrict(lingxiHome) {
   return readJsonStrict(
-    getGpuStartupStatePath(hanakoHome),
+    getGpuStartupStatePath(lingxiHome),
     { version: STATE_VERSION },
     "GPU startup state",
   );
 }
 
-function writeState(hanakoHome, state) {
-  writeJson(getGpuStartupStatePath(hanakoHome), {
+function writeState(lingxiHome, state) {
+  writeJson(getGpuStartupStatePath(lingxiHome), {
     ...state,
     version: STATE_VERSION,
   });
 }
 
-function readPreferences(hanakoHome) {
-  return readJson(getPreferencesPath(hanakoHome), {});
+function readPreferences(lingxiHome) {
+  return readJson(getPreferencesPath(lingxiHome), {});
 }
 
-function readPreferencesStrict(hanakoHome) {
-  return readJsonStrict(getPreferencesPath(hanakoHome), {}, "GPU startup preferences");
+function readPreferencesStrict(lingxiHome) {
+  return readJsonStrict(getPreferencesPath(lingxiHome), {}, "GPU startup preferences");
 }
 
 function boolFromSetting(value, defaultValue) {
@@ -171,15 +171,15 @@ function policyForMode(mode, reason, extra = {}) {
   };
 }
 
-function writeAutoGpuMode(hanakoHome, mode, {
+function writeAutoGpuMode(lingxiHome, mode, {
   reason,
   previousMode,
   previousStartup,
   now,
 } = {}) {
   const timestamp = nowIso(now);
-  const state = readState(hanakoHome);
-  writeState(hanakoHome, {
+  const state = readState(lingxiHome);
+  writeState(lingxiHome, {
     ...state,
     autoGpuMode: {
       mode,
@@ -216,9 +216,9 @@ function legacyAutoSafeModeMigrationCandidate(prefs, state) {
   return evidence;
 }
 
-function prepareLegacySafeModeMigration(hanakoHome, state, candidate, now) {
+function prepareLegacySafeModeMigration(lingxiHome, state, candidate, now) {
   const timestamp = nowIso(now);
-  const statePath = getGpuStartupStatePath(hanakoHome);
+  const statePath = getGpuStartupStatePath(lingxiHome);
   let preparedState = state;
   if (!candidate.prepared) {
     preparedState = {
@@ -232,7 +232,7 @@ function prepareLegacySafeModeMigration(hanakoHome, state, candidate, now) {
       },
     };
     runLegacyGpuMigrationWrite("prepared GPU state", statePath, () => {
-      writeState(hanakoHome, preparedState);
+      writeState(lingxiHome, preparedState);
     });
   }
 
@@ -253,11 +253,11 @@ function prepareLegacySafeModeMigration(hanakoHome, state, candidate, now) {
   });
 }
 
-function migrateLegacyAutoSafeModePreference(hanakoHome, prefs, state, now) {
+function migrateLegacyAutoSafeModePreference(lingxiHome, prefs, state, now) {
   const candidate = legacyAutoSafeModeMigrationCandidate(prefs, state);
   if (!candidate) return null;
 
-  return prepareLegacySafeModeMigration(hanakoHome, state, candidate, now);
+  return prepareLegacySafeModeMigration(lingxiHome, state, candidate, now);
 }
 
 function legacyGpuChildMigrationEvidence(state) {
@@ -318,7 +318,7 @@ function runLegacyGpuMigrationWrite(stage, filePath, write) {
   }
 }
 
-function migrateLegacyGpuChildSafeMode(hanakoHome, prefs, state, now) {
+function migrateLegacyGpuChildSafeMode(lingxiHome, prefs, state, now) {
   const enabledCandidate = legacyEnabledGpuChildMigrationCandidate(prefs, state);
   if (enabledCandidate) {
     const timestamp = nowIso(now);
@@ -342,8 +342,8 @@ function migrateLegacyGpuChildSafeMode(hanakoHome, prefs, state, now) {
       },
     };
     delete nextState.safeMode;
-    runLegacyGpuMigrationWrite("completed GPU state", getGpuStartupStatePath(hanakoHome), () => {
-      writeState(hanakoHome, nextState);
+    runLegacyGpuMigrationWrite("completed GPU state", getGpuStartupStatePath(lingxiHome), () => {
+      writeState(lingxiHome, nextState);
     });
     return policyForMode(GPU_MODE_GPU_SANDBOX_COMPAT, "legacy-auto-safe-mode-migration", {
       autoGpuMode: nextState.autoGpuMode,
@@ -353,16 +353,16 @@ function migrateLegacyGpuChildSafeMode(hanakoHome, prefs, state, now) {
   const candidate = legacyGpuChildMigrationCandidate(prefs, state);
   if (!candidate) return null;
 
-  return prepareLegacySafeModeMigration(hanakoHome, state, candidate, now);
+  return prepareLegacySafeModeMigration(lingxiHome, state, candidate, now);
 }
 
 function settleLegacyGpuPreferenceMigration({
-  hanakoHome,
+  lingxiHome,
   intent,
   preferenceStatus,
   now,
 } = {}) {
-  if (!hanakoHome) throw new Error("settleLegacyGpuPreferenceMigration requires hanakoHome");
+  if (!lingxiHome) throw new Error("settleLegacyGpuPreferenceMigration requires lingxiHome");
   if (
     intent?.version !== LEGACY_SAFE_MODE_MIGRATION_VERSION ||
     typeof intent.sourceReason !== "string" ||
@@ -374,7 +374,7 @@ function settleLegacyGpuPreferenceMigration({
     throw new Error(`Legacy GPU safe-mode migration received unknown preference status: ${preferenceStatus}`);
   }
 
-  const state = readStateStrict(hanakoHome);
+  const state = readStateStrict(lingxiHome);
   const migration = state.legacySafeModeMigration;
   if (
     migration?.version !== intent.version ||
@@ -398,8 +398,8 @@ function settleLegacyGpuPreferenceMigration({
     nextState.legacySafeModeMigration.status = "cancelled";
     nextState.legacySafeModeMigration.cancelledAt = timestamp;
     delete nextState.safeMode;
-    runLegacyGpuMigrationWrite("cancelled GPU state", getGpuStartupStatePath(hanakoHome), () => {
-      writeState(hanakoHome, nextState);
+    runLegacyGpuMigrationWrite("cancelled GPU state", getGpuStartupStatePath(lingxiHome), () => {
+      writeState(lingxiHome, nextState);
     });
     return { status: "cancelled" };
   }
@@ -416,8 +416,8 @@ function settleLegacyGpuPreferenceMigration({
   nextState.legacySafeModeMigration.status = "completed";
   nextState.legacySafeModeMigration.completedAt = timestamp;
   delete nextState.safeMode;
-  runLegacyGpuMigrationWrite("completed GPU state", getGpuStartupStatePath(hanakoHome), () => {
-    writeState(hanakoHome, nextState);
+  runLegacyGpuMigrationWrite("completed GPU state", getGpuStartupStatePath(lingxiHome), () => {
+    writeState(lingxiHome, nextState);
   });
   return { status: "completed" };
 }
@@ -553,13 +553,13 @@ function classifyGpuSandboxDiagnostic(state, policy) {
 }
 
 function resolveGpuStartupPolicy({
-  hanakoHome,
+  lingxiHome,
   platform = process.platform,
   argv = process.argv,
   env = process.env,
   now,
 } = {}) {
-  if (!hanakoHome) throw new Error("resolveGpuStartupPolicy requires hanakoHome");
+  if (!lingxiHome) throw new Error("resolveGpuStartupPolicy requires lingxiHome");
 
   const explicitSafeMode = isExplicitSafeMode(argv, env);
   if (explicitSafeMode) {
@@ -581,22 +581,22 @@ function resolveGpuStartupPolicy({
   }
 
   const state = platform === "win32"
-    ? readStateStrict(hanakoHome)
-    : readState(hanakoHome);
+    ? readStateStrict(lingxiHome)
+    : readState(lingxiHome);
   const legacyGpuMigrationEvidence = platform === "win32"
     ? legacyGpuChildMigrationEvidence(state) || legacyAutoSafeModeMigrationEvidence(state)
     : null;
   const prefs = legacyGpuMigrationEvidence
-    ? readPreferencesStrict(hanakoHome)
-    : readPreferences(hanakoHome);
+    ? readPreferencesStrict(lingxiHome)
+    : readPreferences(lingxiHome);
   const preferenceEnabled = boolFromSetting(prefs.hardware_acceleration, true);
   const migratedLegacyGpuChildPolicy = platform === "win32"
-    ? migrateLegacyGpuChildSafeMode(hanakoHome, prefs, state, now)
+    ? migrateLegacyGpuChildSafeMode(lingxiHome, prefs, state, now)
     : null;
   if (migratedLegacyGpuChildPolicy) return migratedLegacyGpuChildPolicy;
 
   const migratedLegacyPolicy = platform === "win32"
-    ? migrateLegacyAutoSafeModePreference(hanakoHome, prefs, state, now)
+    ? migrateLegacyAutoSafeModePreference(lingxiHome, prefs, state, now)
     : null;
   if (migratedLegacyPolicy) return migratedLegacyPolicy;
 
@@ -605,7 +605,7 @@ function resolveGpuStartupPolicy({
     const fallbackMode = preferenceEnabled ? GPU_MODE_HARDWARE : GPU_MODE_SOFTWARE_SAFE;
     const previousMode = startupPolicyMode(state.startup, autoMode, fallbackMode);
     const nextMode = nextModeAfterGpuFailure(previousMode);
-    writeAutoGpuMode(hanakoHome, nextMode, {
+    writeAutoGpuMode(lingxiHome, nextMode, {
       reason: "previous-startup-incomplete",
       previousMode,
       previousStartup: state.startup,
@@ -724,16 +724,16 @@ function applyGpuStartupPolicy(app, policy) {
 }
 
 function markGpuStartupPending({
-  hanakoHome,
+  lingxiHome,
   platform = process.platform,
   phase = "electron-starting",
   startupId = `${Date.now()}-${process.pid}`,
   policy = null,
   now,
 } = {}) {
-  if (!hanakoHome) throw new Error("markGpuStartupPending requires hanakoHome");
+  if (!lingxiHome) throw new Error("markGpuStartupPending requires lingxiHome");
   const timestamp = nowIso(now);
-  const state = readState(hanakoHome);
+  const state = readState(lingxiHome);
   const startupPolicy = sanitizeStartupPolicy(policy);
   const gpuRecovery = buildGpuRecoveryState(phase, null, timestamp);
   const next = {
@@ -749,19 +749,19 @@ function markGpuStartupPending({
       ...(gpuRecovery ? { gpuRecovery } : {}),
     },
   };
-  writeState(hanakoHome, next);
+  writeState(lingxiHome, next);
   return next.startup;
 }
 
 function markGpuStartupPhase({
-  hanakoHome,
+  lingxiHome,
   platform = process.platform,
   phase,
   startupId,
   now,
 } = {}) {
-  if (!hanakoHome || !phase) return null;
-  const state = readState(hanakoHome);
+  if (!lingxiHome || !phase) return null;
+  const state = readState(lingxiHome);
   if (!state.startup || state.startup.status !== "pending") return null;
   if (startupId && state.startup.startupId && state.startup.startupId !== startupId) return null;
   const timestamp = nowIso(now);
@@ -778,19 +778,19 @@ function markGpuStartupPhase({
   } else {
     delete state.startup.gpuRecovery;
   }
-  writeState(hanakoHome, state);
+  writeState(lingxiHome, state);
   return state.startup;
 }
 
 function markGpuStartupReady({
-  hanakoHome,
+  lingxiHome,
   platform = process.platform,
   phase = "app-ready",
   startupId,
   now,
 } = {}) {
-  if (!hanakoHome) throw new Error("markGpuStartupReady requires hanakoHome");
-  const state = readState(hanakoHome);
+  if (!lingxiHome) throw new Error("markGpuStartupReady requires lingxiHome");
+  const state = readState(lingxiHome);
   const timestamp = nowIso(now);
   state.startup = {
     ...(state.startup || {}),
@@ -801,19 +801,19 @@ function markGpuStartupReady({
     readyAt: timestamp,
     updatedAt: timestamp,
   };
-  writeState(hanakoHome, state);
+  writeState(lingxiHome, state);
   return state.startup;
 }
 
 function markGpuStartupFailed({
-  hanakoHome,
+  lingxiHome,
   platform = process.platform,
   reason,
   startupId,
   now,
 } = {}) {
-  if (!hanakoHome) throw new Error("markGpuStartupFailed requires hanakoHome");
-  const state = readState(hanakoHome);
+  if (!lingxiHome) throw new Error("markGpuStartupFailed requires lingxiHome");
+  const state = readState(lingxiHome);
   const timestamp = nowIso(now);
   state.startup = {
     ...(state.startup || {}),
@@ -824,7 +824,7 @@ function markGpuStartupFailed({
     failedAt: timestamp,
     updatedAt: timestamp,
   };
-  writeState(hanakoHome, state);
+  writeState(lingxiHome, state);
   return state.startup;
 }
 
@@ -843,24 +843,24 @@ function isGpuChildProcessFailure(details = {}) {
 }
 
 function recordGpuChildProcessGone({
-  hanakoHome,
+  lingxiHome,
   platform = process.platform,
   policy = null,
   details,
   now,
 } = {}) {
-  if (!hanakoHome || !isGpuChildProcessFailure(details)) return false;
+  if (!lingxiHome || !isGpuChildProcessFailure(details)) return false;
   const timestamp = nowIso(now);
   const crash = {
     ...sanitizeGpuDetails(details),
     platform,
     at: timestamp,
   };
-  const state = readState(hanakoHome);
-  const prefs = readPreferences(hanakoHome);
+  const state = readState(lingxiHome);
+  const prefs = readPreferences(lingxiHome);
   const previousMode = currentPolicyMode(policy, prefs);
   const nextMode = nextModeAfterGpuFailure(previousMode);
-  writeState(hanakoHome, {
+  writeState(lingxiHome, {
     ...state,
     autoGpuMode: {
       mode: nextMode,
@@ -874,14 +874,14 @@ function recordGpuChildProcessGone({
 }
 
 function recordGpuInfoUpdate({
-  hanakoHome,
+  lingxiHome,
   platform = process.platform,
   featureStatus,
   now,
 } = {}) {
-  if (!hanakoHome || !featureStatus || typeof featureStatus !== "object") return false;
-  const state = readState(hanakoHome);
-  writeState(hanakoHome, {
+  if (!lingxiHome || !featureStatus || typeof featureStatus !== "object") return false;
+  const state = readState(lingxiHome);
+  writeState(lingxiHome, {
     ...state,
     lastGpuFeatureStatus: {
       platform,
@@ -901,9 +901,9 @@ const GPU_MODE_DEPTH = {
   [GPU_MODE_DIAGNOSTIC_FAILED]: 5,
 };
 
-function getGpuRecoveryEvidence(hanakoHome) {
-  if (!hanakoHome) throw new Error("getGpuRecoveryEvidence requires hanakoHome");
-  const state = readState(hanakoHome);
+function getGpuRecoveryEvidence(lingxiHome) {
+  if (!lingxiHome) throw new Error("getGpuRecoveryEvidence requires lingxiHome");
+  const state = readState(lingxiHome);
   return {
     autoGpuMode: state.autoGpuMode || null,
     latestCrashAt: state.lastGpuCrash?.at || null,
@@ -919,9 +919,9 @@ function getGpuRecoveryEvidence(hanakoHome) {
   };
 }
 
-function clearAutoGpuModeForRecovery({ hanakoHome, reason, now } = {}) {
-  if (!hanakoHome) throw new Error("clearAutoGpuModeForRecovery requires hanakoHome");
-  const state = readState(hanakoHome);
+function clearAutoGpuModeForRecovery({ lingxiHome, reason, now } = {}) {
+  if (!lingxiHome) throw new Error("clearAutoGpuModeForRecovery requires lingxiHome");
+  const state = readState(lingxiHome);
   const clearedMode = state.autoGpuMode?.mode || null;
   const stalePendingIsGpuEvidence =
     state.startup?.status === "pending" && classifyIncompleteStartup(state) === "gpu-recovery";
@@ -941,14 +941,14 @@ function clearAutoGpuModeForRecovery({ hanakoHome, reason, now } = {}) {
     clearedPendingPhase,
     at: nowIso(now),
   };
-  writeState(hanakoHome, next);
+  writeState(lingxiHome, next);
   return { cleared: true, clearedMode };
 }
 
-function restoreDeeperAutoGpuMode({ hanakoHome, mode, reason, now } = {}) {
-  if (!hanakoHome) throw new Error("restoreDeeperAutoGpuMode requires hanakoHome");
+function restoreDeeperAutoGpuMode({ lingxiHome, mode, reason, now } = {}) {
+  if (!lingxiHome) throw new Error("restoreDeeperAutoGpuMode requires lingxiHome");
   if (!(mode in GPU_MODE_DEPTH)) throw new Error(`restoreDeeperAutoGpuMode received unknown GPU mode: ${mode}`);
-  const state = readState(hanakoHome);
+  const state = readState(lingxiHome);
   const currentMode = state.autoGpuMode?.mode && state.autoGpuMode.mode in GPU_MODE_DEPTH
     ? state.autoGpuMode.mode
     : GPU_MODE_HARDWARE;
@@ -965,15 +965,15 @@ function restoreDeeperAutoGpuMode({ hanakoHome, mode, reason, now } = {}) {
     previousMode: currentMode,
     updatedAt: nowIso(now),
   };
-  writeState(hanakoHome, next);
+  writeState(lingxiHome, next);
   return { restored: true, currentMode: mode };
 }
 
-function buildGpuStartupDiagnostics({ hanakoHome, policy, app } = {}) {
+function buildGpuStartupDiagnostics({ lingxiHome, policy, app } = {}) {
   const items = [
     ``,
     `--- GPU Startup ---`,
-    `Hardware acceleration preference: ${readPreferences(hanakoHome).hardware_acceleration ?? "default"}`,
+    `Hardware acceleration preference: ${readPreferences(lingxiHome).hardware_acceleration ?? "default"}`,
     `Startup policy: ${policy?.reason || "unknown"}`,
     `Startup policy mode: ${policy?.mode || "unknown"}`,
     `GPU sandbox compatibility switches enabled: ${policy?.shouldApplyGpuSandboxCompatSwitches === true}`,
@@ -993,7 +993,7 @@ function buildGpuStartupDiagnostics({ hanakoHome, policy, app } = {}) {
       items.push(`GPU feature status: ${JSON.stringify(app.getGPUFeatureStatus())}`);
     }
   } catch {}
-  const state = readState(hanakoHome);
+  const state = readState(lingxiHome);
   items.push(`Incomplete startup classification: ${classifyIncompleteStartup(state)}`);
   items.push(`GPU sandbox diagnostic classification: ${classifyGpuSandboxDiagnostic(state, policy)}`);
   items.push(`Unsafe no-sandbox note: only enabled by --hana-gpu-unsafe-no-sandbox for one diagnostic launch`);

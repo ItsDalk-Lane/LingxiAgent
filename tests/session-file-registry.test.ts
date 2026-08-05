@@ -664,13 +664,13 @@ describe("SessionFileRegistry", () => {
   });
 
   it("forks only files reachable from retained entries and gives managed cache bytes an independent owner", () => {
-    const hanakoHome = path.join(ensureTempDir(), "hana-home");
-    const managedCacheRoot = path.join(hanakoHome, "session-files");
+    const lingxiHome = path.join(ensureTempDir(), "hana-home");
+    const managedCacheRoot = path.join(lingxiHome, "session-files");
     const sourceSessionId = "sess_files_source";
     const targetSessionId = "sess_files_target";
     const sourceSessionPath = makeSessionPath("fork-source.jsonl");
     const targetSessionPath = makeSessionPath("fork-target.jsonl");
-    const sourceCacheDir = sessionFilesCacheDir(hanakoHome, {
+    const sourceCacheDir = sessionFilesCacheDir(lingxiHome, {
       sessionId: sourceSessionId,
       sessionPath: sourceSessionPath,
     });
@@ -752,7 +752,7 @@ describe("SessionFileRegistry", () => {
       legacyFilePaths: expect.arrayContaining([managed.filePath, managed.realPath]),
     });
     expect(childManaged.filePath).not.toBe(managed.filePath);
-    expect(canonicalFilesystemPathSync(childManaged.filePath).startsWith(canonicalFilesystemPathSync(sessionFilesCacheDir(hanakoHome, {
+    expect(canonicalFilesystemPathSync(childManaged.filePath).startsWith(canonicalFilesystemPathSync(sessionFilesCacheDir(lingxiHome, {
       sessionId: targetSessionId,
       sessionPath: targetSessionPath,
     })))).toBe(true);
@@ -794,13 +794,13 @@ describe("SessionFileRegistry", () => {
   });
 
   it("preserves expired managed file state when forking a retained reference", () => {
-    const hanakoHome = path.join(ensureTempDir(), "expired-home");
-    const managedCacheRoot = path.join(hanakoHome, "session-files");
+    const lingxiHome = path.join(ensureTempDir(), "expired-home");
+    const managedCacheRoot = path.join(lingxiHome, "session-files");
     const sourceSessionPath = makeSessionPath("fork-expired-source.jsonl");
     const targetSessionPath = makeSessionPath("fork-expired-target.jsonl");
     const sourceSessionId = "sess_expired_source";
     const targetSessionId = "sess_expired_target";
-    const sourceCacheDir = sessionFilesCacheDir(hanakoHome, {
+    const sourceCacheDir = sessionFilesCacheDir(lingxiHome, {
       sessionId: sourceSessionId,
       sessionPath: sourceSessionPath,
     });
@@ -887,13 +887,13 @@ describe("SessionFileRegistry", () => {
   });
 
   it("discards forked files without deleting source bytes and is idempotent", () => {
-    const hanakoHome = path.join(ensureTempDir(), "discard-home");
-    const managedCacheRoot = path.join(hanakoHome, "session-files");
+    const lingxiHome = path.join(ensureTempDir(), "discard-home");
+    const managedCacheRoot = path.join(lingxiHome, "session-files");
     const sourceSessionPath = makeSessionPath("discard-source.jsonl");
     const targetSessionPath = makeSessionPath("discard-target.jsonl");
     const sourceSessionId = "sess_discard_source";
     const targetSessionId = "sess_discard_target";
-    const sourceCacheDir = sessionFilesCacheDir(hanakoHome, {
+    const sourceCacheDir = sessionFilesCacheDir(lingxiHome, {
       sessionId: sourceSessionId,
       sessionPath: sourceSessionPath,
     });

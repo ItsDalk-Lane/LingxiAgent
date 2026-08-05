@@ -692,7 +692,7 @@ describe("submitDesktopSessionMessage", () => {
       }));
       const queueVoiceTranscription = vi.fn();
       const engine = {
-        hanakoHome: tmpDir,
+        lingxiHome: tmpDir,
         registerSessionFile,
         speechRecognition: { queueVoiceTranscription },
         ensureSessionLoaded: vi.fn(async () => session),
@@ -756,7 +756,7 @@ describe("submitDesktopSessionMessage", () => {
       }));
       const queueVoiceTranscription = vi.fn();
       const engine = {
-        hanakoHome: tmpDir,
+        lingxiHome: tmpDir,
         registerSessionFile,
         speechRecognition: { queueVoiceTranscription },
         ensureSessionLoaded: vi.fn(async () => session),
@@ -836,7 +836,7 @@ describe("submitDesktopSessionMessage", () => {
       }));
       const queueVoiceTranscription = vi.fn();
       const engine = {
-        hanakoHome: tmpDir,
+        lingxiHome: tmpDir,
         registerSessionFile,
         speechRecognition: { queueVoiceTranscription },
         ensureSessionLoaded: vi.fn(async () => session),
@@ -918,7 +918,7 @@ describe("submitDesktopSessionMessage", () => {
         createdAt: 1,
       }));
       const engine = {
-        hanakoHome: tmpDir,
+        lingxiHome: tmpDir,
         registerSessionFile,
         ensureSessionLoaded: vi.fn(async () => session),
         promptSession: vi.fn(async (sessionPath, text, opts) => session.prompt(text, opts)),
@@ -1007,7 +1007,7 @@ describe("submitDesktopSessionMessage", () => {
         createdAt: 1,
       }));
       const engine = {
-        hanakoHome: tmpDir,
+        lingxiHome: tmpDir,
         registerSessionFile,
         ensureSessionLoaded: vi.fn(async () => session),
         promptSession: vi.fn(async (sessionPath, text, opts) => session.prompt(text, opts)),
@@ -1086,7 +1086,7 @@ describe("submitDesktopSessionMessage", () => {
         createdAt: 1,
       }));
       const engine = {
-        hanakoHome: tmpDir,
+        lingxiHome: tmpDir,
         registerSessionFile,
         ensureSessionLoaded: vi.fn(async () => makeFakeSession()),
         isSessionStreaming: vi.fn(() => true),

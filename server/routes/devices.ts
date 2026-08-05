@@ -20,7 +20,7 @@ export function createDevicesRoute(engine) {
     const denied = requireLocalOwner(c);
     if (denied) return denied;
     try {
-      const registries = loadDeviceAccessRegistries(engine.hanakoHome);
+      const registries = loadDeviceAccessRegistries(engine.lingxiHome);
       return c.json({
         devices: registries.devices.devices.map(sanitizeDevice),
         credentials: registries.credentials.credentials.map(sanitizeCredential),
@@ -37,7 +37,7 @@ export function createDevicesRoute(engine) {
     try {
       const body = await safeJson(c);
       const runtimeContext = resolveRuntimeContext(c, engine);
-      const created = createPairingSession(engine.hanakoHome, {
+      const created = createPairingSession(engine.lingxiHome, {
         serverNodeId: runtimeContext.serverNodeId,
         userId: runtimeContext.userId,
         requestedDevice: body?.requestedDevice,
@@ -67,7 +67,7 @@ export function createDevicesRoute(engine) {
     try {
       const body = await safeJson(c);
       const runtimeContext = resolveRuntimeContext(c, engine);
-      const issued = approvePairingSession(engine.hanakoHome, {
+      const issued = approvePairingSession(engine.lingxiHome, {
         pairingSessionId: c.req.param("pairingSessionId"),
         userCode: body?.userCode,
         studioIds: normalizeStudioIds(body?.studioIds, runtimeContext.studioId),
@@ -99,7 +99,7 @@ export function createDevicesRoute(engine) {
     const denied = requireLocalOwner(c);
     if (denied) return denied;
     try {
-      const device = revokeDevice(engine.hanakoHome, c.req.param("deviceId"));
+      const device = revokeDevice(engine.lingxiHome, c.req.param("deviceId"));
       recordSecurityAuditEvent(c, engine, {
         action: "devices.revoke",
         target: device.deviceId,
@@ -114,7 +114,7 @@ export function createDevicesRoute(engine) {
     const denied = requireLocalOwner(c);
     if (denied) return denied;
     try {
-      const credential = revokeDeviceCredential(engine.hanakoHome, c.req.param("credentialId"));
+      const credential = revokeDeviceCredential(engine.lingxiHome, c.req.param("credentialId"));
       recordSecurityAuditEvent(c, engine, {
         action: "devices.credential.revoke",
         target: credential.credentialId,

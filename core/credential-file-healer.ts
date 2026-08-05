@@ -78,7 +78,7 @@ const AGENT_CONFIG_TMP_FILE = `${AGENT_CONFIG_FILE}${SECRET_TMP_SUFFIX}`;
 const MAX_TREE_DEPTH = 6;
 
 interface HealOptions {
-  hanakoHome: string;
+  lingxiHome: string;
   log?: (line: string) => void;
 }
 
@@ -89,14 +89,14 @@ export interface CredentialHealResult {
   failed: string[];
 }
 
-export function healCredentialFileModes({ hanakoHome, log = () => {} }: HealOptions): CredentialHealResult {
+export function healCredentialFileModes({ lingxiHome, log = () => {} }: HealOptions): CredentialHealResult {
   const result: CredentialHealResult = { healed: [], failed: [] };
   // Refuse rather than quietly do nothing: without a data directory there is
   // no work to skip, only a caller passing the wrong thing, and silently
   // succeeding would hide that the files were never protected at all.
-  if (!hanakoHome) throw new Error("credential file healer requires a data directory");
+  if (!lingxiHome) throw new Error("credential file healer requires a data directory");
 
-  const relative = (target: string) => path.relative(hanakoHome, target) || ".";
+  const relative = (target: string) => path.relative(lingxiHome, target) || ".";
 
   const apply = (target: string, tighten: (p: string) => boolean) => {
     try {
@@ -124,20 +124,20 @@ export function healCredentialFileModes({ hanakoHome, log = () => {} }: HealOpti
   const healFile = (target: string) => apply(target, ensureSecretFileModeSync);
   const healDir = (target: string) => apply(target, ensureSecretDirModeSync);
 
-  healDir(hanakoHome);
+  healDir(lingxiHome);
 
   for (const name of TOP_LEVEL_SECRET_FILES) {
-    healFile(path.join(hanakoHome, name));
+    healFile(path.join(lingxiHome, name));
   }
 
-  for (const agentDir of subdirectories(path.join(hanakoHome, "agents"))) {
+  for (const agentDir of subdirectories(path.join(lingxiHome, "agents"))) {
     healFile(path.join(agentDir, AGENT_CONFIG_FILE));
     healFile(path.join(agentDir, AGENT_CONFIG_BACKUP_FILE));
     healFile(path.join(agentDir, AGENT_CONFIG_TMP_FILE));
   }
 
   for (const tree of SECRET_TREES) {
-    healTree(path.join(hanakoHome, tree), 0, healDir, healFile);
+    healTree(path.join(lingxiHome, tree), 0, healDir, healFile);
   }
 
   // Plugin configuration can hold connector and service credentials. Only the
@@ -145,13 +145,13 @@ export function healCredentialFileModes({ hanakoHome, log = () => {} }: HealOpti
   // holds downloads, job state and generated output owned by other stores, and
   // flattening those would both overstep this pass and strip modes those files
   // legitimately carry. Names come from the module that writes them.
-  for (const pluginDir of subdirectories(path.join(hanakoHome, PLUGIN_DATA_DIRNAME))) {
+  for (const pluginDir of subdirectories(path.join(lingxiHome, PLUGIN_DATA_DIRNAME))) {
     healFile(path.join(pluginDir, PLUGIN_CONFIG_FILENAME));
   }
 
   // Migration checkpoints copy the agents directory wholesale, so the same
   // configuration files exist a second time inside each checkpoint.
-  const checkpointRoot = path.join(hanakoHome, "checkpoints", "session-manifest");
+  const checkpointRoot = path.join(lingxiHome, "checkpoints", "session-manifest");
   for (const checkpoint of subdirectories(checkpointRoot)) {
     for (const agentDir of subdirectories(path.join(checkpoint, "agents"))) {
       healFile(path.join(agentDir, AGENT_CONFIG_FILE));

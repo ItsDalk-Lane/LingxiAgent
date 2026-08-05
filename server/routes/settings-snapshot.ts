@@ -194,7 +194,7 @@ function resolveBridgeManager(ref: any) {
 }
 
 function buildAccessSnapshot(engine: any, canSeeLocalPaths: boolean, options: Record<string, any>) {
-  if (!canSeeLocalPaths || !engine?.hanakoHome) return null;
+  if (!canSeeLocalPaths || !engine?.lingxiHome) return null;
   return createAccessSummary(
     engine,
     options.runtimeState || {},

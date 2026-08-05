@@ -77,13 +77,13 @@ describe("LingxiEngine.buildTools session external sandbox grants", () => {
 
   it("grants and resolves only active-branch SessionFiles while retaining the hidden sidecar superset", async () => {
     tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "hana-engine-sandbox-files-"));
-    const hanakoHome = path.join(tempRoot, "hana-home");
-    const agentDir = path.join(hanakoHome, "agents", "hana");
+    const lingxiHome = path.join(tempRoot, "hana-home");
+    const agentDir = path.join(lingxiHome, "agents", "hana");
     const workspace = path.join(tempRoot, "workspace");
     const externalFile = path.join(tempRoot, "outside", "brief.md");
     const hiddenExternalFile = path.join(tempRoot, "outside", "abandoned.md");
     const workspaceFile = path.join(workspace, "owned.md");
-    const managedFile = path.join(hanakoHome, "session-files", "cache", "shot.png");
+    const managedFile = path.join(lingxiHome, "session-files", "cache", "shot.png");
     for (const file of [externalFile, hiddenExternalFile, workspaceFile, managedFile]) {
       fs.mkdirSync(path.dirname(file), { recursive: true });
       fs.writeFileSync(file, "x");
@@ -92,7 +92,7 @@ describe("LingxiEngine.buildTools session external sandbox grants", () => {
     const sessionPath = path.join(agentDir, "sessions", "one.jsonl");
 
     const engine = Object.create(LingxiEngine.prototype);
-    engine.hanakoHome = hanakoHome;
+    engine.lingxiHome = lingxiHome;
     engine.getAgent = vi.fn(() => ({ id: "hana", agentDir, tools: [] }));
     engine._pluginManager = null;
     engine._prefs = { getFileBackup: () => ({ enabled: false }) };
@@ -150,14 +150,14 @@ describe("LingxiEngine.buildTools session external sandbox grants", () => {
     Object.defineProperty(process, "platform", { value: "linux", configurable: true });
     try {
       tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "hana-engine-sandbox-network-"));
-      const hanakoHome = path.join(tempRoot, "hana-home");
-      const agentDir = path.join(hanakoHome, "agents", "hana");
+      const lingxiHome = path.join(tempRoot, "hana-home");
+      const agentDir = path.join(lingxiHome, "agents", "hana");
       const workspace = path.join(tempRoot, "workspace");
       fs.mkdirSync(agentDir, { recursive: true });
       fs.mkdirSync(workspace, { recursive: true });
 
       const engine = Object.create(LingxiEngine.prototype);
-      engine.hanakoHome = hanakoHome;
+      engine.lingxiHome = lingxiHome;
       engine.getAgent = vi.fn(() => ({ id: "hana", agentDir, tools: [] }));
       engine._pluginManager = null;
       engine._prefs = { getFileBackup: () => ({ enabled: false }) };
@@ -190,14 +190,14 @@ describe("LingxiEngine.buildTools session external sandbox grants", () => {
     Object.defineProperty(process, "platform", { value: "win32", configurable: true });
 
     try {
-      const hanakoHome = path.join(tempRoot, "hana-home");
-      const agentDir = path.join(hanakoHome, "agents", "hana");
+      const lingxiHome = path.join(tempRoot, "hana-home");
+      const agentDir = path.join(lingxiHome, "agents", "hana");
       const workspace = path.join(tempRoot, "workspace");
       fs.mkdirSync(agentDir, { recursive: true });
       fs.mkdirSync(workspace, { recursive: true });
 
       const engine = Object.create(LingxiEngine.prototype);
-      engine.hanakoHome = hanakoHome;
+      engine.lingxiHome = lingxiHome;
       engine.getAgent = vi.fn(() => ({ id: "hana", agentDir, tools: [] }));
       engine._pluginManager = null;
       engine._prefs = { getFileBackup: () => ({ enabled: false }) };
@@ -244,14 +244,14 @@ describe("LingxiEngine.buildTools session external sandbox grants", () => {
 
   it("defaults sandbox networking to enabled when the preference has not been written yet", () => {
     tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "hana-engine-sandbox-network-default-"));
-    const hanakoHome = path.join(tempRoot, "hana-home");
-    const agentDir = path.join(hanakoHome, "agents", "hana");
+    const lingxiHome = path.join(tempRoot, "hana-home");
+    const agentDir = path.join(lingxiHome, "agents", "hana");
     const workspace = path.join(tempRoot, "workspace");
     fs.mkdirSync(agentDir, { recursive: true });
     fs.mkdirSync(workspace, { recursive: true });
 
     const engine = Object.create(LingxiEngine.prototype);
-    engine.hanakoHome = hanakoHome;
+    engine.lingxiHome = lingxiHome;
     engine.getAgent = vi.fn(() => ({ id: "hana", agentDir, tools: [] }));
     engine._pluginManager = null;
     engine._prefs = { getFileBackup: () => ({ enabled: false }) };
@@ -274,15 +274,15 @@ describe("LingxiEngine.buildTools session external sandbox grants", () => {
 
   it("builds file tools through ResourceIO without a runtime switch", () => {
     tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "hana-engine-resource-io-tools-"));
-    const hanakoHome = path.join(tempRoot, "hana-home");
-    const agentDir = path.join(hanakoHome, "agents", "hana");
+    const lingxiHome = path.join(tempRoot, "hana-home");
+    const agentDir = path.join(lingxiHome, "agents", "hana");
     const workspace = path.join(tempRoot, "workspace");
     fs.mkdirSync(agentDir, { recursive: true });
     fs.mkdirSync(workspace, { recursive: true });
     const sessionPath = path.join(agentDir, "sessions", "one.jsonl");
 
     const engine = Object.create(LingxiEngine.prototype);
-    engine.hanakoHome = hanakoHome;
+    engine.lingxiHome = lingxiHome;
     engine.getAgent = vi.fn(() => ({ id: "hana", agentDir, tools: [] }));
     engine._pluginManager = null;
     engine._prefs = {
@@ -313,24 +313,24 @@ describe("LingxiEngine.buildTools session external sandbox grants", () => {
 
   it("resolves a forked legacy file id against the active child before its source locator", () => {
     tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "hana-engine-fork-file-resolve-"));
-    const hanakoHome = path.join(tempRoot, "hana-home");
-    const agentDir = path.join(hanakoHome, "agents", "hana");
+    const lingxiHome = path.join(tempRoot, "hana-home");
+    const agentDir = path.join(lingxiHome, "agents", "hana");
     const workspace = path.join(tempRoot, "workspace");
     const childSessionPath = path.join(agentDir, "sessions", "child.jsonl");
     const sourceSessionPath = path.join(agentDir, "sessions", "source.jsonl");
-    const sourceFilePath = path.join(hanakoHome, "session-files", "source", "brief.md");
+    const sourceFilePath = path.join(lingxiHome, "session-files", "source", "brief.md");
     fs.mkdirSync(agentDir, { recursive: true });
     fs.mkdirSync(workspace, { recursive: true });
 
     const childFile = {
       id: "child-file",
       sessionPath: childSessionPath,
-      filePath: path.join(hanakoHome, "session-files", "child", "brief.md"),
+      filePath: path.join(lingxiHome, "session-files", "child", "brief.md"),
       legacyFileIds: ["source-file"],
       legacyFilePaths: [sourceFilePath],
     };
     const engine = Object.create(LingxiEngine.prototype);
-    engine.hanakoHome = hanakoHome;
+    engine.lingxiHome = lingxiHome;
     engine.getAgent = vi.fn(() => ({ id: "hana", agentDir, tools: [] }));
     engine._pluginManager = null;
     engine._prefs = { getFileBackup: () => ({ enabled: false }) };
@@ -370,8 +370,8 @@ describe("LingxiEngine.buildTools session external sandbox grants", () => {
 
   it("includes inherited parent session files in read-only sandbox inputs", () => {
     tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "hana-engine-sandbox-parent-files-"));
-    const hanakoHome = path.join(tempRoot, "hana-home");
-    const agentDir = path.join(hanakoHome, "agents", "hana");
+    const lingxiHome = path.join(tempRoot, "hana-home");
+    const agentDir = path.join(lingxiHome, "agents", "hana");
     const workspace = path.join(tempRoot, "workspace");
     const childExternal = path.join(tempRoot, "outside", "child.md");
     const parentExternal = path.join(tempRoot, "outside", "parent.md");
@@ -385,7 +385,7 @@ describe("LingxiEngine.buildTools session external sandbox grants", () => {
     const parentSessionPath = path.join(agentDir, "sessions", "parent.jsonl");
 
     const engine = Object.create(LingxiEngine.prototype);
-    engine.hanakoHome = hanakoHome;
+    engine.lingxiHome = lingxiHome;
     engine.getAgent = vi.fn(() => ({ id: "hana", agentDir, tools: [] }));
     engine._pluginManager = null;
     engine._prefs = { getFileBackup: () => ({ enabled: false }) };
@@ -425,8 +425,8 @@ describe("LingxiEngine.buildTools session external sandbox grants", () => {
 
   it("resolves and grants an unloaded explicit parent session file", () => {
     tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "hana-engine-unloaded-parent-files-"));
-    const hanakoHome = path.join(tempRoot, "hana-home");
-    const agentDir = path.join(hanakoHome, "agents", "hana");
+    const lingxiHome = path.join(tempRoot, "hana-home");
+    const agentDir = path.join(lingxiHome, "agents", "hana");
     const workspace = path.join(tempRoot, "workspace");
     const childSessionPath = path.join(agentDir, "subagent-sessions", "child.jsonl");
     const parentSessionPath = path.join(agentDir, "sessions", "parent.jsonl");
@@ -461,7 +461,7 @@ describe("LingxiEngine.buildTools session external sandbox grants", () => {
     }]);
 
     const engine = Object.create(LingxiEngine.prototype);
-    engine.hanakoHome = hanakoHome;
+    engine.lingxiHome = lingxiHome;
     engine._sessionFiles = registry;
     engine.getSessionByPath = vi.fn(() => null);
     engine.getAgent = vi.fn(() => ({ id: "hana", agentDir, tools: [] }));

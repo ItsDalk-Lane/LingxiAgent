@@ -85,7 +85,7 @@ function writeLaunchMarker(status, payload = {}) {
     arch: process.arch,
     execPath: process.execPath,
     resourcesPath: process.resourcesPath || null,
-    hanakoHome,
+    lingxiHome,
     ...payload,
   });
 }
@@ -124,12 +124,12 @@ process.on("unhandledRejection", (reason) => {
   recordProcessError("unhandledRejection", err);
 });
 
-let hanakoHome = null;
+let lingxiHome = null;
 try {
   const { resolveHanakoHome } = require("../shared/hana-runtime-paths.cjs");
-  hanakoHome = resolveHanakoHome(process.env.LINGXI_HOME);
-  process.env.LINGXI_HOME = hanakoHome;
-  diagnosticsDir = path.join(hanakoHome, "diagnostics", "desktop-launch");
+  lingxiHome = resolveHanakoHome(process.env.LINGXI_HOME);
+  process.env.LINGXI_HOME = lingxiHome;
+  diagnosticsDir = path.join(lingxiHome, "diagnostics", "desktop-launch");
 } catch (err) {
   const diagnosticPath = writeDiagnostic("hana-home-resolve-failed.json", "hana-home-resolve-failed", {
     phase: "desktop-bootstrap",

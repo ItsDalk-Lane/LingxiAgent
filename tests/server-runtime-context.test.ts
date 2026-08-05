@@ -65,7 +65,7 @@ describe("server runtime context", () => {
     writeValidIdentity(tmpDir);
     const { createServerRuntimeContext } = await import("../core/server-runtime-context.ts");
 
-    const context = createServerRuntimeContext({ hanakoHome: tmpDir, appVersion: "2.3.4" });
+    const context = createServerRuntimeContext({ lingxiHome: tmpDir, appVersion: "2.3.4" });
 
     expect(context).toEqual({
       schemaVersion: 1,
@@ -123,7 +123,7 @@ describe("server runtime context", () => {
     fs.writeFileSync(path.join(tmpDir, "users.json"), "{ bad json", "utf-8");
     const { createServerRuntimeContext } = await import("../core/server-runtime-context.ts");
 
-    expect(() => createServerRuntimeContext({ hanakoHome: tmpDir }))
+    expect(() => createServerRuntimeContext({ lingxiHome: tmpDir }))
       .toThrow("invalid users.json");
   });
 });

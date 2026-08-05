@@ -668,7 +668,7 @@
     ],
     "version": 3
   },
-  "payloadFingerprint": "sha256:b9b9a3bfabba7dd56ce687519c4e2bfded1fedc3c2841c3dada4b7c40bd19283",
+  "payloadFingerprint": "sha256:8f0109ca45bc32709b9acb92844439a098baf202874b7170938338ee984066bc",
   "registry": [
     {
       "affectedByEpochMigration": true,
@@ -3118,8 +3118,8 @@
   ],
   "review": {
     "classification": "compatible",
-    "compatibilityReason": "brand assets replaced; data format unchanged",
-    "payloadFingerprint": "sha256:b9b9a3bfabba7dd56ce687519c4e2bfded1fedc3c2841c3dada4b7c40bd19283"
+    "compatibilityReason": "final cleanup: hanakoHome field + comments + tsconfig; data format unchanged",
+    "payloadFingerprint": "sha256:8f0109ca45bc32709b9acb92844439a098baf202874b7170938338ee984066bc"
   },
   "schemas": [
     {
@@ -3201,7 +3201,7 @@
       "contract": "agent config and authored Markdown/image profile protocol",
       "kind": "directory-contract",
       "module": "core/agent-manager.ts",
-      "sourceHash": "sha256:2ad44828cb206cc90488e5892dbf4069152b483ae1be708f61906aa553b8aeed",
+      "sourceHash": "sha256:2b108fdf1355eab558783d3cd323b2634d62ebf0e8b502b5cb79c972d71ec663",
       "storeId": "agent-profile"
     },
     {
@@ -3215,7 +3215,7 @@
       "contract": "token-scoped import plan/package and export package protocol",
       "kind": "directory-contract",
       "module": "lib/character-cards/service.ts",
-      "sourceHash": "sha256:8e205b7ff142be9de658cba07afe910a2ddabdcfa198a7efe9b92d03231da4ec",
+      "sourceHash": "sha256:34ee8270dc08cc12a49641faa568e79bb95e8b9ed2865e40e60330f559baa78b",
       "storeId": "character-card-staging"
     },
     {
@@ -3281,56 +3281,56 @@
       "contract": "bounded base64 cover upload temporary-directory lifecycle",
       "kind": "directory-contract",
       "module": "server/routes/desk.ts",
-      "sourceHash": "sha256:dea9b2e28eaf8310c7edab9f8ad5cf477c04ad89b92d592adbd9af873a7a217b",
+      "sourceHash": "sha256:72642f3f97496ceec7070f59546eb810b8e9830e4e92b5d710cc1954256a766c",
       "storeId": "desk-cover-upload-staging"
     },
     {
       "contract": "desktop launch, renderer, server-crash, and browser-command diagnostic logs",
       "kind": "directory-contract",
       "module": "desktop/src/shared/desktop-launch-diagnostics.cjs",
-      "sourceHash": "sha256:08e6ae1d7d8a9ed9f75be234196aa1d8ec9e65aabd9fc6b1caace522e1bd1406",
+      "sourceHash": "sha256:72d105fe24c0a4996216a13efdb8ea538ecf5d5c0a6b01e1d75ff4d55841391a",
       "storeId": "desktop-diagnostics"
     },
     {
       "contract": "GPU startup state version, crash evidence, recovery mode, and legacy migration markers",
       "kind": "runtime-contract",
       "module": "desktop/src/shared/gpu-startup-policy.cjs",
-      "sourceHash": "sha256:2ab434748c21dc1e1e051d0ace3b37d8568042cd0ef2e8e489c134eb371ddb5c",
+      "sourceHash": "sha256:ae6e55b429c22e4e31a80919e3a26e43f88bff17a9841ac38199bbe9675e03f9",
       "storeId": "desktop-gpu-startup-state"
     },
     {
       "contract": "update channel record version, device identifier, activation flag, update feed address, activation time, and held invite codes",
       "kind": "runtime-contract",
       "module": "desktop/auto-updater.cjs",
-      "sourceHash": "sha256:ba5b4e84938dc05cf821c72c01606587791c9b9b3befc8b1d60ad5a67f0da8f8",
+      "sourceHash": "sha256:45ab7b29d6aa614242580d8278680784f05173008079bc9b5e90ca754146eba7",
       "storeId": "desktop-update-channel"
     },
     {
       "contract": "install ACL heal state version, per install-identity grant bookkeeping, recovery probe result, and ineffective probe count",
       "kind": "runtime-contract",
       "module": "desktop/src/shared/win32-install-acl-heal.cjs",
-      "sourceHash": "sha256:0c97bdae6d38db92d34573d487e868c59fb4a1ab2f904e4493f803aafc949af7",
+      "sourceHash": "sha256:bdbd91eb3ba64ffe59362644c489d1020de238408768c1cfb7b35c72c36501b5",
       "storeId": "desktop-win32-install-acl-heal-state"
     },
     {
       "contract": "desktop window bounds, release announcement bookmark, and update cache version marker readers",
       "kind": "directory-contract",
       "module": "desktop/main.cjs",
-      "sourceHash": "sha256:960c5838bac672f3e5c6a1558f897c9e51c5b75e498d931a4fa8e9c3b8ea9a1c",
+      "sourceHash": "sha256:ddab2f59b4eeb645701a7f4d7eb56a774e1f7f1e1e7147699eb2b2bc42a6a44e",
       "storeId": "desktop-window-version-state"
     },
     {
       "contract": "device, credential, and pairing-session validators/serializers",
       "kind": "runtime-contract",
       "module": "core/device-registry.ts",
-      "sourceHash": "sha256:5e2db8e7b1de0b05eca16bb028fa9d972f1f7ea9f0a9f6417b0961c853d4a43f",
+      "sourceHash": "sha256:9adfca56c417454d380ff582d53203046f19d90aa696ce14afed9975bbfc3306",
       "storeId": "device-access-registries"
     },
     {
       "contract": "execution lease registry validator and atomic serializer",
       "kind": "runtime-contract",
       "module": "core/execution-lease-registry.ts",
-      "sourceHash": "sha256:466f63f0b4ee2839b4d70bb51a85f28ec643c35c324b06b465ff39181b6716c7",
+      "sourceHash": "sha256:52fee17fd5fb456c02d2e2f0ef1cc6f3ecfcae791fdc4b0c0e4fb6807e6d3a16",
       "storeId": "execution-leases"
     },
     {
@@ -3393,14 +3393,14 @@
       "contract": "sessionless upload naming and age-based cleanup protocol",
       "kind": "directory-contract",
       "module": "server/routes/upload.ts",
-      "sourceHash": "sha256:8c07b613a588bdc0ab2c2410ee1c0298188e3142ae188d52ee9880fbe947381c",
+      "sourceHash": "sha256:8625c319a67bfe04f5f00db5857df78883a2a9ffc43e1765e003d6b87e06807e",
       "storeId": "legacy-upload-cache"
     },
     {
       "contract": "local authentication secret reader and atomic serializer",
       "kind": "runtime-contract",
       "module": "core/local-user-account.ts",
-      "sourceHash": "sha256:a91644f7d468bc3a50a0b434428f8b6a66938032484917bd1deb15556ee0bc63",
+      "sourceHash": "sha256:9920f043c92bb4d452d1c1ae7d67cfb7bcb57bf61d7101fd2e8948341c05cd98",
       "storeId": "local-user-auth"
     },
     {
@@ -3449,7 +3449,7 @@
       "contract": "verified plugin release ZIP naming by pluginId/version and expected sha256",
       "kind": "directory-contract",
       "module": "server/routes/plugins.ts",
-      "sourceHash": "sha256:801157b99bb1f4a1f80ca77f0f0a65bd325b06c74cc7654b6404605545f5b30a",
+      "sourceHash": "sha256:d4807cf0631c39e6578691ed31e9763c30031425c53c385f6052e6162f1e3780",
       "storeId": "plugin-download-cache"
     },
     {
@@ -3469,7 +3469,7 @@
       "contract": "ProviderCatalogStore plus provider plugin/config runtime readers",
       "kind": "directory-contract",
       "module": "core/provider-catalog.ts",
-      "sourceHash": "sha256:843021b7c33a2f815e633455b5ae7d3e1619befa6b3c7d53af9be5ca6d257b00",
+      "sourceHash": "sha256:ae94f397d53187f1bb370c1acd95bdd7bddcf7f9942c87318aed162f03f0c3f7",
       "storeId": "provider-state"
     },
     {
@@ -3483,56 +3483,56 @@
       "contract": "one JSON object per append-only security audit line",
       "kind": "runtime-contract",
       "module": "core/security-audit-log.ts",
-      "sourceHash": "sha256:640bace22d0de45b180c3599849f9e4ee79d3a9e5f50631c5a1068443ea69d5c",
+      "sourceHash": "sha256:dd35ae5cc5fbadf287365a9835d6a8a5d873348bb66673ec5d8d84f4e700c3b8",
       "storeId": "security-audit-log"
     },
     {
       "contract": "grant registry validator, quarantine, and atomic serializer",
       "kind": "runtime-contract",
       "module": "core/grant-registry.ts",
-      "sourceHash": "sha256:ab9a9da116f6254ef31caca568ffc52cd9a46552c187796eec860107e12646eb",
+      "sourceHash": "sha256:7bff12e7222423691ccbaafe3a88e87a0ab5601f721b9719230acb1ec2868715",
       "storeId": "security-grants"
     },
     {
       "contract": "independent 0600 random key-file protocols for resource and plugin ticket services",
       "kind": "directory-contract",
       "module": "core/resource-ticket-service.ts",
-      "sourceHash": "sha256:5f573553aefe8d90150fccde5ba4438f44d77e8fcc48f9d1c2943d256b2eb5b2",
+      "sourceHash": "sha256:2b95ca4ab9977dd2de1c79ab61de84635ebe8c404a50f7623308e73cd45508ef",
       "storeId": "security-key-material"
     },
     {
       "contract": "server network mode/listen configuration validator",
       "kind": "runtime-contract",
       "module": "core/server-network-config.ts",
-      "sourceHash": "sha256:100b9051458a988c4156e1236c84f5ad1696c9b6e374c016b9706e36a2fa82b2",
+      "sourceHash": "sha256:d6f74b5492684cd79ee4d2ba635e6d6cffbe02434540553cbe39e3260c650a5a",
       "storeId": "server-network-config"
     },
     {
       "contract": "server-node identity parser and ensureLocalIdentityRegistries seed",
       "kind": "runtime-contract",
       "module": "core/server-identity.ts",
-      "sourceHash": "sha256:c2ea6e4fb07c4f7a0a8d3af2252662d9532739e1fbfa2bb72b30b571fc9c15cf",
+      "sourceHash": "sha256:eda3305af28d5e351b52147c4b27e88b236b9f784a0320671b0ae5941512f5e8",
       "storeId": "server-node-identity"
     },
     {
       "contract": "server-info writer and desktop bootstrap reader",
       "kind": "runtime-contract",
       "module": "server/index.ts",
-      "sourceHash": "sha256:6fe55798f4aeb11c2c5306b289cba2dd0037567d5c057eaae0255c1caa875c20",
+      "sourceHash": "sha256:eda9ceb72ac845aaa923eb2d69ed8ab972eb6f0a3750b87e09d5fdd7f03044a7",
       "storeId": "server-runtime-info"
     },
     {
       "contract": "InputDraftsStore and SessionProjectCatalogStore normalizers",
       "kind": "runtime-contract",
       "module": "core/input-drafts-store.ts",
-      "sourceHash": "sha256:d8b80b579bd4e2d6ab1f686fe96eee5dba2235bbb13c92329928c5dcf4f4cdfa",
+      "sourceHash": "sha256:cf85642646867f9340a6c79f54054c9f359ffcff61b8633e4e7d8ce961b7aa4d",
       "storeId": "session-drafts-and-projects"
     },
     {
       "contract": "SessionFile payload naming, v1 sidecar, ownership, and 72-hour cold-session cleanup protocol",
       "kind": "directory-contract",
       "module": "lib/session-files/session-file-registry.ts",
-      "sourceHash": "sha256:b45edf5121b19472b33c7c4a8e73f75d26b574ce09cc8844304a83103f472f5c",
+      "sourceHash": "sha256:4b3e42a5c8173c79c766ea82f7e283541cef190e804ed0cd99cc01c0d63e5617",
       "storeId": "session-files"
     },
     {
@@ -3638,7 +3638,7 @@
       "contract": "bridge index, legacy session metadata, title, and vision sidecar readers",
       "kind": "runtime-contract",
       "module": "core/bridge-session-manager.ts",
-      "sourceHash": "sha256:01155fe29dd0b3665ba940297e26ca0c6b566c0d27a9926a1ab8e4af710d2199",
+      "sourceHash": "sha256:7e4f7a463ecdd2c965fd2fe5c0f1c7deb816140c08b865abdb6aac013ad5a871",
       "storeId": "session-sidecars"
     },
     {
@@ -3659,14 +3659,14 @@
       "contract": "CACHE_VERSION and translation normalization",
       "kind": "runtime-contract",
       "module": "lib/skills/skill-name-translation-cache.ts",
-      "sourceHash": "sha256:eba740ee9dd214e86625b0d1c6a917f8d6b053ac0e1ec2922308a7fdc19ddca3",
+      "sourceHash": "sha256:ddf9c365c229351e429c4b4aab85e5c9d190f3e9ed5585d644392f298994b172",
       "storeId": "skill-translation-cache"
     },
     {
       "contract": "schemaVersion 1 studio mount registry validator",
       "kind": "runtime-contract",
       "module": "core/studio-mounts.ts",
-      "sourceHash": "sha256:04c2b5d3e98c7bc1b88556ae694b2e2193cc27c9c91db72368f8e40a809491d2",
+      "sourceHash": "sha256:fb1b31ea9cfef2be0a4a9f80e0d27d5e134878dc4c20f50d6563fc90d6998fd7",
       "storeId": "studio-mount-registry"
     },
     {
@@ -3680,7 +3680,7 @@
       "contract": "terminal metadata JSON plus ordered transcript JSONL protocol",
       "kind": "directory-contract",
       "module": "lib/terminal/terminal-session-manager.ts",
-      "sourceHash": "sha256:5e7c4faac6ad1ad030c410192d0d2b96c8bb2f566228c7dcb0a36e5970fd1e9e",
+      "sourceHash": "sha256:f6924f5cf80039f864c7698349e5f8d4d08469ee31b02c58e05de38fb9fc7844",
       "storeId": "terminal-session-state"
     },
     {
@@ -3701,21 +3701,21 @@
       "contract": "user/studio registry readers plus legacy spaces.json compatibility projection",
       "kind": "runtime-contract",
       "module": "core/server-identity.ts",
-      "sourceHash": "sha256:c2ea6e4fb07c4f7a0a8d3af2252662d9532739e1fbfa2bb72b30b571fc9c15cf",
+      "sourceHash": "sha256:eda3305af28d5e351b52147c4b27e88b236b9f784a0320671b0ae5941512f5e8",
       "storeId": "user-studio-registries"
     },
     {
       "contract": "web session registry validator, expiry, and serializer",
       "kind": "runtime-contract",
       "module": "core/web-session-store.ts",
-      "sourceHash": "sha256:1aa9e95917becfdaa38dbe6930110426a34679310e43c13b6460e1b89bd43f04",
+      "sourceHash": "sha256:456d66f84b6a102419bc0cf87e6279514279af70d103b210cfa65e1c3f239654",
       "storeId": "web-session-registry"
     },
     {
       "contract": "Windows sandbox migration marker readers",
       "kind": "runtime-contract",
       "module": "lib/sandbox/win32-legacy-migration.ts",
-      "sourceHash": "sha256:9139e15e9efcd447ad109f426750790b3f82f35e5fccd86ad897a30802cb93c9",
+      "sourceHash": "sha256:25abf02a2206dc5aa79d2cd96a4d1550c02f4cc4621c1b212ce3b20145fd4563",
       "storeId": "windows-sandbox-migration-state"
     },
     {

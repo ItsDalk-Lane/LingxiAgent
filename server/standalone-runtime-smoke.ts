@@ -50,7 +50,7 @@ export async function runPackagedStandaloneRuntimeSmoke({
     throw new Error("[standalone-exec-smoke] this probe requires Windows");
   }
   const workDir = requiredEnv(env, "LINGXI_STANDALONE_EXEC_WORK");
-  const hanakoHome = requiredEnv(env, "LINGXI_HOME");
+  const lingxiHome = requiredEnv(env, "LINGXI_HOME");
   const expectedHelper = requiredEnv(env, "LINGXI_STANDALONE_EXPECTED_HELPER");
   const expectedRoot = requiredEnv(env, "LINGXI_STANDALONE_EXPECTED_ROOT");
   const expectedEntry = path.win32.join(expectedRoot, "bundle", "index.js");
@@ -79,16 +79,16 @@ export async function runPackagedStandaloneRuntimeSmoke({
     );
   }
 
-  const agentDir = path.join(hanakoHome, "agents", "standalone-smoke");
+  const agentDir = path.join(lingxiHome, "agents", "standalone-smoke");
   const policy = deriveSandboxPolicy({
     agentDir,
     cwd: workDir,
     workspace: workDir,
     workspaceFolders: [],
-    hanakoHome,
+    lingxiHome,
     mode: "standard",
   });
-  const commandExec = createWin32Exec({ sandbox: { policy, hanakoHome } });
+  const commandExec = createWin32Exec({ sandbox: { policy, lingxiHome } });
   const execCommand = createExecCommandTools({
     commandExec,
     getCwd: () => workDir,

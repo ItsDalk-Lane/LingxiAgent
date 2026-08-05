@@ -5,7 +5,7 @@
  * icons, splash) so the avatar lookup can be unit-tested without Electron.
  *
  * Avatar storage convention (single source of truth across the app):
- *   {hanakoHome}/agents/{agentId}/avatars/agent.{png|jpg|jpeg|webp}
+ *   {lingxiHome}/agents/{agentId}/avatars/agent.{png|jpg|jpeg|webp}
  * Mirrors server/routes/agents.ts (GET /agents/:id/avatar) and server/routes/avatar.ts.
  *
  * Identity is keyed strictly by the supplied agentId. A missing or unsafe agentId
@@ -30,15 +30,15 @@ function isSafeAgentId(agentId) {
 }
 
 /**
- * @param {string|null|undefined} hanakoHome - resolved LINGXI_HOME data root
+ * @param {string|null|undefined} lingxiHome - resolved LINGXI_HOME data root
  * @param {string|null|undefined} agentId - id of the agent that triggered the notification
  * @returns {string|null} absolute path to the avatar file, or null when none/unsafe
  */
-function resolveAgentAvatarPath(hanakoHome, agentId) {
-  if (typeof hanakoHome !== "string" || hanakoHome.length === 0) return null;
+function resolveAgentAvatarPath(lingxiHome, agentId) {
+  if (typeof lingxiHome !== "string" || lingxiHome.length === 0) return null;
   if (!isSafeAgentId(agentId)) return null;
 
-  const avatarDir = path.join(hanakoHome, "agents", agentId, "avatars");
+  const avatarDir = path.join(lingxiHome, "agents", agentId, "avatars");
   for (const ext of AVATAR_EXTS) {
     const candidate = path.join(avatarDir, `agent.${ext}`);
     if (fs.existsSync(candidate)) return candidate;

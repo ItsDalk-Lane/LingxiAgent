@@ -16,8 +16,8 @@ function resolveHomePath(value) {
   return path.resolve(raw);
 }
 
-export function readLocalServerInfo({ hanaHome = resolveCliLingxiHome(), checkProcess = true } = {}) {
-  const filePath = path.join(hanaHome, "server-info.json");
+export function readLocalServerInfo({ lingxiHome = resolveCliLingxiHome(), checkProcess = true } = {}) {
+  const filePath = path.join(lingxiHome, "server-info.json");
   if (!fs.existsSync(filePath)) {
     return {
       ok: false,
@@ -67,7 +67,7 @@ export function readLocalServerInfo({ hanaHome = resolveCliLingxiHome(), checkPr
   };
 }
 
-export function resolveConnection({ url, token, hanaHome }: { url?: string; token?: string; hanaHome?: string } = {}) {
+export function resolveConnection({ url, token, lingxiHome }: { url?: string; token?: string; lingxiHome?: string } = {}) {
   if (url) {
     return {
       ok: true,
@@ -78,7 +78,7 @@ export function resolveConnection({ url, token, hanaHome }: { url?: string; toke
     };
   }
 
-  const local = readLocalServerInfo({ hanaHome });
+  const local = readLocalServerInfo({ lingxiHome });
   if (!local.ok) return local;
   return {
     ...local,

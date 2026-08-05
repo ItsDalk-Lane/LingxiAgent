@@ -58,7 +58,7 @@ describe('resolveAgentAvatarPath', () => {
     expect(resolveAgentAvatarPath(home, '..')).toBeNull();
   });
 
-  it('returns null when hanakoHome is missing', () => {
+  it('returns null when lingxiHome is missing', () => {
     expect(resolveAgentAvatarPath(null, 'a1')).toBeNull();
     expect(resolveAgentAvatarPath('', 'a1')).toBeNull();
   });

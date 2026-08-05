@@ -16,6 +16,6 @@ import path from "path";
 export const SECURITY_DIR = "security";
 
 /** Absolute path to the security directory inside a data directory. */
-export function securityDirPath(hanakoHome: string): string {
-  return path.join(hanakoHome, SECURITY_DIR);
+export function securityDirPath(lingxiHome: string): string {
+  return path.join(lingxiHome, SECURITY_DIR);
 }

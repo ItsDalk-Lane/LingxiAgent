@@ -233,7 +233,7 @@ async function writeActionResponse(c, engine, action, auth, mountId, operation) 
   let lease = null;
   try {
     lease = issueRemoteWriteLease({
-      hanakoHome: engine?.hanakoHome,
+      lingxiHome: engine?.lingxiHome,
       requestContext: auth?.requestContext,
       decision: auth?.decision,
       // The mobile workbench writes files as a subsystem: no agent asked for
@@ -246,10 +246,10 @@ async function writeActionResponse(c, engine, action, auth, mountId, operation) 
       mountId: mountId && mountId !== "default" ? mountId : null,
     } as any);
     const result = await operation({ reason: action });
-    if (lease) consumeRemoteWriteLease(engine?.hanakoHome, lease);
+    if (lease) consumeRemoteWriteLease(engine?.lingxiHome, lease);
     return auditActionResult(c, engine, action, result, auth, lease);
   } catch (err) {
-    if (lease) revokeRemoteWriteLease(engine?.hanakoHome, lease);
+    if (lease) revokeRemoteWriteLease(engine?.lingxiHome, lease);
     throw err;
   }
 }
@@ -287,7 +287,7 @@ function routeError(message, code, status) {
 function fileService(engine, requestContext, c = null, body = null) {
   const resourceIO = resourceIOForEngine(engine);
   return new MountAwareFileService({
-    hanakoHome: engine.hanakoHome,
+    lingxiHome: engine.lingxiHome,
     defaultRoot: engine.defaultDeskCwd || engine.homeCwd || engine.deskCwd,
     studioId: requestContext?.studioId || engine.getRuntimeContext?.()?.studioId || null,
     createCheckpoint: typeof engine.createUserEditCheckpoint === "function"

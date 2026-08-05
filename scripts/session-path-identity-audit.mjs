@@ -179,7 +179,7 @@ const APPROVED_IDENTITY_BOUNDARY_RULES = [
   {
     file: /(^|\/)lib\/session-files\/(bridge-inbound-files|browser-screenshot-file)\.ts$/,
     patterns: [
-      /\bsessionFilesCacheDir\(hanakoHome,\s*\{\s*sessionId,\s*sessionPath\s*\}\)/,
+      /\bsessionFilesCacheDir\(lingxiHome,\s*\{\s*sessionId,\s*sessionPath\s*\}\)/,
       /\b\.\.\.\(sessionId\s*\?\s*\{\s*sessionId\s*\}\s*:\s*\{\}\)/,
     ],
   },
@@ -188,7 +188,7 @@ const APPROVED_IDENTITY_BOUNDARY_RULES = [
     patterns: [
       /\bofficeMediaResourceKey\b/,
       /\bh\.update\(sessionId\s*\|\|\s*sessionPath\s*\|\|\s*""\)/,
-      /\bsessionFilesCacheDir\(hanakoHome,\s*\{\s*sessionId,\s*sessionPath\s*\}\)/,
+      /\bsessionFilesCacheDir\(lingxiHome,\s*\{\s*sessionId,\s*sessionPath\s*\}\)/,
       /\b\.\.\.\(sessionId\s*\?\s*\{\s*sessionId\s*\}\s*:\s*\{\}\)/,
     ],
   },
@@ -196,7 +196,7 @@ const APPROVED_IDENTITY_BOUNDARY_RULES = [
     file: /(^|\/)server\/routes\/upload\.ts$/,
     patterns: [
       /\bconst sessionId = engine\?\.getSessionIdForPath\?\.\(sessionPath\)/,
-      /\bsessionFilesCacheDir\(engine\.hanakoHome,\s*\{\s*sessionId,\s*sessionPath\s*\}\)/,
+      /\bsessionFilesCacheDir\(engine\.lingxiHome,\s*\{\s*sessionId,\s*sessionPath\s*\}\)/,
       /\bsession-files\/<session-hash>/,
     ],
   },

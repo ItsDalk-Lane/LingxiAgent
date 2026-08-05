@@ -186,7 +186,7 @@ describe("LingxiEngine session manifest startup migration", () => {
     })}\n`);
 
     engine = new LingxiEngine({
-      hanakoHome: tmpDir,
+      lingxiHome: tmpDir,
       productDir: tmpDir,
       agentId: "hana",
       appVersion: "9.9.9",
@@ -217,7 +217,7 @@ describe("LingxiEngine session manifest startup migration", () => {
     fs.writeFileSync(path.join(tmpDir, "session-manifest.db-wal"), "bad wal");
 
     engine = new LingxiEngine({
-      hanakoHome: tmpDir,
+      lingxiHome: tmpDir,
       productDir: tmpDir,
       agentId: "hana",
       appVersion: "9.9.9",
@@ -293,7 +293,7 @@ describe("LingxiEngine getSessionMetadataRecoveryStatus", () => {
     expect(result.reasons).toEqual([
       { kind: "store_unavailable", detail: expect.any(String) },
     ]);
-    // 隐私契约：detail 不得携带 hanaHome 绝对路径（不能直接透传 error.message）。
+    // 隐私契约：detail 不得携带 lingxiHome 绝对路径（不能直接透传 error.message）。
     expect(result.reasons[0].detail).not.toContain(tmpDir);
   });
 

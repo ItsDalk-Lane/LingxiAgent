@@ -11,8 +11,8 @@ const LOOPBACK_HOSTS = new Set(["127.0.0.1", "localhost", "::1", "[::1]"]);
 const MIN_USER_PORT = 1024;
 const MAX_PORT = 65535;
 
-export function ensureServerNetworkConfig(hanakoHome, { now = new Date().toISOString() } = {}) {
-  const filePath = path.join(hanakoHome, SERVER_NETWORK_FILE);
+export function ensureServerNetworkConfig(lingxiHome, { now = new Date().toISOString() } = {}) {
+  const filePath = path.join(lingxiHome, SERVER_NETWORK_FILE);
   const existing = readJsonIfPresent(filePath, SERVER_NETWORK_FILE);
   if (existing) {
     validateServerNetworkConfig(existing, SERVER_NETWORK_FILE);
@@ -22,13 +22,13 @@ export function ensureServerNetworkConfig(hanakoHome, { now = new Date().toISOSt
   return { created: [SERVER_NETWORK_FILE] };
 }
 
-export function loadServerNetworkConfig(hanakoHome) {
-  ensureServerNetworkConfig(hanakoHome);
-  const config = readJsonRequired(path.join(hanakoHome, SERVER_NETWORK_FILE), SERVER_NETWORK_FILE);
+export function loadServerNetworkConfig(lingxiHome) {
+  ensureServerNetworkConfig(lingxiHome);
+  const config = readJsonRequired(path.join(lingxiHome, SERVER_NETWORK_FILE), SERVER_NETWORK_FILE);
   return validateServerNetworkConfig(config, SERVER_NETWORK_FILE);
 }
 
-export function saveServerNetworkConfig(hanakoHome, config, { now = new Date().toISOString() } = {}) {
+export function saveServerNetworkConfig(lingxiHome, config, { now = new Date().toISOString() } = {}) {
   const normalized = validateServerNetworkConfig({
     ...config,
     schemaVersion: SCHEMA_VERSION,
@@ -36,12 +36,12 @@ export function saveServerNetworkConfig(hanakoHome, config, { now = new Date().t
     createdAt: config?.createdAt || now,
     updatedAt: now,
   }, SERVER_NETWORK_FILE);
-  writeJsonAtomic(path.join(hanakoHome, SERVER_NETWORK_FILE), normalized);
+  writeJsonAtomic(path.join(lingxiHome, SERVER_NETWORK_FILE), normalized);
   return normalized;
 }
 
-export function resolveServerListenOptions(hanakoHome) {
-  const config = loadServerNetworkConfig(hanakoHome);
+export function resolveServerListenOptions(lingxiHome) {
+  const config = loadServerNetworkConfig(lingxiHome);
   return {
     mode: config.mode,
     host: config.listenHost,

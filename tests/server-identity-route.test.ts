@@ -67,7 +67,7 @@ describe("server identity route", () => {
     writeValidIdentity(tmpDir);
     const { createServerIdentityRoute } = await import("../server/routes/server-identity.ts");
     const app = new Hono();
-    app.route("/api", createServerIdentityRoute({ hanakoHome: tmpDir, appVersion: "1.2.3" }));
+    app.route("/api", createServerIdentityRoute({ lingxiHome: tmpDir, appVersion: "1.2.3" }));
 
     const res = await app.request("/api/server/identity");
 
@@ -121,7 +121,7 @@ describe("server identity route", () => {
     fs.writeFileSync(path.join(tmpDir, "studios.json"), "{ bad json", "utf-8");
     const { createServerIdentityRoute } = await import("../server/routes/server-identity.ts");
     const app = new Hono();
-    app.route("/api", createServerIdentityRoute({ hanakoHome: tmpDir, appVersion: "1.2.3" }));
+    app.route("/api", createServerIdentityRoute({ lingxiHome: tmpDir, appVersion: "1.2.3" }));
 
     const res = await app.request("/api/server/identity");
 
@@ -138,7 +138,7 @@ describe("server identity route", () => {
     const { createServerIdentityRoute } = await import("../server/routes/server-identity.ts");
     const app = new Hono();
     app.route("/api", createServerIdentityRoute({
-      hanakoHome: tmpDir,
+      lingxiHome: tmpDir,
       appVersion: "9.9.9",
       getRuntimeContext: () => ({
         connectionKind: "local",
@@ -227,7 +227,7 @@ describe("server identity route", () => {
       }));
       await next();
     });
-    app.route("/api", createServerIdentityRoute({ hanakoHome: tmpDir, appVersion: "1.2.3" }));
+    app.route("/api", createServerIdentityRoute({ lingxiHome: tmpDir, appVersion: "1.2.3" }));
 
     const res = await app.request("/api/server/identity");
 

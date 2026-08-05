@@ -16,7 +16,7 @@ type Options = {
   workspaceFolders?: string[];
   authorizedFolders?: string[];
   getAuthorizedFolders?: () => string[];
-  hanakoHome: string;
+  lingxiHome: string;
   getSandboxEnabled?: () => boolean;
   getExternalReadPaths?: () => string[];
   getSessionPath?: () => string | null;
@@ -36,7 +36,7 @@ export function createSandboxResourceIO({
   workspaceFolders = [],
   authorizedFolders = [],
   getAuthorizedFolders,
-  hanakoHome,
+  lingxiHome,
   getSandboxEnabled,
   getExternalReadPaths,
   getSessionPath,
@@ -53,7 +53,7 @@ export function createSandboxResourceIO({
     cwd,
     workspace,
     workspaceFolders,
-    hanakoHome,
+    lingxiHome,
     getAuthorizedFolders: typeof getAuthorizedFolders === "function"
       ? getAuthorizedFolders
       : () => Array.isArray(authorizedFolders) ? authorizedFolders : [],
@@ -61,7 +61,7 @@ export function createSandboxResourceIO({
     getExternalReadPaths,
   });
 
-  const trashRoot = path.join(hanakoHome, "trash");
+  const trashRoot = path.join(lingxiHome, "trash");
   const localFsProviderFactory = ({ cwd: providerCwd, guard }) => new LocalFsProvider({ cwd: providerCwd, guard, trashRoot });
   const providers: Record<string, ResourceIoProvider> = {
     local_fs: localFsProviderFactory({ cwd, guard: resourceAccessGuard }),
@@ -76,7 +76,7 @@ export function createSandboxResourceIO({
   }
   if (studioId) {
     providers.mount = new MountProvider({
-      hanakoHome,
+      lingxiHome,
       studioId,
       localFsProviderFactory,
     });

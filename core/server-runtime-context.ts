@@ -14,8 +14,8 @@ function deepFreeze(value) {
   return Object.freeze(value);
 }
 
-export function createServerRuntimeContext({ hanakoHome, appVersion = "?" }) {
-  const identity = loadServerIdentity(hanakoHome);
+export function createServerRuntimeContext({ lingxiHome, appVersion = "?" }) {
+  const identity = loadServerIdentity(lingxiHome);
   const runtimeContext = {
     schemaVersion: 1,
     serverId: identity.serverId,

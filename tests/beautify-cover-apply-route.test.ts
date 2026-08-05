@@ -22,14 +22,14 @@ function makeEngine(tmpDir, options: any = {}) {
   };
   const emitEvent = vi.fn();
   const emitResourceChanged = vi.fn();
-  const hanakoHome = path.join(tmpDir, "hana");
+  const lingxiHome = path.join(tmpDir, "hana");
   const resourceIO = options.resourceIO || createSandboxResourceIO({
     cwd: tmpDir,
     agentDir: tmpDir,
     workspace: tmpDir,
     workspaceFolders: [tmpDir],
     authorizedFolders: [tmpDir],
-    hanakoHome,
+    lingxiHome,
     getSandboxEnabled: () => false,
     getSessionPath: () => null,
     emitEvent: (event: any) => {
@@ -53,7 +53,7 @@ function makeEngine(tmpDir, options: any = {}) {
     }),
   };
   return {
-    hanakoHome,
+    lingxiHome,
     deskCwd: tmpDir,
     homeCwd: tmpDir,
     getRuntimeContext: () => ({
@@ -183,7 +183,7 @@ describe("desk beautify cover apply route", () => {
     fs.writeFileSync(mountedNotePath, "# Mounted\n", "utf-8");
 
     const engine = makeEngine(tmpDir);
-    upsertStudioMount(engine.hanakoHome, {
+    upsertStudioMount(engine.lingxiHome, {
       mountId: "mount_docs",
       hostStudioId: "studio_1",
       sourceKind: "storage",

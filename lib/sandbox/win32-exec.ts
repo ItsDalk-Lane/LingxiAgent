@@ -517,9 +517,9 @@ function setEnvCaseInsensitive(env, key, value) {
 
 function withWin32SandboxRuntimeEnv(baseEnv, sandbox) {
   const env = withWin32Utf8Defaults(baseEnv);
-  if (!sandboxIsEnabled(sandbox) || !sandbox?.hanakoHome) return env;
+  if (!sandboxIsEnabled(sandbox) || !sandbox?.lingxiHome) return env;
 
-  const root = joinRuntimePath(sandbox.hanakoHome, ".ephemeral", WIN32_SANDBOX_ENV_DIR);
+  const root = joinRuntimePath(sandbox.lingxiHome, ".ephemeral", WIN32_SANDBOX_ENV_DIR);
   const tempDir = joinRuntimePath(root, "Temp");
   const localAppDataDir = joinRuntimePath(root, "LocalAppData");
   const appDataDir = joinRuntimePath(root, "AppData", "Roaming");
@@ -1013,7 +1013,7 @@ function emitWin32RuntimeFailureDiagnostic(onData, {
     diagnosticValueMetadata("Helper", helperPath),
     diagnosticValueMetadata("Runtime label", runtimeInfo?.label),
     diagnosticValueMetadata("Runtime root", runtimeInfo?.bundledRoot),
-    diagnosticValueMetadata("LINGXI_HOME", sandbox?.hanakoHome || envValue(env, "LINGXI_HOME")),
+    diagnosticValueMetadata("LINGXI_HOME", sandbox?.lingxiHome || envValue(env, "LINGXI_HOME")),
     `Output bytes before failure: ${outputBytes ?? 0}`,
     `Duration ms: ${durationMs ?? "unknown"}`,
     ...collectWin32EnvironmentDiagnostics(env),
@@ -1056,7 +1056,7 @@ function emitWin32SandboxHelperLaunchFailureDiagnostic(onData, {
     diagnosticValueMetadata("Helper", helperPath),
     diagnosticValueMetadata("Runtime label", runtimeInfo?.label),
     diagnosticValueMetadata("Runtime root", runtimeInfo?.bundledRoot),
-    diagnosticValueMetadata("LINGXI_HOME", sandbox?.hanakoHome || envValue(env, "LINGXI_HOME")),
+    diagnosticValueMetadata("LINGXI_HOME", sandbox?.lingxiHome || envValue(env, "LINGXI_HOME")),
     `Output bytes before failure: ${outputBytes ?? 0}`,
     `Duration ms: ${durationMs ?? "unknown"}`,
     ...collectWin32EnvironmentDiagnostics(env),
@@ -1134,9 +1134,9 @@ async function runWithWin32Diagnostics({
 }
 
 function prepareRuntimeForSandbox(runtimeInfo, sandbox, kind) {
-  if (!sandboxIsEnabled(sandbox) || !sandbox?.hanakoHome) return runtimeInfo;
+  if (!sandboxIsEnabled(sandbox) || !sandbox?.lingxiHome) return runtimeInfo;
   return prepareSandboxRuntime(runtimeInfo, {
-    hanakoHome: sandbox.hanakoHome,
+    lingxiHome: sandbox.lingxiHome,
     kind,
   });
 }
@@ -1188,21 +1188,21 @@ function cleanupRootsForSandboxGrants(grants) {
 // restriction applies; when that write is denied — the user's real %TEMP% is
 // not one of the granted paths — PowerShell falls back to Constrained
 // Language Mode, which breaks most one-shot commands. withWin32SandboxRuntimeEnv
-// (above) already points TEMP/TMP at <hanakoHome>/.ephemeral/win32-sandbox-env
+// (above) already points TEMP/TMP at <lingxiHome>/.ephemeral/win32-sandbox-env
 // for sandboxed sessions; this makes sure that directory is one of the
 // sandbox's *required* write roots. The restricted-token startup probe needs
 // a guaranteed write grant for this directory; an optional root does not
 // provide the same contract. This lets the token write there under every code
 // path, not just the ones that happen to also touch a required root for other
 // reasons.
-function win32SandboxEnvRoot(hanakoHome) {
-  if (!hanakoHome) return null;
-  return joinRuntimePath(hanakoHome, ".ephemeral", WIN32_SANDBOX_ENV_DIR);
+function win32SandboxEnvRoot(lingxiHome) {
+  if (!lingxiHome) return null;
+  return joinRuntimePath(lingxiHome, ".ephemeral", WIN32_SANDBOX_ENV_DIR);
 }
 
-function withSandboxEnvRootAsRequiredWritePath(grants, hanakoHome) {
-  const root = win32SandboxEnvRoot(hanakoHome);
-  // No hanakoHome means withWin32SandboxRuntimeEnv never redirected TEMP in
+function withSandboxEnvRootAsRequiredWritePath(grants, lingxiHome) {
+  const root = win32SandboxEnvRoot(lingxiHome);
+  // No lingxiHome means withWin32SandboxRuntimeEnv never redirected TEMP in
   // the first place; nothing to promote to a required root here.
   if (!root) return grants;
   mkdirSync(root, { recursive: true });
@@ -1231,7 +1231,7 @@ async function spawnViaSandboxHelper({
     );
   }
   assertSandboxNetworkSupported(sandbox);
-  const grants = withSandboxEnvRootAsRequiredWritePath(grantsForSandbox(sandbox, cwd), sandbox.hanakoHome);
+  const grants = withSandboxEnvRootAsRequiredWritePath(grantsForSandbox(sandbox, cwd), sandbox.lingxiHome);
   const nativeTimeoutMs = timeout == null || timeout <= 0
     ? 0
     : Math.min(Math.ceil(timeout * 1000), 0xFFFFFFFE);

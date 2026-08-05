@@ -18,25 +18,25 @@ export function browserScreenshotFilename({ base64, mimeType }: { base64?: any; 
   return `browser-screenshot-${hash}.${browserScreenshotExt(mimeType)}`;
 }
 
-export function browserScreenshotPath(hanakoHome, sessionPath, { base64, mimeType, sessionId = null }: { base64?: any; mimeType?: any; sessionId?: any } = {}) {
+export function browserScreenshotPath(lingxiHome, sessionPath, { base64, mimeType, sessionId = null }: { base64?: any; mimeType?: any; sessionId?: any } = {}) {
   return path.join(
-    sessionFilesCacheDir(hanakoHome, { sessionId, sessionPath }),
+    sessionFilesCacheDir(lingxiHome, { sessionId, sessionPath }),
     browserScreenshotFilename({ base64, mimeType }),
   );
 }
 
 export async function persistBrowserScreenshotFile({
-  hanakoHome,
+  lingxiHome,
   sessionId = null,
   sessionPath,
   base64,
   mimeType = "image/png",
   registerSessionFile,
-}: { hanakoHome?: any; sessionId?: any; sessionPath?: any; base64?: any; mimeType?: string; registerSessionFile?: any } = {}) {
+}: { lingxiHome?: any; sessionId?: any; sessionPath?: any; base64?: any; mimeType?: string; registerSessionFile?: any } = {}) {
   if (typeof registerSessionFile !== "function") {
     throw new Error("browser screenshot requires registerSessionFile");
   }
-  const filePath = browserScreenshotPath(hanakoHome, sessionPath, { base64, mimeType, sessionId });
+  const filePath = browserScreenshotPath(lingxiHome, sessionPath, { base64, mimeType, sessionId });
   await fs.promises.mkdir(path.dirname(filePath), { recursive: true });
   if (!fs.existsSync(filePath)) {
     await fs.promises.writeFile(filePath, Buffer.from(base64, "base64"));
@@ -52,17 +52,17 @@ export async function persistBrowserScreenshotFile({
 }
 
 export function persistBrowserScreenshotFileSync({
-  hanakoHome,
+  lingxiHome,
   sessionId = null,
   sessionPath,
   base64,
   mimeType = "image/png",
   registerSessionFile,
-}: { hanakoHome?: any; sessionId?: any; sessionPath?: any; base64?: any; mimeType?: string; registerSessionFile?: any } = {}) {
+}: { lingxiHome?: any; sessionId?: any; sessionPath?: any; base64?: any; mimeType?: string; registerSessionFile?: any } = {}) {
   if (typeof registerSessionFile !== "function") {
     throw new Error("browser screenshot requires registerSessionFile");
   }
-  const filePath = browserScreenshotPath(hanakoHome, sessionPath, { base64, mimeType, sessionId });
+  const filePath = browserScreenshotPath(lingxiHome, sessionPath, { base64, mimeType, sessionId });
   fs.mkdirSync(path.dirname(filePath), { recursive: true });
   if (!fs.existsSync(filePath)) {
     fs.writeFileSync(filePath, Buffer.from(base64, "base64"));

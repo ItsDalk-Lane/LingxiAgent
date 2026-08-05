@@ -244,7 +244,7 @@ describe("createWin32Exec", () => {
     const exec = createWin32Exec({
       sandbox: {
         helperPath: helper,
-        hanakoHome: "C:\\Users\\Hana\\.hanako",
+        lingxiHome: "C:\\Users\\Hana\\.hanako",
         grants: {
           readPaths: [],
           writePaths: ["C:\\work", "C:\\other"],
@@ -272,7 +272,7 @@ describe("createWin32Exec", () => {
     expect(spawnOptions.env).toEqual(expect.objectContaining({ TEMP: tempDir, TMP: tempDir }));
   });
 
-  it("does not add a required writable-root when the sandbox has no hanakoHome", async () => {
+  it("does not add a required writable-root when the sandbox has no lingxiHome", async () => {
     classifyWin32Command.mockReturnValue({ runner: "cmd", reason: "windows-native-utility" });
     const helper = "C:\\Hanako\\resources\\sandbox\\windows\\lingxi-win-sandbox.exe";
     existsSync.mockImplementation((p) => p === helper);
@@ -295,7 +295,7 @@ describe("createWin32Exec", () => {
     expect(helperArgs).toEqual(expect.arrayContaining(["--writable-root", "C:\\work"]));
     expect(helperArgs.filter((a: string) => a === "--writable-root")).toHaveLength(1);
     const spawnOptions = spawnAndStream.mock.calls[0][2];
-    // No hanakoHome means withWin32SandboxRuntimeEnv never redirects TEMP;
+    // No lingxiHome means withWin32SandboxRuntimeEnv never redirects TEMP;
     // only the UTF-8 defaults get layered on top of whatever was passed in.
     expect(spawnOptions.env.TEMP).toBe("C:\\Users\\Hana\\AppData\\Local\\Temp");
   });
@@ -821,7 +821,7 @@ describe("createWin32Exec", () => {
     const exec = createWin32Exec({
       sandbox: {
         helperPath: helper,
-        hanakoHome: "C:\\Users\\Hana\\.hanako",
+        lingxiHome: "C:\\Users\\Hana\\.hanako",
         grants: {
           readPaths: [],
           writePaths: ["C:\\work"],
@@ -974,7 +974,7 @@ describe("createWin32Exec", () => {
     prepareSandboxRuntime.mockImplementation((runtimeInfo, options) => {
       expect(options).toEqual(expect.objectContaining({
         kind: "git",
-        hanakoHome: "C:\\Users\\Hana\\.hanako",
+        lingxiHome: "C:\\Users\\Hana\\.hanako",
       }));
       return {
         ...runtimeInfo,
@@ -993,7 +993,7 @@ describe("createWin32Exec", () => {
     const exec = createWin32Exec({
       sandbox: {
         helperPath: helper,
-        hanakoHome: "C:\\Users\\Hana\\.hanako",
+        lingxiHome: "C:\\Users\\Hana\\.hanako",
         grants: {
           readPaths: [],
           writePaths: ["C:\\work"],
@@ -1245,7 +1245,7 @@ describe("createWin32Exec", () => {
     prepareSandboxRuntime.mockImplementation((runtimeInfo, options) => {
       expect(options).toEqual(expect.objectContaining({
         kind: "node",
-        hanakoHome: "C:\\Users\\Hana\\.hanako",
+        lingxiHome: "C:\\Users\\Hana\\.hanako",
       }));
       return {
         ...runtimeInfo,
@@ -1263,7 +1263,7 @@ describe("createWin32Exec", () => {
     const exec = createWin32Exec({
       sandbox: {
         helperPath: helper,
-        hanakoHome: "C:\\Users\\Hana\\.hanako",
+        lingxiHome: "C:\\Users\\Hana\\.hanako",
         grants: {
           readPaths: [],
           writePaths: ["C:\\work"],
@@ -1614,7 +1614,7 @@ describe("createWin32Exec", () => {
     prepareSandboxRuntime.mockImplementation((runtimeInfo, options) => {
       expect(options).toEqual(expect.objectContaining({
         kind: "bash",
-        hanakoHome: "C:\\Users\\Hana\\.hanako",
+        lingxiHome: "C:\\Users\\Hana\\.hanako",
       }));
       return {
         ...runtimeInfo,
@@ -1633,7 +1633,7 @@ describe("createWin32Exec", () => {
     const exec = createWin32Exec({
       sandbox: {
         helperPath: helper,
-        hanakoHome: "C:\\Users\\Hana\\.hanako",
+        lingxiHome: "C:\\Users\\Hana\\.hanako",
         grants: {
           readPaths: [],
           writePaths: ["C:\\work"],
@@ -1707,7 +1707,7 @@ describe("createWin32Exec", () => {
     const exec = createWin32Exec({
       sandbox: {
         helperPath: helper,
-        hanakoHome: "C:\\Users\\Hana\\.hanako",
+        lingxiHome: "C:\\Users\\Hana\\.hanako",
         grants: {
           readPaths: [],
           writePaths: ["C:\\work"],
@@ -1832,7 +1832,7 @@ describe("createWin32Exec", () => {
     const exec = createWin32Exec({
       sandbox: {
         helperPath: helper,
-        hanakoHome: "C:\\Users\\Hana\\.hanako",
+        lingxiHome: "C:\\Users\\Hana\\.hanako",
         grants: {
           readPaths: [],
           writePaths: ["C:\\work"],
@@ -1879,7 +1879,7 @@ describe("createWin32Exec", () => {
     const exec = createWin32Exec({
       sandbox: {
         helperPath: helper,
-        hanakoHome: "C:\\Users\\Hana\\.hanako",
+        lingxiHome: "C:\\Users\\Hana\\.hanako",
         grants: {
           readPaths: [],
           writePaths: ["C:\\work\\project"],
@@ -1932,7 +1932,7 @@ describe("createWin32Exec", () => {
     const exec = createWin32Exec({
       sandbox: {
         helperPath: helper,
-        hanakoHome: `${customerRoot}\\hana-home`,
+        lingxiHome: `${customerRoot}\\hana-home`,
         grants: { readPaths: [], writePaths: [customerRoot] },
       },
     });
@@ -1972,7 +1972,7 @@ describe("createWin32Exec", () => {
     const exec = createWin32Exec({
       sandbox: {
         helperPath: helper,
-        hanakoHome: "C:\\Users\\Hana\\.hanako",
+        lingxiHome: "C:\\Users\\Hana\\.hanako",
         grants: {
           readPaths: [],
           writePaths: ["C:\\work"],

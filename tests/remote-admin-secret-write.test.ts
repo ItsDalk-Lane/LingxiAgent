@@ -50,7 +50,7 @@ describe("trusted remote admin secret writes", () => {
     tmpDir = makeTmpDir();
     const saveProvider = vi.fn();
     const engine = {
-      hanakoHome: tmpDir,
+      lingxiHome: tmpDir,
       config: {},
       configPath: path.join(tmpDir, "config.yaml"),
       updateConfig: vi.fn().mockResolvedValue(undefined),
@@ -90,7 +90,7 @@ describe("trusted remote admin secret writes", () => {
     tmpDir = makeTmpDir();
     const saveProvider = vi.fn();
     const engine = {
-      hanakoHome: tmpDir,
+      lingxiHome: tmpDir,
       config: {},
       configPath: path.join(tmpDir, "config.yaml"),
       updateConfig: vi.fn().mockResolvedValue(undefined),
@@ -140,7 +140,7 @@ describe("trusted remote admin secret writes", () => {
     tmpDir = makeTmpDir();
     const saveProvider = vi.fn();
     const engine = {
-      hanakoHome: tmpDir,
+      lingxiHome: tmpDir,
       config: {},
       configPath: path.join(tmpDir, "config.yaml"),
       updateConfig: vi.fn().mockResolvedValue(undefined),
@@ -182,7 +182,7 @@ describe("trusted remote admin secret writes", () => {
       updateConfig: vi.fn(),
     };
     const engine = {
-      hanakoHome: tmpDir,
+      lingxiHome: tmpDir,
       currentAgentId: "hana",
       getAgent: (id) => id === "hana" ? agent : null,
       getBridgeIndex: () => ({}),

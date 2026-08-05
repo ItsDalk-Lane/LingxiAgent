@@ -12,7 +12,7 @@ describe("ResourceAccessPolicy boundary", () => {
       agentDir: path.join(root, "agent"),
       workspace: root,
       workspaceFolders: [root],
-      hanakoHome: path.join(root, ".hana"),
+      lingxiHome: path.join(root, ".hana"),
       getSandboxEnabled: () => true,
     });
 

@@ -130,17 +130,17 @@ export class ModelManager {
   declare _authStorage: any;
   declare _availableModels: any;
   declare _defaultModel: any;
-  declare _hanakoHome: any;
+  declare _lingxiHome: any;
   declare _modelRegistry: any;
   declare _registeredSdkProviderIds: Set<string>;
   declare executionRouter: any;
   declare providerRegistry: any;
   /**
    * @param {object} opts
-   * @param {string} opts.hanakoHome - 用户数据根目录
+   * @param {string} opts.lingxiHome - 用户数据根目录
    */
-  constructor({ hanakoHome }) {
-    this._hanakoHome = hanakoHome;
+  constructor({ lingxiHome }) {
+    this._lingxiHome = lingxiHome;
     this._authStorage = null;
     this._authBackend = null;
     this._modelRegistry = null;
@@ -149,15 +149,15 @@ export class ModelManager {
     this._availableModels = [];
 
     // 新架构模块（init() 后可用）
-    this.providerRegistry = new ProviderRegistry(hanakoHome);
+    this.providerRegistry = new ProviderRegistry(lingxiHome);
     this.executionRouter = null;
   }
 
   /** 初始化 AuthStorage + ModelRegistry + 新架构模块 */
   init() {
-    this._authStorage = AuthStorage.create(path.join(this._hanakoHome, "auth.json"));
+    this._authStorage = AuthStorage.create(path.join(this._lingxiHome, "auth.json"));
     // Same file, same lock: forced OAuth rotation writes through this backend.
-    this._authBackend = new FileAuthStorageBackend(path.join(this._hanakoHome, "auth.json"));
+    this._authBackend = new FileAuthStorageBackend(path.join(this._lingxiHome, "auth.json"));
     this.providerRegistry.reload();
     this._removeApiKeyProviderAuthEntries();
     const projection = this._buildChatProjectionInputs();
@@ -168,7 +168,7 @@ export class ModelManager {
     });
     this._modelRegistry = createModelRegistry(
       this._authStorage,
-      path.join(this._hanakoHome, "models.json"),
+      path.join(this._lingxiHome, "models.json"),
     );
     this._syncSdkProviderRegistrations();
 
@@ -187,8 +187,8 @@ export class ModelManager {
   set defaultModel(m) { this._defaultModel = m; }
   get currentModel() { return this._defaultModel; }
   get availableModels() { return this._availableModels; }
-  get modelsJsonPath() { return path.join(this._hanakoHome, "models.json"); }
-  get authJsonPath() { return path.join(this._hanakoHome, "auth.json"); }
+  get modelsJsonPath() { return path.join(this._lingxiHome, "models.json"); }
+  get authJsonPath() { return path.join(this._lingxiHome, "auth.json"); }
 
   // ── 模型解析：_availableModels 唯一真理源 ──
 
@@ -374,7 +374,7 @@ export class ModelManager {
   _removeApiKeyProviderAuthEntries() {
     if (!this._authStorage || !this.providerRegistry) return;
     migrateLegacyApiKeyAuthToProviders({
-      hanakoHome: this._hanakoHome,
+      lingxiHome: this._lingxiHome,
       providerRegistry: this.providerRegistry,
     });
     this._authStorage.reload?.();

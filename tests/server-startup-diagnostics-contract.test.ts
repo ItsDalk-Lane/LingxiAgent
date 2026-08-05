@@ -161,7 +161,7 @@ describe("server startup diagnostics contract", () => {
       SERVER_FORCE_KILL_WAIT_MS: 1,
       fs: { unlinkSync() {} },
       path: { join: () => "server-info.json" },
-      hanakoHome: "C:\\hana",
+      lingxiHome: "C:\\hana",
     });
     vm.runInContext(`
       let serverProcess = ownedProc;
@@ -197,7 +197,7 @@ describe("server startup diagnostics contract", () => {
       SERVER_FORCE_KILL_WAIT_MS: 1,
       fs: { unlinkSync() {} },
       path: { join: () => "server-info.json" },
-      hanakoHome: "C:\\hana",
+      lingxiHome: "C:\\hana",
     });
     vm.runInContext(`
       let serverProcess = null;
@@ -234,7 +234,7 @@ describe("server startup diagnostics contract", () => {
       SERVER_FORCE_KILL_WAIT_MS: 1,
       fs: { unlinkSync() {} },
       path: { join: () => "server-info.json" },
-      hanakoHome: "C:\\hana",
+      lingxiHome: "C:\\hana",
     });
     vm.runInContext(`
       let serverProcess = failedGuardian;
@@ -587,7 +587,7 @@ describe("desktop launch failure dialog: data-epoch dedicated branches (C7 E4)",
     const context = vm.createContext({
       fs,
       path,
-      hanakoHome: homeDir,
+      lingxiHome: homeDir,
       readDataEpochStamp,
       DATA_EPOCH,
       _serverLogs: [] as string[],

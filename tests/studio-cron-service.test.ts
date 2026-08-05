@@ -79,7 +79,7 @@ describe("StudioCronService", () => {
     ]);
 
     const service = new StudioCronService({
-      hanakoHome: root,
+      lingxiHome: root,
       agentsDir,
       getStudioId: () => "studio-main",
     });
@@ -125,7 +125,7 @@ describe("StudioCronService", () => {
     ]);
 
     const service = new StudioCronService({
-      hanakoHome: root,
+      lingxiHome: root,
       agentsDir,
       getStudioId: () => "default",
     });
@@ -156,7 +156,7 @@ describe("StudioCronService", () => {
     ]);
 
     const service = new StudioCronService({
-      hanakoHome: root,
+      lingxiHome: root,
       agentsDir,
       getStudioId: () => "default",
     });
@@ -182,7 +182,7 @@ describe("StudioCronService", () => {
       },
     ]);
 
-    const opts = { hanakoHome: root, agentsDir, getStudioId: () => "studio-main" };
+    const opts = { lingxiHome: root, agentsDir, getStudioId: () => "studio-main" };
     const first = new StudioCronService(opts);
     expect(first.listJobs()).toHaveLength(1);
     expect(first.listJobs()).toHaveLength(1);
@@ -212,7 +212,7 @@ describe("StudioCronService", () => {
       finishedAt: "2026-05-20T01:00:01.000Z",
     });
 
-    const opts = { hanakoHome: root, agentsDir, getStudioId: () => "studio-main" };
+    const opts = { lingxiHome: root, agentsDir, getStudioId: () => "studio-main" };
     const first = new StudioCronService(opts);
     const imported = first.listJobs();
     expect(imported).toHaveLength(1);
@@ -268,7 +268,7 @@ describe("StudioCronService", () => {
     ]);
 
     const service = new StudioCronService({
-      hanakoHome: root,
+      lingxiHome: root,
       agentsDir,
       getStudioId: () => "studio-main",
     });
@@ -278,7 +278,7 @@ describe("StudioCronService", () => {
     expect(service.listJobs()).toHaveLength(0);
 
     const restarted = new StudioCronService({
-      hanakoHome: root,
+      lingxiHome: root,
       agentsDir,
       getStudioId: () => "studio-main",
     });
@@ -289,7 +289,7 @@ describe("StudioCronService", () => {
     const root = makeRoot();
     roots.push(root);
     const service = new StudioCronService({
-      hanakoHome: root,
+      lingxiHome: root,
       agentsDir: path.join(root, "agents"),
       getStudioId: () => "studio-main",
     });

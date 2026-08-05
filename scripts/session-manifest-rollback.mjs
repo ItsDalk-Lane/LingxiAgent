@@ -7,7 +7,7 @@ function parseArgs(argv) {
   for (let i = 0; i < argv.length; i += 1) {
     const arg = argv[i];
     if (arg === "--hanako-home") {
-      options.hanaHome = argv[++i];
+      options.lingxiHome = argv[++i];
       continue;
     }
     if (arg === "--restored-at") {
@@ -45,7 +45,7 @@ if (options.help || positional.length !== 1) {
 try {
   const result = restoreSessionManifestCheckpoint({
     checkpointDirectory: positional[0],
-    hanaHome: options.hanaHome,
+    lingxiHome: options.lingxiHome,
     restoredAt: options.restoredAt,
   });
   process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);

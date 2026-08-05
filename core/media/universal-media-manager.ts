@@ -284,7 +284,7 @@ export class UniversalMediaManager {
   declare _store: any;
 
   constructor({
-    hanakoHome,
+    lingxiHome,
     providerRegistry,
     preferences,
     speechRecognition = null,
@@ -294,7 +294,7 @@ export class UniversalMediaManager {
     logger = log,
     builtinAdapters = [],
   }: any = {}) {
-    if (!hanakoHome) throw new Error("UniversalMediaManager requires hanakoHome");
+    if (!lingxiHome) throw new Error("UniversalMediaManager requires lingxiHome");
     if (!providerRegistry) throw new Error("UniversalMediaManager requires providerRegistry");
     if (!preferences) throw new Error("UniversalMediaManager requires preferences");
     if (typeof registerSessionFile !== "function") throw new Error("UniversalMediaManager requires registerSessionFile");
@@ -313,7 +313,7 @@ export class UniversalMediaManager {
     // plugin's historical directory name -- core now owns it as the sole
     // runtime, but the name itself is data-compatibility surface, not an
     // active plugin identity.
-    this._dataDir = path.join(hanakoHome, "plugin-data", "image-gen");
+    this._dataDir = path.join(lingxiHome, "plugin-data", "image-gen");
     this._generatedDir = path.join(this._dataDir, "generated");
     fs.mkdirSync(this._generatedDir, { recursive: true });
 

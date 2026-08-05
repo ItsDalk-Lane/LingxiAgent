@@ -108,7 +108,7 @@ async function makeEngine() {
   await writeFile(path.join(userDir, "user.md"), "user profile");
 
   return {
-    hanakoHome: tmpRoot,
+    lingxiHome: tmpRoot,
     agentsDir,
     productDir: path.join(tmpRoot, "product"),
     userDir,

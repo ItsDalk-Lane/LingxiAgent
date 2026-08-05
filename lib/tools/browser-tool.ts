@@ -343,7 +343,7 @@ export function createBrowserTool(getSessionPath: any, options: {
             }
             const { base64, mimeType } = await browser.screenshot(sessionPath, params.tabId || null);
             const screenshotFile = await persistBrowserScreenshotFile({
-              hanakoHome: options.getHanakoHome?.(),
+              lingxiHome: options.getHanakoHome?.(),
               sessionId: options.getSessionIdForPath?.(sessionPath) || null,
               sessionPath,
               base64,

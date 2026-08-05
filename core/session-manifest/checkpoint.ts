@@ -45,13 +45,13 @@ function readCheckpointReceipt(checkpointDirectory) {
 }
 
 export function createSessionManifestCheckpoint(opts: any = {}) {
-  if (!opts.hanaHome) throw new Error("createSessionManifestCheckpoint requires hanaHome");
-  const hanaHome = path.resolve(opts.hanaHome);
+  if (!opts.lingxiHome) throw new Error("createSessionManifestCheckpoint requires lingxiHome");
+  const lingxiHome = path.resolve(opts.lingxiHome);
   const createdAt = opts.createdAt || new Date().toISOString();
   const id = opts.id || sanitizeTimestamp(createdAt);
   const checkpointRoot = opts.checkpointRoot
     ? path.resolve(opts.checkpointRoot)
-    : path.join(hanaHome, "checkpoints", "session-manifest");
+    : path.join(lingxiHome, "checkpoints", "session-manifest");
   const checkpointDirectory = path.join(checkpointRoot, id);
   const includes = opts.includes || DEFAULT_SESSION_MANIFEST_CHECKPOINT_INCLUDES;
 
@@ -64,7 +64,7 @@ export function createSessionManifestCheckpoint(opts: any = {}) {
   const includeReceipts = [];
   try {
     for (const name of includes) {
-      const source = path.join(hanaHome, name);
+      const source = path.join(lingxiHome, name);
       const target = path.join(checkpointDirectory, name);
       if (!fs.existsSync(source)) {
         includeReceipts.push({ name, source, checkpointPath: target, exists: false });
@@ -80,7 +80,7 @@ export function createSessionManifestCheckpoint(opts: any = {}) {
       id,
       appVersion: opts.appVersion || readPackageVersion(),
       createdAt,
-      hanaHome,
+      lingxiHome,
       gitAnchors: opts.gitAnchors || {},
       includes: includeReceipts,
     };
@@ -98,13 +98,13 @@ export function restoreSessionManifestCheckpoint(opts: any = {}) {
   }
   const checkpointDirectory = path.resolve(opts.checkpointDirectory);
   const receipt = readCheckpointReceipt(checkpointDirectory);
-  const hanaHome = path.resolve(opts.hanaHome || receipt.hanaHome);
+  const lingxiHome = path.resolve(opts.lingxiHome || receipt.lingxiHome);
   const restoredAt = opts.restoredAt || new Date().toISOString();
   const restoreId = sanitizeTimestamp(restoredAt);
-  assertDirectoryWritable(hanaHome);
+  assertDirectoryWritable(lingxiHome);
 
   const movedManifestFiles = moveSessionManifestDbFilesAside({
-    hanaHome,
+    lingxiHome,
     suffix: `rollback-${restoreId}`,
   });
   const movedManifestDbTo = movedManifestFiles.find((entry) => (
@@ -114,13 +114,13 @@ export function restoreSessionManifestCheckpoint(opts: any = {}) {
   for (const entry of receipt.includes || []) {
     if (!entry?.exists) continue;
     const source = path.join(checkpointDirectory, entry.name);
-    const target = path.join(hanaHome, entry.name);
+    const target = path.join(lingxiHome, entry.name);
     safeCopyDir(source, target);
   }
 
   return {
     checkpointDirectory,
-    hanaHome,
+    lingxiHome,
     restoredAt,
     movedManifestDbTo,
     movedManifestFiles,

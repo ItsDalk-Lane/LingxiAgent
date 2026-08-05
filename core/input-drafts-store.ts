@@ -22,9 +22,9 @@ export class InputDraftsStore {
   declare _path: string;
   declare _cache: any;
 
-  constructor({ hanakoHome }) {
-    if (!hanakoHome) throw new Error("InputDraftsStore requires hanakoHome");
-    this._path = path.join(hanakoHome, "input-drafts.v1.json");
+  constructor({ lingxiHome }) {
+    if (!lingxiHome) throw new Error("InputDraftsStore requires lingxiHome");
+    this._path = path.join(lingxiHome, "input-drafts.v1.json");
     this._cache = null;
   }
 

@@ -96,10 +96,10 @@ function createAuthPrincipal(runtimeContext) {
 function getActiveGrants(engine, authPrincipal) {
   if (!authPrincipal?.principalId) return [];
   const implicit = implicitPrincipalGrant(authPrincipal);
-  if (!engine?.hanakoHome) return implicit ? [implicit] : [];
+  if (!engine?.lingxiHome) return implicit ? [implicit] : [];
   try {
     return [
-      ...findActiveGrantsForPrincipal(engine.hanakoHome, authPrincipal.principalId),
+      ...findActiveGrantsForPrincipal(engine.lingxiHome, authPrincipal.principalId),
       ...(implicit ? [implicit] : []),
     ];
   } catch {

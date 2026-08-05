@@ -1,6 +1,6 @@
 # Security Policy
 
-This project is now marketed as HanaAgent. During the rename transition, the repository and security-reporting URLs intentionally remain on the legacy `openhanako` GitHub path.
+This project is now marketed as 灵犀 Lingxi. During the rename transition, the repository and security-reporting URLs intentionally remain on the legacy `openhanako` GitHub path.
 
 ## Reporting a Vulnerability
 

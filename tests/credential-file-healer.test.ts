@@ -41,7 +41,7 @@ describe.skipIf(!POSIX)("healCredentialFileModes", () => {
     const root = makeHome();
     fs.chmodSync(root, 0o755);
 
-    const result = healCredentialFileModes({ hanakoHome: root });
+    const result = healCredentialFileModes({ lingxiHome: root });
 
     expect(modeOf(root)).toBe(0o700);
     expect(result.healed).toContain(".");
@@ -63,7 +63,7 @@ describe.skipIf(!POSIX)("healCredentialFileModes", () => {
     ];
     for (const name of targets) writeOpen(name);
 
-    const result = healCredentialFileModes({ hanakoHome: root });
+    const result = healCredentialFileModes({ lingxiHome: root });
 
     for (const name of targets) {
       expect(modeOf(path.join(root, name))).toBe(0o600);
@@ -76,7 +76,7 @@ describe.skipIf(!POSIX)("healCredentialFileModes", () => {
     writeOpen(path.join("agents", "hanako", "config.yaml"), "api:\n  api_key: value\n");
     writeOpen(path.join("agents", "second", "config.yaml"), "api:\n  api_key: value\n");
 
-    healCredentialFileModes({ hanakoHome: root });
+    healCredentialFileModes({ lingxiHome: root });
 
     expect(modeOf(path.join(root, "agents", "hanako", "config.yaml"))).toBe(0o600);
     expect(modeOf(path.join(root, "agents", "second", "config.yaml"))).toBe(0o600);
@@ -93,7 +93,7 @@ describe.skipIf(!POSIX)("healCredentialFileModes", () => {
     writeOpen(live, "api:\n  api_key: value\n");
     writeOpen(inCheckpoint, "api:\n  api_key: value\n");
 
-    const result = healCredentialFileModes({ hanakoHome: root });
+    const result = healCredentialFileModes({ lingxiHome: root });
 
     expect(modeOf(path.join(root, live))).toBe(0o600);
     expect(modeOf(path.join(root, inCheckpoint))).toBe(0o600);
@@ -113,7 +113,7 @@ describe.skipIf(!POSIX)("healCredentialFileModes", () => {
     writeOpen(live, "api:\n  api_key: value\n");
     writeOpen(inCheckpoint, "api:\n  api_key: value\n");
 
-    const result = healCredentialFileModes({ hanakoHome: root });
+    const result = healCredentialFileModes({ lingxiHome: root });
 
     expect(modeOf(path.join(root, live))).toBe(0o600);
     expect(modeOf(path.join(root, inCheckpoint))).toBe(0o600);
@@ -129,7 +129,7 @@ describe.skipIf(!POSIX)("healCredentialFileModes", () => {
     fs.chmodSync(backupDir, 0o755);
     fs.chmodSync(path.join(root, "migration-backups"), 0o755);
 
-    healCredentialFileModes({ hanakoHome: root });
+    healCredentialFileModes({ lingxiHome: root });
 
     expect(modeOf(path.join(root, "migration-backups"))).toBe(0o700);
     expect(modeOf(backupDir)).toBe(0o700);
@@ -150,7 +150,7 @@ describe.skipIf(!POSIX)("healCredentialFileModes", () => {
     fs.chmodSync(providerDir, 0o755);
     fs.chmodSync(pluginRoot, 0o755);
 
-    const result = healCredentialFileModes({ hanakoHome: root });
+    const result = healCredentialFileModes({ lingxiHome: root });
 
     expect(modeOf(pluginRoot)).toBe(0o700);
     expect(modeOf(providerDir)).toBe(0o700);
@@ -171,7 +171,7 @@ describe.skipIf(!POSIX)("healCredentialFileModes", () => {
     writeOpen(grantsFile, "{}\n");
     fs.chmodSync(securityRoot, 0o755);
 
-    const result = healCredentialFileModes({ hanakoHome: root });
+    const result = healCredentialFileModes({ lingxiHome: root });
 
     expect(modeOf(securityRoot)).toBe(0o700);
     expect(modeOf(path.join(root, keyFile))).toBe(0o600);
@@ -194,7 +194,7 @@ describe.skipIf(!POSIX)("healCredentialFileModes", () => {
     writeOpen(neighbour);
     fs.chmodSync(path.join(root, neighbour), 0o755);
 
-    const result = healCredentialFileModes({ hanakoHome: root });
+    const result = healCredentialFileModes({ lingxiHome: root });
 
     expect(modeOf(path.join(root, mcpConfig))).toBe(0o600);
     expect(modeOf(path.join(root, imageConfig))).toBe(0o600);
@@ -209,7 +209,7 @@ describe.skipIf(!POSIX)("healCredentialFileModes", () => {
       "api:\n  api_key: value\n",
     );
 
-    healCredentialFileModes({ hanakoHome: root });
+    healCredentialFileModes({ lingxiHome: root });
 
     expect(
       modeOf(path.join(root, "checkpoints", "session-manifest", "cp-1", "agents", "hanako", "config.yaml")),
@@ -221,7 +221,7 @@ describe.skipIf(!POSIX)("healCredentialFileModes", () => {
     writeOpen("provider-catalog.json");
     const lines: string[] = [];
 
-    const result = healCredentialFileModes({ hanakoHome: root, log: (line: string) => lines.push(line) });
+    const result = healCredentialFileModes({ lingxiHome: root, log: (line: string) => lines.push(line) });
 
     expect(result.healed).toContain("provider-catalog.json");
     expect(lines.join("\n")).toContain("provider-catalog.json");
@@ -235,7 +235,7 @@ describe.skipIf(!POSIX)("healCredentialFileModes", () => {
     fs.chmodSync(target, 0o600);
     const lines: string[] = [];
 
-    const result = healCredentialFileModes({ hanakoHome: root, log: (line: string) => lines.push(line) });
+    const result = healCredentialFileModes({ lingxiHome: root, log: (line: string) => lines.push(line) });
 
     expect(result.healed).toEqual([]);
     expect(result.failed).toEqual([]);
@@ -243,14 +243,14 @@ describe.skipIf(!POSIX)("healCredentialFileModes", () => {
   });
 
   it("refuses a missing data directory instead of reporting a clean run", () => {
-    expect(() => healCredentialFileModes({ hanakoHome: "" })).toThrowError(/data directory/);
+    expect(() => healCredentialFileModes({ lingxiHome: "" })).toThrowError(/data directory/);
   });
 
   it("skips files that are absent instead of failing", () => {
     const root = makeHome();
     fs.chmodSync(root, 0o700);
 
-    const result = healCredentialFileModes({ hanakoHome: root });
+    const result = healCredentialFileModes({ lingxiHome: root });
 
     expect(result.failed).toEqual([]);
   });
@@ -271,7 +271,7 @@ describe.skipIf(!POSIX)("healCredentialFileModes", () => {
     });
     const lines: string[] = [];
 
-    const result = healCredentialFileModes({ hanakoHome: root, log: (line: string) => lines.push(line) });
+    const result = healCredentialFileModes({ lingxiHome: root, log: (line: string) => lines.push(line) });
 
     expect(result.failed).toContain("provider-catalog.json");
     expect(result.healed).toContain("models.json");

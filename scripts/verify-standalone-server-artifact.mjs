@@ -89,13 +89,13 @@ function envValue(env, name) {
  */
 export function createRestrictedTokenSmokeRuntimeEnv({
   workDir,
-  hanaHome,
+  lingxiHome,
   helperPath,
   layoutRoot,
   env = process.env,
 } = {}) {
   if (!workDir) throw new Error("workDir is required");
-  if (!hanaHome) throw new Error("hanaHome is required");
+  if (!lingxiHome) throw new Error("lingxiHome is required");
   if (!helperPath) throw new Error("helperPath is required");
   if (!layoutRoot) throw new Error("layoutRoot is required");
 
@@ -117,7 +117,7 @@ export function createRestrictedTokenSmokeRuntimeEnv({
     APPDATA: appDataDir,
     USERPROFILE: profileDir,
     HOME: profileDir,
-    LINGXI_HOME: hanaHome,
+    LINGXI_HOME: lingxiHome,
     LINGXI_ROOT: path.win32.join(layoutRoot, "server"),
     LINGXI_SERVER_ENTRY: path.win32.join(layoutRoot, "server", "bundle", "index.js"),
     LINGXI_WIN32_SANDBOX_HELPER: helperPath,
@@ -152,13 +152,13 @@ export function createRestrictedTokenSmokeRuntimeEnv({
 export function standaloneRestrictedTokenSmokeSpec({
   layoutRoot,
   workDir,
-  hanaHome,
+  lingxiHome,
   helperPath = path.win32.join(layoutRoot, "sandbox", "windows", "lingxi-win-sandbox.exe"),
   env = process.env,
 }) {
   const { env: smokeEnv, runtimeDirs } = createRestrictedTokenSmokeRuntimeEnv({
     workDir,
-    hanaHome,
+    lingxiHome,
     helperPath,
     layoutRoot,
     env,
@@ -200,12 +200,12 @@ export function standaloneRestrictedTokenSmokeSpec({
 export function runRestrictedTokenHelperSmoke({
   layoutRoot,
   workDir,
-  hanaHome,
+  lingxiHome,
   helperPath,
   env = process.env,
   spawnSyncImpl = spawnSync,
 }) {
-  const spec = standaloneRestrictedTokenSmokeSpec({ layoutRoot, workDir, hanaHome, helperPath, env });
+  const spec = standaloneRestrictedTokenSmokeSpec({ layoutRoot, workDir, lingxiHome, helperPath, env });
   fs.mkdirSync(spec.blockedDir, { recursive: true });
   for (const dir of spec.runtimeDirs || []) {
     fs.mkdirSync(dir, { recursive: true });
@@ -262,10 +262,10 @@ export function restrictedTokenSmokeSpawnOptions({ cwd, env, timeout }) {
   };
 }
 
-export function standaloneExecCommandSmokeSpec({ layoutRoot, workDir, hanaHome, env = process.env }) {
+export function standaloneExecCommandSmokeSpec({ layoutRoot, workDir, lingxiHome, env = process.env }) {
   const baseEnv = createHermeticMinGitSmokeEnv({
     runtimeRoot: path.win32.join(layoutRoot, "git"),
-    workRoot: hanaHome,
+    workRoot: lingxiHome,
     env,
   });
   const helperPath = path.win32.join(layoutRoot, "sandbox", "windows", "lingxi-win-sandbox.exe");
@@ -281,7 +281,7 @@ export function standaloneExecCommandSmokeSpec({ layoutRoot, workDir, hanaHome, 
     windowsVerbatimArguments: true,
     env: {
       ...baseEnv,
-      LINGXI_HOME: hanaHome,
+      LINGXI_HOME: lingxiHome,
       // Poison values prove the extracted wrapper, rather than the verifier,
       // owns the packaged runtime contract before Node imports the probe.
       LINGXI_ROOT: "Z:\\hana-poison\\server",
@@ -313,12 +313,12 @@ function smokeExtractedRuntime({ rootDir, layoutRoot }) {
   fs.mkdirSync(workDir, { recursive: true });
   fs.mkdirSync(path.join(smokeHome, "agents", "standalone-smoke"), { recursive: true });
   try {
-    runRestrictedTokenHelperSmoke({ layoutRoot, workDir, hanaHome: smokeHome });
+    runRestrictedTokenHelperSmoke({ layoutRoot, workDir, lingxiHome: smokeHome });
 
     const execSpec = standaloneExecCommandSmokeSpec({
       layoutRoot,
       workDir,
-      hanaHome: smokeHome,
+      lingxiHome: smokeHome,
     });
     const execResult = spawnSync(execSpec.command, execSpec.args, {
       cwd: layoutRoot,

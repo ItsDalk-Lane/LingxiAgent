@@ -6,7 +6,7 @@ function createEngine(providerRegistry, mediaConfig: any = {}) {
   return {
     agentsDir: "/agents",
     channelsDir: null,
-    hanakoHome: "/tmp/hana",
+    lingxiHome: "/tmp/hana",
     providerRegistry,
     media: {
       getImageConfig: vi.fn(() => mediaConfig.image || {}),

@@ -17,7 +17,7 @@ function makeApp(engine) {
   });
 }
 
-async function makeRouteResourceIO({ hanakoHome, workspace, eventBus = {}, studioId = "studio_1" }: Record<string, any>) {
+async function makeRouteResourceIO({ lingxiHome, workspace, eventBus = {}, studioId = "studio_1" }: Record<string, any>) {
   const { createSandboxResourceIO } = await import("../lib/resource-io/sandbox-resource-io.ts");
   return createSandboxResourceIO({
     cwd: workspace,
@@ -25,7 +25,7 @@ async function makeRouteResourceIO({ hanakoHome, workspace, eventBus = {}, studi
     workspace,
     workspaceFolders: [workspace],
     authorizedFolders: [workspace],
-    hanakoHome,
+    lingxiHome,
     getSandboxEnabled: () => false,
     getSessionPath: () => null,
     emitEvent: (event: any) => {
@@ -52,7 +52,7 @@ describe("mobile workbench route", () => {
     fs.writeFileSync(path.join(workspace, "note.md"), "hello", "utf-8");
     fs.writeFileSync(path.join(workspace, ".secret"), "hidden", "utf-8");
     const app = await makeApp({
-      hanakoHome: path.join(tmpDir, "hana"),
+      lingxiHome: path.join(tmpDir, "hana"),
       deskCwd: workspace,
       homeCwd: workspace,
     });
@@ -72,11 +72,11 @@ describe("mobile workbench route", () => {
     tmpDir = makeTmpDir();
     const workspace = path.join(tmpDir, "workspace");
     const mountRoot = path.join(tmpDir, "client-project");
-    const hanakoHome = path.join(tmpDir, "hana");
+    const lingxiHome = path.join(tmpDir, "hana");
     fs.mkdirSync(workspace, { recursive: true });
     fs.mkdirSync(mountRoot, { recursive: true });
     fs.writeFileSync(path.join(mountRoot, "brief.md"), "brief", "utf-8");
-    upsertStudioMount(hanakoHome, {
+    upsertStudioMount(lingxiHome, {
       mountId: "mount_client",
       hostStudioId: "studio_1",
       sourceKind: "storage",
@@ -87,7 +87,7 @@ describe("mobile workbench route", () => {
       capabilities: ["list", "read", "write"],
     });
     const app = await makeApp({
-      hanakoHome,
+      lingxiHome,
       deskCwd: workspace,
       homeCwd: workspace,
       getRuntimeContext: () => ({
@@ -120,7 +120,7 @@ describe("mobile workbench route", () => {
     fs.mkdirSync(workspace, { recursive: true });
     fs.writeFileSync(path.join(workspace, "note.md"), "old", "utf-8");
     const app = await makeApp({
-      hanakoHome: path.join(tmpDir, "hana"),
+      lingxiHome: path.join(tmpDir, "hana"),
       deskCwd: workspace,
       homeCwd: workspace,
     });
@@ -167,7 +167,7 @@ describe("mobile workbench route", () => {
     const workspace = path.join(tmpDir, "workspace");
     fs.mkdirSync(workspace, { recursive: true });
     const app = await makeApp({
-      hanakoHome: path.join(tmpDir, "hana"),
+      lingxiHome: path.join(tmpDir, "hana"),
       userDir: path.join(tmpDir, "hana", "user"),
       agentDir: path.join(tmpDir, "hana", "agents", "hana"),
       deskCwd: workspace,
@@ -240,7 +240,7 @@ describe("mobile workbench route", () => {
     fs.mkdirSync(workspace, { recursive: true });
     fs.writeFileSync(path.join(workspace, "粘贴图片.md"), "abcdef", "utf-8");
     const app = await makeApp({
-      hanakoHome: path.join(tmpDir, "hana"),
+      lingxiHome: path.join(tmpDir, "hana"),
       deskCwd: workspace,
       homeCwd: workspace,
     });
@@ -262,11 +262,11 @@ describe("mobile workbench route", () => {
   it("safe-deletes mobile files into recoverable trash instead of hard removing bytes", async () => {
     tmpDir = makeTmpDir();
     const workspace = path.join(tmpDir, "workspace");
-    const hanakoHome = path.join(tmpDir, "hana");
+    const lingxiHome = path.join(tmpDir, "hana");
     fs.mkdirSync(workspace, { recursive: true });
     fs.writeFileSync(path.join(workspace, "draft.txt"), "keep me recoverable", "utf-8");
     const app = await makeApp({
-      hanakoHome,
+      lingxiHome,
       deskCwd: workspace,
       homeCwd: workspace,
     });
@@ -282,7 +282,7 @@ describe("mobile workbench route", () => {
     expect(data).toMatchObject({ ok: true, action: "safeDelete" });
     expect(data.trashId).toMatch(/^trash_/);
     expect(fs.existsSync(path.join(workspace, "draft.txt"))).toBe(false);
-    const trashDir = path.join(hanakoHome, "trash", "mobile-workbench", data.trashId);
+    const trashDir = path.join(lingxiHome, "trash", "mobile-workbench", data.trashId);
     expect(fs.readFileSync(path.join(trashDir, "payload"), "utf-8")).toBe("keep me recoverable");
     expect(JSON.parse(fs.readFileSync(path.join(trashDir, "metadata.json"), "utf-8")))
       .toMatchObject({ originalName: "draft.txt", rootId: "default" });
@@ -296,7 +296,7 @@ describe("mobile workbench route", () => {
     fs.writeFileSync(target, "old", "utf-8");
     const before = fs.statSync(target);
     const app = await makeApp({
-      hanakoHome: path.join(tmpDir, "hana"),
+      lingxiHome: path.join(tmpDir, "hana"),
       deskCwd: workspace,
       homeCwd: workspace,
     });
@@ -351,12 +351,12 @@ describe("mobile workbench route", () => {
     const realTarget = fs.realpathSync(target);
     const changed = vi.fn();
     const resourceIO = await makeRouteResourceIO({
-      hanakoHome: path.join(tmpDir, "hana"),
+      lingxiHome: path.join(tmpDir, "hana"),
       workspace,
       eventBus: { changed },
     });
     const app = await makeApp({
-      hanakoHome: path.join(tmpDir, "hana"),
+      lingxiHome: path.join(tmpDir, "hana"),
       deskCwd: workspace,
       homeCwd: workspace,
       getResourceIO: () => resourceIO,
@@ -388,19 +388,19 @@ describe("mobile workbench route", () => {
   it("emits ResourceEvents for Workbench mkdir, rename, and safe delete", async () => {
     tmpDir = makeTmpDir();
     const workspace = path.join(tmpDir, "workspace");
-    const hanakoHome = path.join(tmpDir, "hana");
+    const lingxiHome = path.join(tmpDir, "hana");
     fs.mkdirSync(workspace, { recursive: true });
     fs.writeFileSync(path.join(workspace, "draft.md"), "draft", "utf-8");
     const changed = vi.fn();
     const renamed = vi.fn();
     const deleted = vi.fn();
     const resourceIO = await makeRouteResourceIO({
-      hanakoHome,
+      lingxiHome,
       workspace,
       eventBus: { changed, renamed, deleted },
     });
     const app = await makeApp({
-      hanakoHome,
+      lingxiHome,
       deskCwd: workspace,
       homeCwd: workspace,
       getResourceIO: () => resourceIO,
@@ -455,7 +455,7 @@ describe("mobile workbench route", () => {
     const workspace = path.join(tmpDir, "workspace");
     fs.mkdirSync(workspace, { recursive: true });
     const app = await makeApp({
-      hanakoHome: path.join(tmpDir, "hana"),
+      lingxiHome: path.join(tmpDir, "hana"),
       deskCwd: workspace,
       homeCwd: workspace,
     });
@@ -475,7 +475,7 @@ describe("mobile workbench route", () => {
     const workspace = path.join(tmpDir, "workspace");
     fs.mkdirSync(workspace, { recursive: true });
     const app = await makeApp({
-      hanakoHome: path.join(tmpDir, "hana"),
+      lingxiHome: path.join(tmpDir, "hana"),
       deskCwd: workspace,
       homeCwd: workspace,
     });
@@ -501,7 +501,7 @@ describe("mobile workbench route", () => {
     const workspace = path.join(tmpDir, "workspace");
     fs.mkdirSync(workspace, { recursive: true });
     const app = await makeApp({
-      hanakoHome: path.join(tmpDir, "hana"),
+      lingxiHome: path.join(tmpDir, "hana"),
       deskCwd: workspace,
       homeCwd: workspace,
     });
@@ -551,7 +551,7 @@ describe("mobile workbench route", () => {
       await next();
     });
     app.route("/api", createMobileWorkbenchRoute({
-      hanakoHome: path.join(tmpDir, "hana"),
+      lingxiHome: path.join(tmpDir, "hana"),
       deskCwd: workspace,
       homeCwd: workspace,
       getRuntimeContext: () => ({
@@ -581,11 +581,11 @@ describe("mobile workbench route", () => {
     tmpDir = makeTmpDir();
     const workspace = path.join(tmpDir, "workspace");
     const mountRoot = path.join(tmpDir, "mounted-docs");
-    const hanakoHome = path.join(tmpDir, "hana");
+    const lingxiHome = path.join(tmpDir, "hana");
     fs.mkdirSync(workspace, { recursive: true });
     fs.mkdirSync(mountRoot, { recursive: true });
     fs.writeFileSync(path.join(mountRoot, "mounted.md"), "mount body", "utf-8");
-    upsertStudioMount(hanakoHome, {
+    upsertStudioMount(lingxiHome, {
       mountId: "mount_docs",
       hostStudioId: "studio_1",
       sourceKind: "storage",
@@ -596,7 +596,7 @@ describe("mobile workbench route", () => {
       capabilities: ["list", "read", "write"],
     });
     const app = await makeApp({
-      hanakoHome,
+      lingxiHome,
       deskCwd: workspace,
       homeCwd: workspace,
       getRuntimeContext: () => ({
@@ -627,11 +627,11 @@ describe("mobile workbench route", () => {
     tmpDir = makeTmpDir();
     const workspace = path.join(tmpDir, "workspace");
     const mountRoot = path.join(tmpDir, "mounted-docs");
-    const hanakoHome = path.join(tmpDir, "hana");
+    const lingxiHome = path.join(tmpDir, "hana");
     fs.mkdirSync(workspace, { recursive: true });
     fs.mkdirSync(mountRoot, { recursive: true });
     fs.writeFileSync(path.join(mountRoot, "mounted.md"), "mount body", "utf-8");
-    upsertStudioMount(hanakoHome, {
+    upsertStudioMount(lingxiHome, {
       mountId: "mount_docs",
       hostStudioId: "studio_1",
       sourceKind: "storage",
@@ -642,7 +642,7 @@ describe("mobile workbench route", () => {
       capabilities: ["list", "read", "write"],
     });
     const app = await makeApp({
-      hanakoHome,
+      lingxiHome,
       deskCwd: workspace,
       homeCwd: workspace,
       getRuntimeContext: () => ({
@@ -698,12 +698,12 @@ describe("mobile workbench route", () => {
     tmpDir = makeTmpDir();
     const workspace = path.join(tmpDir, "workspace");
     const mountRoot = path.join(tmpDir, "mounted-docs");
-    const hanakoHome = path.join(tmpDir, "hana");
+    const lingxiHome = path.join(tmpDir, "hana");
     fs.mkdirSync(path.join(mountRoot, "notes"), { recursive: true });
     fs.mkdirSync(path.join(mountRoot, "archive"), { recursive: true });
     fs.mkdirSync(workspace, { recursive: true });
     fs.writeFileSync(path.join(mountRoot, "notes", "draft.md"), "draft", "utf-8");
-    upsertStudioMount(hanakoHome, {
+    upsertStudioMount(lingxiHome, {
       mountId: "mount_docs",
       hostStudioId: "studio_1",
       sourceKind: "storage",
@@ -714,7 +714,7 @@ describe("mobile workbench route", () => {
       capabilities: ["list", "read", "write"],
     });
     const app = await makeApp({
-      hanakoHome,
+      lingxiHome,
       deskCwd: workspace,
       homeCwd: workspace,
       getRuntimeContext: () => ({
@@ -757,7 +757,7 @@ describe("mobile workbench route", () => {
   it("creates and consumes an execution lease for remote mobile writes", async () => {
     tmpDir = makeTmpDir();
     const workspace = path.join(tmpDir, "workspace");
-    const hanakoHome = path.join(tmpDir, "hana");
+    const lingxiHome = path.join(tmpDir, "hana");
     fs.mkdirSync(workspace, { recursive: true });
     const app = new Hono();
     const { createMobileWorkbenchRoute } = await import("../server/routes/mobile-workbench.ts");
@@ -776,7 +776,7 @@ describe("mobile workbench route", () => {
       await next();
     });
     app.route("/api", createMobileWorkbenchRoute({
-      hanakoHome,
+      lingxiHome,
       currentAgentId: "hana",
       deskCwd: workspace,
       homeCwd: workspace,
@@ -796,7 +796,7 @@ describe("mobile workbench route", () => {
 
     expect(res.status).toBe(200);
     expect(fs.readFileSync(path.join(workspace, "remote.md"), "utf-8")).toBe("remote body");
-    const leases = JSON.parse(fs.readFileSync(path.join(hanakoHome, "security", "execution-leases.json"), "utf-8"));
+    const leases = JSON.parse(fs.readFileSync(path.join(lingxiHome, "security", "execution-leases.json"), "utf-8"));
     expect(leases.leases).toHaveLength(1);
     expect(leases.leases[0]).toMatchObject({
       status: "consumed",
@@ -810,7 +810,7 @@ describe("mobile workbench route", () => {
       agentId: "mobile_workbench",
       sessionId: "mobile_workbench",
     });
-    const audit = fs.readFileSync(path.join(hanakoHome, "logs", "security-audit.jsonl"), "utf-8");
+    const audit = fs.readFileSync(path.join(lingxiHome, "logs", "security-audit.jsonl"), "utf-8");
     expect(audit).toContain(leases.leases[0].leaseId);
   });
 });

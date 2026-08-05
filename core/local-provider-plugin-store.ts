@@ -252,15 +252,15 @@ export function providerConfigHasLocalDefinition(config: any) {
 }
 
 export class LocalProviderPluginStore {
-  declare _hanakoHome: string;
+  declare _lingxiHome: string;
 
-  constructor(hanakoHome: string) {
-    if (!hanakoHome) throw new Error("LocalProviderPluginStore requires hanakoHome");
-    this._hanakoHome = hanakoHome;
+  constructor(lingxiHome: string) {
+    if (!lingxiHome) throw new Error("LocalProviderPluginStore requires lingxiHome");
+    this._lingxiHome = lingxiHome;
   }
 
   get rootDir() {
-    return path.join(this._hanakoHome, LOCAL_PROVIDER_PLUGINS_DIR);
+    return path.join(this._lingxiHome, LOCAL_PROVIDER_PLUGINS_DIR);
   }
 
   providerDir(providerId: string) {

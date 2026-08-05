@@ -14,11 +14,11 @@ export function sessionFileSidecarPath(sessionPath) {
   return `${sessionPath}.files.json`;
 }
 
-export function sessionFilesCacheDir(hanakoHome, sessionRef) {
-  if (!hanakoHome) throw new Error("hanakoHome is required for session file cache");
+export function sessionFilesCacheDir(lingxiHome, sessionRef) {
+  if (!lingxiHome) throw new Error("lingxiHome is required for session file cache");
   if (!sessionRef) throw new Error("sessionPath is required for session file cache");
   const hash = createHash("sha256").update(sessionFileOwnerKey(sessionRef)).digest("hex").slice(0, 24);
-  return path.join(hanakoHome, "session-files", hash);
+  return path.join(lingxiHome, "session-files", hash);
 }
 
 export function buildSessionFileSourceKey(namespace, parts = []) {

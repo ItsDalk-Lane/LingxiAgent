@@ -48,7 +48,7 @@ describe("TerminalSessionManager", () => {
 
   it("keeps terminal ownership scoped to the creating session", async () => {
     const manager = new TerminalSessionManager({
-      hanakoHome: tmpDir,
+      lingxiHome: tmpDir,
       createBackend: () => backend,
       now: () => 1770000000000,
     });
@@ -98,7 +98,7 @@ describe("TerminalSessionManager", () => {
 
   it("rejects start with a missing cwd before touching the pty backend", async () => {
     const manager = new TerminalSessionManager({
-      hanakoHome: tmpDir,
+      lingxiHome: tmpDir,
       createBackend: () => backend,
       now: () => 1770000000000,
     });
@@ -115,7 +115,7 @@ describe("TerminalSessionManager", () => {
 
   it("writes only to a running terminal owned by the same session", async () => {
     const manager = new TerminalSessionManager({
-      hanakoHome: tmpDir,
+      lingxiHome: tmpDir,
       createBackend: () => backend,
     });
     const sessionPath = path.join(tmpDir, "agents", "hana", "sessions", "s1.jsonl");
@@ -142,7 +142,7 @@ describe("TerminalSessionManager", () => {
 
   it("closes live terminals for one session without touching another session", async () => {
     const manager = new TerminalSessionManager({
-      hanakoHome: tmpDir,
+      lingxiHome: tmpDir,
       createBackend: () => backend,
     });
     const sessionPath = path.join(tmpDir, "agents", "hana", "sessions", "s1.jsonl");
@@ -170,7 +170,7 @@ describe("TerminalSessionManager", () => {
     const movedPath = path.join(tmpDir, "agents", "hana", "sessions", "archived", "renamed.jsonl");
     const sessionId = "sess_terminal_stable";
     const manager = new TerminalSessionManager({
-      hanakoHome: tmpDir,
+      lingxiHome: tmpDir,
       createBackend: () => backend,
       getSessionIdForPath: (sessionPath: string) => (
         sessionPath === originalPath || sessionPath === movedPath ? sessionId : null
@@ -191,7 +191,7 @@ describe("TerminalSessionManager", () => {
 
   it("uses the backend dispose contract before falling back to kill", async () => {
     const manager = new TerminalSessionManager({
-      hanakoHome: tmpDir,
+      lingxiHome: tmpDir,
       createBackend: () => backend,
     });
     const sessionPath = path.join(tmpDir, "agents", "hana", "sessions", "s1.jsonl");
@@ -212,14 +212,14 @@ describe("TerminalSessionManager", () => {
   it("marks previously running terminals stale after manager restart and preserves transcript", async () => {
     const sessionPath = path.join(tmpDir, "agents", "hana", "sessions", "s1.jsonl");
     const manager = new TerminalSessionManager({
-      hanakoHome: tmpDir,
+      lingxiHome: tmpDir,
       createBackend: () => backend,
     });
     const started = await manager.start({ sessionPath, agentId: "hana", cwd: tmpDir });
     backend.handles[0].emit("line before restart\n");
 
     const restarted = new TerminalSessionManager({
-      hanakoHome: tmpDir,
+      lingxiHome: tmpDir,
       createBackend: () => makeFakeBackend(),
     });
 

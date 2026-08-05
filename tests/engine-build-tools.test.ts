@@ -49,7 +49,7 @@ describe("LingxiEngine.buildTools", () => {
     const missingAgentDir = path.join(tmpDir, "agents", "missing");
 
     const engine = Object.create(LingxiEngine.prototype);
-    engine.hanakoHome = tmpDir;
+    engine.lingxiHome = tmpDir;
     engine.getAgent = vi.fn(() => null);
     engine._pluginManager = null;
     engine._prefs = { getFileBackup: () => ({ enabled: false }) };
@@ -73,7 +73,7 @@ describe("LingxiEngine.buildTools", () => {
     const agentDir = path.join(tmpDir, "agents", "focus");
     const agent = { id: "focus", agentDir, config: {}, tools: [] };
     const engine = Object.create(LingxiEngine.prototype);
-    engine.hanakoHome = tmpDir;
+    engine.lingxiHome = tmpDir;
     engine.getAgent = vi.fn(() => agent);
     engine._pluginManager = null;
     engine._prefs = { getFileBackup: () => ({ enabled: false }) };
@@ -94,7 +94,7 @@ describe("LingxiEngine.buildTools", () => {
 
     const makeEngine = (pluginTools: any[] = [], pluginDevToolsEnabled = false) => {
       const engine = Object.create(LingxiEngine.prototype);
-      engine.hanakoHome = tmpDir;
+      engine.lingxiHome = tmpDir;
       engine.getAgent = vi.fn(() => agent);
       engine._pluginManager = pluginTools.length ? { getAllTools: () => pluginTools } : null;
       engine._pluginDevService = pluginDevToolsEnabled ? {} : null;
@@ -142,7 +142,7 @@ describe("LingxiEngine.buildTools", () => {
     };
 
     const engine = Object.create(LingxiEngine.prototype);
-    engine.hanakoHome = tmpDir;
+    engine.lingxiHome = tmpDir;
     engine.getAgent = vi.fn(() => ({ id: "focus", agentDir, tools: [] }));
     engine._pluginManager = null;
     engine._prefs = { getFileBackup: () => ({ enabled: false }) };
@@ -192,7 +192,7 @@ describe("LingxiEngine.buildTools", () => {
     };
 
     const engine = Object.create(LingxiEngine.prototype);
-    engine.hanakoHome = tmpDir;
+    engine.lingxiHome = tmpDir;
     engine.getAgent = vi.fn(() => ({ id: "focus", agentDir, tools: [] }));
     engine._pluginManager = null;
     engine._prefs = { getFileBackup: () => ({ enabled: false }) };
@@ -249,7 +249,7 @@ describe("LingxiEngine.buildTools", () => {
     const agent = { id: "focus", agentDir, config: {}, tools: [] };
 
     const engine = Object.create(LingxiEngine.prototype);
-    engine.hanakoHome = tmpDir;
+    engine.lingxiHome = tmpDir;
     engine.getAgent = vi.fn(() => agent);
     engine.getSessionIdForPath = vi.fn(() => "sess_isolated");
     engine._pluginManager = null;
@@ -282,7 +282,7 @@ describe("LingxiEngine.buildTools", () => {
   it("wires utility model reviewers into the default approval gateway", async () => {
     tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "hana-engine-approval-gateway-"));
     const engine = new LingxiEngine({
-      hanakoHome: tmpDir,
+      lingxiHome: tmpDir,
       productDir: tmpDir,
       agentId: "hana",
     } as any);
@@ -374,7 +374,7 @@ describe("LingxiEngine.buildTools", () => {
     };
 
     const engine = Object.create(LingxiEngine.prototype);
-    engine.hanakoHome = tmpDir;
+    engine.lingxiHome = tmpDir;
     engine.getAgent = vi.fn(() => agent);
     engine.isChannelsEnabled = vi.fn(() => false);
     engine._pluginManager = null;
@@ -409,7 +409,7 @@ describe("LingxiEngine.buildTools", () => {
     const agent = { id: "focus", agentDir, config: {}, tools: [] };
 
     const engine = Object.create(LingxiEngine.prototype);
-    engine.hanakoHome = tmpDir;
+    engine.lingxiHome = tmpDir;
     engine.getAgent = vi.fn(() => agent);
     engine._pluginManager = null;
     // MCP tools come from the engine-owned manager, not the plugin registry.
@@ -458,7 +458,7 @@ describe("LingxiEngine.buildTools", () => {
     const agent = { id: "focus", agentDir, config: {}, tools: [] };
 
     const engine = Object.create(LingxiEngine.prototype);
-    engine.hanakoHome = tmpDir;
+    engine.lingxiHome = tmpDir;
     engine.getAgent = vi.fn(() => agent);
     engine._pluginManager = null;
     engine._mcp = {
@@ -488,7 +488,7 @@ describe("LingxiEngine.buildTools", () => {
     };
 
     const engine = Object.create(LingxiEngine.prototype);
-    engine.hanakoHome = tmpDir;
+    engine.lingxiHome = tmpDir;
     engine._runtimeContext = {
       serverId: "server_engine",
       serverNodeId: "node_engine",
@@ -559,7 +559,7 @@ describe("LingxiEngine.buildTools", () => {
     };
 
     const engine = Object.create(LingxiEngine.prototype);
-    engine.hanakoHome = tmpDir;
+    engine.lingxiHome = tmpDir;
     engine._runtimeContext = {
       serverId: "server_engine",
       serverNodeId: "node_engine",
@@ -619,7 +619,7 @@ describe("LingxiEngine.buildTools", () => {
     const agent = { id: "focus", agentDir, config: {}, tools: [] };
 
     const engine = Object.create(LingxiEngine.prototype);
-    engine.hanakoHome = tmpDir;
+    engine.lingxiHome = tmpDir;
     engine.getAgent = vi.fn(() => agent);
     engine._pluginManager = null;
     engine._prefs = { getFileBackup: () => ({ enabled: false }) };
@@ -673,7 +673,7 @@ describe("LingxiEngine.buildTools", () => {
     };
 
     const engine = Object.create(LingxiEngine.prototype);
-    engine.hanakoHome = tmpDir;
+    engine.lingxiHome = tmpDir;
     engine._runtimeContext = {
       serverId: "server_engine",
       serverNodeId: "node_engine",
@@ -752,7 +752,7 @@ describe("LingxiEngine.buildTools", () => {
       operation,
     }));
     const engine = Object.create(LingxiEngine.prototype);
-    engine.hanakoHome = tmpDir;
+    engine.lingxiHome = tmpDir;
     engine.registerSessionFile = registerSessionFile;
     engine.getAgent = vi.fn(() => ({ id: "focus", agentDir, tools: [] }));
     engine._pluginManager = null;
@@ -851,7 +851,7 @@ describe("LingxiEngine.buildTools", () => {
       operation,
     }));
     const engine = Object.create(LingxiEngine.prototype);
-    engine.hanakoHome = tmpDir;
+    engine.lingxiHome = tmpDir;
     engine.registerSessionFile = registerSessionFile;
     engine.getAgent = vi.fn(() => ({ id: "focus", agentDir, tools: [] }));
     engine._pluginManager = null;
@@ -916,12 +916,12 @@ describe("LingxiEngine.buildTools", () => {
     fs.mkdirSync(agentDir, { recursive: true });
     fs.mkdirSync(workspace, { recursive: true });
     fs.mkdirSync(authorized, { recursive: true });
-    const hanakoHome = path.join(tmpDir, "hanako-home");
-    fs.mkdirSync(hanakoHome, { recursive: true });
+    const lingxiHome = path.join(tmpDir, "hanako-home");
+    fs.mkdirSync(lingxiHome, { recursive: true });
     let authorizedFolders = [];
 
     const engine = Object.create(LingxiEngine.prototype);
-    engine.hanakoHome = hanakoHome;
+    engine.lingxiHome = lingxiHome;
     engine.registerSessionFile = vi.fn((entry) => ({
       id: "sf-authorized",
       ...entry,
@@ -983,7 +983,7 @@ describe("LingxiEngine.buildTools", () => {
     fs.writeFileSync(configPath, "agent:\n  name: Hana\n  yuan: lingxi\n", "utf-8");
 
     const engine = Object.create(LingxiEngine.prototype);
-    engine.hanakoHome = tmpDir;
+    engine.lingxiHome = tmpDir;
     engine.registerSessionFile = vi.fn();
     engine.getAgent = vi.fn(() => ({ id: "focus", agentDir, tools: [] }));
     engine._pluginManager = null;
@@ -1026,7 +1026,7 @@ describe("LingxiEngine.buildTools", () => {
     tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "hana-build-tools-dev-"));
     const agentDir = path.join(tmpDir, "agents", "focus");
     const engine = Object.create(LingxiEngine.prototype);
-    engine.hanakoHome = tmpDir;
+    engine.lingxiHome = tmpDir;
     engine.getAgent = vi.fn(() => ({ id: "focus", agentDir, tools: [] }));
     engine._pluginManager = null;
     engine._pluginDevService = { getDiagnostics: vi.fn() };
@@ -1059,7 +1059,7 @@ describe("LingxiEngine.buildTools", () => {
     tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "hana-build-tools-dev-"));
     const agentDir = path.join(tmpDir, "agents", "focus");
     const engine = Object.create(LingxiEngine.prototype);
-    engine.hanakoHome = tmpDir;
+    engine.lingxiHome = tmpDir;
     engine.getAgent = vi.fn(() => ({ id: "focus", agentDir, tools: [] }));
     engine._pluginManager = null;
     engine._pluginDevService = {

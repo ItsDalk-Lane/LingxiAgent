@@ -41,19 +41,19 @@ interface CheckpointSummary {
   totalBytes: number;
 }
 
-function checkpointsRootFor(hanaHome: string): string {
-  return path.join(hanaHome, DATA_EPOCH_CHECKPOINTS_DIRNAME);
+function checkpointsRootFor(lingxiHome: string): string {
+  return path.join(lingxiHome, DATA_EPOCH_CHECKPOINTS_DIRNAME);
 }
 
 /**
  * Lists every published, complete checkpoint under
- * {hanaHome}/data-epoch-checkpoints. `.tmp-*` staging and `.invalid-*`
+ * {lingxiHome}/data-epoch-checkpoints. `.tmp-*` staging and `.invalid-*`
  * quarantine siblings are provider-internal and are never a usable
  * checkpoint (see core/data-epoch-checkpoint-provider.ts's own retention
  * pass) — they are counted but not listed.
  */
-function listDataEpochCheckpoints(hanaHome: string): { checkpoints: CheckpointSummary[]; skipped: number } {
-  const root = checkpointsRootFor(hanaHome);
+function listDataEpochCheckpoints(lingxiHome: string): { checkpoints: CheckpointSummary[]; skipped: number } {
+  const root = checkpointsRootFor(lingxiHome);
   let entries: fs.Dirent[];
   try {
     entries = fs.readdirSync(root, { withFileTypes: true });
@@ -116,11 +116,11 @@ function formatBytes(bytes: number): string {
  * readDataEpochRestoreJournal, inspectDataEpochMaintenance,
  * listDataEpochCheckpoints) only reads.
  */
-export async function runDataDiagnose({ hanaHome = resolveCliLingxiHome() }: { hanaHome?: string } = {}): Promise<number> {
-  console.log(`Data-epoch diagnostics ${ansi.dim}(${hanaHome})${ansi.reset}`);
+export async function runDataDiagnose({ lingxiHome = resolveCliLingxiHome() }: { lingxiHome?: string } = {}): Promise<number> {
+  console.log(`Data-epoch diagnostics ${ansi.dim}(${lingxiHome})${ansi.reset}`);
   console.log(`  Kernel DATA_EPOCH    ${DATA_EPOCH}`);
 
-  const stampRead = readDataEpochStamp(hanaHome);
+  const stampRead = readDataEpochStamp(lingxiHome);
   if (stampRead.status === "ok") {
     const stamp = stampRead.stamp;
     console.log(`  Stamp                minimumReaderEpoch=${stamp.minimumReaderEpoch} committedDataEpoch=${stamp.committedDataEpoch}`);
@@ -135,8 +135,8 @@ export async function runDataDiagnose({ hanaHome = resolveCliLingxiHome() }: { h
   // journal shapes (forward transition vs. in-progress restore) — see
   // shared/data-epoch.cjs's readDataEpochRestoreJournal doc comment. A
   // file that parses as neither is genuinely corrupt.
-  const forwardJournal = readDataEpochJournal(hanaHome);
-  const restoreJournal = readDataEpochRestoreJournal(hanaHome);
+  const forwardJournal = readDataEpochJournal(lingxiHome);
+  const restoreJournal = readDataEpochRestoreJournal(lingxiHome);
   if (forwardJournal.status === "ok") {
     const j = forwardJournal.journal;
     console.log(`  Transition journal   ${j.transitionId} phase=${j.phase} ${j.fromEpoch}→${j.toEpoch}`);
@@ -149,7 +149,7 @@ export async function runDataDiagnose({ hanaHome = resolveCliLingxiHome() }: { h
     console.log(`  Journal              ${ansi.red}corrupt: ${forwardJournal.detail}${ansi.reset}`);
   }
 
-  const maintenance = inspectDataEpochMaintenance(hanaHome);
+  const maintenance = inspectDataEpochMaintenance(lingxiHome);
   if (maintenance.status === "none") {
     console.log(`  Maintenance          ${ansi.green}steady, no transition in progress${ansi.reset}`);
   } else if (maintenance.status === "corrupt") {
@@ -160,7 +160,7 @@ export async function runDataDiagnose({ hanaHome = resolveCliLingxiHome() }: { h
     console.log(`  Affected stores      ${maintenance.affectedStoreIds.join(", ") || "none"}`);
   }
 
-  const { checkpoints, skipped } = listDataEpochCheckpoints(hanaHome);
+  const { checkpoints, skipped } = listDataEpochCheckpoints(lingxiHome);
   const skippedNote = skipped ? ` (${skipped} incomplete/invalid, not listed)` : "";
   if (checkpoints.length === 0) {
     console.log(`  Checkpoints          ${ansi.dim}none available${ansi.reset}${skippedNote}`);
@@ -174,15 +174,15 @@ export async function runDataDiagnose({ hanaHome = resolveCliLingxiHome() }: { h
 /**
  * `hana data checkpoints` — lists every available recovery checkpoint.
  */
-export async function runDataCheckpoints({ hanaHome = resolveCliLingxiHome() }: { hanaHome?: string } = {}): Promise<number> {
-  const { checkpoints, skipped } = listDataEpochCheckpoints(hanaHome);
+export async function runDataCheckpoints({ lingxiHome = resolveCliLingxiHome() }: { lingxiHome?: string } = {}): Promise<number> {
+  const { checkpoints, skipped } = listDataEpochCheckpoints(lingxiHome);
   if (checkpoints.length === 0) {
     console.log(`${ansi.dim}No data-epoch checkpoints available.${ansi.reset}`);
     if (skipped) console.log(`${ansi.dim}(${skipped} incomplete/invalid checkpoint director${skipped === 1 ? "y" : "ies"} found and skipped.)${ansi.reset}`);
     return 0;
   }
 
-  console.log(`Data-epoch checkpoints ${ansi.dim}(${hanaHome})${ansi.reset}`);
+  console.log(`Data-epoch checkpoints ${ansi.dim}(${lingxiHome})${ansi.reset}`);
   for (const checkpoint of checkpoints) {
     console.log("");
     console.log(`  ${ansi.bold}${checkpoint.transitionId}${ansi.reset}`);
@@ -221,14 +221,14 @@ function defaultPromptConfirmation(question: string): Promise<string> {
 export async function runDataRestore({
   transitionId,
   confirmToken = null,
-  hanaHome = resolveCliLingxiHome(),
+  lingxiHome = resolveCliLingxiHome(),
   restore = restoreDataEpochCheckpoint,
   isTTY = process.stdin.isTTY === true,
   promptConfirmation = defaultPromptConfirmation,
 }: {
   transitionId: string | null;
   confirmToken?: string | null;
-  hanaHome?: string;
+  lingxiHome?: string;
   restore?: typeof restoreDataEpochCheckpoint;
   isTTY?: boolean;
   promptConfirmation?: (question: string) => Promise<string>;
@@ -238,12 +238,12 @@ export async function runDataRestore({
     return 1;
   }
 
-  const checkpointDir = path.join(checkpointsRootFor(hanaHome), transitionId);
+  const checkpointDir = path.join(checkpointsRootFor(lingxiHome), transitionId);
   let metadata: Partial<DataEpochCheckpointMetadata>;
   try {
     metadata = JSON.parse(fs.readFileSync(path.join(checkpointDir, "metadata.json"), "utf-8"));
   } catch {
-    console.error(`${ansi.red}No checkpoint found for transitionId "${transitionId}" in ${checkpointsRootFor(hanaHome)}.${ansi.reset}`);
+    console.error(`${ansi.red}No checkpoint found for transitionId "${transitionId}" in ${checkpointsRootFor(lingxiHome)}.${ansi.reset}`);
     console.error(`${ansi.dim}Run \`hana data checkpoints\` to see what is available.${ansi.reset}`);
     return 1;
   }
@@ -280,7 +280,7 @@ export async function runDataRestore({
 
   try {
     const result = await restore({
-      homeDir: hanaHome,
+      homeDir: lingxiHome,
       transitionId,
       confirmToken: token,
       log: { warn: (msg: string) => console.error(`${ansi.dim}${msg}${ansi.reset}`) },

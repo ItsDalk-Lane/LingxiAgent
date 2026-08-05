@@ -14,16 +14,16 @@ export function sanitizeSessionManifestFileSuffix(value) {
 }
 
 export function moveSessionManifestDbFilesAside(opts: any = {}) {
-  if (!opts.hanaHome) throw new Error("moveSessionManifestDbFilesAside requires hanaHome");
+  if (!opts.lingxiHome) throw new Error("moveSessionManifestDbFilesAside requires lingxiHome");
   if (!opts.suffix) throw new Error("moveSessionManifestDbFilesAside requires suffix");
-  const hanaHome = path.resolve(opts.hanaHome);
+  const lingxiHome = path.resolve(opts.lingxiHome);
   const suffix = sanitizeSessionManifestFileSuffix(opts.suffix);
   const moved = [];
 
   for (const name of SESSION_MANIFEST_DB_FILE_NAMES) {
-    const from = path.join(hanaHome, name);
+    const from = path.join(lingxiHome, name);
     if (!fs.existsSync(from)) continue;
-    const to = path.join(hanaHome, `${name}.${suffix}`);
+    const to = path.join(lingxiHome, `${name}.${suffix}`);
     if (fs.existsSync(to)) {
       throw new Error(`Session manifest database target already exists: ${to}`);
     }

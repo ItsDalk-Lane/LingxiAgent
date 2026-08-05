@@ -104,8 +104,8 @@ export function normalizeProviderMediaConfigMap(rawProviders) {
   return { providers, changed };
 }
 
-export function migrateProviderMediaConfig(hanakoHome, log: (...args: any[]) => void = () => {}) {
-  const ymlPath = path.join(hanakoHome, "added-models.yaml");
+export function migrateProviderMediaConfig(lingxiHome, log: (...args: any[]) => void = () => {}) {
+  const ymlPath = path.join(lingxiHome, "added-models.yaml");
   const existing = safeReadYAMLSync(ymlPath, null, YAML);
   if (!existing || !isPlainObject(existing.providers)) return false;
 

@@ -18,7 +18,7 @@ const hanaRoot = process.env.LINGXI_ROOT || import.meta.dirname;
 const serverEntry = process.env.LINGXI_SERVER_ENTRY || path.join(hanaRoot, "bundle", "index.js");
 
 log(`[server-bootstrap] process started pid=${process.pid} platform=${process.platform} arch=${process.arch}`);
-log(`[server-bootstrap] node=${process.version} hanaHome=${process.env.LINGXI_HOME || "unset"}`);
+log(`[server-bootstrap] node=${process.version} lingxiHome=${process.env.LINGXI_HOME || "unset"}`);
 log(`[server-bootstrap] root=${hanaRoot}`);
 log(`[server-bootstrap] entry=${serverEntry}`);
 

@@ -78,7 +78,7 @@ describe("CLI bundle pull (mocked core download — the network pipeline is cove
     const download = vi.fn().mockResolvedValue({ ok: true, train: 2, version: "0.400.0" });
     vi.spyOn(console, "log").mockImplementation(() => {});
 
-    const code = await runBundlePull({ channel: "beta", hanaHome: home, download });
+    const code = await runBundlePull({ channel: "beta", lingxiHome: home, download });
 
     expect(code).toBe(0);
     expect(download).toHaveBeenCalledTimes(1);
@@ -98,7 +98,7 @@ describe("CLI bundle pull (mocked core download — the network pipeline is cove
     const download = vi.fn().mockResolvedValue({ ok: true, train: 2, version: "0.400.0" });
     const logSpy = vi.spyOn(console, "log").mockImplementation(() => {});
 
-    const code = await runBundlePull({ hanaHome: home, download });
+    const code = await runBundlePull({ lingxiHome: home, download });
 
     expect(code).toBe(0);
     const output = logSpy.mock.calls.map((call) => call.join(" ")).join("\n");
@@ -111,7 +111,7 @@ describe("CLI bundle pull (mocked core download — the network pipeline is cove
     const download = vi.fn().mockResolvedValue({ ok: true, alreadyCurrent: true, version: "0.400.0" });
     const logSpy = vi.spyOn(console, "log").mockImplementation(() => {});
 
-    const code = await runBundlePull({ hanaHome: home, download });
+    const code = await runBundlePull({ lingxiHome: home, download });
 
     expect(code).toBe(0);
     const output = logSpy.mock.calls.map((call) => call.join(" ")).join("\n");
@@ -124,7 +124,7 @@ describe("CLI bundle pull (mocked core download — the network pipeline is cove
     const download = vi.fn().mockResolvedValue({ ok: false, error: "train 3 is quarantined" });
     const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
 
-    const code = await runBundlePull({ hanaHome: home, download });
+    const code = await runBundlePull({ lingxiHome: home, download });
 
     expect(code).toBe(1);
     const output = errorSpy.mock.calls.map((call) => call.join(" ")).join("\n");
@@ -137,7 +137,7 @@ describe("CLI bundle status", () => {
     const home = makeTempDir();
     const logSpy = vi.spyOn(console, "log").mockImplementation(() => {});
 
-    const code = await runBundleStatus({ hanaHome: home });
+    const code = await runBundleStatus({ lingxiHome: home });
 
     expect(code).toBe(0);
     const output = logSpy.mock.calls.map((call) => call.join(" ")).join("\n");
@@ -158,7 +158,7 @@ describe("CLI bundle status", () => {
     });
     const logSpy = vi.spyOn(console, "log").mockImplementation(() => {});
 
-    const code = await runBundleStatus({ hanaHome: home });
+    const code = await runBundleStatus({ lingxiHome: home });
 
     expect(code).toBe(0);
     const output = logSpy.mock.calls.map((call) => call.join(" ")).join("\n");
@@ -178,7 +178,7 @@ describe("CLI bundle status", () => {
     });
     const logSpy = vi.spyOn(console, "log").mockImplementation(() => {});
 
-    const code = await runBundleStatus({ channel: "beta", hanaHome: home });
+    const code = await runBundleStatus({ channel: "beta", lingxiHome: home });
 
     expect(code).toBe(0);
     const output = logSpy.mock.calls.map((call) => call.join(" ")).join("\n");

@@ -14,8 +14,8 @@ import {
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(__dirname, "..");
-const hanaHome = defaultDevLingxiHome();
-const serverInfoPath = path.join(hanaHome, "server-info.json");
+const lingxiHome = defaultDevLingxiHome();
+const serverInfoPath = path.join(lingxiHome, "server-info.json");
 
 let serverProcess = null;
 let viteProcess = null;
@@ -54,7 +54,7 @@ async function waitForServerInfo({ timeoutMs = 90_000, intervalMs = 200 } = {}) 
 }
 
 function spawnServer() {
-  fs.mkdirSync(hanaHome, { recursive: true });
+  fs.mkdirSync(lingxiHome, { recursive: true });
   removeStaleServerInfo();
 
   const serverEnv = applyDevEnvironment({ ...process.env });

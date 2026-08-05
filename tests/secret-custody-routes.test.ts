@@ -50,7 +50,7 @@ describe("secret custody across HTTP routes", () => {
         getAll: () => new Map(),
       },
       preferences: { getOAuthCustomModels: () => ({}) },
-      hanakoHome: "/tmp",
+      lingxiHome: "/tmp",
     };
 
     app.route("/api", createProvidersRoute(engine));
@@ -90,7 +90,7 @@ describe("secret custody across HTTP routes", () => {
       resolveProviderCredentials: (name) => name === "deepseek"
         ? { api_key: "sk-provider-secret", base_url: "https://api.deepseek.com", api: "openai-completions" }
         : { api_key: "", base_url: "", api: "" },
-      hanakoHome: "/tmp",
+      lingxiHome: "/tmp",
     };
 
     app.route("/api", createProvidersRoute(engine));
@@ -122,7 +122,7 @@ describe("secret custody across HTTP routes", () => {
       },
       preferences: { getOAuthCustomModels: () => ({}) },
       resolveProviderCredentials: () => ({ api_key: "sk-provider-secret", base_url: "", api: "" }),
-      hanakoHome: "/tmp",
+      lingxiHome: "/tmp",
     };
 
     app.route("/api", createProvidersRoute(engine));

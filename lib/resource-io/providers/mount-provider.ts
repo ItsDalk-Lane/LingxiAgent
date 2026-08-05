@@ -23,7 +23,7 @@ import type {
 type LocalFsProviderFactory = (options: { cwd: string; guard: { check: (filePath: string, operation: "read" | "write" | "delete") => { allowed: boolean; reason?: string } } }) => any;
 
 type Options = {
-  hanakoHome: string;
+  lingxiHome: string;
   studioId: string;
   localFsProviderFactory: LocalFsProviderFactory;
 };
@@ -31,14 +31,14 @@ type Options = {
 export class MountProvider {
   readonly id = "mount" as const;
 
-  declare hanakoHome: string;
+  declare lingxiHome: string;
   declare studioId: string;
   declare localFsProviderFactory: LocalFsProviderFactory;
 
-  constructor({ hanakoHome, studioId, localFsProviderFactory }: Options) {
-    if (!hanakoHome) throw new Error("hanakoHome is required");
+  constructor({ lingxiHome, studioId, localFsProviderFactory }: Options) {
+    if (!lingxiHome) throw new Error("lingxiHome is required");
     if (!studioId) throw new Error("studioId is required");
-    this.hanakoHome = hanakoHome;
+    this.lingxiHome = lingxiHome;
     this.studioId = studioId;
     this.localFsProviderFactory = localFsProviderFactory;
   }
@@ -196,7 +196,7 @@ export class MountProvider {
     }
     let registry;
     try {
-      registry = loadStudioMountRegistry(this.hanakoHome);
+      registry = loadStudioMountRegistry(this.lingxiHome);
     } catch (err) {
       throw new ResourceIOError((err as any)?.message || "mount registry unavailable", {
         code: "provider_not_available",

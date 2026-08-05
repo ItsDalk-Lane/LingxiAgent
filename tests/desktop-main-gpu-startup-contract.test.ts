@@ -127,8 +127,8 @@ describe("desktop main GPU startup contract", () => {
 
   it("appends install ACL heal diagnostics next to the GPU startup diagnostics", () => {
     const source = fs.readFileSync(MAIN_PATH, "utf-8");
-    const gpuDiagIndex = source.indexOf("items.push(buildGpuStartupDiagnostics({ hanakoHome, policy: gpuStartupPolicy, app }));");
-    const healDiagIndex = source.indexOf("items.push(buildInstallAclHealDiagnostics({ hanakoHome }));");
+    const gpuDiagIndex = source.indexOf("items.push(buildGpuStartupDiagnostics({ lingxiHome, policy: gpuStartupPolicy, app }));");
+    const healDiagIndex = source.indexOf("items.push(buildInstallAclHealDiagnostics({ lingxiHome }));");
 
     expect(gpuDiagIndex).toBeGreaterThan(-1);
     expect(healDiagIndex).toBeGreaterThan(gpuDiagIndex);

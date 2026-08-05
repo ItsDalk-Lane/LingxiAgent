@@ -3,11 +3,11 @@ import { normalizePrincipal } from "./security-principal.ts";
 import { authenticateWebSession } from "./web-session-store.ts";
 
 export function createServerAuthService({
-  hanakoHome,
+  lingxiHome,
   loopbackToken,
   runtimeContext,
 }) {
-  if (!hanakoHome) throw new Error("hanakoHome required");
+  if (!lingxiHome) throw new Error("lingxiHome required");
   if (!isNonEmptyString(loopbackToken)) throw new Error("loopbackToken required");
 
   function resolveRuntimeContext() {
@@ -42,7 +42,7 @@ export function createServerAuthService({
   } = {}) {
     const parsed = parseCredential({ authorization, queryToken, allowQueryToken, connectionKind });
     if (!parsed) {
-      const webPrincipal = authenticateWebSession(hanakoHome, cookieHeader, { now });
+      const webPrincipal = authenticateWebSession(lingxiHome, cookieHeader, { now });
       if (!webPrincipal) {
         return denyAuth("missing_credential", { connectionKind });
       }
@@ -70,7 +70,7 @@ export function createServerAuthService({
       return allowAuth(createLocalPrincipal(resolveRuntimeContext()));
     }
 
-    const devicePrincipal = authenticateDeviceCredential(hanakoHome, parsed.token, { now });
+    const devicePrincipal = authenticateDeviceCredential(lingxiHome, parsed.token, { now });
     if (!devicePrincipal) {
       return denyAuth("invalid_credential", {
         credentialSource: parsed.source,

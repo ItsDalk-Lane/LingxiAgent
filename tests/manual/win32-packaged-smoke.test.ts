@@ -75,18 +75,18 @@ smokeDescribe("win32 packaged smoke", () => {
       console.warn("[smoke] lingxi-win-sandbox.exe not found; sandbox chain NOT verified in this tree");
       return;
     }
-    const hanakoHome = fs.mkdtempSync(path.join(os.tmpdir(), "hana-smoke-home-"));
+    const lingxiHome = fs.mkdtempSync(path.join(os.tmpdir(), "hana-smoke-home-"));
     try {
       const { deriveSandboxPolicy } = await import("../../lib/sandbox/policy.ts");
       const policy = deriveSandboxPolicy({
-        agentDir: hanakoHome,
+        agentDir: lingxiHome,
         cwd: workDir,
         workspace: workDir,
         workspaceFolders: [],
-        hanakoHome,
+        lingxiHome,
         mode: "standard",
       });
-      const exec = (await loadExec())({ sandbox: { policy, hanakoHome, helperPath: helper } });
+      const exec = (await loadExec())({ sandbox: { policy, lingxiHome, helperPath: helper } });
       const result = await exec("ipconfig", workDir, {
         onData: () => {},
         signal: undefined,
@@ -95,22 +95,22 @@ smokeDescribe("win32 packaged smoke", () => {
       });
       expect(result.exitCode).toBe(0);
     } finally {
-      fs.rmSync(hanakoHome, { recursive: true, force: true });
+      fs.rmSync(lingxiHome, { recursive: true, force: true });
     }
   });
 
   it("5. node-pty terminal launches and exits cleanly", async () => {
-    const hanakoHome = fs.mkdtempSync(path.join(os.tmpdir(), "hana-smoke-term-"));
+    const lingxiHome = fs.mkdtempSync(path.join(os.tmpdir(), "hana-smoke-term-"));
     try {
       const { TerminalSessionManager } = await import("../../lib/terminal/terminal-session-manager.ts");
-      const manager = new TerminalSessionManager({ hanakoHome });
-      const sessionPath = path.join(hanakoHome, "smoke-session.jsonl");
+      const manager = new TerminalSessionManager({ lingxiHome });
+      const sessionPath = path.join(lingxiHome, "smoke-session.jsonl");
       const started = await manager.start({ sessionPath, agentId: "smoke", cwd: workDir });
       expect(started.status).toBe("running");
       expect(started.terminalId).toBeTruthy();
       manager.close({ sessionPath, terminalId: started.terminalId });
     } finally {
-      fs.rmSync(hanakoHome, { recursive: true, force: true });
+      fs.rmSync(lingxiHome, { recursive: true, force: true });
     }
   });
 

@@ -65,9 +65,9 @@ function basenameForPlatformPath(target) {
   return /^[a-z]:[\\/]|^\\\\/i.test(raw) ? path.win32.basename(raw) : path.basename(raw);
 }
 
-export function externalReadPathsFromSessionFiles(files = [], { workspaceRoots = [], hanakoHome }: { workspaceRoots?: any[]; hanakoHome?: any } = {}) {
+export function externalReadPathsFromSessionFiles(files = [], { workspaceRoots = [], lingxiHome }: { workspaceRoots?: any[]; lingxiHome?: any } = {}) {
   const workspaceRootKeys = identityKeys(uniqueNormalized(workspaceRoots));
-  const homeKey = hanakoHome ? filesystemIdentityKeySync(hanakoHome) : null;
+  const homeKey = lingxiHome ? filesystemIdentityKeySync(lingxiHome) : null;
   const out = [];
 
   for (const file of files || []) {

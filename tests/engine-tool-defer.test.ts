@@ -66,7 +66,7 @@ function makeEngine({
   })));
 
   const engine = Object.create(LingxiEngine.prototype);
-  engine.hanakoHome = tmpDir;
+  engine.lingxiHome = tmpDir;
   engine.getAgent = vi.fn(() => agent);
   engine._pluginManager = pluginTools.length > 0 ? { getAllTools: () => pluginTools } : null;
   engine._mcp = {

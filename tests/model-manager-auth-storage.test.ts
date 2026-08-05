@@ -81,7 +81,7 @@ describe("ModelManager AuthStorage ownership", () => {
       },
     });
 
-    const manager = new ModelManager({ hanakoHome: tmpDir });
+    const manager = new ModelManager({ lingxiHome: tmpDir });
     manager.init();
     await manager.refreshAvailable();
 
@@ -147,7 +147,7 @@ describe("ModelManager AuthStorage ownership", () => {
       },
     });
 
-    const manager = new ModelManager({ hanakoHome: tmpDir });
+    const manager = new ModelManager({ lingxiHome: tmpDir });
     manager.providerRegistry.register(plugin("First OAuth"));
     manager.init();
     expect(manager.authStorage.getOAuthProviders()).toEqual(expect.arrayContaining([
@@ -184,7 +184,7 @@ describe("ModelManager AuthStorage ownership", () => {
       },
     });
 
-    const manager = new ModelManager({ hanakoHome: tmpDir });
+    const manager = new ModelManager({ lingxiHome: tmpDir });
     manager.init();
     await manager.refreshAvailable();
 
@@ -209,7 +209,7 @@ describe("ModelManager AuthStorage ownership", () => {
     writeAddedModels({});
     writeAuth({});
 
-    const manager = new ModelManager({ hanakoHome: tmpDir });
+    const manager = new ModelManager({ lingxiHome: tmpDir });
     manager.init();
     await manager.refreshAvailable();
 
@@ -237,7 +237,7 @@ describe("ModelManager AuthStorage ownership", () => {
       },
     });
 
-    const manager = new ModelManager({ hanakoHome: tmpDir });
+    const manager = new ModelManager({ lingxiHome: tmpDir });
     expect(() => manager.init()).toThrow(/collision/i);
 
     const persistedAuth = JSON.parse(fs.readFileSync(path.join(tmpDir, "auth.json"), "utf-8"));
@@ -262,7 +262,7 @@ describe("ModelManager AuthStorage ownership", () => {
       },
     });
 
-    const manager = new ModelManager({ hanakoHome: tmpDir });
+    const manager = new ModelManager({ lingxiHome: tmpDir });
     manager.init();
     await manager.refreshAvailable();
 
@@ -270,7 +270,7 @@ describe("ModelManager AuthStorage ownership", () => {
       .filter((model) => model.provider === "openai-codex")
       .map((model) => model.id)).toEqual(expected);
 
-    const restarted = new ModelManager({ hanakoHome: tmpDir });
+    const restarted = new ModelManager({ lingxiHome: tmpDir });
     restarted.init();
     await restarted.refreshAvailable();
     expect(restarted.availableModels
@@ -293,7 +293,7 @@ describe("ModelManager AuthStorage ownership", () => {
     });
     writeAuth({});
 
-    const manager = new ModelManager({ hanakoHome: tmpDir });
+    const manager = new ModelManager({ lingxiHome: tmpDir });
     manager.init();
     await manager.refreshAvailable();
 
@@ -312,7 +312,7 @@ describe("ModelManager AuthStorage ownership", () => {
       thinkingLevelMap: { off: "none", xhigh: "high" },
     });
 
-    const restarted = new ModelManager({ hanakoHome: tmpDir });
+    const restarted = new ModelManager({ lingxiHome: tmpDir });
     restarted.init();
     await restarted.refreshAvailable();
     expect(restarted.availableModels[0]).toMatchObject({
@@ -335,7 +335,7 @@ describe("ModelManager AuthStorage ownership", () => {
     });
     writeAuth({});
 
-    const manager = new ModelManager({ hanakoHome: tmpDir });
+    const manager = new ModelManager({ lingxiHome: tmpDir });
     manager.init();
     await manager.refreshAvailable();
 
@@ -358,7 +358,7 @@ describe("ModelManager AuthStorage ownership", () => {
     });
     writeAuth({});
 
-    const manager = new ModelManager({ hanakoHome: tmpDir });
+    const manager = new ModelManager({ lingxiHome: tmpDir });
     manager.init();
     await manager.refreshAvailable();
 
@@ -401,7 +401,7 @@ describe("ModelManager AuthStorage ownership", () => {
     });
     writeAuth({});
 
-    const manager = new ModelManager({ hanakoHome: tmpDir });
+    const manager = new ModelManager({ lingxiHome: tmpDir });
     manager.init();
     await manager.refreshAvailable();
 
@@ -455,7 +455,7 @@ describe("ModelManager AuthStorage ownership", () => {
     });
     writeAuth({});
 
-    const manager = new ModelManager({ hanakoHome: tmpDir });
+    const manager = new ModelManager({ lingxiHome: tmpDir });
     manager.init();
     await manager.refreshAvailable();
 
@@ -476,7 +476,7 @@ describe("ModelManager AuthStorage ownership", () => {
     });
     writeAuth({});
 
-    const manager = new ModelManager({ hanakoHome: tmpDir });
+    const manager = new ModelManager({ lingxiHome: tmpDir });
     expect(() => manager.init()).toThrow(/thinkingLevelMap\.ultra/);
   });
 
@@ -489,7 +489,7 @@ describe("ModelManager AuthStorage ownership", () => {
         deepseek: deepseekProvider("public"),
       });
 
-      const manager = new ModelManager({ hanakoHome: tmpDir });
+      const manager = new ModelManager({ lingxiHome: tmpDir });
       manager.init();
       await manager.syncAndRefresh();
 
@@ -510,7 +510,7 @@ describe("ModelManager AuthStorage ownership", () => {
       deepseek: deepseekProvider(undefined),
     });
 
-    const manager = new ModelManager({ hanakoHome: tmpDir });
+    const manager = new ModelManager({ lingxiHome: tmpDir });
     manager.init();
     await manager.syncAndRefresh();
 
@@ -537,7 +537,7 @@ describe("ModelManager AuthStorage ownership", () => {
       },
     });
 
-    const manager = new ModelManager({ hanakoHome: tmpDir });
+    const manager = new ModelManager({ lingxiHome: tmpDir });
     manager.init();
     await manager.syncAndRefresh();
 
@@ -576,7 +576,7 @@ describe("ModelManager AuthStorage ownership", () => {
       },
     });
 
-    const manager = new ModelManager({ hanakoHome: tmpDir });
+    const manager = new ModelManager({ lingxiHome: tmpDir });
     manager.init();
     await manager.syncAndRefresh();
 
@@ -603,7 +603,7 @@ describe("ModelManager AuthStorage ownership", () => {
       deepseek: deepseekProvider("sk-new-999c"),
     });
 
-    const manager = new ModelManager({ hanakoHome: tmpDir });
+    const manager = new ModelManager({ lingxiHome: tmpDir });
     manager.init();
     await manager.syncAndRefresh();
 
@@ -620,7 +620,7 @@ describe("ModelManager AuthStorage ownership", () => {
       deepseek: deepseekProvider(""),
     });
 
-    const manager = new ModelManager({ hanakoHome: tmpDir });
+    const manager = new ModelManager({ lingxiHome: tmpDir });
     manager.init();
     await manager.syncAndRefresh();
 
@@ -652,7 +652,7 @@ describe("ModelManager AuthStorage ownership", () => {
       },
     });
 
-    const manager = new ModelManager({ hanakoHome: tmpDir });
+    const manager = new ModelManager({ lingxiHome: tmpDir });
     manager.init();
     await manager.syncAndRefresh();
 
@@ -687,7 +687,7 @@ describe("ModelManager AuthStorage ownership", () => {
       },
     });
 
-    const manager = new ModelManager({ hanakoHome: tmpDir });
+    const manager = new ModelManager({ lingxiHome: tmpDir });
     manager.init();
     await manager.syncAndRefresh();
 
@@ -705,7 +705,7 @@ describe("ModelManager AuthStorage ownership", () => {
       deepseek: deepseekProvider("sk-new-999c"),
     });
 
-    const manager = new ModelManager({ hanakoHome: tmpDir });
+    const manager = new ModelManager({ lingxiHome: tmpDir });
     manager.init();
     writeAuth({});
 
@@ -732,7 +732,7 @@ describe("ModelManager AuthStorage ownership", () => {
       },
     });
 
-    const manager = new ModelManager({ hanakoHome: tmpDir });
+    const manager = new ModelManager({ lingxiHome: tmpDir });
     manager.providerRegistry.reload();
     manager._authStorage = {
       getApiKey: vi.fn(async () => {
@@ -787,7 +787,7 @@ describe("ModelManager AuthStorage ownership", () => {
       },
     });
 
-    const manager = new ModelManager({ hanakoHome: tmpDir });
+    const manager = new ModelManager({ lingxiHome: tmpDir });
     manager.providerRegistry.reload();
     manager._authStorage = {
       getApiKey: vi.fn(async () => undefined),
@@ -819,7 +819,7 @@ describe("ModelManager AuthStorage ownership", () => {
       },
     });
 
-    const manager = new ModelManager({ hanakoHome: tmpDir });
+    const manager = new ModelManager({ lingxiHome: tmpDir });
     manager.providerRegistry.reload();
     manager._availableModels = [{
       id: "gpt-5.6-sol",
@@ -891,7 +891,7 @@ describe("ModelManager AuthStorage ownership", () => {
   });
 
   it("keeps Grok provider protocol and model override headers in the fresh execution config", async () => {
-    const manager = new ModelManager({ hanakoHome: tmpDir });
+    const manager = new ModelManager({ lingxiHome: tmpDir });
     manager.providerRegistry = {
       resolveChatProvider: vi.fn(() => ({
         credentialSource: "auth-storage",
@@ -947,7 +947,7 @@ describe("ModelManager AuthStorage ownership", () => {
   });
 
   it("fails closed for auth-storage providers when AuthStorage is unavailable", async () => {
-    const manager = new ModelManager({ hanakoHome: tmpDir });
+    const manager = new ModelManager({ lingxiHome: tmpDir });
     manager.providerRegistry = {
       resolveChatProvider: vi.fn(() => ({
         credentialSource: "auth-storage",
@@ -967,7 +967,7 @@ describe("ModelManager AuthStorage ownership", () => {
   });
 
   it("uses credentialSource instead of authType and never crosses from provider-catalog into AuthStorage", async () => {
-    const manager = new ModelManager({ hanakoHome: tmpDir });
+    const manager = new ModelManager({ lingxiHome: tmpDir });
     const getApiKey = vi.fn(async () => "oauth-token-that-must-not-be-read");
     manager._authStorage = { getApiKey } as any;
     manager.providerRegistry = {
@@ -999,7 +999,7 @@ describe("ModelManager AuthStorage ownership", () => {
   });
 
   it("rejects an unknown credentialSource without consulting legacy registry credentials", async () => {
-    const manager = new ModelManager({ hanakoHome: tmpDir });
+    const manager = new ModelManager({ lingxiHome: tmpDir });
     const getCredentials = vi.fn(() => ({ apiKey: "stale-token" }));
     manager.providerRegistry = {
       resolveChatProvider: vi.fn(() => ({

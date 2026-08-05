@@ -73,13 +73,13 @@ describe("macos Cua provider", () => {
       env: {
         LINGXI_DESKTOP_IS_PACKAGED: "1",
         LINGXI_DESKTOP_RESOURCES_PATH: "/Applications/LingxiAgent.app/Contents/Resources",
-        LINGXI_ROOT: "/Users/hana/.hanako/artifacts/server/0.415.9-darwin-arm64",
+        LINGXI_ROOT: "/Users/hana/.lingxi/artifacts/server/0.415.9-darwin-arm64",
         LINGXI_CUA_DRIVER_PATH: "/opt/cua-driver",
       },
       existsSync: (p) => p === helper || p === "/opt/cua-driver",
       homeDir: "/Users/hana",
       arch: "arm64",
-      cwd: "/Users/hana/.hanako/artifacts/server/0.415.9-darwin-arm64",
+      cwd: "/Users/hana/.lingxi/artifacts/server/0.415.9-darwin-arm64",
     });
 
     expect(command).toBe(helper);
@@ -89,7 +89,7 @@ describe("macos Cua provider", () => {
     const helper = "/Applications/LingxiAgent.app/Contents/Resources/computer-use/macos/lingxi-computer-use-helper";
     const baseEnv = {
       LINGXI_DESKTOP_IS_PACKAGED: "1",
-      LINGXI_ROOT: "/Users/hana/.hanako/artifacts/server/0.412.7-darwin-arm64",
+      LINGXI_ROOT: "/Users/hana/.lingxi/artifacts/server/0.412.7-darwin-arm64",
     };
     const fromAppPath = resolveCuaDriverCommand({
       env: {
@@ -127,12 +127,12 @@ describe("macos Cua provider", () => {
   });
 
   it("does not scan OTA or cwd development helpers in packaged mode", () => {
-    const artifactHelper = "/Users/hana/.hanako/artifacts/server/0.415.9-darwin-arm64/dist-computer-use/mac-arm64/lingxi-computer-use-helper";
+    const artifactHelper = "/Users/hana/.lingxi/artifacts/server/0.415.9-darwin-arm64/dist-computer-use/mac-arm64/lingxi-computer-use-helper";
     const cwdHelper = "/tmp/runtime/dist-computer-use/mac-arm64/lingxi-computer-use-helper";
     const command = resolveCuaDriverCommand({
       env: {
         LINGXI_DESKTOP_IS_PACKAGED: "1",
-        LINGXI_ROOT: "/Users/hana/.hanako/artifacts/server/0.415.9-darwin-arm64",
+        LINGXI_ROOT: "/Users/hana/.lingxi/artifacts/server/0.415.9-darwin-arm64",
         LINGXI_DESKTOP_RESOURCES_PATH: "relative/fake-resources",
         LINGXI_DESKTOP_APP_PATH: "/tmp/app.asar",
         LINGXI_DESKTOP_EXEC_PATH: "/tmp/LingxiAgent",

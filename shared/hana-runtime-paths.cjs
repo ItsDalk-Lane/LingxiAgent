@@ -15,32 +15,32 @@ function resolveHanakoHome(input, homeDir = os.homedir()) {
   return path.resolve(expandHome(raw, homeDir));
 }
 
-function assertHanakoHome(hanakoHome, caller) {
-  if (!hanakoHome || typeof hanakoHome !== "string") {
-    throw new Error(`${caller}: hanakoHome is required`);
+function assertHanakoHome(lingxiHome, caller) {
+  if (!lingxiHome || typeof lingxiHome !== "string") {
+    throw new Error(`${caller}: lingxiHome is required`);
   }
 }
 
-function resolveLingxiPiSdkRuntimeRoot(hanakoHome) {
-  assertHanakoHome(hanakoHome, "resolveLingxiPiSdkRuntimeRoot");
-  return path.join(hanakoHome, "runtime", "pi-sdk");
+function resolveLingxiPiSdkRuntimeRoot(lingxiHome) {
+  assertHanakoHome(lingxiHome, "resolveLingxiPiSdkRuntimeRoot");
+  return path.join(lingxiHome, "runtime", "pi-sdk");
 }
 
-function resolveLingxiPiSdkManagedBinDir(hanakoHome) {
-  return path.join(resolveLingxiPiSdkRuntimeRoot(hanakoHome), "bin");
+function resolveLingxiPiSdkManagedBinDir(lingxiHome) {
+  return path.join(resolveLingxiPiSdkRuntimeRoot(lingxiHome), "bin");
 }
 
-function resolveLingxiPiSdkResourceLoaderCwd(hanakoHome) {
-  return path.join(resolveLingxiPiSdkRuntimeRoot(hanakoHome), "resource-loader", "project");
+function resolveLingxiPiSdkResourceLoaderCwd(lingxiHome) {
+  return path.join(resolveLingxiPiSdkRuntimeRoot(lingxiHome), "resource-loader", "project");
 }
 
-function resolveLingxiPiSdkResourceLoaderAgentDir(hanakoHome) {
-  return path.join(resolveLingxiPiSdkRuntimeRoot(hanakoHome), "resource-loader", "agent");
+function resolveLingxiPiSdkResourceLoaderAgentDir(lingxiHome) {
+  return path.join(resolveLingxiPiSdkRuntimeRoot(lingxiHome), "resource-loader", "agent");
 }
 
-function resolveLegacyPiSdkManagedBinDir(hanakoHome) {
-  assertHanakoHome(hanakoHome, "resolveLegacyPiSdkManagedBinDir");
-  return path.join(hanakoHome, ".pi", "agent", "bin");
+function resolveLegacyPiSdkManagedBinDir(lingxiHome) {
+  assertHanakoHome(lingxiHome, "resolveLegacyPiSdkManagedBinDir");
+  return path.join(lingxiHome, ".pi", "agent", "bin");
 }
 
 module.exports = {

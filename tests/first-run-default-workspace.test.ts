@@ -9,14 +9,14 @@ describe("first run default workspace", () => {
   let tmpDir;
   let homeDir;
   let productDir;
-  let hanakoHome;
+  let lingxiHome;
   let homedirSpy;
 
   beforeEach(() => {
     tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "hana-first-run-workspace-"));
     homeDir = path.join(tmpDir, "home");
     productDir = path.join(tmpDir, "product");
-    hanakoHome = path.join(tmpDir, ".lingxi");
+    lingxiHome = path.join(tmpDir, ".lingxi");
     fs.mkdirSync(homeDir, { recursive: true });
     fs.mkdirSync(productDir, { recursive: true });
     fs.writeFileSync(
@@ -44,10 +44,10 @@ describe("first run default workspace", () => {
   it("seeds lingxi with the desktop OH-WorkSpace, enabled memory, and disabled patrol defaults", async () => {
     const { ensureFirstRun } = await import("../core/first-run.ts");
 
-    ensureFirstRun(hanakoHome, productDir);
+    ensureFirstRun(lingxiHome, productDir);
 
     const workspace = path.join(homeDir, "Desktop", "OH-WorkSpace");
-    const cfgPath = path.join(hanakoHome, "agents", "lingxi", "config.yaml");
+    const cfgPath = path.join(lingxiHome, "agents", "lingxi", "config.yaml");
     const cfg = YAML.load(fs.readFileSync(cfgPath, "utf-8"));
 
     expect(fs.statSync(workspace).isDirectory()).toBe(true);
@@ -72,9 +72,9 @@ describe("first run default workspace", () => {
     );
     const { ensureFirstRun } = await import("../core/first-run.ts");
 
-    ensureFirstRun(hanakoHome, productDir);
+    ensureFirstRun(lingxiHome, productDir);
 
-    const hanakoDir = path.join(hanakoHome, "agents", "lingxi");
+    const hanakoDir = path.join(lingxiHome, "agents", "lingxi");
     // config.yaml 仍然照常播种，只是 identity.md / ishiki.md 不再落盘：
     // 未定制人格靠运行时按 agent.resolveLocale() 回落到 lib 模板。
     expect(fs.existsSync(path.join(hanakoDir, "config.yaml"))).toBe(true);
@@ -91,12 +91,12 @@ describe("first run default workspace", () => {
     );
     const { ensureFirstRun } = await import("../core/first-run.ts");
 
-    ensureFirstRun(hanakoHome, productDir);
+    ensureFirstRun(lingxiHome, productDir);
 
     // identity.md 不落盘，占位符渲染改为运行时 system prompt 组装阶段处理；
     // 这里只验证回落链能取到带原始占位符的模板内容。
     const { content: identity, fromTemplate } = resolvePersonaSource({
-      agentDir: path.join(hanakoHome, "agents", "lingxi"),
+      agentDir: path.join(lingxiHome, "agents", "lingxi"),
       productDir,
       yuanType: "lingxi",
       locale: "zh-CN",
@@ -109,96 +109,96 @@ describe("first run default workspace", () => {
   });
 
   it("repairs a half-initialized default lingxi agent directory", async () => {
-    fs.mkdirSync(path.join(hanakoHome, "agents", "lingxi", "memory"), { recursive: true });
+    fs.mkdirSync(path.join(lingxiHome, "agents", "lingxi", "memory"), { recursive: true });
     const { ensureFirstRun } = await import("../core/first-run.ts");
 
-    ensureFirstRun(hanakoHome, productDir);
+    ensureFirstRun(lingxiHome, productDir);
 
-    const cfgPath = path.join(hanakoHome, "agents", "lingxi", "config.yaml");
+    const cfgPath = path.join(lingxiHome, "agents", "lingxi", "config.yaml");
     const cfg = YAML.load(fs.readFileSync(cfgPath, "utf-8"));
     expect(cfg.agent.name).toBe("Lingxi");
-    expect(fs.statSync(path.join(hanakoHome, "agents", "lingxi", "sessions")).isDirectory()).toBe(true);
+    expect(fs.statSync(path.join(lingxiHome, "agents", "lingxi", "sessions")).isDirectory()).toBe(true);
   });
 
   it("keeps startup alive and reports non-default agent directories without config.yaml", async () => {
     // 历史脏目录：旧版物理删除残留 / phone projection 复活的目录，只有 phone/，没有 config.yaml
-    fs.mkdirSync(path.join(hanakoHome, "agents", "kon", "phone", "conversations"), { recursive: true });
+    fs.mkdirSync(path.join(lingxiHome, "agents", "kon", "phone", "conversations"), { recursive: true });
     const { ensureFirstRun } = await import("../core/first-run.ts");
 
-    const report = ensureFirstRun(hanakoHome, productDir);
+    const report = ensureFirstRun(lingxiHome, productDir);
 
     expect(report.invalidAgentDirs).toEqual([
       { id: "kon", reason: "config_missing" },
     ]);
     // 默认 agent 正常播种，启动不被脏目录阻断
-    const cfgPath = path.join(hanakoHome, "agents", "lingxi", "config.yaml");
+    const cfgPath = path.join(lingxiHome, "agents", "lingxi", "config.yaml");
     expect(fs.existsSync(cfgPath)).toBe(true);
     // 不往脏目录里喂 pinned.md，避免把垃圾目录越喂越像 agent 目录
-    expect(fs.existsSync(path.join(hanakoHome, "agents", "kon", "pinned.md"))).toBe(false);
+    expect(fs.existsSync(path.join(lingxiHome, "agents", "kon", "pinned.md"))).toBe(false);
     // 有效 agent 仍然补齐 pinned.md
-    expect(fs.existsSync(path.join(hanakoHome, "agents", "lingxi", "pinned.md"))).toBe(true);
+    expect(fs.existsSync(path.join(lingxiHome, "agents", "lingxi", "pinned.md"))).toBe(true);
   });
 
   it("keeps startup alive and reports non-default agent directories with unreadable config.yaml", async () => {
-    const brokenDir = path.join(hanakoHome, "agents", "broken-agent");
+    const brokenDir = path.join(lingxiHome, "agents", "broken-agent");
     fs.mkdirSync(brokenDir, { recursive: true });
     fs.writeFileSync(path.join(brokenDir, "config.yaml"), "agent: [unclosed\n", "utf-8");
     const { ensureFirstRun } = await import("../core/first-run.ts");
 
-    const report = ensureFirstRun(hanakoHome, productDir);
+    const report = ensureFirstRun(lingxiHome, productDir);
 
     expect(report.invalidAgentDirs).toHaveLength(1);
     expect(report.invalidAgentDirs[0].id).toBe("broken-agent");
     expect(report.invalidAgentDirs[0].reason).toBe("config_unreadable");
     // 坏 config 原样保留，不动用户数据
     expect(fs.readFileSync(path.join(brokenDir, "config.yaml"), "utf-8")).toBe("agent: [unclosed\n");
-    expect(fs.existsSync(path.join(hanakoHome, "agents", "lingxi", "config.yaml"))).toBe(true);
+    expect(fs.existsSync(path.join(lingxiHome, "agents", "lingxi", "config.yaml"))).toBe(true);
   });
 
   it("keeps legacy non-ASCII agent directories untouched, reports them, and seeds a safe default", async () => {
-    const legacyDir = path.join(hanakoHome, "agents", "明");
+    const legacyDir = path.join(lingxiHome, "agents", "明");
     fs.mkdirSync(legacyDir, { recursive: true });
     fs.writeFileSync(path.join(legacyDir, "config.yaml"), "agent:\n  name: Legacy Ming\n", "utf-8");
     const original = fs.readFileSync(path.join(legacyDir, "config.yaml"), "utf-8");
     const { ensureFirstRun } = await import("../core/first-run.ts");
 
-    const report = ensureFirstRun(hanakoHome, productDir);
+    const report = ensureFirstRun(lingxiHome, productDir);
 
     expect(report.invalidAgentDirs).toContainEqual({ id: "明", reason: "invalid_id" });
     expect(fs.readFileSync(path.join(legacyDir, "config.yaml"), "utf-8")).toBe(original);
     expect(fs.existsSync(path.join(legacyDir, "pinned.md"))).toBe(false);
-    expect(fs.existsSync(path.join(hanakoHome, "agents", "lingxi", "config.yaml"))).toBe(true);
+    expect(fs.existsSync(path.join(lingxiHome, "agents", "lingxi", "config.yaml"))).toBe(true);
 
     const { PreferencesManager } = await import("../core/preferences-manager.ts");
     const preferences = new PreferencesManager({
-      userDir: path.join(hanakoHome, "user"),
-      agentsDir: path.join(hanakoHome, "agents"),
+      userDir: path.join(lingxiHome, "user"),
+      agentsDir: path.join(lingxiHome, "agents"),
     });
     expect(preferences.findFirstAgent()).toBe("lingxi");
   });
 
   it("keeps a safe legacy uppercase and underscore id active without reseeding or reporting it", async () => {
     const legacyId = "Legacy_AGENT-1";
-    const legacyDir = path.join(hanakoHome, "agents", legacyId);
+    const legacyDir = path.join(lingxiHome, "agents", legacyId);
     fs.mkdirSync(legacyDir, { recursive: true });
     fs.writeFileSync(path.join(legacyDir, "config.yaml"), "agent:\n  name: Legacy Agent\n", "utf-8");
     const { ensureFirstRun } = await import("../core/first-run.ts");
 
-    const report = ensureFirstRun(hanakoHome, productDir);
+    const report = ensureFirstRun(lingxiHome, productDir);
 
     expect(report.invalidAgentDirs).toEqual([]);
     expect(report.repairedDefaultAgent).toBe(false);
-    expect(fs.existsSync(path.join(hanakoHome, "agents", "lingxi"))).toBe(false);
+    expect(fs.existsSync(path.join(lingxiHome, "agents", "lingxi"))).toBe(false);
     expect(fs.existsSync(path.join(legacyDir, "pinned.md"))).toBe(true);
   });
 
   it("backs up an unreadable default lingxi config before reseeding", async () => {
-    const hanakoDir = path.join(hanakoHome, "agents", "lingxi");
+    const hanakoDir = path.join(lingxiHome, "agents", "lingxi");
     fs.mkdirSync(hanakoDir, { recursive: true });
     fs.writeFileSync(path.join(hanakoDir, "config.yaml"), "agent: [unclosed\n", "utf-8");
     const { ensureFirstRun } = await import("../core/first-run.ts");
 
-    const report = ensureFirstRun(hanakoHome, productDir);
+    const report = ensureFirstRun(lingxiHome, productDir);
 
     const cfg = YAML.load(fs.readFileSync(path.join(hanakoDir, "config.yaml"), "utf-8"));
     expect(cfg.agent.name).toBe("Lingxi");
@@ -209,16 +209,16 @@ describe("first run default workspace", () => {
   });
 
   it("does not report valid or tombstoned agent directories as invalid", async () => {
-    const validDir = path.join(hanakoHome, "agents", "custom-agent");
+    const validDir = path.join(lingxiHome, "agents", "custom-agent");
     fs.mkdirSync(validDir, { recursive: true });
     fs.writeFileSync(path.join(validDir, "config.yaml"), "agent:\n  name: Custom\n", "utf-8");
-    const tombstoneDir = path.join(hanakoHome, "agents", "deleted-agent");
+    const tombstoneDir = path.join(lingxiHome, "agents", "deleted-agent");
     fs.mkdirSync(tombstoneDir, { recursive: true });
     fs.writeFileSync(path.join(tombstoneDir, "config.yaml"), "agent:\n  name: Gone\n", "utf-8");
     fs.writeFileSync(path.join(tombstoneDir, ".deleted-agent.json"), JSON.stringify({ version: 1 }), "utf-8");
     const { ensureFirstRun } = await import("../core/first-run.ts");
 
-    const report = ensureFirstRun(hanakoHome, productDir);
+    const report = ensureFirstRun(lingxiHome, productDir);
 
     expect(report.invalidAgentDirs).toEqual([]);
   });

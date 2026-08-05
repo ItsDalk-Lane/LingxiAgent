@@ -23,7 +23,7 @@ afterEach(() => {
 describe("plugin surface session service", () => {
   it("issues and verifies a plugin-bound surface session", () => {
     const issued = issuePluginSurfaceSession({
-      hanakoHome: tmpHome,
+      lingxiHome: tmpHome,
       pluginId: "media-board",
       principalId: "principal_local",
     });
@@ -36,7 +36,7 @@ describe("plugin surface session service", () => {
       .toBe(DEFAULT_PLUGIN_SURFACE_SESSION_TTL_MS);
 
     const verified = verifyPluginSurfaceSession({
-      hanakoHome: tmpHome,
+      lingxiHome: tmpHome,
       pluginId: "media-board",
       token: issued.token,
     });
@@ -50,13 +50,13 @@ describe("plugin surface session service", () => {
 
   it("rejects sessions presented for a different plugin", () => {
     const issued = issuePluginSurfaceSession({
-      hanakoHome: tmpHome,
+      lingxiHome: tmpHome,
       pluginId: "media-board",
       principalId: "principal_local",
     });
 
     expect(() => verifyPluginSurfaceSession({
-      hanakoHome: tmpHome,
+      lingxiHome: tmpHome,
       pluginId: "other-plugin",
       token: issued.token,
     })).toThrowError(PluginSurfaceSessionError);
@@ -64,7 +64,7 @@ describe("plugin surface session service", () => {
 
   it("rejects expired sessions with a dedicated code", () => {
     const issued = issuePluginSurfaceSession({
-      hanakoHome: tmpHome,
+      lingxiHome: tmpHome,
       pluginId: "media-board",
       principalId: "principal_local",
       now: "2026-06-10T00:00:00.000Z",
@@ -73,7 +73,7 @@ describe("plugin surface session service", () => {
 
     try {
       verifyPluginSurfaceSession({
-        hanakoHome: tmpHome,
+        lingxiHome: tmpHome,
         pluginId: "media-board",
         token: issued.token,
         now: "2026-06-10T00:00:02.000Z",
@@ -87,7 +87,7 @@ describe("plugin surface session service", () => {
 
   it("rejects tampered and malformed tokens", () => {
     const issued = issuePluginSurfaceSession({
-      hanakoHome: tmpHome,
+      lingxiHome: tmpHome,
       pluginId: "media-board",
       principalId: "principal_local",
     });
@@ -98,19 +98,19 @@ describe("plugin surface session service", () => {
     }), "utf-8").toString("base64url");
 
     expect(() => verifyPluginSurfaceSession({
-      hanakoHome: tmpHome,
+      lingxiHome: tmpHome,
       pluginId: "other-plugin",
       token: `${tamperedBody}.${signature}`,
     })).toThrowError(PluginSurfaceSessionError);
 
     expect(() => verifyPluginSurfaceSession({
-      hanakoHome: tmpHome,
+      lingxiHome: tmpHome,
       pluginId: "media-board",
       token: "not-a-token",
     })).toThrowError(PluginSurfaceSessionError);
 
     expect(() => verifyPluginSurfaceSession({
-      hanakoHome: tmpHome,
+      lingxiHome: tmpHome,
       pluginId: "media-board",
       token: "",
     })).toThrowError(PluginSurfaceSessionError);
@@ -118,7 +118,7 @@ describe("plugin surface session service", () => {
 
   it("clamps requested ttl to the default ceiling", () => {
     const issued = issuePluginSurfaceSession({
-      hanakoHome: tmpHome,
+      lingxiHome: tmpHome,
       pluginId: "media-board",
       principalId: "principal_local",
       ttlMs: DEFAULT_PLUGIN_SURFACE_SESSION_TTL_MS * 10,
@@ -132,24 +132,24 @@ describe("plugin surface session service", () => {
     const { issuePluginAssetSession } = await import("../core/plugin-asset-session-service.ts");
 
     const ticket = issuePluginIframeTicket({
-      hanakoHome: tmpHome,
+      lingxiHome: tmpHome,
       pluginId: "media-board",
       surfacePath: "/page",
       principalId: "principal_local",
     });
     expect(() => verifyPluginSurfaceSession({
-      hanakoHome: tmpHome,
+      lingxiHome: tmpHome,
       pluginId: "media-board",
       token: ticket.ticket,
     })).toThrowError(PluginSurfaceSessionError);
 
     const assetSession = issuePluginAssetSession({
-      hanakoHome: tmpHome,
+      lingxiHome: tmpHome,
       pluginId: "media-board",
       principalId: "principal_local",
     });
     expect(() => verifyPluginSurfaceSession({
-      hanakoHome: tmpHome,
+      lingxiHome: tmpHome,
       pluginId: "media-board",
       token: assetSession.token,
     })).toThrowError(PluginSurfaceSessionError);

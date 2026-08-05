@@ -21,14 +21,14 @@ export class ResourceTicketError extends Error {
 }
 
 export function issueResourceTicket({
-  hanakoHome,
+  lingxiHome,
   resourceId,
   studioId,
   principalId,
   now = new Date().toISOString(),
   ttlMs = DEFAULT_RESOURCE_TICKET_TTL_MS,
 }: any = {}) {
-  assertNonEmpty(hanakoHome, "hanakoHome");
+  assertNonEmpty(lingxiHome, "lingxiHome");
   assertNonEmpty(resourceId, "resourceId");
   assertNonEmpty(studioId, "studioId");
   assertNonEmpty(principalId, "principalId");
@@ -46,7 +46,7 @@ export function issueResourceTicket({
     expiresAt: new Date(issuedAtMs + safeTtlMs).toISOString(),
   };
   const body = base64UrlEncode(JSON.stringify(payload));
-  const signature = signBody(hanakoHome, body);
+  const signature = signBody(lingxiHome, body);
   return {
     ...payload,
     ticket: `${body}.${signature}`,
@@ -54,12 +54,12 @@ export function issueResourceTicket({
 }
 
 export function verifyResourceTicket({
-  hanakoHome,
+  lingxiHome,
   ticket,
   resourceId,
   now = new Date().toISOString(),
 }: any = {}) {
-  assertNonEmpty(hanakoHome, "hanakoHome");
+  assertNonEmpty(lingxiHome, "lingxiHome");
   assertNonEmpty(resourceId, "resourceId");
   if (typeof ticket !== "string" || !ticket.trim()) {
     throw new ResourceTicketError("resource ticket required");
@@ -68,7 +68,7 @@ export function verifyResourceTicket({
   if (!body || !signature || extra !== undefined) {
     throw new ResourceTicketError("resource ticket malformed");
   }
-  const expected = signBody(hanakoHome, body);
+  const expected = signBody(lingxiHome, body);
   if (!timingSafeEqual(signature, expected)) {
     throw new ResourceTicketError("resource ticket signature invalid");
   }
@@ -105,20 +105,20 @@ export function verifyResourceTicket({
   });
 }
 
-export function resourceTicketKeyPath(hanakoHome: any) {
-  assertNonEmpty(hanakoHome, "hanakoHome");
-  return path.join(securityDirPath(hanakoHome), RESOURCE_TICKET_KEY_FILE);
+export function resourceTicketKeyPath(lingxiHome: any) {
+  assertNonEmpty(lingxiHome, "lingxiHome");
+  return path.join(securityDirPath(lingxiHome), RESOURCE_TICKET_KEY_FILE);
 }
 
-function signBody(hanakoHome: any, body: any) {
+function signBody(lingxiHome: any, body: any) {
   return crypto
-    .createHmac("sha256", readOrCreateTicketKey(hanakoHome))
+    .createHmac("sha256", readOrCreateTicketKey(lingxiHome))
     .update(body)
     .digest("base64url");
 }
 
-function readOrCreateTicketKey(hanakoHome: any) {
-  const filePath = resourceTicketKeyPath(hanakoHome);
+function readOrCreateTicketKey(lingxiHome: any) {
+  const filePath = resourceTicketKeyPath(lingxiHome);
   try {
     const existing = fs.readFileSync(filePath, "utf-8").trim();
     if (existing) return existing;

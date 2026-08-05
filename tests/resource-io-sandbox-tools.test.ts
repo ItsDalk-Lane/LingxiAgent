@@ -15,8 +15,8 @@ describe("ResourceIO sandbox file tools", () => {
   function makeTools(options: any = {}) {
     tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "hana-resource-sandbox-tools-"));
     const workspace = path.join(tempRoot, "workspace");
-    const hanakoHome = path.join(tempRoot, "hana-home");
-    const agentDir = path.join(hanakoHome, "agents", "hana");
+    const lingxiHome = path.join(tempRoot, "hana-home");
+    const agentDir = path.join(lingxiHome, "agents", "hana");
     fs.mkdirSync(workspace, { recursive: true });
     fs.mkdirSync(agentDir, { recursive: true });
     const emitEvent = vi.fn();
@@ -25,7 +25,7 @@ describe("ResourceIO sandbox file tools", () => {
       agentDir,
       workspace,
       workspaceFolders: [],
-      hanakoHome,
+      lingxiHome,
       getSandboxEnabled: () => true,
       getSessionPath: () => sessionPath,
       emitEvent,
@@ -37,8 +37,8 @@ describe("ResourceIO sandbox file tools", () => {
   function makeToolsWithResourceIO(resourceIO) {
     tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "hana-resource-sandbox-tools-"));
     const workspace = path.join(tempRoot, "workspace");
-    const hanakoHome = path.join(tempRoot, "hana-home");
-    const agentDir = path.join(hanakoHome, "agents", "hana");
+    const lingxiHome = path.join(tempRoot, "hana-home");
+    const agentDir = path.join(lingxiHome, "agents", "hana");
     fs.mkdirSync(workspace, { recursive: true });
     fs.mkdirSync(agentDir, { recursive: true });
     const sessionPath = path.join(agentDir, "sessions", "main.jsonl");
@@ -46,7 +46,7 @@ describe("ResourceIO sandbox file tools", () => {
       agentDir,
       workspace,
       workspaceFolders: [],
-      hanakoHome,
+      lingxiHome,
       getSandboxEnabled: () => true,
       getSessionPath: () => sessionPath,
       resourceIO,

@@ -23,7 +23,7 @@ describe("desktop launch diagnostics", () => {
     const { createDesktopLaunchDiagnostics } = mod.default || mod;
     let tick = 0;
     const diagnostics = createDesktopLaunchDiagnostics({
-      hanakoHome: tmpDir,
+      lingxiHome: tmpDir,
       startupId: "startup-1",
       appVersion: "1.2.3",
       platform: "win32",

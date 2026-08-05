@@ -90,7 +90,7 @@ function mockEngine( overrides: any = {}) {
       ...overrides.pm,
     },
     fetch: overrides.fetch,
-    hanakoHome: overrides.hanakoHome,
+    lingxiHome: overrides.lingxiHome,
     providerRegistry: overrides.providerRegistry,
     getEventBus: overrides.getEventBus || (() => overrides.eventBus || null),
     pluginDevService: overrides.pluginDevService,
@@ -514,7 +514,7 @@ describe("plugin management API", () => {
     it("issues route-bound iframe tickets and strips them before plugin proxying", async () => {
       const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "lingxi-plugin-iframe-ticket-"));
       try {
-        const engine = mockEngine({ hanakoHome: tmpDir });
+        const engine = mockEngine({ lingxiHome: tmpDir });
         const pluginApp = new Hono();
         pluginApp.get("/page", (c) => c.json({ search: new URL(c.req.url).search }));
         engine.pluginManager.routeRegistry.set("demo", pluginApp);
@@ -610,7 +610,7 @@ describe("plugin management API", () => {
         fs.writeFileSync(path.join(pluginDir, "assets", "dist", "dashboard.js"), "export const ok = true;\n");
 
         const engine = mockEngine({
-          hanakoHome: tmpDir,
+          lingxiHome: tmpDir,
           pm: {
             getPlugin: (id) => (
               id === "demo"
@@ -661,7 +661,7 @@ describe("plugin management API", () => {
         fs.writeFileSync(path.join(pluginDir, "assets", "videos", "background.mp4"), Buffer.from("0123456789abcdef"));
 
         const engine = mockEngine({
-          hanakoHome: tmpDir,
+          lingxiHome: tmpDir,
           pm: {
             getPlugin: (id) => (
               id === "demo"
@@ -723,7 +723,7 @@ describe("plugin management API", () => {
         fs.writeFileSync(path.join(pluginDir, "routes", "page.js"), "export default function route() {}\n");
 
         const engine = mockEngine({
-          hanakoHome: tmpDir,
+          lingxiHome: tmpDir,
           pm: {
             getPlugin: (id) => (
               id === "demo"
@@ -772,7 +772,7 @@ describe("plugin management API", () => {
         fs.writeFileSync(path.join(pluginDir, "assets", "entry.js"), "export {};\n");
 
         const engine = mockEngine({
-          hanakoHome: tmpDir,
+          lingxiHome: tmpDir,
           pm: {
             getPlugin: (id) => (
               id === "demo"
@@ -810,7 +810,7 @@ describe("plugin management API", () => {
     it("rejects iframe ticket issuance for host-owned plugin management routes", async () => {
       const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "lingxi-plugin-iframe-ticket-host-"));
       try {
-        const engine = mockEngine({ hanakoHome: tmpDir });
+        const engine = mockEngine({ lingxiHome: tmpDir });
         engine.pluginManager.routeRegistry.set("demo", new Hono());
         const app = createApp(engine);
 
@@ -834,7 +834,7 @@ describe("plugin management API", () => {
       const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "lingxi-plugin-iframe-ticket-bypass-"));
       try {
         const engine = mockEngine({
-          hanakoHome: tmpDir,
+          lingxiHome: tmpDir,
           getConfig: () => ({
             pluginId: "demo",
             schema: { properties: { endpoint: { type: "string" } } },
@@ -1173,7 +1173,7 @@ describe("plugin management API", () => {
           installedManifestExists: fs.existsSync(path.join(dir, "manifest.json")),
         }));
         const engine = mockEngine({
-          hanakoHome: tmp,
+          lingxiHome: tmp,
           fetch: vi.fn(async () => new Response(zip)),
           plugins: [],
           pm: {
@@ -1263,7 +1263,7 @@ describe("plugin management API", () => {
         const recordPluginInstall = vi.fn();
         const engine = mockEngine({
           appVersion: "0.190.2",
-          hanakoHome: tmp,
+          lingxiHome: tmp,
           fetch: vi.fn(async () => new Response(zip)),
           plugins: [{ id: "demo", name: "Demo", version: "1.5.0", status: "loaded" }],
           recordPluginInstall,
@@ -1349,7 +1349,7 @@ describe("plugin management API", () => {
           .mockRejectedValueOnce(new Error("load exploded"))
           .mockResolvedValueOnce({ id: "demo", name: "Demo", version: "1.0.0", status: "loaded" });
         const engine = mockEngine({
-          hanakoHome: tmp,
+          lingxiHome: tmp,
           pm: {
             getUserPluginsDir: () => userPluginsDir,
             listPlugins: () => [{ id: "demo", name: "Demo", version: "1.0.0", status: "loaded", pluginDir: existingDir }],
@@ -1406,7 +1406,7 @@ describe("plugin management API", () => {
         };
         const installPlugin = vi.fn();
         const engine = mockEngine({
-          hanakoHome: tmp,
+          lingxiHome: tmp,
           fetch: vi.fn(async () => new Response(zip)),
           plugins: [],
           pm: {
@@ -2077,7 +2077,7 @@ function createAppWithProductionPluginSurfaceAuth(engine, { connectionKind = "lo
   // request-principal.ts 的 resolveHttpRequestPrincipal，避免测试侧重新实现
   // 生产中间件后两边漂移。
   const serverAuthService = createServerAuthService({
-    hanakoHome: engine.hanakoHome,
+    lingxiHome: engine.lingxiHome,
     loopbackToken: crypto.randomBytes(16).toString("hex"),
     runtimeContext: null,
   });
@@ -2210,7 +2210,7 @@ describe("plugin route request-level principal and capability context", () => {
   it("issues a plugin surface session alongside the iframe ticket", async () => {
     const tmpHome = fs.mkdtempSync(path.join(os.tmpdir(), "lingxi-plugin-surface-issue-"));
     try {
-      const engine = mockEngine({ hanakoHome: tmpHome });
+      const engine = mockEngine({ lingxiHome: tmpHome });
       const pluginApp = new Hono();
       pluginApp.get("/page", (c) => c.html("<!doctype html>"));
       engine.pluginManager.routeRegistry.set("media-board", pluginApp);
@@ -2253,7 +2253,7 @@ describe("plugin route request-level principal and capability context", () => {
       }));
       bus.handle("session:create", sessionCreate);
 
-      const engine = mockEngine({ hanakoHome: tmpHome });
+      const engine = mockEngine({ lingxiHome: tmpHome });
       (engine as any).pluginManager = pm;
       const app = createAppWithProductionPluginSurfaceAuth(engine);
 
@@ -2304,7 +2304,7 @@ describe("plugin route request-level principal and capability context", () => {
       });
       const sessionCreate = vi.fn(async () => ({ ok: true, sessionPath: "/x.jsonl" }));
       bus.handle("session:create", sessionCreate);
-      const engine = mockEngine({ hanakoHome: tmpHome });
+      const engine = mockEngine({ lingxiHome: tmpHome });
       (engine as any).pluginManager = pm;
       const app = createAppWithProductionPluginSurfaceAuth(engine);
 
@@ -2348,7 +2348,7 @@ describe("plugin route request-level principal and capability context", () => {
       });
       const sessionCreate = vi.fn(async () => ({ ok: true, sessionPath: "/x.jsonl" }));
       bus.handle("session:create", sessionCreate);
-      const engine = mockEngine({ hanakoHome: tmpHome });
+      const engine = mockEngine({ lingxiHome: tmpHome });
       (engine as any).pluginManager = pm;
       const app = createAppWithProductionPluginSurfaceAuth(engine);
 
@@ -2396,7 +2396,7 @@ describe("plugin route request-level principal and capability context", () => {
       });
       const sessionCreate = vi.fn(async () => ({ ok: true, sessionPath: "/x.jsonl" }));
       bus.handle("session:create", sessionCreate);
-      const engine = mockEngine({ hanakoHome: tmpHome });
+      const engine = mockEngine({ lingxiHome: tmpHome });
       (engine as any).pluginManager = pm;
       const app = createAppWithProductionPluginSurfaceAuth(engine);
 
@@ -2443,7 +2443,7 @@ describe("plugin route request-level principal and capability context", () => {
         sessionPath: "/agents/hanako/sessions/legacy.jsonl",
       }));
       bus.handle("session:create", sessionCreate);
-      const engine = mockEngine({ hanakoHome: tmpHome });
+      const engine = mockEngine({ lingxiHome: tmpHome });
       (engine as any).pluginManager = pm;
       const app = createAppWithProductionPluginSurfaceAuth(engine);
 
@@ -2490,7 +2490,7 @@ describe("plugin route request-level principal and capability context", () => {
       });
       const sessionCreate = vi.fn(async () => ({ ok: true, sessionPath: "/x.jsonl" }));
       bus.handle("session:create", sessionCreate);
-      const engine = mockEngine({ hanakoHome: tmpHome });
+      const engine = mockEngine({ lingxiHome: tmpHome });
       (engine as any).pluginManager = pm;
       const app = createAppWithProductionPluginSurfaceAuth(engine);
 
@@ -2532,7 +2532,7 @@ describe("plugin route request-level principal and capability context", () => {
         manifestExtra: { capabilities: ["session"] },
         routeSource: SESSION_CREATE_ROUTE_SOURCE,
       });
-      const engine = mockEngine({ hanakoHome: tmpHome });
+      const engine = mockEngine({ lingxiHome: tmpHome });
       (engine as any).pluginManager = pm;
       const app = createAppWithProductionPluginSurfaceAuth(engine);
 

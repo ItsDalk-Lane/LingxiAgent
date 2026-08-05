@@ -147,7 +147,7 @@ async function runResolvePackagedArtifactBoot(
   };
 
   const context = vm.createContext({
-    hanakoHome: "/tmp/hana-home-fixture",
+    lingxiHome: "/tmp/hana-home-fixture",
     app: { isPackaged: true },
     process: { resourcesPath: "/tmp/resources", platform: "darwin", arch: "arm64" },
     path,
@@ -237,7 +237,7 @@ describe("artifact-boot channel consistency: crash-sentinel + renderer-retry sou
   const rendererRetrySource = extractFunctionSource(mainSource, "handleRendererArtifactLoadFailure");
 
   it("_spawnServerOnce reads the crash-sentinel channel off artifactBootContext, not the stable constant", () => {
-    expect(spawnServerOnceSource).toContain("artifactBoot.writeBootSentinel(hanakoHome, artifactBootContext.channel, artifactBootContext.train)");
+    expect(spawnServerOnceSource).toContain("artifactBoot.writeBootSentinel(lingxiHome, artifactBootContext.channel, artifactBootContext.train)");
     expect(spawnServerOnceSource).toContain("channel: artifactBootContext.channel,");
     expect(spawnServerOnceSource).not.toContain("artifactBoot.SEED_CHANNEL");
   });

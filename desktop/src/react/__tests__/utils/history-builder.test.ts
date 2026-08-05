@@ -148,7 +148,7 @@ describe('buildItemsFromHistory user image restoration', () => {
       messages: [{
         id: 'u1',
         role: 'user',
-        content: '[attached_image: /Users/test/.hanako/attachments/upload-abc.png]\n(看图)',
+        content: '[attached_image: /Users/test/.lingxi/attachments/upload-abc.png]\n(看图)',
       }],
     });
 
@@ -159,7 +159,7 @@ describe('buildItemsFromHistory user image restoration', () => {
     expect(first.data.text).toBe('');
     expect(first.data.textHtml).toBeUndefined();
     expect(first.data.attachments).toEqual([{
-      path: '/Users/test/.hanako/attachments/upload-abc.png',
+      path: '/Users/test/.lingxi/attachments/upload-abc.png',
       name: 'upload-abc.png',
       isDir: false,
     }]);
@@ -170,7 +170,7 @@ describe('buildItemsFromHistory user image restoration', () => {
       messages: [{
         id: 'u1',
         role: 'user',
-        content: '[attached_image: /Users/test/.hanako/attachments/upload-native.png]\n看看这个',
+        content: '[attached_image: /Users/test/.lingxi/attachments/upload-native.png]\n看看这个',
         images: [{ data: 'BASE64', mimeType: 'image/png' }],
       }],
     });
@@ -180,7 +180,7 @@ describe('buildItemsFromHistory user image restoration', () => {
     if (first.type !== 'message') throw new Error('expected message');
     expect(first.data.text).toBe('看看这个');
     expect(first.data.attachments).toEqual([{
-      path: '/Users/test/.hanako/attachments/upload-native.png',
+      path: '/Users/test/.lingxi/attachments/upload-native.png',
       name: 'upload-native.png',
       isDir: false,
       mimeType: 'image/png',
@@ -192,7 +192,7 @@ describe('buildItemsFromHistory user image restoration', () => {
       messages: [{
         id: 'u1',
         role: 'user',
-        content: '[attached_audio: /Users/test/.hanako/session-files/voice.wav]\n听一下',
+        content: '[attached_audio: /Users/test/.lingxi/session-files/voice.wav]\n听一下',
       }],
     });
 
@@ -202,7 +202,7 @@ describe('buildItemsFromHistory user image restoration', () => {
     expect(first.data.text).toBe('听一下');
     expect(first.data.textHtml).not.toContain('attached_audio');
     expect(first.data.attachments).toEqual([{
-      path: '/Users/test/.hanako/session-files/voice.wav',
+      path: '/Users/test/.lingxi/session-files/voice.wav',
       name: 'voice.wav',
       isDir: false,
     }]);
@@ -213,7 +213,7 @@ describe('buildItemsFromHistory user image restoration', () => {
       messages: [{
         id: 'u1',
         role: 'user',
-        content: '[attached_audio: /Users/test/.hanako/session-files/voice.wav]\n（听音频）',
+        content: '[attached_audio: /Users/test/.lingxi/session-files/voice.wav]\n（听音频）',
       }],
     });
 
@@ -223,14 +223,14 @@ describe('buildItemsFromHistory user image restoration', () => {
     expect(first.data.text).toBe('');
     expect(first.data.textHtml).toBeUndefined();
     expect(first.data.attachments).toEqual([{
-      path: '/Users/test/.hanako/session-files/voice.wav',
+      path: '/Users/test/.lingxi/session-files/voice.wav',
       name: 'voice.wav',
       isDir: false,
     }]);
   });
 
   it('从 SessionFile 账本恢复历史音频附件的展示名和元信息', () => {
-    const filePath = '/Users/test/.hanako/session-files/hash/录音 1_mpykkdz7_35680467.wav';
+    const filePath = '/Users/test/.lingxi/session-files/hash/录音 1_mpykkdz7_35680467.wav';
     const items = buildItemsFromHistory({
       messages: [{
         id: 'u1',
@@ -268,8 +268,8 @@ describe('buildItemsFromHistory user image restoration', () => {
   });
 
   it('用 Fork 文件的旧 id 和旧路径别名恢复未改写的历史附件', () => {
-    const parentPath = '/Users/test/.hanako/session-files/parent/voice.wav';
-    const childPath = '/Users/test/.hanako/session-files/child/voice.wav';
+    const parentPath = '/Users/test/.lingxi/session-files/parent/voice.wav';
+    const childPath = '/Users/test/.lingxi/session-files/child/voice.wav';
     const items = buildItemsFromHistory({
       messages: [{
         id: 'u-forked-file',
@@ -301,7 +301,7 @@ describe('buildItemsFromHistory user image restoration', () => {
   });
 
   it('从 SessionFile 账本恢复 voice-input 音频附件的展示语义', () => {
-    const filePath = '/Users/test/.hanako/session-files/hash/录音 1_mpykkdz7_35680467.wav';
+    const filePath = '/Users/test/.lingxi/session-files/hash/录音 1_mpykkdz7_35680467.wav';
     const items = buildItemsFromHistory({
       messages: [{
         id: 'u-voice-input',
@@ -338,7 +338,7 @@ describe('buildItemsFromHistory user image restoration', () => {
   });
 
   it('从 SessionFile 账本恢复 voice-input 转录展示元数据，但不把它写进消息正文', () => {
-    const filePath = '/Users/test/.hanako/session-files/hash/录音 1_mpykkdz7_35680467.wav';
+    const filePath = '/Users/test/.lingxi/session-files/hash/录音 1_mpykkdz7_35680467.wav';
     const items = buildItemsFromHistory({
       messages: [{
         id: 'u-voice-transcript',
@@ -392,7 +392,7 @@ describe('buildItemsFromHistory user image restoration', () => {
   });
 
   it('从 SessionFile 账本恢复旧版图片附件，并把模型传输说明排除出可见正文', () => {
-    const filePath = '/Users/test/.hanako/uploads/粘贴图片_mpyjx6zr_fc3d70a9.png';
+    const filePath = '/Users/test/.lingxi/uploads/粘贴图片_mpyjx6zr_fc3d70a9.png';
     const items = buildItemsFromHistory({
       messages: [{
         id: 'u1',
@@ -430,7 +430,7 @@ describe('buildItemsFromHistory user image restoration', () => {
   });
 
   it('从 SessionFile 机器上下文恢复展示名附件，并把机器行排除出可见正文', () => {
-    const filePath = '/Users/test/.hanako/uploads/报告2026_mq6l.txt';
+    const filePath = '/Users/test/.lingxi/uploads/报告2026_mq6l.txt';
     const items = buildItemsFromHistory({
       messages: [{
         id: 'u-session-file',

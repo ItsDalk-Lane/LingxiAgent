@@ -89,7 +89,7 @@ export class ConfigCoordinator {
   declare _d: any;
   /**
    * @param {object} deps
-   * @param {string} deps.hanakoHome
+   * @param {string} deps.lingxiHome
    * @param {string} deps.agentsDir
    * @param {() => object} deps.getAgent - 当前焦点 agent
    * @param {(id: string) => object|null} deps.getAgentById - 按 ID 查找 agent

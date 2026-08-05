@@ -153,7 +153,7 @@ describe("createWechatAdapter", () => {
   });
 
   it("persists context tokens so scheduled WeChat replies survive adapter restart", async () => {
-    const hanaHome = fs.mkdtempSync(path.join(os.tmpdir(), "hana-wechat-context-"));
+    const lingxiHome = fs.mkdtempSync(path.join(os.tmpdir(), "hana-wechat-context-"));
     vi.setSystemTime(new Date("2026-06-04T08:00:00.000Z"));
     let getUpdatesCount = 0;
     const fetchMock = vi.fn(async (url) => {
@@ -180,7 +180,7 @@ describe("createWechatAdapter", () => {
 
     const adapter = createWechatAdapter({
       botToken: "wx-token",
-      hanaHome,
+      lingxiHome,
       agentId: "hana",
       onMessage: vi.fn(),
       onStatus: vi.fn(),
@@ -190,7 +190,7 @@ describe("createWechatAdapter", () => {
 
     const restarted = createWechatAdapter({
       botToken: "wx-token",
-      hanaHome,
+      lingxiHome,
       agentId: "hana",
       onMessage: vi.fn(),
       onStatus: vi.fn(),
@@ -203,7 +203,7 @@ describe("createWechatAdapter", () => {
     expect(JSON.parse((sendMessageCall as any)![1].body).msg.context_token).toBe("ctx-persisted");
 
     restarted.stop();
-    fs.rmSync(hanaHome, { recursive: true, force: true });
+    fs.rmSync(lingxiHome, { recursive: true, force: true });
   });
 
   it("sends and cancels native typing status through the OpenClaw iLink typing ticket", async () => {
@@ -261,7 +261,7 @@ describe("createWechatAdapter", () => {
   });
 
   it("prunes expired persisted WeChat context tokens on restart", async () => {
-    const hanaHome = fs.mkdtempSync(path.join(os.tmpdir(), "hana-wechat-context-expired-"));
+    const lingxiHome = fs.mkdtempSync(path.join(os.tmpdir(), "hana-wechat-context-expired-"));
     vi.setSystemTime(new Date("2026-06-04T08:00:00.000Z"));
     let getUpdatesCount = 0;
     const fetchMock = vi.fn(async (url) => {
@@ -287,7 +287,7 @@ describe("createWechatAdapter", () => {
 
     const adapter = createWechatAdapter({
       botToken: "wx-token",
-      hanaHome,
+      lingxiHome,
       agentId: "hana",
       onMessage: vi.fn(),
       onStatus: vi.fn(),
@@ -298,7 +298,7 @@ describe("createWechatAdapter", () => {
     vi.setSystemTime(new Date("2026-06-05T08:00:01.000Z"));
     const restarted = createWechatAdapter({
       botToken: "wx-token",
-      hanaHome,
+      lingxiHome,
       agentId: "hana",
       onMessage: vi.fn(),
       onStatus: vi.fn(),
@@ -308,6 +308,6 @@ describe("createWechatAdapter", () => {
     await expect(restarted.sendReply("user-1", "too late")).rejects.toThrow("需要对方最近发过消息");
 
     restarted.stop();
-    fs.rmSync(hanaHome, { recursive: true, force: true });
+    fs.rmSync(lingxiHome, { recursive: true, force: true });
   });
 });

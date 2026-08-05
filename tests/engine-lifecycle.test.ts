@@ -33,7 +33,7 @@ describe("LingxiEngine Computer Use lazy runtime", () => {
   function createEngine() {
     tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "hana-engine-computer-use-"));
     return trackEngine(new LingxiEngine({
-      hanakoHome: tmpDir,
+      lingxiHome: tmpDir,
       productDir: tmpDir,
       agentId: "hana",
     } as any));
@@ -74,7 +74,7 @@ describe("LingxiEngine Computer Use lazy runtime", () => {
     expect(engine._computerProviders).toBeNull();
   });
 
-  it("stores usage ledger entries under hanakoHome so engine restarts keep them", () => {
+  it("stores usage ledger entries under lingxiHome so engine restarts keep them", () => {
     const engine = createEngine();
     engine.usageLedger.record({
       model: { provider: "openai", modelId: "gpt-5", api: "openai-completions" },
@@ -86,7 +86,7 @@ describe("LingxiEngine Computer Use lazy runtime", () => {
     });
 
     const restarted = trackEngine(new LingxiEngine({
-      hanakoHome: tmpDir,
+      lingxiHome: tmpDir,
       productDir: tmpDir,
       agentId: "hana",
     } as any));

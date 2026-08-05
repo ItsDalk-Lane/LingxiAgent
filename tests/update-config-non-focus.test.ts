@@ -39,7 +39,7 @@ describe("updateConfig with agentId", () => {
       focusAgent,
       targetAgent,
       deps: {
-        hanakoHome: "/tmp/test",
+        lingxiHome: "/tmp/test",
         agentsDir: "/tmp/test/agents",
         getAgent: () => focusAgent,
         getAgentById: (id) => (id === "target" ? targetAgent : null),
@@ -393,7 +393,7 @@ describe("updateConfig with agentId", () => {
     const writeSessionMeta = vi.fn();
     const getSessionMemoryEnabled = vi.fn(() => false);
     const coord = new ConfigCoordinator({
-      hanakoHome: "/tmp/test",
+      lingxiHome: "/tmp/test",
       agentsDir: "/tmp/test/agents",
       getAgent: () => focusAgent,
       getAgentById: () => null,
@@ -432,7 +432,7 @@ describe("updateConfig with agentId", () => {
     };
     const setSessionMemoryEnabled = vi.fn(async () => undefined);
     const coord = new ConfigCoordinator({
-      hanakoHome: "/tmp/test",
+      lingxiHome: "/tmp/test",
       agentsDir: "/tmp/test/agents",
       getAgent: () => focusAgent,
       getAgentById: () => null,

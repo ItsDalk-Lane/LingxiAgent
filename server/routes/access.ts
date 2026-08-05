@@ -54,7 +54,7 @@ export function createAccessRoute({
   listLanAddresses?: () => string[];
   now?: () => string;
 } = {}) {
-  if (!engine?.hanakoHome) throw new Error("engine.hanakoHome required");
+  if (!engine?.lingxiHome) throw new Error("engine.lingxiHome required");
   const route = new Hono();
 
   route.get("/access/summary", (c) => {
@@ -87,11 +87,11 @@ export function createAccessRoute({
     if (denied) return denied;
     try {
       const body = await safeJson(c);
-      const existing = loadServerNetworkConfig(engine.hanakoHome);
+      const existing = loadServerNetworkConfig(engine.lingxiHome);
       const mode = normalizeNetworkMode(body?.mode);
       const listenPort = normalizePort(body?.listenPort ?? body?.configuredPort ?? existing.listenPort);
       const listenHost = mode === "lan" ? "0.0.0.0" : "127.0.0.1";
-      const network = saveServerNetworkConfig(engine.hanakoHome, {
+      const network = saveServerNetworkConfig(engine.lingxiHome, {
         ...existing,
         mode,
         listenHost,
@@ -129,7 +129,7 @@ export function createAccessRoute({
       const body = await safeJson(c);
       const runtimeContext = resolveRuntimeContext(c, engine);
       const scopes = normalizeScopes(body?.scopes, profile);
-      const issued = createDeviceCredential(engine.hanakoHome, {
+      const issued = createDeviceCredential(engine.lingxiHome, {
         serverNodeId: runtimeContext.serverNodeId,
         userId: runtimeContext.userId,
         studioIds: [runtimeContext.studioId],
@@ -167,7 +167,7 @@ export function createAccessRoute({
     if (denied) return denied;
     try {
       const body = await safeJson(c);
-      const account = updateLocalAccountProfile(engine.hanakoHome, {
+      const account = updateLocalAccountProfile(engine.lingxiHome, {
         username: body?.username,
         displayName: body?.displayName,
         now: now(),
@@ -187,7 +187,7 @@ export function createAccessRoute({
     if (denied) return denied;
     try {
       const body = await safeJson(c);
-      const account = setLocalAccountPassword(engine.hanakoHome, {
+      const account = setLocalAccountPassword(engine.lingxiHome, {
         password: body?.password,
         now: now(),
       } as any);
@@ -206,7 +206,7 @@ export function createAccessRoute({
     const denied = requireLocalOwner(c);
     if (denied) return denied;
     try {
-      const account = clearLocalAccountPassword(engine.hanakoHome, { now: now() });
+      const account = clearLocalAccountPassword(engine.lingxiHome, { now: now() });
       recordSecurityAuditEvent(c, engine, {
         action: "access.account.password.clear",
         target: account.userId,
@@ -221,11 +221,11 @@ export function createAccessRoute({
 }
 
 export function createAccessSummary(engine, runtimeState, listLanAddresses = getLanAddresses) {
-  const network = loadServerNetworkConfig(engine.hanakoHome);
-  const registries = loadDeviceAccessRegistries(engine.hanakoHome);
+  const network = loadServerNetworkConfig(engine.lingxiHome);
+  const registries = loadDeviceAccessRegistries(engine.lingxiHome);
   return {
     network: createNetworkSummary(network, runtimeState, listLanAddresses),
-    account: getLocalAccountSummary(engine.hanakoHome),
+    account: getLocalAccountSummary(engine.lingxiHome),
     devices: registries.devices.devices.map(sanitizeDevice),
     credentials: registries.credentials.credentials.map(sanitizeCredential),
   };

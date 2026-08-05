@@ -1059,7 +1059,7 @@ export const PERSISTENT_STORES: readonly StoreDescriptor[] = Object.freeze([
     identityContract: "Diagnostic filenames are fixed locators and never provide user, session, or epoch identity.",
     siteRules: [
       ...rules(["desktop/bootstrap.cjs", "desktop/src/shared/launch-integrity.cjs", "desktop/src/shared/desktop-launch-diagnostics.cjs"], "Writes epoch-independent desktop launch diagnostics."),
-      ...rules(["desktop/main.cjs"], "Writes desktop crash or browser-command diagnostics.", ["mkdir", "write-file", "append-file"], "(?:hanakoHome|crashLogPath|browser-cmd[.]log)"),
+      ...rules(["desktop/main.cjs"], "Writes desktop crash or browser-command diagnostics.", ["mkdir", "write-file", "append-file"], "(?:lingxiHome|crashLogPath|browser-cmd[.]log)"),
     ],
   }),
   defineStore({

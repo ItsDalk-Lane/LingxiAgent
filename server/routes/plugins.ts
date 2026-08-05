@@ -163,7 +163,7 @@ function verifyPluginIframeTicketForRequest(c: any, engine: any, pluginId: strin
     throw new PluginIframeTicketError("plugin iframe ticket plugin mismatch");
   }
   return verifyPluginIframeTicket({
-    hanakoHome: engine.hanakoHome,
+    lingxiHome: engine.lingxiHome,
     ticket,
     pluginId,
     surfacePath: surface.surfacePath,
@@ -188,7 +188,7 @@ function responseNeedsPluginAssetSession(c: any, response: Response, iframeTicke
 
 function appendPluginAssetSessionCookie(c: any, engine: any, pluginId: string, response: Response, iframeTicket: any) {
   if (!responseNeedsPluginAssetSession(c, response, iframeTicket)) return response;
-  if (!engine?.hanakoHome) return response;
+  if (!engine?.lingxiHome) return response;
   const principal = readAuthPrincipal(c);
   // Surface session 凭证不允许给自己续发资产会话 cookie：派生凭证不能再派生，
   // 续发只能来自 ticket 或 owner / device 凭证的入口。
@@ -196,7 +196,7 @@ function appendPluginAssetSessionCookie(c: any, engine: any, pluginId: string, r
   const principalId = iframeTicket?.principalId || principal?.principalId;
   if (!principalId) return response;
   const issued = issuePluginAssetSession({
-    hanakoHome: engine.hanakoHome,
+    lingxiHome: engine.lingxiHome,
     pluginId,
     principalId,
   } as any);
@@ -228,7 +228,7 @@ export function verifyPluginIframeTicketForHostRequest(c: any, engine: any, { re
   const surface = pluginIframeSurfaceRouteFromRequest(c);
   assertPluginIframeSurfaceAllowed(surface);
   return verifyPluginIframeTicket({
-    hanakoHome: engine.hanakoHome,
+    lingxiHome: engine.lingxiHome,
     ticket,
     pluginId: surface.pluginId,
     surfacePath: surface.surfacePath,
@@ -526,7 +526,7 @@ async function installPluginFromPath({
     }
 
     backup = createPluginInstallBackup({
-      hanakoHome: engine.hanakoHome,
+      lingxiHome: engine.lingxiHome,
       pluginId: desc.id,
       pluginDir: targetDir,
       version: installedVersion,
@@ -629,7 +629,7 @@ async function downloadMarketplaceRelease({ engine, plugin }: { engine: any; plu
     err.status = 500;
     throw err;
   }
-  if (!engine.hanakoHome) {
+  if (!engine.lingxiHome) {
     const err = new Error("LINGXI_HOME is unavailable for plugin release installation") as Error & { status: number };
     err.status = 500;
     throw err;
@@ -663,7 +663,7 @@ async function downloadMarketplaceRelease({ engine, plugin }: { engine: any; plu
 
   const pluginId = safePathSegment(plugin.id, "plugin");
   const version = safePathSegment(plugin.version, "0.0.0");
-  const downloadsDir = path.join(engine.hanakoHome, "plugin-install-sources", pluginId, version);
+  const downloadsDir = path.join(engine.lingxiHome, "plugin-install-sources", pluginId, version);
   fs.mkdirSync(downloadsDir, { recursive: true });
   const packagePath = path.join(downloadsDir, `${pluginId}-${version}.zip`);
   fs.writeFileSync(packagePath, body);
@@ -966,7 +966,7 @@ export function createPluginsRoute(engine: any) {
 
   function getMarketplace() {
     return engine.pluginMarketplace || createDefaultPluginMarketplace({
-      hanakoHome: engine.hanakoHome,
+      lingxiHome: engine.lingxiHome,
       fetchImpl: engine.fetch,
     } as any);
   }
@@ -1254,7 +1254,7 @@ export function createPluginsRoute(engine: any) {
       const principal = (c as any).get("authPrincipal");
       const principalId = principal?.principalId || "principal_unknown";
       const issued = issuePluginIframeTicket({
-        hanakoHome: engine.hanakoHome,
+        lingxiHome: engine.lingxiHome,
         pluginId,
         surfacePath,
         principalId,
@@ -1262,7 +1262,7 @@ export function createPluginsRoute(engine: any) {
       // Surface session 与 ticket 一并签发：ticket 只负责该 surface 的文档加载，
       // surface session 是页面脚本调用本插件 route handler 的请求级入口凭证。
       const surfaceSession = issuePluginSurfaceSession({
-        hanakoHome: engine.hanakoHome,
+        lingxiHome: engine.lingxiHome,
         pluginId,
         principalId,
       } as any);

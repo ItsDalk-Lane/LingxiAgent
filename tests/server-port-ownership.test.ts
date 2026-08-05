@@ -75,12 +75,12 @@ describe("server transport ownership", () => {
       blocker.listen(0, "127.0.0.1", resolve as any);
     });
     const port = (blocker.address() as any).port;
-    const hanaHome = fs.mkdtempSync(path.join(os.tmpdir(), "hana-port-conflict-test-"));
+    const lingxiHome = fs.mkdtempSync(path.join(os.tmpdir(), "hana-port-conflict-test-"));
     const child = spawn(process.execPath, ["server/bootstrap.ts"], {
       cwd: root,
       env: {
         ...process.env,
-        LINGXI_HOME: hanaHome,
+        LINGXI_HOME: lingxiHome,
         LINGXI_PORT: String(port),
         LINGXI_ROOT: root,
         // server/main-full.ts is the thin closed composition entry:
@@ -113,7 +113,7 @@ describe("server transport ownership", () => {
       expect(stdout + stderr).not.toContain("LingxiEngine");
     } finally {
       blocker.close();
-      fs.rmSync(hanaHome, { recursive: true, force: true });
+      fs.rmSync(lingxiHome, { recursive: true, force: true });
     }
   });
 });

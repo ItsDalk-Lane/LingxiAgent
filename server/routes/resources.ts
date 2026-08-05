@@ -30,7 +30,7 @@ export function createResourcesRoute(engine) {
       const content = resolveResourceContent(engine, resourceId, requestContext);
       const studioId = content.resource?.studioId || requestContext.studioId;
       const issued = issueResourceTicket({
-        hanakoHome: engine?.hanakoHome,
+        lingxiHome: engine?.lingxiHome,
         resourceId,
         studioId,
         principalId: requestContext.principalId,
@@ -142,7 +142,7 @@ function serveResourceContent(c, engine, headOnly) {
 
 function resolveTicketContent(c, engine, resourceId, ticket) {
   verifyResourceTicket({
-    hanakoHome: engine?.hanakoHome,
+    lingxiHome: engine?.lingxiHome,
     ticket,
     resourceId,
   });

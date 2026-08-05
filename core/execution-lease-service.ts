@@ -6,7 +6,7 @@ import {
 } from "./execution-lease-registry.ts";
 
 export function issueRemoteWriteLease({
-  hanakoHome,
+  lingxiHome,
   requestContext,
   decision,
   agentId,
@@ -16,7 +16,7 @@ export function issueRemoteWriteLease({
   now = new Date().toISOString(),
   ttlMs = 5 * 60 * 1000,
 }: {
-  hanakoHome?: any;
+  lingxiHome?: any;
   requestContext?: any;
   decision?: any;
   agentId?: any;
@@ -26,12 +26,12 @@ export function issueRemoteWriteLease({
   now?: string;
   ttlMs?: number;
 } = {}) {
-  if (!hanakoHome || isLocalOwner(requestContext)) return null;
+  if (!lingxiHome || isLocalOwner(requestContext)) return null;
   const principal = requestContext?.authPrincipal;
   if (!principal || principal.kind === "unknown") return null;
   if (!principal?.principalId) return null;
   const issuedAtMs = Date.parse(now);
-  const lease = issueExecutionLease(hanakoHome, {
+  const lease = issueExecutionLease(lingxiHome, {
     schemaVersion: 1,
     leaseId: `lease_${crypto.randomUUID()}`,
     studioId: requestContext.studioId || principal.studioId || "studio_unknown",
@@ -51,14 +51,14 @@ export function issueRemoteWriteLease({
   return lease;
 }
 
-export function consumeRemoteWriteLease(hanakoHome, lease, { now = new Date().toISOString() } = {}) {
-  if (!hanakoHome || !lease?.leaseId) return null;
-  return consumeExecutionLease(hanakoHome, lease.leaseId, { now });
+export function consumeRemoteWriteLease(lingxiHome, lease, { now = new Date().toISOString() } = {}) {
+  if (!lingxiHome || !lease?.leaseId) return null;
+  return consumeExecutionLease(lingxiHome, lease.leaseId, { now });
 }
 
-export function revokeRemoteWriteLease(hanakoHome, lease, { now = new Date().toISOString() } = {}) {
-  if (!hanakoHome || !lease?.leaseId) return null;
-  return revokeExecutionLease(hanakoHome, lease.leaseId, { now });
+export function revokeRemoteWriteLease(lingxiHome, lease, { now = new Date().toISOString() } = {}) {
+  if (!lingxiHome || !lease?.leaseId) return null;
+  return revokeExecutionLease(lingxiHome, lease.leaseId, { now });
 }
 
 function isLocalOwner(requestContext) {

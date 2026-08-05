@@ -539,7 +539,7 @@ function skillBundlesForCard(skills) {
 }
 
 export function createCharacterCardService(engine) {
-  const stagingRoot = path.join(engine.hanakoHome, ".ephemeral", "character-card-imports");
+  const stagingRoot = path.join(engine.lingxiHome, ".ephemeral", "character-card-imports");
 
   function planPath(token) {
     assertSafeToken(token);
@@ -907,7 +907,7 @@ export function createCharacterCardService(engine) {
       throw new CharacterCardError("export target directory not found");
     }
     const token = randomToken();
-    const exportRoot = path.join(engine.hanakoHome, ".ephemeral", "character-card-exports", token);
+    const exportRoot = path.join(engine.lingxiHome, ".ephemeral", "character-card-exports", token);
     const packageRoot = path.join(exportRoot, "package");
     try {
       await fsp.mkdir(packageRoot, { recursive: true });
