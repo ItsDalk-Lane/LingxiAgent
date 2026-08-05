@@ -82,7 +82,7 @@ import path from "node:path";
 import { createRequire } from "node:module";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
-import { buildSeedManifest } from "./build-server-artifact.mjs";
+import { buildSeedManifest, resolveSignKeyId } from "./build-server-artifact.mjs";
 
 const require = createRequire(import.meta.url);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -624,7 +624,16 @@ export async function publishChannel({
   assertSourceReleaseEligible({ tag, channel, sourceRelease, allowPrereleaseStable });
 
   const version = tag.replace(/^v/, "");
-  const keyId = loadPinnedKeyset()[0].keyId;
+  // keyId 必须与签名私钥匹配。默认（真实发布）：有 LINGXI_SIGN_KEY 时从私钥
+  // 推导并硬性校验（不匹配 keyset 就在签名前报错），无私钥（预览场景）沿用
+  // keyset 第一项——真实 publish 在签名阶段还有 requireSignKeyPath guard 兜底。
+  // deps.resolveKeyId 是测试/自定义环境的注入点，可绕过私钥推导。
+  const keyset = loadPinnedKeyset();
+  const keyId = deps.resolveKeyId
+    ? deps.resolveKeyId(env, keyset)
+    : env.LINGXI_SIGN_KEY
+      ? resolveSignKeyId(requireSignKeyPath(env), keyset)
+      : keyset[0].keyId;
 
   const channelsExists = deps.releaseExists("channels");
   let existingChannelManifest = null;

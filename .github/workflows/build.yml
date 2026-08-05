@@ -219,17 +219,11 @@ jobs:
         shell: bash
         run: |
           if [ "$RUNNER_OS" = "macOS" ]; then
-            CMD="node scripts/build-server.mjs darwin ${{ matrix.arch }}"
+            node scripts/build-server.mjs darwin ${{ matrix.arch }}
           elif [ "$RUNNER_OS" = "Linux" ]; then
-            CMD="node scripts/build-server.mjs linux ${{ matrix.arch }}"
+            node scripts/build-server.mjs linux ${{ matrix.arch }}
           else
-            CMD="node scripts/build-server.mjs win32 ${{ matrix.arch }}"
-          fi
-          if ! eval "$CMD" > /tmp/build-server.log 2>&1; then
-            echo "::error::==== build-server FAILED ===="
-            B64=$(tail -c 2800 /tmp/build-server.log | base64 | tr -d '\n')
-            echo "::error::BS_B64:$B64"
-            exit 1
+            node scripts/build-server.mjs win32 ${{ matrix.arch }}
           fi
 
       - name: Build Computer Use helper

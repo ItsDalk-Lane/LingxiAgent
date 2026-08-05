@@ -46,6 +46,7 @@
  *   能被最终产物验证通过，密钥/keyset 不匹配在构建机上炸，不留到用户首启。
  */
 import { execFileSync } from "child_process";
+import crypto from "crypto";
 import fs from "fs";
 import path from "path";
 import { createRequire } from "module";
@@ -256,6 +257,38 @@ function defaultSignManifestFile({ manifestPath, signKeyPath }) {
     [path.join(ROOT, "scripts", "artifact-sign.mjs"), "--key", signKeyPath, "--file", manifestPath],
     { stdio: "pipe" },
   );
+}
+
+/**
+ * 从签名私钥推导 keyId：manifest 的 keyId 必须与签名私钥匹配（verify 会用
+ * manifest.keyId 对应的 keyset 公钥验签）。私钥→公钥后与 keyset 逐项比对，
+ * 找不到匹配公钥就硬报错——绝不静默用 keyset 第一项（那是"猜"）。
+ * @param {string} signKeyPath PKCS8 PEM 私钥文件路径
+ * @param {Array<{keyId: string, publicKey: string}>} keyset
+ * @returns {string} keyset 中与私钥匹配的 keyId
+ */
+export function resolveSignKeyId(signKeyPath, keyset) {
+  const privatePem = fs.readFileSync(signKeyPath, "utf8");
+  const publicPem = crypto
+    .createPublicKey(crypto.createPrivateKey(privatePem))
+    .export({ type: "spki", format: "pem" })
+    .toString();
+  const body = pemPublicKeyBody(publicPem);
+  for (const entry of keyset) {
+    if (pemPublicKeyBody(entry.publicKey) === body) return entry.keyId;
+  }
+  throw new Error(
+    `[build-server] signing key ${signKeyPath} does not match any pinned keyset public key; `
+      + "add its public key to the keyset (scripts/artifact-keygen.mjs).",
+  );
+}
+
+function pemPublicKeyBody(pem) {
+  const match = /-----BEGIN PUBLIC KEY-----([\s\S]*?)-----END PUBLIC KEY-----/.exec(String(pem));
+  if (!match) {
+    throw new Error(`[build-server] not a PEM public key: ${String(pem).slice(0, 60)}...`);
+  }
+  return match[1].replace(/\s+/g, "");
 }
 
 /**
@@ -618,7 +651,7 @@ export async function packDualKindSeed({
     version,
     platform,
     arch,
-    keyId: keyset[0].keyId,
+    keyId: resolveSignKeyId(signKeyPath, keyset),
     releasedAt: new Date().toISOString(),
     renderer: { sha256: rendererPackShared.sha256, size: rendererPackShared.size, archiveName: rendererPackShared.archiveName },
     server: { sha256: serverPack.sha256, size: serverPack.size, archiveName: serverPack.archiveName },

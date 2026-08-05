@@ -552,7 +552,7 @@ describe("build-server-artifact: packDualKindSeed guards and ordering", () => {
     );
     await expect(
       packDualKindSeed({ ...baseOpts(root), env: { LINGXI_SIGN_KEY: keyPath, LINGXI_SIGN_KEYSET: mismatchKeysetPath } }),
-    ).rejects.toThrow(/signature verification failed/i);
+    ).rejects.toThrow(/does not match any pinned keyset public key/i);
   });
 
   it("refuses to build a seed when the renderer dist dir is missing (build ordering guard)", async () => {

@@ -458,6 +458,7 @@ describe("publish-train: publishChannel", () => {
       readFile: (p: string) => fs.readFileSync(p),
       verifyManifest: vi.fn((manifestBytes: Buffer | string) => JSON.parse(Buffer.from(manifestBytes).toString("utf8"))),
       randomSalt: () => "fixed-salt",
+      resolveKeyId: () => "2026a",
       log: () => {},
       ...overrides,
     };
