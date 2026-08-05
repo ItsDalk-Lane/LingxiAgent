@@ -111174,12 +111174,17 @@
       "inputType": "source-graph",
       "provenance": [
         {
+          "root": "cli-entry",
+          "from": "cli/local-server.ts",
+          "kind": "import-statement"
+        },
+        {
           "root": "server-bootstrap",
           "from": "shared/hana-runtime-paths.ts",
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by shared/hana-runtime-paths.ts (import-statement)."
+      "reason": "Reached via esbuild source module graph, imported by cli/local-server.ts (import-statement); shared/hana-runtime-paths.ts (import-statement)."
     },
     {
       "path": "shared/hana-runtime-paths.ts",

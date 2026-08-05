@@ -40,7 +40,7 @@ const log = createModuleLogger("browser");
 // ── 单例 ──
 let _instance = null;
 
-// 冷保存文件：重启后恢复浏览器状态（由 setHanakoHome 注入路径）
+// 冷保存文件：重启后恢复浏览器状态（由 setLingxiHome 注入路径）
 let _lingxiHome = null;
 const _coldStatePath = () => path.join(_lingxiHome, "user", "browser-sessions.json");
 
@@ -213,7 +213,7 @@ export class BrowserManager {
    * 注入用户数据根目录（由入口在启动时调用）
    * @param {string} home - engine.lingxiHome
    */
-  static setHanakoHome(home) {
+  static setLingxiHome(home) {
     _lingxiHome = home;
   }
 

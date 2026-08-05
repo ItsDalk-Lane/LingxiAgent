@@ -76,7 +76,7 @@ function makeDeps(agent) {
     return { sessionId, sessionPath };
   });
   return {
-    getHanakoHome: () => rootDir,
+    getLingxiHome: () => rootDir,
     getAgent: () => agent,
     getAgentById: (id) => (id === agent.id ? agent : null),
     getAgents: () => new Map([[agent.id, agent]]),

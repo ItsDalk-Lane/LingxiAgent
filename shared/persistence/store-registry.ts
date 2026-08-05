@@ -1640,4 +1640,13 @@ export const PERSISTENCE_EXEMPTIONS: readonly PersistenceExemption[] = Object.fr
     "Compatibility helper mutates a caller-supplied config file; concrete agent config ownership is registered at callers.",
     "2026-10-31",
   ),
+  exemption(
+    "legacy-hanako-home-migration",
+    "shared/hana-runtime-paths.cjs",
+    "shared/hana-runtime-paths.cjs",
+    "Relocates the entire legacy ~/.hanako home directory to ~/.lingxi on first launch when LINGXI_HOME is unset; it moves every store as one tree and writes no store content itself.",
+    "2027-01-31",
+    ["rename"],
+    "renameSync\\(legacyHome",
+  ),
 ]);

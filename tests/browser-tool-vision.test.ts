@@ -132,7 +132,7 @@ describe("browser screenshot vision adaptation", () => {
     const tool = createBrowserTool(() => "/tmp/session.jsonl", {
       getSessionModel: () => ({ id: "gpt-4o", provider: "openai", input: ["text", "image"] }),
       getVisionBridge: () => ({ prepare }),
-      getHanakoHome: () => tmpDir,
+      getLingxiHome: () => tmpDir,
       registerSessionFile,
     });
 
@@ -235,7 +235,7 @@ describe("browser screenshot vision adaptation", () => {
     const tool = createBrowserTool(() => "/tmp/session.jsonl", {
       getSessionModel: () => ({ id: "deepseek-v4-pro", provider: "deepseek", input: ["text"] }),
       isVisionAuxiliaryEnabled: () => true,
-      getHanakoHome: () => tmpDir,
+      getLingxiHome: () => tmpDir,
       registerSessionFile,
     });
 

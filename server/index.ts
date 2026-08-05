@@ -61,7 +61,7 @@ import type { CompositionRoot, CompositionContext } from "./composition/contract
 import { registerTaskRegistryBusHandlers } from "./task-bus-handlers.ts";
 import { registerDeferredResultBusHandlers } from "./deferred-result-bus-handlers.ts";
 import { registerLoopBusHandlers } from "./loop-bus-handlers.ts";
-import { resolveHanakoHome } from "../shared/hana-runtime-paths.ts";
+import { resolveLingxiHome, migrateLegacyHanakoHome } from "../shared/hana-runtime-paths.ts";
 import { DATA_EPOCH } from "../shared/contract-versions.cjs";
 import { readDataEpochStamp } from "../shared/data-epoch.cjs";
 import { describeForeignServerBlock, isForeignServerBlocking, probeServerInfo } from "../shared/server-info-probe.cjs";
@@ -250,7 +250,8 @@ export async function startServer(root: CompositionRoot = {}): Promise<void> {
 
   // 用户数据存放在 ~/.lingxi/（打包后与产品代码分离）
   // 开发时可通过 LINGXI_HOME 环境变量隔离数据目录，如：LINGXI_HOME=~/.lingxi-dev node server/index.js
-  const lingxiHome = resolveHanakoHome(process.env.LINGXI_HOME);
+  if (!process.env.LINGXI_HOME) migrateLegacyHanakoHome();
+  const lingxiHome = resolveLingxiHome(process.env.LINGXI_HOME);
   process.env.LINGXI_HOME = lingxiHome;
 
   // 读取版本号
@@ -453,7 +454,7 @@ export async function startServer(root: CompositionRoot = {}): Promise<void> {
   outboundProxyRuntime.apply(engine.getNetworkProxy());
 
   // 注入依赖给 BrowserManager（避免循环依赖）
-  BrowserManager.setHanakoHome(engine.lingxiHome);
+  BrowserManager.setLingxiHome(engine.lingxiHome);
   BrowserManager.setSessionIdResolver((sessionPath: string) => engine.getSessionIdForPath?.(sessionPath) || null);
 
   // 注：任何 createSession 都必须在相关 Pi SDK extension factory 注册完之后。

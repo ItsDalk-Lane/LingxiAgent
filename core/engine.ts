@@ -633,7 +633,7 @@ export class LingxiEngine {
       getHomeCwd: (agentId) => this.getHomeCwd(agentId),
       getVisionBridge: () => this._visionBridge,
       isVisionAuxiliaryEnabled: () => this.isVisionAuxiliaryEnabled(),
-      getHanakoHome: () => this.lingxiHome,
+      getLingxiHome: () => this.lingxiHome,
       registerSessionFile: (entry) => this.registerSessionFile(entry),
       getSessionFile: (fileId, options) => this.getSessionFile(fileId, options),
       getSessionFileByPath: (filePath, options) => this.getSessionFileByPath(filePath, options),

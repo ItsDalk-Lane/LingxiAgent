@@ -2,7 +2,7 @@
   "cover": {
     "make": "カバーを追加",
     "agentGenerate": {
-      "beautifyDisabled": "先にメインエージェントのツール設定で「小花美术」を有効にしてください。",
+      "beautifyDisabled": "先にメインエージェントのツール設定で「Lingxi Beautify」を有効にしてください。",
       "defaultModelMissing": "先に設定でデフォルト画像モデルを設定してください。",
       "defaultModelInvalid": "デフォルト画像モデルが利用できません。設定で再設定してください。",
       "imageGenUnavailable": "画像生成ツールが無効です。先に設定で有効にしてください。",
@@ -1303,7 +1303,7 @@
             "summary": "通知とプラグインのスケジュール動作を Agent が作成できるようにします"
           },
           "beautify": {
-            "label": "小花美术",
+            "label": "Lingxi Beautify",
             "summary": "Agent にドキュメントカバーと美的な強化を生成させます"
           },
           "browser": {
@@ -2422,7 +2422,7 @@
       "userLabel": "なんとお呼びすればいいですか？",
       "placeholder": "あなたの名前",
       "agentLabel": "この Agent の名前は？",
-      "agentPlaceholder": "Hanako",
+      "agentPlaceholder": "Lingxi",
       "memoryTitle": "メモリシステム",
       "memoryHint": "オンにすると、システムは会話終了時に内容を整理してメモリにします。メモリはよく更新されるため、モデルのキャッシュヒット率が下がることがあります。オフにすると通常はより安くなります。",
       "back": "戻る",

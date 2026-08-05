@@ -2,7 +2,7 @@
   "cover": {
     "make": "添加封面",
     "agentGenerate": {
-      "beautifyDisabled": "需要先在主 Agent 的工具设置里开启小花美术。",
+      "beautifyDisabled": "需要先在主 Agent 的工具设置里开启灵犀美术。",
       "defaultModelMissing": "需要先在设置里配置默认生图模型。",
       "defaultModelInvalid": "默认生图模型不可用，需要在设置里重新配置。",
       "imageGenUnavailable": "生图工具未启用，需要先在设置里开启。",
@@ -11,9 +11,9 @@
       "label": "Agent 生成"
     },
     "gallery": {
-      "title": "小花美术馆",
+      "title": "灵犀美术馆",
       "upload": "自己上传",
-      "close": "关闭小花美术馆"
+      "close": "关闭灵犀美术馆"
     },
     "notice": {
       "taskCreated": "已创建 cover 后台任务。",
@@ -1340,7 +1340,7 @@
             "summary": "让 Agent 创建通知和插件定时动作"
           },
           "beautify": {
-            "label": "小花美术",
+            "label": "灵犀美术",
             "summary": "让 Agent 为文档生成封面和审美增强内容"
           },
           "browser": {
@@ -2422,7 +2422,7 @@
       "userLabel": "我该怎么称呼你？",
       "placeholder": "你的名字",
       "agentLabel": "这个 Agent 叫什么？",
-      "agentPlaceholder": "小花",
+      "agentPlaceholder": "灵犀",
       "memoryTitle": "记忆系统",
       "memoryHint": "开启后，系统会在对话结束时整理聊天内容，形成记忆。因为记忆会经常更新，会导致模型缓存命中率降低，关掉记忆时通常会更省钱。",
       "back": "上一步",

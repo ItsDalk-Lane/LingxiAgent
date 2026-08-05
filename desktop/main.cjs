@@ -46,7 +46,8 @@ const {
   focusExistingWindow,
 } = require("./src/shared/single-instance-lock.cjs");
 const {
-  resolveHanakoHome,
+  resolveLingxiHome,
+  migrateLegacyHanakoHome,
 } = require("../shared/hana-runtime-paths.cjs");
 const {
   buildBrowserSearchExtractionScript,
@@ -112,7 +113,7 @@ const {
   renderScreenshotCodeArticle,
 } = require("./src/shared/screenshot-markdown.cjs");
 
-const APP_USER_MODEL_ID = "com.hanako.app"; // Keep in sync with package.json build.appId.
+const APP_USER_MODEL_ID = "com.lingxi.app"; // Keep in sync with package.json build.appId.
 
 // preload 缺失时 Electron 会静默忽略，renderer 拿不到 window.hana →
 // onboarding/主窗口白屏且无前端报错。此处硬崩，拒绝以不可用状态启动。
@@ -158,7 +159,8 @@ function safeReadJSON(filePath, fallback = null) {
   }
 }
 
-const lingxiHome = resolveHanakoHome(process.env.LINGXI_HOME);
+if (!process.env.LINGXI_HOME) migrateLegacyHanakoHome();
+const lingxiHome = resolveLingxiHome(process.env.LINGXI_HOME);
 process.env.LINGXI_HOME = lingxiHome;
 
 const keepAwakeManager = createKeepAwakeManager({ powerSaveBlocker });

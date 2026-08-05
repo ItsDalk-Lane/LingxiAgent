@@ -2,7 +2,7 @@
   "cover": {
     "make": "Add cover",
     "agentGenerate": {
-      "beautifyDisabled": "Enable 小花美术 in the main agent's tool settings first.",
+      "beautifyDisabled": "Enable Lingxi Beautify in the main agent's tool settings first.",
       "defaultModelMissing": "Configure a default image model in settings first.",
       "defaultModelInvalid": "The default image model is unavailable. Reconfigure it in settings.",
       "imageGenUnavailable": "The image generation tool is disabled. Enable it in settings first.",
@@ -1340,7 +1340,7 @@
             "summary": "Let the agent create scheduled notifications and plugin actions"
           },
           "beautify": {
-            "label": "小花美术",
+            "label": "Lingxi Beautify",
             "summary": "Let the agent generate document covers and aesthetic enhancements"
           },
           "browser": {
@@ -2422,7 +2422,7 @@
       "userLabel": "What should I call you?",
       "placeholder": "Your name",
       "agentLabel": "What should this Agent be called?",
-      "agentPlaceholder": "Hanako",
+      "agentPlaceholder": "Lingxi",
       "memoryTitle": "Memory system",
       "memoryHint": "When enabled, the system reviews chats after they end and turns them into memory. Because memory updates often, model cache hit rates may be lower. Turning memory off is usually cheaper.",
       "back": "Back",

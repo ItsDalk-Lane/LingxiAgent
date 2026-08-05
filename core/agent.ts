@@ -196,7 +196,7 @@ export class Agent {
 
     // 身份（init 后从 config 填充）
     this.userName = "User";
-    this.agentName = "Hanako";
+    this.agentName = "Lingxi";
 
     // 运行时状态
     this._config = null;
@@ -308,7 +308,7 @@ export class Agent {
   loadConfigOnly() {
     this._config = loadConfig(this.configPath);
     this.userName = this.resolveUserName();
-    this.agentName = this._config.agent?.name || "Hanako";
+    this.agentName = this._config.agent?.name || "Lingxi";
     this._memoryMasterEnabled = this._config.memory?.enabled !== false;
     this._experienceEnabled = this._config.experience?.enabled === true;
     this._refreshRepairState();
@@ -336,7 +336,7 @@ export class Agent {
 
     // 2. 身份 + 记忆总开关
     this.userName = this.resolveUserName();
-    this.agentName = this._config.agent?.name || "Hanako";
+    this.agentName = this._config.agent?.name || "Lingxi";
     this._memoryMasterEnabled = this._config.memory?.enabled !== false;
     this._experienceEnabled = this._config.experience?.enabled === true;
     this._refreshRepairState();
@@ -555,7 +555,7 @@ export class Agent {
       },
       getVisionBridge: () => this._cb?.getEngine?.()?.getVisionBridge?.() || null,
       isVisionAuxiliaryEnabled: () => this._cb?.getEngine?.()?.isVisionAuxiliaryEnabled?.() === true,
-      getHanakoHome: () => this._cb?.getEngine?.()?.lingxiHome,
+      getLingxiHome: () => this._cb?.getEngine?.()?.lingxiHome,
       getSessionIdForPath: (sessionPath) => this._cb?.getEngine?.()?.getSessionIdForPath?.(sessionPath) || null,
       registerSessionFile: (entry) => this._cb?.registerSessionFile?.(entry),
     });
@@ -1059,7 +1059,7 @@ export class Agent {
 
     // 更新身份。用户的名字不在这里刷新：它只存在于全局 preferences，写它走
     // 全局那条路，agent config 的改动影响不到它。
-    if (partial.agent?.name) this.agentName = this._config.agent?.name || "Hanako";
+    if (partial.agent?.name) this.agentName = this._config.agent?.name || "Lingxi";
 
     // yuan 切换只需更新 config，buildSystemPrompt 会实时读模板
     if (partial.agent?.yuan) {

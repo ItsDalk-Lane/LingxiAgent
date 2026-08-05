@@ -140,7 +140,7 @@ const migrations = {
   31: migrateLearnedSkillsToGlobalSkillPool,
   // Agent Phone runtime 状态从 projection 迁入独立 sidecar
   32: migrateAgentPhoneRuntimeOutOfProjection,
-  // 小花美术默认显式关闭；旧 Agent 配置只有用户手动开启后才可用
+  // 灵犀美术默认显式关闭；旧 Agent 配置只有用户手动开启后才可用
   33: migrateBeautifyDefaultExplicitOff,
   // workflow 默认显式关闭：从全局设置页开关迁移为 per-agent 工具开关后，老 agent 补 disabled
   34: migrateWorkflowDefaultExplicitOff,
@@ -1293,7 +1293,7 @@ function migrateHeartbeatDefaultExplicitOff(ctx) {
 }
 
 /**
- * #33 — 小花美术默认显式关闭
+ * #33 — 灵犀美术默认显式关闭
  *
  * Beautify 是新加入的低频审美生成工具，默认先 opt-in。老配置若已经
  * 写过 tools.disabled: []，运行时无法判断它是否代表用户想开启这个

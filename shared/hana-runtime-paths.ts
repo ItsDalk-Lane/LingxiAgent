@@ -1,7 +1,8 @@
 import runtimePaths from "./hana-runtime-paths.cjs";
 
 export const {
-  resolveHanakoHome,
+  resolveLingxiHome,
+  migrateLegacyHanakoHome,
   resolveLingxiPiSdkManagedBinDir,
   resolveLingxiPiSdkResourceLoaderAgentDir,
   resolveLingxiPiSdkResourceLoaderCwd,

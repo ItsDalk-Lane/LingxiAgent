@@ -102,7 +102,7 @@ function makeAgent(rootDir, id = "agent-a") {
 function makeDeps(agent, rootDir) {
   const sessionIdsByPath = new Map<string, string>();
   return {
-    getHanakoHome: () => rootDir,
+    getLingxiHome: () => rootDir,
     getAgent: () => agent,
     getAgentById: (id) => (id === agent.id ? agent : null),
     getAgents: () => new Map([[agent.id, agent]]),
