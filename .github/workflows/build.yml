@@ -273,7 +273,12 @@ jobs:
         if: runner.os == 'macOS'
         run: |
           ulimit -n 65536
-          npx electron-builder --mac dmg zip --${{ matrix.arch }} --publish never
+          if ! npx electron-builder --mac dmg zip --${{ matrix.arch }} --publish never > /tmp/eb-mac.log 2>&1; then
+            echo "::error::==== electron-builder FAILED ===="
+            B64=$(tail -c 2800 /tmp/eb-mac.log | base64 | tr -d '\n')
+            echo "::error::EB_B64:$B64"
+            exit 1
+          fi
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CSC_LINK: ${{ secrets.CSC_LINK }}
