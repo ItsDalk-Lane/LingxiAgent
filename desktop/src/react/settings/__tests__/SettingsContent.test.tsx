@@ -16,7 +16,7 @@ vi.mock('../actions', () => ({
 }));
 
 vi.mock('../api', () => ({
-  hanaFetch: vi.fn(async (url: string) => {
+  lingxiFetch: vi.fn(async (url: string) => {
     if (url === '/api/config') {
       return new Response(JSON.stringify({ locale: 'zh-CN' }));
     }

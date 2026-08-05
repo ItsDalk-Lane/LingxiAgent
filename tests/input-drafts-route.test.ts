@@ -14,7 +14,7 @@ describe("input drafts route", () => {
 
   beforeEach(() => {
     home = fs.mkdtempSync(path.join(os.tmpdir(), "hana-drafts-route-"));
-    store = new InputDraftsStore({ hanakoHome: home });
+    store = new InputDraftsStore({ lingxiHome: home });
     engine = {
       getInputDrafts: (surface: string) => store.getAll(surface),
       setHomeInputDraft: (surface: string, entry: any) => store.setHome(surface, entry),

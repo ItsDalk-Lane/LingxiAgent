@@ -104,8 +104,8 @@ export function normalizeProviderMediaConfigMap(rawProviders) {
   return { providers, changed };
 }
 
-export function migrateProviderMediaConfig(hanakoHome, log: (...args: any[]) => void = () => {}) {
-  const ymlPath = path.join(hanakoHome, "added-models.yaml");
+export function migrateProviderMediaConfig(lingxiHome, log: (...args: any[]) => void = () => {}) {
+  const ymlPath = path.join(lingxiHome, "added-models.yaml");
   const existing = safeReadYAMLSync(ymlPath, null, YAML);
   if (!existing || !isPlainObject(existing.providers)) return false;
 
@@ -113,7 +113,7 @@ export function migrateProviderMediaConfig(hanakoHome, log: (...args: any[]) => 
   if (!changed) return false;
 
   const header =
-    "# HanaAgent 供应商配置（全局，跨 agent 共享）\n" +
+    "# LingxiAgent 供应商配置（全局，跨 agent 共享）\n" +
     "# 由设置页面管理\n\n";
   const data = { ...existing, providers };
   const yamlStr = header + YAML.dump(data, {

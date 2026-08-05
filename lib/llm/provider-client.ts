@@ -8,7 +8,7 @@
 import { t } from "../i18n.ts";
 import { normalizeProviderHeaders } from "../../shared/provider-auth.ts";
 
-export const DEFAULT_PROVIDER_USER_AGENT = "HanaAgent/1.0";
+export const DEFAULT_PROVIDER_USER_AGENT = "LingxiAgent/1.0";
 const DEFAULT_ANTHROPIC_PROBE_MODEL = "claude-sonnet-4-6";
 
 function hasHeader(headers, name) {

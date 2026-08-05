@@ -38,7 +38,7 @@ const OP_REQUIREMENTS = {
 
 export class PathGuard {
   declare _fullAccess: boolean;
-  declare hanakoHome: string;
+  declare lingxiHome: string;
   declare agentDir: string;
   declare workspaceRoots: string[];
   declare policyWritablePaths: string[];
@@ -53,7 +53,7 @@ export class PathGuard {
       return;
     }
     this._fullAccess = false;
-    this.hanakoHome = this._resolveReal(policy.hanakoHome) || path.resolve(policy.hanakoHome);
+    this.lingxiHome = this._resolveReal(policy.lingxiHome) || path.resolve(policy.lingxiHome);
     this.agentDir = this._resolveReal(policy.agentDir) || path.resolve(policy.agentDir);
     const roots = Array.isArray(policy.workspaceRoots) && policy.workspaceRoots.length > 0
       ? policy.workspaceRoots
@@ -112,14 +112,14 @@ export class PathGuard {
   }
 
   _getAccessLevelResolved(resolved) {
-    // 1. BLOCKED 文件（hanakoHome 根）
+    // 1. BLOCKED 文件（lingxiHome 根）
     for (const f of BLOCKED_FILES) {
-      if (resolved === path.join(this.hanakoHome, f)) return AccessLevel.BLOCKED;
+      if (resolved === path.join(this.lingxiHome, f)) return AccessLevel.BLOCKED;
     }
 
     // 2. BLOCKED 目录
     for (const d of BLOCKED_DIRS) {
-      if (this._isInside(resolved, path.join(this.hanakoHome, d))) {
+      if (this._isInside(resolved, path.join(this.lingxiHome, d))) {
         return AccessLevel.BLOCKED;
       }
     }
@@ -138,7 +138,7 @@ export class PathGuard {
 
     // 5. READ_ONLY 全局目录
     for (const d of READ_ONLY_HOME_DIRS) {
-      if (this._isInside(resolved, path.join(this.hanakoHome, d))) {
+      if (this._isInside(resolved, path.join(this.lingxiHome, d))) {
         return AccessLevel.READ_ONLY;
       }
     }
@@ -157,13 +157,13 @@ export class PathGuard {
 
     // 7. READ_WRITE 全局目录
     for (const d of READ_WRITE_HOME_DIRS) {
-      if (this._isInside(resolved, path.join(this.hanakoHome, d))) {
+      if (this._isInside(resolved, path.join(this.lingxiHome, d))) {
         return AccessLevel.READ_WRITE;
       }
     }
 
-    // 8. hanakoHome 内未匹配 → 遵守 read-all 契约：非敏感路径可读，写仍需显式白名单。
-    if (this._isInside(resolved, this.hanakoHome)) {
+    // 8. lingxiHome 内未匹配 → 遵守 read-all 契约：非敏感路径可读，写仍需显式白名单。
+    if (this._isInside(resolved, this.lingxiHome)) {
       return this.allowExternalReads ? AccessLevel.READ_ONLY : AccessLevel.BLOCKED;
     }
 

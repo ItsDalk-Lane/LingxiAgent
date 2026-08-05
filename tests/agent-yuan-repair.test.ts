@@ -33,7 +33,7 @@ describe("Agent yuan repair state", () => {
     userDir = path.join(tmpDir, "user");
     fs.mkdirSync(path.join(productDir, "yuan"), { recursive: true });
     fs.mkdirSync(userDir, { recursive: true });
-    fs.writeFileSync(path.join(productDir, "yuan", "hanako.md"), "valid yuan\n", "utf-8");
+    fs.writeFileSync(path.join(productDir, "yuan", "lingxi.md"), "valid yuan\n", "utf-8");
   });
 
   afterEach(() => {
@@ -61,7 +61,7 @@ describe("Agent yuan repair state", () => {
   });
 
   it("leaves a valid persisted yuan healthy", () => {
-    writeAgentConfig(path.join(agentsDir, "healthy"), "hanako");
+    writeAgentConfig(path.join(agentsDir, "healthy"), "lingxi");
     const agent = new Agent({
       id: "healthy",
       agentsDir,

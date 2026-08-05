@@ -73,7 +73,7 @@ function createMocks() {
       writeIndex: () => {},
     },
     agentName: "TestAgent",
-    hanakoHome: os.tmpdir(),
+    lingxiHome: os.tmpdir(),
     currentAgentId: "hana",
   };
 

@@ -8,7 +8,7 @@
  */
 
 import { useStore } from './stores';
-import { hanaFetch } from './hooks/use-hana-fetch';
+import { lingxiFetch } from './hooks/use-hana-fetch';
 import { applyAgentIdentity, loadAgents, loadAvatars } from './stores/agent-actions';
 import { loadPendingNewSessionPermissionDefault, loadSessions, pendingNewSessionIdentityPatch, switchSession } from './stores/session-actions';
 import { initSessionProjectCatalog } from './stores/session-project-actions';
@@ -63,7 +63,7 @@ function markRendererLaunch(event: string, details?: unknown) {
 // ── __hanaLog：前端日志上报 ──
 window.__hanaLog = function (level: string, module: string, message: string) {
   if (!hasServerConnection(useStore.getState())) return;
-  hanaFetch('/api/log', {
+  lingxiFetch('/api/log', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ level, module, message }),
@@ -194,9 +194,9 @@ export async function initApp(): Promise<void> {
   let bootstrapAgentId: string | null = null;
   try {
     const [healthRes, globalConfigRes, agentsRes] = await Promise.all([
-      hanaFetch('/api/health'),
-      hanaFetch('/api/config'),
-      hanaFetch('/api/agents'),
+      lingxiFetch('/api/health'),
+      lingxiFetch('/api/config'),
+      lingxiFetch('/api/agents'),
     ]);
     const healthData = await healthRes.json();
     bootstrapAgentId = healthData.agentId || null;
@@ -209,7 +209,7 @@ export async function initApp(): Promise<void> {
     // 所以这里也按主助手取，两边看到的是同一个 agent。
     const bootAgentId = findPrimaryAgent(agentsData.agents || [])?.id || null;
     const agentConfig = bootAgentId
-      ? await hanaFetch(`/api/agents/${encodeURIComponent(bootAgentId)}/config`).then(r => r.json())
+      ? await lingxiFetch(`/api/agents/${encodeURIComponent(bootAgentId)}/config`).then(r => r.json())
       : {};
 
     applyEditorTypography(globalConfig.editor);
@@ -221,7 +221,7 @@ export async function initApp(): Promise<void> {
 
     // 4. 应用 agent 身份
     await applyAgentIdentity({
-      agentName: healthData.agent || 'Hanako',
+      agentName: healthData.agent || 'Lingxi',
       userName: healthData.user || t('common.user'),
       ui: { avatars: false, agents: false, welcome: true },
     });
@@ -272,7 +272,7 @@ export async function initApp(): Promise<void> {
 
   // 14. 任务计划 badge 初始值
   try {
-    const res = await hanaFetch('/api/desk/cron');
+    const res = await lingxiFetch('/api/desk/cron');
     const data = await res.json();
     const count = (data.jobs || []).length;
     useStore.setState({ automationCount: count });
@@ -282,7 +282,7 @@ export async function initApp(): Promise<void> {
   //     agent 身份用 bootstrap 给出的那个，和上面的头像同源
   try {
     if (!bootstrapAgentId) throw new Error('bridge status needs an agent id');
-    const res = await hanaFetch(`/api/bridge/status?agentId=${encodeURIComponent(bootstrapAgentId)}`);
+    const res = await lingxiFetch(`/api/bridge/status?agentId=${encodeURIComponent(bootstrapAgentId)}`);
     const data = await res.json();
     const anyConnected = data.telegram?.status === 'connected' || data.feishu?.status === 'connected' || data.qq?.status === 'connected' || data.wechat?.status === 'connected' || data.whatsapp?.status === 'connected';
     useStore.setState({ bridgeDotConnected: anyConnected });
@@ -346,7 +346,7 @@ export async function initApp(): Promise<void> {
 }
 
 async function loadIdentityForActiveConnection(connection: ServerConnection): Promise<ServerConnection> {
-  const identityRes = await hanaFetch('/api/server/identity');
+  const identityRes = await lingxiFetch('/api/server/identity');
   const identityData = await identityRes.json();
   warnIfServerProtocolMismatch(identityData);
   return mergeServerIdentity(connection, identityData);
@@ -354,7 +354,7 @@ async function loadIdentityForActiveConnection(connection: ServerConnection): Pr
 
 async function refreshDeviceWebSession(connection: ServerConnection): Promise<void> {
   if (connection.credentialKind !== 'device_credential' || !connection.token) return;
-  await hanaFetch('/api/web-auth/login', {
+  await lingxiFetch('/api/web-auth/login', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     credentials: 'include',

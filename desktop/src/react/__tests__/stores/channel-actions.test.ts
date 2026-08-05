@@ -47,12 +47,12 @@ vi.mock('../../stores', () => ({
 }));
 
 vi.mock('../../hooks/use-hana-fetch', () => ({
-  hanaFetch: vi.fn(),
+  lingxiFetch: vi.fn(),
 }));
 
-import { hanaFetch } from '../../hooks/use-hana-fetch';
+import { lingxiFetch } from '../../hooks/use-hana-fetch';
 
-const mockFetch = vi.mocked(hanaFetch);
+const mockFetch = vi.mocked(lingxiFetch);
 
 describe('channel-actions', () => {
   beforeEach(() => {
@@ -391,7 +391,7 @@ describe('channel-actions', () => {
     it('发送成功后按发送开始时的频道同步消息 cache 和频道列表投影', async () => {
       mockState.currentChannel = 'ch1';
       mockState.channelMessages = [
-        { sender: 'hanako', timestamp: '2026-05-07 17:00:00', body: 'old ch1' },
+        { sender: 'lingxi', timestamp: '2026-05-07 17:00:00', body: 'old ch1' },
       ];
       mockState.channelMessageCache = {
         ch1: mockState.channelMessages,
@@ -403,7 +403,7 @@ describe('channel-actions', () => {
         name: 'general',
         members: [],
         lastMessage: 'old ch1',
-        lastSender: 'hanako',
+        lastSender: 'lingxi',
         lastTimestamp: '2026-05-07 17:00:00',
         messageCount: 1,
         newMessageCount: 0,
@@ -443,7 +443,7 @@ describe('channel-actions', () => {
         { sender: 'ming', timestamp: '2026-05-07 16:00:00', body: 'old ch2' },
       ]);
       expect((mockState.channelMessageCache as any).ch1).toEqual([
-        { sender: 'hanako', timestamp: '2026-05-07 17:00:00', body: 'old ch1' },
+        { sender: 'lingxi', timestamp: '2026-05-07 17:00:00', body: 'old ch1' },
         { sender: 'testuser', timestamp: '2026-05-07 17:01:00', body: 'hello from me' },
       ]);
       expect((mockState.channelMessageCacheDirty as any).ch1).toBe(false);
@@ -532,14 +532,14 @@ describe('channel-actions', () => {
 
       const { appendChannelMessage } = await import('../../stores/channel-actions');
       appendChannelMessage('ch1', {
-        sender: 'hanako',
+        sender: 'lingxi',
         timestamp: '2026-05-07 17:01:00',
         body: 'new reply',
       });
 
       expect(mockState.channelMessages).toEqual([
         { sender: 'testuser', timestamp: '2026-05-07 17:00:00', body: 'old' },
-        { sender: 'hanako', timestamp: '2026-05-07 17:01:00', body: 'new reply' },
+        { sender: 'lingxi', timestamp: '2026-05-07 17:01:00', body: 'new reply' },
       ]);
       expect((mockState.channels as Array<{ lastMessage: string; newMessageCount: number }>)[0]).toMatchObject({
         lastMessage: 'new reply',
@@ -567,14 +567,14 @@ describe('channel-actions', () => {
 
       const { appendChannelMessage, hydrateCurrentChannelIfNeeded } = await import('../../stores/channel-actions');
       appendChannelMessage('ch1', {
-        sender: 'hanako',
+        sender: 'lingxi',
         timestamp: '2026-05-07 17:01:00',
         body: 'new reply',
       }, { markRead: false });
 
       expect(mockState.channelMessages).toEqual([
         { sender: 'testuser', timestamp: '2026-05-07 17:00:00', body: 'old' },
-        { sender: 'hanako', timestamp: '2026-05-07 17:01:00', body: 'new reply' },
+        { sender: 'lingxi', timestamp: '2026-05-07 17:01:00', body: 'new reply' },
       ]);
       expect((mockState.channelMessageCache as any).ch1).toEqual(mockState.channelMessages);
       expect((mockState.channels as Array<{ newMessageCount: number }>)[0].newMessageCount).toBe(1);
@@ -604,7 +604,7 @@ describe('channel-actions', () => {
 
       const { appendChannelMessage } = await import('../../stores/channel-actions');
       appendChannelMessage('ch1', {
-        sender: 'hanako',
+        sender: 'lingxi',
         timestamp: '2026-05-07 17:01:00',
         body: 'hidden reply',
       }, { markRead: false });
@@ -626,7 +626,7 @@ describe('channel-actions', () => {
       mockState.channels = [{
         id: 'ch1',
         name: 'general',
-        members: ['hanako', 'yui'],
+        members: ['lingxi', 'yui'],
         lastMessage: 'old',
         lastSender: 'testuser',
         lastTimestamp: '2026-05-07 17:00:00',
@@ -638,10 +638,10 @@ describe('channel-actions', () => {
           ok: true,
           json: async () => ({
             name: 'general',
-            members: ['hanako', 'yui'],
+            members: ['lingxi', 'yui'],
             messages: [
               { sender: 'testuser', timestamp: '2026-05-07 17:00:00', body: 'old' },
-              { sender: 'hanako', timestamp: '2026-05-07 17:01:00', body: 'reloaded reply' },
+              { sender: 'lingxi', timestamp: '2026-05-07 17:01:00', body: 'reloaded reply' },
             ],
           }),
         } as Response)
@@ -659,7 +659,7 @@ describe('channel-actions', () => {
       expect(mockFetch).toHaveBeenCalledWith('/api/channels/ch1');
       expect(mockState.channelMessages).toEqual([
         { sender: 'testuser', timestamp: '2026-05-07 17:00:00', body: 'old' },
-        { sender: 'hanako', timestamp: '2026-05-07 17:01:00', body: 'reloaded reply' },
+        { sender: 'lingxi', timestamp: '2026-05-07 17:01:00', body: 'reloaded reply' },
       ]);
       expect((mockState.channelMessageCacheDirty as any).ch1).toBe(false);
     });

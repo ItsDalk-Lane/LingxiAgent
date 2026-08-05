@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { hanaFetch } from '../api';
+import { lingxiFetch } from '../api';
 import { t } from '../helpers';
 import { Overlay } from '../../ui';
 import styles from './WechatQrcodeOverlay.module.css';
@@ -35,7 +35,7 @@ export function WechatQrcodeOverlay() {
     setStatus('loading');
     setError('');
     try {
-      const res = await hanaFetch('/api/bridge/wechat/qrcode', { method: 'POST' });
+      const res = await lingxiFetch('/api/bridge/wechat/qrcode', { method: 'POST' });
       const data = await res.json();
       if (data.ok && data.qrcodeUrl) {
         setQrcodeUrl(data.qrcodeUrl);
@@ -61,7 +61,7 @@ export function WechatQrcodeOverlay() {
     (async () => {
       while (!stoppedRef.current) {
         try {
-          const res = await hanaFetch('/api/bridge/wechat/qrcode-status', {
+          const res = await lingxiFetch('/api/bridge/wechat/qrcode-status', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ qrcodeId: id }),
@@ -76,7 +76,7 @@ export function WechatQrcodeOverlay() {
             setStatus('confirmed');
             // Read agentId from ref — always current, not stale closure
             const agentQuery = agentIdRef.current ? `?agentId=${encodeURIComponent(agentIdRef.current)}` : '';
-            await hanaFetch(`/api/bridge/config${agentQuery}`, {
+            await lingxiFetch(`/api/bridge/config${agentQuery}`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
@@ -87,7 +87,7 @@ export function WechatQrcodeOverlay() {
             });
             // 微信只绑定一个账号，扫码用户即 owner
             if (data.userId) {
-              await hanaFetch(`/api/bridge/owner${agentQuery}`, {
+              await lingxiFetch(`/api/bridge/owner${agentQuery}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ platform: 'wechat', userId: data.userId }),

@@ -10,7 +10,7 @@ import {
   PLUGIN_UI_ERROR_CODE,
   PLUGIN_UI_PROTOCOL,
   PLUGIN_UI_PROTOCOL_VERSION,
-} from '@hana/plugin-protocol';
+} from '@lingxi/plugin-protocol';
 import type { PluginUiCapability } from '../../plugin-ui/plugin-ui-host-controller';
 
 const switchTab = vi.fn();
@@ -141,7 +141,7 @@ describe('usePluginIframe', () => {
           protocol: PLUGIN_UI_PROTOCOL,
           version: PLUGIN_UI_PROTOCOL_VERSION,
           kind: 'event',
-          type: 'hana.ready',
+          type: 'lingxi.ready',
         },
         origin: 'http://127.0.0.1:3210',
         source: trustedWindow,

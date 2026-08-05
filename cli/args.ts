@@ -98,7 +98,7 @@ export function helpText() {
   return `Hana CLI
 
 Usage:
-  hana serve [-- server args]        Start a headless HanaAgent Server (serves the --channel web frontend, if pulled)
+  hana serve [-- server args]        Start a headless LingxiAgent Server (serves the --channel web frontend, if pulled)
   hana status                       Show local server and agent status
   hana sessions                     List recent sessions
   hana continue [index|path]        Continue a recent session
@@ -110,7 +110,7 @@ Usage:
   hana data restore <transitionId>  Restore data from a checkpoint (asks for confirmation)
 
 Connection options:
-  --url <baseUrl>                   Connect to a specific HanaAgent Server
+  --url <baseUrl>                   Connect to a specific LingxiAgent Server
   --token <token>                   Bearer token for that server
   --session <path>                  Chat in a specific session
 

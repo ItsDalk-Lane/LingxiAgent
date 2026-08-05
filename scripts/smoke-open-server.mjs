@@ -5,7 +5,7 @@
  *
  * Positive direction: spawns the built open-composition server (via its
  * packaged Node runtime + bootstrap.js, the same two files the shell/cmd
- * wrapper execs into) under a throwaway HANA_HOME, waits for it to bind and
+ * wrapper execs into) under a throwaway LINGXI_HOME, waits for it to bind and
  * publish server-info.json, then makes one authenticated loopback HTTP
  * request to `/api/server/identity` and asserts a 200 with the expected
  * shape. This is the actual proof the open build boots and serves traffic
@@ -85,7 +85,7 @@ async function terminateChild(child, { timeoutMs = 10_000 } = {}) {
   }
 }
 
-function spawnOpenServer({ serverDir, isWin, hanakoHome, extraEnv = {} }) {
+function spawnOpenServer({ serverDir, isWin, lingxiHome, extraEnv = {} }) {
   const bin = nodeBinPath(serverDir, isWin);
   if (!fs.existsSync(bin)) {
     throw new Error(`[smoke-open-server] packaged Node runtime not found at ${bin} — run npm run build:server:open first`);
@@ -101,9 +101,9 @@ function spawnOpenServer({ serverDir, isWin, hanakoHome, extraEnv = {} }) {
     cwd: serverDir,
     env: {
       ...process.env,
-      HANA_ROOT: serverDir,
-      HANA_SERVER_ENTRY: path.join(serverDir, "bundle", "index.js"),
-      HANA_HOME: hanakoHome,
+      LINGXI_ROOT: serverDir,
+      LINGXI_SERVER_ENTRY: path.join(serverDir, "bundle", "index.js"),
+      LINGXI_HOME: lingxiHome,
       ...extraEnv,
     },
     stdio: ["ignore", "pipe", "pipe"],
@@ -129,11 +129,11 @@ export async function runPositiveSmoke({ rootDir = ROOT, platform = process.plat
     throw new Error(`[smoke-open-server] open server build not found at ${serverDir} — run npm run build:server:open first`);
   }
 
-  const hanakoHome = fs.mkdtempSync(path.join(os.tmpdir(), "hana-open-smoke-"));
-  const { child, getStderr } = spawnOpenServer({ serverDir, isWin, hanakoHome });
+  const lingxiHome = fs.mkdtempSync(path.join(os.tmpdir(), "hana-open-smoke-"));
+  const { child, getStderr } = spawnOpenServer({ serverDir, isWin, lingxiHome });
 
   try {
-    const serverInfoPath = path.join(hanakoHome, "server-info.json");
+    const serverInfoPath = path.join(lingxiHome, "server-info.json");
     await Promise.race([
       waitForFile(serverInfoPath, { timeoutMs: 60_000 }),
       waitForExit(child, { timeoutMs: 60_000 }).then(({ code, signal }) => {
@@ -173,7 +173,7 @@ export async function runPositiveSmoke({ rootDir = ROOT, platform = process.plat
     return { ok: true, url, status: res.status, body };
   } finally {
     await terminateChild(child);
-    fs.rmSync(hanakoHome, { recursive: true, force: true });
+    fs.rmSync(lingxiHome, { recursive: true, force: true });
   }
 }
 
@@ -197,11 +197,11 @@ export async function runNegativeSmoke({ rootDir = ROOT, platform = process.plat
   }
   fs.renameSync(targetFile, backupFile);
 
-  const hanakoHome = fs.mkdtempSync(path.join(os.tmpdir(), "hana-open-smoke-neg-"));
-  const { child, getStderr } = spawnOpenServer({ serverDir, isWin, hanakoHome });
+  const lingxiHome = fs.mkdtempSync(path.join(os.tmpdir(), "hana-open-smoke-neg-"));
+  const { child, getStderr } = spawnOpenServer({ serverDir, isWin, lingxiHome });
 
   try {
-    const serverInfoPath = path.join(hanakoHome, "server-info.json");
+    const serverInfoPath = path.join(lingxiHome, "server-info.json");
     const outcome = await Promise.race([
       waitForExit(child, { timeoutMs: 60_000 }).then((result) => ({ kind: "exit", ...result })),
       waitForFile(serverInfoPath, { timeoutMs: 60_000 }).then(() => ({ kind: "listening" })),
@@ -228,7 +228,7 @@ export async function runNegativeSmoke({ rootDir = ROOT, platform = process.plat
     return { ok: true, exitCode: outcome.code, stderrExcerpt: stderr.slice(0, 2000) };
   } finally {
     await terminateChild(child);
-    fs.rmSync(hanakoHome, { recursive: true, force: true });
+    fs.rmSync(lingxiHome, { recursive: true, force: true });
     if (fs.existsSync(backupFile)) fs.renameSync(backupFile, targetFile);
   }
 }

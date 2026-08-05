@@ -6,10 +6,10 @@ import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/re
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { CompiledMemoryViewer } from '../CompiledMemoryViewer';
 import { useSettingsStore } from '../../store';
-import { hanaFetch } from '../../api';
+import { lingxiFetch } from '../../api';
 
 vi.mock('../../api', () => ({
-  hanaFetch: vi.fn(),
+  lingxiFetch: vi.fn(),
 }));
 
 vi.mock('../../../hooks/use-mermaid-diagrams', () => ({
@@ -32,7 +32,7 @@ describe('CompiledMemoryViewer editable facts', () => {
       currentAgentId: 'hana',
       agents: [{ id: 'hana', name: 'Hana', isPrimary: true }],
     } as never);
-    vi.mocked(hanaFetch).mockImplementation(async (url: string, init?: RequestInit) => {
+    vi.mocked(lingxiFetch).mockImplementation(async (url: string, init?: RequestInit) => {
       if (url === '/api/memories/compiled?agentId=hana' && !init) {
         return new Response(JSON.stringify({
           editableFactsEnabled: true,
@@ -119,7 +119,7 @@ describe('CompiledMemoryViewer editable facts', () => {
     fireEvent.click(screen.getByText('settings.memory.editSave'));
 
     await waitFor(() => {
-      expect(hanaFetch).toHaveBeenCalledWith('/api/memories/compiled/today?agentId=hana', {
+      expect(lingxiFetch).toHaveBeenCalledWith('/api/memories/compiled/today?agentId=hana', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ today: '编辑后的今天。' }),
@@ -127,7 +127,7 @@ describe('CompiledMemoryViewer editable facts', () => {
     });
 
     await waitFor(() => {
-      expect(hanaFetch).toHaveBeenCalledWith('/api/memories/compiled/facts?agentId=hana', {
+      expect(lingxiFetch).toHaveBeenCalledWith('/api/memories/compiled/facts?agentId=hana', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ facts: '用户喜欢清晰边界。\n用户关注记忆系统。' }),
@@ -135,7 +135,7 @@ describe('CompiledMemoryViewer editable facts', () => {
     });
 
     await waitFor(() => {
-      expect(hanaFetch).toHaveBeenCalledWith('/api/memories/compiled/longterm?agentId=hana', {
+      expect(lingxiFetch).toHaveBeenCalledWith('/api/memories/compiled/longterm?agentId=hana', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ longterm: '编辑后的长期情况。' }),
@@ -143,7 +143,7 @@ describe('CompiledMemoryViewer editable facts', () => {
     });
 
     await waitFor(() => {
-      expect(hanaFetch).toHaveBeenCalledWith('/api/memories/compiled/week/days/2026-07-01?agentId=hana', {
+      expect(lingxiFetch).toHaveBeenCalledWith('/api/memories/compiled/week/days/2026-07-01?agentId=hana', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ body: '编辑后的第一天。' }),

@@ -9,10 +9,10 @@ import { InterfaceTab } from '../InterfaceTab';
 import { useSettingsStore } from '../../store';
 import registry from '../../../../shared/theme-registry';
 
-const hanaFetchMock = vi.fn();
+const lingxiFetchMock = vi.fn();
 
 vi.mock('../../api', () => ({
-  hanaFetch: (...args: unknown[]) => hanaFetchMock(...args),
+  lingxiFetch: (...args: unknown[]) => lingxiFetchMock(...args),
 }));
 
 vi.mock('../../../services/appearance-sync', () => ({
@@ -27,7 +27,7 @@ type AppearanceGlobals = typeof globalThis & {
 
 function setAppearanceGlobals() {
   (globalThis as AppearanceGlobals).setTheme = vi.fn((theme: string) => {
-    localStorage.setItem('hana-theme', theme);
+    localStorage.setItem('lingxi-theme', theme);
     document.documentElement.setAttribute('data-theme', theme === 'auto' ? registry.DEFAULT_THEME : theme);
   });
   (globalThis as AppearanceGlobals).setSerifFont = vi.fn((enabled: boolean) => {
@@ -35,7 +35,7 @@ function setAppearanceGlobals() {
     document.body.classList.toggle('font-sans', !enabled);
   });
   (globalThis as AppearanceGlobals).setPaperTexture = vi.fn((enabled: boolean) => {
-    localStorage.setItem('hana-paper-texture', enabled ? '1' : '0');
+    localStorage.setItem('lingxi-paper-texture', enabled ? '1' : '0');
   });
 }
 
@@ -66,7 +66,7 @@ describe('InterfaceTab appearance state', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    hanaFetchMock.mockImplementation(async (path: string, init?: RequestInit) => {
+    lingxiFetchMock.mockImplementation(async (path: string, init?: RequestInit) => {
       if (path === '/api/preferences/sidebar-ui' && init?.method === 'PUT') {
         return {
           json: async () => ({
@@ -123,8 +123,8 @@ describe('InterfaceTab appearance state', () => {
   });
 
   it('recomputes paper texture availability when the selected theme changes', () => {
-    localStorage.setItem('hana-theme', registry.DEFAULT_THEME);
-    localStorage.setItem('hana-paper-texture', '1');
+    localStorage.setItem('lingxi-theme', registry.DEFAULT_THEME);
+    localStorage.setItem('lingxi-paper-texture', '1');
 
     render(React.createElement(InterfaceTab));
 
@@ -272,7 +272,7 @@ describe('InterfaceTab appearance state', () => {
     fireEvent.click(densitySwitch);
 
     await waitFor(() => {
-      expect(hanaFetchMock).toHaveBeenCalledWith('/api/preferences/sidebar-ui', expect.objectContaining({
+      expect(lingxiFetchMock).toHaveBeenCalledWith('/api/preferences/sidebar-ui', expect.objectContaining({
         method: 'PUT',
         body: JSON.stringify({ sessionList: { rowMode: 'single-line' } }),
       }));

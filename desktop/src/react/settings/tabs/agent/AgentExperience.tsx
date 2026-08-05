@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { hanaFetch } from '../../api';
+import { lingxiFetch } from '../../api';
 import { t } from '../../helpers';
 import styles from '../../Settings.module.css';
 
@@ -36,7 +36,7 @@ export async function putExperience(
   try {
     const agentId = store.getSettingsAgentId();
     const content = serializeExperience(cats);
-    const res = await hanaFetch(`/api/agents/${agentId}/experience`, {
+    const res = await lingxiFetch(`/api/agents/${agentId}/experience`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ content }),

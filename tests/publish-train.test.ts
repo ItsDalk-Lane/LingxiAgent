@@ -469,7 +469,7 @@ describe("publish-train: publishChannel", () => {
     const dir = makeTempDir("hana-publish-train-signing-");
     const signKeyPath = path.join(dir, "test-signing-key.pem");
     fs.writeFileSync(signKeyPath, "test signing key fixture");
-    return { HANA_SIGN_KEY: signKeyPath };
+    return { LINGXI_SIGN_KEY: signKeyPath };
   }
 
   it("refuses to advance stable from a prerelease before any publish write", async () => {

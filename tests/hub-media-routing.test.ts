@@ -14,7 +14,7 @@ function createEngine(overrides = {}) {
   return {
     agentsDir: "/agents",
     channelsDir: null,
-    hanakoHome: "/tmp/hana",
+    lingxiHome: "/tmp/hana",
     providerRegistry: {
       getCredentials: vi.fn(() => ({})),
       getModelsByType: vi.fn(() => []),

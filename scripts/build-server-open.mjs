@@ -14,7 +14,7 @@
  *     捕获异常、回退空翻译表，不是启动必需项）
  *   - 不复制 plugins/、skills2set/、品牌资产、renderer 静态树（这些是 full
  *     专属：本文件从不 import build-server-artifact.mjs，全程不读
- *     HANA_SIGN_KEY）
+ *     LINGXI_SIGN_KEY）
  *
  * 动手前先做白名单断言（assertOpenBuildInputsWhitelisted）：本构建即将读取
  * 的每一个仓库源路径，必须命中 export-manifest.json 的显式白名单，或命中
@@ -24,7 +24,7 @@
  *
  * 产出结构：
  *   dist-server-open/{platform}-{arch}/
- *     hana-server / hana      ← shell wrapper（HANA_SERVER_ENTRY 指向 open bundle）
+ *     hana-server / hana      ← shell wrapper（LINGXI_SERVER_ENTRY 指向 open bundle）
  *     node                    ← Node.js runtime（与 full 相同的目标版本）
  *     bundle/
  *       index.js              ← server/main-open.ts 的 Vite bundle

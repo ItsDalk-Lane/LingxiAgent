@@ -18,14 +18,14 @@ const UPDATE_CHANNEL_FILE_NAME = "update-channel.json";
 const UPDATE_CHANNEL_VERSION = 1;
 // 邀请核销服务地址。内置默认值刻意留空：留空即"通道未配置"，设置页不渲染
 // 任何邀请入口，正式构建在服务上线前不会露出半个按钮。上线后填这里，
-// 或用 HANA_INVITE_API_URL 覆盖。
+// 或用 LINGXI_INVITE_API_URL 覆盖。
 const DEFAULT_INVITE_API_URL = "";
 const DEFAULT_GITHUB_OWNER = "liliMozi";
 const DEFAULT_GITHUB_REPO = "openhanako";
 
 let _mainWindow = null;
 let _setIsUpdating = null;  // 由 main.cjs 注入
-let _hanakoHome = null;     // 由 main.cjs 注入
+let _lingxiHome = null;     // 由 main.cjs 注入
 let _checkTimer = null;
 let _ipcHandlersRegistered = false;
 let _updaterConfigured = false;
@@ -74,11 +74,11 @@ function createInviteChannelFeedConfig(rawFeedUrl, digestBaseUrl = "") {
   };
 }
 
-// ── 更新通道状态文件（{HANA_HOME}/update-channel.json）──
+// ── 更新通道状态文件（{LINGXI_HOME}/update-channel.json）──
 
 function updateChannelFilePathOrNull() {
-  if (!_hanakoHome) return null;
-  return path.join(_hanakoHome, UPDATE_CHANNEL_FILE_NAME);
+  if (!_lingxiHome) return null;
+  return path.join(_lingxiHome, UPDATE_CHANNEL_FILE_NAME);
 }
 
 /**
@@ -149,9 +149,9 @@ function hashDeviceId(deviceId) {
 }
 
 function resolveUpdateFeedConfig(env = process.env) {
-  const explicitFeedUrl = env.HANA_UPDATE_FEED_URL || "";
-  const source = String(env.HANA_UPDATE_SOURCE || env.HANA_UPDATE_PROVIDER || "").trim().toLowerCase();
-  const digestBaseUrl = env.HANA_UPDATE_DIGEST_BASE_URL || "";
+  const explicitFeedUrl = env.LINGXI_UPDATE_FEED_URL || "";
+  const source = String(env.LINGXI_UPDATE_SOURCE || env.LINGXI_UPDATE_PROVIDER || "").trim().toLowerCase();
+  const digestBaseUrl = env.LINGXI_UPDATE_DIGEST_BASE_URL || "";
 
   // 显式环境变量最优先：它是运维/调试的直接指令，压过任何持久化状态。
   if (explicitFeedUrl) {
@@ -220,7 +220,7 @@ let _updateFeedConfig = resolveUpdateFeedConfig();
  */
 function isAutoCheckEnabled() {
   try {
-    const prefsPath = path.join(_hanakoHome || "", "user", "preferences.json");
+    const prefsPath = path.join(_lingxiHome || "", "user", "preferences.json");
     const prefs = JSON.parse(fs.readFileSync(prefsPath, "utf-8"));
     return prefs.auto_check_updates !== false;
   } catch {
@@ -257,9 +257,9 @@ function getState() {
 function logUpdate(message) {
   const line = `[${new Date().toISOString()}] ${message}`;
   try { console.log(`[auto-updater] ${message}`); } catch {}
-  if (!_hanakoHome) return;
+  if (!_lingxiHome) return;
   try {
-    const logDir = path.join(_hanakoHome, "logs");
+    const logDir = path.join(_lingxiHome, "logs");
     fs.mkdirSync(logDir, { recursive: true });
     fs.appendFileSync(path.join(logDir, "auto-update.log"), line + "\n", "utf-8");
   } catch {}
@@ -478,10 +478,10 @@ function isRunningFromDmg() {
 // ── 缓存清理 ──
 
 async function cleanUpdateCache() {
-  const dataDir = _hanakoHome;
+  const dataDir = _lingxiHome;
   const versionFile = path.join(dataDir, "last-update-version");
 
-  // 迁移：旧版 bug 把 last-update-version 写到了 ~/.hanako-dev/（生产环境误用）
+  // 迁移：旧版 bug 把 last-update-version 写到了 ~/.lingxi-dev/（生产环境误用）
   // 搬过来后尝试清理孤儿目录
   try {
     const wrongDir = path.join(require("os").homedir(), ".hanako-dev");
@@ -496,7 +496,7 @@ async function cleanUpdateCache() {
         }
         // 目录空了就删掉
         try { fs.rmdirSync(wrongDir); } catch {} // rmdirSync 非空会失败，正好
-        console.log("[auto-updater] 已清理旧版误写的 ~/.hanako-dev/last-update-version");
+        console.log("[auto-updater] 已清理旧版误写的 ~/.lingxi-dev/last-update-version");
       }
     }
   } catch {}
@@ -657,7 +657,7 @@ function setupAutoUpdater() {
 // ── 邀请码核销 ──
 
 function resolveInviteApiUrl(env = process.env) {
-  return trimTrailingSlash(env.HANA_INVITE_API_URL || DEFAULT_INVITE_API_URL);
+  return trimTrailingSlash(env.LINGXI_INVITE_API_URL || DEFAULT_INVITE_API_URL);
 }
 
 function inviteStatus() {
@@ -836,11 +836,11 @@ function startPolling() {
 // ── 公共 API ──
 
 function initAutoUpdater(mainWindow, {
-  setIsUpdating, hanakoHome,
+  setIsUpdating, lingxiHome,
 } = {}) {
   _mainWindow = mainWindow;
   _setIsUpdating = setIsUpdating;
-  _hanakoHome = hanakoHome;
+  _lingxiHome = lingxiHome;
 
   registerIpcHandlers(); // IPC handlers 是进程级单例，重复 init 时直接复用
 

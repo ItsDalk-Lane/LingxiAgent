@@ -61,7 +61,7 @@ export class ChannelRouter {
     this._agentOrderCache = null; // { list: string[], ts: number }
   }
 
-  /** @returns {import('../core/engine.ts').HanaEngine} */
+  /** @returns {import('../core/engine.ts').LingxiEngine} */
   get _engine() { return this._hub.engine; }
 
   _getAgentInstance(agentId) {

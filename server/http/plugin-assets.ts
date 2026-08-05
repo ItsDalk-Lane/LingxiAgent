@@ -62,7 +62,7 @@ export function verifyPluginAssetSessionForHostRequest(c, engine, { requireSessi
     });
   }
   return verifyPluginAssetSession({
-    hanakoHome: engine.hanakoHome,
+    lingxiHome: engine.lingxiHome,
     pluginId: parsed.pluginId,
     token,
   });

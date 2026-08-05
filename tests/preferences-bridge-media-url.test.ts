@@ -16,16 +16,16 @@ describe("PreferencesManager bridge media public URL", () => {
   it("saves a normalized Bridge media public base URL", () => {
     const prefs = makePrefs();
 
-    expect(prefs.setBridgeMediaPublicBaseUrl(" https://hana.example.com/ ")).toBe("https://hana.example.com");
-    expect(prefs.getBridgeMediaPublicBaseUrl()).toBe("https://hana.example.com");
-    expect(prefs.getPreferences().bridge.mediaPublicBaseUrl).toBe("https://hana.example.com");
+    expect(prefs.setBridgeMediaPublicBaseUrl(" https://lingxi.example.com/ ")).toBe("https://lingxi.example.com");
+    expect(prefs.getBridgeMediaPublicBaseUrl()).toBe("https://lingxi.example.com");
+    expect(prefs.getPreferences().bridge.mediaPublicBaseUrl).toBe("https://lingxi.example.com");
   });
 
   it("clears the bridge key when the URL is empty", () => {
     const prefs = makePrefs();
 
     prefs.setBridgeReadOnly(true);
-    prefs.setBridgeMediaPublicBaseUrl("https://hana.example.com");
+    prefs.setBridgeMediaPublicBaseUrl("https://lingxi.example.com");
     prefs.setBridgeMediaPublicBaseUrl("");
 
     expect(prefs.getBridgeMediaPublicBaseUrl()).toBe("");
@@ -35,8 +35,8 @@ describe("PreferencesManager bridge media public URL", () => {
   it("rejects unsupported or malformed URLs", () => {
     const prefs = makePrefs();
 
-    expect(() => prefs.setBridgeMediaPublicBaseUrl("ftp://hana.example.com")).toThrow(/http or https/);
+    expect(() => prefs.setBridgeMediaPublicBaseUrl("ftp://lingxi.example.com")).toThrow(/http or https/);
     expect(() => prefs.setBridgeMediaPublicBaseUrl("not a url")).toThrow(/valid URL/);
-    expect(() => prefs.setBridgeMediaPublicBaseUrl("https://hana.example.com?x=1")).toThrow(/query or hash/);
+    expect(() => prefs.setBridgeMediaPublicBaseUrl("https://lingxi.example.com?x=1")).toThrow(/query or hash/);
   });
 });

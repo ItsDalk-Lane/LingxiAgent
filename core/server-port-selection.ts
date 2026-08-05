@@ -8,7 +8,7 @@
  *   Windows 保留端口段（Hyper-V/WinNAT excludedportrange）也时常覆盖它；
  *   固定整数端口会让全部安装共享同一枚地雷。
  * - LAN / custom_remote 的端口是对外契约（配对设备、防火墙规则），永不自动改。
- * - 占用者是另一个 Hana server 时禁止 fallback：同 HANA_HOME 双开会并发写坏
+ * - 占用者是另一个 Hana server 时禁止 fallback：同 LINGXI_HOME 双开会并发写坏
  *   SQLite 与 session 文件，同 home 复用/终止由桌面端启动链负责。
  */
 import fs from "fs";
@@ -73,7 +73,7 @@ export async function selectLoopbackListenPort({
 }
 
 export async function ensureServerNetworkConfigWithPortSelection(
-  hanakoHome: string,
+  lingxiHome: string,
   {
     select = selectLoopbackListenPort,
     log = () => {},
@@ -89,16 +89,16 @@ export async function ensureServerNetworkConfigWithPortSelection(
   | { created: false; migrated: false }
 > {
   const nowIso = now || new Date().toISOString();
-  const existing = readExistingConfigOrNull(hanakoHome);
+  const existing = readExistingConfigOrNull(lingxiHome);
 
   if (!existing) {
     const selected = await select({});
     if (selected === null) {
       log(`首启随机选港全部失败，回退到默认端口 ${DEFAULT_SERVER_LISTEN_PORT}`);
-      ensureServerNetworkConfig(hanakoHome, { now: nowIso });
+      ensureServerNetworkConfig(lingxiHome, { now: nowIso });
       return { created: true, migrated: false, port: DEFAULT_SERVER_LISTEN_PORT };
     }
-    saveServerNetworkConfig(hanakoHome, {
+    saveServerNetworkConfig(lingxiHome, {
       schemaVersion: 1,
       mode: "loopback",
       listenHost: "127.0.0.1",
@@ -114,7 +114,7 @@ export async function ensureServerNetworkConfigWithPortSelection(
       log(`存量 loopback+${DEFAULT_SERVER_LISTEN_PORT} 端口迁移选港失败，保留原端口`);
       return { created: false, migrated: false };
     }
-    saveServerNetworkConfig(hanakoHome, { ...existing, listenPort: selected }, { now: nowIso });
+    saveServerNetworkConfig(lingxiHome, { ...existing, listenPort: selected }, { now: nowIso });
     log(`loopback 端口静默迁移: ${DEFAULT_SERVER_LISTEN_PORT} → ${selected}`);
     return { created: false, migrated: true, from: DEFAULT_SERVER_LISTEN_PORT, to: selected };
   }
@@ -122,17 +122,17 @@ export async function ensureServerNetworkConfigWithPortSelection(
   return { created: false, migrated: false };
 }
 
-function readExistingConfigOrNull(hanakoHome: string) {
+function readExistingConfigOrNull(lingxiHome: string) {
   // loadServerNetworkConfig 会在文件缺失时先 ensure 出默认文件；我们需要区分
   // "文件本就不存在"（走首启选港）与"文件存在"（走迁移/原样判定），所以自己
   // 探测文件是否存在，存在时才调用 load（loadServerNetworkConfig 内部的
   // ensureServerNetworkConfig 对已存在文件是无害的 validate-only 路径）。
-  const filePath = path.join(hanakoHome, "server-network.json");
+  const filePath = path.join(lingxiHome, "server-network.json");
   if (!fs.existsSync(filePath)) return null;
-  return loadServerNetworkConfig(hanakoHome);
+  return loadServerNetworkConfig(lingxiHome);
 }
 
-export async function isHanaServerListeningOnPort({
+export async function isLingxiServerListeningOnPort({
   port,
   host = "127.0.0.1",
   fetchImpl = fetch,

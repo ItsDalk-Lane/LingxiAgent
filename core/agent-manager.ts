@@ -245,7 +245,7 @@ export class AgentManager {
       id: agentId,
       name,
       agentName: name,
-      yuan: tombstone.yuan || cfg.agent?.yuan || "hanako",
+      yuan: tombstone.yuan || cfg.agent?.yuan || "lingxi",
       deletedAt: tombstone.deletedAt || null,
     };
   }
@@ -527,7 +527,7 @@ export class AgentManager {
           const { content: idMd } = resolvePersonaSource({
             agentDir: path.join(this._d.agentsDir, entry.name),
             productDir: this._d.productDir,
-            yuanType: cfg.agent?.yuan || "hanako",
+            yuanType: cfg.agent?.yuan || "lingxi",
             locale: resolvePersonaLocale(cfg.locale, globalLocale),
             kind: "identity",
           });
@@ -546,7 +546,7 @@ export class AgentManager {
         agents.push({
           id: entry.name,
           name: cfg.agent?.name || entry.name,
-          yuan: cfg.agent?.yuan || "hanako",
+          yuan: cfg.agent?.yuan || "lingxi",
           plugin: normalizeAgentPluginMeta(cfg.plugin),
           needsRepair: !!repairState,
           repairState,
@@ -580,7 +580,7 @@ export class AgentManager {
       if (!ag) return;
 
       const source = ag.descriptionSource || ag.personality;
-      const yuan = ag.config?.agent?.yuan || "hanako";
+      const yuan = ag.config?.agent?.yuan || "lingxi";
       const hash = createHash("sha256").update(source + "\n" + yuan).digest("hex");
 
       const descPath = path.join(this._d.agentsDir, agentId, "description.md");
@@ -635,7 +635,7 @@ export class AgentManager {
       throw new Error(t("error.agentAlreadyExists", { id: agentId }));
     }
 
-    const yuanType = assertKnownYuan(this._d.productDir, yuan || "hanako");
+    const yuanType = assertKnownYuan(this._d.productDir, yuan || "lingxi");
 
     // 创建目录结构
     fs.mkdirSync(agentDir, { recursive: true });
@@ -951,7 +951,7 @@ export class AgentManager {
       version: 1,
       agentId,
       agentName: ag?.agentName || ag?.name || this._readAgentNameFromConfig(agentDir) || agentId,
-      yuan: ag?.config?.agent?.yuan || this._readAgentYuanFromConfig(agentDir) || "hanako",
+      yuan: ag?.config?.agent?.yuan || this._readAgentYuanFromConfig(agentDir) || "lingxi",
       deletedAt: new Date().toISOString(),
     };
     await fsp.writeFile(
@@ -966,9 +966,9 @@ export class AgentManager {
       log.warn(`subagent 线程账本清理失败 (${agentId}): ${err.message}`);
     }
 
-    if (this._d.hanakoHome) {
+    if (this._d.lingxiHome) {
       try {
-        detachAgentFromBundles({ hanakoHome: this._d.hanakoHome }, agentId);
+        detachAgentFromBundles({ lingxiHome: this._d.lingxiHome }, agentId);
       } catch (err) {
         log.error(`Skill Bundle 解耦失败 (${agentId}): ${err.message}`);
       }

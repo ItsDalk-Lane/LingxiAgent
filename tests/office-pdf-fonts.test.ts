@@ -5,7 +5,7 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import {
-  HANA_PDF_FONT_FAMILIES,
+  LINGXI_PDF_FONT_FAMILIES,
   assertOfficePdfFontAssets,
   buildFontInjectionCss,
   locateThemesDir,
@@ -100,7 +100,7 @@ describe("office pdf font injection css", () => {
   });
 
   it("exposes the family whitelist as the single source for callers and tests", () => {
-    expect(HANA_PDF_FONT_FAMILIES).toEqual(["EB Garamond", "Noto Serif SC", "JetBrains Mono"]);
+    expect(LINGXI_PDF_FONT_FAMILIES).toEqual(["EB Garamond", "Noto Serif SC", "JetBrains Mono"]);
   });
 
   it("fails loudly when a selected font file is missing", () => {
@@ -139,37 +139,37 @@ describe("office pdf font injection css", () => {
   });
 
   describe("resolveThemesDir", () => {
-    it("uses HANA_RENDERER_DIST/themes as the authoritative production source", () => {
+    it("uses LINGXI_RENDERER_DIST/themes as the authoritative production source", () => {
       const fallbackDir = path.join(tempDir, "fallback", "themes");
       fs.mkdirSync(fallbackDir, { recursive: true });
       fs.writeFileSync(path.join(fallbackDir, FONTS_CSS), SAMPLE_CSS, "utf-8");
 
       expect(resolveThemesDir({
-        env: { HANA_RENDERER_DIST: tempDir },
+        env: { LINGXI_RENDERER_DIST: tempDir },
         fallbackCandidates: [fallbackDir],
       })).toBe(themesDir);
     });
 
-    it("rejects a relative HANA_RENDERER_DIST", () => {
+    it("rejects a relative LINGXI_RENDERER_DIST", () => {
       expect(() => resolveThemesDir({
-        env: { HANA_RENDERER_DIST: path.join("relative", "renderer") },
+        env: { LINGXI_RENDERER_DIST: path.join("relative", "renderer") },
         fallbackCandidates: [themesDir],
-      })).toThrow(/HANA_RENDERER_DIST must be an absolute path/);
+      })).toThrow(/LINGXI_RENDERER_DIST must be an absolute path/);
     });
 
-    it("rejects an explicitly empty HANA_RENDERER_DIST instead of treating it as absent", () => {
+    it("rejects an explicitly empty LINGXI_RENDERER_DIST instead of treating it as absent", () => {
       expect(() => resolveThemesDir({
-        env: { HANA_RENDERER_DIST: "" },
+        env: { LINGXI_RENDERER_DIST: "" },
         fallbackCandidates: [themesDir],
-      })).toThrow(/HANA_RENDERER_DIST must be an absolute path/);
+      })).toThrow(/LINGXI_RENDERER_DIST must be an absolute path/);
     });
 
     it("does not fall back when the injected renderer is missing its font css", () => {
       const brokenRenderer = path.join(tempDir, "broken-renderer");
       expect(() => resolveThemesDir({
-        env: { HANA_RENDERER_DIST: brokenRenderer },
+        env: { LINGXI_RENDERER_DIST: brokenRenderer },
         fallbackCandidates: [themesDir],
-      })).toThrow(new RegExp(`HANA_RENDERER_DIST.*${FONTS_CSS.replace(".", "\\.")}`, "s"));
+      })).toThrow(new RegExp(`LINGXI_RENDERER_DIST.*${FONTS_CSS.replace(".", "\\.")}`, "s"));
     });
 
     it("uses development and legacy candidates only when no renderer is injected", () => {
@@ -183,7 +183,7 @@ describe("office pdf font injection css", () => {
     it("extracts all three Hana families and resolves every real woff2 file", () => {
       const realThemesDir = path.join(__dirname, "..", "desktop", "src", "themes");
       const css = buildFontInjectionCss({ themesDir: realThemesDir });
-      for (const family of HANA_PDF_FONT_FAMILIES) {
+      for (const family of LINGXI_PDF_FONT_FAMILIES) {
         expect(css).toContain(`'${family}'`);
       }
       expect(css).toContain("unicode-range:");

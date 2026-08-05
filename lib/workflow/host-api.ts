@@ -9,7 +9,7 @@ import {
 } from "./node-folder-scope.ts";
 import { DEFAULT_RUN_LIMITS, isRetryableNodeError, retryDelayMs } from "./run-limits.ts";
 
-export const WORKFLOW_RUNTIME_CONTRACT = Symbol.for("hana.workflow.runtimeContract");
+export const WORKFLOW_RUNTIME_CONTRACT = Symbol.for("lingxi.workflow.runtimeContract");
 
 const AGENT_OPTION_KEYS = new Set(["label", "model", "agentType", "toolFilter", "access", "schema", "writeFolders", "retries"]);
 

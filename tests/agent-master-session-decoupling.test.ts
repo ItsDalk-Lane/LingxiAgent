@@ -56,7 +56,7 @@ function bootstrapAgentDir(rootDir) {
     [
       "agent:",
       "  name: TestAgent",
-      "  yuan: hanako",
+      "  yuan: lingxi",
       "user:",
       "  name: Tester",
       "locale: en",

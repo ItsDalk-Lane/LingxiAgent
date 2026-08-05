@@ -57,7 +57,7 @@ function assertExtractedLayout(layoutRoot) {
     assertFile(path.join(layoutRoot, "server", ...relative.split("/")), `packaged server file ${relative}`);
   }
   assertFile(
-    path.join(layoutRoot, "sandbox", "windows", "hana-win-sandbox.exe"),
+    path.join(layoutRoot, "sandbox", "windows", "lingxi-win-sandbox.exe"),
     "Windows sandbox helper",
   );
   try {
@@ -89,13 +89,13 @@ function envValue(env, name) {
  */
 export function createRestrictedTokenSmokeRuntimeEnv({
   workDir,
-  hanaHome,
+  lingxiHome,
   helperPath,
   layoutRoot,
   env = process.env,
 } = {}) {
   if (!workDir) throw new Error("workDir is required");
-  if (!hanaHome) throw new Error("hanaHome is required");
+  if (!lingxiHome) throw new Error("lingxiHome is required");
   if (!helperPath) throw new Error("helperPath is required");
   if (!layoutRoot) throw new Error("layoutRoot is required");
 
@@ -117,11 +117,11 @@ export function createRestrictedTokenSmokeRuntimeEnv({
     APPDATA: appDataDir,
     USERPROFILE: profileDir,
     HOME: profileDir,
-    HANA_HOME: hanaHome,
-    HANA_ROOT: path.win32.join(layoutRoot, "server"),
-    HANA_SERVER_ENTRY: path.win32.join(layoutRoot, "server", "bundle", "index.js"),
-    HANA_WIN32_SANDBOX_HELPER: helperPath,
-    HANA_WIN32_SANDBOX_DEBUG: "1",
+    LINGXI_HOME: lingxiHome,
+    LINGXI_ROOT: path.win32.join(layoutRoot, "server"),
+    LINGXI_SERVER_ENTRY: path.win32.join(layoutRoot, "server", "bundle", "index.js"),
+    LINGXI_WIN32_SANDBOX_HELPER: helperPath,
+    LINGXI_WIN32_SANDBOX_DEBUG: "1",
   };
 
   // Carry the small set of host identity/system keys production inherits, but
@@ -152,13 +152,13 @@ export function createRestrictedTokenSmokeRuntimeEnv({
 export function standaloneRestrictedTokenSmokeSpec({
   layoutRoot,
   workDir,
-  hanaHome,
-  helperPath = path.win32.join(layoutRoot, "sandbox", "windows", "hana-win-sandbox.exe"),
+  lingxiHome,
+  helperPath = path.win32.join(layoutRoot, "sandbox", "windows", "lingxi-win-sandbox.exe"),
   env = process.env,
 }) {
   const { env: smokeEnv, runtimeDirs } = createRestrictedTokenSmokeRuntimeEnv({
     workDir,
-    hanaHome,
+    lingxiHome,
     helperPath,
     layoutRoot,
     env,
@@ -172,11 +172,11 @@ export function standaloneRestrictedTokenSmokeSpec({
   // proof. Sandboxed Git startup is covered by the exec_command smoke below,
   // which reaches it through the production exec chain.
   const shellCommand =
-    `echo HANA_RESTRICTED_TOKEN_OK>${markerFileName}`
+    `echo LINGXI_RESTRICTED_TOKEN_OK>${markerFileName}`
     + ` && type ${markerFileName}`
     + ` && (echo SHOULD_NOT_WRITE>${blockedDirName}\\${deniedFileName})`
     + " && exit 73"
-    + " || echo HANA_DENY_WRITE_OK";
+    + " || echo LINGXI_DENY_WRITE_OK";
   return {
     helperPath,
     markerPath: path.win32.join(workDir, markerFileName),
@@ -200,12 +200,12 @@ export function standaloneRestrictedTokenSmokeSpec({
 export function runRestrictedTokenHelperSmoke({
   layoutRoot,
   workDir,
-  hanaHome,
+  lingxiHome,
   helperPath,
   env = process.env,
   spawnSyncImpl = spawnSync,
 }) {
-  const spec = standaloneRestrictedTokenSmokeSpec({ layoutRoot, workDir, hanaHome, helperPath, env });
+  const spec = standaloneRestrictedTokenSmokeSpec({ layoutRoot, workDir, lingxiHome, helperPath, env });
   fs.mkdirSync(spec.blockedDir, { recursive: true });
   for (const dir of spec.runtimeDirs || []) {
     fs.mkdirSync(dir, { recursive: true });
@@ -225,13 +225,13 @@ export function runRestrictedTokenHelperSmoke({
   }
   const smokeStdout = String(sandboxResult.stdout || "");
   const smokeStderr = String(sandboxResult.stderr || "");
-  if (!smokeStdout.includes("HANA_RESTRICTED_TOKEN_OK")) {
+  if (!smokeStdout.includes("LINGXI_RESTRICTED_TOKEN_OK")) {
     throw new Error("[verify-standalone] restricted-token sandbox smoke did not emit its success marker");
   }
-  if (!smokeStdout.includes("HANA_DENY_WRITE_OK")) {
+  if (!smokeStdout.includes("LINGXI_DENY_WRITE_OK")) {
     throw new Error("[verify-standalone] restricted-token sandbox smoke did not prove deny-write enforcement");
   }
-  const terminalRecord = 'hana-win-sandbox: terminal-v1 status="exited" exitCode="0" timeoutMs="30000" win32Error="0"';
+  const terminalRecord = 'lingxi-win-sandbox: terminal-v1 status="exited" exitCode="0" timeoutMs="30000" win32Error="0"';
   if (!smokeStderr.includes(terminalRecord)) {
     throw new Error(
       `[verify-standalone] restricted-token sandbox smoke emitted no successful terminal record\nstderr: ${smokeStderr.trim()}`,
@@ -239,7 +239,7 @@ export function runRestrictedTokenHelperSmoke({
   }
   expectEqual(
     fs.readFileSync(spec.markerPath, "utf8").trim(),
-    "HANA_RESTRICTED_TOKEN_OK",
+    "LINGXI_RESTRICTED_TOKEN_OK",
     "restricted-token writable-root marker",
   );
   if (fs.existsSync(spec.deniedMarkerPath)) {
@@ -262,13 +262,13 @@ export function restrictedTokenSmokeSpawnOptions({ cwd, env, timeout }) {
   };
 }
 
-export function standaloneExecCommandSmokeSpec({ layoutRoot, workDir, hanaHome, env = process.env }) {
+export function standaloneExecCommandSmokeSpec({ layoutRoot, workDir, lingxiHome, env = process.env }) {
   const baseEnv = createHermeticMinGitSmokeEnv({
     runtimeRoot: path.win32.join(layoutRoot, "git"),
-    workRoot: hanaHome,
+    workRoot: lingxiHome,
     env,
   });
-  const helperPath = path.win32.join(layoutRoot, "sandbox", "windows", "hana-win-sandbox.exe");
+  const helperPath = path.win32.join(layoutRoot, "sandbox", "windows", "lingxi-win-sandbox.exe");
   const serverRoot = path.win32.join(layoutRoot, "server");
   return {
     command: baseEnv.ComSpec,
@@ -281,16 +281,16 @@ export function standaloneExecCommandSmokeSpec({ layoutRoot, workDir, hanaHome, 
     windowsVerbatimArguments: true,
     env: {
       ...baseEnv,
-      HANA_HOME: hanaHome,
+      LINGXI_HOME: lingxiHome,
       // Poison values prove the extracted wrapper, rather than the verifier,
       // owns the packaged runtime contract before Node imports the probe.
-      HANA_ROOT: "Z:\\hana-poison\\server",
-      HANA_SERVER_ENTRY: "Z:\\hana-poison\\server\\bundle\\index.js",
-      HANA_WIN32_SANDBOX_HELPER: "Z:\\hana-poison\\sandbox\\hana-win-sandbox.exe",
-      HANA_INTERNAL_STANDALONE_RUNTIME_SMOKE: "1",
-      HANA_STANDALONE_EXEC_WORK: workDir,
-      HANA_STANDALONE_EXPECTED_HELPER: helperPath,
-      HANA_STANDALONE_EXPECTED_ROOT: serverRoot,
+      LINGXI_ROOT: "Z:\\hana-poison\\server",
+      LINGXI_SERVER_ENTRY: "Z:\\hana-poison\\server\\bundle\\index.js",
+      LINGXI_WIN32_SANDBOX_HELPER: "Z:\\hana-poison\\sandbox\\lingxi-win-sandbox.exe",
+      LINGXI_INTERNAL_STANDALONE_RUNTIME_SMOKE: "1",
+      LINGXI_STANDALONE_EXEC_WORK: workDir,
+      LINGXI_STANDALONE_EXPECTED_HELPER: helperPath,
+      LINGXI_STANDALONE_EXPECTED_ROOT: serverRoot,
     },
   };
 }
@@ -313,12 +313,12 @@ function smokeExtractedRuntime({ rootDir, layoutRoot }) {
   fs.mkdirSync(workDir, { recursive: true });
   fs.mkdirSync(path.join(smokeHome, "agents", "standalone-smoke"), { recursive: true });
   try {
-    runRestrictedTokenHelperSmoke({ layoutRoot, workDir, hanaHome: smokeHome });
+    runRestrictedTokenHelperSmoke({ layoutRoot, workDir, lingxiHome: smokeHome });
 
     const execSpec = standaloneExecCommandSmokeSpec({
       layoutRoot,
       workDir,
-      hanaHome: smokeHome,
+      lingxiHome: smokeHome,
     });
     const execResult = spawnSync(execSpec.command, execSpec.args, {
       cwd: layoutRoot,
@@ -337,7 +337,7 @@ function smokeExtractedRuntime({ rootDir, layoutRoot }) {
           + (execResult.stderr ? `\nstderr: ${execResult.stderr.trim()}` : ""),
       );
     }
-    const receiptPrefix = "HANA_STANDALONE_EXEC_RECEIPT=";
+    const receiptPrefix = "LINGXI_STANDALONE_EXEC_RECEIPT=";
     const receiptLine = String(execResult.stdout || "")
       .split(/\r?\n/)
       .find((line) => line.startsWith(receiptPrefix));
@@ -396,7 +396,7 @@ export async function verifyWindowsStandaloneArtifact(opts = {}) {
   expectEqual(manifest.layout?.git, `${STANDALONE_LAYOUT_ROOT}/git`, "manifest Git layout");
   expectEqual(
     manifest.layout?.sandboxHelper,
-    `${STANDALONE_LAYOUT_ROOT}/sandbox/windows/hana-win-sandbox.exe`,
+    `${STANDALONE_LAYOUT_ROOT}/sandbox/windows/lingxi-win-sandbox.exe`,
     "manifest sandbox helper layout",
   );
   expectEqual(manifest.runtime?.minGitVersion, MINGIT_VERSION, "manifest MinGit version");

@@ -46,7 +46,7 @@ describe('Agent review cards', () => {
           firstMessage: '原始问题',
           modified: '',
           messageCount: 3,
-          agentId: 'hanako',
+          agentId: 'lingxi',
           agentName: '小黎',
           cwd: null,
         },

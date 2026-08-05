@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
-  buildWin32HanaWriteAclCleanupArgs,
+  buildWin32LingxiWriteAclCleanupArgs,
   buildWin32LegacyAclDiagnosticArgs,
   buildWin32LegacyProfileCleanupArgs,
 } from "../lib/sandbox/win32-legacy-maintenance.ts";
@@ -29,7 +29,7 @@ describe("Windows legacy sandbox maintenance args", () => {
   });
 
   it("builds stale Hana write ACL cleanup commands without executable passthrough", () => {
-    expect(buildWin32HanaWriteAclCleanupArgs({
+    expect(buildWin32LingxiWriteAclCleanupArgs({
       paths: ["C:\\work", "C:\\Users\\Hana\\.hanako\\.ephemeral", "C:\\work"],
     })).toEqual([
       "--cleanup-hana-write-acl",

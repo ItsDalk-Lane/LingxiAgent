@@ -48,14 +48,14 @@ jobs:
       - name: Materialize train signing key
         shell: bash
         env:
-          HANA_SIGN_KEY_PEM: ${{ secrets.HANA_SIGN_KEY }}
+          LINGXI_SIGN_KEY_PEM: ${{ secrets.LINGXI_SIGN_KEY }}
         run: |
-          if [ -z "$HANA_SIGN_KEY_PEM" ]; then
-            echo "::error::HANA_SIGN_KEY secret is missing; the train manifest MUST be signed"
+          if [ -z "$LINGXI_SIGN_KEY_PEM" ]; then
+            echo "::error::LINGXI_SIGN_KEY secret is missing; the train manifest MUST be signed"
             exit 1
           fi
-          printf '%s\n' "$HANA_SIGN_KEY_PEM" > "$RUNNER_TEMP/hana-train-sign-key.pem"
-          echo "HANA_SIGN_KEY=$RUNNER_TEMP/hana-train-sign-key.pem" >> "$GITHUB_ENV"
+          printf '%s\n' "$LINGXI_SIGN_KEY_PEM" > "$RUNNER_TEMP/hana-train-sign-key.pem"
+          echo "LINGXI_SIGN_KEY=$RUNNER_TEMP/hana-train-sign-key.pem" >> "$GITHUB_ENV"
 
       - name: Publish train
         shell: bash

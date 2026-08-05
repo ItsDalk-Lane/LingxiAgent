@@ -8,13 +8,13 @@ import {
 } from "../scripts/smoke-mingit.mjs";
 
 const identityCanonicalizer = (directory: string) => directory;
-const runtimeRoot = "C:\\Users\\runneradmin\\AppData\\Local\\Temp\\HanaCore\\git";
+const runtimeRoot = "C:\\Users\\runneradmin\\AppData\\Local\\Temp\\LingxiCore\\git";
 const coreutils = "cat ls cp mv rm mkdir grep sed awk find sort uniq head tail wc cut tr xargs echo touch".split(" ");
 
 describe("MinGit release smoke environment", () => {
   it("does not inherit a host Git or arbitrary runner PATH entries", () => {
     const env = createHermeticMinGitSmokeEnv({
-      runtimeRoot: "C:\\downloads\\HanaCore\\git",
+      runtimeRoot: "C:\\downloads\\LingxiCore\\git",
       workRoot: "C:\\Temp\\hana smoke",
       env: {
         SystemRoot: "C:\\Windows",
@@ -27,9 +27,9 @@ describe("MinGit release smoke environment", () => {
     });
 
     expect(env.Path).toBe([
-      "C:\\downloads\\HanaCore\\git\\cmd",
-      "C:\\downloads\\HanaCore\\git\\usr\\bin",
-      "C:\\downloads\\HanaCore\\git\\mingw64\\bin",
+      "C:\\downloads\\LingxiCore\\git\\cmd",
+      "C:\\downloads\\LingxiCore\\git\\usr\\bin",
+      "C:\\downloads\\LingxiCore\\git\\mingw64\\bin",
       "C:\\Windows\\System32",
     ].join(";"));
     expect(env.Path).not.toContain("host-git");
@@ -46,11 +46,11 @@ describe("MinGit command provenance", () => {
     ["/usr/bin/grep", `${runtimeRoot}\\usr\\bin\\grep`],
     ["/mingw64/bin/cat.exe", `${runtimeRoot}\\mingw64\\bin\\cat.exe`],
     [
-      "/c/Users/runneradmin/AppData/Local/Temp/HanaCore/git/usr/bin/sed.exe",
+      "/c/Users/runneradmin/AppData/Local/Temp/LingxiCore/git/usr/bin/sed.exe",
       `${runtimeRoot}\\usr\\bin\\sed.exe`,
     ],
     [
-      "C:/Users/runneradmin/AppData/Local/Temp/HanaCore/git/usr/bin/awk.exe",
+      "C:/Users/runneradmin/AppData/Local/Temp/LingxiCore/git/usr/bin/awk.exe",
       `${runtimeRoot}\\usr\\bin\\awk.exe`,
     ],
   ])("normalizes supported command paths: %s", (resolved, expected) => {
@@ -60,8 +60,8 @@ describe("MinGit command provenance", () => {
   it.each([
     ["grep", "/usr/bin/grep"],
     ["cat", "/mingw64/bin/cat.exe"],
-    ["sed", "/c/Users/runneradmin/AppData/Local/Temp/HanaCore/git/usr/bin/sed.exe"],
-    ["awk", "C:/Users/runneradmin/AppData/Local/Temp/HanaCore/git/usr/bin/awk.exe"],
+    ["sed", "/c/Users/runneradmin/AppData/Local/Temp/LingxiCore/git/usr/bin/sed.exe"],
+    ["awk", "C:/Users/runneradmin/AppData/Local/Temp/LingxiCore/git/usr/bin/awk.exe"],
   ])("accepts %s from an allowed canonical parent", (command, resolved) => {
     expect(classifyMinGitCommandResolution({
       command,
@@ -79,7 +79,7 @@ describe("MinGit command provenance", () => {
 
     expect(classifyMinGitCommandResolution({
       command: "grep",
-      resolved: "/c/Users/RUNNER~1/AppData/Local/Temp/HanaCore/git/usr/bin/grep.exe",
+      resolved: "/c/Users/RUNNER~1/AppData/Local/Temp/LingxiCore/git/usr/bin/grep.exe",
       runtimeRoot,
       canonicalizeDirectory,
     })).toMatchObject({ ok: true, source: "runtime" });
@@ -95,9 +95,9 @@ describe("MinGit command provenance", () => {
   });
 
   it.each([
-    "C:/Users/runneradmin/AppData/Local/Temp/HanaCore/git/usr/bin-neighbor/grep.exe",
-    "C:/Users/runneradmin/AppData/Local/Temp/HanaCore/git-prefix/usr/bin/grep.exe",
-    "C:/Users/runneradmin/AppData/Local/Temp/HanaCore/git/usr/bin/nested/grep.exe",
+    "C:/Users/runneradmin/AppData/Local/Temp/LingxiCore/git/usr/bin-neighbor/grep.exe",
+    "C:/Users/runneradmin/AppData/Local/Temp/LingxiCore/git-prefix/usr/bin/grep.exe",
+    "C:/Users/runneradmin/AppData/Local/Temp/LingxiCore/git/usr/bin/nested/grep.exe",
   ])("rejects sibling, prefix, and nested directory escapes: %s", (resolved) => {
     expect(classifyMinGitCommandResolution({
       command: "grep",

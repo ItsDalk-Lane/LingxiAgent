@@ -12,7 +12,7 @@
  */
 
 import { createRequire } from "module";
-import { resolveCliHanaHome } from "./local-server.ts";
+import { resolveCliLingxiHome } from "./local-server.ts";
 import { ansi } from "./terminal-theme.ts";
 import { SERVER_PROTOCOL_VERSION } from "../shared/contract-versions.cjs";
 
@@ -80,16 +80,16 @@ function createProgressRenderer(stream: NodeJS.WriteStream = process.stdout) {
  */
 export async function runBundlePull({
   channel = "stable",
-  hanaHome = resolveCliHanaHome(),
+  lingxiHome = resolveCliLingxiHome(),
   download = otaCore.downloadAndApplyRendererArtifact as DownloadRendererArtifact,
 }: {
   channel?: string;
-  hanaHome?: string;
+  lingxiHome?: string;
   download?: DownloadRendererArtifact;
 } = {}): Promise<number> {
   const progress = createProgressRenderer();
   const result = await download({
-    homeDir: hanaHome,
+    homeDir: lingxiHome,
     keyset: loadPinnedKeyset(),
     channel,
     serverProtocolVersion: SERVER_PROTOCOL_VERSION,
@@ -118,16 +118,16 @@ export async function runBundlePull({
  */
 export async function runBundleStatus({
   channel = "stable",
-  hanaHome = resolveCliHanaHome(),
+  lingxiHome = resolveCliLingxiHome(),
 }: {
   channel?: string;
-  hanaHome?: string;
+  lingxiHome?: string;
 } = {}): Promise<number> {
   const rendererChannel = rendererPointerChannel(channel);
   const [current, next, otaState] = await Promise.all([
-    pointerStore.readPointer(hanaHome, rendererChannel, "current"),
-    pointerStore.readPointer(hanaHome, rendererChannel, "next"),
-    otaCore.readOtaState(hanaHome),
+    pointerStore.readPointer(lingxiHome, rendererChannel, "current"),
+    pointerStore.readPointer(lingxiHome, rendererChannel, "next"),
+    otaCore.readOtaState(lingxiHome),
   ]);
   const state = (otaState && otaState[channel]) || {};
 

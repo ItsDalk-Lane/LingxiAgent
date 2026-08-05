@@ -6,7 +6,7 @@ import {
 } from "../lib/tools/subagent-tool-policy.ts";
 
 describe("subagent 工具访问策略收口（Codex 式：显式 access + 继承父会话档）", () => {
-  afterEach(() => { delete process.env.HANA_SUBAGENT_TOOL_STRATEGY; });
+  afterEach(() => { delete process.env.LINGXI_SUBAGENT_TOOL_STRATEGY; });
 
   it("默认 intercept（甲）：不剥离工具（filter=null）", () => {
     const a = resolveSubagentToolAccess({ access: "write" });
@@ -104,8 +104,8 @@ describe("subagent 工具访问策略收口（Codex 式：显式 access + 继承
     expect(a.permissionMode).toBe("read_only");
   });
 
-  it("env HANA_SUBAGENT_TOOL_STRATEGY=strip 切到乙（性能 A/B 开关）", () => {
-    process.env.HANA_SUBAGENT_TOOL_STRATEGY = "strip";
+  it("env LINGXI_SUBAGENT_TOOL_STRATEGY=strip 切到乙（性能 A/B 开关）", () => {
+    process.env.LINGXI_SUBAGENT_TOOL_STRATEGY = "strip";
     expect(resolveSubagentToolStrategy()).toBe("strip");
     expect(resolveSubagentToolAccess({ access: "write" }).strategy).toBe("strip");
   });

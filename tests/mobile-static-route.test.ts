@@ -146,7 +146,7 @@ describe("resolveMobileStaticRouteOptions (startup decision, four quadrants)", (
     const devDistDir = makeTmpDir();
     fs.writeFileSync(path.join(devDistDir, "mobile.html"), "<!doctype html>", "utf-8");
 
-    const result = resolveMobileStaticRouteOptions({ env: { HANA_RENDERER_DIST: tmpDir }, devDistDir });
+    const result = resolveMobileStaticRouteOptions({ env: { LINGXI_RENDERER_DIST: tmpDir }, devDistDir });
     expect(result).toEqual({ mode: "dist", distDir: tmpDir });
     fs.rmSync(devDistDir, { recursive: true, force: true });
   });
@@ -157,7 +157,7 @@ describe("resolveMobileStaticRouteOptions (startup decision, four quadrants)", (
     const devDistDir = makeTmpDir();
     fs.writeFileSync(path.join(devDistDir, "mobile.html"), "<!doctype html>", "utf-8");
 
-    const result = resolveMobileStaticRouteOptions({ env: { HANA_RENDERER_DIST: tmpDir }, devDistDir });
+    const result = resolveMobileStaticRouteOptions({ env: { LINGXI_RENDERER_DIST: tmpDir }, devDistDir });
     expect(result.mode).toBe("error");
     expect((result as { reason: string }).reason).toContain(tmpDir);
     fs.rmSync(devDistDir, { recursive: true, force: true });

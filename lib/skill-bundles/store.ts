@@ -81,8 +81,8 @@ function allocateBundleId(store, baseName) {
 }
 
 export function getSkillBundleStorePath(engine) {
-  if (!engine?.hanakoHome) throw new Error("hanakoHome is required for skill bundle store");
-  return path.join(engine.hanakoHome, STORE_FILE);
+  if (!engine?.lingxiHome) throw new Error("lingxiHome is required for skill bundle store");
+  return path.join(engine.lingxiHome, STORE_FILE);
 }
 
 export function loadSkillBundleStore(engine) {

@@ -488,10 +488,10 @@ function describeDataEpochBlock({ stampEpoch, ownEpoch, stampLastVersion }) {
   return (
     `此数据目录要求数据 epoch=${stampEpoch} 或更高版本的内核${lastVersionNote}，本内核 epoch=${ownEpoch}。`
     + `继续使用旧内核可能静默损坏数据。请升级到较新版本，或在确认风险后设置 `
-    + `HANA_ALLOW_DATA_DOWNGRADE=1（或对 hana serve 传 --allow-data-downgrade）。\n`
+    + `LINGXI_ALLOW_DATA_DOWNGRADE=1（或对 hana serve 传 --allow-data-downgrade）。\n`
     + `This data directory requires a kernel at data epoch=${stampEpoch} or newer${lastVersionNote}; `
     + `this kernel is epoch=${ownEpoch}. Continuing with an older kernel risks silent corruption. `
-    + `Upgrade, or explicitly accept the risk with HANA_ALLOW_DATA_DOWNGRADE=1 `
+    + `Upgrade, or explicitly accept the risk with LINGXI_ALLOW_DATA_DOWNGRADE=1 `
     + `(or --allow-data-downgrade for hana serve).`
   );
 }

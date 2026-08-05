@@ -1,6 +1,6 @@
 /**
  * Windows manual smoke test:
- *   $env:HANA_WIN32_SMOKE="1"; npx vitest run tests/manual/win32-packaged-smoke.test.ts
+ *   $env:LINGXI_WIN32_SMOKE="1"; npx vitest run tests/manual/win32-packaged-smoke.test.ts
  *
  * Run from a development tree or unpacked install tree to verify the real Windows
  * process-launch paths. Non-Windows hosts and normal test runs skip this suite.
@@ -10,7 +10,7 @@ import os from "os";
 import path from "path";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
-const SMOKE_ENABLED = process.platform === "win32" && process.env.HANA_WIN32_SMOKE === "1";
+const SMOKE_ENABLED = process.platform === "win32" && process.env.LINGXI_WIN32_SMOKE === "1";
 const smokeDescribe = SMOKE_ENABLED ? describe : describe.skip;
 
 smokeDescribe("win32 packaged smoke", () => {
@@ -72,21 +72,21 @@ smokeDescribe("win32 packaged smoke", () => {
     const { resolveWin32SandboxHelper } = await import("../../lib/sandbox/win32-sandbox-helper.ts");
     const helper = resolveWin32SandboxHelper({ env: process.env });
     if (!helper) {
-      console.warn("[smoke] hana-win-sandbox.exe not found; sandbox chain NOT verified in this tree");
+      console.warn("[smoke] lingxi-win-sandbox.exe not found; sandbox chain NOT verified in this tree");
       return;
     }
-    const hanakoHome = fs.mkdtempSync(path.join(os.tmpdir(), "hana-smoke-home-"));
+    const lingxiHome = fs.mkdtempSync(path.join(os.tmpdir(), "hana-smoke-home-"));
     try {
       const { deriveSandboxPolicy } = await import("../../lib/sandbox/policy.ts");
       const policy = deriveSandboxPolicy({
-        agentDir: hanakoHome,
+        agentDir: lingxiHome,
         cwd: workDir,
         workspace: workDir,
         workspaceFolders: [],
-        hanakoHome,
+        lingxiHome,
         mode: "standard",
       });
-      const exec = (await loadExec())({ sandbox: { policy, hanakoHome, helperPath: helper } });
+      const exec = (await loadExec())({ sandbox: { policy, lingxiHome, helperPath: helper } });
       const result = await exec("ipconfig", workDir, {
         onData: () => {},
         signal: undefined,
@@ -95,22 +95,22 @@ smokeDescribe("win32 packaged smoke", () => {
       });
       expect(result.exitCode).toBe(0);
     } finally {
-      fs.rmSync(hanakoHome, { recursive: true, force: true });
+      fs.rmSync(lingxiHome, { recursive: true, force: true });
     }
   });
 
   it("5. node-pty terminal launches and exits cleanly", async () => {
-    const hanakoHome = fs.mkdtempSync(path.join(os.tmpdir(), "hana-smoke-term-"));
+    const lingxiHome = fs.mkdtempSync(path.join(os.tmpdir(), "hana-smoke-term-"));
     try {
       const { TerminalSessionManager } = await import("../../lib/terminal/terminal-session-manager.ts");
-      const manager = new TerminalSessionManager({ hanakoHome });
-      const sessionPath = path.join(hanakoHome, "smoke-session.jsonl");
+      const manager = new TerminalSessionManager({ lingxiHome });
+      const sessionPath = path.join(lingxiHome, "smoke-session.jsonl");
       const started = await manager.start({ sessionPath, agentId: "smoke", cwd: workDir });
       expect(started.status).toBe("running");
       expect(started.terminalId).toBeTruthy();
       manager.close({ sessionPath, terminalId: started.terminalId });
     } finally {
-      fs.rmSync(hanakoHome, { recursive: true, force: true });
+      fs.rmSync(lingxiHome, { recursive: true, force: true });
     }
   });
 
@@ -124,6 +124,6 @@ smokeDescribe("win32 packaged smoke", () => {
         timeout: 30,
         env: process.env,
       }),
-    ).rejects.toMatchObject({ code: "HANA_EXEC_CWD_MISSING" });
+    ).rejects.toMatchObject({ code: "LINGXI_EXEC_CWD_MISSING" });
   });
 });

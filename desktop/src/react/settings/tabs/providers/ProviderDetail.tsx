@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useSettingsStore, type ProviderSummary } from '../../store';
-import { hanaFetch } from '../../api';
+import { lingxiFetch } from '../../api';
 import { invalidateConfigCache } from '../../../hooks/use-config';
 import { t } from '../../helpers';
 import { OAuthCredentials } from './OAuthCredentials';
@@ -57,7 +57,7 @@ function ProviderDeleteButton({ providerId, onRefresh }: { providerId: string; o
 
   const handleDelete = async () => {
     try {
-      const res = await hanaFetch('/api/config', {
+      const res = await lingxiFetch('/api/config', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ providers: { [providerId]: null } }),

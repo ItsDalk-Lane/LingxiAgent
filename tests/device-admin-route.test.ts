@@ -43,7 +43,7 @@ describe("device admin route", () => {
     const { createDevicesRoute } = await import("../server/routes/devices.ts");
     tmpDir = makeTmpDir();
     const engine = {
-      hanakoHome: tmpDir,
+      lingxiHome: tmpDir,
       getRuntimeContext: () => ({
         serverNodeId: "node_home_mac",
         userId: "user_owner",

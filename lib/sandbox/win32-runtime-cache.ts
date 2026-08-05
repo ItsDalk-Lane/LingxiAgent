@@ -116,9 +116,9 @@ function copyRuntimeTree({ sourceRoot, targetRoot, markerPath, manifest }) {
   }
 }
 
-function ensureCachedRuntimeRoot({ sourceRoot, primaryPath, hanakoHome, kind }) {
-  if (!hanakoHome) {
-    throw new Error("[win32-sandbox] HANA_HOME is required to prepare sandbox runtime cache.");
+function ensureCachedRuntimeRoot({ sourceRoot, primaryPath, lingxiHome, kind }) {
+  if (!lingxiHome) {
+    throw new Error("[win32-sandbox] LINGXI_HOME is required to prepare sandbox runtime cache.");
   }
   if (!sourceRoot || !fs.existsSync(sourceRoot)) {
     throw new Error(`[win32-sandbox] Runtime source root does not exist: ${sourceRoot || "(missing)"}`);
@@ -127,7 +127,7 @@ function ensureCachedRuntimeRoot({ sourceRoot, primaryPath, hanakoHome, kind }) 
     throw new Error(`[win32-sandbox] Runtime executable does not exist: ${primaryPath || "(missing)"}`);
   }
 
-  const cacheRoot = sandboxRuntimeCacheRoot(hanakoHome);
+  const cacheRoot = sandboxRuntimeCacheRoot(lingxiHome);
   if (isInsideRuntimeRoot(sourceRoot, cacheRoot)) return sourceRoot;
 
   const manifest = runtimeManifest({ sourceRoot, primaryPath, kind });
@@ -140,9 +140,9 @@ function ensureCachedRuntimeRoot({ sourceRoot, primaryPath, hanakoHome, kind }) 
   return targetRoot;
 }
 
-export function sandboxRuntimeCacheRoot(hanakoHome) {
-  if (!hanakoHome) throw new Error("[win32-sandbox] HANA_HOME is required for sandbox runtime cache.");
-  return joinRuntimePath(hanakoHome, ".ephemeral", CACHE_DIR);
+export function sandboxRuntimeCacheRoot(lingxiHome) {
+  if (!lingxiHome) throw new Error("[win32-sandbox] LINGXI_HOME is required for sandbox runtime cache.");
+  return joinRuntimePath(lingxiHome, ".ephemeral", CACHE_DIR);
 }
 
 // Per-executable, in-process cache of whether a sandboxed PowerShell startup
@@ -215,11 +215,11 @@ export function detectWin32PowerShellFlavor({
   return probePwshOnPath(spawn) ? "pwsh" : "windows-powershell";
 }
 
-export function prepareSandboxRuntime(runtimeInfo, { hanakoHome, kind }) {
+export function prepareSandboxRuntime(runtimeInfo, { lingxiHome, kind }) {
   if (!runtimeInfo) return runtimeInfo;
   const sourceRoot = runtimeSourceRoot(runtimeInfo);
   const primaryPath = runtimePrimaryPath(runtimeInfo);
-  const targetRoot = ensureCachedRuntimeRoot({ sourceRoot, primaryPath, hanakoHome, kind });
+  const targetRoot = ensureCachedRuntimeRoot({ sourceRoot, primaryPath, lingxiHome, kind });
   if (targetRoot === sourceRoot) return runtimeInfo;
 
   return {

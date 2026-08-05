@@ -2,7 +2,7 @@
  * Settings shared actions — extracted from SettingsApp to avoid circular imports
  */
 import { useSettingsStore } from './store';
-import { hanaFetch, hanaUrl } from './api';
+import { lingxiFetch, lingxiUrl } from './api';
 import { t } from './helpers';
 import {
   createRemoteResource,
@@ -25,7 +25,7 @@ function isAbortError(err: unknown): boolean {
 export async function loadAgents() {
   const store = useSettingsStore.getState();
   try {
-    const res = await hanaFetch('/api/agents');
+    const res = await lingxiFetch('/api/agents');
     const data = await res.json();
     if (data.error) throw new Error(data.error);
     const agents = data.agents || [];
@@ -55,16 +55,16 @@ export async function loadAvatars() {
   const ts = Date.now();
   const store = useSettingsStore.getState();
   try {
-    const res = await hanaFetch('/api/health');
+    const res = await lingxiFetch('/api/health');
     const data = await res.json();
     const avatars = data.avatars || {};
     const agentId = store.getSettingsAgentId();
     const agent = agentId ? (store.agents || []).find((a: any) => a.id === agentId) : null;
 
     store.set({
-      userAvatarUrl: avatars.user ? hanaUrl(`/api/avatar/user?t=${ts}`) : null,
+      userAvatarUrl: avatars.user ? lingxiUrl(`/api/avatar/user?t=${ts}`) : null,
       agentAvatarUrl: agentId && agent?.hasAvatar
-        ? hanaUrl(`/api/avatar/agent?agentId=${encodeURIComponent(agentId)}&t=${ts}`)
+        ? lingxiUrl(`/api/avatar/agent?agentId=${encodeURIComponent(agentId)}&t=${ts}`)
         : null,
     });
   } catch {}
@@ -107,13 +107,13 @@ export async function loadSettingsConfig() {
     const agentBase = `/api/agents/${agentId}`;
     const [configRes, identityRes, ishikiRes, publicIshikiRes, userProfileRes, pinnedRes, globalModelsRes] =
       await Promise.all([
-        hanaFetch(`${agentBase}/config`, { signal: controller.signal }),
-        hanaFetch(`${agentBase}/identity`, { signal: controller.signal }),
-        hanaFetch(`${agentBase}/ishiki`, { signal: controller.signal }),
-        hanaFetch(`${agentBase}/public-ishiki`, { signal: controller.signal }),
-        hanaFetch('/api/user-profile', { signal: controller.signal }),
-        hanaFetch(`${agentBase}/pinned`, { signal: controller.signal }),
-        hanaFetch('/api/preferences/models', { signal: controller.signal }),
+        lingxiFetch(`${agentBase}/config`, { signal: controller.signal }),
+        lingxiFetch(`${agentBase}/identity`, { signal: controller.signal }),
+        lingxiFetch(`${agentBase}/ishiki`, { signal: controller.signal }),
+        lingxiFetch(`${agentBase}/public-ishiki`, { signal: controller.signal }),
+        lingxiFetch('/api/user-profile', { signal: controller.signal }),
+        lingxiFetch(`${agentBase}/pinned`, { signal: controller.signal }),
+        lingxiFetch('/api/preferences/models', { signal: controller.signal }),
       ]);
 
     const config = await configRes.json();
@@ -129,7 +129,7 @@ export async function loadSettingsConfig() {
     const pinnedData = await pinnedRes.json();
     config._experience = '';
     if (config.experience?.enabled === true) {
-      const experienceRes = await hanaFetch(`${agentBase}/experience`, { signal: controller.signal });
+      const experienceRes = await lingxiFetch(`${agentBase}/experience`, { signal: controller.signal });
       const experienceData = await experienceRes.json();
       config._experience = experienceData.content || '';
     }
@@ -262,7 +262,7 @@ export async function loadSettingsSnapshot(options: { retainSameKeyData?: boolea
   }
 
   try {
-    const res = await hanaFetch(`/api/settings/snapshot?agentId=${encodeURIComponent(agentId)}`, {
+    const res = await lingxiFetch(`/api/settings/snapshot?agentId=${encodeURIComponent(agentId)}`, {
       signal: controller.signal,
     });
     const snapshot = await res.json() as SettingsSnapshot & { error?: string };
@@ -299,7 +299,7 @@ export async function loadPluginSettings() {
     pluginDevToolsEnabled: store.pluginSettingsStatus === 'idle' ? undefined : store.pluginDevToolsEnabled,
   });
   try {
-    const settingsRes = await hanaFetch('/api/plugins/settings');
+    const settingsRes = await lingxiFetch('/api/plugins/settings');
     const data = await settingsRes.json();
     if (data.error) throw new Error(data.error);
     store.set({
@@ -327,7 +327,7 @@ export async function browseAgent(agentId: string) {
 export async function switchToAgent(agentId: string) {
   const store = useSettingsStore.getState();
   try {
-    const res = await hanaFetch('/api/agents/switch', {
+    const res = await lingxiFetch('/api/agents/switch', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id: agentId }),
@@ -351,7 +351,7 @@ export async function switchToAgent(agentId: string) {
 export async function setPrimaryAgent(agentId: string) {
   const store = useSettingsStore.getState();
   try {
-    const res = await hanaFetch('/api/agents/primary', {
+    const res = await lingxiFetch('/api/agents/primary', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id: agentId }),

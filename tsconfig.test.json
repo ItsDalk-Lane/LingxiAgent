@@ -9,10 +9,10 @@
     "useUnknownInCatchVariables": false,
     "baseUrl": ".",
     "paths": {
-      "@hana/plugin-protocol": ["packages/plugin-protocol/src/index.ts"],
-      "@hana/plugin-sdk": ["packages/plugin-sdk/src/index.ts"],
-      "@hana/plugin-runtime": ["packages/plugin-runtime/src/index.ts"],
-      "@hana/plugin-components": ["packages/plugin-components/src/index.ts"],
+      "@lingxi/plugin-protocol": ["packages/plugin-protocol/src/index.ts"],
+      "@lingxi/plugin-sdk": ["packages/plugin-sdk/src/index.ts"],
+      "@lingxi/plugin-runtime": ["packages/plugin-runtime/src/index.ts"],
+      "@lingxi/plugin-components": ["packages/plugin-components/src/index.ts"],
       "@/*": ["desktop/src/react/*"]
     }
   },

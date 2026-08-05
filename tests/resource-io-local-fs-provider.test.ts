@@ -243,7 +243,7 @@ function makeProviderWithPolicy() {
   const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "hana-resource-local-fs-policy-"));
   const cwd = path.join(tempRoot, "workspace");
   const agentDir = path.join(tempRoot, "hana-home", "agents", "hana");
-  const hanakoHome = path.join(tempRoot, "hana-home");
+  const lingxiHome = path.join(tempRoot, "hana-home");
   const trashRoot = path.join(tempRoot, "trash");
   fs.mkdirSync(cwd, { recursive: true });
   fs.mkdirSync(agentDir, { recursive: true });
@@ -252,7 +252,7 @@ function makeProviderWithPolicy() {
     agentDir,
     workspace: cwd,
     workspaceFolders: [cwd],
-    hanakoHome,
+    lingxiHome,
     getSandboxEnabled: () => true,
   });
   return {

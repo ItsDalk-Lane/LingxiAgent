@@ -10,7 +10,7 @@ const fixModules = require("../scripts/fix-modules.cjs").default;
 const tempDirs = [];
 
 function makeTempDir() {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "hana-computer-use-packaging-"));
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "lingxi-computer-use-packaging-"));
   tempDirs.push(dir);
   return dir;
 }
@@ -21,13 +21,13 @@ function makeMacAfterPackContext(appOutDir) {
     arch: 3,
     packager: {
       platform: { name: "mac" },
-      appInfo: { productFilename: "HanaAgent" },
+      appInfo: { productFilename: "LingxiAgent" },
     },
   };
 }
 
 function resourcesDir(appOutDir) {
-  return path.join(appOutDir, "HanaAgent.app", "Contents", "Resources");
+  return path.join(appOutDir, "LingxiAgent.app", "Contents", "Resources");
 }
 
 afterEach(() => {
@@ -53,6 +53,6 @@ describe("Computer Use packaging contract", () => {
 
     expect(helperBuild).toBeGreaterThanOrEqual(0);
     expect(helperBuild).toBeLessThan(macBuilder);
-    expect(workflow).toContain("HANA_COMPUTER_USE_HELPER_ARCH=${{ matrix.arch }}");
+    expect(workflow).toContain("LINGXI_COMPUTER_USE_HELPER_ARCH=${{ matrix.arch }}");
   });
 });

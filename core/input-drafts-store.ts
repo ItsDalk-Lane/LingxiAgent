@@ -1,5 +1,5 @@
 /**
- * InputDraftsStore — 输入框草稿落盘（{HANA_HOME}/input-drafts.v1.json）
+ * InputDraftsStore — 输入框草稿落盘（{LINGXI_HOME}/input-drafts.v1.json）
  *
  * 独立于 preferences.json：草稿是高频写入的用户内容，不混进配置。
  * build-to-delete：删除本文件 + shared/input-drafts.ts + server/routes/input-drafts.ts
@@ -22,9 +22,9 @@ export class InputDraftsStore {
   declare _path: string;
   declare _cache: any;
 
-  constructor({ hanakoHome }) {
-    if (!hanakoHome) throw new Error("InputDraftsStore requires hanakoHome");
-    this._path = path.join(hanakoHome, "input-drafts.v1.json");
+  constructor({ lingxiHome }) {
+    if (!lingxiHome) throw new Error("InputDraftsStore requires lingxiHome");
+    this._path = path.join(lingxiHome, "input-drafts.v1.json");
     this._cache = null;
   }
 

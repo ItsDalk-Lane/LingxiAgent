@@ -48,7 +48,7 @@ function resolveUniqueExportPath(targetDir, fileName) {
 }
 
 function resolveDefaultExportTargetDir(engine) {
-  const candidates = [engine?.cwd, engine?.hanakoHome].filter(Boolean);
+  const candidates = [engine?.cwd, engine?.lingxiHome].filter(Boolean);
   const targetDir = candidates.find(candidate => path.isAbsolute(candidate));
   if (!targetDir) throw new SkillBundlePackageError("export target directory is not available", 500);
   return targetDir;
@@ -175,7 +175,7 @@ export async function exportSkillBundlePackage(engine, bundleId, options: { targ
   await fsp.mkdir(targetDir, { recursive: true });
 
   const token = `${process.pid}-${Date.now()}-${Math.random().toString(16).slice(2)}`;
-  const exportRoot = path.join(engine.hanakoHome, ".ephemeral", "skill-bundle-exports", token);
+  const exportRoot = path.join(engine.lingxiHome, ".ephemeral", "skill-bundle-exports", token);
   const packageRoot = path.join(exportRoot, "package");
   const skillIndex = buildSkillIndex(engine);
   const exportedSkills = [];

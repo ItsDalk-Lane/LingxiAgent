@@ -10,11 +10,11 @@ import { clearAppFileDragPayload, writeAppFileDragPayload } from '../../utils/ap
 import type { PreviewItem } from '../../types';
 
 const mocks = vi.hoisted(() => ({
-  hanaFetch: vi.fn(),
+  lingxiFetch: vi.fn(),
 }));
 
 vi.mock('../../hooks/use-hana-fetch', () => ({
-  hanaFetch: mocks.hanaFetch,
+  lingxiFetch: mocks.lingxiFetch,
 }));
 
 function dataTransferStub() {
@@ -66,8 +66,8 @@ describe('PreviewRenderer HTML isolation', () => {
       closeHtmlPreview: vi.fn(async () => true),
     };
     window.platform = legacyNativePreviewApi as unknown as typeof window.platform;
-    mocks.hanaFetch.mockReset();
-    mocks.hanaFetch.mockResolvedValue(new Response(JSON.stringify({
+    mocks.lingxiFetch.mockReset();
+    mocks.lingxiFetch.mockResolvedValue(new Response(JSON.stringify({
       previewUrl: 'http://127.0.0.1:14500/preview/html/pv_123?previewToken=preview_only_token',
     }), {
       status: 200,
@@ -84,7 +84,7 @@ describe('PreviewRenderer HTML isolation', () => {
   it('registers HTML and renders the local preview document in a sandboxed iframe', async () => {
     const { container } = render(<PreviewRenderer previewItem={previewItem} />);
 
-    expect(mocks.hanaFetch).toHaveBeenCalledWith('/api/preview/html', {
+    expect(mocks.lingxiFetch).toHaveBeenCalledWith('/api/preview/html', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -117,7 +117,7 @@ describe('PreviewRenderer HTML isolation', () => {
 
     render(<PreviewRenderer previewItem={rootedItem} />);
 
-    expect(mocks.hanaFetch).toHaveBeenCalledWith('/api/preview/html', expect.objectContaining({
+    expect(mocks.lingxiFetch).toHaveBeenCalledWith('/api/preview/html', expect.objectContaining({
       method: 'POST',
       body: JSON.stringify({
         title: 'demo.html',
@@ -206,7 +206,7 @@ describe('PreviewRenderer HTML isolation', () => {
       watchFile: vi.fn(async () => true),
       unwatchFile: vi.fn(async () => true),
     } as unknown as typeof window.platform;
-    mocks.hanaFetch.mockResolvedValueOnce(new Response(JSON.stringify({
+    mocks.lingxiFetch.mockResolvedValueOnce(new Response(JSON.stringify({
       ok: true,
       cover: { image: '文本附件/demo-cover.png' },
     }), {
@@ -236,7 +236,7 @@ describe('PreviewRenderer HTML isolation', () => {
     fireEvent.drop(cover!, { dataTransfer });
 
     await waitFor(() => {
-      expect(mocks.hanaFetch).toHaveBeenCalledWith('/api/desk/beautify/cover/apply', expect.objectContaining({
+      expect(mocks.lingxiFetch).toHaveBeenCalledWith('/api/desk/beautify/cover/apply', expect.objectContaining({
         method: 'POST',
         body: JSON.stringify({
           filePath: '/tmp/workspace/demo.md',
@@ -255,7 +255,7 @@ describe('PreviewRenderer HTML isolation', () => {
       watchFile: vi.fn(async () => true),
       unwatchFile: vi.fn(async () => true),
     } as unknown as typeof window.platform;
-    mocks.hanaFetch.mockResolvedValueOnce(new Response(JSON.stringify({
+    mocks.lingxiFetch.mockResolvedValueOnce(new Response(JSON.stringify({
       ok: true,
       cover: { image: '文本附件/demo-cover.png' },
     }), {
@@ -283,7 +283,7 @@ describe('PreviewRenderer HTML isolation', () => {
     fireEvent.drop(host!, { dataTransfer, clientY: 12 });
 
     await waitFor(() => {
-      expect(mocks.hanaFetch).toHaveBeenCalledWith('/api/desk/beautify/cover/apply', expect.objectContaining({
+      expect(mocks.lingxiFetch).toHaveBeenCalledWith('/api/desk/beautify/cover/apply', expect.objectContaining({
         method: 'POST',
         body: JSON.stringify({
           filePath: '/tmp/workspace/demo.md',

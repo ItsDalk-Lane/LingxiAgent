@@ -1,10 +1,10 @@
 import path from "path";
 import { describe, expect, it, vi } from "vitest";
-import { HanaEngine } from "../core/engine.ts";
+import { LingxiEngine } from "../core/engine.ts";
 
-describe("HanaEngine ResourceEvent emission", () => {
+describe("LingxiEngine ResourceEvent emission", () => {
   it("emits agent SessionFile writes as resource.changed without a legacy app-event projection", () => {
-    const engine = Object.create(HanaEngine.prototype);
+    const engine = Object.create(LingxiEngine.prototype);
     const listener = vi.fn();
     engine._eventBus = null;
     engine._listeners = new Set([listener]);
@@ -49,7 +49,7 @@ describe("HanaEngine ResourceEvent emission", () => {
   });
 
   it("emits bare ResourceIO resource.changed without a legacy app-event projection", () => {
-    const engine = Object.create(HanaEngine.prototype);
+    const engine = Object.create(LingxiEngine.prototype);
     const listener = vi.fn();
     engine._eventBus = null;
     engine._listeners = new Set([listener]);

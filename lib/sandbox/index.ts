@@ -37,7 +37,7 @@ import { createSandboxResourceIO } from "../resource-io/sandbox-resource-io.ts";
 import { createExecCommandTools } from "../exec-command/tool.ts";
 import { detectWin32PowerShellFlavor } from "./win32-runtime-cache.ts";
 import {
-  resolveHanaPiSdkManagedBinDir,
+  resolveLingxiPiSdkManagedBinDir,
   resolveLegacyPiSdkManagedBinDir,
 } from "../../shared/hana-runtime-paths.ts";
 
@@ -56,7 +56,7 @@ import {
  * @param {string[]} [opts.workspaceFolders]
  * @param {string[]} [opts.authorizedFolders]
  * @param {() => string[]} [opts.getAuthorizedFolders]  当前 session 动态授权的额外沙盒目录
- * @param {string} opts.hanakoHome
+ * @param {string} opts.lingxiHome
  * @param {() => boolean} opts.getSandboxEnabled  动态沙盒开关（每次工具调用时求值）
  * @param {() => boolean} [opts.getSandboxNetworkEnabled]  动态沙盒联网开关（仅沙盒开启时生效）
  * @param {() => string[]} [opts.getExternalReadPaths]  当前 session 用户显式给过的外部只读路径
@@ -79,7 +79,7 @@ export function createSandboxedTools(cwd, customTools, {
   workspaceFolders = [],
   authorizedFolders = [],
   getAuthorizedFolders,
-  hanakoHome,
+  lingxiHome,
   getSandboxEnabled,
   getSandboxNetworkEnabled,
   getExternalReadPaths,
@@ -111,7 +111,7 @@ export function createSandboxedTools(cwd, customTools, {
       ...(Array.isArray(workspaceFolders) ? workspaceFolders : []),
       ...resolveAuthorizedFolders(),
     ],
-    hanakoHome,
+    lingxiHome,
     mode: "standard",
   });
   const guard = {
@@ -124,7 +124,7 @@ export function createSandboxedTools(cwd, customTools, {
 
   const platform = detectPlatform();
   const isWin32 = process.platform === "win32";
-  const checkManagedConfigWrite = createManagedConfigWriteGuard({ hanakoHome });
+  const checkManagedConfigWrite = createManagedConfigWriteGuard({ lingxiHome });
   const resolveSandboxNetworkEnabled = typeof getSandboxNetworkEnabled === "function"
     ? getSandboxNetworkEnabled
     : () => true;
@@ -161,7 +161,7 @@ export function createSandboxedTools(cwd, customTools, {
     workspaceFolders,
     authorizedFolders,
     getAuthorizedFolders,
-    hanakoHome,
+    lingxiHome,
     getSandboxEnabled,
     getExternalReadPaths,
     getSessionPath,
@@ -182,8 +182,8 @@ export function createSandboxedTools(cwd, customTools, {
     detectImageMimeType: async (p) => IMAGE_MIMES[extname(p).toLowerCase()] || undefined,
   });
   const searchToolPaths = {
-    managedBinDir: resolveHanaPiSdkManagedBinDir(hanakoHome),
-    legacyManagedBinDir: resolveLegacyPiSdkManagedBinDir(hanakoHome),
+    managedBinDir: resolveLingxiPiSdkManagedBinDir(lingxiHome),
+    legacyManagedBinDir: resolveLegacyPiSdkManagedBinDir(lingxiHome),
   };
   const enhancedReadFile = createEnhancedReadFile();
   const readOps = {
@@ -209,7 +209,7 @@ export function createSandboxedTools(cwd, customTools, {
     recordFileOperation,
   });
   const readTool = wrapReadImageWithVisionBridge(wrapReadOfficeMedia(createReadTool(cwd, { operations: readOps }), cwd, {
-    hanakoHome,
+    lingxiHome,
     getSessionPath,
     getSessionIdForPath,
     recordFileOperation,
@@ -260,7 +260,7 @@ export function createSandboxedTools(cwd, customTools, {
     const sandboxedWin32Exec = (command, execCwd, execOpts) => createWin32Exec({
       sandbox: {
         policy: makePolicy(),
-        hanakoHome,
+        lingxiHome,
         getExternalReadPaths,
         getSandboxNetworkEnabled: resolveSandboxNetworkEnabled,
         legacyCleanupQueue,

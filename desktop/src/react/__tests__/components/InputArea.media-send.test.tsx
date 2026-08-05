@@ -9,7 +9,7 @@ import { useStore } from '../../stores';
 const mocks = vi.hoisted(() => ({
   clearContent: vi.fn(),
   ensureSession: vi.fn(),
-  hanaFetch: vi.fn(),
+  lingxiFetch: vi.fn(),
   upsertOptimisticSessionFirstMessage: vi.fn(),
   wsSend: vi.fn(),
 }));
@@ -67,8 +67,8 @@ vi.mock('../../hooks/use-config', () => ({
 }));
 
 vi.mock('../../hooks/use-hana-fetch', () => ({
-  hanaFetch: (path: string, opts?: RequestInit) => mocks.hanaFetch(path, opts),
-  hanaUrl: (path: string) => `http://127.0.0.1:3210${path}`,
+  lingxiFetch: (path: string, opts?: RequestInit) => mocks.lingxiFetch(path, opts),
+  lingxiUrl: (path: string) => `http://127.0.0.1:3210${path}`,
 }));
 
 vi.mock('../../stores/session-actions', () => ({
@@ -277,7 +277,7 @@ describe('InputArea media send', () => {
       agentId: 'hana',
     });
     seedSession();
-    mocks.hanaFetch.mockResolvedValue(new Response(JSON.stringify({
+    mocks.lingxiFetch.mockResolvedValue(new Response(JSON.stringify({
       models: {
         vision_enabled: true,
         vision: { id: 'qwen-vl', provider: 'dashscope', input: ['text', 'image'] },
@@ -311,7 +311,7 @@ describe('InputArea media send', () => {
       mimeType: 'image/png',
       visionAuxiliary: true,
     });
-    expect(mocks.hanaFetch).toHaveBeenCalledWith('/api/preferences/models', undefined);
+    expect(mocks.lingxiFetch).toHaveBeenCalledWith('/api/preferences/models', undefined);
   });
 
   it('keeps an async pending-session submission bound to its original session and leaves the new composer intact (#2078)', async () => {
@@ -372,7 +372,7 @@ describe('InputArea media send', () => {
   });
 
   it('keeps the send alive as file-only when the text model has no auxiliary vision (#1647)', async () => {
-    mocks.hanaFetch.mockResolvedValue(new Response(JSON.stringify({
+    mocks.lingxiFetch.mockResolvedValue(new Response(JSON.stringify({
       models: { vision_enabled: false, vision: null },
     }), { status: 200 }));
 
@@ -418,7 +418,7 @@ describe('InputArea media send', () => {
   });
 
   it('uses the chat-scoped auxiliary vision route for mobile image preflight', async () => {
-    mocks.hanaFetch.mockImplementation(async (path: string) => {
+    mocks.lingxiFetch.mockImplementation(async (path: string) => {
       if (path === '/api/models/auxiliary-vision') {
         return new Response(JSON.stringify({
           auxiliaryVision: {
@@ -443,8 +443,8 @@ describe('InputArea media send', () => {
     await waitFor(() => {
       expect(mocks.wsSend).toHaveBeenCalledTimes(1);
     });
-    expect(mocks.hanaFetch).toHaveBeenCalledWith('/api/models/auxiliary-vision', undefined);
-    expect(mocks.hanaFetch.mock.calls.some(([path]) => path === '/api/preferences/models')).toBe(false);
+    expect(mocks.lingxiFetch).toHaveBeenCalledWith('/api/models/auxiliary-vision', undefined);
+    expect(mocks.lingxiFetch.mock.calls.some(([path]) => path === '/api/preferences/models')).toBe(false);
   });
 
   it('sends audio bytes natively for official MiMo audio models', async () => {
@@ -566,7 +566,7 @@ describe('InputArea media send', () => {
 
   it('sends recorded audio immediately after saving the recording', async () => {
     const audioMocks = installAudioCaptureMocks();
-    mocks.hanaFetch.mockImplementation(async (path: string) => {
+    mocks.lingxiFetch.mockImplementation(async (path: string) => {
       if (path === '/api/upload-blob') {
         return new Response(JSON.stringify({
           uploads: [{
@@ -616,13 +616,13 @@ describe('InputArea media send', () => {
     fireEvent.click(screen.getByTestId('record-audio'));
 
     await waitFor(() => {
-      expect(mocks.hanaFetch).toHaveBeenCalledWith('/api/upload-blob', expect.objectContaining({
+      expect(mocks.lingxiFetch).toHaveBeenCalledWith('/api/upload-blob', expect.objectContaining({
         method: 'POST',
         body: expect.stringContaining('"presentation":"voice-input"'),
       }));
       expect(mocks.wsSend).toHaveBeenCalledTimes(1);
     });
-    const uploadBody = JSON.parse(String(mocks.hanaFetch.mock.calls[0][1]?.body));
+    const uploadBody = JSON.parse(String(mocks.lingxiFetch.mock.calls[0][1]?.body));
     expect(uploadBody.waveform).toMatchObject({
       version: 1,
       durationMs: expect.any(Number),

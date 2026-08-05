@@ -51,7 +51,7 @@ describe("server runtime assets", () => {
     fs.writeFileSync(path.join(rendererDir, "assets", "mobile.js.map"), '{"sourcesContent":["sourcemap fixture"]}', "utf-8");
     fs.writeFileSync(path.join(rendererDir, "assets", "main-desktop.js"), "console.log('desktop')", "utf-8");
     fs.writeFileSync(path.join(rendererDir, "assets", "main-desktop.css"), ".desktop {}", "utf-8");
-    fs.writeFileSync(path.join(rendererDir, "lib", "theme.js"), "window.HanaTheme = {}", "utf-8");
+    fs.writeFileSync(path.join(rendererDir, "lib", "theme.js"), "window.LingxiTheme = {}", "utf-8");
     fs.writeFileSync(path.join(rendererDir, "lib", "theme.js.map"), '{"sourcesContent":["theme source"]}', "utf-8");
     fs.writeFileSync(path.join(rendererDir, "themes", "warm-paper.css"), ":root{}", "utf-8");
     fs.writeFileSync(path.join(rendererDir, "locales", "zh.json"), "{}", "utf-8");
@@ -84,7 +84,7 @@ describe("server runtime assets", () => {
       "utf-8",
     )).toBe("cover-gallery\n");
     expect(copied).toEqual(expect.arrayContaining([
-      path.join("desktop", "src", "assets", "Hanako.png"),
+      path.join("desktop", "src", "assets", "Lingxi.png"),
       path.join("desktop", "src", "assets", "character-cards") + path.sep,
       path.join("desktop", "src", "assets", "cover-gallery") + path.sep,
     ]));

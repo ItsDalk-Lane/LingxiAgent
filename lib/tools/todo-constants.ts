@@ -17,4 +17,4 @@ export const TODO_WRITE_TOOL_NAME = "todo_write";
 export const TODO_TOOL_NAMES = Object.freeze(["todo", TODO_WRITE_TOOL_NAME]);
 
 /** Hana 内部 session 事件：用户手动完成并移除当前 todo group */
-export const TODO_STATE_CUSTOM_TYPE = "hana.todo_state";
+export const TODO_STATE_CUSTOM_TYPE = "lingxi.todo_state";

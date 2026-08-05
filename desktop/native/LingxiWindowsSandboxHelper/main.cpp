@@ -46,7 +46,7 @@ struct Options {
     bool parentPidSpecified = false;
     std::vector<WritableRoot> writableRoots;
     std::vector<std::wstring> denyWritePaths;
-    std::vector<std::wstring> hanaWriteAclCleanupPaths;
+    std::vector<std::wstring> lingxiWriteAclCleanupPaths;
     std::vector<std::wstring> legacyAclDiagnosticPaths;
     std::vector<std::wstring> legacyProfileNames;
     std::vector<std::wstring> legacyProfileCleanupNames;
@@ -134,14 +134,14 @@ static const int HELPER_TERMINATION_FAILED_EXIT_CODE = 125;
 static const int HELPER_LAUNCH_FAILED_EXIT_CODE = 126;
 
 static void fail(const std::wstring& message) {
-    std::wcerr << L"hana-win-sandbox: " << message << std::endl;
+    std::wcerr << L"lingxi-win-sandbox: " << message << std::endl;
 }
 
 static void debug(const std::wstring& message) {
     wchar_t enabled[8] = {};
-    DWORD n = GetEnvironmentVariableW(L"HANA_WIN32_SANDBOX_DEBUG", enabled, 8);
+    DWORD n = GetEnvironmentVariableW(L"LINGXI_WIN32_SANDBOX_DEBUG", enabled, 8);
     if (n > 0 && enabled[0] != L'\0' && enabled[0] != L'0') {
-        std::wcerr << L"hana-win-sandbox: " << message << std::endl;
+        std::wcerr << L"lingxi-win-sandbox: " << message << std::endl;
     }
 }
 
@@ -183,7 +183,7 @@ static void emitTerminalRecord(
     DWORD win32Error = ERROR_SUCCESS
 ) {
     std::wcerr
-        << L"hana-win-sandbox: terminal-v1"
+        << L"lingxi-win-sandbox: terminal-v1"
         << L" status=\"" << status << L"\""
         << L" exitCode=\"" << (hasExitCode ? std::to_wstring(exitCode) : L"") << L"\""
         << L" timeoutMs=\"" << timeoutMs << L"\""
@@ -331,15 +331,15 @@ static std::wstring hashSidForWritableRoot(const std::wstring& root, const std::
 }
 
 static std::wstring sidForWritableRoot(const std::wstring& root) {
-    return hashSidForWritableRoot(root, L"S-1-5-21-", L"hana-win32-write-root-v3:");
+    return hashSidForWritableRoot(root, L"S-1-5-21-", L"lingxi-win32-write-root-v3:");
 }
 
 static std::wstring sidForWritableRootLegacyCapabilityNamespace(const std::wstring& root) {
-    return hashSidForWritableRoot(root, L"S-1-15-3-4096-", L"hana-win32-write-root-v2:");
+    return hashSidForWritableRoot(root, L"S-1-15-3-4096-", L"lingxi-win32-write-root-v2:");
 }
 
 static std::wstring sidForWritableRootLegacyAccountNamespace(const std::wstring& root) {
-    return hashSidForWritableRoot(root, L"S-1-5-21-", L"hana-win32-write-root:");
+    return hashSidForWritableRoot(root, L"S-1-5-21-", L"lingxi-win32-write-root:");
 }
 
 static Options parseArgs(int argc, wchar_t** argv) {
@@ -386,8 +386,8 @@ static Options parseArgs(int argc, wchar_t** argv) {
             opts.denyWritePaths.push_back(argv[++i]);
             continue;
         }
-        if (arg == L"--cleanup-hana-write-acl" && i + 1 < argc) {
-            opts.hanaWriteAclCleanupPaths.push_back(argv[++i]);
+        if (arg == L"--cleanup-lingxi-write-acl" && i + 1 < argc) {
+            opts.lingxiWriteAclCleanupPaths.push_back(argv[++i]);
             continue;
         }
         if (arg == L"--diagnose-legacy-acl" && i + 1 < argc) {
@@ -427,7 +427,7 @@ static Options parseArgs(int argc, wchar_t** argv) {
         throw std::runtime_error("unknown or incomplete argument");
     }
 
-    bool maintenanceMode = !opts.hanaWriteAclCleanupPaths.empty() ||
+    bool maintenanceMode = !opts.lingxiWriteAclCleanupPaths.empty() ||
         !opts.legacyAclDiagnosticPaths.empty() ||
         !opts.legacyProfileNames.empty() ||
         !opts.legacyProfileCleanupNames.empty() ||
@@ -1033,7 +1033,7 @@ static bool generatePrivateDesktopName(std::wstring& name) {
         suffix.push_back(HEX_DIGITS[value >> 4]);
         suffix.push_back(HEX_DIGITS[value & 0x0f]);
     }
-    name = L"hana-win-sandbox-desktop-" + suffix;
+    name = L"lingxi-win-sandbox-desktop-" + suffix;
     return true;
 }
 
@@ -1146,7 +1146,7 @@ static void revertImpersonationOrTerminate() {
     if (RevertToSelf()) return;
     const DWORD rc = GetLastError();
     std::wcerr
-        << L"hana-win-sandbox: impersonation-revert-failure-v1"
+        << L"lingxi-win-sandbox: impersonation-revert-failure-v1"
         << L" error=\"" << rc << L"\""
         << L" errorHex=\"" << hexDword(rc) << L"\""
         << std::endl;
@@ -1256,13 +1256,13 @@ static void emitCreateProcessLaunchFailureDiagnostic(
 ) {
     fail(L"CreateProcessAsUserW failed: " + win32Message(errorCode));
     std::wcerr
-        << L"hana-win-sandbox: launch-failure"
+        << L"lingxi-win-sandbox: launch-failure"
         << L" error=\"" << errorCode << L"\""
         << L" errorHex=\"" << hexDword(errorCode) << L"\""
         << L" message=\"" << escapeDiagnosticValue(win32Message(errorCode)) << L"\""
         << std::endl;
     std::wcerr
-        << L"hana-win-sandbox: launch-failure-context"
+        << L"lingxi-win-sandbox: launch-failure-context"
         << L" executablePresent=\"" << boolDiagnosticValue(!opts.executable.empty()) << L"\""
         << L" executableLength=\"" << opts.executable.size() << L"\""
         << L" cwdPresent=\"" << boolDiagnosticValue(!opts.cwd.empty()) << L"\""
@@ -1276,7 +1276,7 @@ static void emitCreateProcessLaunchFailureDiagnostic(
         << L" inheritedHandleCount=\"" << inheritedHandleCount << L"\""
         << std::endl;
     std::wcerr
-        << L"hana-win-sandbox: launch-failure-probes"
+        << L"lingxi-win-sandbox: launch-failure-probes"
         << L" desktopProbe=\"" << escapeDiagnosticValue(probeRestrictedDesktopAccess(restrictedToken, desktop)) << L"\""
         << L" windowStation=\"" << escapeDiagnosticValue(probeProcessWindowStationName()) << L"\""
         << L" namedObjectsProbe=\"" << escapeDiagnosticValue(probeNamedObjectNamespace(restrictedToken)) << L"\""
@@ -1293,7 +1293,7 @@ static void emitPrelaunchDesktopProbeDiagnostic(const std::wstring& desktopProbe
 
 static void emitPrelaunchDesktopProbeFailureDiagnostic(const std::wstring& desktopProbe) {
     std::wcerr
-        << L"hana-win-sandbox: prelaunch-probe-failure-v1"
+        << L"lingxi-win-sandbox: prelaunch-probe-failure-v1"
         << L" desktopProbe=\"" << escapeDiagnosticValue(desktopProbe) << L"\""
         << std::endl;
 }
@@ -1315,7 +1315,7 @@ static void emitPostCreateEarlyExitDiagnostic(
     }
 
     std::wcerr
-        << L"hana-win-sandbox: post-create-exit-v1"
+        << L"lingxi-win-sandbox: post-create-exit-v1"
         << L" exitCode=\"" << exitCode << L"\""
         << L" exitCodeHex=\"" << hexDword(exitCode) << L"\""
         << L" classification=\"" << classification << L"\""
@@ -1359,7 +1359,7 @@ static void emitTimeoutProcessSnapshot(HANDLE job) {
     )) {
         const DWORD errorCode = GetLastError();
         std::wcerr
-            << L"hana-win-sandbox: timeout-processes-v1"
+            << L"lingxi-win-sandbox: timeout-processes-v1"
             << L" queryError=\"" << errorCode << L"\""
             << std::endl;
         return;
@@ -1378,7 +1378,7 @@ static void emitTimeoutProcessSnapshot(HANDLE job) {
         summary += processImageBasename(processId);
     }
     std::wcerr
-        << L"hana-win-sandbox: timeout-processes-v1"
+        << L"lingxi-win-sandbox: timeout-processes-v1"
         << L" assigned=\"" << processes->NumberOfAssignedProcesses << L"\""
         << L" listed=\"" << processes->NumberOfProcessIdsInList << L"\""
         << L" processes=\"" << escapeDiagnosticValue(summary) << L"\""
@@ -1558,7 +1558,7 @@ static void emitGuardianRecord(
     DWORD win32Error = ERROR_SUCCESS
 ) {
     std::wcerr
-        << L"hana-win-sandbox: guardian-v1"
+        << L"lingxi-win-sandbox: guardian-v1"
         << L" status=\"" << status << L"\""
         << L" parentPid=\"" << parentPid << L"\""
         << L" serverPid=\"" << serverPid << L"\""
@@ -1953,7 +1953,7 @@ static bool isDigitsOnly(const std::wstring& value) {
 }
 
 static bool isLegacyAppContainerProfileName(const std::wstring& name) {
-    const std::wstring prefix = L"com.hanako.sandbox.";
+    const std::wstring prefix = L"com.lingxi.sandbox.";
     if (!stringStartsWith(name, prefix)) return false;
     std::wstring rest = name.substr(prefix.size());
     size_t dot = rest.find(L'.');
@@ -1974,7 +1974,7 @@ static std::wstring probeNamedObjectNamespace(HANDLE restrictedToken) {
         return L"impersonate-failed:" + std::to_wstring(GetLastError()) + L":" + win32Message(GetLastError());
     }
 
-    std::wstring name = L"Local\\hana-win-sandbox-diagnose-" +
+    std::wstring name = L"Local\\lingxi-win-sandbox-diagnose-" +
         std::to_wstring(GetCurrentProcessId()) + L"-" +
         std::to_wstring(GetTickCount64());
     HANDLE mutex = CreateMutexW(nullptr, FALSE, name.c_str());
@@ -2014,7 +2014,7 @@ static int diagnoseRestrictedToken(const Options& opts) {
     }
 
     std::wcerr
-        << L"hana-win-sandbox: diagnose-token"
+        << L"lingxi-win-sandbox: diagnose-token"
         << L" cwd=\"" << opts.cwd << L"\""
         << L" executable=\"" << opts.executable << L"\""
         << L" writable-root-count=\"" << opts.writableRoots.size() << L"\""
@@ -2022,7 +2022,7 @@ static int diagnoseRestrictedToken(const Options& opts) {
         << std::endl;
     for (const auto& root : opts.writableRoots) {
         std::wcerr
-            << L"hana-win-sandbox: diagnose-token-writable-root"
+            << L"lingxi-win-sandbox: diagnose-token-writable-root"
             << L" required=\"" << (root.required ? L"true" : L"false") << L"\""
             << L" path=\"" << root.path << L"\""
             << L" sid=\"" << root.sidString << L"\""
@@ -2030,7 +2030,7 @@ static int diagnoseRestrictedToken(const Options& opts) {
     }
     for (const auto& sid : restrictingSids) {
         std::wcerr
-            << L"hana-win-sandbox: diagnose-token-restricting-sid"
+            << L"lingxi-win-sandbox: diagnose-token-restricting-sid"
             << L" sid=\"" << sidToString(sid.Sid) << L"\""
             << std::endl;
     }
@@ -2041,7 +2041,7 @@ static int diagnoseRestrictedToken(const Options& opts) {
         return 1;
     }
     std::wcerr
-        << L"hana-win-sandbox: diagnose-token-base-named-objects-probe"
+        << L"lingxi-win-sandbox: diagnose-token-base-named-objects-probe"
         << L" result=\"" << probeNamedObjectNamespace(token) << L"\""
         << std::endl;
     CloseHandle(token);
@@ -2157,7 +2157,7 @@ static bool convertSidString(const std::wstring& sidString, PSID* sidOut) {
     return true;
 }
 
-static MigrationResult cleanupHanaWriteAcls(const std::vector<std::wstring>& paths) {
+static MigrationResult cleanupLingxiWriteAcls(const std::vector<std::wstring>& paths) {
     MigrationResult result;
     for (const auto& path : paths) {
         std::vector<std::wstring> sidStrings = {
@@ -2186,7 +2186,7 @@ static MigrationResult cleanupHanaWriteAcls(const std::vector<std::wstring>& pat
             &descriptor
         );
         if (rc != ERROR_SUCCESS) {
-            fail(L"hana-write-acl-cleanup path=\"" + path + L"\" error=\"" + win32Message(rc) + L"\"");
+            fail(L"lingxi-write-acl-cleanup path=\"" + path + L"\" error=\"" + win32Message(rc) + L"\"");
             result.failures++;
             for (PSID sid : ownedSids) LocalFree(sid);
             continue;
@@ -2224,7 +2224,7 @@ static MigrationResult cleanupHanaWriteAcls(const std::vector<std::wstring>& pat
                 result.findings += static_cast<int>(matchedSids.size());
                 for (PSID sid : matchedSids) {
                     std::wcerr
-                        << L"hana-win-sandbox: hana-write-acl-cleaned"
+                        << L"lingxi-win-sandbox: lingxi-write-acl-cleaned"
                         << L" path=\"" << path << L"\""
                         << L" sid=\"" << sidToString(sid) << L"\""
                         << std::endl;
@@ -2292,7 +2292,7 @@ static MigrationResult diagnoseLegacyAcls(
                 result.findings++;
                 const LegacyProfileSid* matchedProfile = findLegacyProfileBySid(sid, cleanupProfiles);
                 std::wcerr
-                    << L"hana-win-sandbox: legacy-appcontainer-acl"
+                    << L"lingxi-win-sandbox: legacy-appcontainer-acl"
                     << L" path=\"" << path << L"\""
                     << L" sid=\"" << sidString << L"\""
                     << L" profile=\"" << (matchedProfile ? matchedProfile->name : L"unmatched") << L"\""
@@ -2331,7 +2331,7 @@ static MigrationResult cleanupLegacyProfiles(const std::vector<std::wstring>& pr
         if (SUCCEEDED(hr)) {
             result.findings++;
             std::wcerr
-                << L"hana-win-sandbox: legacy-appcontainer-profile-cleaned"
+                << L"lingxi-win-sandbox: legacy-appcontainer-profile-cleaned"
                 << L" name=\"" << name << L"\""
                 << std::endl;
             continue;
@@ -2354,7 +2354,7 @@ int wmain(int argc, wchar_t** argv) {
     } catch (const std::exception& err) {
         std::string narrow = err.what();
         std::wstring wide(narrow.begin(), narrow.end());
-        std::wcerr << L"hana-win-sandbox: " << wide << std::endl;
+        std::wcerr << L"lingxi-win-sandbox: " << wide << std::endl;
         return 2;
     }
 
@@ -2362,7 +2362,7 @@ int wmain(int argc, wchar_t** argv) {
         return superviseServer(opts);
     }
 
-    if (!opts.hanaWriteAclCleanupPaths.empty() ||
+    if (!opts.lingxiWriteAclCleanupPaths.empty() ||
         !opts.legacyAclDiagnosticPaths.empty() ||
         !opts.legacyProfileNames.empty() ||
         !opts.legacyProfileCleanupNames.empty() ||
@@ -2379,16 +2379,16 @@ int wmain(int argc, wchar_t** argv) {
         }
         std::vector<LegacyProfileSid> profileSids = deriveLegacyProfileSids(sidProfileNames, &failures);
 
-        MigrationResult hanaWriteResult;
-        if (!opts.hanaWriteAclCleanupPaths.empty()) {
-            hanaWriteResult = cleanupHanaWriteAcls(opts.hanaWriteAclCleanupPaths);
+        MigrationResult lingxiWriteResult;
+        if (!opts.lingxiWriteAclCleanupPaths.empty()) {
+            lingxiWriteResult = cleanupLingxiWriteAcls(opts.lingxiWriteAclCleanupPaths);
         }
 
         MigrationResult aclResult;
         if (!opts.legacyAclDiagnosticPaths.empty()) {
             aclResult = diagnoseLegacyAcls(opts, profileSids);
         }
-        failures += hanaWriteResult.failures + aclResult.failures;
+        failures += lingxiWriteResult.failures + aclResult.failures;
 
         MigrationResult profileResult;
         if (failures == 0) {
@@ -2397,7 +2397,7 @@ int wmain(int argc, wchar_t** argv) {
         } else if (!cleanupProfileNames.empty()) {
             debug(L"skipping legacy AppContainer profile cleanup because ACL cleanup failed");
         }
-        int findings = hanaWriteResult.findings + aclResult.findings + profileResult.findings;
+        int findings = lingxiWriteResult.findings + aclResult.findings + profileResult.findings;
 
         freeLegacyProfileSids(profileSids);
         if (failures > 0) return 1;

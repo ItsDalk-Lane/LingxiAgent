@@ -12,15 +12,15 @@ import {
 
 describe("resolveWin32SandboxHelper", () => {
   it("prefers the explicit helper contract over every resource-root candidate", () => {
-    const explicit = "C:\\custom\\hana-win-sandbox.exe";
+    const explicit = "C:\\custom\\lingxi-win-sandbox.exe";
 
     expect(resolveWin32SandboxHelper({
       env: {
-        HANA_WIN32_SANDBOX_HELPER: explicit,
-        HANA_DESKTOP_RESOURCES_PATH: "C:\\Hana\\resources",
-        HANA_DESKTOP_IS_PACKAGED: "1",
-        HANA_DESKTOP_APP_PATH: "C:\\OldHana\\resources\\app.asar",
-        HANA_DESKTOP_EXEC_PATH: "C:\\OldHana\\HanaAgent.exe",
+        LINGXI_WIN32_SANDBOX_HELPER: explicit,
+        LINGXI_DESKTOP_RESOURCES_PATH: "C:\\Hana\\resources",
+        LINGXI_DESKTOP_IS_PACKAGED: "1",
+        LINGXI_DESKTOP_APP_PATH: "C:\\OldHana\\resources\\app.asar",
+        LINGXI_DESKTOP_EXEC_PATH: "C:\\OldHana\\LingxiAgent.exe",
       },
       resourcesPath: "C:\\Electron\\resources",
       cwd: "C:\\repo",
@@ -30,20 +30,20 @@ describe("resolveWin32SandboxHelper", () => {
   });
 
   it("resolves the installed helper and bundled Git from old packaged-shell variables", () => {
-    const appPath = "C:\\Program Files\\HanaAgent\\resources\\app.asar";
+    const appPath = "C:\\Program Files\\LingxiAgent\\resources\\app.asar";
     const expectedResources = path.win32.dirname(appPath);
     const expectedHelper = path.win32.join(
       expectedResources,
       "sandbox",
       "windows",
-      "hana-win-sandbox.exe",
+      "lingxi-win-sandbox.exe",
     );
     const expectedGit = path.win32.join(expectedResources, "git");
     const env = {
-      HANA_DESKTOP_IS_PACKAGED: "1",
-      HANA_DESKTOP_APP_PATH: appPath,
-      HANA_DESKTOP_EXEC_PATH: "C:\\Program Files\\HanaAgent\\HanaAgent.exe",
-      HANA_ROOT: "C:\\Users\\Hana\\.hanako\\artifacts\\server\\0.412.7",
+      LINGXI_DESKTOP_IS_PACKAGED: "1",
+      LINGXI_DESKTOP_APP_PATH: appPath,
+      LINGXI_DESKTOP_EXEC_PATH: "C:\\Program Files\\LingxiAgent\\LingxiAgent.exe",
+      LINGXI_ROOT: "C:\\Users\\Hana\\.hanako\\artifacts\\server\\0.412.7",
     };
     const existsSync = (candidate: string) => candidate === expectedHelper || candidate === expectedGit;
 
@@ -67,10 +67,10 @@ describe("resolveWin32SandboxHelper", () => {
 
     expect(resourceSiblingDir("git", {
       env: {
-        HANA_DESKTOP_RESOURCES_PATH: explicitResources,
-        HANA_DESKTOP_IS_PACKAGED: "1",
-        HANA_DESKTOP_APP_PATH: "C:\\OldHana\\resources\\app.asar",
-        HANA_DESKTOP_EXEC_PATH: "C:\\OldHana\\HanaAgent.exe",
+        LINGXI_DESKTOP_RESOURCES_PATH: explicitResources,
+        LINGXI_DESKTOP_IS_PACKAGED: "1",
+        LINGXI_DESKTOP_APP_PATH: "C:\\OldHana\\resources\\app.asar",
+        LINGXI_DESKTOP_EXEC_PATH: "C:\\OldHana\\LingxiAgent.exe",
       },
       resourcesPath: null,
       existsSync: () => true,
@@ -82,14 +82,14 @@ describe("resolveWin32SandboxHelper", () => {
       "C:\\Hana\\resources",
       "sandbox",
       "windows",
-      "hana-win-sandbox.exe",
+      "lingxi-win-sandbox.exe",
     );
 
     expect(resolveWin32SandboxHelper({
       env: {
-        HANA_DESKTOP_IS_PACKAGED: "0",
-        HANA_DESKTOP_APP_PATH: "C:\\Hana\\resources\\app.asar",
-        HANA_DESKTOP_EXEC_PATH: "C:\\Hana\\HanaAgent.exe",
+        LINGXI_DESKTOP_IS_PACKAGED: "0",
+        LINGXI_DESKTOP_APP_PATH: "C:\\Hana\\resources\\app.asar",
+        LINGXI_DESKTOP_EXEC_PATH: "C:\\Hana\\LingxiAgent.exe",
       },
       resourcesPath: null,
       cwd: "C:\\repo",
@@ -101,10 +101,10 @@ describe("resolveWin32SandboxHelper", () => {
   it("returns null when no explicit, packaged, artifact, or dev helper exists", () => {
     expect(resolveWin32SandboxHelper({
       env: {
-        HANA_DESKTOP_IS_PACKAGED: "1",
-        HANA_DESKTOP_APP_PATH: "C:\\Hana\\resources\\app.asar",
-        HANA_DESKTOP_EXEC_PATH: "C:\\Hana\\HanaAgent.exe",
-        HANA_ROOT: "C:\\Users\\Hana\\.hanako\\artifacts\\server\\0.412.7",
+        LINGXI_DESKTOP_IS_PACKAGED: "1",
+        LINGXI_DESKTOP_APP_PATH: "C:\\Hana\\resources\\app.asar",
+        LINGXI_DESKTOP_EXEC_PATH: "C:\\Hana\\LingxiAgent.exe",
+        LINGXI_ROOT: "C:\\Users\\Hana\\.hanako\\artifacts\\server\\0.412.7",
       },
       resourcesPath: null,
       cwd: "C:\\repo",
@@ -155,7 +155,7 @@ describe("buildWin32SandboxHelperArgs", () => {
       "--deny-read",
       "--diagnose-legacy-acl",
       "--cleanup-legacy-acl",
-      "--cleanup-hana-write-acl",
+      "--cleanup-lingxi-write-acl",
       "--cleanup-legacy-profile",
       "--legacy-appcontainer-profile",
     ]));
@@ -231,8 +231,8 @@ describe("buildWin32SandboxHelperArgs", () => {
   it("parses the last versioned native terminal record without confusing exit 124 with timeout", () => {
     const output = [
       "child output",
-      'hana-win-sandbox: terminal-v1 status="timed_out" exitCode="124" timeoutMs="5000" win32Error="0"',
-      'hana-win-sandbox: terminal-v1 status="exited" exitCode="124" timeoutMs="5000" win32Error="0"',
+      'lingxi-win-sandbox: terminal-v1 status="timed_out" exitCode="124" timeoutMs="5000" win32Error="0"',
+      'lingxi-win-sandbox: terminal-v1 status="exited" exitCode="124" timeoutMs="5000" win32Error="0"',
     ].join("\n");
 
     expect(parseWin32SandboxTerminalRecord(output)).toEqual({
@@ -252,8 +252,8 @@ describe("buildWin32SandboxHelperArgs", () => {
 
     filter.push(Buffer.from([
       "warning one\r\n",
-      "prefix hana-win-sandbox: terminal-v1 is ordinary stderr\n",
-      'hana-win-sandbox: terminal-v1 status="tim',
+      "prefix lingxi-win-sandbox: terminal-v1 is ordinary stderr\n",
+      'lingxi-win-sandbox: terminal-v1 status="tim',
     ].join("")));
     filter.push(Buffer.from([
       'ed_out" exitCode="124" timeoutMs="5000" win32Error="0"\r\n',
@@ -263,7 +263,7 @@ describe("buildWin32SandboxHelperArgs", () => {
 
     expect(Buffer.concat(forwarded).toString("utf8")).toBe([
       "warning one\r\n",
-      "prefix hana-win-sandbox: terminal-v1 is ordinary stderr\n",
+      "prefix lingxi-win-sandbox: terminal-v1 is ordinary stderr\n",
       "warning tail",
     ].join(""));
     expect(filter.terminalRecord).toEqual({
@@ -308,7 +308,7 @@ describe("buildWin32SandboxHelperArgs", () => {
 
   it("keeps required ACL failures diagnosable with numeric Win32 codes", () => {
     const helperSource = fs.readFileSync(
-      path.join(process.cwd(), "desktop", "native", "HanaWindowsSandboxHelper", "main.cpp"),
+      path.join(process.cwd(), "desktop", "native", "LingxiWindowsSandboxHelper", "main.cpp"),
       "utf-8",
     );
 

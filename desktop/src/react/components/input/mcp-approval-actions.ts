@@ -1,4 +1,4 @@
-import { hanaFetch } from '../../hooks/use-hana-fetch';
+import { lingxiFetch } from '../../hooks/use-hana-fetch';
 import type { SessionConfirmationBlock } from '../../stores/chat-types';
 
 /** The bridge tool that fronts every deferred MCP tool. */
@@ -45,7 +45,7 @@ interface StateConnector {
  * renderer would drift from it silently.
  */
 export async function loadMcpApprovalIndex(): Promise<StateConnector[]> {
-  const res = await hanaFetch('/api/mcp/state');
+  const res = await lingxiFetch('/api/mcp/state');
   const data = await res.json();
   if (data?.error) throw new Error(data.error);
   const connectors = Array.isArray(data?.connectors)
@@ -105,7 +105,7 @@ export function resolveMcpApprovalTarget(
  * to the connector.
  */
 export async function grantForSession(sessionId: string, capability: string): Promise<void> {
-  const res = await hanaFetch('/api/mcp/session-permissions', {
+  const res = await lingxiFetch('/api/mcp/session-permissions', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ sessionId, capability }),
@@ -122,7 +122,7 @@ export async function grantForSession(sessionId: string, capability: string): Pr
  * while the connector reviews everything.
  */
 export async function grantPermanently(target: McpApprovalTarget): Promise<void> {
-  const res = await hanaFetch(`/api/mcp/connectors/${encodeURIComponent(target.connectorId)}`, {
+  const res = await lingxiFetch(`/api/mcp/connectors/${encodeURIComponent(target.connectorId)}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({

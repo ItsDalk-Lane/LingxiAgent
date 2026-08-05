@@ -12,8 +12,8 @@ function emptyCache() {
   };
 }
 
-export function getSkillNameTranslationCachePath(hanakoHome) {
-  return path.join(hanakoHome, ".ephemeral", "skill-name-translations.json");
+export function getSkillNameTranslationCachePath(lingxiHome) {
+  return path.join(lingxiHome, ".ephemeral", "skill-name-translations.json");
 }
 
 function normalizeCache(value) {

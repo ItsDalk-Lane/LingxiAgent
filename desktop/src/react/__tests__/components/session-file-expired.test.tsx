@@ -9,8 +9,8 @@ import { UserMessage } from '../../components/chat/UserMessage';
 import { useStore } from '../../stores';
 
 vi.mock('../../hooks/use-hana-fetch', () => ({
-  hanaFetch: vi.fn(async () => new Response('{}', { status: 200 })),
-  hanaUrl: (path: string) => `http://127.0.0.1:3210${path}`,
+  lingxiFetch: vi.fn(async () => new Response('{}', { status: 200 })),
+  lingxiUrl: (path: string) => `http://127.0.0.1:3210${path}`,
 }));
 
 vi.mock('../../utils/screenshot', () => ({
@@ -444,8 +444,8 @@ describe('expired session file presentation', () => {
         userId: 'user_remote',
         studioId: 'studio_remote',
         label: 'Remote Hana',
-        baseUrl: 'https://hana.example',
-        wsUrl: 'wss://hana.example',
+        baseUrl: 'https://lingxi.example',
+        wsUrl: 'wss://lingxi.example',
         token: 'remote token',
         authState: 'paired',
         trustState: 'tunnel',
@@ -507,7 +507,7 @@ describe('expired session file presentation', () => {
     const preview = screen.getByRole('img', { name: 'img.png' });
     expect(preview).toHaveAttribute(
       'src',
-      'https://hana.example/api/resources/res_sf_img/content',
+      'https://lingxi.example/api/resources/res_sf_img/content',
     );
   });
 

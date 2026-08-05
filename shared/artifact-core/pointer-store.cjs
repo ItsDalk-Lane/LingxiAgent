@@ -3,7 +3,7 @@
 /**
  * shared/artifact-core/pointer-store.cjs
  *
- * HANA_HOME artifact pointer/quarantine/lock storage. Every write is
+ * LINGXI_HOME artifact pointer/quarantine/lock storage. Every write is
  * temp-file-then-atomic-rename so a crash mid-write
  * never corrupts what's already on disk — a reader only ever sees the old
  * complete file or the new complete file, never a partial one. Leftover

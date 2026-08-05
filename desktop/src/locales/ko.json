@@ -127,7 +127,7 @@
   },
   "announcement": {
     "title": "업데이트 완료 · v{version}",
-    "fallbackBody": "HanaAgent가 v{version}(으)로 업데이트되었습니다.",
+    "fallbackBody": "Lingxi가 v{version}(으)로 업데이트되었습니다.",
     "confirm": "확인"
   },
   "skills": {
@@ -558,9 +558,9 @@
   },
   "yuan": {
     "types": {
-      "hanako": {
+      "lingxi": {
         "label": "균형 잡힌 어시스턴트",
-        "avatar": "Hanako.png"
+        "avatar": "Lingxi.png"
       },
       "butter": {
         "label": "더 풍부한 감성",
@@ -1119,7 +1119,7 @@
         "scheduledTaskCompletion": "예약 작업 완료",
         "patrolCompletion": "순찰 완료",
         "never": "사용 안 함",
-        "whenUnfocused": "HanaAgent에 포커스가 없을 때",
+        "whenUnfocused": "Lingxi에 포커스가 없을 때",
         "whenSessionUnfocused": "완료된 채팅에 포커스가 없을 때",
         "always": "항상"
       }
@@ -1356,7 +1356,7 @@
       "updateChecking": "업데이트 확인 중…",
       "updateDownloading": "{agentName}이(가) 새 집을 준비하는 중",
       "updateReadyInstall": "v{version} 설치 준비 완료",
-      "updateInstalling": "업데이트를 설치하는 중입니다. HanaAgent가 자동으로 다시 시작됩니다…",
+      "updateInstalling": "업데이트를 설치하는 중입니다. Lingxi가 자동으로 다시 시작됩니다…",
       "updateInstallManualHint": "다시 시작하여 업데이트를 누른 뒤 설치합니다. 종료만으로는 자동 설치하지 않습니다",
       "updateInstall": "재시작하여 업데이트",
       "updateInstallNow": "지금 재시작하여 업데이트",
@@ -1383,7 +1383,7 @@
       "updateManifestReleasedAtViaMirror": "배포 매니페스트 발행일: {date} (백업 소스 경유)",
       "updateCheckBtn": "업데이트 확인",
       "updateRetryBtn": "다시 시도",
-      "updateNeedInstall": "먼저 HanaAgent를 응용 프로그램 폴더로 이동하세요",
+      "updateNeedInstall": "먼저 Lingxi를 응용 프로그램 폴더로 이동하세요",
       "updateDiskSpace": "디스크 공간이 부족하여 업데이트를 다운로드할 수 없습니다",
       "updateDigestCta": "이번 업데이트에서 얻는 것",
       "updateDigestTitle": "이번 업데이트에서 얻는 것",
@@ -1422,7 +1422,7 @@
       "mobileAccess": "모바일 접근",
       "desktopAccess": "컴퓨터 접근",
       "lanToggle": "LAN 기기 접근 허용",
-      "lanHint": "같은 LAN의 휴대폰과 컴퓨터가 이 HanaAgent Server에 접근할 수 있어요",
+      "lanHint": "같은 LAN의 휴대폰과 컴퓨터가 이 Lingxi Server에 접근할 수 있어요",
       "port": "고정 포트",
       "portHint": "북마크와 QR 코드에 사용합니다. 변경 후 Hana를 다시 시작해야 적용돼요",
       "mobileUrl": "모바일 URL",
@@ -1457,7 +1457,7 @@
       "desktopKeyFailed": "생성 실패",
       "connectLanServer": "LAN 서버 연결",
       "remoteServerUrl": "서버 URL",
-      "remoteServerUrlHint": "다른 컴퓨터나 NAS의 HanaAgent Server URL을 입력하세요",
+      "remoteServerUrlHint": "다른 컴퓨터나 NAS의 Lingxi Server URL을 입력하세요",
       "remoteServerKey": "접근 키",
       "remoteServerKeyHint": "그 서버 설정 페이지에서 생성한 컴퓨터 접근 키를 입력하세요",
       "remoteServerConnected": "LAN 서버 연결됨",
@@ -2912,7 +2912,7 @@
     "skillMissingName": "SKILL.md에 name 필드가 없어요",
     "skillNameInvalid": "스킬 이름이 유효하지 않아요 (\"{name}\"). 영문자, 숫자, 밑줄, 하이픈만 사용할 수 있어요.",
     "skillPathMustBeAbsolute": "경로는 절대 경로여야 해요: {path}",
-    "skillCannotAddSelfDir": "HanaAgent 자체의 스킬 디렉토리는 추가할 수 없어요",
+    "skillCannotAddSelfDir": "Lingxi 자체의 스킬 디렉토리는 추가할 수 없어요",
     "skillInvalidName": "유효하지 않은 스킬 이름이에요",
     "skillExternalCannotDelete": "외부 호환 스킬은 여기서 삭제할 수 없어요",
     "skillNotExists": "스킬이 존재하지 않아요",
@@ -3115,7 +3115,7 @@
   },
   "main": {
     "tray": {
-      "show": "HanaAgent 표시",
+      "show": "Lingxi 표시",
       "settings": "설정",
       "quit": "종료",
       "repairArtifacts": "구성 요소 복구…"
@@ -3124,22 +3124,22 @@
       "selectFolder": "작업 폴더 선택",
       "selectSkill": "스킬 선택",
       "selectPlugin": "플러그인 선택",
-      "launchFailedTitle": "HanaAgent 실행 실패",
-      "launchFailedBody": "HanaAgent v{version}\n\n{detail}\n\n상세 로그 저장 위치:\n{logPath}\n\n이 스크린샷이나 로그 파일을 개발자에게 보내주세요.",
-      "serverRestartFailed": "HanaAgent v{version}\n\nServer가 충돌 후 재시작에 실패했어요.\n{error}\n\n앱을 다시 시작해 주세요.",
-      "serverMultipleCrash": "HanaAgent v{version}\n\nServer가 여러 번 충돌했어요 ({reason}).\n\n앱을 다시 시작해 주세요.",
+      "launchFailedTitle": "Lingxi 실행 실패",
+      "launchFailedBody": "Lingxi v{version}\n\n{detail}\n\n상세 로그 저장 위치:\n{logPath}\n\n이 스크린샷이나 로그 파일을 개발자에게 보내주세요.",
+      "serverRestartFailed": "Lingxi v{version}\n\nServer가 충돌 후 재시작에 실패했어요.\n{error}\n\n앱을 다시 시작해 주세요.",
+      "serverMultipleCrash": "Lingxi v{version}\n\nServer가 여러 번 충돌했어요 ({reason}).\n\n앱을 다시 시작해 주세요.",
       "serverStartTimeout": "Server 시작 시간 초과",
       "serverKilledBySignal": "Server가 시그널로 종료되었어요 ({signal})",
       "serverExitedWithCode": "Server가 종료되었어요. 코드: {code}",
-      "serverFilesNotReady": "자동 업데이트가 방금 완료되었고, 새 버전 파일이 아직 디스크에 쓰이고 있어요 ({missing} 없음). {waited}초 동안 기다렸지만 준비되지 않았어요. 잠시 후 HanaAgent를 다시 시작해 주세요.",
-      "serverModuleMissing": "Server 시작 실패: 모듈 {module}을(를) 찾을 수 없어요.\n자동 업데이트가 완료된 직후 파일이 아직 디스크에 쓰이는 중일 때 자주 발생해요.\n권장: 1-2분 기다린 후 HanaAgent를 다시 시작해 주세요. 반복되면 GitHub에 신고해 주세요.",
-      "installFailedTitle": "HanaAgent 업데이트",
-      "installFailedBody": "업데이트 설치에 실패했어요:\n{error}\n\nHanaAgent를 다시 시작한 후 재시도하거나, 설정 페이지에서 수동으로 업데이트를 확인해 주세요.",
+      "serverFilesNotReady": "자동 업데이트가 방금 완료되었고, 새 버전 파일이 아직 디스크에 쓰이고 있어요 ({missing} 없음). {waited}초 동안 기다렸지만 준비되지 않았어요. 잠시 후 Lingxi를 다시 시작해 주세요.",
+      "serverModuleMissing": "Server 시작 실패: 모듈 {module}을(를) 찾을 수 없어요.\n자동 업데이트가 완료된 직후 파일이 아직 디스크에 쓰이는 중일 때 자주 발생해요.\n권장: 1-2분 기다린 후 Lingxi를 다시 시작해 주세요. 반복되면 GitHub에 신고해 주세요.",
+      "installFailedTitle": "Lingxi 업데이트",
+      "installFailedBody": "업데이트 설치에 실패했어요:\n{error}\n\nLingxi를 다시 시작한 후 재시도하거나, 설정 페이지에서 수동으로 업데이트를 확인해 주세요.",
       "repairArtifactsTitle": "구성 요소 복구",
-      "repairArtifactsBody": "이 작업은 HanaAgent의 앱 구성 요소를 설치 당시 버전으로 재설정하고 앱을 다시 시작해요. 데이터(에이전트, 세션, 설정)는 영향을 받지 않아요.",
+      "repairArtifactsBody": "이 작업은 Lingxi의 앱 구성 요소를 설치 당시 버전으로 재설정하고 앱을 다시 시작해요. 데이터(에이전트, 세션, 설정)는 영향을 받지 않아요.",
       "repairArtifactsConfirm": "복구 후 재시작",
       "repairArtifactsCancel": "취소",
-      "trainUpdateApplyFailedBody": "HanaAgent v{version}\n\n업데이트 적용 실패:\n{error}\n\n앱을 다시 시작해 주세요."
+      "trainUpdateApplyFailedBody": "Lingxi v{version}\n\n업데이트 적용 실패:\n{error}\n\n앱을 다시 시작해 주세요."
     },
     "notification": {
       "ready": "알림이 준비되었어요",
@@ -3239,7 +3239,7 @@
     "inputHelp": "/help로 명령어 목록 보기"
   },
   "sandbox": {
-    "blocked": "[보안] {reason}\n\n이 작업은 HanaAgent의 샌드박스 보안 정책에 의해 차단되었어요. 이는 명령이 경로나 권한 경계를 넘었다는 뜻이에요. 먼저 현재 워크스페이스, 정확한 경로 표기, 대상 파일이 허용된 워크스페이스 또는 session 경로에 있어야 하는지 확인하세요. 차단된 경로와 이유를 사용자에게 설명하고, 사용자가 명확히 결정한 경우에만 샌드박스 설정 변경을 논의하세요.",
+    "blocked": "[보안] {reason}\n\n이 작업은 Lingxi의 샌드박스 보안 정책에 의해 차단되었어요. 이는 명령이 경로나 권한 경계를 넘었다는 뜻이에요. 먼저 현재 워크스페이스, 정확한 경로 표기, 대상 파일이 허용된 워크스페이스 또는 session 경로에 있어야 하는지 확인하세요. 차단된 경로와 이유를 사용자에게 설명하고, 사용자가 명확히 결정한 경우에만 샌드박스 설정 변경을 논의하세요.",
     "blockedNeedsEscalation": "[보안] {reason}\n\n이 명령은 샌드박스 모드에서 차단되었어요. 현재 작업에 중요하고 읽기 전용 조회라면, sandbox_permissions=\"require_escalated\"와 한 문장짜리 justification을 붙여 다시 실행해 주세요. 사용자가 검토한 뒤 샌드박스 밖에서 실행돼요.",
     "noSudo": "sudo 사용이 금지되어 있어요",
     "noSu": "su 사용자 전환이 금지되어 있어요",
@@ -3323,7 +3323,7 @@
       "timezone": "시간대",
       "timezoneDesc": "IANA 시간대 (예: Asia/Seoul)",
       "bridgeMediaPublicBaseUrl": "Bridge 파일 공개 URL",
-      "bridgeMediaPublicBaseUrlDesc": "외부 플랫폼이 로컬 스테이징 파일을 가져올 때 사용하는 공개 HTTP/HTTPS 기본 URL이에요. 보통 리버스 프록시나 터널이 제공해요. 비워 두면 HANA_BRIDGE_PUBLIC_BASE_URL로 대체돼요.",
+      "bridgeMediaPublicBaseUrlDesc": "외부 플랫폼이 로컬 스테이징 파일을 가져올 때 사용하는 공개 HTTP/HTTPS 기본 URL이에요. 보통 리버스 프록시나 터널이 제공해요. 비워 두면 LINGXI_BRIDGE_PUBLIC_BASE_URL로 대체돼요.",
       "computerUse": "Computer Use",
       "computerUseDesc": "활성화하면 새 대화에서 주 Agent에 computer 도구가 노출돼요. 비활성화하면 새 대화에서 볼 수 없고, 고정된 이전 대화에서 호출하면 거부돼요.",
       "thinkingBudget": "사고 깊이",
@@ -3535,7 +3535,7 @@
     "next": "다음"
   },
   "mobile": {
-    "startupFailed": "HanaAgent 시작에 실패했어요",
+    "startupFailed": "Lingxi 시작에 실패했어요",
     "auth": {
       "scopeError": "현재 로그인 권한이 만료되었어요. 사용자 이름과 비밀번호로 다시 로그인해 주세요.",
       "loginFailed": "로그인 실패",

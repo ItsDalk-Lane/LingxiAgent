@@ -12,14 +12,14 @@ describe("Windows server guardian desktop contract", () => {
   it("prefers explicit guardian and resolves packaged/dev helper locations", () => {
     const explicit = "C:\\custom\\guardian.exe";
     expect(resolveWindowsServerGuardian({
-      env: { HANA_WIN32_SERVER_GUARDIAN: explicit },
+      env: { LINGXI_WIN32_SERVER_GUARDIAN: explicit },
       resourcesPath: "C:\\Hana\\resources",
       appRoot: "C:\\repo",
       arch: "x64",
       existsSync: (candidate: string) => candidate === explicit,
     })).toBe(explicit);
 
-    const packaged = path.join("C:\\Hana\\resources", "sandbox", "windows", "hana-win-sandbox.exe");
+    const packaged = path.join("C:\\Hana\\resources", "sandbox", "windows", "lingxi-win-sandbox.exe");
     expect(resolveWindowsServerGuardian({
       env: {},
       resourcesPath: "C:\\Hana\\resources",

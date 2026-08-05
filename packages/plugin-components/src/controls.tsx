@@ -9,12 +9,12 @@ import {
 } from 'react';
 import { cx } from './classnames';
 
-export type HanaButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger';
-export type HanaButtonSize = 'sm' | 'md' | 'lg';
+export type LingxiButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger';
+export type LingxiButtonSize = 'sm' | 'md' | 'lg';
 
 export interface ButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'size'> {
-  variant?: HanaButtonVariant;
-  size?: HanaButtonSize;
+  variant?: LingxiButtonVariant;
+  size?: LingxiButtonSize;
   loading?: boolean;
   iconLeft?: ReactNode;
   iconRight?: ReactNode;
@@ -42,15 +42,15 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
       type={type}
       disabled={disabled || loading}
       className={cx(
-        'hana-plugin-button',
-        `hana-plugin-button-${variant}`,
-        `hana-plugin-button-${size}`,
-        loading && 'hana-plugin-button-loading',
+        'lingxi-plugin-button',
+        `lingxi-plugin-button-${variant}`,
+        `lingxi-plugin-button-${size}`,
+        loading && 'lingxi-plugin-button-loading',
         className,
       )}
     >
-      {loading ? <span className="hana-plugin-spinner" aria-hidden /> : iconLeft}
-      {children && <span className="hana-plugin-button-label">{children}</span>}
+      {loading ? <span className="lingxi-plugin-spinner" aria-hidden /> : iconLeft}
+      {children && <span className="lingxi-plugin-button-label">{children}</span>}
       {!loading && iconRight}
     </button>
   );
@@ -58,8 +58,8 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
 
 export interface IconButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children'> {
   label: string;
-  size?: HanaButtonSize;
-  variant?: Extract<HanaButtonVariant, 'secondary' | 'ghost' | 'danger'>;
+  size?: LingxiButtonSize;
+  variant?: Extract<LingxiButtonVariant, 'secondary' | 'ghost' | 'danger'>;
   children: ReactNode;
 }
 
@@ -75,9 +75,9 @@ export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(functio
       aria-label={label}
       title={buttonProps.title || label}
       className={cx(
-        'hana-plugin-icon-button',
-        `hana-plugin-icon-button-${size}`,
-        `hana-plugin-icon-button-${variant}`,
+        'lingxi-plugin-icon-button',
+        `lingxi-plugin-icon-button-${size}`,
+        `lingxi-plugin-icon-button-${variant}`,
         className,
       )}
     >
@@ -110,7 +110,7 @@ export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(function T
         ref={ref}
         id={inputId}
         aria-invalid={Boolean(error)}
-        className={cx('hana-plugin-input', inputClassName)}
+        className={cx('lingxi-plugin-input', inputClassName)}
       />
     </FieldShell>
   );
@@ -135,7 +135,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(function 
         id={textareaId}
         rows={rows}
         aria-invalid={Boolean(error)}
-        className={cx('hana-plugin-textarea', textareaClassName)}
+        className={cx('lingxi-plugin-textarea', textareaClassName)}
       />
     </FieldShell>
   );
@@ -154,7 +154,7 @@ export const Switch = forwardRef<HTMLButtonElement, SwitchProps>(function Switch
   const ariaLabel = typeof label === 'string' ? label : buttonProps['aria-label'];
 
   return (
-    <span className={cx('hana-plugin-switch-wrap', className)}>
+    <span className={cx('lingxi-plugin-switch-wrap', className)}>
       <button
         {...buttonProps}
         ref={ref}
@@ -163,15 +163,15 @@ export const Switch = forwardRef<HTMLButtonElement, SwitchProps>(function Switch
         aria-checked={checked}
         aria-label={ariaLabel}
         disabled={disabled}
-        className={cx('hana-plugin-switch', checked && 'hana-plugin-switch-on')}
+        className={cx('lingxi-plugin-switch', checked && 'lingxi-plugin-switch-on')}
         onClick={(event) => {
           onClick?.(event);
           if (!event.defaultPrevented && !disabled) onChange?.(!checked);
         }}
       >
-        <span className="hana-plugin-switch-thumb" aria-hidden />
+        <span className="lingxi-plugin-switch-thumb" aria-hidden />
       </button>
-      {label && <span className="hana-plugin-switch-label">{label}</span>}
+      {label && <span className="lingxi-plugin-switch-label">{label}</span>}
     </span>
   );
 });
@@ -211,21 +211,21 @@ export function Select({
 
   return (
     <FieldShell label={label} hint={hint} error={error} className={className}>
-      <div className="hana-plugin-select">
+      <div className="lingxi-plugin-select">
         <button
           type="button"
           aria-haspopup="listbox"
           aria-expanded={open}
           aria-label={buttonLabel || undefined}
           disabled={disabled}
-          className={cx('hana-plugin-select-trigger', !current && 'hana-plugin-select-placeholder')}
+          className={cx('lingxi-plugin-select-trigger', !current && 'lingxi-plugin-select-placeholder')}
           onClick={() => setOpen((next) => !next)}
         >
-          <span className="hana-plugin-select-value">{displayText}</span>
-          <span className="hana-plugin-select-arrow" aria-hidden>▾</span>
+          <span className="lingxi-plugin-select-value">{displayText}</span>
+          <span className="lingxi-plugin-select-arrow" aria-hidden>▾</span>
         </button>
         {open && (
-          <div className="hana-plugin-select-popover" role="listbox" aria-label={labelText}>
+          <div className="lingxi-plugin-select-popover" role="listbox" aria-label={labelText}>
             {options.map((option) => (
               <button
                 type="button"
@@ -234,8 +234,8 @@ export function Select({
                 aria-selected={option.value === value}
                 disabled={option.disabled}
                 className={cx(
-                  'hana-plugin-select-option',
-                  option.value === value && 'hana-plugin-select-option-selected',
+                  'lingxi-plugin-select-option',
+                  option.value === value && 'lingxi-plugin-select-option-selected',
                 )}
                 onClick={() => {
                   if (option.disabled) return;
@@ -261,15 +261,15 @@ interface FieldShellProps extends FieldBaseProps {
 
 function FieldShell({ label, hint, error, htmlFor, className, children }: FieldShellProps) {
   return (
-    <div className={cx('hana-plugin-field', className)}>
+    <div className={cx('lingxi-plugin-field', className)}>
       {label && (
-        <label className="hana-plugin-field-label" htmlFor={htmlFor}>
+        <label className="lingxi-plugin-field-label" htmlFor={htmlFor}>
           {label}
         </label>
       )}
-      {hint && <div className="hana-plugin-field-hint">{hint}</div>}
+      {hint && <div className="lingxi-plugin-field-hint">{hint}</div>}
       {children}
-      {error && <div className="hana-plugin-field-error">{error}</div>}
+      {error && <div className="lingxi-plugin-field-error">{error}</div>}
     </div>
   );
 }

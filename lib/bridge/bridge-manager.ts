@@ -160,12 +160,12 @@ const ADAPTER_REGISTRY = {
   wechat: {
     create: (creds, onMessage, hooks, agentId) => createWechatAdapter({
       botToken: creds.botToken,
-      hanaHome: creds.hanaHome,
+      lingxiHome: creds.lingxiHome,
       agentId,
       onMessage,
       onStatus: hooks?.onStatus,
     }),
-    getCredentials: (cfg) => cfg?.enabled && cfg?.botToken ? { botToken: cfg.botToken, hanaHome: cfg._hanaHome || "" } : null,
+    getCredentials: (cfg) => cfg?.enabled && cfg?.botToken ? { botToken: cfg.botToken, lingxiHome: cfg._lingxiHome || "" } : null,
     ownerSessionKey: (userId, agentId) => `wx_dm_${userId}@${agentId}`,
     connectsAsync: true,
   },
@@ -688,7 +688,7 @@ export class BridgeManager {
   declare mediaPublisher: any;
   /**
    * @param {object} opts
-   * @param {import('../../core/engine.ts').HanaEngine} opts.engine
+   * @param {import('../../core/engine.ts').LingxiEngine} opts.engine
    * @param {import('../../hub/index.ts').Hub} opts.hub
    */
   constructor({ engine, hub }) {
@@ -709,7 +709,7 @@ export class BridgeManager {
     this._messageLogs = new Map();
     this._messageLogMax = 200;
     this.mediaPublisher = new MediaPublisher({
-      baseUrl: engine.getBridgeMediaPublicBaseUrl?.() || process.env.HANA_BRIDGE_PUBLIC_BASE_URL || "",
+      baseUrl: engine.getBridgeMediaPublicBaseUrl?.() || process.env.LINGXI_BRIDGE_PUBLIC_BASE_URL || "",
       allowedRoots: roots,
     });
     this._mediaDelivery = new MediaDeliveryService({ engine, mediaPublisher: this.mediaPublisher });
@@ -849,7 +849,7 @@ export class BridgeManager {
       if (!bridgeCfg) continue;
       for (const [platform, spec] of Object.entries(ADAPTER_REGISTRY)) {
         const cfg = { ...(bridgeCfg[platform] || {}) };
-        if (platform === "wechat") cfg._hanaHome = this.engine.hanakoHome;
+        if (platform === "wechat") cfg._lingxiHome = this.engine.lingxiHome;
         let creds = null;
         try {
           creds = spec.getCredentials(cfg);
@@ -871,7 +871,7 @@ export class BridgeManager {
   startPlatformFromConfig(platform, cfg, agentId) {
     const spec = ADAPTER_REGISTRY[platform];
     if (!spec) return;
-    if (platform === "wechat") cfg._hanaHome = this.engine.hanakoHome;
+    if (platform === "wechat") cfg._lingxiHome = this.engine.lingxiHome;
     let creds = null;
     try {
       creds = spec.getCredentials(cfg);

@@ -33,7 +33,7 @@ function makeApp({ pending, principal }) {
     resolve: vi.fn(() => true),
   };
   const engine = {
-    hanakoHome: null,
+    lingxiHome: null,
     getRuntimeContext: () => runtimeContext(),
     emitEvent: vi.fn(),
   };

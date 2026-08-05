@@ -11,21 +11,21 @@ import { normalizeAccessProfile, scopesForAccessProfile } from "../../shared/acc
 const DEFAULT_SESSION_TTL_MS = 14 * 24 * 60 * 60 * 1000;
 
 export function createWebAuthRoute({
-  hanakoHome,
+  lingxiHome,
   authService,
   getConnectionKind,
   getRuntimeContext,
   secureCookies = false,
   now = () => new Date().toISOString(),
 }: {
-  hanakoHome?: any;
+  lingxiHome?: any;
   authService?: any;
   getConnectionKind?: any;
   getRuntimeContext?: any;
   secureCookies?: boolean;
   now?: () => string;
 } = {}) {
-  if (!hanakoHome) throw new Error("hanakoHome required");
+  if (!lingxiHome) throw new Error("lingxiHome required");
   if (!authService) throw new Error("authService required");
   const route = new Hono();
 
@@ -42,7 +42,7 @@ export function createWebAuthRoute({
         now: now(),
       })
       : authenticatePasswordLogin(c, {
-        hanakoHome,
+        lingxiHome,
         body,
         connectionKind,
         getRuntimeContext,
@@ -50,7 +50,7 @@ export function createWebAuthRoute({
     if (principal?.error) return c.json({ error: principal.error }, principal.status || 400);
     if (!principal) return c.json({ error: "forbidden" }, 403);
 
-    const issued = createWebSession(hanakoHome, {
+    const issued = createWebSession(lingxiHome, {
       principal,
       userAgent: c.req.header("user-agent"),
       now: now(),
@@ -84,7 +84,7 @@ export function createWebAuthRoute({
   });
 
   route.post("/web-auth/logout", async (c) => {
-    revokeWebSession(hanakoHome, c.req.header("cookie"), { now: now() });
+    revokeWebSession(lingxiHome, c.req.header("cookie"), { now: now() });
     c.header("Set-Cookie", clearSessionCookie({ secure: secureCookies === true }));
     return c.json({ ok: true });
   });
@@ -93,7 +93,7 @@ export function createWebAuthRoute({
 }
 
 function authenticatePasswordLogin(c, {
-  hanakoHome,
+  lingxiHome,
   body,
   connectionKind,
   getRuntimeContext,
@@ -105,7 +105,7 @@ function authenticatePasswordLogin(c, {
   if (connectionKind !== "local" && !isSecureRequest(c)) {
     return { error: "password_login_requires_secure_context", status: 400 };
   }
-  const verified = verifyLocalAccountPassword(hanakoHome, { username, password });
+  const verified = verifyLocalAccountPassword(lingxiHome, { username, password });
   if (!verified.ok) return null;
   const runtimeContext = typeof getRuntimeContext === "function" ? getRuntimeContext() : {};
   return {

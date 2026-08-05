@@ -13,7 +13,7 @@ function defaultPowerShellCommand(env = process.env) {
 }
 
 function defaultHelperDir() {
-  return path.join(os.tmpdir(), "hana-computer-use", "windows-uia");
+  return path.join(os.tmpdir(), "lingxi-computer-use", "windows-uia");
 }
 
 function helperScriptHash(script) {

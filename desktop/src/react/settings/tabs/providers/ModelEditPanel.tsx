@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useSettingsStore } from '../../store';
 import { t, lookupModelMeta, CONTEXT_PRESETS, OUTPUT_PRESETS } from '../../helpers';
-import { hanaFetch } from '../../api';
+import { lingxiFetch } from '../../api';
 import { ComboInput } from '../../widgets/ComboInput';
 import { Toggle } from '@/ui';
 import styles from '../../Settings.module.css';
@@ -79,7 +79,7 @@ export function ModelEditPanel({ modelId, providerId, modelMeta, anchorEl, onClo
     if (dirtyCapabilities.reasoning) entry.reasoning = reasoning;
 
     try {
-      await hanaFetch(`/api/providers/${encodeURIComponent(providerId)}/models/${encodeURIComponent(modelId)}`, {
+      await lingxiFetch(`/api/providers/${encodeURIComponent(providerId)}/models/${encodeURIComponent(modelId)}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(entry),

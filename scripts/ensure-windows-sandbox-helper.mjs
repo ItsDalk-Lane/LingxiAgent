@@ -23,10 +23,10 @@ export function ensureWindowsSandboxHelper({
 
   const target = path.join(
     windowsSandboxHelperOutputDir({ rootDir, arch }),
-    "hana-win-sandbox.exe",
+    "lingxi-win-sandbox.exe",
   );
   const inputs = [
-    path.join(rootDir, "desktop", "native", "HanaWindowsSandboxHelper", "main.cpp"),
+    path.join(rootDir, "desktop", "native", "LingxiWindowsSandboxHelper", "main.cpp"),
     path.join(rootDir, "scripts", "build-windows-sandbox-helper.mjs"),
   ];
   const targetMtime = existsSync(target) ? statSync(target).mtimeMs : -1;

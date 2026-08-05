@@ -15,6 +15,6 @@ import path from "path";
 export const MIGRATION_BACKUPS_DIR = "migration-backups";
 
 /** Absolute path to the migration backup root inside a data directory. */
-export function migrationBackupsRoot(hanakoHome: string): string {
-  return path.join(hanakoHome, MIGRATION_BACKUPS_DIR);
+export function migrationBackupsRoot(lingxiHome: string): string {
+  return path.join(lingxiHome, MIGRATION_BACKUPS_DIR);
 }

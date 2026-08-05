@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { PLUGIN_SURFACE_SESSION_QUERY } from '@hana/plugin-protocol';
+import { PLUGIN_SURFACE_SESSION_QUERY } from '@lingxi/plugin-protocol';
 import { useStore } from '../stores';
 import {
   appendConnectionAuth,
@@ -141,7 +141,7 @@ export function buildPluginSurfaceUrl({
   // agentId= would claim the surface belongs to an agent whose id is empty;
   // leaving the parameter off says there is no agent.
   if (agentId) url.searchParams.set('agentId', agentId);
-  url.searchParams.set('hana-theme', theme);
-  url.searchParams.set('hana-css', cssUrl);
+  url.searchParams.set('lingxi-theme', theme);
+  url.searchParams.set('lingxi-css', cssUrl);
   return url.toString();
 }

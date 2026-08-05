@@ -8,13 +8,13 @@ import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/re
 import '@testing-library/jest-dom/vitest';
 
 const mocks = vi.hoisted(() => ({
-  hanaFetch: vi.fn(),
+  lingxiFetch: vi.fn(),
   invalidateConfigCache: vi.fn(),
   showToast: vi.fn(),
 }));
 
 vi.mock('../../settings/api', () => ({
-  hanaFetch: (...args: unknown[]) => mocks.hanaFetch(...args),
+  lingxiFetch: (...args: unknown[]) => mocks.lingxiFetch(...args),
 }));
 
 vi.mock('../../../hooks/use-config', () => ({
@@ -55,7 +55,7 @@ describe('MediaProviderDetail', () => {
   });
 
   it('allows adding a custom image model id when provider discovery has no candidate list', async () => {
-    mocks.hanaFetch.mockResolvedValue({ json: async () => ({ ok: true }) });
+    mocks.lingxiFetch.mockResolvedValue({ json: async () => ({ ok: true }) });
     const onRefresh = vi.fn(async () => {});
 
     render(
@@ -80,7 +80,7 @@ describe('MediaProviderDetail', () => {
     fireEvent.click(screen.getByRole('button', { name: /qwen-image-2\.0-pro/ }));
 
     await waitFor(() => {
-      expect(mocks.hanaFetch).toHaveBeenCalledWith('/api/media/image/providers/dashscope/models', expect.objectContaining({
+      expect(mocks.lingxiFetch).toHaveBeenCalledWith('/api/media/image/providers/dashscope/models', expect.objectContaining({
         method: 'POST',
         body: JSON.stringify({ model: { id: 'qwen-image-2.0-pro' } }),
       }));

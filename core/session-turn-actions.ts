@@ -28,7 +28,7 @@ export type SessionNodeTarget =
   | { role: "assistant"; entryId: string }
   | { role: "assistant_turn"; turnInputEntryId: string };
 
-const HANA_USER_ENVELOPE_TYPES = new Set([
+const LINGXI_USER_ENVELOPE_TYPES = new Set([
   MESSAGE_PRESENTATION_RECORD_TYPE,
   MESSAGE_ORIGIN_RECORD_TYPE,
   AGENT_REVIEW_RECORD_TYPE,
@@ -667,12 +667,12 @@ function findNextTurnInputIndex(branch, startIndex) {
 
 function findUserEnvelopeStartIndex(branch, userIndex) {
   let index = userIndex;
-  while (index > 0 && isHanaUserEnvelopeEntry(branch[index - 1])) index -= 1;
+  while (index > 0 && isLingxiUserEnvelopeEntry(branch[index - 1])) index -= 1;
   return index;
 }
 
-function isHanaUserEnvelopeEntry(entry) {
-  return entry?.type === "custom" && HANA_USER_ENVELOPE_TYPES.has(entry.customType);
+function isLingxiUserEnvelopeEntry(entry) {
+  return entry?.type === "custom" && LINGXI_USER_ENVELOPE_TYPES.has(entry.customType);
 }
 
 function displayMessageFromUserEnvelope(branch, userEntryId) {

@@ -26,14 +26,14 @@ function makeAgent(locale?: string) {
   fs.mkdirSync(path.join(agentsDir, "hana"), { recursive: true });
   fs.mkdirSync(path.join(productDir, "yuan"), { recursive: true });
   fs.mkdirSync(userDir, { recursive: true });
-  fs.writeFileSync(path.join(productDir, "yuan", "hanako.md"), "Yuan prompt", "utf-8");
+  fs.writeFileSync(path.join(productDir, "yuan", "lingxi.md"), "Yuan prompt", "utf-8");
 
   const agent = new Agent({ id: "hana", agentsDir, productDir, userDir } as any);
   agent._config = {
     // 真实 config.yaml 里没有任何代码会写 locale 字段；不传 locale 时省略这个
     // key（而不是写 locale: undefined），如实还原生产环境里"字段缺失"的现状。
     ...(locale !== undefined ? { locale } : {}),
-    agent: { yuan: "hanako" },
+    agent: { yuan: "lingxi" },
     memory: { enabled: false },
     experience: { enabled: false },
   };
@@ -106,11 +106,11 @@ describe("Agent persona lazy materialization (identity.md/ishiki.md not seeded)"
 
   function writeIdentityIshikiTemplates(productDir: string) {
     fs.mkdirSync(path.join(productDir, "identity-templates", "en"), { recursive: true });
-    fs.writeFileSync(path.join(productDir, "identity-templates", "hanako.md"), "中文身份模板\n", "utf-8");
-    fs.writeFileSync(path.join(productDir, "identity-templates", "en", "hanako.md"), "English identity template\n", "utf-8");
+    fs.writeFileSync(path.join(productDir, "identity-templates", "lingxi.md"), "中文身份模板\n", "utf-8");
+    fs.writeFileSync(path.join(productDir, "identity-templates", "en", "lingxi.md"), "English identity template\n", "utf-8");
     fs.mkdirSync(path.join(productDir, "ishiki-templates", "en"), { recursive: true });
-    fs.writeFileSync(path.join(productDir, "ishiki-templates", "hanako.md"), "中文意识模板\n", "utf-8");
-    fs.writeFileSync(path.join(productDir, "ishiki-templates", "en", "hanako.md"), "English ishiki template\n", "utf-8");
+    fs.writeFileSync(path.join(productDir, "ishiki-templates", "lingxi.md"), "中文意识模板\n", "utf-8");
+    fs.writeFileSync(path.join(productDir, "ishiki-templates", "en", "lingxi.md"), "English ishiki template\n", "utf-8");
   }
 
   it("resolves the locale-appropriate template with no identity.md/ishiki.md on disk, and follows a live locale switch", () => {

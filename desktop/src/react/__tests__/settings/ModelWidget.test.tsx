@@ -8,7 +8,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { ModelWidget } from '../../settings/widgets/ModelWidget';
 
 vi.mock('../../settings/api', () => ({
-  hanaFetch: vi.fn(async () => ({
+  lingxiFetch: vi.fn(async () => ({
     json: async () => ({ models: [] }),
   })),
 }));

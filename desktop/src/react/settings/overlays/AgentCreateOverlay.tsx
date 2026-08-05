@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useSettingsStore } from '../store';
-import { hanaFetch } from '../api';
+import { lingxiFetch } from '../api';
 import { t } from '../helpers';
 import { switchToAgent } from '../actions';
 import { Overlay } from '../../ui';
@@ -11,7 +11,7 @@ export function AgentCreateOverlay() {
   const showToast = useSettingsStore(s => s.showToast);
   const [visible, setVisible] = useState(false);
   const [name, setName] = useState('');
-  const [yuan, setYuan] = useState('hanako');
+  const [yuan, setYuan] = useState('lingxi');
   const [creating, setCreating] = useState(false);
   const [planning, setPlanning] = useState(false);
   const [dragActive, setDragActive] = useState(false);
@@ -24,7 +24,7 @@ export function AgentCreateOverlay() {
   useEffect(() => {
     const handler = () => {
       setName('');
-      setYuan('hanako');
+      setYuan('lingxi');
       setCardPlan(null);
       setImportMemory(false);
       setError('');
@@ -56,7 +56,7 @@ export function AgentCreateOverlay() {
     setCreating(true);
     setError('');
     try {
-      const res = await hanaFetch('/api/agents', {
+      const res = await lingxiFetch('/api/agents', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name: trimmed, yuan }),
@@ -81,7 +81,7 @@ export function AgentCreateOverlay() {
     try {
       const form = new FormData();
       form.append('file', file);
-      const res = await hanaFetch('/api/character-cards/plan', {
+      const res = await lingxiFetch('/api/character-cards/plan', {
         method: 'POST',
         body: form,
         timeout: 90_000,
@@ -103,7 +103,7 @@ export function AgentCreateOverlay() {
     if (!cardPlan?.token || creating) return;
     setCreating(true);
     try {
-      const res = await hanaFetch('/api/character-cards/import', {
+      const res = await lingxiFetch('/api/character-cards/import', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token: cardPlan.token, importMemory }),
@@ -168,7 +168,7 @@ export function AgentCreateOverlay() {
                   disabled={creating || planning}
                   onClick={() => setYuan(key)}
                 >
-                  <img className="yuan-chip-avatar" src={`assets/${meta.avatar || 'Hanako.png'}`} draggable={false} />
+                  <img className="yuan-chip-avatar" src={`assets/${meta.avatar || 'Lingxi.png'}`} draggable={false} />
                   <div className="yuan-chip-info">
                     <span className="yuan-chip-name">{key}</span>
                     {/* kong 的 label 是为设置页那条 6:1 横幅写的整句，塞进这里 100px

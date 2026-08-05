@@ -25,13 +25,13 @@ function makeAgent({ configUserName, locale }: { configUserName?: string; locale
   fs.mkdirSync(path.join(agentsDir, "hana"), { recursive: true });
   fs.mkdirSync(path.join(productDir, "yuan"), { recursive: true });
   fs.mkdirSync(userDir, { recursive: true });
-  fs.writeFileSync(path.join(productDir, "yuan", "hanako.md"), "Yuan prompt", "utf-8");
+  fs.writeFileSync(path.join(productDir, "yuan", "lingxi.md"), "Yuan prompt", "utf-8");
 
   const agent = new Agent({ id: "hana", agentsDir, productDir, userDir } as any);
   agent._config = {
     ...(locale !== undefined ? { locale } : {}),
     ...(configUserName !== undefined ? { user: { name: configUserName } } : {}),
-    agent: { yuan: "hanako" },
+    agent: { yuan: "lingxi" },
     memory: { enabled: false },
     experience: { enabled: false },
   };

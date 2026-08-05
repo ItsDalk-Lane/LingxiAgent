@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useSettingsStore } from '../store';
-import { hanaFetch } from '../api';
+import { lingxiFetch } from '../api';
 import { autoSaveConfig, t } from '../helpers';
 import { loadSettingsConfig, updateSettingsSnapshot } from '../actions';
 import { SettingsSection } from '../components/SettingsSection';
@@ -221,7 +221,7 @@ export function GeneralTab() {
       return undefined;
     }
     let alive = true;
-    hanaFetch('/api/preferences/quick-chat')
+    lingxiFetch('/api/preferences/quick-chat')
       .then(res => res.json())
       .then((data) => {
         if (!alive) return;
@@ -242,7 +242,7 @@ export function GeneralTab() {
       return undefined;
     }
     let alive = true;
-    hanaFetch('/api/preferences/notifications')
+    lingxiFetch('/api/preferences/notifications')
       .then(res => res.json())
       .then((data) => {
         if (!alive) return;
@@ -267,7 +267,7 @@ export function GeneralTab() {
     setQuickChatPrefs(next);
     setQuickChatSaving(true);
     try {
-      const res = await hanaFetch('/api/preferences/quick-chat', {
+      const res = await lingxiFetch('/api/preferences/quick-chat', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ quickChat: next }),
@@ -290,7 +290,7 @@ export function GeneralTab() {
     } catch (err: any) {
       setQuickChatPrefs(previous);
       try {
-        await hanaFetch('/api/preferences/quick-chat', {
+        await lingxiFetch('/api/preferences/quick-chat', {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ quickChat: previous }),
@@ -379,7 +379,7 @@ export function GeneralTab() {
     setNotificationPrefs(next);
     setNotificationSaving(true);
     try {
-      const res = await hanaFetch('/api/preferences/notifications', {
+      const res = await lingxiFetch('/api/preferences/notifications', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ notifications: { [key]: next[key] } }),

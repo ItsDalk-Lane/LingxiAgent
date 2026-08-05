@@ -4,7 +4,7 @@ import {
   modelSupportsAudioInput,
   modelSupportsDirectAudioInput,
   resolveModelAudioInputTransport,
-  withHanaAudioInputCompat,
+  withLingxiAudioInputCompat,
 } from "../shared/model-capabilities.ts";
 
 describe("model audio capabilities", () => {
@@ -79,7 +79,7 @@ describe("model audio capabilities", () => {
 
   it("projects explicit Hana audio compatibility without mutating the source model", () => {
     const model = { id: "custom-audio", provider: "custom", compat: {} };
-    const projected = withHanaAudioInputCompat(model, true);
+    const projected = withLingxiAudioInputCompat(model, true);
 
     expect(projected).not.toBe(model);
     expect((projected.compat as any).hanaAudioInput).toBe(true);

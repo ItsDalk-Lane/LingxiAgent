@@ -10,7 +10,7 @@
     "noEmit": false,
     "allowImportingTsExtensions": false,
     "paths": {
-      "@hana/plugin-protocol": [
+      "@lingxi/plugin-protocol": [
         "../plugin-protocol/dist/index.d.ts"
       ]
     }

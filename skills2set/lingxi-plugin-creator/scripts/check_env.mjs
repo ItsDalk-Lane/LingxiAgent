@@ -2,7 +2,7 @@
 import { spawnSync } from "node:child_process";
 import process from "node:process";
 
-const ENV_VAR = "HANA_PLUGIN_CREATOR_PYTHON";
+const ENV_VAR = "LINGXI_PLUGIN_CREATOR_PYTHON";
 const MIN_PYTHON_VERSION = [3, 9, 0];
 const MIN_PYTHON_VERSION_TEXT = `${MIN_PYTHON_VERSION[0]}.${MIN_PYTHON_VERSION[1]}`;
 const CHECK_TIMEOUT_MS = 10_000;
@@ -58,7 +58,7 @@ function helpResult() {
     ok: true,
     code: "help",
     message: [
-      "Usage: node skills2set/hana-plugin-creator/scripts/check_env.mjs --capability scaffold",
+      "Usage: node skills2set/lingxi-plugin-creator/scripts/check_env.mjs --capability scaffold",
       `Requires Python ${MIN_PYTHON_VERSION_TEXT}+ for the bundled plugin scaffold script.`,
       `Capabilities: ${Object.keys(CAPABILITIES).join(", ")}`,
     ].join("\n"),

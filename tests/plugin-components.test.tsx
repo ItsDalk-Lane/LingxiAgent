@@ -9,7 +9,7 @@ import {
   Button,
   CardShell,
   EmptyState,
-  HanaThemeProvider,
+  LingxiThemeProvider,
   IconButton,
   List,
   Select,
@@ -17,7 +17,7 @@ import {
   Switch,
   Textarea,
   TextInput,
-} from '@hana/plugin-components';
+} from '@lingxi/plugin-components';
 
 describe('plugin component SDK', () => {
   afterEach(() => {
@@ -26,47 +26,47 @@ describe('plugin component SDK', () => {
 
   it('renders plugin surfaces that inherit Hana theme variables by default', () => {
     render(
-      <HanaThemeProvider>
+      <LingxiThemeProvider>
         <CardShell title="工具结果">正文</CardShell>
-      </HanaThemeProvider>,
+      </LingxiThemeProvider>,
     );
 
-    const root = screen.getByTestId('hana-plugin-theme');
-    expect(root).toHaveClass('hana-plugin-theme');
-    expect(root).toHaveAttribute('data-hana-theme-mode', 'inherit');
-    expect(root).not.toHaveAttribute('data-hana-theme');
-    expect(screen.getByText('工具结果')).toHaveClass('hana-plugin-card-title');
+    const root = screen.getByTestId('lingxi-plugin-theme');
+    expect(root).toHaveClass('lingxi-plugin-theme');
+    expect(root).toHaveAttribute('data-lingxi-theme-mode', 'inherit');
+    expect(root).not.toHaveAttribute('data-lingxi-theme');
+    expect(screen.getByText('工具结果')).toHaveClass('lingxi-plugin-card-title');
     expect(screen.getByText('正文')).toBeInTheDocument();
   });
 
   it('applies named and custom theme tokens while leaving unspecified tokens to CSS fallback', () => {
     const { rerender } = render(
-      <HanaThemeProvider mode="hana" theme="midnight">
+      <LingxiThemeProvider mode="hana" theme="midnight">
         <span>named</span>
-      </HanaThemeProvider>,
+      </LingxiThemeProvider>,
     );
 
-    let root = screen.getByTestId('hana-plugin-theme');
-    expect(root).toHaveAttribute('data-hana-theme-mode', 'hana');
-    expect(root).toHaveAttribute('data-hana-theme', 'midnight');
+    let root = screen.getByTestId('lingxi-plugin-theme');
+    expect(root).toHaveAttribute('data-lingxi-theme-mode', 'hana');
+    expect(root).toHaveAttribute('data-lingxi-theme', 'midnight');
     expect(root).toHaveStyle({
-      '--hana-plugin-bg': '#3B4A54',
-      '--hana-plugin-accent': '#C99AAF',
+      '--lingxi-plugin-bg': '#3B4A54',
+      '--lingxi-plugin-accent': '#C99AAF',
     });
 
     rerender(
-      <HanaThemeProvider mode="custom" theme={{ bg: '#111111', accent: '#88AAFF' }}>
+      <LingxiThemeProvider mode="custom" theme={{ bg: '#111111', accent: '#88AAFF' }}>
         <span>custom</span>
-      </HanaThemeProvider>,
+      </LingxiThemeProvider>,
     );
 
-    root = screen.getByTestId('hana-plugin-theme');
-    expect(root).toHaveAttribute('data-hana-theme-mode', 'custom');
+    root = screen.getByTestId('lingxi-plugin-theme');
+    expect(root).toHaveAttribute('data-lingxi-theme-mode', 'custom');
     expect(root).toHaveStyle({
-      '--hana-plugin-bg': '#111111',
-      '--hana-plugin-accent': '#88AAFF',
+      '--lingxi-plugin-bg': '#111111',
+      '--lingxi-plugin-accent': '#88AAFF',
     });
-    expect(root.style.getPropertyValue('--hana-plugin-text')).toBe('');
+    expect(root.style.getPropertyValue('--lingxi-plugin-text')).toBe('');
   });
 
   it('renders controlled controls with stable Hana component classes', () => {
@@ -89,16 +89,16 @@ describe('plugin component SDK', () => {
     );
 
     const button = screen.getByRole('button', { name: '保存' });
-    expect(button).toHaveClass('hana-plugin-button', 'hana-plugin-button-primary');
+    expect(button).toHaveClass('lingxi-plugin-button', 'lingxi-plugin-button-primary');
     fireEvent.click(button);
     expect(onButtonClick).toHaveBeenCalledTimes(1);
 
-    expect(screen.getByRole('button', { name: '刷新' })).toHaveClass('hana-plugin-icon-button');
-    expect(screen.getByLabelText('名称')).toHaveClass('hana-plugin-input');
-    expect(screen.getByLabelText('备注')).toHaveClass('hana-plugin-textarea');
+    expect(screen.getByRole('button', { name: '刷新' })).toHaveClass('lingxi-plugin-icon-button');
+    expect(screen.getByLabelText('名称')).toHaveClass('lingxi-plugin-input');
+    expect(screen.getByLabelText('备注')).toHaveClass('lingxi-plugin-textarea');
 
     const toggle = screen.getByRole('switch', { name: '启用' });
-    expect(toggle).toHaveClass('hana-plugin-switch');
+    expect(toggle).toHaveClass('lingxi-plugin-switch');
     fireEvent.click(toggle);
     expect(onSwitchChange).toHaveBeenCalledWith(true);
   });
@@ -140,9 +140,9 @@ describe('plugin component SDK', () => {
       </CardShell>,
     );
 
-    expect(screen.getByText('同步')).toHaveClass('hana-plugin-card-title');
-    expect(screen.getByText('目标')).toHaveClass('hana-plugin-setting-label');
-    expect(screen.getByText('第一项')).toHaveClass('hana-plugin-list-title');
-    expect(screen.getByText('暂无结果')).toHaveClass('hana-plugin-empty-title');
+    expect(screen.getByText('同步')).toHaveClass('lingxi-plugin-card-title');
+    expect(screen.getByText('目标')).toHaveClass('lingxi-plugin-setting-label');
+    expect(screen.getByText('第一项')).toHaveClass('lingxi-plugin-list-title');
+    expect(screen.getByText('暂无结果')).toHaveClass('lingxi-plugin-empty-title');
   });
 });

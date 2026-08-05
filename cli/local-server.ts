@@ -2,8 +2,8 @@ import fs from "fs";
 import os from "os";
 import path from "path";
 
-export function resolveCliHanaHome(env = process.env) {
-  return resolveHomePath(env.HANA_HOME || path.join(os.homedir(), ".hanako"));
+export function resolveCliLingxiHome(env = process.env) {
+  return resolveHomePath(env.LINGXI_HOME || path.join(os.homedir(), ".hanako"));
 }
 
 function resolveHomePath(value) {
@@ -16,14 +16,14 @@ function resolveHomePath(value) {
   return path.resolve(raw);
 }
 
-export function readLocalServerInfo({ hanaHome = resolveCliHanaHome(), checkProcess = true } = {}) {
-  const filePath = path.join(hanaHome, "server-info.json");
+export function readLocalServerInfo({ lingxiHome = resolveCliLingxiHome(), checkProcess = true } = {}) {
+  const filePath = path.join(lingxiHome, "server-info.json");
   if (!fs.existsSync(filePath)) {
     return {
       ok: false,
       reason: "missing_server_info",
       filePath,
-      message: `No running HanaAgent Server was found at ${filePath}`,
+      message: `No running LingxiAgent Server was found at ${filePath}`,
     };
   }
 
@@ -53,7 +53,7 @@ export function readLocalServerInfo({ hanaHome = resolveCliHanaHome(), checkProc
       ok: false,
       reason: "stale_server_info",
       filePath,
-      message: `HanaAgent Server process ${info.pid} is no longer running`,
+      message: `LingxiAgent Server process ${info.pid} is no longer running`,
     };
   }
 
@@ -67,7 +67,7 @@ export function readLocalServerInfo({ hanaHome = resolveCliHanaHome(), checkProc
   };
 }
 
-export function resolveConnection({ url, token, hanaHome }: { url?: string; token?: string; hanaHome?: string } = {}) {
+export function resolveConnection({ url, token, lingxiHome }: { url?: string; token?: string; lingxiHome?: string } = {}) {
   if (url) {
     return {
       ok: true,
@@ -78,7 +78,7 @@ export function resolveConnection({ url, token, hanaHome }: { url?: string; toke
     };
   }
 
-  const local = readLocalServerInfo({ hanaHome });
+  const local = readLocalServerInfo({ lingxiHome });
   if (!local.ok) return local;
   return {
     ...local,

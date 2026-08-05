@@ -232,9 +232,9 @@ describe("server port selection", () => {
     });
   });
 
-  describe("isHanaServerListeningOnPort", () => {
+  describe("isLingxiServerListeningOnPort", () => {
     it("returns true for a server that answers with status and version", async () => {
-      const { isHanaServerListeningOnPort } = await import("../core/server-port-selection.ts");
+      const { isLingxiServerListeningOnPort } = await import("../core/server-port-selection.ts");
       const server = http.createServer((_req, res) => {
         res.writeHead(200, { "Content-Type": "application/json" });
         res.end(JSON.stringify({ status: "ok", version: "0.1.0" }));
@@ -244,12 +244,12 @@ describe("server port selection", () => {
       if (!address || typeof address === "string") throw new Error("expected AddressInfo");
       closers.push(() => new Promise<void>((resolve) => server.close(() => resolve())));
 
-      const result = await isHanaServerListeningOnPort({ port: address.port, host: "127.0.0.1" });
+      const result = await isLingxiServerListeningOnPort({ port: address.port, host: "127.0.0.1" });
       expect(result).toBe(true);
     });
 
     it("returns false for a server that answers with plain text", async () => {
-      const { isHanaServerListeningOnPort } = await import("../core/server-port-selection.ts");
+      const { isLingxiServerListeningOnPort } = await import("../core/server-port-selection.ts");
       const server = http.createServer((_req, res) => {
         res.writeHead(200, { "Content-Type": "text/plain" });
         res.end("hello world");
@@ -259,12 +259,12 @@ describe("server port selection", () => {
       if (!address || typeof address === "string") throw new Error("expected AddressInfo");
       closers.push(() => new Promise<void>((resolve) => server.close(() => resolve())));
 
-      const result = await isHanaServerListeningOnPort({ port: address.port, host: "127.0.0.1" });
+      const result = await isLingxiServerListeningOnPort({ port: address.port, host: "127.0.0.1" });
       expect(result).toBe(false);
     });
 
     it("returns false when nothing is listening on the port", async () => {
-      const { isHanaServerListeningOnPort } = await import("../core/server-port-selection.ts");
+      const { isLingxiServerListeningOnPort } = await import("../core/server-port-selection.ts");
       // Grab an ephemeral free port, then close it so nothing is listening.
       const probe = net.createServer();
       const freePort: number = await new Promise((resolve, reject) => {
@@ -276,7 +276,7 @@ describe("server port selection", () => {
       });
       await new Promise<void>((resolve) => probe.close(() => resolve()));
 
-      const result = await isHanaServerListeningOnPort({ port: freePort, host: "127.0.0.1", timeoutMs: 500 });
+      const result = await isLingxiServerListeningOnPort({ port: freePort, host: "127.0.0.1", timeoutMs: 500 });
       expect(result).toBe(false);
     });
   });

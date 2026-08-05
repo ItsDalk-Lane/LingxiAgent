@@ -2,7 +2,7 @@
 
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { hanaFetch } from '../../hooks/use-hana-fetch';
+import { lingxiFetch } from '../../hooks/use-hana-fetch';
 import { ModelSelector } from '../../components/input/ModelSelector';
 
 const addToast = vi.fn();
@@ -27,7 +27,7 @@ vi.mock('../../stores', () => ({
 }));
 
 vi.mock('../../hooks/use-hana-fetch', () => ({
-  hanaFetch: vi.fn(),
+  lingxiFetch: vi.fn(),
 }));
 
 vi.mock('../../hooks/use-i18n', () => ({
@@ -85,7 +85,7 @@ describe('ModelSelector', () => {
       dedupeKey: 'model-switch-streaming',
     });
     expect(screen.queryByText('mimo')).toBeNull();
-    expect(hanaFetch).not.toHaveBeenCalled();
+    expect(lingxiFetch).not.toHaveBeenCalled();
   });
 
   it('marks the session model unavailable when its provider/id is no longer in the model list', () => {
@@ -118,7 +118,7 @@ describe('ModelSelector', () => {
     storeState.sessionModelsByPath = {
       '/sessions/a.jsonl': blockedModel,
     };
-    vi.mocked(hanaFetch).mockResolvedValueOnce(jsonResponse({
+    vi.mocked(lingxiFetch).mockResolvedValueOnce(jsonResponse({
       ok: true,
       model: { ...models[0], available: true, unavailableReason: null },
     }));
@@ -129,7 +129,7 @@ describe('ModelSelector', () => {
     fireEvent.click(screen.getByRole('option', { name: /DeepSeek V4 Flash/ }));
 
     await waitFor(() => {
-      expect(hanaFetch).toHaveBeenCalledWith('/api/models/switch', expect.objectContaining({
+      expect(lingxiFetch).toHaveBeenCalledWith('/api/models/switch', expect.objectContaining({
         method: 'POST',
         body: JSON.stringify({
           sessionPath: '/sessions/a.jsonl',
@@ -157,7 +157,7 @@ describe('ModelSelector', () => {
         provider: 'deepseek',
       },
     };
-    vi.mocked(hanaFetch).mockResolvedValueOnce(jsonResponse({
+    vi.mocked(lingxiFetch).mockResolvedValueOnce(jsonResponse({
       error: 'cannot switch model while streaming',
     }, false));
 
@@ -170,13 +170,13 @@ describe('ModelSelector', () => {
         dedupeKey: 'model-switch-streaming',
       });
     });
-    expect(hanaFetch).toHaveBeenCalledWith('/api/models/switch', expect.objectContaining({
+    expect(lingxiFetch).toHaveBeenCalledWith('/api/models/switch', expect.objectContaining({
       throwOnHttpError: false,
     }));
   });
 
   it('applies the selected model thinking default while preparing a new session', async () => {
-    vi.mocked(hanaFetch)
+    vi.mocked(lingxiFetch)
       .mockResolvedValueOnce(jsonResponse({ ok: true, thinkingLevel: 'high' }))
       .mockResolvedValueOnce(jsonResponse({ models: [{ ...models[1], isCurrent: true }] }));
 
@@ -188,7 +188,7 @@ describe('ModelSelector', () => {
       expect(storeState.setThinkingLevel).toHaveBeenCalledWith('high');
     });
     expect(storeState.setPendingNewSessionThinkingLevel).toHaveBeenCalledWith('high');
-    expect(hanaFetch).toHaveBeenCalledWith('/api/models/set', expect.objectContaining({
+    expect(lingxiFetch).toHaveBeenCalledWith('/api/models/set', expect.objectContaining({
       method: 'POST',
       body: JSON.stringify({ modelId: 'mimo-v2-omni', provider: 'mimo' }),
     }));
@@ -207,7 +207,7 @@ describe('ModelSelector', () => {
         provider: 'deepseek',
       },
     };
-    vi.mocked(hanaFetch).mockResolvedValueOnce(jsonResponse({
+    vi.mocked(lingxiFetch).mockResolvedValueOnce(jsonResponse({
       code: 'MODEL_NOT_FOUND',
       error: 'Model not found: minimax-token-plan/MiniMax-M2.7',
     }, false));
@@ -227,7 +227,7 @@ describe('ModelSelector', () => {
     await waitFor(() => {
       expect(addToast).toHaveBeenCalledWith('Model not found: minimax-token-plan/MiniMax-M2.7', 'error');
     });
-    expect(hanaFetch).toHaveBeenCalledWith('/api/models/switch', expect.objectContaining({
+    expect(lingxiFetch).toHaveBeenCalledWith('/api/models/switch', expect.objectContaining({
       throwOnHttpError: false,
     }));
   });

@@ -4,8 +4,8 @@
  * shared/server-info-probe.cjs — token-authenticated liveness probe for
  * `server-info.json` entries.
  *
- * Threat model (同宅防线 / same-HANA_HOME mutual exclusion):
- * A single HANA_HOME can be opened by more than one kernel binary on the
+ * Threat model (同宅防线 / same-LINGXI_HOME mutual exclusion):
+ * A single LINGXI_HOME can be opened by more than one kernel binary on the
  * same machine — `hana serve` (standalone CLI) and the desktop app are the
  * two shipped entry points, and a user can start either one first. If two
  * kernels hold the same SQLite files / session JSONLs / server-info.json
@@ -18,7 +18,7 @@
  * to spawning a second server anyway, because "port doesn't conflict" was
  * being used as a proxy for "safe to start alongside it". It isn't: the
  * residual process may well be a live, healthy kernel on the very same
- * HANA_HOME, just listening on a different port (e.g. `hana serve` started
+ * LINGXI_HOME, just listening on a different port (e.g. `hana serve` started
  * first, desktop started second).
  *
  * This module closes that hole with a single, reusable question: "is the
@@ -26,7 +26,7 @@
  * provably the same home?" Provably means it accepts the 128-bit
  * SERVER_TOKEN written into that very server-info.json — anyone who can
  * present that token has already had filesystem read access to this
- * HANA_HOME, so a token match is as strong an identity signal as this
+ * LINGXI_HOME, so a token match is as strong an identity signal as this
  * machine can offer locally.
  *
  * Why not trust the bare PID (the classic postmaster.pid mistake)? PIDs
@@ -49,7 +49,7 @@
  *                           middleware rejects bad bearer tokens (403 with
  *                           an `error`/`reason` body). Most likely a Hana
  *                           kernel whose token has since rotated, or a
- *                           different HANA_HOME's kernel that happens to be
+ *                           different LINGXI_HOME's kernel that happens to be
  *                           listening on the same port. Either way it is
  *                           not verifiably foreign, so it is treated as
  *                           blocking too (see isForeignServerBlocking).
@@ -153,13 +153,13 @@ function describeForeignServerBlock({ status, info }) {
   if (status === "alive-same-home") {
     return (
       `检测到同一数据目录已有内核在运行（ownerKind=${ownerKind}, version=${version}, pid=${pid}）。要接管请先退出它，再重新启动。\n`
-      + `A HanaAgent kernel is already running against this data directory (ownerKind=${ownerKind}, version=${version}, pid=${pid}). Quit it first, then start this one again.`
+      + `A LingxiAgent kernel is already running against this data directory (ownerKind=${ownerKind}, version=${version}, pid=${pid}). Quit it first, then start this one again.`
     );
   }
   if (status === "alive-unauthorized") {
     return (
       `该端口上有一个内核在响应，但无法用本机记录的凭据验证它的身份（token 可能已轮换，或另一个 Hana 数据目录的内核占用了这个端口）。请先排查（ownerKind=${ownerKind}, pid=${pid}），确认安全后再启动。\n`
-      + `A kernel on that port responded but could not be authenticated with the credentials recorded locally (the token may have rotated, or a kernel from a different HANA_HOME is holding that port). Investigate first (ownerKind=${ownerKind}, pid=${pid}) before starting.`
+      + `A kernel on that port responded but could not be authenticated with the credentials recorded locally (the token may have rotated, or a kernel from a different LINGXI_HOME is holding that port). Investigate first (ownerKind=${ownerKind}, pid=${pid}) before starting.`
     );
   }
   return null;

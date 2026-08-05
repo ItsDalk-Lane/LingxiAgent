@@ -22,7 +22,7 @@ export interface YuanMetadata {
 }
 
 export const YUAN_METADATA: Readonly<Record<string, Readonly<YuanMetadata>>> = Object.freeze({
-  hanako: Object.freeze({ yuan: "hanako", thinkingBlock: "MOOD" }),
+  lingxi: Object.freeze({ yuan: "lingxi", thinkingBlock: "MOOD" }),
   butter: Object.freeze({ yuan: "butter", thinkingBlock: "PULSE" }),
   ming: Object.freeze({ yuan: "ming", thinkingBlock: "沉思" }),
   kong: Object.freeze({ yuan: "kong", thinkingBlock: null }),

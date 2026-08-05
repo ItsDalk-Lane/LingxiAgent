@@ -53,7 +53,7 @@ afterEach(() => {
   for (const dir of tempDirs.splice(0)) {
     fs.rmSync(dir, { recursive: true, force: true });
   }
-  delete process.env.HANA_ARTIFACT_MANIFEST;
+  delete process.env.LINGXI_ARTIFACT_MANIFEST;
 });
 
 function makeKeys(keyId = "ota-test") {
@@ -196,9 +196,9 @@ function buildSignedManifestBytes(keys: ReturnType<typeof makeKeys>, opts: { tra
 // benefit, since this helper's whole job is just "run fn with the env
 // var set, then unset it" and doesn't care what fn returns.
 function runWithDevOverride(manifestPath: string, fn: () => Promise<any>): Promise<any> {
-  process.env.HANA_ARTIFACT_MANIFEST = manifestPath;
+  process.env.LINGXI_ARTIFACT_MANIFEST = manifestPath;
   return fn().finally(() => {
-    delete process.env.HANA_ARTIFACT_MANIFEST;
+    delete process.env.LINGXI_ARTIFACT_MANIFEST;
   });
 }
 
@@ -570,22 +570,22 @@ describe("artifact-ota: ota-state.json bookkeeping", () => {
 
 describe("artifact-ota: dev-bypass module (real + prod stub)", () => {
   afterEach(() => {
-    delete process.env.HANA_ARTIFACT_MANIFEST;
+    delete process.env.LINGXI_ARTIFACT_MANIFEST;
   });
-  it("real module reads HANA_ARTIFACT_MANIFEST", () => {
+  it("real module reads LINGXI_ARTIFACT_MANIFEST", () => {
     expect(devBypass.hasDevOverride()).toBe(false);
-    process.env.HANA_ARTIFACT_MANIFEST = "/tmp/whatever.json";
+    process.env.LINGXI_ARTIFACT_MANIFEST = "/tmp/whatever.json";
     expect(devBypass.hasDevOverride()).toBe(true);
     expect(devBypass.resolveDevManifestOverride()).toBe("/tmp/whatever.json");
   });
   it("production stub always returns null/false, ignoring the env var", () => {
-    process.env.HANA_ARTIFACT_MANIFEST = "/tmp/whatever.json";
+    process.env.LINGXI_ARTIFACT_MANIFEST = "/tmp/whatever.json";
     expect(prodStub.hasDevOverride()).toBe(false);
     expect(prodStub.resolveDevManifestOverride()).toBeNull();
   });
   it("hasDevOverrideConfigured (as re-exported by artifact-ota.cjs) tracks the real module", () => {
     expect(hasDevOverrideConfigured()).toBe(false);
-    process.env.HANA_ARTIFACT_MANIFEST = "/tmp/whatever.json";
+    process.env.LINGXI_ARTIFACT_MANIFEST = "/tmp/whatever.json";
     expect(hasDevOverrideConfigured()).toBe(true);
   });
 });
@@ -1641,7 +1641,7 @@ describe("artifact-ota: shared pipeline core stays desktop-free (structural)", (
   });
 
   it("never references the dev-only override env var's literal name", () => {
-    expect(otaCoreSource).not.toContain("HANA_ARTIFACT_MANIFEST");
+    expect(otaCoreSource).not.toContain("LINGXI_ARTIFACT_MANIFEST");
   });
 
   it("desktop shell still holds the static dev-bypass require (vite alias contract)", () => {

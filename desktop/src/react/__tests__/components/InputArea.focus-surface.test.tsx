@@ -80,8 +80,8 @@ vi.mock('../../hooks/use-config', () => ({
 }));
 
 vi.mock('../../hooks/use-hana-fetch', () => ({
-  hanaFetch: vi.fn(async () => new Response('{}', { status: 200 })),
-  hanaUrl: (path: string) => `http://127.0.0.1:3210${path}`,
+  lingxiFetch: vi.fn(async () => new Response('{}', { status: 200 })),
+  lingxiUrl: (path: string) => `http://127.0.0.1:3210${path}`,
 }));
 
 vi.mock('../../stores/session-actions', () => ({
@@ -174,7 +174,7 @@ function seedInputState(overrides: Partial<ReturnType<typeof useStore.getState>>
     serverToken: null,
     modelSwitching: false,
     welcomeVisible: false,
-    agentYuan: 'hanako',
+    agentYuan: 'lingxi',
     inputFocusTrigger: 0,
     inputFocusTriggerSource: 'gesture',
     ...overrides,

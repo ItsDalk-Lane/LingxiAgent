@@ -237,7 +237,7 @@ describe("startup root error extraction", () => {
     const root = extractRootServerStartupError([
       "[server-bootstrap] importing server entry\n",
       '[stderr] [server-bootstrap] failed to import server entry: Error: invalid agent directory "kon": config.yaml missing\n',
-      "[stderr]     at MSe (file:///Applications/HanaAgent.app/Contents/Resources/server/bundle/index.js:55420:11)\n",
+      "[stderr]     at MSe (file:///Applications/LingxiAgent.app/Contents/Resources/server/bundle/index.js:55420:11)\n",
       "--- GPU Startup ---\n",
       'GPU startup marker: {"status":"failed","reason":"startup-failed"}\n',
     ]);

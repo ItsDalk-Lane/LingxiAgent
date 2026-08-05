@@ -2,7 +2,7 @@ import fs from "fs";
 import path from "path";
 
 export const SERVER_RUNTIME_ASSET_FILES = [
-  "Hanako.png",
+  "Lingxi.png",
   "Butter.png",
   "Ming.png",
   "Kong.png",

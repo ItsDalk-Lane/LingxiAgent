@@ -30,7 +30,7 @@ describe("handle + request", () => {
   });
 
   it("global SKIP symbol lets SDK handlers pass to next handler", async () => {
-    bus.handle("bridge:send", async () => Symbol.for("hana.event-bus.skip"));
+    bus.handle("bridge:send", async () => Symbol.for("lingxi.event-bus.skip"));
     bus.handle("bridge:send", async () => ({ sent: true }));
 
     const r = await bus.request("bridge:send", { platform: "telegram" });

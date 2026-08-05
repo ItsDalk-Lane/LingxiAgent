@@ -7,7 +7,7 @@ import {
   PLUGIN_UI_PROTOCOL_VERSION,
   parsePluginUiMessage,
   type PluginResourcePickInput,
-} from '@hana/plugin-protocol';
+} from '@lingxi/plugin-protocol';
 
 describe('plugin UI protocol', () => {
   it('accepts a versioned event envelope', () => {
@@ -15,16 +15,16 @@ describe('plugin UI protocol', () => {
       protocol: PLUGIN_UI_PROTOCOL,
       version: PLUGIN_UI_PROTOCOL_VERSION,
       kind: 'event',
-      type: 'hana.ready',
+      type: 'lingxi.ready',
     });
 
     expect(result).toEqual({
       ok: true,
       value: {
-        protocol: 'hana.plugin.ui',
+        protocol: 'lingxi.plugin.ui',
         version: 1,
         kind: 'event',
-        type: 'hana.ready',
+        type: 'lingxi.ready',
       },
     });
   });
@@ -52,7 +52,7 @@ describe('plugin UI protocol', () => {
       protocol: PLUGIN_UI_PROTOCOL,
       version: 2,
       kind: 'event',
-      type: 'hana.ready',
+      type: 'lingxi.ready',
     });
 
     expect(result).toEqual({

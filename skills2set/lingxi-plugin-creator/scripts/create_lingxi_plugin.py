@@ -13,17 +13,17 @@ from pathlib import Path, PurePath, PureWindowsPath
 
 
 SDK_PACKAGES = {
-    "@hana/plugin-protocol": "plugin-protocol",
-    "@hana/plugin-runtime": "plugin-runtime",
-    "@hana/plugin-sdk": "plugin-sdk",
-    "@hana/plugin-components": "plugin-components",
+    "@lingxi/plugin-protocol": "plugin-protocol",
+    "@lingxi/plugin-runtime": "plugin-runtime",
+    "@lingxi/plugin-sdk": "plugin-sdk",
+    "@lingxi/plugin-components": "plugin-components",
 }
 
 SDK_TARBALLS = {
-    "@hana/plugin-protocol": "hana-plugin-protocol-*.tgz",
-    "@hana/plugin-runtime": "hana-plugin-runtime-*.tgz",
-    "@hana/plugin-sdk": "hana-plugin-sdk-*.tgz",
-    "@hana/plugin-components": "hana-plugin-components-*.tgz",
+    "@lingxi/plugin-protocol": "lingxi-plugin-protocol-*.tgz",
+    "@lingxi/plugin-runtime": "lingxi-plugin-runtime-*.tgz",
+    "@lingxi/plugin-sdk": "lingxi-plugin-sdk-*.tgz",
+    "@lingxi/plugin-components": "lingxi-plugin-components-*.tgz",
 }
 
 REACT_TEMPLATES = {"guided-react", "professional-react"}
@@ -31,7 +31,7 @@ REACT_TEMPLATES = {"guided-react", "professional-react"}
 
 def slugify(value: str) -> str:
     slug = re.sub(r"[^a-z0-9]+", "-", value.lower()).strip("-")
-    return slug or "hana-plugin"
+    return slug or "lingxi-plugin"
 
 
 def titleize(value: str) -> str:
@@ -140,12 +140,12 @@ def required_sdk_packages(include_tool: bool, include_ui: bool, include_lifecycl
         return []
     packages: list[str] = []
     if include_tool or include_lifecycle:
-        packages.append("@hana/plugin-protocol")
-        packages.append("@hana/plugin-runtime")
+        packages.append("@lingxi/plugin-protocol")
+        packages.append("@lingxi/plugin-runtime")
     if include_ui:
-        if "@hana/plugin-protocol" not in packages:
-            packages.append("@hana/plugin-protocol")
-        packages.extend(["@hana/plugin-sdk", "@hana/plugin-components"])
+        if "@lingxi/plugin-protocol" not in packages:
+            packages.append("@lingxi/plugin-protocol")
+        packages.extend(["@lingxi/plugin-sdk", "@lingxi/plugin-components"])
     return packages
 
 
@@ -373,7 +373,7 @@ def create_runtime_tool(plugin_id: str, display_name: str) -> str:
     return f"""
 import fs from "node:fs";
 import path from "node:path";
-import {{ createMediaDetails, defineTool }} from "@hana/plugin-runtime";
+import {{ createMediaDetails, defineTool }} from "@lingxi/plugin-runtime";
 
 const tool = defineTool({{
   name: "create_note",
@@ -436,14 +436,14 @@ export const {{ name, description, parameters, execute }} = tool;
 def create_direct_index(plugin_id: str, display_name: str) -> str:
     status_type = f"{plugin_id}:status"
     return f"""
-const HANA_BUS_SKIP = Symbol.for("hana.event-bus.skip");
+const LINGXI_BUS_SKIP = Symbol.for("lingxi.event-bus.skip");
 
 export default class Plugin {{
   async onload() {{
     const ctx = this.ctx;
     if (ctx.bus.handle) {{
       this.register(ctx.bus.handle({js_string(status_type)}, (payload) => {{
-        if (payload?.pluginId && payload.pluginId !== ctx.pluginId) return HANA_BUS_SKIP;
+        if (payload?.pluginId && payload.pluginId !== ctx.pluginId) return LINGXI_BUS_SKIP;
         return {{
           ok: true,
           pluginId: ctx.pluginId,
@@ -467,13 +467,13 @@ def create_runtime_index(plugin_id: str, display_name: str) -> str:
 import {{
   defineBusHandler,
   definePlugin,
-  HANA_BUS_SKIP,
-}} from "@hana/plugin-runtime";
+  LINGXI_BUS_SKIP,
+}} from "@lingxi/plugin-runtime";
 
 const statusHandler = defineBusHandler({{
   type: {js_string(status_type)},
   async handle(payload, ctx) {{
-    if (payload?.pluginId && payload.pluginId !== ctx.pluginId) return HANA_BUS_SKIP;
+    if (payload?.pluginId && payload.pluginId !== ctx.pluginId) return LINGXI_BUS_SKIP;
     return {{
       ok: true,
       pluginId: ctx.pluginId,
@@ -566,8 +566,8 @@ export default function registerPluginUiRoutes(app, ctx) {{
 }}
 
 function renderShell(c, ctx, surface) {{
-  const hanaCss = c.req.query("hana-css") || "";
-  const theme = c.req.query("hana-theme") || "inherit";
+  const hanaCss = c.req.query("lingxi-css") || "";
+  const theme = c.req.query("lingxi-theme") || "inherit";
   const assetBase = `/api/plugins/${{encodeURIComponent(ctx.pluginId)}}/assets`;
   const title = {js_string(display_name)};
 
@@ -580,7 +580,7 @@ function renderShell(c, ctx, surface) {{
   ${{hanaCss ? `<link rel="stylesheet" href="${{escapeAttr(hanaCss)}}">` : ""}}
   <link rel="stylesheet" href="${{assetBase}}/panel.css">
 </head>
-<body data-hana-theme="${{escapeAttr(theme)}}" data-surface="${{surface}}">
+<body data-lingxi-theme="${{escapeAttr(theme)}}" data-surface="${{surface}}">
   <div id="root" data-surface="${{surface}}"></div>
   <script type="module" src="${{assetBase}}/panel.js"></script>
 </body>
@@ -602,13 +602,13 @@ function escapeHtml(value) {{
 
 def create_direct_panel_js(display_name: str) -> str:
     return f"""
-const PROTOCOL = "hana.plugin.ui";
+const PROTOCOL = "lingxi.plugin.ui";
 const VERSION = 1;
 let seq = 0;
 
 function targetOrigin() {{
   const params = new URLSearchParams(window.location.search);
-  const explicit = params.get("hana-host-origin");
+  const explicit = params.get("lingxi-host-origin");
   if (explicit) return explicit;
   try {{
     return new URL(document.referrer).origin;
@@ -626,7 +626,7 @@ function event(type, payload) {{
 }}
 
 function request(type, payload, timeoutMs = 10000) {{
-  const id = `hana-plugin-${{Date.now()}}-${{++seq}}`;
+  const id = `lingxi-plugin-${{Date.now()}}-${{++seq}}`;
   const origin = targetOrigin();
   return new Promise((resolve, reject) => {{
     const timeout = window.setTimeout(() => {{
@@ -693,12 +693,12 @@ function pluginApiFetch(path, init = {{}}) {{
   const surfaceSession = new URLSearchParams(window.location.search).get("pluginSurfaceSession");
   if (!surfaceSession) throw new Error("hana.api.fetch requires pluginSurfaceSession in the iframe URL.");
   const headers = new Headers(init.headers || {{}});
-  headers.set("X-Hana-Plugin-Surface-Session", surfaceSession);
+  headers.set("X-Lingxi-Plugin-Surface-Session", surfaceSession);
   return fetch(pluginApiUrl(path), {{ ...init, headers }});
 }}
 
 const hana = {{
-  ready: () => event("hana.ready"),
+  ready: () => event("lingxi.ready"),
   ui: {{ resize: (size) => event("ui.resize", size) }},
   api: {{ url: pluginApiUrl, fetch: pluginApiFetch }},
   toast: {{ show: (input) => request("toast.show", input) }},
@@ -712,7 +712,7 @@ const hana = {{
   theme: {{
     getSnapshot: () => {{
       const params = new URLSearchParams(window.location.search);
-      return {{ theme: params.get("hana-theme") || undefined, cssUrl: params.get("hana-css") || undefined }};
+      return {{ theme: params.get("lingxi-theme") || undefined, cssUrl: params.get("lingxi-css") || undefined }};
     }},
   }},
 }};
@@ -779,7 +779,7 @@ function render() {{
 }}
 
 render();
-hana.ready();
+lingxi.ready();
 hana.ui.resize({{ height: surface === "widget" ? 320 : 500 }});
 """
 
@@ -930,19 +930,19 @@ def create_react_panel(display_name: str) -> str:
     return f"""
 import {{ useEffect, useMemo, useState }} from 'react';
 import {{ createRoot }} from 'react-dom/client';
-import {{ hana }} from '@hana/plugin-sdk';
+import {{ hana }} from '@lingxi/plugin-sdk';
 import {{
   Button,
   CardShell,
   EmptyState,
-  HanaThemeProvider,
+  LingxiThemeProvider,
   List,
   Select,
   SettingRow,
   Switch,
   TextInput,
-}} from '@hana/plugin-components';
-import '@hana/plugin-components/styles.css';
+}} from '@lingxi/plugin-components';
+import '@lingxi/plugin-components/styles.css';
 import './panel.css';
 
 type ThemeMode = 'inherit' | 'hana' | 'custom';
@@ -954,7 +954,7 @@ function Panel() {{
   const [enabled, setEnabled] = useState(true);
 
   useEffect(() => {{
-    hana.ready();
+    lingxi.ready();
     hana.ui.resize({{ height: surface === 'widget' ? 320 : 520 }});
   }}, [surface]);
 
@@ -970,7 +970,7 @@ function Panel() {{
   }}
 
   return (
-    <HanaThemeProvider
+    <LingxiThemeProvider
       mode={{themeMode}}
       theme={{customTheme || (themeMode === 'hana' ? 'warm-paper' : undefined)}}
       className="plugin-panel"
@@ -1003,14 +1003,14 @@ function Panel() {{
         <TextInput label="Title" value={{title}} onChange={{(event) => setTitle(event.currentTarget.value)}} />
         <List
           items={{[
-            {{ id: 'runtime', title: '@hana/plugin-runtime', meta: 'Node' }},
-            {{ id: 'sdk', title: '@hana/plugin-sdk', meta: 'iframe' }},
-            {{ id: 'components', title: '@hana/plugin-components', meta: 'React' }},
+            {{ id: 'runtime', title: '@lingxi/plugin-runtime', meta: 'Node' }},
+            {{ id: 'sdk', title: '@lingxi/plugin-sdk', meta: 'iframe' }},
+            {{ id: 'components', title: '@lingxi/plugin-components', meta: 'React' }},
           ]}}
         />
         {{!enabled && <EmptyState title="Paused" description="Turn the switch back on to resume actions." />}}
       </CardShell>
-    </HanaThemeProvider>
+    </LingxiThemeProvider>
   );
 }}
 
@@ -1029,8 +1029,8 @@ body,
 }
 
 body {
-  background: var(--hana-plugin-bg, #f8f5ed);
-  color: var(--hana-plugin-text, #3b3d3f);
+  background: var(--lingxi-plugin-bg, #f8f5ed);
+  color: var(--lingxi-plugin-text, #3b3d3f);
 }
 
 .plugin-panel {

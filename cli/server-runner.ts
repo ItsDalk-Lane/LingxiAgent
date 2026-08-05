@@ -2,7 +2,7 @@ import fs from "fs";
 import path from "path";
 import { spawn } from "child_process";
 import { createRequire } from "module";
-import { readLocalServerInfo, resolveCliHanaHome } from "./local-server.ts";
+import { readLocalServerInfo, resolveCliLingxiHome } from "./local-server.ts";
 import { describeForeignServerBlock, isForeignServerBlocking, probeServerInfo } from "../shared/server-info-probe.cjs";
 import { ansi } from "./terminal-theme.ts";
 
@@ -18,7 +18,7 @@ export type RendererDistPointer = { distDir: string; version: string | null; val
 
 /**
  * Resolves which already-activated renderer directory `hana serve` should
- * inject into the server as `HANA_RENDERER_DIST`. Reuses
+ * inject into the server as `LINGXI_RENDERER_DIST`. Reuses
  * `activation.resolveBoot` for the "pointer -> validated version
  * directory" judgment (current first, previous as fallback; both require
  * a `.verified` receipt whose sha256 matches and a directory that still
@@ -32,7 +32,7 @@ export type RendererDistPointer = { distDir: string; version: string | null; val
  * "nothing injected" — that would dress up "content is broken" as "never
  * pulled", and an operator would go looking for the wrong problem. In
  * that case this still returns the `current` pointer's recorded
- * `versionDir` (`valid: false`); the caller sets `HANA_RENDERER_DIST` to
+ * `versionDir` (`valid: false`); the caller sets `LINGXI_RENDERER_DIST` to
  * it anyway, so the server's own decision function lands in its explicit
  * error mode — damage has to be visible, not silently downgraded to the
  * guide page.
@@ -43,15 +43,15 @@ export type RendererDistPointer = { distDir: string; version: string | null; val
  * mode on its own.
  */
 export async function resolveRendererDistPointer({
-  hanaHome,
+  lingxiHome,
   channel = "stable",
-}: { hanaHome: string; channel?: string }): Promise<RendererDistPointer | null> {
+}: { lingxiHome: string; channel?: string }): Promise<RendererDistPointer | null> {
   const rendererChannel = rendererPointerChannel(channel);
-  const boot = await activation.resolveBoot(rendererChannel, hanaHome);
+  const boot = await activation.resolveBoot(rendererChannel, lingxiHome);
   if (boot) {
     return { distDir: boot.pointer.versionDir, version: boot.pointer.version ?? null, valid: true };
   }
-  const current = await pointerStore.readPointer(hanaHome, rendererChannel, "current");
+  const current = await pointerStore.readPointer(lingxiHome, rendererChannel, "current");
   if (current && typeof current.versionDir === "string") {
     return { distDir: current.versionDir, version: current.version ?? null, valid: false };
   }
@@ -65,8 +65,8 @@ export async function resolveServerSpawnSpec({
   channel = "stable",
 }: { projectRoot?: string; env?: NodeJS.ProcessEnv; extraArgs?: string[]; channel?: string } = {}) {
   const root = projectRoot || path.resolve(import.meta.dirname, "..");
-  const explicitRoot = env.HANA_ROOT && fs.existsSync(path.join(env.HANA_ROOT, "bootstrap.js"))
-    ? env.HANA_ROOT
+  const explicitRoot = env.LINGXI_ROOT && fs.existsSync(path.join(env.LINGXI_ROOT, "bootstrap.js"))
+    ? env.LINGXI_ROOT
     : null;
   const packagedRoot = explicitRoot || (
     fs.existsSync(path.join(root, "bootstrap.js"))
@@ -75,15 +75,15 @@ export async function resolveServerSpawnSpec({
       : null
   );
 
-  const rendererDist = await resolveRendererDistPointer({ hanaHome: resolveCliHanaHome(env), channel });
+  const rendererDist = await resolveRendererDistPointer({ lingxiHome: resolveCliLingxiHome(env), channel });
 
   if (packagedRoot) {
     const spawnEnv: NodeJS.ProcessEnv = {
       ...env,
-      HANA_ROOT: packagedRoot,
-      HANA_SERVER_ENTRY: path.join(packagedRoot, "bundle", "index.js"),
+      LINGXI_ROOT: packagedRoot,
+      LINGXI_SERVER_ENTRY: path.join(packagedRoot, "bundle", "index.js"),
     };
-    if (rendererDist) spawnEnv.HANA_RENDERER_DIST = rendererDist.distDir;
+    if (rendererDist) spawnEnv.LINGXI_RENDERER_DIST = rendererDist.distDir;
     return {
       mode: "packaged",
       command: process.execPath,
@@ -94,7 +94,7 @@ export async function resolveServerSpawnSpec({
   }
 
   const spawnEnv: NodeJS.ProcessEnv = { ...env };
-  if (rendererDist) spawnEnv.HANA_RENDERER_DIST = rendererDist.distDir;
+  if (rendererDist) spawnEnv.LINGXI_RENDERER_DIST = rendererDist.distDir;
   return {
     mode: "source",
     command: process.execPath,
@@ -111,7 +111,7 @@ export async function resolveServerSpawnSpec({
 
 /**
  * Pre-spawn check for the "同宅互斥" gate's CLI-side entry point. Reads
- * whatever server-info.json is on disk for `hanaHome` (regardless of
+ * whatever server-info.json is on disk for `lingxiHome` (regardless of
  * whether its recorded PID looks alive — `probeImpl` is the actual source
  * of truth, not the PID) and probes it with the shared token-authenticated
  * probe. Returns a structured decision instead of printing/exiting itself
@@ -125,10 +125,10 @@ export async function resolveServerSpawnSpec({
  * even spawns a child process.
  */
 export async function guardAgainstForeignServer({
-  hanaHome,
+  lingxiHome,
   probeImpl = probeServerInfo,
-}: { hanaHome: string; probeImpl?: typeof probeServerInfo }): Promise<{ blocked: boolean; message: string | null }> {
-  const local = readLocalServerInfo({ hanaHome, checkProcess: false });
+}: { lingxiHome: string; probeImpl?: typeof probeServerInfo }): Promise<{ blocked: boolean; message: string | null }> {
+  const local = readLocalServerInfo({ lingxiHome, checkProcess: false });
   if (!local.ok) return { blocked: false, message: null };
   const probe = await probeImpl({ info: local.info });
   if (!isForeignServerBlocking(probe.status)) return { blocked: false, message: null };
@@ -138,7 +138,7 @@ export async function guardAgainstForeignServer({
 /**
  * Builds the env object `hana serve` spawns its server child with, applying
  * the `--allow-data-downgrade` override (threaded to the child as
- * `HANA_ALLOW_DATA_DOWNGRADE=1`, which server/index.ts's data-epoch gate
+ * `LINGXI_ALLOW_DATA_DOWNGRADE=1`, which server/index.ts's data-epoch gate
  * reads) and printing the accompanying warning. Pure aside from the `warn`
  * side channel, which is injectable so this is testable without capturing
  * real stdout.
@@ -150,7 +150,7 @@ export function buildServeSpawnEnv({
 }: { env: NodeJS.ProcessEnv; allowDataDowngrade: boolean; warn?: (msg: string) => void }): NodeJS.ProcessEnv {
   const spawnEnv: NodeJS.ProcessEnv = { ...env };
   if (allowDataDowngrade) {
-    spawnEnv.HANA_ALLOW_DATA_DOWNGRADE = "1";
+    spawnEnv.LINGXI_ALLOW_DATA_DOWNGRADE = "1";
     warn(
       `${ansi.yellow}--allow-data-downgrade: 已显式接受数据损坏风险，旧内核将放行打开被更高数据 epoch 触碰过的目录。\n`
       + `--allow-data-downgrade: explicitly accepting the data-corruption risk — this older kernel will be `
@@ -177,7 +177,7 @@ export async function spawnServerForeground({
   probeImpl?: typeof probeServerInfo;
   exit?: (code?: number) => any;
 } = {}) {
-  const guard = await guardAgainstForeignServer({ hanaHome: resolveCliHanaHome(env), probeImpl });
+  const guard = await guardAgainstForeignServer({ lingxiHome: resolveCliLingxiHome(env), probeImpl });
   if (guard.blocked) {
     console.error(`${ansi.red}${guard.message}${ansi.reset}`);
     return exit(1);
@@ -202,8 +202,8 @@ export async function startLocalServerAndWait({
   timeoutMs = 30000,
   intervalMs = 250,
 }: { projectRoot?: string; env?: NodeJS.ProcessEnv; timeoutMs?: number; intervalMs?: number } = {}) {
-  const hanaHome = resolveCliHanaHome(env);
-  const existing = readLocalServerInfo({ hanaHome });
+  const lingxiHome = resolveCliLingxiHome(env);
+  const existing = readLocalServerInfo({ lingxiHome });
   if (existing.ok) return existing;
 
   const spec = await resolveServerSpawnSpec({ projectRoot, env, extraArgs: [] });
@@ -216,12 +216,12 @@ export async function startLocalServerAndWait({
 
   const startedAt = Date.now();
   while (Date.now() - startedAt < timeoutMs) {
-    const info = readLocalServerInfo({ hanaHome });
+    const info = readLocalServerInfo({ lingxiHome });
     if (info.ok) return { ...info, started: true, serverMode: spec.mode };
     await delay(intervalMs);
   }
 
-  throw new Error(`HanaAgent Server did not become ready within ${Math.round(timeoutMs / 1000)}s`);
+  throw new Error(`LingxiAgent Server did not become ready within ${Math.round(timeoutMs / 1000)}s`);
 }
 
 function delay(ms: number) {

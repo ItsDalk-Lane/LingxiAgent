@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 
 const helperSourceDir = path.join(
   process.cwd(),
-  "desktop/native/HanaComputerUseHelper/Sources/HanaComputerUseHelper",
+  "desktop/native/LingxiComputerUseHelper/Sources/LingxiComputerUseHelper",
 );
 
 describe("Hana computer-use helper cursor integration", () => {
@@ -27,8 +27,8 @@ describe("Hana computer-use helper cursor integration", () => {
   it("applies Hana runtime cursor overrides inside the helper process", () => {
     const main = fs.readFileSync(path.join(helperSourceDir, "main.swift"), "utf8");
 
-    expect(main).toContain("HANA_AGENT_CURSOR_CONFIG_JSON");
-    expect(main).toContain("applyHanaCursorRuntimeConfig");
+    expect(main).toContain("LINGXI_AGENT_CURSOR_CONFIG_JSON");
+    expect(main).toContain("applyLingxiCursorRuntimeConfig");
     expect(main).toContain("AgentCursor.shared.glideDurationSeconds");
     expect(main).toContain("AgentCursor.shared.dwellAfterClickSeconds");
     expect(main).toContain("AgentCursor.shared.idleHideDelay");

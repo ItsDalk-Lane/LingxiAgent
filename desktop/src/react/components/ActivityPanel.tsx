@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useStore } from '../stores';
 import { usePanel } from '../hooks/use-panel';
-import { hanaFetch } from '../hooks/use-hana-fetch';
+import { lingxiFetch } from '../hooks/use-hana-fetch';
 import { fetchConfig, invalidateConfigCache } from '../hooks/use-config';
 import { loadSessions, switchSession } from '../stores/session-actions';
 import { formatSessionDate, injectCopyButtons, parseMoodFromContent } from '../utils/format';
@@ -128,7 +128,7 @@ export function ActivityPanel() {
   }, [activeAgentId, activeBuckets]);
 
   const loadData = useCallback(() => {
-    hanaFetch('/api/desk/activities')
+    lingxiFetch('/api/desk/activities')
       .then(r => r.json())
       .then(data => setActivities(data.activities || []))
       .catch(err => console.warn('[activity] fetch activities failed:', err));
@@ -144,7 +144,7 @@ export function ActivityPanel() {
     const next = !hbEnabled;
     setHbEnabled(next);
     try {
-      await hanaFetch('/api/config', {
+      await lingxiFetch('/api/config', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ desk: { heartbeat_master: next } }),
@@ -157,7 +157,7 @@ export function ActivityPanel() {
 
   const promoteActivity = useCallback(async (activityId: string) => {
     try {
-      const res = await hanaFetch(`/api/desk/activities/${activityId}/promote`, { method: 'POST' });
+      const res = await lingxiFetch(`/api/desk/activities/${activityId}/promote`, { method: 'POST' });
       const data = await res.json();
       if (data.error || !data.sessionPath) return;
       await loadSessions();
@@ -305,7 +305,7 @@ function ActivityCard({
     setLoading(true);
     setLoadError(false);
 
-    void hanaFetch(`/api/desk/activities/${a.id}/session`)
+    void lingxiFetch(`/api/desk/activities/${a.id}/session`)
       .then(res => res.json())
       .then(data => {
         if (cancelled) return;

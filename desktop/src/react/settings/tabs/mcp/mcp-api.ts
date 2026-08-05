@@ -1,4 +1,4 @@
-import { hanaFetch } from '../../api';
+import { lingxiFetch } from '../../api';
 import type { McpBulkResult, McpConnectorInput, McpState, McpToolPermission } from './types';
 
 /** Mirrors the manager's own default, used only until the first state load lands. */
@@ -20,7 +20,7 @@ async function jsonOrError<T>(res: Response): Promise<T> {
 }
 
 export async function loadMcpState(agentId: string): Promise<McpState> {
-  const res = await hanaFetch(`/api/mcp/state?agentId=${encodeURIComponent(agentId)}`);
+  const res = await lingxiFetch(`/api/mcp/state?agentId=${encodeURIComponent(agentId)}`);
   const data = await jsonOrError<McpState>(res);
   return {
     enabled: data.enabled === true,
@@ -38,7 +38,7 @@ export async function loadMcpState(agentId: string): Promise<McpState> {
 }
 
 export async function setMcpEnabled(enabled: boolean): Promise<void> {
-  const res = await hanaFetch('/api/mcp/settings/enabled', {
+  const res = await lingxiFetch('/api/mcp/settings/enabled', {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ enabled }),
@@ -53,7 +53,7 @@ export async function setMcpEnabled(enabled: boolean): Promise<void> {
 }
 
 export async function addMcpConnector(input: McpConnectorInput): Promise<void> {
-  const res = await hanaFetch('/api/mcp/connectors', {
+  const res = await lingxiFetch('/api/mcp/connectors', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(input),
@@ -70,7 +70,7 @@ export async function addMcpConnector(input: McpConnectorInput): Promise<void> {
  * thrown away with the error.
  */
 export async function addMcpConnectorsBulk(inputs: McpConnectorInput[]): Promise<McpBulkResult[]> {
-  const res = await hanaFetch('/api/mcp/connectors/bulk', {
+  const res = await lingxiFetch('/api/mcp/connectors/bulk', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ connectors: inputs }),
@@ -87,7 +87,7 @@ export async function addMcpConnectorsBulk(inputs: McpConnectorInput[]): Promise
 export async function setMcpDeferSettings(
   patch: { deferEnabled?: boolean; deferThreshold?: number; builtinDeferEnabled?: boolean },
 ): Promise<void> {
-  const res = await hanaFetch('/api/mcp/settings/defer', {
+  const res = await lingxiFetch('/api/mcp/settings/defer', {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(patch),
@@ -96,7 +96,7 @@ export async function setMcpDeferSettings(
 }
 
 export async function updateMcpConnector(connectorId: string, input: McpConnectorInput): Promise<void> {
-  const res = await hanaFetch(`/api/mcp/connectors/${encodeURIComponent(connectorId)}`, {
+  const res = await lingxiFetch(`/api/mcp/connectors/${encodeURIComponent(connectorId)}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(input),
@@ -105,7 +105,7 @@ export async function updateMcpConnector(connectorId: string, input: McpConnecto
 }
 
 export async function removeMcpConnector(connectorId: string): Promise<void> {
-  const res = await hanaFetch(`/api/mcp/connectors/${encodeURIComponent(connectorId)}`, {
+  const res = await lingxiFetch(`/api/mcp/connectors/${encodeURIComponent(connectorId)}`, {
     method: 'DELETE',
   });
   await jsonOrError(res);
@@ -115,7 +115,7 @@ export async function runMcpConnectorAction(
   connectorId: string,
   action: 'start' | 'stop' | 'refresh-tools',
 ): Promise<void> {
-  const res = await hanaFetch(`/api/mcp/connectors/${encodeURIComponent(connectorId)}/${action}`, {
+  const res = await lingxiFetch(`/api/mcp/connectors/${encodeURIComponent(connectorId)}/${action}`, {
     method: 'POST',
   });
   await jsonOrError(res);
@@ -126,7 +126,7 @@ export async function setAgentMcpConnector(
   connectorId: string,
   enabled: boolean,
 ): Promise<void> {
-  const res = await hanaFetch(`/api/mcp/agents/${encodeURIComponent(agentId)}/connectors/${encodeURIComponent(connectorId)}`, {
+  const res = await lingxiFetch(`/api/mcp/agents/${encodeURIComponent(agentId)}/connectors/${encodeURIComponent(connectorId)}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ enabled }),
@@ -154,7 +154,7 @@ export async function setAgentMcpTools(
   connectorId: string,
   tools: Record<string, boolean>,
 ): Promise<void> {
-  const res = await hanaFetch(`/api/mcp/agents/${encodeURIComponent(agentId)}/connectors/${encodeURIComponent(connectorId)}`, {
+  const res = await lingxiFetch(`/api/mcp/agents/${encodeURIComponent(agentId)}/connectors/${encodeURIComponent(connectorId)}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ tools }),
@@ -178,7 +178,7 @@ export async function updateMcpConnectorPolicy(
     pinnedTools?: Record<string, boolean>;
   },
 ): Promise<void> {
-  const res = await hanaFetch(`/api/mcp/connectors/${encodeURIComponent(connectorId)}`, {
+  const res = await lingxiFetch(`/api/mcp/connectors/${encodeURIComponent(connectorId)}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(patch),
@@ -187,27 +187,27 @@ export async function updateMcpConnectorPolicy(
 }
 
 export async function startMcpOAuth(connectorId: string): Promise<{ sessionId: string; url: string }> {
-  const res = await hanaFetch(`/api/mcp/connectors/${encodeURIComponent(connectorId)}/oauth/start`, {
+  const res = await lingxiFetch(`/api/mcp/connectors/${encodeURIComponent(connectorId)}/oauth/start`, {
     method: 'POST',
   });
   return jsonOrError<{ sessionId: string; url: string }>(res);
 }
 
 export async function pollMcpOAuth(sessionId: string): Promise<{ status: string; error?: string }> {
-  const res = await hanaFetch(`/api/mcp/oauth/poll/${encodeURIComponent(sessionId)}`);
+  const res = await lingxiFetch(`/api/mcp/oauth/poll/${encodeURIComponent(sessionId)}`);
   return jsonOrError<{ status: string; error?: string }>(res);
 }
 
 /** Abandon a browser round trip the user gave up on. Saved credentials are untouched. */
 export async function cancelMcpOAuth(connectorId: string): Promise<void> {
-  const res = await hanaFetch(`/api/mcp/connectors/${encodeURIComponent(connectorId)}/oauth/cancel`, {
+  const res = await lingxiFetch(`/api/mcp/connectors/${encodeURIComponent(connectorId)}/oauth/cancel`, {
     method: 'POST',
   });
   await jsonOrError(res);
 }
 
 export async function logoutMcpOAuth(connectorId: string): Promise<void> {
-  const res = await hanaFetch(`/api/mcp/connectors/${encodeURIComponent(connectorId)}/oauth/logout`, {
+  const res = await lingxiFetch(`/api/mcp/connectors/${encodeURIComponent(connectorId)}/oauth/logout`, {
     method: 'POST',
   });
   await jsonOrError(res);

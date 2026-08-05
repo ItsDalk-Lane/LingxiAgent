@@ -4,7 +4,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import { parseCliArgs, helpText } from "./args.ts";
 import { resolveConnection } from "./local-server.ts";
-import { HanaCliClient } from "./client.ts";
+import { LingxiCliClient } from "./client.ts";
 import { printSessions, printStatus, startChat } from "./chat.ts";
 import { spawnServerForeground, startLocalServerAndWait } from "./server-runner.ts";
 import { runBundlePull, runBundleStatus } from "./bundle.ts";
@@ -63,7 +63,7 @@ export async function main(argv = process.argv.slice(2)) {
 
   let connection: any = resolveConnection({ url: args.url, token: args.token });
   if (!connection.ok && shouldAutoStartServer(args)) {
-    console.error(`${ansi.dim}Starting local HanaAgent Server...${ansi.reset}`);
+    console.error(`${ansi.dim}Starting local LingxiAgent Server...${ansi.reset}`);
     connection = await startLocalServerAndWait({ projectRoot: PROJECT_ROOT });
   }
   if (!connection.ok) {
@@ -72,7 +72,7 @@ export async function main(argv = process.argv.slice(2)) {
     return 1;
   }
 
-  const client = new HanaCliClient(connection);
+  const client = new LingxiCliClient(connection);
   if (args.command === "status") {
     await printStatus(client, connection);
     return 0;

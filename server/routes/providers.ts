@@ -23,7 +23,7 @@ import { denySecretMutationWithoutScope, denyWithoutScope } from "../http/capabi
 // ── Models-cache helpers ──
 
 function getCachePath(engine: any) {
-  return path.join(engine.hanakoHome, "models-cache.json");
+  return path.join(engine.lingxiHome, "models-cache.json");
 }
 
 function readModelsCache(engine: any) {

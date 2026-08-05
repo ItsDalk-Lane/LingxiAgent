@@ -16,7 +16,7 @@ const { pathToFileURL } = require("url");
 const FONTS_CSS_FILENAME = "new-warm-paper-fonts.css";
 
 // 生成 HTML 的衬线 / 等宽字体栈实际引用的三族；UI 无衬线走 system-ui，无需注入。
-const HANA_PDF_FONT_FAMILIES = ["EB Garamond", "Noto Serif SC", "JetBrains Mono"];
+const LINGXI_PDF_FONT_FAMILIES = ["EB Garamond", "Noto Serif SC", "JetBrains Mono"];
 
 /**
  * 未注入 renderer artifact 路径时，字体 CSS 的兼容候选目录：
@@ -24,7 +24,7 @@ const HANA_PDF_FONT_FAMILIES = ["EB Garamond", "Noto Serif SC", "JetBrains Mono"
  * - 旧布局：desktop/dist-renderer/themes/（保留给曾把 renderer 放在 app 树内的版本）
  *
  * 当前打包布局的 renderer 是独立 artifact，不在 asar 内；生产路径由 Desktop
- * 通过 HANA_RENDERER_DIST 显式注入，不能在这里从相对位置猜测。
+ * 通过 LINGXI_RENDERER_DIST 显式注入，不能在这里从相对位置猜测。
  */
 function defaultThemesDirCandidates() {
   return [
@@ -54,22 +54,22 @@ function locateThemesDir(candidates = defaultThemesDirCandidates()) {
 /**
  * 解析当前进程应该使用的 themes 目录。
  *
- * HANA_RENDERER_DIST 一旦注入就是生产真值源：错误指针必须显式失败，不能
+ * LINGXI_RENDERER_DIST 一旦注入就是生产真值源：错误指针必须显式失败，不能
  * 静默退回源码或旧 renderer，否则 PDF 会悄悄使用与当前激活内容不一致的字体。
  * 只有完全未注入时，才允许开发 / 旧布局候选。
  */
 function resolveThemesDir({ env = process.env, fallbackCandidates = defaultThemesDirCandidates() } = {}) {
-  const injected = env?.HANA_RENDERER_DIST;
+  const injected = env?.LINGXI_RENDERER_DIST;
   if (injected !== undefined) {
     const rendererDist = String(injected).trim();
     if (!rendererDist || !path.isAbsolute(rendererDist)) {
-      throw new Error(`HANA_RENDERER_DIST must be an absolute path: ${injected}`);
+      throw new Error(`LINGXI_RENDERER_DIST must be an absolute path: ${injected}`);
     }
     const themesDir = path.join(rendererDist, "themes");
     const cssPath = path.join(themesDir, FONTS_CSS_FILENAME);
     if (!hasFontsCss(themesDir)) {
       throw new Error(
-        `HANA_RENDERER_DIST is set to ${rendererDist}, but its Hana font css is missing or not a file: ${cssPath}`,
+        `LINGXI_RENDERER_DIST is set to ${rendererDist}, but its Hana font css is missing or not a file: ${cssPath}`,
       );
     }
     return themesDir;
@@ -134,7 +134,7 @@ function rewriteAndValidateFontUrls(block, { cssPath, fontsDir, family }) {
   return rewritten;
 }
 
-function validatedFontInjectionCss({ themesDir, families = HANA_PDF_FONT_FAMILIES }) {
+function validatedFontInjectionCss({ themesDir, families = LINGXI_PDF_FONT_FAMILIES }) {
   const cssPath = path.join(themesDir, FONTS_CSS_FILENAME);
   const css = fs.readFileSync(cssPath, "utf-8");
   const wanted = new Set(families);
@@ -158,7 +158,7 @@ function validatedFontInjectionCss({ themesDir, families = HANA_PDF_FONT_FAMILIE
 /**
  * 构建 / 装箱入口共用的 fail-closed 资产断言。返回 true 只表示完整验证通过。
  */
-function assertOfficePdfFontAssets({ themesDir, families = HANA_PDF_FONT_FAMILIES } = {}) {
+function assertOfficePdfFontAssets({ themesDir, families = LINGXI_PDF_FONT_FAMILIES } = {}) {
   if (typeof themesDir !== "string" || !themesDir) {
     throw new Error("themesDir is required to validate Hana PDF font assets");
   }
@@ -170,13 +170,13 @@ function assertOfficePdfFontAssets({ themesDir, families = HANA_PDF_FONT_FAMILIE
  * 构建可注入的 @font-face CSS。白名单任一族缺失即抛错：宁可 PDF 转换失败，
  * 也不静默产出回退字体的 PDF。
  */
-function buildFontInjectionCss({ themesDir = resolveThemesDir(), families = HANA_PDF_FONT_FAMILIES } = {}) {
+function buildFontInjectionCss({ themesDir = resolveThemesDir(), families = LINGXI_PDF_FONT_FAMILIES } = {}) {
   return validatedFontInjectionCss({ themesDir, families });
 }
 
 module.exports = {
   FONTS_CSS_FILENAME,
-  HANA_PDF_FONT_FAMILIES,
+  LINGXI_PDF_FONT_FAMILIES,
   assertOfficePdfFontAssets,
   buildFontInjectionCss,
   locateThemesDir,

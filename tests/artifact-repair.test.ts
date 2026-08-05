@@ -49,8 +49,8 @@ describe("artifact-repair: repairSubpaths / computeRepairTargets (pure)", () => 
   });
 
   it("resolves every subpath against the given artifacts root", () => {
-    const targets = computeRepairTargets("/home/.hanako/artifacts");
-    expect(targets).toContain(path.join("/home/.hanako/artifacts", "pointers"));
+    const targets = computeRepairTargets("/home/.lingxi/artifacts");
+    expect(targets).toContain(path.join("/home/.lingxi/artifacts", "pointers"));
     expect(targets.some((t: string) => t.endsWith("rollout-id"))).toBe(false);
   });
 });

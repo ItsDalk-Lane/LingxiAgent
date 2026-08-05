@@ -20,7 +20,7 @@ describe("resource ticket service", () => {
     tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "hana-resource-ticket-"));
 
     const issued = issueResourceTicket({
-      hanakoHome: tmpDir,
+      lingxiHome: tmpDir,
       resourceId: "res_sf_1",
       studioId: "studio_1",
       principalId: "principal_device_1",
@@ -38,7 +38,7 @@ describe("resource ticket service", () => {
     expect(fs.existsSync(resourceTicketKeyPath(tmpDir))).toBe(true);
 
     expect(verifyResourceTicket({
-      hanakoHome: tmpDir,
+      lingxiHome: tmpDir,
       ticket: issued.ticket,
       resourceId: "res_sf_1",
       now: "2026-05-17T00:00:30.000Z",
@@ -50,21 +50,21 @@ describe("resource ticket service", () => {
     });
 
     expect(() => verifyResourceTicket({
-      hanakoHome: tmpDir,
+      lingxiHome: tmpDir,
       ticket: issued.ticket,
       resourceId: "res_other",
       now: "2026-05-17T00:00:30.000Z",
     })).toThrow("resource ticket resource mismatch");
 
     expect(() => verifyResourceTicket({
-      hanakoHome: tmpDir,
+      lingxiHome: tmpDir,
       ticket: issued.ticket,
       resourceId: "res_sf_1",
       now: "2026-05-17T00:02:00.000Z",
     })).toThrow("resource ticket expired");
 
     expect(() => verifyResourceTicket({
-      hanakoHome: tmpDir,
+      lingxiHome: tmpDir,
       ticket: "not-a-valid-ticket",
       resourceId: "res_sf_1",
       now: "2026-05-17T00:00:30.000Z",
@@ -72,14 +72,14 @@ describe("resource ticket service", () => {
 
     const [body] = issued.ticket.split(".");
     expect(() => verifyResourceTicket({
-      hanakoHome: tmpDir,
+      lingxiHome: tmpDir,
       ticket: `${body}.bad-signature`,
       resourceId: "res_sf_1",
       now: "2026-05-17T00:00:30.000Z",
     })).toThrow("resource ticket signature invalid");
 
     expect(() => verifyResourceTicket({
-      hanakoHome: tmpDir,
+      lingxiHome: tmpDir,
       ticket: issued.ticket,
       resourceId: "res_sf_1",
       now: "not-a-date",

@@ -2,12 +2,12 @@
 
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { hanaFetch } from '../../hooks/use-hana-fetch';
+import { lingxiFetch } from '../../hooks/use-hana-fetch';
 import { ThinkingLevelButton } from '../../components/input/ThinkingLevelButton';
 import { useStore } from '../../stores';
 
 vi.mock('../../hooks/use-hana-fetch', () => ({
-  hanaFetch: vi.fn(),
+  lingxiFetch: vi.fn(),
 }));
 
 vi.mock('../../hooks/use-config', () => ({
@@ -48,7 +48,7 @@ describe('ThinkingLevelButton', () => {
   });
 
   it('saves thinking changes to the current session when a session is active', async () => {
-    vi.mocked(hanaFetch).mockResolvedValueOnce(jsonResponse({ thinkingLevel: 'high' }));
+    vi.mocked(lingxiFetch).mockResolvedValueOnce(jsonResponse({ thinkingLevel: 'high' }));
     useStore.setState({
       currentSessionPath: '/session/a.jsonl',
       pendingNewSession: false,
@@ -60,7 +60,7 @@ describe('ThinkingLevelButton', () => {
     fireEvent.click(optionForText('深度'));
 
     await waitFor(() => {
-      expect(hanaFetch).toHaveBeenCalledWith('/api/session-thinking-level', expect.objectContaining({
+      expect(lingxiFetch).toHaveBeenCalledWith('/api/session-thinking-level', expect.objectContaining({
         method: 'POST',
         body: JSON.stringify({ sessionPath: '/session/a.jsonl', level: 'high' }),
       }));
@@ -69,7 +69,7 @@ describe('ThinkingLevelButton', () => {
   });
 
   it('saves pending new-session thinking changes as the model default draft', async () => {
-    vi.mocked(hanaFetch).mockResolvedValueOnce(jsonResponse({ ok: true, thinkingLevel: 'high' }));
+    vi.mocked(lingxiFetch).mockResolvedValueOnce(jsonResponse({ ok: true, thinkingLevel: 'high' }));
     const onChange = vi.fn();
 
     const { container } = render(<ThinkingLevelButton level="medium" onChange={onChange} availableLevels={['off', 'medium', 'high']} />);
@@ -77,7 +77,7 @@ describe('ThinkingLevelButton', () => {
     fireEvent.click(optionForText('深度'));
 
     await waitFor(() => expect(onChange).toHaveBeenCalledWith('high'));
-    expect(hanaFetch).toHaveBeenCalledWith('/api/session-thinking-level', expect.objectContaining({
+    expect(lingxiFetch).toHaveBeenCalledWith('/api/session-thinking-level', expect.objectContaining({
       method: 'POST',
       body: JSON.stringify({ level: 'high' }),
     }));
@@ -103,7 +103,7 @@ describe('ThinkingLevelButton', () => {
   });
 
   it('shows and saves Max for models that support the deep thinking tier', async () => {
-    vi.mocked(hanaFetch).mockResolvedValueOnce(jsonResponse({ ok: true, thinkingLevel: 'max' }));
+    vi.mocked(lingxiFetch).mockResolvedValueOnce(jsonResponse({ ok: true, thinkingLevel: 'max' }));
     const onChange = vi.fn();
 
     const { container } = render(<ThinkingLevelButton level="medium" onChange={onChange} availableLevels={['off', 'medium', 'high', 'max']} />);
@@ -116,7 +116,7 @@ describe('ThinkingLevelButton', () => {
     fireEvent.click(optionForText('Max'));
 
     await waitFor(() => expect(onChange).toHaveBeenCalledWith('max'));
-    expect(hanaFetch).toHaveBeenCalledWith('/api/session-thinking-level', expect.objectContaining({
+    expect(lingxiFetch).toHaveBeenCalledWith('/api/session-thinking-level', expect.objectContaining({
       method: 'POST',
       body: JSON.stringify({ level: 'max' }),
     }));

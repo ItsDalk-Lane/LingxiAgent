@@ -301,9 +301,9 @@ describe("office plugin tools", () => {
     }));
     const rendererDist = path.join(tempDir, "active-renderer");
     const helperEnv = {
-      HANA_DESKTOP_EXEC_PATH: "/Applications/HanaAgent.app/Contents/MacOS/HanaAgent",
-      HANA_DESKTOP_IS_PACKAGED: "1",
-      HANA_RENDERER_DIST: rendererDist,
+      LINGXI_DESKTOP_EXEC_PATH: "/Applications/LingxiAgent.app/Contents/MacOS/LingxiAgent",
+      LINGXI_DESKTOP_IS_PACKAGED: "1",
+      LINGXI_RENDERER_DIST: rendererDist,
       ELECTRON_RUN_AS_NODE: "1",
       OFFICE_TEST_MARKER: "preserved",
     };
@@ -325,12 +325,12 @@ describe("office plugin tools", () => {
     );
 
     expect(observedCommand).toMatchObject({
-      command: "/Applications/HanaAgent.app/Contents/MacOS/HanaAgent",
+      command: "/Applications/LingxiAgent.app/Contents/MacOS/LingxiAgent",
       args: ["--hana-office-html-to-pdf", expect.stringMatching(/job\.json$/)],
     });
     expect(observedSpawnOptions).toMatchObject({
       env: {
-        HANA_RENDERER_DIST: rendererDist,
+        LINGXI_RENDERER_DIST: rendererDist,
         OFFICE_TEST_MARKER: "preserved",
       },
       windowsHide: true,
@@ -339,7 +339,7 @@ describe("office plugin tools", () => {
     expect(observedSpawnOptions.env).not.toHaveProperty("ELECTRON_RUN_AS_NODE");
     expect(helperEnv.ELECTRON_RUN_AS_NODE).toBe("1");
     expect(fs.readFileSync(result.outputPath, "utf-8")).toContain("%PDF-1.4");
-    expect(observedJob).toMatchObject({ embedHanaFonts: true });
+    expect(observedJob).toMatchObject({ embedLingxiFonts: true });
     expect(stageFile).toHaveBeenCalledWith({
       sessionPath: "/sessions/office.jsonl",
       filePath: result.outputPath,
@@ -381,8 +381,8 @@ describe("office plugin tools", () => {
       },
       {
         env: {
-          HANA_DESKTOP_EXEC_PATH: "/Applications/HanaAgent.app/Contents/MacOS/HanaAgent",
-          HANA_DESKTOP_IS_PACKAGED: "1",
+          LINGXI_DESKTOP_EXEC_PATH: "/Applications/LingxiAgent.app/Contents/MacOS/LingxiAgent",
+          LINGXI_DESKTOP_IS_PACKAGED: "1",
         },
         spawn: fakeSpawn,
       },
@@ -397,7 +397,7 @@ describe("office plugin tools", () => {
     expect(result.sessionFile).toMatchObject({ fileId: "sf_pdf", sessionId: "sess_office_pdf" });
   });
 
-  it("lets callers opt out of Hana font embedding via embedHanaFonts:false", async () => {
+  it("lets callers opt out of Hana font embedding via embedLingxiFonts:false", async () => {
     let observedJob = null;
     const fakeSpawn = vi.fn((command, args) => {
       const child: any = new EventEmitter();
@@ -415,14 +415,14 @@ describe("office plugin tools", () => {
     });
 
     await renderHtmlToPdf(
-      { html: "<h1>plain</h1>", embedHanaFonts: false },
+      { html: "<h1>plain</h1>", embedLingxiFonts: false },
       { dataDir: tempDir },
       {
-        env: { HANA_DESKTOP_EXEC_PATH: "/usr/local/bin/electron" },
+        env: { LINGXI_DESKTOP_EXEC_PATH: "/usr/local/bin/electron" },
         spawn: fakeSpawn,
       },
     );
 
-    expect(observedJob).toMatchObject({ embedHanaFonts: false });
+    expect(observedJob).toMatchObject({ embedLingxiFonts: false });
   });
 });

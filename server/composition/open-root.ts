@@ -85,7 +85,7 @@ export function registerOpenRoutes(app: Hono, ctx: CompositionContext): void {
   app.route("", chatWsRoute);
   app.route("/api", createWebSocketAuthRoute({ ticketService: wsTicketService }));
   app.route("/api", createWebAuthRoute({
-    hanakoHome: engine.hanakoHome,
+    lingxiHome: engine.lingxiHome,
     authService: serverAuthService,
     getConnectionKind: (c: any) => c.get("transportConnectionKind"),
     getRuntimeContext: () => engine.getRuntimeContext(),
@@ -131,7 +131,7 @@ export function registerOpenRoutes(app: Hono, ctx: CompositionContext): void {
   app.route("/api", createUsageRoute(engine));
   app.route("/api", createSpeechRecognitionRoute(engine));
   app.route("/api", createServerIdentityRoute({
-    hanakoHome: engine.hanakoHome,
+    lingxiHome: engine.lingxiHome,
     appVersion,
     getRuntimeContext: () => engine.getRuntimeContext(),
   } as any));

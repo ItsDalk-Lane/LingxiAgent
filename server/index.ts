@@ -1,11 +1,11 @@
 /**
- * HanaAgent Server — HTTP + WebSocket API
+ * LingxiAgent Server — HTTP + WebSocket API
  *
  * 启动方式（本文件只导出 startServer，自身不自举，由上层组合入口调用）：
  *   npm run server                              （独立运行，经 launch.js）
  *   Electron main.cjs spawn server/bootstrap.ts （桌面应用内嵌）
  *
- * 无 IPC 通道：就绪与端口写入 HANA_HOME/server-info.json，桌面端轮询该文件。
+ * 无 IPC 通道：就绪与端口写入 LINGXI_HOME/server-info.json，桌面端轮询该文件。
  */
 import crypto from "crypto";
 import fs from "fs";
@@ -17,7 +17,7 @@ import { createNodeWebSocket } from "@hono/node-ws";
 import { WebSocketServer } from "ws";
 import { AppError } from "../shared/errors.ts";
 import { errorBus } from "../shared/error-bus.ts";
-import { HanaEngine } from "../core/engine.ts";
+import { LingxiEngine } from "../core/engine.ts";
 import { ensureFirstRun } from "../core/first-run.ts";
 import { initDebugLog, createModuleLogger } from "../lib/debug-log.ts";
 import { redactLogLabel, redactLogText } from "../lib/log-redactor.ts";
@@ -34,7 +34,7 @@ import { resolveServerListenOptions, saveServerNetworkConfig } from "../core/ser
 import {
   decideLoopbackBindFallback,
   ensureServerNetworkConfigWithPortSelection,
-  isHanaServerListeningOnPort,
+  isLingxiServerListeningOnPort,
   selectLoopbackListenPort,
 } from "../core/server-port-selection.ts";
 import { isCorsOriginAllowed } from "./http/cors-policy.ts";
@@ -69,7 +69,7 @@ import { coordinateDataEpochStartup, describeDataEpochStartupBlock } from "../co
 import { createDataEpochCheckpointProvider } from "../core/data-epoch-checkpoint-provider.ts";
 // internal-browser WS is handled directly via raw ws.WebSocketServer in the
 // upgrade handler below (WsTransport needs raw ws .on()/.off() methods)
-// BrowserManager 用 setter 注入 hanakoHome/sessionIdResolver（而非在别处构造时
+// BrowserManager 用 setter 注入 lingxiHome/sessionIdResolver（而非在别处构造时
 // 直接引用 engine），是原有的循环依赖规避手法；startServer() 内调用这两个
 // setter 的位置不变，只是 import 声明本身按 ESM 规范提到模块顶层（import 语句
 // 本就总是被提升到模块求值最前面，写在函数体外/内对求值顺序无影响，只是
@@ -160,7 +160,7 @@ export async function startServer(root: CompositionRoot = {}): Promise<void> {
       // 非蓝图错误码下对 /api/health 做无意义的额外网络请求。
       const fallbackEligible =
         BIND_FALLBACK_CANDIDATE_CODES.has(errCode) && networkMode === "loopback" && !envPortPinned;
-      const hanaOnPort = fallbackEligible ? await isHanaServerListeningOnPort({ port, host }) : false;
+      const hanaOnPort = fallbackEligible ? await isLingxiServerListeningOnPort({ port, host }) : false;
       const decision = decideLoopbackBindFallback({ errCode, networkMode, envPortPinned, hanaOnPort });
 
       if (decision === "fallback") {
@@ -171,7 +171,7 @@ export async function startServer(root: CompositionRoot = {}): Promise<void> {
             log.warn(
               `loopback 端口自愈: ${port} → ${fallbackPort}（原端口 ${errCode}，已写回 server-network.json）`,
             );
-            saveServerNetworkConfig(hanakoHome, { ...config, listenPort: fallbackPort });
+            saveServerNetworkConfig(lingxiHome, { ...config, listenPort: fallbackPort });
             return { boundPort: fallbackPort };
           } catch {
             // 二次 bind 仍失败，走下方原 startupError 路径（用最初的 err）
@@ -182,7 +182,7 @@ export async function startServer(root: CompositionRoot = {}): Promise<void> {
       if (decision === "fail-other-hana") {
         const startupError: any = createPortInUseStartupError(err, { host, port, listenHost, networkMode });
         startupError.startupPayload.suggestions.unshift(
-          "Another HanaAgent server is already listening on this port. If you have a second HanaAgent installation or data directory, give each one a distinct port; if this is a leftover process, quit hana-server from Task Manager.",
+          "Another LingxiAgent server is already listening on this port. If you have a second LingxiAgent installation or data directory, give each one a distinct port; if this is a leftover process, quit hana-server from Task Manager.",
         );
         failStartup(startupError);
       }
@@ -248,10 +248,10 @@ export async function startServer(root: CompositionRoot = {}): Promise<void> {
     return err;
   }
 
-  // 用户数据存放在 ~/.hanako/（打包后与产品代码分离）
-  // 开发时可通过 HANA_HOME 环境变量隔离数据目录，如：HANA_HOME=~/.hanako-dev node server/index.js
-  const hanakoHome = resolveHanakoHome(process.env.HANA_HOME);
-  process.env.HANA_HOME = hanakoHome;
+  // 用户数据存放在 ~/.lingxi/（打包后与产品代码分离）
+  // 开发时可通过 LINGXI_HOME 环境变量隔离数据目录，如：LINGXI_HOME=~/.lingxi-dev node server/index.js
+  const lingxiHome = resolveHanakoHome(process.env.LINGXI_HOME);
+  process.env.LINGXI_HOME = lingxiHome;
 
   // 读取版本号
   let appVersion = "?";
@@ -260,8 +260,8 @@ export async function startServer(root: CompositionRoot = {}): Promise<void> {
     appVersion = pkg.version || "?";
   } catch {}
 
-  // ── 同宅互斥闸（同一 HANA_HOME 的内核互斥）──
-  // 必须在任何端口监听、任何 store 打开之前跑：一台机器上的同一 HANA_HOME
+  // ── 同宅互斥闸（同一 LINGXI_HOME 的内核互斥）──
+  // 必须在任何端口监听、任何 store 打开之前跑：一台机器上的同一 LINGXI_HOME
   // 可能被两个内核并发打开（`hana serve` 先起、桌面后启动是最常见的触发
   // 路径），并发读写同一批 SQLite / session 文件会互相覆盖。这里用 token
   // 认证探测（shared/server-info-probe.cjs）确认 server-info.json 记录的
@@ -272,7 +272,7 @@ export async function startServer(root: CompositionRoot = {}): Promise<void> {
   // 秒级窗口不设防（与 Postgres postmaster.pid 的取舍一致），且默认端口
   // 相同时后到者的 listen() 会天然 EADDRINUSE。
   {
-    const serverInfoPath = path.join(hanakoHome, "server-info.json");
+    const serverInfoPath = path.join(lingxiHome, "server-info.json");
     let existingServerInfo: any = null;
     try {
       existingServerInfo = JSON.parse(fs.readFileSync(serverInfoPath, "utf-8"));
@@ -296,9 +296,9 @@ export async function startServer(root: CompositionRoot = {}): Promise<void> {
   // 降级覆盖：半途迁移只能由显式维护流程处理，普通启动不会自动续跑、回滚
   // 或猜测数据处于哪个版本。
   {
-    const allowDataDowngrade = process.env.HANA_ALLOW_DATA_DOWNGRADE === "1";
+    const allowDataDowngrade = process.env.LINGXI_ALLOW_DATA_DOWNGRADE === "1";
     const epochResult = await coordinateDataEpochStartup({
-      homeDir: hanakoHome,
+      homeDir: lingxiHome,
       ownEpoch: DATA_EPOCH,
       ownVersion: appVersion,
       allowDowngrade: allowDataDowngrade,
@@ -322,7 +322,7 @@ export async function startServer(root: CompositionRoot = {}): Promise<void> {
       // data: a readable higher stamp or a readable transition targeting a
       // higher epoch. Once this build itself advances beyond epoch 1, every
       // coordinator failure is strict again.
-      const stampRead = readDataEpochStamp(hanakoHome);
+      const stampRead = readDataEpochStamp(lingxiHome);
       const hasHigherStamp = stampRead.status === "ok"
         && stampRead.stamp.minimumReaderEpoch > DATA_EPOCH;
       const hasHigherTransition = Number.isInteger(epochResult.toEpoch)
@@ -330,7 +330,7 @@ export async function startServer(root: CompositionRoot = {}): Promise<void> {
       const mustBlock = DATA_EPOCH > 1 || hasHigherStamp || hasHigherTransition;
       if (!mustBlock) {
         console.warn(
-          `HANA_DATA_EPOCH_BASELINE_WARNING reason=${epochResult.reason}\n`
+          `LINGXI_DATA_EPOCH_BASELINE_WARNING reason=${epochResult.reason}\n`
           + `[data-epoch] epoch=1 baseline metadata could not be trusted (${epochResult.detail}); `
           + "no higher-epoch evidence was found, so ordinary startup will continue.",
         );
@@ -340,8 +340,8 @@ export async function startServer(root: CompositionRoot = {}): Promise<void> {
         // blocked = 旧内核撞上更高印章;其余 reason(incomplete-transition /
         // corrupt-* 等)统一归入 transition-incomplete 分支。人读文案不变。
         const marker = epochResult.reason === "epoch-downgrade-blocked"
-          ? "HANA_DATA_EPOCH_BLOCKED"
-          : "HANA_DATA_EPOCH_TRANSITION_INCOMPLETE";
+          ? "LINGXI_DATA_EPOCH_BLOCKED"
+          : "LINGXI_DATA_EPOCH_TRANSITION_INCOMPLETE";
         console.error(`${marker} reason=${epochResult.reason}`);
         console.error(describeDataEpochStartupBlock(epochResult));
         process.exit(1);
@@ -349,13 +349,13 @@ export async function startServer(root: CompositionRoot = {}): Promise<void> {
     }
   }
 
-  const SERVER_TOKEN = process.env.HANA_TOKEN || crypto.randomBytes(16).toString("hex");
-  const envPort = Number.parseInt(process.env.HANA_PORT || "", 10);
+  const SERVER_TOKEN = process.env.LINGXI_TOKEN || crypto.randomBytes(16).toString("hex");
+  const envPort = Number.parseInt(process.env.LINGXI_PORT || "", 10);
   const envPortPinned = Number.isInteger(envPort) && envPort >= 0;
   if (!envPortPinned) {
-    await ensureServerNetworkConfigWithPortSelection(hanakoHome, { log: (msg) => log.log(msg) });
+    await ensureServerNetworkConfigWithPortSelection(lingxiHome, { log: (msg) => log.log(msg) });
   }
-  const serverNetwork = resolveServerListenOptions(hanakoHome);
+  const serverNetwork = resolveServerListenOptions(lingxiHome);
   const port = envPortPinned ? envPort : serverNetwork.port;
   const serverRuntimeState = {
     mode: serverNetwork.mode,
@@ -416,7 +416,7 @@ export async function startServer(root: CompositionRoot = {}): Promise<void> {
 
   // ── 首次运行播种 ──
   log.log("① ensureFirstRun...");
-  const firstRunReport = ensureFirstRun(hanakoHome, productDir);
+  const firstRunReport = ensureFirstRun(lingxiHome, productDir);
   for (const invalid of firstRunReport.invalidAgentDirs) {
     log.warn(`① 发现无效 agent 目录（已保留原目录、不会载入）: "${invalid.id}" (${invalid.reason})`);
   }
@@ -426,21 +426,21 @@ export async function startServer(root: CompositionRoot = {}): Promise<void> {
   log.log("① ensureFirstRun 完成");
 
   log.log("① ensureLocalIdentityRegistries...");
-  ensureLocalIdentityRegistries(hanakoHome);
+  ensureLocalIdentityRegistries(lingxiHome);
   log.log("① ensureLocalIdentityRegistries 完成");
 
   // ── 初始化 Debug 日志 ──
-  const dlog = initDebugLog(path.join(hanakoHome, "logs"));
+  const dlog = initDebugLog(path.join(lingxiHome, "logs"));
 
   // ── 初始化引擎 ──
-  log.log("② 创建 HanaEngine...");
-  const engine: any = new HanaEngine({
-    hanakoHome,
+  log.log("② 创建 LingxiEngine...");
+  const engine: any = new LingxiEngine({
+    lingxiHome,
     productDir,
     appVersion,
     builtinMediaAdapters: root.builtinMediaAdapters,
   } as any);
-  log.log("② HanaEngine 构造完成，开始 init...");
+  log.log("② LingxiEngine 构造完成，开始 init...");
   await engine.init((msg: any) => log.log(msg));
   log.log("② engine.init 完成");
   dlog.log("server", "engine initialized");
@@ -453,7 +453,7 @@ export async function startServer(root: CompositionRoot = {}): Promise<void> {
   outboundProxyRuntime.apply(engine.getNetworkProxy());
 
   // 注入依赖给 BrowserManager（避免循环依赖）
-  BrowserManager.setHanakoHome(engine.hanakoHome);
+  BrowserManager.setHanakoHome(engine.lingxiHome);
   BrowserManager.setSessionIdResolver((sessionPath: string) => engine.getSessionIdForPath?.(sessionPath) || null);
 
   // 注：任何 createSession 都必须在相关 Pi SDK extension factory 注册完之后。
@@ -480,14 +480,14 @@ export async function startServer(root: CompositionRoot = {}): Promise<void> {
   // lifecycles can create or resume sessions through session:send.
   const deferredResultStore = new DeferredResultStore(
     hub.eventBus,
-    path.join(hanakoHome, ".ephemeral", "deferred-tasks.json"),
+    path.join(lingxiHome, ".ephemeral", "deferred-tasks.json"),
     { getSessionIdForPath: (sessionPath: string) => engine.getSessionIdForPath?.(sessionPath) || null },
   );
   engine.setDeferredResultStore(deferredResultStore);
   registerDeferredResultBusHandlers(hub.eventBus, deferredResultStore);
 
   const loopStore = new LoopStore(
-    path.join(hanakoHome, ".ephemeral", "loop-state.json"),
+    path.join(lingxiHome, ".ephemeral", "loop-state.json"),
     { log },
   );
 
@@ -569,7 +569,7 @@ export async function startServer(root: CompositionRoot = {}): Promise<void> {
   loadLocale(engine.getLocale?.() || engine.config?.locale);
 
   const serverAuthService = createServerAuthService({
-    hanakoHome,
+    lingxiHome,
     loopbackToken: SERVER_TOKEN,
     runtimeContext: () => engine.getRuntimeContext(),
   });
@@ -579,8 +579,8 @@ export async function startServer(root: CompositionRoot = {}): Promise<void> {
   const app = new Hono();
   const { injectWebSocket, upgradeWebSocket } = createNodeWebSocket({ app });
 
-  // CORS（默认允许 localhost 开发前端和 production Electron file:// 前端；HANA_CORS_ORIGIN 可收紧到单一来源）+ 鉴权
-  const corsAllowedOrigin = process.env.HANA_CORS_ORIGIN;
+  // CORS（默认允许 localhost 开发前端和 production Electron file:// 前端；LINGXI_CORS_ORIGIN 可收紧到单一来源）+ 鉴权
+  const corsAllowedOrigin = process.env.LINGXI_CORS_ORIGIN;
   app.use("*", async (c: any, next: any) => {
     const origin = c.req.header("origin") || "";
     const isAllowed = isCorsOriginAllowed({
@@ -702,13 +702,13 @@ export async function startServer(root: CompositionRoot = {}): Promise<void> {
   engine.setConfirmStore(confirmStore);
 
   const subagentRunStore = new SubagentRunStore(
-    path.join(hanakoHome, "subagent-runs.json"),
+    path.join(lingxiHome, "subagent-runs.json"),
     { getSessionIdForPath: (sessionPath: string) => engine.getSessionIdForPath?.(sessionPath) || null },
   );
   engine.setSubagentRunStore(subagentRunStore);
 
   const subagentThreadStore = new SubagentThreadStore(
-    path.join(hanakoHome, "subagent-threads.json"),
+    path.join(lingxiHome, "subagent-threads.json"),
     { getSessionIdForPath: (sessionPath: string) => engine.getSessionIdForPath?.(sessionPath) || null },
   );
   engine.setSubagentThreadStore(subagentThreadStore);
@@ -719,7 +719,7 @@ export async function startServer(root: CompositionRoot = {}): Promise<void> {
   // 再交给 ActivityHub 回灌（构造时把遗留 running 判孤儿、标 failed）。
   const WORKFLOW_ACTIVITY_TTL_MS = 72 * 60 * 60 * 1000;
   const workflowActivityStore = new WorkflowActivityStore(
-    path.join(hanakoHome, "workflow-activity.json"),
+    path.join(lingxiHome, "workflow-activity.json"),
   );
   workflowActivityStore.prune(WORKFLOW_ACTIVITY_TTL_MS, Date.now());
   const activityHub = new ActivityHub(
@@ -837,7 +837,7 @@ export async function startServer(root: CompositionRoot = {}): Promise<void> {
   // 时序要求：所有 framework extension + plugin extension 都注册完之后再 create，
   // 否则 pi SDK ExtensionRunner 构造时拿不到这些 factory，extension 不会挂到
   // startup session 上（Codex 评审发现的 issue#437 部分失效场景）。
-  const shouldCreateStartupSession = process.env.HANA_CREATE_STARTUP_SESSION !== "0";
+  const shouldCreateStartupSession = process.env.LINGXI_CREATE_STARTUP_SESSION !== "0";
   if (shouldCreateStartupSession && engine.currentModel) {
     log.log("③ 创建 session...");
     await engine.createSession();
@@ -950,7 +950,7 @@ export async function startServer(root: CompositionRoot = {}): Promise<void> {
   registerLoopBusHandlers(hub.eventBus, () => engine.loopController);
   engine.loopController?.recoverAtBoot();
 
-  // `/mobile`、`/desktop` 网页客户端入口的供货模式判定（HANA_RENDERER_DIST /
+  // `/mobile`、`/desktop` 网页客户端入口的供货模式判定（LINGXI_RENDERER_DIST /
   // desktop/dist-renderer / guide 三分支）已随路由挂载移入
   // composition/open-root.ts 的 decideMobileStaticRouteOptions；这里不再重复。
 
@@ -998,7 +998,7 @@ export async function startServer(root: CompositionRoot = {}): Promise<void> {
       // owns anything, and the fields below it describe that same agent.
       agentId: engine.currentAgentId || null,
       agent: engine.agentName,
-      agentYuan: engine.agent?.config?.agent?.yuan || "hanako",
+      agentYuan: engine.agent?.config?.agent?.yuan || "lingxi",
       user: engine.userName,
       model: engine.currentModel?.name,
       avatars,
@@ -1160,11 +1160,11 @@ export async function startServer(root: CompositionRoot = {}): Promise<void> {
       const bm = BrowserManager.instance();
       bm.setWsTransport(ws);
 
-      // 调试：记录浏览器 WS 消息往返（异步写入 + 缓冲，仅 HANA_DEBUG=1 时启用）
-      const _bwsEnabled = process.env.HANA_DEBUG === "1";
+      // 调试：记录浏览器 WS 消息往返（异步写入 + 缓冲，仅 LINGXI_DEBUG=1 时启用）
+      const _bwsEnabled = process.env.LINGXI_DEBUG === "1";
       let _bwsBuf = "";
       let _bwsFlushTimer = null;
-      const _bwsLogPath = path.join(hanakoHome, "browser-ws.log");
+      const _bwsLogPath = path.join(lingxiHome, "browser-ws.log");
       let _bwsFlushChain = Promise.resolve();
       const _bwsFlush = () => {
         if (!_bwsBuf) return;
@@ -1221,14 +1221,14 @@ export async function startServer(root: CompositionRoot = {}): Promise<void> {
     const actualPort = address.port;
     serverRuntimeState.actualPort = actualPort;
 
-    log.log(`HanaAgent Server 运行在 http://${host}:${actualPort}`);
+    log.log(`LingxiAgent Server 运行在 http://${host}:${actualPort}`);
     dlog.log("server", `listening on :${actualPort}`);
 
     // 写 server-info 文件，供 Electron 检测复用或外部工具查询。
     // 文件含 128-bit loopback SERVER_TOKEN (本机最高权限凭据)，
     // 必须 owner-only 可读 (0o600)，否则共享主机上的另一 UID / 沙箱外的
     // 非授权进程能读到 token 后冒充 owner 调任意 LOCAL_ONLY 路由。
-    const serverInfoPath = path.join(hanakoHome, "server-info.json");
+    const serverInfoPath = path.join(lingxiHome, "server-info.json");
     try {
       const runtimeContext = engine.getRuntimeContext?.() || {};
       fs.writeFileSync(serverInfoPath, JSON.stringify({
@@ -1243,8 +1243,8 @@ export async function startServer(root: CompositionRoot = {}): Promise<void> {
         network: createServerRuntimeNetworkSummary(),
         token: SERVER_TOKEN,
         version: appVersion,
-        ownerKind: process.env.HANA_SERVER_OWNER === "desktop" ? "desktop" : "standalone",
-        ownerPid: Number.parseInt(process.env.HANA_SERVER_OWNER_PID || "", 10) || null,
+        ownerKind: process.env.LINGXI_SERVER_OWNER === "desktop" ? "desktop" : "standalone",
+        ownerPid: Number.parseInt(process.env.LINGXI_SERVER_OWNER_PID || "", 10) || null,
         serverId: runtimeContext.serverId || null,
         serverNodeId: runtimeContext.serverNodeId || runtimeContext.serverId || null,
         studioId: runtimeContext.studioId || null,
@@ -1332,7 +1332,7 @@ export async function startServer(root: CompositionRoot = {}): Promise<void> {
     }
 
     clearTimeout(forceTimer);
-    try { fs.unlinkSync(path.join(hanakoHome, "server-info.json")); } catch {}
+    try { fs.unlinkSync(path.join(lingxiHome, "server-info.json")); } catch {}
     process.exit(0);
   }
 

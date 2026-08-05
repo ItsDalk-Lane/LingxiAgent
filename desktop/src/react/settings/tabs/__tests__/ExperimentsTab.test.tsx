@@ -6,7 +6,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ExperimentsTab } from '../ExperimentsTab';
 import { useSettingsStore } from '../../store';
 
-const hanaFetchMock = vi.fn(async (url: string, init?: RequestInit) => {
+const lingxiFetchMock = vi.fn(async (url: string, init?: RequestInit) => {
   if (url === '/api/preferences/computer-use') {
     return new Response(JSON.stringify({
       selectedProviderId: 'macos:cua',
@@ -71,7 +71,7 @@ const hanaFetchMock = vi.fn(async (url: string, init?: RequestInit) => {
 });
 
 vi.mock('../../api', () => ({
-  hanaFetch: (...args: [string, RequestInit?]) => hanaFetchMock(...args),
+  lingxiFetch: (...args: [string, RequestInit?]) => lingxiFetchMock(...args),
 }));
 
 describe('ExperimentsTab', () => {
@@ -82,7 +82,7 @@ describe('ExperimentsTab', () => {
 
   afterEach(() => {
     cleanup();
-    hanaFetchMock.mockClear();
+    lingxiFetchMock.mockClear();
     vi.clearAllMocks();
   });
 
@@ -114,7 +114,7 @@ describe('ExperimentsTab', () => {
     fireEvent.click(screen.getByRole('option', { name: 'settings.experiments.compaction.piCompatible' }));
 
     await waitFor(() => {
-      expect(hanaFetchMock).toHaveBeenCalledWith(
+      expect(lingxiFetchMock).toHaveBeenCalledWith(
         '/api/experiments/session.compaction_mode',
         expect.objectContaining({
           method: 'PATCH',
@@ -135,7 +135,7 @@ describe('ExperimentsTab', () => {
     fireEvent.click(toggle);
 
     await waitFor(() => {
-      expect(hanaFetchMock).toHaveBeenCalledWith(
+      expect(lingxiFetchMock).toHaveBeenCalledWith(
         '/api/experiments/provider.deepseek_roleplay_reasoning_patch',
         expect.objectContaining({
           method: 'PATCH',

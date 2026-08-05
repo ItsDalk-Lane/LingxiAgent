@@ -5,11 +5,11 @@ import React from 'react';
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { WidgetButtons } from '../../components/plugin/WidgetButtons';
-import { hanaFetch } from '../../hooks/use-hana-fetch';
+import { lingxiFetch } from '../../hooks/use-hana-fetch';
 import { useStore } from '../../stores';
 
 vi.mock('../../hooks/use-hana-fetch', () => ({
-  hanaFetch: vi.fn(),
+  lingxiFetch: vi.fn(),
 }));
 
 function jsonResponse(data: unknown, status = 200): Response {
@@ -22,8 +22,8 @@ function jsonResponse(data: unknown, status = 200): Response {
 describe('WidgetButtons', () => {
   beforeEach(() => {
     window.t = ((key: string) => key) as typeof window.t;
-    vi.mocked(hanaFetch).mockReset();
-    vi.mocked(hanaFetch).mockImplementation(async () => jsonResponse({ ok: true }));
+    vi.mocked(lingxiFetch).mockReset();
+    vi.mocked(lingxiFetch).mockImplementation(async () => jsonResponse({ ok: true }));
     useStore.setState({
       currentTab: 'chat',
       locale: 'zh-CN',

@@ -32,7 +32,7 @@ describe("MountAwareFileService", () => {
     });
 
     const service = new MountAwareFileService({
-      hanakoHome: tmpDir,
+      lingxiHome: tmpDir,
       defaultRoot,
       studioId: "studio_1",
     });
@@ -64,7 +64,7 @@ describe("MountAwareFileService", () => {
     const defaultRoot = path.join(tmpDir, "default");
     fs.mkdirSync(defaultRoot, { recursive: true });
     const service = new MountAwareFileService({
-      hanakoHome: tmpDir,
+      lingxiHome: tmpDir,
       defaultRoot,
       studioId: "studio_1",
     });
@@ -93,7 +93,7 @@ describe("MountAwareFileService", () => {
     });
 
     const disclosing = new MountAwareFileService({
-      hanakoHome: tmpDir,
+      lingxiHome: tmpDir,
       defaultRoot,
       studioId: "studio_1",
       discloseNativeRoot: true,
@@ -109,7 +109,7 @@ describe("MountAwareFileService", () => {
     });
 
     const closed = new MountAwareFileService({
-      hanakoHome: tmpDir,
+      lingxiHome: tmpDir,
       defaultRoot,
       studioId: "studio_1",
     });
@@ -148,7 +148,7 @@ describe("MountAwareFileService", () => {
       list: vi.fn(async () => ({ items: [] })),
     };
     const service = new MountAwareFileService({
-      hanakoHome: tmpDir,
+      lingxiHome: tmpDir,
       defaultRoot,
       studioId: "studio_1",
       resourceIO,

@@ -4,7 +4,7 @@ import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } fr
 import { useStore } from '../stores';
 import { sessionScopedValue } from '../stores/session-slice';
 import { fetchConfig } from '../hooks/use-config';
-import { hanaFetch } from '../hooks/use-hana-fetch';
+import { lingxiFetch } from '../hooks/use-hana-fetch';
 import { useI18n } from '../hooks/use-i18n';
 import { renderMarkdown } from '../utils/markdown';
 import { findOpenToolIndex, toolCallFromStartEvent, toolCallIdFromEvent } from '../utils/tool-call-identity';
@@ -425,7 +425,7 @@ export function AgentPhoneSessionPreview({ sessionPath, agentId, agentYuan }: {
     active: !!sessionPath,
     stickyThreshold: 32,
   });
-  const moodYuan = agentYuan || 'hanako';
+  const moodYuan = agentYuan || 'lingxi';
 
   // Switch landing runs in the layout phase (before paint) so the panel never shows a wrong
   // scrollTop frame. Only arm an instant landing when the target session has no messages yet:
@@ -809,7 +809,7 @@ export function ChannelAgentSettingsPanel() {
 
   useEffect(() => {
     if (models.length > 0) return;
-    void hanaFetch('/api/models')
+    void lingxiFetch('/api/models')
       .then(res => res.ok ? res.json() : null)
       .then(data => {
         if (data?.models) useStore.setState({ models: data.models });

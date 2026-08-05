@@ -207,21 +207,21 @@ describe("build-server-artifact: dual-kind seed manifest shape", () => {
 });
 
 describe("build-server-artifact: keyset resolution", () => {
-  it("defaults to the repo pinned keyset when HANA_SIGN_KEYSET is unset", () => {
+  it("defaults to the repo pinned keyset when LINGXI_SIGN_KEYSET is unset", () => {
     const { keyset } = resolveBuildKeyset({});
     expect(keyset[0].keyId).toBe("2026a");
   });
 
-  it("uses the HANA_SIGN_KEYSET override file when set", () => {
+  it("uses the LINGXI_SIGN_KEYSET override file when set", () => {
     const root = makeTempDir("hana-keyset-");
     const { keysetPath, keyId } = makeKeypairFiles(root, "override1");
-    const { keyset } = resolveBuildKeyset({ HANA_SIGN_KEYSET: keysetPath });
+    const { keyset } = resolveBuildKeyset({ LINGXI_SIGN_KEYSET: keysetPath });
     expect(keyset[0].keyId).toBe(keyId);
   });
 
-  it("hard-errors when HANA_SIGN_KEYSET points at a missing file", () => {
-    expect(() => resolveBuildKeyset({ HANA_SIGN_KEYSET: "/nonexistent/keyset.json" })).toThrow(
-      /HANA_SIGN_KEYSET/,
+  it("hard-errors when LINGXI_SIGN_KEYSET points at a missing file", () => {
+    expect(() => resolveBuildKeyset({ LINGXI_SIGN_KEYSET: "/nonexistent/keyset.json" })).toThrow(
+      /LINGXI_SIGN_KEYSET/,
     );
   });
 });
@@ -323,7 +323,7 @@ describe("build-server-artifact: packServerArchive (pack-only, no manifest)", ()
     expect(smokeCalled).toBe(false);
   });
 
-  it("passes env down to the darwin signer so HANA_MACHO_SIGN_IDENTITY reaches it (no process.env grabbing)", async () => {
+  it("passes env down to the darwin signer so LINGXI_MACHO_SIGN_IDENTITY reaches it (no process.env grabbing)", async () => {
     const root = makeTempDir("hana-pack-server-");
     const outDir = makeServerTree(root);
     let seenEnv: unknown = null;
@@ -333,7 +333,7 @@ describe("build-server-artifact: packServerArchive (pack-only, no manifest)", ()
       version: "0.381.0",
       platform: "darwin",
       arch: "arm64",
-      env: { HANA_MACHO_SIGN_IDENTITY: "CAFEBABE" },
+      env: { LINGXI_MACHO_SIGN_IDENTITY: "CAFEBABE" },
       log: () => {},
       deps: {
         signMachOFiles: async (_outDir: string, _log: (msg: string) => void, env: unknown) => {
@@ -345,7 +345,7 @@ describe("build-server-artifact: packServerArchive (pack-only, no manifest)", ()
         statSize: () => 1,
       },
     });
-    expect(seenEnv).toEqual({ HANA_MACHO_SIGN_IDENTITY: "CAFEBABE" });
+    expect(seenEnv).toEqual({ LINGXI_MACHO_SIGN_IDENTITY: "CAFEBABE" });
   });
 
   it("does not run the darwin codesign pass for non-darwin targets", async () => {
@@ -493,18 +493,18 @@ describe("build-server-artifact: packDualKindSeed guards and ordering", () => {
     };
   }
 
-  it("hard-errors when HANA_SIGN_KEY is unset (never a silent skip)", async () => {
+  it("hard-errors when LINGXI_SIGN_KEY is unset (never a silent skip)", async () => {
     const root = makeTempDir("hana-dual-");
     await expect(
       packDualKindSeed({ ...baseOpts(root), env: {} }),
-    ).rejects.toThrow(/HANA_SIGN_KEY/);
+    ).rejects.toThrow(/LINGXI_SIGN_KEY/);
   });
 
-  it("hard-errors when HANA_SIGN_KEY points at a missing file", async () => {
+  it("hard-errors when LINGXI_SIGN_KEY points at a missing file", async () => {
     const root = makeTempDir("hana-dual-");
     await expect(
-      packDualKindSeed({ ...baseOpts(root), env: { HANA_SIGN_KEY: path.join(root, "no-such-key.pem") } }),
-    ).rejects.toThrow(/HANA_SIGN_KEY/);
+      packDualKindSeed({ ...baseOpts(root), env: { LINGXI_SIGN_KEY: path.join(root, "no-such-key.pem") } }),
+    ).rejects.toThrow(/LINGXI_SIGN_KEY/);
   });
 
   it("end-to-end: packs both archives, signs and verifies a seed whose manifest matches both", async () => {
@@ -512,7 +512,7 @@ describe("build-server-artifact: packDualKindSeed guards and ordering", () => {
     const { keyPath, keysetPath, keyId } = makeKeypairFiles(root, "e2e2026");
     const opts = baseOpts(root);
 
-    const result = await packDualKindSeed({ ...opts, env: { HANA_SIGN_KEY: keyPath, HANA_SIGN_KEYSET: keysetPath } });
+    const result = await packDualKindSeed({ ...opts, env: { LINGXI_SIGN_KEY: keyPath, LINGXI_SIGN_KEYSET: keysetPath } });
 
     expect(fs.existsSync(result.serverArchivePath)).toBe(true);
     expect(fs.existsSync(result.rendererArchivePath)).toBe(true);
@@ -551,7 +551,7 @@ describe("build-server-artifact: packDualKindSeed guards and ordering", () => {
       JSON.stringify([{ keyId: "signer", publicKey: other.publicKey.export({ type: "spki", format: "pem" }).toString() }]),
     );
     await expect(
-      packDualKindSeed({ ...baseOpts(root), env: { HANA_SIGN_KEY: keyPath, HANA_SIGN_KEYSET: mismatchKeysetPath } }),
+      packDualKindSeed({ ...baseOpts(root), env: { LINGXI_SIGN_KEY: keyPath, LINGXI_SIGN_KEYSET: mismatchKeysetPath } }),
     ).rejects.toThrow(/signature verification failed/i);
   });
 
@@ -561,7 +561,7 @@ describe("build-server-artifact: packDualKindSeed guards and ordering", () => {
     const opts = baseOpts(root);
     fs.rmSync(opts.rendererDistDir, { recursive: true, force: true });
     await expect(
-      packDualKindSeed({ ...opts, env: { HANA_SIGN_KEY: keyPath, HANA_SIGN_KEYSET: keysetPath } }),
+      packDualKindSeed({ ...opts, env: { LINGXI_SIGN_KEY: keyPath, LINGXI_SIGN_KEYSET: keysetPath } }),
     ).rejects.toThrow(/renderer dist dir not found/);
   });
 });
@@ -617,7 +617,7 @@ describe("build-server-artifact: packDualKindSeed prebuilt renderer archive reus
 
     const result = await packDualKindSeed({
       ...opts,
-      env: { HANA_SIGN_KEY: keyPath, HANA_SIGN_KEYSET: keysetPath },
+      env: { LINGXI_SIGN_KEY: keyPath, LINGXI_SIGN_KEYSET: keysetPath },
       prebuiltRendererArchive: prebuilt.archivePath,
     });
 
@@ -641,7 +641,7 @@ describe("build-server-artifact: packDualKindSeed prebuilt renderer archive reus
     expect(result.rendererArchivePath).toBe(inSeedDir);
   });
 
-  it("picks up HANA_PREBUILT_RENDERER_BOX from env when the option is not passed explicitly", async () => {
+  it("picks up LINGXI_PREBUILT_RENDERER_BOX from env when the option is not passed explicitly", async () => {
     const root = makeTempDir("hana-dual-prebuilt-env-");
     const { keyPath, keysetPath } = makeKeypairFiles(root);
     const prebuilt = await packSharedRendererBox(root);
@@ -649,7 +649,7 @@ describe("build-server-artifact: packDualKindSeed prebuilt renderer archive reus
 
     const result = await packDualKindSeed({
       ...opts,
-      env: { HANA_SIGN_KEY: keyPath, HANA_SIGN_KEYSET: keysetPath, HANA_PREBUILT_RENDERER_BOX: prebuilt.archivePath },
+      env: { LINGXI_SIGN_KEY: keyPath, LINGXI_SIGN_KEYSET: keysetPath, LINGXI_PREBUILT_RENDERER_BOX: prebuilt.archivePath },
     });
 
     const manifest = JSON.parse(fs.readFileSync(result.manifestPath, "utf8"));
@@ -665,7 +665,7 @@ describe("build-server-artifact: packDualKindSeed prebuilt renderer archive reus
     await expect(
       packDualKindSeed({
         ...opts,
-        env: { HANA_SIGN_KEY: keyPath, HANA_SIGN_KEYSET: keysetPath },
+        env: { LINGXI_SIGN_KEY: keyPath, LINGXI_SIGN_KEYSET: keysetPath },
         prebuiltRendererArchive: path.join(root, `renderer-${opts.version}.tar.gz`),
       }),
     ).rejects.toThrow(/prebuilt renderer archive path invalid/);
@@ -681,7 +681,7 @@ describe("build-server-artifact: packDualKindSeed prebuilt renderer archive reus
     await expect(
       packDualKindSeed({
         ...opts,
-        env: { HANA_SIGN_KEY: keyPath, HANA_SIGN_KEYSET: keysetPath },
+        env: { LINGXI_SIGN_KEY: keyPath, LINGXI_SIGN_KEYSET: keysetPath },
         prebuiltRendererArchive: wrongVersionArchive,
       }),
     ).rejects.toThrow(/prebuilt renderer archive name mismatch/);

@@ -31,13 +31,13 @@ export class PluginSurfaceSessionError extends Error {
 }
 
 export function issuePluginSurfaceSession({
-  hanakoHome,
+  lingxiHome,
   pluginId,
   principalId,
   now = new Date().toISOString(),
   ttlMs = DEFAULT_PLUGIN_SURFACE_SESSION_TTL_MS,
-}: { hanakoHome?: string; pluginId?: string; principalId?: string; now?: string; ttlMs?: number } = {}) {
-  assertNonEmpty(hanakoHome, "hanakoHome");
+}: { lingxiHome?: string; pluginId?: string; principalId?: string; now?: string; ttlMs?: number } = {}) {
+  assertNonEmpty(lingxiHome, "lingxiHome");
   assertNonEmpty(pluginId, "pluginId");
   assertNonEmpty(principalId, "principalId");
   const issuedAtMs = Date.parse(now);
@@ -53,7 +53,7 @@ export function issuePluginSurfaceSession({
     expiresAt: new Date(issuedAtMs + safeTtlMs).toISOString(),
   };
   const body = base64UrlEncode(JSON.stringify(payload));
-  const signature = signBody(hanakoHome, body);
+  const signature = signBody(lingxiHome, body);
   return {
     ...payload,
     token: `${body}.${signature}`,
@@ -61,12 +61,12 @@ export function issuePluginSurfaceSession({
 }
 
 export function verifyPluginSurfaceSession({
-  hanakoHome,
+  lingxiHome,
   pluginId,
   token,
   now = new Date().toISOString(),
-}: { hanakoHome?: string; pluginId?: string; token?: string; now?: string } = {}) {
-  assertNonEmpty(hanakoHome, "hanakoHome");
+}: { lingxiHome?: string; pluginId?: string; token?: string; now?: string } = {}) {
+  assertNonEmpty(lingxiHome, "lingxiHome");
   assertNonEmpty(pluginId, "pluginId");
   if (typeof token !== "string" || !token.trim()) {
     throw new PluginSurfaceSessionError("plugin surface session required", {
@@ -77,7 +77,7 @@ export function verifyPluginSurfaceSession({
   if (!body || !signature || extra !== undefined) {
     throw new PluginSurfaceSessionError("plugin surface session malformed");
   }
-  const expected = signBody(hanakoHome, body);
+  const expected = signBody(lingxiHome, body);
   if (!timingSafeEqual(signature, expected)) {
     throw new PluginSurfaceSessionError("plugin surface session signature invalid");
   }
@@ -115,20 +115,20 @@ export function verifyPluginSurfaceSession({
   });
 }
 
-function pluginSurfaceSessionKeyPath(hanakoHome) {
-  assertNonEmpty(hanakoHome, "hanakoHome");
-  return path.join(securityDirPath(hanakoHome), PLUGIN_SURFACE_SESSION_KEY_FILE);
+function pluginSurfaceSessionKeyPath(lingxiHome) {
+  assertNonEmpty(lingxiHome, "lingxiHome");
+  return path.join(securityDirPath(lingxiHome), PLUGIN_SURFACE_SESSION_KEY_FILE);
 }
 
-function signBody(hanakoHome, body) {
+function signBody(lingxiHome, body) {
   return crypto
-    .createHmac("sha256", readOrCreateSessionKey(hanakoHome))
+    .createHmac("sha256", readOrCreateSessionKey(lingxiHome))
     .update(body)
     .digest("base64url");
 }
 
-function readOrCreateSessionKey(hanakoHome) {
-  const filePath = pluginSurfaceSessionKeyPath(hanakoHome);
+function readOrCreateSessionKey(lingxiHome) {
+  const filePath = pluginSurfaceSessionKeyPath(lingxiHome);
   try {
     const existing = fs.readFileSync(filePath, "utf-8").trim();
     if (existing) return existing;

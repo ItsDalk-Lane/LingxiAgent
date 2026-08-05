@@ -46,13 +46,13 @@ describe("web auth route", () => {
       now: "2026-05-16T00:00:00.000Z",
     });
     const authService = createServerAuthService({
-      hanakoHome: tmpDir,
+      lingxiHome: tmpDir,
       loopbackToken: "local-secret",
       runtimeContext,
     });
     const app = new Hono();
     app.route("/api", createWebAuthRoute({
-      hanakoHome: tmpDir,
+      lingxiHome: tmpDir,
       authService,
       getConnectionKind: () => "lan",
       secureCookies: false,
@@ -115,14 +115,14 @@ describe("web auth route", () => {
       now: "2026-05-16T00:00:00.000Z",
     });
     const authService = createServerAuthService({
-      hanakoHome: tmpDir,
+      lingxiHome: tmpDir,
       loopbackToken: "local-secret",
       runtimeContext,
     });
     const app = new Hono();
     let connectionKind = "lan";
     app.route("/api", createWebAuthRoute({
-      hanakoHome: tmpDir,
+      lingxiHome: tmpDir,
       authService,
       getConnectionKind: () => connectionKind,
       getRuntimeContext: runtimeContext,
@@ -145,7 +145,7 @@ describe("web auth route", () => {
     });
     expect(spoofedHeader.status).toBe(400);
 
-    const secure = await app.request("https://hana.example.test/api/web-auth/login", {
+    const secure = await app.request("https://lingxi.example.test/api/web-auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ username: "hana-owner", password: "correct horse battery staple" }),
@@ -161,7 +161,7 @@ describe("web auth route", () => {
       },
     });
 
-    const desktop = await app.request("https://hana.example.test/api/web-auth/login", {
+    const desktop = await app.request("https://lingxi.example.test/api/web-auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

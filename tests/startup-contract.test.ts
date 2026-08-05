@@ -23,11 +23,11 @@ describe("local startup contract", () => {
 
     expect(launchJs).toContain('from "./dev-env.js"');
     expect(launchJs).toContain("applyDevEnvironment(process.env)");
-    expect(devEnvJs).toContain("HANA_DEV_NODE_BIN");
-    expect(mainCjs).toContain("HANA_DEV_NODE_BIN");
+    expect(devEnvJs).toContain("LINGXI_DEV_NODE_BIN");
+    expect(mainCjs).toContain("LINGXI_DEV_NODE_BIN");
 
     const env = applyDevEnvironment({}, { nodeBin: "/tmp/hana-node" });
-    expect(env.HANA_DEV_NODE_BIN).toBe("/tmp/hana-node");
+    expect(env.LINGXI_DEV_NODE_BIN).toBe("/tmp/hana-node");
   });
 
   it("server keeps Pi SDK runtime paths explicit and CLI stays server-first", () => {
@@ -37,10 +37,10 @@ describe("local startup contract", () => {
     const serverSource = fs.readFileSync(path.join(ROOT, "server", "index.ts"), "utf-8");
 
     expect(cliSource).toContain("./cli/entry.ts");
-    expect(cliSource).not.toContain("HanaEngine");
-    expect(cliEntrySource).not.toContain("HanaEngine");
+    expect(cliSource).not.toContain("LingxiEngine");
+    expect(cliEntrySource).not.toContain("LingxiEngine");
     expect(launchSource).toContain('"cli/entry.ts"');
-    expect(serverSource).not.toContain("ensureHanaPiSdkDirs");
+    expect(serverSource).not.toContain("ensureLingxiPiSdkDirs");
     expect(serverSource).not.toContain("configureProcessPiSdkEnv");
     expect(serverSource).not.toContain("PI_CODING_AGENT_DIR");
   });
@@ -48,9 +48,9 @@ describe("local startup contract", () => {
   it("desktop main does not create Pi directories or propagate Pi's global agent directory", () => {
     const mainCjs = fs.readFileSync(path.join(ROOT, "desktop", "main.cjs"), "utf-8");
 
-    expect(mainCjs).not.toContain("ensureHanaPiSdkDirs");
+    expect(mainCjs).not.toContain("ensureLingxiPiSdkDirs");
     expect(mainCjs).not.toContain("configureProcessPiSdkEnv");
-    expect(mainCjs).not.toContain("withHanaPiSdkEnv");
+    expect(mainCjs).not.toContain("withLingxiPiSdkEnv");
     expect(mainCjs).toContain("delete serverEnv.PI_CODING_AGENT_DIR");
   });
 

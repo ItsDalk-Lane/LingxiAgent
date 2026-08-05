@@ -1,8 +1,8 @@
 /**
  * Electron client single-instance guard.
  *
- * Electron's requestSingleInstanceLock() is scoped by userData, so HanaAgent sets
- * userData from HANA_HOME before requesting the lock. Production and dev homes
+ * Electron's requestSingleInstanceLock() is scoped by userData, so LingxiAgent sets
+ * userData from LINGXI_HOME before requesting the lock. Production and dev homes
  * get different namespaces, while duplicate launches within the same home are
  * redirected to the first client.
  */
@@ -13,11 +13,11 @@ function normalizeForCompare(filePath) {
   return process.platform === "win32" ? resolved.toLowerCase() : resolved;
 }
 
-function getUserDataAppName(hanakoHome, defaultHome) {
-  if (normalizeForCompare(hanakoHome) === normalizeForCompare(defaultHome)) {
+function getUserDataAppName(lingxiHome, defaultHome) {
+  if (normalizeForCompare(lingxiHome) === normalizeForCompare(defaultHome)) {
     return "Hanako";
   }
-  const suffix = path.basename(hanakoHome).replace(/^\./, "");
+  const suffix = path.basename(lingxiHome).replace(/^\./, "");
   if (!suffix) return "Hanako";
   return suffix.charAt(0).toUpperCase() + suffix.slice(1);
 }
@@ -39,13 +39,13 @@ function focusExistingWindow(win) {
 }
 
 function configureClientSingleInstance(app, opts) {
-  const { hanakoHome, defaultHome, onSecondInstance } = opts;
-  const appName = getUserDataAppName(hanakoHome, defaultHome);
+  const { lingxiHome, defaultHome, onSecondInstance } = opts;
+  const appName = getUserDataAppName(lingxiHome, defaultHome);
   if (appName) {
     app.setPath("userData", path.join(app.getPath("appData"), appName));
   }
 
-  const gotLock = app.requestSingleInstanceLock({ hanakoHome });
+  const gotLock = app.requestSingleInstanceLock({ lingxiHome });
   if (!gotLock) {
     exitDuplicateClient(app);
     return false;

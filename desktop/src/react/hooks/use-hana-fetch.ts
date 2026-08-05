@@ -8,12 +8,12 @@ import {
 const DEFAULT_TIMEOUT = 30_000;
 
 /**
- * 构建带认证的 HanaAgent Server URL
+ * 构建带认证的 LingxiAgent Server URL
  */
-export function hanaUrl(path: string): string {
+export function lingxiUrl(path: string): string {
   const connection = requireServerConnection(
     useStore.getState(),
-    `hanaUrl ${path}: server connection not ready`,
+    `lingxiUrl ${path}: server connection not ready`,
   );
   return buildConnectionUrl(connection, path, { includeTokenQuery: true });
 }
@@ -23,13 +23,13 @@ export function hanaUrl(path: string): string {
  * - 默认 30s 超时
  * - 自动校验 res.ok，非 2xx 抛错
  */
-export async function hanaFetch(
+export async function lingxiFetch(
   path: string,
   opts: RequestInit & { timeout?: number; throwOnHttpError?: boolean } = {},
 ): Promise<Response> {
   const connection = requireServerConnection(
     useStore.getState(),
-    `hanaFetch ${path}: server connection not ready`,
+    `lingxiFetch ${path}: server connection not ready`,
   );
   const headers = appendConnectionAuth(connection, opts.headers);
 
@@ -53,7 +53,7 @@ export async function hanaFetch(
       signal: controller.signal,
     });
     if (throwOnHttpError && !res.ok) {
-      throw new Error(`hanaFetch ${path}: ${res.status} ${res.statusText}`);
+      throw new Error(`lingxiFetch ${path}: ${res.status} ${res.statusText}`);
     }
     return res;
   } finally {

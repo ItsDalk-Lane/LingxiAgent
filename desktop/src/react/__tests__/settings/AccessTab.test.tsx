@@ -10,7 +10,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 type MockState = Record<string, any>;
 
 const mockState: MockState = {};
-const mockHanaFetch = vi.fn();
+const mockLingxiFetch = vi.fn();
 
 vi.mock('../../settings/store', () => {
   const hook: any = (selector?: (s: MockState) => unknown) =>
@@ -21,8 +21,8 @@ vi.mock('../../settings/store', () => {
 });
 
 vi.mock('../../settings/api', () => ({
-  hanaFetch: (...args: unknown[]) => mockHanaFetch(...args),
-  hanaUrl: (path: string) => `http://127.0.0.1:14500${path}?token=local`,
+  lingxiFetch: (...args: unknown[]) => mockLingxiFetch(...args),
+  lingxiUrl: (path: string) => `http://127.0.0.1:14500${path}?token=local`,
 }));
 
 vi.mock('../../settings/helpers', () => ({
@@ -145,8 +145,8 @@ describe('AccessTab', () => {
         updatedAt: null,
       },
     });
-    mockHanaFetch.mockReset();
-    mockHanaFetch.mockImplementation((url: string, options?: RequestInit) => {
+    mockLingxiFetch.mockReset();
+    mockLingxiFetch.mockImplementation((url: string, options?: RequestInit) => {
       if (url === '/api/access/summary') return Promise.resolve(jsonResponse(baseSummary));
       if (url === '/api/access/network' && options?.method === 'PUT') {
         return Promise.resolve(jsonResponse({
@@ -270,7 +270,7 @@ describe('AccessTab', () => {
     fireEvent.click(screen.getByRole('button', { name: 'settings.access.saveNetwork' }));
 
     await waitFor(() => {
-      expect(mockHanaFetch).toHaveBeenCalledWith('/api/access/network', expect.objectContaining({
+      expect(mockLingxiFetch).toHaveBeenCalledWith('/api/access/network', expect.objectContaining({
         method: 'PUT',
         body: JSON.stringify({ mode: 'lan', listenPort: 14500 }),
       }));
@@ -292,7 +292,7 @@ describe('AccessTab', () => {
       requestId: 1,
       updatedAt: Date.now(),
     };
-    mockHanaFetch.mockImplementation((url: string) => {
+    mockLingxiFetch.mockImplementation((url: string) => {
       if (url === '/api/access/summary') {
         return new Promise<Response>((resolve) => {
           resolveSummary = resolve;
@@ -312,12 +312,12 @@ describe('AccessTab', () => {
 
     resolveSummary(jsonResponse(lanSummary));
     await waitFor(() => {
-      expect(mockHanaFetch).toHaveBeenCalledWith('/api/access/summary');
+      expect(mockLingxiFetch).toHaveBeenCalledWith('/api/access/summary');
     });
   });
 
   it('keeps the phone URL on the runtime port and hides QR when a saved port change needs restart', async () => {
-    mockHanaFetch.mockImplementation((url: string) => {
+    mockLingxiFetch.mockImplementation((url: string) => {
       if (url === '/api/access/summary') {
         return Promise.resolve(jsonResponse({
           ...baseSummary,
@@ -362,7 +362,7 @@ describe('AccessTab', () => {
     fireEvent.click(await screen.findByRole('button', { name: 'settings.access.generateMobileKey' }));
 
     expect(await screen.findByDisplayValue('hana_dev_visible_once')).toBeInTheDocument();
-    expect(mockHanaFetch).toHaveBeenCalledWith('/api/access/mobile-credentials', expect.objectContaining({
+    expect(mockLingxiFetch).toHaveBeenCalledWith('/api/access/mobile-credentials', expect.objectContaining({
       method: 'POST',
       body: JSON.stringify({
         displayName: 'Mobile PWA',
@@ -379,7 +379,7 @@ describe('AccessTab', () => {
     fireEvent.click(await screen.findByRole('button', { name: 'settings.access.generateDesktopKey' }));
 
     expect(await screen.findByDisplayValue('hana_dev_desktop_visible_once')).toBeInTheDocument();
-    expect(mockHanaFetch).toHaveBeenCalledWith('/api/access/desktop-credentials', expect.objectContaining({
+    expect(mockLingxiFetch).toHaveBeenCalledWith('/api/access/desktop-credentials', expect.objectContaining({
       method: 'POST',
       body: JSON.stringify({
         displayName: 'Desktop Frontend',
@@ -444,7 +444,7 @@ describe('AccessTab', () => {
     expect(await screen.findByText('settings.access.remoteConnection')).toBeInTheDocument();
     expect(screen.getByText('LAN Studio')).toBeInTheDocument();
     expect(screen.queryByText('settings.access.localAccount')).not.toBeInTheDocument();
-    expect(mockHanaFetch).not.toHaveBeenCalledWith('/api/access/summary');
+    expect(mockLingxiFetch).not.toHaveBeenCalledWith('/api/access/summary');
 
     fireEvent.click(screen.getByRole('button', { name: 'settings.access.returnToLocal' }));
 
@@ -467,7 +467,7 @@ describe('AccessTab', () => {
     fireEvent.click(screen.getByRole('button', { name: 'settings.access.saveAccount' }));
 
     await waitFor(() => {
-      expect(mockHanaFetch).toHaveBeenCalledWith('/api/access/account/profile', expect.objectContaining({
+      expect(mockLingxiFetch).toHaveBeenCalledWith('/api/access/account/profile', expect.objectContaining({
         method: 'PUT',
         body: JSON.stringify({ username: 'hana-owner', displayName: 'Hana Owner' }),
       }));
@@ -479,7 +479,7 @@ describe('AccessTab', () => {
     fireEvent.click(screen.getByRole('button', { name: 'settings.access.savePassword' }));
 
     await waitFor(() => {
-      expect(mockHanaFetch).toHaveBeenCalledWith('/api/access/account/password', expect.objectContaining({
+      expect(mockLingxiFetch).toHaveBeenCalledWith('/api/access/account/password', expect.objectContaining({
         method: 'PUT',
         body: JSON.stringify({ password: 'correct horse battery staple' }),
       }));
@@ -487,7 +487,7 @@ describe('AccessTab', () => {
   });
 
   it('revokes individual credentials without requiring whole-device revocation', async () => {
-    mockHanaFetch.mockImplementation((url: string, options?: RequestInit) => {
+    mockLingxiFetch.mockImplementation((url: string, options?: RequestInit) => {
       if (url === '/api/access/summary') return Promise.resolve(jsonResponse(pairedSummary));
       if (url === '/api/devices/credentials/cred_1/revoke' && options?.method === 'POST') {
         return Promise.resolve(jsonResponse({ ok: true }));
@@ -502,12 +502,12 @@ describe('AccessTab', () => {
     fireEvent.click(screen.getByRole('button', { name: 'settings.access.revokeCredential' }));
 
     await waitFor(() => {
-      expect(mockHanaFetch).toHaveBeenCalledWith('/api/devices/credentials/cred_1/revoke', { method: 'POST' });
+      expect(mockLingxiFetch).toHaveBeenCalledWith('/api/devices/credentials/cred_1/revoke', { method: 'POST' });
     });
   });
 
   it('clears the local password from the password section', async () => {
-    mockHanaFetch.mockImplementation((url: string, options?: RequestInit) => {
+    mockLingxiFetch.mockImplementation((url: string, options?: RequestInit) => {
       if (url === '/api/access/summary') {
         return Promise.resolve(jsonResponse({
           ...baseSummary,
@@ -529,7 +529,7 @@ describe('AccessTab', () => {
     fireEvent.click(await screen.findByRole('button', { name: 'settings.access.clearPassword' }));
 
     await waitFor(() => {
-      expect(mockHanaFetch).toHaveBeenCalledWith('/api/access/account/password', { method: 'DELETE' });
+      expect(mockLingxiFetch).toHaveBeenCalledWith('/api/access/account/password', { method: 'DELETE' });
     });
   });
 });

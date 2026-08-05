@@ -15,7 +15,7 @@
  * startServer() itself.
  *
  * scripts/build-server-open.mjs's Vite bundle uses this file as its entry
- * (via vite.config.server.js's HANA_SERVER_BUNDLE_ENTRY override) to
+ * (via vite.config.server.js's LINGXI_SERVER_BUNDLE_ENTRY override) to
  * produce an open-composition packaged bundle; scripts/build-server.mjs
  * (full) continues to bundle server/main-full.ts and never imports this
  * file.

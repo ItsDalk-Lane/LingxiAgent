@@ -1,7 +1,7 @@
 /**
  * 测试升级后首启公告的触发决策（resolvePostUpdateAnnouncement 纯函数）。
  *
- * 契约：lastSeenVersion 记录在 {HANA_HOME}/user/last-seen-version.json；
+ * 契约：lastSeenVersion 记录在 {LINGXI_HOME}/user/last-seen-version.json；
  * 全新安装静默播种（seedVersion），永不为"从无到有"弹公告；已完成
  * onboarding 却无记录 = 从没有此功能的老版本升级而来，视为升级后首启；
  * 非打包环境不弹也不写。

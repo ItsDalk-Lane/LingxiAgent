@@ -1,11 +1,11 @@
-# @hana/plugin-runtime
+# @lingxi/plugin-runtime
 
-Node-side helper package for Hana plugins.
+Node-side helper package for Lingxi plugins.
 
-This package is intentionally small. It gives plugin authors stable shapes and TypeScript types while preserving Hana's current plugin loading model.
+This package is intentionally small. It gives plugin authors stable shapes and TypeScript types while preserving Lingxi's current plugin loading model.
 
 ```ts
-import { definePlugin, defineTool } from '@hana/plugin-runtime';
+import { definePlugin, defineTool } from '@lingxi/plugin-runtime';
 
 export const searchTool = defineTool({
   name: 'search',
@@ -32,22 +32,22 @@ export default definePlugin({
 });
 ```
 
-Static `tools/*.js` and `commands/*.js` still use Hana's named export loader today. Lifecycle plugins can already use `export default definePlugin(...)` because the host expects a default class-compatible value.
+Static `tools/*.js` and `commands/*.js` still use Lingxi's named export loader today. Lifecycle plugins can already use `export default definePlugin(...)` because the host expects a default class-compatible value.
 
 Scheduled automation `plugin_action` jobs reuse plugin tools in v0. The scheduler stores `{ pluginId, actionId, params }` and invokes the loaded tool named `pluginId_actionId`; both static tools and dynamic `ctx.registerTool()` tools receive the SDK-style `(input, ctx)` call.
 
 ## EventBus helpers
 
 ```ts
-import { defineBusHandler, HANA_BUS_SKIP, requestBus } from '@hana/plugin-runtime';
+import { defineBusHandler, LINGXI_BUS_SKIP, requestBus } from '@lingxi/plugin-runtime';
 
 export const bridgeSend = defineBusHandler<
   { platform: string; text: string },
-  { sent: boolean } | typeof HANA_BUS_SKIP
+  { sent: boolean } | typeof LINGXI_BUS_SKIP
 >({
   type: 'bridge:send',
   async handle(payload) {
-    if (payload.platform !== 'telegram') return HANA_BUS_SKIP;
+    if (payload.platform !== 'telegram') return LINGXI_BUS_SKIP;
     return { sent: true };
   },
 });
@@ -76,7 +76,7 @@ export default definePlugin({
 });
 ```
 
-`HANA_BUS_SKIP` is the shared skip sentinel used by the host `EventBus.SKIP`, so SDK-authored handlers can participate in chained handlers without importing host internals.
+`LINGXI_BUS_SKIP` is the shared skip sentinel used by the host `EventBus.SKIP`, so SDK-authored handlers can participate in chained handlers without importing host internals.
 
 Use `ctx.bus.listCapabilities?.()` or `ctx.bus.getCapability?.(type)` to inspect
 the host EventBus capability directory before making optional requests.
@@ -88,7 +88,7 @@ Route handlers receive a request-scoped context from the host. Use
 directly when a route calls system capabilities:
 
 ```ts
-import { getPluginRequestContext } from '@hana/plugin-runtime';
+import { getPluginRequestContext } from '@lingxi/plugin-runtime';
 
 export default function(app) {
   app.post('/create-session', async (c) => {
@@ -109,7 +109,7 @@ manifest and the current full-access grant for this HTTP request.
 
 Use `ctx.network.fetch()` when runtime plugin code needs public HTTP data such as
 live scores, weather, prices, search, or third-party platform APIs. Browser
-iframe code should call this plugin's own route with `hana.api.fetch(...)`; the
+iframe code should call this plugin's own route with `lingxi.api.fetch(...)`; the
 route then calls `ctx.network.fetch(...)`.
 
 ```json
@@ -205,7 +205,7 @@ execution boundary and perform any source mutation through ResourceIO.
 
 ## Tool session permissions
 
-Declare `sessionPermission` on Agent-callable tools so Hana can apply the current
+Declare `sessionPermission` on Agent-callable tools so Lingxi can apply the current
 session permission mode before the tool runs. Prefer an invocation resolver and
 classify each concrete action as `read`, `routine`, or `review`:
 
@@ -247,7 +247,7 @@ export const renderImage = defineTool({
 
 Multi-action tools should additionally resolve each concrete call with the
 synchronous, non-mutating `resolveInvocation(input)` contract. The capability is
-the tool's local definition name plus the resolved action. Hana strips the plugin
+the tool's local definition name plus the resolved action. Lingxi strips the plugin
 prefix before checking this relation, so a plugin tool named `team_message`
 declares `team_message.send`, not `<plugin-id>_team_message.send`.
 
@@ -284,7 +284,7 @@ export const teamMessage = defineTool({
 
 Resolvers must return a plain descriptor synchronously. Returning `null`,
 throwing, returning a Promise/thenable, using an unknown kind, or declaring a
-capability that does not match `<tool-name>.<action>` fails closed; Hana attaches
+capability that does not match `<tool-name>.<action>` fails closed; Lingxi attaches
 a rejection consumer to asynchronous results and never falls back to the legacy
 static policy once a resolver exists. The resolver owns the mapping from its
 input schema to this stable permission action; the host does not infer aliases.
@@ -300,7 +300,7 @@ resolver descriptor or its `sideEffect` metadata.
 
 Plugins that need their own chat surface should use the typed helpers instead of
 writing session files or importing host internals. `createSession()` creates a
-detached Hana session, so it does not switch the main UI focus.
+detached Lingxi session, so it does not switch the main UI focus.
 
 ```ts
 import {
@@ -312,7 +312,7 @@ import {
   sampleText,
   sendSessionMessage,
   subscribeSessionEvents,
-} from '@hana/plugin-runtime';
+} from '@lingxi/plugin-runtime';
 
 export default definePlugin({
   async onload(ctx, { register }) {
@@ -402,7 +402,7 @@ Plugins that declare `usage.read` can inspect persisted LLM usage records and
 subscribe to new usage events:
 
 ```ts
-import { definePlugin, listUsageEntries, subscribeUsageEvents } from '@hana/plugin-runtime';
+import { definePlugin, listUsageEntries, subscribeUsageEvents } from '@lingxi/plugin-runtime';
 
 export default definePlugin({
   async onload(ctx, { register }) {
@@ -428,7 +428,7 @@ the request or subscription.
 ## SessionFile media helpers
 
 ```ts
-import { createMediaDetails, defineTool } from '@hana/plugin-runtime';
+import { createMediaDetails, defineTool } from '@lingxi/plugin-runtime';
 
 export const renderImage = defineTool({
   name: 'render_image',
@@ -457,7 +457,7 @@ Use `stageFile()` for plugin-generated local files. `createMediaDetails()` norma
 Use `createChatSurfaceCard()` when a tool creates or updates a plugin-owned private session and wants to show its transcript in the current chat stream:
 
 ```ts
-import { createChatSurfaceCard, createSession, defineTool } from '@hana/plugin-runtime';
+import { createChatSurfaceCard, createSession, defineTool } from '@lingxi/plugin-runtime';
 
 export const startRun = defineTool({
   name: 'start_run',
@@ -482,7 +482,7 @@ export const startRun = defineTool({
 });
 ```
 
-The helper requires `sessionId` / `sessionRef`; passing only a legacy `sessionPath` throws. Hana resolves the current path through the session manifest and only renders sessions owned by the same plugin with `plugin_private` or `private` visibility. Main currently provides a thin native transcript surface; richer composer and native card composition are not part of the public runtime contract yet.
+The helper requires `sessionId` / `sessionRef`; passing only a legacy `sessionPath` throws. Lingxi resolves the current path through the session manifest and only renders sessions owned by the same plugin with `plugin_private` or `private` visibility. Main currently provides a thin native transcript surface; richer composer and native card composition are not part of the public runtime contract yet.
 
 ## Provider contributions
 
@@ -491,7 +491,7 @@ The runtime package exposes provider types and `defineProvider()` for authoring,
 Provider declarations are the canonical discovery layer for models and media capabilities. Media adapters execute a declared `protocolId`; adapter registration alone does not make a model discoverable in provider settings, default media model selectors, or media helper APIs.
 
 ```ts
-import { defineProvider } from '@hana/plugin-runtime';
+import { defineProvider } from '@lingxi/plugin-runtime';
 
 const provider = defineProvider({
   id: 'my-image-cli',
@@ -548,7 +548,7 @@ export const { id, displayName, authType, runtime, capabilities } = provider;
 
 Keep chat and media capabilities explicit. Media-only providers should use `chat.projection = "none"`, and CLI providers must use structured argument bindings rather than shell command strings.
 
-Chat providers may separate their Hana catalog identity from their execution identity. Use
+Chat providers may separate their Lingxi catalog identity from their execution identity. Use
 `runtimeProviderId` for the execution/auth key and `credentialSource` to declare ownership:
 `provider-catalog` reads API-key configuration, `auth-storage` uses the OAuth store without
 copying tokens into `models.json`, and `none` is for providers that require no credential.
@@ -577,4 +577,4 @@ export default function(pi) {
 }
 ```
 
-Use extensions only when the plugin needs to run inside the LLM pipeline. Ordinary Agent actions should stay in `tools/*.js` so they can use the restricted permission tier. After a full-access plugin is installed, enabled, or reloaded, Hana rebinds extension runners for idle sessions; in-flight sessions pick up the change on the next safe rebuild.
+Use extensions only when the plugin needs to run inside the LLM pipeline. Ordinary Agent actions should stay in `tools/*.js` so they can use the restricted permission tier. After a full-access plugin is installed, enabled, or reloaded, Lingxi rebinds extension runners for idle sessions; in-flight sessions pick up the change on the next safe rebuild.

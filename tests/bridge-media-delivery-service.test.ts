@@ -382,7 +382,7 @@ describe("MediaDeliveryService", () => {
     const mediaPublisher = {
       setBaseUrl: vi.fn(),
       publish: vi.fn(() => ({
-        publicUrl: "https://hana.example.com/api/bridge/media/token_123",
+        publicUrl: "https://lingxi.example.com/api/bridge/media/token_123",
         expiresAt: 61_000,
       })),
     };
@@ -417,7 +417,7 @@ describe("MediaDeliveryService", () => {
     expect(mediaPublisher.setBaseUrl).toHaveBeenCalledOnce();
     expect(adapter.sendMedia).toHaveBeenCalledWith(
       "chat-1",
-      "https://hana.example.com/api/bridge/media/token_123",
+      "https://lingxi.example.com/api/bridge/media/token_123",
       {
         kind: "image",
         mime: "image/png",

@@ -34,7 +34,7 @@ export function materializeUploadedSkillPackage(engine, body) {
     err.status = 400;
     throw err;
   }
-  const uploadRoot = path.join(engine?.hanakoHome || os.tmpdir(), "tmp", "skill-install-uploads");
+  const uploadRoot = path.join(engine?.lingxiHome || os.tmpdir(), "tmp", "skill-install-uploads");
   fs.mkdirSync(uploadRoot, { recursive: true });
   const tempDir = fs.mkdtempSync(path.join(uploadRoot, "skill-"));
   const sourcePath = path.join(tempDir, upload.filename);

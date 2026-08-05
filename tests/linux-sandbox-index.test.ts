@@ -89,7 +89,7 @@ describe("createSandboxedTools on Linux", () => {
       agentDir: "/hana/agents/hana",
       workspace: "/work",
       workspaceFolders: [],
-      hanakoHome: "/hana",
+      lingxiHome: "/hana",
       getSandboxEnabled: () => true,
     } as any);
 
@@ -111,7 +111,7 @@ describe("createSandboxedTools on Linux", () => {
       agentDir: "/hana/agents/hana",
       workspace: "/work",
       workspaceFolders: [],
-      hanakoHome: "/hana",
+      lingxiHome: "/hana",
       getSandboxEnabled: () => false,
     } as any);
 
@@ -139,7 +139,7 @@ describe("createSandboxedTools on Linux", () => {
       agentDir: "/hana/agents/hana",
       workspace: "/work",
       workspaceFolders: [],
-      hanakoHome: "/hana",
+      lingxiHome: "/hana",
       getSandboxEnabled: () => true,
       getSandboxNetworkEnabled,
     } as any);
@@ -207,7 +207,7 @@ describe("createSandboxedTools on Linux", () => {
       agentDir,
       workspace,
       workspaceFolders: [],
-      hanakoHome: path.join(tempRoot, "hana"),
+      lingxiHome: path.join(tempRoot, "hana"),
       getSandboxEnabled: () => true,
       getSessionPath: () => path.join(agentDir, "sessions", "main.jsonl"),
       resolveSessionFile: resolveSessionFileMock,

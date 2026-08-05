@@ -44,14 +44,14 @@ export interface BackupRetentionResult {
 }
 
 interface PruneOptions {
-  hanakoHome: string;
+  lingxiHome: string;
   now?: number;
   maxAgeMs?: number;
   log?: (line: string) => void;
 }
 
 export function pruneStaleCredentialBackups({
-  hanakoHome,
+  lingxiHome,
   now = Date.now(),
   maxAgeMs = CREDENTIAL_BACKUP_MAX_AGE_MS,
   log = () => {},
@@ -59,9 +59,9 @@ export function pruneStaleCredentialBackups({
   const result: BackupRetentionResult = { removed: [], kept: [] };
   // Refuse rather than quietly do nothing, for the same reason the healer does:
   // an absent data directory means a caller mistake, not an empty workload.
-  if (!hanakoHome) throw new Error("credential backup retention requires a data directory");
+  if (!lingxiHome) throw new Error("credential backup retention requires a data directory");
 
-  const backupRoot = migrationBackupsRoot(hanakoHome);
+  const backupRoot = migrationBackupsRoot(lingxiHome);
   let entries: fs.Dirent[];
   try {
     entries = fs.readdirSync(backupRoot, { withFileTypes: true });
@@ -72,7 +72,7 @@ export function pruneStaleCredentialBackups({
   const directories = entries.filter((entry) => entry.isDirectory());
   if (directories.length === 0) return result;
 
-  const rollbackTargetIsHealthy = liveCatalogIsUsable(path.join(hanakoHome, LIVE_CATALOG_FILE));
+  const rollbackTargetIsHealthy = liveCatalogIsUsable(path.join(lingxiHome, LIVE_CATALOG_FILE));
 
   for (const entry of directories) {
     const name = entry.name;

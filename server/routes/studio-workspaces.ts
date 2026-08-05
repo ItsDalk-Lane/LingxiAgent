@@ -115,7 +115,7 @@ async function listStudioWorkspaces(engine, requestContext) {
   } catch (err) {
     if (!(err instanceof MountAwareFileError && err.code === "no_workspace")) throw err;
   }
-  for (const mount of listStudioMountsForStudio(engine.hanakoHome, studioId)) {
+  for (const mount of listStudioMountsForStudio(engine.lingxiHome, studioId)) {
     if (mount.status !== "active") continue;
     workspaces.push(workspaceFromMount(mount, { discloseNativeRoot }));
   }
@@ -139,7 +139,7 @@ async function createLocalPathWorkspace(engine, requestContext, body) {
     throw routeError("path must be an existing directory", "invalid_path", 400);
   }
 
-  const mount = upsertStudioMount(engine.hanakoHome, {
+  const mount = upsertStudioMount(engine.lingxiHome, {
     mountId: localFsMountId(studioId, rootPath),
     hostStudioId: studioId,
     sourceKind: "storage",
@@ -156,13 +156,13 @@ async function createLocalPathWorkspace(engine, requestContext, body) {
 
 function disableLocalPathWorkspace(engine, requestContext, mountId) {
   const studioId = requireStudioId(requestContext);
-  const activeMount = listStudioMountsForStudio(engine.hanakoHome, studioId)
+  const activeMount = listStudioMountsForStudio(engine.lingxiHome, studioId)
     .find((mount) => mount.mountId === mountId && mount.status === "active");
   if (!activeMount) throw routeError("workspace mount not found", "workspace_not_found", 404);
   if (activeMount.sourceKind !== "storage" || activeMount.provider !== "local_fs") {
     throw routeError("only local_fs workspace mounts can be removed here", "unsupported_workspace_mount", 400);
   }
-  return disableStudioMount(engine.hanakoHome, mountId, { hostStudioId: studioId });
+  return disableStudioMount(engine.lingxiHome, mountId, { hostStudioId: studioId });
 }
 
 function authorizeStudioWorkspace(c, engine, capability) {
@@ -193,7 +193,7 @@ function authorizeStudioWorkspace(c, engine, capability) {
 
 function fileService(engine, requestContext, c = null) {
   return new MountAwareFileService({
-    hanakoHome: engine.hanakoHome,
+    lingxiHome: engine.lingxiHome,
     defaultRoot: engine.defaultDeskCwd || engine.homeCwd || engine.deskCwd,
     studioId: requestContext?.studioId || engine.getRuntimeContext?.()?.studioId || null,
     createCheckpoint: typeof engine.createUserEditCheckpoint === "function"

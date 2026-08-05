@@ -14,7 +14,7 @@ describe('web platform fallback capability contract', () => {
   beforeEach(() => {
     delete (window as any).hana;
     delete (window as any).platform;
-    delete (window as any).__HANA_DEV_WEB__;
+    delete (window as any).__LINGXI_DEV_WEB__;
     (globalThis as any).localStorage = {
       getItem: () => '',
       setItem: () => {},
@@ -30,7 +30,7 @@ describe('web platform fallback capability contract', () => {
   });
 
   it('uses injected dev-web server info for browser preview API access', async () => {
-    (window as any).__HANA_DEV_WEB__ = {
+    (window as any).__LINGXI_DEV_WEB__ = {
       serverPort: 5173,
       apiBaseUrl: 'http://127.0.0.1:5173',
     };

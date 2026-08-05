@@ -12,9 +12,9 @@
 5. **dispatch 单调性**：dispatcher 按数组顺序遍历，第一个 `matches` 返回 true 的子模块负责处理（first-match-wins）。一个 model 只匹配一个子模块。新 provider 默认加在数组末尾；只有当模块的 `matches` 是另一模块的子集（更具体的规则）时才前置，避免被通用规则吞掉。
 6. **禁止散落**：调用点（`callText`、`engine.ts` 钩子、route handler 等）禁止内联 provider-specific 补丁。一旦发现，迁移到本目录。
 
-## Pi SDK 与 Hana 双层边界
+## Pi SDK 与 Lingxi 双层边界
 
-Hana 的 provider 出站链路有两层兼容逻辑，排查时必须同时看：
+Lingxi 的 provider 出站链路有两层兼容逻辑，排查时必须同时看：
 
 1. **Pi SDK provider serializer / compat**：负责 session、model registry、provider serializer，以及上游内置的兼容探测。它会先按自己的 provider 语义组装请求体。
 2. **Hana provider-compat**：负责最终出站 payload 翻译。`before_provider_request` 和 utility `callText` 都会进入 `normalizeProviderPayload()`，所以 Pi SDK 组出的 payload 不一定就是最终发给供应商的 payload。
@@ -23,19 +23,19 @@ Hana 的 provider 出站链路有两层兼容逻辑，排查时必须同时看�
 
 | 层 | 可以处理 | 禁止处理 |
 |---|---|---|
-| Pi SDK session/model 层 | session lifecycle、模型选择、SDK 支持的 thinking level 枚举、provider serializer 基础结构 | Hana 用户可见语义的最终决策、供应商特殊字段散落到调用点 |
-| Hana provider-compat 层 | provider wire protocol 翻译，例如 `thinking`、`reasoning_effort`、`max_tokens`、历史 `reasoning_content` replay | Agent plan、system prompt、memory、工具列表、session 状态、用户可见 thinking level 的语义判断 |
+| Pi SDK session/model 层 | session lifecycle、模型选择、SDK 支持的 thinking level 枚举、provider serializer 基础结构 | Lingxi 用户可见语义的最终决策、供应商特殊字段散落到调用点 |
+| Lingxi provider-compat 层 | provider wire protocol 翻译，例如 `thinking`、`reasoning_effort`、`max_tokens`、历史 `reasoning_content` replay | Agent plan、system prompt、memory、工具列表、session 状态、用户可见 thinking level 的语义判断 |
 
 常见误判：
 
-- 看 Pi SDK 会以为某些 provider 仍发送上游字段，实际 Hana 子模块可能在最终出站前改写。
-- 看 Hana provider-compat 会以为所有 thinking 问题都能在 payload 层修；如果 Pi SDK session 层已经 clamp 了 thinking level，payload 层已经来不及恢复原始意图。
+- 看 Pi SDK 会以为某些 provider 仍发送上游字段，实际 Lingxi 子模块可能在最终出站前改写。
+- 看 Lingxi provider-compat 会以为所有 thinking 问题都能在 payload 层修；如果 Pi SDK session 层已经 clamp 了 thinking level，payload 层已经来不及恢复原始意图。
 - `OpenAI-compatible` 只说明请求大信封相似，不说明 thinking 控制、tool replay、effort 枚举等细节兼容。
 
 排查 provider / reasoning bug 的顺序：
 
 1. 查 `core/model-sync.ts` 与 `shared/model-capabilities.ts`：模型是否投影了正确的 `compat.thinkingFormat` / `compat.reasoningProfile`。
-2. 查 Pi SDK serializer：进入 Hana compat 前，SDK 会生成什么 payload，是否存在 session 层 clamp 或枚举转换。
+2. 查 Pi SDK serializer：进入 Lingxi compat 前，SDK 会生成什么 payload，是否存在 session 层 clamp 或枚举转换。
 3. 查 `core/provider-compat.ts` dispatcher：最终会命中哪个子模块，是否 first-match-wins 被更通用模块吞掉。
 4. 查 provider 子模块：`matches()` 范围、`apply()` 字段翻译、utility/off 行为、历史 replay 规则。
 5. 加最终出站契约测试：优先用 `normalizeProviderPayload()` 和 model-sync 测试固定最终 payload，而不是只测试 Pi SDK 中间形态。
@@ -123,7 +123,7 @@ export function apply(payload, model, options) { ... }
 
 | carrier | 典型协议 | 执行责任 |
 |---|---|---|
-| `reasoning_content` | Kimi、DeepSeek、MiMo、Zhipu Chat Completions | Hana 在 serializer 前验证 canonical signed thinking，并在最终 payload 再校验 tool-call 历史 |
+| `reasoning_content` | Kimi、DeepSeek、MiMo、Zhipu Chat Completions | Lingxi 在 serializer 前验证 canonical signed thinking，并在最终 payload 再校验 tool-call 历史 |
 | `thinking_blocks` | Anthropic Messages | Pi SDK 保存并原样回放 signed / redacted thinking block |
 | `reasoning_items` | OpenAI Responses | Pi SDK 保存完整 reasoning item JSON 并回放 |
 | `reasoning_details` | OpenRouter | Pi SDK 通过 tool-call `thoughtSignature` 回放完整 details |
@@ -152,9 +152,9 @@ Pi Session JSONL 持久化完整 canonical assistant message，包括 thinking b
 
 ## 输出预算策略
 
-`maxOutput` / `model.maxTokens` 在 Hana 数据层表示模型能力上限，不表示每次请求的默认输出长度。
+`maxOutput` / `model.maxTokens` 在 Lingxi 数据层表示模型能力上限，不表示每次请求的默认输出长度。
 当前 Pi SDK 在调用方未传 `maxTokens` 时，会先用 `model.maxTokens`，再按本轮剩余上下文收紧，最后把结果写进请求体。
-Hana 在最终请求发出前把这个默认值进一步限制到 65,536。这样模型的普通回答默认最多使用 64K 输出空间，
+Lingxi 在最终请求发出前把这个默认值进一步限制到 65,536。这样模型的普通回答默认最多使用 64K 输出空间，
 同时不会把 SDK 因上下文不足而已经压到 20K、8K 等更小的安全值反向抬高。
 
 通用层通过 `provider-compat/output-budget.ts` 处理这件事。该文件内部维护
@@ -171,7 +171,7 @@ Hana 在最终请求发出前把这个默认值进一步限制到 65,536。这�
 
 ## 音频输入 transport
 
-Hana 内部用 `{ type: "audio", data, mimeType }` 表示当前轮音频。UI、SessionFile、历史恢复、`@附件`、压缩与缓存逻辑只处理这个内部语义，不按 provider 写分支。
+Lingxi 内部用 `{ type: "audio", data, mimeType }` 表示当前轮音频。UI、SessionFile、历史恢复、`@附件`、压缩与缓存逻辑只处理这个内部语义，不按 provider 写分支。
 
 出站请求分两步：
 
@@ -206,7 +206,7 @@ first-match-wins 的实际匹配次序。改数组顺序时同步改这张表。
 | [`zhipu.ts`](zhipu.ts) | Zhipu / GLM OpenAI-compatible 思考模式协议（thinking.type、clear_thinking）与 OpenAI-only 字段清理；reasoning_content 校验由中心 helper 负责 | pi-ai 原生处理 GLM thinking 控制和 Zhipu 不支持的 OpenAI-only 字段 |
 | [`volcengine.ts`](volcengine.ts) | Volcengine Ark OpenAI-compatible 思考模式协议（thinking.type、reasoning_effort 映射、utility/off 清理） | pi-ai 原生处理 Volcengine thinking 控制、effort 枚举和 utility/off 历史清理 |
 | [`longcat.ts`](longcat.ts) | LongCat 的 `thinking` 对象式 reasoning 控制；utility 调用显式关思考并在回放前清掉过期 reasoning 历史 | pi-ai 原生处理 LongCat thinking 控制与 utility 历史清理 |
-| [`agnes.ts`](agnes.ts) | Agnes AI：官方文档未定义结构化 reasoning carrier，阻止把它当 Hana reasoning 模型而把私有推理挤进正文 | Agnes 发布稳定的结构化 reasoning 流/回放协议，且 Hana 通过 `compat.thinkingFormat` 映射 |
+| [`agnes.ts`](agnes.ts) | Agnes AI：官方文档未定义结构化 reasoning carrier，阻止把它当 Lingxi reasoning 模型而把私有推理挤进正文 | Agnes 发布稳定的结构化 reasoning 流/回放协议，且 Lingxi 通过 `compat.thinkingFormat` 映射 |
 | [`openai-input-audio.ts`](openai-input-audio.ts) | OpenAI Chat Completions 音频模型的 `input_audio` 分发入口（转换本身复用 `input-audio.ts`） | Pi SDK 把本地音频附件直接序列化成 OpenAI 的 `input_audio` part |
 | [`openai-video-url.ts`](openai-video-url.ts) | OpenAI-compatible 视频输入 `image_url data:video` → `video_url`，当前用于 Moonshot Kimi 与 DashScope Qwen | Pi SDK 原生按 video MIME 输出 `video_url`；或相关 provider 接受 `image_url data:video` |
 | [`openrouter.ts`](openrouter.ts) | OpenRouter 托管的 Claude adaptive-only 模型：effort 走 OpenRouter 的 `verbosity` 字段，发 Anthropic 原生 `thinking` 或通用 `reasoning.effort` 会打错线 | pi-ai 原生产出该请求形状；或 OpenRouter 改为接受标准 reasoning effort 字段且语义一致 |
@@ -222,7 +222,7 @@ first-match-wins 的实际匹配次序。改数组顺序时同步改这张表。
 | [`input-audio.ts`](input-audio.ts) | 通用 OpenAI-compatible 音频 transport 转换，由主入口按 `compat.audioTransport` 调用 | Pi SDK / provider serializer 原生按模型 transport 输出正确音频块 |
 | [`tool-pairing.ts`](tool-pairing.ts) | 孤儿 toolResult 配对兜底（issue #1285）：重放时补齐被丢弃的 assistant tool_calls | Pi SDK 重放不再丢弃 `stopReason=error/aborted` 轮次的 tool call |
 | [`reasoning-content-replay.ts`](reasoning-content-replay.ts) | `reasoning_content` carrier 的历史回放执行与 fail-closed 校验 | 所有相关 provider 的 replay 由 Pi SDK 原生保存回放 |
-| [`output-budget.ts`](output-budget.ts) | 通用输出预算策略：`OUTPUT_CAP_CAPABILITIES` + `resolveOutputBudgetPolicy()` | Pi SDK 原生支持 Hana 的默认预算与显式预算来源 |
+| [`output-budget.ts`](output-budget.ts) | 通用输出预算策略：`OUTPUT_CAP_CAPABILITIES` + `resolveOutputBudgetPolicy()` | Pi SDK 原生支持 Lingxi 的默认预算与显式预算来源 |
 | [`deepseek-thinking-budget.ts`](deepseek-thinking-budget.ts) | 仅在 DeepSeek 请求完全没带预算时补一个值；**不覆盖** Pi SDK `clampMaxTokensToContext` 算好的既有预算 | DeepSeek 请求缺预算时服务端有明确默认，或 SDK 始终携带预算 |
 
 子模块的对外 API 仅有 `matches` 和 `apply` 两个 export。其它 export（如 replay helper 的 `extractReasoningFromContent`、`ensureReasoningContentForToolCalls`）属于实现细节、仅供同文件和单元测试访问，**不构成对外契约**。升级 SDK 想删 helper 时不需顾虑外部依赖。

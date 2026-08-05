@@ -13,7 +13,7 @@ describe("win32 bundled shell candidates", () => {
     ]);
 
     const candidates = __testing.getBundledShellCandidates(
-      { HANA_ROOT: "C:\\Program Files\\Hanako\\resources\\server" },
+      { LINGXI_ROOT: "C:\\Program Files\\Hanako\\resources\\server" },
       {
         resourcesPath: "C:\\Program Files\\Hanako\\resources",
         resourceSiblingDir: () => null,
@@ -41,7 +41,7 @@ describe("win32 bundled shell candidates", () => {
     ]);
 
     const candidates = __testing.getBundledShellCandidates(
-      { HANA_ROOT: "C:\\Program Files\\Hanako\\resources\\server" },
+      { LINGXI_ROOT: "C:\\Program Files\\Hanako\\resources\\server" },
       {
         resourcesPath: "C:\\Program Files\\Hanako\\resources",
         resourceSiblingDir: () => null,
@@ -66,7 +66,7 @@ describe("win32 bundled shell candidates", () => {
     ]);
 
     const candidates = __testing.getBundledShellCandidates(
-      { HANA_ROOT: "C:\\Program Files\\Hanako\\resources\\server" },
+      { LINGXI_ROOT: "C:\\Program Files\\Hanako\\resources\\server" },
       {
         resourcesPath: "C:\\Program Files\\Hanako\\resources",
         resourceSiblingDir: () => null,

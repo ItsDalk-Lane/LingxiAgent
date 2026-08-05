@@ -108,7 +108,7 @@ async function makeEngine() {
   await writeFile(path.join(userDir, "user.md"), "user profile");
 
   return {
-    hanakoHome: tmpRoot,
+    lingxiHome: tmpRoot,
     agentsDir,
     productDir: path.join(tmpRoot, "product"),
     userDir,
@@ -196,8 +196,8 @@ describe("settings snapshot route", () => {
     await fs.rm(path.join(agentDir, "identity.md"));
     await fs.rm(path.join(agentDir, "ishiki.md"));
     const productDir = path.join(tmpRoot!, "product");
-    await writeFile(path.join(productDir, "identity-templates", "hanako.md"), "Template identity content");
-    await writeFile(path.join(productDir, "ishiki-templates", "hanako.md"), "Template ishiki content");
+    await writeFile(path.join(productDir, "identity-templates", "lingxi.md"), "Template identity content");
+    await writeFile(path.join(productDir, "ishiki-templates", "lingxi.md"), "Template ishiki content");
     (engine as any).productDir = productDir;
 
     const app = new Hono();

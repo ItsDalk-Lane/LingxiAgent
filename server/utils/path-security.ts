@@ -19,10 +19,10 @@ const SENSITIVE_DIRS = [".ssh", ".gnupg", ".aws", ".config/gcloud", ".kube"];
 /**
  * 检查路径是否指向敏感位置
  * @param {string} srcPath - 待检查的路径（相对路径视为敏感，fail-closed）
- * @param {string} [hanakoHome] - hanakoHome 路径（也视为敏感）
+ * @param {string} [lingxiHome] - lingxiHome 路径（也视为敏感）
  * @returns {boolean}
  */
-export function isSensitivePath(srcPath, hanakoHome) {
+export function isSensitivePath(srcPath, lingxiHome) {
   if (!path.isAbsolute(srcPath)) return true; // fail-closed on relative input
   const resolved = realPath(srcPath);
   if (!resolved) return true; // fail-closed
@@ -31,8 +31,8 @@ export function isSensitivePath(srcPath, hanakoHome) {
     const sensitive = path.join(home, d);
     if (resolved === sensitive || resolved.startsWith(sensitive + path.sep)) return true;
   }
-  if (hanakoHome) {
-    const realHome = realPath(hanakoHome);
+  if (lingxiHome) {
+    const realHome = realPath(lingxiHome);
     if (realHome && (resolved === realHome || resolved.startsWith(realHome + path.sep))) return true;
   }
   return false;

@@ -75,7 +75,7 @@ async function makeApp(root, runtimeState: any = {}) {
   });
   app.route("/api", createAccessRoute({
     engine: {
-      hanakoHome: root,
+      lingxiHome: root,
       getRuntimeContext: () => ({
         serverId: "server_access",
         serverNodeId: "server_access",

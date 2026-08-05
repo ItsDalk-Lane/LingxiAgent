@@ -17,7 +17,7 @@ function makeAgent({ experienceEnabled }) {
   fs.mkdirSync(path.join(productDir, "yuan"), { recursive: true });
   fs.mkdirSync(agentDir, { recursive: true });
   fs.mkdirSync(userDir, { recursive: true });
-  fs.writeFileSync(path.join(productDir, "yuan", "hanako.md"), "yuan", "utf-8");
+  fs.writeFileSync(path.join(productDir, "yuan", "lingxi.md"), "yuan", "utf-8");
   fs.writeFileSync(path.join(agentDir, "identity.md"), "identity", "utf-8");
   fs.writeFileSync(path.join(agentDir, "ishiki.md"), "ishiki", "utf-8");
 
@@ -29,7 +29,7 @@ function makeAgent({ experienceEnabled }) {
   } as any);
   agent._config = {
     locale: "en",
-    agent: { name: "Hana", yuan: "hanako" },
+    agent: { name: "Hana", yuan: "lingxi" },
     experience: { enabled: experienceEnabled },
   };
   agent.agentName = "Hana";

@@ -63,7 +63,7 @@ describe("config route family: no agent-implicit paths", () => {
 function makeGlobalEngine(overrides: Record<string, any> = {}): Record<string, any> {
   return {
     // engine.config is the focused agent's config — the bare route must stop reading it
-    config: { agent: { name: "Hana", yuan: "hanako" }, user: { name: "Owner" }, desk: { home_folder: "/w" }, cwd_history: ["/w"] },
+    config: { agent: { name: "Hana", yuan: "lingxi" }, user: { name: "Owner" }, desk: { home_folder: "/w" }, cwd_history: ["/w"] },
     configPath: "/tmp/does-not-exist/config.yaml",
     currentAgentId: "hana",
     getLocale: () => "zh-CN",

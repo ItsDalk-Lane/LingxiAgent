@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useSettingsStore } from '../store';
-import { hanaFetch } from '../api';
+import { lingxiFetch } from '../api';
 import { t, escapeHtml } from '../helpers';
 import { Overlay } from '../../ui';
 import styles from '../Settings.module.css';
@@ -19,7 +19,7 @@ export function MemoryViewer() {
     setHtml(`<div class="memory-viewer-empty">${t('settings.memory.actions.importing')}</div>`);
     try {
       const aid = useSettingsStore.getState().getSettingsAgentId();
-      const res = await hanaFetch(`/api/memories?agentId=${aid}`);
+      const res = await lingxiFetch(`/api/memories?agentId=${aid}`);
       const { memories } = await res.json();
 
       if (!memories || memories.length === 0) {

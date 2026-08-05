@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { useSettingsStore } from '../store';
 import { t, autoSaveConfig, refreshSettingsConfigSnapshot } from '../helpers';
-import { hanaFetch } from '../api';
+import { lingxiFetch } from '../api';
 import { Toggle } from '@/ui';
 import { AgentSelect } from './bridge/AgentSelect';
 import { BridgePermissionModeSelect, type BridgePermissionMode } from './bridge/BridgeWidgets';
@@ -102,7 +102,7 @@ export function WorkTab() {
     setAgentDesk(null);
     setHbIntervalDraft(null);
     const ac = new AbortController();
-    hanaFetch(`/api/agents/${selectedAgentId}/config`, { signal: ac.signal })
+    lingxiFetch(`/api/agents/${selectedAgentId}/config`, { signal: ac.signal })
       .then(r => r.json())
       .then(data => {
         if (ac.signal.aborted) return;
@@ -127,7 +127,7 @@ export function WorkTab() {
   const saveAgentConfig = async (agentId: string, patch: Record<string, any>): Promise<boolean> => {
     if (!agentId) return false;
     try {
-      const res = await hanaFetch(`/api/agents/${agentId}/config`, {
+      const res = await lingxiFetch(`/api/agents/${agentId}/config`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(patch),

@@ -29,7 +29,7 @@ interface MockStoreHook {
 }
 
 const mockState = {} as MockState;
-const mockHanaFetch = vi.fn();
+const mockLingxiFetch = vi.fn();
 const mockUpdateSettingsSnapshot = vi.fn((mutator: (snapshot: MockSnapshot) => MockSnapshot) => {
   const snapshot = mockState.settingsSnapshot?.data;
   if (!snapshot) return;
@@ -45,7 +45,7 @@ vi.mock('../../settings/store', () => {
 });
 
 vi.mock('../../settings/api', () => ({
-  hanaFetch: (...args: unknown[]) => mockHanaFetch(...args),
+  lingxiFetch: (...args: unknown[]) => mockLingxiFetch(...args),
 }));
 
 vi.mock('../../settings/actions', () => ({
@@ -257,9 +257,9 @@ describe('useBridgeState snapshot hydration', () => {
         updatedAt: Date.now(),
       },
     });
-    mockHanaFetch.mockReset();
+    mockLingxiFetch.mockReset();
     mockUpdateSettingsSnapshot.mockClear();
-    mockHanaFetch.mockImplementation((url: string) => {
+    mockLingxiFetch.mockImplementation((url: string) => {
       if (url === '/api/bridge/status?agentId=hana') {
         return new Promise<Response>(() => {});
       }
@@ -288,7 +288,7 @@ describe('useBridgeState snapshot hydration', () => {
     expect(screen.getByTestId('qq-secret')).toBeEmptyDOMElement();
     expect(screen.getByTestId('qq-secret-stored')).toHaveTextContent('true');
     expect(screen.getByTestId('public-ishiki')).toHaveTextContent('snapshot-public-ishiki');
-    expect(mockHanaFetch).toHaveBeenCalledWith(
+    expect(mockLingxiFetch).toHaveBeenCalledWith(
       '/api/bridge/status?agentId=hana',
       expect.objectContaining({ signal: expect.any(AbortSignal) }),
     );
@@ -297,7 +297,7 @@ describe('useBridgeState snapshot hydration', () => {
   it('keeps reconciling WeChat after QR confirmation until the selected Agent connects', async () => {
     vi.useFakeTimers();
     let statusRequests = 0;
-    mockHanaFetch.mockImplementation((url: string) => {
+    mockLingxiFetch.mockImplementation((url: string) => {
       if (url !== '/api/bridge/status?agentId=hana') {
         throw new Error(`unexpected request: ${url}`);
       }
@@ -330,7 +330,7 @@ describe('useBridgeState snapshot hydration', () => {
   it('cancels WeChat reconciliation when the selected Agent changes', async () => {
     vi.useFakeTimers();
     let hanaStatusRequests = 0;
-    mockHanaFetch.mockImplementation((url: string) => {
+    mockLingxiFetch.mockImplementation((url: string) => {
       if (url === '/api/bridge/status?agentId=hana') {
         hanaStatusRequests += 1;
         const wechat = hanaStatusRequests === 1
@@ -373,7 +373,7 @@ describe('useBridgeState snapshot hydration', () => {
 
   it('keeps saved public ishiki in the settings snapshot for remounts', async () => {
     mockState.settingsSnapshot.data.publicIshiki = '';
-    mockHanaFetch.mockImplementation((url: string, opts?: RequestInit) => {
+    mockLingxiFetch.mockImplementation((url: string, opts?: RequestInit) => {
       if (url === '/api/bridge/status?agentId=hana') {
         return new Promise<Response>(() => {});
       }
@@ -407,7 +407,7 @@ describe('useBridgeState snapshot hydration', () => {
   });
 
   it('applies owner status returned by setOwner without waiting for a later refresh', async () => {
-    mockHanaFetch.mockImplementation((url: string, opts?: RequestInit) => {
+    mockLingxiFetch.mockImplementation((url: string, opts?: RequestInit) => {
       if (url === '/api/bridge/status?agentId=hana') {
         return new Promise<Response>(() => {});
       }
@@ -440,7 +440,7 @@ describe('useBridgeState snapshot hydration', () => {
 
   it('keeps a dirty secret when a stale masked status response arrives', async () => {
     let resolveStatus!: (response: Response) => void;
-    mockHanaFetch.mockImplementation((url: string) => {
+    mockLingxiFetch.mockImplementation((url: string) => {
       if (url === '/api/bridge/status?agentId=hana') {
         return new Promise<Response>((resolve) => { resolveStatus = resolve; });
       }
@@ -463,7 +463,7 @@ describe('useBridgeState snapshot hydration', () => {
 
   it('keeps a dirty non-secret field when a status request started before the edit returns', async () => {
     let resolveStatus!: (response: Response) => void;
-    mockHanaFetch.mockImplementation((url: string) => {
+    mockLingxiFetch.mockImplementation((url: string) => {
       if (url === '/api/bridge/status?agentId=hana') {
         return new Promise<Response>((resolve) => { resolveStatus = resolve; });
       }
@@ -493,7 +493,7 @@ describe('useBridgeState snapshot hydration', () => {
 
   it('clears the submitted plaintext after save, ignores the returned mask, and tests with saved credentials', async () => {
     let statusRequests = 0;
-    mockHanaFetch.mockImplementation((url: string, opts?: RequestInit) => {
+    mockLingxiFetch.mockImplementation((url: string, opts?: RequestInit) => {
       if (url === '/api/bridge/status?agentId=hana') {
         statusRequests += 1;
         return Promise.resolve(new Response(JSON.stringify(bridgeStatus())));
@@ -543,7 +543,7 @@ describe('useBridgeState snapshot hydration', () => {
 
   it('marks a stored secret absent after an explicit empty submission succeeds', async () => {
     let statusRequests = 0;
-    mockHanaFetch.mockImplementation((url: string, opts?: RequestInit) => {
+    mockLingxiFetch.mockImplementation((url: string, opts?: RequestInit) => {
       if (url === '/api/bridge/status?agentId=hana') {
         statusRequests += 1;
         return Promise.resolve(new Response(JSON.stringify(bridgeStatus({
@@ -578,13 +578,13 @@ describe('useBridgeState snapshot hydration', () => {
   });
 
   it('keeps connection-test state and results owned by the Agent and request generation', async () => {
-    let resolveHanaTest!: (response: Response) => void;
+    let resolveLingxiTest!: (response: Response) => void;
     let resolveMioTest!: (response: Response) => void;
-    mockHanaFetch.mockImplementation((url: string) => {
+    mockLingxiFetch.mockImplementation((url: string) => {
       if (url.startsWith('/api/bridge/status?agentId=')) return new Promise<Response>(() => {});
       if (url === '/api/agents/mio/public-ishiki') return new Promise<Response>(() => {});
       if (url === '/api/bridge/test?agentId=hana') {
-        return new Promise<Response>((resolve) => { resolveHanaTest = resolve; });
+        return new Promise<Response>((resolve) => { resolveLingxiTest = resolve; });
       }
       if (url === '/api/bridge/test?agentId=mio') {
         return new Promise<Response>((resolve) => { resolveMioTest = resolve; });
@@ -604,7 +604,7 @@ describe('useBridgeState snapshot hydration', () => {
     expect(screen.getByTestId('testing-platform')).toHaveTextContent('telegram');
 
     await act(async () => {
-      resolveHanaTest(new Response(JSON.stringify({
+      resolveLingxiTest(new Response(JSON.stringify({
         ok: true,
         info: { username: 'old_hana_bot' },
       })));
@@ -630,7 +630,7 @@ describe('useBridgeState snapshot hydration', () => {
 
   it('does not clear a newer secret revision when an earlier save finishes', async () => {
     let resolveSave!: (response: Response) => void;
-    mockHanaFetch.mockImplementation((url: string) => {
+    mockLingxiFetch.mockImplementation((url: string) => {
       if (url === '/api/bridge/status?agentId=hana') {
         return Promise.resolve(new Response(JSON.stringify(bridgeStatus())));
       }
@@ -658,7 +658,7 @@ describe('useBridgeState snapshot hydration', () => {
 
   it('does not reuse a revision after switching away and back while a save is in flight', async () => {
     let resolveSave!: (response: Response) => void;
-    mockHanaFetch.mockImplementation((url: string) => {
+    mockLingxiFetch.mockImplementation((url: string) => {
       if (url.startsWith('/api/bridge/status?agentId=')) return new Promise<Response>(() => {});
       if (url === '/api/agents/mio/public-ishiki') return new Promise<Response>(() => {});
       if (url === '/api/bridge/config?agentId=hana') {
@@ -687,7 +687,7 @@ describe('useBridgeState snapshot hydration', () => {
 
   it('ignores an older same-Agent status response after a newer refresh wins', async () => {
     const statusResolvers: Array<(response: Response) => void> = [];
-    mockHanaFetch.mockImplementation((url: string) => {
+    mockLingxiFetch.mockImplementation((url: string) => {
       if (url === '/api/bridge/status?agentId=hana') {
         return new Promise<Response>((resolve) => { statusResolvers.push(resolve); });
       }
@@ -718,7 +718,7 @@ describe('useBridgeState snapshot hydration', () => {
       telegram: { enabled: false, status: 'disconnected', token: '', hasToken: false },
     });
     mockState.settingsSnapshot.data.bridgeStatus = staleBridgeStatus;
-    mockHanaFetch.mockImplementation((url: string) => {
+    mockLingxiFetch.mockImplementation((url: string) => {
       if (url === '/api/bridge/status?agentId=hana') {
         return Promise.resolve(new Response(JSON.stringify(bridgeStatus({
           telegram: { enabled: true, status: 'connected', token: '********', hasToken: true },
@@ -745,7 +745,7 @@ describe('useBridgeState snapshot hydration', () => {
   });
 
   it('hides the previous Agent status in the same render that changes selection', () => {
-    mockHanaFetch.mockImplementation((url: string) => {
+    mockLingxiFetch.mockImplementation((url: string) => {
       if (url.startsWith('/api/bridge/status?agentId=')) return new Promise<Response>(() => {});
       if (url === '/api/agents/mio/public-ishiki') return new Promise<Response>(() => {});
       throw new Error(`unexpected request: ${url}`);
@@ -761,7 +761,7 @@ describe('useBridgeState snapshot hydration', () => {
   });
 
   it('describes a DingTalk token-only success without claiming the Stream is connected', async () => {
-    mockHanaFetch.mockImplementation((url: string) => {
+    mockLingxiFetch.mockImplementation((url: string) => {
       if (url === '/api/bridge/status?agentId=hana') {
         return new Promise<Response>(() => {});
       }
@@ -787,7 +787,7 @@ describe('useBridgeState snapshot hydration', () => {
   });
 
   it('drops plaintext drafts when the selected Agent changes', async () => {
-    mockHanaFetch.mockImplementation((url: string) => {
+    mockLingxiFetch.mockImplementation((url: string) => {
       if (url.startsWith('/api/bridge/status?agentId=')) return new Promise<Response>(() => {});
       if (url === '/api/agents/mio/public-ishiki') return new Promise<Response>(() => {});
       throw new Error(`unexpected request: ${url}`);

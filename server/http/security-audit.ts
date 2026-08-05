@@ -20,7 +20,7 @@ export function recordSecurityAuditEvent(c, engine, {
   leaseId?: any;
   errorCode?: any;
 } = {}) {
-  return appendSecurityAuditEvent(engine?.hanakoHome, {
+  return appendSecurityAuditEvent(engine?.lingxiHome, {
     action,
     target,
     result,

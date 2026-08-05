@@ -1,5 +1,5 @@
 import { useStore } from './index';
-import { hanaFetch } from '../hooks/use-hana-fetch';
+import { lingxiFetch } from '../hooks/use-hana-fetch';
 import type { PluginPageInfo, PluginUiHostCapabilityGrant, PluginWidgetInfo } from '../types';
 
 function collectPluginUiHostCapabilities(
@@ -30,10 +30,10 @@ export async function refreshPluginUI(): Promise<void> {
     let hostCapabilityGrants: PluginUiHostCapabilityGrant[] = [];
 
     const [pagesResult, widgetsResult, grantsResult, prefsResult] = await Promise.allSettled([
-      hanaFetch('/api/plugins/pages').then(r => r.json()),
-      hanaFetch('/api/plugins/widgets').then(r => r.json()),
-      hanaFetch('/api/plugins/ui-host-capabilities').then(r => r.json()),
-      hanaFetch('/api/preferences/plugin-ui').then(r => r.json()),
+      lingxiFetch('/api/plugins/pages').then(r => r.json()),
+      lingxiFetch('/api/plugins/widgets').then(r => r.json()),
+      lingxiFetch('/api/plugins/ui-host-capabilities').then(r => r.json()),
+      lingxiFetch('/api/preferences/plugin-ui').then(r => r.json()),
     ]);
     if (pagesResult.status === 'fulfilled') pages = pagesResult.value;
     if (widgetsResult.status === 'fulfilled') widgets = widgetsResult.value;
@@ -75,7 +75,7 @@ export async function refreshPluginUI(): Promise<void> {
 }
 
 function persistField(field: Record<string, unknown>): void {
-  hanaFetch('/api/preferences/plugin-ui', {
+  lingxiFetch('/api/preferences/plugin-ui', {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(field),

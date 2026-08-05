@@ -35,7 +35,7 @@ describe("active-agent roster provider（#1657 / #1633 删除残留）", () => {
   function createAgentDir(id, { name = id, chatModel = null, description = null, tombstone = false } = {}) {
     const dir = path.join(agentsDir, id);
     fs.mkdirSync(dir, { recursive: true });
-    const cfg: any = { agent: { name, yuan: "hanako" } };
+    const cfg: any = { agent: { name, yuan: "lingxi" } };
     if (chatModel) cfg.models = { chat: chatModel };
     fs.writeFileSync(path.join(dir, "config.yaml"), YAML.dump(cfg));
     if (description) fs.writeFileSync(path.join(dir, "description.md"), description, "utf-8");
@@ -122,7 +122,7 @@ describe("active-agent roster provider（#1657 / #1633 删除残留）", () => {
     fs.writeFileSync(path.join(localAgentsDir, "ghost", "config.yaml"), "agent:\n  name: Ghost\n", "utf-8");
     fs.mkdirSync(path.join(productDir, "yuan"), { recursive: true });
     fs.mkdirSync(userDir, { recursive: true });
-    fs.writeFileSync(path.join(productDir, "yuan", "hanako.md"), "Yuan prompt", "utf-8");
+    fs.writeFileSync(path.join(productDir, "yuan", "lingxi.md"), "Yuan prompt", "utf-8");
 
     const agent = new Agent({
       id: "hana",
@@ -131,7 +131,7 @@ describe("active-agent roster provider（#1657 / #1633 删除残留）", () => {
       userDir,
       channelsDir: path.join(root, "channels"),
     } as any);
-    agent._config = { locale: "zh-CN", agent: { yuan: "hanako" } };
+    agent._config = { locale: "zh-CN", agent: { yuan: "lingxi" } };
     agent._cb = {
       listActiveAgents: () => [
         { id: "hana", name: "Hana", summary: "", model: "" },

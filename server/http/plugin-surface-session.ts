@@ -40,14 +40,14 @@ export function authenticatePluginSurfaceRequest(c, engine, { connectionKind = n
     || c.req.query(PLUGIN_SURFACE_SESSION_QUERY)
     || null;
   if (!token) return null;
-  if (!engine?.hanakoHome) {
+  if (!engine?.lingxiHome) {
     throw new PluginSurfaceSessionError("plugin surface session storage unavailable", {
       code: "plugin_surface_session_unavailable",
       status: 500,
     });
   }
   const session = verifyPluginSurfaceSession({
-    hanakoHome: engine.hanakoHome,
+    lingxiHome: engine.lingxiHome,
     pluginId,
     token,
   });

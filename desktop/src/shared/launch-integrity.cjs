@@ -170,7 +170,7 @@ function buildWindowsInstallSurfaceChecks({ execPath, resourcesPath } = {}) {
   const seedRendererArchivePath = findSeedArchive(seedRoot, "renderer-");
   const gitRoot = path.join(resourcesRoot, "git");
   const gitExe = path.join(gitRoot, "cmd", "git.exe");
-  const appExecutableLabel = executablePath ? path.basename(executablePath) : "HanaAgent.exe";
+  const appExecutableLabel = executablePath ? path.basename(executablePath) : "LingxiAgent.exe";
   // MinGit 打包 usr/bin/sh.exe（sh-compatible POSIX shell）；bash.exe 是老 PortableGit
   // 安装面的遗留布局，升级半途的混合状态不应误报为损坏。任一存在即视为 POSIX shell 完整。
   const posixShellCandidates = [
@@ -300,7 +300,7 @@ function formatInstallSurfaceError(result, diagnosticPath) {
   const lines = missing.map(item => `- ${item.relativePath}`);
   const diagnosticLine = diagnosticPath ? `\n\nDiagnostic file:\n${diagnosticPath}` : "";
   return [
-    "HanaAgent installation is incomplete.",
+    "LingxiAgent installation is incomplete.",
     "",
     "Missing or unreadable files:",
     ...lines,

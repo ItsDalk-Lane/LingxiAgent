@@ -11,8 +11,8 @@ const PRESENTATIONS = ["folder", "external_panel", "linked_studio"];
 const STATUSES = ["active", "disabled"];
 const CAPABILITIES = ["list", "read", "write", "watch", "materialize", "execute"];
 
-export function ensureStudioMountRegistry(hanakoHome, { now = new Date().toISOString() } = {}) {
-  const filePath = path.join(hanakoHome, STUDIO_MOUNTS_FILE);
+export function ensureStudioMountRegistry(lingxiHome, { now = new Date().toISOString() } = {}) {
+  const filePath = path.join(lingxiHome, STUDIO_MOUNTS_FILE);
   const current = readJsonIfPresent(filePath, STUDIO_MOUNTS_FILE);
   if (current) {
     validateStudioMountRegistry(current);
@@ -27,15 +27,15 @@ export function ensureStudioMountRegistry(hanakoHome, { now = new Date().toISOSt
   return { created: [STUDIO_MOUNTS_FILE] };
 }
 
-export function loadStudioMountRegistry(hanakoHome) {
-  ensureStudioMountRegistry(hanakoHome);
-  const registry = readJsonRequired(path.join(hanakoHome, STUDIO_MOUNTS_FILE), STUDIO_MOUNTS_FILE);
+export function loadStudioMountRegistry(lingxiHome) {
+  ensureStudioMountRegistry(lingxiHome);
+  const registry = readJsonRequired(path.join(lingxiHome, STUDIO_MOUNTS_FILE), STUDIO_MOUNTS_FILE);
   validateStudioMountRegistry(registry);
   return registry;
 }
 
-export function upsertStudioMount(hanakoHome, mount, { now = new Date().toISOString() } = {}) {
-  const registry = loadStudioMountRegistry(hanakoHome);
+export function upsertStudioMount(lingxiHome, mount, { now = new Date().toISOString() } = {}) {
+  const registry = loadStudioMountRegistry(lingxiHome);
   const normalized = validateStudioMount({
     ...mount,
     schemaVersion: SCHEMA_VERSION,
@@ -55,19 +55,19 @@ export function upsertStudioMount(hanakoHome, mount, { now = new Date().toISOStr
   }
   registry.updatedAt = now;
   validateStudioMountRegistry(registry);
-  writeJsonAtomic(path.join(hanakoHome, STUDIO_MOUNTS_FILE), registry);
+  writeJsonAtomic(path.join(lingxiHome, STUDIO_MOUNTS_FILE), registry);
   return clonePlain(existingIndex >= 0 ? registry.mounts[existingIndex] : normalized);
 }
 
 export function disableStudioMount(
-  hanakoHome,
+  lingxiHome,
   mountId,
   options: { hostStudioId?: string; now?: string } = {},
 ) {
   const { hostStudioId, now = new Date().toISOString() } = options;
   if (!isNonEmptyString(mountId)) throw new Error("mountId required");
   if (hostStudioId !== undefined && !isNonEmptyString(hostStudioId)) throw new Error("hostStudioId required");
-  const registry = loadStudioMountRegistry(hanakoHome);
+  const registry = loadStudioMountRegistry(lingxiHome);
   const existingIndex = registry.mounts.findIndex((item) =>
     item.mountId === mountId && (hostStudioId === undefined || item.hostStudioId === hostStudioId)
   );
@@ -79,13 +79,13 @@ export function disableStudioMount(
   };
   registry.updatedAt = now;
   validateStudioMountRegistry(registry);
-  writeJsonAtomic(path.join(hanakoHome, STUDIO_MOUNTS_FILE), registry);
+  writeJsonAtomic(path.join(lingxiHome, STUDIO_MOUNTS_FILE), registry);
   return clonePlain(registry.mounts[existingIndex]);
 }
 
-export function listStudioMountsForStudio(hanakoHome, hostStudioId) {
+export function listStudioMountsForStudio(lingxiHome, hostStudioId) {
   if (!isNonEmptyString(hostStudioId)) throw new Error("hostStudioId required");
-  const registry = loadStudioMountRegistry(hanakoHome);
+  const registry = loadStudioMountRegistry(lingxiHome);
   return registry.mounts
     .filter((mount) => mount.hostStudioId === hostStudioId)
     .map(clonePlain);

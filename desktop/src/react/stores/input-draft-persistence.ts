@@ -9,7 +9,7 @@
  * - 服务端是持久真相，hydrate 不覆盖 renderer 内已经更新过的草稿
  */
 import type { JSONContent } from '@tiptap/core';
-import { hanaFetch } from '../hooks/use-hana-fetch';
+import { lingxiFetch } from '../hooks/use-hana-fetch';
 import { hasServerConnection } from '../services/server-connection';
 import { useStore } from './index';
 import { resolveWorkspaceUiSurface } from './workspace-ui-state-actions';
@@ -34,7 +34,7 @@ async function pushDraft(key: string, text: string, doc: JSONContent | null): Pr
   else if (isPathLikeKey(key)) body.sessionPath = key;
   else body.sessionId = key;
   try {
-    await hanaFetch('/api/input-drafts', {
+    await lingxiFetch('/api/input-drafts', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
@@ -61,7 +61,7 @@ export async function hydrateInputDrafts(): Promise<void> {
   if (!hasServerConnection(useStore.getState())) return;
   let data: any = null;
   try {
-    const res = await hanaFetch(`/api/input-drafts?surface=${resolveWorkspaceUiSurface()}`);
+    const res = await lingxiFetch(`/api/input-drafts?surface=${resolveWorkspaceUiSurface()}`);
     data = await res.json().catch(() => null);
   } catch (err) {
     console.warn('[input-drafts] hydrate failed:', err);

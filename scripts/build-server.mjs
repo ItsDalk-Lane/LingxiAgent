@@ -19,7 +19,7 @@
  *
  * 产出结构：
  *   dist-server/{platform}-{arch}/
- *     hana-server             ← shell wrapper（设置 HANA_ROOT 并启动）
+ *     hana-server             ← shell wrapper（设置 LINGXI_ROOT 并启动）
  *     hana                    ← shell wrapper（server-first CLI）
  *     node                    ← Node.js runtime
  *     bundle/                 ← Vite bundle 产出
@@ -137,7 +137,7 @@ if (fs.existsSync(skillsSrc)) {
 
 // 角色卡导入/导出预览由 server 读取默认头像、卡背和 Yuan 图标。
 // PWA /mobile/* 静态文件也由独立 server 进程读取。
-// 打包模式下 HANA_ROOT 指向 resources/server，不能依赖 renderer asar 里的 assets。
+// 打包模式下 LINGXI_ROOT 指向 resources/server，不能依赖 renderer asar 里的 assets。
 // full 专属：品牌资产 + renderer 静态树，开源产物不携带。
 for (const copiedAsset of copyServerRuntimeAssets({ rootDir: ROOT, outDir })) {
   console.log(`[build-server]   ${copiedAsset}`);
@@ -208,9 +208,9 @@ writeServerWrapperScripts({ outDir, isWin });
 // 树在装箱后不允许再被任何步骤触碰。renderer 树（desktop/dist-renderer/）
 // 由 build:renderer 在本脚本之前产出（package.json 的 build:client 组合脚本
 // 保证顺序）；纯 web 静态资源，不需要签名，只做"不含 Mach-O"的断言。
-// HANA_SIGN_KEY 未设置时这里硬报错（安装包必须携带签名 seed）；本地验证用
-// artifact-keygen.mjs 生成一次性密钥对，配 HANA_SIGN_KEYSET 指向其 keyset。
-// full 专属：开源产物不装箱、不签名、全程不读 HANA_SIGN_KEY。
+// LINGXI_SIGN_KEY 未设置时这里硬报错（安装包必须携带签名 seed）；本地验证用
+// artifact-keygen.mjs 生成一次性密钥对，配 LINGXI_SIGN_KEYSET 指向其 keyset。
+// full 专属：开源产物不装箱、不签名、全程不读 LINGXI_SIGN_KEY。
 await packDualKindSeed({
   outDir,
   rendererDistDir: path.join(ROOT, "desktop", "dist-renderer"),

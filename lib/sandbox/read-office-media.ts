@@ -193,14 +193,14 @@ export async function extractDocxEmbeddedImages(docxPath) {
 async function materializeDocxImages({
   docxPath,
   images,
-  hanakoHome,
+  lingxiHome,
   sessionId = null,
   sessionPath,
   recordFileOperation,
 }) {
   const warnings = [];
   if (!images.length) return { entries: [], warnings };
-  if (!hanakoHome || !sessionPath || typeof recordFileOperation !== "function") {
+  if (!lingxiHome || !sessionPath || typeof recordFileOperation !== "function") {
     warnings.push("Docx embedded images were extracted but could not be registered without session file context.");
     return {
       entries: images.map((image) => {
@@ -217,7 +217,7 @@ async function materializeDocxImages({
     };
   }
 
-  const dir = sessionFilesCacheDir(hanakoHome, { sessionId, sessionPath });
+  const dir = sessionFilesCacheDir(lingxiHome, { sessionId, sessionPath });
   await fs.mkdir(dir, { recursive: true });
   const docBase = safeFilenamePart(path.basename(docxPath, path.extname(docxPath)), "document");
   const entries = [];
@@ -318,13 +318,13 @@ async function adaptForTextOnlyModel(result, {
 }
 
 export function wrapReadOfficeMedia(tool, cwd, {
-  hanakoHome,
+  lingxiHome,
   getVisionBridge,
   isVisionAuxiliaryEnabled,
   getSessionPath,
   getSessionIdForPath,
   recordFileOperation,
-}: { hanakoHome?: any; getVisionBridge?: any; isVisionAuxiliaryEnabled?: any; getSessionPath?: any; getSessionIdForPath?: any; recordFileOperation?: any } = {}) {
+}: { lingxiHome?: any; getVisionBridge?: any; isVisionAuxiliaryEnabled?: any; getSessionPath?: any; getSessionIdForPath?: any; recordFileOperation?: any } = {}) {
   if (!tool || tool.name !== "read" || typeof tool.execute !== "function") return tool;
 
   return {
@@ -350,7 +350,7 @@ export function wrapReadOfficeMedia(tool, cwd, {
       const { entries, warnings } = await materializeDocxImages({
         docxPath: absolutePath,
         images,
-        hanakoHome,
+        lingxiHome,
         sessionId,
         sessionPath,
         recordFileOperation,

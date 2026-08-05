@@ -494,19 +494,19 @@ export class ProviderRegistry {
   declare _builtinPlugins: any;
   declare _catalog: ProviderCatalogStore;
   declare _entries: any;
-  declare _hanakoHome: any;
+  declare _lingxiHome: any;
   declare _localProviderPlugins: LocalProviderPluginStore;
   declare _plugins: any;
   declare _runtimeMediaCapabilities: any;
   declare _runtimeMediaCapabilitySources: any;
   declare _runtimeMediaRefreshes: any;
   /**
-   * @param {string} hanakoHome - 用户数据根目录（如 ~/.hanako-dev）
+   * @param {string} lingxiHome - 用户数据根目录（如 ~/.lingxi-dev）
    */
-  constructor(hanakoHome) {
-    this._hanakoHome = hanakoHome;
-    this._catalog = new ProviderCatalogStore(hanakoHome);
-    this._localProviderPlugins = new LocalProviderPluginStore(hanakoHome);
+  constructor(lingxiHome) {
+    this._lingxiHome = lingxiHome;
+    this._catalog = new ProviderCatalogStore(lingxiHome);
+    this._localProviderPlugins = new LocalProviderPluginStore(lingxiHome);
     /** @type {Map<string, ProviderPlugin>} id → plugin */
     this._plugins = new Map();
     this._builtinPlugins = new Map();
@@ -834,7 +834,7 @@ export class ProviderRegistry {
       // Copy to the destination before cleaning any agent source. A failed
       // catalog write therefore leaves every override available for retry.
       this._saveAddedModels(userConfig);
-      const header = "# HanaAgent 助手配置\n# 由设置页面管理，手动编辑也可以\n\n";
+      const header = "# LingxiAgent 助手配置\n# 由设置页面管理，手动编辑也可以\n\n";
       for (const { cfgPath, cfg } of pendingConfigWrites) {
         const yamlStr = header + YAML.dump(cfg, { indent: 2, lineWidth: -1, sortKeys: false, quotingType: '"', forceQuotes: false });
         writeSecretFileSync(cfgPath, yamlStr);
@@ -1545,7 +1545,7 @@ export class ProviderRegistry {
    */
   _readOAuthEntry(authJsonKey) {
     try {
-      const authPath = path.join(this._hanakoHome, "auth.json");
+      const authPath = path.join(this._lingxiHome, "auth.json");
       // mtime 缓存：auth.json 只在 OAuth 回调写入时变化
       const mtime = fs.statSync(authPath).mtimeMs;
       if (!this._authJsonCache || mtime !== this._authJsonMtime) {

@@ -3,7 +3,7 @@
  * 模式对齐 session-actions.ts：模块级 async 函数 + useStore.getState()。
  */
 import { useStore } from './index';
-import { hanaFetch } from '../hooks/use-hana-fetch';
+import { lingxiFetch } from '../hooks/use-hana-fetch';
 import { switchSession } from './session-actions';
 import { sessionScopedValue } from './session-slice';
 import type { ChatFindResults, ChatFindState } from './chat-find-slice';
@@ -20,7 +20,7 @@ function findStateFor(path: string): ChatFindState | undefined {
 
 export async function fetchSessionFind(path: string, query: string): Promise<ChatFindResults | null> {
   try {
-    const res = await hanaFetch(
+    const res = await lingxiFetch(
       `/api/sessions/find?path=${encodeURIComponent(path)}&q=${encodeURIComponent(query)}`,
     );
     const data = await res.json();

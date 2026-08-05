@@ -14,13 +14,13 @@
  * a "helpfully" auto-triggered build:server call, and never a reason to
  * fall back to an unsigned/partial seed.
  *
- * Structural guarantee: HANA_SIGN_KEY (the private signing key path) is
+ * Structural guarantee: LINGXI_SIGN_KEY (the private signing key path) is
  * never read by this script, and is stripped from the environment handed
  * to every child process it spawns (see buildChildEnv()) — even if the
  * invoking shell happens to have it set for unrelated reasons (e.g. an
  * operator who also runs full signed releases from the same terminal).
  * scripts/verify-seed-kit.mjs's own contract already never reads
- * HANA_SIGN_KEY either (it only ever reads the public HANA_SIGN_KEYSET
+ * LINGXI_SIGN_KEY either (it only ever reads the public LINGXI_SIGN_KEYSET
  * override, which is unrelated and intentionally passed through
  * unmodified — see that variable's doc comment in
  * scripts/build-server-artifact.mjs).
@@ -58,7 +58,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const ROOT = path.resolve(__dirname, "..");
 
-const SIGN_KEY_ENV_VAR = "HANA_SIGN_KEY";
+const SIGN_KEY_ENV_VAR = "LINGXI_SIGN_KEY";
 
 const VITE_BIN = path.join(ROOT, "node_modules", ".bin", "vite");
 const ELECTRON_BUILDER_BIN = path.join(ROOT, "node_modules", ".bin", "electron-builder");
@@ -73,7 +73,7 @@ function log(msg) {
 /**
  * Builds the environment handed to every child process this script spawns.
  * Explicit runtime assertion (not just the `delete` statement's say-so)
- * that HANA_SIGN_KEY cannot leak into anything build:shell runs.
+ * that LINGXI_SIGN_KEY cannot leak into anything build:shell runs.
  */
 function buildChildEnv() {
   const env = { ...process.env };
@@ -116,7 +116,7 @@ function assertSeedKitDirExists({ platform, arch }) {
     throw new Error(
       `[build-shell] no signed seed kit found at ${artifactOutDir} (expected ${manifestFileName}). `
         + `build:shell never builds the seed kit itself (it never touches build:server or ${SIGN_KEY_ENV_VAR}). `
-        + `Run \`npm run build:server\` (with ${SIGN_KEY_ENV_VAR}/HANA_SIGN_KEYSET set) to produce one, or copy an `
+        + `Run \`npm run build:server\` (with ${SIGN_KEY_ENV_VAR}/LINGXI_SIGN_KEYSET set) to produce one, or copy an `
         + `already-signed dist-server-artifact/${osDirName}-${arch}/ directory into place, then re-run build:shell.`,
     );
   }

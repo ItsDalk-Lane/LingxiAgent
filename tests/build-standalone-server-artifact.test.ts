@@ -47,7 +47,7 @@ function createInputs(root: string) {
   writeFile(gitDir, "usr/bin/sh.exe", "posix shell");
   writeFile(gitDir, "usr/bin/grep.exe", "coreutils");
 
-  const helperPath = path.join(root, "dist-sandbox", "win-x64", "hana-win-sandbox.exe");
+  const helperPath = path.join(root, "dist-sandbox", "win-x64", "lingxi-win-sandbox.exe");
   writeFile(path.dirname(helperPath), path.basename(helperPath), "sandbox helper");
 
   return {
@@ -94,7 +94,7 @@ describe("Windows standalone server artifact", () => {
     expect(fs.readFileSync(path.join(repoRoot, ".gitignore"), "utf8")).toMatch(/^dist-standalone\/$/m);
   });
 
-  it("builds a SHA-256-manifested HanaCore archive without mutating the thin server tree", async () => {
+  it("builds a SHA-256-manifested LingxiCore archive without mutating the thin server tree", async () => {
     const root = makeTempRoot();
     const inputs = createInputs(root);
     const before = snapshotTree(inputs.serverDir);
@@ -102,7 +102,7 @@ describe("Windows standalone server artifact", () => {
     const result = await buildWindowsStandaloneArtifact({ rootDir: root, log: () => {} });
     const names = standaloneArtifactNames("1.2.3");
 
-    expect(path.basename(result.archivePath)).toBe("HanaCore-1.2.3-Windows-x64.tar.gz");
+    expect(path.basename(result.archivePath)).toBe("LingxiCore-1.2.3-Windows-x64.tar.gz");
     expect(path.basename(result.archivePath)).toBe(names.archiveName);
     expect(path.basename(result.archivePath)).not.toMatch(/^server-/);
     expect(result.archivePath).toContain(`${path.sep}dist-standalone${path.sep}`);
@@ -135,15 +135,15 @@ describe("Windows standalone server artifact", () => {
     expect(fs.readFileSync(path.join(layoutRoot, "server", "lib", "runtime.json"), "utf8"))
       .toBe("server source must remain unchanged\n");
     expect(fs.readFileSync(path.join(layoutRoot, "git", "cmd", "git.exe"), "utf8")).toBe("git cmd");
-    expect(fs.readFileSync(path.join(layoutRoot, "sandbox", "windows", "hana-win-sandbox.exe"), "utf8"))
+    expect(fs.readFileSync(path.join(layoutRoot, "sandbox", "windows", "lingxi-win-sandbox.exe"), "utf8"))
       .toBe("sandbox helper");
 
     const wrappers = standaloneWrapperContents();
     expect(fs.readFileSync(path.join(layoutRoot, "hana.cmd"), "utf8")).toBe(wrappers.hana);
-    expect(wrappers.hana).toContain('set "HANA_ROOT=%~dp0server"');
-    expect(wrappers.hana).toContain('set "HANA_SERVER_ENTRY=%~dp0server\\bundle\\index.js"');
+    expect(wrappers.hana).toContain('set "LINGXI_ROOT=%~dp0server"');
+    expect(wrappers.hana).toContain('set "LINGXI_SERVER_ENTRY=%~dp0server\\bundle\\index.js"');
     expect(wrappers.hana).toContain(
-      'set "HANA_WIN32_SANDBOX_HELPER=%~dp0sandbox\\windows\\hana-win-sandbox.exe"',
+      'set "LINGXI_WIN32_SANDBOX_HELPER=%~dp0sandbox\\windows\\lingxi-win-sandbox.exe"',
     );
     expect(wrappers.hana).toContain(
       'set "PATH=%~dp0git\\cmd;%~dp0git\\usr\\bin;%~dp0git\\mingw64\\bin;%PATH%"',
@@ -185,7 +185,7 @@ describe("Windows standalone server artifact", () => {
       "utf8",
     );
 
-    expect(source).not.toContain("HANA_SIGN_KEY");
+    expect(source).not.toContain("LINGXI_SIGN_KEY");
     expect(source).not.toContain("artifact-sign.mjs");
     await expect(buildWindowsStandaloneArtifact({ rootDir: root, log: () => {} })).resolves.toMatchObject({
       manifest: { kind: "hana-core-standalone" },
@@ -263,9 +263,9 @@ describe("Windows standalone server artifact", () => {
     const workDir = "C:\\Temp\\hana smoke";
     const runtimeEnvRoot = `${workDir}\\.ephemeral\\win32-sandbox-env`;
     const spec = standaloneRestrictedTokenSmokeSpec({
-      layoutRoot: "C:\\downloads\\HanaCore",
+      layoutRoot: "C:\\downloads\\LingxiCore",
       workDir,
-      hanaHome: "C:\\Temp\\hana home",
+      lingxiHome: "C:\\Temp\\hana home",
       env: {
         SystemRoot: "C:\\Windows",
         PATH: "C:\\Program Files\\Git\\cmd;C:\\Windows\\System32",
@@ -275,7 +275,7 @@ describe("Windows standalone server artifact", () => {
       },
     });
 
-    expect(spec.helperPath).toBe("C:\\downloads\\HanaCore\\sandbox\\windows\\hana-win-sandbox.exe");
+    expect(spec.helperPath).toBe("C:\\downloads\\LingxiCore\\sandbox\\windows\\lingxi-win-sandbox.exe");
     expect(spec.args).toEqual([
       "--cwd", workDir,
       "--writable-root", workDir,
@@ -284,7 +284,7 @@ describe("Windows standalone server artifact", () => {
       "--",
       "C:\\Windows\\System32\\cmd.exe",
       "/d", "/s", "/c",
-      expect.stringContaining("HANA_RESTRICTED_TOKEN_OK"),
+      expect.stringContaining("LINGXI_RESTRICTED_TOKEN_OK"),
     ]);
     expect(Object.keys(spec.env).filter((key) => key.toLowerCase() === "path")).toEqual(["Path"]);
     // Native cmd smoke must not put MinGit/MSYS ahead of System32: this step only
@@ -292,7 +292,7 @@ describe("Windows standalone server artifact", () => {
     expect(spec.env.Path).toBe("C:\\Windows\\System32");
     expect(spec.env.Path).not.toMatch(/git|usr\\bin|mingw/i);
     // Match production win32-exec: TEMP/LOCALAPPDATA/APPDATA/HOME all live inside
-    // the writable root the helper grants, not beside it under hanaHome.
+    // the writable root the helper grants, not beside it under lingxiHome.
     expect(spec.env.TEMP).toBe(`${runtimeEnvRoot}\\Temp`);
     expect(spec.env.TMP).toBe(`${runtimeEnvRoot}\\Temp`);
     expect(spec.env.LOCALAPPDATA).toBe(`${runtimeEnvRoot}\\LocalAppData`);
@@ -305,25 +305,25 @@ describe("Windows standalone server artifact", () => {
       `${runtimeEnvRoot}\\AppData\\Roaming`,
       `${workDir}\\Profile`,
     ]);
-    expect(spec.args.at(-1)).toContain("HANA_DENY_WRITE_OK");
+    expect(spec.args.at(-1)).toContain("LINGXI_DENY_WRITE_OK");
     expect(spec.args.at(-1)).toContain("exit 73");
     expect(spec.deniedMarkerPath).toBe(`${workDir}\\blocked\\hana-deny-write-smoke.txt`);
     expect(spec.env).toMatchObject({
       SystemRoot: "C:\\Windows",
       USERNAME: "runner",
       SystemDrive: "C:",
-      HANA_HOME: "C:\\Temp\\hana home",
-      HANA_ROOT: "C:\\downloads\\HanaCore\\server",
-      HANA_SERVER_ENTRY: "C:\\downloads\\HanaCore\\server\\bundle\\index.js",
-      HANA_WIN32_SANDBOX_HELPER: spec.helperPath,
+      LINGXI_HOME: "C:\\Temp\\hana home",
+      LINGXI_ROOT: "C:\\downloads\\LingxiCore\\server",
+      LINGXI_SERVER_ENTRY: "C:\\downloads\\LingxiCore\\server\\bundle\\index.js",
+      LINGXI_WIN32_SANDBOX_HELPER: spec.helperPath,
     });
   });
 
   it("runs the production exec_command chain through the extracted wrapper with a hermetic environment", () => {
     const spec = standaloneExecCommandSmokeSpec({
-      layoutRoot: "C:\\downloads\\HanaCore",
+      layoutRoot: "C:\\downloads\\LingxiCore",
       workDir: "C:\\Temp\\hana smoke",
-      hanaHome: "C:\\Temp\\hana home",
+      lingxiHome: "C:\\Temp\\hana home",
       env: {
         SystemRoot: "C:\\Windows",
         PATH: "C:\\Program Files\\Git\\cmd;C:\\host-tools",
@@ -332,16 +332,16 @@ describe("Windows standalone server artifact", () => {
     });
 
     expect(spec.command).toBe("C:\\Windows\\System32\\cmd.exe");
-    expect(spec.args.join(" ")).toContain('call "C:\\downloads\\HanaCore\\hana-server.cmd"');
+    expect(spec.args.join(" ")).toContain('call "C:\\downloads\\LingxiCore\\hana-server.cmd"');
     expect(spec.windowsVerbatimArguments).toBe(true);
     expect(spec.env.Path).not.toContain("Program Files\\Git");
-    expect(spec.env.HANA_ROOT).toBe("Z:\\hana-poison\\server");
-    expect(spec.env.HANA_STANDALONE_EXPECTED_ROOT).toBe("C:\\downloads\\HanaCore\\server");
-    expect(spec.env.HANA_STANDALONE_EXPECTED_HELPER)
-      .toBe("C:\\downloads\\HanaCore\\sandbox\\windows\\hana-win-sandbox.exe");
-    expect(spec.env.HANA_INTERNAL_STANDALONE_RUNTIME_SMOKE).toBe("1");
+    expect(spec.env.LINGXI_ROOT).toBe("Z:\\hana-poison\\server");
+    expect(spec.env.LINGXI_STANDALONE_EXPECTED_ROOT).toBe("C:\\downloads\\LingxiCore\\server");
+    expect(spec.env.LINGXI_STANDALONE_EXPECTED_HELPER)
+      .toBe("C:\\downloads\\LingxiCore\\sandbox\\windows\\lingxi-win-sandbox.exe");
+    expect(spec.env.LINGXI_INTERNAL_STANDALONE_RUNTIME_SMOKE).toBe("1");
     expect(spec.env).not.toHaveProperty("NODE_OPTIONS");
-    expect(spec.env).not.toHaveProperty("HANA_STANDALONE_EXEC_MARKER");
+    expect(spec.env).not.toHaveProperty("LINGXI_STANDALONE_EXEC_MARKER");
   });
 
   it("rejects an archive whose bytes no longer match its manifest", async () => {

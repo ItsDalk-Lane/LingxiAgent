@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { useSettingsStore } from '../store';
-import { hanaFetch } from '../api';
+import { lingxiFetch } from '../api';
 import { t } from '../helpers';
 import { updateSettingsSnapshot } from '../actions';
 import { MediaProviderDetail } from './media/MediaProviderDetail';
@@ -200,7 +200,7 @@ export function MediaTab() {
   const loadImageProviders = useCallback(async () => {
     setImageConfigLoading(true);
     try {
-      const res = await hanaFetch('/api/media/image/providers');
+      const res = await lingxiFetch('/api/media/image/providers');
       const data = await res.json();
       const nextProviders = data.providers || {};
       setProviders(nextProviders);
@@ -223,7 +223,7 @@ export function MediaTab() {
   const loadVideoProviders = useCallback(async () => {
     setVideoConfigLoading(true);
     try {
-      const res = await hanaFetch('/api/media/video/providers');
+      const res = await lingxiFetch('/api/media/video/providers');
       const data = await res.json();
       const nextProviders = data.providers || {};
       setVideoProviders(nextProviders);
@@ -245,7 +245,7 @@ export function MediaTab() {
 
   const loadSpeechProviders = useCallback(async () => {
     try {
-      const res = await hanaFetch('/api/speech-recognition/providers');
+      const res = await lingxiFetch('/api/speech-recognition/providers');
       const data = await res.json();
       const nextProviders = data.providers || {};
       setSpeechProviders(nextProviders);
@@ -308,7 +308,7 @@ export function MediaTab() {
 
   const saveConfig = async (updates: Partial<MediaConfig>) => {
     try {
-      const res = await hanaFetch('/api/media/image/config', {
+      const res = await lingxiFetch('/api/media/image/config', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ values: encodeConfigPatch(updates) }),
@@ -324,7 +324,7 @@ export function MediaTab() {
 
   const saveVideoConfig = async (updates: Partial<MediaConfig>) => {
     try {
-      const res = await hanaFetch('/api/media/video/config', {
+      const res = await lingxiFetch('/api/media/video/config', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ values: encodeConfigPatch(updates) }),
@@ -340,7 +340,7 @@ export function MediaTab() {
 
   const saveSpeechConfig = async (updates: SpeechConfigPatch) => {
     try {
-      const res = await hanaFetch('/api/speech-recognition/config', {
+      const res = await lingxiFetch('/api/speech-recognition/config', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ values: encodeSpeechConfigPatch(updates) }),

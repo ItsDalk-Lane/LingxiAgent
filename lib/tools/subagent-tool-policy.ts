@@ -8,7 +8,7 @@
  *   工具对模型始终可见、运行时切只读↔操作不动清单 → 一个 agent 的所有 subagent 共享同一缓存前缀。
  * 乙 strip（Claude Code 式）：按权限档剥离工具清单（白名单）。模型只看见可用工具，但每档一份前缀。
  *
- * 性能 A/B：env HANA_SUBAGENT_TOOL_STRATEGY = "intercept"（默认）| "strip"。
+ * 性能 A/B：env LINGXI_SUBAGENT_TOOL_STRATEGY = "intercept"（默认）| "strip"。
  *
  * 权限档（Codex 式）由两路决定，优先级：显式 access 参数 > 继承父会话档。
  *   - access==="read"  → READ_ONLY（探索/调研/审查：只读，禁改文件、跑命令）
@@ -34,7 +34,7 @@ const STRIP_BUILTIN_READONLY = ["read", "grep", "find", "ls"];
 
 /** 当前策略：env 覆盖，默认甲（intercept）。便于性能 A/B。 */
 export function resolveSubagentToolStrategy() {
-  return process.env.HANA_SUBAGENT_TOOL_STRATEGY === "strip" ? "strip" : "intercept";
+  return process.env.LINGXI_SUBAGENT_TOOL_STRATEGY === "strip" ? "strip" : "intercept";
 }
 
 /**

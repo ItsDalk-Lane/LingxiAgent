@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import type { AutoUpdateState } from '../types';
 
 function devWebPreviewState(): AutoUpdateState | null {
-  if (!window.__HANA_DEV_WEB__) return null;
+  if (!window.__LINGXI_DEV_WEB__) return null;
   const params = new URLSearchParams(window.location.search);
   if (params.get('hana_update_preview') !== 'downloaded') return null;
   return {

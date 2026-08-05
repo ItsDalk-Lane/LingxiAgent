@@ -44,7 +44,7 @@ const PREVIEW_ESSAY = `# 风
 
 const THEME_DIR = path.join(__dirname, "..", "desktop", "src", "screenshot-themes");
 const OUT_DIR = path.join(__dirname, "..", "desktop", "src", "assets", "screenshot-previews");
-const LOGO_PATH = path.join(__dirname, "..", "desktop", "src", "assets", "Hanako.png");
+const LOGO_PATH = path.join(__dirname, "..", "desktop", "src", "assets", "Lingxi.png");
 
 function buildHTML(themeName) {
   const MarkdownIt = require("markdown-it");
@@ -103,7 +103,7 @@ function buildHTML(themeName) {
   ${bodyHTML}
   <footer class="watermark">
     <img class="watermark-logo" src="${logoUrl}" />
-    <span class="watermark-text">HanaAgent</span>
+    <span class="watermark-text">LingxiAgent</span>
   </footer>
 </body>
 </html>`;

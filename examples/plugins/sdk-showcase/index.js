@@ -1,14 +1,14 @@
 import {
   defineBusHandler,
   definePlugin,
-  HANA_BUS_SKIP,
+  LINGXI_BUS_SKIP,
   requestBus,
-} from "@hana/plugin-runtime";
+} from "@lingxi/plugin-runtime";
 
 const previewHandler = defineBusHandler({
   type: "sdk-showcase:preview",
   async handle(payload, ctx) {
-    if (!payload || payload.pluginId !== ctx.pluginId) return HANA_BUS_SKIP;
+    if (!payload || payload.pluginId !== ctx.pluginId) return LINGXI_BUS_SKIP;
     return {
       title: "SDK Showcase",
       text: "Runtime handler is alive.",

@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { hanaFetch, hanaUrl } from '../api';
+import { lingxiFetch, lingxiUrl } from '../api';
 import { t } from '../helpers';
 import { useSettingsStore } from '../store';
 import {
@@ -115,7 +115,7 @@ export function AccessTab() {
     }
     setLoadingSummary(true);
     try {
-      const res = await hanaFetch('/api/access/summary');
+      const res = await lingxiFetch('/api/access/summary');
       const data = await res.json();
       setSummary(data);
       setMode(data.network.mode);
@@ -152,7 +152,7 @@ export function AccessTab() {
     const query = summary?.network.actualPort
       ? `?port=${encodeURIComponent(String(summary.network.actualPort))}`
       : '';
-    return hanaUrl(`/api/access/mobile-qr.svg${query}`);
+    return lingxiUrl(`/api/access/mobile-qr.svg${query}`);
   }, [mode, mobileUrl, summary?.network.actualPort, summary?.network.restartRequired]);
 
   const canCopyMobileUrl = mobileUrl.length > 0;
@@ -184,7 +184,7 @@ export function AccessTab() {
     }
     setSavingNetwork(true);
     try {
-      const res = await hanaFetch('/api/access/network', {
+      const res = await lingxiFetch('/api/access/network', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ mode: nextMode, listenPort }),
@@ -217,7 +217,7 @@ export function AccessTab() {
   const generateMobileKey = useCallback(async () => {
     setGeneratingMobileKey(true);
     try {
-      const res = await hanaFetch('/api/access/mobile-credentials', {
+      const res = await lingxiFetch('/api/access/mobile-credentials', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -239,7 +239,7 @@ export function AccessTab() {
   const generateDesktopKey = useCallback(async () => {
     setGeneratingDesktopKey(true);
     try {
-      const res = await hanaFetch('/api/access/desktop-credentials', {
+      const res = await lingxiFetch('/api/access/desktop-credentials', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -303,7 +303,7 @@ export function AccessTab() {
 
   const saveAccount = useCallback(async () => {
     try {
-      const res = await hanaFetch('/api/access/account/profile', {
+      const res = await lingxiFetch('/api/access/account/profile', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(accountDraft),
@@ -318,7 +318,7 @@ export function AccessTab() {
 
   const savePassword = useCallback(async () => {
     try {
-      const res = await hanaFetch('/api/access/account/password', {
+      const res = await lingxiFetch('/api/access/account/password', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ password: passwordDraft }),
@@ -334,7 +334,7 @@ export function AccessTab() {
 
   const clearPassword = useCallback(async () => {
     try {
-      const res = await hanaFetch('/api/access/account/password', { method: 'DELETE' });
+      const res = await lingxiFetch('/api/access/account/password', { method: 'DELETE' });
       const data = await res.json();
       setSummary(prev => prev ? { ...prev, account: data.account } : prev);
       setPasswordDraft('');
@@ -346,7 +346,7 @@ export function AccessTab() {
 
   const revokeDevice = useCallback(async (deviceId: string) => {
     try {
-      await hanaFetch(`/api/devices/${encodeURIComponent(deviceId)}/revoke`, { method: 'POST' });
+      await lingxiFetch(`/api/devices/${encodeURIComponent(deviceId)}/revoke`, { method: 'POST' });
       await loadSummary();
       showToast(t('settings.access.deviceRevoked'), 'success');
     } catch (err: any) {
@@ -356,7 +356,7 @@ export function AccessTab() {
 
   const revokeCredential = useCallback(async (credentialId: string) => {
     try {
-      await hanaFetch(`/api/devices/credentials/${encodeURIComponent(credentialId)}/revoke`, { method: 'POST' });
+      await lingxiFetch(`/api/devices/credentials/${encodeURIComponent(credentialId)}/revoke`, { method: 'POST' });
       await loadSummary();
       showToast(t('settings.access.credentialRevoked'), 'success');
     } catch (err: any) {

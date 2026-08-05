@@ -159,7 +159,7 @@ describe("composition boundary behavior lock: builtin media adapter injection", 
     expect(mainFullSource).toMatch(/registerClosedRoutes,\s*builtinMediaAdapters/);
     expect(mainFullSource).toMatch(/startServer\(\{\s*registerClosedRoutes,\s*builtinMediaAdapters\s*\}\)/);
     expect(mainFullSource).toContain('from "./standalone-runtime-smoke.ts"');
-    expect(mainFullSource).toContain('process.env.HANA_INTERNAL_STANDALONE_RUNTIME_SMOKE === "1"');
+    expect(mainFullSource).toContain('process.env.LINGXI_INTERNAL_STANDALONE_RUNTIME_SMOKE === "1"');
     expect(mainFullSource).toContain("await runPackagedStandaloneRuntimeSmoke();");
   });
 });
@@ -172,14 +172,14 @@ describe("composition boundary behavior lock: builtin media adapter injection", 
 
 describe("composition boundary behavior lock: bootstrap contract (no silent non-start)", () => {
   it("importing server/index.ts alone defines startServer but starts nothing (no port bind, no server-info.json, clean exit)", async () => {
-    const hanaHome = fs.mkdtempSync(path.join(os.tmpdir(), "hana-index-only-import-"));
+    const lingxiHome = fs.mkdtempSync(path.join(os.tmpdir(), "hana-index-only-import-"));
     try {
       const child = spawn(
         process.execPath,
         ["--input-type=module", "-e", 'import("./server/index.ts").then((m) => { process.stdout.write(`exports: ${Object.keys(m).sort().join(",")}\\n`); process.exit(0); })'],
         {
           cwd: root,
-          env: { ...process.env, HANA_HOME: hanaHome },
+          env: { ...process.env, LINGXI_HOME: lingxiHome },
           stdio: ["ignore", "pipe", "pipe"],
         },
       );
@@ -199,13 +199,13 @@ describe("composition boundary behavior lock: bootstrap contract (no silent non-
       expect(stdout).toContain("exports: resolveSessionMetadataRecoveryStatusForHealth,startServer");
       // No engine/store side effects: no server-info.json written, no
       // agents/user directory seeded by ensureFirstRun.
-      expect(fs.existsSync(path.join(hanaHome, "server-info.json"))).toBe(false);
-      expect(fs.existsSync(path.join(hanaHome, "agents"))).toBe(false);
+      expect(fs.existsSync(path.join(lingxiHome, "server-info.json"))).toBe(false);
+      expect(fs.existsSync(path.join(lingxiHome, "agents"))).toBe(false);
       expect(stderr).not.toContain("ensureFirstRun");
     } finally {
       // The timeout/assertion-failure paths reach here right after a SIGKILL,
       // so this rm needs the same Windows handle-latency tolerance as Part 3.
-      fs.rmSync(hanaHome, TEMP_HOME_RM_OPTIONS);
+      fs.rmSync(lingxiHome, TEMP_HOME_RM_OPTIONS);
     }
   }, 20000);
 });
@@ -221,7 +221,7 @@ describe("composition boundary behavior lock: bootstrap contract (no silent non-
 // Windows cleanup contract for tests that SIGKILL a spawned server: kill() is
 // TerminateProcess and returns before the process dies, and the dying process
 // (plus antivirus/search-indexer scans) can briefly hold handles inside the
-// temp HANA_HOME without FILE_SHARE_DELETE. Removing the directory therefore
+// temp LINGXI_HOME without FILE_SHARE_DELETE. Removing the directory therefore
 // has to happen after the real exit event, with retries for transient
 // EPERM/EBUSY — otherwise cleanup itself fails the test on Windows CI.
 const TEMP_HOME_RM_OPTIONS = { recursive: true, force: true, maxRetries: 20, retryDelay: 250 } as const;
@@ -270,17 +270,17 @@ function waitForServerInfo(serverInfoPath: string, child: ReturnType<typeof spaw
 
 describe("composition boundary behavior lock: real request smoke against the full composition (server/main-full.ts)", () => {
   it("serves an open-root route and a full-root (closed-product) route behind the same global auth middleware", async () => {
-    const hanaHome = fs.mkdtempSync(path.join(os.tmpdir(), "hana-composition-smoke-"));
-    const serverInfoPath = path.join(hanaHome, "server-info.json");
+    const lingxiHome = fs.mkdtempSync(path.join(os.tmpdir(), "hana-composition-smoke-"));
+    const serverInfoPath = path.join(lingxiHome, "server-info.json");
     const child = spawn(process.execPath, ["server/bootstrap.ts"], {
       cwd: root,
       env: {
         ...process.env,
-        HANA_HOME: hanaHome,
-        HANA_PORT: "0",
-        HANA_ROOT: root,
-        HANA_SERVER_ENTRY: path.join(root, "server", "main-full.ts"),
-        HANA_CREATE_STARTUP_SESSION: "0",
+        LINGXI_HOME: lingxiHome,
+        LINGXI_PORT: "0",
+        LINGXI_ROOT: root,
+        LINGXI_SERVER_ENTRY: path.join(root, "server", "main-full.ts"),
+        LINGXI_CREATE_STARTUP_SESSION: "0",
       },
       stdio: ["ignore", "pipe", "pipe"],
     });
@@ -323,8 +323,8 @@ describe("composition boundary behavior lock: real request smoke against the ful
     } finally {
       child.kill("SIGKILL");
       await waitForExit(child);
-      fs.rmSync(hanaHome, TEMP_HOME_RM_OPTIONS);
-      if (process.env.HANA_TEST_DEBUG) process.stderr.write(stderr);
+      fs.rmSync(lingxiHome, TEMP_HOME_RM_OPTIONS);
+      if (process.env.LINGXI_TEST_DEBUG) process.stderr.write(stderr);
     }
   }, 60000);
 });

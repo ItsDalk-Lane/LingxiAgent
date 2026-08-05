@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
-// Mock useStore before importing hanaFetch
+// Mock useStore before importing lingxiFetch
 vi.mock('../../stores', () => ({
   useStore: {
     getState: () => ({
@@ -23,21 +23,21 @@ vi.mock('../../stores', () => ({
   },
 }));
 
-import { hanaUrl, hanaFetch } from '../../hooks/use-hana-fetch';
+import { lingxiUrl, lingxiFetch } from '../../hooks/use-hana-fetch';
 
-describe('hanaUrl', () => {
+describe('lingxiUrl', () => {
   it('构建带 token 的 URL', () => {
-    const url = hanaUrl('/api/health');
+    const url = lingxiUrl('/api/health');
     expect(url).toBe('http://127.0.0.1:3210/api/health?token=test-token-123');
   });
 
   it('路径已有 query param 时用 & 连接', () => {
-    const url = hanaUrl('/api/sessions?limit=10');
+    const url = lingxiUrl('/api/sessions?limit=10');
     expect(url).toBe('http://127.0.0.1:3210/api/sessions?limit=10&token=test-token-123');
   });
 });
 
-describe('hanaFetch', () => {
+describe('lingxiFetch', () => {
   const mockFetch = vi.fn();
 
   beforeEach(() => {
@@ -55,7 +55,7 @@ describe('hanaFetch', () => {
       json: async () => ({ status: 'ok' }),
     });
 
-    await hanaFetch('/api/health');
+    await lingxiFetch('/api/health');
 
     expect(mockFetch).toHaveBeenCalledOnce();
     const [url, opts] = mockFetch.mock.calls[0];
@@ -70,7 +70,7 @@ describe('hanaFetch', () => {
       statusText: 'Not Found',
     });
 
-    await expect(hanaFetch('/api/missing')).rejects.toThrow('404');
+    await expect(lingxiFetch('/api/missing')).rejects.toThrow('404');
   });
 
   it('允许调用方显式读取非 2xx 响应体', async () => {
@@ -82,7 +82,7 @@ describe('hanaFetch', () => {
     };
     mockFetch.mockResolvedValueOnce(response);
 
-    const res = await hanaFetch('/api/diary/write', { throwOnHttpError: false });
+    const res = await lingxiFetch('/api/diary/write', { throwOnHttpError: false });
 
     expect(res).toBe(response);
     expect(mockFetch.mock.calls[0][1]).not.toHaveProperty('throwOnHttpError');
@@ -91,7 +91,7 @@ describe('hanaFetch', () => {
   it('传递自定义 method 和 headers', async () => {
     mockFetch.mockResolvedValueOnce({ ok: true });
 
-    await hanaFetch('/api/test', {
+    await lingxiFetch('/api/test', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
     });
@@ -107,7 +107,7 @@ describe('hanaFetch', () => {
   it('传递 AbortSignal 用于超时', async () => {
     mockFetch.mockResolvedValueOnce({ ok: true });
 
-    await hanaFetch('/api/test');
+    await lingxiFetch('/api/test');
 
     const [, opts] = mockFetch.mock.calls[0];
     expect(opts.signal).toBeInstanceOf(AbortSignal);

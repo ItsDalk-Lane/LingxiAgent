@@ -75,14 +75,14 @@ describe("AgentManager.createAgent default skills.enabled", () => {
 
   function seedTemplate(enabledLiteral = '["skill-creator"]') {
     fs.mkdirSync(path.join(productDir, "yuan"), { recursive: true });
-    fs.writeFileSync(path.join(productDir, "yuan", "hanako.md"), "Hanako yuan\n", "utf-8");
+    fs.writeFileSync(path.join(productDir, "yuan", "lingxi.md"), "Hanako yuan\n", "utf-8");
     fs.writeFileSync(path.join(productDir, "yuan", "ming.md"), "Ming yuan\n", "utf-8");
     fs.writeFileSync(
       path.join(productDir, "config.example.yaml"),
       [
         "agent:",
         "  name: Hanako",
-        "  yuan: hanako",
+        "  yuan: lingxi",
         "user:",
         '  name: ""',
         "api:",
@@ -163,7 +163,7 @@ describe("AgentManager.createAgent default skills.enabled", () => {
       { name: "ext-one", source: "external" },
     ];
 
-    const { id: newId } = await mgr.createAgent({ name: "TestAgent", yuan: "hanako" });
+    const { id: newId } = await mgr.createAgent({ name: "TestAgent", yuan: "lingxi" });
 
     const cfgPath = path.join(agentsDir, newId, "config.yaml");
     const cfg = YAML.load(fs.readFileSync(cfgPath, "utf-8"));
@@ -176,7 +176,7 @@ describe("AgentManager.createAgent default skills.enabled", () => {
     mgr._agents.set("hana", { id: "hana", userName: "阿黎" });
     mgr._activeAgentId = "hana";
 
-    const { id: newId } = await mgr.createAgent({ name: "TestAgent", yuan: "hanako" });
+    const { id: newId } = await mgr.createAgent({ name: "TestAgent", yuan: "lingxi" });
 
     const cfg = YAML.load(fs.readFileSync(path.join(agentsDir, newId, "config.yaml"), "utf-8"));
     expect(cfg.user).toBeUndefined();
@@ -210,7 +210,7 @@ describe("AgentManager.createAgent default skills.enabled", () => {
   it("falls back to seeded template default when snapshot is empty", async () => {
     skillsMock._allSkills = [];
 
-    const { id: newId } = await mgr.createAgent({ name: "EmptyAgent", yuan: "hanako" });
+    const { id: newId } = await mgr.createAgent({ name: "EmptyAgent", yuan: "lingxi" });
 
     const cfgPath = path.join(agentsDir, newId, "config.yaml");
     const cfg = YAML.load(fs.readFileSync(cfgPath, "utf-8"));
@@ -222,14 +222,14 @@ describe("AgentManager.createAgent default skills.enabled", () => {
   it("does not touch existing agents' config.yaml (regression for #419)", async () => {
     skillsMock._allSkills = [{ name: "pdf", source: "user" }];
 
-    const { id: firstId } = await mgr.createAgent({ name: "First", yuan: "hanako" });
+    const { id: firstId } = await mgr.createAgent({ name: "First", yuan: "lingxi" });
     const firstCfgPath = path.join(agentsDir, firstId, "config.yaml");
     const mtimeBefore = fs.statSync(firstCfgPath).mtimeMs;
 
     // Wait 20ms so filesystem mtime resolution can distinguish any write
     await new Promise((r) => setTimeout(r, 20));
 
-    await mgr.createAgent({ name: "Second", yuan: "hanako" });
+    await mgr.createAgent({ name: "Second", yuan: "lingxi" });
 
     const mtimeAfter = fs.statSync(firstCfgPath).mtimeMs;
     expect(mtimeAfter).toBe(mtimeBefore);
@@ -238,7 +238,7 @@ describe("AgentManager.createAgent default skills.enabled", () => {
   it("persists models.chat as composite ref for newly created agents", async () => {
     skillsMock._allSkills = [];
 
-    const { id: newId } = await mgr.createAgent({ name: "CompositeAgent", yuan: "hanako" });
+    const { id: newId } = await mgr.createAgent({ name: "CompositeAgent", yuan: "lingxi" });
 
     const cfgPath = path.join(agentsDir, newId, "config.yaml");
     const cfg = YAML.load(fs.readFileSync(cfgPath, "utf-8"));
@@ -248,18 +248,18 @@ describe("AgentManager.createAgent default skills.enabled", () => {
   it("does not seed identity.md/ishiki.md to disk for newly created agents (lazy materialization)", async () => {
     fs.mkdirSync(path.join(productDir, "identity-templates"), { recursive: true });
     fs.writeFileSync(
-      path.join(productDir, "identity-templates", "hanako.md"),
+      path.join(productDir, "identity-templates", "lingxi.md"),
       "# {{agentName}}\n\n{{userName}}的个人助手。\n",
       "utf-8",
     );
     fs.mkdirSync(path.join(productDir, "ishiki-templates"), { recursive: true });
     fs.writeFileSync(
-      path.join(productDir, "ishiki-templates", "hanako.md"),
+      path.join(productDir, "ishiki-templates", "lingxi.md"),
       "Ishiki template\n",
       "utf-8",
     );
 
-    const { id: newId } = await mgr.createAgent({ name: "TemplateAgent", yuan: "hanako" });
+    const { id: newId } = await mgr.createAgent({ name: "TemplateAgent", yuan: "lingxi" });
 
     // identity.md / ishiki.md 不再在创建时落盘：未定制人格靠运行时回落到
     // lib 模板（core/persona-source.ts），不是靠此刻就把模板拷进 agentDir。
@@ -271,7 +271,7 @@ describe("AgentManager.createAgent default skills.enabled", () => {
     const { content: identity, fromTemplate: identityFromTemplate } = resolvePersonaSource({
       agentDir: path.join(agentsDir, newId),
       productDir,
-      yuanType: "hanako",
+      yuanType: "lingxi",
       locale: "zh-CN",
       kind: "identity",
     });
@@ -282,7 +282,7 @@ describe("AgentManager.createAgent default skills.enabled", () => {
     const { content: ishiki, fromTemplate: ishikiFromTemplate } = resolvePersonaSource({
       agentDir: path.join(agentsDir, newId),
       productDir,
-      yuanType: "hanako",
+      yuanType: "lingxi",
       locale: "zh-CN",
       kind: "ishiki",
     });
@@ -293,7 +293,7 @@ describe("AgentManager.createAgent default skills.enabled", () => {
   it("defaults patrol to disabled with a 31 minute interval for newly created agents", async () => {
     skillsMock._allSkills = [];
 
-    const { id: newId } = await mgr.createAgent({ name: "DeskAgent", yuan: "hanako" });
+    const { id: newId } = await mgr.createAgent({ name: "DeskAgent", yuan: "lingxi" });
 
     const cfgPath = path.join(agentsDir, newId, "config.yaml");
     const cfg = YAML.load(fs.readFileSync(cfgPath, "utf-8"));
@@ -304,7 +304,7 @@ describe("AgentManager.createAgent default skills.enabled", () => {
   it("defaults the memory master switch to enabled for newly created agents", async () => {
     skillsMock._allSkills = [];
 
-    const { id: newId } = await mgr.createAgent({ name: "QuietMemoryAgent", yuan: "hanako" });
+    const { id: newId } = await mgr.createAgent({ name: "QuietMemoryAgent", yuan: "lingxi" });
 
     const cfgPath = path.join(agentsDir, newId, "config.yaml");
     const cfg = YAML.load(fs.readFileSync(cfgPath, "utf-8"));
@@ -385,7 +385,7 @@ describe("AgentManager.createAgent default skills.enabled", () => {
   it("falls back to the template identity summary in the agent list when identity.md is not seeded", async () => {
     fs.mkdirSync(path.join(productDir, "identity-templates"), { recursive: true });
     fs.writeFileSync(
-      path.join(productDir, "identity-templates", "hanako.md"),
+      path.join(productDir, "identity-templates", "lingxi.md"),
       "# {{agentName}}\n\nA quiet template summary line.\n",
       "utf-8",
     );
@@ -394,7 +394,7 @@ describe("AgentManager.createAgent default skills.enabled", () => {
     fs.mkdirSync(path.join(agentsDir, "no-identity-file"), { recursive: true });
     fs.writeFileSync(
       path.join(agentsDir, "no-identity-file", "config.yaml"),
-      "agent:\n  name: NoIdentityFile\n  yuan: hanako\n",
+      "agent:\n  name: NoIdentityFile\n  yuan: lingxi\n",
       "utf-8",
     );
     expect(fs.existsSync(path.join(agentsDir, "no-identity-file", "identity.md"))).toBe(false);

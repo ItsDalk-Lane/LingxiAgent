@@ -35,7 +35,7 @@ describe("log redaction", () => {
     const raw = [
       "/Users/alice/Desktop/private.txt",
       "file:///Users/alice/Desktop/private.txt",
-      "/home/bob/.hanako/auth.json",
+      "/home/bob/.lingxi/auth.json",
       "C:\\Users\\carol\\AppData\\Roaming\\Hanako\\crash.log",
       "C:/Users/dave/AppData/Roaming/Hanako/crash.log",
     ].join("\n");
@@ -70,7 +70,7 @@ describe("log redaction", () => {
     const raw = {
       userId: "u-123456",
       chatId: "chat-789",
-      sessionPath: "/Users/alice/.hanako/agents/a/sessions/s.md",
+      sessionPath: "/Users/alice/.lingxi/agents/a/sessions/s.md",
       nested: {
         password: "secret-password",
         safe: "hello",
@@ -82,7 +82,7 @@ describe("log redaction", () => {
     expect(cleaned).toEqual({
       userId: "[redacted]",
       chatId: "[redacted]",
-      sessionPath: "~/.hanako/agents/a/sessions/s.md",
+      sessionPath: "~/.lingxi/agents/a/sessions/s.md",
       nested: {
         password: "[redacted]",
         safe: "hello",

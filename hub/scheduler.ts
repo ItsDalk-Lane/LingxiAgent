@@ -60,7 +60,7 @@ export class Scheduler {
     });
   }
 
-  /** @returns {import('../core/engine.ts').HanaEngine} */
+  /** @returns {import('../core/engine.ts').LingxiEngine} */
   get _engine() { return this._hub.engine; }
 
   /** 获取某个 agent 的 heartbeat 实例 */
@@ -411,7 +411,7 @@ export class Scheduler {
       : entry.id;
     try {
       await engine.deliverNotification({
-        title: entry.agentName || "HanaAgent",
+        title: entry.agentName || "LingxiAgent",
         body: t(bodyKey, { label: entry.label || entry.summary }),
         channels: ["desktop"],
         desktopFocusPolicy: mode,

@@ -11,13 +11,13 @@ import { clearAppFileDragPayload, writeAppFileDragPayload } from '../../utils/ap
 import type { PlatformApi } from '../../types';
 
 const mocks = vi.hoisted(() => ({
-  hanaFetch: vi.fn(),
+  lingxiFetch: vi.fn(),
   refreshPreviewDocumentTarget: vi.fn(async () => undefined),
   changeOptions: { retryMissing: true, retryUnchanged: true },
 }));
 
 vi.mock('../../hooks/use-hana-fetch', () => ({
-  hanaFetch: mocks.hanaFetch,
+  lingxiFetch: mocks.lingxiFetch,
 }));
 
 vi.mock('../../utils/preview-document-refresh', () => ({
@@ -103,9 +103,9 @@ describe('PreviewEditor markdown cover drop', () => {
       unwatchFile: vi.fn(async () => true),
       onFileChanged: vi.fn(),
     } as unknown as PlatformApi;
-    mocks.hanaFetch.mockReset();
+    mocks.lingxiFetch.mockReset();
     mocks.refreshPreviewDocumentTarget.mockClear();
-    mocks.hanaFetch.mockResolvedValue(new Response(JSON.stringify({
+    mocks.lingxiFetch.mockResolvedValue(new Response(JSON.stringify({
       ok: true,
       cover: { image: '文本附件/demo-cover.png' },
     }), {
@@ -151,7 +151,7 @@ describe('PreviewEditor markdown cover drop', () => {
     fireEvent.drop(cover!, { dataTransfer });
 
     await waitFor(() => {
-      expect(mocks.hanaFetch).toHaveBeenCalledWith('/api/desk/beautify/cover/apply', expect.objectContaining({
+      expect(mocks.lingxiFetch).toHaveBeenCalledWith('/api/desk/beautify/cover/apply', expect.objectContaining({
         method: 'POST',
         body: JSON.stringify({
           filePath: '/tmp/workspace/demo.md',
@@ -232,7 +232,7 @@ describe('PreviewEditor markdown cover drop', () => {
     await waitFor(() => {
       expect(window.platform?.copyFile).toHaveBeenCalled();
     });
-    expect(mocks.hanaFetch).not.toHaveBeenCalled();
+    expect(mocks.lingxiFetch).not.toHaveBeenCalled();
     expect(ref.current?.getView()?.state.doc.toString()).toContain('![cover-source](<文本附件/cover-source-');
   });
 
@@ -261,7 +261,7 @@ describe('PreviewEditor markdown cover drop', () => {
     editorDom!.dispatchEvent(editorDragEvent('drop', dataTransfer, 12));
 
     await waitFor(() => {
-      expect(mocks.hanaFetch).toHaveBeenCalledWith('/api/desk/beautify/cover/apply', expect.objectContaining({
+      expect(mocks.lingxiFetch).toHaveBeenCalledWith('/api/desk/beautify/cover/apply', expect.objectContaining({
         method: 'POST',
         body: JSON.stringify({
           filePath: '/tmp/workspace/demo.md',

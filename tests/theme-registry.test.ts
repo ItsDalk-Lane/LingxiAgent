@@ -22,8 +22,8 @@ describe('theme-registry', () => {
   });
 
   describe('constants', () => {
-    it('STORAGE_KEY 是 "hana-theme"', () => {
-      expect(reg.STORAGE_KEY).toBe('hana-theme');
+    it('STORAGE_KEY 是 "lingxi-theme"', () => {
+      expect(reg.STORAGE_KEY).toBe('lingxi-theme');
     });
 
     it('DEFAULT_THEME 是 "warm-paper"', () => {

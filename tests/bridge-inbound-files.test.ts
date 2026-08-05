@@ -35,7 +35,7 @@ describe("materializeBridgeInboundFiles", () => {
     }));
 
     const result = await materializeBridgeInboundFiles({
-      hanakoHome: tmpDir,
+      lingxiHome: tmpDir,
       sessionPath,
       registerSessionFile,
       files: [{

@@ -280,7 +280,7 @@ describe("SkillManager.computeDefaultEnabledForNewAgent", () => {
   it("excludes skills that opt out of default enablement", () => {
     sm._allSkills = [
       { name: "pdf", source: "user" },
-      { name: "hana-plugin-creator", source: "user", defaultEnabled: false },
+      { name: "lingxi-plugin-creator", source: "user", defaultEnabled: false },
     ];
     expect(sm.computeDefaultEnabledForNewAgent()).toEqual(["pdf"]);
   });

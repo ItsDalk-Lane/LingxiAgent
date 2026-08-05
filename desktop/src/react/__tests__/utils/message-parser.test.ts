@@ -28,7 +28,7 @@ describe('parseMoodFromContent', () => {
     const input = '<mood>feeling good</mood>\n\nSome text here.';
     const result = parseMoodFromContent(input);
     expect(result.mood).toBe('feeling good');
-    expect(result.yuan).toBe('hanako');
+    expect(result.yuan).toBe('lingxi');
     expect(result.text).toBe('Some text here.');
   });
 
@@ -185,13 +185,13 @@ describe('parseUserAttachments', () => {
   });
 
   it('解析内部 attached_image 标记为图片引用，并从正文隐藏', () => {
-    const input = '[attached_image: /Users/test/.hanako/attachments/upload-abc.png]\n(看图)';
+    const input = '[attached_image: /Users/test/.lingxi/attachments/upload-abc.png]\n(看图)';
     const result = parseUserAttachments(input);
 
     expect(result.text).toBe('(看图)');
     expect(result.attachedImages).toEqual([
       {
-        path: '/Users/test/.hanako/attachments/upload-abc.png',
+        path: '/Users/test/.lingxi/attachments/upload-abc.png',
         name: 'upload-abc.png',
       },
     ]);
@@ -312,7 +312,7 @@ describe('extractToolDetail', () => {
 
 describe('moodLabel', () => {
   it('hanako 返回 MOOD', () => {
-    expect(moodLabel('hanako')).toContain('MOOD');
+    expect(moodLabel('lingxi')).toContain('MOOD');
   });
 
   it('butter 返回 PULSE', () => {

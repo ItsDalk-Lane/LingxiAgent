@@ -85,7 +85,7 @@ function writeLaunchMarker(status, payload = {}) {
     arch: process.arch,
     execPath: process.execPath,
     resourcesPath: process.resourcesPath || null,
-    hanakoHome,
+    lingxiHome,
     ...payload,
   });
 }
@@ -124,20 +124,20 @@ process.on("unhandledRejection", (reason) => {
   recordProcessError("unhandledRejection", err);
 });
 
-let hanakoHome = null;
+let lingxiHome = null;
 try {
   const { resolveHanakoHome } = require("../shared/hana-runtime-paths.cjs");
-  hanakoHome = resolveHanakoHome(process.env.HANA_HOME);
-  process.env.HANA_HOME = hanakoHome;
-  diagnosticsDir = path.join(hanakoHome, "diagnostics", "desktop-launch");
+  lingxiHome = resolveHanakoHome(process.env.LINGXI_HOME);
+  process.env.LINGXI_HOME = lingxiHome;
+  diagnosticsDir = path.join(lingxiHome, "diagnostics", "desktop-launch");
 } catch (err) {
   const diagnosticPath = writeDiagnostic("hana-home-resolve-failed.json", "hana-home-resolve-failed", {
     phase: "desktop-bootstrap",
     error: serializeError(err),
   });
   showBootstrapError(
-    "HanaAgent Launch Failed",
-    `HanaAgent failed before HANA_HOME could be resolved.\n\n${err?.message || err}\n\nDiagnostic file:\n${diagnosticPath || diagnosticsDir}`,
+    "LingxiAgent Launch Failed",
+    `LingxiAgent failed before LINGXI_HOME could be resolved.\n\n${err?.message || err}\n\nDiagnostic file:\n${diagnosticPath || diagnosticsDir}`,
   );
   exitAfterBootstrapFailure();
 }
@@ -174,7 +174,7 @@ function verifyWindowsInstallSurfaceBeforeMain() {
     diagnosticPath,
   });
   const detail = launchIntegrity.formatInstallSurfaceError(result, diagnosticPath);
-  showBootstrapError("HanaAgent Launch Failed", detail);
+  showBootstrapError("LingxiAgent Launch Failed", detail);
   exitAfterBootstrapFailure();
   return false;
 }
@@ -203,8 +203,8 @@ function loadDesktopMain() {
     appendLaunchLog("desktop-main-load-failed", { ...payload, diagnosticPath });
     writeLaunchMarker("desktop-main-load-failed", { diagnosticPath });
     showBootstrapError(
-      "HanaAgent Launch Failed",
-      `HanaAgent failed before the desktop main process finished loading.\n\n${err?.message || err}\n\nDiagnostic file:\n${diagnosticPath || diagnosticsDir}`,
+      "LingxiAgent Launch Failed",
+      `LingxiAgent failed before the desktop main process finished loading.\n\n${err?.message || err}\n\nDiagnostic file:\n${diagnosticPath || diagnosticsDir}`,
     );
     exitAfterBootstrapFailure();
   }

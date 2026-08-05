@@ -33,17 +33,17 @@ function appendLimited(buffer, chunk) {
 
 function helperCommandForJob(jobPath, input: any = {}, env = process.env) {
   const execPath = input.helperExecPath
-    || env.HANA_OFFICE_PDF_HELPER_EXEC
-    || env.HANA_DESKTOP_EXEC_PATH;
+    || env.LINGXI_OFFICE_PDF_HELPER_EXEC
+    || env.LINGXI_DESKTOP_EXEC_PATH;
   if (!execPath) {
     throw new Error(
-      "Chromium PDF helper is unavailable. Start Hana Desktop, or set HANA_OFFICE_PDF_HELPER_EXEC to an Electron executable.",
+      "Chromium PDF helper is unavailable. Start Hana Desktop, or set LINGXI_OFFICE_PDF_HELPER_EXEC to an Electron executable.",
     );
   }
 
   const helperAppPath = input.helperAppPath
-    || env.HANA_OFFICE_PDF_HELPER_APP_PATH
-    || (env.HANA_DESKTOP_IS_PACKAGED === "1" ? null : env.HANA_DESKTOP_APP_PATH);
+    || env.LINGXI_OFFICE_PDF_HELPER_APP_PATH
+    || (env.LINGXI_DESKTOP_IS_PACKAGED === "1" ? null : env.LINGXI_DESKTOP_APP_PATH);
 
   const args = helperAppPath
     ? [helperAppPath, OFFICE_PDF_HELPER_FLAG, jobPath]
@@ -130,7 +130,7 @@ function buildJobPayload(input, htmlPath, outputPath) {
     landscape: input.landscape === true,
     margins: input.margins && typeof input.margins === "object" ? input.margins : undefined,
     allowJavaScript: input.allowJavaScript === true,
-    embedHanaFonts: input.embedHanaFonts !== false,
+    embedLingxiFonts: input.embedLingxiFonts !== false,
     settleMs: Number.isFinite(Number(input.settleMs)) ? Number(input.settleMs) : DEFAULT_SETTLE_MS,
   };
 }

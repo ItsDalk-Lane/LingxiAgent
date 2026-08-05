@@ -38,8 +38,8 @@ import {
   updateTask,
   updateAgent,
   updateSession,
-} from '@hana/plugin-runtime';
-import type { HanaPluginNetwork, HanaPluginNetworkFetchInit } from '@hana/plugin-runtime';
+} from '@lingxi/plugin-runtime';
+import type { LingxiPluginNetwork, LingxiPluginNetworkFetchInit } from '@lingxi/plugin-runtime';
 
 describe('plugin runtime SDK', () => {
   it('defines tools with stable fields and default parameters', async () => {
@@ -223,16 +223,16 @@ describe('plugin runtime SDK', () => {
   });
 
   it('exports the shared EventBus SKIP symbol for chained handlers', () => {
-    expect(HANA_BUS_SKIP).toBe(Symbol.for('hana.event-bus.skip'));
+    expect(HANA_BUS_SKIP).toBe(Symbol.for('lingxi.event-bus.skip'));
   });
 
   it('types plugin network fetch options without host internals', async () => {
-    const init: HanaPluginNetworkFetchInit = {
+    const init: LingxiPluginNetworkFetchInit = {
       cacheTtlMs: 1000,
       timeoutMs: 5000,
       maxResponseBytes: 1024,
     };
-    const network: HanaPluginNetwork = {
+    const network: LingxiPluginNetwork = {
       fetch: vi.fn(async () => new Response('ok')),
     };
 

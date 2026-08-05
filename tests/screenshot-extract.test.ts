@@ -59,7 +59,7 @@ describe('extractScreenshotPayload', () => {
       {
         id: '1', role: 'assistant' as const, blocks: [
           { type: 'thinking' as const, content: '...', sealed: true },
-          { type: 'mood' as const, yuan: 'hanako', text: 'happy' },
+          { type: 'mood' as const, yuan: 'lingxi', text: 'happy' },
           { type: 'tool_group' as const, tools: [] as any[], collapsed: true },
           { type: 'text' as const, html: '<p>visible</p>' },
         ],

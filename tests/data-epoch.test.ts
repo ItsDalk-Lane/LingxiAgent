@@ -155,7 +155,7 @@ describe("describeDataEpochBlock", () => {
     expect(message).toContain("epoch=5");
     expect(message).toContain("epoch=3");
     expect(message).toContain("2.0.0");
-    expect(message).toContain("HANA_ALLOW_DATA_DOWNGRADE=1");
+    expect(message).toContain("LINGXI_ALLOW_DATA_DOWNGRADE=1");
     expect(message).toContain("继续使用旧内核");
   });
 });

@@ -13,13 +13,13 @@ export type MobileStaticRouteOptions =
 /**
  * Startup-time decision for whether `/mobile` and `/desktop` have a real
  * renderer build to serve. `devDistDir` is the repo-tree fallback used
- * when no `HANA_RENDERER_DIST` is injected (the existing `npm start` dev
+ * when no `LINGXI_RENDERER_DIST` is injected (the existing `npm start` dev
  * shape). This is deliberately a pure, side-effect-free predicate — it
  * lives here (not in server/index.ts, which binds ports and boots the
  * engine at module load and so cannot be safely `import`-ed by a test)
  * so the three-mode decision can be exercised directly in tests.
  *
- * No silent fallback: if `HANA_RENDERER_DIST` is set but doesn't contain
+ * No silent fallback: if `LINGXI_RENDERER_DIST` is set but doesn't contain
  * a real build, this returns "error", never a quiet drop-through to
  * `devDistDir` — a broken injected pointer must surface loudly, not
  * masquerade as "dev fallback available" or "never installed".
@@ -28,12 +28,12 @@ export function resolveMobileStaticRouteOptions({
   env = process.env,
   devDistDir,
 }: { env?: NodeJS.ProcessEnv; devDistDir: string }): MobileStaticRouteOptions {
-  const injected = env.HANA_RENDERER_DIST;
+  const injected = env.LINGXI_RENDERER_DIST;
   if (injected) {
     if (hasMobileEntry(injected)) return { mode: "dist", distDir: injected };
     return {
       mode: "error",
-      reason: `HANA_RENDERER_DIST is set to ${injected}, but that directory is missing or does not contain mobile.html`,
+      reason: `LINGXI_RENDERER_DIST is set to ${injected}, but that directory is missing or does not contain mobile.html`,
     };
   }
   if (hasMobileEntry(devDistDir)) return { mode: "dist", distDir: devDistDir };

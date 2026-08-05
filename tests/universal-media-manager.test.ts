@@ -34,7 +34,7 @@ function makePreferences(root, initial: any = null) {
 
 function makeManager(root, preferences, extra: any = {}) {
   return new UniversalMediaManager({
-    hanakoHome: root,
+    lingxiHome: root,
     preferences,
     sessionFiles: extra.sessionFiles,
     providerRegistry: {
@@ -447,7 +447,7 @@ describe("UniversalMediaManager adapter registration bus contract", () => {
     roots.push(root);
     const { builtinImageGenAdapters } = await import("../core/media-adapters/builtin-adapters.ts");
     const manager = new UniversalMediaManager({
-      hanakoHome: root,
+      lingxiHome: root,
       preferences: makePreferences(root),
       providerRegistry: {
         getMediaProviders: () => [],
@@ -476,7 +476,7 @@ describe("UniversalMediaManager adapter registration bus contract", () => {
     const root = makeRoot();
     roots.push(root);
     const manager = new UniversalMediaManager({
-      hanakoHome: root,
+      lingxiHome: root,
       preferences: makePreferences(root),
       providerRegistry: {
         getMediaProviders: () => [],
@@ -514,7 +514,7 @@ describe("UniversalMediaManager adapter registration bus contract", () => {
     const root = makeRoot();
     roots.push(root);
     const manager = new UniversalMediaManager({
-      hanakoHome: root,
+      lingxiHome: root,
       preferences: makePreferences(root),
       providerRegistry: {
         getMediaProviders: () => [],
@@ -579,7 +579,7 @@ describe("UniversalMediaManager adapter registration bus contract", () => {
     const root = makeRoot();
     roots.push(root);
     const manager = new UniversalMediaManager({
-      hanakoHome: root,
+      lingxiHome: root,
       preferences: makePreferences(root),
       providerRegistry: {
         getMediaProviders: () => [],
@@ -743,7 +743,7 @@ describe("UniversalMediaManager response delivery", () => {
       })),
     };
     const manager = new UniversalMediaManager({
-      hanakoHome: root,
+      lingxiHome: root,
       preferences: makePreferences(root),
       providerRegistry,
       registerSessionFile: () => {},
@@ -808,7 +808,7 @@ describe("UniversalMediaManager response delivery", () => {
       })),
     };
     const manager = new UniversalMediaManager({
-      hanakoHome: root,
+      lingxiHome: root,
       preferences: makePreferences(root, {
         videoGeneration: {
           defaultVideoModel: { provider: "agnes", id: "agnes-video-v2.0" },
@@ -886,7 +886,7 @@ describe("UniversalMediaManager response delivery", () => {
       },
     };
     const manager = new UniversalMediaManager({
-      hanakoHome: root,
+      lingxiHome: root,
       preferences: makePreferences(root),
       providerRegistry,
       registerSessionFile: () => {},
@@ -944,7 +944,7 @@ describe("UniversalMediaManager response delivery", () => {
       },
     };
     const manager = new UniversalMediaManager({
-      hanakoHome: root,
+      lingxiHome: root,
       preferences: makePreferences(root),
       providerRegistry,
       registerSessionFile: () => {},
@@ -996,7 +996,7 @@ describe("UniversalMediaManager response delivery", () => {
       })),
     };
     const manager = new UniversalMediaManager({
-      hanakoHome: root,
+      lingxiHome: root,
       preferences: makePreferences(root, {
         videoGeneration: {
           defaultVideoModel: { provider: "jimeng-cli", id: "seedance2.0_vip" },
@@ -1080,7 +1080,7 @@ describe("UniversalMediaManager response delivery", () => {
       })),
     };
     const manager = new UniversalMediaManager({
-      hanakoHome: root,
+      lingxiHome: root,
       preferences: makePreferences(root, {
         videoGeneration: {
           defaultVideoModel: { provider: "jimeng-cli", id: "seedance2.0fast" },

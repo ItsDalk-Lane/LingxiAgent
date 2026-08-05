@@ -30,7 +30,7 @@ export function argValue(flag, argv = process.argv.slice(2)) {
 }
 
 // helper 的 CreateProcessAsUserW 把 executable 直接当 lpApplicationName，不做
-// PATH 搜索（desktop/native/HanaWindowsSandboxHelper/main.cpp:1841）。生产链路
+// PATH 搜索（desktop/native/LingxiWindowsSandboxHelper/main.cpp:1841）。生产链路
 // (lib/sandbox/win32-exec.ts:631 firstPathResult / :847 resolvePowerShellExecutable)
 // 在 Node 侧先用 `where` 解析出绝对路径再传给 helper；此脚本此前直接传裸的
 // "powershell.exe"/"pwsh.exe"，导致每一格都在 CreateProcessAsUserW 阶段就以

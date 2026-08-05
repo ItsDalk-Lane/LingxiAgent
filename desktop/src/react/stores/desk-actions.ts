@@ -5,7 +5,7 @@
  */
 
 import { useStore } from './index';
-import { hanaFetch } from '../hooks/use-hana-fetch';
+import { lingxiFetch } from '../hooks/use-hana-fetch';
 import { clearChat } from './agent-actions';
 import type { DeskFile, DeskSearchResult, StudioWorkspace } from '../types';
 import type { WorkspaceDeskState } from './desk-slice';
@@ -152,7 +152,7 @@ async function pruneStaleLocalDeskRoot(dir: string): Promise<void> {
     return;
   }
   try {
-    const res = await hanaFetch(url, {
+    const res = await lingxiFetch(url, {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ path: normalized }),
@@ -237,7 +237,7 @@ export async function loadStudioWorkspaces(): Promise<StudioWorkspace[]> {
   const s = useStore.getState();
   if (!hasServerConnection(s)) return [];
   try {
-    const res = await hanaFetch('/api/studio/workspaces');
+    const res = await lingxiFetch('/api/studio/workspaces');
     const data = await res.json();
     if (data.error) throw new Error(String(data.error));
     const workspaces = (Array.isArray(data.workspaces) ? data.workspaces : [])
@@ -256,7 +256,7 @@ export async function createLocalStudioWorkspaceFromFolder(folder: string): Prom
   const s = useStore.getState();
   if (!normalized || !hasServerConnection(s)) return null;
   try {
-    const res = await hanaFetch('/api/studio/workspaces', {
+    const res = await lingxiFetch('/api/studio/workspaces', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ path: normalized }),
@@ -308,7 +308,7 @@ export async function removeStudioWorkspace(mountId: string): Promise<boolean> {
       .filter((workspace: StudioWorkspace) => workspace.mountId !== normalized),
   }));
   try {
-    const res = await hanaFetch(`/api/studio/workspaces/${encodeURIComponent(normalized)}`, {
+    const res = await lingxiFetch(`/api/studio/workspaces/${encodeURIComponent(normalized)}`, {
       method: 'DELETE',
     });
     const data = await res.json();
@@ -537,7 +537,7 @@ export async function loadDeskFiles(subdir?: string, overrideDir?: string | null
     const curPath = '';
     if (curPath) params.set('subdir', curPath);
     const qs = params.toString() ? `?${params}` : '';
-    const res = await hanaFetch(`${mountId ? '/api/workbench/files' : '/api/desk/files'}${qs}`);
+    const res = await lingxiFetch(`${mountId ? '/api/workbench/files' : '/api/desk/files'}${qs}`);
     const data = await responseJsonOrEmpty(res);
     if (myVersion !== _deskLoadVersion) return;
     if (!mountId && dir && isMissingLocalDeskRootResponse(res, data)) {
@@ -689,7 +689,7 @@ export async function loadDeskTreeFiles(subdir = '', options: { force?: boolean;
     if (normalizedSubdir) params.set('subdir', normalizedSubdir);
     if (!mountId) addSelectedDeskAgentParam(params, s);
     const qs = params.toString() ? `?${params}` : '';
-    const res = await hanaFetch(`${mountId ? '/api/workbench/files' : '/api/desk/files'}${qs}`);
+    const res = await lingxiFetch(`${mountId ? '/api/workbench/files' : '/api/desk/files'}${qs}`);
     const data = await res.json();
     if (_deskTreeLoadVersion.get(key) !== myVersion) return false;
     if (data.error) throw new Error(String(data.error));
@@ -731,7 +731,7 @@ export async function searchDeskFiles(query: string): Promise<DeskSearchResult[]
     }
     if (!mountId) addSelectedDeskAgentParam(params, s);
     params.set('q', trimmed);
-    const res = await hanaFetch(`${mountId ? '/api/workbench/search' : '/api/desk/search-files'}?${params}`);
+    const res = await lingxiFetch(`${mountId ? '/api/workbench/search' : '/api/desk/search-files'}?${params}`);
     const data = await res.json();
     if (data.error) throw new Error(String(data.error));
     return Array.isArray(data.results) ? data.results : [];
@@ -807,7 +807,7 @@ export async function loadJianContent(): Promise<void> {
       addSelectedDeskAgentParam(params, s);
     }
     const qs = params.toString() ? `?${params}` : '';
-    const res = await hanaFetch(`${mountId ? '/api/workbench/content' : '/api/desk/jian'}${qs}`);
+    const res = await lingxiFetch(`${mountId ? '/api/workbench/content' : '/api/desk/jian'}${qs}`);
     if (mountId) {
       if (res.status === 404) {
         useStore.getState().setDeskJianContent(null);
@@ -831,7 +831,7 @@ export async function saveJianContent(content?: string): Promise<void> {
   const text = content ?? s.deskJianContent ?? '';
   try {
     const mountId = activeDeskMountId(s);
-    await hanaFetch(mountId ? '/api/workbench/actions' : '/api/desk/jian', {
+    await lingxiFetch(mountId ? '/api/workbench/actions' : '/api/desk/jian', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(mountId
@@ -849,7 +849,7 @@ export async function saveJianContent(content?: string): Promise<void> {
       addSelectedDeskAgentParam(params, st2);
     }
     const qs = params.toString() ? `?${params}` : '';
-    const res2 = await hanaFetch(`${activeMountId ? '/api/workbench/files' : '/api/desk/files'}${qs}`);
+    const res2 = await lingxiFetch(`${activeMountId ? '/api/workbench/files' : '/api/desk/files'}${qs}`);
     const data2 = await res2.json();
     const st = useStore.getState();
     st.setDeskFiles(data2.files || []);
@@ -862,7 +862,7 @@ export async function saveJianContent(content?: string): Promise<void> {
 export async function deskUploadFiles(paths: string[]): Promise<void> {
   const s = useStore.getState();
   try {
-    const res = await hanaFetch('/api/desk/files', {
+    const res = await lingxiFetch('/api/desk/files', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ ...selectedDeskAgentBody(s), action: 'upload', dir: s.deskBasePath || undefined, subdir: '', paths }),
@@ -882,7 +882,7 @@ export async function deskUploadFilesToSubdir(paths: string[], subdir: string): 
   const s = useStore.getState();
   const normalizedSubdir = subdir.replace(/^\/+|\/+$/g, '');
   try {
-    const res = await hanaFetch('/api/desk/files', {
+    const res = await lingxiFetch('/api/desk/files', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ ...selectedDeskAgentBody(s), action: 'upload', dir: s.deskBasePath || undefined, subdir: normalizedSubdir, paths }),
@@ -909,7 +909,7 @@ export async function deskUploadBrowserFilesToSubdir(files: File[], subdir: stri
       type: file.type || '',
       contentBase64: await blobToBase64(file),
     })));
-    const res = await hanaFetch('/api/workbench/upload', {
+    const res = await lingxiFetch('/api/workbench/upload', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -945,7 +945,7 @@ export async function deskCreateFileInSubdir(subdir: string, name: string, text:
   if (!isPlainFileName(trimmed)) return false;
   const mountId = activeDeskMountId(s);
   try {
-    const res = await hanaFetch(mountId ? '/api/workbench/actions' : '/api/desk/files', {
+    const res = await lingxiFetch(mountId ? '/api/workbench/actions' : '/api/desk/files', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(mountId
@@ -985,7 +985,7 @@ export async function deskMoveFiles(names: string[], destFolder: string): Promis
     if (mountId) {
       for (const name of names) {
         if (!isPlainFileName(name)) continue;
-        const res = await hanaFetch('/api/workbench/actions', {
+        const res = await lingxiFetch('/api/workbench/actions', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ action: 'move', mountId, subdir: '', name, destSubdir: destFolder }),
@@ -1000,7 +1000,7 @@ export async function deskMoveFiles(names: string[], destFolder: string): Promis
       }
       return;
     }
-    const res = await hanaFetch('/api/desk/files', {
+    const res = await lingxiFetch('/api/desk/files', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ ...selectedDeskAgentBody(s), action: 'move', dir: s.deskBasePath || undefined, subdir: '', names, destFolder }),
@@ -1062,7 +1062,7 @@ export async function deskMoveTreeFiles(items: DeskTreeMoveItem[], destSubdir: s
   const normalizedDest = destSubdir.replace(/^\/+|\/+$/g, '');
   const mountId = activeDeskMountId(s);
   try {
-    const res = await hanaFetch(mountId ? '/api/workbench/actions' : '/api/desk/files', {
+    const res = await lingxiFetch(mountId ? '/api/workbench/actions' : '/api/desk/files', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(mountId
@@ -1115,7 +1115,7 @@ export async function deskRenameTreeItem(sourceSubdir: string, oldName: string, 
   if (oldName === trimmed) return true;
   const mountId = activeDeskMountId(s);
   try {
-    const res = await hanaFetch(mountId ? '/api/workbench/actions' : '/api/desk/files', {
+    const res = await lingxiFetch(mountId ? '/api/workbench/actions' : '/api/desk/files', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(mountId
@@ -1202,7 +1202,7 @@ async function deskSafeDeleteMobileWorkbenchItems(items: DeskTreeMoveItem[]): Pr
   try {
     for (const item of paths) {
       if (!isPlainFileName(item.name)) break;
-      const res = await hanaFetch('/api/workbench/actions', {
+      const res = await lingxiFetch('/api/workbench/actions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -1231,7 +1231,7 @@ export async function deskRemoveFile(name: string): Promise<void> {
   const s = useStore.getState();
   const mountId = activeDeskMountId(s);
   try {
-    const res = await hanaFetch(mountId ? '/api/workbench/actions' : '/api/desk/files', {
+    const res = await lingxiFetch(mountId ? '/api/workbench/actions' : '/api/desk/files', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(mountId
@@ -1264,7 +1264,7 @@ export async function deskMkdirInSubdir(subdir: string, name: string): Promise<b
   if (!isPlainFileName(trimmed)) return false;
   const mountId = activeDeskMountId(s);
   try {
-    const res = await hanaFetch(mountId ? '/api/workbench/actions' : '/api/desk/files', {
+    const res = await lingxiFetch(mountId ? '/api/workbench/actions' : '/api/desk/files', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(mountId
@@ -1291,7 +1291,7 @@ export async function deskRenameFile(oldName: string, newName: string): Promise<
   const s = useStore.getState();
   const mountId = activeDeskMountId(s);
   try {
-    const res = await hanaFetch(mountId ? '/api/workbench/actions' : '/api/desk/files', {
+    const res = await lingxiFetch(mountId ? '/api/workbench/actions' : '/api/desk/files', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(mountId
@@ -1345,7 +1345,7 @@ async function persistWorkspaceHistory(folder: string): Promise<void> {
     return;
   }
   try {
-    const res = await hanaFetch(url, {
+    const res = await lingxiFetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ path: folder }),
@@ -1374,7 +1374,7 @@ export async function removeRecentWorkspace(folder: string): Promise<void> {
     return;
   }
   try {
-    const res = await hanaFetch(url, {
+    const res = await lingxiFetch(url, {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ path: normalized }),
@@ -1399,7 +1399,7 @@ export async function clearRecentWorkspaces(): Promise<void> {
     return;
   }
   try {
-    const res = await hanaFetch(url, {
+    const res = await lingxiFetch(url, {
       method: 'DELETE',
     });
     const data = await res.json();

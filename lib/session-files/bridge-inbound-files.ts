@@ -21,22 +21,22 @@ const MIME_EXTENSIONS = {
 };
 
 export async function materializeBridgeInboundFiles({
-  hanakoHome,
+  lingxiHome,
   sessionId = null,
   sessionPath,
   files,
   registerSessionFile,
-}: { hanakoHome?: any; sessionId?: any; sessionPath?: any; files?: any[]; registerSessionFile?: any } = {}) {
+}: { lingxiHome?: any; sessionId?: any; sessionPath?: any; files?: any[]; registerSessionFile?: any } = {}) {
   if (!files?.length) {
     return { sessionFiles: [], imageAttachmentPaths: [], displayAttachments: [] };
   }
-  if (!hanakoHome) throw new Error("bridge inbound file materialization requires hanakoHome");
+  if (!lingxiHome) throw new Error("bridge inbound file materialization requires lingxiHome");
   if (!sessionPath) throw new Error("bridge inbound file materialization requires sessionPath");
   if (typeof registerSessionFile !== "function") {
     throw new Error("bridge inbound file materialization requires registerSessionFile");
   }
 
-  const dir = sessionFilesCacheDir(hanakoHome, { sessionId, sessionPath });
+  const dir = sessionFilesCacheDir(lingxiHome, { sessionId, sessionPath });
   await fs.mkdir(dir, { recursive: true });
 
   const sessionFiles = [];

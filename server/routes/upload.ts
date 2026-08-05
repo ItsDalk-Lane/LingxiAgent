@@ -8,8 +8,8 @@
  * 不做任何业务判断（PDF 解析、图片识别等由 skill 层处理）。
  *
  * 存储位置：
- * - 无 sessionPath：{hanakoHome}/uploads/，按 24 小时清理旧临时文件
- * - 有 sessionPath：{hanakoHome}/session-files/<session-hash>/，跟随 session 冷却清理
+ * - 无 sessionPath：{lingxiHome}/uploads/，按 24 小时清理旧临时文件
+ * - 有 sessionPath：{lingxiHome}/session-files/<session-hash>/，跟随 session 冷却清理
  */
 import fsSync from "fs";
 import fs from "fs/promises";
@@ -193,13 +193,13 @@ function resolveUploadTarget(engine, sessionPath) {
   if (sessionPath) {
     const sessionId = engine?.getSessionIdForPath?.(sessionPath) || null;
     return {
-      dir: sessionFilesCacheDir(engine.hanakoHome, { sessionId, sessionPath }),
+      dir: sessionFilesCacheDir(engine.lingxiHome, { sessionId, sessionPath }),
       storageKind: "managed_cache",
       shouldCleanOldUploads: false,
     };
   }
   return {
-    dir: path.join(engine.hanakoHome, "uploads"),
+    dir: path.join(engine.lingxiHome, "uploads"),
     storageKind: undefined,
     shouldCleanOldUploads: true,
   };
@@ -307,7 +307,7 @@ export function createUploadRoute(engine) {
           results.push({ src: srcPath, error: "symlink not allowed" });
           continue;
         }
-        if (isSensitivePath(srcPath, engine.hanakoHome)) {
+        if (isSensitivePath(srcPath, engine.lingxiHome)) {
           results.push({ src: srcPath, error: "sensitive path blocked" });
           continue;
         }

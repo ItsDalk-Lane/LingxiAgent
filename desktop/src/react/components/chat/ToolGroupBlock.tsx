@@ -22,7 +22,7 @@ interface Props {
   agentName?: string;
 }
 
-export const ToolGroupBlock = memo(function ToolGroupBlock({ tools: rawTools, collapsed: initialCollapsed, agentName = 'Hanako' }: Props) {
+export const ToolGroupBlock = memo(function ToolGroupBlock({ tools: rawTools, collapsed: initialCollapsed, agentName = 'Lingxi' }: Props) {
   // 独立卡片或产物块承接状态的工具，不在工具组里重复显示。
   const tools = rawTools.filter(t => !isToolCallHiddenFromProcessUi(t));
   const [collapsed, setCollapsed] = useState(initialCollapsed);

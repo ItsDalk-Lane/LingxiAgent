@@ -9,7 +9,7 @@ import { Fragment, memo, useCallback, useEffect, useMemo, useRef, useState } fro
 import { createPortal } from 'react-dom';
 import { Collapse } from '@/ui';
 import { useStore } from '../stores';
-import { hanaFetch } from '../hooks/use-hana-fetch';
+import { lingxiFetch } from '../hooks/use-hana-fetch';
 import { useI18n } from '../hooks/use-i18n';
 import { formatSessionDate } from '../utils/format';
 import { switchSession, archiveSession, renameSession, pinSession, createNewSession, reorderPinnedSessions } from '../stores/session-actions';
@@ -44,9 +44,9 @@ import { FolderIcon } from './shared/FolderIcon';
 import styles from './SessionList.module.css';
 
 const SESSION_VIEW_MODE_KEY = 'hana-session-sidebar-view-mode';
-const SESSION_DRAG_MIME = 'application/x-hana-session-path';
-const PROJECT_DRAG_MIME = 'application/x-hana-project-id';
-const FOLDER_DRAG_MIME = 'application/x-hana-project-folder-id';
+const SESSION_DRAG_MIME = 'application/x-lingxi-session-path';
+const PROJECT_DRAG_MIME = 'application/x-lingxi-project-id';
+const FOLDER_DRAG_MIME = 'application/x-lingxi-project-folder-id';
 const PROJECT_SESSION_PREVIEW_LIMIT = 5;
 
 type SidebarDragState =
@@ -245,7 +245,7 @@ function SessionListInner() {
       setBrowserSessions({});
       return;
     }
-    hanaFetch('/api/browser/session-states')
+    lingxiFetch('/api/browser/session-states')
       .then(r => r.json())
       .then(data => {
         if (!cancelled) setVisibleBrowserSessions(data);
@@ -273,7 +273,7 @@ function SessionListInner() {
     const timer = window.setTimeout(async () => {
       const encodedQuery = encodeURIComponent(searchQueryTrimmed);
       try {
-        const titleRes = await hanaFetch(`/api/sessions/search?q=${encodedQuery}&phase=title&limit=20`, {
+        const titleRes = await lingxiFetch(`/api/sessions/search?q=${encodedQuery}&phase=title&limit=20`, {
           signal: controller.signal,
           timeout: 12_000,
         });
@@ -282,7 +282,7 @@ function SessionListInner() {
         setTitleResults(normalizeSessionSearchResults(titleData));
         setSearchStatus('content');
 
-        const contentRes = await hanaFetch(`/api/sessions/search?q=${encodedQuery}&phase=content&limit=20`, {
+        const contentRes = await lingxiFetch(`/api/sessions/search?q=${encodedQuery}&phase=content&limit=20`, {
           signal: controller.signal,
           timeout: 12_000,
         });
@@ -335,7 +335,7 @@ function SessionListInner() {
       return next;
     });
     try {
-      const res = await hanaFetch('/api/browser/close-session', {
+      const res = await lingxiFetch('/api/browser/close-session', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ sessionPath }),
@@ -1627,7 +1627,7 @@ const SessionItem = memo(function SessionItem({ session: s, isActive, isPending,
     e.preventDefault();
     e.stopPropagation();
     try {
-      await hanaFetch('/api/browser/open-session', {
+      await lingxiFetch('/api/browser/open-session', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ sessionPath: s.path }),
@@ -1931,7 +1931,7 @@ const SessionSummaryPreviewCard = memo(function SessionSummaryPreviewCard({
 
     let cancelled = false;
     setSummaryState({ status: 'loading', text: null });
-    hanaFetch(`/api/sessions/summary?path=${encodeURIComponent(session.path)}`)
+    lingxiFetch(`/api/sessions/summary?path=${encodeURIComponent(session.path)}`)
       .then(res => res.json())
       .then((data: SessionSummaryResponse) => {
         if (cancelled) return;

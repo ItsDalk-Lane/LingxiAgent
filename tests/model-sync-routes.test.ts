@@ -888,7 +888,7 @@ describe("model sync related routes", () => {
         getAuthJsonKey: (id) => id,
         getDefaultModels: () => [],
       },
-      hanakoHome: "/tmp",
+      lingxiHome: "/tmp",
     });
 
     app.route("/api", createProvidersRoute(engine));
@@ -915,7 +915,7 @@ describe("model sync related routes", () => {
       onProviderChanged: vi.fn().mockResolvedValue(undefined),
       emitEvent: vi.fn(),
       providerRegistry: { removeModel },
-      hanakoHome: "/tmp",
+      lingxiHome: "/tmp",
     };
 
     app.route("/api", createProvidersRoute(engine));
@@ -941,7 +941,7 @@ describe("model sync related routes", () => {
       onProviderChanged: vi.fn().mockResolvedValue(undefined),
       emitEvent: vi.fn(),
       providerRegistry: { updateModelEntry },
-      hanakoHome: "/tmp",
+      lingxiHome: "/tmp",
     };
 
     app.route("/api", createProvidersRoute(engine));
@@ -973,7 +973,7 @@ describe("model sync related routes", () => {
       providerRegistry: {
         updateModelEntry: vi.fn(() => { throw validationError; }),
       },
-      hanakoHome: "/tmp",
+      lingxiHome: "/tmp",
     };
 
     app.route("/api", createProvidersRoute(engine));
@@ -1010,7 +1010,7 @@ describe("model sync related routes", () => {
         get: vi.fn(() => ({ baseUrl: "https://stale.example/v1", api: "openai-completions" })),
         isOAuth: vi.fn(() => true),
       },
-      hanakoHome: "/tmp",
+      lingxiHome: "/tmp",
     };
     app.route("/api", createProvidersRoute(engine));
 
@@ -1049,7 +1049,7 @@ describe("model sync related routes", () => {
         ]),
         resolveChatProvider: vi.fn(() => ({ credentialSource: "provider-catalog" })),
       },
-      hanakoHome: "/tmp",
+      lingxiHome: "/tmp",
     };
     app.route("/api", createProvidersRoute(engine));
 
@@ -1085,7 +1085,7 @@ describe("model sync related routes", () => {
         get: vi.fn(() => ({ baseUrl: "https://entry.example/v1", api: "openai-completions" })),
         isOAuth: vi.fn(() => true),
       },
-      hanakoHome: "/tmp",
+      lingxiHome: "/tmp",
     };
     app.route("/api", createProvidersRoute(engine));
 
@@ -1118,7 +1118,7 @@ describe("model sync related routes", () => {
         get: vi.fn(() => ({ baseUrl: "https://entry.example/v1", api: "openai-completions" })),
         isOAuth: vi.fn(() => true),
       },
-      hanakoHome: "/tmp",
+      lingxiHome: "/tmp",
     };
     app.route("/api", createProvidersRoute(engine));
 
@@ -1161,7 +1161,7 @@ describe("model sync related routes", () => {
       preferences: {
         getOAuthCustomModels: () => ({}),
       },
-      hanakoHome: "/tmp",
+      lingxiHome: "/tmp",
     };
 
     app.route("/api", createProvidersRoute(engine));
@@ -1208,7 +1208,7 @@ describe("model sync related routes", () => {
         get: () => ({ type: "oauth" }),
       },
       preferences: { getOAuthCustomModels: () => ({}) },
-      hanakoHome: "/tmp",
+      lingxiHome: "/tmp",
     };
     app.route("/api", createProvidersRoute(engine));
 
@@ -1257,7 +1257,7 @@ describe("model sync related routes", () => {
         },
         getRegistryModelsForProvider: () => [],
         resolveProviderCredentials: () => ({ api_key: "", base_url: "", api: "" }),
-        hanakoHome: tmpHome,
+        lingxiHome: tmpHome,
       };
       const app = new Hono();
       app.route("/api", createProvidersRoute(engine));
@@ -1298,7 +1298,7 @@ describe("model sync related routes", () => {
         getAuthJsonKey: (id) => id,
         getDefaultModels: (id) => id === "openai-codex" ? ["gpt-5.4", "gpt-5.3-codex"] : [],
       },
-      hanakoHome: "/tmp",
+      lingxiHome: "/tmp",
     });
 
     app.route("/api", createProvidersRoute(engine));
@@ -1339,7 +1339,7 @@ describe("model sync related routes", () => {
         getAuthJsonKey: () => "legacy-runtime",
         getDefaultModels: () => [],
       },
-      hanakoHome: "/tmp",
+      lingxiHome: "/tmp",
     };
     app.route("/api", createProvidersRoute(engine));
 
@@ -1393,7 +1393,7 @@ describe("model sync related routes", () => {
         getAuthJsonKey: (id) => id,
         getDefaultModels: () => [],
       },
-      hanakoHome: "/tmp",
+      lingxiHome: "/tmp",
     };
     app.route("/api", createProvidersRoute(engine));
 
@@ -1443,7 +1443,7 @@ describe("model sync related routes", () => {
         getAuthJsonKey: (id) => id,
         getDefaultModels: () => [],
       },
-      hanakoHome: "/tmp",
+      lingxiHome: "/tmp",
     };
     app.route("/api", createProvidersRoute(engine));
 
@@ -1479,7 +1479,7 @@ describe("model sync related routes", () => {
           credentialSource: "provider-catalog",
         }),
       },
-      hanakoHome: "/tmp",
+      lingxiHome: "/tmp",
     };
     app.route("/api", createProvidersRoute(engine));
 
@@ -1514,7 +1514,7 @@ describe("model sync related routes", () => {
         getAuthJsonKey: (id) => id,
         getDefaultModels: () => [],
       },
-      hanakoHome: "/tmp",
+      lingxiHome: "/tmp",
     });
 
     app.route("/api", createProvidersRoute(engine));
@@ -1560,7 +1560,7 @@ describe("model sync related routes", () => {
         getAuthJsonKey: (id) => id,
         getDefaultModels: () => [],
       },
-      hanakoHome: fs.mkdtempSync(path.join(os.tmpdir(), "hana-ollama-discovery-")),
+      lingxiHome: fs.mkdtempSync(path.join(os.tmpdir(), "hana-ollama-discovery-")),
     });
 
     try {
@@ -1582,7 +1582,7 @@ describe("model sync related routes", () => {
       expect(data.models.find((model) => model.id === "minicpm-v:8b")).toMatchObject({ image: true });
       expect(data.models.find((model) => model.id === "llama3.2")?.image).toBeUndefined();
     } finally {
-      fs.rmSync(engine.hanakoHome, { recursive: true, force: true });
+      fs.rmSync(engine.lingxiHome, { recursive: true, force: true });
     }
   });
 
@@ -1610,7 +1610,7 @@ describe("model sync related routes", () => {
         getAuthJsonKey: (id) => id,
         getDefaultModels: () => [],
       },
-      hanakoHome: "/tmp",
+      lingxiHome: "/tmp",
     });
 
     app.route("/api", createProvidersRoute(engine));
@@ -1653,7 +1653,7 @@ describe("model sync related routes", () => {
         getAuthJsonKey: (id) => id,
         getDefaultModels: () => [],
       },
-      hanakoHome: "/tmp",
+      lingxiHome: "/tmp",
     });
 
     app.route("/api", createProvidersRoute(engine));
@@ -1698,7 +1698,7 @@ describe("model sync related routes", () => {
         providerRegistry: {
           getCredentials: () => ({ apiKey: "sk-test", baseUrl: "https://api.deepseek.com/v1", api: "openai-completions" }),
         },
-        hanakoHome: tmpDir,
+        lingxiHome: tmpDir,
       });
 
       app.route("/api", createProvidersRoute(engine));
@@ -1736,7 +1736,7 @@ describe("model sync related routes", () => {
         getAuthJsonKey: (id) => id,
         getDefaultModels: () => [],
       },
-      hanakoHome: "/tmp",
+      lingxiHome: "/tmp",
     });
 
     app.route("/api", createProvidersRoute(engine));
@@ -1780,7 +1780,7 @@ describe("model sync related routes", () => {
         }),
         getChatDiscoverableModelEntries: () => [{ id: "gpt-5.4", name: "GPT-5.4", contextWindow: 272000, maxOutputTokens: 96000 }],
       },
-      hanakoHome: "/tmp",
+      lingxiHome: "/tmp",
     });
 
     app.route("/api", createProvidersRoute(engine));
@@ -1821,7 +1821,7 @@ describe("model sync related routes", () => {
         }),
         getChatDiscoverableModelEntries: () => ["gpt-5.6-sol"],
       },
-      hanakoHome: "/tmp",
+      lingxiHome: "/tmp",
     });
 
     app.route("/api", createProvidersRoute(engine));
@@ -1853,7 +1853,7 @@ describe("model sync related routes", () => {
         getAuthJsonKey: (id) => id,
         getDefaultModels: () => [],
       },
-      hanakoHome: "/tmp",
+      lingxiHome: "/tmp",
     });
 
     app.route("/api", createProvidersRoute(engine));
@@ -1883,7 +1883,7 @@ describe("model sync related routes", () => {
         getAuthJsonKey: (id) => id,
         getDefaultModels: () => [],
       },
-      hanakoHome: "/tmp",
+      lingxiHome: "/tmp",
     });
 
     app.route("/api", createProvidersRoute(engine));
@@ -1915,7 +1915,7 @@ describe("model sync related routes", () => {
           return null;
         },
       },
-      hanakoHome: "/tmp",
+      lingxiHome: "/tmp",
     });
 
     app.route("/api", createProvidersRoute(engine));
@@ -1959,7 +1959,7 @@ describe("model sync related routes", () => {
         getAuthJsonKey: (id) => id,
         getDefaultModels: () => [],
       },
-      hanakoHome: "/tmp",
+      lingxiHome: "/tmp",
     });
 
     app.route("/api", createProvidersRoute(engine));
@@ -1976,7 +1976,7 @@ describe("model sync related routes", () => {
     const headers = fetchMock.mock.calls[0][1].headers;
     expect(headers["x-api-key"]).toBe("sk-test");
     expect(headers["anthropic-version"]).toBe("2023-06-01");
-    expect(headers["User-Agent"]).toBe("HanaAgent/1.0");
+    expect(headers["User-Agent"]).toBe("LingxiAgent/1.0");
 
     const data = await res.json();
     expect(data.models).toEqual([
@@ -2003,7 +2003,7 @@ describe("model sync related routes", () => {
         getAuthJsonKey: (id) => id,
         getDefaultModels: () => [],
       },
-      hanakoHome: "/tmp",
+      lingxiHome: "/tmp",
     });
 
     app.route("/api", createProvidersRoute(engine));
@@ -2053,7 +2053,7 @@ describe("model sync related routes", () => {
         getAuthJsonKey: (id) => id,
         getDefaultModels: () => [],
       },
-      hanakoHome: "/tmp",
+      lingxiHome: "/tmp",
     });
 
     app.route("/api", createProvidersRoute(engine));
@@ -2105,7 +2105,7 @@ describe("model sync related routes", () => {
         getAuthJsonKey: (id) => id,
         getDefaultModels: (id) => id === "zhipu" ? ["glm-5.2", "glm-5.1", "glm-5", "glm-4.7-flash"] : [],
       },
-      hanakoHome: "/tmp",
+      lingxiHome: "/tmp",
     });
 
     app.route("/api", createProvidersRoute(engine));
@@ -2139,7 +2139,7 @@ describe("model sync related routes", () => {
         getAuthJsonKey: (id) => id,
         getDefaultModels: (id) => id === "kimi-coding" ? ["kimi-k2.6", "kimi-k2.5"] : [],
       },
-      hanakoHome: "/tmp",
+      lingxiHome: "/tmp",
     });
 
     app.route("/api", createProvidersRoute(engine));
@@ -2174,7 +2174,7 @@ describe("model sync related routes", () => {
         getAuthJsonKey: (id) => id,
         getDefaultModels: () => [],
       },
-      hanakoHome: "/tmp",
+      lingxiHome: "/tmp",
     });
 
     app.route("/api", createProvidersRoute(engine));
@@ -2209,7 +2209,7 @@ describe("model sync related routes", () => {
         getAuthJsonKey: (id) => id,
         getDefaultModels: () => [],
       },
-      hanakoHome: "/tmp",
+      lingxiHome: "/tmp",
     });
 
     app.route("/api", createProvidersRoute(engine));
@@ -2243,7 +2243,7 @@ describe("model sync related routes", () => {
         getAuthJsonKey: (id) => id,
         getDefaultModels: () => [],
       },
-      hanakoHome: "/tmp",
+      lingxiHome: "/tmp",
     });
 
     app.route("/api", createProvidersRoute(engine));

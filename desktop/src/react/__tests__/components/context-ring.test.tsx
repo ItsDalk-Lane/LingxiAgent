@@ -26,7 +26,7 @@ describe('ContextRing', () => {
     vi.clearAllMocks();
     getWebSocketMock.mockReturnValue({ readyState: WebSocket.OPEN, send: sendMock });
     useStore.setState({
-      agentYuan: 'hanako',
+      agentYuan: 'lingxi',
       currentSessionId: 'sess_a',
       currentSessionPath: '/session/a.jsonl',
       contextTokens: null,

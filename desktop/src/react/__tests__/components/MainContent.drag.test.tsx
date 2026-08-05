@@ -5,12 +5,12 @@ import React from 'react';
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useStore } from '../../stores';
-import { hanaFetch } from '../../hooks/use-hana-fetch';
+import { lingxiFetch } from '../../hooks/use-hana-fetch';
 import { MainContent } from '../../MainContent';
 import { SkillsPanel } from '../../components/SkillsPanel';
 
 vi.mock('../../hooks/use-hana-fetch', () => ({
-  hanaFetch: vi.fn(),
+  lingxiFetch: vi.fn(),
 }));
 
 vi.mock('../../components/BrowserCard', () => ({ BrowserCard: () => null }));
@@ -31,7 +31,7 @@ function fileDataTransfer(files: File[] = []) {
 describe('MainContent app file drag attachments', () => {
   beforeEach(() => {
     window.t = ((key: string) => key) as typeof window.t;
-    vi.mocked(hanaFetch).mockReset();
+    vi.mocked(lingxiFetch).mockReset();
     window.platform = {
       getFilePath: vi.fn((file: File) => `/tmp/${file.name}`),
     } as unknown as typeof window.platform;
@@ -42,8 +42,8 @@ describe('MainContent app file drag attachments', () => {
       activePanel: null,
       currentAgentId: 'agent-a',
       agentName: 'Hana',
-      agentYuan: 'hanako',
-      agents: [{ id: 'agent-a', name: 'Hana', yuan: 'hanako', isPrimary: true }],
+      agentYuan: 'lingxi',
+      agents: [{ id: 'agent-a', name: 'Hana', yuan: 'lingxi', isPrimary: true }],
       attachedFiles: [],
       attachedFilesBySession: {},
     } as never);
@@ -55,7 +55,7 @@ describe('MainContent app file drag attachments', () => {
   });
 
   it('ends the global drag lifecycle when SkillsPanel exclusively consumes the nested drop', async () => {
-    vi.mocked(hanaFetch).mockImplementation(async (url: string) => {
+    vi.mocked(lingxiFetch).mockImplementation(async (url: string) => {
       if (url.includes('/api/skills/install')) {
         return jsonResponse({ ok: true, skill: { name: 'nested-skill' } });
       }
@@ -83,16 +83,16 @@ describe('MainContent app file drag attachments', () => {
 
     fireEvent.drop(screen.getByTestId('skills-panel-drop-surface'), { dataTransfer });
 
-    await waitFor(() => expect(vi.mocked(hanaFetch).mock.calls.filter(([url]) =>
+    await waitFor(() => expect(vi.mocked(lingxiFetch).mock.calls.filter(([url]) =>
       String(url).includes('/api/skills/install')
     )).toHaveLength(1));
     expect(overlay).not.toHaveClass('visible');
     expect(useStore.getState().attachedFiles).toEqual([]);
-    expect(vi.mocked(hanaFetch).mock.calls.some(([url]) => url === '/api/upload')).toBe(false);
+    expect(vi.mocked(lingxiFetch).mock.calls.some(([url]) => url === '/api/upload')).toBe(false);
   });
 
   it('keeps an ordinary root drop on the chat attachment path exactly once', async () => {
-    vi.mocked(hanaFetch).mockImplementation(async (url: string) => {
+    vi.mocked(lingxiFetch).mockImplementation(async (url: string) => {
       if (url === '/api/upload') {
         return jsonResponse({
           uploads: [{ src: '/tmp/report.txt', dest: '/uploads/report.txt', name: 'report.txt' }],
@@ -115,7 +115,7 @@ describe('MainContent app file drag attachments', () => {
       isDirectory: false,
       waveform: undefined,
     }]));
-    expect(vi.mocked(hanaFetch).mock.calls.filter(([url]) => url === '/api/upload')).toHaveLength(1);
+    expect(vi.mocked(lingxiFetch).mock.calls.filter(([url]) => url === '/api/upload')).toHaveLength(1);
     expect(overlay).not.toHaveClass('visible');
   });
 
@@ -169,7 +169,7 @@ describe('MainContent app file drag attachments', () => {
   });
 
   it('attaches workspace files dragged from a native-root mount directly by absolute path', async () => {
-    vi.mocked(hanaFetch).mockClear();
+    vi.mocked(lingxiFetch).mockClear();
     useStore.setState({
       currentTab: 'chat',
       deskBasePath: 'studio:mount_docs',
@@ -196,7 +196,7 @@ describe('MainContent app file drag attachments', () => {
       name: 'report.md',
       isDirectory: false,
     }]);
-    expect(hanaFetch).not.toHaveBeenCalled();
+    expect(lingxiFetch).not.toHaveBeenCalled();
   });
 
   it('does not attach dragged files to the chat input while viewing channels', async () => {
@@ -221,7 +221,7 @@ describe('MainContent app file drag attachments', () => {
 
     expect(useStore.getState().attachedFiles).toEqual([]);
     expect(useStore.getState().attachedFilesBySession['/sessions/main.jsonl']).toBeUndefined();
-    expect(hanaFetch).not.toHaveBeenCalled();
+    expect(lingxiFetch).not.toHaveBeenCalled();
     expect(addToast).toHaveBeenCalledWith('channel.filesUnsupported', 'error');
   });
 });

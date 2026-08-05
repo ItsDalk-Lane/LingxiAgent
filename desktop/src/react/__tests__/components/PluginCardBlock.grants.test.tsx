@@ -4,7 +4,7 @@
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, render } from '@testing-library/react';
-import { PLUGIN_UI_CAPABILITY } from '@hana/plugin-protocol';
+import { PLUGIN_UI_CAPABILITY } from '@lingxi/plugin-protocol';
 import { useStore } from '../../stores';
 import { PluginCardBlock } from '../../components/chat/PluginCardBlock';
 import { usePluginIframe } from '../../hooks/use-plugin-iframe';

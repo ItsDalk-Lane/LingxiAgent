@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { hanaFetch } from '../../hooks/use-hana-fetch';
+import { lingxiFetch } from '../../hooks/use-hana-fetch';
 import { useStore } from '../../stores';
 import {
   hydrateInputDrafts,
@@ -8,13 +8,13 @@ import {
 import { registerDraftSyncListener } from '../../stores/input-draft-sync';
 
 vi.mock('../../hooks/use-hana-fetch', () => ({
-  hanaFetch: vi.fn(),
+  lingxiFetch: vi.fn(),
 }));
 vi.mock('../../services/server-connection', () => ({
   hasServerConnection: () => true,
 }));
 
-const mockFetch = vi.mocked(hanaFetch);
+const mockFetch = vi.mocked(lingxiFetch);
 
 function jsonResponse(data: unknown) {
   return { ok: true, json: async () => data } as unknown as Response;

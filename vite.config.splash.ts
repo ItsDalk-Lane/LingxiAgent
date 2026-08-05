@@ -8,8 +8,8 @@ import { injectCsp } from './vite.csp-profiles';
  *
  * splash 是壳自持表面："The shell never serves UI
  * from Resources directly; splash remains the only shell-owned surface"）：
- * 装箱后的安装器不再把 renderer 打进 asar（改成签名归档、首启在 HANA_HOME
- * 解压），但 splash 必须在"HANA_HOME 空、还没解压任何 artifact"这个时间点
+ * 装箱后的安装器不再把 renderer 打进 asar（改成签名归档、首启在 LINGXI_HOME
+ * 解压），但 splash 必须在"LINGXI_HOME 空、还没解压任何 artifact"这个时间点
  * 就能渲染——所以它不能依赖 renderer 的构建产物，需要一份自己的、随 asar
  * 走的独立构建。
  *

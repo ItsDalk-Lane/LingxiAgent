@@ -8,13 +8,13 @@ import { describe, expect, it } from "vitest";
 const YUAN_DIR = path.join(__dirname, "..", "lib", "yuan");
 
 const ZH_CASES = [
-  { yuan: "hanako", anchor: "每条新消息后的第一段输出以 MOOD 区块开头", tag: "<mood>" },
+  { yuan: "lingxi", anchor: "每条新消息后的第一段输出以 MOOD 区块开头", tag: "<mood>" },
   { yuan: "butter", anchor: "每条新消息后的第一段输出以 PULSE 区块开头", tag: "<pulse>" },
   { yuan: "ming", anchor: "每条新消息后的第一段输出以沉思区块开头", tag: "<reflect>" },
 ];
 
 const EN_CASES = [
-  { yuan: "hanako", anchor: "after each new message, your first output opens with the MOOD block", tag: "<mood>" },
+  { yuan: "lingxi", anchor: "after each new message, your first output opens with the MOOD block", tag: "<mood>" },
   { yuan: "butter", anchor: "after each new message, your first output opens with the PULSE block", tag: "<pulse>" },
   { yuan: "ming", anchor: "after each new message, your first output opens with the Reflect block", tag: "<reflect>" },
 ];

@@ -18,7 +18,7 @@ describe("CLI local server discovery", () => {
 
   it("reports a missing server-info file explicitly", () => {
     tmpDir = makeTmpDir();
-    const result = readLocalServerInfo({ hanaHome: tmpDir });
+    const result = readLocalServerInfo({ lingxiHome: tmpDir });
 
     expect(result).toMatchObject({
       ok: false,
@@ -35,7 +35,7 @@ describe("CLI local server discovery", () => {
       version: "1.2.3",
     }), "utf-8");
 
-    expect(resolveConnection({ hanaHome: tmpDir })).toMatchObject({
+    expect(resolveConnection({ lingxiHome: tmpDir })).toMatchObject({
       ok: true,
       baseUrl: "http://127.0.0.1:14500",
       token: "hana_token",

@@ -2,7 +2,7 @@
  * @vitest-environment jsdom
  */
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { PLUGIN_UI_CAPABILITY } from '@hana/plugin-protocol';
+import { PLUGIN_UI_CAPABILITY } from '@lingxi/plugin-protocol';
 import { useStore } from '../../stores';
 import { DEFAULT_PLUGIN_UI_CAPABILITIES } from '../../plugin-ui/capabilities';
 import type { PluginUiRequestContext } from '../../plugin-ui/plugin-ui-host-controller';

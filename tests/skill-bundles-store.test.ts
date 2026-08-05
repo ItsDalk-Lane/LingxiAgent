@@ -19,7 +19,7 @@ describe("skill bundle store", () => {
 
   beforeEach(() => {
     tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "hana-skill-bundles-"));
-    engine = { hanakoHome: tempDir };
+    engine = { lingxiHome: tempDir };
   });
 
   afterEach(() => {

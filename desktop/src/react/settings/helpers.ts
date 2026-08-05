@@ -2,7 +2,7 @@
  * Settings 共享工具函数
  */
 import { useSettingsStore } from './store';
-import { hanaFetch } from './api';
+import { lingxiFetch } from './api';
 import registry from '../../shared/theme-registry';
 import { lookupReferenceModelMeta } from '../utils/model-metadata';
 import { API_PROVIDER_PRESETS, getProviderPresetLabel } from '../utils/provider-presets';
@@ -77,7 +77,7 @@ export function lookupModelMeta(modelId: string, provider?: string): any {
 export async function refreshSettingsConfigSnapshot(): Promise<void> {
   const ownerId = useSettingsStore.getState().getSettingsAgentId();
   if (!ownerId) return;
-  const cfgRes = await hanaFetch(`/api/agents/${ownerId}/config`);
+  const cfgRes = await lingxiFetch(`/api/agents/${ownerId}/config`);
   const newConfig = await cfgRes.json();
   // 刷新期间 settings owner 可能已切换，晚到的响应不覆盖新 owner 的快照
   if (useSettingsStore.getState().getSettingsAgentId() !== ownerId) return;
@@ -96,7 +96,7 @@ export async function autoSaveConfig(
   const store = useSettingsStore.getState();
   try {
     const agentId = store.getSettingsAgentId();
-    const res = await hanaFetch(`/api/agents/${agentId}/config`, {
+    const res = await lingxiFetch(`/api/agents/${agentId}/config`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(partial),
@@ -119,7 +119,7 @@ export async function autoSaveGlobalModels(
 ) {
   const store = useSettingsStore.getState();
   try {
-    const res = await hanaFetch('/api/preferences/models', {
+    const res = await lingxiFetch('/api/preferences/models', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(partial),
@@ -127,7 +127,7 @@ export async function autoSaveGlobalModels(
     const data = await res.json();
     if (data.error) throw new Error(data.error);
     if (!opts.silent) store.showToast(t('settings.autoSaved'), 'success');
-    const refreshRes = await hanaFetch('/api/preferences/models');
+    const refreshRes = await lingxiFetch('/api/preferences/models');
     const newGlobal = await refreshRes.json();
     useSettingsStore.setState({ globalModelsConfig: newGlobal });
   } catch (err: any) {
@@ -142,7 +142,7 @@ export function savePins() {
     const store = useSettingsStore.getState();
     try {
       const agentId = store.getSettingsAgentId();
-      const res = await hanaFetch(`/api/agents/${agentId}/pinned`, {
+      const res = await lingxiFetch(`/api/agents/${agentId}/pinned`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ pins: store.currentPins }),

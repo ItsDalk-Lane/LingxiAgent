@@ -69,7 +69,7 @@
  *
  * Env:
  *   GH_TOKEN            required (gh CLI auth)
- *   HANA_SIGN_KEY       required for a real (non-dry-run) publish — PKCS8 PEM
+ *   LINGXI_SIGN_KEY       required for a real (non-dry-run) publish — PKCS8 PEM
  *                        private key path, same key the seed build uses
  *   GITHUB_REPOSITORY   "owner/repo"; set automatically inside GitHub Actions
  */
@@ -373,18 +373,18 @@ export function assertArtifactsMatchForResume(candidateManifest, existingTrainMa
   }
 }
 
-// ── HANA_SIGN_KEY guard (mirrors requireSignKeyPath in build-server-artifact.mjs) ─
+// ── LINGXI_SIGN_KEY guard (mirrors requireSignKeyPath in build-server-artifact.mjs) ─
 
 function requireSignKeyPath(env) {
-  const signKeyPath = env.HANA_SIGN_KEY;
+  const signKeyPath = env.LINGXI_SIGN_KEY;
   if (!signKeyPath) {
     throw new Error(
-      "publish-train: HANA_SIGN_KEY is not set. A published channel pointer MUST be signed; "
-        + "set HANA_SIGN_KEY=<private-key-path> (same key the seed build uses).",
+      "publish-train: LINGXI_SIGN_KEY is not set. A published channel pointer MUST be signed; "
+        + "set LINGXI_SIGN_KEY=<private-key-path> (same key the seed build uses).",
     );
   }
   if (!fs.existsSync(signKeyPath)) {
-    throw new Error(`publish-train: HANA_SIGN_KEY points at a missing file: ${signKeyPath}`);
+    throw new Error(`publish-train: LINGXI_SIGN_KEY points at a missing file: ${signKeyPath}`);
   }
   return signKeyPath;
 }

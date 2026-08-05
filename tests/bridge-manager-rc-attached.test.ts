@@ -42,7 +42,7 @@ function createMocks({ session }: any = {}) {
     bridgeSessionManager: { injectMessage: vi.fn(() => true), readIndex: () => ({}), writeIndex: () => {} },
     ensureSessionLoaded: vi.fn(async () => s),
     agentName: "T",
-    hanakoHome: os.tmpdir(),
+    lingxiHome: os.tmpdir(),
     currentAgentId: "hana",
   };
   const hub = {

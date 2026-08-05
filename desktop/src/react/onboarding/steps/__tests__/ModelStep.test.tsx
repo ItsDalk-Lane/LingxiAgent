@@ -41,7 +41,7 @@ describe('ModelStep', () => {
     render(
       <ModelStep
         preview={false}
-        hanaFetch={vi.fn()}
+        lingxiFetch={vi.fn()}
         agentId="hana-primary"
         verificationPlan={{ agentConfig: {}, preferenceModels: {}, requiredAgentSecretPaths: [] }}
         providerName="deepseek"
@@ -70,7 +70,7 @@ describe('ModelStep', () => {
     render(
       <ModelStep
         preview={false}
-        hanaFetch={vi.fn()}
+        lingxiFetch={vi.fn()}
         agentId="hana-primary"
         verificationPlan={{ agentConfig: {}, preferenceModels: {}, requiredAgentSecretPaths: [] }}
         providerName="deepseek"
@@ -105,7 +105,7 @@ describe('ModelStep', () => {
     render(
       <ModelStep
         preview={false}
-        hanaFetch={vi.fn()}
+        lingxiFetch={vi.fn()}
         agentId="hana-primary"
         verificationPlan={{ agentConfig: {}, preferenceModels: {}, requiredAgentSecretPaths: [] }}
         providerName="custom-provider"
@@ -150,7 +150,7 @@ describe('ModelStep', () => {
     render(
       <ModelStep
         preview={false}
-        hanaFetch={vi.fn()}
+        lingxiFetch={vi.fn()}
         agentId="hana-primary"
         verificationPlan={{ agentConfig: {}, preferenceModels: {}, requiredAgentSecretPaths: [] }}
         providerName="custom-vllm"

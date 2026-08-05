@@ -2,7 +2,7 @@ import { useState, useEffect, useLayoutEffect, useCallback, useRef, useMemo } fr
 import { useStore } from '../stores';
 import { sessionScopedListIncludes, sessionScopedValue } from '../stores/session-slice';
 import { usePanel } from '../hooks/use-panel';
-import { hanaFetch } from '../hooks/use-hana-fetch';
+import { lingxiFetch } from '../hooks/use-hana-fetch';
 import { formatSessionDate } from '../utils/format';
 import { renderMarkdown } from '../utils/markdown';
 import { AgentAvatar, resolveAgentDisplayInfo } from '../utils/agent-display';
@@ -82,7 +82,7 @@ export function BridgePanel() {
     const snapshotId = bridgeAgentId;
     if (!snapshotId) return;
     try {
-      const res = await hanaFetch(`/api/bridge/status?agentId=${encodeURIComponent(snapshotId)}`);
+      const res = await lingxiFetch(`/api/bridge/status?agentId=${encodeURIComponent(snapshotId)}`);
       if (bridgeAgentIdRef.current !== snapshotId) return; // stale
       const data = await res.json();
       if (bridgeAgentIdRef.current !== snapshotId) return; // stale
@@ -98,8 +98,8 @@ export function BridgePanel() {
     try {
       const agentQuery = `&agentId=${encodeURIComponent(snapshotId)}`;
       const [statusRes, sessionsRes] = await Promise.all([
-        hanaFetch(`/api/bridge/status?agentId=${encodeURIComponent(snapshotId)}`),
-        hanaFetch(`/api/bridge/sessions?platform=${plat}${agentQuery}`),
+        lingxiFetch(`/api/bridge/status?agentId=${encodeURIComponent(snapshotId)}`),
+        lingxiFetch(`/api/bridge/sessions?platform=${plat}${agentQuery}`),
       ]);
       if (bridgeAgentIdRef.current !== snapshotId) return; // stale
       const sData = await statusRes.json();
@@ -232,7 +232,7 @@ export function BridgePanel() {
     const snapshotId = bridgeAgentId;
     if (!snapshotId) return;
     try {
-      await hanaFetch(`/api/bridge/sessions/${encodeURIComponent(currentKey)}/reset?agentId=${encodeURIComponent(snapshotId)}`, { method: 'POST' });
+      await lingxiFetch(`/api/bridge/sessions/${encodeURIComponent(currentKey)}/reset?agentId=${encodeURIComponent(snapshotId)}`, { method: 'POST' });
       if (bridgeAgentIdRef.current !== snapshotId) return; // stale
       if (currentSessionPath) useStore.getState().clearSession(currentSessionPath);
       setChatOpen(false);

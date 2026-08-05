@@ -21,8 +21,8 @@ vi.mock('../../settings/store', () => ({
 const mockFetch = vi.fn();
 
 vi.mock('../../settings/api', () => ({
-  hanaFetch: (...args: unknown[]) => mockFetch(...args),
-  hanaUrl: (path: string) => `http://127.0.0.1:3210${path}`,
+  lingxiFetch: (...args: unknown[]) => mockFetch(...args),
+  lingxiUrl: (path: string) => `http://127.0.0.1:3210${path}`,
 }));
 
 vi.mock('../../settings/helpers', () => ({
@@ -402,7 +402,7 @@ describe('settings actions', () => {
       if (path === '/api/agents') {
         return Promise.resolve(jsonResponse({
           agents: [
-            { id: 'agent-a', name: 'Agent A', yuan: 'hanako', isPrimary: false },
+            { id: 'agent-a', name: 'Agent A', yuan: 'lingxi', isPrimary: false },
             { id: 'agent-b', name: 'Agent B', yuan: 'ming', isPrimary: true },
           ],
         }));

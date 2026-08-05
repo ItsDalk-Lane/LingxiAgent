@@ -477,7 +477,7 @@ function buildCompactionBoundaryScope(oldRegionEnd: number) {
 
 function createCompactionBoundaryPlaceholder() {
   compactionBoundaryPlaceholderSequence += 1;
-  return `<hana.compaction.boundary:${Date.now().toString(36)}:${compactionBoundaryPlaceholderSequence}>`;
+  return `<lingxi.compaction.boundary:${Date.now().toString(36)}:${compactionBoundaryPlaceholderSequence}>`;
 }
 
 function countStringTokenOccurrences(value: any, token: string): number {

@@ -27,7 +27,7 @@ export async function execute(input) {
 }
 ```
 
-2. Open HanaAgent → Settings → Plugins, drag the folder into the install area (or drag a .zip)
+2. Open LingxiAgent → Settings → Plugins, drag the folder into the install area (or drag a .zip)
 3. After installation, the Agent can immediately call `my-plugin_hello`
 4. Uninstall: click the delete button on the plugins page
 
@@ -42,22 +42,22 @@ Pick the plugin shape first, then follow the manifest, runtime, and UI guidance 
 | UI | Page / widget / WebView/iframe card / `chat.surface` | `full-access` |
 | Marketplace entry | Makes the plugin discoverable in the marketplace | `OH-Plugins/plugins/<id>.yaml` |
 
-Start with the `hana-plugin-creator` scaffold, then delete what you do not need:
+Start with the `lingxi-plugin-creator` scaffold, then delete what you do not need:
 
 ```bash
-python3 skills2set/hana-plugin-creator/scripts/create_hana_plugin.py "My Plugin" --path examples/plugins --kind full
+python3 skills2set/lingxi-plugin-creator/scripts/create_lingxi_plugin.py "My Plugin" --path examples/plugins --kind full
 ```
 
 Debug order: install the local folder, inspect Settings diagnostics, finish README/manifest, then add an `OH-Plugins` marketplace entry when the plugin is ready to publish.
 
 ### Agent-Assisted Dev Loop
 
-When an Agent such as Hana or Codex is building a plugin on the user's behalf,
+When an Agent such as Lingxi or Codex is building a plugin on the user's behalf,
 prefer the dev loop over copying a half-finished plugin into the real plugin
 directory:
 
-1. Keep the plugin source in the current workspace, or in `${HANA_HOME}/plugin-dev-sources/`.
-2. Call the EventBus `plugin.dev.install` or HTTP `POST /api/plugins/dev/install` to copy the source into `${HANA_HOME}/plugins-dev/<pluginId>` and load it.
+1. Keep the plugin source in the current workspace, or in `${LINGXI_HOME}/plugin-dev-sources/`.
+2. Call the EventBus `plugin.dev.install` or HTTP `POST /api/plugins/dev/install` to copy the source into `${LINGXI_HOME}/plugins-dev/<pluginId>` and load it.
 3. After editing the source, call `plugin.dev.reload` or `POST /api/plugins/dev/:id/reload`.
 4. To control the lifecycle, call `plugin.dev.disable`, `plugin.dev.enable`, `plugin.dev.reset`, `plugin.dev.uninstall`, or their HTTP counterparts: `PUT /api/plugins/dev/:id/enabled`, `POST /api/plugins/dev/:id/reset`, `DELETE /api/plugins/dev/:id`.
 5. Smoke-test tool plugins with `plugin.dev.invokeTool` or `POST /api/plugins/dev/:id/tools/:toolName/invoke`. Prefer passing `sessionId` or `sessionRef` in the call body; `sessionPath` is only a legacy locator kept for older plugins.
@@ -71,12 +71,12 @@ then does the Agent see `plugin_dev_install`, `plugin_dev_reload`,
 `plugin_dev_list_surfaces`, `plugin_dev_describe_surface` and
 `plugin_dev_run_scenario`.
 
-Dev-mode permissions come from the dev slot Hana remembers, not from what the
+Dev-mode permissions come from the dev slot Lingxi remembers, not from what the
 manifest declares for itself. `devRunId` is the run guard for one dev
 install/reload cycle; pass it to enable/disable/reset/uninstall so a stale
 context cannot act on a newer dev slot. Dev operations may only touch the
-runtime copy under `${HANA_HOME}/plugins-dev/`. They never write to
-`${HANA_HOME}/plugins/` and never pollute the disable preferences of a real
+runtime copy under `${LINGXI_HOME}/plugins-dev/`. They never write to
+`${LINGXI_HOME}/plugins/` and never pollute the disable preferences of a real
 installed plugin.
 
 A `full-access` dev plugin must pass `allowFullAccess: true` explicitly. The
@@ -124,7 +124,7 @@ compatibility. The first phase supports `invokeTool`, `expectToolText` and
 
 - **Drag-and-drop**: Drag a plugin folder or .zip into Settings → Plugins install area
 - **File picker**: Click the install area and select a plugin folder or .zip via the file picker
-- **Manual**: Place the plugin directory in `${HANA_HOME}/plugins/`. The actual path is shown in Settings → Plugins or via `/api/plugins/settings` as `plugins_dir`
+- **Manual**: Place the plugin directory in `${LINGXI_HOME}/plugins/`. The actual path is shown in Settings → Plugins or via `/api/plugins/settings` as `plugins_dir`
 
 ### Management
 
@@ -136,7 +136,7 @@ All operations take effect immediately, no restart required:
 
 ### Plugin Data
 
-Plugin private data is stored in `${HANA_HOME}/plugin-data/{pluginId}/`. This directory is preserved when the plugin is deleted, so config persists across reinstalls.
+Plugin private data is stored in `${LINGXI_HOME}/plugin-data/{pluginId}/`. This directory is preserved when the plugin is deleted, so config persists across reinstalls.
 
 ## Directory Structure
 
@@ -200,7 +200,7 @@ Declare `"trust": "full-access"` in manifest:
 }
 ```
 
-`minAppVersion` (optional) declares the minimum HanaAgent version required to run the plugin. If the current app version is lower, the plugin will not load and its status is set to `incompatible`. All plugins should declare this field to prevent compatibility issues on older versions.
+`minAppVersion` (optional) declares the minimum LingxiAgent version required to run the plugin. If the current app version is lower, the plugin will not load and its status is set to `incompatible`. All plugins should declare this field to prevent compatibility issues on older versions.
 
 The user must enable the "Allow full-access plugins" toggle in Settings → Plugins. **When the toggle is off, full-access plugins are not loaded at all** (no partial loading) until the user explicitly enables it.
 
@@ -236,11 +236,11 @@ export async function execute(input, toolCtx) {  // required
 
 - Automatically namespaced: `pluginId_name` (e.g. `my-plugin_search`)
 - Restricted plugins' `toolCtx.bus` only has `emit/subscribe/request`, not `handle`
-- New plugins can use `defineTool()` from `@hana/plugin-runtime` for types and default parameters. The current static `tools/*.js` loader still reads named exports.
+- New plugins can use `defineTool()` from `@lingxi/plugin-runtime` for types and default parameters. The current static `tools/*.js` loader still reads named exports.
 - Agent-callable tools should declare `sessionPermission`. Use `readOnly: true` for pure reads, `kind: "plugin_output"` for bounded `ctx.dataDir` writes returned through `stageFile()`, and `kind: "external_side_effect"` for provider, network, platform, or account actions that Auto mode should send to the reviewer. Tools that modify user workspace files should remain reviewer-bound unless they describe a narrower side effect with `describeSideEffect(input)`.
 
 ```js
-import { defineTool } from '@hana/plugin-runtime';
+import { defineTool } from '@lingxi/plugin-runtime';
 
 const tool = defineTool({
   name: "search",
@@ -288,7 +288,7 @@ ResourceIO is the only authority path for user resources. `local-file`, `mount`,
 When a tool needs to deliver files, first stage the local file as a `SessionFile` for the current session, then return the staged media item through `details.media.items`:
 
 ```js
-import { createMediaDetails } from "@hana/plugin-runtime";
+import { createMediaDetails } from "@lingxi/plugin-runtime";
 
 const staged = toolCtx.stageFile({
   sessionId: toolCtx.sessionId,
@@ -305,7 +305,7 @@ return {
 
 The framework automatically extracts `details.media` and delivers files according to context: desktop renders file cards, Bridge sends through the target platform, and Mobile PWA / remote frontends read through the same `SessionFile` / Resource identity. The new protocol prefers structured `session_file` entries in `details.media.items`; `mediaUrls` remains only as a compatibility field for old tools and remote URLs. Local files must not bypass `stageFile()` / `stage_files` through `MEDIA:/path`, `file://`, or `mediaUrls`; register them as `session_file` entries first. Do not create private plugin file cards as a substitute for `SessionFile`.
 
-When a plugin produces local files directly, call `toolCtx.stageFile({ sessionId, sessionRef, filePath, label })` to attach them to the current session and obtain a ready-to-return media item. `registerSessionFile` remains available as a lower-level compatibility API, but new plugins should use `stageFile` so file ownership and media delivery stay coupled. `sessionId` / `sessionRef` are the preferred identity fields; `sessionPath` remains only as a legacy compatibility locator. `filePath` must be absolute. Hana records these files as `storageKind: "plugin_data"`, so they are treated as plugin data or generated output and are not removed by the session temporary-cache cleaner. Plugins should not assign temporary-cache lifecycle to arbitrary local paths; that lifecycle belongs to the framework.
+When a plugin produces local files directly, call `toolCtx.stageFile({ sessionId, sessionRef, filePath, label })` to attach them to the current session and obtain a ready-to-return media item. `registerSessionFile` remains available as a lower-level compatibility API, but new plugins should use `stageFile` so file ownership and media delivery stay coupled. `sessionId` / `sessionRef` are the preferred identity fields; `sessionPath` remains only as a legacy compatibility locator. `filePath` must be absolute. Lingxi records these files as `storageKind: "plugin_data"`, so they are treated as plugin data or generated output and are not removed by the session temporary-cache cleaner. Plugins should not assign temporary-cache lifecycle to arbitrary local paths; that lifecycle belongs to the framework.
 
 Boundaries:
 
@@ -317,7 +317,7 @@ Boundaries:
 
 #### External Data Access
 
-When a plugin needs live scores, weather, prices, external search results, or third-party platform data, new code should use the host-provided `ctx.network.fetch()` helper for outbound HTTP APIs. The iframe page calls only this plugin's own route, such as `hana.api.fetch("api/live-scores")`; the route handler then calls `ctx.network.fetch("https://...")`. This keeps iframe authentication, outbound host declarations, timeouts, caching, and response-size limits inside the host runtime boundary.
+When a plugin needs live scores, weather, prices, external search results, or third-party platform data, new code should use the host-provided `ctx.network.fetch()` helper for outbound HTTP APIs. The iframe page calls only this plugin's own route, such as `lingxi.api.fetch("api/live-scores")`; the route handler then calls `ctx.network.fetch("https://...")`. This keeps iframe authentication, outbound host declarations, timeouts, caching, and response-size limits inside the host runtime boundary.
 
 `ctx.network.fetch()` requires an explicit `network.fetch` capability plus allowed hosts in the manifest:
 
@@ -359,7 +359,7 @@ Boundaries:
 
 Scheduled automation `plugin_action` executors reuse plugin tools in v0. A job stores `{ pluginId, actionId, params }` as JSON and maps it to the loaded tool named `pluginId_actionId` at runtime.
 
-Both static `tools/*.js` exports and dynamic `ctx.registerTool()` tools receive the SDK-style `(input, ctx)` call. If the plugin is disabled, missing, or the tool cannot be found, the scheduled run fails explicitly and records the error in cron history. Hana does not silently fall back to an Agent session.
+Both static `tools/*.js` exports and dynamic `ctx.registerTool()` tools receive the SDK-style `(input, ctx)` call. If the plugin is disabled, missing, or the tool cannot be found, the scheduled run fails explicitly and records the error in cron history. Lingxi does not silently fall back to an Agent session.
 
 #### Visual Cards
 
@@ -396,7 +396,7 @@ return {
 Native chat surface example:
 
 ```js
-import { createChatSurfaceCard, createSession } from "@hana/plugin-runtime";
+import { createChatSurfaceCard, createSession } from "@lingxi/plugin-runtime";
 
 const child = await createSession(ctx, {
   kind: "tavern-run",
@@ -554,7 +554,7 @@ Common events:
 | `before_agent_start` | After user input | Inject system prompt |
 | `input` | When user input arrives | Intercept/transform input |
 
-Factory functions are invoked by Pi SDK at session creation time; handlers fire when the corresponding event occurs. After a full-access plugin is installed, enabled, or reloaded, Hana rebinds extension runners for currently idle sessions; sessions that are streaming, compacting, or switching are skipped and pick up the new extension set on the next safe rebuild. See Pi SDK extension documentation for the full event list.
+Factory functions are invoked by Pi SDK at session creation time; handlers fire when the corresponding event occurs. After a full-access plugin is installed, enabled, or reloaded, Lingxi rebinds extension runners for currently idle sessions; sessions that are streaming, compacting, or switching are skipped and pick up the new extension set on the next safe rebuild. See Pi SDK extension documentation for the full event list.
 
 `extensions/` remains a full-access boundary. Restricted plugins that include an `extensions/` directory do not load those factories. If a plugin needs to intercept provider requests, tool calls, or context construction, it must declare `"trust": "full-access"` and the user must enable the full-access plugin toggle.
 
@@ -611,7 +611,7 @@ export const capabilities = {
 };
 ```
 
-CLI providers must use structured argument bindings. Do not build shell command strings; Hana runs commands through non-shell `execFile` / `spawn` paths and collects outputs into the media task directory.
+CLI providers must use structured argument bindings. Do not build shell command strings; Lingxi runs commands through non-shell `execFile` / `spawn` paths and collects outputs into the media task directory.
 
 ### Configuration (Config Schema)
 
@@ -657,17 +657,17 @@ Declare in `manifest.json` under `contributes`:
 - Hovering over the tab shows the plugin's full name (tooltip)
 - When there are more than 5 tabs, extras are collapsed into an overflow dropdown menu; users can drag to reorder
 
-Plugin pages are rendered via WebView/iframe. New plugins should use `@hana/plugin-sdk` for handshake and host requests:
+Plugin pages are rendered via WebView/iframe. New plugins should use `@lingxi/plugin-sdk` for handshake and host requests:
 
 ```js
-import { hana } from '@hana/plugin-sdk';
+import { hana } from '@lingxi/plugin-sdk';
 
 hana.ready();
-hana.ui.resize({ height: 320 });
-await hana.toast.show({ message: 'Refreshed', type: 'success' });
+lingxi.ui.resize({ height: 320 });
+await lingxi.toast.show({ message: 'Refreshed', type: 'success' });
 await hana.external.open('https://example.com');
 await hana.clipboard.writeText('Copied text');
-await hana.resources.open({ resource: { kind: 'session-file', fileId: 'sf_1' }, mode: 'preview' });
+await lingxi.resources.open({ resource: { kind: 'session-file', fileId: 'sf_1' }, mode: 'preview' });
 ```
 
 The lower-level `hana.host.request(type, payload)` remains available for future or experimental capabilities. Prefer typed helpers for stable capabilities.
@@ -693,7 +693,7 @@ Grant-required iframe host capabilities must be declared in the manifest:
 
 Sensitive capabilities that are not declared return `CAPABILITY_DENIED`. Unknown capability names are ignored at load time; `toast.show` does not need to be declared.
 
-`hana.resources.*` only sends host-mediated requests from the iframe: it can ask Hana to open a resource, pick resources, or request access, but it cannot read or write file contents directly. Actual user-resource reads and writes stay in server-side plugin routes, tools, or lifecycle code through `ctx.resources` and ResourceIO.
+`lingxi.resources.*` only sends host-mediated requests from the iframe: it can ask Lingxi to open a resource, pick resources, or request access, but it cannot read or write file contents directly. Actual user-resource reads and writes stay in server-side plugin routes, tools, or lifecycle code through `ctx.resources` and ResourceIO.
 
 The host appends `hana-theme` and `hana-css` query parameters to the iframe URL. Plugins can optionally reference the theme CSS for visual consistency:
 
@@ -701,25 +701,25 @@ The host appends `hana-theme` and `hana-css` query parameters to the iframe URL.
 <link rel="stylesheet" href="${new URLSearchParams(location.search).get('hana-css')}">
 ```
 
-Static frontend resources belong under the plugin's `assets/` directory and are served by the Hana host at `/api/plugins/{pluginId}/assets/...`. This follows the same boundary idea as VS Code Webview resources: the entry route is opened with the local token or `pluginIframeTicket`; after a successful page response, the host issues a short-lived HttpOnly cookie scoped only to `/api/plugins/{pluginId}/assets/`. Vite split chunks, `React.lazy()` imports, CSS, fonts, images, JSON, wasm, and browser-playable video files such as MP4/WebM/MOV should not depend on `?token` or `pluginIframeTicket`. Video assets support HTTP byte ranges for `<video>` playback and seeking.
+Static frontend resources belong under the plugin's `assets/` directory and are served by the Lingxi host at `/api/plugins/{pluginId}/assets/...`. This follows the same boundary idea as VS Code Webview resources: the entry route is opened with the local token or `pluginIframeTicket`; after a successful page response, the host issues a short-lived HttpOnly cookie scoped only to `/api/plugins/{pluginId}/assets/`. Vite split chunks, `React.lazy()` imports, CSS, fonts, images, JSON, wasm, and browser-playable video files such as MP4/WebM/MOV should not depend on `?token` or `pluginIframeTicket`. Video assets support HTTP byte ranges for `<video>` playback and seeking.
 
-When page scripts call the plugin's own dynamic route APIs, prefer `hana.api.fetch()` from `@hana/plugin-sdk`. It derives the current plugin id from the iframe route and sends the surface session credential that the host appended to the iframe URL:
+When page scripts call the plugin's own dynamic route APIs, prefer `lingxi.api.fetch()` from `@lingxi/plugin-sdk`. It derives the current plugin id from the iframe route and sends the surface session credential that the host appended to the iframe URL:
 
 ```js
-import { hana } from '@hana/plugin-sdk';
+import { hana } from '@lingxi/plugin-sdk';
 
-const res = await hana.api.fetch('create-session', {
+const res = await lingxi.api.fetch('create-session', {
   method: 'POST',
 });
 ```
 
-When converting a website into a plugin, rewrite same-plugin `fetch('/api/...')` calls to `hana.api.fetch(...)` instead of hard-coding `/api/plugins/{pluginId}/...` in browser code. The lower-level protocol is: the host appends the surface session as the `pluginSurfaceSession` query parameter, and page scripts send it back with the `X-Hana-Plugin-Surface-Session` header (or a query parameter of the same name):
+When converting a website into a plugin, rewrite same-plugin `fetch('/api/...')` calls to `lingxi.api.fetch(...)` instead of hard-coding `/api/plugins/{pluginId}/...` in browser code. The lower-level protocol is: the host appends the surface session as the `pluginSurfaceSession` query parameter, and page scripts send it back with the `X-Lingxi-Plugin-Surface-Session` header (or a query parameter of the same name):
 
 ```js
 const surfaceSession = new URLSearchParams(location.search).get('pluginSurfaceSession');
 const res = await fetch('/api/plugins/my-plugin/create-session', {
   method: 'POST',
-  headers: { 'X-Hana-Plugin-Surface-Session': surfaceSession },
+  headers: { 'X-Lingxi-Plugin-Surface-Session': surfaceSession },
 });
 ```
 
@@ -728,10 +728,10 @@ This credential only authorizes the plugin's own proxied route paths and carries
 Browser code should prefer the SDK helper:
 
 ```js
-import { hana } from '@hana/plugin-sdk';
+import { hana } from '@lingxi/plugin-sdk';
 
-const iconUrl = hana.assets.url('images/icon.svg');
-const bgVideoUrl = hana.assets.url('videos/background.mp4');
+const iconUrl = lingxi.assets.url('images/icon.svg');
+const bgVideoUrl = lingxi.assets.url('videos/background.mp4');
 ```
 
 The server-side shell can also point directly at the same host-served path:
@@ -742,27 +742,27 @@ The server-side shell can also point directly at the same host-served path:
 
 Treat `assets/` as a public static root. Put only built files and public media there. Do not put source files, secrets, private config, or runtime data in it. The host rejects path traversal, dotfiles, source maps, and non-web static extensions by default. Use plugin route APIs or SDK host requests for dynamic data.
 
-Agent-generated plugins and newly edited plugin UI should not register extra `/api/file`, `/api/video`, `/assets/*`, or similar routes only to serve CSS, JS, images, fonts, or MP4 files. Existing plugins that already use static-file compatibility handlers remain loadable. The documented contract for new work is to put those resources in `assets/` and reference them with `hana.assets.url(...)` or the official host-served assets path in the route shell.
+Agent-generated plugins and newly edited plugin UI should not register extra `/api/file`, `/api/video`, `/assets/*`, or similar routes only to serve CSS, JS, images, fonts, or MP4 files. Existing plugins that already use static-file compatibility handlers remain loadable. The documented contract for new work is to put those resources in `assets/` and reference them with `lingxi.assets.url(...)` or the official host-served assets path in the route shell.
 
-React plugin UIs should use `@hana/plugin-components`. It provides Button, IconButton, TextInput, Textarea, Select, Switch, SettingRow, CardShell, List, EmptyState, and related primitives that match Hana's current controls:
+React plugin UIs should use `@lingxi/plugin-components`. It provides Button, IconButton, TextInput, Textarea, Select, Switch, SettingRow, CardShell, List, EmptyState, and related primitives that match Lingxi's current controls:
 
 ```tsx
-import { Button, CardShell, HanaThemeProvider, SettingRow, Switch } from "@hana/plugin-components";
-import "@hana/plugin-components/styles.css";
+import { Button, CardShell, LingxiThemeProvider, SettingRow, Switch } from "@lingxi/plugin-components";
+import "@lingxi/plugin-components/styles.css";
 
 export function PluginPanel() {
   return (
-    <HanaThemeProvider mode="inherit">
+    <LingxiThemeProvider mode="inherit">
       <CardShell title="Sync">
         <SettingRow label="Enabled" control={<Switch checked label="On" />} />
         <Button variant="primary">Run</Button>
       </CardShell>
-    </HanaThemeProvider>
+    </LingxiThemeProvider>
   );
 }
 ```
 
-`HanaThemeProvider` supports three modes: `inherit` reads host CSS variables and then uses SDK fallback tokens; `hana` pins the UI to a named Hana theme token set; `custom` only overrides explicitly provided tokens and lets missing fields continue through the fallback chain. Components depend only on `hana-plugin-*` classes and CSS variables, not renderer internals.
+`LingxiThemeProvider` supports three modes: `inherit` reads host CSS variables and then uses SDK fallback tokens; `lingxi` pins the UI to a named Lingxi theme token set; `custom` only overrides explicitly provided tokens and lets missing fields continue through the fallback chain. Components depend only on `hana-plugin-*` classes and CSS variables, not renderer internals.
 
 ### Widget (Sidebar Component) ⚡ full-access
 
@@ -886,10 +886,10 @@ Older plugins without `activationEvents` remain compatible: if `index.js` exists
 
 If a plugin needs persistent connections, scheduled tasks, or bus handlers, create `index.js`:
 
-New plugins should use `definePlugin()` from `@hana/plugin-runtime`. It returns a class-compatible value for the current PluginManager:
+New plugins should use `definePlugin()` from `@lingxi/plugin-runtime`. It returns a class-compatible value for the current PluginManager:
 
 ```js
-import { definePlugin } from '@hana/plugin-runtime';
+import { definePlugin } from '@lingxi/plugin-runtime';
 
 export default definePlugin({
   async onload(ctx, { register }) {
@@ -903,7 +903,7 @@ export default definePlugin({
 The traditional class form is still supported:
 
 ```js
-import { HANA_BUS_SKIP } from "@hana/plugin-runtime";
+import { LINGXI_BUS_SKIP } from "@lingxi/plugin-runtime";
 
 export default class MyPlugin {
   async onload() {
@@ -919,7 +919,7 @@ export default class MyPlugin {
     // Resources registered via register() are auto-cleaned on unload (reverse order)
     this.register(
       this.ctx.bus.handle("bridge:send", async (payload) => {
-        if (payload.platform !== "feishu") return HANA_BUS_SKIP;
+        if (payload.platform !== "feishu") return LINGXI_BUS_SKIP;
         await this.sendToFeishu(payload);
         return { sent: true };
       })
@@ -938,16 +938,16 @@ export default class MyPlugin {
 
 ## Bus Communication (bus.request / bus.handle)
 
-Inter-plugin communication uses EventBus request-response. `bus.handle` requires full-access permission; `bus.request` is available to all plugins. `bus.listCapabilities()` / `bus.getCapability(type)` can read the current stable capability directory, which records the capability name, input/output schema, permission requirements, error codes, stability, and whether a handler is currently available. New plugins should use `defineBusHandler()`, `requestBus()`, and `HANA_BUS_SKIP` from `@hana/plugin-runtime` so handler types, request arguments, and chained skip semantics come from the SDK instead of hand-written conventions.
+Inter-plugin communication uses EventBus request-response. `bus.handle` requires full-access permission; `bus.request` is available to all plugins. `bus.listCapabilities()` / `bus.getCapability(type)` can read the current stable capability directory, which records the capability name, input/output schema, permission requirements, error codes, stability, and whether a handler is currently available. New plugins should use `defineBusHandler()`, `requestBus()`, and `LINGXI_BUS_SKIP` from `@lingxi/plugin-runtime` so handler types, request arguments, and chained skip semantics come from the SDK instead of hand-written conventions.
 
 ```js
-import { defineBusHandler, HANA_BUS_SKIP, requestBus } from "@hana/plugin-runtime";
+import { defineBusHandler, LINGXI_BUS_SKIP, requestBus } from "@lingxi/plugin-runtime";
 
 // Plugin A (full-access): register a capability
 const bridgeSend = defineBusHandler({
   type: "bridge:send",
   async handle(payload) {
-    if (payload.platform !== "telegram") return HANA_BUS_SKIP;
+    if (payload.platform !== "telegram") return LINGXI_BUS_SKIP;
     await telegramBot.send(payload.chatId, payload.text);
     return { sent: true };
   },
@@ -991,12 +991,12 @@ if (capability?.available) {
 
 **Naming convention**: `domain:action`, colon-separated. E.g. `bridge:send`, `memory:query`, `timer:schedule`.
 
-**SKIP chain**: Multiple handlers can be registered for the same event type. The system calls them in registration order until one returns a value other than `HANA_BUS_SKIP`. Returning `HANA_BUS_SKIP` means "I don't handle this, pass it on":
+**SKIP chain**: Multiple handlers can be registered for the same event type. The system calls them in registration order until one returns a value other than `LINGXI_BUS_SKIP`. Returning `LINGXI_BUS_SKIP` means "I don't handle this, pass it on":
 
 ```js
 this.register(
   this.ctx.bus.handle("bridge:send", async (payload) => {
-    if (payload.platform !== "telegram") return HANA_BUS_SKIP;
+    if (payload.platform !== "telegram") return LINGXI_BUS_SKIP;
     await telegramBot.send(payload.chatId, payload.text);
     return { sent: true };
   })
@@ -1012,11 +1012,11 @@ this.register(
 
 ### Built-in Session / Agent / Model / Media Capabilities
 
-Plugins should prefer the typed helpers from `@hana/plugin-runtime`. They map to these EventBus capabilities:
+Plugins should prefer the typed helpers from `@lingxi/plugin-runtime`. They map to these EventBus capabilities:
 
 | Capability | Description |
 |------------|-------------|
-| `session:create` | Create a normal Hana session without switching the main UI focus, with `agentId`, `cwd`, `memoryEnabled`, `workspaceFolders`, `thinkingLevel`, `permissionMode`, `ownerPluginId`, `kind`, and `visibility` |
+| `session:create` | Create a normal Lingxi session without switching the main UI focus, with `agentId`, `cwd`, `memoryEnabled`, `workspaceFolders`, `thinkingLevel`, `permissionMode`, `ownerPluginId`, `kind`, and `visibility` |
 | `session:get` / `session:list` | Read session projections; plugin-private sessions are hidden from the main list by default, and plugins can query their own sessions by `ownerPluginId` |
 | `session:update` | Update title, pinned state, project, thinking level, permission mode, plugin owner, kind, and visibility |
 | `session:send` | Send a message to a specific session; supports `context.system`, `context.beforeUser`, and `context.afterUser` |
@@ -1028,7 +1028,7 @@ Plugins should prefer the typed helpers from `@hana/plugin-runtime`. They map to
 | `media:generate-image` | Submit an image generation task through the built-in media task pipeline; completed files are delivered as `SessionFile` records by default, while `delivery.mode="response"` returns task/file results only |
 | `media:generate` / `media:generate-video` / `media:transcribe-audio` | Submit generic media tasks, video generation, or audio transcription through the native Media Manager |
 
-Plugin backend code should prefer the `@hana/plugin-runtime` helpers. Plugin pages or route handlers that already hold host HTTP credentials can also use the native facade: `POST /api/media/generate`, `POST /api/media/image/generate`, `POST /api/media/video/generate`, and `POST /api/media/asr/transcribe`. These endpoints require chat scope. Image/video requests must include `prompt`; the default `delivery.mode="session"` also requires `sessionId` or `sessionRef` and registers completed files as `SessionFile` records. For plugin-owned artifacts, pass `delivery: { mode: "response" }` and omit session identity; poll `GET /api/media/tasks/:taskId`, then fetch `task.files[]` through `GET /api/media/generated/:filename`. ASR requests require `sessionId` or legacy `sessionPath` plus `fileId`; image references must use `SessionFile` references such as `{ kind: "session_file", fileId }`. All of them forward into the same Media Manager task pipeline. Image adapters accept multiple reference images by default; adapters that only support one reference should declare `maxReferenceImages: 1`, and the pipeline rejects oversized requests before enqueueing.
+Plugin backend code should prefer the `@lingxi/plugin-runtime` helpers. Plugin pages or route handlers that already hold host HTTP credentials can also use the native facade: `POST /api/media/generate`, `POST /api/media/image/generate`, `POST /api/media/video/generate`, and `POST /api/media/asr/transcribe`. These endpoints require chat scope. Image/video requests must include `prompt`; the default `delivery.mode="session"` also requires `sessionId` or `sessionRef` and registers completed files as `SessionFile` records. For plugin-owned artifacts, pass `delivery: { mode: "response" }` and omit session identity; poll `GET /api/media/tasks/:taskId`, then fetch `task.files[]` through `GET /api/media/generated/:filename`. ASR requests require `sessionId` or legacy `sessionPath` plus `fileId`; image references must use `SessionFile` references such as `{ kind: "session_file", fileId }`. All of them forward into the same Media Manager task pipeline. Image adapters accept multiple reference images by default; adapters that only support one reference should declare `maxReferenceImages: 1`, and the pipeline rejects oversized requests before enqueueing.
 
 `session:send.context` is injected only into the current provider request. It does not rewrite the visible user message and does not persist as user text. A plugin can run its own RAG, world-state, mood, or character-state system, then attach those snippets when sending:
 
@@ -1041,7 +1041,7 @@ import {
   transcribeAudio,
   sampleText,
   sendSessionMessage,
-} from "@hana/plugin-runtime";
+} from "@lingxi/plugin-runtime";
 
 const agent = await createAgent(ctx, {
   name: "Tavern Character",
@@ -1122,7 +1122,7 @@ Tool names are auto-prefixed with `pluginId_` and auto-removed on unload via `re
 
 ### Background Tasks ⚡ full-access
 
-Plugins can register background tasks so HanaAgent can track and abort them. Runtime lifecycle is managed by `TaskRegistry`.
+Plugins can register background tasks so LingxiAgent can track and abort them. Runtime lifecycle is managed by `TaskRegistry`.
 
 **Register a task type handler** once in `onload()`:
 
@@ -1162,7 +1162,7 @@ TaskRegistry persists task records and schedule metadata. On restart, active tas
 
 ### Official Plugin Marketplace
 
-The "Open plugin marketplace" button in Settings -> Plugins opens a full marketplace subpage that reads `/api/plugins/marketplace`. Hana follows the Obsidian-style official community catalog model: third-party authors submit plugins to `OH-Plugins`, while users browse, install, enable, and disable plugins without managing marketplace sources.
+The "Open plugin marketplace" button in Settings -> Plugins opens a full marketplace subpage that reads `/api/plugins/marketplace`. Lingxi follows the Obsidian-style official community catalog model: third-party authors submit plugins to `OH-Plugins`, while users browse, install, enable, and disable plugins without managing marketplace sources.
 
 Default official catalog:
 
@@ -1172,10 +1172,10 @@ https://raw.githubusercontent.com/liliMozi/OH-Plugins/main/marketplace.json
 
 Developer overrides remain available:
 
-- `HANA_PLUGIN_MARKETPLACE_FILE=/path/to/marketplace.json`
-- `HANA_PLUGIN_MARKETPLACE_URL=https://.../marketplace.json`
+- `LINGXI_PLUGIN_MARKETPLACE_FILE=/path/to/marketplace.json`
+- `LINGXI_PLUGIN_MARKETPLACE_URL=https://.../marketplace.json`
 
-Without either environment variable, Hana first tries `${HANA_HOME}/plugin-marketplace/marketplace.json` for local development. If it does not exist, Hana reads the official `OH-Plugins` URL. The marketplace index shape matches the `OH-Plugins` repository:
+Without either environment variable, Lingxi first tries `${LINGXI_HOME}/plugin-marketplace/marketplace.json` for local development. If it does not exist, Lingxi reads the official `OH-Plugins` URL. The marketplace index shape matches the `OH-Plugins` repository:
 
 ```json
 {
@@ -1215,9 +1215,9 @@ Without either environment variable, Hana first tries `${HANA_HOME}/plugin-marke
 
 The marketplace UI shows the plugin list and README in a wider settings subpage. Selecting a plugin reads `/api/plugins/marketplace/:id/readme`. `distribution.kind: "release"` downloads the zip package, verifies `sha256`, then installs it into the user's plugin directory. `distribution.kind: "source"` is only for local file marketplace development because the source path must resolve to a directory on the user's machine.
 
-Marketplace version management uses `versions[]` as the long-term contract: each item declares `version`, that version's `compatibility.minAppVersion`, and its own `distribution`. If `versions[]` is absent, Hana treats the root-level `version` / `compatibility` / `distribution` as a single version entry. The client chooses the highest SemVer version compatible with the current app, while exposing `latestVersion`, `selectedVersion`, `installedVersion`, `updateAvailable`, `downgrade`, `reinstall`, `compatible`, `installAction`, and `canInstall` for UI state.
+Marketplace version management uses `versions[]` as the long-term contract: each item declares `version`, that version's `compatibility.minAppVersion`, and its own `distribution`. If `versions[]` is absent, Lingxi treats the root-level `version` / `compatibility` / `distribution` as a single version entry. The client chooses the highest SemVer version compatible with the current app, while exposing `latestVersion`, `selectedVersion`, `installedVersion`, `updateAvailable`, `downgrade`, `reinstall`, `compatible`, `installAction`, and `canInstall` for UI state.
 
-If the installed version is newer than the highest compatible marketplace version, the action is marked as `downgrade` and install requires explicit `allowDowngrade: true`. Drag-and-drop / local path installs also reject implicit downgrades. Updates back up the previous plugin directory under `${HANA_HOME}/plugin-backups/<pluginId>/`; if the new version fails to load, Hana restores and reloads the old directory. Successful installs are recorded in `${HANA_HOME}/plugin-installs.json` with source, version, release URL, and sha256 so later marketplace state is explicit.
+If the installed version is newer than the highest compatible marketplace version, the action is marked as `downgrade` and install requires explicit `allowDowngrade: true`. Drag-and-drop / local path installs also reject implicit downgrades. Updates back up the previous plugin directory under `${LINGXI_HOME}/plugin-backups/<pluginId>/`; if the new version fails to load, Lingxi restores and reloads the old directory. Successful installs are recorded in `${LINGXI_HOME}/plugin-installs.json` with source, version, release URL, and sha256 so later marketplace state is explicit.
 
 ## Forward Compatibility
 
@@ -1242,7 +1242,7 @@ re-register its handler in `onload()` and restore its own business state.
 
 ## Concurrency
 
-Hana supports multiple sessions and multiple agents running in parallel. Keep the following in mind when developing plugins:
+Lingxi supports multiple sessions and multiple agents running in parallel. Keep the following in mind when developing plugins:
 
 - All EventBus operations against an existing session (`session:get`, `session:update`, `session:send`, `session:abort`, `session:history`, etc.) must include `sessionId` or `sessionRef` to identify the target session; `sessionPath` is a legacy compatibility input
 - Tools obtain the current session identity via `toolCtx.sessionId` / `toolCtx.sessionRef`; `toolCtx.sessionPath` is only the current locator

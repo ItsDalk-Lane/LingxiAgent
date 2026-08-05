@@ -9,7 +9,7 @@
 
 import { useStore } from './index';
 import { sessionScopedKey, sessionScopedListIncludes, sessionScopedValue } from './session-slice';
-import { hanaFetch, hanaUrl } from '../hooks/use-hana-fetch';
+import { lingxiFetch, lingxiUrl } from '../hooks/use-hana-fetch';
 import { hydrateInputDrafts } from './input-draft-persistence';
 import { HOME_DRAFT_KEY } from '../../../../shared/input-drafts.ts';
 import { buildItemsFromHistory } from '../utils/history-builder';
@@ -349,7 +349,7 @@ export async function loadMessages(forPath?: string): Promise<void> {
   // 通过后按 flight 结果决定是丢弃快照还是应用快照 + 重放 flight 期间的 upsert。
   useStore.getState().beginSessionFilesFlight(targetPath, myVersion);
   try {
-    const res = await hanaFetch(sessionMessagesUrl(targetPath));
+    const res = await lingxiFetch(sessionMessagesUrl(targetPath));
     const data = await res.json();
     const latestVersion =
       sessionScopedValue(useStore.getState() as Record<string, any>, useStore.getState()._loadMessagesVersion, targetPath) ?? 0;
@@ -433,7 +433,7 @@ export async function completeSessionTodos(sessionPath: string): Promise<boolean
   if (sessionScopedListIncludes(state as Record<string, any>, state.streamingSessions, sessionPath)) return false;
 
   try {
-    await hanaFetch('/api/sessions/todos/complete', {
+    await lingxiFetch('/api/sessions/todos/complete', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ path: sessionPath }),
@@ -478,7 +478,7 @@ export async function loadMoreMessages(forPath?: string): Promise<void> {
   useStore.getState().setLoadingMore(targetPath, true);
   try {
     const before = session.oldestId ?? '';
-    const res = await hanaFetch(sessionMessagesUrl(targetPath, { before }));
+    const res = await lingxiFetch(sessionMessagesUrl(targetPath, { before }));
     const data = await res.json();
     if (Array.isArray(data.sessionFiles)) {
       useStore.getState().setSessionRegistryFiles(targetPath, data.sessionFiles);
@@ -557,7 +557,7 @@ export function reconcileCurrentSessionMessages(reason = 'unknown'): Promise<voi
 // 让健康检查探测的失败反过来拖垮或延后会话列表本身的加载。
 async function fetchSessionMetaRecoveryStatus(): Promise<SessionMetaRecoveryStatus | null> {
   try {
-    const res = await hanaFetch('/api/health');
+    const res = await lingxiFetch('/api/health');
     const data = await res.json();
     return (data && typeof data === 'object' && data.sessionStore) || null;
   } catch {
@@ -567,10 +567,10 @@ async function fetchSessionMetaRecoveryStatus(): Promise<SessionMetaRecoveryStat
 
 export async function loadSessions(): Promise<void> {
   // 先发起 /api/sessions（调用顺序上排在前面，保持它是 loadSessions() 触发的
-  // 第一个 hanaFetch 调用——调用方/测试对"/api/sessions 是这次加载的第一个
+  // 第一个 lingxiFetch 调用——调用方/测试对"/api/sessions 是这次加载的第一个
   // 请求"这个顺序有既有假设），紧接着不等待地发起 /api/health 探测：两个请求
   // 仍然背靠背同时打到网络上，只是调用顺序固定，不会因为并行而变得不确定。
-  const sessionsFetchPromise = hanaFetch('/api/sessions');
+  const sessionsFetchPromise = lingxiFetch('/api/sessions');
   const metaRecoveryPromise = fetchSessionMetaRecoveryStatus();
   try {
     const res = await sessionsFetchPromise;
@@ -765,7 +765,7 @@ export async function switchSession(path: string): Promise<void> {
   const targetSessionId = sessionIdForPathFromState(s as Record<string, any>, path);
 
   try {
-    const res = await hanaFetch('/api/sessions/switch', {
+    const res = await lingxiFetch('/api/sessions/switch', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -809,8 +809,8 @@ export async function switchSession(path: string): Promise<void> {
       const ag = state.agents.find((a: any) => a.id === data.agentId);
       agentPatch.currentAgentId = data.agentId;
       agentPatch.agentName = data.agentName || ag?.name || data.agentId;
-      agentPatch.agentYuan = ag?.yuan || 'hanako';
-      agentPatch.agentAvatarUrl = ag?.hasAvatar ? hanaUrl(`/api/agents/${data.agentId}/avatar?t=${Date.now()}`) : null;
+      agentPatch.agentYuan = ag?.yuan || 'lingxi';
+      agentPatch.agentAvatarUrl = ag?.hasAvatar ? lingxiUrl(`/api/agents/${data.agentId}/avatar?t=${Date.now()}`) : null;
       agentPatch.homeFolder = typeof ag?.homeFolder === 'string' && ag.homeFolder.trim()
         ? ag.homeFolder.trim()
         : null;
@@ -1081,7 +1081,7 @@ function currentPendingSessionDraft(): { body: PendingSessionCreateBody; key: st
 }
 
 async function postPendingSessionCreate(body: PendingSessionCreateBody): Promise<any> {
-  const res = await hanaFetch('/api/sessions/new-detached', {
+  const res = await lingxiFetch('/api/sessions/new-detached', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
@@ -1127,7 +1127,7 @@ function stageDetachedSessionForActivation(data: any, ref: Readonly<SessionRef>,
 
 export async function loadPendingNewSessionPermissionDefault(): Promise<SessionPermissionMode> {
   try {
-    const res = await hanaFetch('/api/preferences/session-permission-default');
+    const res = await lingxiFetch('/api/preferences/session-permission-default');
     const data = await res.json();
     const mode = normalizeSessionPermissionMode(data.permissionMode);
     if (isPendingNewSessionDraftView()) emitSessionPermissionMode(mode);
@@ -1194,7 +1194,7 @@ export async function createNewSession(options: CreateNewSessionOptions = {}): P
   await loadPendingNewSessionPermissionDefault();
 
   try {
-    const res = await hanaFetch('/api/session-thinking-level?pendingNewSession=1');
+    const res = await lingxiFetch('/api/session-thinking-level?pendingNewSession=1');
     const data = await res.json();
     if (data.thinkingLevel && isPendingNewSessionDraftView()) {
       useStore.getState().setThinkingLevel(data.thinkingLevel);
@@ -1254,7 +1254,7 @@ export async function ensureSession(expectedPendingDraftId?: string | null): Pro
 
 export async function continueDeletedAgentSession(path: string): Promise<boolean> {
   try {
-    const res = await hanaFetch('/api/sessions/continue-deleted-agent', {
+    const res = await lingxiFetch('/api/sessions/continue-deleted-agent', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ path }),
@@ -1295,7 +1295,7 @@ export async function continueDeletedAgentSession(path: string): Promise<boolean
 export async function archiveSession(path: string): Promise<void> {
   try {
     const localSessionId = sessionIdForPathFromState(useStore.getState() as Record<string, any>, path);
-    const res = await hanaFetch('/api/sessions/archive', {
+    const res = await lingxiFetch('/api/sessions/archive', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -1356,7 +1356,7 @@ export type RestoreResult =
 
 export async function listArchivedSessions(): Promise<ArchivedSession[]> {
   try {
-    const res = await hanaFetch('/api/sessions/archived');
+    const res = await lingxiFetch('/api/sessions/archived');
     if (!res.ok) return [];
     return await res.json();
   } catch (err) {
@@ -1369,7 +1369,7 @@ export async function restoreSession(target: string | Pick<ArchivedSession, 'pat
   const sessionPath = typeof target === 'string' ? target : target.path;
   const sessionId = typeof target === 'string' ? null : normalizeSessionId(target.sessionId);
   try {
-    const res = await hanaFetch('/api/sessions/restore', {
+    const res = await lingxiFetch('/api/sessions/restore', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -1404,7 +1404,7 @@ export async function deleteArchivedSession(target: string | Pick<ArchivedSessio
   const sessionPath = typeof target === 'string' ? target : target.path;
   const sessionId = typeof target === 'string' ? null : normalizeSessionId(target.sessionId);
   try {
-    const res = await hanaFetch('/api/sessions/archived/delete', {
+    const res = await lingxiFetch('/api/sessions/archived/delete', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -1421,7 +1421,7 @@ export async function deleteArchivedSession(target: string | Pick<ArchivedSessio
 
 export async function cleanupArchivedSessions(maxAgeDays: 30 | 90): Promise<{ deleted: number }> {
   try {
-    const res = await hanaFetch('/api/sessions/cleanup', {
+    const res = await lingxiFetch('/api/sessions/cleanup', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ maxAgeDays }),
@@ -1441,7 +1441,7 @@ export async function cleanupArchivedSessions(maxAgeDays: 30 | 90): Promise<{ de
 
 export async function renameSession(path: string, title: string): Promise<boolean> {
   try {
-    const res = await hanaFetch('/api/sessions/rename', {
+    const res = await lingxiFetch('/api/sessions/rename', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ path, title }),
@@ -1470,7 +1470,7 @@ export async function renameSession(path: string, title: string): Promise<boolea
 export async function pinSession(path: string, pinned: boolean): Promise<boolean> {
   try {
     const localSessionId = sessionIdForPathFromState(useStore.getState() as Record<string, any>, path);
-    const res = await hanaFetch('/api/sessions/pin', {
+    const res = await lingxiFetch('/api/sessions/pin', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -1524,7 +1524,7 @@ export async function reorderPinnedSessions(orderedSessionIds: string[]): Promis
   });
 
   try {
-    const res = await hanaFetch('/api/sessions/pin-order', {
+    const res = await lingxiFetch('/api/sessions/pin-order', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ sessionIds }),
@@ -1555,12 +1555,12 @@ export async function refreshSessionCapabilities(path: string): Promise<boolean>
   if (sessionScopedListIncludes(store as Record<string, any>, store.capabilityRefreshingSessions, path)) return false;
   store.setSessionCapabilityRefreshing(path, true);
   try {
-    const res = await hanaFetch('/api/sessions/fresh-compact', {
+    const res = await lingxiFetch('/api/sessions/fresh-compact', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ path }),
       // Fresh compact runs an LLM summarization over the whole conversation;
-      // long sessions routinely exceed the 30s hanaFetch default. A premature
+      // long sessions routinely exceed the 30s lingxiFetch default. A premature
       // abort here surfaces a false failure while the server keeps compacting.
       timeout: 180_000,
     });

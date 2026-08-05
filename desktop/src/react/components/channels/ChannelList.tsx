@@ -5,7 +5,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useStore } from '../../stores';
 import { useI18n } from '../../hooks/use-i18n';
-import { hanaFetch } from '../../hooks/use-hana-fetch';
+import { lingxiFetch } from '../../hooks/use-hana-fetch';
 import {
   loadChannels,
   openChannel,

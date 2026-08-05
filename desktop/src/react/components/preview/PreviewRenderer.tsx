@@ -35,7 +35,7 @@ import { fileIconSvg } from '../../utils/icons';
 import { openFilePreview } from '../../utils/file-preview';
 import { openInternalLink, resolveLinkTarget, type LinkOpenContext } from '../../utils/link-open';
 import { showError } from '../../utils/ui-helpers';
-import { hanaFetch } from '../../hooks/use-hana-fetch';
+import { lingxiFetch } from '../../hooks/use-hana-fetch';
 import { useStore } from '../../stores';
 import { upsertPreviewItem } from '../../stores/preview-actions';
 import { isRemoteWorkbenchContentRef, normalizeWorkbenchContentRef, saveRemoteWorkbenchContent } from '../../utils/remote-file-preview';
@@ -123,7 +123,7 @@ function HtmlPreview({ previewItem }: { previewItem: PreviewItem }) {
     setPreviewUrl(null);
     setError(null);
 
-    hanaFetch('/api/preview/html', {
+    lingxiFetch('/api/preview/html', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

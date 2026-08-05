@@ -2,10 +2,10 @@
 import PackageDescription
 
 let package = Package(
-    name: "HanaComputerUseHelper",
+    name: "LingxiComputerUseHelper",
     platforms: [.macOS(.v14)],
     products: [
-        .executable(name: "hana-computer-use-helper", targets: ["HanaComputerUseHelper"]),
+        .executable(name: "lingxi-computer-use-helper", targets: ["LingxiComputerUseHelper"]),
     ],
     dependencies: [
         .package(url: "https://github.com/trycua/cua.git", revision: "d38bfbfb6b1d4296903477f517b1a0fa54af497b"),
@@ -13,7 +13,7 @@ let package = Package(
     ],
     targets: [
         .executableTarget(
-            name: "HanaComputerUseHelper",
+            name: "LingxiComputerUseHelper",
             dependencies: [
                 .product(name: "CuaDriverCore", package: "cua"),
                 .product(name: "CuaDriverServer", package: "cua"),

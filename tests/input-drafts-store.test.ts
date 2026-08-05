@@ -16,12 +16,12 @@ describe("InputDraftsStore", () => {
   const filePath = () => path.join(home, "input-drafts.v1.json");
 
   it("persists home and session drafts per surface and survives reload", () => {
-    const store = new InputDraftsStore({ hanakoHome: home });
+    const store = new InputDraftsStore({ lingxiHome: home });
     store.setHome("electron", { text: "home draft", doc: { type: "doc" } });
     store.setSession("electron", "sess-1", { text: "session draft" });
     store.setSession("pwa", "sess-1", { text: "phone draft" });
 
-    const reloaded = new InputDraftsStore({ hanakoHome: home });
+    const reloaded = new InputDraftsStore({ lingxiHome: home });
     expect(reloaded.getAll("electron").home?.text).toBe("home draft");
     expect(reloaded.getAll("electron").home?.doc).toEqual({ type: "doc" });
     expect(reloaded.getAll("electron").sessions["sess-1"]?.text).toBe("session draft");
@@ -30,7 +30,7 @@ describe("InputDraftsStore", () => {
   });
 
   it("clears entries when text is empty", () => {
-    const store = new InputDraftsStore({ hanakoHome: home });
+    const store = new InputDraftsStore({ lingxiHome: home });
     store.setHome("electron", { text: "x" });
     store.setSession("electron", "sess-1", { text: "y" });
     store.setHome("electron", { text: "" });
@@ -40,7 +40,7 @@ describe("InputDraftsStore", () => {
   });
 
   it("deleteSession removes the session draft across all surfaces", () => {
-    const store = new InputDraftsStore({ hanakoHome: home });
+    const store = new InputDraftsStore({ lingxiHome: home });
     store.setSession("electron", "sess-1", { text: "a" });
     store.setSession("pwa", "sess-1", { text: "b" });
     store.setSession("pwa", "sess-2", { text: "keep" });
@@ -52,7 +52,7 @@ describe("InputDraftsStore", () => {
 
   it("quarantines a corrupt file and restarts from empty state", () => {
     fs.writeFileSync(filePath(), "{ not json !!!");
-    const store = new InputDraftsStore({ hanakoHome: home });
+    const store = new InputDraftsStore({ lingxiHome: home });
     expect(store.getAll("electron")).toEqual({ home: null, sessions: {} });
     const quarantined = fs.readdirSync(home).filter((f) => f.includes(".corrupt-"));
     expect(quarantined).toHaveLength(1);

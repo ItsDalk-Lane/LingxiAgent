@@ -8,7 +8,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useStore } from '../stores';
-import { hanaFetch } from '../hooks/use-hana-fetch';
+import { lingxiFetch } from '../hooks/use-hana-fetch';
 import { useI18n } from '../hooks/use-i18n';
 import { loadModels } from '../utils/ui-helpers';
 import {
@@ -226,7 +226,7 @@ function AgentChip({ agent, isSelected, onClick }: {
 
 function refreshModelsAfterAgentModelSwitch(agent: Agent | undefined): void {
   if (agent?.chatModel?.id && agent.chatModel.provider) {
-    hanaFetch('/api/models/set', {
+    lingxiFetch('/api/models/set', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ modelId: agent.chatModel.id, provider: agent.chatModel.provider }),

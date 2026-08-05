@@ -93,7 +93,7 @@ function readAgentPersonaSource(engine, id, kind) {
   return resolvePersonaSource({
     agentDir: agentDir(engine, id),
     productDir: engine.productDir,
-    yuanType: cfg.agent?.yuan || "hanako",
+    yuanType: cfg.agent?.yuan || "lingxi",
     locale: resolvePersonaLocale(cfg.locale, engine.getLocale?.()),
     kind,
   });

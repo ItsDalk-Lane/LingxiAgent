@@ -26,15 +26,15 @@ const STATE = {
   }],
 };
 
-const hanaFetchMock = vi.fn<(path: string, opts?: RequestInit) => Promise<Response>>(
+const lingxiFetchMock = vi.fn<(path: string, opts?: RequestInit) => Promise<Response>>(
   async (path: string) => (path === '/api/mcp/state'
     ? new Response(JSON.stringify(STATE), { status: 200 })
     : new Response('{}', { status: 200 })),
 );
 
 vi.mock('../../hooks/use-hana-fetch', () => ({
-  hanaFetch: (path: string, opts?: RequestInit) => hanaFetchMock(path, opts),
-  hanaUrl: (path: string) => `http://127.0.0.1:3210${path}`,
+  lingxiFetch: (path: string, opts?: RequestInit) => lingxiFetchMock(path, opts),
+  lingxiUrl: (path: string) => `http://127.0.0.1:3210${path}`,
 }));
 
 function approvalBlock(payload: Record<string, unknown>): SessionConfirmationBlock {
@@ -57,13 +57,13 @@ function openMenu() {
 }
 
 function bodyFor(path: string) {
-  const call = hanaFetchMock.mock.calls.find(entry => entry[0] === path);
+  const call = lingxiFetchMock.mock.calls.find(entry => entry[0] === path);
   return call?.[1]?.body ? JSON.parse(String(call[1].body)) : null;
 }
 
 describe('MCP tool approval prompt', () => {
   beforeEach(() => {
-    hanaFetchMock.mockClear();
+    lingxiFetchMock.mockClear();
     useStore.setState({ currentSessionId: 'sess_1' } as any);
   });
 
@@ -102,7 +102,7 @@ describe('MCP tool approval prompt', () => {
   });
 
   it('records a permanent grant against the connector without erasing its peers', async () => {
-    hanaFetchMock.mockImplementation(async (path: string) => (path === '/api/mcp/state'
+    lingxiFetchMock.mockImplementation(async (path: string) => (path === '/api/mcp/state'
       ? new Response(JSON.stringify({
         ...STATE,
         connectors: [{ ...STATE.connectors[0], toolPermissions: { other_tool: 'allow' } }],
@@ -165,7 +165,7 @@ describe('MCP tool approval prompt', () => {
       block: { ...approvalBlock({ toolName: 'write', params: { path: 'note.md' } }), subject: { label: 'write' } },
     }));
 
-    await waitFor(() => expect(hanaFetchMock).toHaveBeenCalledWith('/api/mcp/state', undefined));
+    await waitFor(() => expect(lingxiFetchMock).toHaveBeenCalledWith('/api/mcp/state', undefined));
     openMenu();
 
     expect(screen.queryByTestId('mcp-approve-session')).toBeNull();

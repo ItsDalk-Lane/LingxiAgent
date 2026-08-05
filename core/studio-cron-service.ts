@@ -88,7 +88,7 @@ class BoundStudioCronStore {
 }
 
 export class StudioCronService {
-  declare _hanakoHome: string;
+  declare _lingxiHome: string;
   declare _agentsDir: string;
   declare _getStudioId: () => string;
   declare _handles: Map<string, BoundStudioCronStore>;
@@ -97,15 +97,15 @@ export class StudioCronService {
 
   /**
    * @param {object} opts
-   * @param {string} opts.hanakoHome
+   * @param {string} opts.lingxiHome
    * @param {string} opts.agentsDir
    * @param {() => string} opts.getStudioId
    */
-  constructor({ hanakoHome, agentsDir, getStudioId }) {
-    if (!hanakoHome) throw new Error("StudioCronService requires hanakoHome");
+  constructor({ lingxiHome, agentsDir, getStudioId }) {
+    if (!lingxiHome) throw new Error("StudioCronService requires lingxiHome");
     if (!agentsDir) throw new Error("StudioCronService requires agentsDir");
     if (typeof getStudioId !== "function") throw new Error("StudioCronService requires getStudioId");
-    this._hanakoHome = hanakoHome;
+    this._lingxiHome = lingxiHome;
     this._agentsDir = agentsDir;
     this._getStudioId = getStudioId;
     this._handles = new Map();
@@ -206,7 +206,7 @@ export class StudioCronService {
     const normalizedStudioId = assertValidPathSegment(studioId, "studioId");
     let store = this._stores.get(normalizedStudioId);
     if (!store) {
-      const deskDir = path.join(this._hanakoHome, "studios", normalizedStudioId, "desk");
+      const deskDir = path.join(this._lingxiHome, "studios", normalizedStudioId, "desk");
       store = new CronStore(
         path.join(deskDir, "cron-jobs.json"),
         path.join(deskDir, "cron-runs"),
@@ -222,7 +222,7 @@ export class StudioCronService {
   }
 
   _importLegacyJobs(store, studioId) {
-    const studioRunsDir = path.join(this._hanakoHome, "studios", studioId, "desk", "cron-runs");
+    const studioRunsDir = path.join(this._lingxiHome, "studios", studioId, "desk", "cron-runs");
     const existingLegacyJobs = new Map();
     for (const job of store.listJobs()) {
       const refKey = legacyRefKey(job.legacyRef);

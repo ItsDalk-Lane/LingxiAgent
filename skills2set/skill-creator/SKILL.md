@@ -43,7 +43,7 @@ node skills2set/skill-creator/scripts/check_env.mjs --capability run-loop
 Behavior:
 
 - The preflight itself is JavaScript and uses only Node built-ins.
-- It finds Python through `HANA_SKILL_CREATOR_PYTHON`, `python3`, `python`, or Windows `py -3`.
+- It finds Python through `LINGXI_SKILL_CREATOR_PYTHON`, `python3`, `python`, or Windows `py -3`.
 - It requires Python 3.10+ because these scripts use modern Python syntax.
 - It checks only what the requested capability needs.
 - If it returns `ok: false`, stop and show the user the `message`, `installGuidance`, `missingPackages`, or `missingCommands`. Do not auto-install dependencies.

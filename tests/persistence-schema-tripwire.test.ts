@@ -167,7 +167,7 @@ describe("persistence schema tripwire", () => {
     const inventory = JSON.parse(fs.readFileSync(INVENTORY_PATH, "utf-8"));
 
     const markers: Array<[string, string]> = [
-      ["server/index.ts", "HanaAgent Server — HTTP + WebSocket API"],
+      ["server/index.ts", "LingxiAgent Server — HTTP + WebSocket API"],
       ["shared/data-epoch.cjs", "Reads both the legacy v1 high-water stamp"],
     ];
     for (const [module, marker] of markers) {

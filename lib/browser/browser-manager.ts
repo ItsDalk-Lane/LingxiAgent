@@ -41,8 +41,8 @@ const log = createModuleLogger("browser");
 let _instance = null;
 
 // 冷保存文件：重启后恢复浏览器状态（由 setHanakoHome 注入路径）
-let _hanakoHome = null;
-const _coldStatePath = () => path.join(_hanakoHome, "user", "browser-sessions.json");
+let _lingxiHome = null;
+const _coldStatePath = () => path.join(_lingxiHome, "user", "browser-sessions.json");
 
 // 最大并发浏览器实例数
 const MAX_INSTANCES = 5;
@@ -211,10 +211,10 @@ export class BrowserManager {
 
   /**
    * 注入用户数据根目录（由入口在启动时调用）
-   * @param {string} home - engine.hanakoHome
+   * @param {string} home - engine.lingxiHome
    */
   static setHanakoHome(home) {
-    _hanakoHome = home;
+    _lingxiHome = home;
   }
 
   static setSessionIdResolver(resolver) {

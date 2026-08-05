@@ -1,7 +1,7 @@
 import type { CSSProperties, HTMLAttributes, ReactNode } from 'react';
 import { cx } from './classnames';
 
-export type HanaThemeMode = 'inherit' | 'hana' | 'custom';
+export type LingxiThemeMode = 'inherit' | 'hana' | 'custom';
 
 export const HANA_THEME_IDS = [
   'warm-paper',
@@ -16,9 +16,9 @@ export const HANA_THEME_IDS = [
   'new-warm-paper',
 ] as const;
 
-export type HanaThemeId = (typeof HANA_THEME_IDS)[number];
+export type LingxiThemeId = (typeof HANA_THEME_IDS)[number];
 
-export interface HanaThemeTokens {
+export interface LingxiThemeTokens {
   bg?: string;
   bgCard?: string;
   accent?: string;
@@ -36,7 +36,7 @@ export interface HanaThemeTokens {
   fontMono?: string;
 }
 
-export const HANA_BUILT_IN_THEMES: Record<HanaThemeId, HanaThemeTokens> = {
+export const HANA_BUILT_IN_THEMES: Record<LingxiThemeId, LingxiThemeTokens> = {
   'warm-paper': {
     bg: '#F8F5ED',
     bgCard: '#FCFAF5',
@@ -159,42 +159,42 @@ export const HANA_BUILT_IN_THEMES: Record<HanaThemeId, HanaThemeTokens> = {
   },
 };
 
-const TOKEN_TO_CSS_VAR: Record<keyof HanaThemeTokens, string> = {
-  bg: '--hana-plugin-bg',
-  bgCard: '--hana-plugin-bg-card',
-  accent: '--hana-plugin-accent',
-  accentHover: '--hana-plugin-accent-hover',
-  accentLight: '--hana-plugin-accent-light',
-  text: '--hana-plugin-text',
-  textLight: '--hana-plugin-text-light',
-  textMuted: '--hana-plugin-text-muted',
-  border: '--hana-plugin-border',
-  danger: '--hana-plugin-danger',
-  radiusInput: '--hana-plugin-radius-input',
-  radiusCard: '--hana-plugin-radius-card',
-  fontUi: '--hana-plugin-font-ui',
-  fontSerif: '--hana-plugin-font-serif',
-  fontMono: '--hana-plugin-font-mono',
+const TOKEN_TO_CSS_VAR: Record<keyof LingxiThemeTokens, string> = {
+  bg: '--lingxi-plugin-bg',
+  bgCard: '--lingxi-plugin-bg-card',
+  accent: '--lingxi-plugin-accent',
+  accentHover: '--lingxi-plugin-accent-hover',
+  accentLight: '--lingxi-plugin-accent-light',
+  text: '--lingxi-plugin-text',
+  textLight: '--lingxi-plugin-text-light',
+  textMuted: '--lingxi-plugin-text-muted',
+  border: '--lingxi-plugin-border',
+  danger: '--lingxi-plugin-danger',
+  radiusInput: '--lingxi-plugin-radius-input',
+  radiusCard: '--lingxi-plugin-radius-card',
+  fontUi: '--lingxi-plugin-font-ui',
+  fontSerif: '--lingxi-plugin-font-serif',
+  fontMono: '--lingxi-plugin-font-mono',
 };
 
 type ThemeStyle = CSSProperties & Record<string, string>;
 
-export interface HanaThemeProviderProps extends HTMLAttributes<HTMLDivElement> {
-  mode?: HanaThemeMode;
-  theme?: HanaThemeId | HanaThemeTokens;
+export interface LingxiThemeProviderProps extends HTMLAttributes<HTMLDivElement> {
+  mode?: LingxiThemeMode;
+  theme?: LingxiThemeId | LingxiThemeTokens;
   children?: ReactNode;
   'data-testid'?: string;
 }
 
-export function HanaThemeProvider({
+export function LingxiThemeProvider({
   mode = 'inherit',
   theme,
   className,
   style,
   children,
-  'data-testid': dataTestId = 'hana-plugin-theme',
+  'data-testid': dataTestId = 'lingxi-plugin-theme',
   ...rootProps
-}: HanaThemeProviderProps) {
+}: LingxiThemeProviderProps) {
   const themeId = typeof theme === 'string' ? theme : undefined;
   const tokenStyle = themeStyleFor(mode, theme);
 
@@ -202,9 +202,9 @@ export function HanaThemeProvider({
     <div
       {...rootProps}
       data-testid={dataTestId}
-      className={cx('hana-plugin-theme', className)}
-      data-hana-theme-mode={mode}
-      data-hana-theme={mode === 'hana' ? themeId : undefined}
+      className={cx('lingxi-plugin-theme', className)}
+      data-lingxi-theme-mode={mode}
+      data-lingxi-theme={mode === 'hana' ? themeId : undefined}
       style={{ ...tokenStyle, ...style }}
     >
       {children}
@@ -212,12 +212,12 @@ export function HanaThemeProvider({
   );
 }
 
-export function themeStyleFor(mode: HanaThemeMode, theme?: HanaThemeId | HanaThemeTokens): ThemeStyle {
+export function themeStyleFor(mode: LingxiThemeMode, theme?: LingxiThemeId | LingxiThemeTokens): ThemeStyle {
   if (mode === 'inherit') return {};
   const tokens = resolveThemeTokens(mode, theme);
   const css: ThemeStyle = {};
 
-  for (const [key, cssVar] of Object.entries(TOKEN_TO_CSS_VAR) as Array<[keyof HanaThemeTokens, string]>) {
+  for (const [key, cssVar] of Object.entries(TOKEN_TO_CSS_VAR) as Array<[keyof LingxiThemeTokens, string]>) {
     const value = tokens?.[key];
     if (value) css[cssVar] = value;
   }
@@ -226,9 +226,9 @@ export function themeStyleFor(mode: HanaThemeMode, theme?: HanaThemeId | HanaThe
 }
 
 function resolveThemeTokens(
-  mode: HanaThemeMode,
-  theme?: HanaThemeId | HanaThemeTokens,
-): HanaThemeTokens | undefined {
+  mode: LingxiThemeMode,
+  theme?: LingxiThemeId | LingxiThemeTokens,
+): LingxiThemeTokens | undefined {
   if (typeof theme === 'string') return HANA_BUILT_IN_THEMES[theme];
   if (theme) return theme;
   if (mode === 'hana') return HANA_BUILT_IN_THEMES['warm-paper'];

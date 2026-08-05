@@ -26,7 +26,7 @@ describe("MediaPublisher", () => {
   it("publishes registered session files as tokenized expiring public URLs", () => {
     const filePath = makeFile();
     const publisher = new MediaPublisher({
-      baseUrl: "https://hana.example.com",
+      baseUrl: "https://lingxi.example.com",
       allowedRoots: [tmpDir],
       ttlMs: 60_000,
       now: () => 1000,
@@ -42,7 +42,7 @@ describe("MediaPublisher", () => {
       size: 5,
     });
 
-    expect(result.publicUrl).toBe("https://hana.example.com/api/bridge/media/token_123");
+    expect(result.publicUrl).toBe("https://lingxi.example.com/api/bridge/media/token_123");
     expect(result.expiresAt).toBe(61_000);
     expect(publisher.resolve("token_123")).toEqual(expect.objectContaining({
       fileId: "sf_1",
@@ -76,7 +76,7 @@ describe("MediaPublisher", () => {
       randomToken: () => "token_123",
     });
 
-    expect(publisher.setBaseUrl("https://hana.example.com/")).toBe("https://hana.example.com");
+    expect(publisher.setBaseUrl("https://lingxi.example.com/")).toBe("https://lingxi.example.com");
     const result = publisher.publish({
       id: "sf_1",
       filePath,
@@ -85,13 +85,13 @@ describe("MediaPublisher", () => {
       mime: "image/png",
     });
 
-    expect(result.publicUrl).toBe("https://hana.example.com/api/bridge/media/token_123");
+    expect(result.publicUrl).toBe("https://lingxi.example.com/api/bridge/media/token_123");
   });
 
   it("refuses files outside allowed roots", () => {
     const filePath = makeFile();
     const publisher = new MediaPublisher({
-      baseUrl: "https://hana.example.com",
+      baseUrl: "https://lingxi.example.com",
       allowedRoots: [path.join(tmpDir, "other")],
       randomToken: () => "token_123",
     });
@@ -109,7 +109,7 @@ describe("MediaPublisher", () => {
     const root = path.parse(os.tmpdir()).root;
 
     expect(() => new MediaPublisher({
-      baseUrl: "https://hana.example.com",
+      baseUrl: "https://lingxi.example.com",
       allowedRoots: [root],
       randomToken: () => "token_123",
     })).toThrow(/filesystem root/);
@@ -119,7 +119,7 @@ describe("MediaPublisher", () => {
     const filePath = makeFile();
     let now = 1000;
     const publisher = new MediaPublisher({
-      baseUrl: "https://hana.example.com",
+      baseUrl: "https://lingxi.example.com",
       allowedRoots: [tmpDir],
       ttlMs: 10,
       now: () => now,
@@ -141,7 +141,7 @@ describe("MediaPublisher", () => {
   it("expires tokens after the configured download count", () => {
     const filePath = makeFile();
     const publisher = new MediaPublisher({
-      baseUrl: "https://hana.example.com",
+      baseUrl: "https://lingxi.example.com",
       allowedRoots: [tmpDir],
       maxDownloads: 2,
       randomToken: () => "token_123",

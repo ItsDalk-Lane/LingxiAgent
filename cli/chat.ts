@@ -74,7 +74,7 @@ export async function printStatus(client, connection) {
     client.identity().catch(() => null),
   ]);
   const theme = createTerminalTheme(health.agentYuan);
-  console.log(`${paint(theme, theme.symbol)} HanaAgent Server`);
+  console.log(`${paint(theme, theme.symbol)} LingxiAgent Server`);
   console.log(`  ${ansi.dim}URL${ansi.reset}       ${connection.baseUrl}`);
   console.log(`  ${ansi.dim}Version${ansi.reset}   ${identity?.version || health.version || "unknown"}`);
   console.log(`  ${ansi.dim}Studio${ansi.reset}    ${identity?.studioLabel || identity?.studioId || "local"}`);
@@ -395,7 +395,7 @@ async function loadContext(client) {
   return {
     agentId: health.agentId || current?.id || null,
     agentName: health.agent || current?.name || "Hana",
-    agentYuan: health.agentYuan || current?.yuan || "hanako",
+    agentYuan: health.agentYuan || current?.yuan || "lingxi",
     userName: health.user || "you",
   };
 }

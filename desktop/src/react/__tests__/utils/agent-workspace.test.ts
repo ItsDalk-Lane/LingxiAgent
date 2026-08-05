@@ -9,7 +9,7 @@ describe('agent workspace resolution', () => {
     expect(resolveAgentWorkspace({
       id: 'hana',
       name: 'Hana',
-      yuan: 'hanako',
+      yuan: 'lingxi',
       isPrimary: true,
       homeFolder: null,
       effectiveHomeFolder: '/home/test/Desktop/OH-WorkSpace',

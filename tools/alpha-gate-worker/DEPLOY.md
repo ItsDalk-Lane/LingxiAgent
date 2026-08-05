@@ -111,11 +111,11 @@ generic rejection.
 
 ## 7. Point the desktop client at the Worker
 
-The client reads the endpoint from `HANA_INVITE_API_URL`, falling back to the
+The client reads the endpoint from `LINGXI_INVITE_API_URL`, falling back to the
 constant `DEFAULT_INVITE_API_URL` in `desktop/auto-updater.cjs` (currently the
 empty string, which makes the invite UI report "not configured"). Two ways in:
 
-- For your own testing, launch the app with `HANA_INVITE_API_URL=$GATE`.
+- For your own testing, launch the app with `LINGXI_INVITE_API_URL=$GATE`.
 - To turn the feature on for everyone, set `DEFAULT_INVITE_API_URL` to the
   Worker URL and ship a release. The URL is not a secret — the invite code is
   the credential, and the endpoint is rate limited per IP.

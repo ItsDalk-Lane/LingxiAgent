@@ -64,7 +64,7 @@ describe('SubagentSessionPreview session binding', () => {
       userName: 'USER SELF',
       userAvatarUrl: '/mock-user-avatar.png',
       agentName: 'Hanako',
-      agentYuan: 'hanako',
+      agentYuan: 'lingxi',
       agents: [
         { id: 'butter', name: 'butter', yuan: 'neko', hasAvatar: false },
       ],

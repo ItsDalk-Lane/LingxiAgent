@@ -27,22 +27,22 @@ function envFlag(value) {
   return ["1", "true", "on", "yes", "enabled"].includes(value.trim().toLowerCase());
 }
 
-function getInstallAclHealStatePath(hanakoHome) {
-  return path.join(hanakoHome, STATE_FILE);
+function getInstallAclHealStatePath(lingxiHome) {
+  return path.join(lingxiHome, STATE_FILE);
 }
 
 // 该文件只是"是否已 grant 过"的幂等记账；损坏时按空处理并在下次写入时重建，
 // 代价是多跑一次幂等 icacls，自我修正，不构成静默降级。
-function readHealState(hanakoHome) {
+function readHealState(lingxiHome) {
   try {
-    const parsed = JSON.parse(fs.readFileSync(getInstallAclHealStatePath(hanakoHome), "utf-8"));
+    const parsed = JSON.parse(fs.readFileSync(getInstallAclHealStatePath(lingxiHome), "utf-8"));
     if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) return parsed;
   } catch {}
   return { version: STATE_VERSION, ineffectiveCount: 0, heal: null };
 }
 
-function writeHealState(hanakoHome, state) {
-  const filePath = getInstallAclHealStatePath(hanakoHome);
+function writeHealState(lingxiHome, state) {
+  const filePath = getInstallAclHealStatePath(lingxiHome);
   fs.mkdirSync(path.dirname(filePath), { recursive: true });
   const tmpPath = `${filePath}.${process.pid}.tmp`;
   fs.writeFileSync(tmpPath, JSON.stringify({ ...state, version: STATE_VERSION }, null, 2) + "\n", "utf-8");
@@ -67,17 +67,17 @@ function icaclsPath(env) {
   return path.win32.join(systemRoot, "System32", "icacls.exe");
 }
 
-function runProbe({ hanakoHome, state, heal, policy, now }) {
+function runProbe({ lingxiHome, state, heal, policy, now }) {
   if ((state.ineffectiveCount || 0) >= MAX_INEFFECTIVE_PROBES) {
     const next = {
       ...state,
       heal: { ...heal, probedAt: nowIso(now), clearedMode: null, updatedAt: nowIso(now) },
     };
-    writeHealState(hanakoHome, next);
+    writeHealState(lingxiHome, next);
     return { status: "healed", probed: false, clearedMode: null };
   }
   const recovery = policy.clearAutoGpuModeForRecovery({
-    hanakoHome,
+    lingxiHome,
     reason: "win32-install-acl-heal",
     now,
   });
@@ -90,12 +90,12 @@ function runProbe({ hanakoHome, state, heal, policy, now }) {
       updatedAt: nowIso(now),
     },
   };
-  writeHealState(hanakoHome, next);
+  writeHealState(lingxiHome, next);
   return { status: "healed", probed: recovery.cleared, clearedMode: recovery.clearedMode };
 }
 
-function judgeProbeOutcome({ hanakoHome, state, heal, policy, now }) {
-  const evidence = policy.getGpuRecoveryEvidence(hanakoHome);
+function judgeProbeOutcome({ lingxiHome, state, heal, policy, now }) {
+  const evidence = policy.getGpuRecoveryEvidence(lingxiHome);
   const crashedAfterProbe =
     (evidence.latestCrashAt && evidence.latestCrashAt > heal.probedAt) ||
     (evidence.startup?.status === "pending" &&
@@ -105,13 +105,13 @@ function judgeProbeOutcome({ hanakoHome, state, heal, policy, now }) {
   if (crashedAfterProbe) {
     if (heal.clearedMode) {
       policy.restoreDeeperAutoGpuMode({
-        hanakoHome,
+        lingxiHome,
         mode: heal.clearedMode,
         reason: "acl-heal-ineffective",
         now,
       });
     }
-    writeHealState(hanakoHome, {
+    writeHealState(lingxiHome, {
       ...state,
       ineffectiveCount: (state.ineffectiveCount || 0) + 1,
       heal: { ...heal, status: "ineffective", updatedAt: nowIso(now) },
@@ -124,7 +124,7 @@ function judgeProbeOutcome({ hanakoHome, state, heal, policy, now }) {
     evidence.startup.readyAt &&
     evidence.startup.readyAt > heal.probedAt;
   if (stableHardwareStartup && (state.ineffectiveCount || 0) !== 0) {
-    writeHealState(hanakoHome, { ...state, ineffectiveCount: 0 });
+    writeHealState(lingxiHome, { ...state, ineffectiveCount: 0 });
     return { status: "stable" };
   }
   if (stableHardwareStartup) return { status: "stable" };
@@ -132,7 +132,7 @@ function judgeProbeOutcome({ hanakoHome, state, heal, policy, now }) {
 }
 
 function maybeHealWin32InstallAcl({
-  hanakoHome,
+  lingxiHome,
   platform = process.platform,
   isPackaged,
   installDir,
@@ -142,17 +142,17 @@ function maybeHealWin32InstallAcl({
   policy = gpuStartupPolicy,
   now,
 } = {}) {
-  if (!hanakoHome) throw new Error("maybeHealWin32InstallAcl requires hanakoHome");
+  if (!lingxiHome) throw new Error("maybeHealWin32InstallAcl requires lingxiHome");
   if (platform !== "win32") return { status: "skipped", reason: "platform" };
-  if (envFlag(env?.HANA_DISABLE_INSTALL_ACL_HEAL)) return { status: "skipped", reason: "disabled" };
-  if (!isPackaged && !envFlag(env?.HANA_FORCE_INSTALL_ACL_HEAL)) {
+  if (envFlag(env?.LINGXI_DISABLE_INSTALL_ACL_HEAL)) return { status: "skipped", reason: "disabled" };
+  if (!isPackaged && !envFlag(env?.LINGXI_FORCE_INSTALL_ACL_HEAL)) {
     return { status: "skipped", reason: "not-packaged" };
   }
   if (!installDir || !appVersion) {
     throw new Error("maybeHealWin32InstallAcl requires installDir and appVersion");
   }
 
-  const state = readHealState(hanakoHome);
+  const state = readHealState(lingxiHome);
   const heal = sameIdentity(state.heal, installDir, appVersion) ? state.heal : null;
 
   if (heal?.status === "ineffective") return { status: "skipped", reason: "ineffective" };
@@ -162,8 +162,8 @@ function maybeHealWin32InstallAcl({
   if (heal?.status === "ok") {
     // grant 与 probe 是两次连续写盘；中间进程被杀会留下 probedAt=null 的 ok 记录，
     // 这里续跑探测而不是把它误判成"已处理完"。
-    if (!heal.probedAt) return runProbe({ hanakoHome, state, heal, policy, now });
-    return judgeProbeOutcome({ hanakoHome, state, heal, policy, now });
+    if (!heal.probedAt) return runProbe({ lingxiHome, state, heal, policy, now });
+    return judgeProbeOutcome({ lingxiHome, state, heal, policy, now });
   }
 
   try {
@@ -183,7 +183,7 @@ function maybeHealWin32InstallAcl({
       lastError: `${error?.message || error}${typeof error?.status === "number" ? ` (exit ${error.status})` : ""}`,
       updatedAt: nowIso(now),
     };
-    writeHealState(hanakoHome, { ...state, heal: nextHeal });
+    writeHealState(lingxiHome, { ...state, heal: nextHeal });
     return { status: "grant-failed", failureCount: nextHeal.failureCount };
   }
 
@@ -199,19 +199,19 @@ function maybeHealWin32InstallAcl({
     updatedAt: nowIso(now),
   };
   const grantedState = { ...state, heal: grantedHeal };
-  writeHealState(hanakoHome, grantedState);
-  return runProbe({ hanakoHome, state: grantedState, heal: grantedHeal, policy, now });
+  writeHealState(lingxiHome, grantedState);
+  return runProbe({ lingxiHome, state: grantedState, heal: grantedHeal, policy, now });
 }
 
-function buildInstallAclHealDiagnostics({ hanakoHome } = {}) {
-  const state = hanakoHome ? readHealState(hanakoHome) : { heal: null };
+function buildInstallAclHealDiagnostics({ lingxiHome } = {}) {
+  const state = lingxiHome ? readHealState(lingxiHome) : { heal: null };
   return [
     "",
     "--- Install ACL Heal ---",
     `Heal state: ${JSON.stringify(state.heal || null)}`,
     `Ineffective probe count: ${state.ineffectiveCount || 0}`,
     `Manual fix (electron/electron#51761): icacls "<installDir>" /grant ${SANDBOX_ACE_GRANT}`,
-    "Env switches: HANA_DISABLE_INSTALL_ACL_HEAL=1 disables the heal; HANA_FORCE_INSTALL_ACL_HEAL=1 forces it in unpackaged builds",
+    "Env switches: LINGXI_DISABLE_INSTALL_ACL_HEAL=1 disables the heal; LINGXI_FORCE_INSTALL_ACL_HEAL=1 forces it in unpackaged builds",
   ].join("\n");
 }
 

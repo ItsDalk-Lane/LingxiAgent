@@ -14,8 +14,8 @@ import {
   normalizeModelProtocolCompat,
   normalizeToolUseContract,
   normalizeVisionCapabilities,
-  withHanaAudioInputCompat,
-  withHanaVideoInputCompat,
+  withLingxiAudioInputCompat,
+  withLingxiVideoInputCompat,
   withThinkingFormatCompat,
 } from "../shared/model-capabilities.ts";
 import { normalizeProviderHeaders, providerCredentialAllowsMissingApiKey } from "../shared/provider-auth.ts";
@@ -212,8 +212,8 @@ function buildModelOverride(modelEntry, modelDefaults = {}, executionHeaders = {
     : null;
   if (visionCapabilities) override.visionCapabilities = visionCapabilities;
 
-  let finalOverride = video === true ? withHanaVideoInputCompat(override, true) : override;
-  finalOverride = audio === true ? withHanaAudioInputCompat(finalOverride, true) : finalOverride;
+  let finalOverride = video === true ? withLingxiVideoInputCompat(override, true) : override;
+  finalOverride = audio === true ? withLingxiAudioInputCompat(finalOverride, true) : finalOverride;
   return Object.keys(finalOverride).length > 0 ? finalOverride : null;
 }
 
@@ -360,8 +360,8 @@ function buildModelEntry(
     entry.compat = compat;
   }
 
-  let mediaAwareEntry = video === true ? withHanaVideoInputCompat(entry, true) : entry;
-  mediaAwareEntry = audio === true ? withHanaAudioInputCompat(mediaAwareEntry, true) : mediaAwareEntry;
+  let mediaAwareEntry = video === true ? withLingxiVideoInputCompat(entry, true) : entry;
+  mediaAwareEntry = audio === true ? withLingxiAudioInputCompat(mediaAwareEntry, true) : mediaAwareEntry;
   return withThinkingFormatCompat(mediaAwareEntry, { provider, api: modelApi, baseUrl });
 }
 

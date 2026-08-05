@@ -305,7 +305,7 @@ describe("resources route", () => {
       await next();
     });
     app.route("/api", createResourcesRoute({
-      hanakoHome: tmpDir,
+      lingxiHome: tmpDir,
       getRuntimeContext: () => ({
         serverId: "server_1",
         serverNodeId: "node_1",

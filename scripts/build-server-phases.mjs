@@ -161,7 +161,7 @@ export function prepareNodeRuntime({
 /**
  * Runs `vite build --config vite.config.server.js` and copies the produced
  * bundle into `bundleOutDir`. `entry` overrides the bundle's lib entry via
- * the `HANA_SERVER_BUNDLE_ENTRY` environment variable (read by
+ * the `LINGXI_SERVER_BUNDLE_ENTRY` environment variable (read by
  * vite.config.server.js); when omitted, vite.config.server.js's own default
  * (server/main-full.ts, the closed composition entry) is used unchanged.
  *
@@ -172,7 +172,7 @@ export function buildViteServerBundle({ rootDir, viteBundleDir, bundleOutDir, en
   execSync("npx vite build --config vite.config.server.js", {
     cwd: rootDir,
     stdio: "inherit",
-    env: entry ? { ...process.env, HANA_SERVER_BUNDLE_ENTRY: entry } : process.env,
+    env: entry ? { ...process.env, LINGXI_SERVER_BUNDLE_ENTRY: entry } : process.env,
   });
 
   fs.cpSync(viteBundleDir, bundleOutDir, { recursive: true });
@@ -703,7 +703,7 @@ export function finalizeServerPackageJsonVersion({ outDir, version }) {
 }
 
 /**
- * Writes the shell/cmd wrapper scripts that set HANA_ROOT + HANA_SERVER_ENTRY
+ * Writes the shell/cmd wrapper scripts that set LINGXI_ROOT + LINGXI_SERVER_ENTRY
  * and exec into the packaged Node runtime. `serverEntryRelPath` /
  * `cliEntryRelPath` are relative to `outDir` and default to the shape every
  * composition's bundle produces (`bundle/index.js` / `bundle/cli.js`).
@@ -726,19 +726,19 @@ export function writeServerWrapperScripts({
     const winCliEntry = cliEntryRelPath.split("/").join("\\");
     fs.writeFileSync(
       path.join(outDir, "hana-server.cmd"),
-      `@echo off\r\nset "HANA_ROOT=%~dp0"\r\nset "HANA_SERVER_ENTRY=%~dp0${winServerEntry}"\r\n"%~dp0hana-server.exe" "%~dp0bootstrap.js" %*\r\n`,
+      `@echo off\r\nset "LINGXI_ROOT=%~dp0"\r\nset "LINGXI_SERVER_ENTRY=%~dp0${winServerEntry}"\r\n"%~dp0hana-server.exe" "%~dp0bootstrap.js" %*\r\n`,
     );
     fs.writeFileSync(
       path.join(outDir, "hana.cmd"),
-      `@echo off\r\nset "HANA_ROOT=%~dp0"\r\nset "HANA_SERVER_ENTRY=%~dp0${winServerEntry}"\r\n"%~dp0hana-server.exe" "%~dp0${winCliEntry}" %*\r\n`,
+      `@echo off\r\nset "LINGXI_ROOT=%~dp0"\r\nset "LINGXI_SERVER_ENTRY=%~dp0${winServerEntry}"\r\n"%~dp0hana-server.exe" "%~dp0${winCliEntry}" %*\r\n`,
     );
   } else {
     const wrapper = path.join(outDir, "hana-server");
     fs.writeFileSync(wrapper, [
       "#!/bin/sh",
       'DIR="$(cd "$(dirname "$0")" && pwd)"',
-      'export HANA_ROOT="$DIR"',
-      `export HANA_SERVER_ENTRY="$DIR/${serverEntryRelPath}"`,
+      'export LINGXI_ROOT="$DIR"',
+      `export LINGXI_SERVER_ENTRY="$DIR/${serverEntryRelPath}"`,
       "# Raise file descriptor limit. Server got split out of Electron in v0.67",
       "# (see #765 / #787 root-cause); standalone Node loses Electron's implicit",
       "# fd raise (macOS default 256 → not enough for chokidar + DB + WS + plugins).",
@@ -753,8 +753,8 @@ export function writeServerWrapperScripts({
     fs.writeFileSync(cliWrapper, [
       "#!/bin/sh",
       'DIR="$(cd "$(dirname "$0")" && pwd)"',
-      'export HANA_ROOT="$DIR"',
-      `export HANA_SERVER_ENTRY="$DIR/${serverEntryRelPath}"`,
+      'export LINGXI_ROOT="$DIR"',
+      `export LINGXI_SERVER_ENTRY="$DIR/${serverEntryRelPath}"`,
       `exec "$DIR/node" "$DIR/${cliEntryRelPath}" "$@"`,
       "",
     ].join("\n"));

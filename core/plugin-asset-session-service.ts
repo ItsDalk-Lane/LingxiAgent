@@ -52,13 +52,13 @@ export function createPluginAssetSessionCookie({
 }
 
 export function issuePluginAssetSession({
-  hanakoHome,
+  lingxiHome,
   pluginId,
   principalId,
   now = new Date().toISOString(),
   ttlMs = DEFAULT_PLUGIN_ASSET_SESSION_TTL_MS,
-}: { hanakoHome?: string; pluginId?: string; principalId?: string; now?: string; ttlMs?: number } = {}) {
-  assertNonEmpty(hanakoHome, "hanakoHome");
+}: { lingxiHome?: string; pluginId?: string; principalId?: string; now?: string; ttlMs?: number } = {}) {
+  assertNonEmpty(lingxiHome, "lingxiHome");
   assertNonEmpty(pluginId, "pluginId");
   assertNonEmpty(principalId, "principalId");
   const issuedAtMs = Date.parse(now);
@@ -74,7 +74,7 @@ export function issuePluginAssetSession({
     expiresAt: new Date(issuedAtMs + safeTtlMs).toISOString(),
   };
   const body = base64UrlEncode(JSON.stringify(payload));
-  const signature = signBody(hanakoHome, body);
+  const signature = signBody(lingxiHome, body);
   return {
     ...payload,
     token: `${body}.${signature}`,
@@ -83,12 +83,12 @@ export function issuePluginAssetSession({
 }
 
 export function verifyPluginAssetSession({
-  hanakoHome,
+  lingxiHome,
   pluginId,
   token,
   now = new Date().toISOString(),
-}: { hanakoHome?: string; pluginId?: string; token?: string; now?: string } = {}) {
-  assertNonEmpty(hanakoHome, "hanakoHome");
+}: { lingxiHome?: string; pluginId?: string; token?: string; now?: string } = {}) {
+  assertNonEmpty(lingxiHome, "lingxiHome");
   assertNonEmpty(pluginId, "pluginId");
   if (typeof token !== "string" || !token.trim()) {
     throw new PluginAssetSessionError("plugin asset session required", {
@@ -99,7 +99,7 @@ export function verifyPluginAssetSession({
   if (!body || !signature || extra !== undefined) {
     throw new PluginAssetSessionError("plugin asset session malformed");
   }
-  const expected = signBody(hanakoHome, body);
+  const expected = signBody(lingxiHome, body);
   if (!timingSafeEqual(signature, expected)) {
     throw new PluginAssetSessionError("plugin asset session signature invalid");
   }
@@ -137,20 +137,20 @@ export function verifyPluginAssetSession({
   });
 }
 
-function pluginAssetSessionKeyPath(hanakoHome) {
-  assertNonEmpty(hanakoHome, "hanakoHome");
-  return path.join(securityDirPath(hanakoHome), PLUGIN_ASSET_SESSION_KEY_FILE);
+function pluginAssetSessionKeyPath(lingxiHome) {
+  assertNonEmpty(lingxiHome, "lingxiHome");
+  return path.join(securityDirPath(lingxiHome), PLUGIN_ASSET_SESSION_KEY_FILE);
 }
 
-function signBody(hanakoHome, body) {
+function signBody(lingxiHome, body) {
   return crypto
-    .createHmac("sha256", readOrCreateSessionKey(hanakoHome))
+    .createHmac("sha256", readOrCreateSessionKey(lingxiHome))
     .update(body)
     .digest("base64url");
 }
 
-function readOrCreateSessionKey(hanakoHome) {
-  const filePath = pluginAssetSessionKeyPath(hanakoHome);
+function readOrCreateSessionKey(lingxiHome) {
+  const filePath = pluginAssetSessionKeyPath(lingxiHome);
   try {
     const existing = fs.readFileSync(filePath, "utf-8").trim();
     if (existing) return existing;

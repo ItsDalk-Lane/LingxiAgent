@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useSettingsStore } from '../store';
-import { hanaFetch } from '../api';
+import { lingxiFetch } from '../api';
 import { t } from '../helpers';
 import { SettingsSection } from '../components/SettingsSection';
 import { renderMarkdown } from '../../utils/markdown';
@@ -78,7 +78,7 @@ export function PluginMarketplaceTab() {
     setReadme('');
     setReadmeLoading(true);
     try {
-      const res = await hanaFetch(`/api/plugins/marketplace/${encodeURIComponent(plugin.id)}/readme`);
+      const res = await lingxiFetch(`/api/plugins/marketplace/${encodeURIComponent(plugin.id)}/readme`);
       const data = await res.json();
       if (data.error) throw new Error(data.error);
       setReadme(data.markdown || '');
@@ -92,7 +92,7 @@ export function PluginMarketplaceTab() {
   const loadMarketplace = useCallback(async () => {
     setMarketplaceLoading(true);
     try {
-      const res = await hanaFetch('/api/plugins/marketplace');
+      const res = await lingxiFetch('/api/plugins/marketplace');
       const data = await res.json();
       if (data.error) throw new Error(data.error);
       const plugins = Array.isArray(data.plugins) ? data.plugins : [];
@@ -130,7 +130,7 @@ export function PluginMarketplaceTab() {
 
     setInstallingPluginId(plugin.id);
     try {
-      const res = await hanaFetch(`/api/plugins/marketplace/${encodeURIComponent(plugin.id)}/install`, {
+      const res = await lingxiFetch(`/api/plugins/marketplace/${encodeURIComponent(plugin.id)}/install`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

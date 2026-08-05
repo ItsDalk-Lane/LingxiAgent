@@ -137,7 +137,7 @@ export const CLOSURE_ROOTS = Object.freeze([
       + "entry). No current boot path spawns or imports this file directly anymore -- "
       + "cli/server-runner.ts's resolveServerSpawnSpec() source mode, "
       + "scripts/launch.js, scripts/dev-web.js, and desktop/main.cjs's dev "
-      + "HANA_SERVER_ENTRY all target server/main-full.ts instead, and "
+      + "LINGXI_SERVER_ENTRY all target server/main-full.ts instead, and "
       + "vite.config.server.js's build.lib.entry (which scripts/build-server.mjs feeds "
       + "into the packaged bundle) does too. main-full.ts is a thin closed entry that "
       + "statically imports this file's startServer() export plus "
@@ -218,7 +218,7 @@ export const DYNAMIC_CALL_ALLOWLIST = Object.freeze([
     callee: "import",
     argText: "pathToFileURL(serverEntry).href",
     reason:
-      "serverEntry is HANA_SERVER_ENTRY or a path.join() computed from HANA_ROOT; it "
+      "serverEntry is LINGXI_SERVER_ENTRY or a path.join() computed from LINGXI_ROOT; it "
       + "always resolves to the compiled output of server/main-full.ts (the closed thin "
       + "composition entry that statically imports the server-bootstrap root, "
       + "server/index.ts, plus composition/full-root.ts), not to the server-bootstrap "

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import { createPortal } from 'react-dom';
-import { hanaFetch } from '../../hooks/use-hana-fetch';
+import { lingxiFetch } from '../../hooks/use-hana-fetch';
 import { useStore } from '../../stores';
 import type { SessionConfirmationBlock } from '../../stores/chat-types';
 import { Tooltip } from '../../ui';
@@ -255,7 +255,7 @@ export function SessionConfirmationPrompt({ block, exiting = false }: SessionCon
       ? collectElicitationValue(elicitation, fieldValues)
       : null;
     try {
-      await hanaFetch(`/api/confirm/${block.confirmId}`, {
+      await lingxiFetch(`/api/confirm/${block.confirmId}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(value ? { action, value } : { action }),
@@ -311,7 +311,7 @@ export function SessionConfirmationPrompt({ block, exiting = false }: SessionCon
     setMenuOpen(false);
     setSwitchingMode(true);
     try {
-      const res = await hanaFetch('/api/session-permission-mode', {
+      const res = await lingxiFetch('/api/session-permission-mode', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ mode: 'operate', currentSessionOnly: true }),

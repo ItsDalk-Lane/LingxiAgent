@@ -10,10 +10,10 @@ import { workspaceRootsForSandbox } from "../../shared/workspace-scope.ts";
 
 // ─── 常量 ─────────────────────────────────────
 
-/** hanakoHome 根级别被屏蔽的文件 */
+/** lingxiHome 根级别被屏蔽的文件 */
 export const BLOCKED_FILES = ["auth.json", "models.json", "added-models.yaml", "crash.log"];
 
-/** hanakoHome 根级别被屏蔽的目录 */
+/** lingxiHome 根级别被屏蔽的目录 */
 export const BLOCKED_DIRS = ["browser-data", "playwright-browsers"];
 
 /** agentDir 下只读的文件 */
@@ -24,7 +24,7 @@ export const READ_ONLY_AGENT_FILES = [
   "yuan.md",
 ];
 
-/** hanakoHome 根级别只读的目录 */
+/** lingxiHome 根级别只读的目录 */
 export const READ_ONLY_HOME_DIRS = ["user", "skills", "session-files"];
 
 /** agentDir 下可读写的目录 */
@@ -44,7 +44,7 @@ export const READ_ONLY_AGENT_DIRS = [];
 /** agentDir 下可读写的文件 */
 export const READ_WRITE_AGENT_FILES = ["pinned.md", "channels.md"];
 
-/** hanakoHome 根级别可读写的目录 */
+/** lingxiHome 根级别可读写的目录 */
 export const READ_WRITE_HOME_DIRS = ["channels", "logs", "uploads", ".ephemeral"];
 
 export const SANDBOX_ACCESS_CONTRACT = Object.freeze({
@@ -78,7 +78,7 @@ function uniqueTruthy(paths) {
  * @param {string|null} [opts.cwd]
  * @param {string|null} opts.workspace
  * @param {string[]} [opts.workspaceFolders]
- * @param {string} opts.hanakoHome
+ * @param {string} opts.lingxiHome
  * @param {string[]} [opts.runtimeWritablePaths]
  * @param {"standard"|"full-access"} opts.mode
  * @returns {object} policy
@@ -88,7 +88,7 @@ export function deriveSandboxPolicy({
   cwd = null,
   workspace,
   workspaceFolders = [],
-  hanakoHome,
+  lingxiHome,
   runtimeWritablePaths = [],
   mode,
 }) {
@@ -103,7 +103,7 @@ export function deriveSandboxPolicy({
   return {
     mode: "standard",
     access: SANDBOX_ACCESS_CONTRACT,
-    hanakoHome,
+    lingxiHome,
     agentDir,
     cwd,
     workspace,
@@ -113,7 +113,7 @@ export function deriveSandboxPolicy({
     // OS 沙盒用：可写路径
     writablePaths: [
       ...READ_WRITE_AGENT_DIRS.map((d) => path.join(agentDir, d)),
-      ...READ_WRITE_HOME_DIRS.map((d) => path.join(hanakoHome, d)),
+      ...READ_WRITE_HOME_DIRS.map((d) => path.join(lingxiHome, d)),
       ...workspaceRoots,
       ...runtimeWritablePaths,
     ].filter(Boolean),
@@ -123,19 +123,19 @@ export function deriveSandboxPolicy({
     readablePaths: [
       ...READ_ONLY_AGENT_FILES.map((f) => path.join(agentDir, f)),
       ...READ_ONLY_AGENT_DIRS.map((d) => path.join(agentDir, d)),
-      ...READ_ONLY_HOME_DIRS.map((d) => path.join(hanakoHome, d)),
+      ...READ_ONLY_HOME_DIRS.map((d) => path.join(lingxiHome, d)),
     ].filter(Boolean),
 
     // OS 沙盒用：拒绝读取（文件 + 目录）
     denyReadPaths: [
-      ...BLOCKED_FILES.map((f) => path.join(hanakoHome, f)),
-      ...BLOCKED_DIRS.map((d) => path.join(hanakoHome, d)),
+      ...BLOCKED_FILES.map((f) => path.join(lingxiHome, f)),
+      ...BLOCKED_DIRS.map((d) => path.join(lingxiHome, d)),
     ],
 
     // OS 沙盒用：写保护（在可写范围内再限制）
     protectedPaths: [
       ...workspaceRoots.map((root) => path.join(root, ".git")),
-      path.join(hanakoHome, "session-files"),
+      path.join(lingxiHome, "session-files"),
     ].filter(Boolean),
   };
 }

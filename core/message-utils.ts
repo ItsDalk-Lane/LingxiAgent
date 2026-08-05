@@ -23,7 +23,7 @@ import { repairOversizedSessionEntriesInFile } from "./session-jsonl-file.ts";
 import { isAssistantCommentaryTextBlock } from "../shared/text-signature.ts";
 import { TOOL_ARG_SUMMARY_KEYS, summarizeToolArgs } from "../shared/tool-arg-summary.ts";
 import { projectSessionMessageForDisplay } from "./session-reminders.ts";
-import { isKnownLegacyHanaToolFailure } from "../shared/tool-outcome.ts";
+import { isKnownLegacyLingxiToolFailure } from "../shared/tool-outcome.ts";
 export { TOOL_ARG_SUMMARY_KEYS };
 
 const SESSION_TAIL_READ_THRESHOLD = 256 * 1024;
@@ -152,7 +152,7 @@ function historyMessageFromEntry(entry) {
   if (entry?.type === "message" && entry.message) {
     const message = entry.message.role === "toolResult"
       && entry.message.isError !== true
-      && isKnownLegacyHanaToolFailure(entry.message)
+      && isKnownLegacyLingxiToolFailure(entry.message)
       ? { ...entry.message, isError: true }
       : { ...entry.message };
     if (entry.id) message.id = entry.id;

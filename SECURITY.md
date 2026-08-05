@@ -1,6 +1,6 @@
 # Security Policy
 
-This project is now marketed as HanaAgent. During the rename transition, the repository and security-reporting URLs intentionally remain on the legacy `openhanako` GitHub path.
+This project is now marketed as 灵犀 Lingxi. During the rename transition, the repository and security-reporting URLs intentionally remain on the legacy `openhanako` GitHub path.
 
 ## Reporting a Vulnerability
 
@@ -28,7 +28,7 @@ I will respond within 72 hours and work with you on a fix before public disclosu
 ## Local credential storage
 
 Provider keys, OAuth tokens, and device records live in the data directory
-(`HANA_HOME`, by default `~/.hanako`). What the application guarantees:
+(`LINGXI_HOME`, by default `~/.hanako`). What the application guarantees:
 
 - Files holding credentials are written readable and writable by their owner
   only, and the data directory itself is owner-only.
@@ -50,7 +50,7 @@ Where that protection ends:
   application performs no permission work there at all. What protects the data
   is the access control list the data directory inherits from its parent. Under
   the default location inside the user profile that already excludes other
-  standard accounts, but a data directory placed elsewhere through `HANA_HOME`
+  standard accounts, but a data directory placed elsewhere through `LINGXI_HOME`
   inherits whatever that location grants, and the application neither adjusts
   nor reports it. On Windows, prefer leaving the data directory in its default
   location.

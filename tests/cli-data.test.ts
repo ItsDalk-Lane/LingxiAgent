@@ -124,7 +124,7 @@ describe("hana data diagnose — read-only across three home states", () => {
     const home = makeHomeDir();
     const logSpy = vi.spyOn(console, "log").mockImplementation(() => {});
 
-    const code = await runDataDiagnose({ hanaHome: home });
+    const code = await runDataDiagnose({ lingxiHome: home });
 
     expect(code).toBe(0);
     const output = collectOutput(logSpy);
@@ -156,7 +156,7 @@ describe("hana data diagnose — read-only across three home states", () => {
     });
     const logSpy = vi.spyOn(console, "log").mockImplementation(() => {});
 
-    const code = await runDataDiagnose({ hanaHome: home });
+    const code = await runDataDiagnose({ lingxiHome: home });
 
     expect(code).toBe(0);
     const output = stripAnsi(collectOutput(logSpy));
@@ -172,7 +172,7 @@ describe("hana data diagnose — read-only across three home states", () => {
     await buildCheckpoint({ homeDir: home, store, transitionId: "t-diag" });
     const logSpy = vi.spyOn(console, "log").mockImplementation(() => {});
 
-    const code = await runDataDiagnose({ hanaHome: home });
+    const code = await runDataDiagnose({ lingxiHome: home });
 
     expect(code).toBe(0);
     const output = collectOutput(logSpy);
@@ -188,7 +188,7 @@ describe("hana data diagnose — read-only across three home states", () => {
     vi.spyOn(console, "log").mockImplementation(() => {});
 
     const before = snapshotTree(home);
-    await runDataDiagnose({ hanaHome: home });
+    await runDataDiagnose({ lingxiHome: home });
     const after = snapshotTree(home);
 
     expect(after).toEqual(before);
@@ -200,7 +200,7 @@ describe("hana data checkpoints", () => {
     const home = makeHomeDir();
     const logSpy = vi.spyOn(console, "log").mockImplementation(() => {});
 
-    const code = await runDataCheckpoints({ hanaHome: home });
+    const code = await runDataCheckpoints({ lingxiHome: home });
 
     expect(code).toBe(0);
     expect(collectOutput(logSpy)).toMatch(/no data-epoch checkpoints/i);
@@ -213,7 +213,7 @@ describe("hana data checkpoints", () => {
     await buildCheckpoint({ homeDir: home, store, transitionId: "t-list", fromEpoch: 1, toEpoch: 2 });
     const logSpy = vi.spyOn(console, "log").mockImplementation(() => {});
 
-    const code = await runDataCheckpoints({ hanaHome: home });
+    const code = await runDataCheckpoints({ lingxiHome: home });
 
     expect(code).toBe(0);
     const output = stripAnsi(collectOutput(logSpy));
@@ -231,7 +231,7 @@ describe("hana data checkpoints", () => {
     fs.mkdirSync(path.join(home, "data-epoch-checkpoints", "t-real.invalid-123"), { recursive: true });
     const logSpy = vi.spyOn(console, "log").mockImplementation(() => {});
 
-    const code = await runDataCheckpoints({ hanaHome: home });
+    const code = await runDataCheckpoints({ lingxiHome: home });
 
     expect(code).toBe(0);
     const output = collectOutput(logSpy);
@@ -253,7 +253,7 @@ describe("hana data restore — confirmation is never skippable", () => {
 
     const code = await runDataRestore({
       transitionId: "t-mismatch",
-      hanaHome: home,
+      lingxiHome: home,
       restore,
       isTTY: true,
       promptConfirmation: async () => "restore wrong-id",
@@ -273,7 +273,7 @@ describe("hana data restore — confirmation is never skippable", () => {
     const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
     const restore = vi.fn();
 
-    const code = await runDataRestore({ transitionId: "t-no-tty", hanaHome: home, restore, isTTY: false });
+    const code = await runDataRestore({ transitionId: "t-no-tty", lingxiHome: home, restore, isTTY: false });
 
     expect(code).toBe(1);
     expect(restore).not.toHaveBeenCalled();
@@ -292,7 +292,7 @@ describe("hana data restore — confirmation is never skippable", () => {
 
     const code = await runDataRestore({
       transitionId: "t-bad-token",
-      hanaHome: home,
+      lingxiHome: home,
       restore,
       isTTY: false,
       confirmToken: "restore t-bad-token-typo",
@@ -309,7 +309,7 @@ describe("hana data restore — confirmation is never skippable", () => {
     const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
     const restore = vi.fn();
 
-    const code = await runDataRestore({ transitionId: "does-not-exist", hanaHome: home, restore, isTTY: false });
+    const code = await runDataRestore({ transitionId: "does-not-exist", lingxiHome: home, restore, isTTY: false });
 
     expect(code).toBe(1);
     expect(restore).not.toHaveBeenCalled();
@@ -331,7 +331,7 @@ describe("hana data restore — confirmation is never skippable", () => {
 
     const code = await runDataRestore({
       transitionId: "t-e2e",
-      hanaHome: home,
+      lingxiHome: home,
       isTTY: false,
       confirmToken: "restore t-e2e",
       restore: (args) => restoreDataEpochCheckpoint({ ...args, stores: [store] }),
@@ -359,7 +359,7 @@ describe("hana data restore — confirmation is never skippable", () => {
 
     const code = await runDataRestore({
       transitionId: "t-tty-ok",
-      hanaHome: home,
+      lingxiHome: home,
       isTTY: true,
       promptConfirmation: prompt,
       restore: (args) => restoreDataEpochCheckpoint({ ...args, stores: [store] }),

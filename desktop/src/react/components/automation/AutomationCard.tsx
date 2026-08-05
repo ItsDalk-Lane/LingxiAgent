@@ -58,8 +58,8 @@ export function AutomationCard({
   const t = window.t ?? ((p: string) => p);
   const agents = useStore(s => s.agents);
   const currentAgentId = useStore(s => s.currentAgentId);
-  const fallbackAgentName = useStore(s => s.agentName) || 'Hanako';
-  const fallbackAgentYuan = useStore(s => s.agentYuan) || 'hanako';
+  const fallbackAgentName = useStore(s => s.agentName) || 'Lingxi';
+  const fallbackAgentYuan = useStore(s => s.agentYuan) || 'lingxi';
   const addToast = useStore(s => s.addToast);
   const [label, setLabel] = useState(jobTitle(job));
   const [scheduleDraft, setScheduleDraft] = useState<ScheduleDraft>(() => scheduleDraftFromStored(job.type, job.schedule));

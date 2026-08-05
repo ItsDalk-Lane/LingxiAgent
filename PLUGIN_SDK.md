@@ -1,13 +1,13 @@
-# Hana Plugin SDK
+# Lingxi Plugin SDK
 
-Hana's plugin SDK is split into small packages so plugin authors can choose only the layer they need.
+Lingxi's plugin SDK is split into small packages so plugin authors can choose only the layer they need.
 
 | Package | Runs In | Purpose |
 | --- | --- | --- |
-| `@hana/plugin-protocol` | WebView/iframe / host | Shared protocol constants and message shapes for plugin UI. |
-| `@hana/plugin-sdk` | WebView/iframe browser code | Typed helpers for `ready`, asset URLs, resize, toast, external links, clipboard, and lower-level host requests. |
-| `@hana/plugin-runtime` | plugin Node runtime | Helpers for tools, lifecycle plugins, EventBus handlers, SessionFile media details, providers, and Pi SDK extensions. |
-| `@hana/plugin-components` | WebView/iframe React UI | Hana-styled React primitives with theme fallback: controls, cards, rows, lists, and empty states. |
+| `@lingxi/plugin-protocol` | WebView/iframe / host | Shared protocol constants and message shapes for plugin UI. |
+| `@lingxi/plugin-sdk` | WebView/iframe browser code | Typed helpers for `ready`, asset URLs, resize, toast, external links, clipboard, and lower-level host requests. |
+| `@lingxi/plugin-runtime` | plugin Node runtime | Helpers for tools, lifecycle plugins, EventBus handlers, SessionFile media details, providers, and Pi SDK extensions. |
+| `@lingxi/plugin-components` | WebView/iframe React UI | Lingxi-styled React primitives with theme fallback: controls, cards, rows, lists, and empty states. |
 
 For the end-to-end plugin author workflow, start with [`PLUGINS_EN.md`](PLUGINS_EN.md), then use this file as the SDK package map.
 
@@ -19,7 +19,7 @@ npm run build:packages
 
 ## Runtime Boundary
 
-The SDK packages are developer-facing source/build dependencies. The app package still excludes `packages/**`, so plugin UI code should bundle `@hana/plugin-sdk` and `@hana/plugin-components` into its WebView/iframe assets. Runtime helpers from `@hana/plugin-runtime` should be bundled or installed with the plugin when the plugin is distributed outside the monorepo.
+The SDK packages are developer-facing source/build dependencies. The app package still excludes `packages/**`, so plugin UI code should bundle `@lingxi/plugin-sdk` and `@lingxi/plugin-components` into its WebView/iframe assets. Runtime helpers from `@lingxi/plugin-runtime` should be bundled or installed with the plugin when the plugin is distributed outside the monorepo.
 
 Built-in plugins may use the same source patterns, but they should be checked against the packaged server bundle before release. The host does not silently provide these SDK packages as global runtime modules.
 
@@ -27,7 +27,7 @@ Plugin server code is installed and loaded by the Studio server. Plugin WebView/
 
 ## Production Install Checklist
 
-A plugin installed under `${HANA_HOME}/plugins`, `${HANA_HOME}/plugins-dev`, or a marketplace release is imported from that plugin directory. Bare package imports in server-side plugin code resolve from the plugin package, not from the Hana repository, the desktop renderer, or the packaged server root. A `package.json` beside the plugin is only metadata unless the dependency files are also present or the code has been bundled.
+A plugin installed under `${LINGXI_HOME}/plugins`, `${LINGXI_HOME}/plugins-dev`, or a marketplace release is imported from that plugin directory. Bare package imports in server-side plugin code resolve from the plugin package, not from the Lingxi repository, the desktop renderer, or the packaged server root. A `package.json` beside the plugin is only metadata unless the dependency files are also present or the code has been bundled.
 
 Before copying or zipping a plugin outside the monorepo, inspect every server-side entry point:
 
@@ -38,31 +38,31 @@ Before copying or zipping a plugin outside the monorepo, inspect every server-si
 - `extensions/*`
 - any helper file imported by those files
 
-If any of those files import `@hana/plugin-runtime`, `@hana/plugin-sdk`, `@hana/plugin-components`, or another bare package name, the installed plugin must satisfy that import without relying on workspace symlinks. Use one of these release shapes:
+If any of those files import `@lingxi/plugin-runtime`, `@lingxi/plugin-sdk`, `@lingxi/plugin-components`, or another bare package name, the installed plugin must satisfy that import without relying on workspace symlinks. Use one of these release shapes:
 
 - Bundle the server-side plugin code so the installed file no longer contains unresolved SDK imports.
-- Ship a plugin directory or release zip that already contains the installed dependencies needed by Node's resolver. Do not assume Hana will run `npm install` during plugin installation.
+- Ship a plugin directory or release zip that already contains the installed dependencies needed by Node's resolver. Do not assume Lingxi will run `npm install` during plugin installation.
 - Avoid the SDK helper for that entry point and use the host objects already passed by the plugin manager, such as `ctx` for lifecycle, tool, and route code.
 
-`--sdk-mode workspace` is only for source development inside the Hana monorepo. Do not drag a workspace-mode plugin directory into `${HANA_HOME}/plugins` or publish it as a release package. `--sdk-mode bundled` copies SDK tarballs for the plugin's own install or build step; the final installed directory must still be smoke-tested as an extracted plugin, with no dependency on the repo root `node_modules`.
+`--sdk-mode workspace` is only for source development inside the Lingxi monorepo. Do not drag a workspace-mode plugin directory into `${LINGXI_HOME}/plugins` or publish it as a release package. `--sdk-mode bundled` copies SDK tarballs for the plugin's own install or build step; the final installed directory must still be smoke-tested as an extracted plugin, with no dependency on the repo root `node_modules`.
 
-The production smoke test is: install the exact folder or zip that users will receive, then check plugin diagnostics and server logs for `Cannot find package` or other import errors. A plugin that loads in the repo but fails from `${HANA_HOME}/plugins` has crossed the runtime boundary incorrectly.
+The production smoke test is: install the exact folder or zip that users will receive, then check plugin diagnostics and server logs for `Cannot find package` or other import errors. A plugin that loads in the repo but fails from `${LINGXI_HOME}/plugins` has crossed the runtime boundary incorrectly.
 
 ## Plugin Shape Guide
 
-- Tool-only plugins can stay `restricted`. No-build tools may export the static tool contract directly; tools that import `@hana/plugin-runtime` must still satisfy the production install checklist above.
+- Tool-only plugins can stay `restricted`. No-build tools may export the static tool contract directly; tools that import `@lingxi/plugin-runtime` must still satisfy the production install checklist above.
 - Runtime plugins use `index.js` for lifecycle, EventBus handlers, background tasks, schedules, or dynamic tools. They require `trust: "full-access"`.
-- UI plugins use WebView/iframe routes plus `@hana/plugin-sdk` and, for React UI, `@hana/plugin-components`. They require `trust: "full-access"` and explicit `ui.hostCapabilities` grants for host calls such as `external.open`, `clipboard.writeText`, `resource.open`, `resource.pick`, or `resource.requestAccess`. Native `chat.surface` cards are declarative transcript surfaces for plugin-owned private sessions and use `createChatSurfaceCard()`. Rich native card composition is not part of the public SDK contract yet.
+- UI plugins use WebView/iframe routes plus `@lingxi/plugin-sdk` and, for React UI, `@lingxi/plugin-components`. They require `trust: "full-access"` and explicit `ui.hostCapabilities` grants for host calls such as `external.open`, `clipboard.writeText`, `resource.open`, `resource.pick`, or `resource.requestAccess`. Native `chat.surface` cards are declarative transcript surfaces for plugin-owned private sessions and use `createChatSurfaceCard()`. Rich native card composition is not part of the public SDK contract yet.
 - Provider contribution plugins use `providers/*.js` declarations. They require `trust: "full-access"` and should declare `capabilities.chat` separately from `capabilities.media.*` so chat selectors stay clean while image, video, or speech tools discover media providers. Provider declarations, `listMediaProviders()`, and `resolveMediaModel()` are the stable discovery entrypoints; media adapter / executor authoring remains a separate API surface. Legacy `media-gen:*` adapter/runtime events remain compatibility-only for older image generation plugins.
-- Pi SDK extension plugins use `extensions/*.js` factories. They require `trust: "full-access"` because they run inside the LLM request pipeline. Hana reloads idle sessions after full-access plugin install/enable/reload so existing chats can pick up new extension handlers without requiring an app restart; busy sessions are not reloaded and will retain old extension handlers until the session is naturally rebuilt.
-- Marketplace metadata lives outside the app repo in `OH-Plugins`, the official community plugin catalog. The app reads the generated catalog URL by default, installs `distribution.kind = "release"` entries by downloading the zip package and verifying `sha256`, and keeps `distribution.kind = "source"` for local file marketplace development only. `versions[]` lets the catalog keep multiple SemVer releases; Hana selects the highest app-compatible version, blocks implicit downgrades, backs up old installs, and records successful installs in `${HANA_HOME}/plugin-installs.json`. `readmePath` is resolved relative to the catalog when the official URL is used.
+- Pi SDK extension plugins use `extensions/*.js` factories. They require `trust: "full-access"` because they run inside the LLM request pipeline. Lingxi reloads idle sessions after full-access plugin install/enable/reload so existing chats can pick up new extension handlers without requiring an app restart; busy sessions are not reloaded and will retain old extension handlers until the session is naturally rebuilt.
+- Marketplace metadata lives outside the app repo in `OH-Plugins`, the official community plugin catalog. The app reads the generated catalog URL by default, installs `distribution.kind = "release"` entries by downloading the zip package and verifying `sha256`, and keeps `distribution.kind = "source"` for local file marketplace development only. `versions[]` lets the catalog keep multiple SemVer releases; Lingxi selects the highest app-compatible version, blocks implicit downgrades, backs up old installs, and records successful installs in `${LINGXI_HOME}/plugin-installs.json`. `readmePath` is resolved relative to the catalog when the official URL is used.
 
 ## Agent Dev Loop
 
-Agent-assisted plugin work should use Hana's dev loop instead of copying work-in-progress code into the production plugin directory.
+Agent-assisted plugin work should use Lingxi's dev loop instead of copying work-in-progress code into the production plugin directory.
 
-- Source stays in the workspace or `${HANA_HOME}/plugin-dev-sources/`.
-- `plugin.dev.install` copies the source into `${HANA_HOME}/plugins-dev/<pluginId>` and loads it through the normal `PluginManager`.
+- Source stays in the workspace or `${LINGXI_HOME}/plugin-dev-sources/`.
+- `plugin.dev.install` copies the source into `${LINGXI_HOME}/plugins-dev/<pluginId>` and loads it through the normal `PluginManager`.
 - `plugin.dev.reload` replaces the dev copy from the same source slot.
 - `plugin.dev.disable`, `plugin.dev.enable`, `plugin.dev.reset`, and `plugin.dev.uninstall` control only the remembered dev slot. They do not write normal plugin preferences and do not remove community installs.
 - `plugin.dev.invokeTool` runs a tool smoke test with explicit input. Pass `sessionId` or `sessionRef` for session-scoped tools; `sessionPath` remains a legacy locator compatibility field.
@@ -71,47 +71,47 @@ Agent-assisted plugin work should use Hana's dev loop instead of copying work-in
 
 Agent-callable dev tools are opt-in. The user must enable "Allow Agent plugin dev tools" in Settings -> Plugins before the Agent sees `plugin_dev_install`, `plugin_dev_reload`, `plugin_dev_disable`, `plugin_dev_enable`, `plugin_dev_reset`, `plugin_dev_uninstall`, `plugin_dev_invoke_tool`, `plugin_dev_diagnostics`, `plugin_dev_list_surfaces`, `plugin_dev_describe_surface`, or `plugin_dev_run_scenario`.
 
-The trusted development identity comes from Hana's install record and the `${HANA_HOME}/plugins-dev/` slot, not from a manifest field. Pass `devRunId` when controlling lifecycle if the Agent has one, so stale tool calls cannot accidentally act on a newer dev run.
+The trusted development identity comes from Lingxi's install record and the `${LINGXI_HOME}/plugins-dev/` slot, not from a manifest field. Pass `devRunId` when controlling lifecycle if the Agent has one, so stale tool calls cannot accidentally act on a newer dev run.
 
-UI debugging is element-first. A capable Agent should inspect accessible elements, text, roles, labels, and stable locators before asking for screenshots. Screenshots are still useful for visual polish, clipping, theme contrast, and blank-state checks, but they are no longer the first source of truth when Hana can expose semantic UI structure.
+UI debugging is element-first. A capable Agent should inspect accessible elements, text, roles, labels, and stable locators before asking for screenshots. Screenshots are still useful for visual polish, clipping, theme contrast, and blank-state checks, but they are no longer the first source of truth when Lingxi can expose semantic UI structure.
 
 ## UI Path
 
-Use `@hana/plugin-sdk` for host communication:
+Use `@lingxi/plugin-sdk` for host communication:
 
 ```ts
-import { hana } from '@hana/plugin-sdk';
+import { hana } from '@lingxi/plugin-sdk';
 
 hana.ready();
-hana.ui.resize({ height: 320 });
-await hana.toast.show({ message: 'Ready' });
-await hana.resources.open({ resource: { kind: 'session-file', fileId: 'sf_1' }, mode: 'preview' });
+lingxi.ui.resize({ height: 320 });
+await lingxi.toast.show({ message: 'Ready' });
+await lingxi.resources.open({ resource: { kind: 'session-file', fileId: 'sf_1' }, mode: 'preview' });
 ```
 
-Use `hana.api.fetch(path, init)` for browser-side calls to this plugin's own dynamic route handlers. It derives the current plugin id from the iframe route and sends the `X-Hana-Plugin-Surface-Session` header that Hana issued with the iframe URL:
+Use `lingxi.api.fetch(path, init)` for browser-side calls to this plugin's own dynamic route handlers. It derives the current plugin id from the iframe route and sends the `X-Lingxi-Plugin-Surface-Session` header that Lingxi issued with the iframe URL:
 
 ```ts
-const res = await hana.api.fetch('api/translate', {
+const res = await lingxi.api.fetch('api/translate', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({ domain: 'football' }),
 });
 ```
 
-Website-to-plugin conversions should rewrite same-plugin `fetch('/api/...')` calls to `hana.api.fetch(...)`. Do not hard-code `/api/plugins/{pluginId}/...` in browser code, and do not reuse `pluginIframeTicket` for XHR/fetch calls; that ticket is only for the iframe document load.
+Website-to-plugin conversions should rewrite same-plugin `fetch('/api/...')` calls to `lingxi.api.fetch(...)`. Do not hard-code `/api/plugins/{pluginId}/...` in browser code, and do not reuse `pluginIframeTicket` for XHR/fetch calls; that ticket is only for the iframe document load.
 
-Browser-side code should not call third-party APIs directly. If a plugin needs live data from the public internet, call a same-plugin route with `hana.api.fetch(...)`; the route should use the runtime `ctx.network.fetch()` helper described below. When a route calls sensitive host capabilities, read the request-scoped context with `getPluginRequestContext(c)` and use `req.bus`. This keeps API keys out of iframe assets and lets Hana diagnose missing host, method, timeout, response-size, and capability declarations.
+Browser-side code should not call third-party APIs directly. If a plugin needs live data from the public internet, call a same-plugin route with `lingxi.api.fetch(...)`; the route should use the runtime `ctx.network.fetch()` helper described below. When a route calls sensitive host capabilities, read the request-scoped context with `getPluginRequestContext(c)` and use `req.bus`. This keeps API keys out of iframe assets and lets Lingxi diagnose missing host, method, timeout, response-size, and capability declarations.
 
-Browser-side resource helpers are host-mediated only: `hana.resources.open()`, `hana.resources.pick()`, and `hana.resources.requestAccess()` can ask Hana to open, choose, or grant access to a resource, but they do not expose filesystem reads or writes inside the iframe. Actual user-resource reads and writes belong in server-side plugin code through `ctx.resources`.
+Browser-side resource helpers are host-mediated only: `lingxi.resources.open()`, `lingxi.resources.pick()`, and `lingxi.resources.requestAccess()` can ask Lingxi to open, choose, or grant access to a resource, but they do not expose filesystem reads or writes inside the iframe. Actual user-resource reads and writes belong in server-side plugin code through `ctx.resources`.
 
-Use `hana.assets.url(path)` for browser-side references to files bundled under the plugin's `assets/` directory:
+Use `lingxi.assets.url(path)` for browser-side references to files bundled under the plugin's `assets/` directory:
 
 ```ts
-const logoUrl = hana.assets.url('images/logo.svg');
-const videoUrl = hana.assets.url('videos/background.mp4');
+const logoUrl = lingxi.assets.url('images/logo.svg');
+const videoUrl = lingxi.assets.url('videos/background.mp4');
 ```
 
-Hana uses a VS Code-like webview resource boundary. The iframe entry route is authenticated by the host, then the host issues a short-lived, HttpOnly cookie scoped only to `/api/plugins/{pluginId}/assets/`. Static JS, CSS, fonts, images, JSON, wasm, and browser-playable video files are served from the plugin's own `assets/` directory through that path. Video assets support HTTP byte ranges for `<video>` playback and seeking. Do not rely on `?token` or `pluginIframeTicket` being copied to Vite chunks, `React.lazy()` imports, modulepreload links, CSS requests, or media requests.
+Lingxi uses a VS Code-like webview resource boundary. The iframe entry route is authenticated by the host, then the host issues a short-lived, HttpOnly cookie scoped only to `/api/plugins/{pluginId}/assets/`. Static JS, CSS, fonts, images, JSON, wasm, and browser-playable video files are served from the plugin's own `assets/` directory through that path. Video assets support HTTP byte ranges for `<video>` playback and seeking. Do not rely on `?token` or `pluginIframeTicket` being copied to Vite chunks, `React.lazy()` imports, modulepreload links, CSS requests, or media requests.
 
 For a built UI, put compiled files under `assets/` and point the shell at the host-served resource URL:
 
@@ -121,35 +121,35 @@ For a built UI, put compiled files under `assets/` and point the shell at the ho
 
 Keep source files, secrets, config, and private data outside `assets/`. The host rejects path traversal, dotfiles, source maps, and non-web asset extensions by default. Use plugin routes or SDK host requests for dynamic data.
 
-Agent-generated plugins and scaffold updates should not create custom routes only to serve static resources such as CSS, JS, images, fonts, or MP4 files. Existing plugins that already use static-file compatibility handlers remain loadable. The documented contract for new work is to put those resources in `assets/` and reference them through `hana.assets.url(...)` or the same host-served assets path in the route shell. Treat `pluginIframeTicket` as a document-load credential only; do not manually append it to asset URLs.
+Agent-generated plugins and scaffold updates should not create custom routes only to serve static resources such as CSS, JS, images, fonts, or MP4 files. Existing plugins that already use static-file compatibility handlers remain loadable. The documented contract for new work is to put those resources in `assets/` and reference them through `lingxi.assets.url(...)` or the same host-served assets path in the route shell. Treat `pluginIframeTicket` as a document-load credential only; do not manually append it to asset URLs.
 
-Use `@hana/plugin-components` for WebView/iframe UI:
+Use `@lingxi/plugin-components` for WebView/iframe UI:
 
 ```tsx
-import { Button, CardShell, HanaThemeProvider } from '@hana/plugin-components';
-import '@hana/plugin-components/styles.css';
+import { Button, CardShell, LingxiThemeProvider } from '@lingxi/plugin-components';
+import '@lingxi/plugin-components/styles.css';
 
 export function Panel() {
   return (
-    <HanaThemeProvider mode="inherit">
+    <LingxiThemeProvider mode="inherit">
       <CardShell title="Plugin">
         <Button variant="primary">Run</Button>
       </CardShell>
-    </HanaThemeProvider>
+    </LingxiThemeProvider>
   );
 }
 ```
 
 Theme fallback order is:
 
-1. Explicit custom tokens passed to `HanaThemeProvider`.
-2. Named Hana tokens when `mode="hana"`.
+1. Explicit custom tokens passed to `LingxiThemeProvider`.
+2. Named Lingxi tokens when `mode="lingxi"`.
 3. Host CSS variables when `mode="inherit"`.
-4. SDK defaults in `@hana/plugin-components/styles.css`.
+4. SDK defaults in `@lingxi/plugin-components/styles.css`.
 
 ## Runtime Path
 
-Use `@hana/plugin-runtime` for Node-side plugin code:
+Use `@lingxi/plugin-runtime` for Node-side plugin code:
 
 ```js
 import {
@@ -162,12 +162,12 @@ import {
   requestBus,
   sampleText,
   sendSessionMessage,
-} from '@hana/plugin-runtime';
+} from '@lingxi/plugin-runtime';
 ```
 
 Tools should return local files through `stageFile()` and `createMediaDetails()` so desktop, Bridge, Mobile PWA, and future remote clients all consume the same `SessionFile` / Resource identity.
 
-Tools should also declare `sessionPermission` so Hana's session permission mode can make a precise decision before the tool runs. Use `readOnly: true` for pure reads, `kind: "plugin_output"` for bounded writes under `ctx.dataDir` that return `SessionFile` media, and `kind: "external_side_effect"` for provider, network, platform, or account actions that Auto mode should review. Tools that modify user workspace files should stay reviewer-bound unless they can describe a narrower side effect with `describeSideEffect(input)`.
+Tools should also declare `sessionPermission` so Lingxi's session permission mode can make a precise decision before the tool runs. Use `readOnly: true` for pure reads, `kind: "plugin_output"` for bounded writes under `ctx.dataDir` that return `SessionFile` media, and `kind: "external_side_effect"` for provider, network, platform, or account actions that Auto mode should review. Tools that modify user workspace files should stay reviewer-bound unless they can describe a narrower side effect with `describeSideEffect(input)`.
 
 ```js
 const tool = defineTool({
@@ -220,7 +220,7 @@ Long-running plugins should use the runtime task helpers (`registerTask`, `updat
 
 ### Runtime External HTTP API
 
-Use `ctx.network.fetch()` for external HTTP APIs such as live scores, weather, prices, search, or third-party platform data. It is intentionally a runtime helper, not an iframe helper: iframe code calls a plugin route with `hana.api.fetch(...)`, and the route performs the outbound request.
+Use `ctx.network.fetch()` for external HTTP APIs such as live scores, weather, prices, search, or third-party platform data. It is intentionally a runtime helper, not an iframe helper: iframe code calls a plugin route with `lingxi.api.fetch(...)`, and the route performs the outbound request.
 
 Manifest:
 
@@ -265,7 +265,7 @@ Browser automation, login-backed websites, and turning a full external web app i
 
 ### Runtime Session and Agent API
 
-Plugins can use the same session-facing operations that Hana's own UI and server use, through typed runtime helpers:
+Plugins can use the same session-facing operations that Lingxi's own UI and server use, through typed runtime helpers:
 
 ```js
 import {
@@ -276,7 +276,7 @@ import {
   listSessions,
   sendSessionMessage,
   subscribeSessionEvents,
-} from '@hana/plugin-runtime';
+} from '@lingxi/plugin-runtime';
 
 const agent = await createAgent(ctx, {
   name: 'Tavern Character',
@@ -308,9 +308,9 @@ const off = subscribeSessionEvents(ctx, sessionTarget, (event) => {
 });
 ```
 
-`context.system`, `context.beforeUser`, and `context.afterUser` are injected into the model request through Hana's Pi SDK context hook for that turn only. They do not change the visible user message and are cleared after the prompt finishes. Use this for plugin-side RAG, world lore, mood, or scene state.
+`context.system`, `context.beforeUser`, and `context.afterUser` are injected into the model request through Lingxi's Pi SDK context hook for that turn only. They do not change the visible user message and are cleared after the prompt finishes. Use this for plugin-side RAG, world lore, mood, or scene state.
 
-`visibility: 'plugin_private'` keeps plugin-owned agents and sessions out of Hana's main agent/session lists by default. The owning plugin can list them with `listAgents(ctx, { ownerPluginId: ctx.pluginId })` or `listSessions(ctx, { ownerPluginId: ctx.pluginId })`.
+`visibility: 'plugin_private'` keeps plugin-owned agents and sessions out of Lingxi's main agent/session lists by default. The owning plugin can list them with `listAgents(ctx, { ownerPluginId: ctx.pluginId })` or `listSessions(ctx, { ownerPluginId: ctx.pluginId })`.
 
 To show one of those plugin-owned private sessions inside the main chat stream, return a declarative `chat.surface` card:
 
@@ -326,7 +326,7 @@ return {
 };
 ```
 
-`createChatSurfaceCard()` requires `sessionId` / `sessionRef`; path-only locators are rejected. Hana resolves the current session path from the manifest and only renders sessions owned by the same plugin with `visibility: 'plugin_private'` or `'private'`. In main this is a thin native transcript surface; rich composer and native card composition are not part of the public SDK contract yet.
+`createChatSurfaceCard()` requires `sessionId` / `sessionRef`; path-only locators are rejected. Lingxi resolves the current session path from the manifest and only renders sessions owned by the same plugin with `visibility: 'plugin_private'` or `'private'`. In main this is a thin native transcript surface; rich composer and native card composition are not part of the public SDK contract yet.
 
 ### Runtime Model and Media API
 
@@ -340,7 +340,7 @@ const { text } = await sampleText(ctx, {
 });
 ```
 
-Media helpers expose Hana's configured provider stack. `listMediaProviders()` and `resolveMediaModel()` are stable discovery helpers for configured image/video/speech-capable providers; they do not make adapter execution contracts stable by themselves. `generateImage()` submits an image generation task through the built-in media task pipeline and returns a task/batch result; by default generated files are delivered as `SessionFile` resources when the task completes. Use `referenceImages` with `SessionFile` references for multi-reference image generation. Image/video adapters must declare reference-image support on the selected model mode with `modes[].inputLimits.referenceImages`, for example `{ min: 1, max: 1 }` for single-image-to-video or `{ min: 0, max: 0 }` for text-only generation. The task pipeline rejects unsupported reference images before enqueueing. `generateVideo()`, `generateMedia()`, and `transcribeAudio()` use the same native media manager for video tasks and ASR. `transcribeAudio()` returns `{ ok: true, transcription }`.
+Media helpers expose Lingxi's configured provider stack. `listMediaProviders()` and `resolveMediaModel()` are stable discovery helpers for configured image/video/speech-capable providers; they do not make adapter execution contracts stable by themselves. `generateImage()` submits an image generation task through the built-in media task pipeline and returns a task/batch result; by default generated files are delivered as `SessionFile` resources when the task completes. Use `referenceImages` with `SessionFile` references for multi-reference image generation. Image/video adapters must declare reference-image support on the selected model mode with `modes[].inputLimits.referenceImages`, for example `{ min: 1, max: 1 }` for single-image-to-video or `{ min: 0, max: 0 }` for text-only generation. The task pipeline rejects unsupported reference images before enqueueing. `generateVideo()`, `generateMedia()`, and `transcribeAudio()` use the same native media manager for video tasks and ASR. `transcribeAudio()` returns `{ ok: true, transcription }`.
 
 Image/video helpers keep a stable top-level shape. Provider-specific controls go through `options`. Parameter support belongs to the model and usually to the mode, not to the provider as a whole: use `models[].modes[].parameterSchema`, `modes[].defaults`, `modes[].inputLimits`, `modes[].pricing`, and `modes[].agentHints` so settings UI, Agent discovery, and runtime validation all read the same contract.
 
@@ -378,7 +378,7 @@ POST /api/media/asr/transcribe
 
 The image/video endpoints require `prompt`; default `delivery.mode = "session"` also requires `sessionId` or legacy `sessionPath`. With `delivery.mode = "response"`, image/video requests may omit both and will not create `SessionFile` records. ASR requires `sessionId` or legacy `sessionPath` plus `fileId`. Image reference fields on the native facade accept only `SessionFile` references such as `{ "kind": "session_file", "fileId": "sf_..." }`; raw local paths are reserved for legacy/internal image-gen calls. These routes require chat-scope host credentials and forward into the same native Media Manager task pipeline as the SDK helpers.
 
-For Agent-assisted development, plugins can declare `manifest.dev.scenarios`. These are not runtime features; they are smoke-test instructions for Hana's dev loop and should only describe repeatable checks such as invoking a tool, expecting text in the result, or opening a declared UI surface. `invokeTool` scenario steps may pass `sessionId`, `sessionRef`, `sessionPath`, and `agentId`; prefer `sessionId/sessionRef` for new scenarios.
+For Agent-assisted development, plugins can declare `manifest.dev.scenarios`. These are not runtime features; they are smoke-test instructions for Lingxi's dev loop and should only describe repeatable checks such as invoking a tool, expecting text in the result, or opening a declared UI surface. `invokeTool` scenario steps may pass `sessionId`, `sessionRef`, `sessionPath`, and `agentId`; prefer `sessionId/sessionRef` for new scenarios.
 
 Pi SDK extension factories live in `extensions/*.js` and are loaded only for full-access plugins:
 
@@ -400,7 +400,7 @@ Use extensions for request-pipeline hooks such as provider request rewriting, co
 Provider plugins can use `defineProvider()` for TypeScript-friendly authoring, then export named provider fields from `providers/*.js`:
 
 ```js
-import { defineProvider } from '@hana/plugin-runtime';
+import { defineProvider } from '@lingxi/plugin-runtime';
 
 const provider = defineProvider({
   id: 'my-image-cli',

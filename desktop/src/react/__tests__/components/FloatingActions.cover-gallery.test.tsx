@@ -11,11 +11,11 @@ import { useStore, type StoreState } from '../../stores';
 import type { PlatformApi } from '../../types';
 
 const mocks = vi.hoisted(() => ({
-  hanaFetch: vi.fn(),
+  lingxiFetch: vi.fn(),
 }));
 
 vi.mock('../../hooks/use-hana-fetch', () => ({
-  hanaFetch: mocks.hanaFetch,
+  lingxiFetch: mocks.lingxiFetch,
 }));
 
 describe('FloatingActions cover gallery', () => {
@@ -29,8 +29,8 @@ describe('FloatingActions cover gallery', () => {
         version: 'v-cover',
       })),
     } as unknown as PlatformApi;
-    mocks.hanaFetch.mockReset();
-    mocks.hanaFetch.mockImplementation(async (url: string) => {
+    mocks.lingxiFetch.mockReset();
+    mocks.lingxiFetch.mockImplementation(async (url: string) => {
       if (url.startsWith('/api/desk/beautify/status')) {
         return new Response(JSON.stringify({ available: true, enabled: true, agentId: 'agent-1' }), { status: 200 });
       }
@@ -95,7 +95,7 @@ describe('FloatingActions cover gallery', () => {
     fireEvent.click(screen.getByRole('button', { name: COVER_GALLERY_PRESETS[0].title }));
 
     await waitFor(() => {
-      expect(mocks.hanaFetch).toHaveBeenCalledWith(
+      expect(mocks.lingxiFetch).toHaveBeenCalledWith(
         '/api/desk/beautify/cover/preset/apply',
         expect.objectContaining({
           method: 'POST',
@@ -115,7 +115,7 @@ describe('FloatingActions cover gallery', () => {
   });
 
   it('keeps system cover actions visible when Agent generation is disabled', async () => {
-    mocks.hanaFetch.mockImplementation(async (url: string) => {
+    mocks.lingxiFetch.mockImplementation(async (url: string) => {
       if (url.startsWith('/api/desk/beautify/status')) {
         return new Response(JSON.stringify({
           systemCover: { available: true },
@@ -185,7 +185,7 @@ describe('FloatingActions cover gallery', () => {
   });
 
   it('does not start Agent generation when the generation menu item is disabled', async () => {
-    mocks.hanaFetch.mockImplementation(async (url: string) => {
+    mocks.lingxiFetch.mockImplementation(async (url: string) => {
       if (url.startsWith('/api/desk/beautify/status')) {
         return new Response(JSON.stringify({
           systemCover: { available: true },
@@ -213,7 +213,7 @@ describe('FloatingActions cover gallery', () => {
     expect(await screen.findByRole('tooltip')).toHaveTextContent('cover.agentGenerate.defaultModelMissing');
     fireEvent.click(generateButton);
 
-    expect(mocks.hanaFetch).not.toHaveBeenCalledWith(
+    expect(mocks.lingxiFetch).not.toHaveBeenCalledWith(
       '/api/desk/beautify/cover',
       expect.anything(),
     );
@@ -227,7 +227,7 @@ describe('FloatingActions cover gallery', () => {
     fireEvent.click(screen.getByText('cover.gallery.upload'));
 
     await waitFor(() => {
-      expect(mocks.hanaFetch).toHaveBeenCalledWith(
+      expect(mocks.lingxiFetch).toHaveBeenCalledWith(
         '/api/desk/beautify/cover/apply',
         expect.objectContaining({
           method: 'POST',
@@ -264,7 +264,7 @@ describe('FloatingActions cover gallery', () => {
     fireEvent.click(screen.getByRole('button', { name: COVER_GALLERY_PRESETS[0].title }));
 
     await waitFor(() => {
-      expect(mocks.hanaFetch).toHaveBeenCalledWith(
+      expect(mocks.lingxiFetch).toHaveBeenCalledWith(
         '/api/desk/beautify/cover/preset/apply',
         expect.objectContaining({
           method: 'POST',
@@ -310,7 +310,7 @@ describe('FloatingActions cover gallery', () => {
 
     await waitFor(() => {
       expect(window.platform?.readFileBase64).toHaveBeenCalledWith('/client/cover.png');
-      expect(mocks.hanaFetch).toHaveBeenCalledWith(
+      expect(mocks.lingxiFetch).toHaveBeenCalledWith(
         '/api/desk/beautify/cover/apply',
         expect.objectContaining({
           method: 'POST',

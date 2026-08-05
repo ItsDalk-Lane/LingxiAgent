@@ -75,7 +75,7 @@ describe('channel_new_message websocket routing', () => {
 
   it('appends a complete message event for the visible channel without reopening it', () => {
     const message = {
-      sender: 'hanako',
+      sender: 'lingxi',
       timestamp: '2026-05-07 17:01:00',
       body: 'new reply',
     };
@@ -83,7 +83,7 @@ describe('channel_new_message websocket routing', () => {
     handleServerMessage({
       type: 'channel_new_message',
       channelName: 'ch_crew',
-      sender: 'hanako',
+      sender: 'lingxi',
       message,
     });
 
@@ -101,7 +101,7 @@ describe('channel_new_message websocket routing', () => {
       ],
     } as never);
     const message = {
-      sender: 'hanako',
+      sender: 'lingxi',
       timestamp: '2026-05-07 17:01:00',
       body: 'new reply',
     };
@@ -109,7 +109,7 @@ describe('channel_new_message websocket routing', () => {
     handleServerMessage({
       type: 'channel_new_message',
       channelName: 'ch_crew',
-      sender: 'hanako',
+      sender: 'lingxi',
       message,
     });
 
@@ -124,7 +124,7 @@ describe('channel_new_message websocket routing', () => {
       value: 'hidden',
     });
     const message = {
-      sender: 'hanako',
+      sender: 'lingxi',
       timestamp: '2026-05-07 17:01:00',
       body: 'new reply',
     };
@@ -132,7 +132,7 @@ describe('channel_new_message websocket routing', () => {
     handleServerMessage({
       type: 'channel_new_message',
       channelName: 'ch_crew',
-      sender: 'hanako',
+      sender: 'lingxi',
       message,
     });
 
@@ -147,7 +147,7 @@ describe('channel_new_message websocket routing', () => {
       channels: [{ id: 'ch_crew', name: 'Crew' }],
     } as never);
     const message = {
-      sender: 'hanako',
+      sender: 'lingxi',
       timestamp: '2026-05-07 17:02:00',
       body: 'new channel message',
     };
@@ -155,7 +155,7 @@ describe('channel_new_message websocket routing', () => {
     handleServerMessage({
       type: 'channel_new_message',
       channelName: 'ch_new',
-      sender: 'hanako',
+      sender: 'lingxi',
       message,
     });
 
@@ -181,7 +181,7 @@ describe('channel_new_message websocket routing', () => {
     handleServerMessage({
       type: 'channel_new_message',
       channelName: 'ch_crew',
-      sender: 'hanako',
+      sender: 'lingxi',
     });
 
     expect(markChannelMessagesDirtyMock).toHaveBeenCalledWith('ch_crew');
@@ -221,7 +221,7 @@ describe('dm_new_message websocket routing', () => {
       currentTab: 'channels',
       currentAgentId: 'dana',
       agents: [
-        { id: 'alice', name: 'Alice', yuan: 'hanako', isPrimary: true },
+        { id: 'alice', name: 'Alice', yuan: 'lingxi', isPrimary: true },
         { id: 'bob', name: 'Bob', yuan: 'ming', isPrimary: false },
         { id: 'dana', name: 'Dana', yuan: 'ming', isPrimary: false },
       ],

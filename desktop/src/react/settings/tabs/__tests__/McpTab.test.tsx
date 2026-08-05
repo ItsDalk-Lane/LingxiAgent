@@ -65,8 +65,8 @@ describe('McpTab', () => {
       resolveState = resolve;
     }));
     useSettingsStore.setState({
-      currentAgentId: 'hanako',
-      agents: [{ id: 'hanako', name: 'Hanako', yuan: 'hanako', isPrimary: true }],
+      currentAgentId: 'lingxi',
+      agents: [{ id: 'lingxi', name: 'Hanako', yuan: 'lingxi', isPrimary: true }],
     });
 
     render(<McpTab />);
@@ -81,8 +81,8 @@ describe('McpTab', () => {
   it('offers the global defer settings on the tab itself, not inside a connector', async () => {
     apiMocks.loadMcpState.mockResolvedValue(state(true));
     useSettingsStore.setState({
-      currentAgentId: 'hanako',
-      agents: [{ id: 'hanako', name: 'Hanako', yuan: 'hanako', isPrimary: true }],
+      currentAgentId: 'lingxi',
+      agents: [{ id: 'lingxi', name: 'Hanako', yuan: 'lingxi', isPrimary: true }],
     });
 
     render(<McpTab />);
@@ -96,13 +96,13 @@ describe('McpTab', () => {
       .mockResolvedValueOnce(state(true));
     apiMocks.setMcpEnabled.mockResolvedValue(undefined);
     useSettingsStore.setState({
-      currentAgentId: 'hanako',
-      agents: [{ id: 'hanako', name: 'Hanako', yuan: 'hanako', isPrimary: true }],
+      currentAgentId: 'lingxi',
+      agents: [{ id: 'lingxi', name: 'Hanako', yuan: 'lingxi', isPrimary: true }],
     });
 
     render(<McpTab />);
 
-    await waitFor(() => expect(apiMocks.loadMcpState).toHaveBeenCalledWith('hanako'));
+    await waitFor(() => expect(apiMocks.loadMcpState).toHaveBeenCalledWith('lingxi'));
     fireEvent.click(screen.getByText('settings.mcp.masterName'));
 
     await waitFor(() => expect(apiMocks.setMcpEnabled).toHaveBeenCalledWith(true));
@@ -114,13 +114,13 @@ describe('McpTab', () => {
       .mockResolvedValueOnce(state(true));
     apiMocks.setMcpEnabled.mockResolvedValue(undefined);
     useSettingsStore.setState({
-      currentAgentId: 'hanako',
-      agents: [{ id: 'hanako', name: 'Hanako', yuan: 'hanako', isPrimary: true }],
+      currentAgentId: 'lingxi',
+      agents: [{ id: 'lingxi', name: 'Hanako', yuan: 'lingxi', isPrimary: true }],
     });
 
     render(<McpTab />);
 
-    await waitFor(() => expect(apiMocks.loadMcpState).toHaveBeenCalledWith('hanako'));
+    await waitFor(() => expect(apiMocks.loadMcpState).toHaveBeenCalledWith('lingxi'));
     fireEvent.click(screen.getByRole('switch', { name: 'common.off' }));
 
     await waitFor(() => expect(apiMocks.setMcpEnabled).toHaveBeenCalledTimes(1));
@@ -138,8 +138,8 @@ describe('McpTab', () => {
     };
     apiMocks.loadMcpState.mockResolvedValue(state(true, [connector]));
     useSettingsStore.setState({
-      currentAgentId: 'hanako',
-      agents: [{ id: 'hanako', name: 'Hanako', yuan: 'hanako', isPrimary: true }],
+      currentAgentId: 'lingxi',
+      agents: [{ id: 'lingxi', name: 'Hanako', yuan: 'lingxi', isPrimary: true }],
     });
     const overlayRoot = document.createElement('div');
     document.body.append(overlayRoot);

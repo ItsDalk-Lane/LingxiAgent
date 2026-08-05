@@ -20,15 +20,15 @@ function makeTmpDir() {
 }
 
 /**
- * Writes a `current` renderer pointer for `channel` under `hanaHome`. When
+ * Writes a `current` renderer pointer for `channel` under `lingxiHome`. When
  * `withReceipt` is true the versioned directory + matching `.verified`
  * receipt are also written, so `activation.resolveBoot` judges it valid;
  * when false the pointer file exists but nothing backs it (simulating an
  * externally deleted/corrupted version directory).
  */
-async function writeRendererPointer(hanaHome, channel, { version = "9.9.9", withReceipt }: { version?: string; withReceipt: boolean }) {
+async function writeRendererPointer(lingxiHome, channel, { version = "9.9.9", withReceipt }: { version?: string; withReceipt: boolean }) {
   const rendererChannel = rendererPointerChannel(channel);
-  const versionDir = path.join(hanaHome, "artifacts", "renderer", version);
+  const versionDir = path.join(lingxiHome, "artifacts", "renderer", version);
   const sha256 = "0".repeat(64);
   if (withReceipt) {
     fs.mkdirSync(versionDir, { recursive: true });
@@ -39,7 +39,7 @@ async function writeRendererPointer(hanaHome, channel, { version = "9.9.9", with
       "utf-8",
     );
   }
-  await pointerStore.writePointer(hanaHome, rendererChannel, "current", {
+  await pointerStore.writePointer(lingxiHome, rendererChannel, "current", {
     train: 1,
     channel: rendererChannel,
     kind: "renderer",
@@ -54,21 +54,21 @@ async function writeRendererPointer(hanaHome, channel, { version = "9.9.9", with
 
 describe("CLI server runner", () => {
   let tmpDir = null;
-  let hanaHome = null;
+  let lingxiHome = null;
 
   afterEach(() => {
     if (tmpDir) fs.rmSync(tmpDir, { recursive: true, force: true });
-    if (hanaHome) fs.rmSync(hanaHome, { recursive: true, force: true });
+    if (lingxiHome) fs.rmSync(lingxiHome, { recursive: true, force: true });
     tmpDir = null;
-    hanaHome = null;
+    lingxiHome = null;
   });
 
   it("runs the source server entry in development", async () => {
     tmpDir = makeTmpDir();
-    hanaHome = makeTmpDir(); // isolated HANA_HOME — never touch the real user home's pointers
+    lingxiHome = makeTmpDir(); // isolated LINGXI_HOME — never touch the real user home's pointers
     const spec = await resolveServerSpawnSpec({
       projectRoot: tmpDir,
-      env: { HANA_HOME: hanaHome },
+      env: { LINGXI_HOME: lingxiHome },
       extraArgs: ["--chat"],
     });
 
@@ -77,69 +77,69 @@ describe("CLI server runner", () => {
       command: process.execPath,
     });
     expect(spec.args).toEqual([path.join(tmpDir, "server", "main-full.ts"), "--chat"]);
-    expect(spec.env.HANA_RENDERER_DIST).toBeUndefined();
+    expect(spec.env.LINGXI_RENDERER_DIST).toBeUndefined();
   });
 
-  it("runs the packaged bootstrap entry when HANA_ROOT is available", async () => {
+  it("runs the packaged bootstrap entry when LINGXI_ROOT is available", async () => {
     tmpDir = makeTmpDir();
-    hanaHome = makeTmpDir();
+    lingxiHome = makeTmpDir();
     fs.mkdirSync(path.join(tmpDir, "bundle"), { recursive: true });
     fs.writeFileSync(path.join(tmpDir, "bootstrap.js"), "", "utf-8");
     fs.writeFileSync(path.join(tmpDir, "bundle", "index.js"), "", "utf-8");
 
     const spec = await resolveServerSpawnSpec({
       projectRoot: "/source/project",
-      env: { HANA_ROOT: tmpDir, HANA_HOME: hanaHome },
+      env: { LINGXI_ROOT: tmpDir, LINGXI_HOME: lingxiHome },
       extraArgs: [],
     });
 
     expect(spec.mode).toBe("packaged");
     expect(spec.args).toEqual([path.join(tmpDir, "bootstrap.js")]);
-    expect(spec.env.HANA_ROOT).toBe(tmpDir);
-    expect(spec.env.HANA_SERVER_ENTRY).toBe(path.join(tmpDir, "bundle", "index.js"));
+    expect(spec.env.LINGXI_ROOT).toBe(tmpDir);
+    expect(spec.env.LINGXI_SERVER_ENTRY).toBe(path.join(tmpDir, "bundle", "index.js"));
   });
 
-  it("injects HANA_RENDERER_DIST into the spawn env when a valid renderer pointer exists", async () => {
+  it("injects LINGXI_RENDERER_DIST into the spawn env when a valid renderer pointer exists", async () => {
     tmpDir = makeTmpDir();
-    hanaHome = makeTmpDir();
-    const versionDir = await writeRendererPointer(hanaHome, "stable", { withReceipt: true });
+    lingxiHome = makeTmpDir();
+    const versionDir = await writeRendererPointer(lingxiHome, "stable", { withReceipt: true });
 
     const spec = await resolveServerSpawnSpec({
       projectRoot: tmpDir,
-      env: { HANA_HOME: hanaHome },
+      env: { LINGXI_HOME: lingxiHome },
       extraArgs: [],
     });
 
-    expect(spec.env.HANA_RENDERER_DIST).toBe(versionDir);
+    expect(spec.env.LINGXI_RENDERER_DIST).toBe(versionDir);
     expect(spec.rendererDist).toEqual({ distDir: versionDir, version: "9.9.9", valid: true });
   });
 });
 
-function writeServerInfoFile(hanaHome, info) {
-  fs.mkdirSync(hanaHome, { recursive: true });
-  fs.writeFileSync(path.join(hanaHome, "server-info.json"), JSON.stringify(info), "utf-8");
+function writeServerInfoFile(lingxiHome, info) {
+  fs.mkdirSync(lingxiHome, { recursive: true });
+  fs.writeFileSync(path.join(lingxiHome, "server-info.json"), JSON.stringify(info), "utf-8");
 }
 
 describe("guardAgainstForeignServer (CLI pre-spawn 同宅互斥预判)", () => {
-  let hanaHome = null;
+  let lingxiHome = null;
 
   afterEach(() => {
-    if (hanaHome) fs.rmSync(hanaHome, { recursive: true, force: true });
-    hanaHome = null;
+    if (lingxiHome) fs.rmSync(lingxiHome, { recursive: true, force: true });
+    lingxiHome = null;
   });
 
   it("does not block when no server-info.json exists", async () => {
-    hanaHome = makeTmpDir();
-    const result = await guardAgainstForeignServer({ hanaHome });
+    lingxiHome = makeTmpDir();
+    const result = await guardAgainstForeignServer({ lingxiHome });
     expect(result).toEqual({ blocked: false, message: null });
   });
 
   it("blocks when the probe reports alive-same-home, with a message naming ownerKind/version/pid", async () => {
-    hanaHome = makeTmpDir();
-    writeServerInfoFile(hanaHome, { port: 12345, token: "tok", ownerKind: "desktop", version: "0.393.0", pid: 555 });
+    lingxiHome = makeTmpDir();
+    writeServerInfoFile(lingxiHome, { port: 12345, token: "tok", ownerKind: "desktop", version: "0.393.0", pid: 555 });
     const probeImpl = async () => ({ status: "alive-same-home" as const });
 
-    const result = await guardAgainstForeignServer({ hanaHome, probeImpl });
+    const result = await guardAgainstForeignServer({ lingxiHome, probeImpl });
 
     expect(result.blocked).toBe(true);
     expect(result.message).toContain("desktop");
@@ -148,51 +148,51 @@ describe("guardAgainstForeignServer (CLI pre-spawn 同宅互斥预判)", () => {
   });
 
   it("blocks when the probe reports alive-unauthorized", async () => {
-    hanaHome = makeTmpDir();
-    writeServerInfoFile(hanaHome, { port: 12345, token: "tok", ownerKind: "standalone", pid: 1 });
+    lingxiHome = makeTmpDir();
+    writeServerInfoFile(lingxiHome, { port: 12345, token: "tok", ownerKind: "standalone", pid: 1 });
     const probeImpl = async () => ({ status: "alive-unauthorized" as const });
 
-    const result = await guardAgainstForeignServer({ hanaHome, probeImpl });
+    const result = await guardAgainstForeignServer({ lingxiHome, probeImpl });
     expect(result.blocked).toBe(true);
   });
 
   it("does not block when the probe reports not-hana or dead — self-cleaning cases", async () => {
-    hanaHome = makeTmpDir();
-    writeServerInfoFile(hanaHome, { port: 12345, token: "tok" });
+    lingxiHome = makeTmpDir();
+    writeServerInfoFile(lingxiHome, { port: 12345, token: "tok" });
 
-    const deadResult = await guardAgainstForeignServer({ hanaHome, probeImpl: async () => ({ status: "dead" as const }) });
+    const deadResult = await guardAgainstForeignServer({ lingxiHome, probeImpl: async () => ({ status: "dead" as const }) });
     expect(deadResult).toEqual({ blocked: false, message: null });
 
-    const notHanaResult = await guardAgainstForeignServer({
-      hanaHome,
+    const notLingxiResult = await guardAgainstForeignServer({
+      lingxiHome,
       probeImpl: async () => ({ status: "not-hana" as const, detail: "whatever" }),
     });
-    expect(notHanaResult).toEqual({ blocked: false, message: null });
+    expect(notLingxiResult).toEqual({ blocked: false, message: null });
   });
 
   it("ignores whether the recorded pid looks alive — the probe result is the sole source of truth", async () => {
-    hanaHome = makeTmpDir();
+    lingxiHome = makeTmpDir();
     // pid 999999999 is virtually guaranteed not to be alive on this machine,
     // yet the probe (not the pid check) still decides the outcome here.
-    writeServerInfoFile(hanaHome, { port: 12345, token: "tok", ownerKind: "standalone", pid: 999999999 });
+    writeServerInfoFile(lingxiHome, { port: 12345, token: "tok", ownerKind: "standalone", pid: 999999999 });
     const probeImpl = async () => ({ status: "alive-same-home" as const });
 
-    const result = await guardAgainstForeignServer({ hanaHome, probeImpl });
+    const result = await guardAgainstForeignServer({ lingxiHome, probeImpl });
     expect(result.blocked).toBe(true);
   });
 });
 
 describe("spawnServerForeground — blocked path never spawns", () => {
-  let hanaHome = null;
+  let lingxiHome = null;
 
   afterEach(() => {
-    if (hanaHome) fs.rmSync(hanaHome, { recursive: true, force: true });
-    hanaHome = null;
+    if (lingxiHome) fs.rmSync(lingxiHome, { recursive: true, force: true });
+    lingxiHome = null;
   });
 
   it("exits 1 and never resolves resolveServerSpawnSpec/spawn when a foreign server is detected", async () => {
-    hanaHome = makeTmpDir();
-    writeServerInfoFile(hanaHome, { port: 12345, token: "tok", ownerKind: "standalone", version: "0.393.0", pid: 1 });
+    lingxiHome = makeTmpDir();
+    writeServerInfoFile(lingxiHome, { port: 12345, token: "tok", ownerKind: "standalone", version: "0.393.0", pid: 1 });
     const probeImpl = async () => ({ status: "alive-same-home" as const });
     const exitCalls: any[] = [];
     const exit = ((code?: number) => { exitCalls.push(code); return undefined as any; }) as any;
@@ -200,7 +200,7 @@ describe("spawnServerForeground — blocked path never spawns", () => {
 
     const result = await spawnServerForeground({
       projectRoot: "/nonexistent/project/root/that/must/never/be/touched",
-      env: { HANA_HOME: hanaHome },
+      env: { LINGXI_HOME: lingxiHome },
       probeImpl,
       exit,
     });
@@ -217,48 +217,48 @@ describe("buildServeSpawnEnv", () => {
     const warn = vi.fn();
     const result = buildServeSpawnEnv({ env: { FOO: "bar" }, allowDataDowngrade: false, warn });
     expect(result).toEqual({ FOO: "bar" });
-    expect(result.HANA_ALLOW_DATA_DOWNGRADE).toBeUndefined();
+    expect(result.LINGXI_ALLOW_DATA_DOWNGRADE).toBeUndefined();
     expect(warn).not.toHaveBeenCalled();
   });
 
-  it("sets HANA_ALLOW_DATA_DOWNGRADE=1 and warns when allowDataDowngrade is true", () => {
+  it("sets LINGXI_ALLOW_DATA_DOWNGRADE=1 and warns when allowDataDowngrade is true", () => {
     const warn = vi.fn();
     const result = buildServeSpawnEnv({ env: { FOO: "bar" }, allowDataDowngrade: true, warn });
-    expect(result).toEqual({ FOO: "bar", HANA_ALLOW_DATA_DOWNGRADE: "1" });
+    expect(result).toEqual({ FOO: "bar", LINGXI_ALLOW_DATA_DOWNGRADE: "1" });
     expect(warn).toHaveBeenCalledTimes(1);
     expect(warn.mock.calls[0][0]).toContain("--allow-data-downgrade");
   });
 });
 
 describe("resolveRendererDistPointer (CLI pointer resolution layer)", () => {
-  let hanaHome = null;
+  let lingxiHome = null;
 
   afterEach(() => {
-    if (hanaHome) fs.rmSync(hanaHome, { recursive: true, force: true });
-    hanaHome = null;
+    if (lingxiHome) fs.rmSync(lingxiHome, { recursive: true, force: true });
+    lingxiHome = null;
   });
 
   it("pointer present and validated -> returns the versionDir, valid: true", async () => {
-    hanaHome = makeTmpDir();
-    const versionDir = await writeRendererPointer(hanaHome, "stable", { withReceipt: true });
+    lingxiHome = makeTmpDir();
+    const versionDir = await writeRendererPointer(lingxiHome, "stable", { withReceipt: true });
 
-    const result = await resolveRendererDistPointer({ hanaHome, channel: "stable" });
+    const result = await resolveRendererDistPointer({ lingxiHome, channel: "stable" });
     expect(result).toEqual({ distDir: versionDir, version: "9.9.9", valid: true });
   });
 
   it("no pointer at all (never bundle pull'd) -> returns null, caller must not set the env var", async () => {
-    hanaHome = makeTmpDir();
+    lingxiHome = makeTmpDir();
 
-    const result = await resolveRendererDistPointer({ hanaHome, channel: "stable" });
+    const result = await resolveRendererDistPointer({ lingxiHome, channel: "stable" });
     expect(result).toBeNull();
   });
 
   it("pointer present but its versionDir is missing/corrupted -> still returns the (invalid) versionDir, not null", async () => {
-    hanaHome = makeTmpDir();
-    const versionDir = await writeRendererPointer(hanaHome, "stable", { withReceipt: false });
+    lingxiHome = makeTmpDir();
+    const versionDir = await writeRendererPointer(lingxiHome, "stable", { withReceipt: false });
 
-    const result = await resolveRendererDistPointer({ hanaHome, channel: "stable" });
-    // Damage must stay visible: the caller sets HANA_RENDERER_DIST to this
+    const result = await resolveRendererDistPointer({ lingxiHome, channel: "stable" });
+    // Damage must stay visible: the caller sets LINGXI_RENDERER_DIST to this
     // broken path anyway so the server lands in its explicit error mode,
     // instead of this function silently reporting "nothing to inject"
     // (which would masquerade as the guide-mode "never installed" case).
@@ -266,10 +266,10 @@ describe("resolveRendererDistPointer (CLI pointer resolution layer)", () => {
   });
 
   it("channels are namespaced independently (a beta pointer does not satisfy a stable resolve)", async () => {
-    hanaHome = makeTmpDir();
-    await writeRendererPointer(hanaHome, "beta", { withReceipt: true });
+    lingxiHome = makeTmpDir();
+    await writeRendererPointer(lingxiHome, "beta", { withReceipt: true });
 
-    const result = await resolveRendererDistPointer({ hanaHome, channel: "stable" });
+    const result = await resolveRendererDistPointer({ lingxiHome, channel: "stable" });
     expect(result).toBeNull();
   });
 });

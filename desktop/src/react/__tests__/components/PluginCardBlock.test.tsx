@@ -10,7 +10,7 @@ import {
   PLUGIN_UI_CAPABILITY,
   PLUGIN_UI_PROTOCOL,
   PLUGIN_UI_PROTOCOL_VERSION,
-} from '@hana/plugin-protocol';
+} from '@lingxi/plugin-protocol';
 
 vi.mock('../../hooks/use-plugin-surface-url', () => ({
   usePluginSurfaceUrl: (routeUrl: string | null) => ({
@@ -109,7 +109,7 @@ describe('PluginCardBlock', () => {
           protocol: PLUGIN_UI_PROTOCOL,
           version: PLUGIN_UI_PROTOCOL_VERSION,
           kind: 'event',
-          type: 'hana.ready',
+          type: 'lingxi.ready',
         },
         origin: 'http://127.0.0.1:3210',
         source: trustedWindow,

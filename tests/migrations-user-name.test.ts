@@ -64,7 +64,7 @@ describe("migration #51: user name to global preferences", () => {
 
   function run(prefs) {
     runMigrations({
-      hanakoHome: tmpDir,
+      lingxiHome: tmpDir,
       agentsDir,
       prefs,
       providerRegistry: makeRegistry(),

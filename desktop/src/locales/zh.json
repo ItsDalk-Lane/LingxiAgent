@@ -127,7 +127,7 @@
   },
   "announcement": {
     "title": "更新完成 · v{version}",
-    "fallbackBody": "HanaAgent 已更新至 v{version}。",
+    "fallbackBody": "灵犀 已更新至 v{version}。",
     "confirm": "知道了"
   },
   "skills": {
@@ -513,9 +513,9 @@
   },
   "yuan": {
     "types": {
-      "hanako": {
+      "lingxi": {
         "label": "均衡的助手",
-        "avatar": "Hanako.png"
+        "avatar": "Lingxi.png"
       },
       "butter": {
         "label": "更富有感情",
@@ -1406,7 +1406,7 @@
         "scheduledTaskCompletion": "计划任务完成",
         "patrolCompletion": "巡检完成",
         "never": "从不",
-        "whenUnfocused": "焦点不在 HanaAgent 时",
+        "whenUnfocused": "焦点不在 灵犀 时",
         "whenSessionUnfocused": "焦点不在该聊天时",
         "always": "总是"
       }
@@ -1422,7 +1422,7 @@
       "updateChecking": "正在检查更新…",
       "updateDownloading": "{agentName}正在准备新家",
       "updateReadyInstall": "v{version} 已就绪",
-      "updateInstalling": "正在安装更新，HanaAgent 会自动重启…",
+      "updateInstalling": "正在安装更新，灵犀 会自动重启…",
       "updateInstallManualHint": "点「重启更新」后安装，直接退出不会自动安装",
       "updateInstall": "重启更新",
       "updateInstallNow": "重启立即更新",
@@ -1449,7 +1449,7 @@
       "updateManifestReleasedAtViaMirror": "货架清单签发于 {date}（经备用源）",
       "updateCheckBtn": "检查更新",
       "updateRetryBtn": "重试",
-      "updateNeedInstall": "请先将 HanaAgent 移动到应用程序文件夹",
+      "updateNeedInstall": "请先将 灵犀 移动到应用程序文件夹",
       "updateDiskSpace": "磁盘空间不足，无法下载更新",
       "updateDigestCta": "此次更新你将获得",
       "updateDigestTitle": "此次更新你将获得",
@@ -1488,7 +1488,7 @@
       "mobileAccess": "手机访问",
       "desktopAccess": "电脑访问",
       "lanToggle": "允许局域网设备访问",
-      "lanHint": "开启后，同一局域网内的手机和电脑可以访问这台 HanaAgent Server",
+      "lanHint": "开启后，同一局域网内的手机和电脑可以访问这台 灵犀 Server",
       "port": "固定端口",
       "portHint": "用于收藏夹和二维码；修改后需要重启 Hana 生效",
       "mobileUrl": "手机访问地址",
@@ -1523,7 +1523,7 @@
       "desktopKeyFailed": "生成失败",
       "connectLanServer": "连接局域网服务器",
       "remoteServerUrl": "服务器地址",
-      "remoteServerUrlHint": "填入另一台电脑或 NAS 上 HanaAgent Server 的地址",
+      "remoteServerUrlHint": "填入另一台电脑或 NAS 上 灵犀 Server 的地址",
       "remoteServerKey": "访问密钥",
       "remoteServerKeyHint": "填入那台服务器设置页生成的电脑访问密钥",
       "remoteServerConnected": "已连接局域网服务器",
@@ -2912,7 +2912,7 @@
     "skillMissingName": "SKILL.md 中缺少 name 字段",
     "skillNameInvalid": "技能名称无效（\"{name}\"）。仅允许字母、数字、下划线和短横线。",
     "skillPathMustBeAbsolute": "路径必须是绝对路径: {path}",
-    "skillCannotAddSelfDir": "不能添加 HanaAgent 自身的技能目录",
+    "skillCannotAddSelfDir": "不能添加 灵犀 自身的技能目录",
     "skillInvalidName": "无效的技能名称",
     "skillExternalCannotDelete": "外部兼容技能无法从此处删除",
     "skillNotExists": "技能不存在",
@@ -3116,7 +3116,7 @@
   },
   "main": {
     "tray": {
-      "show": "显示 HanaAgent",
+      "show": "显示 灵犀",
       "settings": "设置",
       "quit": "退出",
       "repairArtifacts": "修复组件…"
@@ -3125,22 +3125,22 @@
       "selectFolder": "选择工作文件夹",
       "selectSkill": "选择技能",
       "selectPlugin": "选择插件",
-      "launchFailedTitle": "HanaAgent 启动失败",
-      "launchFailedBody": "HanaAgent v{version}\n\n{detail}\n\n详细日志已保存到：\n{logPath}\n\n请将此截图或日志文件发送给开发者。",
-      "serverRestartFailed": "HanaAgent v{version}\n\nServer 崩溃后重启失败。\n{error}\n\n请重新启动应用。",
-      "serverMultipleCrash": "HanaAgent v{version}\n\nServer 多次崩溃 ({reason})。\n\n请重新启动应用。",
+      "launchFailedTitle": "灵犀 启动失败",
+      "launchFailedBody": "灵犀 v{version}\n\n{detail}\n\n详细日志已保存到：\n{logPath}\n\n请将此截图或日志文件发送给开发者。",
+      "serverRestartFailed": "灵犀 v{version}\n\nServer 崩溃后重启失败。\n{error}\n\n请重新启动应用。",
+      "serverMultipleCrash": "灵犀 v{version}\n\nServer 多次崩溃 ({reason})。\n\n请重新启动应用。",
       "serverStartTimeout": "Server 启动超时",
       "serverKilledBySignal": "Server 被信号终止 ({signal})",
       "serverExitedWithCode": "Server 退出，code: {code}",
-      "serverFilesNotReady": "自动更新刚完成，新版本文件还在落地（缺少 {missing}），已等待 {waited}s 仍未就绪。请稍后重新启动 HanaAgent。",
-      "serverModuleMissing": "Server 启动时找不到模块 {module}。\n通常是自动更新刚完成、新版本文件还在写入磁盘导致的。\n建议：等待 1-2 分钟后重新启动 HanaAgent；若反复出现，请前往 GitHub 反馈。",
-      "installFailedTitle": "HanaAgent 更新",
-      "installFailedBody": "更新安装失败：\n{error}\n\n请重启 HanaAgent 后重试，或前往设置页面手动检查更新。",
+      "serverFilesNotReady": "自动更新刚完成，新版本文件还在落地（缺少 {missing}），已等待 {waited}s 仍未就绪。请稍后重新启动 灵犀。",
+      "serverModuleMissing": "Server 启动时找不到模块 {module}。\n通常是自动更新刚完成、新版本文件还在写入磁盘导致的。\n建议：等待 1-2 分钟后重新启动 灵犀；若反复出现，请前往 GitHub 反馈。",
+      "installFailedTitle": "灵犀 更新",
+      "installFailedBody": "更新安装失败：\n{error}\n\n请重启 灵犀 后重试，或前往设置页面手动检查更新。",
       "repairArtifactsTitle": "修复组件",
-      "repairArtifactsBody": "此操作会把 HanaAgent 的应用组件重置为安装包自带的版本，并重启应用。你的数据（助手、会话、设置）不受影响。",
+      "repairArtifactsBody": "此操作会把 灵犀 的应用组件重置为安装包自带的版本，并重启应用。你的数据（助手、会话、设置）不受影响。",
       "repairArtifactsConfirm": "修复并重启",
       "repairArtifactsCancel": "取消",
-      "trainUpdateApplyFailedBody": "HanaAgent v{version}\n\n更新应用失败：\n{error}\n\n请重新启动应用。"
+      "trainUpdateApplyFailedBody": "灵犀 v{version}\n\n更新应用失败：\n{error}\n\n请重新启动应用。"
     },
     "notification": {
       "ready": "通知已就绪",
@@ -3240,7 +3240,7 @@
     "inputHelp": "输入 /help 查看命令列表"
   },
   "sandbox": {
-    "blocked": "[安全策略] {reason}\n\n此操作被 HanaAgent 的沙盒安全策略阻止，表示命令越过了路径或权限边界。先检查当前工作台、具体路径写法，以及目标文件是否本来就应该放在允许的工作台或 session 路径内。请向用户说明被拦截的路径和原因；只有用户明确决定时，再讨论是否修改沙盒设置。",
+    "blocked": "[安全策略] {reason}\n\n此操作被 灵犀 的沙盒安全策略阻止，表示命令越过了路径或权限边界。先检查当前工作台、具体路径写法，以及目标文件是否本来就应该放在允许的工作台或 session 路径内。请向用户说明被拦截的路径和原因；只有用户明确决定时，再讨论是否修改沙盒设置。",
     "blockedNeedsEscalation": "[安全策略] {reason}\n\n此命令在沙盒模式下被拦截。如果它对当前任务重要且为只读查询，请带一句话 justification 用 sandbox_permissions=\"require_escalated\" 重新执行，等待用户审批。",
     "noSudo": "禁止使用 sudo",
     "noSu": "禁止使用 su 切换用户",
@@ -3440,7 +3440,7 @@
       "available": "Hana 有新版本可用",
       "reload": "刷新"
     },
-    "startupFailed": "HanaAgent 启动失败"
+    "startupFailed": "灵犀 启动失败"
   },
   "approval": {
     "toolAction": {
@@ -3523,7 +3523,7 @@
       "timezone": "时区",
       "timezoneDesc": "IANA 时区（如 Asia/Shanghai）",
       "bridgeMediaPublicBaseUrl": "Bridge 文件公网 URL",
-      "bridgeMediaPublicBaseUrlDesc": "外部平台拉取本地暂存文件时使用的公网 HTTP/HTTPS 基址，通常由反向代理或隧道提供。留空则回退到 HANA_BRIDGE_PUBLIC_BASE_URL。",
+      "bridgeMediaPublicBaseUrlDesc": "外部平台拉取本地暂存文件时使用的公网 HTTP/HTTPS 基址，通常由反向代理或隧道提供。留空则回退到 LINGXI_BRIDGE_PUBLIC_BASE_URL。",
       "computerUse": "Computer Use",
       "computerUseDesc": "开启后，新对话会向主 Agent 暴露 computer 工具；关闭后新对话不可见，旧对话若调用会被拒绝。",
       "thinkingBudget": "思考深度",

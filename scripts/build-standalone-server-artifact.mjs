@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Build the self-contained Windows HanaCore archive published alongside the
+ * Build the self-contained Windows LingxiCore archive published alongside the
  * desktop installer.
  *
  * This is deliberately a second packaging boundary. The existing
@@ -24,7 +24,7 @@ const activation = require("../shared/artifact-core/activation.cjs");
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 export const ROOT = path.resolve(__dirname, "..");
-export const STANDALONE_LAYOUT_ROOT = "HanaCore";
+export const STANDALONE_LAYOUT_ROOT = "LingxiCore";
 export const STANDALONE_PLATFORM = "win32";
 export const STANDALONE_ARCH = "x64";
 
@@ -79,7 +79,7 @@ export function standaloneArtifactNames(version, arch = STANDALONE_ARCH) {
   if (arch !== STANDALONE_ARCH) {
     throw new Error(`[standalone] unsupported Windows architecture ${arch}; only ${STANDALONE_ARCH} is published`);
   }
-  const stem = `HanaCore-${version}-Windows-${arch}`;
+  const stem = `LingxiCore-${version}-Windows-${arch}`;
   const archiveName = `${stem}.tar.gz`;
   if (archiveName.startsWith("server-")) {
     throw new Error(`[standalone] archive name must never overlap the OTA server-* namespace: ${archiveName}`);
@@ -94,9 +94,9 @@ export function standaloneWrapperContents() {
   const common = [
     "@echo off",
     "setlocal",
-    'set "HANA_ROOT=%~dp0server"',
-    'set "HANA_SERVER_ENTRY=%~dp0server\\bundle\\index.js"',
-    'set "HANA_WIN32_SANDBOX_HELPER=%~dp0sandbox\\windows\\hana-win-sandbox.exe"',
+    'set "LINGXI_ROOT=%~dp0server"',
+    'set "LINGXI_SERVER_ENTRY=%~dp0server\\bundle\\index.js"',
+    'set "LINGXI_WIN32_SANDBOX_HELPER=%~dp0sandbox\\windows\\lingxi-win-sandbox.exe"',
     'set "PATH=%~dp0git\\cmd;%~dp0git\\usr\\bin;%~dp0git\\mingw64\\bin;%PATH%"',
   ];
   return {
@@ -159,7 +159,7 @@ export async function buildWindowsStandaloneArtifact(opts = {}) {
   const serverDir = path.resolve(opts.serverDir ?? path.join(rootDir, "dist-server", `win-${arch}`));
   const gitDir = path.resolve(opts.gitDir ?? path.join(rootDir, "vendor", "mingit"));
   const helperPath = path.resolve(
-    opts.helperPath ?? path.join(rootDir, "dist-sandbox", `win-${arch}`, "hana-win-sandbox.exe"),
+    opts.helperPath ?? path.join(rootDir, "dist-sandbox", `win-${arch}`, "lingxi-win-sandbox.exe"),
   );
   const artifactOutDir = path.resolve(opts.artifactOutDir ?? path.join(rootDir, "dist-standalone"));
   const log = opts.log ?? console.log;
@@ -207,7 +207,7 @@ export async function buildWindowsStandaloneArtifact(opts = {}) {
       dereference: false,
       preserveTimestamps: true,
     });
-    const stagedHelper = path.join(layoutRoot, "sandbox", "windows", "hana-win-sandbox.exe");
+    const stagedHelper = path.join(layoutRoot, "sandbox", "windows", "lingxi-win-sandbox.exe");
     fs.mkdirSync(path.dirname(stagedHelper), { recursive: true });
     fs.copyFileSync(helperPath, stagedHelper);
 
@@ -230,7 +230,7 @@ export async function buildWindowsStandaloneArtifact(opts = {}) {
         root: STANDALONE_LAYOUT_ROOT,
         server: `${STANDALONE_LAYOUT_ROOT}/server`,
         git: `${STANDALONE_LAYOUT_ROOT}/git`,
-        sandboxHelper: `${STANDALONE_LAYOUT_ROOT}/sandbox/windows/hana-win-sandbox.exe`,
+        sandboxHelper: `${STANDALONE_LAYOUT_ROOT}/sandbox/windows/lingxi-win-sandbox.exe`,
       },
       runtime: { minGitVersion: MINGIT_VERSION },
     };

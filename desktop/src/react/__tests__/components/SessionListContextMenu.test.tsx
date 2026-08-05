@@ -7,7 +7,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import fs from 'node:fs';
 import path from 'node:path';
 
-const hanaFetchMock = vi.fn();
+const lingxiFetchMock = vi.fn();
 const switchSessionMock = vi.fn();
 const archiveSessionMock = vi.fn();
 const renameSessionMock = vi.fn();
@@ -32,8 +32,8 @@ const localServerConnection = {
 };
 
 vi.mock('../../hooks/use-hana-fetch', () => ({
-  hanaFetch: (...args: unknown[]) => hanaFetchMock(...args),
-  hanaUrl: (p: string) => p,
+  lingxiFetch: (...args: unknown[]) => lingxiFetchMock(...args),
+  lingxiUrl: (p: string) => p,
 }));
 
 vi.mock('../../stores/session-actions', () => ({
@@ -149,8 +149,8 @@ describe('SessionList context menu', () => {
       if (key === 'yuan.types') return {};
       return key;
     }) as typeof globalThis.t;
-    hanaFetchMock.mockReset();
-    hanaFetchMock.mockImplementation(async (url: string) => {
+    lingxiFetchMock.mockReset();
+    lingxiFetchMock.mockImplementation(async (url: string) => {
       if (url === '/api/browser/session-states') return jsonResponse({});
       if (url === '/api/browser/sessions') return jsonResponse({});
       if (url.startsWith('/api/sessions/summary')) {
@@ -197,7 +197,7 @@ describe('SessionList context menu', () => {
 
     fireEvent.click(screen.getByText('摘要'));
     expect(screen.queryByTestId('session-summary-card')).not.toBeInTheDocument();
-    expect(hanaFetchMock).not.toHaveBeenCalledWith(
+    expect(lingxiFetchMock).not.toHaveBeenCalledWith(
       '/api/sessions/summary?path=%2Ftmp%2Fagents%2Fhana%2Fsessions%2Fno-summary.jsonl',
     );
   });
@@ -214,7 +214,7 @@ describe('SessionList context menu', () => {
     expect(screen.getByText('摘要')).toBeInTheDocument();
     expect(menu?.querySelector('.context-menu-divider')).toBeNull();
     expect(screen.queryByTestId('session-summary-card')).not.toBeInTheDocument();
-    expect(hanaFetchMock).not.toHaveBeenCalledWith(
+    expect(lingxiFetchMock).not.toHaveBeenCalledWith(
       '/api/sessions/summary?path=%2Ftmp%2Fagents%2Fhana%2Fsessions%2Fwith-summary.jsonl',
     );
 
@@ -222,7 +222,7 @@ describe('SessionList context menu', () => {
 
     expect(await screen.findByTestId('session-summary-card')).toHaveAttribute('data-scrollable', 'true');
     expect(await screen.findByText(/用户在做记忆系统/)).toBeInTheDocument();
-    expect(hanaFetchMock).toHaveBeenCalledWith(
+    expect(lingxiFetchMock).toHaveBeenCalledWith(
       '/api/sessions/summary?path=%2Ftmp%2Fagents%2Fhana%2Fsessions%2Fwith-summary.jsonl',
     );
   });
@@ -307,7 +307,7 @@ describe('SessionList context menu', () => {
         unavailableReason: null,
       },
     };
-    hanaFetchMock.mockImplementation(async (url: string) => {
+    lingxiFetchMock.mockImplementation(async (url: string) => {
       if (url === '/api/browser/session-states') return jsonResponse(browserStates);
       if (url === '/api/browser/open-session') return jsonResponse({ ok: true });
       return jsonResponse({});
@@ -318,7 +318,7 @@ describe('SessionList context menu', () => {
     fireEvent.click(await screen.findByRole('button', { name: 'browser.open' }));
 
     await waitFor(() => {
-      expect(hanaFetchMock).toHaveBeenCalledWith('/api/browser/open-session', expect.objectContaining({
+      expect(lingxiFetchMock).toHaveBeenCalledWith('/api/browser/open-session', expect.objectContaining({
         method: 'POST',
         body: JSON.stringify({ sessionPath: '/tmp/agents/hana/sessions/with-summary.jsonl' }),
       }));
@@ -326,7 +326,7 @@ describe('SessionList context menu', () => {
         sessionPath: '/tmp/agents/hana/sessions/with-summary.jsonl',
       });
     });
-    expect(hanaFetchMock).not.toHaveBeenCalledWith('/api/browser/close-session', expect.anything());
+    expect(lingxiFetchMock).not.toHaveBeenCalledWith('/api/browser/close-session', expect.anything());
     expect(switchSessionMock).not.toHaveBeenCalled();
     expect(await screen.findByRole('button', { name: 'browser.open' })).toBeInTheDocument();
   });
@@ -341,7 +341,7 @@ describe('SessionList context menu', () => {
       },
     };
     let closed = false;
-    hanaFetchMock.mockImplementation(async (url: string) => {
+    lingxiFetchMock.mockImplementation(async (url: string) => {
       if (url === '/api/browser/session-states') return jsonResponse(closed ? {} : browserStates);
       if (url === '/api/browser/close-session') {
         closed = true;
@@ -359,7 +359,7 @@ describe('SessionList context menu', () => {
     fireEvent.click(await screen.findByText('browser.closeForSession'));
 
     await waitFor(() => {
-      expect(hanaFetchMock).toHaveBeenCalledWith('/api/browser/close-session', expect.objectContaining({
+      expect(lingxiFetchMock).toHaveBeenCalledWith('/api/browser/close-session', expect.objectContaining({
         method: 'POST',
         body: JSON.stringify({ sessionPath: '/tmp/agents/hana/sessions/with-summary.jsonl' }),
       }));
@@ -392,9 +392,9 @@ describe('SessionList context menu', () => {
     render(<SessionList />);
 
     await waitFor(() => {
-      expect(hanaFetchMock).toHaveBeenCalledWith('/api/browser/session-states');
+      expect(lingxiFetchMock).toHaveBeenCalledWith('/api/browser/session-states');
     });
-    expect(hanaFetchMock).not.toHaveBeenCalledWith('/api/preferences/sidebar-ui');
+    expect(lingxiFetchMock).not.toHaveBeenCalledWith('/api/preferences/sidebar-ui');
   });
 
   it('follows the row mode when the store picks up new preferences after mount', async () => {
@@ -431,11 +431,11 @@ describe('SessionList context menu', () => {
 
     render(<SessionList />);
     expect(sessionButton('Has summary')).toHaveAttribute('data-row-mode', 'single-line');
-    expect(hanaFetchMock).not.toHaveBeenCalledWith('/api/preferences/sidebar-ui');
+    expect(lingxiFetchMock).not.toHaveBeenCalledWith('/api/preferences/sidebar-ui');
   });
 
   it('shows title search results first and then content results', async () => {
-    hanaFetchMock.mockImplementation(async (url: string) => {
+    lingxiFetchMock.mockImplementation(async (url: string) => {
       if (url === '/api/browser/session-states') return jsonResponse({});
       if (url.includes('phase=title')) {
         return jsonResponse({
@@ -480,7 +480,7 @@ describe('SessionList context menu', () => {
     expect(await screen.findByText('聊天记录搜索')).toBeInTheDocument();
     expect(await screen.findByText(/和其他 Agent 的聊天记录/)).toBeInTheDocument();
 
-    const searchCalls = hanaFetchMock.mock.calls
+    const searchCalls = lingxiFetchMock.mock.calls
       .map(([url]) => String(url))
       .filter(url => url.startsWith('/api/sessions/search'));
     expect(searchCalls[0]).toContain('phase=title');
@@ -631,7 +631,7 @@ describe('SessionList context menu', () => {
 
   it('switches views through one Codex-like sort menu on the section heading', async () => {
     makeSessionsToday();
-    hanaFetchMock.mockImplementation(async (url: string) => {
+    lingxiFetchMock.mockImplementation(async (url: string) => {
       if (url === '/api/browser/session-states') return jsonResponse({});
       if (url === '/api/session-projects') {
         return jsonResponse({ catalog: { folders: [], projects: [] } });
@@ -657,7 +657,7 @@ describe('SessionList context menu', () => {
   });
 
   it('keeps the sort menu on an empty today heading when today has no sessions', async () => {
-    hanaFetchMock.mockImplementation(async (url: string) => {
+    lingxiFetchMock.mockImplementation(async (url: string) => {
       if (url === '/api/browser/session-states') return jsonResponse({});
       if (url === '/api/session-projects') {
         return jsonResponse({ catalog: { folders: [], projects: [] } });
@@ -674,7 +674,7 @@ describe('SessionList context menu', () => {
 
   it('creates a project directly through the project heading button', async () => {
     makeSessionsToday();
-    hanaFetchMock.mockImplementation(async (url: string, init?: RequestInit) => {
+    lingxiFetchMock.mockImplementation(async (url: string, init?: RequestInit) => {
       if (url === '/api/browser/session-states') return jsonResponse({});
       if (url === '/api/session-projects') {
         return jsonResponse({ catalog: { folders: [], projects: [] } });
@@ -695,7 +695,7 @@ describe('SessionList context menu', () => {
     fireEvent.click(screen.getByText('sidebar.projects.createAction'));
 
     await waitFor(() => {
-      expect(hanaFetchMock).toHaveBeenCalledWith('/api/session-projects/projects', expect.objectContaining({
+      expect(lingxiFetchMock).toHaveBeenCalledWith('/api/session-projects/projects', expect.objectContaining({
         method: 'POST',
         body: JSON.stringify({ name: 'Created Project', folderId: null }),
       }));
@@ -706,7 +706,7 @@ describe('SessionList context menu', () => {
 
   it('renames a project from the project row context menu', async () => {
     makeSessionsToday();
-    hanaFetchMock.mockImplementation(async (url: string, init?: RequestInit) => {
+    lingxiFetchMock.mockImplementation(async (url: string, init?: RequestInit) => {
       if (url === '/api/browser/session-states') return jsonResponse({});
       if (url === '/api/session-projects') {
         return jsonResponse({
@@ -733,7 +733,7 @@ describe('SessionList context menu', () => {
     fireEvent.click(screen.getByText('sidebar.projects.save'));
 
     await waitFor(() => {
-      expect(hanaFetchMock).toHaveBeenCalledWith('/api/session-projects/projects/project-root', expect.objectContaining({
+      expect(lingxiFetchMock).toHaveBeenCalledWith('/api/session-projects/projects/project-root', expect.objectContaining({
         method: 'PATCH',
         body: JSON.stringify({ name: 'Renamed Project' }),
       }));
@@ -758,7 +758,7 @@ describe('SessionList context menu', () => {
         hasSummary: false,
       }],
     });
-    hanaFetchMock.mockImplementation(async (url: string, init?: RequestInit) => {
+    lingxiFetchMock.mockImplementation(async (url: string, init?: RequestInit) => {
       if (url === '/api/browser/session-states') return jsonResponse({});
       if (url === '/api/session-projects') {
         return jsonResponse({
@@ -785,7 +785,7 @@ describe('SessionList context menu', () => {
     fireEvent.click(await screen.findByText('sidebar.projects.deleteProject'));
 
     await waitFor(() => {
-      expect(hanaFetchMock).toHaveBeenCalledWith('/api/session-projects/projects/project-root', expect.objectContaining({
+      expect(lingxiFetchMock).toHaveBeenCalledWith('/api/session-projects/projects/project-root', expect.objectContaining({
         method: 'DELETE',
       }));
       expect(useStore.getState().sessions[0].projectId).toBe('cwd:');
@@ -809,7 +809,7 @@ describe('SessionList context menu', () => {
         hasSummary: false,
       }],
     });
-    hanaFetchMock.mockImplementation(async (url: string) => {
+    lingxiFetchMock.mockImplementation(async (url: string) => {
       if (url === '/api/browser/session-states') return jsonResponse({});
       if (url === '/api/session-projects') {
         return jsonResponse({
@@ -851,7 +851,7 @@ describe('SessionList context menu', () => {
         hasSummary: false,
       }],
     });
-    hanaFetchMock.mockImplementation(async (url: string) => {
+    lingxiFetchMock.mockImplementation(async (url: string) => {
       if (url === '/api/browser/session-states') return jsonResponse({});
       if (url === '/api/session-projects') {
         return jsonResponse({ catalog: { folders: [], projects: [] } });
@@ -888,7 +888,7 @@ describe('SessionList context menu', () => {
         hasSummary: false,
       })),
     });
-    hanaFetchMock.mockImplementation(async (url: string) => {
+    lingxiFetchMock.mockImplementation(async (url: string) => {
       if (url === '/api/browser/session-states') return jsonResponse({});
       if (url === '/api/session-projects') {
         return jsonResponse({
@@ -914,7 +914,7 @@ describe('SessionList context menu', () => {
     fireEvent.click(await screen.findByText('sidebar.projects.showMore'));
     await waitFor(() => {
       expect(screen.getByText('Project item 6')).toBeInTheDocument();
-      expect(hanaFetchMock).toHaveBeenCalledWith('/api/preferences/sidebar-ui', expect.objectContaining({
+      expect(lingxiFetchMock).toHaveBeenCalledWith('/api/preferences/sidebar-ui', expect.objectContaining({
         method: 'PUT',
         body: JSON.stringify({
           projectView: {
@@ -945,7 +945,7 @@ describe('SessionList context menu', () => {
         },
       ],
     });
-    hanaFetchMock.mockImplementation(async (url: string) => {
+    lingxiFetchMock.mockImplementation(async (url: string) => {
       if (url === '/api/browser/session-states') return jsonResponse({});
       if (url === '/api/session-projects') {
         return jsonResponse({
@@ -976,7 +976,7 @@ describe('SessionList context menu', () => {
 
     await waitFor(() => {
       expect(screen.getByText('Project item 1')).toBeInTheDocument();
-      expect(hanaFetchMock).toHaveBeenCalledWith('/api/preferences/sidebar-ui', expect.objectContaining({
+      expect(lingxiFetchMock).toHaveBeenCalledWith('/api/preferences/sidebar-ui', expect.objectContaining({
         method: 'PUT',
         body: JSON.stringify({
           projectView: {
@@ -1007,7 +1007,7 @@ describe('SessionList context menu', () => {
         },
       ],
     });
-    hanaFetchMock.mockImplementation(async (url: string) => {
+    lingxiFetchMock.mockImplementation(async (url: string) => {
       if (url === '/api/browser/session-states') return jsonResponse({});
       if (url === '/api/session-projects') {
         return jsonResponse({
@@ -1036,7 +1036,7 @@ describe('SessionList context menu', () => {
 
     await waitFor(() => {
       expect(screen.getByText('Child Project')).toBeInTheDocument();
-      expect(hanaFetchMock).toHaveBeenCalledWith('/api/preferences/sidebar-ui', expect.objectContaining({
+      expect(lingxiFetchMock).toHaveBeenCalledWith('/api/preferences/sidebar-ui', expect.objectContaining({
         method: 'PUT',
         body: JSON.stringify({
           projectView: {
@@ -1051,7 +1051,7 @@ describe('SessionList context menu', () => {
 
   it('assigns a session when dragged onto a project row', async () => {
     makeSessionsToday();
-    hanaFetchMock.mockImplementation(async (url: string, init?: RequestInit) => {
+    lingxiFetchMock.mockImplementation(async (url: string, init?: RequestInit) => {
       if (url === '/api/browser/session-states') return jsonResponse({});
       if (url === '/api/session-projects') {
         return jsonResponse({
@@ -1076,7 +1076,7 @@ describe('SessionList context menu', () => {
     fireEvent.drop(await screen.findByText('Custom Project'), { dataTransfer });
 
     await waitFor(() => {
-      expect(hanaFetchMock).toHaveBeenCalledWith('/api/session-projects/session-assignment', expect.objectContaining({
+      expect(lingxiFetchMock).toHaveBeenCalledWith('/api/session-projects/session-assignment', expect.objectContaining({
         method: 'POST',
         body: JSON.stringify({
           sessionPath: '/tmp/agents/hana/sessions/with-summary.jsonl',
@@ -1088,7 +1088,7 @@ describe('SessionList context menu', () => {
 
   it('reorders projects when a project is dragged onto another project at the same level', async () => {
     makeSessionsToday();
-    hanaFetchMock.mockImplementation(async (url: string, init?: RequestInit) => {
+    lingxiFetchMock.mockImplementation(async (url: string, init?: RequestInit) => {
       if (url === '/api/browser/session-states') return jsonResponse({});
       if (url === '/api/session-projects') {
         return jsonResponse({
@@ -1125,7 +1125,7 @@ describe('SessionList context menu', () => {
     fireEvent.drop(await screen.findByText('First Project'), { dataTransfer });
 
     await waitFor(() => {
-      expect(hanaFetchMock).toHaveBeenCalledWith('/api/session-projects/projects/reorder', expect.objectContaining({
+      expect(lingxiFetchMock).toHaveBeenCalledWith('/api/session-projects/projects/reorder', expect.objectContaining({
         method: 'POST',
         body: JSON.stringify({ folderId: null, projectIds: ['project-second', 'project-first', 'cwd:%2Ftmp%2Fproject'] }),
       }));
@@ -1164,7 +1164,7 @@ describe('SessionList context menu', () => {
     const alphaId = 'cwd:%2Ftmp%2Falpha-project';
     const betaId = 'cwd:%2Ftmp%2Fbeta-project';
     makeSessionsToday();
-    hanaFetchMock.mockImplementation(async (url: string, init?: RequestInit) => {
+    lingxiFetchMock.mockImplementation(async (url: string, init?: RequestInit) => {
       if (url === '/api/browser/session-states') return jsonResponse({});
       if (url === '/api/session-projects') {
         return jsonResponse({ catalog: { folders: [], projects: [] } });
@@ -1198,15 +1198,15 @@ describe('SessionList context menu', () => {
     fireEvent.drop(await screen.findByText('beta-project'), { dataTransfer });
 
     await waitFor(() => {
-      expect(hanaFetchMock).toHaveBeenCalledWith(`/api/session-projects/projects/${encodeURIComponent(alphaId)}`, expect.objectContaining({
+      expect(lingxiFetchMock).toHaveBeenCalledWith(`/api/session-projects/projects/${encodeURIComponent(alphaId)}`, expect.objectContaining({
         method: 'PATCH',
         body: JSON.stringify({ name: 'alpha-project', folderId: null }),
       }));
-      expect(hanaFetchMock).toHaveBeenCalledWith(`/api/session-projects/projects/${encodeURIComponent(betaId)}`, expect.objectContaining({
+      expect(lingxiFetchMock).toHaveBeenCalledWith(`/api/session-projects/projects/${encodeURIComponent(betaId)}`, expect.objectContaining({
         method: 'PATCH',
         body: JSON.stringify({ name: 'beta-project', folderId: null }),
       }));
-      expect(hanaFetchMock).toHaveBeenCalledWith('/api/session-projects/projects/reorder', expect.objectContaining({
+      expect(lingxiFetchMock).toHaveBeenCalledWith('/api/session-projects/projects/reorder', expect.objectContaining({
         method: 'POST',
         body: JSON.stringify({ folderId: null, projectIds: [alphaId, betaId] }),
       }));
@@ -1352,7 +1352,7 @@ describe('SessionList context menu', () => {
 
     it('does not assign a pinned row to a project when it is dragged out of the pinned strip', async () => {
       seedPinnedSessions();
-      hanaFetchMock.mockImplementation(async (url: string) => {
+      lingxiFetchMock.mockImplementation(async (url: string) => {
         if (url === '/api/browser/session-states') return jsonResponse({});
         if (url === '/api/session-projects') {
           return jsonResponse({
@@ -1375,7 +1375,7 @@ describe('SessionList context menu', () => {
       fireEvent.drop(projectRow, { dataTransfer });
 
       await waitFor(() => {
-        expect(hanaFetchMock).not.toHaveBeenCalledWith(
+        expect(lingxiFetchMock).not.toHaveBeenCalledWith(
           '/api/session-projects/session-assignment',
           expect.anything(),
         );

@@ -18,17 +18,17 @@ describe("sandbox workspace roots", () => {
 
   it("grants full access to explicit extra workspace folders and read-only access to ordinary external paths", () => {
     const agentDir = path.join(tempRoot, "agents", "hana");
-    const hanakoHome = path.join(tempRoot, "home");
+    const lingxiHome = path.join(tempRoot, "home");
     const primary = path.join(tempRoot, "project");
     const extra = path.join(tempRoot, "reference");
     const sibling = path.join(tempRoot, "private");
-    for (const dir of [agentDir, hanakoHome, primary, extra, sibling]) {
+    for (const dir of [agentDir, lingxiHome, primary, extra, sibling]) {
       fs.mkdirSync(dir, { recursive: true });
     }
 
     const policy = deriveSandboxPolicy({
       agentDir,
-      hanakoHome,
+      lingxiHome,
       workspace: primary,
       workspaceFolders: [extra],
       mode: "standard",
@@ -50,36 +50,36 @@ describe("sandbox workspace roots", () => {
 
   it("lets agents read session files but blocks writing runtime copies", () => {
     const agentDir = path.join(tempRoot, "agents", "hana");
-    const hanakoHome = path.join(tempRoot, "home");
+    const lingxiHome = path.join(tempRoot, "home");
     const workspace = path.join(tempRoot, "project");
-    const sessionFile = path.join(hanakoHome, "session-files", "abc123", "SKILL.md");
+    const sessionFile = path.join(lingxiHome, "session-files", "abc123", "SKILL.md");
     fs.mkdirSync(path.dirname(sessionFile), { recursive: true });
     fs.writeFileSync(sessionFile, "---\nname: demo\n---\n", "utf-8");
     fs.mkdirSync(workspace, { recursive: true });
 
     const policy = deriveSandboxPolicy({
       agentDir,
-      hanakoHome,
+      lingxiHome,
       workspace,
       workspaceFolders: [],
       mode: "standard",
     });
     const guard = new PathGuard(policy);
 
-    expect(policy.writablePaths).not.toContain(path.join(hanakoHome, "session-files"));
+    expect(policy.writablePaths).not.toContain(path.join(lingxiHome, "session-files"));
     expect(guard.getAccessLevel(sessionFile)).toBe(AccessLevel.READ_ONLY);
     expect(guard.check(sessionFile, "read").allowed).toBe(true);
     expect(guard.check(sessionFile, "write").allowed).toBe(false);
     expect(guard.check(sessionFile, "stage").allowed).toBe(false);
   });
 
-  it("honors read-all semantics for non-secret HANA_HOME paths while keeping writes scoped", () => {
+  it("honors read-all semantics for non-secret LINGXI_HOME paths while keeping writes scoped", () => {
     const agentDir = path.join(tempRoot, "home", "agents", "hana");
-    const hanakoHome = path.join(tempRoot, "home");
+    const lingxiHome = path.join(tempRoot, "home");
     const workspace = path.join(tempRoot, "project");
-    const pluginSkill = path.join(hanakoHome, "plugins", "demo", "skills", "reader", "SKILL.md");
-    const pluginSource = path.join(hanakoHome, "plugins", "demo", "index.js");
-    const blockedAuth = path.join(hanakoHome, "auth.json");
+    const pluginSkill = path.join(lingxiHome, "plugins", "demo", "skills", "reader", "SKILL.md");
+    const pluginSource = path.join(lingxiHome, "plugins", "demo", "index.js");
+    const blockedAuth = path.join(lingxiHome, "auth.json");
     fs.mkdirSync(path.dirname(pluginSkill), { recursive: true });
     fs.writeFileSync(pluginSkill, "---\nname: reader\n---\n", "utf-8");
     fs.writeFileSync(pluginSource, "export default {};\n", "utf-8");
@@ -89,7 +89,7 @@ describe("sandbox workspace roots", () => {
 
     const policy = deriveSandboxPolicy({
       agentDir,
-      hanakoHome,
+      lingxiHome,
       workspace,
       workspaceFolders: [],
       mode: "standard",
@@ -107,17 +107,17 @@ describe("sandbox workspace roots", () => {
 
   it("treats cwd and explicit runtime roots as scoped write roots", () => {
     const agentDir = path.join(tempRoot, "agents", "hana");
-    const hanakoHome = path.join(tempRoot, "home");
+    const lingxiHome = path.join(tempRoot, "home");
     const workspace = path.join(tempRoot, "project");
     const cwd = path.join(tempRoot, "scratch");
     const runtimeRoot = path.join(tempRoot, "runtime-cache");
-    for (const dir of [agentDir, hanakoHome, workspace, cwd, runtimeRoot]) {
+    for (const dir of [agentDir, lingxiHome, workspace, cwd, runtimeRoot]) {
       fs.mkdirSync(dir, { recursive: true });
     }
 
     const policy = deriveSandboxPolicy({
       agentDir,
-      hanakoHome,
+      lingxiHome,
       workspace,
       workspaceFolders: [],
       cwd,
@@ -141,10 +141,10 @@ describe("sandbox workspace roots", () => {
 
   it("resolves symlinks before allowing a workspace file to be staged", () => {
     const agentDir = path.join(tempRoot, "agents", "hana");
-    const hanakoHome = path.join(tempRoot, "home");
+    const lingxiHome = path.join(tempRoot, "home");
     const workspace = path.join(tempRoot, "project");
     const external = path.join(tempRoot, "private");
-    for (const dir of [agentDir, hanakoHome, workspace, external]) {
+    for (const dir of [agentDir, lingxiHome, workspace, external]) {
       fs.mkdirSync(dir, { recursive: true });
     }
     const externalFile = path.join(external, "secret.txt");
@@ -154,7 +154,7 @@ describe("sandbox workspace roots", () => {
 
     const guard = new PathGuard(deriveSandboxPolicy({
       agentDir,
-      hanakoHome,
+      lingxiHome,
       workspace,
       workspaceFolders: [],
       mode: "standard",
@@ -166,9 +166,9 @@ describe("sandbox workspace roots", () => {
 
   it("returns the canonical workspace target for an allowed staged symlink", () => {
     const agentDir = path.join(tempRoot, "agents", "hana");
-    const hanakoHome = path.join(tempRoot, "home");
+    const lingxiHome = path.join(tempRoot, "home");
     const workspace = path.join(tempRoot, "project");
-    for (const dir of [agentDir, hanakoHome, workspace]) {
+    for (const dir of [agentDir, lingxiHome, workspace]) {
       fs.mkdirSync(dir, { recursive: true });
     }
     const target = path.join(workspace, "report.txt");
@@ -178,7 +178,7 @@ describe("sandbox workspace roots", () => {
 
     const guard = new PathGuard(deriveSandboxPolicy({
       agentDir,
-      hanakoHome,
+      lingxiHome,
       workspace,
       workspaceFolders: [],
       mode: "standard",

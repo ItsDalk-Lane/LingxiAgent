@@ -17,7 +17,7 @@ private struct HelperError: Error {
 }
 
 @main
-struct HanaComputerUseHelper {
+struct LingxiComputerUseHelper {
     static func main() {
         do {
             try run()
@@ -25,7 +25,7 @@ struct HanaComputerUseHelper {
             fputs(err.message + "\n", stderr)
             Foundation.exit(err.code)
         } catch {
-            fputs("hana-computer-use-helper failed: \(error)\n", stderr)
+            fputs("lingxi-computer-use-helper failed: \(error)\n", stderr)
             Foundation.exit(ExitCode.software)
         }
     }
@@ -45,9 +45,9 @@ struct HanaComputerUseHelper {
         switch command {
         case "status":
             guard DaemonClient.isDaemonListening(socketPath: socketPath) else {
-                throw HelperError(code: ExitCode.toolError, message: "hana-computer-use-helper daemon is not running on \(socketPath).")
+                throw HelperError(code: ExitCode.toolError, message: "lingxi-computer-use-helper daemon is not running on \(socketPath).")
             }
-            print("hana-computer-use-helper daemon running; CuaDriverCore \(CuaDriverCore.version)\n  socket: \(socketPath)")
+            print("lingxi-computer-use-helper daemon running; CuaDriverCore \(CuaDriverCore.version)\n  socket: \(socketPath)")
         case "serve":
             let exitCode = AppKitBootstrap.runBlockingAppKitWith {
                 await runDaemon(socketPath: socketPath)
@@ -84,7 +84,7 @@ struct HanaComputerUseHelper {
             fputs(err.message + "\n", stderr)
             return err.code
         } catch {
-            fputs("hana-computer-use-helper failed: \(error)\n", stderr)
+            fputs("lingxi-computer-use-helper failed: \(error)\n", stderr)
             return ExitCode.software
         }
     }
@@ -102,7 +102,7 @@ struct HanaComputerUseHelper {
         let config = await ConfigStore.shared.load()
         await MainActor.run {
             AgentCursor.shared.apply(config: config.agentCursor)
-            applyHanaCursorRuntimeConfig(from: ProcessInfo.processInfo.environment)
+            applyLingxiCursorRuntimeConfig(from: ProcessInfo.processInfo.environment)
         }
 
         let result: CallTool.Result
@@ -144,11 +144,11 @@ struct HanaComputerUseHelper {
             guard response.ok else {
                 throw HelperError(
                     code: response.exitCode ?? ExitCode.software,
-                    message: response.error ?? "hana-computer-use-helper daemon call failed."
+                    message: response.error ?? "lingxi-computer-use-helper daemon call failed."
                 )
             }
             guard case .call(let result) = response.result else {
-                throw HelperError(code: ExitCode.software, message: "hana-computer-use-helper daemon returned a non-call response.")
+                throw HelperError(code: ExitCode.software, message: "lingxi-computer-use-helper daemon returned a non-call response.")
             }
             try emitToolResult(result, raw: raw, compact: compact)
             return true
@@ -195,13 +195,13 @@ struct HanaComputerUseHelper {
             let config = await ConfigStore.shared.load()
             await MainActor.run {
                 AgentCursor.shared.apply(config: config.agentCursor)
-                applyHanaCursorRuntimeConfig(from: ProcessInfo.processInfo.environment)
+                applyLingxiCursorRuntimeConfig(from: ProcessInfo.processInfo.environment)
             }
             let server = DaemonServer(socketPath: socketPath, pidFilePath: nil)
             try await server.run()
             return 0
         } catch {
-            fputs("hana-computer-use-helper daemon failed: \(error)\n", stderr)
+            fputs("lingxi-computer-use-helper daemon failed: \(error)\n", stderr)
             return ExitCode.software
         }
     }
@@ -210,11 +210,11 @@ struct HanaComputerUseHelper {
         switch DaemonClient.sendRequest(DaemonRequest(method: "shutdown"), socketPath: socketPath) {
         case .ok(let response):
             guard response.ok else {
-                throw HelperError(code: response.exitCode ?? ExitCode.software, message: response.error ?? "Failed to stop hana-computer-use-helper daemon.")
+                throw HelperError(code: response.exitCode ?? ExitCode.software, message: response.error ?? "Failed to stop lingxi-computer-use-helper daemon.")
             }
-            print("hana-computer-use-helper daemon stopped.")
+            print("lingxi-computer-use-helper daemon stopped.")
         case .noDaemon:
-            throw HelperError(code: ExitCode.toolError, message: "hana-computer-use-helper daemon is not running on \(socketPath).")
+            throw HelperError(code: ExitCode.toolError, message: "lingxi-computer-use-helper daemon is not running on \(socketPath).")
         case .error(let message):
             throw HelperError(code: ExitCode.software, message: message)
         }
@@ -226,7 +226,7 @@ struct HanaComputerUseHelper {
             return expandHome(explicit)
         }
         let home = env["HOME"] ?? NSHomeDirectory()
-        return home + "/Library/Caches/hana-computer-use/hana-computer-use-helper.sock"
+        return home + "/Library/Caches/lingxi-computer-use/lingxi-computer-use-helper.sock"
     }
 
     private static func expandHome(_ path: String) -> String {
@@ -246,9 +246,9 @@ struct HanaComputerUseHelper {
 
     private static func printHelp() {
         print("""
-        hana-computer-use-helper status
-        hana-computer-use-helper list_apps '{"bundle_id":"com.apple.finder"}' --raw --compact
-        hana-computer-use-helper get_window_state '{"pid":844,"window_id":10725}' --raw --compact
+        lingxi-computer-use-helper status
+        lingxi-computer-use-helper list_apps '{"bundle_id":"com.apple.finder"}' --raw --compact
+        lingxi-computer-use-helper get_window_state '{"pid":844,"window_id":10725}' --raw --compact
         """)
     }
 }
@@ -277,10 +277,10 @@ private enum AppKitBootstrap {
     }
 }
 
-private let hanaAgentCursorConfigEnvKey = "HANA_AGENT_CURSOR_CONFIG_JSON"
-private let hanaAgentSocketPathEnvKey = "HANA_COMPUTER_USE_SOCKET_PATH"
+private let hanaAgentCursorConfigEnvKey = "LINGXI_AGENT_CURSOR_CONFIG_JSON"
+private let hanaAgentSocketPathEnvKey = "LINGXI_COMPUTER_USE_SOCKET_PATH"
 
-private struct HanaCursorRuntimeConfig: Decodable {
+private struct LingxiCursorRuntimeConfig: Decodable {
     let enabled: Bool?
     let style: Style?
     let motion: Motion?
@@ -321,10 +321,10 @@ private struct HanaCursorRuntimeConfig: Decodable {
 }
 
 @MainActor
-private func applyHanaCursorRuntimeConfig(from environment: [String: String]) {
+private func applyLingxiCursorRuntimeConfig(from environment: [String: String]) {
     guard let raw = environment[hanaAgentCursorConfigEnvKey],
           let data = raw.data(using: .utf8),
-          let config = try? JSONDecoder().decode(HanaCursorRuntimeConfig.self, from: data)
+          let config = try? JSONDecoder().decode(LingxiCursorRuntimeConfig.self, from: data)
     else {
         return
     }

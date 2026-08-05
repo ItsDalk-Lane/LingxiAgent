@@ -1,37 +1,37 @@
-# @hana/plugin-components
+# @lingxi/plugin-components
 
-React component primitives for Hana plugin WebViews/iframes.
+React component primitives for Lingxi plugin WebViews/iframes.
 
 ```tsx
 import {
   Button,
   CardShell,
-  HanaThemeProvider,
+  LingxiThemeProvider,
   SettingRow,
   Switch,
-} from '@hana/plugin-components';
-import '@hana/plugin-components/styles.css';
+} from '@lingxi/plugin-components';
+import '@lingxi/plugin-components/styles.css';
 
 export function PluginPanel() {
   return (
-    <HanaThemeProvider mode="inherit">
+    <LingxiThemeProvider mode="inherit">
       <CardShell title="Sync">
         <SettingRow
           label="Enabled"
-          hint="Follows the current Hana theme."
+          hint="Follows the current Lingxi theme."
           control={<Switch checked label="On" />}
         />
         <Button variant="primary">Run</Button>
       </CardShell>
-    </HanaThemeProvider>
+    </LingxiThemeProvider>
   );
 }
 ```
 
-`HanaThemeProvider` has three modes:
+`LingxiThemeProvider` has three modes:
 
-- `inherit`: use host CSS variables when the WebView/iframe receives them, then fall back to Hana defaults from `styles.css`.
-- `hana`: set one of Hana's named theme token groups, such as `warm-paper` or `midnight`.
+- `inherit`: use host CSS variables when the WebView/iframe receives them, then fall back to Lingxi defaults from `styles.css`.
+- `lingxi`: set one of Lingxi's named theme token groups, such as `warm-paper` or `midnight`.
 - `custom`: set only the tokens you provide. Missing tokens still fall back through host variables and SDK defaults.
 
-Components intentionally expose stable `hana-plugin-*` classes so plugin authors can add small local refinements without depending on Hana renderer internals.
+Components intentionally expose stable `hana-plugin-*` classes so plugin authors can add small local refinements without depending on Lingxi renderer internals.

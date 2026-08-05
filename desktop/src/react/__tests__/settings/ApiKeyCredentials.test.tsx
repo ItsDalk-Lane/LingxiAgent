@@ -9,11 +9,11 @@ import '@testing-library/jest-dom/vitest';
 import { useSettingsStore, type ProviderSummary } from '../../settings/store';
 
 const mocks = vi.hoisted(() => ({
-  hanaFetch: vi.fn(),
+  lingxiFetch: vi.fn(),
 }));
 
 vi.mock('../../settings/api', () => ({
-  hanaFetch: (...args: unknown[]) => mocks.hanaFetch(...args),
+  lingxiFetch: (...args: unknown[]) => mocks.lingxiFetch(...args),
 }));
 
 vi.mock('../../hooks/use-config', () => ({
@@ -54,8 +54,8 @@ function providerSummary(overrides: Partial<ProviderSummary>): ProviderSummary {
 
 describe('ApiKeyCredentials', () => {
   beforeEach(() => {
-    mocks.hanaFetch.mockReset();
-    mocks.hanaFetch.mockResolvedValue(jsonResponse({ ok: true }));
+    mocks.lingxiFetch.mockReset();
+    mocks.lingxiFetch.mockResolvedValue(jsonResponse({ ok: true }));
     useSettingsStore.setState({ toastMessage: '', toastType: '', toastVisible: false });
   });
 
@@ -107,11 +107,11 @@ describe('ApiKeyCredentials', () => {
     expect(verifyButton).not.toBeNull();
     fireEvent.click(verifyButton as HTMLButtonElement);
 
-    await waitFor(() => expect(mocks.hanaFetch).toHaveBeenCalledWith(
+    await waitFor(() => expect(mocks.lingxiFetch).toHaveBeenCalledWith(
       '/api/providers/test',
       expect.objectContaining({ method: 'POST' }),
     ));
-    const [, options] = mocks.hanaFetch.mock.calls[0];
+    const [, options] = mocks.lingxiFetch.mock.calls[0];
     expect(JSON.parse(String((options as RequestInit).body))).toMatchObject({
       name: 'groq',
       base_url: 'https://api.groq.com/openai/v1',
@@ -122,7 +122,7 @@ describe('ApiKeyCredentials', () => {
 
   it('reveals a masked saved api key through the explicit provider endpoint', async () => {
     const onRefresh = vi.fn(async () => {});
-    mocks.hanaFetch.mockResolvedValueOnce(jsonResponse({ api_key: 'sk-real-provider-key' }));
+    mocks.lingxiFetch.mockResolvedValueOnce(jsonResponse({ api_key: 'sk-real-provider-key' }));
 
     const { container } = render(
       <ApiKeyCredentials
@@ -139,13 +139,13 @@ describe('ApiKeyCredentials', () => {
     expect(revealButton).toBeTruthy();
     fireEvent.click(revealButton as HTMLButtonElement);
 
-    await waitFor(() => expect(mocks.hanaFetch).toHaveBeenCalledWith('/api/providers/deepseek/api-key'));
+    await waitFor(() => expect(mocks.lingxiFetch).toHaveBeenCalledWith('/api/providers/deepseek/api-key'));
     await waitFor(() => expect(container.querySelector('input[type="text"]')).toHaveValue('sk-real-provider-key'));
   });
 
   it('keeps revealed saved api keys out of ordinary state and blocks copy', async () => {
     const onRefresh = vi.fn(async () => {});
-    mocks.hanaFetch
+    mocks.lingxiFetch
       .mockResolvedValueOnce(jsonResponse({ api_key: 'sk-real-provider-key' }))
       .mockResolvedValue(jsonResponse({ ok: true }));
 
@@ -174,18 +174,18 @@ describe('ApiKeyCredentials', () => {
     const verifyButton = container.querySelector('button[title="settings.providers.verifyConnection"]') as HTMLButtonElement;
     fireEvent.click(verifyButton);
 
-    await waitFor(() => expect(mocks.hanaFetch).toHaveBeenCalledWith(
+    await waitFor(() => expect(mocks.lingxiFetch).toHaveBeenCalledWith(
       '/api/providers/test',
       expect.objectContaining({ method: 'POST' }),
     ));
-    const testCall = mocks.hanaFetch.mock.calls.find(([path]) => path === '/api/providers/test');
+    const testCall = mocks.lingxiFetch.mock.calls.find(([path]) => path === '/api/providers/test');
     const body = JSON.parse(String((testCall?.[1] as RequestInit).body));
     expect(body).not.toHaveProperty('api_key', 'sk-real-provider-key');
   });
 
   it('lets a revealed saved api key be replaced directly', async () => {
     const onRefresh = vi.fn(async () => {});
-    mocks.hanaFetch
+    mocks.lingxiFetch
       .mockResolvedValueOnce(jsonResponse({ api_key: 'sk-real-provider-key' }))
       .mockResolvedValue(jsonResponse({ ok: true }));
 
@@ -211,11 +211,11 @@ describe('ApiKeyCredentials', () => {
     expect(input).toHaveValue('sk-replacement-key');
     fireEvent.blur(input);
 
-    await waitFor(() => expect(mocks.hanaFetch).toHaveBeenCalledWith(
+    await waitFor(() => expect(mocks.lingxiFetch).toHaveBeenCalledWith(
       '/api/config',
       expect.objectContaining({ method: 'PUT' }),
     ));
-    const configCall = mocks.hanaFetch.mock.calls.find(([path]) => path === '/api/config');
+    const configCall = mocks.lingxiFetch.mock.calls.find(([path]) => path === '/api/config');
     expect(JSON.parse(String((configCall?.[1] as RequestInit).body))).toEqual({
       providers: { deepseek: { api_key: 'sk-replacement-key' } },
     });
@@ -223,7 +223,7 @@ describe('ApiKeyCredentials', () => {
 
   it('does not persist the revealed secret when editing begins from transient text', async () => {
     const onRefresh = vi.fn(async () => {});
-    mocks.hanaFetch
+    mocks.lingxiFetch
       .mockResolvedValueOnce(jsonResponse({ api_key: 'sk-real-provider-key' }))
       .mockResolvedValue(jsonResponse({ ok: true }));
 
@@ -248,11 +248,11 @@ describe('ApiKeyCredentials', () => {
     fireEvent.change(input, { target: { value: 'sk-real-provider-keyx' } });
     fireEvent.blur(input);
 
-    await waitFor(() => expect(mocks.hanaFetch).toHaveBeenCalledWith(
+    await waitFor(() => expect(mocks.lingxiFetch).toHaveBeenCalledWith(
       '/api/config',
       expect.objectContaining({ method: 'PUT' }),
     ));
-    const configCall = mocks.hanaFetch.mock.calls.find(([path]) => path === '/api/config');
+    const configCall = mocks.lingxiFetch.mock.calls.find(([path]) => path === '/api/config');
     expect(JSON.parse(String((configCall?.[1] as RequestInit).body))).toEqual({
       providers: { deepseek: { api_key: 'x' } },
     });
@@ -282,15 +282,15 @@ describe('ApiKeyCredentials', () => {
     fireEvent.change(input, { target: { value: 'new-kimi-key' } });
     fireEvent.blur(input);
 
-    await waitFor(() => expect(mocks.hanaFetch).toHaveBeenCalledWith(
+    await waitFor(() => expect(mocks.lingxiFetch).toHaveBeenCalledWith(
       '/api/config',
       expect.objectContaining({ method: 'PUT' }),
     ));
-    expect(mocks.hanaFetch).not.toHaveBeenCalledWith(
+    expect(mocks.lingxiFetch).not.toHaveBeenCalledWith(
       '/api/providers/test',
       expect.objectContaining({ method: 'POST' }),
     );
-    const configCall = mocks.hanaFetch.mock.calls.find(([path]) => path === '/api/config');
+    const configCall = mocks.lingxiFetch.mock.calls.find(([path]) => path === '/api/config');
     expect(JSON.parse(String((configCall?.[1] as RequestInit).body))).toEqual({
       providers: { 'kimi-coding': { api_key: 'new-kimi-key' } },
     });
@@ -317,11 +317,11 @@ describe('ApiKeyCredentials', () => {
     fireEvent.change(input, { target: { value: '' } });
     fireEvent.blur(input);
 
-    await waitFor(() => expect(mocks.hanaFetch).toHaveBeenCalledWith(
+    await waitFor(() => expect(mocks.lingxiFetch).toHaveBeenCalledWith(
       '/api/config',
       expect.objectContaining({ method: 'PUT' }),
     ));
-    const configCall = mocks.hanaFetch.mock.calls.find(([path]) => path === '/api/config');
+    const configCall = mocks.lingxiFetch.mock.calls.find(([path]) => path === '/api/config');
     expect(JSON.parse(String((configCall?.[1] as RequestInit).body))).toEqual({
       providers: { 'kimi-coding': { api_key: '' } },
     });
@@ -329,7 +329,7 @@ describe('ApiKeyCredentials', () => {
 
   it('saves discovered Gemini models during preset setup instead of static defaults', async () => {
     const onRefresh = vi.fn(async () => {});
-    mocks.hanaFetch
+    mocks.lingxiFetch
       .mockResolvedValueOnce(jsonResponse({ ok: true }))
       .mockResolvedValueOnce(jsonResponse({
         models: [
@@ -369,15 +369,15 @@ describe('ApiKeyCredentials', () => {
     const saveButton = container.querySelector('button[title="settings.providers.verifyConnection"]') as HTMLButtonElement;
     fireEvent.click(saveButton);
 
-    await waitFor(() => expect(mocks.hanaFetch).toHaveBeenCalledWith(
+    await waitFor(() => expect(mocks.lingxiFetch).toHaveBeenCalledWith(
       '/api/config',
       expect.objectContaining({ method: 'PUT' }),
     ));
-    expect(mocks.hanaFetch).toHaveBeenCalledWith('/api/providers/fetch-models', expect.objectContaining({
+    expect(mocks.lingxiFetch).toHaveBeenCalledWith('/api/providers/fetch-models', expect.objectContaining({
       method: 'POST',
     }));
 
-    const configCall = mocks.hanaFetch.mock.calls.find(([path]) => path === '/api/config');
+    const configCall = mocks.lingxiFetch.mock.calls.find(([path]) => path === '/api/config');
     const body = JSON.parse(String((configCall?.[1] as RequestInit).body));
     expect(body.providers.gemini).toEqual({
       base_url: 'https://generativelanguage.googleapis.com/v1beta',
@@ -424,11 +424,11 @@ describe('ApiKeyCredentials', () => {
     fireEvent.change(input, { target: { value: 'registry-key' } });
     fireEvent.click(container.querySelector('button[title="settings.providers.verifyConnection"]') as HTMLButtonElement);
 
-    await waitFor(() => expect(mocks.hanaFetch).toHaveBeenCalledWith(
+    await waitFor(() => expect(mocks.lingxiFetch).toHaveBeenCalledWith(
       '/api/config',
       expect.objectContaining({ method: 'PUT' }),
     ));
-    const configCall = mocks.hanaFetch.mock.calls.find(([path]) => path === '/api/config');
+    const configCall = mocks.lingxiFetch.mock.calls.find(([path]) => path === '/api/config');
     expect(JSON.parse(String((configCall?.[1] as RequestInit).body))).toMatchObject({
       providers: {
         'registry-provider': {
@@ -454,11 +454,11 @@ describe('ApiKeyCredentials', () => {
     fireEvent.click(screen.getByRole('option', { name: 'Anthropic Messages' }));
 
     expect(screen.getByRole('button', { name: 'Anthropic Messages' })).toBeInTheDocument();
-    await waitFor(() => expect(mocks.hanaFetch).toHaveBeenCalledWith(
+    await waitFor(() => expect(mocks.lingxiFetch).toHaveBeenCalledWith(
       '/api/config',
       expect.objectContaining({ method: 'PUT' }),
     ));
-    const configCall = mocks.hanaFetch.mock.calls.find(([path]) => path === '/api/config');
+    const configCall = mocks.lingxiFetch.mock.calls.find(([path]) => path === '/api/config');
     expect(JSON.parse(String((configCall?.[1] as RequestInit).body))).toEqual({
       providers: { deepseek: { api: 'anthropic-messages' } },
     });
@@ -480,7 +480,7 @@ describe('ApiKeyCredentials', () => {
   });
 
   it('shows the server rejection and preserves the API draft for retry', async () => {
-    mocks.hanaFetch.mockResolvedValueOnce(jsonResponse({ error: 'unsupported provider API type' }));
+    mocks.lingxiFetch.mockResolvedValueOnce(jsonResponse({ error: 'unsupported provider API type' }));
     render(
       <ApiKeyCredentials
         providerId="deepseek"

@@ -10,7 +10,7 @@
  * server 仍是唯一持久真相，localStorage 只是首帧缓存，不参与冲突仲裁。
  */
 
-import { hanaFetch } from '../hooks/use-hana-fetch';
+import { lingxiFetch } from '../hooks/use-hana-fetch';
 import {
   normalizeSidebarUiPrefs,
   type SidebarUiPrefs,
@@ -81,7 +81,7 @@ export const createSidebarUiSlice = (
     });
     writeCachedSidebarUiPrefs(next);
     set({ sidebarUiPrefs: next });
-    hanaFetch('/api/preferences/sidebar-ui', {
+    lingxiFetch('/api/preferences/sidebar-ui', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ projectView: next.projectView }),
@@ -109,7 +109,7 @@ export function loadSidebarUiPrefs(): Promise<void> {
     const { useStore } = await import('./index');
     for (let attempt = 0; ; attempt += 1) {
       try {
-        const res = await hanaFetch('/api/preferences/sidebar-ui');
+        const res = await lingxiFetch('/api/preferences/sidebar-ui');
         const data = await res.json();
         useStore.getState().applySidebarUiPrefs(data);
         return;

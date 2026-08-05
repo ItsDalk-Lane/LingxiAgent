@@ -63,7 +63,7 @@ const initialStateFactory = (): MockState => ({
   agents: [] as unknown[],
   currentAgentId: null,
   agentName: '',
-  agentYuan: 'hanako',
+  agentYuan: 'lingxi',
   agentAvatarUrl: null,
   memoryEnabled: true,
   browserBySession: {} as Record<string, unknown>,
@@ -102,8 +102,8 @@ vi.mock('../../stores', () => ({
 }));
 
 vi.mock('../../hooks/use-hana-fetch', () => ({
-  hanaFetch: vi.fn(),
-  hanaUrl: (p: string) => p,
+  lingxiFetch: vi.fn(),
+  lingxiUrl: (p: string) => p,
 }));
 
 vi.mock('../../utils/history-builder', () => ({
@@ -282,7 +282,7 @@ function installStoreMethods() {
   s.setSessionMetaRecovery = vi.fn((status: unknown) => { mockState.metaRecovery = status; });
 }
 
-import { hanaFetch } from '../../hooks/use-hana-fetch';
+import { lingxiFetch } from '../../hooks/use-hana-fetch';
 import { clearChat } from '../../stores/agent-actions';
 import { loadDeskFiles } from '../../stores/desk-actions';
 import { bumpMessageLiveVersion, clearMessageLiveVersion } from '../../stores/message-live-version';
@@ -303,7 +303,7 @@ import {
 } from '../../stores/session-actions';
 import { snapshotStreamBuffer } from '../../stores/stream-invalidator';
 
-const mockFetch = vi.mocked(hanaFetch);
+const mockFetch = vi.mocked(lingxiFetch);
 const mockClearChat = vi.mocked(clearChat);
 const mockLoadDeskFiles = vi.mocked(loadDeskFiles);
 const mockSnapshot = vi.mocked(snapshotStreamBuffer);
@@ -1349,7 +1349,7 @@ function mockPermissionDefault(mode = 'ask') {
         text: '正文',
         thinking: '',
         mood: 'Vibe: 好',
-        moodYuan: 'hanako',
+        moodYuan: 'lingxi',
         inThinking: false,
         inMood: false,
       });
@@ -1882,7 +1882,7 @@ function mockPermissionDefault(mode = 'ask') {
           {
             id: 'hana',
             name: 'Hana',
-            yuan: 'hanako',
+            yuan: 'lingxi',
             isPrimary: true,
             homeFolder: '/workspace/hana-home',
             effectiveHomeFolder: '/workspace/hana-home',
@@ -1890,7 +1890,7 @@ function mockPermissionDefault(mode = 'ask') {
           {
             id: 'mio',
             name: 'Mio',
-            yuan: 'hanako',
+            yuan: 'lingxi',
             isPrimary: false,
             homeFolder: '/workspace/mio-home',
             effectiveHomeFolder: '/workspace/mio-home',

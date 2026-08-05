@@ -429,7 +429,7 @@ ${c.bold}${t("cli.helpTitle")}${c.reset}
           : {};
         console.log(`\n${c.bold}${t("cli.currentConfig")}${c.reset}`);
         console.log(`  ${c.dim}Agent:${c.reset}  ${agentConfig.agent?.name || "Hanako"}`);
-        console.log(`  ${c.dim}Yuan:${c.reset}   ${agentConfig.agent?.yuan || "hanako"}`);
+        console.log(`  ${c.dim}Yuan:${c.reset}   ${agentConfig.agent?.yuan || "lingxi"}`);
         console.log(`  ${c.dim}User:${c.reset}   ${agentConfig.user?.name || "User"}`);
         console.log(`  ${c.dim}Locale:${c.reset} ${globalConfig.locale || "en"}`);
         console.log(`  ${c.dim}Model:${c.reset}  ${agentConfig.api?.model || t("cli.notSet")}`);

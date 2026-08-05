@@ -46,7 +46,7 @@ describe("pruneStaleCredentialBackups", () => {
     const stale = makeBackup("provider-catalog-v1-old", 91);
     const lines: string[] = [];
 
-    const result = pruneStaleCredentialBackups({ hanakoHome: home!, now: NOW, log: (l: string) => lines.push(l) });
+    const result = pruneStaleCredentialBackups({ lingxiHome: home!, now: NOW, log: (l: string) => lines.push(l) });
 
     expect(fs.existsSync(stale)).toBe(false);
     expect(result.removed).toEqual(["provider-catalog-v1-old"]);
@@ -58,7 +58,7 @@ describe("pruneStaleCredentialBackups", () => {
     writeHealthyCatalog();
     const fresh = makeBackup("provider-catalog-v1-recent", 89);
 
-    const result = pruneStaleCredentialBackups({ hanakoHome: home!, now: NOW });
+    const result = pruneStaleCredentialBackups({ lingxiHome: home!, now: NOW });
 
     expect(fs.existsSync(fresh)).toBe(true);
     expect(result.removed).toEqual([]);
@@ -69,7 +69,7 @@ describe("pruneStaleCredentialBackups", () => {
     makeHome();
     const stale = makeBackup("provider-catalog-v1-old", 400);
 
-    const result = pruneStaleCredentialBackups({ hanakoHome: home!, now: NOW });
+    const result = pruneStaleCredentialBackups({ lingxiHome: home!, now: NOW });
 
     expect(fs.existsSync(stale)).toBe(true);
     expect(result.kept[0]).toMatchObject({ reason: "live-catalog-unusable" });
@@ -80,7 +80,7 @@ describe("pruneStaleCredentialBackups", () => {
     fs.writeFileSync(path.join(home!, "provider-catalog.json"), "{ not json");
     const stale = makeBackup("provider-catalog-v1-old", 400);
 
-    const result = pruneStaleCredentialBackups({ hanakoHome: home!, now: NOW });
+    const result = pruneStaleCredentialBackups({ lingxiHome: home!, now: NOW });
 
     expect(fs.existsSync(stale)).toBe(true);
     expect(result.kept[0]).toMatchObject({ reason: "live-catalog-unusable" });
@@ -91,7 +91,7 @@ describe("pruneStaleCredentialBackups", () => {
     writeHealthyCatalog({});
     const stale = makeBackup("provider-catalog-v1-old", 400);
 
-    const result = pruneStaleCredentialBackups({ hanakoHome: home!, now: NOW });
+    const result = pruneStaleCredentialBackups({ lingxiHome: home!, now: NOW });
 
     expect(fs.existsSync(stale)).toBe(true);
     expect(result.kept[0]).toMatchObject({ reason: "live-catalog-unusable" });
@@ -103,20 +103,20 @@ describe("pruneStaleCredentialBackups", () => {
     makeHome();
     makeBackup("provider-catalog-v1-old", 400);
 
-    pruneStaleCredentialBackups({ hanakoHome: home!, now: NOW });
+    pruneStaleCredentialBackups({ lingxiHome: home!, now: NOW });
 
     expect(fs.existsSync(path.join(home!, "provider-catalog.json"))).toBe(false);
   });
 
   it("refuses a missing data directory instead of reporting a clean run", () => {
-    expect(() => pruneStaleCredentialBackups({ hanakoHome: "", now: NOW })).toThrowError(/data directory/);
+    expect(() => pruneStaleCredentialBackups({ lingxiHome: "", now: NOW })).toThrowError(/data directory/);
   });
 
   it("does nothing when there are no backups at all", () => {
     makeHome();
     writeHealthyCatalog();
 
-    const result = pruneStaleCredentialBackups({ hanakoHome: home!, now: NOW });
+    const result = pruneStaleCredentialBackups({ lingxiHome: home!, now: NOW });
 
     expect(result).toEqual({ removed: [], kept: [] });
   });

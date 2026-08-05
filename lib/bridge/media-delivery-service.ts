@@ -125,7 +125,7 @@ export class MediaDeliveryService {
 
   _refreshPublisherBaseUrl() {
     if (!this.mediaPublisher?.setBaseUrl) return;
-    const baseUrl = this.engine?.getBridgeMediaPublicBaseUrl?.() || process.env.HANA_BRIDGE_PUBLIC_BASE_URL || "";
+    const baseUrl = this.engine?.getBridgeMediaPublicBaseUrl?.() || process.env.LINGXI_BRIDGE_PUBLIC_BASE_URL || "";
     this.mediaPublisher.setBaseUrl(baseUrl);
   }
 
@@ -269,7 +269,7 @@ function kindFromExt(ext) {
 
 function publicUrlRequiredMessage(platform, detail = null) {
   const suffix = detail ? `：${detail.message || detail}` : "";
-  return `${platform || "platform"} 当前 adapter 不能直接消费这个本地 staged file，只能走 public_url fallback（配置 bridge_media_public_base_url 或 HANA_BRIDGE_PUBLIC_BASE_URL 后可启用）${suffix}`;
+  return `${platform || "platform"} 当前 adapter 不能直接消费这个本地 staged file，只能走 public_url fallback（配置 bridge_media_public_base_url 或 LINGXI_BRIDGE_PUBLIC_BASE_URL 后可启用）${suffix}`;
 }
 
 function logDelivery({ platform, mode, kind, file, metadata, filename, size }: any = {}) {

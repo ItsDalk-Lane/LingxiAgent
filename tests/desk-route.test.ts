@@ -200,12 +200,12 @@ describe("desk route", () => {
   it("manages workspace skills through a mounted Studio workspace", async () => {
     const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "hana-desk-route-"));
     try {
-      const hanakoHome = path.join(tempRoot, "hana");
+      const lingxiHome = path.join(tempRoot, "hana");
       const workspace = path.join(tempRoot, "mounted-workspace");
       const existingSkillDir = path.join(workspace, ".agents", "skills", "existing-skill");
       fs.mkdirSync(existingSkillDir, { recursive: true });
       fs.writeFileSync(path.join(existingSkillDir, "SKILL.md"), "---\nname: existing-skill\n---\n", "utf-8");
-      upsertStudioMount(hanakoHome, {
+      upsertStudioMount(lingxiHome, {
         schemaVersion: 1,
         mountId: "mount_docs",
         hostStudioId: "studio-main",
@@ -219,7 +219,7 @@ describe("desk route", () => {
 
       const syncWorkspaceSkillPaths = vi.fn(async () => {});
       const engine = {
-        hanakoHome,
+        lingxiHome,
         deskCwd: path.join(tempRoot, "default-workspace"),
         homeCwd: path.join(tempRoot, "default-workspace"),
         getRuntimeContext: () => ({ studioId: "studio-main" }),
@@ -277,7 +277,7 @@ describe("desk route", () => {
       for (const dir of [cwd, extra, sibling]) fs.mkdirSync(dir, { recursive: true });
 
       const engine = {
-        hanakoHome: path.join(tempRoot, "hana-home"),
+        lingxiHome: path.join(tempRoot, "hana-home"),
         deskCwd: cwd,
         homeCwd: cwd,
         isApprovedWorkspaceDir: vi.fn((dir) => dir === cwd || dir === extra),
@@ -309,7 +309,7 @@ describe("desk route", () => {
       fs.writeFileSync(path.join(selectedHome, "mio.md"), "ok");
 
       const engine = {
-        hanakoHome: path.join(tempRoot, "hana-home"),
+        lingxiHome: path.join(tempRoot, "hana-home"),
         deskCwd: currentHome,
         homeCwd: currentHome,
         getExplicitHomeCwd: vi.fn((agentId) => (agentId === "mio" ? selectedHome : null)),
@@ -343,7 +343,7 @@ describe("desk route", () => {
       fs.writeFileSync(path.join(selectedWorkspace, "visible.txt"), "ok");
 
       const engine = {
-        hanakoHome: path.join(tempRoot, "hana-home"),
+        lingxiHome: path.join(tempRoot, "hana-home"),
         config: { cwd_history: [selectedWorkspace] },
         deskCwd: agentHome,
         homeCwd: agentHome,
@@ -469,7 +469,7 @@ describe("desk route", () => {
       fs.writeFileSync(path.join(cwd, "notes", "chapter.md"), "chapter", "utf-8");
 
       const engine = {
-        hanakoHome: path.join(tempRoot, "hana"),
+        lingxiHome: path.join(tempRoot, "hana"),
         deskCwd: cwd,
         homeCwd: cwd,
       };
@@ -509,7 +509,7 @@ describe("desk route", () => {
       fs.writeFileSync(path.join(cwd, "old.md"), "old", "utf-8");
 
       const engine = {
-        hanakoHome: path.join(tempRoot, "hana"),
+        lingxiHome: path.join(tempRoot, "hana"),
         deskCwd: cwd,
         homeCwd: cwd,
       };
@@ -552,7 +552,7 @@ describe("desk route", () => {
       fs.mkdirSync(cwd, { recursive: true });
 
       const engine = {
-        hanakoHome: path.join(tempRoot, "hana"),
+        lingxiHome: path.join(tempRoot, "hana"),
         deskCwd: cwd,
         homeCwd: cwd,
       };
@@ -627,7 +627,7 @@ describe("desk route", () => {
       fs.writeFileSync(path.join(cwd, ".git", "desk-private"), "hidden", "utf-8");
 
       const engine = {
-        hanakoHome: path.join(tempRoot, "hana-home"),
+        lingxiHome: path.join(tempRoot, "hana-home"),
         deskCwd: cwd,
         homeCwd: cwd,
       };
@@ -709,7 +709,7 @@ describe("desk route", () => {
       fs.writeFileSync(draggedFile, "dragged content", "utf-8");
 
       const engine = {
-        hanakoHome: path.join(tempRoot, "hana"),
+        lingxiHome: path.join(tempRoot, "hana"),
         deskCwd: cwd,
         homeCwd: cwd,
       };

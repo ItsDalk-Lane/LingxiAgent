@@ -9,11 +9,11 @@ import '@testing-library/jest-dom/vitest';
 import type { ProviderSummary } from '../../settings/store';
 
 const mocks = vi.hoisted(() => ({
-  hanaFetch: vi.fn(),
+  lingxiFetch: vi.fn(),
 }));
 
 vi.mock('../../settings/api', () => ({
-  hanaFetch: (...args: unknown[]) => mocks.hanaFetch(...args),
+  lingxiFetch: (...args: unknown[]) => mocks.lingxiFetch(...args),
 }));
 
 vi.mock('../../settings/helpers', () => ({
@@ -47,8 +47,8 @@ const summary: ProviderSummary = {
 
 describe('OAuthCredentials', () => {
   beforeEach(() => {
-    mocks.hanaFetch.mockReset();
-    mocks.hanaFetch.mockResolvedValue(jsonResponse({
+    mocks.lingxiFetch.mockReset();
+    mocks.lingxiFetch.mockResolvedValue(jsonResponse({
       sessionId: 'oauth-session-1',
       url: 'https://auth.example/start',
     }));
@@ -70,20 +70,20 @@ describe('OAuthCredentials', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'settings.oauth.login' }));
 
-    await waitFor(() => expect(mocks.hanaFetch).toHaveBeenCalledTimes(1));
-    const [startPath, startOptions] = mocks.hanaFetch.mock.calls[0];
+    await waitFor(() => expect(mocks.lingxiFetch).toHaveBeenCalledTimes(1));
+    const [startPath, startOptions] = mocks.lingxiFetch.mock.calls[0];
     expect(startPath).toBe('/api/auth/oauth/start');
     expect(JSON.parse(String((startOptions as RequestInit).body))).toEqual({
       provider: 'openai-codex-oauth',
       loginMethod: 'browser',
     });
 
-    mocks.hanaFetch.mockResolvedValueOnce(jsonResponse({ ok: true }));
+    mocks.lingxiFetch.mockResolvedValueOnce(jsonResponse({ ok: true }));
     fireEvent.change(await screen.findByRole('textbox'), { target: { value: 'manual-code' } });
     fireEvent.click(screen.getByRole('button', { name: 'settings.oauth.submit' }));
 
-    await waitFor(() => expect(mocks.hanaFetch).toHaveBeenCalledTimes(2));
-    const [callbackPath, callbackOptions] = mocks.hanaFetch.mock.calls[1];
+    await waitFor(() => expect(mocks.lingxiFetch).toHaveBeenCalledTimes(2));
+    const [callbackPath, callbackOptions] = mocks.lingxiFetch.mock.calls[1];
     expect(callbackPath).toBe('/api/auth/oauth/callback');
     expect(JSON.parse(String((callbackOptions as RequestInit).body))).toEqual({
       sessionId: 'oauth-session-1',

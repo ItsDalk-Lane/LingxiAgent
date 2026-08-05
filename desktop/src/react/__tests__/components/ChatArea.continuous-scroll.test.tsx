@@ -98,7 +98,7 @@ describe('ChatArea continuous bottom scroll', () => {
       },
       sessions: [{ path: '/chat/scroll.jsonl', agentId: 'hana', title: null, firstMessage: '', modified: '', messageCount: 1 }],
       streamingSessions: ['/chat/scroll.jsonl'],
-      agents: [{ id: 'hana', name: 'Hana', yuan: 'hanako' }],
+      agents: [{ id: 'hana', name: 'Hana', yuan: 'lingxi' }],
     } as never);
     window.getSelection()?.removeAllRanges();
   });

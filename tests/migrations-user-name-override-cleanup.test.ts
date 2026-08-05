@@ -65,7 +65,7 @@ describe("migration #52: clear agent-level user name overrides", () => {
 
   function run(prefs) {
     runMigrations({
-      hanakoHome: tmpDir,
+      lingxiHome: tmpDir,
       agentsDir,
       prefs,
       providerRegistry: makeRegistry(),

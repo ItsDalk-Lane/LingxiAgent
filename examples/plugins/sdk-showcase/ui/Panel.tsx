@@ -1,18 +1,18 @@
 import { useEffect, useMemo, useState } from 'react';
 import { createRoot } from 'react-dom/client';
-import { hana } from '@hana/plugin-sdk';
+import { hana } from '@lingxi/plugin-sdk';
 import {
   Button,
   CardShell,
   EmptyState,
-  HanaThemeProvider,
+  LingxiThemeProvider,
   List,
   Select,
   SettingRow,
   Switch,
   TextInput,
-} from '@hana/plugin-components';
-import '@hana/plugin-components/styles.css';
+} from '@lingxi/plugin-components';
+import '@lingxi/plugin-components/styles.css';
 
 type ThemeMode = 'inherit' | 'hana' | 'custom';
 
@@ -39,7 +39,7 @@ function Panel() {
   }
 
   return (
-    <HanaThemeProvider mode={themeMode} theme={customTheme || (themeMode === 'hana' ? 'warm-paper' : undefined)}>
+    <LingxiThemeProvider mode={themeMode} theme={customTheme || (themeMode === 'hana' ? 'warm-paper' : undefined)}>
       <CardShell
         title={title}
         description="A compact example using Hana plugin SDK packages."
@@ -68,14 +68,14 @@ function Panel() {
         <TextInput label="Title" value={title} onChange={(event) => setTitle(event.currentTarget.value)} />
         <List
           items={[
-            { id: 'runtime', title: '@hana/plugin-runtime', meta: 'Node' },
-            { id: 'sdk', title: '@hana/plugin-sdk', meta: 'iframe' },
-            { id: 'components', title: '@hana/plugin-components', meta: 'React' },
+            { id: 'runtime', title: '@lingxi/plugin-runtime', meta: 'Node' },
+            { id: 'sdk', title: '@lingxi/plugin-sdk', meta: 'iframe' },
+            { id: 'components', title: '@lingxi/plugin-components', meta: 'React' },
           ]}
         />
         {!enabled && <EmptyState title="Paused" description="Turn the switch back on to resume actions." />}
       </CardShell>
-    </HanaThemeProvider>
+    </LingxiThemeProvider>
   );
 }
 

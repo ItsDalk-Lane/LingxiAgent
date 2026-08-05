@@ -3,7 +3,7 @@ import { resolveMcpApprovalTarget } from '../../components/input/mcp-approval-ac
 import type { SessionConfirmationBlock } from '../../stores/chat-types';
 
 vi.mock('../../hooks/use-hana-fetch', () => ({
-  hanaFetch: vi.fn(),
+  lingxiFetch: vi.fn(),
 }));
 
 const CONNECTORS = [

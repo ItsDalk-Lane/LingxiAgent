@@ -4,7 +4,7 @@
  * Electron 环境下这些操作走 IPC（preload.cjs），
  * Web / 云部署环境下前端通过这些 HTTP 端点读取文件。
  *
- * 安全：路径限定在 ~/.hanako/ 和 desk 工作台内。
+ * 安全：路径限定在 ~/.lingxi/ 和 desk 工作台内。
  */
 
 import fs from "fs";
@@ -62,7 +62,7 @@ function escapeHtmlCell(value) {
 
 export function createFsRoute(engine) {
   const route = new Hono();
-  const hanakoHome = path.resolve(engine.hanakoHome);
+  const lingxiHome = path.resolve(engine.lingxiHome);
 
   /**
    * 收集允许的根目录：数据目录 + 全体 agent 的 desk 工作台（用户可能配在数据目录外面）。
@@ -75,7 +75,7 @@ export function createFsRoute(engine) {
    * 每个请求现算：agent 可以在运行时增删，缓存会把删掉的 desk 留在白名单里。
    */
   function getAllowedRoots() {
-    const roots = [hanakoHome];
+    const roots = [lingxiHome];
     for (const entry of engine.listAgents?.() || []) {
       const agent = engine.getAgent?.(entry.id);
       if (!agent) continue;

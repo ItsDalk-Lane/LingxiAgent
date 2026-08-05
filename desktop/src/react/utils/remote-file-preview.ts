@@ -6,7 +6,7 @@ import type {
 } from '../types';
 import type { DeskFile } from '../types';
 import type { FileRef } from '../types/file-ref';
-import { hanaFetch } from '../hooks/use-hana-fetch';
+import { lingxiFetch } from '../hooks/use-hana-fetch';
 import { openPreview, upsertPreviewItem } from '../stores/preview-actions';
 import { useStore } from '../stores';
 import { resolveServerConnection } from '../services/server-connection';
@@ -109,8 +109,8 @@ interface PreviewContentSnapshot {
 }
 
 function fileVersionFromContentHeaders(headers: Headers): FileVersion | undefined {
-  const mtimeMs = Number(headers.get('X-Hana-File-MtimeMs'));
-  const size = Number(headers.get('X-Hana-File-Size'));
+  const mtimeMs = Number(headers.get('X-Lingxi-File-MtimeMs'));
+  const size = Number(headers.get('X-Lingxi-File-Size'));
   if (!Number.isFinite(mtimeMs) || !Number.isFinite(size)) return undefined;
   return { mtimeMs, size };
 }
@@ -142,7 +142,7 @@ function remoteContentRefWithVersion(
 }
 
 async function readContentForPreview(contentPath: string, previewType: string): Promise<PreviewContentSnapshot> {
-  const res = await hanaFetch(contentPath);
+  const res = await lingxiFetch(contentPath);
   const fileVersion = fileVersionFromContentHeaders(res.headers);
   let content: string;
   if (BINARY_PREVIEW_TYPES.has(previewType)) {
@@ -242,7 +242,7 @@ export async function saveRemoteWorkbenchContent(
   expectedVersion?: FileVersion | null,
 ): Promise<VersionedWriteResult> {
   const normalized = normalizeWorkbenchContentRef(ref);
-  const res = await hanaFetch('/api/workbench/actions', {
+  const res = await lingxiFetch('/api/workbench/actions', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({

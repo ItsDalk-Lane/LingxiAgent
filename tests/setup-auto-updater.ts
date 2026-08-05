@@ -43,7 +43,7 @@ const electronStub = {
     isPackaged: true,
     getVersion: () => "1.0.0",
     getPath: (name) => {
-      if (name === "exe") return "/Applications/HanaAgent.app/Contents/MacOS/HanaAgent";
+      if (name === "exe") return "/Applications/LingxiAgent.app/Contents/MacOS/LingxiAgent";
       if (name === "userData") return "/tmp/test-userdata";
       return "/tmp";
     },

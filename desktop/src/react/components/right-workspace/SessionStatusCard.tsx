@@ -8,7 +8,7 @@ import { type MouseEvent, useState } from 'react';
 import { Collapse } from '@/ui';
 import { useStore } from '../../stores';
 import { sessionScopedValue } from '../../stores/session-slice';
-import { hanaFetch } from '../../hooks/use-hana-fetch';
+import { lingxiFetch } from '../../hooks/use-hana-fetch';
 import styles from './SessionStatusCard.module.css';
 import { workspaceDisplayName } from '../../../../../shared/workspace-history.ts';
 
@@ -79,7 +79,7 @@ export function SessionStatusCard() {
     if (!folder) return;
     setAddingFolder(true);
     try {
-      const res = await hanaFetch('/api/sessions/authorized-folders', {
+      const res = await lingxiFetch('/api/sessions/authorized-folders', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

@@ -127,7 +127,7 @@
   },
   "announcement": {
     "title": "What's New · v{version}",
-    "fallbackBody": "HanaAgent has been updated to v{version}.",
+    "fallbackBody": "Lingxi has been updated to v{version}.",
     "confirm": "Got it"
   },
   "skills": {
@@ -558,9 +558,9 @@
   },
   "yuan": {
     "types": {
-      "hanako": {
+      "lingxi": {
         "label": "Balanced assistant",
-        "avatar": "Hanako.png"
+        "avatar": "Lingxi.png"
       },
       "butter": {
         "label": "More expressive",
@@ -1406,7 +1406,7 @@
         "scheduledTaskCompletion": "Scheduled task completion",
         "patrolCompletion": "Patrol completion",
         "never": "Never",
-        "whenUnfocused": "When HanaAgent is unfocused",
+        "whenUnfocused": "When Lingxi is unfocused",
         "whenSessionUnfocused": "When the completed chat is unfocused",
         "always": "Always"
       }
@@ -1422,7 +1422,7 @@
       "updateChecking": "Checking for updates…",
       "updateDownloading": "{agentName} is preparing a new home",
       "updateReadyInstall": "v{version} ready to install",
-      "updateInstalling": "Installing update. HanaAgent will restart automatically…",
+      "updateInstalling": "Installing update. Lingxi will restart automatically…",
       "updateInstallManualHint": "Install after clicking Restart to update; quitting will not install automatically",
       "updateInstall": "Restart to update",
       "updateInstallNow": "Restart and update now",
@@ -1449,7 +1449,7 @@
       "updateManifestReleasedAtViaMirror": "Shelf manifest issued {date} (via backup source)",
       "updateCheckBtn": "Check for updates",
       "updateRetryBtn": "Retry",
-      "updateNeedInstall": "Please move HanaAgent to the Applications folder first",
+      "updateNeedInstall": "Please move Lingxi to the Applications folder first",
       "updateDiskSpace": "Not enough disk space to download update",
       "updateDigestCta": "What you get in this update",
       "updateDigestTitle": "What you get in this update",
@@ -1488,7 +1488,7 @@
       "mobileAccess": "Mobile Access",
       "desktopAccess": "Computer Access",
       "lanToggle": "Allow LAN devices",
-      "lanHint": "Allow phones and computers on the same LAN to reach this HanaAgent Server",
+      "lanHint": "Allow phones and computers on the same LAN to reach this Lingxi Server",
       "port": "Fixed Port",
       "portHint": "Used by bookmarks and QR codes. Restart Hana after changing it",
       "mobileUrl": "Mobile URL",
@@ -1523,7 +1523,7 @@
       "desktopKeyFailed": "Creation failed",
       "connectLanServer": "Connect LAN Server",
       "remoteServerUrl": "Server URL",
-      "remoteServerUrlHint": "Enter the HanaAgent Server URL on another computer or NAS",
+      "remoteServerUrlHint": "Enter the Lingxi Server URL on another computer or NAS",
       "remoteServerKey": "Access key",
       "remoteServerKeyHint": "Enter the computer access key generated on that server",
       "remoteServerConnected": "LAN server connected",
@@ -2917,7 +2917,7 @@
     "skillMissingName": "Missing name field in SKILL.md",
     "skillNameInvalid": "Invalid skill name (\"{name}\"). Only letters, numbers, underscores, and hyphens are allowed.",
     "skillPathMustBeAbsolute": "Path must be absolute: {path}",
-    "skillCannotAddSelfDir": "Cannot add HanaAgent's own skills directory",
+    "skillCannotAddSelfDir": "Cannot add Lingxi's own skills directory",
     "skillInvalidName": "Invalid skill name",
     "skillExternalCannotDelete": "External skills cannot be deleted from here",
     "skillNotExists": "Skill does not exist",
@@ -3121,7 +3121,7 @@
   },
   "main": {
     "tray": {
-      "show": "Show HanaAgent",
+      "show": "Show Lingxi",
       "settings": "Settings",
       "quit": "Quit",
       "repairArtifacts": "Repair Components…"
@@ -3130,22 +3130,22 @@
       "selectFolder": "Select Working Folder",
       "selectSkill": "Select Skill",
       "selectPlugin": "Select Plugin",
-      "launchFailedTitle": "HanaAgent Launch Failed",
-      "launchFailedBody": "HanaAgent v{version}\n\n{detail}\n\nDetailed log saved to:\n{logPath}\n\nPlease send this screenshot or log file to the developer.",
-      "serverRestartFailed": "HanaAgent v{version}\n\nServer crashed and failed to restart.\n{error}\n\nPlease restart the application.",
-      "serverMultipleCrash": "HanaAgent v{version}\n\nServer crashed multiple times ({reason}).\n\nPlease restart the application.",
+      "launchFailedTitle": "Lingxi Launch Failed",
+      "launchFailedBody": "Lingxi v{version}\n\n{detail}\n\nDetailed log saved to:\n{logPath}\n\nPlease send this screenshot or log file to the developer.",
+      "serverRestartFailed": "Lingxi v{version}\n\nServer crashed and failed to restart.\n{error}\n\nPlease restart the application.",
+      "serverMultipleCrash": "Lingxi v{version}\n\nServer crashed multiple times ({reason}).\n\nPlease restart the application.",
       "serverStartTimeout": "Server start timed out",
       "serverKilledBySignal": "Server killed by signal ({signal})",
       "serverExitedWithCode": "Server exited with code {code}",
-      "serverFilesNotReady": "Auto-update just completed; new version files still landing on disk (missing {missing}). Waited {waited}s without success. Please restart HanaAgent shortly.",
-      "serverModuleMissing": "Server startup failed: cannot find module {module}.\nThis typically happens right after an auto-update, while new files are still being written to disk.\nRecommendation: wait 1-2 minutes and restart HanaAgent. Report on GitHub if it persists.",
-      "installFailedTitle": "HanaAgent Update",
-      "installFailedBody": "Update installation failed:\n{error}\n\nPlease restart HanaAgent and try again, or check for updates manually in Settings.",
+      "serverFilesNotReady": "Auto-update just completed; new version files still landing on disk (missing {missing}). Waited {waited}s without success. Please restart Lingxi shortly.",
+      "serverModuleMissing": "Server startup failed: cannot find module {module}.\nThis typically happens right after an auto-update, while new files are still being written to disk.\nRecommendation: wait 1-2 minutes and restart Lingxi. Report on GitHub if it persists.",
+      "installFailedTitle": "Lingxi Update",
+      "installFailedBody": "Update installation failed:\n{error}\n\nPlease restart Lingxi and try again, or check for updates manually in Settings.",
       "repairArtifactsTitle": "Repair Components",
-      "repairArtifactsBody": "This resets HanaAgent's app components to the originally installed version and restarts the app. Your data (agents, sessions, settings) is not affected.",
+      "repairArtifactsBody": "This resets Lingxi's app components to the originally installed version and restarts the app. Your data (agents, sessions, settings) is not affected.",
       "repairArtifactsConfirm": "Repair and Restart",
       "repairArtifactsCancel": "Cancel",
-      "trainUpdateApplyFailedBody": "HanaAgent v{version}\n\nUpdate failed to apply:\n{error}\n\nPlease restart the app."
+      "trainUpdateApplyFailedBody": "Lingxi v{version}\n\nUpdate failed to apply:\n{error}\n\nPlease restart the app."
     },
     "notification": {
       "ready": "Notifications enabled",
@@ -3214,7 +3214,7 @@
       "timezone": "Timezone",
       "timezoneDesc": "IANA timezone (e.g. Asia/Shanghai)",
       "bridgeMediaPublicBaseUrl": "Bridge File Public URL",
-      "bridgeMediaPublicBaseUrlDesc": "Public HTTP/HTTPS base URL used by external platforms to fetch local staged files. Usually provided by a reverse proxy or tunnel. Leave empty to fall back to HANA_BRIDGE_PUBLIC_BASE_URL.",
+      "bridgeMediaPublicBaseUrlDesc": "Public HTTP/HTTPS base URL used by external platforms to fetch local staged files. Usually provided by a reverse proxy or tunnel. Leave empty to fall back to LINGXI_BRIDGE_PUBLIC_BASE_URL.",
       "computerUse": "Computer Use",
       "computerUseDesc": "When enabled, new conversations expose the computer tool to the primary Agent. When disabled, new conversations cannot see it, and frozen old conversations are rejected if they call it.",
       "thinkingBudget": "Thinking Depth",
@@ -3358,7 +3358,7 @@
     "inputHelp": "Type /help to see commands"
   },
   "sandbox": {
-    "blocked": "[Security] {reason}\n\nThis operation was blocked by HanaAgent's sandbox security policy. This means the command crossed a path or permission boundary. Check the current workspace, the exact path syntax, and whether the target file belongs in an allowed workspace or session path. Explain the blocked path and reason to the user; discuss changing sandbox settings only if the user explicitly decides to do that.",
+    "blocked": "[Security] {reason}\n\nThis operation was blocked by Lingxi's sandbox security policy. This means the command crossed a path or permission boundary. Check the current workspace, the exact path syntax, and whether the target file belongs in an allowed workspace or session path. Explain the blocked path and reason to the user; discuss changing sandbox settings only if the user explicitly decides to do that.",
     "blockedNeedsEscalation": "[Security] {reason}\n\nThis command was blocked in sandboxed mode. If it matters for the current task and is a read-only query, rerun it with sandbox_permissions=\"require_escalated\" and a one-sentence justification; the user will review it before it runs.",
     "noSudo": "sudo is not allowed",
     "noSu": "su user switching is not allowed",
@@ -3537,7 +3537,7 @@
     "retry": "Retry"
   },
   "mobile": {
-    "startupFailed": "HanaAgent failed to start",
+    "startupFailed": "Lingxi failed to start",
     "auth": {
       "scopeError": "Current login lacks workspace access. Please re-enter the access key.",
       "loginFailed": "Login failed",

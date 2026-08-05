@@ -1,12 +1,12 @@
 <p align="center">
-  <img src=".github/assets/banner.jpg" width="100%" alt="HanaAgent Banner">
+  <img src=".github/assets/banner.jpg" width="100%" alt="灵犀 Lingxi Banner">
 </p>
 
 <p align="center">
-  <img src=".github/assets/HanaAgent-280.png" width="80" alt="HanaAgent">
+  <img src=".github/assets/Lingxi-280.png" width="80" alt="灵犀 Lingxi">
 </p>
 
-<h1 align="center">HanaAgent</h1>
+<h1 align="center">LingxiAgent</h1>
 
 <p align="center">A personal AI agent with memory and soul</p>
 
@@ -17,11 +17,11 @@
 
 ---
 
-## What is HanaAgent
+## What is LingxiAgent
 
-HanaAgent is a personal AI agent that is easier to use than traditional coding agents. It has memory, personality, and can act autonomously. Multiple agents can work together on your machine.
+LingxiAgent is a personal AI agent that is easier to use than traditional coding agents. It has memory, personality, and can act autonomously. Multiple agents can work together on your machine.
 
-As an assistant, it is gentle: no complex configuration files, no obscure jargon. HanaAgent is designed not just for coders, but for everyone who works at a computer.
+As an assistant, it is gentle: no complex configuration files, no obscure jargon. LingxiAgent is designed not just for coders, but for everyone who works at a computer.
 As a tool, it is powerful: it remembers everything you've said, operates your computer, browses the web, searches for information, reads and writes files, executes code, manages schedules, and can even learn new skills on its own.
 
 ## Features
@@ -30,7 +30,7 @@ As a tool, it is powerful: it remembers everything you've said, operates your co
 
 **Personality** — Not a generic "AI assistant". Each agent has its own voice and behavior through personality templates. Agents are self-contained folders, easy to back up and manage.
 
-**Tools** — Read/write files, run one-shot commands or persistent terminal sessions, browse the web, search the internet through browser-backed or API providers, take screenshots and segmented long screenshots, preview media, and inspect pages. Covers the vast majority of daily work scenarios. A server-first CLI can also attach to the same HanaAgent Server to show status, list sessions, and continue chats from a terminal.
+**Tools** — Read/write files, run one-shot commands or persistent terminal sessions, browse the web, search the internet through browser-backed or API providers, take screenshots and segmented long screenshots, preview media, and inspect pages. Covers the vast majority of daily work scenarios. A server-first CLI can also attach to the same LingxiAgent Server to show status, list sessions, and continue chats from a terminal.
 
 **Skills** — Built-in compatibility with the community Skills ecosystem. Agents can also install skills from GitHub or write their own. Strict safety review enabled by default.
 
@@ -52,14 +52,14 @@ As a tool, it is powerful: it remembers everything you've said, operates your co
 
 **Multi-Platform Bridge** — A single agent can connect to Telegram, Feishu, QQ, and WeChat bots simultaneously. Chat from any platform and remotely operate your computer. Bridge sessions carry platform context, and notifications can be delivered back to the current external platform.
 
-**Mobile & LAN Frontends** — HanaAgent Server can host the `/mobile/` PWA. Phones can sign in with a device access key or local account, view sessions, chat, and manage workbench files. Another desktop frontend can also connect to an existing LAN HanaAgent Server with a LAN URL and access key.
+**Mobile & LAN Frontends** — LingxiAgent Server can host the `/mobile/` PWA. Phones can sign in with a device access key or local account, view sessions, chat, and manage workbench files. Another desktop frontend can also connect to an existing LAN LingxiAgent Server with a LAN URL and access key.
 
 **i18n** — Interface available in 5 languages: Chinese, English, Japanese, Korean, and Traditional Chinese.
 
 ## Screenshots
 
 <p align="center">
-  <img src=".github/assets/screenshot-main.jpg" width="100%" alt="HanaAgent Main Interface">
+  <img src=".github/assets/screenshot-main.jpg" width="100%" alt="LingxiAgent Main Interface">
 </p>
 
 ## Quick Start
@@ -78,7 +78,7 @@ The app is signed and notarized with an Apple Developer ID. macOS should allow i
 
 ### First Run
 
-On first launch, an onboarding wizard will guide you through setup: choose a language, enter your name, connect a model provider (API key + base URL), and select three models — a **chat model** (main conversation), a **utility model** (lightweight tasks), and a **utility large model** (memory compilation and deep analysis). In settings you can also choose a **vision model** that lets text-only chat models work with image attachments through Vision Bridge. HanaAgent supports OpenAI-compatible providers, Anthropic-style providers, OAuth providers, and local models via Ollama.
+On first launch, an onboarding wizard will guide you through setup: choose a language, enter your name, connect a model provider (API key + base URL), and select three models — a **chat model** (main conversation), a **utility model** (lightweight tasks), and a **utility large model** (memory compilation and deep analysis). In settings you can also choose a **vision model** that lets text-only chat models work with image attachments through Vision Bridge. LingxiAgent supports OpenAI-compatible providers, Anthropic-style providers, OAuth providers, and local models via Ollama.
 
 ## Architecture
 
@@ -99,10 +99,10 @@ The engine layer coordinates multiple managers (Agent, Session, Model, Preferenc
 
 User-visible files inside a session are registered through `SessionFile` sidecars. Desktop, Bridge, Mobile PWA, and other remote frontends consume the same file identity according to their own capabilities. Each Bridge adapter explicitly declares its supported media kinds, delivery modes, and size limits; plugin file contribution rules live in `PLUGINS.md`.
 
-Local staged files are uploaded directly by platform adapters when possible: Telegram / Feishu / WeChat use their native upload flows, and QQ uses the official bot chunked-upload flow before sending `msg_type: 7` rich media. `preferences.bridge.mediaPublicBaseUrl` / `HANA_BRIDGE_PUBLIC_BASE_URL` are only for consumers or fallback paths that still require an internet-reachable URL.
+Local staged files are uploaded directly by platform adapters when possible: Telegram / Feishu / WeChat use their native upload flows, and QQ uses the official bot chunked-upload flow before sending `msg_type: 7` rich media. `preferences.bridge.mediaPublicBaseUrl` / `LINGXI_BRIDGE_PUBLIC_BASE_URL` are only for consumers or fallback paths that still require an internet-reachable URL.
 
 The server runs as a standalone Node.js process (spawned by Electron or independently), bundled via Vite with @vercel/nft for dependency tracing. It communicates with the Electron renderer through WebSocket.
-User data is rooted at `HANA_HOME` (`~/.hanako` in production, `~/.hanako-dev` in development). Hana-managed Pi SDK runtime resources live under `${HANA_HOME}/runtime/pi-sdk/`; Hana does not rely on Pi's global agent directory or `PI_CODING_AGENT_DIR`. Legacy `fd` / `rg` binaries under `${HANA_HOME}/.pi/agent/bin/` are copied into the new directory on first use of the corresponding search tool, while the legacy files remain untouched.
+User data is rooted at `LINGXI_HOME` (`~/.hanako` in production, `~/.hanako-dev` in development). Hana-managed Pi SDK runtime resources live under `${LINGXI_HOME}/runtime/pi-sdk/`; Lingxi does not rely on Pi's global agent directory or `PI_CODING_AGENT_DIR`. Legacy `fd` / `rg` binaries under `${LINGXI_HOME}/.pi/agent/bin/` are copied into the new directory on first use of the corresponding search tool, while the legacy files remain untouched.
 
 ## Tech Stack
 
@@ -125,7 +125,7 @@ User data is rooted at `HANA_HOME` (`~/.hanako` in production, `~/.hanako-dev` i
 | macOS (Intel) | Supported |
 | Windows | Beta |
 | Linux | Supported (AppImage / deb) |
-| Mobile (PWA) | v0: phone sessions and workbench access through the same HanaAgent Server |
+| Mobile (PWA) | v0: phone sessions and workbench access through the same LingxiAgent Server |
 
 ## Development
 

@@ -154,7 +154,7 @@ export async function collectDigestSource(options) {
 
   return {
     schemaVersion: DIGEST_SCHEMA_VERSION,
-    task: "Generate a bilingual, user-facing release digest for HanaAgent.",
+    task: "Generate a bilingual, user-facing release digest for LingxiAgent.",
     rules: [
       "Use only facts from releaseNotes and commits.",
       "Write concise zh and en content for normal users, not raw engineering changelog prose.",
@@ -179,7 +179,7 @@ export async function collectDigestSource(options) {
 
 function buildSystemPrompt() {
   return [
-    "You write HanaAgent release digests.",
+    "You write LingxiAgent release digests.",
     "Return JSON that strictly matches the supplied schema.",
     "The digest is shown in the app About page under a button named 此次更新你将获得.",
     "The zh text should be natural Simplified Chinese.",

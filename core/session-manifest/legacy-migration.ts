@@ -309,7 +309,7 @@ function sourceMetaCandidate(source, sourcePath, entry) {
   return record(entry) ? { source, sourcePath, entry: { ...entry } } : null;
 }
 
-function discoverSessionRows({ hanaHome, agentsDir }) {
+function discoverSessionRows({ lingxiHome, agentsDir }) {
   const rowsByKey = new Map();
   const diagnostics: any[] = [];
 
@@ -596,7 +596,7 @@ function discoverSessionRows({ hanaHome, agentsDir }) {
     for (const [recordId, value] of Object.entries(entries)) {
       const entry: any = record(value);
       if (!entry) continue;
-      const sessionPath = storedPathWithin(hanaHome, entry.childSessionPath || entry.sessionPath, hanaHome);
+      const sessionPath = storedPathWithin(lingxiHome, entry.childSessionPath || entry.sessionPath, lingxiHome);
       if (!sessionPath || isEphemeralSessionPath(sessionPath)) continue;
       const sourceAgentId = ownerAgentIdForPath(agentsDir, sessionPath);
       const ownerAgentId = text(entry.executorAgentId) || text(entry.agentId) || sourceAgentId;
@@ -627,8 +627,8 @@ function discoverSessionRows({ hanaHome, agentsDir }) {
       });
     }
   };
-  addSubagentStoreRecords(path.join(hanaHome, "subagent-runs.json"), "runs", "legacy_subagent_run_store");
-  addSubagentStoreRecords(path.join(hanaHome, "subagent-threads.json"), "threads", "legacy_subagent_thread_store");
+  addSubagentStoreRecords(path.join(lingxiHome, "subagent-runs.json"), "runs", "legacy_subagent_run_store");
+  addSubagentStoreRecords(path.join(lingxiHome, "subagent-threads.json"), "threads", "legacy_subagent_thread_store");
 
   return {
     sessions: [...rowsByKey.values()],
@@ -637,10 +637,10 @@ function discoverSessionRows({ hanaHome, agentsDir }) {
 }
 
 export function discoverLegacySessions(opts: any = {}) {
-  if (!opts.hanaHome) throw new Error("discoverLegacySessions requires hanaHome");
-  const hanaHome = path.resolve(opts.hanaHome);
-  const agentsDir = path.resolve(opts.agentsDir || path.join(hanaHome, "agents"));
-  return discoverSessionRows({ hanaHome, agentsDir });
+  if (!opts.lingxiHome) throw new Error("discoverLegacySessions requires lingxiHome");
+  const lingxiHome = path.resolve(opts.lingxiHome);
+  const agentsDir = path.resolve(opts.agentsDir || path.join(lingxiHome, "agents"));
+  return discoverSessionRows({ lingxiHome, agentsDir });
 }
 
 function hasLegacyPermissionFields(metaEntry) {
@@ -970,7 +970,7 @@ function expectedManifestInput(row, reader, migratedAt) {
 }
 
 export function auditLegacySessionManifests(opts: any = {}) {
-  if (!opts.hanaHome) throw new Error("auditLegacySessionManifests requires hanaHome");
+  if (!opts.lingxiHome) throw new Error("auditLegacySessionManifests requires lingxiHome");
   if (!opts.store) throw new Error("auditLegacySessionManifests requires store");
 
   const discovery = discoverLegacySessions(opts);
@@ -1089,14 +1089,14 @@ export function auditLegacySessionManifests(opts: any = {}) {
 }
 
 export function migrateLegacySessions(opts: any = {}) {
-  if (!opts.hanaHome) throw new Error("migrateLegacySessions requires hanaHome");
+  if (!opts.lingxiHome) throw new Error("migrateLegacySessions requires lingxiHome");
   if (!opts.store) throw new Error("migrateLegacySessions requires store");
 
-  const hanaHome = path.resolve(opts.hanaHome);
+  const lingxiHome = path.resolve(opts.lingxiHome);
   const migratedAt = opts.migratedAt || new Date().toISOString();
   const result: any = { scanned: 0, created: 0, existing: 0, skipped: 0, skippedDetails: [] };
   const discovery = discoverLegacySessions({
-    hanaHome,
+    lingxiHome,
     ...(opts.agentsDir ? { agentsDir: opts.agentsDir } : {}),
   });
   const gate = createMetaSourceGate({

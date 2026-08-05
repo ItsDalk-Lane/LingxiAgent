@@ -10,7 +10,7 @@ import { moodLabelForYuan } from '../../../../shared/yuan-visuals.ts';
 
 // ── Mood 解析 ──
 
-const TAG_TO_YUAN: Record<string, string> = { mood: 'hanako', pulse: 'butter', reflect: 'ming' };
+const TAG_TO_YUAN: Record<string, string> = { mood: 'lingxi', pulse: 'butter', reflect: 'ming' };
 // 当前块头是静态的；`at <时间戳>` 是历史 JSONL 里的旧块头，剥离端必须继续认
 const SESSION_REMINDER_HEADER_RE = /^\[hana_reminder(?: at \d{4}-\d{2}-\d{2} \d{2}:\d{2})?\]\r?\n/;
 const SESSION_REMINDER_END = '[/hana_reminder]';
@@ -44,7 +44,7 @@ export function parseMoodFromContent(content: string): { mood: string | null; yu
   const moodRe = /<(mood|pulse|reflect)>([\s\S]*?)<\/(?:mood|pulse|reflect)>/;
   const match = content.match(moodRe);
   if (!match) return { mood: null, yuan: null, text: content };
-  const yuan = TAG_TO_YUAN[match[1]] || 'hanako';
+  const yuan = TAG_TO_YUAN[match[1]] || 'lingxi';
   const mood = cleanMoodText(match[2].trim());
   const text = content.replace(moodRe, '').replace(/^\n+/, '').trim();
   return { mood, yuan, text };

@@ -2,7 +2,7 @@ import path from "path";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const spawnAndStream = vi.fn<(...args: any[]) => Promise<{ exitCode: number }>>(async (cmd, args, opts) => {
-  if (/hana-win-sandbox\.exe$/i.test(String(cmd))) {
+  if (/lingxi-win-sandbox\.exe$/i.test(String(cmd))) {
     // The sandboxed PowerShell startup probe always succeeds by default so
     // tests that don't care about probing can exercise the actual command;
     // tests that specifically exercise probe failure override this per-case.
@@ -10,7 +10,7 @@ const spawnAndStream = vi.fn<(...args: any[]) => Promise<{ exitCode: number }>>(
       opts?.onStdout?.(Buffer.from("ok"));
     }
     opts?.onStderr?.(Buffer.from(
-      'hana-win-sandbox: terminal-v1 status="exited" exitCode="0" timeoutMs="5000" win32Error="0"\n'
+      'lingxi-win-sandbox: terminal-v1 status="exited" exitCode="0" timeoutMs="5000" win32Error="0"\n'
     ));
   }
   return { exitCode: 0 };
@@ -119,7 +119,7 @@ describe("createWin32Exec", () => {
         timeout: 5,
         env: { PATH: "C:\\Windows\\System32" },
       }),
-    ).rejects.toMatchObject({ code: "HANA_EXEC_CWD_MISSING", cwd: "C:\\gone" });
+    ).rejects.toMatchObject({ code: "LINGXI_EXEC_CWD_MISSING", cwd: "C:\\gone" });
     expect(spawnAndStream).not.toHaveBeenCalled();
   });
 
@@ -153,7 +153,7 @@ describe("createWin32Exec", () => {
 
   it("routes sandboxed Windows native commands through cmd with UTF-8 defaults", async () => {
     classifyWin32Command.mockReturnValue({ runner: "cmd", reason: "windows-native-utility" });
-    const helper = "C:\\Hanako\\resources\\sandbox\\windows\\hana-win-sandbox.exe";
+    const helper = "C:\\Hanako\\resources\\sandbox\\windows\\lingxi-win-sandbox.exe";
     existsSync.mockImplementation((p) => p === helper);
     const createWin32Exec = await loadExecFactory();
     const exec = createWin32Exec({
@@ -204,7 +204,7 @@ describe("createWin32Exec", () => {
 
   it("passes embedded double quotes through the sandbox helper verbatim", async () => {
     classifyWin32Command.mockReturnValue({ runner: "cmd", reason: "windows-native-utility" });
-    const helper = "C:\\Hanako\\resources\\sandbox\\windows\\hana-win-sandbox.exe";
+    const helper = "C:\\Hanako\\resources\\sandbox\\windows\\lingxi-win-sandbox.exe";
     existsSync.mockImplementation((p) => p === helper);
     const createWin32Exec = await loadExecFactory();
     const exec = createWin32Exec({
@@ -238,13 +238,13 @@ describe("createWin32Exec", () => {
 
   it("promotes the Hana sandbox scratch root to a required writable-root for every sandbox-helper launch", async () => {
     classifyWin32Command.mockReturnValue({ runner: "cmd", reason: "windows-native-utility" });
-    const helper = "C:\\Hanako\\resources\\sandbox\\windows\\hana-win-sandbox.exe";
+    const helper = "C:\\Hanako\\resources\\sandbox\\windows\\lingxi-win-sandbox.exe";
     existsSync.mockImplementation((p) => p === helper);
     const createWin32Exec = await loadExecFactory();
     const exec = createWin32Exec({
       sandbox: {
         helperPath: helper,
-        hanakoHome: "C:\\Users\\Hana\\.hanako",
+        lingxiHome: "C:\\Users\\Hana\\.hanako",
         grants: {
           readPaths: [],
           writePaths: ["C:\\work", "C:\\other"],
@@ -272,9 +272,9 @@ describe("createWin32Exec", () => {
     expect(spawnOptions.env).toEqual(expect.objectContaining({ TEMP: tempDir, TMP: tempDir }));
   });
 
-  it("does not add a required writable-root when the sandbox has no hanakoHome", async () => {
+  it("does not add a required writable-root when the sandbox has no lingxiHome", async () => {
     classifyWin32Command.mockReturnValue({ runner: "cmd", reason: "windows-native-utility" });
-    const helper = "C:\\Hanako\\resources\\sandbox\\windows\\hana-win-sandbox.exe";
+    const helper = "C:\\Hanako\\resources\\sandbox\\windows\\lingxi-win-sandbox.exe";
     existsSync.mockImplementation((p) => p === helper);
     const createWin32Exec = await loadExecFactory();
     const exec = createWin32Exec({
@@ -295,7 +295,7 @@ describe("createWin32Exec", () => {
     expect(helperArgs).toEqual(expect.arrayContaining(["--writable-root", "C:\\work"]));
     expect(helperArgs.filter((a: string) => a === "--writable-root")).toHaveLength(1);
     const spawnOptions = spawnAndStream.mock.calls[0][2];
-    // No hanakoHome means withWin32SandboxRuntimeEnv never redirects TEMP;
+    // No lingxiHome means withWin32SandboxRuntimeEnv never redirects TEMP;
     // only the UTF-8 defaults get layered on top of whatever was passed in.
     expect(spawnOptions.env.TEMP).toBe("C:\\Users\\Hana\\AppData\\Local\\Temp");
   });
@@ -321,7 +321,7 @@ describe("createWin32Exec", () => {
 
   it("uses the native terminal status to distinguish timeout from a real command exit 124", async () => {
     classifyWin32Command.mockReturnValue({ runner: "cmd", reason: "cmd-builtin" });
-    const helper = "C:\\Hanako\\resources\\sandbox\\windows\\hana-win-sandbox.exe";
+    const helper = "C:\\Hanako\\resources\\sandbox\\windows\\lingxi-win-sandbox.exe";
     existsSync.mockImplementation((p) => p === helper);
     const createWin32Exec = await loadExecFactory();
     const exec = createWin32Exec({ sandbox: { helperPath: helper, grants: { writePaths: ["C:\\work"] } } });
@@ -329,7 +329,7 @@ describe("createWin32Exec", () => {
 
     spawnAndStream.mockImplementationOnce(async (_cmd, _args, opts) => {
       opts.onStderr(Buffer.from(
-        'hana-win-sandbox: terminal-v1 status="exited" exitCode="124" timeoutMs="5000" win32Error="0"\n'
+        'lingxi-win-sandbox: terminal-v1 status="exited" exitCode="124" timeoutMs="5000" win32Error="0"\n'
       ));
       return { exitCode: 124 };
     });
@@ -343,7 +343,7 @@ describe("createWin32Exec", () => {
 
     spawnAndStream.mockImplementationOnce(async (_cmd, _args, opts) => {
       opts.onStderr(Buffer.from(
-        'hana-win-sandbox: terminal-v1 status="timed_out" exitCode="124" timeoutMs="5000" win32Error="0"\n'
+        'lingxi-win-sandbox: terminal-v1 status="timed_out" exitCode="124" timeoutMs="5000" win32Error="0"\n'
       ));
       return { exitCode: 124 };
     });
@@ -358,11 +358,11 @@ describe("createWin32Exec", () => {
 
   it("surfaces native Job termination failures without retrying", async () => {
     classifyWin32Command.mockReturnValue({ runner: "cmd", reason: "cmd-builtin" });
-    const helper = "C:\\Hanako\\resources\\sandbox\\windows\\hana-win-sandbox.exe";
+    const helper = "C:\\Hanako\\resources\\sandbox\\windows\\lingxi-win-sandbox.exe";
     existsSync.mockImplementation((p) => p === helper);
     spawnAndStream.mockImplementationOnce(async (_cmd, _args, opts) => {
       opts.onStderr(Buffer.from(
-        'hana-win-sandbox: terminal-v1 status="termination_failed" exitCode="" timeoutMs="5000" win32Error="5"\n'
+        'lingxi-win-sandbox: terminal-v1 status="termination_failed" exitCode="" timeoutMs="5000" win32Error="5"\n'
       ));
       return { exitCode: 125 };
     });
@@ -375,14 +375,14 @@ describe("createWin32Exec", () => {
       signal: undefined,
       timeout: 5,
       env: { PATH: "C:\\Windows\\System32" },
-    })).rejects.toMatchObject({ code: "HANA_WIN32_SANDBOX_TERMINATION_FAILED", win32Error: 5 });
+    })).rejects.toMatchObject({ code: "LINGXI_WIN32_SANDBOX_TERMINATION_FAILED", win32Error: 5 });
     expect(chunks).toEqual([]);
     expect(spawnAndStream).toHaveBeenCalledTimes(1);
   });
 
   it("fails closed when a sandbox helper exits without its terminal protocol record", async () => {
     classifyWin32Command.mockReturnValue({ runner: "cmd", reason: "cmd-builtin" });
-    const helper = "C:\\Hanako\\resources\\sandbox\\windows\\hana-win-sandbox.exe";
+    const helper = "C:\\Hanako\\resources\\sandbox\\windows\\lingxi-win-sandbox.exe";
     existsSync.mockImplementation((p) => p === helper);
     spawnAndStream.mockResolvedValueOnce({ exitCode: 0 });
     const createWin32Exec = await loadExecFactory();
@@ -390,17 +390,17 @@ describe("createWin32Exec", () => {
 
     await expect(exec("echo ok", "C:\\work", {
       onData: () => {}, signal: undefined, timeout: 5, env: { PATH: "C:\\Windows\\System32" },
-    })).rejects.toMatchObject({ code: "HANA_WIN32_SANDBOX_TERMINAL_PROTOCOL" });
+    })).rejects.toMatchObject({ code: "LINGXI_WIN32_SANDBOX_TERMINAL_PROTOCOL" });
     expect(spawnAndStream).toHaveBeenCalledTimes(1);
   });
 
   it("does not expose native terminal records to command output while preserving stdout and ordinary stderr", async () => {
     classifyWin32Command.mockReturnValue({ runner: "cmd", reason: "cmd-builtin" });
-    const helper = "C:\\Hanako\\resources\\sandbox\\windows\\hana-win-sandbox.exe";
+    const helper = "C:\\Hanako\\resources\\sandbox\\windows\\lingxi-win-sandbox.exe";
     existsSync.mockImplementation((p) => p === helper);
     spawnAndStream.mockImplementationOnce(async (_cmd, _args, opts) => {
       opts.onStdout(Buffer.from("stdout line\n"));
-      opts.onStderr(Buffer.from("warning line\r\nhana-win-sandbox: terminal-v1 status=\"ex"));
+      opts.onStderr(Buffer.from("warning line\r\nlingxi-win-sandbox: terminal-v1 status=\"ex"));
       opts.onStderr(Buffer.from("ited\" exitCode=\"0\" timeoutMs=\"5000\" win32Error=\"0\"\r\ntrailing stderr"));
       return { exitCode: 0 };
     });
@@ -544,7 +544,7 @@ describe("createWin32Exec", () => {
 
   it("routes sandboxed default PowerShell commands through the helper after a passing startup probe", async () => {
     classifyWin32Command.mockReturnValue({ runner: "powershell-command", reason: "default-powershell" });
-    const helper = "C:\\Hanako\\resources\\sandbox\\windows\\hana-win-sandbox.exe";
+    const helper = "C:\\Hanako\\resources\\sandbox\\windows\\lingxi-win-sandbox.exe";
     const powerShellExe = "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe";
     existsSync.mockImplementation((candidate) => candidate === helper);
     const createWin32Exec = await loadExecFactory();
@@ -576,7 +576,7 @@ describe("createWin32Exec", () => {
 
   it("caches a passing sandboxed PowerShell probe across repeated commands", async () => {
     classifyWin32Command.mockReturnValue({ runner: "powershell-command", reason: "default-powershell" });
-    const helper = "C:\\Hanako\\resources\\sandbox\\windows\\hana-win-sandbox.exe";
+    const helper = "C:\\Hanako\\resources\\sandbox\\windows\\lingxi-win-sandbox.exe";
     existsSync.mockImplementation((candidate) => candidate === helper);
     const createWin32Exec = await loadExecFactory();
     const exec = createWin32Exec({
@@ -602,7 +602,7 @@ describe("createWin32Exec", () => {
 
   it("probes the explicitly requested PowerShell executable before running it in the sandbox", async () => {
     classifyWin32Command.mockReturnValue({ runner: "powershell", reason: "explicit-powershell-shell" });
-    const helper = "C:\\Hanako\\resources\\sandbox\\windows\\hana-win-sandbox.exe";
+    const helper = "C:\\Hanako\\resources\\sandbox\\windows\\lingxi-win-sandbox.exe";
     const powerShellExe = "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe";
     existsSync.mockImplementation((candidate) => candidate === helper);
     const createWin32Exec = await loadExecFactory();
@@ -627,12 +627,12 @@ describe("createWin32Exec", () => {
 
   it("fails fast when the explicitly requested PowerShell executable fails its sandboxed startup probe", async () => {
     classifyWin32Command.mockReturnValue({ runner: "powershell", reason: "explicit-powershell-shell" });
-    const helper = "C:\\Hanako\\resources\\sandbox\\windows\\hana-win-sandbox.exe";
+    const helper = "C:\\Hanako\\resources\\sandbox\\windows\\lingxi-win-sandbox.exe";
     const configuredPowerShell = "C:\\Program Files\\PowerShell\\7\\pwsh.exe";
     existsSync.mockImplementation((candidate) => candidate === helper);
     spawnAndStream.mockImplementation(async (cmd, args, opts) => {
       opts?.onStderr?.(Buffer.from(
-        'hana-win-sandbox: terminal-v1 status="exited" exitCode="1" timeoutMs="5000" win32Error="0"\n'
+        'lingxi-win-sandbox: terminal-v1 status="exited" exitCode="1" timeoutMs="5000" win32Error="0"\n'
       ));
       return { exitCode: 1 };
     });
@@ -649,12 +649,12 @@ describe("createWin32Exec", () => {
       signal: undefined,
       timeout: 5,
       env: {
-        HANA_POWERSHELL: configuredPowerShell,
+        LINGXI_POWERSHELL: configuredPowerShell,
         PATH: "C:\\Windows\\System32",
         SystemRoot: "C:\\Windows",
       },
     })).rejects.toMatchObject({
-      code: "HANA_WIN32_SANDBOX_POWERSHELL_UNSUPPORTED",
+      code: "LINGXI_WIN32_SANDBOX_POWERSHELL_UNSUPPORTED",
       message: expect.stringContaining('sandbox_permissions="require_escalated"'),
     });
     // Only the probe ran; the explicitly requested shell never got a chance
@@ -664,7 +664,7 @@ describe("createWin32Exec", () => {
 
   it("falls back from pwsh to Windows PowerShell 5.1 when the sandboxed pwsh probe fails", async () => {
     classifyWin32Command.mockReturnValue({ runner: "powershell-command", reason: "default-powershell" });
-    const helper = "C:\\Hanako\\resources\\sandbox\\windows\\hana-win-sandbox.exe";
+    const helper = "C:\\Hanako\\resources\\sandbox\\windows\\lingxi-win-sandbox.exe";
     const pwshExe = "D:\\PowerShell\\7\\pwsh.exe";
     const legacyExe = "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe";
     existsSync.mockImplementation((candidate) => candidate === helper);
@@ -678,18 +678,18 @@ describe("createWin32Exec", () => {
       return { status: 1, stdout: "", stderr: "" };
     });
     spawnAndStream.mockImplementation(async (cmd, args, opts) => {
-      if (!/hana-win-sandbox\.exe$/i.test(String(cmd))) return { exitCode: 0 };
+      if (!/lingxi-win-sandbox\.exe$/i.test(String(cmd))) return { exitCode: 0 };
       const isProbe = Array.isArray(args) && args.includes("[Console]::Out.Write('ok')");
       const targetsPwsh = Array.isArray(args) && args.includes(pwshExe);
       if (isProbe && targetsPwsh) {
         opts?.onStderr?.(Buffer.from(
-          'hana-win-sandbox: terminal-v1 status="exited" exitCode="1" timeoutMs="5000" win32Error="0"\n'
+          'lingxi-win-sandbox: terminal-v1 status="exited" exitCode="1" timeoutMs="5000" win32Error="0"\n'
         ));
         return { exitCode: 1 };
       }
       if (isProbe) opts?.onStdout?.(Buffer.from("ok"));
       opts?.onStderr?.(Buffer.from(
-        'hana-win-sandbox: terminal-v1 status="exited" exitCode="0" timeoutMs="5000" win32Error="0"\n'
+        'lingxi-win-sandbox: terminal-v1 status="exited" exitCode="0" timeoutMs="5000" win32Error="0"\n'
       ));
       return { exitCode: 0 };
     });
@@ -716,7 +716,7 @@ describe("createWin32Exec", () => {
 
   it("fails fast when both pwsh and Windows PowerShell 5.1 fail the sandboxed startup probe", async () => {
     classifyWin32Command.mockReturnValue({ runner: "powershell-command", reason: "default-powershell" });
-    const helper = "C:\\Hanako\\resources\\sandbox\\windows\\hana-win-sandbox.exe";
+    const helper = "C:\\Hanako\\resources\\sandbox\\windows\\lingxi-win-sandbox.exe";
     const pwshExe = "D:\\PowerShell\\7\\pwsh.exe";
     existsSync.mockImplementation((candidate) => candidate === helper);
     spawnSync.mockImplementation((command: any, args: any[]) => {
@@ -729,9 +729,9 @@ describe("createWin32Exec", () => {
       return { status: 1, stdout: "", stderr: "" };
     });
     spawnAndStream.mockImplementation(async (cmd, _args, opts) => {
-      if (!/hana-win-sandbox\.exe$/i.test(String(cmd))) return { exitCode: 0 };
+      if (!/lingxi-win-sandbox\.exe$/i.test(String(cmd))) return { exitCode: 0 };
       opts?.onStderr?.(Buffer.from(
-        'hana-win-sandbox: terminal-v1 status="exited" exitCode="1" timeoutMs="5000" win32Error="0"\n'
+        'lingxi-win-sandbox: terminal-v1 status="exited" exitCode="1" timeoutMs="5000" win32Error="0"\n'
       ));
       return { exitCode: 1 };
     });
@@ -749,7 +749,7 @@ describe("createWin32Exec", () => {
       timeout: 5,
       env: { PATH: "D:\\PowerShell\\7;C:\\Windows\\System32", SystemRoot: "C:\\Windows" },
     })).rejects.toMatchObject({
-      code: "HANA_WIN32_SANDBOX_POWERSHELL_UNSUPPORTED",
+      code: "LINGXI_WIN32_SANDBOX_POWERSHELL_UNSUPPORTED",
       message: expect.stringContaining('sandbox_permissions="require_escalated"'),
     });
     // pwsh probe, then legacy probe; both fail, route fails fast without
@@ -778,7 +778,7 @@ describe("createWin32Exec", () => {
 
   it("routes sandboxed relative batch scripts through cmd call", async () => {
     classifyWin32Command.mockReturnValue({ runner: "cmd-script", reason: "cmd-script-file" });
-    const helper = "C:\\Hanako\\resources\\sandbox\\windows\\hana-win-sandbox.exe";
+    const helper = "C:\\Hanako\\resources\\sandbox\\windows\\lingxi-win-sandbox.exe";
     existsSync.mockImplementation((p) => p === helper);
     const createWin32Exec = await loadExecFactory();
     const exec = createWin32Exec({
@@ -815,13 +815,13 @@ describe("createWin32Exec", () => {
 
   it("redirects sandbox runtime temp and cache env into the writable Hana scratch area", async () => {
     classifyWin32Command.mockReturnValue({ runner: "cmd", reason: "default-cmd" });
-    const helper = "C:\\Hanako\\resources\\sandbox\\windows\\hana-win-sandbox.exe";
+    const helper = "C:\\Hanako\\resources\\sandbox\\windows\\lingxi-win-sandbox.exe";
     existsSync.mockImplementation((p) => p === helper);
     const createWin32Exec = await loadExecFactory();
     const exec = createWin32Exec({
       sandbox: {
         helperPath: helper,
-        hanakoHome: "C:\\Users\\Hana\\.hanako",
+        lingxiHome: "C:\\Users\\Hana\\.hanako",
         grants: {
           readPaths: [],
           writePaths: ["C:\\work"],
@@ -912,7 +912,7 @@ describe("createWin32Exec", () => {
   it("routes sandboxed simple Git commands through bundled git.exe via the helper", async () => {
     classifyWin32Command.mockReturnValue({ runner: "git", reason: "git-command" });
     const gitExe = "C:\\Hanako\\resources\\git\\cmd\\git.exe";
-    const helper = "C:\\Hanako\\resources\\sandbox\\windows\\hana-win-sandbox.exe";
+    const helper = "C:\\Hanako\\resources\\sandbox\\windows\\lingxi-win-sandbox.exe";
     existsSync.mockImplementation((p) => p === gitExe || p === helper);
 
     const originalResourcesPath = process.resourcesPath;
@@ -969,12 +969,12 @@ describe("createWin32Exec", () => {
     const gitExe = "C:\\Hanako\\resources\\git\\cmd\\git.exe";
     const cachedRoot = "C:\\Users\\Hana\\.hanako\\.ephemeral\\win32-sandbox-runtime\\git-cache";
     const cachedGit = `${cachedRoot}\\cmd\\git.exe`;
-    const helper = "C:\\Hanako\\resources\\sandbox\\windows\\hana-win-sandbox.exe";
+    const helper = "C:\\Hanako\\resources\\sandbox\\windows\\lingxi-win-sandbox.exe";
     existsSync.mockImplementation((p) => p === gitExe || p === helper);
     prepareSandboxRuntime.mockImplementation((runtimeInfo, options) => {
       expect(options).toEqual(expect.objectContaining({
         kind: "git",
-        hanakoHome: "C:\\Users\\Hana\\.hanako",
+        lingxiHome: "C:\\Users\\Hana\\.hanako",
       }));
       return {
         ...runtimeInfo,
@@ -993,7 +993,7 @@ describe("createWin32Exec", () => {
     const exec = createWin32Exec({
       sandbox: {
         helperPath: helper,
-        hanakoHome: "C:\\Users\\Hana\\.hanako",
+        lingxiHome: "C:\\Users\\Hana\\.hanako",
         grants: {
           readPaths: [],
           writePaths: ["C:\\work"],
@@ -1035,7 +1035,7 @@ describe("createWin32Exec", () => {
     classifyWin32Command.mockReturnValue({ runner: "python", reason: "python-command" });
     const pythonExe = "C:\\Users\\Me\\AppData\\Local\\Programs\\Python\\Python311\\python.exe";
     const pythonRoot = "C:\\Users\\Me\\AppData\\Local\\Programs\\Python\\Python311";
-    const helper = "C:\\Hanako\\resources\\sandbox\\windows\\hana-win-sandbox.exe";
+    const helper = "C:\\Hanako\\resources\\sandbox\\windows\\lingxi-win-sandbox.exe";
     existsSync.mockImplementation((p) => p === pythonExe || p === pythonRoot || p === helper);
     spawnSync.mockImplementation((cmd, args) => {
       if (cmd === "where" && args?.[0] === "python") {
@@ -1083,7 +1083,7 @@ describe("createWin32Exec", () => {
   it("passes Python inline code as argv instead of routing it through bash", async () => {
     classifyWin32Command.mockReturnValue({ runner: "python", reason: "python-command" });
     const pythonExe = "C:\\Users\\Me\\AppData\\Local\\Programs\\Python\\Python311\\python.exe";
-    const helper = "C:\\Hanako\\resources\\sandbox\\windows\\hana-win-sandbox.exe";
+    const helper = "C:\\Hanako\\resources\\sandbox\\windows\\lingxi-win-sandbox.exe";
     existsSync.mockImplementation((p) => p === pythonExe || p === helper);
     spawnSync.mockImplementation((cmd, args) => {
       if (cmd === "where" && args?.[0] === "python") {
@@ -1126,7 +1126,7 @@ describe("createWin32Exec", () => {
     classifyWin32Command.mockReturnValue({ runner: "node", reason: "node-command" });
     const nodeExe = "C:\\Hanako\\resources\\server\\hana-server.exe";
     const nodeRoot = "C:\\Hanako\\resources\\server";
-    const helper = "C:\\Hanako\\resources\\sandbox\\windows\\hana-win-sandbox.exe";
+    const helper = "C:\\Hanako\\resources\\sandbox\\windows\\lingxi-win-sandbox.exe";
     existsSync.mockImplementation((p) => p === nodeExe || p === nodeRoot || p === helper);
 
     const originalExecPath = process.execPath;
@@ -1183,7 +1183,7 @@ describe("createWin32Exec", () => {
     classifyWin32Command.mockReturnValue({ runner: "node", reason: "node-command" });
     const hanaNodeExe = "C:\\Hanako\\resources\\server\\hana-server.exe";
     const pathNodeExe = "C:\\Program Files\\nodejs\\node.exe";
-    const helper = "C:\\Hanako\\resources\\sandbox\\windows\\hana-win-sandbox.exe";
+    const helper = "C:\\Hanako\\resources\\sandbox\\windows\\lingxi-win-sandbox.exe";
     existsSync.mockImplementation((p) => p === hanaNodeExe || p === pathNodeExe || p === helper);
     spawnSync.mockImplementation((cmd, args) => {
       if (cmd === "where" && args?.[0] === "node") {
@@ -1240,12 +1240,12 @@ describe("createWin32Exec", () => {
     const nodeExe = "C:\\Hanako\\resources\\server\\hana-server.exe";
     const cachedRoot = "C:\\Users\\Hana\\.hanako\\.ephemeral\\win32-sandbox-runtime\\node-cache";
     const cachedNode = `${cachedRoot}\\hana-server.exe`;
-    const helper = "C:\\Hanako\\resources\\sandbox\\windows\\hana-win-sandbox.exe";
+    const helper = "C:\\Hanako\\resources\\sandbox\\windows\\lingxi-win-sandbox.exe";
     existsSync.mockImplementation((p) => p === nodeExe || p === helper);
     prepareSandboxRuntime.mockImplementation((runtimeInfo, options) => {
       expect(options).toEqual(expect.objectContaining({
         kind: "node",
-        hanakoHome: "C:\\Users\\Hana\\.hanako",
+        lingxiHome: "C:\\Users\\Hana\\.hanako",
       }));
       return {
         ...runtimeInfo,
@@ -1263,7 +1263,7 @@ describe("createWin32Exec", () => {
     const exec = createWin32Exec({
       sandbox: {
         helperPath: helper,
-        hanakoHome: "C:\\Users\\Hana\\.hanako",
+        lingxiHome: "C:\\Users\\Hana\\.hanako",
         grants: {
           readPaths: [],
           writePaths: ["C:\\work"],
@@ -1305,7 +1305,7 @@ describe("createWin32Exec", () => {
   it("rejects explicit Python executables outside the workspace when they are not on PATH", async () => {
     classifyWin32Command.mockReturnValue({ runner: "python", reason: "python-command" });
     const privatePython = "D:\\Secrets\\python.exe";
-    const helper = "C:\\Hanako\\resources\\sandbox\\windows\\hana-win-sandbox.exe";
+    const helper = "C:\\Hanako\\resources\\sandbox\\windows\\lingxi-win-sandbox.exe";
     existsSync.mockImplementation((p) => p === privatePython || p === helper);
     spawnSync.mockImplementation((cmd, args) => {
       if (cmd === "where" && args?.[0] === "python.exe") {
@@ -1447,7 +1447,7 @@ describe("createWin32Exec", () => {
   it("routes sandbox-enabled bash commands through the restricted-token helper with write roots", async () => {
     classifyWin32Command.mockReturnValue({ runner: "bash", reason: "complex-shell" });
     const bundledShell = "C:\\Hanako\\resources\\git\\bin\\bash.exe";
-    const helper = "C:\\Hanako\\resources\\sandbox\\windows\\hana-win-sandbox.exe";
+    const helper = "C:\\Hanako\\resources\\sandbox\\windows\\lingxi-win-sandbox.exe";
     existsSync.mockImplementation((p) => p === bundledShell || p === helper);
     spawnSync.mockImplementation((cmd, args) => {
       if (cmd === bundledShell && args?.[0] === "-lc") {
@@ -1515,7 +1515,7 @@ describe("createWin32Exec", () => {
 
   it("keeps sandbox helper cwd separate from policy write roots", async () => {
     classifyWin32Command.mockReturnValue({ runner: "cmd", reason: "windows-native-utility" });
-    const helper = "C:\\Hanako\\resources\\sandbox\\windows\\hana-win-sandbox.exe";
+    const helper = "C:\\Hanako\\resources\\sandbox\\windows\\lingxi-win-sandbox.exe";
     const workspaceRoot = path.resolve("/workspace");
     existsSync.mockImplementation((p) => p === helper);
     const createWin32Exec = await loadExecFactory();
@@ -1554,7 +1554,7 @@ describe("createWin32Exec", () => {
 
   it("holds a cleanup lease while sandboxed commands use writable roots", async () => {
     classifyWin32Command.mockReturnValue({ runner: "cmd", reason: "windows-native-utility" });
-    const helper = "C:\\Hanako\\resources\\sandbox\\windows\\hana-win-sandbox.exe";
+    const helper = "C:\\Hanako\\resources\\sandbox\\windows\\lingxi-win-sandbox.exe";
     existsSync.mockImplementation((p) => p === helper);
     const cleanupQueue = {
       beginRootUse: vi.fn(() => ({ id: "lease-1" })),
@@ -1603,7 +1603,7 @@ describe("createWin32Exec", () => {
     const bundledShell = "C:\\Hanako\\resources\\git\\bin\\bash.exe";
     const cachedRoot = "C:\\Users\\Hana\\.hanako\\.ephemeral\\win32-sandbox-runtime\\bash-cache";
     const cachedShell = `${cachedRoot}\\bin\\bash.exe`;
-    const helper = "C:\\Hanako\\resources\\sandbox\\windows\\hana-win-sandbox.exe";
+    const helper = "C:\\Hanako\\resources\\sandbox\\windows\\lingxi-win-sandbox.exe";
     existsSync.mockImplementation((p) => p === bundledShell || p === helper);
     spawnSync.mockImplementation((cmd, args) => {
       if (cmd === bundledShell && args?.[0] === "-lc") {
@@ -1614,7 +1614,7 @@ describe("createWin32Exec", () => {
     prepareSandboxRuntime.mockImplementation((runtimeInfo, options) => {
       expect(options).toEqual(expect.objectContaining({
         kind: "bash",
-        hanakoHome: "C:\\Users\\Hana\\.hanako",
+        lingxiHome: "C:\\Users\\Hana\\.hanako",
       }));
       return {
         ...runtimeInfo,
@@ -1633,7 +1633,7 @@ describe("createWin32Exec", () => {
     const exec = createWin32Exec({
       sandbox: {
         helperPath: helper,
-        hanakoHome: "C:\\Users\\Hana\\.hanako",
+        lingxiHome: "C:\\Users\\Hana\\.hanako",
         grants: {
           readPaths: [],
           writePaths: ["C:\\work"],
@@ -1676,7 +1676,7 @@ describe("createWin32Exec", () => {
     const bundledShell = "C:\\Hanako\\resources\\git\\bin\\bash.exe";
     const cachedRoot = "C:\\Users\\Hana\\.hanako\\.ephemeral\\win32-sandbox-runtime\\bash-cache";
     const cachedShell = `${cachedRoot}\\bin\\bash.exe`;
-    const helper = "C:\\Hanako\\resources\\sandbox\\windows\\hana-win-sandbox.exe";
+    const helper = "C:\\Hanako\\resources\\sandbox\\windows\\lingxi-win-sandbox.exe";
     existsSync.mockImplementation((p) => p === bundledShell || p === helper);
     spawnSync.mockImplementation((cmd, args) => {
       if (cmd === bundledShell && args?.[0] === "-lc") {
@@ -1686,7 +1686,7 @@ describe("createWin32Exec", () => {
     });
     spawnAndStream.mockImplementationOnce(async (_cmd, _args, opts) => {
       opts.onStderr(Buffer.from(
-        'hana-win-sandbox: terminal-v1 status="exited" exitCode="3221225794" timeoutMs="5000" win32Error="0"\n'
+        'lingxi-win-sandbox: terminal-v1 status="exited" exitCode="3221225794" timeoutMs="5000" win32Error="0"\n'
       ));
       return { exitCode: 3221225794 };
     });
@@ -1707,7 +1707,7 @@ describe("createWin32Exec", () => {
     const exec = createWin32Exec({
       sandbox: {
         helperPath: helper,
-        hanakoHome: "C:\\Users\\Hana\\.hanako",
+        lingxiHome: "C:\\Users\\Hana\\.hanako",
         grants: {
           readPaths: [],
           writePaths: ["C:\\work"],
@@ -1734,7 +1734,7 @@ describe("createWin32Exec", () => {
     expect(diagnostic).toContain("STATUS_DLL_INIT_FAILED");
     expect(diagnostic).toContain("Executable: present=true length=");
     expect(diagnostic).toContain("Runtime root: present=true length=");
-    expect(diagnostic).toContain("HANA_HOME: present=true length=");
+    expect(diagnostic).toContain("LINGXI_HOME: present=true length=");
     expect(diagnostic).not.toContain("C:\\Users\\Hana");
     expect(diagnostic).not.toContain(cachedShell);
     expect(diagnostic).not.toContain(cachedRoot);
@@ -1801,8 +1801,8 @@ describe("createWin32Exec", () => {
         TMP: `${customerRoot}\\tmp`,
         LOCALAPPDATA: `${customerRoot}\\local`,
         APPDATA: `${customerRoot}\\roaming`,
-        HANA_ROOT: `${customerRoot}\\hana`,
-        HANA_SERVER_ENTRY: `${customerRoot}\\server.mjs`,
+        LINGXI_ROOT: `${customerRoot}\\hana`,
+        LINGXI_SERVER_ENTRY: `${customerRoot}\\server.mjs`,
       },
     });
 
@@ -1819,11 +1819,11 @@ describe("createWin32Exec", () => {
 
   it("emits STATUS_DLL_INIT_FAILED diagnostics for sandboxed cmd helper failures", async () => {
     classifyWin32Command.mockReturnValue({ runner: "cmd", reason: "cmd-builtin" });
-    const helper = "C:\\Hanako\\resources\\sandbox\\windows\\hana-win-sandbox.exe";
+    const helper = "C:\\Hanako\\resources\\sandbox\\windows\\lingxi-win-sandbox.exe";
     existsSync.mockImplementation((p) => p === helper);
     spawnAndStream.mockImplementationOnce(async (_cmd, _args, opts) => {
       opts.onStderr(Buffer.from(
-        'hana-win-sandbox: terminal-v1 status="exited" exitCode="3221225794" timeoutMs="5000" win32Error="0"\n'
+        'lingxi-win-sandbox: terminal-v1 status="exited" exitCode="3221225794" timeoutMs="5000" win32Error="0"\n'
       ));
       return { exitCode: 3221225794 };
     });
@@ -1832,7 +1832,7 @@ describe("createWin32Exec", () => {
     const exec = createWin32Exec({
       sandbox: {
         helperPath: helper,
-        hanakoHome: "C:\\Users\\Hana\\.hanako",
+        lingxiHome: "C:\\Users\\Hana\\.hanako",
         grants: {
           readPaths: [],
           writePaths: ["C:\\work"],
@@ -1848,7 +1848,7 @@ describe("createWin32Exec", () => {
         PATH: "C:\\Windows\\System32",
         COMSPEC: systemCmdExe,
         SystemRoot: "C:\\Windows",
-        HANA_HOME: "C:\\Users\\Hana\\.hanako",
+        LINGXI_HOME: "C:\\Users\\Hana\\.hanako",
       },
     });
 
@@ -1856,21 +1856,21 @@ describe("createWin32Exec", () => {
     const diagnostic = chunks.join("");
     expect(diagnostic).toContain("Route: runner=cmd reason=cmd-builtin mode=sandbox-helper sandbox=true");
     expect(diagnostic).toContain("Helper: present=true length=");
-    expect(diagnostic).toContain("HANA_HOME: present=true length=");
+    expect(diagnostic).toContain("LINGXI_HOME: present=true length=");
     expect(diagnostic).not.toContain("C:\\Users\\Hana");
     expect(spawnAndStream).toHaveBeenCalledTimes(1);
   });
 
   it("emits helper launch diagnostics for sandbox CreateProcessAsUserW failures", async () => {
     classifyWin32Command.mockReturnValue({ runner: "cmd", reason: "cmd-builtin" });
-    const helper = "C:\\Hanako\\resources\\sandbox\\windows\\hana-win-sandbox.exe";
+    const helper = "C:\\Hanako\\resources\\sandbox\\windows\\lingxi-win-sandbox.exe";
     existsSync.mockImplementation((p) => p === helper);
     spawnAndStream.mockImplementationOnce(async (_cmd, _args, opts) => {
       opts.onStderr(Buffer.from([
-        "hana-win-sandbox: CreateProcessAsUserW failed: Access is denied.",
-        "hana-win-sandbox: launch-failure error=\"5\" errorHex=\"0x00000005\"",
-        "hana-win-sandbox: launch-failure-context executablePresent=\"true\" executableLength=\"31\" cwdPresent=\"true\" cwdLength=\"15\" argumentCount=\"4\" commandLineLength=\"38\"",
-        "hana-win-sandbox: terminal-v1 status=\"launch_failed\" exitCode=\"\" timeoutMs=\"5000\" win32Error=\"5\"",
+        "lingxi-win-sandbox: CreateProcessAsUserW failed: Access is denied.",
+        "lingxi-win-sandbox: launch-failure error=\"5\" errorHex=\"0x00000005\"",
+        "lingxi-win-sandbox: launch-failure-context executablePresent=\"true\" executableLength=\"31\" cwdPresent=\"true\" cwdLength=\"15\" argumentCount=\"4\" commandLineLength=\"38\"",
+        "lingxi-win-sandbox: terminal-v1 status=\"launch_failed\" exitCode=\"\" timeoutMs=\"5000\" win32Error=\"5\"",
       ].join("\n")));
       return { exitCode: 1 };
     });
@@ -1879,7 +1879,7 @@ describe("createWin32Exec", () => {
     const exec = createWin32Exec({
       sandbox: {
         helperPath: helper,
-        hanakoHome: "C:\\Users\\Hana\\.hanako",
+        lingxiHome: "C:\\Users\\Hana\\.hanako",
         grants: {
           readPaths: [],
           writePaths: ["C:\\work\\project"],
@@ -1895,7 +1895,7 @@ describe("createWin32Exec", () => {
         PATH: "C:\\Windows\\System32",
         COMSPEC: systemCmdExe,
         SystemRoot: "C:\\Windows",
-        HANA_HOME: "C:\\Users\\Hana\\.hanako",
+        LINGXI_HOME: "C:\\Users\\Hana\\.hanako",
         USERPROFILE: "C:\\Users\\Hana",
       },
     });
@@ -1915,15 +1915,15 @@ describe("createWin32Exec", () => {
   it("never includes command arguments or customer paths in helper launch diagnostics", async () => {
     classifyWin32Command.mockReturnValue({ runner: "cmd", reason: "cmd-builtin" });
     const customerRoot = "D:\\Customers\\Private Tenant\\Incident 9";
-    const helper = `${customerRoot}\\hana-win-sandbox.exe`;
+    const helper = `${customerRoot}\\lingxi-win-sandbox.exe`;
     const secret = "HELPER_SECRET_c91e";
     existsSync.mockImplementation((p) => p === helper);
     spawnAndStream.mockImplementationOnce(async (_cmd, _args, opts) => {
       opts.onStderr(Buffer.from([
-        "hana-win-sandbox: CreateProcessAsUserW failed: Access is denied.",
-        "hana-win-sandbox: launch-failure error=\"5\" errorHex=\"0x00000005\"",
-        "hana-win-sandbox: launch-failure-context executablePresent=\"true\" executableLength=\"31\" cwdPresent=\"true\" cwdLength=\"42\" argumentCount=\"4\" commandLineLength=\"91\"",
-        "hana-win-sandbox: terminal-v1 status=\"launch_failed\" exitCode=\"\" timeoutMs=\"5000\" win32Error=\"5\"",
+        "lingxi-win-sandbox: CreateProcessAsUserW failed: Access is denied.",
+        "lingxi-win-sandbox: launch-failure error=\"5\" errorHex=\"0x00000005\"",
+        "lingxi-win-sandbox: launch-failure-context executablePresent=\"true\" executableLength=\"31\" cwdPresent=\"true\" cwdLength=\"42\" argumentCount=\"4\" commandLineLength=\"91\"",
+        "lingxi-win-sandbox: terminal-v1 status=\"launch_failed\" exitCode=\"\" timeoutMs=\"5000\" win32Error=\"5\"",
       ].join("\n")));
       return { exitCode: 1 };
     });
@@ -1932,7 +1932,7 @@ describe("createWin32Exec", () => {
     const exec = createWin32Exec({
       sandbox: {
         helperPath: helper,
-        hanakoHome: `${customerRoot}\\hana-home`,
+        lingxiHome: `${customerRoot}\\hana-home`,
         grants: { readPaths: [], writePaths: [customerRoot] },
       },
     });
@@ -1959,11 +1959,11 @@ describe("createWin32Exec", () => {
 
   it("does not leak the startup probe's own output into the caller's stream for unsupported sandboxed PowerShell", async () => {
     classifyWin32Command.mockReturnValue({ runner: "powershell", reason: "explicit-powershell-shell" });
-    const helper = "C:\\Hanako\\resources\\sandbox\\windows\\hana-win-sandbox.exe";
+    const helper = "C:\\Hanako\\resources\\sandbox\\windows\\lingxi-win-sandbox.exe";
     existsSync.mockImplementation((p) => p === helper);
     spawnAndStream.mockImplementation(async (cmd, _args, opts) => {
       opts?.onStderr?.(Buffer.from(
-        'hana-win-sandbox: terminal-v1 status="exited" exitCode="1" timeoutMs="5000" win32Error="0"\n'
+        'lingxi-win-sandbox: terminal-v1 status="exited" exitCode="1" timeoutMs="5000" win32Error="0"\n'
       ));
       return { exitCode: 1 };
     });
@@ -1972,7 +1972,7 @@ describe("createWin32Exec", () => {
     const exec = createWin32Exec({
       sandbox: {
         helperPath: helper,
-        hanakoHome: "C:\\Users\\Hana\\.hanako",
+        lingxiHome: "C:\\Users\\Hana\\.hanako",
         grants: {
           readPaths: [],
           writePaths: ["C:\\work"],
@@ -1988,7 +1988,7 @@ describe("createWin32Exec", () => {
         PATH: "C:\\Windows\\System32",
         SystemRoot: "C:\\Windows",
       },
-    })).rejects.toMatchObject({ code: "HANA_WIN32_SANDBOX_POWERSHELL_UNSUPPORTED" });
+    })).rejects.toMatchObject({ code: "LINGXI_WIN32_SANDBOX_POWERSHELL_UNSUPPORTED" });
 
     // The probe ran (and failed) but the caller's own onData never saw any
     // of the probe's internal stdio; the failed command itself never spawned.
@@ -1999,7 +1999,7 @@ describe("createWin32Exec", () => {
   it("does not pass network capability flags for restricted-token sandboxed commands", async () => {
     classifyWin32Command.mockReturnValue({ runner: "bash", reason: "complex-shell" });
     const bundledShell = "C:\\Hanako\\resources\\git\\bin\\bash.exe";
-    const helper = "C:\\Hanako\\resources\\sandbox\\windows\\hana-win-sandbox.exe";
+    const helper = "C:\\Hanako\\resources\\sandbox\\windows\\lingxi-win-sandbox.exe";
     existsSync.mockImplementation((p) => p === bundledShell || p === helper);
     spawnSync.mockImplementation((cmd, args) => {
       if (cmd === bundledShell && args?.[0] === "-lc") {
@@ -2058,7 +2058,7 @@ describe("createWin32Exec", () => {
   it("keeps network unrestricted by default without helper network flags", async () => {
     classifyWin32Command.mockReturnValue({ runner: "bash", reason: "complex-shell" });
     const bundledShell = "C:\\Hanako\\resources\\git\\bin\\bash.exe";
-    const helper = "C:\\Hanako\\resources\\sandbox\\windows\\hana-win-sandbox.exe";
+    const helper = "C:\\Hanako\\resources\\sandbox\\windows\\lingxi-win-sandbox.exe";
     existsSync.mockImplementation((p) => p === bundledShell || p === helper);
     spawnSync.mockImplementation((cmd, args) => {
       if (cmd === bundledShell && args?.[0] === "-lc") {
@@ -2105,7 +2105,7 @@ describe("createWin32Exec", () => {
   it("rejects sandboxed commands when Windows sandbox networking is explicitly disabled", async () => {
     classifyWin32Command.mockReturnValue({ runner: "bash", reason: "complex-shell" });
     const bundledShell = "C:\\Hanako\\resources\\git\\bin\\bash.exe";
-    const helper = "C:\\Hanako\\resources\\sandbox\\windows\\hana-win-sandbox.exe";
+    const helper = "C:\\Hanako\\resources\\sandbox\\windows\\lingxi-win-sandbox.exe";
     existsSync.mockImplementation((p) => p === bundledShell || p === helper);
     spawnSync.mockImplementation((cmd, args) => {
       if (cmd === bundledShell && args?.[0] === "-lc") {
@@ -2152,7 +2152,7 @@ describe("createWin32Exec", () => {
   it("rejects sandboxed commands when Windows sandbox networking mode is none", async () => {
     classifyWin32Command.mockReturnValue({ runner: "bash", reason: "complex-shell" });
     const bundledShell = "C:\\Hanako\\resources\\git\\bin\\bash.exe";
-    const helper = "C:\\Hanako\\resources\\sandbox\\windows\\hana-win-sandbox.exe";
+    const helper = "C:\\Hanako\\resources\\sandbox\\windows\\lingxi-win-sandbox.exe";
     existsSync.mockImplementation((p) => p === bundledShell || p === helper);
     spawnSync.mockImplementation((cmd, args) => {
       if (cmd === bundledShell && args?.[0] === "-lc") {
@@ -2200,7 +2200,7 @@ describe("createWin32Exec", () => {
   it("does not call obsolete external read path projection for restricted-token grants", async () => {
     classifyWin32Command.mockReturnValue({ runner: "bash", reason: "complex-shell" });
     const bundledShell = "C:\\Hanako\\resources\\git\\bin\\bash.exe";
-    const helper = "C:\\Hanako\\resources\\sandbox\\windows\\hana-win-sandbox.exe";
+    const helper = "C:\\Hanako\\resources\\sandbox\\windows\\lingxi-win-sandbox.exe";
     const getExternalReadPaths = vi.fn(() => ["C:\\outside\\secret.txt"]);
     existsSync.mockImplementation((p) => p === bundledShell || p === helper);
     spawnSync.mockImplementation((cmd, args) => {
@@ -2253,7 +2253,7 @@ describe("createWin32Exec", () => {
   it("does not fall back to system Git Bash for sandboxed POSIX commands", async () => {
     classifyWin32Command.mockReturnValue({ runner: "bash", reason: "complex-shell" });
     const systemBash = "C:\\Program Files\\Git\\bin\\bash.exe";
-    const helper = "C:\\Hanako\\resources\\sandbox\\windows\\hana-win-sandbox.exe";
+    const helper = "C:\\Hanako\\resources\\sandbox\\windows\\lingxi-win-sandbox.exe";
     existsSync.mockImplementation((p) => p === systemBash || p === helper);
     spawnSync.mockImplementation((cmd, args) => {
       if (cmd === systemBash && args?.[0] === "-c") {

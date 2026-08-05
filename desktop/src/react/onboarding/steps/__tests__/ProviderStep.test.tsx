@@ -41,7 +41,7 @@ describe('ProviderStep', () => {
     render(
       <ProviderStep
         preview={false}
-        hanaFetch={vi.fn()}
+        lingxiFetch={vi.fn()}
         agentId="hana-primary"
         verificationPlan={{ agentConfig: {}, preferenceModels: {}, requiredAgentSecretPaths: [] }}
         goToStep={goToStep}

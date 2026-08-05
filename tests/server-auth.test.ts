@@ -33,7 +33,7 @@ describe("server auth service", () => {
     tmpDir = makeTmpDir();
     const { createServerAuthService } = await import("../core/server-auth.ts");
     const auth = createServerAuthService({
-      hanakoHome: tmpDir,
+      lingxiHome: tmpDir,
       loopbackToken: "local-secret",
       runtimeContext: runtimeContext(),
     });
@@ -61,7 +61,7 @@ describe("server auth service", () => {
     tmpDir = makeTmpDir();
     const { createServerAuthService } = await import("../core/server-auth.ts");
     const auth = createServerAuthService({
-      hanakoHome: tmpDir,
+      lingxiHome: tmpDir,
       loopbackToken: "local-secret",
       runtimeContext: runtimeContext(),
     });
@@ -96,7 +96,7 @@ describe("server auth service", () => {
       now: "2026-05-16T00:00:00.000Z",
     });
     const auth = createServerAuthService({
-      hanakoHome: tmpDir,
+      lingxiHome: tmpDir,
       loopbackToken: "local-secret",
       runtimeContext: runtimeContext(),
     });
@@ -142,7 +142,7 @@ describe("server auth service", () => {
       now: "2026-05-16T00:00:00.000Z",
     });
     const auth = createServerAuthService({
-      hanakoHome: tmpDir,
+      lingxiHome: tmpDir,
       loopbackToken: "local-secret",
       runtimeContext: runtimeContext(),
     });
@@ -186,7 +186,7 @@ describe("server auth service", () => {
       now: "2026-05-16T00:00:01.000Z",
     });
     const auth = createServerAuthService({
-      hanakoHome: tmpDir,
+      lingxiHome: tmpDir,
       loopbackToken: "local-secret",
       runtimeContext: runtimeContext(),
     });
@@ -205,7 +205,7 @@ describe("server auth service", () => {
     tmpDir = makeTmpDir();
     const { createServerAuthService } = await import("../core/server-auth.ts");
     const auth = createServerAuthService({
-      hanakoHome: tmpDir,
+      lingxiHome: tmpDir,
       loopbackToken: "new-local-secret",
       runtimeContext: runtimeContext(),
     });
@@ -240,7 +240,7 @@ describe("server auth service", () => {
       now: "2026-05-16T00:00:00.000Z",
     });
     const auth = createServerAuthService({
-      hanakoHome: tmpDir,
+      lingxiHome: tmpDir,
       loopbackToken: "local-secret",
       runtimeContext: runtimeContext(),
     });
@@ -283,7 +283,7 @@ describe("server auth service", () => {
     const { createWebSession } = await import("../core/web-session-store.ts");
     const { createServerAuthService } = await import("../core/server-auth.ts");
     const auth = createServerAuthService({
-      hanakoHome: tmpDir,
+      lingxiHome: tmpDir,
       loopbackToken: "local-secret",
       runtimeContext: runtimeContext(),
     });

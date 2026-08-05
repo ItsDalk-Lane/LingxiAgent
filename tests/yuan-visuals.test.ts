@@ -3,11 +3,11 @@ import { getYuanVisual, moodLabelForYuan, normalizeYuan } from "../shared/yuan-v
 
 describe("yuan visuals", () => {
   it("keeps the desktop and CLI yuan symbolism in one place", () => {
-    expect(getYuanVisual("hanako")).toMatchObject({
+    expect(getYuanVisual("lingxi")).toMatchObject({
       symbol: "✿",
       moodLabel: "MOOD",
       accent: "#537D96",
-      avatar: "Hanako.png",
+      avatar: "Lingxi.png",
     });
     expect(getYuanVisual("butter")).toMatchObject({
       symbol: "❊",
@@ -23,8 +23,8 @@ describe("yuan visuals", () => {
     });
   });
 
-  it("falls back to hanako for unknown yuan values", () => {
-    expect(normalizeYuan("unknown")).toBe("hanako");
+  it("falls back to lingxi for unknown yuan values", () => {
+    expect(normalizeYuan("unknown")).toBe("lingxi");
     expect(moodLabelForYuan("unknown")).toBe("✿ MOOD");
   });
 });

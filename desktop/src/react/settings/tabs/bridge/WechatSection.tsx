@@ -3,7 +3,7 @@
  */
 import React from 'react';
 import { t } from '../../helpers';
-import { hanaFetch } from '../../api';
+import { lingxiFetch } from '../../api';
 import { Toggle } from '@/ui';
 import { BridgeStatusDot, BridgeStatusText } from './BridgeWidgets';
 import { SettingsSection } from '../../components/SettingsSection';
@@ -23,12 +23,12 @@ export function WechatSection({ status, showToast, onSaveConfig, onReload, agent
     try {
       const agentQuery = agentId ? `?agentId=${encodeURIComponent(agentId)}` : '';
       await Promise.all([
-        hanaFetch(`/api/bridge/config${agentQuery}`, {
+        lingxiFetch(`/api/bridge/config${agentQuery}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ platform: 'wechat', credentials: { botToken: '' }, enabled: false }),
         }),
-        hanaFetch(`/api/bridge/owner${agentQuery}`, {
+        lingxiFetch(`/api/bridge/owner${agentQuery}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ platform: 'wechat', userId: null }),

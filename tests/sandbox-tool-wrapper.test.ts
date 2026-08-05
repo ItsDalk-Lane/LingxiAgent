@@ -156,7 +156,7 @@ describe("sandbox wrapper dynamic external read grants", () => {
     try {
       const configPath = path.join(tempRoot, "home", "agents", "hana", "config.yaml");
       fs.mkdirSync(path.dirname(configPath), { recursive: true });
-      fs.writeFileSync(configPath, "agent:\n  yuan: hanako\n", "utf-8");
+      fs.writeFileSync(configPath, "agent:\n  yuan: lingxi\n", "utf-8");
 
       const sandboxedTool = { execute: vi.fn(async () => ({ content: [{ type: "text", text: "sandboxed" }] })) };
       const fallbackTool = { execute: vi.fn(async () => ({ content: [{ type: "text", text: "fallback" }] })) };
@@ -180,7 +180,7 @@ describe("sandbox wrapper dynamic external read grants", () => {
       expect(fallbackTool.execute).not.toHaveBeenCalled();
       expect(sandboxedTool.execute).not.toHaveBeenCalled();
       expect(result.content[0].text).toContain("managed config files");
-      expect(fs.readFileSync(configPath, "utf-8")).toContain("yuan: hanako");
+      expect(fs.readFileSync(configPath, "utf-8")).toContain("yuan: lingxi");
     } finally {
       fs.rmSync(tempRoot, { recursive: true, force: true });
     }

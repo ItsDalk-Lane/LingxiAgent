@@ -10,7 +10,7 @@ const mocks = vi.hoisted(() => ({
   editorOptions: undefined as undefined | { extensions?: Array<{ name?: string; options?: Record<string, unknown> }> },
   dispatch: vi.fn(),
   setMeta: vi.fn(),
-  hanaFetch: vi.fn(),
+  lingxiFetch: vi.fn(),
   wsSend: vi.fn(),
 }));
 
@@ -57,8 +57,8 @@ vi.mock('../../hooks/use-config', () => ({
 }));
 
 vi.mock('../../hooks/use-hana-fetch', () => ({
-  hanaFetch: (path: string, opts?: RequestInit) => mocks.hanaFetch(path, opts),
-  hanaUrl: (path: string) => `http://127.0.0.1:3210${path}`,
+  lingxiFetch: (path: string, opts?: RequestInit) => mocks.lingxiFetch(path, opts),
+  lingxiUrl: (path: string) => `http://127.0.0.1:3210${path}`,
 }));
 
 vi.mock('../../stores/session-actions', () => ({
@@ -160,7 +160,7 @@ function seedInputState(overrides: Partial<ReturnType<typeof useStore.getState>>
     modelSwitching: false,
     welcomeVisible: true,
     locale: '',
-    agentYuan: 'hanako',
+    agentYuan: 'lingxi',
     ...overrides,
   } as never);
 }
@@ -170,7 +170,7 @@ describe('InputArea welcome placeholder', () => {
     cleanup();
     vi.clearAllMocks();
     seedInputState();
-    mocks.hanaFetch.mockResolvedValue(new Response('{}', { status: 200 }));
+    mocks.lingxiFetch.mockResolvedValue(new Response('{}', { status: 200 }));
     window.platform = {} as typeof window.platform;
     delete (window as unknown as { hana?: unknown }).hana;
   });

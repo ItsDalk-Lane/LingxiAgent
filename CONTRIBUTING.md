@@ -1,6 +1,6 @@
-# Contributing to HanaAgent
+# Contributing to 灵犀 Lingxi
 
-感谢你对 HanaAgent 的关注！
+感谢你对 灵犀 Lingxi 的关注！
 
 ## 开发环境
 

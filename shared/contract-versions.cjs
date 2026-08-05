@@ -41,11 +41,11 @@
  * user as "please update the app") until they update the app itself — a
  * real cost, so don't bump casually.
  *
- * DATA_EPOCH — the on-disk data format contract for a HANA_HOME directory
+ * DATA_EPOCH — the on-disk data format contract for a LINGXI_HOME directory
  * (SQLite schemas, session JSONL shapes, and any other persisted state a
  * kernel reads/writes there). Checked by shared/data-epoch.cjs at server
  * startup: a kernel whose own DATA_EPOCH is lower than the epoch already
- * stamped into a HANA_HOME's data-epoch.json is refused (an older kernel
+ * stamped into a LINGXI_HOME's data-epoch.json is refused (an older kernel
  * must not silently misread data a newer kernel already evolved), unless
  * the operator explicitly overrides it. Unlike PRELOAD_API_VERSION /
  * SERVER_PROTOCOL_VERSION this is not a shell/server handshake — it is a

@@ -27,7 +27,7 @@ const mocks = vi.hoisted(() => ({
   setContent: vi.fn(),
   clearContent: vi.fn(),
   ensureSession: vi.fn(),
-  hanaFetch: vi.fn(),
+  lingxiFetch: vi.fn(),
   wsSend: vi.fn(),
 }));
 
@@ -103,8 +103,8 @@ vi.mock('../../hooks/use-config', () => ({
 }));
 
 vi.mock('../../hooks/use-hana-fetch', () => ({
-  hanaFetch: (path: string, opts?: RequestInit) => mocks.hanaFetch(path, opts),
-  hanaUrl: (path: string) => `http://127.0.0.1:3210${path}`,
+  lingxiFetch: (path: string, opts?: RequestInit) => mocks.lingxiFetch(path, opts),
+  lingxiUrl: (path: string) => `http://127.0.0.1:3210${path}`,
 }));
 
 vi.mock('../../stores/session-actions', () => ({
@@ -210,7 +210,7 @@ describe('InputArea pending identity & sendable predicate (#2101)', () => {
     window.platform = {} as typeof window.platform;
     delete (window as unknown as { hana?: unknown }).hana;
     mocks.ensureSession.mockResolvedValue(null);
-    mocks.hanaFetch.mockResolvedValue(new Response(JSON.stringify({ models: {} }), { status: 200 }));
+    mocks.lingxiFetch.mockResolvedValue(new Response(JSON.stringify({ models: {} }), { status: 200 }));
   });
 
   describe('R1: welcome 态 pendingDraftId 缺失时发送', () => {

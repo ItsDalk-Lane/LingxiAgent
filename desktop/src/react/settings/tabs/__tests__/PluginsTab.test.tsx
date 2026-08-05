@@ -9,10 +9,10 @@ import '@testing-library/jest-dom/vitest';
 import { useSettingsStore } from '../../store';
 import { AUTO_DARK_DEFAULT } from '../../../../shared/theme-registry';
 
-const hanaFetch = vi.fn();
+const lingxiFetch = vi.fn();
 
 vi.mock('../../api', () => ({
-  hanaFetch: (...args: unknown[]) => hanaFetch(...args),
+  lingxiFetch: (...args: unknown[]) => lingxiFetch(...args),
 }));
 
 function jsonResponse(body: unknown): Response {
@@ -46,7 +46,7 @@ function mockConfigurablePlugin(initialValues: Record<string, unknown> = {
   metadata: { theme: 'paper' },
 }) {
   let savedValues = initialValues;
-  hanaFetch.mockImplementation(async (path: string, options?: RequestInit) => {
+  lingxiFetch.mockImplementation(async (path: string, options?: RequestInit) => {
     if (path === '/api/plugins?source=community') return jsonResponse([configurablePlugin]);
     if (path === `/api/plugins/${configurablePlugin.id}/config` && options?.method === 'PUT') {
       const body = JSON.parse(String(options.body));
@@ -74,7 +74,7 @@ async function openPluginConfig() {
 
 describe('PluginsTab', () => {
   beforeEach(() => {
-    hanaFetch.mockResolvedValue(jsonResponse([]));
+    lingxiFetch.mockResolvedValue(jsonResponse([]));
     window.t = ((key: string) => key) as typeof window.t;
     window.platform = {
       selectFile: vi.fn(),
@@ -93,7 +93,7 @@ describe('PluginsTab', () => {
 
   afterEach(() => {
     cleanup();
-    hanaFetch.mockReset();
+    lingxiFetch.mockReset();
     vi.unstubAllGlobals();
     useSettingsStore.setState({
       pluginAllowFullAccess: undefined,
@@ -130,7 +130,7 @@ describe('PluginsTab', () => {
 
     await waitFor(() => expect(useSettingsStore.getState().toastMessage).toBe('settings.plugins.invalidJson'));
     expect(tags).toHaveValue('[\n  "alpha"\n');
-    expect(hanaFetch.mock.calls.filter(([, options]) => options?.method === 'PUT')).toHaveLength(0);
+    expect(lingxiFetch.mock.calls.filter(([, options]) => options?.method === 'PUT')).toHaveLength(0);
 
     const multilineTags = '[\n  "alpha",\n  "beta"\n]';
     const multilineMetadata = JSON.stringify({ theme: AUTO_DARK_DEFAULT, density: 2 }, null, 2);
@@ -150,7 +150,7 @@ describe('PluginsTab', () => {
     expect(metadata).toHaveValue(multilineMetadata);
     fireEvent.click(screen.getByRole('button', { name: 'settings.api.save' }));
 
-    await waitFor(() => expect(hanaFetch.mock.calls.some(([, options]) => options?.method === 'PUT')).toBe(true));
+    await waitFor(() => expect(lingxiFetch.mock.calls.some(([, options]) => options?.method === 'PUT')).toBe(true));
     expect(getSavedValues()).toEqual({
       tags: ['alpha', 'beta'],
       metadata: { theme: AUTO_DARK_DEFAULT, density: 2 },
@@ -170,7 +170,7 @@ describe('PluginsTab', () => {
 
     await waitFor(() => expect(useSettingsStore.getState().toastMessage).toBe('settings.plugins.invalidJson'));
     expect(tags).toHaveValue(incompleteText);
-    expect(hanaFetch.mock.calls.filter(([, options]) => options?.method === 'PUT')).toHaveLength(0);
+    expect(lingxiFetch.mock.calls.filter(([, options]) => options?.method === 'PUT')).toHaveLength(0);
   });
 
   it('reopens saved JSON values as editable JSON instead of a quoted string', async () => {

@@ -7,17 +7,17 @@ import { auditLegacySessionManifests } from "../core/session-manifest/legacy-mig
 import { SessionManifestStore } from "../core/session-manifest/store.ts";
 
 describe("session manifest audit", () => {
-  let hanaHome: string;
+  let lingxiHome: string;
   let store: SessionManifestStore;
 
   beforeEach(() => {
-    hanaHome = fs.mkdtempSync(path.join(os.tmpdir(), "hana-session-manifest-audit-"));
-    store = new SessionManifestStore({ dbPath: path.join(hanaHome, "session-manifest.db") });
+    lingxiHome = fs.mkdtempSync(path.join(os.tmpdir(), "hana-session-manifest-audit-"));
+    store = new SessionManifestStore({ dbPath: path.join(lingxiHome, "session-manifest.db") });
   });
 
   afterEach(() => {
     store?.close();
-    fs.rmSync(hanaHome, { recursive: true, force: true });
+    fs.rmSync(lingxiHome, { recursive: true, force: true });
   });
 
   function writeJsonl(filePath: string) {
@@ -27,15 +27,15 @@ describe("session manifest audit", () => {
   }
 
   it("reports discovered, manifested, missing, missing locators, and classification mismatches without writing", () => {
-    const desktopPath = writeJsonl(path.join(hanaHome, "agents", "hana", "sessions", "desktop.jsonl"));
-    const bridgeDir = path.join(hanaHome, "agents", "hana", "sessions", "bridge");
+    const desktopPath = writeJsonl(path.join(lingxiHome, "agents", "hana", "sessions", "desktop.jsonl"));
+    const bridgeDir = path.join(lingxiHome, "agents", "hana", "sessions", "bridge");
     const bridgePath = writeJsonl(path.join(bridgeDir, "owner", "bridge.jsonl"));
     fs.writeFileSync(path.join(bridgeDir, "bridge-sessions.json"), JSON.stringify({
       "tg_dm_owner@hana": { file: "owner/bridge.jsonl", role: "owner" },
     }));
-    const activityPath = writeJsonl(path.join(hanaHome, "agents", "hana", "activity", "activity.jsonl"));
-    const missingLocatorPath = writeJsonl(path.join(hanaHome, "agents", "hana", "sessions", "gone.jsonl"));
-    const deletedLocatorPath = writeJsonl(path.join(hanaHome, "agents", "hana", "sessions", "deleted.jsonl"));
+    const activityPath = writeJsonl(path.join(lingxiHome, "agents", "hana", "activity", "activity.jsonl"));
+    const missingLocatorPath = writeJsonl(path.join(lingxiHome, "agents", "hana", "sessions", "gone.jsonl"));
+    const deletedLocatorPath = writeJsonl(path.join(lingxiHome, "agents", "hana", "sessions", "deleted.jsonl"));
 
     store.createForPath({ sessionPath: desktopPath, ownerAgentId: "hana", domain: "desktop", kind: "chat" });
     store.createForPath({
@@ -52,7 +52,7 @@ describe("session manifest audit", () => {
     fs.unlinkSync(deletedLocatorPath);
     const before = store.list();
 
-    const report = auditLegacySessionManifests({ hanaHome, store });
+    const report = auditLegacySessionManifests({ lingxiHome, store });
 
     expect(report).toMatchObject({
       discovered: 3,
@@ -95,7 +95,7 @@ describe("session manifest audit", () => {
   });
 
   it("counts a missing locator once when both the manifest and a legacy index reference it", () => {
-    const bridgeDir = path.join(hanaHome, "agents", "hana", "sessions", "bridge");
+    const bridgeDir = path.join(lingxiHome, "agents", "hana", "sessions", "bridge");
     const bridgePath = writeJsonl(path.join(bridgeDir, "owner", "gone.jsonl"));
     fs.writeFileSync(path.join(bridgeDir, "bridge-sessions.json"), JSON.stringify({
       "tg_dm_owner@hana": { file: "owner/gone.jsonl", role: "owner" },
@@ -108,7 +108,7 @@ describe("session manifest audit", () => {
     });
     fs.unlinkSync(bridgePath);
 
-    const report = auditLegacySessionManifests({ hanaHome, store });
+    const report = auditLegacySessionManifests({ lingxiHome, store });
 
     expect(report.missingLocator).toBe(1);
     expect(report.details.missingLocators).toEqual([
@@ -129,20 +129,20 @@ describe("session manifest audit", () => {
 
   it("ignores temporary workflow sessions referenced by closed legacy thread records", () => {
     const existingEphemeralPath = writeJsonl(path.join(
-      hanaHome,
+      lingxiHome,
       "agents",
       "hana",
       ".ephemeral",
       "existing.jsonl",
     ));
     const missingEphemeralPath = path.join(
-      hanaHome,
+      lingxiHome,
       "agents",
       "hana",
       ".ephemeral",
       "gone.jsonl",
     );
-    fs.writeFileSync(path.join(hanaHome, "subagent-threads.json"), JSON.stringify({
+    fs.writeFileSync(path.join(lingxiHome, "subagent-threads.json"), JSON.stringify({
       schemaVersion: 1,
       threads: {
         "workflow-1::node-1": {
@@ -158,7 +158,7 @@ describe("session manifest audit", () => {
       },
     }));
 
-    const report = auditLegacySessionManifests({ hanaHome, store });
+    const report = auditLegacySessionManifests({ lingxiHome, store });
 
     expect(report).toMatchObject({
       discovered: 0,
@@ -173,7 +173,7 @@ describe("session manifest audit", () => {
   });
 
   it("CLI fail gate includes owner and lifecycle mismatches", () => {
-    const sessionPath = writeJsonl(path.join(hanaHome, "agents", "hana", "sessions", "identity.jsonl"));
+    const sessionPath = writeJsonl(path.join(lingxiHome, "agents", "hana", "sessions", "identity.jsonl"));
     store.createForPath({
       sessionPath,
       ownerAgentId: "butter",
@@ -187,7 +187,7 @@ describe("session manifest audit", () => {
     const result = spawnSync(process.execPath, [
       "scripts/session-manifest-audit.mjs",
       "--hana-home",
-      hanaHome,
+      lingxiHome,
       "--json",
       "--fail-on-anomaly",
     ], { cwd: process.cwd(), encoding: "utf8" });
@@ -206,7 +206,7 @@ describe("session manifest audit", () => {
     const humanResult = spawnSync(process.execPath, [
       "scripts/session-manifest-audit.mjs",
       "--hana-home",
-      hanaHome,
+      lingxiHome,
       "--fail-on-anomaly",
     ], { cwd: process.cwd(), encoding: "utf8" });
 
@@ -218,16 +218,16 @@ describe("session manifest audit", () => {
   });
 
   it("CLI opens the manifest database read-only and supports an anomaly exit gate", () => {
-    writeJsonl(path.join(hanaHome, "agents", "hana", "activity", "missing.jsonl"));
+    writeJsonl(path.join(lingxiHome, "agents", "hana", "activity", "missing.jsonl"));
     store.close();
     store = null as any;
-    const dbPath = path.join(hanaHome, "session-manifest.db");
+    const dbPath = path.join(lingxiHome, "session-manifest.db");
     const beforeStat = fs.statSync(dbPath);
 
     const result = spawnSync(process.execPath, [
       "scripts/session-manifest-audit.mjs",
       "--hana-home",
-      hanaHome,
+      lingxiHome,
       "--json",
       "--fail-on-anomaly",
     ], { cwd: process.cwd(), encoding: "utf8" });

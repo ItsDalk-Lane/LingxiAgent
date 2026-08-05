@@ -26,7 +26,7 @@ const HEAVY_DIR_NAMES = new Set([
 ]);
 
 // chokidar 默认会对"绝对路径里任意段带点"判定为隐藏，而用户的 skill 根
-// （~/.hanako/skills、workspace 下的 .agents/... 等）自身就住在隐藏目录里，
+// （~/.lingxi/skills、workspace 下的 .agents/... 等）自身就住在隐藏目录里，
 // 用全局 regex 会把整棵树吞掉。这里改为相对 watch 根做判断：
 //   1. 屏蔽根以下的隐藏文件和编辑器临时文件（.DS_Store / .swp / foo~ / #foo#）
 //   2. 屏蔽 skill 内部的 HEAVY_DIR_NAMES（node_modules 等递归会爆 fd）

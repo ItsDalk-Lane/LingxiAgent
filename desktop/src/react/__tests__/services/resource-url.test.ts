@@ -28,8 +28,8 @@ const remoteConnection: ServerConnection = {
   serverId: 'server_remote',
   studioId: 'studio_remote',
   label: 'Remote Hana',
-  baseUrl: 'https://hana.example',
-  wsUrl: 'wss://hana.example',
+  baseUrl: 'https://lingxi.example',
+  wsUrl: 'wss://lingxi.example',
   token: 'remote token',
   trustState: 'tunnel',
   credentialKind: 'device_credential',
@@ -82,7 +82,7 @@ describe('resolveFileRefUrl', () => {
 
     expect(result).toEqual({
       mode: 'resource-content',
-      url: 'https://hana.example/api/resources/res_sf_asset/content?v=11-22',
+      url: 'https://lingxi.example/api/resources/res_sf_asset/content?v=11-22',
     });
     expect(platform.getFileUrl).not.toHaveBeenCalled();
   });
@@ -94,7 +94,7 @@ describe('resolveFileRefUrl', () => {
     });
 
     expect(result.mode).toBe('resource-content');
-    expect(result.url).toBe('https://hana.example/api/resources/res_sf_asset/content');
+    expect(result.url).toBe('https://lingxi.example/api/resources/res_sf_asset/content');
   });
 
   it('uses inline data only when there is no path or resource content link', () => {

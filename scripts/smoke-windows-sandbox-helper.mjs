@@ -45,7 +45,7 @@ export function commandIsAvailable(name, env = process.env) {
 }
 
 export function windowsSandboxHelperPath({ rootDir = ROOT, arch = "x64" } = {}) {
-  return path.join(rootDir, "dist-sandbox", `win-${arch}`, "hana-win-sandbox.exe");
+  return path.join(rootDir, "dist-sandbox", `win-${arch}`, "lingxi-win-sandbox.exe");
 }
 
 export function smokeWindowsSandboxHelper({
@@ -64,14 +64,14 @@ export function smokeWindowsSandboxHelper({
 
   const smokeRoot = fs.mkdtempSync(path.join(os.tmpdir(), "hana-windows-sandbox-ci-"));
   const workDir = path.join(smokeRoot, "work");
-  const hanaHome = path.join(smokeRoot, "hana-home");
+  const lingxiHome = path.join(smokeRoot, "hana-home");
   fs.mkdirSync(workDir, { recursive: true });
-  fs.mkdirSync(hanaHome, { recursive: true });
+  fs.mkdirSync(lingxiHome, { recursive: true });
   try {
     runRestrictedTokenHelperSmoke({
       layoutRoot: rootDir,
       workDir,
-      hanaHome,
+      lingxiHome,
       helperPath,
       env,
     });
@@ -83,7 +83,7 @@ export function smokeWindowsSandboxHelper({
 
 // Runs `command` through the real createWin32Exec({ sandbox }) production
 // path (the same call the exec_command tool makes), not a direct helper argv
-// construction. A fresh hanakoHome is provisioned per case so the required
+// construction. A fresh lingxiHome is provisioned per case so the required
 // TEMP-redirect writable root is exercised for real rather than assumed
 // present.
 async function runSandboxedCommandForSmoke({ rootDir, arch, env, command, timeout }) {
@@ -94,21 +94,21 @@ async function runSandboxedCommandForSmoke({ rootDir, arch, env, command, timeou
 
   const smokeRoot = fs.mkdtempSync(path.join(os.tmpdir(), "hana-windows-sandbox-parity-"));
   const workDir = path.join(smokeRoot, "work");
-  const hanaHome = path.join(smokeRoot, "hana-home");
+  const lingxiHome = path.join(smokeRoot, "hana-home");
   fs.mkdirSync(workDir, { recursive: true });
-  fs.mkdirSync(hanaHome, { recursive: true });
+  fs.mkdirSync(lingxiHome, { recursive: true });
   try {
     const { createWin32Exec } = await import("../lib/sandbox/win32-exec.ts");
     const { deriveSandboxPolicy } = await import("../lib/sandbox/policy.ts");
     const policy = deriveSandboxPolicy({
-      agentDir: hanaHome,
+      agentDir: lingxiHome,
       cwd: workDir,
       workspace: workDir,
       workspaceFolders: [],
-      hanakoHome: hanaHome,
+      lingxiHome: lingxiHome,
       mode: "standard",
     });
-    const exec = createWin32Exec({ sandbox: { policy, hanakoHome: hanaHome, helperPath } });
+    const exec = createWin32Exec({ sandbox: { policy, lingxiHome: lingxiHome, helperPath } });
     const chunks = [];
     const result = await exec(command, workDir, {
       onData: (chunk) => chunks.push(String(chunk)),

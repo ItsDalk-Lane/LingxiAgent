@@ -4,12 +4,12 @@ import '@testing-library/jest-dom/vitest';
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { AssistantMessage } from '../../components/chat/AssistantMessage';
-import { hanaFetch } from '../../hooks/use-hana-fetch';
+import { lingxiFetch } from '../../hooks/use-hana-fetch';
 import { useStore } from '../../stores';
 
 vi.mock('../../hooks/use-hana-fetch', () => ({
-  hanaFetch: vi.fn(async () => new Response(JSON.stringify({ ok: true }), { status: 200 })),
-  hanaUrl: (path: string) => `http://127.0.0.1:3210${path}`,
+  lingxiFetch: vi.fn(async () => new Response(JSON.stringify({ ok: true }), { status: 200 })),
+  lingxiUrl: (path: string) => `http://127.0.0.1:3210${path}`,
 }));
 
 vi.mock('../../utils/screenshot', () => ({
@@ -36,7 +36,7 @@ function renderSuggestion(status = 'approved', jobDataOverrides: Record<string, 
           status,
           title: '奶茶提醒',
           description: '提醒我喝奶茶',
-          target: { type: 'agent', id: 'hanako' },
+          target: { type: 'agent', id: 'lingxi' },
           detail: {
             kind: 'automation_draft',
             jobData: {
@@ -44,7 +44,7 @@ function renderSuggestion(status = 'approved', jobDataOverrides: Record<string, 
               schedule: '0 12 * * *',
               label: '奶茶提醒',
               prompt: '提醒我喝奶茶',
-              actorAgentId: 'hanako',
+              actorAgentId: 'lingxi',
               ...jobDataOverrides,
             },
           },
@@ -61,18 +61,18 @@ describe('AssistantMessage automation suggestion card', () => {
       return key;
     }) as typeof window.t;
     useStore.setState({
-      agents: [{ id: 'hanako', name: 'Hanako', yuan: 'hanako', homeFolder: '/home/hanako' }],
+      agents: [{ id: 'lingxi', name: 'Hanako', yuan: 'lingxi', homeFolder: '/home/hanako' }],
       agentName: 'Hanako',
-      agentYuan: 'hanako',
-      currentAgentId: 'hanako',
+      agentYuan: 'lingxi',
+      currentAgentId: 'lingxi',
       currentSessionId: 'session-main',
       currentSessionPath: '/sessions/main.jsonl',
       sessions: [{ sessionId: 'session-main', path: '/sessions/main.jsonl' }],
       streamingSessions: [],
       selectedMessageIdsBySession: {},
     } as never);
-    vi.mocked(hanaFetch).mockReset();
-    vi.mocked(hanaFetch).mockResolvedValue(new Response(JSON.stringify({ ok: true }), { status: 200 }));
+    vi.mocked(lingxiFetch).mockReset();
+    vi.mocked(lingxiFetch).mockResolvedValue(new Response(JSON.stringify({ ok: true }), { status: 200 }));
   });
 
   afterEach(() => {
@@ -100,11 +100,11 @@ describe('AssistantMessage automation suggestion card', () => {
     fireEvent.click(screen.getByRole('button', { name: 'automation.confirmCreate' }));
 
     await waitFor(() => {
-      expect(hanaFetch).toHaveBeenCalledWith('/api/desk/cron', expect.objectContaining({
+      expect(lingxiFetch).toHaveBeenCalledWith('/api/desk/cron', expect.objectContaining({
         method: 'POST',
       }));
     });
-    const deskCronCall = vi.mocked(hanaFetch).mock.calls.find(([url]) => url === '/api/desk/cron');
+    const deskCronCall = vi.mocked(lingxiFetch).mock.calls.find(([url]) => url === '/api/desk/cron');
     const body = JSON.parse((deskCronCall?.[1] as RequestInit).body as string);
     expect(body).toEqual({
       action: 'apply_suggestion',
@@ -116,19 +116,19 @@ describe('AssistantMessage automation suggestion card', () => {
         label: '奶茶提醒',
         prompt: '提醒我喝奶茶',
         model: '',
-        targetAgentId: 'hanako',
+        targetAgentId: 'lingxi',
       },
     });
-    expect(hanaFetch).not.toHaveBeenCalledWith(expect.stringContaining('/api/confirm/'), expect.anything());
+    expect(lingxiFetch).not.toHaveBeenCalledWith(expect.stringContaining('/api/confirm/'), expect.anything());
   });
 
   it('submits the selected Agent identity from the draft card', async () => {
     useStore.setState({
       agents: [
-        { id: 'hanako', name: 'Hanako', yuan: 'hanako', homeFolder: '/home/hanako' },
+        { id: 'lingxi', name: 'Hanako', yuan: 'lingxi', homeFolder: '/home/hanako' },
         { id: 'maomao', name: '毛毛', yuan: 'maomao', homeFolder: '/home/maomao' },
       ],
-      currentAgentId: 'hanako',
+      currentAgentId: 'lingxi',
     } as never);
 
     renderSuggestion('pending');
@@ -139,7 +139,7 @@ describe('AssistantMessage automation suggestion card', () => {
     fireEvent.click(screen.getByRole('button', { name: 'automation.confirmCreate' }));
 
     await waitFor(() => {
-      const deskCronCall = vi.mocked(hanaFetch).mock.calls.find(([url]) => url === '/api/desk/cron');
+      const deskCronCall = vi.mocked(lingxiFetch).mock.calls.find(([url]) => url === '/api/desk/cron');
       expect(deskCronCall).toBeTruthy();
       const body = JSON.parse((deskCronCall?.[1] as RequestInit).body as string);
       expect(body.jobData.targetAgentId).toBe('maomao');
@@ -160,7 +160,7 @@ describe('AssistantMessage automation suggestion card', () => {
     fireEvent.click(screen.getByRole('button', { name: 'automation.confirmCreate' }));
 
     await waitFor(() => {
-      const deskCronCall = vi.mocked(hanaFetch).mock.calls.find(([url]) => url === '/api/desk/cron');
+      const deskCronCall = vi.mocked(lingxiFetch).mock.calls.find(([url]) => url === '/api/desk/cron');
       expect(deskCronCall).toBeTruthy();
       const body = JSON.parse((deskCronCall?.[1] as RequestInit).body as string);
       expect(body.jobData.type).toBe('every');

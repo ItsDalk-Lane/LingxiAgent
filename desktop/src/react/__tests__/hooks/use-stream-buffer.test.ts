@@ -79,7 +79,7 @@ describe('streamBufferManager.snapshot', () => {
       }],
       agents: [{ id: 'owner', yuan: 'butter' }],
       currentAgentId: 'focus',
-      agentYuan: 'hanako',
+      agentYuan: 'lingxi',
     } as never);
 
     streamBufferManager.handle({ type: 'mood_start', sessionPath: PATH });

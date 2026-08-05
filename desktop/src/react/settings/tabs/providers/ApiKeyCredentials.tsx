@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useSettingsStore, type ProviderSummary } from '../../store';
-import { hanaFetch } from '../../api';
+import { lingxiFetch } from '../../api';
 import { invalidateConfigCache } from '../../../hooks/use-config';
 import { t, API_FORMAT_OPTIONS } from '../../helpers';
 import { SelectWidget } from '@/ui';
@@ -22,7 +22,7 @@ function errorMessage(err: unknown): string {
 }
 
 async function saveProviderConfigPatch(providerId: string, patch: Record<string, unknown>): Promise<void> {
-  const res = await hanaFetch('/api/config', {
+  const res = await lingxiFetch('/api/config', {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ providers: { [providerId]: patch } }),
@@ -65,7 +65,7 @@ async function resolveModelsForInitialSave(
   if (!shouldDiscoverModelsBeforeSave(providerId, plan.api, payload)) return payload;
 
   try {
-    const res = await hanaFetch('/api/providers/fetch-models', {
+    const res = await lingxiFetch('/api/providers/fetch-models', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -187,7 +187,7 @@ export function ApiKeyCredentials({ providerId, summary, providerConfig: _provid
       if (!headers) return;
       const includeHeaders = headersEdited || Object.keys(headers).length > 0;
       if (verify && plan.shouldVerify) {
-        const testRes = await hanaFetch('/api/providers/test', {
+        const testRes = await lingxiFetch('/api/providers/test', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ name: providerId, base_url: plan.effectiveUrl, api: plan.api, api_key: plan.key, headers }),
@@ -216,7 +216,7 @@ export function ApiKeyCredentials({ providerId, summary, providerConfig: _provid
   const [connStatus, setConnStatus] = useState<'idle' | 'testing' | 'ok' | 'fail'>('idle');
 
   const revealSavedApiKey = async () => {
-    const res = await hanaFetch(`/api/providers/${encodeURIComponent(providerId)}/api-key`);
+    const res = await lingxiFetch(`/api/providers/${encodeURIComponent(providerId)}/api-key`);
     const data = await res.json();
     return typeof data.api_key === 'string' ? data.api_key : '';
   };
@@ -227,7 +227,7 @@ export function ApiKeyCredentials({ providerId, summary, providerConfig: _provid
     try {
       const headers = parseHeaders();
       if (!headers) return;
-      const testRes = await hanaFetch('/api/providers/test', {
+      const testRes = await lingxiFetch('/api/providers/test', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

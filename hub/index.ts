@@ -1,7 +1,7 @@
 /**
  * Hub — 消息调度中枢
  *
- * 同进程模式：Hub 和 HanaEngine 跑在同一个 Node 进程里。
+ * 同进程模式：Hub 和 LingxiEngine 跑在同一个 Node 进程里。
  * hub.send() 内部直接调 engine 方法，行为零变化。
  * EventBus 通过 engine.setEventBus() 注入，统一事件广播。
  *
@@ -65,7 +65,7 @@ export class Hub {
   declare _sessionHandlerCleanups: any;
   /**
    * @param {object} opts
-   * @param {import('../core/engine.ts').HanaEngine} opts.engine
+   * @param {import('../core/engine.ts').LingxiEngine} opts.engine
    */
   constructor({ engine }) {
     this._engine = engine;
@@ -101,7 +101,7 @@ export class Hub {
     this._setupDmHandler();
   }
 
-  /** @returns {import('../core/engine.ts').HanaEngine} */
+  /** @returns {import('../core/engine.ts').LingxiEngine} */
   get engine() { return this._engine; }
 
   /** @returns {EventBus} */
@@ -208,11 +208,11 @@ export class Hub {
     // 在路由之前统一处理，所有消息路径（WS / Bridge DM / Bridge Group）共享
     if (
       o.images?.length
-      && this._engine.hanakoHome
+      && this._engine.lingxiHome
       && !o.inboundFiles?.length
       && !hasDisplayImageAttachments(o.displayMessage)
     ) {
-      const attachDir = path.join(this._engine.hanakoHome, "attachments");
+      const attachDir = path.join(this._engine.lingxiHome, "attachments");
       await fs.promises.mkdir(attachDir, { recursive: true });
       const savedPaths = [];
       for (const img of o.images) {
@@ -232,11 +232,11 @@ export class Hub {
     }
     if (
       o.videos?.length
-      && this._engine.hanakoHome
+      && this._engine.lingxiHome
       && !o.inboundFiles?.length
       && !hasDisplayVideoAttachments(o.displayMessage)
     ) {
-      const attachDir = path.join(this._engine.hanakoHome, "attachments");
+      const attachDir = path.join(this._engine.lingxiHome, "attachments");
       await fs.promises.mkdir(attachDir, { recursive: true });
       const savedPaths = [];
       for (const video of o.videos) {
@@ -1018,7 +1018,7 @@ function publicAgentProfile(agent) {
   return {
     id: agent?.id || null,
     name: agent?.agentName || config.agent?.name || agent?.name || agent?.id || null,
-    yuan: config.agent?.yuan || "hanako",
+    yuan: config.agent?.yuan || "lingxi",
     ownerPluginId: plugin.ownerPluginId || null,
     visibility: plugin.visibility || "public",
     identity: agent?.personality || agent?.identity || "",

@@ -659,7 +659,7 @@ describe("callText provider-compat routing", () => {
       timeoutMs: 5_000,
     } as any);
 
-    expect(fetchMock.mock.calls[0][1].headers["User-Agent"]).toBe("HanaAgent/1.0");
+    expect(fetchMock.mock.calls[0][1].headers["User-Agent"]).toBe("LingxiAgent/1.0");
     expect(fetchMock.mock.calls[1][1].headers["User-Agent"]).toBe("ExistingClient/2.0");
   });
 

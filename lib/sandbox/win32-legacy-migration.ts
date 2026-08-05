@@ -5,7 +5,7 @@ import path from "path";
 import { spawn as defaultSpawn } from "child_process";
 import { isWin32PathLike } from "../shell/shell-utils.ts";
 import {
-  buildWin32HanaWriteAclCleanupArgs,
+  buildWin32LingxiWriteAclCleanupArgs,
   buildWin32LegacyAclDiagnosticArgs,
   buildWin32LegacyProfileCleanupArgs,
 } from "./win32-legacy-maintenance.ts";
@@ -85,7 +85,7 @@ function discoverLegacyProfileNames({ env, readdirSync, existsSync, homedir }) {
 
 export function collectWin32LegacySandboxMigrationTargets({
   platform = process.platform,
-  hanakoHome,
+  lingxiHome,
   workspaceRoots = [],
   env = process.env,
   resourcesPath = (process as any).resourcesPath,
@@ -99,12 +99,12 @@ export function collectWin32LegacySandboxMigrationTargets({
   const seen = new Set();
   const push = (target) => pushExistingUnique(aclPaths, seen, target, existsSync);
 
-  if (hanakoHome) {
-    push(hanakoHome);
-    push(joinWin32Aware(hanakoHome, ".ephemeral"));
-    push(joinWin32Aware(hanakoHome, "agents"));
-    push(joinWin32Aware(hanakoHome, "session-files"));
-    push(joinWin32Aware(hanakoHome, "uploads"));
+  if (lingxiHome) {
+    push(lingxiHome);
+    push(joinWin32Aware(lingxiHome, ".ephemeral"));
+    push(joinWin32Aware(lingxiHome, "agents"));
+    push(joinWin32Aware(lingxiHome, "session-files"));
+    push(joinWin32Aware(lingxiHome, "uploads"));
   }
   for (const root of workspaceRoots || []) push(root);
   if (resourcesPath) {
@@ -168,15 +168,15 @@ function runHelper(helperPath, args, {
   });
 }
 
-function defaultMigrationMarkerPath(hanakoHome) {
-  return hanakoHome
-    ? path.join(hanakoHome, "user", "win32-sandbox-migration-v3.json")
+function defaultMigrationMarkerPath(lingxiHome) {
+  return lingxiHome
+    ? path.join(lingxiHome, "user", "win32-sandbox-migration-v3.json")
     : null;
 }
 
-function defaultCleanupMarkerPath(hanakoHome) {
-  return hanakoHome
-    ? path.join(hanakoHome, "user", "win32-sandbox-cleanup-v4.json")
+function defaultCleanupMarkerPath(lingxiHome) {
+  return lingxiHome
+    ? path.join(lingxiHome, "user", "win32-sandbox-cleanup-v4.json")
     : null;
 }
 
@@ -209,7 +209,7 @@ function buildMigrationPhases({ targets, cleanup, cleanupProfiles = true }) {
   if (targets.aclPaths?.length) {
     const args = [];
     if (cleanup) {
-      args.push(...buildWin32HanaWriteAclCleanupArgs({ paths: targets.aclPaths }));
+      args.push(...buildWin32LingxiWriteAclCleanupArgs({ paths: targets.aclPaths }));
       for (const name of profileNames) args.push("--legacy-appcontainer-profile", name);
     }
     args.push(...buildWin32LegacyAclDiagnosticArgs({
@@ -239,7 +239,7 @@ function helperExitStatus(code) {
 
 export async function runWin32LegacySandboxMigration({
   platform = process.platform,
-  hanakoHome,
+  lingxiHome,
   workspaceRoots = [],
   cleanup = false,
   markerPath,
@@ -259,7 +259,7 @@ export async function runWin32LegacySandboxMigration({
   if (platform !== "win32") return { status: "skipped", reason: "platform" };
 
   const completionMarkerPath = cleanup && !disableMarker
-    ? (markerPath || defaultMigrationMarkerPath(hanakoHome))
+    ? (markerPath || defaultMigrationMarkerPath(lingxiHome))
     : null;
   if (hasCompletedMarker(completionMarkerPath)) {
     return {
@@ -275,7 +275,7 @@ export async function runWin32LegacySandboxMigration({
 
   const resolvedTargets = targets || collectWin32LegacySandboxMigrationTargets({
     platform,
-    hanakoHome,
+    lingxiHome,
     workspaceRoots,
     env,
     resourcesPath,
@@ -430,7 +430,7 @@ function discoverProfilesForCleanup({ env, readdirSync, existsSync, homedir }) {
 
 export async function runWin32LegacySandboxRootCleanup({
   platform = process.platform,
-  hanakoHome,
+  lingxiHome,
   roots = [],
   profileNames,
   cleanup = true,
@@ -447,7 +447,7 @@ export async function runWin32LegacySandboxRootCleanup({
   now = Date.now,
 }: any = {}) {
   if (platform !== "win32") return { status: "skipped", reason: "platform", rootResults: [] };
-  const marker = markerPath || defaultCleanupMarkerPath(hanakoHome);
+  const marker = markerPath || defaultCleanupMarkerPath(lingxiHome);
   const state = readCleanupState(marker);
   const normalizedRoots = uniqueNormalizedRoots(roots);
   const profiles = Array.isArray(profileNames)
@@ -465,7 +465,7 @@ export async function runWin32LegacySandboxRootCleanup({
 
     const result = await runWin32LegacySandboxMigration({
       platform,
-      hanakoHome,
+      lingxiHome,
       cleanup,
       helperPath,
       resolveHelper,
@@ -515,7 +515,7 @@ export async function runWin32LegacySandboxRootCleanup({
 
 export async function runWin32LegacySandboxProfileCleanup({
   platform = process.platform,
-  hanakoHome,
+  lingxiHome,
   profileNames,
   maxProfiles = DEFAULT_PROFILE_BATCH_SIZE,
   markerPath,
@@ -531,7 +531,7 @@ export async function runWin32LegacySandboxProfileCleanup({
   now = Date.now,
 }: any = {}) {
   if (platform !== "win32") return { status: "skipped", reason: "platform", profileResults: [] };
-  const marker = markerPath || defaultCleanupMarkerPath(hanakoHome);
+  const marker = markerPath || defaultCleanupMarkerPath(lingxiHome);
   const state = readCleanupState(marker);
   const discovered = Array.isArray(profileNames)
     ? profileNames
@@ -550,7 +550,7 @@ export async function runWin32LegacySandboxProfileCleanup({
 
   const result = await runWin32LegacySandboxMigration({
     platform,
-    hanakoHome,
+    lingxiHome,
     cleanup: true,
     helperPath,
     resolveHelper,
@@ -607,7 +607,7 @@ export class Win32LegacySandboxCleanupQueue {
   declare draining: any;
   declare env: any;
   declare existsSync: any;
-  declare hanakoHome: any;
+  declare lingxiHome: any;
   declare helperPath: any;
   declare homedir: any;
   declare log: any;
@@ -625,7 +625,7 @@ export class Win32LegacySandboxCleanupQueue {
   declare timer: any;
   constructor({
     platform = process.platform,
-    hanakoHome,
+    lingxiHome,
     helperPath,
     markerPath,
     env = process.env,
@@ -641,9 +641,9 @@ export class Win32LegacySandboxCleanupQueue {
     log,
   }: any = {}) {
     this.platform = platform;
-    this.hanakoHome = hanakoHome;
+    this.lingxiHome = lingxiHome;
     this.helperPath = helperPath;
-    this.markerPath = markerPath || defaultCleanupMarkerPath(hanakoHome);
+    this.markerPath = markerPath || defaultCleanupMarkerPath(lingxiHome);
     this.env = env;
     this.spawn = spawn;
     this.existsSync = existsSync;
@@ -726,7 +726,7 @@ export class Win32LegacySandboxCleanupQueue {
         this.pendingRootKeys.delete(root.toLowerCase());
         const result = await runWin32LegacySandboxRootCleanup({
           platform: this.platform,
-          hanakoHome: this.hanakoHome,
+          lingxiHome: this.lingxiHome,
           roots: [root],
           markerPath: this.markerPath,
           helperPath: this.helperPath,
@@ -745,7 +745,7 @@ export class Win32LegacySandboxCleanupQueue {
         this.profileCleanupPending = false;
         profileResult = await runWin32LegacySandboxProfileCleanup({
           platform: this.platform,
-          hanakoHome: this.hanakoHome,
+          lingxiHome: this.lingxiHome,
           markerPath: this.markerPath,
           helperPath: this.helperPath,
           env: this.env,

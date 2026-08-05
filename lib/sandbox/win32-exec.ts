@@ -63,7 +63,7 @@ const POWERSHELL_COMMANDS = new Set(["powershell", "powershell.exe", "pwsh", "pw
 const WIN32_SANDBOX_ENV_DIR = "win32-sandbox-env";
 const STATUS_DLL_INIT_FAILED_UNSIGNED = 0xC0000142;
 const STATUS_DLL_INIT_FAILED_SIGNED = -1073741502;
-const WIN32_SANDBOX_HELPER_LAUNCH_FAILURE_RE = /hana-win-sandbox:\s+CreateProcessAsUserW failed/i;
+const WIN32_SANDBOX_HELPER_LAUNCH_FAILURE_RE = /lingxi-win-sandbox:\s+CreateProcessAsUserW failed/i;
 const WIN32_DIAGNOSTIC_OUTPUT_PREVIEW_LIMIT = 8192;
 const WIN32_SANDBOX_TERMINATION_GRACE_MS = 5000;
 const WIN32_SANDBOX_HELPER_WATCHDOG_EXTRA_MS = WIN32_SANDBOX_TERMINATION_GRACE_MS + 2000;
@@ -123,7 +123,7 @@ function getBundledGitRoots(env = process.env, deps: Record<string, any> = {}) {
   const resolveResourceSibling = deps.resourceSiblingDir || ((name, options) => resourceSiblingDir(name, options));
   const roots = [
     resourcesPath ? joinRuntimePath(resourcesPath, "git") : null,
-    env.HANA_ROOT ? resolve(env.HANA_ROOT, "..", "git") : null,
+    env.LINGXI_ROOT ? resolve(env.LINGXI_ROOT, "..", "git") : null,
     resolveResourceSibling("git", { env }),
   ].filter(Boolean);
 
@@ -272,7 +272,7 @@ function findGitRuntime({ env = process.env, bundledOnly = false } = {}) {
   }
 
   throw new Error(
-    "[win32-exec] No usable git.exe found. Install Git for Windows or rebuild HanaAgent with bundled MinGit."
+    "[win32-exec] No usable git.exe found. Install Git for Windows or rebuild LingxiAgent with bundled MinGit."
   );
 }
 
@@ -517,9 +517,9 @@ function setEnvCaseInsensitive(env, key, value) {
 
 function withWin32SandboxRuntimeEnv(baseEnv, sandbox) {
   const env = withWin32Utf8Defaults(baseEnv);
-  if (!sandboxIsEnabled(sandbox) || !sandbox?.hanakoHome) return env;
+  if (!sandboxIsEnabled(sandbox) || !sandbox?.lingxiHome) return env;
 
-  const root = joinRuntimePath(sandbox.hanakoHome, ".ephemeral", WIN32_SANDBOX_ENV_DIR);
+  const root = joinRuntimePath(sandbox.lingxiHome, ".ephemeral", WIN32_SANDBOX_ENV_DIR);
   const tempDir = joinRuntimePath(root, "Temp");
   const localAppDataDir = joinRuntimePath(root, "LocalAppData");
   const appDataDir = joinRuntimePath(root, "AppData", "Roaming");
@@ -656,7 +656,7 @@ function isUsableCurrentNodeRuntime(executable) {
 
 function findNodeRuntimeOnPath(commandName, args, env) {
   const candidates = [];
-  if (env?.HANA_DEV_NODE_BIN) candidates.push(executableInfoFromPath(env.HANA_DEV_NODE_BIN, `HANA_DEV_NODE_BIN (${env.HANA_DEV_NODE_BIN})`));
+  if (env?.LINGXI_DEV_NODE_BIN) candidates.push(executableInfoFromPath(env.LINGXI_DEV_NODE_BIN, `LINGXI_DEV_NODE_BIN (${env.LINGXI_DEV_NODE_BIN})`));
 
   try {
     const result = spawnSync("where", [commandName], {
@@ -977,8 +977,8 @@ function collectWin32EnvironmentDiagnostics(env) {
     diagnosticValueMetadata("TMP", envValue(env, "TMP")),
     diagnosticValueMetadata("LOCALAPPDATA", envValue(env, "LOCALAPPDATA")),
     diagnosticValueMetadata("APPDATA", envValue(env, "APPDATA")),
-    diagnosticValueMetadata("HANA_ROOT", envValue(env, "HANA_ROOT")),
-    diagnosticValueMetadata("HANA_SERVER_ENTRY", envValue(env, "HANA_SERVER_ENTRY")),
+    diagnosticValueMetadata("LINGXI_ROOT", envValue(env, "LINGXI_ROOT")),
+    diagnosticValueMetadata("LINGXI_SERVER_ENTRY", envValue(env, "LINGXI_SERVER_ENTRY")),
     diagnosticValueMetadata("process.execPath", process.execPath),
     `Node: ${process.versions.node || "unknown"} ABI ${process.versions.modules || "unknown"}`,
   ];
@@ -1013,14 +1013,14 @@ function emitWin32RuntimeFailureDiagnostic(onData, {
     diagnosticValueMetadata("Helper", helperPath),
     diagnosticValueMetadata("Runtime label", runtimeInfo?.label),
     diagnosticValueMetadata("Runtime root", runtimeInfo?.bundledRoot),
-    diagnosticValueMetadata("HANA_HOME", sandbox?.hanakoHome || envValue(env, "HANA_HOME")),
+    diagnosticValueMetadata("LINGXI_HOME", sandbox?.lingxiHome || envValue(env, "LINGXI_HOME")),
     `Output bytes before failure: ${outputBytes ?? 0}`,
     `Duration ms: ${durationMs ?? "unknown"}`,
     ...collectWin32EnvironmentDiagnostics(env),
     "Default PowerShell/cmd/terminal execution is not changed by this diagnostic path.",
     "No fallback was attempted for this STATUS_DLL_INIT_FAILED result.",
     "Likely causes: Windows child process DLL initialization failed, the restricted-token helper environment is incomplete, or a runtime cache/AV block is preventing startup.",
-    "Next step: attach this diagnostic with the command log; for cached POSIX runtimes also clear HANA_HOME/.ephemeral/win32-sandbox-runtime and retry.",
+    "Next step: attach this diagnostic with the command log; for cached POSIX runtimes also clear LINGXI_HOME/.ephemeral/win32-sandbox-runtime and retry.",
     "",
   ].filter(Boolean);
   onData(Buffer.from(`${lines.join("\n")}\n`, "utf-8"));
@@ -1056,7 +1056,7 @@ function emitWin32SandboxHelperLaunchFailureDiagnostic(onData, {
     diagnosticValueMetadata("Helper", helperPath),
     diagnosticValueMetadata("Runtime label", runtimeInfo?.label),
     diagnosticValueMetadata("Runtime root", runtimeInfo?.bundledRoot),
-    diagnosticValueMetadata("HANA_HOME", sandbox?.hanakoHome || envValue(env, "HANA_HOME")),
+    diagnosticValueMetadata("LINGXI_HOME", sandbox?.lingxiHome || envValue(env, "LINGXI_HOME")),
     `Output bytes before failure: ${outputBytes ?? 0}`,
     `Duration ms: ${durationMs ?? "unknown"}`,
     ...collectWin32EnvironmentDiagnostics(env),
@@ -1134,9 +1134,9 @@ async function runWithWin32Diagnostics({
 }
 
 function prepareRuntimeForSandbox(runtimeInfo, sandbox, kind) {
-  if (!sandboxIsEnabled(sandbox) || !sandbox?.hanakoHome) return runtimeInfo;
+  if (!sandboxIsEnabled(sandbox) || !sandbox?.lingxiHome) return runtimeInfo;
   return prepareSandboxRuntime(runtimeInfo, {
-    hanakoHome: sandbox.hanakoHome,
+    lingxiHome: sandbox.lingxiHome,
     kind,
   });
 }
@@ -1188,21 +1188,21 @@ function cleanupRootsForSandboxGrants(grants) {
 // restriction applies; when that write is denied — the user's real %TEMP% is
 // not one of the granted paths — PowerShell falls back to Constrained
 // Language Mode, which breaks most one-shot commands. withWin32SandboxRuntimeEnv
-// (above) already points TEMP/TMP at <hanakoHome>/.ephemeral/win32-sandbox-env
+// (above) already points TEMP/TMP at <lingxiHome>/.ephemeral/win32-sandbox-env
 // for sandboxed sessions; this makes sure that directory is one of the
 // sandbox's *required* write roots. The restricted-token startup probe needs
 // a guaranteed write grant for this directory; an optional root does not
 // provide the same contract. This lets the token write there under every code
 // path, not just the ones that happen to also touch a required root for other
 // reasons.
-function win32SandboxEnvRoot(hanakoHome) {
-  if (!hanakoHome) return null;
-  return joinRuntimePath(hanakoHome, ".ephemeral", WIN32_SANDBOX_ENV_DIR);
+function win32SandboxEnvRoot(lingxiHome) {
+  if (!lingxiHome) return null;
+  return joinRuntimePath(lingxiHome, ".ephemeral", WIN32_SANDBOX_ENV_DIR);
 }
 
-function withSandboxEnvRootAsRequiredWritePath(grants, hanakoHome) {
-  const root = win32SandboxEnvRoot(hanakoHome);
-  // No hanakoHome means withWin32SandboxRuntimeEnv never redirected TEMP in
+function withSandboxEnvRootAsRequiredWritePath(grants, lingxiHome) {
+  const root = win32SandboxEnvRoot(lingxiHome);
+  // No lingxiHome means withWin32SandboxRuntimeEnv never redirected TEMP in
   // the first place; nothing to promote to a required root here.
   if (!root) return grants;
   mkdirSync(root, { recursive: true });
@@ -1231,7 +1231,7 @@ async function spawnViaSandboxHelper({
     );
   }
   assertSandboxNetworkSupported(sandbox);
-  const grants = withSandboxEnvRootAsRequiredWritePath(grantsForSandbox(sandbox, cwd), sandbox.hanakoHome);
+  const grants = withSandboxEnvRootAsRequiredWritePath(grantsForSandbox(sandbox, cwd), sandbox.lingxiHome);
   const nativeTimeoutMs = timeout == null || timeout <= 0
     ? 0
     : Math.min(Math.ceil(timeout * 1000), 0xFFFFFFFE);
@@ -1274,7 +1274,7 @@ async function spawnViaSandboxHelper({
     const terminal = stderrFilter.terminalRecord;
     if (!terminal) {
       const error: any = new Error("[win32-sandbox] helper terminal record missing or invalid");
-      error.code = "HANA_WIN32_SANDBOX_TERMINAL_PROTOCOL";
+      error.code = "LINGXI_WIN32_SANDBOX_TERMINAL_PROTOCOL";
       throw error;
     }
     if (terminal.status === "timed_out") {
@@ -1284,7 +1284,7 @@ async function spawnViaSandboxHelper({
       const error: any = new Error(
         `[win32-sandbox] native Job termination failed (win32Error=${terminal.win32Error})`
       );
-      error.code = "HANA_WIN32_SANDBOX_TERMINATION_FAILED";
+      error.code = "LINGXI_WIN32_SANDBOX_TERMINATION_FAILED";
       error.win32Error = terminal.win32Error;
       throw error;
     }
@@ -1351,7 +1351,7 @@ function throwSandboxPowerShellUnsupported() {
     + "Rerun it with sandbox_permissions=\"require_escalated\" and a one-sentence justification; "
     + "the user reviews it before it runs unsandboxed.",
   );
-  error.code = "HANA_WIN32_SANDBOX_POWERSHELL_UNSUPPORTED";
+  error.code = "LINGXI_WIN32_SANDBOX_POWERSHELL_UNSUPPORTED";
   throw error;
 }
 

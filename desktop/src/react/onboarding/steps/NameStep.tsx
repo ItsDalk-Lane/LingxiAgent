@@ -5,19 +5,19 @@
 import { useState, useCallback } from 'react';
 import { Toggle } from '../../settings/widgets/Toggle';
 import { describeOnboardingError, saveOnboardingIdentity } from '../onboarding-actions';
-import type { HanaFetch, OnboardingVerificationPlan } from '../onboarding-actions';
+import type { LingxiFetch, OnboardingVerificationPlan } from '../onboarding-actions';
 import { StepContainer } from '../onboarding-ui';
 
 interface NameStepProps {
   preview: boolean;
-  hanaFetch: HanaFetch;
+  lingxiFetch: LingxiFetch;
   agentId: string;
   verificationPlan: OnboardingVerificationPlan;
   goToStep: (index: number) => void;
   showError: (msg: string) => void;
 }
 
-export function NameStep({ preview, hanaFetch, agentId, verificationPlan, goToStep, showError }: NameStepProps) {
+export function NameStep({ preview, lingxiFetch, agentId, verificationPlan, goToStep, showError }: NameStepProps) {
   const [userName, setUserName] = useState('');
   const [agentName, setAgentName] = useState('');
   const [memoryEnabled, setMemoryEnabled] = useState(true);
@@ -28,7 +28,7 @@ export function NameStep({ preview, hanaFetch, agentId, verificationPlan, goToSt
     if (!trimmed) return;
     try {
       await saveOnboardingIdentity({
-        hanaFetch,
+        lingxiFetch,
         agentId,
         userName: trimmed,
         agentName,
@@ -40,7 +40,7 @@ export function NameStep({ preview, hanaFetch, agentId, verificationPlan, goToSt
       console.error('[onboarding] save identity failed:', err);
       showError(describeOnboardingError(err, t('onboarding.error')));
     }
-  }, [preview, hanaFetch, agentId, userName, agentName, memoryEnabled, verificationPlan, goToStep, showError]);
+  }, [preview, lingxiFetch, agentId, userName, agentName, memoryEnabled, verificationPlan, goToStep, showError]);
 
   return (
     <StepContainer>

@@ -7,7 +7,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useStore } from '../stores';
-import { hanaFetch } from '../hooks/use-hana-fetch';
+import { lingxiFetch } from '../hooks/use-hana-fetch';
 
 import { renderMarkdownPreview } from '../utils/markdown';
 import { useMermaidDiagrams } from '../hooks/use-mermaid-diagrams';
@@ -83,7 +83,7 @@ export function SkillViewerOverlay() {
         showToast(`${t('skillViewer.installFailed')}no current agent`);
         return;
       }
-      const res = await hanaFetch(`/api/skills/install?agentId=${encodeURIComponent(agentId)}`, {
+      const res = await lingxiFetch(`/api/skills/install?agentId=${encodeURIComponent(agentId)}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

@@ -1,5 +1,5 @@
 import { useStore } from '../stores';
-import { hanaFetch } from '../hooks/use-hana-fetch';
+import { lingxiFetch } from '../hooks/use-hana-fetch';
 import { sessionIdForPathFromLocatorState, sessionScopedValue } from '../stores/session-slice';
 import { applyAgentIdentity, loadAvatars } from '../stores/agent-actions';
 import { activateWorkspaceDesk } from '../stores/desk-actions';
@@ -90,7 +90,7 @@ export async function initializeMobileRuntime(principal: MobilePrincipal): Promi
     welcomeVisible: true,
   });
 
-  const bootstrapRes = await hanaFetch('/api/mobile/bootstrap');
+  const bootstrapRes = await lingxiFetch('/api/mobile/bootstrap');
   const bootstrap = await bootstrapRes.json() as MobileBootstrap;
   const permissionDefault = await rawJson<{ permissionMode?: SessionPermissionMode }>('/api/preferences/session-permission-default');
   applySyncedAppearancePreferences(bootstrap.appearance);
@@ -103,7 +103,7 @@ export async function initializeMobileRuntime(principal: MobilePrincipal): Promi
   }
 
   await applyAgentIdentity({
-    agentName: bootstrap.agentName || 'Hanako',
+    agentName: bootstrap.agentName || 'Lingxi',
     agentId: bootstrap.currentAgentId || undefined,
     userName: bootstrap.userName || window.t?.('common.user') || 'User',
     yuan: bootstrap.agentYuan,
@@ -120,7 +120,7 @@ export async function initializeMobileRuntime(principal: MobilePrincipal): Promi
     useStore.setState({
       currentAgentId: currentAgent.id,
       agentName: currentAgent.name,
-      agentYuan: currentAgent.yuan || bootstrap.agentYuan || 'hanako',
+      agentYuan: currentAgent.yuan || bootstrap.agentYuan || 'lingxi',
       homeFolder,
       selectedFolder: homeFolder,
       cwdHistory: Array.isArray(bootstrap.cwdHistory) ? bootstrap.cwdHistory : [],
@@ -152,7 +152,7 @@ export async function loadMobileSessions({
 }: {
   selectFirst?: boolean;
 } = {}): Promise<Session[]> {
-  const res = await hanaFetch('/api/sessions');
+  const res = await lingxiFetch('/api/sessions');
   const sessions = await res.json() as Session[];
   const next = Array.isArray(sessions) ? sessions : [];
   useStore.getState().setSessions(next);
@@ -214,7 +214,7 @@ export async function switchMobileSession(
     ...(session?.agentId ? {
       currentAgentId: session.agentId,
       agentName: session.agentName || sessionAgent?.name || session.agentId,
-      agentYuan: sessionAgent?.yuan || 'hanako',
+      agentYuan: sessionAgent?.yuan || 'lingxi',
       homeFolder: sessionAgent?.homeFolder || null,
     } : {}),
     };
@@ -244,7 +244,7 @@ export async function createMobileSession(): Promise<string | null> {
     body.agentId = state.selectedAgentId;
   }
 
-  const res = await hanaFetch('/api/sessions/new', {
+  const res = await lingxiFetch('/api/sessions/new', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),

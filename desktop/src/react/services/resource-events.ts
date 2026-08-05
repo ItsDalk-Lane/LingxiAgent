@@ -1,4 +1,4 @@
-import { hanaFetch } from '../hooks/use-hana-fetch';
+import { lingxiFetch } from '../hooks/use-hana-fetch';
 
 export type ResourceRef =
   | { kind: 'local-file'; path: string }
@@ -41,7 +41,7 @@ type ForegroundCatchUpOptions = {
 };
 
 export function createResourceEventClient({
-  fetchImpl = hanaFetch,
+  fetchImpl = lingxiFetch,
   applyEvent,
   resubscribeWatches,
 }: ResourceEventClientOptions = {}) {
@@ -87,7 +87,7 @@ export function createResourceEventClient({
 }
 
 const resourceEventClient = createResourceEventClient({
-  fetchImpl: hanaFetch,
+  fetchImpl: lingxiFetch,
   resubscribeWatches: resubscribeActiveWatches,
 });
 
@@ -135,7 +135,7 @@ export function retainResourceWatch(ref: ResourceRef): () => void {
 
 function subscribeEntry(entry: WatchEntry): Promise<void> {
   entry.released = false;
-  return hanaFetch('/api/resource-io/subscribe', {
+  return lingxiFetch('/api/resource-io/subscribe', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ purpose: 'resource-watch', resources: [entry.ref] }),
@@ -171,7 +171,7 @@ function releaseResourceWatch(key: string): void {
 function releaseEntry(entry: WatchEntry): void {
   if (entry.released || !entry.subscriptionId) return;
   entry.released = true;
-  void hanaFetch(`/api/resource-io/subscriptions/${encodeURIComponent(entry.subscriptionId)}`, {
+  void lingxiFetch(`/api/resource-io/subscriptions/${encodeURIComponent(entry.subscriptionId)}`, {
     method: 'DELETE',
     throwOnHttpError: false,
   }).catch((err) => {
@@ -185,7 +185,7 @@ async function resubscribeActiveWatches(): Promise<void> {
     const previousSubscriptionId = entry.subscriptionId;
     entry.subscriptionId = null;
     if (previousSubscriptionId) {
-      await hanaFetch(`/api/resource-io/subscriptions/${encodeURIComponent(previousSubscriptionId)}`, {
+      await lingxiFetch(`/api/resource-io/subscriptions/${encodeURIComponent(previousSubscriptionId)}`, {
         method: 'DELETE',
         throwOnHttpError: false,
       }).catch((err) => {

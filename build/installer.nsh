@@ -1,7 +1,7 @@
-; installer.nsh - NSIS custom hooks for HanaAgent installer
+; installer.nsh - NSIS custom hooks for Lingxi installer
 ;
-; Owns the Windows overlay boundary for HanaAgent installs. The installer may
-; replace HanaAgent-owned program files, while user/runtime state stays outside
+; Owns the Windows overlay boundary for Lingxi installs. The installer may
+; replace Lingxi-owned program files, while user/runtime state stays outside
 ; $INSTDIR.
 
 ; Disable CRC integrity check. electron-builder's post-compilation PE editing
@@ -11,7 +11,7 @@ CRCCheck off
 
 !include LogicLib.nsh
 
-!macro hanakoInstallTimingMark _PHASE _EVENT
+!macro lingxiInstallTimingMark _PHASE _EVENT
   Push $0
   Push $1
   InitPluginsDir
@@ -26,27 +26,30 @@ CRCCheck off
   Pop $0
 !macroend
 
-!macro hanakoPersistInstallTiming
+!macro lingxiPersistInstallTiming
   IfFileExists "$PLUGINSDIR\hanaagent-install-timing.log" 0 +2
     CopyFiles /SILENT "$PLUGINSDIR\hanaagent-install-timing.log" "$INSTDIR\hanaagent-install-timing.log"
 !macroend
 
-!macro hanakoFindProcess _NAME _RETURN
+!macro lingxiFindProcess _NAME _RETURN
   nsExec::ExecToLog `"$SYSDIR\cmd.exe" /D /C tasklist /FI "IMAGENAME eq ${_NAME}" /FO CSV | "$SYSDIR\find.exe" "${_NAME}"`
   Pop ${_RETURN}
 !macroend
 
-!macro hanakoFindRunningProcesses _RETURN
-  !insertmacro hanakoFindProcess HanaAgent.exe ${_RETURN}
+!macro lingxiFindRunningProcesses _RETURN
+  !insertmacro lingxiFindProcess Lingxi.exe ${_RETURN}
   ${If} ${_RETURN} != 0
-    !insertmacro hanakoFindProcess Hanako.exe ${_RETURN}
+    !insertmacro lingxiFindProcess HanaAgent.exe ${_RETURN}
   ${EndIf}
   ${If} ${_RETURN} != 0
-    !insertmacro hanakoFindProcess hana-server.exe ${_RETURN}
+    !insertmacro lingxiFindProcess Hanako.exe ${_RETURN}
+  ${EndIf}
+  ${If} ${_RETURN} != 0
+    !insertmacro lingxiFindProcess lingxi-server.exe ${_RETURN}
   ${EndIf}
 !macroend
 
-!macro hanakoKillProcess _NAME _FORCE
+!macro lingxiKillProcess _NAME _FORCE
   Push $0
   Push $1
   ${If} ${_FORCE} == 1
@@ -60,21 +63,22 @@ CRCCheck off
   Pop $0
 !macroend
 
-!macro hanakoKillRunningProcesses _FORCE
-  !insertmacro hanakoKillProcess HanaAgent.exe ${_FORCE}
-  !insertmacro hanakoKillProcess Hanako.exe ${_FORCE}
-  !insertmacro hanakoKillProcess hana-server.exe ${_FORCE}
+!macro lingxiKillRunningProcesses _FORCE
+  !insertmacro lingxiKillProcess Lingxi.exe ${_FORCE}
+  !insertmacro lingxiKillProcess HanaAgent.exe ${_FORCE}
+  !insertmacro lingxiKillProcess Hanako.exe ${_FORCE}
+  !insertmacro lingxiKillProcess lingxi-server.exe ${_FORCE}
 !macroend
 
-!macro hanakoRequireInstallSurfaceFile _PATH _LABEL
+!macro lingxiRequireInstallSurfaceFile _PATH _LABEL
   IfFileExists "${_PATH}" +2 0
     StrCpy $R2 "$R2$\r$\n- ${_LABEL}: ${_PATH}"
 !macroend
 
 ; 归档文件名带版本号（如 server-<version>-<platform>-<arch>.tar.gz），无法用固定路径
 ; 校验，用 FindFirst/FindClose 做通配存在性检查；找不到时把目录+通配模式一起写进
-; 诊断信息，跟 hanakoRequireInstallSurfaceFile 走同一条报错/弹窗流程。
-!macro hanakoRequireInstallSurfaceGlob _DIR _PATTERN _LABEL
+; 诊断信息，跟 lingxiRequireInstallSurfaceFile 走同一条报错/弹窗流程。
+!macro lingxiRequireInstallSurfaceGlob _DIR _PATTERN _LABEL
   Push $R3
   Push $R4
   ClearErrors
@@ -92,23 +96,23 @@ CRCCheck off
   Pop $R3
 !macroend
 
-!macro hanakoVerifyInstallSurface
-  !insertmacro hanakoInstallTimingMark "installSurfaceSelfCheck" "start"
+!macro lingxiVerifyInstallSurface
+  !insertmacro lingxiInstallTimingMark "installSurfaceSelfCheck" "start"
   Push $0
   Push $R2
   StrCpy $R2 ""
-  !insertmacro hanakoRequireInstallSurfaceFile "$INSTDIR\${APP_EXECUTABLE_FILENAME}" "HanaAgent.exe"
-  !insertmacro hanakoRequireInstallSurfaceFile "$INSTDIR\resources\app.asar" "resources\app.asar"
-  !insertmacro hanakoRequireInstallSurfaceFile "$INSTDIR\resources\app-update.yml" "resources\app-update.yml"
+  !insertmacro lingxiRequireInstallSurfaceFile "$INSTDIR\${APP_EXECUTABLE_FILENAME}" "HanaAgent.exe"
+  !insertmacro lingxiRequireInstallSurfaceFile "$INSTDIR\resources\app.asar" "resources\app.asar"
+  !insertmacro lingxiRequireInstallSurfaceFile "$INSTDIR\resources\app-update.yml" "resources\app-update.yml"
   ; manifest 文件名带平台限定（seed-train-<platform>-<arch>.json，见
   ; scripts/build-server-artifact.mjs 的 seedManifestFileName），跟归档文件名
   ; 一样无法用固定路径校验，走同一条通配存在性检查。
-  !insertmacro hanakoRequireInstallSurfaceGlob "$INSTDIR\resources\seed" "seed-train-*.json" "resources\seed\seed-train-*.json"
-  !insertmacro hanakoRequireInstallSurfaceGlob "$INSTDIR\resources\seed" "seed-train-*.json.sig" "resources\seed\seed-train-*.json.sig"
-  !insertmacro hanakoRequireInstallSurfaceGlob "$INSTDIR\resources\seed" "server-*.tar.gz" "resources\seed\server-*.tar.gz"
-  !insertmacro hanakoRequireInstallSurfaceGlob "$INSTDIR\resources\seed" "renderer-*.tar.gz" "resources\seed\renderer-*.tar.gz"
-  !insertmacro hanakoRequireInstallSurfaceFile "$INSTDIR\resources\git\cmd\git.exe" "MinGit git.exe"
-  !insertmacro hanakoRequireInstallSurfaceFile "$INSTDIR\resources\git\usr\bin\sh.exe" "MinGit sh.exe"
+  !insertmacro lingxiRequireInstallSurfaceGlob "$INSTDIR\resources\seed" "seed-train-*.json" "resources\seed\seed-train-*.json"
+  !insertmacro lingxiRequireInstallSurfaceGlob "$INSTDIR\resources\seed" "seed-train-*.json.sig" "resources\seed\seed-train-*.json.sig"
+  !insertmacro lingxiRequireInstallSurfaceGlob "$INSTDIR\resources\seed" "server-*.tar.gz" "resources\seed\server-*.tar.gz"
+  !insertmacro lingxiRequireInstallSurfaceGlob "$INSTDIR\resources\seed" "renderer-*.tar.gz" "resources\seed\renderer-*.tar.gz"
+  !insertmacro lingxiRequireInstallSurfaceFile "$INSTDIR\resources\git\cmd\git.exe" "MinGit git.exe"
+  !insertmacro lingxiRequireInstallSurfaceFile "$INSTDIR\resources\git\usr\bin\sh.exe" "MinGit sh.exe"
 
   ${If} $R2 != ""
     DetailPrint "HanaAgent install surface self-check failed."
@@ -119,8 +123,8 @@ CRCCheck off
     FileClose $0
     MessageBox MB_OK|MB_ICONSTOP "HanaAgent installation is incomplete. Missing or unreadable files:$R2$\r$\n$\r$\nDiagnostic file:$\r$\n$INSTDIR\hanaagent-install-diagnostics.log"
     SetErrorLevel 1
-    !insertmacro hanakoInstallTimingMark "installSurfaceSelfCheck" "failed"
-    !insertmacro hanakoPersistInstallTiming
+    !insertmacro lingxiInstallTimingMark "installSurfaceSelfCheck" "failed"
+    !insertmacro lingxiPersistInstallTiming
     Pop $R2
     Pop $0
     Quit
@@ -131,7 +135,7 @@ CRCCheck off
   ${EndIf}
   Pop $R2
   Pop $0
-  !insertmacro hanakoInstallTimingMark "installSurfaceSelfCheck" "end"
+  !insertmacro lingxiInstallTimingMark "installSurfaceSelfCheck" "end"
 !macroend
 
 ; 根治 electron/electron#51761：安装目录 DACL 含 orphaned AppContainer SID 时
@@ -139,8 +143,8 @@ CRCCheck off
 ; PACKAGES）的继承 ACE 后沙箱无需降级；该 ACE 同时满足网络沙箱的要求。grant 幂等，
 ; 每次安装/更新重发一次即可覆盖上层目录继承来的污染。失败不阻断安装：应用启动侧
 ; 还有同一 grant 的运行时自愈兜底。
-!macro hanakoGrantSandboxAce
-  !insertmacro hanakoInstallTimingMark "grantSandboxAce" "start"
+!macro lingxiGrantSandboxAce
+  !insertmacro lingxiInstallTimingMark "grantSandboxAce" "start"
   Push $0
   DetailPrint "Granting the restricted-app-packages sandbox ACE on the install directory"
   nsExec::ExecToLog `"$SYSDIR\icacls.exe" "$INSTDIR" /grant *S-1-15-2-2:(OI)(CI)(RX)`
@@ -149,14 +153,14 @@ CRCCheck off
     DetailPrint "Sandbox ACE grant failed (code $0); the app applies the same grant at startup."
   ${EndIf}
   Pop $0
-  !insertmacro hanakoInstallTimingMark "grantSandboxAce" "end"
+  !insertmacro lingxiInstallTimingMark "grantSandboxAce" "end"
 !macroend
 
-!macro hanakoWriteInstallDirProcessCleaner _SCRIPT
+!macro lingxiWriteInstallDirProcessCleaner _SCRIPT
   Push $0
   FileOpen $0 "${_SCRIPT}" w
   FileWrite $0 `$$ErrorActionPreference = 'SilentlyContinue'$\r$\n`
-  FileWrite $0 `$$installDir = [Environment]::GetEnvironmentVariable('HANA_INSTALL_DIR')$\r$\n`
+  FileWrite $0 `$$installDir = [Environment]::GetEnvironmentVariable('LINGXI_INSTALL_DIR')$\r$\n`
   FileWrite $0 `if ([string]::IsNullOrWhiteSpace($$installDir)) { exit 0 }$\r$\n`
   FileWrite $0 `$$installFull = [System.IO.Path]::GetFullPath($$installDir).TrimEnd('\')$\r$\n`
   FileWrite $0 `$$installPrefix = $$installFull + '\'$\r$\n`
@@ -184,11 +188,11 @@ CRCCheck off
   Pop $0
 !macroend
 
-!macro hanakoWriteInstallDirProcessFinder _SCRIPT
+!macro lingxiWriteInstallDirProcessFinder _SCRIPT
   Push $0
   FileOpen $0 "${_SCRIPT}" w
   FileWrite $0 `$$ErrorActionPreference = 'SilentlyContinue'$\r$\n`
-  FileWrite $0 `$$installDir = [Environment]::GetEnvironmentVariable('HANA_INSTALL_DIR')$\r$\n`
+  FileWrite $0 `$$installDir = [Environment]::GetEnvironmentVariable('LINGXI_INSTALL_DIR')$\r$\n`
   FileWrite $0 `if ([string]::IsNullOrWhiteSpace($$installDir)) { exit 3 }$\r$\n`
   FileWrite $0 `$$installFull = [System.IO.Path]::GetFullPath($$installDir).TrimEnd('\')$\r$\n`
   FileWrite $0 `$$installPrefix = $$installFull + '\'$\r$\n`
@@ -221,42 +225,42 @@ CRCCheck off
   Pop $0
 !macroend
 
-!macro hanakoStopInstallDirProcesses
+!macro lingxiStopInstallDirProcesses
   ; Stop every process launched from this install root. This catches renamed
   ; helper processes and stale child processes that do not use fixed image names.
-  !insertmacro hanakoInstallTimingMark "stopInstallDirProcesses" "start"
+  !insertmacro lingxiInstallTimingMark "stopInstallDirProcesses" "start"
   Push $0
   Push $1
   InitPluginsDir
   StrCpy $1 "$PLUGINSDIR\hanako-stop-install-dir.ps1"
-  !insertmacro hanakoWriteInstallDirProcessCleaner "$1"
-  System::Call 'kernel32::SetEnvironmentVariable(t "HANA_INSTALL_DIR", t "$INSTDIR") i.r0'
+  !insertmacro lingxiWriteInstallDirProcessCleaner "$1"
+  System::Call 'kernel32::SetEnvironmentVariable(t "LINGXI_INSTALL_DIR", t "$INSTDIR") i.r0'
   nsExec::ExecToLog `"$SYSDIR\WindowsPowerShell\v1.0\powershell.exe" -NoProfile -ExecutionPolicy Bypass -File "$1"`
   Pop $0
   Pop $1
   Pop $0
-  !insertmacro hanakoInstallTimingMark "stopInstallDirProcesses" "end"
+  !insertmacro lingxiInstallTimingMark "stopInstallDirProcesses" "end"
 !macroend
 
-!macro hanakoFindInstallDirProcesses _RETURN
-  !insertmacro hanakoInstallTimingMark "findInstallDirProcesses" "start"
+!macro lingxiFindInstallDirProcesses _RETURN
+  !insertmacro lingxiInstallTimingMark "findInstallDirProcesses" "start"
   Push $0
   Push $1
   InitPluginsDir
   StrCpy $1 "$PLUGINSDIR\hanako-find-install-dir.ps1"
-  !insertmacro hanakoWriteInstallDirProcessFinder "$1"
-  System::Call 'kernel32::SetEnvironmentVariable(t "HANA_INSTALL_DIR", t "$INSTDIR") i.r0'
+  !insertmacro lingxiWriteInstallDirProcessFinder "$1"
+  System::Call 'kernel32::SetEnvironmentVariable(t "LINGXI_INSTALL_DIR", t "$INSTDIR") i.r0'
   nsExec::ExecToLog `"$SYSDIR\WindowsPowerShell\v1.0\powershell.exe" -NoProfile -ExecutionPolicy Bypass -File "$1"`
   Pop ${_RETURN}
   Pop $1
   Pop $0
-  !insertmacro hanakoInstallTimingMark "findInstallDirProcesses" "end"
+  !insertmacro lingxiInstallTimingMark "findInstallDirProcesses" "end"
 !macroend
 
-!macro hanakoBypassOldUninstallerForUpdate
+!macro lingxiBypassOldUninstallerForUpdate
   ${If} ${isUpdated}
     DetailPrint "Update mode detected; bypassing the previous uninstaller and preparing a HanaAgent-owned overlay."
-    !insertmacro hanakoPrepareOwnedOverlay
+    !insertmacro lingxiPrepareOwnedOverlay
     DeleteRegKey SHELL_CONTEXT "${UNINSTALL_REGISTRY_KEY}"
     !ifdef UNINSTALL_REGISTRY_KEY_2
       DeleteRegKey SHELL_CONTEXT "${UNINSTALL_REGISTRY_KEY_2}"
@@ -276,15 +280,15 @@ CRCCheck off
 !macroend
 
 !macro customInstall
-  !insertmacro hanakoInstallTimingMark "customInstall" "start"
-  !insertmacro hanakoGrantSandboxAce
-  !insertmacro hanakoVerifyInstallSurface
-  !insertmacro hanakoInstallTimingMark "customInstall" "end"
-  !insertmacro hanakoPersistInstallTiming
+  !insertmacro lingxiInstallTimingMark "customInstall" "start"
+  !insertmacro lingxiGrantSandboxAce
+  !insertmacro lingxiVerifyInstallSurface
+  !insertmacro lingxiInstallTimingMark "customInstall" "end"
+  !insertmacro lingxiPersistInstallTiming
   ${If} ${isUpdated}
   ${AndIf} ${isForceRun}
-    !insertmacro hanakoInstallTimingMark "relaunch" "start"
-    !insertmacro hanakoPersistInstallTiming
+    !insertmacro lingxiInstallTimingMark "relaunch" "start"
+    !insertmacro lingxiPersistInstallTiming
     HideWindow
     StrCpy $1 "--updated"
     ${StdUtils.ExecShellAsUser} $0 "$launchLink" "open" "$1"
@@ -311,23 +315,23 @@ CRCCheck off
 !macroend
 
 !macro customCheckAppRunning
-  !insertmacro hanakoInstallTimingMark "customCheckAppRunning" "start"
-  !insertmacro hanakoBypassOldUninstallerForUpdate
-  !insertmacro hanakoStopInstallDirProcesses
-  ; Finder exit contract: 0 = found HanaAgent-owned processes, 10 = confirmed
+  !insertmacro lingxiInstallTimingMark "customCheckAppRunning" "start"
+  !insertmacro lingxiBypassOldUninstallerForUpdate
+  !insertmacro lingxiStopInstallDirProcesses
+  ; Finder exit contract: 0 = found Lingxi-owned processes, 10 = confirmed
   ; none, anything else = query unavailable (PowerShell blocked / WMI broken).
   ; $R9 = 1 when the query is unavailable and we must fall back to the
   ; cmd-based image-name sweep below.
   StrCpy $R9 0
-  !insertmacro hanakoFindInstallDirProcesses $R0
+  !insertmacro lingxiFindInstallDirProcesses $R0
   ${If} $R0 == 0
-    DetailPrint "Detected HanaAgent-owned process in install directory; closing it before install."
+    DetailPrint "Detected Lingxi-owned process in install directory; closing it before install."
     Sleep 500
-    !insertmacro hanakoStopInstallDirProcesses
+    !insertmacro lingxiStopInstallDirProcesses
 
     StrCpy $R1 0
     hanako_check_install_dir_processes:
-      !insertmacro hanakoFindInstallDirProcesses $R0
+      !insertmacro lingxiFindInstallDirProcesses $R0
       ${If} $R0 == 0
         IntOp $R1 $R1 + 1
         DetailPrint "Waiting for HanaAgent-owned install-directory processes to close."
@@ -338,7 +342,7 @@ CRCCheck off
           hanako_retry_install_dir_close:
           StrCpy $R1 0
         ${EndIf}
-        !insertmacro hanakoStopInstallDirProcesses
+        !insertmacro lingxiStopInstallDirProcesses
         Sleep 1000
         Goto hanako_check_install_dir_processes
       ${ElseIf} $R0 != 10
@@ -361,59 +365,59 @@ CRCCheck off
   ${EndIf}
 
   ${If} $R8 == 1
-  !insertmacro hanakoFindRunningProcesses $R0
+  !insertmacro lingxiFindRunningProcesses $R0
   ${If} $R0 == 0
-    DetailPrint "Detected HanaAgent.exe, Hanako.exe, or hana-server.exe; closing them before install."
-    !insertmacro hanakoKillRunningProcesses 0
+    DetailPrint "Detected Lingxi.exe, HanaAgent.exe, Hanako.exe, or lingxi-server.exe; closing them before install."
+    !insertmacro lingxiKillRunningProcesses 0
     Sleep 500
 
-    !insertmacro hanakoFindRunningProcesses $R0
+    !insertmacro lingxiFindRunningProcesses $R0
     ${If} $R0 == 0
-      !insertmacro hanakoKillRunningProcesses 1
+      !insertmacro lingxiKillRunningProcesses 1
       Sleep 1000
     ${EndIf}
 
     StrCpy $R1 0
     hanako_check_processes:
-      !insertmacro hanakoFindRunningProcesses $R0
+      !insertmacro lingxiFindRunningProcesses $R0
       ${If} $R0 == 0
         IntOp $R1 $R1 + 1
-        DetailPrint "Waiting for HanaAgent.exe, Hanako.exe, or hana-server.exe to close."
+        DetailPrint "Waiting for Lingxi.exe, HanaAgent.exe, Hanako.exe, or lingxi-server.exe to close."
         ${If} $R1 > 2
-          DetailPrint "HanaAgent.exe, Hanako.exe, or hana-server.exe still running; asking user to retry."
+          DetailPrint "Lingxi.exe, HanaAgent.exe, Hanako.exe, or lingxi-server.exe still running; asking user to retry."
           MessageBox MB_RETRYCANCEL|MB_ICONEXCLAMATION "$(appCannotBeClosed)" /SD IDCANCEL IDRETRY hanako_retry_close
           Quit
           hanako_retry_close:
           StrCpy $R1 0
         ${EndIf}
-        !insertmacro hanakoKillRunningProcesses 1
+        !insertmacro lingxiKillRunningProcesses 1
         Sleep 1000
         Goto hanako_check_processes
       ${EndIf}
   ${EndIf}
   ${EndIf}
-  !insertmacro hanakoInstallTimingMark "customCheckAppRunning" "end"
+  !insertmacro lingxiInstallTimingMark "customCheckAppRunning" "end"
 !macroend
 
-!macro hanakoCleanBundledServer
+!macro lingxiCleanBundledServer
   ; 打包布局已改成 resources\seed 归档 + 首启解压，散装的 resources\server 树
   ; 只会出现在老版本升级覆盖的场景。这里保留清理逻辑，避免覆盖安装时新旧
-  ; 文件混杂；实际生效的同名清理见下方 hanakoRemoveOwnedInstallTrees。
+  ; 文件混杂；实际生效的同名清理见下方 lingxiRemoveOwnedInstallTrees。
   IfFileExists "$INSTDIR\resources\server\*.*" 0 +3
     DetailPrint "Removing old bundled server resources"
     RMDir /r "$INSTDIR\resources\server"
 !macroend
 
-!macro hanakoWriteLegacyShortcutCleaner _SCRIPT
+!macro lingxiWriteLegacyShortcutCleaner _SCRIPT
   Push $0
   FileOpen $0 "${_SCRIPT}" w
   FileWrite $0 `$$ErrorActionPreference = 'SilentlyContinue'$\r$\n`
-  FileWrite $0 `$$installDir = [Environment]::GetEnvironmentVariable('HANA_INSTALL_DIR')$\r$\n`
+  FileWrite $0 `$$installDir = [Environment]::GetEnvironmentVariable('LINGXI_INSTALL_DIR')$\r$\n`
   FileWrite $0 `if ([string]::IsNullOrWhiteSpace($$installDir)) { exit 0 }$\r$\n`
   FileWrite $0 `$$installFull = [System.IO.Path]::GetFullPath($$installDir).TrimEnd('\')$\r$\n`
   FileWrite $0 `$$installPrefix = $$installFull + '\'$\r$\n`
   FileWrite $0 `$$shell = New-Object -ComObject WScript.Shell$\r$\n`
-  FileWrite $0 `function Test-HanaInstallPath([string]$$value) {$\r$\n`
+  FileWrite $0 `function Test-LingxiInstallPath([string]$$value) {$\r$\n`
   FileWrite $0 `  if ([string]::IsNullOrWhiteSpace($$value)) { return $$false }$\r$\n`
   FileWrite $0 `  try {$\r$\n`
   FileWrite $0 `    $$expanded = [Environment]::ExpandEnvironmentVariables($$value)$\r$\n`
@@ -426,14 +430,14 @@ CRCCheck off
   FileWrite $0 `  if (-not (Test-Path -LiteralPath $$path -PathType Leaf)) { return }$\r$\n`
   FileWrite $0 `  try {$\r$\n`
   FileWrite $0 `    $$shortcut = $$shell.CreateShortcut($$path)$\r$\n`
-  FileWrite $0 `    if ((Test-HanaInstallPath $$shortcut.TargetPath) -or (Test-HanaInstallPath $$shortcut.WorkingDirectory)) {$\r$\n`
+  FileWrite $0 `    if ((Test-LingxiInstallPath $$shortcut.TargetPath) -or (Test-LingxiInstallPath $$shortcut.WorkingDirectory)) {$\r$\n`
   FileWrite $0 `      Remove-Item -LiteralPath $$path -Force$\r$\n`
   FileWrite $0 `    }$\r$\n`
   FileWrite $0 `  } catch {}$\r$\n`
   FileWrite $0 `}$\r$\n`
-  FileWrite $0 `Remove-OwnedShortcut ([Environment]::GetEnvironmentVariable('HANA_DESKTOP_LEGACY_SHORTCUT'))$\r$\n`
-  FileWrite $0 `Remove-OwnedShortcut ([Environment]::GetEnvironmentVariable('HANA_STARTMENU_LEGACY_SHORTCUT'))$\r$\n`
-  FileWrite $0 `$$legacyDir = [Environment]::GetEnvironmentVariable('HANA_STARTMENU_LEGACY_DIR')$\r$\n`
+  FileWrite $0 `Remove-OwnedShortcut ([Environment]::GetEnvironmentVariable('LINGXI_DESKTOP_LEGACY_SHORTCUT'))$\r$\n`
+  FileWrite $0 `Remove-OwnedShortcut ([Environment]::GetEnvironmentVariable('LINGXI_STARTMENU_LEGACY_SHORTCUT'))$\r$\n`
+  FileWrite $0 `$$legacyDir = [Environment]::GetEnvironmentVariable('LINGXI_STARTMENU_LEGACY_DIR')$\r$\n`
   FileWrite $0 `if (-not [string]::IsNullOrWhiteSpace($$legacyDir) -and (Test-Path -LiteralPath $$legacyDir -PathType Container)) {$\r$\n`
   FileWrite $0 `  Get-ChildItem -LiteralPath $$legacyDir -Filter '*.lnk' | Where-Object { -not $$_.PSIsContainer } | ForEach-Object { Remove-OwnedShortcut $$_.FullName }$\r$\n`
   FileWrite $0 `  try { Remove-Item -LiteralPath $$legacyDir -Force -ErrorAction Stop } catch {}$\r$\n`
@@ -442,26 +446,26 @@ CRCCheck off
   Pop $0
 !macroend
 
-!macro hanakoRemoveLegacyGlobalShortcuts
-  !insertmacro hanakoInstallTimingMark "legacyShortcutCleanup" "start"
+!macro lingxiRemoveLegacyGlobalShortcuts
+  !insertmacro lingxiInstallTimingMark "legacyShortcutCleanup" "start"
   Push $0
   Push $1
   InitPluginsDir
   StrCpy $1 "$PLUGINSDIR\hanako-clean-legacy-shortcuts.ps1"
-  !insertmacro hanakoWriteLegacyShortcutCleaner "$1"
-  System::Call 'kernel32::SetEnvironmentVariable(t "HANA_INSTALL_DIR", t "$INSTDIR") i.r0'
-  System::Call 'kernel32::SetEnvironmentVariable(t "HANA_DESKTOP_LEGACY_SHORTCUT", t "$DESKTOP\Hanako.lnk") i.r0'
-  System::Call 'kernel32::SetEnvironmentVariable(t "HANA_STARTMENU_LEGACY_SHORTCUT", t "$SMPROGRAMS\Hanako.lnk") i.r0'
-  System::Call 'kernel32::SetEnvironmentVariable(t "HANA_STARTMENU_LEGACY_DIR", t "$SMPROGRAMS\Hanako") i.r0'
+  !insertmacro lingxiWriteLegacyShortcutCleaner "$1"
+  System::Call 'kernel32::SetEnvironmentVariable(t "LINGXI_INSTALL_DIR", t "$INSTDIR") i.r0'
+  System::Call 'kernel32::SetEnvironmentVariable(t "LINGXI_DESKTOP_LEGACY_SHORTCUT", t "$DESKTOP\Hanako.lnk") i.r0'
+  System::Call 'kernel32::SetEnvironmentVariable(t "LINGXI_STARTMENU_LEGACY_SHORTCUT", t "$SMPROGRAMS\Hanako.lnk") i.r0'
+  System::Call 'kernel32::SetEnvironmentVariable(t "LINGXI_STARTMENU_LEGACY_DIR", t "$SMPROGRAMS\Hanako") i.r0'
   nsExec::ExecToLog `"$SYSDIR\WindowsPowerShell\v1.0\powershell.exe" -NoProfile -ExecutionPolicy Bypass -File "$1"`
   Pop $0
   Pop $1
   Pop $0
-  !insertmacro hanakoInstallTimingMark "legacyShortcutCleanup" "end"
+  !insertmacro lingxiInstallTimingMark "legacyShortcutCleanup" "end"
 !macroend
 
-!macro hanakoRemoveOwnedInstallTrees
-  !insertmacro hanakoInstallTimingMark "removeOwnedInstallTrees" "start"
+!macro lingxiRemoveOwnedInstallTrees
+  !insertmacro lingxiInstallTimingMark "removeOwnedInstallTrees" "start"
   DetailPrint "Removing HanaAgent-owned install files"
   SetOutPath "$TEMP"
   ; 老版本安装面是散装 resources\server 目录；现在改成 resources\seed 归档，
@@ -482,7 +486,7 @@ CRCCheck off
   Delete "$INSTDIR\Hanako.exe"
   Delete "$INSTDIR\Uninstall Hanako.exe"
   Delete "$INSTDIR\hanako-install-diagnostics.log"
-  !insertmacro hanakoRemoveLegacyGlobalShortcuts
+  !insertmacro lingxiRemoveLegacyGlobalShortcuts
   Delete "$INSTDIR\uninstallerIcon.ico"
   Delete "$INSTDIR\*.pak"
   Delete "$INSTDIR\*.bin"
@@ -492,61 +496,61 @@ CRCCheck off
   Delete "$INSTDIR\*.html"
   Delete "$INSTDIR\LICENSE*"
   Delete "$INSTDIR\*.ico"
-  !insertmacro hanakoInstallTimingMark "removeOwnedInstallTrees" "end"
+  !insertmacro lingxiInstallTimingMark "removeOwnedInstallTrees" "end"
 !macroend
 
-!macro hanakoPrepareOwnedOverlay
-  !insertmacro hanakoInstallTimingMark "prepareOwnedOverlay" "start"
-  !insertmacro hanakoStopInstallDirProcesses
-  !insertmacro hanakoRemoveOwnedInstallTrees
+!macro lingxiPrepareOwnedOverlay
+  !insertmacro lingxiInstallTimingMark "prepareOwnedOverlay" "start"
+  !insertmacro lingxiStopInstallDirProcesses
+  !insertmacro lingxiRemoveOwnedInstallTrees
   ClearErrors
-  !insertmacro hanakoInstallTimingMark "prepareOwnedOverlay" "end"
+  !insertmacro lingxiInstallTimingMark "prepareOwnedOverlay" "end"
 !macroend
 
 !macro customInit
-  !insertmacro hanakoInstallTimingMark "customInit" "start"
-  !insertmacro hanakoStopInstallDirProcesses
+  !insertmacro lingxiInstallTimingMark "customInit" "start"
+  !insertmacro lingxiStopInstallDirProcesses
   ; Wait for file handles to release.
   Sleep 2000
-  !insertmacro hanakoInstallTimingMark "customInit" "end"
+  !insertmacro lingxiInstallTimingMark "customInit" "end"
 !macroend
 
 !macro customUnInstallCheck
-  !insertmacro hanakoInstallTimingMark "customUnInstallCheck" "start"
+  !insertmacro lingxiInstallTimingMark "customUnInstallCheck" "start"
   ${If} ${Errors}
     DetailPrint `Previous uninstaller could not be launched; preparing a HanaAgent-owned overlay.`
   ${ElseIf} $R0 != 0
     DetailPrint `Previous uninstaller exited with code $R0; preparing a HanaAgent-owned overlay.`
   ${EndIf}
-  !insertmacro hanakoPrepareOwnedOverlay
+  !insertmacro lingxiPrepareOwnedOverlay
   ClearErrors
-  !insertmacro hanakoInstallTimingMark "customUnInstallCheck" "end"
+  !insertmacro lingxiInstallTimingMark "customUnInstallCheck" "end"
 !macroend
 
 !macro customUnInstallCheckCurrentUser
-  !insertmacro hanakoInstallTimingMark "customUnInstallCheckCurrentUser" "start"
+  !insertmacro lingxiInstallTimingMark "customUnInstallCheckCurrentUser" "start"
   ${If} ${Errors}
     DetailPrint `Previous current-user uninstaller could not be launched; continuing with HanaAgent-owned overlay.`
   ${ElseIf} $R0 != 0
     DetailPrint `Previous current-user uninstaller exited with code $R0; continuing with HanaAgent-owned overlay.`
   ${EndIf}
-  !insertmacro hanakoPrepareOwnedOverlay
+  !insertmacro lingxiPrepareOwnedOverlay
   ClearErrors
-  !insertmacro hanakoInstallTimingMark "customUnInstallCheckCurrentUser" "end"
+  !insertmacro lingxiInstallTimingMark "customUnInstallCheckCurrentUser" "end"
 !macroend
 
 !macro customRemoveFiles
-  !insertmacro hanakoInstallTimingMark "customRemoveFiles" "start"
-  !insertmacro hanakoStopInstallDirProcesses
+  !insertmacro lingxiInstallTimingMark "customRemoveFiles" "start"
+  !insertmacro lingxiStopInstallDirProcesses
   Delete "$INSTDIR\${APP_EXECUTABLE_FILENAME}"
-  !insertmacro hanakoRemoveOwnedInstallTrees
+  !insertmacro lingxiRemoveOwnedInstallTrees
   RMDir "$INSTDIR"
-  !insertmacro hanakoInstallTimingMark "customRemoveFiles" "end"
+  !insertmacro lingxiInstallTimingMark "customRemoveFiles" "end"
 !macroend
 
 !macro customUnInit
-  !insertmacro hanakoInstallTimingMark "customUnInit" "start"
-  !insertmacro hanakoStopInstallDirProcesses
+  !insertmacro lingxiInstallTimingMark "customUnInit" "start"
+  !insertmacro lingxiStopInstallDirProcesses
   Sleep 2000
-  !insertmacro hanakoInstallTimingMark "customUnInit" "end"
+  !insertmacro lingxiInstallTimingMark "customUnInit" "end"
 !macroend

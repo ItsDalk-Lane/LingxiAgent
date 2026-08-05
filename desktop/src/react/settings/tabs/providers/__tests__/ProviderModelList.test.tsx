@@ -8,12 +8,12 @@ import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/re
 import '@testing-library/jest-dom/vitest';
 
 const mocks = vi.hoisted(() => ({
-  hanaFetch: vi.fn(),
+  lingxiFetch: vi.fn(),
   lookupModelMeta: vi.fn((_id: unknown, _provider?: unknown): unknown => null),
 }));
 
 vi.mock('../../../api', () => ({
-  hanaFetch: (...args: unknown[]) => mocks.hanaFetch(...args),
+  lingxiFetch: (...args: unknown[]) => mocks.lingxiFetch(...args),
 }));
 
 vi.mock('../../../../hooks/use-config', () => ({
@@ -51,7 +51,7 @@ function rect(init: Partial<DOMRect>): DOMRect {
 describe('ProviderModelList', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mocks.hanaFetch.mockResolvedValue(jsonResponse({ models: [{ id: 'kimi-for-coding' }] }));
+    mocks.lingxiFetch.mockResolvedValue(jsonResponse({ models: [{ id: 'kimi-for-coding' }] }));
     mocks.lookupModelMeta.mockReturnValue(null);
     Object.defineProperty(window, 'innerWidth', { configurable: true, writable: true, value: 1200 });
     Object.defineProperty(window, 'innerHeight', { configurable: true, writable: true, value: 900 });
@@ -158,7 +158,7 @@ describe('ProviderModelList', () => {
 
   it('opens fetched models in the add-model dropdown so they can be enabled', async () => {
     const onRefresh = vi.fn(async () => {});
-    mocks.hanaFetch
+    mocks.lingxiFetch
       .mockResolvedValueOnce(jsonResponse({ models: [] }))
       .mockResolvedValueOnce(jsonResponse({ models: [{ id: 'kimi-new-model' }] }))
       .mockResolvedValueOnce(jsonResponse({ ok: true }));
@@ -189,7 +189,7 @@ describe('ProviderModelList', () => {
     const option = await screen.findByRole('button', { name: /kimi-new-model/ });
     fireEvent.click(option);
 
-    await waitFor(() => expect(mocks.hanaFetch).toHaveBeenCalledWith('/api/config', expect.objectContaining({
+    await waitFor(() => expect(mocks.lingxiFetch).toHaveBeenCalledWith('/api/config', expect.objectContaining({
       method: 'PUT',
       body: JSON.stringify({ providers: { 'kimi-coding': { models: ['kimi-new-model'] } } }),
     })));
@@ -198,7 +198,7 @@ describe('ProviderModelList', () => {
 
   it('writes OAuth custom models through Provider Catalog instead of the legacy preferences route', async () => {
     const onRefresh = vi.fn(async () => {});
-    mocks.hanaFetch
+    mocks.lingxiFetch
       .mockResolvedValueOnce(jsonResponse({ models: [] }))
       .mockResolvedValueOnce(jsonResponse({ ok: true }));
 
@@ -228,7 +228,7 @@ describe('ProviderModelList', () => {
     fireEvent.change(input, { target: { value: 'my-codex-model' } });
     fireEvent.keyDown(input, { key: 'Enter' });
 
-    await waitFor(() => expect(mocks.hanaFetch).toHaveBeenCalledWith('/api/config', expect.objectContaining({
+    await waitFor(() => expect(mocks.lingxiFetch).toHaveBeenCalledWith('/api/config', expect.objectContaining({
       method: 'PUT',
       body: JSON.stringify({
         providers: {
@@ -236,13 +236,13 @@ describe('ProviderModelList', () => {
         },
       }),
     })));
-    expect(mocks.hanaFetch.mock.calls.some(([url]) => String(url).includes('/auth/oauth/'))).toBe(false);
+    expect(mocks.lingxiFetch.mock.calls.some(([url]) => String(url).includes('/auth/oauth/'))).toBe(false);
     expect(onRefresh).toHaveBeenCalled();
   });
 
   it('persists discovered model metadata when enabling a fetched model', async () => {
     const onRefresh = vi.fn(async () => {});
-    mocks.hanaFetch
+    mocks.lingxiFetch
       .mockResolvedValueOnce(jsonResponse({ models: [] }))
       .mockResolvedValueOnce(jsonResponse({
         models: [
@@ -287,7 +287,7 @@ describe('ProviderModelList', () => {
     fireEvent.click(option);
 
     await waitFor(() => {
-      expect(mocks.hanaFetch).toHaveBeenCalledWith('/api/config', expect.objectContaining({
+      expect(mocks.lingxiFetch).toHaveBeenCalledWith('/api/config', expect.objectContaining({
         method: 'PUT',
         body: JSON.stringify({
           providers: {
@@ -315,7 +315,7 @@ describe('ProviderModelList', () => {
 
   it('does not serialize untouched capability defaults as explicit false overrides', async () => {
     const onRefresh = vi.fn(async () => {});
-    mocks.hanaFetch.mockResolvedValue(jsonResponse({ models: [] }));
+    mocks.lingxiFetch.mockResolvedValue(jsonResponse({ models: [] }));
     mocks.lookupModelMeta.mockImplementation((id: unknown, provider: unknown) => {
       expect(provider).toBe('mimo');
       if (id === 'mimo-v2.5-pro') {
@@ -355,7 +355,7 @@ describe('ProviderModelList', () => {
     fireEvent.click(screen.getByRole('button', { name: 'settings.api.save' }));
 
     await waitFor(() => {
-      const updateCall = mocks.hanaFetch.mock.calls.find(([url, options]) => (
+      const updateCall = mocks.lingxiFetch.mock.calls.find(([url, options]) => (
         String(url).includes('/api/providers/mimo/models/mimo-v2.5-pro')
         && options?.method === 'PUT'
       ));
@@ -368,7 +368,7 @@ describe('ProviderModelList', () => {
 
   it('serializes audio only after the user changes the audio capability toggle', async () => {
     const onRefresh = vi.fn(async () => {});
-    mocks.hanaFetch.mockResolvedValue(jsonResponse({ models: [] }));
+    mocks.lingxiFetch.mockResolvedValue(jsonResponse({ models: [] }));
     mocks.lookupModelMeta.mockImplementation((id: unknown, provider: unknown) => {
       expect(provider).toBe('mimo');
       if (id === 'mimo-v2.5-pro') {
@@ -409,7 +409,7 @@ describe('ProviderModelList', () => {
     fireEvent.click(screen.getByRole('button', { name: 'settings.api.save' }));
 
     await waitFor(() => {
-      const updateCall = mocks.hanaFetch.mock.calls.find(([url, options]) => (
+      const updateCall = mocks.lingxiFetch.mock.calls.find(([url, options]) => (
         String(url).includes('/api/providers/mimo/models/mimo-v2.5-pro')
         && options?.method === 'PUT'
       ));
@@ -424,7 +424,7 @@ describe('ProviderModelList', () => {
   it.each(['maxOutput', 'maxTokens', 'maxOutputTokens'] as const)(
     'reopens the editor with persisted user %s metadata overriding known defaults',
     async (outputField) => {
-    mocks.hanaFetch.mockResolvedValue(jsonResponse({ models: [] }));
+    mocks.lingxiFetch.mockResolvedValue(jsonResponse({ models: [] }));
     mocks.lookupModelMeta.mockReturnValue({
       name: 'Known GPT',
       context: 1050000,
@@ -471,7 +471,7 @@ describe('ProviderModelList', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'settings.api.save' }));
     await waitFor(() => {
-      const updateCall = mocks.hanaFetch.mock.calls.find(([url, options]) => (
+      const updateCall = mocks.lingxiFetch.mock.calls.find(([url, options]) => (
         String(url).includes('/api/providers/openai/models/gpt-5.6-sol')
         && options?.method === 'PUT'
       ));

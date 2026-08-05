@@ -3,7 +3,7 @@
  *
  * ActivityHub 是内存广播层，进程重启即清空，导致右侧卡（WorkflowCard / AgentActivityCard）
  * 重启消失。这个 store 把 ActivityHub 标记为可持久的活动（workflow / workflow_agent / subagent，
- * 见 activity-hub.js 的 PERSISTABLE_KINDS）落盘（hanakoHome/workflow-activity.json），作为
+ * 见 activity-hub.js 的 PERSISTABLE_KINDS）落盘（lingxiHome/workflow-activity.json），作为
  * ActivityHub 的「持久化背书」：upsert 写穿、重启回灌、会话退场清理、72h TTL 修剪。
  * 名称沿用 workflow-activity（首次落地时仅 workflow），实为 ActivityHub 通用持久层。
  *

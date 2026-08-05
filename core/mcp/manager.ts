@@ -674,7 +674,7 @@ export interface McpLogger {
 export interface McpManagerDeps {
   /**
    * Absolute directory holding config.json. Production passes
-   * `{hanakoHome}/plugin-data/mcp` — the path is a data compatibility surface
+   * `{lingxiHome}/plugin-data/mcp` — the path is a data compatibility surface
    * inherited from the era when MCP shipped as a bundled plugin.
    */
   dataDir: string;

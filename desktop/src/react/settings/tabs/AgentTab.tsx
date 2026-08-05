@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { useShallow } from 'zustand/react/shallow';
 import { useSettingsStore } from '../store';
-import { hanaFetch } from '../api';
+import { lingxiFetch } from '../api';
 import { t, autoSaveConfig } from '../helpers';
 import { SelectWidget, Toggle, ProviderIcon, ProviderGroupHeader, selectWidgetStyles } from '@/ui';
 import { browseAgent, setPrimaryAgent, loadSettingsConfig, loadAgents } from '../actions';
@@ -61,7 +61,7 @@ export function AgentTab() {
     }
   }, [settingsConfig]);
 
-  const currentYuan = settingsConfig?.agent?.yuan || 'hanako';
+  const currentYuan = settingsConfig?.agent?.yuan || 'lingxi';
 
   // 用 "provider/id" 复合键作为 SelectWidget 的 value，区分多 provider 下同名模型。
   // 展示层可仍用 id/name；value/onChange payload 必须带 provider。
@@ -80,7 +80,7 @@ export function AgentTab() {
   // 从唯一信源 /api/models 获取模型列表（和聊天页一致）
   const [availableModels, setAvailableModels] = useState<Array<{ id: string; name: string; provider: string }>>([]);
   useEffect(() => {
-    hanaFetch('/api/models').then(r => r.json()).then(data => {
+    lingxiFetch('/api/models').then(r => r.json()).then(data => {
       setAvailableModels(data.models || []);
     }).catch(() => {});
   }, [settingsConfig]); // settingsConfig 变化时刷新
@@ -113,7 +113,7 @@ export function AgentTab() {
         return;
       }
 
-      const res = await hanaFetch(`/api/agents/${agentId}/config`, {
+      const res = await lingxiFetch(`/api/agents/${agentId}/config`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ agent: { name: agentName } }),
@@ -147,14 +147,14 @@ export function AgentTab() {
       const agentBase = `/api/agents/${agentId}`;
       const requests: Promise<Response>[] = [];
       if (identityChanged) {
-        requests.push(hanaFetch(`${agentBase}/identity`, {
+        requests.push(lingxiFetch(`${agentBase}/identity`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ content: identity }),
         }));
       }
       if (ishikiChanged) {
-        requests.push(hanaFetch(`${agentBase}/ishiki`, {
+        requests.push(lingxiFetch(`${agentBase}/ishiki`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ content: ishiki }),
@@ -179,7 +179,7 @@ export function AgentTab() {
     if (exportPlanningAgentId || exportingCharacterCard) return;
     setExportPlanningAgentId(agentId);
     try {
-      const res = await hanaFetch('/api/character-cards/export/preview', {
+      const res = await lingxiFetch('/api/character-cards/export/preview', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ agentId }),
@@ -201,7 +201,7 @@ export function AgentTab() {
     if (!exportPlan?.agentId || exportingCharacterCard) return;
     setExportingCharacterCard(true);
     try {
-      const res = await hanaFetch('/api/character-cards/export', {
+      const res = await lingxiFetch('/api/character-cards/export', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -347,7 +347,7 @@ export function AgentTab() {
             onChange={async (key) => {
               const agentId = getSettingsAgentId()!;
               try {
-                await hanaFetch(`/api/agents/${agentId}/config`, {
+                await lingxiFetch(`/api/agents/${agentId}/config`, {
                   method: 'PUT',
                   headers: { 'Content-Type': 'application/json' },
                   body: JSON.stringify({ agent: { yuan: key } }),

@@ -12,10 +12,10 @@ import path from "path";
 const MISSING_CODES = new Set(["ENOENT", "ENOTDIR"]);
 
 const ERROR_CODES = {
-  invalid: "HANA_EXEC_CWD_INVALID",
-  relative: "HANA_EXEC_CWD_RELATIVE",
-  missing: "HANA_EXEC_CWD_MISSING",
-  "not-directory": "HANA_EXEC_CWD_NOT_DIRECTORY",
+  invalid: "LINGXI_EXEC_CWD_INVALID",
+  relative: "LINGXI_EXEC_CWD_RELATIVE",
+  missing: "LINGXI_EXEC_CWD_MISSING",
+  "not-directory": "LINGXI_EXEC_CWD_NOT_DIRECTORY",
 };
 
 function messageFor(status, cwd) {
@@ -64,7 +64,7 @@ export function classifyExecutionCwd(cwd, { statSync = fsStatSync } = {}) {
 }
 
 /**
- * spawn 前的工作目录断言。确定性失败抛 HANA_EXEC_CWD_*；
+ * spawn 前的工作目录断言。确定性失败抛 LINGXI_EXEC_CWD_*；
  * unreadable 放行，交给 spawn 层保留原始系统行为。
  */
 export function assertExecutionCwd(cwd, deps = {}) {

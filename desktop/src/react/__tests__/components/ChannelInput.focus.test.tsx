@@ -4,11 +4,11 @@ import '@testing-library/jest-dom/vitest';
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ChannelInput, ChannelMembers, requestChannelComposerFocus } from '../../components/ChannelsPanel';
-import { hanaFetch } from '../../hooks/use-hana-fetch';
+import { lingxiFetch } from '../../hooks/use-hana-fetch';
 import { useStore } from '../../stores';
 
 vi.mock('../../hooks/use-hana-fetch', () => ({
-  hanaFetch: vi.fn(),
+  lingxiFetch: vi.fn(),
 }));
 
 function seedChannelState() {
@@ -70,7 +70,7 @@ describe('ChannelInput focus restoration', () => {
   });
 
   it('returns focus to the composer after removing a channel member', async () => {
-    vi.mocked(hanaFetch).mockResolvedValueOnce({
+    vi.mocked(lingxiFetch).mockResolvedValueOnce({
       ok: true,
       json: async () => ({ ok: true, members: ['bob', 'carol'] }),
     } as Response);
@@ -87,7 +87,7 @@ describe('ChannelInput focus restoration', () => {
     fireEvent.click(removeButtons[0]);
 
     await waitFor(() => {
-      expect(hanaFetch).toHaveBeenCalledWith('/api/channels/ch_crew/members/alice', { method: 'DELETE' });
+      expect(lingxiFetch).toHaveBeenCalledWith('/api/channels/ch_crew/members/alice', { method: 'DELETE' });
       expect(input).toHaveFocus();
     });
   });

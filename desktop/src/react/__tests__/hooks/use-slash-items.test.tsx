@@ -7,7 +7,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { useStore } from '../../stores';
 
 const mocks = vi.hoisted(() => ({
-  hanaFetch: vi.fn<(path: string, opts?: RequestInit) => Promise<Response>>(async (path: string) => {
+  lingxiFetch: vi.fn<(path: string, opts?: RequestInit) => Promise<Response>>(async (path: string) => {
     if (path.startsWith('/api/commands')) {
       return new Response(JSON.stringify({
         commands: [
@@ -23,7 +23,7 @@ const mocks = vi.hoisted(() => ({
 }));
 
 vi.mock('../../hooks/use-hana-fetch', () => ({
-  hanaFetch: (path: string, opts?: RequestInit) => mocks.hanaFetch(path, opts),
+  lingxiFetch: (path: string, opts?: RequestInit) => mocks.lingxiFetch(path, opts),
 }));
 
 describe('useSkillSlashItems', () => {
@@ -42,8 +42,8 @@ describe('useSkillSlashItems', () => {
     const { result } = renderHook(() => useSkillSlashItems({ enabled: true, agentId: 'mio' }));
 
     await waitFor(() => expect(result.current.map(item => item.name)).toEqual(['mio_skill']));
-    expect(mocks.hanaFetch.mock.calls[0]?.[0]).toBe('/api/skills?agentId=mio&runtime=1');
-    expect(mocks.hanaFetch.mock.calls.map(call => call[0])).not.toContain('/api/skills?agentId=hana&runtime=1');
+    expect(mocks.lingxiFetch.mock.calls[0]?.[0]).toBe('/api/skills?agentId=mio&runtime=1');
+    expect(mocks.lingxiFetch.mock.calls.map(call => call[0])).not.toContain('/api/skills?agentId=hana&runtime=1');
   });
 });
 
@@ -68,6 +68,6 @@ describe('useServerSlashCommandItems', () => {
       label: '/plugin_hello',
       type: 'server-command',
     });
-    expect(mocks.hanaFetch.mock.calls[0]?.[0]).toBe('/api/commands?agentId=mio');
+    expect(mocks.lingxiFetch.mock.calls[0]?.[0]).toBe('/api/commands?agentId=mio');
   });
 });

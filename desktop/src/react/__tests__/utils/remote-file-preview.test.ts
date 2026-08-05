@@ -6,11 +6,11 @@ import { useStore, type StoreState } from '../../stores';
 import type { DeskFile, RemoteWorkbenchContentRef } from '../../types';
 import type { FileRef } from '../../types/file-ref';
 
-const mockHanaFetch = vi.hoisted(() => vi.fn());
+const mockLingxiFetch = vi.hoisted(() => vi.fn());
 const mockOpenFilePreview = vi.hoisted(() => vi.fn(async () => undefined));
 
 vi.mock('../../hooks/use-hana-fetch', () => ({
-  hanaFetch: mockHanaFetch,
+  lingxiFetch: mockLingxiFetch,
 }));
 
 vi.mock('../../utils/file-preview', async (importOriginal) => {
@@ -32,9 +32,9 @@ describe('remote file preview workbench refs', () => {
       serverPort: '62950',
       serverToken: 'local-token',
     } as Partial<StoreState>);
-    mockHanaFetch.mockReset();
+    mockLingxiFetch.mockReset();
     mockOpenFilePreview.mockClear();
-    mockHanaFetch.mockResolvedValue({
+    mockLingxiFetch.mockResolvedValue({
       json: async () => ({ ok: true, version: { mtimeMs: 1, size: 4 } }),
     });
   });
@@ -51,7 +51,7 @@ describe('remote file preview workbench refs', () => {
 
     await saveRemoteWorkbenchContent(ref, 'body');
 
-    expect(mockHanaFetch).toHaveBeenCalledWith(
+    expect(mockLingxiFetch).toHaveBeenCalledWith(
       '/api/workbench/actions',
       expect.objectContaining({
         method: 'POST',
@@ -65,7 +65,7 @@ describe('remote file preview workbench refs', () => {
         }),
       }),
     );
-    expect(String(mockHanaFetch.mock.calls[0][1].body)).not.toContain('"rootId"');
+    expect(String(mockLingxiFetch.mock.calls[0][1].body)).not.toContain('"rootId"');
   });
 
   it('retries remote workbench refresh when the first cache-busted read is unchanged', async () => {
@@ -91,7 +91,7 @@ describe('remote file preview workbench refs', () => {
         },
       }],
     } as Partial<StoreState>);
-    mockHanaFetch
+    mockLingxiFetch
       .mockResolvedValueOnce(new Response('old', { status: 200 }))
       .mockResolvedValueOnce(new Response('new', { status: 200 }));
 
@@ -101,7 +101,7 @@ describe('remote file preview workbench refs', () => {
     });
 
     const item = useStore.getState().previewItems[0];
-    expect(mockHanaFetch).toHaveBeenCalledTimes(2);
+    expect(mockLingxiFetch).toHaveBeenCalledTimes(2);
     expect(item.content).toBe('new');
     expect(item.fileVersion).toEqual({ mtimeMs: 2, size: 8 });
     expect(item.remoteContentRef?.version).toEqual({ mtimeMs: 2, size: 8 });
@@ -116,11 +116,11 @@ describe('remote file preview workbench refs', () => {
       mtime: staleListVersion,
       size: 0,
     };
-    mockHanaFetch.mockResolvedValueOnce(new Response('# fresh\n', {
+    mockLingxiFetch.mockResolvedValueOnce(new Response('# fresh\n', {
       status: 200,
       headers: {
-        'X-Hana-File-MtimeMs': '1781989413542',
-        'X-Hana-File-Size': '8',
+        'X-Lingxi-File-MtimeMs': '1781989413542',
+        'X-Lingxi-File-Size': '8',
       },
     }));
 
@@ -160,11 +160,11 @@ describe('remote file preview workbench refs', () => {
         remoteContentRef: target,
       }],
     } as Partial<StoreState>);
-    mockHanaFetch.mockResolvedValueOnce(new Response('fresh external body', {
+    mockLingxiFetch.mockResolvedValueOnce(new Response('fresh external body', {
       status: 200,
       headers: {
-        'X-Hana-File-MtimeMs': String(diskVersion.mtimeMs),
-        'X-Hana-File-Size': String(diskVersion.size),
+        'X-Lingxi-File-MtimeMs': String(diskVersion.mtimeMs),
+        'X-Lingxi-File-Size': String(diskVersion.size),
       },
     }));
 
@@ -195,7 +195,7 @@ describe('remote file preview workbench refs', () => {
       origin: 'desk',
       sourceRootPath: '/Users/me/project',
     });
-    expect(mockHanaFetch).not.toHaveBeenCalled();
+    expect(mockLingxiFetch).not.toHaveBeenCalled();
   });
 
   it('opens remote default workbench documents through ResourceIO content even in desktop runtime', async () => {
@@ -225,7 +225,7 @@ describe('remote file preview workbench refs', () => {
       mtime: '2026-06-25T01:02:03.000Z',
       size: 9,
     };
-    mockHanaFetch.mockResolvedValueOnce(new Response('# remote\n', { status: 200 }));
+    mockLingxiFetch.mockResolvedValueOnce(new Response('# remote\n', { status: 200 }));
 
     await openWorkbenchFilePreview({
       subdir: 'notes',
@@ -234,7 +234,7 @@ describe('remote file preview workbench refs', () => {
     });
 
     expect(mockOpenFilePreview).not.toHaveBeenCalled();
-    expect(mockHanaFetch).toHaveBeenCalledWith(expect.stringMatching(
+    expect(mockLingxiFetch).toHaveBeenCalledWith(expect.stringMatching(
       /^\/api\/workbench\/content\?mountId=default&subdir=notes&name=remote\.md&v=/,
     ));
     expect(useStore.getState().previewItems[0]).toMatchObject({
@@ -290,7 +290,7 @@ describe('remote file preview workbench refs', () => {
         },
       },
     };
-    mockHanaFetch.mockResolvedValueOnce(new Response('# file ref\n', { status: 200 }));
+    mockLingxiFetch.mockResolvedValueOnce(new Response('# file ref\n', { status: 200 }));
 
     await openFileRefPreview(fileRef, {
       origin: 'session',
@@ -300,7 +300,7 @@ describe('remote file preview workbench refs', () => {
     });
 
     expect(mockOpenFilePreview).not.toHaveBeenCalled();
-    expect(mockHanaFetch).toHaveBeenCalledWith('/api/resources/res_sf_report/content');
+    expect(mockLingxiFetch).toHaveBeenCalledWith('/api/resources/res_sf_report/content');
     expect(useStore.getState().previewItems[0]).toMatchObject({
       title: 'report.md',
       content: '# file ref\n',

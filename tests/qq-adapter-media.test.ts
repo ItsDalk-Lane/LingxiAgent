@@ -379,7 +379,7 @@ describe("createQQAdapter media delivery", () => {
       onMessage: vi.fn(),
     } as any);
 
-    await adapter.sendMedia("user-openid", "https://hana.example.com/api/bridge/media/token_123", {
+    await adapter.sendMedia("user-openid", "https://lingxi.example.com/api/bridge/media/token_123", {
       kind: "image",
       mime: "image/png",
       filename: "image.png",
@@ -389,7 +389,7 @@ describe("createQQAdapter media delivery", () => {
     expect(uploadCall).toBeTruthy();
     expect(JSON.parse(uploadCall[1].body)).toMatchObject({
       file_type: 1,
-      url: "https://hana.example.com/api/bridge/media/token_123",
+      url: "https://lingxi.example.com/api/bridge/media/token_123",
       srv_send_msg: false,
     });
     const messageCall = (fetch as any).mock.calls.find(([url]: any) => String(url).includes("/v2/users/user-openid/messages"));

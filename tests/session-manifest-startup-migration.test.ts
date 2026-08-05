@@ -9,15 +9,15 @@ import {
 import { SessionManifestStore } from "../core/session-manifest/store.ts";
 
 describe("session manifest startup migration", () => {
-  let hanaHome;
+  let lingxiHome;
   let store;
   let nextId;
 
   beforeEach(() => {
-    hanaHome = fs.mkdtempSync(path.join(os.tmpdir(), "hana-manifest-startup-"));
+    lingxiHome = fs.mkdtempSync(path.join(os.tmpdir(), "hana-manifest-startup-"));
     nextId = 1;
     store = new SessionManifestStore({
-      dbPath: path.join(hanaHome, "session-manifest.db"),
+      dbPath: path.join(lingxiHome, "session-manifest.db"),
       idGenerator: () => `sess_startup_${String(nextId++).padStart(4, "0")}`,
       now: () => "2026-06-18T06:00:00.000Z",
     });
@@ -25,11 +25,11 @@ describe("session manifest startup migration", () => {
 
   afterEach(() => {
     store?.close();
-    fs.rmSync(hanaHome, { recursive: true, force: true });
+    fs.rmSync(lingxiHome, { recursive: true, force: true });
   });
 
   function writeLegacySession(agentId, fileName) {
-    const sessionDir = path.join(hanaHome, "agents", agentId, "sessions");
+    const sessionDir = path.join(lingxiHome, "agents", agentId, "sessions");
     const sessionPath = path.join(sessionDir, fileName);
     fs.mkdirSync(sessionDir, { recursive: true });
     fs.writeFileSync(sessionPath, `${JSON.stringify({
@@ -44,7 +44,7 @@ describe("session manifest startup migration", () => {
     const sessionPath = writeLegacySession("hana", "alpha.jsonl");
 
     const first = ensureLegacySessionManifestMigration({
-      hanaHome,
+      lingxiHome,
       store,
       appVersion: "9.9.9",
       startedAt: "2026-06-18T06:01:00.000Z",
@@ -64,7 +64,7 @@ describe("session manifest startup migration", () => {
     const secondCheckpoint = vi.fn();
     const secondMigration = vi.fn(() => ({ scanned: 1, created: 0, existing: 1, skipped: 0 }));
     const second = ensureLegacySessionManifestMigration({
-      hanaHome,
+      lingxiHome,
       store,
       createCheckpoint: secondCheckpoint,
       migrate: secondMigration,
@@ -73,7 +73,7 @@ describe("session manifest startup migration", () => {
     expect(second.status).toBe("rescanned");
     expect(secondCheckpoint).not.toHaveBeenCalled();
     expect(secondMigration).toHaveBeenCalledWith({
-      hanaHome,
+      lingxiHome,
       store,
       migratedAt: expect.any(String),
       stopOnError: undefined,
@@ -88,7 +88,7 @@ describe("session manifest startup migration", () => {
 
   it("records startup migration failures without throwing", () => {
     const failure = ensureLegacySessionManifestMigration({
-      hanaHome,
+      lingxiHome,
       store,
       startedAt: "2026-06-18T06:02:00.000Z",
       createCheckpoint: () => {

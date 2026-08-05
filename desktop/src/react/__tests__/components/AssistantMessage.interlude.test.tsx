@@ -30,7 +30,7 @@ describe('AssistantMessage interlude-only rendering', () => {
     useStore.setState({
       agents: [],
       agentName: 'Hanako',
-      agentYuan: 'hanako',
+      agentYuan: 'lingxi',
       streamingSessions: [],
       selectedMessageIdsBySession: {},
     } as never);

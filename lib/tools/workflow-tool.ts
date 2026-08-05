@@ -23,7 +23,7 @@ const WORKFLOW_DESCRIPTION = [
   'agent() signature is agent(prompt, { label?, model?, agentType?, access?: "read"|"write", writeFolders?: string[], schema?, toolFilter?, retries? }).',
   "Runtime model: per-node timeout 15min (transient node failures retry twice with backoff; override with agent() retries / limits.nodeRetries), the whole run fails only when NO node makes progress for 10min or after 4h total; on failure the message carries resumeFromRunId so a fixed re-dispatch replays completed nodes from cache. Concurrency defaults to 16 (limits.maxConcurrent, max 64).",
   'Least-privilege rule: every node must either run read-only (access:"read") or declare writeFolders — the narrowest absolute existing folders it writes to. Write-capable nodes without writeFolders are rejected at start. writeFolders entries must stay inside the parent session folder scope; the first entry becomes the node cwd. Parallel write nodes should declare disjoint writeFolders so they cannot clobber each other. Reads keep following the sandbox global read-only contract.',
-  "Always await agent(): const result = await agent('task prompt', { access: 'read', agentType: 'hanako' }); agent() does not return { result }.",
+  "Always await agent(): const result = await agent('task prompt', { access: 'read', agentType: 'lingxi' }); agent() does not return { result }.",
   "To choose a target agent, use opts.agentType. Do not pass task in opts; put complete task instructions in the first prompt argument.",
   "The script cannot import modules or access require/process/fs/net. To read/write files or run tools, ask an agent() node to do it.",
 ].join("\n");

@@ -269,19 +269,19 @@ describe("session path identity audit", () => {
         const key = this._sessionKeyForPath(entry.sessionPath);
       `,
       "lib/session-files/bridge-inbound-files.ts": `
-        const dir = sessionFilesCacheDir(hanakoHome, { sessionId, sessionPath });
+        const dir = sessionFilesCacheDir(lingxiHome, { sessionId, sessionPath });
       `,
       "lib/session-files/browser-screenshot-file.ts": `
-        sessionFilesCacheDir(hanakoHome, { sessionId, sessionPath });
+        sessionFilesCacheDir(lingxiHome, { sessionId, sessionPath });
       `,
       "lib/sandbox/read-office-media.ts": `
         function officeMediaResourceKey({ sessionId, sessionPath, docxPath, index, mimeType, hash }) {}
         key: officeMediaResourceKey({ sessionId, sessionPath, docxPath, index: image.index, mimeType: image.mimeType, hash: image.hash });
-        const dir = sessionFilesCacheDir(hanakoHome, { sessionId, sessionPath });
+        const dir = sessionFilesCacheDir(lingxiHome, { sessionId, sessionPath });
       `,
       "server/routes/upload.ts": `
         const sessionId = engine?.getSessionIdForPath?.(sessionPath) || null;
-        dir: sessionFilesCacheDir(engine.hanakoHome, { sessionId, sessionPath });
+        dir: sessionFilesCacheDir(engine.lingxiHome, { sessionId, sessionPath });
       `,
       "core/engine.ts": `
         const key = this._sessionRuntimeKeyForPath(sessionPath);

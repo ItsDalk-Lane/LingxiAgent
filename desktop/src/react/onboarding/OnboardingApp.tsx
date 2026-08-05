@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { TOTAL_STEPS } from './constants';
 import { createOnboardingVerificationPlan, resolveOnboardingAgentId } from './onboarding-actions';
-import type { HanaFetch } from './onboarding-actions';
+import type { LingxiFetch } from './onboarding-actions';
 import { LocaleStep } from './steps/LocaleStep';
 import { NameStep } from './steps/NameStep';
 import { ProviderStep } from './steps/ProviderStep';
@@ -26,8 +26,8 @@ export function OnboardingApp({ preview, skipToTutorial }: OnboardingAppProps) {
   const [initError, setInitError] = useState('');
   const [step, setStep] = useState(skipToTutorial ? 5 : 0);
   const [stepKey, setStepKey] = useState(0);
-  const [agentName, setAgentName] = useState('Hanako');
-  const [avatarSrc, setAvatarSrc] = useState('assets/Hanako.png');
+  const [agentName, setAgentName] = useState('Lingxi');
+  const [avatarSrc, setAvatarSrc] = useState('assets/Lingxi.png');
   const [locale, setLocale] = useState('zh-CN');
   const [i18nReady, setI18nReady] = useState(false);
 
@@ -42,9 +42,9 @@ export function OnboardingApp({ preview, skipToTutorial }: OnboardingAppProps) {
   const localeLoadSeq = useRef(0);
   const verificationPlan = useRef(createOnboardingVerificationPlan()).current;
 
-  const hanaFetch: HanaFetch = useCallback((path, opts = {}) => {
+  const lingxiFetch: LingxiFetch = useCallback((path, opts = {}) => {
     if (!serverConnection) {
-      throw new Error(`onboarding hanaFetch ${path}: server connection not ready`);
+      throw new Error(`onboarding lingxiFetch ${path}: server connection not ready`);
     }
     const headers = appendConnectionAuth(serverConnection, opts.headers);
     return fetch(buildConnectionUrl(serverConnection, path), { ...opts, headers });
@@ -105,7 +105,7 @@ export function OnboardingApp({ preview, skipToTutorial }: OnboardingAppProps) {
         setServerConnection(connection);
         const splashInfo = await window.hana.getSplashInfo?.();
         const loc = splashInfo?.locale || 'zh-CN';
-        const name = splashInfo?.agentName || 'Hanako';
+        const name = splashInfo?.agentName || 'Lingxi';
         setLocale(loc);
         setAgentName(name);
         await i18n.load(loc);
@@ -116,7 +116,7 @@ export function OnboardingApp({ preview, skipToTutorial }: OnboardingAppProps) {
           if (localPath) setAvatarSrc(window.platform?.getFileUrl?.(localPath) ?? '');
         } catch { /* ignore */ }
         if (!preview) {
-          const connectionFetch: HanaFetch = (path, opts = {}) => {
+          const connectionFetch: LingxiFetch = (path, opts = {}) => {
             const headers = appendConnectionAuth(connection, opts.headers);
             return fetch(buildConnectionUrl(connection, path), { ...opts, headers });
           };
@@ -146,12 +146,12 @@ export function OnboardingApp({ preview, skipToTutorial }: OnboardingAppProps) {
         ))}
       </div>
 
-      {activeStep === 0 && <LocaleStep key={`step-0-${stepKey}`} preview={preview} hanaFetch={hanaFetch} agentId={agentId} verificationPlan={verificationPlan} avatarSrc={avatarSrc} initialLocale={locale} goToStep={goToStep} showError={showError} onLocaleChange={onLocaleChange} onConnectLanServer={connectLanServer} />}
-      {activeStep === 1 && <NameStep key={`step-1-${stepKey}`} preview={preview} hanaFetch={hanaFetch} agentId={agentId} verificationPlan={verificationPlan} goToStep={goToStep} showError={showError} />}
-      {activeStep === 2 && <ProviderStep key={`step-2-${stepKey}`} preview={preview} hanaFetch={hanaFetch} agentId={agentId} verificationPlan={verificationPlan} goToStep={goToStep} showError={showError} onProviderReady={onProviderReady} />}
-      {activeStep === 3 && <ModelStep key={`step-3-${stepKey}`} preview={preview} hanaFetch={hanaFetch} agentId={agentId} verificationPlan={verificationPlan} providerName={providerName} providerUrl={providerUrl} providerApi={providerApi} apiKey={apiKey} goToStep={goToStep} showError={showError} />}
-      {activeStep === 4 && <WorkspaceStep key={`step-4-${stepKey}`} preview={preview} hanaFetch={hanaFetch} agentId={agentId} verificationPlan={verificationPlan} goToStep={goToStep} showError={showError} />}
-      {activeStep === 5 && <TutorialStep key={`step-5-${stepKey}`} preview={preview} hanaFetch={hanaFetch} agentId={agentId} verificationPlan={verificationPlan} showError={showError} />}
+      {activeStep === 0 && <LocaleStep key={`step-0-${stepKey}`} preview={preview} lingxiFetch={lingxiFetch} agentId={agentId} verificationPlan={verificationPlan} avatarSrc={avatarSrc} initialLocale={locale} goToStep={goToStep} showError={showError} onLocaleChange={onLocaleChange} onConnectLanServer={connectLanServer} />}
+      {activeStep === 1 && <NameStep key={`step-1-${stepKey}`} preview={preview} lingxiFetch={lingxiFetch} agentId={agentId} verificationPlan={verificationPlan} goToStep={goToStep} showError={showError} />}
+      {activeStep === 2 && <ProviderStep key={`step-2-${stepKey}`} preview={preview} lingxiFetch={lingxiFetch} agentId={agentId} verificationPlan={verificationPlan} goToStep={goToStep} showError={showError} onProviderReady={onProviderReady} />}
+      {activeStep === 3 && <ModelStep key={`step-3-${stepKey}`} preview={preview} lingxiFetch={lingxiFetch} agentId={agentId} verificationPlan={verificationPlan} providerName={providerName} providerUrl={providerUrl} providerApi={providerApi} apiKey={apiKey} goToStep={goToStep} showError={showError} />}
+      {activeStep === 4 && <WorkspaceStep key={`step-4-${stepKey}`} preview={preview} lingxiFetch={lingxiFetch} agentId={agentId} verificationPlan={verificationPlan} goToStep={goToStep} showError={showError} />}
+      {activeStep === 5 && <TutorialStep key={`step-5-${stepKey}`} preview={preview} lingxiFetch={lingxiFetch} agentId={agentId} verificationPlan={verificationPlan} showError={showError} />}
 
       {visibleError && (
         <div style={{ position: 'fixed', bottom: 20, left: '50%', transform: 'translateX(-50%)', background: 'var(--coral, #c66)', color: '#fff', padding: '8px 20px', borderRadius: 8, fontSize: '0.82rem', zIndex: 999 }}>

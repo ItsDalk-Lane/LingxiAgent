@@ -67,7 +67,7 @@ describe('ProcessFoldBlock', () => {
     useStore.setState({
       agents: [],
       agentName: '小花',
-      agentYuan: 'hanako',
+      agentYuan: 'lingxi',
       streamingSessions: [],
       selectedIdsBySession: {},
       chatSessions: {

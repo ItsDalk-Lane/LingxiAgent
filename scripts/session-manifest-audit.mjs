@@ -6,11 +6,11 @@ import { loadBetterSqliteDatabase } from "../core/session-manifest/store.ts";
 import { sessionLocatorKey } from "../core/session-manifest/path-normalizer.ts";
 
 function parseArgs(argv) {
-  const options = { json: false, failOnAnomaly: false, hanaHome: process.env.HANA_HOME || null };
+  const options = { json: false, failOnAnomaly: false, lingxiHome: process.env.LINGXI_HOME || null };
   for (let index = 0; index < argv.length; index += 1) {
     const arg = argv[index];
     if (arg === "--hana-home" || arg === "--hanako-home") {
-      options.hanaHome = argv[++index] || null;
+      options.lingxiHome = argv[++index] || null;
     } else if (arg === "--json") {
       options.json = true;
     } else if (arg === "--fail-on-anomaly") {
@@ -29,7 +29,7 @@ function helpText() {
     "session-manifest-audit: read-only coverage check for persisted session identities",
     "",
     "Usage:",
-    "  HANA_HOME=/path/to/data node scripts/session-manifest-audit.mjs [--json] [--fail-on-anomaly]",
+    "  LINGXI_HOME=/path/to/data node scripts/session-manifest-audit.mjs [--json] [--fail-on-anomaly]",
     "  node scripts/session-manifest-audit.mjs --hana-home /path/to/data [--json]",
     "",
     "The command never creates or repairs manifests. Use --fail-on-anomaly to exit 1 when",
@@ -87,9 +87,9 @@ function openReadonlyManifestIndex(dbPath) {
   };
 }
 
-function humanReport(report, hanaHome) {
+function humanReport(report, lingxiHome) {
   const lines = [
-    `Session manifest audit (${hanaHome})`,
+    `Session manifest audit (${lingxiHome})`,
     `discovered: ${report.discovered}`,
     `manifested: ${report.manifested}`,
     `missing: ${report.missing}`,
@@ -119,13 +119,13 @@ try {
     process.stdout.write(`${helpText()}\n`);
     process.exit(0);
   }
-  if (!options.hanaHome) throw new Error("HANA_HOME or --hana-home is required");
-  const hanaHome = path.resolve(options.hanaHome);
-  index = openReadonlyManifestIndex(path.join(hanaHome, "session-manifest.db"));
-  const report = auditLegacySessionManifests({ hanaHome, store: index });
+  if (!options.lingxiHome) throw new Error("LINGXI_HOME or --hana-home is required");
+  const lingxiHome = path.resolve(options.lingxiHome);
+  index = openReadonlyManifestIndex(path.join(lingxiHome, "session-manifest.db"));
+  const report = auditLegacySessionManifests({ lingxiHome, store: index });
   process.stdout.write(options.json
     ? `${JSON.stringify(report, null, 2)}\n`
-    : `${humanReport(report, hanaHome)}\n`);
+    : `${humanReport(report, lingxiHome)}\n`);
   const anomalous = report.missing > 0
     || report.missingLocator > 0
     || report.domainMismatch > 0

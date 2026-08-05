@@ -27,7 +27,7 @@ import type { ChatMessage, ContentBlock } from '../../stores/chat-types';
 import { useStore } from '../../stores';
 import { selectSessionFiles } from '../../stores/selectors/file-refs';
 import { sessionIdForPathFromLocatorState } from '../../stores/session-slice';
-import { hanaFetch } from '../../hooks/use-hana-fetch';
+import { lingxiFetch } from '../../hooks/use-hana-fetch';
 import { openFilePreview, openSkillPreview } from '../../utils/file-preview';
 import { writeAppFileDragPayload, clearAppFileDragPayload } from '../../utils/app-file-drag';
 import { openMediaViewerForRef } from '../../utils/open-media-viewer';
@@ -330,7 +330,7 @@ const MediaGenerationBlock = memo(function MediaGenerationBlock({ block, session
     setRetrying(true);
     setRetryError('');
     try {
-      const res = await hanaFetch(`/api/media/tasks/${encodeURIComponent(viewBlock.taskId)}/retry`, {
+      const res = await lingxiFetch(`/api/media/tasks/${encodeURIComponent(viewBlock.taskId)}/retry`, {
         method: 'POST',
       });
       const data = await res.json().catch(() => null);
@@ -876,8 +876,8 @@ const CronConfirmBlock = memo(function CronConfirmBlock({ block, sessionPath }: 
   const agents = useStore(s => s.agents);
   const currentAgentId = useStore(s => s.currentAgentId);
   const sourceSessionId = useStore(state => sessionIdForPathFromLocatorState(state, sessionPath));
-  const fallbackAgentName = useStore(s => s.agentName) || 'Hanako';
-  const fallbackAgentYuan = useStore(s => s.agentYuan) || 'hanako';
+  const fallbackAgentName = useStore(s => s.agentName) || 'Lingxi';
+  const fallbackAgentYuan = useStore(s => s.agentYuan) || 'lingxi';
   const initialPrompt = (jobData.prompt as string) || (block.description as string) || '';
   const [draftLabel, setDraftLabel] = useState((jobData.label as string) || (block.title as string) || initialPrompt.slice(0, 40) || '');
   const [scheduleDraft, setScheduleDraft] = useState<ScheduleDraft>(() => scheduleDraftFromStored(initialType, jobData.schedule));
@@ -971,7 +971,7 @@ const CronConfirmBlock = memo(function CronConfirmBlock({ block, sessionPath }: 
       if (typeof suggestionId !== 'string' || !suggestionId.trim() || !sourceSessionId) {
         throw new Error('automation suggestion identity unavailable');
       }
-      const response = await hanaFetch('/api/desk/cron', {
+      const response = await lingxiFetch('/api/desk/cron', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -993,7 +993,7 @@ const CronConfirmBlock = memo(function CronConfirmBlock({ block, sessionPath }: 
     }
     const isUpdate = operation === 'update';
     const { id, ...fields } = editedJobData;
-    const response = await hanaFetch('/api/desk/cron', {
+    const response = await lingxiFetch('/api/desk/cron', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(isUpdate
@@ -1009,7 +1009,7 @@ const CronConfirmBlock = memo(function CronConfirmBlock({ block, sessionPath }: 
       if (isSuggestionCard) {
         await submitDraftJob(editedJobData);
       } else if (block.confirmId) {
-        await hanaFetch(`/api/confirm/${block.confirmId}`, {
+        await lingxiFetch(`/api/confirm/${block.confirmId}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ action: 'confirmed', value: { jobData: editedJobData } }),
@@ -1029,7 +1029,7 @@ const CronConfirmBlock = memo(function CronConfirmBlock({ block, sessionPath }: 
     }
     if (block.confirmId) {
       try {
-        await hanaFetch(`/api/confirm/${block.confirmId}`, {
+        await lingxiFetch(`/api/confirm/${block.confirmId}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ action: 'rejected' }),

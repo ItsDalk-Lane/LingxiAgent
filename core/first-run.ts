@@ -1,7 +1,7 @@
 /**
  * first-run.js — 首次运行播种
  *
- * 在 server/engine 启动之前调用，确保 ~/.hanako/ 结构存在。
+ * 在 server/engine 启动之前调用，确保 ~/.lingxi/ 结构存在。
  * 如果是全新安装（agents/ 为空），自动创建默认 agent。
  */
 
@@ -22,7 +22,7 @@ import { isValidAgentId } from "../shared/agent-id.ts";
 
 const log = createModuleLogger("first-run");
 
-const DEFAULT_AGENT_ID = "hanako";
+const DEFAULT_AGENT_ID = "lingxi";
 
 export interface InvalidAgentDirReport {
   id: string;
@@ -39,25 +39,25 @@ export interface FirstRunReport {
 }
 
 /**
- * 确保 ~/.hanako/ 数据目录就绪
+ * 确保 ~/.lingxi/ 数据目录就绪
  *
  * 对 agent 目录采用"分类处置"而不是 fail-fast：
- * - 默认 agent（hanako）缺 config → 播种修复；config 损坏 → 先备份再播种
+ * - 默认 agent（lingxi）缺 config → 播种修复；config 损坏 → 先备份再播种
  * - 非默认目录缺/坏 config → 跳过并记入诊断报告，不阻断启动、不动用户数据
  * 历史上脏目录有多个来源（旧版物理删除残留、phone projection 复活、半截创建），
  * 启动链路必须容忍它们，运行时扫描（AgentManager）本来就会跳过这类目录。
  *
- * @param {string} hanakoHome - ~/.hanako 绝对路径
+ * @param {string} lingxiHome - ~/.lingxi 绝对路径
  * @param {string} productDir - 产品模板目录（lib/）
  */
-export function ensureFirstRun(hanakoHome, productDir): FirstRunReport {
+export function ensureFirstRun(lingxiHome, productDir): FirstRunReport {
   // 1. 确保目录结构存在
-  const userDir = path.join(hanakoHome, "user");
-  fs.mkdirSync(path.join(hanakoHome, "agents"), { recursive: true });
+  const userDir = path.join(lingxiHome, "user");
+  fs.mkdirSync(path.join(lingxiHome, "agents"), { recursive: true });
   fs.mkdirSync(userDir, { recursive: true });
 
   // 2. 分类每个 agent 目录；没有任何可用 agent → 播种默认 agent
-  const agentsDir = path.join(hanakoHome, "agents");
+  const agentsDir = path.join(lingxiHome, "agents");
   const agentEntries = fs.readdirSync(agentsDir, { withFileTypes: true })
     .filter(entry => entry.isDirectory() && !entry.name.startsWith('.'));
 
@@ -103,9 +103,9 @@ export function ensureFirstRun(hanakoHome, productDir): FirstRunReport {
     validAgentIds.add(DEFAULT_AGENT_ID);
   }
 
-  // 3. 同步 skills：从 skills2set/ 复制到 ~/.hanako/skills/
+  // 3. 同步 skills：从 skills2set/ 复制到 ~/.lingxi/skills/
   const skillsSrc = path.join(productDir, "..", "skills2set");
-  const skillsDst = path.join(hanakoHome, "skills");
+  const skillsDst = path.join(lingxiHome, "skills");
   fs.mkdirSync(skillsDst, { recursive: true });
   if (fs.existsSync(skillsSrc)) {
     syncSkills(skillsSrc, skillsDst);
@@ -114,18 +114,18 @@ export function ensureFirstRun(hanakoHome, productDir): FirstRunReport {
   // 4. 确保可选文件存在（老用户升级 + 新 agent 都覆盖）。
   // 只补有效 agent 目录：往无效目录里写 pinned.md 会把垃圾目录越喂越像 agent 目录。
   const touchIfMissing = (p) => { if (!fs.existsSync(p)) fs.writeFileSync(p, '', 'utf-8'); };
-  touchIfMissing(path.join(hanakoHome, 'user', USER_PROFILE_FILENAME));
+  touchIfMissing(path.join(lingxiHome, 'user', USER_PROFILE_FILENAME));
   for (const agentId of validAgentIds) {
     touchIfMissing(path.join(agentsDir, agentId, 'pinned.md'));
   }
 
   // 5. 确保 user/preferences.json 存在
-  const prefsPath = path.join(hanakoHome, "user", "preferences.json");
+  const prefsPath = path.join(lingxiHome, "user", "preferences.json");
   if (!fs.existsSync(prefsPath)) {
     fs.writeFileSync(
       prefsPath,
       JSON.stringify({
-        primaryAgent: "hanako",
+        primaryAgent: "lingxi",
       }, null, 2) + "\n",
       "utf-8",
     );
@@ -167,7 +167,7 @@ function backupUnreadableDefaultConfig(agentsDir): string {
  * 从模板播种默认 agent（与 engine.createAgent 相同逻辑，但纯同步、无依赖）
  */
 function seedDefaultAgent(agentsDir, productDir, userDir) {
-  const agentId = "hanako";
+  const agentId = "lingxi";
   const agentDir = path.join(agentsDir, agentId);
 
   // 创建目录结构
@@ -177,7 +177,7 @@ function seedDefaultAgent(agentsDir, productDir, userDir) {
   fs.mkdirSync(path.join(agentDir, "avatars"), { recursive: true });
   fs.mkdirSync(path.join(agentDir, "desk"), { recursive: true });
 
-  // config.yaml（保持模板默认值：name=Hanako, yuan=hanako）
+  // config.yaml（保持模板默认值：name=Lingxi, yuan=lingxi）
   const cfgDest = path.join(agentDir, "config.yaml");
   const configSrc = path.join(productDir, "config.example.yaml");
   if (!fs.existsSync(configSrc)) {
@@ -245,7 +245,7 @@ function seedDefaultAgent(agentsDir, productDir, userDir) {
 }
 
 /**
- * 同步 skills2set/ → ~/.hanako/skills/
+ * 同步 skills2set/ → ~/.lingxi/skills/
  * 每次启动都跑，确保新增/更新的 skill 能同步到用户目录
  */
 function syncSkills(srcDir, dstDir) {

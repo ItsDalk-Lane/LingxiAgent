@@ -7,7 +7,7 @@ import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/re
 import '@testing-library/jest-dom/vitest';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { TutorialStep } from '../TutorialStep';
-import type { HanaFetch } from '../../onboarding-actions';
+import type { LingxiFetch } from '../../onboarding-actions';
 
 describe('TutorialStep', () => {
   beforeEach(() => {
@@ -24,7 +24,7 @@ describe('TutorialStep', () => {
     vi.spyOn(console, 'error').mockImplementation(() => {});
     const onboardingComplete = vi.fn(async () => {});
     const showError = vi.fn();
-    const hanaFetch = vi.fn<HanaFetch>(async () => ({
+    const lingxiFetch = vi.fn<LingxiFetch>(async () => ({
       ok: true,
       status: 200,
       json: async () => ({ locale: 'zh-CN' }),
@@ -34,7 +34,7 @@ describe('TutorialStep', () => {
     render(
       <TutorialStep
         preview={false}
-        hanaFetch={hanaFetch}
+        lingxiFetch={lingxiFetch}
         agentId="renamed-primary"
         verificationPlan={{ agentConfig: { locale: 'en' }, preferenceModels: {}, requiredAgentSecretPaths: [] }}
         showError={showError}
@@ -46,7 +46,7 @@ describe('TutorialStep', () => {
     await waitFor(() => {
       expect(showError).toHaveBeenCalledWith(expect.stringContaining('agent config.locale'));
     });
-    expect(hanaFetch).toHaveBeenCalledWith('/api/agents/renamed-primary/config');
+    expect(lingxiFetch).toHaveBeenCalledWith('/api/agents/renamed-primary/config');
     expect(onboardingComplete).not.toHaveBeenCalled();
     expect(screen.getByRole('button', { name: 'onboarding.tutorial.finish' })).toBeEnabled();
   });

@@ -4,10 +4,10 @@ import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
 import { PluginManager } from '../core/plugin-manager.ts';
-import { PLUGIN_UI_CAPABILITY } from '@hana/plugin-protocol';
+import { PLUGIN_UI_CAPABILITY } from '@lingxi/plugin-protocol';
 
 function tmpPluginDir() {
-  return fs.mkdtempSync(path.join(os.tmpdir(), 'hana-plugin-test-'));
+  return fs.mkdtempSync(path.join(os.tmpdir(), 'lingxi-plugin-test-'));
 }
 
 function createPluginWithPage(dir, id = 'test-page-plugin') {

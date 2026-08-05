@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { useSettingsStore, type ProviderSummary } from '../store';
-import { hanaFetch } from '../api';
+import { lingxiFetch } from '../api';
 import { t, PROVIDER_PRESETS } from '../helpers';
 import { loadSettingsConfig } from '../actions';
 import { ProviderDetail } from './providers/ProviderDetail';
@@ -21,7 +21,7 @@ export function ProvidersTab() {
 
   const loadSummary = useCallback(async () => {
     try {
-      const res = await hanaFetch('/api/providers/summary');
+      const res = await lingxiFetch('/api/providers/summary');
       const data = await res.json();
       useSettingsStore.setState({ providersSummary: data.providers || {} });
     } catch { /* swallow */ }

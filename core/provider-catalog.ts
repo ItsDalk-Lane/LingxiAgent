@@ -99,19 +99,19 @@ function timestampSlug(date = new Date()) {
 }
 
 export class ProviderCatalogStore {
-  declare _hanakoHome: string;
+  declare _lingxiHome: string;
 
-  constructor(hanakoHome: string) {
-    if (!hanakoHome) throw new Error("ProviderCatalogStore requires hanakoHome");
-    this._hanakoHome = hanakoHome;
+  constructor(lingxiHome: string) {
+    if (!lingxiHome) throw new Error("ProviderCatalogStore requires lingxiHome");
+    this._lingxiHome = lingxiHome;
   }
 
   get catalogPath() {
-    return path.join(this._hanakoHome, PROVIDER_CATALOG_FILE);
+    return path.join(this._lingxiHome, PROVIDER_CATALOG_FILE);
   }
 
   get legacyAddedModelsPath() {
-    return path.join(this._hanakoHome, LEGACY_ADDED_MODELS_FILE);
+    return path.join(this._lingxiHome, LEGACY_ADDED_MODELS_FILE);
   }
 
   load() {
@@ -215,13 +215,13 @@ export class ProviderCatalogStore {
   _writeMigrationBackup(catalog: any) {
     const files = [
       this.legacyAddedModelsPath,
-      path.join(this._hanakoHome, "models.json"),
+      path.join(this._lingxiHome, "models.json"),
     ];
     const existingFiles = files.filter((filePath) => fs.existsSync(filePath));
     if (existingFiles.length === 0) return;
 
     const backupDir = path.join(
-      migrationBackupsRoot(this._hanakoHome),
+      migrationBackupsRoot(this._lingxiHome),
       `provider-catalog-v1-${timestampSlug()}`,
     );
     fs.mkdirSync(backupDir, { recursive: true, mode: SECRET_DIR_MODE });

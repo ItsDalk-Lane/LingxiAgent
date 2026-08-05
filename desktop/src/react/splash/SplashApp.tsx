@@ -8,8 +8,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { getYuanVisual } from '../../../../shared/yuan-visuals.ts';
 
-const DEFAULT_NAME = 'Hanako';
-const DEFAULT_VISUAL = getYuanVisual('hanako');
+const DEFAULT_NAME = 'Lingxi';
+const DEFAULT_VISUAL = getYuanVisual('lingxi');
 
 type SplashLocaleData = { splash?: { preparing?: { named?: string; anonymous?: string } } } | null | undefined;
 
@@ -28,7 +28,7 @@ export function resolvePreparingText(data: SplashLocaleData, locale: string, age
 }
 
 export function SplashApp() {
-  const [avatarSrc, setAvatarSrc] = useState('assets/Hanako.png');
+  const [avatarSrc, setAvatarSrc] = useState('assets/Lingxi.png');
   const [text, setText] = useState('');
   const [switching, setSwitching] = useState(false);
   const [symbol, setSymbol] = useState(DEFAULT_VISUAL.symbol);
@@ -49,7 +49,7 @@ export function SplashApp() {
       let locale = 'zh';
       let name = DEFAULT_NAME;
       let agentNameRaw: string | null = null;
-      let yuan = 'hanako';
+      let yuan = 'lingxi';
 
       try {
         const hana = window.hana;

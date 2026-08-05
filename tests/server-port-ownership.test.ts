@@ -15,7 +15,7 @@ describe("server transport ownership", () => {
     expect(bindIndex).toBeGreaterThan(-1);
     expect(bindIndex).toBeLessThan(source.indexOf("ensureFirstRun("));
     expect(bindIndex).toBeLessThan(source.indexOf("ensureLocalIdentityRegistries("));
-    expect(bindIndex).toBeLessThan(source.indexOf("new HanaEngine("));
+    expect(bindIndex).toBeLessThan(source.indexOf("new LingxiEngine("));
     expect(bindIndex).toBeLessThan(source.indexOf("await engine.init("));
     expect(bindIndex).toBeLessThan(source.indexOf("await engine.initPlugins("));
     expect(bindIndex).toBeLessThan(source.indexOf("hub.initSchedulers()"));
@@ -26,7 +26,7 @@ describe("server transport ownership", () => {
 
     const firstRunIndex = source.indexOf("ensureFirstRun(");
     const identityIndex = source.indexOf("ensureLocalIdentityRegistries(");
-    const engineIndex = source.indexOf("new HanaEngine(");
+    const engineIndex = source.indexOf("new LingxiEngine(");
 
     expect(firstRunIndex).toBeGreaterThan(-1);
     expect(identityIndex).toBeGreaterThan(firstRunIndex);
@@ -75,19 +75,19 @@ describe("server transport ownership", () => {
       blocker.listen(0, "127.0.0.1", resolve as any);
     });
     const port = (blocker.address() as any).port;
-    const hanaHome = fs.mkdtempSync(path.join(os.tmpdir(), "hana-port-conflict-test-"));
+    const lingxiHome = fs.mkdtempSync(path.join(os.tmpdir(), "hana-port-conflict-test-"));
     const child = spawn(process.execPath, ["server/bootstrap.ts"], {
       cwd: root,
       env: {
         ...process.env,
-        HANA_HOME: hanaHome,
-        HANA_PORT: String(port),
-        HANA_ROOT: root,
+        LINGXI_HOME: lingxiHome,
+        LINGXI_PORT: String(port),
+        LINGXI_ROOT: root,
         // server/main-full.ts is the thin closed composition entry:
         // server/index.ts itself only exports startServer() and boots
         // nothing on mere import.
-        HANA_SERVER_ENTRY: path.join(root, "server", "main-full.ts"),
-        HANA_CREATE_STARTUP_SESSION: "0",
+        LINGXI_SERVER_ENTRY: path.join(root, "server", "main-full.ts"),
+        LINGXI_CREATE_STARTUP_SESSION: "0",
       },
       stdio: ["ignore", "pipe", "pipe"],
     });
@@ -110,10 +110,10 @@ describe("server transport ownership", () => {
       expect(stderr).toContain("PORT_IN_USE");
       expect(stdout + stderr).not.toContain("ensureFirstRun");
       expect(stdout + stderr).not.toContain("ensureLocalIdentityRegistries");
-      expect(stdout + stderr).not.toContain("HanaEngine");
+      expect(stdout + stderr).not.toContain("LingxiEngine");
     } finally {
       blocker.close();
-      fs.rmSync(hanaHome, { recursive: true, force: true });
+      fs.rmSync(lingxiHome, { recursive: true, force: true });
     }
   });
 });

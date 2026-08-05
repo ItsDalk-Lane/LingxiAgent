@@ -34,11 +34,11 @@ describe("MountProvider", () => {
 
   function setup() {
     tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "hana-resource-mount-"));
-    const hanakoHome = path.join(tempRoot, "hana");
+    const lingxiHome = path.join(tempRoot, "hana");
     const mountRoot = path.join(tempRoot, "mounted");
     fs.mkdirSync(mountRoot, { recursive: true });
     const studioId = "studio_mount";
-    upsertStudioMount(hanakoHome, {
+    upsertStudioMount(lingxiHome, {
       schemaVersion: 1,
       mountId: "mount_local",
       hostStudioId: studioId,
@@ -50,7 +50,7 @@ describe("MountProvider", () => {
       capabilities: ["list", "read", "write", "watch", "materialize"],
       grantId: null,
     });
-    upsertStudioMount(hanakoHome, {
+    upsertStudioMount(lingxiHome, {
       schemaVersion: 1,
       mountId: "mount_s3",
       hostStudioId: studioId,
@@ -65,7 +65,7 @@ describe("MountProvider", () => {
     return {
       mountRoot,
       provider: new MountProvider({
-        hanakoHome,
+        lingxiHome,
         studioId,
         localFsProviderFactory: ({ cwd, guard }) => new LocalFsProvider({ cwd, guard }),
       }),

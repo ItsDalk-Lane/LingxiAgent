@@ -325,7 +325,7 @@ export class Agent {
     // 0. 兼容性检查（目录、数据库、配置文件）
     await runCompatChecks({
       agentDir: this.agentDir,
-      hanakoHome: path.dirname(path.dirname(this.agentDir)),
+      lingxiHome: path.dirname(path.dirname(this.agentDir)),
       log,
     });
 
@@ -555,7 +555,7 @@ export class Agent {
       },
       getVisionBridge: () => this._cb?.getEngine?.()?.getVisionBridge?.() || null,
       isVisionAuxiliaryEnabled: () => this._cb?.getEngine?.()?.isVisionAuxiliaryEnabled?.() === true,
-      getHanakoHome: () => this._cb?.getEngine?.()?.hanakoHome,
+      getHanakoHome: () => this._cb?.getEngine?.()?.lingxiHome,
       getSessionIdForPath: (sessionPath) => this._cb?.getEngine?.()?.getSessionIdForPath?.(sessionPath) || null,
       registerSessionFile: (entry) => this._cb?.registerSessionFile?.(entry),
     });
@@ -1110,7 +1110,7 @@ export class Agent {
     return resolvePersonaSource({
       agentDir: this.agentDir,
       productDir: this.productDir,
-      yuanType: this._config?.agent?.yuan || "hanako",
+      yuanType: this._config?.agent?.yuan || "lingxi",
       locale: this.resolveLocale(),
       kind: "identity",
     });
@@ -1121,7 +1121,7 @@ export class Agent {
     return resolvePersonaSource({
       agentDir: this.agentDir,
       productDir: this.productDir,
-      yuanType: this._config?.agent?.yuan || "hanako",
+      yuanType: this._config?.agent?.yuan || "lingxi",
       locale: this.resolveLocale(),
       kind: "ishiki",
     });
@@ -1152,7 +1152,7 @@ export class Agent {
 
   /** 读取 yuan 模板（能力定义） */
   _readYuan() {
-    const yuanType = this._config?.agent?.yuan || "hanako";
+    const yuanType = this._config?.agent?.yuan || "lingxi";
     const isZh = String(this.resolveLocale()).startsWith("zh");
     const langDir = isZh ? "" : "en/";
     return safeReadFile(path.join(this.productDir, "yuan", `${langDir}${yuanType}.md`), "")
@@ -1166,7 +1166,7 @@ export class Agent {
       .replace(/\{\{userName\}\}/g, this.userName)
       .replace(/\{\{agentName\}\}/g, this.agentName)
       .replace(/\{\{agentId\}\}/g, this.id);
-    const yuanType = this._config?.agent?.yuan || "hanako";
+    const yuanType = this._config?.agent?.yuan || "lingxi";
     const isZh = String(this.resolveLocale()).startsWith("zh");
     const langDir = isZh ? "" : "en/";
     const raw = readFile(path.join(this.agentDir, "public-ishiki.md"))
@@ -1253,7 +1253,7 @@ export class Agent {
     const readFile = (filePath) => safeReadFile(filePath, "");
 
     // identity + yuan + ishiki（复用 personality getter）
-    const yuanType = this._config?.agent?.yuan || "hanako";
+    const yuanType = this._config?.agent?.yuan || "lingxi";
     if (!this._readYuan()) throw new Error(`Cannot find yuan "${yuanType}". Check lib/yuan/`);
     const ishiki = this.personality;
 
@@ -1281,8 +1281,8 @@ export class Agent {
     // 叙事顺序上先告诉模型"用户是谁"，再告诉它"你是谁、你和用户什么关系"。
     const parts = [
       isZh
-        ? "你运行在 HanaAgent 平台上（原名 OpenHanako），由 liliMozi 开发。项目主页：https://github.com/liliMozi/openhanako"
-        : "You are running on the HanaAgent platform (formerly OpenHanako), developed by liliMozi. Project page: https://github.com/liliMozi/openhanako",
+        ? "你运行在 LingxiAgent 平台上（原名 OpenHanako），由 liliMozi 开发。项目主页：https://github.com/liliMozi/openhanako"
+        : "You are running on the LingxiAgent platform (formerly OpenHanako), developed by liliMozi. Project page: https://github.com/liliMozi/openhanako",
     ];
     const platformPrompt = getPlatformPromptNote({ platform: process.platform });
     if (platformPrompt) {
