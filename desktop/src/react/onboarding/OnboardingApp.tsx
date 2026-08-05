@@ -26,7 +26,7 @@ export function OnboardingApp({ preview, skipToTutorial }: OnboardingAppProps) {
   const [initError, setInitError] = useState('');
   const [step, setStep] = useState(skipToTutorial ? 5 : 0);
   const [stepKey, setStepKey] = useState(0);
-  const [agentName, setAgentName] = useState('Hanako');
+  const [agentName, setAgentName] = useState('Lingxi');
   const [avatarSrc, setAvatarSrc] = useState('assets/Hanako.png');
   const [locale, setLocale] = useState('zh-CN');
   const [i18nReady, setI18nReady] = useState(false);
@@ -105,7 +105,7 @@ export function OnboardingApp({ preview, skipToTutorial }: OnboardingAppProps) {
         setServerConnection(connection);
         const splashInfo = await window.hana.getSplashInfo?.();
         const loc = splashInfo?.locale || 'zh-CN';
-        const name = splashInfo?.agentName || 'Hanako';
+        const name = splashInfo?.agentName || 'Lingxi';
         setLocale(loc);
         setAgentName(name);
         await i18n.load(loc);

@@ -42,10 +42,10 @@ Pick the plugin shape first, then follow the manifest, runtime, and UI guidance 
 | UI | Page / widget / WebView/iframe card / `chat.surface` | `full-access` |
 | Marketplace entry | Makes the plugin discoverable in the marketplace | `OH-Plugins/plugins/<id>.yaml` |
 
-Start with the `hana-plugin-creator` scaffold, then delete what you do not need:
+Start with the `lingxi-plugin-creator` scaffold, then delete what you do not need:
 
 ```bash
-python3 skills2set/hana-plugin-creator/scripts/create_hana_plugin.py "My Plugin" --path examples/plugins --kind full
+python3 skills2set/lingxi-plugin-creator/scripts/create_lingxi_plugin.py "My Plugin" --path examples/plugins --kind full
 ```
 
 Debug order: install the local folder, inspect Settings diagnostics, finish README/manifest, then add an `OH-Plugins` marketplace entry when the plugin is ready to publish.

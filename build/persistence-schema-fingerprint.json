@@ -3118,7 +3118,7 @@
   ],
   "review": {
     "classification": "compatible",
-    "compatibilityReason": "native module dirs/products/strings renamed; data format unchanged",
+    "compatibilityReason": "build/CI/i18n/UI brand rename; data format unchanged",
     "payloadFingerprint": "sha256:b9b9a3bfabba7dd56ce687519c4e2bfded1fedc3c2841c3dada4b7c40bd19283"
   },
   "schemas": [

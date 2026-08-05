@@ -165,7 +165,7 @@ export const useSettingsStore = create<SettingsStore>()((set, get) => ({
   agents: [],
   currentAgentId: null,
   settingsAgentId: null,
-  agentName: 'Hanako',
+  agentName: 'Lingxi',
   userName: 'User',
   agentYuan: 'hanako',
   agentAvatarUrl: null,

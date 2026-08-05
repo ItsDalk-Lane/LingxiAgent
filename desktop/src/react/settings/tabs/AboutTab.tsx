@@ -516,7 +516,7 @@ export function AboutTab() {
         <div className={styles['about-tagline']}>{t('settings.about.tagline')}</div>
         {currentVersion && <div className={styles['about-version']}>v{currentVersion}</div>}
         <TrainUpdateArea
-          agentName={settingsConfig?.agent?.name || 'Hanako'}
+          agentName={settingsConfig?.agent?.name || 'Lingxi'}
           available={available}
           lastError={lastError}
           lastCheckedAt={lastCheckedAt}

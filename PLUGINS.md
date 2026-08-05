@@ -42,10 +42,10 @@ export async function execute(input) {
 | UI | 需要 page / widget / WebView/iframe card / `chat.surface` | `full-access` |
 | Marketplace entry | 让插件出现在插件市场 | 写入 `OH-Plugins/plugins/<id>.yaml` |
 
-推荐先用 `hana-plugin-creator` 脚手架生成，再按需求删减：
+推荐先用 `lingxi-plugin-creator` 脚手架生成，再按需求删减：
 
 ```bash
-python3 skills2set/hana-plugin-creator/scripts/create_hana_plugin.py "My Plugin" --path examples/plugins --kind full
+python3 skills2set/lingxi-plugin-creator/scripts/create_lingxi_plugin.py "My Plugin" --path examples/plugins --kind full
 ```
 
 调试顺序：本地文件夹安装 → 设置页诊断 → 补 README/manifest → 需要公开时再写 `OH-Plugins` 市场条目。

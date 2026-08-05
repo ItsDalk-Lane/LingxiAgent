@@ -179,18 +179,18 @@ describe("build.yml: Windows standalone server stays outside the seed/OTA bounda
     const buildSteps = doc.jobs.build?.steps ?? [];
     const uploadArtifact = buildSteps.find((step) => step.name === "Upload artifacts");
     const uploadArtifactText = JSON.stringify(uploadArtifact);
-    expect(uploadArtifactText).toContain("dist-standalone/HanaCore-*-Windows-x64.tar.gz");
-    expect(uploadArtifactText).toContain("dist-standalone/HanaCore-*-Windows-x64.manifest.json");
-    expect(uploadArtifactText).not.toContain("dist-standalone/HanaCore-*-Windows-x64.manifest.json.sig");
+    expect(uploadArtifactText).toContain("dist-standalone/LingxiCore-*-Windows-x64.tar.gz");
+    expect(uploadArtifactText).toContain("dist-standalone/LingxiCore-*-Windows-x64.manifest.json");
+    expect(uploadArtifactText).not.toContain("dist-standalone/LingxiCore-*-Windows-x64.manifest.json.sig");
 
     const releaseSteps = doc.jobs.release?.steps ?? [];
     const releaseUpload = releaseSteps.find((step) => step.name === "Upload release assets");
     const releaseGate = releaseSteps.find((step) => step.name === "Verify release assets");
-    expect(stepRun(releaseUpload ?? {})).toContain("dist-standalone/HanaCore-*-Windows-x64.tar.gz");
-    expect(stepRun(releaseUpload ?? {})).toContain("dist-standalone/HanaCore-*-Windows-x64.manifest.json");
-    expect(stepRun(releaseUpload ?? {})).not.toContain("dist-standalone/HanaCore-*-Windows-x64*'");
-    expect(stepRun(releaseGate ?? {})).toContain("HanaCore-.*-Windows-x64\\.tar\\.gz");
-    expect(stepRun(releaseGate ?? {})).toContain("HanaCore-.*-Windows-x64\\.manifest\\.json");
+    expect(stepRun(releaseUpload ?? {})).toContain("dist-standalone/LingxiCore-*-Windows-x64.tar.gz");
+    expect(stepRun(releaseUpload ?? {})).toContain("dist-standalone/LingxiCore-*-Windows-x64.manifest.json");
+    expect(stepRun(releaseUpload ?? {})).not.toContain("dist-standalone/LingxiCore-*-Windows-x64*'");
+    expect(stepRun(releaseGate ?? {})).toContain("LingxiCore-.*-Windows-x64\\.tar\\.gz");
+    expect(stepRun(releaseGate ?? {})).toContain("LingxiCore-.*-Windows-x64\\.manifest\\.json");
     expect(stepRun(releaseGate ?? {})).toContain("Obsolete standalone manifest signature leaked into the release");
     expect(stepRun(releaseGate ?? {})).not.toContain(
       'MISSING+=("Windows x64 standalone server manifest signature")',
@@ -200,7 +200,7 @@ describe("build.yml: Windows standalone server stays outside the seed/OTA bounda
   it("does not expose the standalone namespace to publish-train", () => {
     const publishTrainText = JSON.stringify(doc.jobs["publish-train"]);
     expect(publishTrainText).not.toContain("dist-standalone");
-    expect(publishTrainText).not.toContain("HanaCore-");
+    expect(publishTrainText).not.toContain("LingxiCore-");
     expect(publishTrainText).toContain("publish-train.mjs");
   });
 });

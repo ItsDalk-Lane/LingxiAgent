@@ -103,7 +103,7 @@ export async function initializeMobileRuntime(principal: MobilePrincipal): Promi
   }
 
   await applyAgentIdentity({
-    agentName: bootstrap.agentName || 'Hanako',
+    agentName: bootstrap.agentName || 'Lingxi',
     agentId: bootstrap.currentAgentId || undefined,
     userName: bootstrap.userName || window.t?.('common.user') || 'User',
     yuan: bootstrap.agentYuan,

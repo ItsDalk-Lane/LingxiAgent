@@ -96,7 +96,7 @@ function ReleaseDigestEntry({ digest }: { digest: ReleaseDigest | null | undefin
   );
 }
 
-export function AutoUpdateStatus({ state, agentName = 'Hanako', onInstall, variant }: AutoUpdateStatusProps) {
+export function AutoUpdateStatus({ state, agentName = 'Lingxi', onInstall, variant }: AutoUpdateStatusProps) {
   if (!state || state.status === 'idle') {
     return null;
   }

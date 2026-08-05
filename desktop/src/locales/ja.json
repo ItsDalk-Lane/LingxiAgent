@@ -127,7 +127,7 @@
   },
   "announcement": {
     "title": "アップデート完了 · v{version}",
-    "fallbackBody": "HanaAgent は v{version} に更新されました。",
+    "fallbackBody": "Lingxi は v{version} に更新されました。",
     "confirm": "OK"
   },
   "skills": {
@@ -1119,7 +1119,7 @@
         "scheduledTaskCompletion": "スケジュールタスクの完了",
         "patrolCompletion": "巡回の完了",
         "never": "通知しない",
-        "whenUnfocused": "HanaAgent にフォーカスがないとき",
+        "whenUnfocused": "Lingxi にフォーカスがないとき",
         "whenSessionUnfocused": "完了したチャットにフォーカスしていないとき",
         "always": "常に"
       }
@@ -1356,7 +1356,7 @@
       "updateChecking": "アップデートを確認中…",
       "updateDownloading": "{agentName}が新しいお家を準備中",
       "updateReadyInstall": "v{version} インストール準備完了",
-      "updateInstalling": "アップデートをインストール中です。HanaAgent は自動で再起動します…",
+      "updateInstalling": "アップデートをインストール中です。Lingxi は自動で再起動します…",
       "updateInstallManualHint": "「再起動して更新」を押すとインストールします。終了だけでは自動インストールしません",
       "updateInstall": "再起動して更新",
       "updateInstallNow": "今すぐ再起動して更新",
@@ -1383,7 +1383,7 @@
       "updateManifestReleasedAtViaMirror": "配布マニフェストの発行日: {date}（バックアップ経由）",
       "updateCheckBtn": "アップデートを確認",
       "updateRetryBtn": "再試行",
-      "updateNeedInstall": "先に HanaAgent をアプリケーションフォルダに移動してください",
+      "updateNeedInstall": "先に Lingxi をアプリケーションフォルダに移動してください",
       "updateDiskSpace": "ディスク容量不足のため、アップデートをダウンロードできません",
       "updateDigestCta": "このアップデートで得られるもの",
       "updateDigestTitle": "このアップデートで得られるもの",
@@ -1422,7 +1422,7 @@
       "mobileAccess": "モバイルアクセス",
       "desktopAccess": "コンピューターアクセス",
       "lanToggle": "LAN デバイスを許可",
-      "lanHint": "同じ LAN 上のスマートフォンやコンピューターからこの HanaAgent Server にアクセスできます",
+      "lanHint": "同じ LAN 上のスマートフォンやコンピューターからこの Lingxi Server にアクセスできます",
       "port": "固定ポート",
       "portHint": "ブックマークと QR コードに使います。変更後は Hana の再起動が必要です",
       "mobileUrl": "モバイル URL",
@@ -1457,7 +1457,7 @@
       "desktopKeyFailed": "生成に失敗しました",
       "connectLanServer": "LAN サーバーに接続",
       "remoteServerUrl": "サーバー URL",
-      "remoteServerUrlHint": "別のコンピューターまたは NAS の HanaAgent Server URL を入力します",
+      "remoteServerUrlHint": "別のコンピューターまたは NAS の Lingxi Server URL を入力します",
       "remoteServerKey": "アクセスキー",
       "remoteServerKeyHint": "そのサーバーの設定ページで生成したコンピューターアクセスキーを入力します",
       "remoteServerConnected": "LAN サーバーに接続しました",
@@ -2912,7 +2912,7 @@
     "skillMissingName": "SKILL.md に name フィールドがありません",
     "skillNameInvalid": "スキル名が無効です（\"{name}\"）。英字、数字、アンダースコア、ハイフンのみ使用できます。",
     "skillPathMustBeAbsolute": "パスは絶対パスである必要があります: {path}",
-    "skillCannotAddSelfDir": "HanaAgent 自身のスキルディレクトリは追加できません",
+    "skillCannotAddSelfDir": "Lingxi 自身のスキルディレクトリは追加できません",
     "skillInvalidName": "無効なスキル名です",
     "skillExternalCannotDelete": "外部互換スキルはここからは削除できません",
     "skillNotExists": "スキルが存在しません",
@@ -3115,7 +3115,7 @@
   },
   "main": {
     "tray": {
-      "show": "HanaAgent を表示",
+      "show": "Lingxi を表示",
       "settings": "設定",
       "quit": "終了",
       "repairArtifacts": "コンポーネントを修復…"
@@ -3124,22 +3124,22 @@
       "selectFolder": "作業フォルダを選択",
       "selectSkill": "スキルを選択",
       "selectPlugin": "プラグインを選択",
-      "launchFailedTitle": "HanaAgent の起動に失敗しました",
-      "launchFailedBody": "HanaAgent v{version}\n\n{detail}\n\n詳細ログの保存先：\n{logPath}\n\nこのスクリーンショットまたはログファイルを開発者にお送りください。",
-      "serverRestartFailed": "HanaAgent v{version}\n\nServer がクラッシュし、再起動に失敗しました。\n{error}\n\nアプリケーションを再起動してください。",
-      "serverMultipleCrash": "HanaAgent v{version}\n\nServer が複数回クラッシュしました ({reason})。\n\nアプリケーションを再起動してください。",
+      "launchFailedTitle": "Lingxi の起動に失敗しました",
+      "launchFailedBody": "Lingxi v{version}\n\n{detail}\n\n詳細ログの保存先：\n{logPath}\n\nこのスクリーンショットまたはログファイルを開発者にお送りください。",
+      "serverRestartFailed": "Lingxi v{version}\n\nServer がクラッシュし、再起動に失敗しました。\n{error}\n\nアプリケーションを再起動してください。",
+      "serverMultipleCrash": "Lingxi v{version}\n\nServer が複数回クラッシュしました ({reason})。\n\nアプリケーションを再起動してください。",
       "serverStartTimeout": "Server の起動がタイムアウトしました",
       "serverKilledBySignal": "Server がシグナルで終了しました ({signal})",
       "serverExitedWithCode": "Server が終了しました。コード: {code}",
-      "serverFilesNotReady": "自動アップデートが完了したばかりで、新バージョンのファイルがまだディスクに書き込まれていません（{missing} が見つかりません）。{waited} 秒待機しましたが完了しませんでした。しばらくしてから HanaAgent を再起動してください。",
-      "serverModuleMissing": "Server 起動失敗：モジュール {module} が見つかりません。\n通常、自動アップデート完了直後にファイルがまだディスクに書き込み中の場合に発生します。\n推奨：1〜2 分待ってから HanaAgent を再起動してください。問題が続く場合は GitHub で報告してください。",
-      "installFailedTitle": "HanaAgent アップデート",
-      "installFailedBody": "アップデートのインストールに失敗しました：\n{error}\n\nHanaAgent を再起動してからもう一度お試しください。または設定ページで手動でアップデートを確認してください。",
+      "serverFilesNotReady": "自動アップデートが完了したばかりで、新バージョンのファイルがまだディスクに書き込まれていません（{missing} が見つかりません）。{waited} 秒待機しましたが完了しませんでした。しばらくしてから Lingxi を再起動してください。",
+      "serverModuleMissing": "Server 起動失敗：モジュール {module} が見つかりません。\n通常、自動アップデート完了直後にファイルがまだディスクに書き込み中の場合に発生します。\n推奨：1〜2 分待ってから Lingxi を再起動してください。問題が続く場合は GitHub で報告してください。",
+      "installFailedTitle": "Lingxi アップデート",
+      "installFailedBody": "アップデートのインストールに失敗しました：\n{error}\n\nLingxi を再起動してからもう一度お試しください。または設定ページで手動でアップデートを確認してください。",
       "repairArtifactsTitle": "コンポーネントの修復",
-      "repairArtifactsBody": "この操作は HanaAgent のアプリコンポーネントをインストール時のバージョンにリセットし、アプリを再起動します。データ（エージェント、セッション、設定）は影響を受けません。",
+      "repairArtifactsBody": "この操作は Lingxi のアプリコンポーネントをインストール時のバージョンにリセットし、アプリを再起動します。データ（エージェント、セッション、設定）は影響を受けません。",
       "repairArtifactsConfirm": "修復して再起動",
       "repairArtifactsCancel": "キャンセル",
-      "trainUpdateApplyFailedBody": "HanaAgent v{version}\n\n更新の適用に失敗しました：\n{error}\n\nアプリを再起動してください。"
+      "trainUpdateApplyFailedBody": "Lingxi v{version}\n\n更新の適用に失敗しました：\n{error}\n\nアプリを再起動してください。"
     },
     "notification": {
       "ready": "通知が有効になりました",
@@ -3239,7 +3239,7 @@
     "inputHelp": "/help でコマンド一覧を表示"
   },
   "sandbox": {
-    "blocked": "[セキュリティ] {reason}\n\nこの操作は HanaAgent のサンドボックスセキュリティポリシーによりブロックされました。これはコマンドがパスまたは権限の境界を越えたことを示します。まず現在のワークスペース、具体的なパス表記、対象ファイルが許可されたワークスペースまたは session パスに属するべきかを確認してください。ブロックされたパスと理由をユーザーに説明し、サンドボックス設定の変更はユーザーが明示的に決めた場合にだけ相談してください。",
+    "blocked": "[セキュリティ] {reason}\n\nこの操作は Lingxi のサンドボックスセキュリティポリシーによりブロックされました。これはコマンドがパスまたは権限の境界を越えたことを示します。まず現在のワークスペース、具体的なパス表記、対象ファイルが許可されたワークスペースまたは session パスに属するべきかを確認してください。ブロックされたパスと理由をユーザーに説明し、サンドボックス設定の変更はユーザーが明示的に決めた場合にだけ相談してください。",
     "blockedNeedsEscalation": "[セキュリティ] {reason}\n\nこのコマンドはサンドボックスモードでブロックされました。現在のタスクにとって重要で読み取り専用のクエリであれば、sandbox_permissions=\"require_escalated\" と一文の justification を添えて再実行してください。ユーザーが確認してから、サンドボックス外で実行されます。",
     "noSudo": "sudo の使用は禁止されています",
     "noSu": "su によるユーザー切り替えは禁止されています",
@@ -3535,7 +3535,7 @@
     "next": "次へ"
   },
   "mobile": {
-    "startupFailed": "HanaAgent の起動に失敗しました",
+    "startupFailed": "Lingxi の起動に失敗しました",
     "auth": {
       "scopeError": "このログイン権限は期限切れです。ユーザー名とパスワードでもう一度サインインしてください。",
       "loginFailed": "ログインに失敗しました",

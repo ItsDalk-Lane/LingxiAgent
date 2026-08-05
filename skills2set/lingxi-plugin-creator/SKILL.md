@@ -1,5 +1,5 @@
 ---
-name: hana-plugin-creator
+name: lingxi-plugin-creator
 description: Create Lingxi plugin scaffolds and guide users through beginner or developer plugin planning, capability checks, manifest setup, runtime tools, WebView/iframe UI, Session/Agent APIs, model/media APIs, SDK templates, and install-ready plugin directories. Use when LingxiAgent/Codex needs to explain what Lingxi plugins can do, help a user describe a plugin idea, check whether the SDK supports it, or generate/update a Lingxi plugin with @lingxi/plugin-runtime, @lingxi/plugin-sdk, and @lingxi/plugin-components.
 compatibility: "Uses a bundled Node preflight plus a Python scaffold script. No third-party Python packages are required."
 metadata:
@@ -58,7 +58,7 @@ Current boundaries: WebView/iframe UI is the stable escape hatch for existing we
 Run the bundled Node preflight before invoking the Python scaffold script:
 
 ```bash
-node skills2set/hana-plugin-creator/scripts/check_env.mjs --capability scaffold
+node skills2set/lingxi-plugin-creator/scripts/check_env.mjs --capability scaffold
 ```
 
 Behavior:
@@ -111,13 +111,13 @@ Behavior:
 Beginner starter:
 
 ```bash
-python3 skills2set/hana-plugin-creator/scripts/create_hana_plugin.py "My Plugin" --path examples/plugins --audience beginner --template direct
+python3 skills2set/lingxi-plugin-creator/scripts/create_lingxi_plugin.py "My Plugin" --path examples/plugins --audience beginner --template direct
 ```
 
 Developer React starter:
 
 ```bash
-python3 skills2set/hana-plugin-creator/scripts/create_hana_plugin.py "My Plugin" --path examples/plugins --audience developer --template professional-react --sdk-mode workspace
+python3 skills2set/lingxi-plugin-creator/scripts/create_lingxi_plugin.py "My Plugin" --path examples/plugins --audience developer --template professional-react --sdk-mode workspace
 ```
 
 Useful options:
@@ -134,7 +134,7 @@ Useful options:
 Provider contribution starter:
 
 ```bash
-python3 skills2set/hana-plugin-creator/scripts/create_hana_plugin.py "Jimeng Provider" --path examples/plugins --kind provider --audience developer
+python3 skills2set/lingxi-plugin-creator/scripts/create_lingxi_plugin.py "Jimeng Provider" --path examples/plugins --kind provider --audience developer
 ```
 
 ## SDK Rules

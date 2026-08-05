@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Build the self-contained Windows HanaCore archive published alongside the
+ * Build the self-contained Windows LingxiCore archive published alongside the
  * desktop installer.
  *
  * This is deliberately a second packaging boundary. The existing
@@ -24,7 +24,7 @@ const activation = require("../shared/artifact-core/activation.cjs");
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 export const ROOT = path.resolve(__dirname, "..");
-export const STANDALONE_LAYOUT_ROOT = "HanaCore";
+export const STANDALONE_LAYOUT_ROOT = "LingxiCore";
 export const STANDALONE_PLATFORM = "win32";
 export const STANDALONE_ARCH = "x64";
 
@@ -79,7 +79,7 @@ export function standaloneArtifactNames(version, arch = STANDALONE_ARCH) {
   if (arch !== STANDALONE_ARCH) {
     throw new Error(`[standalone] unsupported Windows architecture ${arch}; only ${STANDALONE_ARCH} is published`);
   }
-  const stem = `HanaCore-${version}-Windows-${arch}`;
+  const stem = `LingxiCore-${version}-Windows-${arch}`;
   const archiveName = `${stem}.tar.gz`;
   if (archiveName.startsWith("server-")) {
     throw new Error(`[standalone] archive name must never overlap the OTA server-* namespace: ${archiveName}`);

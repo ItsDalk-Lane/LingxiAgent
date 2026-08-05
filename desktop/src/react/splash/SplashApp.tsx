@@ -8,7 +8,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { getYuanVisual } from '../../../../shared/yuan-visuals.ts';
 
-const DEFAULT_NAME = 'Hanako';
+const DEFAULT_NAME = 'Lingxi';
 const DEFAULT_VISUAL = getYuanVisual('hanako');
 
 type SplashLocaleData = { splash?: { preparing?: { named?: string; anonymous?: string } } } | null | undefined;

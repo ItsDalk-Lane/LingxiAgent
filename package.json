@@ -1,8 +1,8 @@
 {
-  "name": "hanako",
+  "name": "lingxi",
   "version": "0.442.0",
   "type": "module",
-  "description": "HanaAgent - a personal AI agent with memory and soul",
+  "description": "Lingxi - a personal AI agent with memory and soul",
   "license": "Apache-2.0",
   "workspaces": [
     "packages/*"
@@ -20,7 +20,7 @@
   ],
   "main": "desktop/bootstrap.cjs",
   "bin": {
-    "hana": "cli/entry.ts"
+    "lingxi": "cli/entry.ts"
   },
   "engines": {
     "node": ">=24.12.0 <25"
@@ -46,7 +46,7 @@
     "build:packages": "npm run build --workspaces --if-present",
     "generate:windows-icon": "node scripts/generate-windows-icon.cjs",
     "pack": "npm run build:computer-use-helper && npm run build:client && npm run build:server && npm run verify:seed-kit && electron-builder --dir",
-    "install:local": "npm run pack && rm -rf /Applications/HanaAgent.app /Applications/Hanako.app && cp -R dist/mac-arm64/HanaAgent.app /Applications/ && printf 'provider: github\\nowner: liliMozi\\nrepo: openhanako\\n' > /Applications/HanaAgent.app/Contents/Resources/app-update.yml && node scripts/sign-local.cjs",
+    "install:local": "npm run pack && rm -rf /Applications/Lingxi.app /Applications/Lingxi.app && cp -R dist/mac-arm64/Lingxi.app /Applications/ && printf 'provider: github\\nowner: liliMozi\\nrepo: openhanako\\n' > /Applications/Lingxi.app/Contents/Resources/app-update.yml && node scripts/sign-local.cjs",
     "dist": "npm run build:computer-use-helper && npm run build:client && npm run build:server && npm run verify:seed-kit && electron-builder --mac dmg",
     "dist:win": "npm run build:computer-use-helper && npm run build:windows-sandbox-helper && npm run generate:windows-icon && npm run build:client && npm run build:server && npm run verify:seed-kit && npm run pack:server:standalone && npm run verify:standalone:server && electron-builder --win nsis",
     "dist:linux": "npm run build:client && npm run build:server && npm run verify:seed-kit && electron-builder --linux AppImage deb",
@@ -137,8 +137,8 @@
     "vitest": "^4.0.18"
   },
   "build": {
-    "appId": "com.hanako.app",
-    "productName": "HanaAgent",
+    "appId": "com.lingxi.app",
+    "productName": "Lingxi",
     "asar": true,
     "npmRebuild": false,
     "afterPack": "./scripts/fix-modules.cjs",
@@ -199,7 +199,7 @@
       ]
     },
     "dmg": {
-      "title": "HanaAgent",
+      "title": "Lingxi",
       "contents": [
         {
           "x": 180,
@@ -223,7 +223,7 @@
     "win": {
       "target": "nsis",
       "icon": "desktop/src/icon.ico",
-      "executableName": "HanaAgent",
+      "executableName": "Lingxi",
       "artifactName": "${productName}-${version}-Windows-${arch}.${ext}",
       "requestedExecutionLevel": "asInvoker",
       "extraResources": [
@@ -240,7 +240,7 @@
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": false,
-      "shortcutName": "HanaAgent",
+      "shortcutName": "Lingxi",
       "include": "build/installer.nsh",
       "installerIcon": "desktop/src/icon.ico",
       "uninstallerIcon": "desktop/src/icon.ico"

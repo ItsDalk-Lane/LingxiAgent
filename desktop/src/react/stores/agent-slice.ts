@@ -26,7 +26,7 @@ export interface AgentSlice {
 export const createAgentSlice = (
   set: (partial: Partial<AgentSlice>) => void
 ): AgentSlice => ({
-  agentName: 'Hanako',
+  agentName: 'Lingxi',
   userName: 'User',
   agentAvatarUrl: null,
   userAvatarUrl: null,

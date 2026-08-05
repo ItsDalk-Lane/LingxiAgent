@@ -7,7 +7,7 @@ import { fileURLToPath } from "node:url";
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const skillCreatorCheck = path.join(repoRoot, "skills2set", "skill-creator", "scripts", "check_env.mjs");
-const pluginCreatorCheck = path.join(repoRoot, "skills2set", "hana-plugin-creator", "scripts", "check_env.mjs");
+const pluginCreatorCheck = path.join(repoRoot, "skills2set", "lingxi-plugin-creator", "scripts", "check_env.mjs");
 
 function isolatedPathEnv(directory) {
   const env = { ...process.env, PATH: directory };
@@ -131,7 +131,7 @@ describe("skill-creator environment check", () => {
   });
 });
 
-describe("hana-plugin-creator environment check", () => {
+describe("lingxi-plugin-creator environment check", () => {
   const roots = [];
 
   afterEach(() => {
@@ -141,7 +141,7 @@ describe("hana-plugin-creator environment check", () => {
   });
 
   it("reports missing Python before running plugin scaffold scripts", () => {
-    const root = fs.mkdtempSync(path.join(os.tmpdir(), "hana-plugin-creator-env-"));
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), "lingxi-plugin-creator-env-"));
     roots.push(root);
 
     const result = runCheck(pluginCreatorCheck, ["--capability", "scaffold"], isolatedPathEnv(root));
@@ -154,7 +154,7 @@ describe("hana-plugin-creator environment check", () => {
   });
 
   it("passes plugin scaffold preflight with supported Python and no Python packages", () => {
-    const root = fs.mkdtempSync(path.join(os.tmpdir(), "hana-plugin-creator-env-"));
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), "lingxi-plugin-creator-env-"));
     roots.push(root);
     const fakePython = makeFakePython(root);
 
@@ -172,7 +172,7 @@ describe("hana-plugin-creator environment check", () => {
   });
 
   it("accepts Python 3.9 for plugin scaffold preflight", () => {
-    const root = fs.mkdtempSync(path.join(os.tmpdir(), "hana-plugin-creator-env-"));
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), "lingxi-plugin-creator-env-"));
     roots.push(root);
     const fakePython = makeFakePython(root);
 
