@@ -128,6 +128,35 @@ function removeNodeModulesBinDirs(nodeModulesDir) {
   return removedDirs;
 }
 
+/**
+ * 递归清除 macOS app 包内的 codesign 阻塞性扩展属性。
+ *
+ * 在 iCloud Drive / 文件提供者同步的目录（如 ~/Desktop）下构建时，
+ * macOS 会给文件打上 com.apple.FinderInfo 和 com.apple.fileprovider.fpfs#P
+ * 标记，codesign 签名时会报 "resource fork, Finder information, or similar
+ * detritus not allowed" 并拒绝签名。这里在签名前递归删除这两个属性
+ *（com.apple.provenance 是 SIP 锁定的，但 codesign 能容忍它，不需处理）。
+ *
+ * 幂等：对没有目标属性的文件，xattr -d 会非零退出，忽略即可。
+ * @param {string} appBundleDir — .app bundle 根目录
+ */
+function stripCodesignDetritus(appBundleDir) {
+  if (process.platform !== "darwin") return;
+  const blockingAttrs = ["com.apple.FinderInfo", "com.apple.fileprovider.fpfs#P"];
+  for (const attr of blockingAttrs) {
+    try {
+      // find ... -exec xattr -d 对无该属性的文件会报错，统一吞掉
+      execSync(
+        `find ${JSON.stringify(appBundleDir)} -exec xattr -d ${JSON.stringify(attr)} {} \\; 2>/dev/null; true`,
+        { stdio: ["pipe", "pipe", "pipe"], shell: true },
+      );
+    } catch {
+      // 整体失败不致命（非同步目录下本就无需清理）
+    }
+  }
+  console.log("[fix-modules] stripped codesign-blocking xattrs (FinderInfo/fileprovider)");
+}
+
 exports.default = async function (context) {
   const platformName = context.packager.platform.name;
   const arch = context.arch === 1 ? "x64" : context.arch === 3 ? "arm64" : "x64";
@@ -137,6 +166,12 @@ exports.default = async function (context) {
     : path.join(context.appOutDir, "resources", "app");
   const distModules = path.join(appDir, "node_modules");
   const localModules = path.resolve(__dirname, "..", "node_modules");
+
+  // ── macOS: 清除 codesign 阻塞性 xattr（iCloud 同步目录下构建时必须）──
+  if (platformName === "mac") {
+    const appBundle = path.join(context.appOutDir, context.packager.appInfo.productFilename + ".app");
+    stripCodesignDetritus(appBundle);
+  }
 
   // ── server runtime deps 重建 ──
   // electron-builder 的 extraResources 会过滤 node_modules，

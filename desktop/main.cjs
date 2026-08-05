@@ -760,7 +760,7 @@ function createBrowserWindowWithDiagnostics(label, opts, { windowsMinimalRetry =
       height: opts?.height || 820,
       minWidth: opts?.minWidth,
       minHeight: opts?.minHeight,
-      title: opts?.title || "LingxiAgent",
+      title: opts?.title || "Lingxi",
       show: opts?.show === true,
       ...(opts?.x != null ? { x: opts.x } : {}),
       ...(opts?.y != null ? { y: opts.y } : {}),
@@ -1452,7 +1452,7 @@ function notifyComponentQuarantined() {
   try {
     if (!Notification.isSupported()) return;
     const notif = new Notification({
-      title: "LingxiAgent",
+      title: "Lingxi",
       body: mt(
         "notification.componentQuarantined",
         null,
@@ -2292,7 +2292,7 @@ function createSplashWindow() {
     height: 280,
     resizable: false,
     frame: false,
-    title: "LingxiAgent",
+    title: "Lingxi",
     ...titleBarOpts({ x: 12, y: 12 }),
     transparent: true,
     show: false,
@@ -2563,7 +2563,7 @@ function createQuickChatWindow() {
     skipTaskbar: process.platform !== "darwin",
     frame: false,
     alwaysOnTop: true,
-    title: "Hana Quick Chat",
+    title: "Lingxi Quick Chat",
     transparent: true,
     backgroundColor: "#00000000",
     hasShadow: false,
@@ -2766,7 +2766,7 @@ function createMainWindow() {
     height: saved?.height || 820,
     minWidth: 420,
     minHeight: 500,
-    title: "LingxiAgent",
+    title: "Lingxi",
     ...titleBarOpts({ x: 16, y: 16 }),
     backgroundColor: getThemeBackgroundColor(initialTheme),
     show: false,
@@ -4360,7 +4360,7 @@ function createOnboardingWindow(query = {}) {
     height: 780,
     resizable: false,
     frame: false,
-    title: "LingxiAgent",
+    title: "Lingxi",
     ...titleBarOpts({ x: 16, y: 16 }),
     backgroundColor: getThemeBackgroundColor(initialTheme),
     show: false,
@@ -5898,7 +5898,7 @@ wrapIpcBestEffortHandler("show-notification", (_event, title, body, agentId, raw
   if (!Notification.isSupported()) return { shown: false, reason: "unsupported" };
   /** @type {Electron.NotificationConstructorOptions} */
   const options = {
-    title: title || "Hana",
+    title: title || "Lingxi",
     body: body || "",
     silent: false,
   };
@@ -5989,7 +5989,7 @@ wrapIpcBestEffortHandler("app-ready", (event) => {
     const settings = systemPreferences.getNotificationSettings?.();
     const status = settings?.authorizationStatus;
     if (settings && status === "not-determined") {
-      const notif = new Notification({ title: "Hana", body: mt("notification.ready", null, "Notifications enabled"), silent: true });
+      const notif = new Notification({ title: "Lingxi", body: mt("notification.ready", null, "Notifications enabled"), silent: true });
       notif.show();
     }
   }
