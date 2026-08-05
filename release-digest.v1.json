@@ -1,138 +1,55 @@
 {
   "schemaVersion": 1,
-  "tag": "v0.1.0",
-  "version": "0.1.0",
-  "previousTag": "v0.442.0",
-  "generatedAt": "2026-08-05T13:08:19.000Z",
+  "tag": "v0.1.1",
+  "version": "0.1.1",
+  "previousTag": "v0.1.0",
+  "generatedAt": "2026-08-05T16:10:00.000Z",
   "noUserFacingChanges": false,
   "summary": {
-    "zh": "灵犀（Lingxi）以 0.1.0 正式起步。这一版完成了从 HanaAgent 到灵犀的品牌焕新：新图标、新角色卡，窗口与应用各处的品牌名统一为 Lingxi；老用户的个人数据目录会自动从 ~/.hanako 迁移到 ~/.lingxi，不需要手动搬动。版本号从上游 0.442.0 归零，重启为独立的 0.1.0 版本线，关于页新增「上游项目 / 上游版本」记录，标明本项目同步的上游 openhanako 及其版本。本次同时清理了大量重构遗留，发布与更新渠道迁移到 LingxiAgent 仓库。",
-    "en": "Lingxi starts its own version line at 0.1.0. This release completes the rebrand from HanaAgent to Lingxi: a new icon, new character cards, and the Lingxi name now appears everywhere from window titles to notifications. Existing users' data directory is migrated automatically from ~/.hanako to ~/.lingxi. The version number resets from the upstream 0.442.0 to an independent 0.1.0 line, and the About page now records the upstream project (openhanako) and the version it tracks. Plenty of refactoring leftovers were cleaned up, and the release/update channel moved to the LingxiAgent repository."
+    "zh": "0.1.1 修复 0.1.0 在 macOS 上无法启动的严重问题。根因是 CI 在无 Apple 证书时走 ad-hoc 签名路径，但只重签了主程序与 Helper，漏签了 Electron Framework——主程序（无 Team ID）与 Framework（Electron 官方 Team ID）Team ID 不一致，macOS dyld 在加载 framework 时直接终止进程，表现为双击无反应/闪退。本次在 electron-builder 的 afterSign 钩子里补全全量 ad-hoc 重签，统一包内所有 Mach-O 组件的签名身份，启动恢复正常。",
+    "en": "0.1.1 fixes a critical issue where 0.1.0 could not launch on macOS. The root cause: CI's certificate-less ad-hoc signing path re-signed only the main executable and Helpers, leaving Electron Framework with its original Electron Team ID. The Team ID mismatch between the main process (no Team ID) and the framework (Electron's Team ID) caused macOS dyld to terminate the process while loading the framework — appearing as a silent crash on launch. This release adds a full ad-hoc re-sign step in electron-builder's afterSign hook, unifying the signing identity of every Mach-O component in the bundle, so the app launches normally."
   },
   "counts": {
-    "feature": 1,
+    "feature": 0,
     "fix": 1,
-    "improvement": 1,
-    "migration": 1
+    "improvement": 0,
+    "migration": 0
   },
   "source": {
     "owner": "ItsDalk-Lane",
     "repo": "LingxiAgent",
-    "commitRange": "v0.442.0..v0.1.0",
-    "releaseUrl": "https://github.com/ItsDalk-Lane/LingxiAgent/releases/tag/v0.1.0",
+    "commitRange": "v0.1.0..v0.1.1",
+    "releaseUrl": "https://github.com/ItsDalk-Lane/LingxiAgent/releases/tag/v0.1.1",
     "releaseNotes": ""
   },
   "items": [
     {
-      "id": "lingxi-brand-relaunch",
-      "kind": "feature",
-      "importance": "high",
-      "title": {
-        "zh": "品牌焕新：HanaAgent 正式更名为灵犀 Lingxi",
-        "en": "Rebrand: HanaAgent is now Lingxi"
-      },
-      "summary": {
-        "zh": "新图标与角色卡替换了占位图，窗口标题、通知、开机页等所有用户可见处的品牌名统一为 Lingxi，桌面端打包产物与签名路径也一并对齐。",
-        "en": "A new icon and character cards replace the placeholders, and every user-visible surface — window titles, notifications, splash — now consistently reads Lingxi, with packaging and signing paths aligned."
-      },
-      "details": [
-        {
-          "zh": "图标、角色卡等视觉资产全部换成灵犀专属设计（2048 母图 + Windows/macOS 全尺寸）。",
-          "en": "All visual assets — app icon and character cards — are now Lingxi-specific (2048px master plus full Windows/macOS size sets)."
-        },
-        {
-          "zh": "用户可见品牌名残留统一：窗口标题、快速问答、通知、开机页均使用 Lingxi。",
-          "en": "User-visible brand leftovers were unified: window titles, quick chat, notifications and splash all say Lingxi."
-        }
-      ],
-      "sources": [
-        {
-          "type": "commit",
-          "ref": "57e22e5",
-          "title": "feat(stage-6): replace AI-generated brand assets (icon + character cards)"
-        },
-        {
-          "type": "commit",
-          "ref": "9de6279",
-          "title": "fix(stage-7): unify window titles to Lingxi + macOS packaging hooks"
-        }
-      ]
-    },
-    {
-      "id": "data-dir-migration",
-      "kind": "migration",
-      "importance": "high",
-      "title": {
-        "zh": "老用户数据目录自动迁移：~/.hanako → ~/.lingxi",
-        "en": "Automatic data-dir migration: ~/.hanako → ~/.lingxi"
-      },
-      "summary": {
-        "zh": "老用户的个人数据会整体从 ~/.hanako 搬迁到 ~/.lingxi，迁移过程登记持久化豁免，随时可安全重试；CLI 与桌面端的数据目录行为已对齐为 .lingxi。",
-        "en": "Existing users' data moves wholesale from ~/.hanako to ~/.lingxi; the migration is registered as a persistent exemption and can be safely retried, and CLI and desktop now agree on the .lingxi data directory."
-      },
-      "details": [
-        {
-          "zh": "首次启动时自动检测并搬迁旧目录，无需手动操作；CLI 本地服务的数据目录也统一为 .lingxi。",
-          "en": "The old directory is detected and moved on first launch with no manual steps, and the CLI local server now uses .lingxi too."
-        }
-      ],
-      "sources": [
-        {
-          "type": "commit",
-          "ref": "a8e8a7f",
-          "title": "fix: 对抗审查后修复 — i18n/标识符残留 + ~/.hanako→~/.lingxi 迁移 + keyset 对齐"
-        }
-      ]
-    },
-    {
-      "id": "version-line-reset",
-      "kind": "improvement",
-      "importance": "medium",
-      "title": {
-        "zh": "版本线归零：0.1.0 独立发版，关于页记录上游版本",
-        "en": "Fresh 0.1.0 version line, About page tracks upstream version"
-      },
-      "summary": {
-        "zh": "版本号从上游 0.442.0 归零重启为 0.1.0，灵犀从此拥有独立版本线；设置 > 关于 新增「上游项目 / 上游版本」两行，标明同步的上游项目 openhanako 与当前同步的版本（0.442.0）。",
-        "en": "The version resets from upstream 0.442.0 to an independent 0.1.0 line; Settings > About now shows the upstream project (openhanako) and the exact upstream version (0.442.0) this build tracks."
-      },
-      "details": [
-        {
-          "zh": "发布与更新渠道迁移到 LingxiAgent 仓库，GitHub Releases 与自动更新指向新的仓库地址。",
-          "en": "Release and update channels moved to the LingxiAgent repository: GitHub Releases and auto-update now point at the new repo."
-        }
-      ],
-      "sources": [
-        {
-          "type": "release-notes",
-          "ref": "v0.1.0",
-          "title": "release digest v0.1.0"
-        }
-      ]
-    },
-    {
-      "id": "refactor-cleanup",
+      "id": "fix-mac-launch-teamid-mismatch",
       "kind": "fix",
-      "importance": "low",
+      "importance": "high",
       "title": {
-        "zh": "重构遗留清理",
-        "en": "Refactoring leftovers cleaned up"
+        "zh": "修复 macOS 启动崩溃：统一 ad-hoc 签名 Team ID",
+        "en": "Fix macOS launch crash: unify ad-hoc signing Team ID"
       },
       "summary": {
-        "zh": "移除已废弃的迁移/维护代码与测试，修正 Windows 沙箱助手与打包脚本，密钥集对齐后无环境配置也可通过构建校验。",
-        "en": "Deprecated migration/maintenance code and tests were removed, the Windows sandbox helper and packaging scripts were corrected, and the pinned keyset now lets seed verification pass without extra environment setup."
+        "zh": "新增 electron-builder afterSign 钩子（resign-adhoc.cjs），在无 Apple 证书时把包内所有 Mach-O 组件（Electron Framework、各 Helper、computer-use helper、主程序）统一重签为 ad-hoc，消除主程序与 Framework 的 Team ID 不一致——这正是 0.1.0 在 macOS 上 dyld 加载 framework 即 SIGABRT 的根因。同时把 CI 里被硬编码为常开的 SKIP_NOTARIZE 改为「仅在无公证凭据时跳过」，配齐 Apple 凭据后可无缝切到正规签名+公证。",
+        "en": "Adds an electron-builder afterSign hook (resign-adhoc.cjs) that, when no Apple certificate is present, re-signs every Mach-O component in the bundle (Electron Framework, Helpers, computer-use helper, main executable) to a unified ad-hoc identity, eliminating the Team ID mismatch between the main process and the framework — the root cause of 0.1.0's dyld SIGABRT on macOS launch. The CI's hardcoded-always-on SKIP_NOTARIZE is also corrected to 'skip only when notary credentials are absent', so adding Apple credentials later switches to proper signing + notarization with no further changes."
       },
       "details": [
         {
-          "zh": "同步删除了对应的旧测试与审计脚本，保持仓库与实现一致。",
-          "en": "The matching legacy tests and audit scripts were removed so the repo stays consistent with the implementation."
+          "zh": "崩溃报告铁证：codeSigningTeamID 为空（主程序 ad-hoc），加载 Electron Framework 时报 'mapping process and mapped file have different Team IDs'，启动 30ms 内被 dyld 终止。",
+          "en": "Crash report evidence: codeSigningTeamID was empty (ad-hoc main process), and loading Electron Framework failed with 'mapping process and mapped file have different Team IDs' — dyld terminated the process within 30ms of launch."
+        },
+        {
+          "zh": "对比验证：本地 install:local 走的 sign-local.cjs 全量 ad-hoc 重签能正常启动，但 CI 发布流程从未执行该步骤，发布的 0.1.0 是半残 ad-hoc。",
+          "en": "Comparative verification: the local install:local path runs sign-local.cjs for a full ad-hoc re-sign and launches fine, but the CI release pipeline never ran that step, so the published 0.1.0 was a half-signed ad-hoc build."
         }
       ],
       "sources": [
         {
           "type": "commit",
-          "ref": "a8e8a7f",
-          "title": "fix: 对抗审查后修复 — i18n/标识符残留 + ~/.hanako→~/.lingxi 迁移 + keyset 对齐"
+          "ref": "323aa92",
+          "title": "ci: macOS 无证书时跳过签名/公证（ad-hoc），build-server 失败输出日志"
         }
       ]
     }

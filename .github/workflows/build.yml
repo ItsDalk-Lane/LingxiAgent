@@ -287,8 +287,9 @@ jobs:
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-          # 无 Apple 证书/公证凭据时跳过公证（notarize.cjs 检查 SKIP_NOTARIZE）
-          SKIP_NOTARIZE: 'true'
+          # 无 Apple notary 凭据时跳过公证（ad-hoc 包无需也无法公证）；
+          # 配齐 APPLE_ID/APPLE_ID_PASSWORD 后自动启用公证，无需改这里。
+          SKIP_NOTARIZE: ${{ (secrets.APPLE_ID == '' || secrets.APPLE_ID_PASSWORD == '') && 'true' || 'false' }}
 
       # 同上：Windows job 直调 electron-builder，seed kit 校验必须单独接线。
       - name: Verify seed kit (Windows)
