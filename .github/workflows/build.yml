@@ -29,41 +29,8 @@ jobs:
       # 顺序不能颠倒：build:theme 的产物写进 dist-renderer/lib/theme.js，
       # 必须在 build:renderer 的 emptyOutDir 清空该目录之后才落地
       # （见 vite.config.theme.js 文件头注释）。
-      - name: Native deps smoke test
-        run: |
-          set -e
-          node -e "require('esbuild').transformSync('const x=1; console.log(x)')"
-          echo "esbuild OK"
-          node -e "console.log('rollup', require('rollup/package.json').version)"
-          node -e "const { rollup } = require('rollup'); console.log('rollup api OK')"
-          node -e "console.log('vite', require('vite/package.json').version)"
-          echo "smoke OK"
-
       - name: Build renderer bundle
-        run: |
-          set -o pipefail
-          echo "MEM_BEFORE:"; free -m || true
-          if ! npm run build:renderer > /tmp/renderer-build.log 2>&1; then
-            echo "::error::==== FULL BUILD LOG ($(wc -c < /tmp/renderer-build.log) bytes) ===="
-            # base64（无换行）塞入 annotation，规避 ::error:: 单行限制
-            B64=$(base64 < /tmp/renderer-build.log | tr -d '\n')
-            echo "::error::LOG_B64_START"
-            echo "::error::$B64"
-            echo "::error::LOG_B64_END"
-            echo "MEM_AFTER:"; free -m || true
-            exit 1
-          fi
-          tail -3 /tmp/renderer-build.log
-
-      # 诊断（临时）：无论成败都把构建日志作为 artifact 上传，用于排查 CI 上
-      # build:renderer 偶发/平台相关的失败。定位后移除。
-      - name: Upload renderer build log
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: renderer-build-log
-          path: /tmp/renderer-build.log
-          if-no-files-found: warn
+        run: npm run build:renderer
 
       - name: Build theme bundle (writes into dist-renderer/lib, must run after build:renderer)
         run: npm run build:theme
