@@ -28,7 +28,7 @@ describe('parseMoodFromContent', () => {
     const input = '<mood>feeling good</mood>\n\nSome text here.';
     const result = parseMoodFromContent(input);
     expect(result.mood).toBe('feeling good');
-    expect(result.yuan).toBe('hanako');
+    expect(result.yuan).toBe('lingxi');
     expect(result.text).toBe('Some text here.');
   });
 
@@ -312,7 +312,7 @@ describe('extractToolDetail', () => {
 
 describe('moodLabel', () => {
   it('hanako 返回 MOOD', () => {
-    expect(moodLabel('hanako')).toContain('MOOD');
+    expect(moodLabel('lingxi')).toContain('MOOD');
   });
 
   it('butter 返回 PULSE', () => {

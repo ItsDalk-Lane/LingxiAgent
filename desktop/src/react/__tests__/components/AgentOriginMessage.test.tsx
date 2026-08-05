@@ -35,7 +35,7 @@ describe('AgentOriginMessage', () => {
     useStore.setState({
       agents: [],
       agentName: 'Hanako',
-      agentYuan: 'hanako',
+      agentYuan: 'lingxi',
     } as never);
   });
 

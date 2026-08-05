@@ -156,7 +156,7 @@ function seedStore(partial: Partial<SettingsState> = {}) {
     settingsAgentId: null,
     agentName: 'Hanako',
     userName: 'User',
-    agentYuan: 'hanako',
+    agentYuan: 'lingxi',
     agentAvatarUrl: null,
     userAvatarUrl: null,
     settingsConfig: { capabilities: { learn_skills: {} } },

@@ -107,7 +107,7 @@ describe('AppPages page ownership', () => {
     useStore.setState({
       currentTab: 'channels',
       currentChannel: 'ch_crew',
-      channelMembers: ['hanako', 'butter'],
+      channelMembers: ['lingxi', 'butter'],
       channelInfoName: 'Crew',
     } as never);
 

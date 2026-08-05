@@ -5435,7 +5435,7 @@ wrapIpcHandler("get-avatar-path", (_event, role) => {
 wrapIpcHandler("get-splash-info", () => {
   try {
     const agentId = getCurrentAgentId();
-    if (!agentId) return { agentName: null, locale: "zh-CN", yuan: "hanako" };
+    if (!agentId) return { agentName: null, locale: "zh-CN", yuan: "lingxi" };
     const configPath = path.join(lingxiHome, "agents", agentId, "config.yaml");
     const text = fs.readFileSync(configPath, "utf-8");
     // 简易提取：agent:\n  name: xxx / yuan: xxx 和顶层 locale: xxx
@@ -5448,7 +5448,7 @@ wrapIpcHandler("get-splash-info", () => {
       yuan: yuanMatch?.[1]?.trim() || "lingxi",
     };
   } catch {
-    return { agentName: null, locale: "zh-CN", yuan: "hanako" };
+    return { agentName: null, locale: "zh-CN", yuan: "lingxi" };
   }
 });
 

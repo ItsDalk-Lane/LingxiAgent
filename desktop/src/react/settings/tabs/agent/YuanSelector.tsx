@@ -7,7 +7,7 @@ import kongBannerUrl from '../../../../assets/kong-banner.jpg';
 export function YuanSelector({ currentYuan, onChange }: { currentYuan: string; onChange: (key: string) => void }) {
   const types = t('yuan.types') || {};
   const entries = Object.entries(types) as [string, { label?: string; avatar?: string }][];
-  const hIdx = entries.findIndex(([k]) => k === 'hanako');
+  const hIdx = entries.findIndex(([k]) => k === 'lingxi');
   if (hIdx >= 0 && entries.length >= 3) {
     const [h] = entries.splice(hIdx, 1);
     entries.splice(1, 0, h);

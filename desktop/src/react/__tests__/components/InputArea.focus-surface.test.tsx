@@ -174,7 +174,7 @@ function seedInputState(overrides: Partial<ReturnType<typeof useStore.getState>>
     serverToken: null,
     modelSwitching: false,
     welcomeVisible: false,
-    agentYuan: 'hanako',
+    agentYuan: 'lingxi',
     inputFocusTrigger: 0,
     inputFocusTriggerSource: 'gesture',
     ...overrides,

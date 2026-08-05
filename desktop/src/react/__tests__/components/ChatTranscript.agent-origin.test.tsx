@@ -55,7 +55,7 @@ describe('ChatTranscript agent origin routing', () => {
         role: 'user',
         timestamp: Date.now(),
         text: '跨 session 投递的消息',
-        origin: { kind: 'agent', agentId: 'hanako', agentName: 'Hanako' },
+        origin: { kind: 'agent', agentId: 'lingxi', agentName: 'Hanako' },
       },
     }];
 

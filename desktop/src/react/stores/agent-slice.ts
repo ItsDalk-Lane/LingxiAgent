@@ -30,7 +30,7 @@ export const createAgentSlice = (
   userName: 'User',
   agentAvatarUrl: null,
   userAvatarUrl: null,
-  agentYuan: 'hanako',
+  agentYuan: 'lingxi',
   memoryMasterEnabled: true,
   agents: [],
   currentAgentId: null,

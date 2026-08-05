@@ -302,7 +302,7 @@ describe('screenshot utils', () => {
       ...storeMock.state,
       currentAgentId: 'hana',
       agentName: 'Hana',
-      agentYuan: 'hanako',
+      agentYuan: 'lingxi',
       userName: '唐',
       selectedIdsBySession: {
         [sessionPath]: ['u1', 'a1'],

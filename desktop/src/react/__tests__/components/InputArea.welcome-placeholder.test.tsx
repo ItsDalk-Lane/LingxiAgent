@@ -160,7 +160,7 @@ function seedInputState(overrides: Partial<ReturnType<typeof useStore.getState>>
     modelSwitching: false,
     welcomeVisible: true,
     locale: '',
-    agentYuan: 'hanako',
+    agentYuan: 'lingxi',
     ...overrides,
   } as never);
 }

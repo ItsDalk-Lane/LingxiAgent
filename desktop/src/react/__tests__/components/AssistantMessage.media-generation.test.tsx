@@ -27,7 +27,7 @@ describe('AssistantMessage media generation placeholder', () => {
     useStore.setState({
       agents: [],
       agentName: 'Hanako',
-      agentYuan: 'hanako',
+      agentYuan: 'lingxi',
       mediaViewer: null,
       streamingSessions: [],
       selectedMessageIdsBySession: {},

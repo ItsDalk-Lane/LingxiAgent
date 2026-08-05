@@ -33,10 +33,10 @@ describe('AutomationCard model selection', () => {
       'common.confirm': 'Save',
     }[key] ?? key)) as typeof window.t;
     useStore.setState({
-      agents: [{ id: 'hanako', name: 'Hanako', yuan: 'lingxi', homeFolder: '/home/hanako' }],
-      currentAgentId: 'hanako',
+      agents: [{ id: 'lingxi', name: 'Hanako', yuan: 'lingxi', homeFolder: '/home/hanako' }],
+      currentAgentId: 'lingxi',
       agentName: 'Hanako',
-      agentYuan: 'hanako',
+      agentYuan: 'lingxi',
     } as never);
   });
 

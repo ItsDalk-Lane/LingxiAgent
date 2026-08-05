@@ -59,7 +59,7 @@ describe('WelcomeScreen workspace picker', () => {
       agents: [],
       agentName: 'Hanako',
       agentAvatarUrl: null,
-      agentYuan: 'hanako',
+      agentYuan: 'lingxi',
       currentAgentId: 'hana',
       selectedAgentId: null,
       memoryEnabled: true,

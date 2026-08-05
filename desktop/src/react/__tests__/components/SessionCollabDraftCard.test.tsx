@@ -28,7 +28,7 @@ function sendBlock(overrides: Record<string, unknown> = {}) {
     status: 'pending',
     title: 'sid-target-1',
     description: 'original message',
-    target: { type: 'session', sessionId: 'sid-target-1', sessionTitle: null, agentId: 'hanako', agentName: 'Hanako' },
+    target: { type: 'session', sessionId: 'sid-target-1', sessionTitle: null, agentId: 'lingxi', agentName: 'Hanako' },
     detail: {
       kind: 'session_send_draft',
       draft: { targetSessionId: 'sid-target-1', message: 'original message' },
@@ -46,10 +46,10 @@ function createBlock(overrides: Record<string, unknown> = {}) {
     status: 'pending',
     title: 'Hanako',
     description: 'first message body',
-    target: { type: 'agent', agentId: 'hanako', agentName: 'Hanako' },
+    target: { type: 'agent', agentId: 'lingxi', agentName: 'Hanako' },
     detail: {
       kind: 'session_create_draft',
-      draft: { agentId: 'hanako', model: 'claude', title: '', firstMessage: 'first message body' },
+      draft: { agentId: 'lingxi', model: 'claude', title: '', firstMessage: 'first message body' },
     },
     actions: [{ id: 'view', kind: 'open' }],
     ...overrides,
@@ -70,12 +70,12 @@ describe('SessionCollabDraftCard', () => {
     }) as typeof window.t;
     useStore.setState({
       agents: [
-        { id: 'hanako', name: 'Hanako', yuan: 'lingxi', homeFolder: '/home/hanako' },
+        { id: 'lingxi', name: 'Hanako', yuan: 'lingxi', homeFolder: '/home/hanako' },
         { id: 'maomao', name: '毛毛', yuan: 'maomao', homeFolder: '/home/maomao' },
       ],
       agentName: 'Hanako',
-      agentYuan: 'hanako',
-      currentAgentId: 'hanako',
+      agentYuan: 'lingxi',
+      currentAgentId: 'lingxi',
       streamingSessions: [],
       selectedMessageIdsBySession: {},
       // 源 session 的 path→sessionId 映射：走既有 currentSessionPath/currentSessionId
@@ -96,7 +96,7 @@ describe('SessionCollabDraftCard', () => {
   it('renders a send draft card with the target agent avatar and the store-resolved session title', () => {
     useStore.setState({
       sessions: [
-        { path: '/sessions/target.jsonl', sessionId: 'sid-target-1', title: 'Project kickoff', firstMessage: '', modified: '', messageCount: 0, agentId: 'hanako', agentName: 'Hanako', cwd: null },
+        { path: '/sessions/target.jsonl', sessionId: 'sid-target-1', title: 'Project kickoff', firstMessage: '', modified: '', messageCount: 0, agentId: 'lingxi', agentName: 'Hanako', cwd: null },
       ],
     } as never);
     renderCard(sendBlock());

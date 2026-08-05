@@ -36,7 +36,7 @@ function renderSuggestion(status = 'approved', jobDataOverrides: Record<string, 
           status,
           title: '奶茶提醒',
           description: '提醒我喝奶茶',
-          target: { type: 'agent', id: 'hanako' },
+          target: { type: 'agent', id: 'lingxi' },
           detail: {
             kind: 'automation_draft',
             jobData: {
@@ -44,7 +44,7 @@ function renderSuggestion(status = 'approved', jobDataOverrides: Record<string, 
               schedule: '0 12 * * *',
               label: '奶茶提醒',
               prompt: '提醒我喝奶茶',
-              actorAgentId: 'hanako',
+              actorAgentId: 'lingxi',
               ...jobDataOverrides,
             },
           },
@@ -61,10 +61,10 @@ describe('AssistantMessage automation suggestion card', () => {
       return key;
     }) as typeof window.t;
     useStore.setState({
-      agents: [{ id: 'hanako', name: 'Hanako', yuan: 'lingxi', homeFolder: '/home/hanako' }],
+      agents: [{ id: 'lingxi', name: 'Hanako', yuan: 'lingxi', homeFolder: '/home/hanako' }],
       agentName: 'Hanako',
-      agentYuan: 'hanako',
-      currentAgentId: 'hanako',
+      agentYuan: 'lingxi',
+      currentAgentId: 'lingxi',
       currentSessionId: 'session-main',
       currentSessionPath: '/sessions/main.jsonl',
       sessions: [{ sessionId: 'session-main', path: '/sessions/main.jsonl' }],
@@ -116,7 +116,7 @@ describe('AssistantMessage automation suggestion card', () => {
         label: '奶茶提醒',
         prompt: '提醒我喝奶茶',
         model: '',
-        targetAgentId: 'hanako',
+        targetAgentId: 'lingxi',
       },
     });
     expect(lingxiFetch).not.toHaveBeenCalledWith(expect.stringContaining('/api/confirm/'), expect.anything());
@@ -125,10 +125,10 @@ describe('AssistantMessage automation suggestion card', () => {
   it('submits the selected Agent identity from the draft card', async () => {
     useStore.setState({
       agents: [
-        { id: 'hanako', name: 'Hanako', yuan: 'lingxi', homeFolder: '/home/hanako' },
+        { id: 'lingxi', name: 'Hanako', yuan: 'lingxi', homeFolder: '/home/hanako' },
         { id: 'maomao', name: '毛毛', yuan: 'maomao', homeFolder: '/home/maomao' },
       ],
-      currentAgentId: 'hanako',
+      currentAgentId: 'lingxi',
     } as never);
 
     renderSuggestion('pending');

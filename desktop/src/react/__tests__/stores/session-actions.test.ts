@@ -63,7 +63,7 @@ const initialStateFactory = (): MockState => ({
   agents: [] as unknown[],
   currentAgentId: null,
   agentName: '',
-  agentYuan: 'hanako',
+  agentYuan: 'lingxi',
   agentAvatarUrl: null,
   memoryEnabled: true,
   browserBySession: {} as Record<string, unknown>,
@@ -1349,7 +1349,7 @@ function mockPermissionDefault(mode = 'ask') {
         text: '正文',
         thinking: '',
         mood: 'Vibe: 好',
-        moodYuan: 'hanako',
+        moodYuan: 'lingxi',
         inThinking: false,
         inMood: false,
       });

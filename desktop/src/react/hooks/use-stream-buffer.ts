@@ -57,7 +57,7 @@ function createBuffer(sessionPath: string): Buffer {
     textAcc: '',
     thinkingAcc: '',
     moodAcc: '',
-    moodYuan: 'hanako',
+    moodYuan: 'lingxi',
     inThinking: false,
     hasThinkingBlock: false,
     inMood: false,
@@ -84,7 +84,7 @@ function bufferKeyForSession(sessionPath: string, sessionId: string | null = nul
 function resolveSessionYuan(sessionPath: string): string {
   const state = useStore.getState();
   const sessionAgentId = state.sessions.find((session: any) => session.path === sessionPath)?.agentId ?? null;
-  if (!sessionAgentId) return 'hanako';
+  if (!sessionAgentId) return 'lingxi';
   return state.agents.find((agent: any) => agent.id === sessionAgentId)?.yuan || 'lingxi';
 }
 

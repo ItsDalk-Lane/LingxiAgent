@@ -42,7 +42,7 @@ describe('MainContent app file drag attachments', () => {
       activePanel: null,
       currentAgentId: 'agent-a',
       agentName: 'Hana',
-      agentYuan: 'hanako',
+      agentYuan: 'lingxi',
       agents: [{ id: 'agent-a', name: 'Hana', yuan: 'lingxi', isPrimary: true }],
       attachedFiles: [],
       attachedFilesBySession: {},

@@ -247,7 +247,7 @@ function seedLayeredInputState() {
     serverToken: null,
     modelSwitching: false,
     welcomeVisible: false,
-    agentYuan: 'hanako',
+    agentYuan: 'lingxi',
   } as never);
   useStore.getState().initSession(sessionPath, [{
     type: 'message',

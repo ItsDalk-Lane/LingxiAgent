@@ -26,7 +26,7 @@ describe('ChannelMessages scroll behavior', () => {
       channels: [{
         id: 'ch_crew',
         name: 'crew',
-        members: ['hanako'],
+        members: ['lingxi'],
         lastMessage: '',
         lastSender: '',
         lastTimestamp: '',
@@ -39,7 +39,7 @@ describe('ChannelMessages scroll behavior', () => {
       agents: [],
       userName: 'user',
       userAvatarUrl: '',
-      currentAgentId: 'hanako',
+      currentAgentId: 'lingxi',
     } as never);
   });
 
@@ -63,7 +63,7 @@ describe('ChannelMessages scroll behavior', () => {
       useStore.setState({
         channelMessages: [
           { sender: 'user', timestamp: '2026-05-07 17:00:00', body: 'old' },
-          { sender: 'hanako', timestamp: '2026-05-07 17:01:00', body: 'new reply' },
+          { sender: 'lingxi', timestamp: '2026-05-07 17:01:00', body: 'new reply' },
         ],
       } as never);
     });
@@ -89,7 +89,7 @@ describe('ChannelMessages scroll behavior', () => {
       useStore.setState({
         channelMessages: [
           { sender: 'user', timestamp: '2026-05-07 17:00:00', body: 'old' },
-          { sender: 'hanako', timestamp: '2026-05-07 17:01:00', body: 'latest' },
+          { sender: 'lingxi', timestamp: '2026-05-07 17:01:00', body: 'latest' },
         ],
       } as never);
     });

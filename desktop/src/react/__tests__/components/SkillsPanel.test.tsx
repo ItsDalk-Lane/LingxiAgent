@@ -37,7 +37,7 @@ describe('SkillsPanel', () => {
       activePanel: 'skills',
       currentAgentId: 'agent-a',
       agentName: 'Hana',
-      agentYuan: 'hanako',
+      agentYuan: 'lingxi',
       agents: [
         { id: 'agent-a', name: 'Hana', yuan: 'lingxi', isPrimary: true },
         { id: 'agent-b', name: 'Mao', yuan: 'butter', isPrimary: false },

@@ -9,7 +9,7 @@ import { useState, useEffect, useRef } from 'react';
 import { getYuanVisual } from '../../../../shared/yuan-visuals.ts';
 
 const DEFAULT_NAME = 'Lingxi';
-const DEFAULT_VISUAL = getYuanVisual('hanako');
+const DEFAULT_VISUAL = getYuanVisual('lingxi');
 
 type SplashLocaleData = { splash?: { preparing?: { named?: string; anonymous?: string } } } | null | undefined;
 
@@ -49,7 +49,7 @@ export function SplashApp() {
       let locale = 'zh';
       let name = DEFAULT_NAME;
       let agentNameRaw: string | null = null;
-      let yuan = 'hanako';
+      let yuan = 'lingxi';
 
       try {
         const hana = window.hana;

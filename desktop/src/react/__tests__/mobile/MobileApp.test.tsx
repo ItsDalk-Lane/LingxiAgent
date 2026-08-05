@@ -894,7 +894,7 @@ function jsonResponseForMobile(
       agentName: 'Hana',
       userName: 'Owner',
       currentAgentId: 'hana',
-      agentYuan: 'hanako',
+      agentYuan: 'lingxi',
       homeFolder: '/workspace',
       cwdHistory: ['/workspace'],
       avatars: { agent: false, user: false },

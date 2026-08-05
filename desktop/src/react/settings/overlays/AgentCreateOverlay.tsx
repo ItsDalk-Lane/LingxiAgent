@@ -11,7 +11,7 @@ export function AgentCreateOverlay() {
   const showToast = useSettingsStore(s => s.showToast);
   const [visible, setVisible] = useState(false);
   const [name, setName] = useState('');
-  const [yuan, setYuan] = useState('hanako');
+  const [yuan, setYuan] = useState('lingxi');
   const [creating, setCreating] = useState(false);
   const [planning, setPlanning] = useState(false);
   const [dragActive, setDragActive] = useState(false);
@@ -24,7 +24,7 @@ export function AgentCreateOverlay() {
   useEffect(() => {
     const handler = () => {
       setName('');
-      setYuan('hanako');
+      setYuan('lingxi');
       setCardPlan(null);
       setImportMemory(false);
       setError('');

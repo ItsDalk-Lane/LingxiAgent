@@ -347,7 +347,7 @@ export function QuickChatApp() {
         if (!preferred) {
           useStore.setState({
             agentName: healthData.agent || 'Lingxi',
-            agentYuan: 'hanako',
+            agentYuan: 'lingxi',
           });
         }
         applyRuntimePermissionMode(resolveQuickChatPermissionMode(permissionData));

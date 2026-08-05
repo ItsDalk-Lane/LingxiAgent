@@ -69,7 +69,7 @@ describe("workflow end-to-end (mock executeIsolated)", () => {
   it("未知 agent() option 即使未 await 也会同步失败", async () => {
     const exec = vi.fn(async () => ({ replyText: "bug", error: null }));
     const script = META + `
-      const read = agent('hanako', { task: '读取 README', access: 'read' });
+      const read = agent('lingxi', { task: '读取 README', access: 'read' });
       return 'done';
     `;
 
