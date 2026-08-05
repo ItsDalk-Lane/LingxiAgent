@@ -4,8 +4,8 @@ export default function registerSdkShowcaseRoutes(app, ctx) {
 }
 
 function renderShell(c, ctx, surface) {
-  const hanaCss = c.req.query("hana-css") || "";
-  const theme = c.req.query("hana-theme") || "inherit";
+  const hanaCss = c.req.query("lingxi-css") || "";
+  const theme = c.req.query("lingxi-theme") || "inherit";
   const base = `/api/plugins/${ctx.pluginId}`;
 
   return `<!doctype html>
@@ -16,7 +16,7 @@ function renderShell(c, ctx, surface) {
   ${hanaCss ? `<link rel="stylesheet" href="${escapeAttr(hanaCss)}">` : ""}
   <link rel="stylesheet" href="${base}/assets/panel.css">
 </head>
-<body data-hana-theme="${escapeAttr(theme)}" data-surface="${surface}">
+<body data-lingxi-theme="${escapeAttr(theme)}" data-surface="${surface}">
   <div id="root" data-surface="${surface}"></div>
   <script type="module" src="${base}/assets/panel.js"></script>
 </body>

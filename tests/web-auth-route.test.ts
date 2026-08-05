@@ -145,7 +145,7 @@ describe("web auth route", () => {
     });
     expect(spoofedHeader.status).toBe(400);
 
-    const secure = await app.request("https://hana.example.test/api/web-auth/login", {
+    const secure = await app.request("https://lingxi.example.test/api/web-auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ username: "hana-owner", password: "correct horse battery staple" }),
@@ -161,7 +161,7 @@ describe("web auth route", () => {
       },
     });
 
-    const desktop = await app.request("https://hana.example.test/api/web-auth/login", {
+    const desktop = await app.request("https://lingxi.example.test/api/web-auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

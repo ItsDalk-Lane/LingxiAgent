@@ -52,7 +52,7 @@ describe("PluginDevService", () => {
   let service;
 
   beforeEach(() => {
-    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "hana-plugin-dev-"));
+    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "lingxi-plugin-dev-"));
     sourceRoot = path.join(tmpDir, "sources");
     communityPluginsDir = path.join(tmpDir, "hana-home", "plugins");
     devPluginsDir = path.join(tmpDir, "hana-home", "plugins-dev");

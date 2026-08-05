@@ -1,6 +1,6 @@
-# Hana Test Policy
+# Lingxi Test Policy
 
-Hana uses risk-driven tests. Test value comes from protecting contracts and old-user safety, not from keeping a large file count.
+Lingxi uses risk-driven tests. Test value comes from protecting contracts and old-user safety, not from keeping a large file count.
 
 ## Test Layers
 

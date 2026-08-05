@@ -13,7 +13,7 @@ import {
 let tmpHome = "";
 
 beforeEach(() => {
-  tmpHome = fs.mkdtempSync(path.join(os.tmpdir(), "hana-plugin-surface-session-"));
+  tmpHome = fs.mkdtempSync(path.join(os.tmpdir(), "lingxi-plugin-surface-session-"));
 });
 
 afterEach(() => {

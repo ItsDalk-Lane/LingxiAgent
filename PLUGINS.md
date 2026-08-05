@@ -27,7 +27,7 @@ export async function execute(input) {
 }
 ```
 
-2. 打开 HanaAgent → 设置 → 插件，把文件夹拖进安装区（或压缩成 .zip 拖入）
+2. 打开 LingxiAgent → 设置 → 插件，把文件夹拖进安装区（或压缩成 .zip 拖入）
 3. 安装后 Agent 立即可以调用 `my-plugin_hello` 工具
 4. 卸载：在插件页面点删除按钮
 
@@ -52,7 +52,7 @@ python3 skills2set/hana-plugin-creator/scripts/create_hana_plugin.py "My Plugin"
 
 ### Agent 辅助开发循环
 
-当 Hana / Codex 这类 Agent 直接帮用户开发插件时，优先走 dev loop，而不是把半成品复制到正式插件目录：
+当 Lingxi / Codex 这类 Agent 直接帮用户开发插件时，优先走 dev loop，而不是把半成品复制到正式插件目录：
 
 1. 插件源码放在当前工作区，或 `${LINGXI_HOME}/plugin-dev-sources/`。
 2. 调用 EventBus `plugin.dev.install` 或 HTTP `POST /api/plugins/dev/install`，把源码复制到 `${LINGXI_HOME}/plugins-dev/<pluginId>` 并加载。
@@ -63,7 +63,7 @@ python3 skills2set/hana-plugin-creator/scripts/create_hana_plugin.py "My Plugin"
 
 Agent 可见的 dev 工具默认关闭。用户需要在设置 → 插件 → 权限中开启"允许 Agent 插件开发工具"，开启后 Agent 才会看到 `plugin_dev_install`、`plugin_dev_reload`、`plugin_dev_disable`、`plugin_dev_enable`、`plugin_dev_reset`、`plugin_dev_uninstall`、`plugin_dev_invoke_tool`、`plugin_dev_diagnostics`、`plugin_dev_list_surfaces`、`plugin_dev_describe_surface`、`plugin_dev_run_scenario`。
 
-开发态权限来自 Hana 记住的 dev slot，而不是 manifest 自己声明。`devRunId` 是一次 dev install/reload 的运行护栏，调用 enable/disable/reset/uninstall 时建议带上，避免旧上下文误操作新的开发槽。dev 操作只允许作用于 `${LINGXI_HOME}/plugins-dev/` 中的 runtime copy，不会写入 `${LINGXI_HOME}/plugins/`，也不会污染正式插件的禁用偏好。
+开发态权限来自 Lingxi 记住的 dev slot，而不是 manifest 自己声明。`devRunId` 是一次 dev install/reload 的运行护栏，调用 enable/disable/reset/uninstall 时建议带上，避免旧上下文误操作新的开发槽。dev 操作只允许作用于 `${LINGXI_HOME}/plugins-dev/` 中的 runtime copy，不会写入 `${LINGXI_HOME}/plugins/`，也不会污染正式插件的禁用偏好。
 
 `full-access` dev 插件必须显式传 `allowFullAccess: true`，全局社区插件开关不会自动授权开发态插件。
 
@@ -173,7 +173,7 @@ restricted 插件的 tool/command 代码在主进程运行，有完整的 Node.j
 }
 ```
 
-`minAppVersion`（可选）声明插件运行所需的最低 HanaAgent 版本。如果当前 app 版本低于该值，插件不会加载，状态标记为 `incompatible`。建议所有插件都声明此字段，避免用户在旧版本上遇到不兼容问题。
+`minAppVersion`（可选）声明插件运行所需的最低 LingxiAgent 版本。如果当前 app 版本低于该值，插件不会加载，状态标记为 `incompatible`。建议所有插件都声明此字段，避免用户在旧版本上遇到不兼容问题。
 
 用户需要在设置 → 插件页面开启"允许全权插件"开关。**开关关着时，full-access 插件完全不会加载**（不会部分加载），直到用户主动打开开关。
 
@@ -209,12 +209,12 @@ export async function execute(input, toolCtx) {  // 必须
 
 - 自动加命名空间前缀：`pluginId_name`（如 `my-plugin_search`）
 - restricted 插件的 `toolCtx.bus` 只有 `emit/subscribe/request`，没有 `handle`
-- 新插件可以使用 `@hana/plugin-runtime` 的 `defineTool()` 获得类型和默认参数；当前静态 `tools/*.js` loader 仍读取命名导出。
+- 新插件可以使用 `@lingxi/plugin-runtime` 的 `defineTool()` 获得类型和默认参数；当前静态 `tools/*.js` loader 仍读取命名导出。
 - Agent 可调用工具应声明 `sessionPermission`。纯读取工具用 `readOnly: true`；只写 `ctx.dataDir` 并通过 `stageFile()` 返回 `SessionFile` 的工具用 `kind: "plugin_output"`；会访问外部 provider、网络、平台账号或真实世界副作用的工具用 `kind: "external_side_effect"`，Auto 模式会交给 reviewer。修改用户工作区文件的工具默认保持 reviewer-bound，除非能用 `describeSideEffect(input)` 明确描述更窄的副作用。
 - 定时自动化的 `plugin_action` v0 复用工具入口：`pluginId/actionId` 会映射到 `pluginId_actionId` 工具。cron 只保存 `pluginId`、`actionId` 和 JSON 参数；插件作者写的静态 `tools/*.js` 与动态 `ctx.registerTool()` 工具都会收到 SDK 风格的 `(input, ctx)` 调用；插件缺失、工具缺失或插件被禁用时，任务执行失败并记录运行历史，不会自动降级成 Agent 会话。
 
 ```js
-import { defineTool } from '@hana/plugin-runtime';
+import { defineTool } from '@lingxi/plugin-runtime';
 
 const tool = defineTool({
   name: "search",
@@ -264,7 +264,7 @@ ResourceIO 是用户资源的唯一权限入口。`local-file`、`mount`、`sess
 工具需要交付文件时，使用 `toolCtx.stageFile()` 把本地文件登记成当前 session 的 `SessionFile`，并直接复用它返回的 `mediaItem`：
 
 ```js
-import { createMediaDetails } from "@hana/plugin-runtime";
+import { createMediaDetails } from "@lingxi/plugin-runtime";
 
 const staged = toolCtx.stageFile({
   sessionId: toolCtx.sessionId,
@@ -293,7 +293,7 @@ return {
 
 #### 外部数据访问
 
-插件需要实时比分、天气、行情、外部搜索结果或第三方平台数据时，新代码应通过宿主提供的 `ctx.network.fetch()` 访问外部 HTTP API。iframe 页面只调用本插件自己的 route，例如 `hana.api.fetch("api/live-scores")`；route handler 再调用 `ctx.network.fetch("https://...")`。这样 iframe 认证、外部域名声明、超时、缓存和响应大小限制都在宿主边界内统一处理。
+插件需要实时比分、天气、行情、外部搜索结果或第三方平台数据时，新代码应通过宿主提供的 `ctx.network.fetch()` 访问外部 HTTP API。iframe 页面只调用本插件自己的 route，例如 `lingxi.api.fetch("api/live-scores")`；route handler 再调用 `ctx.network.fetch("https://...")`。这样 iframe 认证、外部域名声明、超时、缓存和响应大小限制都在宿主边界内统一处理。
 
 `ctx.network.fetch()` 需要 manifest 显式声明 `network.fetch`，并列出允许访问的主机：
 
@@ -368,7 +368,7 @@ return {
 原生聊天 surface 示例：
 
 ```js
-import { createChatSurfaceCard, createSession } from "@hana/plugin-runtime";
+import { createChatSurfaceCard, createSession } from "@lingxi/plugin-runtime";
 
 const child = await createSession(ctx, {
   kind: "tavern-run",
@@ -477,10 +477,10 @@ export function register(app, ctx) {
 
 #### 请求级上下文（pluginRequestContext）
 
-每个进入插件 route 的 HTTP 请求都会得到一份独立的请求级上下文。新 route 建议通过 `@hana/plugin-runtime` 的 `getPluginRequestContext(c)` 读取；老写法 `c.get("pluginRequestContext")` 仍兼容。
+每个进入插件 route 的 HTTP 请求都会得到一份独立的请求级上下文。新 route 建议通过 `@lingxi/plugin-runtime` 的 `getPluginRequestContext(c)` 读取；老写法 `c.get("pluginRequestContext")` 仍兼容。
 
 ```js
-import { getPluginRequestContext } from "@hana/plugin-runtime";
+import { getPluginRequestContext } from "@lingxi/plugin-runtime";
 
 app.post("/create-session", async (c) => {
   const reqCtx = getPluginRequestContext(c);
@@ -682,17 +682,17 @@ const value = await ctx.config.get("agentMode", { scope: "per-agent", agentId: "
 - 悬停 tab 时显示插件全名（tooltip）
 - Tab 超过 5 个时自动折叠到 overflow 下拉菜单，用户可拖拽排序
 
-插件页面通过 WebView/iframe 渲染。旧 iframe 是兼容名称，新的插件设计可以把它理解成 WebView：适合展示已有 Web 应用、远程网站或单独 HTML。Hana 原生聊天 surface 不依赖 WebView/iframe。新插件建议使用 `@hana/plugin-sdk` 发送握手和宿主请求：
+插件页面通过 WebView/iframe 渲染。旧 iframe 是兼容名称，新的插件设计可以把它理解成 WebView：适合展示已有 Web 应用、远程网站或单独 HTML。Hana 原生聊天 surface 不依赖 WebView/iframe。新插件建议使用 `@lingxi/plugin-sdk` 发送握手和宿主请求：
 
 ```js
-import { hana } from '@hana/plugin-sdk';
+import { hana } from '@lingxi/plugin-sdk';
 
 hana.ready();
-hana.ui.resize({ height: 320 });
-await hana.toast.show({ message: '已刷新', type: 'success' });
+lingxi.ui.resize({ height: 320 });
+await lingxi.toast.show({ message: '已刷新', type: 'success' });
 await hana.external.open('https://example.com');
 await hana.clipboard.writeText('复制内容');
-await hana.resources.open({ resource: { kind: 'session-file', fileId: 'sf_1' }, mode: 'preview' });
+await lingxi.resources.open({ resource: { kind: 'session-file', fileId: 'sf_1' }, mode: 'preview' });
 ```
 
 底层仍保留 `hana.host.request(type, payload)`，用于未来 capability 或实验能力；稳定能力优先使用 typed helper。
@@ -718,7 +718,7 @@ window.parent.postMessage({ type: 'ready' }, '*');
 
 未声明的敏感能力会返回 `CAPABILITY_DENIED`。未知能力名会在加载时被忽略；`toast.show` 不需要声明。
 
-`hana.resources.*` 只是在 iframe 中向宿主发请求：可以请求打开资源、选择资源、申请访问权限，但不能直接读取或写入文件内容。真正的用户资源读写仍然放在插件服务端 route、tool 或 lifecycle 里，通过 `ctx.resources` 进入 ResourceIO。
+`lingxi.resources.*` 只是在 iframe 中向宿主发请求：可以请求打开资源、选择资源、申请访问权限，但不能直接读取或写入文件内容。真正的用户资源读写仍然放在插件服务端 route、tool 或 lifecycle 里，通过 `ctx.resources` 进入 ResourceIO。
 
 宿主会在 iframe URL 上附加 `hana-theme` 和 `hana-css` 参数，插件可选择引用主题 CSS 以保持视觉一致：
 
@@ -726,25 +726,25 @@ window.parent.postMessage({ type: 'ready' }, '*');
 <link rel="stylesheet" href="${new URLSearchParams(location.search).get('hana-css')}">
 ```
 
-静态前端资源放在插件目录的 `assets/` 下，由 Hana 宿主通过 `/api/plugins/{pluginId}/assets/...` 统一服务。这个模型参考 VS Code Webview 的资源边界：入口 route 通过本地 token 或 `pluginIframeTicket` 打开，成功返回页面后，宿主下发一个只作用于 `/api/plugins/{pluginId}/assets/` 的 HttpOnly 短会话 cookie。Vite split chunks、`React.lazy()`、CSS、字体、图片、JSON、wasm、MP4/WebM/MOV 等浏览器可播放视频请求不需要也不应该携带 `?token` 或 `pluginIframeTicket`。视频资源支持 HTTP Range，`<video>` 可以通过官方 assets 路由播放和 seek。
+静态前端资源放在插件目录的 `assets/` 下，由 Lingxi 宿主通过 `/api/plugins/{pluginId}/assets/...` 统一服务。这个模型参考 VS Code Webview 的资源边界：入口 route 通过本地 token 或 `pluginIframeTicket` 打开，成功返回页面后，宿主下发一个只作用于 `/api/plugins/{pluginId}/assets/` 的 HttpOnly 短会话 cookie。Vite split chunks、`React.lazy()`、CSS、字体、图片、JSON、wasm、MP4/WebM/MOV 等浏览器可播放视频请求不需要也不应该携带 `?token` 或 `pluginIframeTicket`。视频资源支持 HTTP Range，`<video>` 可以通过官方 assets 路由播放和 seek。
 
-页面脚本调用本插件的动态 route API 时，优先使用 `@hana/plugin-sdk` 的 `hana.api.fetch()`。它会从当前 iframe route 推导 pluginId，并自动携带宿主随 iframe URL 下发的 surface session 凭证：
+页面脚本调用本插件的动态 route API 时，优先使用 `@lingxi/plugin-sdk` 的 `lingxi.api.fetch()`。它会从当前 iframe route 推导 pluginId，并自动携带宿主随 iframe URL 下发的 surface session 凭证：
 
 ```js
-import { hana } from '@hana/plugin-sdk';
+import { hana } from '@lingxi/plugin-sdk';
 
-const res = await hana.api.fetch('create-session', {
+const res = await lingxi.api.fetch('create-session', {
   method: 'POST',
 });
 ```
 
-网页转换成插件时，要把同插件的 `fetch('/api/...')` 重写为 `hana.api.fetch(...)`，不要在浏览器代码里硬编码 `/api/plugins/{pluginId}/...`。底层协议是：宿主把 surface session 放在 query 参数 `pluginSurfaceSession`，页面调用本插件 route handler 时以 `X-Hana-Plugin-Surface-Session` 请求头（或同名 query 参数）回传：
+网页转换成插件时，要把同插件的 `fetch('/api/...')` 重写为 `lingxi.api.fetch(...)`，不要在浏览器代码里硬编码 `/api/plugins/{pluginId}/...`。底层协议是：宿主把 surface session 放在 query 参数 `pluginSurfaceSession`，页面调用本插件 route handler 时以 `X-Lingxi-Plugin-Surface-Session` 请求头（或同名 query 参数）回传：
 
 ```js
 const surfaceSession = new URLSearchParams(location.search).get('pluginSurfaceSession');
 const res = await fetch('/api/plugins/my-plugin/create-session', {
   method: 'POST',
-  headers: { 'X-Hana-Plugin-Surface-Session': surfaceSession },
+  headers: { 'X-Lingxi-Plugin-Surface-Session': surfaceSession },
 });
 ```
 
@@ -753,10 +753,10 @@ const res = await fetch('/api/plugins/my-plugin/create-session', {
 浏览器代码优先使用 SDK 生成资源 URL：
 
 ```js
-import { hana } from '@hana/plugin-sdk';
+import { hana } from '@lingxi/plugin-sdk';
 
-const iconUrl = hana.assets.url('images/icon.svg');
-const bgVideoUrl = hana.assets.url('videos/background.mp4');
+const iconUrl = lingxi.assets.url('images/icon.svg');
+const bgVideoUrl = lingxi.assets.url('videos/background.mp4');
 ```
 
 服务端 shell 可以直接引用同一个 host-served 资源路径：
@@ -767,27 +767,27 @@ const bgVideoUrl = hana.assets.url('videos/background.mp4');
 
 `assets/` 是公开静态资源根，只放构建产物和公开素材。不要放源码、密钥、私有配置或运行时数据。宿主默认拒绝路径穿越、隐藏文件、source map 和非 Web 静态扩展；动态数据继续走插件 route API 或 SDK host request。
 
-Agent 新生成或重构插件时，不要为了 CSS、JS、图片、字体、MP4 这类静态资源额外注册 `/api/file`、`/api/video`、`/assets/*` 等 route。已有插件中的静态资源兼容 handler 继续可用；新工作遵循的正式契约是把这些资源放进 `assets/`，用 `hana.assets.url(...)` 或 route shell 中的官方 assets 路径引用。`pluginIframeTicket` 只用于 iframe 文档加载，不要手动拼到静态资源 URL。
+Agent 新生成或重构插件时，不要为了 CSS、JS、图片、字体、MP4 这类静态资源额外注册 `/api/file`、`/api/video`、`/assets/*` 等 route。已有插件中的静态资源兼容 handler 继续可用；新工作遵循的正式契约是把这些资源放进 `assets/`，用 `lingxi.assets.url(...)` 或 route shell 中的官方 assets 路径引用。`pluginIframeTicket` 只用于 iframe 文档加载，不要手动拼到静态资源 URL。
 
-React 插件 UI 建议使用 `@hana/plugin-components`，它提供和 Hana 当前控件接近的 Button、IconButton、TextInput、Textarea、Select、Switch、SettingRow、CardShell、List、EmptyState 等基础组件：
+React 插件 UI 建议使用 `@lingxi/plugin-components`，它提供和 Lingxi 当前控件接近的 Button、IconButton、TextInput、Textarea、Select、Switch、SettingRow、CardShell、List、EmptyState 等基础组件：
 
 ```tsx
-import { Button, CardShell, HanaThemeProvider, SettingRow, Switch } from "@hana/plugin-components";
-import "@hana/plugin-components/styles.css";
+import { Button, CardShell, LingxiThemeProvider, SettingRow, Switch } from "@lingxi/plugin-components";
+import "@lingxi/plugin-components/styles.css";
 
 export function PluginPanel() {
   return (
-    <HanaThemeProvider mode="inherit">
+    <LingxiThemeProvider mode="inherit">
       <CardShell title="同步">
         <SettingRow label="启用" control={<Switch checked label="开启" />} />
         <Button variant="primary">运行</Button>
       </CardShell>
-    </HanaThemeProvider>
+    </LingxiThemeProvider>
   );
 }
 ```
 
-`HanaThemeProvider` 支持三种模式：`inherit` 读取宿主 CSS 变量并走 SDK fallback；`hana` 固定使用某个 Hana 主题 token；`custom` 只覆盖插件显式传入的 token，未传字段继续 fallback。组件只依赖 `hana-plugin-*` class 和 CSS 变量，不导入 renderer 内部组件。
+`LingxiThemeProvider` 支持三种模式：`inherit` 读取宿主 CSS 变量并走 SDK fallback；`lingxi` 固定使用某个 Lingxi 主题 token；`custom` 只覆盖插件显式传入的 token，未传字段继续 fallback。组件只依赖 `hana-plugin-*` class 和 CSS 变量，不导入 renderer 内部组件。
 
 ### Widget（侧栏组件）⚡ full-access
 
@@ -909,10 +909,10 @@ Widget 同样通过 iframe 渲染，需要发送 `ready` 握手信号。
 }
 ```
 
-新插件建议使用 `@hana/plugin-runtime` 的 `definePlugin()`。它会返回兼容当前 PluginManager 的 class：
+新插件建议使用 `@lingxi/plugin-runtime` 的 `definePlugin()`。它会返回兼容当前 PluginManager 的 class：
 
 ```js
-import { definePlugin } from '@hana/plugin-runtime';
+import { definePlugin } from '@lingxi/plugin-runtime';
 
 export default definePlugin({
   async onload(ctx, { register }) {
@@ -926,7 +926,7 @@ export default definePlugin({
 也可以继续使用传统 class 形式：
 
 ```js
-import { LINGXI_BUS_SKIP } from "@hana/plugin-runtime";
+import { LINGXI_BUS_SKIP } from "@lingxi/plugin-runtime";
 
 export default class MyPlugin {
   async onload() {
@@ -961,10 +961,10 @@ export default class MyPlugin {
 
 ## 总线通信（bus.request / bus.handle）
 
-Plugin 间通信通过 EventBus 的请求-响应机制。`bus.handle` 需要 full-access 权限，`bus.request` 所有插件都可以用。`bus.listCapabilities()` / `bus.getCapability(type)` 可以读取当前稳定能力目录，目录记录能力名、输入输出 schema、权限要求、错误码、稳定性和当前是否有 handler 可用。新插件建议用 `@hana/plugin-runtime` 的 `defineBusHandler()`、`requestBus()` 和 `LINGXI_BUS_SKIP`，这样 handler 类型、请求参数和链式跳过语义都来自 SDK，而不是手写约定。
+Plugin 间通信通过 EventBus 的请求-响应机制。`bus.handle` 需要 full-access 权限，`bus.request` 所有插件都可以用。`bus.listCapabilities()` / `bus.getCapability(type)` 可以读取当前稳定能力目录，目录记录能力名、输入输出 schema、权限要求、错误码、稳定性和当前是否有 handler 可用。新插件建议用 `@lingxi/plugin-runtime` 的 `defineBusHandler()`、`requestBus()` 和 `LINGXI_BUS_SKIP`，这样 handler 类型、请求参数和链式跳过语义都来自 SDK，而不是手写约定。
 
 ```js
-import { defineBusHandler, LINGXI_BUS_SKIP, requestBus } from "@hana/plugin-runtime";
+import { defineBusHandler, LINGXI_BUS_SKIP, requestBus } from "@lingxi/plugin-runtime";
 
 // Plugin A（full-access）: 注册能力
 const bridgeSend = defineBusHandler({
@@ -1035,11 +1035,11 @@ this.register(
 
 ### 内置 Session / Agent / 模型 / 媒体能力
 
-插件可以直接使用 `@hana/plugin-runtime` 的 typed helpers；底层对应 EventBus 能力如下：
+插件可以直接使用 `@lingxi/plugin-runtime` 的 typed helpers；底层对应 EventBus 能力如下：
 
 | 能力 | 说明 |
 |------|------|
-| `session:create` | 创建不切换主界面焦点的普通 Hana session，可指定 `agentId`、`cwd`、`memoryEnabled`、`workspaceFolders`、`thinkingLevel`、`permissionMode`、`ownerPluginId`、`kind`、`visibility` |
+| `session:create` | 创建不切换主界面焦点的普通 Lingxi session，可指定 `agentId`、`cwd`、`memoryEnabled`、`workspaceFolders`、`thinkingLevel`、`permissionMode`、`ownerPluginId`、`kind`、`visibility` |
 | `session:get` / `session:list` | 读取 session 投影；插件私有 session 默认不进主列表，插件可按 `ownerPluginId` 查自己的 session |
 | `session:update` | 更新标题、置顶、项目、思考等级、权限模式、插件归属和可见性 |
 | `session:send` | 向指定 session 发送消息；支持 `context.system`、`context.beforeUser`、`context.afterUser` |
@@ -1051,7 +1051,7 @@ this.register(
 | `media:generate-image` | 通过内置媒体任务管线提交生图任务，默认完成后以 `SessionFile` 交付；`delivery.mode="response"` 时只返回任务/文件结果 |
 | `media:generate` / `media:generate-video` / `media:transcribe-audio` | 通过原生 Media Manager 提交通用媒体任务、视频生成任务或音频转录任务 |
 
-插件后端优先使用 `@hana/plugin-runtime` helpers。插件页面或插件 route handler 如果已经有宿主 HTTP 凭证，也可以使用原生 façade：`POST /api/media/generate`、`POST /api/media/image/generate`、`POST /api/media/video/generate`、`POST /api/media/asr/transcribe`。这些入口需要 chat scope，图片/视频必须传 `prompt`；默认 `delivery.mode="session"` 时还必须传 `sessionId` 或 `sessionRef`，完成后登记 `SessionFile`。如果插件只想拿生成产物，传 `delivery: { mode: "response" }` 可省略 session 身份，完成后轮询 `GET /api/media/tasks/:taskId`，再用 `task.files[]` 调 `GET /api/media/generated/:filename` 读取文件。ASR 必须传 `sessionId` 或旧 `sessionPath` 加 `fileId`。图片参考图只接受 `{ kind: "session_file", fileId }` 这类 SessionFile 引用，底层仍进入同一个 Media Manager 任务管线。图片 / 视频模型必须在当前 mode 上声明参考图能力，例如 `modes[].inputLimits.referenceImages = { min: 0, max: 0 }` 表示纯文生图，`{ min: 1, max: 1 }` 表示单参考图模式。任务管线会按所选 mode 在入队前拒绝不足量或超量参考图。
+插件后端优先使用 `@lingxi/plugin-runtime` helpers。插件页面或插件 route handler 如果已经有宿主 HTTP 凭证，也可以使用原生 façade：`POST /api/media/generate`、`POST /api/media/image/generate`、`POST /api/media/video/generate`、`POST /api/media/asr/transcribe`。这些入口需要 chat scope，图片/视频必须传 `prompt`；默认 `delivery.mode="session"` 时还必须传 `sessionId` 或 `sessionRef`，完成后登记 `SessionFile`。如果插件只想拿生成产物，传 `delivery: { mode: "response" }` 可省略 session 身份，完成后轮询 `GET /api/media/tasks/:taskId`，再用 `task.files[]` 调 `GET /api/media/generated/:filename` 读取文件。ASR 必须传 `sessionId` 或旧 `sessionPath` 加 `fileId`。图片参考图只接受 `{ kind: "session_file", fileId }` 这类 SessionFile 引用，底层仍进入同一个 Media Manager 任务管线。图片 / 视频模型必须在当前 mode 上声明参考图能力，例如 `modes[].inputLimits.referenceImages = { min: 0, max: 0 }` 表示纯文生图，`{ min: 1, max: 1 }` 表示单参考图模式。任务管线会按所选 mode 在入队前拒绝不足量或超量参考图。
 
 `session:send.context` 只注入到当轮 provider 请求，不会改写可见用户消息，也不会写入用户消息文本。插件可以在自己的 RAG、世界观、mood、角色状态系统里生成这些片段，然后在发送时附带：
 
@@ -1065,7 +1065,7 @@ import {
   sampleText,
   sendSessionMessage,
   createChatSurfaceCard,
-} from "@hana/plugin-runtime";
+} from "@lingxi/plugin-runtime";
 
 const agent = await createAgent(ctx, {
   name: "Tavern Character",
@@ -1140,7 +1140,7 @@ const transcription = await transcribeAudio(ctx, {
 ```
 
 ```js
-import { listUsageEntries, subscribeUsageEvents } from "@hana/plugin-runtime";
+import { listUsageEntries, subscribeUsageEvents } from "@lingxi/plugin-runtime";
 
 const usage = await listUsageEntries(this.ctx, {
   since: "2026-05-01T00:00:00.000Z",
@@ -1333,7 +1333,7 @@ https://raw.githubusercontent.com/liliMozi/OH-Plugins/main/marketplace.json
 
 ## 并发设计
 
-Hana 支持多 session / 多 agent 并行运行。插件开发时需注意：
+Lingxi 支持多 session / 多 agent 并行运行。插件开发时需注意：
 
 - 所有针对已有 session 的 EventBus 事件（`session:get`、`session:update`、`session:send`、`session:abort`、`session:history` 等）必须携带 `sessionId` 或 `sessionRef`，用于标识目标 session；`sessionPath` 只保留为旧插件兼容输入
 - 工具（tool）通过 `toolCtx.sessionId` / `toolCtx.sessionRef` 获取当前 session 身份；`toolCtx.sessionPath` 是当前 locator，不要把它当持久身份

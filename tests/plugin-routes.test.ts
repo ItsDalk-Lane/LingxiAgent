@@ -512,7 +512,7 @@ describe("plugin management API", () => {
     });
 
     it("issues route-bound iframe tickets and strips them before plugin proxying", async () => {
-      const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "hana-plugin-iframe-ticket-"));
+      const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "lingxi-plugin-iframe-ticket-"));
       try {
         const engine = mockEngine({ hanakoHome: tmpDir });
         const pluginApp = new Hono();
@@ -558,13 +558,13 @@ describe("plugin management API", () => {
       const pluginApp = new Hono();
       pluginApp.get("/identity", (c) => c.json({
         agentId: (c.env as { pluginRouteRequest?: { agentId?: string | null } })?.pluginRouteRequest?.agentId || null,
-        rawHeader: c.req.header("X-Hana-Agent-Id") || null,
+        rawHeader: c.req.header("X-Lingxi-Agent-Id") || null,
       }));
       engine.pluginManager.routeRegistry.set("demo", pluginApp);
       const app = createApp(engine);
 
       const res = await app.request("/api/plugins/demo/identity?agentId=butter", {
-        headers: { "X-Hana-Agent-Id": "attacker" },
+        headers: { "X-Lingxi-Agent-Id": "attacker" },
       });
 
       expect(res.status).toBe(200);
@@ -603,7 +603,7 @@ describe("plugin management API", () => {
     });
 
     it("issues a path-scoped asset session from iframe pages and serves static plugin assets", async () => {
-      const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "hana-plugin-assets-"));
+      const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "lingxi-plugin-assets-"));
       try {
         const pluginDir = path.join(tmpDir, "plugins", "demo");
         fs.mkdirSync(path.join(pluginDir, "assets", "dist"), { recursive: true });
@@ -654,7 +654,7 @@ describe("plugin management API", () => {
     });
 
     it("serves plugin video assets with byte ranges through the official assets route", async () => {
-      const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "hana-plugin-video-assets-"));
+      const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "lingxi-plugin-video-assets-"));
       try {
         const pluginDir = path.join(tmpDir, "plugins", "demo");
         fs.mkdirSync(path.join(pluginDir, "assets", "videos"), { recursive: true });
@@ -712,7 +712,7 @@ describe("plugin management API", () => {
     });
 
     it("keeps asset sessions confined to static files under the plugin assets root", async () => {
-      const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "hana-plugin-assets-confined-"));
+      const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "lingxi-plugin-assets-confined-"));
       try {
         const pluginDir = path.join(tmpDir, "plugins", "demo");
         fs.mkdirSync(path.join(pluginDir, "assets", "dist"), { recursive: true });
@@ -765,7 +765,7 @@ describe("plugin management API", () => {
     });
 
     it("does not let a plugin asset session authorize plugin route apps", async () => {
-      const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "hana-plugin-assets-api-"));
+      const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "lingxi-plugin-assets-api-"));
       try {
         const pluginDir = path.join(tmpDir, "plugins", "demo");
         fs.mkdirSync(path.join(pluginDir, "assets"), { recursive: true });
@@ -808,7 +808,7 @@ describe("plugin management API", () => {
     });
 
     it("rejects iframe ticket issuance for host-owned plugin management routes", async () => {
-      const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "hana-plugin-iframe-ticket-host-"));
+      const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "lingxi-plugin-iframe-ticket-host-"));
       try {
         const engine = mockEngine({ hanakoHome: tmpDir });
         engine.pluginManager.routeRegistry.set("demo", new Hono());
@@ -831,7 +831,7 @@ describe("plugin management API", () => {
     });
 
     it("rejects garbage iframe tickets before host-owned config routes run", async () => {
-      const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "hana-plugin-iframe-ticket-bypass-"));
+      const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "lingxi-plugin-iframe-ticket-bypass-"));
       try {
         const engine = mockEngine({
           hanakoHome: tmpDir,
@@ -1324,7 +1324,7 @@ describe("plugin management API", () => {
     });
 
     it("restores the previous plugin directory when replacement install fails", async () => {
-      const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "hana-plugin-rollback-"));
+      const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "lingxi-plugin-rollback-"));
       try {
         const userPluginsDir = path.join(tmp, "plugins");
         const existingDir = path.join(userPluginsDir, "demo");
@@ -1683,7 +1683,7 @@ describe("plugin management API", () => {
     });
 
     it("registers a session-scoped plugin install source before installing", async () => {
-      const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "hana-plugin-install-"));
+      const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "lingxi-plugin-install-"));
       try {
         const sourceDir = path.join(tmpDir, "plugin-src");
         const userPluginsDir = path.join(tmpDir, "plugins");
@@ -1757,7 +1757,7 @@ describe("plugin management API", () => {
     });
 
     it("installs a community plugin into plugins dir when a same-id dev plugin is loaded", async () => {
-      const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "hana-plugin-install-dev-shadow-"));
+      const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "lingxi-plugin-install-dev-shadow-"));
       try {
         const sourceDir = path.join(tmpDir, "source-demo");
         const userPluginsDir = path.join(tmpDir, "plugins");
@@ -2175,7 +2175,7 @@ export default function register(app) {
 
 describe("plugin route request-level principal and capability context", () => {
   it("does not derive pluginRequestContext.agentId from a raw header fallback", async () => {
-    const tmpHome = fs.mkdtempSync(path.join(os.tmpdir(), "hana-plugin-agent-context-"));
+    const tmpHome = fs.mkdtempSync(path.join(os.tmpdir(), "lingxi-plugin-agent-context-"));
     try {
       const { pm } = await loadRealPluginWithRoutes({
         tmpHome,
@@ -2191,13 +2191,13 @@ describe("plugin route request-level principal and capability context", () => {
       const app = pm.getRouteApp("media-board");
 
       const spoofed = await app.fetch(new Request("http://hana.local/identity", {
-        headers: { "X-Hana-Agent-Id": "attacker" },
+        headers: { "X-Lingxi-Agent-Id": "attacker" },
       }));
       expect(await spoofed.json()).toEqual({ agentId: null });
 
       const explicit = await app.fetch(
         new Request("http://hana.local/identity", {
-          headers: { "X-Hana-Agent-Id": "attacker" },
+          headers: { "X-Lingxi-Agent-Id": "attacker" },
         }),
         { pluginRouteRequest: { pluginId: "media-board", agentId: "hana", principal: null } },
       );
@@ -2208,7 +2208,7 @@ describe("plugin route request-level principal and capability context", () => {
   });
 
   it("issues a plugin surface session alongside the iframe ticket", async () => {
-    const tmpHome = fs.mkdtempSync(path.join(os.tmpdir(), "hana-plugin-surface-issue-"));
+    const tmpHome = fs.mkdtempSync(path.join(os.tmpdir(), "lingxi-plugin-surface-issue-"));
     try {
       const engine = mockEngine({ hanakoHome: tmpHome });
       const pluginApp = new Hono();
@@ -2238,7 +2238,7 @@ describe("plugin route request-level principal and capability context", () => {
   });
 
   it("lets a full-access plugin surface call session:create through its own route handler", async () => {
-    const tmpHome = fs.mkdtempSync(path.join(os.tmpdir(), "hana-plugin-surface-e2e-"));
+    const tmpHome = fs.mkdtempSync(path.join(os.tmpdir(), "lingxi-plugin-surface-e2e-"));
     try {
       const { pm, bus } = await loadRealPluginWithRoutes({
         tmpHome,
@@ -2294,7 +2294,7 @@ describe("plugin route request-level principal and capability context", () => {
   });
 
   it("denies credential-less plugin route calls and cross-plugin surface sessions", async () => {
-    const tmpHome = fs.mkdtempSync(path.join(os.tmpdir(), "hana-plugin-surface-deny-"));
+    const tmpHome = fs.mkdtempSync(path.join(os.tmpdir(), "lingxi-plugin-surface-deny-"));
     try {
       const { pm, bus } = await loadRealPluginWithRoutes({
         tmpHome,
@@ -2338,7 +2338,7 @@ describe("plugin route request-level principal and capability context", () => {
   });
 
   it("reports undeclared sensitive capabilities with a diagnosable 403 instead of a generic error", async () => {
-    const tmpHome = fs.mkdtempSync(path.join(os.tmpdir(), "hana-plugin-surface-undeclared-"));
+    const tmpHome = fs.mkdtempSync(path.join(os.tmpdir(), "lingxi-plugin-surface-undeclared-"));
     try {
       const { pm, bus } = await loadRealPluginWithRoutes({
         tmpHome,
@@ -2384,7 +2384,7 @@ describe("plugin route request-level principal and capability context", () => {
   });
 
   it("treats an explicitly empty manifest capability declaration as strict denial, not legacy", async () => {
-    const tmpHome = fs.mkdtempSync(path.join(os.tmpdir(), "hana-plugin-surface-empty-decl-"));
+    const tmpHome = fs.mkdtempSync(path.join(os.tmpdir(), "lingxi-plugin-surface-empty-decl-"));
     try {
       // 作者显式声明空列表 = "我不需要任何敏感 capability"，必须严格拒绝；
       // 只有完全没写声明字段的老 manifest 才算 legacy。
@@ -2430,7 +2430,7 @@ describe("plugin route request-level principal and capability context", () => {
   });
 
   it("keeps manifests without any capability declaration working end to end (legacy)", async () => {
-    const tmpHome = fs.mkdtempSync(path.join(os.tmpdir(), "hana-plugin-surface-legacy-"));
+    const tmpHome = fs.mkdtempSync(path.join(os.tmpdir(), "lingxi-plugin-surface-legacy-"));
     try {
       const { pm, bus } = await loadRealPluginWithRoutes({
         tmpHome,
@@ -2477,7 +2477,7 @@ describe("plugin route request-level principal and capability context", () => {
   });
 
   it("rejects an invalid bearer credential even when a valid surface session token is attached", async () => {
-    const tmpHome = fs.mkdtempSync(path.join(os.tmpdir(), "hana-plugin-surface-mixed-cred-"));
+    const tmpHome = fs.mkdtempSync(path.join(os.tmpdir(), "lingxi-plugin-surface-mixed-cred-"));
     try {
       // surface session 后备只在主凭证缺席（missing_credential）时运行：
       // 无效 / 已吊销 bearer 必须按 invalid_credential 原样拒绝，不得被同
@@ -2524,7 +2524,7 @@ describe("plugin route request-level principal and capability context", () => {
   });
 
   it("does not let surface-session requests mint or renew plugin asset session cookies", async () => {
-    const tmpHome = fs.mkdtempSync(path.join(os.tmpdir(), "hana-plugin-surface-renew-"));
+    const tmpHome = fs.mkdtempSync(path.join(os.tmpdir(), "lingxi-plugin-surface-renew-"));
     try {
       const { pm } = await loadRealPluginWithRoutes({
         tmpHome,

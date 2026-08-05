@@ -2,7 +2,7 @@ import type { AssistantMessageEventStream } from "@earendil-works/pi-ai";
 import { createAssistantMessageEventStream } from "@earendil-works/pi-ai";
 import { isToolProtocolFragment } from "../tool-protocol-sanitizer.ts";
 
-const STREAM_GUARD_FLAG = Symbol.for("hana.piSdk.streamGuardInstalled");
+const STREAM_GUARD_FLAG = Symbol.for("lingxi.piSdk.streamGuardInstalled");
 
 export function installAssistantStreamGuard(session) {
   const agent = session?.agent;

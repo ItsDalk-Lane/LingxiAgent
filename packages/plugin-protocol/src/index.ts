@@ -1,4 +1,4 @@
-export const PLUGIN_UI_PROTOCOL = 'hana.plugin.ui' as const;
+export const PLUGIN_UI_PROTOCOL = 'lingxi.plugin.ui' as const;
 export const PLUGIN_UI_PROTOCOL_VERSION = 1 as const;
 
 /**
@@ -7,7 +7,7 @@ export const PLUGIN_UI_PROTOCOL_VERSION = 1 as const;
  * route handler 时通过 `PLUGIN_SURFACE_SESSION_HEADER`（或同名 query）回传。
  * 服务端、桌面宿主与 iframe SDK 共用这一份定义。
  */
-export const PLUGIN_SURFACE_SESSION_HEADER = 'X-Hana-Plugin-Surface-Session' as const;
+export const PLUGIN_SURFACE_SESSION_HEADER = 'X-Lingxi-Plugin-Surface-Session' as const;
 export const PLUGIN_SURFACE_SESSION_QUERY = 'pluginSurfaceSession' as const;
 
 export const PLUGIN_UI_ERROR_CODE = {

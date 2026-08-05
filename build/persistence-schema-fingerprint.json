@@ -668,7 +668,7 @@
     ],
     "version": 3
   },
-  "payloadFingerprint": "sha256:102d48b0cafbcb5d45e81430631d7be47fc34a2c7d38ec46e195f4fe6e1e55d1",
+  "payloadFingerprint": "sha256:46899b345f4defb07fb282a50b1d4a53eb6fd55d15f2de76a768480c4551d7eb",
   "registry": [
     {
       "affectedByEpochMigration": true,
@@ -3118,8 +3118,8 @@
   ],
   "review": {
     "classification": "compatible",
-    "compatibilityReason": "SDK + Swift identifiers renamed; data format unchanged",
-    "payloadFingerprint": "sha256:102d48b0cafbcb5d45e81430631d7be47fc34a2c7d38ec46e195f4fe6e1e55d1"
+    "compatibilityReason": "protocol strings + storage keys + scaffold; data format unchanged",
+    "payloadFingerprint": "sha256:46899b345f4defb07fb282a50b1d4a53eb6fd55d15f2de76a768480c4551d7eb"
   },
   "schemas": [
     {
@@ -3449,7 +3449,7 @@
       "contract": "verified plugin release ZIP naming by pluginId/version and expected sha256",
       "kind": "directory-contract",
       "module": "server/routes/plugins.ts",
-      "sourceHash": "sha256:3f736cb8199f9dac0ee412feb2612bbd163343399c1f43fac06f6c0a2d4688e4",
+      "sourceHash": "sha256:801157b99bb1f4a1f80ca77f0f0a65bd325b06c74cc7654b6404605545f5b30a",
       "storeId": "plugin-download-cache"
     },
     {

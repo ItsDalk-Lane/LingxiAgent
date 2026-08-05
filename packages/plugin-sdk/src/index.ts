@@ -131,7 +131,7 @@ function defaultIdFactory(): string {
     return crypto.randomUUID();
   }
   fallbackIdSeq += 1;
-  return `hana-plugin-${Date.now()}-${fallbackIdSeq}`;
+  return `lingxi-plugin-${Date.now()}-${fallbackIdSeq}`;
 }
 
 function getBrowserWindow(): Window {
@@ -153,7 +153,7 @@ function safeOriginFromUrl(value: string | null | undefined): string | null {
 function resolveTargetOrigin(targetWindow: Window, explicit?: string): string {
   if (explicit) return explicit;
 
-  const hostOrigin = new URLSearchParams(targetWindow.location.search).get('hana-host-origin');
+  const hostOrigin = new URLSearchParams(targetWindow.location.search).get('lingxi-host-origin');
   if (hostOrigin) return hostOrigin;
 
   return safeOriginFromUrl(targetWindow.document.referrer) ?? '*';
@@ -162,8 +162,8 @@ function resolveTargetOrigin(targetWindow: Window, explicit?: string): string {
 function readInitialTheme(targetWindow: Window): LingxiPluginThemeSnapshot {
   const params = new URLSearchParams(targetWindow.location.search);
   return {
-    theme: params.get('hana-theme') ?? undefined,
-    cssUrl: params.get('hana-css') ?? undefined,
+    theme: params.get('lingxi-theme') ?? undefined,
+    cssUrl: params.get('lingxi-css') ?? undefined,
   };
 }
 
@@ -320,7 +320,7 @@ export function createLingxiPluginSdk(options: LingxiPluginSdkOptions = {}): Lin
     if (!parsed.ok) return;
 
     const message = parsed.value;
-    if (message.kind !== 'event' || message.type !== 'hana.theme.changed') return;
+    if (message.kind !== 'event' || message.type !== 'lingxi.theme.changed') return;
     if (typeof message.payload !== 'object' || message.payload === null) return;
 
     const payload = message.payload as Record<string, unknown>;
@@ -387,7 +387,7 @@ export function createLingxiPluginSdk(options: LingxiPluginSdkOptions = {}): Lin
 
   return {
     ready(payload?: unknown) {
-      postEvent('hana.ready', payload);
+      postEvent('lingxi.ready', payload);
     },
     assets: {
       url(assetPath: string) {

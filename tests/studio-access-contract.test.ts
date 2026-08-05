@@ -51,7 +51,7 @@ describe("shared trusted studio access contract", () => {
 
   it("rejects local connections that drift away from loopback transport", () => {
     expect(() => validateStudioConnectionTrust(localConnection({
-      baseUrl: "https://hana.example",
+      baseUrl: "https://lingxi.example",
     }))).toThrow("local connection must use loopback baseUrl and wsUrl");
   });
 
@@ -62,8 +62,8 @@ describe("shared trusted studio access contract", () => {
       serverId: "server_relay",
       userId: "user_relay",
       studioId: "studio_relay",
-      baseUrl: "https://relay.hana.example",
-      wsUrl: "wss://relay.hana.example",
+      baseUrl: "https://relay.lingxi.example",
+      wsUrl: "wss://relay.lingxi.example",
       token: "relay-session-token",
       trustState: "tunnel",
       credentialKind: "user_session",

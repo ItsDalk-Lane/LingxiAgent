@@ -13,7 +13,7 @@ describe.skipIf(process.platform === "win32")("plugin config storage", () => {
   // credentials, so it is written under the same contract as the other
   // credential stores rather than with the generic writer.
   it("keeps the configuration file readable only by its owner", () => {
-    const dir = fs.mkdtempSync(path.join(os.tmpdir(), "hana-plugin-config-"));
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), "lingxi-plugin-config-"));
     try {
       const schema = normalizePluginConfigSchema("demo", {
         properties: { token: { type: "string", sensitive: true } },
@@ -36,7 +36,7 @@ describe.skipIf(process.platform === "win32")("plugin config storage", () => {
 
 describe("plugin config schema", () => {
   it("normalizes fields and materializes global defaults", () => {
-    const dir = fs.mkdtempSync(path.join(os.tmpdir(), "hana-plugin-config-"));
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), "lingxi-plugin-config-"));
     try {
       const schema = normalizePluginConfigSchema("demo", {
         properties: {
@@ -55,7 +55,7 @@ describe("plugin config schema", () => {
   });
 
   it("rejects invalid type writes with field errors", () => {
-    const dir = fs.mkdtempSync(path.join(os.tmpdir(), "hana-plugin-config-"));
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), "lingxi-plugin-config-"));
     try {
       const schema = normalizePluginConfigSchema("demo", {
         properties: {
@@ -76,7 +76,7 @@ describe("plugin config schema", () => {
   });
 
   it("keeps scoped values in their own keyed containers", () => {
-    const dir = fs.mkdtempSync(path.join(os.tmpdir(), "hana-plugin-config-"));
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), "lingxi-plugin-config-"));
     try {
       const schema = normalizePluginConfigSchema("demo", {
         properties: {
@@ -99,7 +99,7 @@ describe("plugin config schema", () => {
   });
 
   it("uses sessionId for per-session config while reading legacy sessionPath buckets", () => {
-    const dir = fs.mkdtempSync(path.join(os.tmpdir(), "hana-plugin-config-"));
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), "lingxi-plugin-config-"));
     try {
       const schema = normalizePluginConfigSchema("demo", {
         properties: {
@@ -145,7 +145,7 @@ describe("plugin config schema", () => {
   });
 
   it("forks raw per-session values, including sensitive fields, into an independent bucket", () => {
-    const dir = fs.mkdtempSync(path.join(os.tmpdir(), "hana-plugin-config-fork-"));
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), "lingxi-plugin-config-fork-"));
     try {
       const schema = normalizePluginConfigSchema("demo", {
         properties: {
@@ -185,7 +185,7 @@ describe("plugin config schema", () => {
   });
 
   it("forks a legacy sessionPath bucket into the child sessionId without changing the source", () => {
-    const dir = fs.mkdtempSync(path.join(os.tmpdir(), "hana-plugin-config-fork-legacy-"));
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), "lingxi-plugin-config-fork-legacy-"));
     try {
       fs.mkdirSync(dir, { recursive: true });
       fs.writeFileSync(path.join(dir, "config.json"), JSON.stringify({
@@ -214,7 +214,7 @@ describe("plugin config schema", () => {
   });
 
   it("reads old flat config files as global config", () => {
-    const dir = fs.mkdtempSync(path.join(os.tmpdir(), "hana-plugin-config-"));
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), "lingxi-plugin-config-"));
     try {
       fs.writeFileSync(path.join(dir, "config.json"), JSON.stringify({ oldKey: "old" }), "utf-8");
       const store = createPluginConfigStore({
@@ -229,7 +229,7 @@ describe("plugin config schema", () => {
   });
 
   it("removes optional keys when a patch value is undefined", () => {
-    const dir = fs.mkdtempSync(path.join(os.tmpdir(), "hana-plugin-config-"));
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), "lingxi-plugin-config-"));
     try {
       const schema = normalizePluginConfigSchema("image-gen", {
         properties: {

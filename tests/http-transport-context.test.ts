@@ -18,7 +18,7 @@ describe("HTTP transport context", () => {
     const { inferHttpConnectionKind } = await import("../server/http/transport-context.ts");
 
     expect(inferHttpConnectionKind({
-      hostHeader: "hana.example.com",
+      hostHeader: "lingxi.example.com",
       networkMode: "loopback",
     })).toEqual({
       connectionKind: null,
@@ -43,7 +43,7 @@ describe("HTTP transport context", () => {
     })).toEqual({ connectionKind: "lan", reason: null });
 
     expect(inferHttpConnectionKind({
-      hostHeader: "hana.example.com",
+      hostHeader: "lingxi.example.com",
       networkMode: "custom_remote",
     })).toEqual({ connectionKind: "custom_remote", reason: null });
   });

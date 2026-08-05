@@ -223,7 +223,7 @@ describe('plugin runtime SDK', () => {
   });
 
   it('exports the shared EventBus SKIP symbol for chained handlers', () => {
-    expect(HANA_BUS_SKIP).toBe(Symbol.for('hana.event-bus.skip'));
+    expect(HANA_BUS_SKIP).toBe(Symbol.for('lingxi.event-bus.skip'));
   });
 
   it('types plugin network fetch options without host internals', async () => {

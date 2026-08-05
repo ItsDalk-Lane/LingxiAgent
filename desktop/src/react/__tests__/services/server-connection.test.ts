@@ -110,8 +110,8 @@ describe('server connection helpers', () => {
       connectionId: 'custom:remote',
       kind: 'custom_remote' as const,
       label: 'Remote Studio',
-      baseUrl: 'https://hana.example',
-      wsUrl: 'wss://hana.example',
+      baseUrl: 'https://lingxi.example',
+      wsUrl: 'wss://lingxi.example',
       token: 'remote-token',
       trustState: 'tunnel' as const,
       credentialKind: 'device_credential' as const,
@@ -168,16 +168,16 @@ describe('server connection helpers', () => {
       connectionId: 'custom:remote',
       kind: 'custom_remote' as const,
       label: 'Remote Studio',
-      baseUrl: 'https://hana.example',
-      wsUrl: 'wss://hana.example',
+      baseUrl: 'https://lingxi.example',
+      wsUrl: 'wss://lingxi.example',
       token: 'remote-token',
       trustState: 'tunnel' as const,
       credentialKind: 'device_credential' as const,
     };
 
     expect(buildConnectionUrl(remote, '/api/resources/res_1/content', { includeTokenQuery: true }))
-      .toBe('https://hana.example/api/resources/res_1/content');
-    expect(buildConnectionWsUrl(remote, '/ws')).toBe('wss://hana.example/ws');
+      .toBe('https://lingxi.example/api/resources/res_1/content');
+    expect(buildConnectionWsUrl(remote, '/ws')).toBe('wss://lingxi.example/ws');
   });
 
   it('identifies the local owner connection by the same contract as server route security', () => {

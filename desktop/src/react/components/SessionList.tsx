@@ -44,9 +44,9 @@ import { FolderIcon } from './shared/FolderIcon';
 import styles from './SessionList.module.css';
 
 const SESSION_VIEW_MODE_KEY = 'hana-session-sidebar-view-mode';
-const SESSION_DRAG_MIME = 'application/x-hana-session-path';
-const PROJECT_DRAG_MIME = 'application/x-hana-project-id';
-const FOLDER_DRAG_MIME = 'application/x-hana-project-folder-id';
+const SESSION_DRAG_MIME = 'application/x-lingxi-session-path';
+const PROJECT_DRAG_MIME = 'application/x-lingxi-project-id';
+const FOLDER_DRAG_MIME = 'application/x-lingxi-project-folder-id';
 const PROJECT_SESSION_PREVIEW_LIMIT = 5;
 
 type SidebarDragState =

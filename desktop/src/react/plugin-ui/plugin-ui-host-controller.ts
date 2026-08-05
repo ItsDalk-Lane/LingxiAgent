@@ -106,7 +106,7 @@ export function parsePluginIframeHostMessage(data: unknown): PluginIframeHostMes
   if (message.kind === 'request') return { kind: 'request', message };
   if (message.kind !== 'event') return null;
 
-  if (message.type === 'hana.ready') return { kind: 'ready' };
+  if (message.type === 'lingxi.ready') return { kind: 'ready' };
 
   if (message.type === PLUGIN_UI_CAPABILITY.UI_RESIZE && isObject(message.payload)) {
     const width = numberField(message.payload.width);

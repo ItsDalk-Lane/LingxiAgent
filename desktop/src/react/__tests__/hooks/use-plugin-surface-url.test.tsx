@@ -20,8 +20,8 @@ const remoteConnection = {
   connectionId: 'lan:node_lan:studio_lan',
   kind: 'lan' as const,
   label: 'LAN Studio',
-  baseUrl: 'https://hana.example',
-  wsUrl: 'wss://hana.example',
+  baseUrl: 'https://lingxi.example',
+  wsUrl: 'wss://lingxi.example',
   token: 'remote-token',
   trustState: 'lan' as const,
   credentialKind: 'device_credential' as const,
@@ -101,7 +101,7 @@ describe('usePluginSurfaceUrl', () => {
     expect(url.searchParams.get('pluginSurfaceSession')).toBe('surface-session-1');
     expect(url.searchParams.get('pluginIframeTicket')).toBeNull();
     expect(url.searchParams.get('agentId')).toBe('butter');
-    expect(url.searchParams.get('hana-css')).toBe(
+    expect(url.searchParams.get('lingxi-css')).toBe(
       `http://127.0.0.1:3210/api/plugins/theme.css?theme=${DEFAULT_THEME}&token=local-token`,
     );
   });
@@ -121,21 +121,21 @@ describe('usePluginSurfaceUrl', () => {
     render(<Harness routeUrl="/api/plugins/demo/page?view=compact" />);
 
     await waitFor(() => expect(screen.getByTestId('status').textContent).toBe('ready'));
-    expect(fetchMock).toHaveBeenCalledWith('https://hana.example/api/plugins/iframe-ticket', expect.objectContaining({
+    expect(fetchMock).toHaveBeenCalledWith('https://lingxi.example/api/plugins/iframe-ticket', expect.objectContaining({
       method: 'POST',
       credentials: 'include',
       headers: expect.objectContaining({ Authorization: 'Bearer remote-token' }),
       body: JSON.stringify({ routeUrl: '/api/plugins/demo/page?view=compact' }),
     }));
     const url = new URL(screen.getByTestId('src').textContent || '');
-    expect(url.origin).toBe('https://hana.example');
+    expect(url.origin).toBe('https://lingxi.example');
     expect(url.searchParams.get('pluginIframeTicket')).toBe('ticket-1');
     expect(url.searchParams.get('pluginSurfaceSession')).toBe('surface-session-1');
     expect(url.searchParams.get('view')).toBe('compact');
     expect(url.searchParams.get('token')).toBeNull();
     expect(url.toString()).not.toContain('remote-token');
-    expect(url.searchParams.get('hana-css')).toBe(
-      `https://hana.example/api/plugins/theme.css?theme=${DEFAULT_THEME}`,
+    expect(url.searchParams.get('lingxi-css')).toBe(
+      `https://lingxi.example/api/plugins/theme.css?theme=${DEFAULT_THEME}`,
     );
   });
 

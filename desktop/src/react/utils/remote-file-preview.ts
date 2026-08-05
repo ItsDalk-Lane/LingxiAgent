@@ -109,8 +109,8 @@ interface PreviewContentSnapshot {
 }
 
 function fileVersionFromContentHeaders(headers: Headers): FileVersion | undefined {
-  const mtimeMs = Number(headers.get('X-Hana-File-MtimeMs'));
-  const size = Number(headers.get('X-Hana-File-Size'));
+  const mtimeMs = Number(headers.get('X-Lingxi-File-MtimeMs'));
+  const size = Number(headers.get('X-Lingxi-File-Size'));
   if (!Number.isFinite(mtimeMs) || !Number.isFinite(size)) return undefined;
   return { mtimeMs, size };
 }

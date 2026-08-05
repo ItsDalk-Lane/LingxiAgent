@@ -795,7 +795,7 @@ describe("session-compactor", () => {
     let boundaryPlaceholder = "";
     const transformContext = vi.fn(async (messages) => {
       boundaryPlaceholder = messages.at(-1).content[0].text.match(
-        /<hana\.compaction\.boundary:[^>]+>/,
+        /<lingxi\.compaction\.boundary:[^>]+>/,
       )?.[0] || "";
       return messages.map((message) => (
         message.role === "toolResult"
@@ -830,7 +830,7 @@ describe("session-compactor", () => {
       oldMessageCount: 2,
       retainedMessageCount: 1,
     });
-    expect(boundaryPlaceholder).toMatch(/^<hana\.compaction\.boundary:/);
+    expect(boundaryPlaceholder).toMatch(/^<lingxi\.compaction\.boundary:/);
     for (const [messages] of convertToLlm.mock.calls) {
       expect(messages.every((message) => Object.getOwnPropertySymbols(message).length === 0)).toBe(true);
       expect(JSON.stringify(messages)).not.toContain(boundaryPlaceholder);
@@ -1239,7 +1239,7 @@ describe("session-compactor", () => {
         ),
       }],
     });
-    expect(JSON.stringify(result)).not.toContain("hana.compaction.boundary");
+    expect(JSON.stringify(result)).not.toContain("lingxi.compaction.boundary");
     expect(result).toMatchObject({
       oldMessageCount: 2,
       retainedMessageCount: 1,

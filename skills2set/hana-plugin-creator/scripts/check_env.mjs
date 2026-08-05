@@ -58,7 +58,7 @@ function helpResult() {
     ok: true,
     code: "help",
     message: [
-      "Usage: node skills2set/hana-plugin-creator/scripts/check_env.mjs --capability scaffold",
+      "Usage: node skills2set/lingxi-plugin-creator/scripts/check_env.mjs --capability scaffold",
       `Requires Python ${MIN_PYTHON_VERSION_TEXT}+ for the bundled plugin scaffold script.`,
       `Capabilities: ${Object.keys(CAPABILITIES).join(", ")}`,
     ].join("\n"),

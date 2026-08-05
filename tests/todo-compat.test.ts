@@ -280,7 +280,7 @@ describe("extractLatestTodos", () => {
       },
       {
         role: "custom",
-        customType: "hana.todo_state",
+        customType: "lingxi.todo_state",
         details: {
           action: "complete_all",
           removed: true,
@@ -305,7 +305,7 @@ describe("extractLatestTodos", () => {
     const messages = [
       {
         role: "custom",
-        customType: "hana.todo_state",
+        customType: "lingxi.todo_state",
         details: {
           action: "complete_all",
           removed: true,
@@ -399,7 +399,7 @@ describe("extractLatestTodos", () => {
       },
       {
         role: "custom",
-        customType: "hana.todo_state",
+        customType: "lingxi.todo_state",
         details: badStateDetails,
       },
     ];

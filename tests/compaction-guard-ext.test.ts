@@ -1458,7 +1458,7 @@ describe("CompactionGuardExtension", () => {
       let boundaryPlaceholder = "";
       const transformContext = vi.fn(async (messages) => {
         boundaryPlaceholder = messages.at(-1).content[0].text.match(
-          /<hana\.compaction\.boundary:[^>]+>/,
+          /<lingxi\.compaction\.boundary:[^>]+>/,
         )?.[0] || "";
         return [
           {
@@ -1509,7 +1509,7 @@ describe("CompactionGuardExtension", () => {
 
       expect(getSessionTransformContext).toHaveBeenCalledWith("/sessions/current.jsonl");
       expect(transformContext).toHaveBeenCalledTimes(1);
-      expect(boundaryPlaceholder).toMatch(/^<hana\.compaction\.boundary:/);
+      expect(boundaryPlaceholder).toMatch(/^<lingxi\.compaction\.boundary:/);
       expect(cacheCompactor).toHaveBeenCalledWith(expect.objectContaining({
         messages: [
           expect.objectContaining({

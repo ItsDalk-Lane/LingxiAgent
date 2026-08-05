@@ -160,21 +160,21 @@ export const HANA_BUILT_IN_THEMES: Record<LingxiThemeId, LingxiThemeTokens> = {
 };
 
 const TOKEN_TO_CSS_VAR: Record<keyof LingxiThemeTokens, string> = {
-  bg: '--hana-plugin-bg',
-  bgCard: '--hana-plugin-bg-card',
-  accent: '--hana-plugin-accent',
-  accentHover: '--hana-plugin-accent-hover',
-  accentLight: '--hana-plugin-accent-light',
-  text: '--hana-plugin-text',
-  textLight: '--hana-plugin-text-light',
-  textMuted: '--hana-plugin-text-muted',
-  border: '--hana-plugin-border',
-  danger: '--hana-plugin-danger',
-  radiusInput: '--hana-plugin-radius-input',
-  radiusCard: '--hana-plugin-radius-card',
-  fontUi: '--hana-plugin-font-ui',
-  fontSerif: '--hana-plugin-font-serif',
-  fontMono: '--hana-plugin-font-mono',
+  bg: '--lingxi-plugin-bg',
+  bgCard: '--lingxi-plugin-bg-card',
+  accent: '--lingxi-plugin-accent',
+  accentHover: '--lingxi-plugin-accent-hover',
+  accentLight: '--lingxi-plugin-accent-light',
+  text: '--lingxi-plugin-text',
+  textLight: '--lingxi-plugin-text-light',
+  textMuted: '--lingxi-plugin-text-muted',
+  border: '--lingxi-plugin-border',
+  danger: '--lingxi-plugin-danger',
+  radiusInput: '--lingxi-plugin-radius-input',
+  radiusCard: '--lingxi-plugin-radius-card',
+  fontUi: '--lingxi-plugin-font-ui',
+  fontSerif: '--lingxi-plugin-font-serif',
+  fontMono: '--lingxi-plugin-font-mono',
 };
 
 type ThemeStyle = CSSProperties & Record<string, string>;
@@ -192,7 +192,7 @@ export function LingxiThemeProvider({
   className,
   style,
   children,
-  'data-testid': dataTestId = 'hana-plugin-theme',
+  'data-testid': dataTestId = 'lingxi-plugin-theme',
   ...rootProps
 }: LingxiThemeProviderProps) {
   const themeId = typeof theme === 'string' ? theme : undefined;
@@ -202,9 +202,9 @@ export function LingxiThemeProvider({
     <div
       {...rootProps}
       data-testid={dataTestId}
-      className={cx('hana-plugin-theme', className)}
-      data-hana-theme-mode={mode}
-      data-hana-theme={mode === 'hana' ? themeId : undefined}
+      className={cx('lingxi-plugin-theme', className)}
+      data-lingxi-theme-mode={mode}
+      data-lingxi-theme={mode === 'hana' ? themeId : undefined}
       style={{ ...tokenStyle, ...style }}
     >
       {children}

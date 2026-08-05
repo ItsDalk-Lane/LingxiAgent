@@ -1,46 +1,46 @@
-# @hana/plugin-sdk
+# @lingxi/plugin-sdk
 
-Browser-side SDK for Hana WebView/iframe plugins.
+Browser-side SDK for Lingxi WebView/iframe plugins.
 
 ```ts
-import { hana } from '@hana/plugin-sdk';
+import { hana } from '@lingxi/plugin-sdk';
 
 hana.ready();
-const logoUrl = hana.assets.url('images/logo.svg');
-hana.ui.resize({ height: 320 });
+const logoUrl = lingxi.assets.url('images/logo.svg');
+lingxi.ui.resize({ height: 320 });
 
-await hana.toast.show({ message: 'Saved', type: 'success' });
+await lingxi.toast.show({ message: 'Saved', type: 'success' });
 await hana.external.open('https://example.com');
 await hana.clipboard.writeText('Copied text');
-await hana.resources.open({ resource: { kind: 'session-file', fileId: 'sf_1' }, mode: 'preview' });
+await lingxi.resources.open({ resource: { kind: 'session-file', fileId: 'sf_1' }, mode: 'preview' });
 ```
 
 ## Assets
 
-Use `hana.assets.url(path)` for files bundled under the plugin's `assets/` directory:
+Use `lingxi.assets.url(path)` for files bundled under the plugin's `assets/` directory:
 
 ```ts
-const js = hana.assets.url('dist/app.js');
-const logo = hana.assets.url('/images/logo.svg');
+const js = lingxi.assets.url('dist/app.js');
+const logo = lingxi.assets.url('/images/logo.svg');
 ```
 
-The helper returns `/api/plugins/{pluginId}/assets/{path}` for the current iframe plugin. It accepts only relative, non-dotfile paths. Hana serves these resources through a path-scoped, HttpOnly asset session cookie, so Vite chunks, lazy imports, CSS, fonts, images, JSON, wasm, and browser-playable video files such as MP4 should live under `assets/`. The host asset route supports byte ranges for video playback.
+The helper returns `/api/plugins/{pluginId}/assets/{path}` for the current iframe plugin. It accepts only relative, non-dotfile paths. Lingxi serves these resources through a path-scoped, HttpOnly asset session cookie, so Vite chunks, lazy imports, CSS, fonts, images, JSON, wasm, and browser-playable video files such as MP4 should live under `assets/`. The host asset route supports byte ranges for video playback.
 
-Do not put secrets, source files, or source maps in `assets/`. Agent-generated plugins and newly edited plugin UI should not create custom route handlers just to serve static files such as CSS, JS, images, or MP4. Existing plugins that already expose static-file compatibility handlers remain loadable; treat the official `assets/` route plus `hana.assets.url(...)` as the documented contract for new work.
+Do not put secrets, source files, or source maps in `assets/`. Agent-generated plugins and newly edited plugin UI should not create custom route handlers just to serve static files such as CSS, JS, images, or MP4. Existing plugins that already expose static-file compatibility handlers remain loadable; treat the official `assets/` route plus `lingxi.assets.url(...)` as the documented contract for new work.
 
 ## Plugin API Routes
 
-Use `hana.api.fetch(path, init)` when browser code calls this plugin's own route handlers:
+Use `lingxi.api.fetch(path, init)` when browser code calls this plugin's own route handlers:
 
 ```ts
-const res = await hana.api.fetch('api/translate', {
+const res = await lingxi.api.fetch('api/translate', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({ domain: 'football' }),
 });
 ```
 
-The helper builds `/api/plugins/{pluginId}/{path}` for the current iframe plugin and sends the `X-Hana-Plugin-Surface-Session` header from the iframe URL. Do not reuse `pluginIframeTicket` for `fetch()` calls, and do not hard-code `/api/plugins/{pluginId}/...` in browser code. `hana.api.url(path)` is available when you only need the current plugin route URL.
+The helper builds `/api/plugins/{pluginId}/{path}` for the current iframe plugin and sends the `X-Lingxi-Plugin-Surface-Session` header from the iframe URL. Do not reuse `pluginIframeTicket` for `fetch()` calls, and do not hard-code `/api/plugins/{pluginId}/...` in browser code. `lingxi.api.url(path)` is available when you only need the current plugin route URL.
 
 ## Host Requests
 
@@ -48,12 +48,12 @@ Stable helpers are thin wrappers around `hana.host.request(type, payload)`.
 
 | Helper | Capability | Grant |
 | --- | --- | --- |
-| `hana.toast.show(input)` | `toast.show` | no |
+| `lingxi.toast.show(input)` | `toast.show` | no |
 | `hana.external.open(input)` | `external.open` | yes |
 | `hana.clipboard.writeText(input)` | `clipboard.writeText` | yes |
-| `hana.resources.open(input)` | `resource.open` | yes |
-| `hana.resources.pick(input)` | `resource.pick` | yes |
-| `hana.resources.requestAccess(input)` | `resource.requestAccess` | yes |
+| `lingxi.resources.open(input)` | `resource.open` | yes |
+| `lingxi.resources.pick(input)` | `resource.pick` | yes |
+| `lingxi.resources.requestAccess(input)` | `resource.requestAccess` | yes |
 
 Grant-required capabilities must be declared in `manifest.json`:
 
@@ -66,11 +66,11 @@ Grant-required capabilities must be declared in `manifest.json`:
 }
 ```
 
-Browser-side resource helpers are host requests only. They can ask Hana to open
+Browser-side resource helpers are host requests only. They can ask Lingxi to open
 or reveal local/session/url resources, show the host picker, or request access,
 but they do not expose direct filesystem read or write APIs inside the iframe.
 Runtime code that actually reads or edits user resources should use
-`ctx.resources` from `@hana/plugin-runtime`.
+`ctx.resources` from `@lingxi/plugin-runtime`.
 
 Do not mirror runtime ResourceIO operations into iframe code. The browser SDK is
 for presentation and host-mediated actions; server-side plugin tools, routes, or

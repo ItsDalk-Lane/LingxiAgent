@@ -45,7 +45,7 @@ describe('plugin SDK', () => {
       protocol: PLUGIN_UI_PROTOCOL,
       version: PLUGIN_UI_PROTOCOL_VERSION,
       kind: 'event',
-      type: 'hana.ready',
+      type: 'lingxi.ready',
     }, 'http://127.0.0.1:3210');
     expect(parentWindow.postMessage).toHaveBeenNthCalledWith(2, {
       protocol: PLUGIN_UI_PROTOCOL,
@@ -304,38 +304,38 @@ describe('plugin SDK', () => {
 
   it('resolves plugin asset URLs from the current iframe route', () => {
     const parentWindow = makeParentWindow();
-    const targetWindow = makeTargetWindow('https://hana.example/api/plugins/demo-plugin/page?hana-host-origin=https%3A%2F%2Fhana.example');
+    const targetWindow = makeTargetWindow('https://lingxi.example/api/plugins/demo-plugin/page?lingxi-host-origin=https%3A%2F%2Flingxi.example');
     const sdk = createLingxiPluginSdk({
       parentWindow,
       targetWindow,
-      targetOrigin: 'https://hana.example',
+      targetOrigin: 'https://lingxi.example',
     });
 
-    expect(sdk.assets.url('dist/app.js')).toBe('https://hana.example/api/plugins/demo-plugin/assets/dist/app.js');
-    expect(sdk.assets.url('/images/logo.svg')).toBe('https://hana.example/api/plugins/demo-plugin/assets/images/logo.svg');
+    expect(sdk.assets.url('dist/app.js')).toBe('https://lingxi.example/api/plugins/demo-plugin/assets/dist/app.js');
+    expect(sdk.assets.url('/images/logo.svg')).toBe('https://lingxi.example/api/plugins/demo-plugin/assets/images/logo.svg');
   });
 
   it('resolves plugin API URLs from the current iframe route', () => {
     const sdk = createLingxiPluginSdk({
       parentWindow: makeParentWindow(),
-      targetWindow: makeTargetWindow('https://hana.example/api/plugins/demo-plugin/page?pluginSurfaceSession=session-1'),
-      targetOrigin: 'https://hana.example',
+      targetWindow: makeTargetWindow('https://lingxi.example/api/plugins/demo-plugin/page?pluginSurfaceSession=session-1'),
+      targetOrigin: 'https://lingxi.example',
     });
 
-    expect(sdk.api.url('api/translate')).toBe('https://hana.example/api/plugins/demo-plugin/api/translate');
-    expect(sdk.api.url('/api/translate?mode=fast')).toBe('https://hana.example/api/plugins/demo-plugin/api/translate?mode=fast');
+    expect(sdk.api.url('api/translate')).toBe('https://lingxi.example/api/plugins/demo-plugin/api/translate');
+    expect(sdk.api.url('/api/translate?mode=fast')).toBe('https://lingxi.example/api/plugins/demo-plugin/api/translate?mode=fast');
   });
 
   it('adds the plugin surface session when fetching the current plugin API', async () => {
     const fetchMock = vi.fn(async (_input: RequestInfo | URL, _init?: RequestInit) => new Response('ok'));
     const targetWindow = {
-      ...makeTargetWindow('https://hana.example/api/plugins/demo-plugin/page?pluginSurfaceSession=session-1'),
+      ...makeTargetWindow('https://lingxi.example/api/plugins/demo-plugin/page?pluginSurfaceSession=session-1'),
       fetch: fetchMock,
     } as unknown as Window;
     const sdk = createLingxiPluginSdk({
       parentWindow: makeParentWindow(),
       targetWindow,
-      targetOrigin: 'https://hana.example',
+      targetOrigin: 'https://lingxi.example',
     });
 
     await sdk.api.fetch('api/translate', {
@@ -345,7 +345,7 @@ describe('plugin SDK', () => {
     });
 
     expect(fetchMock).toHaveBeenCalledWith(
-      'https://hana.example/api/plugins/demo-plugin/api/translate',
+      'https://lingxi.example/api/plugins/demo-plugin/api/translate',
       expect.objectContaining({
         method: 'POST',
         body: JSON.stringify({ domain: 'test' }),
@@ -359,8 +359,8 @@ describe('plugin SDK', () => {
   it('rejects unsafe plugin API inputs and missing surface sessions', () => {
     const sdk = createLingxiPluginSdk({
       parentWindow: makeParentWindow(),
-      targetWindow: makeTargetWindow('https://hana.example/api/plugins/demo/page?pluginSurfaceSession=session-1'),
-      targetOrigin: 'https://hana.example',
+      targetWindow: makeTargetWindow('https://lingxi.example/api/plugins/demo/page?pluginSurfaceSession=session-1'),
+      targetOrigin: 'https://lingxi.example',
     });
 
     for (const unsafePath of [
@@ -377,8 +377,8 @@ describe('plugin SDK', () => {
 
     const missingSessionSdk = createLingxiPluginSdk({
       parentWindow: makeParentWindow(),
-      targetWindow: makeTargetWindow('https://hana.example/api/plugins/demo/page'),
-      targetOrigin: 'https://hana.example',
+      targetWindow: makeTargetWindow('https://lingxi.example/api/plugins/demo/page'),
+      targetOrigin: 'https://lingxi.example',
     });
     expect(() => missingSessionSdk.api.fetch('api/translate')).toThrow(/pluginSurfaceSession/);
   });
@@ -386,8 +386,8 @@ describe('plugin SDK', () => {
   it('rejects unsafe plugin asset URL inputs', () => {
     const sdk = createLingxiPluginSdk({
       parentWindow: makeParentWindow(),
-      targetWindow: makeTargetWindow('https://hana.example/api/plugins/demo/page'),
-      targetOrigin: 'https://hana.example',
+      targetWindow: makeTargetWindow('https://lingxi.example/api/plugins/demo/page'),
+      targetOrigin: 'https://lingxi.example',
     });
 
     for (const unsafePath of ['../secret.js', 'dist\\app.js', 'https://evil.test/app.js', '', './app.js']) {

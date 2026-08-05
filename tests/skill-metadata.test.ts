@@ -128,7 +128,7 @@ describe("SkillManager metadata scanning", () => {
     fs.mkdirSync(skillDir, { recursive: true });
     fs.writeFileSync(skillFile, [
       "---",
-      "name: hana-plugin-creator",
+      "name: lingxi-plugin-creator",
       "description: Create Hana plugins.",
       "metadata:",
       "  default-enabled: false",

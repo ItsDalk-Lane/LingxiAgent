@@ -119,8 +119,8 @@ describe('remote file preview workbench refs', () => {
     mockLingxiFetch.mockResolvedValueOnce(new Response('# fresh\n', {
       status: 200,
       headers: {
-        'X-Hana-File-MtimeMs': '1781989413542',
-        'X-Hana-File-Size': '8',
+        'X-Lingxi-File-MtimeMs': '1781989413542',
+        'X-Lingxi-File-Size': '8',
       },
     }));
 
@@ -163,8 +163,8 @@ describe('remote file preview workbench refs', () => {
     mockLingxiFetch.mockResolvedValueOnce(new Response('fresh external body', {
       status: 200,
       headers: {
-        'X-Hana-File-MtimeMs': String(diskVersion.mtimeMs),
-        'X-Hana-File-Size': String(diskVersion.size),
+        'X-Lingxi-File-MtimeMs': String(diskVersion.mtimeMs),
+        'X-Lingxi-File-Size': String(diskVersion.size),
       },
     }));
 

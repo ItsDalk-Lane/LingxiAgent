@@ -285,16 +285,16 @@ describe("update-settings-tool", () => {
       await tool.execute("c-bridge-url-apply", {
         action: "apply",
         key: "bridge_media_public_base_url",
-        value: "https://hana.example.com",
+        value: "https://lingxi.example.com",
       });
 
-      expect(engine.setBridgeMediaPublicBaseUrl).toHaveBeenCalledWith("https://hana.example.com");
-      expect(engine._prefs._store.bridge.mediaPublicBaseUrl).toBe("https://hana.example.com");
+      expect(engine.setBridgeMediaPublicBaseUrl).toHaveBeenCalledWith("https://lingxi.example.com");
+      expect(engine._prefs._store.bridge.mediaPublicBaseUrl).toBe("https://lingxi.example.com");
     });
 
     it("allows clearing the Bridge media public URL with an empty value", async () => {
       const { tool, engine } = buildTool({
-        prefsData: { bridge: { mediaPublicBaseUrl: "https://hana.example.com" } },
+        prefsData: { bridge: { mediaPublicBaseUrl: "https://lingxi.example.com" } },
       });
       await tool.execute("c-bridge-url-clear", {
         action: "apply",

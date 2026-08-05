@@ -18,7 +18,7 @@ describe("bundled plugin runtime dependencies", () => {
   let outDir;
 
   beforeEach(() => {
-    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "hana-plugin-runtime-deps-"));
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "lingxi-plugin-runtime-deps-"));
     rootDir = path.join(tempDir, "root");
     outDir = path.join(tempDir, "dist-server", "mac-arm64");
 

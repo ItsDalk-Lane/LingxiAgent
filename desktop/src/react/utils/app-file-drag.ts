@@ -21,7 +21,7 @@ export type AppFileDragPayloadInput = Omit<AppFileDragPayload, 'dragId'> & {
   dragId?: string;
 };
 
-const APP_FILE_DRAG_MIME = 'application/x-hana-file-drag';
+const APP_FILE_DRAG_MIME = 'application/x-lingxi-file-drag';
 
 let dragSeq = 0;
 let activeDragId: string | null = null;

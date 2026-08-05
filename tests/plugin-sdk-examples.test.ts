@@ -49,7 +49,7 @@ describe("plugin SDK examples and docs", () => {
     expect(guide).toContain("@lingxi/plugin-sdk");
     expect(guide).toContain("@lingxi/plugin-runtime");
     expect(guide).toContain("@lingxi/plugin-components");
-    expect(guide).toContain("hana.assets.url");
+    expect(guide).toContain("lingxi.assets.url");
     expect(guide).toContain("getPluginRequestContext");
     expect(guide).toContain("stable discovery");
     expect(guide).toContain("npm run build:packages");
@@ -120,16 +120,16 @@ describe("plugin SDK examples and docs", () => {
     expect(panel).toContain("@lingxi/plugin-components");
     expect(panel).toContain("LingxiThemeProvider");
     expect(readme).toContain("bundle the UI");
-    expect(readme).toContain("hana.assets.url");
+    expect(readme).toContain("lingxi.assets.url");
   });
 
-  it("keeps hana-plugin-creator bundled SDK tarballs aligned with current runtime and protocol APIs", () => {
-    const runtimePackage = JSON.parse(readBundledSdkFile("hana-plugin-runtime-0.0.0.tgz", "package.json"));
-    const runtimeTypes = readBundledSdkFile("hana-plugin-runtime-0.0.0.tgz", "dist/index.d.ts");
-    const runtimeReadme = readBundledSdkFile("hana-plugin-runtime-0.0.0.tgz", "README.md");
-    const sdkTypes = readBundledSdkFile("hana-plugin-sdk-0.0.0.tgz", "dist/index.d.ts");
-    const sdkReadme = readBundledSdkFile("hana-plugin-sdk-0.0.0.tgz", "README.md");
-    const protocolTypes = readBundledSdkFile("hana-plugin-protocol-0.0.0.tgz", "dist/index.d.ts");
+  it("keeps lingxi-plugin-creator bundled SDK tarballs aligned with current runtime and protocol APIs", () => {
+    const runtimePackage = JSON.parse(readBundledSdkFile("lingxi-plugin-runtime-0.0.0.tgz", "package.json"));
+    const runtimeTypes = readBundledSdkFile("lingxi-plugin-runtime-0.0.0.tgz", "dist/index.d.ts");
+    const runtimeReadme = readBundledSdkFile("lingxi-plugin-runtime-0.0.0.tgz", "README.md");
+    const sdkTypes = readBundledSdkFile("lingxi-plugin-sdk-0.0.0.tgz", "dist/index.d.ts");
+    const sdkReadme = readBundledSdkFile("lingxi-plugin-sdk-0.0.0.tgz", "README.md");
+    const protocolTypes = readBundledSdkFile("lingxi-plugin-protocol-0.0.0.tgz", "dist/index.d.ts");
 
     expect(runtimeTypes).toContain("generateVideo");
     expect(runtimeTypes).toContain("generateMedia");
@@ -158,8 +158,8 @@ describe("plugin SDK examples and docs", () => {
     expect(sdkTypes).toContain("fetch(");
     expect(sdkTypes).toContain("resources:");
     expect(sdkTypes).toContain("PluginResourceOpenInput");
-    expect(sdkReadme).toContain("hana.api.fetch");
-    expect(sdkReadme).toContain("hana.resources.open");
+    expect(sdkReadme).toContain("lingxi.api.fetch");
+    expect(sdkReadme).toContain("lingxi.resources.open");
     expect(protocolTypes).toContain("PLUGIN_SURFACE_SESSION_HEADER");
     expect(protocolTypes).toContain("PLUGIN_SURFACE_SESSION_QUERY");
     expect(protocolTypes).toContain("PLUGIN_RESOURCE_CAPABILITY");
@@ -188,11 +188,11 @@ describe("plugin SDK examples and docs", () => {
       const pkg = JSON.parse(fs.readFileSync(path.join(pluginDir, "package.json"), "utf-8"));
 
       expect(pkg.dependencies).toMatchObject({
-        "@lingxi/plugin-runtime": expect.stringContaining("vendor/sdk/hana-plugin-runtime-"),
-        "@lingxi/plugin-protocol": expect.stringContaining("vendor/sdk/hana-plugin-protocol-"),
+        "@lingxi/plugin-runtime": expect.stringContaining("vendor/sdk/lingxi-plugin-runtime-"),
+        "@lingxi/plugin-protocol": expect.stringContaining("vendor/sdk/lingxi-plugin-protocol-"),
       });
-      expect(fs.existsSync(path.join(pluginDir, "vendor", "sdk", "hana-plugin-protocol-0.0.0.tgz"))).toBe(true);
-      expect(fs.existsSync(path.join(pluginDir, "vendor", "sdk", "hana-plugin-runtime-0.0.0.tgz"))).toBe(true);
+      expect(fs.existsSync(path.join(pluginDir, "vendor", "sdk", "lingxi-plugin-protocol-0.0.0.tgz"))).toBe(true);
+      expect(fs.existsSync(path.join(pluginDir, "vendor", "sdk", "lingxi-plugin-runtime-0.0.0.tgz"))).toBe(true);
     } finally {
       fs.rmSync(tmpDir, { recursive: true, force: true });
     }
@@ -293,7 +293,7 @@ describe("plugin SDK examples and docs", () => {
       const readme = fs.readFileSync(path.join(pluginDir, "README.md"), "utf-8");
 
       expect(panel).toContain("pluginSurfaceSession");
-      expect(panel).toContain("X-Hana-Plugin-Surface-Session");
+      expect(panel).toContain("X-Lingxi-Plugin-Surface-Session");
       expect(panel).toContain("api: {");
       expect(panel).toContain("fetch: pluginApiFetch");
       expect(readme).toContain("ui.hostCapabilities");

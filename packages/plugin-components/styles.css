@@ -1,52 +1,52 @@
-.hana-plugin-theme {
-  --hana-plugin-bg: var(--bg, #F8F5ED);
-  --hana-plugin-bg-card: var(--bg-card, #FCFAF5);
-  --hana-plugin-accent: var(--accent, #537D96);
-  --hana-plugin-accent-hover: var(--accent-hover, #456A80);
-  --hana-plugin-accent-light: var(--accent-light, rgba(83, 125, 150, 0.08));
-  --hana-plugin-text: var(--text, #3B3D3F);
-  --hana-plugin-text-light: var(--text-light, #6B6F73);
-  --hana-plugin-text-muted: var(--text-muted, #8E9196);
-  --hana-plugin-border: var(--border, rgba(83, 125, 150, 0.22));
-  --hana-plugin-danger: var(--danger, #8B3A3A);
-  --hana-plugin-radius-input: var(--radius-input, 4px);
-  --hana-plugin-radius-card: var(--radius-card, 8px);
-  --hana-plugin-font-ui: var(--font-ui, Inter, -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif);
-  --hana-plugin-font-serif: var(--font-serif, "Songti SC", "STSong", serif);
-  --hana-plugin-font-mono: var(--font-mono, "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace);
+.lingxi-plugin-theme {
+  --lingxi-plugin-bg: var(--bg, #F8F5ED);
+  --lingxi-plugin-bg-card: var(--bg-card, #FCFAF5);
+  --lingxi-plugin-accent: var(--accent, #537D96);
+  --lingxi-plugin-accent-hover: var(--accent-hover, #456A80);
+  --lingxi-plugin-accent-light: var(--accent-light, rgba(83, 125, 150, 0.08));
+  --lingxi-plugin-text: var(--text, #3B3D3F);
+  --lingxi-plugin-text-light: var(--text-light, #6B6F73);
+  --lingxi-plugin-text-muted: var(--text-muted, #8E9196);
+  --lingxi-plugin-border: var(--border, rgba(83, 125, 150, 0.22));
+  --lingxi-plugin-danger: var(--danger, #8B3A3A);
+  --lingxi-plugin-radius-input: var(--radius-input, 4px);
+  --lingxi-plugin-radius-card: var(--radius-card, 8px);
+  --lingxi-plugin-font-ui: var(--font-ui, Inter, -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif);
+  --lingxi-plugin-font-serif: var(--font-serif, "Songti SC", "STSong", serif);
+  --lingxi-plugin-font-mono: var(--font-mono, "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace);
   display: block;
   min-width: 0;
   box-sizing: border-box;
-  background: var(--hana-plugin-bg);
-  color: var(--hana-plugin-text);
-  font-family: var(--hana-plugin-font-ui);
+  background: var(--lingxi-plugin-bg);
+  color: var(--lingxi-plugin-text);
+  font-family: var(--lingxi-plugin-font-ui);
   font-size: 0.9rem;
   line-height: 1.5;
 }
 
-.hana-plugin-theme *,
-.hana-plugin-theme *::before,
-.hana-plugin-theme *::after {
+.lingxi-plugin-theme *,
+.lingxi-plugin-theme *::before,
+.lingxi-plugin-theme *::after {
   box-sizing: border-box;
 }
 
-.hana-plugin-button,
-.hana-plugin-icon-button,
-.hana-plugin-select-trigger,
-.hana-plugin-select-option,
-.hana-plugin-switch {
+.lingxi-plugin-button,
+.lingxi-plugin-icon-button,
+.lingxi-plugin-select-trigger,
+.lingxi-plugin-select-option,
+.lingxi-plugin-switch {
   font-family: inherit;
   -webkit-app-region: no-drag;
 }
 
-.hana-plugin-button {
+.lingxi-plugin-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: var(--space-xs, 0.25rem);
   min-width: 0;
   border: 1px solid transparent;
-  border-radius: var(--hana-plugin-radius-input);
+  border-radius: var(--lingxi-plugin-radius-input);
   cursor: pointer;
   user-select: none;
   line-height: 1;
@@ -57,87 +57,87 @@
     opacity var(--duration-fast, 0.15s) var(--ease-out, ease);
 }
 
-.hana-plugin-button:focus-visible,
-.hana-plugin-icon-button:focus-visible,
-.hana-plugin-select-trigger:focus-visible,
-.hana-plugin-select-option:focus-visible,
-.hana-plugin-switch:focus-visible,
-.hana-plugin-input:focus-visible,
-.hana-plugin-textarea:focus-visible {
-  outline: 2px solid var(--hana-plugin-accent);
+.lingxi-plugin-button:focus-visible,
+.lingxi-plugin-icon-button:focus-visible,
+.lingxi-plugin-select-trigger:focus-visible,
+.lingxi-plugin-select-option:focus-visible,
+.lingxi-plugin-switch:focus-visible,
+.lingxi-plugin-input:focus-visible,
+.lingxi-plugin-textarea:focus-visible {
+  outline: 2px solid var(--lingxi-plugin-accent);
   outline-offset: 2px;
 }
 
-.hana-plugin-button:disabled,
-.hana-plugin-icon-button:disabled,
-.hana-plugin-select-trigger:disabled,
-.hana-plugin-select-option:disabled,
-.hana-plugin-switch:disabled,
-.hana-plugin-input:disabled,
-.hana-plugin-textarea:disabled {
+.lingxi-plugin-button:disabled,
+.lingxi-plugin-icon-button:disabled,
+.lingxi-plugin-select-trigger:disabled,
+.lingxi-plugin-select-option:disabled,
+.lingxi-plugin-switch:disabled,
+.lingxi-plugin-input:disabled,
+.lingxi-plugin-textarea:disabled {
   cursor: not-allowed;
   opacity: 0.5;
 }
 
-.hana-plugin-button-sm {
+.lingxi-plugin-button-sm {
   padding: 0.3rem 0.75rem;
   font-size: 0.7rem;
 }
 
-.hana-plugin-button-md {
+.lingxi-plugin-button-md {
   padding: 0.45rem 0.9rem;
   font-size: 0.9rem;
 }
 
-.hana-plugin-button-lg {
+.lingxi-plugin-button-lg {
   padding: 0.6rem 1.2rem;
   font-size: 0.9rem;
 }
 
-.hana-plugin-button-primary {
-  background: var(--hana-plugin-accent);
+.lingxi-plugin-button-primary {
+  background: var(--lingxi-plugin-accent);
   color: #fff;
-  border-color: var(--hana-plugin-accent);
+  border-color: var(--lingxi-plugin-accent);
 }
 
-.hana-plugin-button-primary:hover:not(:disabled) {
-  background: var(--hana-plugin-accent-hover);
-  border-color: var(--hana-plugin-accent-hover);
+.lingxi-plugin-button-primary:hover:not(:disabled) {
+  background: var(--lingxi-plugin-accent-hover);
+  border-color: var(--lingxi-plugin-accent-hover);
 }
 
-.hana-plugin-button-secondary {
+.lingxi-plugin-button-secondary {
   background: var(--overlay-subtle, rgba(0, 0, 0, 0.03));
-  color: var(--hana-plugin-text);
+  color: var(--lingxi-plugin-text);
 }
 
-.hana-plugin-button-secondary:hover:not(:disabled) {
+.lingxi-plugin-button-secondary:hover:not(:disabled) {
   background: var(--overlay-medium, rgba(0, 0, 0, 0.08));
 }
 
-.hana-plugin-button-ghost {
+.lingxi-plugin-button-ghost {
   background: transparent;
-  color: var(--hana-plugin-text-muted);
+  color: var(--lingxi-plugin-text-muted);
 }
 
-.hana-plugin-button-ghost:hover:not(:disabled) {
+.lingxi-plugin-button-ghost:hover:not(:disabled) {
   background: var(--overlay-subtle, rgba(0, 0, 0, 0.03));
-  color: var(--hana-plugin-text);
+  color: var(--lingxi-plugin-text);
 }
 
-.hana-plugin-button-danger {
-  background: var(--hana-plugin-danger);
+.lingxi-plugin-button-danger {
+  background: var(--lingxi-plugin-danger);
   color: #fff;
-  border-color: var(--hana-plugin-danger);
+  border-color: var(--lingxi-plugin-danger);
 }
 
-.hana-plugin-icon-button {
+.lingxi-plugin-icon-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   border: 1px solid transparent;
-  border-radius: var(--hana-plugin-radius-input);
+  border-radius: var(--lingxi-plugin-radius-input);
   background: transparent;
-  color: var(--hana-plugin-text-muted);
+  color: var(--lingxi-plugin-text-muted);
   cursor: pointer;
   transition:
     background var(--duration-fast, 0.15s) var(--ease-out, ease),
@@ -145,71 +145,71 @@
     border-color var(--duration-fast, 0.15s) var(--ease-out, ease);
 }
 
-.hana-plugin-icon-button-sm {
+.lingxi-plugin-icon-button-sm {
   width: 28px;
   height: 28px;
 }
 
-.hana-plugin-icon-button-md {
+.lingxi-plugin-icon-button-md {
   width: 34px;
   height: 34px;
 }
 
-.hana-plugin-icon-button-lg {
+.lingxi-plugin-icon-button-lg {
   width: 40px;
   height: 40px;
 }
 
-.hana-plugin-icon-button:hover:not(:disabled) {
+.lingxi-plugin-icon-button:hover:not(:disabled) {
   background: var(--overlay-subtle, rgba(0, 0, 0, 0.03));
-  color: var(--hana-plugin-text);
+  color: var(--lingxi-plugin-text);
 }
 
-.hana-plugin-spinner {
+.lingxi-plugin-spinner {
   width: 1em;
   height: 1em;
   border: 2px solid currentColor;
   border-top-color: transparent;
   border-radius: 50%;
-  animation: hana-plugin-spin 0.8s linear infinite;
+  animation: lingxi-plugin-spin 0.8s linear infinite;
 }
 
-.hana-plugin-field {
+.lingxi-plugin-field {
   display: flex;
   flex-direction: column;
   gap: 2px;
   min-width: 0;
 }
 
-.hana-plugin-field-label {
+.lingxi-plugin-field-label {
   font-size: 0.9rem;
   font-weight: 500;
-  color: var(--hana-plugin-text);
+  color: var(--lingxi-plugin-text);
 }
 
-.hana-plugin-field-hint,
-.hana-plugin-field-error {
+.lingxi-plugin-field-hint,
+.lingxi-plugin-field-error {
   font-size: 0.7rem;
   line-height: 1.4;
 }
 
-.hana-plugin-field-hint {
-  color: var(--hana-plugin-text-muted);
+.lingxi-plugin-field-hint {
+  color: var(--lingxi-plugin-text-muted);
 }
 
-.hana-plugin-field-error {
-  color: var(--hana-plugin-danger);
+.lingxi-plugin-field-error {
+  color: var(--lingxi-plugin-danger);
 }
 
-.hana-plugin-input,
-.hana-plugin-textarea,
-.hana-plugin-select-trigger {
+.lingxi-plugin-input,
+.lingxi-plugin-textarea,
+.lingxi-plugin-select-trigger {
   width: 100%;
   min-width: 0;
-  color: var(--hana-plugin-text);
-  background: var(--hana-plugin-bg-card);
-  border: 1px solid var(--hana-plugin-border);
-  border-radius: var(--hana-plugin-radius-input);
+  color: var(--lingxi-plugin-text);
+  background: var(--lingxi-plugin-bg-card);
+  border: 1px solid var(--lingxi-plugin-border);
+  border-radius: var(--lingxi-plugin-radius-input);
   font-family: inherit;
   font-size: 0.9rem;
   transition:
@@ -217,30 +217,30 @@
     background var(--duration-fast, 0.15s) var(--ease-out, ease);
 }
 
-.hana-plugin-input {
+.lingxi-plugin-input {
   height: 34px;
   padding: 0 var(--space-sm, 0.5rem);
 }
 
-.hana-plugin-textarea {
+.lingxi-plugin-textarea {
   resize: vertical;
   min-height: 92px;
   padding: var(--space-sm, 0.5rem);
   line-height: 1.5;
 }
 
-.hana-plugin-input:hover:not(:disabled),
-.hana-plugin-textarea:hover:not(:disabled),
-.hana-plugin-select-trigger:hover:not(:disabled) {
-  border-color: var(--hana-plugin-accent);
+.lingxi-plugin-input:hover:not(:disabled),
+.lingxi-plugin-textarea:hover:not(:disabled),
+.lingxi-plugin-select-trigger:hover:not(:disabled) {
+  border-color: var(--lingxi-plugin-accent);
 }
 
-.hana-plugin-select {
+.lingxi-plugin-select {
   position: relative;
   width: 100%;
 }
 
-.hana-plugin-select-trigger {
+.lingxi-plugin-select-trigger {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -250,22 +250,22 @@
   text-align: left;
 }
 
-.hana-plugin-select-value {
+.lingxi-plugin-select-value {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.hana-plugin-select-placeholder {
-  color: var(--hana-plugin-text-muted);
+.lingxi-plugin-select-placeholder {
+  color: var(--lingxi-plugin-text-muted);
 }
 
-.hana-plugin-select-arrow {
-  color: var(--hana-plugin-text-muted);
+.lingxi-plugin-select-arrow {
+  color: var(--lingxi-plugin-text-muted);
   margin-left: var(--space-sm, 0.5rem);
 }
 
-.hana-plugin-select-popover {
+.lingxi-plugin-select-popover {
   position: absolute;
   z-index: 20;
   top: calc(100% + 2px);
@@ -276,94 +276,94 @@
   max-height: 240px;
   overflow-y: auto;
   padding: var(--space-xs, 0.25rem) 0;
-  background: var(--hana-plugin-bg-card);
-  border: 1px solid var(--hana-plugin-border);
-  border-radius: var(--hana-plugin-radius-input);
-  animation: hana-plugin-fade-up var(--duration-fast, 0.15s) var(--ease-out, ease);
+  background: var(--lingxi-plugin-bg-card);
+  border: 1px solid var(--lingxi-plugin-border);
+  border-radius: var(--lingxi-plugin-radius-input);
+  animation: lingxi-plugin-fade-up var(--duration-fast, 0.15s) var(--ease-out, ease);
 }
 
-.hana-plugin-select-option {
+.lingxi-plugin-select-option {
   display: flex;
   align-items: center;
   width: 100%;
   padding: 0.45rem var(--space-sm, 0.5rem);
   border: 0;
   background: transparent;
-  color: var(--hana-plugin-text-light);
+  color: var(--lingxi-plugin-text-light);
   cursor: pointer;
   text-align: left;
 }
 
-.hana-plugin-select-option:hover:not(:disabled) {
-  background: var(--hana-plugin-accent-light);
+.lingxi-plugin-select-option:hover:not(:disabled) {
+  background: var(--lingxi-plugin-accent-light);
 }
 
-.hana-plugin-select-option-selected {
-  color: var(--hana-plugin-accent);
-  background: var(--hana-plugin-accent-light);
+.lingxi-plugin-select-option-selected {
+  color: var(--lingxi-plugin-accent);
+  background: var(--lingxi-plugin-accent-light);
   font-weight: 600;
 }
 
-.hana-plugin-switch-wrap {
+.lingxi-plugin-switch-wrap {
   display: inline-flex;
   align-items: center;
   gap: var(--space-sm, 0.5rem);
 }
 
-.hana-plugin-switch {
+.lingxi-plugin-switch {
   position: relative;
   width: 34px;
   height: 20px;
   padding: 0;
-  border: 1px solid var(--hana-plugin-border);
-  border-radius: var(--hana-plugin-radius-input);
-  background: var(--hana-plugin-bg-card);
+  border: 1px solid var(--lingxi-plugin-border);
+  border-radius: var(--lingxi-plugin-radius-input);
+  background: var(--lingxi-plugin-bg-card);
   cursor: pointer;
   transition:
     background var(--duration-fast, 0.15s) var(--ease-out, ease),
     border-color var(--duration-fast, 0.15s) var(--ease-out, ease);
 }
 
-.hana-plugin-switch-thumb {
+.lingxi-plugin-switch-thumb {
   position: absolute;
   top: 3px;
   left: 3px;
   width: 12px;
   height: 12px;
   border-radius: 2px;
-  background: var(--hana-plugin-text-muted);
+  background: var(--lingxi-plugin-text-muted);
   transition:
     transform var(--duration-fast, 0.15s) var(--ease-out, ease),
     background var(--duration-fast, 0.15s) var(--ease-out, ease);
 }
 
-.hana-plugin-switch-on {
-  background: var(--hana-plugin-accent);
-  border-color: var(--hana-plugin-accent);
+.lingxi-plugin-switch-on {
+  background: var(--lingxi-plugin-accent);
+  border-color: var(--lingxi-plugin-accent);
 }
 
-.hana-plugin-switch-on .hana-plugin-switch-thumb {
+.lingxi-plugin-switch-on .lingxi-plugin-switch-thumb {
   transform: translateX(14px);
   background: #fff;
 }
 
-.hana-plugin-switch-label {
+.lingxi-plugin-switch-label {
   font-size: 0.9rem;
-  color: var(--hana-plugin-text-muted);
+  color: var(--lingxi-plugin-text-muted);
 }
 
-.hana-plugin-card {
+.lingxi-plugin-card {
   display: flex;
   flex-direction: column;
   min-width: 0;
   overflow: hidden;
-  background: var(--hana-plugin-bg-card);
-  border: 1px solid var(--hana-plugin-border);
-  border-radius: var(--hana-plugin-radius-card);
+  background: var(--lingxi-plugin-bg-card);
+  border: 1px solid var(--lingxi-plugin-border);
+  border-radius: var(--lingxi-plugin-radius-card);
 }
 
-.hana-plugin-card-header,
-.hana-plugin-card-footer {
+.lingxi-plugin-card-header,
+.lingxi-plugin-card-footer {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -371,58 +371,58 @@
   padding: var(--space-sm, 0.5rem) var(--space-md, 1rem);
 }
 
-.hana-plugin-card-header {
-  border-bottom: 1px solid var(--hana-plugin-border);
+.lingxi-plugin-card-header {
+  border-bottom: 1px solid var(--lingxi-plugin-border);
 }
 
-.hana-plugin-card-heading {
+.lingxi-plugin-card-heading {
   min-width: 0;
 }
 
-.hana-plugin-card-title {
+.lingxi-plugin-card-title {
   margin: 0;
-  color: var(--hana-plugin-text);
-  font-family: var(--hana-plugin-font-serif);
+  color: var(--lingxi-plugin-text);
+  font-family: var(--lingxi-plugin-font-serif);
   font-size: 1rem;
   font-weight: 600;
   line-height: 1.3;
 }
 
-.hana-plugin-card-description {
+.lingxi-plugin-card-description {
   margin: 2px 0 0;
-  color: var(--hana-plugin-text-muted);
+  color: var(--lingxi-plugin-text-muted);
   font-size: 0.7rem;
 }
 
-.hana-plugin-card-actions {
+.lingxi-plugin-card-actions {
   flex-shrink: 0;
 }
 
-.hana-plugin-card-body {
+.lingxi-plugin-card-body {
   padding: var(--space-md, 1rem);
 }
 
-.hana-plugin-card-footer {
+.lingxi-plugin-card-footer {
   justify-content: flex-end;
-  border-top: 1px solid var(--hana-plugin-border);
+  border-top: 1px solid var(--lingxi-plugin-border);
 }
 
-.hana-plugin-setting-row {
+.lingxi-plugin-setting-row {
   display: flex;
   gap: var(--space-md, 1rem);
   padding: var(--space-sm, 0.5rem) 0;
 }
 
-.hana-plugin-setting-row-inline {
+.lingxi-plugin-setting-row-inline {
   align-items: center;
   justify-content: space-between;
 }
 
-.hana-plugin-setting-row-stacked {
+.lingxi-plugin-setting-row-stacked {
   flex-direction: column;
 }
 
-.hana-plugin-setting-text {
+.lingxi-plugin-setting-text {
   display: flex;
   flex: 1;
   min-width: 0;
@@ -430,23 +430,23 @@
   gap: 2px;
 }
 
-.hana-plugin-setting-label {
-  color: var(--hana-plugin-text);
+.lingxi-plugin-setting-label {
+  color: var(--lingxi-plugin-text);
   font-size: 0.9rem;
   font-weight: 500;
 }
 
-.hana-plugin-setting-hint {
-  color: var(--hana-plugin-text-muted);
+.lingxi-plugin-setting-hint {
+  color: var(--lingxi-plugin-text-muted);
   font-size: 0.7rem;
   line-height: 1.4;
 }
 
-.hana-plugin-setting-control {
+.lingxi-plugin-setting-control {
   flex-shrink: 0;
 }
 
-.hana-plugin-list {
+.lingxi-plugin-list {
   display: flex;
   flex-direction: column;
   gap: 0;
@@ -455,7 +455,7 @@
   list-style: none;
 }
 
-.hana-plugin-list-item {
+.lingxi-plugin-list-item {
   display: flex;
   align-items: center;
   gap: var(--space-sm, 0.5rem);
@@ -463,57 +463,57 @@
   padding: var(--space-sm, 0.5rem) 0;
 }
 
-.hana-plugin-list-item + .hana-plugin-list-item {
-  border-top: 1px solid var(--hana-plugin-border);
+.lingxi-plugin-list-item + .lingxi-plugin-list-item {
+  border-top: 1px solid var(--lingxi-plugin-border);
 }
 
-.hana-plugin-list-main {
+.lingxi-plugin-list-main {
   flex: 1;
   min-width: 0;
 }
 
-.hana-plugin-list-line {
+.lingxi-plugin-list-line {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
   gap: var(--space-sm, 0.5rem);
 }
 
-.hana-plugin-list-title {
-  color: var(--hana-plugin-text);
+.lingxi-plugin-list-title {
+  color: var(--lingxi-plugin-text);
   font-size: 0.9rem;
   font-weight: 500;
 }
 
-.hana-plugin-list-meta,
-.hana-plugin-list-description {
-  color: var(--hana-plugin-text-muted);
+.lingxi-plugin-list-meta,
+.lingxi-plugin-list-description {
+  color: var(--lingxi-plugin-text-muted);
   font-size: 0.7rem;
 }
 
-.hana-plugin-empty {
+.lingxi-plugin-empty {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: var(--space-xs, 0.25rem);
   padding: var(--space-lg, 1.5rem) var(--space-md, 1rem);
-  color: var(--hana-plugin-text-muted);
+  color: var(--lingxi-plugin-text-muted);
   text-align: center;
 }
 
-.hana-plugin-empty-title {
-  color: var(--hana-plugin-text);
+.lingxi-plugin-empty-title {
+  color: var(--lingxi-plugin-text);
   font-size: 0.9rem;
   font-weight: 500;
 }
 
-.hana-plugin-empty-description {
+.lingxi-plugin-empty-description {
   max-width: 32rem;
   font-size: 0.7rem;
   line-height: 1.4;
 }
 
-@keyframes hana-plugin-fade-up {
+@keyframes lingxi-plugin-fade-up {
   from {
     opacity: 0;
     transform: translateY(4px);
@@ -524,7 +524,7 @@
   }
 }
 
-@keyframes hana-plugin-spin {
+@keyframes lingxi-plugin-spin {
   to {
     transform: rotate(360deg);
   }

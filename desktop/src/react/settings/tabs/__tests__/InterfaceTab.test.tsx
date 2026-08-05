@@ -27,7 +27,7 @@ type AppearanceGlobals = typeof globalThis & {
 
 function setAppearanceGlobals() {
   (globalThis as AppearanceGlobals).setTheme = vi.fn((theme: string) => {
-    localStorage.setItem('hana-theme', theme);
+    localStorage.setItem('lingxi-theme', theme);
     document.documentElement.setAttribute('data-theme', theme === 'auto' ? registry.DEFAULT_THEME : theme);
   });
   (globalThis as AppearanceGlobals).setSerifFont = vi.fn((enabled: boolean) => {
@@ -35,7 +35,7 @@ function setAppearanceGlobals() {
     document.body.classList.toggle('font-sans', !enabled);
   });
   (globalThis as AppearanceGlobals).setPaperTexture = vi.fn((enabled: boolean) => {
-    localStorage.setItem('hana-paper-texture', enabled ? '1' : '0');
+    localStorage.setItem('lingxi-paper-texture', enabled ? '1' : '0');
   });
 }
 
@@ -123,8 +123,8 @@ describe('InterfaceTab appearance state', () => {
   });
 
   it('recomputes paper texture availability when the selected theme changes', () => {
-    localStorage.setItem('hana-theme', registry.DEFAULT_THEME);
-    localStorage.setItem('hana-paper-texture', '1');
+    localStorage.setItem('lingxi-theme', registry.DEFAULT_THEME);
+    localStorage.setItem('lingxi-paper-texture', '1');
 
     render(React.createElement(InterfaceTab));
 

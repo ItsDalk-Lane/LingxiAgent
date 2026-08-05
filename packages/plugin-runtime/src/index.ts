@@ -24,7 +24,7 @@ export type MaybePromise<T> = T | Promise<T>;
 
 export type JsonSchema = Record<string, unknown>;
 
-export const HANA_BUS_SKIP = Symbol.for('hana.event-bus.skip');
+export const HANA_BUS_SKIP = Symbol.for('lingxi.event-bus.skip');
 
 export interface LingxiToolResult {
   content?: Array<Record<string, unknown>>;

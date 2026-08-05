@@ -444,8 +444,8 @@ describe('expired session file presentation', () => {
         userId: 'user_remote',
         studioId: 'studio_remote',
         label: 'Remote Hana',
-        baseUrl: 'https://hana.example',
-        wsUrl: 'wss://hana.example',
+        baseUrl: 'https://lingxi.example',
+        wsUrl: 'wss://lingxi.example',
         token: 'remote token',
         authState: 'paired',
         trustState: 'tunnel',
@@ -507,7 +507,7 @@ describe('expired session file presentation', () => {
     const preview = screen.getByRole('img', { name: 'img.png' });
     expect(preview).toHaveAttribute(
       'src',
-      'https://hana.example/api/resources/res_sf_img/content',
+      'https://lingxi.example/api/resources/res_sf_img/content',
     );
   });
 

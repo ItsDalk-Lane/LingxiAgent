@@ -44,11 +44,11 @@ interface SkillBundleTreeProps {
 }
 
 function skillDragType() {
-  return 'application/x-hana-skill-name';
+  return 'application/x-lingxi-skill-name';
 }
 
 function bundleDragType() {
-  return 'application/x-hana-skill-bundle-id';
+  return 'application/x-lingxi-skill-bundle-id';
 }
 
 function startSkillDrag(event: React.DragEvent<HTMLDivElement>, skillName: string) {

@@ -47,8 +47,8 @@ const PLUGIN_IFRAME_HOST_QUERY_PARAMS = new Set([
   PLUGIN_IFRAME_TICKET_QUERY,
   PLUGIN_SURFACE_SESSION_QUERY,
   "agentId",
-  "hana-theme",
-  "hana-css",
+  "lingxi-theme",
+  "lingxi-css",
 ]);
 
 /**
@@ -77,7 +77,7 @@ async function proxyToPlugin(c: any, pluginApp: any, pluginId: string, agentId?:
   headers.delete(PLUGIN_SURFACE_SESSION_HEADER);
   // 请求级 env 是 agent 身份唯一信源；删除同名原始 header，避免调用方
   // 伪造第二套上下文或让插件 handler 误读到不同身份。
-  headers.delete("X-Hana-Agent-Id");
+  headers.delete("X-Lingxi-Agent-Id");
 
   const hasBody = c.req.method !== "GET" && c.req.method !== "HEAD";
   const subReq = new Request(url.toString(), {
