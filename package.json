@@ -1,6 +1,6 @@
 {
   "name": "lingxi",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "type": "module",
   "description": "Lingxi - a personal AI agent with memory and soul",
   "license": "Apache-2.0",
@@ -177,10 +177,7 @@
         "to": "assets/"
       }
     ],
-    "afterSign": [
-      "./scripts/resign-adhoc.cjs",
-      "./scripts/notarize.cjs"
-    ],
+    "afterSign": "./scripts/notarize.cjs",
     "mac": {
       "target": [
         "dmg",

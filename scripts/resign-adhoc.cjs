@@ -1,15 +1,15 @@
 /**
- * resign-adhoc.cjs — electron-builder afterSign 钩子：无证书时全量 ad-hoc 重签
+ * resign-adhoc.cjs — 无 Apple 证书时全量 ad-hoc 重签（electron-builder afterSign）
  *
- * 为什么需要这个钩子（根因见 v0.1.0 mac 崩溃报告）：
- *   CI 未配 Apple 证书时，electron-builder 走 ad-hoc 签名路径——它只把主程序
- *   Lingxi 和 Helper 重签成 ad-hoc，但 Electron Framework 等 .framework 仍保留
- *   Electron 官方 Team ID。macOS dyld 加载 framework 时发现「主进程(无 Team ID)
- *   与 framework(Electron 官方 Team ID) Team ID 不一致」，启动即 SIGABRT：
+ * 为什么需要这一步（根因见 v0.1.0 mac 崩溃报告）：
+ *   CI 未配 Apple 证书时，electron-builder 走 ad-hoc 签名——它把主程序和 Helper
+ *   重签成 ad-hoc，但 Electron Framework 等 .framework 仍保留 Electron 官方
+ *   Team ID。macOS dyld 加载 framework 时发现「主进程(无 Team ID) 与 framework
+ *   (Electron 官方 Team ID) Team ID 不一致」，启动即 SIGABRT：
  *     "code signature ... not valid for use in process:
  *      mapping process and mapped file (non-platform) have different Team IDs"
  *
- *   本钩子把包内所有 Mach-O 组件统一重签为 ad-hoc(无 Team ID)，消除 Team ID
+ *   本模块把包内所有 Mach-O 组件统一重签为 ad-hoc(无 Team ID)，消除 Team ID
  *   不一致。逻辑与本地安装用的 scripts/sign-local.cjs 同源（那份处理 /Applications，
  *   且包含已废弃的散装 server/ 树重签）。
  *
@@ -27,7 +27,10 @@
  *   注：Resources/seed/ 下是 tar.gz 归档，箱内 Mach-O 在 build-server 阶段已签，
  *   且 afterSign 时仍是归档形态，不在本层处理。
  *
- * 调用方式：作为 build.afterSign 数组的第一个元素，在 notarize.cjs 之前执行。
+ * 调用方式：electron-builder 的 afterSign 钩子在 26.8.x 只接受单个 string/function，
+ * 不支持数组（resolveFunction 遇非 string 直接原样返回，数组被当函数调用会崩）。
+ * 因此本模块由 scripts/notarize.cjs 在公证之前 require 并调用 exports.resignAdhoc，
+ * 由 notarize.cjs 作为唯一的 afterSign 入口编排「重签 → 公证」顺序。
  */
 const { execSync } = require("child_process");
 const fs = require("fs");
@@ -47,9 +50,6 @@ const path = require("path");
  * com.apple.provenance 会被一并清掉，codesign 不依赖它，不影响签名有效性。
  */
 function sign(target, opts = "") {
-  // xattr -cr 紧跟 codesign：清完立即签，把 codesign 阻塞性 detritus
-  //（FinderInfo / fileprovider 标记）的重新注入窗口压到最小。CI 环境
-  //（非 iCloud 同步目录）无此问题，本地同步目录下偶发注入则靠重试兜底。
   const cmd = `xattr -cr "${target}" && codesign --sign - --force ${opts} "${target}"`;
   let lastErr;
   for (let attempt = 1; attempt <= 3; attempt++) {
@@ -64,8 +64,12 @@ function sign(target, opts = "") {
   throw lastErr;
 }
 
-exports.default = async function resignAdhoc(context) {
-  // 仅 mac；electron-builder 对每个平台都会调用 afterSign，非 mac 直接放行。
+/**
+ * 无证书时全量 ad-hoc 重签。由 notarize.cjs 在公证前调用。
+ * @param {object} context electron-builder afterSign context
+ */
+async function resignAdhoc(context) {
+  // 仅 mac；notarize.cjs 已做平台判断，这里二次防御。
   if (context.electronPlatformName !== "darwin") return;
 
   // 有 Developer ID 证书时跳过：electron-builder 已统一签名，Team ID 一致。
@@ -109,4 +113,9 @@ exports.default = async function resignAdhoc(context) {
   // 4. fail-closed 校验：签名不一致的包绝不能流出构建机
   execSync(`codesign --verify --deep --strict "${appDir}"`, { stdio: "inherit" });
   console.log("[resign-adhoc] ✓ signed and verified");
-};
+}
+
+exports.resignAdhoc = resignAdhoc;
+// 保留 default 以便单独作为 hook 测试/兼容（electron-builder 读取 default）。
+exports.default = resignAdhoc;
+

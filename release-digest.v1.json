@@ -1,13 +1,13 @@
 {
   "schemaVersion": 1,
-  "tag": "v0.1.1",
-  "version": "0.1.1",
+  "tag": "v0.1.2",
+  "version": "0.1.2",
   "previousTag": "v0.1.0",
-  "generatedAt": "2026-08-05T16:10:00.000Z",
+  "generatedAt": "2026-08-05T17:20:00.000Z",
   "noUserFacingChanges": false,
   "summary": {
-    "zh": "0.1.1 修复 0.1.0 在 macOS 上无法启动的严重问题。根因是 CI 在无 Apple 证书时走 ad-hoc 签名路径，但只重签了主程序与 Helper，漏签了 Electron Framework——主程序（无 Team ID）与 Framework（Electron 官方 Team ID）Team ID 不一致，macOS dyld 在加载 framework 时直接终止进程，表现为双击无反应/闪退。本次在 electron-builder 的 afterSign 钩子里补全全量 ad-hoc 重签，统一包内所有 Mach-O 组件的签名身份，启动恢复正常。",
-    "en": "0.1.1 fixes a critical issue where 0.1.0 could not launch on macOS. The root cause: CI's certificate-less ad-hoc signing path re-signed only the main executable and Helpers, leaving Electron Framework with its original Electron Team ID. The Team ID mismatch between the main process (no Team ID) and the framework (Electron's Team ID) caused macOS dyld to terminate the process while loading the framework — appearing as a silent crash on launch. This release adds a full ad-hoc re-sign step in electron-builder's afterSign hook, unifying the signing identity of every Mach-O component in the bundle, so the app launches normally."
+    "zh": "0.1.2 修复 0.1.0 在 macOS 上无法启动的严重问题。根因是 CI 在无 Apple 证书时走 ad-hoc 签名路径，但只重签了主程序与 Helper，漏签了 Electron Framework——主程序（无 Team ID）与 Framework（Electron 官方 Team ID）Team ID 不一致，macOS dyld 在加载 framework 时直接终止进程，表现为双击无反应/闪退。本次在 electron-builder 的 afterSign 钩子里补全全量 ad-hoc 重签，统一包内所有 Mach-O 组件的签名身份，启动恢复正常。注：0.1.1 因 afterSign 配置写成数组（该版本 electron-builder 不支持）导致 CI 构建失败，未发布成功；0.1.2 改为单个 afterSign 入口在内部编排重签+公证后修复。",
+    "en": "0.1.2 fixes a critical issue where 0.1.0 could not launch on macOS. The root cause: CI's certificate-less ad-hoc signing path re-signed only the main executable and Helpers, leaving Electron Framework with its original Electron Team ID. The Team ID mismatch between the main process (no Team ID) and the framework (Electron's Team ID) caused macOS dyld to terminate the process while loading the framework — appearing as a silent crash on launch. This release adds a full ad-hoc re-sign step in electron-builder's afterSign hook, unifying the signing identity of every Mach-O component in the bundle, so the app launches normally. Note: 0.1.1 failed CI because afterSign was configured as an array (unsupported by this electron-builder version) and was never published; 0.1.2 fixes it with a single afterSign entry that orchestrates resign + notarize internally."
   },
   "counts": {
     "feature": 0,
@@ -18,8 +18,8 @@
   "source": {
     "owner": "ItsDalk-Lane",
     "repo": "LingxiAgent",
-    "commitRange": "v0.1.0..v0.1.1",
-    "releaseUrl": "https://github.com/ItsDalk-Lane/LingxiAgent/releases/tag/v0.1.1",
+    "commitRange": "v0.1.0..v0.1.2",
+    "releaseUrl": "https://github.com/ItsDalk-Lane/LingxiAgent/releases/tag/v0.1.2",
     "releaseNotes": ""
   },
   "items": [
@@ -32,8 +32,8 @@
         "en": "Fix macOS launch crash: unify ad-hoc signing Team ID"
       },
       "summary": {
-        "zh": "新增 electron-builder afterSign 钩子（resign-adhoc.cjs），在无 Apple 证书时把包内所有 Mach-O 组件（Electron Framework、各 Helper、computer-use helper、主程序）统一重签为 ad-hoc，消除主程序与 Framework 的 Team ID 不一致——这正是 0.1.0 在 macOS 上 dyld 加载 framework 即 SIGABRT 的根因。同时把 CI 里被硬编码为常开的 SKIP_NOTARIZE 改为「仅在无公证凭据时跳过」，配齐 Apple 凭据后可无缝切到正规签名+公证。",
-        "en": "Adds an electron-builder afterSign hook (resign-adhoc.cjs) that, when no Apple certificate is present, re-signs every Mach-O component in the bundle (Electron Framework, Helpers, computer-use helper, main executable) to a unified ad-hoc identity, eliminating the Team ID mismatch between the main process and the framework — the root cause of 0.1.0's dyld SIGABRT on macOS launch. The CI's hardcoded-always-on SKIP_NOTARIZE is also corrected to 'skip only when notary credentials are absent', so adding Apple credentials later switches to proper signing + notarization with no further changes."
+        "zh": "新增 electron-builder afterSign 重签逻辑（resign-adhoc.cjs），在无 Apple 证书时把包内所有 Mach-O 组件（Electron Framework、各 Helper、computer-use helper、主程序）统一重签为 ad-hoc，消除主程序与 Framework 的 Team ID 不一致——这正是 0.1.0 在 macOS 上 dyld 加载 framework 即 SIGABRT 的根因。该逻辑由唯一的 afterSign 入口 notarize.cjs 在公证之前编排调用（electron-builder 26.8.x 的 afterSign 不支持数组配置）。同时把 CI 里被硬编码为常开的 SKIP_NOTARIZE 改为「仅在无公证凭据时跳过」，配齐 Apple 凭据后可无缝切到正规签名+公证。",
+        "en": "Adds an electron-builder afterSign re-sign step (resign-adhoc.cjs) that, when no Apple certificate is present, re-signs every Mach-O component in the bundle (Electron Framework, Helpers, computer-use helper, main executable) to a unified ad-hoc identity, eliminating the Team ID mismatch between the main process and the framework — the root cause of 0.1.0's dyld SIGABRT on macOS launch. The logic is orchestrated by the single afterSign entry notarize.cjs before notarization (electron-builder 26.8.x does not support array afterSign configs). The CI's hardcoded-always-on SKIP_NOTARIZE is also corrected to 'skip only when notary credentials are absent', so adding Apple credentials later switches to proper signing + notarization with no further changes."
       },
       "details": [
         {
@@ -41,8 +41,8 @@
           "en": "Crash report evidence: codeSigningTeamID was empty (ad-hoc main process), and loading Electron Framework failed with 'mapping process and mapped file have different Team IDs' — dyld terminated the process within 30ms of launch."
         },
         {
-          "zh": "对比验证：本地 install:local 走的 sign-local.cjs 全量 ad-hoc 重签能正常启动，但 CI 发布流程从未执行该步骤，发布的 0.1.0 是半残 ad-hoc。",
-          "en": "Comparative verification: the local install:local path runs sign-local.cjs for a full ad-hoc re-sign and launches fine, but the CI release pipeline never ran that step, so the published 0.1.0 was a half-signed ad-hoc build."
+          "zh": "0.1.1 教训：afterSign 写成数组 [a.cjs, b.cjs]，但 electron-builder 的 resolveFunction 只接受 string，数组被原样注册为事件处理器，emit 时崩溃，CI 构建失败未发布。0.1.2 改为 notarize.cjs 单入口，内部 require 并调用 resignAdhoc。",
+          "en": "0.1.1 lesson: afterSign was written as an array [a.cjs, b.cjs], but electron-builder's resolveFunction only accepts a string; the array was registered as-is as the event handler and crashed on emit, failing CI. 0.1.2 uses notarize.cjs as the single entry, which requires and calls resignAdhoc internally."
         }
       ],
       "sources": [
