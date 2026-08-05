@@ -42,12 +42,15 @@ jobs:
       - name: Build renderer bundle
         run: |
           set -o pipefail
+          echo "MEM_BEFORE:"; free -m || true
           if ! npm run build:renderer > /tmp/renderer-build.log 2>&1; then
-            echo "::error::==== build:renderer FAILED (last 60 lines) ===="
-            tail -60 /tmp/renderer-build.log | while IFS= read -r line; do echo "::error::$line"; done
+            echo "::error::==== FULL BUILD LOG ($(wc -c < /tmp/renderer-build.log) bytes) ===="
+            # 单条 ::error:: 塞入完整日志（GitHub 每条 annotation 上限 64KB）
+            echo "::error::$(cat /tmp/renderer-build.log | head -c 30000)"
+            echo "MEM_AFTER:"; free -m || true
             exit 1
           fi
-          tail -5 /tmp/renderer-build.log
+          tail -3 /tmp/renderer-build.log
 
       # 诊断（临时）：无论成败都把构建日志作为 artifact 上传，用于排查 CI 上
       # build:renderer 偶发/平台相关的失败。定位后移除。
