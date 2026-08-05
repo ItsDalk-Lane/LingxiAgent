@@ -3,7 +3,6 @@ import { spawn, spawnSync } from "child_process";
 import { extractZip } from "../extract-zip.ts";
 import {
   chmodSync,
-  copyFileSync,
   createWriteStream,
   existsSync,
   mkdirSync,
@@ -126,13 +125,7 @@ function requireAbsoluteDirectory(value, optionName) {
 
 function resolveSearchToolPaths(options: Record<string, any> = {}) {
   const managedBinDir = requireAbsoluteDirectory(options.managedBinDir, "managedBinDir");
-  const legacyManagedBinDir = options.legacyManagedBinDir == null
-    ? null
-    : requireAbsoluteDirectory(options.legacyManagedBinDir, "legacyManagedBinDir");
-  if (legacyManagedBinDir && legacyManagedBinDir === managedBinDir) {
-    throw new TypeError("legacyManagedBinDir must differ from managedBinDir");
-  }
-  return { managedBinDir, legacyManagedBinDir };
+  return { managedBinDir };
 }
 
 function commandExists(command) {
@@ -151,61 +144,12 @@ function managedBinaryPath(tool, managedBinDir) {
   return path.join(managedBinDir, `${config.binaryName}${binaryExt}`);
 }
 
-function removeMigrationTemp(tempPath) {
-  try {
-    rmSync(tempPath, { force: true });
-  } catch {
-    // The migration error below is the actionable failure. Cleanup is best
-    // effort because an invalid destination parent can make rm fail too.
-  }
-}
-
-function migrateLegacyManagedBinary(tool, { managedBinDir, legacyManagedBinDir }) {
-  if (!legacyManagedBinDir) return null;
-  const legacyPath = managedBinaryPath(tool, legacyManagedBinDir);
-  const managedPath = managedBinaryPath(tool, managedBinDir);
-  if (!legacyPath || !managedPath || !existsSync(legacyPath)) return null;
-
-  const tempPath = path.join(
-    managedBinDir,
-    `.${path.basename(managedPath)}.migrating-${process.pid}-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`,
-  );
-  try {
-    mkdirSync(managedBinDir, { recursive: true });
-    copyFileSync(legacyPath, tempPath);
-    if (platform() !== "win32") chmodSync(tempPath, 0o755);
-    if (existsSync(managedPath)) {
-      removeMigrationTemp(tempPath);
-      return managedPath;
-    }
-    try {
-      renameSync(tempPath, managedPath);
-    } catch (error) {
-      if (existsSync(managedPath)) {
-        removeMigrationTemp(tempPath);
-        return managedPath;
-      }
-      throw error;
-    }
-    return managedPath;
-  } catch (error) {
-    removeMigrationTemp(tempPath);
-    const message = error instanceof Error ? error.message : String(error);
-    throw new Error(`Failed to migrate legacy ${tool} binary from ${legacyPath} to ${managedPath}: ${message}`, {
-      cause: error,
-    });
-  }
-}
-
 function getToolPath(tool, toolPaths) {
   const config = TOOL_CONFIGS[tool];
   if (!config) return null;
 
   const managedPath = managedBinaryPath(tool, toolPaths.managedBinDir);
   if (existsSync(managedPath)) return managedPath;
-
-  const migratedPath = migrateLegacyManagedBinary(tool, toolPaths);
-  if (migratedPath) return migratedPath;
 
   if (commandExists(config.binaryName)) return config.binaryName;
   return null;

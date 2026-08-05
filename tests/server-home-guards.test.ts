@@ -277,7 +277,6 @@ describe("server home guards — real spawn behavior (fast failure paths, before
       fs.mkdirSync(path.join(realHome, "user"), { recursive: true });
       fs.writeFileSync(path.join(realHome, "user", "preferences.json"), JSON.stringify({
         _dataVersion: 43,
-        _configScopeMigrated: true,
         _defaultsRelaxedMigrated: true,
       }, null, 2) + "\n", "utf-8");
       fs.writeFileSync(path.join(realHome, "added-models.yaml"), "_migrated: true\nproviders: {}\n", "utf-8");
@@ -291,14 +290,15 @@ describe("server home guards — real spawn behavior (fast failure paths, before
 
       const child = spawnServerBootstrap(linkedHome);
       // The default marker only proves first-run seeding completed. Wait until
-      // engine initialization reaches the first post-migration phase so the
-      // registry has finished writing its per-step receipts before shutdown.
+      // engine initialization reaches the first post-migration phase so startup
+      // has fully passed the (now empty) migration registry before shutdown.
       const result = await waitForStartupProgress(child, "[init] 1/5 Pi SDK 初始化...");
 
       expect(result.stderr).toContain("LINGXI_DATA_EPOCH_BASELINE_WARNING reason=ambiguous-unstamped-home");
       expect(result.stderr).not.toContain("LINGXI_DATA_EPOCH_TRANSITION_INCOMPLETE");
+      // 旧数据迁移注册表已整体退役：没有待执行迁移时 runner 不会推进 _dataVersion。
       expect(JSON.parse(fs.readFileSync(path.join(realHome, "user", "preferences.json"), "utf-8"))._dataVersion)
-        .toBeGreaterThan(43);
+        .toBe(43);
     } finally {
       fs.rmSync(container, { recursive: true, force: true });
     }

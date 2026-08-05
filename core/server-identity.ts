@@ -16,12 +16,11 @@ import { ensureStudioMountRegistry } from "./studio-mounts.ts";
 const SERVER_NODE_FILE = "server-node.json";
 const USERS_FILE = "users.json";
 const STUDIOS_FILE = "studios.json";
-const LEGACY_SPACES_FILE = "spaces.json";
 
 export function loadServerIdentity(lingxiHome) {
   const serverNode = readRequiredIdentityJson(path.join(lingxiHome, SERVER_NODE_FILE), SERVER_NODE_FILE);
   const users = readRequiredIdentityJson(path.join(lingxiHome, USERS_FILE), USERS_FILE);
-  const studios = readRequiredStudioRegistry(lingxiHome);
+  const studios = readRequiredIdentityJson(path.join(lingxiHome, STUDIOS_FILE), STUDIOS_FILE);
 
   validateServerNodeIdentity(serverNode, SERVER_NODE_FILE);
   validateUsersIdentity(users, USERS_FILE);
@@ -51,32 +50,18 @@ export function ensureLocalIdentityRegistries(lingxiHome) {
   const serverNodePath = path.join(lingxiHome, SERVER_NODE_FILE);
   const usersPath = path.join(lingxiHome, USERS_FILE);
   const studiosPath = path.join(lingxiHome, STUDIOS_FILE);
-  const legacySpacesPath = path.join(lingxiHome, LEGACY_SPACES_FILE);
 
   const existingServerNode = readIdentityJsonIfPresent(serverNodePath, SERVER_NODE_FILE);
   const existingUsers = readIdentityJsonIfPresent(usersPath, USERS_FILE);
   const existingStudios = readIdentityJsonIfPresent(studiosPath, STUDIOS_FILE);
-  const existingLegacySpaces = existingStudios
-    ? null
-    : readIdentityJsonIfPresent(legacySpacesPath, LEGACY_SPACES_FILE);
 
   if (existingServerNode) validateServerNodeIdentity(existingServerNode, SERVER_NODE_FILE);
   if (existingUsers) validateUsersIdentity(existingUsers, USERS_FILE);
   if (existingStudios) validateStudiosIdentity(existingStudios, STUDIOS_FILE);
-  if (existingLegacySpaces) validateLegacySpacesIdentity(existingLegacySpaces, LEGACY_SPACES_FILE);
-
-  const migratedStudios = existingStudios
-    ? null
-    : existingLegacySpaces
-      ? mapLegacySpacesToStudios(existingLegacySpaces)
-      : null;
 
   const now = new Date().toISOString();
-  const users = existingUsers || createLegacyUsersIdentity({
-    userId: migratedStudios ? getDefaultStudio(migratedStudios).ownerUserId : undefined,
-    now,
-  });
-  const studios = existingStudios || migratedStudios || createLegacyStudiosIdentity({
+  const users = existingUsers || createDefaultUsersIdentity({ now });
+  const studios = existingStudios || createDefaultStudiosIdentity({
     ownerUserId: users.defaultUserId,
     now,
   });
@@ -100,7 +85,6 @@ export function ensureLocalIdentityRegistries(lingxiHome) {
       !existingStudios ? STUDIOS_FILE : null,
       ...foundationRegistries.created,
     ].filter(Boolean),
-    migratedFromLegacySpaces: !existingStudios && !!existingLegacySpaces,
   };
 }
 
@@ -149,21 +133,6 @@ function ensureSecurityRegistries(lingxiHome, { now }) {
   return { created };
 }
 
-function readRequiredStudioRegistry(lingxiHome) {
-  const studiosPath = path.join(lingxiHome, STUDIOS_FILE);
-  const studios = readIdentityJsonIfPresent(studiosPath, STUDIOS_FILE);
-  if (studios) return studios;
-
-  const legacySpacesPath = path.join(lingxiHome, LEGACY_SPACES_FILE);
-  const legacySpaces = readIdentityJsonIfPresent(legacySpacesPath, LEGACY_SPACES_FILE);
-  if (legacySpaces) {
-    validateLegacySpacesIdentity(legacySpaces, LEGACY_SPACES_FILE);
-    return mapLegacySpacesToStudios(legacySpaces);
-  }
-
-  throw new Error(`${STUDIOS_FILE} not found`);
-}
-
 function readRequiredIdentityJson(filePath, label) {
   try {
     return JSON.parse(fs.readFileSync(filePath, "utf-8"));
@@ -206,8 +175,8 @@ function createLocalServerNodeIdentity({ now }) {
   };
 }
 
-function createLegacyUsersIdentity({ userId, now }) {
-  const resolvedUserId = userId || `user_${crypto.randomUUID()}`;
+function createDefaultUsersIdentity({ now }) {
+  const resolvedUserId = `user_${crypto.randomUUID()}`;
   return {
     schemaVersion: 1,
     defaultUserId: resolvedUserId,
@@ -224,7 +193,7 @@ function createLegacyUsersIdentity({ userId, now }) {
   };
 }
 
-function createLegacyStudiosIdentity({ ownerUserId, now }) {
+function createDefaultStudiosIdentity({ ownerUserId, now }) {
   const studioId = `studio_${crypto.randomUUID()}`;
   return {
     schemaVersion: 1,
@@ -245,31 +214,6 @@ function createLegacyStudiosIdentity({ ownerUserId, now }) {
     createdAt: now,
     updatedAt: now,
   };
-}
-
-function mapLegacySpacesToStudios(spaces) {
-  return {
-    schemaVersion: spaces.schemaVersion,
-    defaultStudioId: spaces.defaultSpaceId,
-    studios: spaces.spaces.map((space) => ({
-      studioId: space.spaceId,
-      ownerUserId: space.ownerUserId,
-      label: migrateLegacyStudioLabel(space.label),
-      kind: space.kind,
-      ...(space.storage ? { storage: space.storage } : {}),
-      membershipModel: space.membershipModel,
-      ...(space.createdAt ? { createdAt: space.createdAt } : {}),
-      ...(space.updatedAt ? { updatedAt: space.updatedAt } : {}),
-    })),
-    ...(spaces.createdAt ? { createdAt: spaces.createdAt } : {}),
-    ...(spaces.updatedAt ? { updatedAt: spaces.updatedAt } : {}),
-  };
-}
-
-function migrateLegacyStudioLabel(label) {
-  if (label === "Personal Space") return "Personal Studio";
-  if (label === "Default Space") return "Default Studio";
-  return label;
 }
 
 function validateServerNodeIdentity(value, label) {
@@ -335,29 +279,6 @@ function validateStudiosIdentity(value, label) {
   }
   if (!seen.has(value.defaultStudioId)) {
     throw new Error(`invalid ${label}: defaultStudioId must reference an existing studio`);
-  }
-}
-
-function validateLegacySpacesIdentity(value, label) {
-  if (!isPlainObject(value)) throw new Error(`invalid ${label}: expected object`);
-  if (value.schemaVersion !== 1) throw new Error(`invalid ${label}: schemaVersion must be 1`);
-  if (!isNonEmptyString(value.defaultSpaceId)) throw new Error(`invalid ${label}: defaultSpaceId required`);
-  if (!Array.isArray(value.spaces) || value.spaces.length === 0) {
-    throw new Error(`invalid ${label}: spaces must be a non-empty array`);
-  }
-  const seen = new Set();
-  for (const space of value.spaces) {
-    if (!isPlainObject(space)) throw new Error(`invalid ${label}: space must be object`);
-    if (!isNonEmptyString(space.spaceId)) throw new Error(`invalid ${label}: spaceId required`);
-    if (seen.has(space.spaceId)) throw new Error(`invalid ${label}: duplicate spaceId ${space.spaceId}`);
-    seen.add(space.spaceId);
-    if (!isNonEmptyString(space.ownerUserId)) throw new Error(`invalid ${label}: ownerUserId required`);
-    if (!isNonEmptyString(space.label)) throw new Error(`invalid ${label}: space.label required`);
-    if (!isNonEmptyString(space.kind)) throw new Error(`invalid ${label}: space.kind required`);
-    if (!isNonEmptyString(space.membershipModel)) throw new Error(`invalid ${label}: membershipModel required`);
-  }
-  if (!seen.has(value.defaultSpaceId)) {
-    throw new Error(`invalid ${label}: defaultSpaceId must reference an existing space`);
   }
 }
 

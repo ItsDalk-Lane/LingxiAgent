@@ -229,4 +229,4 @@ first-match-wins 的实际匹配次序。改数组顺序时同步改这张表。
 
 ## 历史背景
 
-本架构由 commit `2a9ea17`（README 奠基）至 `0d87520`（llm-client 收口）一系列 commit 引入，根因来自 issue [#468](https://github.com/liliMozi/openhanako/issues/468) 的 DeepSeek 思考模式 400。
+本架构由 commit `2a9ea17`（README 奠基）至 `0d87520`（llm-client 收口）一系列 commit 引入，根因来自上游 openhanako 仓库 issue #468 的 DeepSeek 思考模式 400。

@@ -14,7 +14,7 @@ describe("release mirror workflows", () => {
 
     expect(workflow).toContain("mirror-atomgit:");
     expect(workflow).toContain("needs: release");
-    expect(workflow).toContain("ATOMGIT_REPO: OpenHanako-Releases");
+    expect(workflow).toContain("ATOMGIT_REPO: LingxiAgent-Releases");
     expect(workflow).toContain("node scripts/mirror-release-to-atomgit.mjs --tag \"${{ github.ref_name }}\"");
     expect(workflow).not.toContain("node scripts/mirror-release-to-atomgit.mjs --newest");
     expect(workflow).not.toContain("node scripts/mirror-release-to-atomgit.mjs --latest");
@@ -26,7 +26,7 @@ describe("release mirror workflows", () => {
     expect(workflow).toContain("- newest");
     expect(workflow).toContain("- stable");
     expect(workflow).toContain("- tag");
-    expect(workflow).toContain("ATOMGIT_REPO: OpenHanako-Releases");
+    expect(workflow).toContain("ATOMGIT_REPO: LingxiAgent-Releases");
     expect(workflow).toContain("INPUT_LIMIT: ${{ inputs.limit }}");
     expect(workflow).toContain('ARGS+=(--stable "$INPUT_LIMIT")');
     expect(workflow).toContain('ARGS+=(--newest "$INPUT_LIMIT")');

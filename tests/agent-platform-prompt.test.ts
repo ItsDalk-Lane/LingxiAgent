@@ -47,24 +47,26 @@ afterEach(() => {
 });
 
 describe("Agent platform prompt identity", () => {
-  it("describes the current LingxiAgent platform name and the former OpenHanako name in Chinese", () => {
+  it("describes the Lingxi platform identity in Chinese without upstream references", () => {
     const prompt = makeAgent("zh-CN").buildSystemPrompt({
       forceMemoryEnabled: false,
       forceExperienceEnabled: false,
     });
 
-    expect(prompt).toContain("你运行在 LingxiAgent 平台上（原名 OpenHanako）");
-    expect(prompt).toContain("https://github.com/liliMozi/openhanako");
+    expect(prompt).toContain("你运行在灵犀（Lingxi）平台上");
+    expect(prompt).not.toContain("ItsDalk-Lane");
+    expect(prompt).not.toContain("LingxiAgent");
   });
 
-  it("describes the current LingxiAgent platform name and the former OpenHanako name in English", () => {
+  it("describes the Lingxi platform identity in English without upstream references", () => {
     const prompt = makeAgent("en").buildSystemPrompt({
       forceMemoryEnabled: false,
       forceExperienceEnabled: false,
     });
 
-    expect(prompt).toContain("You are running on the LingxiAgent platform (formerly OpenHanako)");
-    expect(prompt).toContain("https://github.com/liliMozi/openhanako");
+    expect(prompt).toContain("You are running on the Lingxi (灵犀) platform");
+    expect(prompt).not.toContain("ItsDalk-Lane");
+    expect(prompt).not.toContain("LingxiAgent");
   });
 
   it("distinguishes SessionFile identity from writable local refs in Chinese", () => {

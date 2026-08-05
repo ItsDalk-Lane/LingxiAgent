@@ -55,8 +55,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ATOMGIT_TOKEN: ${{ secrets.ATOMGIT_TOKEN }}
-          ATOMGIT_OWNER: liliMozi
-          ATOMGIT_REPO: OpenHanako-Releases
+          ATOMGIT_OWNER: ItsDalk-Lane
+          ATOMGIT_REPO: LingxiAgent-Releases
           EVENT_NAME: ${{ github.event_name }}
           RELEASE_TAG: ${{ github.event.release.tag_name }}
           INPUT_MODE: ${{ inputs.mode }}

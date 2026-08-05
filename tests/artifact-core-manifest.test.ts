@@ -37,7 +37,7 @@ function baseManifest(overrides: Record<string, unknown> = {}) {
         },
       },
     },
-    mirrors: ["https://github.com/liliMozi/openhanako/releases/download/train-412"],
+    mirrors: ["https://github.com/ItsDalk-Lane/LingxiAgent/releases/download/train-412"],
     ...overrides,
   };
 }

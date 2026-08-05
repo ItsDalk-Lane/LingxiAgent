@@ -13,7 +13,7 @@
 <p align="center"><a href="README_EN.md">English</a></p>
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
-[![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Windows%20%7C%20Linux-lightgrey.svg)](https://github.com/liliMozi/openhanako/releases)
+![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Windows%20%7C%20Linux-lightgrey.svg)
 
 ---
 
@@ -71,15 +71,15 @@ LingxiAgent 是一个更加易用的 AI agent，有记忆，有性格，会主�
 
 ### 下载安装
 
-**macOS（Apple Silicon / Intel）**：从 [Releases](https://github.com/liliMozi/openhanako/releases) 下载最新 `.dmg`。
+**macOS（Apple Silicon / Intel）**：从 Releases 页面下载最新 `.dmg`。
 
 应用已通过 Apple Developer ID 签名和公证，macOS 应该可以直接打开。
 
-**Windows**：从 [Releases](https://github.com/liliMozi/openhanako/releases) 下载最新 `.exe` 安装包。
+**Windows**：从 Releases 页面下载最新 `.exe` 安装包。
 
 > **Windows SmartScreen 提示：** 安装包暂未经过代码签名，首次运行时 Windows Defender SmartScreen 可能会拦截，点击**更多信息** → **仍要运行**即可，未签名版本的正常现象。
 
-**Linux**：从 [Releases](https://github.com/liliMozi/openhanako/releases) 下载最新 `.AppImage` 或 `.deb`。
+**Linux**：从 Releases 页面下载最新 `.AppImage` 或 `.deb`。
 
 ### 首次运行
 
@@ -105,10 +105,10 @@ tests/          Vitest 测试
 
 Session 内的用户可见文件通过 `SessionFile` sidecar 统一登记，桌面端、Bridge、Mobile PWA 和其它远程前端按各自能力消费同一份文件身份。各 Bridge adapter 显式声明自己的媒体类型、投递方式与大小限制；插件文件贡献规则见 `PLUGINS.md`。
 
-本机 staged 文件优先由各平台 adapter 直接上传：Telegram / 飞书 / 微信走各自上传接口，QQ 走官方 Bot 分片上传接口，再发送 `msg_type: 7` 富媒体消息。`preferences.bridge.mediaPublicBaseUrl` / `LINGXI_BRIDGE_PUBLIC_BASE_URL` 只用于仍需公网 URL 的平台或远程 fallback；该 URL 作为 `/api/bridge/media/:token` 临时文件路由的 origin，文件本身仍由短期 token、下载次数和本地路径白名单保护。Hana 不会自动开启公网 tunnel，公网入口必须由用户显式提供。
+本机 staged 文件优先由各平台 adapter 直接上传：Telegram / 飞书 / 微信走各自上传接口，QQ 走官方 Bot 分片上传接口，再发送 `msg_type: 7` 富媒体消息。`preferences.bridge.mediaPublicBaseUrl` / `LINGXI_BRIDGE_PUBLIC_BASE_URL` 只用于仍需公网 URL 的平台或远程 fallback；该 URL 作为 `/api/bridge/media/:token` 临时文件路由的 origin，文件本身仍由短期 token、下载次数和本地路径白名单保护。Lingxi 不会自动开启公网 tunnel，公网入口必须由用户显式提供。
 
 Server 以独立 Node.js 进程运行（由 Electron spawn 或独立启动），通过 Vite 打包，@vercel/nft 追踪依赖。与 Electron 渲染进程通过 WebSocket 通信。
-用户数据目录由 `LINGXI_HOME` 决定（生产默认 `~/.hanako`，开发默认 `~/.hanako-dev`）。Hana 管理的 Pi SDK 运行时资源位于 `${LINGXI_HOME}/runtime/pi-sdk/`；Hana 不依赖 Pi 的全局 agent 目录或 `PI_CODING_AGENT_DIR`。旧版本遗留在 `${LINGXI_HOME}/.pi/agent/bin/` 的 `fd` / `rg` 只会在首次使用相应搜索工具时复制到新目录，旧文件会原样保留。
+用户数据目录由 `LINGXI_HOME` 决定（生产默认 `~/.lingxi`，开发默认 `~/.lingxi-dev`）。Lingxi 管理的 Pi SDK 运行时资源位于 `${LINGXI_HOME}/runtime/pi-sdk/`；Lingxi 不依赖 Pi 的全局 agent 目录或 `PI_CODING_AGENT_DIR`。
 
 ## 技术栈
 
@@ -158,6 +158,9 @@ npm test
 npm run typecheck
 ```
 
+### 打包与发布
+
+`npm run pack` / `npm run dist*` 走 electron-builder。`package.json` 里 `build.publish` 已指向发布仓库 [ItsDalk-Lane/LingxiAgent](https://github.com/ItsDalk-Lane/LingxiAgent)，`--publish` 发布与自动更新都走该仓库的 Releases；不带 `--publish` 的本地构建不受影响。
 ## 致谢
 
 - [tw93/kami](https://github.com/tw93/kami)：beautify 插件 HTML 美学规范的「路由器 + 平级章节按需获取」渐进披露结构受其启发。
@@ -168,12 +171,6 @@ npm run typecheck
 
 ## 链接
 
-> 仓库和 release 地址在当前迁移阶段仍保留旧的 `openhanako` URL，后续仓库 rename 会单独执行。
-
-- [官网](https://openhanako.com)
-- [提交 Issue](https://github.com/liliMozi/openhanako/issues)
-- [安全页](https://github.com/liliMozi/openhanako/security)
 - [安全政策](SECURITY.md)
 - [插件开发指南](PLUGINS.md)
 - [贡献指南](CONTRIBUTING.md)
-- [国内 AtomGit 托管](https://gitcode.com/liliMozi/OpenHanako)

@@ -1552,52 +1552,6 @@ describe("createWin32Exec", () => {
       .not.toContain("C:\\read-only-reference");
   });
 
-  it("holds a cleanup lease while sandboxed commands use writable roots", async () => {
-    classifyWin32Command.mockReturnValue({ runner: "cmd", reason: "windows-native-utility" });
-    const helper = "C:\\Hanako\\resources\\sandbox\\windows\\lingxi-win-sandbox.exe";
-    existsSync.mockImplementation((p) => p === helper);
-    const cleanupQueue = {
-      beginRootUse: vi.fn(() => ({ id: "lease-1" })),
-      endRootUse: vi.fn(),
-      enqueueRoots: vi.fn(),
-    };
-    const createWin32Exec = await loadExecFactory();
-    const exec = createWin32Exec({
-      sandbox: {
-        helperPath: helper,
-        legacyCleanupQueue: cleanupQueue,
-        grants: {
-          readPaths: [],
-          writePaths: ["C:\\work"],
-          optionalWritePaths: ["C:\\Users\\Hana\\.hanako\\.ephemeral"],
-        },
-      },
-    });
-
-    await exec("echo hello", "C:\\work", {
-      onData: () => {},
-      signal: undefined,
-      timeout: 5,
-      env: { PATH: "C:\\Windows\\System32" },
-    });
-
-    expect(cleanupQueue.beginRootUse).toHaveBeenCalledWith([
-      "C:\\work",
-      "C:\\Users\\Hana\\.hanako\\.ephemeral",
-    ]);
-    expect(cleanupQueue.endRootUse).toHaveBeenCalledWith({ id: "lease-1" });
-    expect(cleanupQueue.enqueueRoots).toHaveBeenCalledWith([
-      "C:\\work",
-      "C:\\Users\\Hana\\.hanako\\.ephemeral",
-    ]);
-    expect(cleanupQueue.beginRootUse.mock.invocationCallOrder[0])
-      .toBeLessThan(spawnAndStream.mock.invocationCallOrder[0]);
-    expect(cleanupQueue.endRootUse.mock.invocationCallOrder[0])
-      .toBeGreaterThan(spawnAndStream.mock.invocationCallOrder[0]);
-    expect(cleanupQueue.endRootUse.mock.invocationCallOrder[0])
-      .toBeLessThan(cleanupQueue.enqueueRoots.mock.invocationCallOrder[0]);
-  });
-
   it("rewrites sandboxed Bash commands to the user-writable runtime cache", async () => {
     classifyWin32Command.mockReturnValue({ runner: "bash", reason: "complex-shell" });
     const bundledShell = "C:\\Hanako\\resources\\git\\bin\\bash.exe";

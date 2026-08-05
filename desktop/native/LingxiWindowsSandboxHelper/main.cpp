@@ -46,27 +46,11 @@ struct Options {
     bool parentPidSpecified = false;
     std::vector<WritableRoot> writableRoots;
     std::vector<std::wstring> denyWritePaths;
-    std::vector<std::wstring> lingxiWriteAclCleanupPaths;
-    std::vector<std::wstring> legacyAclDiagnosticPaths;
-    std::vector<std::wstring> legacyProfileNames;
-    std::vector<std::wstring> legacyProfileCleanupNames;
-    bool cleanupLegacyAcl = false;
     bool diagnoseToken = false;
     bool currentDesktop = false;
     bool verbatimLastArg = false;
     std::wstring executable;
     std::vector<std::wstring> args;
-};
-
-struct LegacyProfileSid {
-    std::wstring name;
-    std::wstring sidString;
-    PSID sid = nullptr;
-};
-
-struct MigrationResult {
-    int findings = 0;
-    int failures = 0;
 };
 
 struct AclRestore {
@@ -334,14 +318,6 @@ static std::wstring sidForWritableRoot(const std::wstring& root) {
     return hashSidForWritableRoot(root, L"S-1-5-21-", L"lingxi-win32-write-root-v3:");
 }
 
-static std::wstring sidForWritableRootLegacyCapabilityNamespace(const std::wstring& root) {
-    return hashSidForWritableRoot(root, L"S-1-15-3-4096-", L"lingxi-win32-write-root-v2:");
-}
-
-static std::wstring sidForWritableRootLegacyAccountNamespace(const std::wstring& root) {
-    return hashSidForWritableRoot(root, L"S-1-5-21-", L"lingxi-win32-write-root:");
-}
-
 static Options parseArgs(int argc, wchar_t** argv) {
     Options opts;
     bool passthrough = false;
@@ -386,26 +362,6 @@ static Options parseArgs(int argc, wchar_t** argv) {
             opts.denyWritePaths.push_back(argv[++i]);
             continue;
         }
-        if (arg == L"--cleanup-lingxi-write-acl" && i + 1 < argc) {
-            opts.lingxiWriteAclCleanupPaths.push_back(argv[++i]);
-            continue;
-        }
-        if (arg == L"--diagnose-legacy-acl" && i + 1 < argc) {
-            opts.legacyAclDiagnosticPaths.push_back(argv[++i]);
-            continue;
-        }
-        if (arg == L"--cleanup-legacy-acl") {
-            opts.cleanupLegacyAcl = true;
-            continue;
-        }
-        if (arg == L"--legacy-appcontainer-profile" && i + 1 < argc) {
-            opts.legacyProfileNames.push_back(argv[++i]);
-            continue;
-        }
-        if (arg == L"--cleanup-legacy-profile" && i + 1 < argc) {
-            opts.legacyProfileCleanupNames.push_back(argv[++i]);
-            continue;
-        }
         if (arg == L"--diagnose-token") {
             opts.diagnoseToken = true;
             continue;
@@ -427,17 +383,6 @@ static Options parseArgs(int argc, wchar_t** argv) {
         throw std::runtime_error("unknown or incomplete argument");
     }
 
-    bool maintenanceMode = !opts.lingxiWriteAclCleanupPaths.empty() ||
-        !opts.legacyAclDiagnosticPaths.empty() ||
-        !opts.legacyProfileNames.empty() ||
-        !opts.legacyProfileCleanupNames.empty() ||
-        opts.cleanupLegacyAcl;
-    if (maintenanceMode) {
-        if (!opts.cwd.empty() || !opts.executable.empty() || !opts.writableRoots.empty() || !opts.denyWritePaths.empty() || opts.diagnoseToken || opts.currentDesktop || opts.verbatimLastArg || opts.timeoutSpecified || opts.superviseServer || opts.parentPidSpecified) {
-            throw std::runtime_error("maintenance arguments cannot be combined with sandbox execution arguments");
-        }
-        return opts;
-    }
     if (opts.superviseServer) {
         if (!opts.parentPidSpecified) throw std::runtime_error("missing --parent-pid");
         if (opts.cwd.empty()) throw std::runtime_error("missing --cwd");
@@ -1941,26 +1886,6 @@ static int runSandboxed(const Options& opts, HANDLE restrictedToken) {
     return HELPER_TERMINATION_FAILED_EXIT_CODE;
 }
 
-static bool stringStartsWith(const std::wstring& value, const std::wstring& prefix) {
-    return value.size() >= prefix.size() && value.compare(0, prefix.size(), prefix) == 0;
-}
-
-static bool isDigitsOnly(const std::wstring& value) {
-    if (value.empty()) return false;
-    return std::all_of(value.begin(), value.end(), [](wchar_t ch) {
-        return ch >= L'0' && ch <= L'9';
-    });
-}
-
-static bool isLegacyAppContainerProfileName(const std::wstring& name) {
-    const std::wstring prefix = L"com.lingxi.sandbox.";
-    if (!stringStartsWith(name, prefix)) return false;
-    std::wstring rest = name.substr(prefix.size());
-    size_t dot = rest.find(L'.');
-    if (dot == std::wstring::npos) return false;
-    return isDigitsOnly(rest.substr(0, dot)) && isDigitsOnly(rest.substr(dot + 1));
-}
-
 static std::wstring sidToString(PSID sid) {
     LPWSTR sidText = nullptr;
     if (!sid || !ConvertSidToStringSidW(sid, &sidText)) return L"";
@@ -2049,304 +1974,6 @@ static int diagnoseRestrictedToken(const Options& opts) {
     return 0;
 }
 
-static bool isLegacyAppContainerSid(PSID sid, std::wstring* sidStringOut = nullptr) {
-    std::wstring sidString = sidToString(sid);
-    if (sidString.empty()) return false;
-    bool legacy = stringStartsWith(sidString, L"S-1-15-2-");
-    if (legacy && sidStringOut) *sidStringOut = sidString;
-    return legacy;
-}
-
-static bool pushUniqueLegacyProfileName(std::vector<std::wstring>& out, const std::wstring& name) {
-    if (!isLegacyAppContainerProfileName(name)) {
-        fail(L"invalid legacy AppContainer profile name: " + name);
-        return false;
-    }
-    auto it = std::find_if(out.begin(), out.end(), [&name](const std::wstring& existing) {
-        return _wcsicmp(existing.c_str(), name.c_str()) == 0;
-    });
-    if (it == out.end()) out.push_back(name);
-    return true;
-}
-
-static std::vector<std::wstring> uniqueLegacyProfileNames(const std::vector<std::wstring>& names, int* failures) {
-    std::vector<std::wstring> out;
-    for (const auto& name : names) {
-        if (!pushUniqueLegacyProfileName(out, name) && failures) (*failures)++;
-    }
-    return out;
-}
-
-static std::vector<LegacyProfileSid> deriveLegacyProfileSids(
-    const std::vector<std::wstring>& names,
-    int* failures
-) {
-    std::vector<LegacyProfileSid> profiles;
-    for (const auto& name : names) {
-        PSID sid = nullptr;
-        HRESULT hr = DeriveAppContainerSidFromAppContainerName(name.c_str(), &sid);
-        if (FAILED(hr) || !sid) {
-            fail(L"cannot derive legacy AppContainer SID for " + name +
-                L": HRESULT " + std::to_wstring(static_cast<unsigned long>(hr)));
-            if (failures) (*failures)++;
-            continue;
-        }
-        profiles.push_back({ name, sidToString(sid), sid });
-    }
-    return profiles;
-}
-
-static void freeLegacyProfileSids(std::vector<LegacyProfileSid>& profiles) {
-    for (auto& profile : profiles) {
-        if (profile.sid) FreeSid(profile.sid);
-        profile.sid = nullptr;
-    }
-}
-
-static const LegacyProfileSid* findLegacyProfileBySid(
-    PSID sid,
-    const std::vector<LegacyProfileSid>& profiles
-) {
-    if (!sid) return nullptr;
-    for (const auto& profile : profiles) {
-        if (profile.sid && EqualSid(sid, profile.sid)) return &profile;
-    }
-    return nullptr;
-}
-
-static bool revokeSidsFromPath(const std::wstring& path, const std::vector<PSID>& sids, PACL oldDacl) {
-    if (sids.empty()) return true;
-    std::vector<EXPLICIT_ACCESSW> entries;
-    for (PSID sid : sids) {
-        EXPLICIT_ACCESSW access = {};
-        access.grfAccessMode = REVOKE_ACCESS;
-        access.Trustee.TrusteeForm = TRUSTEE_IS_SID;
-        access.Trustee.TrusteeType = TRUSTEE_IS_UNKNOWN;
-        access.Trustee.ptstrName = reinterpret_cast<LPWSTR>(sid);
-        entries.push_back(access);
-    }
-    PACL newDacl = nullptr;
-    DWORD rc = SetEntriesInAclW(static_cast<ULONG>(entries.size()), entries.data(), oldDacl, &newDacl);
-    if (rc != ERROR_SUCCESS) {
-        fail(L"cannot build ACL cleanup for " + path + L": " + win32Message(rc));
-        return false;
-    }
-    rc = SetNamedSecurityInfoW(
-        const_cast<LPWSTR>(path.c_str()),
-        SE_FILE_OBJECT,
-        DACL_SECURITY_INFORMATION,
-        nullptr,
-        nullptr,
-        newDacl,
-        nullptr
-    );
-    if (newDacl) LocalFree(newDacl);
-    if (rc != ERROR_SUCCESS) {
-        fail(L"cannot clean ACL for " + path + L": " + win32Message(rc));
-        return false;
-    }
-    return true;
-}
-
-static bool convertSidString(const std::wstring& sidString, PSID* sidOut) {
-    *sidOut = nullptr;
-    if (!ConvertStringSidToSidW(sidString.c_str(), sidOut)) {
-        fail(L"cannot convert SID " + sidString + L": " + win32Message(GetLastError()));
-        return false;
-    }
-    return true;
-}
-
-static MigrationResult cleanupLingxiWriteAcls(const std::vector<std::wstring>& paths) {
-    MigrationResult result;
-    for (const auto& path : paths) {
-        std::vector<std::wstring> sidStrings = {
-            sidForWritableRoot(path),
-            sidForWritableRootLegacyCapabilityNamespace(path),
-            sidForWritableRootLegacyAccountNamespace(path),
-        };
-        std::vector<PSID> ownedSids;
-        for (const auto& sidString : sidStrings) {
-            PSID sid = nullptr;
-            if (convertSidString(sidString, &sid)) ownedSids.push_back(sid);
-            else result.failures++;
-        }
-        if (ownedSids.empty()) continue;
-
-        PACL dacl = nullptr;
-        PSECURITY_DESCRIPTOR descriptor = nullptr;
-        DWORD rc = GetNamedSecurityInfoW(
-            const_cast<LPWSTR>(path.c_str()),
-            SE_FILE_OBJECT,
-            DACL_SECURITY_INFORMATION,
-            nullptr,
-            nullptr,
-            &dacl,
-            nullptr,
-            &descriptor
-        );
-        if (rc != ERROR_SUCCESS) {
-            fail(L"lingxi-write-acl-cleanup path=\"" + path + L"\" error=\"" + win32Message(rc) + L"\"");
-            result.failures++;
-            for (PSID sid : ownedSids) LocalFree(sid);
-            continue;
-        }
-
-        std::vector<PSID> matchedSids;
-        if (dacl) {
-            for (DWORD i = 0; i < dacl->AceCount; i++) {
-                void* rawAce = nullptr;
-                if (!GetAce(dacl, i, &rawAce) || !rawAce) continue;
-                ACE_HEADER* header = reinterpret_cast<ACE_HEADER*>(rawAce);
-                if (header->AceType != ACCESS_ALLOWED_ACE_TYPE && header->AceType != ACCESS_DENIED_ACE_TYPE) continue;
-
-                PSID aceSid = nullptr;
-                if (header->AceType == ACCESS_ALLOWED_ACE_TYPE) {
-                    auto* ace = reinterpret_cast<ACCESS_ALLOWED_ACE*>(rawAce);
-                    aceSid = reinterpret_cast<PSID>(&ace->SidStart);
-                } else {
-                    auto* ace = reinterpret_cast<ACCESS_DENIED_ACE*>(rawAce);
-                    aceSid = reinterpret_cast<PSID>(&ace->SidStart);
-                }
-                for (PSID ownedSid : ownedSids) {
-                    if (!EqualSid(aceSid, ownedSid)) continue;
-                    if (std::none_of(matchedSids.begin(), matchedSids.end(), [ownedSid](PSID existing) {
-                        return EqualSid(existing, ownedSid);
-                    })) {
-                        matchedSids.push_back(ownedSid);
-                    }
-                }
-            }
-        }
-
-        if (!matchedSids.empty()) {
-            if (revokeSidsFromPath(path, matchedSids, dacl)) {
-                result.findings += static_cast<int>(matchedSids.size());
-                for (PSID sid : matchedSids) {
-                    std::wcerr
-                        << L"lingxi-win-sandbox: lingxi-write-acl-cleaned"
-                        << L" path=\"" << path << L"\""
-                        << L" sid=\"" << sidToString(sid) << L"\""
-                        << std::endl;
-                }
-            } else {
-                result.failures++;
-            }
-        }
-
-        if (descriptor) LocalFree(descriptor);
-        for (PSID sid : ownedSids) LocalFree(sid);
-    }
-    return result;
-}
-
-static MigrationResult diagnoseLegacyAcls(
-    const Options& opts,
-    const std::vector<LegacyProfileSid>& cleanupProfiles
-) {
-    MigrationResult result;
-    for (const auto& path : opts.legacyAclDiagnosticPaths) {
-        PACL dacl = nullptr;
-        PSECURITY_DESCRIPTOR descriptor = nullptr;
-        DWORD rc = GetNamedSecurityInfoW(
-            const_cast<LPWSTR>(path.c_str()),
-            SE_FILE_OBJECT,
-            DACL_SECURITY_INFORMATION,
-            nullptr,
-            nullptr,
-            &dacl,
-            nullptr,
-            &descriptor
-        );
-        if (rc != ERROR_SUCCESS) {
-            fail(L"legacy-acl-diagnostic path=\"" + path + L"\" error=\"" + win32Message(rc) + L"\"");
-            result.failures++;
-            continue;
-        }
-
-        std::vector<PSID> legacySids;
-        if (dacl) {
-            for (DWORD i = 0; i < dacl->AceCount; i++) {
-                void* rawAce = nullptr;
-                if (!GetAce(dacl, i, &rawAce) || !rawAce) continue;
-                ACE_HEADER* header = reinterpret_cast<ACE_HEADER*>(rawAce);
-                if (header->AceType != ACCESS_ALLOWED_ACE_TYPE && header->AceType != ACCESS_DENIED_ACE_TYPE) continue;
-
-                DWORD mask = 0;
-                PSID sid = nullptr;
-                std::wstring aceKind = L"unknown";
-                if (header->AceType == ACCESS_ALLOWED_ACE_TYPE) {
-                    auto* ace = reinterpret_cast<ACCESS_ALLOWED_ACE*>(rawAce);
-                    mask = ace->Mask;
-                    sid = reinterpret_cast<PSID>(&ace->SidStart);
-                    aceKind = L"allow";
-                } else {
-                    auto* ace = reinterpret_cast<ACCESS_DENIED_ACE*>(rawAce);
-                    mask = ace->Mask;
-                    sid = reinterpret_cast<PSID>(&ace->SidStart);
-                    aceKind = L"deny";
-                }
-
-                std::wstring sidString;
-                if (!isLegacyAppContainerSid(sid, &sidString)) continue;
-                result.findings++;
-                const LegacyProfileSid* matchedProfile = findLegacyProfileBySid(sid, cleanupProfiles);
-                std::wcerr
-                    << L"lingxi-win-sandbox: legacy-appcontainer-acl"
-                    << L" path=\"" << path << L"\""
-                    << L" sid=\"" << sidString << L"\""
-                    << L" profile=\"" << (matchedProfile ? matchedProfile->name : L"unmatched") << L"\""
-                    << L" ace=\"" << aceKind << L"\""
-                    << L" mask=\"" << mask << L"\""
-                    << std::endl;
-                if (opts.cleanupLegacyAcl && matchedProfile && std::none_of(legacySids.begin(), legacySids.end(), [sid](PSID existing) {
-                    return EqualSid(existing, sid);
-                })) {
-                    legacySids.push_back(sid);
-                }
-            }
-        }
-
-        if (opts.cleanupLegacyAcl) {
-            if (legacySids.empty()) {
-                debug(L"legacy ACL cleanup found no Hana-owned AppContainer SID for " + path);
-            } else if (!revokeSidsFromPath(path, legacySids, dacl)) {
-                result.failures++;
-            }
-        }
-        if (descriptor) LocalFree(descriptor);
-    }
-    return result;
-}
-
-static bool isMissingAppContainerProfile(HRESULT hr) {
-    DWORD code = HRESULT_CODE(hr);
-    return code == ERROR_FILE_NOT_FOUND || code == ERROR_PATH_NOT_FOUND || code == ERROR_NOT_FOUND;
-}
-
-static MigrationResult cleanupLegacyProfiles(const std::vector<std::wstring>& profileNames) {
-    MigrationResult result;
-    for (const auto& name : profileNames) {
-        HRESULT hr = DeleteAppContainerProfile(name.c_str());
-        if (SUCCEEDED(hr)) {
-            result.findings++;
-            std::wcerr
-                << L"lingxi-win-sandbox: legacy-appcontainer-profile-cleaned"
-                << L" name=\"" << name << L"\""
-                << std::endl;
-            continue;
-        }
-        if (isMissingAppContainerProfile(hr)) {
-            debug(L"legacy AppContainer profile already absent: " + name);
-            continue;
-        }
-        result.failures++;
-        fail(L"cannot delete legacy AppContainer profile " + name +
-            L": HRESULT " + std::to_wstring(static_cast<unsigned long>(hr)));
-    }
-    return result;
-}
-
 int wmain(int argc, wchar_t** argv) {
     Options opts;
     try {
@@ -2360,48 +1987,6 @@ int wmain(int argc, wchar_t** argv) {
 
     if (opts.superviseServer) {
         return superviseServer(opts);
-    }
-
-    if (!opts.lingxiWriteAclCleanupPaths.empty() ||
-        !opts.legacyAclDiagnosticPaths.empty() ||
-        !opts.legacyProfileNames.empty() ||
-        !opts.legacyProfileCleanupNames.empty() ||
-        opts.cleanupLegacyAcl) {
-        int failures = 0;
-        std::vector<std::wstring> profileNames = uniqueLegacyProfileNames(opts.legacyProfileNames, &failures);
-        std::vector<std::wstring> cleanupProfileNames = uniqueLegacyProfileNames(opts.legacyProfileCleanupNames, &failures);
-        std::vector<std::wstring> sidProfileNames = profileNames;
-        for (const auto& name : cleanupProfileNames) {
-            auto it = std::find_if(sidProfileNames.begin(), sidProfileNames.end(), [&name](const std::wstring& existing) {
-                return _wcsicmp(existing.c_str(), name.c_str()) == 0;
-            });
-            if (it == sidProfileNames.end()) sidProfileNames.push_back(name);
-        }
-        std::vector<LegacyProfileSid> profileSids = deriveLegacyProfileSids(sidProfileNames, &failures);
-
-        MigrationResult lingxiWriteResult;
-        if (!opts.lingxiWriteAclCleanupPaths.empty()) {
-            lingxiWriteResult = cleanupLingxiWriteAcls(opts.lingxiWriteAclCleanupPaths);
-        }
-
-        MigrationResult aclResult;
-        if (!opts.legacyAclDiagnosticPaths.empty()) {
-            aclResult = diagnoseLegacyAcls(opts, profileSids);
-        }
-        failures += lingxiWriteResult.failures + aclResult.failures;
-
-        MigrationResult profileResult;
-        if (failures == 0) {
-            profileResult = cleanupLegacyProfiles(cleanupProfileNames);
-            failures += profileResult.failures;
-        } else if (!cleanupProfileNames.empty()) {
-            debug(L"skipping legacy AppContainer profile cleanup because ACL cleanup failed");
-        }
-        int findings = lingxiWriteResult.findings + aclResult.findings + profileResult.findings;
-
-        freeLegacyProfileSids(profileSids);
-        if (failures > 0) return 1;
-        return findings > 0 ? 3 : 0;
     }
 
     int exitCode = 1;

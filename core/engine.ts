@@ -15,9 +15,6 @@
 import fs from "fs";
 import os from "os";
 import path from "path";
-import { migrateConfigScope } from "../shared/migrate-config-scope.ts";
-import { migrateToProvidersYaml } from "./migrate-providers.ts";
-import { migrateProviderMediaConfig } from "./provider-media-config.ts";
 import { runMigrations } from "./migrations.ts";
 import { healCredentialFileModes } from "./credential-file-healer.ts";
 import { PLUGIN_DATA_DIRNAME } from "./plugin-config.ts";
@@ -109,8 +106,6 @@ import { SessionCoordinator } from "./session-coordinator.ts";
 import { SessionManifestResolver } from "./session-manifest/resolver.ts";
 import { SessionManifestStore } from "./session-manifest/store.ts";
 import { ensureSessionRefForPath as establishSessionRefForPath } from "./session-manifest/ref.ts";
-import { ensureLegacySessionManifestMigration } from "./session-manifest/startup-migration.ts";
-import { listSkippedMetaSources } from "./session-manifest/legacy-migration.ts";
 import {
   moveSessionManifestDbFilesAside,
   sanitizeSessionManifestFileSuffix,
@@ -131,7 +126,6 @@ import { resourceKeyForRef } from "../lib/resource-io/resource-refs.ts";
 import { ResourceWatchRegistry } from "../lib/resource-io/resource-watch-registry.ts";
 import { FileHistoryService } from "../lib/file-history/file-history-service.ts";
 import { externalReadPathsFromSessionFiles } from "../lib/sandbox/win32-policy.ts";
-import { Win32LegacySandboxCleanupQueue } from "../lib/sandbox/win32-legacy-migration.ts";
 import { t } from "../lib/i18n.ts";
 import { CheckpointStore } from "../lib/checkpoint-store.ts";
 import {
@@ -223,7 +217,6 @@ import { assertValidAgentId, isValidAgentId } from "../shared/agent-id.ts";
 const moduleLog = createModuleLogger("engine");
 const mcpLog = createModuleLogger("mcp");
 const toolAvailabilityLog = createModuleLogger("tool-availability");
-const win32SandboxCleanupLog = createModuleLogger("win32-sandbox-cleanup");
 
 export function runBestEffortStartupMigrationStep(label, operation, log: any = () => {}) {
   try {
@@ -307,7 +300,6 @@ export class LingxiEngine {
   declare _sessionCoord: any;
   declare _sessionFiles: any;
   declare _sessionExecutions: any;
-  declare _sessionManifestMigration: any;
   declare _sessionManifestResolver: any;
   declare _sessionManifestStore: any;
   declare _sessionManifestStoreRecovery: any;
@@ -325,7 +317,6 @@ export class LingxiEngine {
   declare _usageLedger: any;
   declare _videoStripNotified: any;
   declare _visionBridge: any;
-  declare _win32LegacySandboxCleanupQueue: any;
   declare agentsDir: any;
   declare appVersion: any;
   declare channelsDir: any;
@@ -383,7 +374,6 @@ export class LingxiEngine {
     this._sessionManifestResolver = this._sessionManifestStore
       ? new SessionManifestResolver({ store: this._sessionManifestStore })
       : null;
-    this._sessionManifestMigration = this._runSessionManifestStartupMigration();
     this._currentTurnNativeMedia = createCurrentTurnNativeMediaStore();
     this._pluginInstallRecords = new PluginInstallRecords({ lingxiHome });
     this._automationSuggestionStore = new AutomationSuggestionStore();
@@ -746,12 +736,6 @@ export class LingxiEngine {
     this._devLogsMax = 200;
 
     this._outboundProxyRuntime = null;
-    this._win32LegacySandboxCleanupQueue = process.platform === "win32"
-      ? new Win32LegacySandboxCleanupQueue({
-          lingxiHome: this.lingxiHome,
-          log: win32SandboxCleanupLog,
-        })
-      : null;
 
     // 设置起始 agentId
     this._agentMgr.activeAgentId = startId;
@@ -1469,37 +1453,11 @@ export class LingxiEngine {
     }
   }
 
-  _runSessionManifestStartupMigration() {
-    if (!this._sessionManifestStore) {
-      return {
-        status: "unavailable",
-        error: this._sessionManifestStoreRecovery?.error || null,
-      };
-    }
-    try {
-      const result = ensureLegacySessionManifestMigration({
-        lingxiHome: this.lingxiHome,
-        store: this._sessionManifestStore,
-        appVersion: this.appVersion,
-      });
-      if (result.status === "failed") {
-        moduleLog.warn(`Session manifest startup migration failed: ${result.error?.message || "unknown error"}`);
-      }
-      return result;
-    } catch (error) {
-      moduleLog.warn(`Session manifest startup migration crashed: ${error?.message || String(error)}`);
-      return {
-        status: "failed",
-        error,
-      };
-    }
-  }
   /**
-   * 聚合三路 session 元数据"待恢复"信号，供 /api/health 附块与侧边栏提示消费。
-   * 三源：① manifest store 本身不可用/被隔离重建（_sessionManifestStoreRecovery）
-   * ② 运行期发生过的 session-meta 隔离（_sessionCoord.listMetaQuarantines）
-   * ③ 迁移账本里全集的 too_large/parse_error legacy 源（listSkippedMetaSources）。
-   * 三源全空 → { degraded: false, reasons: [] }。纯读聚合，不产生副作用。
+   * 聚合两路 session 元数据"待恢复"信号，供 /api/health 附块与侧边栏提示消费。
+   * 两源：① manifest store 本身不可用/被隔离重建（_sessionManifestStoreRecovery）
+   * ② 运行期发生过的 session-meta 隔离（_sessionCoord.listMetaQuarantines）。
+   * 两源全空 → { degraded: false, reasons: [] }。纯读聚合，不产生副作用。
    */
   getSessionMetadataRecoveryStatus() {
     const reasons: Array<{ kind: string; detail: string }> = [];
@@ -1513,10 +1471,6 @@ export class LingxiEngine {
 
     for (const quarantine of this._sessionCoord?.listMetaQuarantines?.() || []) {
       reasons.push({ kind: "meta_quarantined", detail: describeMetaSourcePath(quarantine?.metaPath) });
-    }
-
-    for (const skipped of listSkippedMetaSources(this._sessionManifestStore)) {
-      reasons.push({ kind: "meta_skipped", detail: describeMetaSourcePath(skipped?.path) });
     }
 
     return { degraded: reasons.length > 0, reasons };
@@ -1937,9 +1891,6 @@ export class LingxiEngine {
   setSessionThinkingLevel(sessionPath, level) { return this._sessionCoord.setSessionThinkingLevel(sessionPath, level); }
   getSandbox() { return this._prefs.getSandbox(); }
   setSandbox(v) { this._prefs.setSandbox(v); }
-  startWin32LegacySandboxMaintenance() {
-    this._win32LegacySandboxCleanupQueue?.enqueueProfileCleanup?.();
-  }
   getSandboxNetwork() {
     if (process.platform === "win32") return true;
     return this._prefs.getSandboxNetwork();
@@ -2353,66 +2304,23 @@ export class LingxiEngine {
   async init(log: any = () => {}) {
     const startupTimer = Date.now();
 
-    // 0. Config scope 迁移（全局字段从 agent config → preferences）
-    const configScopeStep = runBestEffortStartupMigrationStep("config-scope", () => {
-      migrateConfigScope({
-        agentsDir: this.agentsDir,
-        prefs: this._prefs,
-        primaryAgentId: this._prefs.getPrimaryAgent(),
-        log,
-      });
-    }, log);
-
-    // 0b. Provider 迁移（旧数据 → added-models.yaml，只跑一次）
-    const providerSourceStep = runBestEffortStartupMigrationStep("provider-source", () => {
-      migrateToProvidersYaml(this.lingxiHome, this.agentsDir, log);
-    }, log);
-
-    let providerMediaStep = { ok: false };
-    let providerOverridesStep = { ok: false };
-    if (providerSourceStep.ok) {
-      // 0b2. Provider media 迁移（旧 type:image 模型 → media.image_generation）
-      providerMediaStep = runBestEffortStartupMigrationStep("provider-media", () => {
-        migrateProviderMediaConfig(this.lingxiHome, log);
-      }, log);
-
-      if (providerMediaStep.ok) {
-        // 0c. Model overrides 迁移（config.models.overrides → added-models.yaml，只跑一次）
-        providerOverridesStep = runBestEffortStartupMigrationStep("provider-overrides", () => {
-          this._models.providerRegistry.migrateOverridesToAddedModels(this.agentsDir, log);
-        }, log);
-      } else {
-        log("[migrations] provider-overrides 等待 provider-media；应用继续启动");
-      }
-    } else {
-      log("[migrations] provider-media 与 provider-overrides 等待 provider-source；应用继续启动");
+    // 0. 统一数据迁移（版本号驱动，新迁移统一加在 migrations.js）
+    const registryStep = runBestEffortStartupMigrationStep("migration-registry", () => runMigrations({
+      lingxiHome: this.lingxiHome,
+      agentsDir: this.agentsDir,
+      prefs: this._prefs,
+      providerRegistry: this._models.providerRegistry,
+      log,
+    }), log);
+    const migrationStatus = registryStep.ok ? registryStep.value : null;
+    if (migrationStatus?.pendingIds.length > 0) {
+      log(
+        `[migrations] 应用继续启动；仍有 ${migrationStatus.pendingIds.length} 条迁移待重试：`
+        + `#${migrationStatus.pendingIds.join(", #")}`,
+      );
     }
 
-    // 0d. 统一数据迁移（版本号驱动，新迁移统一加在 migrations.js）
-    const legacyPrerequisitesReady = configScopeStep.ok
-      && providerSourceStep.ok
-      && providerMediaStep.ok
-      && providerOverridesStep.ok;
-    if (legacyPrerequisitesReady) {
-      const registryStep = runBestEffortStartupMigrationStep("migration-registry", () => runMigrations({
-        lingxiHome: this.lingxiHome,
-        agentsDir: this.agentsDir,
-        prefs: this._prefs,
-        providerRegistry: this._models.providerRegistry,
-        log,
-      }), log);
-      const migrationStatus = registryStep.ok ? registryStep.value : null;
-      if (migrationStatus?.pendingIds.length > 0) {
-        log(
-          `[migrations] 应用继续启动；仍有 ${migrationStatus.pendingIds.length} 条迁移待重试：`
-          + `#${migrationStatus.pendingIds.join(", #")}`,
-        );
-      }
-    } else {
-      log("[migrations] migration-registry 等待启动迁移前置步骤；应用继续启动，下次启动重试");
-    }
-
-    // 0e. 凭证文件权限自愈。放在所有迁移之后，让本轮迁移刚写出的文件也被覆盖。
+    // 1. 凭证文件权限自愈。放在所有迁移之后，让本轮迁移刚写出的文件也被覆盖。
     // 每次启动都跑：权限会因为备份恢复、跨机拷贝、外部同步而回退，
     // 只跑一次的迁移覆盖不到这些情况。
     // 拆成两步：清理和矫正互不依赖，任一步出意外都不该连累另一步
@@ -3178,7 +3086,6 @@ export class LingxiEngine {
       getAgentId: () => agentId,
       resourceIO,
       emitEvent: (event, sessionPath) => this._emitEvent(event, sessionPath),
-      legacyCleanupQueue: this._win32LegacySandboxCleanupQueue,
     } as any);
     assertUniqueBuiltToolNames([
       { source: "Pi built-in tools", tools: result.tools },

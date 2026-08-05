@@ -113,12 +113,6 @@
       "reason": "probeShell(shell, args, env) probes a candidate Windows shell binary to confirm it starts correctly; shell is one of a small set of candidate executables under test, not an import target."
     },
     {
-      "file": "lib/sandbox/win32-legacy-migration.ts",
-      "callee": "spawn",
-      "argText": "helperPath",
-      "reason": "Spawns a bundled Windows sandbox migration helper native binary at helperPath. A native-binary process launch, not a reference to repo JS/TS source -- the helper binary itself is a desktop packaging asset, out of this CLI closure's scope."
-    },
-    {
       "file": "lib/shell/shell-utils.ts",
       "callee": "spawn",
       "argText": "executable",
@@ -1185,16 +1179,11 @@
       "provenance": [
         {
           "root": "server-bootstrap",
-          "from": "core/provider-media-config.ts",
-          "kind": "import-statement"
-        },
-        {
-          "root": "server-bootstrap",
           "from": "core/provider-registry.ts",
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by core/provider-media-config.ts (import-statement); core/provider-registry.ts (import-statement)."
+      "reason": "Reached via esbuild source module graph, imported by core/provider-registry.ts (import-statement)."
     },
     {
       "path": "core/media-runtime-contract.ts",
@@ -1399,31 +1388,9 @@
       "reason": "Reached via esbuild source module graph, imported by lib/session-collab/transcript.ts (import-statement); lib/tools/session-tool.ts (import-statement); core/agent-manager.ts (import-statement); +3 more importer(s)."
     },
     {
-      "path": "core/migrate-providers.ts",
-      "inputType": "source-graph",
-      "provenance": [
-        {
-          "root": "server-bootstrap",
-          "from": "core/engine.ts",
-          "kind": "import-statement"
-        }
-      ],
-      "reason": "Reached via esbuild source module graph, imported by core/engine.ts (import-statement)."
-    },
-    {
       "path": "core/migration-backups.ts",
       "inputType": "source-graph",
       "provenance": [
-        {
-          "root": "server-bootstrap",
-          "from": "core/provider-catalog.ts",
-          "kind": "import-statement"
-        },
-        {
-          "root": "server-bootstrap",
-          "from": "core/migrations.ts",
-          "kind": "import-statement"
-        },
         {
           "root": "server-bootstrap",
           "from": "core/credential-file-healer.ts",
@@ -1433,9 +1400,14 @@
           "root": "server-bootstrap",
           "from": "core/credential-backup-retention.ts",
           "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "core/provider-catalog.ts",
+          "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by core/provider-catalog.ts (import-statement); core/migrations.ts (import-statement); core/credential-file-healer.ts (import-statement); +1 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by core/credential-file-healer.ts (import-statement); core/credential-backup-retention.ts (import-statement); core/provider-catalog.ts (import-statement)."
     },
     {
       "path": "core/migrations.ts",
@@ -1860,16 +1832,11 @@
       "provenance": [
         {
           "root": "server-bootstrap",
-          "from": "core/migrations.ts",
-          "kind": "import-statement"
-        },
-        {
-          "root": "server-bootstrap",
           "from": "core/model-manager.ts",
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by core/migrations.ts (import-statement); core/model-manager.ts (import-statement)."
+      "reason": "Reached via esbuild source module graph, imported by core/model-manager.ts (import-statement)."
     },
     {
       "path": "core/provider-catalog.ts",
@@ -1877,21 +1844,16 @@
       "provenance": [
         {
           "root": "server-bootstrap",
-          "from": "core/provider-auth-migration.ts",
-          "kind": "import-statement"
-        },
-        {
-          "root": "server-bootstrap",
-          "from": "core/migrations.ts",
-          "kind": "import-statement"
-        },
-        {
-          "root": "server-bootstrap",
           "from": "core/provider-registry.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "core/provider-auth-migration.ts",
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by core/provider-auth-migration.ts (import-statement); core/migrations.ts (import-statement); core/provider-registry.ts (import-statement)."
+      "reason": "Reached via esbuild source module graph, imported by core/provider-registry.ts (import-statement); core/provider-auth-migration.ts (import-statement)."
     },
     {
       "path": "core/provider-compat.ts",
@@ -2219,18 +2181,6 @@
       "reason": "Reached via esbuild source module graph, imported by core/provider-compat.ts (import-statement)."
     },
     {
-      "path": "core/provider-media-config.ts",
-      "inputType": "source-graph",
-      "provenance": [
-        {
-          "root": "server-bootstrap",
-          "from": "core/engine.ts",
-          "kind": "import-statement"
-        }
-      ],
-      "reason": "Reached via esbuild source module graph, imported by core/engine.ts (import-statement)."
-    },
-    {
       "path": "core/provider-media-serializer.ts",
       "inputType": "source-graph",
       "provenance": [
@@ -2241,18 +2191,6 @@
         }
       ],
       "reason": "Reached via esbuild source module graph, imported by core/llm-client.ts (import-statement)."
-    },
-    {
-      "path": "core/provider-model-metadata-migration.ts",
-      "inputType": "source-graph",
-      "provenance": [
-        {
-          "root": "server-bootstrap",
-          "from": "core/migrations.ts",
-          "kind": "import-statement"
-        }
-      ],
-      "reason": "Reached via esbuild source module graph, imported by core/migrations.ts (import-statement)."
     },
     {
       "path": "core/provider-prompt-patches.ts",
@@ -2376,6 +2314,11 @@
       "provenance": [
         {
           "root": "server-bootstrap",
+          "from": "core/credential-file-healer.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
           "from": "core/execution-lease-registry.ts",
           "kind": "import-statement"
         },
@@ -2387,11 +2330,6 @@
         {
           "root": "server-bootstrap",
           "from": "core/server-identity.ts",
-          "kind": "import-statement"
-        },
-        {
-          "root": "server-bootstrap",
-          "from": "core/credential-file-healer.ts",
           "kind": "import-statement"
         },
         {
@@ -2415,7 +2353,7 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by core/execution-lease-registry.ts (import-statement); core/grant-registry.ts (import-statement); core/server-identity.ts (import-statement); +5 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by core/credential-file-healer.ts (import-statement); core/execution-lease-registry.ts (import-statement); core/grant-registry.ts (import-statement); +5 more importer(s)."
     },
     {
       "path": "core/security-principal.ts",
@@ -2492,11 +2430,6 @@
       "provenance": [
         {
           "root": "server-bootstrap",
-          "from": "core/migrations.ts",
-          "kind": "import-statement"
-        },
-        {
-          "root": "server-bootstrap",
           "from": "core/server-runtime-context.ts",
           "kind": "import-statement"
         },
@@ -2506,7 +2439,7 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by core/migrations.ts (import-statement); core/server-runtime-context.ts (import-statement); server/index.ts (import-statement)."
+      "reason": "Reached via esbuild source module graph, imported by core/server-runtime-context.ts (import-statement); server/index.ts (import-statement)."
     },
     {
       "path": "core/server-network-config.ts",
@@ -2770,33 +2703,16 @@
       "reason": "Reached via esbuild source module graph, imported by core/session-coordinator.ts (import-statement); server/routes/sessions.ts (import-statement)."
     },
     {
-      "path": "core/session-manifest/checkpoint.ts",
-      "inputType": "source-graph",
-      "provenance": [
-        {
-          "root": "server-bootstrap",
-          "from": "core/session-manifest/startup-migration.ts",
-          "kind": "import-statement"
-        }
-      ],
-      "reason": "Reached via esbuild source module graph, imported by core/session-manifest/startup-migration.ts (import-statement)."
-    },
-    {
       "path": "core/session-manifest/db-files.ts",
       "inputType": "source-graph",
       "provenance": [
-        {
-          "root": "server-bootstrap",
-          "from": "core/session-manifest/checkpoint.ts",
-          "kind": "import-statement"
-        },
         {
           "root": "server-bootstrap",
           "from": "core/engine.ts",
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by core/session-manifest/checkpoint.ts (import-statement); core/engine.ts (import-statement)."
+      "reason": "Reached via esbuild source module graph, imported by core/engine.ts (import-statement)."
     },
     {
       "path": "core/session-manifest/id.ts",
@@ -2811,23 +2727,6 @@
       "reason": "Reached via esbuild source module graph, imported by core/session-manifest/store.ts (import-statement)."
     },
     {
-      "path": "core/session-manifest/legacy-migration.ts",
-      "inputType": "source-graph",
-      "provenance": [
-        {
-          "root": "server-bootstrap",
-          "from": "core/session-manifest/startup-migration.ts",
-          "kind": "import-statement"
-        },
-        {
-          "root": "server-bootstrap",
-          "from": "core/engine.ts",
-          "kind": "import-statement"
-        }
-      ],
-      "reason": "Reached via esbuild source module graph, imported by core/session-manifest/startup-migration.ts (import-statement); core/engine.ts (import-statement)."
-    },
-    {
       "path": "core/session-manifest/path-normalizer.ts",
       "inputType": "source-graph",
       "provenance": [
@@ -2838,16 +2737,11 @@
         },
         {
           "root": "server-bootstrap",
-          "from": "core/session-manifest/legacy-migration.ts",
-          "kind": "import-statement"
-        },
-        {
-          "root": "server-bootstrap",
           "from": "hub/scheduler.ts",
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by core/session-manifest/store.ts (import-statement); core/session-manifest/legacy-migration.ts (import-statement); hub/scheduler.ts (import-statement)."
+      "reason": "Reached via esbuild source module graph, imported by core/session-manifest/store.ts (import-statement); hub/scheduler.ts (import-statement)."
     },
     {
       "path": "core/session-manifest/ref.ts",
@@ -2873,18 +2767,6 @@
     },
     {
       "path": "core/session-manifest/resolver.ts",
-      "inputType": "source-graph",
-      "provenance": [
-        {
-          "root": "server-bootstrap",
-          "from": "core/engine.ts",
-          "kind": "import-statement"
-        }
-      ],
-      "reason": "Reached via esbuild source module graph, imported by core/engine.ts (import-statement)."
-    },
-    {
-      "path": "core/session-manifest/startup-migration.ts",
       "inputType": "source-graph",
       "provenance": [
         {
@@ -2935,11 +2817,6 @@
       "provenance": [
         {
           "root": "server-bootstrap",
-          "from": "core/migrations.ts",
-          "kind": "import-statement"
-        },
-        {
-          "root": "server-bootstrap",
           "from": "core/preferences-manager.ts",
           "kind": "import-statement"
         },
@@ -2985,11 +2862,6 @@
         },
         {
           "root": "server-bootstrap",
-          "from": "core/session-manifest/legacy-migration.ts",
-          "kind": "import-statement"
-        },
-        {
-          "root": "server-bootstrap",
           "from": "lib/tools/session-permission-wrapper.ts",
           "kind": "import-statement"
         },
@@ -3019,7 +2891,7 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by core/migrations.ts (import-statement); core/preferences-manager.ts (import-statement); core/bridge-session-manager.ts (import-statement); +14 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by core/preferences-manager.ts (import-statement); core/bridge-session-manager.ts (import-statement); lib/conversations/agent-phone-session.ts (import-statement); +12 more importer(s)."
     },
     {
       "path": "core/session-project-catalog-store.ts",
@@ -3059,11 +2931,6 @@
       "path": "core/session-reminders.ts",
       "inputType": "source-graph",
       "provenance": [
-        {
-          "root": "server-bootstrap",
-          "from": "core/migrations.ts",
-          "kind": "import-statement"
-        },
         {
           "root": "server-bootstrap",
           "from": "core/message-utils.ts",
@@ -3110,7 +2977,7 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by core/migrations.ts (import-statement); core/message-utils.ts (import-statement); lib/session-collab/transcript.ts (import-statement); +7 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by core/message-utils.ts (import-statement); lib/session-collab/transcript.ts (import-statement); core/session-list-projection-cache.ts (import-statement); +6 more importer(s)."
     },
     {
       "path": "core/session-teardown.ts",
@@ -3138,11 +3005,6 @@
       "path": "core/session-thinking-level.ts",
       "inputType": "source-graph",
       "provenance": [
-        {
-          "root": "server-bootstrap",
-          "from": "core/migrations.ts",
-          "kind": "import-statement"
-        },
         {
           "root": "server-bootstrap",
           "from": "core/session-cache-snapshot.ts",
@@ -3214,7 +3076,7 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by core/migrations.ts (import-statement); core/session-cache-snapshot.ts (import-statement); core/provider-compat/anthropic.ts (import-statement); +12 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by core/session-cache-snapshot.ts (import-statement); core/provider-compat/anthropic.ts (import-statement); core/provider-compat.ts (import-statement); +11 more importer(s)."
     },
     {
       "path": "core/session-turn-actions.ts",
@@ -3957,11 +3819,6 @@
       "provenance": [
         {
           "root": "server-bootstrap",
-          "from": "core/migrations.ts",
-          "kind": "import-statement"
-        },
-        {
-          "root": "server-bootstrap",
           "from": "lib/bridge/dingtalk-api.ts",
           "kind": "import-statement"
         },
@@ -3981,7 +3838,7 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by core/migrations.ts (import-statement); lib/bridge/dingtalk-api.ts (import-statement); server/routes/bridge.ts (import-statement); +2 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by lib/bridge/dingtalk-api.ts (import-statement); server/routes/bridge.ts (import-statement); lib/bridge/dingtalk-adapter.ts (import-statement); +1 more importer(s)."
     },
     {
       "path": "lib/bridge/feishu-adapter.ts",
@@ -4217,11 +4074,6 @@
       "provenance": [
         {
           "root": "server-bootstrap",
-          "from": "core/migrations.ts",
-          "kind": "import-statement"
-        },
-        {
-          "root": "server-bootstrap",
           "from": "lib/bridge/bridge-context.ts",
           "kind": "import-statement"
         },
@@ -4246,7 +4098,7 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by core/migrations.ts (import-statement); lib/bridge/bridge-context.ts (import-statement); lib/tools/automation-tool.ts (import-statement); +3 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by lib/bridge/bridge-context.ts (import-statement); lib/tools/automation-tool.ts (import-statement); lib/bridge/owner-policy.ts (import-statement); +2 more importer(s)."
     },
     {
       "path": "lib/bridge/streaming-capabilities.ts",
@@ -4605,17 +4457,7 @@
       "provenance": [
         {
           "root": "server-bootstrap",
-          "from": "core/migrations.ts",
-          "kind": "import-statement"
-        },
-        {
-          "root": "server-bootstrap",
           "from": "lib/conversations/agent-phone-session.ts",
-          "kind": "import-statement"
-        },
-        {
-          "root": "server-bootstrap",
-          "from": "core/session-manifest/legacy-migration.ts",
           "kind": "import-statement"
         },
         {
@@ -4649,7 +4491,7 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by core/migrations.ts (import-statement); lib/conversations/agent-phone-session.ts (import-statement); core/session-manifest/legacy-migration.ts (import-statement); +6 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by lib/conversations/agent-phone-session.ts (import-statement); server/routes/channels.ts (import-statement); lib/conversations/agent-phone-runtime.ts (import-statement); +4 more importer(s)."
     },
     {
       "path": "lib/conversations/agent-phone-prompt.ts",
@@ -5168,7 +5010,7 @@
           "kind": "file"
         }
       ],
-      "reason": "core/migrate-providers.ts:22 and core/provider-registry.ts:45 both read fromRoot(\"lib\", \"default-models.json\") via fs.readFileSync."
+      "reason": "core/provider-registry.ts:43 reads fromRoot(\"lib\", \"default-models.json\") via fs.readFileSync."
     },
     {
       "path": "lib/deferred-result-coordinator.ts",
@@ -5322,11 +5164,6 @@
       "provenance": [
         {
           "root": "server-bootstrap",
-          "from": "core/migrations.ts",
-          "kind": "import-statement"
-        },
-        {
-          "root": "server-bootstrap",
           "from": "lib/desk/cron-store.ts",
           "kind": "import-statement"
         },
@@ -5336,7 +5173,7 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by core/migrations.ts (import-statement); lib/desk/cron-store.ts (import-statement); lib/desk/cron-scheduler.ts (import-statement)."
+      "reason": "Reached via esbuild source module graph, imported by lib/desk/cron-store.ts (import-statement); lib/desk/cron-scheduler.ts (import-statement)."
     },
     {
       "path": "lib/desk/automation-suggestion-receipt.ts",
@@ -6251,12 +6088,12 @@
       "provenance": [
         {
           "root": "server-bootstrap",
-          "from": "core/session-reminders.ts",
+          "from": "core/session-compactor.ts",
           "kind": "import-statement"
         },
         {
           "root": "server-bootstrap",
-          "from": "core/session-compactor.ts",
+          "from": "core/session-reminders.ts",
           "kind": "import-statement"
         },
         {
@@ -6265,7 +6102,7 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by core/session-reminders.ts (import-statement); core/session-compactor.ts (import-statement); core/tool-catalog.ts (import-statement)."
+      "reason": "Reached via esbuild source module graph, imported by core/session-compactor.ts (import-statement); core/session-reminders.ts (import-statement); core/tool-catalog.ts (import-statement)."
     },
     {
       "path": "lib/llm/prompt-layout.ts",
@@ -6565,11 +6402,6 @@
       "provenance": [
         {
           "root": "server-bootstrap",
-          "from": "core/migrations.ts",
-          "kind": "import-statement"
-        },
-        {
-          "root": "server-bootstrap",
           "from": "lib/tools/web-search.ts",
           "kind": "import-statement"
         },
@@ -6624,7 +6456,7 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by core/migrations.ts (import-statement); lib/tools/web-search.ts (import-statement); core/agent.ts (import-statement); +9 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by lib/tools/web-search.ts (import-statement); core/agent.ts (import-statement); core/agent-manager.ts (import-statement); +8 more importer(s)."
     },
     {
       "path": "lib/memory/deep-memory.ts",
@@ -8222,16 +8054,16 @@
       "provenance": [
         {
           "root": "server-bootstrap",
-          "from": "lib/session-files/session-file-response.ts",
+          "from": "core/resource-service.ts",
           "kind": "import-statement"
         },
         {
           "root": "server-bootstrap",
-          "from": "core/resource-service.ts",
+          "from": "lib/session-files/session-file-response.ts",
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by lib/session-files/session-file-response.ts (import-statement); core/resource-service.ts (import-statement)."
+      "reason": "Reached via esbuild source module graph, imported by core/resource-service.ts (import-statement); lib/session-files/session-file-response.ts (import-statement)."
     },
     {
       "path": "lib/sandbox/bwrap.ts",
@@ -8471,30 +8303,6 @@
       "reason": "Reached via esbuild source module graph, imported by lib/sandbox/index.ts (import-statement); lib/terminal/shell-resolver.ts (import-statement)."
     },
     {
-      "path": "lib/sandbox/win32-legacy-maintenance.ts",
-      "inputType": "source-graph",
-      "provenance": [
-        {
-          "root": "server-bootstrap",
-          "from": "lib/sandbox/win32-legacy-migration.ts",
-          "kind": "import-statement"
-        }
-      ],
-      "reason": "Reached via esbuild source module graph, imported by lib/sandbox/win32-legacy-migration.ts (import-statement)."
-    },
-    {
-      "path": "lib/sandbox/win32-legacy-migration.ts",
-      "inputType": "source-graph",
-      "provenance": [
-        {
-          "root": "server-bootstrap",
-          "from": "core/engine.ts",
-          "kind": "import-statement"
-        }
-      ],
-      "reason": "Reached via esbuild source module graph, imported by core/engine.ts (import-statement)."
-    },
-    {
       "path": "lib/sandbox/win32-path.ts",
       "inputType": "source-graph",
       "provenance": [
@@ -8568,14 +8376,9 @@
           "root": "server-bootstrap",
           "from": "lib/sandbox/win32-exec.ts",
           "kind": "import-statement"
-        },
-        {
-          "root": "server-bootstrap",
-          "from": "lib/sandbox/win32-legacy-migration.ts",
-          "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by lib/sandbox/win32-exec.ts (import-statement); lib/sandbox/win32-legacy-migration.ts (import-statement)."
+      "reason": "Reached via esbuild source module graph, imported by lib/sandbox/win32-exec.ts (import-statement)."
     },
     {
       "path": "lib/search/session-find.ts",
@@ -8765,11 +8568,6 @@
       "provenance": [
         {
           "root": "server-bootstrap",
-          "from": "core/migrations.ts",
-          "kind": "import-statement"
-        },
-        {
-          "root": "server-bootstrap",
           "from": "lib/tools/browser-tool.ts",
           "kind": "import-statement"
         },
@@ -8779,7 +8577,7 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by core/migrations.ts (import-statement); lib/tools/browser-tool.ts (import-statement); server/routes/sessions.ts (import-statement)."
+      "reason": "Reached via esbuild source module graph, imported by lib/tools/browser-tool.ts (import-statement); server/routes/sessions.ts (import-statement)."
     },
     {
       "path": "lib/session-files/session-file-registry.ts",
@@ -8787,17 +8585,12 @@
       "provenance": [
         {
           "root": "server-bootstrap",
-          "from": "lib/session-files/browser-screenshot-file.ts",
-          "kind": "import-statement"
-        },
-        {
-          "root": "server-bootstrap",
-          "from": "core/migrations.ts",
-          "kind": "import-statement"
-        },
-        {
-          "root": "server-bootstrap",
           "from": "lib/session-files/bridge-inbound-files.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/session-files/browser-screenshot-file.ts",
           "kind": "import-statement"
         },
         {
@@ -8821,17 +8614,12 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by lib/session-files/browser-screenshot-file.ts (import-statement); core/migrations.ts (import-statement); lib/session-files/bridge-inbound-files.ts (import-statement); +4 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by lib/session-files/bridge-inbound-files.ts (import-statement); lib/session-files/browser-screenshot-file.ts (import-statement); lib/sandbox/read-office-media.ts (import-statement); +3 more importer(s)."
     },
     {
       "path": "lib/session-files/session-file-response.ts",
       "inputType": "source-graph",
       "provenance": [
-        {
-          "root": "server-bootstrap",
-          "from": "lib/session-files/browser-screenshot-file.ts",
-          "kind": "import-statement"
-        },
         {
           "root": "server-bootstrap",
           "from": "core/plugin-context.ts",
@@ -8845,6 +8633,11 @@
         {
           "root": "server-bootstrap",
           "from": "lib/tools/file-tool.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/session-files/browser-screenshot-file.ts",
           "kind": "import-statement"
         },
         {
@@ -8898,7 +8691,7 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by lib/session-files/browser-screenshot-file.ts (import-statement); core/plugin-context.ts (import-statement); lib/session-files/bridge-inbound-files.ts (import-statement); +11 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by core/plugin-context.ts (import-statement); lib/session-files/bridge-inbound-files.ts (import-statement); lib/tools/file-tool.ts (import-statement); +11 more importer(s)."
     },
     {
       "path": "lib/session-jsonl.ts",
@@ -8906,22 +8699,12 @@
       "provenance": [
         {
           "root": "server-bootstrap",
-          "from": "lib/session-files/session-file-registry.ts",
-          "kind": "import-statement"
-        },
-        {
-          "root": "server-bootstrap",
-          "from": "core/migrations.ts",
-          "kind": "import-statement"
-        },
-        {
-          "root": "server-bootstrap",
-          "from": "core/migrations.ts",
-          "kind": "import-statement"
-        },
-        {
-          "root": "server-bootstrap",
           "from": "core/session-jsonl-file.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/session-files/session-file-registry.ts",
           "kind": "import-statement"
         },
         {
@@ -8951,11 +8734,6 @@
         },
         {
           "root": "server-bootstrap",
-          "from": "core/session-manifest/legacy-migration.ts",
-          "kind": "import-statement"
-        },
-        {
-          "root": "server-bootstrap",
           "from": "lib/diary/diary-writer.ts",
           "kind": "import-statement"
         },
@@ -8965,7 +8743,7 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by lib/session-files/session-file-registry.ts (import-statement); core/migrations.ts (import-statement); core/migrations.ts (import-statement); +9 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by core/session-jsonl-file.ts (import-statement); lib/session-files/session-file-registry.ts (import-statement); lib/memory/memory-ticker.ts (import-statement); +6 more importer(s)."
     },
     {
       "path": "lib/shell/execution-cwd.ts",
@@ -9027,11 +8805,6 @@
         },
         {
           "root": "server-bootstrap",
-          "from": "lib/sandbox/win32-legacy-migration.ts",
-          "kind": "import-statement"
-        },
-        {
-          "root": "server-bootstrap",
           "from": "lib/shell/shell-profile.ts",
           "kind": "import-statement"
         },
@@ -9041,7 +8814,7 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by core/platform-prompt.ts (import-statement); lib/sandbox/win32-command-router.ts (import-statement); lib/sandbox/win32-runtime-cache.ts (import-statement); +5 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by core/platform-prompt.ts (import-statement); lib/sandbox/win32-command-router.ts (import-statement); lib/sandbox/win32-runtime-cache.ts (import-statement); +4 more importer(s)."
     },
     {
       "path": "lib/skill-bundles/package-service.ts",
@@ -9122,11 +8895,6 @@
       "provenance": [
         {
           "root": "server-bootstrap",
-          "from": "core/migrations.ts",
-          "kind": "import-statement"
-        },
-        {
-          "root": "server-bootstrap",
           "from": "core/skill-manager.ts",
           "kind": "import-statement"
         },
@@ -9136,7 +8904,7 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by core/migrations.ts (import-statement); core/skill-manager.ts (import-statement); lib/skills/skill-package-installer.ts (import-statement)."
+      "reason": "Reached via esbuild source module graph, imported by core/skill-manager.ts (import-statement); lib/skills/skill-package-installer.ts (import-statement)."
     },
     {
       "path": "lib/skills/skill-name-translation-cache.ts",
@@ -9173,11 +8941,6 @@
       "provenance": [
         {
           "root": "server-bootstrap",
-          "from": "core/migrations.ts",
-          "kind": "import-statement"
-        },
-        {
-          "root": "server-bootstrap",
           "from": "lib/tools/subagent-tool.ts",
           "kind": "import-statement"
         },
@@ -9192,17 +8955,12 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by core/migrations.ts (import-statement); lib/tools/subagent-tool.ts (import-statement); server/block-extractors.ts (import-statement); +1 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by lib/tools/subagent-tool.ts (import-statement); server/block-extractors.ts (import-statement); server/routes/sessions.ts (import-statement)."
     },
     {
       "path": "lib/subagent-run-store.ts",
       "inputType": "source-graph",
       "provenance": [
-        {
-          "root": "server-bootstrap",
-          "from": "core/migrations.ts",
-          "kind": "import-statement"
-        },
         {
           "root": "server-bootstrap",
           "from": "core/session-coordinator.ts",
@@ -9214,7 +8972,7 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by core/migrations.ts (import-statement); core/session-coordinator.ts (import-statement); server/index.ts (import-statement)."
+      "reason": "Reached via esbuild source module graph, imported by core/session-coordinator.ts (import-statement); server/index.ts (import-statement)."
     },
     {
       "path": "lib/subagent-thread-store.ts",
@@ -9222,16 +8980,11 @@
       "provenance": [
         {
           "root": "server-bootstrap",
-          "from": "core/migrations.ts",
-          "kind": "import-statement"
-        },
-        {
-          "root": "server-bootstrap",
           "from": "server/index.ts",
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by core/migrations.ts (import-statement); server/index.ts (import-statement)."
+      "reason": "Reached via esbuild source module graph, imported by server/index.ts (import-statement)."
     },
     {
       "path": "lib/task-registry.ts",
@@ -73641,28 +73394,6 @@
       "reason": "nft-runtime-trace via nft-server-bundle (see roots[] for the full explanation)"
     },
     {
-      "path": "node_modules/extract-zip/index.js",
-      "inputType": "nft-runtime-trace",
-      "provenance": [
-        {
-          "root": "nft-server-bundle",
-          "kind": "nft-trace"
-        }
-      ],
-      "reason": "nft-runtime-trace via nft-server-bundle (see roots[] for the full explanation)"
-    },
-    {
-      "path": "node_modules/extract-zip/package.json",
-      "inputType": "nft-runtime-trace",
-      "provenance": [
-        {
-          "root": "nft-server-bundle",
-          "kind": "nft-trace"
-        }
-      ],
-      "reason": "nft-runtime-trace via nft-server-bundle (see roots[] for the full explanation)"
-    },
-    {
       "path": "node_modules/extsprintf/lib/extsprintf.js",
       "inputType": "nft-runtime-trace",
       "provenance": [
@@ -74431,39 +74162,6 @@
     },
     {
       "path": "node_modules/get-proto/Reflect.getPrototypeOf.js",
-      "inputType": "nft-runtime-trace",
-      "provenance": [
-        {
-          "root": "nft-server-bundle",
-          "kind": "nft-trace"
-        }
-      ],
-      "reason": "nft-runtime-trace via nft-server-bundle (see roots[] for the full explanation)"
-    },
-    {
-      "path": "node_modules/get-stream/buffer-stream.js",
-      "inputType": "nft-runtime-trace",
-      "provenance": [
-        {
-          "root": "nft-server-bundle",
-          "kind": "nft-trace"
-        }
-      ],
-      "reason": "nft-runtime-trace via nft-server-bundle (see roots[] for the full explanation)"
-    },
-    {
-      "path": "node_modules/get-stream/index.js",
-      "inputType": "nft-runtime-trace",
-      "provenance": [
-        {
-          "root": "nft-server-bundle",
-          "kind": "nft-trace"
-        }
-      ],
-      "reason": "nft-runtime-trace via nft-server-bundle (see roots[] for the full explanation)"
-    },
-    {
-      "path": "node_modules/get-stream/package.json",
       "inputType": "nft-runtime-trace",
       "provenance": [
         {
@@ -92635,28 +92333,6 @@
       "reason": "nft-runtime-trace via nft-server-bundle (see roots[] for the full explanation)"
     },
     {
-      "path": "node_modules/pump/index.js",
-      "inputType": "nft-runtime-trace",
-      "provenance": [
-        {
-          "root": "nft-server-bundle",
-          "kind": "nft-trace"
-        }
-      ],
-      "reason": "nft-runtime-trace via nft-server-bundle (see roots[] for the full explanation)"
-    },
-    {
-      "path": "node_modules/pump/package.json",
-      "inputType": "nft-runtime-trace",
-      "provenance": [
-        {
-          "root": "nft-server-bundle",
-          "kind": "nft-trace"
-        }
-      ],
-      "reason": "nft-runtime-trace via nft-server-bundle (see roots[] for the full explanation)"
-    },
-    {
       "path": "node_modules/punycode.js/package.json",
       "inputType": "nft-runtime-trace",
       "provenance": [
@@ -110816,16 +110492,11 @@
       "provenance": [
         {
           "root": "server-bootstrap",
-          "from": "shared/migrate-config-scope.ts",
-          "kind": "import-statement"
-        },
-        {
-          "root": "server-bootstrap",
           "from": "shared/config-scope.ts",
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by shared/migrate-config-scope.ts (import-statement); shared/config-scope.ts (import-statement)."
+      "reason": "Reached via esbuild source module graph, imported by shared/config-scope.ts (import-statement)."
     },
     {
       "path": "shared/config-scope.ts",
@@ -111012,12 +110683,12 @@
         },
         {
           "root": "server-bootstrap",
-          "from": "shared/safe-fs.ts",
+          "from": "core/credential-file-healer.ts",
           "kind": "import-statement"
         },
         {
           "root": "server-bootstrap",
-          "from": "core/credential-file-healer.ts",
+          "from": "shared/safe-fs.ts",
           "kind": "import-statement"
         },
         {
@@ -111051,7 +110722,7 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by shared/secret-fs.ts (import-statement); shared/safe-fs.ts (import-statement); core/credential-file-healer.ts (import-statement); +6 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by shared/secret-fs.ts (import-statement); core/credential-file-healer.ts (import-statement); shared/safe-fs.ts (import-statement); +6 more importer(s)."
     },
     {
       "path": "shared/errors.ts",
@@ -111069,12 +110740,12 @@
         },
         {
           "root": "server-bootstrap",
-          "from": "shared/safe-fs.ts",
+          "from": "core/credential-file-healer.ts",
           "kind": "import-statement"
         },
         {
           "root": "server-bootstrap",
-          "from": "core/credential-file-healer.ts",
+          "from": "shared/safe-fs.ts",
           "kind": "import-statement"
         },
         {
@@ -111108,7 +110779,7 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by shared/error-bus.ts (import-statement); shared/secret-fs.ts (import-statement); shared/safe-fs.ts (import-statement); +7 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by shared/error-bus.ts (import-statement); shared/secret-fs.ts (import-statement); core/credential-file-healer.ts (import-statement); +7 more importer(s)."
     },
     {
       "path": "shared/experiments-schema.ts",
@@ -111129,11 +110800,6 @@
         {
           "root": "cli-entry",
           "from": "core/data-epoch-restore.ts",
-          "kind": "import-statement"
-        },
-        {
-          "root": "server-bootstrap",
-          "from": "core/migrate-providers.ts",
           "kind": "import-statement"
         },
         {
@@ -111167,24 +110833,19 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by core/data-epoch-restore.ts (import-statement); core/migrate-providers.ts (import-statement); shared/known-models.ts (import-statement); +5 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by core/data-epoch-restore.ts (import-statement); shared/known-models.ts (import-statement); lib/i18n.ts (import-statement); +4 more importer(s)."
     },
     {
       "path": "shared/hana-runtime-paths.cjs",
       "inputType": "source-graph",
       "provenance": [
         {
-          "root": "cli-entry",
-          "from": "cli/local-server.ts",
-          "kind": "import-statement"
-        },
-        {
           "root": "server-bootstrap",
           "from": "shared/hana-runtime-paths.ts",
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by cli/local-server.ts (import-statement); shared/hana-runtime-paths.ts (import-statement)."
+      "reason": "Reached via esbuild source module graph, imported by shared/hana-runtime-paths.ts (import-statement)."
     },
     {
       "path": "shared/hana-runtime-paths.ts",
@@ -111248,17 +110909,7 @@
       "provenance": [
         {
           "root": "server-bootstrap",
-          "from": "core/provider-media-config.ts",
-          "kind": "import-statement"
-        },
-        {
-          "root": "server-bootstrap",
           "from": "core/session-thinking-level.ts",
-          "kind": "import-statement"
-        },
-        {
-          "root": "server-bootstrap",
-          "from": "core/migrations.ts",
           "kind": "import-statement"
         },
         {
@@ -111292,22 +110943,12 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by core/provider-media-config.ts (import-statement); core/session-thinking-level.ts (import-statement); core/migrations.ts (import-statement); +6 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by core/session-thinking-level.ts (import-statement); core/provider-registry.ts (import-statement); core/model-sync.ts (import-statement); +4 more importer(s)."
     },
     {
       "path": "shared/link-aware-fs.ts",
       "inputType": "source-graph",
       "provenance": [
-        {
-          "root": "server-bootstrap",
-          "from": "lib/session-files/session-file-registry.ts",
-          "kind": "import-statement"
-        },
-        {
-          "root": "server-bootstrap",
-          "from": "core/migrations.ts",
-          "kind": "import-statement"
-        },
         {
           "root": "server-bootstrap",
           "from": "lib/desk/cron-store.ts",
@@ -111316,6 +110957,11 @@
         {
           "root": "server-bootstrap",
           "from": "lib/desk/automation-execution-context.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/session-files/session-file-registry.ts",
           "kind": "import-statement"
         },
         {
@@ -111331,11 +110977,6 @@
         {
           "root": "server-bootstrap",
           "from": "core/session-list-projection-cache.ts",
-          "kind": "import-statement"
-        },
-        {
-          "root": "server-bootstrap",
-          "from": "core/session-manifest/legacy-migration.ts",
           "kind": "import-statement"
         },
         {
@@ -111369,7 +111010,7 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by lib/session-files/session-file-registry.ts (import-statement); core/migrations.ts (import-statement); lib/desk/cron-store.ts (import-statement); +11 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by lib/desk/cron-store.ts (import-statement); lib/desk/automation-execution-context.ts (import-statement); lib/session-files/session-file-registry.ts (import-statement); +9 more importer(s)."
     },
     {
       "path": "shared/log-redactor.ts",
@@ -111392,23 +111033,6 @@
         }
       ],
       "reason": "Reached via esbuild source module graph, imported by shared/error-bus.ts (import-statement); lib/log-redactor.ts (import-statement); lib/secret-fingerprint.ts (import-statement)."
-    },
-    {
-      "path": "shared/migrate-config-scope.ts",
-      "inputType": "source-graph",
-      "provenance": [
-        {
-          "root": "server-bootstrap",
-          "from": "core/credential-file-healer.ts",
-          "kind": "import-statement"
-        },
-        {
-          "root": "server-bootstrap",
-          "from": "core/engine.ts",
-          "kind": "import-statement"
-        }
-      ],
-      "reason": "Reached via esbuild source module graph, imported by core/credential-file-healer.ts (import-statement); core/engine.ts (import-statement)."
     },
     {
       "path": "shared/model-capabilities.ts",
@@ -111801,11 +111425,6 @@
       "provenance": [
         {
           "root": "server-bootstrap",
-          "from": "core/provider-auth-migration.ts",
-          "kind": "import-statement"
-        },
-        {
-          "root": "server-bootstrap",
           "from": "core/local-provider-plugin-store.ts",
           "kind": "import-statement"
         },
@@ -111836,6 +111455,11 @@
         },
         {
           "root": "server-bootstrap",
+          "from": "core/provider-auth-migration.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
           "from": "core/model-manager.ts",
           "kind": "import-statement"
         },
@@ -111850,22 +111474,12 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by core/provider-auth-migration.ts (import-statement); core/local-provider-plugin-store.ts (import-statement); core/model-execution-config.ts (import-statement); +7 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by core/local-provider-plugin-store.ts (import-statement); core/model-execution-config.ts (import-statement); lib/llm/provider-client.ts (import-statement); +7 more importer(s)."
     },
     {
       "path": "shared/provider-model-validation.ts",
       "inputType": "source-graph",
       "provenance": [
-        {
-          "root": "server-bootstrap",
-          "from": "core/provider-auth-migration.ts",
-          "kind": "import-statement"
-        },
-        {
-          "root": "server-bootstrap",
-          "from": "core/migrations.ts",
-          "kind": "import-statement"
-        },
         {
           "root": "server-bootstrap",
           "from": "core/provider-registry.ts",
@@ -111878,11 +111492,16 @@
         },
         {
           "root": "server-bootstrap",
+          "from": "core/provider-auth-migration.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
           "from": "server/routes/providers.ts",
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by core/provider-auth-migration.ts (import-statement); core/migrations.ts (import-statement); core/provider-registry.ts (import-statement); +2 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by core/provider-registry.ts (import-statement); core/model-sync.ts (import-statement); core/provider-auth-migration.ts (import-statement); +1 more importer(s)."
     },
     {
       "path": "shared/quick-chat-preferences.cjs",
@@ -111936,11 +111555,6 @@
       "provenance": [
         {
           "root": "server-bootstrap",
-          "from": "core/provider-media-config.ts",
-          "kind": "import-statement"
-        },
-        {
-          "root": "server-bootstrap",
           "from": "core/execution-lease-registry.ts",
           "kind": "import-statement"
         },
@@ -111962,26 +111576,6 @@
         {
           "root": "server-bootstrap",
           "from": "core/server-identity.ts",
-          "kind": "import-statement"
-        },
-        {
-          "root": "server-bootstrap",
-          "from": "lib/subagent-run-store.ts",
-          "kind": "import-statement"
-        },
-        {
-          "root": "server-bootstrap",
-          "from": "lib/subagent-thread-store.ts",
-          "kind": "import-statement"
-        },
-        {
-          "root": "server-bootstrap",
-          "from": "core/provider-catalog.ts",
-          "kind": "import-statement"
-        },
-        {
-          "root": "server-bootstrap",
-          "from": "core/migrations.ts",
           "kind": "import-statement"
         },
         {
@@ -112012,6 +111606,11 @@
         {
           "root": "server-bootstrap",
           "from": "core/input-drafts-store.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "core/provider-catalog.ts",
           "kind": "import-statement"
         },
         {
@@ -112086,7 +111685,7 @@
         },
         {
           "root": "server-bootstrap",
-          "from": "core/session-manifest/checkpoint.ts",
+          "from": "lib/subagent-run-store.ts",
           "kind": "import-statement"
         },
         {
@@ -112156,6 +111755,11 @@
         },
         {
           "root": "server-bootstrap",
+          "from": "lib/subagent-thread-store.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
           "from": "lib/workflow-activity-store.ts",
           "kind": "import-statement"
         },
@@ -112170,7 +111774,7 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by core/provider-media-config.ts (import-statement); core/execution-lease-registry.ts (import-statement); core/grant-registry.ts (import-statement); +44 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by core/execution-lease-registry.ts (import-statement); core/grant-registry.ts (import-statement); core/server-network-config.ts (import-statement); +41 more importer(s)."
     },
     {
       "path": "shared/safe-parse.ts",
@@ -112284,41 +111888,6 @@
       "provenance": [
         {
           "root": "server-bootstrap",
-          "from": "shared/migrate-config-scope.ts",
-          "kind": "import-statement"
-        },
-        {
-          "root": "server-bootstrap",
-          "from": "core/migrate-providers.ts",
-          "kind": "import-statement"
-        },
-        {
-          "root": "server-bootstrap",
-          "from": "core/provider-media-config.ts",
-          "kind": "import-statement"
-        },
-        {
-          "root": "server-bootstrap",
-          "from": "core/device-registry.ts",
-          "kind": "import-statement"
-        },
-        {
-          "root": "server-bootstrap",
-          "from": "lib/memory/config-loader.ts",
-          "kind": "import-statement"
-        },
-        {
-          "root": "server-bootstrap",
-          "from": "core/provider-catalog.ts",
-          "kind": "import-statement"
-        },
-        {
-          "root": "server-bootstrap",
-          "from": "core/migrations.ts",
-          "kind": "import-statement"
-        },
-        {
-          "root": "server-bootstrap",
           "from": "core/local-provider-plugin-store.ts",
           "kind": "import-statement"
         },
@@ -112334,12 +111903,22 @@
         },
         {
           "root": "server-bootstrap",
-          "from": "core/provider-registry.ts",
+          "from": "core/device-registry.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "core/provider-catalog.ts",
           "kind": "import-statement"
         },
         {
           "root": "server-bootstrap",
           "from": "core/model-sync.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/memory/config-loader.ts",
           "kind": "import-statement"
         },
         {
@@ -112358,7 +111937,7 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by shared/migrate-config-scope.ts (import-statement); core/migrate-providers.ts (import-statement); core/provider-media-config.ts (import-statement); +12 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by core/local-provider-plugin-store.ts (import-statement); core/plugin-config.ts (import-statement); core/credential-file-healer.ts (import-statement); +7 more importer(s)."
     },
     {
       "path": "shared/server-info-probe.cjs",
@@ -112461,11 +112040,6 @@
       "provenance": [
         {
           "root": "server-bootstrap",
-          "from": "core/migrations.ts",
-          "kind": "import-statement"
-        },
-        {
-          "root": "server-bootstrap",
           "from": "core/tool-snapshot-repair.ts",
           "kind": "import-statement"
         },
@@ -112505,7 +112079,7 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by core/migrations.ts (import-statement); core/tool-snapshot-repair.ts (import-statement); core/bridge-session-manager.ts (import-statement); +6 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by core/tool-snapshot-repair.ts (import-statement); core/bridge-session-manager.ts (import-statement); lib/conversations/agent-phone-session.ts (import-statement); +5 more importer(s)."
     },
     {
       "path": "shared/tool-outcome.ts",
@@ -112729,11 +112303,11 @@
     }
   ],
   "stats": {
-    "totalFiles": 9634,
+    "totalFiles": 9618,
     "byInputType": {
-      "source-graph": 656,
+      "source-graph": 647,
       "runtime-asset": 11,
-      "nft-runtime-trace": 8967
+      "nft-runtime-trace": 8960
     }
   }
 }

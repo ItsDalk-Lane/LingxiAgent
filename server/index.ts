@@ -61,7 +61,7 @@ import type { CompositionRoot, CompositionContext } from "./composition/contract
 import { registerTaskRegistryBusHandlers } from "./task-bus-handlers.ts";
 import { registerDeferredResultBusHandlers } from "./deferred-result-bus-handlers.ts";
 import { registerLoopBusHandlers } from "./loop-bus-handlers.ts";
-import { resolveLingxiHome, migrateLegacyHanakoHome } from "../shared/hana-runtime-paths.ts";
+import { resolveLingxiHome } from "../shared/hana-runtime-paths.ts";
 import { DATA_EPOCH } from "../shared/contract-versions.cjs";
 import { readDataEpochStamp } from "../shared/data-epoch.cjs";
 import { describeForeignServerBlock, isForeignServerBlocking, probeServerInfo } from "../shared/server-info-probe.cjs";
@@ -250,7 +250,6 @@ export async function startServer(root: CompositionRoot = {}): Promise<void> {
 
   // 用户数据存放在 ~/.lingxi/（打包后与产品代码分离）
   // 开发时可通过 LINGXI_HOME 环境变量隔离数据目录，如：LINGXI_HOME=~/.lingxi-dev node server/index.js
-  if (!process.env.LINGXI_HOME) migrateLegacyHanakoHome();
   const lingxiHome = resolveLingxiHome(process.env.LINGXI_HOME);
   process.env.LINGXI_HOME = lingxiHome;
 
@@ -471,8 +470,6 @@ export async function startServer(root: CompositionRoot = {}): Promise<void> {
     utilityModel: (() => { try { return engine.resolveUtilityConfig?.()?.utility?.id || "(none)"; } catch { return "(none)"; } })(),
     channelsDir: engine.channelsDir,
   });
-
-  if (process.platform === "win32") engine.startWin32LegacySandboxMaintenance();
 
   // ── 初始化 Hub（调度中枢，包装 engine） ──
   const hub = new Hub({ engine });

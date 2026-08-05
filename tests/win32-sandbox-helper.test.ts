@@ -153,11 +153,6 @@ describe("buildWin32SandboxHelperArgs", () => {
       "--grant-write",
       "--grant-write-optional",
       "--deny-read",
-      "--diagnose-legacy-acl",
-      "--cleanup-legacy-acl",
-      "--cleanup-lingxi-write-acl",
-      "--cleanup-legacy-profile",
-      "--legacy-appcontainer-profile",
     ]));
   });
 

@@ -32,15 +32,12 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const EXCLUSIVE_CREDENTIAL_WRITERS = [
   "core/provider-catalog.ts",
   "core/model-sync.ts",
-  "core/provider-media-config.ts",
   "core/local-provider-plugin-store.ts",
   "core/device-registry.ts",
   "core/local-user-account.ts",
   "core/web-session-store.ts",
-  "core/migrate-providers.ts",
   "core/plugin-config.ts",
   "lib/memory/config-loader.ts",
-  "shared/migrate-config-scope.ts",
 ];
 
 /**
@@ -48,8 +45,6 @@ const EXCLUSIVE_CREDENTIAL_WRITERS = [
  * required to carry at least one owner-only write.
  */
 const MIXED_CREDENTIAL_WRITERS = [
-  "core/provider-registry.ts",
-  "core/migrations.ts",
   "core/first-run.ts",
 ];
 

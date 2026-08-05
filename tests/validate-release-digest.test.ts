@@ -12,10 +12,10 @@ function digest(overrides = {}) {
     summary: { zh: "更新说明更清楚。", en: "Update notes are clearer." },
     counts: { feature: 1, fix: 0, improvement: 0, migration: 0 },
     source: {
-      owner: "liliMozi",
-      repo: "openhanako",
+      owner: "ItsDalk-Lane",
+      repo: "LingxiAgent",
       commitRange: "v0.425.3..HEAD",
-      releaseUrl: "https://github.com/liliMozi/openhanako/releases/tag/v0.425.4",
+      releaseUrl: "https://github.com/ItsDalk-Lane/LingxiAgent/releases/tag/v0.425.4",
       releaseNotes: "",
     },
     items: [

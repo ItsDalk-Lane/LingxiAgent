@@ -92,9 +92,11 @@ const manifestModule = require("../shared/artifact-core/manifest.cjs");
 const activation = require("../shared/artifact-core/activation.cjs");
 const { loadPinnedKeyset } = require("../shared/artifact-core/keyset.cjs");
 
-// Matches desktop/src/shared/artifact-ota.cjs's GITHUB_CHANNEL_BASE owner/repo
-// and scripts/mirror-release-to-atomgit.mjs's DEFAULT_GITHUB_REPOSITORY.
-const DEFAULT_REPO = "liliMozi/openhanako";
+// Repo that hosts the train/channel releases. Installed clients do not read
+// this constant: they download via the LINGXI_ARTIFACT_CHANNEL_BASE_URL
+// environment variable (see shared/artifact-core/ota-core.cjs). Keep this in
+// sync with scripts/mirror-release-to-atomgit.mjs's DEFAULT_GITHUB_REPOSITORY.
+const DEFAULT_REPO = "ItsDalk-Lane/LingxiAgent";
 
 const TRAIN_RELEASE_NOTES =
   "Hot-update train release. Holds one train's signed archives and manifest "

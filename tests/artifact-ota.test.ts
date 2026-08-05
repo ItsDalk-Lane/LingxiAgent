@@ -41,7 +41,11 @@ const {
 
 const PLATFORM_ARCH = "darwin-arm64";
 const SHELL_VERSION = "1.0.0";
+const TEST_CHANNEL_BASE_URL = "https://updates.example.com/ota/channels";
 const tempDirs: string[] = [];
+
+// OTA channel 来源不再有内置默认仓库：测试统一通过环境变量指向一个中性地址。
+process.env.LINGXI_ARTIFACT_CHANNEL_BASE_URL = TEST_CHANNEL_BASE_URL;
 
 function makeTempDir(prefix: string) {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), prefix));
@@ -54,6 +58,7 @@ afterEach(() => {
     fs.rmSync(dir, { recursive: true, force: true });
   }
   delete process.env.LINGXI_ARTIFACT_MANIFEST;
+  process.env.LINGXI_ARTIFACT_CHANNEL_BASE_URL = TEST_CHANNEL_BASE_URL;
 });
 
 function makeKeys(keyId = "ota-test") {
@@ -409,14 +414,36 @@ describe("artifact-ota: downloadToFile stall/deadline guards (trickle-attack mit
 });
 
 describe("artifact-ota: channelManifestUrls", () => {
-  it.each(["stable", "beta"])("returns only the GitHub %s channel pointer", (channel) => {
+  it.each(["stable", "beta"])("returns only the configured %s channel pointer", (channel) => {
     expect(channelManifestUrls(channel)).toEqual([
-      `https://github.com/liliMozi/openhanako/releases/download/channels/${channel}.json`,
+      `${TEST_CHANNEL_BASE_URL}/${channel}.json`,
     ]);
+  });
+
+  it("returns an empty list when no channel base URL is configured", () => {
+    delete process.env.LINGXI_ARTIFACT_CHANNEL_BASE_URL;
+    expect(channelManifestUrls("stable")).toEqual([]);
   });
 
   it("keeps background public checks on the four-hour cadence", () => {
     expect(RECHECK_INTERVAL_MS).toBe(4 * 60 * 60 * 1000);
+  });
+});
+
+describe("artifact-ota: checkOnce without a configured channel source", () => {
+  it("skips cleanly with outcome disabled and records no error", async () => {
+    delete process.env.LINGXI_ARTIFACT_CHANNEL_BASE_URL;
+    const root = makeTempDir("hana-ota-disabled-");
+    const keys = makeKeys();
+    const result = await checkOnce({
+      homeDir: path.join(root, "home"),
+      keyset: keys.keyset,
+      currentShellVersion: SHELL_VERSION,
+      platformArch: PLATFORM_ARCH,
+      channel: "stable",
+      log: () => {},
+    });
+    expect(result).toEqual({ outcome: "disabled" });
   });
 });
 

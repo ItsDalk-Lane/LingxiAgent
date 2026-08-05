@@ -20,8 +20,6 @@ const UPDATE_CHANNEL_VERSION = 1;
 // 任何邀请入口，正式构建在服务上线前不会露出半个按钮。上线后填这里，
 // 或用 LINGXI_INVITE_API_URL 覆盖。
 const DEFAULT_INVITE_API_URL = "";
-const DEFAULT_GITHUB_OWNER = "liliMozi";
-const DEFAULT_GITHUB_REPO = "openhanako";
 
 let _mainWindow = null;
 let _setIsUpdating = null;  // 由 main.cjs 注入
@@ -41,21 +39,40 @@ function ensureTrailingSlash(value) {
   return trimmed ? `${trimmed}/` : "";
 }
 
-function createGithubFeedConfig(digestBaseUrl = "") {
+/**
+ * GitHub 更新源的 feed 配置。owner/repo 不再内置默认值，全部由调用方
+ * （环境变量 LINGXI_UPDATE_GITHUB_OWNER / LINGXI_UPDATE_GITHUB_REPO）给出。
+ */
+function createGithubFeedConfig(owner, repo, digestBaseUrl = "") {
   return {
     feedURL: {
       provider: "github",
-      owner: DEFAULT_GITHUB_OWNER,
-      repo: DEFAULT_GITHUB_REPO,
+      owner,
+      repo,
     },
     source: {
       provider: "github",
-      owner: DEFAULT_GITHUB_OWNER,
-      repo: DEFAULT_GITHUB_REPO,
+      owner,
+      repo,
     },
-    digestBaseUrl: digestBaseUrl || `https://github.com/${DEFAULT_GITHUB_OWNER}/${DEFAULT_GITHUB_REPO}/releases/download`,
+    digestBaseUrl: digestBaseUrl || `https://github.com/${owner}/${repo}/releases/download`,
     channel: "default",
     channelError: null,
+  };
+}
+
+/**
+ * 未配置任何更新源时的占位配置：feedURL 为 null，checkForUpdatesOnce 会
+ * 干净地跳过检查（记一条日志，不报错）。channelError 仍然带在身上——
+ * 通道文件损坏必须让用户看见，不能因为"没有货架"就把错误吞掉。
+ */
+function createUnconfiguredFeedConfig(channelError = null) {
+  return {
+    feedURL: null,
+    source: null,
+    digestBaseUrl: "",
+    channel: "default",
+    channelError,
   };
 }
 
@@ -178,32 +195,67 @@ function resolveUpdateFeedConfig(env = process.env) {
     return createInviteChannelFeedConfig(record.feedUrl, digestBaseUrl);
   }
 
-  // 公开 stable/beta 固定使用 GitHub。旧环境里即使还留着其它 source 值，
-  // 也不再触发第二个公共更新源；只有上面的显式 feed URL 和邀请通道可以改源。
-  const defaultConfig = createGithubFeedConfig(digestBaseUrl);
-  return { ...defaultConfig, channelError: channelError || null };
+  // 显式的 GitHub 更新源：owner/repo 完全由环境变量给出，没有内置默认仓库。
+  // 旧环境里残留的其它 source 值不再触发任何公共更新源。
+  const githubOwner = String(env.LINGXI_UPDATE_GITHUB_OWNER || "").trim();
+  const githubRepo = String(env.LINGXI_UPDATE_GITHUB_REPO || "").trim();
+  if (githubOwner && githubRepo) {
+    const githubConfig = createGithubFeedConfig(githubOwner, githubRepo, digestBaseUrl);
+    return { ...githubConfig, channelError: channelError || null };
+  }
+
+  // 未配置任何更新源：返回 feedURL 为 null 的占位配置，由 checkForUpdatesOnce
+  // 干净地跳过检查（打包产物里的 app-update.yml 也算一种配置来源，见
+  // hasNativeUpdateConfig）。
+  return createUnconfiguredFeedConfig(channelError || null);
 }
 
 function feedSourceLabel(config) {
-  const source = config?.source || {};
+  const source = config?.source;
+  if (!source) return "none";
   if (source.provider === "github") return `github:${source.owner}/${source.repo}`;
   if (source.feedUrl) return `${source.provider}:${source.feedUrl}`;
   return source.provider || "unknown";
 }
 
+/**
+ * electron-updater 的原生配置来源：打包产物里的 app-update.yml（开发模式
+ * 为 app 目录下的 dev-app-update.yml）。存在即视为"已配置更新源"——此时
+ * 不显式 setFeedURL，让 electron-updater 自己读这份文件。
+ */
+function nativeUpdateConfigPath() {
+  try {
+    if (app.isPackaged) return path.join(process.resourcesPath || "", "app-update.yml");
+    return path.join(app.getAppPath(), "dev-app-update.yml");
+  } catch {
+    return null;
+  }
+}
+
+function hasNativeUpdateConfig() {
+  const configPath = nativeUpdateConfigPath();
+  return Boolean(configPath) && fs.existsSync(configPath);
+}
+
 function applyUpdateFeedConfig(config) {
   _updateFeedConfig = config;
   setState({
-    updateSource: _updateFeedConfig.source,
-    updateChannel: _updateFeedConfig.channel || "default",
-    updateChannelError: _updateFeedConfig.channelError || null,
+    updateSource: _updateFeedConfig?.source || null,
+    updateChannel: _updateFeedConfig?.channel || "default",
+    updateChannelError: _updateFeedConfig?.channelError || null,
   });
-  autoUpdater.setFeedURL(_updateFeedConfig.feedURL);
+  // feedURL 为 null = 未显式配置更新源：不调用 setFeedURL。若打包产物里有
+  // app-update.yml，electron-updater 会在 checkForUpdates 时自己读它。
+  if (_updateFeedConfig?.feedURL) autoUpdater.setFeedURL(_updateFeedConfig.feedURL);
 }
 
 async function checkForUpdatesOnce(source = "manual") {
   const config = resolveUpdateFeedConfig();
   applyUpdateFeedConfig(config);
+  if (!config.feedURL && !hasNativeUpdateConfig()) {
+    logUpdate(`update check skipped (${source}): no update source configured`);
+    return null;
+  }
   try {
     return await autoUpdater.checkForUpdates();
   } finally {
@@ -242,9 +294,9 @@ function createIdleState() {
     digest: null,
     digestUrl: null,
     digestError: null,
-    updateSource: _updateFeedConfig.source,
-    updateChannel: _updateFeedConfig.channel || "default",
-    updateChannelError: _updateFeedConfig.channelError || null,
+    updateSource: _updateFeedConfig?.source || null,
+    updateChannel: _updateFeedConfig?.channel || "default",
+    updateChannelError: _updateFeedConfig?.channelError || null,
   };
 }
 
@@ -324,7 +376,7 @@ function buildReleaseAssetUrl(baseUrl, tag, assetName) {
 function buildReleaseDigestUrl(version, feedConfig = _updateFeedConfig) {
   const tag = tagFromVersion(version);
   if (!tag) return null;
-  return buildReleaseAssetUrl(feedConfig.digestBaseUrl, tag, DIGEST_ASSET_NAME);
+  return buildReleaseAssetUrl(feedConfig?.digestBaseUrl || "", tag, DIGEST_ASSET_NAME);
 }
 
 function isLocalizedText(value) {
@@ -560,8 +612,13 @@ async function dirSize(dir) {
 // ── electron-updater 配置 ──
 
 function setupAutoUpdater() {
-  // 显式设置 feed URL，不依赖 app-update.yml（electron-builder --dir 不生成该文件）
-  applyUpdateFeedConfig(resolveUpdateFeedConfig());
+  // 更新源完全由配置驱动：显式环境变量 / 邀请通道文件 / 打包产物里的
+  // app-update.yml。三者都没有时记一条日志，后续检查会干净地跳过。
+  const config = resolveUpdateFeedConfig();
+  applyUpdateFeedConfig(config);
+  if (!config.feedURL && !hasNativeUpdateConfig()) {
+    logUpdate("no update source configured; update checks will be skipped until one is set");
+  }
 
   autoUpdater.autoDownload = false;          // 由我们控制（磁盘空间检查后手动触发）
   autoUpdater.autoInstallOnAppQuit = false;  // 只在用户明确点击"重启更新"时安装

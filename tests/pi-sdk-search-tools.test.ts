@@ -114,7 +114,6 @@ describe("Hana Pi SDK search tools", () => {
     if (!tempRoot) tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "hana-search-tools-"));
     return {
       managedBinDir: path.join(tempRoot, "runtime", "pi-sdk", "bin"),
-      legacyManagedBinDir: path.join(tempRoot, ".pi", "agent", "bin"),
     };
   }
 
@@ -191,47 +190,13 @@ describe("Hana Pi SDK search tools", () => {
     );
   });
 
-  it("copies a legacy managed binary into Hana's runtime directory on first use", async () => {
+  it("uses the managed binary from Hana's runtime directory when present", async () => {
     const { createGrepTool } = await import("../lib/pi-sdk/index.ts");
     const cwd = process.cwd();
     const paths = managedPaths();
     const binaryName = process.platform === "win32" ? "rg.exe" : "rg";
-    const legacyPath = path.join(paths.legacyManagedBinDir, binaryName);
     const managedPath = path.join(paths.managedBinDir, binaryName);
-    fs.mkdirSync(paths.legacyManagedBinDir, { recursive: true });
-    fs.writeFileSync(legacyPath, "legacy-rg", "utf-8");
-
-    spawn.mockReturnValue(createChildProcess());
-    const tool = (createGrepTool as any)(cwd, {
-      ...paths,
-      operations: {
-        isDirectory: () => true,
-        readFile: () => "",
-      },
-    });
-
-    await (tool as any).execute("call-migrate", { pattern: "missing", path: "." });
-
-    expect(spawn).toHaveBeenCalledWith(
-      managedPath,
-      expect.any(Array),
-      expect.objectContaining({ windowsHide: true }),
-    );
-    expect(fs.readFileSync(managedPath, "utf-8")).toBe("legacy-rg");
-    expect(fs.readFileSync(legacyPath, "utf-8")).toBe("legacy-rg");
-    expect(spawnSync).not.toHaveBeenCalled();
-  });
-
-  it("prefers the Hana runtime binary without touching a legacy copy", async () => {
-    const { createGrepTool } = await import("../lib/pi-sdk/index.ts");
-    const cwd = process.cwd();
-    const paths = managedPaths();
-    const binaryName = process.platform === "win32" ? "rg.exe" : "rg";
-    const legacyPath = path.join(paths.legacyManagedBinDir, binaryName);
-    const managedPath = path.join(paths.managedBinDir, binaryName);
-    fs.mkdirSync(paths.legacyManagedBinDir, { recursive: true });
     fs.mkdirSync(paths.managedBinDir, { recursive: true });
-    fs.writeFileSync(legacyPath, "legacy-rg", "utf-8");
     fs.writeFileSync(managedPath, "managed-rg", "utf-8");
 
     spawn.mockReturnValue(createChildProcess());
@@ -247,30 +212,5 @@ describe("Hana Pi SDK search tools", () => {
 
     expect(spawn).toHaveBeenCalledWith(managedPath, expect.any(Array), expect.any(Object));
     expect(fs.readFileSync(managedPath, "utf-8")).toBe("managed-rg");
-    expect(fs.readFileSync(legacyPath, "utf-8")).toBe("legacy-rg");
-  });
-
-  it("surfaces legacy binary copy failures instead of falling back", async () => {
-    const { createGrepTool } = await import("../lib/pi-sdk/index.ts");
-    const cwd = process.cwd();
-    const paths = managedPaths();
-    const binaryName = process.platform === "win32" ? "rg.exe" : "rg";
-    fs.mkdirSync(paths.legacyManagedBinDir, { recursive: true });
-    fs.writeFileSync(path.join(paths.legacyManagedBinDir, binaryName), "legacy-rg", "utf-8");
-    fs.mkdirSync(path.dirname(paths.managedBinDir), { recursive: true });
-    fs.writeFileSync(paths.managedBinDir, "blocks-directory", "utf-8");
-
-    const tool = (createGrepTool as any)(cwd, {
-      ...paths,
-      operations: {
-        isDirectory: () => true,
-        readFile: () => "",
-      },
-    });
-
-    await expect((tool as any).execute("call-copy-failure", { pattern: "missing", path: "." }))
-      .rejects.toThrow("Failed to migrate legacy rg binary");
-    expect(spawn).not.toHaveBeenCalled();
-    expect(spawnSync).not.toHaveBeenCalled();
   });
 });

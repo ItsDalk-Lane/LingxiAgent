@@ -49,6 +49,8 @@ describe('update digest history loader', () => {
       fetchImpl,
       normalize,
       readBundledEntries: () => [],
+      releasesApiUrl: 'https://api.github.com/repos/example-org/lingxi/releases?per_page=20&page=1',
+      releaseAssetBaseUrl: 'https://github.com/example-org/lingxi/releases/download',
     });
 
     const result = await load();
@@ -81,7 +83,13 @@ describe('update digest history loader', () => {
     );
 
     const { createUpdateDigestHistoryLoader } = await import('../desktop/src/shared/update-digest-history.cjs');
-    const load = createUpdateDigestHistoryLoader({ fetchImpl, normalize, readBundledEntries: () => [] });
+    const load = createUpdateDigestHistoryLoader({
+      fetchImpl,
+      normalize,
+      readBundledEntries: () => [],
+      releasesApiUrl: 'https://api.github.com/repos/example-org/lingxi/releases?per_page=20&page=1',
+      releaseAssetBaseUrl: 'https://github.com/example-org/lingxi/releases/download',
+    });
     const result = await load();
 
     expect(result).toMatchObject({ source: 'online', complete: false });
@@ -99,6 +107,8 @@ describe('update digest history loader', () => {
       normalize: (value: ReturnType<typeof digest>) => value,
       readBundledEntries: () => bundled,
       log,
+      releasesApiUrl: 'https://api.github.com/repos/example-org/lingxi/releases?per_page=20&page=1',
+      releaseAssetBaseUrl: 'https://github.com/example-org/lingxi/releases/download',
     });
     const result = await load();
 
@@ -121,11 +131,33 @@ describe('update digest history loader', () => {
       fetchImpl,
       normalize: (value: ReturnType<typeof digest>) => value,
       readBundledEntries: () => [],
+      releasesApiUrl: 'https://api.github.com/repos/example-org/lingxi/releases?per_page=20&page=1',
+      releaseAssetBaseUrl: 'https://github.com/example-org/lingxi/releases/download',
     });
 
     await load();
     await load();
 
     expect(fetchImpl).toHaveBeenCalledTimes(2);
+  });
+
+  it('skips the online load entirely when no release source is configured', async () => {
+    const fetchImpl = vi.fn();
+    const bundled = [digest('0.500.1')];
+    const log = vi.fn();
+
+    const { createUpdateDigestHistoryLoader } = await import('../desktop/src/shared/update-digest-history.cjs');
+    const load = createUpdateDigestHistoryLoader({
+      fetchImpl,
+      normalize: (value: ReturnType<typeof digest>) => value,
+      readBundledEntries: () => bundled,
+      log,
+      env: {},
+    });
+    const result = await load();
+
+    expect(fetchImpl).not.toHaveBeenCalled();
+    expect(result).toEqual({ entries: bundled, source: 'bundled', complete: false });
+    expect(log).toHaveBeenCalledWith(expect.stringContaining('no release source configured'));
   });
 });

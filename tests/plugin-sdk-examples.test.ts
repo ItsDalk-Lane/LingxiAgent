@@ -30,13 +30,13 @@ describe("plugin SDK examples and docs", () => {
         "spec.loader.exec_module(mod)",
         "print(mod.relative_file_spec(",
         "    PureWindowsPath('C:/Users/runner/AppData/Local/Temp/hana-ui-scaffold/sdk-panel'),",
-        "    PureWindowsPath('D:/a/openhanako/openhanako/packages/plugin-sdk'),",
+        "    PureWindowsPath('D:/a/LingxiAgent/LingxiAgent/packages/plugin-sdk'),",
         "))",
       ].join("\n"),
       scriptPath,
     ], { cwd: root, encoding: "utf-8" }).trim();
 
-    expect(result).toBe("file:///D:/a/openhanako/openhanako/packages/plugin-sdk");
+    expect(result).toBe("file:///D:/a/LingxiAgent/LingxiAgent/packages/plugin-sdk");
     // Spawning a python interpreter on a loaded Windows CI runner has been
     // observed to take >10s (the suite-wide default); the assertion itself is
     // instant once the interpreter is up.

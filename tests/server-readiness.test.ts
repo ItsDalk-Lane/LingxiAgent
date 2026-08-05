@@ -157,7 +157,7 @@ describe("isModuleResolutionError", () => {
   });
 
   it("issue #484 真实日志 → 抽出 ws", () => {
-    // 来自 https://github.com/liliMozi/openhanako/issues/484
+    // 来自上游 openhanako 仓库 issue #484 的真实日志
     const real = [
       "[stderr] node:internal/modules/package_json_reader:256\n",
       "[stderr]   throw new ERR_MODULE_NOT_FOUND(packageName, fileURLToPath(base), null);\n",

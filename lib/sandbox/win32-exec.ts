@@ -1175,13 +1175,6 @@ function assertSandboxNetworkSupported(sandbox) {
   }
 }
 
-function cleanupRootsForSandboxGrants(grants) {
-  return [
-    ...(grants?.writePaths || []),
-    ...(grants?.optionalWritePaths || []),
-  ];
-}
-
 // A write-restricted token can only write inside the paths the sandbox
 // explicitly granted. PowerShell writes a small policy-probe script file to
 // %TEMP% while starting up to figure out whether an AppLocker-style script
@@ -1244,58 +1237,50 @@ async function spawnViaSandboxHelper({
     executable,
     args,
   } as any);
-  const cleanupQueue = sandbox.legacyCleanupQueue;
-  const cleanupRoots = cleanupRootsForSandboxGrants(grants);
-  const lease = cleanupQueue?.beginRootUse?.(cleanupRoots);
+  const stderrFilter = createWin32SandboxTerminalStderrFilter({ onData });
+  const watchdogTimeout = nativeTimeoutMs > 0
+    ? (nativeTimeoutMs + WIN32_SANDBOX_HELPER_WATCHDOG_EXTRA_MS) / 1000
+    : undefined;
+  let result;
   try {
-    const stderrFilter = createWin32SandboxTerminalStderrFilter({ onData });
-    const watchdogTimeout = nativeTimeoutMs > 0
-      ? (nativeTimeoutMs + WIN32_SANDBOX_HELPER_WATCHDOG_EXTRA_MS) / 1000
-      : undefined;
-    let result;
-    try {
-      result = await spawnAndStream(helper, helperArgs, {
-        cwd,
-        env,
-        onData,
-        onStdout: onData,
-        onStderr: (data) => stderrFilter.push(data),
-        signal,
-        timeout: watchdogTimeout,
-        timeoutErrorValue: timeout,
-        exitStdioGraceMs: WIN32_SANDBOX_HELPER_STDIO_GRACE_MS,
-        // Terminating the helper closes its KILL_ON_JOB_CLOSE handle. Do not start
-        // taskkill for sandbox execution; the private Job owns the command tree.
-        killMode: "process",
-      });
-    } finally {
-      stderrFilter.flush();
-    }
-    const terminal = stderrFilter.terminalRecord;
-    if (!terminal) {
-      const error: any = new Error("[win32-sandbox] helper terminal record missing or invalid");
-      error.code = "LINGXI_WIN32_SANDBOX_TERMINAL_PROTOCOL";
-      throw error;
-    }
-    if (terminal.status === "timed_out") {
-      throw new Error(`timeout:${timeout}`);
-    }
-    if (terminal.status === "termination_failed") {
-      const error: any = new Error(
-        `[win32-sandbox] native Job termination failed (win32Error=${terminal.win32Error})`
-      );
-      error.code = "LINGXI_WIN32_SANDBOX_TERMINATION_FAILED";
-      error.win32Error = terminal.win32Error;
-      throw error;
-    }
-    if (terminal.status === "exited" && terminal.exitCode !== null) {
-      return { exitCode: terminal.exitCode };
-    }
-    return result;
+    result = await spawnAndStream(helper, helperArgs, {
+      cwd,
+      env,
+      onData,
+      onStdout: onData,
+      onStderr: (data) => stderrFilter.push(data),
+      signal,
+      timeout: watchdogTimeout,
+      timeoutErrorValue: timeout,
+      exitStdioGraceMs: WIN32_SANDBOX_HELPER_STDIO_GRACE_MS,
+      // Terminating the helper closes its KILL_ON_JOB_CLOSE handle. Do not start
+      // taskkill for sandbox execution; the private Job owns the command tree.
+      killMode: "process",
+    });
   } finally {
-    cleanupQueue?.endRootUse?.(lease);
-    cleanupQueue?.enqueueRoots?.(cleanupRoots);
+    stderrFilter.flush();
   }
+  const terminal = stderrFilter.terminalRecord;
+  if (!terminal) {
+    const error: any = new Error("[win32-sandbox] helper terminal record missing or invalid");
+    error.code = "LINGXI_WIN32_SANDBOX_TERMINAL_PROTOCOL";
+    throw error;
+  }
+  if (terminal.status === "timed_out") {
+    throw new Error(`timeout:${timeout}`);
+  }
+  if (terminal.status === "termination_failed") {
+    const error: any = new Error(
+      `[win32-sandbox] native Job termination failed (win32Error=${terminal.win32Error})`
+    );
+    error.code = "LINGXI_WIN32_SANDBOX_TERMINATION_FAILED";
+    error.win32Error = terminal.win32Error;
+    throw error;
+  }
+  if (terminal.status === "exited" && terminal.exitCode !== null) {
+    return { exitCode: terminal.exitCode };
+  }
+  return result;
 }
 
 // ── 沙盒 PowerShell 启动探针 ──

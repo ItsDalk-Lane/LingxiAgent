@@ -82,6 +82,8 @@ describe("auto-updater", () => {
     delete process.env.LINGXI_UPDATE_SOURCE;
     delete process.env.LINGXI_UPDATE_PROVIDER;
     delete process.env.LINGXI_UPDATE_DIGEST_BASE_URL;
+    delete process.env.LINGXI_UPDATE_GITHUB_OWNER;
+    delete process.env.LINGXI_UPDATE_GITHUB_REPO;
     delete process.env.LINGXI_INVITE_API_URL;
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue({
       ok: false,
@@ -125,47 +127,42 @@ describe("auto-updater", () => {
     return win;
   }
 
-  it("should configure autoUpdater correctly", () => {
+  it("should configure autoUpdater correctly without a configured update source", () => {
     initWithMockWindow();
-    expect(mockAutoUpdater.setFeedURL).toHaveBeenCalledWith({
-      provider: "github",
-      owner: "liliMozi",
-      repo: "openhanako",
-    });
+    expect(mockAutoUpdater.setFeedURL).not.toHaveBeenCalled();
     expect(mockAutoUpdater.autoDownload).toBe(false);
     expect(mockAutoUpdater.autoInstallOnAppQuit).toBe(false);
   });
 
-  it("resolves GitHub as the only public update feed", () => {
+  it("returns an unconfigured feed when no update source is set", () => {
     const config = mod.resolveUpdateFeedConfig({});
-    expect(config.feedURL).toEqual({
-      provider: "github",
-      owner: "liliMozi",
-      repo: "openhanako",
-    });
+    expect(config.feedURL).toBeNull();
+    expect(config.source).toBeNull();
+    expect(config.channel).toBe("default");
+    expect(config.channelError).toBeNull();
     expect(config).not.toHaveProperty("fallbackConfigs");
   });
 
-  it.each(["gitcode", "atomgit"])("ignores legacy public source selector %s and keeps GitHub", (source) => {
+  it.each(["gitcode", "atomgit"])("ignores legacy public source selector %s when no feed is configured", (source) => {
     const config = mod.resolveUpdateFeedConfig({ LINGXI_UPDATE_SOURCE: source });
-    expect(config.feedURL).toEqual({
-      provider: "github",
-      owner: "liliMozi",
-      repo: "openhanako",
-    });
-    expect(mod.buildReleaseDigestUrl("0.425.4", config)).toBe(
-      "https://github.com/liliMozi/openhanako/releases/download/v0.425.4/release-digest.v1.json",
-    );
+    expect(config.feedURL).toBeNull();
+    expect(mod.buildReleaseDigestUrl("0.425.4", config)).toBeNull();
   });
 
-  it("can force GitHub as the only update feed", () => {
-    const config = mod.resolveUpdateFeedConfig({ LINGXI_UPDATE_SOURCE: "github" });
+  it("resolves a GitHub update feed from explicit owner/repo env config", () => {
+    const config = mod.resolveUpdateFeedConfig({
+      LINGXI_UPDATE_GITHUB_OWNER: "example-org",
+      LINGXI_UPDATE_GITHUB_REPO: "example-repo",
+    });
     expect(config.feedURL).toEqual({
       provider: "github",
-      owner: "liliMozi",
-      repo: "openhanako",
+      owner: "example-org",
+      repo: "example-repo",
     });
     expect(config).not.toHaveProperty("fallbackConfigs");
+    expect(mod.buildReleaseDigestUrl("0.425.4", config)).toBe(
+      "https://github.com/example-org/example-repo/releases/download/v0.425.4/release-digest.v1.json",
+    );
   });
 
   it("loads digest from the generic feed directory when an explicit feed URL is configured", () => {
@@ -213,10 +210,19 @@ describe("auto-updater", () => {
     expect(mod.getState().status).toBe("latest");
   });
 
+  it("skips update checks cleanly when no update source is configured", async () => {
+    initWithMockWindow();
+    await ipcHandlers["auto-update-check"]();
+    expect(mockAutoUpdater.checkForUpdates).not.toHaveBeenCalled();
+    expect(mockAutoUpdater.setFeedURL).not.toHaveBeenCalled();
+    expect(mod.getState().status).not.toBe("error");
+  });
+
   it("makes one bounded public attempt per click and remains retryable after every failure", async () => {
+    process.env.LINGXI_UPDATE_FEED_URL = "https://updates.example.com/stable";
     mockAutoUpdater.checkForUpdates
-      .mockRejectedValueOnce(new Error("getaddrinfo ENOTFOUND github.com"))
-      .mockRejectedValueOnce(new Error("connect ETIMEDOUT github.com"));
+      .mockRejectedValueOnce(new Error("getaddrinfo ENOTFOUND updates.example.com"))
+      .mockRejectedValueOnce(new Error("connect ETIMEDOUT updates.example.com"));
 
     initWithMockWindow();
     await ipcHandlers["auto-update-check"]();
@@ -224,7 +230,7 @@ describe("auto-updater", () => {
     expect(mockAutoUpdater.checkForUpdates).toHaveBeenCalledTimes(1);
     expect(mod.getState()).toEqual(expect.objectContaining({
       status: "error",
-      error: "getaddrinfo ENOTFOUND github.com",
+      error: "getaddrinfo ENOTFOUND updates.example.com",
     }));
 
     await ipcHandlers["auto-update-check"]();
@@ -232,17 +238,15 @@ describe("auto-updater", () => {
     expect(mockAutoUpdater.checkForUpdates).toHaveBeenCalledTimes(2);
     expect(mod.getState()).toEqual(expect.objectContaining({
       status: "error",
-      error: "connect ETIMEDOUT github.com",
+      error: "connect ETIMEDOUT updates.example.com",
     }));
     expect(mockAutoUpdater.setFeedURL).toHaveBeenLastCalledWith({
-      provider: "github",
-      owner: "liliMozi",
-      repo: "openhanako",
+      provider: "generic",
+      url: "https://updates.example.com/stable/",
     });
     expect(mod.getState().updateSource).toEqual({
-      provider: "github",
-      owner: "liliMozi",
-      repo: "openhanako",
+      provider: "generic",
+      feedUrl: "https://updates.example.com/stable/",
     });
   });
 
@@ -261,20 +265,19 @@ describe("auto-updater", () => {
   });
 
   it("should set allowPrerelease on channel change", () => {
+    process.env.LINGXI_UPDATE_FEED_URL = "https://updates.example.com/stable";
     initWithMockWindow();
     mod.setUpdateChannel("beta");
     expect(mockAutoUpdater.allowPrerelease).toBe(true);
     expect(mockAutoUpdater.setFeedURL).toHaveBeenLastCalledWith({
-      provider: "github",
-      owner: "liliMozi",
-      repo: "openhanako",
+      provider: "generic",
+      url: "https://updates.example.com/stable/",
     });
     mod.setUpdateChannel("stable");
     expect(mockAutoUpdater.allowPrerelease).toBe(false);
     expect(mockAutoUpdater.setFeedURL).toHaveBeenLastCalledWith({
-      provider: "github",
-      owner: "liliMozi",
-      repo: "openhanako",
+      provider: "generic",
+      url: "https://updates.example.com/stable/",
     });
   });
 
@@ -299,6 +302,7 @@ describe("auto-updater", () => {
   });
 
   it("loads release digest metadata without changing the downloaded update contract", async () => {
+    process.env.LINGXI_UPDATE_FEED_URL = "https://updates.example.com/stable";
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue({
       ok: true,
       json: vi.fn().mockResolvedValue({
@@ -502,11 +506,7 @@ describe("auto-updater", () => {
     initWithMockWindow({ lingxiHome: home });
 
     const config = mod.resolveUpdateFeedConfig({});
-    expect(config.feedURL).toEqual({
-      provider: "github",
-      owner: "liliMozi",
-      repo: "openhanako",
-    });
+    expect(config.feedURL).toBeNull();
     expect(config.channel).toBe("default");
     expect(config.channelError).toBeNull();
   });

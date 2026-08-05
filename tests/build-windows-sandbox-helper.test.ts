@@ -134,7 +134,7 @@ describe("Windows sandbox helper build script", () => {
     expect(createDesktop).toContain("generatePrivateDesktopName(desktop.desktopName)");
   });
 
-  it("uses ordinary Lingxi write SIDs while retaining legacy capability ACL cleanup", () => {
+  it("uses ordinary Lingxi write SIDs for writable-root ACL grants", () => {
     const source = fs.readFileSync(
       path.resolve(__dirname, "../desktop/native/LingxiWindowsSandboxHelper/main.cpp"),
       "utf8"
@@ -145,11 +145,6 @@ describe("Windows sandbox helper build script", () => {
 
     expect(currentSidFunction).toContain("S-1-5-21-");
     expect(currentSidFunction).not.toContain("S-1-15-3-4096-");
-    expect(source).toContain("sidForWritableRootLegacyCapabilityNamespace");
-    expect(source).toContain("sidForWritableRootLegacyAccountNamespace");
-    expect(source).toContain("S-1-15-3-4096-");
-    expect(source).toContain("--cleanup-lingxi-write-acl");
-    expect(source).toContain("lingxi-write-acl-cleaned");
   });
 
   it("adds the Windows write-restricted SID to the restricted token", () => {
@@ -560,22 +555,6 @@ describe("Windows sandbox helper build script", () => {
     expect(source).toContain("GetFinalPathNameByHandleW");
     expect(source).toContain("FILE_FLAG_BACKUP_SEMANTICS");
     expect(source).toContain("normalizePathKey");
-  });
-
-  it("keeps a scoped legacy AppContainer diagnostic and cleanup path", () => {
-    const source = fs.readFileSync(
-      path.resolve(__dirname, "../desktop/native/LingxiWindowsSandboxHelper/main.cpp"),
-      "utf8"
-    );
-
-    expect(source).toContain("--legacy-appcontainer-profile");
-    expect(source).toContain("--cleanup-legacy-profile");
-    expect(source).toContain("--diagnose-legacy-acl");
-    expect(source).toContain("legacy-appcontainer-acl");
-    expect(source).toContain("S-1-15-2-");
-    expect(source).toContain("DeriveAppContainerSidFromAppContainerName");
-    expect(source).toContain("DeleteAppContainerProfile");
-    expect(source).toContain("REVOKE_ACCESS");
   });
 
   it("writes a batch script that calls VsDevCmd.bat before cl.exe", () => {

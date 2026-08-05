@@ -20,6 +20,10 @@ import updateStyles from '../../components/AutoUpdateStatus.module.css';
 
 const EMPTY_HISTORY: UpdateDigestHistoryResult = { entries: [], source: 'none', complete: false };
 
+// 上游项目：本仓库（LingxiAgent）由 openhanako 改名/重构而来，版本线同步跟踪上游。
+const UPSTREAM_REPO_URL = 'https://github.com/liliMozi/openhanako';
+const UPSTREAM_VERSION = '0.442.0';
+
 function UpdateHistoryDialog({
   open,
   loading,
@@ -538,7 +542,7 @@ export function AboutTab() {
         </div>
       </div>
 
-      {/* Info：4 个标准 row（license / copyright / github / beta toggle）+
+      {/* Info：标准 row（license / copyright / auto-check / beta toggle）+
           仅在壳更新待命时出现的条件行 */}
       <SettingsSection>
         <SettingsRow
@@ -547,27 +551,23 @@ export function AboutTab() {
         />
         <SettingsRow
           label={t('settings.about.copyright')}
-          control={<span>© 2026 liliMozi</span>}
+          control={<span>© 2026 Lingxi</span>}
         />
         <SettingsRow
-          label="GitHub"
+          label={t('settings.about.upstreamProject')}
           control={
-            <a
-              className={styles['about-link']}
-              href="#"
-              onClick={(e) => {
-                e.preventDefault();
-                hana?.openExternal?.('https://github.com/liliMozi');
-              }}
+            <button
+              type="button"
+              className={styles['settings-btn-secondary']}
+              onClick={() => { void hana?.openExternal?.(UPSTREAM_REPO_URL); }}
             >
-              github.com/liliMozi
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-                <polyline points="15 3 21 3 21 9" />
-                <line x1="10" y1="14" x2="21" y2="3" />
-              </svg>
-            </a>
+              openhanako
+            </button>
           }
+        />
+        <SettingsRow
+          label={t('settings.about.upstreamVersion')}
+          control={<span>v{UPSTREAM_VERSION}</span>}
         />
         <SettingsRow
           label={t('settings.about.autoCheckUpdates')}
@@ -610,7 +610,7 @@ export function AboutTab() {
 
 const LICENSE_TEXT = `Apache License, Version 2.0
 
-Copyright 2026 liliMozi
+Copyright 2026 Lingxi
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

@@ -1082,9 +1082,8 @@ export class SessionCoordinator {
     this._ensureSessionLoadedInFlight = new Map();
     // 运行期 session-meta 隔离记录：key 是 metaPath，value 是隔离详情。
     // 只记内存态（不落盘）——重启后 quarantine 文件仍在磁盘上，但这份
-    // "刚刚发生过隔离"的提示只需要覆盖当前进程生命周期；重启后的存量隔离
-    // 文件由 listSkippedMetaSources（账本）与 _sessionManifestStoreRecovery
-    // 两条独立信号覆盖，不需要这里补历史。
+    // "刚刚发生过隔离"的提示只需要覆盖当前进程生命周期；重启后的存量问题
+    // 由 _sessionManifestStoreRecovery 信号覆盖，不需要这里补历史。
     this._metaQuarantines = new Map();
   }
 

@@ -1,22 +1,20 @@
 # Security Policy
 
-This project is now marketed as 灵犀 Lingxi. During the rename transition, the repository and security-reporting URLs intentionally remain on the legacy `openhanako` GitHub path.
+This project is marketed as 灵犀 Lingxi.
 
 ## Reporting a Vulnerability
 
-If you discover a security vulnerability, please report it through GitHub:
-
-- Open a private vulnerability report in the repository Security tab when available:
-  https://github.com/liliMozi/openhanako/security
-- If private reporting is not available, open an issue:
-  https://github.com/liliMozi/openhanako/issues
+If you discover a security vulnerability, please report it privately through
+the repository's security channel (for example, the GitHub Security tab of
+the repository you obtained this code from) rather than opening a public
+issue.
 
 Please include:
 - Description of the vulnerability
 - Steps to reproduce
 - Potential impact
 
-I will respond within 72 hours and work with you on a fix before public disclosure.
+We will respond within 72 hours and work with you on a fix before public disclosure.
 
 ## Scope
 
@@ -28,7 +26,7 @@ I will respond within 72 hours and work with you on a fix before public disclosu
 ## Local credential storage
 
 Provider keys, OAuth tokens, and device records live in the data directory
-(`LINGXI_HOME`, by default `~/.hanako`). What the application guarantees:
+(`LINGXI_HOME`, by default `~/.lingxi`). What the application guarantees:
 
 - Files holding credentials are written readable and writable by their owner
   only, and the data directory itself is owner-only.

@@ -2,10 +2,9 @@
  * Session 列表故障逃逸拓扑加固（#414 同族）故障注入测试。
  *
  * 背景：listSessions 是 per-agent try/catch，块内单点抛错会让整个 agent
- * 的会话列表清空成 []。这里覆盖三处未守卫单点：
+ * 的会话列表清空成 []。这里覆盖两处未守卫单点：
  *   T1 - core/session-coordinator.ts listSessions 内 manifest 查询直连 SQLite
  *   T2 - core/session-list-projection-cache.ts list() 单文件 stat 非 ENOENT rethrow
- *   T3 - core/session-manifest/legacy-migration.ts 迁移单条失败只计数不记诊断
  */
 import fs from "fs";
 import fsp from "fs/promises";
@@ -45,7 +44,6 @@ vi.mock("../lib/debug-log.js", () => ({
 import { SessionCoordinator } from "../core/session-coordinator.ts";
 import { SessionListProjectionCache } from "../core/session-list-projection-cache.ts";
 import { SessionManifestStore } from "../core/session-manifest/store.ts";
-import { migrateLegacySessions } from "../core/session-manifest/legacy-migration.ts";
 
 describe("T1: listSessions manifest query guard (session-coordinator)", () => {
   let tempDir: string;
@@ -186,53 +184,5 @@ describe("T2: projection cache single-file stat isolation", () => {
     } finally {
       statSpy.mockRestore();
     }
-  });
-});
-
-describe("T3: legacy migration skip diagnostics", () => {
-  let lingxiHome: string;
-
-  beforeEach(() => {
-    lingxiHome = fs.mkdtempSync(path.join(os.tmpdir(), "hana-migration-resilience-"));
-  });
-
-  afterEach(() => {
-    fs.rmSync(lingxiHome, { recursive: true, force: true });
-  });
-
-  function writeSession(agentId: string, fileName: string) {
-    const sessionDir = path.join(lingxiHome, "agents", agentId, "sessions");
-    const sessionPath = path.join(sessionDir, fileName);
-    fs.mkdirSync(sessionDir, { recursive: true });
-    fs.writeFileSync(sessionPath, [
-      JSON.stringify({ type: "session", version: 3, id: fileName, timestamp: "2026-07-08T00:00:00.000Z", cwd: lingxiHome }),
-      "",
-    ].join("\n"));
-    return sessionPath;
-  }
-
-  it("records {sessionPath, error} for a session that fails to migrate", () => {
-    const sessionPath = writeSession("hana", "broken.jsonl");
-    const stubStore = {
-      resolveByLocatorPath: () => null,
-      createForPath: () => {
-        throw new Error("disk write failed");
-      },
-    };
-
-    const result: any = migrateLegacySessions({
-      lingxiHome,
-      store: stubStore,
-      migratedAt: "2026-07-08T00:01:00.000Z",
-    });
-
-    // 未修复时：result.skippedDetails 不存在，无法诊断被 skip 的原因。
-    expect(result.skipped).toBe(1);
-    expect(result.skippedDetails).toBeDefined();
-    expect(result.skippedDetails).toHaveLength(1);
-    expect(result.skippedDetails[0]).toMatchObject({
-      sessionPath,
-      error: "disk write failed",
-    });
   });
 });

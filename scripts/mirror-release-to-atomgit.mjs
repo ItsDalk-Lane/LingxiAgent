@@ -6,9 +6,9 @@ import { Readable } from "node:stream";
 import process from "node:process";
 import { pathToFileURL } from "node:url";
 
-const DEFAULT_GITHUB_REPOSITORY = "liliMozi/openhanako";
-const DEFAULT_ATOMGIT_OWNER = "liliMozi";
-const DEFAULT_ATOMGIT_REPO = "OpenHanako-Releases";
+const DEFAULT_GITHUB_REPOSITORY = "ItsDalk-Lane/LingxiAgent";
+const DEFAULT_ATOMGIT_OWNER = "ItsDalk-Lane";
+const DEFAULT_ATOMGIT_REPO = "LingxiAgent-Releases";
 const ATOMGIT_API_BASE = "https://api.gitcode.com/api/v5";
 const ATOMGIT_WEB_API_BASE = "https://gitcode.com/api/v2";
 // GitCode caps this endpoint at 20 items even when a larger per_page is sent.
@@ -99,7 +99,7 @@ function atomgitWebHeaders(env, extra = {}) {
     "X-Platform": "web",
     "X-App-Channel": "gitcode-fe",
     "X-Device-ID": "unknown",
-    "User-Agent": "Mozilla/5.0 (compatible; LingxiReleaseMirror/1.0; +https://github.com/liliMozi/openhanako)",
+    "User-Agent": "Mozilla/5.0 (compatible; LingxiReleaseMirror/1.0; +https://github.com/ItsDalk-Lane/LingxiAgent)",
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
     ...extra,
   };

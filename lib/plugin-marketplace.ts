@@ -7,7 +7,10 @@ import {
 } from "./plugin-versioning.ts";
 
 const DEFAULT_EMPTY_MARKETPLACE = Object.freeze({ schemaVersion: 1, plugins: [] });
-export const DEFAULT_OFFICIAL_PLUGIN_MARKETPLACE_URL = "https://raw.githubusercontent.com/liliMozi/OH-Plugins/main/marketplace.json";
+// 不再内置指向上游仓库的默认市场地址：未配置时市场视为"未配置"，
+// 通过 LINGXI_PLUGIN_MARKETPLACE_URL / LINGXI_PLUGIN_MARKETPLACE_FILE 或
+// ${LINGXI_HOME}/plugin-marketplace/marketplace.json 显式指定来源。
+export const DEFAULT_OFFICIAL_PLUGIN_MARKETPLACE_URL = "";
 
 export class PluginMarketplace {
   declare indexPath: string;

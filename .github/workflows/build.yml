@@ -629,7 +629,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ATOMGIT_TOKEN: ${{ secrets.ATOMGIT_TOKEN }}
-          ATOMGIT_OWNER: liliMozi
-          ATOMGIT_REPO: OpenHanako-Releases
+          ATOMGIT_OWNER: ItsDalk-Lane
+          ATOMGIT_REPO: LingxiAgent-Releases
         run: |
           node scripts/mirror-release-to-atomgit.mjs --tag "${{ github.ref_name }}"

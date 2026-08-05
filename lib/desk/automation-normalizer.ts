@@ -213,15 +213,3 @@ export function normalizeAutomationJob(job: any = {}) {
 export function normalizeAutomationJobs(jobs: any[] = []) {
   return Array.isArray(jobs) ? jobs.map((job: any) => normalizeAutomationJob(job)) : [];
 }
-
-export function patchAutomationJobForMigration(job: any = {}) {
-  const normalized = normalizeAutomationJob(job);
-  return {
-    ...normalized,
-    prompt: normalized.prompt,
-    schemaVersion: normalized.schemaVersion,
-    trigger: normalized.trigger,
-    executor: normalized.executor,
-    createdBy: normalized.createdBy,
-  };
-}

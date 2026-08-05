@@ -8,14 +8,14 @@ describe("generate-release-digest", () => {
   it("parses local pre-tag defaults without requiring release lookup", () => {
     const args = parseArgs(["--out", "tmp/digest.json"], {
       GITHUB_REF_NAME: "v0.425.4",
-      GITHUB_REPOSITORY: "liliMozi/openhanako",
+      GITHUB_REPOSITORY: "ItsDalk-Lane/LingxiAgent",
     });
     expect(args).toEqual(expect.objectContaining({
       tag: "v0.425.4",
       previousTag: "auto",
       ref: "HEAD",
-      owner: "liliMozi",
-      repo: "openhanako",
+      owner: "ItsDalk-Lane",
+      repo: "LingxiAgent",
       out: "tmp/digest.json",
     }));
   });
@@ -45,10 +45,10 @@ describe("generate-release-digest", () => {
       summary: { zh: "更新说明更清楚。", en: "Update notes are clearer." },
       counts: { feature: 1, fix: 0, improvement: 0, migration: 0 },
       source: {
-        owner: "liliMozi",
-        repo: "openhanako",
+        owner: "ItsDalk-Lane",
+        repo: "LingxiAgent",
         commitRange: "v0.425.3..v0.425.4",
-        releaseUrl: "https://github.com/liliMozi/openhanako/releases/tag/v0.425.4",
+        releaseUrl: "https://github.com/ItsDalk-Lane/LingxiAgent/releases/tag/v0.425.4",
         releaseNotes: "",
       },
       items: [
@@ -102,10 +102,10 @@ function digestFixture(version: string, previous: string) {
     summary: { zh: "更新说明更清楚。", en: "Update notes are clearer." },
     counts: { feature: 1, fix: 0, improvement: 0, migration: 0 },
     source: {
-      owner: "liliMozi",
-      repo: "openhanako",
+      owner: "ItsDalk-Lane",
+      repo: "LingxiAgent",
       commitRange: `v${previous}..v${version}`,
-      releaseUrl: `https://github.com/liliMozi/openhanako/releases/tag/v${version}`,
+      releaseUrl: `https://github.com/ItsDalk-Lane/LingxiAgent/releases/tag/v${version}`,
       releaseNotes: "",
     },
     items: [

@@ -99,3 +99,6 @@ reviews/
 
 # ZCode CLI working dir
 .zcode/
+
+# Reasonix 本地 agent 状态
+.reasonix/

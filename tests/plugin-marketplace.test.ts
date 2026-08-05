@@ -64,28 +64,24 @@ describe("PluginMarketplace", () => {
     });
   });
 
-  it("uses the official OH-Plugins marketplace URL by default", async () => {
+  it("reports the marketplace as unconfigured when no source is set", async () => {
+    expect(DEFAULT_OFFICIAL_PLUGIN_MARKETPLACE_URL).toBe("");
     const marketplace = createDefaultPluginMarketplace({
       env: {},
-      fetchImpl: async (url) => {
-        expect(url).toBe(DEFAULT_OFFICIAL_PLUGIN_MARKETPLACE_URL);
-        return Response.json({ schemaVersion: 1, plugins: [] });
+      fetchImpl: async () => {
+        throw new Error("fetch must not be attempted without a configured source");
       },
     });
 
     await expect(marketplace.load()).resolves.toMatchObject({
-      source: {
-        kind: "url",
-        configured: true,
-        url: DEFAULT_OFFICIAL_PLUGIN_MARKETPLACE_URL,
-      },
+      source: { kind: "none", configured: false },
       plugins: [],
     });
   });
 
   it("resolves readmePath relative to URL marketplaces", async () => {
     const marketplace = new PluginMarketplace({
-      indexUrl: "https://raw.githubusercontent.com/liliMozi/OH-Plugins/main/marketplace.json",
+      indexUrl: "https://plugins.example.com/marketplace.json",
       fetchImpl: async (url) => {
         if (url.endsWith("/marketplace.json")) {
           return Response.json({
@@ -107,14 +103,14 @@ describe("PluginMarketplace", () => {
             }],
           });
         }
-        expect(url).toBe("https://raw.githubusercontent.com/liliMozi/OH-Plugins/main/plugins/demo/README.md");
+        expect(url).toBe("https://plugins.example.com/plugins/demo/README.md");
         return new Response("# Demo from URL");
       },
     });
 
     const data = await marketplace.load();
     expect(data.plugins[0].readmePath).toBeNull();
-    expect(data.plugins[0].readmeUrl).toBe("https://raw.githubusercontent.com/liliMozi/OH-Plugins/main/plugins/demo/README.md");
+    expect(data.plugins[0].readmeUrl).toBe("https://plugins.example.com/plugins/demo/README.md");
     await expect(marketplace.getReadme("demo")).resolves.toBe("# Demo from URL");
   });
 

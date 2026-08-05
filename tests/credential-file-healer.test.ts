@@ -82,24 +82,6 @@ describe.skipIf(!POSIX)("healCredentialFileModes", () => {
     expect(modeOf(path.join(root, "agents", "second", "config.yaml"))).toBe(0o600);
   });
 
-  // The scope migration writes this backup once and never rewrites it, so a
-  // file left behind by an older version would otherwise keep its mode forever.
-  it("tightens the scope-migration backups kept beside agent configuration files", () => {
-    const root = makeHome();
-    const live = path.join("agents", "hanako", "config.yaml.pre-scope-migration");
-    const inCheckpoint = path.join(
-      "checkpoints", "session-manifest", "cp-1", "agents", "hanako", "config.yaml.pre-scope-migration",
-    );
-    writeOpen(live, "api:\n  api_key: value\n");
-    writeOpen(inCheckpoint, "api:\n  api_key: value\n");
-
-    const result = healCredentialFileModes({ lingxiHome: root });
-
-    expect(modeOf(path.join(root, live))).toBe(0o600);
-    expect(modeOf(path.join(root, inCheckpoint))).toBe(0o600);
-    expect(result.healed).toContain(live);
-  });
-
   // Older versions rewrote agent configuration through a temporary copy written
   // with default permissions. A crash before the rename leaves that copy behind
   // with the full configuration in it, and nothing ever rewrites it, so the

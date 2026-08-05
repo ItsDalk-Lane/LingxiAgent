@@ -1162,20 +1162,14 @@ TaskRegistry persists task records and schedule metadata. On restart, active tas
 
 ### Official Plugin Marketplace
 
-The "Open plugin marketplace" button in Settings -> Plugins opens a full marketplace subpage that reads `/api/plugins/marketplace`. Lingxi follows the Obsidian-style official community catalog model: third-party authors submit plugins to `OH-Plugins`, while users browse, install, enable, and disable plugins without managing marketplace sources.
+The "Open plugin marketplace" button in Settings -> Plugins opens a full marketplace subpage that reads `/api/plugins/marketplace`. Lingxi follows the Obsidian-style official community catalog model: third-party authors submit plugins to the plugin catalog repository, while users browse, install, enable, and disable plugins without managing marketplace sources.
 
-Default official catalog:
-
-```text
-https://raw.githubusercontent.com/liliMozi/OH-Plugins/main/marketplace.json
-```
-
-Developer overrides remain available:
+The app ships no built-in default marketplace URL; the source is entirely configuration-driven:
 
 - `LINGXI_PLUGIN_MARKETPLACE_FILE=/path/to/marketplace.json`
 - `LINGXI_PLUGIN_MARKETPLACE_URL=https://.../marketplace.json`
 
-Without either environment variable, Lingxi first tries `${LINGXI_HOME}/plugin-marketplace/marketplace.json` for local development. If it does not exist, Lingxi reads the official `OH-Plugins` URL. The marketplace index shape matches the `OH-Plugins` repository:
+Without either environment variable, Lingxi tries `${LINGXI_HOME}/plugin-marketplace/marketplace.json` for local development; when neither exists the marketplace reports itself as unconfigured. The marketplace index shape:
 
 ```json
 {
@@ -1194,7 +1188,7 @@ Without either environment variable, Lingxi first tries `${LINGXI_HOME}/plugin-m
     "contributions": ["tools"],
     "distribution": {
       "kind": "release",
-      "packageUrl": "https://github.com/liliMozi/OH-Plugins/releases/download/demo-v1.0.0/demo.zip",
+      "packageUrl": "https://plugins.example.com/releases/download/demo-v1.0.0/demo.zip",
       "sha256": "..."
     },
     "versions": [
@@ -1203,7 +1197,7 @@ Without either environment variable, Lingxi first tries `${LINGXI_HOME}/plugin-m
         "compatibility": { "minAppVersion": "0.170.0" },
         "distribution": {
           "kind": "release",
-          "packageUrl": "https://github.com/liliMozi/OH-Plugins/releases/download/demo-v1.0.0/demo.zip",
+          "packageUrl": "https://plugins.example.com/releases/download/demo-v1.0.0/demo.zip",
           "sha256": "..."
         }
       }

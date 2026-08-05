@@ -1,6 +1,6 @@
 {
   "name": "lingxi",
-  "version": "0.442.0",
+  "version": "0.1.0",
   "type": "module",
   "description": "Lingxi - a personal AI agent with memory and soul",
   "license": "Apache-2.0",
@@ -8,7 +8,7 @@
     "packages/*"
   ],
   "author": {
-    "name": "liliMozi"
+    "name": "Lingxi"
   },
   "keywords": [
     "ai-agent",
@@ -46,7 +46,7 @@
     "build:packages": "npm run build --workspaces --if-present",
     "generate:windows-icon": "node scripts/generate-windows-icon.cjs",
     "pack": "npm run build:computer-use-helper && npm run build:client && npm run build:server && npm run verify:seed-kit && electron-builder --dir",
-    "install:local": "npm run pack && rm -rf /Applications/Lingxi.app /Applications/Lingxi.app && cp -R dist/mac-arm64/Lingxi.app /Applications/ && printf 'provider: github\\nowner: liliMozi\\nrepo: openhanako\\n' > /Applications/Lingxi.app/Contents/Resources/app-update.yml && node scripts/sign-local.cjs",
+    "install:local": "npm run pack && rm -rf /Applications/Lingxi.app /Applications/Lingxi.app && cp -R dist/mac-arm64/Lingxi.app /Applications/ && node scripts/sign-local.cjs",
     "dist": "npm run build:computer-use-helper && npm run build:client && npm run build:server && npm run verify:seed-kit && electron-builder --mac dmg",
     "dist:win": "npm run build:computer-use-helper && npm run build:windows-sandbox-helper && npm run generate:windows-icon && npm run build:client && npm run build:server && npm run verify:seed-kit && npm run pack:server:standalone && npm run verify:standalone:server && electron-builder --win nsis",
     "dist:linux": "npm run build:client && npm run build:server && npm run verify:seed-kit && electron-builder --linux AppImage deb",
@@ -89,7 +89,6 @@
     "diff": "8.0.4",
     "electron-updater": "^6.8.3",
     "exceljs": "^4.4.0",
-    "extract-zip": "^2.0.1",
     "hono": "^4.12.9",
     "js-yaml": "^4.1.0",
     "jsdom": "^29.0.2",
@@ -216,8 +215,8 @@
     "publish": [
       {
         "provider": "github",
-        "owner": "liliMozi",
-        "repo": "openhanako"
+        "owner": "ItsDalk-Lane",
+        "repo": "LingxiAgent"
       }
     ],
     "win": {
@@ -250,7 +249,7 @@
         "AppImage",
         "deb"
       ],
-      "maintainer": "liliMozi <liliMozi@users.noreply.github.com>",
+      "maintainer": "Lingxi Developers <manbuchao@qq.com>",
       "category": "Utility",
       "icon": "desktop/src/icon.png",
       "artifactName": "${productName}-${version}-Linux-${arch}.${ext}"

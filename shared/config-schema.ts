@@ -15,7 +15,7 @@
  * @property {string} [setter] - engine 上的 setter 方法名（仅 global scope）
  * @property {string} [getter] - engine 上的 getter 方法名（仅 global scope）
  * @property {string} [prefsPath] - preferences.json 中的真实存储路径（默认同 schema key）
- * @property {unknown} [defaultValue] - global 字段的默认值（用于 migrate-config-scope）
+ * @property {unknown} [defaultValue] - global 字段的默认值（用于 scope 拆分与注入）
  */
 
 /** @type {Record<string, FieldDef>} */

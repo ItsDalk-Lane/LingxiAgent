@@ -126,8 +126,7 @@ process.on("unhandledRejection", (reason) => {
 
 let lingxiHome = null;
 try {
-  const { resolveLingxiHome, migrateLegacyHanakoHome } = require("../shared/hana-runtime-paths.cjs");
-  if (!process.env.LINGXI_HOME) migrateLegacyHanakoHome();
+  const { resolveLingxiHome } = require("../shared/hana-runtime-paths.cjs");
   lingxiHome = resolveLingxiHome(process.env.LINGXI_HOME);
   process.env.LINGXI_HOME = lingxiHome;
   diagnosticsDir = path.join(lingxiHome, "diagnostics", "desktop-launch");

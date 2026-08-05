@@ -13,7 +13,7 @@
 <p align="center"><a href="README.md">中文版</a></p>
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
-[![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Windows%20%7C%20Linux-lightgrey.svg)](https://github.com/liliMozi/openhanako/releases)
+![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Windows%20%7C%20Linux-lightgrey.svg)
 
 ---
 
@@ -66,15 +66,15 @@ As a tool, it is powerful: it remembers everything you've said, operates your co
 
 ### Download
 
-**macOS (Apple Silicon / Intel):** download the latest `.dmg` from [Releases](https://github.com/liliMozi/openhanako/releases).
+**macOS (Apple Silicon / Intel):** download the latest `.dmg` from the Releases page.
 
 The app is signed and notarized with an Apple Developer ID. macOS should allow it to launch directly.
 
-**Windows:** download the latest `.exe` installer from [Releases](https://github.com/liliMozi/openhanako/releases).
+**Windows:** download the latest `.exe` installer from the Releases page.
 
 > **Windows SmartScreen notice:** The installer is not yet code-signed. Windows Defender SmartScreen may show a warning on first run. Click **More info** → **Run anyway**. This is expected for unsigned builds.
 
-**Linux:** download the latest `.AppImage` or `.deb` from [Releases](https://github.com/liliMozi/openhanako/releases).
+**Linux:** download the latest `.AppImage` or `.deb` from the Releases page.
 
 ### First Run
 
@@ -102,7 +102,7 @@ User-visible files inside a session are registered through `SessionFile` sidecar
 Local staged files are uploaded directly by platform adapters when possible: Telegram / Feishu / WeChat use their native upload flows, and QQ uses the official bot chunked-upload flow before sending `msg_type: 7` rich media. `preferences.bridge.mediaPublicBaseUrl` / `LINGXI_BRIDGE_PUBLIC_BASE_URL` are only for consumers or fallback paths that still require an internet-reachable URL.
 
 The server runs as a standalone Node.js process (spawned by Electron or independently), bundled via Vite with @vercel/nft for dependency tracing. It communicates with the Electron renderer through WebSocket.
-User data is rooted at `LINGXI_HOME` (`~/.hanako` in production, `~/.hanako-dev` in development). Hana-managed Pi SDK runtime resources live under `${LINGXI_HOME}/runtime/pi-sdk/`; Lingxi does not rely on Pi's global agent directory or `PI_CODING_AGENT_DIR`. Legacy `fd` / `rg` binaries under `${LINGXI_HOME}/.pi/agent/bin/` are copied into the new directory on first use of the corresponding search tool, while the legacy files remain untouched.
+User data is rooted at `LINGXI_HOME` (`~/.lingxi` in production, `~/.lingxi-dev` in development). Lingxi-managed Pi SDK runtime resources live under `${LINGXI_HOME}/runtime/pi-sdk/`; Lingxi does not rely on Pi's global agent directory or `PI_CODING_AGENT_DIR`.
 
 ## Tech Stack
 
@@ -162,11 +162,6 @@ npm run typecheck
 
 ## Links
 
-> The repository and release URLs intentionally remain under the legacy `openhanako` path during the current migration. The repository rename is a separate later step.
-
-- [Homepage](https://openhanako.com)
-- [Report an Issue](https://github.com/liliMozi/openhanako/issues)
-- [Security](https://github.com/liliMozi/openhanako/security)
 - [Security Policy](SECURITY.md)
-- [Plugin Development](PLUGINS.md)
+- [Plugin Development](PLUGINS_EN.md)
 - [Contributing](CONTRIBUTING.md)

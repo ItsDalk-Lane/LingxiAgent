@@ -296,16 +296,6 @@
       "breakingMigrationRequiresAccessMove": false
     },
     {
-      "id": "legacy-pi-search-cache",
-      "firstPossibleOpenPhase": "engine_construct",
-      "firstPossibleWritePhase": "runtime_ready",
-      "opensBeforeFutureCoordinator": false,
-      "writesBeforeFutureCoordinator": false,
-      "bootstrapSafety": null,
-      "preCoordinatorReadProjection": null,
-      "breakingMigrationRequiresAccessMove": false
-    },
-    {
       "id": "legacy-upload-cache",
       "firstPossibleOpenPhase": "runtime_ready",
       "firstPossibleWritePhase": "runtime_ready",
@@ -666,16 +656,6 @@
       "id": "web-session-registry",
       "firstPossibleOpenPhase": "identity_seed",
       "firstPossibleWritePhase": "identity_seed",
-      "opensBeforeFutureCoordinator": false,
-      "writesBeforeFutureCoordinator": false,
-      "bootstrapSafety": null,
-      "preCoordinatorReadProjection": null,
-      "breakingMigrationRequiresAccessMove": false
-    },
-    {
-      "id": "windows-sandbox-migration-state",
-      "firstPossibleOpenPhase": "engine_construct",
-      "firstPossibleWritePhase": "runtime_ready",
       "opensBeforeFutureCoordinator": false,
       "writesBeforeFutureCoordinator": false,
       "bootstrapSafety": null,

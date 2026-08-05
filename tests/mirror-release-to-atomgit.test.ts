@@ -12,15 +12,15 @@ import {
 } from "../scripts/mirror-release-to-atomgit.mjs";
 
 const mirrorOptions = {
-  githubOwner: "liliMozi",
-  githubRepo: "openhanako",
-  atomgitOwner: "liliMozi",
-  atomgitRepo: "OpenHanako-Releases",
+  githubOwner: "ItsDalk-Lane",
+  githubRepo: "LingxiAgent",
+  atomgitOwner: "ItsDalk-Lane",
+  atomgitRepo: "LingxiAgent-Releases",
   dryRun: false,
 };
 
 function atomgitProjectLookupResponse(url: string, init: RequestInit = {}) {
-  if (url !== "https://gitcode.com/api/v2/projects/liliMozi%2FOpenHanako-Releases?view=all") return null;
+  if (url !== "https://gitcode.com/api/v2/projects/ItsDalk-Lane%2FLingxiAgent-Releases?view=all") return null;
   expect(init.headers).toEqual(expect.objectContaining({
     Authorization: "Bearer atomgit-token",
     "X-Platform": "web",
@@ -46,11 +46,11 @@ function githubRelease(tagName: string, prerelease = true) {
 
 describe("mirror-release-to-atomgit", () => {
   it("defaults manual mirroring to the newest one release", () => {
-    expect(parseArgs([], { GITHUB_REPOSITORY: "liliMozi/openhanako" })).toEqual(expect.objectContaining({
-      githubOwner: "liliMozi",
-      githubRepo: "openhanako",
-      atomgitOwner: "liliMozi",
-      atomgitRepo: "OpenHanako-Releases",
+    expect(parseArgs([], { GITHUB_REPOSITORY: "ItsDalk-Lane/LingxiAgent" })).toEqual(expect.objectContaining({
+      githubOwner: "ItsDalk-Lane",
+      githubRepo: "LingxiAgent",
+      atomgitOwner: "ItsDalk-Lane",
+      atomgitRepo: "LingxiAgent-Releases",
       selection: "newest",
       latest: 1,
     }));
@@ -66,8 +66,8 @@ describe("mirror-release-to-atomgit", () => {
     });
 
     const releases = await selectGithubReleases({
-      githubOwner: "liliMozi",
-      githubRepo: "openhanako",
+      githubOwner: "ItsDalk-Lane",
+      githubRepo: "LingxiAgent",
       latest: 1,
     }, { env: {}, fetchImpl });
 
@@ -86,8 +86,8 @@ describe("mirror-release-to-atomgit", () => {
     });
 
     const releases = await selectGithubReleases({
-      githubOwner: "liliMozi",
-      githubRepo: "openhanako",
+      githubOwner: "ItsDalk-Lane",
+      githubRepo: "LingxiAgent",
       selection: "stable",
       latest: 1,
     }, { env: {}, fetchImpl });
@@ -104,7 +104,7 @@ describe("mirror-release-to-atomgit", () => {
     const log = vi.spyOn(console, "log").mockImplementation(() => {});
     try {
       const summaries = await run(["--newest", "2", "--dry-run"], {
-        env: { GITHUB_REPOSITORY: "liliMozi/openhanako" },
+        env: { GITHUB_REPOSITORY: "ItsDalk-Lane/LingxiAgent" },
         fetchImpl,
       });
       expect(summaries.map(summary => summary.tag)).toEqual(["v0.425.3", "v0.425.4"]);
@@ -130,7 +130,7 @@ describe("mirror-release-to-atomgit", () => {
     const fetchImpl = vi.fn().mockResolvedValue(new Response(JSON.stringify(githubRelease("v0.425.3", false)), { status: 200 }));
     await expect(getGithubLatestTag(mirrorOptions, { env: {}, fetchImpl })).resolves.toBe("v0.425.3");
     expect(fetchImpl).toHaveBeenCalledWith(
-      "https://api.github.com/repos/liliMozi/openhanako/releases/latest",
+      "https://api.github.com/repos/ItsDalk-Lane/LingxiAgent/releases/latest",
       expect.anything(),
     );
   });
@@ -155,14 +155,14 @@ describe("mirror-release-to-atomgit", () => {
       const url = String(input);
       const method = init.method || "GET";
 
-      if (url.endsWith("/repos/liliMozi/openhanako/releases/latest")) {
+      if (url.endsWith("/repos/ItsDalk-Lane/LingxiAgent/releases/latest")) {
         return new Response(JSON.stringify(githubRelease("v0.425.3", false)), { status: 200 });
       }
 
       const projectLookup = atomgitProjectLookupResponse(url, init);
       if (projectLookup) return projectLookup;
 
-      if (url.includes("/repos/liliMozi/OpenHanako-Releases/releases?") && method === "GET") {
+      if (url.includes("/repos/ItsDalk-Lane/LingxiAgent-Releases/releases?") && method === "GET") {
         releaseListCalls += 1;
         return new Response(JSON.stringify(releaseListCalls === 1 ? [] : [{
           tag_name: "v0.425.4",
@@ -206,7 +206,7 @@ describe("mirror-release-to-atomgit", () => {
         return new Response(null, { status: 200, headers: { "content-length": "240" } });
       }
 
-      if (url.includes("/repos/liliMozi/OpenHanako-Releases/releases") && method === "POST") {
+      if (url.includes("/repos/ItsDalk-Lane/LingxiAgent-Releases/releases") && method === "POST") {
         return new Response(JSON.stringify({ tag_name: "v0.425.4" }), { status: 201 });
       }
 
@@ -232,14 +232,14 @@ describe("mirror-release-to-atomgit", () => {
       const url = String(input);
       const method = init.method || "GET";
 
-      if (url.endsWith("/repos/liliMozi/openhanako/releases/latest")) {
+      if (url.endsWith("/repos/ItsDalk-Lane/LingxiAgent/releases/latest")) {
         return new Response(JSON.stringify(githubRelease("v0.425.3", false)), { status: 200 });
       }
 
       const projectLookup = atomgitProjectLookupResponse(url, init);
       if (projectLookup) return projectLookup;
 
-      if (url.includes("/repos/liliMozi/OpenHanako-Releases/releases?") && method === "GET") {
+      if (url.includes("/repos/ItsDalk-Lane/LingxiAgent-Releases/releases?") && method === "GET") {
         return new Response(JSON.stringify([{
           tag_name: "v0.425.4",
           prerelease: true,
@@ -256,7 +256,7 @@ describe("mirror-release-to-atomgit", () => {
         return new Response(null, { status: 200, headers: { "content-length": "240" } });
       }
 
-      if (url.includes("/repos/liliMozi/OpenHanako-Releases/releases/v0.425.4") && method === "PATCH") {
+      if (url.includes("/repos/ItsDalk-Lane/LingxiAgent-Releases/releases/v0.425.4") && method === "PATCH") {
         expect(JSON.parse(String(init.body))).toEqual(expect.objectContaining({
           release_status: "pre",
         }));
@@ -294,12 +294,12 @@ describe("mirror-release-to-atomgit", () => {
       const url = String(input);
       const method = init.method || "GET";
 
-      if (url.endsWith("/repos/liliMozi/openhanako/releases/latest")) {
+      if (url.endsWith("/repos/ItsDalk-Lane/LingxiAgent/releases/latest")) {
         return new Response(JSON.stringify(githubRelease("v0.425.3", false)), { status: 200 });
       }
       const projectLookup = atomgitProjectLookupResponse(url, init);
       if (projectLookup) return projectLookup;
-      if (url.includes("/repos/liliMozi/OpenHanako-Releases/releases?") && method === "GET") {
+      if (url.includes("/repos/ItsDalk-Lane/LingxiAgent-Releases/releases?") && method === "GET") {
         releaseListCalls += 1;
         operations.push(`list:${releaseListCalls}`);
         const listed = releaseListCalls === 1
@@ -316,7 +316,7 @@ describe("mirror-release-to-atomgit", () => {
         operations.push(`delete:${tag}`);
         return new Response(null, { status: 204 });
       }
-      if (url.endsWith("/repos/liliMozi/OpenHanako-Releases/releases?access_token=atomgit-token") && method === "POST") {
+      if (url.endsWith("/repos/ItsDalk-Lane/LingxiAgent-Releases/releases?access_token=atomgit-token") && method === "POST") {
         operations.push("create:target");
         return new Response(JSON.stringify({ tag_name: target.tag_name, assets: [] }), { status: 201 });
       }
@@ -369,15 +369,15 @@ describe("mirror-release-to-atomgit", () => {
       const method = init.method || "GET";
       methods.push(method);
 
-      if (url.endsWith("/repos/liliMozi/openhanako/releases/latest")) {
+      if (url.endsWith("/repos/ItsDalk-Lane/LingxiAgent/releases/latest")) {
         return new Response(JSON.stringify(githubRelease("v0.425.2", false)), { status: 200 });
       }
       const projectLookup = atomgitProjectLookupResponse(url, init);
       if (projectLookup) return projectLookup;
-      if (url.includes("/repos/liliMozi/OpenHanako-Releases/releases?") && method === "GET") {
+      if (url.includes("/repos/ItsDalk-Lane/LingxiAgent-Releases/releases?") && method === "GET") {
         return new Response(JSON.stringify([fallback]), { status: 200 });
       }
-      if (url.endsWith("/repos/liliMozi/OpenHanako-Releases/releases?access_token=atomgit-token") && method === "POST") {
+      if (url.endsWith("/repos/ItsDalk-Lane/LingxiAgent-Releases/releases?access_token=atomgit-token") && method === "POST") {
         return new Response(JSON.stringify({ tag_name: target.tag_name, assets: [] }), { status: 201 });
       }
       if (url.includes(`/releases/${target.tag_name}/upload_url`)) {
@@ -409,7 +409,7 @@ describe("mirror-release-to-atomgit", () => {
       const url = String(input);
       const method = init.method || "GET";
       methods.push(method);
-      if (url.endsWith("/repos/liliMozi/openhanako/releases/latest")) {
+      if (url.endsWith("/repos/ItsDalk-Lane/LingxiAgent/releases/latest")) {
         return new Response(JSON.stringify(githubRelease("v0.425.3", false)), { status: 200 });
       }
       const projectLookup = atomgitProjectLookupResponse(url, init);

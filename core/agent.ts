@@ -1281,8 +1281,8 @@ export class Agent {
     // 叙事顺序上先告诉模型"用户是谁"，再告诉它"你是谁、你和用户什么关系"。
     const parts = [
       isZh
-        ? "你运行在 LingxiAgent 平台上（原名 OpenHanako），由 liliMozi 开发。项目主页：https://github.com/liliMozi/openhanako"
-        : "You are running on the LingxiAgent platform (formerly OpenHanako), developed by liliMozi. Project page: https://github.com/liliMozi/openhanako",
+        ? "你运行在灵犀（Lingxi）平台上。"
+        : "You are running on the Lingxi (灵犀) platform.",
     ];
     const platformPrompt = getPlatformPromptNote({ platform: process.platform });
     if (platformPrompt) {

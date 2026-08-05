@@ -102,7 +102,6 @@ describe("persistent store registry", () => {
       "desktop-gpu-startup-state",
       "desktop-window-version-state",
       "managed-runtime-caches",
-      "legacy-pi-search-cache",
     ]));
 
     for (const store of PERSISTENT_STORES) {
@@ -137,9 +136,6 @@ describe("persistent store registry", () => {
     const cache = PERSISTENT_STORES.find((store) => store.id === "managed-runtime-caches")!;
     expect(cache.pathPatterns).toContain("runtime/pi-sdk/bin/{toolName}");
     expect(cache.epochPolicy).toBe("regenerable");
-    const legacy = PERSISTENT_STORES.find((store) => store.id === "legacy-pi-search-cache")!;
-    expect(legacy.pathPattern).toBe(".pi/agent/bin/{toolName}");
-    expect(legacy.epochPolicy).toBe("migration-source");
 
     const pluginData = PERSISTENT_STORES.find((store) => store.id === "plugin-runtime-data")!;
     expect(pluginData.pathExclusions).toEqual([

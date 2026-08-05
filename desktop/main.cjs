@@ -47,7 +47,6 @@ const {
 } = require("./src/shared/single-instance-lock.cjs");
 const {
   resolveLingxiHome,
-  migrateLegacyHanakoHome,
 } = require("../shared/hana-runtime-paths.cjs");
 const {
   buildBrowserSearchExtractionScript,
@@ -159,7 +158,6 @@ function safeReadJSON(filePath, fallback = null) {
   }
 }
 
-if (!process.env.LINGXI_HOME) migrateLegacyHanakoHome();
 const lingxiHome = resolveLingxiHome(process.env.LINGXI_HOME);
 process.env.LINGXI_HOME = lingxiHome;
 

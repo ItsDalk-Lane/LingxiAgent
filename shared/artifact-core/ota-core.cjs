@@ -210,14 +210,23 @@ const ORIGIN_MANIFEST_RACE_TIMEOUT_MS = MANIFEST_REQUEST_TIMEOUT_MS;
 
 // ── channel pointer URLs: clients poll ONLY these static asset
 //    URLs, never the GitHub API ───────────────────────────────────────────
-const GITHUB_CHANNEL_BASE = "https://github.com/liliMozi/openhanako/releases/download/channels";
+// The channel base is fully configuration-driven: there is no built-in
+// default repository. Set LINGXI_ARTIFACT_CHANNEL_BASE_URL (e.g.
+// "https://example.com/releases/download/channels"); with no base configured
+// channelManifestUrls returns an empty list and OTA checks are skipped.
+
+function channelBaseUrl(env = process.env) {
+  return String(env.LINGXI_ARTIFACT_CHANNEL_BASE_URL || "").replace(/\/+$/, "");
+}
 
 /**
  * One-element array retained for compatibility with existing callers.
- * @returns {[string]} the GitHub channel manifest URL.
+ * Empty when no channel base URL is configured.
+ * @returns {string[]} the channel manifest URLs.
  */
-function channelManifestUrls(channel) {
-  return [`${GITHUB_CHANNEL_BASE}/${channel}.json`];
+function channelManifestUrls(channel, env) {
+  const base = channelBaseUrl(env);
+  return base ? [`${base}/${channel}.json`] : [];
 }
 
 // ── low-level https transport: manual redirect following, injectable for
@@ -482,6 +491,9 @@ async function fetchChannelManifest({ channel, keyset, cachedEtags = {}, log = (
     return fetchDevOverrideManifest(devBypass.resolveDevManifestOverride(), keyset, log);
   }
   const [originUrl] = channelManifestUrls(channel);
+  if (!originUrl) {
+    throw new Error("artifact-ota: no channel manifest source configured (set LINGXI_ARTIFACT_CHANNEL_BASE_URL)");
+  }
   const originResult = await fetchOneChannelSource(originUrl, {
     cachedEtag: cachedEtags.origin,
     fetchOnce,
@@ -898,6 +910,13 @@ async function checkOnce(opts) {
   if (!Array.isArray(keyset) || keyset.length === 0) throw new Error("artifact-ota: keyset is required");
   if (!currentShellVersion) throw new Error("artifact-ota: currentShellVersion is required");
   if (!platformArch) throw new Error("artifact-ota: platformArch is required");
+
+  // 未配置任何 channel 来源时干净地跳过：记一条日志，不记错误状态。
+  // dev override（本地开发旁路）优先于此判断，不受 channel 来源缺省影响。
+  if (channelManifestUrls(channel).length === 0 && !devBypass.hasDevOverride()) {
+    log("[ota] check skipped: no channel manifest source configured (set LINGXI_ARTIFACT_CHANNEL_BASE_URL)");
+    return { outcome: "disabled" };
+  }
 
   const priorChannelState = (await readOtaState(homeDir))[channel] || {};
   // Read the old multi-source state safely, but only carry GitHub's ETag

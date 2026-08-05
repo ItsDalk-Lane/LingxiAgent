@@ -23,10 +23,10 @@ function validDigest() {
     },
     counts: { feature: 1, fix: 0, improvement: 1, migration: 0 },
     source: {
-      owner: "liliMozi",
-      repo: "openhanako",
+      owner: "ItsDalk-Lane",
+      repo: "LingxiAgent",
       commitRange: "v0.425.3..v0.425.4",
-      releaseUrl: "https://github.com/liliMozi/openhanako/releases/tag/v0.425.4",
+      releaseUrl: "https://github.com/ItsDalk-Lane/LingxiAgent/releases/tag/v0.425.4",
       releaseNotes: "",
     },
     items: [

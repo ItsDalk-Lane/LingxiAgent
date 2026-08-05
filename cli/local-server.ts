@@ -1,11 +1,8 @@
 import fs from "fs";
 import os from "os";
 import path from "path";
-import { migrateLegacyHanakoHome } from "../shared/hana-runtime-paths.cjs";
 
 export function resolveCliLingxiHome(env = process.env) {
-  // 仅真实进程环境才做老目录搬迁；测试注入 env 时不得触碰真实 home
-  if (!env.LINGXI_HOME && env === process.env) migrateLegacyHanakoHome();
   return resolveHomePath(env.LINGXI_HOME || path.join(os.homedir(), ".lingxi"));
 }
 

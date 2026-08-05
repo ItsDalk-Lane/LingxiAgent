@@ -13,7 +13,7 @@ import {
   assertValidReleaseDigestHistory,
 } from "./release-digest-schema.mjs";
 
-const DEFAULT_REPOSITORY = "liliMozi/openhanako";
+const DEFAULT_REPOSITORY = "ItsDalk-Lane/LingxiAgent";
 const DEFAULT_MODEL = "gpt-5.5";
 
 export function parseArgs(argv = process.argv.slice(2), env = process.env) {

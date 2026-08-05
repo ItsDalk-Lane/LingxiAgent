@@ -222,7 +222,7 @@ describe("session path identity audit", () => {
   it("flags path-keyed session-meta business reads but allows legacy migration boundaries", () => {
     const dir = fs.mkdtempSync(path.join(os.tmpdir(), "hana-session-audit-meta-"));
     const appDir = path.join(dir, "core");
-    const legacyDir = path.join(dir, "core", "session-manifest");
+    const legacyDir = path.join(dir, "lib");
     fs.mkdirSync(appDir, { recursive: true });
     fs.mkdirSync(legacyDir, { recursive: true });
     fs.writeFileSync(path.join(appDir, "new-business.ts"), `
@@ -230,7 +230,7 @@ describe("session path identity audit", () => {
       const rawEntry = raw[path.basename(sessionPath)];
       const restoredToolNames = meta[path.basename(sessionPathForMeta)]?.toolNames;
     `);
-    fs.writeFileSync(path.join(legacyDir, "legacy-migration.ts"), `
+    fs.writeFileSync(path.join(legacyDir, "subagent-executor-metadata.ts"), `
       const metaEntry = meta[path.basename(sessionPath)];
     `);
 
@@ -241,8 +241,8 @@ describe("session path identity audit", () => {
       .map((item: { file: string }) => item.file);
 
     expect(risks.some((file: string) => file.endsWith("new-business.ts"))).toBe(true);
-    expect(risks.some((file: string) => file.endsWith("legacy-migration.ts"))).toBe(false);
-    expect(legacy.some((file: string) => file.endsWith("legacy-migration.ts"))).toBe(true);
+    expect(risks.some((file: string) => file.endsWith("subagent-executor-metadata.ts"))).toBe(false);
+    expect(legacy.some((file: string) => file.endsWith("subagent-executor-metadata.ts"))).toBe(true);
   });
 
   it("allows verified sessionId-first runtime adapters while still flagging new path-keyed maps", () => {

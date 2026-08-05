@@ -521,8 +521,7 @@ function isPathKeyedSessionMetaLine(line) {
 }
 
 function isLegacySessionMetaBoundaryFile(normalizedFile) {
-  return /(^|\/)core\/session-manifest\/legacy-migration\.ts$/.test(normalizedFile)
-    || /(^|\/)core\/session-coordinator\.ts$/.test(normalizedFile)
+  return /(^|\/)core\/session-coordinator\.ts$/.test(normalizedFile)
     || /(^|\/)core\/migrations\.ts$/.test(normalizedFile)
     || /(^|\/)lib\/subagent-executor-metadata\.ts$/.test(normalizedFile);
 }

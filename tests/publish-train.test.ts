@@ -65,7 +65,7 @@ function buildSampleManifest(overrides: Partial<Parameters<typeof assembleTrainM
     train: 1,
     rendererEntry: sampleRendererEntry(),
     serverEntries: sampleServerEntries(),
-    mirrors: ["https://github.com/liliMozi/openhanako/releases/download/train-1"],
+    mirrors: ["https://github.com/ItsDalk-Lane/LingxiAgent/releases/download/train-1"],
     rolloutSalt: "test-salt",
     ...overrides,
   });
@@ -207,17 +207,17 @@ describe("publish-train: computeMirrors", () => {
   it("builds a channel-scoped release identity and matching GitHub download base", () => {
     expect(computeTrainReleaseTag({ channel: "stable", train: 6 })).toBe("train-stable-6");
     expect(computeTrainReleaseTag({ channel: "beta", train: 6 })).toBe("train-beta-6");
-    expect(computeMirrors({ repo: "liliMozi/openhanako", channel: "beta", train: 6 })).toEqual([
-      "https://github.com/liliMozi/openhanako/releases/download/train-beta-6",
+    expect(computeMirrors({ repo: "ItsDalk-Lane/LingxiAgent", channel: "beta", train: 6 })).toEqual([
+      "https://github.com/ItsDalk-Lane/LingxiAgent/releases/download/train-beta-6",
     ]);
   });
 
   it("rejects a malformed repo", () => {
-    expect(() => computeMirrors({ repo: "openhanako", channel: "stable", train: 1 })).toThrow(/repo must be/);
+    expect(() => computeMirrors({ repo: "LingxiAgent", channel: "stable", train: 1 })).toThrow(/repo must be/);
   });
 
   it("rejects a non-positive train", () => {
-    expect(() => computeMirrors({ repo: "liliMozi/openhanako", channel: "stable", train: 0 })).toThrow(/train must be a positive integer/);
+    expect(() => computeMirrors({ repo: "ItsDalk-Lane/LingxiAgent", channel: "stable", train: 0 })).toThrow(/train must be a positive integer/);
   });
 
   it("rejects an unknown channel before constructing a release tag", () => {
@@ -233,7 +233,7 @@ describe("publish-train: assembleTrainManifest (reuses buildSeedManifest, no par
     expect(manifest.channel).toBe("stable");
     expect(manifest.contract).toEqual({ preload: 1, serverProtocol: 1 }); // sourced from buildSeedManifest, not invented here
     expect(manifest.rollout).toEqual({ percent: 100, salt: "test-salt" });
-    expect(manifest.mirrors).toEqual(["https://github.com/liliMozi/openhanako/releases/download/train-1"]);
+    expect(manifest.mirrors).toEqual(["https://github.com/ItsDalk-Lane/LingxiAgent/releases/download/train-1"]);
     expect(Object.keys(manifest.artifacts.server).sort()).toEqual(["darwin-arm64", "linux-x64"]);
     expect(manifest.artifacts.server["darwin-arm64"]).toEqual({
       version: "1.2.3", sha256: HEX_A, size: 111, path: "server-1.2.3-darwin-arm64.tar.gz",
@@ -483,7 +483,7 @@ describe("publish-train: publishChannel", () => {
 
     await expect(
       publishChannel({
-        tag: "v1.2.3", channel: "stable", dryRun: false, repo: "liliMozi/openhanako",
+        tag: "v1.2.3", channel: "stable", dryRun: false, repo: "ItsDalk-Lane/LingxiAgent",
         releasedAt: "2026-07-11T00:00:00.000Z", boxes, env: makeSigningEnv(), deps, log: () => {},
       }),
     ).rejects.toThrow(/prerelease.*beta/i);
@@ -505,7 +505,7 @@ describe("publish-train: publishChannel", () => {
 
     await expect(
       publishChannel({
-        tag: "v1.2.3", channel: "beta", dryRun: false, repo: "liliMozi/openhanako",
+        tag: "v1.2.3", channel: "beta", dryRun: false, repo: "ItsDalk-Lane/LingxiAgent",
         releasedAt: "2026-07-11T00:00:00.000Z", boxes, env: makeSigningEnv(), deps, log: () => {},
       }),
     ).rejects.toThrow(/still a draft/);
@@ -524,7 +524,7 @@ describe("publish-train: publishChannel", () => {
     });
 
     const result = await publishChannel({
-      tag: "v1.2.3", channel: "beta", dryRun: false, repo: "liliMozi/openhanako",
+      tag: "v1.2.3", channel: "beta", dryRun: false, repo: "ItsDalk-Lane/LingxiAgent",
       releasedAt: "2026-07-11T00:00:00.000Z", boxes, env: makeSigningEnv(), deps, log: () => {},
     });
 
@@ -542,7 +542,7 @@ describe("publish-train: publishChannel", () => {
     });
 
     const result = await publishChannel({
-      tag: "v1.2.3", channel: "stable", dryRun: false, repo: "liliMozi/openhanako",
+      tag: "v1.2.3", channel: "stable", dryRun: false, repo: "ItsDalk-Lane/LingxiAgent",
       releasedAt: "2026-07-11T00:00:00.000Z", boxes, env: makeSigningEnv(), deps, log: () => {},
       allowPrereleaseStable: true,
     });
@@ -554,7 +554,7 @@ describe("publish-train: publishChannel", () => {
   it("dry-run computes and prints the plan but calls zero publish operations", async () => {
     const deps = baseDeps();
     const result = await publishChannel({
-      tag: "v1.2.3", channel: "stable", dryRun: true, repo: "liliMozi/openhanako",
+      tag: "v1.2.3", channel: "stable", dryRun: true, repo: "ItsDalk-Lane/LingxiAgent",
       releasedAt: "2026-07-11T00:00:00.000Z", boxes, env: makeSigningEnv(), deps, log: () => {},
     });
     expect(result.action).toBe("dry-run");
@@ -567,7 +567,7 @@ describe("publish-train: publishChannel", () => {
   it("first-ever publish: creates both the train release and the channels release", async () => {
     const deps = baseDeps(); // releaseExists() -> false for everything: channels AND train-stable-1 are both new
     const result = await publishChannel({
-      tag: "v1.2.3", channel: "stable", dryRun: false, repo: "liliMozi/openhanako",
+      tag: "v1.2.3", channel: "stable", dryRun: false, repo: "ItsDalk-Lane/LingxiAgent",
       releasedAt: "2026-07-11T00:00:00.000Z", boxes, env: makeSigningEnv(), deps, log: () => {},
     });
     expect(result).toEqual({ action: "created", channel: "stable", train: 1, trainTag: "train-stable-1" });
@@ -585,7 +585,7 @@ describe("publish-train: publishChannel", () => {
     });
 
     await expect(publishChannel({
-      tag: "v1.2.3", channel: "stable", dryRun: false, repo: "liliMozi/openhanako",
+      tag: "v1.2.3", channel: "stable", dryRun: false, repo: "ItsDalk-Lane/LingxiAgent",
       releasedAt: "2026-07-11T00:00:00.000Z", boxes, env: makeSigningEnv(), deps, log: () => {},
     })).rejects.toThrow(/stable\.json.*signature.*incomplete/i);
 
@@ -605,7 +605,7 @@ describe("publish-train: publishChannel", () => {
     });
 
     await expect(publishChannel({
-      tag: "v1.2.3", channel: "stable", dryRun: false, repo: "liliMozi/openhanako",
+      tag: "v1.2.3", channel: "stable", dryRun: false, repo: "ItsDalk-Lane/LingxiAgent",
       releasedAt: "2026-07-11T00:00:00.000Z", boxes, env: makeSigningEnv(), deps, log: () => {},
     })).rejects.toThrow(/pointer.*channel.*beta.*stable/i);
 
@@ -622,14 +622,14 @@ describe("publish-train: publishChannel", () => {
       version: "1.2.2",
       train: 13,
       channel: "stable",
-      mirrors: ["https://github.com/liliMozi/openhanako/releases/download/train-13"],
+      mirrors: ["https://github.com/ItsDalk-Lane/LingxiAgent/releases/download/train-13"],
     });
     const betaTrain14 = buildSampleManifest({
       version: "1.2.1",
       train: 14,
       channel: "beta",
       rendererEntry: { ...sampleRendererEntry(), sha256: "9".repeat(64) },
-      mirrors: ["https://github.com/liliMozi/openhanako/releases/download/train-14"],
+      mirrors: ["https://github.com/ItsDalk-Lane/LingxiAgent/releases/download/train-14"],
     });
     let publishedPointerBytes: Buffer | null = null;
     const deps = baseDeps({
@@ -651,7 +651,7 @@ describe("publish-train: publishChannel", () => {
     });
 
     const result = await publishChannel({
-      tag: "v1.2.3", channel: "stable", dryRun: false, repo: "liliMozi/openhanako",
+      tag: "v1.2.3", channel: "stable", dryRun: false, repo: "ItsDalk-Lane/LingxiAgent",
       releasedAt: "2026-07-11T00:00:00.000Z", boxes, env: makeSigningEnv(), deps, log: () => {},
     });
 
@@ -671,7 +671,7 @@ describe("publish-train: publishChannel", () => {
     expect(published.train).toBe(14);
     expect(published.channel).toBe("stable");
     expect(published.mirrors).toEqual([
-      "https://github.com/liliMozi/openhanako/releases/download/train-stable-14",
+      "https://github.com/ItsDalk-Lane/LingxiAgent/releases/download/train-stable-14",
     ]);
   });
 
@@ -679,7 +679,7 @@ describe("publish-train: publishChannel", () => {
     const alreadyPublished = buildSampleManifest({
       train: 13,
       channel: "stable",
-      mirrors: ["https://github.com/liliMozi/openhanako/releases/download/train-13"],
+      mirrors: ["https://github.com/ItsDalk-Lane/LingxiAgent/releases/download/train-13"],
     });
     const deps = baseDeps({
       releaseExists: vi.fn((tag: string) => tag === "channels"),
@@ -692,7 +692,7 @@ describe("publish-train: publishChannel", () => {
     });
 
     const result = await publishChannel({
-      tag: "v1.2.3", channel: "stable", dryRun: false, repo: "liliMozi/openhanako",
+      tag: "v1.2.3", channel: "stable", dryRun: false, repo: "ItsDalk-Lane/LingxiAgent",
       releasedAt: "2026-07-11T00:00:00.000Z", boxes, env: makeSigningEnv(), deps, log: () => {},
     });
 
@@ -720,7 +720,7 @@ describe("publish-train: publishChannel", () => {
     });
 
     await expect(publishChannel({
-      tag: "v1.2.3", channel: "stable", dryRun: false, repo: "liliMozi/openhanako",
+      tag: "v1.2.3", channel: "stable", dryRun: false, repo: "ItsDalk-Lane/LingxiAgent",
       releasedAt: "2026-07-11T00:00:00.000Z", boxes, env: makeSigningEnv(), deps, log: () => {},
     })).rejects.toThrow(/same content version.*different artifacts/i);
 
@@ -735,7 +735,7 @@ describe("publish-train: publishChannel", () => {
       releaseAssetNames: vi.fn().mockReturnValue(["stable.json", "stable.json.sig"]), // beta not published yet
     });
     const result = await publishChannel({
-      tag: "v1.2.3", channel: "beta", dryRun: false, repo: "liliMozi/openhanako",
+      tag: "v1.2.3", channel: "beta", dryRun: false, repo: "ItsDalk-Lane/LingxiAgent",
       releasedAt: "2026-07-11T00:00:00.000Z", boxes, env: makeSigningEnv(), deps, log: () => {},
     });
     expect(result.action).toBe("created");
@@ -764,7 +764,7 @@ describe("publish-train: publishChannel", () => {
     });
 
     const result = await publishChannel({
-      tag: "v1.2.3", channel: "stable", dryRun: false, repo: "liliMozi/openhanako",
+      tag: "v1.2.3", channel: "stable", dryRun: false, repo: "ItsDalk-Lane/LingxiAgent",
       releasedAt: "2026-07-11T00:00:00.000Z", boxes, env: makeSigningEnv(), deps, log: () => {},
     });
 
@@ -793,7 +793,7 @@ describe("publish-train: publishChannel", () => {
     });
 
     await expect(publishChannel({
-      tag: "v1.2.3", channel: "stable", dryRun: false, repo: "liliMozi/openhanako",
+      tag: "v1.2.3", channel: "stable", dryRun: false, repo: "ItsDalk-Lane/LingxiAgent",
       releasedAt: "2026-07-11T00:00:00.000Z", boxes, env: makeSigningEnv(), deps, log: () => {},
     })).rejects.toThrow(/signature verification failed/);
 
@@ -821,7 +821,7 @@ describe("publish-train: publishChannel", () => {
 
     await expect(
       publishChannel({
-        tag: "v1.2.3", channel: "stable", dryRun: false, repo: "liliMozi/openhanako",
+        tag: "v1.2.3", channel: "stable", dryRun: false, repo: "ItsDalk-Lane/LingxiAgent",
         releasedAt: "2026-07-11T00:00:00.000Z", boxes, env: makeSigningEnv(), deps, log: () => {},
       }),
     ).rejects.toThrow(/real conflict, not a safe resume/);
@@ -837,7 +837,7 @@ describe("publish-train: publishChannel", () => {
     });
     await expect(
       publishChannel({
-        tag: "v1.2.3", channel: "stable", dryRun: false, repo: "liliMozi/openhanako",
+        tag: "v1.2.3", channel: "stable", dryRun: false, repo: "ItsDalk-Lane/LingxiAgent",
         releasedAt: "2026-07-11T00:00:00.000Z", boxes, env: makeSigningEnv(), deps, log: () => {},
       }),
     ).rejects.toThrow(/HTTP 401/);
@@ -868,7 +868,7 @@ describe("publish-train: publishChannel", () => {
     });
 
     const result = await publishChannel({
-      tag: "v1.2.3", channel: "beta", dryRun: false, repo: "liliMozi/openhanako",
+      tag: "v1.2.3", channel: "beta", dryRun: false, repo: "ItsDalk-Lane/LingxiAgent",
       releasedAt: "2026-07-11T00:00:00.000Z", boxes, env: makeSigningEnv(), deps, log: () => {},
     });
 

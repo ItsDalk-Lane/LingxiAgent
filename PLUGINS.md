@@ -1260,20 +1260,14 @@ const schedules = await this.ctx.bus.request("task:list-schedules", {
 
 ### 官方插件市场
 
-设置 → 插件里的「打开插件市场」会进入独立的市场子页，该页面读取 `/api/plugins/marketplace`。Hana 采用 Obsidian 式官方社区插件目录：第三方开发者把插件提交到 `OH-Plugins`，用户只浏览、安装、启用、禁用，不管理市场源。
+设置 → 插件里的「打开插件市场」会进入独立的市场子页，该页面读取 `/api/plugins/marketplace`。Hana 采用 Obsidian 式官方社区插件目录：第三方开发者把插件提交到插件目录仓库，用户只浏览、安装、启用、禁用，不管理市场源。
 
-默认官方目录：
-
-```text
-https://raw.githubusercontent.com/liliMozi/OH-Plugins/main/marketplace.json
-```
-
-开发调试仍可用环境变量覆盖：
+应用不再内置默认市场地址，市场来源完全由配置指定：
 
 - `LINGXI_PLUGIN_MARKETPLACE_FILE=/path/to/marketplace.json`
 - `LINGXI_PLUGIN_MARKETPLACE_URL=https://.../marketplace.json`
 
-没有配置环境变量时，Hana 会先尝试读取 `${LINGXI_HOME}/plugin-marketplace/marketplace.json`（本地开发覆盖），如果不存在则读取官方 `OH-Plugins` URL。市场 index 的基本形状与 `OH-Plugins` 仓库一致：
+没有配置环境变量时，Hana 会尝试读取 `${LINGXI_HOME}/plugin-marketplace/marketplace.json`（本地开发覆盖）；两者都不存在时市场显示为"未配置"。市场 index 的基本形状：
 
 ```json
 {
@@ -1292,7 +1286,7 @@ https://raw.githubusercontent.com/liliMozi/OH-Plugins/main/marketplace.json
     "contributions": ["tools"],
     "distribution": {
       "kind": "release",
-      "packageUrl": "https://github.com/liliMozi/OH-Plugins/releases/download/demo-v1.0.0/demo.zip",
+      "packageUrl": "https://plugins.example.com/releases/download/demo-v1.0.0/demo.zip",
       "sha256": "..."
     },
     "versions": [
@@ -1301,7 +1295,7 @@ https://raw.githubusercontent.com/liliMozi/OH-Plugins/main/marketplace.json
         "compatibility": { "minAppVersion": "0.170.0" },
         "distribution": {
           "kind": "release",
-          "packageUrl": "https://github.com/liliMozi/OH-Plugins/releases/download/demo-v1.0.0/demo.zip",
+          "packageUrl": "https://plugins.example.com/releases/download/demo-v1.0.0/demo.zip",
           "sha256": "..."
         }
       }

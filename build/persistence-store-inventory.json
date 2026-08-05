@@ -162,8 +162,7 @@
         "memory ticker and summary stores"
       ],
       "migrationEntry": [
-        "LingxiAgent v1 memories.db import",
-        "core/migrations.ts memory migrations"
+        "LingxiAgent v1 memories.db import"
       ],
       "protocolModules": [],
       "firstPossibleOpenPhase": "engine_construct",
@@ -201,9 +200,7 @@
       "openEntry": [
         "Agent Phone conversation runtime"
       ],
-      "migrationEntry": [
-        "core/migrations.ts Agent Phone projection migration"
-      ],
+      "migrationEntry": [],
       "protocolModules": [],
       "firstPossibleOpenPhase": "engine_construct",
       "firstPossibleWritePhase": "runtime_ready",
@@ -287,9 +284,7 @@
         "ChannelManager",
         "ChannelStore"
       ],
-      "migrationEntry": [
-        "core/migrations.ts channel migrations"
-      ],
+      "migrationEntry": [],
       "protocolModules": [],
       "firstPossibleOpenPhase": "engine_construct",
       "firstPossibleWritePhase": "runtime_ready",
@@ -367,9 +362,7 @@
         "new CronStore",
         "StudioCronService"
       ],
-      "migrationEntry": [
-        "core/migrations.ts cron migrations"
-      ],
+      "migrationEntry": [],
       "protocolModules": [],
       "firstPossibleOpenPhase": "engine_construct",
       "firstPossibleWritePhase": "runtime_ready",
@@ -562,9 +555,7 @@
       "openEntry": [
         "new DeferredResultStore"
       ],
-      "migrationEntry": [
-        "core/migrations.ts deferred result migrations"
-      ],
+      "migrationEntry": [],
       "protocolModules": [],
       "firstPossibleOpenPhase": "engine_construct",
       "firstPossibleWritePhase": "engine_construct",
@@ -1033,42 +1024,6 @@
       "exemption": null
     },
     {
-      "id": "legacy-pi-search-cache",
-      "ownerModule": "lib/pi-sdk/search-tools.ts",
-      "pathPattern": ".pi/agent/bin/{toolName}",
-      "pathPatterns": [
-        ".pi/agent/bin/{toolName}"
-      ],
-      "pathExclusions": [],
-      "pathKind": "file",
-      "format": "binary-cache",
-      "schemaSource": {
-        "kind": "directory-contract",
-        "module": "lib/pi-sdk/search-tools.ts",
-        "contract": "read-only known-binary legacy copy source"
-      },
-      "schemaContract": {
-        "kind": "protocol",
-        "source": "lib/pi-sdk/search-tools.ts",
-        "compatibility": "The named runtime reader is canonical; this inventory does not imply stricter validation than runtime currently performs."
-      },
-      "openEntry": [
-        "search tool legacy cache probe"
-      ],
-      "migrationEntry": [],
-      "protocolModules": [],
-      "firstPossibleOpenPhase": "engine_construct",
-      "firstPossibleWritePhase": "runtime_ready",
-      "epochPolicy": "migration-source",
-      "checkpointPolicy": "Excluded; the legacy tree is not Hana-owned active state.",
-      "restorePolicy": "Never rewrite or delete; copy a recognized file lazily into runtime/pi-sdk/bin.",
-      "affectedByEpochMigration": false,
-      "bootstrapSafety": null,
-      "preCoordinatorReadProjection": null,
-      "identityContract": "Legacy path is a compatibility source only, not an active cache identity.",
-      "exemption": null
-    },
-    {
       "id": "legacy-upload-cache",
       "ownerModule": "server/routes/upload.ts",
       "pathPattern": "uploads/{uploadName}",
@@ -1516,9 +1471,7 @@
         "new ProviderCatalogStore"
       ],
       "migrationEntry": [
-        "core/migrate-providers.ts",
-        "core/provider-auth-migration.ts",
-        "core/provider-media-config.ts"
+        "core/provider-auth-migration.ts"
       ],
       "protocolModules": [],
       "firstPossibleOpenPhase": "engine_construct",
@@ -1862,9 +1815,7 @@
       "openEntry": [
         "SessionFileRegistry"
       ],
-      "migrationEntry": [
-        "core/migrations.ts SessionFile migrations"
-      ],
+      "migrationEntry": [],
       "protocolModules": [],
       "firstPossibleOpenPhase": "engine_construct",
       "firstPossibleWritePhase": "runtime_ready",
@@ -1911,8 +1862,7 @@
         "Pi SessionManager"
       ],
       "migrationEntry": [
-        "core/session-jsonl-file.ts",
-        "core/migrations.ts session JSONL migrations"
+        "core/session-jsonl-file.ts"
       ],
       "protocolModules": [],
       "firstPossibleOpenPhase": "engine_construct",
@@ -1951,9 +1901,7 @@
       "openEntry": [
         "new SessionManifestStore"
       ],
-      "migrationEntry": [
-        "core/session-manifest/legacy-migration.ts"
-      ],
+      "migrationEntry": [],
       "protocolModules": [],
       "firstPossibleOpenPhase": "engine_construct",
       "firstPossibleWritePhase": "engine_construct",
@@ -1995,10 +1943,7 @@
         "BridgeSessionManager",
         "VisionBridge"
       ],
-      "migrationEntry": [
-        "core/session-manifest/legacy-migration.ts",
-        "core/migrations.ts"
-      ],
+      "migrationEntry": [],
       "protocolModules": [],
       "firstPossibleOpenPhase": "engine_construct",
       "firstPossibleWritePhase": "runtime_ready",
@@ -2082,9 +2027,7 @@
         "skill loader",
         "SkillBundleStore"
       ],
-      "migrationEntry": [
-        "core/migrations.ts skill migrations"
-      ],
+      "migrationEntry": [],
       "protocolModules": [],
       "firstPossibleOpenPhase": "first_run_seed",
       "firstPossibleWritePhase": "first_run_seed",
@@ -2195,9 +2138,7 @@
         "new SubagentRunStore",
         "new SubagentThreadStore"
       ],
-      "migrationEntry": [
-        "core/migrations.ts subagent identity migrations"
-      ],
+      "migrationEntry": [],
       "protocolModules": [],
       "firstPossibleOpenPhase": "engine_construct",
       "firstPossibleWritePhase": "runtime_ready",
@@ -2343,8 +2284,7 @@
       "pathPattern": "users.json",
       "pathPatterns": [
         "users.json",
-        "studios.json",
-        "spaces.json"
+        "studios.json"
       ],
       "pathExclusions": [],
       "pathKind": "file",
@@ -2352,7 +2292,7 @@
       "schemaSource": {
         "kind": "runtime-contract",
         "module": "core/server-identity.ts",
-        "contract": "user/studio registry readers plus legacy spaces.json compatibility projection"
+        "contract": "user/studio registry readers"
       },
       "schemaContract": {
         "kind": "runtime-source",
@@ -2363,19 +2303,17 @@
         "loadServerIdentity",
         "ensureLocalIdentityRegistries"
       ],
-      "migrationEntry": [
-        "legacy spaces.json compatibility reader"
-      ],
+      "migrationEntry": [],
       "protocolModules": [],
       "firstPossibleOpenPhase": "identity_seed",
       "firstPossibleWritePhase": "identity_seed",
       "epochPolicy": "epoch-managed",
-      "checkpointPolicy": "Checkpoint users and studios together; retain spaces.json only as a legacy migration source.",
-      "restorePolicy": "Restore users/studios before dependent grants or mounts; never project newer studio state back into spaces.json.",
+      "checkpointPolicy": "Checkpoint users and studios together.",
+      "restorePolicy": "Restore users/studios before dependent grants or mounts.",
       "affectedByEpochMigration": true,
       "bootstrapSafety": null,
       "preCoordinatorReadProjection": null,
-      "identityContract": "userId and studioId are durable identities; spaces.json is a legacy locator/source only.",
+      "identityContract": "userId and studioId are durable identities.",
       "exemption": null
     },
     {
@@ -2413,43 +2351,6 @@
       "bootstrapSafety": null,
       "preCoordinatorReadProjection": null,
       "identityContract": "webSessionId is durable only for the validated lifetime of its user-bound session.",
-      "exemption": null
-    },
-    {
-      "id": "windows-sandbox-migration-state",
-      "ownerModule": "lib/sandbox/win32-legacy-migration.ts",
-      "pathPattern": "user/win32-sandbox-migration-v3.json",
-      "pathPatterns": [
-        "user/win32-sandbox-migration-v3.json",
-        "user/win32-sandbox-cleanup-v4.json"
-      ],
-      "pathExclusions": [],
-      "pathKind": "file",
-      "format": "json",
-      "schemaSource": {
-        "kind": "runtime-contract",
-        "module": "lib/sandbox/win32-legacy-migration.ts",
-        "contract": "Windows sandbox migration marker readers"
-      },
-      "schemaContract": {
-        "kind": "runtime-source",
-        "source": "lib/sandbox/win32-legacy-migration.ts",
-        "compatibility": "The named runtime reader is canonical; this inventory does not imply stricter validation than runtime currently performs."
-      },
-      "openEntry": [
-        "Windows sandbox legacy migration"
-      ],
-      "migrationEntry": [],
-      "protocolModules": [],
-      "firstPossibleOpenPhase": "engine_construct",
-      "firstPossibleWritePhase": "runtime_ready",
-      "epochPolicy": "compatible",
-      "checkpointPolicy": "Include markers only with the migrated target state they describe.",
-      "restorePolicy": "Restore markers and migrated state together or rerun the idempotent migration.",
-      "affectedByEpochMigration": false,
-      "bootstrapSafety": null,
-      "preCoordinatorReadProjection": null,
-      "identityContract": "Each fixed marker records completion for one LINGXI_HOME.",
       "exemption": null
     },
     {
@@ -3511,663 +3412,6 @@
       "ordinal": 0
     },
     {
-      "sourceFile": "core/migrate-providers.ts",
-      "kind": "rename",
-      "excerpt": "fs.renameSync(oldPath, providersPath)",
-      "reason": "Owns provider catalog, authentication, model compatibility, local provider plugin state, or the retention of their migration backups.",
-      "storeId": "provider-state",
-      "exemptionId": null,
-      "ordinal": 0
-    },
-    {
-      "sourceFile": "core/migrate-providers.ts",
-      "kind": "secret-write",
-      "excerpt": "writeSecretFileSync(filePath, JSON.stringify(data, null, 2) + \"\\n\")",
-      "reason": "Owns provider catalog, authentication, model compatibility, local provider plugin state, or the retention of their migration backups.",
-      "storeId": "provider-state",
-      "exemptionId": null,
-      "ordinal": 0
-    },
-    {
-      "sourceFile": "core/migrate-providers.ts",
-      "kind": "secret-write",
-      "excerpt": "writeSecretFileSync(filePath, yamlStr)",
-      "reason": "Owns provider catalog, authentication, model compatibility, local provider plugin state, or the retention of their migration backups.",
-      "storeId": "provider-state",
-      "exemptionId": null,
-      "ordinal": 0
-    },
-    {
-      "sourceFile": "core/migrations.ts",
-      "kind": "atomic-write",
-      "excerpt": "atomicWriteSync(identityPath, repaired)",
-      "reason": "The legacy migration orchestrator mutates many registered targets. Each target is inventoried, while exact-site flow attribution remains prerequisite work for the coordinator.",
-      "storeId": null,
-      "exemptionId": "cross-store-legacy-migrations",
-      "ordinal": 0
-    },
-    {
-      "sourceFile": "core/migrations.ts",
-      "kind": "atomic-write",
-      "excerpt": "atomicWriteSync(jobsPath, JSON.stringify({ ...data, jobs }, null, 2) + \"\\n\")",
-      "reason": "The legacy migration orchestrator mutates many registered targets. Each target is inventoried, while exact-site flow attribution remains prerequisite work for the coordinator.",
-      "storeId": null,
-      "exemptionId": "cross-store-legacy-migrations",
-      "ordinal": 0
-    },
-    {
-      "sourceFile": "core/migrations.ts",
-      "kind": "atomic-write",
-      "excerpt": "atomicWriteSync(jobsPath, JSON.stringify({ ...data, jobs }, null, 2) + \"\\n\")",
-      "reason": "The legacy migration orchestrator mutates many registered targets. Each target is inventoried, while exact-site flow attribution remains prerequisite work for the coordinator.",
-      "storeId": null,
-      "exemptionId": "cross-store-legacy-migrations",
-      "ordinal": 1
-    },
-    {
-      "sourceFile": "core/migrations.ts",
-      "kind": "atomic-write",
-      "excerpt": "atomicWriteSync(projectionPath, nextProjection)",
-      "reason": "The legacy migration orchestrator mutates many registered targets. Each target is inventoried, while exact-site flow attribution remains prerequisite work for the coordinator.",
-      "storeId": null,
-      "exemptionId": "cross-store-legacy-migrations",
-      "ordinal": 0
-    },
-    {
-      "sourceFile": "core/migrations.ts",
-      "kind": "atomic-write",
-      "excerpt": "atomicWriteSync(runsPath, JSON.stringify(rawRuns, null, 2) + \"\\n\")",
-      "reason": "The legacy migration orchestrator mutates many registered targets. Each target is inventoried, while exact-site flow attribution remains prerequisite work for the coordinator.",
-      "storeId": null,
-      "exemptionId": "cross-store-legacy-migrations",
-      "ordinal": 0
-    },
-    {
-      "sourceFile": "core/migrations.ts",
-      "kind": "atomic-write",
-      "excerpt": "atomicWriteSync(runtimePath, JSON.stringify(nextRuntime, null, 2) + \"\\n\")",
-      "reason": "The legacy migration orchestrator mutates many registered targets. Each target is inventoried, while exact-site flow attribution remains prerequisite work for the coordinator.",
-      "storeId": null,
-      "exemptionId": "cross-store-legacy-migrations",
-      "ordinal": 0
-    },
-    {
-      "sourceFile": "core/migrations.ts",
-      "kind": "atomic-write",
-      "excerpt": "atomicWriteSync(tasksPath, JSON.stringify(tasks, null, 2) + \"\\n\")",
-      "reason": "The legacy migration orchestrator mutates many registered targets. Each target is inventoried, while exact-site flow attribution remains prerequisite work for the coordinator.",
-      "storeId": null,
-      "exemptionId": "cross-store-legacy-migrations",
-      "ordinal": 0
-    },
-    {
-      "sourceFile": "core/migrations.ts",
-      "kind": "atomic-write",
-      "excerpt": "atomicWriteSync(threadsPath, JSON.stringify(rawThreads, null, 2) + \"\\n\")",
-      "reason": "The legacy migration orchestrator mutates many registered targets. Each target is inventoried, while exact-site flow attribution remains prerequisite work for the coordinator.",
-      "storeId": null,
-      "exemptionId": "cross-store-legacy-migrations",
-      "ordinal": 0
-    },
-    {
-      "sourceFile": "core/migrations.ts",
-      "kind": "atomic-write",
-      "excerpt": "atomicWriteSync(titlePath, JSON.stringify(titles, null, 2))",
-      "reason": "The legacy migration orchestrator mutates many registered targets. Each target is inventoried, while exact-site flow attribution remains prerequisite work for the coordinator.",
-      "storeId": null,
-      "exemptionId": "cross-store-legacy-migrations",
-      "ordinal": 0
-    },
-    {
-      "sourceFile": "core/migrations.ts",
-      "kind": "copy-file",
-      "excerpt": "fs.copyFileSync(store.catalogPath, backupPath)",
-      "reason": "The legacy migration orchestrator mutates many registered targets. Each target is inventoried, while exact-site flow attribution remains prerequisite work for the coordinator.",
-      "storeId": null,
-      "exemptionId": "cross-store-legacy-migrations",
-      "ordinal": 0
-    },
-    {
-      "sourceFile": "core/migrations.ts",
-      "kind": "copy-file",
-      "excerpt": "fs.copyFileSync(store.catalogPath, backupPath)",
-      "reason": "The legacy migration orchestrator mutates many registered targets. Each target is inventoried, while exact-site flow attribution remains prerequisite work for the coordinator.",
-      "storeId": null,
-      "exemptionId": "cross-store-legacy-migrations",
-      "ordinal": 1
-    },
-    {
-      "sourceFile": "core/migrations.ts",
-      "kind": "copy-file",
-      "excerpt": "fs.cpSync(srcDir, tmpDir, { recursive: true })",
-      "reason": "The legacy migration orchestrator mutates many registered targets. Each target is inventoried, while exact-site flow attribution remains prerequisite work for the coordinator.",
-      "storeId": null,
-      "exemptionId": "cross-store-legacy-migrations",
-      "ordinal": 0
-    },
-    {
-      "sourceFile": "core/migrations.ts",
-      "kind": "mkdir",
-      "excerpt": "fs.mkdirSync(backupRoot, { recursive: true })",
-      "reason": "The legacy migration orchestrator mutates many registered targets. Each target is inventoried, while exact-site flow attribution remains prerequisite work for the coordinator.",
-      "storeId": null,
-      "exemptionId": "cross-store-legacy-migrations",
-      "ordinal": 0
-    },
-    {
-      "sourceFile": "core/migrations.ts",
-      "kind": "mkdir",
-      "excerpt": "fs.mkdirSync(backupRoot, { recursive: true })",
-      "reason": "The legacy migration orchestrator mutates many registered targets. Each target is inventoried, while exact-site flow attribution remains prerequisite work for the coordinator.",
-      "storeId": null,
-      "exemptionId": "cross-store-legacy-migrations",
-      "ordinal": 1
-    },
-    {
-      "sourceFile": "core/migrations.ts",
-      "kind": "mkdir",
-      "excerpt": "fs.mkdirSync(path.dirname(deferredTasksPath), { recursive: true })",
-      "reason": "The legacy migration orchestrator mutates many registered targets. Each target is inventoried, while exact-site flow attribution remains prerequisite work for the coordinator.",
-      "storeId": null,
-      "exemptionId": "cross-store-legacy-migrations",
-      "ordinal": 0
-    },
-    {
-      "sourceFile": "core/migrations.ts",
-      "kind": "mkdir",
-      "excerpt": "fs.mkdirSync(path.dirname(dstDir), { recursive: true })",
-      "reason": "The legacy migration orchestrator mutates many registered targets. Each target is inventoried, while exact-site flow attribution remains prerequisite work for the coordinator.",
-      "storeId": null,
-      "exemptionId": "cross-store-legacy-migrations",
-      "ordinal": 0
-    },
-    {
-      "sourceFile": "core/migrations.ts",
-      "kind": "mkdir",
-      "excerpt": "fs.mkdirSync(path.dirname(metaPath), { recursive: true })",
-      "reason": "The legacy migration orchestrator mutates many registered targets. Each target is inventoried, while exact-site flow attribution remains prerequisite work for the coordinator.",
-      "storeId": null,
-      "exemptionId": "cross-store-legacy-migrations",
-      "ordinal": 0
-    },
-    {
-      "sourceFile": "core/migrations.ts",
-      "kind": "mkdir",
-      "excerpt": "fs.mkdirSync(runtimeDir, { recursive: true })",
-      "reason": "The legacy migration orchestrator mutates many registered targets. Each target is inventoried, while exact-site flow attribution remains prerequisite work for the coordinator.",
-      "storeId": null,
-      "exemptionId": "cross-store-legacy-migrations",
-      "ordinal": 0
-    },
-    {
-      "sourceFile": "core/migrations.ts",
-      "kind": "mkdir",
-      "excerpt": "fs.mkdirSync(skillsDir, { recursive: true })",
-      "reason": "The legacy migration orchestrator mutates many registered targets. Each target is inventoried, while exact-site flow attribution remains prerequisite work for the coordinator.",
-      "storeId": null,
-      "exemptionId": "cross-store-legacy-migrations",
-      "ordinal": 0
-    },
-    {
-      "sourceFile": "core/migrations.ts",
-      "kind": "persistent-store-constructor",
-      "excerpt": "new SubagentRunStore(path.join(lingxiHome, \"subagent-runs.json\"))",
-      "reason": "The legacy migration orchestrator mutates many registered targets. Each target is inventoried, while exact-site flow attribution remains prerequisite work for the coordinator.",
-      "storeId": null,
-      "exemptionId": "cross-store-legacy-migrations",
-      "ordinal": 0
-    },
-    {
-      "sourceFile": "core/migrations.ts",
-      "kind": "persistent-store-constructor",
-      "excerpt": "new SubagentRunStore(path.join(lingxiHome, \"subagent-runs.json\"))",
-      "reason": "The legacy migration orchestrator mutates many registered targets. Each target is inventoried, while exact-site flow attribution remains prerequisite work for the coordinator.",
-      "storeId": null,
-      "exemptionId": "cross-store-legacy-migrations",
-      "ordinal": 1
-    },
-    {
-      "sourceFile": "core/migrations.ts",
-      "kind": "persistent-store-constructor",
-      "excerpt": "new SubagentThreadStore(path.join(lingxiHome, \"subagent-threads.json\"))",
-      "reason": "The legacy migration orchestrator mutates many registered targets. Each target is inventoried, while exact-site flow attribution remains prerequisite work for the coordinator.",
-      "storeId": null,
-      "exemptionId": "cross-store-legacy-migrations",
-      "ordinal": 0
-    },
-    {
-      "sourceFile": "core/migrations.ts",
-      "kind": "remove-path",
-      "excerpt": "fs.rmSync(learnedDir, { recursive: true, force: true })",
-      "reason": "The legacy migration orchestrator mutates many registered targets. Each target is inventoried, while exact-site flow attribution remains prerequisite work for the coordinator.",
-      "storeId": null,
-      "exemptionId": "cross-store-legacy-migrations",
-      "ordinal": 0
-    },
-    {
-      "sourceFile": "core/migrations.ts",
-      "kind": "remove-path",
-      "excerpt": "fs.rmSync(tmpDir, { recursive: true, force: true })",
-      "reason": "The legacy migration orchestrator mutates many registered targets. Each target is inventoried, while exact-site flow attribution remains prerequisite work for the coordinator.",
-      "storeId": null,
-      "exemptionId": "cross-store-legacy-migrations",
-      "ordinal": 0
-    },
-    {
-      "sourceFile": "core/migrations.ts",
-      "kind": "remove-path",
-      "excerpt": "fs.rmSync(tmpDir, { recursive: true, force: true })",
-      "reason": "The legacy migration orchestrator mutates many registered targets. Each target is inventoried, while exact-site flow attribution remains prerequisite work for the coordinator.",
-      "storeId": null,
-      "exemptionId": "cross-store-legacy-migrations",
-      "ordinal": 1
-    },
-    {
-      "sourceFile": "core/migrations.ts",
-      "kind": "rename",
-      "excerpt": "fs.renameSync(tmp, filePath)",
-      "reason": "The legacy migration orchestrator mutates many registered targets. Each target is inventoried, while exact-site flow attribution remains prerequisite work for the coordinator.",
-      "storeId": null,
-      "exemptionId": "cross-store-legacy-migrations",
-      "ordinal": 0
-    },
-    {
-      "sourceFile": "core/migrations.ts",
-      "kind": "rename",
-      "excerpt": "fs.renameSync(tmp, filePath)",
-      "reason": "The legacy migration orchestrator mutates many registered targets. Each target is inventoried, while exact-site flow attribution remains prerequisite work for the coordinator.",
-      "storeId": null,
-      "exemptionId": "cross-store-legacy-migrations",
-      "ordinal": 1
-    },
-    {
-      "sourceFile": "core/migrations.ts",
-      "kind": "rename",
-      "excerpt": "fs.renameSync(tmp, filePath)",
-      "reason": "The legacy migration orchestrator mutates many registered targets. Each target is inventoried, while exact-site flow attribution remains prerequisite work for the coordinator.",
-      "storeId": null,
-      "exemptionId": "cross-store-legacy-migrations",
-      "ordinal": 2
-    },
-    {
-      "sourceFile": "core/migrations.ts",
-      "kind": "rename",
-      "excerpt": "fs.renameSync(tmp, filePath)",
-      "reason": "The legacy migration orchestrator mutates many registered targets. Each target is inventoried, while exact-site flow attribution remains prerequisite work for the coordinator.",
-      "storeId": null,
-      "exemptionId": "cross-store-legacy-migrations",
-      "ordinal": 3
-    },
-    {
-      "sourceFile": "core/migrations.ts",
-      "kind": "rename",
-      "excerpt": "fs.renameSync(tmp, indexPath)",
-      "reason": "The legacy migration orchestrator mutates many registered targets. Each target is inventoried, while exact-site flow attribution remains prerequisite work for the coordinator.",
-      "storeId": null,
-      "exemptionId": "cross-store-legacy-migrations",
-      "ordinal": 0
-    },
-    {
-      "sourceFile": "core/migrations.ts",
-      "kind": "rename",
-      "excerpt": "fs.renameSync(tmp, jobsPath)",
-      "reason": "The legacy migration orchestrator mutates many registered targets. Each target is inventoried, while exact-site flow attribution remains prerequisite work for the coordinator.",
-      "storeId": null,
-      "exemptionId": "cross-store-legacy-migrations",
-      "ordinal": 0
-    },
-    {
-      "sourceFile": "core/migrations.ts",
-      "kind": "rename",
-      "excerpt": "fs.renameSync(tmp, metaPath)",
-      "reason": "The legacy migration orchestrator mutates many registered targets. Each target is inventoried, while exact-site flow attribution remains prerequisite work for the coordinator.",
-      "storeId": null,
-      "exemptionId": "cross-store-legacy-migrations",
-      "ordinal": 0
-    },
-    {
-      "sourceFile": "core/migrations.ts",
-      "kind": "rename",
-      "excerpt": "fs.renameSync(tmp, metaPath)",
-      "reason": "The legacy migration orchestrator mutates many registered targets. Each target is inventoried, while exact-site flow attribution remains prerequisite work for the coordinator.",
-      "storeId": null,
-      "exemptionId": "cross-store-legacy-migrations",
-      "ordinal": 1
-    },
-    {
-      "sourceFile": "core/migrations.ts",
-      "kind": "rename",
-      "excerpt": "fs.renameSync(tmpDir, dstDir)",
-      "reason": "The legacy migration orchestrator mutates many registered targets. Each target is inventoried, while exact-site flow attribution remains prerequisite work for the coordinator.",
-      "storeId": null,
-      "exemptionId": "cross-store-legacy-migrations",
-      "ordinal": 0
-    },
-    {
-      "sourceFile": "core/migrations.ts",
-      "kind": "secret-write",
-      "excerpt": "writeSecretFileSync( cfgPath, YAML.dump(cfg, { indent: 2, lineWidth: -1, sortKeys: false, quotingType: \"\\\"\" }), )",
-      "reason": "The legacy migration orchestrator mutates many registered targets. Each target is inventoried, while exact-site flow attribution remains prerequisite work for the coordinator.",
-      "storeId": null,
-      "exemptionId": "cross-store-legacy-migrations",
-      "ordinal": 0
-    },
-    {
-      "sourceFile": "core/migrations.ts",
-      "kind": "secret-write",
-      "excerpt": "writeSecretFileSync( cfgPath, YAML.dump(cfg, { indent: 2, lineWidth: -1, sortKeys: false, quotingType: \"\\\"\" }), )",
-      "reason": "The legacy migration orchestrator mutates many registered targets. Each target is inventoried, while exact-site flow attribution remains prerequisite work for the coordinator.",
-      "storeId": null,
-      "exemptionId": "cross-store-legacy-migrations",
-      "ordinal": 1
-    },
-    {
-      "sourceFile": "core/migrations.ts",
-      "kind": "secret-write",
-      "excerpt": "writeSecretFileSync( cfgPath, YAML.dump(cfg, { indent: 2, lineWidth: -1, sortKeys: false, quotingType: \"\\\"\" }), )",
-      "reason": "The legacy migration orchestrator mutates many registered targets. Each target is inventoried, while exact-site flow attribution remains prerequisite work for the coordinator.",
-      "storeId": null,
-      "exemptionId": "cross-store-legacy-migrations",
-      "ordinal": 2
-    },
-    {
-      "sourceFile": "core/migrations.ts",
-      "kind": "secret-write",
-      "excerpt": "writeSecretFileSync( cfgPath, YAML.dump(config, { indent: 2, lineWidth: -1, sortKeys: false, quotingType: \"\\\"\" }), )",
-      "reason": "The legacy migration orchestrator mutates many registered targets. Each target is inventoried, while exact-site flow attribution remains prerequisite work for the coordinator.",
-      "storeId": null,
-      "exemptionId": "cross-store-legacy-migrations",
-      "ordinal": 0
-    },
-    {
-      "sourceFile": "core/migrations.ts",
-      "kind": "secret-write",
-      "excerpt": "writeSecretFileSync( configPath, YAML.dump(config, { indent: 2, lineWidth: -1, sortKeys: false, quotingType: \"\\\"\", }), )",
-      "reason": "The legacy migration orchestrator mutates many registered targets. Each target is inventoried, while exact-site flow attribution remains prerequisite work for the coordinator.",
-      "storeId": null,
-      "exemptionId": "cross-store-legacy-migrations",
-      "ordinal": 0
-    },
-    {
-      "sourceFile": "core/migrations.ts",
-      "kind": "secret-write",
-      "excerpt": "writeSecretFileSync( configPath, YAML.dump(config, { indent: 2, lineWidth: -1, sortKeys: false, quotingType: \"\\\"\", }), )",
-      "reason": "The legacy migration orchestrator mutates many registered targets. Each target is inventoried, while exact-site flow attribution remains prerequisite work for the coordinator.",
-      "storeId": null,
-      "exemptionId": "cross-store-legacy-migrations",
-      "ordinal": 1
-    },
-    {
-      "sourceFile": "core/migrations.ts",
-      "kind": "secret-write",
-      "excerpt": "writeSecretFileSync( path.join(backupDir, \"migration-report.json\"), JSON.stringify(report, null, 2) + \"\\n\", )",
-      "reason": "The legacy migration orchestrator mutates many registered targets. Each target is inventoried, while exact-site flow attribution remains prerequisite work for the coordinator.",
-      "storeId": null,
-      "exemptionId": "cross-store-legacy-migrations",
-      "ordinal": 0
-    },
-    {
-      "sourceFile": "core/migrations.ts",
-      "kind": "secret-write",
-      "excerpt": "writeSecretFileSync( path.join(backupDir, \"migration-report.json\"), JSON.stringify(report, null, 2) + \"\\n\", )",
-      "reason": "The legacy migration orchestrator mutates many registered targets. Each target is inventoried, while exact-site flow attribution remains prerequisite work for the coordinator.",
-      "storeId": null,
-      "exemptionId": "cross-store-legacy-migrations",
-      "ordinal": 1
-    },
-    {
-      "sourceFile": "core/migrations.ts",
-      "kind": "secret-write",
-      "excerpt": "writeSecretFileSync( ymlPath, header + YAML.dump(raw, { indent: 2, lineWidth: -1, sortKeys: false, quotingType: \"\\\"\", forceQuotes: false, }), )",
-      "reason": "The legacy migration orchestrator mutates many registered targets. Each target is inventoried, while exact-site flow attribution remains prerequisite work for the coordinator.",
-      "storeId": null,
-      "exemptionId": "cross-store-legacy-migrations",
-      "ordinal": 0
-    },
-    {
-      "sourceFile": "core/migrations.ts",
-      "kind": "secret-write",
-      "excerpt": "writeSecretFileSync( ymlPath, header + YAML.dump(raw, { indent: 2, lineWidth: -1, sortKeys: false, quotingType: \"\\\"\", forceQuotes: false, }), )",
-      "reason": "The legacy migration orchestrator mutates many registered targets. Each target is inventoried, while exact-site flow attribution remains prerequisite work for the coordinator.",
-      "storeId": null,
-      "exemptionId": "cross-store-legacy-migrations",
-      "ordinal": 1
-    },
-    {
-      "sourceFile": "core/migrations.ts",
-      "kind": "secret-write",
-      "excerpt": "writeSecretFileSync(cfgPath, YAML.dump(config, { indent: 2, lineWidth: -1, sortKeys: false, quotingType: '\"' }))",
-      "reason": "The legacy migration orchestrator mutates many registered targets. Each target is inventoried, while exact-site flow attribution remains prerequisite work for the coordinator.",
-      "storeId": null,
-      "exemptionId": "cross-store-legacy-migrations",
-      "ordinal": 0
-    },
-    {
-      "sourceFile": "core/migrations.ts",
-      "kind": "secret-write",
-      "excerpt": "writeSecretFileSync(cfgPath, YAML.dump(config, { indent: 2, lineWidth: -1, sortKeys: false, quotingType: '\"' }))",
-      "reason": "The legacy migration orchestrator mutates many registered targets. Each target is inventoried, while exact-site flow attribution remains prerequisite work for the coordinator.",
-      "storeId": null,
-      "exemptionId": "cross-store-legacy-migrations",
-      "ordinal": 1
-    },
-    {
-      "sourceFile": "core/migrations.ts",
-      "kind": "secret-write",
-      "excerpt": "writeSecretFileSync(cfgPath, YAML.dump(config, { indent: 2, lineWidth: -1, sortKeys: false, quotingType: '\"' }))",
-      "reason": "The legacy migration orchestrator mutates many registered targets. Each target is inventoried, while exact-site flow attribution remains prerequisite work for the coordinator.",
-      "storeId": null,
-      "exemptionId": "cross-store-legacy-migrations",
-      "ordinal": 2
-    },
-    {
-      "sourceFile": "core/migrations.ts",
-      "kind": "secret-write",
-      "excerpt": "writeSecretFileSync(cfgPath, YAML.dump(config, { indent: 2, lineWidth: -1, sortKeys: false, quotingType: '\"' }))",
-      "reason": "The legacy migration orchestrator mutates many registered targets. Each target is inventoried, while exact-site flow attribution remains prerequisite work for the coordinator.",
-      "storeId": null,
-      "exemptionId": "cross-store-legacy-migrations",
-      "ordinal": 3
-    },
-    {
-      "sourceFile": "core/migrations.ts",
-      "kind": "secret-write",
-      "excerpt": "writeSecretFileSync(cfgPath, YAML.dump(config, { indent: 2, lineWidth: -1, sortKeys: false, quotingType: '\"' }))",
-      "reason": "The legacy migration orchestrator mutates many registered targets. Each target is inventoried, while exact-site flow attribution remains prerequisite work for the coordinator.",
-      "storeId": null,
-      "exemptionId": "cross-store-legacy-migrations",
-      "ordinal": 4
-    },
-    {
-      "sourceFile": "core/migrations.ts",
-      "kind": "secret-write",
-      "excerpt": "writeSecretFileSync(configPath, JSON.stringify(config, null, 2) + \"\\n\")",
-      "reason": "The legacy migration orchestrator mutates many registered targets. Each target is inventoried, while exact-site flow attribution remains prerequisite work for the coordinator.",
-      "storeId": null,
-      "exemptionId": "cross-store-legacy-migrations",
-      "ordinal": 0
-    },
-    {
-      "sourceFile": "core/migrations.ts",
-      "kind": "secret-write",
-      "excerpt": "writeSecretFileSync(configPath, JSON.stringify(config, null, 2) + \"\\n\")",
-      "reason": "The legacy migration orchestrator mutates many registered targets. Each target is inventoried, while exact-site flow attribution remains prerequisite work for the coordinator.",
-      "storeId": null,
-      "exemptionId": "cross-store-legacy-migrations",
-      "ordinal": 1
-    },
-    {
-      "sourceFile": "core/migrations.ts",
-      "kind": "secret-write",
-      "excerpt": "writeSecretFileSync(modelsJsonPath, JSON.stringify(raw, null, 4) + \"\\n\")",
-      "reason": "The legacy migration orchestrator mutates many registered targets. Each target is inventoried, while exact-site flow attribution remains prerequisite work for the coordinator.",
-      "storeId": null,
-      "exemptionId": "cross-store-legacy-migrations",
-      "ordinal": 0
-    },
-    {
-      "sourceFile": "core/migrations.ts",
-      "kind": "secret-write",
-      "excerpt": "writeSecretFileSync(ymlPath, yamlStr)",
-      "reason": "The legacy migration orchestrator mutates many registered targets. Each target is inventoried, while exact-site flow attribution remains prerequisite work for the coordinator.",
-      "storeId": null,
-      "exemptionId": "cross-store-legacy-migrations",
-      "ordinal": 0
-    },
-    {
-      "sourceFile": "core/migrations.ts",
-      "kind": "secret-write",
-      "excerpt": "writeSecretFileSync(ymlPath, yamlStr)",
-      "reason": "The legacy migration orchestrator mutates many registered targets. Each target is inventoried, while exact-site flow attribution remains prerequisite work for the coordinator.",
-      "storeId": null,
-      "exemptionId": "cross-store-legacy-migrations",
-      "ordinal": 1
-    },
-    {
-      "sourceFile": "core/migrations.ts",
-      "kind": "secret-write",
-      "excerpt": "writeSecretFileSync(ymlPath, yamlStr)",
-      "reason": "The legacy migration orchestrator mutates many registered targets. Each target is inventoried, while exact-site flow attribution remains prerequisite work for the coordinator.",
-      "storeId": null,
-      "exemptionId": "cross-store-legacy-migrations",
-      "ordinal": 2
-    },
-    {
-      "sourceFile": "core/migrations.ts",
-      "kind": "write-file",
-      "excerpt": "fs.writeFileSync( path.join(tmpDir, \"SKILL.md\"), rewriteSkillContentForGlobalPool(content, skillName), \"utf-8\", )",
-      "reason": "The legacy migration orchestrator mutates many registered targets. Each target is inventoried, while exact-site flow attribution remains prerequisite work for the coordinator.",
-      "storeId": null,
-      "exemptionId": "cross-store-legacy-migrations",
-      "ordinal": 0
-    },
-    {
-      "sourceFile": "core/migrations.ts",
-      "kind": "write-file",
-      "excerpt": "fs.writeFileSync(backupPath, raw, { encoding: \"utf-8\", flag: \"wx\" })",
-      "reason": "The legacy migration orchestrator mutates many registered targets. Each target is inventoried, while exact-site flow attribution remains prerequisite work for the coordinator.",
-      "storeId": null,
-      "exemptionId": "cross-store-legacy-migrations",
-      "ordinal": 0
-    },
-    {
-      "sourceFile": "core/migrations.ts",
-      "kind": "write-file",
-      "excerpt": "fs.writeFileSync(backupPath, raw, { encoding: \"utf-8\", flag: \"wx\" })",
-      "reason": "The legacy migration orchestrator mutates many registered targets. Each target is inventoried, while exact-site flow attribution remains prerequisite work for the coordinator.",
-      "storeId": null,
-      "exemptionId": "cross-store-legacy-migrations",
-      "ordinal": 1
-    },
-    {
-      "sourceFile": "core/migrations.ts",
-      "kind": "write-file",
-      "excerpt": "fs.writeFileSync(backupPath, raw, { encoding: \"utf-8\", flag: \"wx\" })",
-      "reason": "The legacy migration orchestrator mutates many registered targets. Each target is inventoried, while exact-site flow attribution remains prerequisite work for the coordinator.",
-      "storeId": null,
-      "exemptionId": "cross-store-legacy-migrations",
-      "ordinal": 2
-    },
-    {
-      "sourceFile": "core/migrations.ts",
-      "kind": "write-file",
-      "excerpt": "fs.writeFileSync(deferredTasksPath, JSON.stringify(deferredTasks, null, 2) + \"\\n\", \"utf-8\")",
-      "reason": "The legacy migration orchestrator mutates many registered targets. Each target is inventoried, while exact-site flow attribution remains prerequisite work for the coordinator.",
-      "storeId": null,
-      "exemptionId": "cross-store-legacy-migrations",
-      "ordinal": 0
-    },
-    {
-      "sourceFile": "core/migrations.ts",
-      "kind": "write-file",
-      "excerpt": "fs.writeFileSync(metaPath, JSON.stringify(meta, null, 2) + \"\\n\", \"utf-8\")",
-      "reason": "The legacy migration orchestrator mutates many registered targets. Each target is inventoried, while exact-site flow attribution remains prerequisite work for the coordinator.",
-      "storeId": null,
-      "exemptionId": "cross-store-legacy-migrations",
-      "ordinal": 0
-    },
-    {
-      "sourceFile": "core/migrations.ts",
-      "kind": "write-file",
-      "excerpt": "fs.writeFileSync(sessionFile, outputLines.join(\"\\n\") + \"\\n\", \"utf-8\")",
-      "reason": "The legacy migration orchestrator mutates many registered targets. Each target is inventoried, while exact-site flow attribution remains prerequisite work for the coordinator.",
-      "storeId": null,
-      "exemptionId": "cross-store-legacy-migrations",
-      "ordinal": 0
-    },
-    {
-      "sourceFile": "core/migrations.ts",
-      "kind": "write-file",
-      "excerpt": "fs.writeFileSync(tmp, JSON.stringify(data, null, 2) + \"\\n\", \"utf-8\")",
-      "reason": "The legacy migration orchestrator mutates many registered targets. Each target is inventoried, while exact-site flow attribution remains prerequisite work for the coordinator.",
-      "storeId": null,
-      "exemptionId": "cross-store-legacy-migrations",
-      "ordinal": 0
-    },
-    {
-      "sourceFile": "core/migrations.ts",
-      "kind": "write-file",
-      "excerpt": "fs.writeFileSync(tmp, JSON.stringify(index, null, 2) + \"\\n\", \"utf-8\")",
-      "reason": "The legacy migration orchestrator mutates many registered targets. Each target is inventoried, while exact-site flow attribution remains prerequisite work for the coordinator.",
-      "storeId": null,
-      "exemptionId": "cross-store-legacy-migrations",
-      "ordinal": 0
-    },
-    {
-      "sourceFile": "core/migrations.ts",
-      "kind": "write-file",
-      "excerpt": "fs.writeFileSync(tmp, JSON.stringify(meta, null, 2) + \"\\n\", \"utf-8\")",
-      "reason": "The legacy migration orchestrator mutates many registered targets. Each target is inventoried, while exact-site flow attribution remains prerequisite work for the coordinator.",
-      "storeId": null,
-      "exemptionId": "cross-store-legacy-migrations",
-      "ordinal": 0
-    },
-    {
-      "sourceFile": "core/migrations.ts",
-      "kind": "write-file",
-      "excerpt": "fs.writeFileSync(tmp, JSON.stringify(meta, null, 2) + \"\\n\", \"utf-8\")",
-      "reason": "The legacy migration orchestrator mutates many registered targets. Each target is inventoried, while exact-site flow attribution remains prerequisite work for the coordinator.",
-      "storeId": null,
-      "exemptionId": "cross-store-legacy-migrations",
-      "ordinal": 1
-    },
-    {
-      "sourceFile": "core/migrations.ts",
-      "kind": "write-file",
-      "excerpt": "fs.writeFileSync(tmp, next, \"utf-8\")",
-      "reason": "The legacy migration orchestrator mutates many registered targets. Each target is inventoried, while exact-site flow attribution remains prerequisite work for the coordinator.",
-      "storeId": null,
-      "exemptionId": "cross-store-legacy-migrations",
-      "ordinal": 0
-    },
-    {
-      "sourceFile": "core/migrations.ts",
-      "kind": "write-file",
-      "excerpt": "fs.writeFileSync(tmp, next, \"utf-8\")",
-      "reason": "The legacy migration orchestrator mutates many registered targets. Each target is inventoried, while exact-site flow attribution remains prerequisite work for the coordinator.",
-      "storeId": null,
-      "exemptionId": "cross-store-legacy-migrations",
-      "ordinal": 1
-    },
-    {
-      "sourceFile": "core/migrations.ts",
-      "kind": "write-file",
-      "excerpt": "fs.writeFileSync(tmp, next, \"utf-8\")",
-      "reason": "The legacy migration orchestrator mutates many registered targets. Each target is inventoried, while exact-site flow attribution remains prerequisite work for the coordinator.",
-      "storeId": null,
-      "exemptionId": "cross-store-legacy-migrations",
-      "ordinal": 2
-    },
-    {
-      "sourceFile": "core/migrations.ts",
-      "kind": "write-file",
-      "excerpt": "fs.writeFileSync(tmp, next, \"utf-8\")",
-      "reason": "The legacy migration orchestrator mutates many registered targets. Each target is inventoried, while exact-site flow attribution remains prerequisite work for the coordinator.",
-      "storeId": null,
-      "exemptionId": "cross-store-legacy-migrations",
-      "ordinal": 3
-    },
-    {
       "sourceFile": "core/model-sync.ts",
       "kind": "secret-write",
       "excerpt": "writeSecretFileSync(modelsJsonPath, newStr)",
@@ -4414,24 +3658,6 @@
       "sourceFile": "core/provider-catalog.ts",
       "kind": "secret-write",
       "excerpt": "writeSecretFileSync(this.catalogPath, JSON.stringify(normalized, null, 2) + \"\\n\")",
-      "reason": "Owns provider catalog, authentication, model compatibility, local provider plugin state, or the retention of their migration backups.",
-      "storeId": "provider-state",
-      "exemptionId": null,
-      "ordinal": 0
-    },
-    {
-      "sourceFile": "core/provider-media-config.ts",
-      "kind": "secret-write",
-      "excerpt": "writeSecretFileSync(ymlPath, yamlStr)",
-      "reason": "Owns provider catalog, authentication, model compatibility, local provider plugin state, or the retention of their migration backups.",
-      "storeId": "provider-state",
-      "exemptionId": null,
-      "ordinal": 0
-    },
-    {
-      "sourceFile": "core/provider-registry.ts",
-      "kind": "secret-write",
-      "excerpt": "writeSecretFileSync(cfgPath, yamlStr)",
       "reason": "Owns provider catalog, authentication, model compatibility, local provider plugin state, or the retention of their migration backups.",
       "storeId": "provider-state",
       "exemptionId": null,
@@ -4873,16 +4099,7 @@
       "sourceFile": "core/session-manifest/db-files.ts",
       "kind": "rename",
       "excerpt": "fs.renameSync(from, to)",
-      "reason": "Opens, migrates, or manages files for session-manifest.db.",
-      "storeId": "session-manifest-sqlite",
-      "exemptionId": null,
-      "ordinal": 0
-    },
-    {
-      "sourceFile": "core/session-manifest/legacy-migration.ts",
-      "kind": "write-file",
-      "excerpt": "fs.writeFileSync(titlesPath, JSON.stringify(titles, null, 2))",
-      "reason": "Opens, migrates, or manages files for session-manifest.db.",
+      "reason": "Opens or manages files for session-manifest.db.",
       "storeId": "session-manifest-sqlite",
       "exemptionId": null,
       "ordinal": 0
@@ -4891,7 +4108,7 @@
       "sourceFile": "core/session-manifest/store.ts",
       "kind": "database-open",
       "excerpt": "new Database(opts.dbPath)",
-      "reason": "Opens, migrates, or manages files for session-manifest.db.",
+      "reason": "Opens or manages files for session-manifest.db.",
       "storeId": "session-manifest-sqlite",
       "exemptionId": null,
       "ordinal": 0
@@ -4900,7 +4117,7 @@
       "sourceFile": "core/session-manifest/store.ts",
       "kind": "mkdir",
       "excerpt": "fs.mkdirSync(path.dirname(opts.dbPath), { recursive: true })",
-      "reason": "Opens, migrates, or manages files for session-manifest.db.",
+      "reason": "Opens or manages files for session-manifest.db.",
       "storeId": "session-manifest-sqlite",
       "exemptionId": null,
       "ordinal": 0
@@ -6391,6 +5608,42 @@
       "ordinal": 0
     },
     {
+      "sourceFile": "lib/extract-zip.ts",
+      "kind": "mkdir",
+      "excerpt": "fsp.mkdir(dest, { recursive: true, mode: (mode || 0o755) & 0o777 })",
+      "reason": "Extracts zip entries into a destination directory explicitly selected by the caller (skill/plugin/character-card staging), outside any implied LINGXI_HOME store.",
+      "storeId": null,
+      "exemptionId": "lib-extract-zip-caller-destination",
+      "ordinal": 0
+    },
+    {
+      "sourceFile": "lib/extract-zip.ts",
+      "kind": "mkdir",
+      "excerpt": "fsp.mkdir(path.dirname(dest), { recursive: true })",
+      "reason": "Extracts zip entries into a destination directory explicitly selected by the caller (skill/plugin/character-card staging), outside any implied LINGXI_HOME store.",
+      "storeId": null,
+      "exemptionId": "lib-extract-zip-caller-destination",
+      "ordinal": 0
+    },
+    {
+      "sourceFile": "lib/extract-zip.ts",
+      "kind": "mkdir",
+      "excerpt": "fsp.mkdir(rootDir, { recursive: true })",
+      "reason": "Extracts zip entries into a destination directory explicitly selected by the caller (skill/plugin/character-card staging), outside any implied LINGXI_HOME store.",
+      "storeId": null,
+      "exemptionId": "lib-extract-zip-caller-destination",
+      "ordinal": 0
+    },
+    {
+      "sourceFile": "lib/extract-zip.ts",
+      "kind": "write-file",
+      "excerpt": "fsp.writeFile(dest, data)",
+      "reason": "Extracts zip entries into a destination directory explicitly selected by the caller (skill/plugin/character-card staging), outside any implied LINGXI_HOME store.",
+      "storeId": null,
+      "exemptionId": "lib-extract-zip-caller-destination",
+      "ordinal": 0
+    },
+    {
       "sourceFile": "lib/file-history/file-history-service.ts",
       "kind": "persistent-store-constructor",
       "excerpt": "new FileHistoryStore({ dbPath: path.join(this._historyRoot, workspaceHashForRoot(root), \"history.sqlite\"), mergeWindowMs: this._mergeWindowMs, now: this._now, })",
@@ -6833,15 +6086,6 @@
     },
     {
       "sourceFile": "lib/pi-sdk/search-tools.ts",
-      "kind": "copy-file",
-      "excerpt": "copyFileSync(legacyPath, tempPath)",
-      "reason": "Populates a Hana-owned regenerable runtime cache.",
-      "storeId": "managed-runtime-caches",
-      "exemptionId": null,
-      "ordinal": 0
-    },
-    {
-      "sourceFile": "lib/pi-sdk/search-tools.ts",
       "kind": "mkdir",
       "excerpt": "mkdirSync(extractDir, { recursive: true })",
       "reason": "Populates a Hana-owned regenerable runtime cache.",
@@ -6857,15 +6101,6 @@
       "storeId": "managed-runtime-caches",
       "exemptionId": null,
       "ordinal": 0
-    },
-    {
-      "sourceFile": "lib/pi-sdk/search-tools.ts",
-      "kind": "mkdir",
-      "excerpt": "mkdirSync(managedBinDir, { recursive: true })",
-      "reason": "Populates a Hana-owned regenerable runtime cache.",
-      "storeId": "managed-runtime-caches",
-      "exemptionId": null,
-      "ordinal": 1
     },
     {
       "sourceFile": "lib/pi-sdk/search-tools.ts",
@@ -6887,26 +6122,8 @@
     },
     {
       "sourceFile": "lib/pi-sdk/search-tools.ts",
-      "kind": "remove-path",
-      "excerpt": "rmSync(tempPath, { force: true })",
-      "reason": "Populates a Hana-owned regenerable runtime cache.",
-      "storeId": "managed-runtime-caches",
-      "exemptionId": null,
-      "ordinal": 0
-    },
-    {
-      "sourceFile": "lib/pi-sdk/search-tools.ts",
       "kind": "rename",
       "excerpt": "renameSync(extractedBinary, binaryPath)",
-      "reason": "Populates a Hana-owned regenerable runtime cache.",
-      "storeId": "managed-runtime-caches",
-      "exemptionId": null,
-      "ordinal": 0
-    },
-    {
-      "sourceFile": "lib/pi-sdk/search-tools.ts",
-      "kind": "rename",
-      "excerpt": "renameSync(tempPath, managedPath)",
       "reason": "Populates a Hana-owned regenerable runtime cache.",
       "storeId": "managed-runtime-caches",
       "exemptionId": null,
@@ -7225,60 +6442,6 @@
       "reason": "Writes a request-scoped Windows command wrapper outside persistent Hana state.",
       "storeId": null,
       "exemptionId": "sandbox-win32-command-temp",
-      "ordinal": 0
-    },
-    {
-      "sourceFile": "lib/sandbox/win32-legacy-migration.ts",
-      "kind": "mkdir",
-      "excerpt": "fs.mkdirSync(path.dirname(markerPath), { recursive: true })",
-      "reason": "Writes Windows sandbox migration markers or compatible copies.",
-      "storeId": "windows-sandbox-migration-state",
-      "exemptionId": null,
-      "ordinal": 0
-    },
-    {
-      "sourceFile": "lib/sandbox/win32-legacy-migration.ts",
-      "kind": "mkdir",
-      "excerpt": "fs.mkdirSync(path.dirname(markerPath), { recursive: true })",
-      "reason": "Writes Windows sandbox migration markers or compatible copies.",
-      "storeId": "windows-sandbox-migration-state",
-      "exemptionId": null,
-      "ordinal": 1
-    },
-    {
-      "sourceFile": "lib/sandbox/win32-legacy-migration.ts",
-      "kind": "rename",
-      "excerpt": "fs.renameSync(tmp, markerPath)",
-      "reason": "Writes Windows sandbox migration markers or compatible copies.",
-      "storeId": "windows-sandbox-migration-state",
-      "exemptionId": null,
-      "ordinal": 0
-    },
-    {
-      "sourceFile": "lib/sandbox/win32-legacy-migration.ts",
-      "kind": "rename",
-      "excerpt": "fs.renameSync(tmp, markerPath)",
-      "reason": "Writes Windows sandbox migration markers or compatible copies.",
-      "storeId": "windows-sandbox-migration-state",
-      "exemptionId": null,
-      "ordinal": 1
-    },
-    {
-      "sourceFile": "lib/sandbox/win32-legacy-migration.ts",
-      "kind": "write-file",
-      "excerpt": "fs.writeFileSync(tmp, JSON.stringify({ version: CLEANUP_MARKER_VERSION, roots: state.roots || {}, profiles: state.profiles || {}, updatedAt: state.updatedAt || new Date().toISOString(), }, null, 2))",
-      "reason": "Writes Windows sandbox migration markers or compatible copies.",
-      "storeId": "windows-sandbox-migration-state",
-      "exemptionId": null,
-      "ordinal": 0
-    },
-    {
-      "sourceFile": "lib/sandbox/win32-legacy-migration.ts",
-      "kind": "write-file",
-      "excerpt": "fs.writeFileSync(tmp, JSON.stringify({ version: MIGRATION_MARKER_VERSION, status: \"completed\", completedAt: new Date().toISOString(), ...payload, }, null, 2))",
-      "reason": "Writes Windows sandbox migration markers or compatible copies.",
-      "storeId": "windows-sandbox-migration-state",
-      "exemptionId": null,
       "ordinal": 0
     },
     {
@@ -9190,33 +8353,6 @@
       "ordinal": 0
     },
     {
-      "sourceFile": "shared/hana-runtime-paths.cjs",
-      "kind": "rename",
-      "excerpt": "fs.renameSync(legacyHome, lingxiHome)",
-      "reason": "Relocates the entire legacy ~/.hanako home directory to ~/.lingxi on first launch when LINGXI_HOME is unset; it moves every store as one tree and writes no store content itself.",
-      "storeId": null,
-      "exemptionId": "legacy-hanako-home-migration",
-      "ordinal": 0
-    },
-    {
-      "sourceFile": "shared/migrate-config-scope.ts",
-      "kind": "secret-write",
-      "excerpt": "writeSecretFileSync(ac.path, YAML.dump(ac.config, { lineWidth: -1 }))",
-      "reason": "Compatibility helper mutates a caller-supplied config file; concrete agent config ownership is registered at callers.",
-      "storeId": null,
-      "exemptionId": "config-scope-migration-helper",
-      "ordinal": 0
-    },
-    {
-      "sourceFile": "shared/migrate-config-scope.ts",
-      "kind": "secret-write",
-      "excerpt": "writeSecretFileSync(backupPath, ac.content)",
-      "reason": "Compatibility helper mutates a caller-supplied config file; concrete agent config ownership is registered at callers.",
-      "storeId": null,
-      "exemptionId": "config-scope-migration-helper",
-      "ordinal": 0
-    },
-    {
       "sourceFile": "shared/safe-fs.ts",
       "kind": "copy-file",
       "excerpt": "fs.copyFileSync(s, d)",
@@ -9445,50 +8581,10 @@
       ]
     },
     {
-      "id": "config-scope-migration-helper",
-      "ownerModule": "shared/migrate-config-scope.ts",
-      "sourceFile": "shared/migrate-config-scope.ts",
-      "reason": "Compatibility helper mutates a caller-supplied config file; concrete agent config ownership is registered at callers.",
-      "expiresOn": "2026-10-31",
-      "kinds": [
-        "database-open",
-        "write-file",
-        "append-file",
-        "rename",
-        "copy-file",
-        "mkdir",
-        "remove-path",
-        "truncate-file",
-        "atomic-write",
-        "secret-write",
-        "persistent-store-constructor"
-      ]
-    },
-    {
       "id": "cross-store-first-run-bootstrap",
       "ownerModule": "core/first-run.ts",
       "sourceFile": "core/first-run.ts",
       "reason": "First-run seeds several registered stores from packaged templates. Flow-sensitive attribution moves into the future coordinator; this exact composition file is not ignored by directory.",
-      "expiresOn": "2026-10-31",
-      "kinds": [
-        "database-open",
-        "write-file",
-        "append-file",
-        "rename",
-        "copy-file",
-        "mkdir",
-        "remove-path",
-        "truncate-file",
-        "atomic-write",
-        "secret-write",
-        "persistent-store-constructor"
-      ]
-    },
-    {
-      "id": "cross-store-legacy-migrations",
-      "ownerModule": "core/migrations.ts",
-      "sourceFile": "core/migrations.ts",
-      "reason": "The legacy migration orchestrator mutates many registered targets. Each target is inventoried, while exact-site flow attribution remains prerequisite work for the coordinator.",
       "expiresOn": "2026-10-31",
       "kinds": [
         "database-open",
@@ -9852,15 +8948,24 @@
       "linePattern": "ConfirmStore"
     },
     {
-      "id": "legacy-hanako-home-migration",
-      "ownerModule": "shared/hana-runtime-paths.cjs",
-      "sourceFile": "shared/hana-runtime-paths.cjs",
-      "reason": "Relocates the entire legacy ~/.hanako home directory to ~/.lingxi on first launch when LINGXI_HOME is unset; it moves every store as one tree and writes no store content itself.",
+      "id": "lib-extract-zip-caller-destination",
+      "ownerModule": "lib/extract-zip.ts",
+      "sourceFile": "lib/extract-zip.ts",
+      "reason": "Extracts zip entries into a destination directory explicitly selected by the caller (skill/plugin/character-card staging), outside any implied LINGXI_HOME store.",
       "expiresOn": "2027-01-31",
       "kinds": [
-        "rename"
-      ],
-      "linePattern": "renameSync\\(legacyHome"
+        "database-open",
+        "write-file",
+        "append-file",
+        "rename",
+        "copy-file",
+        "mkdir",
+        "remove-path",
+        "truncate-file",
+        "atomic-write",
+        "secret-write",
+        "persistent-store-constructor"
+      ]
     },
     {
       "id": "local-user-account-atomic-helper",
