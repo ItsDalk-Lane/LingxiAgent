@@ -667,11 +667,11 @@ function findNextTurnInputIndex(branch, startIndex) {
 
 function findUserEnvelopeStartIndex(branch, userIndex) {
   let index = userIndex;
-  while (index > 0 && isHanaUserEnvelopeEntry(branch[index - 1])) index -= 1;
+  while (index > 0 && isLingxiUserEnvelopeEntry(branch[index - 1])) index -= 1;
   return index;
 }
 
-function isHanaUserEnvelopeEntry(entry) {
+function isLingxiUserEnvelopeEntry(entry) {
   return entry?.type === "custom" && LINGXI_USER_ENVELOPE_TYPES.has(entry.customType);
 }
 

@@ -20,7 +20,7 @@ describe("resolveWin32SandboxHelper", () => {
         LINGXI_DESKTOP_RESOURCES_PATH: "C:\\Hana\\resources",
         LINGXI_DESKTOP_IS_PACKAGED: "1",
         LINGXI_DESKTOP_APP_PATH: "C:\\OldHana\\resources\\app.asar",
-        LINGXI_DESKTOP_EXEC_PATH: "C:\\OldHana\\HanaAgent.exe",
+        LINGXI_DESKTOP_EXEC_PATH: "C:\\OldHana\\LingxiAgent.exe",
       },
       resourcesPath: "C:\\Electron\\resources",
       cwd: "C:\\repo",
@@ -30,7 +30,7 @@ describe("resolveWin32SandboxHelper", () => {
   });
 
   it("resolves the installed helper and bundled Git from old packaged-shell variables", () => {
-    const appPath = "C:\\Program Files\\HanaAgent\\resources\\app.asar";
+    const appPath = "C:\\Program Files\\LingxiAgent\\resources\\app.asar";
     const expectedResources = path.win32.dirname(appPath);
     const expectedHelper = path.win32.join(
       expectedResources,
@@ -42,7 +42,7 @@ describe("resolveWin32SandboxHelper", () => {
     const env = {
       LINGXI_DESKTOP_IS_PACKAGED: "1",
       LINGXI_DESKTOP_APP_PATH: appPath,
-      LINGXI_DESKTOP_EXEC_PATH: "C:\\Program Files\\HanaAgent\\HanaAgent.exe",
+      LINGXI_DESKTOP_EXEC_PATH: "C:\\Program Files\\LingxiAgent\\LingxiAgent.exe",
       LINGXI_ROOT: "C:\\Users\\Hana\\.hanako\\artifacts\\server\\0.412.7",
     };
     const existsSync = (candidate: string) => candidate === expectedHelper || candidate === expectedGit;
@@ -70,7 +70,7 @@ describe("resolveWin32SandboxHelper", () => {
         LINGXI_DESKTOP_RESOURCES_PATH: explicitResources,
         LINGXI_DESKTOP_IS_PACKAGED: "1",
         LINGXI_DESKTOP_APP_PATH: "C:\\OldHana\\resources\\app.asar",
-        LINGXI_DESKTOP_EXEC_PATH: "C:\\OldHana\\HanaAgent.exe",
+        LINGXI_DESKTOP_EXEC_PATH: "C:\\OldHana\\LingxiAgent.exe",
       },
       resourcesPath: null,
       existsSync: () => true,
@@ -89,7 +89,7 @@ describe("resolveWin32SandboxHelper", () => {
       env: {
         LINGXI_DESKTOP_IS_PACKAGED: "0",
         LINGXI_DESKTOP_APP_PATH: "C:\\Hana\\resources\\app.asar",
-        LINGXI_DESKTOP_EXEC_PATH: "C:\\Hana\\HanaAgent.exe",
+        LINGXI_DESKTOP_EXEC_PATH: "C:\\Hana\\LingxiAgent.exe",
       },
       resourcesPath: null,
       cwd: "C:\\repo",
@@ -103,7 +103,7 @@ describe("resolveWin32SandboxHelper", () => {
       env: {
         LINGXI_DESKTOP_IS_PACKAGED: "1",
         LINGXI_DESKTOP_APP_PATH: "C:\\Hana\\resources\\app.asar",
-        LINGXI_DESKTOP_EXEC_PATH: "C:\\Hana\\HanaAgent.exe",
+        LINGXI_DESKTOP_EXEC_PATH: "C:\\Hana\\LingxiAgent.exe",
         LINGXI_ROOT: "C:\\Users\\Hana\\.hanako\\artifacts\\server\\0.412.7",
       },
       resourcesPath: null,

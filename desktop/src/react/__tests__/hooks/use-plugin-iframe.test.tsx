@@ -10,7 +10,7 @@ import {
   PLUGIN_UI_ERROR_CODE,
   PLUGIN_UI_PROTOCOL,
   PLUGIN_UI_PROTOCOL_VERSION,
-} from '@hana/plugin-protocol';
+} from '@lingxi/plugin-protocol';
 import type { PluginUiCapability } from '../../plugin-ui/plugin-ui-host-controller';
 
 const switchTab = vi.fn();

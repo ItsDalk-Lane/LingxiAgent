@@ -163,11 +163,11 @@ describe("guardAgainstForeignServer (CLI pre-spawn 同宅互斥预判)", () => {
     const deadResult = await guardAgainstForeignServer({ hanaHome, probeImpl: async () => ({ status: "dead" as const }) });
     expect(deadResult).toEqual({ blocked: false, message: null });
 
-    const notHanaResult = await guardAgainstForeignServer({
+    const notLingxiResult = await guardAgainstForeignServer({
       hanaHome,
       probeImpl: async () => ({ status: "not-hana" as const, detail: "whatever" }),
     });
-    expect(notHanaResult).toEqual({ blocked: false, message: null });
+    expect(notLingxiResult).toEqual({ blocked: false, message: null });
   });
 
   it("ignores whether the recorded pid looks alive — the probe result is the sole source of truth", async () => {

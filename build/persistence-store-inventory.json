@@ -158,11 +158,11 @@
         "compatibility": "The named runtime reader is canonical; this inventory does not imply stricter validation than runtime currently performs."
       },
       "openEntry": [
-        "HanaAgent.init",
+        "LingxiAgent.init",
         "memory ticker and summary stores"
       ],
       "migrationEntry": [
-        "HanaAgent v1 memories.db import",
+        "LingxiAgent v1 memories.db import",
         "core/migrations.ts memory migrations"
       ],
       "protocolModules": [],
@@ -246,7 +246,7 @@
       },
       "openEntry": [
         "AgentManager.loadAgents",
-        "new HanaAgent"
+        "new LingxiAgent"
       ],
       "migrationEntry": [
         "lib/compat/checks/config-yaml.ts"

@@ -668,7 +668,7 @@
     ],
     "version": 3
   },
-  "payloadFingerprint": "sha256:93a70ef4d8cadb1ebdd0920195bebb0c9abb8f49cdc16e312e593fcf73641e57",
+  "payloadFingerprint": "sha256:102d48b0cafbcb5d45e81430631d7be47fc34a2c7d38ec46e195f4fe6e1e55d1",
   "registry": [
     {
       "affectedByEpochMigration": true,
@@ -761,11 +761,11 @@
       "id": "agent-memory",
       "identityContract": "agentId owns long-term memory; session summaries are keyed by sessionId, never by sessionPath.",
       "migrationEntry": [
-        "HanaAgent v1 memories.db import",
+        "LingxiAgent v1 memories.db import",
         "core/migrations.ts memory migrations"
       ],
       "openEntry": [
-        "HanaAgent.init",
+        "LingxiAgent.init",
         "memory ticker and summary stores"
       ],
       "ownerModule": "lib/memory/compile.ts",
@@ -856,7 +856,7 @@
       ],
       "openEntry": [
         "AgentManager.loadAgents",
-        "new HanaAgent"
+        "new LingxiAgent"
       ],
       "ownerModule": "core/agent-manager.ts",
       "pathExclusions": [],
@@ -3118,8 +3118,8 @@
   ],
   "review": {
     "classification": "compatible",
-    "compatibilityReason": "internal class rename HanaEngine->LingxiEngine, HanaFetch->LingxiFetch; data format unchanged",
-    "payloadFingerprint": "sha256:93a70ef4d8cadb1ebdd0920195bebb0c9abb8f49cdc16e312e593fcf73641e57"
+    "compatibilityReason": "SDK + Swift identifiers renamed; data format unchanged",
+    "payloadFingerprint": "sha256:102d48b0cafbcb5d45e81430631d7be47fc34a2c7d38ec46e195f4fe6e1e55d1"
   },
   "schemas": [
     {
@@ -3316,7 +3316,7 @@
       "contract": "desktop window bounds, release announcement bookmark, and update cache version marker readers",
       "kind": "directory-contract",
       "module": "desktop/main.cjs",
-      "sourceHash": "sha256:5616b36289e173e20772308be1408617b7b21f2db10d19b63b4f0168874d097a",
+      "sourceHash": "sha256:54c8fc9317a63927e4102e30c2a186444b0277db0f88a9c0a2e999785ec48c3c",
       "storeId": "desktop-window-version-state"
     },
     {
@@ -3428,7 +3428,7 @@
       "contract": "job.json/input.html request contract and generated PDF output lifecycle",
       "kind": "directory-contract",
       "module": "plugins/office/lib/html-to-pdf.ts",
-      "sourceHash": "sha256:3d1d27ffef162f14a0ae5fd34eb609ef076ca89e610de6756f00ebcd918980e4",
+      "sourceHash": "sha256:de4563aff55d4efcf23d5634c1f046a3839d5f7ec85c29b9bb38f5330556eecc",
       "storeId": "office-render-jobs"
     },
     {
@@ -3476,7 +3476,7 @@
       "contract": "debug logs, browser cold state, switch diagnostics, and WeChat cache readers",
       "kind": "directory-contract",
       "module": "lib/debug-log.ts",
-      "sourceHash": "sha256:b17c104fd85fe7f3751137519fdb4ff4d8aec2d5a386e0fb358167d83da6ede6",
+      "sourceHash": "sha256:e8ae38e9f015d1964e34cca8e2ad0aa3523691e4d34038700955382412bf6861",
       "storeId": "runtime-diagnostics"
     },
     {
@@ -3518,7 +3518,7 @@
       "contract": "server-info writer and desktop bootstrap reader",
       "kind": "runtime-contract",
       "module": "server/index.ts",
-      "sourceHash": "sha256:4823cfdabd78deeb3e5de1fe72ec162b81bd822811636a8da41c70af2a644c2d",
+      "sourceHash": "sha256:6fe55798f4aeb11c2c5306b289cba2dd0037567d5c057eaae0255c1caa875c20",
       "storeId": "server-runtime-info"
     },
     {
@@ -3652,7 +3652,7 @@
       "contract": "SKILL.md package, bundle registry, and export staging protocols",
       "kind": "directory-contract",
       "module": "lib/skills/skill-package-installer.ts",
-      "sourceHash": "sha256:5a2271d372236897663e9f9c1da68b5d886bdfa720f3edfea78277c6e26e754e",
+      "sourceHash": "sha256:5487c25f6137155106a92a01f2647820f60e06167e45a87a416cf59a4e30b8e9",
       "storeId": "skill-state"
     },
     {
@@ -3715,7 +3715,7 @@
       "contract": "Windows sandbox migration marker readers",
       "kind": "runtime-contract",
       "module": "lib/sandbox/win32-legacy-migration.ts",
-      "sourceHash": "sha256:46672032c7ec242c4395e29556066864ee36d3dec59183a8ddf7bbef4d1c56ec",
+      "sourceHash": "sha256:9139e15e9efcd447ad109f426750790b3f82f35e5fccd86ad897a30802cb93c9",
       "storeId": "windows-sandbox-migration-state"
     },
     {

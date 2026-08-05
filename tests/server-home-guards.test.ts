@@ -115,7 +115,7 @@ describe("server/index.ts source-order contract: home guards run before any stor
     expect(bindIndex).toBeLessThan(firstRunIndex);
     expect(identityIndex).toBeGreaterThan(firstRunIndex);
     expect(identityIndex).toBeLessThan(engineIndex);
-    expect(source).not.toContain("ensureHanaPiSdkDirs");
+    expect(source).not.toContain("ensureLingxiPiSdkDirs");
     expect(source).not.toContain("configureProcessPiSdkEnv");
   });
 

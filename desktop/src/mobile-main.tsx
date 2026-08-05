@@ -24,7 +24,7 @@ void import('./react/mobile/MobileApp').then(({ MobileApp }) => {
   const translated = window.t?.('mobile.startupFailed');
   root.textContent = translated && translated !== 'mobile.startupFailed'
     ? translated
-    : 'HanaAgent failed to start';
+    : 'LingxiAgent failed to start';
 });
 
 const MOBILE_UPDATE_AVAILABLE_EVENT = 'hana-mobile-update-available';

@@ -43,11 +43,11 @@ function helperPath(root: any) {
   return path.posix.join(root, "hana-computer-use-helper");
 }
 
-function defaultHanaComputerUseSocketPath(homeDir = os.homedir()) {
+function defaultLingxiComputerUseSocketPath(homeDir = os.homedir()) {
   return path.join(homeDir, "Library", "Caches", "hana-computer-use", "hana-computer-use-helper.sock");
 }
 
-function commandIsBundledHanaHelper(command: any) {
+function commandIsBundledLingxiHelper(command: any) {
   return path.posix.basename(String(command || "")) === "hana-computer-use-helper";
 }
 
@@ -85,7 +85,7 @@ function resourcesRootFromPackagedExecPath(value: any) {
   return path.posix.join(contentsRoot, "Resources");
 }
 
-function resourcesRootFromLegacyHanaRoot(value: any) {
+function resourcesRootFromLegacyLingxiRoot(value: any) {
   const hanaRoot = normalizedAbsolutePosixPath(value);
   if (!hanaRoot || path.posix.basename(hanaRoot) !== "server") return null;
   return macAppResourcesRoot(path.posix.dirname(hanaRoot));
@@ -107,19 +107,19 @@ function packagedHelperCandidates({ env, hanaRoot }: any) {
   // Shells predating the desktop path contract launched the server directly
   // from Contents/Resources/server. Accept only that exact app-bundle shape;
   // an OTA artifact root must never become a source of native helper code.
-  pushUniquePosixPath(roots, resourcesRootFromLegacyHanaRoot(hanaRoot));
+  pushUniquePosixPath(roots, resourcesRootFromLegacyLingxiRoot(hanaRoot));
   return roots.map((root) => helperPath(path.posix.join(root, "computer-use", "macos")));
 }
 
 function developmentHelperCandidates({ env, hanaRoot, cwd, arch }: any) {
   if (env.LINGXI_DESKTOP_IS_PACKAGED === "1") return [];
   const candidates: string[] = [];
-  const normalizedHanaRoot = normalizedAbsolutePosixPath(hanaRoot);
+  const normalizedLingxiRoot = normalizedAbsolutePosixPath(hanaRoot);
   const normalizedCwd = normalizedAbsolutePosixPath(cwd);
-  if (normalizedHanaRoot) {
+  if (normalizedLingxiRoot) {
     pushUniquePosixPath(
       candidates,
-      helperPath(path.posix.join(normalizedHanaRoot, "dist-computer-use", `mac-${arch}`)),
+      helperPath(path.posix.join(normalizedLingxiRoot, "dist-computer-use", `mac-${arch}`)),
     );
   }
   if (normalizedCwd) {
@@ -571,7 +571,7 @@ export function createMacosCuaProvider({
   timeoutMs = 30000,
   launchRetryAttempts = 3,
   launchRetryDelayMs = 350,
-  socketPath = process.env[LINGXI_AGENT_SOCKET_PATH_ENV] || defaultHanaComputerUseSocketPath(),
+  socketPath = process.env[LINGXI_AGENT_SOCKET_PATH_ENV] || defaultLingxiComputerUseSocketPath(),
   autoStartDaemon = null,
   daemonStartupTimeoutMs = 5000,
 } = {}) {
@@ -581,11 +581,11 @@ export function createMacosCuaProvider({
   let managedDaemonActive = false;
   let spawnedDaemonChild = null;
   let spawnedDaemonPid = null;
-  const bundledHanaHelper = commandIsBundledHanaHelper(command);
-  const shouldAutoStartDaemon = autoStartDaemon ?? bundledHanaHelper;
+  const bundledLingxiHelper = commandIsBundledLingxiHelper(command);
+  const shouldAutoStartDaemon = autoStartDaemon ?? bundledLingxiHelper;
   const resolvedCursorStyle = normalizeCursorStyle({ cursorStyle, cursorImagePath, cursorBloomColor });
-  const nativeCursorEnabled = bundledHanaHelper && cursorEnabled !== false && Boolean(resolvedCursorStyle);
-  const hanaCursorRuntimeConfig = resolvedCursorStyle && bundledHanaHelper
+  const nativeCursorEnabled = bundledLingxiHelper && cursorEnabled !== false && Boolean(resolvedCursorStyle);
+  const hanaCursorRuntimeConfig = resolvedCursorStyle && bundledLingxiHelper
     ? {
         enabled: cursorEnabled !== false,
         style: { ...resolvedCursorStyle },
@@ -762,7 +762,7 @@ export function createMacosCuaProvider({
   }
 
   async function stopManagedDaemon() {
-    if (!bundledHanaHelper || !shouldAutoStartDaemon) {
+    if (!bundledLingxiHelper || !shouldAutoStartDaemon) {
       return { stopped: false, reason: "not-managed" };
     }
     if (daemonStopPromise) return daemonStopPromise;
@@ -806,7 +806,7 @@ export function createMacosCuaProvider({
   }
 
   async function ensureNativeCursorConfigured() {
-    if (!resolvedCursorStyle || !bundledHanaHelper) return;
+    if (!resolvedCursorStyle || !bundledLingxiHelper) return;
     await ensureDaemonRunning();
     if (!nativeCursorConfigPromise) {
       nativeCursorConfigPromise = (async () => {
@@ -887,7 +887,7 @@ export function createMacosCuaProvider({
           providerId,
           available: false,
           reason: err?.code === "ENOENT"
-            ? (bundledHanaHelper ? "bundled-helper-missing" : "binary-not-found")
+            ? (bundledLingxiHelper ? "bundled-helper-missing" : "binary-not-found")
             : "status-failed",
           command,
           error: err?.message || String(err),

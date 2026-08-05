@@ -1,9 +1,9 @@
 /**
- * HanaAgent Desktop — Electron 主进程
+ * LingxiAgent Desktop — Electron 主进程
  *
  * 职责：
  * 1. 创建启动窗口（splash）
- * 2. spawn() 启动 HanaAgent Server
+ * 2. spawn() 启动 LingxiAgent Server
  * 3. 等待 server 就绪 + 主窗口初始化完成
  * 4. 关闭 splash，显示主窗口
  * 5. 优雅关闭
@@ -120,7 +120,7 @@ const APP_USER_MODEL_ID = "com.hanako.app"; // Keep in sync with package.json bu
   const preloadPath = path.join(__dirname, "preload.bundle.cjs");
   if (!fs.existsSync(preloadPath)) {
     const msg = `Missing preload bundle:\n${preloadPath}\n\nBuild is incomplete. Run 'npm run build:preload' or rebuild the installer.`;
-    try { dialog.showErrorBox("HanaAgent failed to start", msg); } catch {}
+    try { dialog.showErrorBox("LingxiAgent failed to start", msg); } catch {}
     console.error("[desktop] " + redactLogText(msg));
     process.exit(1);
   }
@@ -270,7 +270,7 @@ async function serverEnvironmentForNetworkProxy(baseEnv) {
 }
 
 // 按 LINGXI_HOME 隔离 Electron userData（localStorage / cache / session）
-// 生产: ~/Library/Application Support/Hanako（历史目录，随 HanaAgent 显示名保留）
+// 生产: ~/Library/Application Support/Hanako（历史目录，随 LingxiAgent 显示名保留）
 // 开发: ~/Library/Application Support/Hanako-dev
 const defaultHome = path.join(os.homedir(), ".hanako");
 configureClientSingleInstance(app, {
@@ -760,7 +760,7 @@ function createBrowserWindowWithDiagnostics(label, opts, { windowsMinimalRetry =
       height: opts?.height || 820,
       minWidth: opts?.minWidth,
       minHeight: opts?.minHeight,
-      title: opts?.title || "HanaAgent",
+      title: opts?.title || "LingxiAgent",
       show: opts?.show === true,
       ...(opts?.x != null ? { x: opts.x } : {}),
       ...(opts?.y != null ? { y: opts.y } : {}),
@@ -1233,8 +1233,8 @@ async function startServer() {
         console.warn(`[desktop] 残留 server PID ${existingInfo.pid} 仍存活，保留 server-info.json 供下次启动识别`);
         if (disposition.failFast) {
           const err = new Error(
-            `STALE_SERVER_UNCLEANED: residual HanaAgent server (PID ${existingInfo.pid}) is still running and holds port ${Number.isInteger(stalePort) ? stalePort : "unknown"} (${verification.reason}). ` +
-            `Quit it from Task Manager (look for hana-server.exe) or restart the computer, then launch HanaAgent again.`
+            `STALE_SERVER_UNCLEANED: residual LingxiAgent server (PID ${existingInfo.pid}) is still running and holds port ${Number.isInteger(stalePort) ? stalePort : "unknown"} (${verification.reason}). ` +
+            `Quit it from Task Manager (look for hana-server.exe) or restart the computer, then launch LingxiAgent again.`
           );
           err.code = "STALE_SERVER_UNCLEANED";
           throw err;
@@ -1358,7 +1358,7 @@ async function resolvePackagedArtifactBoot() {
     if (app.isPackaged) {
       throw new Error(
         `Packaged app is missing its artifact seed (expected under ${path.join(resourcesPath, "seed")}). `
-          + "The installation is broken — please reinstall HanaAgent.",
+          + "The installation is broken — please reinstall LingxiAgent.",
       );
     }
     return null;
@@ -1452,7 +1452,7 @@ function notifyComponentQuarantined() {
   try {
     if (!Notification.isSupported()) return;
     const notif = new Notification({
-      title: "HanaAgent",
+      title: "LingxiAgent",
       body: mt(
         "notification.componentQuarantined",
         null,
@@ -1648,7 +1648,7 @@ async function triggerArtifactRepairFlow() {
     detail: mt(
       "dialog.repairArtifactsBody",
       null,
-      "This resets HanaAgent's app components to the originally installed version and restarts the app. Your data (agents, sessions, settings) is not affected.",
+      "This resets LingxiAgent's app components to the originally installed version and restarts the app. Your data (agents, sessions, settings) is not affected.",
     ),
   });
   if (result.response !== 0) return; // 取消
@@ -1792,7 +1792,7 @@ async function _spawnServerOnce(serverInfoPath, artifactBootContext) {
     });
     if (!guardianBin) {
       throw new Error(
-        "WINDOWS_SERVER_GUARDIAN_MISSING: hana-win-sandbox.exe is required to supervise the server process tree. Rebuild or reinstall HanaAgent."
+        "WINDOWS_SERVER_GUARDIAN_MISSING: hana-win-sandbox.exe is required to supervise the server process tree. Rebuild or reinstall LingxiAgent."
       );
     }
     serverEnv.LINGXI_WIN32_SANDBOX_HELPER = guardianBin;
@@ -1956,7 +1956,7 @@ function monitorServer() {
         writeCrashLog(`Server 重启失败: ${err.message}`);
         // 壳身份用途：崩溃诊断对话框，问的是"哪个壳进程崩了"，见
         // getCurrentContentVersion() 声明处对这类诊断文案的例外说明。
-        dialog.showErrorBox("HanaAgent Server", mt("dialog.serverRestartFailed", {
+        dialog.showErrorBox("LingxiAgent Server", mt("dialog.serverRestartFailed", {
           version: app?.getVersion?.() || "unknown",
           error: err.message,
         }));
@@ -1964,7 +1964,7 @@ function monitorServer() {
     } else {
       writeCrashLog(`Server 多次崩溃 (${reason})，放弃重启`);
       // 壳身份用途：同上。
-      dialog.showErrorBox("HanaAgent Server", mt("dialog.serverMultipleCrash", {
+      dialog.showErrorBox("LingxiAgent Server", mt("dialog.serverMultipleCrash", {
         version: app?.getVersion?.() || "unknown",
         reason,
       }));
@@ -1984,7 +1984,7 @@ function showPrimaryWindow() {
 /**
  * 创建系统托盘图标
  * - 双击：显示主窗口
- * - 右键菜单：显示 HanaAgent / 设置 / 退出
+ * - 右键菜单：显示 LingxiAgent / 设置 / 退出
  */
 function resolveTrayAssetCandidates(fileName) {
   const candidates = [];
@@ -2024,10 +2024,10 @@ function createTray() {
     if (process.platform === "darwin") resolved.image.setTemplateImage(true);
   }
   tray = new Tray(resolved.image);
-  tray.setToolTip(isDev ? "HanaAgent (dev)" : "HanaAgent");
+  tray.setToolTip(isDev ? "LingxiAgent (dev)" : "LingxiAgent");
 
   const buildMenu = () => Menu.buildFromTemplate([
-    { label: mt("tray.show", null, "Show HanaAgent"), click: () => showPrimaryWindow() },
+    { label: mt("tray.show", null, "Show LingxiAgent"), click: () => showPrimaryWindow() },
     { label: mt("tray.settings", null, "Settings"), click: () => createSettingsWindow() },
     { type: "separator" },
     // 修复逃生门：本仓库没有独立的应用菜单栏基础设施
@@ -2248,10 +2248,10 @@ function writeCrashLog(errorMessage) {
   const diagnostics = buildServerCrashDiagnostics();
 
   const content = redactMainLogText([
-    `=== HanaAgent Crash Log ===`,
+    `=== LingxiAgent Crash Log ===`,
     // 壳身份用途：crash log 记录的是"哪个壳进程崩了"，见
     // getCurrentContentVersion() 声明处对这类诊断文案的例外说明。
-    `HanaAgent: v${app?.getVersion?.() || "unknown"}`,
+    `LingxiAgent: v${app?.getVersion?.() || "unknown"}`,
     `Time: ${timestamp}`,
     `Error: ${errorMessage}`,
     `Platform: ${process.platform} ${process.arch}`,
@@ -2292,7 +2292,7 @@ function createSplashWindow() {
     height: 280,
     resizable: false,
     frame: false,
-    title: "HanaAgent",
+    title: "LingxiAgent",
     ...titleBarOpts({ x: 12, y: 12 }),
     transparent: true,
     show: false,
@@ -2766,7 +2766,7 @@ function createMainWindow() {
     height: saved?.height || 820,
     minWidth: 420,
     minHeight: 500,
-    title: "HanaAgent",
+    title: "LingxiAgent",
     ...titleBarOpts({ x: 16, y: 16 }),
     backgroundColor: getThemeBackgroundColor(initialTheme),
     show: false,
@@ -4360,7 +4360,7 @@ function createOnboardingWindow(query = {}) {
     height: 780,
     resizable: false,
     frame: false,
-    title: "HanaAgent",
+    title: "LingxiAgent",
     ...titleBarOpts({ x: 16, y: 16 }),
     backgroundColor: getThemeBackgroundColor(initialTheme),
     show: false,
@@ -4865,7 +4865,7 @@ function buildScreenshotHTML(payload) {
   ${bodyHTML}
   <footer class="watermark">
     <img class="watermark-logo" src="${logoUrl}" />
-    <span class="watermark-text">HanaAgent</span>
+    <span class="watermark-text">LingxiAgent</span>
   </footer>
 </body>
 </html>`;
@@ -5063,10 +5063,10 @@ async function applyTrainUpdateNow(senderWebContents) {
       // 用跟现有崩溃重启失败同款的错误对话框告知用户重启应用（复用既有
       // installFailedTitle 键——同属"更新失败"这一类对话框标题）。
       // 壳身份用途：诊断对话框，见 getCurrentContentVersion() 声明处的例外说明。
-      dialog.showErrorBox(mt("dialog.installFailedTitle", null, "HanaAgent Update"), mt(
+      dialog.showErrorBox(mt("dialog.installFailedTitle", null, "LingxiAgent Update"), mt(
         "dialog.trainUpdateApplyFailedBody",
         { version: app?.getVersion?.() || "unknown", error: result.error },
-        `HanaAgent update failed to apply: ${result.error}\n\nPlease restart the app.`,
+        `LingxiAgent update failed to apply: ${result.error}\n\nPlease restart the app.`,
       ));
     }
     return { ok: false, error: result.error };
@@ -5402,7 +5402,7 @@ wrapIpcOn("settings-changed", (_event, type, data) => {
     // 重建托盘菜单，使标签跟随新 locale
     if (tray && !tray.isDestroyed()) {
       const buildMenu = () => Menu.buildFromTemplate([
-        { label: mt("tray.show", null, "Show HanaAgent"), click: () => showPrimaryWindow() },
+        { label: mt("tray.show", null, "Show LingxiAgent"), click: () => showPrimaryWindow() },
         { label: mt("tray.settings", null, "Settings"), click: () => createSettingsWindow() },
         { type: "separator" },
         { label: mt("tray.repairArtifacts", null, "Repair Components…"), click: () => { triggerArtifactRepairFlow().catch((err) => console.error(`[desktop] repair flow failed: ${err.message}`)); } },
@@ -6041,7 +6041,7 @@ app.whenReady().then(async () => {
         startupId: desktopStartupId,
       });
     }
-    console.log("[desktop] 启动 HanaAgent Server...");
+    console.log("[desktop] 启动 LingxiAgent Server...");
     await startServer();
     await settleLegacyGpuPreferenceAfterServerStart();
     if (process.platform === "win32") {
@@ -6157,7 +6157,7 @@ app.whenReady().then(async () => {
     // 壳身份用途：启动失败对话框，见 getCurrentContentVersion() 声明处的
     // 例外说明——这里问的是"哪个壳进程启动失败"。
     dialog.showErrorBox(
-      mt("dialog.launchFailedTitle", null, "HanaAgent Launch Failed"),
+      mt("dialog.launchFailedTitle", null, "LingxiAgent Launch Failed"),
       mt("dialog.launchFailedBody", {
         version: app?.getVersion?.() || "unknown",
         detail,

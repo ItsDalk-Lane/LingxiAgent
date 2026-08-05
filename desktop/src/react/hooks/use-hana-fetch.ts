@@ -8,7 +8,7 @@ import {
 const DEFAULT_TIMEOUT = 30_000;
 
 /**
- * 构建带认证的 HanaAgent Server URL
+ * 构建带认证的 LingxiAgent Server URL
  */
 export function lingxiUrl(path: string): string {
   const connection = requireServerConnection(

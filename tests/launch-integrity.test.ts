@@ -41,7 +41,7 @@ describe("desktop launch integrity helper", () => {
     const tmp = makeTempDir();
     const resourcesPath = path.join(tmp, "resources");
     const result = helper.checkWindowsInstallSurface({
-      execPath: path.join(tmp, "HanaAgent.exe"),
+      execPath: path.join(tmp, "LingxiAgent.exe"),
       resourcesPath,
     });
 
@@ -57,7 +57,7 @@ describe("desktop launch integrity helper", () => {
       "bundled-git",
     ]);
     expect(result.missing.map(item => item.relativePath)).toEqual([
-      "HanaAgent.exe",
+      "LingxiAgent.exe",
       "resources/app.asar",
       "resources/app-update.yml",
       "resources/seed/seed-train-*.json",
@@ -74,7 +74,7 @@ describe("desktop launch integrity helper", () => {
 
     const tmp = makeTempDir();
     const resourcesPath = path.join(tmp, "resources");
-    writeFile(tmp, "HanaAgent.exe");
+    writeFile(tmp, "LingxiAgent.exe");
     writeFile(resourcesPath, "app.asar");
     writeFile(resourcesPath, "app-update.yml");
     writeFile(resourcesPath, "seed/seed-train-win32-x64.json");
@@ -85,7 +85,7 @@ describe("desktop launch integrity helper", () => {
     writeFile(resourcesPath, "git/usr/bin/sh.exe");
 
     const result = helper.checkWindowsInstallSurface({
-      execPath: path.join(tmp, "HanaAgent.exe"),
+      execPath: path.join(tmp, "LingxiAgent.exe"),
       resourcesPath,
     });
 
@@ -112,7 +112,7 @@ describe("desktop launch integrity helper", () => {
 
     const tmp = makeTempDir();
     const resourcesPath = path.join(tmp, "resources");
-    writeFile(tmp, "HanaAgent.exe");
+    writeFile(tmp, "LingxiAgent.exe");
     writeFile(resourcesPath, "app.asar");
     writeFile(resourcesPath, "app-update.yml");
     // Old scattered layout only — no resources/seed/ at all.
@@ -124,7 +124,7 @@ describe("desktop launch integrity helper", () => {
     writeFile(resourcesPath, "git/usr/bin/sh.exe");
 
     const result = helper.checkWindowsInstallSurface({
-      execPath: path.join(tmp, "HanaAgent.exe"),
+      execPath: path.join(tmp, "LingxiAgent.exe"),
       resourcesPath,
     });
 
@@ -143,7 +143,7 @@ describe("desktop launch integrity helper", () => {
 
     const tmp = makeTempDir();
     const resourcesPath = path.join(tmp, "resources");
-    writeFile(tmp, "HanaAgent.exe");
+    writeFile(tmp, "LingxiAgent.exe");
     writeFile(resourcesPath, "app.asar");
     writeFile(resourcesPath, "app-update.yml");
     writeFile(resourcesPath, "seed/seed-train-win32-x64.json");
@@ -153,7 +153,7 @@ describe("desktop launch integrity helper", () => {
     writeFile(resourcesPath, "git/usr/bin/sh.exe");
 
     const result = helper.checkWindowsInstallSurface({
-      execPath: path.join(tmp, "HanaAgent.exe"),
+      execPath: path.join(tmp, "LingxiAgent.exe"),
       resourcesPath,
     });
 
@@ -167,7 +167,7 @@ describe("desktop launch integrity helper", () => {
 
     const tmp = makeTempDir();
     const resourcesPath = path.join(tmp, "resources");
-    writeFile(tmp, "HanaAgent.exe");
+    writeFile(tmp, "LingxiAgent.exe");
     writeFile(resourcesPath, "app.asar");
     writeFile(resourcesPath, "app-update.yml");
     writeFile(resourcesPath, "seed/seed-train-win32-x64.json");
@@ -177,7 +177,7 @@ describe("desktop launch integrity helper", () => {
     writeFile(resourcesPath, "git/usr/bin/sh.exe");
 
     const result = helper.checkWindowsInstallSurface({
-      execPath: path.join(tmp, "HanaAgent.exe"),
+      execPath: path.join(tmp, "LingxiAgent.exe"),
       resourcesPath,
     });
 
@@ -191,7 +191,7 @@ describe("desktop launch integrity helper", () => {
 
     const tmp = makeTempDir();
     const resourcesPath = path.join(tmp, "resources");
-    writeFile(tmp, "HanaAgent.exe");
+    writeFile(tmp, "LingxiAgent.exe");
     writeFile(resourcesPath, "app.asar");
     writeFile(resourcesPath, "app-update.yml");
     writeFile(resourcesPath, "seed/seed-train-win32-x64.json");
@@ -201,7 +201,7 @@ describe("desktop launch integrity helper", () => {
     writeFile(resourcesPath, "git/usr/bin/sh.exe");
 
     const result = helper.checkWindowsInstallSurface({
-      execPath: path.join(tmp, "HanaAgent.exe"),
+      execPath: path.join(tmp, "LingxiAgent.exe"),
       resourcesPath,
     });
 
@@ -215,7 +215,7 @@ describe("desktop launch integrity helper", () => {
 
     const tmp = makeTempDir();
     const resourcesPath = path.join(tmp, "resources");
-    writeFile(tmp, "HanaAgent.exe");
+    writeFile(tmp, "LingxiAgent.exe");
     writeFile(resourcesPath, "app.asar");
     writeFile(resourcesPath, "app-update.yml");
     writeFile(resourcesPath, "seed/seed-train-win32-x64.json");
@@ -226,7 +226,7 @@ describe("desktop launch integrity helper", () => {
     writeFile(resourcesPath, "git/usr/bin/bash.exe");
 
     const result = helper.checkWindowsInstallSurface({
-      execPath: path.join(tmp, "HanaAgent.exe"),
+      execPath: path.join(tmp, "LingxiAgent.exe"),
       resourcesPath,
     });
 
@@ -239,7 +239,7 @@ describe("desktop launch integrity helper", () => {
 
     const tmp = makeTempDir();
     const resourcesPath = path.join(tmp, "resources");
-    writeFile(tmp, "HanaAgent.exe");
+    writeFile(tmp, "LingxiAgent.exe");
     writeFile(resourcesPath, "app.asar");
     writeFile(resourcesPath, "app-update.yml");
     writeFile(resourcesPath, "seed/seed-train-win32-x64.json");
@@ -249,7 +249,7 @@ describe("desktop launch integrity helper", () => {
     writeFile(resourcesPath, "git/cmd/git.exe");
 
     const result = helper.checkWindowsInstallSurface({
-      execPath: path.join(tmp, "HanaAgent.exe"),
+      execPath: path.join(tmp, "LingxiAgent.exe"),
       resourcesPath,
     });
 
@@ -263,7 +263,7 @@ describe("desktop launch integrity helper", () => {
 
     const tmp = makeTempDir();
     const resourcesPath = path.join(tmp, "resources");
-    writeFile(tmp, "HanaAgent.exe");
+    writeFile(tmp, "LingxiAgent.exe");
     writeFile(resourcesPath, "app/desktop/bootstrap.cjs");
     writeFile(resourcesPath, "app/package.json");
     writeFile(resourcesPath, "app-update.yml");
@@ -275,7 +275,7 @@ describe("desktop launch integrity helper", () => {
     writeFile(resourcesPath, "git/usr/bin/sh.exe");
 
     const result = helper.checkWindowsInstallSurface({
-      execPath: path.join(tmp, "HanaAgent.exe"),
+      execPath: path.join(tmp, "LingxiAgent.exe"),
       resourcesPath,
     });
 
@@ -304,7 +304,7 @@ describe("desktop launch integrity helper", () => {
     const tmp = makeTempDir();
     const diagnosticsDir = path.join(tmp, "diagnostics");
     const result = helper.checkWindowsInstallSurface({
-      execPath: path.join(tmp, "HanaAgent.exe"),
+      execPath: path.join(tmp, "LingxiAgent.exe"),
       resourcesPath: path.join(tmp, "resources"),
     });
 

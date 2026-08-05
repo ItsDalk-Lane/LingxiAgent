@@ -52,7 +52,7 @@ function resultErrorText(result: ToolResultLike): string | null {
  * details.error values are diagnostics unless they match Hana's old helper
  * shape exactly.
  */
-export function isKnownLegacyHanaToolFailure(result: ToolResultLike): boolean {
+export function isKnownLegacyLingxiToolFailure(result: ToolResultLike): boolean {
   const details = recordOf(result.details);
   const errorCode = nonEmptyText(details?.errorCode);
   if (errorCode && (LEGACY_ERROR_CODE_RE.test(errorCode) || errorCode === "mcp_unavailable")) {
@@ -82,7 +82,7 @@ export function projectLiveToolResultOutcome(result: ToolResultLike): ToolOutcom
 
 export function projectToolResultOutcome(result: ToolResultLike): ToolOutcome {
   if (result?.isError === true) return projectLiveToolResultOutcome(result);
-  if (!isKnownLegacyHanaToolFailure(result)) return { status: "succeeded", success: true };
+  if (!isKnownLegacyLingxiToolFailure(result)) return { status: "succeeded", success: true };
   const error = resultErrorText(result);
   return { status: "failed", success: false, ...(error ? { error: shortText(error) } : {}) };
 }
@@ -109,7 +109,7 @@ export function projectKnownLegacyToolFailures(messages: unknown): unknown {
       !result
       || result.role !== "toolResult"
       || result.isError === true
-      || !isKnownLegacyHanaToolFailure(result)
+      || !isKnownLegacyLingxiToolFailure(result)
     ) {
       return message;
     }

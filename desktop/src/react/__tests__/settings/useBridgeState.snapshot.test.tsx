@@ -578,13 +578,13 @@ describe('useBridgeState snapshot hydration', () => {
   });
 
   it('keeps connection-test state and results owned by the Agent and request generation', async () => {
-    let resolveHanaTest!: (response: Response) => void;
+    let resolveLingxiTest!: (response: Response) => void;
     let resolveMioTest!: (response: Response) => void;
     mockLingxiFetch.mockImplementation((url: string) => {
       if (url.startsWith('/api/bridge/status?agentId=')) return new Promise<Response>(() => {});
       if (url === '/api/agents/mio/public-ishiki') return new Promise<Response>(() => {});
       if (url === '/api/bridge/test?agentId=hana') {
-        return new Promise<Response>((resolve) => { resolveHanaTest = resolve; });
+        return new Promise<Response>((resolve) => { resolveLingxiTest = resolve; });
       }
       if (url === '/api/bridge/test?agentId=mio') {
         return new Promise<Response>((resolve) => { resolveMioTest = resolve; });
@@ -604,7 +604,7 @@ describe('useBridgeState snapshot hydration', () => {
     expect(screen.getByTestId('testing-platform')).toHaveTextContent('telegram');
 
     await act(async () => {
-      resolveHanaTest(new Response(JSON.stringify({
+      resolveLingxiTest(new Response(JSON.stringify({
         ok: true,
         info: { username: 'old_hana_bot' },
       })));

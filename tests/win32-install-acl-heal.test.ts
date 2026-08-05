@@ -33,7 +33,7 @@ function writeGpuState(hanakoHome: string, state: object) {
   fs.writeFileSync(gpuStatePath(hanakoHome), JSON.stringify(state, null, 2) + "\n", "utf-8");
 }
 
-const INSTALL_DIR = "C:\\Users\\demo\\AppData\\Local\\Programs\\HanaAgent";
+const INSTALL_DIR = "C:\\Users\\demo\\AppData\\Local\\Programs\\LingxiAgent";
 const ICACLS = "C:\\Windows\\System32\\icacls.exe";
 
 function baseInput(hanakoHome: string, overrides: object = {}) {

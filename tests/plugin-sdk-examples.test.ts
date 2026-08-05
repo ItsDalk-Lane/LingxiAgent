@@ -45,10 +45,10 @@ describe("plugin SDK examples and docs", () => {
   it("documents the SDK package map in a top-level guide", () => {
     const guide = fs.readFileSync(path.join(root, "PLUGIN_SDK.md"), "utf-8");
 
-    expect(guide).toContain("@hana/plugin-protocol");
-    expect(guide).toContain("@hana/plugin-sdk");
-    expect(guide).toContain("@hana/plugin-runtime");
-    expect(guide).toContain("@hana/plugin-components");
+    expect(guide).toContain("@lingxi/plugin-protocol");
+    expect(guide).toContain("@lingxi/plugin-sdk");
+    expect(guide).toContain("@lingxi/plugin-runtime");
+    expect(guide).toContain("@lingxi/plugin-components");
     expect(guide).toContain("hana.assets.url");
     expect(guide).toContain("getPluginRequestContext");
     expect(guide).toContain("stable discovery");
@@ -116,9 +116,9 @@ describe("plugin SDK examples and docs", () => {
     expect(tool).toContain("createMediaDetails");
     expect(tool).toContain("sessionPermission");
     expect(tool).toContain("plugin_output");
-    expect(panel).toContain("@hana/plugin-sdk");
-    expect(panel).toContain("@hana/plugin-components");
-    expect(panel).toContain("HanaThemeProvider");
+    expect(panel).toContain("@lingxi/plugin-sdk");
+    expect(panel).toContain("@lingxi/plugin-components");
+    expect(panel).toContain("LingxiThemeProvider");
     expect(readme).toContain("bundle the UI");
     expect(readme).toContain("hana.assets.url");
   });
@@ -134,21 +134,21 @@ describe("plugin SDK examples and docs", () => {
     expect(runtimeTypes).toContain("generateVideo");
     expect(runtimeTypes).toContain("generateMedia");
     expect(runtimeTypes).toContain("transcribeAudio");
-    expect(runtimeTypes).toContain("HanaProviderMediaMode");
-    expect(runtimeTypes).toContain("HanaPluginResources");
-    expect(runtimeTypes).toContain("HanaResourceRef");
+    expect(runtimeTypes).toContain("LingxiProviderMediaMode");
+    expect(runtimeTypes).toContain("LingxiPluginResources");
+    expect(runtimeTypes).toContain("LingxiResourceRef");
     expect(runtimeTypes).toContain("writeExpectedVersion");
-    expect(runtimeTypes).toContain("HanaResourceMoveResult");
-    expect(runtimeTypes).toContain("HanaResourceTrashResult");
-    expect(runtimeTypes).toContain("HanaResourceWatchSubscription");
+    expect(runtimeTypes).toContain("LingxiResourceMoveResult");
+    expect(runtimeTypes).toContain("LingxiResourceTrashResult");
+    expect(runtimeTypes).toContain("LingxiResourceWatchSubscription");
     expect(runtimeTypes).toContain("watch(");
     expect(runtimeTypes).toContain("subscribe(");
-    expect(runtimeTypes).toContain("HanaToolSessionPermission");
+    expect(runtimeTypes).toContain("LingxiToolSessionPermission");
     expect(runtimeTypes).toContain("sessionPermission");
     expect(runtimeTypes).toContain("getPluginRequestContext");
     expect(runtimeTypes).toContain("resources:");
     expect(runtimePackage.dependencies).toMatchObject({
-      "@hana/plugin-protocol": "0.0.0",
+      "@lingxi/plugin-protocol": "0.0.0",
     });
     expect(runtimeReadme).toContain("modes[].inputLimits.referenceImages");
     expect(runtimeReadme).toContain("sessionPermission");
@@ -188,8 +188,8 @@ describe("plugin SDK examples and docs", () => {
       const pkg = JSON.parse(fs.readFileSync(path.join(pluginDir, "package.json"), "utf-8"));
 
       expect(pkg.dependencies).toMatchObject({
-        "@hana/plugin-runtime": expect.stringContaining("vendor/sdk/hana-plugin-runtime-"),
-        "@hana/plugin-protocol": expect.stringContaining("vendor/sdk/hana-plugin-protocol-"),
+        "@lingxi/plugin-runtime": expect.stringContaining("vendor/sdk/hana-plugin-runtime-"),
+        "@lingxi/plugin-protocol": expect.stringContaining("vendor/sdk/hana-plugin-protocol-"),
       });
       expect(fs.existsSync(path.join(pluginDir, "vendor", "sdk", "hana-plugin-protocol-0.0.0.tgz"))).toBe(true);
       expect(fs.existsSync(path.join(pluginDir, "vendor", "sdk", "hana-plugin-runtime-0.0.0.tgz"))).toBe(true);

@@ -834,7 +834,7 @@ export class ProviderRegistry {
       // Copy to the destination before cleaning any agent source. A failed
       // catalog write therefore leaves every override available for retry.
       this._saveAddedModels(userConfig);
-      const header = "# HanaAgent 助手配置\n# 由设置页面管理，手动编辑也可以\n\n";
+      const header = "# LingxiAgent 助手配置\n# 由设置页面管理，手动编辑也可以\n\n";
       for (const { cfgPath, cfg } of pendingConfigWrites) {
         const yamlStr = header + YAML.dump(cfg, { indent: 2, lineWidth: -1, sortKeys: false, quotingType: '"', forceQuotes: false });
         writeSecretFileSync(cfgPath, yamlStr);

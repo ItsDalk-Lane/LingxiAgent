@@ -4,7 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { applyDevEnvironment, defaultDevHanaHome } from "./dev-env.js";
+import { applyDevEnvironment, defaultDevLingxiHome } from "./dev-env.js";
 import {
   buildDevWebClientConfig,
   buildDevWebPreviewUrl,
@@ -14,7 +14,7 @@ import {
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(__dirname, "..");
-const hanaHome = defaultDevHanaHome();
+const hanaHome = defaultDevLingxiHome();
 const serverInfoPath = path.join(hanaHome, "server-info.json");
 
 let serverProcess = null;

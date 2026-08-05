@@ -3,7 +3,7 @@ import {
   definePlugin,
   LINGXI_BUS_SKIP,
   requestBus,
-} from "@hana/plugin-runtime";
+} from "@lingxi/plugin-runtime";
 
 const previewHandler = defineBusHandler({
   type: "sdk-showcase:preview",

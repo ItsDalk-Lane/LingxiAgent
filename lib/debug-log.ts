@@ -60,7 +60,7 @@ class DebugLog {
   header(version, info: any = {}) {
     const lines = [
       "═".repeat(60),
-      `HanaAgent v${version} — started at ${new Date().toISOString()}`,
+      `LingxiAgent v${version} — started at ${new Date().toISOString()}`,
       "═".repeat(60),
     ];
 

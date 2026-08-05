@@ -13,47 +13,47 @@ import {
   type PluginResourceRequestAccessResult,
   type PluginUiError,
   type PluginUiMessage,
-} from '@hana/plugin-protocol';
+} from '@lingxi/plugin-protocol';
 
-export interface HanaPluginSize {
+export interface LingxiPluginSize {
   width?: number;
   height?: number;
 }
 
-export interface HanaPluginThemeSnapshot {
+export interface LingxiPluginThemeSnapshot {
   theme?: string;
   cssUrl?: string;
 }
 
-export interface HanaPluginRequestOptions {
+export interface LingxiPluginRequestOptions {
   timeoutMs?: number;
 }
 
-export type HanaToastType = 'success' | 'error' | 'info' | 'warning';
+export type LingxiToastType = 'success' | 'error' | 'info' | 'warning';
 
-export interface HanaToastShowInput {
+export interface LingxiToastShowInput {
   message: string;
-  type?: HanaToastType;
+  type?: LingxiToastType;
   duration?: number;
 }
 
-export interface HanaToastShowResult {
+export interface LingxiToastShowResult {
   shown: boolean;
 }
 
-export type HanaExternalOpenInput = string | { url: string };
+export type LingxiExternalOpenInput = string | { url: string };
 
-export interface HanaExternalOpenResult {
+export interface LingxiExternalOpenResult {
   opened: boolean;
 }
 
-export type HanaClipboardWriteTextInput = string | { text: string };
+export type LingxiClipboardWriteTextInput = string | { text: string };
 
-export interface HanaClipboardWriteTextResult {
+export interface LingxiClipboardWriteTextResult {
   written: boolean;
 }
 
-export interface HanaPluginSdkOptions {
+export interface LingxiPluginSdkOptions {
   parentWindow?: Window;
   targetWindow?: Window;
   targetOrigin?: string;
@@ -61,7 +61,7 @@ export interface HanaPluginSdkOptions {
   idFactory?: () => string;
 }
 
-export interface HanaPluginSdk {
+export interface LingxiPluginSdk {
   ready(payload?: unknown): void;
   assets: {
     url(path: string): string;
@@ -71,49 +71,49 @@ export interface HanaPluginSdk {
     fetch(path: string, init?: RequestInit): Promise<Response>;
   };
   ui: {
-    resize(size: HanaPluginSize): void;
+    resize(size: LingxiPluginSize): void;
   };
   theme: {
-    getSnapshot(): HanaPluginThemeSnapshot;
-    subscribe(callback: (theme: HanaPluginThemeSnapshot) => void): () => void;
+    getSnapshot(): LingxiPluginThemeSnapshot;
+    subscribe(callback: (theme: LingxiPluginThemeSnapshot) => void): () => void;
   };
   host: {
     request<T = unknown>(
       type: string,
       payload?: unknown,
-      options?: HanaPluginRequestOptions,
+      options?: LingxiPluginRequestOptions,
     ): Promise<T>;
   };
   toast: {
-    show(input: HanaToastShowInput, options?: HanaPluginRequestOptions): Promise<HanaToastShowResult>;
+    show(input: LingxiToastShowInput, options?: LingxiPluginRequestOptions): Promise<LingxiToastShowResult>;
   };
   external: {
-    open(input: HanaExternalOpenInput, options?: HanaPluginRequestOptions): Promise<HanaExternalOpenResult>;
+    open(input: LingxiExternalOpenInput, options?: LingxiPluginRequestOptions): Promise<LingxiExternalOpenResult>;
   };
   clipboard: {
     writeText(
-      input: HanaClipboardWriteTextInput,
-      options?: HanaPluginRequestOptions,
-    ): Promise<HanaClipboardWriteTextResult>;
+      input: LingxiClipboardWriteTextInput,
+      options?: LingxiPluginRequestOptions,
+    ): Promise<LingxiClipboardWriteTextResult>;
   };
   resources: {
     open(
       input: PluginResourceOpenInput,
-      options?: HanaPluginRequestOptions,
+      options?: LingxiPluginRequestOptions,
     ): Promise<PluginResourceOpenResult>;
     pick(
       input?: PluginResourcePickInput,
-      options?: HanaPluginRequestOptions,
+      options?: LingxiPluginRequestOptions,
     ): Promise<PluginResourcePickResult>;
     requestAccess(
       input: PluginResourceRequestAccessInput,
-      options?: HanaPluginRequestOptions,
+      options?: LingxiPluginRequestOptions,
     ): Promise<PluginResourceRequestAccessResult>;
   };
 }
 
-export class HanaPluginError extends Error {
-  override name = 'HanaPluginError';
+export class LingxiPluginError extends Error {
+  override name = 'LingxiPluginError';
   readonly code: string;
   readonly details?: unknown;
 
@@ -136,7 +136,7 @@ function defaultIdFactory(): string {
 
 function getBrowserWindow(): Window {
   if (typeof window === 'undefined') {
-    throw new Error('@hana/plugin-sdk requires a browser iframe window.');
+    throw new Error('@lingxi/plugin-sdk requires a browser iframe window.');
   }
   return window;
 }
@@ -159,7 +159,7 @@ function resolveTargetOrigin(targetWindow: Window, explicit?: string): string {
   return safeOriginFromUrl(targetWindow.document.referrer) ?? '*';
 }
 
-function readInitialTheme(targetWindow: Window): HanaPluginThemeSnapshot {
+function readInitialTheme(targetWindow: Window): LingxiPluginThemeSnapshot {
   const params = new URLSearchParams(targetWindow.location.search);
   return {
     theme: params.get('hana-theme') ?? undefined,
@@ -173,11 +173,11 @@ function isTrustedHostEvent(event: MessageEvent, parentWindow: Window, targetOri
   return true;
 }
 
-function externalOpenPayload(input: HanaExternalOpenInput): { url: string } {
+function externalOpenPayload(input: LingxiExternalOpenInput): { url: string } {
   return typeof input === 'string' ? { url: input } : input;
 }
 
-function clipboardWriteTextPayload(input: HanaClipboardWriteTextInput): { text: string } {
+function clipboardWriteTextPayload(input: LingxiClipboardWriteTextInput): { text: string } {
   return typeof input === 'string' ? { text: input } : input;
 }
 
@@ -290,14 +290,14 @@ function pluginApiFetch(targetWindow: Window, input: string, init?: RequestInit)
   });
 }
 
-export function createHanaPluginSdk(options: HanaPluginSdkOptions = {}): HanaPluginSdk {
+export function createLingxiPluginSdk(options: LingxiPluginSdkOptions = {}): LingxiPluginSdk {
   const targetWindow = options.targetWindow ?? getBrowserWindow();
   const parentWindow = options.parentWindow ?? targetWindow.parent;
   const targetOrigin = resolveTargetOrigin(targetWindow, options.targetOrigin);
   const requestTimeoutMs = options.requestTimeoutMs ?? 10_000;
   const idFactory = options.idFactory ?? defaultIdFactory;
   let themeSnapshot = readInitialTheme(targetWindow);
-  const themeSubscribers = new Set<(theme: HanaPluginThemeSnapshot) => void>();
+  const themeSubscribers = new Set<(theme: LingxiPluginThemeSnapshot) => void>();
 
   function post(message: PluginUiMessage): void {
     parentWindow.postMessage(message, targetOrigin);
@@ -334,7 +334,7 @@ export function createHanaPluginSdk(options: HanaPluginSdkOptions = {}): HanaPlu
   function request<T = unknown>(
     type: string,
     payload?: unknown,
-    requestOptions: HanaPluginRequestOptions = {},
+    requestOptions: LingxiPluginRequestOptions = {},
   ): Promise<T> {
     const id = idFactory();
     const timeoutMs = requestOptions.timeoutMs ?? requestTimeoutMs;
@@ -359,13 +359,13 @@ export function createHanaPluginSdk(options: HanaPluginSdkOptions = {}): HanaPlu
         }
         if (message.kind === 'error' && message.error) {
           cleanup();
-          reject(new HanaPluginError(message.error));
+          reject(new LingxiPluginError(message.error));
         }
       };
 
       const timeout = targetWindow.setTimeout(() => {
         cleanup();
-        reject(new HanaPluginError({
+        reject(new LingxiPluginError({
           code: 'TIMEOUT',
           message: `Plugin host request timed out: ${type}.`,
         }));
@@ -403,7 +403,7 @@ export function createHanaPluginSdk(options: HanaPluginSdkOptions = {}): HanaPlu
       },
     },
     ui: {
-      resize(size: HanaPluginSize) {
+      resize(size: LingxiPluginSize) {
         postEvent(PLUGIN_UI_CAPABILITY.UI_RESIZE, size);
       },
     },
@@ -411,7 +411,7 @@ export function createHanaPluginSdk(options: HanaPluginSdkOptions = {}): HanaPlu
       getSnapshot() {
         return { ...themeSnapshot };
       },
-      subscribe(callback: (theme: HanaPluginThemeSnapshot) => void) {
+      subscribe(callback: (theme: LingxiPluginThemeSnapshot) => void) {
         if (themeSubscribers.size === 0) {
           targetWindow.addEventListener('message', onThemeMessage);
         }
@@ -429,18 +429,18 @@ export function createHanaPluginSdk(options: HanaPluginSdkOptions = {}): HanaPlu
       request,
     },
     toast: {
-      show(input: HanaToastShowInput, options?: HanaPluginRequestOptions) {
-        return request<HanaToastShowResult>(PLUGIN_UI_CAPABILITY.TOAST_SHOW, input, options);
+      show(input: LingxiToastShowInput, options?: LingxiPluginRequestOptions) {
+        return request<LingxiToastShowResult>(PLUGIN_UI_CAPABILITY.TOAST_SHOW, input, options);
       },
     },
     external: {
-      open(input: HanaExternalOpenInput, options?: HanaPluginRequestOptions) {
-        return request<HanaExternalOpenResult>(PLUGIN_UI_CAPABILITY.EXTERNAL_OPEN, externalOpenPayload(input), options);
+      open(input: LingxiExternalOpenInput, options?: LingxiPluginRequestOptions) {
+        return request<LingxiExternalOpenResult>(PLUGIN_UI_CAPABILITY.EXTERNAL_OPEN, externalOpenPayload(input), options);
       },
     },
     clipboard: {
-      writeText(input: HanaClipboardWriteTextInput, options?: HanaPluginRequestOptions) {
-        return request<HanaClipboardWriteTextResult>(
+      writeText(input: LingxiClipboardWriteTextInput, options?: LingxiPluginRequestOptions) {
+        return request<LingxiClipboardWriteTextResult>(
           PLUGIN_UI_CAPABILITY.CLIPBOARD_WRITE_TEXT,
           clipboardWriteTextPayload(input),
           options,
@@ -448,13 +448,13 @@ export function createHanaPluginSdk(options: HanaPluginSdkOptions = {}): HanaPlu
       },
     },
     resources: {
-      open(input: PluginResourceOpenInput, options?: HanaPluginRequestOptions) {
+      open(input: PluginResourceOpenInput, options?: LingxiPluginRequestOptions) {
         return request<PluginResourceOpenResult>(PLUGIN_UI_CAPABILITY.RESOURCE_OPEN, input, options);
       },
-      pick(input: PluginResourcePickInput = {}, options?: HanaPluginRequestOptions) {
+      pick(input: PluginResourcePickInput = {}, options?: LingxiPluginRequestOptions) {
         return request<PluginResourcePickResult>(PLUGIN_UI_CAPABILITY.RESOURCE_PICK, input, options);
       },
-      requestAccess(input: PluginResourceRequestAccessInput, options?: HanaPluginRequestOptions) {
+      requestAccess(input: PluginResourceRequestAccessInput, options?: LingxiPluginRequestOptions) {
         return request<PluginResourceRequestAccessResult>(
           PLUGIN_UI_CAPABILITY.RESOURCE_REQUEST_ACCESS,
           input,
@@ -465,14 +465,14 @@ export function createHanaPluginSdk(options: HanaPluginSdkOptions = {}): HanaPlu
   };
 }
 
-let singleton: HanaPluginSdk | null = null;
+let singleton: LingxiPluginSdk | null = null;
 
-function getSingleton(): HanaPluginSdk {
-  singleton ??= createHanaPluginSdk();
+function getSingleton(): LingxiPluginSdk {
+  singleton ??= createLingxiPluginSdk();
   return singleton;
 }
 
-export const hana: HanaPluginSdk = {
+export const hana: LingxiPluginSdk = {
   ready(payload?: unknown) {
     return getSingleton().ready(payload);
   },
@@ -490,7 +490,7 @@ export const hana: HanaPluginSdk = {
     },
   },
   ui: {
-    resize(size: HanaPluginSize) {
+    resize(size: LingxiPluginSize) {
       return getSingleton().ui.resize(size);
     },
   },
@@ -498,7 +498,7 @@ export const hana: HanaPluginSdk = {
     getSnapshot() {
       return getSingleton().theme.getSnapshot();
     },
-    subscribe(callback: (theme: HanaPluginThemeSnapshot) => void) {
+    subscribe(callback: (theme: LingxiPluginThemeSnapshot) => void) {
       return getSingleton().theme.subscribe(callback);
     },
   },
@@ -506,34 +506,34 @@ export const hana: HanaPluginSdk = {
     request<T = unknown>(
       type: string,
       payload?: unknown,
-      options?: HanaPluginRequestOptions,
+      options?: LingxiPluginRequestOptions,
     ) {
       return getSingleton().host.request<T>(type, payload, options);
     },
   },
   toast: {
-    show(input: HanaToastShowInput, options?: HanaPluginRequestOptions) {
+    show(input: LingxiToastShowInput, options?: LingxiPluginRequestOptions) {
       return getSingleton().toast.show(input, options);
     },
   },
   external: {
-    open(input: HanaExternalOpenInput, options?: HanaPluginRequestOptions) {
+    open(input: LingxiExternalOpenInput, options?: LingxiPluginRequestOptions) {
       return getSingleton().external.open(input, options);
     },
   },
   clipboard: {
-    writeText(input: HanaClipboardWriteTextInput, options?: HanaPluginRequestOptions) {
+    writeText(input: LingxiClipboardWriteTextInput, options?: LingxiPluginRequestOptions) {
       return getSingleton().clipboard.writeText(input, options);
     },
   },
   resources: {
-    open(input: PluginResourceOpenInput, options?: HanaPluginRequestOptions) {
+    open(input: PluginResourceOpenInput, options?: LingxiPluginRequestOptions) {
       return getSingleton().resources.open(input, options);
     },
-    pick(input?: PluginResourcePickInput, options?: HanaPluginRequestOptions) {
+    pick(input?: PluginResourcePickInput, options?: LingxiPluginRequestOptions) {
       return getSingleton().resources.pick(input, options);
     },
-    requestAccess(input: PluginResourceRequestAccessInput, options?: HanaPluginRequestOptions) {
+    requestAccess(input: PluginResourceRequestAccessInput, options?: LingxiPluginRequestOptions) {
       return getSingleton().resources.requestAccess(input, options);
     },
   },

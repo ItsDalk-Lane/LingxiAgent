@@ -511,8 +511,8 @@ export function AboutTab() {
           更新主位是列车更新（check / "更新" 按钮 / 通道 / 历史，壳版本
           永不出现在这里）。 */}
       <div className={styles['about-hero']}>
-        <img className={styles['about-icon']} src={appIconUrl} alt="HanaAgent" />
-        <div className={styles['about-name']}>HanaAgent</div>
+        <img className={styles['about-icon']} src={appIconUrl} alt="LingxiAgent" />
+        <div className={styles['about-name']}>LingxiAgent</div>
         <div className={styles['about-tagline']}>{t('settings.about.tagline')}</div>
         {currentVersion && <div className={styles['about-version']}>v{currentVersion}</div>}
         <TrainUpdateArea

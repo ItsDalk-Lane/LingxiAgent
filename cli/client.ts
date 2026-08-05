@@ -1,6 +1,6 @@
 import WebSocket from "ws";
 
-export class HanaCliClient {
+export class LingxiCliClient {
   declare baseUrl: string;
   declare token: string;
   declare queryTokenAllowed: boolean;

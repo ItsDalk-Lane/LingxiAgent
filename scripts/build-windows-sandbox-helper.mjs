@@ -94,7 +94,7 @@ export function buildWindowsSandboxHelper({
     return { skipped: true };
   }
 
-  const source = path.join(rootDir, "desktop", "native", "HanaWindowsSandboxHelper", "main.cpp");
+  const source = path.join(rootDir, "desktop", "native", "LingxiWindowsSandboxHelper", "main.cpp");
   if (!fs.existsSync(source)) {
     throw new Error(`[windows-sandbox-helper] source not found: ${source}`);
   }

@@ -17,7 +17,7 @@ private struct HelperError: Error {
 }
 
 @main
-struct HanaComputerUseHelper {
+struct LingxiComputerUseHelper {
     static func main() {
         do {
             try run()
@@ -102,7 +102,7 @@ struct HanaComputerUseHelper {
         let config = await ConfigStore.shared.load()
         await MainActor.run {
             AgentCursor.shared.apply(config: config.agentCursor)
-            applyHanaCursorRuntimeConfig(from: ProcessInfo.processInfo.environment)
+            applyLingxiCursorRuntimeConfig(from: ProcessInfo.processInfo.environment)
         }
 
         let result: CallTool.Result
@@ -195,7 +195,7 @@ struct HanaComputerUseHelper {
             let config = await ConfigStore.shared.load()
             await MainActor.run {
                 AgentCursor.shared.apply(config: config.agentCursor)
-                applyHanaCursorRuntimeConfig(from: ProcessInfo.processInfo.environment)
+                applyLingxiCursorRuntimeConfig(from: ProcessInfo.processInfo.environment)
             }
             let server = DaemonServer(socketPath: socketPath, pidFilePath: nil)
             try await server.run()
@@ -280,7 +280,7 @@ private enum AppKitBootstrap {
 private let hanaAgentCursorConfigEnvKey = "LINGXI_AGENT_CURSOR_CONFIG_JSON"
 private let hanaAgentSocketPathEnvKey = "LINGXI_COMPUTER_USE_SOCKET_PATH"
 
-private struct HanaCursorRuntimeConfig: Decodable {
+private struct LingxiCursorRuntimeConfig: Decodable {
     let enabled: Bool?
     let style: Style?
     let motion: Motion?
@@ -321,10 +321,10 @@ private struct HanaCursorRuntimeConfig: Decodable {
 }
 
 @MainActor
-private func applyHanaCursorRuntimeConfig(from environment: [String: String]) {
+private func applyLingxiCursorRuntimeConfig(from environment: [String: String]) {
     guard let raw = environment[hanaAgentCursorConfigEnvKey],
           let data = raw.data(using: .utf8),
-          let config = try? JSONDecoder().decode(HanaCursorRuntimeConfig.self, from: data)
+          let config = try? JSONDecoder().decode(LingxiCursorRuntimeConfig.self, from: data)
     else {
         return
     }

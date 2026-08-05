@@ -132,7 +132,7 @@ function readExistingConfigOrNull(hanakoHome: string) {
   return loadServerNetworkConfig(hanakoHome);
 }
 
-export async function isHanaServerListeningOnPort({
+export async function isLingxiServerListeningOnPort({
   port,
   host = "127.0.0.1",
   fetchImpl = fetch,

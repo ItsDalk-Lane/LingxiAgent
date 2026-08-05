@@ -122,7 +122,7 @@ export function saveConfig(configPath, partial) {
   const merged = deepMerge(current, partial);
 
   const header =
-    "# HanaAgent 系统配置\n" +
+    "# LingxiAgent 系统配置\n" +
     "# 由设置页面管理，手动编辑也可以\n\n";
   const yamlStr = header + YAML.dump(merged, {
     indent: 2,

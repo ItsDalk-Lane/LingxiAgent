@@ -21,21 +21,21 @@ function assertHanakoHome(hanakoHome, caller) {
   }
 }
 
-function resolveHanaPiSdkRuntimeRoot(hanakoHome) {
-  assertHanakoHome(hanakoHome, "resolveHanaPiSdkRuntimeRoot");
+function resolveLingxiPiSdkRuntimeRoot(hanakoHome) {
+  assertHanakoHome(hanakoHome, "resolveLingxiPiSdkRuntimeRoot");
   return path.join(hanakoHome, "runtime", "pi-sdk");
 }
 
-function resolveHanaPiSdkManagedBinDir(hanakoHome) {
-  return path.join(resolveHanaPiSdkRuntimeRoot(hanakoHome), "bin");
+function resolveLingxiPiSdkManagedBinDir(hanakoHome) {
+  return path.join(resolveLingxiPiSdkRuntimeRoot(hanakoHome), "bin");
 }
 
-function resolveHanaPiSdkResourceLoaderCwd(hanakoHome) {
-  return path.join(resolveHanaPiSdkRuntimeRoot(hanakoHome), "resource-loader", "project");
+function resolveLingxiPiSdkResourceLoaderCwd(hanakoHome) {
+  return path.join(resolveLingxiPiSdkRuntimeRoot(hanakoHome), "resource-loader", "project");
 }
 
-function resolveHanaPiSdkResourceLoaderAgentDir(hanakoHome) {
-  return path.join(resolveHanaPiSdkRuntimeRoot(hanakoHome), "resource-loader", "agent");
+function resolveLingxiPiSdkResourceLoaderAgentDir(hanakoHome) {
+  return path.join(resolveLingxiPiSdkRuntimeRoot(hanakoHome), "resource-loader", "agent");
 }
 
 function resolveLegacyPiSdkManagedBinDir(hanakoHome) {
@@ -45,9 +45,9 @@ function resolveLegacyPiSdkManagedBinDir(hanakoHome) {
 
 module.exports = {
   resolveHanakoHome,
-  resolveHanaPiSdkManagedBinDir,
-  resolveHanaPiSdkResourceLoaderAgentDir,
-  resolveHanaPiSdkResourceLoaderCwd,
-  resolveHanaPiSdkRuntimeRoot,
+  resolveLingxiPiSdkManagedBinDir,
+  resolveLingxiPiSdkResourceLoaderAgentDir,
+  resolveLingxiPiSdkResourceLoaderCwd,
+  resolveLingxiPiSdkRuntimeRoot,
   resolveLegacyPiSdkManagedBinDir,
 };

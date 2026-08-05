@@ -411,7 +411,7 @@ export class Scheduler {
       : entry.id;
     try {
       await engine.deliverNotification({
-        title: entry.agentName || "HanaAgent",
+        title: entry.agentName || "LingxiAgent",
         body: t(bodyKey, { label: entry.label || entry.summary }),
         channels: ["desktop"],
         desktopFocusPolicy: mode,

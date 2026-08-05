@@ -15,7 +15,7 @@ export function buildWin32LegacyAclDiagnosticArgs({ paths = [], cleanup = false 
   return out;
 }
 
-export function buildWin32HanaWriteAclCleanupArgs({ paths = [] } = {}) {
+export function buildWin32LingxiWriteAclCleanupArgs({ paths = [] } = {}) {
   const targets = [...new Set((paths || []).filter(Boolean))];
   if (targets.length === 0) {
     throw new Error("win32 Hana write ACL cleanup requires at least one path");

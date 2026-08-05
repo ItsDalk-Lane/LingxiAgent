@@ -2,7 +2,7 @@ import fs from "fs";
 import path from "path";
 import { spawn } from "child_process";
 import { createRequire } from "module";
-import { readLocalServerInfo, resolveCliHanaHome } from "./local-server.ts";
+import { readLocalServerInfo, resolveCliLingxiHome } from "./local-server.ts";
 import { describeForeignServerBlock, isForeignServerBlocking, probeServerInfo } from "../shared/server-info-probe.cjs";
 import { ansi } from "./terminal-theme.ts";
 
@@ -75,7 +75,7 @@ export async function resolveServerSpawnSpec({
       : null
   );
 
-  const rendererDist = await resolveRendererDistPointer({ hanaHome: resolveCliHanaHome(env), channel });
+  const rendererDist = await resolveRendererDistPointer({ hanaHome: resolveCliLingxiHome(env), channel });
 
   if (packagedRoot) {
     const spawnEnv: NodeJS.ProcessEnv = {
@@ -177,7 +177,7 @@ export async function spawnServerForeground({
   probeImpl?: typeof probeServerInfo;
   exit?: (code?: number) => any;
 } = {}) {
-  const guard = await guardAgainstForeignServer({ hanaHome: resolveCliHanaHome(env), probeImpl });
+  const guard = await guardAgainstForeignServer({ hanaHome: resolveCliLingxiHome(env), probeImpl });
   if (guard.blocked) {
     console.error(`${ansi.red}${guard.message}${ansi.reset}`);
     return exit(1);
@@ -202,7 +202,7 @@ export async function startLocalServerAndWait({
   timeoutMs = 30000,
   intervalMs = 250,
 }: { projectRoot?: string; env?: NodeJS.ProcessEnv; timeoutMs?: number; intervalMs?: number } = {}) {
-  const hanaHome = resolveCliHanaHome(env);
+  const hanaHome = resolveCliLingxiHome(env);
   const existing = readLocalServerInfo({ hanaHome });
   if (existing.ok) return existing;
 
@@ -221,7 +221,7 @@ export async function startLocalServerAndWait({
     await delay(intervalMs);
   }
 
-  throw new Error(`HanaAgent Server did not become ready within ${Math.round(timeoutMs / 1000)}s`);
+  throw new Error(`LingxiAgent Server did not become ready within ${Math.round(timeoutMs / 1000)}s`);
 }
 
 function delay(ms: number) {

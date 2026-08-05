@@ -420,7 +420,7 @@ export function buildComputerUseHelper({
     return { skipped: true };
   }
 
-  const packageDir = path.join(rootDir, "desktop", "native", "HanaComputerUseHelper");
+  const packageDir = path.join(rootDir, "desktop", "native", "LingxiComputerUseHelper");
   const swiftArch = swiftArchForNodeArch(arch);
   const scratchPath = swiftBuildScratchPath({ rootDir, arch });
   const baseArgs = [

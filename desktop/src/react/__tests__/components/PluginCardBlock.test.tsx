@@ -10,7 +10,7 @@ import {
   PLUGIN_UI_CAPABILITY,
   PLUGIN_UI_PROTOCOL,
   PLUGIN_UI_PROTOCOL_VERSION,
-} from '@hana/plugin-protocol';
+} from '@lingxi/plugin-protocol';
 
 vi.mock('../../hooks/use-plugin-surface-url', () => ({
   usePluginSurfaceUrl: (routeUrl: string | null) => ({

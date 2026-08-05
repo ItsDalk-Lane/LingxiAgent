@@ -18,7 +18,7 @@ const mockAutoUpdater = {
 };
 
 const mockWindows = [];
-let mockExePath = "/Applications/HanaAgent.app/Contents/MacOS/HanaAgent";
+let mockExePath = "/Applications/LingxiAgent.app/Contents/MacOS/LingxiAgent";
 
 vi.mock("electron", () => ({
   ipcMain: { handle: vi.fn() },
@@ -77,7 +77,7 @@ describe("auto-updater", () => {
     mockAutoUpdater.autoInstallOnAppQuit = true;
     mockAutoUpdater.allowPrerelease = false;
     mockAutoUpdater.installDirectory = undefined;
-    mockExePath = "/Applications/HanaAgent.app/Contents/MacOS/HanaAgent";
+    mockExePath = "/Applications/LingxiAgent.app/Contents/MacOS/LingxiAgent";
     delete process.env.LINGXI_UPDATE_FEED_URL;
     delete process.env.LINGXI_UPDATE_SOURCE;
     delete process.env.LINGXI_UPDATE_PROVIDER;
@@ -184,12 +184,12 @@ describe("auto-updater", () => {
     try {
       Object.defineProperty(process, "platform", { value: "win32" });
       vi.resetModules();
-      mockExePath = "/tmp/HanaAgent/HanaAgent.exe";
+      mockExePath = "/tmp/LingxiAgent/LingxiAgent.exe";
       mod = await import("../desktop/auto-updater.cjs");
 
       initWithMockWindow();
 
-      expect(mockAutoUpdater.installDirectory).toBe("/tmp/HanaAgent");
+      expect(mockAutoUpdater.installDirectory).toBe("/tmp/LingxiAgent");
     } finally {
       Object.defineProperty(process, "platform", { value: originalPlatform });
     }
@@ -690,7 +690,7 @@ describe("auto-updater", () => {
     try {
       Object.defineProperty(process, "platform", { value: "win32" });
       vi.resetModules();
-      mockExePath = "/tmp/HanaAgent/HanaAgent.exe";
+      mockExePath = "/tmp/LingxiAgent/LingxiAgent.exe";
       mod = await import("../desktop/auto-updater.cjs");
 
       initWithMockWindow();

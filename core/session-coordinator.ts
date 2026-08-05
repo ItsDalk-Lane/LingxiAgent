@@ -2277,7 +2277,7 @@ export class SessionCoordinator {
     //
     // allToolNames must cover the COMPLETE active set: Hana built-ins
     // (read/write/edit/exec_command/write_stdin/grep/find/ls) from
-    // sessionTools + HanaAgent
+    // sessionTools + LingxiAgent
     // customs + plugin tools from sessionCustomTools. Using only agent.tools
     // would silently drop SDK built-ins and plugin tools when
     // setActiveToolsByName is applied.

@@ -113,7 +113,7 @@ describe("Windows NSIS installer contract", () => {
     expect(overlay).toContain("hanakoRemoveOwnedInstallTrees");
   });
 
-  it("overrides app-running detection to close HanaAgent, legacy Hanako, and the bundled server explicitly", () => {
+  it("overrides app-running detection to close LingxiAgent, legacy Hanako, and the bundled server explicitly", () => {
     const source = fs.readFileSync(path.join(root, "build", "installer.nsh"), "utf-8");
     const macro = extractMacro(source, "customCheckAppRunning");
 

@@ -16,8 +16,8 @@ const labels: Record<string, string> = {
   'settings.about.updateInstallManualHint': '点重启更新后安装，直接退出不会自动安装',
   'settings.about.updateApply': '更新',
   'settings.about.updateApplyAutoHint': '不点击也会在下次启动时自动生效',
-  'settings.about.updateInstalling': '正在安装更新，HanaAgent 会自动重启…',
-  'settings.about.updateNeedInstall': '请先将 HanaAgent 移动到应用程序文件夹',
+  'settings.about.updateInstalling': '正在安装更新，LingxiAgent 会自动重启…',
+  'settings.about.updateNeedInstall': '请先将 LingxiAgent 移动到应用程序文件夹',
   'settings.about.updateDigestCta': '此次更新你将获得',
   'settings.about.updateDigestTitle': '此次更新你将获得',
   'settings.about.updateDigestClose': '关闭',
@@ -158,9 +158,9 @@ describe('AutoUpdateStatus', () => {
       <AutoUpdateStatus state={updateState({ status: 'installing' })} variant="shell" />,
     );
 
-    expect(screen.getByText('正在安装更新，HanaAgent 会自动重启…')).toBeTruthy();
+    expect(screen.getByText('正在安装更新，LingxiAgent 会自动重启…')).toBeTruthy();
 
     rerender(<AutoUpdateStatus state={updateState({ status: 'error', error: 'running_from_dmg' })} variant="shell" />);
-    expect(screen.getByText('请先将 HanaAgent 移动到应用程序文件夹')).toBeTruthy();
+    expect(screen.getByText('请先将 LingxiAgent 移动到应用程序文件夹')).toBeTruthy();
   });
 });

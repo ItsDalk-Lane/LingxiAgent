@@ -7,7 +7,7 @@ import {
   PLUGIN_UI_PROTOCOL_VERSION,
   parsePluginUiMessage,
   type PluginResourcePickInput,
-} from '@hana/plugin-protocol';
+} from '@lingxi/plugin-protocol';
 
 describe('plugin UI protocol', () => {
   it('accepts a versioned event envelope', () => {

@@ -12,7 +12,7 @@
  */
 
 import { createRequire } from "module";
-import { resolveCliHanaHome } from "./local-server.ts";
+import { resolveCliLingxiHome } from "./local-server.ts";
 import { ansi } from "./terminal-theme.ts";
 import { SERVER_PROTOCOL_VERSION } from "../shared/contract-versions.cjs";
 
@@ -80,7 +80,7 @@ function createProgressRenderer(stream: NodeJS.WriteStream = process.stdout) {
  */
 export async function runBundlePull({
   channel = "stable",
-  hanaHome = resolveCliHanaHome(),
+  hanaHome = resolveCliLingxiHome(),
   download = otaCore.downloadAndApplyRendererArtifact as DownloadRendererArtifact,
 }: {
   channel?: string;
@@ -118,7 +118,7 @@ export async function runBundlePull({
  */
 export async function runBundleStatus({
   channel = "stable",
-  hanaHome = resolveCliHanaHome(),
+  hanaHome = resolveCliLingxiHome(),
 }: {
   channel?: string;
   hanaHome?: string;

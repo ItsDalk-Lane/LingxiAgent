@@ -153,7 +153,7 @@ function describeForeignServerBlock({ status, info }) {
   if (status === "alive-same-home") {
     return (
       `检测到同一数据目录已有内核在运行（ownerKind=${ownerKind}, version=${version}, pid=${pid}）。要接管请先退出它，再重新启动。\n`
-      + `A HanaAgent kernel is already running against this data directory (ownerKind=${ownerKind}, version=${version}, pid=${pid}). Quit it first, then start this one again.`
+      + `A LingxiAgent kernel is already running against this data directory (ownerKind=${ownerKind}, version=${version}, pid=${pid}). Quit it first, then start this one again.`
     );
   }
   if (status === "alive-unauthorized") {

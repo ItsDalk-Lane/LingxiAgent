@@ -35,8 +35,8 @@ import {
   workspaceSkillPolicyFromConfig,
 } from "../shared/workspace-skill-paths.ts";
 import {
-  resolveHanaPiSdkResourceLoaderAgentDir,
-  resolveHanaPiSdkResourceLoaderCwd,
+  resolveLingxiPiSdkResourceLoaderAgentDir,
+  resolveLingxiPiSdkResourceLoaderCwd,
 } from "../shared/hana-runtime-paths.ts";
 import { PluginManager } from "./plugin-manager.ts";
 import { EnvChangeLedger } from "./env-change-ledger.ts";
@@ -1750,8 +1750,8 @@ export class LingxiEngine {
     return this._configCoord.getExplicitHomeFolder(agentId || this.currentAgentId) || null;
   }
   _createResourceLoaderOptions(skillsDir) {
-    const cwd = resolveHanaPiSdkResourceLoaderCwd(this.hanakoHome);
-    const agentDir = resolveHanaPiSdkResourceLoaderAgentDir(this.hanakoHome);
+    const cwd = resolveLingxiPiSdkResourceLoaderCwd(this.hanakoHome);
+    const agentDir = resolveLingxiPiSdkResourceLoaderAgentDir(this.hanakoHome);
     if (!cwd || typeof cwd !== "string") {
       throw new Error("ResourceLoader init: cwd is required");
     }

@@ -99,7 +99,7 @@ function atomgitWebHeaders(env, extra = {}) {
     "X-Platform": "web",
     "X-App-Channel": "gitcode-fe",
     "X-Device-ID": "unknown",
-    "User-Agent": "Mozilla/5.0 (compatible; HanaReleaseMirror/1.0; +https://github.com/liliMozi/openhanako)",
+    "User-Agent": "Mozilla/5.0 (compatible; LingxiReleaseMirror/1.0; +https://github.com/liliMozi/openhanako)",
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
     ...extra,
   };

@@ -88,7 +88,7 @@ function analyzeFile(file) {
     isIssueNamed,
     isAcceptance: isIssueNamed || hasAcceptanceLanguage,
     touchesPrivateMock: /as any|@ts-ignore|_engine|_agentMgr|_sessionCoord|currentSessionPath|currentAgentId/.test(haystack),
-    hardcodesHanaHome: /\.hanako(?:-dev)?/.test(haystack),
+    hardcodesLingxiHome: /\.hanako(?:-dev)?/.test(haystack),
   };
   const category = categorize(rel, lowerHaystack, flags);
   const decision = decide(flags, category);
@@ -132,10 +132,10 @@ function decide(flags, category) {
   if (category.startsWith("regression")) return "MERGE";
   if (category === "security" || category === "build" || category === "platform") return "KEEP";
   if (category === "persistence" || category === "adapter" || category === "architecture" || category === "ui-state") {
-    return flags.touchesPrivateMock || flags.hardcodesHanaHome ? "SHRINK" : "KEEP";
+    return flags.touchesPrivateMock || flags.hardcodesLingxiHome ? "SHRINK" : "KEEP";
   }
   if (category === "scaffold") return "QUARANTINE";
-  if (flags.touchesPrivateMock || flags.hardcodesHanaHome) return "SHRINK";
+  if (flags.touchesPrivateMock || flags.hardcodesLingxiHome) return "SHRINK";
   return "QUARANTINE";
 }
 
@@ -174,7 +174,7 @@ function deleteOrMergeCandidate(flags, category, decision) {
   if (category.startsWith("regression")) candidates.push("merge into permanent behavior-named contract if coverage is still unique");
   if (decision === "QUARANTINE") candidates.push("review for implementation detail, duplicate coverage, or obsolete scaffold value");
   if (flags.touchesPrivateMock) candidates.push("rewrite away from private-field/mock coupling if kept");
-  if (flags.hardcodesHanaHome) candidates.push("replace hardcoded Hana data directory with injected temp LINGXI_HOME");
+  if (flags.hardcodesLingxiHome) candidates.push("replace hardcoded Hana data directory with injected temp LINGXI_HOME");
   if (!candidates.length) candidates.push("none in first-pass inventory");
   return candidates.join("; ");
 }

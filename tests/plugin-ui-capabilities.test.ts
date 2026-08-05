@@ -3,7 +3,7 @@
  */
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { PLUGIN_UI_CAPABILITY } from '@hana/plugin-protocol';
+import { PLUGIN_UI_CAPABILITY } from '@lingxi/plugin-protocol';
 import { DEFAULT_PLUGIN_UI_CAPABILITIES } from '../desktop/src/react/plugin-ui/capabilities';
 import { useStore } from '../desktop/src/react/stores';
 import type { PluginUiRequestContext } from '../desktop/src/react/plugin-ui/plugin-ui-host-controller';

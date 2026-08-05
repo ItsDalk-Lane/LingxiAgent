@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
-import { createMediaDetails, defineTool } from "@hana/plugin-runtime";
+import { createMediaDetails, defineTool } from "@lingxi/plugin-runtime";
 
 const tool = defineTool({
   name: "sdk_showcase_create_note",

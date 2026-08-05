@@ -8,8 +8,8 @@ import {
   PLUGIN_UI_CAPABILITY,
   PLUGIN_UI_PROTOCOL,
   PLUGIN_UI_PROTOCOL_VERSION,
-} from '@hana/plugin-protocol';
-import { createHanaPluginSdk, HanaPluginError } from '@hana/plugin-sdk';
+} from '@lingxi/plugin-protocol';
+import { createLingxiPluginSdk, LingxiPluginError } from '@lingxi/plugin-sdk';
 
 function makeParentWindow() {
   return { postMessage: vi.fn() } as unknown as Window & { postMessage: ReturnType<typeof vi.fn> };
@@ -31,7 +31,7 @@ function makeTargetWindow(href: string) {
 describe('plugin SDK', () => {
   it('posts ready and resize as versioned plugin UI events', () => {
     const parentWindow = makeParentWindow();
-    const sdk = createHanaPluginSdk({
+    const sdk = createLingxiPluginSdk({
       parentWindow,
       targetWindow: window,
       targetOrigin: 'http://127.0.0.1:3210',
@@ -58,7 +58,7 @@ describe('plugin SDK', () => {
 
   it('resolves host requests only from the configured parent window and origin', async () => {
     const parentWindow = makeParentWindow();
-    const sdk = createHanaPluginSdk({
+    const sdk = createLingxiPluginSdk({
       parentWindow,
       targetWindow: window,
       targetOrigin: 'http://127.0.0.1:3210',
@@ -116,9 +116,9 @@ describe('plugin SDK', () => {
     await expect(pending).resolves.toEqual({ ok: true });
   });
 
-  it('rejects host request errors with a typed HanaPluginError', async () => {
+  it('rejects host request errors with a typed LingxiPluginError', async () => {
     const parentWindow = makeParentWindow();
-    const sdk = createHanaPluginSdk({
+    const sdk = createLingxiPluginSdk({
       parentWindow,
       targetWindow: window,
       targetOrigin: 'http://127.0.0.1:3210',
@@ -145,16 +145,16 @@ describe('plugin SDK', () => {
     }));
 
     await expect(pending).rejects.toMatchObject({
-      name: 'HanaPluginError',
+      name: 'LingxiPluginError',
       code: 'CAPABILITY_DENIED',
       message: 'Capability denied.',
       details: { capability: 'external.open' },
-    } satisfies Partial<HanaPluginError>);
+    } satisfies Partial<LingxiPluginError>);
   });
 
   it('wraps toast.show as a typed host request helper', async () => {
     const parentWindow = makeParentWindow();
-    const sdk = createHanaPluginSdk({
+    const sdk = createLingxiPluginSdk({
       parentWindow,
       targetWindow: window,
       targetOrigin: 'http://127.0.0.1:3210',
@@ -190,7 +190,7 @@ describe('plugin SDK', () => {
 
   it('wraps external.open string input as a typed host request helper', async () => {
     const parentWindow = makeParentWindow();
-    const sdk = createHanaPluginSdk({
+    const sdk = createLingxiPluginSdk({
       parentWindow,
       targetWindow: window,
       targetOrigin: 'http://127.0.0.1:3210',
@@ -226,7 +226,7 @@ describe('plugin SDK', () => {
 
   it('wraps clipboard.writeText string input as a typed host request helper', async () => {
     const parentWindow = makeParentWindow();
-    const sdk = createHanaPluginSdk({
+    const sdk = createLingxiPluginSdk({
       parentWindow,
       targetWindow: window,
       targetOrigin: 'http://127.0.0.1:3210',
@@ -262,7 +262,7 @@ describe('plugin SDK', () => {
 
   it('wraps resource helpers as browser-safe host requests', async () => {
     const parentWindow = makeParentWindow();
-    const sdk = createHanaPluginSdk({
+    const sdk = createLingxiPluginSdk({
       parentWindow,
       targetWindow: window,
       targetOrigin: 'http://127.0.0.1:3210',
@@ -305,7 +305,7 @@ describe('plugin SDK', () => {
   it('resolves plugin asset URLs from the current iframe route', () => {
     const parentWindow = makeParentWindow();
     const targetWindow = makeTargetWindow('https://hana.example/api/plugins/demo-plugin/page?hana-host-origin=https%3A%2F%2Fhana.example');
-    const sdk = createHanaPluginSdk({
+    const sdk = createLingxiPluginSdk({
       parentWindow,
       targetWindow,
       targetOrigin: 'https://hana.example',
@@ -316,7 +316,7 @@ describe('plugin SDK', () => {
   });
 
   it('resolves plugin API URLs from the current iframe route', () => {
-    const sdk = createHanaPluginSdk({
+    const sdk = createLingxiPluginSdk({
       parentWindow: makeParentWindow(),
       targetWindow: makeTargetWindow('https://hana.example/api/plugins/demo-plugin/page?pluginSurfaceSession=session-1'),
       targetOrigin: 'https://hana.example',
@@ -332,7 +332,7 @@ describe('plugin SDK', () => {
       ...makeTargetWindow('https://hana.example/api/plugins/demo-plugin/page?pluginSurfaceSession=session-1'),
       fetch: fetchMock,
     } as unknown as Window;
-    const sdk = createHanaPluginSdk({
+    const sdk = createLingxiPluginSdk({
       parentWindow: makeParentWindow(),
       targetWindow,
       targetOrigin: 'https://hana.example',
@@ -357,7 +357,7 @@ describe('plugin SDK', () => {
   });
 
   it('rejects unsafe plugin API inputs and missing surface sessions', () => {
-    const sdk = createHanaPluginSdk({
+    const sdk = createLingxiPluginSdk({
       parentWindow: makeParentWindow(),
       targetWindow: makeTargetWindow('https://hana.example/api/plugins/demo/page?pluginSurfaceSession=session-1'),
       targetOrigin: 'https://hana.example',
@@ -375,7 +375,7 @@ describe('plugin SDK', () => {
       expect(() => sdk.api.url(unsafePath)).toThrow(/plugin API path/i);
     }
 
-    const missingSessionSdk = createHanaPluginSdk({
+    const missingSessionSdk = createLingxiPluginSdk({
       parentWindow: makeParentWindow(),
       targetWindow: makeTargetWindow('https://hana.example/api/plugins/demo/page'),
       targetOrigin: 'https://hana.example',
@@ -384,7 +384,7 @@ describe('plugin SDK', () => {
   });
 
   it('rejects unsafe plugin asset URL inputs', () => {
-    const sdk = createHanaPluginSdk({
+    const sdk = createLingxiPluginSdk({
       parentWindow: makeParentWindow(),
       targetWindow: makeTargetWindow('https://hana.example/api/plugins/demo/page'),
       targetOrigin: 'https://hana.example',

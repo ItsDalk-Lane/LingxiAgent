@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { PLUGIN_SURFACE_SESSION_QUERY } from '@hana/plugin-protocol';
+import { PLUGIN_SURFACE_SESSION_QUERY } from '@lingxi/plugin-protocol';
 import { useStore } from '../stores';
 import {
   appendConnectionAuth,

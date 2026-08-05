@@ -1,5 +1,5 @@
 /**
- * HanaAgent Server — HTTP + WebSocket API
+ * LingxiAgent Server — HTTP + WebSocket API
  *
  * 启动方式（本文件只导出 startServer，自身不自举，由上层组合入口调用）：
  *   npm run server                              （独立运行，经 launch.js）
@@ -34,7 +34,7 @@ import { resolveServerListenOptions, saveServerNetworkConfig } from "../core/ser
 import {
   decideLoopbackBindFallback,
   ensureServerNetworkConfigWithPortSelection,
-  isHanaServerListeningOnPort,
+  isLingxiServerListeningOnPort,
   selectLoopbackListenPort,
 } from "../core/server-port-selection.ts";
 import { isCorsOriginAllowed } from "./http/cors-policy.ts";
@@ -160,7 +160,7 @@ export async function startServer(root: CompositionRoot = {}): Promise<void> {
       // 非蓝图错误码下对 /api/health 做无意义的额外网络请求。
       const fallbackEligible =
         BIND_FALLBACK_CANDIDATE_CODES.has(errCode) && networkMode === "loopback" && !envPortPinned;
-      const hanaOnPort = fallbackEligible ? await isHanaServerListeningOnPort({ port, host }) : false;
+      const hanaOnPort = fallbackEligible ? await isLingxiServerListeningOnPort({ port, host }) : false;
       const decision = decideLoopbackBindFallback({ errCode, networkMode, envPortPinned, hanaOnPort });
 
       if (decision === "fallback") {
@@ -182,7 +182,7 @@ export async function startServer(root: CompositionRoot = {}): Promise<void> {
       if (decision === "fail-other-hana") {
         const startupError: any = createPortInUseStartupError(err, { host, port, listenHost, networkMode });
         startupError.startupPayload.suggestions.unshift(
-          "Another HanaAgent server is already listening on this port. If you have a second HanaAgent installation or data directory, give each one a distinct port; if this is a leftover process, quit hana-server from Task Manager.",
+          "Another LingxiAgent server is already listening on this port. If you have a second LingxiAgent installation or data directory, give each one a distinct port; if this is a leftover process, quit hana-server from Task Manager.",
         );
         failStartup(startupError);
       }
@@ -1221,7 +1221,7 @@ export async function startServer(root: CompositionRoot = {}): Promise<void> {
     const actualPort = address.port;
     serverRuntimeState.actualPort = actualPort;
 
-    log.log(`HanaAgent Server 运行在 http://${host}:${actualPort}`);
+    log.log(`LingxiAgent Server 运行在 http://${host}:${actualPort}`);
     dlog.log("server", `listening on :${actualPort}`);
 
     // 写 server-info 文件，供 Electron 检测复用或外部工具查询。

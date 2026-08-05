@@ -753,7 +753,7 @@ function isMoonshotEndpoint(model: any, context: any = {}) {
     || baseUrl.includes("moonshot.ai");
 }
 
-export function withHanaVideoInputCompat(model: any, enabled: unknown): any {
+export function withLingxiVideoInputCompat(model: any, enabled: unknown): any {
   if (!isPlainObject(model) || enabled !== true) return model;
 
   const compat = isPlainObject(model.compat) ? model.compat : {};
@@ -768,7 +768,7 @@ export function withHanaVideoInputCompat(model: any, enabled: unknown): any {
   };
 }
 
-export function withHanaAudioInputCompat(model: any, enabled: unknown): any {
+export function withLingxiAudioInputCompat(model: any, enabled: unknown): any {
   if (!isPlainObject(model) || enabled !== true) return model;
 
   const compat = isPlainObject(model.compat) ? model.compat : {};

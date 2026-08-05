@@ -40,7 +40,7 @@ describe("local startup contract", () => {
     expect(cliSource).not.toContain("LingxiEngine");
     expect(cliEntrySource).not.toContain("LingxiEngine");
     expect(launchSource).toContain('"cli/entry.ts"');
-    expect(serverSource).not.toContain("ensureHanaPiSdkDirs");
+    expect(serverSource).not.toContain("ensureLingxiPiSdkDirs");
     expect(serverSource).not.toContain("configureProcessPiSdkEnv");
     expect(serverSource).not.toContain("PI_CODING_AGENT_DIR");
   });
@@ -48,9 +48,9 @@ describe("local startup contract", () => {
   it("desktop main does not create Pi directories or propagate Pi's global agent directory", () => {
     const mainCjs = fs.readFileSync(path.join(ROOT, "desktop", "main.cjs"), "utf-8");
 
-    expect(mainCjs).not.toContain("ensureHanaPiSdkDirs");
+    expect(mainCjs).not.toContain("ensureLingxiPiSdkDirs");
     expect(mainCjs).not.toContain("configureProcessPiSdkEnv");
-    expect(mainCjs).not.toContain("withHanaPiSdkEnv");
+    expect(mainCjs).not.toContain("withLingxiPiSdkEnv");
     expect(mainCjs).toContain("delete serverEnv.PI_CODING_AGENT_DIR");
   });
 

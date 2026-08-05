@@ -5,7 +5,7 @@ import path from "path";
 import { spawn as defaultSpawn } from "child_process";
 import { isWin32PathLike } from "../shell/shell-utils.ts";
 import {
-  buildWin32HanaWriteAclCleanupArgs,
+  buildWin32LingxiWriteAclCleanupArgs,
   buildWin32LegacyAclDiagnosticArgs,
   buildWin32LegacyProfileCleanupArgs,
 } from "./win32-legacy-maintenance.ts";
@@ -209,7 +209,7 @@ function buildMigrationPhases({ targets, cleanup, cleanupProfiles = true }) {
   if (targets.aclPaths?.length) {
     const args = [];
     if (cleanup) {
-      args.push(...buildWin32HanaWriteAclCleanupArgs({ paths: targets.aclPaths }));
+      args.push(...buildWin32LingxiWriteAclCleanupArgs({ paths: targets.aclPaths }));
       for (const name of profileNames) args.push("--legacy-appcontainer-profile", name);
     }
     args.push(...buildWin32LegacyAclDiagnosticArgs({

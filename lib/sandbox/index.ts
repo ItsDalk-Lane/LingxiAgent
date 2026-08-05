@@ -37,7 +37,7 @@ import { createSandboxResourceIO } from "../resource-io/sandbox-resource-io.ts";
 import { createExecCommandTools } from "../exec-command/tool.ts";
 import { detectWin32PowerShellFlavor } from "./win32-runtime-cache.ts";
 import {
-  resolveHanaPiSdkManagedBinDir,
+  resolveLingxiPiSdkManagedBinDir,
   resolveLegacyPiSdkManagedBinDir,
 } from "../../shared/hana-runtime-paths.ts";
 
@@ -182,7 +182,7 @@ export function createSandboxedTools(cwd, customTools, {
     detectImageMimeType: async (p) => IMAGE_MIMES[extname(p).toLowerCase()] || undefined,
   });
   const searchToolPaths = {
-    managedBinDir: resolveHanaPiSdkManagedBinDir(hanakoHome),
+    managedBinDir: resolveLingxiPiSdkManagedBinDir(hanakoHome),
     legacyManagedBinDir: resolveLegacyPiSdkManagedBinDir(hanakoHome),
   };
   const enhancedReadFile = createEnhancedReadFile();

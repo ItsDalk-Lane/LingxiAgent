@@ -1404,7 +1404,7 @@ function migrateMiniMaxTokenPlanAnthropicEndpoint(ctx) {
   provider.api = MINIMAX_CURRENT_ANTHROPIC_API;
 
   const header =
-    "# HanaAgent 供应商配置（全局，跨 agent 共享）\n" +
+    "# LingxiAgent 供应商配置（全局，跨 agent 共享）\n" +
     "# 由设置页面管理\n\n";
   const yamlStr = header + YAML.dump(raw, {
     indent: 2,
@@ -1461,7 +1461,7 @@ function migrateVisionToImage(ctx) {
     }
     if (changed) {
       const header =
-        "# HanaAgent 供应商配置（全局，跨 agent 共享）\n" +
+        "# LingxiAgent 供应商配置（全局，跨 agent 共享）\n" +
         "# 由设置页面管理\n\n";
       const yamlStr = header + YAML.dump(raw, {
         indent: 2,
@@ -3472,7 +3472,7 @@ function migrateGeminiOpenAICompatToNative(ctx) {
 
   if (patched > 0) {
     const header =
-      "# HanaAgent 供应商配置（全局，跨 agent 共享）\n" +
+      "# LingxiAgent 供应商配置（全局，跨 agent 共享）\n" +
       "# 由设置页面管理\n\n";
     const yamlStr = header + YAML.dump(raw, {
       indent: 2,
@@ -3710,7 +3710,7 @@ function repairPiModelInputRecord(providerId, record, fallbackModelId) {
     record.input = sanitizedInput.input;
     patched++;
   }
-  if (shouldEnableVideo && ensureHanaVideoInputCompat(record)) patched++;
+  if (shouldEnableVideo && ensureLingxiVideoInputCompat(record)) patched++;
   if (hadRuntimeVideoField) {
     delete record.video;
     patched++;
@@ -3745,7 +3745,7 @@ function sanitizePiInputModalities(input) {
   };
 }
 
-function ensureHanaVideoInputCompat(record) {
+function ensureLingxiVideoInputCompat(record) {
   const compat = record.compat && typeof record.compat === "object" && !Array.isArray(record.compat)
     ? record.compat
     : {};
@@ -3809,7 +3809,7 @@ function promoteAgentVideoOverrides(ctx) {
 
   if (addedModelsChanged) {
     const header =
-      "# HanaAgent 供应商配置（全局，跨 agent 共享）\n" +
+      "# LingxiAgent 供应商配置（全局，跨 agent 共享）\n" +
       "# 由设置页面管理\n\n";
     writeSecretFileSync(
       ymlPath,
@@ -4140,7 +4140,7 @@ function repairLegacyDeepSeekProviderModelIds(ctx) {
 
   if (patched > 0) {
     const header =
-      "# HanaAgent 供应商配置（全局，跨 agent 共享）\n" +
+      "# LingxiAgent 供应商配置（全局，跨 agent 共享）\n" +
       "# 由设置页面管理\n\n";
     writeSecretFileSync(
       ymlPath,

@@ -5,10 +5,10 @@ import path from "path";
 
 import {
   resolveHanakoHome,
-  resolveHanaPiSdkManagedBinDir,
-  resolveHanaPiSdkResourceLoaderAgentDir,
-  resolveHanaPiSdkResourceLoaderCwd,
-  resolveHanaPiSdkRuntimeRoot,
+  resolveLingxiPiSdkManagedBinDir,
+  resolveLingxiPiSdkResourceLoaderAgentDir,
+  resolveLingxiPiSdkResourceLoaderCwd,
+  resolveLingxiPiSdkRuntimeRoot,
   resolveLegacyPiSdkManagedBinDir,
 } from "../shared/hana-runtime-paths.ts";
 
@@ -17,10 +17,10 @@ describe("Hana runtime path contracts", () => {
     const hanakoHome = path.join(os.tmpdir(), "hana-runtime-paths", ".hanako-dev");
     const runtimeRoot = path.join(hanakoHome, "runtime", "pi-sdk");
 
-    expect(resolveHanaPiSdkRuntimeRoot(hanakoHome)).toBe(runtimeRoot);
-    expect(resolveHanaPiSdkManagedBinDir(hanakoHome)).toBe(path.join(runtimeRoot, "bin"));
-    expect(resolveHanaPiSdkResourceLoaderCwd(hanakoHome)).toBe(path.join(runtimeRoot, "resource-loader", "project"));
-    expect(resolveHanaPiSdkResourceLoaderAgentDir(hanakoHome)).toBe(path.join(runtimeRoot, "resource-loader", "agent"));
+    expect(resolveLingxiPiSdkRuntimeRoot(hanakoHome)).toBe(runtimeRoot);
+    expect(resolveLingxiPiSdkManagedBinDir(hanakoHome)).toBe(path.join(runtimeRoot, "bin"));
+    expect(resolveLingxiPiSdkResourceLoaderCwd(hanakoHome)).toBe(path.join(runtimeRoot, "resource-loader", "project"));
+    expect(resolveLingxiPiSdkResourceLoaderAgentDir(hanakoHome)).toBe(path.join(runtimeRoot, "resource-loader", "agent"));
   });
 
   it("normalizes LINGXI_HOME before deriving Pi SDK paths", () => {
@@ -36,7 +36,7 @@ describe("Hana runtime path contracts", () => {
     expect(resolveLegacyPiSdkManagedBinDir(hanakoHome)).toBe(
       path.join(hanakoHome, ".pi", "agent", "bin"),
     );
-    expect(resolveHanaPiSdkManagedBinDir(hanakoHome)).toBe(
+    expect(resolveLingxiPiSdkManagedBinDir(hanakoHome)).toBe(
       path.join(hanakoHome, "runtime", "pi-sdk", "bin"),
     );
 

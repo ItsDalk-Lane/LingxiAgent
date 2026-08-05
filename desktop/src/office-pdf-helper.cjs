@@ -61,7 +61,7 @@ function normalizeJob(raw) {
     landscape: raw.landscape === true,
     margins: raw.margins && typeof raw.margins === "object" ? raw.margins : undefined,
     allowJavaScript: raw.allowJavaScript === true,
-    embedHanaFonts: raw.embedHanaFonts !== false,
+    embedLingxiFonts: raw.embedLingxiFonts !== false,
     settleMs: normalizeNumber(raw.settleMs, 250, 0, 30000),
     timeoutMs: normalizeNumber(raw.timeoutMs, DEFAULT_TIMEOUT_MS, 1000, 5 * 60 * 1000),
   };
@@ -90,7 +90,7 @@ async function waitForPageAssets(webContents, settleMs) {
 
 async function renderJob(job) {
   // 注入素材在开窗口前构建：字体资源缺失时显式失败，不静默产出回退字体的 PDF。
-  const fontCss = job.embedHanaFonts ? buildFontInjectionCss() : null;
+  const fontCss = job.embedLingxiFonts ? buildFontInjectionCss() : null;
 
   const win = new BrowserWindow({
     show: false,

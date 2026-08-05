@@ -51,7 +51,7 @@ describe("desktop main GPU startup contract", () => {
 
   it("settles legacy GPU preference cleanup only after the local server is ready", () => {
     const source = fs.readFileSync(MAIN_PATH, "utf-8");
-    const startupBlockIndex = source.indexOf('console.log("[desktop] 启动 HanaAgent Server...")');
+    const startupBlockIndex = source.indexOf('console.log("[desktop] 启动 LingxiAgent Server...")');
     const serverStartIndex = source.indexOf("await startServer();", startupBlockIndex);
     const settleIndex = source.indexOf("await settleLegacyGpuPreferenceAfterServerStart();", serverStartIndex);
     const serverReadyIndex = source.indexOf('phase: "server-ready"', settleIndex);

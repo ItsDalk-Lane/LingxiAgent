@@ -19,7 +19,7 @@
 import fs from "fs";
 import path from "path";
 import readline from "readline";
-import { resolveCliHanaHome } from "./local-server.ts";
+import { resolveCliLingxiHome } from "./local-server.ts";
 import { ansi } from "./terminal-theme.ts";
 import { inspectDataEpochMaintenance } from "../core/data-epoch-coordinator.ts";
 import { restoreDataEpochCheckpoint } from "../core/data-epoch-restore.ts";
@@ -116,7 +116,7 @@ function formatBytes(bytes: number): string {
  * readDataEpochRestoreJournal, inspectDataEpochMaintenance,
  * listDataEpochCheckpoints) only reads.
  */
-export async function runDataDiagnose({ hanaHome = resolveCliHanaHome() }: { hanaHome?: string } = {}): Promise<number> {
+export async function runDataDiagnose({ hanaHome = resolveCliLingxiHome() }: { hanaHome?: string } = {}): Promise<number> {
   console.log(`Data-epoch diagnostics ${ansi.dim}(${hanaHome})${ansi.reset}`);
   console.log(`  Kernel DATA_EPOCH    ${DATA_EPOCH}`);
 
@@ -174,7 +174,7 @@ export async function runDataDiagnose({ hanaHome = resolveCliHanaHome() }: { han
 /**
  * `hana data checkpoints` — lists every available recovery checkpoint.
  */
-export async function runDataCheckpoints({ hanaHome = resolveCliHanaHome() }: { hanaHome?: string } = {}): Promise<number> {
+export async function runDataCheckpoints({ hanaHome = resolveCliLingxiHome() }: { hanaHome?: string } = {}): Promise<number> {
   const { checkpoints, skipped } = listDataEpochCheckpoints(hanaHome);
   if (checkpoints.length === 0) {
     console.log(`${ansi.dim}No data-epoch checkpoints available.${ansi.reset}`);
@@ -221,7 +221,7 @@ function defaultPromptConfirmation(question: string): Promise<string> {
 export async function runDataRestore({
   transitionId,
   confirmToken = null,
-  hanaHome = resolveCliHanaHome(),
+  hanaHome = resolveCliLingxiHome(),
   restore = restoreDataEpochCheckpoint,
   isTTY = process.stdin.isTTY === true,
   promptConfirmation = defaultPromptConfirmation,

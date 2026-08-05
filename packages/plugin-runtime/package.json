@@ -1,5 +1,5 @@
 {
-  "name": "@hana/plugin-runtime",
+  "name": "@lingxi/plugin-runtime",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -17,7 +17,7 @@
     "README.md"
   ],
   "dependencies": {
-    "@hana/plugin-protocol": "0.0.0"
+    "@lingxi/plugin-protocol": "0.0.0"
   },
   "scripts": {
     "build": "tsc -p tsconfig.json"

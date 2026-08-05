@@ -9,12 +9,12 @@ import {
 } from 'react';
 import { cx } from './classnames';
 
-export type HanaButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger';
-export type HanaButtonSize = 'sm' | 'md' | 'lg';
+export type LingxiButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger';
+export type LingxiButtonSize = 'sm' | 'md' | 'lg';
 
 export interface ButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'size'> {
-  variant?: HanaButtonVariant;
-  size?: HanaButtonSize;
+  variant?: LingxiButtonVariant;
+  size?: LingxiButtonSize;
   loading?: boolean;
   iconLeft?: ReactNode;
   iconRight?: ReactNode;
@@ -58,8 +58,8 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
 
 export interface IconButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children'> {
   label: string;
-  size?: HanaButtonSize;
-  variant?: Extract<HanaButtonVariant, 'secondary' | 'ghost' | 'danger'>;
+  size?: LingxiButtonSize;
+  variant?: Extract<LingxiButtonVariant, 'secondary' | 'ghost' | 'danger'>;
   children: ReactNode;
 }
 

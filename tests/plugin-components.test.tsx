@@ -9,7 +9,7 @@ import {
   Button,
   CardShell,
   EmptyState,
-  HanaThemeProvider,
+  LingxiThemeProvider,
   IconButton,
   List,
   Select,
@@ -17,7 +17,7 @@ import {
   Switch,
   Textarea,
   TextInput,
-} from '@hana/plugin-components';
+} from '@lingxi/plugin-components';
 
 describe('plugin component SDK', () => {
   afterEach(() => {
@@ -26,9 +26,9 @@ describe('plugin component SDK', () => {
 
   it('renders plugin surfaces that inherit Hana theme variables by default', () => {
     render(
-      <HanaThemeProvider>
+      <LingxiThemeProvider>
         <CardShell title="工具结果">正文</CardShell>
-      </HanaThemeProvider>,
+      </LingxiThemeProvider>,
     );
 
     const root = screen.getByTestId('hana-plugin-theme');
@@ -41,9 +41,9 @@ describe('plugin component SDK', () => {
 
   it('applies named and custom theme tokens while leaving unspecified tokens to CSS fallback', () => {
     const { rerender } = render(
-      <HanaThemeProvider mode="hana" theme="midnight">
+      <LingxiThemeProvider mode="hana" theme="midnight">
         <span>named</span>
-      </HanaThemeProvider>,
+      </LingxiThemeProvider>,
     );
 
     let root = screen.getByTestId('hana-plugin-theme');
@@ -55,9 +55,9 @@ describe('plugin component SDK', () => {
     });
 
     rerender(
-      <HanaThemeProvider mode="custom" theme={{ bg: '#111111', accent: '#88AAFF' }}>
+      <LingxiThemeProvider mode="custom" theme={{ bg: '#111111', accent: '#88AAFF' }}>
         <span>custom</span>
-      </HanaThemeProvider>,
+      </LingxiThemeProvider>,
     );
 
     root = screen.getByTestId('hana-plugin-theme');

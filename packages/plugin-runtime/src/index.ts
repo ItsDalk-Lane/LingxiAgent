@@ -18,7 +18,7 @@ import type {
   PluginResourceWriteConflictResult,
   PluginResourceWriteExpectedVersionResult,
   PluginResourceMutationResult,
-} from '@hana/plugin-protocol';
+} from '@lingxi/plugin-protocol';
 
 export type MaybePromise<T> = T | Promise<T>;
 
@@ -26,25 +26,25 @@ export type JsonSchema = Record<string, unknown>;
 
 export const HANA_BUS_SKIP = Symbol.for('hana.event-bus.skip');
 
-export interface HanaToolResult {
+export interface LingxiToolResult {
   content?: Array<Record<string, unknown>>;
   details?: Record<string, unknown>;
 }
 
-export interface HanaSessionRef {
+export interface LingxiSessionRef {
   sessionId: string;
   sessionPath?: string | null;
   legacySessionPath?: string | null;
 }
 
-export type HanaSessionTarget = string | HanaSessionRef | {
+export type LingxiSessionTarget = string | LingxiSessionRef | {
   sessionId?: string | null;
   sessionPath?: string | null;
   path?: string | null;
   legacySessionPath?: string | null;
 };
 
-export interface HanaSessionFile {
+export interface LingxiSessionFile {
   id?: string | null;
   fileId?: string | null;
   sessionId?: string | null;
@@ -65,11 +65,11 @@ export interface HanaSessionFile {
   storageKind?: string;
   status?: string;
   missingAt?: number | string | null;
-  resource?: HanaResourceEnvelope;
+  resource?: LingxiResourceEnvelope;
   [key: string]: unknown;
 }
 
-export interface HanaResourceEnvelope {
+export interface LingxiResourceEnvelope {
   schemaVersion: 1;
   resourceId: string;
   name: string;
@@ -105,65 +105,65 @@ export interface HanaResourceEnvelope {
   [key: string]: unknown;
 }
 
-export type HanaResourceRef = PluginResourceRef;
-export type HanaResourceVersion = PluginResourceVersion;
-export type HanaResourceDescriptor = PluginResourceDescriptor;
-export type HanaResourceStat = PluginResourceStat;
-export type HanaResourceReadResult = PluginResourceReadResult;
-export type HanaResourceMutationResult = PluginResourceMutationResult;
-export type HanaResourceWriteConflictResult = PluginResourceWriteConflictResult;
-export type HanaResourceWriteExpectedVersionResult = PluginResourceWriteExpectedVersionResult;
-export type HanaResourceMoveResult = PluginResourceMoveResult;
-export type HanaResourceTrashOptions = PluginResourceTrashOptions;
-export type HanaResourceTrashResult = PluginResourceTrashResult;
-export type HanaResourceEdit = PluginResourceEdit;
-export type HanaResourceListItem = PluginResourceListItem;
-export type HanaResourceListResult = PluginResourceListResult;
-export type HanaResourceSearchOptions = PluginResourceSearchOptions;
-export type HanaResourceSearchMatch = PluginResourceSearchMatch;
-export type HanaResourceSearchResult = PluginResourceSearchResult;
-export type HanaResourceMaterializeResult = PluginResourceMaterializeResult;
-export type HanaResourceWatchTarget = PluginResourceWatchTarget;
+export type LingxiResourceRef = PluginResourceRef;
+export type LingxiResourceVersion = PluginResourceVersion;
+export type LingxiResourceDescriptor = PluginResourceDescriptor;
+export type LingxiResourceStat = PluginResourceStat;
+export type LingxiResourceReadResult = PluginResourceReadResult;
+export type LingxiResourceMutationResult = PluginResourceMutationResult;
+export type LingxiResourceWriteConflictResult = PluginResourceWriteConflictResult;
+export type LingxiResourceWriteExpectedVersionResult = PluginResourceWriteExpectedVersionResult;
+export type LingxiResourceMoveResult = PluginResourceMoveResult;
+export type LingxiResourceTrashOptions = PluginResourceTrashOptions;
+export type LingxiResourceTrashResult = PluginResourceTrashResult;
+export type LingxiResourceEdit = PluginResourceEdit;
+export type LingxiResourceListItem = PluginResourceListItem;
+export type LingxiResourceListResult = PluginResourceListResult;
+export type LingxiResourceSearchOptions = PluginResourceSearchOptions;
+export type LingxiResourceSearchMatch = PluginResourceSearchMatch;
+export type LingxiResourceSearchResult = PluginResourceSearchResult;
+export type LingxiResourceMaterializeResult = PluginResourceMaterializeResult;
+export type LingxiResourceWatchTarget = PluginResourceWatchTarget;
 
-export interface HanaPluginResourceMutationOptions {
+export interface LingxiPluginResourceMutationOptions {
   emit?: boolean;
 }
 
-export interface HanaPluginResourceWatchOptions {
+export interface LingxiPluginResourceWatchOptions {
   purpose?: string | null;
-  sessionRef?: HanaSessionRef | { sessionPath?: string | null; path?: string | null } | null;
+  sessionRef?: LingxiSessionRef | { sessionPath?: string | null; path?: string | null } | null;
   /** @deprecated Prefer sessionId/sessionRef on the invocation context. */
   sessionPath?: string | null;
 }
 
-export interface HanaResourceWatchSubscription {
+export interface LingxiResourceWatchSubscription {
   subscriptionId: string;
   resourceKeys: string[];
   unsubscribe(): boolean;
   close(): boolean;
 }
 
-export interface HanaPluginResources {
-  stat(ref: HanaResourceRef | Record<string, unknown>): Promise<HanaResourceStat>;
-  read(ref: HanaResourceRef | Record<string, unknown>): Promise<HanaResourceReadResult>;
-  list(ref: HanaResourceRef | Record<string, unknown>): Promise<HanaResourceListResult>;
-  search(ref: HanaResourceRef | Record<string, unknown>, options?: HanaResourceSearchOptions): Promise<HanaResourceSearchResult>;
-  materialize(ref: HanaResourceRef | Record<string, unknown>): Promise<HanaResourceMaterializeResult>;
-  write(ref: HanaResourceRef | Record<string, unknown>, content: string | Uint8Array | ArrayBuffer, options?: HanaPluginResourceMutationOptions): Promise<HanaResourceMutationResult>;
-  writeExpectedVersion(ref: HanaResourceRef | Record<string, unknown>, content: string | Uint8Array | ArrayBuffer, expectedVersion: HanaResourceVersion, options?: HanaPluginResourceMutationOptions): Promise<HanaResourceWriteExpectedVersionResult>;
-  edit(ref: HanaResourceRef | Record<string, unknown>, edits: HanaResourceEdit[], options?: HanaPluginResourceMutationOptions): Promise<HanaResourceMutationResult>;
-  mkdir(ref: HanaResourceRef | Record<string, unknown>, options?: HanaPluginResourceMutationOptions): Promise<HanaResourceMutationResult>;
-  delete(ref: HanaResourceRef | Record<string, unknown>, options?: HanaPluginResourceMutationOptions): Promise<HanaResourceMutationResult>;
-  copy(from: HanaResourceRef | Record<string, unknown>, to: HanaResourceRef | Record<string, unknown>, options?: HanaPluginResourceMutationOptions): Promise<HanaResourceMutationResult>;
-  rename(from: HanaResourceRef | Record<string, unknown>, to: HanaResourceRef | Record<string, unknown>, options?: HanaPluginResourceMutationOptions): Promise<HanaResourceMoveResult>;
-  move(from: HanaResourceRef | Record<string, unknown>, to: HanaResourceRef | Record<string, unknown>, options?: HanaPluginResourceMutationOptions): Promise<HanaResourceMoveResult>;
-  trash(ref: HanaResourceRef | Record<string, unknown>, trashOptions?: HanaResourceTrashOptions, options?: HanaPluginResourceMutationOptions): Promise<HanaResourceTrashResult>;
-  watch(ref: HanaResourceRef | Record<string, unknown>, options?: HanaPluginResourceWatchOptions): HanaResourceWatchSubscription;
-  subscribe(resources: Array<HanaResourceRef | Record<string, unknown>>, options?: HanaPluginResourceWatchOptions): HanaResourceWatchSubscription;
-  resolveWatchTarget?(ref: HanaResourceRef | Record<string, unknown>, options?: HanaPluginResourceWatchOptions): HanaResourceWatchTarget;
+export interface LingxiPluginResources {
+  stat(ref: LingxiResourceRef | Record<string, unknown>): Promise<LingxiResourceStat>;
+  read(ref: LingxiResourceRef | Record<string, unknown>): Promise<LingxiResourceReadResult>;
+  list(ref: LingxiResourceRef | Record<string, unknown>): Promise<LingxiResourceListResult>;
+  search(ref: LingxiResourceRef | Record<string, unknown>, options?: LingxiResourceSearchOptions): Promise<LingxiResourceSearchResult>;
+  materialize(ref: LingxiResourceRef | Record<string, unknown>): Promise<LingxiResourceMaterializeResult>;
+  write(ref: LingxiResourceRef | Record<string, unknown>, content: string | Uint8Array | ArrayBuffer, options?: LingxiPluginResourceMutationOptions): Promise<LingxiResourceMutationResult>;
+  writeExpectedVersion(ref: LingxiResourceRef | Record<string, unknown>, content: string | Uint8Array | ArrayBuffer, expectedVersion: LingxiResourceVersion, options?: LingxiPluginResourceMutationOptions): Promise<LingxiResourceWriteExpectedVersionResult>;
+  edit(ref: LingxiResourceRef | Record<string, unknown>, edits: LingxiResourceEdit[], options?: LingxiPluginResourceMutationOptions): Promise<LingxiResourceMutationResult>;
+  mkdir(ref: LingxiResourceRef | Record<string, unknown>, options?: LingxiPluginResourceMutationOptions): Promise<LingxiResourceMutationResult>;
+  delete(ref: LingxiResourceRef | Record<string, unknown>, options?: LingxiPluginResourceMutationOptions): Promise<LingxiResourceMutationResult>;
+  copy(from: LingxiResourceRef | Record<string, unknown>, to: LingxiResourceRef | Record<string, unknown>, options?: LingxiPluginResourceMutationOptions): Promise<LingxiResourceMutationResult>;
+  rename(from: LingxiResourceRef | Record<string, unknown>, to: LingxiResourceRef | Record<string, unknown>, options?: LingxiPluginResourceMutationOptions): Promise<LingxiResourceMoveResult>;
+  move(from: LingxiResourceRef | Record<string, unknown>, to: LingxiResourceRef | Record<string, unknown>, options?: LingxiPluginResourceMutationOptions): Promise<LingxiResourceMoveResult>;
+  trash(ref: LingxiResourceRef | Record<string, unknown>, trashOptions?: LingxiResourceTrashOptions, options?: LingxiPluginResourceMutationOptions): Promise<LingxiResourceTrashResult>;
+  watch(ref: LingxiResourceRef | Record<string, unknown>, options?: LingxiPluginResourceWatchOptions): LingxiResourceWatchSubscription;
+  subscribe(resources: Array<LingxiResourceRef | Record<string, unknown>>, options?: LingxiPluginResourceWatchOptions): LingxiResourceWatchSubscription;
+  resolveWatchTarget?(ref: LingxiResourceRef | Record<string, unknown>, options?: LingxiPluginResourceWatchOptions): LingxiResourceWatchTarget;
 }
 
-export interface HanaExecutionBoundary {
+export interface LingxiExecutionBoundary {
   schemaVersion: 1;
   boundaryId: string;
   kind: 'local_process' | string;
@@ -190,7 +190,7 @@ export interface HanaExecutionBoundary {
   [key: string]: unknown;
 }
 
-export interface HanaSessionFileMediaItem {
+export interface LingxiSessionFileMediaItem {
   type: 'session_file';
   fileId: string;
   sessionId?: string | null;
@@ -203,19 +203,19 @@ export interface HanaSessionFileMediaItem {
   [key: string]: unknown;
 }
 
-export interface HanaStagedSessionFile {
-  file?: HanaSessionFile | null;
-  sessionFile?: HanaSessionFile | null;
-  mediaItem: HanaSessionFileMediaItem;
+export interface LingxiStagedSessionFile {
+  file?: LingxiSessionFile | null;
+  sessionFile?: LingxiSessionFile | null;
+  mediaItem: LingxiSessionFileMediaItem;
 }
 
-export interface HanaMediaDetails {
+export interface LingxiMediaDetails {
   media: {
-    items: HanaSessionFileMediaItem[];
+    items: LingxiSessionFileMediaItem[];
   };
 }
 
-export interface HanaChatSurfaceCardOptions {
+export interface LingxiChatSurfaceCardOptions {
   title?: string;
   description?: string;
   mode?: 'transcript' | 'full' | string;
@@ -223,11 +223,11 @@ export interface HanaChatSurfaceCardOptions {
   aspectRatio?: string;
 }
 
-export interface HanaChatSurfaceCardDetails {
+export interface LingxiChatSurfaceCardDetails {
   type: 'chat.surface';
   pluginId: string;
   sessionId: string;
-  sessionRef: HanaSessionRef;
+  sessionRef: LingxiSessionRef;
   sessionPath?: string;
   title?: string;
   description: string;
@@ -236,17 +236,17 @@ export interface HanaChatSurfaceCardDetails {
   aspectRatio?: string;
 }
 
-export interface HanaPluginNetworkFetchInit extends RequestInit {
+export interface LingxiPluginNetworkFetchInit extends RequestInit {
   timeoutMs?: number;
   cacheTtlMs?: number;
   maxResponseBytes?: number;
 }
 
-export interface HanaPluginNetwork {
-  fetch(input: string | URL | Request, init?: HanaPluginNetworkFetchInit): Promise<Response>;
+export interface LingxiPluginNetwork {
+  fetch(input: string | URL | Request, init?: LingxiPluginNetworkFetchInit): Promise<Response>;
 }
 
-export interface HanaToolContext {
+export interface LingxiToolContext {
   serverId: string;
   serverNodeId?: string;
   userId: string;
@@ -255,27 +255,27 @@ export interface HanaToolContext {
   credentialKind?: 'none' | 'loopback_token' | 'device_credential' | 'user_session' | string;
   platformAccountId?: string | null;
   officialServiceKind?: 'relay' | 'cloud_studio' | 'inference' | 'billing' | string | null;
-  executionBoundary?: HanaExecutionBoundary;
+  executionBoundary?: LingxiExecutionBoundary;
   pluginId: string;
   pluginDir: string;
   dataDir: string;
   capabilities?: string[];
   sensitiveCapabilities?: string[];
   sessionId?: string | null;
-  sessionRef?: HanaSessionRef | null;
+  sessionRef?: LingxiSessionRef | null;
   /** @deprecated Use sessionId/sessionRef. Kept for legacy plugins. */
   sessionPath?: string | null;
-  bus: HanaEventBus;
-  network: HanaPluginNetwork;
-  resources: HanaPluginResources;
-  config: HanaPluginConfigStore;
-  log: HanaPluginLogger;
-  registerSessionFile?: (input: Record<string, unknown>) => HanaSessionFile;
-  stageFile?: (input: Record<string, unknown>) => HanaStagedSessionFile;
+  bus: LingxiEventBus;
+  network: LingxiPluginNetwork;
+  resources: LingxiPluginResources;
+  config: LingxiPluginConfigStore;
+  log: LingxiPluginLogger;
+  registerSessionFile?: (input: Record<string, unknown>) => LingxiSessionFile;
+  stageFile?: (input: Record<string, unknown>) => LingxiStagedSessionFile;
   [key: string]: unknown;
 }
 
-export type HanaToolSessionPermissionKind =
+export type LingxiToolSessionPermissionKind =
   | 'read'
   | 'read_only'
   | 'plugin_output'
@@ -285,9 +285,9 @@ export type HanaToolSessionPermissionKind =
   | 'review'
   | string;
 
-export type HanaToolInvocationKind = 'read' | 'routine' | 'review';
+export type LingxiToolInvocationKind = 'read' | 'routine' | 'review';
 
-export type HanaToolInvocationTargetType =
+export type LingxiToolInvocationTargetType =
   | 'url'
   | 'browser_tab'
   | 'background_task'
@@ -303,24 +303,24 @@ export type HanaToolInvocationTargetType =
   | 'session_files'
   | 'terminal_process';
 
-export interface HanaToolInvocationTarget {
-  type: HanaToolInvocationTargetType;
+export interface LingxiToolInvocationTarget {
+  type: LingxiToolInvocationTargetType;
   /** Exact wildcard-free identity, limited by the host to 4096 characters. */
   id: string;
   /** Display-only label for reviewer context. */
   label?: string;
 }
 
-export interface HanaToolInvocationDescriptor {
+export interface LingxiToolInvocationDescriptor {
   action: string;
-  kind: HanaToolInvocationKind;
+  kind: LingxiToolInvocationKind;
   /** Stable capability id in the form `<tool-name>.<action>`. */
   capability: string;
-  target?: HanaToolInvocationTarget;
+  target?: LingxiToolInvocationTarget;
   sideEffect?: Record<string, unknown>;
 }
 
-export interface HanaToolSessionPermission<Input = unknown> {
+export interface LingxiToolSessionPermission<Input = unknown> {
   /**
    * True means the tool only reads already-authorized data and may run in
    * read-only sessions without reviewer escalation.
@@ -330,7 +330,7 @@ export interface HanaToolSessionPermission<Input = unknown> {
    * Host approval classification hint. Unknown or external side-effect kinds
    * remain reviewer-bound in Auto mode.
    */
-  kind?: HanaToolSessionPermissionKind;
+  kind?: LingxiToolSessionPermissionKind;
   /**
    * Override Auto-mode handling for a declared non-read tool.
    */
@@ -348,77 +348,77 @@ export interface HanaToolSessionPermission<Input = unknown> {
    * Actor, server, and session identity are host-owned and must not appear in
    * the returned descriptor or sideEffect metadata.
    */
-  resolveInvocation?: (input: Input) => HanaToolInvocationDescriptor | null;
+  resolveInvocation?: (input: Input) => LingxiToolInvocationDescriptor | null;
 }
 
-export interface HanaToolDefinition<Input = unknown, Output = unknown> {
+export interface LingxiToolDefinition<Input = unknown, Output = unknown> {
   name: string;
   description: string;
   parameters?: JsonSchema;
   promptSnippet?: string;
   promptGuidelines?: string;
-  sessionPermission?: HanaToolSessionPermission<Input>;
+  sessionPermission?: LingxiToolSessionPermission<Input>;
   metadata?: Record<string, unknown>;
   invocationStyle?: 'sdk_tool' | 'pi_tool';
-  execute(input: Input, ctx: HanaToolContext): MaybePromise<Output>;
+  execute(input: Input, ctx: LingxiToolContext): MaybePromise<Output>;
 }
 
-export type HanaSlashPermission = 'anyone' | 'owner' | 'admin';
-export type HanaSlashScope = 'session' | 'global';
+export type LingxiSlashPermission = 'anyone' | 'owner' | 'admin';
+export type LingxiSlashScope = 'session' | 'global';
 
-export interface HanaCommandContext {
+export interface LingxiCommandContext {
   [key: string]: unknown;
 }
 
-export interface HanaCommandResult {
+export interface LingxiCommandResult {
   reply?: string;
   silent?: boolean;
   error?: string;
   [key: string]: unknown;
 }
 
-export interface HanaCommandDefinition<Context = HanaCommandContext> {
+export interface LingxiCommandDefinition<Context = LingxiCommandContext> {
   name: string;
   aliases?: string[];
   description?: string;
-  scope?: HanaSlashScope;
-  permission?: HanaSlashPermission;
+  scope?: LingxiSlashScope;
+  permission?: LingxiSlashPermission;
   usage?: string;
-  handler?: (ctx: Context) => MaybePromise<HanaCommandResult | void>;
+  handler?: (ctx: Context) => MaybePromise<LingxiCommandResult | void>;
   execute?: (ctx: Context) => MaybePromise<unknown>;
 }
 
-export type HanaProviderRuntimeKind = 'http' | 'oauth-http' | 'local-cli' | 'browser-cli' | 'plugin';
-export type HanaMediaCapabilityName = 'imageGeneration' | 'videoGeneration' | 'speechGeneration' | string;
-export type HanaMediaOutputKind = 'file_glob' | 'json_stdout' | 'url_stdout';
-export type HanaCliBindingSource = 'prompt' | 'modelId' | 'inputFile' | 'outputDir' | 'size' | 'duration';
+export type LingxiProviderRuntimeKind = 'http' | 'oauth-http' | 'local-cli' | 'browser-cli' | 'plugin';
+export type LingxiMediaCapabilityName = 'imageGeneration' | 'videoGeneration' | 'speechGeneration' | string;
+export type LingxiMediaOutputKind = 'file_glob' | 'json_stdout' | 'url_stdout';
+export type LingxiCliBindingSource = 'prompt' | 'modelId' | 'inputFile' | 'outputDir' | 'size' | 'duration';
 
-export type HanaCliArgBinding =
+export type LingxiCliArgBinding =
   | { literal: string }
-  | { option: string; from: HanaCliBindingSource };
+  | { option: string; from: LingxiCliBindingSource };
 
-export interface HanaCliOutputContract {
-  kind: HanaMediaOutputKind;
-  directory?: HanaCliBindingSource | string;
+export interface LingxiCliOutputContract {
+  kind: LingxiMediaOutputKind;
+  directory?: LingxiCliBindingSource | string;
   pattern?: string;
   [key: string]: unknown;
 }
 
-export interface HanaCliCommandSpec {
+export interface LingxiCliCommandSpec {
   executable: string;
-  args: HanaCliArgBinding[];
+  args: LingxiCliArgBinding[];
   timeoutMs: number;
-  output: HanaCliOutputContract;
+  output: LingxiCliOutputContract;
 }
 
-export interface HanaProviderRuntime {
-  kind: HanaProviderRuntimeKind;
+export interface LingxiProviderRuntime {
+  kind: LingxiProviderRuntimeKind;
   protocolId?: string;
-  command?: HanaCliCommandSpec;
+  command?: LingxiCliCommandSpec;
   [key: string]: unknown;
 }
 
-export interface HanaProviderChatCapability {
+export interface LingxiProviderChatCapability {
   projection?: 'models-json' | 'sdk-auth-alias' | 'none' | string;
   credentialSource?: 'provider-catalog' | 'auth-storage' | 'none';
   runtimeProviderId?: string;
@@ -427,29 +427,29 @@ export interface HanaProviderChatCapability {
   [key: string]: unknown;
 }
 
-export interface HanaMediaReferenceImageLimits {
+export interface LingxiMediaReferenceImageLimits {
   min?: number;
   max?: number;
   [key: string]: unknown;
 }
 
-export interface HanaMediaInputLimits {
-  referenceImages?: HanaMediaReferenceImageLimits;
+export interface LingxiMediaInputLimits {
+  referenceImages?: LingxiMediaReferenceImageLimits;
   [key: string]: unknown;
 }
 
-export interface HanaProviderMediaMode {
+export interface LingxiProviderMediaMode {
   id: string;
   label?: string;
   parameterSchema?: JsonSchema;
   defaults?: Record<string, unknown>;
-  inputLimits?: HanaMediaInputLimits;
+  inputLimits?: LingxiMediaInputLimits;
   pricing?: Record<string, unknown>;
   agentHints?: Record<string, unknown>;
   [key: string]: unknown;
 }
 
-export interface HanaProviderMediaModel {
+export interface LingxiProviderMediaModel {
   id: string;
   displayName?: string;
   protocolId: string;
@@ -458,40 +458,40 @@ export interface HanaProviderMediaModel {
   supportsEdit?: boolean;
   aliases?: string[];
   credentialLaneId?: string;
-  modes?: HanaProviderMediaMode[];
+  modes?: LingxiProviderMediaMode[];
   parameterSchema?: JsonSchema;
   defaults?: Record<string, unknown>;
-  inputLimits?: HanaMediaInputLimits;
+  inputLimits?: LingxiMediaInputLimits;
   [key: string]: unknown;
 }
 
-export interface HanaProviderCredentialLane {
+export interface LingxiProviderCredentialLane {
   id: string;
   kind?: string;
   label?: string;
   [key: string]: unknown;
 }
 
-export interface HanaProviderMediaCapability {
+export interface LingxiProviderMediaCapability {
   defaultModelId?: string;
-  models: HanaProviderMediaModel[];
-  credentialLanes?: HanaProviderCredentialLane[];
+  models: LingxiProviderMediaModel[];
+  credentialLanes?: LingxiProviderCredentialLane[];
   [key: string]: unknown;
 }
 
-export interface HanaProviderCapabilities {
-  chat?: HanaProviderChatCapability;
-  media?: Partial<Record<HanaMediaCapabilityName, HanaProviderMediaCapability>>;
+export interface LingxiProviderCapabilities {
+  chat?: LingxiProviderChatCapability;
+  media?: Partial<Record<LingxiMediaCapabilityName, LingxiProviderMediaCapability>>;
   [key: string]: unknown;
 }
 
-export interface HanaProviderSource {
+export interface LingxiProviderSource {
   kind: 'builtin' | 'plugin' | 'user' | string;
   pluginId?: string;
   [key: string]: unknown;
 }
 
-export interface HanaProviderDefinition {
+export interface LingxiProviderDefinition {
   id: string;
   displayName?: string;
   name?: string;
@@ -501,23 +501,23 @@ export interface HanaProviderDefinition {
   defaultApi?: string;
   api?: string;
   models?: unknown[];
-  runtime?: HanaProviderRuntime;
-  capabilities?: HanaProviderCapabilities;
-  source?: HanaProviderSource;
+  runtime?: LingxiProviderRuntime;
+  capabilities?: LingxiProviderCapabilities;
+  source?: LingxiProviderSource;
   [key: string]: unknown;
 }
 
-export type HanaExtensionFactory<Pi = unknown> = (pi: Pi) => MaybePromise<void>;
+export type LingxiExtensionFactory<Pi = unknown> = (pi: Pi) => MaybePromise<void>;
 
-export interface HanaPluginConfigStore {
-  get<T = unknown>(key: string, options?: HanaPluginConfigScopeOptions): MaybePromise<T | undefined>;
-  getAll?(options?: HanaPluginConfigScopeOptions & { redacted?: boolean }): MaybePromise<Record<string, unknown>>;
-  set<T = unknown>(key: string, value: T, options?: HanaPluginConfigScopeOptions): MaybePromise<void>;
-  setMany?(values: Record<string, unknown>, options?: HanaPluginConfigScopeOptions): MaybePromise<Record<string, unknown>>;
+export interface LingxiPluginConfigStore {
+  get<T = unknown>(key: string, options?: LingxiPluginConfigScopeOptions): MaybePromise<T | undefined>;
+  getAll?(options?: LingxiPluginConfigScopeOptions & { redacted?: boolean }): MaybePromise<Record<string, unknown>>;
+  set<T = unknown>(key: string, value: T, options?: LingxiPluginConfigScopeOptions): MaybePromise<void>;
+  setMany?(values: Record<string, unknown>, options?: LingxiPluginConfigScopeOptions): MaybePromise<Record<string, unknown>>;
   getSchema?(): JsonSchema;
 }
 
-export interface HanaPluginConfigScopeOptions {
+export interface LingxiPluginConfigScopeOptions {
   scope?: 'global' | 'per-agent' | 'per-session';
   agentId?: string;
   sessionId?: string;
@@ -525,14 +525,14 @@ export interface HanaPluginConfigScopeOptions {
   sessionPath?: string;
 }
 
-export interface HanaSessionTurnContext {
+export interface LingxiSessionTurnContext {
   system?: string | Array<string | { text: string; label?: string }>;
   beforeUser?: string | Array<string | { text: string; label?: string }>;
   afterUser?: string | Array<string | { text: string; label?: string }>;
   metadata?: Record<string, unknown>;
 }
 
-export interface HanaSessionCreateInput {
+export interface LingxiSessionCreateInput {
   agentId?: string | null;
   cwd?: string | null;
   memoryEnabled?: boolean;
@@ -547,9 +547,9 @@ export interface HanaSessionCreateInput {
   visibility?: 'public' | 'plugin_private' | 'private' | string;
 }
 
-export interface HanaSessionSendInput {
+export interface LingxiSessionSendInput {
   text: string;
-  context?: HanaSessionTurnContext | null;
+  context?: LingxiSessionTurnContext | null;
   images?: unknown[];
   videos?: unknown[];
   audios?: unknown[];
@@ -559,13 +559,13 @@ export interface HanaSessionSendInput {
   [key: string]: unknown;
 }
 
-export interface HanaSessionListFilter {
+export interface LingxiSessionListFilter {
   agentId?: string;
   ownerPluginId?: string;
   includePluginPrivate?: boolean;
 }
 
-export interface HanaSessionUpdateInput {
+export interface LingxiSessionUpdateInput {
   title?: string;
   pinned?: boolean;
   projectId?: string | null;
@@ -576,7 +576,7 @@ export interface HanaSessionUpdateInput {
   visibility?: 'public' | 'plugin_private' | 'private' | string;
 }
 
-export interface HanaAgentCreateInput {
+export interface LingxiAgentCreateInput {
   id?: string;
   name: string;
   yuan?: string;
@@ -588,7 +588,7 @@ export interface HanaAgentCreateInput {
   memoryPolicy?: { enabled?: boolean };
 }
 
-export interface HanaAgentUpdateInput {
+export interface LingxiAgentUpdateInput {
   name?: string;
   yuan?: string;
   ownerPluginId?: string | null;
@@ -599,11 +599,11 @@ export interface HanaAgentUpdateInput {
   config?: Record<string, unknown>;
 }
 
-export interface HanaModelSampleInput {
+export interface LingxiModelSampleInput {
   systemPrompt?: string;
   messages: Array<{ role: string; content: unknown }>;
   sessionId?: string;
-  sessionRef?: HanaSessionRef;
+  sessionRef?: LingxiSessionRef;
   /** @deprecated Use sessionId/sessionRef. */
   sessionPath?: string;
   agentId?: string;
@@ -612,11 +612,11 @@ export interface HanaModelSampleInput {
   operation?: string;
 }
 
-export interface HanaMediaProviderFilter {
+export interface LingxiMediaProviderFilter {
   capability?: string;
 }
 
-export interface HanaMediaModelRef {
+export interface LingxiMediaModelRef {
   providerId?: string;
   provider?: string;
   modelId?: string;
@@ -625,27 +625,27 @@ export interface HanaMediaModelRef {
   credentialLaneId?: string;
 }
 
-export type HanaSessionFileReference =
+export type LingxiSessionFileReference =
   | { kind: 'session_file'; fileId: string }
   | { type: 'session_file'; fileId: string };
 
-export type HanaGenerateImageReference = HanaSessionFileReference;
+export type LingxiGenerateImageReference = LingxiSessionFileReference;
 
-export interface HanaMediaDelivery {
+export interface LingxiMediaDelivery {
   mode?: 'session' | 'response' | string;
   ttlMs?: number;
   [key: string]: unknown;
 }
 
-export interface HanaGenerateImageInput {
+export interface LingxiGenerateImageInput {
   sessionId?: string;
-  sessionRef?: HanaSessionRef;
+  sessionRef?: LingxiSessionRef;
   /** @deprecated Use sessionId/sessionRef. */
   sessionPath?: string;
   prompt: string;
   count?: number;
-  image?: HanaGenerateImageReference | HanaGenerateImageReference[];
-  referenceImages?: HanaGenerateImageReference[];
+  image?: LingxiGenerateImageReference | LingxiGenerateImageReference[];
+  referenceImages?: LingxiGenerateImageReference[];
   ratio?: string;
   resolution?: string;
   quality?: string;
@@ -655,19 +655,19 @@ export interface HanaGenerateImageInput {
   provider?: string;
   input?: Record<string, unknown>;
   metadata?: Record<string, unknown>;
-  delivery?: HanaMediaDelivery;
+  delivery?: LingxiMediaDelivery;
   deliveryMode?: string;
   deliveryTarget?: unknown;
 }
 
-export interface HanaGenerateVideoInput {
+export interface LingxiGenerateVideoInput {
   sessionId?: string;
-  sessionRef?: HanaSessionRef;
+  sessionRef?: LingxiSessionRef;
   /** @deprecated Use sessionId/sessionRef. */
   sessionPath?: string;
   prompt: string;
-  image?: HanaGenerateImageReference | HanaGenerateImageReference[] | string;
-  referenceImages?: HanaGenerateImageReference[];
+  image?: LingxiGenerateImageReference | LingxiGenerateImageReference[] | string;
+  referenceImages?: LingxiGenerateImageReference[];
   duration?: number;
   ratio?: string;
   resolution?: string;
@@ -677,23 +677,23 @@ export interface HanaGenerateVideoInput {
   provider?: string;
   input?: Record<string, unknown>;
   metadata?: Record<string, unknown>;
-  delivery?: HanaMediaDelivery;
+  delivery?: LingxiMediaDelivery;
   deliveryMode?: string;
   deliveryTarget?: unknown;
 }
 
-export interface HanaGenerateMediaInput {
+export interface LingxiGenerateMediaInput {
   kind?: 'image' | 'video' | 'audio' | 'image_generation' | 'video_generation' | 'speech_recognition' | 'asr' | 'transcription' | string;
   type?: string;
   mediaKind?: string;
   sessionId?: string;
-  sessionRef?: HanaSessionRef;
+  sessionRef?: LingxiSessionRef;
   /** @deprecated Use sessionId/sessionRef. */
   sessionPath?: string;
   fileId?: string;
   prompt?: string;
-  image?: HanaGenerateImageReference | HanaGenerateImageReference[] | string;
-  referenceImages?: HanaGenerateImageReference[];
+  image?: LingxiGenerateImageReference | LingxiGenerateImageReference[] | string;
+  referenceImages?: LingxiGenerateImageReference[];
   duration?: number;
   ratio?: string;
   resolution?: string;
@@ -702,15 +702,15 @@ export interface HanaGenerateMediaInput {
   options?: Record<string, unknown>;
   model?: string;
   provider?: string;
-  delivery?: HanaMediaDelivery;
+  delivery?: LingxiMediaDelivery;
   deliveryMode?: string;
   input?: Record<string, unknown>;
   [key: string]: unknown;
 }
 
-export interface HanaTranscribeAudioInput {
+export interface LingxiTranscribeAudioInput {
   sessionId?: string;
-  sessionRef?: HanaSessionRef;
+  sessionRef?: LingxiSessionRef;
   /** @deprecated Use sessionId/sessionRef. */
   sessionPath?: string;
   fileId: string;
@@ -721,26 +721,26 @@ export interface HanaTranscribeAudioInput {
   model?: string;
 }
 
-export interface HanaTranscribeAudioResult {
+export interface LingxiTranscribeAudioResult {
   ok: true;
   transcription: unknown;
   taskId?: string;
   stream?: unknown;
 }
 
-export interface HanaEventBus {
+export interface LingxiEventBus {
   emit(event: unknown, sessionPath?: string | null): unknown;
   emit(type: string, payload?: unknown): unknown;
-  subscribe(callback: (event: unknown, sessionPath?: string | null) => void, filter?: HanaBusSubscriptionFilter): () => void;
+  subscribe(callback: (event: unknown, sessionPath?: string | null) => void, filter?: LingxiBusSubscriptionFilter): () => void;
   subscribe(type: string, handler: (payload: unknown) => void): () => void;
   request<T = unknown>(type: string, payload?: unknown, options?: Record<string, unknown>): Promise<T>;
   hasHandler?(type: string): boolean;
   handle?(type: string, handler: (payload: unknown) => MaybePromise<unknown>): () => void;
-  listCapabilities?(): HanaEventBusCapability[];
-  getCapability?(type: string): HanaEventBusCapability | null;
+  listCapabilities?(): LingxiEventBusCapability[];
+  getCapability?(type: string): LingxiEventBusCapability | null;
 }
 
-export interface HanaPluginRouteRequestContext {
+export interface LingxiPluginRouteRequestContext {
   pluginId: string;
   agentId: string | null;
   principal: Record<string, unknown> | null;
@@ -749,14 +749,14 @@ export interface HanaPluginRouteRequestContext {
     declaredPermissions: readonly string[];
     legacyDeclaration: boolean;
   };
-  bus: Pick<HanaEventBus, 'request' | 'emit' | 'subscribe' | 'hasHandler' | 'getCapability' | 'listCapabilities'>;
+  bus: Pick<LingxiEventBus, 'request' | 'emit' | 'subscribe' | 'hasHandler' | 'getCapability' | 'listCapabilities'>;
 }
 
-export interface HanaPluginHonoLikeContext {
+export interface LingxiPluginHonoLikeContext {
   get?(name: string): unknown;
 }
 
-export function getPluginRequestContext(c: HanaPluginHonoLikeContext): HanaPluginRouteRequestContext {
+export function getPluginRequestContext(c: LingxiPluginHonoLikeContext): LingxiPluginRouteRequestContext {
   if (!c || typeof c.get !== 'function') {
     throw new Error('getPluginRequestContext requires a Hono context with c.get(name)');
   }
@@ -771,15 +771,15 @@ export function getPluginRequestContext(c: HanaPluginHonoLikeContext): HanaPlugi
   if (typeof request !== 'function') {
     throw new Error('getPluginRequestContext found an invalid plugin route request context');
   }
-  return requestContext as HanaPluginRouteRequestContext;
+  return requestContext as LingxiPluginRouteRequestContext;
 }
 
-export interface HanaBusSubscriptionFilter {
+export interface LingxiBusSubscriptionFilter {
   types?: string[] | Set<string>;
   [key: string]: unknown;
 }
 
-export interface HanaEventBusCapability {
+export interface LingxiEventBusCapability {
   type: string;
   title: string;
   description: string;
@@ -793,7 +793,7 @@ export interface HanaEventBusCapability {
   available?: boolean;
 }
 
-export interface HanaNormalizedUsage {
+export interface LingxiNormalizedUsage {
   input: {
     totalTokens: number | null;
     uncachedTokens: number | null;
@@ -815,7 +815,7 @@ export interface HanaNormalizedUsage {
   costTotal: number | null;
 }
 
-export type HanaUsageAttribution =
+export type LingxiUsageAttribution =
   | { kind: 'session'; agentId: string | null; sessionId?: string | null; sessionPath?: string | null }
   | { kind: 'phone_conversation'; agentId: string; conversationId: string; conversationType: 'channel' | 'dm'; sessionId?: string | null; sessionPath?: string | null }
   | { kind: 'memory'; agentId: string | null }
@@ -824,7 +824,7 @@ export type HanaUsageAttribution =
   | { kind: 'utility'; agentId?: string | null; sessionId?: string | null; sessionPath?: string | null }
   | { kind: 'unknown' };
 
-export interface HanaUsageSource {
+export interface LingxiUsageSource {
   subsystem: 'session' | 'phone' | 'memory' | 'automation' | 'subagent' | 'compaction' | 'plugin' | 'utility' | 'vision' | 'unknown' | string;
   operation: string;
   surface: 'desktop' | 'mobile' | 'bridge' | 'channel' | 'dm' | 'cron' | 'heartbeat' | 'system' | 'plugin' | 'unknown' | string;
@@ -849,21 +849,21 @@ export interface HanaUsageSource {
   };
 }
 
-export interface HanaUsageLedgerEntry {
+export interface LingxiUsageLedgerEntry {
   schemaVersion: 1;
   requestId: string;
   startedAt: string;
   endedAt: string | null;
   durationMs: number | null;
   status: 'ok' | 'error' | 'aborted' | 'usage_missing';
-  source: HanaUsageSource;
-  attribution: HanaUsageAttribution;
+  source: LingxiUsageSource;
+  attribution: LingxiUsageAttribution;
   model: {
     provider: string | null;
     modelId: string | null;
     api: string | null;
   };
-  usage: HanaNormalizedUsage | null;
+  usage: LingxiNormalizedUsage | null;
   rawUsageShape: string | null;
   error: {
     name: string | null;
@@ -871,7 +871,7 @@ export interface HanaUsageLedgerEntry {
   } | null;
 }
 
-export interface HanaUsageListFilter {
+export interface LingxiUsageListFilter {
   since?: string;
   until?: string;
   attributionKind?: string;
@@ -886,25 +886,25 @@ export interface HanaUsageListFilter {
   limit?: number;
 }
 
-export interface HanaUsageListResult {
-  entries: HanaUsageLedgerEntry[];
+export interface LingxiUsageListResult {
+  entries: LingxiUsageLedgerEntry[];
   nextCursor: string | null;
 }
 
-export interface HanaUsageEventMeta {
+export interface LingxiUsageEventMeta {
   sessionId?: string | null;
   sessionPath?: string | null;
-  sessionRef?: HanaSessionRef | null;
+  sessionRef?: LingxiSessionRef | null;
 }
 
-export interface HanaPluginLogger {
+export interface LingxiPluginLogger {
   debug(...args: unknown[]): void;
   info(...args: unknown[]): void;
   warn(...args: unknown[]): void;
   error(...args: unknown[]): void;
 }
 
-export interface HanaBusHandlerContext {
+export interface LingxiBusHandlerContext {
   serverId: string;
   serverNodeId?: string;
   userId: string;
@@ -913,26 +913,26 @@ export interface HanaBusHandlerContext {
   credentialKind?: 'none' | 'loopback_token' | 'device_credential' | 'user_session' | string;
   platformAccountId?: string | null;
   officialServiceKind?: 'relay' | 'cloud_studio' | 'inference' | 'billing' | string | null;
-  executionBoundary?: HanaExecutionBoundary;
+  executionBoundary?: LingxiExecutionBoundary;
   pluginId: string;
-  bus: HanaEventBus;
-  network?: HanaPluginNetwork;
-  resources?: HanaPluginResources;
-  config?: HanaPluginConfigStore;
-  log?: HanaPluginLogger;
+  bus: LingxiEventBus;
+  network?: LingxiPluginNetwork;
+  resources?: LingxiPluginResources;
+  config?: LingxiPluginConfigStore;
+  log?: LingxiPluginLogger;
   [key: string]: unknown;
 }
 
-export interface HanaBusHandlerDefinition<
+export interface LingxiBusHandlerDefinition<
   Payload = unknown,
   Result = unknown,
-  Context extends HanaBusHandlerContext = HanaBusHandlerContext,
+  Context extends LingxiBusHandlerContext = LingxiBusHandlerContext,
 > {
   type: string;
   handle(payload: Payload, ctx: Context): MaybePromise<Result>;
 }
 
-export interface HanaPluginContext {
+export interface LingxiPluginContext {
   serverId: string;
   serverNodeId?: string;
   userId: string;
@@ -941,46 +941,46 @@ export interface HanaPluginContext {
   credentialKind?: 'none' | 'loopback_token' | 'device_credential' | 'user_session' | string;
   platformAccountId?: string | null;
   officialServiceKind?: 'relay' | 'cloud_studio' | 'inference' | 'billing' | string | null;
-  executionBoundary?: HanaExecutionBoundary;
+  executionBoundary?: LingxiExecutionBoundary;
   pluginId: string;
   pluginDir: string;
   dataDir: string;
   capabilities?: string[];
   sensitiveCapabilities?: string[];
   sessionId?: string | null;
-  sessionRef?: HanaSessionRef | null;
+  sessionRef?: LingxiSessionRef | null;
   /** @deprecated Use sessionId/sessionRef. Kept for legacy plugins. */
   sessionPath?: string | null;
-  bus: HanaEventBus;
-  network: HanaPluginNetwork;
-  resources: HanaPluginResources;
-  config: HanaPluginConfigStore;
-  log: HanaPluginLogger;
-  registerTool?: (tool: HanaToolDefinition) => () => void;
-  registerSessionFile?: (input: Record<string, unknown>) => HanaSessionFile;
-  stageFile?: (input: Record<string, unknown>) => HanaStagedSessionFile;
+  bus: LingxiEventBus;
+  network: LingxiPluginNetwork;
+  resources: LingxiPluginResources;
+  config: LingxiPluginConfigStore;
+  log: LingxiPluginLogger;
+  registerTool?: (tool: LingxiToolDefinition) => () => void;
+  registerSessionFile?: (input: Record<string, unknown>) => LingxiSessionFile;
+  stageFile?: (input: Record<string, unknown>) => LingxiStagedSessionFile;
   [key: string]: unknown;
 }
 
-export type HanaPluginDisposable = () => void;
+export type LingxiPluginDisposable = () => void;
 
-export interface HanaPluginLifecycleHelpers {
-  register(disposable: HanaPluginDisposable): void;
+export interface LingxiPluginLifecycleHelpers {
+  register(disposable: LingxiPluginDisposable): void;
 }
 
-export interface HanaPluginLifecycle {
-  onload?(ctx: HanaPluginContext, helpers: HanaPluginLifecycleHelpers): MaybePromise<void>;
-  onunload?(ctx: HanaPluginContext): MaybePromise<void>;
+export interface LingxiPluginLifecycle {
+  onload?(ctx: LingxiPluginContext, helpers: LingxiPluginLifecycleHelpers): MaybePromise<void>;
+  onunload?(ctx: LingxiPluginContext): MaybePromise<void>;
 }
 
-export interface HanaPluginInstance {
-  ctx: HanaPluginContext;
-  register: (disposable: HanaPluginDisposable) => void;
+export interface LingxiPluginInstance {
+  ctx: LingxiPluginContext;
+  register: (disposable: LingxiPluginDisposable) => void;
   onload?(): MaybePromise<void>;
   onunload?(): MaybePromise<void>;
 }
 
-export type HanaTaskStatus =
+export type LingxiTaskStatus =
   | 'pending'
   | 'running'
   | 'paused'
@@ -991,22 +991,22 @@ export type HanaTaskStatus =
   | 'canceled'
   | 'aborted';
 
-export interface HanaTaskProgress {
+export interface LingxiTaskProgress {
   current?: number;
   total?: number;
   percent?: number;
   message?: string;
 }
 
-export interface HanaTaskRecord {
+export interface LingxiTaskRecord {
   taskId: string;
   type: string;
   parentSessionPath?: string | null;
   pluginId?: string | null;
   agentId?: string | null;
   meta?: Record<string, unknown>;
-  progress?: HanaTaskProgress | null;
-  status: HanaTaskStatus;
+  progress?: LingxiTaskProgress | null;
+  status: LingxiTaskStatus;
   aborted?: boolean;
   createdAt?: number;
   updatedAt?: number;
@@ -1015,7 +1015,7 @@ export interface HanaTaskRecord {
   error?: string;
 }
 
-export interface HanaTaskSchedule {
+export interface LingxiTaskSchedule {
   scheduleId: string;
   type: string;
   pluginId?: string | null;
@@ -1033,7 +1033,7 @@ export interface HanaTaskSchedule {
   runCount?: number;
 }
 
-export interface HanaTaskRegisterInput {
+export interface LingxiTaskRegisterInput {
   taskId: string;
   type: string;
   parentSessionPath?: string | null;
@@ -1043,10 +1043,10 @@ export interface HanaTaskRegisterInput {
   persist?: boolean;
 }
 
-export interface HanaTaskUpdateInput {
+export interface LingxiTaskUpdateInput {
   taskId: string;
-  status?: HanaTaskStatus;
-  progress?: HanaTaskProgress | null;
+  status?: LingxiTaskStatus;
+  progress?: LingxiTaskProgress | null;
   meta?: Record<string, unknown>;
   result?: unknown;
   error?: unknown;
@@ -1055,7 +1055,7 @@ export interface HanaTaskUpdateInput {
   agentId?: string | null;
 }
 
-export interface HanaTaskScheduleInput {
+export interface LingxiTaskScheduleInput {
   scheduleId: string;
   type: string;
   pluginId?: string | null;
@@ -1071,36 +1071,36 @@ export interface HanaTaskScheduleInput {
 const EMPTY_PARAMETERS: JsonSchema = { type: 'object', properties: {} };
 
 export function defineTool<Input = unknown, Output = unknown>(
-  definition: HanaToolDefinition<Input, Output>,
-): HanaToolDefinition<Input, Output> & { parameters: JsonSchema } {
+  definition: LingxiToolDefinition<Input, Output>,
+): LingxiToolDefinition<Input, Output> & { parameters: JsonSchema } {
   return {
     ...definition,
     parameters: definition.parameters ?? EMPTY_PARAMETERS,
   };
 }
 
-export function defineCommand<Context = HanaCommandContext>(
-  definition: HanaCommandDefinition<Context>,
-): HanaCommandDefinition<Context> {
+export function defineCommand<Context = LingxiCommandContext>(
+  definition: LingxiCommandDefinition<Context>,
+): LingxiCommandDefinition<Context> {
   return { ...definition };
 }
 
-export function defineProvider<T extends HanaProviderDefinition>(definition: T): T {
+export function defineProvider<T extends LingxiProviderDefinition>(definition: T): T {
   return definition;
 }
 
 export function defineBusHandler<
   Payload = unknown,
   Result = unknown,
-  Context extends HanaBusHandlerContext = HanaBusHandlerContext,
+  Context extends LingxiBusHandlerContext = LingxiBusHandlerContext,
 >(
-  definition: HanaBusHandlerDefinition<Payload, Result, Context>,
-): HanaBusHandlerDefinition<Payload, Result, Context> {
+  definition: LingxiBusHandlerDefinition<Payload, Result, Context>,
+): LingxiBusHandlerDefinition<Payload, Result, Context> {
   return { ...definition };
 }
 
 export function requestBus<Result = unknown, Payload = unknown>(
-  ctx: { bus?: Pick<HanaEventBus, 'request'> | null },
+  ctx: { bus?: Pick<LingxiEventBus, 'request'> | null },
   type: string,
   payload?: Payload,
   options?: Record<string, unknown>,
@@ -1126,8 +1126,8 @@ function withOwnerPlugin<T extends Record<string, unknown>>(
 
 function withContextMetadata(
   ctx: { pluginId?: string | null },
-  context: HanaSessionTurnContext | null | undefined,
-): HanaSessionTurnContext | null | undefined {
+  context: LingxiSessionTurnContext | null | undefined,
+): LingxiSessionTurnContext | null | undefined {
   const pluginId = pluginIdFromContext(ctx);
   if (!pluginId) return context;
   if (!context) {
@@ -1146,7 +1146,7 @@ function textOrNull(value: unknown): string | null {
   return typeof value === 'string' && value.trim() ? value.trim() : null;
 }
 
-function normalizeSessionTarget(target: HanaSessionTarget): Record<string, unknown> {
+function normalizeSessionTarget(target: LingxiSessionTarget): Record<string, unknown> {
   if (typeof target === 'string') return { sessionPath: target };
   if (!target || typeof target !== 'object') return { sessionPath: target as unknown };
 
@@ -1157,7 +1157,7 @@ function normalizeSessionTarget(target: HanaSessionTarget): Record<string, unkno
     return sessionPath ? { sessionPath } : {};
   }
 
-  const sessionRef: HanaSessionRef = {
+  const sessionRef: LingxiSessionRef = {
     sessionId,
     ...(sessionPath ? { sessionPath } : {}),
     ...(legacySessionPath ? { legacySessionPath } : {}),
@@ -1170,16 +1170,16 @@ function normalizeSessionTarget(target: HanaSessionTarget): Record<string, unkno
   };
 }
 
-function sessionRefFromTarget(target: HanaSessionTarget): HanaSessionRef | null {
+function sessionRefFromTarget(target: LingxiSessionTarget): LingxiSessionRef | null {
   const payload = normalizeSessionTarget(target);
-  return (payload.sessionRef as HanaSessionRef | undefined) || null;
+  return (payload.sessionRef as LingxiSessionRef | undefined) || null;
 }
 
 export function createChatSurfaceCard(
   ctx: { pluginId?: string | null },
-  target: HanaSessionTarget,
-  options: HanaChatSurfaceCardOptions = {},
-): HanaChatSurfaceCardDetails {
+  target: LingxiSessionTarget,
+  options: LingxiChatSurfaceCardOptions = {},
+): LingxiChatSurfaceCardDetails {
   const pluginId = pluginIdFromContext(ctx);
   if (!pluginId) {
     throw new Error('createChatSurfaceCard requires ctx.pluginId');
@@ -1190,7 +1190,7 @@ export function createChatSurfaceCard(
   if (!sessionId) {
     throw new Error('createChatSurfaceCard requires sessionId or sessionRef; sessionPath alone is legacy locator metadata');
   }
-  const sessionRef: HanaSessionRef = {
+  const sessionRef: LingxiSessionRef = {
     sessionId,
     ...(sessionPath ? { sessionPath } : {}),
   };
@@ -1209,33 +1209,33 @@ export function createChatSurfaceCard(
 }
 
 export function createSession(
-  ctx: { pluginId?: string | null; bus?: Pick<HanaEventBus, 'request'> | null },
-  input: HanaSessionCreateInput = {},
+  ctx: { pluginId?: string | null; bus?: Pick<LingxiEventBus, 'request'> | null },
+  input: LingxiSessionCreateInput = {},
   options?: Record<string, unknown>,
 ): Promise<unknown> {
   return requestBus(ctx, 'session:create', withOwnerPlugin(ctx, { ...input }), options);
 }
 
 export function getSession(
-  ctx: { bus?: Pick<HanaEventBus, 'request'> | null },
-  target: HanaSessionTarget,
+  ctx: { bus?: Pick<LingxiEventBus, 'request'> | null },
+  target: LingxiSessionTarget,
   options?: Record<string, unknown>,
 ): Promise<unknown> {
   return requestBus(ctx, 'session:get', normalizeSessionTarget(target), options);
 }
 
 export function listSessions(
-  ctx: { bus?: Pick<HanaEventBus, 'request'> | null },
-  filter: HanaSessionListFilter = {},
+  ctx: { bus?: Pick<LingxiEventBus, 'request'> | null },
+  filter: LingxiSessionListFilter = {},
   options?: Record<string, unknown>,
 ): Promise<unknown> {
   return requestBus(ctx, 'session:list', filter, options);
 }
 
 export function updateSession(
-  ctx: { pluginId?: string | null; bus?: Pick<HanaEventBus, 'request'> | null },
-  target: HanaSessionTarget,
-  patch: HanaSessionUpdateInput,
+  ctx: { pluginId?: string | null; bus?: Pick<LingxiEventBus, 'request'> | null },
+  target: LingxiSessionTarget,
+  patch: LingxiSessionUpdateInput,
   options?: Record<string, unknown>,
 ): Promise<unknown> {
   return requestBus(ctx, 'session:update', {
@@ -1245,9 +1245,9 @@ export function updateSession(
 }
 
 export function sendSessionMessage(
-  ctx: { pluginId?: string | null; bus?: Pick<HanaEventBus, 'request'> | null },
-  target: HanaSessionTarget,
-  input: HanaSessionSendInput,
+  ctx: { pluginId?: string | null; bus?: Pick<LingxiEventBus, 'request'> | null },
+  target: LingxiSessionTarget,
+  input: LingxiSessionSendInput,
   options?: Record<string, unknown>,
 ): Promise<unknown> {
   return requestBus(ctx, 'session:send', {
@@ -1258,9 +1258,9 @@ export function sendSessionMessage(
 }
 
 export function subscribeSessionEvents(
-  ctx: { bus?: Pick<HanaEventBus, 'subscribe'> | null },
-  target: HanaSessionTarget,
-  handler: (event: unknown, meta: { sessionId: string | null; sessionPath: string | null; sessionRef: HanaSessionRef | null }) => void,
+  ctx: { bus?: Pick<LingxiEventBus, 'subscribe'> | null },
+  target: LingxiSessionTarget,
+  handler: (event: unknown, meta: { sessionId: string | null; sessionPath: string | null; sessionRef: LingxiSessionRef | null }) => void,
 ): () => void {
   if (!ctx.bus || typeof ctx.bus.subscribe !== 'function') {
     throw new Error('plugin bus subscribe unavailable');
@@ -1281,7 +1281,7 @@ export function subscribeSessionEvents(
 }
 
 export function listAgents(
-  ctx: { bus?: Pick<HanaEventBus, 'request'> | null },
+  ctx: { bus?: Pick<LingxiEventBus, 'request'> | null },
   filter: { ownerPluginId?: string; includePluginPrivate?: boolean } = {},
   options?: Record<string, unknown>,
 ): Promise<unknown> {
@@ -1289,7 +1289,7 @@ export function listAgents(
 }
 
 export function getAgentProfile(
-  ctx: { bus?: Pick<HanaEventBus, 'request'> | null },
+  ctx: { bus?: Pick<LingxiEventBus, 'request'> | null },
   agentId: string,
   options?: Record<string, unknown>,
 ): Promise<unknown> {
@@ -1297,25 +1297,25 @@ export function getAgentProfile(
 }
 
 export function createAgent(
-  ctx: { pluginId?: string | null; bus?: Pick<HanaEventBus, 'request'> | null },
-  input: HanaAgentCreateInput,
+  ctx: { pluginId?: string | null; bus?: Pick<LingxiEventBus, 'request'> | null },
+  input: LingxiAgentCreateInput,
   options?: Record<string, unknown>,
 ): Promise<unknown> {
   return requestBus(ctx, 'agent:create', withOwnerPlugin(ctx, { ...input }), options);
 }
 
 export function updateAgent(
-  ctx: { pluginId?: string | null; bus?: Pick<HanaEventBus, 'request'> | null },
+  ctx: { pluginId?: string | null; bus?: Pick<LingxiEventBus, 'request'> | null },
   agentId: string,
-  patch: HanaAgentUpdateInput,
+  patch: LingxiAgentUpdateInput,
   options?: Record<string, unknown>,
 ): Promise<unknown> {
   return requestBus(ctx, 'agent:update', { agentId, ...withOwnerPlugin(ctx, { ...patch }) }, options);
 }
 
 export function sampleText(
-  ctx: { pluginId?: string | null; bus?: Pick<HanaEventBus, 'request'> | null },
-  input: HanaModelSampleInput,
+  ctx: { pluginId?: string | null; bus?: Pick<LingxiEventBus, 'request'> | null },
+  input: LingxiModelSampleInput,
   options?: Record<string, unknown>,
 ): Promise<unknown> {
   return requestBus(ctx, 'model:sample-text', {
@@ -1325,24 +1325,24 @@ export function sampleText(
 }
 
 export function listMediaProviders(
-  ctx: { bus?: Pick<HanaEventBus, 'request'> | null },
-  filter: HanaMediaProviderFilter = {},
+  ctx: { bus?: Pick<LingxiEventBus, 'request'> | null },
+  filter: LingxiMediaProviderFilter = {},
   options?: Record<string, unknown>,
 ): Promise<unknown> {
   return requestBus(ctx, 'provider:media-providers', filter, options);
 }
 
 export function resolveMediaModel(
-  ctx: { bus?: Pick<HanaEventBus, 'request'> | null },
-  ref: HanaMediaModelRef,
+  ctx: { bus?: Pick<LingxiEventBus, 'request'> | null },
+  ref: LingxiMediaModelRef,
   options?: Record<string, unknown>,
 ): Promise<unknown> {
   return requestBus(ctx, 'provider:resolve-media-model', ref, options);
 }
 
 export function generateImage(
-  ctx: { pluginId?: string | null; bus?: Pick<HanaEventBus, 'request'> | null },
-  input: HanaGenerateImageInput,
+  ctx: { pluginId?: string | null; bus?: Pick<LingxiEventBus, 'request'> | null },
+  input: LingxiGenerateImageInput,
   options?: Record<string, unknown>,
 ): Promise<unknown> {
   return requestBus(ctx, 'media:generate-image', {
@@ -1352,8 +1352,8 @@ export function generateImage(
 }
 
 export function generateVideo(
-  ctx: { pluginId?: string | null; bus?: Pick<HanaEventBus, 'request'> | null },
-  input: HanaGenerateVideoInput,
+  ctx: { pluginId?: string | null; bus?: Pick<LingxiEventBus, 'request'> | null },
+  input: LingxiGenerateVideoInput,
   options?: Record<string, unknown>,
 ): Promise<unknown> {
   return requestBus(ctx, 'media:generate-video', {
@@ -1363,8 +1363,8 @@ export function generateVideo(
 }
 
 export function generateMedia(
-  ctx: { pluginId?: string | null; bus?: Pick<HanaEventBus, 'request'> | null },
-  input: HanaGenerateMediaInput,
+  ctx: { pluginId?: string | null; bus?: Pick<LingxiEventBus, 'request'> | null },
+  input: LingxiGenerateMediaInput,
   options?: Record<string, unknown>,
 ): Promise<unknown> {
   return requestBus(ctx, 'media:generate', {
@@ -1374,35 +1374,35 @@ export function generateMedia(
 }
 
 export function transcribeAudio(
-  ctx: { pluginId?: string | null; bus?: Pick<HanaEventBus, 'request'> | null },
-  input: HanaTranscribeAudioInput,
+  ctx: { pluginId?: string | null; bus?: Pick<LingxiEventBus, 'request'> | null },
+  input: LingxiTranscribeAudioInput,
   options?: Record<string, unknown>,
-): Promise<HanaTranscribeAudioResult> {
+): Promise<LingxiTranscribeAudioResult> {
   return requestBus(ctx, 'media:transcribe-audio', {
     ...input,
     ...(pluginIdFromContext(ctx) ? { pluginId: pluginIdFromContext(ctx) } : {}),
   }, options).then(normalizeTranscribeAudioResult);
 }
 
-function normalizeTranscribeAudioResult(result: unknown): HanaTranscribeAudioResult {
+function normalizeTranscribeAudioResult(result: unknown): LingxiTranscribeAudioResult {
   if (result && typeof result === 'object' && (result as any).ok === true
     && Object.prototype.hasOwnProperty.call(result, 'transcription')) {
-    return result as HanaTranscribeAudioResult;
+    return result as LingxiTranscribeAudioResult;
   }
   return { ok: true, transcription: result };
 }
 
 export function listUsageEntries(
-  ctx: { bus?: Pick<HanaEventBus, 'request'> | null },
-  filter: HanaUsageListFilter = {},
+  ctx: { bus?: Pick<LingxiEventBus, 'request'> | null },
+  filter: LingxiUsageListFilter = {},
   options?: Record<string, unknown>,
-): Promise<HanaUsageListResult> {
-  return requestBus<HanaUsageListResult, HanaUsageListFilter>(ctx, 'usage:list', filter, options);
+): Promise<LingxiUsageListResult> {
+  return requestBus<LingxiUsageListResult, LingxiUsageListFilter>(ctx, 'usage:list', filter, options);
 }
 
 export function subscribeUsageEvents(
-  ctx: { bus?: Pick<HanaEventBus, 'subscribe'> | null },
-  handler: (entry: HanaUsageLedgerEntry, meta: HanaUsageEventMeta) => void,
+  ctx: { bus?: Pick<LingxiEventBus, 'subscribe'> | null },
+  handler: (entry: LingxiUsageLedgerEntry, meta: LingxiUsageEventMeta) => void,
 ): () => void {
   if (!ctx.bus || typeof ctx.bus.subscribe !== 'function') {
     throw new Error('plugin bus subscribe unavailable');
@@ -1411,7 +1411,7 @@ export function subscribeUsageEvents(
     if (!event || typeof event !== 'object') return;
     const typed = event as { type?: unknown; entry?: unknown };
     if (typed.type !== 'llm_usage') return;
-    const entry = typed.entry as HanaUsageLedgerEntry;
+    const entry = typed.entry as LingxiUsageLedgerEntry;
     const entrySessionId =
       textOrNull((entry as any)?.attribution?.sessionId)
       || textOrNull((entry as any)?.source?.actor?.sessionId)
@@ -1435,37 +1435,37 @@ export function subscribeUsageEvents(
 }
 
 export function registerTask(
-  ctx: { bus?: Pick<HanaEventBus, 'request'> | null },
-  input: HanaTaskRegisterInput,
+  ctx: { bus?: Pick<LingxiEventBus, 'request'> | null },
+  input: LingxiTaskRegisterInput,
 ): Promise<{ ok: true }> {
   return requestBus(ctx, 'task:register', input);
 }
 
 export function updateTask(
-  ctx: { bus?: Pick<HanaEventBus, 'request'> | null },
-  input: HanaTaskUpdateInput,
-): Promise<{ ok: true; task: HanaTaskRecord }> {
+  ctx: { bus?: Pick<LingxiEventBus, 'request'> | null },
+  input: LingxiTaskUpdateInput,
+): Promise<{ ok: true; task: LingxiTaskRecord }> {
   return requestBus(ctx, 'task:update', input);
 }
 
 export function completeTask(
-  ctx: { bus?: Pick<HanaEventBus, 'request'> | null },
+  ctx: { bus?: Pick<LingxiEventBus, 'request'> | null },
   taskId: string,
   result?: unknown,
-): Promise<{ ok: true; task: HanaTaskRecord }> {
+): Promise<{ ok: true; task: LingxiTaskRecord }> {
   return requestBus(ctx, 'task:complete', { taskId, result });
 }
 
 export function failTask(
-  ctx: { bus?: Pick<HanaEventBus, 'request'> | null },
+  ctx: { bus?: Pick<LingxiEventBus, 'request'> | null },
   taskId: string,
   error: unknown,
-): Promise<{ ok: true; task: HanaTaskRecord }> {
+): Promise<{ ok: true; task: LingxiTaskRecord }> {
   return requestBus(ctx, 'task:fail', { taskId, error });
 }
 
 export function cancelTask(
-  ctx: { bus?: Pick<HanaEventBus, 'request'> | null },
+  ctx: { bus?: Pick<LingxiEventBus, 'request'> | null },
   taskId: string,
   reason?: string,
 ): Promise<{ result: string; canceled: boolean }> {
@@ -1473,26 +1473,26 @@ export function cancelTask(
 }
 
 export function scheduleTask(
-  ctx: { bus?: Pick<HanaEventBus, 'request'> | null },
-  input: HanaTaskScheduleInput,
-): Promise<{ ok: true; schedule: HanaTaskSchedule }> {
+  ctx: { bus?: Pick<LingxiEventBus, 'request'> | null },
+  input: LingxiTaskScheduleInput,
+): Promise<{ ok: true; schedule: LingxiTaskSchedule }> {
   return requestBus(ctx, 'task:schedule', input);
 }
 
 export function unscheduleTask(
-  ctx: { bus?: Pick<HanaEventBus, 'request'> | null },
+  ctx: { bus?: Pick<LingxiEventBus, 'request'> | null },
   scheduleId: string,
 ): Promise<{ ok: true; removed: boolean }> {
   return requestBus(ctx, 'task:unschedule', { scheduleId });
 }
 
-export function sessionFileToMediaItem(file: HanaSessionFile): HanaSessionFileMediaItem {
+export function sessionFileToMediaItem(file: LingxiSessionFile): LingxiSessionFileMediaItem {
   const fileId = firstText(file.fileId, file.id);
   if (!fileId) {
     throw new Error('SessionFile media item requires id or fileId');
   }
 
-  const item: HanaSessionFileMediaItem = {
+  const item: LingxiSessionFileMediaItem = {
     type: 'session_file',
     fileId,
   };
@@ -1506,9 +1506,9 @@ export function sessionFileToMediaItem(file: HanaSessionFile): HanaSessionFileMe
   return item;
 }
 
-type HanaMediaInput = HanaSessionFile | HanaSessionFileMediaItem | HanaStagedSessionFile;
+type LingxiMediaInput = LingxiSessionFile | LingxiSessionFileMediaItem | LingxiStagedSessionFile;
 
-export function createMediaDetails(items: HanaMediaInput[]): HanaMediaDetails {
+export function createMediaDetails(items: LingxiMediaInput[]): LingxiMediaDetails {
   return {
     media: {
       items: items.map(normalizeMediaItem),
@@ -1516,14 +1516,14 @@ export function createMediaDetails(items: HanaMediaInput[]): HanaMediaDetails {
   };
 }
 
-export function defineExtension<Pi = unknown>(factory: HanaExtensionFactory<Pi>): HanaExtensionFactory<Pi> {
+export function defineExtension<Pi = unknown>(factory: LingxiExtensionFactory<Pi>): LingxiExtensionFactory<Pi> {
   return factory;
 }
 
-export function definePlugin(lifecycle: HanaPluginLifecycle): new () => HanaPluginInstance {
-  return class DefinedHanaPlugin implements HanaPluginInstance {
-    ctx!: HanaPluginContext;
-    register!: (disposable: HanaPluginDisposable) => void;
+export function definePlugin(lifecycle: LingxiPluginLifecycle): new () => LingxiPluginInstance {
+  return class DefinedLingxiPlugin implements LingxiPluginInstance {
+    ctx!: LingxiPluginContext;
+    register!: (disposable: LingxiPluginDisposable) => void;
 
     async onload(): Promise<void> {
       await lifecycle.onload?.(this.ctx, { register: this.register });
@@ -1535,7 +1535,7 @@ export function definePlugin(lifecycle: HanaPluginLifecycle): new () => HanaPlug
   };
 }
 
-function normalizeMediaItem(input: HanaMediaInput): HanaSessionFileMediaItem {
+function normalizeMediaItem(input: LingxiMediaInput): LingxiSessionFileMediaItem {
   if (isRecord(input) && isRecord(input.mediaItem)) {
     return normalizeSessionFileMediaItem(input.mediaItem);
   }
@@ -1548,7 +1548,7 @@ function normalizeMediaItem(input: HanaMediaInput): HanaSessionFileMediaItem {
   throw new Error('media details item must be a SessionFile, staged file, or session_file media item');
 }
 
-function normalizeSessionFileMediaItem(input: Record<string, unknown>): HanaSessionFileMediaItem {
+function normalizeSessionFileMediaItem(input: Record<string, unknown>): LingxiSessionFileMediaItem {
   if (input.type !== 'session_file') {
     throw new Error('media details item must be a session_file media item');
   }

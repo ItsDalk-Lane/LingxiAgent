@@ -136,8 +136,8 @@ try {
     error: serializeError(err),
   });
   showBootstrapError(
-    "HanaAgent Launch Failed",
-    `HanaAgent failed before LINGXI_HOME could be resolved.\n\n${err?.message || err}\n\nDiagnostic file:\n${diagnosticPath || diagnosticsDir}`,
+    "LingxiAgent Launch Failed",
+    `LingxiAgent failed before LINGXI_HOME could be resolved.\n\n${err?.message || err}\n\nDiagnostic file:\n${diagnosticPath || diagnosticsDir}`,
   );
   exitAfterBootstrapFailure();
 }
@@ -174,7 +174,7 @@ function verifyWindowsInstallSurfaceBeforeMain() {
     diagnosticPath,
   });
   const detail = launchIntegrity.formatInstallSurfaceError(result, diagnosticPath);
-  showBootstrapError("HanaAgent Launch Failed", detail);
+  showBootstrapError("LingxiAgent Launch Failed", detail);
   exitAfterBootstrapFailure();
   return false;
 }
@@ -203,8 +203,8 @@ function loadDesktopMain() {
     appendLaunchLog("desktop-main-load-failed", { ...payload, diagnosticPath });
     writeLaunchMarker("desktop-main-load-failed", { diagnosticPath });
     showBootstrapError(
-      "HanaAgent Launch Failed",
-      `HanaAgent failed before the desktop main process finished loading.\n\n${err?.message || err}\n\nDiagnostic file:\n${diagnosticPath || diagnosticsDir}`,
+      "LingxiAgent Launch Failed",
+      `LingxiAgent failed before the desktop main process finished loading.\n\n${err?.message || err}\n\nDiagnostic file:\n${diagnosticPath || diagnosticsDir}`,
     );
     exitAfterBootstrapFailure();
   }

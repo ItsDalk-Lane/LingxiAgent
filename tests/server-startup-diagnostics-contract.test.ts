@@ -632,7 +632,7 @@ describe("desktop launch failure dialog: data-epoch dedicated branches (C7 E4)",
       await writeDataEpochStamp(homeDir, { minimumReaderEpoch: 5, committedDataEpoch: 5, lastVersion: "9.9.9" });
       const context = buildDataEpochDialogContext(homeDir);
 
-      const crashInfo = `=== HanaAgent Crash Log ===\n--- Server Output ---\n[stderr] LINGXI_DATA_EPOCH_BLOCKED reason=epoch-downgrade-blocked\n[stderr] [data-epoch] 数据安全闸拒绝启动\n`;
+      const crashInfo = `=== LingxiAgent Crash Log ===\n--- Server Output ---\n[stderr] LINGXI_DATA_EPOCH_BLOCKED reason=epoch-downgrade-blocked\n[stderr] [data-epoch] 数据安全闸拒绝启动\n`;
       const detail = context.buildLaunchFailureDialogDetail({ code: undefined, message: "" }, crashInfo);
 
       expect(detail).toContain("数据已被更新的版本使用");

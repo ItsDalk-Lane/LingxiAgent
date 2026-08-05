@@ -3,7 +3,7 @@ import {
   type PluginResourceOpenInput,
   type PluginResourcePickInput,
   type PluginResourceRequestAccessInput,
-} from '@hana/plugin-protocol';
+} from '@lingxi/plugin-protocol';
 import { useStore } from '../stores';
 import { selectSessionFiles } from '../stores/selectors/file-refs';
 import type { Toast } from '../stores/toast-slice';

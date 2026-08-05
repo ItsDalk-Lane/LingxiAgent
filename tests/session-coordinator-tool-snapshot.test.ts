@@ -56,7 +56,7 @@ const SDK_BUILTIN_OBJS = [
   "read", "write", "edit", "exec_command", "write_stdin", "grep", "find", "ls",
 ].map(makeTool);
 
-// HanaAgent custom tools — in production these come from agent.tools getter
+// LingxiAgent custom tools — in production these come from agent.tools getter
 // and flow through buildTools.customTools.
 const HANAKO_CUSTOM_OBJS = [
   "search_memory", "pin_memory", "unpin_memory", "web_search",

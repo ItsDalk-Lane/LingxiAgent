@@ -5,7 +5,7 @@ import {
   PLUGIN_UI_PROTOCOL_VERSION,
   parsePluginUiMessage,
   type PluginUiMessage,
-} from '@hana/plugin-protocol';
+} from '@lingxi/plugin-protocol';
 
 export type PluginIframeStatus = 'loading' | 'ready' | 'error';
 export type PluginUiSlot = 'page' | 'widget' | 'card' | 'settings';
