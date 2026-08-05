@@ -1,0 +1,93 @@
+name: Mirror Release to AtomGit
+
+on:
+  release:
+    types:
+      - published
+      - edited
+      - prereleased
+      - released
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: Mirror selection
+        type: choice
+        options:
+          - newest
+          - stable
+          - tag
+        default: newest
+      tag:
+        description: Tag to mirror when mode=tag, for example v0.425.4
+        required: false
+        type: string
+      limit:
+        description: Number of releases to mirror when mode=newest or mode=stable
+        required: true
+        default: "1"
+        type: string
+      dry_run:
+        description: Show what would be mirrored without uploading to AtomGit
+        required: true
+        default: true
+        type: boolean
+
+concurrency:
+  group: atomgit-release-mirror
+  cancel-in-progress: false
+
+jobs:
+  mirror:
+    if: github.event_name == 'workflow_dispatch' || github.event.sender.login != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24.15.0"
+
+      - name: Mirror release assets
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ATOMGIT_TOKEN: ${{ secrets.ATOMGIT_TOKEN }}
+          ATOMGIT_OWNER: liliMozi
+          ATOMGIT_REPO: OpenHanako-Releases
+          EVENT_NAME: ${{ github.event_name }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+          INPUT_MODE: ${{ inputs.mode }}
+          INPUT_TAG: ${{ inputs.tag }}
+          INPUT_LIMIT: ${{ inputs.limit }}
+          INPUT_DRY_RUN: ${{ inputs.dry_run }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          ARGS=()
+          if [ "$EVENT_NAME" = "release" ]; then
+            if [ -z "$RELEASE_TAG" ]; then
+              echo "::error::release event did not include a tag"
+              exit 1
+            fi
+            ARGS+=(--tag "$RELEASE_TAG")
+          elif [ "$INPUT_MODE" = "tag" ]; then
+            if [ -z "$INPUT_TAG" ]; then
+              echo "::error::tag is required when mode=tag"
+              exit 1
+            fi
+            ARGS+=(--tag "$INPUT_TAG")
+          elif [ "$INPUT_MODE" = "stable" ]; then
+            ARGS+=(--stable "$INPUT_LIMIT")
+          else
+            ARGS+=(--newest "$INPUT_LIMIT")
+          fi
+
+          if [ "$EVENT_NAME" = "workflow_dispatch" ] && [ "$INPUT_DRY_RUN" = "true" ]; then
+            ARGS+=(--dry-run)
+          fi
+
+          node scripts/mirror-release-to-atomgit.mjs "${ARGS[@]}"

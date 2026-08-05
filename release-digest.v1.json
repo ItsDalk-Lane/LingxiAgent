@@ -1,0 +1,367 @@
+{
+  "schemaVersion": 1,
+  "tag": "v0.442.0",
+  "version": "0.442.0",
+  "previousTag": "v0.441.32",
+  "generatedAt": "2026-08-04T18:28:22.000Z",
+  "noUserFacingChanges": false,
+  "summary": {
+    "zh": "这一版最大的新东西是工作区文件历史。工作区里的文本文件被改动时会自动留一份快照，在文件树上右键、或在预览里点历史按钮，就能翻到任意一版，看到一段「还原之后会变成什么样」的逐行 diff，确认了再写回；还原这个动作本身也会被记成一版，所以随时能再还原回来。它只收文本文件（单份上限 5MB），一分钟内的连续改动并成一条，保留 30 天、每个工作区最多占 500MB，node_modules、dist 这类目录和 lock、log 文件不收。模型这边接上了 Claude Opus 5 与 Sonnet 5，它们的 Max 思考档不再被降成 High；普通对话的默认输出上限从 32K 提到 64K，另外给出 128K 和 256K 两个显式选项。新会话的标题从此按你真正打的字来取——以前随消息一起注入的提醒和附件标记会把标题占满，没配摘要模型的人看到的就是一段标记文本截断成 30 个字，存量里这类标题会被清掉。切换到装不下当前对话的模型时不再自动压缩或截断历史，而是先问你要不要压缩。另外，工具集合变化不再弹出打断对话的刷新提示。",
+    "en": "The headline addition this release is workspace file history. Text files in your workspace are snapshotted automatically as you change them; right-click a file in the tree, or press the history button in the preview, and you can walk back to any version, read a line-by-line diff of what restoring would actually change, and write it back once you agree. The restore itself is recorded as a version too, so you can always restore back. It covers text files only (5MB each), merges consecutive edits within one minute into a single version, keeps 30 days and at most 500MB per workspace, and skips directories like node_modules and dist along with lock and log files. On the model side, Claude Opus 5 and Sonnet 5 are wired up and their Max thinking level is no longer downgraded to High; the default output ceiling for ordinary chat moves from 32K to 64K, with 128K and 256K added as explicit choices. New chats are now titled from what you actually typed: the reminders and attachment markers injected alongside your message used to fill the title, so anyone without a summarizer model configured saw marker text cut off at 30 characters, and existing titles like that are removed. Switching to a model that cannot hold the current conversation no longer compacts or truncates history behind your back; it asks you to compact first. And a changing tool set no longer interrupts the conversation with a refresh prompt."
+  },
+  "counts": {
+    "feature": 1,
+    "fix": 9,
+    "improvement": 2,
+    "migration": 0
+  },
+  "source": {
+    "owner": "liliMozi",
+    "repo": "openhanako",
+    "commitRange": "v0.441.32..v0.442.0",
+    "releaseUrl": "https://github.com/liliMozi/openhanako/releases/tag/v0.442.0",
+    "releaseNotes": ""
+  },
+  "items": [
+    {
+      "id": "workspace-file-history",
+      "kind": "feature",
+      "importance": "high",
+      "title": {
+        "zh": "工作区文件历史：自动快照、逐行 diff、确认后还原",
+        "en": "Workspace file history: automatic snapshots, line diff, restore on confirm"
+      },
+      "summary": {
+        "zh": "工作区里的文本文件每次被改动，都会自动留下一份带时间的快照，无论改动来自你自己、助手的工具调用，还是外部编辑器。打开历史弹窗后是三栏：左边是这个工作区所有留过历史的文件（删掉的文件单独一组，仍然翻得到），中间是选中文件的版本时间线，右边是逐行 diff 与还原按钮。还原走的是正常的文件写入通道，所以工作区树和已打开的编辑器会跟着刷新；还原动作本身也会被记成新的一版，因此每一次还原都是可撤销的。",
+        "en": "Every change to a text file in your workspace leaves a timestamped snapshot behind, whether the change came from you, from a tool call, or from an editor outside the app. The history dialog has three columns: on the left every file in this workspace that has history (deleted files grouped separately and still reachable), in the middle the version timeline for the selected file, on the right a line-by-line diff and the restore button. Restoring goes through the normal file-write path, so the workspace tree and any open editor refresh with it, and the restore itself is recorded as a new version, which makes every restore reversible."
+      },
+      "details": [
+        {
+          "zh": "两个入口，都只是同一个弹窗的调用方：文件树上右键某个文件，或在预览里点悬浮的历史按钮。只对本地工作区开放。",
+          "en": "Two entry points, both opening the same dialog: right-click a file in the workspace tree, or press the floating history button in the preview. Local workspaces only."
+        },
+        {
+          "zh": "diff 的方向是「当前内容 → 选中的那一版」，读出来就是还原之后会发生什么：绿色的行是会被写回的内容，红色的行是会被替换掉的当前内容。当前内容读不到（文件已删除、或挂载在远端）时退回与上一版比对，再不行就展示那一版的全文，不拼一个看起来像 diff 的东西出来。",
+          "en": "The diff reads from current content to the selected version, so what you see is what restoring would do: added lines are what gets written back, removed lines are the current content it replaces. When the current content cannot be read (the file is gone, or the mount is remote) it falls back to comparing against the previous version, and failing that shows the snapshot in full rather than fabricating a diff."
+        },
+        {
+          "zh": "收录范围有意收窄：只存文本文件、单份不超过 5MB，node_modules、dist、build、coverage 这类目录和以点开头的目录整棵跳过，package-lock.json 与 log、lock、tmp 类文件也不收。一分钟内对同一个文件的连续改动合并成一版，免得敲一行存一次就刷出几十条。",
+          "en": "The scope is deliberately narrow: text files only, 5MB each, whole subtrees skipped for directories like node_modules, dist, build and coverage as well as anything starting with a dot, and no package-lock.json or log, lock and tmp files. Consecutive edits to the same file within one minute collapse into a single version, so save-on-keystroke does not produce dozens of entries."
+        },
+        {
+          "zh": "每个工作区一个独立的历史数据库，保留 30 天、最多 500MB，超出的按时间从旧到新清理。macOS 的文件系统事件在并发读写下会静默丢事件（不报错也不补发），所以除了监听之外还有一轮基线扫描兜底：工作区接入时先整个扫一遍，之后每天一轮，被丢掉的那次改动最迟在下一轮进入历史。",
+          "en": "Each workspace gets its own history database, kept for 30 days and up to 500MB, pruned oldest-first beyond that. macOS filesystem events are silently dropped under concurrent activity, with no error and no redelivery, so alongside the watcher there is a baseline sweep: a full pass when the workspace is attached, then once a day, so a dropped change reaches history on the next pass at the latest."
+        }
+      ],
+      "sources": [
+        { "type": "commit", "ref": "37cf87257", "title": "feat(file-history): add text file capture policy" },
+        { "type": "commit", "ref": "04c8ad565", "title": "feat(file-history): add per-workspace sqlite snapshot store" },
+        { "type": "commit", "ref": "d22f86e20", "title": "feat(file-history): add recursive workspace watcher" },
+        { "type": "commit", "ref": "4067d734a", "title": "feat(file-history): add capture orchestration service" },
+        { "type": "commit", "ref": "803ac4866", "title": "fix(file-history): tolerate silent fsevents event loss" },
+        { "type": "commit", "ref": "82edc9fe2", "title": "feat(file-history): wire capture service into engine lifecycle" },
+        { "type": "commit", "ref": "e21dd41d0", "title": "feat(file-history): add rest surface for listing and restore" },
+        { "type": "commit", "ref": "b1770bc90", "title": "feat(file-history): add unified history modal with diff and restore" }
+      ]
+    },
+    {
+      "id": "claude-5-and-64k-output",
+      "kind": "improvement",
+      "importance": "high",
+      "title": {
+        "zh": "接入 Claude Opus 5 与 Sonnet 5，普通对话默认输出提到 64K",
+        "en": "Claude Opus 5 and Sonnet 5 wired up, default chat output raised to 64K"
+      },
+      "summary": {
+        "zh": "Claude Opus 5 与 Sonnet 5 的原生 Anthropic 与 OpenRouter 模型 ID 都已注册，并带上各自的自适应思考档位信息。此前选 Max 思考档会在 provider 归一那一步被悄悄降成 High，现在两条路径都原样保留。同时，没有显式指定输出长度的普通对话，目标输出从 32K 或 provider 默认值统一提到 64K。",
+        "en": "Native Anthropic and OpenRouter model IDs for Claude Opus 5 and Sonnet 5 are registered with their adaptive thinking metadata. Choosing the Max thinking level used to be quietly normalized down to High at the provider layer; both paths now preserve it. Separately, ordinary chat with no explicit output length now targets 64K instead of 32K or the provider default."
+      },
+      "details": [
+        {
+          "zh": "提高的是默认值，不是硬抬：既不会超过模型自身的上限，也不会把 SDK 为了给剩余上下文留地方而收紧过的封顶重新撑开。",
+          "en": "This raises a default, not a cap: it never exceeds the model's own limit, and it does not reopen a ceiling the SDK had already tightened to leave room for remaining context."
+        },
+        {
+          "zh": "输出长度设置里另外给出 128K 和 256K 两个显式选项。",
+          "en": "The output length setting adds 128K and 256K as explicit choices."
+        },
+        {
+          "zh": "一个回合如果只产出了思考内容就撞上长度上限，以前会被当成正常完成，现在明确报成空回复错误，不再让你对着一片空白猜发生了什么。",
+          "en": "A turn that produces only thinking content before hitting the length limit used to count as a normal completion; it now surfaces an explicit empty-response error instead of leaving you staring at a blank reply."
+        }
+      ],
+      "sources": [
+        { "type": "commit", "ref": "17091a5be", "title": "fix(models): add Claude Opus 5 and Sonnet 5 reasoning contracts" },
+        { "type": "commit", "ref": "1efa4e5d4", "title": "fix(models): raise default chat output to 64K (#2320)" },
+        { "type": "commit", "ref": "90a4aa368", "title": "test(models): align provider contracts with 64K output (#2320)" }
+      ]
+    },
+    {
+      "id": "session-title-from-typed-text",
+      "kind": "fix",
+      "importance": "high",
+      "title": {
+        "zh": "新会话的标题按你真正打的字来取",
+        "en": "New chats are titled from what you actually typed"
+      },
+      "summary": {
+        "zh": "一条消息被存下来的时候，已经带上了一串只给模型看的信封：提醒广播、引用条目列表，以及代表随消息一起发出的文件的附件与会话文件标记。生成标题读的是这段原始文本，于是没配摘要模型的人拿到的标题就是一段标记文本截断成 30 个字，配了摘要模型的人则把整个摘要输入都花在了信封上。现在标题生成读的是一层剥掉信封的可见文本投影：剥完什么都不剩就干脆不生成，侧边栏退回同样剥过的第一条消息。",
+        "en": "By the time a message is stored it already carries envelopes written for the model only: reminder broadcasts, reference listings, and the attachment and session-file markers that stand in for files sent alongside it. Title generation read that raw text, so anyone without a summarizer model configured got a title that was marker text truncated to 30 characters, while anyone with one spent the entire summarizer input on envelopes. Titles are now derived from a visible-text projection with the envelopes stripped; when nothing remains, no title is generated at all and the sidebar falls back to the same projection of the first message."
+      },
+      "details": [
+        {
+          "zh": "存量里已经是信封字面量的标题会被一次性清掉，这样老会话不会一直顶着一段标记文本。只删不改写，不会替你猜一个标题。",
+          "en": "Stored titles that are envelope literals are removed once, so old chats stop displaying marker text. Entries are only deleted, never rewritten, so nothing is guessed on your behalf."
+        },
+        {
+          "zh": "同一处缺口也让消息重试和编辑失明过：编辑一条以延迟工具清单开头的消息，重新提交时那份清单会被丢掉。现在会把消息开头的每一层信封都吃掉，而不是只认提醒那一种。",
+          "en": "The same gap had left message retry and edit blind: editing a message that opened with a deferred-tool listing dropped that listing from the resubmitted prompt. Every envelope at the head of a prompt is now consumed, not just the reminder kind."
+        },
+        {
+          "zh": "行为上有一处变化：一条只有附件、没有文字的首条消息，从此不生成标题，而不是像以前那样拿标记文本凑一个出来。",
+          "en": "One behavior change: a first message consisting only of attachments now produces no title at all, where it previously produced one made of marker text."
+        }
+      ],
+      "sources": [
+        { "type": "commit", "ref": "ac830bc5c", "title": "fix(sessions): title new chats from what the user typed, not injected envelopes" }
+      ]
+    },
+    {
+      "id": "model-switch-no-silent-truncation",
+      "kind": "fix",
+      "importance": "high",
+      "title": {
+        "zh": "换成装不下当前对话的模型时，先问你，不再偷偷截断历史",
+        "en": "Switching to a model that cannot hold the conversation now asks first"
+      },
+      "summary": {
+        "zh": "在会话中途切换模型，如果目标模型的上下文放不下当前这段对话，以前会自动压缩或截断历史再切过去，你事后才发现前面的内容没了。现在这种切换会在动历史之前就被拒绝，并且明确告诉你需要先压缩，压不压由你决定。",
+        "en": "Switching models mid-conversation used to auto-compact or truncate history when the target model's context could not hold it, and you only found out afterwards that earlier content was gone. Such a switch is now rejected before any history is touched, with a clear message that you need to compact first; whether to do so is your call."
+      },
+      "details": [
+        {
+          "zh": "拒绝发生在改动历史之前，所以失败的切换不会留下任何半途的痕迹。",
+          "en": "The rejection happens before history is mutated, so a failed switch leaves nothing half-applied behind."
+        },
+        {
+          "zh": "错误信息是本地化的，模型切换接口也会把这个原因原样返回，而不是笼统地报一个失败。",
+          "en": "The error is localized, and the model-switch endpoint returns the same reason rather than a generic failure."
+        }
+      ],
+      "sources": [
+        { "type": "commit", "ref": "997cc8318", "title": "fix(session): reject unsafe model downsizing before history mutation (#2268)" }
+      ]
+    },
+    {
+      "id": "compaction-recovery",
+      "kind": "fix",
+      "importance": "medium",
+      "title": {
+        "zh": "压缩：能从损坏的思考历史里恢复，压缩后不再被旧用量卡住",
+        "en": "Compaction recovers from damaged reasoning history and no longer inherits stale usage"
+      },
+      "summary": {
+        "zh": "两件都发生在压缩前后的事。一是有些模型要求重放的工具调用必须带上思考数据，历史一旦缺了这块，压缩就整个失败；现在会精确剪掉最短的那一段完整的受损旧工具事务，真的救不回来时返回一个说明得清的 422，而不是一个笼统的 500 或者悄悄退回原生兜底。二是压缩之后的第一条回复：压缩前的用量记录会被当成还在生效，把后面的输出额度提前吃掉，现在只有确认比当前摘要更新的用量才算数。",
+        "en": "Two problems around compaction. First, some models require reasoning data on replayed tool calls, and a history missing it made compaction fail outright; it now trims only the shortest complete damaged old tool transaction, and returns a structured 422 that explains itself when a history genuinely cannot be salvaged, instead of a generic 500 or a silent fallback. Second, the first reply after compaction: usage recorded before the compaction was still treated as live and ate into the later output budget, and only usage proven newer than the current summary now counts."
+      },
+      "details": [
+        {
+          "zh": "剪裁的边界是「最短的一段完整的受损旧事务」，不是遇到问题就往前削一大片。",
+          "en": "The trim boundary is the shortest complete damaged old transaction, not a broad sweep backwards whenever something looks wrong."
+        },
+        {
+          "zh": "重复压缩同一段对话也不会再累积旧用量。",
+          "en": "Compacting the same conversation repeatedly no longer accumulates stale usage."
+        }
+      ],
+      "sources": [
+        { "type": "commit", "ref": "1a48c576f", "title": "fix(compaction): recover malformed reasoning history (#2326)" },
+        { "type": "commit", "ref": "f1de4a293", "title": "fix(compaction): reset output usage epoch after summaries (#2320)" }
+      ]
+    },
+    {
+      "id": "session-tool-line",
+      "kind": "fix",
+      "importance": "medium",
+      "title": {
+        "zh": "跨会话工具不再在草稿还没确认时就说消息已发出",
+        "en": "The cross-session tool no longer says a message was sent while it is still a draft"
+      },
+      "summary": {
+        "zh": "同一个 session 工具管着三件不同的事，此前共用一句「跟另一个会话联系上了」，两头都不准：读取和列举只是看了看别的会话，说联系上了言过其实；而发送和新建的那一刻消息根本没送出去，只生成了一张待确认的草稿卡，工具行抢在卡片前面宣布结果，跟卡片上待确认的状态直接打架。现在按动作分成三档，发送和新建这两档的完成文案明说在等你确认。",
+        "en": "One session tool covers three different actions, and all three shared a single line about having reached another chat, which fit none of them: reading and listing merely looked at another chat, and for send and create the message had not gone anywhere yet, only a pending draft card awaiting your confirmation. The tool line announced a result ahead of the card and contradicted the pending state shown on it. The three actions are now separated, and the send and create wordings say plainly that they are waiting for you."
+      },
+      "details": [
+        {
+          "zh": "工具行右侧那格以前落到通用分支，显示的是动作名或一串会话 ID。现在显示目标会话的助手名与标题，点一下就切过去；查不到（会话已归档或不在列表里）就退回 ID 短尾，不猜也不静默。",
+          "en": "The detail cell on the right of the tool line used to fall through to a generic branch showing an action name or a raw session id. It now shows the target chat's agent name and title and switches to it on click; when the chat cannot be found, because it is archived or not listed, it falls back to a short id rather than guessing or going silent."
+        }
+      ],
+      "sources": [
+        { "type": "commit", "ref": "b78705e04", "title": "fix(chat): scope session tool wording by action" }
+      ]
+    },
+    {
+      "id": "no-tool-refresh-prompt",
+      "kind": "improvement",
+      "importance": "medium",
+      "title": {
+        "zh": "工具集合变化不再弹出打断对话的刷新提示",
+        "en": "A changing tool set no longer interrupts the conversation with a refresh prompt"
+      },
+      "summary": {
+        "zh": "以前工具集合一有变化，就会提示你刷新并压缩会话，正说着话被打断一次。这个提示连同它背后的整套记账一起移除了。需要主动更新时，手动的重新压缩动作一直都在，随时可用。",
+        "en": "A change in the available tool set used to prompt you to refresh and compact the session, interrupting you mid-conversation. That notice and the bookkeeping behind it are removed. When you do want to bring things up to date, the manual fresh-compact action is still there and always available."
+      },
+      "details": [
+        {
+          "zh": "提醒类功能是否可用的检查保留下来了，去掉的只是那条打断对话的提示。",
+          "en": "The availability checks behind reminders are kept; only the interrupting notice is gone."
+        }
+      ],
+      "sources": [
+        { "type": "commit", "ref": "40c80f6b1", "title": "fix(session): remove tool refresh prompt" }
+      ]
+    },
+    {
+      "id": "update-check-retry",
+      "kind": "fix",
+      "importance": "medium",
+      "title": {
+        "zh": "更新检查收敛到一个来源，失败看得见、重试不限次",
+        "en": "Update checks use one source, failures stay visible, retries are unlimited"
+      },
+      "summary": {
+        "zh": "公开渠道的更新检查以前会在多个来源之间辗转，失败信息容易被吞掉，手动重试还有次数上限。现在每次检查只对 GitHub 发起一次有限次重试的尝试，失败就明明白白留在界面上，手动重试想点几次点几次。",
+        "en": "Update checks on the public channel used to shuffle between several sources, failures were easy to swallow, and manual retries had a cap. Each check now makes one bounded attempt against GitHub, failures stay visible on screen, and manual retry is available as often as you want."
+      },
+      "details": [
+        {
+          "zh": "覆盖稳定版与测试版的外壳检查、内容更新清单、更新状态文案、手动重试和后台轮询五处。",
+          "en": "This covers stable and beta shell checks, content update manifests, update status wording, manual retry and background polling."
+        }
+      ],
+      "sources": [
+        { "type": "commit", "ref": "91320169c", "title": "fix(updates): use one retryable GitHub source (#2290 #2303 #2306)" }
+      ]
+    },
+    {
+      "id": "onboarding-verified-and-shorter",
+      "kind": "fix",
+      "importance": "medium",
+      "title": {
+        "zh": "首次设置少一步，并且完成前会回读确认真的写进去了",
+        "en": "First-run setup is one step shorter and verifies settings before finishing"
+      },
+      "summary": {
+        "zh": "首次设置以前会在写入被拒时继续往下走，最后标记为完成，你以为配好了其实没有。现在每一步都会解析到真正的目标助手，写入被拒就停下，并且在标记完成之前把设置回读一遍确认。同时主题选择这一步移除了，流程从七步变成六步，选完模型直接进工作区设置——主题在设置里随时能改，没必要在第一次打开时挡在路上。",
+        "en": "First-run setup used to keep going when a write was rejected and still mark itself complete, leaving you believing things were configured when they were not. Each step now resolves the actual target agent, stops on a rejected write, and reads the settings back before marking setup done. The theme step is also removed, taking the flow from seven steps to six and going straight from model selection to workspace setup: the theme is changeable in settings at any time and did not need to stand in the way on first launch."
+      },
+      "details": [
+        {
+          "zh": "覆盖首次运行时的助手、供应商、模型、语言、记忆和工作区设置。",
+          "en": "This covers first-run agent, provider, model, language, memory and workspace setup."
+        },
+        {
+          "zh": "普通的主题设置没有任何变化，只是不再出现在首次设置流程里。",
+          "en": "Normal theme settings are unchanged; the theme simply no longer appears in the first-run flow."
+        }
+      ],
+      "sources": [
+        { "type": "commit", "ref": "73f955a82", "title": "fix(onboarding): verify settings before completion (#2293)" },
+        { "type": "commit", "ref": "335e27946", "title": "fix(onboarding): remove the theme step (#2271)" }
+      ]
+    },
+    {
+      "id": "image-and-vision",
+      "kind": "fix",
+      "importance": "medium",
+      "title": {
+        "zh": "图像生成能从被拒的缓存凭证里自救，Seedream 5.0 接上官方模型",
+        "en": "Image generation recovers from a rejected cached credential, Seedream 5.0 wired to the official model"
+      },
+      "summary": {
+        "zh": "存下来的访问令牌有可能在记录的过期时间之前就被服务方拒掉，这时图像生成会直接失败。现在它会在凭证文件锁的保护下轮换一次 OAuth 凭证并重试；第二次还被拒，就把服务方的原始错误如实抛出来，不再自作主张。图像模型这边补上了 Seedream 5.0 的官方标准模型，Lite 仍然是默认；写错的模型 ID 会明确报错，而不是悄悄落到 Lite。",
+        "en": "A stored access token can be rejected by the provider before its recorded expiry, and image generation simply failed. It now rotates the OAuth credential under the credential file lock and retries once; if it is rejected a second time the provider's own error is surfaced unchanged rather than papered over. On the model side, Seedream 5.0's official standard model is added with Lite still the default, and an unknown explicit model id now fails instead of silently becoming Lite."
+      },
+      "details": [
+        {
+          "zh": "还有一处相关的修复：给视觉等辅助任务解析模型时，供应商凭证只负责提供认证信息，不再覆盖已经解析好的模型访问地址，OAuth 的资源地址和显式指定的工具模型仍然说了算。",
+          "en": "A related fix: when resolving models for vision and other auxiliary tasks, provider credentials now supply authentication only and no longer overwrite an already-resolved model endpoint, leaving OAuth resource URLs and explicit utility overrides authoritative."
+        }
+      ],
+      "sources": [
+        { "type": "commit", "ref": "01d08134a", "title": "fix(media): recover image generation when the provider rejects a cached OAuth token" },
+        { "type": "commit", "ref": "dcaa2bd54", "title": "fix(media): add official Seedream 5.0 model (#2305)" },
+        { "type": "commit", "ref": "0a5c971cd", "title": "fix(vision): preserve resolved model endpoints (#2322)" }
+      ]
+    },
+    {
+      "id": "session-create-and-subagent",
+      "kind": "fix",
+      "importance": "medium",
+      "title": {
+        "zh": "新建会话失败不再白建一场，子任务失败也会把父任务叫醒",
+        "en": "A failed chat creation is no longer wasted, and a failed subagent still wakes its parent"
+      },
+      "summary": {
+        "zh": "两处会让工作卡住的问题。新建会话以前在第一条消息发失败时会把整件事一并算失败，你得从头再来；现在只有真正通过了发送前检查才算创建成功，失败时新建的会话保留下来，重试只重试那条消息。子任务这边，失败或中止的运行以前可能不回头通知父任务，父任务就一直等在那；现在每一个终止结果，包括失败和中止，都会带着状态明确唤醒父任务。",
+        "en": "Two ways work could stall. Creating a chat used to fail as a whole when its first message failed, leaving you to start over; creation is now acknowledged only after the message passes real preflight, and on failure the created chat is kept so only that message is retried. On the subagent side, a failed or aborted run could fail to report back and leave the parent waiting; every terminal result, failure and abort included, now explicitly wakes the parent turn with its status."
+      },
+      "details": [
+        {
+          "zh": "跨会话投递的回执、重试行为，以及模型和助手的校验都跟着这次修正。",
+          "en": "Cross-session delivery receipts, retry behavior, and model and agent validation are corrected along with it."
+        },
+        {
+          "zh": "直接派发的子任务和 subagent_reply 续跑两条路径都覆盖到了。",
+          "en": "Both direct subagent dispatch and subagent_reply continuations are covered."
+        }
+      ],
+      "sources": [
+        { "type": "commit", "ref": "f724daeb0", "title": "fix(sessions): preserve failed session.create results (#2282)" },
+        { "type": "commit", "ref": "6cdb62476", "title": "fix(subagents): resume parent after failed runs (#2337)" }
+      ]
+    },
+    {
+      "id": "assorted-fixes",
+      "kind": "fix",
+      "importance": "low",
+      "title": {
+        "zh": "其余修复：MCP 工具名、设置弹窗层级、插件选文件、飞书与 Kimi",
+        "en": "Other fixes: MCP tool names, settings dialog layering, plugin file picks, Feishu and Kimi"
+      },
+      "summary": {
+        "zh": "一批范围较小但会实际挡路的修复。模型看到的 MCP 工具名统一成稳定的小写 ID，重名会直接报错而不是悄悄互相覆盖，界面上显示的名字和线路上传的名字都不变，历史记录里的旧键仍然读得出来。设置页里弹出的确认框以前会被压在设置层下面，点不到也按不掉，现在稳稳浮在上面。插件请求选单个文件时，从此真的打开单选对话框。延迟执行的 MCP 调用把参数声明成开放的 JSON 对象，非对象的参数在交给连接器之前就被挡下，不再带着错型的参数一路跑到连接器里才炸。飞书的流式卡片按协议要求把设置包进一层信封，Kimi 的 K3 请求去掉了它不支持的温度参数。",
+        "en": "A batch of smaller fixes that were nonetheless in the way. The MCP tool names the model sees are now stable lowercase ids, with collisions raising an error instead of quietly shadowing each other, while displayed and wire names stay as they were and historical keys remain readable. Confirmation dialogs opened from settings used to sit behind the settings layer where they could be neither clicked nor dismissed, and now float properly above it. A plugin asking for a single file finally opens a single-select dialog. Deferred MCP calls now advertise their arguments as an open JSON object and reject non-object values before they reach the connector, instead of carrying a malformed argument all the way in before it blows up. Feishu's streaming cards wrap their settings in the envelope the protocol requires, and Kimi's K3 requests drop the temperature parameter it does not support."
+      },
+      "details": [
+        {
+          "zh": "MCP 那一处覆盖工具发布、目录查找、权限、置顶、按助手启用，以及恢复会话时的工具快照。",
+          "en": "The MCP change covers tool publication, catalog lookup, permissions, pins, per-agent enablement, and the tool snapshot restored with a session."
+        },
+        {
+          "zh": "设置里的连接器移除和传输方式切换这两处确认框受益最明显。",
+          "en": "Removing a connector and changing its transport mode are where the dialog fix shows most."
+        },
+        {
+          "zh": "插件请求目录仍然是单选，没指定选项时仍然是多选，只有明确要求单个文件的那一种变了。",
+          "en": "Directory picks stay single, omitted options stay multi-select, and only an explicit request for one file changes behavior."
+        },
+        {
+          "zh": "自动化任务的模型选择器改成按供应商分组，两个供应商有同名或同 ID 的模型时也不会选错。",
+          "en": "The automation model picker now groups choices by provider, so overlapping model names or ids across providers no longer select the wrong one."
+        }
+      ],
+      "sources": [
+        { "type": "commit", "ref": "a153059f1", "title": "fix(mcp): canonicalize model-facing tool ids (#2278)" },
+        { "type": "commit", "ref": "37998c289", "title": "fix(mcp): require object arguments in bridge schema (#2311)" },
+        { "type": "commit", "ref": "d80c2a98a", "title": "fix(settings): keep nested confirmations above settings" },
+        { "type": "commit", "ref": "b137e2236", "title": "fix(plugins): honor single-file resource picks (#2283)" },
+        { "type": "commit", "ref": "5a3227a3b", "title": "fix(automation): group model choices by provider (#2281)" },
+        { "type": "commit", "ref": "a0a4107c2", "title": "fix(feishu): nest CardKit streaming settings (#2335)" },
+        { "type": "commit", "ref": "643715c40", "title": "fix(kimi): omit unsupported K3 temperature" }
+      ]
+    }
+  ]
+}
