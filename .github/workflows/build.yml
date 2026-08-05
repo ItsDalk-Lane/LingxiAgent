@@ -30,7 +30,19 @@ jobs:
       # 必须在 build:renderer 的 emptyOutDir 清空该目录之后才落地
       # （见 vite.config.theme.js 文件头注释）。
       - name: Build renderer bundle
-        run: npm run build:renderer
+        run: |
+          set -o pipefail
+          npm run build:renderer 2>&1 | tee /tmp/renderer-build.log
+
+      # 诊断（临时）：无论成败都把构建日志作为 artifact 上传，用于排查 CI 上
+      # build:renderer 偶发/平台相关的失败。定位后移除。
+      - name: Upload renderer build log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: renderer-build-log
+          path: /tmp/renderer-build.log
+          if-no-files-found: warn
 
       - name: Build theme bundle (writes into dist-renderer/lib, must run after build:renderer)
         run: npm run build:theme
