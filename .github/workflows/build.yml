@@ -273,12 +273,12 @@ jobs:
         if: runner.os == 'macOS'
         run: |
           ulimit -n 65536
-          if ! npx electron-builder --mac dmg zip --${{ matrix.arch }} --publish never > /tmp/eb-mac.log 2>&1; then
-            echo "::error::==== electron-builder FAILED ===="
-            B64=$(tail -c 2800 /tmp/eb-mac.log | base64 | tr -d '\n')
-            echo "::error::EB_B64:$B64"
-            exit 1
-          fi
+          # CSC_LINK secret 未配置时注入的是空串，electron-builder 会把空串当作
+          # "已提供的证书"（importCertificate("") → resolve 到项目根 → "not a file"）。
+          # 置空后 electron-builder 走无证书的 ad-hoc 签名路径。
+          if [ -z "$CSC_LINK" ]; then unset CSC_LINK; fi
+          if [ -z "$CSC_KEY_PASSWORD" ]; then unset CSC_KEY_PASSWORD; fi
+          npx electron-builder --mac dmg zip --${{ matrix.arch }} --publish never
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CSC_LINK: ${{ secrets.CSC_LINK }}
@@ -301,6 +301,10 @@ jobs:
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
+          # WIN_CSC_LINK 未配置时为空串，同样会触发 electron-builder 的
+          # importCertificate("") "not a file"；置空后走无签名打包。
+          if ([string]::IsNullOrEmpty($env:WIN_CSC_LINK)) { Remove-Item Env:WIN_CSC_LINK -ErrorAction SilentlyContinue }
+          if ([string]::IsNullOrEmpty($env:WIN_CSC_KEY_PASSWORD)) { Remove-Item Env:WIN_CSC_KEY_PASSWORD -ErrorAction SilentlyContinue }
           npx electron-builder --win nsis --publish never
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
