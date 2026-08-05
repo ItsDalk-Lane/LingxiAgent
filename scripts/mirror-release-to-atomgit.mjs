@@ -331,6 +331,22 @@ async function downloadGithubAsset(asset, destination, { env, fetchImpl }) {
   await pipeline(Readable.fromWeb(response.body), fs.createWriteStream(destination));
 }
 
+// Undici (Node's built-in fetch engine) caps the time it waits for response
+// HEADERS at 5 minutes (headersTimeout = 300000). For a large PUT the server
+// only sends headers AFTER receiving the whole body, so a ~430MB+ installer
+// reliably trips UND_ERR_HEADERS_TIMEOUT mid-upload even though the transfer
+// is healthy (observed: the deb upload died at exactly 5:00). We raise the
+// per-request dispatcher's headers/body timeouts well above our own 10-minute
+// AbortSignal so that signal stays the single, intentional ceiling. Lazy: undici
+// is only needed for real uploads, never in tests (which inject a mock fetch).
+let uploadDispatcher = null;
+async function getUploadDispatcher() {
+  if (uploadDispatcher) return uploadDispatcher;
+  const { Agent } = await import("undici");
+  uploadDispatcher = new Agent({ headersTimeout: 30 * 60 * 1000, bodyTimeout: 30 * 60 * 1000 });
+  return uploadDispatcher;
+}
+
 async function uploadAtomGitAsset(uploadTarget, filePath, asset, fetchImpl) {
   const content = await fs.promises.readFile(filePath);
   const headers = {
@@ -340,11 +356,15 @@ async function uploadAtomGitAsset(uploadTarget, filePath, asset, fetchImpl) {
   };
   let response;
   try {
+    // dispatcher is consumed by Node's real fetch (undici) and ignored by the
+    // mock fetchImpl used in tests, so passing it unconditionally is safe.
+    const dispatcher = await getUploadDispatcher();
     response = await fetchImpl(uploadTarget.uploadUrl, {
       method: "PUT",
       headers,
       body: content,
       signal: AbortSignal.timeout(10 * 60 * 1000),
+      dispatcher,
     });
   } catch (error) {
     const cause = error?.cause ? `: ${error.cause?.message || String(error.cause)}` : "";
