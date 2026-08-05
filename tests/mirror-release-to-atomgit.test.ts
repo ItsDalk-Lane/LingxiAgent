@@ -162,6 +162,10 @@ describe("mirror-release-to-atomgit", () => {
       const projectLookup = atomgitProjectLookupResponse(url, init);
       if (projectLookup) return projectLookup;
 
+      if (url.includes("/repos/ItsDalk-Lane/LingxiAgent-Releases/branches/main") && method === "GET") {
+        return new Response(JSON.stringify({ name: "main" }), { status: 200 });
+      }
+
       if (url.includes("/repos/ItsDalk-Lane/LingxiAgent-Releases/releases?") && method === "GET") {
         releaseListCalls += 1;
         return new Response(JSON.stringify(releaseListCalls === 1 ? [] : [{
@@ -239,6 +243,10 @@ describe("mirror-release-to-atomgit", () => {
       const projectLookup = atomgitProjectLookupResponse(url, init);
       if (projectLookup) return projectLookup;
 
+      if (url.includes("/repos/ItsDalk-Lane/LingxiAgent-Releases/branches/main") && method === "GET") {
+        return new Response(JSON.stringify({ name: "main" }), { status: 200 });
+      }
+
       if (url.includes("/repos/ItsDalk-Lane/LingxiAgent-Releases/releases?") && method === "GET") {
         return new Response(JSON.stringify([{
           tag_name: "v0.425.4",
@@ -299,6 +307,9 @@ describe("mirror-release-to-atomgit", () => {
       }
       const projectLookup = atomgitProjectLookupResponse(url, init);
       if (projectLookup) return projectLookup;
+      if (url.includes("/repos/ItsDalk-Lane/LingxiAgent-Releases/branches/main") && method === "GET") {
+        return new Response(JSON.stringify({ name: "main" }), { status: 200 });
+      }
       if (url.includes("/repos/ItsDalk-Lane/LingxiAgent-Releases/releases?") && method === "GET") {
         releaseListCalls += 1;
         operations.push(`list:${releaseListCalls}`);
@@ -374,6 +385,9 @@ describe("mirror-release-to-atomgit", () => {
       }
       const projectLookup = atomgitProjectLookupResponse(url, init);
       if (projectLookup) return projectLookup;
+      if (url.includes("/repos/ItsDalk-Lane/LingxiAgent-Releases/branches/main") && method === "GET") {
+        return new Response(JSON.stringify({ name: "main" }), { status: 200 });
+      }
       if (url.includes("/repos/ItsDalk-Lane/LingxiAgent-Releases/releases?") && method === "GET") {
         return new Response(JSON.stringify([fallback]), { status: 200 });
       }
@@ -414,6 +428,9 @@ describe("mirror-release-to-atomgit", () => {
       }
       const projectLookup = atomgitProjectLookupResponse(url, init);
       if (projectLookup) return projectLookup;
+      if (url.includes("/repos/ItsDalk-Lane/LingxiAgent-Releases/branches/main") && method === "GET") {
+        return new Response(JSON.stringify({ name: "main" }), { status: 200 });
+      }
       const page = new URL(url).searchParams.get("page");
       if (page === "1") return new Response(JSON.stringify(firstPage), { status: 200 });
       if (page === "2") return new Response("upstream unavailable", { status: 503 });
@@ -426,6 +443,99 @@ describe("mirror-release-to-atomgit", () => {
     })).rejects.toThrow(/release list page 2 failed/);
     expect(methods).not.toContain("DELETE");
     expect(methods).not.toContain("POST");
+  });
+
+  it("seeds an initial commit when the target branch is missing (self-heal empty mirror repo)", async () => {
+    const operations: string[] = [];
+    let releaseListCalls = 0;
+    const fetchImpl = vi.fn(async (input, init = {}) => {
+      const url = String(input);
+      const method = init.method || "GET";
+
+      if (url.endsWith("/repos/ItsDalk-Lane/LingxiAgent/releases/latest")) {
+        return new Response(JSON.stringify(githubRelease("v0.425.3", false)), { status: 200 });
+      }
+      const projectLookup = atomgitProjectLookupResponse(url, init);
+      if (projectLookup) return projectLookup;
+
+      // Target branch does not exist → probe returns 404.
+      if (url.includes("/repos/ItsDalk-Lane/LingxiAgent-Releases/branches/main") && method === "GET") {
+        operations.push("probe-branch:404");
+        return new Response(JSON.stringify({ message: "Not Found" }), { status: 404 });
+      }
+      // Self-heal: create the initial file to seed the branch.
+      if (url.includes("/repos/ItsDalk-Lane/LingxiAgent-Releases/contents/README.md") && method === "POST") {
+        operations.push("seed-file:create");
+        const body = JSON.parse(String(init.body));
+        expect(body.branch).toBe("main");
+        expect(body.message).toMatch(/Initialize main/);
+        expect(typeof body.content).toBe("string");
+        return new Response(JSON.stringify({ commit: { sha: "seedsha" } }), { status: 201 });
+      }
+      if (url.includes("/repos/ItsDalk-Lane/LingxiAgent-Releases/releases?") && method === "GET") {
+        releaseListCalls += 1;
+        operations.push("list-releases");
+        // First list: empty (nothing exists yet). Later lists: the target is present.
+        const listed = releaseListCalls === 1
+          ? []
+          : [{ tag_name: "v0.425.4", prerelease: true, created_at: "2026-07-21T00:00:00Z" }];
+        return new Response(JSON.stringify(listed), { status: 200 });
+      }
+      if (url.endsWith("/repos/ItsDalk-Lane/LingxiAgent-Releases/releases?access_token=atomgit-token") && method === "POST") {
+        operations.push("release:upsert");
+        return new Response(JSON.stringify({ tag_name: "v0.425.4", assets: [] }), { status: 201 });
+      }
+      if (url.includes("/repos/ItsDalk-Lane/LingxiAgent-Releases/releases/v0.425.4/upload_url")) {
+        return new Response(JSON.stringify({ url: "https://upload.example.com/latest.yml" }), { status: 200 });
+      }
+      if (url === "https://example.com/latest.yml") return new Response("asset", { status: 200 });
+      if (url === "https://upload.example.com/latest.yml" && method === "PUT") {
+        return new Response(null, { status: 200 });
+      }
+      if (url.includes("/attach_files/latest.yml/download") && method === "HEAD") {
+        return new Response(null, { status: 200, headers: { "content-length": "120" } });
+      }
+      throw new Error(`unexpected fetch: ${method} ${url}`);
+    });
+
+    await mirrorRelease(mirrorOptions, {
+      ...githubRelease("v0.425.4"),
+      assets: [githubRelease("v0.425.4").assets[0]],
+    }, {
+      env: { ATOMGIT_TOKEN: "atomgit-token" },
+      fetchImpl,
+    });
+
+    // Seed file must happen BEFORE the release upsert; probe-404 triggers it.
+    // The final list-releases is retainOnlyTargetRelease re-listing after upload.
+    expect(operations).toEqual([
+      "probe-branch:404",
+      "seed-file:create",
+      "list-releases",
+      "release:upsert",
+      "list-releases",
+    ]);
+  });
+
+  it("propagates non-404 branch probe errors verbatim (never silent-degrades)", async () => {
+    const fetchImpl = vi.fn(async (input, init = {}) => {
+      const url = String(input);
+      const method = init.method || "GET";
+      if (url.endsWith("/repos/ItsDalk-Lane/LingxiAgent/releases/latest")) {
+        return new Response(JSON.stringify(githubRelease("v0.425.3", false)), { status: 200 });
+      }
+      const projectLookup = atomgitProjectLookupResponse(url, init);
+      if (projectLookup) return projectLookup;
+      if (url.includes("/repos/ItsDalk-Lane/LingxiAgent-Releases/branches/main") && method === "GET") {
+        return new Response("rate limited", { status: 429 });
+      }
+      throw new Error(`unexpected fetch: ${method} ${url}`);
+    });
+
+    await expect(mirrorRelease(mirrorOptions, githubRelease("v0.425.4"), {
+      env: { ATOMGIT_TOKEN: "atomgit-token" },
+      fetchImpl,
+    })).rejects.toThrow(/branch probe main failed: 429/);
   });
 
   it("wires manual GitHub release changes to exact-tag mirroring", () => {

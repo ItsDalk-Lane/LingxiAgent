@@ -408,6 +408,71 @@ async function shouldSkipExistingAsset(options, githubRelease, asset, { env, fet
   return true;
 }
 
+// Minimal placeholder committed to seed an empty mirror repo with its first
+// reference, so GitCode's release API accepts `target_commitish`. The content
+// is intentionally trivial — this host repo exists only to carry release
+// records and their attach assets, never source code.
+const SEED_README_CONTENT = "# LingxiAgent-Releases\n\nAuto-created mirror release host.\n";
+const SEED_README_BASE64 = Buffer.from(SEED_README_CONTENT).toString("base64");
+
+/**
+ * Ensures the AtomGit mirror repo has a `target_commitish` reference before
+ * the release POST — GitCode rejects `POST /releases` with `400 "X is not
+ * exist"` when the named commitish has no backing branch (a freshly-created,
+ * never-initialized mirror repo). A light GET probes the branch; on 404 we
+ * create one initial file (which GitCode/Gitee seeds into the first commit +
+ * default branch), any other error propagates unchanged (never swallowed —
+ * see the project's no-silent-degradation rule). Idempotent: a branch that
+ * already exists skips the create, so multi-release batches probe-then-skip.
+ * @param {object} options
+ * @param {{target_commitish?: string}} githubRelease
+ * @param {{env: NodeJS.ProcessEnv, fetchImpl: typeof fetch}} dependencies
+ */
+async function ensureAtomGitDefaultBranch(options, githubRelease, { env, fetchImpl }) {
+  const targetCommitish = githubRelease.target_commitish || "main";
+  const branchUrl = atomgitUrl(
+    `/repos/${options.atomgitOwner}/${options.atomgitRepo}/branches/${encodeURIComponent(targetCommitish)}`,
+    env,
+  );
+  const probeResponse = await fetchImpl(branchUrl, { headers: atomgitHeaders(env) });
+  if (probeResponse.ok) return; // branch exists, nothing to do
+  if (probeResponse.status !== 404) {
+    // Auth/rate-limit/server errors are real failures — surface them verbatim.
+    const text = await probeResponse.text().catch(() => "");
+    throw new Error(
+      `AtomGit branch probe ${targetCommitish} failed: ${probeResponse.status} ${text}`,
+    );
+  }
+
+  // 404 → branch missing. Seed an initial file; GitCode/Gitee's contents
+  // endpoint creates the first commit + default branch in a never-initialized
+  // repo. Bail-on-failure: if this GitCode flavor doesn't accept the payload
+  // shape on an empty repo, the operator must initialize the repo by hand
+  // (the documented setup path) — we never pretend it succeeded.
+  const createUrl = atomgitUrl(
+    `/repos/${options.atomgitOwner}/${options.atomgitRepo}/contents/README.md`,
+    env,
+  );
+  const createResponse = await fetchImpl(createUrl, {
+    method: "POST",
+    headers: atomgitHeaders(env),
+    body: JSON.stringify({
+      content: SEED_README_BASE64,
+      message: `Initialize ${targetCommitish} for release mirroring (auto)`,
+      branch: targetCommitish,
+    }),
+  });
+  if (!createResponse.ok) {
+    const text = await createResponse.text().catch(() => "");
+    throw new Error(
+      `AtomGit initial file create failed (needed to seed ${targetCommitish}): `
+        + `${createResponse.status} ${text} — create the branch manually and rerun the mirror`,
+    );
+  }
+  await expectJson(createResponse, `AtomGit seed file create ${targetCommitish}`);
+  console.log(`Seeded initial commit on AtomGit branch ${targetCommitish} (repo had no such branch)`);
+}
+
 export async function mirrorRelease(options, githubRelease, { env = process.env, fetchImpl = fetch } = {}) {
   if (!options.dryRun && !(env.ATOMGIT_TOKEN || env.GITCODE_TOKEN)) {
     throw new Error("ATOMGIT_TOKEN is required unless --dry-run is set");
@@ -426,6 +491,9 @@ export async function mirrorRelease(options, githubRelease, { env = process.env,
   const dependencies = { env, fetchImpl };
   const githubLatestTag = await getGithubLatestTag(options, dependencies);
   const atomgitProjectId = await getAtomGitProjectId(options, dependencies);
+  // Seed the target branch before listing/upserting releases — a never-initialized
+  // mirror repo makes the release POST fail with "X is not exist". Idempotent.
+  await ensureAtomGitDefaultBranch(options, githubRelease, dependencies);
   const listedReleases = await listAtomGitReleases(options, dependencies);
   const availableReleases = await makePrereleaseQuotaRoom(
     options,
