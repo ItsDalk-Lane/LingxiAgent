@@ -29,6 +29,16 @@ jobs:
       # 顺序不能颠倒：build:theme 的产物写进 dist-renderer/lib/theme.js，
       # 必须在 build:renderer 的 emptyOutDir 清空该目录之后才落地
       # （见 vite.config.theme.js 文件头注释）。
+      - name: Native deps smoke test
+        run: |
+          set -e
+          node -e "require('esbuild').transformSync('const x=1; console.log(x)')"
+          echo "esbuild OK"
+          node -e "console.log('rollup', require('rollup/package.json').version)"
+          node -e "const { rollup } = require('rollup'); console.log('rollup api OK')"
+          node -e "console.log('vite', require('vite/package.json').version)"
+          echo "smoke OK"
+
       - name: Build renderer bundle
         run: |
           set -o pipefail
