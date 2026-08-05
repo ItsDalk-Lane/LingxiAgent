@@ -120,7 +120,7 @@ export async function initializeMobileRuntime(principal: MobilePrincipal): Promi
     useStore.setState({
       currentAgentId: currentAgent.id,
       agentName: currentAgent.name,
-      agentYuan: currentAgent.yuan || bootstrap.agentYuan || 'hanako',
+      agentYuan: currentAgent.yuan || bootstrap.agentYuan || 'lingxi',
       homeFolder,
       selectedFolder: homeFolder,
       cwdHistory: Array.isArray(bootstrap.cwdHistory) ? bootstrap.cwdHistory : [],
@@ -214,7 +214,7 @@ export async function switchMobileSession(
     ...(session?.agentId ? {
       currentAgentId: session.agentId,
       agentName: session.agentName || sessionAgent?.name || session.agentId,
-      agentYuan: sessionAgent?.yuan || 'hanako',
+      agentYuan: sessionAgent?.yuan || 'lingxi',
       homeFolder: sessionAgent?.homeFolder || null,
     } : {}),
     };

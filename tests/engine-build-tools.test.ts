@@ -980,7 +980,7 @@ describe("HanaEngine.buildTools", () => {
     const configPath = path.join(agentDir, "config.yaml");
     fs.mkdirSync(agentDir, { recursive: true });
     fs.mkdirSync(workspace, { recursive: true });
-    fs.writeFileSync(configPath, "agent:\n  name: Hana\n  yuan: hanako\n", "utf-8");
+    fs.writeFileSync(configPath, "agent:\n  name: Hana\n  yuan: lingxi\n", "utf-8");
 
     const engine = Object.create(HanaEngine.prototype);
     engine.hanakoHome = tmpDir;
@@ -1013,12 +1013,12 @@ describe("HanaEngine.buildTools", () => {
     });
     const editResult = await edit.execute("edit-config", {
       path: configPath,
-      edits: [{ oldText: "yuan: hanako", newText: "yuan: caikangyong" }],
+      edits: [{ oldText: "yuan: lingxi", newText: "yuan: caikangyong" }],
     });
 
     expect(writeResult.content[0].text.toLowerCase()).toContain("managed");
     expect(editResult.content[0].text.toLowerCase()).toContain("managed");
-    expect(fs.readFileSync(configPath, "utf-8")).toContain("yuan: hanako");
+    expect(fs.readFileSync(configPath, "utf-8")).toContain("yuan: lingxi");
     expect(engine.registerSessionFile).not.toHaveBeenCalled();
   });
 

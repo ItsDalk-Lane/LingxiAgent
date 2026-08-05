@@ -5445,7 +5445,7 @@ wrapIpcHandler("get-splash-info", () => {
     return {
       agentName: agentMatch?.[1]?.trim() || null,
       locale: localeMatch?.[1]?.trim() || null,
-      yuan: yuanMatch?.[1]?.trim() || "hanako",
+      yuan: yuanMatch?.[1]?.trim() || "lingxi",
     };
   } catch {
     return { agentName: null, locale: "zh-CN", yuan: "hanako" };

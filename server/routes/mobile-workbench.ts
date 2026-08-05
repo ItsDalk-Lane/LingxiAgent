@@ -39,7 +39,7 @@ export function createMobileWorkbenchRoute(engine) {
       // agent the server is currently on so the phone can open there; the phone
       // names an agent explicitly on every request after this one.
       currentAgentId: engine.currentAgentId || null,
-      agentYuan: engine.agent?.config?.agent?.yuan || "hanako",
+      agentYuan: engine.agent?.config?.agent?.yuan || "lingxi",
       homeFolder: engine.homeCwd || null,
       cwdHistory: Array.isArray(engine.config?.cwd_history) ? engine.config.cwd_history : [],
       memoryMasterEnabled: engine.agent?.memoryMasterEnabled !== false,

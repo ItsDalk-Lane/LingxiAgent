@@ -66,7 +66,7 @@ describe('McpTab', () => {
     }));
     useSettingsStore.setState({
       currentAgentId: 'hanako',
-      agents: [{ id: 'hanako', name: 'Hanako', yuan: 'hanako', isPrimary: true }],
+      agents: [{ id: 'hanako', name: 'Hanako', yuan: 'lingxi', isPrimary: true }],
     });
 
     render(<McpTab />);
@@ -82,7 +82,7 @@ describe('McpTab', () => {
     apiMocks.loadMcpState.mockResolvedValue(state(true));
     useSettingsStore.setState({
       currentAgentId: 'hanako',
-      agents: [{ id: 'hanako', name: 'Hanako', yuan: 'hanako', isPrimary: true }],
+      agents: [{ id: 'hanako', name: 'Hanako', yuan: 'lingxi', isPrimary: true }],
     });
 
     render(<McpTab />);
@@ -97,7 +97,7 @@ describe('McpTab', () => {
     apiMocks.setMcpEnabled.mockResolvedValue(undefined);
     useSettingsStore.setState({
       currentAgentId: 'hanako',
-      agents: [{ id: 'hanako', name: 'Hanako', yuan: 'hanako', isPrimary: true }],
+      agents: [{ id: 'hanako', name: 'Hanako', yuan: 'lingxi', isPrimary: true }],
     });
 
     render(<McpTab />);
@@ -115,7 +115,7 @@ describe('McpTab', () => {
     apiMocks.setMcpEnabled.mockResolvedValue(undefined);
     useSettingsStore.setState({
       currentAgentId: 'hanako',
-      agents: [{ id: 'hanako', name: 'Hanako', yuan: 'hanako', isPrimary: true }],
+      agents: [{ id: 'hanako', name: 'Hanako', yuan: 'lingxi', isPrimary: true }],
     });
 
     render(<McpTab />);
@@ -139,7 +139,7 @@ describe('McpTab', () => {
     apiMocks.loadMcpState.mockResolvedValue(state(true, [connector]));
     useSettingsStore.setState({
       currentAgentId: 'hanako',
-      agents: [{ id: 'hanako', name: 'Hanako', yuan: 'hanako', isPrimary: true }],
+      agents: [{ id: 'hanako', name: 'Hanako', yuan: 'lingxi', isPrimary: true }],
     });
     const overlayRoot = document.createElement('div');
     document.body.append(overlayRoot);

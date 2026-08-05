@@ -193,7 +193,7 @@ describe("current_status tool", () => {
         userDir,
         agentDir,
         productDir: root,
-        config: { agent: { name: "Hana", yuan: "hanako" } },
+        config: { agent: { name: "Hana", yuan: "lingxi" } },
       }),
       getCurrentModel: () => ({ id: "gpt-4o", provider: "openai", input: ["text", "image"] }),
     });

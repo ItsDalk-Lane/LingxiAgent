@@ -36,7 +36,7 @@ describe("AgentManager.listAgents 缓存", () => {
     fs.mkdirSync(dir, { recursive: true });
     fs.writeFileSync(
       path.join(dir, "config.yaml"),
-      YAML.dump({ agent: { name, yuan: "hanako" } }),
+      YAML.dump({ agent: { name, yuan: "lingxi" } }),
     );
     fs.writeFileSync(path.join(dir, "identity.md"), `# ${name}\n这是 ${name} 的身份`);
   }
@@ -51,7 +51,7 @@ describe("AgentManager.listAgents 缓存", () => {
     fs.mkdirSync(realDir, { recursive: true });
     fs.writeFileSync(
       path.join(realDir, "config.yaml"),
-      YAML.dump({ agent: { name, yuan: "hanako" } }),
+      YAML.dump({ agent: { name, yuan: "lingxi" } }),
     );
     fs.writeFileSync(path.join(realDir, "identity.md"), `# ${name}\n这是 ${name} 的身份`);
     linkDirectory(realDir, linkedDir);
@@ -141,7 +141,7 @@ describe("AgentManager.listAgents 缓存", () => {
     fs.mkdirSync(dir, { recursive: true });
     fs.writeFileSync(
       path.join(dir, "config.yaml"),
-      YAML.dump({ agent: { name: "Hana", yuan: "hanako" } }),
+      YAML.dump({ agent: { name: "Hana", yuan: "lingxi" } }),
     );
     fs.writeFileSync(
       path.join(dir, "identity.md"),

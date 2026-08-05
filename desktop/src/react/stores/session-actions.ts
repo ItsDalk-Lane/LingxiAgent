@@ -809,7 +809,7 @@ export async function switchSession(path: string): Promise<void> {
       const ag = state.agents.find((a: any) => a.id === data.agentId);
       agentPatch.currentAgentId = data.agentId;
       agentPatch.agentName = data.agentName || ag?.name || data.agentId;
-      agentPatch.agentYuan = ag?.yuan || 'hanako';
+      agentPatch.agentYuan = ag?.yuan || 'lingxi';
       agentPatch.agentAvatarUrl = ag?.hasAvatar ? hanaUrl(`/api/agents/${data.agentId}/avatar?t=${Date.now()}`) : null;
       agentPatch.homeFolder = typeof ag?.homeFolder === 'string' && ag.homeFolder.trim()
         ? ag.homeFolder.trim()

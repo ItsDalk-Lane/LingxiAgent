@@ -61,7 +61,7 @@ export function AgentTab() {
     }
   }, [settingsConfig]);
 
-  const currentYuan = settingsConfig?.agent?.yuan || 'hanako';
+  const currentYuan = settingsConfig?.agent?.yuan || 'lingxi';
 
   // 用 "provider/id" 复合键作为 SelectWidget 的 value，区分多 provider 下同名模型。
   // 展示层可仍用 id/name；value/onChange payload 必须带 provider。

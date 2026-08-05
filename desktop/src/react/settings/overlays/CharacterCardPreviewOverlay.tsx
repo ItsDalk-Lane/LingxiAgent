@@ -72,7 +72,7 @@ export function CharacterCardPreviewOverlay({
   const confirmLabel = processing ? (mode === 'export' ? t('settings.characterCard.exporting') : t('settings.characterCard.importing')) : t('settings.characterCard.confirm');
   const descriptionText = plan.agent.description || t('settings.characterCard.noDescription');
   const ishikiText = plan.prompts?.ishiki || t('settings.characterCard.noIshiki');
-  const yuanKey = (plan.agent.yuan || 'hanako').toLowerCase();
+  const yuanKey = (plan.agent.yuan || 'lingxi').toLowerCase();
   const memoryInputId = `character-card-memory-${plan.token || plan.agentId || 'preview'}`;
   const memoryAvailable = plan.memory.available;
   const memoryPreviewText = plan.memory.preview || t('settings.characterCard.noMemory');

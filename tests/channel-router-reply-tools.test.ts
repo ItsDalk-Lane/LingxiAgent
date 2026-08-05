@@ -164,7 +164,7 @@ describe("ChannelRouter reply tool boundary", () => {
           marker: "engine",
           channelsDir,
           agentsDir,
-          getAgent: (id) => ({ id, agentName: id === "yui" ? "Yui" : "Hana", config: { agent: { yuan: "hanako" } } }),
+          getAgent: (id) => ({ id, agentName: id === "yui" ? "Yui" : "Hana", config: { agent: { yuan: "lingxi" } } }),
         },
         eventBus: { emit: vi.fn() },
       },

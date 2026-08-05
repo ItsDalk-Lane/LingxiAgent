@@ -66,8 +66,8 @@ vi.mock('../../settings/helpers', () => ({
 vi.mock('../../settings/store', () => {
   const state = {
     agents: [
-      { id: 'hana', name: 'Hana', yuan: 'hanako', isPrimary: false },
-      { id: 'primary', name: 'Primary', yuan: 'hanako', isPrimary: true },
+      { id: 'hana', name: 'Hana', yuan: 'lingxi', isPrimary: false },
+      { id: 'primary', name: 'Primary', yuan: 'lingxi', isPrimary: true },
     ],
     getSettingsAgentId: () => 'hana',
     showToast: showToastMock,

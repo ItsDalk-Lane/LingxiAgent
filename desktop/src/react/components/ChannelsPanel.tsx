@@ -425,7 +425,7 @@ export function AgentPhoneSessionPreview({ sessionPath, agentId, agentYuan }: {
     active: !!sessionPath,
     stickyThreshold: 32,
   });
-  const moodYuan = agentYuan || 'hanako';
+  const moodYuan = agentYuan || 'lingxi';
 
   // Switch landing runs in the layout phase (before paint) so the panel never shows a wrong
   // scrollTop frame. Only arm an instant landing when the target session has no messages yet:

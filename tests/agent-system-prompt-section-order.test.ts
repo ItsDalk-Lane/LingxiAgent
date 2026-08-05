@@ -30,7 +30,7 @@ function makeAgent(locale: string) {
   fs.mkdirSync(path.join(agentDir, "avatars"), { recursive: true });
   fs.mkdirSync(path.join(productDir, "yuan"), { recursive: true });
   fs.mkdirSync(userDir, { recursive: true });
-  fs.writeFileSync(path.join(productDir, "yuan", "hanako.md"), "ISHIKI-TEMPLATE-MARKER", "utf-8");
+  fs.writeFileSync(path.join(productDir, "yuan", "lingxi.md"), "ISHIKI-TEMPLATE-MARKER", "utf-8");
   fs.writeFileSync(path.join(userDir, "user.md"), "PROFILE-MARKER\n", "utf-8");
   fs.writeFileSync(path.join(agentDir, "pinned.md"), "PINNED-MARKER\n", "utf-8");
   fs.writeFileSync(path.join(agentDir, "memory", "memory.md"), "MEMORY-MARKER\n", "utf-8");
@@ -46,7 +46,7 @@ function makeAgent(locale: string) {
   const agent = new Agent({ id: "hana", agentsDir, productDir, userDir } as any);
   agent._config = {
     locale,
-    agent: { yuan: "hanako" },
+    agent: { yuan: "lingxi" },
     memory: { enabled: true },
     experience: { enabled: false },
     user: { name: locale.startsWith("zh") ? "黎" : "Li" },

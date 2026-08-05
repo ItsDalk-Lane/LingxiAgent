@@ -2,7 +2,7 @@ import { homedir } from "node:os";
 import { join } from "node:path";
 
 export function defaultDevHanaHome() {
-  return join(homedir(), ".hanako-dev");
+  return join(homedir(), ".lingxi-dev");
 }
 
 export function applyDevEnvironment(env = process.env, {

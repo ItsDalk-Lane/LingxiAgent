@@ -1018,7 +1018,7 @@ function publicAgentProfile(agent) {
   return {
     id: agent?.id || null,
     name: agent?.agentName || config.agent?.name || agent?.name || agent?.id || null,
-    yuan: config.agent?.yuan || "hanako",
+    yuan: config.agent?.yuan || "lingxi",
     ownerPluginId: plugin.ownerPluginId || null,
     visibility: plugin.visibility || "public",
     identity: agent?.personality || agent?.identity || "",

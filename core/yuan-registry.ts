@@ -4,7 +4,7 @@ import path from "path";
 const YUAN_KEY_RE = /^[A-Za-z0-9_-]+$/;
 
 export function normalizeYuanKey(value) {
-  if (value === undefined || value === null || value === "") return "hanako";
+  if (value === undefined || value === null || value === "") return "lingxi";
   if (typeof value !== "string") {
     throw new Error(`Invalid yuan ${JSON.stringify(value)}: expected string`);
   }
@@ -59,7 +59,7 @@ export function assertKnownYuan(productDir, value) {
 }
 
 export function getAgentConfigRepairState(config, productDir) {
-  const value = config?.agent?.yuan || "hanako";
+  const value = config?.agent?.yuan || "lingxi";
   try {
     const key = normalizeYuanKey(value);
     if (isKnownYuan(productDir, key)) return null;

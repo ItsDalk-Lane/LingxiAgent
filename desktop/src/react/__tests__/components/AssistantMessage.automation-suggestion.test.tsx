@@ -61,7 +61,7 @@ describe('AssistantMessage automation suggestion card', () => {
       return key;
     }) as typeof window.t;
     useStore.setState({
-      agents: [{ id: 'hanako', name: 'Hanako', yuan: 'hanako', homeFolder: '/home/hanako' }],
+      agents: [{ id: 'hanako', name: 'Hanako', yuan: 'lingxi', homeFolder: '/home/hanako' }],
       agentName: 'Hanako',
       agentYuan: 'hanako',
       currentAgentId: 'hanako',
@@ -125,7 +125,7 @@ describe('AssistantMessage automation suggestion card', () => {
   it('submits the selected Agent identity from the draft card', async () => {
     useStore.setState({
       agents: [
-        { id: 'hanako', name: 'Hanako', yuan: 'hanako', homeFolder: '/home/hanako' },
+        { id: 'hanako', name: 'Hanako', yuan: 'lingxi', homeFolder: '/home/hanako' },
         { id: 'maomao', name: '毛毛', yuan: 'maomao', homeFolder: '/home/maomao' },
       ],
       currentAgentId: 'hanako',

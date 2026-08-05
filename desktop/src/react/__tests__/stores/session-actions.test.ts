@@ -1882,7 +1882,7 @@ function mockPermissionDefault(mode = 'ask') {
           {
             id: 'hana',
             name: 'Hana',
-            yuan: 'hanako',
+            yuan: 'lingxi',
             isPrimary: true,
             homeFolder: '/workspace/hana-home',
             effectiveHomeFolder: '/workspace/hana-home',
@@ -1890,7 +1890,7 @@ function mockPermissionDefault(mode = 'ask') {
           {
             id: 'mio',
             name: 'Mio',
-            yuan: 'hanako',
+            yuan: 'lingxi',
             isPrimary: false,
             homeFolder: '/workspace/mio-home',
             effectiveHomeFolder: '/workspace/mio-home',

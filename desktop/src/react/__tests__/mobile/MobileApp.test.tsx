@@ -650,7 +650,7 @@ describe('MobileApp', () => {
             {
               id: 'hana',
               name: 'Hana',
-              yuan: 'hanako',
+              yuan: 'lingxi',
               isPrimary: true,
               homeFolder: null,
               effectiveHomeFolder: '/home/test/Desktop/OH-WorkSpace',
@@ -658,7 +658,7 @@ describe('MobileApp', () => {
             {
               id: 'mio',
               name: 'Mio',
-              yuan: 'hanako',
+              yuan: 'lingxi',
               isPrimary: false,
               homeFolder: '/workspace/mio',
               effectiveHomeFolder: '/workspace/mio',
@@ -901,7 +901,7 @@ function jsonResponseForMobile(
       agents: [{
         id: 'hana',
         name: 'Hana',
-        yuan: 'hanako',
+        yuan: 'lingxi',
         isPrimary: true,
         hasAvatar: false,
         homeFolder: '/workspace',

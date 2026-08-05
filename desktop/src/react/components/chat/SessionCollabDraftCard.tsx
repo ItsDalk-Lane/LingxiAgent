@@ -36,7 +36,7 @@ export const SessionCollabDraftCard = memo(function SessionCollabDraftCard({ blo
   const agents = useStore(s => s.agents);
   const currentAgentId = useStore(s => s.currentAgentId);
   const fallbackAgentName = useStore(s => s.agentName) || 'Hanako';
-  const fallbackAgentYuan = useStore(s => s.agentYuan) || 'hanako';
+  const fallbackAgentYuan = useStore(s => s.agentYuan) || 'lingxi';
   // reject 的 sourceSessionId 必须是真正的 sessionId，不能拿 sessionPath 充数——
   // 走 store 里 path→sessionId 的既有映射（session-slice.ts），查不到就不带这个字段，
   // 后端对活条目（store.get 命中）本就不强制要求它。

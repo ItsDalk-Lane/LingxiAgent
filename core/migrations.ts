@@ -1014,7 +1014,7 @@ function migrateUserNameToGlobalPreferences(ctx) {
   const readUserName = (cfg) => (typeof cfg?.user?.name === "string" ? cfg.user.name.trim() : "");
 
   // 主 agent 的名字最能代表用户本人，排在最前面挑
-  const primaryAgentId = preferences.primaryAgent || "hanako";
+  const primaryAgentId = preferences.primaryAgent || "lingxi";
   const ordered = [...agentDirs].sort((a, b) => {
     if (a.name === primaryAgentId) return -1;
     if (b.name === primaryAgentId) return 1;
@@ -1084,7 +1084,7 @@ function migrateClearUserNameOverrides(ctx) {
 
   // 全局还没名字：先提升一个，主 agent 的名字最能代表用户本人，排在最前面挑
   if (!(typeof preferences.userName === "string" && preferences.userName.trim())) {
-    const primaryAgentId = preferences.primaryAgent || "hanako";
+    const primaryAgentId = preferences.primaryAgent || "lingxi";
     const ordered = [...agentDirs].sort((a, b) => {
       if (a.name === primaryAgentId) return -1;
       if (b.name === primaryAgentId) return 1;

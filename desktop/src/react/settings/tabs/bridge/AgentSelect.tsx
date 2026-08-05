@@ -26,8 +26,8 @@ export function AgentSelect({ value, onChange }: AgentSelectProps) {
       <>
         <img
           className={styles['bridge-agent-avatar']}
-          src={agent?.hasAvatar ? hanaUrl(`/api/agents/${agent.id}/avatar?t=${ts}`) : yuanFallbackAvatar(agent?.yuan || 'hanako')}
-          onError={(e) => { (e.target as HTMLImageElement).src = yuanFallbackAvatar(agent?.yuan || 'hanako'); }}
+          src={agent?.hasAvatar ? hanaUrl(`/api/agents/${agent.id}/avatar?t=${ts}`) : yuanFallbackAvatar(agent?.yuan || 'lingxi')}
+          onError={(e) => { (e.target as HTMLImageElement).src = yuanFallbackAvatar(agent?.yuan || 'lingxi'); }}
         />
         <span className={styles['bridge-agent-name']}>{agent?.name || '—'}</span>
         <svg className={`${styles['bridge-agent-arrow']}${isOpen ? ` ${styles['open']}` : ''}`} viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -45,8 +45,8 @@ export function AgentSelect({ value, onChange }: AgentSelectProps) {
       <>
         <img
           className={styles['bridge-agent-avatar']}
-          src={agent?.hasAvatar ? hanaUrl(`/api/agents/${agent.id}/avatar?t=${ts}`) : yuanFallbackAvatar(agent?.yuan || 'hanako')}
-          onError={(e) => { (e.target as HTMLImageElement).src = yuanFallbackAvatar(agent?.yuan || 'hanako'); }}
+          src={agent?.hasAvatar ? hanaUrl(`/api/agents/${agent.id}/avatar?t=${ts}`) : yuanFallbackAvatar(agent?.yuan || 'lingxi')}
+          onError={(e) => { (e.target as HTMLImageElement).src = yuanFallbackAvatar(agent?.yuan || 'lingxi'); }}
         />
         <span className={styles['bridge-agent-name']}>{option.label}</span>
         {isSelected && (

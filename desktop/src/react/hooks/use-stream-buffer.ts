@@ -85,7 +85,7 @@ function resolveSessionYuan(sessionPath: string): string {
   const state = useStore.getState();
   const sessionAgentId = state.sessions.find((session: any) => session.path === sessionPath)?.agentId ?? null;
   if (!sessionAgentId) return 'hanako';
-  return state.agents.find((agent: any) => agent.id === sessionAgentId)?.yuan || 'hanako';
+  return state.agents.find((agent: any) => agent.id === sessionAgentId)?.yuan || 'lingxi';
 }
 
 class StreamBufferManager {

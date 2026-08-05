@@ -107,7 +107,7 @@ function resetStore(items: ChatListItem[] = []) {
     deskCurrentPath: '',
     deskFiles: [],
     deskJianContent: '',
-    agents: [{ id: 'hana', name: 'Hana', yuan: 'hanako', hasAvatar: false }],
+    agents: [{ id: 'hana', name: 'Hana', yuan: 'lingxi', hasAvatar: false }],
     currentAgentId: 'hana',
     selectedFolder: null,
     homeFolder: null,

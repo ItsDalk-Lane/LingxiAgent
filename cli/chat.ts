@@ -395,7 +395,7 @@ async function loadContext(client) {
   return {
     agentId: health.agentId || current?.id || null,
     agentName: health.agent || current?.name || "Hana",
-    agentYuan: health.agentYuan || current?.yuan || "hanako",
+    agentYuan: health.agentYuan || current?.yuan || "lingxi",
     userName: health.user || "you",
   };
 }

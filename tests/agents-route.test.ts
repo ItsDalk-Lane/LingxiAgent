@@ -607,7 +607,7 @@ describe("agents route", () => {
     const agentId = "hana";
     const agentDir = path.join(tempRoot, agentId);
     fs.mkdirSync(agentDir, { recursive: true });
-    fs.writeFileSync(path.join(agentDir, "config.yaml"), "agent:\n  name: Hana\n  yuan: hanako\n", "utf-8");
+    fs.writeFileSync(path.join(agentDir, "config.yaml"), "agent:\n  name: Hana\n  yuan: lingxi\n", "utf-8");
 
     const { createAgentsRoute } = await import("../server/routes/agents.ts");
     const app = new Hono();
@@ -639,7 +639,7 @@ describe("agents route", () => {
 
     expect(res.status).toBe(400);
     expect(data.error).toContain('Invalid yuan "pm-assistant"');
-    expect(fs.readFileSync(path.join(agentDir, "config.yaml"), "utf-8")).toContain("yuan: hanako");
+    expect(fs.readFileSync(path.join(agentDir, "config.yaml"), "utf-8")).toContain("yuan: lingxi");
     expect(engine.updateConfig).not.toHaveBeenCalled();
   });
 
@@ -678,11 +678,11 @@ describe("agents route", () => {
     const agentDir = path.join(tempRoot, agentId);
     const productDir = path.join(tempRoot, "product");
     fs.mkdirSync(agentDir, { recursive: true });
-    fs.writeFileSync(path.join(agentDir, "config.yaml"), "agent:\n  name: Hana\n  yuan: hanako\n", "utf-8");
+    fs.writeFileSync(path.join(agentDir, "config.yaml"), "agent:\n  name: Hana\n  yuan: lingxi\n", "utf-8");
     fs.mkdirSync(path.join(productDir, "identity-templates"), { recursive: true });
-    fs.writeFileSync(path.join(productDir, "identity-templates", "hanako.md"), "template identity content", "utf-8");
+    fs.writeFileSync(path.join(productDir, "identity-templates", "lingxi.md"), "template identity content", "utf-8");
     fs.mkdirSync(path.join(productDir, "ishiki-templates"), { recursive: true });
-    fs.writeFileSync(path.join(productDir, "ishiki-templates", "hanako.md"), "template ishiki content", "utf-8");
+    fs.writeFileSync(path.join(productDir, "ishiki-templates", "lingxi.md"), "template ishiki content", "utf-8");
     // identity.md / ishiki.md 惰性材料化：agentDir 下确实没有落盘文件
     expect(fs.existsSync(path.join(agentDir, "identity.md"))).toBe(false);
     expect(fs.existsSync(path.join(agentDir, "ishiki.md"))).toBe(false);
@@ -711,7 +711,7 @@ describe("agents route", () => {
     const agentDir = path.join(tempRoot, agentId);
     const productDir = path.join(tempRoot, "product");
     fs.mkdirSync(agentDir, { recursive: true });
-    fs.writeFileSync(path.join(agentDir, "config.yaml"), "agent:\n  name: Hana\n  yuan: hanako\n", "utf-8");
+    fs.writeFileSync(path.join(agentDir, "config.yaml"), "agent:\n  name: Hana\n  yuan: lingxi\n", "utf-8");
     fs.writeFileSync(path.join(agentDir, "identity.md"), "user customized identity", "utf-8");
     fs.writeFileSync(path.join(agentDir, "ishiki.md"), "user customized ishiki", "utf-8");
     // 模板目录故意留空/不存在，证明命中的是落盘文件而不是误落到模板兜底

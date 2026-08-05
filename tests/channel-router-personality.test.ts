@@ -52,7 +52,7 @@ describe("ChannelRouter._executeCheck phone delivery", () => {
 
     const mockAgent = {
       agentDir: path.join(agentsDir, "hana"),
-      config: { agent: { name: "Hana", yuan: "hanako" } },
+      config: { agent: { name: "Hana", yuan: "lingxi" } },
       personality: "我是 Hana，一个温柔的助手。这是内存中的 personality。",
     };
     const resolveUtilityConfig = vi.fn(() => ({

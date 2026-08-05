@@ -135,13 +135,13 @@ describe('AgentTab settings agent selection', () => {
     (window as unknown as { platform: unknown }).platform = { showInFinder: showInFinderMock };
     useSettingsStore.setState({
       agents: [
-        { id: 'hana', name: 'Hana', yuan: 'hanako', isPrimary: true },
+        { id: 'hana', name: 'Hana', yuan: 'lingxi', isPrimary: true },
         { id: 'deepseek', name: 'DeepSeek', yuan: 'deepseek', isPrimary: false },
       ],
       currentAgentId: 'hana',
       settingsAgentId: null,
       settingsConfig: {
-        agent: { name: 'Hana', yuan: 'hanako' },
+        agent: { name: 'Hana', yuan: 'lingxi' },
         memory: { enabled: true },
       },
       currentPins: [],
@@ -189,7 +189,7 @@ describe('AgentTab settings agent selection', () => {
     }));
     useSettingsStore.setState({
       settingsConfig: {
-        agent: { name: 'Hana', yuan: 'hanako' },
+        agent: { name: 'Hana', yuan: 'lingxi' },
         memory: { enabled: true },
         models: { chat: { id: 'glm-5.2', provider: 'zhipu-coding' } },
       },
@@ -213,7 +213,7 @@ describe('AgentTab settings agent selection', () => {
               mode: 'export',
               agentId: 'hana',
               packageName: 'hana-charactercard.zip',
-              agent: { name: 'Hana', yuan: 'hanako', description: '花名册描述' },
+              agent: { name: 'Hana', yuan: 'lingxi', description: '花名册描述' },
               prompts: { identity: 'identity', ishiki: 'ishiki', publicIshiki: 'public' },
               memory: {
                 available: true,

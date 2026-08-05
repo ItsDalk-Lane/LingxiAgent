@@ -44,7 +44,7 @@ afterEach(() => {
 describe('AgentCardStack', () => {
   it('renders the primary badge from the server-provided isPrimary flag', () => {
     const agents: Agent[] = [
-      { id: 'agent-a', name: '小花', yuan: 'hanako', isPrimary: false },
+      { id: 'agent-a', name: '小花', yuan: 'lingxi', isPrimary: false },
       { id: 'agent-b', name: '毛毛', yuan: 'butter', isPrimary: true },
     ];
 

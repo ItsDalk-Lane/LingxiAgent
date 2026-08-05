@@ -998,7 +998,7 @@ export async function startServer(root: CompositionRoot = {}): Promise<void> {
       // owns anything, and the fields below it describe that same agent.
       agentId: engine.currentAgentId || null,
       agent: engine.agentName,
-      agentYuan: engine.agent?.config?.agent?.yuan || "hanako",
+      agentYuan: engine.agent?.config?.agent?.yuan || "lingxi",
       user: engine.userName,
       model: engine.currentModel?.name,
       avatars,

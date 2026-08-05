@@ -1110,7 +1110,7 @@ export class Agent {
     return resolvePersonaSource({
       agentDir: this.agentDir,
       productDir: this.productDir,
-      yuanType: this._config?.agent?.yuan || "hanako",
+      yuanType: this._config?.agent?.yuan || "lingxi",
       locale: this.resolveLocale(),
       kind: "identity",
     });
@@ -1121,7 +1121,7 @@ export class Agent {
     return resolvePersonaSource({
       agentDir: this.agentDir,
       productDir: this.productDir,
-      yuanType: this._config?.agent?.yuan || "hanako",
+      yuanType: this._config?.agent?.yuan || "lingxi",
       locale: this.resolveLocale(),
       kind: "ishiki",
     });
@@ -1152,7 +1152,7 @@ export class Agent {
 
   /** 读取 yuan 模板（能力定义） */
   _readYuan() {
-    const yuanType = this._config?.agent?.yuan || "hanako";
+    const yuanType = this._config?.agent?.yuan || "lingxi";
     const isZh = String(this.resolveLocale()).startsWith("zh");
     const langDir = isZh ? "" : "en/";
     return safeReadFile(path.join(this.productDir, "yuan", `${langDir}${yuanType}.md`), "")
@@ -1166,7 +1166,7 @@ export class Agent {
       .replace(/\{\{userName\}\}/g, this.userName)
       .replace(/\{\{agentName\}\}/g, this.agentName)
       .replace(/\{\{agentId\}\}/g, this.id);
-    const yuanType = this._config?.agent?.yuan || "hanako";
+    const yuanType = this._config?.agent?.yuan || "lingxi";
     const isZh = String(this.resolveLocale()).startsWith("zh");
     const langDir = isZh ? "" : "en/";
     const raw = readFile(path.join(this.agentDir, "public-ishiki.md"))
@@ -1253,7 +1253,7 @@ export class Agent {
     const readFile = (filePath) => safeReadFile(filePath, "");
 
     // identity + yuan + ishiki（复用 personality getter）
-    const yuanType = this._config?.agent?.yuan || "hanako";
+    const yuanType = this._config?.agent?.yuan || "lingxi";
     if (!this._readYuan()) throw new Error(`Cannot find yuan "${yuanType}". Check lib/yuan/`);
     const ishiki = this.personality;
 

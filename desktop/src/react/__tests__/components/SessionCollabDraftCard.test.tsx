@@ -70,7 +70,7 @@ describe('SessionCollabDraftCard', () => {
     }) as typeof window.t;
     useStore.setState({
       agents: [
-        { id: 'hanako', name: 'Hanako', yuan: 'hanako', homeFolder: '/home/hanako' },
+        { id: 'hanako', name: 'Hanako', yuan: 'lingxi', homeFolder: '/home/hanako' },
         { id: 'maomao', name: '毛毛', yuan: 'maomao', homeFolder: '/home/maomao' },
       ],
       agentName: 'Hanako',

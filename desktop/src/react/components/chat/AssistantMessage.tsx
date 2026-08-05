@@ -877,7 +877,7 @@ const CronConfirmBlock = memo(function CronConfirmBlock({ block, sessionPath }: 
   const currentAgentId = useStore(s => s.currentAgentId);
   const sourceSessionId = useStore(state => sessionIdForPathFromLocatorState(state, sessionPath));
   const fallbackAgentName = useStore(s => s.agentName) || 'Hanako';
-  const fallbackAgentYuan = useStore(s => s.agentYuan) || 'hanako';
+  const fallbackAgentYuan = useStore(s => s.agentYuan) || 'lingxi';
   const initialPrompt = (jobData.prompt as string) || (block.description as string) || '';
   const [draftLabel, setDraftLabel] = useState((jobData.label as string) || (block.title as string) || initialPrompt.slice(0, 40) || '');
   const [scheduleDraft, setScheduleDraft] = useState<ScheduleDraft>(() => scheduleDraftFromStored(initialType, jobData.schedule));

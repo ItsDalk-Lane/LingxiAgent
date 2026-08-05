@@ -16,15 +16,15 @@ describe("first run default workspace", () => {
     tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "hana-first-run-workspace-"));
     homeDir = path.join(tmpDir, "home");
     productDir = path.join(tmpDir, "product");
-    hanakoHome = path.join(tmpDir, ".hanako");
+    hanakoHome = path.join(tmpDir, ".lingxi");
     fs.mkdirSync(homeDir, { recursive: true });
     fs.mkdirSync(productDir, { recursive: true });
     fs.writeFileSync(
       path.join(productDir, "config.example.yaml"),
       [
         "agent:",
-        "  name: Hanako",
-        "  yuan: hanako",
+        "  name: Lingxi",
+        "  yuan: lingxi",
         "user:",
         '  name: ""',
         "models:",
@@ -41,13 +41,13 @@ describe("first run default workspace", () => {
     vi.resetModules();
   });
 
-  it("seeds hanako with the desktop OH-WorkSpace, enabled memory, and disabled patrol defaults", async () => {
+  it("seeds lingxi with the desktop OH-WorkSpace, enabled memory, and disabled patrol defaults", async () => {
     const { ensureFirstRun } = await import("../core/first-run.ts");
 
     ensureFirstRun(hanakoHome, productDir);
 
     const workspace = path.join(homeDir, "Desktop", "OH-WorkSpace");
-    const cfgPath = path.join(hanakoHome, "agents", "hanako", "config.yaml");
+    const cfgPath = path.join(hanakoHome, "agents", "lingxi", "config.yaml");
     const cfg = YAML.load(fs.readFileSync(cfgPath, "utf-8"));
 
     expect(fs.statSync(workspace).isDirectory()).toBe(true);
@@ -60,13 +60,13 @@ describe("first run default workspace", () => {
   it("does not seed identity.md/ishiki.md to disk on first run (lazy materialization)", async () => {
     fs.mkdirSync(path.join(productDir, "identity-templates"), { recursive: true });
     fs.writeFileSync(
-      path.join(productDir, "identity-templates", "hanako.md"),
+      path.join(productDir, "identity-templates", "lingxi.md"),
       "# {{agentName}}\n\n{{userName}}的个人助手。\n",
       "utf-8",
     );
     fs.mkdirSync(path.join(productDir, "ishiki-templates"), { recursive: true });
     fs.writeFileSync(
-      path.join(productDir, "ishiki-templates", "hanako.md"),
+      path.join(productDir, "ishiki-templates", "lingxi.md"),
       "Ishiki template\n",
       "utf-8",
     );
@@ -74,7 +74,7 @@ describe("first run default workspace", () => {
 
     ensureFirstRun(hanakoHome, productDir);
 
-    const hanakoDir = path.join(hanakoHome, "agents", "hanako");
+    const hanakoDir = path.join(hanakoHome, "agents", "lingxi");
     // config.yaml 仍然照常播种，只是 identity.md / ishiki.md 不再落盘：
     // 未定制人格靠运行时按 agent.resolveLocale() 回落到 lib 模板。
     expect(fs.existsSync(path.join(hanakoDir, "config.yaml"))).toBe(true);
@@ -85,7 +85,7 @@ describe("first run default workspace", () => {
   it("keeps userName as a dynamic identity placeholder for first-run Hanako (resolved via template fallback)", async () => {
     fs.mkdirSync(path.join(productDir, "identity-templates"), { recursive: true });
     fs.writeFileSync(
-      path.join(productDir, "identity-templates", "hanako.md"),
+      path.join(productDir, "identity-templates", "lingxi.md"),
       "# {{agentName}}\n\n{{userName}}的个人助手。\n",
       "utf-8",
     );
@@ -96,9 +96,9 @@ describe("first run default workspace", () => {
     // identity.md 不落盘，占位符渲染改为运行时 system prompt 组装阶段处理；
     // 这里只验证回落链能取到带原始占位符的模板内容。
     const { content: identity, fromTemplate } = resolvePersonaSource({
-      agentDir: path.join(hanakoHome, "agents", "hanako"),
+      agentDir: path.join(hanakoHome, "agents", "lingxi"),
       productDir,
-      yuanType: "hanako",
+      yuanType: "lingxi",
       locale: "zh-CN",
       kind: "identity",
     });
@@ -108,16 +108,16 @@ describe("first run default workspace", () => {
     expect(identity).not.toContain("\n\n的个人助手");
   });
 
-  it("repairs a half-initialized default hanako agent directory", async () => {
-    fs.mkdirSync(path.join(hanakoHome, "agents", "hanako", "memory"), { recursive: true });
+  it("repairs a half-initialized default lingxi agent directory", async () => {
+    fs.mkdirSync(path.join(hanakoHome, "agents", "lingxi", "memory"), { recursive: true });
     const { ensureFirstRun } = await import("../core/first-run.ts");
 
     ensureFirstRun(hanakoHome, productDir);
 
-    const cfgPath = path.join(hanakoHome, "agents", "hanako", "config.yaml");
+    const cfgPath = path.join(hanakoHome, "agents", "lingxi", "config.yaml");
     const cfg = YAML.load(fs.readFileSync(cfgPath, "utf-8"));
-    expect(cfg.agent.name).toBe("Hanako");
-    expect(fs.statSync(path.join(hanakoHome, "agents", "hanako", "sessions")).isDirectory()).toBe(true);
+    expect(cfg.agent.name).toBe("Lingxi");
+    expect(fs.statSync(path.join(hanakoHome, "agents", "lingxi", "sessions")).isDirectory()).toBe(true);
   });
 
   it("keeps startup alive and reports non-default agent directories without config.yaml", async () => {
@@ -131,12 +131,12 @@ describe("first run default workspace", () => {
       { id: "kon", reason: "config_missing" },
     ]);
     // 默认 agent 正常播种，启动不被脏目录阻断
-    const cfgPath = path.join(hanakoHome, "agents", "hanako", "config.yaml");
+    const cfgPath = path.join(hanakoHome, "agents", "lingxi", "config.yaml");
     expect(fs.existsSync(cfgPath)).toBe(true);
     // 不往脏目录里喂 pinned.md，避免把垃圾目录越喂越像 agent 目录
     expect(fs.existsSync(path.join(hanakoHome, "agents", "kon", "pinned.md"))).toBe(false);
     // 有效 agent 仍然补齐 pinned.md
-    expect(fs.existsSync(path.join(hanakoHome, "agents", "hanako", "pinned.md"))).toBe(true);
+    expect(fs.existsSync(path.join(hanakoHome, "agents", "lingxi", "pinned.md"))).toBe(true);
   });
 
   it("keeps startup alive and reports non-default agent directories with unreadable config.yaml", async () => {
@@ -152,7 +152,7 @@ describe("first run default workspace", () => {
     expect(report.invalidAgentDirs[0].reason).toBe("config_unreadable");
     // 坏 config 原样保留，不动用户数据
     expect(fs.readFileSync(path.join(brokenDir, "config.yaml"), "utf-8")).toBe("agent: [unclosed\n");
-    expect(fs.existsSync(path.join(hanakoHome, "agents", "hanako", "config.yaml"))).toBe(true);
+    expect(fs.existsSync(path.join(hanakoHome, "agents", "lingxi", "config.yaml"))).toBe(true);
   });
 
   it("keeps legacy non-ASCII agent directories untouched, reports them, and seeds a safe default", async () => {
@@ -167,14 +167,14 @@ describe("first run default workspace", () => {
     expect(report.invalidAgentDirs).toContainEqual({ id: "明", reason: "invalid_id" });
     expect(fs.readFileSync(path.join(legacyDir, "config.yaml"), "utf-8")).toBe(original);
     expect(fs.existsSync(path.join(legacyDir, "pinned.md"))).toBe(false);
-    expect(fs.existsSync(path.join(hanakoHome, "agents", "hanako", "config.yaml"))).toBe(true);
+    expect(fs.existsSync(path.join(hanakoHome, "agents", "lingxi", "config.yaml"))).toBe(true);
 
     const { PreferencesManager } = await import("../core/preferences-manager.ts");
     const preferences = new PreferencesManager({
       userDir: path.join(hanakoHome, "user"),
       agentsDir: path.join(hanakoHome, "agents"),
     });
-    expect(preferences.findFirstAgent()).toBe("hanako");
+    expect(preferences.findFirstAgent()).toBe("lingxi");
   });
 
   it("keeps a safe legacy uppercase and underscore id active without reseeding or reporting it", async () => {
@@ -188,12 +188,12 @@ describe("first run default workspace", () => {
 
     expect(report.invalidAgentDirs).toEqual([]);
     expect(report.repairedDefaultAgent).toBe(false);
-    expect(fs.existsSync(path.join(hanakoHome, "agents", "hanako"))).toBe(false);
+    expect(fs.existsSync(path.join(hanakoHome, "agents", "lingxi"))).toBe(false);
     expect(fs.existsSync(path.join(legacyDir, "pinned.md"))).toBe(true);
   });
 
-  it("backs up an unreadable default hanako config before reseeding", async () => {
-    const hanakoDir = path.join(hanakoHome, "agents", "hanako");
+  it("backs up an unreadable default lingxi config before reseeding", async () => {
+    const hanakoDir = path.join(hanakoHome, "agents", "lingxi");
     fs.mkdirSync(hanakoDir, { recursive: true });
     fs.writeFileSync(path.join(hanakoDir, "config.yaml"), "agent: [unclosed\n", "utf-8");
     const { ensureFirstRun } = await import("../core/first-run.ts");
@@ -201,7 +201,7 @@ describe("first run default workspace", () => {
     const report = ensureFirstRun(hanakoHome, productDir);
 
     const cfg = YAML.load(fs.readFileSync(path.join(hanakoDir, "config.yaml"), "utf-8"));
-    expect(cfg.agent.name).toBe("Hanako");
+    expect(cfg.agent.name).toBe("Lingxi");
     expect(report.repairedDefaultAgent).toBe(true);
     const backups = fs.readdirSync(hanakoDir).filter((name) => name.startsWith("config.yaml.broken-"));
     expect(backups).toHaveLength(1);

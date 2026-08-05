@@ -32,11 +32,11 @@ describe("resolvePersonaSource", () => {
         fs.mkdirSync(agentDir, { recursive: true });
         fs.mkdirSync(path.join(productDir, templateDir, "en"), { recursive: true });
         fs.writeFileSync(path.join(agentDir, fileName), "user customized content", "utf-8");
-        fs.writeFileSync(path.join(productDir, templateDir, "en", "hanako.md"), "en template", "utf-8");
-        fs.writeFileSync(path.join(productDir, templateDir, "hanako.md"), "generic template", "utf-8");
+        fs.writeFileSync(path.join(productDir, templateDir, "en", "lingxi.md"), "en template", "utf-8");
+        fs.writeFileSync(path.join(productDir, templateDir, "lingxi.md"), "generic template", "utf-8");
         fs.writeFileSync(path.join(productDir, exampleFile), "example fallback", "utf-8");
 
-        const result = resolvePersonaSource({ agentDir, productDir, yuanType: "hanako", locale: "en", kind });
+        const result = resolvePersonaSource({ agentDir, productDir, yuanType: "lingxi", locale: "en", kind });
 
         expect(result).toEqual({ content: "user customized content", fromTemplate: false });
       });
@@ -47,11 +47,11 @@ describe("resolvePersonaSource", () => {
         const productDir = path.join(root, "product");
         fs.mkdirSync(agentDir, { recursive: true });
         fs.mkdirSync(path.join(productDir, templateDir, "en"), { recursive: true });
-        fs.writeFileSync(path.join(productDir, templateDir, "en", "hanako.md"), "en template", "utf-8");
-        fs.writeFileSync(path.join(productDir, templateDir, "hanako.md"), "generic template", "utf-8");
+        fs.writeFileSync(path.join(productDir, templateDir, "en", "lingxi.md"), "en template", "utf-8");
+        fs.writeFileSync(path.join(productDir, templateDir, "lingxi.md"), "generic template", "utf-8");
         fs.writeFileSync(path.join(productDir, exampleFile), "example fallback", "utf-8");
 
-        const result = resolvePersonaSource({ agentDir, productDir, yuanType: "hanako", locale: "en", kind });
+        const result = resolvePersonaSource({ agentDir, productDir, yuanType: "lingxi", locale: "en", kind });
 
         expect(result).toEqual({ content: "en template", fromTemplate: true });
       });
@@ -62,10 +62,10 @@ describe("resolvePersonaSource", () => {
         const productDir = path.join(root, "product");
         fs.mkdirSync(agentDir, { recursive: true });
         fs.mkdirSync(path.join(productDir, templateDir), { recursive: true });
-        fs.writeFileSync(path.join(productDir, templateDir, "hanako.md"), "zh template (generic path)", "utf-8");
+        fs.writeFileSync(path.join(productDir, templateDir, "lingxi.md"), "zh template (generic path)", "utf-8");
         fs.writeFileSync(path.join(productDir, exampleFile), "example fallback", "utf-8");
 
-        const result = resolvePersonaSource({ agentDir, productDir, yuanType: "hanako", locale: "zh-CN", kind });
+        const result = resolvePersonaSource({ agentDir, productDir, yuanType: "lingxi", locale: "zh-CN", kind });
 
         expect(result).toEqual({ content: "zh template (generic path)", fromTemplate: true });
       });
@@ -76,10 +76,10 @@ describe("resolvePersonaSource", () => {
         const productDir = path.join(root, "product");
         fs.mkdirSync(agentDir, { recursive: true });
         fs.mkdirSync(path.join(productDir, templateDir), { recursive: true });
-        fs.writeFileSync(path.join(productDir, templateDir, "hanako.md"), "generic yuan template", "utf-8");
+        fs.writeFileSync(path.join(productDir, templateDir, "lingxi.md"), "generic yuan template", "utf-8");
         fs.writeFileSync(path.join(productDir, exampleFile), "example fallback", "utf-8");
 
-        const result = resolvePersonaSource({ agentDir, productDir, yuanType: "hanako", locale: "en", kind });
+        const result = resolvePersonaSource({ agentDir, productDir, yuanType: "lingxi", locale: "en", kind });
 
         expect(result).toEqual({ content: "generic yuan template", fromTemplate: true });
       });
@@ -92,7 +92,7 @@ describe("resolvePersonaSource", () => {
         fs.mkdirSync(productDir, { recursive: true });
         fs.writeFileSync(path.join(productDir, exampleFile), "example fallback", "utf-8");
 
-        const result = resolvePersonaSource({ agentDir, productDir, yuanType: "hanako", locale: "en", kind });
+        const result = resolvePersonaSource({ agentDir, productDir, yuanType: "lingxi", locale: "en", kind });
 
         expect(result).toEqual({ content: "example fallback", fromTemplate: true });
       });
@@ -104,7 +104,7 @@ describe("resolvePersonaSource", () => {
         fs.mkdirSync(agentDir, { recursive: true });
         fs.mkdirSync(productDir, { recursive: true });
 
-        const result = resolvePersonaSource({ agentDir, productDir, yuanType: "hanako", locale: "en", kind });
+        const result = resolvePersonaSource({ agentDir, productDir, yuanType: "lingxi", locale: "en", kind });
 
         expect(result).toEqual({ content: "", fromTemplate: true });
       });

@@ -38,7 +38,7 @@ describe('AgentDeleteOverlay', () => {
     Object.keys(mockState).forEach(key => delete mockState[key]);
     Object.assign(mockState, {
       agents: [
-        { id: 'hana', name: '小花', yuan: 'hanako', isPrimary: true },
+        { id: 'hana', name: '小花', yuan: 'lingxi', isPrimary: true },
         { id: 'deepseek', name: 'DeepSeek', yuan: 'deepseek', isPrimary: false },
       ],
       currentAgentId: 'hana',

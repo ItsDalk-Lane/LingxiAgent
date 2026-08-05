@@ -242,7 +242,7 @@ describe('WelcomeScreen workspace picker', () => {
   it('disables the memory toggle when the selected agent has memory disabled in settings', async () => {
     useStore.setState({
       agents: [
-        { id: 'hana', name: 'Hanako', yuan: 'hanako', isPrimary: true, memoryMasterEnabled: false },
+        { id: 'hana', name: 'Hanako', yuan: 'lingxi', isPrimary: true, memoryMasterEnabled: false },
       ],
       currentAgentId: 'hana',
       memoryEnabled: true,
@@ -263,7 +263,7 @@ describe('WelcomeScreen workspace picker', () => {
         {
           id: 'hana',
           name: 'Hanako',
-          yuan: 'hanako',
+          yuan: 'lingxi',
           isPrimary: true,
           homeFolder: '/workspace/Hana',
           chatModel: { id: 'deepseek-chat', provider: 'deepseek' },
@@ -271,7 +271,7 @@ describe('WelcomeScreen workspace picker', () => {
         {
           id: 'mio',
           name: 'Mio',
-          yuan: 'hanako',
+          yuan: 'lingxi',
           isPrimary: false,
           homeFolder: '/workspace/Mio',
           chatModel: { id: 'gpt-5.2', provider: 'openai' },
@@ -303,7 +303,7 @@ describe('WelcomeScreen workspace picker', () => {
         {
           id: 'hana',
           name: 'Hanako',
-          yuan: 'hanako',
+          yuan: 'lingxi',
           isPrimary: true,
           homeFolder: '/workspace/Hana',
           effectiveHomeFolder: '/workspace/Hana',
@@ -311,7 +311,7 @@ describe('WelcomeScreen workspace picker', () => {
         {
           id: 'mio',
           name: 'Mio',
-          yuan: 'hanako',
+          yuan: 'lingxi',
           isPrimary: false,
           homeFolder: null,
           effectiveHomeFolder: '/home/test/Desktop/OH-WorkSpace',
@@ -337,7 +337,7 @@ describe('WelcomeScreen workspace picker', () => {
         {
           id: 'hana',
           name: 'Hanako',
-          yuan: 'hanako',
+          yuan: 'lingxi',
           isPrimary: true,
           homeFolder: '/home/test/Desktop/OH-WorkSpace',
           effectiveHomeFolder: '/home/test/Desktop/OH-WorkSpace',
@@ -345,7 +345,7 @@ describe('WelcomeScreen workspace picker', () => {
         {
           id: 'mio',
           name: 'Mio',
-          yuan: 'hanako',
+          yuan: 'lingxi',
           isPrimary: false,
           homeFolder: '/home/test/Desktop/OH-WorkSpace',
           effectiveHomeFolder: '/home/test/Desktop/OH-WorkSpace',

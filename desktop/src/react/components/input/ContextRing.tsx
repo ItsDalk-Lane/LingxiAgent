@@ -85,7 +85,7 @@ export function ContextRing() {
   const center = size / 2;
   const circumference = 2 * Math.PI * r;
   const strokeDashoffset = circumference * (1 - Math.min(pct, 100) / 100);
-  const yuan = agentYuan || 'hanako';
+  const yuan = agentYuan || 'lingxi';
 
   // token 数量格式化
   const tokensK = Math.round(displayTokens / 1000);

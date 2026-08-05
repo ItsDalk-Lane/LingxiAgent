@@ -66,21 +66,21 @@ describe("AgentCreateOverlay yuan chips", () => {
     expect(descFor(container, "kong")).not.toBe(zh.yuan.types.kong.label);
   });
 
-  it.each(["hanako", "butter", "ming"])("leaves the %s description on label", async (yuan) => {
+  it.each(["lingxi", "butter", "ming"])("leaves the %s description on label", async (yuan) => {
     const container = await openOverlay();
     expect(descFor(container, yuan)).toBe(zh.yuan.types[yuan].label);
   });
 
   // 上面三条只证明「现状没坏」——真实的 zh locale 里除 kong 外没人有 shortLabel，
-  // 所以把这条规则推广成全局也照样绿。这条用一个带 shortLabel 的 hanako 试探边界：
+  // 所以把这条规则推广成全局也照样绿。这条用一个带 shortLabel 的 lingxi 试探边界：
   // 只有它能在「shortLabel 存在时仍必须被忽略」这件事上失败。
   it("ignores shortLabel on any yuan other than kong", async () => {
     types = {
-      hanako: { label: "均衡的助手", shortLabel: "不该出现", avatar: "Hanako.png" },
+      lingxi: { label: "均衡的助手", shortLabel: "不该出现", avatar: "Lingxi.png" },
       kong: { label: "长描述", shortLabel: "短描述", avatar: "Kong.png" },
     };
     const container = await openOverlay();
-    expect(descFor(container, "hanako")).toBe("均衡的助手");
+    expect(descFor(container, "lingxi")).toBe("均衡的助手");
     expect(descFor(container, "kong")).toBe("短描述");
   });
 });

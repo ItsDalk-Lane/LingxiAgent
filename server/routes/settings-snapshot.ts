@@ -221,7 +221,7 @@ export function createSettingsSnapshotRoute(engine: any, options: Record<string,
       const configRecord = config as Record<string, any>;
       const personaLocale = runtimeAgent?.resolveLocale?.()
         ?? resolvePersonaLocale(configRecord.locale, engine.getLocale?.());
-      const personaYuanType = configRecord.agent?.yuan || "hanako";
+      const personaYuanType = configRecord.agent?.yuan || "lingxi";
       const identity = resolvePersonaSource({
         agentDir: baseDir, productDir: engine.productDir, yuanType: personaYuanType, locale: personaLocale, kind: "identity",
       }).content;

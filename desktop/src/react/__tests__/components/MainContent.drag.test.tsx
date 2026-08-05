@@ -43,7 +43,7 @@ describe('MainContent app file drag attachments', () => {
       currentAgentId: 'agent-a',
       agentName: 'Hana',
       agentYuan: 'hanako',
-      agents: [{ id: 'agent-a', name: 'Hana', yuan: 'hanako', isPrimary: true }],
+      agents: [{ id: 'agent-a', name: 'Hana', yuan: 'lingxi', isPrimary: true }],
       attachedFiles: [],
       attachedFilesBySession: {},
     } as never);

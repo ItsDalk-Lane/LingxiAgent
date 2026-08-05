@@ -21,7 +21,7 @@ vi.mock('../../settings/store', () => ({
 vi.mock('../../settings/api', () => ({
   hanaFetch: vi.fn(),
   hanaUrl: (path: string) => path,
-  yuanFallbackAvatar: (yuan?: string) => `fallback:${yuan || 'hanako'}`,
+  yuanFallbackAvatar: (yuan?: string) => `fallback:${yuan || 'lingxi'}`,
 }));
 
 vi.mock('../../settings/helpers', () => ({
@@ -33,7 +33,7 @@ vi.mock('../../settings/actions', () => ({
 }));
 
 const agents = [
-  { id: 'hana', name: '小花', yuan: 'hanako', isPrimary: true, hasAvatar: false },
+  { id: 'hana', name: '小花', yuan: 'lingxi', isPrimary: true, hasAvatar: false },
   { id: 'deepseek', name: 'DeepSeek', yuan: 'deepseek', isPrimary: false, hasAvatar: false },
   { id: 'maomao', name: '毛毛', yuan: 'maomao', isPrimary: false, hasAvatar: false },
 ];

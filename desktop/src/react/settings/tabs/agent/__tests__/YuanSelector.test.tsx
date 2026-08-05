@@ -25,7 +25,7 @@ vi.mock("../../../helpers", () => ({
 
 import { YuanSelector } from "../YuanSelector";
 
-function renderSelector(currentYuan = "hanako") {
+function renderSelector(currentYuan = "lingxi") {
   const onChange = vi.fn();
   const { container } = render(<YuanSelector currentYuan={currentYuan} onChange={onChange} />);
   return { container, onChange };
@@ -40,7 +40,7 @@ function chipFor(container: HTMLElement, yuan: string): HTMLElement {
 
 describe("YuanSelector", () => {
   it.each([
-    ["hanako", "MOOD"],
+    ["lingxi", "MOOD"],
     ["butter", "PULSE"],
     ["ming", "沉思"],
   ])("labels the %s chip with its thinking block", (yuan, block) => {
@@ -67,6 +67,6 @@ describe("YuanSelector", () => {
       (el) => el.textContent,
     );
     expect(names).not.toContain("kong");
-    expect(names).toEqual(["butter", "hanako", "ming"]);
+    expect(names).toEqual(["lingxi", "butter", "ming"]);
   });
 });

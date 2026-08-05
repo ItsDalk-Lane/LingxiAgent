@@ -402,7 +402,7 @@ describe('settings actions', () => {
       if (path === '/api/agents') {
         return Promise.resolve(jsonResponse({
           agents: [
-            { id: 'agent-a', name: 'Agent A', yuan: 'hanako', isPrimary: false },
+            { id: 'agent-a', name: 'Agent A', yuan: 'lingxi', isPrimary: false },
             { id: 'agent-b', name: 'Agent B', yuan: 'ming', isPrimary: true },
           ],
         }));

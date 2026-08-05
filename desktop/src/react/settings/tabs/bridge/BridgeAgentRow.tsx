@@ -53,11 +53,11 @@ export function BridgeAgentRow({ value, onChange }: BridgeAgentRowProps) {
                   draggable={false}
                   src={agent.hasAvatar
                     ? hanaUrl(`/api/agents/${agent.id}/avatar?t=${ts}`)
-                    : yuanFallbackAvatar(agent.yuan || 'hanako')}
+                    : yuanFallbackAvatar(agent.yuan || 'lingxi')}
                   onError={(e) => {
                     const img = e.target as HTMLImageElement;
                     img.onerror = null;
-                    img.src = yuanFallbackAvatar(agent.yuan || 'hanako');
+                    img.src = yuanFallbackAvatar(agent.yuan || 'lingxi');
                   }}
                 />
               </div>

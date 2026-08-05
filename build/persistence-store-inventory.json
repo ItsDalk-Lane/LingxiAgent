@@ -3216,7 +3216,7 @@
     {
       "sourceFile": "core/first-run.ts",
       "kind": "write-file",
-      "excerpt": "fs.writeFileSync( prefsPath, JSON.stringify({ primaryAgent: \"hanako\", }, null, 2) + \"\\n\", \"utf-8\", )",
+      "excerpt": "fs.writeFileSync( prefsPath, JSON.stringify({ primaryAgent: \"lingxi\", }, null, 2) + \"\\n\", \"utf-8\", )",
       "reason": "First-run seeds several registered stores from packaged templates. Flow-sensitive attribution moves into the future coordinator; this exact composition file is not ignored by directory.",
       "storeId": null,
       "exemptionId": "cross-store-first-run-bootstrap",

@@ -221,7 +221,7 @@ describe('dm_new_message websocket routing', () => {
       currentTab: 'channels',
       currentAgentId: 'dana',
       agents: [
-        { id: 'alice', name: 'Alice', yuan: 'hanako', isPrimary: true },
+        { id: 'alice', name: 'Alice', yuan: 'lingxi', isPrimary: true },
         { id: 'bob', name: 'Bob', yuan: 'ming', isPrimary: false },
         { id: 'dana', name: 'Dana', yuan: 'ming', isPrimary: false },
       ],

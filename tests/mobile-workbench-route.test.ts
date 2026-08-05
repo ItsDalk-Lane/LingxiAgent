@@ -184,14 +184,14 @@ describe("mobile workbench route", () => {
       getThinkingLevel: () => "high",
       agent: {
         config: {
-          agent: { yuan: "hanako" },
+          agent: { yuan: "lingxi" },
           providers: { openai: { api_key: "secret-key" } },
         },
       },
       listAgents: () => [{
         id: "hana",
         name: "Hana",
-        yuan: "hanako",
+        yuan: "lingxi",
         isPrimary: true,
         hasAvatar: false,
         homeFolder: null,
@@ -221,7 +221,7 @@ describe("mobile workbench route", () => {
       {
         id: "hana",
         name: "Hana",
-        yuan: "hanako",
+        yuan: "lingxi",
         isPrimary: true,
         isCurrent: false,
         hasAvatar: false,

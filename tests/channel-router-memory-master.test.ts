@@ -49,7 +49,7 @@ function writeAgentFixture(memoryEnabled) {
     [
       "agent:",
       "  name: Hana",
-      "  yuan: hanako",
+      "  yuan: lingxi",
       "memory:",
       `  enabled: ${memoryEnabled ? "true" : "false"}`,
     ].join("\n"),
@@ -58,7 +58,7 @@ function writeAgentFixture(memoryEnabled) {
   fs.writeFileSync(path.join(agentDir, "identity.md"), "IDENTITY_FALLBACK_BEACON\n", "utf-8");
   fs.writeFileSync(path.join(agentDir, "ishiki.md"), "ISHIKI_FALLBACK_BEACON\n", "utf-8");
   fs.writeFileSync(path.join(agentDir, "memory", "memory.md"), "MEMORY_FALLBACK_BEACON\n", "utf-8");
-  fs.writeFileSync(path.join(productDir, "yuan", "hanako.md"), "YUAN_FALLBACK_BEACON\n", "utf-8");
+  fs.writeFileSync(path.join(productDir, "yuan", "lingxi.md"), "YUAN_FALLBACK_BEACON\n", "utf-8");
   fs.writeFileSync(path.join(userDir, "user.md"), "USER_PROFILE_BEACON\n", "utf-8");
   return { agentsDir, productDir, userDir };
 }

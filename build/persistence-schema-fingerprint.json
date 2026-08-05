@@ -668,7 +668,7 @@
     ],
     "version": 3
   },
-  "payloadFingerprint": "sha256:0103b3720cdb56ff9011510d4ca15ccbfadd96cbd136db347f30daa8a47c3fd5",
+  "payloadFingerprint": "sha256:41d44d4d8cef7ccb696783b70d354d6a78b30741317b40c4f37a5278c2ed6799",
   "registry": [
     {
       "affectedByEpochMigration": true,
@@ -3118,8 +3118,8 @@
   ],
   "review": {
     "classification": "compatible",
-    "compatibilityReason": "Adds the new file-history-sqlite store to the inventory; no existing store's schema, reader, or on-disk layout changes. The per-workspace history database is created on first open and carries its own meta.schema_version, so homes without it stay readable.",
-    "payloadFingerprint": "sha256:0103b3720cdb56ff9011510d4ca15ccbfadd96cbd136db347f30daa8a47c3fd5"
+    "compatibilityReason": "yuan persona identifier renamed hanako to lingxi; data format unchanged",
+    "payloadFingerprint": "sha256:41d44d4d8cef7ccb696783b70d354d6a78b30741317b40c4f37a5278c2ed6799"
   },
   "schemas": [
     {
@@ -3201,7 +3201,7 @@
       "contract": "agent config and authored Markdown/image profile protocol",
       "kind": "directory-contract",
       "module": "core/agent-manager.ts",
-      "sourceHash": "sha256:1eb1515b94791b6ebaab1adbe7551ccbc754c05b04991f9ce9025d145c456c46",
+      "sourceHash": "sha256:2ad44828cb206cc90488e5892dbf4069152b483ae1be708f61906aa553b8aeed",
       "storeId": "agent-profile"
     },
     {
@@ -3215,7 +3215,7 @@
       "contract": "token-scoped import plan/package and export package protocol",
       "kind": "directory-contract",
       "module": "lib/character-cards/service.ts",
-      "sourceHash": "sha256:04d85be0fcff0b7a8d6187e648ced184d79ee1cfbbddba91fec4b40886a26dd0",
+      "sourceHash": "sha256:8e205b7ff142be9de658cba07afe910a2ddabdcfa198a7efe9b92d03231da4ec",
       "storeId": "character-card-staging"
     },
     {
@@ -3316,7 +3316,7 @@
       "contract": "desktop window bounds, release announcement bookmark, and update cache version marker readers",
       "kind": "directory-contract",
       "module": "desktop/main.cjs",
-      "sourceHash": "sha256:ab00d3a87caf3b994faba151ed6c370ee093dd545564535f9fefbaee314640e0",
+      "sourceHash": "sha256:f0b28d3fd438a35b23371f5315e9331ae982d421a6873d2cd8f01f4c4256fff4",
       "storeId": "desktop-window-version-state"
     },
     {
@@ -3518,7 +3518,7 @@
       "contract": "server-info writer and desktop bootstrap reader",
       "kind": "runtime-contract",
       "module": "server/index.ts",
-      "sourceHash": "sha256:a63a67ce8d4f09cb70a3aaab7728146cae2dab7c32a6efa4e24bdf7efe7e36db",
+      "sourceHash": "sha256:57fee15a12cf3be2e0207d4457251fbfa71312780144d091870673643533bf5f",
       "storeId": "server-runtime-info"
     },
     {

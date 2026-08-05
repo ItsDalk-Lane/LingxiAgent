@@ -39,7 +39,7 @@ describe('SkillsPanel', () => {
       agentName: 'Hana',
       agentYuan: 'hanako',
       agents: [
-        { id: 'agent-a', name: 'Hana', yuan: 'hanako', isPrimary: true },
+        { id: 'agent-a', name: 'Hana', yuan: 'lingxi', isPrimary: true },
         { id: 'agent-b', name: 'Mao', yuan: 'butter', isPrimary: false },
       ],
     } as never);

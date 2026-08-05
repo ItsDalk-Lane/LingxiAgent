@@ -22,7 +22,7 @@ import { loadSkillBundleStore, recordSkillBundle } from "../skill-bundles/store.
 import { isValidAgentId } from "../../shared/agent-id.ts";
 import { resolvePersonaLocale, resolvePersonaSource } from "../../core/persona-source.ts";
 
-const VALID_YUAN = new Set(["hanako", "butter", "ming", "kong"]);
+const VALID_YUAN = new Set(["lingxi", "butter", "ming", "kong"]);
 const CARD_FILE_NAMES = [
   "manifest.json",
   "manifest.yaml",
@@ -231,7 +231,7 @@ function normalizeAgent(card) {
       400,
     );
   }
-  const yuan = VALID_YUAN.has(agent.yuan || card?.yuan) ? (agent.yuan || card?.yuan) : "hanako";
+  const yuan = VALID_YUAN.has(agent.yuan || card?.yuan) ? (agent.yuan || card?.yuan) : "lingxi";
   const description = trimString(agent.description || card?.agentDescription || card?.description);
   const identitySummary = trimString(
     card?.identity?.summary ||
@@ -395,31 +395,31 @@ function firstNonEmptyLine(text) {
 
 function defaultAvatarForYuan(yuan) {
   const fileName = {
-    hanako: "Hanako.png",
+    lingxi: "Lingxi.png",
     butter: "Butter.png",
     ming: "Ming.png",
     kong: "Kong.png",
-  }[yuan] || "Hanako.png";
+  }[yuan] || "Lingxi.png";
   return fromRoot("desktop", "src", "assets", fileName);
 }
 
 function defaultCardBackForYuan(yuan) {
   const fileName = {
-    hanako: "yuan-hanako-card-back.png",
+    lingxi: "yuan-lingxi-card-back.png",
     butter: "yuan-butter-card-back.png",
     ming: "yuan-ming-card-back.png",
     kong: "yuan-kong-card-back.png",
-  }[yuan] || "yuan-hanako-card-back.png";
+  }[yuan] || "yuan-lingxi-card-back.png";
   return fromRoot("desktop", "src", "assets", "character-cards", fileName);
 }
 
 function defaultYuanIconForYuan(yuan) {
   const fileName = {
-    hanako: "yuan-hanako-emblem.png",
+    lingxi: "yuan-lingxi-emblem.png",
     butter: "yuan-butter-emblem.png",
     ming: "yuan-ming-emblem.png",
     kong: "yuan-kong-emblem.png",
-  }[yuan] || "yuan-hanako-emblem.png";
+  }[yuan] || "yuan-lingxi-emblem.png";
   return fromRoot("desktop", "src", "assets", "character-cards", fileName);
 }
 
@@ -463,7 +463,7 @@ function copyPlanAsset(plan, sourcePath, key, targetBaseName) {
 }
 
 function ensurePreviewAssets(plan) {
-  const yuan = plan.agent?.yuan || "hanako";
+  const yuan = plan.agent?.yuan || "lingxi";
   if (!plan.assets.avatar) {
     copyPlanAsset(plan, defaultAvatarForYuan(yuan), "avatar", "hana-default-avatar");
   }
@@ -686,7 +686,7 @@ export function createCharacterCardService(engine) {
     const configPath = path.join(agentDir, "config.yaml");
     if (!fs.existsSync(configPath)) throw new CharacterCardError("agent not found", 404);
     const config = YAML.load(fs.readFileSync(configPath, "utf-8")) || {};
-    const yuan = VALID_YUAN.has(config?.agent?.yuan) ? config.agent.yuan : "hanako";
+    const yuan = VALID_YUAN.has(config?.agent?.yuan) ? config.agent.yuan : "lingxi";
     const name = trimString(config?.agent?.name) || agent?.agentName || agentId;
     // identity.md / ishiki.md 惰性材料化后可能没有落盘文件；导出必须捕捉
     // agent 此刻实际生效的人格（回落到模板，见 core/persona-source.ts），

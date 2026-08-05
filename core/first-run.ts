@@ -22,7 +22,7 @@ import { isValidAgentId } from "../shared/agent-id.ts";
 
 const log = createModuleLogger("first-run");
 
-const DEFAULT_AGENT_ID = "hanako";
+const DEFAULT_AGENT_ID = "lingxi";
 
 export interface InvalidAgentDirReport {
   id: string;
@@ -125,7 +125,7 @@ export function ensureFirstRun(hanakoHome, productDir): FirstRunReport {
     fs.writeFileSync(
       prefsPath,
       JSON.stringify({
-        primaryAgent: "hanako",
+        primaryAgent: "lingxi",
       }, null, 2) + "\n",
       "utf-8",
     );
@@ -167,7 +167,7 @@ function backupUnreadableDefaultConfig(agentsDir): string {
  * 从模板播种默认 agent（与 engine.createAgent 相同逻辑，但纯同步、无依赖）
  */
 function seedDefaultAgent(agentsDir, productDir, userDir) {
-  const agentId = "hanako";
+  const agentId = "lingxi";
   const agentDir = path.join(agentsDir, agentId);
 
   // 创建目录结构

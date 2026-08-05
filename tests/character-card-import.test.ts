@@ -152,7 +152,7 @@ describe("character-card import service", () => {
   it("does not create skill bundle metadata for character cards without skills", async () => {
     writeJson(path.join(packageDir, "card.json"), {
       kind: "CharacterCard",
-      agent: { name: "No Skill Hana", id: "no-skill-hana", yuan: "hanako" },
+      agent: { name: "No Skill Hana", id: "no-skill-hana", yuan: "lingxi" },
     });
 
     const service = createCharacterCardService(engine);
@@ -167,7 +167,7 @@ describe("character-card import service", () => {
   it("imports memory facts only when the commit option enables memory import", async () => {
     writeJson(path.join(packageDir, "card.json"), {
       kind: "CharacterCard",
-      agent: { name: "Hana Writer", id: "hana-writer", yuan: "hanako" },
+      agent: { name: "Hana Writer", id: "hana-writer", yuan: "lingxi" },
       memory: {
         facts: [
           { fact: "喜欢把章节标题写得短一点", tags: ["writing"], time: "2026-05-14" },
@@ -196,7 +196,7 @@ describe("character-card import service", () => {
   it("imports packaged compiled memory before agent init can run memory tick", async () => {
     writeJson(path.join(packageDir, "card.json"), {
       kind: "CharacterCard",
-      agent: { name: "Today Hana", id: "today-hana", yuan: "hanako" },
+      agent: { name: "Today Hana", id: "today-hana", yuan: "lingxi" },
       memory: {
         compiled: {
           facts: "用户喜欢短句。",
@@ -241,7 +241,7 @@ describe("character-card import service", () => {
   it("shows a 20 character important-facts memory preview in preview plans", async () => {
     writeJson(path.join(packageDir, "card.json"), {
       kind: "CharacterCard",
-      agent: { name: "Memory Hana", id: "memory-hana", yuan: "hanako" },
+      agent: { name: "Memory Hana", id: "memory-hana", yuan: "lingxi" },
       memory: {
         compiled: {
           facts: "重要事实内容用于角色卡预览摘要，应该优先于今天记忆显示。",
@@ -275,7 +275,7 @@ describe("character-card import service", () => {
       agent: {
         name: "Ishiki Hana",
         id: "local-only-id",
-        yuan: "hanako",
+        yuan: "lingxi",
         description: "花名册里的描述",
       },
       identity: { summary: "沉静的手账写作者", content: "Identity full text" },
@@ -291,7 +291,7 @@ describe("character-card import service", () => {
 
     expect(plan.agent).toEqual({
       name: "Ishiki Hana",
-      yuan: "hanako",
+      yuan: "lingxi",
       description: "花名册里的描述",
       identitySummary: "沉静的手账写作者",
     });
@@ -323,7 +323,7 @@ describe("character-card import service", () => {
     writeSkill(packageDir, "skills/research", "research");
     writeJson(path.join(packageDir, "card.json"), {
       kind: "CharacterCard",
-      agent: { name: "Research Hana", id: "research-hana", yuan: "hanako" },
+      agent: { name: "Research Hana", id: "research-hana", yuan: "lingxi" },
       skills: [{ path: "skills/research" }],
     });
 
@@ -339,7 +339,7 @@ describe("character-card import service", () => {
     expect(planRes.status).toBe(200);
     expect(planData.plan).toMatchObject({
       packageName: "package",
-      agent: { name: "Research Hana", yuan: "hanako" },
+      agent: { name: "Research Hana", yuan: "lingxi" },
       skills: { count: 1 },
     });
     expect(planData.plan.agent.id).toBeUndefined();
@@ -362,7 +362,7 @@ describe("character-card import service", () => {
     fs.writeFileSync(path.join(agentDir, "config.yaml"), [
       "agent:",
       "  name: Hana",
-      "  yuan: hanako",
+      "  yuan: lingxi",
       "skills:",
       "  enabled:",
       "    - writer",
@@ -407,7 +407,7 @@ describe("character-card import service", () => {
       mode: "export",
       agentId: "hana",
       packageName: "hana-charactercard.zip",
-      agent: { name: "Hana", yuan: "hanako", description: "花名册描述" },
+      agent: { name: "Hana", yuan: "lingxi", description: "花名册描述" },
       memory: {
         available: true,
         count: 5,
@@ -443,7 +443,7 @@ describe("character-card import service", () => {
     fs.mkdirSync(outDir);
     await extractZip(exported.filePath, outDir);
     const card = JSON.parse(fs.readFileSync(path.join(outDir, "card.json"), "utf-8"));
-    expect(card.agent).toEqual({ name: "Hana", yuan: "hanako", description: "花名册描述" });
+    expect(card.agent).toEqual({ name: "Hana", yuan: "lingxi", description: "花名册描述" });
     expect(card.prompts).toMatchObject({
       identity: "Writer identity",
       ishiki: "Writer ishiki",
@@ -470,16 +470,16 @@ describe("character-card import service", () => {
     fs.writeFileSync(path.join(agentDir, "config.yaml"), [
       "agent:",
       "  name: Hana",
-      "  yuan: hanako",
+      "  yuan: lingxi",
     ].join("\n"), "utf-8");
     // identity.md / ishiki.md 故意不写：agent 从未定制过人格，惰性材料化后
     // agentDir 下本来就不会有这两个文件。
     expect(fs.existsSync(path.join(agentDir, "identity.md"))).toBe(false);
     expect(fs.existsSync(path.join(agentDir, "ishiki.md"))).toBe(false);
     fs.mkdirSync(path.join(engine.productDir, "identity-templates"), { recursive: true });
-    fs.writeFileSync(path.join(engine.productDir, "identity-templates", "hanako.md"), "Template identity content", "utf-8");
+    fs.writeFileSync(path.join(engine.productDir, "identity-templates", "lingxi.md"), "Template identity content", "utf-8");
     fs.mkdirSync(path.join(engine.productDir, "ishiki-templates"), { recursive: true });
-    fs.writeFileSync(path.join(engine.productDir, "ishiki-templates", "hanako.md"), "Template ishiki content", "utf-8");
+    fs.writeFileSync(path.join(engine.productDir, "ishiki-templates", "lingxi.md"), "Template ishiki content", "utf-8");
     engine.getAgent = vi.fn((id) => id === "hana"
       ? { id: "hana", agentDir, factStore: { exportAll: vi.fn(() => []) } }
       : null);
@@ -508,7 +508,7 @@ describe("character-card import service", () => {
     fs.writeFileSync(path.join(agentDir, "config.yaml"), [
       "agent:",
       "  name: Hana",
-      "  yuan: hanako",
+      "  yuan: lingxi",
     ].join("\n"), "utf-8");
     fs.writeFileSync(path.join(agentDir, "identity.md"), "Writer identity", "utf-8");
     fs.writeFileSync(path.join(deskDir, "hana-charactercard.zip"), "existing", "utf-8");
@@ -531,7 +531,7 @@ describe("character-card import service", () => {
     fs.writeFileSync(path.join(agentDir, "config.yaml"), [
       "agent:",
       "  name: Hana",
-      "  yuan: hanako",
+      "  yuan: lingxi",
     ].join("\n"), "utf-8");
     fs.writeFileSync(path.join(agentDir, "identity.md"), "Writer identity", "utf-8");
     fs.writeFileSync(path.join(agentDir, "memory", "memory.md"), [
@@ -611,7 +611,7 @@ describe("character-card import service", () => {
     fs.writeFileSync(path.join(agentDir, "config.yaml"), [
       "agent:",
       "  name: Hana",
-      "  yuan: hanako",
+      "  yuan: lingxi",
     ].join("\n"), "utf-8");
     fs.writeFileSync(path.join(agentDir, "identity.md"), "Writer identity", "utf-8");
     engine.getAgent = vi.fn((id) => id === "hana"
