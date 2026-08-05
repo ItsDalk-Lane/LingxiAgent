@@ -23,7 +23,7 @@ export function ensureWindowsSandboxHelper({
 
   const target = path.join(
     windowsSandboxHelperOutputDir({ rootDir, arch }),
-    "hana-win-sandbox.exe",
+    "lingxi-win-sandbox.exe",
   );
   const inputs = [
     path.join(rootDir, "desktop", "native", "LingxiWindowsSandboxHelper", "main.cpp"),

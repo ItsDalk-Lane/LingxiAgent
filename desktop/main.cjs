@@ -1792,7 +1792,7 @@ async function _spawnServerOnce(serverInfoPath, artifactBootContext) {
     });
     if (!guardianBin) {
       throw new Error(
-        "WINDOWS_SERVER_GUARDIAN_MISSING: hana-win-sandbox.exe is required to supervise the server process tree. Rebuild or reinstall LingxiAgent."
+        "WINDOWS_SERVER_GUARDIAN_MISSING: lingxi-win-sandbox.exe is required to supervise the server process tree. Rebuild or reinstall LingxiAgent."
       );
     }
     serverEnv.LINGXI_WIN32_SANDBOX_HELPER = guardianBin;

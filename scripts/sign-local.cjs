@@ -40,7 +40,7 @@ if (fs.existsSync(serverDir)) {
 }
 
 // 2. 签 Computer Use helper
-const computerUseHelper = path.join(APP, "Contents", "Resources", "computer-use", "macos", "hana-computer-use-helper");
+const computerUseHelper = path.join(APP, "Contents", "Resources", "computer-use", "macos", "lingxi-computer-use-helper");
 if (fs.existsSync(computerUseHelper)) {
   sign(computerUseHelper);
 }

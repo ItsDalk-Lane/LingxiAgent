@@ -21,7 +21,7 @@ import {
 describe("Windows sandbox helper CI smoke", () => {
   it("resolves the helper produced by the native helper build", () => {
     expect(windowsSandboxHelperPath({ rootDir: "C:\\repo", arch: "x64" }))
-      .toBe(path.join("C:\\repo", "dist-sandbox", "win-x64", "hana-win-sandbox.exe"));
+      .toBe(path.join("C:\\repo", "dist-sandbox", "win-x64", "lingxi-win-sandbox.exe"));
   });
 
   it("fails explicitly outside a Windows runner", () => {
@@ -41,7 +41,7 @@ describe("Windows sandbox helper CI smoke", () => {
       layoutRoot: "C:\\HanaCore",
       workDir: "C:\\smoke\\work",
       hanaHome: "C:\\smoke\\home",
-      helperPath: "C:\\HanaCore\\sandbox\\windows\\hana-win-sandbox.exe",
+      helperPath: "C:\\HanaCore\\sandbox\\windows\\lingxi-win-sandbox.exe",
       env: { SystemRoot: "C:\\Windows" },
     });
 

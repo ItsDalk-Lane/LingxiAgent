@@ -57,7 +57,7 @@ function assertExtractedLayout(layoutRoot) {
     assertFile(path.join(layoutRoot, "server", ...relative.split("/")), `packaged server file ${relative}`);
   }
   assertFile(
-    path.join(layoutRoot, "sandbox", "windows", "hana-win-sandbox.exe"),
+    path.join(layoutRoot, "sandbox", "windows", "lingxi-win-sandbox.exe"),
     "Windows sandbox helper",
   );
   try {
@@ -153,7 +153,7 @@ export function standaloneRestrictedTokenSmokeSpec({
   layoutRoot,
   workDir,
   hanaHome,
-  helperPath = path.win32.join(layoutRoot, "sandbox", "windows", "hana-win-sandbox.exe"),
+  helperPath = path.win32.join(layoutRoot, "sandbox", "windows", "lingxi-win-sandbox.exe"),
   env = process.env,
 }) {
   const { env: smokeEnv, runtimeDirs } = createRestrictedTokenSmokeRuntimeEnv({
@@ -231,7 +231,7 @@ export function runRestrictedTokenHelperSmoke({
   if (!smokeStdout.includes("LINGXI_DENY_WRITE_OK")) {
     throw new Error("[verify-standalone] restricted-token sandbox smoke did not prove deny-write enforcement");
   }
-  const terminalRecord = 'hana-win-sandbox: terminal-v1 status="exited" exitCode="0" timeoutMs="30000" win32Error="0"';
+  const terminalRecord = 'lingxi-win-sandbox: terminal-v1 status="exited" exitCode="0" timeoutMs="30000" win32Error="0"';
   if (!smokeStderr.includes(terminalRecord)) {
     throw new Error(
       `[verify-standalone] restricted-token sandbox smoke emitted no successful terminal record\nstderr: ${smokeStderr.trim()}`,
@@ -268,7 +268,7 @@ export function standaloneExecCommandSmokeSpec({ layoutRoot, workDir, hanaHome, 
     workRoot: hanaHome,
     env,
   });
-  const helperPath = path.win32.join(layoutRoot, "sandbox", "windows", "hana-win-sandbox.exe");
+  const helperPath = path.win32.join(layoutRoot, "sandbox", "windows", "lingxi-win-sandbox.exe");
   const serverRoot = path.win32.join(layoutRoot, "server");
   return {
     command: baseEnv.ComSpec,
@@ -286,7 +286,7 @@ export function standaloneExecCommandSmokeSpec({ layoutRoot, workDir, hanaHome, 
       // owns the packaged runtime contract before Node imports the probe.
       LINGXI_ROOT: "Z:\\hana-poison\\server",
       LINGXI_SERVER_ENTRY: "Z:\\hana-poison\\server\\bundle\\index.js",
-      LINGXI_WIN32_SANDBOX_HELPER: "Z:\\hana-poison\\sandbox\\hana-win-sandbox.exe",
+      LINGXI_WIN32_SANDBOX_HELPER: "Z:\\hana-poison\\sandbox\\lingxi-win-sandbox.exe",
       LINGXI_INTERNAL_STANDALONE_RUNTIME_SMOKE: "1",
       LINGXI_STANDALONE_EXEC_WORK: workDir,
       LINGXI_STANDALONE_EXPECTED_HELPER: helperPath,
@@ -396,7 +396,7 @@ export async function verifyWindowsStandaloneArtifact(opts = {}) {
   expectEqual(manifest.layout?.git, `${STANDALONE_LAYOUT_ROOT}/git`, "manifest Git layout");
   expectEqual(
     manifest.layout?.sandboxHelper,
-    `${STANDALONE_LAYOUT_ROOT}/sandbox/windows/hana-win-sandbox.exe`,
+    `${STANDALONE_LAYOUT_ROOT}/sandbox/windows/lingxi-win-sandbox.exe`,
     "manifest sandbox helper layout",
   );
   expectEqual(manifest.runtime?.minGitVersion, MINGIT_VERSION, "manifest MinGit version");

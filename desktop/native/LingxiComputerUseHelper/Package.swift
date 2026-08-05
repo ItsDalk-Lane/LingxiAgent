@@ -5,7 +5,7 @@ let package = Package(
     name: "LingxiComputerUseHelper",
     platforms: [.macOS(.v14)],
     products: [
-        .executable(name: "hana-computer-use-helper", targets: ["LingxiComputerUseHelper"]),
+        .executable(name: "lingxi-computer-use-helper", targets: ["LingxiComputerUseHelper"]),
     ],
     dependencies: [
         .package(url: "https://github.com/trycua/cua.git", revision: "d38bfbfb6b1d4296903477f517b1a0fa54af497b"),

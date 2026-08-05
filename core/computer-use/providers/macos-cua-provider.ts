@@ -40,15 +40,15 @@ function expandHome(filePath: any, homeDir = os.homedir()) {
 }
 
 function helperPath(root: any) {
-  return path.posix.join(root, "hana-computer-use-helper");
+  return path.posix.join(root, "lingxi-computer-use-helper");
 }
 
 function defaultLingxiComputerUseSocketPath(homeDir = os.homedir()) {
-  return path.join(homeDir, "Library", "Caches", "hana-computer-use", "hana-computer-use-helper.sock");
+  return path.join(homeDir, "Library", "Caches", "lingxi-computer-use", "lingxi-computer-use-helper.sock");
 }
 
 function commandIsBundledLingxiHelper(command: any) {
-  return path.posix.basename(String(command || "")) === "hana-computer-use-helper";
+  return path.posix.basename(String(command || "")) === "lingxi-computer-use-helper";
 }
 
 function normalizedAbsolutePosixPath(value: any) {

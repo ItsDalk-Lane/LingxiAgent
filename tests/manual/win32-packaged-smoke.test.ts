@@ -72,7 +72,7 @@ smokeDescribe("win32 packaged smoke", () => {
     const { resolveWin32SandboxHelper } = await import("../../lib/sandbox/win32-sandbox-helper.ts");
     const helper = resolveWin32SandboxHelper({ env: process.env });
     if (!helper) {
-      console.warn("[smoke] hana-win-sandbox.exe not found; sandbox chain NOT verified in this tree");
+      console.warn("[smoke] lingxi-win-sandbox.exe not found; sandbox chain NOT verified in this tree");
       return;
     }
     const hanakoHome = fs.mkdtempSync(path.join(os.tmpdir(), "hana-smoke-home-"));

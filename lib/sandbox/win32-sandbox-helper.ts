@@ -2,8 +2,8 @@
 import { existsSync as defaultExistsSync } from "fs";
 import path from "path";
 
-export const WIN32_SANDBOX_HELPER_NAME = "hana-win-sandbox.exe";
-export const WIN32_SANDBOX_TERMINAL_PREFIX = "hana-win-sandbox: terminal-v1";
+export const WIN32_SANDBOX_HELPER_NAME = "lingxi-win-sandbox.exe";
+export const WIN32_SANDBOX_TERMINAL_PREFIX = "lingxi-win-sandbox: terminal-v1";
 export const WIN32_SANDBOX_MAX_TIMEOUT_MS = 0xFFFFFFFE;
 
 export type Win32SandboxTerminalStatus =
@@ -164,7 +164,7 @@ export function buildWin32SandboxTokenDiagnosticArgs(options = {}) {
 
 function parseWin32SandboxTerminalRecordLine(line: string): Win32SandboxTerminalRecord | null {
   const match = line.match(
-    /^hana-win-sandbox: terminal-v1 status="([^"]*)" exitCode="([^"]*)" timeoutMs="([^"]*)" win32Error="([^"]*)"$/,
+    /^lingxi-win-sandbox: terminal-v1 status="([^"]*)" exitCode="([^"]*)" timeoutMs="([^"]*)" win32Error="([^"]*)"$/,
   );
   if (!match) return null;
   const status = match[1] as Win32SandboxTerminalStatus;

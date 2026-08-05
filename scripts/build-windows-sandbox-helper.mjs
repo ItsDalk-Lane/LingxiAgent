@@ -102,7 +102,7 @@ export function buildWindowsSandboxHelper({
   const outDir = windowsSandboxHelperOutputDir({ rootDir, arch });
   fs.rmSync(outDir, { recursive: true, force: true });
   fs.mkdirSync(outDir, { recursive: true });
-  const output = path.join(outDir, "hana-win-sandbox.exe");
+  const output = path.join(outDir, "lingxi-win-sandbox.exe");
   const command = buildWindowsSandboxCompileCommand({ source, output });
   console.log(`[windows-sandbox-helper] building ${output}`);
   runCompile(command, { rootDir, arch });

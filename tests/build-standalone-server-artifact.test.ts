@@ -47,7 +47,7 @@ function createInputs(root: string) {
   writeFile(gitDir, "usr/bin/sh.exe", "posix shell");
   writeFile(gitDir, "usr/bin/grep.exe", "coreutils");
 
-  const helperPath = path.join(root, "dist-sandbox", "win-x64", "hana-win-sandbox.exe");
+  const helperPath = path.join(root, "dist-sandbox", "win-x64", "lingxi-win-sandbox.exe");
   writeFile(path.dirname(helperPath), path.basename(helperPath), "sandbox helper");
 
   return {
@@ -135,7 +135,7 @@ describe("Windows standalone server artifact", () => {
     expect(fs.readFileSync(path.join(layoutRoot, "server", "lib", "runtime.json"), "utf8"))
       .toBe("server source must remain unchanged\n");
     expect(fs.readFileSync(path.join(layoutRoot, "git", "cmd", "git.exe"), "utf8")).toBe("git cmd");
-    expect(fs.readFileSync(path.join(layoutRoot, "sandbox", "windows", "hana-win-sandbox.exe"), "utf8"))
+    expect(fs.readFileSync(path.join(layoutRoot, "sandbox", "windows", "lingxi-win-sandbox.exe"), "utf8"))
       .toBe("sandbox helper");
 
     const wrappers = standaloneWrapperContents();
@@ -143,7 +143,7 @@ describe("Windows standalone server artifact", () => {
     expect(wrappers.hana).toContain('set "LINGXI_ROOT=%~dp0server"');
     expect(wrappers.hana).toContain('set "LINGXI_SERVER_ENTRY=%~dp0server\\bundle\\index.js"');
     expect(wrappers.hana).toContain(
-      'set "LINGXI_WIN32_SANDBOX_HELPER=%~dp0sandbox\\windows\\hana-win-sandbox.exe"',
+      'set "LINGXI_WIN32_SANDBOX_HELPER=%~dp0sandbox\\windows\\lingxi-win-sandbox.exe"',
     );
     expect(wrappers.hana).toContain(
       'set "PATH=%~dp0git\\cmd;%~dp0git\\usr\\bin;%~dp0git\\mingw64\\bin;%PATH%"',
@@ -275,7 +275,7 @@ describe("Windows standalone server artifact", () => {
       },
     });
 
-    expect(spec.helperPath).toBe("C:\\downloads\\HanaCore\\sandbox\\windows\\hana-win-sandbox.exe");
+    expect(spec.helperPath).toBe("C:\\downloads\\HanaCore\\sandbox\\windows\\lingxi-win-sandbox.exe");
     expect(spec.args).toEqual([
       "--cwd", workDir,
       "--writable-root", workDir,
@@ -338,7 +338,7 @@ describe("Windows standalone server artifact", () => {
     expect(spec.env.LINGXI_ROOT).toBe("Z:\\hana-poison\\server");
     expect(spec.env.LINGXI_STANDALONE_EXPECTED_ROOT).toBe("C:\\downloads\\HanaCore\\server");
     expect(spec.env.LINGXI_STANDALONE_EXPECTED_HELPER)
-      .toBe("C:\\downloads\\HanaCore\\sandbox\\windows\\hana-win-sandbox.exe");
+      .toBe("C:\\downloads\\HanaCore\\sandbox\\windows\\lingxi-win-sandbox.exe");
     expect(spec.env.LINGXI_INTERNAL_STANDALONE_RUNTIME_SMOKE).toBe("1");
     expect(spec.env).not.toHaveProperty("NODE_OPTIONS");
     expect(spec.env).not.toHaveProperty("LINGXI_STANDALONE_EXEC_MARKER");

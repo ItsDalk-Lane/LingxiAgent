@@ -45,7 +45,7 @@ export function commandIsAvailable(name, env = process.env) {
 }
 
 export function windowsSandboxHelperPath({ rootDir = ROOT, arch = "x64" } = {}) {
-  return path.join(rootDir, "dist-sandbox", `win-${arch}`, "hana-win-sandbox.exe");
+  return path.join(rootDir, "dist-sandbox", `win-${arch}`, "lingxi-win-sandbox.exe");
 }
 
 export function smokeWindowsSandboxHelper({

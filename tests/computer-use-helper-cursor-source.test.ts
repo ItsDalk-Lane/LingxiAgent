@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 
 const helperSourceDir = path.join(
   process.cwd(),
-  "desktop/native/HanaComputerUseHelper/Sources/HanaComputerUseHelper",
+  "desktop/native/LingxiComputerUseHelper/Sources/LingxiComputerUseHelper",
 );
 
 describe("Hana computer-use helper cursor integration", () => {

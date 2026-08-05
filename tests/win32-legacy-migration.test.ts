@@ -126,7 +126,7 @@ describe("Windows legacy sandbox migration", () => {
     const spawn = fakeSpawnSequence([
       {
         code: 3,
-        stderr: "hana-win-sandbox: legacy-appcontainer-acl path=\"C:\\\\\" sid=\"S-1-15-2-1\"",
+        stderr: "lingxi-win-sandbox: legacy-appcontainer-acl path=\"C:\\\\\" sid=\"S-1-15-2-1\"",
       },
       { code: 0 },
     ]);
@@ -134,7 +134,7 @@ describe("Windows legacy sandbox migration", () => {
     const result = await runWin32LegacySandboxMigration({
       platform: "win32",
       cleanup: true,
-      helperPath: "C:\\Hanako\\hana-win-sandbox.exe",
+      helperPath: "C:\\Hanako\\lingxi-win-sandbox.exe",
       markerPath,
       targets: {
         aclPaths: ["C:\\"],
@@ -147,7 +147,7 @@ describe("Windows legacy sandbox migration", () => {
     expect(result.cleanup).toBe(true);
     expect(spawn).toHaveBeenNthCalledWith(
       1,
-      "C:\\Hanako\\hana-win-sandbox.exe",
+      "C:\\Hanako\\lingxi-win-sandbox.exe",
       [
         "--cleanup-hana-write-acl",
         "C:\\",
@@ -161,7 +161,7 @@ describe("Windows legacy sandbox migration", () => {
     );
     expect(spawn).toHaveBeenNthCalledWith(
       2,
-      "C:\\Hanako\\hana-win-sandbox.exe",
+      "C:\\Hanako\\lingxi-win-sandbox.exe",
       [
         "--cleanup-legacy-profile",
         "com.hanako.sandbox.1288.475900",
@@ -174,13 +174,13 @@ describe("Windows legacy sandbox migration", () => {
   it("does not delete legacy profiles when ACL cleanup fails", async () => {
     const spawn = fakeSpawnFactory({
       code: 1,
-      stderr: "hana-win-sandbox: cannot clean legacy ACL",
+      stderr: "lingxi-win-sandbox: cannot clean legacy ACL",
     });
 
     const result = await runWin32LegacySandboxMigration({
       platform: "win32",
       cleanup: true,
-      helperPath: "C:\\Hanako\\hana-win-sandbox.exe",
+      helperPath: "C:\\Hanako\\lingxi-win-sandbox.exe",
       markerPath: path.join(makeTempDir(), "marker.json"),
       targets: {
         aclPaths: ["C:\\work"],
@@ -203,7 +203,7 @@ describe("Windows legacy sandbox migration", () => {
     const result = await runWin32LegacySandboxMigration({
       platform: "win32",
       cleanup: true,
-      helperPath: "C:\\Hanako\\hana-win-sandbox.exe",
+      helperPath: "C:\\Hanako\\lingxi-win-sandbox.exe",
       markerPath,
       targets: {
         aclPaths: ["C:\\work"],
@@ -225,7 +225,7 @@ describe("Windows legacy sandbox migration", () => {
     const result = await runWin32LegacySandboxMigration({
       platform: "win32",
       cleanup: true,
-      helperPath: "C:\\Hanako\\hana-win-sandbox.exe",
+      helperPath: "C:\\Hanako\\lingxi-win-sandbox.exe",
       markerPath,
       targets: {
         aclPaths: ["C:\\work"],
@@ -246,7 +246,7 @@ describe("Windows legacy sandbox migration", () => {
     const base = {
       platform: "win32",
       cleanup: true,
-      helperPath: "C:\\Hanako\\hana-win-sandbox.exe",
+      helperPath: "C:\\Hanako\\lingxi-win-sandbox.exe",
       targets: { aclPaths: ["C:\\work"], profileNames: [] },
     };
 
@@ -282,7 +282,7 @@ describe("Windows legacy sandbox migration", () => {
     await expect(runWin32LegacySandboxMigration({
       platform: "win32",
       cleanup: true,
-      helperPath: "C:\\Hanako\\hana-win-sandbox.exe",
+      helperPath: "C:\\Hanako\\lingxi-win-sandbox.exe",
       markerPath: path.join(makeTempDir(), "timeout.json"),
       timeoutMs: 1,
       targets: { aclPaths: ["C:\\work"], profileNames: [] },
@@ -292,7 +292,7 @@ describe("Windows legacy sandbox migration", () => {
     await expect(runWin32LegacySandboxMigration({
       platform: "win32",
       cleanup: true,
-      helperPath: "C:\\Hanako\\hana-win-sandbox.exe",
+      helperPath: "C:\\Hanako\\lingxi-win-sandbox.exe",
       markerPath: path.join(makeTempDir(), "spawn-error.json"),
       targets: { aclPaths: ["C:\\work"], profileNames: [] },
       spawn: vi.fn(() => { throw new Error("spawn boom"); }),
@@ -313,7 +313,7 @@ describe("Windows legacy sandbox migration", () => {
     const markerPath = path.join(makeTempDir(), "cleanup-v4.json");
     const spawn = fakeSpawnFactory({
       code: 3,
-      stderr: "hana-win-sandbox: hana-write-acl-cleaned path=\"C:\\\\work\"",
+      stderr: "lingxi-win-sandbox: hana-write-acl-cleaned path=\"C:\\\\work\"",
     });
 
     const result = await runWin32LegacySandboxRootCleanup({
@@ -321,7 +321,7 @@ describe("Windows legacy sandbox migration", () => {
       roots: ["C:\\work"],
       profileNames: ["com.hanako.sandbox.1288.475900"],
       cleanup: true,
-      helperPath: "C:\\Hanako\\hana-win-sandbox.exe",
+      helperPath: "C:\\Hanako\\lingxi-win-sandbox.exe",
       markerPath,
       spawn,
       now: () => new Date("2026-05-25T06:00:00.000Z"),
@@ -331,7 +331,7 @@ describe("Windows legacy sandbox migration", () => {
     expect(result.rootResults).toHaveLength(1);
     expect(spawn).toHaveBeenCalledOnce();
     expect(spawn).toHaveBeenCalledWith(
-      "C:\\Hanako\\hana-win-sandbox.exe",
+      "C:\\Hanako\\lingxi-win-sandbox.exe",
       [
         "--cleanup-hana-write-acl",
         "C:\\work",
@@ -358,7 +358,7 @@ describe("Windows legacy sandbox migration", () => {
     await runWin32LegacySandboxRootCleanup({
       platform: "win32",
       roots: ["C:\\work"],
-      helperPath: "C:\\Hanako\\hana-win-sandbox.exe",
+      helperPath: "C:\\Hanako\\lingxi-win-sandbox.exe",
       markerPath,
       spawn: fakeSpawnFactory({ code: 0 }),
       now: () => new Date("2026-05-25T06:00:00.000Z"),
@@ -368,7 +368,7 @@ describe("Windows legacy sandbox migration", () => {
     const result = await runWin32LegacySandboxRootCleanup({
       platform: "win32",
       roots: ["C:\\work"],
-      helperPath: "C:\\Hanako\\hana-win-sandbox.exe",
+      helperPath: "C:\\Hanako\\lingxi-win-sandbox.exe",
       markerPath,
       spawn,
     });
@@ -399,7 +399,7 @@ describe("Windows legacy sandbox migration", () => {
     const spawn = fakeSpawnFactory({ code: 0 });
     const queue = new Win32LegacySandboxCleanupQueue({
       platform: "win32",
-      helperPath: "C:\\Hanako\\hana-win-sandbox.exe",
+      helperPath: "C:\\Hanako\\lingxi-win-sandbox.exe",
       markerPath,
       spawn,
       schedule: false,

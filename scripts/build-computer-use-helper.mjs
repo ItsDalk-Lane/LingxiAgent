@@ -433,7 +433,7 @@ export function buildComputerUseHelper({
     "--arch",
     swiftArch,
     "--product",
-    "hana-computer-use-helper",
+    "lingxi-computer-use-helper",
   ];
 
   console.log(`[computer-use-helper] building for ${swiftArch}`);
@@ -442,7 +442,7 @@ export function buildComputerUseHelper({
   run("swift", ["build", ...baseArgs], { cwd: rootDir, env });
 
   const binPath = read("swift", ["build", "--show-bin-path", ...baseArgs], { cwd: rootDir, env });
-  const source = path.join(binPath, "hana-computer-use-helper");
+  const source = path.join(binPath, "lingxi-computer-use-helper");
   if (!fs.existsSync(source)) {
     throw new Error(`[computer-use-helper] build did not produce ${source}`);
   }
@@ -450,7 +450,7 @@ export function buildComputerUseHelper({
   const outDir = computerUseHelperOutputDir({ rootDir, osName: "mac", arch });
   fs.rmSync(outDir, { recursive: true, force: true });
   fs.mkdirSync(outDir, { recursive: true });
-  const target = path.join(outDir, "hana-computer-use-helper");
+  const target = path.join(outDir, "lingxi-computer-use-helper");
   fs.copyFileSync(source, target);
   fs.chmodSync(target, 0o755);
   console.log(`[computer-use-helper] copied ${target}`);

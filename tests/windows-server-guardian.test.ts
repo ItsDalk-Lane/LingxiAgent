@@ -19,7 +19,7 @@ describe("Windows server guardian desktop contract", () => {
       existsSync: (candidate: string) => candidate === explicit,
     })).toBe(explicit);
 
-    const packaged = path.join("C:\\Hana\\resources", "sandbox", "windows", "hana-win-sandbox.exe");
+    const packaged = path.join("C:\\Hana\\resources", "sandbox", "windows", "lingxi-win-sandbox.exe");
     expect(resolveWindowsServerGuardian({
       env: {},
       resourcesPath: "C:\\Hana\\resources",

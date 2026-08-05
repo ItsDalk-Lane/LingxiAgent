@@ -64,11 +64,11 @@ describe("macos Cua provider", () => {
       homeDir: "/Users/hana",
     });
 
-    expect(command).toBe("/opt/hana-runtime/hana-computer-use-helper");
+    expect(command).toBe("/opt/hana-runtime/lingxi-computer-use-helper");
   });
 
   it("resolves the new shell resource contract instead of the OTA artifact root", () => {
-    const helper = "/Applications/LingxiAgent.app/Contents/Resources/computer-use/macos/hana-computer-use-helper";
+    const helper = "/Applications/LingxiAgent.app/Contents/Resources/computer-use/macos/lingxi-computer-use-helper";
     const command = resolveCuaDriverCommand({
       env: {
         LINGXI_DESKTOP_IS_PACKAGED: "1",
@@ -86,7 +86,7 @@ describe("macos Cua provider", () => {
   });
 
   it("recovers old packaged shells from app.asar and executable paths", () => {
-    const helper = "/Applications/LingxiAgent.app/Contents/Resources/computer-use/macos/hana-computer-use-helper";
+    const helper = "/Applications/LingxiAgent.app/Contents/Resources/computer-use/macos/lingxi-computer-use-helper";
     const baseEnv = {
       LINGXI_DESKTOP_IS_PACKAGED: "1",
       LINGXI_ROOT: "/Users/hana/.hanako/artifacts/server/0.412.7-darwin-arm64",
@@ -111,7 +111,7 @@ describe("macos Cua provider", () => {
   });
 
   it("keeps the exact pre-artifact Resources/server layout compatible", () => {
-    const helper = "/Applications/LingxiAgent.app/Contents/Resources/computer-use/macos/hana-computer-use-helper";
+    const helper = "/Applications/LingxiAgent.app/Contents/Resources/computer-use/macos/lingxi-computer-use-helper";
     const command = resolveCuaDriverCommand({
       env: {
         LINGXI_ROOT: "/Applications/LingxiAgent.app/Contents/Resources/server",
@@ -127,8 +127,8 @@ describe("macos Cua provider", () => {
   });
 
   it("does not scan OTA or cwd development helpers in packaged mode", () => {
-    const artifactHelper = "/Users/hana/.hanako/artifacts/server/0.415.9-darwin-arm64/dist-computer-use/mac-arm64/hana-computer-use-helper";
-    const cwdHelper = "/tmp/runtime/dist-computer-use/mac-arm64/hana-computer-use-helper";
+    const artifactHelper = "/Users/hana/.hanako/artifacts/server/0.415.9-darwin-arm64/dist-computer-use/mac-arm64/lingxi-computer-use-helper";
+    const cwdHelper = "/tmp/runtime/dist-computer-use/mac-arm64/lingxi-computer-use-helper";
     const command = resolveCuaDriverCommand({
       env: {
         LINGXI_DESKTOP_IS_PACKAGED: "1",
@@ -148,7 +148,7 @@ describe("macos Cua provider", () => {
   });
 
   it("does not silently replace a missing packaged helper with an external driver", () => {
-    const expectedHelper = "/Applications/LingxiAgent.app/Contents/Resources/computer-use/macos/hana-computer-use-helper";
+    const expectedHelper = "/Applications/LingxiAgent.app/Contents/Resources/computer-use/macos/lingxi-computer-use-helper";
     const command = resolveCuaDriverCommand({
       env: {
         LINGXI_DESKTOP_IS_PACKAGED: "1",
@@ -165,13 +165,13 @@ describe("macos Cua provider", () => {
   it("resolves the development helper build output before falling back to PATH", () => {
     const command = resolveCuaDriverCommand({
       env: { LINGXI_ROOT: "/Users/hana/project-hana" },
-      existsSync: (p) => p === "/Users/hana/project-hana/dist-computer-use/mac-arm64/hana-computer-use-helper",
+      existsSync: (p) => p === "/Users/hana/project-hana/dist-computer-use/mac-arm64/lingxi-computer-use-helper",
       homeDir: "/Users/hana",
       arch: "arm64",
       cwd: "/Users/hana/project-hana",
     });
 
-    expect(command).toBe("/Users/hana/project-hana/dist-computer-use/mac-arm64/hana-computer-use-helper");
+    expect(command).toBe("/Users/hana/project-hana/dist-computer-use/mac-arm64/lingxi-computer-use-helper");
   });
 
   it("reports unavailable on non-macOS platforms", async () => {
@@ -190,14 +190,14 @@ describe("macos Cua provider", () => {
     const { runner } = makeRunner((_command, args) => {
       if (args[0] === "status") {
         expect(args).toEqual(["status", "--socket", "/tmp/hana.sock"]);
-        return { stdout: "hana-computer-use-helper running", stderr: "", exitCode: 0 };
+        return { stdout: "lingxi-computer-use-helper running", stderr: "", exitCode: 0 };
       }
       expect(args[0]).toBe("check_permissions");
       return rawResult(null, [{ type: "text", text: "✅ Accessibility: granted.\n❌ Screen Recording: NOT granted." }]);
     });
     const provider = createMacosCuaProvider({
       platform: "darwin",
-      command: "/tmp/hana-computer-use-helper",
+      command: "/tmp/lingxi-computer-use-helper",
       runner,
       socketPath: "/tmp/hana.sock",
     });
@@ -346,7 +346,7 @@ describe("macos Cua provider", () => {
     });
     const provider = createMacosCuaProvider({
       platform: "darwin",
-      command: "/tmp/hana-computer-use-helper",
+      command: "/tmp/lingxi-computer-use-helper",
       runner,
       autoStartDaemon: false,
     });
@@ -395,7 +395,7 @@ describe("macos Cua provider", () => {
     });
     const provider = createMacosCuaProvider({
       platform: "darwin",
-      command: "/tmp/hana-computer-use-helper",
+      command: "/tmp/lingxi-computer-use-helper",
       runner,
       socketPath: "/tmp/hana.sock",
       daemonStartupTimeoutMs: 1000,
@@ -405,7 +405,7 @@ describe("macos Cua provider", () => {
 
     const serveCall = calls.find((call) => call.spawned === true);
     expect(serveCall).toMatchObject({
-      command: "/tmp/hana-computer-use-helper",
+      command: "/tmp/lingxi-computer-use-helper",
       args: ["serve", "--socket", "/tmp/hana.sock"],
       options: { detached: true, stdio: "ignore" },
     });
@@ -431,7 +431,7 @@ describe("macos Cua provider", () => {
           : { stdout: "running", stderr: "", exitCode: 0 };
       }
       if (args[0] === "stop") {
-        return { stdout: "hana-computer-use-helper daemon stopped.", stderr: "", exitCode: 0 };
+        return { stdout: "lingxi-computer-use-helper daemon stopped.", stderr: "", exitCode: 0 };
       }
       if (args[0] === "launch_app") {
         return rawResult({
@@ -448,7 +448,7 @@ describe("macos Cua provider", () => {
     });
     const provider = createMacosCuaProvider({
       platform: "darwin",
-      command: "/tmp/hana-computer-use-helper",
+      command: "/tmp/lingxi-computer-use-helper",
       runner,
       socketPath: "/tmp/hana.sock",
       daemonStartupTimeoutMs: 1000,
@@ -460,7 +460,7 @@ describe("macos Cua provider", () => {
     expect(calls.map((call) => call.args[0])).toContain("stop");
     const stopCall = calls.find((call) => call.args[0] === "stop");
     expect(stopCall).toMatchObject({
-      command: "/tmp/hana-computer-use-helper",
+      command: "/tmp/lingxi-computer-use-helper",
       args: ["stop", "--socket", "/tmp/hana.sock"],
     });
   });
@@ -676,7 +676,7 @@ describe("macos Cua provider", () => {
     });
     const provider = createMacosCuaProvider({
       platform: "darwin",
-      command: "/tmp/hana-computer-use-helper",
+      command: "/tmp/lingxi-computer-use-helper",
       runner,
     });
     const lease = {
@@ -688,7 +688,7 @@ describe("macos Cua provider", () => {
 
     await provider.performAction({}, lease, { type: "click_element", elementId: "14" });
 
-    const clickCall = calls.find((call) => call.command === "/tmp/hana-computer-use-helper" && call.args[0] === "click");
+    const clickCall = calls.find((call) => call.command === "/tmp/lingxi-computer-use-helper" && call.args[0] === "click");
     expect(clickCall?.options?.env?.LINGXI_AGENT_CURSOR_CONFIG_JSON).toBeTruthy();
     const cursorConfig = JSON.parse(clickCall.options.env.LINGXI_AGENT_CURSOR_CONFIG_JSON);
     expect(cursorConfig).toMatchObject({
@@ -751,7 +751,7 @@ describe("macos Cua provider", () => {
       }
       return rawResult({ ok: true });
     });
-    const provider = createMacosCuaProvider({ platform: "darwin", command: "/tmp/hana-computer-use-helper", runner });
+    const provider = createMacosCuaProvider({ platform: "darwin", command: "/tmp/lingxi-computer-use-helper", runner });
     const lease = {
       leaseId: "lease-1",
       appId: "com.apple.Music",
@@ -783,7 +783,7 @@ describe("macos Cua provider", () => {
   it("reports an authoritative packaged helper path as missing", async () => {
     const missing = Object.assign(new Error("spawn ENOENT"), { code: "ENOENT" });
     const { runner } = makeRunner(() => { throw missing; });
-    const command = "/Applications/LingxiAgent.app/Contents/Resources/computer-use/macos/hana-computer-use-helper";
+    const command = "/Applications/LingxiAgent.app/Contents/Resources/computer-use/macos/lingxi-computer-use-helper";
     const provider = createMacosCuaProvider({
       platform: "darwin",
       command,
@@ -829,7 +829,7 @@ describe("macos Cua provider", () => {
     } as any;
     const provider = createMacosCuaProvider({
       platform: "darwin",
-      command: "/tmp/hana-computer-use-helper",
+      command: "/tmp/lingxi-computer-use-helper",
       runner,
       socketPath: "/tmp/hana.sock",
       daemonStartupTimeoutMs: 500,
@@ -838,7 +838,7 @@ describe("macos Cua provider", () => {
     await expect(provider.listApps()).rejects.toMatchObject({
       code: COMPUTER_USE_ERRORS.PROVIDER_UNAVAILABLE,
       details: {
-        command: "/tmp/hana-computer-use-helper",
+        command: "/tmp/lingxi-computer-use-helper",
         launchCode: "ENOENT",
       },
     });
@@ -866,7 +866,7 @@ describe("macos Cua provider", () => {
     } as any;
     const provider = createMacosCuaProvider({
       platform: "darwin",
-      command: "/tmp/hana-computer-use-helper",
+      command: "/tmp/lingxi-computer-use-helper",
       runner,
       socketPath: "/tmp/hana.sock",
       daemonStartupTimeoutMs: 500,

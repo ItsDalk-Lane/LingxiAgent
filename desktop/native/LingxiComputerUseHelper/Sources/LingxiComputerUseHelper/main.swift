@@ -25,7 +25,7 @@ struct LingxiComputerUseHelper {
             fputs(err.message + "\n", stderr)
             Foundation.exit(err.code)
         } catch {
-            fputs("hana-computer-use-helper failed: \(error)\n", stderr)
+            fputs("lingxi-computer-use-helper failed: \(error)\n", stderr)
             Foundation.exit(ExitCode.software)
         }
     }
@@ -45,9 +45,9 @@ struct LingxiComputerUseHelper {
         switch command {
         case "status":
             guard DaemonClient.isDaemonListening(socketPath: socketPath) else {
-                throw HelperError(code: ExitCode.toolError, message: "hana-computer-use-helper daemon is not running on \(socketPath).")
+                throw HelperError(code: ExitCode.toolError, message: "lingxi-computer-use-helper daemon is not running on \(socketPath).")
             }
-            print("hana-computer-use-helper daemon running; CuaDriverCore \(CuaDriverCore.version)\n  socket: \(socketPath)")
+            print("lingxi-computer-use-helper daemon running; CuaDriverCore \(CuaDriverCore.version)\n  socket: \(socketPath)")
         case "serve":
             let exitCode = AppKitBootstrap.runBlockingAppKitWith {
                 await runDaemon(socketPath: socketPath)
@@ -84,7 +84,7 @@ struct LingxiComputerUseHelper {
             fputs(err.message + "\n", stderr)
             return err.code
         } catch {
-            fputs("hana-computer-use-helper failed: \(error)\n", stderr)
+            fputs("lingxi-computer-use-helper failed: \(error)\n", stderr)
             return ExitCode.software
         }
     }
@@ -144,11 +144,11 @@ struct LingxiComputerUseHelper {
             guard response.ok else {
                 throw HelperError(
                     code: response.exitCode ?? ExitCode.software,
-                    message: response.error ?? "hana-computer-use-helper daemon call failed."
+                    message: response.error ?? "lingxi-computer-use-helper daemon call failed."
                 )
             }
             guard case .call(let result) = response.result else {
-                throw HelperError(code: ExitCode.software, message: "hana-computer-use-helper daemon returned a non-call response.")
+                throw HelperError(code: ExitCode.software, message: "lingxi-computer-use-helper daemon returned a non-call response.")
             }
             try emitToolResult(result, raw: raw, compact: compact)
             return true
@@ -201,7 +201,7 @@ struct LingxiComputerUseHelper {
             try await server.run()
             return 0
         } catch {
-            fputs("hana-computer-use-helper daemon failed: \(error)\n", stderr)
+            fputs("lingxi-computer-use-helper daemon failed: \(error)\n", stderr)
             return ExitCode.software
         }
     }
@@ -210,11 +210,11 @@ struct LingxiComputerUseHelper {
         switch DaemonClient.sendRequest(DaemonRequest(method: "shutdown"), socketPath: socketPath) {
         case .ok(let response):
             guard response.ok else {
-                throw HelperError(code: response.exitCode ?? ExitCode.software, message: response.error ?? "Failed to stop hana-computer-use-helper daemon.")
+                throw HelperError(code: response.exitCode ?? ExitCode.software, message: response.error ?? "Failed to stop lingxi-computer-use-helper daemon.")
             }
-            print("hana-computer-use-helper daemon stopped.")
+            print("lingxi-computer-use-helper daemon stopped.")
         case .noDaemon:
-            throw HelperError(code: ExitCode.toolError, message: "hana-computer-use-helper daemon is not running on \(socketPath).")
+            throw HelperError(code: ExitCode.toolError, message: "lingxi-computer-use-helper daemon is not running on \(socketPath).")
         case .error(let message):
             throw HelperError(code: ExitCode.software, message: message)
         }
@@ -226,7 +226,7 @@ struct LingxiComputerUseHelper {
             return expandHome(explicit)
         }
         let home = env["HOME"] ?? NSHomeDirectory()
-        return home + "/Library/Caches/hana-computer-use/hana-computer-use-helper.sock"
+        return home + "/Library/Caches/lingxi-computer-use/lingxi-computer-use-helper.sock"
     }
 
     private static func expandHome(_ path: String) -> String {
@@ -246,9 +246,9 @@ struct LingxiComputerUseHelper {
 
     private static func printHelp() {
         print("""
-        hana-computer-use-helper status
-        hana-computer-use-helper list_apps '{"bundle_id":"com.apple.finder"}' --raw --compact
-        hana-computer-use-helper get_window_state '{"pid":844,"window_id":10725}' --raw --compact
+        lingxi-computer-use-helper status
+        lingxi-computer-use-helper list_apps '{"bundle_id":"com.apple.finder"}' --raw --compact
+        lingxi-computer-use-helper get_window_state '{"pid":844,"window_id":10725}' --raw --compact
         """)
     }
 }

@@ -2,7 +2,7 @@
 
 const path = require("path");
 
-const WINDOWS_HELPER_NAME = "hana-win-sandbox.exe";
+const WINDOWS_HELPER_NAME = "lingxi-win-sandbox.exe";
 const WINDOWS_GUARDIAN_TERMINATION_FAILED_EXIT_CODE = 125;
 
 function resolveWindowsServerGuardian({

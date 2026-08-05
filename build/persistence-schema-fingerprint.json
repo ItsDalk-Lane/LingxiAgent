@@ -668,7 +668,7 @@
     ],
     "version": 3
   },
-  "payloadFingerprint": "sha256:46899b345f4defb07fb282a50b1d4a53eb6fd55d15f2de76a768480c4551d7eb",
+  "payloadFingerprint": "sha256:b9b9a3bfabba7dd56ce687519c4e2bfded1fedc3c2841c3dada4b7c40bd19283",
   "registry": [
     {
       "affectedByEpochMigration": true,
@@ -3118,8 +3118,8 @@
   ],
   "review": {
     "classification": "compatible",
-    "compatibilityReason": "protocol strings + storage keys + scaffold; data format unchanged",
-    "payloadFingerprint": "sha256:46899b345f4defb07fb282a50b1d4a53eb6fd55d15f2de76a768480c4551d7eb"
+    "compatibilityReason": "native module dirs/products/strings renamed; data format unchanged",
+    "payloadFingerprint": "sha256:b9b9a3bfabba7dd56ce687519c4e2bfded1fedc3c2841c3dada4b7c40bd19283"
   },
   "schemas": [
     {
@@ -3316,7 +3316,7 @@
       "contract": "desktop window bounds, release announcement bookmark, and update cache version marker readers",
       "kind": "directory-contract",
       "module": "desktop/main.cjs",
-      "sourceHash": "sha256:54c8fc9317a63927e4102e30c2a186444b0277db0f88a9c0a2e999785ec48c3c",
+      "sourceHash": "sha256:960c5838bac672f3e5c6a1558f897c9e51c5b75e498d931a4fa8e9c3b8ea9a1c",
       "storeId": "desktop-window-version-state"
     },
     {

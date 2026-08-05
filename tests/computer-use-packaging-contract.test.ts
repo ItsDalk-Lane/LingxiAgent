@@ -10,7 +10,7 @@ const fixModules = require("../scripts/fix-modules.cjs").default;
 const tempDirs = [];
 
 function makeTempDir() {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "hana-computer-use-packaging-"));
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "lingxi-computer-use-packaging-"));
   tempDirs.push(dir);
   return dir;
 }

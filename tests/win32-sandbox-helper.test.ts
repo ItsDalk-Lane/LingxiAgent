@@ -12,7 +12,7 @@ import {
 
 describe("resolveWin32SandboxHelper", () => {
   it("prefers the explicit helper contract over every resource-root candidate", () => {
-    const explicit = "C:\\custom\\hana-win-sandbox.exe";
+    const explicit = "C:\\custom\\lingxi-win-sandbox.exe";
 
     expect(resolveWin32SandboxHelper({
       env: {
@@ -36,7 +36,7 @@ describe("resolveWin32SandboxHelper", () => {
       expectedResources,
       "sandbox",
       "windows",
-      "hana-win-sandbox.exe",
+      "lingxi-win-sandbox.exe",
     );
     const expectedGit = path.win32.join(expectedResources, "git");
     const env = {
@@ -82,7 +82,7 @@ describe("resolveWin32SandboxHelper", () => {
       "C:\\Hana\\resources",
       "sandbox",
       "windows",
-      "hana-win-sandbox.exe",
+      "lingxi-win-sandbox.exe",
     );
 
     expect(resolveWin32SandboxHelper({
@@ -155,7 +155,7 @@ describe("buildWin32SandboxHelperArgs", () => {
       "--deny-read",
       "--diagnose-legacy-acl",
       "--cleanup-legacy-acl",
-      "--cleanup-hana-write-acl",
+      "--cleanup-lingxi-write-acl",
       "--cleanup-legacy-profile",
       "--legacy-appcontainer-profile",
     ]));
@@ -231,8 +231,8 @@ describe("buildWin32SandboxHelperArgs", () => {
   it("parses the last versioned native terminal record without confusing exit 124 with timeout", () => {
     const output = [
       "child output",
-      'hana-win-sandbox: terminal-v1 status="timed_out" exitCode="124" timeoutMs="5000" win32Error="0"',
-      'hana-win-sandbox: terminal-v1 status="exited" exitCode="124" timeoutMs="5000" win32Error="0"',
+      'lingxi-win-sandbox: terminal-v1 status="timed_out" exitCode="124" timeoutMs="5000" win32Error="0"',
+      'lingxi-win-sandbox: terminal-v1 status="exited" exitCode="124" timeoutMs="5000" win32Error="0"',
     ].join("\n");
 
     expect(parseWin32SandboxTerminalRecord(output)).toEqual({
@@ -252,8 +252,8 @@ describe("buildWin32SandboxHelperArgs", () => {
 
     filter.push(Buffer.from([
       "warning one\r\n",
-      "prefix hana-win-sandbox: terminal-v1 is ordinary stderr\n",
-      'hana-win-sandbox: terminal-v1 status="tim',
+      "prefix lingxi-win-sandbox: terminal-v1 is ordinary stderr\n",
+      'lingxi-win-sandbox: terminal-v1 status="tim',
     ].join("")));
     filter.push(Buffer.from([
       'ed_out" exitCode="124" timeoutMs="5000" win32Error="0"\r\n',
@@ -263,7 +263,7 @@ describe("buildWin32SandboxHelperArgs", () => {
 
     expect(Buffer.concat(forwarded).toString("utf8")).toBe([
       "warning one\r\n",
-      "prefix hana-win-sandbox: terminal-v1 is ordinary stderr\n",
+      "prefix lingxi-win-sandbox: terminal-v1 is ordinary stderr\n",
       "warning tail",
     ].join(""));
     expect(filter.terminalRecord).toEqual({
@@ -308,7 +308,7 @@ describe("buildWin32SandboxHelperArgs", () => {
 
   it("keeps required ACL failures diagnosable with numeric Win32 codes", () => {
     const helperSource = fs.readFileSync(
-      path.join(process.cwd(), "desktop", "native", "HanaWindowsSandboxHelper", "main.cpp"),
+      path.join(process.cwd(), "desktop", "native", "LingxiWindowsSandboxHelper", "main.cpp"),
       "utf-8",
     );
 
