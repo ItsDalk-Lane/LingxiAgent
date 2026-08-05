@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { hanaFetch } from '../../hooks/use-hana-fetch';
+import { lingxiFetch } from '../../hooks/use-hana-fetch';
 import { useStore } from '../../stores';
 import {
   forkSessionTurn,
@@ -10,7 +10,7 @@ import {
 import { installWindowTestT } from '../helpers/i18n-test-strings';
 
 vi.mock('../../hooks/use-hana-fetch', () => ({
-  hanaFetch: vi.fn(),
+  lingxiFetch: vi.fn(),
 }));
 
 vi.mock('../../utils/ui-context', () => ({
@@ -40,7 +40,7 @@ describe('message turn actions', () => {
   });
 
   it('retries an arbitrary persisted user node with explicit session identity and display envelope', async () => {
-    vi.mocked(hanaFetch).mockResolvedValueOnce(new Response(JSON.stringify({ ok: true }), { status: 200 }));
+    vi.mocked(lingxiFetch).mockResolvedValueOnce(new Response(JSON.stringify({ ok: true }), { status: 200 }));
     const message = {
       id: 'client-u1',
       sourceEntryId: 'entry-u1',
@@ -57,12 +57,12 @@ describe('message turn actions', () => {
     );
 
     expect(ok).toBe(true);
-    expect(hanaFetch).toHaveBeenCalledWith('/api/sessions/turns/retry', expect.objectContaining({
+    expect(lingxiFetch).toHaveBeenCalledWith('/api/sessions/turns/retry', expect.objectContaining({
       method: 'POST',
       timeout: 30 * 60 * 1000,
       throwOnHttpError: false,
     }));
-    const init = vi.mocked(hanaFetch).mock.calls[0][1];
+    const init = vi.mocked(lingxiFetch).mock.calls[0][1];
     expect(init).toEqual(expect.objectContaining({
       timeout: 30 * 60 * 1000,
       throwOnHttpError: false,
@@ -82,7 +82,7 @@ describe('message turn actions', () => {
   });
 
   it('forks an assistant node and normalizes the returned child locator', async () => {
-    vi.mocked(hanaFetch).mockResolvedValueOnce(new Response(JSON.stringify({
+    vi.mocked(lingxiFetch).mockResolvedValueOnce(new Response(JSON.stringify({
       ok: true,
       sessionId: 'sess_child',
       path: '/sessions/child.jsonl',
@@ -99,7 +99,7 @@ describe('message turn actions', () => {
       sessionPath: '/sessions/child.jsonl',
       agentId: 'hana',
     });
-    const init = vi.mocked(hanaFetch).mock.calls[0][1];
+    const init = vi.mocked(lingxiFetch).mock.calls[0][1];
     expect(JSON.parse(String(init?.body))).toEqual({
       sessionId,
       sessionPath,
@@ -123,7 +123,7 @@ describe('message turn actions', () => {
     );
 
     expect(ok).toBe(false);
-    expect(hanaFetch).not.toHaveBeenCalled();
+    expect(lingxiFetch).not.toHaveBeenCalled();
     expect(setInlineError).toHaveBeenCalledWith(
       sessionPath,
       expect.objectContaining({ detail: expect.stringContaining('sessionId') }),
@@ -132,7 +132,7 @@ describe('message turn actions', () => {
   });
 
   it('speaks the localized sentence and keeps the backend English as detail when an active task blocks Fork', async () => {
-    vi.mocked(hanaFetch).mockResolvedValueOnce(new Response(JSON.stringify({
+    vi.mocked(lingxiFetch).mockResolvedValueOnce(new Response(JSON.stringify({
       error: 'active workflow must finish before Fork',
       code: 'session_fork_active_task',
     }), { status: 409, statusText: 'Conflict' }));
@@ -156,7 +156,7 @@ describe('message turn actions', () => {
 
   it('recognises routes whose error field is the code itself', async () => {
     // POST /sessions/fork answers a streaming session with { error: "session_busy" }, no code field.
-    vi.mocked(hanaFetch).mockResolvedValueOnce(new Response(JSON.stringify({
+    vi.mocked(lingxiFetch).mockResolvedValueOnce(new Response(JSON.stringify({
       error: 'session_busy',
     }), { status: 409, statusText: 'Conflict' }));
 
@@ -174,7 +174,7 @@ describe('message turn actions', () => {
   });
 
   it('falls back to a readable sentence when the backend sends an unmapped failure', async () => {
-    vi.mocked(hanaFetch).mockResolvedValueOnce(new Response(JSON.stringify({
+    vi.mocked(lingxiFetch).mockResolvedValueOnce(new Response(JSON.stringify({
       error: 'session pin order is empty',
       code: 'session_pin_order_empty',
     }), { status: 409, statusText: 'Conflict' }));

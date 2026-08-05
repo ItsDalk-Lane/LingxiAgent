@@ -7,7 +7,7 @@ import { cleanup, render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-const hanaFetchMock = vi.fn();
+const lingxiFetchMock = vi.fn();
 const showToastMock = vi.fn();
 
 function response(body: unknown): Response {
@@ -34,7 +34,7 @@ const observationPayload = {
 };
 
 vi.mock('../../settings/api', () => ({
-  hanaFetch: (url: string, opts?: RequestInit) => hanaFetchMock(url, opts),
+  lingxiFetch: (url: string, opts?: RequestInit) => lingxiFetchMock(url, opts),
 }));
 
 vi.mock('../../settings/helpers', () => ({
@@ -89,9 +89,9 @@ vi.mock('../../utils/markdown', () => ({
 
 describe('ExperimentsTab', () => {
   beforeEach(() => {
-    hanaFetchMock.mockReset();
+    lingxiFetchMock.mockReset();
     showToastMock.mockClear();
-    hanaFetchMock.mockImplementation(async (url: string, opts?: RequestInit) => {
+    lingxiFetchMock.mockImplementation(async (url: string, opts?: RequestInit) => {
       if (opts?.method === 'PATCH') {
         return response({ ok: true, value: JSON.parse(String(opts.body)).value });
       }
@@ -115,7 +115,7 @@ describe('ExperimentsTab', () => {
     expect(screen.queryByText('可编辑记忆')).not.toBeInTheDocument();
     expect(screen.queryByText('缓存记忆系统')).not.toBeInTheDocument();
     expect(screen.queryByText('只观察，不写入记忆')).not.toBeInTheDocument();
-    expect(hanaFetchMock).not.toHaveBeenCalledWith(
+    expect(lingxiFetchMock).not.toHaveBeenCalledWith(
       '/api/experiments/memory/cache-snapshot-reflection/observation?agentId=primary',
       undefined,
     );

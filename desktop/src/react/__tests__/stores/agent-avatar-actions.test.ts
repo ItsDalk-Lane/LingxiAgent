@@ -7,8 +7,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
  * server guess one.
  */
 vi.mock('../../hooks/use-hana-fetch', () => ({
-  hanaFetch: vi.fn(),
-  hanaUrl: (path: string) => `http://127.0.0.1:1234${path}`,
+  lingxiFetch: vi.fn(),
+  lingxiUrl: (path: string) => `http://127.0.0.1:1234${path}`,
 }));
 
 vi.mock('../../stores/preview-actions', () => ({ closePreview: vi.fn() }));

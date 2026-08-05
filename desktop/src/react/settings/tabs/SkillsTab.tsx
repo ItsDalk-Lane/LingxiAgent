@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useSettingsStore, type SkillInfo } from '../store';
-import { hanaFetch } from '../api';
+import { lingxiFetch } from '../api';
 import { t } from '../helpers';
 import { SkillBundleTree, type SkillBundleInfo } from './skills/SkillBundleTree';
 import { SkillCapabilities } from './skills/SkillCapabilities';
@@ -76,8 +76,8 @@ export function SkillsTab() {
     try {
       const snapshotAgentId = agentId;
       const [skillsRes, bundlesRes] = await Promise.all([
-        hanaFetch(`/api/skills?agentId=${encodeURIComponent(agentId)}&runtime=1`),
-        hanaFetch(`/api/skills/bundles?agentId=${encodeURIComponent(agentId)}`),
+        lingxiFetch(`/api/skills?agentId=${encodeURIComponent(agentId)}&runtime=1`),
+        lingxiFetch(`/api/skills/bundles?agentId=${encodeURIComponent(agentId)}`),
       ]);
       const data = await skillsRes.json();
       const bundleData = await bundlesRes.json();
@@ -98,7 +98,7 @@ export function SkillsTab() {
 
   const loadExternalPaths = useCallback(async () => {
     try {
-      const res = await hanaFetch('/api/skills/external-paths');
+      const res = await lingxiFetch('/api/skills/external-paths');
       const data = await res.json();
       setExternalPathsData({
         configured: data.configured || [],
@@ -137,7 +137,7 @@ export function SkillsTab() {
     if (!agentId) return;
     const names = visible.map(s => s.name);
     if (names.length === 0) return;
-    hanaFetch('/api/skills/translate', {
+    lingxiFetch('/api/skills/translate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ agentId, names, lang: locale }),
@@ -151,7 +151,7 @@ export function SkillsTab() {
   // 原则：全局的管全局的。装完后用户到 Section 3 "Agent 配置" 自己打开开关。
   const installSkillFromPath = async (filePath: string) => {
     try {
-      const res = await hanaFetch('/api/skills/install', {
+      const res = await lingxiFetch('/api/skills/install', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ path: filePath }),
@@ -173,7 +173,7 @@ export function SkillsTab() {
     }
     try {
       const contentBase64 = await fileToBase64(file);
-      const res = await hanaFetch('/api/skills/install', {
+      const res = await lingxiFetch('/api/skills/install', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -211,7 +211,7 @@ export function SkillsTab() {
     const msg = t('settings.skills.deleteConfirm', { name });
     if (!confirm(msg)) return;
     try {
-      const res = await hanaFetch(
+      const res = await lingxiFetch(
         `/api/skills/${encodeURIComponent(name)}?agentId=${encodeURIComponent(agentId)}`,
         { method: 'DELETE' },
       );
@@ -232,7 +232,7 @@ export function SkillsTab() {
     const agentId = skillsViewAgentIdRef.current;
     if (!agentId) return;
     try {
-      const res = await hanaFetch(`/api/skills/bundles?agentId=${encodeURIComponent(agentId)}`, {
+      const res = await lingxiFetch(`/api/skills/bundles?agentId=${encodeURIComponent(agentId)}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, skillNames: [] }),
@@ -256,7 +256,7 @@ export function SkillsTab() {
     if (!agentId) return;
     if (!name || name === bundle.name) return;
     try {
-      const res = await hanaFetch(`/api/skills/bundles/${encodeURIComponent(bundle.id)}?agentId=${encodeURIComponent(agentId)}`, {
+      const res = await lingxiFetch(`/api/skills/bundles/${encodeURIComponent(bundle.id)}?agentId=${encodeURIComponent(agentId)}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name }),
@@ -277,7 +277,7 @@ export function SkillsTab() {
 
   const exportBundle = async (bundle: SkillBundleInfo) => {
     try {
-      const res = await hanaFetch(`/api/skills/bundles/${encodeURIComponent(bundle.id)}/export`, {
+      const res = await lingxiFetch(`/api/skills/bundles/${encodeURIComponent(bundle.id)}/export`, {
         method: 'POST',
       });
       const data = await res.json();
@@ -298,7 +298,7 @@ export function SkillsTab() {
 
   const submitDeleteBundle = async (bundle: SkillBundleInfo) => {
     try {
-      const res = await hanaFetch(`/api/skills/bundles/${encodeURIComponent(bundle.id)}`, {
+      const res = await lingxiFetch(`/api/skills/bundles/${encodeURIComponent(bundle.id)}`, {
         method: 'DELETE',
       });
       const data = await res.json();
@@ -314,7 +314,7 @@ export function SkillsTab() {
   const updateBundleSkillNames = async (bundle: SkillBundleInfo, skillNames: string[]) => {
     const agentId = skillsViewAgentIdRef.current;
     if (!agentId) return;
-    const res = await hanaFetch(`/api/skills/bundles/${encodeURIComponent(bundle.id)}?agentId=${encodeURIComponent(agentId)}`, {
+    const res = await lingxiFetch(`/api/skills/bundles/${encodeURIComponent(bundle.id)}?agentId=${encodeURIComponent(agentId)}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ skillNames }),
@@ -327,7 +327,7 @@ export function SkillsTab() {
     const agentId = skillsViewAgentIdRef.current;
     if (!agentId) return;
     try {
-      const res = await hanaFetch(`/api/skills/bundles/order?agentId=${encodeURIComponent(agentId)}`, {
+      const res = await lingxiFetch(`/api/skills/bundles/order?agentId=${encodeURIComponent(agentId)}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ bundleIds }),
@@ -412,7 +412,7 @@ export function SkillsTab() {
     setSkillsList(updated);
 
     try {
-      const res = await hanaFetch(`/api/agents/${encodeURIComponent(agentId)}/skills/${encodeURIComponent(name)}`, {
+      const res = await lingxiFetch(`/api/agents/${encodeURIComponent(agentId)}/skills/${encodeURIComponent(name)}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ enabled: enable }),
@@ -449,7 +449,7 @@ export function SkillsTab() {
       : item));
 
     try {
-      const res = await hanaFetch(`/api/agents/${encodeURIComponent(agentId)}/skill-bundles/${encodeURIComponent(bundle.id)}`, {
+      const res = await lingxiFetch(`/api/agents/${encodeURIComponent(agentId)}/skill-bundles/${encodeURIComponent(bundle.id)}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ enabled: enable }),
@@ -482,7 +482,7 @@ export function SkillsTab() {
     if (!folder) return;
     const newPaths = [...externalPathsData.configured, folder];
     try {
-      await hanaFetch('/api/skills/external-paths', {
+      await lingxiFetch('/api/skills/external-paths', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ paths: newPaths }),
@@ -498,7 +498,7 @@ export function SkillsTab() {
   const removeExternalPath = async (pathToRemove: string) => {
     const newPaths = externalPathsData.configured.filter(p => p !== pathToRemove);
     try {
-      await hanaFetch('/api/skills/external-paths', {
+      await lingxiFetch('/api/skills/external-paths', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ paths: newPaths }),

@@ -4,7 +4,7 @@
  * 从 InputArea.tsx 提取，减少主组件体量。
  */
 
-import { hanaFetch } from '../../hooks/use-hana-fetch';
+import { lingxiFetch } from '../../hooks/use-hana-fetch';
 import { getWebSocket } from '../../services/websocket';
 import { useStore } from '../../stores';
 
@@ -130,7 +130,7 @@ export function executeDiary(
 
     void (async () => {
       try {
-        const res = await hanaFetch('/api/diary/write', {
+        const res = await lingxiFetch('/api/diary/write', {
           method: 'POST',
           timeout: DIARY_WRITE_TIMEOUT_MS,
           throwOnHttpError: false,

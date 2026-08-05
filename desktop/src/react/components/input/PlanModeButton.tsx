@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { hanaFetch } from '../../hooks/use-hana-fetch';
+import { lingxiFetch } from '../../hooks/use-hana-fetch';
 import { useI18n } from '../../hooks/use-i18n';
 import { useStore } from '../../stores';
 import styles from './InputArea.module.css';
@@ -73,7 +73,7 @@ export function PlanModeButton({ mode, onChange, locked = false }: {
       const pendingNewSession = state.pendingNewSession === true;
       const sessionPath = pendingNewSession ? null : state.currentSessionPath;
       if (pendingNewSession) {
-        const res = await hanaFetch('/api/preferences/session-permission-default', {
+        const res = await lingxiFetch('/api/preferences/session-permission-default', {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ permissionMode: nextMode }),
@@ -87,7 +87,7 @@ export function PlanModeButton({ mode, onChange, locked = false }: {
         pendingNewSession,
         ...(sessionPath ? { sessionPath } : {}),
       };
-      const res = await hanaFetch('/api/session-permission-mode', {
+      const res = await lingxiFetch('/api/session-permission-mode', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),

@@ -421,7 +421,7 @@ export function createDeskRoute(engine, hub) {
   }
 
   // engine.media (core/media/universal-media-manager.ts) is the sole runtime
-  // source: it is constructed unconditionally by HanaEngine, so its absence
+  // source: it is constructed unconditionally by LingxiEngine, so its absence
   // here means genuinely unavailable, never "ask the plugin manager instead".
   function getImageGenerationRuntime() {
     if (!engine.media) return null;

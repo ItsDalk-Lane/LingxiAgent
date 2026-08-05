@@ -2,10 +2,10 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import fs from "fs";
 import os from "os";
 import path from "path";
-import { HanaEngine } from "../core/engine.ts";
+import { LingxiEngine } from "../core/engine.ts";
 import { SettingsManager } from "../lib/pi-sdk/index.ts";
 
-describe("HanaEngine resource loader options", () => {
+describe("LingxiEngine resource loader options", () => {
   let tempRoot: string | null = null;
 
   afterEach(() => {
@@ -17,7 +17,7 @@ describe("HanaEngine resource loader options", () => {
   it("uses explicit Hana-owned Pi SDK cwd, agentDir, and in-memory Pi settings", () => {
     const settings = { kind: "in-memory-settings" };
     const inMemory = vi.spyOn(SettingsManager, "inMemory").mockReturnValue(settings as any);
-    const engine = Object.create(HanaEngine.prototype);
+    const engine = Object.create(LingxiEngine.prototype);
     tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "hana-resource-loader-options-"));
     engine.hanakoHome = path.join(tempRoot, "hanako-home");
     engine._agentMgr = {

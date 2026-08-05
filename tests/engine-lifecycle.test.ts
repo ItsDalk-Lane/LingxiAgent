@@ -2,16 +2,16 @@ import fs from "fs";
 import os from "os";
 import path from "path";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { HanaEngine } from "../core/engine.ts";
+import { LingxiEngine } from "../core/engine.ts";
 import { autoProjectIdForCwd, UNCATEGORIZED_PROJECT_ID } from "../shared/session-projects.ts";
 
 // ---------------------------------------------------------------------------
 // Computer Use lazy runtime
 // ---------------------------------------------------------------------------
 
-describe("HanaEngine Computer Use lazy runtime", () => {
+describe("LingxiEngine Computer Use lazy runtime", () => {
   let tmpDir = null;
-  let engines: HanaEngine[] = [];
+  let engines: LingxiEngine[] = [];
 
   afterEach(async () => {
     for (const engine of engines.splice(0).reverse()) {
@@ -21,18 +21,18 @@ describe("HanaEngine Computer Use lazy runtime", () => {
     tmpDir = null;
   });
 
-  function trackEngine(engine: HanaEngine) {
+  function trackEngine(engine: LingxiEngine) {
     engines.push(engine);
     return engine;
   }
 
-  function untrackEngine(engine: HanaEngine) {
+  function untrackEngine(engine: LingxiEngine) {
     engines = engines.filter((candidate) => candidate !== engine);
   }
 
   function createEngine() {
     tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "hana-engine-computer-use-"));
-    return trackEngine(new HanaEngine({
+    return trackEngine(new LingxiEngine({
       hanakoHome: tmpDir,
       productDir: tmpDir,
       agentId: "hana",
@@ -85,7 +85,7 @@ describe("HanaEngine Computer Use lazy runtime", () => {
       },
     });
 
-    const restarted = trackEngine(new HanaEngine({
+    const restarted = trackEngine(new LingxiEngine({
       hanakoHome: tmpDir,
       productDir: tmpDir,
       agentId: "hana",
@@ -114,7 +114,7 @@ function names(factories) {
 }
 
 function makeEngine({ pluginFactories = [] } = {}) {
-  const engine = Object.create(HanaEngine.prototype);
+  const engine = Object.create(LingxiEngine.prototype);
   engine._coreExtensionFactories = [
     makeFactory("core-provider"),
     makeFactory("core-image"),
@@ -131,7 +131,7 @@ function makeEngine({ pluginFactories = [] } = {}) {
   return engine;
 }
 
-describe("HanaEngine extension factories", () => {
+describe("LingxiEngine extension factories", () => {
   it("reloads ResourceLoader after plugin extension factories are synced", async () => {
     const engine = makeEngine({
       pluginFactories: [makeFactory("plugin-a")],
@@ -182,9 +182,9 @@ describe("HanaEngine extension factories", () => {
 // Session API
 // ---------------------------------------------------------------------------
 
-describe("HanaEngine session API", () => {
+describe("LingxiEngine session API", () => {
   it("exposes session model switch state without leaking coordinator internals", () => {
-    const engine = Object.create(HanaEngine.prototype);
+    const engine = Object.create(LingxiEngine.prototype);
     engine._sessionCoord = {
       isSessionSwitching: vi.fn(() => true),
     };
@@ -194,7 +194,7 @@ describe("HanaEngine session API", () => {
   });
 
   it("deletes a project by moving explicit and cwd-derived sessions to uncategorized", async () => {
-    const engine = Object.create(HanaEngine.prototype);
+    const engine = Object.create(LingxiEngine.prototype);
     const cwdProjectId = autoProjectIdForCwd("/tmp/project-hana");
     engine._sessionProjects = {
       deleteProject: vi.fn(() => ({ folders: [], projects: [] })),

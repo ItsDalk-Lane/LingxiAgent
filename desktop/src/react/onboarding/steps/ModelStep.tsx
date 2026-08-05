@@ -8,12 +8,12 @@ import type { SelectOption } from '@/ui';
 import { Toggle } from '../../settings/widgets/Toggle';
 import { lookupReferenceModelMeta } from '../../utils/model-metadata';
 import { describeOnboardingError, loadModels as loadModelsAction, saveModel as saveModelAction } from '../onboarding-actions';
-import type { AddedModelEntry, AddedModelObject, DiscoveredModel, HanaFetch, OnboardingVerificationPlan } from '../onboarding-actions';
+import type { AddedModelEntry, AddedModelObject, DiscoveredModel, LingxiFetch, OnboardingVerificationPlan } from '../onboarding-actions';
 import { StepContainer } from '../onboarding-ui';
 
 interface ModelStepProps {
   preview: boolean;
-  hanaFetch: HanaFetch;
+  lingxiFetch: LingxiFetch;
   agentId: string;
   verificationPlan: OnboardingVerificationPlan;
   providerName: string;
@@ -86,7 +86,7 @@ function draftFromDiscoveredModel(model: DiscoveredModel): AddedModelDraft {
 }
 
 export function ModelStep({
-  preview, hanaFetch, agentId, verificationPlan, providerName, providerUrl, providerApi, apiKey,
+  preview, lingxiFetch, agentId, verificationPlan, providerName, providerUrl, providerApi, apiKey,
   goToStep, showError,
 }: ModelStepProps) {
   const [fetchedModels, setFetchedModels] = useState<DiscoveredModel[]>([]);
@@ -120,7 +120,7 @@ export function ModelStep({
 
       setModelLoading(t('onboarding.model.loading'));
       try {
-        const result = await loadModelsAction({ hanaFetch, providerName, providerUrl, providerApi, apiKey });
+        const result = await loadModelsAction({ lingxiFetch, providerName, providerUrl, providerApi, apiKey });
         if (result.error) {
           setModelLoading(result.error);
           return;
@@ -138,7 +138,7 @@ export function ModelStep({
       }
     };
     doLoad();
-  }, [preview, hanaFetch, providerName, providerUrl, providerApi, apiKey]);
+  }, [preview, lingxiFetch, providerName, providerUrl, providerApi, apiKey]);
 
   const addedModelIds = new Set(addedModels.map(model => model.id));
   const availableModels = fetchedModels.filter(model => !addedModelIds.has(model.id));
@@ -276,7 +276,7 @@ export function ModelStep({
     if (!canContinue) return;
     try {
       await saveModelAction({
-        hanaFetch, agentId, selectedModel, providerName,
+        lingxiFetch, agentId, selectedModel, providerName,
         addedModels: addedModels.map(toSavedModelEntry),
         selectedUtility, selectedUtilityLarge,
         verificationPlan,
@@ -286,7 +286,7 @@ export function ModelStep({
       console.error('[onboarding] save model failed:', err);
       showError(describeOnboardingError(err, t('onboarding.error')));
     }
-  }, [preview, canContinue, hanaFetch, agentId, selectedModel, providerName, addedModels, selectedUtility, selectedUtilityLarge, verificationPlan, goToStep, showError]);
+  }, [preview, canContinue, lingxiFetch, agentId, selectedModel, providerName, addedModels, selectedUtility, selectedUtilityLarge, verificationPlan, goToStep, showError]);
 
   return (
     <StepContainer>

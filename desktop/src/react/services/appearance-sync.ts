@@ -1,6 +1,6 @@
 import registry from '../../shared/theme-registry';
 import { isPaperTextureEnabled } from '../../shared/appearance-preferences';
-import { hanaFetch } from '../hooks/use-hana-fetch';
+import { lingxiFetch } from '../hooks/use-hana-fetch';
 
 export interface SyncedAppearancePreferences {
   theme?: string;
@@ -34,7 +34,7 @@ export function applySyncedAppearancePreferences(preferences?: SyncedAppearanceP
 export async function persistAppearancePreferences(
   preferences: SyncedAppearancePreferences = readBrowserAppearancePreferences(),
 ): Promise<void> {
-  await hanaFetch('/api/preferences/appearance', {
+  await lingxiFetch('/api/preferences/appearance', {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(preferences),

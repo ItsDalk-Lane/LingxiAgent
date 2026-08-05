@@ -22,7 +22,7 @@
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import s from './InteractiveCard.module.css';
 import { useStore } from '../../stores';
-import { hanaFetch, hanaUrl } from '../../hooks/use-hana-fetch';
+import { lingxiFetch, lingxiUrl } from '../../hooks/use-hana-fetch';
 
 // ── 宿主注入 iframe 的主题 CSS 变量 ──
 // 从 document root 的 computed style 中提取，随注册 PUT 给 server 注入到 iframe :root。
@@ -79,13 +79,13 @@ export const InteractiveCard = memo(function InteractiveCard({ block }: Interact
     const varsCss = collectThemeVars();
     (async () => {
       try {
-        await hanaFetch(`/api/cards/${encodeURIComponent(cardId)}`, {
+        await lingxiFetch(`/api/cards/${encodeURIComponent(cardId)}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ code: block.code, title: block.title, varsCss }),
         });
         if (cancelled) return;
-        const base = hanaUrl(`/api/cards/${encodeURIComponent(cardId)}`);
+        const base = lingxiUrl(`/api/cards/${encodeURIComponent(cardId)}`);
         verRef.current += 1;
         const sep = base.includes('?') ? '&' : '?';
         setSrc(`${base}${sep}v=${verRef.current}`);

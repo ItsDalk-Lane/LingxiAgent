@@ -5,7 +5,7 @@ import {
 } from './session-slice';
 import { loadSessions, switchSession } from './session-actions';
 import type { ChatMessage } from './chat-types';
-import { hanaFetch } from '../hooks/use-hana-fetch';
+import { lingxiFetch } from '../hooks/use-hana-fetch';
 import { collectUiContext } from '../utils/ui-context';
 import { errorWithCode, presentError } from '../errors/error-presenter';
 import { errorCodeFromResponseBody } from '../../../../shared/error-user-messages.ts';
@@ -86,7 +86,7 @@ export async function retrySessionTurn(
     const identity = resolveSessionIdentity(sessionPath);
     const { message, replacementText } = options;
 
-    const response = await hanaFetch('/api/sessions/turns/retry', {
+    const response = await lingxiFetch('/api/sessions/turns/retry', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       timeout: SESSION_NODE_ACTION_TIMEOUT_MS,
@@ -118,7 +118,7 @@ export async function forkSessionTurn(
     const state = useStore.getState();
     if (sessionScopedListIncludes(state, state.streamingSessions, sessionPath)) return null;
     const identity = resolveSessionIdentity(sessionPath);
-    const response = await hanaFetch('/api/sessions/fork', {
+    const response = await lingxiFetch('/api/sessions/fork', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       timeout: SESSION_NODE_ACTION_TIMEOUT_MS,

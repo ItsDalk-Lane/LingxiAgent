@@ -102,8 +102,8 @@ vi.mock('../../stores', () => ({
 }));
 
 vi.mock('../../hooks/use-hana-fetch', () => ({
-  hanaFetch: vi.fn(),
-  hanaUrl: (p: string) => p,
+  lingxiFetch: vi.fn(),
+  lingxiUrl: (p: string) => p,
 }));
 
 vi.mock('../../utils/history-builder', () => ({
@@ -282,7 +282,7 @@ function installStoreMethods() {
   s.setSessionMetaRecovery = vi.fn((status: unknown) => { mockState.metaRecovery = status; });
 }
 
-import { hanaFetch } from '../../hooks/use-hana-fetch';
+import { lingxiFetch } from '../../hooks/use-hana-fetch';
 import { clearChat } from '../../stores/agent-actions';
 import { loadDeskFiles } from '../../stores/desk-actions';
 import { bumpMessageLiveVersion, clearMessageLiveVersion } from '../../stores/message-live-version';
@@ -303,7 +303,7 @@ import {
 } from '../../stores/session-actions';
 import { snapshotStreamBuffer } from '../../stores/stream-invalidator';
 
-const mockFetch = vi.mocked(hanaFetch);
+const mockFetch = vi.mocked(lingxiFetch);
 const mockClearChat = vi.mocked(clearChat);
 const mockLoadDeskFiles = vi.mocked(loadDeskFiles);
 const mockSnapshot = vi.mocked(snapshotStreamBuffer);

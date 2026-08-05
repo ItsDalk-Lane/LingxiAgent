@@ -37,8 +37,8 @@ describe("local startup contract", () => {
     const serverSource = fs.readFileSync(path.join(ROOT, "server", "index.ts"), "utf-8");
 
     expect(cliSource).toContain("./cli/entry.ts");
-    expect(cliSource).not.toContain("HanaEngine");
-    expect(cliEntrySource).not.toContain("HanaEngine");
+    expect(cliSource).not.toContain("LingxiEngine");
+    expect(cliEntrySource).not.toContain("LingxiEngine");
     expect(launchSource).toContain('"cli/entry.ts"');
     expect(serverSource).not.toContain("ensureHanaPiSdkDirs");
     expect(serverSource).not.toContain("configureProcessPiSdkEnv");

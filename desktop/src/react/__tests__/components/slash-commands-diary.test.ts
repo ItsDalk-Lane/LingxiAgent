@@ -1,10 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('../../hooks/use-hana-fetch', () => ({
-  hanaFetch: vi.fn(),
+  lingxiFetch: vi.fn(),
 }));
 
-import { hanaFetch } from '../../hooks/use-hana-fetch';
+import { lingxiFetch } from '../../hooks/use-hana-fetch';
 
 const t = (key: string) => key;
 
@@ -18,7 +18,7 @@ beforeEach(async () => {
 
 describe('executeDiary', () => {
   it('runs diary writing in the background and reports progress through toast', async () => {
-    vi.mocked(hanaFetch).mockResolvedValue({
+    vi.mocked(lingxiFetch).mockResolvedValue({
       ok: true,
       json: async () => ({}),
     } as Response);
@@ -37,7 +37,7 @@ describe('executeDiary', () => {
       dedupeKey: 'slash-diary-progress',
     });
 
-    await vi.waitFor(() => expect(hanaFetch).toHaveBeenCalledWith('/api/diary/write', {
+    await vi.waitFor(() => expect(lingxiFetch).toHaveBeenCalledWith('/api/diary/write', {
       method: 'POST',
       timeout: 150_000,
       throwOnHttpError: false,
@@ -47,7 +47,7 @@ describe('executeDiary', () => {
   });
 
   it('keeps the progress toast cleanup and failure toast when diary writing fails', async () => {
-    vi.mocked(hanaFetch).mockRejectedValue(new Error('request aborted'));
+    vi.mocked(lingxiFetch).mockRejectedValue(new Error('request aborted'));
     const addToast = vi.fn().mockReturnValue(42);
     const removeToast = vi.fn();
     const setInput = vi.fn();
@@ -55,7 +55,7 @@ describe('executeDiary', () => {
 
     executeDiary(t, addToast, removeToast, setInput, setMenuOpen)();
 
-    await vi.waitFor(() => expect(hanaFetch).toHaveBeenCalledWith('/api/diary/write', {
+    await vi.waitFor(() => expect(lingxiFetch).toHaveBeenCalledWith('/api/diary/write', {
       method: 'POST',
       timeout: 150_000,
       throwOnHttpError: false,
@@ -65,7 +65,7 @@ describe('executeDiary', () => {
   });
 
   it('shows the server error body when diary writing returns a non-2xx response', async () => {
-    vi.mocked(hanaFetch).mockResolvedValue({
+    vi.mocked(lingxiFetch).mockResolvedValue({
       ok: false,
       json: async () => ({ error: '日记材料准备失败: simulated summary failure' }),
     } as Response);
@@ -76,7 +76,7 @@ describe('executeDiary', () => {
 
     executeDiary(t, addToast, removeToast, setInput, setMenuOpen)();
 
-    await vi.waitFor(() => expect(hanaFetch).toHaveBeenCalledWith('/api/diary/write', {
+    await vi.waitFor(() => expect(lingxiFetch).toHaveBeenCalledWith('/api/diary/write', {
       method: 'POST',
       timeout: 150_000,
       throwOnHttpError: false,

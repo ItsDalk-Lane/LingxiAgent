@@ -7,7 +7,7 @@
 
 import { memo, useState, useCallback, useMemo } from 'react';
 import styles from './Chat.module.css';
-import { hanaFetch } from '../../hooks/use-hana-fetch';
+import { lingxiFetch } from '../../hooks/use-hana-fetch';
 import { useI18n } from '../../hooks/use-i18n';
 import registry from '../../../shared/theme-registry';
 
@@ -92,7 +92,7 @@ export const SettingsConfirmCard = memo(function SettingsConfirmCard(props: Prop
 
   const handleConfirm = useCallback(async () => {
     try {
-      await hanaFetch(`/api/confirm/${confirmId}`, {
+      await lingxiFetch(`/api/confirm/${confirmId}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'confirmed', value: editValue }),
@@ -103,7 +103,7 @@ export const SettingsConfirmCard = memo(function SettingsConfirmCard(props: Prop
 
   const handleReject = useCallback(async () => {
     try {
-      await hanaFetch(`/api/confirm/${confirmId}`, {
+      await lingxiFetch(`/api/confirm/${confirmId}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'rejected' }),

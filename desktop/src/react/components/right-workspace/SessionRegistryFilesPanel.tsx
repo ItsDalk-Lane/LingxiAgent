@@ -13,7 +13,7 @@ import {
 } from '../../services/resource-access';
 import { resolveServerConnection } from '../../services/server-connection';
 import { takeMarkdownFileScreenshot } from '../../utils/screenshot';
-import { hanaFetch } from '../../hooks/use-hana-fetch';
+import { lingxiFetch } from '../../hooks/use-hana-fetch';
 import { FileKindIcon } from '../shared/FileKindIcon';
 import {
   clearAppFileDragPayload,
@@ -480,7 +480,7 @@ export function SessionRegistryFilesPanel() {
       const targets: BridgeSendTarget[] = [];
       await Promise.all(bridgeAgents.map(async agent => {
         await Promise.all(BRIDGE_PLATFORMS.map(async platform => {
-          const res = await hanaFetch(`/api/bridge/sessions?platform=${encodeURIComponent(platform)}&agentId=${encodeURIComponent(agent.id)}`);
+          const res = await lingxiFetch(`/api/bridge/sessions?platform=${encodeURIComponent(platform)}&agentId=${encodeURIComponent(agent.id)}`);
           const data = await res.json().catch(() => ({ sessions: [] }));
           const sessions = Array.isArray(data.sessions) ? data.sessions as BridgeSessionSummary[] : [];
           for (const session of sessions) {
@@ -520,7 +520,7 @@ export function SessionRegistryFilesPanel() {
     const targetLabel = bridgeTargetLabel(target);
     try {
       for (const file of sendableFiles) {
-        const res = await hanaFetch(`/api/bridge/send-media?agentId=${encodeURIComponent(target.agentId)}`, {
+        const res = await lingxiFetch(`/api/bridge/send-media?agentId=${encodeURIComponent(target.agentId)}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({

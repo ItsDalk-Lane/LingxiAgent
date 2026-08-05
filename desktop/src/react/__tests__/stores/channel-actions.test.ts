@@ -47,12 +47,12 @@ vi.mock('../../stores', () => ({
 }));
 
 vi.mock('../../hooks/use-hana-fetch', () => ({
-  hanaFetch: vi.fn(),
+  lingxiFetch: vi.fn(),
 }));
 
-import { hanaFetch } from '../../hooks/use-hana-fetch';
+import { lingxiFetch } from '../../hooks/use-hana-fetch';
 
-const mockFetch = vi.mocked(hanaFetch);
+const mockFetch = vi.mocked(lingxiFetch);
 
 describe('channel-actions', () => {
   beforeEach(() => {

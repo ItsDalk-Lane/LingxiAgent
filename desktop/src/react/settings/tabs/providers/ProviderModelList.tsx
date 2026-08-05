@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { useSettingsStore, type ProviderSummary } from '../../store';
-import { hanaFetch } from '../../api';
+import { lingxiFetch } from '../../api';
 import { invalidateConfigCache } from '../../../hooks/use-config';
 import { t, formatContext, lookupModelMeta } from '../../helpers';
 import { useAnchoredDropdown } from '../../hooks/useAnchoredDropdown';
@@ -133,7 +133,7 @@ export function ProviderModelList({ providerId, summary, onRefresh }: {
 
   const loadDiscoveredModels = async () => {
     try {
-      const res = await hanaFetch(`/api/providers/${encodeURIComponent(providerId)}/discovered-models`);
+      const res = await lingxiFetch(`/api/providers/${encodeURIComponent(providerId)}/discovered-models`);
       const data = await res.json();
       setDiscoveredModels(data.models || []);
     } catch {
@@ -156,7 +156,7 @@ export function ProviderModelList({ providerId, summary, onRefresh }: {
     try {
       const discovered = discoveredModels.find(model => model.id === mid);
       const nextEntry = discovered ? compactDiscoveredModelEntry(discovered) : mid;
-      await hanaFetch('/api/config', {
+      await lingxiFetch('/api/config', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ providers: { [providerId]: { models: [...rawModels, nextEntry] } } }),
@@ -172,7 +172,7 @@ export function ProviderModelList({ providerId, summary, onRefresh }: {
   const removeModelFromProvider = async (mid: string) => {
     try {
       const next = rawModels.filter((m: ProviderModelEntry) => modelIdOf(m) !== mid);
-      await hanaFetch('/api/config', {
+      await lingxiFetch('/api/config', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ providers: { [providerId]: { models: next } } }),
@@ -193,7 +193,7 @@ export function ProviderModelList({ providerId, summary, onRefresh }: {
       return;
     }
     try {
-      await hanaFetch('/api/config', {
+      await lingxiFetch('/api/config', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ providers: { [providerId]: { models: [...rawModels, id] } } }),
@@ -219,7 +219,7 @@ export function ProviderModelList({ providerId, summary, onRefresh }: {
   const fetchModels = async (btn: HTMLButtonElement | null) => {
     if (btn) btn.classList.add(styles['spinning']);
     try {
-      const res = await hanaFetch('/api/providers/fetch-models', {
+      const res = await lingxiFetch('/api/providers/fetch-models', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name: providerId, base_url: summary.base_url, api: summary.api }),

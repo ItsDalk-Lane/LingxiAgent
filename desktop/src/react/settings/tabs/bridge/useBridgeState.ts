@@ -3,7 +3,7 @@
  */
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useSettingsStore } from '../../store';
-import { hanaFetch } from '../../api';
+import { lingxiFetch } from '../../api';
 import { loadSettingsConfig, updateSettingsSnapshot } from '../../actions';
 import { t } from '../../helpers';
 import type { BridgePermissionMode, KnownUser } from './BridgeWidgets';
@@ -237,7 +237,7 @@ export function useBridgeState() {
       return;
     }
     const ac = new AbortController();
-    hanaFetch(`/api/agents/${selectedAgentId}/public-ishiki`, { signal: ac.signal })
+    lingxiFetch(`/api/agents/${selectedAgentId}/public-ishiki`, { signal: ac.signal })
       .then(r => r.json())
       .then(data => { setPublicIshiki(data.content || ''); setPublicIshikiOriginal(data.content || ''); })
       .catch(err => { if (err?.name !== 'AbortError') console.warn('[bridge] fetch public-ishiki failed:', err); });
@@ -248,7 +248,7 @@ export function useBridgeState() {
     const agentId = selectedAgentId;
     if (!agentId || publicIshiki === publicIshikiOriginal) return;
     try {
-      await hanaFetch(`/api/agents/${agentId}/public-ishiki`, {
+      await lingxiFetch(`/api/agents/${agentId}/public-ishiki`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ content: publicIshiki }),
@@ -273,7 +273,7 @@ export function useBridgeState() {
     if (!agentId) return null;
     const requestId = ++statusRequestIdRef.current;
     try {
-      const res = await hanaFetch(`/api/bridge/status?agentId=${encodeURIComponent(agentId)}`, signal ? { signal } : undefined);
+      const res = await lingxiFetch(`/api/bridge/status?agentId=${encodeURIComponent(agentId)}`, signal ? { signal } : undefined);
       const data = await res.json();
       if (
         signal?.aborted
@@ -362,7 +362,7 @@ export function useBridgeState() {
     const fieldSubmissions = captureFieldSubmissions(plat, credentials);
     try {
       const agentQuery = agentId ? `?agentId=${encodeURIComponent(agentId)}` : '';
-      await hanaFetch(`/api/bridge/config${agentQuery}`, {
+      await lingxiFetch(`/api/bridge/config${agentQuery}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ platform: plat, credentials, enabled }),
@@ -391,7 +391,7 @@ export function useBridgeState() {
     );
     try {
       const agentQuery = agentId ? `?agentId=${encodeURIComponent(agentId)}` : '';
-      const res = await hanaFetch(`/api/bridge/test${agentQuery}`, {
+      const res = await lingxiFetch(`/api/bridge/test${agentQuery}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ platform: plat, credentials, useSavedCredentials }),
@@ -424,7 +424,7 @@ export function useBridgeState() {
     const agentId = selectedAgentId;
     try {
       const agentQuery = agentId ? `?agentId=${encodeURIComponent(agentId)}` : '';
-      const res = await hanaFetch(`/api/bridge/owner${agentQuery}`, {
+      const res = await lingxiFetch(`/api/bridge/owner${agentQuery}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ platform: plat, userId: userId || null }),
@@ -447,7 +447,7 @@ export function useBridgeState() {
   const saveGlobalSettings = async (partial: { permissionMode?: BridgePermissionMode; readOnly?: boolean; receiptEnabled?: boolean; richStreamingEnabled?: boolean }) => {
     setGlobalSettingsSaving(true);
     try {
-      const res = await hanaFetch('/api/bridge/settings', {
+      const res = await lingxiFetch('/api/bridge/settings', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(partial),

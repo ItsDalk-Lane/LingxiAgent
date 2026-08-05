@@ -7,7 +7,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any -- API 响应 JSON 及 catch(err: any) */
 
 import { useStore } from './index';
-import { hanaFetch } from '../hooks/use-hana-fetch';
+import { lingxiFetch } from '../hooks/use-hana-fetch';
 import { hasServerConnection } from '../services/server-connection';
 import type { AgentPhoneActivity, AgentPhoneSettings, AgentPhoneToolMode, Channel, ChannelAgentActivities, ChannelMessage } from '../types';
 
@@ -20,8 +20,8 @@ export async function loadChannels(): Promise<void> {
   if (!hasServerConnection(s)) return;
   try {
     const [chRes, dmRes] = await Promise.all([
-      hanaFetch('/api/channels'),
-      hanaFetch('/api/dm'),
+      lingxiFetch('/api/channels'),
+      lingxiFetch('/api/dm'),
     ]);
 
     const chData = chRes.ok ? await chRes.json() : { channels: [] };
@@ -71,7 +71,7 @@ export async function loadConversationAgentActivities(conversationId: string): P
   const s = useStore.getState();
   if (!conversationId || !hasServerConnection(s)) return;
   try {
-    const res = await hanaFetch(`/api/conversations/${encodeURIComponent(conversationId)}/agent-activities`);
+    const res = await lingxiFetch(`/api/conversations/${encodeURIComponent(conversationId)}/agent-activities`);
     if (!res.ok) return;
     const data = await res.json();
     const activities = keyActivities(data.activities || []);
@@ -187,7 +187,7 @@ export async function loadConversationAgentPhoneSettings(conversationId: string)
   const s = useStore.getState();
   if (!conversationId || !hasServerConnection(s)) return;
   try {
-    const res = await hanaFetch(conversationPhoneSettingsUrl(conversationId));
+    const res = await lingxiFetch(conversationPhoneSettingsUrl(conversationId));
     if (!res.ok) {
       applyAgentPhoneSettings({
         mode: 'read_only',
@@ -226,7 +226,7 @@ export async function saveConversationAgentPhoneSettings(patch: Partial<AgentPho
   const s = useStore.getState();
   const conversationId = s.currentChannel;
   if (!conversationId || !hasServerConnection(s)) return;
-  const res = await hanaFetch(conversationPhoneSettingsUrl(conversationId), {
+  const res = await lingxiFetch(conversationPhoneSettingsUrl(conversationId), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -274,7 +274,7 @@ export async function openChannel(channelId: string, isDM?: boolean): Promise<vo
   try {
     if (isThisDM) {
       const ownerQuery = dmOwnerId ? `?agentId=${encodeURIComponent(dmOwnerId)}` : '';
-      const res = await hanaFetch(`/api/dm/${encodeURIComponent(peerId)}${ownerQuery}`);
+      const res = await lingxiFetch(`/api/dm/${encodeURIComponent(peerId)}${ownerQuery}`);
       if (res.ok) {
         const data = await res.json();
         const responseOwnerId = data.ownerAgentId || dmOwnerId;
@@ -300,7 +300,7 @@ export async function openChannel(channelId: string, isDM?: boolean): Promise<vo
       }
       // 404 = 没有历史，基本信息已在上方设置，不需要额外处理
     } else {
-      const res = await hanaFetch(`/api/channels/${encodeURIComponent(channelId)}`);
+      const res = await lingxiFetch(`/api/channels/${encodeURIComponent(channelId)}`);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
       const members = data.members || [];
@@ -328,7 +328,7 @@ export async function openChannel(channelId: string, isDM?: boolean): Promise<vo
       const msgs = messages;
       const lastMsg = msgs[msgs.length - 1];
       if (lastMsg) {
-        hanaFetch(`/api/channels/${encodeURIComponent(channelId)}/read`, {
+        lingxiFetch(`/api/channels/${encodeURIComponent(channelId)}/read`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ timestamp: lastMsg.timestamp }),
@@ -474,7 +474,7 @@ export function appendChannelMessage(
   useStore.setState(patch);
 
   if (shouldMarkRead) {
-    Promise.resolve(hanaFetch(`/api/channels/${encodeURIComponent(channelId)}/read`, {
+    Promise.resolve(lingxiFetch(`/api/channels/${encodeURIComponent(channelId)}/read`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ timestamp: message.timestamp }),
@@ -494,7 +494,7 @@ export async function sendChannelMessage(text: string): Promise<void> {
   const sender = s.userName || 'user';
 
   try {
-    const res = await hanaFetch(`/api/channels/${encodeURIComponent(channelId)}/messages`, {
+    const res = await lingxiFetch(`/api/channels/${encodeURIComponent(channelId)}/messages`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ body: text }),
@@ -526,7 +526,7 @@ export async function exportCurrentConversation(): Promise<string> {
   const conversationId = useStore.getState().currentChannel;
   if (!conversationId) throw new Error('No active conversation');
   const ownerQuery = conversationOwnerQuery(conversationId);
-  const res = await hanaFetch(`/api/conversations/${encodeURIComponent(conversationId)}/export${ownerQuery}`);
+  const res = await lingxiFetch(`/api/conversations/${encodeURIComponent(conversationId)}/export${ownerQuery}`);
   if (!res.ok) {
     const payload = await res.json().catch(() => null);
     throw new Error(payload?.error || `HTTP ${res.status}`);
@@ -554,7 +554,7 @@ export async function exportCurrentConversation(): Promise<string> {
 export async function deleteChannel(channelId: string): Promise<void> {
   const s = useStore.getState();
   try {
-    const res = await hanaFetch(`/api/channels/${encodeURIComponent(channelId)}`, {
+    const res = await lingxiFetch(`/api/channels/${encodeURIComponent(channelId)}`, {
       method: 'DELETE',
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -584,7 +584,7 @@ export async function deleteChannel(channelId: string): Promise<void> {
 // ══════════════════════════════════════════════════════
 
 export async function addChannelMember(channelId: string, memberId: string): Promise<void> {
-  const res = await hanaFetch(`/api/channels/${encodeURIComponent(channelId)}/members`, {
+  const res = await lingxiFetch(`/api/channels/${encodeURIComponent(channelId)}/members`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ memberId }),
@@ -597,7 +597,7 @@ export async function addChannelMember(channelId: string, memberId: string): Pro
 }
 
 export async function removeChannelMember(channelId: string, memberId: string): Promise<void> {
-  const res = await hanaFetch(`/api/channels/${encodeURIComponent(channelId)}/members/${encodeURIComponent(memberId)}`, {
+  const res = await lingxiFetch(`/api/channels/${encodeURIComponent(channelId)}/members/${encodeURIComponent(memberId)}`, {
     method: 'DELETE',
   });
   const data = await res.json().catch(() => ({}));
@@ -618,7 +618,7 @@ export async function toggleChannelsEnabled(): Promise<boolean | undefined> {
   const newEnabled = !s.channelsEnabled;
 
   try {
-    const res = await hanaFetch('/api/channels/toggle', {
+    const res = await lingxiFetch('/api/channels/toggle', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ enabled: newEnabled }),
@@ -660,7 +660,7 @@ export async function toggleChannelsEnabled(): Promise<boolean | undefined> {
 
 export async function createChannel(name: string, members: string[], intro?: string): Promise<string | null> {
   try {
-    const res = await hanaFetch('/api/channels', {
+    const res = await lingxiFetch('/api/channels', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

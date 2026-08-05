@@ -668,7 +668,7 @@
     ],
     "version": 3
   },
-  "payloadFingerprint": "sha256:a888d8bfcd5e1a2e691391805fe1c16c1c234d62ea543565f34b8c7c9dff0c4c",
+  "payloadFingerprint": "sha256:93a70ef4d8cadb1ebdd0920195bebb0c9abb8f49cdc16e312e593fcf73641e57",
   "registry": [
     {
       "affectedByEpochMigration": true,
@@ -3118,8 +3118,8 @@
   ],
   "review": {
     "classification": "compatible",
-    "compatibilityReason": "HANA_ env var prefix renamed to LINGXI_; data format unchanged",
-    "payloadFingerprint": "sha256:a888d8bfcd5e1a2e691391805fe1c16c1c234d62ea543565f34b8c7c9dff0c4c"
+    "compatibilityReason": "internal class rename HanaEngine->LingxiEngine, HanaFetch->LingxiFetch; data format unchanged",
+    "payloadFingerprint": "sha256:93a70ef4d8cadb1ebdd0920195bebb0c9abb8f49cdc16e312e593fcf73641e57"
   },
   "schemas": [
     {
@@ -3518,7 +3518,7 @@
       "contract": "server-info writer and desktop bootstrap reader",
       "kind": "runtime-contract",
       "module": "server/index.ts",
-      "sourceHash": "sha256:8af6559233dda945103b68649619491fe8436fe6cc1ed52711600fd832c079a6",
+      "sourceHash": "sha256:4823cfdabd78deeb3e5de1fe72ec162b81bd822811636a8da41c70af2a644c2d",
       "storeId": "server-runtime-info"
     },
     {

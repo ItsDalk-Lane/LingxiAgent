@@ -8,11 +8,11 @@ import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/re
 import '@testing-library/jest-dom/vitest';
 
 const mocks = vi.hoisted(() => ({
-  hanaFetch: vi.fn(),
+  lingxiFetch: vi.fn(),
 }));
 
 vi.mock('../../settings/api', () => ({
-  hanaFetch: (...args: unknown[]) => mocks.hanaFetch(...args),
+  lingxiFetch: (...args: unknown[]) => mocks.lingxiFetch(...args),
 }));
 
 vi.mock('../../settings/helpers', () => ({
@@ -89,7 +89,7 @@ function jsonResponse(body: unknown): Response {
 describe('MediaTab media config', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mocks.hanaFetch.mockImplementation((path: string) => {
+    mocks.lingxiFetch.mockImplementation((path: string) => {
       if (path === '/api/media/image/providers') {
         return Promise.resolve(jsonResponse({
           providers: {
@@ -128,7 +128,7 @@ describe('MediaTab media config', () => {
   it('keeps default model selectors in loading state until provider configs arrive', async () => {
     let resolveImageProviders: (response: Response) => void = () => {};
     let resolveSpeechProviders: (response: Response) => void = () => {};
-    mocks.hanaFetch.mockImplementation((path: string) => {
+    mocks.lingxiFetch.mockImplementation((path: string) => {
       if (path === '/api/media/image/providers') {
         return new Promise(resolve => {
           resolveImageProviders = resolve;
@@ -186,26 +186,26 @@ describe('MediaTab media config', () => {
 
     const select = await screen.findByLabelText('settings.media.defaultModel');
     await waitFor(() => {
-      expect(mocks.hanaFetch).toHaveBeenCalledWith('/api/media/image/providers');
+      expect(mocks.lingxiFetch).toHaveBeenCalledWith('/api/media/image/providers');
     });
 
     fireEvent.change(select, { target: { value: 'volcengine/seedream-5' } });
 
     await waitFor(() => {
-      expect(mocks.hanaFetch.mock.calls.some(([path]) => path === '/api/media/image/config')).toBe(true);
+      expect(mocks.lingxiFetch.mock.calls.some(([path]) => path === '/api/media/image/config')).toBe(true);
     });
-    const saveCall = mocks.hanaFetch.mock.calls.find(([path]) => path === '/api/media/image/config');
+    const saveCall = mocks.lingxiFetch.mock.calls.find(([path]) => path === '/api/media/image/config');
     expect(saveCall?.[1]).toMatchObject({ method: 'PUT' });
     expect(JSON.parse(String((saveCall?.[1] as RequestInit).body))).toEqual({
       values: {
         defaultImageModel: { provider: 'volcengine', id: 'seedream-5' },
       },
     });
-    expect(mocks.hanaFetch.mock.calls.map(call => String(call[0])).join('\n')).not.toContain('agentId=');
+    expect(mocks.lingxiFetch.mock.calls.map(call => String(call[0])).join('\n')).not.toContain('agentId=');
   });
 
   it('sends null to clear the global default model over HTTP', async () => {
-    mocks.hanaFetch.mockImplementation((path: string) => {
+    mocks.lingxiFetch.mockImplementation((path: string) => {
       if (path === '/api/media/image/providers') {
         return Promise.resolve(jsonResponse({
           providers: {
@@ -229,14 +229,14 @@ describe('MediaTab media config', () => {
     fireEvent.change(select, { target: { value: '' } });
 
     await waitFor(() => {
-      expect(mocks.hanaFetch).toHaveBeenCalledWith('/api/media/image/config', expect.objectContaining({
+      expect(mocks.lingxiFetch).toHaveBeenCalledWith('/api/media/image/config', expect.objectContaining({
         body: JSON.stringify({ values: { defaultImageModel: null } }),
       }));
     });
   });
 
   it('auto-selects the first credentialed image provider instead of the first provider in transport order', async () => {
-    mocks.hanaFetch.mockImplementation((path: string) => {
+    mocks.lingxiFetch.mockImplementation((path: string) => {
       if (path === '/api/media/image/providers') {
         return Promise.resolve(jsonResponse({
           providers: {
@@ -267,7 +267,7 @@ describe('MediaTab media config', () => {
   });
 
   it('switches the detail pane to speech recognition providers without falling back to image provider details', async () => {
-    mocks.hanaFetch.mockImplementation((path: string) => {
+    mocks.lingxiFetch.mockImplementation((path: string) => {
       if (path === '/api/media/image/providers') {
         return Promise.resolve(jsonResponse({
           providers: {
@@ -311,7 +311,7 @@ describe('MediaTab media config', () => {
   });
 
   it('does not offer image models with missing runtime adapters as selectable defaults', async () => {
-    mocks.hanaFetch.mockImplementation((path: string) => {
+    mocks.lingxiFetch.mockImplementation((path: string) => {
       if (path === '/api/media/image/providers') {
         return Promise.resolve(jsonResponse({
           providers: {
@@ -339,7 +339,7 @@ describe('MediaTab media config', () => {
   });
 
   it('surfaces runtime CLI discovery errors on provider and model choices', async () => {
-    mocks.hanaFetch.mockImplementation((path: string) => {
+    mocks.lingxiFetch.mockImplementation((path: string) => {
       if (path === '/api/media/image/providers') {
         return Promise.resolve(jsonResponse({
           providers: {
@@ -373,7 +373,7 @@ describe('MediaTab media config', () => {
 
   it('refreshes runtime CLI model choices when the app regains focus', async () => {
     let imageLoads = 0;
-    mocks.hanaFetch.mockImplementation((path: string) => {
+    mocks.lingxiFetch.mockImplementation((path: string) => {
       if (path === '/api/media/image/providers') {
         imageLoads += 1;
         const modelId = imageLoads === 1 ? 'jimeng-image-4.7' : 'jimeng-image-5.0';
@@ -410,7 +410,7 @@ describe('MediaTab media config', () => {
   });
 
   it('renders custom provider image models from the endpoint and offers them as selectable defaults (#1627)', async () => {
-    mocks.hanaFetch.mockImplementation((path: string) => {
+    mocks.lingxiFetch.mockImplementation((path: string) => {
       if (path === '/api/media/image/providers') {
         return Promise.resolve(jsonResponse({
           providers: {
@@ -443,7 +443,7 @@ describe('MediaTab media config', () => {
   });
 
   it('loads speech-recognition providers from the speech endpoint', async () => {
-    mocks.hanaFetch.mockImplementation((path: string) => {
+    mocks.lingxiFetch.mockImplementation((path: string) => {
       if (path === '/api/media/image/providers') {
         return Promise.resolve(jsonResponse({ providers: {}, config: {} }));
       }
@@ -467,12 +467,12 @@ describe('MediaTab media config', () => {
 
     expect(await screen.findByText('OpenAI Speech')).toBeInTheDocument();
     await waitFor(() => {
-      expect(mocks.hanaFetch).toHaveBeenCalledWith('/api/speech-recognition/providers');
+      expect(mocks.lingxiFetch).toHaveBeenCalledWith('/api/speech-recognition/providers');
     });
   });
 
   it('loads video generation providers and saves the default video model through the video config endpoint', async () => {
-    mocks.hanaFetch.mockImplementation((path: string) => {
+    mocks.lingxiFetch.mockImplementation((path: string) => {
       if (path === '/api/media/image/providers') {
         return Promise.resolve(jsonResponse({ providers: {}, config: {} }));
       }
@@ -510,7 +510,7 @@ describe('MediaTab media config', () => {
     fireEvent.change(select, { target: { value: 'agnes/agnes-video-v2.0' } });
 
     await waitFor(() => {
-      expect(mocks.hanaFetch).toHaveBeenCalledWith('/api/media/video/config', expect.objectContaining({
+      expect(mocks.lingxiFetch).toHaveBeenCalledWith('/api/media/video/config', expect.objectContaining({
         method: 'PUT',
         body: JSON.stringify({ values: { defaultVideoModel: { provider: 'agnes', id: 'agnes-video-v2.0' } } }),
       }));
@@ -518,7 +518,7 @@ describe('MediaTab media config', () => {
   });
 
   it('saves speech-recognition enabled state through the speech config endpoint', async () => {
-    mocks.hanaFetch.mockImplementation((path: string) => {
+    mocks.lingxiFetch.mockImplementation((path: string) => {
       if (path === '/api/media/image/providers') {
         return Promise.resolve(jsonResponse({ providers: {}, config: {} }));
       }
@@ -547,7 +547,7 @@ describe('MediaTab media config', () => {
     fireEvent.click(toggle);
 
     await waitFor(() => {
-      expect(mocks.hanaFetch).toHaveBeenCalledWith('/api/speech-recognition/config', expect.objectContaining({
+      expect(mocks.lingxiFetch).toHaveBeenCalledWith('/api/speech-recognition/config', expect.objectContaining({
         method: 'PUT',
         body: JSON.stringify({ values: { enabled: true } }),
       }));
@@ -555,7 +555,7 @@ describe('MediaTab media config', () => {
   });
 
   it('saves the default speech-recognition model through the speech config endpoint', async () => {
-    mocks.hanaFetch.mockImplementation((path: string) => {
+    mocks.lingxiFetch.mockImplementation((path: string) => {
       if (path === '/api/media/image/providers') {
         return Promise.resolve(jsonResponse({ providers: {}, config: {} }));
       }
@@ -586,9 +586,9 @@ describe('MediaTab media config', () => {
     fireEvent.change(select, { target: { value: 'openai/whisper-1' } });
 
     await waitFor(() => {
-      expect(mocks.hanaFetch.mock.calls.some(([path]) => path === '/api/speech-recognition/config')).toBe(true);
+      expect(mocks.lingxiFetch.mock.calls.some(([path]) => path === '/api/speech-recognition/config')).toBe(true);
     });
-    const saveCall = mocks.hanaFetch.mock.calls.find(([path]) => path === '/api/speech-recognition/config');
+    const saveCall = mocks.lingxiFetch.mock.calls.find(([path]) => path === '/api/speech-recognition/config');
     expect(saveCall?.[1]).toMatchObject({ method: 'PUT' });
     expect(JSON.parse(String((saveCall?.[1] as RequestInit).body))).toEqual({
       values: { defaultModel: { provider: 'openai', id: 'whisper-1' } },
@@ -596,7 +596,7 @@ describe('MediaTab media config', () => {
   });
 
   it('does not offer speech models without runnable adapters as selectable defaults', async () => {
-    mocks.hanaFetch.mockImplementation((path: string) => {
+    mocks.lingxiFetch.mockImplementation((path: string) => {
       if (path === '/api/media/image/providers') {
         return Promise.resolve(jsonResponse({ providers: {}, config: {} }));
       }
@@ -640,7 +640,7 @@ describe('MediaTab media config', () => {
         updatedAt: Date.now(),
       } as any,
     });
-    mocks.hanaFetch.mockImplementation((path: string) => {
+    mocks.lingxiFetch.mockImplementation((path: string) => {
       if (path === '/api/media/image/providers') {
         return Promise.resolve(jsonResponse({ providers: {}, config: {} }));
       }
@@ -654,7 +654,7 @@ describe('MediaTab media config', () => {
 
     const toggle = await screen.findByRole('switch', { name: '发送语音条时转录' });
     await waitFor(() => {
-      expect(mocks.hanaFetch).toHaveBeenCalledWith('/api/speech-recognition/providers');
+      expect(mocks.lingxiFetch).toHaveBeenCalledWith('/api/speech-recognition/providers');
     });
     expect(toggle).toHaveAttribute('aria-checked', 'true');
   });

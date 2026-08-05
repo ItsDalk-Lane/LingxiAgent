@@ -5,7 +5,7 @@
  */
 
 import { useStore } from '../stores';
-import { hanaFetch } from '../hooks/use-hana-fetch';
+import { lingxiFetch } from '../hooks/use-hana-fetch';
 import { errorBus } from '../../../../shared/error-bus.ts';
 import { AppError } from '../../../../shared/errors.ts';
 
@@ -25,7 +25,7 @@ export function showError(message: string): void {
 
 export async function loadModels(): Promise<void> {
   try {
-    const res = await hanaFetch('/api/models');
+    const res = await lingxiFetch('/api/models');
     const data = await res.json();
     const { pendingNewSession } = useStore.getState();
     const activeModel = data.activeModel;

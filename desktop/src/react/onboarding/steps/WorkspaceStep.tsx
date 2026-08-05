@@ -9,7 +9,7 @@ import {
   loadDefaultWorkspace,
   saveWorkspace,
 } from '../onboarding-actions';
-import type { HanaFetch, OnboardingVerificationPlan } from '../onboarding-actions';
+import type { LingxiFetch, OnboardingVerificationPlan } from '../onboarding-actions';
 import { StepContainer, Multiline } from '../onboarding-ui';
 
 const WorkspaceIcon = () => (
@@ -22,14 +22,14 @@ const WorkspaceIcon = () => (
 
 interface WorkspaceStepProps {
   preview: boolean;
-  hanaFetch: HanaFetch;
+  lingxiFetch: LingxiFetch;
   agentId: string;
   verificationPlan: OnboardingVerificationPlan;
   goToStep: (index: number) => void;
   showError: (msg: string) => void;
 }
 
-export function WorkspaceStep({ preview, hanaFetch, agentId, verificationPlan, goToStep, showError }: WorkspaceStepProps) {
+export function WorkspaceStep({ preview, lingxiFetch, agentId, verificationPlan, goToStep, showError }: WorkspaceStepProps) {
   const previewPath = useMemo(() => `~/Desktop/${DEFAULT_WORKSPACE_DIRNAME}`, []);
   const [defaultPath, setDefaultPath] = useState(preview ? previewPath : '');
   const [selectedPath, setSelectedPath] = useState('');
@@ -41,7 +41,7 @@ export function WorkspaceStep({ preview, hanaFetch, agentId, verificationPlan, g
   useEffect(() => {
     if (preview) return;
     let cancelled = false;
-    loadDefaultWorkspace(hanaFetch)
+    loadDefaultWorkspace(lingxiFetch)
       .then(path => {
         if (cancelled) return;
         setDefaultPath(path);
@@ -51,7 +51,7 @@ export function WorkspaceStep({ preview, hanaFetch, agentId, verificationPlan, g
         showError(describeOnboardingError(err, t('onboarding.error')));
       });
     return () => { cancelled = true; };
-  }, [preview, hanaFetch, showError]);
+  }, [preview, lingxiFetch, showError]);
 
   const onBrowse = useCallback(async () => {
     const folder = await window.platform?.selectFolder?.();
@@ -67,14 +67,14 @@ export function WorkspaceStep({ preview, hanaFetch, agentId, verificationPlan, g
     if (!defaultPath || !visiblePath) return;
     setSaving(true);
     try {
-      await saveWorkspace({ hanaFetch, agentId, workspacePath: visiblePath, defaultPath, verificationPlan });
+      await saveWorkspace({ lingxiFetch, agentId, workspacePath: visiblePath, defaultPath, verificationPlan });
       goToStep(5);
     } catch (err) {
       console.error('[onboarding] save workspace failed:', err);
       showError(describeOnboardingError(err, t('onboarding.error')));
       setSaving(false);
     }
-  }, [preview, goToStep, defaultPath, visiblePath, hanaFetch, agentId, verificationPlan, showError]);
+  }, [preview, goToStep, defaultPath, visiblePath, lingxiFetch, agentId, verificationPlan, showError]);
 
   return (
     <StepContainer>

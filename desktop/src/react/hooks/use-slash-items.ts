@@ -1,5 +1,5 @@
 import { useMemo, useEffect, useState } from 'react';
-import { hanaFetch } from './use-hana-fetch';
+import { lingxiFetch } from './use-hana-fetch';
 import { useStore } from '../stores';
 import { getSkillIcon } from '../utils/skill-icons';
 import type { SlashItem } from '../components/input/slash-commands';
@@ -48,7 +48,7 @@ export function useSkillSlashItems({
     }
     let cancelled = false;
     setSkills([]);
-    hanaFetch(`/api/skills?agentId=${encodeURIComponent(agentId)}&runtime=1`)
+    lingxiFetch(`/api/skills?agentId=${encodeURIComponent(agentId)}&runtime=1`)
       .then(r => r.json())
       .then(data => {
         if (!cancelled && data.skills) setSkills(data.skills);
@@ -97,7 +97,7 @@ export function useServerSlashCommandItems({
     let cancelled = false;
     setCommands([]);
     const query = agentId ? `?agentId=${encodeURIComponent(agentId)}` : '';
-    hanaFetch(`/api/commands${query}`)
+    lingxiFetch(`/api/commands${query}`)
       .then(r => r.json())
       .then(data => {
         if (!cancelled && Array.isArray(data.commands)) setCommands(data.commands);

@@ -9,10 +9,10 @@ import { InterfaceTab } from '../InterfaceTab';
 import { useSettingsStore } from '../../store';
 import registry from '../../../../shared/theme-registry';
 
-const hanaFetchMock = vi.fn();
+const lingxiFetchMock = vi.fn();
 
 vi.mock('../../api', () => ({
-  hanaFetch: (...args: unknown[]) => hanaFetchMock(...args),
+  lingxiFetch: (...args: unknown[]) => lingxiFetchMock(...args),
 }));
 
 vi.mock('../../../services/appearance-sync', () => ({
@@ -66,7 +66,7 @@ describe('InterfaceTab appearance state', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    hanaFetchMock.mockImplementation(async (path: string, init?: RequestInit) => {
+    lingxiFetchMock.mockImplementation(async (path: string, init?: RequestInit) => {
       if (path === '/api/preferences/sidebar-ui' && init?.method === 'PUT') {
         return {
           json: async () => ({
@@ -272,7 +272,7 @@ describe('InterfaceTab appearance state', () => {
     fireEvent.click(densitySwitch);
 
     await waitFor(() => {
-      expect(hanaFetchMock).toHaveBeenCalledWith('/api/preferences/sidebar-ui', expect.objectContaining({
+      expect(lingxiFetchMock).toHaveBeenCalledWith('/api/preferences/sidebar-ui', expect.objectContaining({
         method: 'PUT',
         body: JSON.stringify({ sessionList: { rowMode: 'single-line' } }),
       }));

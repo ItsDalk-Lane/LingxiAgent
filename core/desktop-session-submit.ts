@@ -400,7 +400,7 @@ export async function submitDesktopSessionMessage(engine: any, opts: {
           afterInputAccepted: onInputAccepted,
         });
       } else {
-        // Compatibility for older embedders. HanaEngine always takes the guarded path above.
+        // Compatibility for older embedders. LingxiEngine always takes the guarded path above.
         afterCachePreflight();
         await engine.promptSession(sessionPath, promptText, promptOpts);
       }

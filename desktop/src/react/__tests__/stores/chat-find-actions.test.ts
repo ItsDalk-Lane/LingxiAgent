@@ -1,11 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const { hanaFetchMock, switchSessionMock } = vi.hoisted(() => ({
-  hanaFetchMock: vi.fn(),
+const { lingxiFetchMock, switchSessionMock } = vi.hoisted(() => ({
+  lingxiFetchMock: vi.fn(),
   switchSessionMock: vi.fn(),
 }));
 
-vi.mock('../../hooks/use-hana-fetch', () => ({ hanaFetch: hanaFetchMock }));
+vi.mock('../../hooks/use-hana-fetch', () => ({ lingxiFetch: lingxiFetchMock }));
 vi.mock('../../stores/session-actions', () => ({ switchSession: switchSessionMock }));
 
 import { useStore } from '../../stores';
@@ -24,14 +24,14 @@ const SAMPLE = {
 
 describe('chat-find-actions', () => {
   beforeEach(() => {
-    hanaFetchMock.mockReset();
+    lingxiFetchMock.mockReset();
     switchSessionMock.mockReset();
     useStore.setState({ chatFindBySession: {}, pendingMessageLocate: null, currentSessionPath: PATH });
   });
 
   it('runChatFind 写结果并把定位意图指向最新命中', async () => {
     useStore.getState().openChatFind(PATH, 'x');
-    hanaFetchMock.mockResolvedValue(findResponse(SAMPLE));
+    lingxiFetchMock.mockResolvedValue(findResponse(SAMPLE));
     await runChatFind(PATH, 'x');
     const st = useStore.getState().chatFindBySession[PATH];
     expect(st.matches.length).toBe(2);
@@ -41,7 +41,7 @@ describe('chat-find-actions', () => {
 
   it('runChatFind 不给已离开的会话种定位意图（切换窗口内 debounce 残留）', async () => {
     useStore.getState().openChatFind(PATH, 'x');
-    hanaFetchMock.mockResolvedValue(findResponse(SAMPLE));
+    lingxiFetchMock.mockResolvedValue(findResponse(SAMPLE));
     useStore.setState({ currentSessionPath: '/elsewhere.jsonl' });
     await runChatFind(PATH, 'x');
     // 结果照常落地（查找条状态无损），但不种陈旧意图
@@ -52,7 +52,7 @@ describe('chat-find-actions', () => {
   it('runChatFind 竞态护栏：返回时 query 已变化则丢弃结果', async () => {
     useStore.getState().openChatFind(PATH, 'x');
     let resolveFetch: (v: Response) => void;
-    hanaFetchMock.mockReturnValue(new Promise((r) => { resolveFetch = r; }));
+    lingxiFetchMock.mockReturnValue(new Promise((r) => { resolveFetch = r; }));
     const p = runChatFind(PATH, 'x');
     useStore.getState().setChatFindQuery(PATH, 'changed');
     resolveFetch!(findResponse(SAMPLE));
@@ -65,7 +65,7 @@ describe('chat-find-actions', () => {
     // 模拟 debounce 竞态漏网：close 之后 runChatFind 才被调用。
     // runChatFind 只负责查询与结果落地，query 状态由 UI 层（ChatFindBar）写；
     // 若它自己写 query，会经 EMPTY_FIND 兜底重建 open:false 的幽灵条目。
-    hanaFetchMock.mockResolvedValue(findResponse(SAMPLE));
+    lingxiFetchMock.mockResolvedValue(findResponse(SAMPLE));
     await runChatFind(PATH, 'x');
     expect(useStore.getState().chatFindBySession[PATH]).toBeUndefined();
     expect(useStore.getState().pendingMessageLocate).toBeNull();
@@ -73,7 +73,7 @@ describe('chat-find-actions', () => {
 
   it('runChatFind 接口失败置 error 状态、不发定位', async () => {
     useStore.getState().openChatFind(PATH, 'x');
-    hanaFetchMock.mockResolvedValue(findResponse({ error: 'boom' }, false));
+    lingxiFetchMock.mockResolvedValue(findResponse({ error: 'boom' }, false));
     await runChatFind(PATH, 'x');
     expect(useStore.getState().chatFindBySession[PATH].status).toBe('error');
     expect(useStore.getState().pendingMessageLocate).toBeNull();
@@ -101,7 +101,7 @@ describe('chat-find-actions', () => {
     switchSessionMock.mockImplementation(async (p: string) => {
       useStore.setState({ currentSessionPath: p });
     });
-    hanaFetchMock.mockResolvedValue(findResponse(SAMPLE));
+    lingxiFetchMock.mockResolvedValue(findResponse(SAMPLE));
     await locateSearchHit(PATH, 'x');
     expect(switchSessionMock).toHaveBeenCalledWith(PATH);
     const st = useStore.getState().chatFindBySession[PATH];
@@ -115,7 +115,7 @@ describe('chat-find-actions', () => {
     switchSessionMock.mockImplementation(async () => {
       useStore.setState({ currentSessionPath: '/elsewhere.jsonl' });
     });
-    hanaFetchMock.mockResolvedValue(findResponse(SAMPLE));
+    lingxiFetchMock.mockResolvedValue(findResponse(SAMPLE));
     await locateSearchHit(PATH, 'x');
     expect(useStore.getState().chatFindBySession[PATH]).toBeUndefined();
     expect(useStore.getState().pendingMessageLocate).toBeNull();
@@ -125,7 +125,7 @@ describe('chat-find-actions', () => {
     switchSessionMock.mockImplementation(async (p: string) => {
       useStore.setState({ currentSessionPath: p });
     });
-    hanaFetchMock.mockResolvedValue(findResponse({ ...SAMPLE, total: 0, matches: [], bestIndex: null }));
+    lingxiFetchMock.mockResolvedValue(findResponse({ ...SAMPLE, total: 0, matches: [], bestIndex: null }));
     await locateSearchHit(PATH, 'x');
     expect(useStore.getState().chatFindBySession[PATH]).toBeUndefined();
     expect(useStore.getState().pendingMessageLocate).toBeNull();

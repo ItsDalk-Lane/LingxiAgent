@@ -26,7 +26,7 @@
 import type { Hono } from "hono";
 
 export interface CompositionContext {
-  /** HanaEngine instance (loosely typed like the rest of server/index.ts). */
+  /** LingxiEngine instance (loosely typed like the rest of server/index.ts). */
   engine: any;
   /** Hub instance wrapping the engine (scheduler + channel router). */
   hub: any;

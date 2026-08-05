@@ -9,12 +9,12 @@ import '@testing-library/jest-dom/vitest';
 import { useSettingsStore, type ProviderSummary } from '../../settings/store';
 
 const mocks = vi.hoisted(() => ({
-  hanaFetch: vi.fn(),
+  lingxiFetch: vi.fn(),
   loadSettingsConfig: vi.fn(async () => {}),
 }));
 
 vi.mock('../../settings/api', () => ({
-  hanaFetch: (...args: unknown[]) => mocks.hanaFetch(...args),
+  lingxiFetch: (...args: unknown[]) => mocks.lingxiFetch(...args),
 }));
 
 vi.mock('../../settings/actions', () => ({
@@ -86,7 +86,7 @@ describe('ProvidersTab provider-scoped form state', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    mocks.hanaFetch.mockImplementation((path: string) => {
+    mocks.lingxiFetch.mockImplementation((path: string) => {
       if (path === '/api/providers/summary') {
         return Promise.resolve(jsonResponse({ providers: providersSummary }));
       }
@@ -138,7 +138,7 @@ describe('ProvidersTab provider-scoped form state', () => {
       }),
     };
 
-    mocks.hanaFetch.mockImplementation((path: string) => {
+    mocks.lingxiFetch.mockImplementation((path: string) => {
       if (path === '/api/providers/summary') {
         return Promise.resolve(jsonResponse({ providers: registryOnlySummary }));
       }
@@ -175,7 +175,7 @@ describe('ProvidersTab provider-scoped form state', () => {
       }),
     };
 
-    mocks.hanaFetch.mockImplementation((path: string) => {
+    mocks.lingxiFetch.mockImplementation((path: string) => {
       if (path === '/api/providers/summary') {
         return Promise.resolve(jsonResponse({ providers: registryOnlySummary }));
       }
@@ -213,7 +213,7 @@ describe('ProvidersTab provider-scoped form state', () => {
       }),
     };
 
-    mocks.hanaFetch.mockImplementation((path: string) => {
+    mocks.lingxiFetch.mockImplementation((path: string) => {
       if (path === '/api/providers/summary') {
         return Promise.resolve(jsonResponse({ providers: registryOnlySummary }));
       }
@@ -232,11 +232,11 @@ describe('ProvidersTab provider-scoped form state', () => {
     const saveButton = container.querySelector('button[title="settings.providers.verifyConnection"]') as HTMLButtonElement;
     fireEvent.click(saveButton);
 
-    await waitFor(() => expect(mocks.hanaFetch).toHaveBeenCalledWith(
+    await waitFor(() => expect(mocks.lingxiFetch).toHaveBeenCalledWith(
       '/api/config',
       expect.objectContaining({ method: 'PUT' }),
     ));
-    const configCall = mocks.hanaFetch.mock.calls.find(([path]) => path === '/api/config');
+    const configCall = mocks.lingxiFetch.mock.calls.find(([path]) => path === '/api/config');
     expect(JSON.parse(String((configCall?.[1] as RequestInit).body))).toEqual({
       providers: {
         agnes: {
@@ -271,7 +271,7 @@ describe('ProvidersTab provider-scoped form state', () => {
       }),
     };
 
-    mocks.hanaFetch.mockImplementation((path: string) => {
+    mocks.lingxiFetch.mockImplementation((path: string) => {
       if (path === '/api/providers/summary') {
         return Promise.resolve(jsonResponse({ providers: mixedSummary }));
       }

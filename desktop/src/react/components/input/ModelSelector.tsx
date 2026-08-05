@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useStore } from '../../stores';
 import { sessionScopedValue } from '../../stores/session-slice';
-import { hanaFetch } from '../../hooks/use-hana-fetch';
+import { lingxiFetch } from '../../hooks/use-hana-fetch';
 import { useI18n } from '../../hooks/use-i18n';
 import type { Model } from '../../types';
 import type { SessionModel } from '../../stores/chat-types';
@@ -62,7 +62,7 @@ export function ModelSelector({ models, sessionModel, isStreaming = false }: {
         // Per-session switch
         setLoading(true);
         useStore.getState().setModelSwitching(true);
-        const res = await hanaFetch('/api/models/switch', {
+        const res = await lingxiFetch('/api/models/switch', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ sessionPath: currentSessionPath, modelId, provider }),
@@ -95,7 +95,7 @@ export function ModelSelector({ models, sessionModel, isStreaming = false }: {
         useStore.getState().setModelSwitching(false);
       } else {
         // New session path: persist the model selection and mirror its thinking default into the draft.
-        const setRes = await hanaFetch('/api/models/set', {
+        const setRes = await lingxiFetch('/api/models/set', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ modelId, provider }),
@@ -109,7 +109,7 @@ export function ModelSelector({ models, sessionModel, isStreaming = false }: {
           const { createNewSession } = await import('../../stores/session-actions');
           await createNewSession();
         }
-        const res = await hanaFetch('/api/models');
+        const res = await lingxiFetch('/api/models');
         const data = await res.json();
         useStore.setState({ models: data.models || [] });
       }

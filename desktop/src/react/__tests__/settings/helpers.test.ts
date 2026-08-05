@@ -21,7 +21,7 @@ vi.mock('../../settings/store', () => ({
 const mockFetch = vi.fn();
 
 vi.mock('../../settings/api', () => ({
-  hanaFetch: (...args: unknown[]) => mockFetch(...args),
+  lingxiFetch: (...args: unknown[]) => mockFetch(...args),
 }));
 
 function jsonResponse(body: unknown): Response {

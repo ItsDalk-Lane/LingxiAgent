@@ -96,13 +96,13 @@ function listenFakeSameHomeServer(handler: http.RequestListener): Promise<{ serv
 describe("server/index.ts source-order contract: home guards run before any store is opened", () => {
   const source = fs.readFileSync(path.join(root, "server", "index.ts"), "utf-8");
 
-  it("runs the mutex probe and the data-epoch gate before bindServerTransportOwnership, ensureFirstRun, ensureLocalIdentityRegistries, and HanaEngine construction", () => {
+  it("runs the mutex probe and the data-epoch gate before bindServerTransportOwnership, ensureFirstRun, ensureLocalIdentityRegistries, and LingxiEngine construction", () => {
     const probeIndex = source.indexOf("await probeServerInfo({ info: existingServerInfo })");
     const epochIndex = source.indexOf("await coordinateDataEpochStartup(");
     const bindIndex = source.indexOf("await bindServerTransportOwnership");
     const firstRunIndex = source.indexOf("ensureFirstRun(");
     const identityIndex = source.indexOf("ensureLocalIdentityRegistries(");
-    const engineIndex = source.indexOf("new HanaEngine(");
+    const engineIndex = source.indexOf("new LingxiEngine(");
 
     expect(probeIndex).toBeGreaterThan(-1);
     expect(epochIndex).toBeGreaterThan(-1);
@@ -161,7 +161,7 @@ describe("server home guards — real spawn behavior (fast failure paths, before
       expect(result).toMatchObject({ code: 1, signal: null });
       expect(result.stderr).toContain("要接管请先退出它");
       expect(result.stdout + result.stderr).not.toContain("ensureFirstRun");
-      expect(result.stdout + result.stderr).not.toContain("HanaEngine");
+      expect(result.stdout + result.stderr).not.toContain("LingxiEngine");
       expectNoPiRuntimeTrees(hanaHome);
     } finally {
       await new Promise<void>((resolve) => fakeServer.close(() => resolve()));
@@ -220,7 +220,7 @@ describe("server home guards — real spawn behavior (fast failure paths, before
       expect(result.stderr).toContain("epoch=999999");
       expect(result.stderr).toContain("LINGXI_ALLOW_DATA_DOWNGRADE=1");
       expect(result.stdout + result.stderr).not.toContain("ensureFirstRun");
-      expect(result.stdout + result.stderr).not.toContain("HanaEngine");
+      expect(result.stdout + result.stderr).not.toContain("LingxiEngine");
       expectNoPiRuntimeTrees(hanaHome);
     } finally {
       fs.rmSync(hanaHome, { recursive: true, force: true });
@@ -378,7 +378,7 @@ describe("server home guards — real spawn behavior (fast failure paths, before
       expect(result.stderr).toContain("incomplete-transition");
       expect(result.stderr).toContain("migrating");
       expect(result.stdout + result.stderr).not.toContain("ensureFirstRun");
-      expect(result.stdout + result.stderr).not.toContain("HanaEngine");
+      expect(result.stdout + result.stderr).not.toContain("LingxiEngine");
       expectNoPiRuntimeTrees(hanaHome);
     } finally {
       fs.rmSync(hanaHome, { recursive: true, force: true });

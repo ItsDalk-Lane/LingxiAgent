@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
 import { useSettingsStore } from '../../store';
-import { hanaUrl, yuanFallbackAvatar } from '../../api';
+import { lingxiUrl, yuanFallbackAvatar } from '../../api';
 import { SelectWidget, type SelectOption } from '@/ui';
 import styles from '../../Settings.module.css';
 
@@ -26,7 +26,7 @@ export function AgentSelect({ value, onChange }: AgentSelectProps) {
       <>
         <img
           className={styles['bridge-agent-avatar']}
-          src={agent?.hasAvatar ? hanaUrl(`/api/agents/${agent.id}/avatar?t=${ts}`) : yuanFallbackAvatar(agent?.yuan || 'lingxi')}
+          src={agent?.hasAvatar ? lingxiUrl(`/api/agents/${agent.id}/avatar?t=${ts}`) : yuanFallbackAvatar(agent?.yuan || 'lingxi')}
           onError={(e) => { (e.target as HTMLImageElement).src = yuanFallbackAvatar(agent?.yuan || 'lingxi'); }}
         />
         <span className={styles['bridge-agent-name']}>{agent?.name || '—'}</span>
@@ -45,7 +45,7 @@ export function AgentSelect({ value, onChange }: AgentSelectProps) {
       <>
         <img
           className={styles['bridge-agent-avatar']}
-          src={agent?.hasAvatar ? hanaUrl(`/api/agents/${agent.id}/avatar?t=${ts}`) : yuanFallbackAvatar(agent?.yuan || 'lingxi')}
+          src={agent?.hasAvatar ? lingxiUrl(`/api/agents/${agent.id}/avatar?t=${ts}`) : yuanFallbackAvatar(agent?.yuan || 'lingxi')}
           onError={(e) => { (e.target as HTMLImageElement).src = yuanFallbackAvatar(agent?.yuan || 'lingxi'); }}
         />
         <span className={styles['bridge-agent-name']}>{option.label}</span>

@@ -6,10 +6,10 @@ import React from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 
-const hanaFetchMock = vi.fn();
+const lingxiFetchMock = vi.fn();
 
 vi.mock('../../api', () => ({
-  hanaFetch: (...args: unknown[]) => hanaFetchMock(...args),
+  lingxiFetch: (...args: unknown[]) => lingxiFetchMock(...args),
 }));
 
 vi.mock('../../helpers', () => ({
@@ -34,7 +34,7 @@ import { useSettingsStore } from '../../store';
 
 afterEach(() => {
   cleanup();
-  hanaFetchMock.mockReset();
+  lingxiFetchMock.mockReset();
   useSettingsStore.setState({
     toastMessage: '',
     toastType: '',
@@ -57,7 +57,7 @@ function jsonResponse(body: unknown) {
 describe('ComputerUseSection', () => {
   it('hydrates the enabled switch from the unified settings snapshot before refresh completes', async () => {
     let resolveLoad: (response: Response) => void = () => {};
-    hanaFetchMock.mockImplementation(() => new Promise<Response>((resolve) => {
+    lingxiFetchMock.mockImplementation(() => new Promise<Response>((resolve) => {
       resolveLoad = resolve;
     }));
     useSettingsStore.setState({
@@ -95,11 +95,11 @@ describe('ComputerUseSection', () => {
         activeLease: null,
       },
     }));
-    await waitFor(() => expect(hanaFetchMock).toHaveBeenCalledWith('/api/preferences/computer-use'));
+    await waitFor(() => expect(lingxiFetchMock).toHaveBeenCalledWith('/api/preferences/computer-use'));
   });
 
   it('renders the experimental risk warning near the top of the Computer Use page', async () => {
-    hanaFetchMock.mockResolvedValue(jsonResponse({
+    lingxiFetchMock.mockResolvedValue(jsonResponse({
       selectedProviderId: 'macos:cua',
       settings: { enabled: false, app_approvals: [] },
       status: {
@@ -110,7 +110,7 @@ describe('ComputerUseSection', () => {
 
     render(<ComputerUseSection />);
 
-    await waitFor(() => expect(hanaFetchMock).toHaveBeenCalledWith('/api/preferences/computer-use'));
+    await waitFor(() => expect(lingxiFetchMock).toHaveBeenCalledWith('/api/preferences/computer-use'));
     const warning = screen.getByTestId('computer-use-experimental-warning');
 
     expect(warning.textContent || '').toContain('Computer use 功能属于测试阶段');
@@ -118,7 +118,7 @@ describe('ComputerUseSection', () => {
   });
 
   it('shows a toast when requesting permissions fails', async () => {
-    hanaFetchMock
+    lingxiFetchMock
       .mockResolvedValueOnce(jsonResponse({
         selectedProviderId: 'macos:cua',
         settings: { enabled: false, app_approvals: [] },
@@ -127,11 +127,11 @@ describe('ComputerUseSection', () => {
           activeLease: null,
         },
       }))
-      .mockRejectedValueOnce(new Error('hanaFetch /api/preferences/computer-use/request-permissions: 400 Bad Request'));
+      .mockRejectedValueOnce(new Error('lingxiFetch /api/preferences/computer-use/request-permissions: 400 Bad Request'));
 
     render(<ComputerUseSection />);
 
-    await waitFor(() => expect(hanaFetchMock).toHaveBeenCalledWith('/api/preferences/computer-use'));
+    await waitFor(() => expect(lingxiFetchMock).toHaveBeenCalledWith('/api/preferences/computer-use'));
     fireEvent.click(screen.getByText('settings.computerUse.requestPermissions'));
 
     await waitFor(() => {

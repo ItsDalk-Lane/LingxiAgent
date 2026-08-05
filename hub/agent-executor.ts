@@ -199,7 +199,7 @@ async function getRuntimeAgent(engine, agentId, reason) {
  * @param {string} agentId
  * @param {Array<{text: string, capture?: boolean}>} rounds  按序执行的 prompts
  * @param {object} opts
- * @param {import('../core/engine.ts').HanaEngine} opts.engine
+ * @param {import('../core/engine.ts').LingxiEngine} opts.engine
  * @param {AbortSignal} [opts.signal]
  * @param {string} [opts.sessionSuffix="temp"]
  * @param {string} [opts.systemAppend] - 追加到 system prompt 末尾

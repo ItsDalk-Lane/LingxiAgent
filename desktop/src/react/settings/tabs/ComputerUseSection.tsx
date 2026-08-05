@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { hanaFetch } from '../api';
+import { lingxiFetch } from '../api';
 import { t } from '../helpers';
 import { SettingsSection } from '../components/SettingsSection';
 import { SettingsRow } from '../components/SettingsRow';
@@ -73,7 +73,7 @@ export function ComputerUseSection() {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await hanaFetch('/api/preferences/computer-use');
+      const res = await lingxiFetch('/api/preferences/computer-use');
       const body = await res.json();
       setData(body);
       rememberComputerUseSnapshot(body);
@@ -122,7 +122,7 @@ export function ComputerUseSection() {
     if (!data) return;
     setSaving(true);
     try {
-      const res = await hanaFetch('/api/preferences/computer-use', {
+      const res = await lingxiFetch('/api/preferences/computer-use', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ settings: { enabled: next } }),
@@ -148,7 +148,7 @@ export function ComputerUseSection() {
   const requestPermissions = async () => {
     setRequesting(true);
     try {
-      await hanaFetch('/api/preferences/computer-use/request-permissions', {
+      await lingxiFetch('/api/preferences/computer-use/request-permissions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ providerId: data?.selectedProviderId || undefined }),

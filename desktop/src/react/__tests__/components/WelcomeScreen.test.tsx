@@ -9,12 +9,12 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useStore } from '../../stores';
 
 const mocks = vi.hoisted(() => ({
-  hanaFetch: vi.fn(async (_path: string, _opts?: RequestInit) => new Response(JSON.stringify({ ok: true }), { status: 200 })),
+  lingxiFetch: vi.fn(async (_path: string, _opts?: RequestInit) => new Response(JSON.stringify({ ok: true }), { status: 200 })),
   loadModels: vi.fn(),
 }));
 
 vi.mock('../../hooks/use-hana-fetch', () => ({
-  hanaFetch: (path: string, opts?: RequestInit) => mocks.hanaFetch(path, opts),
+  lingxiFetch: (path: string, opts?: RequestInit) => mocks.lingxiFetch(path, opts),
 }));
 
 vi.mock('../../utils/ui-helpers', () => ({
@@ -137,7 +137,7 @@ describe('WelcomeScreen workspace picker', () => {
   });
 
   it('selects a Studio workspace by mountId instead of a local path', async () => {
-    mocks.hanaFetch.mockImplementation(async (path: string) => {
+    mocks.lingxiFetch.mockImplementation(async (path: string) => {
       if (path === '/api/studio/workspaces') {
         return new Response(JSON.stringify({
           workspaces: [{ workspaceId: 'mount_docs', mountId: 'mount_docs', label: 'Docs', capabilities: ['list', 'read', 'write'] }],
@@ -169,11 +169,11 @@ describe('WelcomeScreen workspace picker', () => {
       expect(useStore.getState().selectedWorkspaceMountId).toBe('mount_docs');
       expect(useStore.getState().deskBasePath).toBe('studio:mount_docs');
     });
-    expect(mocks.hanaFetch.mock.calls.some(([path]) => path === '/api/workbench/files?mountId=mount_docs')).toBe(true);
+    expect(mocks.lingxiFetch.mock.calls.some(([path]) => path === '/api/workbench/files?mountId=mount_docs')).toBe(true);
   });
 
   it('removes a recent workspace from the picker without switching workspace', async () => {
-    mocks.hanaFetch.mockResolvedValueOnce(new Response(JSON.stringify({
+    mocks.lingxiFetch.mockResolvedValueOnce(new Response(JSON.stringify({
       ok: true,
       cwd_history: [],
     }), { status: 200 }));
@@ -185,7 +185,7 @@ describe('WelcomeScreen workspace picker', () => {
 
     expect(useStore.getState().selectedFolder).toBe('/workspace/Desktop');
     expect(useStore.getState().cwdHistory).toEqual([]);
-    expect(mocks.hanaFetch).toHaveBeenCalledWith('/api/config/workspaces/recent?agentId=hana', expect.objectContaining({
+    expect(mocks.lingxiFetch).toHaveBeenCalledWith('/api/config/workspaces/recent?agentId=hana', expect.objectContaining({
       method: 'DELETE',
       body: JSON.stringify({ path: '/workspace/Desktop/project-hana' }),
     }));
@@ -201,7 +201,7 @@ describe('WelcomeScreen workspace picker', () => {
         { workspaceId: 'mount_docs', mountId: 'mount_docs', label: 'Docs', isDefault: false },
       ],
     } as never);
-    mocks.hanaFetch.mockImplementation(async (path: string, opts?: RequestInit) => {
+    mocks.lingxiFetch.mockImplementation(async (path: string, opts?: RequestInit) => {
       if (path === '/api/studio/workspaces/mount_docs' && opts?.method === 'DELETE') {
         return new Response(JSON.stringify({ ok: true, mountId: 'mount_docs' }), { status: 200 });
       }
@@ -224,7 +224,7 @@ describe('WelcomeScreen workspace picker', () => {
     await waitFor(() => {
       expect(useStore.getState().studioWorkspaces.map(workspace => workspace.mountId)).toEqual(['default']);
     });
-    expect(mocks.hanaFetch).toHaveBeenCalledWith('/api/studio/workspaces/mount_docs', expect.objectContaining({
+    expect(mocks.lingxiFetch).toHaveBeenCalledWith('/api/studio/workspaces/mount_docs', expect.objectContaining({
       method: 'DELETE',
     }));
   });
@@ -291,7 +291,7 @@ describe('WelcomeScreen workspace picker', () => {
     expect(useStore.getState().selectedAgentId).toBe('mio');
     expect(useStore.getState().selectedFolder).toBe('/workspace/Mio');
     expect(useStore.getState().workspaceFolders).toEqual([]);
-    expect(mocks.hanaFetch).toHaveBeenCalledWith('/api/models/set', expect.objectContaining({
+    expect(mocks.lingxiFetch).toHaveBeenCalledWith('/api/models/set', expect.objectContaining({
       method: 'POST',
       body: JSON.stringify({ modelId: 'gpt-5.2', provider: 'openai' }),
     }));

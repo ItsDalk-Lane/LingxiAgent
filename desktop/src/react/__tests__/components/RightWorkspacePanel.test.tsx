@@ -12,7 +12,7 @@ import { RightWorkspacePanel } from '../../components/right-workspace/RightWorks
 import { openFilePreview } from '../../utils/file-preview';
 import { openMediaViewerForRef } from '../../utils/open-media-viewer';
 import { takeMarkdownFileScreenshot } from '../../utils/screenshot';
-import { hanaFetch } from '../../hooks/use-hana-fetch';
+import { lingxiFetch } from '../../hooks/use-hana-fetch';
 
 const mockOpenFilePreview = vi.hoisted(() => vi.fn(async () => undefined));
 
@@ -33,7 +33,7 @@ vi.mock('../../utils/screenshot', () => ({
 }));
 
 vi.mock('../../hooks/use-hana-fetch', () => ({
-  hanaFetch: vi.fn(),
+  lingxiFetch: vi.fn(),
 }));
 
 // 整列卡片栈的兄弟卡（Activity / Session 状态）各有独立测试；这里聚焦 desk 卡 tab
@@ -146,8 +146,8 @@ describe('RightWorkspacePanel', () => {
     vi.mocked(openFilePreview).mockClear();
     vi.mocked(openMediaViewerForRef).mockClear();
     vi.mocked(takeMarkdownFileScreenshot).mockClear();
-    vi.mocked(hanaFetch).mockReset();
-    vi.mocked(hanaFetch).mockImplementation(async () => jsonResponse({ sessions: [] }));
+    vi.mocked(lingxiFetch).mockReset();
+    vi.mocked(lingxiFetch).mockImplementation(async () => jsonResponse({ sessions: [] }));
     document.documentElement.removeAttribute('data-platform');
     window.platform = {
       openFolder: () => undefined,
@@ -431,7 +431,7 @@ describe('RightWorkspacePanel', () => {
   });
 
   it('previews remote resource-backed session files through ResourceIO without local path controls', async () => {
-    vi.mocked(hanaFetch).mockImplementation(async (url) => {
+    vi.mocked(lingxiFetch).mockImplementation(async (url) => {
       if (String(url).startsWith('/api/resources/res_sf_report/content')) {
         return new Response('# remote report\n', { status: 200 });
       }
@@ -494,7 +494,7 @@ describe('RightWorkspacePanel', () => {
     fireEvent.click(screen.getByRole('button', { name: '预览 report.md' }));
 
     await waitFor(() => {
-      expect(hanaFetch).toHaveBeenCalledWith('/api/resources/res_sf_report/content');
+      expect(lingxiFetch).toHaveBeenCalledWith('/api/resources/res_sf_report/content');
     });
     expect(openFilePreview).not.toHaveBeenCalled();
     expect(useStore.getState().previewItems[0]).toMatchObject({
@@ -797,7 +797,7 @@ describe('RightWorkspacePanel', () => {
 
   it('sends session files to an existing Bridge target from the context submenu', async () => {
     const sendBodies: unknown[] = [];
-    vi.mocked(hanaFetch).mockImplementation(async (path, init) => {
+    vi.mocked(lingxiFetch).mockImplementation(async (path, init) => {
       if (path.startsWith('/api/bridge/sessions?platform=feishu')) {
         return jsonResponse({
           sessions: [{ sessionKey: 'fs_1', chatId: 'oc_chat', displayName: '小群' }],
@@ -844,7 +844,7 @@ describe('RightWorkspacePanel', () => {
         },
       ]);
     });
-    expect(hanaFetch).toHaveBeenCalledWith('/api/bridge/send-media?agentId=hana', expect.objectContaining({
+    expect(lingxiFetch).toHaveBeenCalledWith('/api/bridge/send-media?agentId=hana', expect.objectContaining({
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
     }));
@@ -934,7 +934,7 @@ describe('RightWorkspacePanel', () => {
       });
       await vi.advanceTimersByTimeAsync(850);
 
-      const saveCall = vi.mocked(hanaFetch).mock.calls.find(([url, init]) => (
+      const saveCall = vi.mocked(lingxiFetch).mock.calls.find(([url, init]) => (
         url === '/api/desk/jian' && init && typeof init === 'object' && init.method === 'POST'
       ));
       expect(saveCall).toBeTruthy();

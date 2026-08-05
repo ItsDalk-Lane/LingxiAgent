@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useSettingsStore } from '../store';
-import { hanaFetch } from '../api';
+import { lingxiFetch } from '../api';
 import { t } from '../helpers';
 import { Overlay } from '../../ui';
 import styles from '../Settings.module.css';
@@ -21,7 +21,7 @@ export function ClearMemoryConfirm() {
     close();
     try {
       const aid = useSettingsStore.getState().getSettingsAgentId();
-      const res = await hanaFetch(`/api/memories?agentId=${aid}`, { method: 'DELETE' });
+      const res = await lingxiFetch(`/api/memories?agentId=${aid}`, { method: 'DELETE' });
       const data = await res.json();
       if (data.error) throw new Error(data.error);
       showToast(t('settings.memory.actions.clearSuccess'), 'success');

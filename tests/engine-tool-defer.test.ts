@@ -2,7 +2,7 @@ import fs from "fs";
 import os from "os";
 import path from "path";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { HanaEngine } from "../core/engine.ts";
+import { LingxiEngine } from "../core/engine.ts";
 import { toMcpToolId } from "../core/mcp/manager.ts";
 import { resolveToolInvocationPermission } from "../lib/permission/tool-invocation-permission.ts";
 
@@ -65,7 +65,7 @@ function makeEngine({
     execute: vi.fn(async () => ({ content: [{ type: "text", text: "ok" }] })),
   })));
 
-  const engine = Object.create(HanaEngine.prototype);
+  const engine = Object.create(LingxiEngine.prototype);
   engine.hanakoHome = tmpDir;
   engine.getAgent = vi.fn(() => agent);
   engine._pluginManager = pluginTools.length > 0 ? { getAllTools: () => pluginTools } : null;

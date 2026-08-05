@@ -10,12 +10,12 @@ import { useSettingsStore } from '../../settings/store';
 
 type MockResponse = { json: () => Promise<unknown> };
 
-const hanaFetchMock = vi.fn(async (_url: string, _opts?: RequestInit): Promise<MockResponse> => ({
+const lingxiFetchMock = vi.fn(async (_url: string, _opts?: RequestInit): Promise<MockResponse> => ({
   json: async () => ({ ok: true }),
 }));
 
 vi.mock('../../settings/api', () => ({
-  hanaFetch: (url: string, opts?: RequestInit) => hanaFetchMock(url, opts),
+  lingxiFetch: (url: string, opts?: RequestInit) => lingxiFetchMock(url, opts),
 }));
 
 vi.mock('../../settings/helpers', () => ({
@@ -34,7 +34,7 @@ import { MeTab } from '../../settings/tabs/MeTab';
 
 describe('MeTab', () => {
   beforeEach(() => {
-    hanaFetchMock.mockClear();
+    lingxiFetchMock.mockClear();
     useSettingsStore.setState({
       settingsAgentId: 'mio',
       currentAgentId: 'hana',
@@ -54,13 +54,13 @@ describe('MeTab', () => {
     fireEvent.change(nameInput, { target: { value: 'New Name' } });
     fireEvent.click(screen.getByText('settings.save'));
 
-    await waitFor(() => expect(hanaFetchMock).toHaveBeenCalled());
+    await waitFor(() => expect(lingxiFetchMock).toHaveBeenCalled());
 
-    const configCalls = hanaFetchMock.mock.calls.filter(([url]) => url.includes('/config'));
+    const configCalls = lingxiFetchMock.mock.calls.filter(([url]) => url.includes('/config'));
     expect(configCalls).toHaveLength(1);
     expect(configCalls[0][0]).toBe('/api/config');
     expect(JSON.parse(String(configCalls[0][1]?.body))).toEqual({ user: { name: 'New Name' } });
-    expect(hanaFetchMock.mock.calls.some(([url]) => url.startsWith('/api/agents/'))).toBe(false);
+    expect(lingxiFetchMock.mock.calls.some(([url]) => url.startsWith('/api/agents/'))).toBe(false);
   });
 
   it('still saves the user profile through the user-level route', async () => {
@@ -70,9 +70,9 @@ describe('MeTab', () => {
     fireEvent.change(profileInput, { target: { value: 'new profile' } });
     fireEvent.click(screen.getByText('settings.save'));
 
-    await waitFor(() => expect(hanaFetchMock).toHaveBeenCalled());
+    await waitFor(() => expect(lingxiFetchMock).toHaveBeenCalled());
 
-    const profileCall = hanaFetchMock.mock.calls.find(([url]) => url === '/api/user-profile');
+    const profileCall = lingxiFetchMock.mock.calls.find(([url]) => url === '/api/user-profile');
     expect(profileCall).toBeDefined();
     expect(JSON.parse(String(profileCall?.[1]?.body))).toEqual({ content: 'new profile' });
   });

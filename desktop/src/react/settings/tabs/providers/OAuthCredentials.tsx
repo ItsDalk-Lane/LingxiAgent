@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { useSettingsStore, type ProviderSummary } from '../../store';
-import { hanaFetch } from '../../api';
+import { lingxiFetch } from '../../api';
 import { t } from '../../helpers';
 import { DEFAULT_OAUTH_LOGIN_METHOD } from '../../../../../../shared/oauth-login.ts';
 import styles from '../../Settings.module.css';
@@ -22,7 +22,7 @@ export function OAuthCredentials({ providerId, summary, onRefresh }: {
 
   const login = async () => {
     try {
-      const res = await hanaFetch('/api/auth/oauth/start', {
+      const res = await lingxiFetch('/api/auth/oauth/start', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -57,7 +57,7 @@ export function OAuthCredentials({ providerId, summary, onRefresh }: {
     const code = codeInput.trim();
     if (!code) return;
     try {
-      const res = await hanaFetch('/api/auth/oauth/callback', {
+      const res = await lingxiFetch('/api/auth/oauth/callback', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ sessionId: oauthSessionIdRef.current, code }),
@@ -79,7 +79,7 @@ export function OAuthCredentials({ providerId, summary, onRefresh }: {
       await new Promise(r => setTimeout(r, 3000));
       if (!pollingRef.current) return;
       try {
-        const res = await hanaFetch(`/api/auth/oauth/poll/${sessionId}`);
+        const res = await lingxiFetch(`/api/auth/oauth/poll/${sessionId}`);
         const data = await res.json();
         if (data.status === 'done') {
           showToast(t('settings.oauth.success'), 'success');
@@ -106,7 +106,7 @@ export function OAuthCredentials({ providerId, summary, onRefresh }: {
 
   const logout = async () => {
     try {
-      await hanaFetch('/api/auth/oauth/logout', {
+      await lingxiFetch('/api/auth/oauth/logout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ provider: providerId }),

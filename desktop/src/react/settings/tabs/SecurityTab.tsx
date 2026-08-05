@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { useSettingsStore } from '../store';
 import { autoSaveConfig, t } from '../helpers';
-import { hanaFetch } from '../api';
+import { lingxiFetch } from '../api';
 import { loadSettingsConfig } from '../actions';
 import { SelectWidget, Toggle } from '@/ui';
 import { readConfigBoolean } from '../resource-state';
@@ -144,7 +144,7 @@ export function SecurityTab() {
   const loadCheckpoints = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await hanaFetch('/api/checkpoints');
+      const res = await lingxiFetch('/api/checkpoints');
       const data = await res.json();
       setCheckpoints(data.checkpoints || []);
     } catch {
@@ -156,7 +156,7 @@ export function SecurityTab() {
 
   const handleRestore = useCallback(async (id: string) => {
     try {
-      const res = await hanaFetch(`/api/checkpoints/${id}/restore`, { method: 'POST' });
+      const res = await lingxiFetch(`/api/checkpoints/${id}/restore`, { method: 'POST' });
       const data = await res.json();
       if (data.ok) {
         showToast(t('settings.security.restoreSuccess'), 'success');

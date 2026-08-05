@@ -6,13 +6,13 @@ import React from 'react';
 import { SessionConfirmationPrompt } from '../../components/input/SessionConfirmationPrompt';
 import type { SessionConfirmationBlock } from '../../stores/chat-types';
 
-const hanaFetchMock = vi.fn<(path: string, opts?: RequestInit) => Promise<Response>>(
+const lingxiFetchMock = vi.fn<(path: string, opts?: RequestInit) => Promise<Response>>(
   async () => new Response('{}', { status: 200 }),
 );
 
 vi.mock('../../hooks/use-hana-fetch', () => ({
-  hanaFetch: (path: string, opts?: RequestInit) => hanaFetchMock(path, opts),
-  hanaUrl: (path: string) => `http://127.0.0.1:3210${path}`,
+  lingxiFetch: (path: string, opts?: RequestInit) => lingxiFetchMock(path, opts),
+  lingxiUrl: (path: string) => `http://127.0.0.1:3210${path}`,
 }));
 
 function elicitationBlock(requestedSchema: unknown): SessionConfirmationBlock {
@@ -37,13 +37,13 @@ function elicitationBlock(requestedSchema: unknown): SessionConfirmationBlock {
 }
 
 function lastConfirmBody() {
-  const call = hanaFetchMock.mock.calls.at(-1);
+  const call = lingxiFetchMock.mock.calls.at(-1);
   return JSON.parse(String(call?.[1]?.body));
 }
 
 describe('mcp_elicitation confirmation prompt', () => {
   beforeEach(() => {
-    hanaFetchMock.mockClear();
+    lingxiFetchMock.mockClear();
   });
 
   afterEach(() => {
@@ -73,8 +73,8 @@ describe('mcp_elicitation confirmation prompt', () => {
     fireEvent.click(screen.getByLabelText('Subscribe'));
     fireEvent.click(screen.getByText('Approve'));
 
-    await waitFor(() => expect(hanaFetchMock).toHaveBeenCalled());
-    const [path] = hanaFetchMock.mock.calls.at(-1)!;
+    await waitFor(() => expect(lingxiFetchMock).toHaveBeenCalled());
+    const [path] = lingxiFetchMock.mock.calls.at(-1)!;
     expect(path).toBe('/api/confirm/confirm-1');
     expect(lastConfirmBody()).toEqual({
       action: 'confirmed',
@@ -90,7 +90,7 @@ describe('mcp_elicitation confirmation prompt', () => {
 
     fireEvent.click(screen.getByText('Deny'));
 
-    await waitFor(() => expect(hanaFetchMock).toHaveBeenCalled());
+    await waitFor(() => expect(lingxiFetchMock).toHaveBeenCalled());
     expect(lastConfirmBody()).toEqual({ action: 'rejected' });
   });
 
@@ -111,7 +111,7 @@ describe('mcp_elicitation confirmation prompt', () => {
 
     // Declining stays available: the user can always get out.
     fireEvent.click(screen.getByText('Deny'));
-    await waitFor(() => expect(hanaFetchMock).toHaveBeenCalled());
+    await waitFor(() => expect(lingxiFetchMock).toHaveBeenCalled());
     expect(lastConfirmBody()).toEqual({ action: 'rejected' });
   });
 
@@ -193,7 +193,7 @@ describe('mcp_elicitation confirmation prompt', () => {
     await waitFor(() => expect(screen.getByTestId('elicitation-required')).toBeTruthy());
     // Nothing was sent: an incomplete answer is the user's to finish, not the
     // server's to reject.
-    expect(hanaFetchMock).not.toHaveBeenCalled();
+    expect(lingxiFetchMock).not.toHaveBeenCalled();
   });
 
   it('clears the required warning once the field is filled in', async () => {
@@ -214,7 +214,7 @@ describe('mcp_elicitation confirmation prompt', () => {
     expect(screen.queryByTestId('elicitation-required')).toBeNull();
 
     fireEvent.click(screen.getByText('Approve'));
-    await waitFor(() => expect(hanaFetchMock).toHaveBeenCalled());
+    await waitFor(() => expect(lingxiFetchMock).toHaveBeenCalled());
     expect(lastConfirmBody()).toEqual({ action: 'confirmed', value: { name: 'octocat' } });
   });
 
@@ -237,7 +237,7 @@ describe('mcp_elicitation confirmation prompt', () => {
     fireEvent.change(screen.getByLabelText('City'), { target: { value: 'Berlin' } });
     fireEvent.click(screen.getByText('Approve'));
 
-    await waitFor(() => expect(hanaFetchMock).toHaveBeenCalled());
+    await waitFor(() => expect(lingxiFetchMock).toHaveBeenCalled());
     expect(lastConfirmBody()).toEqual({ action: 'confirmed', value: { address: { city: 'Berlin' } } });
   });
 });

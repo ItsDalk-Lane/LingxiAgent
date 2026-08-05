@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { hanaUrl } from '../hooks/use-hana-fetch';
+import { lingxiUrl } from '../hooks/use-hana-fetch';
 import type { Agent } from '../types';
 import { userFallbackAvatar, yuanFallbackAvatar } from './agent-helpers';
 import { displayInitial } from './grapheme';
@@ -67,7 +67,7 @@ export function resolveAgentDisplayInfo({
     return {
       id: agent.id,
       displayName: agent.name || agent.id,
-      avatarUrl: agent.hasAvatar ? hanaUrl(`/api/agents/${agent.id}/avatar?t=${agentAvatarVersion}`) : null,
+      avatarUrl: agent.hasAvatar ? lingxiUrl(`/api/agents/${agent.id}/avatar?t=${agentAvatarVersion}`) : null,
       fallbackAvatar: yuanFallbackAvatar(agent.yuan),
       yuan: agent.yuan,
       isUser: false,

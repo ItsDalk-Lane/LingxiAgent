@@ -5,14 +5,14 @@ import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/re
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ActivityPanel } from '../../components/ActivityPanel';
 import { useStore } from '../../stores';
-import { hanaFetch } from '../../hooks/use-hana-fetch';
+import { lingxiFetch } from '../../hooks/use-hana-fetch';
 
 vi.mock('../../hooks/use-panel', () => ({
   usePanel: () => ({ visible: true, close: vi.fn() }),
 }));
 
 vi.mock('../../hooks/use-hana-fetch', () => ({
-  hanaFetch: vi.fn(),
+  lingxiFetch: vi.fn(),
 }));
 
 vi.mock('../../hooks/use-config', () => ({
@@ -26,7 +26,7 @@ describe('ActivityPanel', () => {
       if (key === 'activity.duration') return `耗时 ${vars?.text || ''}`;
       return key;
     }) as typeof window.t;
-    vi.mocked(hanaFetch).mockImplementation((path: string) => {
+    vi.mocked(lingxiFetch).mockImplementation((path: string) => {
       if (path === '/api/desk/activities/act_cover/session') {
         return Promise.resolve({
           json: () => Promise.resolve({

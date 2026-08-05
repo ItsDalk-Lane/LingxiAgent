@@ -3,10 +3,10 @@ import { useStore } from '../../stores';
 
 // vi.hoisted: the mock factory below is hoisted above this file's imports, and
 // importing the store now reaches use-hana-fetch during that hoisted phase.
-const mockHanaFetch = vi.hoisted(() => vi.fn());
+const mockLingxiFetch = vi.hoisted(() => vi.fn());
 
 vi.mock('../../hooks/use-hana-fetch', () => ({
-  hanaFetch: mockHanaFetch,
+  lingxiFetch: mockLingxiFetch,
 }));
 
 vi.mock('../../stores/agent-actions', () => ({
@@ -31,8 +31,8 @@ describe('desk-actions workspace roots', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     delete (globalThis as any).document;
-    mockHanaFetch.mockReset();
-    mockHanaFetch.mockImplementation(async (url: string) => {
+    mockLingxiFetch.mockReset();
+    mockLingxiFetch.mockImplementation(async (url: string) => {
       if (url.startsWith('/api/preferences/workspace-ui-state')) return jsonResponse({ state: null });
       if (url.startsWith('/api/desk/jian')) return jsonResponse({ content: null });
       return jsonResponse({});
@@ -82,14 +82,14 @@ describe('desk-actions workspace roots', () => {
   });
 
   it('loads the selected/home folder when no explicit override is passed', async () => {
-    mockHanaFetch
+    mockLingxiFetch
       .mockResolvedValueOnce(jsonResponse({ files: [], basePath: '/home-folder' }))
       .mockResolvedValueOnce(jsonResponse({ content: null }));
 
     const { loadDeskFiles } = await import('../../stores/desk-actions');
     await loadDeskFiles();
 
-    expect(mockHanaFetch).toHaveBeenNthCalledWith(
+    expect(mockLingxiFetch).toHaveBeenNthCalledWith(
       1,
       '/api/desk/files?dir=%2Fhome-folder',
     );
@@ -102,14 +102,14 @@ describe('desk-actions workspace roots', () => {
       selectedFolder: '/workspace/Mio',
       deskBasePath: '/workspace/Mio',
     } as never);
-    mockHanaFetch
+    mockLingxiFetch
       .mockResolvedValueOnce(jsonResponse({ files: [], basePath: '/workspace/Mio' }))
       .mockResolvedValueOnce(jsonResponse({ content: null }));
 
     const { loadDeskFiles } = await import('../../stores/desk-actions');
     await loadDeskFiles();
 
-    expect(mockHanaFetch).toHaveBeenNthCalledWith(
+    expect(mockLingxiFetch).toHaveBeenNthCalledWith(
       1,
       '/api/desk/files?dir=%2Fworkspace%2FMio&agentId=mio',
     );
@@ -123,7 +123,7 @@ describe('desk-actions workspace roots', () => {
       deskFiles: [{ name: 'old.md', isDir: false }],
       deskTreeFilesByPath: { '': [{ name: 'old.md', isDir: false }] },
     } as never);
-    mockHanaFetch
+    mockLingxiFetch
       .mockResolvedValueOnce(jsonStatusResponse({ error: { code: 'resource_not_found', message: 'missing' } }, 404))
       .mockResolvedValueOnce(jsonResponse({ cwd_history: ['/workspace/Keep'] }));
 
@@ -135,7 +135,7 @@ describe('desk-actions workspace roots', () => {
     expect(useStore.getState().deskFiles).toEqual([]);
     expect(useStore.getState().deskTreeFilesByPath).toEqual({});
     expect(useStore.getState().cwdHistory).toEqual(['/workspace/Keep']);
-    expect(mockHanaFetch).toHaveBeenNthCalledWith(
+    expect(mockLingxiFetch).toHaveBeenNthCalledWith(
       2,
       '/api/config/workspaces/recent?agentId=hana',
       expect.objectContaining({
@@ -152,7 +152,7 @@ describe('desk-actions workspace roots', () => {
       cwdHistory: ['/workspace/Private', '/workspace/Keep'],
       deskFiles: [{ name: 'private.md', isDir: false }],
     } as never);
-    mockHanaFetch.mockResolvedValueOnce(jsonStatusResponse({
+    mockLingxiFetch.mockResolvedValueOnce(jsonStatusResponse({
       error: { code: 'insufficient_scope', message: 'forbidden' },
     }, 403));
 
@@ -162,7 +162,7 @@ describe('desk-actions workspace roots', () => {
     expect(useStore.getState().selectedFolder).toBe('/workspace/Private');
     expect(useStore.getState().deskBasePath).toBe('/workspace/Private');
     expect(useStore.getState().cwdHistory).toEqual(['/workspace/Private', '/workspace/Keep']);
-    expect(mockHanaFetch).toHaveBeenCalledTimes(1);
+    expect(mockLingxiFetch).toHaveBeenCalledTimes(1);
   });
 
   it('loads files through the workbench mount route when a Studio workspace is active', async () => {
@@ -171,7 +171,7 @@ describe('desk-actions workspace roots', () => {
       deskWorkspaceMountId: 'mount_docs',
       deskWorkspaceLabel: 'Docs',
     } as never);
-    mockHanaFetch
+    mockLingxiFetch
       .mockResolvedValueOnce(jsonResponse({
         mountId: 'mount_docs',
         mount: { label: 'Docs' },
@@ -182,7 +182,7 @@ describe('desk-actions workspace roots', () => {
     const { loadDeskFiles } = await import('../../stores/desk-actions');
     await loadDeskFiles();
 
-    expect(mockHanaFetch).toHaveBeenNthCalledWith(
+    expect(mockLingxiFetch).toHaveBeenNthCalledWith(
       1,
       '/api/workbench/files?mountId=mount_docs',
     );
@@ -201,7 +201,7 @@ describe('desk-actions workspace roots', () => {
       deskFiles: existingFiles,
       deskTreeFilesByPath: { '': existingFiles },
     } as never);
-    mockHanaFetch.mockResolvedValueOnce(jsonStatusResponse({
+    mockLingxiFetch.mockResolvedValueOnce(jsonStatusResponse({
       error: { code: 'resource_not_found', message: 'missing' },
     }, 404));
 
@@ -212,7 +212,7 @@ describe('desk-actions workspace roots', () => {
     expect(useStore.getState().cwdHistory).toEqual(['/workspace/Local']);
     expect(useStore.getState().deskBasePath).toBe('studio:mount_docs');
     expect(useStore.getState().deskFiles).toBe(existingFiles);
-    expect(mockHanaFetch).toHaveBeenCalledTimes(1);
+    expect(mockLingxiFetch).toHaveBeenCalledTimes(1);
   });
 
   it('stores the disclosed native root of a local_fs workspace from the workbench files response', async () => {
@@ -221,7 +221,7 @@ describe('desk-actions workspace roots', () => {
       deskWorkspaceMountId: 'mount_docs',
       deskWorkspaceLabel: 'Docs',
     } as never);
-    mockHanaFetch
+    mockLingxiFetch
       .mockResolvedValueOnce(jsonResponse({
         mountId: 'mount_docs',
         mount: { label: 'Docs', nativeRootPath: '/Users/me/docs' },
@@ -244,7 +244,7 @@ describe('desk-actions workspace roots', () => {
       deskFiles: existingFiles,
       deskTreeFilesByPath: { '': existingFiles },
     } as never);
-    mockHanaFetch.mockResolvedValueOnce(jsonResponse({ error: 'workspace_not_found' }));
+    mockLingxiFetch.mockResolvedValueOnce(jsonResponse({ error: 'workspace_not_found' }));
 
     const { loadDeskFiles } = await import('../../stores/desk-actions');
     await loadDeskFiles('', null, 'mount_docs');
@@ -261,7 +261,7 @@ describe('desk-actions workspace roots', () => {
       deskWorkspaceLabel: 'Docs',
       deskTreeFilesByPath: { docs: existingChildren },
     } as never);
-    mockHanaFetch.mockResolvedValueOnce(jsonResponse({ error: 'workspace_not_found' }));
+    mockLingxiFetch.mockResolvedValueOnce(jsonResponse({ error: 'workspace_not_found' }));
 
     const { loadDeskTreeFiles } = await import('../../stores/desk-actions');
     await loadDeskTreeFiles('docs', { force: true });
@@ -276,7 +276,7 @@ describe('desk-actions workspace roots', () => {
       deskWorkspaceLabel: 'Docs',
       deskWorkspaceNativeRoot: '/Users/me/docs',
     } as never);
-    mockHanaFetch
+    mockLingxiFetch
       .mockResolvedValueOnce(jsonResponse({
         mountId: 'mount_docs',
         mount: { label: 'Docs' },
@@ -291,7 +291,7 @@ describe('desk-actions workspace roots', () => {
   });
 
   it('seeds the native root when applying a studio workspace and resets it for plain folders', async () => {
-    mockHanaFetch.mockImplementation(async (url: string) => {
+    mockLingxiFetch.mockImplementation(async (url: string) => {
       if (url.startsWith('/api/workbench/files')) {
         return jsonResponse({
           mountId: 'mount_docs',
@@ -344,7 +344,7 @@ describe('desk-actions workspace roots', () => {
       homeFolder: '/hana',
       cwdHistory: ['/workspace/Desktop'],
     } as never);
-    mockHanaFetch
+    mockLingxiFetch
       .mockResolvedValueOnce(jsonResponse({ cwd_history: ['/workspace/Desktop'] }))
       .mockResolvedValueOnce(jsonResponse({ files: [], basePath: '/workspace/Desktop' }))
       .mockResolvedValueOnce(jsonResponse({ content: null }));
@@ -363,7 +363,7 @@ describe('desk-actions workspace roots', () => {
       cwdHistory: ['/workspace/Desktop'],
       workspaceFolders: ['/reference', '/workspace/Desktop'],
     } as never);
-    mockHanaFetch
+    mockLingxiFetch
       .mockResolvedValueOnce(jsonResponse({ cwd_history: ['/workspace/Desktop'] }))
       .mockResolvedValueOnce(jsonResponse({ files: [], basePath: '/workspace/Desktop' }))
       .mockResolvedValueOnce(jsonResponse({ content: null }));
@@ -380,13 +380,13 @@ describe('desk-actions workspace roots', () => {
     useStore.setState({
       cwdHistory: ['/workspace/Desktop', '/workspace/Novel'],
     } as never);
-    mockHanaFetch.mockResolvedValueOnce(jsonResponse({ cwd_history: ['/workspace/Novel'] }));
+    mockLingxiFetch.mockResolvedValueOnce(jsonResponse({ cwd_history: ['/workspace/Novel'] }));
 
     const { removeRecentWorkspace } = await import('../../stores/desk-actions');
     await removeRecentWorkspace('/workspace/Desktop/');
 
     expect(useStore.getState().cwdHistory).toEqual(['/workspace/Novel']);
-    expect(mockHanaFetch).toHaveBeenCalledWith(
+    expect(mockLingxiFetch).toHaveBeenCalledWith(
       '/api/config/workspaces/recent?agentId=hana',
       expect.objectContaining({
         method: 'DELETE',
@@ -409,7 +409,7 @@ describe('desk-actions workspace roots', () => {
     await removeRecentWorkspace('/workspace/Desktop');
     await clearRecentWorkspaces();
 
-    expect(mockHanaFetch.mock.calls.some(([url]) => String(url).includes('/api/config/workspaces/recent'))).toBe(false);
+    expect(mockLingxiFetch.mock.calls.some(([url]) => String(url).includes('/api/config/workspaces/recent'))).toBe(false);
     expect(warn).toHaveBeenCalled();
     warn.mockRestore();
   });
@@ -426,7 +426,7 @@ describe('desk-actions workspace roots', () => {
         { workspaceId: 'mount_docs', mountId: 'mount_docs', label: 'Docs', isDefault: false },
       ],
     } as never);
-    mockHanaFetch.mockImplementation(async (url: string, opts?: RequestInit) => {
+    mockLingxiFetch.mockImplementation(async (url: string, opts?: RequestInit) => {
       if (url === '/api/studio/workspaces/mount_docs' && opts?.method === 'DELETE') {
         return jsonResponse({ ok: true, mountId: 'mount_docs' });
       }
@@ -446,7 +446,7 @@ describe('desk-actions workspace roots', () => {
     expect(useStore.getState().selectedWorkspaceMountId).toBeNull();
     expect(useStore.getState().deskWorkspaceMountId).toBeNull();
     expect(useStore.getState().deskBasePath).toBe('');
-    expect(mockHanaFetch).toHaveBeenCalledWith(
+    expect(mockLingxiFetch).toHaveBeenCalledWith(
       '/api/studio/workspaces/mount_docs',
       expect.objectContaining({ method: 'DELETE' }),
     );
@@ -456,13 +456,13 @@ describe('desk-actions workspace roots', () => {
     useStore.setState({
       cwdHistory: ['/workspace/Desktop', '/workspace/Novel'],
     } as never);
-    mockHanaFetch.mockResolvedValueOnce(jsonResponse({ cwd_history: [] }));
+    mockLingxiFetch.mockResolvedValueOnce(jsonResponse({ cwd_history: [] }));
 
     const { clearRecentWorkspaces } = await import('../../stores/desk-actions');
     await clearRecentWorkspaces();
 
     expect(useStore.getState().cwdHistory).toEqual([]);
-    expect(mockHanaFetch).toHaveBeenCalledWith(
+    expect(mockLingxiFetch).toHaveBeenCalledWith(
       '/api/config/workspaces/recent/all?agentId=hana',
       expect.objectContaining({ method: 'DELETE' }),
     );
@@ -470,7 +470,7 @@ describe('desk-actions workspace roots', () => {
 
   it('persists the selected workspace before refreshing the visible desk root', async () => {
     const persist = deferred<Response>();
-    mockHanaFetch
+    mockLingxiFetch
       .mockResolvedValueOnce(jsonResponse({ state: null }))
       .mockReturnValueOnce(persist.promise)
       .mockResolvedValueOnce(jsonResponse({ files: [{ name: 'note.md' }], basePath: '/workspace/Desktop' }))
@@ -482,12 +482,12 @@ describe('desk-actions workspace roots', () => {
     expect(useStore.getState().selectedFolder).toBe('/workspace/Desktop');
     expect(useStore.getState().deskBasePath).toBe('/workspace/Desktop');
     expect(useStore.getState().deskFiles).toEqual([]);
-    expect(mockHanaFetch).toHaveBeenCalledTimes(2);
-    expect(mockHanaFetch).toHaveBeenNthCalledWith(
+    expect(mockLingxiFetch).toHaveBeenCalledTimes(2);
+    expect(mockLingxiFetch).toHaveBeenNthCalledWith(
       1,
       '/api/preferences/workspace-ui-state?workspace=%2Fworkspace%2FDesktop&surface=electron',
     );
-    expect(mockHanaFetch).toHaveBeenNthCalledWith(
+    expect(mockLingxiFetch).toHaveBeenNthCalledWith(
       2,
       '/api/config/workspaces/recent?agentId=hana',
       expect.objectContaining({
@@ -499,7 +499,7 @@ describe('desk-actions workspace roots', () => {
     persist.resolve(jsonResponse({ cwd_history: ['/workspace/Desktop'] }));
     await run;
 
-    expect(mockHanaFetch).toHaveBeenNthCalledWith(
+    expect(mockLingxiFetch).toHaveBeenNthCalledWith(
       3,
       '/api/desk/files?dir=%2Fworkspace%2FDesktop',
     );
@@ -557,10 +557,10 @@ describe('desk-actions workspace roots', () => {
     const { persistCurrentWorkspaceUiStateNow } = await import('../../stores/workspace-ui-state-actions');
     await persistCurrentWorkspaceUiStateNow('/workspace');
 
-    expect(mockHanaFetch).toHaveBeenCalledWith('/api/preferences/workspace-ui-state', expect.objectContaining({
+    expect(mockLingxiFetch).toHaveBeenCalledWith('/api/preferences/workspace-ui-state', expect.objectContaining({
       method: 'PUT',
     }));
-    const [, requestInit] = mockHanaFetch.mock.calls.at(-1) || [];
+    const [, requestInit] = mockLingxiFetch.mock.calls.at(-1) || [];
     const body = JSON.parse(String((requestInit as RequestInit).body));
     expect(body).toMatchObject({
       workspace: '/workspace',
@@ -630,7 +630,7 @@ describe('desk-actions workspace roots', () => {
       await activateWorkspaceDesk('/workspace-b', { reload: false });
       await vi.runOnlyPendingTimersAsync();
 
-      const putCall = mockHanaFetch.mock.calls.find(([url, init]) =>
+      const putCall = mockLingxiFetch.mock.calls.find(([url, init]) =>
         url === '/api/preferences/workspace-ui-state' && (init as RequestInit | undefined)?.method === 'PUT',
       );
       expect(putCall).toBeTruthy();
@@ -729,7 +729,7 @@ describe('desk-actions workspace roots', () => {
   });
 
   it('restores persisted workspace preview state from the backend when memory has no entry', async () => {
-    mockHanaFetch.mockResolvedValueOnce(jsonResponse({
+    mockLingxiFetch.mockResolvedValueOnce(jsonResponse({
       state: {
         deskCurrentPath: 'src/react',
         deskExpandedPaths: ['src', 'src/react'],
@@ -768,7 +768,7 @@ describe('desk-actions workspace roots', () => {
     const { activateWorkspaceDesk } = await import('../../stores/desk-actions');
     await activateWorkspaceDesk('/workspace', { reload: false });
 
-    expect(mockHanaFetch).toHaveBeenCalledWith('/api/preferences/workspace-ui-state?workspace=%2Fworkspace&surface=electron');
+    expect(mockLingxiFetch).toHaveBeenCalledWith('/api/preferences/workspace-ui-state?workspace=%2Fworkspace&surface=electron');
     expect(useStore.getState().deskCurrentPath).toBe('');
     expect(useStore.getState().deskExpandedPaths).toEqual(['src', 'src/react']);
     expect(useStore.getState().deskSelectedPath).toBe('src/react/App.tsx');
@@ -876,7 +876,7 @@ describe('desk-actions workspace roots', () => {
       },
       deskFiles: [{ name: 'notes', isDir: true }],
     } as never);
-    mockHanaFetch.mockResolvedValueOnce(jsonResponse({
+    mockLingxiFetch.mockResolvedValueOnce(jsonResponse({
       ok: true,
       files: [{ name: 'renamed.md', isDir: false }],
     }));
@@ -885,7 +885,7 @@ describe('desk-actions workspace roots', () => {
     const ok = await deskRenameTreeItem('notes', 'chapter.md', 'renamed.md', false);
 
     expect(ok).toBe(true);
-    expect(mockHanaFetch).toHaveBeenCalledWith('/api/desk/files', expect.objectContaining({
+    expect(mockLingxiFetch).toHaveBeenCalledWith('/api/desk/files', expect.objectContaining({
       method: 'POST',
       body: JSON.stringify({
         action: 'rename',
@@ -907,7 +907,7 @@ describe('desk-actions workspace roots', () => {
       },
       deskFiles: [{ name: 'notes', isDir: true }],
     } as never);
-    mockHanaFetch.mockResolvedValueOnce(jsonResponse({
+    mockLingxiFetch.mockResolvedValueOnce(jsonResponse({
       ok: true,
       files: [{ name: 'idea.md', isDir: false }],
     }));
@@ -916,7 +916,7 @@ describe('desk-actions workspace roots', () => {
     const ok = await deskCreateFileInSubdir('notes', 'idea.md', '');
 
     expect(ok).toBe(true);
-    expect(mockHanaFetch).toHaveBeenCalledWith('/api/desk/files', expect.objectContaining({
+    expect(mockLingxiFetch).toHaveBeenCalledWith('/api/desk/files', expect.objectContaining({
       method: 'POST',
       body: JSON.stringify({
         action: 'create',
@@ -939,7 +939,7 @@ describe('desk-actions workspace roots', () => {
       },
       deskFiles: [],
     } as never);
-    mockHanaFetch.mockResolvedValueOnce(jsonResponse({
+    mockLingxiFetch.mockResolvedValueOnce(jsonResponse({
       ok: true,
       files: [{ name: 'drafts', isDir: true }],
     }));
@@ -948,7 +948,7 @@ describe('desk-actions workspace roots', () => {
     const ok = await deskMkdirInSubdir('notes', 'drafts');
 
     expect(ok).toBe(true);
-    expect(mockHanaFetch).toHaveBeenCalledWith('/api/desk/files', expect.objectContaining({
+    expect(mockLingxiFetch).toHaveBeenCalledWith('/api/desk/files', expect.objectContaining({
       method: 'POST',
       body: JSON.stringify({
         action: 'mkdir',
@@ -974,7 +974,7 @@ describe('desk-actions workspace roots', () => {
       deskSelectedPath: 'notes/deep/leaf.md',
       deskFiles: [{ name: 'notes', isDir: true }],
     } as never);
-    mockHanaFetch.mockResolvedValueOnce(jsonResponse({
+    mockLingxiFetch.mockResolvedValueOnce(jsonResponse({
       ok: true,
       files: [{ name: 'renamed', isDir: true }],
     }));
@@ -1001,7 +1001,7 @@ describe('desk-actions workspace roots', () => {
       },
       deskExpandedPaths: ['notes'],
     } as never);
-    mockHanaFetch.mockResolvedValueOnce(jsonResponse({
+    mockLingxiFetch.mockResolvedValueOnce(jsonResponse({
       files: [],
       basePath: '/workspace',
     }));
@@ -1013,7 +1013,7 @@ describe('desk-actions workspace roots', () => {
 
     expect(ok).toBe(true);
     expect(trashItem).toHaveBeenCalledWith('/workspace/notes/chapter.md');
-    expect(mockHanaFetch).toHaveBeenCalledWith('/api/desk/files?dir=%2Fworkspace&subdir=notes');
+    expect(mockLingxiFetch).toHaveBeenCalledWith('/api/desk/files?dir=%2Fworkspace&subdir=notes');
     expect(useStore.getState().deskTreeFilesByPath.notes).toEqual([]);
   });
 
@@ -1044,7 +1044,7 @@ describe('desk-actions workspace roots', () => {
         getAttribute: (name: string) => (name === 'data-platform' ? 'web' : null),
       },
     };
-    mockHanaFetch.mockResolvedValueOnce(jsonResponse({
+    mockLingxiFetch.mockResolvedValueOnce(jsonResponse({
       state: {
         deskExpandedPaths: ['mobile-only'],
         deskSelectedPath: 'mobile-only/a.md',
@@ -1054,7 +1054,7 @@ describe('desk-actions workspace roots', () => {
     const { activateWorkspaceDesk } = await import('../../stores/desk-actions');
     await activateWorkspaceDesk('/workspace', { reload: false });
 
-    expect(mockHanaFetch).toHaveBeenCalledWith('/api/preferences/workspace-ui-state?workspace=%2Fworkspace&surface=pwa');
+    expect(mockLingxiFetch).toHaveBeenCalledWith('/api/preferences/workspace-ui-state?workspace=%2Fworkspace&surface=pwa');
     expect(useStore.getState().deskExpandedPaths).toEqual(['mobile-only']);
     expect(useStore.getState().deskSelectedPath).toBe('mobile-only/a.md');
   });
@@ -1068,7 +1068,7 @@ describe('desk-actions workspace roots', () => {
       deskExpandedPaths: [],
       deskSelectedPath: '',
     } as never);
-    mockHanaFetch.mockResolvedValueOnce(jsonResponse({
+    mockLingxiFetch.mockResolvedValueOnce(jsonResponse({
       files: [{ name: 'chapter.md', isDir: false }],
       basePath: '/workspace',
     }));
@@ -1076,7 +1076,7 @@ describe('desk-actions workspace roots', () => {
     const { loadDeskTreeFiles } = await import('../../stores/desk-actions');
     await loadDeskTreeFiles('notes');
 
-    expect(mockHanaFetch).toHaveBeenCalledWith('/api/desk/files?dir=%2Fworkspace&subdir=notes');
+    expect(mockLingxiFetch).toHaveBeenCalledWith('/api/desk/files?dir=%2Fworkspace&subdir=notes');
     expect(useStore.getState().deskCurrentPath).toBe('drafts');
     expect(useStore.getState().deskFiles).toEqual([{ name: 'draft.md', isDir: false }]);
     expect(useStore.getState().deskTreeFilesByPath).toEqual({
@@ -1096,7 +1096,7 @@ describe('desk-actions workspace roots', () => {
         notes: [{ name: 'chapter.md', isDir: false }],
       },
     } as never);
-    mockHanaFetch.mockResolvedValueOnce(jsonResponse({
+    mockLingxiFetch.mockResolvedValueOnce(jsonResponse({
       ok: true,
       files: [],
     }));
@@ -1105,7 +1105,7 @@ describe('desk-actions workspace roots', () => {
     const ok = await deskTrashTreeItems([{ sourceSubdir: 'notes', name: 'chapter.md', isDirectory: false }]);
 
     expect(ok).toBe(true);
-    expect(mockHanaFetch).toHaveBeenCalledWith('/api/workbench/actions', expect.objectContaining({
+    expect(mockLingxiFetch).toHaveBeenCalledWith('/api/workbench/actions', expect.objectContaining({
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -1144,7 +1144,7 @@ describe('desk-actions workspace roots', () => {
         notes: [{ name: 'chapter.md', isDir: false }],
       },
     } as never);
-    mockHanaFetch.mockResolvedValueOnce(jsonResponse({
+    mockLingxiFetch.mockResolvedValueOnce(jsonResponse({
       ok: true,
       files: [],
     }));
@@ -1154,7 +1154,7 @@ describe('desk-actions workspace roots', () => {
 
     expect(ok).toBe(true);
     expect(trashItem).not.toHaveBeenCalled();
-    expect(mockHanaFetch).toHaveBeenCalledWith('/api/workbench/actions', expect.objectContaining({
+    expect(mockLingxiFetch).toHaveBeenCalledWith('/api/workbench/actions', expect.objectContaining({
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -1175,7 +1175,7 @@ describe('desk-actions workspace roots', () => {
         notes: [{ name: 'chapter.md', isDir: false }],
       },
     } as never);
-    mockHanaFetch.mockResolvedValueOnce(jsonResponse({
+    mockLingxiFetch.mockResolvedValueOnce(jsonResponse({
       ok: true,
       files: [],
     }));
@@ -1184,7 +1184,7 @@ describe('desk-actions workspace roots', () => {
     const ok = await deskTrashTreeItems([{ sourceSubdir: 'notes', name: 'chapter.md', isDirectory: false }]);
 
     expect(ok).toBe(true);
-    expect(mockHanaFetch).toHaveBeenCalledWith('/api/workbench/actions', expect.objectContaining({
+    expect(mockLingxiFetch).toHaveBeenCalledWith('/api/workbench/actions', expect.objectContaining({
       body: JSON.stringify({
         action: 'safeDelete',
         mountId: 'mount_docs',
@@ -1201,7 +1201,7 @@ describe('desk-actions workspace roots', () => {
         notes: [],
       },
     } as never);
-    mockHanaFetch.mockResolvedValueOnce(jsonResponse({
+    mockLingxiFetch.mockResolvedValueOnce(jsonResponse({
       ok: true,
       files: [{ name: 'note.md', isDir: false }],
     }));
@@ -1211,7 +1211,7 @@ describe('desk-actions workspace roots', () => {
     const ok = await deskUploadBrowserFilesToSubdir([file], 'notes');
 
     expect(ok).toBe(true);
-    const call = mockHanaFetch.mock.calls[0];
+    const call = mockLingxiFetch.mock.calls[0];
     expect(call[0]).toBe('/api/workbench/upload');
     expect(call[1]).toMatchObject({
       method: 'POST',
@@ -1237,7 +1237,7 @@ describe('desk-actions workspace roots', () => {
         notes: [],
       },
     } as never);
-    mockHanaFetch.mockResolvedValueOnce(jsonResponse({
+    mockLingxiFetch.mockResolvedValueOnce(jsonResponse({
       ok: true,
       files: [{ name: 'note.md', isDir: false }],
     }));
@@ -1247,7 +1247,7 @@ describe('desk-actions workspace roots', () => {
     const ok = await deskUploadBrowserFilesToSubdir([file], 'notes');
 
     expect(ok).toBe(true);
-    const call = mockHanaFetch.mock.calls[0];
+    const call = mockLingxiFetch.mock.calls[0];
     expect(call[0]).toBe('/api/workbench/upload');
     expect(JSON.parse(call[1].body)).toMatchObject({
       mountId: 'mount_docs',
@@ -1266,7 +1266,7 @@ describe('desk-actions workspace roots', () => {
         archive: [],
       },
     } as never);
-    mockHanaFetch.mockResolvedValueOnce(jsonResponse({
+    mockLingxiFetch.mockResolvedValueOnce(jsonResponse({
       filesByPath: {
         notes: [],
         archive: [{ name: 'chapter.md', isDir: false }],
@@ -1277,7 +1277,7 @@ describe('desk-actions workspace roots', () => {
     const { deskMoveTreeFiles } = await import('../../stores/desk-actions');
     await deskMoveTreeFiles([{ sourceSubdir: 'notes', name: 'chapter.md', isDirectory: false }], 'archive');
 
-    expect(mockHanaFetch).toHaveBeenCalledWith('/api/desk/files', expect.objectContaining({
+    expect(mockLingxiFetch).toHaveBeenCalledWith('/api/desk/files', expect.objectContaining({
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -1298,7 +1298,7 @@ describe('desk-actions workspace roots', () => {
     useStore.setState({
       deskBasePath: '/workspace',
     } as never);
-    mockHanaFetch.mockResolvedValueOnce(jsonResponse({
+    mockLingxiFetch.mockResolvedValueOnce(jsonResponse({
       results: [
         { name: 'DeskTree.tsx', relativePath: 'src/DeskTree.tsx', parentSubdir: 'src', isDir: false },
       ],
@@ -1307,7 +1307,7 @@ describe('desk-actions workspace roots', () => {
     const { searchDeskFiles } = await import('../../stores/desk-actions');
     const results = await searchDeskFiles('Desk');
 
-    expect(mockHanaFetch).toHaveBeenCalledWith('/api/desk/search-files?dir=%2Fworkspace&q=Desk');
+    expect(mockLingxiFetch).toHaveBeenCalledWith('/api/desk/search-files?dir=%2Fworkspace&q=Desk');
     expect(results).toEqual([
       { name: 'DeskTree.tsx', relativePath: 'src/DeskTree.tsx', parentSubdir: 'src', isDir: false },
     ]);
@@ -1320,7 +1320,7 @@ describe('desk-actions workspace roots', () => {
       deskExpandedPaths: [],
       deskSelectedPath: '',
     } as never);
-    mockHanaFetch
+    mockLingxiFetch
       .mockResolvedValueOnce(jsonResponse({ files: [{ name: 'components', isDir: true }], basePath: '/workspace' }))
       .mockResolvedValueOnce(jsonResponse({ files: [{ name: 'DeskTree.tsx', isDir: false }], basePath: '/workspace' }));
 
@@ -1332,8 +1332,8 @@ describe('desk-actions workspace roots', () => {
       isDir: false,
     });
 
-    expect(mockHanaFetch).toHaveBeenNthCalledWith(1, '/api/desk/files?dir=%2Fworkspace&subdir=src');
-    expect(mockHanaFetch).toHaveBeenNthCalledWith(2, '/api/desk/files?dir=%2Fworkspace&subdir=src%2Fcomponents');
+    expect(mockLingxiFetch).toHaveBeenNthCalledWith(1, '/api/desk/files?dir=%2Fworkspace&subdir=src');
+    expect(mockLingxiFetch).toHaveBeenNthCalledWith(2, '/api/desk/files?dir=%2Fworkspace&subdir=src%2Fcomponents');
     expect(useStore.getState().deskExpandedPaths).toEqual(['src', 'src/components']);
     expect(useStore.getState().deskSelectedPath).toBe('src/components/DeskTree.tsx');
   });
@@ -1350,7 +1350,7 @@ describe('desk-actions workspace roots', () => {
       deskSelectedPath: '',
       rightWorkspaceTab: 'session-files',
     } as never);
-    mockHanaFetch
+    mockLingxiFetch
       .mockResolvedValueOnce(jsonResponse({
         files: [{ name: 'OH-Works', isDir: true }],
         basePath: '/workspace',
@@ -1368,9 +1368,9 @@ describe('desk-actions workspace roots', () => {
     const ok = await revealDeskDirectory('/workspace/OH-Works/Screenshots');
 
     expect(ok).toBe(true);
-    expect(mockHanaFetch).toHaveBeenNthCalledWith(1, '/api/desk/files?dir=%2Fworkspace');
-    expect(mockHanaFetch).toHaveBeenNthCalledWith(2, '/api/desk/files?dir=%2Fworkspace&subdir=OH-Works');
-    expect(mockHanaFetch).toHaveBeenNthCalledWith(3, '/api/desk/files?dir=%2Fworkspace&subdir=OH-Works%2FScreenshots');
+    expect(mockLingxiFetch).toHaveBeenNthCalledWith(1, '/api/desk/files?dir=%2Fworkspace');
+    expect(mockLingxiFetch).toHaveBeenNthCalledWith(2, '/api/desk/files?dir=%2Fworkspace&subdir=OH-Works');
+    expect(mockLingxiFetch).toHaveBeenNthCalledWith(3, '/api/desk/files?dir=%2Fworkspace&subdir=OH-Works%2FScreenshots');
     expect(useStore.getState().deskBasePath).toBe('/workspace');
     expect(useStore.getState().deskCurrentPath).toBe('');
     expect(useStore.getState().deskFiles).toEqual([{ name: 'OH-Works', isDir: true }]);
@@ -1396,7 +1396,7 @@ describe('desk-actions workspace roots', () => {
     const ok = await revealDeskDirectory('/other/OH-Works');
 
     expect(ok).toBe(false);
-    expect(mockHanaFetch).not.toHaveBeenCalled();
+    expect(mockLingxiFetch).not.toHaveBeenCalled();
     expect(useStore.getState().deskExpandedPaths).toEqual([]);
     expect(useStore.getState().deskSelectedPath).toBe('');
   });

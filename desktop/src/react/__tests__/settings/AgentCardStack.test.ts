@@ -12,15 +12,15 @@ import {
   calculateNearestRevealScrollLeft,
 } from '../../settings/tabs/agent/AgentCardStack';
 import { useSettingsStore } from '../../settings/store';
-import { hanaFetch } from '../../settings/api';
+import { lingxiFetch } from '../../settings/api';
 
 vi.mock('../../settings/store', () => ({
   useSettingsStore: Object.assign(vi.fn(), { setState: vi.fn() }),
 }));
 
 vi.mock('../../settings/api', () => ({
-  hanaFetch: vi.fn(),
-  hanaUrl: (path: string) => path,
+  lingxiFetch: vi.fn(),
+  lingxiUrl: (path: string) => path,
   yuanFallbackAvatar: (yuan?: string) => `fallback:${yuan || 'lingxi'}`,
 }));
 
@@ -189,11 +189,11 @@ describe('AgentCardStack actions', () => {
     fireEvent.lostPointerCapture(card, { pointerId: 8 });
     expect(stack.className).not.toContain('expanded');
     expect(useSettingsStore.setState).not.toHaveBeenCalled();
-    expect(hanaFetch).not.toHaveBeenCalled();
+    expect(lingxiFetch).not.toHaveBeenCalled();
   });
 
   it('keeps the existing drag reorder commit semantics on pointerup', () => {
-    vi.mocked(hanaFetch).mockResolvedValue(new Response('{}'));
+    vi.mocked(lingxiFetch).mockResolvedValue(new Response('{}'));
     render(React.createElement(AgentCardStack, {
       agents,
       selectedId: 'hana',
@@ -218,7 +218,7 @@ describe('AgentCardStack actions', () => {
     expect(useSettingsStore.setState).toHaveBeenCalledWith({
       agents: [agents[1], agents[0], agents[2]],
     });
-    expect(hanaFetch).toHaveBeenCalledWith('/api/agents/order', expect.objectContaining({
+    expect(lingxiFetch).toHaveBeenCalledWith('/api/agents/order', expect.objectContaining({
       method: 'PUT',
       body: JSON.stringify({ order: ['deepseek', 'hana', 'maomao'] }),
     }));

@@ -1,16 +1,16 @@
 import { describe, expect, it, vi } from "vitest";
-import { HanaEngine } from "../core/engine.ts";
+import { LingxiEngine } from "../core/engine.ts";
 
 /**
- * 针对 HanaEngine.syncWorkspaceSkillPaths 的最小单测。
+ * 针对 LingxiEngine.syncWorkspaceSkillPaths 的最小单测。
  *
  * syncWorkspaceSkillPaths 在"externalPaths 列表没变"时默认短路 return false，不 reload
  * 也不 emit。上传/删除 workspace skill 的场景（dirPath 不变，内容变）必须用 force: true
  * 绕过这个短路，否则会和 chokidar watcher 的 dot-ignore bug 叠加成用户看不到变化的 bug。
  */
-describe("HanaEngine.syncWorkspaceSkillPaths", () => {
+describe("LingxiEngine.syncWorkspaceSkillPaths", () => {
   function makeFakeEngine(initialPaths) {
-    const engine = Object.create(HanaEngine.prototype);
+    const engine = Object.create(LingxiEngine.prototype);
     const skills = {
       _externalPaths: initialPaths,
       setExternalPaths: vi.fn((paths) => { skills._externalPaths = paths; }),
@@ -92,7 +92,7 @@ describe("HanaEngine.syncWorkspaceSkillPaths", () => {
   });
 
   it("recomputes one keyed Agent policy without changing shared workspace paths", () => {
-    const engine = Object.create(HanaEngine.prototype);
+    const engine = Object.create(LingxiEngine.prototype);
     const targetAgent = { id: "target", config: { workspace_context: { discover_project_skills: false } } };
     engine._agentMgr = {
       getAgent: vi.fn((id) => id === "target" ? targetAgent : null),

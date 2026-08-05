@@ -5,12 +5,12 @@ import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/re
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { AssistantMessage } from '../../components/chat/AssistantMessage';
-import { hanaFetch } from '../../hooks/use-hana-fetch';
+import { lingxiFetch } from '../../hooks/use-hana-fetch';
 import { useStore } from '../../stores';
 
 vi.mock('../../hooks/use-hana-fetch', () => ({
-  hanaFetch: vi.fn(async () => new Response('{}', { status: 200 })),
-  hanaUrl: (path: string) => `http://127.0.0.1:3210${path}`,
+  lingxiFetch: vi.fn(async () => new Response('{}', { status: 200 })),
+  lingxiUrl: (path: string) => `http://127.0.0.1:3210${path}`,
 }));
 
 vi.mock('../../utils/screenshot', () => ({
@@ -72,7 +72,7 @@ describe('AssistantMessage media generation placeholder', () => {
     useStore.setState({
       resolveBlockByTaskId,
     } as never);
-    vi.mocked(hanaFetch).mockResolvedValueOnce(new Response(JSON.stringify({
+    vi.mocked(lingxiFetch).mockResolvedValueOnce(new Response(JSON.stringify({
       ok: true,
       placeholder: {
         type: 'media_generation',
@@ -108,7 +108,7 @@ describe('AssistantMessage media generation placeholder', () => {
     fireEvent.click(screen.getByRole('button', { name: 'chat.media.retryLabel' }));
 
     await waitFor(() => {
-      expect(hanaFetch).toHaveBeenCalledWith('/api/media/tasks/task-img/retry', {
+      expect(lingxiFetch).toHaveBeenCalledWith('/api/media/tasks/task-img/retry', {
         method: 'POST',
       });
     });

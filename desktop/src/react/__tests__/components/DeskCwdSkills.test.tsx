@@ -15,7 +15,7 @@ vi.mock('../../stores', () => {
   return { useStore };
 });
 
-vi.mock('../../hooks/use-hana-fetch', () => ({ hanaFetch: vi.fn() }));
+vi.mock('../../hooks/use-hana-fetch', () => ({ lingxiFetch: vi.fn() }));
 vi.mock('../../services/resource-access', () => ({ canUseNativeResourcePath: () => true }));
 vi.mock('../../services/server-connection', () => ({ resolveServerConnection: () => ({}) }));
 vi.mock('../../utils/platform-runtime', () => ({ isWebRuntime: () => false }));

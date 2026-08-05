@@ -4,7 +4,7 @@
  */
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { ProviderIcon } from '@/ui';
-import { hanaFetch } from '../api';
+import { lingxiFetch } from '../api';
 import styles from '../Settings.module.css';
 
 interface ModelInfo {
@@ -45,7 +45,7 @@ export function ModelWidget({
 
   // 从唯一信源获取模型列表
   const refreshModels = React.useCallback(() => {
-    hanaFetch('/api/models').then(r => r.json()).then(data => {
+    lingxiFetch('/api/models').then(r => r.json()).then(data => {
       setModels(data.models || []);
     }).catch(() => {});
   }, []);

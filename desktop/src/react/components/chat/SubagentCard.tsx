@@ -6,7 +6,7 @@
  */
 
 import { memo, useState, useEffect, useCallback } from 'react';
-import { hanaUrl } from '../../hooks/use-hana-fetch';
+import { lingxiUrl } from '../../hooks/use-hana-fetch';
 import { useStore } from '../../stores';
 import { AgentAvatar, resolveAgentDisplayInfo } from '../../utils/agent-display';
 import { ChatResourceCard } from './ChatResourceCard';
@@ -68,7 +68,7 @@ export const SubagentCard = memo(function SubagentCard({ block }: SubagentCardPr
 
   const handleAbort = useCallback(async () => {
     try {
-      const res = await fetch(hanaUrl(`/api/task/${block.taskId}/abort`), { method: 'POST' });
+      const res = await fetch(lingxiUrl(`/api/task/${block.taskId}/abort`), { method: 'POST' });
       if (res.ok) {
         setStatus('aborted');
       }

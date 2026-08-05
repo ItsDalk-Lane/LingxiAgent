@@ -4,7 +4,7 @@ type MockState = Record<string, unknown>;
 
 const mockState: MockState = {};
 
-const mockHanaFetch = vi.fn();
+const mockLingxiFetch = vi.fn();
 const mockApplyAgentIdentity = vi.fn(async () => {});
 const mockLoadAgents = vi.fn(async () => {});
 const mockLoadAvatars = vi.fn();
@@ -45,7 +45,7 @@ vi.mock('../stores', () => ({
 }));
 
 vi.mock('../hooks/use-hana-fetch', () => ({
-  hanaFetch: mockHanaFetch,
+  lingxiFetch: mockLingxiFetch,
 }));
 
 vi.mock('../stores/agent-actions', () => ({
@@ -161,7 +161,7 @@ function persistedLanConnectionJson() {
 describe('initApp bridge indicator', () => {
   beforeEach(() => {
     Object.keys(mockState).forEach(k => delete mockState[k]);
-    mockHanaFetch.mockReset();
+    mockLingxiFetch.mockReset();
     mockApplyAgentIdentity.mockReset();
     mockLoadAgents.mockReset();
     mockLoadAvatars.mockReset();
@@ -219,7 +219,7 @@ describe('initApp bridge indicator', () => {
     };
     (globalThis as Record<string, unknown>).t = vi.fn((key: string) => key);
 
-    mockHanaFetch
+    mockLingxiFetch
       .mockResolvedValueOnce(serverIdentityResponse())
       .mockResolvedValueOnce(jsonResponse({ agentId: 'hana', agent: 'Hanako', user: 'User', avatars: {} }))
       .mockResolvedValueOnce(jsonResponse({ locale: 'zh-CN' }))
@@ -263,7 +263,7 @@ describe('initApp bridge indicator', () => {
     expect(mockState.bridgeDotConnected).toBe(true);
     // The dot describes the bootstrap agent's bridges, named in the request,
     // rather than whichever agent the server is focused on when it arrives.
-    expect(mockHanaFetch).toHaveBeenCalledWith('/api/bridge/status?agentId=hana');
+    expect(mockLingxiFetch).toHaveBeenCalledWith('/api/bridge/status?agentId=hana');
   });
 
   it('refreshes the HttpOnly device web session before opening WebSocket for a persisted LAN frontend', async () => {
@@ -297,7 +297,7 @@ describe('initApp bridge indicator', () => {
     };
     (globalThis as Record<string, unknown>).t = vi.fn((key: string) => key);
 
-    mockHanaFetch
+    mockLingxiFetch
       .mockResolvedValueOnce(jsonResponse({ ok: true }))
       .mockResolvedValueOnce(serverIdentityResponse({
         connectionKind: 'lan',
@@ -326,12 +326,12 @@ describe('initApp bridge indicator', () => {
     const { initApp } = await import('../app-init');
     await initApp();
 
-    expect(mockHanaFetch).toHaveBeenNthCalledWith(1, '/api/web-auth/login', expect.objectContaining({
+    expect(mockLingxiFetch).toHaveBeenNthCalledWith(1, '/api/web-auth/login', expect.objectContaining({
       method: 'POST',
       credentials: 'include',
       body: JSON.stringify({ credential: 'fixture-key' }),
     }));
-    expect(mockHanaFetch).toHaveBeenNthCalledWith(2, '/api/server/identity');
+    expect(mockLingxiFetch).toHaveBeenNthCalledWith(2, '/api/server/identity');
     expect(mockState.activeServerConnection).toEqual(expect.objectContaining({
       connectionId: 'lan:node_lan:studio_lan',
       kind: 'lan',
@@ -339,7 +339,7 @@ describe('initApp bridge indicator', () => {
       credentialKind: 'device_credential',
     }));
     expect(mockConnectWebSocket).toHaveBeenCalledTimes(1);
-    expect((mockHanaFetch.mock.invocationCallOrder[0] ?? 0)).toBeLessThan(mockConnectWebSocket.mock.invocationCallOrder[0] ?? 0);
+    expect((mockLingxiFetch.mock.invocationCallOrder[0] ?? 0)).toBeLessThan(mockConnectWebSocket.mock.invocationCallOrder[0] ?? 0);
   });
 
   it('stops startup explicitly when server identity cannot be loaded', async () => {
@@ -364,12 +364,12 @@ describe('initApp bridge indicator', () => {
     };
     (globalThis as Record<string, unknown>).t = vi.fn((key: string) => key);
 
-    mockHanaFetch.mockRejectedValueOnce(new Error('identity unavailable'));
+    mockLingxiFetch.mockRejectedValueOnce(new Error('identity unavailable'));
 
     const { initApp } = await import('../app-init');
     await initApp();
 
-    expect(mockHanaFetch).toHaveBeenCalledWith('/api/server/identity');
+    expect(mockLingxiFetch).toHaveBeenCalledWith('/api/server/identity');
     expect(mockSetStatus).toHaveBeenCalledWith('status.serverNotReady', false);
     expect(mockLoadModels).not.toHaveBeenCalled();
     expect(mockConnectWebSocket).not.toHaveBeenCalled();
@@ -398,7 +398,7 @@ describe('initApp bridge indicator', () => {
     };
     (globalThis as Record<string, unknown>).t = vi.fn((key: string) => key);
 
-    mockHanaFetch
+    mockLingxiFetch
       .mockResolvedValueOnce(serverIdentityResponse())
       .mockResolvedValueOnce(jsonResponse({ agentId: 'hana', agent: 'Hanako', user: 'User', avatars: {} }))
       .mockResolvedValueOnce(jsonResponse({ locale: 'zh-CN' }))
@@ -421,7 +421,7 @@ describe('initApp bridge indicator', () => {
     // Desk root, workspace history and the memory switch belong to one agent,
     // so startup must ask that agent for them by name rather than read them off
     // a request that carries no agent identity.
-    expect(mockHanaFetch).toHaveBeenCalledWith('/api/agents/hana/config');
+    expect(mockLingxiFetch).toHaveBeenCalledWith('/api/agents/hana/config');
     expect(mockState.homeFolder).toBe('/agent-home');
     expect(mockState.selectedFolder).toBe('/agent-home');
     expect(mockState.cwdHistory).toEqual(['/desktop']);
@@ -451,7 +451,7 @@ describe('initApp bridge indicator', () => {
     };
     (globalThis as Record<string, unknown>).t = vi.fn((key: string) => key);
 
-    mockHanaFetch
+    mockLingxiFetch
       .mockResolvedValueOnce(serverIdentityResponse())
       .mockResolvedValueOnce(jsonResponse({ agentId: 'hana', agent: 'Hanako', user: 'User', avatars: {} }))
       .mockResolvedValueOnce(jsonResponse({ locale: 'zh-CN' }))
@@ -500,7 +500,7 @@ describe('initApp bridge indicator', () => {
     };
     (globalThis as Record<string, unknown>).t = vi.fn((key: string) => key);
 
-    mockHanaFetch
+    mockLingxiFetch
       .mockResolvedValueOnce(serverIdentityResponse())
       .mockResolvedValueOnce(jsonResponse({ agentId: 'hana', agent: 'Hanako', user: 'User', avatars: {} }))
       .mockResolvedValueOnce(jsonResponse({ locale: 'zh-CN' }))
@@ -559,7 +559,7 @@ describe('initApp bridge indicator', () => {
     };
     (globalThis as Record<string, unknown>).t = vi.fn((key: string) => key);
 
-    mockHanaFetch
+    mockLingxiFetch
       .mockResolvedValueOnce(serverIdentityResponse())
       .mockResolvedValueOnce(jsonResponse({ agentId: 'hana', agent: 'Hanako', user: 'User', avatars: {} }))
       .mockResolvedValueOnce(jsonResponse({ locale: 'zh-CN' }))
@@ -631,7 +631,7 @@ describe('initApp bridge indicator', () => {
     };
     (globalThis as Record<string, unknown>).t = vi.fn((key: string) => key);
 
-    mockHanaFetch
+    mockLingxiFetch
       .mockResolvedValueOnce(serverIdentityResponse())
       .mockResolvedValueOnce(jsonResponse({ agentId: 'hana', agent: 'Hanako', user: 'User', avatars: {} }))
       .mockResolvedValueOnce(jsonResponse({ locale: 'zh-CN' }))
@@ -693,7 +693,7 @@ describe('initApp bridge indicator', () => {
     };
     (globalThis as Record<string, unknown>).t = vi.fn((key: string) => key);
 
-    mockHanaFetch
+    mockLingxiFetch
       .mockResolvedValueOnce(serverIdentityResponse())
       .mockResolvedValueOnce(jsonResponse({ agentId: 'hana', agent: 'Hanako', user: 'User', avatars: {} }))
       .mockResolvedValueOnce(jsonResponse({ locale: 'zh-CN' }))
@@ -755,7 +755,7 @@ describe('initApp bridge indicator', () => {
     };
     (globalThis as Record<string, unknown>).t = vi.fn((key: string) => key);
 
-    mockHanaFetch
+    mockLingxiFetch
       .mockResolvedValueOnce(serverIdentityResponse())
       .mockResolvedValueOnce(jsonResponse({ agentId: 'hana', agent: 'Hanako', user: 'User', avatars: {} }))
       .mockResolvedValueOnce(jsonResponse({ locale: 'zh-CN' }))
@@ -821,7 +821,7 @@ describe('initApp bridge indicator', () => {
     (globalThis as Record<string, unknown>).WebSocket = { OPEN: 1 };
 
     mockGetWebSocket.mockReturnValue({ readyState: 1, send } as unknown as WebSocket);
-    mockHanaFetch
+    mockLingxiFetch
       .mockResolvedValueOnce(serverIdentityResponse())
       .mockResolvedValueOnce(jsonResponse({ agentId: 'hana', agent: 'Hanako', user: 'User', avatars: {} }))
       .mockResolvedValueOnce(jsonResponse({ locale: 'zh-CN' }))
@@ -892,7 +892,7 @@ describe('initApp bridge indicator', () => {
     };
     (globalThis as Record<string, unknown>).t = vi.fn((key: string) => key);
 
-    mockHanaFetch
+    mockLingxiFetch
       .mockResolvedValueOnce(serverIdentityResponse())
       .mockResolvedValueOnce(jsonResponse({ agentId: 'hana', agent: 'Hanako', user: 'User', avatars: {} }))
       .mockResolvedValueOnce(jsonResponse({ locale: 'zh-CN' }))

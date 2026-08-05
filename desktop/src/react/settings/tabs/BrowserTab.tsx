@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSettingsStore } from '../store';
-import { hanaFetch } from '../api';
+import { lingxiFetch } from '../api';
 import { t } from '../helpers';
 import { updateSettingsSnapshot } from '../actions';
 import { SettingsSection } from '../components/SettingsSection';
@@ -33,7 +33,7 @@ export function BrowserTab() {
       return undefined;
     }
     let alive = true;
-    hanaFetch('/api/preferences/browser')
+    lingxiFetch('/api/preferences/browser')
       .then(res => res.json())
       .then((data) => {
         if (!alive) return;
@@ -60,7 +60,7 @@ export function BrowserTab() {
     setPrefs(next);
     setSaving(true);
     try {
-      const res = await hanaFetch('/api/preferences/browser', {
+      const res = await lingxiFetch('/api/preferences/browser', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ browser: next }),
@@ -84,7 +84,7 @@ export function BrowserTab() {
   const clearCookies = useCallback(async () => {
     setClearing(true);
     try {
-      const res = await hanaFetch('/api/preferences/browser/clear-cookies', { method: 'POST' });
+      const res = await lingxiFetch('/api/preferences/browser/clear-cookies', { method: 'POST' });
       const data = await res.json().catch(() => ({}));
       if (!res.ok || data?.error) throw new Error(data?.error || res.statusText || 'Failed');
       showToast(t('settings.browser.clearCookiesSuccess'), 'success');

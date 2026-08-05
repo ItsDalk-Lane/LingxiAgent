@@ -13,9 +13,9 @@ vi.mock("../lib/sandbox/index.js", () => ({
   createSandboxedTools,
 }));
 
-const { HanaEngine } = await import("../core/engine.ts");
+const { LingxiEngine } = await import("../core/engine.ts");
 
-describe("HanaEngine.buildTools session external sandbox grants", () => {
+describe("LingxiEngine.buildTools session external sandbox grants", () => {
   let tempRoot;
 
   afterEach(() => {
@@ -64,7 +64,7 @@ describe("HanaEngine.buildTools session external sandbox grants", () => {
       },
     }]);
 
-    const engine = Object.create(HanaEngine.prototype);
+    const engine = Object.create(LingxiEngine.prototype);
     engine._sessionFiles = registry;
     engine.getSessionByPath = vi.fn(() => null);
 
@@ -91,7 +91,7 @@ describe("HanaEngine.buildTools session external sandbox grants", () => {
     fs.mkdirSync(agentDir, { recursive: true });
     const sessionPath = path.join(agentDir, "sessions", "one.jsonl");
 
-    const engine = Object.create(HanaEngine.prototype);
+    const engine = Object.create(LingxiEngine.prototype);
     engine.hanakoHome = hanakoHome;
     engine.getAgent = vi.fn(() => ({ id: "hana", agentDir, tools: [] }));
     engine._pluginManager = null;
@@ -156,7 +156,7 @@ describe("HanaEngine.buildTools session external sandbox grants", () => {
       fs.mkdirSync(agentDir, { recursive: true });
       fs.mkdirSync(workspace, { recursive: true });
 
-      const engine = Object.create(HanaEngine.prototype);
+      const engine = Object.create(LingxiEngine.prototype);
       engine.hanakoHome = hanakoHome;
       engine.getAgent = vi.fn(() => ({ id: "hana", agentDir, tools: [] }));
       engine._pluginManager = null;
@@ -196,7 +196,7 @@ describe("HanaEngine.buildTools session external sandbox grants", () => {
       fs.mkdirSync(agentDir, { recursive: true });
       fs.mkdirSync(workspace, { recursive: true });
 
-      const engine = Object.create(HanaEngine.prototype);
+      const engine = Object.create(LingxiEngine.prototype);
       engine.hanakoHome = hanakoHome;
       engine.getAgent = vi.fn(() => ({ id: "hana", agentDir, tools: [] }));
       engine._pluginManager = null;
@@ -221,12 +221,12 @@ describe("HanaEngine.buildTools session external sandbox grants", () => {
     }
   });
 
-  it("rejects disabling sandbox networking through HanaEngine on Windows", () => {
+  it("rejects disabling sandbox networking through LingxiEngine on Windows", () => {
     const originalPlatform = process.platform;
     Object.defineProperty(process, "platform", { value: "win32", configurable: true });
 
     try {
-      const engine = Object.create(HanaEngine.prototype);
+      const engine = Object.create(LingxiEngine.prototype);
       engine._prefs = {
         getSandboxNetwork: vi.fn(() => false),
         setSandboxNetwork: vi.fn(),
@@ -250,7 +250,7 @@ describe("HanaEngine.buildTools session external sandbox grants", () => {
     fs.mkdirSync(agentDir, { recursive: true });
     fs.mkdirSync(workspace, { recursive: true });
 
-    const engine = Object.create(HanaEngine.prototype);
+    const engine = Object.create(LingxiEngine.prototype);
     engine.hanakoHome = hanakoHome;
     engine.getAgent = vi.fn(() => ({ id: "hana", agentDir, tools: [] }));
     engine._pluginManager = null;
@@ -281,7 +281,7 @@ describe("HanaEngine.buildTools session external sandbox grants", () => {
     fs.mkdirSync(workspace, { recursive: true });
     const sessionPath = path.join(agentDir, "sessions", "one.jsonl");
 
-    const engine = Object.create(HanaEngine.prototype);
+    const engine = Object.create(LingxiEngine.prototype);
     engine.hanakoHome = hanakoHome;
     engine.getAgent = vi.fn(() => ({ id: "hana", agentDir, tools: [] }));
     engine._pluginManager = null;
@@ -329,7 +329,7 @@ describe("HanaEngine.buildTools session external sandbox grants", () => {
       legacyFileIds: ["source-file"],
       legacyFilePaths: [sourceFilePath],
     };
-    const engine = Object.create(HanaEngine.prototype);
+    const engine = Object.create(LingxiEngine.prototype);
     engine.hanakoHome = hanakoHome;
     engine.getAgent = vi.fn(() => ({ id: "hana", agentDir, tools: [] }));
     engine._pluginManager = null;
@@ -384,7 +384,7 @@ describe("HanaEngine.buildTools session external sandbox grants", () => {
     const childSessionPath = path.join(agentDir, "subagent-sessions", "child.jsonl");
     const parentSessionPath = path.join(agentDir, "sessions", "parent.jsonl");
 
-    const engine = Object.create(HanaEngine.prototype);
+    const engine = Object.create(LingxiEngine.prototype);
     engine.hanakoHome = hanakoHome;
     engine.getAgent = vi.fn(() => ({ id: "hana", agentDir, tools: [] }));
     engine._pluginManager = null;
@@ -460,7 +460,7 @@ describe("HanaEngine.buildTools session external sandbox grants", () => {
       message: { role: "user", content: "continue" },
     }]);
 
-    const engine = Object.create(HanaEngine.prototype);
+    const engine = Object.create(LingxiEngine.prototype);
     engine.hanakoHome = hanakoHome;
     engine._sessionFiles = registry;
     engine.getSessionByPath = vi.fn(() => null);

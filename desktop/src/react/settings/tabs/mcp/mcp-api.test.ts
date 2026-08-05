@@ -4,10 +4,10 @@
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-const hanaFetchMock = vi.fn();
+const lingxiFetchMock = vi.fn();
 
 vi.mock('../../api', () => ({
-  hanaFetch: (...args: unknown[]) => hanaFetchMock(...args),
+  lingxiFetch: (...args: unknown[]) => lingxiFetchMock(...args),
 }));
 
 import { addMcpConnector, removeMcpConnector, setMcpEnabled, updateMcpConnector } from './mcp-api';
@@ -18,11 +18,11 @@ function jsonResponse(body: unknown): Response {
 
 function mockMcpResponses(...responses: Response[]) {
   const queue = [...responses];
-  hanaFetchMock.mockImplementation(() => Promise.resolve(queue.shift() ?? jsonResponse({ ok: true })));
+  lingxiFetchMock.mockImplementation(() => Promise.resolve(queue.shift() ?? jsonResponse({ ok: true })));
 }
 
 afterEach(() => {
-  hanaFetchMock.mockReset();
+  lingxiFetchMock.mockReset();
 });
 
 describe('mcp-api mutations', () => {
@@ -37,7 +37,7 @@ describe('mcp-api mutations', () => {
 
     await setMcpEnabled(true);
 
-    expect(hanaFetchMock).toHaveBeenCalledWith(
+    expect(lingxiFetchMock).toHaveBeenCalledWith(
       '/api/mcp/settings/enabled',
       expect.objectContaining({ method: 'PUT' }),
     );
@@ -50,7 +50,7 @@ describe('mcp-api mutations', () => {
   });
 
   it('checks JSON errors for connector mutations too', async () => {
-    hanaFetchMock
+    lingxiFetchMock
       .mockResolvedValueOnce(jsonResponse({ error: 'add failed' }))
       .mockResolvedValueOnce(jsonResponse({ error: 'remove failed' }));
 
@@ -74,7 +74,7 @@ describe('mcp-api mutations', () => {
       autoStart: true,
     });
 
-    expect(hanaFetchMock).toHaveBeenCalledWith(
+    expect(lingxiFetchMock).toHaveBeenCalledWith(
       '/api/mcp/connectors/local',
       expect.objectContaining({
         method: 'PUT',

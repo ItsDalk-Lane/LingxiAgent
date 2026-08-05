@@ -751,7 +751,7 @@ function sanitizeMarketplacePluginForClient(plugin: any) {
 
 /**
  * Plugin management REST API + route proxy (combined).
- * @param {import('../../core/engine.ts').HanaEngine} engine
+ * @param {import('../../core/engine.ts').LingxiEngine} engine
  */
 export function createPluginsRoute(engine: any) {
   const route = new Hono();

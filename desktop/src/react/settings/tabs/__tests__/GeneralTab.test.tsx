@@ -14,10 +14,10 @@ const settingsChanged = vi.fn();
 const autoSaveConfig = vi.fn();
 const loadSettingsConfig = vi.fn();
 const updateSettingsSnapshot = vi.fn();
-const hanaFetch = vi.fn();
+const lingxiFetch = vi.fn();
 
 vi.mock('../../api', () => ({
-  hanaFetch: (...args: unknown[]) => hanaFetch(...args),
+  lingxiFetch: (...args: unknown[]) => lingxiFetch(...args),
 }));
 
 vi.mock('../../helpers', () => ({
@@ -111,7 +111,7 @@ beforeEach(() => {
     openedAtLogin: false,
     status: null,
   });
-  hanaFetch.mockResolvedValue(jsonResponse({
+  lingxiFetch.mockResolvedValue(jsonResponse({
     notifications: { chatCompletion: 'never' },
   }));
   quickChatReloadShortcut.mockResolvedValue({ ok: true, shortcut: 'Alt+Space' });
@@ -141,7 +141,7 @@ afterEach(() => {
   autoSaveConfig.mockReset();
   loadSettingsConfig.mockReset();
   updateSettingsSnapshot.mockReset();
-  hanaFetch.mockReset();
+  lingxiFetch.mockReset();
   useSettingsStore.setState({
     settingsConfig: null,
     settingsSnapshot: {
@@ -228,7 +228,7 @@ describe('GeneralTab', () => {
 
   it('renders three completion categories and saves the chat preference through the notification route', async () => {
     installHana();
-    hanaFetch
+    lingxiFetch
       .mockResolvedValueOnce(jsonResponse({ quickChat: { shortcut: 'Alt+Space' } }))
       .mockResolvedValueOnce(jsonResponse({ notifications: { chatCompletion: 'never' } }))
       .mockResolvedValueOnce(jsonResponse({
@@ -251,7 +251,7 @@ describe('GeneralTab', () => {
     expect(within(row).getByText('settings.general.notifications.whenSessionUnfocused')).toBeTruthy();
     fireEvent.change(select, { target: { value: 'when_session_unfocused' } });
 
-    await waitFor(() => expect(hanaFetch).toHaveBeenLastCalledWith('/api/preferences/notifications', {
+    await waitFor(() => expect(lingxiFetch).toHaveBeenLastCalledWith('/api/preferences/notifications', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ notifications: { chatCompletion: 'when_session_unfocused' } }),
@@ -261,7 +261,7 @@ describe('GeneralTab', () => {
 
   it('records and registers the quick chat shortcut', async () => {
     installHana();
-    hanaFetch
+    lingxiFetch
       .mockResolvedValueOnce(jsonResponse({ quickChat: { shortcut: 'Alt+Space', reuseTimeoutMinutes: 5 } }))
       .mockResolvedValueOnce(jsonResponse({ notifications: { chatCompletion: 'never' } }))
       .mockResolvedValueOnce(jsonResponse({ ok: true, quickChat: { shortcut: 'CommandOrControl+Shift+K', reuseTimeoutMinutes: 5 } }));
@@ -274,7 +274,7 @@ describe('GeneralTab', () => {
     fireEvent.click(shortcutButton);
     fireEvent.keyDown(window, { key: 'k', ctrlKey: true, shiftKey: true });
 
-    await waitFor(() => expect(hanaFetch).toHaveBeenLastCalledWith('/api/preferences/quick-chat', {
+    await waitFor(() => expect(lingxiFetch).toHaveBeenLastCalledWith('/api/preferences/quick-chat', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ quickChat: { shortcut: 'CommandOrControl+Shift+K', reuseTimeoutMinutes: 5 } }),
@@ -287,7 +287,7 @@ describe('GeneralTab', () => {
 
   it('saves the quick chat reuse timeout without re-registering the shortcut', async () => {
     installHana();
-    hanaFetch
+    lingxiFetch
       .mockResolvedValueOnce(jsonResponse({ quickChat: { shortcut: 'Alt+Space', reuseTimeoutMinutes: 10 } }))
       .mockResolvedValueOnce(jsonResponse({ notifications: { chatCompletion: 'never' } }))
       .mockResolvedValueOnce(jsonResponse({ ok: true, quickChat: { shortcut: 'Alt+Space', reuseTimeoutMinutes: 5 } }));
@@ -297,7 +297,7 @@ describe('GeneralTab', () => {
     const input = await screen.findByLabelText('settings.general.quickChat.reuseTimeout');
     fireEvent.change(input, { target: { value: '5' } });
 
-    await waitFor(() => expect(hanaFetch).toHaveBeenLastCalledWith('/api/preferences/quick-chat', {
+    await waitFor(() => expect(lingxiFetch).toHaveBeenLastCalledWith('/api/preferences/quick-chat', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ quickChat: { shortcut: 'Alt+Space', reuseTimeoutMinutes: 5 } }),
@@ -307,7 +307,7 @@ describe('GeneralTab', () => {
 
   it('records macOS Option+Space as Alt+Space instead of an invisible character', async () => {
     installHana();
-    hanaFetch
+    lingxiFetch
       .mockResolvedValueOnce(jsonResponse({ quickChat: { shortcut: 'CommandOrControl+Shift+K', reuseTimeoutMinutes: 10 } }))
       .mockResolvedValueOnce(jsonResponse({ notifications: { chatCompletion: 'never' } }))
       .mockResolvedValueOnce(jsonResponse({ ok: true, quickChat: { shortcut: 'Alt+Space', reuseTimeoutMinutes: 10 } }));
@@ -318,7 +318,7 @@ describe('GeneralTab', () => {
     fireEvent.click(await screen.findByLabelText('settings.general.quickChat.shortcut'));
     fireEvent.keyDown(window, { key: '\u00A0', code: 'Space', altKey: true });
 
-    await waitFor(() => expect(hanaFetch).toHaveBeenLastCalledWith('/api/preferences/quick-chat', {
+    await waitFor(() => expect(lingxiFetch).toHaveBeenLastCalledWith('/api/preferences/quick-chat', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ quickChat: { shortcut: 'Alt+Space', reuseTimeoutMinutes: 10 } }),

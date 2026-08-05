@@ -19,7 +19,7 @@ vi.mock('../../../helpers', () => ({
 }));
 
 vi.mock('../../../api', () => ({
-  hanaFetch: vi.fn(),
+  lingxiFetch: vi.fn(),
 }));
 
 vi.mock('../../../actions', () => ({

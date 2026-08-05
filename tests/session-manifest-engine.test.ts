@@ -2,14 +2,14 @@ import fs from "fs";
 import os from "os";
 import path from "path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { HanaEngine } from "../core/engine.ts";
+import { LingxiEngine } from "../core/engine.ts";
 import { SessionManifestResolver } from "../core/session-manifest/resolver.ts";
 import { LEGACY_SESSION_MANIFEST_MIGRATION_KEY } from "../core/session-manifest/startup-migration.ts";
 import { LEGACY_META_SCAN_LEDGER_KEY } from "../core/session-manifest/legacy-migration.ts";
 import { SessionManifestStore } from "../core/session-manifest/store.ts";
 import { SessionFileRegistry } from "../lib/session-files/session-file-registry.ts";
 
-describe("HanaEngine session manifest facade", () => {
+describe("LingxiEngine session manifest facade", () => {
   let tmpDir;
   let store;
   let engine;
@@ -23,7 +23,7 @@ describe("HanaEngine session manifest facade", () => {
       idGenerator: () => `sess_engine_${String(nextId++).padStart(4, "0")}`,
       now: () => "2026-06-18T05:00:00.000Z",
     });
-    engine = Object.create(HanaEngine.prototype);
+    engine = Object.create(LingxiEngine.prototype);
     engine._sessionManifestStore = store;
     engine._sessionManifestResolver = new SessionManifestResolver({ store });
     engine._sessionFiles = new SessionFileRegistry({ now: () => 1234 });
@@ -166,7 +166,7 @@ describe("HanaEngine session manifest facade", () => {
   });
 });
 
-describe("HanaEngine session manifest startup migration", () => {
+describe("LingxiEngine session manifest startup migration", () => {
   let tmpDir;
   let engine;
 
@@ -185,7 +185,7 @@ describe("HanaEngine session manifest startup migration", () => {
       timestamp: "2026-06-18T06:10:00.000Z",
     })}\n`);
 
-    engine = new HanaEngine({
+    engine = new LingxiEngine({
       hanakoHome: tmpDir,
       productDir: tmpDir,
       agentId: "hana",
@@ -216,7 +216,7 @@ describe("HanaEngine session manifest startup migration", () => {
     fs.writeFileSync(path.join(tmpDir, "session-manifest.db"), "not sqlite");
     fs.writeFileSync(path.join(tmpDir, "session-manifest.db-wal"), "bad wal");
 
-    engine = new HanaEngine({
+    engine = new LingxiEngine({
       hanakoHome: tmpDir,
       productDir: tmpDir,
       agentId: "hana",
@@ -239,7 +239,7 @@ describe("HanaEngine session manifest startup migration", () => {
   });
 });
 
-describe("HanaEngine getSessionMetadataRecoveryStatus", () => {
+describe("LingxiEngine getSessionMetadataRecoveryStatus", () => {
   let tmpDir;
   let store;
   let engine;
@@ -251,7 +251,7 @@ describe("HanaEngine getSessionMetadataRecoveryStatus", () => {
       idGenerator: () => `sess_recovery_${Math.random()}`,
       now: () => "2026-07-23T00:00:00.000Z",
     });
-    engine = Object.create(HanaEngine.prototype);
+    engine = Object.create(LingxiEngine.prototype);
     engine._sessionManifestStore = store;
     engine._sessionManifestStoreRecovery = null;
     engine._sessionCoord = { listMetaQuarantines: () => [] };

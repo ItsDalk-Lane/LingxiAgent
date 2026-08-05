@@ -5,11 +5,11 @@ import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
 import '@testing-library/jest-dom/vitest';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-const hanaFetchMock = vi.fn(async (..._args: unknown[]) => ({ json: async () => ({}) }));
+const lingxiFetchMock = vi.fn(async (..._args: unknown[]) => ({ json: async () => ({}) }));
 
 vi.mock('../../hooks/use-hana-fetch', () => ({
-  hanaFetch: (...args: unknown[]) => hanaFetchMock(...args),
-  hanaUrl: (p: string) => p,
+  lingxiFetch: (...args: unknown[]) => lingxiFetchMock(...args),
+  lingxiUrl: (p: string) => p,
 }));
 
 import { BrowserCard } from '../../components/BrowserCard';
@@ -38,7 +38,7 @@ function card() {
 describe('BrowserCard collapse semantics', () => {
   beforeEach(() => {
     globalThis.t = ((key: string) => key) as typeof globalThis.t;
-    hanaFetchMock.mockClear();
+    lingxiFetchMock.mockClear();
     browserEmergencyStopMock.mockClear();
     openBrowserViewerMock.mockClear();
     Object.defineProperty(window, 'platform', {
@@ -71,7 +71,7 @@ describe('BrowserCard collapse semantics', () => {
 
     fireEvent.click(screen.getByTitle('browser.collapse'));
 
-    expect(hanaFetchMock).not.toHaveBeenCalled();
+    expect(lingxiFetchMock).not.toHaveBeenCalled();
     expect(browserEmergencyStopMock).not.toHaveBeenCalled();
     expect(openBrowserViewerMock).not.toHaveBeenCalled();
     expect(card()).not.toBeInTheDocument();

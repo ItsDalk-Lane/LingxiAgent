@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { useSettingsStore } from './store';
-import { hanaFetch } from './api';
+import { lingxiFetch } from './api';
 import {
   createLocalServerConnection,
   readPersistedServerConnectionState,
@@ -328,7 +328,7 @@ async function initSettings() {
     // i18n
     const i18n = window.i18n;
     try {
-      const cfgRes = await hanaFetch('/api/config');
+      const cfgRes = await lingxiFetch('/api/config');
       const cfg = await cfgRes.json();
       const locale = cfg.locale || 'zh-CN';
       await i18n.load(locale);

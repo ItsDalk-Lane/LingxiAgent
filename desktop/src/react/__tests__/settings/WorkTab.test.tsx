@@ -9,7 +9,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 type MockState = Record<string, any>;
 
 const mockState: MockState = {};
-const mockHanaFetch = vi.fn();
+const mockLingxiFetch = vi.fn();
 const autoSaveConfigMock = vi.fn(async (_partial?: unknown, _options?: unknown) => {});
 const refreshSettingsConfigSnapshotMock = vi.fn(async () => {});
 
@@ -22,7 +22,7 @@ vi.mock('../../settings/store', () => {
 });
 
 vi.mock('../../settings/api', () => ({
-  hanaFetch: (...args: unknown[]) => mockHanaFetch(...args),
+  lingxiFetch: (...args: unknown[]) => mockLingxiFetch(...args),
 }));
 
 vi.mock('../../settings/helpers', () => ({
@@ -57,11 +57,11 @@ describe('WorkTab workspace persistence', () => {
       showToast: vi.fn(),
       getSettingsAgentId: () => mockState.settingsAgentId || mockState.currentAgentId,
     });
-    mockHanaFetch.mockReset();
+    mockLingxiFetch.mockReset();
     autoSaveConfigMock.mockClear();
     refreshSettingsConfigSnapshotMock.mockReset();
     refreshSettingsConfigSnapshotMock.mockImplementation(async () => {});
-    mockHanaFetch.mockImplementation((url: string, options?: RequestInit) => {
+    mockLingxiFetch.mockImplementation((url: string, options?: RequestInit) => {
       if (url === '/api/agents/agent-a/config' && !options?.method) {
         return Promise.resolve(jsonResponse({
           desk: {
@@ -128,7 +128,7 @@ describe('WorkTab workspace persistence', () => {
     fireEvent.click(await screen.findByDisplayValue('/old-home'));
 
     await waitFor(() => {
-      expect(mockHanaFetch).toHaveBeenCalledWith('/api/agents/agent-a/config', expect.objectContaining({
+      expect(mockLingxiFetch).toHaveBeenCalledWith('/api/agents/agent-a/config', expect.objectContaining({
         method: 'PUT',
         body: JSON.stringify({ desk: { home_folder: '/new-home' } }),
       }));
@@ -144,7 +144,7 @@ describe('WorkTab workspace persistence', () => {
     fireEvent.click(await screen.findByTitle('settings.work.homeFolderClear'));
 
     await waitFor(() => {
-      expect(mockHanaFetch).toHaveBeenCalledWith('/api/agents/agent-a/config', expect.objectContaining({
+      expect(mockLingxiFetch).toHaveBeenCalledWith('/api/agents/agent-a/config', expect.objectContaining({
         method: 'PUT',
         body: JSON.stringify({ desk: { home_folder: '' } }),
       }));
@@ -153,7 +153,7 @@ describe('WorkTab workspace persistence', () => {
   });
 
   it('shows 31 minutes when the agent config omits the patrol interval', async () => {
-    mockHanaFetch.mockImplementation((url: string, options?: RequestInit) => {
+    mockLingxiFetch.mockImplementation((url: string, options?: RequestInit) => {
       if (url === '/api/agents/agent-a/config' && !options?.method) {
         return Promise.resolve(jsonResponse({
           desk: {
@@ -175,7 +175,7 @@ describe('WorkTab workspace persistence', () => {
   });
 
   it('treats a missing per-agent heartbeat flag as off after loading the agent config', async () => {
-    mockHanaFetch.mockImplementation((url: string, options?: RequestInit) => {
+    mockLingxiFetch.mockImplementation((url: string, options?: RequestInit) => {
       if (url === '/api/agents/agent-a/config' && !options?.method) {
         return Promise.resolve(jsonResponse({
           desk: {
@@ -248,7 +248,7 @@ describe('WorkTab workspace persistence', () => {
     fireEvent.click(await screen.findByRole('switch', { name: 'settings.work.injectAgentsMd' }));
 
     await waitFor(() => {
-      expect(mockHanaFetch).toHaveBeenCalledWith('/api/agents/agent-a/config', expect.objectContaining({
+      expect(mockLingxiFetch).toHaveBeenCalledWith('/api/agents/agent-a/config', expect.objectContaining({
         method: 'PUT',
         body: JSON.stringify({ workspace_context: { inject_agents_md: true } }),
       }));
@@ -264,7 +264,7 @@ describe('WorkTab workspace persistence', () => {
     fireEvent.click(await screen.findByRole('switch', { name: 'settings.work.injectClaudeMd' }));
 
     await waitFor(() => {
-      expect(mockHanaFetch).toHaveBeenCalledWith('/api/agents/agent-a/config', expect.objectContaining({
+      expect(mockLingxiFetch).toHaveBeenCalledWith('/api/agents/agent-a/config', expect.objectContaining({
         method: 'PUT',
         body: JSON.stringify({ workspace_context: { inject_claude_md: false } }),
       }));
@@ -279,7 +279,7 @@ describe('WorkTab workspace persistence', () => {
 
     fireEvent.click(await screen.findByRole('switch', { name: 'settings.work.discoverProjectSkills' }));
     await waitFor(() => {
-      expect(mockHanaFetch).toHaveBeenCalledWith('/api/agents/agent-a/config', expect.objectContaining({
+      expect(mockLingxiFetch).toHaveBeenCalledWith('/api/agents/agent-a/config', expect.objectContaining({
         method: 'PUT',
         body: JSON.stringify({ workspace_context: { discover_project_skills: false } }),
       }));
@@ -287,7 +287,7 @@ describe('WorkTab workspace persistence', () => {
 
     fireEvent.click(screen.getByRole('switch', { name: 'settings.work.discoverCompatibleProjectSkills' }));
     await waitFor(() => {
-      expect(mockHanaFetch).toHaveBeenCalledWith('/api/agents/agent-a/config', expect.objectContaining({
+      expect(mockLingxiFetch).toHaveBeenCalledWith('/api/agents/agent-a/config', expect.objectContaining({
         method: 'PUT',
         body: JSON.stringify({ workspace_context: { discover_compatible_project_skills: true } }),
       }));
@@ -295,7 +295,7 @@ describe('WorkTab workspace persistence', () => {
   });
 
   it('rolls a project skill switch back when the Agent config save fails', async () => {
-    mockHanaFetch.mockImplementation((url: string, options?: RequestInit) => {
+    mockLingxiFetch.mockImplementation((url: string, options?: RequestInit) => {
       if (url === '/api/agents/agent-a/config' && !options?.method) {
         return Promise.resolve(jsonResponse({
           desk: { home_folder: '/old-home', heartbeat_enabled: true, heartbeat_interval: 17 },
@@ -342,7 +342,7 @@ describe('WorkTab workspace persistence', () => {
       };
     });
 
-    mockHanaFetch.mockImplementation((url: string, options?: RequestInit) => {
+    mockLingxiFetch.mockImplementation((url: string, options?: RequestInit) => {
       if (url === '/api/agents/agent-a/config' && options?.method === 'PUT') {
         return Promise.resolve(jsonResponse({ ok: true }));
       }
@@ -381,7 +381,7 @@ describe('WorkTab workspace persistence', () => {
 
   it('does not refresh the settings snapshot when saving a non-owner agent config', async () => {
     mockState.settingsSnapshot = { data: { agentId: 'agent-a' } };
-    mockHanaFetch.mockImplementation((url: string, options?: RequestInit) => {
+    mockLingxiFetch.mockImplementation((url: string, options?: RequestInit) => {
       if (url === '/api/agents/agent-b/config' && !options?.method) {
         return Promise.resolve(jsonResponse({
           desk: { home_folder: '/b-home', heartbeat_enabled: false, heartbeat_interval: 12 },
@@ -406,7 +406,7 @@ describe('WorkTab workspace persistence', () => {
     fireEvent.click(await screen.findByRole('switch', { name: 'settings.work.injectAgentsMd' }));
 
     await waitFor(() => {
-      expect(mockHanaFetch).toHaveBeenCalledWith('/api/agents/agent-b/config', expect.objectContaining({
+      expect(mockLingxiFetch).toHaveBeenCalledWith('/api/agents/agent-b/config', expect.objectContaining({
         method: 'PUT',
       }));
     });
@@ -428,7 +428,7 @@ describe('WorkTab workspace persistence', () => {
     refreshSettingsConfigSnapshotMock.mockImplementation(async () => { throw refreshError; });
     const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
-    mockHanaFetch.mockImplementation((url: string, options?: RequestInit) => {
+    mockLingxiFetch.mockImplementation((url: string, options?: RequestInit) => {
       if (url === '/api/agents/agent-a/config' && options?.method === 'PUT') {
         return Promise.resolve(jsonResponse({ ok: true }));
       }

@@ -2,7 +2,7 @@ import fs from "fs";
 import os from "os";
 import path from "path";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { HanaEngine } from "../core/engine.ts";
+import { LingxiEngine } from "../core/engine.ts";
 import { SessionExecutionRegistry } from "../lib/session-execution-registry.ts";
 
 function permissionTool(name, execute = vi.fn(), kind: "read" | "routine" | "review" = "routine") {
@@ -19,9 +19,9 @@ function permissionTool(name, execute = vi.fn(), kind: "read" | "routine" | "rev
   };
 }
 
-describe("HanaEngine.buildTools", () => {
+describe("LingxiEngine.buildTools", () => {
   let tmpDir;
-  let engines: HanaEngine[] = [];
+  let engines: LingxiEngine[] = [];
 
   afterEach(async () => {
     for (const engine of engines.splice(0).reverse()) {
@@ -32,7 +32,7 @@ describe("HanaEngine.buildTools", () => {
   });
 
   it("rejects strict tool assembly without a complete runtime SessionRef", () => {
-    const engine = Object.create(HanaEngine.prototype);
+    const engine = Object.create(LingxiEngine.prototype);
 
     expect(() => engine.buildTools("/tmp", [], {
       requireSessionIdentity: true,
@@ -48,7 +48,7 @@ describe("HanaEngine.buildTools", () => {
     const focusAgentDir = path.join(tmpDir, "agents", "focus");
     const missingAgentDir = path.join(tmpDir, "agents", "missing");
 
-    const engine = Object.create(HanaEngine.prototype);
+    const engine = Object.create(LingxiEngine.prototype);
     engine.hanakoHome = tmpDir;
     engine.getAgent = vi.fn(() => null);
     engine._pluginManager = null;
@@ -72,7 +72,7 @@ describe("HanaEngine.buildTools", () => {
     tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "hana-build-tools-duplicate-pi-"));
     const agentDir = path.join(tmpDir, "agents", "focus");
     const agent = { id: "focus", agentDir, config: {}, tools: [] };
-    const engine = Object.create(HanaEngine.prototype);
+    const engine = Object.create(LingxiEngine.prototype);
     engine.hanakoHome = tmpDir;
     engine.getAgent = vi.fn(() => agent);
     engine._pluginManager = null;
@@ -93,7 +93,7 @@ describe("HanaEngine.buildTools", () => {
     const agent = { id: "focus", agentDir, config: {}, tools: [] };
 
     const makeEngine = (pluginTools: any[] = [], pluginDevToolsEnabled = false) => {
-      const engine = Object.create(HanaEngine.prototype);
+      const engine = Object.create(LingxiEngine.prototype);
       engine.hanakoHome = tmpDir;
       engine.getAgent = vi.fn(() => agent);
       engine._pluginManager = pluginTools.length ? { getAllTools: () => pluginTools } : null;
@@ -141,7 +141,7 @@ describe("HanaEngine.buildTools", () => {
       })),
     };
 
-    const engine = Object.create(HanaEngine.prototype);
+    const engine = Object.create(LingxiEngine.prototype);
     engine.hanakoHome = tmpDir;
     engine.getAgent = vi.fn(() => ({ id: "focus", agentDir, tools: [] }));
     engine._pluginManager = null;
@@ -191,7 +191,7 @@ describe("HanaEngine.buildTools", () => {
       })),
     };
 
-    const engine = Object.create(HanaEngine.prototype);
+    const engine = Object.create(LingxiEngine.prototype);
     engine.hanakoHome = tmpDir;
     engine.getAgent = vi.fn(() => ({ id: "focus", agentDir, tools: [] }));
     engine._pluginManager = null;
@@ -248,7 +248,7 @@ describe("HanaEngine.buildTools", () => {
     const approvalGateway = { review: vi.fn() };
     const agent = { id: "focus", agentDir, config: {}, tools: [] };
 
-    const engine = Object.create(HanaEngine.prototype);
+    const engine = Object.create(LingxiEngine.prototype);
     engine.hanakoHome = tmpDir;
     engine.getAgent = vi.fn(() => agent);
     engine.getSessionIdForPath = vi.fn(() => "sess_isolated");
@@ -281,7 +281,7 @@ describe("HanaEngine.buildTools", () => {
 
   it("wires utility model reviewers into the default approval gateway", async () => {
     tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "hana-engine-approval-gateway-"));
-    const engine = new HanaEngine({
+    const engine = new LingxiEngine({
       hanakoHome: tmpDir,
       productDir: tmpDir,
       agentId: "hana",
@@ -333,7 +333,7 @@ describe("HanaEngine.buildTools", () => {
 
   it("resolves utility config through the session owner when only sessionPath is known", () => {
     const sessionPath = "/tmp/agents/target/sessions/s1.jsonl";
-    const engine = Object.create(HanaEngine.prototype);
+    const engine = Object.create(LingxiEngine.prototype);
     engine._agentMgr = { activeAgentId: "focus" };
     engine.agentIdFromSessionPath = vi.fn(() => "target");
     engine.resolveSessionOwnership = vi.fn((ref) => {
@@ -373,7 +373,7 @@ describe("HanaEngine.buildTools", () => {
       tools: [],
     };
 
-    const engine = Object.create(HanaEngine.prototype);
+    const engine = Object.create(LingxiEngine.prototype);
     engine.hanakoHome = tmpDir;
     engine.getAgent = vi.fn(() => agent);
     engine.isChannelsEnabled = vi.fn(() => false);
@@ -408,7 +408,7 @@ describe("HanaEngine.buildTools", () => {
     const execute = vi.fn(async () => ({ content: [{ type: "text", text: "ok" }] }));
     const agent = { id: "focus", agentDir, config: {}, tools: [] };
 
-    const engine = Object.create(HanaEngine.prototype);
+    const engine = Object.create(LingxiEngine.prototype);
     engine.hanakoHome = tmpDir;
     engine.getAgent = vi.fn(() => agent);
     engine._pluginManager = null;
@@ -457,7 +457,7 @@ describe("HanaEngine.buildTools", () => {
     const agentDir = path.join(tmpDir, "agents", "focus");
     const agent = { id: "focus", agentDir, config: {}, tools: [] };
 
-    const engine = Object.create(HanaEngine.prototype);
+    const engine = Object.create(LingxiEngine.prototype);
     engine.hanakoHome = tmpDir;
     engine.getAgent = vi.fn(() => agent);
     engine._pluginManager = null;
@@ -487,7 +487,7 @@ describe("HanaEngine.buildTools", () => {
       tools: [],
     };
 
-    const engine = Object.create(HanaEngine.prototype);
+    const engine = Object.create(LingxiEngine.prototype);
     engine.hanakoHome = tmpDir;
     engine._runtimeContext = {
       serverId: "server_engine",
@@ -558,7 +558,7 @@ describe("HanaEngine.buildTools", () => {
       tools: [],
     };
 
-    const engine = Object.create(HanaEngine.prototype);
+    const engine = Object.create(LingxiEngine.prototype);
     engine.hanakoHome = tmpDir;
     engine._runtimeContext = {
       serverId: "server_engine",
@@ -618,7 +618,7 @@ describe("HanaEngine.buildTools", () => {
     const execute = vi.fn(async () => ({ content: [{ type: "text", text: "ok" }] }));
     const agent = { id: "focus", agentDir, config: {}, tools: [] };
 
-    const engine = Object.create(HanaEngine.prototype);
+    const engine = Object.create(LingxiEngine.prototype);
     engine.hanakoHome = tmpDir;
     engine.getAgent = vi.fn(() => agent);
     engine._pluginManager = null;
@@ -672,7 +672,7 @@ describe("HanaEngine.buildTools", () => {
       tools: [],
     };
 
-    const engine = Object.create(HanaEngine.prototype);
+    const engine = Object.create(LingxiEngine.prototype);
     engine.hanakoHome = tmpDir;
     engine._runtimeContext = {
       serverId: "server_engine",
@@ -751,7 +751,7 @@ describe("HanaEngine.buildTools", () => {
       origin,
       operation,
     }));
-    const engine = Object.create(HanaEngine.prototype);
+    const engine = Object.create(LingxiEngine.prototype);
     engine.hanakoHome = tmpDir;
     engine.registerSessionFile = registerSessionFile;
     engine.getAgent = vi.fn(() => ({ id: "focus", agentDir, tools: [] }));
@@ -850,7 +850,7 @@ describe("HanaEngine.buildTools", () => {
       origin,
       operation,
     }));
-    const engine = Object.create(HanaEngine.prototype);
+    const engine = Object.create(LingxiEngine.prototype);
     engine.hanakoHome = tmpDir;
     engine.registerSessionFile = registerSessionFile;
     engine.getAgent = vi.fn(() => ({ id: "focus", agentDir, tools: [] }));
@@ -920,7 +920,7 @@ describe("HanaEngine.buildTools", () => {
     fs.mkdirSync(hanakoHome, { recursive: true });
     let authorizedFolders = [];
 
-    const engine = Object.create(HanaEngine.prototype);
+    const engine = Object.create(LingxiEngine.prototype);
     engine.hanakoHome = hanakoHome;
     engine.registerSessionFile = vi.fn((entry) => ({
       id: "sf-authorized",
@@ -982,7 +982,7 @@ describe("HanaEngine.buildTools", () => {
     fs.mkdirSync(workspace, { recursive: true });
     fs.writeFileSync(configPath, "agent:\n  name: Hana\n  yuan: lingxi\n", "utf-8");
 
-    const engine = Object.create(HanaEngine.prototype);
+    const engine = Object.create(LingxiEngine.prototype);
     engine.hanakoHome = tmpDir;
     engine.registerSessionFile = vi.fn();
     engine.getAgent = vi.fn(() => ({ id: "focus", agentDir, tools: [] }));
@@ -1025,7 +1025,7 @@ describe("HanaEngine.buildTools", () => {
   it("keeps plugin dev Agent tools hidden until the global dev setting is enabled", () => {
     tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "hana-build-tools-dev-"));
     const agentDir = path.join(tmpDir, "agents", "focus");
-    const engine = Object.create(HanaEngine.prototype);
+    const engine = Object.create(LingxiEngine.prototype);
     engine.hanakoHome = tmpDir;
     engine.getAgent = vi.fn(() => ({ id: "focus", agentDir, tools: [] }));
     engine._pluginManager = null;
@@ -1058,7 +1058,7 @@ describe("HanaEngine.buildTools", () => {
   it("adds plugin dev Agent tools when the user enables the dev setting", () => {
     tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "hana-build-tools-dev-"));
     const agentDir = path.join(tmpDir, "agents", "focus");
-    const engine = Object.create(HanaEngine.prototype);
+    const engine = Object.create(LingxiEngine.prototype);
     engine.hanakoHome = tmpDir;
     engine.getAgent = vi.fn(() => ({ id: "focus", agentDir, tools: [] }));
     engine._pluginManager = null;

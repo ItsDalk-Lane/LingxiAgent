@@ -688,7 +688,7 @@ export class BridgeManager {
   declare mediaPublisher: any;
   /**
    * @param {object} opts
-   * @param {import('../../core/engine.ts').HanaEngine} opts.engine
+   * @param {import('../../core/engine.ts').LingxiEngine} opts.engine
    * @param {import('../../hub/index.ts').Hub} opts.hub
    */
   constructor({ engine, hub }) {

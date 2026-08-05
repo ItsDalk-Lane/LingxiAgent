@@ -1,6 +1,6 @@
 import { memo, useEffect, useState } from 'react';
 import { ChatResourceCard } from './ChatResourceCard';
-import { hanaFetch } from '../../hooks/use-hana-fetch';
+import { lingxiFetch } from '../../hooks/use-hana-fetch';
 import { useStore } from '../../stores';
 import { sessionIdForPathFromLocatorState } from '../../stores/session-slice';
 import { AgentAvatar, resolveAgentDisplayInfo } from '../../utils/agent-display';
@@ -101,7 +101,7 @@ export const SessionCollabDraftCard = memo(function SessionCollabDraftCard({ blo
       const editedDraft = isCreate
         ? { ...draft, agentId: effectiveAgentId, title: draftTitle, firstMessage: draftMessage }
         : { ...draft, message: draftMessage };
-      const res = await hanaFetch('/api/session-collab/apply', {
+      const res = await lingxiFetch('/api/session-collab/apply', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ suggestionId: block.suggestionId, draft: editedDraft }),
@@ -152,7 +152,7 @@ export const SessionCollabDraftCard = memo(function SessionCollabDraftCard({ blo
     try {
       const body: Record<string, unknown> = { suggestionId: block.suggestionId };
       if (sourceSessionId) body.sourceSessionId = sourceSessionId;
-      const res = await hanaFetch('/api/session-collab/reject', {
+      const res = await lingxiFetch('/api/session-collab/reject', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),

@@ -7,7 +7,7 @@ import { PROVIDER_PRESETS } from '../constants';
 import type { ProviderPreset } from '../constants';
 import { getProviderPresetLabel } from '../../utils/provider-presets';
 import { describeOnboardingError, testConnection, saveProvider as saveProviderAction } from '../onboarding-actions';
-import type { HanaFetch, OnboardingVerificationPlan } from '../onboarding-actions';
+import type { LingxiFetch, OnboardingVerificationPlan } from '../onboarding-actions';
 import { StepContainer, Multiline } from '../onboarding-ui';
 import { SelectWidget } from '@/ui';
 
@@ -29,7 +29,7 @@ const EyeOffIcon = () => (
 
 interface ProviderStepProps {
   preview: boolean;
-  hanaFetch: HanaFetch;
+  lingxiFetch: LingxiFetch;
   agentId: string;
   verificationPlan: OnboardingVerificationPlan;
   goToStep: (index: number) => void;
@@ -38,7 +38,7 @@ interface ProviderStepProps {
 }
 
 export function ProviderStep({
-  preview, hanaFetch, agentId, verificationPlan, goToStep, showError, onProviderReady,
+  preview, lingxiFetch, agentId, verificationPlan, goToStep, showError, onProviderReady,
 }: ProviderStepProps) {
   // ── Provider state ──
   const [selectedPreset, setSelectedPreset] = useState<string | null>(null);
@@ -131,7 +131,7 @@ export function ProviderStep({
     }
     setTestStatus({ type: 'loading', text: t('onboarding.provider.testing') });
     try {
-      const result = await testConnection({ hanaFetch, providerUrl, providerApi, apiKey });
+      const result = await testConnection({ lingxiFetch, providerUrl, providerApi, apiKey });
       if (result.ok) {
         setTestStatus({ type: 'success', text: result.text });
         setConnectionTested(true);
@@ -144,21 +144,21 @@ export function ProviderStep({
       setTestStatus({ type: 'error', text: msg });
       setConnectionTested(false);
     }
-  }, [preview, hanaFetch, providerUrl, providerApi, apiKey]);
+  }, [preview, lingxiFetch, providerUrl, providerApi, apiKey]);
 
   // ── Next ──
   const onNext = useCallback(async () => {
     if (preview) { goToStep(3); return; }
     if (!connectionTested) return;
     try {
-      await saveProviderAction({ hanaFetch, agentId, providerName, providerUrl, apiKey, providerApi, verificationPlan });
+      await saveProviderAction({ lingxiFetch, agentId, providerName, providerUrl, apiKey, providerApi, verificationPlan });
       onProviderReady(providerName, providerUrl, providerApi, apiKey);
       goToStep(3);
     } catch (err) {
       console.error('[onboarding] save provider failed:', err);
       showError(describeOnboardingError(err, t('onboarding.provider.testFailed')));
     }
-  }, [preview, connectionTested, hanaFetch, agentId, providerName, providerUrl, apiKey, providerApi, verificationPlan, goToStep, showError, onProviderReady]);
+  }, [preview, connectionTested, lingxiFetch, agentId, providerName, providerUrl, apiKey, providerApi, verificationPlan, goToStep, showError, onProviderReady]);
 
   return (
     <StepContainer>

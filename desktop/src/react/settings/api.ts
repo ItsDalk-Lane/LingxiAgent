@@ -11,21 +11,21 @@ import {
 
 const DEFAULT_TIMEOUT = 30_000;
 
-export function hanaUrl(path: string): string {
+export function lingxiUrl(path: string): string {
   const connection = requireServerConnection(
     useSettingsStore.getState(),
-    `settings hanaUrl ${path}: server connection not ready`,
+    `settings lingxiUrl ${path}: server connection not ready`,
   );
   return buildConnectionUrl(connection, path, { includeTokenQuery: true });
 }
 
-export async function hanaFetch(
+export async function lingxiFetch(
   path: string,
   opts: RequestInit & { timeout?: number } = {},
 ): Promise<Response> {
   const connection = requireServerConnection(
     useSettingsStore.getState(),
-    `settings hanaFetch ${path}: server connection not ready`,
+    `settings lingxiFetch ${path}: server connection not ready`,
   );
   const headers = appendConnectionAuth(connection, opts.headers);
 
@@ -47,7 +47,7 @@ export async function hanaFetch(
     });
     if (!res.ok) {
       const detail = await readErrorMessage(res);
-      throw new Error(detail || `hanaFetch ${path}: ${res.status} ${res.statusText}`);
+      throw new Error(detail || `lingxiFetch ${path}: ${res.status} ${res.statusText}`);
     }
     return res;
   } finally {

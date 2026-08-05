@@ -1,9 +1,9 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import { HanaEngine } from "../core/engine.ts";
+import { LingxiEngine } from "../core/engine.ts";
 
 /**
  * 轻量测试：只校验 setUiContext / getUiContext 的 Map 行为。
- * 不实例化 HanaEngine（依赖过多），用原型方法 + 手工 fake this 测试。
+ * 不实例化 LingxiEngine（依赖过多），用原型方法 + 手工 fake this 测试。
  */
 
 function makeFakeEngine() {
@@ -17,16 +17,16 @@ function makeFakeEngine() {
     _sessionFiles: { unloadSession: vi.fn() },
     _computerHost: { abortSession: vi.fn() },
   };
-  fake._sessionRuntimeKeyForPath = HanaEngine.prototype._sessionRuntimeKeyForPath;
-  fake._deleteSessionRuntimeMapEntry = HanaEngine.prototype._deleteSessionRuntimeMapEntry;
-  fake._deleteSessionRuntimeSetEntry = HanaEngine.prototype._deleteSessionRuntimeSetEntry;
-  fake.setUiContext = HanaEngine.prototype.setUiContext;
-  fake.getUiContext = HanaEngine.prototype.getUiContext;
-  fake.clearSessionRuntimeState = HanaEngine.prototype.clearSessionRuntimeState;
+  fake._sessionRuntimeKeyForPath = LingxiEngine.prototype._sessionRuntimeKeyForPath;
+  fake._deleteSessionRuntimeMapEntry = LingxiEngine.prototype._deleteSessionRuntimeMapEntry;
+  fake._deleteSessionRuntimeSetEntry = LingxiEngine.prototype._deleteSessionRuntimeSetEntry;
+  fake.setUiContext = LingxiEngine.prototype.setUiContext;
+  fake.getUiContext = LingxiEngine.prototype.getUiContext;
+  fake.clearSessionRuntimeState = LingxiEngine.prototype.clearSessionRuntimeState;
   return fake;
 }
 
-describe("HanaEngine uiContext", () => {
+describe("LingxiEngine uiContext", () => {
   let engine;
 
   beforeEach(() => {

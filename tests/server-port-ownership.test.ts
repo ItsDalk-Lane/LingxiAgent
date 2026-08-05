@@ -15,7 +15,7 @@ describe("server transport ownership", () => {
     expect(bindIndex).toBeGreaterThan(-1);
     expect(bindIndex).toBeLessThan(source.indexOf("ensureFirstRun("));
     expect(bindIndex).toBeLessThan(source.indexOf("ensureLocalIdentityRegistries("));
-    expect(bindIndex).toBeLessThan(source.indexOf("new HanaEngine("));
+    expect(bindIndex).toBeLessThan(source.indexOf("new LingxiEngine("));
     expect(bindIndex).toBeLessThan(source.indexOf("await engine.init("));
     expect(bindIndex).toBeLessThan(source.indexOf("await engine.initPlugins("));
     expect(bindIndex).toBeLessThan(source.indexOf("hub.initSchedulers()"));
@@ -26,7 +26,7 @@ describe("server transport ownership", () => {
 
     const firstRunIndex = source.indexOf("ensureFirstRun(");
     const identityIndex = source.indexOf("ensureLocalIdentityRegistries(");
-    const engineIndex = source.indexOf("new HanaEngine(");
+    const engineIndex = source.indexOf("new LingxiEngine(");
 
     expect(firstRunIndex).toBeGreaterThan(-1);
     expect(identityIndex).toBeGreaterThan(firstRunIndex);
@@ -110,7 +110,7 @@ describe("server transport ownership", () => {
       expect(stderr).toContain("PORT_IN_USE");
       expect(stdout + stderr).not.toContain("ensureFirstRun");
       expect(stdout + stderr).not.toContain("ensureLocalIdentityRegistries");
-      expect(stdout + stderr).not.toContain("HanaEngine");
+      expect(stdout + stderr).not.toContain("LingxiEngine");
     } finally {
       blocker.close();
       fs.rmSync(hanaHome, { recursive: true, force: true });

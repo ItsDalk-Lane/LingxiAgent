@@ -9,7 +9,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 type MockResponse = { json: () => Promise<any> };
 
-const hanaFetchMock = vi.fn(async (_url: string, _opts?: RequestInit): Promise<MockResponse> => ({
+const lingxiFetchMock = vi.fn(async (_url: string, _opts?: RequestInit): Promise<MockResponse> => ({
   json: async () => ({
     agentId: 'hana',
     status: 'degraded',
@@ -30,7 +30,7 @@ const hanaFetchMock = vi.fn(async (_url: string, _opts?: RequestInit): Promise<M
 }));
 
 vi.mock('../../settings/api', () => ({
-  hanaFetch: (url: string, opts?: RequestInit) => hanaFetchMock(url, opts),
+  lingxiFetch: (url: string, opts?: RequestInit) => lingxiFetchMock(url, opts),
 }));
 
 vi.mock('../../settings/helpers', () => ({
@@ -62,7 +62,7 @@ vi.mock('../../settings/helpers', () => ({
 
 describe('Agent memory settings health notice', () => {
   beforeEach(() => {
-    hanaFetchMock.mockClear();
+    lingxiFetchMock.mockClear();
   });
 
   afterEach(() => {
@@ -83,7 +83,7 @@ describe('Agent memory settings health notice', () => {
     );
 
     await waitFor(() => {
-      expect(hanaFetchMock).toHaveBeenCalledWith(
+      expect(lingxiFetchMock).toHaveBeenCalledWith(
         '/api/memories/health?agentId=hana',
         expect.objectContaining({ signal: expect.any(AbortSignal) }),
       );

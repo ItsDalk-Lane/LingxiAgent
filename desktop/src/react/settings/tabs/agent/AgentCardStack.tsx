@@ -1,6 +1,6 @@
 import React, { useEffect, useLayoutEffect, useRef, useCallback, useState } from 'react';
 import { useSettingsStore, type Agent } from '../../store';
-import { hanaFetch, hanaUrl, yuanFallbackAvatar } from '../../api';
+import { lingxiFetch, lingxiUrl, yuanFallbackAvatar } from '../../api';
 import { t } from '../../helpers';
 import { loadAgents } from '../../actions';
 import styles from '../../Settings.module.css';
@@ -246,7 +246,7 @@ export function AgentCardStack({
             const [movedAgent] = reordered.splice(dragIdx, 1);
             reordered.splice(dropIdx, 0, movedAgent);
             useSettingsStore.setState({ agents: reordered });
-            hanaFetch('/api/agents/order', {
+            lingxiFetch('/api/agents/order', {
               method: 'PUT',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ order: reordered.map(a => a.id) }),
@@ -342,7 +342,7 @@ export function AgentCardStack({
                   className={styles['agent-card-avatar']}
                   draggable={false}
                   src={agent.hasAvatar
-                    ? hanaUrl(`/api/agents/${agent.id}/avatar${agent.avatarRevision ? `?v=${encodeURIComponent(agent.avatarRevision)}` : ''}`)
+                    ? lingxiUrl(`/api/agents/${agent.id}/avatar${agent.avatarRevision ? `?v=${encodeURIComponent(agent.avatarRevision)}` : ''}`)
                     : yuanFallbackAvatar(agent.yuan)}
                   onError={(e) => {
                     const img = e.target as HTMLImageElement;

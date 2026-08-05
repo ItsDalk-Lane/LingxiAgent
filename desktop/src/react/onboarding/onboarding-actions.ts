@@ -5,7 +5,7 @@
 import { isValidAgentId } from '../../../../shared/agent-id.ts';
 import { DEFAULT_HEARTBEAT_INTERVAL_MINUTES } from '../../../../shared/default-workspace-constants.ts';
 
-export type HanaFetch = (path: string, opts?: RequestInit) => Promise<Response>;
+export type LingxiFetch = (path: string, opts?: RequestInit) => Promise<Response>;
 
 type JsonObject = Record<string, unknown>;
 
@@ -98,8 +98,8 @@ export function selectOnboardingAgentId(rawAgents: unknown): string {
   throw new Error('Onboarding target agent is ambiguous');
 }
 
-export async function resolveOnboardingAgentId(hanaFetch: HanaFetch): Promise<string> {
-  const res = await hanaFetch('/api/agents?fresh=1');
+export async function resolveOnboardingAgentId(lingxiFetch: LingxiFetch): Promise<string> {
+  const res = await lingxiFetch('/api/agents?fresh=1');
   const body = await requireResponse(res, 'Loading onboarding agent');
   if (!isObject(body) || !Array.isArray(body.agents)) {
     throw new Error('Loading onboarding agent returned an invalid response');
@@ -178,17 +178,17 @@ function findMismatch(actual: unknown, expected: unknown, path: string): string 
 }
 
 interface VerifyOnboardingPersistenceParams {
-  hanaFetch: HanaFetch;
+  lingxiFetch: LingxiFetch;
   agentId: string;
   verificationPlan: OnboardingVerificationPlan;
 }
 
 export async function verifyOnboardingPersistence({
-  hanaFetch,
+  lingxiFetch,
   agentId,
   verificationPlan,
 }: VerifyOnboardingPersistenceParams): Promise<void> {
-  const configRes = await hanaFetch(agentConfigPath(agentId));
+  const configRes = await lingxiFetch(agentConfigPath(agentId));
   const config = await requireResponse(configRes, 'Verifying onboarding settings');
   if (!isObject(config)) throw new Error('Verifying onboarding settings returned an invalid response');
 
@@ -204,7 +204,7 @@ export async function verifyOnboardingPersistence({
   }
 
   if (Object.keys(verificationPlan.preferenceModels).length === 0) return;
-  const preferencesRes = await hanaFetch('/api/preferences/models');
+  const preferencesRes = await lingxiFetch('/api/preferences/models');
   const preferences = await requireResponse(preferencesRes, 'Verifying onboarding model preferences');
   if (!isObject(preferences)) {
     throw new Error('Verifying onboarding model preferences returned an invalid response');
@@ -218,7 +218,7 @@ export async function verifyOnboardingPersistence({
 // ── Test connection ──
 
 interface TestConnectionParams {
-  hanaFetch: HanaFetch;
+  lingxiFetch: LingxiFetch;
   providerUrl: string;
   providerApi: string;
   apiKey: string;
@@ -229,8 +229,8 @@ export interface TestResult {
   text: string;
 }
 
-export async function testConnection({ hanaFetch, providerUrl, providerApi, apiKey }: TestConnectionParams): Promise<TestResult> {
-  const res = await hanaFetch('/api/providers/test', {
+export async function testConnection({ lingxiFetch, providerUrl, providerApi, apiKey }: TestConnectionParams): Promise<TestResult> {
+  const res = await lingxiFetch('/api/providers/test', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -252,7 +252,7 @@ export async function testConnection({ hanaFetch, providerUrl, providerApi, apiK
 // ── Save provider ──
 
 interface SaveProviderParams {
-  hanaFetch: HanaFetch;
+  lingxiFetch: LingxiFetch;
   agentId: string;
   providerName: string;
   providerUrl: string;
@@ -262,7 +262,7 @@ interface SaveProviderParams {
 }
 
 export async function saveProvider({
-  hanaFetch,
+  lingxiFetch,
   agentId,
   providerName,
   providerUrl,
@@ -280,7 +280,7 @@ export async function saveProvider({
       },
     },
   };
-  const res = await hanaFetch(agentConfigPath(agentId), {
+  const res = await lingxiFetch(agentConfigPath(agentId), {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(patch),
@@ -293,7 +293,7 @@ export async function saveProvider({
 // ── Load models ──
 
 interface LoadModelsParams {
-  hanaFetch: HanaFetch;
+  lingxiFetch: LingxiFetch;
   providerName: string;
   providerUrl: string;
   providerApi: string;
@@ -320,8 +320,8 @@ export interface LoadModelsResult {
   error?: string;
 }
 
-export async function loadModels({ hanaFetch, providerName, providerUrl, providerApi, apiKey }: LoadModelsParams): Promise<LoadModelsResult> {
-  const res = await hanaFetch('/api/providers/fetch-models', {
+export async function loadModels({ lingxiFetch, providerName, providerUrl, providerApi, apiKey }: LoadModelsParams): Promise<LoadModelsResult> {
+  const res = await lingxiFetch('/api/providers/fetch-models', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -360,7 +360,7 @@ export interface AddedModelObject {
 export type AddedModelEntry = string | AddedModelObject;
 
 interface SaveModelParams {
-  hanaFetch: HanaFetch;
+  lingxiFetch: LingxiFetch;
   agentId: string;
   selectedModel: string;
   providerName: string;
@@ -385,7 +385,7 @@ function compactModelEntry(entry: AddedModelEntry): AddedModelEntry {
 }
 
 export async function saveModel({
-  hanaFetch,
+  lingxiFetch,
   agentId,
   selectedModel,
   providerName,
@@ -396,7 +396,7 @@ export async function saveModel({
 }: SaveModelParams): Promise<void> {
   // Save chat model
   const chatModelPatch = { models: { chat: { id: selectedModel, provider: providerName } } };
-  const chatModelRes = await hanaFetch(agentConfigPath(agentId), {
+  const chatModelRes = await lingxiFetch(agentConfigPath(agentId), {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(chatModelPatch),
@@ -407,7 +407,7 @@ export async function saveModel({
   // Save only the user's explicit Added Models selection to provider.
   const modelEntries = addedModels.map(compactModelEntry);
   const providerModelsPatch = { providers: { [providerName]: { models: modelEntries } } };
-  const providerModelsRes = await hanaFetch(agentConfigPath(agentId), {
+  const providerModelsRes = await lingxiFetch(agentConfigPath(agentId), {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(providerModelsPatch),
@@ -421,7 +421,7 @@ export async function saveModel({
     if (selectedUtility) utilityModels.utility = { id: selectedUtility, provider: providerName };
     if (selectedUtilityLarge) utilityModels.utility_large = { id: selectedUtilityLarge, provider: providerName };
     const preferencesPatch = { models: utilityModels };
-    const preferencesRes = await hanaFetch('/api/preferences/models', {
+    const preferencesRes = await lingxiFetch('/api/preferences/models', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(preferencesPatch),
@@ -434,13 +434,13 @@ export async function saveModel({
 // ── Save locale ──
 
 export async function saveLocale(
-  hanaFetch: HanaFetch,
+  lingxiFetch: LingxiFetch,
   agentId: string,
   locale: string,
   verificationPlan?: OnboardingVerificationPlan,
 ): Promise<void> {
   const patch = { locale };
-  const res = await hanaFetch(agentConfigPath(agentId), {
+  const res = await lingxiFetch(agentConfigPath(agentId), {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(patch),
@@ -452,7 +452,7 @@ export async function saveLocale(
 // ── Save identity ──
 
 interface SaveOnboardingIdentityParams {
-  hanaFetch: HanaFetch;
+  lingxiFetch: LingxiFetch;
   agentId: string;
   userName: string;
   agentName: string;
@@ -461,7 +461,7 @@ interface SaveOnboardingIdentityParams {
 }
 
 export async function saveOnboardingIdentity({
-  hanaFetch,
+  lingxiFetch,
   agentId,
   userName,
   agentName,
@@ -484,7 +484,7 @@ export async function saveOnboardingIdentity({
     ...(body.agent ? { agent: body.agent } : {}),
     memory: body.memory,
   };
-  const res = await hanaFetch(agentConfigPath(agentId), {
+  const res = await lingxiFetch(agentConfigPath(agentId), {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(patch),
@@ -494,13 +494,13 @@ export async function saveOnboardingIdentity({
 }
 
 export async function saveUserName(
-  hanaFetch: HanaFetch,
+  lingxiFetch: LingxiFetch,
   agentId: string,
   name: string,
   verificationPlan?: OnboardingVerificationPlan,
 ): Promise<void> {
   const patch = { user: { name } };
-  const res = await hanaFetch(agentConfigPath(agentId), {
+  const res = await lingxiFetch(agentConfigPath(agentId), {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(patch),
@@ -511,22 +511,22 @@ export async function saveUserName(
 
 // ── Workspace ──
 
-export async function loadDefaultWorkspace(hanaFetch: HanaFetch): Promise<string> {
-  const res = await hanaFetch('/api/config/default-workspace');
+export async function loadDefaultWorkspace(lingxiFetch: LingxiFetch): Promise<string> {
+  const res = await lingxiFetch('/api/config/default-workspace');
   const data = await requireResponse(res, 'Loading default workspace');
   if (!isObject(data)) throw new Error('Loading default workspace returned an invalid response');
   if (typeof data.error === 'string' && data.error) throw new Error(data.error);
   return typeof data.path === 'string' ? data.path : '';
 }
 
-async function ensureDefaultWorkspace(hanaFetch: HanaFetch): Promise<string> {
-  const res = await hanaFetch('/api/config/default-workspace', { method: 'POST' });
+async function ensureDefaultWorkspace(lingxiFetch: LingxiFetch): Promise<string> {
+  const res = await lingxiFetch('/api/config/default-workspace', { method: 'POST' });
   const data = await requireMutation(res, 'Creating default workspace');
   return isObject(data) && typeof data.path === 'string' ? data.path : '';
 }
 
 interface SaveWorkspaceParams {
-  hanaFetch: HanaFetch;
+  lingxiFetch: LingxiFetch;
   agentId: string;
   workspacePath: string;
   defaultPath: string;
@@ -534,7 +534,7 @@ interface SaveWorkspaceParams {
 }
 
 export async function saveWorkspace({
-  hanaFetch,
+  lingxiFetch,
   agentId,
   workspacePath,
   defaultPath,
@@ -544,7 +544,7 @@ export async function saveWorkspace({
   if (!selected) throw new Error('workspacePath is required');
 
   if (selected === defaultPath) {
-    await ensureDefaultWorkspace(hanaFetch);
+    await ensureDefaultWorkspace(lingxiFetch);
   }
 
   const patch = {
@@ -554,7 +554,7 @@ export async function saveWorkspace({
       heartbeat_interval: DEFAULT_HEARTBEAT_INTERVAL_MINUTES,
     },
   };
-  const res = await hanaFetch(agentConfigPath(agentId), {
+  const res = await lingxiFetch(agentConfigPath(agentId), {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(patch),

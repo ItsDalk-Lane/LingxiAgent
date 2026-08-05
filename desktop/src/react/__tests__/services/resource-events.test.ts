@@ -3,16 +3,16 @@
  */
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-const hanaFetch = vi.hoisted(() => vi.fn(async (path: string) => ({
+const lingxiFetch = vi.hoisted(() => vi.fn(async (path: string) => ({
   json: async () => (path.endsWith('/subscribe') ? { ok: true, subscriptionId: 'sub-1' } : { ok: true }),
 })));
 
-vi.mock('../../hooks/use-hana-fetch', () => ({ hanaFetch }));
+vi.mock('../../hooks/use-hana-fetch', () => ({ lingxiFetch }));
 
 describe('resource-events', () => {
   afterEach(() => {
     vi.resetModules();
-    hanaFetch.mockClear();
+    lingxiFetch.mockClear();
   });
 
   it('shares one backend resource subscription per local file and releases it after the last subscriber leaves', async () => {
@@ -22,8 +22,8 @@ describe('resource-events', () => {
     const releaseSecond = retainLocalFileResourceWatch('/tmp/note.md');
     await Promise.resolve();
 
-    expect(hanaFetch).toHaveBeenCalledTimes(1);
-    expect(hanaFetch).toHaveBeenCalledWith('/api/resource-io/subscribe', expect.objectContaining({
+    expect(lingxiFetch).toHaveBeenCalledTimes(1);
+    expect(lingxiFetch).toHaveBeenCalledWith('/api/resource-io/subscribe', expect.objectContaining({
       method: 'POST',
       body: JSON.stringify({
         purpose: 'resource-watch',
@@ -33,13 +33,13 @@ describe('resource-events', () => {
 
     releaseFirst();
     await Promise.resolve();
-    expect(hanaFetch).toHaveBeenCalledTimes(1);
+    expect(lingxiFetch).toHaveBeenCalledTimes(1);
 
     releaseSecond();
     await Promise.resolve();
     await Promise.resolve();
 
-    expect(hanaFetch).toHaveBeenCalledWith('/api/resource-io/subscriptions/sub-1', expect.objectContaining({
+    expect(lingxiFetch).toHaveBeenCalledWith('/api/resource-io/subscriptions/sub-1', expect.objectContaining({
       method: 'DELETE',
     }));
   });
@@ -51,8 +51,8 @@ describe('resource-events', () => {
     const releaseSecond = retainResourceWatch({ kind: 'mount', mountId: 'mount_docs', path: 'notes/' });
     await Promise.resolve();
 
-    expect(hanaFetch).toHaveBeenCalledTimes(1);
-    expect(hanaFetch).toHaveBeenCalledWith('/api/resource-io/subscribe', expect.objectContaining({
+    expect(lingxiFetch).toHaveBeenCalledTimes(1);
+    expect(lingxiFetch).toHaveBeenCalledWith('/api/resource-io/subscribe', expect.objectContaining({
       method: 'POST',
       body: JSON.stringify({
         purpose: 'resource-watch',

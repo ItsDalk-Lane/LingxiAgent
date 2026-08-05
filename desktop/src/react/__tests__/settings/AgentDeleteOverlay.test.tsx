@@ -18,7 +18,7 @@ vi.mock('../../settings/store', () => ({
 }));
 
 vi.mock('../../settings/api', () => ({
-  hanaFetch: vi.fn(),
+  lingxiFetch: vi.fn(),
 }));
 
 vi.mock('../../settings/actions', () => ({
@@ -67,9 +67,9 @@ describe('AgentDeleteOverlay', () => {
   });
 
   it('deletes the active agent through the backend without switching first', async () => {
-    const { hanaFetch } = await import('../../settings/api');
+    const { lingxiFetch } = await import('../../settings/api');
     const actions = await import('../../settings/actions');
-    (hanaFetch as any).mockResolvedValue({ json: async () => ({ ok: true, replacementAgentId: 'deepseek' }) });
+    (lingxiFetch as any).mockResolvedValue({ json: async () => ({ ok: true, replacementAgentId: 'deepseek' }) });
     const { AgentDeleteOverlay } = await import('../../settings/overlays/AgentDeleteOverlay');
     render(<AgentDeleteOverlay />);
 
@@ -84,7 +84,7 @@ describe('AgentDeleteOverlay', () => {
     });
     fireEvent.click(screen.getByText('settings.agent.deleteConfirm'));
 
-    await waitFor(() => expect(hanaFetch).toHaveBeenCalledWith('/api/agents/hana', { method: 'DELETE' }));
+    await waitFor(() => expect(lingxiFetch).toHaveBeenCalledWith('/api/agents/hana', { method: 'DELETE' }));
     expect(actions.switchToAgent).not.toHaveBeenCalled();
     expect(actions.loadAgents).toHaveBeenCalled();
     expect(actions.loadSettingsConfig).toHaveBeenCalled();

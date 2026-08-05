@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSettingsStore } from '../../store';
-import { hanaFetch } from '../../api';
+import { lingxiFetch } from '../../api';
 import {
   t, lookupModelMeta, formatContext, autoSaveGlobalModels,
 } from '../../helpers';
@@ -46,7 +46,7 @@ function ToolModelTestBtn({ modelRef }: { modelRef: unknown }) {
     if (!hasRef) return;
     setStatus('testing');
     try {
-      const res = await hanaFetch('/api/models/health', {
+      const res = await lingxiFetch('/api/models/health', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ modelId: ref.id, provider: ref.provider }),
@@ -116,7 +116,7 @@ export function OtherModelsSection({ providers }: { providers: Record<string, { 
     if (!provider) { showToast(t('settings.search.noProvider'), 'error'); return; }
     if (searchProviderNeedsApiKey(provider) && !apiKey) { showToast(t('settings.search.noKey'), 'error'); return; }
     try {
-      const res = await hanaFetch('/api/search/verify', {
+      const res = await lingxiFetch('/api/search/verify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ provider, api_key: apiKey, search_provider: searchProvider }),

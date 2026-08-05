@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useSettingsStore } from '../../store';
-import { hanaFetch } from '../../api';
+import { lingxiFetch } from '../../api';
 import { t, API_FORMAT_OPTIONS } from '../../helpers';
 import { loadSettingsConfig } from '../../actions';
 import { SelectWidget } from '@/ui';
@@ -52,7 +52,7 @@ function AddProviderForm({ onDone }: { onDone: () => void }) {
     if (!u) { showToast(t('settings.providers.urlRequired'), 'error'); return; }
     try {
       const headers = parseProviderHeaderLines(headersText);
-      const res = await hanaFetch('/api/config', {
+      const res = await lingxiFetch('/api/config', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ providers: { [n]: {

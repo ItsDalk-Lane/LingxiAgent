@@ -24,10 +24,10 @@ import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-libra
 
 // ─── Mocks (hoisted) ──────────────────────────────────────────────────────────
 
-// `hanaFetch` is the single I/O seam for SkillsTab. Spy on it per test.
+// `lingxiFetch` is the single I/O seam for SkillsTab. Spy on it per test.
 const fetchMock = vi.fn();
 vi.mock('../../api', () => ({
-  hanaFetch: (...args: unknown[]) => fetchMock(...args),
+  lingxiFetch: (...args: unknown[]) => fetchMock(...args),
 }));
 
 // `helpers.ts` reads `window.platform` at module eval time (line 8). Full mock
@@ -240,7 +240,7 @@ describe('SkillsTab — sticky skillsViewAgentId & toggleSkill race guard', () =
     const sel = screen.getByTestId('agent-select') as HTMLSelectElement;
     expect(sel.value).toBe('agent-a');
 
-    // hanaFetch was called with agentId=agent-a for the initial skills load.
+    // lingxiFetch was called with agentId=agent-a for the initial skills load.
     const skillsCalls = fetchMock.mock.calls.filter((c) =>
       typeof c[0] === 'string' && c[0].includes('/api/skills?agentId='),
     );

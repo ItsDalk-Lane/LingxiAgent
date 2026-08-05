@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { useSettingsStore } from '../store';
-import { hanaFetch } from '../api';
+import { lingxiFetch } from '../api';
 import { t } from '../helpers';
 import styles from '../Settings.module.css';
 import { SettingsSection } from '../components/SettingsSection';
@@ -178,7 +178,7 @@ export function PluginsTab() {
 
   const loadPlugins = useCallback(async () => {
     try {
-      const res = await hanaFetch('/api/plugins?source=community');
+      const res = await lingxiFetch('/api/plugins?source=community');
       const data = await res.json();
       setPlugins(Array.isArray(data) ? data : []);
     } catch (err) {
@@ -189,7 +189,7 @@ export function PluginsTab() {
 
   const loadPluginConfig = useCallback(async (plugin: PluginInfo) => {
     try {
-      const res = await hanaFetch(`/api/plugins/${encodeURIComponent(plugin.id)}/config`);
+      const res = await lingxiFetch(`/api/plugins/${encodeURIComponent(plugin.id)}/config`);
       const data = await res.json();
       if (data.error) throw new Error(data.error);
       setConfigPlugin(plugin);
@@ -205,7 +205,7 @@ export function PluginsTab() {
   const loadDiagnostics = useCallback(async () => {
     setDiagnosticsLoading(true);
     try {
-      const res = await hanaFetch('/api/plugins/diagnostics');
+      const res = await lingxiFetch('/api/plugins/diagnostics');
       const data = await res.json();
       if (data.error) throw new Error(data.error);
       setDiagnostics({
@@ -236,7 +236,7 @@ export function PluginsTab() {
     const next = !pluginAllowFullAccess;
     set({ pluginAllowFullAccess: next });
     try {
-      const res = await hanaFetch('/api/plugins/settings', {
+      const res = await lingxiFetch('/api/plugins/settings', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ allow_full_access: next }),
@@ -255,7 +255,7 @@ export function PluginsTab() {
     const next = !pluginDevToolsEnabled;
     set({ pluginDevToolsEnabled: next });
     try {
-      const res = await hanaFetch('/api/plugins/settings', {
+      const res = await lingxiFetch('/api/plugins/settings', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ plugin_dev_tools_enabled: next }),
@@ -273,7 +273,7 @@ export function PluginsTab() {
 
   const installFromPath = async (filePath: string) => {
     try {
-      const res = await hanaFetch('/api/plugins/install', {
+      const res = await lingxiFetch('/api/plugins/install', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ path: filePath }),
@@ -311,7 +311,7 @@ export function PluginsTab() {
     // Optimistic update
     setPlugins(prev => prev.map(p => p.id === id ? { ...p, status: enable ? 'loaded' : 'disabled' } as PluginInfo : p));
     try {
-      const res = await hanaFetch(`/api/plugins/${encodeURIComponent(id)}/enabled`, {
+      const res = await lingxiFetch(`/api/plugins/${encodeURIComponent(id)}/enabled`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ enabled: enable }),
@@ -333,7 +333,7 @@ export function PluginsTab() {
     const msg = t('settings.plugins.deleteConfirm', { name: plugin.name });
     if (!confirm(msg)) return;
     try {
-      const res = await hanaFetch(`/api/plugins/${encodeURIComponent(plugin.id)}`, { method: 'DELETE' });
+      const res = await lingxiFetch(`/api/plugins/${encodeURIComponent(plugin.id)}`, { method: 'DELETE' });
       const data = await res.json();
       if (data.error) throw new Error(data.error);
       showToast(t('settings.autoSaved'), 'success');
@@ -386,7 +386,7 @@ export function PluginsTab() {
     }
     setConfigSaving(true);
     try {
-      const res = await hanaFetch(`/api/plugins/${encodeURIComponent(configPlugin.id)}/config`, {
+      const res = await lingxiFetch(`/api/plugins/${encodeURIComponent(configPlugin.id)}/config`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ values }),

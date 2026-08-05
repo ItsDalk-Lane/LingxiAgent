@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect, useCallback } from 'react';
 import { useSettingsStore } from '../store';
-import { hanaFetch } from '../api';
+import { lingxiFetch } from '../api';
 import { t } from '../helpers';
 import { renderMarkdown } from '../../utils/markdown';
 import { useMermaidDiagrams } from '../../hooks/use-mermaid-diagrams';
@@ -37,7 +37,7 @@ export function CompiledMemoryViewer() {
     setLoading(true);
     try {
       const aid = useSettingsStore.getState().getSettingsAgentId();
-      const res = await hanaFetch(`/api/memories/compiled?agentId=${aid}`);
+      const res = await lingxiFetch(`/api/memories/compiled?agentId=${aid}`);
       const data = await res.json();
       const nextSections = {
         facts: data.sections?.facts || '',
@@ -65,7 +65,7 @@ export function CompiledMemoryViewer() {
 
   const loadWeekDays = async (aid: string | null) => {
     try {
-      const res = await hanaFetch(`/api/memories/compiled/week/days?agentId=${aid}`);
+      const res = await lingxiFetch(`/api/memories/compiled/week/days?agentId=${aid}`);
       const data = await res.json();
       const days: WeekDay[] = Array.isArray(data.days) ? data.days : [];
       setWeekDays(days);
@@ -80,7 +80,7 @@ export function CompiledMemoryViewer() {
   const clearCompiled = async () => {
     try {
       const aid = useSettingsStore.getState().getSettingsAgentId();
-      await hanaFetch(`/api/memories/compiled?agentId=${aid}`, { method: 'DELETE' });
+      await lingxiFetch(`/api/memories/compiled?agentId=${aid}`, { method: 'DELETE' });
       setSections(prev => ({ ...prev, today: '', week: '', longterm: '' }));
       setTodayDraft('');
       setLongtermDraft('');
@@ -98,7 +98,7 @@ export function CompiledMemoryViewer() {
     || weekDays.some((day) => (weekDrafts[day.date] ?? '') !== day.body);
 
   const putCompiledJson = async (url: string, body: Record<string, string>) => {
-    const res = await hanaFetch(url, {
+    const res = await lingxiFetch(url, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
@@ -164,7 +164,7 @@ export function CompiledMemoryViewer() {
       }
 
       if (changedWeekDays.length > 0) {
-        const refreshed = await hanaFetch(`/api/memories/compiled?agentId=${aid}`);
+        const refreshed = await lingxiFetch(`/api/memories/compiled?agentId=${aid}`);
         const refreshedData = await refreshed.json();
         if (refreshedData.error) throw new Error(refreshedData.error);
         if (typeof refreshedData.sections?.week === 'string') {

@@ -15,7 +15,7 @@ interface MockState extends Record<string, unknown> {
 }
 
 const mockState: MockState = {};
-const mockHanaFetch = vi.fn();
+const mockLingxiFetch = vi.fn();
 
 vi.mock('../../settings/store', () => {
   const hook: any = (selector?: (s: MockState) => unknown) =>
@@ -26,7 +26,7 @@ vi.mock('../../settings/store', () => {
 });
 
 vi.mock('../../settings/api', () => ({
-  hanaFetch: (...args: unknown[]) => mockHanaFetch(...args),
+  lingxiFetch: (...args: unknown[]) => mockLingxiFetch(...args),
 }));
 
 vi.mock('../../settings/actions', () => ({
@@ -96,8 +96,8 @@ describe('SettingsContent title placement', () => {
   beforeEach(() => {
     resetState();
     window.localStorage.clear();
-    mockHanaFetch.mockReset();
-    mockHanaFetch.mockResolvedValue(jsonResponse({ locale: 'zh-CN' }));
+    mockLingxiFetch.mockReset();
+    mockLingxiFetch.mockResolvedValue(jsonResponse({ locale: 'zh-CN' }));
     window.platform = {
       getServerPort: vi.fn(async () => 62950),
       getServerToken: vi.fn(async () => 'token'),
@@ -153,7 +153,7 @@ describe('SettingsContent title placement', () => {
     render(<SettingsContent variant="modal" onClose={() => {}} onActiveTabChange={onActiveTabChange} />);
 
     await waitFor(() => {
-      expect(mockHanaFetch).toHaveBeenCalledWith('/api/config');
+      expect(mockLingxiFetch).toHaveBeenCalledWith('/api/config');
     });
     await waitFor(() => {
       expect(actions.loadSettingsSnapshot).toHaveBeenCalled();

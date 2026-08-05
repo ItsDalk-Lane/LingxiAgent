@@ -1,5 +1,5 @@
 /**
- * HanaEngine — Hanako 的核心引擎（Thin Facade）
+ * LingxiEngine — Hanako 的核心引擎（Thin Facade）
  *
  * 持有所有 Manager，对外暴露统一 API。
  * 具体逻辑委托给：
@@ -255,7 +255,7 @@ function sessionBelongsToProject(projectId) {
   };
 }
 
-export class HanaEngine {
+export class LingxiEngine {
   declare _activityHub: any;
   declare _agentMgr: any;
   declare _approvalGateway: any;
@@ -3254,7 +3254,7 @@ export class HanaEngine {
       }),
     };
 
-    // Object.create(HanaEngine.prototype) is used by focused tool unit tests;
+    // Object.create(LingxiEngine.prototype) is used by focused tool unit tests;
     // every constructed runtime owns the registry from the constructor above.
     if (this._sessionExecutions) {
       result = {

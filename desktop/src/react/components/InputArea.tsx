@@ -73,7 +73,7 @@ import {
   type SlashItem,
 } from './input/slash-commands';
 import { attachFilesFromPaths } from '../MainContent';
-import { hanaFetch } from '../hooks/use-hana-fetch';
+import { lingxiFetch } from '../hooks/use-hana-fetch';
 import styles from './input/InputArea.module.css';
 import type { AudioWaveform, ChatListItem, SessionConfirmationBlock, SessionModel } from '../stores/chat-types';
 
@@ -955,7 +955,7 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
               return undefined;
             })
             : undefined;
-          const res = await hanaFetch('/api/upload-blob', {
+          const res = await lingxiFetch('/api/upload-blob', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -1138,7 +1138,7 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
       audioRecordingSeqRef.current = index;
       const name = t('input.recordedAudioName', { index });
       const sessionRef = await ensureVoiceSessionRef();
-      const res = await hanaFetch('/api/upload-blob', {
+      const res = await lingxiFetch('/api/upload-blob', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -1429,7 +1429,7 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
 
   const loadVisionAuxiliaryConfig = useCallback(async () => {
     if (surface === 'mobile') {
-      const res = await hanaFetch('/api/models/auxiliary-vision');
+      const res = await lingxiFetch('/api/models/auxiliary-vision');
       const data = await res.json();
       const auxiliaryVision = data?.auxiliaryVision;
       return {
@@ -1437,7 +1437,7 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
         model: auxiliaryVision?.model || null,
       };
     }
-    const res = await hanaFetch('/api/preferences/models');
+    const res = await lingxiFetch('/api/preferences/models');
     const data = await res.json();
     return {
       enabled: data?.models?.vision_enabled === true,
@@ -1494,7 +1494,7 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
               base64Data,
               mimeType,
             });
-            const res = await hanaFetch('/api/upload-blob', {
+            const res = await lingxiFetch('/api/upload-blob', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
@@ -1542,7 +1542,7 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
         : currentSessionPath
           ? `?sessionPath=${encodeURIComponent(currentSessionPath)}`
           : '';
-      hanaFetch(`/api/session-thinking-level${query}`)
+      lingxiFetch(`/api/session-thinking-level${query}`)
         .then(r => r.json())
         .then(d => { if (d.thinkingLevel) setThinkingLevel(d.thinkingLevel as ThinkingLevel); })
         .catch((err: unknown) => console.warn('[InputArea] load thinking level failed', err));

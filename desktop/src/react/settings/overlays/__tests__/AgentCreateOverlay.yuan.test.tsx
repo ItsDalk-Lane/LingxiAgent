@@ -27,7 +27,7 @@ let types: Record<string, Record<string, string>> = zh.yuan.types;
 vi.mock("../../helpers", () => ({
   t: (key: string) => (key === "yuan.types" ? types : key),
 }));
-vi.mock("../../api", () => ({ hanaFetch: vi.fn() }));
+vi.mock("../../api", () => ({ lingxiFetch: vi.fn() }));
 vi.mock("../../actions", () => ({ switchToAgent: vi.fn() }));
 
 import { AgentCreateOverlay } from "../AgentCreateOverlay";

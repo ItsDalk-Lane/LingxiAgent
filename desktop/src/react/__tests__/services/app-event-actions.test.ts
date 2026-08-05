@@ -4,7 +4,7 @@ type MockState = Record<string, unknown>;
 
 const mockState: MockState = {};
 
-const mockHanaFetch = vi.fn();
+const mockLingxiFetch = vi.fn();
 const mockApplyAgentIdentity = vi.fn(async () => {});
 const mockLoadAgents = vi.fn(async () => {});
 const mockLoadSessions = vi.fn(async () => {});
@@ -26,7 +26,7 @@ vi.mock('../../stores', () => ({
 }));
 
 vi.mock('../../hooks/use-hana-fetch', () => ({
-  hanaFetch: mockHanaFetch,
+  lingxiFetch: mockLingxiFetch,
 }));
 
 vi.mock('../../stores/agent-actions', () => ({
@@ -71,7 +71,7 @@ async function flushPromises(): Promise<void> {
 describe('handleAppEvent', () => {
   beforeEach(() => {
     Object.keys(mockState).forEach(k => delete mockState[k]);
-    mockHanaFetch.mockReset();
+    mockLingxiFetch.mockReset();
     mockApplyAgentIdentity.mockReset();
     mockLoadAgents.mockReset();
     mockLoadSessions.mockReset();
@@ -100,7 +100,7 @@ describe('handleAppEvent', () => {
   });
 
   it('agent-switched applies agent identity, reloads dependent data, and resets agent-scoped UI state', async () => {
-    mockHanaFetch
+    mockLingxiFetch
       .mockResolvedValueOnce(jsonResponse({ jobs: [{ id: 'job-1' }] }));
     Object.assign(mockState, {
       currentChannel: { id: 'old' },
@@ -231,7 +231,7 @@ describe('handleAppEvent', () => {
   });
 
   it('agent-switched reads the next agent memory gate from config', async () => {
-    mockHanaFetch
+    mockLingxiFetch
       .mockResolvedValueOnce(jsonResponse({ jobs: [] }));
     Object.assign(mockState, { currentAgentId: 'agent-a', memoryMasterEnabled: true });
     const { handleAppEvent } = await import('../../services/app-event-actions');
@@ -249,7 +249,7 @@ describe('handleAppEvent', () => {
       expect(mockState.memoryMasterEnabled).toBe(false);
     });
 
-    expect(mockHanaFetch).not.toHaveBeenCalledWith('/api/config');
+    expect(mockLingxiFetch).not.toHaveBeenCalledWith('/api/config');
   });
 
   it('theme-changed applies the selected theme', async () => {

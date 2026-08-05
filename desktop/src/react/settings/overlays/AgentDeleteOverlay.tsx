@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { useSettingsStore } from '../store';
-import { hanaFetch } from '../api';
+import { lingxiFetch } from '../api';
 import { t } from '../helpers';
 import { loadSettingsConfig, loadAgents } from '../actions';
 import { Overlay } from '../../ui';
@@ -53,7 +53,7 @@ export function AgentDeleteOverlay() {
     setDeleting(true);
     setError('');
     try {
-      const res = await hanaFetch(`/api/agents/${targetId}`, { method: 'DELETE' });
+      const res = await lingxiFetch(`/api/agents/${targetId}`, { method: 'DELETE' });
       const data = await res.json();
       if (data.error) throw new Error(data.error);
       close();

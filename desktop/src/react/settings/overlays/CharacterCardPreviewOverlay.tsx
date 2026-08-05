@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
-import { hanaUrl } from '../api';
+import { lingxiUrl } from '../api';
 import { t } from '../helpers';
 import { displayInitial } from '../../utils/grapheme';
 import styles from '../Settings.module.css';
@@ -86,9 +86,9 @@ export function CharacterCardPreviewOverlay({
   const assetUrl = (key: string) => (
     plan.assets?.[key]
       ? mode === 'export' && plan.agentId
-        ? hanaUrl(`/api/character-cards/export/${encodeURIComponent(plan.agentId)}/assets/${key}`)
+        ? lingxiUrl(`/api/character-cards/export/${encodeURIComponent(plan.agentId)}/assets/${key}`)
         : plan.token
-          ? hanaUrl(`/api/character-cards/plans/${plan.token}/assets/${key}`)
+          ? lingxiUrl(`/api/character-cards/plans/${plan.token}/assets/${key}`)
           : ''
       : ''
   );

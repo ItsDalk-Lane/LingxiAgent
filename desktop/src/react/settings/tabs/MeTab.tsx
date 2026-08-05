@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { useSettingsStore } from '../store';
-import { hanaFetch } from '../api';
+import { lingxiFetch } from '../api';
 import { invalidateConfigCache } from '../../hooks/use-config';
 import { t } from '../helpers';
 import { loadSettingsConfig } from '../actions';
@@ -43,14 +43,14 @@ export function MeTab() {
         // The name describes the person using Hana, not any one agent, so it is
         // stored globally and saved through the global config route. Every agent
         // reads the same value.
-        requests.push(hanaFetch('/api/config', {
+        requests.push(lingxiFetch('/api/config', {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(partial),
         }));
       }
       if (profileChanged) {
-        requests.push(hanaFetch('/api/user-profile', {
+        requests.push(lingxiFetch('/api/user-profile', {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ content: userProfile }),

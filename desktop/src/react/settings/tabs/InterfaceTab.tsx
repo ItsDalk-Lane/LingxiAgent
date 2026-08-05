@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSettingsStore } from '../store';
-import { hanaFetch } from '../api';
+import { lingxiFetch } from '../api';
 import { t, VALID_THEMES, autoSaveConfig } from '../helpers';
 import { SelectWidget, Toggle } from '@/ui';
 import { SettingsGrid } from '../components/SettingsPrimitives';
@@ -175,7 +175,7 @@ export function InterfaceTab() {
 
   useEffect(() => {
     let cancelled = false;
-    hanaFetch('/api/preferences/sidebar-ui')
+    lingxiFetch('/api/preferences/sidebar-ui')
       .then(res => res.json())
       .then(data => {
         if (cancelled) return;
@@ -253,7 +253,7 @@ export function InterfaceTab() {
     });
     setSidebarUiPrefs(optimistic);
     try {
-      const res = await hanaFetch('/api/preferences/sidebar-ui', {
+      const res = await lingxiFetch('/api/preferences/sidebar-ui', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ sessionList: { rowMode } }),

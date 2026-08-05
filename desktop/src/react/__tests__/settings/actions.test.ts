@@ -21,8 +21,8 @@ vi.mock('../../settings/store', () => ({
 const mockFetch = vi.fn();
 
 vi.mock('../../settings/api', () => ({
-  hanaFetch: (...args: unknown[]) => mockFetch(...args),
-  hanaUrl: (path: string) => `http://127.0.0.1:3210${path}`,
+  lingxiFetch: (...args: unknown[]) => mockFetch(...args),
+  lingxiUrl: (path: string) => `http://127.0.0.1:3210${path}`,
 }));
 
 vi.mock('../../settings/helpers', () => ({

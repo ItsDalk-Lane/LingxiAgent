@@ -8,7 +8,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 type MockState = Record<string, any>;
 
 const mockState: MockState = {};
-const hanaFetchMock = vi.fn();
+const lingxiFetchMock = vi.fn();
 
 vi.mock('../../stores', () => ({
   useStore: {
@@ -21,8 +21,8 @@ vi.mock('../../stores', () => ({
 }));
 
 vi.mock('../../hooks/use-hana-fetch', () => ({
-  hanaFetch: (...args: unknown[]) => hanaFetchMock(...args),
-  hanaUrl: (p: string) => p,
+  lingxiFetch: (...args: unknown[]) => lingxiFetchMock(...args),
+  lingxiUrl: (p: string) => p,
 }));
 
 vi.mock('../../utils/history-builder', () => ({ buildItemsFromHistory: vi.fn(() => []) }));
@@ -64,7 +64,7 @@ function pinnedSession(sessionId: string, pinOrder: number | null) {
 
 describe('reorderPinnedSessions', () => {
   beforeEach(() => {
-    hanaFetchMock.mockReset();
+    lingxiFetchMock.mockReset();
     for (const key of Object.keys(mockState)) delete mockState[key];
     Object.assign(mockState, {
       addToast: vi.fn(),
@@ -80,7 +80,7 @@ describe('reorderPinnedSessions', () => {
 
   it('renumbers the pinned sessions immediately and posts the submitted order', async () => {
     let resolveFetch: (value: unknown) => void = () => {};
-    hanaFetchMock.mockImplementation(() => new Promise((resolve) => { resolveFetch = resolve; }));
+    lingxiFetchMock.mockImplementation(() => new Promise((resolve) => { resolveFetch = resolve; }));
 
     const pending = reorderPinnedSessions(['sess_c', 'sess_a', 'sess_b']);
 
@@ -90,10 +90,10 @@ describe('reorderPinnedSessions', () => {
       ['sess_b', 3072],
       ['sess_c', 1024],
     ]);
-    expect(hanaFetchMock).toHaveBeenCalledWith('/api/sessions/pin-order', expect.objectContaining({
+    expect(lingxiFetchMock).toHaveBeenCalledWith('/api/sessions/pin-order', expect.objectContaining({
       method: 'POST',
     }));
-    expect(JSON.parse(hanaFetchMock.mock.calls[0][1].body)).toEqual({
+    expect(JSON.parse(lingxiFetchMock.mock.calls[0][1].body)).toEqual({
       sessionIds: ['sess_c', 'sess_a', 'sess_b'],
     });
 
@@ -118,7 +118,7 @@ describe('reorderPinnedSessions', () => {
   });
 
   it('restores the previous order and warns when the server rejects the reorder', async () => {
-    hanaFetchMock.mockResolvedValue({
+    lingxiFetchMock.mockResolvedValue({
       ok: false,
       statusText: 'Bad Request',
       json: async () => ({ error: 'session_not_pinned' }),
@@ -135,7 +135,7 @@ describe('reorderPinnedSessions', () => {
   });
 
   it('restores the previous order when the request throws', async () => {
-    hanaFetchMock.mockRejectedValue(new Error('offline'));
+    lingxiFetchMock.mockRejectedValue(new Error('offline'));
 
     await expect(reorderPinnedSessions(['sess_b', 'sess_a', 'sess_c'])).resolves.toBe(false);
 
@@ -149,6 +149,6 @@ describe('reorderPinnedSessions', () => {
 
   it('does nothing when the submitted list is empty', async () => {
     await expect(reorderPinnedSessions([])).resolves.toBe(false);
-    expect(hanaFetchMock).not.toHaveBeenCalled();
+    expect(lingxiFetchMock).not.toHaveBeenCalled();
   });
 });

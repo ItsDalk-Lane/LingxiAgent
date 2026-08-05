@@ -9,7 +9,7 @@
 
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { useStore } from './stores';
-import { hanaFetch } from './hooks/use-hana-fetch';
+import { lingxiFetch } from './hooks/use-hana-fetch';
 import { toSlash, baseName } from './utils/format';
 import { isAudioFileName } from './utils/file-kind';
 import { buildWaveformFromBase64 } from './utils/audio-waveform';
@@ -39,7 +39,7 @@ async function installSkillFile(filePath: string, sessionPath?: string | null): 
       );
       return;
     }
-    const res = await hanaFetch(`/api/skills/install?agentId=${encodeURIComponent(agentId)}`, {
+    const res = await lingxiFetch(`/api/skills/install?agentId=${encodeURIComponent(agentId)}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ path: filePath, ...(sessionPath ? { sessionPath } : {}) }),
@@ -146,7 +146,7 @@ export async function attachFilesFromPaths(
   try {
     const sessionPath = useStore.getState().currentSessionPath || null;
     const metadataByPath = await computeAudioWaveformsForPaths(srcPaths);
-    const res = await hanaFetch('/api/upload', {
+    const res = await lingxiFetch('/api/upload', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

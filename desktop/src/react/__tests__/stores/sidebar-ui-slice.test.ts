@@ -8,11 +8,11 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { create } from 'zustand';
 
-const hanaFetchMock = vi.fn();
+const lingxiFetchMock = vi.fn();
 
 vi.mock('../../hooks/use-hana-fetch', () => ({
-  hanaFetch: (...args: unknown[]) => hanaFetchMock(...args),
-  hanaUrl: (path: string) => path,
+  lingxiFetch: (...args: unknown[]) => lingxiFetchMock(...args),
+  lingxiUrl: (path: string) => path,
 }));
 
 import {
@@ -44,8 +44,8 @@ function singleLinePrefsPayload() {
 describe('sidebar-ui-slice', () => {
   beforeEach(() => {
     window.localStorage.clear();
-    hanaFetchMock.mockReset();
-    hanaFetchMock.mockResolvedValue({ json: async () => ({}) });
+    lingxiFetchMock.mockReset();
+    lingxiFetchMock.mockResolvedValue({ json: async () => ({}) });
   });
 
   afterEach(() => {
@@ -100,7 +100,7 @@ describe('sidebar-ui-slice', () => {
   it('setSidebarProjectViewPrefs updates optimistically and persists only the project view', async () => {
     const store = createSidebarUiStore();
     store.getState().applySidebarUiPrefs(singleLinePrefsPayload());
-    hanaFetchMock.mockClear();
+    lingxiFetchMock.mockClear();
 
     store.getState().setSidebarProjectViewPrefs({ collapsedProjectIds: ['project-a', 'project-c'] });
 
@@ -109,8 +109,8 @@ describe('sidebar-ui-slice', () => {
     expect(state.sidebarUiPrefs.projectView.collapsedFolderIds).toEqual(['folder-a']);
     expect(state.sidebarUiPrefs.sessionList.rowMode).toBe('single-line');
 
-    expect(hanaFetchMock).toHaveBeenCalledTimes(1);
-    const [url, options] = hanaFetchMock.mock.calls[0] as [string, { method: string; body: string }];
+    expect(lingxiFetchMock).toHaveBeenCalledTimes(1);
+    const [url, options] = lingxiFetchMock.mock.calls[0] as [string, { method: string; body: string }];
     expect(url).toBe('/api/preferences/sidebar-ui');
     expect(options.method).toBe('PUT');
     expect(JSON.parse(options.body)).toEqual({
@@ -128,7 +128,7 @@ describe('sidebar-ui-slice', () => {
   it('loadSidebarUiPrefs retries with bounded backoff and applies the result to the store', async () => {
     vi.useFakeTimers();
     let attempts = 0;
-    hanaFetchMock.mockImplementation(async () => {
+    lingxiFetchMock.mockImplementation(async () => {
       attempts += 1;
       if (attempts < 3) throw new Error('server is still starting');
       return { json: async () => singleLinePrefsPayload() };
@@ -150,11 +150,11 @@ describe('sidebar-ui-slice', () => {
   });
 
   it('loadSidebarUiPrefs de-dupes concurrent calls into a single request', async () => {
-    hanaFetchMock.mockImplementation(async () => ({ json: async () => singleLinePrefsPayload() }));
+    lingxiFetchMock.mockImplementation(async () => ({ json: async () => singleLinePrefsPayload() }));
 
     await Promise.all([loadSidebarUiPrefs(), loadSidebarUiPrefs(), loadSidebarUiPrefs()]);
 
-    expect(hanaFetchMock).toHaveBeenCalledTimes(1);
-    expect(hanaFetchMock).toHaveBeenCalledWith('/api/preferences/sidebar-ui');
+    expect(lingxiFetchMock).toHaveBeenCalledTimes(1);
+    expect(lingxiFetchMock).toHaveBeenCalledWith('/api/preferences/sidebar-ui');
   });
 });

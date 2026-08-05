@@ -12,13 +12,13 @@ import { SessionConfirmationPrompt } from '../../components/input/SessionConfirm
 import { handleServerMessage } from '../../services/ws-message-handler';
 import { useStore } from '../../stores';
 
-const hanaFetchMock = vi.fn<(path: string, opts?: RequestInit) => Promise<Response>>(
+const lingxiFetchMock = vi.fn<(path: string, opts?: RequestInit) => Promise<Response>>(
   async () => new Response('{}', { status: 200 }),
 );
 
 vi.mock('../../hooks/use-hana-fetch', () => ({
-  hanaFetch: (path: string, opts?: RequestInit) => hanaFetchMock(path, opts),
-  hanaUrl: (path: string) => `http://127.0.0.1:3210${path}`,
+  lingxiFetch: (path: string, opts?: RequestInit) => lingxiFetchMock(path, opts),
+  lingxiUrl: (path: string) => `http://127.0.0.1:3210${path}`,
 }));
 
 vi.mock('@tiptap/react', () => ({
@@ -188,7 +188,7 @@ describe('computer app approval prompt', () => {
     fireEvent.click(screen.getByRole('button', { name: '同意' }));
 
     await waitFor(() => {
-      expect(hanaFetchMock).toHaveBeenCalledWith('/api/confirm/confirm-computer-1', expect.objectContaining({
+      expect(lingxiFetchMock).toHaveBeenCalledWith('/api/confirm/confirm-computer-1', expect.objectContaining({
         method: 'POST',
         body: JSON.stringify({ action: 'confirmed' }),
       }));
@@ -255,7 +255,7 @@ describe('computer app approval prompt', () => {
     fireEvent.click(screen.getByRole('button', { name: '同意' }));
 
     await waitFor(() => {
-      expect(hanaFetchMock).toHaveBeenCalledWith('/api/confirm/confirm-computer-1', expect.any(Object));
+      expect(lingxiFetchMock).toHaveBeenCalledWith('/api/confirm/confirm-computer-1', expect.any(Object));
     });
     expect((screen.getByRole('button', { name: '同意' }) as HTMLButtonElement).disabled).toBe(true);
 
@@ -265,7 +265,7 @@ describe('computer app approval prompt', () => {
     fireEvent.click(screen.getByRole('button', { name: '同意' }));
 
     await waitFor(() => {
-      expect(hanaFetchMock).toHaveBeenCalledWith('/api/confirm/confirm-computer-2', expect.any(Object));
+      expect(lingxiFetchMock).toHaveBeenCalledWith('/api/confirm/confirm-computer-2', expect.any(Object));
     });
   });
 
@@ -275,7 +275,7 @@ describe('computer app approval prompt', () => {
       permissionEvents.push((event as CustomEvent).detail || {});
     };
     window.addEventListener('hana-plan-mode', listener);
-    hanaFetchMock
+    lingxiFetchMock
       .mockResolvedValueOnce(new Response(JSON.stringify({ ok: true, mode: 'operate' }), { status: 200 }))
       .mockResolvedValueOnce(new Response('{}', { status: 200 }));
 
@@ -302,7 +302,7 @@ describe('computer app approval prompt', () => {
       // A tool approval also reads the MCP connector registry, to find out
       // whether it is about an MCP tool. Match the calls that matter by path
       // rather than by position, so that lookup does not shift the assertions.
-      const callFor = (path: string) => hanaFetchMock.mock.calls.find(call => call[0] === path);
+      const callFor = (path: string) => lingxiFetchMock.mock.calls.find(call => call[0] === path);
       await waitFor(() => {
         expect(callFor('/api/confirm/confirm-tool-1')).toBeTruthy();
       });

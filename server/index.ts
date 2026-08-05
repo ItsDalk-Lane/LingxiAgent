@@ -17,7 +17,7 @@ import { createNodeWebSocket } from "@hono/node-ws";
 import { WebSocketServer } from "ws";
 import { AppError } from "../shared/errors.ts";
 import { errorBus } from "../shared/error-bus.ts";
-import { HanaEngine } from "../core/engine.ts";
+import { LingxiEngine } from "../core/engine.ts";
 import { ensureFirstRun } from "../core/first-run.ts";
 import { initDebugLog, createModuleLogger } from "../lib/debug-log.ts";
 import { redactLogLabel, redactLogText } from "../lib/log-redactor.ts";
@@ -433,14 +433,14 @@ export async function startServer(root: CompositionRoot = {}): Promise<void> {
   const dlog = initDebugLog(path.join(hanakoHome, "logs"));
 
   // ── 初始化引擎 ──
-  log.log("② 创建 HanaEngine...");
-  const engine: any = new HanaEngine({
+  log.log("② 创建 LingxiEngine...");
+  const engine: any = new LingxiEngine({
     hanakoHome,
     productDir,
     appVersion,
     builtinMediaAdapters: root.builtinMediaAdapters,
   } as any);
-  log.log("② HanaEngine 构造完成，开始 init...");
+  log.log("② LingxiEngine 构造完成，开始 init...");
   await engine.init((msg: any) => log.log(msg));
   log.log("② engine.init 完成");
   dlog.log("server", "engine initialized");

@@ -10,7 +10,7 @@ import { SkillsPanel } from '../../components/SkillsPanel';
 
 const fetchMock = vi.fn();
 vi.mock('../../hooks/use-hana-fetch', () => ({
-  hanaFetch: (...args: unknown[]) => fetchMock(...args),
+  lingxiFetch: (...args: unknown[]) => fetchMock(...args),
 }));
 
 function jsonResponse(body: unknown): Response {
