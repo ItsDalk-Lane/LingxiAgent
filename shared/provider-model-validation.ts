@@ -1,7 +1,9 @@
 const OFFICIAL_DEEPSEEK_PROVIDER_ID = "deepseek";
 const OFFICIAL_DEEPSEEK_HOST = "api.deepseek.com";
 const OFFICIAL_DEEPSEEK_RESERVED_MODEL_IDS = new Set(["deepseek"]);
-const THINKING_LEVEL_MAP_KEYS = new Set(["off", "minimal", "low", "medium", "high", "xhigh"]);
+// max 与 core/session-thinking-level.ts 的 VALID_THINKING_LEVELS 对齐（max↔xhigh）。
+// pi SDK 0.83.0 内置目录有模型用 "max" 作 thinkingLevelMap 键，缺它会被拒。
+const THINKING_LEVEL_MAP_KEYS = new Set(["off", "minimal", "low", "medium", "high", "xhigh", "max"]);
 const MODEL_CREDENTIAL_FIELDS = new Set([
   "api_key",
   "apikey",

@@ -11,23 +11,32 @@
  *   这个原语表达的是另一件事：**服务端刚刚拒收了这个 token，现在就换**。
  *   它不看本地到期时间，只看"你手上那个 token 是不是仍然是存储里那个"。
  *
- * 为什么必须走 AuthStorage 实例上的 provider 列表 + 同一把文件锁：
- *   - OAuth provider 注册表是模块级单例，而依赖树里存在两份 SDK 拷贝，
- *     跨拷贝的注册表互相看不见。所以 provider 只能从传进来的 AuthStorage
- *     实例上取（authStorage.getOAuthProviders()），不能从包的顶层注册表取。
+ * 为什么必须走 ModelRuntime 上的 provider + 同一把文件锁：
+ *   - 0.83.0 起 OAuth provider 注册表与刷新能力整体迁出 AuthStorage，落到
+ *     pi-ai Models（由 ModelRuntime.compose）。provider 的 refresh/toAuth 在
+ *     ModelRuntime.getProvider(authKey).auth.oauth 上。provider 不能再从
+ *     AuthStorage 取（getOAuthProviders 已删）。
  *   - 换 token 是"读—改—写"，同一台机器上可能有多个进程同时在换。整个
- *     决策和写盘都放在存储自己的文件锁里，锁的是 auth.json 这个路径本身，
- *     所以和 SDK 自己的刷新路径天然互斥；后进锁的人会看到前一个人已经写好
- *     的新凭证，于是直接复用，不会把刚换来的 refresh token 再换一次作废掉。
+ *     决策和写盘都放在存储自己的文件锁里（backend.withLockAsync），锁的是
+ *     auth.json 这个路径本身，所以和 SDK 自己的刷新路径（pi-ai Models 也走
+ *     credentials.modify→store.modify，同一把锁）天然互斥；后进锁的人会看到
+ *     前一个人已经写好的新凭证，于是直接复用，不会把刚换来的 refresh token
+ *     再换一次作废掉。
  *
- * 失败一律上抛：解析不了、条目不存在、不是 OAuth、服务端拒绝换新，都直接报
- * 错，不写盘、不降级、不返回旧 token。
+ * 失败一律上抛：解析不了、条目不存在、不是 OAuth、provider 未注册、服务端
+ * 拒绝换新，都直接报错，不写盘、不降级、不返回旧 token。
  */
 
 interface ForceRefreshOptions {
-  /** 与 backend 指向同一份存储的 AuthStorage 实例，用于取 provider 和刷新内存副本 */
-  authStorage: any;
-  /** 存储后端，提供 withLockAsync */
+  /**
+   * ModelRuntime 实例（OAuth provider 注册表与刷新能力的唯一入口）。
+   * 兼容传 SdkAuthFacade：自动读 .modelRuntime。
+   */
+  modelRuntime: any;
+  /**
+   * 与 ModelRuntime 同一份 auth.json 的存储后端，提供 withLockAsync。
+   * 0.83.0 AuthStorage 不再暴露 backend；调用方持有 FileAuthStorageBackend 传入。
+   */
   backend: any;
   /** auth.json 里的凭证键，例如 "openai-codex" */
   authKey: string;
@@ -36,19 +45,20 @@ interface ForceRefreshOptions {
 }
 
 export async function forceRefreshOAuthApiKey({
-  authStorage,
+  modelRuntime,
   backend,
   authKey,
   staleApiKey,
 }: ForceRefreshOptions): Promise<string> {
-  if (!authStorage || typeof authStorage.getOAuthProviders !== "function") {
-    throw new Error(`Cannot rotate OAuth credential for "${authKey}": auth storage unavailable`);
+  const runtime: any = modelRuntime?.modelRuntime ?? modelRuntime;
+  if (!runtime || typeof runtime.getProvider !== "function") {
+    throw new Error(`Cannot rotate OAuth credential for "${authKey}": model runtime unavailable`);
   }
   if (!backend || typeof backend.withLockAsync !== "function") {
     throw new Error(`Cannot rotate OAuth credential for "${authKey}": auth storage backend unavailable`);
   }
 
-  const apiKey = await backend.withLockAsync(async (current) => {
+  const apiKey: string = await backend.withLockAsync(async (current) => {
     // 解析失败必须抛：宁可这次刷新失败，也不能拿一个空对象覆盖掉用户的凭证文件。
     const data = current ? JSON.parse(current) : {};
     const cred = data[authKey];
@@ -56,26 +66,42 @@ export async function forceRefreshOAuthApiKey({
       throw new Error(`Cannot rotate OAuth credential for "${authKey}": no OAuth credential stored`);
     }
 
-    const provider = authStorage.getOAuthProviders().find((p) => p?.id === authKey);
-    if (!provider) {
+    const provider = runtime.getProvider(authKey);
+    const oauth = provider?.auth?.oauth;
+    if (!oauth || typeof oauth.refresh !== "function") {
       throw new Error(`Cannot rotate OAuth credential for "${authKey}": no OAuth provider registered`);
     }
 
     // 存储里的 token 已经不是调用方手上那个了，说明别的执行流刚换过。
     // 直接用新的，不再发一次刷新请求（那会把刚换来的 refresh token 作废）。
     if (staleApiKey && cred.access !== staleApiKey) {
-      return { result: provider.getApiKey(cred) };
+      const reused = await deriveOAuthApiKey(oauth, cred);
+      return { result: reused };
     }
 
-    const refreshed = await provider.refreshToken(cred);
+    // 0.83.0：provider.auth.oauth.refresh(cred) 换新 token（网络调用，失败抛）。
+    // 返回的 OAuthCredential 形状 { access, refresh, expires, ... } 与存储一致。
+    const refreshed = await oauth.refresh(cred);
     const nextCred = { type: "oauth", ...refreshed };
+    const rotated = await deriveOAuthApiKey(oauth, nextCred);
     return {
-      result: provider.getApiKey(nextCred),
+      result: rotated,
       next: JSON.stringify({ ...data, [authKey]: nextCred }, null, 2),
     };
   });
 
-  // 让同进程的内存副本立刻看到刚写下去的凭证。
-  authStorage.reload?.();
   return apiKey;
+}
+
+/**
+ * 从 OAuth credential 派生请求用 API key（旧 provider.getApiKey 语义）。
+ * 0.83.0 对应 provider.auth.oauth.toAuth(credential).apiKey；toAuth 主要是
+ * credential.access，对个别 provider（如 GitHub Copilot）有 baseUrl 归一。
+ */
+async function deriveOAuthApiKey(oauth: any, credential: any): Promise<string> {
+  if (typeof oauth.toAuth === "function") {
+    const auth = await oauth.toAuth(credential);
+    return auth?.apiKey;
+  }
+  return credential?.access;
 }

@@ -6,9 +6,9 @@ const STREAM_GUARD_FLAG = Symbol.for("lingxi.piSdk.streamGuardInstalled");
 
 export function installAssistantStreamGuard(session) {
   const agent = session?.agent;
-  if (!agent || typeof agent.streamFn !== "function" || agent[STREAM_GUARD_FLAG]) return;
-  const originalStreamFn = agent.streamFn;
-  agent.streamFn = async (model, context, options) => {
+  if (!agent || typeof agent.streamFunction !== "function" || agent[STREAM_GUARD_FLAG]) return;
+  const originalStreamFn = agent.streamFunction;
+  agent.streamFunction = async (model, context, options) => {
     const inner = await originalStreamFn(model, context, options);
     return guardAssistantMessageStream(inner);
   };

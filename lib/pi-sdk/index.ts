@@ -12,13 +12,20 @@
  */
 
 import {
-  AuthStorage,
   createAgentSession as rawCreateAgentSession,
   ModelRegistry,
+  ModelRuntime,
   resizeImage as rawResizeImage,
   formatDimensionNote as rawFormatDimensionNote,
   convertToLlm as rawConvertToLlm,
 } from "@earendil-works/pi-coding-agent";
+// 0.83.0 起 AuthStorage / FileAuthStorageBackend 不再从包根导出，但仍在
+// dist/core/auth-storage.js（深路径相对引，对齐 compaction 的深路径引法）。
+// AuthStorage 仍实现 CredentialStore，可作 ModelRuntime.create 的 credentials。
+import {
+  AuthStorage,
+  FileAuthStorageBackend,
+} from "../../node_modules/@earendil-works/pi-coding-agent/dist/core/auth-storage.js";
 // 0.80.0 起 pi-ai 老全局 API 移到 /compat 子入口（根入口是 createModels 新 API）
 import {
   getModel as rawGetPiModel,
@@ -35,6 +42,9 @@ import {
   createFindTool,
   createGrepTool,
 } from "./search-tools.ts";
+// 0.83.0 OAuth/凭证能力门面（桥接旧 AuthStorage 形状到 ModelRuntime）
+export { SdkAuthFacade } from "./auth-facade.ts";
+export type { LegacyOAuthProvider } from "./auth-facade.ts";
 // prepareCompaction 0.80.3 仍未从包根导出，深路径保留（升级时必查此文件是否存在）
 import {
   prepareCompaction as rawPrepareCompaction,
@@ -91,25 +101,108 @@ export { formatSkillsForPrompt, getLastAssistantUsage } from "@earendil-works/pi
 export { AuthStorage };
 // The file-backed store is exported alongside AuthStorage because forcing a
 // credential rotation has to take the same auth.json lock the SDK takes.
-export { FileAuthStorageBackend } from "@earendil-works/pi-coding-agent";
+export { FileAuthStorageBackend };
 
-type OAuthProviderId = Parameters<AuthStorage["login"]>[0];
-export type OAuthLoginCallbacks = Parameters<AuthStorage["login"]>[1];
+// 0.83.0 起 OAuth 登录从 AuthStorage.login 迁到 ModelRuntime.login(providerId,
+// type, interaction)。pi-ai 的 compat/extension-oauth-types 仍保留这套旧回调
+// 形状（Hana 的 server/routes/auth.ts 按它构造回调），这里按下游契约显式声明。
+export interface OAuthLoginCallbacks {
+  onAuth(info: { url: string; instructions?: string }): void;
+  onDeviceCode(info: {
+    userCode: string;
+    verificationUri: string;
+    intervalSeconds?: number;
+    expiresInSeconds?: number;
+  }): void;
+  onPrompt(prompt: { message: string; placeholder?: string; allowEmpty?: boolean }): Promise<string>;
+  onProgress?(message: string): void;
+  onManualCodeInput?(): Promise<string>;
+  onSelect(prompt: { message: string; options: { id: string; label: string }[] }): Promise<string | undefined>;
+  signal?: AbortSignal;
+}
+
 export type SdkProviderRegistrationConfig = Parameters<ModelRegistry["registerProvider"]>[1];
 export type SdkOAuthProvider = NonNullable<SdkProviderRegistrationConfig["oauth"]>;
 
 /**
  * OAuth login adapter.
  *
- * The callback contract is deliberately derived from AuthStorage.login so an
- * SDK upgrade fails Hana's typecheck at this boundary instead of at runtime.
+ * 0.83.0 起 AuthStorage.login 已删，登录走 ModelRuntime.login(providerId, type,
+ * interaction)。本函数把 Hana 下游的旧 OAuthLoginCallbacks 形状适配成新的
+ * AuthInteraction（prompt/notify/signal），语义双向保持：
+ *   onAuth        ↔ notify({type:"auth_url"})
+ *   onDeviceCode  ↔ notify({type:"device_code"})
+ *   onPrompt      ↔ prompt({type:"text"})
+ *   onSelect      ↔ prompt({type:"select"})
+ *   onManualCodeInput ↔ prompt({type:"manual_code"})
+ *   onProgress    ↔ notify({type:"progress"})
+ *   signal        ↔ signal
+ * 第二参数收 SdkAuthFacade | ModelRuntime：facade 直接读 .modelRuntime，
+ * 兼容下游两种拿到的对象。
  */
-export function loginOAuthProvider(
-  authStorage: AuthStorage,
-  providerId: OAuthProviderId,
+export async function loginOAuthProvider(
+  modelRuntimeOrFacade: any,
+  providerId: string,
   callbacks: OAuthLoginCallbacks,
 ): Promise<void> {
-  return authStorage.login(providerId, callbacks);
+  const modelRuntime: any = modelRuntimeOrFacade?.modelRuntime ?? modelRuntimeOrFacade;
+  const interaction = buildAuthInteraction(callbacks);
+  await modelRuntime.login(providerId, "oauth", interaction);
+}
+
+/**
+ * 把旧的 OAuthLoginCallbacks 适配成 0.83.0 pi-ai AuthInteraction。
+ * 仅本模块内部用，下游不直接调。
+ */
+function buildAuthInteraction(callbacks: OAuthLoginCallbacks) {
+  return {
+    signal: callbacks.signal,
+    prompt(prompt: any): Promise<string> {
+      if (prompt?.type === "select") {
+        return callbacks.onSelect({
+          message: prompt.message,
+          options: (prompt.options || []).map((opt: any) => ({
+            id: opt.id,
+            label: opt.label,
+            ...(opt.description ? { description: opt.description } : {}),
+          })),
+        }).then((id: string | undefined) => (typeof id === "string" ? id : ""));
+      }
+      if (prompt?.type === "manual_code") {
+        return callbacks.onManualCodeInput
+          ? callbacks.onManualCodeInput()
+          : callbacks.onPrompt({ message: prompt.message ?? "Paste the authorization code" });
+      }
+      // text / secret 都走 onPrompt（Hana 不区分，密码由浏览器侧收集）
+      return callbacks.onPrompt({
+        message: prompt?.message ?? "",
+        ...(prompt?.placeholder ? { placeholder: prompt.placeholder } : {}),
+        ...(prompt?.allowEmpty ? { allowEmpty: prompt.allowEmpty } : {}),
+      });
+    },
+    notify(event: any): void {
+      if (!event) return;
+      switch (event.type) {
+        case "auth_url":
+          callbacks.onAuth({ url: event.url, ...(event.instructions ? { instructions: event.instructions } : {}) });
+          return;
+        case "device_code":
+          callbacks.onDeviceCode({
+            userCode: event.userCode,
+            verificationUri: event.verificationUri,
+            ...(event.intervalSeconds != null ? { intervalSeconds: event.intervalSeconds } : {}),
+            ...(event.expiresInSeconds != null ? { expiresInSeconds: event.expiresInSeconds } : {}),
+          });
+          return;
+        case "progress":
+        case "info":
+          callbacks.onProgress?.(event.message);
+          return;
+        default:
+          return;
+      }
+    },
+  };
 }
 
 // ── Session/history utilities ──
@@ -206,15 +299,71 @@ export function formatModelImageDimensionNote(result) {
 }
 
 /**
- * ModelRegistry 工厂。
- * 0.64.0 将构造函数私有化，必须用静态方法。
- * 下次 SDK 改工厂签名，只改这里。
- * @param {import('@earendil-works/pi-coding-agent').AuthStorage} authStorage
- * @param {string} [modelsJsonPath]
- * @returns {import('@earendil-works/pi-coding-agent').ModelRegistry}
+ * ModelRuntime 工厂（0.83.0 的新装配点）。
+ * credentials 可直接传现有 AuthStorage 实例（内部包 RuntimeCredentials，调
+ * store.read/list/modify/delete，AuthStorage 全有 → auth.json 同一把锁语义保住）。
+ * @param {import('@earendil-works/pi-coding-agent/dist/core/auth-storage.js').AuthStorage} authStorage
+ * @param {string} [authPath] auth.json 路径
+ * @param {string} [modelsJsonPath] models.json 路径
+ * @returns {Promise<import('@earendil-works/pi-coding-agent').ModelRuntime>}
  */
-export function createModelRegistry(authStorage, modelsJsonPath) {
-  return ModelRegistry.create(authStorage, modelsJsonPath);
+export async function createModelRuntime(authStorage, authPath, modelsJsonPath) {
+  const modelRuntime = await ModelRuntime.create({
+    credentials: authStorage,
+    ...(authPath ? { authPath } : {}),
+    ...(modelsJsonPath ? { modelsPath: modelsJsonPath } : {}),
+  });
+  return withLegacyAvailabilityScoping(modelRuntime);
+}
+
+/**
+ * 把 0.83.0 ModelRuntime 的可用性收敛回 0.80.3 ModelRegistry.create 的语义。
+ *
+ * 背景：0.83.0 的 ModelRuntime.getAvailable()/getAvailableSnapshot() 把"环境凭据
+ * 可用"的内置 provider（如设了 ANTHROPIC_AUTH_TOKEN 的 anthropic）也算进 availability
+ * （runAvailabilityRefresh 用 checkAuth 判定 configuredProviders，含 env 解析的 key）。
+ * 0.80.3 的 ModelRegistry.create 不算这些——可用性只覆盖 models.json 显式配置的
+ * provider + 经 registerProvider 注册的 extension/native provider，环境兜底的内置项
+ * 不进入可用集合。model-manager.refreshAvailable() 与 model-sync 测试都依赖这个旧语义。
+ *
+ * 修法：包装 getAvailable / getAvailableSnapshot，只保留 provider 命中"显式配置集合"的
+ * 模型——显式配置集合 = models.json 的 config provider ∪ extensionProviders ∪
+ * nativeExtensionProviders。仅靠 env 凭据激活的内置 provider 不在该集合内，被滤掉。
+ * 不改 SDK 内部状态，只在外层收口；registerProvider 等仍正常生效（注册即进 extension
+ * 集合，下次读 availability 即纳入）。
+ */
+function withLegacyAvailabilityScoping(modelRuntime) {
+  const intendedProviderIds = () => new Set([
+    ...(modelRuntime.config?.getProviderIds?.() || []),
+    ...(modelRuntime.extensionProviders?.keys?.() || []),
+    ...(modelRuntime.nativeExtensionProviders?.keys?.() || []),
+  ]);
+  const scope = (models) => {
+    const allowed = intendedProviderIds();
+    return Array.isArray(models) ? models.filter((m) => m && allowed.has(m.provider)) : models;
+  };
+  const originalGetAvailable = modelRuntime.getAvailable.bind(modelRuntime);
+  const originalGetAvailableSnapshot = modelRuntime.getAvailableSnapshot?.bind(modelRuntime);
+  modelRuntime.getAvailable = async (...args) => scope(await originalGetAvailable(...args));
+  if (typeof originalGetAvailableSnapshot === "function") {
+    modelRuntime.getAvailableSnapshot = (...args) => scope(originalGetAvailableSnapshot(...args));
+  }
+  return modelRuntime;
+}
+
+/**
+ * ModelRegistry 工厂。
+ * 0.83.0 起 ModelRegistry 变成 ModelRuntime 的同步兼容 facade：静态 create
+ * 没了，构造器改吃 ModelRuntime。这里先建 ModelRuntime 再包 ModelRegistry，
+ * 返回 { modelRuntime, modelRegistry } 供下游分别取用。
+ * @param {import('@earendil-works/pi-coding-agent/dist/core/auth-storage.js').AuthStorage} authStorage
+ * @param {string} modelsJsonPath
+ * @returns {Promise<{ modelRuntime: import('@earendil-works/pi-coding-agent').ModelRuntime, modelRegistry: import('@earendil-works/pi-coding-agent').ModelRegistry }>}
+ */
+export async function createModelRegistry(authStorage, modelsJsonPath) {
+  const modelRuntime = await createModelRuntime(authStorage, undefined, modelsJsonPath);
+  const modelRegistry = new ModelRegistry(modelRuntime);
+  return { modelRuntime, modelRegistry };
 }
 
 /**

@@ -376,7 +376,9 @@ export function createAuthRoute(engine) {
       return c.json({ error: "provider is required" }, 400);
     }
     const authKey = engine.providerRegistry?.getAuthJsonKey(provider) || provider;
-    engine.authStorage.logout(authKey);
+    // 0.83.0：logout 改 async（ModelRuntime.logout 删凭证 + async refresh）。await 它，
+    // 否则 onProviderChanged→reloadAndSync 的刷新会读到未删的旧凭证，OAuth 模型不消失。
+    await engine.authStorage.logout(authKey);
     engine.providerRegistry?.clearAuthCache?.();
     await engine.onProviderChanged?.();
     return c.json({ ok: true });

@@ -214,7 +214,10 @@ describe("CompactionGuardExtension", () => {
         tools: [],
         messages: await convertAgentMessagesToLlm(messages),
       };
-      expect(clampMaxTokensToContext(model, providerContextBefore, 32_000)).toBe(1);
+      // pi-ai 0.83.0：clampMaxTokensToContext 改用 estimateContextTokens(content)（按实际内容估算），
+      // 不再把消息 usage/tokensBefore（127000）计入占用，故 before-clamp 不再被压到 1，而是满额 32000。
+      // 这条断言只校验 pi-ai 的 clamp 语义变了（context 按内容算），下方才是 Hana 的 epoch 重置行为。
+      expect(clampMaxTokensToContext(model, providerContextBefore, 32_000)).toBe(32_000);
 
       const result = await pi.trigger("context", { messages });
       const providerContextAfter = {
@@ -1670,9 +1673,18 @@ describe("CompactionGuardExtension", () => {
         reasoning: true,
         contextWindow: 128_000,
       };
+      // pi-coding-agent 0.83.0：convertToLlm 不再把 wire 形态（content:"" + tool_calls）
+      // 归一成 canonical 数组 content（透传），而 serializeConversation 要求 content 是数组。
+      // 故直接给 canonical 形态（toolCall 块、无 reasoning），保持测试意图：GLM tool_call 历史无
+      // reasoning_content → 触发 Zhipu reasoning-replay-unavailable → cache-recovery。
       const glmHistory = {
         role: "assistant",
-        content: "",
+        content: [{
+          type: "toolCall",
+          id: "call_1",
+          name: "read",
+          arguments: {},
+        }],
         tool_calls: [{ id: "call_1", type: "function", function: { name: "read", arguments: "{}" } }],
       };
       const res = await pi.trigger(

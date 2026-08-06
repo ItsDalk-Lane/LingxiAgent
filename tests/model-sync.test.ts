@@ -1460,8 +1460,11 @@ describe("syncModels", () => {
 
     syncModels(providers, { modelsJsonPath });
 
-    const registry = createModelRegistry(new (AuthStorage as any)(tmpDir), modelsJsonPath);
-    const available = await registry.getAvailable();
+    // 0.83.0：createModelRegistry 改 async，返回 { modelRuntime, modelRegistry }；
+    // AuthStorage 构造私有，用 AuthStorage.create(authPath)。
+    const authStorage = AuthStorage.create(path.join(tmpDir, "auth.json"));
+    const { modelRuntime } = await createModelRegistry(authStorage, modelsJsonPath);
+    const available = await modelRuntime.getAvailable();
     expect(available).toHaveLength(1);
     expect(available[0]).toMatchObject({
       id: "qwen3-vl-plus",
@@ -2104,6 +2107,7 @@ describe("syncModels", () => {
     }, { modelsJsonPath });
 
     const result = JSON.parse(fs.readFileSync(modelsJsonPath, "utf-8"));
+    // pi SDK 0.83.0 目录：deepseek-v4-flash 不再带 xhigh 档（0.80.3 的 xhigh:"max" 已移除）。
     expect(result.providers["opencode-go"].models[0]).toMatchObject({
       id: "deepseek-v4-flash",
       contextWindow: 1_000_000,
@@ -2114,7 +2118,6 @@ describe("syncModels", () => {
         low: null,
         medium: null,
         high: "high",
-        xhigh: "max",
       },
       compat: {
         supportsDeveloperRole: false,

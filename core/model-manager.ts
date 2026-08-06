@@ -15,6 +15,7 @@ import {
   createModelRegistry,
   registerModelProvider,
   unregisterModelProvider,
+  SdkAuthFacade,
 } from "../lib/pi-sdk/index.ts";
 import { forceRefreshOAuthApiKey } from "./oauth-force-refresh.ts";
 import { t } from "../lib/i18n.ts";
@@ -132,6 +133,7 @@ export class ModelManager {
   declare _defaultModel: any;
   declare _lingxiHome: any;
   declare _modelRegistry: any;
+  declare _modelRuntime: any;
   declare _registeredSdkProviderIds: Set<string>;
   declare executionRouter: any;
   declare providerRegistry: any;
@@ -144,6 +146,7 @@ export class ModelManager {
     this._authStorage = null;
     this._authBackend = null;
     this._modelRegistry = null;
+    this._modelRuntime = null;
     this._registeredSdkProviderIds = new Set();
     this._defaultModel = null;   // 设置页面选的，持久化，bridge 用这个
     this._availableModels = [];
@@ -153,23 +156,44 @@ export class ModelManager {
     this.executionRouter = null;
   }
 
-  /** 初始化 AuthStorage + ModelRegistry + 新架构模块 */
-  init() {
-    this._authStorage = AuthStorage.create(path.join(this._lingxiHome, "auth.json"));
+  /**
+   * 初始化 AuthStorage + ModelRuntime/ModelRegistry + 新架构模块。
+   *
+   * 0.83.0 起 ModelRuntime.create 是 async（内部刷新模型目录）；本方法随之
+   * 改 async。同步阶段的校验（provider collision / thinkingLevelMap）仍在
+   * await 之前先抛，保持“init 期配置错误立即暴露”的旧契约。
+   */
+  async init() {
+    const rawAuthStorage = AuthStorage.create(path.join(this._lingxiHome, "auth.json"));
     // Same file, same lock: forced OAuth rotation writes through this backend.
     this._authBackend = new FileAuthStorageBackend(path.join(this._lingxiHome, "auth.json"));
     this.providerRegistry.reload();
-    this._removeApiKeyProviderAuthEntries();
+    // 先把 _authStorage 装上 rawAuthStorage，让 _removeApiKeyProviderAuthEntries
+    // 的 guard（!this._authStorage）通过——否则 0.83.0 改 async 后，migration 在
+    // init() 里被整体跳过，rescue 的 api_key 进不了 catalog，紧随其后的 syncModels
+    // 会用无 key 的 projection 覆盖 models.json，把待抢救的 key 永久丢掉。
+    // raw AuthStorage 提供 reload；has/remove 缺失时 optional chaining 跳过删除，
+    // syncAndRefresh() 装上 SdkAuthFacade 后会重跑完整 auth.json 清理。
+    this._authStorage = rawAuthStorage;
+    await this._removeApiKeyProviderAuthEntries();
     const projection = this._buildChatProjectionInputs();
-    this._applyRuntimeApiKeyOverrides(projection);
     syncModels(projection.providers, {
       modelsJsonPath: this.modelsJsonPath,
       chatProjectionPlans: projection.planMap,
     });
-    this._modelRegistry = createModelRegistry(
-      this._authStorage,
+    // 0.83.0：ModelRuntime 是新装配点，ModelRegistry 变成它的同步 facade。
+    // credentials 直接传 rawAuthStorage（AuthStorage 实现 CredentialStore），
+    // auth.json 同一把锁语义保住。
+    const { modelRuntime, modelRegistry } = await createModelRegistry(
+      rawAuthStorage,
       path.join(this._lingxiHome, "models.json"),
     );
+    this._modelRuntime = modelRuntime;
+    this._modelRegistry = modelRegistry;
+    // 装上 SdkAuthFacade：把旧 AuthStorage 形状（getOAuthProviders/getApiKey/
+    // setRuntimeApiKey 等）桥接到 ModelRuntime，下游与测试按旧形状调用即可。
+    this._authStorage = new SdkAuthFacade({ authStorage: rawAuthStorage, modelRuntime });
+    this._applyRuntimeApiKeyOverrides(projection);
     this._syncSdkProviderRegistrations();
 
     this.executionRouter = new ExecutionRouter(
@@ -183,6 +207,8 @@ export class ModelManager {
 
   get authStorage() { return this._authStorage; }
   get modelRegistry() { return this._modelRegistry; }
+  /** 0.83.0 新装配点：createAgentSession 收 modelRuntime 而非 authStorage/modelRegistry。 */
+  get modelRuntime() { return this._modelRuntime; }
   get defaultModel() { return this._defaultModel; }
   set defaultModel(m) { this._defaultModel = m; }
   get currentModel() { return this._defaultModel; }
@@ -226,7 +252,14 @@ export class ModelManager {
 
   /** 刷新可用模型列表，用 Provider Catalog v2 过滤 */
   async refreshAvailable() {
-    const allModels = await this._modelRegistry.getAvailable();
+    // 0.83.0：ModelRegistry.getAvailable() 改成同步读 snapshot，不再 await 内部
+    // availability 刷新（logout/registerProvider 后的 refresh 是 fire-and-forget）。
+    // 要拿到刷新后的可用模型，必须走 ModelRuntime.getAvailable()（async，等刷新）。
+    // 兜底：_modelRuntime 未装配时（如部分单元测试只 mock _modelRegistry）回退到
+    // _modelRegistry.getAvailable()，保持旧契约可用。
+    const allModels = this._modelRuntime
+      ? await this._modelRuntime.getAvailable()
+      : await this._modelRegistry.getAvailable();
     const plans = this.providerRegistry.getChatProjectionPlans();
     const effectiveModelSets = new Map();
     const legacyRuntimeCatalogProviders = new Set();
@@ -262,7 +295,7 @@ export class ModelManager {
    * @returns {boolean} 是否有变化
    */
   async syncAndRefresh() {
-    this._removeApiKeyProviderAuthEntries();
+    await this._removeApiKeyProviderAuthEntries();
     const projection = this._buildChatProjectionInputs();
     const changed = syncModels(projection.providers, {
       modelsJsonPath: this.modelsJsonPath,
@@ -270,7 +303,9 @@ export class ModelManager {
     });
     this._applyRuntimeApiKeyOverrides(projection);
     if (changed) {
-      this._modelRegistry.refresh();
+      // 0.83.0：ModelRegistry.refresh() 改 async（await runtime.refresh()）。
+      // 不 await 会让下面的 refreshAvailable() 读到旧 availability 快照。
+      await this._modelRegistry.refresh();
     }
     await this.refreshAvailable();
     this._rebindDefaultModel();
@@ -371,7 +406,7 @@ export class ModelManager {
    * AuthStorage 只保留 OAuth 条目，避免 Pi SDK 优先读取 stale auth.json。
    * @private
    */
-  _removeApiKeyProviderAuthEntries() {
+  async _removeApiKeyProviderAuthEntries() {
     if (!this._authStorage || !this.providerRegistry) return;
     migrateLegacyApiKeyAuthToProviders({
       lingxiHome: this._lingxiHome,
@@ -387,6 +422,9 @@ export class ModelManager {
       if (entry.authJsonKey) oauthOwnedAuthKeys.add(entry.authJsonKey);
     }
 
+    // 0.83.0：AuthStorage.delete 改 async（withLockAsync）。收集待删 key 并行 await，
+    // 避免 fire-and-forget 在测试清理 tmpDir 后才落地导致 ENOENT。
+    const removals: Promise<unknown>[] = [];
     for (const entry of entries) {
       if (entry.authType === "oauth") continue;
       const authKeys = new Set([entry.id, entry.authJsonKey]);
@@ -397,9 +435,11 @@ export class ModelManager {
         // while surfacing the collision.
         if (oauthOwnedAuthKeys.has(authKey)) continue;
         if (!authKey || !this._authStorage.has?.(authKey)) continue;
-        this._authStorage.remove(authKey);
+        removals.push(Promise.resolve(this._authStorage.remove(authKey)));
       }
     }
+    await Promise.all(removals);
+    this._authStorage.reload?.();
   }
 
   /**
@@ -529,7 +569,7 @@ export class ModelManager {
       }
       refreshedOAuthKey = options.forceRefresh
         ? await forceRefreshOAuthApiKey({
-            authStorage: this._authStorage,
+            modelRuntime: this._modelRuntime,
             backend: this._authBackend,
             authKey,
             staleApiKey: options.staleApiKey,

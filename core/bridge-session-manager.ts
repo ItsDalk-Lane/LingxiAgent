@@ -1243,8 +1243,7 @@ export class BridgeSessionManager {
       const { session } = await createAgentSession({
         cwd: homeCwd,
         sessionManager: mgr,
-        authStorage: mm.authStorage,
-        modelRegistry: mm.modelRegistry,
+        modelRuntime: mm.modelRuntime,
         ...sessionOpts,
       });
 
@@ -1722,8 +1721,7 @@ export class BridgeSessionManager {
     const { session } = await createAgentSession({
       cwd: homeCwd,
       sessionManager: mgr,
-      authStorage: mm.authStorage,
-      modelRegistry: mm.modelRegistry,
+      modelRuntime: mm.modelRuntime,
       ...sessionOpts,
     });
 

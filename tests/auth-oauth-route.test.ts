@@ -6,7 +6,67 @@ import { createAuthRoute } from "../server/routes/auth.ts";
 
 type LoginImpl = (authKey: string, callbacks: OAuthLoginCallbacks) => Promise<void>;
 
+/**
+ * Build a legacy OAuthLoginCallbacks object from a 0.83.0 AuthInteraction.
+ * This is the inverse of lib/pi-sdk/index.ts buildAuthInteraction, so the test's
+ * loginImpl (which drives onSelect/onAuth/onDeviceCode) keeps working after the
+ * SDK moved OAuth login from authStorage.login(callbacks) to
+ * modelRuntime.login(providerId, "oauth", interaction).
+ */
+function callbacksFromInteraction(interaction: any): OAuthLoginCallbacks {
+  const callbacks: OAuthLoginCallbacks = {
+    onAuth: (info) => interaction.notify({
+      type: "auth_url",
+      url: info.url,
+      ...(info.instructions ? { instructions: info.instructions } : {}),
+    }),
+    onDeviceCode: (info) => interaction.notify({
+      type: "device_code",
+      userCode: info.userCode,
+      verificationUri: info.verificationUri,
+      ...(info.intervalSeconds != null ? { intervalSeconds: info.intervalSeconds } : {}),
+      ...(info.expiresInSeconds != null ? { expiresInSeconds: info.expiresInSeconds } : {}),
+    }),
+    onPrompt: (prompt) => interaction.prompt({
+      type: "text",
+      message: prompt.message ?? "",
+      ...(prompt.placeholder ? { placeholder: prompt.placeholder } : {}),
+      ...(prompt.allowEmpty ? { allowEmpty: prompt.allowEmpty } : {}),
+    }),
+    onSelect: (prompt) => interaction.prompt({
+      type: "select",
+      message: prompt.message,
+      options: (prompt.options || []).map((opt: any) => ({
+        id: opt.id,
+        label: opt.label,
+        ...(opt.description ? { description: opt.description } : {}),
+      })),
+    }) as Promise<string>,
+    signal: interaction.signal,
+  };
+  if (typeof interaction.prompt === "function") {
+    callbacks.onManualCodeInput = () => interaction.prompt({ type: "manual_code" });
+  }
+  if (typeof interaction.notify === "function") {
+    callbacks.onProgress = (message) => interaction.notify({ type: "progress", message });
+  }
+  return callbacks;
+}
+
 function makeEngine(loginImpl: LoginImpl) {
+  // modelRuntime.login is the 0.83.0 entry point (loginOAuthProvider reads
+  // .modelRuntime off its first arg and calls modelRuntime.login(providerId,
+  // "oauth", interaction)). The route passes engine.authStorage to
+  // loginOAuthProvider, and the real engine's authStorage is an SdkAuthFacade
+  // exposing .modelRuntime, so the mock authStorage mirrors that shape. The
+  // login mock adapts the new interaction shape back into loginImpl(callbacks),
+  // preserving the test's intent of verifying the route's callback wiring.
+  const modelRuntime = {
+    login: vi.fn(async (providerId: string, _type: string, interaction: any) => {
+      const callbacks = callbacksFromInteraction(interaction);
+      await loginImpl(providerId, callbacks);
+    }),
+  };
   return {
     providerRegistry: {
       getAuthJsonKey: vi.fn((provider: string) => provider === "openai-codex-oauth" ? "openai-codex" : provider),
@@ -23,10 +83,13 @@ function makeEngine(loginImpl: LoginImpl) {
       getOAuthProviders: vi.fn(() => [
         { id: "openai-codex", name: "OpenAI Codex", usesCallbackServer: true },
       ]),
-      login: vi.fn(loginImpl),
       get: vi.fn(() => null),
       logout: vi.fn(),
+      // SdkAuthFacade exposes .modelRuntime; loginOAuthProvider reads it.
+      modelRuntime,
     },
+    // Also exposed at the engine root for direct mock assertions.
+    modelRuntime,
     onProviderChanged: vi.fn(async () => {}),
     availableModels: [],
     preferences: {
@@ -71,8 +134,8 @@ describe("auth oauth route", () => {
     });
 
     expect(await second.json()).toEqual(await first.clone().json());
-    expect(engine.authStorage.login).toHaveBeenCalledTimes(1);
-    expect(engine.authStorage.login).toHaveBeenCalledWith("openai-codex", expect.any(Object));
+    expect(engine.modelRuntime.login).toHaveBeenCalledTimes(1);
+    expect(engine.modelRuntime.login).toHaveBeenCalledWith("openai-codex", "oauth", expect.any(Object));
     expect(capturedCallbacks.onManualCodeInput).toEqual(expect.any(Function));
     expect(capturedCallbacks.signal).toBeInstanceOf(AbortSignal);
     expect(selectedMethod).toBe("browser");
@@ -238,7 +301,7 @@ describe("auth oauth route", () => {
     const second = await secondPromise;
 
     expect(await second.json()).toEqual(await first.json());
-    expect(engine.authStorage.login).toHaveBeenCalledTimes(1);
+    expect(engine.modelRuntime.login).toHaveBeenCalledTimes(1);
   });
 
   it("refreshes Hana model availability after OAuth logout", async () => {

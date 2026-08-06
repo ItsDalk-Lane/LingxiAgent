@@ -3134,7 +3134,7 @@ describe("SessionCoordinator", () => {
         session.agent.state.tools = names.map((name) => activeTools.get(name)).filter(Boolean);
       }),
       agent: {
-        streamFn: originalStreamFn,
+        streamFunction: originalStreamFn,
         state: {
           model,
           systemPrompt: "FINAL CACHE PREFIX",
@@ -3254,7 +3254,7 @@ describe("SessionCoordinator", () => {
     })).rejects.toThrow(/must be synchronous/);
     expect(session.prompt).toHaveBeenCalledTimes(4);
 
-    await expect((session.agent.streamFn as any)(model, {
+    await expect((session.agent.streamFunction as any)(model, {
       systemPrompt: "FINAL CACHE PREFIX",
       tools: [readTool, execCommandTool],
       messages: [{ role: "user", content: "hello" }],
@@ -3263,7 +3263,7 @@ describe("SessionCoordinator", () => {
     expect(violations()).toHaveLength(3);
 
     // 请求发出那一刻才漂移：记录 + 续签 + 照常发给 provider
-    await expect((session.agent.streamFn as any)(model, {
+    await expect((session.agent.streamFunction as any)(model, {
       systemPrompt: "MUTATED CACHE PREFIX",
       tools: [readTool, execCommandTool],
       messages: [
@@ -3276,7 +3276,7 @@ describe("SessionCoordinator", () => {
     expect(violations()[3].drift.systemPrompt.actualExcerpt).toContain("MUTATED CACHE PREFIX");
 
     // 续签之后同一个前缀不再重复告警
-    await expect((session.agent.streamFn as any)(model, {
+    await expect((session.agent.streamFunction as any)(model, {
       systemPrompt: "MUTATED CACHE PREFIX",
       tools: [readTool, execCommandTool],
       messages: [{ role: "user", content: "hello again" }],
@@ -3285,7 +3285,7 @@ describe("SessionCoordinator", () => {
     expect(violations()).toHaveLength(4);
 
     session.isCompacting = true;
-    await expect((session.agent.streamFn as any)(model, {
+    await expect((session.agent.streamFunction as any)(model, {
       systemPrompt: "INDEPENDENT SUMMARIZATION PROMPT",
       tools: [],
       messages: [{ role: "user", content: "Summarize the conversation" }],
@@ -3295,7 +3295,7 @@ describe("SessionCoordinator", () => {
 
     // 工具表漂移同样只留证据，并按名字点出增删改
     session.isCompacting = false;
-    await expect((session.agent.streamFn as any)(model, {
+    await expect((session.agent.streamFunction as any)(model, {
       systemPrompt: "MUTATED CACHE PREFIX",
       tools: [readTool],
       messages: [{ role: "user", content: "fewer tools" }],
@@ -3381,7 +3381,7 @@ describe("SessionCoordinator", () => {
       }),
       setThinkingLevel: vi.fn(),
       agent: {
-        streamFn: originalStreamFn,
+        streamFunction: originalStreamFn,
         state: {
           model: initialModel,
           systemPrompt: "FINAL CACHE PREFIX",
@@ -3436,7 +3436,7 @@ describe("SessionCoordinator", () => {
     await coordinator.createSession(null, "/tmp/workspace", true);
     await coordinator.switchSessionModel(sessionFile, nextModel);
 
-    await expect((session.agent.streamFn as any)(nextModel, {
+    await expect((session.agent.streamFunction as any)(nextModel, {
       systemPrompt: "FINAL CACHE PREFIX",
       tools: [readTool],
       messages: [{ role: "user", content: "hello" }],
@@ -3517,7 +3517,7 @@ describe("SessionCoordinator", () => {
         session: {
           sessionManager: { getSessionId: () => "session-runtime-1" },
           agent: {
-            streamFn,
+            streamFunction: streamFn,
             onPayload,
             onResponse,
             transport: "sse",
@@ -3555,7 +3555,7 @@ describe("SessionCoordinator", () => {
     const sessionPath = path.join(tempDir, "hana", "sessions", "missing-agent-run-runtime.jsonl");
     const coordinator = Object.create(SessionCoordinator.prototype);
     coordinator._sessions = new Map(includeSession
-      ? [[sessionPath, { session: { agent: { streamFn, state: { tools: [] } } } }]]
+      ? [[sessionPath, { session: { agent: { streamFunction: streamFn, state: { tools: [] } } } }]]
       : []);
 
     let caught = null;
@@ -3830,7 +3830,7 @@ Continue the restored transcript.
           systemPrompt: "primary Agent system prompt",
           tools: [{ name: "dangerous-live-tool", execute: vi.fn() }],
         },
-        streamFn,
+        streamFunction: streamFn,
         convertToLlm: async (messages) => messages,
         replaceMessages,
       },
@@ -4093,13 +4093,13 @@ Continue the restored transcript.
       return {};
     });
     const session: any = {
-      agent: { streamFn: originalStreamFn },
+      agent: { streamFunction: originalStreamFn },
       sessionManager: manager,
       subscribe: vi.fn(() => vi.fn()),
       abort: vi.fn(),
     };
     session.prompt = vi.fn(async () => {
-      await session.agent.streamFn(codexModel, { messages: [] }, {
+      await session.agent.streamFunction(codexModel, { messages: [] }, {
         sessionId: "pi-child",
         headers: { "x-test": "1" },
       });

@@ -2,11 +2,15 @@ import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import fs from "fs";
 import os from "os";
 import path from "path";
+// 0.83.0 起 AuthStorage / FileAuthStorageBackend / InMemoryAuthStorageBackend
+// 不再从包根导出，走深路径相对引（对齐 lib/pi-sdk 的引法）。
 import {
   AuthStorage,
   FileAuthStorageBackend,
   InMemoryAuthStorageBackend,
-} from "@earendil-works/pi-coding-agent";
+} from "../node_modules/@earendil-works/pi-coding-agent/dist/core/auth-storage.js";
+// 0.83.0：OAuth provider 注册表与刷新能力迁到 ModelRuntime。
+import { ModelRuntime } from "@earendil-works/pi-coding-agent";
 import { forceRefreshOAuthApiKey } from "../core/oauth-force-refresh.ts";
 
 const TOKEN_URL = "https://auth.openai.com/oauth/token";
@@ -57,19 +61,42 @@ function seedData(access = "stale-A"): Record<string, any> {
   };
 }
 
-/** The SDK types credentials as a union; these tests only ever seed OAuth ones. */
+/**
+ * 读 auth.json 里某 authKey 的凭证条目（同步）。
+ * 0.83.0：forceRefreshOAuthApiKey 直接写 backend 文件锁（不经 AuthStorage.modify），
+ * 故读 backend 的实时 value 才是刚写下去的真理源；authStorage.data 是内存副本，
+ * 写后未 reload 时滞后。两种都试，取存在的。
+ */
 function storedCred(authStorage): any {
-  return authStorage.get(AUTH_KEY);
+  const backendValue = (authStorage as any).storage?.value;
+  if (typeof backendValue === "string") {
+    try {
+      const parsed = JSON.parse(backendValue);
+      if (parsed && parsed[AUTH_KEY]) return parsed[AUTH_KEY];
+    } catch { /* fall through */ }
+  }
+  return authStorage.data?.[AUTH_KEY];
 }
 
-function inMemoryStore(raw) {
+/**
+ * 用 in-memory AuthStorage backend 组装一个 ModelRuntime：credentials 直接传
+ * AuthStorage 实例（实现 CredentialStore），OAuth provider 注册表由 ModelRuntime
+ * 从内置目录 compose 出来（含 openai-codex）。allowModelNetwork:false 避免联网
+ * 拉模型目录（测试只关心本地凭证 + mock 的 token 端点）。
+ */
+async function inMemoryRuntime(raw: string) {
   const backend = new InMemoryAuthStorageBackend();
   backend.withLock(() => ({ result: undefined, next: raw }));
-  return { backend, authStorage: AuthStorage.fromStorage(backend) };
+  const authStorage = AuthStorage.fromStorage(backend);
+  const modelRuntime = await ModelRuntime.create({
+    credentials: authStorage,
+    allowModelNetwork: false,
+  });
+  return { backend, authStorage, modelRuntime };
 }
 
-function seededInMemoryStore(data = seedData()) {
-  return inMemoryStore(JSON.stringify(data, null, 2));
+async function seededInMemoryRuntime(data: Record<string, any> = seedData()) {
+  return inMemoryRuntime(JSON.stringify(data, null, 2));
 }
 
 describe("forceRefreshOAuthApiKey", () => {
@@ -85,14 +112,14 @@ describe("forceRefreshOAuthApiKey", () => {
   });
 
   it("rotates the credential even though the local record is not expired yet", async () => {
-    const { backend, authStorage } = seededInMemoryStore();
+    const { backend, authStorage, modelRuntime } = await seededInMemoryRuntime();
     expect(storedCred(authStorage).expires).toBeGreaterThan(Date.now());
 
     const rotated = codexJwt("acct_new");
     mockFetch.mockResolvedValueOnce(tokenResponse({ access: rotated, refresh: "r2" }));
 
     const apiKey = await forceRefreshOAuthApiKey({
-      authStorage,
+      modelRuntime,
       backend,
       authKey: AUTH_KEY,
       staleApiKey: "stale-A",
@@ -110,10 +137,10 @@ describe("forceRefreshOAuthApiKey", () => {
   });
 
   it("skips the network call when the stored credential was already rotated", async () => {
-    const { backend, authStorage } = seededInMemoryStore(seedData("B"));
+    const { backend, authStorage, modelRuntime } = await seededInMemoryRuntime(seedData("B"));
 
     const apiKey = await forceRefreshOAuthApiKey({
-      authStorage,
+      modelRuntime,
       backend,
       authKey: AUTH_KEY,
       staleApiKey: "A",
@@ -126,7 +153,7 @@ describe("forceRefreshOAuthApiKey", () => {
   });
 
   it("leaves the stored credential untouched when the refresh call fails", async () => {
-    const { backend, authStorage } = seededInMemoryStore();
+    const { backend, authStorage, modelRuntime } = await seededInMemoryRuntime();
     mockFetch.mockResolvedValueOnce({
       ok: false,
       status: 401,
@@ -135,7 +162,7 @@ describe("forceRefreshOAuthApiKey", () => {
     });
 
     await expect(forceRefreshOAuthApiKey({
-      authStorage,
+      modelRuntime,
       backend,
       authKey: AUTH_KEY,
       staleApiKey: "stale-A",
@@ -148,19 +175,19 @@ describe("forceRefreshOAuthApiKey", () => {
   });
 
   it("rejects without any network call when the entry is missing or not an OAuth credential", async () => {
-    const missing = seededInMemoryStore({});
+    const missing = await seededInMemoryRuntime({});
     await expect(forceRefreshOAuthApiKey({
-      authStorage: missing.authStorage,
+      modelRuntime: missing.modelRuntime,
       backend: missing.backend,
       authKey: AUTH_KEY,
       staleApiKey: "stale-A",
     })).rejects.toThrow();
 
-    const wrongType = seededInMemoryStore({
+    const wrongType = await seededInMemoryRuntime({
       [AUTH_KEY]: { type: "api_key", key: "sk-test" },
     });
     await expect(forceRefreshOAuthApiKey({
-      authStorage: wrongType.authStorage,
+      modelRuntime: wrongType.modelRuntime,
       backend: wrongType.backend,
       authKey: AUTH_KEY,
       staleApiKey: "stale-A",
@@ -174,12 +201,16 @@ describe("forceRefreshOAuthApiKey", () => {
     fs.writeFileSync(authPath, JSON.stringify(seedData(), null, 2), "utf-8");
     const backend = new FileAuthStorageBackend(authPath);
     const authStorage = AuthStorage.fromStorage(backend);
+    const modelRuntime = await ModelRuntime.create({
+      credentials: authStorage,
+      allowModelNetwork: false,
+    });
 
     const rotated = codexJwt("acct_race");
     mockFetch.mockImplementation(async () => tokenResponse({ access: rotated, refresh: "r2" }));
 
     const call = () => forceRefreshOAuthApiKey({
-      authStorage,
+      modelRuntime,
       backend,
       authKey: AUTH_KEY,
       staleApiKey: "stale-A",
@@ -193,10 +224,10 @@ describe("forceRefreshOAuthApiKey", () => {
   });
 
   it("rejects without any network call when the stored credentials are unreadable", async () => {
-    const { backend, authStorage } = inMemoryStore("{not json");
+    const { backend, modelRuntime } = await inMemoryRuntime("{not json");
 
     await expect(forceRefreshOAuthApiKey({
-      authStorage,
+      modelRuntime,
       backend,
       authKey: AUTH_KEY,
       staleApiKey: "stale-A",

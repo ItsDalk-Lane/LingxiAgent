@@ -1728,6 +1728,7 @@ export class LingxiEngine {
   }
   get authStorage() { return this._models.authStorage; }
   get modelRegistry() { return this._models.modelRegistry; }
+  get modelRuntime() { return this._models.modelRuntime; }
   get providerRegistry() { return this._models.providerRegistry; }
   get preferences() { return this._prefs; }
 
@@ -2352,7 +2353,7 @@ export class LingxiEngine {
 
     // 1. Pi SDK + 模型基础设施（必须在 agent init 之前，agent 需要解析记忆模型）
     log(`[init] 1/5 Pi SDK 初始化...`);
-    this._models.init();
+    await this._models.init();
     // 预填充 _availableModels，agent init 时需要解析 utility model
     await this._models.refreshAvailable();
     log(`[init] 1/5 AuthStorage + ModelRegistry + ${this._models.availableModels.length} 个模型就绪`);

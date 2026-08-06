@@ -1,55 +1,103 @@
 {
   "schemaVersion": 1,
-  "tag": "v0.1.21",
-  "version": "0.1.21",
-  "previousTag": "v0.1.2",
-  "generatedAt": "2026-08-06T04:46:38.000Z",
+  "tag": "v0.1.22",
+  "version": "0.1.22",
+  "previousTag": "v0.1.21",
+  "generatedAt": "2026-08-06T14:48:27.000Z",
   "noUserFacingChanges": false,
   "summary": {
-    "zh": "0.1.21（预览版）同步上游 openhanako 0.443.46，旗舰为新增文档抽取模块（PDF/DOCX/XLSX/CSV/扫描件，经 @firecrawl/anydoc），并并入会话路由错误分层、MCP id 冲突检测、ws-session-context 隔离、crash log 双行版本记录等改进。desktop 35 文件逐个三方合并，保留 Lingxi 全部定制。本版本为 GitHub prerelease 预览，不动 stable 通道。",
-    "en": "0.1.21 (prerelease) syncs upstream openhanako 0.443.46. The flagship is the new document-extract module (PDF/DOCX/XLSX/CSV/scanned, via @firecrawl/anydoc), plus session route error layering, MCP id collision detection, ws-session-context isolation, and crash log dual-line version recording. The 35 desktop files were each 3-way merged, preserving all Lingxi customizations. This is a GitHub prerelease preview; the stable channel is untouched."
+    "zh": "0.1.22（预览版）升级核心 pi SDK（0.80.3→0.83.0），OAuth 登录与凭据管理重构到新的 ModelRuntime 架构，会话创建/压缩链路改用更健壮的新契约；修复跨版本号体系的 server 指针误判——旧逻辑按 semver 比较会把 0.1.22 判成比 0.442.0 更旧，导致随包新版 server 永不激活（MCP 等新功能缺失）；关于页「上游版本」改由 package.json 单一真相源注入，杜绝同步遗漏。本版本为 GitHub prerelease 预览，不动 stable 通道。",
+    "en": "0.1.22 (prerelease) upgrades the core pi SDK (0.80.3→0.83.0): OAuth login and credential management are re-architected onto the new ModelRuntime layer, and the session create/compaction paths use the more robust new contract. Fixes a cross-versioning server pointer misjudgment — the old semver comparison treated 0.1.22 as older than 0.442.0, so the bundled new server never activated (missing MCP and other new features). The About page's upstream version now comes from package.json as the single source of truth. This is a GitHub prerelease preview; the stable channel is untouched."
   },
   "counts": {
     "feature": 1,
-    "fix": 0,
-    "improvement": 0,
+    "fix": 1,
+    "improvement": 1,
     "migration": 0
   },
   "source": {
     "owner": "ItsDalk-Lane",
     "repo": "LingxiAgent",
-    "commitRange": "v0.1.2..v0.1.21",
-    "releaseUrl": "https://github.com/ItsDalk-Lane/LingxiAgent/releases/tag/v0.1.21",
+    "commitRange": "v0.1.21..v0.1.22",
+    "releaseUrl": "https://github.com/ItsDalk-Lane/LingxiAgent/releases/tag/v0.1.22",
     "releaseNotes": ""
   },
   "items": [
     {
-      "id": "feat-document-extract",
+      "id": "feat-pi-sdk-0830-runtime",
       "kind": "feature",
       "importance": "high",
       "title": {
-        "zh": "新增文档抽取模块：会话内直接读取 PDF / DOCX / XLSX / CSV / 扫描件",
-        "en": "New document-extract module: read PDF / DOCX / XLSX / CSV / scanned docs directly in-session"
+        "zh": "核心 pi SDK 升级至 0.83.0：OAuth/凭据管理迁到 ModelRuntime 新架构",
+        "en": "Core pi SDK upgraded to 0.83.0: OAuth/credential management moved to the new ModelRuntime architecture"
       },
       "summary": {
-        "zh": "同步上游 openhanako 0.443.46 的旗舰特性。新增 lib/document-extract 模块（index/types/anydoc-loader），通过新依赖 @firecrawl/anydoc@0.1.2 支持 PDF、DOCX、XLSX、CSV 及扫描件的内容抽取；file-tool 并入对应调用，会话中可直接读取并解析这些文档格式。含 4 个二进制 fixture 与单元/集成测试。",
-        "en": "Syncs the flagship feature of upstream openhanako 0.443.46. Adds the lib/document-extract module (index/types/anydoc-loader) that, via the new dependency @firecrawl/anydoc@0.1.2, supports content extraction from PDF, DOCX, XLSX, CSV and scanned documents; file-tool integrates the call so sessions can read and parse these formats directly. Ships with 4 binary fixtures plus unit/integration tests."
+        "zh": "升级 @earendil-works 三件套（pi-agent-core / pi-ai / pi-coding-agent）0.80.3→0.83.0。上游把 AuthStorage 上的 OAuth/login/getOAuthProviders 全部迁到 ModelRuntime/Models 新层：本次为 4 个消费方（oauth-force-refresh / auth 路由 / providers / pi-sdk 门面）做了最小桥接适配，会话创建、压缩、流式守护等 6+ 处调用同步切换新契约（modelRuntime + sessionAffinityFormat）。全部类型检查、三组测试与 server 冒烟保持不劣于基线。",
+        "en": "Upgrades the @earendil-works trio (pi-agent-core / pi-ai / pi-coding-agent) from 0.80.3 to 0.83.0. Upstream moved OAuth/login/getOAuthProviders off AuthStorage onto the new ModelRuntime/Models layer: all four consumers (oauth-force-refresh / auth routes / providers / the pi-sdk facade) get a minimal bridging adaptation, and 6+ call sites (session create, compaction, stream guard, …) switch to the new contract (modelRuntime + sessionAffinityFormat). Typecheck, the three test groups, and server smoke all stay at or above baseline."
       },
       "details": [
         {
-          "zh": "同步范围：上游 0.442→0.443 共 94 文件 +6573/−716。core/lib/server/scripts 层用 git 三方合并落地（保留 lingxiHome 等改名定制），desktop 35 文件逐个三方合并（含 main.cjs writeCrashLog 双行、locales 品牌、settings/api 错误分层等重点）。",
-          "en": "Sync scope: upstream 0.442→0.443 spans 94 files +6573/−716. The core/lib/server/scripts layers were applied via git 3-way merge (preserving the lingxiHome rename and other customizations); the 35 desktop files were each 3-way merged (including main.cjs writeCrashLog dual-line, locale branding, settings/api error layering, etc.)."
-        },
-        {
-          "zh": "并入的其它上游改进：会话路由错误分层（409/404/503 不再被压平成 500）、MCP 工具 id 大小写折叠冲突检测、ws-session-context 会话上下文隔离、crash log 壳版本/内容版本双行记录（解决热更新后排障误导）。",
-          "en": "Other integrated upstream improvements: session route error layering (409/404/503 no longer flattened to 500), MCP tool id case-folding collision detection, ws-session-context session context isolation, and crash log dual-line shell/content version recording (fixes post-hot-update debugging misdirection)."
+          "zh": "新增 lib/pi-sdk/auth-facade.ts 桥接层（SdkAuthFacade 包 AuthStorage+ModelRuntime），旧 OAuthLoginCallbacks 回调形状适配到新 AuthInteraction；同时修复 model-sync 视频测试中环境凭据被误算进可用集合的语义回归（恢复 0.80.3 的显式配置作用域）。",
+          "en": "Adds a bridging layer lib/pi-sdk/auth-facade.ts (SdkAuthFacade wrapping AuthStorage+ModelRuntime) that adapts the legacy OAuthLoginCallbacks shape to the new AuthInteraction; also fixes the model-sync video test regression where env-credential providers leaked into the available set (restoring the 0.80.3 explicit-config scoping)."
         }
       ],
       "sources": [
         {
           "type": "commit",
-          "ref": "v0.1.21",
-          "title": "feat(sync): 同步上游 openhanako 0.443.46（文档抽取）+ 升版 0.1.21 预览"
+          "ref": "HEAD",
+          "title": "feat(pi): 升级 pi SDK 0.80.3→0.83.0（ModelRuntime 新架构桥接）+ 升版 0.1.22 预览"
+        }
+      ]
+    },
+    {
+      "id": "fix-boot-server-pointer",
+      "kind": "fix",
+      "importance": "high",
+      "title": {
+        "zh": "修复随包新版 server 永不激活：跨版本号体系的 server 指针误判",
+        "en": "Fix bundled new server never activating: cross-versioning server pointer misjudgment"
+      },
+      "summary": {
+        "zh": "server 指针激活逻辑原先直接按 semver 比较版本号，而 Lingxi 壳版本（0.1.x）与上游 server 版本（0.44x.x）是两个体系——旧逻辑把 0.1.22 判为比 0.442.0 更旧，导致随包的新版 server 永远停在 seed、MCP 等新功能缺失。改为按各自体系正确比较后，新版 server 正常激活。",
+        "en": "The server-pointer activation logic compared versions with plain semver, but the Lingxi shell version (0.1.x) and the upstream server version (0.44x.x) are two separate numbering systems — the old logic treated 0.1.22 as older than 0.442.0, so the bundled new server stayed a seed forever and MCP and other new features were missing. Comparing each system correctly fixes activation."
+      },
+      "details": [
+        {
+          "zh": "根治在 desktop/src/shared/artifact-boot.cjs：同一版本体系内才做数值/语义比较，跨体系指针以槽位内携带的版本为真理源，不再混淆两者。",
+          "en": "Fixed in desktop/src/shared/artifact-boot.cjs: numeric/semantic comparison is only done within the same versioning system; cross-system pointers trust the version carried in the slot instead of mixing the two."
+        }
+      ],
+      "sources": [
+        {
+          "type": "commit",
+          "ref": "e9c7612",
+          "title": "fix(boot): 跨版本号体系的 server 指针误判导致新版 server 永不激活（MCP 等新功能缺失）"
+        }
+      ]
+    },
+    {
+      "id": "imp-about-upstream-version",
+      "kind": "improvement",
+      "importance": "low",
+      "title": {
+        "zh": "关于页「上游版本」改为 package.json 单一真相源注入",
+        "en": "About page 'upstream version' injected from package.json as the single source of truth"
+      },
+      "summary": {
+        "zh": "关于页显示的上游 openhanako 版本号此前由构建时硬编码注入，容易在升版时同步遗漏；现在直接读 package.json 的 lingxi.upstreamVersion 字段，杜绝数字漂移。",
+        "en": "The upstream openhanako version shown on the About page was previously injected from a build-time hardcoded value, prone to being missed on version bumps; it now reads the lingxi.upstreamVersion field in package.json, eliminating number drift."
+      },
+      "details": [
+        {
+          "zh": "配合桌面端版本展示改造：上游版本号跟随 package.json 一处修改，About 页自动同步，避免再出现升版时展示旧值。",
+          "en": "Part of the desktop version-display rework: the upstream version follows the single package.json field, and the About page picks it up automatically, preventing stale display on future bumps."
+        }
+      ],
+      "sources": [
+        {
+          "type": "commit",
+          "ref": "1ed72a6",
+          "title": "fix(about): 关于页「上游版本」改由 package.json 单一真相源注入，杜绝同步遗漏"
         }
       ]
     }

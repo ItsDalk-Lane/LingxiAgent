@@ -21,11 +21,28 @@ export function applyProviderCacheAffinityToPayload(payload: any, affinityKey: a
   return next;
 }
 
+/**
+ * 是否给 openai-responses 模型发 session_id 头。
+ *
+ * 0.80.7 起 models.json 的 compat.sendSessionIdHeader（布尔）被删，换成
+ * compat.sessionAffinityFormat（字符串，"openai-nosession" 表示不发 session 头）。
+ * 双向语义保持：nosession 不发、其余照发。这里同时认新旧字段——新字段优先，
+ * 旧字段兼容已落盘的历史 projection（只读，不改判卷）。
+ */
+function shouldSendSessionIdHeader(model: any): boolean {
+  const compat = model?.compat;
+  if (!compat) return true;
+  if (typeof compat.sessionAffinityFormat === "string") {
+    return compat.sessionAffinityFormat !== "openai-nosession";
+  }
+  return compat.sendSessionIdHeader !== false;
+}
+
 function affinityHeadersForModel(model: any, affinityKey: string) {
   switch (model?.api) {
     case "openai-responses":
       return {
-        ...(model?.compat?.sendSessionIdHeader === false ? {} : { session_id: affinityKey }),
+        ...(shouldSendSessionIdHeader(model) ? { session_id: affinityKey } : {}),
         "x-client-request-id": affinityKey,
       };
     case "openai-completions":

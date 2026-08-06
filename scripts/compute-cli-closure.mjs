@@ -318,6 +318,25 @@ export const DYNAMIC_CALL_ALLOWLIST = Object.freeze([
       + "xdg-open); cmd is a local variable holding one of those literals, not an "
       + "import target.",
   },
+  {
+    file: "node_modules/@earendil-works/pi-coding-agent/dist/core/resolve-config-value.js",
+    callee: "spawnSync",
+    argText: "shell",
+    reason:
+      "pi-coding-agent 0.83.0 resolveConfigValue() shell fallback: spawnSync(shell, ...) "
+      + "shells out to the detected user shell (e.g. to resolve `$(...)`/command config "
+      + "values). shell is the platform shell binary, never an import target; vendored "
+      + "dependency code, not statically traceable repo source.",
+  },
+  {
+    file: "node_modules/@earendil-works/pi-coding-agent/dist/core/resolve-config-value.js",
+    callee: "execSync",
+    argText: "command",
+    reason:
+      "pi-coding-agent 0.83.0 resolveConfigValue() command fallback: execSync(command, ...) "
+      + "runs a command string to resolve a config value. command is a local command "
+      + "expression, not an import target; vendored dependency code.",
+  },
 ]);
 
 const SPAWN_FAMILY_NAMES = new Set([
