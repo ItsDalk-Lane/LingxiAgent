@@ -121,6 +121,15 @@ function isJsDocKind(kind) {
   return kind >= ts.SyntaxKind.FirstJSDocNode && kind <= ts.SyntaxKind.LastJSDocNode;
 }
 
+// Parsing is where verifying this tripwire spends most of its time, and a run
+// that verifies several payloads re-reads a nearly identical inventory each
+// time. The digest below is a pure function of the source path and the exact
+// bytes hashed, so memoize it under both: a changed byte is a different key,
+// and a cached digest can never describe source that has moved. Overridden text
+// keys the same way, so probes that reuse an override are just as cheap.
+const executableSourceHashCache = new Map();
+let executableSourceParses = 0;
+
 /**
  * Hash what executes, not what the file happens to say.
  *
@@ -162,6 +171,10 @@ export function executableSourceHash(rootDir, relativePath, sourceOverrides) {
   if (scriptKind === undefined) {
     throw new Error(`persistence schema source has no known script kind: ${sourcePath}`);
   }
+  const cacheKey = `${sha256(text)} ${sourcePath}`;
+  const memoized = executableSourceHashCache.get(cacheKey);
+  if (memoized !== undefined) return memoized;
+  executableSourceParses += 1;
   const source = ts.createSourceFile(sourcePath, text, ts.ScriptTarget.Latest, true, scriptKind);
   const diagnostics = source.parseDiagnostics;
   if (!Array.isArray(diagnostics)) {
@@ -193,7 +206,11 @@ export function executableSourceHash(rootDir, relativePath, sourceOverrides) {
   if (pieces.length === 0 && text.trim().length > 0) {
     throw new Error(`persistence schema source yielded no tokens: ${sourcePath}`);
   }
-  return sha256(pieces.join(""));
+  // Only a clean parse is memoized; the throws above leave the key absent so a
+  // later call re-reads and fails the same way instead of replaying a verdict.
+  const digest = sha256(pieces.join(""));
+  executableSourceHashCache.set(cacheKey, digest);
+  return digest;
 }
 
 function sourceContract(rootDir, schemaSource, sourceOverrides) {
@@ -299,19 +316,72 @@ async function fileHistorySchema(rootDir) {
   );
 }
 
+async function introspectSqliteStore(rootDir, storeId) {
+  if (storeId === "session-manifest-sqlite") return sessionManifestSchema(rootDir);
+  if (storeId === "agent-facts-sqlite") return factStoreSchema(rootDir);
+  if (storeId === "file-history-sqlite") return fileHistorySchema(rootDir);
+  throw new Error(
+    `SQLite store ${storeId} has no runtime introspector. Add one that opens the real store; do not copy DDL into the fingerprint generator.`,
+  );
+}
+
+// A store's runtime schema is a property of the checked-out tree, not of the
+// payload being computed: the introspectors take only `rootDir`, `sourceOverrides`
+// cannot reach them, and the store classes they instantiate come from an ESM
+// import the runtime already caches — so a second look at the same root builds
+// the same throwaway database and reads back the same schema.
+//
+// Recomputing it per payload is therefore pure cost, and the cost is a temp
+// directory plus a database build and teardown, which is exactly the work a
+// Windows filesystem is slowest at. A single generation run calls this once per
+// store and never notices; the tripwire tests compute a payload per probed
+// module and paid for it until the Windows runner ran them out of time.
+const sqliteRuntimeSchemaCache = new Map();
+let sqliteIntrospections = 0;
+
+/**
+ * Drop every memoized runtime schema and parsed source. Both caches are only
+ * sound because they cannot outlive the process that filled them, so anything
+ * that needs to observe real introspection — or deliberately re-read a tree —
+ * must be able to clear them.
+ */
+export function resetPersistenceSchemaCaches() {
+  sqliteRuntimeSchemaCache.clear();
+  executableSourceHashCache.clear();
+  sqliteIntrospections = 0;
+  executableSourceParses = 0;
+}
+
+/**
+ * Counts of the work actually performed, as opposed to served from a cache.
+ * Verifying this tripwire is dominated by parsing guarded sources and building
+ * throwaway SQLite databases; naming those two numbers keeps the cost visible
+ * to whoever registers the next store, instead of leaving it to be rediscovered
+ * from a CI timeout.
+ */
+export function persistenceSchemaCacheStats() {
+  return { sourceParses: executableSourceParses, sqliteIntrospections };
+}
+
+function cachedSqliteRuntimeSchema(rootDir, storeId) {
+  const key = `${path.resolve(rootDir)} ${storeId}`;
+  const cached = sqliteRuntimeSchemaCache.get(key);
+  if (cached) return cached;
+  // Cache the promise, not the result, so concurrent callers share one build.
+  // Evict on rejection: a probe that failed once says nothing about the tree,
+  // and a stuck rejected promise would turn one transient failure into a
+  // process-wide one that no later call could retry past.
+  sqliteIntrospections += 1;
+  const pending = introspectSqliteStore(rootDir, storeId).catch((error) => {
+    sqliteRuntimeSchemaCache.delete(key);
+    throw error;
+  });
+  sqliteRuntimeSchemaCache.set(key, pending);
+  return pending;
+}
+
 async function sqliteContract(rootDir, store, sourceOverrides) {
-  let runtimeSchema;
-  if (store.id === "session-manifest-sqlite") {
-    runtimeSchema = await sessionManifestSchema(rootDir);
-  } else if (store.id === "agent-facts-sqlite") {
-    runtimeSchema = await factStoreSchema(rootDir);
-  } else if (store.id === "file-history-sqlite") {
-    runtimeSchema = await fileHistorySchema(rootDir);
-  } else {
-    throw new Error(
-      `SQLite store ${store.id} has no runtime introspector. Add one that opens the real store; do not copy DDL into the fingerprint generator.`,
-    );
-  }
+  const runtimeSchema = await cachedSqliteRuntimeSchema(rootDir, store.id);
 
   return {
     contract: store.schemaSource.contract,

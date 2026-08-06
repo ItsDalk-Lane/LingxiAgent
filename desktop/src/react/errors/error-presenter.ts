@@ -97,6 +97,30 @@ export function presentError(error: unknown, options: PresentOptions = {}): Pres
 }
 
 /**
+ * 只要一句话的失败原因：错误码翻得出人话就说人话，翻不出就退回原文。
+ *
+ * 跟 presentError 的分工看呈现位置有没有详情区。有详情区的（inline error、带
+ * errorCode 的 toast）用 presentError：它把原始英文塞进 detail，正文可以放心换成
+ * 兜底文案，信息一条都不丢。设置页这种单行 toast 没有详情区，正文是唯一的载体——
+ * 那里若用兜底文案盖掉原文，英文就彻底消失了，用户连报障时能贴的线索都没有。
+ * 所以这里的档位链把原文排在兜底文案前面：
+ *
+ *   映射到的本地化文案 → 原始 message → 错误码 → 通用兜底文案
+ *
+ * 后两档是给空 message 兜的：拿不到原文时宁可显示一个错误码，也好过让调用方拼出
+ * "切换失败: "这样后面空着的半句话。
+ */
+export function localizedReasonOrRaw(error: unknown, translate: Translate = defaultTranslate): string {
+  const code = codeOf(error);
+  const mappedKey = userMessageKeyForCode(code);
+  return (mappedKey ? translateKeyOrNull(mappedKey, translate) : null)
+    || messageOf(error)
+    || code
+    || translateKeyOrNull(UNKNOWN_ERROR_MESSAGE_KEY, translate)
+    || 'Unexpected error';
+}
+
+/**
  * 呈现一个带动作前缀的错误，例如"新建会话失败：会话正忙，稍后再试"。
  * 前缀由调用方给出（已本地化），详情与错误码原样保留。
  */

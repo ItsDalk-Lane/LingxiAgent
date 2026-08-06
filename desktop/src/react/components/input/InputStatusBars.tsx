@@ -110,7 +110,13 @@ export const InputStatusBars = memo(function InputStatusBars({
         <div
           className={`${styles['slash-busy-bar']}${resultClickable ? ` ${styles['slash-busy-bar-clickable']}` : ''}`}
           onClick={onResultClick}
+          onKeyDown={resultClickable ? (event) => {
+            if (event.key !== 'Enter' && event.key !== ' ') return;
+            event.preventDefault();
+            onResultClick();
+          } : undefined}
           role={resultClickable ? 'button' : undefined}
+          tabIndex={resultClickable ? 0 : undefined}
         >
           <span className={styles[slashResult.type === 'success' ? 'slash-result-dot-ok' : 'slash-result-dot-err']} />
           <span>{slashResult.text}</span>

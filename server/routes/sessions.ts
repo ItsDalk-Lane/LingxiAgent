@@ -6,6 +6,7 @@ import fs from "fs/promises";
 import path from "path";
 import { Hono } from "hono";
 import { safeJson } from "../hono-helpers.ts";
+import { bodyFromRouteError, routeError, statusFromRouteError } from "./route-errors.ts";
 import { t } from "../../lib/i18n.ts";
 import { dropUninstalledPluginCards, extractBlocks, pluginInstalledPredicate, resolveMediaGenerationBlocks } from "../block-extractors.ts";
 import { normalizePluginChatSurfaceBlocks } from "../plugin-chat-surface.ts";
@@ -171,28 +172,6 @@ function sessionWorkspaceMountFields(engine, sessionPath, fallback = null) {
   };
 }
 
-function routeError(message, code, status) {
-  const err: any = new Error(message);
-  err.code = code;
-  err.status = status;
-  return err;
-}
-
-function statusFromRouteError(err) {
-  return Number.isInteger(err?.status) ? err.status : 500;
-}
-
-function bodyFromRouteError(err) {
-  return {
-    error: err?.message || String(err),
-    ...(err?.code ? { code: err.code } : {}),
-    ...(err?.sessionId ? { sessionId: err.sessionId } : {}),
-    ...(err?.currentPath ? { currentPath: err.currentPath } : {}),
-    ...(err?.requestedPath ? { requestedPath: err.requestedPath } : {}),
-    ...(err?.lifecycle ? { lifecycle: err.lifecycle } : {}),
-  };
-}
-
 async function resumeBrowserForSessionSwitch(bm, sessionPath) {
   if (typeof bm.resumeForSessionIfAvailable === "function") {
     return await bm.resumeForSessionIfAvailable(sessionPath);
@@ -209,6 +188,14 @@ async function resumeBrowserForSessionSwitch(bm, sessionPath) {
   };
 }
 
+/**
+ * 把建会话失败的异常分层成 { status, body }。
+ *
+ * 唯一正确的做法是在抛错点就带上 code 和 status——新增抛错点必须这么写。
+ * 下面那串文案正则只服务于还没来得及带码的历史抛错点：它依赖错误信息的字面量，
+ * 上游改一次文案就会失灵，翻译一变更是直接漏判。所以它是只减不增的兜底，
+ * 不要再往里加语言或新的匹配分支。
+ */
 function classifySessionCreationError(err) {
   const message = err?.message || String(err);
   if (err?.status && Number.isInteger(err.status)) {
@@ -1858,12 +1845,11 @@ export function createSessionsRoute(engine, hub = null) {
       });
       return c.json({ ok: true, ...result });
     } catch (err) {
-      const status = Number.isInteger(err?.status)
-        ? err.status
-        : err?.message === "session_busy"
-          ? 409
-          : 400;
-      return c.json(bodyFromRouteError(err), status);
+      // 无码默认 400（重放失败绝大多数是请求本身的问题），session_busy 仍单独回 409。
+      return c.json(
+        bodyFromRouteError(err),
+        statusFromRouteError(err, err?.message === "session_busy" ? 409 : 400),
+      );
     }
   });
 
@@ -1934,12 +1920,11 @@ export function createSessionsRoute(engine, hub = null) {
       }, childPath);
       return c.json(response);
     } catch (err) {
-      const status = Number.isInteger(err?.status)
-        ? err.status
-        : err?.message === "session_busy"
-          ? 409
-          : 500;
-      return c.json(bodyFromRouteError(err), status);
+      // 无码默认 500（fork 失败多半是文件系统或引擎侧的问题），session_busy 仍单独回 409。
+      return c.json(
+        bodyFromRouteError(err),
+        statusFromRouteError(err, err?.message === "session_busy" ? 409 : 500),
+      );
     }
   });
 
@@ -2072,7 +2057,7 @@ export function createSessionsRoute(engine, hub = null) {
           createOptions,
         ));
       }
-      engine.persistSessionMeta();
+      engine.persistSessionMeta(newSessionPath);
       if (projectId && typeof engine.setSessionProjectAssignment === "function") {
         await engine.setSessionProjectAssignment({ sessionPath: newSessionPath, projectId });
       }
@@ -2170,7 +2155,7 @@ export function createSessionsRoute(engine, hub = null) {
       const newSessionPath = result.sessionPath;
       const newAgentId = result.agentId;
       const newSessionId = result.sessionId || engine.getSessionIdForPath?.(newSessionPath) || null;
-      engine.persistSessionMeta?.();
+      engine.persistSessionMeta?.(newSessionPath);
       if (projectId && typeof engine.setSessionProjectAssignment === "function") {
         await engine.setSessionProjectAssignment({ sessionPath: newSessionPath, projectId });
       }
@@ -2207,7 +2192,8 @@ export function createSessionsRoute(engine, hub = null) {
       }, newSessionPath);
       return c.json(response);
     } catch (err) {
-      return c.json({ error: err.message }, 500);
+      const classified = classifySessionCreationError(err);
+      return c.json(classified.body, classified.status);
     }
   });
 
@@ -2375,7 +2361,9 @@ export function createSessionsRoute(engine, hub = null) {
       const errDetail = `${err.message}\n${err.stack || ""}`;
       switchLog.error(`error: ${errDetail}`);
       try { appendFileSync(path.join(engine.lingxiHome, "switch-error.log"), `${new Date().toISOString()}\n${errDetail}\n---\n`); } catch {}
-      return c.json({ error: err.message }, 500);
+      // 日志保持全量，响应按下游语义分层：session-coordinator 抛的 409/404/503
+      // 不该在这里被压平成 500，否则用户只看得到"未知错误"，无从判断该刷新还是重试。
+      return c.json(bodyFromRouteError(err), statusFromRouteError(err));
     }
   });
 
@@ -2786,3 +2774,8 @@ function sessionFileLifecycleFields(file, engine) {
     ...(source.resource ? { resource: source.resource } : {}),
   };
 }
+
+// 仅供测试使用的内部函数出口；生产调用一律走 route handler。
+// 这个出口跟 classifySessionCreationError 的文案正则兜底同生共死：它存在的唯一理由
+// 是让那段兜底可被直接测到。兜底删除之日，这个出口一并删除，不要往里加第二个成员。
+export const __testables = { classifySessionCreationError };

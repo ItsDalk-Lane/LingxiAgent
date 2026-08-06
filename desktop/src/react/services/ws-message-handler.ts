@@ -1009,7 +1009,13 @@ export function handleServerMessage(msg: any): void {
         typeof msg.code === 'string' ? msg.code : null,
       ));
       if (!sp) {
-        if (msg.code === 'session_identity_unresolved' || msg.code === 'session_identity_mismatch') {
+        // 身份类错误本身就说明没有会话可以挂靠，落不到 inline 位，只能弹 toast。
+        // internal_contract 同理：服务端认定调用方没带身份，用户看不到就等于故障消失了。
+        if (
+          msg.code === 'session_identity_unresolved'
+          || msg.code === 'session_identity_mismatch'
+          || msg.code === 'internal_contract'
+        ) {
           useStore.getState().addToast(presented.text, 'error', 6000, { errorCode: msg.code });
         } else {
           console.warn('[ws] event missing sessionPath:', msg.type);

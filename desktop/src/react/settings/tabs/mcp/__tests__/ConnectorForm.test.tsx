@@ -13,13 +13,13 @@ vi.mock('../../../helpers', () => ({
 }));
 
 describe('ConnectorForm', () => {
-  it('server-renders the edited connector auto-start value without waiting for effects', () => {
+  it('server-renders the edited connector\'s own values without waiting for effects', () => {
     const connector: McpConnector = {
       id: 'connector-1',
       name: 'Remote MCP',
       transport: 'remote',
       url: 'https://mcp.example.com/mcp',
-      autoStart: true,
+      timeout: 45,
       status: 'stopped',
       tools: [],
     };
@@ -32,7 +32,11 @@ describe('ConnectorForm', () => {
       />,
     );
 
-    expect(html).toContain('type="checkbox" checked=""');
+    // The initial form state is seeded from the connector on the very first
+    // render, not filled in later by an effect, so the fields are already
+    // populated in server-rendered markup.
+    expect(html).toContain('https://mcp.example.com/mcp');
+    expect(html).toContain('value="45"');
   });
 });
 

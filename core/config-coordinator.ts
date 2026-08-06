@@ -98,7 +98,6 @@ export class ConfigCoordinator {
    * @param {() => import('./model-manager.ts').ModelManager} deps.getModels
    * @param {() => import('./preferences-manager.ts').PreferencesManager} deps.getPrefs
    * @param {() => import('./skill-manager.ts').SkillManager} deps.getSkills
-   * @param {() => object|null} deps.getSession - 当前 session
    * @param {() => import('./session-coordinator.ts').SessionCoordinator|null} deps.getSessionCoordinator
    * @param {() => object|null} deps.getHub
    * @param {(event, sp) => void} deps.emitEvent
@@ -437,33 +436,28 @@ export class ConfigCoordinator {
 
   // ── Memory ──
 
-  async setMemoryEnabled(val) {
-    const session = this._d.getSession();
-    const sessPath = session?.sessionManager?.getSessionFile?.();
-    if (!sessPath) {
-      return { ok: false, error: "current session memory requires an active session" };
-    }
-    const sessionCoord = this._d.getSessionCoordinator();
-    if (typeof sessionCoord?.setSessionMemoryEnabled !== "function") {
-      throw new Error("session memory coordinator unavailable");
-    }
-    return sessionCoord.setSessionMemoryEnabled(sessPath, val);
-  }
+  // 这里曾经有一个 setMemoryEnabled(val)：它从"当前焦点会话"反推要写哪个
+  // session 的记忆开关，和 persistSessionMeta 当年的毛病是同一种。全仓生产
+  // 路径没有任何调用方（界面上切记忆开关只改前端草稿态，随新建会话的请求体
+  // 落盘），所以直接删掉而不是给死代码改签名。将来若要支持"会话进行中切记忆
+  // 开关"，调用方必须显式说明写哪个 session：
+  // sessionCoord.setSessionMemoryEnabled(sessionPath, val)。
 
   setMemoryMasterEnabled(agentId, val) {
     const ag = this._d.getAgents().get(agentId);
     if (ag) ag.setMemoryMasterEnabled(val);
   }
 
-  persistSessionMeta() {
-    const session = this._d.getSession();
-    const sessPath = session?.sessionManager?.getSessionFile?.();
-    if (!sessPath) return;
+  // sessionPath 必传：这个函数曾经从全局焦点指针读要写哪个 session，而新建
+  // 分离会话的路径会在创建结束时把焦点还给上一个会话，于是新会话的记忆开关
+  // 被写到了上一个会话头上。要写哪个 session 只能由调用方显式说明。
+  persistSessionMeta(sessionPath) {
+    if (!sessionPath) throw new Error("persistSessionMeta: sessionPath is required");
     const sessionCoord = this._d.getSessionCoordinator();
     const memoryEnabled = typeof sessionCoord?.getSessionMemoryEnabled === "function"
-      ? sessionCoord.getSessionMemoryEnabled(sessPath)
+      ? sessionCoord.getSessionMemoryEnabled(sessionPath)
       : this._d.getAgent().sessionMemoryEnabled;
-    return sessionCoord.writeSessionMeta(sessPath, {
+    return sessionCoord.writeSessionMeta(sessionPath, {
       // session-meta 持久化的是 session 自身冻结下来的记忆参与态，
       // 不能写 master && session 的临时组合态，否则会把运行时 gate
       // 错写成 session 身份，打穿 prefix cache 前提。

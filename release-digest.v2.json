@@ -3,6 +3,63 @@
   "entries": [
     {
       "schemaVersion": 1,
+      "tag": "v0.1.21",
+      "version": "0.1.21",
+      "previousTag": "v0.1.2",
+      "generatedAt": "2026-08-06T04:46:38.000Z",
+      "noUserFacingChanges": false,
+      "summary": {
+        "zh": "0.1.21（预览版）同步上游 openhanako 0.443.46，旗舰为新增文档抽取模块（PDF/DOCX/XLSX/CSV/扫描件，经 @firecrawl/anydoc），并并入会话路由错误分层、MCP id 冲突检测、ws-session-context 隔离、crash log 双行版本记录等改进。desktop 35 文件逐个三方合并，保留 Lingxi 全部定制。本版本为 GitHub prerelease 预览，不动 stable 通道。",
+        "en": "0.1.21 (prerelease) syncs upstream openhanako 0.443.46. The flagship is the new document-extract module (PDF/DOCX/XLSX/CSV/scanned, via @firecrawl/anydoc), plus session route error layering, MCP id collision detection, ws-session-context isolation, and crash log dual-line version recording. The 35 desktop files were each 3-way merged, preserving all Lingxi customizations. This is a GitHub prerelease preview; the stable channel is untouched."
+      },
+      "counts": {
+        "feature": 1,
+        "fix": 0,
+        "improvement": 0,
+        "migration": 0
+      },
+      "source": {
+        "owner": "ItsDalk-Lane",
+        "repo": "LingxiAgent",
+        "commitRange": "v0.1.2..v0.1.21",
+        "releaseUrl": "https://github.com/ItsDalk-Lane/LingxiAgent/releases/tag/v0.1.21",
+        "releaseNotes": ""
+      },
+      "items": [
+        {
+          "id": "feat-document-extract",
+          "kind": "feature",
+          "importance": "high",
+          "title": {
+            "zh": "新增文档抽取模块：会话内直接读取 PDF / DOCX / XLSX / CSV / 扫描件",
+            "en": "New document-extract module: read PDF / DOCX / XLSX / CSV / scanned docs directly in-session"
+          },
+          "summary": {
+            "zh": "同步上游 openhanako 0.443.46 的旗舰特性。新增 lib/document-extract 模块（index/types/anydoc-loader），通过新依赖 @firecrawl/anydoc@0.1.2 支持 PDF、DOCX、XLSX、CSV 及扫描件的内容抽取；file-tool 并入对应调用，会话中可直接读取并解析这些文档格式。含 4 个二进制 fixture 与单元/集成测试。",
+            "en": "Syncs the flagship feature of upstream openhanako 0.443.46. Adds the lib/document-extract module (index/types/anydoc-loader) that, via the new dependency @firecrawl/anydoc@0.1.2, supports content extraction from PDF, DOCX, XLSX, CSV and scanned documents; file-tool integrates the call so sessions can read and parse these formats directly. Ships with 4 binary fixtures plus unit/integration tests."
+          },
+          "details": [
+            {
+              "zh": "同步范围：上游 0.442→0.443 共 94 文件 +6573/−716。core/lib/server/scripts 层用 git 三方合并落地（保留 lingxiHome 等改名定制），desktop 35 文件逐个三方合并（含 main.cjs writeCrashLog 双行、locales 品牌、settings/api 错误分层等重点）。",
+              "en": "Sync scope: upstream 0.442→0.443 spans 94 files +6573/−716. The core/lib/server/scripts layers were applied via git 3-way merge (preserving the lingxiHome rename and other customizations); the 35 desktop files were each 3-way merged (including main.cjs writeCrashLog dual-line, locale branding, settings/api error layering, etc.)."
+            },
+            {
+              "zh": "并入的其它上游改进：会话路由错误分层（409/404/503 不再被压平成 500）、MCP 工具 id 大小写折叠冲突检测、ws-session-context 会话上下文隔离、crash log 壳版本/内容版本双行记录（解决热更新后排障误导）。",
+              "en": "Other integrated upstream improvements: session route error layering (409/404/503 no longer flattened to 500), MCP tool id case-folding collision detection, ws-session-context session context isolation, and crash log dual-line shell/content version recording (fixes post-hot-update debugging misdirection)."
+            }
+          ],
+          "sources": [
+            {
+              "type": "commit",
+              "ref": "v0.1.21",
+              "title": "feat(sync): 同步上游 openhanako 0.443.46（文档抽取）+ 升版 0.1.21 预览"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "schemaVersion": 1,
       "tag": "v0.1.2",
       "version": "0.1.2",
       "previousTag": "v0.1.0",

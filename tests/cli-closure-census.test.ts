@@ -73,6 +73,62 @@ describe("compute-cli-closure: fail-closed validation", () => {
     expect(withBinding).not.toContain(nativeBinding);
   });
 
+  it("keeps nft closure output stable across the host's platform-variant native package", () => {
+    const scratchRel = "build/.cli-closure-nft-scratch-test.mjs";
+    // A napi-rs style package ships one npm package per platform, selected
+    // through optionalDependencies, so the host's platform shows up in the
+    // package *name* rather than inside a file the .node filter can reach.
+    const commonFiles = [
+      scratchRel,
+      "package.json",
+      "node_modules/@firecrawl/anydoc/index.js",
+      "node_modules/@firecrawl/anydoc/package.json",
+    ];
+
+    const onMacOS = normalizeNftTraceFiles({
+      fileList: new Set([
+        ...commonFiles,
+        "node_modules/@firecrawl/anydoc-darwin-arm64/package.json",
+        "node_modules/@firecrawl/anydoc-darwin-arm64/anydoc.darwin-arm64.node",
+      ]),
+      scratchRel,
+    });
+    const onWindows = normalizeNftTraceFiles({
+      fileList: new Set([
+        ...commonFiles,
+        "node_modules/@firecrawl/anydoc-win32-x64-msvc/package.json",
+        "node_modules/@firecrawl/anydoc-win32-x64-msvc/anydoc.win32-x64-msvc.node",
+      ]),
+      scratchRel,
+    });
+
+    expect(onWindows).toEqual(onMacOS);
+    // The variant package still has to leave evidence that it is required;
+    // only the host-specific part of its name is folded away.
+    expect(onMacOS).toContain("node_modules/@firecrawl/anydoc-<platform>/package.json");
+    expect(onMacOS).toContain("node_modules/@firecrawl/anydoc/index.js");
+    expect(onMacOS).not.toContain("node_modules/@firecrawl/anydoc-darwin-arm64/package.json");
+  });
+
+  it("does not fold a package that merely looks platform-suffixed but ships real code", () => {
+    const scratchRel = "build/.cli-closure-nft-scratch-test.mjs";
+    // Same name shape as a platform variant, but it contributes real modules
+    // rather than a lone package.json, so folding it would erase real files.
+    const files = [
+      scratchRel,
+      "package.json",
+      "node_modules/some-tool-linux-x64/index.js",
+      "node_modules/some-tool-linux-x64/lib/run.js",
+      "node_modules/some-tool-linux-x64/package.json",
+    ];
+
+    const normalized = normalizeNftTraceFiles({ fileList: new Set(files), scratchRel });
+
+    expect(normalized).toContain("node_modules/some-tool-linux-x64/index.js");
+    expect(normalized).toContain("node_modules/some-tool-linux-x64/lib/run.js");
+    expect(normalized).toContain("node_modules/some-tool-linux-x64/package.json");
+  });
+
   it("flags a non-literal dynamic import() as a hit", () => {
     const hits = scanDynamicCallSites({
       relPath: "fixture.ts",

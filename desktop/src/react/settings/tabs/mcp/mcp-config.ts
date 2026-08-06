@@ -88,7 +88,11 @@ function connectorFromJsonServer(id: string, raw: McpJsonServer): McpConnectorIn
     ...(stringRecord(raw.headers) ? { headers: stringRecord(raw.headers) } : {}),
     ...(stringValue(raw.registryUrl) ? { registryUrl: stringValue(raw.registryUrl) } : {}),
     ...(positiveNumber(raw.timeout) ? { timeout: positiveNumber(raw.timeout) } : {}),
-    ...(raw.autoStart === true || raw.isActive === true ? { autoStart: true } : {}),
+    // An imported server is on unless it says otherwise. The older isActive /
+    // autoStart flags are not carried over: they described a start preference
+    // nothing ever wrote, so importing them would switch off servers the file's
+    // author expects to work.
+    ...(raw.enabled === false ? { enabled: false } : {}),
   };
   if (transport === 'stdio' && !connector.command) {
     throw new Error(`MCP server "${id}" is missing command`);

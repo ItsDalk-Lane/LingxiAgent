@@ -33,17 +33,23 @@ describe('mcp connector config helpers', () => {
           env: { API_KEY: 'secret' },
           registryUrl: 'https://registry.npmmirror.com',
         },
+        parked: {
+          command: 'npx',
+          args: ['-y', 'mcp-server-parked'],
+          enabled: false,
+        },
       },
     }));
 
     expect(connectors).toEqual([
       {
+        // isActive said "on", which is also the default, so nothing is carried
+        // over for it: an imported server is on unless it opts out.
         name: 'remote',
         transport: 'streamable-http',
         url: 'https://mcp.example.com/mcp',
         headers: { Authorization: 'Bearer secret' },
         timeout: 45,
-        autoStart: true,
       },
       {
         name: 'local',
@@ -52,6 +58,13 @@ describe('mcp connector config helpers', () => {
         args: ['-y', 'mcp-server-example'],
         env: { API_KEY: 'secret' },
         registryUrl: 'https://registry.npmmirror.com',
+      },
+      {
+        name: 'parked',
+        transport: 'stdio',
+        command: 'npx',
+        args: ['-y', 'mcp-server-parked'],
+        enabled: false,
       },
     ]);
   });

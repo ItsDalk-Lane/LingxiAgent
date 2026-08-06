@@ -1,8 +1,13 @@
 import path from "path";
 import { Type } from "../pi-sdk/index.ts";
 import { serializeSessionFile } from "../session-files/session-file-response.ts";
-import { copyFileRefToPath, statFileRef } from "../file-ref/resource-io.ts";
+import { copyFileRefToPath, resolveReadableFileRef, statFileRef } from "../file-ref/resource-io.ts";
+import { extractDocument as defaultExtractDocument } from "../document-extract/index.ts";
 import { getToolSessionPath } from "./tool-session.ts";
+
+// 抽取出来的 Markdown 直接进模型上下文，一份长报告能轻松吃掉整个窗口。超过这个字数就截断，
+// 并在尾部说明被截掉多少，让模型知道自己看到的是片段而不是全文。
+const EXTRACT_OUTPUT_MAX_CHARS = 200_000;
 
 function refFromParams(params: any = {}, key = "ref") {
   const explicit = params[key] || null;
@@ -74,26 +79,29 @@ export function createFileTool({
   getAuthorizedFolders,
   resolveSessionFile,
   registerSessionFile,
+  extractDocument = defaultExtractDocument,
 }: {
   getCwd?: any;
   getSessionPath?: any;
   getAuthorizedFolders?: any;
   resolveSessionFile?: any;
   registerSessionFile?: any;
+  extractDocument?: any;
 } = {}) {
   return {
     name: "file",
     label: "File",
-    description: "File operations: stat to inspect metadata without reading content, copy to materialize a file into the workspace.",
+    description: "File operations: stat to inspect metadata without reading content, copy to materialize a file into the workspace, extract to convert a document into Markdown text. Use extract for office and publishing formats such as docx, pdf, xlsx, pptx, odt, ods, rtf, epub and csv; the read tool only handles plain text and images and will return garbage for those formats.",
     parameters: Type.Object({
       action: Type.Union([
         Type.Literal("stat"),
         Type.Literal("copy"),
+        Type.Literal("extract"),
       ], {
-        description: "File action to perform. v0 supports stat and copy only.",
+        description: "File action to perform. stat inspects metadata, copy materializes a file into the workspace, extract converts a document into Markdown text.",
       }),
       ref: Type.Optional(Type.Object({}, {
-        description: "Typed FileRef for stat, such as { type: 'session_file', fileId } or { type: 'path', path }.",
+        description: "Typed FileRef for stat and extract, such as { type: 'session_file', fileId } or { type: 'path', path }.",
         additionalProperties: true,
       } as any)),
       source: Type.Optional(Type.Object({}, {
@@ -189,6 +197,44 @@ export function createFileTool({
               filePath: copied.filePath,
               ...(serialized ? { file: serialized, sessionFile: serialized } : {}),
               ...(mediaItem ? { media: { items: [mediaItem], mediaUrls: [copied.filePath] } } : {}),
+            },
+          };
+        }
+
+        if (params.action === "extract") {
+          const resolved = await resolveReadableFileRef(refFromParams(params), {
+            cwd,
+            allowedRoots,
+            label: "extract source",
+            sessionId,
+            sessionPath,
+            resolveSessionFile,
+          });
+          if (resolved.stat.isDirectory()) {
+            throw new Error(`extract source is a directory: ${resolved.filePath}`);
+          }
+          const extracted = await extractDocument({
+            filePath: resolved.filePath,
+            filename: resolved.filename,
+          });
+          if (!extracted?.ok) {
+            throw new Error(`extract failed (${extracted?.reason || "unknown"}): ${extracted?.message || "no detail"}`);
+          }
+          const markdown = typeof extracted.markdown === "string" ? extracted.markdown : "";
+          const totalChars = markdown.length;
+          const truncated = totalChars > EXTRACT_OUTPUT_MAX_CHARS;
+          const text = truncated
+            ? `${markdown.slice(0, EXTRACT_OUTPUT_MAX_CHARS)}\n\n[Truncated: showing first ${EXTRACT_OUTPUT_MAX_CHARS} chars of ${totalChars}]`
+            : markdown;
+          return {
+            content: [{ type: "text", text }],
+            details: {
+              filePath: resolved.filePath,
+              filename: resolved.filename,
+              format: extracted.format,
+              warnings: Array.isArray(extracted.warnings) ? extracted.warnings : [],
+              truncated,
+              totalChars,
             },
           };
         }

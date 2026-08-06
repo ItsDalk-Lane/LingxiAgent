@@ -489,6 +489,8 @@ describe("sessions route", () => {
     );
     expect(data.workspaceFolders).toEqual([extra]);
     expect(data.sessionId).toBe("sess_route_new");
+    // session meta 必须显式落到刚建出来的会话上，而不是由被调方去猜焦点
+    expect(engine.persistSessionMeta).toHaveBeenCalledWith("/tmp/agents/hana/sessions/new.jsonl");
     expect(hub.eventBus.emit).toHaveBeenCalledWith(
       expect.objectContaining({
         type: "session_created",
@@ -668,6 +670,10 @@ describe("sessions route", () => {
       sessionPath: "/tmp/agents/hana/sessions/quick.jsonl",
       projectId: "project-quick",
     });
+    // 回归钉子：detached 创建结束时焦点已经还给 focused.jsonl，
+    // 读焦点的旧实现会把新会话的记忆开关写到上一个会话头上。
+    expect(engine.persistSessionMeta).toHaveBeenCalledWith("/tmp/agents/hana/sessions/quick.jsonl");
+    expect(engine.persistSessionMeta).not.toHaveBeenCalledWith("/tmp/agents/hana/sessions/focused.jsonl");
     expect(data).toMatchObject({
       ok: true,
       path: "/tmp/agents/hana/sessions/quick.jsonl",
@@ -1595,6 +1601,101 @@ describe("sessions route", () => {
       }),
       childPath,
     );
+  });
+
+  // retry 和 fork 是最容易接到外来异常的两条路由（重放会碰模型和文件，fork 会碰文件系统）。
+  // 它们各自的无码默认值不同——retry 回 400、fork 回 500——这是既有的用户可见行为，
+  // 收编到统一的状态码出口时必须原样保住，只把"越界状态码"这一种情形交给范围门。
+  describe("retry / fork error status contract", () => {
+    function activeSession(name) {
+      const sessionPath = path.join(tmpDir, "agents", "hana", "sessions", `${name}.jsonl`);
+      fs.mkdirSync(path.dirname(sessionPath), { recursive: true });
+      fs.writeFileSync(sessionPath, "x\n");
+      return {
+        sessionPath,
+        manifest: {
+          sessionId: `sess_${name}`,
+          lifecycle: "active",
+          currentLocator: { path: sessionPath },
+        },
+      };
+    }
+
+    async function retryWith(err) {
+      const { createSessionsRoute } = await import("../server/routes/sessions.ts");
+      const app = new Hono();
+      const { sessionPath, manifest } = activeSession("retry-status");
+      retrySessionTurnMock.mockRejectedValueOnce(err);
+      app.route("/api", createSessionsRoute({
+        agentsDir: path.join(tmpDir, "agents"),
+        getSessionManifest: vi.fn(() => manifest),
+        isSessionStreaming: vi.fn(() => false),
+      }));
+      const res = await app.request("/api/sessions/turns/retry", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          sessionId: manifest.sessionId,
+          sessionPath,
+          target: { role: "assistant", entryId: "entry-a2" },
+        }),
+      });
+      return { res, raw: await res.text() };
+    }
+
+    async function forkWith(err) {
+      const { createSessionsRoute } = await import("../server/routes/sessions.ts");
+      const app = new Hono();
+      const { sessionPath, manifest } = activeSession("fork-status");
+      app.route("/api", createSessionsRoute({
+        agentsDir: path.join(tmpDir, "agents"),
+        getSessionManifest: vi.fn(() => manifest),
+        isSessionStreaming: vi.fn(() => false),
+        forkSessionAtNode: vi.fn().mockRejectedValue(err),
+        getAgent: vi.fn(() => ({ agentName: "Hana" })),
+      }));
+      const res = await app.request("/api/sessions/fork", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          sessionId: manifest.sessionId,
+          sessionPath,
+          target: { role: "assistant", entryId: "entry-a2" },
+        }),
+      });
+      return { res, raw: await res.text() };
+    }
+
+    it("keeps retry's 400 default for an error that declares no status", async () => {
+      const { res } = await retryWith(new Error("retry blew up"));
+      expect(res.status).toBe(400);
+    });
+
+    it("keeps fork's 500 default for an error that declares no status", async () => {
+      const { res } = await forkWith(new Error("fork blew up"));
+      expect(res.status).toBe(500);
+    });
+
+    it.each([
+      ["retry", (e) => retryWith(e)],
+      ["fork", (e) => forkWith(e)],
+    ])("keeps the session_busy 409 special case on %s", async (_name, run) => {
+      const { res } = await run(new Error("session_busy"));
+      expect(res.status).toBe(409);
+    });
+
+    // 改动前这两条是红的：越界状态码原样交给 Response 构造会抛 RangeError，
+    // 异常穿透 catch，客户端收到的是框架兜底的纯文本而不是我们的错误体。
+    it.each([
+      ["retry", (e) => retryWith(e)],
+      ["fork", (e) => forkWith(e)],
+    ])("clamps an out-of-range status to 500 on %s", async (_name, run) => {
+      const err: any = new Error("upstream exit code leaked");
+      err.status = 999;
+      const { res, raw } = await run(err);
+      expect(res.status).toBe(500);
+      expect(JSON.parse(raw)).toMatchObject({ error: "upstream exit code leaked" });
+    });
   });
 
   it("returns a session summary through an explicit route", async () => {

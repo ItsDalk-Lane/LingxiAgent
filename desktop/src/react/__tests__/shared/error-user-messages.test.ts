@@ -3,6 +3,7 @@ import {
   ERROR_CODE_MESSAGE_KEYS,
   UNKNOWN_ERROR_MESSAGE_KEY,
   errorCodeFromResponseBody,
+  normalizeSessionRouteError,
   userMessageKeyForCode,
 } from '../../../../../shared/error-user-messages.ts';
 import en from '../../../locales/en.json';
@@ -25,6 +26,14 @@ describe('error-user-messages · code → i18n key', () => {
     expect(userMessageKeyForCode('session_fork_active_task')).toBe('error.code.sessionForkActiveTask');
     expect(userMessageKeyForCode('session_busy')).toBe('error.code.sessionBusy');
     expect(userMessageKeyForCode('subagent_run_busy')).toBe('error.code.subagentRunBusy');
+  });
+
+  it('gives internal contract violations their own copy instead of the generic fallback', () => {
+    // These only fire when a caller skipped part of an explicit contract. The user
+    // cannot act on the English assertion, so it needs a sentence that says "this is
+    // ours, not yours" and parks the original text in the details area.
+    expect(userMessageKeyForCode('internal_contract')).toBe('error.code.internalContract');
+    expect(ERROR_CODE_MESSAGE_KEYS.internal_contract).not.toBe(UNKNOWN_ERROR_MESSAGE_KEY);
   });
 
   it('returns null for unmapped codes so callers fall back explicitly', () => {
@@ -87,5 +96,46 @@ describe('error-user-messages · response body normalization', () => {
     expect(errorCodeFromResponseBody({})).toBeNull();
     expect(errorCodeFromResponseBody('boom')).toBeNull();
     expect(errorCodeFromResponseBody({ code: '   ' })).toBeNull();
+  });
+});
+
+describe('error-user-messages · normalizeSessionRouteError', () => {
+  it('reads the flat shape route handlers answer with', () => {
+    expect(normalizeSessionRouteError({
+      error: 'session locator is not active',
+      code: 'session_locator_not_active',
+    })).toEqual({ message: 'session locator is not active', code: 'session_locator_not_active' });
+  });
+
+  it('reads the nested shape the top-level onError wrapper answers with', () => {
+    // app.onError 把异常包成 { error: { code, message, traceId } }，跟 route handler
+    // 自己应答的扁平形状不是一回事。两种都要读得出来，否则用户会看到 "[object Object]"。
+    expect(normalizeSessionRouteError({
+      error: { code: 'session_manifest_unavailable', message: 'session index is rebuilding', traceId: 't-1' },
+    })).toEqual({ message: 'session index is rebuilding', code: 'session_manifest_unavailable' });
+  });
+
+  it('keeps the bare-code shape working', () => {
+    expect(normalizeSessionRouteError({ error: 'session_busy' }))
+      .toEqual({ message: 'session_busy', code: 'session_busy' });
+  });
+
+  it('returns a null code when the body carries no code', () => {
+    expect(normalizeSessionRouteError({ error: 'Invalid session path' }))
+      .toEqual({ message: 'Invalid session path', code: null });
+  });
+
+  it('tolerates missing or malformed bodies', () => {
+    expect(normalizeSessionRouteError(null)).toEqual({ message: '', code: null });
+    expect(normalizeSessionRouteError({})).toEqual({ message: '', code: null });
+    expect(normalizeSessionRouteError({ error: { traceId: 't-2' } })).toEqual({ message: '', code: null });
+  });
+});
+
+describe('error-user-messages · session_create_failed', () => {
+  it('maps the synthetic fallback code the create route stamps on coded failures', () => {
+    // sessions.ts 的 classifySessionCreationError 在 err 带 status 但没带 code 时
+    // 会合成这个码，它会真的出现在响应体里，所以必须有文案，不能落到兜底。
+    expect(userMessageKeyForCode('session_create_failed')).toBe('error.code.sessionCreateFailed');
   });
 });

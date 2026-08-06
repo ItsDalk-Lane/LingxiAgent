@@ -428,7 +428,7 @@ export class Hub {
         ...(agentId ? { agentId } : {}),
         ...createOptions,
       });
-      engine.persistSessionMeta?.();
+      engine.persistSessionMeta?.(result.sessionPath);
       const sessionPath = result.sessionPath;
       const sessionId = sessionPath ? engine.getSessionIdForPath?.(sessionPath) || null : null;
       if (payload.permissionMode !== undefined && sessionPath) {

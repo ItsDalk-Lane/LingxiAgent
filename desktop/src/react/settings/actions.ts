@@ -4,6 +4,8 @@
 import { useSettingsStore } from './store';
 import { lingxiFetch, lingxiUrl } from './api';
 import { t } from './helpers';
+import { errorWithCode, localizedReasonOrRaw } from '../errors/error-presenter';
+import { normalizeSessionRouteError } from '../../../../shared/error-user-messages.ts';
 import {
   createRemoteResource,
   failRemoteLoad,
@@ -333,7 +335,12 @@ export async function switchToAgent(agentId: string) {
       body: JSON.stringify({ id: agentId }),
     });
     const data = await res.json();
-    if (data.error) throw new Error(data.error);
+    // 走到这里响应一定是 2xx：非 2xx 已经在 hanaFetch 边界抛成带码的异常了。
+    // 剩下要防的是 2xx 里仍带 error 字段的老写法，它同样要把码带过 throw。
+    if (data.error) {
+      const routeError = normalizeSessionRouteError(data);
+      throw errorWithCode(routeError.message, routeError.code);
+    }
 
     store.set({
       settingsAgentId: null,
@@ -344,7 +351,8 @@ export async function switchToAgent(agentId: string) {
     await loadAgents();
     store.showToast(t('settings.agent.switched', { name: data.agent.name }), 'success');
   } catch (err: any) {
-    store.showToast(t('settings.agent.switchFailed') + ': ' + err.message, 'error');
+    console.error('[agents] switch failed:', err);
+    store.showToast(t('settings.agent.switchFailed') + ': ' + localizedReasonOrRaw(err, t), 'error');
   }
 }
 
@@ -357,11 +365,17 @@ export async function setPrimaryAgent(agentId: string) {
       body: JSON.stringify({ id: agentId }),
     });
     const data = await res.json();
-    if (data.error) throw new Error(data.error);
+    // 同 switchToAgent：非 2xx 已在 hanaFetch 边界抛成带码的异常，这里只补 2xx 带
+    // error 字段的老写法，同样要把码带过 throw，catch 才有得翻。
+    if (data.error) {
+      const routeError = normalizeSessionRouteError(data);
+      throw errorWithCode(routeError.message, routeError.code);
+    }
 
     await loadAgents();
     store.showToast(t('settings.agent.setPrimary'), 'success');
   } catch (err: any) {
-    store.showToast(t('settings.agent.setPrimaryFailed') + ': ' + err.message, 'error');
+    console.error('[agents] set primary failed:', err);
+    store.showToast(t('settings.agent.setPrimaryFailed') + ': ' + localizedReasonOrRaw(err, t), 'error');
   }
 }

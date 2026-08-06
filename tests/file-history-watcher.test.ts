@@ -69,6 +69,35 @@ describe("workspace watcher", () => {
     await waitForWithPoke(() => deleted.includes("sub/a.md"), removeTracked);
   }, 45_000);
 
+  it("does not hold a file descriptor per watched file", async () => {
+    // 每文件一个 OS 级 watch 会把进程的文件描述符表撑爆，大工作区因此连 spawn 都做不了。
+    // /dev/fd 是本进程描述符表的快照，Windows 没有等价物，故只在类 Unix 平台上断言。
+    if (process.platform === "win32") return;
+
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), "hana-fh-watch-"));
+    cleanups.push(() => fs.rmSync(root, { recursive: true, force: true }));
+    for (let dir = 0; dir < 3; dir++) {
+      const dirPath = path.join(root, `pack-${dir}`);
+      fs.mkdirSync(dirPath);
+      for (let i = 0; i < 100; i++) {
+        fs.writeFileSync(path.join(dirPath, `note-${i}.md`), `content-${dir}-${i}`);
+      }
+    }
+
+    const fdBefore = fs.readdirSync("/dev/fd").length;
+    const watcher = createWorkspaceWatcher({
+      root,
+      onChanged: () => {},
+      onDeleted: () => {},
+      onError: () => {},
+    });
+    cleanups.push(() => watcher.close());
+    await watcher.ready;
+    const fdAfter = fs.readdirSync("/dev/fd").length;
+
+    expect(fdAfter - fdBefore).toBeLessThan(30);
+  }, 45_000);
+
   it("does not ignore dot-files while still pruning dot-directories", async () => {
     const root = fs.mkdtempSync(path.join(os.tmpdir(), "hana-fh-watch-"));
     cleanups.push(() => fs.rmSync(root, { recursive: true, force: true }));

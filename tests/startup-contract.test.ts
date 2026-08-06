@@ -83,6 +83,22 @@ describe("local startup contract", () => {
     expect(external).toContain("@node-rs/jieba");
   });
 
+  it("keeps the native document converter external in the server bundle", () => {
+    // Its per-platform subpackage declares the .node binary as "main", so
+    // bundling it makes Rollup parse machine code as JavaScript and the
+    // server bundle build fails outright.
+    const external = viteServerConfig.build?.rollupOptions?.external || [];
+
+    expect(external).toContain("@firecrawl/anydoc");
+  });
+
+  it("smoke-tests the native document converter in the packaged runtime", () => {
+    const buildServerPhases = fs.readFileSync(path.join(ROOT, "scripts", "build-server-phases.mjs"), "utf-8");
+
+    expect(buildServerPhases).toContain('externalPackageNames.includes("@firecrawl/anydoc")');
+    expect(buildServerPhases).toContain("buildAnydocRuntimeSmokeScript()");
+  });
+
   it("keeps workspace output helper statically bundleable in packaged server", () => {
     const source = fs.readFileSync(path.join(ROOT, "shared", "workspace-output.ts"), "utf-8");
 

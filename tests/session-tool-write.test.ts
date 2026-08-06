@@ -124,6 +124,8 @@ describe("session tool write side", () => {
       "kimi", undefined, true, undefined, { workspaceFolders: [], visibleInSessionList: true },
     );
     expect(deliverAgentMessage).toHaveBeenCalledWith(engine, expect.objectContaining({ targetSessionId: "sid-new" }));
+    // meta 显式落到刚建出来的会话上，不依赖调用时的焦点指针
+    expect(engine.persistSessionMeta).toHaveBeenCalledWith("/tmp/new.jsonl");
     expect(applied.result).toEqual({ sessionId: "sid-new" });
   });
 

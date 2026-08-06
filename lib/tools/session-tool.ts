@@ -258,7 +258,7 @@ export function createSessionTool(deps: {
               finalAgent.id, undefined, true, finalModel,
               { workspaceFolders: [], visibleInSessionList: true },
             );
-            engine.persistSessionMeta?.();
+            engine.persistSessionMeta?.(created?.sessionPath);
             const newSessionId = created?.sessionId
               || engine.getSessionIdForPath?.(created?.sessionPath) || null;
             if (!newSessionId) throw new Error("session_create_failed: no sessionId returned");

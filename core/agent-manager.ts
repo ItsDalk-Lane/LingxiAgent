@@ -858,7 +858,14 @@ export class AgentManager {
       if (ref) {
         const model = findModel(models.availableModels, ref.id, ref.provider);
         if (!model) {
-          throw new Error(t("error.agentModelNotAvailable", { id: agentId, model: `${ref.provider}/${ref.id}` }));
+          // 带上码和状态，切换失败才能在路由边界保住语义：模型没了是用户改配置能解决的
+          // 冲突（409），不是服务端故障（500）。少了这两个字段，上层只能压平成未知错误。
+          const error: any = new Error(
+            t("error.agentModelNotAvailable", { id: agentId, model: `${ref.provider}/${ref.id}` }),
+          );
+          error.code = "agent_model_not_available";
+          error.status = 409;
+          throw error;
         }
         models.defaultModel = model;
       } else if (chatRef) {

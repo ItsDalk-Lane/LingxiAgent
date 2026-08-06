@@ -92,6 +92,28 @@ function normalizeTool(tool) {
   return normalized;
 }
 
+/**
+ * Collapse repeated tool names inside one connector, keeping the first.
+ *
+ * Third-party servers may legally-but-uselessly list the same tool twice, and
+ * old versions persisted such lists verbatim. Within one connector the name
+ * alone selects the executor, so folding to the first occurrence is a
+ * deterministic merge, not a guess. The first occurrence is also the one that
+ * was already in effect: an invocation dispatches by name to the server, and
+ * the lookups that actually pick one entry out of a connector's tool list (the
+ * two app-resource resolutions) stop at the first match. The availability probe
+ * is not one of those — it only asks whether any entry carries the name, so
+ * dropping the later duplicates cannot change its answer either way.
+ */
+function dedupeToolsByName(tools) {
+  const seen = new Set();
+  return tools.filter((tool) => {
+    if (seen.has(tool.name)) return false;
+    seen.add(tool.name);
+    return true;
+  });
+}
+
 // Per-connector permission policy. "review-all" is both the default and the
 // safe one: every tool invocation goes through review. "allowlist" opts the
 // connector into policy-driven silent approval, but only for tools the user
@@ -217,6 +239,46 @@ export function resolveMcpToolPermissionKind(policy: any, liveAnnotations: any =
   return "review";
 }
 
+// Hints that raise scrutiny versus hints that lower it. The split is what lets
+// duplicate declarations be merged without ever weakening the outcome.
+const DANGER_RAISING_HINTS = ["destructiveHint", "openWorldHint"];
+const SCRUTINY_LOWERING_HINTS = ["readOnlyHint", "idempotentHint"];
+
+/**
+ * Merge the annotations of two listings that share one tool name.
+ *
+ * Duplicate names fold to their first occurrence, but their annotations may
+ * disagree, and last-one-wins would let a later read-only claim erase an
+ * earlier destructive one. By rule 1 above, a server-declared destructive tool
+ * is never silently approved and known danger outranks authorization, so the
+ * merge may only ever move in the direction of more scrutiny: a raising hint
+ * counts when any occurrence declares it, a lowering hint only when every
+ * occurrence does.
+ *
+ * "Every occurrence" means every occurrence that reached this merge. The caller
+ * skips listings whose `annotations` is not a plain object, so a duplicate that
+ * carries no annotations field at all never gets a vote, while one carrying an
+ * empty `{}` does and can therefore veto a lowering hint. The two silences are
+ * deliberately judged differently: an absent field is a listing that says
+ * nothing, an empty object is a listing that was asked and claimed nothing.
+ */
+function mergeDuplicateToolAnnotations(previous, next) {
+  // A copy, not the caller's object: the side table owns every value it holds,
+  // so the first listing and the merged ones enter it the same way.
+  if (!isPlainObject(previous)) return { ...next };
+  const merged = { ...previous, ...next };
+  for (const hint of DANGER_RAISING_HINTS) {
+    if (previous[hint] === true || next[hint] === true) merged[hint] = true;
+  }
+  for (const hint of SCRUTINY_LOWERING_HINTS) {
+    // Untouched when neither listing mentions the hint: absent already means
+    // "no claim", and inventing a false one would say the server denied it.
+    if (!(hint in merged)) continue;
+    if (previous[hint] !== true || next[hint] !== true) merged[hint] = false;
+  }
+  return merged;
+}
+
 // A pin keeps one tool in the prefix even when its connector is deferred.
 // Only an explicit `true` pins: anything else, including "yes" and 1, is
 // dropped so a malformed value cannot quietly enlarge the prefix.
@@ -242,9 +304,11 @@ function normalizeConnector(connector, fallbackId = "") {
   if (!id) return null;
   const env = normalizeStringRecord(connector.env);
   const headers = normalizeStringRecord(connector.headers);
-  const tools = Array.isArray(connector.tools)
-    ? connector.tools.map(normalizeTool).filter(Boolean)
-    : [];
+  const tools = dedupeToolsByName(
+    (Array.isArray(connector.tools) ? connector.tools : [])
+      .map(normalizeTool)
+      .filter(Boolean),
+  );
   const toolPermissions = mirrorHistoricalToolSettings(
     normalizeToolPermissions(connector.toolPermissions),
     id,
@@ -283,7 +347,14 @@ function normalizeConnector(connector, fallbackId = "") {
     // when a client id is already present, otherwise "" (unknown/unregistered).
     clientIdSource: normalizeClientIdSource(connector),
     oauth,
-    autoStart: connector.autoStart === true || connector.isActive === true,
+    // Single persisted switch, aligned with every major MCP client: present
+    // means enabled unless the user explicitly opted out. Legacy autoStart /
+    // isActive are not read as gates (they never had a runtime writer, so
+    // almost every real config says false while the user expects the connector
+    // to work); enabled is mirrored onto autoStart on write so a downgraded
+    // build keeps behaving like the user's current intent.
+    enabled: connector.enabled !== false,
+    autoStart: connector.enabled !== false,
     // Read-time compatibility: connectors saved before auto-reconnect
     // existed have no `autoReconnect` field; default them to true so existing
     // users get keepalive without a migration script. Only an explicit `false`
@@ -305,6 +376,31 @@ function normalizeConnector(connector, fallbackId = "") {
   };
 }
 
+/**
+ * Three different switches in this system are spelled `enabled`. They are not
+ * interchangeable, and reading one where another was meant silently changes who
+ * a decision belongs to:
+ *
+ *   - `config.enabled` — the global master switch. Off means MCP does nothing
+ *     at all, for every agent.
+ *   - `connector.enabled` — the connector's own persisted lifecycle switch,
+ *     which this predicate reads. It decides whether the connector connects at
+ *     launch and on demand, and it applies to every agent alike. This file is
+ *     its authority: setConnectorEnabled is the only writer.
+ *   - `agentConfig.mcp.connectors[id].enabled` — a per-agent exposure gate,
+ *     read in isMcpToolEnabledForAgentConfig. It decides whether one agent may
+ *     see a connector that is already switched on, and never starts or stops
+ *     anything.
+ *
+ * Absent means enabled: a connector present in the config is one the user meant
+ * to have, so only an explicit opt-out switches it off. Reading it through one
+ * predicate keeps that default from being restated (and eventually mis-stated)
+ * at each call site.
+ */
+export function isConnectorEnabled(connector) {
+  return connector?.enabled !== false;
+}
+
 export function sanitizeId(value) {
   return String(value || "")
     .trim()
@@ -323,30 +419,74 @@ export function toMcpToolId(serverId, toolName) {
 }
 
 /**
- * Refuse any ambiguous projection before tools reach the model or catalog.
- * Lowercasing is intentionally lossy for display names; this check is what
- * prevents two distinct server identities from silently sharing one executor.
+ * Find every model-facing tool id that more than one raw identity claims.
+ *
+ * Lowercasing and sanitizing are lossy by design: display names keep their
+ * case and their punctuation, the id the model sees does not. Two distinct raw
+ * identities can therefore land on one canonical name, in two ways that both
+ * occur in the wild — two connectors whose ids differ only in case, and one
+ * connector whose server lists two tool names that differ only in characters
+ * `sanitizeId` folds away or strips.
+ *
+ * Ambiguity fails closed: when several identities claim one name there is no
+ * way to say which executor a call was meant for, so every claimant is dropped
+ * rather than one being picked. That verdict is unchanged. What changed is
+ * where it lands. This used to throw out of config normalization, which meant
+ * one bad pair anywhere in the file failed every config read — including the
+ * one the server performs while starting, so a single duplicated tool name
+ * took the whole application down. A bad config may only degrade the tools it
+ * actually made ambiguous, so the finding is returned and the caller that
+ * publishes tools is the one that drops them.
+ *
+ * Returns canonical id -> the claimants, in the order encountered, and only
+ * for ids with more than one. The host's own connectors_status tool seeds the
+ * table, so a connector tool that would shadow it counts as ambiguous too.
+ *
+ * That seed is the one exception to "every claimant is dropped". The status
+ * tool is published before any connector tool is considered, and it is a host
+ * diagnostic rather than a connector's capability, so it stays and only the
+ * connector side of that clash goes. Callers mark those entries so a notice
+ * does not tell the user both sides were disabled when one of them was not.
  */
-export function assertUniqueMcpToolIds(connectors) {
-  const seen = new Map([
-    [MCP_CONNECTORS_STATUS_TOOL_NAME, { connectorId: MCP_TOOL_NAMESPACE, toolName: MCP_CONNECTORS_STATUS_TOOL_NAME }],
+export function computeMcpToolIdCollisions(connectors) {
+  const claimed = new Map([
+    [MCP_CONNECTORS_STATUS_TOOL_NAME, [{ connectorId: MCP_TOOL_NAMESPACE, toolName: MCP_CONNECTORS_STATUS_TOOL_NAME }]],
   ]);
   for (const connector of Array.isArray(connectors) ? connectors : []) {
     for (const tool of connector?.tools || []) {
       const canonical = toMcpToolId(connector.id, tool.name);
-      const previous = seen.get(canonical);
-      if (!previous) {
-        seen.set(canonical, { connectorId: connector.id, toolName: tool.name });
-        continue;
-      }
-      const error: any = new Error(
-        `MCP tool id collision "${canonical}": `
-        + `"${previous.connectorId}/${previous.toolName}" and "${connector.id}/${tool.name}" `
-        + "both normalize to the same lowercase model-facing name. Rename the connector id or server tool.",
-      );
-      error.code = "MCP_TOOL_ID_COLLISION";
-      throw error;
+      const claimants = claimed.get(canonical);
+      if (claimants) claimants.push({ connectorId: connector.id, toolName: tool.name });
+      else claimed.set(canonical, [{ connectorId: connector.id, toolName: tool.name }]);
     }
+  }
+  const collisions = new Map();
+  for (const [canonical, claimants] of claimed) {
+    if (claimants.length > 1) collisions.set(canonical, claimants);
+  }
+  return collisions;
+}
+
+/**
+ * Refuse a connector id that no longer tells itself apart from an existing one.
+ *
+ * Two connector ids that differ only in case, or only in characters sanitizeId
+ * folds away, prefix every tool they carry identically — so accepting the
+ * second one makes both connectors' entire tool lists ambiguous at once. The
+ * check belongs at the write boundary because only the writer can still do
+ * something useful about it: refuse the save and name the connector to rename.
+ * Once it is on disk the reader can do nothing but drop the tools.
+ */
+function assertConnectorIdIsDistinct(connectors, id, { excludeId = "" } = {}) {
+  const canonical = sanitizeId(id).toLowerCase();
+  for (const existing of Array.isArray(connectors) ? connectors : []) {
+    if (excludeId && existing.id === excludeId) continue;
+    if (sanitizeId(existing.id).toLowerCase() !== canonical) continue;
+    const error: any = new Error(
+      `MCP connector id "${id}" conflicts with existing connector "${existing.id}" after normalization`,
+    );
+    error.code = "MCP_CONNECTOR_ID_COLLISION";
+    throw error;
   }
 }
 
@@ -376,7 +516,6 @@ export function normalizeMcpConfig(value) {
   const connectors = rawConnectors
     .map((connector, index) => normalizeConnector(connector, `connector_${index + 1}`))
     .filter(Boolean);
-  assertUniqueMcpToolIds(connectors);
   return {
     ...DEFAULT_CONFIG,
     enabled: input.enabled === true,
@@ -416,6 +555,7 @@ interface McpLiveAvailabilityInput {
   serverId?: string;
   toolName?: string;
   connectorPresent?: boolean;
+  connectorEnabled?: boolean;
   toolPresent?: boolean;
   status?: string;
   transportAvailable?: boolean;
@@ -439,6 +579,7 @@ export function probeMcpToolLiveAvailability(agentConfig, {
   serverId,
   toolName,
   connectorPresent,
+  connectorEnabled = true,
   toolPresent,
   status,
   transportAvailable,
@@ -456,6 +597,12 @@ export function probeMcpToolLiveAvailability(agentConfig, {
   }
   if (connectorPresent !== true) {
     return { available: false, reason: "mcp_connector_removed", diagnostics };
+  }
+  if (connectorEnabled === false) {
+    // Ahead of the per-agent gate and the transport checks on purpose: a
+    // switched-off connector is not going to start, so reporting it as merely
+    // stopped would point at a retry that cannot work.
+    return { available: false, reason: "mcp_connector_disabled", diagnostics };
   }
   if (toolPresent !== true) {
     return { available: false, reason: "mcp_tool_removed", diagnostics };
@@ -518,11 +665,21 @@ function statusConnectorView(connector) {
     id: connector.id,
     name: connector.name,
     transport: connector.transport,
+    // Switched off is not the same fact as not running, and the agent acts on
+    // the difference: one is fixed by starting the connector, the other only
+    // by the user turning it back on.
+    enabled: isConnectorEnabled(connector),
     status: connector.status,
     error: connector.error || "",
     authType: connector.authType,
     authStatus: connector.authStatus,
     toolCount: Array.isArray(connector.tools) ? connector.tools.length : 0,
+    // toolCount counts what the connector is configured with, so a dropped
+    // tool leaves the agent looking at a healthy connector whose tool is
+    // nowhere to be found — indistinguishable from a server that never
+    // offered it. Carrying the same entries the settings page shows lets the
+    // agent name the clash instead of guessing at an absence.
+    collisions: Array.isArray(connector.collisions) ? connector.collisions : [],
   };
 }
 
@@ -698,6 +855,7 @@ interface McpManagerOptions {
 export class McpManager {
   declare Client: any;
   declare clientErrors: any;
+  declare toolCollisions: any;
   declare toolListFreshness: any;
   declare _runtimeToolAnnotations: Map<string, Map<string, any>>;
   declare _getConfirmStore: any;
@@ -713,6 +871,8 @@ export class McpManager {
   declare oauthSessions: any;
   declare reconnectState: any;
   declare refreshInFlight: any;
+  declare _lazyStarts: Map<string, Promise<any>>;
+  declare _toolListings: Map<string, number>;
   declare _bus: any;
   declare _busDisposers: any;
   declare _configStore: any;
@@ -752,6 +912,11 @@ export class McpManager {
     ));
     this.clients = new Map();
     this.clientErrors = new Map();
+    // Per-connector record of the tools registerCachedTools refused to publish
+    // because another raw identity normalizes onto the same model-facing id.
+    // Rebuilt wholesale on every registration, exactly like the tool list it
+    // explains, so a notice can never outlive the projection it describes.
+    this.toolCollisions = new Map();
     // Per-connector tool-list caching hints from the last refresh. Deliberately
     // in memory only: a hint describes one live response, so persisting it
     // would let it outlive the answer it describes.
@@ -787,6 +952,14 @@ export class McpManager {
     // In-flight OAuth refresh promises keyed by connector id. Guarantees a single
     // refresh per connector even under concurrent near-expiry / 401 callers.
     this.refreshInFlight = new Map();
+    // In-flight lazy starts keyed by connector id. A burst of tool calls against
+    // one idle connector must produce one connection attempt, not one per call.
+    this._lazyStarts = new Map();
+    // How many times each connector's tools have been listed and stored in this
+    // process. Only ever compared for change, by a refresh that had to start the
+    // connector first and needs to know whether the start already did the
+    // listing. Never persisted: it describes this process's own work.
+    this._toolListings = new Map();
   }
 
   /**
@@ -807,7 +980,7 @@ export class McpManager {
     this.registerCachedTools();
     const config = this.getConfig();
     if (config.enabled) {
-      for (const connector of config.connectors.filter((s) => s.autoStart)) {
+      for (const connector of config.connectors.filter(isConnectorEnabled)) {
         this.startConnector(connector.id, { retryInitialFailure: true }).catch((err) => {
           this.log.warn(`auto-start failed for ${connector.id}: ${err.message}`);
         });
@@ -835,10 +1008,13 @@ export class McpManager {
     }
     this.clients.clear();
     this.clientErrors.clear();
+    this.toolCollisions.clear();
     this.connectorStatus.clear();
     this.desiredStates.clear();
     this.oauthSessions.clear();
     this.refreshInFlight.clear();
+    this._lazyStarts.clear();
+    this._toolListings.clear();
   }
 
   getConfig() {
@@ -892,6 +1068,7 @@ export class McpManager {
       error: this.clientErrors.get(connector.id) || "",
       toolListFreshness: this.toolListFreshness.get(connector.id) || null,
       toolAnnotations: this._runtimeToolAnnotations.get(connector.id) || null,
+      collisions: this.toolCollisions.get(connector.id) || [],
     }));
     return {
       enabled: config.enabled,
@@ -927,6 +1104,7 @@ export class McpManager {
       connectorId,
       toolName,
       connectorPresent,
+      connectorEnabled: isConnectorEnabled(connector),
       toolPresent,
       status,
       transportAvailable: this.clients.get(connectorId)?.running === true,
@@ -947,11 +1125,42 @@ export class McpManager {
     return saved;
   }
 
+  /**
+   * Write down that the user wants this connector on or off.
+   *
+   * This is the only writer of the per-connector switch, and it exists so the
+   * two entry points that carry a user's decision (the settings action and the
+   * HTTP route) share one implementation. Everything the runtime does on its
+   * own — starting connectors at launch, reconnecting after a drop, tearing
+   * down on dispose — deliberately goes straight to startConnector /
+   * stopConnector and leaves the stored intent alone. Otherwise a server that
+   * happened to be unreachable at launch would end up recorded as "the user
+   * turned this off".
+   *
+   * Callers must pair this with the matching transport action, in this order:
+   * persist first, then start or stop. Writing the decision down before the
+   * attempt is what makes it survive a connection that fails right now, and
+   * startConnector refuses a connector whose switch is still off. Both entry
+   * points' call sites point here rather than restating the rule.
+   */
+  async setConnectorEnabled(id, enabled) {
+    const config = this.getConfig();
+    const connector = config.connectors.find((item) => item.id === id);
+    if (!connector) throw new Error(`MCP connector "${id}" not found`);
+    connector.enabled = enabled === true;
+    const saved = this.saveConfig(config);
+    return saved.connectors.find((item) => item.id === id);
+  }
+
   addConnector(input) {
     const config = this.getConfig();
     const id = uniqueConnectorId(config.connectors, input?.id || input?.name || input?.url || input?.command || "connector");
     const connector = normalizeConnector({ ...input, id }, id);
     validateConnector(connector);
+    // uniqueConnectorId only avoids an exactly taken id. An id that differs
+    // from an existing one by case alone survives it and would then make both
+    // connectors' tools ambiguous, so it is refused here instead.
+    assertConnectorIdIsDistinct(config.connectors, connector.id);
     config.connectors.push(connector);
     const saved = this.saveConfig(config);
     this.registerCachedTools();
@@ -992,6 +1201,10 @@ export class McpManager {
         const id = uniqueConnectorId([...config.connectors, ...staged], input?.id || input?.name || input?.url || input?.command || "connector");
         const connector = normalizeConnector({ ...input, id }, id);
         validateConnector(connector);
+        // Checked against the batch in progress too, so an imported file that
+        // carries two case-variant ids fails the row that introduces the clash
+        // rather than saving a pair whose tools all go missing afterwards.
+        assertConnectorIdIsDistinct([...config.connectors, ...staged], connector.id);
         staged.push(connector);
         results.push({ ok: true, id });
       } catch (err) {
@@ -1025,7 +1238,15 @@ export class McpManager {
    * thrown back at the add request.
    */
   async autoStartAfterAdd(id) {
-    if (this.getConfig().enabled !== true) return;
+    const config = this.getConfig();
+    if (config.enabled !== true) return;
+    // Imported configs may legitimately ship switched-off connectors, and the
+    // same gate load() applies has to apply here. Dialling one anyway costs
+    // more than a wasted connection: the start would record "wanted running"
+    // in memory while the disk says off, and every later drop would reconnect
+    // forever against the user's stated intent.
+    const connector = config.connectors.find((item) => item.id === id);
+    if (!isConnectorEnabled(connector)) return;
     try {
       await this.startConnector(id);
     } catch {
@@ -1040,8 +1261,21 @@ export class McpManager {
     if (index === -1) throw new Error(`MCP connector "${id}" not found`);
     const existing = config.connectors[index];
     const unmaskedPatch = unmaskConnectorPatch(existing, patch || {});
+    // The switch is dropped here rather than only at the settings-action layer
+    // because the HTTP route hands its request body to this method directly,
+    // and a second writer is exactly what the single-writer rule is for. The
+    // connector keeps whatever the last start/stop decision recorded.
+    delete unmaskedPatch.enabled;
     const next = normalizeConnector({ ...existing, ...unmaskedPatch, id: existing.id, tools: patch?.tools || existing.tools }, existing.id);
     validateConnector(next);
+    // Only when the id actually moves. An edit that leaves the id alone must
+    // stay possible even on a config that already holds a clashing pair —
+    // otherwise the user could not use this screen to repair the very config
+    // the check is complaining about. Today the id is pinned to the existing
+    // one above, so this guards a patchable id rather than the current one.
+    if (next.id !== existing.id) {
+      assertConnectorIdIsDistinct(config.connectors, next.id, { excludeId: existing.id });
+    }
     const changedClient = connectorClientFingerprint(next) !== connectorClientFingerprint(existing);
     config.connectors[index] = next;
     const saved = this.saveConfig(config);
@@ -1057,6 +1291,11 @@ export class McpManager {
 
   async removeConnector(id) {
     await this.stopConnector(id);
+    // stopConnector only tears down per-client state when there was a client to
+    // tear down. A connector that is going away for good takes its bookkeeping
+    // with it either way, so nothing is left keyed to an id that no longer names
+    // anything.
+    this._toolListings.delete(id);
     const config = this.getConfig();
     config.connectors = config.connectors.filter((s) => s.id !== id);
     const saved = this.saveConfig(config);
@@ -1073,6 +1312,16 @@ export class McpManager {
     if (!config.enabled) throw new Error("MCP connectors are disabled globally");
     const connector = config.connectors.find((s) => s.id === id);
     if (!connector) throw new Error(`MCP connector "${id}" not found`);
+    // Starting a switched-off connector is refused here rather than left to
+    // each caller to remember. Everything below records "wanted running", and a
+    // run recorded against a connector the disk says is off is exactly the
+    // divergence the switch exists to prevent. It fails loudly instead of
+    // quietly doing nothing: a caller that got here without flipping the switch
+    // first has a bug worth seeing. The two user entry points persist the
+    // switch before they call this, so they never meet it.
+    if (!isConnectorEnabled(connector)) {
+      throw new Error(`MCP connector "${id}" is disabled; enable it in Settings → MCP before starting`);
+    }
     // Record intent up front: a manual/auto start means the user wants this
     // connector running, which is what later authorizes auto-reconnect.
     this.desiredStates.set(id, "running");
@@ -1164,6 +1413,12 @@ export class McpManager {
     this.clientErrors.delete(id);
     // The hint described that client's last response; it dies with the client.
     this.toolListFreshness.delete(id);
+    // Likewise the listing count: it records work done on connections that are
+    // now gone. Restarting counts from scratch, which the refresh path reads
+    // correctly — it only ever asks whether a listing finished while it waited,
+    // and a count that restarts can answer that wrongly in one direction only,
+    // by making the refresh do its own listing.
+    this._toolListings.delete(id);
     await client.stop();
   }
 
@@ -1229,16 +1484,23 @@ export class McpManager {
     this.clientErrors.set(id, reason);
   }
 
-  // Is this connector still one the user wants live, and that still exists and is
-  // globally enabled? These are the intent gates that say "this connector is a
-  // going concern" — independent of the keepalive (autoReconnect) preference.
-  // A needs-auth credential fact is reported whenever this holds, even when
-  // autoReconnect is off (re-auth is orthogonal to retry-on-drop).
+  // Is this connector still one the user wants live? Four gates: the process
+  // was asked to run it, MCP is globally on, the connector still exists, and
+  // its own switch is on. These say "this connector is a going concern" —
+  // independent of the keepalive (autoReconnect) preference. A needs-auth
+  // credential fact is reported whenever this holds, even when autoReconnect is
+  // off (re-auth is orthogonal to retry-on-drop).
+  //
+  // The persisted switch is checked here rather than trusted to whoever set
+  // desiredStates, because the two live in different places and can disagree:
+  // desiredStates is this process's memory, the switch is what the user last
+  // decided. When they disagree the user's decision wins, so a connector
+  // switched off never reconnects on the strength of a stale in-memory intent.
   _isDesiredLiveConnector(id) {
     if (this.desiredStates.get(id) !== "running") return false;
     const config = this.getConfig();
     if (!config.enabled) return false;
-    return config.connectors.some((s) => s.id === id);
+    return config.connectors.some((s) => s.id === id && isConnectorEnabled(s));
   }
 
   // Reconnect is permitted only when ALL intent gates agree. This is the red
@@ -1327,7 +1589,43 @@ export class McpManager {
   }
 
   async refreshTools(id) {
-    const client = this.clients.get(id);
+    const config = this.getConfig();
+    if (!config.enabled) throw new Error("MCP connectors are disabled globally");
+    const connector = config.connectors.find((s) => s.id === id);
+    if (!connector) throw new Error(`MCP connector "${id}" not found`);
+    // Same split callTool makes: switched off is a decision only the user can
+    // undo, so say so and leave the connector down; not connected yet is the
+    // runtime's own problem, so bring it up rather than fail the request.
+    if (!isConnectorEnabled(connector)) {
+      throw new Error(`MCP connector "${id}" is disabled; enable it in Settings → MCP to use this tool`);
+    }
+    let client = this.clients.get(id);
+    // No on-demand start while this connector is mid-connection: the listing
+    // that finishes a connection is issued from inside that very attempt, so
+    // starting the connector from here would be waiting on the attempt this
+    // call is a part of.
+    if (!client?.running && !this.establishing.has(id)) {
+      const listedBefore = this._toolListings.get(id) ?? 0;
+      await this._ensureConnectorStarted(id);
+      // Establishing a connection lists the connector's tools as its last step,
+      // so when that happened the stored list is the answer of a listing that
+      // finished moments ago on this very connection — asking again would only
+      // repeat the round trip. The counter is what tells that apart from a start
+      // that found an already-live client and listed nothing: in that case there
+      // is no fresh answer to hand back and we still have to ask ourselves.
+      //
+      // That second case is defensive rather than reachable today: this method
+      // reads the client and enters the branch in one tick, and a start racing
+      // in alongside marks the connector as establishing, which the guard above
+      // already excludes. It is written and tested anyway because the condition
+      // it protects is a property of the counter, not of today's call graph —
+      // the alternative is a branch that silently starts serving stored data if
+      // some future caller ever does reach it.
+      if ((this._toolListings.get(id) ?? 0) !== listedBefore) {
+        return this.getConfig().connectors.find((s) => s.id === id)?.tools || [];
+      }
+      client = this.clients.get(id);
+    }
     if (!client?.running) throw new Error(`MCP connector "${id}" is not running`);
     const tools = await client.listTools();
     this.toolListFreshness.set(id, client.toolListFreshness ?? null);
@@ -1335,13 +1633,24 @@ export class McpManager {
     // projects them away on the way to disk. This is the only point where the
     // live, server-declared annotations exist.
     this._captureRuntimeToolAnnotations(id, tools);
-    const config = this.getConfig();
-    const connector = config.connectors.find((s) => s.id === id);
-    if (!connector) throw new Error(`MCP connector "${id}" not found`);
-    connector.tools = tools.map(normalizeTool).filter(Boolean);
-    this.saveConfig(config);
+    // Re-read rather than reuse the snapshot taken before the listing: the call
+    // above is an await, and saving a snapshot from before it would write back
+    // whatever else changed meanwhile.
+    const latest = this.getConfig();
+    const latestConnector = latest.connectors.find((s) => s.id === id);
+    if (!latestConnector) throw new Error(`MCP connector "${id}" not found`);
+    latestConnector.tools = tools.map(normalizeTool).filter(Boolean);
+    // Hand back what was actually stored, not the pre-normalization local list:
+    // saveConfig folds duplicate names, so returning the mutation would let a
+    // caller act on tools that are not on disk.
+    const saved = this.saveConfig(latest);
     this.registerCachedTools();
-    return connector.tools;
+    // Counted only once the list is on disk. A refresh that inherits this
+    // listing answers by reading the store, so bumping any earlier would make
+    // the count visible while the store still holds the previous list — the
+    // inheriting caller would hand back data this one had not written yet.
+    this._toolListings.set(id, (this._toolListings.get(id) ?? 0) + 1);
+    return saved.connectors.find((s) => s.id === id)?.tools || [];
   }
 
   /**
@@ -1355,7 +1664,8 @@ export class McpManager {
     const table = new Map();
     for (const tool of Array.isArray(wireTools) ? wireTools : []) {
       if (!tool || typeof tool.name !== "string" || !tool.name) continue;
-      if (isPlainObject(tool.annotations)) table.set(tool.name, tool.annotations);
+      if (!isPlainObject(tool.annotations)) continue;
+      table.set(tool.name, mergeDuplicateToolAnnotations(table.get(tool.name), tool.annotations));
     }
     this._runtimeToolAnnotations.set(connectorId, table);
   }
@@ -1404,11 +1714,22 @@ export class McpManager {
     if (!isUiResourceUri(resourceUri)) throw new Error("MCP app resource uri must start with ui://");
     const config = this.getConfig();
     if (!config.enabled) throw new Error("MCP connectors are disabled globally");
-    if (!config.connectors.some((connector) => connector.id === connectorId)) {
-      throw new Error(`MCP connector "${connectorId}" not found`);
+    const connector = config.connectors.find((entry) => entry.id === connectorId);
+    if (!connector) throw new Error(`MCP connector "${connectorId}" not found`);
+    // Same split callTool makes: switched off is a decision only the user can
+    // undo, so say so and leave the connector down; not connected yet is the
+    // runtime's own problem, so bring it up rather than fail the request.
+    if (!isConnectorEnabled(connector)) {
+      throw new Error(`MCP connector "${connectorId}" is disabled; enable it in Settings → MCP to use this tool`);
     }
-    const client = this.clients.get(connectorId);
-    if (!client?.running) throw new Error(`MCP connector "${connectorId}" is not running`);
+    let client = this.clients.get(connectorId);
+    if (!client?.running) {
+      await this._ensureConnectorStarted(connectorId);
+      client = this.clients.get(connectorId);
+      if (!client?.running) throw new Error(`MCP connector "${connectorId}" is not running`);
+    }
+    // Asked only of a live connection: what a connector can do is a property of
+    // the client we ended up with, not of the one we started out without.
     if (typeof client.readResource !== "function") {
       throw new Error(`MCP connector "${connectorId}" does not support resources/read`);
     }
@@ -1419,17 +1740,42 @@ export class McpManager {
     this._requireAppVisibleTool(connectorId, toolName);
     const config = this.getConfig();
     if (!config.enabled) throw new Error("MCP connectors are disabled globally");
-    const client = this.clients.get(connectorId);
-    if (!client?.running) throw new Error(`MCP connector "${connectorId}" is not running`);
+    const connector = config.connectors.find((entry) => entry.id === connectorId);
+    if (!connector) throw new Error(`MCP connector "${connectorId}" not found`);
+    // Same split callTool makes: switched off is a decision only the user can
+    // undo, so say so and leave the connector down; not connected yet is the
+    // runtime's own problem, so bring it up rather than fail the request.
+    if (!isConnectorEnabled(connector)) {
+      throw new Error(`MCP connector "${connectorId}" is disabled; enable it in Settings → MCP to use this tool`);
+    }
+    let client = this.clients.get(connectorId);
+    if (!client?.running) {
+      await this._ensureConnectorStarted(connectorId);
+      client = this.clients.get(connectorId);
+      if (!client?.running) throw new Error(`MCP connector "${connectorId}" is not running`);
+    }
     return client.callTool(toolName, args || {});
   }
 
   async callTool(connectorId, toolName, args, runtimeCtx: any = {}) {
     const config = this.getConfig();
     if (!config.enabled) throw new Error("MCP connectors are disabled globally");
-    const client = this.clients.get(connectorId);
-    if (!client?.running) throw new Error(`MCP connector "${connectorId}" is not running`);
     const connector = config.connectors.find((entry) => entry.id === connectorId);
+    if (!connector) throw new Error(`MCP connector "${connectorId}" not found`);
+    // Two very different reasons for "no live connection", told apart because
+    // they need different things from the user. Switched off is a decision they
+    // made and only they can undo; merely idle (never started this process, or
+    // dropped since) is the runtime's problem to solve, so we solve it here
+    // rather than failing a call the connector is perfectly able to serve.
+    if (!isConnectorEnabled(connector)) {
+      throw new Error(`MCP connector "${connectorId}" is disabled; enable it in Settings → MCP to use this tool`);
+    }
+    let client = this.clients.get(connectorId);
+    if (!client?.running) {
+      await this._ensureConnectorStarted(connectorId);
+      client = this.clients.get(connectorId);
+      if (!client?.running) throw new Error(`MCP connector "${connectorId}" is not running`);
+    }
     return this._callToolThroughInputRounds(client, {
       connectorId,
       connectorName: connector?.name || connectorId,
@@ -1437,6 +1783,34 @@ export class McpManager {
       args,
       runtimeCtx,
     });
+  }
+
+  /**
+   * Bring an enabled connector up on demand, at most once at a time.
+   *
+   * A model that decides to use a tool tends to issue several calls at once, so
+   * the in-flight attempt is shared: without it every call in the burst would
+   * spawn its own process or open its own session. Deliberately not a method
+   * marked async — the registration has to happen before the caller's first
+   * await, or two calls made in the same tick would both miss the entry.
+   *
+   * Retrying on the backoff schedule is left off: the caller is waiting on this
+   * attempt, so a failure has to come back now, with the transport's own reason
+   * plus a pointer to where the details live.
+   */
+  _ensureConnectorStarted(id) {
+    const inFlight = this._lazyStarts.get(id);
+    if (inFlight) return inFlight;
+    const attempt = this.startConnector(id, { retryInitialFailure: false })
+      .catch((err) => {
+        const reason = err?.message || String(err);
+        throw new Error(`${reason} (automatic reconnect failed; start it manually in Settings → MCP for details)`);
+      })
+      .finally(() => {
+        this._lazyStarts.delete(id);
+      });
+    this._lazyStarts.set(id, attempt);
+    return attempt;
   }
 
   // A server may answer a tool call by asking for more information instead of
@@ -1574,6 +1948,14 @@ export class McpManager {
    * Rebuild the agent-facing tool list from the cached connector config.
    * The whole list is replaced at once: cached tools are a pure projection of
    * config, so there is no incremental state to reconcile.
+   *
+   * This is also where a canonical id collision is acted on. Two raw identities
+   * that normalize onto one model-facing name are ambiguous, and the response
+   * to ambiguity is to publish neither of them: choosing one would route the
+   * user's call to a server they never named. Every other tool in the config,
+   * including the rest of the offending connectors' own tools, is published as
+   * usual, and each claimant is recorded so the settings page can say what went
+   * missing and why.
    */
   registerCachedTools() {
     const tools = [];
@@ -1583,8 +1965,57 @@ export class McpManager {
     });
     tools.push(this._publishTool(statusDefinition));
     const config = this.getConfig();
-    for (const connector of config.connectors) {
+    // A connector the user switched off leaves the model's world entirely: its
+    // tools are not published, and it does not claim a canonical id either.
+    // The claim matters as much as the publication — ambiguity is what costs a
+    // tool its place, and a connector nobody can call is not a claimant, so
+    // letting a switched-off one keep its claim would take a live connector's
+    // identically-named tool down with it. This is the model's view only: the
+    // settings page still lists every connector, because a connector the user
+    // cannot see is one the user cannot switch back on.
+    const liveConnectors = config.connectors.filter(isConnectorEnabled);
+    const collisions = computeMcpToolIdCollisions(liveConnectors);
+    this.toolCollisions = new Map();
+    for (const connector of liveConnectors) {
       for (const tool of connector.tools || []) {
+        const canonical = toMcpToolId(connector.id, tool.name);
+        const claimants = collisions.get(canonical);
+        if (claimants) {
+          // Name one other claimant rather than all of them: two is the case
+          // that actually happens, and one concrete counterpart is what makes
+          // the notice actionable. Falling back to this same entry keeps the
+          // notice truthful for a hand-edited config that lists one identity
+          // twice, instead of reporting an undefined counterpart.
+          const other = claimants.find(
+            (claim) => claim.connectorId !== connector.id || claim.toolName !== tool.name,
+          ) || { connectorId: connector.id, toolName: tool.name };
+          // The host diagnostic is already published and is not a connector
+          // capability, so this clash costs the connector's tool alone. Flagged
+          // rather than inferred downstream, because "mcp" is a legal connector
+          // id and a surface comparing ids could not tell the two apart.
+          // Matched on the seeded bucket as well as the claimant, because a
+          // connector legitimately named "mcp" carrying a tool named
+          // "connectors_status" produces that same pair under a different
+          // canonical id, and it is not the host.
+          const host = canonical === MCP_CONNECTORS_STATUS_TOOL_NAME
+            && other.connectorId === MCP_TOOL_NAMESPACE
+            && other.toolName === MCP_CONNECTORS_STATUS_TOOL_NAME;
+          const bucket = this.toolCollisions.get(connector.id) || [];
+          bucket.push({
+            canonical,
+            toolName: tool.name,
+            otherConnectorId: other.connectorId,
+            otherToolName: other.toolName,
+            ...(host ? { host: true } : {}),
+          });
+          this.toolCollisions.set(connector.id, bucket);
+          this.log.warn(
+            `MCP tool "${connector.id}/${tool.name}" was not registered: it and `
+            + `"${other.connectorId}/${other.toolName}" both normalize to "${canonical}". `
+            + "Rename the connector id or the server tool.",
+          );
+          continue;
+        }
         const definition = createMcpToolDefinition({
           connectorId: connector.id,
           serverId: connector.id,
@@ -1638,6 +2069,9 @@ export class McpManager {
   getCatalogEntries() {
     const entries = [];
     for (const connector of this.getConfig().connectors) {
+      // Same cut as the direct-load path. A tool the model can see in the
+      // catalog but can never load is worse than one it cannot see at all.
+      if (!isConnectorEnabled(connector)) continue;
       for (const tool of connector.tools || []) {
         if (!tool?.name) continue;
         entries.push({
@@ -1802,6 +2236,11 @@ export class McpManager {
 
       case "mcp.connector.start": {
         const connectorId = connectorIdFromPayload(input);
+        // Written down before the attempt, not after it: a connector the user
+        // asked for that fails to come up right now must still be tried again
+        // at the next launch. Recording only successful starts is how the old
+        // behaviour lost the user's decision on every restart.
+        await this.setConnectorEnabled(connectorId, true);
         const connector = await this.startConnector(connectorId);
         key = `mcp.connector.${connector.id}`;
         title = "MCP connector started";
@@ -1813,6 +2252,9 @@ export class McpManager {
       case "mcp.connector.stop": {
         const connectorId = connectorIdFromPayload(input);
         const connector = this.getConfig().connectors.find((item) => item.id === connectorId);
+        // A manual stop lasts until the user re-enables it, including across
+        // restarts — otherwise the connector would quietly come back.
+        await this.setConnectorEnabled(connectorId, false);
         await this.stopConnector(connectorId);
         key = `mcp.connector.${connectorId}`;
         title = "MCP connector stopped";
@@ -2213,7 +2655,11 @@ function connectorInputFromPayload(payload) {
 
 function connectorPatchFromPayload(payload) {
   const source = isPlainObject(payload.patch) ? payload.patch : payload;
-  return omitKeys(source, ["connectorId", "serverId", "id", "patch", "value"]);
+  // `enabled` is not an editable field here: it records a start/stop decision,
+  // and setConnectorEnabled is its only writer. An edit form that happened to
+  // echo it back would otherwise switch a connector off as a side effect of
+  // renaming it.
+  return omitKeys(source, ["connectorId", "serverId", "id", "patch", "value", "enabled"]);
 }
 
 function omitKeys(source, keys) {
@@ -2319,7 +2765,14 @@ function connectorClientFingerprint(connector) {
   });
 }
 
-function publicConnector({ connector, status, error = "", toolListFreshness = null, toolAnnotations = null }: any) {
+function publicConnector({
+  connector,
+  status,
+  error = "",
+  toolListFreshness = null,
+  toolAnnotations = null,
+  collisions = [],
+}: any) {
   return {
     ...connector,
     // Live annotations ride along the runtime view only, so surfaces can badge
@@ -2337,6 +2790,11 @@ function publicConnector({ connector, status, error = "", toolListFreshness = nu
     status,
     error,
     toolListFreshness,
+    // Tools this connector carries but that were not published, because some
+    // other raw identity normalizes onto the same model-facing name. Surfaces
+    // render them as a per-connector notice: without one, the tools would just
+    // be quietly missing and nobody could tell why.
+    collisions,
     apps: appsForConnector(connector),
     env: redactRecord(connector.env),
     headers: redactRecord(connector.headers),

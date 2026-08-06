@@ -40,7 +40,6 @@ const INITIAL_FORM = {
   headers: '',
   registryUrl: '',
   timeout: '',
-  autoStart: false,
   authType: 'none' as McpAuthType,
   authorizationToken: '',
   oauthClientId: '',
@@ -119,7 +118,6 @@ export function ConnectorForm({
       name: form.name,
       description: form.description,
       timeout: Number.isFinite(timeout) && timeout > 0 ? timeout : undefined,
-      autoStart: form.autoStart,
     };
     const input: McpConnectorInput = form.mode === 'local'
       ? {
@@ -333,26 +331,16 @@ export function ConnectorForm({
         </>
       )}
 
-      <div className={styles['settings-form-grid']}>
-        <div className={fieldHalfClass}>
-          <label className={styles['settings-form-label']}>{t('settings.mcp.timeout')}</label>
-          <input
-            className={styles['settings-input']}
-            type="number"
-            min={1}
-            value={form.timeout}
-            onChange={(e) => setForm({ ...form, timeout: e.target.value })}
-            placeholder="30"
-          />
-        </div>
-        <label className={`${fieldHalfClass} ${styles['settings-toggle-row']}`}>
-          <input
-            type="checkbox"
-            checked={form.autoStart}
-            onChange={(e) => setForm({ ...form, autoStart: e.target.checked })}
-          />
-          <span className={styles['settings-form-label']}>{t('settings.mcp.autoStart')}</span>
-        </label>
+      <div className={fieldFullClass}>
+        <label className={styles['settings-form-label']}>{t('settings.mcp.timeout')}</label>
+        <input
+          className={styles['settings-input']}
+          type="number"
+          min={1}
+          value={form.timeout}
+          onChange={(e) => setForm({ ...form, timeout: e.target.value })}
+          placeholder="30"
+        />
       </div>
 
       {error && <p className={styles['settings-muted-note']}>{error}</p>}
@@ -416,7 +404,6 @@ function formFromConnector(connector: McpConnector): typeof INITIAL_FORM {
     headers: serializeKeyValueLines(connector.headers),
     registryUrl: connector.registryUrl || '',
     timeout: connector.timeout ? String(connector.timeout) : '',
-    autoStart: connector.autoStart === true,
     authType: connector.authType || 'none',
     authorizationToken: connector.authorizationToken || '',
     oauthClientId: connector.oauthClientId || '',

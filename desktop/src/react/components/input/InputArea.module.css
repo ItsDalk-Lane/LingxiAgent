@@ -916,9 +916,10 @@
     transition: background var(--duration-fast) ease, color var(--duration-fast) ease;
 }
 
-.slash-busy-bar-clickable:hover {
+.slash-busy-bar-clickable:hover,
+.slash-busy-bar-clickable:focus-visible {
     color: var(--text);
-    background: var(--overlay-subtle, rgba(0, 0, 0, 0.02));
+    background: color-mix(in srgb, var(--panel-card-bg) 96%, var(--text) 4%);
 }
 
 .slash-busy-dot {

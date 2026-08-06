@@ -733,8 +733,37 @@ export function scanAndValidateDynamicCallSites({
 // Evidence source 3: nft trace of compiled bundles.
 // ---------------------------------------------------------------------------
 
+// Some native packages ship one npm package PER TARGET (napi-rs and esbuild
+// both do this): the variants are declared as optionalDependencies and npm
+// installs only the one matching the host, so the platform ends up in the
+// package NAME rather than inside a file the `.node` filter above can reach.
+// This is Node's own platform/arch vocabulary plus the libc/toolchain suffix
+// those packages append.
+const PLATFORM_VARIANT_SUFFIX_RE =
+  /-(?:aix|android|darwin|freebsd|linux|openbsd|sunos|win32)-(?:arm|arm64|ia32|loong64|mips64el|ppc|ppc64|riscv64|s390|s390x|x64)(?:-(?:eabi|eabihf|gnu|gnueabihf|msvc|musl))?$/;
+
+const PLATFORM_VARIANT_PLACEHOLDER = "<platform>";
+
+// Splits a traced path at its innermost `node_modules/<pkg>` boundary.
+// Returns null for paths that are not inside a package (repo sources) or that
+// stop at the package directory itself.
+export function splitNodeModulesPath(relPath) {
+  const marker = "node_modules/";
+  const idx = relPath.lastIndexOf(marker);
+  if (idx === -1) return null;
+  const base = relPath.slice(0, idx + marker.length);
+  const parts = relPath.slice(idx + marker.length).split("/");
+  const nameLen = parts[0].startsWith("@") ? 2 : 1;
+  if (parts.length <= nameLen) return null;
+  return {
+    base,
+    pkgName: parts.slice(0, nameLen).join("/"),
+    inner: parts.slice(nameLen).join("/"),
+  };
+}
+
 export function normalizeNftTraceFiles({ fileList, scratchRel }) {
-  return [...fileList]
+  const kept = [...fileList]
     .map(toPosix)
     .filter((relPath) => {
       if (relPath === scratchRel || relPath === "package.json") return false;
@@ -744,8 +773,40 @@ export function normalizeNftTraceFiles({ fileList, scratchRel }) {
       // change when npm ignore-scripts changes, while omitting the package's
       // JavaScript and metadata would still be incorrect.
       return path.posix.extname(relPath).toLowerCase() !== ".node";
-    })
-    .sort();
+    });
+
+  // A platform-variant package is only folded when BOTH hold: its name carries
+  // a platform suffix, AND (once its `.node` bytes are filtered above) it
+  // contributes nothing but its own package.json. The second condition is what
+  // keeps an ordinary package that merely looks platform-suffixed intact --
+  // folding one that ships real modules would erase real files from the census.
+  const contributions = new Map();
+  for (const relPath of kept) {
+    const split = splitNodeModulesPath(relPath);
+    if (!split) continue;
+    const key = split.base + split.pkgName;
+    if (!contributions.has(key)) contributions.set(key, []);
+    contributions.get(key).push(split.inner);
+  }
+  const foldable = new Set();
+  for (const [key, inners] of contributions) {
+    const pkgName = key.slice(key.lastIndexOf("node_modules/") + "node_modules/".length);
+    if (!PLATFORM_VARIANT_SUFFIX_RE.test(pkgName)) continue;
+    if (inners.length !== 1 || inners[0] !== "package.json") continue;
+    foldable.add(key);
+  }
+
+  const folded = kept.map((relPath) => {
+    const split = splitNodeModulesPath(relPath);
+    if (!split || !foldable.has(split.base + split.pkgName)) return relPath;
+    const stableName = split.pkgName.replace(
+      PLATFORM_VARIANT_SUFFIX_RE,
+      `-${PLATFORM_VARIANT_PLACEHOLDER}`,
+    );
+    return `${split.base}${stableName}/${split.inner}`;
+  });
+
+  return [...new Set(folded)].sort();
 }
 
 export async function traceNftRoot({ rootDir, root }) {

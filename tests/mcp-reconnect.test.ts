@@ -376,7 +376,7 @@ describe("MCP runtime auto-start initial failures", () => {
     factory.failNextStart(new Error("network unavailable"));
     const runtime = makeRuntime({
       enabled: true,
-      connectors: [{ ...STDIO_CONNECTOR, autoStart: true }],
+      connectors: [{ ...STDIO_CONNECTOR, enabled: true }],
     }, factory);
 
     await runtime.load();
@@ -406,7 +406,7 @@ describe("MCP runtime auto-start initial failures", () => {
     }));
     const runtime = makeRuntime({
       enabled: true,
-      connectors: [{ ...STDIO_CONNECTOR, autoStart: true }],
+      connectors: [{ ...STDIO_CONNECTOR, enabled: true }],
     }, factory);
 
     await runtime.load();
@@ -430,7 +430,7 @@ describe("MCP runtime auto-start initial failures", () => {
     factory.failNextStart(new Error("network unavailable"));
     const runtime = makeRuntime({
       enabled: true,
-      connectors: [{ ...STDIO_CONNECTOR, autoStart: true, autoReconnect: false }],
+      connectors: [{ ...STDIO_CONNECTOR, enabled: true, autoReconnect: false }],
     }, factory);
 
     await runtime.load();
@@ -442,6 +442,24 @@ describe("MCP runtime auto-start initial failures", () => {
       status: "stopped",
       error: "network unavailable",
     });
+
+    await runtime.dispose();
+  });
+
+  it("never dials or arms a reconnect for a connector that was added switched off", async () => {
+    const factory = makeFakeClientFactory();
+    const runtime = makeRuntime({ enabled: true, connectors: [] }, factory);
+    const connector = runtime.addConnector({ ...STDIO_CONNECTOR, enabled: false });
+
+    await runtime.autoStartAfterAdd(connector.id);
+    await vi.advanceTimersByTimeAsync(60_000);
+
+    // Dialling one anyway is worse than a wasted connection: the start records
+    // "wanted running" in memory while the disk says off, and every drop after
+    // that reconnects forever against the user's stated intent.
+    expect(factory.instances).toHaveLength(0);
+    expect(runtime.desiredStates.get(connector.id)).toBeUndefined();
+    expect(runtime.reconnectState.size).toBe(0);
 
     await runtime.dispose();
   });

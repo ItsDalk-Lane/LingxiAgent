@@ -712,6 +712,59 @@ describe("desktop launch failure dialog: data-epoch dedicated branches (C7 E4)",
   });
 });
 
+// crash.log 的版本头是热更新后唯一能分辨"崩的是哪份代码"的地方，而
+// desktop/main.cjs 既不在 eslint 覆盖面（全局 ignores 含 **/*.cjs）也不在
+// tsconfig include 内，这两行没有其它自动化保护，只能由本组契约测试盯住。
+describe("desktop crash log version header", () => {
+  function runWriteCrashLog(getCurrentContentVersion: () => string) {
+    const mainSource = fs.readFileSync(path.join(root, "desktop", "main.cjs"), "utf-8");
+    const writeCrashLog = extractFunctionSource(mainSource, "writeCrashLog");
+    const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), "hana-desktop-crash-log-"));
+    try {
+      const context = vm.createContext({
+        fs,
+        path,
+        process,
+        console: { error() {} },
+        // 壳版本刻意取一个明显早于内容版本的值：两行若被改回同源，断言立刻红。
+        app: { getVersion: () => "0.421.24" },
+        lingxiHome: homeDir,
+        getCurrentContentVersion,
+        _serverLogs: ["[stderr] boom\n"],
+        buildServerCrashDiagnostics: () => "--- Diagnostics ---",
+        redactMainLogText: (text: string) => text,
+      });
+      const returned = vm.runInContext(`${writeCrashLog}\nwriteCrashLog("simulated crash");`, context) as string;
+      const onDisk = fs.readFileSync(path.join(homeDir, "crash.log"), "utf-8");
+      return { returned, onDisk, header: onDisk.split("\n").slice(0, 3) };
+    } finally {
+      fs.rmSync(homeDir, { recursive: true, force: true });
+    }
+  }
+
+  it("writes the shell identity and the hot-updated content version as two separate lines", () => {
+    const { returned, onDisk, header } = runWriteCrashLog(() => "0.442.0");
+
+    expect(header).toEqual([
+      "=== LingxiAgent Crash Log ===",
+      "LingxiAgent shell: v0.421.24",
+      "Content: v0.442.0",
+    ]);
+    // 单行时代的旧格式不得复活：只报壳版本会把新内容里的崩溃标成老版本。
+    expect(onDisk).not.toMatch(/^LingxiAgent: v/m);
+    expect(returned).toBe(onDisk);
+  });
+
+  it("falls back to unknown for the content line without borrowing the shell version", () => {
+    const { header } = runWriteCrashLog(() => {
+      throw new Error("content version accessor unavailable");
+    });
+
+    expect(header[1]).toBe("LingxiAgent shell: v0.421.24");
+    expect(header[2]).toBe("Content: vunknown");
+  });
+});
+
 function extractFunctionSource(source: string, name: string) {
   const asyncStart = source.indexOf(`async function ${name}(`);
   const plainStart = source.indexOf(`function ${name}(`);

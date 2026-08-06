@@ -23,6 +23,7 @@ import { builtinModules } from "module";
 import { pathToFileURL } from "url";
 import ts from "typescript";
 import {
+  buildAnydocRuntimeSmokeScript,
   buildBetterSqliteRuntimeSmokeScript,
   buildJiebaRuntimeSmokeScript,
   buildExternalPackage,
@@ -500,8 +501,9 @@ async function readNftTraceSource(filePath) {
  * protected package directory (every package.json-declared external, since
  * their conditional-export / CJS-ESM resolution isn't always traced
  * correctly, plus their installed optionalDependencies). Then re-verifies
- * external entrypoints and runs the better-sqlite3 / @node-rs/jieba runtime
- * smoke tests when those packages are present in `externalPackageNames`.
+ * external entrypoints and runs the better-sqlite3 / @node-rs/jieba /
+ * @firecrawl/anydoc runtime smoke tests when those packages are present in
+ * `externalPackageNames`.
  *
  * @param {{
  *   outDir: string, nftRoots: string[], externalPackageNames: string[],
@@ -611,6 +613,20 @@ export async function pruneServerNodeModulesViaNft({
   if (externalPackageNames.includes("@node-rs/jieba")) {
     const smokeScript = path.join(outDir, ".jieba-smoke.mjs");
     fs.writeFileSync(smokeScript, buildJiebaRuntimeSmokeScript());
+    try {
+      runWithTargetNode(path.basename(smokeScript));
+    } finally {
+      fs.rmSync(smokeScript, { force: true });
+    }
+  }
+
+  // A packaged server whose document converter cannot load its native binary
+  // is a broken product, so this is a hard build failure. The runtime side is
+  // deliberately the opposite: a failed load there degrades one extraction
+  // attempt into a reported error and never takes the session down with it.
+  if (externalPackageNames.includes("@firecrawl/anydoc")) {
+    const smokeScript = path.join(outDir, ".anydoc-smoke.mjs");
+    fs.writeFileSync(smokeScript, buildAnydocRuntimeSmokeScript());
     try {
       runWithTargetNode(path.basename(smokeScript));
     } finally {

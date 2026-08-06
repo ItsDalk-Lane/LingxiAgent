@@ -6,6 +6,7 @@ import {
   MCP_CONNECTORS_STATUS_TOOL_NAME,
   createMcpConnectorsStatusToolDefinition,
   createMcpToolDefinition,
+  computeMcpToolIdCollisions,
   isMcpToolEnabledForAgentConfig,
   normalizeMcpConfig,
   resolveMcpToolPermissionKind,
@@ -113,24 +114,61 @@ describe("MCP runtime policy", () => {
     })).toBe(true);
   });
 
-  it("rejects raw MCP identities that collapse to the same lowercase tool id", () => {
+  it("reads back raw MCP identities that collapse to the same lowercase tool id", () => {
+    // Reading a config must never fail on account of its contents: every read
+    // of every session goes through here, so an exception raised on a bad pair
+    // used to take the whole runtime down with it. The ambiguity is reported
+    // instead, and acted on where the tools are published.
     for (const collidingTools of [
       [{ name: "SearchIssues" }, { name: "searchissues" }],
       [{ name: "search/issues" }, { name: "search.issues" }],
     ]) {
-      expect(() => normalizeMcpConfig({
+      const config = normalizeMcpConfig({
         enabled: true,
         connectors: [{ id: "GitHub", url: "https://mcp.example.test", tools: collidingTools }],
-      })).toThrow(/MCP tool id collision.*github.*GitHub\/.*both normalize/i);
+      });
+      expect(config.connectors[0].tools.map((tool) => tool.name))
+        .toEqual(collidingTools.map((tool) => tool.name));
+      const collisions = computeMcpToolIdCollisions(config.connectors);
+      expect([...collisions.values()][0]).toEqual(
+        collidingTools.map((tool) => ({ connectorId: "GitHub", toolName: tool.name })),
+      );
     }
 
-    expect(() => normalizeMcpConfig({
+    const crossConnector = normalizeMcpConfig({
       enabled: true,
       connectors: [
         { id: "GitHub", url: "https://one.example.test", tools: [{ name: "Search" }] },
         { id: "github", url: "https://two.example.test", tools: [{ name: "search" }] },
       ],
-    })).toThrow(/MCP tool id collision.*GitHub\/Search.*github\/search/i);
+    });
+    expect(computeMcpToolIdCollisions(crossConnector.connectors).get("github_search")).toEqual([
+      { connectorId: "GitHub", toolName: "Search" },
+      { connectorId: "github", toolName: "search" },
+    ]);
+  });
+
+  it("folds repeated tool names to their first occurrence within a connector", () => {
+    const config = normalizeMcpConfig({
+      enabled: true,
+      connectors: [{
+        id: "tushare",
+        transport: "stdio",
+        command: "python",
+        // Repeats are neither adjacent nor limited to a single pair: the fold
+        // is by name across the whole list, not a neighbour comparison.
+        tools: [
+          { name: "daily_report", description: "first", inputSchema: { type: "object" } },
+          { name: "daily_basic", description: "ok", inputSchema: { type: "object" } },
+          { name: "daily_report", description: "second copy", inputSchema: { type: "object" } },
+          { name: "daily_report", description: "third copy", inputSchema: { type: "object" } },
+        ],
+      }],
+    });
+
+    const tools = config.connectors[0].tools;
+    expect(tools.map((tool) => tool.name)).toEqual(["daily_report", "daily_basic"]);
+    expect(tools[0].description).toBe("first");
   });
 
   it("keeps legacy lowercase qualified names and raw permission keys compatible", () => {
@@ -459,7 +497,9 @@ describe("MCP runtime policy", () => {
         "X-API-Key": "key-123",
       },
       timeout: 45,
-      autoStart: true,
+      // An imported server is on by default; neither isActive nor autoStart is
+      // read as a gate any more.
+      enabled: true,
     });
     expect(config.connectors[1]).toMatchObject({
       id: "cherry-stdio",
@@ -467,7 +507,7 @@ describe("MCP runtime policy", () => {
       command: "npx",
       env: { API_KEY: "secret" },
       registryUrl: "https://registry.npmmirror.com",
-      autoStart: true,
+      enabled: true,
     });
   });
 
@@ -2087,6 +2127,285 @@ describe("MCP runtime OAuth persistence", () => {
   });
 });
 
+describe("MCP duplicate tool listings", () => {
+  /**
+   * A running connector whose server reports the given tool listing verbatim,
+   * duplicates included. Writes are persisted back into the in-memory store so
+   * a refresh can be read back the way the on-disk store behaves.
+   */
+  async function runtimeListing(listed) {
+    let stored: any = {
+      enabled: true,
+      connectors: [{ id: "tushare", name: "Tushare", url: "https://mcp.example.com/mcp" }],
+    };
+    const runtime = createManager({
+      dataDir: path.join(os.tmpdir(), "hana-mcp-duplicate-tools"),
+      config: {
+        get: vi.fn(() => stored),
+        set: (_key, value) => { stored = value; },
+      },
+    }, {
+      clientFactory: () => ({
+        running: true,
+        start: vi.fn(async () => {}),
+        stop: vi.fn(async () => {}),
+        listTools: vi.fn(async () => listed),
+      }),
+    });
+    await runtime.startConnector("tushare");
+    return runtime;
+  }
+
+  it("returns the folded tool list from refreshTools, identical to what was persisted", async () => {
+    const runtime = await runtimeListing([
+      { name: "daily_report", description: "first", inputSchema: { type: "object" } },
+      { name: "daily_basic", description: "ok", inputSchema: { type: "object" } },
+      { name: "daily_report", description: "second copy", inputSchema: { type: "object" } },
+    ]);
+
+    const returned = await runtime.refreshTools("tushare");
+    expect(returned.map((tool) => tool.name)).toEqual(["daily_report", "daily_basic"]);
+    expect(returned[0].description).toBe("first");
+
+    // The caller must not be handed a richer list than the one on disk: the
+    // settings page renders this return value directly after a refresh.
+    const persisted = runtime.getConfig().connectors.find((item) => item.id === "tushare").tools;
+    expect(returned).toEqual(persisted);
+  });
+
+  it("keeps a destructive declaration made by any occurrence of a repeated tool name", async () => {
+    const runtime = await runtimeListing([
+      {
+        name: "daily_report",
+        inputSchema: { type: "object" },
+        annotations: { destructiveHint: true, idempotentHint: true },
+      },
+      {
+        name: "daily_report",
+        inputSchema: { type: "object" },
+        annotations: { readOnlyHint: true, idempotentHint: false },
+      },
+    ]);
+    await runtime.refreshTools("tushare");
+
+    // Were the later entry to simply overwrite the earlier one, the side table
+    // would report a read-only tool and implicit trust could approve a call the
+    // server itself called destructive.
+    const annotations = runtime.getRuntimeToolAnnotations("tushare", "daily_report");
+    expect(annotations.destructiveHint).toBe(true);
+    expect(annotations.readOnlyHint).not.toBe(true);
+    // Lowering hints need every occurrence to agree, so one dissent is enough.
+    expect(annotations.idempotentHint).not.toBe(true);
+  });
+});
+
+describe("MCP canonical tool id collisions", () => {
+  /** A manager reading a fixed config out of memory, with writes captured. */
+  function runtimeWithConnectors(connectors) {
+    let stored: any = { enabled: true, connectors };
+    const set = vi.fn((_key, value) => { stored = value; });
+    const runtime = createManager({
+      dataDir: path.join(os.tmpdir(), "hana-mcp-tool-collisions"),
+      config: { get: () => stored, set },
+      log: { info: vi.fn(), warn: vi.fn(), error: vi.fn() },
+    }, {
+      // A stub transport, so a test that loads the config does not dial the
+      // example addresses these fixtures carry.
+      clientFactory: () => ({
+        running: true,
+        start: vi.fn(async () => {}),
+        stop: vi.fn(async () => {}),
+        listTools: vi.fn(async () => []),
+      }),
+    });
+    return { runtime, set };
+  }
+
+  it("reports every ambiguous canonical id and leaves unambiguous ones out", () => {
+    const { runtime } = runtimeWithConnectors([
+      { id: "Tushare", url: "https://one.example.test", tools: [{ name: "daily_report" }] },
+      {
+        id: "tushare",
+        url: "https://two.example.test",
+        tools: [{ name: "daily_report" }, { name: "daily_basic" }],
+      },
+    ]);
+
+    const collisions = computeMcpToolIdCollisions(runtime.getConfig().connectors);
+    expect(collisions.get("tushare_daily_report")).toEqual([
+      { connectorId: "Tushare", toolName: "daily_report" },
+      { connectorId: "tushare", toolName: "daily_report" },
+    ]);
+    // A tool only one identity claims is not ambiguous and must not be reported.
+    expect(collisions.has("tushare_daily_basic")).toBe(false);
+  });
+
+  it("skips every ambiguous entry when publishing and keeps the rest", () => {
+    const { runtime } = runtimeWithConnectors([
+      { id: "Tushare", url: "https://one.example.test", tools: [{ name: "daily_report" }] },
+      {
+        id: "tushare",
+        url: "https://two.example.test",
+        tools: [{ name: "daily_report" }, { name: "daily_basic" }],
+      },
+    ]);
+    runtime.registerCachedTools();
+
+    const published = runtime.getAllTools().map((tool) => tool.name);
+    // Neither claimant is published: with two identities behind one name there
+    // is no way to say which executor a call was meant for, so picking either
+    // would be routing the user's call by coin flip.
+    expect(published).not.toContain("mcp_tushare_daily_report");
+    expect(published).toContain("mcp_tushare_daily_basic");
+
+    // Both sides carry the notice, since either one of them is the fix.
+    const state = runtime.getState();
+    expect(state.connectors[0].collisions).toEqual([{
+      canonical: "tushare_daily_report",
+      toolName: "daily_report",
+      otherConnectorId: "tushare",
+      otherToolName: "daily_report",
+    }]);
+    expect(state.connectors[1].collisions).toEqual([{
+      canonical: "tushare_daily_report",
+      toolName: "daily_report",
+      otherConnectorId: "Tushare",
+      otherToolName: "daily_report",
+    }]);
+  });
+
+  it("detects sanitize-induced collisions within one connector", () => {
+    // Trailing characters outside [A-Za-z0-9_-] are folded to an underscore by
+    // sanitizeId and then stripped off the end, so a tool name and a suffixed
+    // variant of it collapse to one canonical id.
+    const { runtime } = runtimeWithConnectors([{
+      id: "financeMcp",
+      url: "https://one.example.test",
+      tools: [{ name: "daily_report" }, { name: "daily_report_备份" }],
+    }]);
+
+    const collisions = computeMcpToolIdCollisions(runtime.getConfig().connectors);
+    expect(collisions.get("financemcp_daily_report")).toEqual([
+      { connectorId: "financeMcp", toolName: "daily_report" },
+      { connectorId: "financeMcp", toolName: "daily_report_备份" },
+    ]);
+
+    runtime.registerCachedTools();
+    expect(runtime.getAllTools().map((tool) => tool.name))
+      .not.toContain("mcp_financemcp_daily_report");
+    // Self-collision: the other claimant is this same connector, so the notice
+    // names it rather than inventing a second connector.
+    expect(runtime.getState().connectors[0].collisions).toEqual([
+      {
+        canonical: "financemcp_daily_report",
+        toolName: "daily_report",
+        otherConnectorId: "financeMcp",
+        otherToolName: "daily_report_备份",
+      },
+      {
+        canonical: "financemcp_daily_report",
+        toolName: "daily_report_备份",
+        otherConnectorId: "financeMcp",
+        otherToolName: "daily_report",
+      },
+    ]);
+  });
+
+  it("still starts a connector whose config carries a collision", async () => {
+    // The whole point of the change: a bad pair may cost its own two tools and
+    // nothing else. Loading the runtime must still bring the config up.
+    const { runtime } = runtimeWithConnectors([{
+      id: "financeMcp",
+      url: "https://one.example.test",
+      tools: [{ name: "daily_report" }, { name: "daily_report_备份" }, { name: "daily_basic" }],
+    }]);
+    await runtime.load();
+    expect(runtime.getAllTools().map((tool) => tool.name)).toContain("mcp_financemcp_daily_basic");
+  });
+
+  it("tells the agent through connectors_status which tools were dropped and why", async () => {
+    const { runtime } = runtimeWithConnectors([{
+      id: "financeMcp",
+      name: "Finance",
+      url: "https://one.example.test",
+      tools: [{ name: "daily_report" }, { name: "daily_report_备份" }, { name: "daily_basic" }],
+    }]);
+    runtime.registerCachedTools();
+
+    const statusTool = runtime.getAllTools().find((tool) => tool.name === "mcp_connectors_status");
+    const result = await statusTool.execute("call-1", {}, { agentId: "hana" });
+    const payload = JSON.parse(result.content[0].text);
+
+    // Without this the agent's own diagnostic shows a connector in perfect
+    // health while two of its tools are simply not there, which reads as the
+    // server never having offered them.
+    expect(payload.connectors[0].collisions).toEqual([
+      {
+        canonical: "financemcp_daily_report",
+        toolName: "daily_report",
+        otherConnectorId: "financeMcp",
+        otherToolName: "daily_report_备份",
+      },
+      {
+        canonical: "financemcp_daily_report",
+        toolName: "daily_report_备份",
+        otherConnectorId: "financeMcp",
+        otherToolName: "daily_report",
+      },
+    ]);
+    // The count still describes the configured list, so the two numbers only
+    // agree once the collision is fixed.
+    expect(payload.connectors[0].toolCount).toBe(3);
+  });
+
+  it("keeps the built-in status tool and marks the connector side of that clash", () => {
+    // The host tool is published before the connector loop runs, so this is the
+    // one clash that is not symmetric: the diagnostic survives and only the
+    // connector's tool is dropped. The entry says so, so the notice can avoid
+    // claiming both sides went away.
+    const { runtime } = runtimeWithConnectors([
+      { id: "connectors", url: "https://one.example.test", tools: [{ name: "status" }] },
+    ]);
+    runtime.registerCachedTools();
+
+    const published = runtime.getAllTools().map((tool) => tool.name);
+    expect(published).toContain("mcp_connectors_status");
+    expect(published).toHaveLength(1);
+    expect(runtime.getState().connectors[0].collisions).toEqual([{
+      canonical: "connectors_status",
+      toolName: "status",
+      otherConnectorId: "mcp",
+      otherToolName: "connectors_status",
+      host: true,
+    }]);
+  });
+
+  it("rejects a batch whose own rows normalize onto one another", () => {
+    const { runtime, set } = runtimeWithConnectors([]);
+
+    // The clash is between two rows of the same import, neither of which is on
+    // disk yet, so checking only against the saved connectors would let it
+    // through and cost both connectors all of their tools afterwards.
+    expect(() => runtime.addConnectors([
+      { id: "Alpha", url: "https://one.example.test" },
+      { id: "alpha", url: "https://two.example.test" },
+    ])).toThrow(/connector 2:.*conflicts with existing connector "Alpha"/i);
+    expect(set).not.toHaveBeenCalled();
+  });
+
+  it("rejects an added id whose sanitized form collides with an existing connector", () => {
+    const { runtime, set } = runtimeWithConnectors([
+      { id: "Tushare", url: "https://one.example.test", tools: [] },
+    ]);
+
+    // Refused at the boundary that can still name the fix, before anything is
+    // written: after the fact the reader can only drop tools.
+    expect(() => runtime.addConnector({ id: "tushare", url: "https://two.example.test" }))
+      .toThrow(/conflicts with existing connector "Tushare"/i);
+    expect(set).not.toHaveBeenCalled();
+  });
+});
+
 describe("MCP management-center seams", () => {
   function memoryStore(initial: any = { enabled: true, connectors: [] }) {
     let value = initial;
@@ -2270,6 +2589,57 @@ describe("MCP management-center seams", () => {
       expect(runtime.getState().connectors[0]).toMatchObject({ error: "spawn ENOENT" });
     });
 
+    it("does not dial a connector that was added switched off", async () => {
+      const store = memoryStore();
+      const start = vi.fn(async () => {});
+      const runtime = createManager({
+        dataDir: path.join(os.tmpdir(), "hana-mcp-autostart-off"),
+        config: store,
+        log: console,
+      }, {
+        clientFactory: () => ({ running: false, start, stop: vi.fn(async () => {}) }),
+      });
+      const connector = runtime.addConnector({
+        name: "Alpha",
+        transport: "stdio",
+        command: "npx",
+        enabled: false,
+      });
+
+      await runtime.autoStartAfterAdd(connector.id);
+
+      expect(start).not.toHaveBeenCalled();
+      // Nothing was started, so nothing claims to be wanted running — which is
+      // what keeps the switch and the live intent from drifting apart.
+      expect(runtime.desiredStates.get(connector.id)).toBeUndefined();
+    });
+
+    it("dials the enabled rows of a bulk import and leaves a switched-off row alone", async () => {
+      const store = memoryStore();
+      const started: string[] = [];
+      const runtime = createManager({
+        dataDir: path.join(os.tmpdir(), "hana-mcp-autostart-bulk"),
+        config: store,
+        log: console,
+      }, {
+        clientFactory: (connector) => ({
+          running: true,
+          start: vi.fn(async () => { started.push(connector.id); }),
+          stop: vi.fn(async () => {}),
+          listTools: vi.fn(async () => []),
+        }),
+      });
+
+      const results = runtime.addConnectors([
+        { name: "Alpha", transport: "stdio", command: "npx" },
+        { name: "Beta", transport: "stdio", command: "npx", enabled: false },
+      ]);
+      // The import route starts each accepted row exactly this way.
+      for (const result of results) await runtime.autoStartAfterAdd(result.id);
+
+      expect(started).toEqual(["Alpha"]);
+    });
+
     it("does not try to start while MCP is globally disabled", async () => {
       const store = memoryStore({ enabled: false, connectors: [] });
       const start = vi.fn(async () => {});
@@ -2368,6 +2738,590 @@ describe("MCP management-center seams", () => {
       name: "search/repositories",
       qualifiedName: "github_com_search_repositories",
       capability: "github_com_search_repositories.invoke",
+    });
+  });
+
+  describe("single persisted enabled switch", () => {
+    /** Let every already-queued continuation run, including fire-and-forget starts. */
+    const flush = () => new Promise((resolve) => setTimeout(resolve, 0));
+
+    function enabledSwitchRuntime(connectors, { start = vi.fn(async () => {}), running = true }: any = {}) {
+      const store = memoryStore({ enabled: true, connectors });
+      const runtime = createManager({
+        dataDir: path.join(os.tmpdir(), "hana-mcp-enabled-switch"),
+        config: store,
+        log: { info: vi.fn(), warn: vi.fn(), error: vi.fn() },
+      }, {
+        clientFactory: () => ({
+          running,
+          start,
+          stop: vi.fn(async () => {}),
+          listTools: vi.fn(async () => []),
+          callTool: vi.fn(async () => ({ content: [{ type: "text", text: "ok" }] })),
+        }),
+      });
+      return { runtime, store, start };
+    }
+
+    it("read-time migration: connectors without enabled default to enabled=true regardless of autoStart", () => {
+      // The old autoStart field never had a runtime writer, so nearly every
+      // real config says false while the user expects the connector to work.
+      // Presence means enabled; only an explicit opt-out disables.
+      const { runtime } = enabledSwitchRuntime([
+        { id: "a", url: "https://a.example.test" },
+        { id: "b", url: "https://b.example.test", autoStart: false },
+        { id: "c", url: "https://c.example.test", enabled: false },
+      ]);
+
+      expect(runtime.getConfig().connectors.map((connector) => [connector.id, connector.enabled])).toEqual([
+        ["a", true],
+        ["b", true],
+        ["c", false],
+      ]);
+    });
+
+    it("mirrors enabled onto autoStart on write for downgrade safety", () => {
+      const { runtime, store } = enabledSwitchRuntime([
+        { id: "on", url: "https://on.example.test" },
+        { id: "off", url: "https://off.example.test", enabled: false },
+      ]);
+
+      runtime.saveConfig(runtime.getConfig());
+
+      // A build rolled back to the previous release reads autoStart only; the
+      // mirror keeps it behaving like the user's current intent.
+      expect(store.read().connectors[0]).toMatchObject({ enabled: true, autoStart: true });
+      expect(store.read().connectors[1]).toMatchObject({ enabled: false, autoStart: false });
+    });
+
+    it("load() starts every enabled connector and skips disabled ones", async () => {
+      const started: string[] = [];
+      const store = memoryStore({
+        enabled: true,
+        connectors: [
+          { id: "live", url: "https://live.example.test" },
+          { id: "legacy", url: "https://legacy.example.test", autoStart: false },
+          { id: "off", url: "https://off.example.test", enabled: false },
+        ],
+      });
+      const runtime = createManager({
+        dataDir: path.join(os.tmpdir(), "hana-mcp-enabled-load"),
+        config: store,
+        log: { info: vi.fn(), warn: vi.fn(), error: vi.fn() },
+      }, {
+        clientFactory: (connector) => ({
+          running: true,
+          start: vi.fn(async () => { started.push(connector.id); }),
+          stop: vi.fn(async () => {}),
+          listTools: vi.fn(async () => []),
+        }),
+      });
+
+      await runtime.load();
+      await flush();
+
+      expect(started.sort()).toEqual(["legacy", "live"]);
+      await runtime.dispose();
+    });
+
+    it("stop via settings action persists enabled=false; start persists enabled=true", async () => {
+      const { runtime, store } = enabledSwitchRuntime([{ id: "alpha", url: "https://alpha.example.test" }]);
+
+      await runtime.handleSettingsAction({ action: "mcp.connector.stop", payload: { connectorId: "alpha" } });
+      expect(store.read().connectors[0]).toMatchObject({ enabled: false });
+
+      await runtime.handleSettingsAction({ action: "mcp.connector.start", payload: { connectorId: "alpha" } });
+      expect(store.read().connectors[0]).toMatchObject({ enabled: true });
+
+      await runtime.dispose();
+    });
+
+    it("records intent before touching the transport in the settings action too", async () => {
+      const { runtime } = enabledSwitchRuntime([{ id: "alpha", url: "https://alpha.example.test" }]);
+      const order: string[] = [];
+      const persist = runtime.setConnectorEnabled.bind(runtime);
+      runtime.setConnectorEnabled = async (id, enabled) => {
+        order.push(`persist:${enabled}`);
+        return persist(id, enabled);
+      };
+      runtime.startConnector = async () => {
+        order.push("start");
+        return runtime.getConfig().connectors[0];
+      };
+      runtime.stopConnector = async () => { order.push("stop"); };
+
+      await runtime.handleSettingsAction({ action: "mcp.connector.start", payload: { connectorId: "alpha" } });
+      await runtime.handleSettingsAction({ action: "mcp.connector.stop", payload: { connectorId: "alpha" } });
+
+      // Same pairing the HTTP route is held to: persist, then transport.
+      expect(order).toEqual(["persist:true", "start", "persist:false", "stop"]);
+    });
+
+    it("internal reconnect paths never rewrite enabled", async () => {
+      const start = vi.fn(async () => { throw new Error("connection refused"); });
+      const { runtime, store } = enabledSwitchRuntime(
+        [{ id: "alpha", url: "https://alpha.example.test", enabled: true }],
+        { start, running: false },
+      );
+
+      // A failed auto-start, the backoff teardown behind it, and a dropped
+      // connection are the runtime's own business. Only the user's start/stop
+      // is an intent worth writing down.
+      await runtime.load();
+      await flush();
+      await runtime.stopConnector("alpha");
+      runtime._onClientClose("alpha", { reason: "connection lost" });
+
+      expect(store.read().connectors[0]).toMatchObject({ enabled: true });
+      await runtime.dispose();
+    });
+
+    it("callTool lazily starts an enabled-but-idle connector once, coalescing concurrent calls", async () => {
+      const { runtime } = enabledSwitchRuntime([
+        { id: "alpha", url: "https://alpha.example.test", tools: [{ name: "search" }] },
+      ]);
+      let openGate = () => {};
+      const gate = new Promise<void>((resolve) => { openGate = resolve; });
+      const callTool = vi.fn(async () => ({ content: [{ type: "text", text: "ok" }] }));
+      const startConnector = vi.fn(async () => {
+        await gate;
+        runtime.clients.set("alpha", { running: true, callTool, stop: vi.fn(async () => {}) });
+      });
+      runtime.startConnector = startConnector;
+
+      const calls = Promise.all([
+        runtime.callTool("alpha", "search", {}),
+        runtime.callTool("alpha", "search", {}),
+      ]);
+      openGate();
+      const results = await calls;
+
+      expect(startConnector).toHaveBeenCalledTimes(1);
+      expect(callTool).toHaveBeenCalledTimes(2);
+      expect(results[0]).toMatchObject({ content: [{ type: "text", text: "ok" }] });
+    });
+
+    it("keeps a disabled connector's tools out of the model-facing tool list", () => {
+      const { runtime } = enabledSwitchRuntime([
+        { id: "live", url: "https://live.example.test", tools: [{ name: "search" }] },
+        { id: "off", url: "https://off.example.test", enabled: false, tools: [{ name: "lookup" }] },
+      ]);
+
+      runtime.registerCachedTools();
+      const names = runtime.getAllTools().map((tool) => tool.name);
+
+      expect(names).toContain("mcp_live_search");
+      expect(names).not.toContain("mcp_off_lookup");
+      // The host diagnostic is not a connector capability and stays published.
+      expect(names).toContain("mcp_connectors_status");
+    });
+
+    it("keeps the deferred catalog on the same footing as the published tools", () => {
+      const { runtime } = enabledSwitchRuntime([
+        { id: "live", url: "https://live.example.test", tools: [{ name: "search" }] },
+        { id: "off", url: "https://off.example.test", enabled: false, tools: [{ name: "lookup" }] },
+      ]);
+
+      // Two projections of one config: a tool missing from the direct path but
+      // present in the catalog would let the model ask for something that
+      // cannot be loaded.
+      expect(runtime.getCatalogEntries().map((entry) => entry.name)).toEqual(["live_search"]);
+    });
+
+    it("does not let a disabled connector drag a live connector's tool down with it", () => {
+      const { runtime } = enabledSwitchRuntime([
+        { id: "Finance", url: "https://one.example.test", tools: [{ name: "daily_report" }] },
+        { id: "finance", url: "https://two.example.test", enabled: false, tools: [{ name: "daily_report" }] },
+      ]);
+
+      runtime.registerCachedTools();
+
+      // Ambiguity is what costs a tool its place, and a connector nobody can
+      // call is not a claimant. Switching one off has to resolve the clash, not
+      // preserve it.
+      expect(runtime.getAllTools().map((tool) => tool.name)).toContain("mcp_finance_daily_report");
+      const byId = new Map<string, any>(runtime.getState().connectors.map((item) => [item.id, item]));
+      expect(byId.get("Finance").collisions).toEqual([]);
+      expect(byId.get("finance").collisions).toEqual([]);
+    });
+
+    it("restores the collision verdict when the disabled claimant is switched back on", async () => {
+      const { runtime } = enabledSwitchRuntime([
+        { id: "Finance", url: "https://one.example.test", tools: [{ name: "daily_report" }] },
+        { id: "finance", url: "https://two.example.test", enabled: false, tools: [{ name: "daily_report" }] },
+      ]);
+
+      await runtime.setConnectorEnabled("finance", true);
+      runtime.registerCachedTools();
+
+      expect(runtime.getAllTools().map((tool) => tool.name)).not.toContain("mcp_finance_daily_report");
+      const byId = new Map<string, any>(runtime.getState().connectors.map((item) => [item.id, item]));
+      expect(byId.get("Finance").collisions).toMatchObject([{ canonical: "finance_daily_report" }]);
+      expect(byId.get("finance").collisions).toMatchObject([{ canonical: "finance_daily_report" }]);
+    });
+
+    it("keeps a disabled connector visible in the settings projection", () => {
+      const { runtime } = enabledSwitchRuntime([
+        { id: "live", url: "https://live.example.test" },
+        { id: "off", url: "https://off.example.test", enabled: false },
+      ]);
+
+      // Leaving the model's view is not leaving the user's view: a connector
+      // the user cannot see is a connector the user cannot switch back on.
+      expect(runtime.getState().connectors.map((item) => [item.id, item.enabled])).toEqual([
+        ["live", true],
+        ["off", false],
+      ]);
+    });
+
+    it("holds the connector id namespace against disabled connectors too", () => {
+      const { runtime } = enabledSwitchRuntime([
+        { id: "Finance", url: "https://one.example.test", enabled: false },
+      ]);
+
+      // Switching a connector off does not surrender its name; taking it would
+      // make both connectors' tools ambiguous the moment it comes back.
+      expect(() => runtime.addConnector({
+        id: "finance",
+        name: "finance",
+        transport: "remote",
+        url: "https://two.example.test",
+      })).toThrow(/conflicts with existing connector/);
+    });
+
+    it("refuses to move the switch through a connector update", async () => {
+      const { runtime, store } = enabledSwitchRuntime([
+        { id: "alpha", url: "https://alpha.example.test", enabled: true },
+      ]);
+
+      await runtime.handleSettingsAction({
+        action: "mcp.connector.update",
+        payload: { connectorId: "alpha", name: "Alpha", enabled: false },
+      });
+      expect(store.read().connectors[0]).toMatchObject({ enabled: true, name: "Alpha" });
+
+      // The HTTP route hands its request body straight to updateConnector, so
+      // the guard has to hold one level below the settings action too.
+      await runtime.updateConnector("alpha", { name: "Alpha two", enabled: false });
+      expect(store.read().connectors[0]).toMatchObject({ enabled: true, name: "Alpha two" });
+    });
+
+    it("refuses a direct start of a switched-off connector instead of forking intent", async () => {
+      const { runtime, start } = enabledSwitchRuntime([
+        { id: "off", url: "https://off.example.test", enabled: false },
+      ]);
+
+      await expect(runtime.startConnector("off"))
+        .rejects.toThrow(/is disabled; enable it in Settings . MCP before starting/);
+      expect(start).not.toHaveBeenCalled();
+      // The refusal has to land before the intent is recorded, or the very
+      // divergence the switch exists to prevent is created by the guard itself.
+      expect(runtime.desiredStates.get("off")).toBeUndefined();
+    });
+
+    it("refuses to reconnect a connector the switch says is off, whatever memory claims", () => {
+      const { runtime } = enabledSwitchRuntime([
+        { id: "off", url: "https://off.example.test", enabled: false },
+      ]);
+      // A hand-made fork of the two sources of truth: the process still thinks
+      // this connector is wanted, the disk says it was switched off. The disk
+      // is the one the user edited, so it wins.
+      runtime.desiredStates.set("off", "running");
+
+      expect(runtime._isDesiredLiveConnector("off")).toBe(false);
+      expect(runtime._canAutoReconnect("off")).toBe(false);
+    });
+
+    it("drops in-flight lazy starts on dispose", async () => {
+      const { runtime } = enabledSwitchRuntime([
+        { id: "alpha", url: "https://alpha.example.test", tools: [{ name: "search" }] },
+      ]);
+      runtime._lazyStarts.set("alpha", Promise.resolve());
+
+      await runtime.dispose();
+
+      expect(runtime._lazyStarts.size).toBe(0);
+    });
+
+    it("tells the agent's own diagnostic which connectors are switched off", async () => {
+      const { runtime } = enabledSwitchRuntime([
+        { id: "live", url: "https://live.example.test", tools: [{ name: "search" }] },
+        { id: "off", url: "https://off.example.test", enabled: false, tools: [{ name: "lookup" }] },
+      ]);
+      runtime.registerCachedTools();
+
+      const statusTool = runtime.getAllTools().find((tool) => tool.name === "mcp_connectors_status");
+      const payload = JSON.parse((await statusTool.execute("call-1", {}, { agentId: "hana" })).content[0].text);
+
+      // Without this the agent sees a stopped connector and keeps suggesting a
+      // start, which is not the action that would fix it.
+      expect(payload.connectors.map((item) => [item.id, item.enabled])).toEqual([
+        ["live", true],
+        ["off", false],
+      ]);
+    });
+
+    it("diagnoses a switched-off connector as disabled rather than stopped", () => {
+      const { runtime } = enabledSwitchRuntime([
+        { id: "off", url: "https://off.example.test", enabled: false, tools: [{ name: "lookup" }] },
+      ]);
+
+      expect(runtime.probeToolLiveAvailability("off", "lookup", {
+        mcp: { connectors: { off: { enabled: true, tools: { lookup: true } } } },
+      })).toMatchObject({
+        available: false,
+        reason: "mcp_connector_disabled",
+      });
+    });
+
+    it("names an unknown connector instead of reporting it as not running", async () => {
+      const { runtime } = enabledSwitchRuntime([]);
+
+      await expect(runtime.callTool("ghost", "search", {}))
+        .rejects.toThrow('MCP connector "ghost" not found');
+    });
+
+    it("says where to look when the on-demand start fails", async () => {
+      const start = vi.fn(async () => { throw new Error("spawn ENOENT"); });
+      const { runtime } = enabledSwitchRuntime(
+        [{ id: "alpha", url: "https://alpha.example.test", tools: [{ name: "search" }] }],
+        { start, running: false },
+      );
+
+      // The transport's own reason survives; the pointer to the settings page
+      // is appended, because that is where the retry and the detail live.
+      await expect(runtime.callTool("alpha", "search", {})).rejects.toThrow(
+        "spawn ENOENT (automatic reconnect failed; start it manually in Settings → MCP for details)",
+      );
+    });
+
+    it("callTool refuses a disabled connector with an actionable message", async () => {
+      const { runtime, start } = enabledSwitchRuntime([
+        { id: "alpha", url: "https://alpha.example.test", enabled: false, tools: [{ name: "search" }] },
+      ]);
+
+      await expect(runtime.callTool("alpha", "search", {}))
+        .rejects.toThrow(/is disabled; enable it in Settings/);
+      // A disabled connector must not be woken up by the refusal path either.
+      expect(start).not.toHaveBeenCalled();
+    });
+  });
+});
+
+// The app-facing surface — reading a ui:// resource, calling an app-visible
+// tool, refreshing a connector's tool list — has to tell the same two states
+// apart that callTool does. A connector the user switched off is refused with
+// the message that says how to undo it, and is never woken up on the way; a
+// connector that merely is not connected yet gets started on demand instead of
+// failing a request it is perfectly able to serve.
+describe("MCP app-facing calls and the enabled switch", () => {
+  const boardTool = () => ({ name: "board", _meta: { ui: { resourceUri: "ui://board/main" } } });
+
+  function appRuntime(connectors, { listTools = vi.fn(async () => [boardTool()]) }: any = {}) {
+    let value: any = { enabled: true, connectors };
+    const store = {
+      get: vi.fn(() => value),
+      set: vi.fn((_key: any, next: any) => { value = next; }),
+      read: () => value,
+    };
+    const built: any[] = [];
+    const runtime = createManager({
+      dataDir: path.join(os.tmpdir(), "hana-mcp-app-switch"),
+      config: store,
+      log: { info: vi.fn(), warn: vi.fn(), error: vi.fn() },
+    }, {
+      // A fresh client reports itself as not running until start() resolves,
+      // which is what makes the on-demand start observable from the outside.
+      clientFactory: () => {
+        const client: any = {
+          running: false,
+          start: vi.fn(async () => { client.running = true; }),
+          stop: vi.fn(async () => {}),
+          listTools,
+          readResource: vi.fn(async () => ({
+            contents: [{ uri: "ui://board/main", mimeType: "text/html", text: "<h1>board</h1>" }],
+          })),
+          callTool: vi.fn(async () => ({ content: [{ type: "text", text: "ok" }] })),
+        };
+        built.push(client);
+        return client;
+      },
+    });
+    return { runtime, store, built, listTools };
+  }
+
+  const offConnector = () => ({
+    id: "acme", name: "Acme", url: "https://mcp.acme.test/mcp", enabled: false, tools: [boardTool()],
+  });
+  const idleConnector = () => ({
+    id: "acme", name: "Acme", url: "https://mcp.acme.test/mcp", tools: [boardTool()],
+  });
+
+  describe("readResource", () => {
+    it("refuses a switched-off connector with an actionable message and never wakes it", async () => {
+      const { runtime } = appRuntime([offConnector()]);
+      const ensure = vi.spyOn(runtime as any, "_ensureConnectorStarted");
+
+      await expect(runtime.readResource("acme", "ui://board/main"))
+        .rejects.toThrow(/is disabled; enable it in Settings/);
+      expect(ensure).not.toHaveBeenCalled();
+    });
+
+    it("starts an enabled but unconnected connector on demand instead of failing", async () => {
+      const { runtime, built } = appRuntime([idleConnector()]);
+      const ensure = vi.spyOn(runtime as any, "_ensureConnectorStarted");
+
+      const result = await runtime.readResource("acme", "ui://board/main");
+
+      expect(ensure).toHaveBeenCalledWith("acme");
+      expect(result.contents[0].text).toBe("<h1>board</h1>");
+      expect(built[0].readResource).toHaveBeenCalledWith("ui://board/main");
+    });
+
+    it("names an unknown connector instead of reporting it as not running", async () => {
+      const { runtime } = appRuntime([]);
+
+      await expect(runtime.readResource("ghost", "ui://board/main"))
+        .rejects.toThrow('MCP connector "ghost" not found');
+    });
+  });
+
+  describe("callAppTool", () => {
+    it("refuses a switched-off connector with an actionable message and never wakes it", async () => {
+      const { runtime } = appRuntime([offConnector()]);
+      const ensure = vi.spyOn(runtime as any, "_ensureConnectorStarted");
+
+      await expect(runtime.callAppTool("acme", "board", {}))
+        .rejects.toThrow(/is disabled; enable it in Settings/);
+      expect(ensure).not.toHaveBeenCalled();
+    });
+
+    it("starts an enabled but unconnected connector on demand instead of failing", async () => {
+      const { runtime, built } = appRuntime([idleConnector()]);
+      const ensure = vi.spyOn(runtime as any, "_ensureConnectorStarted");
+
+      const result = await runtime.callAppTool("acme", "board", { q: 1 });
+
+      expect(ensure).toHaveBeenCalledWith("acme");
+      expect(result.content[0].text).toBe("ok");
+      expect(built[0].callTool).toHaveBeenCalledWith("board", { q: 1 });
+    });
+
+    it("names an unknown connector instead of reporting it as not running", async () => {
+      const { runtime } = appRuntime([]);
+
+      await expect(runtime.callAppTool("ghost", "board", {}))
+        .rejects.toThrow('MCP connector "ghost" not found');
+    });
+  });
+
+  describe("refreshTools", () => {
+    it("refuses a switched-off connector with an actionable message and never wakes it", async () => {
+      const { runtime } = appRuntime([offConnector()]);
+      const ensure = vi.spyOn(runtime as any, "_ensureConnectorStarted");
+
+      await expect(runtime.refreshTools("acme"))
+        .rejects.toThrow(/is disabled; enable it in Settings/);
+      expect(ensure).not.toHaveBeenCalled();
+    });
+
+    it("starts an enabled but unconnected connector on demand instead of failing", async () => {
+      const listTools = vi.fn(async () => [{ name: "fresh" }]);
+      const { runtime } = appRuntime(
+        [{ id: "acme", name: "Acme", url: "https://mcp.acme.test/mcp", tools: [{ name: "stale" }] }],
+        { listTools },
+      );
+      const ensure = vi.spyOn(runtime as any, "_ensureConnectorStarted");
+
+      const tools = await runtime.refreshTools("acme");
+
+      expect(ensure).toHaveBeenCalledWith("acme");
+      // Bringing the connector up lists its tools as part of connecting, so the
+      // answer is already the freshest one there is: it must be handed back
+      // rather than asked for a second time.
+      expect(tools.map((tool) => tool.name)).toEqual(["fresh"]);
+      expect(listTools).toHaveBeenCalledTimes(1);
+    });
+
+    it("lists the tools itself when the start found the connection already live", async () => {
+      // The other half of the same decision. A start that arrives to find a live
+      // connection has nothing to list, so there is no fresh answer to inherit
+      // and the refresh has to ask for one. Handing back the stored list here
+      // would answer a refresh with whatever happened to be on disk.
+      const listTools = vi.fn(async () => [{ name: "fresh" }]);
+      const { runtime, built } = appRuntime(
+        [{ id: "acme", name: "Acme", url: "https://mcp.acme.test/mcp", tools: [{ name: "stale" }] }],
+        { listTools },
+      );
+      // Stubbed deliberately: the real call graph cannot drive this branch —
+      // the client is read and the branch entered in one tick, and a concurrent
+      // start marks the connector as establishing, which is excluded earlier.
+      // The stub reproduces exactly what startConnector does when it finds a
+      // running client, so the branch is held to its contract regardless.
+      runtime.startConnector = vi.fn(async () => {
+        // Adopt the live client and return, without listing anything.
+        const live: any = { running: true, stop: vi.fn(async () => {}), listTools };
+        built.push(live);
+        runtime.clients.set("acme", live);
+        return runtime.getConfig().connectors.find((entry) => entry.id === "acme");
+      });
+
+      const tools = await runtime.refreshTools("acme");
+
+      expect(tools.map((tool) => tool.name)).toEqual(["fresh"]);
+      expect(listTools).toHaveBeenCalledTimes(1);
+    });
+
+    it("counts listings from scratch again after the connector was stopped", async () => {
+      // Stopping drops the listing count along with the connection it described.
+      // The next refresh starts the connector again and must still recognize the
+      // listing that start performed, rather than being confused by the reset.
+      const listTools = vi.fn(async () => [{ name: "fresh" }]);
+      const { runtime } = appRuntime(
+        [{ id: "acme", name: "Acme", url: "https://mcp.acme.test/mcp", tools: [{ name: "stale" }] }],
+        { listTools },
+      );
+
+      await runtime.startConnector("acme");
+      await runtime.stopConnector("acme");
+      expect((runtime as any)._toolListings.has("acme")).toBe(false);
+
+      const tools = await runtime.refreshTools("acme");
+
+      expect(tools.map((tool) => tool.name)).toEqual(["fresh"]);
+      // Once for the first start, once for the restart this refresh triggered —
+      // and no third listing, because the restart's own listing was recognized.
+      expect(listTools).toHaveBeenCalledTimes(2);
+    });
+
+    it("names an unknown connector instead of reporting it as not running", async () => {
+      const { runtime } = appRuntime([]);
+
+      await expect(runtime.refreshTools("ghost"))
+        .rejects.toThrow('MCP connector "ghost" not found');
+    });
+
+    it("does not try to start the connector while it is the one being started", async () => {
+      // A connection ends by listing the connector's tools, so this refresh runs
+      // from inside the start attempt. A transport that comes back from start()
+      // without being usable must surface as a failed connection, not as a
+      // refresh waiting on the very attempt it belongs to.
+      const { runtime, built } = appRuntime([idleConnector()]);
+      const ensure = vi.spyOn(runtime as any, "_ensureConnectorStarted");
+      runtime.clientFactory = () => {
+        const client: any = {
+          running: false,
+          start: vi.fn(async () => {}),
+          stop: vi.fn(async () => {}),
+          listTools: vi.fn(async () => []),
+        };
+        built.push(client);
+        return client;
+      };
+
+      await expect(runtime.startConnector("acme")).rejects.toThrow(/is not running/);
+      expect(ensure).not.toHaveBeenCalled();
+      expect(built).toHaveLength(1);
     });
   });
 });

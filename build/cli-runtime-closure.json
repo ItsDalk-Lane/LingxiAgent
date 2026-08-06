@@ -4805,6 +4805,11 @@
         },
         {
           "root": "server-bootstrap",
+          "from": "server/routes/ws-session-context.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
           "from": "server/routes/chat.ts",
           "kind": "import-statement"
         },
@@ -4999,7 +5004,7 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by core/migrations.ts (import-statement); core/plugin-config.ts (import-statement); lib/desk/cron-store.ts (import-statement); +80 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by core/migrations.ts (import-statement); core/plugin-config.ts (import-statement); lib/desk/cron-store.ts (import-statement); +81 more importer(s)."
     },
     {
       "path": "lib/default-models.json",
@@ -5256,6 +5261,30 @@
         }
       ],
       "reason": "Reached via esbuild source module graph, imported by core/engine.ts (dynamic-import)."
+    },
+    {
+      "path": "lib/document-extract/anydoc-loader.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "lib/document-extract/index.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by lib/document-extract/index.ts (import-statement)."
+    },
+    {
+      "path": "lib/document-extract/index.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "lib/tools/file-tool.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by lib/tools/file-tool.ts (import-statement)."
     },
     {
       "path": "lib/exec-command/guidance.ts",
@@ -51430,6 +51459,39 @@
     },
     {
       "path": "node_modules/@fast-csv/parse/package.json",
+      "inputType": "nft-runtime-trace",
+      "provenance": [
+        {
+          "root": "nft-server-bundle",
+          "kind": "nft-trace"
+        }
+      ],
+      "reason": "nft-runtime-trace via nft-server-bundle (see roots[] for the full explanation)"
+    },
+    {
+      "path": "node_modules/@firecrawl/anydoc-<platform>/package.json",
+      "inputType": "nft-runtime-trace",
+      "provenance": [
+        {
+          "root": "nft-server-bundle",
+          "kind": "nft-trace"
+        }
+      ],
+      "reason": "nft-runtime-trace via nft-server-bundle (see roots[] for the full explanation)"
+    },
+    {
+      "path": "node_modules/@firecrawl/anydoc/index.js",
+      "inputType": "nft-runtime-trace",
+      "provenance": [
+        {
+          "root": "nft-server-bundle",
+          "kind": "nft-trace"
+        }
+      ],
+      "reason": "nft-runtime-trace via nft-server-bundle (see roots[] for the full explanation)"
+    },
+    {
+      "path": "node_modules/@firecrawl/anydoc/package.json",
       "inputType": "nft-runtime-trace",
       "provenance": [
         {
@@ -109894,6 +109956,23 @@
       "reason": "Reached via esbuild source module graph, imported by server/composition/open-root.ts (import-statement)."
     },
     {
+      "path": "server/routes/route-errors.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "server/routes/sessions.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "server/routes/agents.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by server/routes/sessions.ts (import-statement); server/routes/agents.ts (import-statement)."
+    },
+    {
       "path": "server/routes/server-identity.ts",
       "inputType": "source-graph",
       "provenance": [
@@ -110036,6 +110115,18 @@
         }
       ],
       "reason": "Reached via esbuild source module graph, imported by server/composition/open-root.ts (import-statement)."
+    },
+    {
+      "path": "server/routes/ws-session-context.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "server/routes/chat.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by server/routes/chat.ts (import-statement)."
     },
     {
       "path": "server/session-stream-store.ts",
@@ -112303,11 +112394,11 @@
     }
   ],
   "stats": {
-    "totalFiles": 9618,
+    "totalFiles": 9625,
     "byInputType": {
-      "source-graph": 647,
+      "source-graph": 651,
       "runtime-asset": 11,
-      "nft-runtime-trace": 8960
+      "nft-runtime-trace": 8963
     }
   }
 }

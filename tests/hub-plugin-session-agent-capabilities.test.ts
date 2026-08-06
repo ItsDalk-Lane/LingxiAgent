@@ -26,6 +26,8 @@ function createEngine(overrides: any = {}) {
     createSession: vi.fn(async () => ({ sessionPath: "/agents/agent-a/sessions/new.jsonl", agentId: "agent-a" })),
     createSessionForAgent: vi.fn(async () => ({ sessionPath: "/agents/agent-b/sessions/new.jsonl", agentId: "agent-b" })),
     createDetachedSession: vi.fn(async () => ({ sessionPath: "/agents/agent-b/sessions/new.jsonl", agentId: "agent-b" })),
+    currentSessionPath: "/agents/agent-a/sessions/focused.jsonl",
+    persistSessionMeta: vi.fn(),
     setSessionPinned: vi.fn(async () => "2026-06-07T00:00:00.000Z"),
     setSessionProjectAssignment: vi.fn(async () => ({})),
     setSessionThinkingLevel: vi.fn(async (_sessionPath, level) => ({ ok: true, thinkingLevel: level })),
@@ -96,6 +98,10 @@ describe("Hub plugin-facing session and agent capabilities", () => {
       }),
     );
     expect(engine.createSessionForAgent).not.toHaveBeenCalled();
+    // 回归钉子：detached 创建后焦点已还给上一个会话，
+    // meta 必须写刚建出来的这个会话，不能写焦点会话。
+    expect(engine.persistSessionMeta).toHaveBeenCalledWith("/agents/agent-b/sessions/new.jsonl");
+    expect(engine.persistSessionMeta).not.toHaveBeenCalledWith("/agents/agent-a/sessions/focused.jsonl");
   });
 
   it("updates session metadata without writing conversation history directly", async () => {

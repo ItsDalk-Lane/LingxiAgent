@@ -8,6 +8,8 @@ import {
   buildConnectionUrl,
   requireServerConnection,
 } from '../services/server-connection';
+import { errorWithCode } from '../errors/error-presenter';
+import { normalizeSessionRouteError } from '../../../../shared/error-user-messages.ts';
 
 const DEFAULT_TIMEOUT = 30_000;
 
@@ -46,8 +48,10 @@ export async function lingxiFetch(
       signal: controller.signal,
     });
     if (!res.ok) {
-      const detail = await readErrorMessage(res);
-      throw new Error(detail || `lingxiFetch ${path}: ${res.status} ${res.statusText}`);
+      // 错误码在这里就得挂到异常上。调用方拿到的是抛出来的 Error，不是响应体——
+      // 一旦这里只带走那句英文，后面再想把失败翻成人话就没有依据了。
+      const { message, code } = await readErrorResponse(res);
+      throw errorWithCode(message || `lingxiFetch ${path}: ${res.status} ${res.statusText}`, code);
     }
     return res;
   } finally {
@@ -55,21 +59,44 @@ export async function lingxiFetch(
   }
 }
 
-async function readErrorMessage(res: Response): Promise<string | null> {
+/**
+ * 读错误响应：给调用方一句话，外加一个错误码。
+ *
+ * 同一个失败会有两种响应形状：route handler 自己应答的是扁平的 `{error, code}`，
+ * 而没被 route 接住、冒到服务端顶层错误处理器的异常会被包成嵌套的
+ * `{error: {code, message, traceId}}`。只认扁平形状的话，嵌套那种会把整段 JSON
+ * 文本当成"错误消息"显示出来，错误码也一并丢掉。归一交给 shared 的
+ * normalizeSessionRouteError——它两种都认，跟其它消费点用的是同一个归一器。
+ *
+ * 归一取不到消息时才往下退：先看 `{message}` 这种不带 error 字段的写法，
+ * 最后退回整段响应文本。body 读不出来或根本不是 JSON 时没有码，文案跟以前一样。
+ */
+async function readErrorResponse(res: Response): Promise<{ message: string | null; code: string | null }> {
+  let text: string;
   try {
-    const text = await res.text();
-    if (!text) return null;
-    try {
-      const data = JSON.parse(text);
-      if (typeof data?.error === 'string' && data.error.trim()) return data.error.trim();
-      if (typeof data?.message === 'string' && data.message.trim()) return data.message.trim();
-    } catch {
-      return text.trim() || null;
-    }
-    return text.trim() || null;
+    text = await res.text();
   } catch {
-    return null;
+    return { message: null, code: null };
   }
+  if (!text) return { message: null, code: null };
+
+  let data: unknown;
+  try {
+    data = JSON.parse(text);
+  } catch {
+    // try 只围 JSON.parse：底下的字段读取若有缺陷，应该原地炸出来让人看见，
+    // 而不是被这个 catch 收编成"body 不是 JSON"，把 bug 伪装成正常分支。
+    return { message: text.trim() || null, code: null };
+  }
+
+  const routeError = normalizeSessionRouteError(data);
+  if (routeError.message) return { message: routeError.message, code: routeError.code };
+
+  const legacyMessage = (data as { message?: unknown } | null)?.message;
+  if (typeof legacyMessage === 'string' && legacyMessage.trim()) {
+    return { message: legacyMessage.trim(), code: routeError.code };
+  }
+  return { message: text.trim() || null, code: routeError.code };
 }
 
 /** 根据 yuan 类型返回 fallback 头像路径 */

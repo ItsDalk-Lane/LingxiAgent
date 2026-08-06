@@ -311,7 +311,9 @@ describe('InputArea status stack', () => {
     expect(screen.getAllByText('input.refreshAndCompactBusy')).toHaveLength(1);
   });
 
-  it('reveals screenshot notice directories in the workspace tree without replacing the desk root', async () => {
+  it('opens legacy screenshot notice directories in the system file manager', async () => {
+    const openFolder = vi.fn();
+    window.platform = { openFolder } as unknown as typeof window.platform;
     render(React.createElement(InputArea));
 
     window.dispatchEvent(new CustomEvent('hana-inline-notice', {
@@ -324,14 +326,17 @@ describe('InputArea status stack', () => {
 
     fireEvent.click(await screen.findByTestId('input-status-bars'));
 
-    expect(deskActionMocks.toggleJianSidebar).toHaveBeenCalledWith(true);
-    expect(deskActionMocks.revealDeskDirectory).toHaveBeenCalledWith('/workspace/OH-Works');
+    expect(openFolder).toHaveBeenCalledWith('/workspace/OH-Works');
+    expect(deskActionMocks.toggleJianSidebar).not.toHaveBeenCalled();
+    expect(deskActionMocks.revealDeskDirectory).not.toHaveBeenCalled();
     expect(deskActionMocks.loadDeskFiles).not.toHaveBeenCalled();
   });
 
-  it('opens the generated screenshot image directly when the notice carries a file path', async () => {
+  it('reveals the generated screenshot in the system file manager when the notice carries a file path', async () => {
     const openFile = vi.fn();
-    window.platform = { openFile } as unknown as typeof window.platform;
+    const openFolder = vi.fn();
+    const showInFinder = vi.fn();
+    window.platform = { openFile, openFolder, showInFinder } as unknown as typeof window.platform;
     render(React.createElement(InputArea));
 
     window.dispatchEvent(new CustomEvent('hana-inline-notice', {
@@ -345,7 +350,9 @@ describe('InputArea status stack', () => {
 
     fireEvent.click(await screen.findByTestId('input-status-bars'));
 
-    expect(openFile).toHaveBeenCalledWith('/workspace/OH-Works/截图/hanako-20260617.png');
+    expect(showInFinder).toHaveBeenCalledWith('/workspace/OH-Works/截图/hanako-20260617.png');
+    expect(openFile).not.toHaveBeenCalled();
+    expect(openFolder).not.toHaveBeenCalled();
     expect(deskActionMocks.toggleJianSidebar).not.toHaveBeenCalled();
     expect(deskActionMocks.revealDeskDirectory).not.toHaveBeenCalled();
   });

@@ -71,7 +71,7 @@ describe('mcp-api mutations', () => {
       transport: 'stdio',
       command: 'npx',
       env: { API_KEY: '********' },
-      autoStart: true,
+      enabled: true,
     });
 
     expect(lingxiFetchMock).toHaveBeenCalledWith(
@@ -83,7 +83,7 @@ describe('mcp-api mutations', () => {
           transport: 'stdio',
           command: 'npx',
           env: { API_KEY: '********' },
-          autoStart: true,
+          enabled: true,
         }),
       }),
     );

@@ -188,6 +188,30 @@ export async function statFileRef(ref, deps: any = {}) {
   };
 }
 
+/**
+ * 所有"要拿到文件本体"的操作（复制源、抽取源）共用的前置：解析 FileRef、确认文件真实存在、
+ * 对裸路径做授权根校验，并把 stat 一并交回调用方判断类型。
+ *
+ * 授权校验只保留这一份实现。新增读取入口一律走这里，不要在调用侧另写一条取文件路径，
+ * 否则授权目录的约束会随着入口数量慢慢漏掉。
+ */
+export async function resolveReadableFileRef(ref, {
+  cwd = process.cwd(),
+  allowedRoots = null,
+  label = "source",
+  sessionId = null,
+  sessionPath = null,
+  resolveSessionFile,
+}: any = {}) {
+  const resolved = await resolveFileRef(ref, { cwd, resolveSessionFile, sessionId, sessionPath });
+  if (!fs.existsSync(resolved.filePath)) throw new Error(`file not found: ${resolved.filePath}`);
+  // SessionFile 的归属由 session 自己把关；只有用户直接给的裸路径需要在这里对齐授权目录。
+  if (resolved.ref.type === "path" && Array.isArray(allowedRoots)) {
+    assertExistingPathInsideAllowedRoots(resolved.filePath, allowedRoots, cwd, label);
+  }
+  return { ...resolved, stat: fs.statSync(resolved.filePath) };
+}
+
 function resolveTargetPath({ targetPath, targetDir, filename, cwd, sourceFilename: fallbackFilename }) {
   if (targetPath && targetDir) throw new Error("Pass either targetPath or targetDir, not both");
   if (targetPath) {
@@ -229,13 +253,15 @@ export async function copyFileRefToPath({
   resolveSessionFile,
   registerSessionFile,
 }: any = {}) {
-  const resolved = await resolveFileRef(from, { cwd, resolveSessionFile, sessionId, sessionPath });
-  if (!fs.existsSync(resolved.filePath)) throw new Error(`file not found: ${resolved.filePath}`);
-  if (resolved.ref.type === "path" && Array.isArray(sourceAllowedRoots)) {
-    assertExistingPathInsideAllowedRoots(resolved.filePath, sourceAllowedRoots, cwd, "copy source");
-  }
-  const sourceStat = fs.statSync(resolved.filePath);
-  if (sourceStat.isDirectory()) {
+  const resolved = await resolveReadableFileRef(from, {
+    cwd,
+    allowedRoots: sourceAllowedRoots,
+    label: "copy source",
+    sessionId,
+    sessionPath,
+    resolveSessionFile,
+  });
+  if (resolved.stat.isDirectory()) {
     throw new Error("copying directory FileRefs is not supported in v0");
   }
 

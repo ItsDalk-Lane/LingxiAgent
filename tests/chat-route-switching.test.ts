@@ -467,6 +467,88 @@ describe("chat route model switch guard", () => {
     }));
   });
 
+  // 身份解析排在媒体校验之前：一条没有身份的消息不该先把附件量一遍再拒，
+  // 而且媒体校验的错误回包也要报在解析出来的会话上，而不是客户端原样送来的字段。
+  it("rejects a prompt with no identity before it validates the attachments", async () => {
+    let createHandlers;
+    const upgradeWebSocket = vi.fn((factory) => {
+      createHandlers = factory;
+      return () => new Response(null);
+    });
+    const hub = { subscribe: vi.fn(), send: vi.fn(async () => {}) };
+    const engine = {
+      agentName: "Hana",
+      abortAllStreaming: vi.fn(async () => {}),
+      getSessionIdForPath: vi.fn(() => null),
+      getSessionManifest: vi.fn(() => null),
+      getSessionByPath: vi.fn(() => null),
+      isSessionStreaming: vi.fn(() => false),
+      isSessionSwitching: vi.fn(() => false),
+      steerSession: vi.fn(() => false),
+      slashDispatcher: null,
+    };
+
+    createChatRoute(engine, hub, { upgradeWebSocket });
+    const handlers = createHandlers({});
+    const ws = { readyState: 1, send: vi.fn() };
+    handlers.onMessage({
+      data: JSON.stringify({
+        type: "prompt",
+        text: "hello",
+        images: Array.from({ length: 11 }, () => ({ mimeType: "image/png", data: "AAAA" })),
+      }),
+    }, ws);
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(hub.send).not.toHaveBeenCalled();
+    const payloads = ws.send.mock.calls.map(([raw]) => JSON.parse(raw));
+    expect(payloads).toEqual([{
+      type: "error",
+      code: "internal_contract",
+      message: "session identity required",
+    }]);
+  });
+
+  it("reports attachment problems against the resolved session locator", async () => {
+    let createHandlers;
+    const upgradeWebSocket = vi.fn((factory) => {
+      createHandlers = factory;
+      return () => new Response(null);
+    });
+    const hub = { subscribe: vi.fn(), send: vi.fn(async () => {}) };
+    const engine = {
+      agentName: "Hana",
+      abortAllStreaming: vi.fn(async () => {}),
+      getSessionIdForPath: vi.fn(() => "sess_moved"),
+      getSessionManifest: vi.fn(() => ({ currentLocator: { path: "/tmp/canonical.jsonl" } })),
+      getSessionByPath: vi.fn(() => null),
+      resolveSessionOwnership: vi.fn(() => ({ agentId: "agent-a", source: "manifest", agentDeleted: false })),
+      isSessionStreaming: vi.fn(() => false),
+      isSessionSwitching: vi.fn(() => false),
+      steerSession: vi.fn(() => false),
+      slashDispatcher: null,
+    };
+
+    createChatRoute(engine, hub, { upgradeWebSocket });
+    const handlers = createHandlers({});
+    const ws = { readyState: 1, send: vi.fn() };
+    handlers.onMessage({
+      data: JSON.stringify({
+        type: "prompt",
+        text: "hello",
+        sessionPath: "/tmp/stale.jsonl",
+        images: [{ mimeType: "image/tiff", data: "AAAA" }],
+      }),
+    }, ws);
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(hub.send).not.toHaveBeenCalled();
+    expect(ws.send.mock.calls.map(([raw]) => JSON.parse(raw))).toContainEqual(expect.objectContaining({
+      type: "error",
+      sessionPath: "/tmp/canonical.jsonl",
+    }));
+  });
+
   it("rejects mismatched steer and resume targets before touching runtime state (#2078)", async () => {
     let createHandlers;
     const upgradeWebSocket = vi.fn((factory) => {
@@ -882,6 +964,7 @@ describe("chat route model switch guard", () => {
       abortAllStreaming: vi.fn(async () => {}),
       getSessionByPath: vi.fn(() => ({ entries: [] })),
       getSessionIdForPath: vi.fn(() => "sess_running"),
+      getSessionManifest: vi.fn(() => ({ currentLocator: { path: "/tmp/running-session.jsonl" } })),
       isSessionStreaming: vi.fn((sessionPath) => sessionPath === "/tmp/running-session.jsonl"),
       isSessionSwitching: vi.fn(() => false),
       steerSession: vi.fn(() => false),

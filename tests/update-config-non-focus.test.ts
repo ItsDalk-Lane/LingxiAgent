@@ -384,7 +384,11 @@ describe("updateConfig with agentId", () => {
     expect(models.defaultModel).toEqual({ id: "gpt-4", provider: "openai", name: "GPT-4" });
   });
 
-  it("persistSessionMeta writes the path-scoped session memory flag", async () => {
+  /**
+   * 焦点会话固定为 focused.jsonl，与被显式要求持久化的会话区分开。
+   * persistSessionMeta 曾经读焦点指针，所以这个夹具能把"写错会话"照出来。
+   */
+  function makePersistMetaCoord() {
     const focusAgent = {
       id: "focus",
       memoryEnabled: true,
@@ -404,7 +408,7 @@ describe("updateConfig with agentId", () => {
       getSkills: () => ({ syncAgentSkills: vi.fn() }),
       getSession: () => ({
         sessionManager: {
-          getSessionFile: () => "/tmp/test/agents/focus/sessions/frozen.jsonl",
+          getSessionFile: () => "/tmp/test/agents/focus/sessions/focused.jsonl",
         },
       }),
       getSessionCoordinator: () => ({ getSessionMemoryEnabled, writeSessionMeta }),
@@ -413,8 +417,13 @@ describe("updateConfig with agentId", () => {
       emitDevLog: vi.fn(),
       getCurrentModel: () => null,
     });
+    return { coord, writeSessionMeta, getSessionMemoryEnabled };
+  }
 
-    await coord.persistSessionMeta();
+  it("persistSessionMeta writes the path-scoped session memory flag", async () => {
+    const { coord, writeSessionMeta, getSessionMemoryEnabled } = makePersistMetaCoord();
+
+    await coord.persistSessionMeta("/tmp/test/agents/focus/sessions/frozen.jsonl");
 
     expect(getSessionMemoryEnabled).toHaveBeenCalledWith("/tmp/test/agents/focus/sessions/frozen.jsonl");
     expect(writeSessionMeta).toHaveBeenCalledWith(
@@ -423,42 +432,38 @@ describe("updateConfig with agentId", () => {
     );
   });
 
-  it("setMemoryEnabled updates the current session state through SessionCoordinator", async () => {
-    const focusAgent = {
-      id: "focus",
-      setMemoryEnabled: vi.fn(),
-      memoryEnabled: true,
-      sessionMemoryEnabled: true,
-    };
-    const setSessionMemoryEnabled = vi.fn(async () => undefined);
-    const coord = new ConfigCoordinator({
-      lingxiHome: "/tmp/test",
-      agentsDir: "/tmp/test/agents",
-      getAgent: () => focusAgent,
-      getAgentById: () => null,
-      getActiveAgentId: () => "focus",
-      getAgents: () => new Map([["focus", focusAgent]]),
-      getModels: () => ({ availableModels: [], defaultModel: null }),
-      getPrefs: () => ({ getPreferences: () => ({}), savePreferences: vi.fn() }),
-      getSkills: () => ({ syncAgentSkills: vi.fn() }),
-      getSession: () => ({
-        sessionManager: {
-          getSessionFile: () => "/tmp/test/agents/focus/sessions/current.jsonl",
-        },
-      }),
-      getSessionCoordinator: () => ({ setSessionMemoryEnabled }),
-      getHub: () => null,
-      emitEvent: vi.fn(),
-      emitDevLog: vi.fn(),
-      getCurrentModel: () => null,
-    });
+  /**
+   * 回归钉子：detached 创建会在 finally 里把焦点还给上一个会话，
+   * 所以"读焦点"的旧实现会把新会话的记忆开关写到上一个会话头上。
+   */
+  it("persistSessionMeta writes the requested session, not the focused one", async () => {
+    const { coord, writeSessionMeta, getSessionMemoryEnabled } = makePersistMetaCoord();
 
-    await coord.setMemoryEnabled(false);
+    await coord.persistSessionMeta("/tmp/test/agents/focus/sessions/detached-new.jsonl");
 
-    expect(setSessionMemoryEnabled).toHaveBeenCalledWith(
-      "/tmp/test/agents/focus/sessions/current.jsonl",
-      false,
+    expect(getSessionMemoryEnabled).toHaveBeenCalledWith("/tmp/test/agents/focus/sessions/detached-new.jsonl");
+    expect(writeSessionMeta).toHaveBeenCalledTimes(1);
+    expect(writeSessionMeta.mock.calls[0][0]).toBe("/tmp/test/agents/focus/sessions/detached-new.jsonl");
+    expect(writeSessionMeta).not.toHaveBeenCalledWith(
+      "/tmp/test/agents/focus/sessions/focused.jsonl",
+      expect.anything(),
     );
-    expect(focusAgent.setMemoryEnabled).not.toHaveBeenCalled();
   });
+
+  it("persistSessionMeta throws when no session path is supplied", async () => {
+    const { coord, writeSessionMeta } = makePersistMetaCoord();
+
+    // 显式绕过类型检查：模拟未走类型约束的运行时调用方漏传 path，
+    // 这时必须直接抛，不许退回读焦点。
+    expect(() => (coord as any).persistSessionMeta()).toThrow(/sessionPath is required/);
+    expect(() => coord.persistSessionMeta(undefined)).toThrow(/sessionPath is required/);
+    expect(writeSessionMeta).not.toHaveBeenCalled();
+  });
+
+  // 这里曾经有一条 ConfigCoordinator.setMemoryEnabled 的用例，用来防止它写错
+  // session。那个方法本身从"当前焦点会话"反推写入目标，违反状态归属只能显式
+  // 传递的底线，而且生产路径零调用方，已随实现一起删除，所以这条用例的保护
+  // 对象也不存在了。别从 git 历史里把它原样抄回来：会话进行中切记忆开关的正确
+  // 形状是调用方显式传 sessionPath 调 sessionCoord.setSessionMemoryEnabled，
+  // 那种实现要配的是一条针对显式入参的用例。
 });

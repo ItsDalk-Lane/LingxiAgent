@@ -1,55 +1,55 @@
 {
   "schemaVersion": 1,
-  "tag": "v0.1.2",
-  "version": "0.1.2",
-  "previousTag": "v0.1.0",
-  "generatedAt": "2026-08-05T17:20:00.000Z",
+  "tag": "v0.1.21",
+  "version": "0.1.21",
+  "previousTag": "v0.1.2",
+  "generatedAt": "2026-08-06T04:46:38.000Z",
   "noUserFacingChanges": false,
   "summary": {
-    "zh": "0.1.2 修复 0.1.0 在 macOS 上无法启动的严重问题。根因是 CI 在无 Apple 证书时走 ad-hoc 签名路径，但只重签了主程序与 Helper，漏签了 Electron Framework——主程序（无 Team ID）与 Framework（Electron 官方 Team ID）Team ID 不一致，macOS dyld 在加载 framework 时直接终止进程，表现为双击无反应/闪退。本次在 electron-builder 的 afterSign 钩子里补全全量 ad-hoc 重签，统一包内所有 Mach-O 组件的签名身份，启动恢复正常。注：0.1.1 因 afterSign 配置写成数组（该版本 electron-builder 不支持）导致 CI 构建失败，未发布成功；0.1.2 改为单个 afterSign 入口在内部编排重签+公证后修复。",
-    "en": "0.1.2 fixes a critical issue where 0.1.0 could not launch on macOS. The root cause: CI's certificate-less ad-hoc signing path re-signed only the main executable and Helpers, leaving Electron Framework with its original Electron Team ID. The Team ID mismatch between the main process (no Team ID) and the framework (Electron's Team ID) caused macOS dyld to terminate the process while loading the framework — appearing as a silent crash on launch. This release adds a full ad-hoc re-sign step in electron-builder's afterSign hook, unifying the signing identity of every Mach-O component in the bundle, so the app launches normally. Note: 0.1.1 failed CI because afterSign was configured as an array (unsupported by this electron-builder version) and was never published; 0.1.2 fixes it with a single afterSign entry that orchestrates resign + notarize internally."
+    "zh": "0.1.21（预览版）同步上游 openhanako 0.443.46，旗舰为新增文档抽取模块（PDF/DOCX/XLSX/CSV/扫描件，经 @firecrawl/anydoc），并并入会话路由错误分层、MCP id 冲突检测、ws-session-context 隔离、crash log 双行版本记录等改进。desktop 35 文件逐个三方合并，保留 Lingxi 全部定制。本版本为 GitHub prerelease 预览，不动 stable 通道。",
+    "en": "0.1.21 (prerelease) syncs upstream openhanako 0.443.46. The flagship is the new document-extract module (PDF/DOCX/XLSX/CSV/scanned, via @firecrawl/anydoc), plus session route error layering, MCP id collision detection, ws-session-context isolation, and crash log dual-line version recording. The 35 desktop files were each 3-way merged, preserving all Lingxi customizations. This is a GitHub prerelease preview; the stable channel is untouched."
   },
   "counts": {
-    "feature": 0,
-    "fix": 1,
+    "feature": 1,
+    "fix": 0,
     "improvement": 0,
     "migration": 0
   },
   "source": {
     "owner": "ItsDalk-Lane",
     "repo": "LingxiAgent",
-    "commitRange": "v0.1.0..v0.1.2",
-    "releaseUrl": "https://github.com/ItsDalk-Lane/LingxiAgent/releases/tag/v0.1.2",
+    "commitRange": "v0.1.2..v0.1.21",
+    "releaseUrl": "https://github.com/ItsDalk-Lane/LingxiAgent/releases/tag/v0.1.21",
     "releaseNotes": ""
   },
   "items": [
     {
-      "id": "fix-mac-launch-teamid-mismatch",
-      "kind": "fix",
+      "id": "feat-document-extract",
+      "kind": "feature",
       "importance": "high",
       "title": {
-        "zh": "修复 macOS 启动崩溃：统一 ad-hoc 签名 Team ID",
-        "en": "Fix macOS launch crash: unify ad-hoc signing Team ID"
+        "zh": "新增文档抽取模块：会话内直接读取 PDF / DOCX / XLSX / CSV / 扫描件",
+        "en": "New document-extract module: read PDF / DOCX / XLSX / CSV / scanned docs directly in-session"
       },
       "summary": {
-        "zh": "新增 electron-builder afterSign 重签逻辑（resign-adhoc.cjs），在无 Apple 证书时把包内所有 Mach-O 组件（Electron Framework、各 Helper、computer-use helper、主程序）统一重签为 ad-hoc，消除主程序与 Framework 的 Team ID 不一致——这正是 0.1.0 在 macOS 上 dyld 加载 framework 即 SIGABRT 的根因。该逻辑由唯一的 afterSign 入口 notarize.cjs 在公证之前编排调用（electron-builder 26.8.x 的 afterSign 不支持数组配置）。同时把 CI 里被硬编码为常开的 SKIP_NOTARIZE 改为「仅在无公证凭据时跳过」，配齐 Apple 凭据后可无缝切到正规签名+公证。",
-        "en": "Adds an electron-builder afterSign re-sign step (resign-adhoc.cjs) that, when no Apple certificate is present, re-signs every Mach-O component in the bundle (Electron Framework, Helpers, computer-use helper, main executable) to a unified ad-hoc identity, eliminating the Team ID mismatch between the main process and the framework — the root cause of 0.1.0's dyld SIGABRT on macOS launch. The logic is orchestrated by the single afterSign entry notarize.cjs before notarization (electron-builder 26.8.x does not support array afterSign configs). The CI's hardcoded-always-on SKIP_NOTARIZE is also corrected to 'skip only when notary credentials are absent', so adding Apple credentials later switches to proper signing + notarization with no further changes."
+        "zh": "同步上游 openhanako 0.443.46 的旗舰特性。新增 lib/document-extract 模块（index/types/anydoc-loader），通过新依赖 @firecrawl/anydoc@0.1.2 支持 PDF、DOCX、XLSX、CSV 及扫描件的内容抽取；file-tool 并入对应调用，会话中可直接读取并解析这些文档格式。含 4 个二进制 fixture 与单元/集成测试。",
+        "en": "Syncs the flagship feature of upstream openhanako 0.443.46. Adds the lib/document-extract module (index/types/anydoc-loader) that, via the new dependency @firecrawl/anydoc@0.1.2, supports content extraction from PDF, DOCX, XLSX, CSV and scanned documents; file-tool integrates the call so sessions can read and parse these formats directly. Ships with 4 binary fixtures plus unit/integration tests."
       },
       "details": [
         {
-          "zh": "崩溃报告铁证：codeSigningTeamID 为空（主程序 ad-hoc），加载 Electron Framework 时报 'mapping process and mapped file have different Team IDs'，启动 30ms 内被 dyld 终止。",
-          "en": "Crash report evidence: codeSigningTeamID was empty (ad-hoc main process), and loading Electron Framework failed with 'mapping process and mapped file have different Team IDs' — dyld terminated the process within 30ms of launch."
+          "zh": "同步范围：上游 0.442→0.443 共 94 文件 +6573/−716。core/lib/server/scripts 层用 git 三方合并落地（保留 lingxiHome 等改名定制），desktop 35 文件逐个三方合并（含 main.cjs writeCrashLog 双行、locales 品牌、settings/api 错误分层等重点）。",
+          "en": "Sync scope: upstream 0.442→0.443 spans 94 files +6573/−716. The core/lib/server/scripts layers were applied via git 3-way merge (preserving the lingxiHome rename and other customizations); the 35 desktop files were each 3-way merged (including main.cjs writeCrashLog dual-line, locale branding, settings/api error layering, etc.)."
         },
         {
-          "zh": "0.1.1 教训：afterSign 写成数组 [a.cjs, b.cjs]，但 electron-builder 的 resolveFunction 只接受 string，数组被原样注册为事件处理器，emit 时崩溃，CI 构建失败未发布。0.1.2 改为 notarize.cjs 单入口，内部 require 并调用 resignAdhoc。",
-          "en": "0.1.1 lesson: afterSign was written as an array [a.cjs, b.cjs], but electron-builder's resolveFunction only accepts a string; the array was registered as-is as the event handler and crashed on emit, failing CI. 0.1.2 uses notarize.cjs as the single entry, which requires and calls resignAdhoc internally."
+          "zh": "并入的其它上游改进：会话路由错误分层（409/404/503 不再被压平成 500）、MCP 工具 id 大小写折叠冲突检测、ws-session-context 会话上下文隔离、crash log 壳版本/内容版本双行记录（解决热更新后排障误导）。",
+          "en": "Other integrated upstream improvements: session route error layering (409/404/503 no longer flattened to 500), MCP tool id case-folding collision detection, ws-session-context session context isolation, and crash log dual-line shell/content version recording (fixes post-hot-update debugging misdirection)."
         }
       ],
       "sources": [
         {
           "type": "commit",
-          "ref": "323aa92",
-          "title": "ci: macOS 无证书时跳过签名/公证（ad-hoc），build-server 失败输出日志"
+          "ref": "v0.1.21",
+          "title": "feat(sync): 同步上游 openhanako 0.443.46（文档抽取）+ 升版 0.1.21 预览"
         }
       ]
     }

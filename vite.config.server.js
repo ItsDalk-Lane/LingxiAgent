@@ -32,6 +32,13 @@ export default defineConfig({
         "better-sqlite3",
         "node-pty",
 
+        // @firecrawl/anydoc: napi native addon. Its per-platform subpackage
+        // declares the .node binary itself as "main", so bundling makes
+        // Rollup parse Mach-O/ELF bytes as JavaScript. External also means
+        // build-server installs it into the packaged server's node_modules
+        // (this list is the source of truth for that install set).
+        "@firecrawl/anydoc",
+
         // ws: CJS package, Rollup's CJS→ESM interop loses WebSocketServer
         // named export. Keep external — available as PI SDK transitive dep.
         "ws",
