@@ -21,8 +21,11 @@ import updateStyles from '../../components/AutoUpdateStatus.module.css';
 const EMPTY_HISTORY: UpdateDigestHistoryResult = { entries: [], source: 'none', complete: false };
 
 // 上游项目：本仓库（LingxiAgent）由 openhanako 改名/重构而来，版本线同步跟踪上游。
+// UPSTREAM_VERSION 是构建期从 package.json 的 lingxi.upstreamVersion 注入的（见
+// vite.config.ts 的 define），单一真相源在 package.json——同步上游代码时改那一处即可，
+// 这里自动跟随。一致性由 tests/upstream-version-consistency.test.ts 钉死。
 const UPSTREAM_REPO_URL = 'https://github.com/liliMozi/openhanako';
-const UPSTREAM_VERSION = '0.442.0';
+const UPSTREAM_VERSION = String(import.meta.env.LINGXI_UPSTREAM_VERSION ?? '0.0.0-unknown');
 // 「下载最新版本」的回退目标：release API 没带回 html_url 时（理论上不会），
 // 至少把用户带到 releases/latest 总入口，自己挑平台安装包。owner/repo 与
 // package.json electron-builder publish 配置、github-release-check.cjs 一致。

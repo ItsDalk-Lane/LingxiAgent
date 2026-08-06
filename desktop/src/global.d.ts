@@ -63,6 +63,17 @@ declare global {
   function setTheme(theme: string): void;
   function setSerifFont(enabled: boolean): void;
   function setPaperTexture(enabled: boolean): void;
+
+  // ── Vite 构建期注入的常量（define） ──
+  // import.meta.env 在本仓库只有构建期注入一途（不走 Vite dev 的 import.meta.env
+  // 热替换），所以这里只声明实际用到的字段，不引入完整的 vite/client 类型。
+  interface ImportMeta {
+    readonly env: {
+      // 上游版本号，由 vite.config.ts 从 package.json lingxi.upstreamVersion 注入。
+      // 见 tests/upstream-version-consistency.test.ts。
+      LINGXI_UPSTREAM_VERSION?: string;
+    };
+  }
 }
 
 export {};

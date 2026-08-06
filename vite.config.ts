@@ -4,6 +4,7 @@ import path from 'path';
 import fs from 'fs';
 import crypto from 'crypto';
 import { injectCsp } from './vite.csp-profiles';
+import pkg from './package.json' assert { type: 'json' };
 
 interface DevWebClientConfig {
   serverPort: string;
@@ -296,6 +297,12 @@ function copyLegacyFiles(): Plugin {
 export default defineConfig({
   root: 'desktop/src',
   base: './',
+  // 把 package.json 的 lingxi.upstreamVersion（上游版本单一真相源）在构建期注入到
+  // renderer。AboutTab 的关于页用它展示「上游版本」——同步上游代码时只需改 package.json
+  // 这一处，无需碰组件。一致性由 tests/upstream-version-consistency.test.ts 钉死。
+  define: {
+    'import.meta.env.LINGXI_UPSTREAM_VERSION': JSON.stringify(pkg.lingxi?.upstreamVersion ?? ''),
+  },
   plugins: [
     browserCjsDefaultInterop(),
     preserveLegacyCss(),
