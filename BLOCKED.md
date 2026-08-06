@@ -19,6 +19,14 @@
 - 本次策略：fingerprint.json 按任务1原文同步上游 v0.443.46 版本（不重生成，避免触发 B1 争议 + 触碰判卷）；closure.json 同理同步上游版本。两个 json 在本项目本就与源码不一致（B1），同步上游版本不会让情况更糟，且符合「同步上游」的本意。
 - 建议（给后续）：B1 修完后，连带重跑两个生成脚本让 json 与本项目实际闭包对齐。
 
+### B5. CI mirror-atomgit job 失败（undici 缺失，不影响 GitHub prerelease）
+- 现象：v0.1.21 的 CI run `31074231296` 整体 `failure`，唯一失败 job 是 `mirror-atomgit in 18s`：
+  `Cannot find package 'undici' imported from scripts/mirror-release-to-atomgit.mjs`（上传 latest-linux.yml 到 atomgit 时）。
+- 其余 job 全绿：✓ renderer-box / ✓ 4 平台 build（含 macOS dmg x64+arm64）/ ✓ release（创建 GitHub prerelease）/ ✓ publish-train（推 train-beta）。
+- 根因（**非本次同步引入**）：`scripts/mirror-release-to-atomgit.mjs` 本次未改（git log 空）；undici 是 package.json dependencies@7.24.7；脚本用 `await import("undici")`。失败说明 mirror-atomgit job 的 runner 上下文没装/没暴露 node_modules（很可能该 job 缺 `npm install` 步骤，或 Node 升级后 undici 不再隐式可用）。属既有 CI 配置问题。
+- 影响：**GitHub prerelease（single source of truth）已完整发布**——v0.1.21，isPrerelease=true，isDraft=false，18 assets（Linux/macOS/Windows 全平台）。仅 atomgit 次要镜像源未同步，不影响 GitHub 渠道与 OTA。
+- 建议（给后续）：给 build.yml 的 mirror-atomgit job 加 `npm install`（或 `npm install undici`）步骤，确保 runner 有 undici。
+
 ### B4. 本地 `npm run pack` 在 codesign 阶段失败（pre-existing 环境问题，阻断任务7 推 tag）
 - 现象：`npm run pack` 在 electron-builder 内置 codesign 阶段报错：
   `Lingxi Helper (GPU).app/.../Lingxi Helper (GPU): resource fork, Finder information, or similar detritus not allowed`。连败 3 次（①缺 LINGXI_SIGN_KEY→补临时密钥通过；②清 dist xattr 重跑；③重建后 Helper 仍带 xattr）。

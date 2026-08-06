@@ -55,8 +55,9 @@
 - **任务7 已执行（用户裁决路径1：直接让 CI 打包）**：
   - `git push origin main` → `2780c55..8840d1a main -> main` ✓
   - `git tag v0.1.21`（指向 8840d1a）+ `git push origin v0.1.21` → `[new tag] v0.1.21 -> v0.1.21` ✓
-  - CI build.yml 已触发：run `31074231296`（v0.1.21, in_progress）。本地 pack 的 codesign xattr 卡点不适用于 CI 环境。
-  - 注：本地 `npm run pack` 的 EXIT 0 前置未在本地达成（BLOCKED B4，pre-existing 环境问题），用户裁决接受「核心打包链路已验证健康 + CI 打包」替代，直接推 tag。
+  - CI build.yml run `31074231296`（14m47s）：✓ renderer-box / ✓ 4 平台 build / ✓ release / ✓ publish-train / ✗ mirror-atomgit（undici 缺失，BLOCKED B5，不影响 GitHub release）。
+  - **GitHub prerelease 已发布**：v0.1.21，isPrerelease=true，isDraft=false，18 assets（Linux/macOS/Windows 全平台）。URL: https://github.com/ItsDalk-Lane/LingxiAgent/releases/tag/v0.1.21
+  - 注：本地 `npm run pack` 的 EXIT 0 前置未在本地达成（BLOCKED B4，pre-existing 环境问题），用户裁决接受「核心打包链路已验证健康 + CI 打包」替代，直接推 tag。CI 4 平台 build 全绿印证了该判断。
 
 ## 任务 4 验证过程中的关键发现与修复
 全量测试暴露了任务1清单的**系统性遗漏**——上游 0.442→0.443 不仅改了 94 个文件的实现，还配套改了**多个已存在的测试文件**（不在「新增」清单里，容易被漏）。逐轮定位并修复：
