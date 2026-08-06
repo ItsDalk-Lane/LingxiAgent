@@ -107,3 +107,4 @@
 - 升版：package.json / package-lock.json version → 0.1.22；electron-builder artifactName 用 `${version}` 自动跟随。
 - digest：release-digest.v1.json 重写为 v0.1.22 条目（3 items：pi SDK 0.83.0 升级 / server 指针误判修复 / 关于页上游版本单一真相源），`node scripts/generate-release-digest.mjs --append-history` 追加进 v2（head 0.1.22，4 entries），v1/v2 `validate-release-digest.mjs --tag v0.1.22` 双向通过 ✓。
 - 流程沿用 v0.1.21：提交 → push main → tag v0.1.22 → push tag → CI build.yml 自动出 prerelease（release job 显式 `--prerelease` + 校验 v1 digest 与 tag 一致）。
+- **发布结果（已确认）**：CI run `31112807735`（~14m）：✓ renderer-box / ✓ 4 平台 build / ✓ release / ✓ publish-train / ✗ mirror-atomgit（undici 缺失，同 B5，不影响 GitHub release）。**GitHub prerelease 已发布**：v0.1.22，isPrerelease=true，isDraft=false，18 assets（全平台）。URL: https://github.com/ItsDalk-Lane/LingxiAgent/releases/tag/v0.1.22
