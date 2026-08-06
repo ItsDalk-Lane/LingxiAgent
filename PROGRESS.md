@@ -46,8 +46,17 @@
 - [x] 任务 2 desktop 35 文件（2 拷贝 + 31 自动 + main.cjs/api.ts 手工；6 文件定制已核）
 - [x] 任务 5 版本号 0.1.2→0.1.21（仅 version 一处）
 - [x] 任务 4 验证（typecheck 0 error；npm test 10597 passed / +178 / failed=5=基线；document-extract 反向验证 红→绿）
-- [x] 任务 6 release-digest v1+v2 追加 v0.1.21（validate 通过）+ npm run pack
-- [ ] 任务 7 发布 prerelease
+- [x] 任务 6 release-digest v1+v2 追加 v0.1.21（validate 通过）；npm run pack 卡在本地 codesign（pre-existing xattr，BLOCKED B4）
+- [⏸] 任务 7 发布 prerelease —— **停于本地提交，未推 tag**（按死规矩：pack 未 EXIT 0 不推 tag）
+
+## 最终状态（2026-08-06 13:00）
+- 已提交：commit `362f815`，95 files changed, +7003/−770，工作区干净。
+- 代码同步全绿：typecheck 0 error / npm test 10597 passed(+178) / failed=5(=基线) / 反向验证 红→绿 / digest validate 通过 / 判卷三指纹不变。
+- 未推 tag v0.1.21：本地 `npm run pack` 撞 pre-existing macOS codesign xattr 卡点（afterSign=None，本地 pack 不触发 resign-adhoc 清理；非本次同步引入，核心打包链路已验证健康，见 BLOCKED B4）。
+- 后续推 tag 的两条路（任选，需重新评估 pack 前置）：
+  1. 在干净环境/CI 跑 pack 验证（CI 无此 xattr 问题），或本地 pack 前 `xattr -cr dist/` + 配临时 LINGXI_SIGN_KEY（已验证可行）。
+  2. 给 package.json `build.mac.afterSign` 指向 notarize.cjs（让本地 pack 也走 resign-adhoc xattr 清理）——但涉本项目专属配置，需单独评估。
+  - 然后 `git tag v0.1.21 && git push origin v0.1.21`（及 `git push origin main` 推提交）即可触发 CI 出 GitHub prerelease。
 
 ## 任务 4 验证过程中的关键发现与修复
 全量测试暴露了任务1清单的**系统性遗漏**——上游 0.442→0.443 不仅改了 94 个文件的实现，还配套改了**多个已存在的测试文件**（不在「新增」清单里，容易被漏）。逐轮定位并修复：
