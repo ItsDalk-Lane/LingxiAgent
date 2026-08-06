@@ -942,6 +942,10 @@ const artifactBoot = require("./src/shared/artifact-boot.cjs");
 // 启动时的 artifact-boot 已覆盖 server 与 renderer。dev 模式默认不调度（见下方
 // createMainWindow 里的挂钩注释）。
 const artifactOta = require("./src/shared/artifact-ota.cjs");
+// GitHub Release 版本检查：About 页"检查更新"的主检测源。OTA 签名通道
+// （artifact-ota）依赖未配置的 LINGXI_ARTIFACT_CHANNEL_BASE_URL，正式构建里
+// 从未生效；这个模块直接查 GitHub Releases，不依赖签名/环境变量。
+const githubReleaseCheck = require("./src/shared/github-release-check.cjs");
 // 拆箱目录 GC：boot 决议完成后对 server/renderer 各自的
 // 版本目录做一次"只保留 current+previous"清理，失败静默，绝不影响启动。
 const artifactGc = require("./src/shared/artifact-gc.cjs");
@@ -5135,9 +5139,14 @@ function readBundledUpdateDigestHistory() {
 
 // About 页的历史是“当前网站上最近发布的版本”，不能由安装时冻结的包内文件
 // 充当真相。包内 v2 史册只在网络不可用时显式回退，并由 renderer 标注来源。
+// 仓库地址硬编码为 ItsDalk-Lane/LingxiAgent（与 github-release-check.cjs、
+// package.json electron-builder publish 一致）——正式构建里没有机会配
+// LINGXI_UPDATE_GITHUB_OWNER/REPO 环境变量，靠 env 只会永远走 bundled 回退。
 const loadUpdateDigestHistory = createUpdateDigestHistoryLoader({
   normalize: normalizeReleaseDigest,
   readBundledEntries: readBundledUpdateDigestHistory,
+  releasesApiUrl: "https://api.github.com/repos/ItsDalk-Lane/LingxiAgent/releases?per_page=20&page=1",
+  releaseAssetBaseUrl: "https://github.com/ItsDalk-Lane/LingxiAgent/releases/download",
   log: (message) => console.warn(`[update-history] ${redactMainLogText(message)}`),
 });
 
@@ -5161,6 +5170,22 @@ wrapIpcHandler("run-edit-command", (event, command) => {
 // desktop/src/react/types.ts 里 TrainUpdateStatus 的文档注释）。保留这个
 // handler 作为壳版本自省的通道，不删、不改语义。
 wrapIpcHandler("get-app-version", () => app.getVersion());
+
+// About 页"检查更新"主出口：查 GitHub 最新 release，与当前壳版本比对。
+// 60s 内存缓存——用户反复点"检查更新"不会狂打 GitHub API（未认证请求
+// 速率受限），但也不至于缓存太久让"刚发布了新版本"延迟一整轮。
+const _releaseCheckCache = { at: 0, result: null };
+const RELEASE_CHECK_CACHE_TTL_MS = 60_000;
+wrapIpcHandler("release-check-latest", async () => {
+  const now = Date.now();
+  if (_releaseCheckCache.result && now - _releaseCheckCache.at < RELEASE_CHECK_CACHE_TTL_MS) {
+    return _releaseCheckCache.result;
+  }
+  const result = await githubReleaseCheck.checkLatestRelease({ currentVersion: app.getVersion() });
+  _releaseCheckCache.at = now;
+  _releaseCheckCache.result = result;
+  return result;
+});
 wrapIpcBestEffortHandler("get-pending-announcement", () => computePendingAnnouncement());
 // 书签必须写内容版本——跟 computePendingAnnouncement 读书签时用的比较基准
 // 是同一把尺子（见该函数内注释），否则热更新用户的书签会被壳版本污染。

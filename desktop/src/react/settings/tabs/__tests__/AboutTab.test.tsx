@@ -12,42 +12,30 @@ vi.mock('../../../hooks/use-auto-update-state', () => ({
   useAutoUpdateState: () => shellUpdateStateOverride ?? { status: 'idle' },
 }));
 
-const checkTrainNow = vi.fn();
-const applyTrainNow = vi.fn();
+const checkReleaseNow = vi.fn();
 
-interface TrainOverride {
-  currentVersion: string;
-  available: { version: string } | null;
-  minShellBlocked: boolean;
-  lastError: string | null;
+interface ReleaseOverride {
+  status: 'idle' | 'checking' | 'latest' | 'available' | 'error';
+  latestVersion?: string;
+  releaseUrl?: string | null;
+  error?: string;
   lastCheckedAt: string | null;
-  manifestSource: 'origin' | 'mirror' | null;
-  manifestReleasedAt: string | null;
-  originUnreachable: boolean;
-  phase: 'idle' | 'checking' | 'downloading' | 'applying';
-  progress: { receivedBytes: number; totalBytes: number } | null;
 }
 
-const DEFAULT_TRAIN_OVERRIDE: TrainOverride = {
-  currentVersion: '0.160.2',
-  available: null,
-  minShellBlocked: false,
-  lastError: null,
-  lastCheckedAt: null,
-  manifestSource: null,
-  manifestReleasedAt: null,
-  originUnreachable: false,
-  phase: 'idle',
-  progress: null,
+const DEFAULT_RELEASE_OVERRIDE: ReleaseOverride = {
+  status: 'latest',
+  latestVersion: '0.1.2',
+  releaseUrl: 'https://github.com/ItsDalk-Lane/LingxiAgent/releases/tag/v0.1.2',
+  error: undefined,
+  lastCheckedAt: '2026-08-06T08:00:00.000Z',
 };
 
-let trainOverride: TrainOverride = { ...DEFAULT_TRAIN_OVERRIDE };
+let releaseOverride: ReleaseOverride = { ...DEFAULT_RELEASE_OVERRIDE };
 
-vi.mock('../../../hooks/use-train-update-state', () => ({
-  useTrainUpdateState: () => ({
-    ...trainOverride,
-    checkNow: checkTrainNow,
-    applyNow: applyTrainNow,
+vi.mock('../../../hooks/use-release-check', () => ({
+  useReleaseCheck: () => ({
+    ...releaseOverride,
+    checkNow: checkReleaseNow,
   }),
 }));
 
@@ -99,9 +87,8 @@ afterEach(() => {
   cleanup();
   autoSaveConfig.mockReset();
   loadSettingsConfig.mockReset();
-  checkTrainNow.mockReset();
-  applyTrainNow.mockReset();
-  trainOverride = { ...DEFAULT_TRAIN_OVERRIDE };
+  checkReleaseNow.mockReset();
+  releaseOverride = { ...DEFAULT_RELEASE_OVERRIDE };
   shellUpdateStateOverride = null;
   useSettingsStore.setState({ settingsConfig: null });
   vi.unstubAllGlobals();
@@ -110,6 +97,8 @@ afterEach(() => {
 function installHana(overrides: Record<string, unknown> = {}) {
   vi.stubGlobal('window', Object.assign(window, {
     hana: {
+      // Hero 版本号走 getAppVersion（app.getVersion()），不再是列车内容版本。
+      getAppVersion: vi.fn().mockResolvedValue('0.1.2'),
       autoUpdateCheck: vi.fn(),
       autoUpdateInstall: vi.fn(),
       autoUpdateSetChannel: vi.fn(),
@@ -171,14 +160,18 @@ describe('AboutTab', () => {
     expect(loadSettingsConfig).not.toHaveBeenCalled();
   });
 
-  it('shows the content version (single source, not the shell version) in the hero', () => {
-    installHana();
+  it('shows the app version (app.getVersion) in the hero, not the train content version', async () => {
+    const getAppVersion = vi.fn().mockResolvedValue('0.1.2');
+    installHana({ getAppVersion });
     useSettingsStore.setState({ settingsConfig: { auto_check_updates: true, update_channel: 'stable' } });
-    trainOverride = { ...DEFAULT_TRAIN_OVERRIDE, currentVersion: '0.388.0' };
 
-    render(<AboutTab />);
+    await act(async () => {
+      render(<AboutTab />);
+      await Promise.resolve();
+    });
 
-    expect(screen.getByText('v0.388.0')).toBeTruthy();
+    expect(getAppVersion).toHaveBeenCalledTimes(1);
+    expect(screen.getByText('v0.1.2')).toBeTruthy();
   });
 
   it('does not render the platform-update row when no shell update is pending', () => {
@@ -206,144 +199,81 @@ describe('AboutTab', () => {
     expect(autoUpdateInstall).toHaveBeenCalledTimes(1);
   });
 
-  it('escalates the platform-update row copy when minShellBlocked is true (two-tier copy)', () => {
-    installHana();
+  it('available: shows the "new version available" headline with a "download latest" button that calls openExternal', async () => {
+    const openExternal = vi.fn();
+    installHana({ openExternal });
     useSettingsStore.setState({ settingsConfig: { auto_check_updates: true, update_channel: 'stable' } });
-    shellUpdateStateOverride = { status: 'downloaded', version: '2.0.0' };
-    trainOverride = { ...DEFAULT_TRAIN_OVERRIDE, minShellBlocked: true };
+    releaseOverride = {
+      ...DEFAULT_RELEASE_OVERRIDE,
+      status: 'available',
+      latestVersion: '0.2.0',
+      releaseUrl: 'https://github.com/ItsDalk-Lane/LingxiAgent/releases/tag/v0.2.0',
+    };
 
     render(<AboutTab />);
 
-    expect(screen.getByText('settings.about.shellStickerTitleBlocking')).toBeTruthy();
-    expect(screen.queryByText('settings.about.shellStickerTitle')).toBeNull();
-  });
+    expect(screen.getByText('settings.about.updateAvailableGithub')).toBeTruthy();
+    fireEvent.click(screen.getByText('settings.about.updateDownloadLatest'));
 
-  it('available: shows the "new version available" headline with an update button that calls applyNow (never autoUpdateInstall)', () => {
-    const autoUpdateInstall = vi.fn();
-    installHana({ autoUpdateInstall });
-    useSettingsStore.setState({ settingsConfig: { auto_check_updates: true, update_channel: 'stable' } });
-    trainOverride = { ...DEFAULT_TRAIN_OVERRIDE, available: { version: '0.389.0' } };
-
-    render(<AboutTab />);
-
-    expect(screen.getByText('settings.about.updateAvailable')).toBeTruthy();
-    fireEvent.click(screen.getByText('settings.about.updateApply'));
-
-    expect(applyTrainNow).toHaveBeenCalledTimes(1);
-    expect(autoUpdateInstall).not.toHaveBeenCalled();
-    // No manual "check for updates" button while an update is already sitting there.
+    expect(openExternal).toHaveBeenCalledTimes(1);
+    expect(openExternal).toHaveBeenCalledWith('https://github.com/ItsDalk-Lane/LingxiAgent/releases/tag/v0.2.0');
+    // No manual "check for updates" button while a download button is showing.
     expect(screen.queryByText('settings.about.updateCheckBtn')).toBeNull();
   });
 
-  it('lastError: shows the error text with a retry button that calls checkNow', () => {
-    const autoUpdateCheck = vi.fn();
-    installHana({ autoUpdateCheck });
+  it('available: falls back to the releases/latest page url when releaseUrl is missing', async () => {
+    const openExternal = vi.fn();
+    installHana({ openExternal });
     useSettingsStore.setState({ settingsConfig: { auto_check_updates: true, update_channel: 'stable' } });
-    trainOverride = { ...DEFAULT_TRAIN_OVERRIDE, lastError: 'network down' };
+    releaseOverride = { ...DEFAULT_RELEASE_OVERRIDE, status: 'available', latestVersion: '0.2.0', releaseUrl: null };
+
+    render(<AboutTab />);
+
+    fireEvent.click(screen.getByText('settings.about.updateDownloadLatest'));
+    expect(openExternal).toHaveBeenCalledWith('https://github.com/ItsDalk-Lane/LingxiAgent/releases/latest');
+  });
+
+  it('error: shows the error copy with a retry button that calls checkNow', () => {
+    installHana();
+    useSettingsStore.setState({ settingsConfig: { auto_check_updates: true, update_channel: 'stable' } });
+    releaseOverride = { ...DEFAULT_RELEASE_OVERRIDE, status: 'error', error: 'network' };
 
     render(<AboutTab />);
 
     expect(screen.getByText('settings.about.updateError')).toBeTruthy();
-    expect(screen.getByText('network down')).toBeTruthy();
 
     fireEvent.click(screen.getByText('settings.about.updateRetryBtn'));
-    expect(checkTrainNow).toHaveBeenCalledTimes(1);
+    expect(checkReleaseNow).toHaveBeenCalledTimes(1);
     fireEvent.click(screen.getByText('settings.about.updateRetryBtn'));
-    expect(checkTrainNow).toHaveBeenCalledTimes(2);
-    expect(autoUpdateCheck).toHaveBeenCalledTimes(2);
+    expect(checkReleaseNow).toHaveBeenCalledTimes(2);
     // The generic check button is redundant once the retry button is showing.
     expect(screen.queryByText('settings.about.updateCheckBtn')).toBeNull();
   });
 
-  it('up-to-date: only shows the "latest, last checked at" line when there is no available update and no error', () => {
+  it('up-to-date: shows the "latest, last checked at" line and keeps the manual check button', () => {
     installHana();
     useSettingsStore.setState({ settingsConfig: { auto_check_updates: true, update_channel: 'stable' } });
-    trainOverride = { ...DEFAULT_TRAIN_OVERRIDE, lastCheckedAt: '2026-07-11T08:00:00.000Z' };
+    releaseOverride = { ...DEFAULT_RELEASE_OVERRIDE, status: 'latest', lastCheckedAt: '2026-08-06T08:00:00.000Z' };
 
     render(<AboutTab />);
 
     expect(screen.getByText('settings.about.updateLatestCheckedAt')).toBeTruthy();
     // Manual check remains available from the calm "up to date" state.
     expect(screen.getByText('settings.about.updateCheckBtn')).toBeTruthy();
-    // No manifest date line when the hook never reported one (pre-upgrade
-    // shell / never-fetched-from-real-source case).
-    expect(screen.queryByText('settings.about.updateManifestReleasedAt')).toBeNull();
-    expect(screen.queryByText('settings.about.updateManifestReleasedAtViaMirror')).toBeNull();
   });
 
-  it('up-to-date: shows the neutral shelf-manifest-issued line when manifestReleasedAt is present, without the mirror suffix when origin was reachable', () => {
+  it('checking: shows the checking message and hides the manual check button', () => {
     installHana();
     useSettingsStore.setState({ settingsConfig: { auto_check_updates: true, update_channel: 'stable' } });
-    trainOverride = {
-      ...DEFAULT_TRAIN_OVERRIDE,
-      lastCheckedAt: '2026-07-11T08:00:00.000Z',
-      manifestSource: 'origin',
-      manifestReleasedAt: '2026-07-11T00:00:00.000Z',
-      originUnreachable: false,
-    };
+    releaseOverride = { ...DEFAULT_RELEASE_OVERRIDE, status: 'checking', lastCheckedAt: null };
 
     render(<AboutTab />);
 
-    expect(screen.getByText('settings.about.updateManifestReleasedAt')).toBeTruthy();
-    expect(screen.queryByText('settings.about.updateManifestReleasedAtViaMirror')).toBeNull();
-  });
-
-  it('up-to-date: ignores legacy source flags and always uses the single-source manifest copy', () => {
-    installHana();
-    useSettingsStore.setState({ settingsConfig: { auto_check_updates: true, update_channel: 'stable' } });
-    trainOverride = {
-      ...DEFAULT_TRAIN_OVERRIDE,
-      lastCheckedAt: '2026-07-11T08:00:00.000Z',
-      manifestSource: 'mirror',
-      manifestReleasedAt: '2026-07-11T00:00:00.000Z',
-      originUnreachable: true,
-    };
-
-    render(<AboutTab />);
-
-    expect(screen.getByText('settings.about.updateManifestReleasedAt')).toBeTruthy();
-    expect(screen.queryByText('settings.about.updateManifestReleasedAtViaMirror')).toBeNull();
-  });
-
-  it('never checked: renders no conclusion text, only the manual check button', () => {
-    installHana();
-    useSettingsStore.setState({ settingsConfig: { auto_check_updates: true, update_channel: 'stable' } });
-
-    render(<AboutTab />);
-
-    expect(screen.queryByText('settings.about.updateAvailable')).toBeNull();
-    expect(screen.queryByText('settings.about.updateError')).toBeNull();
-    expect(screen.queryByText('settings.about.updateLatestCheckedAt')).toBeNull();
-    expect(screen.getByText('settings.about.updateCheckBtn')).toBeTruthy();
-  });
-
-  it('downloading: shows byte progress while an apply is in flight, driven by the hook phase/progress', () => {
-    installHana();
-    useSettingsStore.setState({ settingsConfig: { auto_check_updates: true, update_channel: 'stable' } });
-    trainOverride = {
-      ...DEFAULT_TRAIN_OVERRIDE,
-      available: { version: '0.389.0' },
-      phase: 'downloading',
-      progress: { receivedBytes: 50, totalBytes: 200 },
-    };
-
-    render(<AboutTab />);
-
-    expect((screen.getByRole('progressbar') as HTMLProgressElement).value).toBe(25);
-  });
-
-  it('applying: shows the applying message and hides the manual check button', () => {
-    installHana();
-    useSettingsStore.setState({ settingsConfig: { auto_check_updates: true, update_channel: 'stable' } });
-    trainOverride = { ...DEFAULT_TRAIN_OVERRIDE, available: { version: '0.389.0' }, phase: 'applying' };
-
-    render(<AboutTab />);
-
-    expect(screen.getByText('settings.about.trainStickerApplying')).toBeTruthy();
+    expect(screen.getByText('settings.about.updateChecking')).toBeTruthy();
     expect(screen.queryByText('settings.about.updateCheckBtn')).toBeNull();
   });
 
-  it('the beta toggle drives both the shell channel IPC and a train update check', async () => {
+  it('the beta toggle drives the shell channel IPC', async () => {
     const autoUpdateSetChannel = vi.fn();
     installHana({ autoUpdateSetChannel });
     useSettingsStore.setState({ settingsConfig: { auto_check_updates: true, update_channel: 'stable' } });
@@ -362,7 +292,6 @@ describe('AboutTab', () => {
 
     expect(autoUpdateSetChannel).toHaveBeenCalledWith('beta');
     expect(autoSaveConfig).toHaveBeenCalledWith({ update_channel: 'beta' }, { silent: true });
-    expect(checkTrainNow).toHaveBeenCalledTimes(1);
   });
 
   it('loads the newest five releases only after the update-history dialog is opened', async () => {

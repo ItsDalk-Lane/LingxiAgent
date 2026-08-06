@@ -35,6 +35,8 @@ contextBridge.exposeInMainWorld("hana", {
   getServerToken: () => ipcRenderer.invoke("get-server-token"),
   runEditCommand: (command) => ipcRenderer.invoke("run-edit-command", command),
   getAppVersion: () => ipcRenderer.invoke("get-app-version"),
+  // About 页"检查更新"：查 GitHub 最新 release 是否比当前版本新。
+  releaseCheckLatest: () => ipcRenderer.invoke("release-check-latest"),
   getPendingAnnouncement: () => ipcRenderer.invoke("get-pending-announcement"),
   ackAnnouncement: () => ipcRenderer.invoke("ack-announcement"),
   // Auto-update (Windows)

@@ -11,7 +11,7 @@ import { SettingsStack } from '../components/SettingsPrimitives';
 import { ExpandableRow } from '../components/ExpandableRow';
 import { digestLocale, digestText, kindLabel } from '../../components/shared/release-digest-text';
 import { useAutoUpdateState } from '../../hooks/use-auto-update-state';
-import { useTrainUpdateState } from '../../hooks/use-train-update-state';
+import { useReleaseCheck } from '../../hooks/use-release-check';
 import { ConfirmDialog, Overlay } from '../../ui';
 import type { InviteChannelStatus, UpdateDigestHistoryResult } from '../../types';
 import appIconUrl from '../../../icon.png';
@@ -23,6 +23,10 @@ const EMPTY_HISTORY: UpdateDigestHistoryResult = { entries: [], source: 'none', 
 // 上游项目：本仓库（LingxiAgent）由 openhanako 改名/重构而来，版本线同步跟踪上游。
 const UPSTREAM_REPO_URL = 'https://github.com/liliMozi/openhanako';
 const UPSTREAM_VERSION = '0.442.0';
+// 「下载最新版本」的回退目标：release API 没带回 html_url 时（理论上不会），
+// 至少把用户带到 releases/latest 总入口，自己挑平台安装包。owner/repo 与
+// package.json electron-builder publish 配置、github-release-check.cjs 一致。
+const RELEASES_LATEST_PAGE_URL = 'https://github.com/ItsDalk-Lane/LingxiAgent/releases/latest';
 
 function UpdateHistoryDialog({
   open,
@@ -118,54 +122,39 @@ function UpdateHistoryDialog({
   );
 }
 
-function updatePercentOf(progress: { receivedBytes: number; totalBytes: number } | null): number {
-  if (!progress || !progress.totalBytes) return 0;
-  return Math.max(0, Math.min(100, Math.round((progress.receivedBytes / progress.totalBytes) * 100)));
-}
-
 function formatCheckedAt(iso: string): string {
   const date = new Date(iso);
   if (Number.isNaN(date.getTime())) return iso;
   return date.toLocaleString();
 }
 
-// 货架清单签发日期：只取日期，不带时间——这条是"清单本身多新"的中性背景
-// 信息，不是"我刚检查过"那个已经有独立时间戳的结论（formatCheckedAt）。
-function formatManifestDate(iso: string): string {
-  const date = new Date(iso);
-  if (Number.isNaN(date.getTime())) return iso;
-  return date.toLocaleDateString();
-}
-
 /**
- * 更新区状态机：四态互斥，phase 优先于 idle 分支——一轮检查/下载/应用
- * 正在进行时不该同时冒出"已是最新"这类只在真正 idle 时才成立的结论。
- * available 在 idle 分支里优先于 lastError：哪怕最近一次后台检查失败了，
- * 只要手头还攥着一个之前发现的可用更新，用户能做的动作就是去点它，
- * 不该被一条过期的错误信息挡住。
+ * 更新区状态机：GitHub Release 检测的呈现层。
+ *
+ * 与旧的 TrainUpdateArea 的根本区别——这里不再有任何"下载/应用中"的中间
+ * 态，因为这个渠道本身就是"查到新版本 → 跳浏览器手动下载安装"，应用内不
+ * 下载字节。三态互斥：checking（请求中）/ available（有新版，露"下载最新
+ * 版本"按钮）/ latest（已是最新）/ error（失败，带重试）。失败态不会像 OTA
+ * 那样残留在 ota-state.json 永不清除——每次 check 都是即时网络结果。
  */
-function TrainUpdateArea({
-  agentName,
-  available,
-  lastError,
+function ReleaseUpdateArea({
+  status,
+  latestVersion,
+  releaseUrl,
+  error,
   lastCheckedAt,
-  manifestReleasedAt,
-  phase,
-  progress,
-  onApply,
+  onDownload,
   onRetry,
 }: {
-  agentName: string;
-  available: { version: string } | null;
-  lastError: string | null;
+  status: 'idle' | 'checking' | 'latest' | 'available' | 'error';
+  latestVersion?: string;
+  releaseUrl?: string | null;
+  error?: string;
   lastCheckedAt: string | null;
-  manifestReleasedAt: string | null;
-  phase: 'idle' | 'checking' | 'downloading' | 'applying';
-  progress: { receivedBytes: number; totalBytes: number } | null;
-  onApply: () => void;
+  onDownload: () => void;
   onRetry: () => void;
 }) {
-  if (phase === 'checking') {
+  if (status === 'checking') {
     return (
       <div className={updateStyles.root}>
         <div className={updateStyles.row}>
@@ -175,58 +164,30 @@ function TrainUpdateArea({
     );
   }
 
-  if (phase === 'downloading') {
-    const percent = updatePercentOf(progress);
-    return (
-      <div className={updateStyles.root}>
-        <div className={updateStyles.column}>
-          <div className={updateStyles.downloadHeader}>
-            <span className={updateStyles.message}>
-              {t('settings.about.updateDownloading', { agentName })}
-            </span>
-            <span className={updateStyles.progressValue}>{t('settings.about.updateProgress', { percent })}</span>
-          </div>
-          <progress
-            className={updateStyles.nativeProgress}
-            aria-label={t('settings.about.updateDownloading', { agentName })}
-            max={100}
-            value={percent}
-          />
-        </div>
-      </div>
-    );
-  }
-
-  if (phase === 'applying') {
+  if (status === 'available') {
     return (
       <div className={updateStyles.root}>
         <div className={updateStyles.row}>
-          <span className={updateStyles.message}>{t('settings.about.trainStickerApplying')}</span>
-        </div>
-      </div>
-    );
-  }
-
-  // phase === 'idle' 以下——available 优先，其次 lastError，最后才是"已是最新"。
-  if (available) {
-    return (
-      <div className={updateStyles.root}>
-        <div className={updateStyles.row}>
-          <span className={updateStyles.message}>{t('settings.about.updateAvailable', { version: available.version })}</span>
-          <button type="button" className={updateStyles.action} onClick={onApply}>
-            {t('settings.about.updateApply')}
+          <span className={updateStyles.message}>
+            {t('settings.about.updateAvailableGithub', { version: latestVersion })}
+          </span>
+          <button type="button" className={updateStyles.action} onClick={onDownload}>
+            {t('settings.about.updateDownloadLatest')}
           </button>
         </div>
+        <div className={updateStyles.row}>
+          <span className={updateStyles.message}>{t('settings.about.updateDownloadHint')}</span>
+        </div>
       </div>
     );
   }
 
-  if (lastError) {
+  if (status === 'error') {
     return (
       <div className={updateStyles.root}>
         <div className={updateStyles.row}>
           <span className={`${updateStyles.message} ${updateStyles.error}`}>{t('settings.about.updateError')}</span>
-          <span className={updateStyles.errorDetail} title={lastError}>{lastError}</span>
+          {error && <span className={updateStyles.errorDetail} title={error}>{error}</span>}
           <button type="button" className={updateStyles.action} onClick={onRetry}>
             {t('settings.about.updateRetryBtn')}
           </button>
@@ -235,7 +196,7 @@ function TrainUpdateArea({
     );
   }
 
-  if (lastCheckedAt) {
+  if (status === 'latest' && lastCheckedAt) {
     return (
       <div className={updateStyles.root}>
         <div className={updateStyles.row}>
@@ -243,20 +204,11 @@ function TrainUpdateArea({
             {t('settings.about.updateLatestCheckedAt', { time: formatCheckedAt(lastCheckedAt) })}
           </span>
         </div>
-        {/* 中性背景信息：货架清单本身的签发日期，不是告警。 */}
-        {manifestReleasedAt && (
-          <div className={updateStyles.row}>
-            <span className={updateStyles.message}>
-              {t('settings.about.updateManifestReleasedAt', { date: formatManifestDate(manifestReleasedAt) })}
-            </span>
-          </div>
-        )}
       </div>
     );
   }
 
-  // 从未检查过（既没有 available，也没有 lastError/lastCheckedAt）：不渲染
-  // 任何结论性文案，只留下方的"检查更新"按钮可点。
+  // idle（尚未检查过）或 latest 但没时间戳：不渲染结论文案，只留"检查更新"按钮。
   return null;
 }
 
@@ -438,30 +390,42 @@ export function AboutTab() {
   const [historyLoading, setHistoryLoading] = useState(false);
   const [history, setHistory] = useState<UpdateDigestHistoryResult>(EMPTY_HISTORY);
   const shellUpdate = useAutoUpdateState();
+  // Hero 版本号用 app.getVersion()（产品/壳版本，如 0.1.2），不再用列车内容
+  // 版本（useTrainUpdateState 的 currentVersion，会显示成上游版本 0.442.0）。
+  // getAppVersion IPC 读的就是 app.getVersion()，单一源、不歧义。
+  const [appVersion, setAppVersion] = useState('');
+  useEffect(() => {
+    let alive = true;
+    void hana?.getAppVersion?.().then((v) => {
+      if (alive && v) setAppVersion(v);
+    });
+    return () => { alive = false; };
+  }, [hana]);
+  // 更新检测主源：查 GitHub Releases。OTA 签名通道（useTrainUpdateState）依赖
+  // 未配置的 LINGXI_ARTIFACT_CHANNEL_BASE_URL，正式构建里从未生效，且失败会
+  // 永久残留在 ota-state.json——这里改走 GitHub，开箱即用、失败不落盘。
   const {
-    currentVersion,
-    available,
-    minShellBlocked,
-    lastError,
-    lastCheckedAt,
-    manifestReleasedAt,
-    phase,
-    progress,
-    checkNow: checkTrainNow,
-    applyNow: applyTrainNow,
-  } = useTrainUpdateState();
+    status: releaseStatus,
+    latestVersion,
+    releaseUrl,
+    error: releaseError,
+    lastCheckedAt: releaseLastCheckedAt,
+    checkNow: checkReleaseNow,
+  } = useReleaseCheck();
   const isBeta = readConfigBoolean(settingsConfig, cfg => cfg.update_channel === 'beta', false);
   // 默认 true：老用户（preferences 里没写这个字段）保持原有"自动检查"行为
   const autoCheck = readConfigBoolean(settingsConfig, cfg => cfg.auto_check_updates, true);
 
   const handleCheck = useCallback(() => {
-    void hana?.autoUpdateCheck?.();
-    void checkTrainNow();
-  }, [checkTrainNow, hana]);
+    void checkReleaseNow();
+  }, [checkReleaseNow]);
 
-  const handleApply = useCallback(() => {
-    void applyTrainNow();
-  }, [applyTrainNow]);
+  // 「下载最新版本」：在系统浏览器打开 release 页面，用户自己选对应平台
+  // 的安装包下载后手动安装。releaseUrl 缺失时回退到 releases/latest 总入口。
+  const handleDownloadLatest = useCallback(() => {
+    const url = releaseUrl || RELEASES_LATEST_PAGE_URL;
+    void hana?.openExternal?.(url);
+  }, [hana, releaseUrl]);
 
   const handleInstallShell = useCallback(async () => {
     await hana?.autoUpdateInstall?.();
@@ -484,50 +448,41 @@ export function AboutTab() {
     hana?.autoUpdateSetChannel?.(channel);
     await autoSaveConfig({ update_channel: channel }, { silent: true });
     await loadSettingsConfig();
-    hana?.autoUpdateCheck?.();
-    void checkTrainNow();
-  }, [checkTrainNow, hana]);
+  }, [hana]);
 
   const handleAutoCheckToggle = useCallback(async (on: boolean) => {
     await autoSaveConfig({ auto_check_updates: on }, { silent: true });
     await loadSettingsConfig();
   }, []);
 
-  // 平台更新条件行：仅当壳更新待命时出现，平时不渲染——一个
-  // 一年两次的事件不该常年占一行。两层文案：minShell 真的挡住
-  // 新列车时升级成更明确的警告措辞。这一行是唯一还会触发壳安装
-  // （autoUpdateInstall）的地方——Hero 区的主更新按钮只会走 applyTrainNow。
+  // 平台（壳）更新条件行：仅当壳更新已下载待安装时出现，平时不渲染——一个
+  // 一年两次的事件不该常年占一行。这是唯一还会触发壳安装
+  // （autoUpdateInstall）的地方。
   const showPlatformRow = shellUpdate?.status === 'downloaded';
-  const platformRowLabel = minShellBlocked
-    ? t('settings.about.shellStickerTitleBlocking')
-    : t('settings.about.shellStickerTitle');
+  const platformRowLabel = t('settings.about.shellStickerTitle');
 
-  // 忙碌（checking/downloading/applying）、已经有明确可用更新、或已经在
-  // 展示带"重试"按钮的错误态时，这颗通用检查按钮就是多余的——要么已经在
-  // 做同一件事，要么已经有一颗更贴切的按钮摆在上面了。只在"从未检查过"与
-  // "已是最新"两种平静态下出现。
-  const showCheckButton = phase === 'idle' && !available && !lastError;
+  // 检查中、已发现新版本（有专属"下载"按钮）、或失败态（有"重试"按钮）时，
+  // 这颗通用检查按钮就是多余的。只在 idle/latest 态出现。
+  const showCheckButton = releaseStatus === 'idle' || releaseStatus === 'latest';
 
   return (
     <div className={`${styles['settings-tab-content']} ${styles['active']}`} data-tab="about">
-      {/* Hero：内容版本是唯一常规展示的版本号（单一源：useTrainUpdateState
-          的 currentVersion，读自已激活内容，不是壳 package.json 版本）；
-          更新主位是列车更新（check / "更新" 按钮 / 通道 / 历史，壳版本
-          永不出现在这里）。 */}
+      {/* Hero：版本号用 app.getVersion()（产品/壳版本，如 0.1.2），单一源、
+          无歧义；上游版本 0.442.0 作为 Info 区独立信息行展示，不混进 Hero。
+          更新检测走 GitHub Releases（ReleaseUpdateArea）：查到新版本就给
+          「下载最新版本」按钮，跳浏览器手动下载安装，不依赖 OTA 签名通道。 */}
       <div className={styles['about-hero']}>
         <img className={styles['about-icon']} src={appIconUrl} alt="LingxiAgent" />
         <div className={styles['about-name']}>LingxiAgent</div>
         <div className={styles['about-tagline']}>{t('settings.about.tagline')}</div>
-        {currentVersion && <div className={styles['about-version']}>v{currentVersion}</div>}
-        <TrainUpdateArea
-          agentName={settingsConfig?.agent?.name || 'Lingxi'}
-          available={available}
-          lastError={lastError}
-          lastCheckedAt={lastCheckedAt}
-          manifestReleasedAt={manifestReleasedAt}
-          phase={phase}
-          progress={progress}
-          onApply={handleApply}
+        {appVersion && <div className={styles['about-version']}>v{appVersion}</div>}
+        <ReleaseUpdateArea
+          status={releaseStatus}
+          latestVersion={latestVersion}
+          releaseUrl={releaseUrl}
+          error={releaseError}
+          lastCheckedAt={releaseLastCheckedAt}
+          onDownload={handleDownloadLatest}
           onRetry={handleCheck}
         />
         <div className={styles['about-update-actions']}>
@@ -581,7 +536,6 @@ export function AboutTab() {
           <SettingsRow
             label={platformRowLabel}
             hint={shellUpdate?.version ? `v${shellUpdate.version}` : undefined}
-            hintVariant={minShellBlocked ? 'warn' : 'default'}
             control={
               <button type="button" className={styles['about-check-update-btn']} onClick={handleInstallShell}>
                 {t('settings.about.updateInstall')}

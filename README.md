@@ -73,7 +73,7 @@ LingxiAgent 是一个更加易用的 AI agent，有记忆，有性格，会主�
 
 **macOS（Apple Silicon / Intel）**：从 Releases 页面下载最新 `.dmg`。
 
-应用已通过 Apple Developer ID 签名和公证，macOS 应该可以直接打开。
+当前发布版 macOS 构建为 ad-hoc 签名（CI 尚未配置 Apple Developer 证书），非 Developer ID 签名+公证，首次打开可能被 Gatekeeper 拦截。可右键 → **打开** 放行；待配齐 Apple 凭据后 CI 会自动切换到 Developer ID 签名+公证，届时可直接打开。
 
 **Windows**：从 Releases 页面下载最新 `.exe` 安装包。
 
@@ -127,7 +127,7 @@ Server 以独立 Node.js 进程运行（由 Electron spawn 或独立启动），
 
 | 平台 | 状态 |
 |------|------|
-| macOS (Apple Silicon) | 已支持（已签名公证） |
+| macOS (Apple Silicon) | 已支持（当前 ad-hoc 签名，待 Developer ID 签名+公证） |
 | macOS (Intel) | 已支持 |
 | Windows | Beta |
 | Linux | 已支持（AppImage / deb） |

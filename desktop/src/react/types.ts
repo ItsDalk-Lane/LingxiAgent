@@ -166,6 +166,22 @@ export interface TrainUpdateProgress {
   overallTotalBytes?: number;
 }
 
+/**
+ * GitHub Release 版本检查结果。About 页"检查更新"主出口，与 OTA 签名通道
+ * （TrainUpdateStatus）相互独立：OTA 依赖未配置的 channel manifest，这里
+ * 直接查 GitHub Releases，不依赖签名。
+ */
+export interface ReleaseCheckResult {
+  /** latest=已是最新；available=发现新版本；error=网络/解析失败 */
+  status: 'latest' | 'available' | 'error';
+  /** 最新 release 的版本号（去掉 v 前缀），latest/available 态都有 */
+  latestVersion?: string;
+  /** release 页面地址，available 态下作为"下载最新版本"按钮目标 */
+  releaseUrl?: string | null;
+  /** error 态下的简短说明（不泄露内部细节） */
+  error?: string;
+}
+
 export interface AutoLaunchStatus {
   supported: boolean;
   openAtLogin: boolean;
@@ -615,6 +631,11 @@ export interface PlatformApi {
 
   // ── App info ──
   getAppVersion?(): Promise<string>;
+  /**
+   * 查询 GitHub 最新 release，与当前壳版本比对。About 页"检查更新"主出口：
+   * 返回 latest（已是最新）/ available（发现新版本，带 releaseUrl）/ error（网络失败）。
+   */
+  releaseCheckLatest?(): Promise<ReleaseCheckResult>;
   /** 升级后首启合订本：entries 为 (书签, 当前] 区间的 digest 史册切片，新→旧 */
   getPendingAnnouncement?(): Promise<{ version: string; entries: ReleaseDigest[] } | null>;
   ackAnnouncement?(): Promise<void>;

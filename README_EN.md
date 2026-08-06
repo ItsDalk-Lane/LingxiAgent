@@ -68,7 +68,7 @@ As a tool, it is powerful: it remembers everything you've said, operates your co
 
 **macOS (Apple Silicon / Intel):** download the latest `.dmg` from the Releases page.
 
-The app is signed and notarized with an Apple Developer ID. macOS should allow it to launch directly.
+The current release uses ad-hoc signing (CI is not yet configured with an Apple Developer certificate) rather than Developer ID signing + notarization, so Gatekeeper may block the first launch. Right-click → **Open** to allow it. Once Apple credentials are in place, CI will switch to Developer ID signing + notarization and launch directly.
 
 **Windows:** download the latest `.exe` installer from the Releases page.
 
@@ -121,7 +121,7 @@ User data is rooted at `LINGXI_HOME` (`~/.lingxi` in production, `~/.lingxi-dev`
 
 | Platform | Status |
 |----------|--------|
-| macOS (Apple Silicon) | Supported (signed & notarized) |
+| macOS (Apple Silicon) | Supported (currently ad-hoc signed; Developer ID signing + notarization pending) |
 | macOS (Intel) | Supported |
 | Windows | Beta |
 | Linux | Supported (AppImage / deb) |
