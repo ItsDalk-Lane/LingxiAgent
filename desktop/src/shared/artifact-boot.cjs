@@ -142,6 +142,29 @@ function parseProductVersion(version) {
 }
 
 /**
+ * 检测两个可解析的版本号是否属于不同的版本号体系（不可直接做 semver 比较）。
+ *
+ * 两个版本都能通过 parseProductVersion 解析时，semver 比较默认假定它们在同一体系内
+ * 递增。但下游分叉（如 Lingxi）可能用与上游不同的版本号方案：Lingxi 壳版本是
+ * 0.1.x（minor 为 1~2 位数），上游 server 版本是 0.44x（minor 为 3 位数）。把它们
+ * 直接比较会把 0.1.21 误判为比 0.442.0 更旧，从而永远挡住随包新版 server 激活。
+ *
+ * 判据：major 段相等且 minor 段跨越了一个数量级（一侧 ≤2 位数、另一侧 ≥3 位数），
+ * 是不同版本号体系的强信号——同体系内 minor 不会无端跳一个数量级。此函数只标
+ * "可疑"，由 decideBootAction 决定是否降级为不可比较。
+ */
+function looksLikeDifferentVersionScheme(leftVersion, rightVersion) {
+  const left = parseProductVersion(leftVersion);
+  const right = parseProductVersion(rightVersion);
+  if (!left || !right) return false;
+  if (left[0] !== right[0]) return false;
+  // minor 段位数差 ≥1 个数量级（一边 <100、一边 ≥100）视为跨体系。
+  const minorDigits = (n) => (n <= 0 ? 1 : Math.floor(Math.log10(n)) + 1);
+  return Math.abs(minorDigits(left[1]) - minorDigits(right[1])) >= 1
+    && (left[1] < 100) !== (right[1] < 100);
+}
+
+/**
  * @param {unknown} leftVersion
  * @param {unknown} rightVersion
  * @returns {-1|0|1|null}
@@ -166,14 +189,19 @@ function decideBootAction({ resolved, seedEntry, crashFallback }) {
   if (!resolved) return "activate-seed";
   if (crashFallback) return "boot"; // 绝不把降级目标又顶回 seed
   const pointer = resolved.pointer;
-  const versionComparison = compareProductVersions(seedEntry.version, pointer.version);
+  const pointerTrain = Number.isInteger(pointer.train) ? pointer.train : 0;
+  // 跨版本号体系（如 Lingxi 0.1.x 的 seed 遇到上游 0.44x 的历史指针）时，semver 比较
+  // 会把 0.1.x 误判为更旧，永远挡住新版 server 激活。检测到跨体系就把比较结果视为
+  // 不可比较，降级到下面的 train/sha 自愈规则。
+  const crossScheme = looksLikeDifferentVersionScheme(seedEntry.version, pointer.version);
+  const versionComparison = crossScheme ? null : compareProductVersions(seedEntry.version, pointer.version);
   if (versionComparison !== null) {
     return versionComparison > 0 ? "activate-seed" : "boot";
   }
 
-  // 老指针或异常数据没有完整产品版本时，逐字保留原来的 train/sha 决策：
-  // seed-era 指针按内容新鲜度自愈，OTA train 不被无法比较的 seed 覆盖。
-  const pointerTrain = Number.isInteger(pointer.train) ? pointer.train : 0;
+  // 版本不可比较（或跨体系残留）：seed-era 的 train-0 指针按内容新鲜度自愈——sha256
+  // 不同即说明磁盘指针不是这个安装包带来的，激活随包 seed；train > 0 的 OTA 仍优先
+  // 于无法比较的 seed，不被无法比较的 seed 覆盖。
   if (pointerTrain === 0 && pointer.sha256 !== seedEntry.sha256) {
     return "activate-seed";
   }

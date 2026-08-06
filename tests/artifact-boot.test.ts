@@ -232,6 +232,32 @@ describe("artifact-boot: decideBootAction (pure)", () => {
     const resolved = { slot: "current", pointer: { sha256: "b".repeat(64), train: 7, version: "1.0.0" } };
     expect(decideBootAction({ resolved, seedEntry, crashFallback: true })).toBe("boot");
   });
+
+  // 回归：跨版本号体系的 train-0 残留指针不得挡住随包 seed 激活。
+  // Lingxi 壳版本是 0.1.x，但开发期残留的 server 指针版本是上游的 0.442.0；
+  // semver 把 0.1.21 误判为比 0.442.0 更旧，导致随包新版 server seed 永不激活，
+  // 用户装了新版却一直跑旧 server（看不到 MCP 重启自动连接等新功能）。
+  // 跨体系检测把比较降级为不可比较，train 0 + sha 不同 → 激活随包 seed。
+  it("activates a train-0 seed when the pointer is a cross-scheme residue that semver would misrank as newer (0.1.x seed vs 0.44x pointer)", () => {
+    const legacySeed = { sha256: "a".repeat(64), version: "0.1.21" };
+    const resolved = { slot: "current", pointer: { sha256: "b".repeat(64), train: 0, version: "0.442.0" } };
+    expect(decideBootAction({ resolved, seedEntry: legacySeed, crashFallback: false })).toBe("activate-seed");
+  });
+
+  // 对称回归：同一跨体系但方向相反（上游体系的 seed 遇 Lingxi 体系的指针）也应降级。
+  it("activates a train-0 seed when the pointer is a cross-scheme residue in the opposite direction (0.44x seed vs 0.1x pointer)", () => {
+    const upstreamSeed = { sha256: "a".repeat(64), version: "0.443.46" };
+    const resolved = { slot: "current", pointer: { sha256: "b".repeat(64), train: 0, version: "0.1.21" } };
+    expect(decideBootAction({ resolved, seedEntry: upstreamSeed, crashFallback: false })).toBe("activate-seed");
+  });
+
+  // 保护：同体系内 seed 真的更旧时（minor 段同量级，semver 可信），仍尊重"不降级"原则，
+  // 不被跨体系安全网误伤——这是上面"never downgrades"用例的同族保护。
+  it("does not treat same-scheme versions as cross-scheme (same minor magnitude keeps semver authoritative)", () => {
+    const lowerSeed = { sha256: "a".repeat(64), version: "2.0.0" };
+    const resolved = { slot: "current", pointer: { sha256: "b".repeat(64), train: 0, version: "2.0.1" } };
+    expect(decideBootAction({ resolved, seedEntry: lowerSeed, crashFallback: false })).toBe("boot");
+  });
 });
 
 describe("artifact-boot: prepareArtifactServerBoot", () => {
