@@ -50,13 +50,13 @@
 - [⏸] 任务 7 发布 prerelease —— **停于本地提交，未推 tag**（按死规矩：pack 未 EXIT 0 不推 tag）
 
 ## 最终状态（2026-08-06 13:00）
-- 已提交：commit `362f815`，95 files changed, +7003/−770，工作区干净。
+- 已提交：commit `362f815` + `8840d1a`，95 files changed, +7003/−770，工作区干净。
 - 代码同步全绿：typecheck 0 error / npm test 10597 passed(+178) / failed=5(=基线) / 反向验证 红→绿 / digest validate 通过 / 判卷三指纹不变。
-- 未推 tag v0.1.21：本地 `npm run pack` 撞 pre-existing macOS codesign xattr 卡点（afterSign=None，本地 pack 不触发 resign-adhoc 清理；非本次同步引入，核心打包链路已验证健康，见 BLOCKED B4）。
-- 后续推 tag 的两条路（任选，需重新评估 pack 前置）：
-  1. 在干净环境/CI 跑 pack 验证（CI 无此 xattr 问题），或本地 pack 前 `xattr -cr dist/` + 配临时 LINGXI_SIGN_KEY（已验证可行）。
-  2. 给 package.json `build.mac.afterSign` 指向 notarize.cjs（让本地 pack 也走 resign-adhoc xattr 清理）——但涉本项目专属配置，需单独评估。
-  - 然后 `git tag v0.1.21 && git push origin v0.1.21`（及 `git push origin main` 推提交）即可触发 CI 出 GitHub prerelease。
+- **任务7 已执行（用户裁决路径1：直接让 CI 打包）**：
+  - `git push origin main` → `2780c55..8840d1a main -> main` ✓
+  - `git tag v0.1.21`（指向 8840d1a）+ `git push origin v0.1.21` → `[new tag] v0.1.21 -> v0.1.21` ✓
+  - CI build.yml 已触发：run `31074231296`（v0.1.21, in_progress）。本地 pack 的 codesign xattr 卡点不适用于 CI 环境。
+  - 注：本地 `npm run pack` 的 EXIT 0 前置未在本地达成（BLOCKED B4，pre-existing 环境问题），用户裁决接受「核心打包链路已验证健康 + CI 打包」替代，直接推 tag。
 
 ## 任务 4 验证过程中的关键发现与修复
 全量测试暴露了任务1清单的**系统性遗漏**——上游 0.442→0.443 不仅改了 94 个文件的实现，还配套改了**多个已存在的测试文件**（不在「新增」清单里，容易被漏）。逐轮定位并修复：
