@@ -23,8 +23,17 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: npm
 
+      # npm ci 走网络下载依赖，偶发抖动（连接重置 / registry 5xx）会直接挂掉整个
+      # 矩阵。这里用 nick-fields/retry 在步骤层面重试，不改 npm 本身、不改 lockfile。
+      # cache: npm 已生效（默认 cache-dependency-path 指向仓库根 package-lock.json，
+      # 该文件 git 追踪中、在根目录）；日志里的 "npm cache is not found" 是首次运行
+      # 冷缓存或缓存服务抖动的正常现象，不是 lockfile 路径配错——无需改 cache-dependency-path。
       - name: Install dependencies
-        run: npm ci
+        uses: nick-fields/retry@v3
+        with:
+          max_attempts: 3
+          retry_wait_seconds: 30
+          command: npm ci
 
       - name: Build Windows sandbox helper
         if: runner.os == 'Windows'
@@ -84,6 +93,27 @@ jobs:
 
       - name: Run tests
         run: npm test
+
+  # persistence-schema 防呆：当 diff 触及指纹所钉的受护源文件（持久化存储、
+  # site 映射源等共 ~149 个）、而 build/persistence-schema-fingerprint.json
+  # 未在同一次提交里更新时，在这里比 test 矩阵更早地 fail 并提示重钉命令。
+  # 纯 git diff + JSON 解析，不跑 vitest、不解析 TypeScript、不装 npm 依赖，
+  # 因此与 test/lint-open-boundary/open-build-smoke 并行，不阻塞它们的启动。
+  # 权威 tripwire 仍是 npm test 里的 tests/persistence-schema-tripwire.test.ts
+  # （它跑完整的 assertCommittedPersistenceSchemaFingerprint），这里是它的快前哨。
+  persistence-schema-guard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # 需要 base..HEAD 的完整历史来算 diff（push 事件下 GitHub 默认浅克隆拿不到 before SHA 的提交）。
+          fetch-depth: 0
+
+      - name: Check persistence schema fingerprint repinned
+        env:
+          GITHUB_EVENT_BEFORE: ${{ github.event.before }}
+          GITHUB_BASE_REF: ${{ github.base_ref }}
+        run: node scripts/check-persistence-schema-fingerprint.mjs
 
   # 独立于上面 test 矩阵：只跑边界 lint 脚本本身，给"开/闭边界回归"一个比
   # 全量矩阵（typecheck/lint/build/test 跑完才轮到 npm test 里的边界用例）

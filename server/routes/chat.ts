@@ -1975,7 +1975,10 @@ export function createChatRoute(engine: any, hub: any, { upgradeWebSocket }: any
               return;
             }
 
-            if ((msg.type === "prompt" || msg.type === "interject") && (msg.text || msg.images?.length || msg.videos?.length || msg.audios?.length)) {
+            // 技能消息：用户点快捷指令按钮调用技能时，text 可能为空（只有 skillBadge），
+            // 此时 msg.skills 非空。不把 skills 纳入门禁，纯技能消息会被静默丢弃——
+            // 用户看到消息气泡但无任何输出，新会话里还会留下无法进入/重启即消失的空记录。
+            if ((msg.type === "prompt" || msg.type === "interject") && (msg.text || msg.skills?.length || msg.images?.length || msg.videos?.length || msg.audios?.length)) {
               const interject = msg.type === "interject";
               // 身份先解析：媒体校验的错误回包也要报在解析后的会话上，而且一条没有身份的
               // 消息不值得先把几 MB base64 量一遍再拒。

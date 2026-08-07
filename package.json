@@ -60,6 +60,7 @@
     "build:server": "node scripts/build-server.mjs",
     "build:server:open": "node scripts/build-server-open.mjs",
     "smoke:server:open": "node scripts/smoke-open-server.mjs",
+    "smoke:skill-ws": "node scripts/smoke-skill-ws.mjs",
     "export:open": "node scripts/export-open-tree.mjs",
     "rehearse:open": "node scripts/rehearse-open-export.mjs",
     "lint": "eslint .",

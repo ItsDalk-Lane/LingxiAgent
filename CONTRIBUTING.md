@@ -42,6 +42,33 @@ npm run start:vite
 
 Server 以独立 Node.js 进程运行（`spawn`，非 `fork`），不在 Electron 主进程内，因此 `better-sqlite3` **不需要 `electron-rebuild`**。`build-server.mjs` 在目标 Node.js runtime 下执行 `npm install --omit=dev`，native addon 的 ABI 自动匹配。
 
+## 持久化 schema 改动 → 重钉指纹
+
+仓库有一份钉死的持久化 schema 指纹 `build/persistence-schema-fingerprint.json`，它把约 149 个"受护源文件"（持久化存储定义、site 映射源、schemaSource 声明的模块等）的解析树哈希和 SQLite runtime schema 固化下来，防止持久化形态在不知不觉中漂移。
+
+**改了这些文件就必须重钉指纹，并在同一次提交里带上 `build/persistence-schema-fingerprint.json` 的更新。** 不知道一个文件算不算受护？改完直接提交，CI 会告诉你。
+
+CI 的 `persistence-schema-guard` job 会在 test 矩阵之前做一次快速 diff 防呆：只要你碰了任一受护源文件、而指纹文件没有在同一次 diff 里变动，就 fail 并打印重钉命令。权威校验仍是 `npm test` 里的 `tests/persistence-schema-tripwire.test.ts`（它跑完整的 `assertCommittedPersistenceSchemaFingerprint`），guard job 是它的快前哨。
+
+重钉命令（选一种）：
+
+```bash
+# 兼容性变更（持久化形态不破坏既有数据，如纯新增字段/表）
+node scripts/generate-persistence-schema-fingerprint.mjs \
+  --classification compatible \
+  --compatibility-reason "<说明为什么这次源码改动是 schema 兼容的>"
+
+# 破坏性变更（既有数据无法满足新形态，需要迁移 + DATA_EPOCH 递增）
+node scripts/generate-persistence-schema-fingerprint.mjs \
+  --classification breaking \
+  --source-data-epoch <当前> --target-data-epoch <当前+1> \
+  --affected-store <storeId> \
+  --checkpoint-policy "<迁移前如何 checkpoint>" \
+  --restore-policy "<迁移后如何 restore>"
+```
+
+> 注：指纹的源码哈希走的是 TypeScript **解析树**，所以纯注释 / 空白变更不会移动哈希。但 guard job 比权威校验更严格——注释改动也会被要求重钉。重钉后若哈希未变，`npm test` 会确认指纹确实一致，不会误报。
+
 ## Pull Request
 
 项目目前处于早期阶段，**不接受 Pull Request**。如果你有想法或发现了问题，欢迎开 issue 讨论。

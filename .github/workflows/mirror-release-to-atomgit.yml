@@ -51,6 +51,16 @@ jobs:
         with:
           node-version: "24.15.0"
 
+      # mirror-release-to-atomgit.mjs 懒加载 import("undici") 以抬高上传
+      # dispatcher 的 headers/body 超时（见脚本内注释）。这是为本地无依赖
+      # 环境设计的兜底——CI 上没有 node_modules，所以这里只装这一个顶层
+      # 依赖（package-lock.json 已固定 undici@7.24.7）。脚本本身不改。
+      # --omit=dev：不带 devDependencies（否则 Electron 二进制等会白下载）；
+      # --ignore-scripts：undici 是纯 JS 包，跳过 postinstall（patch-pi-sdk、
+      # better-sqlite3 原生构建等）与本 job 无关的构建脚本，省时并少一层抖动面。
+      - name: Install undici for mirror upload dispatcher
+        run: npm install --no-save --no-audit --no-fund --ignore-scripts --omit=dev undici@7.24.7
+
       - name: Mirror release assets
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
