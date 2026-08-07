@@ -1590,7 +1590,11 @@
       "addCustom": "新增自訂供應商",
       "noKey": "未設定",
       "remove": "移除",
-      "deleteConfirm": "確定刪除供應商 {name}？相關模型將一併清除。"
+      "deleteConfirm": "確定刪除供應商 {name}？相關模型將一併清除。",
+      "addService": "新增服務商",
+      "pickTitle": "選擇服務商",
+      "backToList": "返回服務商列表",
+      "empty": "尚未新增服務商，請點擊上方「新增服務商」開始設定。"
     },
     "usage": {
       "title": "用量統計",
@@ -1729,6 +1733,7 @@
       "visionModelMissingHint": "如果找不到你的模型，請在供應商頁面設定視覺能力。",
       "searchProvider": "搜尋服務",
       "searchProviderField": "搜尋引擎",
+      "searchSection": "搜尋 API",
       "searchApiKey": "搜尋 API Key",
       "searchApiKeyHint": "啟用搜尋時請填寫所選 provider 的 API Key",
       "searchApiKeysAutoHint": "Auto 會優先使用已設定的 AnySearch、Tavily、Brave、Serper 付費 API，然後使用 AnySearch 免費搜尋；額度耗盡、報錯、空結果或相關性較弱時再回退到瀏覽器搜尋。",

@@ -1,35 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useSettingsStore } from '../../store';
 import { lingxiFetch } from '../../api';
 import {
   t, lookupModelMeta, formatContext, autoSaveGlobalModels,
 } from '../../helpers';
-import { loadSettingsConfig } from '../../actions';
-import { SelectWidget, Toggle } from '@/ui';
+import { Toggle, SelectWidget } from '@/ui';
 import { ModelWidget } from '../../widgets/ModelWidget';
-import { KeyInput } from '../../widgets/KeyInput';
 import styles from '../../Settings.module.css';
 import {
   AUTO_SEARCH_PROVIDER,
-  SEARCH_API_PROVIDER_IDS,
   isFreeSearchApiProvider,
   isBrowserSearchProvider,
-  isSearchApiProvider,
-  normalizeSearchApiKeys,
 } from '../../../../../../shared/search-providers.ts';
 
 type ModelRef = { id: string; provider: string };
-
-const SEARCH_API_PROVIDER_LABELS: Record<string, string> = {
-  anysearch: 'AnySearch',
-  tavily: 'Tavily',
-  brave: 'Brave Search',
-  serper: 'Serper (Google)',
-};
-
-function searchProviderNeedsApiKey(provider: string): boolean {
-  return isSearchApiProvider(provider);
-}
 
 function ToolModelTestBtn({ modelRef }: { modelRef: unknown }) {
   const [status, setStatus] = useState<'idle' | 'testing' | 'ok' | 'fail'>('idle');
@@ -87,71 +71,6 @@ function ToolModelTestBtn({ modelRef }: { modelRef: unknown }) {
 
 export function OtherModelsSection({ providers }: { providers: Record<string, { models?: string[]; base_url?: string }> }) {
   const globalModelsConfig = useSettingsStore(s => s.globalModelsConfig);
-  const showToast = useSettingsStore(s => s.showToast);
-  const savedSearchApiKeys = normalizeSearchApiKeys(globalModelsConfig?.search?.api_keys || {});
-  const savedLegacySearchKey = globalModelsConfig?.search?.api_key || '';
-  const [searchApiKeys, setSearchApiKeys] = useState<Record<string, string>>({});
-  const [searchKeyEdited, setSearchKeyEdited] = useState<Record<string, boolean>>({});
-
-  // 从后端同步已保存的 key
-  useEffect(() => {
-    setSearchApiKeys((prev) => {
-      const next = { ...prev };
-      for (const provider of SEARCH_API_PROVIDER_IDS) {
-        if (searchKeyEdited[provider]) continue;
-        const legacyForSelectedProvider = globalModelsConfig?.search?.provider === provider ? savedLegacySearchKey : '';
-        next[provider] = savedSearchApiKeys[provider] || legacyForSelectedProvider || '';
-      }
-      return next;
-    });
-  }, [globalModelsConfig?.search?.provider, savedLegacySearchKey, JSON.stringify(savedSearchApiKeys), searchKeyEdited]);
-
-  const searchProvider = globalModelsConfig?.search?.provider || AUTO_SEARCH_PROVIDER;
-  const searchIsAutoProvider = searchProvider === AUTO_SEARCH_PROVIDER;
-  const searchIsKeylessProvider = isBrowserSearchProvider(searchProvider) || isFreeSearchApiProvider(searchProvider);
-  const explicitSearchApiProvider = searchProviderNeedsApiKey(searchProvider) ? searchProvider : '';
-
-  const verifySearch = async (provider: string) => {
-    const apiKey = (searchApiKeys[provider] || '').trim();
-    if (!provider) { showToast(t('settings.search.noProvider'), 'error'); return; }
-    if (searchProviderNeedsApiKey(provider) && !apiKey) { showToast(t('settings.search.noKey'), 'error'); return; }
-    try {
-      const res = await lingxiFetch('/api/search/verify', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ provider, api_key: apiKey, search_provider: searchProvider }),
-      });
-      const data = await res.json();
-      if (data.ok) {
-        showToast(t('settings.search.verified'), 'success');
-        setSearchKeyEdited((prev) => ({ ...prev, [provider]: false }));
-        await loadSettingsConfig();
-      } else {
-        showToast(t('settings.search.verifyFailed') + (data.error ? ': ' + data.error : ''), 'error');
-      }
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : String(err);
-      showToast(t('settings.saveFailed') + ': ' + msg, 'error');
-    }
-  };
-
-  // 工具模型配置可能来自老数据。展示层可读裸 id；保存路径必须重新选择成 {id, provider}。
-  const toModelRef = (raw: unknown): ModelRef | null => {
-    if (!raw) return null;
-    if (typeof raw === 'object' && (raw as any).id) {
-      return {
-        id: String((raw as any).id || ''),
-        provider: String((raw as any).provider || ''),
-      };
-    }
-    const s = String(raw || '').trim();
-    if (!s) return null;
-    const slashIdx = s.indexOf('/');
-    if (slashIdx > 0 && slashIdx < s.length - 1) {
-      return { provider: s.slice(0, slashIdx), id: s.slice(slashIdx + 1) };
-    }
-    return { id: s, provider: '' };
-  };
 
   const utilityVal = toModelRef(globalModelsConfig?.models?.utility);
   const utilityLargeVal = toModelRef(globalModelsConfig?.models?.utility_large);
@@ -160,33 +79,17 @@ export function OtherModelsSection({ providers }: { providers: Record<string, { 
   const imageCapableOnly = (model: { input?: string[] }) => (
     Array.isArray(model.input) && model.input.includes('image')
   );
-  const updateSearchApiKey = (provider: string, value: string) => {
-    setSearchApiKeys((prev) => ({ ...prev, [provider]: value }));
-    setSearchKeyEdited((prev) => ({ ...prev, [provider]: true }));
-  };
-  const renderSearchApiKeyRow = (provider: string) => (
-    <div className={styles['search-api-key-row']} key={provider}>
-      {searchIsAutoProvider && (
-        <span className={styles['search-api-key-label']}>{SEARCH_API_PROVIDER_LABELS[provider] || provider}</span>
-      )}
-      <div className={styles['search-api-key-controls']}>
-        <KeyInput
-          value={searchApiKeys[provider] || ''}
-          onChange={(v) => updateSearchApiKey(provider, v)}
-          placeholder={t('settings.api.apiKeyPlaceholder')}
-        />
-        <button className={styles['search-verify-btn']} onClick={() => verifySearch(provider)}>
-          {t('settings.search.verify')}
-        </button>
-      </div>
-    </div>
-  );
+  const searchProvider = globalModelsConfig?.search?.provider || AUTO_SEARCH_PROVIDER;
 
   return (
-    <div style={{ padding: 'var(--space-16)' }}>
-      <div className={styles['settings-form-grid']}>
-        <div className={`${styles['settings-form-field']} ${styles['settings-form-field-half']}`}>
-          <label className={styles['settings-form-label']}>{t('settings.api.utilityModel')}</label>
+    <div className={styles['pv-model-config']}>
+      {/* 每行：左侧标题 + 提示，右侧模型选择菜单 */}
+      <div className={styles['pv-model-config-row']}>
+        <div className={styles['pv-model-config-label']}>
+          <span className={styles['pv-model-config-title']}>{t('settings.api.utilityModel')}</span>
+          <span className={styles['settings-form-hint']}>{t('settings.api.utilityModelHint')}</span>
+        </div>
+        <div className={styles['pv-model-config-control']}>
           <div className={styles['pv-tool-model-row']}>
             <ModelWidget
               providers={providers}
@@ -199,10 +102,15 @@ export function OtherModelsSection({ providers }: { providers: Record<string, { 
             />
             <ToolModelTestBtn modelRef={globalModelsConfig?.models?.utility || ''} />
           </div>
-          <span className={styles['settings-form-hint']}>{t('settings.api.utilityModelHint')}</span>
         </div>
-        <div className={`${styles['settings-form-field']} ${styles['settings-form-field-half']}`}>
-          <label className={styles['settings-form-label']}>{t('settings.api.utilityLargeModel')}</label>
+      </div>
+
+      <div className={styles['pv-model-config-row']}>
+        <div className={styles['pv-model-config-label']}>
+          <span className={styles['pv-model-config-title']}>{t('settings.api.utilityLargeModel')}</span>
+          <span className={styles['settings-form-hint']}>{t('settings.api.utilityLargeModelHint')}</span>
+        </div>
+        <div className={styles['pv-model-config-control']}>
           <div className={styles['pv-tool-model-row']}>
             <ModelWidget
               providers={providers}
@@ -215,12 +123,16 @@ export function OtherModelsSection({ providers }: { providers: Record<string, { 
             />
             <ToolModelTestBtn modelRef={globalModelsConfig?.models?.utility_large || ''} />
           </div>
-          <span className={styles['settings-form-hint']}>{t('settings.api.utilityLargeModelHint')}</span>
         </div>
       </div>
-      <div className={styles['settings-form-grid']}>
-        <div className={`${styles['settings-form-field']} ${styles['settings-form-field-half']}`}>
-          <label className={styles['settings-form-label']}>{t('settings.api.visionModel')}</label>
+
+      <div className={styles['pv-model-config-row']}>
+        <div className={styles['pv-model-config-label']}>
+          <span className={styles['pv-model-config-title']}>{t('settings.api.visionModel')}</span>
+          <span className={styles['settings-form-hint']}>{t('settings.api.visionModelHint')}</span>
+          <span className={styles['settings-form-hint']}>{t('settings.api.visionModelMissingHint')}</span>
+        </div>
+        <div className={styles['pv-model-config-control']}>
           <div className={styles['settings-toggle-row']}>
             <Toggle
               on={visionAuxiliaryEnabled}
@@ -243,14 +155,17 @@ export function OtherModelsSection({ providers }: { providers: Record<string, { 
             />
             <ToolModelTestBtn modelRef={globalModelsConfig?.models?.vision || ''} />
           </div>
-          <span className={styles['settings-form-hint']}>{t('settings.api.visionModelHint')}</span>
-          <span className={styles['settings-form-hint']}>{t('settings.api.visionModelMissingHint')}</span>
         </div>
       </div>
-      <div className={styles['settings-form-grid']}>
-        <div className={`${styles['settings-form-field']} ${styles['settings-form-field-half']}`}>
-          <label className={styles['settings-form-label']}>{t('settings.api.searchProviderField')}</label>
+
+      {/* 搜索引擎选择：与模型行对齐（左标题，右选择器） */}
+      <div className={styles['pv-model-config-row']}>
+        <div className={styles['pv-model-config-label']}>
+          <span className={styles['pv-model-config-title']}>{t('settings.api.searchProviderField')}</span>
+        </div>
+        <div className={styles['pv-model-config-control']}>
           <SelectWidget
+            className={styles['pv-model-config-select']}
             options={[
               { value: AUTO_SEARCH_PROVIDER, label: 'Auto (Paid API -> AnySearch free -> Browser)' },
               { value: 'anysearch', label: 'AnySearch' },
@@ -264,32 +179,31 @@ export function OtherModelsSection({ providers }: { providers: Record<string, { 
             ]}
             value={searchProvider}
             onChange={(val) => {
-              setSearchKeyEdited({});
               const keyless = val === AUTO_SEARCH_PROVIDER || isBrowserSearchProvider(val) || isFreeSearchApiProvider(val);
               autoSaveGlobalModels({ search: keyless ? { provider: val, api_key: '' } : { provider: val } });
             }}
             placeholder={t('settings.api.searchProviderField')}
           />
         </div>
-        <div className={`${styles['settings-form-field']} ${styles['settings-form-field-half']}`}>
-          <label className={styles['settings-form-label']}>{t('settings.api.searchApiKey')}</label>
-          {searchIsKeylessProvider ? (
-            <span className={styles['settings-form-hint']}>{t('settings.api.searchApiKeyNotRequired')}</span>
-          ) : searchIsAutoProvider ? (
-            <>
-              <div className={styles['search-api-key-list']}>
-                {SEARCH_API_PROVIDER_IDS.map((provider) => renderSearchApiKeyRow(provider))}
-              </div>
-              <span className={styles['settings-form-hint']}>{t('settings.api.searchApiKeysAutoHint')}</span>
-            </>
-          ) : (
-            <>
-              {explicitSearchApiProvider && renderSearchApiKeyRow(explicitSearchApiProvider)}
-              <span className={styles['settings-form-hint']}>{t('settings.api.searchApiKeyHint')}</span>
-            </>
-          )}
-        </div>
       </div>
     </div>
   );
+}
+
+// 工具模型配置可能来自老数据。展示层可读裸 id；保存路径必须重新选择成 {id, provider}。
+function toModelRef(raw: unknown): ModelRef | null {
+  if (!raw) return null;
+  if (typeof raw === 'object' && (raw as any).id) {
+    return {
+      id: String((raw as any).id || ''),
+      provider: String((raw as any).provider || ''),
+    };
+  }
+  const s = String(raw || '').trim();
+  if (!s) return null;
+  const slashIdx = s.indexOf('/');
+  if (slashIdx > 0 && slashIdx < s.length - 1) {
+    return { provider: s.slice(0, slashIdx), id: s.slice(slashIdx + 1) };
+  }
+  return { id: s, provider: '' };
 }

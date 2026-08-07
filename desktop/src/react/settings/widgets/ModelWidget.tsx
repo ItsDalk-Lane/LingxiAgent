@@ -1,9 +1,11 @@
 /**
  * MDW（模型下拉组件）的 React 版本
- * 从 /api/models 读取唯一信源，按 provider 分组、支持搜索和自定义输入
+ * 从 /api/models 读取唯一信源，按 provider 分组、支持搜索和自定义输入。
+ * 下拉列表通过 AnchoredPortal 悬浮渲染（portal 到 body，position: fixed），
+ * 内容少时按内容自适应高度，超过统一最大高度时内部滚动。
  */
 import React, { useState, useRef, useEffect, useMemo } from 'react';
-import { ProviderIcon } from '@/ui';
+import { ProviderIcon, AnchoredPortal } from '@/ui';
 import { lingxiFetch } from '../api';
 import styles from '../Settings.module.css';
 
@@ -40,7 +42,7 @@ export function ModelWidget({
   const [search, setSearch] = useState('');
   const [customInput, setCustomInput] = useState('');
   const [models, setModels] = useState<ModelInfo[]>([]);
-  const ref = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
   const searchRef = useRef<HTMLInputElement>(null);
 
   // 从唯一信源获取模型列表
@@ -52,15 +54,6 @@ export function ModelWidget({
 
   // mount 时首次拉取
   useEffect(() => { refreshModels(); }, [refreshModels]);
-
-  useEffect(() => {
-    if (!open) return;
-    const handler = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
-    };
-    document.addEventListener('click', handler);
-    return () => document.removeEventListener('click', handler);
-  }, [open]);
 
   useEffect(() => {
     if (open) {
@@ -107,8 +100,9 @@ export function ModelWidget({
   };
 
   return (
-    <div className={styles['mdw']} ref={ref}>
+    <div className={styles['mdw']}>
       <button
+        ref={triggerRef}
         className={styles['mdw-trigger']}
         type="button"
         data-open={open}
@@ -120,7 +114,16 @@ export function ModelWidget({
         <span className={styles['mdw-value']}>{displayValue || `— ${placeholder || t('settings.api.selectModel')} —`}</span>
         <span className={styles['mdw-arrow']}>▾</span>
       </button>
-      <div className={`${styles['mdw-popup']}${open ? ' ' + styles['open'] : ''}`}>
+      <AnchoredPortal
+        open={open}
+        anchorRef={triggerRef}
+        align="start"
+        offset={4}
+        minWidth={280}
+        className={styles['mdw-popup']}
+        onClose={() => setOpen(false)}
+        role="listbox"
+      >
         <input
           ref={searchRef}
           className={styles['mdw-search']}
@@ -173,7 +176,7 @@ export function ModelWidget({
             </button>
           </div>
         </div>
-      </div>
+      </AnchoredPortal>
     </div>
   );
 }

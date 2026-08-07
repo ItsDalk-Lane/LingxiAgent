@@ -1590,7 +1590,11 @@
       "addCustom": "カスタムプロバイダーを追加",
       "noKey": "未設定",
       "remove": "削除",
-      "deleteConfirm": "プロバイダー {name} を削除しますか？関連するモデルも削除されます。"
+      "deleteConfirm": "プロバイダー {name} を削除しますか？関連するモデルも削除されます。",
+      "addService": "プロバイダーを追加",
+      "pickTitle": "プロバイダーを選択",
+      "backToList": "プロバイダー一覧に戻る",
+      "empty": "プロバイダーはまだありません。上部の「プロバイダーを追加」から始めてください。"
     },
     "usage": {
       "title": "使用量",
@@ -1729,6 +1733,7 @@
       "visionModelMissingHint": "モデルが見つからない場合は、プロバイダーページで視覚機能を有効にしてください。",
       "searchProvider": "検索サービス",
       "searchProviderField": "検索エンジン",
+      "searchSection": "検索 API",
       "searchApiKey": "検索 API Key",
       "searchApiKeyHint": "選択した検索プロバイダーの API Key を入力してください",
       "searchApiKeysAutoHint": "Auto は設定済みの AnySearch、Tavily、Brave、Serper の有料 API を優先し、次に AnySearch の無料検索を使い、上限、エラー、空結果、関連度不足の場合はブラウザー検索へフォールバックします。",

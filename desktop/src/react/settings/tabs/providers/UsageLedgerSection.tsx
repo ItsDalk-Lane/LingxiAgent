@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState, type CSSProperties } from 'react';
-import { SettingsSection } from '../../components/SettingsSection';
+
 import { t } from '../../helpers';
 import styles from '../../Settings.module.css';
 import { loadLlmUsageEntries, type UsageLedgerEntry } from './usage-ledger-actions';
@@ -57,10 +57,16 @@ export function UsageLedgerSection() {
   const latestEntries = useMemo(() => [...entries].reverse(), [entries]);
 
   return (
-    <SettingsSection title={t('settings.usage.title')} context={<RefreshButton loading={loading} onRefresh={refresh} />}>
+    <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, padding: 'var(--space-16)' }}>
       <div className={styles['usage-ledger']}>
-        <div className={styles['usage-note']}>{t('settings.usage.note')}</div>
-        <UsageTabs view={view} onChange={setView} />
+        {/* 工具栏：左侧描述文字，右侧标签页 + 刷新按钮，同行同水平 */}
+        <div className={styles['usage-toolbar']}>
+          <div className={styles['usage-note']}>{t('settings.usage.note')}</div>
+          <div className={styles['usage-toolbar-right']}>
+            <UsageTabs view={view} onChange={setView} />
+            <RefreshButton loading={loading} onRefresh={refresh} />
+          </div>
+        </div>
         <div className={styles['usage-view-frame']}>
           {error && <div className={styles['usage-error']}>{error}</div>}
           {!error && loading && entries.length === 0 && <div className={styles['usage-empty']}>{t('settings.usage.loading')}</div>}
@@ -75,7 +81,7 @@ export function UsageLedgerSection() {
           )}
         </div>
       </div>
-    </SettingsSection>
+    </div>
   );
 }
 

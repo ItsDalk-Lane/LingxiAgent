@@ -2966,7 +2966,6 @@ function createSettingsWindow(tab, theme) {
     width: 720,
     height: 700,
     minWidth: 720,
-    maxWidth: 720,
     minHeight: 500,
     title: "Settings",
     ...titleBarOpts({ x: 16, y: 14 }),
@@ -3014,6 +3013,24 @@ function createSettingsWindow(tab, theme) {
     }
     settingsWindow = null;
   });
+  // 主窗口 resize 时按比例调整设置窗口大小（仅独立窗口模式）
+  const _syncSettingsSize = () => {
+    if (!settingsWindow || settingsWindow.isDestroyed()) return;
+    if (!mainWindow || mainWindow.isDestroyed()) return;
+    if (settingsWindow.isMaximized()) return;
+    const mainBounds = mainWindow.getBounds();
+    const mainW = mainBounds.width;
+    const mainH = mainBounds.height;
+    const targetW = Math.max(720, Math.round(mainW * 0.9));
+    const targetH = Math.max(500, Math.round(mainH * 0.9));
+    const [curW, curH] = settingsWindow.getSize();
+    if (curW !== targetW || curH !== targetH) {
+      settingsWindow.setSize(targetW, targetH);
+    }
+  };
+  mainWindow?.on("resize", _syncSettingsSize);
+  // 初始同步一次
+  _syncSettingsSize();
 
   settingsWindow.on("closed", () => {
     settingsWindow = null;

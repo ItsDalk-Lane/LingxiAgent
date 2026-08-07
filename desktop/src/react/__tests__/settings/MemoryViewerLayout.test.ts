@@ -49,9 +49,9 @@ describe('memory viewer layout contract', () => {
     expect(cssRule(css, '.compiled-memory-week-day-editor')).toMatch(/overflow-y:\s*auto;/);
   });
 
-  it('uses the taller, wider default settings modal size', () => {
-    expect(cssRule(modalCss, '.card')).toMatch(/--settings-shell-width:\s*884px;/);
-    expect(cssRule(modalCss, '.card')).toMatch(/width:\s*min\(var\(--settings-shell-width\),\s*calc\(100vw - 2 \* var\(--space-24\)\)\);/);
-    expect(cssRule(modalCss, '.card')).toMatch(/height:\s*min\(840px,\s*calc\(100vh - var\(--space-24\) - var\(--space-24\)\)\);/);
+  it('uses proportional settings modal size relative to viewport', () => {
+    expect(cssRule(modalCss, '.card')).toMatch(/width:\s*min\(90vw,\s*calc\(100vw - 2 \* var\(--space-24\)\)\);/);
+    expect(cssRule(modalCss, '.card')).toMatch(/max-width:\s*min\(90vw,\s*calc\(100vw - 2 \* var\(--space-24\)\)\);/);
+    expect(cssRule(modalCss, '.card')).toMatch(/height:\s*min\(90vh,\s*calc\(100vh - 2 \* var\(--space-24\)\)\);/);
   });
 });

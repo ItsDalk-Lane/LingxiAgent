@@ -1590,7 +1590,11 @@
       "addCustom": "커스텀 Provider 추가",
       "noKey": "미설정",
       "remove": "제거",
-      "deleteConfirm": "Provider {name}을(를) 삭제할까요? 연결된 모델도 함께 제거돼요."
+      "deleteConfirm": "Provider {name}을(를) 삭제할까요? 연결된 모델도 함께 제거돼요.",
+      "addService": "Provider 추가",
+      "pickTitle": "Provider 선택",
+      "backToList": "Provider 목록으로 돌아가기",
+      "empty": "등록된 Provider가 없어요. 위의 「Provider 추가」를 눌러 시작하세요."
     },
     "usage": {
       "title": "사용량",
@@ -1729,6 +1733,7 @@
       "visionModelMissingHint": "모델을 찾을 수 없다면 제공자 페이지에서 비전 기능을 설정하세요.",
       "searchProvider": "검색 서비스",
       "searchProviderField": "검색 엔진",
+      "searchSection": "검색 API",
       "searchApiKey": "검색 API Key",
       "searchApiKeyHint": "선택한 검색 Provider의 API Key를 입력해 주세요",
       "searchApiKeysAutoHint": "Auto는 설정된 AnySearch, Tavily, Brave, Serper 유료 API를 먼저 사용한 다음 AnySearch 무료 검색을 쓰고, 한도 초과, 오류, 빈 결과, 낮은 관련도일 때 브라우저 검색으로 대체해요.",

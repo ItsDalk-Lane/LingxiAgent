@@ -490,7 +490,11 @@ function resolveToolPermissionMode(deps: any, sessionPath: any) {
 }
 
 function toolApprovalUnavailable(toolName: any, status = "needs_user_approval_but_unavailable", reason = "human approval unavailable", extras: any = {}) {
-  return toolError("Tool action needs user approval, but this execution context cannot ask the user.", {
+  const reasonCode = extras.reasonCode || "human_approval_unavailable";
+  const text = reasonCode === "reviewer_requested_user_confirmation"
+    ? "The automatic approval reviewer decided this action needs your confirmation, but Auto mode cannot prompt you, so the action was not run. Switch this session to Ask mode and retry so you can approve it directly."
+    : "Automatic approval review did not complete (the reviewer is unavailable or failed), and Auto mode cannot ask you, so the action was not run. Switch this session to Ask mode and retry, or check the small/large utility model settings so the automatic reviewer can work.";
+  return toolError(text, {
     errorCode: "TOOL_APPROVAL_UNAVAILABLE",
     action: toolName,
     confirmed: false,
@@ -499,7 +503,7 @@ function toolApprovalUnavailable(toolName: any, status = "needs_user_approval_bu
       status,
       toolName,
       reason,
-      reasonCode: "human_approval_unavailable",
+      reasonCode,
       approvalPolicy: SESSION_APPROVAL_POLICIES.DENY_ON_PROMPT,
       ...extras,
     },

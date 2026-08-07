@@ -1656,7 +1656,16 @@
       "addCustom": "添加自定义供应商",
       "noKey": "未配置",
       "remove": "移除",
-      "deleteConfirm": "确定删除供应商 {name}？相关模型将一并清除。"
+      "deleteConfirm": "确定删除供应商 {name}？相关模型将一并清除。",
+      "addService": "添加服务商",
+      "pickTitle": "选择服务商",
+      "backToList": "返回服务商列表",
+      "empty": "还没有添加服务商，点击上方「添加服务商」开始配置。",
+      "subtab": {
+        "api": "配置 API",
+        "models": "配置模型",
+        "usage": "用量统计"
+      }
     },
     "usage": {
       "title": "用量统计",
@@ -1795,10 +1804,12 @@
       "visionModelMissingHint": "如果找不到你的模型，请在供应商页面配置视觉能力。",
       "searchProvider": "搜索服务",
       "searchProviderField": "搜索引擎",
+      "searchSection": "搜索 API",
       "searchApiKey": "搜索 API Key",
       "searchApiKeyHint": "启用搜索时请填写所选 provider 的 API Key",
       "searchApiKeysAutoHint": "Auto 会优先使用已配置的 AnySearch、Tavily、Brave、Serper 付费 API，然后使用 AnySearch 免费搜索；额度耗尽、报错、空结果或相关性较弱时再回退到浏览器搜索。",
       "searchApiKeyNotRequired": "这个搜索引擎不需要 API Key；浏览器搜索会在本机后台打开搜索页并整理结果。",
+      "searchConfig": "搜索 API 配置",
       "favorites": "收藏",
       "searchModel": "搜索模型...",
       "noFavorites": "点击 ☆ 收藏常用模型",

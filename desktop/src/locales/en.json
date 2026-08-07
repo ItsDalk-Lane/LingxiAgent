@@ -1656,7 +1656,16 @@
       "addCustom": "Add Custom Provider",
       "noKey": "Not configured",
       "remove": "Remove",
-      "deleteConfirm": "Delete provider {name}? Associated models will be removed."
+      "deleteConfirm": "Delete provider {name}? Associated models will be removed.",
+      "addService": "Add Provider",
+      "pickTitle": "Select Provider",
+      "backToList": "Back to providers",
+      "empty": "No providers yet. Click “Add Provider” above to start.",
+      "subtab": {
+        "api": "Configure API",
+        "models": "Configure Models",
+        "usage": "Usage"
+      }
     },
     "usage": {
       "title": "Usage",
@@ -1795,10 +1804,12 @@
       "visionModelMissingHint": "Can't find your model? Enable its vision capability in the Providers page.",
       "searchProvider": "Search Service",
       "searchProviderField": "Search engine",
+      "searchSection": "Search API",
       "searchApiKey": "Search API Key",
       "searchApiKeyHint": "Enter the API key for the selected search provider",
       "searchApiKeysAutoHint": "Auto uses configured AnySearch, Tavily, Brave, and Serper paid APIs first, then AnySearch free search, then browser search when quota, errors, empty results, or weak relevance get in the way.",
       "searchApiKeyNotRequired": "This search engine does not need an API key. Browser search opens the search page locally in the background and structures the results.",
+      "searchConfig": "Search API Configuration",
       "favorites": "Favorites",
       "searchModel": "Search models...",
       "noFavorites": "Click ☆ to favorite models",

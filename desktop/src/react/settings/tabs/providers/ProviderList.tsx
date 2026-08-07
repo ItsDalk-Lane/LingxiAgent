@@ -3,17 +3,55 @@ import { useSettingsStore } from '../../store';
 import { lingxiFetch } from '../../api';
 import { t, API_FORMAT_OPTIONS } from '../../helpers';
 import { loadSettingsConfig } from '../../actions';
-import { SelectWidget } from '@/ui';
+import { SelectWidget, ProviderIcon } from '@/ui';
 import { KeyInput } from '../../widgets/KeyInput';
 import { parseProviderHeaderLines, ProviderHeadersField } from './ProviderHeadersField';
 import styles from '../../Settings.module.css';
 
-export function AddCustomButton({ onClick }: { onClick: () => void }) {
+export interface ProviderPickerItem {
+  id: string;
+  label: string;
+  dim?: boolean;
+  hasCredentials?: boolean;
+  count?: number;
+}
+
+export function ProviderPickerOverlay({ items, onSelect, onAddCustom, onCancel }: {
+  items: ProviderPickerItem[];
+  onSelect: (id: string) => void;
+  onAddCustom: () => void;
+  onCancel: () => void;
+}) {
   return (
-    <div className={styles['pv-add-wrapper']}>
-      <button className={styles['pv-add-btn']} onClick={onClick}>
-        + {t('settings.providers.addCustom')}
-      </button>
+    <div className={styles['pv-add-overlay']}>
+      <div className={styles['pv-add-overlay-header']}>
+        <button className={styles['pv-add-overlay-back']} onClick={onCancel} aria-label={t('settings.api.cancel')}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="15 18 9 12 15 6" />
+          </svg>
+          <span>{t('settings.api.cancel')}</span>
+        </button>
+        <div className={styles['pv-add-overlay-title']}>{t('settings.providers.pickTitle')}</div>
+      </div>
+      {/* 3 列网格：第一格「自定义供应商」，后续服务商按顺序一行三个 */}
+      <div className={styles['pv-picker-grid']}>
+        <button type="button" className={styles['pv-picker-add-custom']} onClick={onAddCustom}>
+          <span className={styles['pv-picker-add-custom-icon']}>+</span>
+          <span>{t('settings.providers.addCustom')}</span>
+        </button>
+        {items.map(item => (
+          <button
+            key={item.id}
+            type="button"
+            className={`${styles['pv-picker-item']}${item.dim ? ' ' + styles['dim'] : ''}`}
+            onClick={() => onSelect(item.id)}
+          >
+            <span className={`${styles['pv-status-dot']}${item.hasCredentials ? ' ' + styles['on'] : ''}`} />
+            <ProviderIcon provider={item.id} className={styles['pv-list-item-icon']} />
+            <span className={styles['pv-picker-item-name']}>{item.label}</span>
+          </button>
+        ))}
+      </div>
     </div>
   );
 }

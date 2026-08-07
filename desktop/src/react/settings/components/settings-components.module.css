@@ -75,6 +75,10 @@
 .justify-end { justify-content: flex-end; }
 
 .section {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
     margin-bottom: var(--space-40);
 }
 
@@ -125,6 +129,8 @@
 .sectionBody {
     display: flex;
     flex-direction: column;
+    flex: 1;
+    min-height: 0;
     /* 左右 padding 移到 row/warning 自己上，让分隔线能贴卡片 border */
 }
 

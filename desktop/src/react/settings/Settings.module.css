@@ -3764,18 +3764,27 @@
 .search-api-key-list {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: var(--space-16);
+}
+
+/* 搜索服务商 API Key 区（无标题），行内：左侧标题，右侧输入框 */
+.pv-search-config {
+    display: flex;
+    flex-direction: column;
 }
 
 .search-api-key-row {
     display: flex;
-    flex-direction: column;
-    gap: 3px;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-24);
 }
 
 .search-api-key-label {
-    font-size: var(--fs-hint);
-    color: var(--text-light);
+    width: 240px;
+    flex-shrink: 0;
+    font-size: var(--fs-ui);
+    color: var(--text);
     font-weight: 600;
 }
 
@@ -3783,7 +3792,9 @@
     display: flex;
     align-items: center;
     gap: 6px;
-    width: 100%;
+    flex: 0 1 auto;
+    min-width: 0;
+    width: min(420px, 55%);
 }
 
 .search-api-key-controls > :first-child {
@@ -3834,10 +3845,13 @@
     display: none;
 }
 
-.settings-tab-content.active {
-    display: block;
-    animation: hana-fade-up var(--duration-fast) var(--ease-out);
-}
+ .settings-tab-content.active {
+     display: flex;
+     flex-direction: column;
+     flex: 1;
+     min-height: 0;
+     animation: hana-fade-up var(--duration-fast) var(--ease-out);
+ }
 
 /* ── About Tab ── */
 
@@ -4371,13 +4385,65 @@ a.about-link:hover {
     animation: hana-pulse 1.5s ease-in-out infinite;
 }
 
-/* ========================================
-   Provider Tab — 双栏布局（新）
-   ======================================== */
+ /* ========================================
+    Provider Sub-Tabs
+    ======================================== */
+ .provider-sub-tabs {
+     display: flex;
+     gap: var(--space-4);
+     padding: 0 var(--space-16);
+     margin-bottom: var(--space-16);
+     border-bottom: 1px solid var(--overlay-light);
+ }
+
+ .provider-sub-tab {
+     padding: var(--space-8) var(--space-16);
+     font-family: inherit;
+     font-size: var(--fs-body);
+     color: var(--text-muted);
+     background: none;
+     border: none;
+     border-bottom: 2px solid transparent;
+     cursor: pointer;
+     transition: color var(--duration-fast) var(--ease-out), border-color var(--duration-fast) var(--ease-out);
+     position: relative;
+     bottom: -1px;
+ }
+
+ .provider-sub-tab:hover {
+     color: var(--text);
+ }
+
+ .provider-sub-tab.active {
+     color: var(--accent);
+     border-bottom-color: var(--accent);
+     font-weight: 500;
+ }
+
+ .provider-sub-tab-content {
+     flex: 1;
+     min-height: 0;
+     display: flex;
+     flex-direction: column;
+     overflow-y: auto;
+ }
+
+ .provider-sub-panel {
+     flex: 1;
+     min-height: 0;
+     display: flex;
+     flex-direction: column;
+     gap: var(--space-16);
+ }
+
+ /* ========================================
+    Provider Tab — 双栏布局（新）
+    ======================================== */
 .pv-layout {
     display: flex;
     gap: 0;
-    height: 420px;
+    flex: 1;
+    min-height: 0;
     max-width: 100%;
     min-width: 0;
     background: var(--bg-card, var(--bg));
@@ -4398,6 +4464,114 @@ a.about-link:hover {
     padding: var(--space-4) 0;
     overflow-y: auto;
     background: transparent;
+}
+
+/* 服务商行列表顶部「添加服务商」按钮，始终在首位 */
+.pv-add-provider-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: calc(100% - 2 * var(--space-12));
+    margin: var(--space-4) var(--space-12) var(--space-8);
+    padding: var(--space-8) var(--space-12);
+    background: var(--accent-light);
+    border: 1px dashed color-mix(in srgb, var(--accent) 45%, transparent);
+    border-radius: var(--radius-card, 8px);
+    color: var(--accent);
+    font-family: inherit;
+    font-size: var(--fs-ui);
+    font-weight: 600;
+    cursor: default;
+    transition: all var(--duration-fast) var(--ease-out);
+}
+
+.pv-add-provider-btn:hover {
+    background: color-mix(in srgb, var(--accent) 12%, transparent);
+    border-color: var(--accent);
+}
+
+.pv-add-provider-btn-icon {
+    font-size: var(--fs-title);
+    line-height: 1;
+}
+
+/* 服务商选择弹层：3 列网格，第一格自定义供应商，后续服务商一行三个按顺序排列 */
+.pv-picker-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-8);
+    padding: var(--space-4) 0;
+    overflow-y: auto;
+    align-content: start;
+}
+
+.pv-picker-add-custom {
+    display: flex;
+    align-items: center;
+    gap: var(--space-6);
+    min-height: 40px;
+    padding: var(--space-8) var(--space-10);
+    background: var(--accent-light);
+    border: 1px dashed color-mix(in srgb, var(--accent) 45%, transparent);
+    border-radius: var(--radius-input, 6px);
+    color: var(--accent);
+    font-family: inherit;
+    font-size: var(--fs-hint);
+    font-weight: 600;
+    cursor: default;
+    text-align: left;
+    transition: all var(--duration-fast) var(--ease-out);
+}
+
+.pv-picker-add-custom:hover {
+    background: color-mix(in srgb, var(--accent) 12%, transparent);
+    border-color: var(--accent);
+}
+
+.pv-picker-add-custom-icon {
+    font-size: var(--fs-title);
+    line-height: 1;
+}
+
+.pv-picker-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-6);
+    min-height: 40px;
+    padding: var(--space-8) var(--space-10);
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-input, 6px);
+    cursor: default;
+    text-align: left;
+    font-family: inherit;
+    font-size: var(--fs-hint);
+    color: var(--text);
+    transition: all var(--duration-fast) var(--ease-out);
+}
+
+.pv-picker-item:hover {
+    border-color: var(--accent);
+    background: var(--accent-light);
+}
+
+.pv-picker-item.dim {
+    opacity: 0.6;
+}
+
+.pv-picker-item-name {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* 窄屏/窄卡片时降为两列 */
+@media (max-width: 720px) {
+    .pv-picker-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
 }
 
 .pv-list-title {
@@ -4571,8 +4745,30 @@ a.about-link:hover {
     display: flex;
     flex-direction: column;
     gap: var(--space-16);
-    height: clamp(500px, 58vh, 560px);
+    flex: 1;
+    min-height: 0;
     padding: var(--space-16);
+}
+
+/* 用量页顶部工具栏：左侧描述文字，右侧标签页 + 刷新按钮，同行同水平 */
+.usage-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-16);
+    flex-shrink: 0;
+}
+
+.usage-toolbar .usage-note {
+    flex: 1;
+    min-width: 0;
+}
+
+.usage-toolbar-right {
+    display: flex;
+    align-items: center;
+    gap: var(--space-12);
+    flex-shrink: 0;
 }
 
 .usage-note {
@@ -4808,9 +5004,9 @@ a.about-link:hover {
 }
 
 .usage-overall-grid {
-    display: grid;
-    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
-    gap: var(--space-40);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-24);
 }
 
 .usage-panel {
@@ -5107,11 +5303,10 @@ a.about-link:hover {
 
 @media (max-width: 760px) {
     .usage-ledger {
-        height: clamp(480px, 66vh, 540px);
+        /* flex: 1 fills available space */
     }
 
     .usage-ring-grid,
-    .usage-overall-grid,
     .usage-hero {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
@@ -5128,7 +5323,6 @@ a.about-link:hover {
 
 @media (max-width: 560px) {
     .usage-ring-grid,
-    .usage-overall-grid,
     .usage-hero {
         grid-template-columns: 1fr;
     }
@@ -5669,6 +5863,58 @@ a.about-link:hover {
 .pv-tool-test-btn.ok { color: #3a7d44; border-color: #3a7d44; }
 .pv-tool-test-btn.fail { color: #b44040; border-color: #b44040; }
 .pv-tool-test-btn.testing { color: var(--text-secondary); pointer-events: none; }
+
+/* ── 配置模型子标签页：上下行布局（左标题+提示，右模型选择菜单） ── */
+
+.pv-model-config {
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+}
+
+.pv-model-config-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-24);
+    padding: var(--space-16) var(--space-16) var(--space-24);
+}
+
+.pv-model-config-row + .pv-model-config-row {
+    border-top: 1px solid var(--overlay-light);
+}
+
+.pv-model-config-label {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    width: 240px;
+    flex-shrink: 0;
+    padding-top: 2px;
+}
+
+.pv-model-config-title {
+    font-size: var(--fs-ui);
+    font-weight: 600;
+    color: var(--text);
+}
+
+/* 控制区贴右侧，空隙留在中间（space-between）；固定舒适宽度，
+   窗口过窄时允许压缩而非溢出 */
+.pv-model-config-control {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-8);
+    flex: 0 1 auto;
+    min-width: 0;
+    width: min(420px, 55%);
+}
+
+/* 搜索 provider 下拉撑满控制列，与模型选择器同宽、贴右对齐 */
+.pv-model-config-select {
+    width: 100%;
+    max-width: none;
+}
 
 /* ── 模型下拉选择器 ── */
 
@@ -7615,32 +7861,24 @@ a.about-link:hover {
     transition: transform var(--duration-slow);
 }
 
-.mdw-popup.open ~ .mdw-trigger .mdw-arrow,
-.mdw .mdw-popup.open + .mdw-trigger .mdw-arrow,
+/* 下拉浮层已 portal 到 body，箭头旋转只认 trigger 上的 data-open */
 .mdw-trigger[data-open="true"] .mdw-arrow {
     transform: rotate(180deg);
 }
 
 .mdw-popup {
-    display: none;
-    position: absolute;
-    top: 100%;
-    left: 0;
-    width: 100%;
-    min-width: 200px;
-    max-height: 320px;
+    display: flex;
+    flex-direction: column;
+    /* position:fixed + 尺寸由 AnchoredPortal 计算（悬浮列表，portal 到 body） */
+    min-width: 260px;
+    /* 悬浮列表统一最大高度：内容超过则内部滚动，未超过则按内容自适应高度 */
+    max-height: min(60vh, 520px);
     background-color: var(--bg-card);
     border: 1px solid var(--border);
     border-radius: var(--radius-input, 6px);
-    z-index: 60;
-    margin-top: 4px;
+    box-shadow: 0 8px 28px var(--shadow);
     overflow: hidden;
-    flex-direction: column;
     animation: hana-fade-up var(--duration-fast) var(--ease-out);
-}
-
-.mdw-popup.open {
-    display: flex;
 }
 
 .mdw-search {

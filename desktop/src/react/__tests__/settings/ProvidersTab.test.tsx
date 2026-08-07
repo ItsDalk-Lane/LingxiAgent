@@ -111,11 +111,14 @@ describe('ProvidersTab provider-scoped form state', () => {
   it('does not carry an unsaved api key draft when switching providers', async () => {
     const { container } = render(<ProvidersTab />);
 
+    // 初始 selectedProviderId=deepseek 被纳入左栏列表，右栏直接显示 DeepSeek 配置
     const deepseekInput = await screen.findByDisplayValue('saved-deepseek-key');
     fireEvent.change(deepseekInput, { target: { value: 'unsaved-deepseek-draft' } });
     expect(screen.getByDisplayValue('unsaved-deepseek-draft')).toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole('button', { name: /Groq/ }));
+    // 通过选择界面加入 Groq 并切换
+    fireEvent.click(screen.getByRole('button', { name: /settings.providers.addService/ }));
+    fireEvent.click(await screen.findByRole('button', { name: /Groq/ }));
 
     await waitFor(() => {
       expect(useSettingsStore.getState().selectedProviderId).toBe('groq');
@@ -152,8 +155,9 @@ describe('ProvidersTab provider-scoped form state', () => {
 
     render(<ProvidersTab />);
 
+    // 未注册预设只出现在「添加服务商」选择弹层中
+    fireEvent.click(await screen.findByRole('button', { name: /settings.providers.addService/ }));
     const deepseekButton = await screen.findByRole('button', { name: /DeepSeek/ });
-    expect(deepseekButton.className).toContain('dim');
     fireEvent.click(deepseekButton);
 
     await waitFor(() => {
@@ -189,8 +193,9 @@ describe('ProvidersTab provider-scoped form state', () => {
 
     render(<ProvidersTab />);
 
+    // registry-only 服务商需通过「添加服务商」选择界面加入
+    fireEvent.click(screen.getByRole('button', { name: /settings.providers.addService/ }));
     const baichuanButton = await screen.findByRole('button', { name: /Baichuan/ });
-    expect(baichuanButton.className).toContain('dim');
     fireEvent.click(baichuanButton);
 
     await waitFor(() => {
@@ -249,7 +254,7 @@ describe('ProvidersTab provider-scoped form state', () => {
     });
   });
 
-  it('keeps configured custom providers above setup entries in the API group', async () => {
+  it('appends one provider row to the left list per pick', async () => {
     const mixedSummary = {
       deepseek: providerSummary({
         display_name: 'DeepSeek',
@@ -290,13 +295,23 @@ describe('ProvidersTab provider-scoped form state', () => {
 
     render(<ProvidersTab />);
 
-    const customButton = await screen.findByRole('button', { name: /My Proxy/ });
-    const unregisteredPresetButton = screen.getByRole('button', { name: /Groq/ });
-    const registrySetupButton = screen.getByRole('button', { name: /Baichuan/ });
+    // 初始左栏只有「添加服务商」按钮
+    expect(screen.queryByRole('button', { name: /My Proxy/ })).not.toBeInTheDocument();
 
-    expect(customButton.compareDocumentPosition(unregisteredPresetButton) & Node.DOCUMENT_POSITION_FOLLOWING)
-      .toBeTruthy();
-    expect(customButton.compareDocumentPosition(registrySetupButton) & Node.DOCUMENT_POSITION_FOLLOWING)
-      .toBeTruthy();
+    // 第一次点选：添加 My Proxy 一行并显示配置
+    fireEvent.click(screen.getByRole('button', { name: /settings.providers.addService/ }));
+    fireEvent.click(await screen.findByRole('button', { name: /My Proxy/ }));
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /My Proxy/ })).toBeInTheDocument();
+      expect(useSettingsStore.getState().selectedProviderId).toBe('my-proxy');
+    });
+
+    // 第二次点选：追加 DeepSeek 一行（每点一个添加一个）
+    fireEvent.click(screen.getByRole('button', { name: /settings.providers.addService/ }));
+    fireEvent.click(await screen.findByRole('button', { name: /DeepSeek/ }));
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /DeepSeek/ })).toBeInTheDocument();
+      expect(useSettingsStore.getState().selectedProviderId).toBe('deepseek');
+    });
   });
 });
