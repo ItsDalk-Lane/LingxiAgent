@@ -8,9 +8,10 @@ import { ContextRing } from '../../components/input/ContextRing';
 import { useStore } from '../../stores';
 import { refreshSessionCapabilities } from '../../stores/session-actions';
 
-const { sendMock, getWebSocketMock } = vi.hoisted(() => ({
+const { sendMock, getWebSocketMock, lingxiFetchMock } = vi.hoisted(() => ({
   sendMock: vi.fn(),
   getWebSocketMock: vi.fn(),
+  lingxiFetchMock: vi.fn(),
 }));
 
 vi.mock('../../services/websocket', () => ({
@@ -21,9 +22,16 @@ vi.mock('../../stores/session-actions', () => ({
   refreshSessionCapabilities: vi.fn(() => Promise.resolve(true)),
 }));
 
+vi.mock('../../hooks/use-hana-fetch', () => ({
+  lingxiFetch: lingxiFetchMock,
+}));
+
 describe('ContextRing', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    lingxiFetchMock.mockResolvedValue(new Response(JSON.stringify({
+      experiments: [{ id: 'session.instant_simple_compaction', value: false }],
+    })));
     getWebSocketMock.mockReturnValue({ readyState: WebSocket.OPEN, send: sendMock });
     useStore.setState({
       agentYuan: 'lingxi',
@@ -34,6 +42,7 @@ describe('ContextRing', () => {
       contextPercent: null,
       contextBySession: {},
       compactingSessions: ['/session/a.jsonl'],
+      compactionModeBySession: {},
     } as never);
   });
 
@@ -47,6 +56,7 @@ describe('ContextRing', () => {
       contextPercent: null,
       contextBySession: {},
       compactingSessions: [],
+      compactionModeBySession: {},
     } as never);
   });
 
@@ -57,6 +67,19 @@ describe('ContextRing', () => {
       const button = container.querySelector('button');
       expect(button).toBeTruthy();
       expect((button as HTMLButtonElement).disabled).toBe(true);
+    });
+  });
+
+  it('identifies instant simple compaction in the ring tooltip', async () => {
+    useStore.setState({
+      compactionModeBySession: { sess_a: 'lossy_local' },
+    } as never);
+    const { container } = render(<ContextRing />);
+
+    fireEvent.mouseEnter(container.querySelector('button') as HTMLButtonElement);
+
+    await waitFor(() => {
+      expect(screen.getByText('chat.instantSimpleCompaction')).toBeInTheDocument();
     });
   });
 
@@ -104,7 +127,44 @@ describe('ContextRing', () => {
     expect(screen.getByRole('menu')).toBeInTheDocument();
     expect(screen.getByText('input.refreshAndCompact')).toBeInTheDocument();
     expect(screen.getByText('input.compact')).toBeInTheDocument();
+    expect(screen.queryByText('chat.instantSimpleCompaction')).not.toBeInTheDocument();
     expect(sendMock).not.toHaveBeenCalled();
+  });
+
+  it('shows and runs instant simple compaction only when its experiment is enabled', async () => {
+    lingxiFetchMock.mockResolvedValueOnce(new Response(JSON.stringify({
+      experiments: [{ id: 'session.instant_simple_compaction', value: true }],
+    })));
+    useStore.setState({ compactingSessions: [] } as never);
+
+    const { container } = render(<ContextRing />);
+    await waitFor(() => expect(lingxiFetchMock).toHaveBeenCalledWith('/api/experiments'));
+    fireEvent.click(container.querySelector('button') as HTMLButtonElement);
+    fireEvent.click(await screen.findByText('chat.instantSimpleCompaction'));
+
+    expect(sendMock).toHaveBeenCalledWith(JSON.stringify({
+      type: 'compact',
+      sessionId: 'sess_a',
+      method: 'instant_simple',
+    }));
+    expect(refreshSessionCapabilities).not.toHaveBeenCalled();
+  });
+
+  it('updates the one-shot menu entry when the settings window broadcasts the toggle', async () => {
+    useStore.setState({ compactingSessions: [] } as never);
+    const { container } = render(<ContextRing />);
+    await waitFor(() => expect(lingxiFetchMock).toHaveBeenCalledWith('/api/experiments'));
+
+    window.dispatchEvent(new CustomEvent('hana-settings', {
+      detail: {
+        type: 'experiment-changed',
+        id: 'session.instant_simple_compaction',
+        value: true,
+      },
+    }));
+    fireEvent.click(container.querySelector('button') as HTMLButtonElement);
+
+    expect(await screen.findByText('chat.instantSimpleCompaction')).toBeInTheDocument();
   });
 
   it('runs fresh compact from the update action', async () => {

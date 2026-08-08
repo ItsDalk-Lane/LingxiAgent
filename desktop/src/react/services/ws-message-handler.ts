@@ -298,10 +298,32 @@ function setCompactionBusy(msg: any, busy: boolean): void {
   const { key, sessionId, sessionPath } = compactionIdentity(msg);
   if (!key) return;
   useStore.setState((state: any) => {
-    const withoutIdentity = (state.compactingSessions || []).filter((item: string) => (
+    const compactingSessions = state.compactingSessions || [];
+    const wasBusy = compactingSessions.some((item: string) => (
+      item === key || item === sessionId || item === sessionPath
+    ));
+    const withoutIdentity = compactingSessions.filter((item: string) => (
       item !== key && item !== sessionId && item !== sessionPath
     ));
-    return { compactingSessions: busy ? [...withoutIdentity, key] : withoutIdentity };
+    const compactionModeBySession = { ...(state.compactionModeBySession || {}) };
+    const priorMode = wasBusy
+      ? compactionModeBySession[key]
+        || (sessionId ? compactionModeBySession[sessionId] : null)
+        || (sessionPath ? compactionModeBySession[sessionPath] : null)
+      : null;
+    const incomingMode = typeof msg.mode === 'string' && msg.mode.trim()
+      ? msg.mode.trim()
+      : null;
+    delete compactionModeBySession[key];
+    if (sessionId) delete compactionModeBySession[sessionId];
+    if (sessionPath) delete compactionModeBySession[sessionPath];
+    if (busy && (incomingMode || priorMode)) {
+      compactionModeBySession[key] = incomingMode || priorMode;
+    }
+    return {
+      compactingSessions: busy ? [...withoutIdentity, key] : withoutIdentity,
+      compactionModeBySession,
+    };
   });
 }
 

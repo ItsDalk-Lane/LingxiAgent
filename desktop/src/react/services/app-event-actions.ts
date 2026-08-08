@@ -246,6 +246,11 @@ export function handleAppEvent(type: string, data: any = {}, options: AppEventOp
     case 'chat-layout-changed':
       applyChatLayout(data.chat ?? data);
       break;
+    case 'experiment-changed':
+      window.dispatchEvent(new CustomEvent('hana-settings', {
+        detail: { type: 'experiment-changed', id: data.id, value: data.value },
+      }));
+      break;
     case 'network-proxy-changed':
       if (options.source === 'server') {
         window.platform?.settingsChanged?.('network-proxy-changed', data);

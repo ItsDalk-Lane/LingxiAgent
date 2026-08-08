@@ -787,7 +787,7 @@ describe("callText provider-compat routing", () => {
     expect(detailedResult).toEqual({
       text: "ok",
       usage: expect.objectContaining({
-        input: { totalTokens: 100, uncachedTokens: 20 },
+        input: { totalTokens: 100, uncachedTokens: 100 },
         output: { totalTokens: 20, reasoningTokens: null },
         cache: expect.objectContaining({
           readTokens: 80,

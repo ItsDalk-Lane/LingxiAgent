@@ -6,12 +6,14 @@ import {
 import {
   COMPACTION_MODE_EXPERIMENT_ID,
   COMPACTION_MODES,
+  getResolvedInstantSimpleCompactionEnabled,
+  INSTANT_SIMPLE_COMPACTION_EXPERIMENT_ID,
 } from "../../shared/compaction-mode.ts";
 
 export const CACHE_SNAPSHOT_EXPERIMENT_ID = "memory.cache_snapshot_reflection";
 export const DEEPSEEK_ROLEPLAY_REASONING_PATCH_EXPERIMENT_ID = "provider.deepseek_roleplay_reasoning_patch";
 export const PROACTIVE_SUBAGENT_EXPERIMENT_ID = "subagent.proactive_delegation";
-export { COMPACTION_MODE_EXPERIMENT_ID };
+export { COMPACTION_MODE_EXPERIMENT_ID, INSTANT_SIMPLE_COMPACTION_EXPERIMENT_ID };
 
 const RETIRED_EXPERIMENT_VALUES = new Map([
   [CACHE_SNAPSHOT_EXPERIMENT_ID, "off"],
@@ -52,6 +54,37 @@ const DEFINITIONS = [
     sunsetPolicy: {
       removeWhenRetired: false,
       migration: "Keep reading session.compaction_mode until the setting graduates out of Experiments.",
+    },
+  }),
+  normalizeExperimentDefinition({
+    id: INSTANT_SIMPLE_COMPACTION_EXPERIMENT_ID,
+    titleKey: "settings.experiments.instantSimpleCompaction.title",
+    descriptionKey: "settings.experiments.instantSimpleCompaction.description",
+    owner: "session",
+    scope: "global",
+    defaultValue: false,
+    valueSchema: {
+      type: "boolean",
+      presentation: {
+        type: "toggle",
+      },
+    },
+    status: "alpha",
+    risk: "medium",
+    restartPolicy: "immediate",
+    targetHome: {
+      tab: "experiments",
+      section: "compaction",
+      whenStable: "Keep the one-shot action beside the context ring and graduate only its visibility control.",
+    },
+    exitCriteria: [
+      "The action appears only while the experiment is enabled.",
+      "Invoking it never changes automatic or ordinary compaction behavior.",
+      "The local checkpoint preserves the retained tail and strips complete tool transactions.",
+    ],
+    sunsetPolicy: {
+      removeWhenRetired: false,
+      migration: "Keep the one-shot action hidden when disabled; never promote it into session.compaction_mode.",
     },
   }),
   normalizeExperimentDefinition({
@@ -144,6 +177,9 @@ export function getResolvedExperimentValue(preferencesManager, id) {
   if (RETIRED_EXPERIMENT_VALUES.has(id)) return RETIRED_EXPERIMENT_VALUES.get(id);
   const definition = requireDefinition(id);
   const stored = preferencesManager?.getExperimentValue?.(id);
+  if (id === INSTANT_SIMPLE_COMPACTION_EXPERIMENT_ID) {
+    return getResolvedInstantSimpleCompactionEnabled(preferencesManager);
+  }
   if (stored === undefined) return definition.defaultValue;
   try {
     return normalizeExperimentValue(definition, stored);

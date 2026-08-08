@@ -513,3 +513,182 @@ memory ticker / approval / guard / summarize / title generation / channel summar
 - **better-sqlite3 native mismatch**（NODE_MODULE_VERSION 137 vs 127）：环境基线，需 `npm rebuild better-sqlite3`，与本任务无关。
 - 真实 Provider 网络调用未做人工验证（仅 mock 测试通过）。
 
+---
+
+# ========== upstream-0.444.1 + pi SDK 0.84.1 迁移任务（2026-08-08）==========
+
+> TASK_ID=upstream-0.444.1_pi-0.84.1
+> 本 section 仅供本任务；旧 section 是历史记录，不当成本任务状态。
+
+## P0. 任务身份
+
+```
+TASK_ID      = upstream-0.444.1_pi-0.84.1
+START_HEAD   = a5d1e5415c28b55074ba9ae81a6429d57ff5a934
+START_TIME   = 2026-08-08T10:41:32Z
+Repository   = ItsDalk-Lane/LingxiAgent
+Base upstream= openhanako v0.443.46  (262d385c7fb53217c4c8a7de9817efeef9c1bf4b)
+Target upstr = openhanako v0.444.1   (cc19cb49b0786d61ed723764e0a83baf87887270)
+Current pi   = 0.83.0
+Target pi    = 0.84.1
+Required Node= 24.16.0  (nvm exec 24.16.0；本机默认 node v22.23.2 不可用于验证)
+```
+
+## P1. Phase 0 — 可重现基线（本机实测，权威）
+
+执行环境：`nvm exec 24.16.0`。本机默认 `node -v` = v22.23.2（不是要求的 24.16.0），所有验证命令一律 `nvm exec 24.16.0 <cmd>`。
+
+```
+node -v (via nvm exec 24.16.0)  → v24.16.0 ✓
+git rev-parse HEAD              → a5d1e5415c28b55074ba9ae81a6429d57ff5a934
+git status --short              → (clean) ✓
+```
+
+### 基线 typecheck
+
+```
+nvm exec 24.16.0 npm run typecheck  → 0 error ✓
+```
+
+### 基线 full suite（实测权威）
+
+```
+Test Files  6 failed | 1074 passed | 1 skipped (1081)
+Tests       13 failed | 10904 passed | 7 skipped (10924)
+```
+
+→ **BASELINE: 13 failed / 7 skipped**（验收线：最终 0 failed，skipped ≤ 7）。
+
+注意：PROGRESS/BLOCKED 旧 section 记录的 162/170 失败是 Node22 下 better-sqlite3 native ABI mismatch（NODE_MODULE_VERSION 137 vs 127）的环境噪声；Node24.16.0 下该类失败已消失，**本任务 baseline 以本机 Node24 实测为准**。失败清单详见 P1.1。
+
+### 包版本核对（实际仓库为准）
+
+```
+app version            = 0.1.22
+lingxi.upstreamVersion = 0.443.46
+@earendil-works/pi-agent-core   = 0.83.0
+@earendil-works/pi-ai           = 0.83.0
+@earendil-works/pi-coding-agent = 0.83.0
+engines.node           = ">=24.12.0 <25"
+verifiedVersions (verifier)       = {0.80.3, 0.83.0}
+verifiedPiAiVersions (verifier)   = {0.80.3, 0.83.0}
+```
+
+### SDK import boundary 现状（lib/pi-sdk 是唯一入口）
+
+- 根 re-export：`@earendil-works/pi-coding-agent`、`@earendil-works/pi-agent-core`、`@earendil-works/pi-ai`、`@earendil-works/pi-ai/compat`
+- 深路径：`dist/core/auth-storage.js`（AuthStorage, FileAuthStorageBackend）、`dist/core/compaction/compaction.js`（prepareCompaction）
+- verifier（patch-pi-sdk.cjs）扫描 core/server/lib/hub 生产代码，禁止越界直接 import @earendil-works/*（lib/pi-sdk 除外）。
+
+### P1.1 BASELINE_FAILURE_LIST（6 file / 13 failed，全部 pre-existing）
+
+| 文件 | 失败数 | 分类（根因判断） |
+|------|--------|------------------|
+| tests/i18n-locale-parity.test.ts | 3 | **guardrail** — en vs zh-TW/ja/ko 缺 key（pre-existing locale debt） |
+| tests/model-sync-routes.test.ts | 1 | **legacy** — utility account 计费断言（pre-existing） |
+| tests/open-boundary-lint.test.ts | 2 | **guardrail** — committed export-manifest/baseline 与 source 不一致（pre-existing 边界债） |
+| tests/persistence-schema-tripwire.test.ts | 4 | **guardrail** — committed fingerprint 与实时 store 不一致（pre-existing） |
+| desktop/.../screenshot.test.ts | 1 | **legacy** — 默认头像烧录断言（pre-existing） |
+| desktop/.../settings-search-layout.test.ts | 2 | **legacy** — 设置 modal 884px 宽 token 断言（pre-existing） |
+
+### BASELINE_SKIPPED_LIST（7 skipped，全部 platform skip）
+
+- tests/secret-fs.test.ts :: windows contract（×1）
+- tests/manual/win32-packaged-smoke.test.ts :: win32 packaged smoke（×6）
+
+→ 全部为 darwin 上恒不运行的 win32 skip。**skip 基线 = 7，验收线 skip ≤ 7。**
+
+> 这 13 个失败均为 pre-existing（与 0.83.0→0.84.1 / upstream 0.444.1 无因果关系）。其中 3 个 guardrail 文件（i18n-locale-parity / open-boundary-lint / persistence-schema-tripwire）的 **assertion semantics 在本任务中不可修改**；本任务目标是最终 full green，但区分 migration correctness vs legacy cleanup（Phase 15），修复 pre-existing 失败须独立证明 + 独立 commit，不得改 guardrail assertion。
+
+## P2. Phase 2 — pi SDK 0.83.0 → 0.84.1 升级（迁移本身）
+
+### 改动
+- `package.json`：三个 `@earendil-works/pi-*` 0.83.0 → 0.84.1。
+- `scripts/patch-pi-sdk.cjs`：`verifiedVersions` / `verifiedPiAiVersions` **追加** "0.84.1"（旧 0.80.3/0.83.0 保留）。
+- `nvm exec 24.16.0 npm install`（非 --ignore-scripts，postinstall 自然运行）→ `[verify-pi-sdk] all checks passed`，installed 0.84.1 ✓。
+
+### PI_083_TO_084_CONTRACT（读真实 0.84.1 .d.ts/runtime 后得出）
+
+#### message stream（stream-guard 依赖）— contract 不变
+- `AssistantMessageEvent`（pi-ai types.d.ts:383-436）shape 与 0.83 一致：
+  `start` / `text_start|delta|end` / `thinking_start|delta|end` / `toolcall_start|delta|end`（带 contentIndex, delta, toolCall, partial）/ `done{reason,message}` / `error{reason,error}`。
+- `EventStream`/`AssistantMessageEventStream`（utils/event-stream.d.ts）：`push`/`end`/`result` 不变。
+- `toolcall_delta` 仍 emit `delta` 字符串（openai-completions.js:399）；`partialArgs` 是 runtime streaming scratch buffer，streaming 中可读、`toolcall_end` 前 `delete`、`done` 前 `delete`。
+  → stream-guard 现有 dual-source（event.delta ∪ block.partialArgs）策略 **仍成立**，运行时验证 `tests/pi-sdk-stream-guard.test.ts` 全绿。
+
+#### OAuth provider contract — **breaking（refreshToken 加 signal 参数）**
+0.84.1 `ProviderConfig.oauth`（pi-coding-agent core/extensions/types.d.ts:1059-1074 / provider-composer.d.ts:11）：
+```
+oauth: {
+  name: string;
+  isSubscription?: boolean;
+  usesCallbackServer?: boolean;   // @deprecated
+  login(callbacks: OAuthLoginCallbacks): Promise<OAuthCredentials>;        // 不变
+  refreshToken(credentials: OAuthCredentials, signal: AbortSignal): Promise<OAuthCredentials>;  // 0.83 是 1 参，0.84.1 加 signal
+  getApiKey(credentials: OAuthCredentials): string;                          // 不变
+  modifyModels?(...): ...;
+}
+```
+- 受影响 Lingxi 代码：`lib/auth/xai-oauth.ts` `refreshToken(credentials)` 须改为 `refreshToken(credentials, signal)`，且 signal 必须真实接入（throwIfAborted + requestSignal），非 no-op。
+- `OAuthLoginCallbacks` shape 不变；`loginOAuthProvider`/AuthInteraction adapter 不动。
+
+#### deep imports — 全部仍存在
+- `pi-coding-agent/dist/core/auth-storage.js`（AuthStorage, FileAuthStorageBackend）✓
+- `pi-coding-agent/dist/core/compaction/compaction.js`（prepareCompaction）✓
+- `pi-ai/compat`（getModel/getModels/completeSimple）✓
+
+#### 结论
+- stream-guard：无需机械改造，运行时契约保持；Phase 3 只验证，不改 guard 语义。
+- 真正需要迁移的只有 `xai-oauth.ts` 的 refreshToken 2-arg 契约（生产 typecheck 已过，因 SdkOAuthProvider 是结构类型，Lingxi 实现收 1 参在调用侧不报错；只有 test 显式 1-arg 调用被 0.84.1 返回类型判定为缺参）。
+
+## P3/P4. Phase 3 + 4 — stream guard & SDK boundary verification
+
+### Phase 3：stream guard（contract 不变，仅验证）
+0.84.1 的 `AssistantMessageEvent` 与 `EventStream`/`AssistantMessageEventStream` shape 与 0.83 完全一致；`toolcall_delta` 仍带 `delta` 字符串，`partialArgs` 仍是 streaming scratch buffer（streaming 中可读，end/done 前 delete）。stream-guard 现有 dual-source（event.delta ∪ block.partialArgs）策略成立，**无需机械改造**。
+
+- `nvm exec 24.16.0 npx vitest run tests/pi-sdk-stream-guard.test.ts` → 全绿 ✓
+- guard 8 项语义职责全部保留（malformed tool-call recovery / 合法透传 / done-error / cancellation）。
+
+### Phase 4：SDK boundary
+- `nvm exec 24.16.0 node scripts/patch-pi-sdk.cjs` → `[verify-pi-sdk] all checks passed` ✓
+- deep imports 全部仍存在：`dist/core/auth-storage.js` ✓ / `dist/core/compaction/compaction.js` ✓ / `pi-ai/compat` ✓（import 实测可解析）
+- pi-sdk targeted 套件（14 file / 150 test）→ 148 passed；剩 2 = **pre-existing open-boundary baseline debt**（provider-compat→ollama + SDK 包内 auth-storage→abort），与本次迁移无因果（baseline 文件自 START_HEAD 未变）。
+
+**Checkpoint commit 1**（branch `chore/upstream-0.444.1-pi-0.84.1`）：5338cef6 — pi SDK 0.84.1 升级 + refreshToken 契约适配。typecheck 0 error，oauth targeted 23 passed。
+
+## P5. Phase 5 — upstream v0.444.1 semantic merge（逐文件 3-way）
+
+三方模型：BASE=v0.443.46 / OURS=START_HEAD a5d1e54 / THEIRS=v0.444.1。Lingxi 与 upstream 无共同 git 祖先（recreated fork），无法用 git merge；用 `git merge-file`（base/ours/theirs 三个临时文件）做真 3-way。
+
+### 文件分类（64 files）
+
+- **OURS==BASE（fast-forward，Lingxi 未分歧，~30 文件）**：直接 take THEIRS。含 events.ts / rc-router.ts / ws-protocol.ts / websocket.ts / ws-message-handler.ts / context-slice.ts / format.ts / SessionList.module.css / experiments-registry / compaction-guard-ext / usage-observer / notification-service + 对应 tests + 5 个 NEW source（lossy-local-compaction / visible-text-accumulator / internal-mood-block）+ 2 个 NEW test。
+- **OURS!=BASE（真 3-way，~24 文件）**：用 git merge-file。
+
+### OURS!=BASE 3-way 结果
+
+- **CLEAN（无冲突）**：bridge-session-manager.ts / desktop-session-submit.ts / engine.ts / session-compactor.ts / SessionList.tsx / ContextRing.tsx / app-event-actions.ts / ExperimentsTab.tsx / bridge-manager.ts / chat.ts + 全部 OURS!=BASE tests + 5 locale。
+- **CONFLICT（手工裁决，已解）**：
+  - `InputArea.tsx`：import 块。保留 Lingxi `lingxiFetch`（不取上游 `hanaFetch`）+ 接入上游新 file-mention（`searchDeskFiles` + `DeskSearchResult`）。
+  - `message-parser.ts parseMoodFromContent`：取上游 canonical `parseLeadingInternalMoodBlock`（shared 新模块，更干净的抽象），但默认 yuan 保持 Lingxi 品牌 `'lingxi'`（非上游 `'hanako'`）。
+
+### 品牌 invariant 修复（merge 引入的回流，已逐项改正）
+- `ContextRing.tsx`：merge 把上游 `hanaFetch` 回流 → 改回 `lingxiFetch`（import + 调用点）。对应 test mock 同步 `hanaFetchMock`→`lingxiFetchMock`。
+- `ExperimentsTab.test.tsx`：merge 回流 `hanaFetchMock`（一处）→ `lingxiFetchMock`。
+- `message-parser.test.ts`：merge 回流期望 `yuan:'hanako'`（一处）→ `'lingxi'`。
+
+### Phase 11 语义裁决（不新增/不盲删）
+- **`core/session-manifest/legacy-migration.ts`**：在 START_HEAD **未 tracked**（Lingxi 已删除，无任何 tracked 代码 import 它；Lingxi 用 `core/migrations.ts` + `data-epoch-migrations.ts` 独立迁移体系）。上游 v0.444.1 仅给它加 BOM revalidation。裁决：**不重新引入**（语义已由 Lingxi 等价体系承担；上游 BOM fix 不适用于 Lingxi 独立迁移路径，无 tracked 消费方）。`tests/session-manifest-legacy-migration.test.ts` 同理不存在。
+- **release-digest.v1/v2.json**：**不合并**（Phase 2.3：本任务非 release，digest 必须不变）。
+- **package.json**：上游只改 `version`，Lingxi 保持 app=0.1.22；pi 版本已在 Phase 2 处理。
+
+### locale（Phase 14）
+- 5 locale 全 CLEAN merge，JSON 合法。
+- 上游新增 `chat.instantSimpleCompaction` + `settings.experiments.instantSimpleCompaction.{title,description}` 在 en/ja/ko/zh-TW/zh **均有真实翻译**（非英文占位、非空）。
+- i18n-locale-parity 仍 3 fail = **pre-existing debt**（4 个 key：`settings.providers.subtab.{api,models,usage}` + `settings.api.searchConfig`，与本次合并无因果，留 Phase 15 legacy cleanup）。
+
+### 验证（迁移本身的 targeted tests，全绿）
+- core/lib feature tests（12 file / 272 test）→ 全绿：lossy-local-compaction / mood-parser / visible-text-accumulator / notification / experiments / usage-observer / chat-compaction-events / session-compactor / bridge-handle-message / chat-route-switching / llm-client-provider-compat。
+- desktop React tests（10 file）→ 全绿（context-ring 12 / message-parser 51 / file-mention / ExperimentsTab / etc.）。
+- typecheck = 0 error。
+

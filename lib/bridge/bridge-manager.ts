@@ -31,6 +31,7 @@ import { createModuleLogger } from "../debug-log.ts";
 import { t } from "../i18n.ts";
 import { stripToolProtocolTagsFromProse } from "../tool-protocol-sanitizer.ts";
 import { sanitizeBridgeVisibleText } from "../../shared/bridge-visible-text.ts";
+import { createVisibleTextAccumulator } from "./visible-text-accumulator.ts";
 
 const log = createModuleLogger("bridge");
 const blockChunkerLog = createModuleLogger("block-chunker");
@@ -2582,7 +2583,7 @@ export class BridgeManager {
         ...target,
         delivery,
         replyContext,
-        text: "",
+        visibleText: createVisibleTextAccumulator(),
         toolMedia: [],
       });
       return;
@@ -2596,30 +2597,38 @@ export class BridgeManager {
     if (event.type === "message_update") {
       const sub = event.assistantMessageEvent;
       if (sub?.type === "text_delta") {
-        const delta = sub.delta || "";
-        state.text += delta;
-        try { state.delivery.onDelta?.(delta, state.text); } catch (err) { log.warn(`rc mirror onDelta failed: ${err?.message}`); }
+        const { emittedDelta, text } = state.visibleText.appendTextDelta(sub.delta || "");
+        try { state.delivery.onDelta?.(emittedDelta, text); } catch (err) { log.warn(`rc mirror onDelta failed: ${err?.message}`); }
       }
+      return;
+    }
+
+    if (event.type === "tool_execution_start") {
+      state.visibleText.markHiddenToolBoundary();
       return;
     }
 
     if (event.type === "tool_execution_end" && !event.isError) {
       state.toolMedia.push(...collectMediaItems(event.result?.details?.media));
+      let appendedDetail = false;
       const card = event.result?.details?.card;
       if (card?.description) {
-        state.text += (state.text ? "\n\n" : "") + card.description;
+        state.visibleText.appendVisibleDetail(card.description);
+        appendedDetail = true;
       }
       const settingsUpdateText = formatSettingsUpdateText(event.result?.details?.settingsUpdate);
       if (settingsUpdateText) {
-        state.text += (state.text ? "\n\n" : "") + settingsUpdateText;
+        state.visibleText.appendVisibleDetail(settingsUpdateText);
+        appendedDetail = true;
       }
+      if (!appendedDetail) state.visibleText.markHiddenToolBoundary();
       return;
     }
 
     if (event.type === "session_status" && event.isStreaming === false) {
       this._rcMirrorStreams.delete(streamKey);
       if (streamKey !== sessionPath) this._rcMirrorStreams.delete(sessionPath);
-      const cleaned = this._cleanReplyForPlatform(state.text || "");
+      const cleaned = this._cleanReplyForPlatform(state.visibleText.getText() || "");
       if (!cleaned) return;
 
       let allMediaItems = await state.delivery.finish(cleaned);
@@ -2763,8 +2772,16 @@ export class BridgeManager {
    *
    * @param {string} text - 要发送的文本（会自动 clean mood/pulse 标签）
    * @param {string} [targetAgentId]
-   * @param {{ contextPolicy?: "none"|"record_when_delivered", bridgePlatforms?: string[], idempotencyKey?: string }} [opts]
-   * @returns {{ platform: string, chatId: string, sessionKey: string, recorded: boolean, deliveries?: Array<any> } | null} 发送成功返回平台信息，失败返回 null
+   * @param {{ contextPolicy?: "none"|"record_when_delivered", bridgePlatforms?: string[], deliveryTarget?: object, idempotencyKey?: string }} [opts]
+   * @returns {Promise<
+   *   | { platform: string, chatId: string, sessionKey: string, recorded: boolean, deliveries?: Array<any>, skipped?: boolean }
+   *   | { ok: false, error: "target_missing"|"disconnected"|"reply_context_unavailable"|"send_failed", deliveries: Array<any>, message?: string }
+   *   | null
+   * >}
+   *   Success: platform delivery info (optional `skipped` when an idempotency key hits a prior success).
+   *   Failure: structured `{ ok: false, error, deliveries, message? }` — `send_failed` includes `message` from the adapter throw.
+   *   `null` only when cleaned text is empty (nothing to send).
+   *   Fan-out aggregate `error` prefers `send_failed` when any platform threw, else `reply_context_unavailable`, else connectivity/target codes.
    */
   async sendProactive(text, targetAgentId, opts: any = {}) {
     const cleaned = this._cleanReplyForPlatform(text);
@@ -2794,6 +2811,11 @@ export class BridgeManager {
     }
   }
 
+  /**
+   * Single proactive attempt (caller already cleaned non-empty text).
+   * Never returns null: success object, or `{ ok: false, error, deliveries, message? }`.
+   * Fan-out aggregate prefers `send_failed` over `reply_context_unavailable` when both occur.
+   */
   async _sendProactiveOnce(cleaned, targetAgentId, opts: any = {}, idempotencyKey = null) {
     const contextPolicy = opts.contextPolicy || "record_when_delivered";
     const explicitTarget = normalizeProactiveBridgeDeliveryTarget(opts.deliveryTarget, targetAgentId);
@@ -2813,6 +2835,11 @@ export class BridgeManager {
       : platformEntries;
     const fanOut = !explicitTarget && bridgePlatforms.length > 0;
     const deliveries = [];
+    let sawBoundConnected = false;
+    let sawResolvedTarget = false;
+    let sawReplyContextUnavailable = false;
+    let sawSendFailed = false;
+    let lastSendError = null;
 
     for (const entry of deliveryEntries) {
       if (entry.status !== "connected" || !entry.adapter) continue;
@@ -2824,6 +2851,7 @@ export class BridgeManager {
         continue;
       }
 
+      sawBoundConnected = true;
       const entryAgentId = explicitTarget?.agentId || entry.agentId;
       const agent = entryAgentId ? this.engine.getAgent(entryAgentId) : null;
       const ownerTarget = explicitTarget || resolveBridgeOwnerDeliveryTarget({
@@ -2834,10 +2862,18 @@ export class BridgeManager {
       const ownerId = ownerTarget?.userId;
       if (!ownerId) continue;
 
+      sawResolvedTarget = true;
       const chatId = explicitTarget?.chatId || entry.adapter.resolveOwnerChatId?.(ownerId) || ownerTarget.chatId;
 
       if (entry.adapter.capabilities?.proactive === false && !entry.adapter.canReply?.(chatId)) {
         debugLog()?.log("bridge", `→ ${platform} skipped proactive (no reply context for ${chatId})`);
+        sawReplyContextUnavailable = true;
+        deliveries.push({
+          status: "failed",
+          platform,
+          chatId,
+          error: "reply_context_unavailable",
+        });
         continue;
       }
 
@@ -2893,14 +2929,14 @@ export class BridgeManager {
           return result;
         }
       } catch (err) {
-        if (fanOut) {
-          deliveries.push({
-            status: "failed",
-            platform,
-            chatId,
-            error: err.message,
-          });
-        }
+        sawSendFailed = true;
+        lastSendError = err.message;
+        deliveries.push({
+          status: "failed",
+          platform,
+          chatId,
+          error: err.message,
+        });
         log.error(`proactive send failed (${platform}): ${err.message}`);
         debugLog()?.error("bridge", `proactive send failed (${platform}): ${err.message}`);
       }
@@ -2927,7 +2963,27 @@ export class BridgeManager {
     }
 
     if (idempotencyKey) this._proactiveIdempotency.delete(idempotencyKey);
-    return null;
+
+    let error = "target_missing";
+    // Prefer send_failed when present: a transport throw is more actionable than a
+    // missing reply window on another fan-out platform.
+    if (sawSendFailed) {
+      error = "send_failed";
+    } else if (sawReplyContextUnavailable) {
+      error = "reply_context_unavailable";
+    } else if (!sawBoundConnected) {
+      const hasConnectedPlatform = deliveryEntries.some((entry) => entry.status === "connected" && entry.adapter);
+      error = hasConnectedPlatform ? "target_missing" : "disconnected";
+    } else if (!sawResolvedTarget) {
+      error = "target_missing";
+    }
+
+    return {
+      ok: false,
+      error,
+      deliveries,
+      ...(error === "send_failed" && lastSendError ? { message: lastSendError } : {}),
+    };
   }
 
   _readBridgeIndex(agentId, agent) {

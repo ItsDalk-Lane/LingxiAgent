@@ -31,6 +31,7 @@ import path from "path";
 import { extOfName, inferFileKind } from "../lib/file-metadata.ts";
 import { collectMediaItems } from "../lib/tools/media-details.ts";
 import { formatSettingsUpdateText } from "../lib/tools/settings-update-result.ts";
+import { createVisibleTextAccumulator } from "../lib/bridge/visible-text-accumulator.ts";
 import { materializeBridgeInboundFiles } from "../lib/session-files/bridge-inbound-files.ts";
 import { serializeSessionFile } from "../lib/session-files/session-file-response.ts";
 import { BrowserManager } from "../lib/browser/browser-manager.ts";
@@ -361,26 +362,31 @@ export async function submitDesktopSessionMessage(engine: any, opts: {
       }
     };
 
-    let captured = "";
+    const visibleText = createVisibleTextAccumulator();
     const toolMedia = [];
     const unsub = session.subscribe?.((event) => {
       if (event.type === "message_update") {
         const sub = event.assistantMessageEvent;
         if (sub?.type === "text_delta") {
-          const delta = sub.delta || "";
-          captured += delta;
-          try { onDelta?.(delta, captured); } catch {}
+          const { emittedDelta, text } = visibleText.appendTextDelta(sub.delta || "");
+          try { onDelta?.(emittedDelta, text); } catch {}
         }
+      } else if (event.type === "tool_execution_start") {
+        visibleText.markHiddenToolBoundary();
       } else if (event.type === "tool_execution_end" && !event.isError) {
         toolMedia.push(...collectMediaItems(event.result?.details?.media));
+        let appendedDetail = false;
         const card = event.result?.details?.card;
         if (card?.description) {
-          captured += (captured ? "\n\n" : "") + card.description;
+          visibleText.appendVisibleDetail(card.description);
+          appendedDetail = true;
         }
         const settingsUpdateText = formatSettingsUpdateText(event.result?.details?.settingsUpdate);
         if (settingsUpdateText) {
-          captured += (captured ? "\n\n" : "") + settingsUpdateText;
+          visibleText.appendVisibleDetail(settingsUpdateText);
+          appendedDetail = true;
         }
+        if (!appendedDetail) visibleText.markHiddenToolBoundary();
       }
     });
 
@@ -413,7 +419,7 @@ export async function submitDesktopSessionMessage(engine: any, opts: {
     }
 
     return {
-      text: captured.trim() || null,
+      text: visibleText.getText().trim() || null,
       toolMedia,
     };
   } finally {

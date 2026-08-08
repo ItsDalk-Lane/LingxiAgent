@@ -638,6 +638,112 @@ describe("chat route model switch guard", () => {
     ]);
   });
 
+  it("runs instant simple compaction as an enabled one-shot method without changing ordinary compaction", async () => {
+    let createHandlers;
+    const upgradeWebSocket = vi.fn((factory) => {
+      createHandlers = factory;
+      return () => new Response(null);
+    });
+    const session = {
+      isCompacting: false,
+      compact: vi.fn(),
+    };
+    const summarySource = { summary: "rolling" };
+    const runInstantSimpleCompaction = vi.fn(async (_session, options) => {
+      expect(await options.getSummarySource()).toEqual(summarySource);
+      return { summary: "local checkpoint" };
+    });
+    const hub = { subscribe: vi.fn(), send: vi.fn(async () => {}) };
+    const engine = {
+      agentName: "Hana",
+      abortAllStreaming: vi.fn(async () => {}),
+      preferences: {
+        getExperimentValue: vi.fn((id) => (
+          id === "session.instant_simple_compaction" ? true : undefined
+        )),
+      },
+      getLossyLocalCompactionSummarySource: vi.fn(() => summarySource),
+      getSessionManifest: vi.fn(() => ({ currentLocator: { path: "/tmp/current-b.jsonl" } })),
+      getSessionByPath: vi.fn(() => session),
+      isDeletedAgentSession: vi.fn(() => false),
+      isSessionStreaming: vi.fn(() => false),
+      slashDispatcher: null,
+    };
+
+    createChatRoute(engine, hub, { upgradeWebSocket, runInstantSimpleCompaction });
+    const handlers = createHandlers({});
+    const ws = { readyState: 1, send: vi.fn() };
+    handlers.onMessage({
+      data: JSON.stringify({
+        type: "compact",
+        sessionId: "sess_a",
+        method: "instant_simple",
+      }),
+    }, ws);
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(runInstantSimpleCompaction).toHaveBeenCalledWith(session, expect.objectContaining({
+      getSummarySource: expect.any(Function),
+      lifecycleReason: "manual",
+    }));
+    expect(session.compact).not.toHaveBeenCalled();
+    expect(ws.send.mock.calls.map(([raw]) => JSON.parse(raw))).toEqual([
+      expect.objectContaining({
+        type: "compaction_accepted",
+        mode: "lossy_local",
+      }),
+      expect.objectContaining({
+        type: "compaction_result",
+        mode: "lossy_local",
+        status: "succeeded",
+      }),
+    ]);
+  });
+
+  it("rejects the one-shot instant method while its experiment is disabled", async () => {
+    let createHandlers;
+    const upgradeWebSocket = vi.fn((factory) => {
+      createHandlers = factory;
+      return () => new Response(null);
+    });
+    const session = { isCompacting: false, compact: vi.fn() };
+    const runInstantSimpleCompaction = vi.fn();
+    const hub = { subscribe: vi.fn(), send: vi.fn(async () => {}) };
+    const engine = {
+      agentName: "Hana",
+      abortAllStreaming: vi.fn(async () => {}),
+      preferences: { getExperimentValue: vi.fn(() => false) },
+      getSessionManifest: vi.fn(() => ({ currentLocator: { path: "/tmp/current-b.jsonl" } })),
+      getSessionByPath: vi.fn(() => session),
+      isDeletedAgentSession: vi.fn(() => false),
+      isSessionStreaming: vi.fn(() => false),
+      slashDispatcher: null,
+    };
+
+    createChatRoute(engine, hub, { upgradeWebSocket, runInstantSimpleCompaction });
+    const handlers = createHandlers({});
+    const ws = { readyState: 1, send: vi.fn() };
+    handlers.onMessage({
+      data: JSON.stringify({
+        type: "compact",
+        sessionId: "sess_a",
+        method: "instant_simple",
+      }),
+    }, ws);
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(runInstantSimpleCompaction).not.toHaveBeenCalled();
+    expect(session.compact).not.toHaveBeenCalled();
+    expect(ws.send.mock.calls.map(([raw]) => JSON.parse(raw))).toEqual([
+      expect.objectContaining({
+        type: "compaction_result",
+        mode: "lossy_local",
+        status: "failed",
+        reason: "experiment_disabled",
+      }),
+    ]);
+  });
+
   it("converts legacy compact paths at the boundary and never executes against the stale locator", async () => {
     let createHandlers;
     const upgradeWebSocket = vi.fn((factory) => {

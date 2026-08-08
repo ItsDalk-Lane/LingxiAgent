@@ -7,6 +7,7 @@
 
 import { QUOTE_ORIGINAL_END, QUOTE_ORIGINAL_START } from './quoted-selection';
 import { moodLabelForYuan } from '../../../../shared/yuan-visuals.ts';
+import { parseLeadingInternalMoodBlock } from '../../../../shared/internal-mood-block.ts';
 
 // ── Mood 解析 ──
 
@@ -41,12 +42,11 @@ export function cleanMoodText(raw: string): string {
 
 export function parseMoodFromContent(content: string): { mood: string | null; yuan: string | null; text: string } {
   if (!content) return { mood: null, yuan: null, text: '' };
-  const moodRe = /<(mood|pulse|reflect)>([\s\S]*?)<\/(?:mood|pulse|reflect)>/;
-  const match = content.match(moodRe);
-  if (!match) return { mood: null, yuan: null, text: content };
-  const yuan = TAG_TO_YUAN[match[1]] || 'lingxi';
-  const mood = cleanMoodText(match[2].trim());
-  const text = content.replace(moodRe, '').replace(/^\n+/, '').trim();
+  const block = parseLeadingInternalMoodBlock(content);
+  if (!block) return { mood: null, yuan: null, text: content };
+  const yuan = TAG_TO_YUAN[block.tag] || 'lingxi';
+  const mood = cleanMoodText(block.content.trim());
+  const text = block.rest.replace(/^\n+/, '').trim();
   return { mood, yuan, text };
 }
 

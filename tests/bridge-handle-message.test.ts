@@ -575,9 +575,162 @@ describe("BridgeManager._handleMessage", () => {
 
       const result = await bm.sendProactive("hello", "hana");
 
-      expect(result).toBeNull();
+      expect(result).toMatchObject({
+        ok: false,
+        error: "reply_context_unavailable",
+        deliveries: [{
+          status: "failed",
+          platform: "wechat",
+          chatId: "wx-user",
+          error: "reply_context_unavailable",
+        }],
+      });
       expect(wechatAdapter.sendReply).not.toHaveBeenCalled();
       expect(engine.bridgeSessionManager.recordAssistantMessage).not.toHaveBeenCalled();
+    });
+
+    it("returns reply_context_unavailable when an explicit deliveryTarget lacks WeChat reply context", async () => {
+      const { bm, engine } = createMocks();
+      const wechatAdapter = {
+        capabilities: { proactive: false },
+        canReply: vi.fn().mockReturnValue(false),
+        sendReply: (vi.fn().mockResolvedValue as any)(),
+      };
+      bm._platforms.clear();
+      bm._platforms.set("wechat:hana", {
+        adapter: wechatAdapter,
+        status: "connected",
+        agentId: "hana",
+        platform: "wechat",
+      });
+      engine.getAgent.mockImplementation((id) => {
+        if (id === "hana") return { agentName: "TestAgent", config: { bridge: { wechat: { owner: "wx-user" } } }, sessionDir: os.tmpdir() };
+        return null;
+      });
+
+      const result = await bm.sendProactive("hello", "hana", {
+        deliveryTarget: {
+          kind: "bridge",
+          platform: "wechat",
+          chatId: "wx-user",
+          sessionKey: "wx_dm_wx-user@hana",
+          agentId: "hana",
+        },
+      });
+
+      expect(wechatAdapter.canReply).toHaveBeenCalledWith("wx-user");
+      expect(wechatAdapter.sendReply).not.toHaveBeenCalled();
+      expect(result).toMatchObject({
+        ok: false,
+        error: "reply_context_unavailable",
+        deliveries: [{
+          status: "failed",
+          platform: "wechat",
+          chatId: "wx-user",
+          error: "reply_context_unavailable",
+        }],
+      });
+    });
+
+    it("returns send_failed when a connected adapter with reply context throws from sendReply", async () => {
+      const { bm, engine } = createMocks();
+      const wechatAdapter = {
+        capabilities: { proactive: false },
+        canReply: vi.fn().mockReturnValue(true),
+        sendReply: vi.fn().mockRejectedValue(new Error("upstream 503")),
+      };
+      bm._platforms.clear();
+      bm._platforms.set("wechat:hana", {
+        adapter: wechatAdapter,
+        status: "connected",
+        agentId: "hana",
+        platform: "wechat",
+      });
+      engine.getAgent.mockImplementation((id) => {
+        if (id === "hana") return { agentName: "TestAgent", config: { bridge: { wechat: { owner: "wx-user" } } }, sessionDir: os.tmpdir() };
+        return null;
+      });
+      engine.getBridgeIndex = vi.fn().mockReturnValue({
+        "wx_dm_wx-user@hana": {
+          file: "owner/wx.jsonl",
+          userId: "wx-user",
+          name: "微信用户",
+        },
+      });
+
+      const result = await bm.sendProactive("hello", "hana");
+
+      expect(wechatAdapter.canReply).toHaveBeenCalledWith("wx-user");
+      expect(wechatAdapter.sendReply).toHaveBeenCalledWith("wx-user", "hello");
+      expect(result).toMatchObject({
+        ok: false,
+        error: "send_failed",
+        message: "upstream 503",
+        deliveries: [{
+          status: "failed",
+          platform: "wechat",
+          chatId: "wx-user",
+          error: "upstream 503",
+        }],
+      });
+      expect(engine.bridgeSessionManager.recordAssistantMessage).not.toHaveBeenCalled();
+    });
+
+    it("returns target_missing when no owner delivery target can be resolved", async () => {
+      const { bm, engine } = createMocks();
+      const wechatAdapter = {
+        capabilities: { proactive: false },
+        canReply: vi.fn().mockReturnValue(true),
+        sendReply: (vi.fn().mockResolvedValue as any)(),
+      };
+      bm._platforms.clear();
+      bm._platforms.set("wechat:hana", {
+        adapter: wechatAdapter,
+        status: "connected",
+        agentId: "hana",
+        platform: "wechat",
+      });
+      engine.getAgent.mockImplementation((id) => {
+        if (id === "hana") return { agentName: "TestAgent", config: { bridge: { wechat: {} } }, sessionDir: os.tmpdir() };
+        return null;
+      });
+      engine.getBridgeIndex = vi.fn().mockReturnValue({});
+
+      const result = await bm.sendProactive("hello", "hana");
+
+      expect(result).toMatchObject({
+        ok: false,
+        error: "target_missing",
+      });
+      expect(wechatAdapter.sendReply).not.toHaveBeenCalled();
+    });
+
+    it("returns disconnected when Bridge platforms exist but none are connected", async () => {
+      const { bm, engine } = createMocks();
+      const wechatAdapter = {
+        capabilities: { proactive: false },
+        canReply: vi.fn().mockReturnValue(true),
+        sendReply: (vi.fn().mockResolvedValue as any)(),
+      };
+      bm._platforms.clear();
+      bm._platforms.set("wechat:hana", {
+        adapter: wechatAdapter,
+        status: "disconnected",
+        agentId: "hana",
+        platform: "wechat",
+      });
+      engine.getAgent.mockImplementation((id) => {
+        if (id === "hana") return { agentName: "TestAgent", config: { bridge: { wechat: { owner: "wx-user" } } }, sessionDir: os.tmpdir() };
+        return null;
+      });
+
+      const result = await bm.sendProactive("hello", "hana");
+
+      expect(result).toMatchObject({
+        ok: false,
+        error: "disconnected",
+      });
+      expect(wechatAdapter.sendReply).not.toHaveBeenCalled();
     });
 
     it("does not send proactive replies through a Bridge entry owned by another agent", async () => {
@@ -604,7 +757,10 @@ describe("BridgeManager._handleMessage", () => {
 
       const result = await bm.sendProactive("hello", "hana");
 
-      expect(result).toBeNull();
+      expect(result).toMatchObject({
+        ok: false,
+        error: "target_missing",
+      });
       expect(otherAdapter.sendReply).not.toHaveBeenCalled();
       expect(unboundAdapter.sendReply).not.toHaveBeenCalled();
     });

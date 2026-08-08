@@ -300,6 +300,7 @@
     "stop": "停止",
     "browserScreenshot": "浏览器截图",
     "compacting": "上下文压缩中",
+    "instantSimpleCompaction": "瞬时简易压缩",
     "visionAuxiliary": "辅助视觉",
     "fileExpired": "文件已过期",
     "fileActions": {
@@ -1095,7 +1096,7 @@
     "experiments": {
       "title": "实验",
       "compactionTitle": "上下文压缩",
-      "compactionSectionDescription": "选择 compact 时优先保护缓存，还是优先兼容历史格式。",
+      "compactionSectionDescription": "设置自动压缩的默认策略，并决定是否在聊天的上下文圆圈中显示实验性的一次性压缩入口。",
       "modelPersonaTitle": "模型与人格",
       "modelPersonaDescription": "观察不同供应商在 Hana 人格、心境和输出契约上的适配表现。",
       "memoryTitle": "记忆实验",
@@ -1142,10 +1143,14 @@
       },
       "compaction": {
         "title": "压缩模式",
-        "description": "自动会优先使用缓存保护压缩；普通压缩会放行 Pi SDK 原生摘要，更适合历史格式不稳定的会话。",
+        "description": "自动会优先使用缓存保护压缩；普通压缩会放行 Pi SDK 原生摘要。",
         "auto": "自动",
         "cachePreserving": "缓存保护压缩",
         "piCompatible": "普通压缩"
+      },
+      "instantSimpleCompaction": {
+        "title": "瞬时简易压缩",
+        "description": "打开后，聊天输入框的上下文圆圈菜单会增加“瞬时简易压缩”。它只影响你主动点击的这一次压缩，不改变自动压缩或普通压缩的行为。"
       },
       "deepseekRoleplay": {
         "title": "DeepSeek 人格沉浸补丁",

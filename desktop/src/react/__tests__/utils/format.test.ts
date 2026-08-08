@@ -92,6 +92,29 @@ describe('parseMoodFromContent (format.ts)', () => {
     expect(result.mood).toBeNull();
     expect(result.text).toBe('plain text');
   });
+
+  it('保留行内与代码栅里的 mood 标签字面量', () => {
+    for (const input of [
+      'prefix `<mood>` suffix',
+      '`<pulse>` suffix',
+      '`<reflect>` suffix',
+      '```xml\n<pulse>literal</pulse>\n```\nafter',
+    ]) {
+      expect(parseMoodFromContent(input)).toEqual({ mood: null, text: input });
+    }
+  });
+
+  it('要求完整开头块的闭合标签与开头匹配', () => {
+    const input = '<reflect>literal</mood>\nafter';
+    expect(parseMoodFromContent(input)).toEqual({ mood: null, text: input });
+  });
+
+  it('解析 BOM/空白后的单个开头块并保留后续标签字面量', () => {
+    expect(parseMoodFromContent('\uFEFF \n<pulse>inside</pulse>\nafter <mood>literal</mood>')).toEqual({
+      mood: 'inside',
+      text: 'after <mood>literal</mood>',
+    });
+  });
 });
 
 describe('injectCopyButtons', () => {

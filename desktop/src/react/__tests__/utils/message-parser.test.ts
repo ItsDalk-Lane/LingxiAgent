@@ -51,6 +51,44 @@ describe('parseMoodFromContent', () => {
     const result = parseMoodFromContent(input);
     expect(result.mood).toBe('line1\nline2');
   });
+
+  it('保留行内代码里的 mood 字面量及后文', () => {
+    for (const tag of ['mood', 'pulse', 'reflect']) {
+      const input = `\`<${tag}>\` 后半段不能消失`;
+      expect(parseMoodFromContent(input)).toEqual({ mood: null, yuan: null, text: input });
+    }
+  });
+
+  it('保留代码栅里成对的内部标签字面量', () => {
+    const input = '```xml\n<mood>literal</mood>\n```\nafter';
+    expect(parseMoodFromContent(input)).toEqual({ mood: null, yuan: null, text: input });
+  });
+
+  it('正文开始后不再把成对标签当作内部块', () => {
+    const input = 'prefix <pulse>literal</pulse> suffix';
+    expect(parseMoodFromContent(input)).toEqual({ mood: null, yuan: null, text: input });
+  });
+
+  it('允许 BOM 与空白后的完整开头块', () => {
+    expect(parseMoodFromContent('\uFEFF \n<reflect>pondering</reflect>\nContent.')).toEqual({
+      mood: 'pondering',
+      yuan: 'ming',
+      text: 'Content.',
+    });
+  });
+
+  it('拒绝不匹配的闭合标签', () => {
+    const input = '<mood>literal</pulse>\nContent.';
+    expect(parseMoodFromContent(input)).toEqual({ mood: null, yuan: null, text: input });
+  });
+
+  it('只解析第一个合法开头块，后续标签保留为正文', () => {
+    expect(parseMoodFromContent('<mood>inside</mood>\nafter <pulse>literal</pulse>')).toEqual({
+      mood: 'inside',
+      yuan: 'lingxi',
+      text: 'after <pulse>literal</pulse>',
+    });
+  });
 });
 
 describe('cleanMoodText', () => {

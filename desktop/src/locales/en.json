@@ -300,6 +300,7 @@
     "stop": "Stop",
     "browserScreenshot": "Browser screenshot",
     "compacting": "Compacting context",
+    "instantSimpleCompaction": "Instant simple compaction",
     "visionAuxiliary": "Vision auxiliary",
     "fileExpired": "File expired",
     "fileActions": {
@@ -1095,7 +1096,7 @@
     "experiments": {
       "title": "Experiments",
       "compactionTitle": "Context Compaction",
-      "compactionSectionDescription": "Choose whether compact prioritizes prompt-cache preservation or broad history compatibility.",
+      "compactionSectionDescription": "Set the default automatic compaction strategy and choose whether the chat context ring exposes an experimental one-shot action.",
       "modelPersonaTitle": "Models & Persona",
       "modelPersonaDescription": "Observe how providers adapt to Hana's persona, mood, and output contracts.",
       "memoryTitle": "Memory Experiments",
@@ -1142,10 +1143,14 @@
       },
       "compaction": {
         "title": "Compaction mode",
-        "description": "Auto prefers cache-preserving compaction. Normal compaction lets Pi SDK run its native summarizer, which is better for unstable history formats.",
+        "description": "Auto prefers cache-preserving compaction. Normal compaction uses Pi SDK's native summarizer.",
         "auto": "Auto",
         "cachePreserving": "Cache-preserving compaction",
         "piCompatible": "Normal compaction"
+      },
+      "instantSimpleCompaction": {
+        "title": "Instant simple compaction",
+        "description": "When enabled, the chat input's context-ring menu adds an Instant simple compaction action. It affects only the run you explicitly start and never changes automatic or ordinary compaction behavior."
       },
       "deepseekRoleplay": {
         "title": "DeepSeek persona immersion patch",

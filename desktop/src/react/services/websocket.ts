@@ -107,7 +107,12 @@ async function openConnectionWebSocket(connection: ServerConnection): Promise<vo
     _wsRetryDelay = 1000;
     _wsRetryCount = 0;
     setStatus('status.connected', true);
-    useStore.setState({ wsState: 'connected', wsReconnectAttempt: 0, compactingSessions: [] });
+    useStore.setState({
+      wsState: 'connected',
+      wsReconnectAttempt: 0,
+      compactingSessions: [],
+      compactionModeBySession: {},
+    });
 
     const s = useStore.getState();
     const streamingPaths = resolveStreamingSessionResumeTargets(s);

@@ -31,6 +31,8 @@ import {
 } from "./provider-compat/reasoning-content-replay.ts";
 import { normalizeRequestThinkingLevel } from "./session-thinking-level.ts";
 import { resolveRequestReasoningLevel } from "./request-reasoning-level.ts";
+import { createLossyLocalCompactionResult } from "./lossy-local-compaction.ts";
+import { INSTANT_SIMPLE_COMPACTION_RUNTIME_MODE } from "../shared/compaction-mode.ts";
 
 const DEFAULT_HARD_TRUNCATE_THRESHOLD = 0.85;
 
@@ -1890,6 +1892,97 @@ export async function runCachePreservingCompactionForSession(session: any, {
     }
     throw error;
   }
+  } finally {
+    delete session[DIRECT_COMPACTION_IN_PROGRESS];
+  }
+}
+
+export async function runLossyLocalCompactionForSession(session: any, {
+  settings,
+  summarySource = null,
+  getSummarySource,
+  signal,
+  emitLifecycle = false,
+  lifecycleReason = "manual",
+  onCompacted,
+}: {
+  settings?: any;
+  summarySource?: any;
+  getSummarySource?: ((session: any) => any | Promise<any>) | null;
+  signal?: any;
+  emitLifecycle?: boolean;
+  lifecycleReason?: string;
+  onCompacted?: (session: any) => void;
+} = {}) {
+  if (!session?.sessionManager) throw new Error("runLossyLocalCompactionForSession: missing session manager");
+  if (!session?.agent) throw new Error("runLossyLocalCompactionForSession: missing agent");
+
+  const compactionSettings = settings || session.settingsManager?.getCompactionSettings?.();
+  if (!compactionSettings) throw new Error("runLossyLocalCompactionForSession: missing compaction settings");
+  if (session.isCompacting === true || session[DIRECT_COMPACTION_IN_PROGRESS] === true) {
+    throw new Error("runLossyLocalCompactionForSession: compaction already in progress for this session");
+  }
+  session[DIRECT_COMPACTION_IN_PROGRESS] = true;
+
+  const branchEntries = session.sessionManager.getBranch();
+  if (emitLifecycle) {
+    emitCompactionProgress(session, {
+      type: "compaction_start",
+      reason: lifecycleReason,
+      mode: INSTANT_SIMPLE_COMPACTION_RUNTIME_MODE,
+    });
+  }
+
+  try {
+    if (signal?.aborted) {
+      const error: any = new Error("Compaction cancelled");
+      error.name = "AbortError";
+      throw error;
+    }
+    const preparation = prepareCompaction(branchEntries, compactionSettings);
+    if (!preparation) {
+      const lastEntry = branchEntries[branchEntries.length - 1];
+      if (lastEntry?.type === "compaction") throw new Error("Already compacted");
+      throw new Error("Nothing to compact (session too small)");
+    }
+    const resolvedSummarySource = typeof getSummarySource === "function"
+      ? await getSummarySource(session)
+      : summarySource;
+    const result = createLossyLocalCompactionResult({
+      branchEntries,
+      preparation,
+      summarySource: resolvedSummarySource,
+    });
+    const saved = await appendCompactionResultToSession(session, result, {
+      fromExtension: true,
+      onCompacted,
+    });
+    if (emitLifecycle) {
+      emitCompactionProgress(session, {
+        type: "compaction_end",
+        reason: lifecycleReason,
+        mode: INSTANT_SIMPLE_COMPACTION_RUNTIME_MODE,
+        result: saved,
+        aborted: false,
+        willRetry: false,
+      });
+    }
+    return saved;
+  } catch (error) {
+    if (emitLifecycle) {
+      const message = error instanceof Error ? error.message : String(error);
+      const aborted = signal?.aborted || message === "Compaction cancelled" || error?.name === "AbortError";
+      emitCompactionProgress(session, {
+        type: "compaction_end",
+        reason: lifecycleReason,
+        mode: INSTANT_SIMPLE_COMPACTION_RUNTIME_MODE,
+        result: undefined,
+        aborted,
+        willRetry: false,
+        errorMessage: aborted ? undefined : `Compaction failed: ${message}`,
+      });
+    }
+    throw error;
   } finally {
     delete session[DIRECT_COMPACTION_IN_PROGRESS];
   }

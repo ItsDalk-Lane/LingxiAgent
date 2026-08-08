@@ -300,6 +300,7 @@
     "stop": "중지",
     "browserScreenshot": "브라우저 스크린샷",
     "compacting": "컨텍스트 압축 중",
+    "instantSimpleCompaction": "즉시 간이 압축",
     "visionAuxiliary": "보조 시각",
     "fileExpired": "파일 만료됨",
     "fileActions": {
@@ -2329,7 +2330,7 @@
     "experiments": {
       "title": "실험 기능",
       "compactionTitle": "컨텍스트 압축",
-      "compactionSectionDescription": "압축 시 프롬프트 캐시 보존과 넓은 기록 호환성 중 무엇을 우선할지 선택해요.",
+      "compactionSectionDescription": "자동 압축의 기본 전략과 채팅 컨텍스트 링에 실험적인 일회성 동작을 표시할지 설정해요.",
       "modelPersonaTitle": "모델 & 페르소나",
       "modelPersonaDescription": "프로바이더가 Hana의 페르소나, 분위기, 출력 계약에 어떻게 적응하는지 관찰해요.",
       "memoryTitle": "메모리 실험",
@@ -2376,10 +2377,14 @@
       },
       "compaction": {
         "title": "압축 모드",
-        "description": "자동은 캐시 보존 압축을 우선해요. 일반 압축은 Pi SDK 기본 요약기를 사용해 불안정한 기록 형식에 더 적합해요.",
+        "description": "자동은 캐시 보존 압축을 우선해요. 일반 압축은 Pi SDK 기본 요약기를 사용해요.",
         "auto": "자동",
         "cachePreserving": "캐시 보존 압축",
         "piCompatible": "일반 압축"
+      },
+      "instantSimpleCompaction": {
+        "title": "즉시 간이 압축",
+        "description": "켜면 채팅 입력창의 컨텍스트 링 메뉴에 ‘즉시 간이 압축’ 동작이 추가돼요. 직접 시작한 한 번의 압축에만 적용되며 자동 또는 일반 압축 동작은 바꾸지 않아요."
       },
       "deepseekRoleplay": {
         "title": "DeepSeek 페르소나 몰입 패치",

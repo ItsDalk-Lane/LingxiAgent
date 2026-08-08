@@ -21,6 +21,10 @@ const lingxiFetchMock = vi.fn(async (url: string, init?: RequestInit) => {
     const body = JSON.parse(String(init.body || '{}'));
     return new Response(JSON.stringify({ ok: true, value: body.value }));
   }
+  if (url === '/api/experiments/session.instant_simple_compaction' && init?.method === 'PATCH') {
+    const body = JSON.parse(String(init.body || '{}'));
+    return new Response(JSON.stringify({ ok: true, value: body.value }));
+  }
   if (url === '/api/experiments/provider.deepseek_roleplay_reasoning_patch' && init?.method === 'PATCH') {
     const body = JSON.parse(String(init.body || '{}'));
     return new Response(JSON.stringify({ ok: true, value: body.value }));
@@ -45,6 +49,20 @@ const lingxiFetchMock = vi.fn(async (url: string, init?: RequestInit) => {
               { value: 'cache_preserving', labelKey: 'settings.experiments.compaction.cachePreserving' },
               { value: 'pi_compatible', labelKey: 'settings.experiments.compaction.piCompatible' },
             ],
+          },
+        },
+        {
+          id: 'session.instant_simple_compaction',
+          titleKey: 'settings.experiments.instantSimpleCompaction.title',
+          descriptionKey: 'settings.experiments.instantSimpleCompaction.description',
+          owner: 'session',
+          value: false,
+          status: 'alpha',
+          risk: 'medium',
+          restartPolicy: 'immediate',
+          valueSchema: {
+            type: 'boolean',
+            presentation: { type: 'toggle' },
           },
         },
         {
@@ -99,7 +117,7 @@ describe('ExperimentsTab', () => {
     expect(screen.queryByText('settings.experiments.cacheSnapshot.observeOnly')).toBeNull();
   });
 
-  it('renders the three-mode compaction selector in experiments', async () => {
+  it('keeps the compaction selector to three persistent modes', async () => {
     render(React.createElement(ExperimentsTab));
 
     await waitFor(() => {
@@ -111,6 +129,7 @@ describe('ExperimentsTab', () => {
     expect(screen.getByTitle('settings.experiments.compaction.auto')).toBeTruthy();
 
     fireEvent.click(screen.getByTitle('settings.experiments.compaction.auto'));
+    expect(screen.queryByRole('option', { name: 'settings.experiments.compaction.lossyLocal' })).toBeNull();
     fireEvent.click(screen.getByRole('option', { name: 'settings.experiments.compaction.piCompatible' }));
 
     await waitFor(() => {
@@ -119,6 +138,27 @@ describe('ExperimentsTab', () => {
         expect.objectContaining({
           method: 'PATCH',
           body: JSON.stringify({ value: 'pi_compatible' }),
+        }),
+      );
+    });
+  });
+
+  it('renders instant simple compaction as an independent capability toggle', async () => {
+    render(React.createElement(ExperimentsTab));
+
+    const toggle = await screen.findByRole('switch', {
+      name: 'settings.experiments.instantSimpleCompaction.title',
+    });
+    expect(toggle.getAttribute('aria-checked')).toBe('false');
+
+    fireEvent.click(toggle);
+
+    await waitFor(() => {
+      expect(lingxiFetchMock).toHaveBeenCalledWith(
+        '/api/experiments/session.instant_simple_compaction',
+        expect.objectContaining({
+          method: 'PATCH',
+          body: JSON.stringify({ value: true }),
         }),
       );
     });

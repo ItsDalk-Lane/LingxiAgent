@@ -64,19 +64,51 @@ function reasoningTokens(usage) {
   );
 }
 
-function uncachedTokens(inputTokens, cacheReadTokens, cacheMissTokens, support) {
-  if (support !== "reported") return null;
-  if (cacheMissTokens !== null) return cacheMissTokens;
-  if (inputTokens !== null && cacheReadTokens !== null) {
-    return Math.max(0, inputTokens - cacheReadTokens);
-  }
-  return null;
+/**
+ * Providers disagree on what the input token count covers. OpenAI-compatible
+ * payloads fold the cached part into prompt_tokens, so input is the whole
+ * prompt. Pi SDK and Anthropic bill the cached part separately and report input
+ * as only the remainder that was processed at full price. Anything that relates
+ * input to the cache has to know which of the two shapes it is holding, so the
+ * test lives here once instead of being restated at each use.
+ */
+function inputIncludesCachedTokens(usage) {
+  // OpenAI Chat Completions.
+  if (numberOrNull(usage?.prompt_tokens) !== null) return true;
+  if (numberOrNull(usage?.completion_tokens) !== null) return true;
+  // OpenAI Responses reuses Anthropic's input_tokens name for the opposite
+  // meaning: the whole prompt, with the cached slice broken out under
+  // input_tokens_details. That detail block is the only thing telling the two
+  // apart, so it has to count as a signal here.
+  if (numberOrNull(usage?.input_tokens_details?.cached_tokens) !== null) return true;
+  return false;
 }
 
-function hitRatio(inputTokens, cacheReadTokens, support) {
+/** Whole prompt as the provider counted it, cached portions included. */
+function promptTokens(inputTokens, cacheReadTokens, cacheWriteTokens, inputCoversCache) {
+  if (inputTokens === null) return null;
+  if (inputCoversCache) return inputTokens;
+  if (cacheReadTokens === null || cacheWriteTokens === null) return null;
+  return inputTokens + cacheReadTokens + cacheWriteTokens;
+}
+
+function uncachedTokens(inputTokens, cacheReadTokens, cacheMissTokens, support, inputCoversCache) {
   if (support !== "reported") return null;
-  if (inputTokens === null || cacheReadTokens === null || inputTokens <= 0) return null;
-  return cacheReadTokens / inputTokens;
+  if (cacheMissTokens !== null) return cacheMissTokens;
+  if (inputTokens === null) return null;
+  // Already the uncached remainder — subtracting the cache again would floor it
+  // at zero and silently zero the input side of any rate-based cost.
+  if (!inputCoversCache) return inputTokens;
+  if (cacheReadTokens === null) return null;
+  return Math.max(0, inputTokens - cacheReadTokens);
+}
+
+function hitRatio(inputTokens, cacheReadTokens, cacheWriteTokens, support, inputCoversCache) {
+  if (support !== "reported") return null;
+  if (cacheReadTokens === null) return null;
+  const prompt = promptTokens(inputTokens, cacheReadTokens, cacheWriteTokens, inputCoversCache);
+  if (prompt === null || prompt <= 0) return null;
+  return cacheReadTokens / prompt;
 }
 
 /**
@@ -105,7 +137,8 @@ export function normalizeLlmUsage(usage, options: Record<string, any> = {}) {
     )
     : null;
   const cacheWriteTokens = support === "reported" ? cacheCreationTokens(usage) : null;
-  const fallbackTotal = numberOrNull(usage.prompt_tokens) !== null || numberOrNull(usage.completion_tokens) !== null
+  const inputCoversCache = inputIncludesCachedTokens(usage);
+  const fallbackTotal = inputCoversCache
     ? inputTokens + outputTokens
     : inputTokens + outputTokens + cacheReadTokens + cacheWriteTokens;
   const totalTokens = firstNumber(
@@ -116,7 +149,7 @@ export function normalizeLlmUsage(usage, options: Record<string, any> = {}) {
   const normalized = {
     input: {
       totalTokens: inputTokens,
-      uncachedTokens: uncachedTokens(inputTokens, cacheReadTokens, cacheMissTokens, support),
+      uncachedTokens: uncachedTokens(inputTokens, cacheReadTokens, cacheMissTokens, support, inputCoversCache),
     },
     output: {
       totalTokens: outputTokens,
@@ -128,7 +161,7 @@ export function normalizeLlmUsage(usage, options: Record<string, any> = {}) {
       missTokens: support === "reported" ? cacheMissTokens : null,
       hit: support === "reported" ? cacheReadTokens > 0 : null,
       created: support === "reported" ? cacheWriteTokens > 0 : null,
-      hitRatio: hitRatio(inputTokens, cacheReadTokens, support),
+      hitRatio: hitRatio(inputTokens, cacheReadTokens, cacheWriteTokens, support, inputCoversCache),
       support,
     },
     totalTokens,

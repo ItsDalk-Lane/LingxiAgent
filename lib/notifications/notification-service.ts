@@ -234,7 +234,16 @@ export class NotificationService {
       if (payload.idempotencyKey) proactiveOpts.idempotencyKey = `${payload.idempotencyKey}:bridge_owner`;
       const result = await manager.sendProactive(text, context.agentId || null, proactiveOpts);
       if (!result) {
-        return { channel: CHANNEL_BRIDGE_OWNER, status: "failed", error: "no bridge owner delivery target available" };
+        return { channel: CHANNEL_BRIDGE_OWNER, status: "failed", error: "target_missing" };
+      }
+      if (result.ok === false) {
+        return {
+          channel: CHANNEL_BRIDGE_OWNER,
+          status: "failed",
+          error: result.error || "target_missing",
+          ...(result.message ? { message: result.message } : {}),
+          ...(Array.isArray(result.deliveries) ? { bridgeDeliveries: result.deliveries } : {}),
+        };
       }
       return {
         channel: CHANNEL_BRIDGE_OWNER,
