@@ -19,6 +19,8 @@ import {
   AUXILIARY_SLOTS,
   type AuxiliarySlot,
   validateAuxiliaryModelCapability,
+  AuxiliaryConfigurationError,
+  isAuxiliaryConfigError,
 } from "./auxiliary-slots.ts";
 import { modelSupportsImageInput } from "../shared/model-capabilities.ts";
 import { callTextConfigFromResolvedModel, composeResolvedModelExecution } from "./model-execution-config.ts";
@@ -79,25 +81,9 @@ function hasCredentialHeaders(cred: any): boolean {
   );
 }
 
-/**
- * 判断错误是否为「已配置但不可用」类型。
- * 这些错误不得 fallback。
- */
-export function isAuxiliaryConfigError(error: any): boolean {
-  if (!error) return false;
-  const msg = String(error.message || error);
-  return (
-    msg.includes("error.modelNotFound") ||
-    msg.includes("error.providerMissingCreds") ||
-    msg.includes("error.providerMissingApi") ||
-    msg.includes("error.auxiliarySlotCapabilityMismatch") ||
-    msg.includes("error.noUtilityModel") === false &&
-      (msg.includes("modelNotFound") ||
-        msg.includes("providerMissingCreds") ||
-        msg.includes("providerMissingApi") ||
-        msg.includes("auxiliarySlotCapabilityMismatch"))
-  );
-}
+// re-export 配置错误类型，便于消费方从 resolver 模块一并引入。
+export { AuxiliaryConfigurationError, isAuxiliaryConfigError };
+
 
 export class AuxiliaryModelResolver {
   declare _deps: AuxiliaryResolveDeps;
@@ -144,7 +130,11 @@ export class AuxiliaryModelResolver {
           typeof slotRef === "object"
             ? `${slotRef.provider || "?"}/${slotRef.id || "?"}`
             : String(slotRef);
-        throw new Error(t("error.auxiliarySlotModelNotFound", { slot, ref: refStr }));
+        throw new AuxiliaryConfigurationError(
+          t("error.auxiliarySlotModelNotFound", { slot, ref: refStr }),
+          "model_not_found",
+          slot,
+        );
       }
       // capability 校验（vision 模型必须支持 image input）
       validateAuxiliaryModelCapability(slot, model);
@@ -190,7 +180,11 @@ export class AuxiliaryModelResolver {
     const cred = this._deps.getProviderCredentials(model.provider);
     const api = model.api || cred?.api;
     if (!api) {
-      throw new Error(t("error.providerMissingApi", { provider: model.provider }));
+      throw new AuxiliaryConfigurationError(
+        t("error.providerMissingApi", { provider: model.provider }),
+        "provider_missing_api",
+        slot,
+      );
     }
     const allowsMissingApiKey =
       this._deps.allowsMissingApiKey?.(model.provider, cred?.baseUrl || "") ??
@@ -199,7 +193,11 @@ export class AuxiliaryModelResolver {
       !cred?.baseUrl ||
       (!cred.apiKey && !hasCredentialHeaders(cred) && !allowsMissingApiKey)
     ) {
-      throw new Error(t("error.providerMissingCreds", { provider: model.provider }));
+      throw new AuxiliaryConfigurationError(
+        t("error.providerMissingCreds", { provider: model.provider }),
+        "provider_missing_creds",
+        slot,
+      );
     }
 
     const composed = composeResolvedModelExecution({ model, credential: cred });
@@ -245,7 +243,11 @@ export class AuxiliaryModelResolver {
     const cred = await this._deps.resolveProviderCredentialsFresh(model.provider);
     const api = model.api || cred?.api;
     if (!api) {
-      throw new Error(t("error.providerMissingApi", { provider: model.provider }));
+      throw new AuxiliaryConfigurationError(
+        t("error.providerMissingApi", { provider: model.provider }),
+        "provider_missing_api",
+        slot,
+      );
     }
     const allowsMissingApiKey =
       this._deps.allowsMissingApiKey?.(model.provider, cred?.baseUrl || "") ??
@@ -254,7 +256,11 @@ export class AuxiliaryModelResolver {
       !cred?.baseUrl ||
       (!cred.apiKey && !hasCredentialHeaders(cred) && !allowsMissingApiKey)
     ) {
-      throw new Error(t("error.providerMissingCreds", { provider: model.provider }));
+      throw new AuxiliaryConfigurationError(
+        t("error.providerMissingCreds", { provider: model.provider }),
+        "provider_missing_creds",
+        slot,
+      );
     }
 
     const composed = composeResolvedModelExecution({ model, credential: cred });

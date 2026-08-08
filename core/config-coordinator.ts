@@ -9,6 +9,7 @@ import { createModuleLogger } from "../lib/debug-log.ts";
 import { findModel, parseModelRef, requireModelRef } from "../shared/model-ref.ts";
 import { t } from "../lib/i18n.ts";
 import { resolveDefaultWorkspacePath } from "../shared/default-workspace.ts";
+import { AUXILIARY_SLOT_PREF_ENTRIES } from "./auxiliary-slots.ts";
 import {
   AUTO_SEARCH_PROVIDER,
   isSearchApiProvider,
@@ -36,21 +37,16 @@ export function normalizeAccessMode(mode, { legacyPlanMode = false } = {}) {
 }
 
 /**
- * 语义 Slot 字段 → preferences key 映射（canonical，从 auxiliary-slots 派生）。
- * 业务层通过 resolveAuxiliaryModel(slot) 消费，不再关心 utility/utility_large。
- * 旧 utility_model / utility_large_model preference key 在运行时完全忽略（一刀切）。
+ * 语义 Slot 字段 → preferences key 映射。
+ * 单一真理源：从 canonical auxiliary-slots 的 AUXILIARY_SLOT_PREF_ENTRIES 派生，
+ * 禁止在此处手写第二份 Slot→prefKey 映射。新增 Slot 时 canonical 处加一条即可，
+ * ConfigCoordinator / preferences / UI 全部自动跟随。
  */
-export const AUXILIARY_MODEL_PREF_KEYS: ReadonlyArray<readonly [string, string]> = [
-  ["title",     "title_model"],
-  ["summarize", "summarize_model"],
-  ["memory",    "memory_model"],
-  ["vision",    "vision_model"],
-  ["approval",  "approval_model"],
-  ["guard",     "guard_model"],
-];
+export const AUXILIARY_MODEL_PREF_KEYS: ReadonlyArray<readonly [string, string]> =
+  AUXILIARY_SLOT_PREF_ENTRIES;
 
 /**
- * @deprecated 使用 AUXILIARY_MODEL_PREF_KEYS。仅为向后兼容 re-export（不再含 utility/utility_large）。
+ * @deprecated 使用 AUXILIARY_MODEL_PREF_KEYS。仅为向后兼容 re-export。
  */
 export const SHARED_MODEL_KEYS = AUXILIARY_MODEL_PREF_KEYS;
 
@@ -65,9 +61,24 @@ export function sharedModelsPatchRequiresModelSync(patch) {
   return AUXILIARY_MODEL_PREF_KEYS.some(([field]) => hasOwn(patch, field));
 }
 
+/**
+ * 允许的非 Slot model settings 字段（feature toggle 等，与 Slot 模型引用是不同概念）。
+ */
+const ALLOWED_NON_SLOT_FIELDS = new Set(["vision_enabled"]);
+
 export function normalizeSharedModelsPatch(partial) {
   if (!partial || typeof partial !== "object" || Array.isArray(partial)) {
     throw new Error("shared models patch must be an object");
+  }
+
+  const validSlotFields = new Set(AUXILIARY_MODEL_PREF_KEYS.map(([f]) => f));
+
+  // 拒绝未知字段——防止拼写错误（如 summarzie）被静默接受。
+  // 契约：字段 omitted → no change；字段 null → clear；字段 valid ModelRef → set；字段 unknown → reject。
+  for (const key of Object.keys(partial)) {
+    if (!validSlotFields.has(key) && !ALLOWED_NON_SLOT_FIELDS.has(key)) {
+      throw new Error(`unknown shared model field "${key}"`);
+    }
   }
 
   const result: any = {};

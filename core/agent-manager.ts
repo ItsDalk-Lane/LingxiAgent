@@ -22,6 +22,7 @@ import {
   generateDescription,
 } from "./llm-utils.ts";
 import { findModel, parseModelRef } from "../shared/model-ref.ts";
+import { isAuxiliaryConfigError } from "./auxiliary-slots.ts";
 import { DEFAULT_HEARTBEAT_INTERVAL_MINUTES } from "../shared/default-workspace.ts";
 import { relativePathInsideBase } from "./message-utils.ts";
 import { detachAgentFromBundles } from "../lib/skill-bundles/store.ts";
@@ -1236,8 +1237,19 @@ export class AgentManager {
     let resolved;
     try {
       resolved = await this._d.resolveAuxiliaryModelFresh?.("title");
-    } catch {
-      // title 模型不可用（新用户常见），直接走兜底 ID
+    } catch (err) {
+      // title slot 不可用。允许 deterministic local ID fallback（创建 Agent
+      // 不应因辅助模型不可用而整体失败），但配置错误必须可观测——不得静默吞掉。
+      if (isAuxiliaryConfigError(err)) {
+        log.warn(`title slot 配置错误，Agent ID 改用 deterministic fallback（不回退 chat）: ${err.message}`);
+        this._d.getEngine?.()?.emitDevLog?.(`title_model 配置无效，已改用时间戳 ID — ${err.message}`, "warn");
+      } else {
+        log.warn(`title slot 不可用，Agent ID 改用 deterministic fallback: ${err.message}`);
+      }
+      return `agent-${Date.now().toString(36)}`;
+    }
+    if (!resolved) {
+      // title 未配置且无 chat 可 fallback → deterministic ID
       return `agent-${Date.now().toString(36)}`;
     }
     return _generateAgentId(resolved, name, this._d.agentsDir);

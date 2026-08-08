@@ -1,25 +1,29 @@
 /**
- * rc-summary.js — 为 /rc 接管生成桌面 session 简述（summarize slot fallback）
+ * rc-summary.js — 为 /rc 接管生成桌面 session 简述（summarize slot）
  *
  * 接管成功后要发一条带 summary 的回复给 bridge 用户，告诉 ta
  * "这个桌面会话之前聊了什么"。
  *
- * 新 Slot 架构下，summary 由语义 Slot "summarize" 提供：
- *   summarize slot 配置了模型 → 用该模型
- *   summarize slot 未配置 → fallback 到 chat 主聊天模型
- *   均失败 → null（上层自行兜底为 "已接管对话 <title>"）
+ * 不变量：fallback 只发生一次，且完全收口在统一 resolver。
+ * 本函数只表达「我要 summarize slot 的模型」，调用 resolver 一次，
+ * 不再自行解析 chat、不再二次 fallback：
+ *
+ *   resolver 返回 resolved（summarize 显式配置，或未配置时 fallback 到 chat）
+ *     → 调用该模型；运行时失败（timeout / 5xx / empty）→ 返回 null（best-effort）
+ *   resolver 返回 null（无可用模型，例如未配置且 chat 缺失）
+ *     → 返回 null
+ *   resolver throw（summarize 显式配置错误：模型不存在 / 凭证缺失 / capability 不符）
+ *     → 报告配置错误，返回 null；绝不回退到 chat
  *
  * 不在此处做兜底文案；失败返回 null，调用方（/rc 选择 handler）决定最终文案，
  * 避免"摘要器"和"文案兜底"两个职责互相纠缠。
  */
 import fs from "fs";
 import { callText } from "../llm-client.ts";
-import {
-  callTextConfigFromResolvedModel,
-} from "../model-execution-config.ts";
 import { callTextWithLengthContract, type OutputLengthContract } from "../output-length-contract.ts";
 import { getLocale } from "../../lib/i18n.ts";
 import { isToolCallBlock } from "../llm-utils.ts";
+import { isAuxiliaryConfigError } from "../auxiliary-model-resolver.ts";
 import { createModuleLogger } from "../../lib/debug-log.ts";
 
 const log = createModuleLogger("rc-summary");
@@ -29,8 +33,8 @@ const CONTENT_CHAR_LIMIT = 1500;
 const MAX_TURNS_FROM_TAIL = 8;
 
 /**
- * @param {object} engine  engine.resolveAuxiliaryModelFresh()、engine.resolveModelWithCredentialsFresh(ref)
- * @param {object} agent   agent.config.models.chat 用于 chat fallback
+ * @param {object} engine  engine.resolveAuxiliaryModelFresh("summarize", ctx)
+ * @param {object} agent   agent.id 用于 resolver 上下文（cross-agent 正确 fallback）
  * @param {string} sessionPath  桌面 session 绝对路径
  * @returns {Promise<string|null>}
  */
@@ -44,49 +48,41 @@ export async function summarizeSessionForRc(engine, agent, sessionPath) {
   const messages = _buildMessages(content, isZh);
   const lengthContract = _summaryLengthContract(isZh);
 
-  // summarize slot（未配置时 fallback 到 chat）
+  // 一次 resolve，一次 fallback——完全收口在 resolver。
+  // resolver 对「未配置」按 Slot 策略 fallback（summarize→chat）；
+  // 对「显式配置错误」直接 throw，这里不得吞掉后改用 chat。
   const ctx = agent?.id ? { agentId: agent.id } : {};
   let summarizeResolved = null;
   try {
     summarizeResolved = await engine.resolveAuxiliaryModelFresh?.("summarize", ctx);
-  } catch { /* ignore, fall through to chat */ }
-
-  if (summarizeResolved?.model && summarizeResolved.baseUrl && summarizeResolved.api) {
-    const text = await _safeCall({
-      api: summarizeResolved.api,
-      apiKey: summarizeResolved.apiKey,
-      baseUrl: summarizeResolved.baseUrl,
-      headers: summarizeResolved.headers,
-      model: summarizeResolved.model,
-      usageLedger: summarizeResolved.usageLedger ?? engine.usageLedger,
-      usageContext: usageContextForRc(engine, agent, sessionPath, "rc_summary_summarize"),
-      messages,
-      lengthContract,
-    }, "summarize");
-    if (text) return text;
-  }
-
-  // chat model fallback（summarize slot 未配置或调用失败时）
-  const chatRef = agent?.config?.models?.chat;
-  if (chatRef?.id && chatRef?.provider) {
-    try {
-      const resolved = await engine.resolveModelWithCredentialsFresh?.({ id: chatRef.id, provider: chatRef.provider });
-      if (resolved) {
-        const text = await _safeCall({
-          ...callTextConfigFromResolvedModel(resolved),
-          usageLedger: engine.usageLedger,
-          usageContext: usageContextForRc(engine, agent, sessionPath, "rc_summary_chat"),
-          messages,
-          lengthContract,
-        }, "chat");
-        if (text) return text;
-      }
-    } catch (err) {
-      log.warn(`chat tier resolve failed: ${err.message}`);
+  } catch (err) {
+    // 显式配置错误：模型不存在 / 凭证缺失 / capability 不符。
+    // 不得 fallback chat；返回 null 让上层走普通接管文案。
+    if (isAuxiliaryConfigError(err)) {
+      log.warn(`summarize slot 配置错误，摘要不可用（不回退 chat）: ${err.message}`);
+    } else {
+      log.warn(`summarize slot 解析异常: ${err.message}`);
     }
+    return null;
   }
 
-  return null;
+  if (!summarizeResolved?.model || !summarizeResolved.baseUrl || !summarizeResolved.api) {
+    // 无可用模型（未配置且 chat 缺失），返回 null。
+    return null;
+  }
+
+  const text = await _safeCall({
+    api: summarizeResolved.api,
+    apiKey: summarizeResolved.apiKey,
+    baseUrl: summarizeResolved.baseUrl,
+    headers: summarizeResolved.headers,
+    model: summarizeResolved.model,
+    usageLedger: summarizeResolved.usageLedger ?? engine.usageLedger,
+    usageContext: usageContextForRc(engine, agent, sessionPath, "rc_summary_summarize"),
+    messages,
+    lengthContract,
+  }, "summarize");
+  return text;
 }
 
 function usageContextForRc(engine, agent, sessionPath, operation) {
@@ -105,7 +101,7 @@ function usageContextForRc(engine, agent, sessionPath, operation) {
           sessionPath,
           agentId: agent?.id ?? null,
         }
-      : { kind: "utility", agentId: agent?.id ?? null },
+      : { kind: "auxiliary", agentId: agent?.id ?? null },
   };
 }
 

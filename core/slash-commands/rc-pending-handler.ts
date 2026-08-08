@@ -86,7 +86,8 @@ export async function handleRcPendingInput(ctx) {
     return { handled: true };
   }
 
-  // 三级 summary fallback（失败则兜底文案）
+  // summary 由统一 resolver 收口（summarize slot 未配置时 fallback chat；
+  // 显式配置错误不 fallback，返回 null）。失败则上层走普通接管文案。
   const agent = engine.getAgent?.(agentId);
   let summary = null;
   try {

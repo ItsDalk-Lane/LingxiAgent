@@ -779,14 +779,14 @@ export async function startServer(root: CompositionRoot = {}): Promise<void> {
       usageLedger: resolved.usageLedger,
       usageContext: {
         source: {
-          subsystem: "utility",
+          subsystem: "auxiliary",
           operation: payload.operation || "call-text",
           surface: sessionPath ? "desktop" : "system",
           trigger: "tool",
         },
         attribution: sessionPath
           ? sessionUsageAttribution(sessionPath, resolved.usageAgentId || agentId || null)
-          : { kind: "utility", agentId: resolved.usageAgentId || agentId || null },
+          : { kind: "auxiliary", agentId: resolved.usageAgentId || agentId || null },
       },
     } as any);
     return { text };

@@ -113,7 +113,8 @@ function auxiliaryUsageContext(resolved, operation, trigger = "tool") {
   const sessionPath = resolved?.usageSessionPath || null;
   return {
     source: {
-      subsystem: "utility",
+      // telemetry category only — 标识「辅助模型调用」来源，不再指代旧 utility 模型角色。
+      subsystem: "auxiliary",
       operation,
       surface: "system",
       trigger,
@@ -125,7 +126,7 @@ function auxiliaryUsageContext(resolved, operation, trigger = "tool") {
           ...(sessionId ? { sessionId } : {}),
           ...(sessionPath ? { sessionPath } : {}),
         }
-      : { kind: "utility", agentId },
+      : { kind: "auxiliary", agentId },
   };
 }
 

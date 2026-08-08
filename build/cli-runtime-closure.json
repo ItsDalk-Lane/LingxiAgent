@@ -313,9 +313,14 @@
           "root": "server-bootstrap",
           "from": "core/engine.ts",
           "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "core/slash-commands/rc-summary.ts",
+          "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by core/engine.ts (import-statement)."
+      "reason": "Reached via esbuild source module graph, imported by core/engine.ts (import-statement); core/slash-commands/rc-summary.ts (import-statement)."
     },
     {
       "path": "core/auxiliary-slots.ts",
@@ -325,9 +330,24 @@
           "root": "server-bootstrap",
           "from": "core/auxiliary-model-resolver.ts",
           "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "core/agent-manager.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "core/config-coordinator.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "core/engine.ts",
+          "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by core/auxiliary-model-resolver.ts (import-statement)."
+      "reason": "Reached via esbuild source module graph, imported by core/auxiliary-model-resolver.ts (import-statement); core/agent-manager.ts (import-statement); core/config-coordinator.ts (import-statement); +1 more importer(s)."
     },
     {
       "path": "core/bridge-session-manager.ts",
@@ -1500,14 +1520,9 @@
           "root": "server-bootstrap",
           "from": "server/routes/models.ts",
           "kind": "import-statement"
-        },
-        {
-          "root": "server-bootstrap",
-          "from": "core/slash-commands/rc-summary.ts",
-          "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by core/model-manager.ts (import-statement); core/auxiliary-model-resolver.ts (import-statement); core/vision-bridge.ts (import-statement); +6 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by core/model-manager.ts (import-statement); core/auxiliary-model-resolver.ts (import-statement); core/vision-bridge.ts (import-statement); +5 more importer(s)."
     },
     {
       "path": "core/model-image-preprocess.ts",
@@ -120509,6 +120524,18 @@
       "reason": "Reached via esbuild source module graph, imported by core/provider-compat/input-audio.ts (import-statement); core/provider-media-serializer.ts (import-statement); server/routes/chat.ts (import-statement); +1 more importer(s)."
     },
     {
+      "path": "shared/auxiliary-slot-ids.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "core/auxiliary-slots.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by core/auxiliary-slots.ts (import-statement)."
+    },
+    {
       "path": "shared/bridge-visible-text.ts",
       "inputType": "source-graph",
       "provenance": [
@@ -122411,9 +122438,9 @@
     }
   ],
   "stats": {
-    "totalFiles": 10531,
+    "totalFiles": 10532,
     "byInputType": {
-      "source-graph": 658,
+      "source-graph": 659,
       "runtime-asset": 11,
       "nft-runtime-trace": 9862
     }

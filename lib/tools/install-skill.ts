@@ -89,15 +89,15 @@ export async function safetyReview(skillContent: any, resolveGuardModel: any) {
   try {
     resolved = typeof resolveGuardModel === "function" ? await resolveGuardModel() : null;
   } catch (err) {
-    return { safe: false, reason: err instanceof Error && err.message ? err.message : t("error.installSkillNoUtility") };
+    return { safe: false, reason: err instanceof Error && err.message ? err.message : t("error.installSkillGuardUnavailable") };
   }
   // guard slot 未配置 → fail-closed（不 fallback chat）
   if (!resolved) {
-    return { safe: false, reason: t("error.installSkillNoUtility") };
+    return { safe: false, reason: t("error.installSkillGuardUnavailable") };
   }
 
   if (!resolved.model || !resolved.baseUrl || !resolved.api) {
-    return { safe: false, reason: t("error.installSkillUtilityIncomplete") };
+    return { safe: false, reason: t("error.installSkillGuardIncomplete") };
   }
 
   const prompt = isZh

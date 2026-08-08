@@ -10,14 +10,52 @@
 
 import { modelSupportsImageInput } from "../shared/model-capabilities.ts";
 import { t } from "../lib/i18n.ts";
+import {
+  AUXILIARY_SLOT_IDS as SHARED_AUXILIARY_SLOT_IDS,
+  type AuxiliarySlot as SharedAuxiliarySlot,
+} from "../shared/auxiliary-slot-ids.ts";
 
-export type AuxiliarySlot =
-  | "title"
-  | "summarize"
-  | "memory"
-  | "vision"
-  | "approval"
-  | "guard";
+/**
+ * 结构化配置错误——「Slot 已配置但不可用」类型。
+ *
+ * 定义在 canonical auxiliary-slots 模块，避免 resolver ↔ slots 循环依赖。
+ * 消费方用 isAuxiliaryConfigError(err) 识别这类错误：
+ *   - 不得 fallback（不能偷偷改用 chat）
+ *   - 应报告诊断信息（devlog / warning），而非静默吞掉
+ *
+ * 与「运行时失败」（timeout / 5xx / rate limit / empty）严格区分。
+ * 运行时失败允许 best-effort 跳过；配置错误必须可观测。
+ */
+export class AuxiliaryConfigurationError extends Error {
+  readonly code = "AUXILIARY_CONFIG_ERROR";
+  readonly slot?: string;
+  readonly reason: string;
+  constructor(message: string, reason: string, slot?: string) {
+    super(message);
+    this.name = "AuxiliaryConfigurationError";
+    this.reason = reason;
+    if (slot) this.slot = slot;
+  }
+}
+
+/**
+ * 判断错误是否为「Slot 已配置但不可用」（配置错误）。
+ * 这类错误不得 fallback，消费方应报告诊断而非静默吞掉。
+ *
+ * 不依赖 brittle i18n 文本匹配——靠结构化 code + instanceof 判定。
+ */
+export function isAuxiliaryConfigError(error: any): boolean {
+  if (!error) return false;
+  if (error instanceof AuxiliaryConfigurationError) return true;
+  return error?.code === "AUXILIARY_CONFIG_ERROR";
+}
+
+/**
+ * Slot 身份（id 列表 + 类型）来自 shared/auxiliary-slot-ids.ts，
+ * server / core / desktop renderer 共用同一份，禁止在各层手写第二份。
+ * 此处 re-export 以保持现有 import 路径稳定。
+ */
+export type AuxiliarySlot = SharedAuxiliarySlot;
 
 export type AuxiliarySlotFallback = "chat" | "image_capable_chat" | "none";
 export type AuxiliarySlotCapability = "text" | "image";
@@ -74,8 +112,12 @@ export const AUXILIARY_SLOTS: Record<AuxiliarySlot, AuxiliarySlotDescriptor> = {
   },
 };
 
-export const AUXILIARY_SLOT_IDS: readonly AuxiliarySlot[] =
-  Object.keys(AUXILIARY_SLOTS) as AuxiliarySlot[];
+/**
+ * Slot id 列表来自 shared 单一真理源（shared/auxiliary-slot-ids.ts）。
+ * 同时用一个静态 exhaustive 校验保证 canonical descriptor 的 key 集合
+ * 与 shared id 列表完全一致——任一侧新增 Slot 而忘记同步另一侧时编译失败。
+ */
+export const AUXILIARY_SLOT_IDS: readonly AuxiliarySlot[] = SHARED_AUXILIARY_SLOT_IDS;
 
 /** vision feature flag 与 model slot 是两个概念，独立 key。 */
 export const VISION_AUXILIARY_ENABLED_PREF_KEY = "vision_auxiliary_enabled";
@@ -109,7 +151,11 @@ export function validateAuxiliaryModelCapability(
 ): void {
   const descriptor = AUXILIARY_SLOTS[slot];
   if (descriptor.capability === "image" && model && !modelSupportsImageInput(model)) {
-    throw new Error(t("error.auxiliarySlotCapabilityMismatch", { slot }));
+    throw new AuxiliaryConfigurationError(
+      t("error.auxiliarySlotCapabilityMismatch", { slot }),
+      "capability_mismatch",
+      slot,
+    );
   }
 }
 
@@ -126,6 +172,10 @@ export function validateAuxiliaryModelRef(
   if (descriptor.capability !== "image") return;
   const model = resolveModel(modelRef);
   if (model && !modelSupportsImageInput(model)) {
-    throw new Error(t("error.auxiliarySlotCapabilityMismatch", { slot }));
+    throw new AuxiliaryConfigurationError(
+      t("error.auxiliarySlotCapabilityMismatch", { slot }),
+      "capability_mismatch",
+      slot,
+    );
   }
 }

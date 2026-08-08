@@ -383,39 +383,54 @@ export class Agent {
 
     log(`  [agent] 4. FactStore + SummaryManager 完成`);
 
-    // 记忆系统使用语义 Slot "memory"（未配置时 fallback 到聊天模型）。
+    // 记忆系统使用语义 Slot "memory"。
     // 不再缓存 _utilityModel / _memoryModel——MemoryTicker 在调用边界
     // 通过 engine.resolveAuxiliaryExecution("memory") 现场解析，用户改完
     // memory_model 后下一次 tick 自动生效，无需重启 agent。
-    const chatModelRef = this._config.models?.chat || null;
+    //
+    // 关键：MemoryTicker 的可用性由 memory slot 决定，而非 chat。
+    // memory slot 自身的 fallback 策略收口在 resolver：
+    //   memory_model 显式配置 → 用该模型
+    //   memory_model 未配置   → fallback 到目标 agent 的 chat
+    //   两者皆无              → resolver 返回 null，tick 时报告 memory unavailable
+    // 因此即使 chat=null 但 memory_model 有效（Case M-2），ticker 仍要创建。
 
     // 保存解析函数：每次 tick 现场调用，拿到最新凭证。
     this._resolveModel = resolveModel || null;
     this._resolveModelFresh = resolveModelFresh || null;
 
-    // 启动时试探性探测 memory slot，只为打一条启动告警
-    if (chatModelRef) {
+    // 启动时试探性探测 memory slot，只为打一条启动告警。
+    // 探测的是 memory slot（由 resolver 决定最终模型），不是 chat。
+    {
+      let memoryProbe = "unavailable";
       try {
         const engine = this._cb?.getEngine?.();
         if (engine?.resolveAuxiliaryExecution) {
-          await engine.resolveAuxiliaryExecution("memory", { agentId: this.id });
+          const probed = await engine.resolveAuxiliaryExecution("memory", { agentId: this.id });
+          memoryProbe = probed ? "ok" : "no-model";
         }
       } catch (err) {
+        // 显式配置错误与运行时解析失败都报告——但记忆系统不因此整体失败：
+        // MemoryTicker 照常创建，每次 tick 会现场 resolve，凭证修复后自动恢复。
         moduleLog.warn(`记忆系统暂不可用：memory slot 解析失败（改完凭证后 tick 会自动恢复） — ${err.message}`);
         this._cb?.emitDevLog?.(`记忆系统暂不可用：memory slot 解析失败 — ${err.message}`, "warn");
+        memoryProbe = "error";
       }
-    } else {
-      moduleLog.warn("记忆系统未启动：无聊天模型可 fallback");
-      this._cb?.emitDevLog?.("记忆系统未启动：无聊天模型可 fallback", "warn");
+      if (memoryProbe === "no-model") {
+        moduleLog.warn("记忆系统暂不可用：memory slot 未配置且无 chat 可 fallback");
+        this._cb?.emitDevLog?.("记忆系统暂不可用：memory slot 未配置且无 chat 可 fallback", "warn");
+      }
     }
 
-    if (chatModelRef) {
+    {
       log(`  [agent] 4. memoryTicker...`);
       this._memoryTicker = createMemoryTicker({
         summaryManager: this._summaryManager,
         configPath: this.configPath,
         factStore: this._factStore,
-        // 现场 resolve memory slot：每次 tick 拿到最新凭证和模型配置
+        // 现场 resolve memory slot：每次 tick 拿到最新凭证和模型配置。
+        // resolver 负责 memory slot 的 fallback（显式 memory 或 chat），
+        // 这里不关心最终是哪个模型。
         getResolvedMemoryModel: async () => {
           const engine = this._cb?.getEngine?.();
           if (!engine?.resolveAuxiliaryExecution) {
@@ -488,8 +503,6 @@ export class Agent {
       // 6. 启动定时调度。首次维护交给 AgentManager 的后台队列，
       // 避免 agent runtime 初始化时直接抢前台 CPU。
       this._memoryTicker.start();
-    } else {
-      moduleLog.warn(`⚠ 未配置聊天模型，记忆系统暂不可用（用户可在设置中配置后重启）`);
     }
 
     // 7. 创建工具（记忆 + 通用）
