@@ -23,10 +23,12 @@ embedding_api:
   provider: ""                     # embedding 走哪个 provider
 
 # 模型配置
+# 注意：辅助模型（标题生成 / 摘要 / 记忆 / 视觉 / 审批 / 安全审查）不再配置在
+# per-agent config.yaml，而是统一存放在「全局设置」的语义 Slot 里（title_model /
+# summarize_model / memory_model / vision_model / approval_model / guard_model）。
+# 每个 agent 只在这里声明自己的主对话模型和向量模型。
 models:
   chat: ""                         # 主对话模型
-  utility: ""                      # 工具模型（对话摘要等轻量任务）
-  utility_large: ""                # 大工具模型（记忆编译、深度分析等需要理解力的任务）
   embedding: ""                    # 向量模型
   embedding_dimensions: 1024       # 向量维度
 

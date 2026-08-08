@@ -96,6 +96,7 @@ import { PreferencesManager } from "./preferences-manager.ts";
 import { InputDraftsStore } from "./input-drafts-store.ts";
 import { ModelManager } from "./model-manager.ts";
 import { AuxiliaryModelResolver } from "./auxiliary-model-resolver.ts";
+import { isAuxiliaryConfigError } from "./auxiliary-slots.ts";
 import { SessionProjectCatalogStore } from "./session-project-catalog-store.ts";
 import { SkillManager } from "./skill-manager.ts";
 import { BridgeSessionManager } from "./bridge-session-manager.ts";
@@ -3323,13 +3324,19 @@ export class LingxiEngine {
       await this.agent.memoryTicker.flushSession(currentPath);
     }
     const { writeDiary } = await import("../lib/diary/diary-writer.ts");
-    const chatRef = this.agent.config.models?.chat || null;
+    // diary 产物是持久记忆材料，模型选择收口在 memory slot：
+    //   memory_model 显式配置 → 用该模型
+    //   memory_model 未配置   → resolver fallback 到目标 agent 的 chat
+    //   memory_model 配置错误 → resolver throw，日记报错而非偷偷改用别的模型
+    // 业务层不自行决定 chat/memory 优先级。
     let resolvedModel = null;
-    if (chatRef) {
-      resolvedModel = await this._models.resolveModelWithCredentialsFresh(chatRef);
-    } else {
-      // chat 未配置时 fallback 到 memory slot
+    try {
       resolvedModel = await this.resolveAuxiliaryExecution("memory");
+    } catch (err) {
+      if (isAuxiliaryConfigError(err)) {
+        moduleLog.warn(`memory slot 配置错误，日记生成失败（不回退其它模型）: ${err.message}`);
+      }
+      throw err;
     }
     // 写日记是用户主动触发的「读历史」功能，必须参考记忆，
     // 跟「在对话中潜移默化带入记忆」的 master 开关无关。所以不查 memoryMasterEnabled。

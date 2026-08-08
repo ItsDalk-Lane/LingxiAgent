@@ -12,6 +12,10 @@ import {
   isFreeSearchApiProvider,
   isBrowserSearchProvider,
 } from '../../../../../../shared/search-providers.ts';
+import {
+  AUXILIARY_SLOT_IDS,
+  type AuxiliarySlot,
+} from '../../../../../../shared/auxiliary-slot-ids.ts';
 
 type ModelRef = { id: string; provider: string };
 
@@ -76,21 +80,24 @@ export function OtherModelsSection({ providers }: { providers: Record<string, { 
   );
   const searchProvider = globalModelsConfig?.search?.provider || AUTO_SEARCH_PROVIDER;
 
-  const slots: Array<{
-    field: string;
+  // UI-only metadata keyed by canonical Slot id。Slot 身份来自 shared 单一真理源
+  // （shared/auxiliary-slot-ids.ts），不再手写 field 字符串数组；新增第 7 个 Slot 时，
+  // 这里的 Record<AuxiliarySlot, ...> 会因缺 key 直接编译失败，强迫 UI 补齐。
+  const UI_METADATA: Record<AuxiliarySlot, {
     titleKey: string;
     hintKey: string;
     fallbackKey: string;
     followKey: string;
     imageOnly?: boolean;
-  }> = [
-    { field: 'title', titleKey: 'settings.api.auxTitleModel', hintKey: 'settings.api.auxTitleModelHint', fallbackKey: 'settings.api.auxFallbackChat', followKey: 'settings.api.auxFollowMain' },
-    { field: 'summarize', titleKey: 'settings.api.auxSummarizeModel', hintKey: 'settings.api.auxSummarizeModelHint', fallbackKey: 'settings.api.auxFallbackChat', followKey: 'settings.api.auxFollowMain' },
-    { field: 'memory', titleKey: 'settings.api.auxMemoryModel', hintKey: 'settings.api.auxMemoryModelHint', fallbackKey: 'settings.api.auxFallbackChat', followKey: 'settings.api.auxFollowMain' },
-    { field: 'vision', titleKey: 'settings.api.visionModel', hintKey: 'settings.api.visionModelHint', fallbackKey: 'settings.api.auxFallbackVision', followKey: 'settings.api.auxFollowMain', imageOnly: true },
-    { field: 'approval', titleKey: 'settings.api.auxApprovalModel', hintKey: 'settings.api.auxApprovalModelHint', fallbackKey: 'settings.api.auxFallbackApproval', followKey: 'settings.api.auxFollowDisabled' },
-    { field: 'guard', titleKey: 'settings.api.auxGuardModel', hintKey: 'settings.api.auxGuardModelHint', fallbackKey: 'settings.api.auxFallbackGuard', followKey: 'settings.api.auxFollowDisabled' },
-  ];
+  }> = {
+    title: { titleKey: 'settings.api.auxTitleModel', hintKey: 'settings.api.auxTitleModelHint', fallbackKey: 'settings.api.auxFallbackChat', followKey: 'settings.api.auxFollowMain' },
+    summarize: { titleKey: 'settings.api.auxSummarizeModel', hintKey: 'settings.api.auxSummarizeModelHint', fallbackKey: 'settings.api.auxFallbackChat', followKey: 'settings.api.auxFollowMain' },
+    memory: { titleKey: 'settings.api.auxMemoryModel', hintKey: 'settings.api.auxMemoryModelHint', fallbackKey: 'settings.api.auxFallbackChat', followKey: 'settings.api.auxFollowMain' },
+    vision: { titleKey: 'settings.api.visionModel', hintKey: 'settings.api.visionModelHint', fallbackKey: 'settings.api.auxFallbackVision', followKey: 'settings.api.auxFollowMain', imageOnly: true },
+    approval: { titleKey: 'settings.api.auxApprovalModel', hintKey: 'settings.api.auxApprovalModelHint', fallbackKey: 'settings.api.auxFallbackApproval', followKey: 'settings.api.auxFollowDisabled' },
+    guard: { titleKey: 'settings.api.auxGuardModel', hintKey: 'settings.api.auxGuardModelHint', fallbackKey: 'settings.api.auxFallbackGuard', followKey: 'settings.api.auxFollowDisabled' },
+  };
+  const slots = AUXILIARY_SLOT_IDS.map((id) => ({ field: id, ...UI_METADATA[id] }));
 
   const visionAuxiliaryEnabled = globalModelsConfig ? globalModelsConfig.models?.vision_enabled === true : undefined;
 

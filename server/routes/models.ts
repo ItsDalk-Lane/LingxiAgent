@@ -240,13 +240,13 @@ export function createModelsRoute(engine) {
         usageLedger: engine.usageLedger,
         usageContext: {
           source: {
-            subsystem: "utility",
+            subsystem: "auxiliary",
             operation: "model_health",
             surface: "settings",
             trigger: "user",
           },
           attribution: {
-            kind: "utility",
+            kind: "auxiliary",
             // A health probe from the settings panel is the product checking a
             // provider, not an agent doing work. Billing it to whichever agent
             // the server is focused on would put a cost on that agent's usage
