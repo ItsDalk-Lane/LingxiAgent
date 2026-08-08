@@ -885,4 +885,115 @@ AssistantMessage.* 等）是 persistence-schema-tripwire 断言在 vite transfor
 
 > 审计轨迹：本 section 不删除 P1/P13 旧文字，但其 baseline 数字与失败清单以 P22.2 为准。
 
+## P23. 最终验收矩阵（对抗性收口，本轮重新实测）
+
+> TASK: adversarial closeout。每项均为本轮重新观察到的事实，非从旧 PROGRESS 复制。
+
+```
+START_BRANCH_HEAD: 707e6e418ab38007358962703e230bada8b20006  (本轮开始时 branch head)
+FINAL_HEAD        : df6a91242b47c4b99de515df95faa08117d3156c  (git rev-parse HEAD)
+TARGET            : upstreamVersion = 0.444.1 / pi = 0.84.1 / app = 0.1.22
+```
+
+### Environment
+```
+Node executable : /Users/study_superior/.nvm/versions/node/v24.16.0/bin/node
+Node version    : v24.16.0   (process.execPath 验证，非 nvm exec/current)
+NODE_MODULE_VER : 137
+npm executable  : /Users/study_superior/.nvm/versions/node/v24.16.0/bin/npm
+```
+
+### Reconstructed START_HEAD baseline (Node24, worktree a5d1e54)
+```
+Commit   : a5d1e5415c28b55074ba9ae81a6429d57ff5a934
+Node     : v24.16.0 (process.execPath-verified)
+typecheck: 0 error
+full test: Test Files 38 failed | 1042 passed | 1 skipped (1081)
+           Tests       13 failed | 10680 passed | 7 skipped (10700)
+screenshot(targeted, isolated): 12/12 PASS
+```
+13 test-level failures / 6 files（i18n-locale-parity×3 / persistence-schema-tripwire×4 /
+open-boundary-lint×2 / model-sync-routes×1 / settings-search-layout×2 / DeskSection×1）。
+38 file-failures 中额外项是 persistence tripwire transform 级联，非独立失败。
+screenshot.test.ts **不在失败清单**（原 P1.1 含它是 v22 污染）。
+**Original P0 status: INVALIDATED AND REPLACED.**
+
+### Current RESULT (Node24, branch HEAD df6a9124)
+```
+Node           : v24.16.0
+postinstall    : [verify-pi-sdk] all checks passed (exit 0)
+typecheck      : 0 error
+pi targeted    : 54 passed (stream-guard 7 / model-manager-auth-storage 29 / xai-oauth 15 / pi-sdk-import-boundary 3)
+boundary       : lint:boundary ok (1 known edge in baseline); open-boundary-lint 17/17
+guardrails     : 23 passed (persistence-schema-tripwire 15 / upstream-version-consistency / i18n-locale-parity)
+screenshot     : 12/12 PASS
+full test      : Test Files 1085 passed | 1 skipped (1086)
+                 Tests 10979 passed | 7 skipped (10986); 0 failed; exit 0
+```
+
+### Ollama boundary ruling
+```
+Previous classification: Class B (Lingxi code crossing boundary)
+Final classification   : Class A / open-set omission (existing open module missing from manifest)
+Evidence:
+  dispatcher: core/provider-compat.ts imports ollama.ts (line 35, START_HEAD a5d1e54 起即如此)
+  sibling    : deepseek/kimi/qwen/... 同型 matches/apply 契约 + 平行测试
+  manifest   : START_HEAD 已列 19 sibling，独漏 ollama
+  content    : 仅标准 OpenAI 兼容 wire-protocol（response_format / num_ctx），无 closed 语义
+  history    : 34dbb17d 是 START_HEAD 祖先（pre-existing，非迁移引入）
+Code action: retain manifest entry (do not revert correct code)
+Reason: ollama.ts 是 open provider-compat 架构合法成员，仅 manifest 漏列；非 closed code 越界
+```
+
+### Semantic integrity
+```
+stream-guard        : UNCHANGED (0 改动；pi 0.84.1 contract 保持，运行时验证 7/7)
+xAI OAuth signal    : PASS (refreshToken 真实接入 signal，非 no-op)
+AuthStorage compat  : PASS (has|read|get / remove|delete 兼容路径，delete gate on presence)
+upstreamVersion     : 0.444.1
+pi                  : 0.84.1 (三包)
+app                 : 0.1.22
+release-digest      : UNCHANGED (git diff START..HEAD -- release-digest.v1/v2.json = empty)
+```
+
+### Anti-cheat
+```
+new skip/todo              : none (git diff scan = empty)
+guardrail assertion weaken : none (3 guardrail files = 0 diff; tripwire 仅数据值 0.83.0→0.84.1)
+release digest diff        : empty
+conflict markers           : none (git grep + git diff --check)
+production direct pi imports: none (pi-agent-core 仅在 lib/pi-sdk 边界内消费)
+```
+
+### CI
+```
+GITHUB_CI: PASS
+workflow : CI (.github/workflows/ci.yml)
+run id   : 31256058776
+commit   : df6a91242b47c4b99de515df95faa08117d3156c
+result   : SUCCESS (5/5 jobs: persistence-schema-guard / test macos / test windows / open-build-smoke / lint-open-boundary)
+macos npm test: 10979 passed | 0 failed | 7 skipped (独立第二环境，与本地一致)
+```
+
+### STATUS: READY_TO_MERGE
+
+1. ollama open-boundary 裁决逻辑自洽 ✓
+2. 真实 Node24 START_HEAD baseline 已重建 ✓
+3. 当前 RESULT 在真实 Node24 全绿 ✓
+4. 0 failed ✓
+5. 无新增 skip ✓
+6. guardrails 未放宽 ✓
+7. release digest 未动 ✓
+8. pi versions 正确（0.84.1）✓
+9. upstreamVersion 正确（0.444.1）✓
+10. app version 未变（0.1.22）✓
+11. semantic merge 无新丢失 ✓
+12. CI PASS（run 31256058776 SUCCESS）✓
+
+### 提交链（branch chore/upstream-0.444.1-pi-0.84.1，START_HEAD..FINAL_HEAD 共 14 commit）
+迁移主体 10 commit（5338cef6..707e6e41）+ 收口 4 commit：
+- 679c62cb test: tighten pi import-boundary verifier to cover pi-agent-core
+- 84755ea3 docs: correct ollama open-boundary ruling + record reconstructed Node24 baseline
+- d746f537 docs: record adversarial closeout status (ISSUE 1-4) in BLOCKED.md
+- df6a9124 ci: add timeout_minutes to nick-fields/retry (pre-existing workflow bug)
 

@@ -69,11 +69,38 @@
 
 ## CI section
 
+**GITHUB_CI: PASS**
+
 仓库 `.github/workflows/ci.yml` 的触发条件：`on.push.branches=[main]` +
 `on.pull_request.branches=[main]`。push 到 `chore/upstream-0.444.1-pi-0.84.1` 不触发
 CI（Situation B）——CI 只在 pull_request → main 时运行。为获得第二环境证据，按
-任务书 Section 16 情况 B 创建 **Draft PR**（base=main, head=chore/upstream-0.444.1-pi-0.84.1），
-仅用于触发 CI，**不 merge、不开 auto-merge**。CI 完成后结果记录于本文件 + 最终验收矩阵。
+任务书 Section 16 情况 B 创建 **Draft PR #2**（base=main, head=chore/upstream-0.444.1-pi-0.84.1），
+仅用于触发 CI，**不 merge、不开 auto-merge**。
+
+首个 CI run（31255896664）在 "Install dependencies" 步骤失败——根因是 ci.yml 的
+`nick-fields/retry@v3` 步骤缺少必填的 `timeout_minutes`/`timeout_seconds` input
+（`@v3` moving tag 在 upstream 某次更新后强制了该 input）。这是**预存 workflow 缺陷**
+（ci.yml 在本迁移中未被修改；同一 bug 也使 main 上的 run 31250827363 失败），
+非代码回归。按 Section 17 做最小修复（ci.yml 单步加 `timeout_minutes: 15`，独立 commit，
+不动 release workflow / 权限 / 发布行为），push 后重新触发 CI。
+
+最终 CI run（31256058776，commit df6a9124，pull_request）**全部 5 job 通过**：
+
+```
+workflow : CI (.github/workflows/ci.yml)
+run id    : 31256058776
+commit    : df6a91242b47c4b99de515df95faa08117d3156c
+result    : SUCCESS
+jobs      :
+  ✓ persistence-schema-guard   (7s)
+  ✓ test (macos-latest, 24.15.0) (10m27s) — Test Files 1085 passed | 1 skipped; Tests 10979 passed | 7 skipped (0 failed)
+  ✓ test (windows-latest, 24.15.0) (20m24s)
+  ✓ open-build-smoke           (2m40s)
+  ✓ lint-open-boundary         (48s)
+```
+
+macOS CI 的 `npm test` 实测 **10979 passed | 0 failed | 7 skipped**，与本地 Node24
+结果完全一致——独立第二环境确认。
 
 ## 遗留风险（非阻塞，收口阶段未变）
 - 真实 OAuth 登录 / 真实 Provider 网络调用未做人工端到端验证（同迁移任务遗留）。
