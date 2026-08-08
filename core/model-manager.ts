@@ -424,6 +424,26 @@ export class ModelManager {
 
     // 0.83.0：AuthStorage.delete 改 async（withLockAsync）。收集待删 key 并行 await，
     // 避免 fire-and-forget 在测试清理 tmpDir 后才落地导致 ENOENT。
+    //
+    // 0.84.1：raw AuthStorage 不再暴露 has/remove（CredentialStore 契约只剩
+    // read/list/modify/delete）。本方法在 init() 早期跑时 this._authStorage 还是
+    // raw AuthStorage（has/remove 缺失），syncAndRefresh() 装上 SdkAuthFacade 后重跑
+    // 才有 has/remove。因此存在性检查与删除都按"任一可用 API"适配：
+    //   has  → facade.has | raw.read?.() | raw.get?.()
+    //   删除 → remove?.() | delete?.()
+    // 不放宽语义：没有凭证的 key 不调 delete（保持旧的"只在有时才写盘"行为）。
+    const authStorage: any = this._authStorage;
+    const hasAuthEntry = async (key: string): Promise<boolean> => {
+      if (typeof authStorage.has === "function") return !!authStorage.has(key);
+      if (typeof authStorage.read === "function") return (await authStorage.read(key)) !== undefined;
+      if (typeof authStorage.get === "function") return authStorage.get(key) != null;
+      return false;
+    };
+    const removeAuthEntry = (key: string): Promise<unknown> => {
+      if (typeof authStorage.remove === "function") return Promise.resolve(authStorage.remove(key));
+      if (typeof authStorage.delete === "function") return Promise.resolve(authStorage.delete(key));
+      return Promise.resolve();
+    };
     const removals: Promise<unknown>[] = [];
     for (const entry of entries) {
       if (entry.authType === "oauth") continue;
@@ -434,8 +454,9 @@ export class ModelManager {
         // catalog, but cleanup must never delete the OAuth owner's credentials
         // while surfacing the collision.
         if (oauthOwnedAuthKeys.has(authKey)) continue;
-        if (!authKey || !this._authStorage.has?.(authKey)) continue;
-        removals.push(Promise.resolve(this._authStorage.remove(authKey)));
+        if (!authKey) continue;
+        // gate the delete on actual presence (avoid no-op writes / masking bugs)
+        removals.push(hasAuthEntry(authKey).then((present) => (present ? removeAuthEntry(authKey) : undefined)));
       }
     }
     await Promise.all(removals);
