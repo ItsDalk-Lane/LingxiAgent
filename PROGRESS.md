@@ -707,7 +707,7 @@ oauth: {
 
 ### Phase 13 裁决
 - 5 个新 open→closed edge（lossy/visible-text/internal-mood 被 core/lib import）→ Class A（上游合法新公开路径）→ 加 open-set 解决。
-- provider-compat→ollama → Class B（Lingxi 代码越界）但修法是补 open-set（sibling 公开模块），非掩盖。
+- provider-compat→ollama → ~~Class B（Lingxi 代码越界）~~ **【对抗性审计收口纠正，见 P22】**：此前"Class B"标签与"补 open-set"修法逻辑矛盾（Class B = 实现越界须改实现，不能用白名单掩盖）。经重新裁决，真实分类是 **Class A / open-set omission（既有 open 模块 manifest 漏列）**——ollama.ts 是 open provider-compat dispatcher 架构的合法成员，manifest addition 正确，详见 P22。
 - auth-storage→abort → Class D（SDK 包内 transitive dep，CLI closure stale）→ 补 open-set。
 - 结果：`lint:boundary ok`，open-boundary-lint 17/17（baseline 是 2 fail）。
 
@@ -774,7 +774,7 @@ exit 0
 ```
 7 skipped 全是 win32 platform smoke（macOS 上恒不运行）。**0 failed。**
 
-### 提交链（8 个语义 checkpoint，branch chore/upstream-0.444.1-pi-0.84.1）
+### 提交链（branch chore/upstream-0.444.1-pi-0.84.1，截至 P21 时 8 个语义 checkpoint）
 1. 5338cef6 chore: upgrade pi sdk to 0.84.1 + adapt refreshToken contract
 2. 140f5e59 sync: merge openhanako 0.444.1 semantics (per-file 3-way)
 3. 140b06e8 chore: regenerate sync artifacts for pi 0.84.1 + upstream 0.444.1
@@ -784,5 +784,105 @@ exit 0
 7. 55a31db6 docs: record task progress (Phases 12-17)
 8. ec44f188 fix: update settings-search-layout test for the responsive shell (d555c14e)
 
-START_HEAD a5d1e54 → FINAL_HEAD ec44f188。
+> **【对抗性审计收口纠正，见 P22】**：此后又有 2 个 docs commit（e49cbc22 / 707e6e41），
+> 以及 P22 收口还会再产生 commit。因此 **FINAL_HEAD 不再硬编码**——以任务结束时
+> `git rev-parse HEAD` 与 `git log --oneline a5d1e541..HEAD` 动态输出为准。上方"8 个"
+> 是 P21 时点快照，非最终数。
+
+---
+
+# ========== 对抗性审计收口（adversarial closeout，2026-08-08）==========
+
+> TASK: adversarial closeout（不是重新迁移）。本 section 取代此前 P1/P20 中被环境
+> 污染或逻辑矛盾的结论；旧文字保留为审计轨迹，但下方 P22 的裁决为权威。
+
+## P22. 对抗性审计收口裁决
+
+### P22.1 — ollama open-boundary 裁决（ISSUE 1，逻辑矛盾纠正）
+
+**此前分类（P13）**：provider-compat→ollama 标为 "Class B（Lingxi 代码越界）"，但修法是
+"补 open-set"。"Class B + 白名单修法"逻辑自相矛盾（Class B 须改实现，不能用 allowlist 掩盖）。
+
+**重新裁决（读真实源码 + git 历史）**：
+
+- `core/provider-compat.ts` 是 open-set dispatcher，其顶部架构注释明确要求
+  "所有 provider-specific 实现拆到 `core/provider-compat/<name>.ts`"。
+- dispatcher 正式 import（START_HEAD a5d1e54 起即如此）：
+  `./provider-compat/deepseek.ts` / `kimi.ts` / `qwen.ts` / ... / `ollama.ts`（line 35），
+  并在 `PROVIDER_MODULES` 数组注册 `ollama`（line 83）。
+- `core/provider-compat/ollama.ts` 在 START_HEAD **已存在且已被 import**：
+  `git cat-file -e a5d1e54:core/provider-compat/ollama.ts` = YES；
+  引入 commit `34dbb17d` 是 START_HEAD 的祖先（pre-existing，非迁移引入）。
+- ollama.ts 与 deepseek/kimi/qwen 等 sibling 同型：均 export `matches(model)`+
+  `apply(payload,model,options)`，遵循 `core/provider-compat/README.md` 的接口契约。
+- 平行测试 `tests/provider-compat/ollama.test.ts` 存在（与每个 sibling 一致）。
+- export-manifest.json 在 START_HEAD 已列 19 个 provider-compat/*.ts，**独漏 ollama**。
+- ollama.ts 内容只有标准 OpenAI 兼容 wire-protocol 翻译（结构化输出 response_format、
+  num_ctx 桥接），无任何 closed-source/product-only 逻辑。
+
+**最终分类**：`Class A / open-set omission（既有 open 模块 manifest 漏列）`。
+ollama.ts 不是"closed code 越界后用白名单逃逸"，而是本就属于 open provider-compat
+架构（dispatcher 自 START_HEAD 起 runtime import 它），仅 export-manifest 漏列。
+
+**Code action**：**保留** export-manifest.json 中 `core/provider-compat/ollama.ts`（不撤销）。
+证据链：dispatcher import + sibling 同型 + manifest 历史漏列 + 无 closed 语义。
+
+**验收**：`npm run lint:boundary` → ok（1 known edge in baseline）；
+`npx vitest run tests/open-boundary-lint.test.ts` → 17/17 ✓。
+
+### P22.2 — START_HEAD Node24 baseline 重建（ISSUE 2，证据链重建）
+
+**此前 P1 claim**：START_HEAD + Node24.16.0 = 13 failed，并列出 screenshot.test.ts 等。
+
+**问题**：P1 用 `nvm exec 24.16.0`，但本机 `~/.local/bin/node`(v22.23.2) 在 PATH 中
+抢占 nvm bin——`nvm exec`/`nvm run` 实际执行的可能不是真 v24.16.0。better-sqlite3 在
+v22/v24 都能加载（预编译兼容），掩盖了 runtime 差异。**因此 P1 的"Node24 baseline"
+不能继续当作已证实事实，必须用 process.execPath 显式验证的真 v24.16.0 重建。**
+
+**重建方法**：disposable worktree（`git worktree add --detach <tmp> a5d1e541`），
+`nvm which 24.16.0` 取真二进制路径，`export PATH=<v24bin>:$PATH; hash -r`，
+显式校验 `node -v`=v24.16.0、`process.execPath` 指向 `.nvm/versions/node/v24.16.0/`、
+NODE_MODULE_VERSION=137。worktree 内独立 `npm ci`（postinstall 自然运行，非 --ignore-scripts）。
+
+**重建结果（真 Node24 START_HEAD，权威）**：
+
+```
+Node executable : /Users/study_superior/.nvm/versions/node/v24.16.0/bin/node
+Node version    : v24.16.0
+NODE_MODULE_VER : 137
+typecheck       : 0 error（tsc x3）
+full test       : Test Files 38 failed | 1042 passed | 1 skipped (1081)
+                  Tests       13 failed | 10680 passed | 7 skipped (10700)
+screenshot (targeted, isolated) : 12/12 PASS ✓
+```
+
+**13 个 test-level 失败（精确清单，6 file）**：
+
+| 文件 | 失败数 | 分类 |
+|------|--------|------|
+| tests/i18n-locale-parity.test.ts | 3 (ja/ko/zh-TW 缺 key) | guardrail — pre-existing locale debt |
+| tests/persistence-schema-tripwire.test.ts | 4 (fingerprint drift) | guardrail — pre-existing |
+| tests/open-boundary-lint.test.ts | 2 (manifest/baseline stale) | guardrail — pre-existing 边界债（ollama 漏列即其中之一） |
+| tests/model-sync-routes.test.ts | 1 (utility attribution) | legacy — pre-existing |
+| desktop/.../settings-search-layout.test.ts | 2 (884px width token) | legacy — pre-existing |
+| desktop/.../DeskSection.test.tsx | 1 (Jian drawer overlay) | legacy — pre-existing |
+
+**38 file-level failures vs 13 test-level**：额外 file-failures（plugin-*、AgentReviewCards、
+AssistantMessage.* 等）是 persistence-schema-tripwire 断言在 vite transform 阶段抛错
+（`EnvironmentPluginContainer.resolveId` / `assertCommittedPersistenceSchemaFingerprint`）
+导致的级联 file-load 失败，非独立 test 失败。
+
+**Section 8 特别调查结论 — screenshot.test.ts "自动消失"**：
+真实 Node24 START_HEAD 上 `screenshot.test.ts` **不失败**（full suite 内 0 失败 + 隔离
+单跑 12/12 PASS）。原 P1.1 把它列入 13 失败清单是**错误环境（v22 PATH 抢占）污染**，
+不是真 Node24 行为。**P1.1 的 screenshot 失败项 INVALIDATED。**
+
+**P0 baseline 裁决**：**INVALIDATED AND REPLACED**。
+- 旧 P1 的 13-failed 计数**恰好**与重建一致（巧合），但 P1.1 的**失败清单构成错误**
+  （含 screenshot，缺 DeskSection；真实清单是上表 6 file/13 test）。
+- 重建的 6-file/13-test 清单（含 screenshot 不失败的事实）取代 P1.1 作为 START_HEAD
+  Node24 权威 baseline。
+
+> 审计轨迹：本 section 不删除 P1/P13 旧文字，但其 baseline 数字与失败清单以 P22.2 为准。
+
 
