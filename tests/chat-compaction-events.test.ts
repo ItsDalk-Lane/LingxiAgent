@@ -44,6 +44,32 @@ describe("chat route compaction lifecycle messages", () => {
     expect(getSessionByPath).toHaveBeenCalledWith("/session/a.jsonl");
   });
 
+  it("includes the resolved compaction mode so the session ring can label local compaction", () => {
+    expect(toCompactionLifecycleWsMessage(
+      { type: "compaction_start", reason: "threshold" },
+      "/session/a.jsonl",
+      () => null,
+      () => "sess_a",
+      () => "lossy_local",
+    )).toEqual({
+      type: "compaction_start",
+      sessionId: "sess_a",
+      sessionPath: "/session/a.jsonl",
+      reason: "threshold",
+      mode: "lossy_local",
+    });
+  });
+
+  it("prefers the mode carried by the compaction event", () => {
+    expect(toCompactionLifecycleWsMessage(
+      { type: "compaction_start", reason: "threshold", mode: "lossy_local" },
+      "/session/a.jsonl",
+      () => null,
+      () => "sess_a",
+      () => "auto",
+    )).toMatchObject({ mode: "lossy_local" });
+  });
+
   it("ignores non-compaction events", () => {
     expect(toCompactionLifecycleWsMessage(
       { type: "turn_end" },

@@ -513,3 +513,487 @@ memory ticker / approval / guard / summarize / title generation / channel summar
 - **better-sqlite3 native mismatch**（NODE_MODULE_VERSION 137 vs 127）：环境基线，需 `npm rebuild better-sqlite3`，与本任务无关。
 - 真实 Provider 网络调用未做人工验证（仅 mock 测试通过）。
 
+---
+
+# ========== upstream-0.444.1 + pi SDK 0.84.1 迁移任务（2026-08-08）==========
+
+> TASK_ID=upstream-0.444.1_pi-0.84.1
+> 本 section 仅供本任务；旧 section 是历史记录，不当成本任务状态。
+
+## P0. 任务身份
+
+```
+TASK_ID      = upstream-0.444.1_pi-0.84.1
+START_HEAD   = a5d1e5415c28b55074ba9ae81a6429d57ff5a934
+START_TIME   = 2026-08-08T10:41:32Z
+Repository   = ItsDalk-Lane/LingxiAgent
+Base upstream= openhanako v0.443.46  (262d385c7fb53217c4c8a7de9817efeef9c1bf4b)
+Target upstr = openhanako v0.444.1   (cc19cb49b0786d61ed723764e0a83baf87887270)
+Current pi   = 0.83.0
+Target pi    = 0.84.1
+Required Node= 24.16.0  (nvm exec 24.16.0；本机默认 node v22.23.2 不可用于验证)
+```
+
+## P1. Phase 0 — 可重现基线（本机实测，权威）
+
+执行环境：`nvm exec 24.16.0`。本机默认 `node -v` = v22.23.2（不是要求的 24.16.0），所有验证命令一律 `nvm exec 24.16.0 <cmd>`。
+
+```
+node -v (via nvm exec 24.16.0)  → v24.16.0 ✓
+git rev-parse HEAD              → a5d1e5415c28b55074ba9ae81a6429d57ff5a934
+git status --short              → (clean) ✓
+```
+
+### 基线 typecheck
+
+```
+nvm exec 24.16.0 npm run typecheck  → 0 error ✓
+```
+
+### 基线 full suite（实测权威）
+
+```
+Test Files  6 failed | 1074 passed | 1 skipped (1081)
+Tests       13 failed | 10904 passed | 7 skipped (10924)
+```
+
+→ **BASELINE: 13 failed / 7 skipped**（验收线：最终 0 failed，skipped ≤ 7）。
+
+注意：PROGRESS/BLOCKED 旧 section 记录的 162/170 失败是 Node22 下 better-sqlite3 native ABI mismatch（NODE_MODULE_VERSION 137 vs 127）的环境噪声；Node24.16.0 下该类失败已消失，**本任务 baseline 以本机 Node24 实测为准**。失败清单详见 P1.1。
+
+### 包版本核对（实际仓库为准）
+
+```
+app version            = 0.1.22
+lingxi.upstreamVersion = 0.443.46
+@earendil-works/pi-agent-core   = 0.83.0
+@earendil-works/pi-ai           = 0.83.0
+@earendil-works/pi-coding-agent = 0.83.0
+engines.node           = ">=24.12.0 <25"
+verifiedVersions (verifier)       = {0.80.3, 0.83.0}
+verifiedPiAiVersions (verifier)   = {0.80.3, 0.83.0}
+```
+
+### SDK import boundary 现状（lib/pi-sdk 是唯一入口）
+
+- 根 re-export：`@earendil-works/pi-coding-agent`、`@earendil-works/pi-agent-core`、`@earendil-works/pi-ai`、`@earendil-works/pi-ai/compat`
+- 深路径：`dist/core/auth-storage.js`（AuthStorage, FileAuthStorageBackend）、`dist/core/compaction/compaction.js`（prepareCompaction）
+- verifier（patch-pi-sdk.cjs）扫描 core/server/lib/hub 生产代码，禁止越界直接 import @earendil-works/*（lib/pi-sdk 除外）。
+
+### P1.1 BASELINE_FAILURE_LIST（6 file / 13 failed，全部 pre-existing）
+
+| 文件 | 失败数 | 分类（根因判断） |
+|------|--------|------------------|
+| tests/i18n-locale-parity.test.ts | 3 | **guardrail** — en vs zh-TW/ja/ko 缺 key（pre-existing locale debt） |
+| tests/model-sync-routes.test.ts | 1 | **legacy** — utility account 计费断言（pre-existing） |
+| tests/open-boundary-lint.test.ts | 2 | **guardrail** — committed export-manifest/baseline 与 source 不一致（pre-existing 边界债） |
+| tests/persistence-schema-tripwire.test.ts | 4 | **guardrail** — committed fingerprint 与实时 store 不一致（pre-existing） |
+| desktop/.../screenshot.test.ts | 1 | **legacy** — 默认头像烧录断言（pre-existing） |
+| desktop/.../settings-search-layout.test.ts | 2 | **legacy** — 设置 modal 884px 宽 token 断言（pre-existing） |
+
+### BASELINE_SKIPPED_LIST（7 skipped，全部 platform skip）
+
+- tests/secret-fs.test.ts :: windows contract（×1）
+- tests/manual/win32-packaged-smoke.test.ts :: win32 packaged smoke（×6）
+
+→ 全部为 darwin 上恒不运行的 win32 skip。**skip 基线 = 7，验收线 skip ≤ 7。**
+
+> 这 13 个失败均为 pre-existing（与 0.83.0→0.84.1 / upstream 0.444.1 无因果关系）。其中 3 个 guardrail 文件（i18n-locale-parity / open-boundary-lint / persistence-schema-tripwire）的 **assertion semantics 在本任务中不可修改**；本任务目标是最终 full green，但区分 migration correctness vs legacy cleanup（Phase 15），修复 pre-existing 失败须独立证明 + 独立 commit，不得改 guardrail assertion。
+
+## P2. Phase 2 — pi SDK 0.83.0 → 0.84.1 升级（迁移本身）
+
+### 改动
+- `package.json`：三个 `@earendil-works/pi-*` 0.83.0 → 0.84.1。
+- `scripts/patch-pi-sdk.cjs`：`verifiedVersions` / `verifiedPiAiVersions` **追加** "0.84.1"（旧 0.80.3/0.83.0 保留）。
+- `nvm exec 24.16.0 npm install`（非 --ignore-scripts，postinstall 自然运行）→ `[verify-pi-sdk] all checks passed`，installed 0.84.1 ✓。
+
+### PI_083_TO_084_CONTRACT（读真实 0.84.1 .d.ts/runtime 后得出）
+
+#### message stream（stream-guard 依赖）— contract 不变
+- `AssistantMessageEvent`（pi-ai types.d.ts:383-436）shape 与 0.83 一致：
+  `start` / `text_start|delta|end` / `thinking_start|delta|end` / `toolcall_start|delta|end`（带 contentIndex, delta, toolCall, partial）/ `done{reason,message}` / `error{reason,error}`。
+- `EventStream`/`AssistantMessageEventStream`（utils/event-stream.d.ts）：`push`/`end`/`result` 不变。
+- `toolcall_delta` 仍 emit `delta` 字符串（openai-completions.js:399）；`partialArgs` 是 runtime streaming scratch buffer，streaming 中可读、`toolcall_end` 前 `delete`、`done` 前 `delete`。
+  → stream-guard 现有 dual-source（event.delta ∪ block.partialArgs）策略 **仍成立**，运行时验证 `tests/pi-sdk-stream-guard.test.ts` 全绿。
+
+#### OAuth provider contract — **breaking（refreshToken 加 signal 参数）**
+0.84.1 `ProviderConfig.oauth`（pi-coding-agent core/extensions/types.d.ts:1059-1074 / provider-composer.d.ts:11）：
+```
+oauth: {
+  name: string;
+  isSubscription?: boolean;
+  usesCallbackServer?: boolean;   // @deprecated
+  login(callbacks: OAuthLoginCallbacks): Promise<OAuthCredentials>;        // 不变
+  refreshToken(credentials: OAuthCredentials, signal: AbortSignal): Promise<OAuthCredentials>;  // 0.83 是 1 参，0.84.1 加 signal
+  getApiKey(credentials: OAuthCredentials): string;                          // 不变
+  modifyModels?(...): ...;
+}
+```
+- 受影响 Lingxi 代码：`lib/auth/xai-oauth.ts` `refreshToken(credentials)` 须改为 `refreshToken(credentials, signal)`，且 signal 必须真实接入（throwIfAborted + requestSignal），非 no-op。
+- `OAuthLoginCallbacks` shape 不变；`loginOAuthProvider`/AuthInteraction adapter 不动。
+
+#### deep imports — 全部仍存在
+- `pi-coding-agent/dist/core/auth-storage.js`（AuthStorage, FileAuthStorageBackend）✓
+- `pi-coding-agent/dist/core/compaction/compaction.js`（prepareCompaction）✓
+- `pi-ai/compat`（getModel/getModels/completeSimple）✓
+
+#### 结论
+- stream-guard：无需机械改造，运行时契约保持；Phase 3 只验证，不改 guard 语义。
+- 真正需要迁移的只有 `xai-oauth.ts` 的 refreshToken 2-arg 契约（生产 typecheck 已过，因 SdkOAuthProvider 是结构类型，Lingxi 实现收 1 参在调用侧不报错；只有 test 显式 1-arg 调用被 0.84.1 返回类型判定为缺参）。
+
+## P3/P4. Phase 3 + 4 — stream guard & SDK boundary verification
+
+### Phase 3：stream guard（contract 不变，仅验证）
+0.84.1 的 `AssistantMessageEvent` 与 `EventStream`/`AssistantMessageEventStream` shape 与 0.83 完全一致；`toolcall_delta` 仍带 `delta` 字符串，`partialArgs` 仍是 streaming scratch buffer（streaming 中可读，end/done 前 delete）。stream-guard 现有 dual-source（event.delta ∪ block.partialArgs）策略成立，**无需机械改造**。
+
+- `nvm exec 24.16.0 npx vitest run tests/pi-sdk-stream-guard.test.ts` → 全绿 ✓
+- guard 8 项语义职责全部保留（malformed tool-call recovery / 合法透传 / done-error / cancellation）。
+
+### Phase 4：SDK boundary
+- `nvm exec 24.16.0 node scripts/patch-pi-sdk.cjs` → `[verify-pi-sdk] all checks passed` ✓
+- deep imports 全部仍存在：`dist/core/auth-storage.js` ✓ / `dist/core/compaction/compaction.js` ✓ / `pi-ai/compat` ✓（import 实测可解析）
+- pi-sdk targeted 套件（14 file / 150 test）→ 148 passed；剩 2 = **pre-existing open-boundary baseline debt**（provider-compat→ollama + SDK 包内 auth-storage→abort），与本次迁移无因果（baseline 文件自 START_HEAD 未变）。
+
+**Checkpoint commit 1**（branch `chore/upstream-0.444.1-pi-0.84.1`）：5338cef6 — pi SDK 0.84.1 升级 + refreshToken 契约适配。typecheck 0 error，oauth targeted 23 passed。
+
+## P5. Phase 5 — upstream v0.444.1 semantic merge（逐文件 3-way）
+
+三方模型：BASE=v0.443.46 / OURS=START_HEAD a5d1e54 / THEIRS=v0.444.1。Lingxi 与 upstream 无共同 git 祖先（recreated fork），无法用 git merge；用 `git merge-file`（base/ours/theirs 三个临时文件）做真 3-way。
+
+### 文件分类（64 files）
+
+- **OURS==BASE（fast-forward，Lingxi 未分歧，~30 文件）**：直接 take THEIRS。含 events.ts / rc-router.ts / ws-protocol.ts / websocket.ts / ws-message-handler.ts / context-slice.ts / format.ts / SessionList.module.css / experiments-registry / compaction-guard-ext / usage-observer / notification-service + 对应 tests + 5 个 NEW source（lossy-local-compaction / visible-text-accumulator / internal-mood-block）+ 2 个 NEW test。
+- **OURS!=BASE（真 3-way，~24 文件）**：用 git merge-file。
+
+### OURS!=BASE 3-way 结果
+
+- **CLEAN（无冲突）**：bridge-session-manager.ts / desktop-session-submit.ts / engine.ts / session-compactor.ts / SessionList.tsx / ContextRing.tsx / app-event-actions.ts / ExperimentsTab.tsx / bridge-manager.ts / chat.ts + 全部 OURS!=BASE tests + 5 locale。
+- **CONFLICT（手工裁决，已解）**：
+  - `InputArea.tsx`：import 块。保留 Lingxi `lingxiFetch`（不取上游 `hanaFetch`）+ 接入上游新 file-mention（`searchDeskFiles` + `DeskSearchResult`）。
+  - `message-parser.ts parseMoodFromContent`：取上游 canonical `parseLeadingInternalMoodBlock`（shared 新模块，更干净的抽象），但默认 yuan 保持 Lingxi 品牌 `'lingxi'`（非上游 `'hanako'`）。
+
+### 品牌 invariant 修复（merge 引入的回流，已逐项改正）
+- `ContextRing.tsx`：merge 把上游 `hanaFetch` 回流 → 改回 `lingxiFetch`（import + 调用点）。对应 test mock 同步 `hanaFetchMock`→`lingxiFetchMock`。
+- `ExperimentsTab.test.tsx`：merge 回流 `hanaFetchMock`（一处）→ `lingxiFetchMock`。
+- `message-parser.test.ts`：merge 回流期望 `yuan:'hanako'`（一处）→ `'lingxi'`。
+
+### Phase 11 语义裁决（不新增/不盲删）
+- **`core/session-manifest/legacy-migration.ts`**：在 START_HEAD **未 tracked**（Lingxi 已删除，无任何 tracked 代码 import 它；Lingxi 用 `core/migrations.ts` + `data-epoch-migrations.ts` 独立迁移体系）。上游 v0.444.1 仅给它加 BOM revalidation。裁决：**不重新引入**（语义已由 Lingxi 等价体系承担；上游 BOM fix 不适用于 Lingxi 独立迁移路径，无 tracked 消费方）。`tests/session-manifest-legacy-migration.test.ts` 同理不存在。
+- **release-digest.v1/v2.json**：**不合并**（Phase 2.3：本任务非 release，digest 必须不变）。
+- **package.json**：上游只改 `version`，Lingxi 保持 app=0.1.22；pi 版本已在 Phase 2 处理。
+
+### locale（Phase 14）
+- 5 locale 全 CLEAN merge，JSON 合法。
+- 上游新增 `chat.instantSimpleCompaction` + `settings.experiments.instantSimpleCompaction.{title,description}` 在 en/ja/ko/zh-TW/zh **均有真实翻译**（非英文占位、非空）。
+- i18n-locale-parity 仍 3 fail = **pre-existing debt**（4 个 key：`settings.providers.subtab.{api,models,usage}` + `settings.api.searchConfig`，与本次合并无因果，留 Phase 15 legacy cleanup）。
+
+### 验证（迁移本身的 targeted tests，全绿）
+- core/lib feature tests（12 file / 272 test）→ 全绿：lossy-local-compaction / mood-parser / visible-text-accumulator / notification / experiments / usage-observer / chat-compaction-events / session-compactor / bridge-handle-message / chat-route-switching / llm-client-provider-compat。
+- desktop React tests（10 file）→ 全绿（context-ring 12 / message-parser 51 / file-mention / ExperimentsTab / etc.）。
+- typecheck = 0 error。
+
+## P12/P13. Phase 12 + 13 — 衍生产物重生成 + open-boundary
+
+**关键环境事实**：`nvm exec 24.16.0` / `nvm run 24.16.0` 在本机被 `~/.local/bin/node`(v22.23.2) **PATH 抢占**——`nvm use` 后 PATH 里 `~/.local/bin` 仍在 nvm bin 之前。所有验证必须用显式 `export PATH="/Users/study_superior/.nvm/versions/node/v24.16.0/bin:$PATH"` 把真 v24.16.0 二进制顶到最前。本任务 P0 基线（13 failed）实际是在 v22 跑的——better-sqlite3 在 v22/v24 都能加载（预编译兼容），所以 sqlite 测试在 v22 也过；但 v24 跑才暴露真正的 NODE_MODULE_VERSION 137 需求。
+
+### 产物重生成（用仓库自带 generator，非手编）
+- `build/persistence-schema-fingerprint.json`：`generate-persistence-schema-fingerprint.mjs --classification compatible --compatibility-reason "..."`。CURRENT_SESSION_VERSION=3 / DATA_EPOCH=1 不变；只 pinned pi 版本 + sourceHash 变。与 0.80.3→0.83.0 同类 compatible addition。
+- `build/cli-runtime-closure.json`：`compute-cli-closure.mjs` 重生成（10604 files，0.84.1 node_modules tree）。
+- `export-manifest.json`（open-set），5 处合法扩充：
+  - core/lossy-local-compaction.ts / lib/bridge/visible-text-accumulator.ts / shared/internal-mood-block.ts（上游新模块，与上游 manifest 一致）
+  - core/provider-compat/ollama.ts（Lingxi 预存遗漏：19 个 sibling 已在 set，独漏 ollama）
+  - node_modules/.../utils/abort.js（pi 0.84.1 auth-storage.js 新 import raceWithAbortSignal 的 transitive dep；auth-storage.js 已在 open-set/bundled）
+- `build/open-boundary-baseline.json`：内容与 START_HEAD 一致（1 edge: server/index→mobile-workbench），未变。
+
+### Phase 13 裁决
+- 5 个新 open→closed edge（lossy/visible-text/internal-mood 被 core/lib import）→ Class A（上游合法新公开路径）→ 加 open-set 解决。
+- provider-compat→ollama → ~~Class B（Lingxi 代码越界）~~ **【对抗性审计收口纠正，见 P22】**：此前"Class B"标签与"补 open-set"修法逻辑矛盾（Class B = 实现越界须改实现，不能用白名单掩盖）。经重新裁决，真实分类是 **Class A / open-set omission（既有 open 模块 manifest 漏列）**——ollama.ts 是 open provider-compat dispatcher 架构的合法成员，manifest addition 正确，详见 P22。
+- auth-storage→abort → Class D（SDK 包内 transitive dep，CLI closure stale）→ 补 open-set。
+- 结果：`lint:boundary ok`，open-boundary-lint 17/17（baseline 是 2 fail）。
+
+### persistence tripwire：fixture 版本号 0.83.0→0.84.1
+`tests/persistence-schema-tripwire.test.ts` 一处 fixture（packageVersion/requestedVersion）。guard 语义（currentSessionVersion=3、sha512- 完整性、extensions 列表、kind=external-versioned）未改。tripwire 15/15（baseline 4 fail）。
+
+## P15. Phase 15 — pre-existing 失败修复（独立 commit）
+
+- **i18n-locale-parity（3→0）**：ja/ko/zh-TW 缺 4 key（`settings.providers.subtab.{api,models,usage}` + `settings.api.searchConfig`），en/zh 已有。补真实翻译（非英文占位）。JSON reserialization 顺带合并了三 locale 在 settings.providers 内的 pre-existing 重复 `empty` key（last-wins，符合 runtime 语义）。
+- **model-sync-routes（1→0）**：stale attribution 断言 `kind:'utility'`，auxiliary-slot refactor 已改 `kind:'auxiliary'`（server/routes/models.ts:249）。更新断言到当前契约。54/54。
+
+## P15b. pi 0.84.1 AuthStorage 契约迁移（**required migration failure**）
+
+v24 跑暴露（v22 因 sqlite 兼容未暴露）：`model-manager-auth-storage` 3 fail。根因：pi 0.84.1 raw `AuthStorage` 删了 `has`/`remove`（CredentialStore 只剩 read/list/modify/delete）。`_removeApiKeyProviderAuthEntries` 在 init() 早期跑时 `this._authStorage` 还是 raw AuthStorage，`has?.()`/`remove()` 全 no-op → legacy API-key 条目未从 auth.json 清掉。
+
+修法（core/model-manager.ts）：存在性检查与删除按"任一可用 API"适配（has|read|get / remove|delete），不放宽语义（delete 仍 gate on presence）。29/29。
+
+## P17. Phase 17 — 版本收尾
+`lingxi.upstreamVersion` 0.443.46 → 0.444.1（package.json）。app version 保持 0.1.22。upstream-version-consistency 4/4。
+
+## P18/P19/P20/P21. 最终审计 + 验收矩阵（v24.16.0，sqlite rebuilt）
+
+**环境前提（关键）**：`nvm exec/run 24.16.0` 被 `~/.local/bin/node`(v22.23.2) PATH 抢占。所有最终验证一律 `export PATH="/Users/study_superior/.nvm/versions/node/v24.16.0/bin:$PATH"` 显式顶 v24.16.0 二进制。v22 下跑会掩盖 159 个 sqlite ABI 失败 + 3 个 model-manager-auth-storage 失败——只有真 v24 暴露全部 required migration failures。
+
+### Phase 19 反作弊（全 PASS）
+- `git diff START -- release-digest.v1/v2.json` = 空 ✓
+- conflict marker scan = 空 ✓
+- 新增 skip/todo scan = 空 ✓
+- guardrail assertion 文件：open-boundary-lint / upstream-version-consistency / i18n-locale-parity = 0 改动；persistence-schema-tripwire = 仅 packageVersion/requestedVersion 数据值 0.83.0→0.84.1（guard 语义 currentSessionVersion=3/sha512-/extensions/kind 全保留）✓
+
+### Phase 18 合并完整性（全 PASS）
+- 8 个 THEIRS-added 文件全部 PRESENT ✓
+- OMITTED_UPSTREAM_DELTAS: core/session-manifest/legacy-migration.ts（BOM fix，Lingxi 已删无消费方）+ release-digest（非 release）
+- OMITTED_OURS_DELTAS: none
+- Lingxi invariant 保留：engine.ts aux wiring 16/16 符号、bridge-manager 34/34 符号、lingxi.compaction.boundary、streamFunction、lingxiFetch、yuan='lingxi' ✓
+- production pi import leak = none（qwen.ts 的命中是注释中的文档引用，非真实 import；verifier 通过）✓
+
+### Phase 20 验收矩阵（实测）
+| Check | Result |
+|-------|--------|
+| node -v | v24.16.0 ✓ |
+| app version | 0.1.22 ✓ |
+| upstreamVersion | 0.444.1 ✓ |
+| pi-agent-core / pi-ai / pi-coding-agent | 0.84.1 / 0.84.1 / 0.84.1 ✓ |
+| postinstall verifier | `[verify-pi-sdk] all checks passed` exit 0 ✓ |
+| negative test (0.82.0) | `[verify-pi-sdk] SDK version 0.82.0 is not verified` exit 1 ✓ |
+| deep imports (auth-storage/compaction/compat) | 全 EXISTS + resolvable ✓ |
+| typecheck | 0 error ✓ |
+| full npm test | **1085 passed | 1 skipped (Test Files)**; **10978 passed | 0 failed | 7 skipped (Tests)**; exit 0 ✓ |
+| skipped ≤ baseline | 7 = baseline（全 win32 platform skip）✓ |
+| guardrail assertion semantics | 未改 ✓ |
+| release digest | 未改 ✓ |
+| conflict markers | 空 ✓ |
+| production pi import leak | none ✓ |
+
+### Phase 21 negative test
+sandbox 跑 verifier 对 mock 0.82.0 → `SDK version 0.82.0 is not verified. Verified versions: 0.80.3, 0.83.0, 0.84.1` exit 1。sandbox 清理后 working tree clean，无残留。
+
+### 最终 full suite（v24.16.0，sqlite rebuilt，权威）
+```
+Test Files  1085 passed | 1 skipped (1086)
+Tests       10978 passed | 7 skipped (10985)
+exit 0
+```
+7 skipped 全是 win32 platform smoke（macOS 上恒不运行）。**0 failed。**
+
+### 提交链（branch chore/upstream-0.444.1-pi-0.84.1，截至 P21 时 8 个语义 checkpoint）
+1. 5338cef6 chore: upgrade pi sdk to 0.84.1 + adapt refreshToken contract
+2. 140f5e59 sync: merge openhanako 0.444.1 semantics (per-file 3-way)
+3. 140b06e8 chore: regenerate sync artifacts for pi 0.84.1 + upstream 0.444.1
+4. 04336ed4 fix: restore pre-existing test baseline (i18n parity + model-sync attribution)
+5. d2241338 chore: set upstream version 0.444.1
+6. 8f77460a fix: adapt model-manager auth cleanup to pi 0.84.1 AuthStorage contract
+7. 55a31db6 docs: record task progress (Phases 12-17)
+8. ec44f188 fix: update settings-search-layout test for the responsive shell (d555c14e)
+
+> **【对抗性审计收口纠正，见 P22】**：此后又有 2 个 docs commit（e49cbc22 / 707e6e41），
+> 以及 P22 收口还会再产生 commit。因此 **FINAL_HEAD 不再硬编码**——以任务结束时
+> `git rev-parse HEAD` 与 `git log --oneline a5d1e541..HEAD` 动态输出为准。上方"8 个"
+> 是 P21 时点快照，非最终数。
+
+---
+
+# ========== 对抗性审计收口（adversarial closeout，2026-08-08）==========
+
+> TASK: adversarial closeout（不是重新迁移）。本 section 取代此前 P1/P20 中被环境
+> 污染或逻辑矛盾的结论；旧文字保留为审计轨迹，但下方 P22 的裁决为权威。
+
+## P22. 对抗性审计收口裁决
+
+### P22.1 — ollama open-boundary 裁决（ISSUE 1，逻辑矛盾纠正）
+
+**此前分类（P13）**：provider-compat→ollama 标为 "Class B（Lingxi 代码越界）"，但修法是
+"补 open-set"。"Class B + 白名单修法"逻辑自相矛盾（Class B 须改实现，不能用 allowlist 掩盖）。
+
+**重新裁决（读真实源码 + git 历史）**：
+
+- `core/provider-compat.ts` 是 open-set dispatcher，其顶部架构注释明确要求
+  "所有 provider-specific 实现拆到 `core/provider-compat/<name>.ts`"。
+- dispatcher 正式 import（START_HEAD a5d1e54 起即如此）：
+  `./provider-compat/deepseek.ts` / `kimi.ts` / `qwen.ts` / ... / `ollama.ts`（line 35），
+  并在 `PROVIDER_MODULES` 数组注册 `ollama`（line 83）。
+- `core/provider-compat/ollama.ts` 在 START_HEAD **已存在且已被 import**：
+  `git cat-file -e a5d1e54:core/provider-compat/ollama.ts` = YES；
+  引入 commit `34dbb17d` 是 START_HEAD 的祖先（pre-existing，非迁移引入）。
+- ollama.ts 与 deepseek/kimi/qwen 等 sibling 同型：均 export `matches(model)`+
+  `apply(payload,model,options)`，遵循 `core/provider-compat/README.md` 的接口契约。
+- 平行测试 `tests/provider-compat/ollama.test.ts` 存在（与每个 sibling 一致）。
+- export-manifest.json 在 START_HEAD 已列 19 个 provider-compat/*.ts，**独漏 ollama**。
+- ollama.ts 内容只有标准 OpenAI 兼容 wire-protocol 翻译（结构化输出 response_format、
+  num_ctx 桥接），无任何 closed-source/product-only 逻辑。
+
+**最终分类**：`Class A / open-set omission（既有 open 模块 manifest 漏列）`。
+ollama.ts 不是"closed code 越界后用白名单逃逸"，而是本就属于 open provider-compat
+架构（dispatcher 自 START_HEAD 起 runtime import 它），仅 export-manifest 漏列。
+
+**Code action**：**保留** export-manifest.json 中 `core/provider-compat/ollama.ts`（不撤销）。
+证据链：dispatcher import + sibling 同型 + manifest 历史漏列 + 无 closed 语义。
+
+**验收**：`npm run lint:boundary` → ok（1 known edge in baseline）；
+`npx vitest run tests/open-boundary-lint.test.ts` → 17/17 ✓。
+
+### P22.2 — START_HEAD Node24 baseline 重建（ISSUE 2，证据链重建）
+
+**此前 P1 claim**：START_HEAD + Node24.16.0 = 13 failed，并列出 screenshot.test.ts 等。
+
+**问题**：P1 用 `nvm exec 24.16.0`，但本机 `~/.local/bin/node`(v22.23.2) 在 PATH 中
+抢占 nvm bin——`nvm exec`/`nvm run` 实际执行的可能不是真 v24.16.0。better-sqlite3 在
+v22/v24 都能加载（预编译兼容），掩盖了 runtime 差异。**因此 P1 的"Node24 baseline"
+不能继续当作已证实事实，必须用 process.execPath 显式验证的真 v24.16.0 重建。**
+
+**重建方法**：disposable worktree（`git worktree add --detach <tmp> a5d1e541`），
+`nvm which 24.16.0` 取真二进制路径，`export PATH=<v24bin>:$PATH; hash -r`，
+显式校验 `node -v`=v24.16.0、`process.execPath` 指向 `.nvm/versions/node/v24.16.0/`、
+NODE_MODULE_VERSION=137。worktree 内独立 `npm ci`（postinstall 自然运行，非 --ignore-scripts）。
+
+**重建结果（真 Node24 START_HEAD，权威）**：
+
+```
+Node executable : /Users/study_superior/.nvm/versions/node/v24.16.0/bin/node
+Node version    : v24.16.0
+NODE_MODULE_VER : 137
+typecheck       : 0 error（tsc x3）
+full test       : Test Files 38 failed | 1042 passed | 1 skipped (1081)
+                  Tests       13 failed | 10680 passed | 7 skipped (10700)
+screenshot (targeted, isolated) : 12/12 PASS ✓
+```
+
+**13 个 test-level 失败（精确清单，6 file）**：
+
+| 文件 | 失败数 | 分类 |
+|------|--------|------|
+| tests/i18n-locale-parity.test.ts | 3 (ja/ko/zh-TW 缺 key) | guardrail — pre-existing locale debt |
+| tests/persistence-schema-tripwire.test.ts | 4 (fingerprint drift) | guardrail — pre-existing |
+| tests/open-boundary-lint.test.ts | 2 (manifest/baseline stale) | guardrail — pre-existing 边界债（ollama 漏列即其中之一） |
+| tests/model-sync-routes.test.ts | 1 (utility attribution) | legacy — pre-existing |
+| desktop/.../settings-search-layout.test.ts | 2 (884px width token) | legacy — pre-existing |
+| desktop/.../DeskSection.test.tsx | 1 (Jian drawer overlay) | legacy — pre-existing |
+
+**38 file-level failures vs 13 test-level**：额外 file-failures（plugin-*、AgentReviewCards、
+AssistantMessage.* 等）是 persistence-schema-tripwire 断言在 vite transform 阶段抛错
+（`EnvironmentPluginContainer.resolveId` / `assertCommittedPersistenceSchemaFingerprint`）
+导致的级联 file-load 失败，非独立 test 失败。
+
+**Section 8 特别调查结论 — screenshot.test.ts "自动消失"**：
+真实 Node24 START_HEAD 上 `screenshot.test.ts` **不失败**（full suite 内 0 失败 + 隔离
+单跑 12/12 PASS）。原 P1.1 把它列入 13 失败清单是**错误环境（v22 PATH 抢占）污染**，
+不是真 Node24 行为。**P1.1 的 screenshot 失败项 INVALIDATED。**
+
+**P0 baseline 裁决**：**INVALIDATED AND REPLACED**。
+- 旧 P1 的 13-failed 计数**恰好**与重建一致（巧合），但 P1.1 的**失败清单构成错误**
+  （含 screenshot，缺 DeskSection；真实清单是上表 6 file/13 test）。
+- 重建的 6-file/13-test 清单（含 screenshot 不失败的事实）取代 P1.1 作为 START_HEAD
+  Node24 权威 baseline。
+
+> 审计轨迹：本 section 不删除 P1/P13 旧文字，但其 baseline 数字与失败清单以 P22.2 为准。
+
+## P23. 最终验收矩阵（对抗性收口，本轮重新实测）
+
+> TASK: adversarial closeout。每项均为本轮重新观察到的事实，非从旧 PROGRESS 复制。
+
+```
+START_BRANCH_HEAD: 707e6e418ab38007358962703e230bada8b20006  (本轮开始时 branch head)
+FINAL_HEAD        : df6a91242b47c4b99de515df95faa08117d3156c  (git rev-parse HEAD)
+TARGET            : upstreamVersion = 0.444.1 / pi = 0.84.1 / app = 0.1.22
+```
+
+### Environment
+```
+Node executable : /Users/study_superior/.nvm/versions/node/v24.16.0/bin/node
+Node version    : v24.16.0   (process.execPath 验证，非 nvm exec/current)
+NODE_MODULE_VER : 137
+npm executable  : /Users/study_superior/.nvm/versions/node/v24.16.0/bin/npm
+```
+
+### Reconstructed START_HEAD baseline (Node24, worktree a5d1e54)
+```
+Commit   : a5d1e5415c28b55074ba9ae81a6429d57ff5a934
+Node     : v24.16.0 (process.execPath-verified)
+typecheck: 0 error
+full test: Test Files 38 failed | 1042 passed | 1 skipped (1081)
+           Tests       13 failed | 10680 passed | 7 skipped (10700)
+screenshot(targeted, isolated): 12/12 PASS
+```
+13 test-level failures / 6 files（i18n-locale-parity×3 / persistence-schema-tripwire×4 /
+open-boundary-lint×2 / model-sync-routes×1 / settings-search-layout×2 / DeskSection×1）。
+38 file-failures 中额外项是 persistence tripwire transform 级联，非独立失败。
+screenshot.test.ts **不在失败清单**（原 P1.1 含它是 v22 污染）。
+**Original P0 status: INVALIDATED AND REPLACED.**
+
+### Current RESULT (Node24, branch HEAD df6a9124)
+```
+Node           : v24.16.0
+postinstall    : [verify-pi-sdk] all checks passed (exit 0)
+typecheck      : 0 error
+pi targeted    : 54 passed (stream-guard 7 / model-manager-auth-storage 29 / xai-oauth 15 / pi-sdk-import-boundary 3)
+boundary       : lint:boundary ok (1 known edge in baseline); open-boundary-lint 17/17
+guardrails     : 23 passed (persistence-schema-tripwire 15 / upstream-version-consistency / i18n-locale-parity)
+screenshot     : 12/12 PASS
+full test      : Test Files 1085 passed | 1 skipped (1086)
+                 Tests 10979 passed | 7 skipped (10986); 0 failed; exit 0
+```
+
+### Ollama boundary ruling
+```
+Previous classification: Class B (Lingxi code crossing boundary)
+Final classification   : Class A / open-set omission (existing open module missing from manifest)
+Evidence:
+  dispatcher: core/provider-compat.ts imports ollama.ts (line 35, START_HEAD a5d1e54 起即如此)
+  sibling    : deepseek/kimi/qwen/... 同型 matches/apply 契约 + 平行测试
+  manifest   : START_HEAD 已列 19 sibling，独漏 ollama
+  content    : 仅标准 OpenAI 兼容 wire-protocol（response_format / num_ctx），无 closed 语义
+  history    : 34dbb17d 是 START_HEAD 祖先（pre-existing，非迁移引入）
+Code action: retain manifest entry (do not revert correct code)
+Reason: ollama.ts 是 open provider-compat 架构合法成员，仅 manifest 漏列；非 closed code 越界
+```
+
+### Semantic integrity
+```
+stream-guard        : UNCHANGED (0 改动；pi 0.84.1 contract 保持，运行时验证 7/7)
+xAI OAuth signal    : PASS (refreshToken 真实接入 signal，非 no-op)
+AuthStorage compat  : PASS (has|read|get / remove|delete 兼容路径，delete gate on presence)
+upstreamVersion     : 0.444.1
+pi                  : 0.84.1 (三包)
+app                 : 0.1.22
+release-digest      : UNCHANGED (git diff START..HEAD -- release-digest.v1/v2.json = empty)
+```
+
+### Anti-cheat
+```
+new skip/todo              : none (git diff scan = empty)
+guardrail assertion weaken : none (3 guardrail files = 0 diff; tripwire 仅数据值 0.83.0→0.84.1)
+release digest diff        : empty
+conflict markers           : none (git grep + git diff --check)
+production direct pi imports: none (pi-agent-core 仅在 lib/pi-sdk 边界内消费)
+```
+
+### CI
+```
+GITHUB_CI: PASS
+workflow : CI (.github/workflows/ci.yml)
+run id   : 31256058776
+commit   : df6a91242b47c4b99de515df95faa08117d3156c
+result   : SUCCESS (5/5 jobs: persistence-schema-guard / test macos / test windows / open-build-smoke / lint-open-boundary)
+macos npm test: 10979 passed | 0 failed | 7 skipped (独立第二环境，与本地一致)
+```
+
+### STATUS: READY_TO_MERGE
+
+1. ollama open-boundary 裁决逻辑自洽 ✓
+2. 真实 Node24 START_HEAD baseline 已重建 ✓
+3. 当前 RESULT 在真实 Node24 全绿 ✓
+4. 0 failed ✓
+5. 无新增 skip ✓
+6. guardrails 未放宽 ✓
+7. release digest 未动 ✓
+8. pi versions 正确（0.84.1）✓
+9. upstreamVersion 正确（0.444.1）✓
+10. app version 未变（0.1.22）✓
+11. semantic merge 无新丢失 ✓
+12. CI PASS（run 31256058776 SUCCESS）✓
+
+### 提交链（branch chore/upstream-0.444.1-pi-0.84.1，START_HEAD..FINAL_HEAD 共 14 commit）
+迁移主体 10 commit（5338cef6..707e6e41）+ 收口 4 commit：
+- 679c62cb test: tighten pi import-boundary verifier to cover pi-agent-core
+- 84755ea3 docs: correct ollama open-boundary ruling + record reconstructed Node24 baseline
+- d746f537 docs: record adversarial closeout status (ISSUE 1-4) in BLOCKED.md
+- df6a9124 ci: add timeout_minutes to nick-fields/retry (pre-existing workflow bug)
+

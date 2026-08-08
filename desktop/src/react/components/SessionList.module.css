@@ -206,10 +206,6 @@
     background: var(--accent-light);
 }
 
-.sessionItemPending {
-    box-shadow: inset 2px 0 0 rgba(var(--accent-rgb), 0.38);
-}
-
 .sessionItemTitle {
     font-size: var(--fs-ui);
     color: var(--text);
@@ -223,10 +219,6 @@
 .sessionItemActive .sessionItemTitle {
     color: var(--accent);
     font-weight: 600;
-}
-
-.sessionItemPending .sessionItemTitle {
-    opacity: 0.9;
 }
 
 .sessionItemMeta {
@@ -419,13 +411,10 @@
     flex-shrink: 0;
 }
 
+/* Static state cue only — continuous opacity animation kept the compositor
+   busy under software rendering (esp. WARP). Do not restore infinite pulse. */
 .sessionStreamingDot[data-state="running"] {
-    animation: hana-pulse 2s ease-in-out infinite;
-}
-
-.sessionStreamingDot[data-state="pending"] {
-    opacity: 0.78;
-    animation: hana-pulse 1.2s ease-in-out infinite;
+    opacity: 1;
 }
 
 @media (prefers-reduced-motion: reduce) {

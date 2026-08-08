@@ -11,6 +11,7 @@ import { ComputerUseSection } from './ComputerUseSection';
 import {
   COMPACTION_MODE_EXPERIMENT_ID,
   COMPACTION_MODES,
+  INSTANT_SIMPLE_COMPACTION_EXPERIMENT_ID,
   normalizeCompactionMode,
 } from '../../../../../shared/compaction-mode.ts';
 import styles from '../Settings.module.css';
@@ -407,6 +408,11 @@ export function ExperimentsTab() {
         experiments: applyNextValue(snapshot.preferences.experiments as ExperimentDefinition[]),
       },
     }));
+    const change = { id, value: nextValue };
+    window.dispatchEvent(new CustomEvent('hana-settings', {
+      detail: { type: 'experiment-changed', ...change },
+    }));
+    window.platform?.settingsChanged?.('experiment-changed', change);
     showToast(t('settings.autoSaved'), 'success');
   };
 
@@ -421,6 +427,12 @@ export function ExperimentsTab() {
           {sessionExperiments.map((experiment) => (
             experiment.id === COMPACTION_MODE_EXPERIMENT_ID ? (
               <CompactionModeExperiment
+                key={experiment.id}
+                experiment={experiment}
+                onValueChange={updateExperimentValue}
+              />
+            ) : experiment.id === INSTANT_SIMPLE_COMPACTION_EXPERIMENT_ID ? (
+              <BooleanExperiment
                 key={experiment.id}
                 experiment={experiment}
                 onValueChange={updateExperimentValue}

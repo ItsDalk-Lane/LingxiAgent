@@ -12,7 +12,7 @@ import { useStore } from '../stores';
 import { HOME_DRAFT_KEY } from '../../../../shared/input-drafts.ts';
 import { selectPreviewItems, selectActiveTabId } from '../stores/preview-slice';
 import { sessionScopedListIncludes, sessionScopedValue } from '../stores/session-slice';
-import { isSessionCompacting } from '../stores/context-slice';
+import { getSessionCompactionMode, isSessionCompacting } from '../stores/context-slice';
 import { selectSessionFiles } from '../stores/selectors/file-refs';
 import { isImageFile, isVideoFile } from '../utils/format';
 import { isAudioFileName } from '../utils/file-kind';
@@ -72,7 +72,9 @@ import {
   type SlashItem,
 } from './input/slash-commands';
 import { attachFilesFromPaths } from '../MainContent';
+import { searchDeskFiles } from '../stores/desk-actions';
 import { lingxiFetch } from '../hooks/use-hana-fetch';
+import type { DeskSearchResult } from '../types';
 import styles from './input/InputArea.module.css';
 import type { AudioWaveform, ChatListItem, SessionConfirmationBlock, SessionModel } from '../stores/chat-types';
 
@@ -443,6 +445,7 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
     : null);
   const deletedAgentReadOnly = currentSessionProjection?.agentDeleted === true;
   const compacting = useStore(s => isSessionCompacting(s, currentSessionPath));
+  const compactionMode = useStore(s => getSessionCompactionMode(s, currentSessionPath));
   const screenshotBusy = useStore(s => s.screenshotTaskCount > 0);
   const screenshotProgress = useStore(s => s.screenshotProgress);
   const inlineError = useStore(s => s.currentSessionPath ? (sessionScopedValue(s, s.inlineErrors, s.currentSessionPath) ?? null) : null);
@@ -478,7 +481,7 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
   const compactingStatus = capabilityRefreshing || compacting;
   const compactingStatusLabel = capabilityRefreshing
     ? t('input.refreshAndCompactBusy')
-    : t('chat.compacting');
+    : t(compactionMode === 'lossy_local' ? 'chat.instantSimpleCompaction' : 'chat.compacting');
   const currentModelInfo = sessionModelInfo || globalModelInfo;
   const availableThinkingLevels = useMemo(
     () => getModelThinkingLevels(currentModelInfo),
@@ -521,6 +524,7 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
   const slashBtnRef = useRef<HTMLButtonElement>(null);
   const browserFileInputRef = useRef<HTMLInputElement>(null);
   const slashDismissedTextRef = useRef<string | null>(null);
+  const fileMentionSearchSeqRef = useRef(0);
   const inputSurfaceRef = useRef<HTMLDivElement>(null);
   const inputCardRef = useRef<HTMLDivElement>(null);
   const focusFrameRef = useRef<number | null>(null);
@@ -532,7 +536,8 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
   const [fileSelected, setFileSelected] = useState(0);
   const [fileMentionRange, setFileMentionRange] = useState<FileMentionRange | null>(null);
   const [fileMentionQuery, setFileMentionQuery] = useState('');
-  const [fileMentionBusy] = useState(false);
+  const [fileMentionSearchResults, setFileMentionSearchResults] = useState<DeskSearchResult[]>([]);
+  const [fileMentionBusy, setFileMentionBusy] = useState(false);
   const [continuingDeletedAgentSession, setContinuingDeletedAgentSession] = useState(false);
   const [deletedAgentContinueError, setDeletedAgentContinueError] = useState<string | null>(null);
   const [audioRecorderOpen, setAudioRecorderOpen] = useState(false);
@@ -874,15 +879,50 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
     deskFiles,
     deskBasePath,
     deskCurrentPath: '',
-    searchResults: [],
+    searchResults: fileMentionSearchResults,
+    includeWorkspace: true,
     limit: 20,
   }), [
     attachedFiles,
     deskBasePath,
     deskFiles,
     fileMentionQuery,
+    fileMentionSearchResults,
     sessionFiles,
   ]);
+
+  useEffect(() => {
+    if (!fileMenuOpen) {
+      setFileMentionSearchResults([]);
+      setFileMentionBusy(false);
+      return;
+    }
+
+    const query = fileMentionQuery.trim();
+    const seq = ++fileMentionSearchSeqRef.current;
+    if (!query) {
+      setFileMentionSearchResults([]);
+      setFileMentionBusy(false);
+      return;
+    }
+
+    setFileMentionBusy(true);
+    const timer = window.setTimeout(() => {
+      searchDeskFiles(query)
+        .then((results) => {
+          if (fileMentionSearchSeqRef.current === seq) setFileMentionSearchResults(results);
+        })
+        .catch((err: unknown) => {
+          if (fileMentionSearchSeqRef.current === seq) setFileMentionSearchResults([]);
+          console.warn('[file-mention] search failed', err);
+        })
+        .finally(() => {
+          if (fileMentionSearchSeqRef.current === seq) setFileMentionBusy(false);
+        });
+    }, 120);
+
+    return () => window.clearTimeout(timer);
+  }, [fileMentionQuery, fileMenuOpen]);
 
   const sessionMentionItems = useMemo(() => buildSessionMentionItems({
     sessions,

@@ -301,6 +301,118 @@ describe("NotificationService", () => {
     }]);
   });
 
+  it("surfaces reply_context_unavailable from BridgeManager instead of a coarse missing-target error", async () => {
+    const bridgeManager = {
+      sendProactive: vi.fn().mockResolvedValue({
+        ok: false,
+        error: "reply_context_unavailable",
+        deliveries: [{
+          status: "failed",
+          platform: "wechat",
+          chatId: "wx-user",
+          error: "reply_context_unavailable",
+        }],
+      }),
+    };
+    const service = new NotificationService({
+      emitDesktop: vi.fn(),
+      getBridgeManager: () => bridgeManager,
+    });
+
+    const result = await service.notify(
+      { title: "提醒", body: "正文", channels: ["bridge_owner"] },
+      {
+        agentId: "hana",
+        bridgeDeliveryTarget: {
+          kind: "bridge",
+          platform: "wechat",
+          chatId: "wx-user",
+          sessionKey: "wx_dm_wx-user@hana",
+          agentId: "hana",
+        },
+      },
+    );
+
+    expect(result.ok).toBe(false);
+    expect(result.deliveries[0]).toMatchObject({
+      channel: "bridge_owner",
+      status: "failed",
+      error: "reply_context_unavailable",
+      bridgeDeliveries: [{
+        status: "failed",
+        platform: "wechat",
+        chatId: "wx-user",
+        error: "reply_context_unavailable",
+      }],
+    });
+    expect(result.deliveries[0].error).not.toBe("no bridge owner delivery target available");
+  });
+
+  it("surfaces send_failed from BridgeManager with adapter message on bridge_owner", async () => {
+    const bridgeManager = {
+      sendProactive: vi.fn().mockResolvedValue({
+        ok: false,
+        error: "send_failed",
+        message: "upstream 503",
+        deliveries: [{
+          status: "failed",
+          platform: "wechat",
+          chatId: "wx-user",
+          error: "upstream 503",
+        }],
+      }),
+    };
+    const service = new NotificationService({
+      emitDesktop: vi.fn(),
+      getBridgeManager: () => bridgeManager,
+    });
+
+    const result = await service.notify(
+      { title: "提醒", body: "正文", channels: ["bridge_owner"] },
+      { agentId: "hana" },
+    );
+
+    expect(result.ok).toBe(false);
+    expect(result.deliveries[0]).toMatchObject({
+      channel: "bridge_owner",
+      status: "failed",
+      error: "send_failed",
+      message: "upstream 503",
+      bridgeDeliveries: [{
+        status: "failed",
+        platform: "wechat",
+        chatId: "wx-user",
+        error: "upstream 503",
+      }],
+    });
+  });
+
+  it("surfaces target_missing from BridgeManager when no owner target exists", async () => {
+    const bridgeManager = {
+      sendProactive: vi.fn().mockResolvedValue({
+        ok: false,
+        error: "target_missing",
+        deliveries: [],
+      }),
+    };
+    const service = new NotificationService({
+      emitDesktop: vi.fn(),
+      getBridgeManager: () => bridgeManager,
+    });
+
+    const result = await service.notify(
+      { title: "提醒", body: "正文", channels: ["bridge_owner"] },
+      { agentId: "hana" },
+    );
+
+    expect(result.ok).toBe(false);
+    expect(result.deliveries[0]).toMatchObject({
+      channel: "bridge_owner",
+      status: "failed",
+      error: "target_missing",
+    });
+  });
+
   it("treats explicit desktop and bridge channels as fan-out rather than ordered fallback", async () => {
     const emitDesktop = vi.fn();
     const service = new NotificationService({

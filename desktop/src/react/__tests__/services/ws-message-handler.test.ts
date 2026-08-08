@@ -1099,6 +1099,7 @@ describe('ws-message-handler compaction lifecycle', () => {
       ],
       chatSessions: {},
       compactingSessions: [],
+      compactionModeBySession: {},
       contextTokens: null,
       contextWindow: null,
       contextPercent: null,
@@ -1113,14 +1114,19 @@ describe('ws-message-handler compaction lifecycle', () => {
       type: 'compaction_start',
       sessionPath: '/session/b.jsonl',
       reason: 'threshold',
+      mode: 'lossy_local',
     });
 
     expect(useStore.getState().compactingSessions).toEqual(['/session/b.jsonl']);
+    expect(useStore.getState().compactionModeBySession).toEqual({
+      '/session/b.jsonl': 'lossy_local',
+    });
   });
 
   it('tracks compaction_end and preserves the provided context window when tokens are unknown', () => {
     useStore.setState({
       compactingSessions: ['/session/b.jsonl'],
+      compactionModeBySession: { '/session/b.jsonl': 'lossy_local' },
     } as never);
 
     handleServerMessage({
@@ -1132,6 +1138,7 @@ describe('ws-message-handler compaction lifecycle', () => {
     });
 
     expect(useStore.getState().compactingSessions).toEqual([]);
+    expect(useStore.getState().compactionModeBySession).toEqual({});
     expect(useStore.getState().contextBySession['/session/b.jsonl']).toEqual({
       tokens: null,
       window: 200_000,
@@ -1175,11 +1182,16 @@ describe('ws-message-handler compaction lifecycle', () => {
   });
 
   it('tracks accepted and clears succeeded results by sessionId', () => {
-    handleServerMessage({ type: 'compaction_accepted', sessionId: 'sess_a' });
+    handleServerMessage({ type: 'compaction_accepted', sessionId: 'sess_a', mode: 'lossy_local' });
     expect(useStore.getState().compactingSessions).toEqual(['sess_a']);
+    expect(useStore.getState().compactionModeBySession).toEqual({ sess_a: 'lossy_local' });
+
+    handleServerMessage({ type: 'compaction_start', sessionId: 'sess_a' });
+    expect(useStore.getState().compactionModeBySession).toEqual({ sess_a: 'lossy_local' });
 
     handleServerMessage({ type: 'compaction_result', sessionId: 'sess_a', status: 'succeeded' });
     expect(useStore.getState().compactingSessions).toEqual([]);
+    expect(useStore.getState().compactionModeBySession).toEqual({});
   });
 
   it('clears busy and surfaces noop and failed results', () => {

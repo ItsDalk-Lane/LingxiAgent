@@ -25,8 +25,9 @@
  *   { type: "status", sessionId?: string, sessionPath: "...", isStreaming: bool, streamId?: string|null, turnId?: string|null }
  *   { type: "abort_rejected", reason: "stale_stream", sessionId?: string|null, sessionPath: "...", streamId?: string|null }
  *   { type: "abort_result", status: "accepted"|"already_stopped"|"rejected", reason?: "stale_stream", sessionId?: string|null, sessionPath: "...", streamId?: string|null }  (Stop 的显式结果；streamId 是服务端收到请求时的权威当前流)
- *   { type: "compaction_accepted", sessionId: "...", sessionPath?: "..." }  (sessionPath 仅 locator metadata，不参与身份或状态归属)
- *   { type: "compaction_result", sessionId: "...", sessionPath?: "...", status: "succeeded"|"noop"|"failed", reason?: "...", message?: "..." }  (sessionPath 仅 locator metadata)
+ *   { type: "compact", sessionId: "...", method?: "instant_simple" }  (method 省略时走既有压缩模式；instant_simple 是实验开关保护的一次性动作)
+ *   { type: "compaction_accepted", sessionId: "...", sessionPath?: "...", mode?: "auto"|"cache_preserving"|"pi_compatible"|"lossy_local" }  (lossy_local 只描述一次性运行状态，不是持久化压缩模式；sessionPath 仅 locator metadata，不参与身份或状态归属)
+ *   { type: "compaction_result", sessionId: "...", sessionPath?: "...", mode?: "auto"|"cache_preserving"|"pi_compatible"|"lossy_local", status: "succeeded"|"noop"|"failed", reason?: "...", message?: "..." }  (sessionPath 仅 locator metadata)
  *   { type: "session_title", title: "...", path: "..." }
  *   { type: "jian_update", content: "..." }
  *   { type: "devlog", text: "...", level: "info"|"heartbeat"|"error" }

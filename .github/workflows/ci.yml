@@ -33,6 +33,12 @@ jobs:
         with:
           max_attempts: 3
           retry_wait_seconds: 30
+          # nick-fields/retry@v3（当前 revision）要求显式传 timeout_minutes 或
+          # timeout_seconds，否则直接报 "Must specify either timeout_minutes or
+          # timeout_seconds inputs" 并在 npm ci 执行前就 fail。这是 workflow 自身
+          # 的预存缺陷（@v3 moving tag 在某次 upstream 更新后强制了该 input），
+          # 与本分支迁移无关——补齐 input 以恢复 CI 可用性。
+          timeout_minutes: 15
           command: npm ci
 
       - name: Build Windows sandbox helper

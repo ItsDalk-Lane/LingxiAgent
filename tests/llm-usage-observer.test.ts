@@ -6,6 +6,49 @@ import {
 } from "../lib/llm/usage-observer.ts";
 
 describe("LLM usage observer", () => {
+  // Providers disagree on what "input" counts. OpenAI's prompt_tokens is the
+  // whole prompt with the cached part folded in; Pi SDK and Anthropic report
+  // input as the remainder that was NOT served from cache. Reading the second
+  // shape with the first shape's arithmetic produces a hit ratio far above 1
+  // and an uncached count pinned to zero, which in turn zeroes the input side
+  // of any cost computed from rates. Numbers below are a real ledger record.
+  it("reads Pi SDK input as the uncached remainder, not the whole prompt", () => {
+    const usage = normalizeLlmUsage({
+      input: 337,
+      output: 436,
+      cacheRead: 107008,
+      cacheWrite: 0,
+      totalTokens: 107781,
+    });
+
+    expect(usage.input.uncachedTokens).toBe(337);
+    expect(usage.cache.hitRatio).toBeLessThanOrEqual(1);
+    expect(usage.cache.hitRatio).toBeCloseTo(107008 / 107345, 6);
+  });
+
+  it("keeps the input side of rate-based cost from collapsing to zero", () => {
+    const usage = normalizeLlmUsage(
+      { input: 337, output: 436, cacheRead: 107008, cacheWrite: 0, totalTokens: 107781 },
+      { costRates: { input: 1_000_000, output: 0, cacheRead: 0, cacheWrite: 0 } },
+    );
+
+    expect(usage.costTotal).toBeCloseTo(337, 6);
+  });
+
+  // input_tokens means the opposite thing here than it does on Anthropic: the
+  // whole prompt, with the cached slice broken out under input_tokens_details.
+  it("treats OpenAI Responses input_tokens as the whole prompt", () => {
+    const usage = normalizeLlmUsage({
+      input_tokens: 500,
+      output_tokens: 40,
+      input_tokens_details: { cached_tokens: 400 },
+    });
+
+    expect(usage.input.uncachedTokens).toBe(100);
+    expect(usage.cache.hitRatio).toBeCloseTo(0.8, 6);
+    expect(usage.totalTokens).toBe(540);
+  });
+
   it("normalizes Pi SDK usage and marks cache hits", () => {
     const usage = normalizeLlmUsage({
       input: 1200,
@@ -16,8 +59,10 @@ describe("LLM usage observer", () => {
       cost: { total: 0.042 },
     });
 
+    // input is already the uncached remainder, so all 1200 were paid at full
+    // price; the prompt itself was 1200 + 900 read + 150 written = 2250.
     expect(usage).toEqual({
-      input: { totalTokens: 1200, uncachedTokens: 300 },
+      input: { totalTokens: 1200, uncachedTokens: 1200 },
       output: { totalTokens: 300, reasoningTokens: null },
       cache: {
         readTokens: 900,
@@ -25,7 +70,7 @@ describe("LLM usage observer", () => {
         missTokens: null,
         hit: true,
         created: true,
-        hitRatio: 0.75,
+        hitRatio: 900 / 2250,
         support: "reported",
       },
       totalTokens: 2550,
@@ -41,15 +86,17 @@ describe("LLM usage observer", () => {
       cache_creation_input_tokens: 40,
     });
 
+    // Anthropic bills cache reads and writes separately from input_tokens, so
+    // the full prompt is 100 + 80 + 40 = 220 and none of the 100 was cached.
     expect(usage).toMatchObject({
-      input: { totalTokens: 100, uncachedTokens: 20 },
+      input: { totalTokens: 100, uncachedTokens: 100 },
       output: { totalTokens: 20, reasoningTokens: null },
       cache: {
         readTokens: 80,
         writeTokens: 40,
         hit: true,
         created: true,
-        hitRatio: 0.8,
+        hitRatio: 80 / 220,
         support: "reported",
       },
       totalTokens: 240,

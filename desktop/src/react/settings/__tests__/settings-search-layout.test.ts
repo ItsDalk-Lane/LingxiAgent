@@ -19,12 +19,18 @@ describe('settings search sidebar layout', () => {
     expect(css).toContain('--settings-nav-width: 180px;');
   });
 
-  it('keeps the modal shell at the single 884px width token', () => {
+  it('keeps the modal shell responsive (scales with the main window, no fixed pixel width)', () => {
     const css = readProjectFile('desktop/src/react/components/SettingsModalShell.module.css');
 
-    expect(css).toContain('--settings-shell-width: 884px;');
-    expect(css).toContain('width: min(var(--settings-shell-width), calc(100vw - 2 * var(--space-24)));');
+    // The settings window follows the main window proportionally (commit
+    // d555c14e "设置窗口尺寸自适应"); the fixed 884px token was retired in
+    // favour of a viewport-relative shell. Pin that contract: width and
+    // max-width are both viewport-relative, with no fixed pixel shell width.
+    expect(css).not.toContain('--settings-shell-width: 884px;');
     expect(css).not.toContain('1200px');
+    const cardRule = cssRule(css, '.card');
+    expect(cardRule).toMatch(/width:\s*min\(90vw,\s*calc\(100vw\s*-\s*2\s*\*\s*var\(--space-24\)\)\)/);
+    expect(cardRule).toMatch(/max-width:\s*min\(90vw,\s*calc\(100vw\s*-\s*2\s*\*\s*var\(--space-24\)\)\)/);
   });
 });
 
@@ -63,7 +69,10 @@ describe('settings page width contract', () => {
     const root = cssRule(settingsCss, '.settings-content-root');
 
     expect(card).not.toMatch(/min-width:\s*0;/);
-    expect(card).toMatch(/max-width:\s*min\(var\(--settings-shell-width\),/);
+    // Responsive shell (d555c14e): the card's width bound is viewport-relative,
+    // not the retired --settings-shell-width token. The flex chain still closes
+    // through settings-content-root below.
+    expect(card).toMatch(/max-width:\s*min\(90vw,\s*calc\(100vw\s*-\s*2\s*\*\s*var\(--space-24\)\)\)/);
     expect(root).toMatch(/width:\s*100%/);
     expect(root).toMatch(/flex:\s*1 1 auto/);
     expect(root).toMatch(/min-width:\s*0/);

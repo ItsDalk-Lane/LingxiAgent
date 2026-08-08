@@ -300,6 +300,7 @@
     "stop": "停止",
     "browserScreenshot": "ブラウザスクリーンショット",
     "compacting": "コンテキスト圧縮中",
+    "instantSimpleCompaction": "瞬時簡易コンパクション",
     "visionAuxiliary": "補助ビジョン",
     "fileExpired": "ファイル期限切れ",
     "fileActions": {
@@ -1565,7 +1566,7 @@
       "url": "Base URL",
       "apiKey": "API Key",
       "addBtn": "追加",
-      "empty": "プロバイダーはまだ登録されていません",
+      "empty": "プロバイダーはまだありません。上部の「プロバイダーを追加」から始めてください。",
       "fetchModels": "モデルを取得",
       "delete": "プロバイダーを削除",
       "modelCount": "{n} モデル",
@@ -1594,7 +1595,11 @@
       "addService": "プロバイダーを追加",
       "pickTitle": "プロバイダーを選択",
       "backToList": "プロバイダー一覧に戻る",
-      "empty": "プロバイダーはまだありません。上部の「プロバイダーを追加」から始めてください。"
+      "subtab": {
+        "api": "API を設定",
+        "models": "モデルを設定",
+        "usage": "使用量"
+      }
     },
     "usage": {
       "title": "使用量",
@@ -1785,7 +1790,8 @@
         "audio": "音声入力に対応",
         "reasoning": "推論に対応",
         "tools": "ツール呼び出しに対応"
-      }
+      },
+      "searchConfig": "検索 API 設定"
     },
     "memory": {
       "sectionTitle": "記憶",
@@ -2329,7 +2335,7 @@
     "experiments": {
       "title": "実験機能",
       "compactionTitle": "コンテキストコンパクション",
-      "compactionSectionDescription": "コンパクト時にプロンプトキャッシュの保持と広範な履歴互換性のどちらを優先するかを選択します。",
+      "compactionSectionDescription": "自動コンパクションの既定戦略と、チャットのコンテキストリングに実験的な一回限りの操作を表示するかを設定します。",
       "modelPersonaTitle": "モデルとペルソナ",
       "modelPersonaDescription": "各プロバイダーが Hana のペルソナ、ムード、出力契約にどう適応するかを観察します。",
       "memoryTitle": "メモリ実験",
@@ -2376,10 +2382,14 @@
       },
       "compaction": {
         "title": "コンパクションモード",
-        "description": "Auto はキャッシュ保持型コンパクションを優先します。通常コンパクションは Pi SDK のネイティブ要約を実行し、不安定な履歴形式に適しています。",
+        "description": "Auto はキャッシュ保持型コンパクションを優先します。通常コンパクションは Pi SDK のネイティブ要約を使用します。",
         "auto": "自動",
         "cachePreserving": "キャッシュ保持型コンパクション",
         "piCompatible": "通常コンパクション"
+      },
+      "instantSimpleCompaction": {
+        "title": "瞬時簡易コンパクション",
+        "description": "有効にすると、チャット入力欄のコンテキストリングメニューに「瞬時簡易コンパクション」が追加されます。明示的に開始した一回だけに作用し、自動または通常コンパクションの動作は変更しません。"
       },
       "deepseekRoleplay": {
         "title": "DeepSeek ペルソナ没入パッチ",

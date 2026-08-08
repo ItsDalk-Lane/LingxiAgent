@@ -16,3 +16,107 @@
 
 ---
 （执行中未遇到需上层裁决的收不回操作或拿不准项；原 6 个白名单受限失败已由用户裁决放宽后全部转绿。）
+
+---
+
+# ========== upstream-0.444.1 + pi SDK 0.84.1 迁移任务（2026-08-08）==========
+
+> TASK_ID=upstream-0.444.1_pi-0.84.1。本 section 仅供本任务；上方旧 section 是历史记录。
+
+## 当前状态：无 blocker（STATUS: COMPLETE）
+
+本任务未遇到 Phase 23 定义的真正 blocker。所有验收项达标（详见 PROGRESS.md P20 验收矩阵）。最终 `npm test`（v24.16.0，sqlite rebuilt）：**10978 passed | 0 failed | 7 skipped**，exit 0。
+
+执行中遇到的"看似 blocker、实为正常迁移工作"的项（均已解决，不属 blocker）：
+- Lingxi 与 upstream 无共同 git 祖先 → 不能用 git merge，改逐文件 `git merge-file` 3-way（Phase 5）。
+- pi 0.84.1 `AuthStorage` 删了 has/remove → model-manager auth cleanup 适配（required migration，非 blocker）。
+- pi 0.84.1 OAuth provider `refreshToken` 加 signal 参数 → xai-oauth 适配（required migration）。
+- 衍生产物 stale → 用仓库自带 generator 重生成（Phase 12，非 blocker）。
+- `~/.local/bin/node`(v22) PATH 抢占 nvm → 显式 `export PATH=...v24.16.0/bin` 解决（环境，非 blocker）。
+
+## 遗留风险（非阻塞）
+- **真实 OAuth 登录 / 真实 Provider 网络调用未做人工端到端验证**（无法自动化）：refreshToken 的 signal 接入、AuthStorage has/remove→read/delete 适配、stream-guard 契约保持均用单元测试验证，但真实 OAuth refresh / 真实模型流式未人工跑通。
+- **better-sqlite3 native binary 已为 v24.16.0 (NODE_MODULE_VERSION 137) 重建**；若 CI/其他开发者默认 node 不同，需各自 `npm rebuild better-sqlite3`。这是环境前提，非本任务产物。
+
+---
+
+# ========== 对抗性审计收口（adversarial closeout，2026-08-08）==========
+
+> TASK: adversarial closeout of upstream-0.444.1 + pi 0.84.1 迁移。本 section 记录
+> 收口阶段（ISSUE 1-4）的状态。详见 PROGRESS.md P22。
+
+## STATUS: COMPLETE（本收口阶段）
+## BLOCKERS: none
+
+收口阶段解决了审计指出的 4 个问题，均不构成 merge blocker：
+
+1. **ollama open-boundary 裁决（ISSUE 1）**：纠正 P13 的逻辑矛盾分类。
+   证据（dispatcher import + sibling 同型 + manifest 历史漏列 + 无 closed 语义）证明
+   ollama.ts 是 open provider-compat 架构的合法成员，真实分类为
+   "open-set omission"。manifest addition 保留；仅修正文档分类。boundary lint 17/17 ✓。
+
+2. **START_HEAD Node24 baseline 重建（ISSUE 2）**：原 P1 baseline 经 `nvm exec` 被
+   `~/.local/bin/node`(v22) PATH 抢占，证据链失效。用 disposable worktree + 真
+   process.execPath-verified v24.16.0 重建：13 test-level failures / 6 files。
+   screenshot.test.ts 在真 Node24 **不失败**（12/12），原 P1.1 清单为 v22 污染 →
+   INVALIDATED AND REPLACED。
+
+3. **当前 HEAD Node24 重新验证（ISSUE 3）**：typecheck 0 error；targeted SDK/boundary/
+   guardrail/screenshot 全绿；full suite **10979 passed | 0 failed | 7 skipped**，
+   exit 0（+1 pass 为新增 pi-agent-core 回归测试；7 skipped = baseline win32 platform）。
+
+4. **GitHub CI 证据（ISSUE 4）**：见下方 CI section。
+
+## CI section
+
+**GITHUB_CI: PASS**
+
+仓库 `.github/workflows/ci.yml` 的触发条件：`on.push.branches=[main]` +
+`on.pull_request.branches=[main]`。push 到 `chore/upstream-0.444.1-pi-0.84.1` 不触发
+CI（Situation B）——CI 只在 pull_request → main 时运行。为获得第二环境证据，按
+任务书 Section 16 情况 B 创建 **Draft PR #2**（base=main, head=chore/upstream-0.444.1-pi-0.84.1），
+仅用于触发 CI，**不 merge、不开 auto-merge**。
+
+首个 CI run（31255896664）在 "Install dependencies" 步骤失败——根因是 ci.yml 的
+`nick-fields/retry@v3` 步骤缺少必填的 `timeout_minutes`/`timeout_seconds` input
+（`@v3` moving tag 在 upstream 某次更新后强制了该 input）。这是**预存 workflow 缺陷**
+（ci.yml 在本迁移中未被修改；同一 bug 也使 main 上的 run 31250827363 失败），
+非代码回归。按 Section 17 做最小修复（ci.yml 单步加 `timeout_minutes: 15`，独立 commit，
+不动 release workflow / 权限 / 发布行为），push 后重新触发 CI。
+
+最终 CI run（31256058776，commit df6a9124，pull_request）**全部 5 job 通过**：
+
+```
+workflow : CI (.github/workflows/ci.yml)
+run id    : 31256058776
+commit    : df6a91242b47c4b99de515df95faa08117d3156c
+result    : SUCCESS
+jobs      :
+  ✓ persistence-schema-guard   (7s)
+  ✓ test (macos-latest, 24.15.0) (10m27s) — Test Files 1085 passed | 1 skipped; Tests 10979 passed | 7 skipped (0 failed)
+  ✓ test (windows-latest, 24.15.0) (20m24s)
+  ✓ open-build-smoke           (2m40s)
+  ✓ lint-open-boundary         (48s)
+```
+
+macOS CI 的 `npm test` 实测 **10979 passed | 0 failed | 7 skipped**，与本地 Node24
+结果完全一致——独立第二环境确认。
+
+### CI flake 说明（透明记录）
+
+CI 权威验证 run 是 **31256058776（commit df6a9124，含全部代码 + ci.yml 修复）**：
+macOS + Windows 双平台全绿。其后一个 docs-only commit（2a7626ae，仅 PROGRESS.md /
+BLOCKED.md markdown）触发的 run **31256879632** 在 Windows 上失败——失败是
+`persistence-schema-tripwire > uses real SQLite stores` 的 **test timeout**（10s），
+非断言失败；macOS 仍全绿。
+
+df6a9124 与 2a7626ae 之间 **零代码/测试/workflow 改动**（`git diff` 仅 2 个 .md 文件），
+且同一测试在 df6a9124 的 Windows run 通过、在两次 macOS run 均通过。判定为
+**Windows CI runner 上 SQLite-integration 测试的偶发 timeout flake**（Windows runner
+较慢 + 并发测试负载），非迁移回归。代码 CI 证据以 df6a9124 的全绿 run 为准。
+
+## 遗留风险（非阻塞，收口阶段未变）
+- 真实 OAuth 登录 / 真实 Provider 网络调用未做人工端到端验证（同迁移任务遗留）。
+- better-sqlite3 native binary 为 v24.16.0 重建，CI/其他开发者默认 node 不同时需各自 rebuild。
+- Windows CI runner 上 `persistence-schema-tripwire`（real SQLite）偶发 timeout flake（pre-existing 平台特性，非本迁移引入）。
+

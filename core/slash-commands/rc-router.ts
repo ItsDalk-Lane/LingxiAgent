@@ -1,5 +1,6 @@
 import { collectMediaItems } from "../../lib/tools/media-details.ts";
 import { formatSettingsUpdateText } from "../../lib/tools/settings-update-result.ts";
+import { createVisibleTextAccumulator } from "../../lib/bridge/visible-text-accumulator.ts";
 
 /**
  * rc-router.js — /rc 接管态的消息路由层
@@ -43,27 +44,32 @@ export async function promptAttachedDesktopSession(engine, sessionPath, text, op
 
   // 订阅 text_delta + tool_execution_end（媒体产出）
   // 沿用 executeExternalMessage 的模式（bridge-session-manager.js lines 246-266）
-  let captured = "";
+  const visibleText = createVisibleTextAccumulator();
   const toolMedia = [];
   const unsub = session.subscribe((event) => {
     if (event.type === "message_update") {
       const sub = event.assistantMessageEvent;
       if (sub?.type === "text_delta") {
-        const delta = sub.delta || "";
-        captured += delta;
-        try { opts.onDelta?.(delta, captured); } catch {}
+        const { emittedDelta, text } = visibleText.appendTextDelta(sub.delta || "");
+        try { opts.onDelta?.(emittedDelta, text); } catch {}
       }
+    } else if (event.type === "tool_execution_start") {
+      visibleText.markHiddenToolBoundary();
     } else if (event.type === "tool_execution_end" && !event.isError) {
       toolMedia.push(...collectMediaItems(event.result?.details?.media));
       // 工具产生 card.description 时也并入正文，与 bridge-session-manager 一致
+      let appendedDetail = false;
       const card = event.result?.details?.card;
       if (card?.description) {
-        captured += (captured ? "\n\n" : "") + card.description;
+        visibleText.appendVisibleDetail(card.description);
+        appendedDetail = true;
       }
       const settingsUpdateText = formatSettingsUpdateText(event.result?.details?.settingsUpdate);
       if (settingsUpdateText) {
-        captured += (captured ? "\n\n" : "") + settingsUpdateText;
+        visibleText.appendVisibleDetail(settingsUpdateText);
+        appendedDetail = true;
       }
+      if (!appendedDetail) visibleText.markHiddenToolBoundary();
     }
   });
 
@@ -78,7 +84,7 @@ export async function promptAttachedDesktopSession(engine, sessionPath, text, op
   }
 
   return {
-    text: captured.trim() || null,
+    text: visibleText.getText().trim() || null,
     toolMedia,
   };
 }

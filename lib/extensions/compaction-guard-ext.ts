@@ -237,8 +237,7 @@ export function createCompactionGuardExtension(opts: Record<string, any> = {}) {
       let allowNativeFallback = false;
       try {
         const rawPreparation = event?.preparation;
-        const model = ctx?.model;
-        if (!rawPreparation || !model) return { cancel: true };
+        if (!rawPreparation) return { cancel: true };
 
         const compactionMode = readCompactionMode(event, ctx);
         if (compactionMode === COMPACTION_MODES.PI_COMPATIBLE) {
@@ -246,6 +245,9 @@ export function createCompactionGuardExtension(opts: Record<string, any> = {}) {
           return undefined;
         }
         allowNativeFallback = compactionMode === COMPACTION_MODES.AUTO;
+
+        const model = ctx?.model;
+        if (!model) return { cancel: true };
 
         const contextWindow = model.contextWindow ?? 0;
         if (contextWindow <= 0) return { cancel: true };

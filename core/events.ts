@@ -16,7 +16,7 @@
  *   });
  */
 
-const TAGS = ["mood", "pulse", "reflect"];
+import { inspectLeadingInternalMoodOpener } from "../shared/internal-mood-block.ts";
 
 /** 检查 buffer 末尾是否是 target 的前缀（1..target.length-1 个字符），返回匹配长度 */
 function trailingPrefixLen(buffer, target) {
@@ -28,6 +28,7 @@ function trailingPrefixLen(buffer, target) {
 }
 
 export class MoodParser {
+  declare _allowOpenTag: boolean;
   declare _currentTag: any;
   declare _justEndedMood: any;
   declare buffer: any;
@@ -37,6 +38,7 @@ export class MoodParser {
     this.buffer = "";
     this._justEndedMood = false;
     this._currentTag = null; // 当前打开的标签名
+    this._allowOpenTag = true;
   }
 
   /**
@@ -56,6 +58,7 @@ export class MoodParser {
         emit({ type: "mood_text", data: this.buffer });
       } else {
         emit({ type: "text", data: this.buffer });
+        if (this.buffer.trim().length > 0) this._allowOpenTag = false;
       }
       this.buffer = "";
     }
@@ -63,6 +66,7 @@ export class MoodParser {
       emit({ type: "mood_end" });
       this.inMood = false;
       this._currentTag = null;
+      this._allowOpenTag = false;
     }
   }
 
@@ -71,38 +75,7 @@ export class MoodParser {
     this.buffer = "";
     this._justEndedMood = false;
     this._currentTag = null;
-  }
-
-  _trailingPrefixLen(buffer, target) {
-    return trailingPrefixLen(buffer, target);
-  }
-
-  /**
-   * 在 buffer 中查找最早出现的开始标签
-   * @returns {{ tag: string, idx: number, openTag: string } | null}
-   */
-  _findOpenTag() {
-    let best = null;
-    for (const tag of TAGS) {
-      const openTag = `<${tag}>`;
-      const idx = this.buffer.indexOf(openTag);
-      if (idx !== -1 && (best === null || idx < best.idx)) {
-        best = { tag, idx, openTag };
-      }
-    }
-    return best;
-  }
-
-  /**
-   * 计算所有开始标签在 buffer 末尾的最大前缀匹配长度
-   */
-  _maxTrailingPrefix() {
-    let max = 0;
-    for (const tag of TAGS) {
-      const len = trailingPrefixLen(this.buffer, `<${tag}>`);
-      if (len > max) max = len;
-    }
-    return max;
+    this._allowOpenTag = true;
   }
 
   /** 内部：尽可能多地从 buffer 中提取完整事件 */
@@ -116,26 +89,30 @@ export class MoodParser {
       }
 
       if (!this.inMood) {
-        // 寻找任意开始标签
-        const found = this._findOpenTag();
-        if (found) {
-          const before = this.buffer.slice(0, found.idx);
-          if (before) emit({ type: "text", data: before });
-          emit({ type: "mood_start" });
-          this.inMood = true;
-          this._currentTag = found.tag;
-          this.buffer = this.buffer.slice(found.idx + found.openTag.length);
+        if (!this._allowOpenTag) {
+          emit({ type: "text", data: this.buffer });
+          this.buffer = "";
           continue;
         }
-        // buffer 末尾可能是某个开始标签的前缀
-        const holdLen = this._maxTrailingPrefix();
-        if (holdLen > 0) {
-          const safe = this.buffer.slice(0, -holdLen);
-          if (safe) emit({ type: "text", data: safe });
-          this.buffer = this.buffer.slice(-holdLen);
+
+        const inspection = inspectLeadingInternalMoodOpener(this.buffer);
+        if (inspection.kind === "open") {
+          if (inspection.prefix) emit({ type: "text", data: inspection.prefix });
+          emit({ type: "mood_start" });
+          this.inMood = true;
+          this._currentTag = inspection.tag;
+          this.buffer = inspection.remainder;
+          continue;
+        }
+
+        if (inspection.kind === "pending") {
+          if (inspection.prefix) emit({ type: "text", data: inspection.prefix });
+          this.buffer = inspection.pending;
           break;
         }
+
         emit({ type: "text", data: this.buffer });
+        if (this.buffer.trim().length > 0) this._allowOpenTag = false;
         this.buffer = "";
       } else {
         // 寻找对应的关闭标签
@@ -147,6 +124,7 @@ export class MoodParser {
           emit({ type: "mood_end" });
           this.inMood = false;
           this._justEndedMood = true;
+          this._allowOpenTag = false;
           this.buffer = this.buffer.slice(idx + closeTag.length);
           this._currentTag = null;
           continue;

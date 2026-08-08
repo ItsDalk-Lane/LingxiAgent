@@ -200,6 +200,7 @@ function seedLayeredInputState() {
     pendingSessionSwitchPath: null,
     streamingSessions: [],
     compactingSessions: [sessionPath],
+    compactionModeBySession: {},
     inlineErrors: {},
     screenshotTaskCount: 0,
     screenshotProgress: null,
@@ -309,6 +310,23 @@ describe('InputArea status stack', () => {
     expect(statusBars[0].textContent).toContain('input.refreshAndCompactBusy');
     expect(statusBars[0].textContent).not.toContain('chat.compacting');
     expect(screen.getAllByText('input.refreshAndCompactBusy')).toHaveLength(1);
+  });
+
+  it('labels lossy local compaction as instant simple compaction', () => {
+    const sessionPath = '/session/status-stack.jsonl';
+    useStore.setState({
+      compactionModeBySession: { [sessionPath]: 'lossy_local' },
+      capabilityRefreshingSessions: [],
+      chatSessions: {
+        [sessionPath]: { items: [] },
+      },
+      pendingSessionConfirmationsByPath: {},
+    } as never);
+
+    render(React.createElement(InputArea));
+
+    expect(screen.getByTestId('input-status-bars').textContent)
+      .toContain('chat.instantSimpleCompaction');
   });
 
   it('opens legacy screenshot notice directories in the system file manager', async () => {

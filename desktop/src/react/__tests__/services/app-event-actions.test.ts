@@ -284,6 +284,24 @@ describe('handleAppEvent', () => {
     });
   });
 
+  it('experiment-changed forwards the setting into the main-window browser event', async () => {
+    const { handleAppEvent } = await import('../../services/app-event-actions');
+
+    handleAppEvent('experiment-changed', {
+      id: 'session.instant_simple_compaction',
+      value: true,
+    });
+
+    expect((globalThis as any).window.dispatchEvent).toHaveBeenCalledTimes(1);
+    const event = ((globalThis as any).window.dispatchEvent as any).mock.calls[0][0] as CustomEvent;
+    expect(event.type).toBe('hana-settings');
+    expect(event.detail).toEqual({
+      type: 'experiment-changed',
+      id: 'session.instant_simple_compaction',
+      value: true,
+    });
+  });
+
   it('does not echo desktop IPC network proxy broadcasts back to the main process', async () => {
     const settingsChanged = vi.fn();
     (globalThis as any).window.platform = { settingsChanged };

@@ -581,12 +581,40 @@ describe('SessionList context menu', () => {
 
     const pendingRow = sessionButton('Has summary');
     expect(pendingRow).toHaveAttribute('data-switch-pending', 'true');
-    const dot = pendingRow.querySelector('[data-session-status-dot]');
-    expect(dot).toBeInTheDocument();
-    expect(dot).toHaveAttribute('data-state', 'pending');
 
     const currentRow = sessionButton('No summary');
     expect(currentRow).toHaveAttribute('data-switch-pending', 'false');
+  });
+
+  // 切换会话是本地操作，通常几十毫秒就完成。此前它会借用「正在输出」的状态点，
+  // 结果每次点列表都闪一下，既是视觉噪音，也把「这个会话正在跑」的语义冲淡了。
+  it('shows no status dot while a session switch is loading', () => {
+    useStore.setState({
+      currentSessionPath: '/tmp/agents/hana/sessions/no-summary.jsonl',
+      pendingSessionSwitchPath: '/tmp/agents/hana/sessions/with-summary.jsonl',
+      streamingSessions: [],
+      unreadOutputSessionPaths: [],
+    } as never);
+
+    render(<SessionList />);
+
+    const pendingRow = sessionButton('Has summary');
+    expect(pendingRow.querySelector('[data-session-status-dot]')).not.toBeInTheDocument();
+  });
+
+  it('keeps the running dot on a session that is both switching and streaming', () => {
+    useStore.setState({
+      currentSessionPath: '/tmp/agents/hana/sessions/no-summary.jsonl',
+      pendingSessionSwitchPath: '/tmp/agents/hana/sessions/with-summary.jsonl',
+      streamingSessions: ['/tmp/agents/hana/sessions/with-summary.jsonl'],
+      unreadOutputSessionPaths: [],
+    } as never);
+
+    render(<SessionList />);
+
+    const dot = sessionButton('Has summary').querySelector('[data-session-status-dot]');
+    expect(dot).toBeInTheDocument();
+    expect(dot).toHaveAttribute('data-state', 'running');
   });
 
   it('keeps the status dot after a background session finishes until the user opens it', () => {

@@ -1609,8 +1609,10 @@ const SessionItem = memo(function SessionItem({ session: s, isActive, isPending,
     : null;
   const browserUrl = browserState?.url || null;
   const hasStatusSlot = !!browserUrl;
-  const showStatusDot = isPending || isStreaming || hasUnreadOutput;
-  const statusDotState = isPending ? 'pending' : isStreaming ? 'running' : 'unread';
+  // 状态点只表达「这个会话自己有动静」——正在输出，或后台跑完还没看。
+  // 切换加载不属于会话状态，本地切换又快，画上去只会一闪而过。
+  const showStatusDot = isStreaming || hasUnreadOutput;
+  const statusDotState = isStreaming ? 'running' : 'unread';
   const isSingleLine = rowMode === 'single-line';
   const displayTitle = s.title || s.firstMessage || t('session.untitled');
   const metaText = parts.join(' · ');
@@ -1658,7 +1660,7 @@ const SessionItem = memo(function SessionItem({ session: s, isActive, isPending,
   return (
     <>
       <button
-        className={`${styles.sessionItem}${isSingleLine ? ` ${styles.sessionItemSingleLine}` : ''}${isActive ? ` ${styles.sessionItemActive}` : ''}${isPending ? ` ${styles.sessionItemPending}` : ''}${isDeletedAgentSession ? ` ${styles.sessionItemReadOnly}` : ''}`}
+        className={`${styles.sessionItem}${isSingleLine ? ` ${styles.sessionItemSingleLine}` : ''}${isActive ? ` ${styles.sessionItemActive}` : ''}${isDeletedAgentSession ? ` ${styles.sessionItemReadOnly}` : ''}`}
         data-session-path={s.path}
         data-row-mode={rowMode}
         data-unread-output={hasUnreadOutput ? 'true' : 'false'}

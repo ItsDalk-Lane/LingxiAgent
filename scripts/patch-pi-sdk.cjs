@@ -19,8 +19,8 @@ const path = require("path");
 const root = path.join(__dirname, "..");
 const sdkRoot = path.join(root, "node_modules", "@earendil-works", "pi-coding-agent");
 const piAiRoot = path.join(root, "node_modules", "@earendil-works", "pi-ai");
-const verifiedVersions = new Set(["0.80.3", "0.83.0"]);
-const verifiedPiAiVersions = new Set(["0.80.3", "0.83.0"]);
+const verifiedVersions = new Set(["0.80.3", "0.83.0", "0.84.1"]);
+const verifiedPiAiVersions = new Set(["0.80.3", "0.83.0", "0.84.1"]);
 
 function fail(message) {
   console.error(`[verify-pi-sdk] ${message}`);
@@ -69,9 +69,14 @@ for (const marker of expectedExportMarkers) {
   }
 }
 
+// 生产 import 边界：lib/pi-sdk 是所有 pi SDK production imports 的唯一边界。
+// 扫描 core/server/lib/hub，禁止越界直接 import @earendil-works/*（lib/pi-sdk 除外）。
+// pi-ai / pi-coding-agent / pi-agent-core 三个包一视同仁——任一直接 import 都算泄漏。
+// （此前 regex 漏列 pi-agent-core；当前虽无生产泄漏——lib/pi-sdk/index.ts 从它
+//  re-export runAgentLoop 等属合法边界内消费——补齐以闭合静态覆盖。）
 const scanDirs = ["core", "server", "lib", "hub"].map(d => path.join(root, d));
 const adapterDir = path.join(root, "lib", "pi-sdk");
-const importPattern = /(?:from\s+["']@(?:mariozechner|earendil-works)\/(?:pi-ai|pi-coding-agent)|import\s*\(\s*["']@(?:mariozechner|earendil-works)\/(?:pi-ai|pi-coding-agent)|require\s*\(\s*["']@(?:mariozechner|earendil-works)\/(?:pi-ai|pi-coding-agent))/;
+const importPattern = /(?:from\s+["']@(?:mariozechner|earendil-works)\/(?:pi-ai|pi-coding-agent|pi-agent-core)|import\s*\(\s*["']@(?:mariozechner|earendil-works)\/(?:pi-ai|pi-coding-agent|pi-agent-core)|require\s*\(\s*["']@(?:mariozechner|earendil-works)\/(?:pi-ai|pi-coding-agent|pi-agent-core))/;
 const leaks = [];
 
 function scanDir(dir) {

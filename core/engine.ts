@@ -56,6 +56,7 @@ import { loadLocale } from "../lib/i18n.ts";
 import { createApprovalGateway, createModelApprovalReviewer } from "../lib/approval-gateway.ts";
 import { callText } from "./llm-client.ts";
 import { SESSION_APPROVAL_POLICIES } from "./session-permission-mode.ts";
+import { readCompiledResetAt } from "../lib/memory/compiled-memory-state.ts";
 
 /** 已知的外部 AI 工具技能目录（相对 $HOME） */
 export const WELL_KNOWN_SKILL_PATHS = [
@@ -1434,6 +1435,26 @@ export class LingxiEngine {
       moduleLog.warn(`Session manifest lookup failed for ${path.basename(sessionPath || "")}: ${error?.message || error}`);
       return null;
     }
+  }
+
+  getLossyLocalCompactionSummarySource(sessionPath) {
+    const sessionId = this.getSessionIdForPath(sessionPath);
+    if (!sessionId) {
+      throw new Error("Instant local compaction could not resolve the session identity");
+    }
+    const ownership = this.resolveSessionOwnership({ sessionId, sessionPath });
+    const agent = ownership?.agentId ? this._agentMgr.getAgent(ownership.agentId) : null;
+    if (!agent?.summaryManager) {
+      throw new Error("Instant local compaction could not resolve the session's summary owner");
+    }
+    const record = agent.summaryManager.getSummary(sessionId);
+    return {
+      summary: record?.summary || "",
+      cursor: record?.cursor || null,
+      createdAt: record?.created_at || null,
+      updatedAt: record?.updated_at || null,
+      resetAt: readCompiledResetAt(path.dirname(agent.summariesDir)),
+    };
   }
 
   _openSessionManifestStore() {

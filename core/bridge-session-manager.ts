@@ -42,6 +42,7 @@ import {
   bridgeContextIndexMeta,
   buildBridgeContext,
 } from "../lib/bridge/bridge-context.ts";
+import { createVisibleTextAccumulator } from "../lib/bridge/visible-text-accumulator.ts";
 import {
   buildFreshCompactMetaPatch,
   buildFreshCompactSnapshot,
@@ -1108,7 +1109,7 @@ export class BridgeSessionManager {
    */
   async executeExternalMessage(prompt, sessionKey, meta, opts: any = {}) {
     // 捕获状态提升到 try 外：错误路径（含 transport throw）也必须拿得到已生成内容（#1607）
-    let capturedText = "";
+    const visibleText = createVisibleTextAccumulator();
     let providerErrorMessage = null;
     // 工具 details.media 收集器（被动提取 tool_execution_end 事件）
     const toolMediaUrls = [];
@@ -1309,7 +1310,7 @@ export class BridgeSessionManager {
         message: displayMessage,
       }, activeSessionPath);
 
-      // 捕获文本输出（capturedText / providerErrorMessage 声明见方法顶部）
+      // 捕获文本输出（visibleText / providerErrorMessage 声明见方法顶部）
       const unsub = session.subscribe((event) => {
         recordBridgeAssistantUsage({
           ledger: this._deps.getUsageLedger?.(),
@@ -1322,12 +1323,14 @@ export class BridgeSessionManager {
         if (event.type === "message_update") {
           const sub = event.assistantMessageEvent;
           if (sub?.type === "text_delta") {
-            const delta = sub.delta || "";
-            capturedText += delta;
-            try { opts.onDelta?.(delta, capturedText); } catch {}
+            const { emittedDelta, text } = visibleText.appendTextDelta(sub.delta || "");
+            try { opts.onDelta?.(emittedDelta, text); } catch {}
           }
+        } else if (event.type === "tool_execution_start") {
+          visibleText.markHiddenToolBoundary();
         } else if (event.type === "tool_execution_end" && !event.isError) {
           toolMediaUrls.push(...collectMediaItems(event.result?.details?.media));
+          let appendedDetail = false;
           const automationSuggestionText = formatAutomationSuggestionText(
             event.result?.details?.automationSuggestion || event.result?.details?.automationSuggestions,
             {
@@ -1336,16 +1339,20 @@ export class BridgeSessionManager {
             },
           );
           if (automationSuggestionText) {
-            capturedText += (capturedText ? "\n\n" : "") + automationSuggestionText;
+            visibleText.appendVisibleDetail(automationSuggestionText);
+            appendedDetail = true;
           }
           const card = event.result?.details?.card;
           if (card?.description) {
-            capturedText += (capturedText ? "\n\n" : "") + card.description;
+            visibleText.appendVisibleDetail(card.description);
+            appendedDetail = true;
           }
           const settingsUpdateText = formatSettingsUpdateText(event.result?.details?.settingsUpdate);
           if (settingsUpdateText) {
-            capturedText += (capturedText ? "\n\n" : "") + settingsUpdateText;
+            visibleText.appendVisibleDetail(settingsUpdateText);
+            appendedDetail = true;
           }
+          if (!appendedDetail) visibleText.markHiddenToolBoundary();
         }
         const messageEndError = getProviderMessageEndError(event);
         if (messageEndError) providerErrorMessage = messageEndError;
@@ -1439,7 +1446,7 @@ export class BridgeSessionManager {
         debugLog()?.log("bridge-session", `tool media → ${toolMediaUrls.length} url(s) via details.media`);
       }
       return buildExternalMessageResult({
-        capturedText,
+        capturedText: visibleText.getText(),
         toolMedia: toolMediaUrls,
         error: providerErrorMessage,
       });
@@ -1447,7 +1454,7 @@ export class BridgeSessionManager {
       if (isAbortLikeError(err)) return null;
       log.error(`external message failed (${sessionKey}): ${err.message}`);
       return buildExternalMessageResult({
-        capturedText,
+        capturedText: visibleText.getText(),
         toolMedia: toolMediaUrls,
         // message_end 携带的 provider 错误（若有）比 transport throw 更贴近根因，优先保留
         error: providerErrorMessage || err.message || String(err),
