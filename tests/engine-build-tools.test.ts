@@ -287,15 +287,12 @@ describe("LingxiEngine.buildTools", () => {
       agentId: "hana",
     } as any);
     engines.push(engine);
-    engine.resolveUtilityConfigFresh = vi.fn(async () => ({
-      utility: { id: "small-reviewer", provider: "test" },
-      utility_large: { id: "large-reviewer", provider: "test" },
+    engine.resolveAuxiliaryModelFresh = vi.fn(async () => ({
       api: "openai-completions",
-      api_key: "small-key",
-      base_url: "https://small.example.test",
-      large_api: "openai-completions",
-      large_api_key: "large-key",
-      large_base_url: "https://large.example.test",
+      apiKey: "approval-key",
+      baseUrl: "https://approval.example.test",
+      headers: {},
+      model: { id: "approval-reviewer", provider: "test" },
     }));
     // The approval reviewer now speaks the authorization schema (verdict +
     // scopeRelation), not the legacy action shape.
@@ -319,15 +316,15 @@ describe("LingxiEngine.buildTools", () => {
       reversibility: "moderate",
     });
 
-    expect(engine.resolveUtilityConfigFresh).toHaveBeenCalledWith(expect.objectContaining({
-      agentId: "hana",
-    }));
-    // The single intent reviewer resolves to the utility (small) model. The
-    // large utility model is NOT consulted for approval any more.
+    // The approval reviewer resolves from the semantic "approval" slot.
+    expect(engine.resolveAuxiliaryModelFresh).toHaveBeenCalledWith(
+      "approval",
+      expect.objectContaining({ agentId: "hana" }),
+    );
     expect(engine._callApprovalReviewerText).toHaveBeenCalledWith(expect.objectContaining({
-      model: { id: "small-reviewer", provider: "test" },
-      apiKey: "small-key",
-      baseUrl: "https://small.example.test",
+      model: { id: "approval-reviewer", provider: "test" },
+      apiKey: "approval-key",
+      baseUrl: "https://approval.example.test",
     }));
     expect(engine._callApprovalReviewerText).toHaveBeenCalledTimes(1);
     expect(decision).toMatchObject({
@@ -337,7 +334,7 @@ describe("LingxiEngine.buildTools", () => {
     });
   });
 
-  it("resolves utility config through the session owner when only sessionPath is known", () => {
+  it("resolves auxiliary model through the session owner when only sessionPath is known", async () => {
     const sessionPath = "/tmp/agents/target/sessions/s1.jsonl";
     const engine = Object.create(LingxiEngine.prototype);
     engine._agentMgr = { activeAgentId: "focus" };
@@ -347,22 +344,29 @@ describe("LingxiEngine.buildTools", () => {
       const agentId = sp ? engine.agentIdFromSessionPath?.(sp) || null : null;
       return { agentId, source: agentId ? "path" : "none", agentDeleted: false };
     });
-    engine._configCoord = {
-      resolveUtilityConfig: vi.fn(() => ({ utility: { id: "target-utility" } })),
+    // The auxiliary resolver routes through the session owner's agentId.
+    engine._auxResolver = {
+      resolveAuxiliaryModelFresh: vi.fn(async () => ({
+        api: "openai",
+        apiKey: "key",
+        baseUrl: "https://example.test",
+        headers: {},
+        model: { id: "target-summarize" },
+      })),
     };
     engine._usageLedger = { id: "ledger" };
     engine.getSessionIdForPath = vi.fn(() => "sess_target_1");
 
-    const result = engine.resolveUtilityConfig({ sessionPath });
+    const result = await engine.resolveAuxiliaryModelFresh("summarize", { sessionPath });
 
     expect(engine.agentIdFromSessionPath).toHaveBeenCalledWith(sessionPath);
     expect(engine.getSessionIdForPath).toHaveBeenCalledWith(sessionPath);
-    expect(engine._configCoord.resolveUtilityConfig).toHaveBeenCalledWith({
-      sessionPath,
-      agentId: "target",
-    });
+    expect(engine._auxResolver.resolveAuxiliaryModelFresh).toHaveBeenCalledWith(
+      "summarize",
+      { sessionPath, agentId: "target" },
+    );
     expect(result).toMatchObject({
-      utility: { id: "target-utility" },
+      model: { id: "target-summarize" },
       usageAgentId: "target",
       usageSessionPath: sessionPath,
       usageSessionId: "sess_target_1",

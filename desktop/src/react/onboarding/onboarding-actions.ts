@@ -135,11 +135,6 @@ function recordAgentConfig(plan: OnboardingVerificationPlan | undefined, patch: 
   mergeExpected(plan.agentConfig, withoutSecrets(patch) as JsonObject);
 }
 
-function recordPreferenceModels(plan: OnboardingVerificationPlan | undefined, patch: JsonObject): void {
-  if (!plan) return;
-  mergeExpected(plan.preferenceModels, withoutSecrets(patch) as JsonObject);
-}
-
 function recordRequiredAgentSecret(plan: OnboardingVerificationPlan | undefined, path: string[]): void {
   if (!plan) return;
   const serialized = JSON.stringify(path);
@@ -365,8 +360,6 @@ interface SaveModelParams {
   selectedModel: string;
   providerName: string;
   addedModels: AddedModelEntry[];
-  selectedUtility: string;
-  selectedUtilityLarge: string;
   verificationPlan?: OnboardingVerificationPlan;
 }
 
@@ -390,8 +383,6 @@ export async function saveModel({
   selectedModel,
   providerName,
   addedModels,
-  selectedUtility,
-  selectedUtilityLarge,
   verificationPlan,
 }: SaveModelParams): Promise<void> {
   // Save chat model
@@ -414,21 +405,6 @@ export async function saveModel({
   });
   await requireMutation(providerModelsRes, 'Saving provider models');
   recordAgentConfig(verificationPlan, providerModelsPatch);
-
-  // Save utility models to global preferences
-  if (selectedUtility || selectedUtilityLarge) {
-    const utilityModels: Record<string, { id: string; provider: string }> = {};
-    if (selectedUtility) utilityModels.utility = { id: selectedUtility, provider: providerName };
-    if (selectedUtilityLarge) utilityModels.utility_large = { id: selectedUtilityLarge, provider: providerName };
-    const preferencesPatch = { models: utilityModels };
-    const preferencesRes = await lingxiFetch('/api/preferences/models', {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(preferencesPatch),
-    });
-    await requireMutation(preferencesRes, 'Saving utility models');
-    recordPreferenceModels(verificationPlan, preferencesPatch);
-  }
 }
 
 // ── Save locale ──

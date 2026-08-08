@@ -188,13 +188,10 @@ describe("secret custody across HTTP routes", () => {
   it("masks global preference secrets and resolves masked updates back to saved values", async () => {
     const { createPreferencesRoute } = await import("../server/routes/preferences.ts");
     const setSearchConfig = vi.fn();
-    const setUtilityApi = vi.fn();
     const engine = {
       getSharedModels: () => ({}),
       getSearchConfig: () => ({ provider: "tavily", api_key: "tvly-secret" }),
-      getUtilityApi: () => ({ provider: "openai", base_url: "https://api.example/v1", api_key: "sk-utility" }),
       setSearchConfig,
-      setUtilityApi,
       emitEvent: vi.fn(),
     };
     const app = new Hono();
@@ -203,26 +200,19 @@ describe("secret custody across HTTP routes", () => {
     const readRes = await app.request("/api/preferences/models");
     const readBody = await readRes.json();
     expect(readBody.search.api_key).toBe(MASKED_SECRET);
-    expect(readBody.utility_api.api_key).toBe(MASKED_SECRET);
+    expect(readBody.utility_api).toBeUndefined();
     expect(JSON.stringify(readBody)).not.toContain("tvly-secret");
-    expect(JSON.stringify(readBody)).not.toContain("sk-utility");
 
     const writeRes = await app.request("/api/preferences/models", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         search: { provider: "tavily", api_key: MASKED_SECRET },
-        utility_api: { provider: "openai", base_url: "https://new.example/v1", api_key: MASKED_SECRET },
       }),
     });
 
     expect(writeRes.status).toBe(200);
     expect(setSearchConfig).toHaveBeenCalledWith({ provider: "tavily", api_key: "tvly-secret" });
-    expect(setUtilityApi).toHaveBeenCalledWith({
-      provider: "openai",
-      base_url: "https://new.example/v1",
-      api_key: "sk-utility",
-    });
   });
 
   it("masks bridge secrets in status and preserves masked config updates", async () => {

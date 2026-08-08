@@ -1,13 +1,13 @@
 /**
  * LLM Utilities — 轻量 LLM 调用（标题摘要、翻译、ID 生成等）
  *
- * 纯函数模块，不持有状态。调用方传入 utilConfig（model/api_key/base_url）。
- * 从 Engine 提取，消除 5 处重复的 fetch 模式。
+ * 纯函数模块，不持有状态。调用方传入 resolved 辅助模型配置
+ *（resolveAuxiliaryModelFresh 的结果：api/apiKey/baseUrl/headers/model +
+ *  usageLedger/usageAgentId/usageSessionId/usageSessionPath）。
  */
 import fs from "fs";
 import path from "path";
 import { callText } from "./llm-client.ts";
-import { callTextConfigFromUtilityConfig } from "./model-execution-config.ts";
 import { callTextWithLengthContract, type OutputLengthContract } from "./output-length-contract.ts";
 import { getLocale } from "../lib/i18n.ts";
 import { normalizePlainDescription } from "../lib/text/internal-narration.ts";
@@ -107,10 +107,10 @@ async function callLlm({
   }) as Promise<string>;
 }
 
-function utilityUsageContext(utilConfig, operation, trigger = "tool") {
-  const agentId = utilConfig?.usageAgentId || null;
-  const sessionId = utilConfig?.usageSessionId || null;
-  const sessionPath = utilConfig?.usageSessionPath || null;
+function auxiliaryUsageContext(resolved, operation, trigger = "tool") {
+  const agentId = resolved?.usageAgentId || null;
+  const sessionId = resolved?.usageSessionId || null;
+  const sessionPath = resolved?.usageSessionPath || null;
   return {
     source: {
       subsystem: "utility",
@@ -210,16 +210,15 @@ export function buildLocalSummary(assistantText, toolCalls) {
 
 /**
  * 生成对话标题
- * @param {object} utilConfig - resolveUtilityConfig() 结果
+ * @param {object} resolved - resolveAuxiliaryModelFresh("title") 结果（含 usage 归因）
  * @param {string} userText
  * @param {string} assistantText
  * @param {{ timeoutMs?: number, signal?: AbortSignal }} [opts]
  */
-export async function summarizeTitle(utilConfig, userText, assistantText, opts: { timeoutMs?: number; signal?: AbortSignal } = {}) {
+export async function summarizeTitle(resolved, userText, assistantText, opts: { timeoutMs?: number; signal?: AbortSignal } = {}) {
   try {
     const isZh = getLocale().startsWith("zh");
-    const execution = callTextConfigFromUtilityConfig(utilConfig);
-    if (!execution.model || !execution.baseUrl || !execution.api) return null;
+    if (!resolved?.model || !resolved?.baseUrl || !resolved?.api) return null;
 
     const systemContent = isZh
       ? `你是一个对话标题生成器。根据用户和助手的第一轮对话，用一句极短的话概括对话主题。
@@ -241,7 +240,11 @@ Rules:
     const assistantLabel = isZh ? "助手" : "Assistant";
 
     return await callLlm({
-      ...execution,
+      api: resolved.api,
+      apiKey: resolved.apiKey,
+      baseUrl: resolved.baseUrl,
+      headers: resolved.headers,
+      model: resolved.model,
       messages: [
         { role: "system", content: systemContent },
         {
@@ -260,8 +263,8 @@ Rules:
       }),
       timeoutMs: opts.timeoutMs,
       signal: opts.signal,
-      usageLedger: utilConfig.usageLedger,
-      usageContext: utilityUsageContext(utilConfig, "title", "user"),
+      usageLedger: resolved.usageLedger,
+      usageContext: auxiliaryUsageContext(resolved, "title", "user"),
     });
   } catch (err) {
     // AbortError（超时）不算失败，静默返回 null 让调用方走 fallback
@@ -274,16 +277,19 @@ Rules:
 /**
  * 批量翻译技能名称
  */
-export async function translateSkillNames(utilConfig, names, lang) {
+export async function translateSkillNames(resolved, names, lang) {
   if (!names.length) return {};
   const LANG_LABEL = { zh: "中文", ja: "日本語", ko: "한국어" };
   const label = LANG_LABEL[lang] || lang;
   try {
-    const execution = callTextConfigFromUtilityConfig(utilConfig);
-    if (!execution.model || !execution.baseUrl || !execution.api) return {};
+    if (!resolved?.model || !resolved?.baseUrl || !resolved?.api) return {};
     const isZh = getLocale().startsWith("zh");
     const text = await callLlm({
-      ...execution,
+      api: resolved.api,
+      apiKey: resolved.apiKey,
+      baseUrl: resolved.baseUrl,
+      headers: resolved.headers,
+      model: resolved.model,
       messages: [
         {
           role: "system",
@@ -295,8 +301,8 @@ export async function translateSkillNames(utilConfig, names, lang) {
       ],
       temperature: 0,
       max_tokens: 200,
-      usageLedger: utilConfig.usageLedger,
-      usageContext: utilityUsageContext(utilConfig, "translate_skill_names", "startup"),
+      usageLedger: resolved.usageLedger,
+      usageContext: auxiliaryUsageContext(resolved, "translate_skill_names", "startup"),
     });
     if (!text) return {};
     const jsonMatch = text.match(/\{[\s\S]*\}/);
@@ -308,12 +314,12 @@ export async function translateSkillNames(utilConfig, names, lang) {
 }
 
 /**
- * 为活动 session 生成摘要（用 utility_large 模型）
- * @param {object} utilConfig - resolveUtilityConfig() 结果
+ * 为活动 session 生成摘要（用 summarize slot 模型）
+ * @param {object} resolved - resolveAuxiliaryModelFresh("summarize") 结果
  * @param {string} sessionPath
  * @param {(text: string, level?: string) => void} [emitDevLog]
  */
-export async function summarizeActivity(utilConfig, sessionPath, emitDevLog, preloaded) {
+export async function summarizeActivity(resolved, sessionPath, emitDevLog, preloaded) {
   const log = emitDevLog || (() => {});
   const isZh = getLocale().startsWith("zh");
   try {
@@ -335,9 +341,8 @@ export async function summarizeActivity(utilConfig, sessionPath, emitDevLog, pre
           ? `\n\n调用的工具：${[...new Set(toolCalls)].join("、")}`
           : `\n\nTools used: ${[...new Set(toolCalls)].join(", ")}`)
       : "";
-    const execution = callTextConfigFromUtilityConfig(utilConfig, "utility_large");
-    if (!execution.model || !execution.baseUrl || !execution.api) {
-      log("[summarize] utility_large config incomplete, skipping");
+    if (!resolved?.model || !resolved?.baseUrl || !resolved?.api) {
+      log("[summarize] summarize model config incomplete, skipping");
       return null;
     }
 
@@ -365,7 +370,11 @@ Rules:
     const { text } = await callTextWithLengthContract({
       callText,
       request: {
-        ...execution,
+        api: resolved.api,
+        apiKey: resolved.apiKey,
+        baseUrl: resolved.baseUrl,
+        headers: resolved.headers,
+        model: resolved.model,
         signal: undefined,
         messages: [
           { role: "system", content: systemContent },
@@ -375,8 +384,8 @@ Rules:
           },
         ],
         temperature: 0.3,
-        usageLedger: utilConfig.usageLedger,
-        usageContext: utilityUsageContext(utilConfig, "activity_summary", "scheduled"),
+        usageLedger: resolved.usageLedger,
+        usageContext: auxiliaryUsageContext(resolved, "activity_summary", "scheduled"),
       },
       contract: localeLengthContract({
         isZh,
@@ -398,11 +407,11 @@ Rules:
 }
 
 /**
- * 快速摘要（用 utility 小模型）
- * @param {object} utilConfig
+ * 快速摘要（用 summarize slot 模型）
+ * @param {object} resolved - resolveAuxiliaryModelFresh("summarize") 结果
  * @param {string} sessionPath - activity session 文件绝对路径
  */
-export async function summarizeActivityQuick(utilConfig, sessionPath) {
+export async function summarizeActivityQuick(resolved, sessionPath) {
   if (!fs.existsSync(sessionPath)) return null;
   const isZh = getLocale().startsWith("zh");
   try {
@@ -411,8 +420,7 @@ export async function summarizeActivityQuick(utilConfig, sessionPath) {
     });
     if (!userText && !assistantText) return null;
 
-    const execution = callTextConfigFromUtilityConfig(utilConfig);
-    if (!execution.model || !execution.baseUrl || !execution.api) return null;
+    if (!resolved?.model || !resolved?.baseUrl || !resolved?.api) return null;
 
     const systemContent = isZh
       ? `根据 Agent 的巡检上下文和执行结果，用一两句话概括它做了什么。目标约 30 字，可在 18-60 字之间自然浮动。中文，直接输出。`
@@ -424,7 +432,11 @@ export async function summarizeActivityQuick(utilConfig, sessionPath) {
     const { text } = await callTextWithLengthContract({
       callText,
       request: {
-        ...execution,
+        api: resolved.api,
+        apiKey: resolved.apiKey,
+        baseUrl: resolved.baseUrl,
+        headers: resolved.headers,
+        model: resolved.model,
         signal: undefined,
         messages: [
           { role: "system", content: systemContent },
@@ -434,8 +446,8 @@ export async function summarizeActivityQuick(utilConfig, sessionPath) {
           },
         ],
         temperature: 0.3,
-        usageLedger: utilConfig.usageLedger,
-        usageContext: utilityUsageContext(utilConfig, "activity_summary_quick", "scheduled"),
+        usageLedger: resolved.usageLedger,
+        usageContext: auxiliaryUsageContext(resolved, "activity_summary_quick", "scheduled"),
       },
       contract: localeLengthContract({
         isZh,
@@ -494,18 +506,21 @@ function findAvailableAgentId(base, agentsDir, max = 99) {
  *   3. base 拿到后探测 base / base-2 / ... / base-99，找到空位就用
  *   4. 上述全失败 → 时间戳兜底 `agent-xxxxxx`（几乎不可能冲突，再兜底一次防万一）
  *
- * @param {object} utilConfig
+ * @param {object} resolved - resolveAuxiliaryModelFresh("title") 结果
  * @param {string} name - 显示名
  * @param {string} agentsDir - agents 根目录（检查冲突）
  */
-export async function generateAgentId(utilConfig, name, agentsDir) {
+export async function generateAgentId(resolved, name, agentsDir) {
   let base = "";
 
   try {
     const isZh = getLocale().startsWith("zh");
-    const execution = callTextConfigFromUtilityConfig(utilConfig);
     const text = await callLlm({
-      ...execution,
+      api: resolved?.api,
+      apiKey: resolved?.apiKey,
+      baseUrl: resolved?.baseUrl,
+      headers: resolved?.headers,
+      model: resolved?.model,
       messages: [
         {
           role: "system",
@@ -537,8 +552,8 @@ Examples:
         },
         { role: "user", content: name },
       ],
-      usageLedger: utilConfig.usageLedger,
-      usageContext: utilityUsageContext(utilConfig, "generate_agent_id", "manual"),
+      usageLedger: resolved?.usageLedger,
+      usageContext: auxiliaryUsageContext(resolved, "generate_agent_id", "manual"),
     });
 
     base = sanitizeAgentId(text);
@@ -566,15 +581,14 @@ Examples:
 
 /**
  * 为 agent 生成能力描述摘要
- * @param {object} utilConfig - resolveUtilityConfig() 返回值
+ * @param {object} resolved - resolveAuxiliaryModelFresh("summarize") 结果
  * @param {string} personality - Agent.descriptionSource 全文（identity + ishiki，不含 yuan 运行协议）
  * @param {string} locale - agent 的 config.locale（"zh" / "en" 等）
  * @returns {Promise<string|null>}
  */
-export async function generateDescription(utilConfig, personality, locale) {
+export async function generateDescription(resolved, personality, locale) {
   try {
-    const execution = callTextConfigFromUtilityConfig(utilConfig);
-    if (!execution.model || !execution.baseUrl || !execution.api) return null;
+    if (!resolved?.model || !resolved?.baseUrl || !resolved?.api) return null;
 
     const isZh = String(locale || "").startsWith("zh");
     const systemContent = isZh
@@ -582,7 +596,11 @@ export async function generateDescription(utilConfig, personality, locale) {
       : "You are a third-person product roster editor. Based on the public persona material below, write a public-facing description of this AI agent. Aim for about 100 characters; 60-200 characters is acceptable. Describe the assistant from the outside, not in first person. Cover personality traits, expertise, communication style, and suitable tasks. Do not output <mood>, Vibe, Sparks, Pulse, Reflect, or any internal tags. Plain text, no markdown. Output the description directly, no explanation.";
 
     const raw = await callLlm({
-      ...execution,
+      api: resolved.api,
+      apiKey: resolved.apiKey,
+      baseUrl: resolved.baseUrl,
+      headers: resolved.headers,
+      model: resolved.model,
       messages: [
         { role: "system", content: systemContent },
         { role: "user", content: personality.slice(0, 3000) },
@@ -599,8 +617,8 @@ export async function generateDescription(utilConfig, personality, locale) {
         zhMin: 1,
         enMin: 1,
       }),
-      usageLedger: utilConfig.usageLedger,
-      usageContext: utilityUsageContext(utilConfig, "generate_description", "manual"),
+      usageLedger: resolved.usageLedger,
+      usageContext: auxiliaryUsageContext(resolved, "generate_description", "manual"),
     });
     if (!raw) return null;
 

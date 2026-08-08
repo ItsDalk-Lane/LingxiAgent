@@ -15,7 +15,7 @@ function between(text: string, start: string, end: string) {
 }
 
 describe("fresh credential network boundaries", () => {
-  it("uses the fresh utility resolver in both server text-generation bus handlers", () => {
+  it("uses the fresh auxiliary resolver in both server text-generation bus handlers", () => {
     const text = source("server/index.ts");
     const utilityHandler = between(
       text,
@@ -29,20 +29,22 @@ describe("fresh credential network boundaries", () => {
     );
 
     for (const handler of [utilityHandler, sampleHandler]) {
-      expect(handler).toContain("await engine.resolveUtilityConfigFresh");
-      expect(handler).not.toMatch(/engine\.resolveUtilityConfig\s*\(/);
+      expect(handler).toContain('await engine.resolveAuxiliaryModelFresh("summarize"');
+      expect(handler).not.toMatch(/engine\.resolveUtilityConfig(Fresh)?\s*\(/);
       expect(handler).toContain("await callText");
-      expect(handler).toContain("...callTextConfigFromUtilityConfig(utility)");
+      expect(handler).not.toContain("callTextConfigFromUtilityConfig");
+      expect(handler).toContain("resolved.api");
+      expect(handler).toContain("resolved.apiKey");
       expect(handler).not.toContain("apiKey: utility.api_key");
       expect(handler).not.toContain("baseUrl: utility.base_url");
     }
   });
 
-  it("keeps the channel memory request behind the fresh utility boundary", () => {
+  it("keeps the channel memory request behind the fresh auxiliary boundary", () => {
     const text = source("hub/channel-router.ts");
     const handler = between(text, "async _memorySummarize", "_clearPreviousChannelMemoryFacts");
-    expect(handler).toContain("await engine.resolveUtilityConfigFresh");
-    expect(handler).not.toMatch(/engine\.resolveUtilityConfig\s*\(/);
+    expect(handler).toContain('await engine.resolveAuxiliaryModelFresh("memory"');
+    expect(handler).not.toMatch(/engine\.resolveUtilityConfig(Fresh)?\s*\(/);
     expect(handler).toContain("await (callText as any)");
   });
 });

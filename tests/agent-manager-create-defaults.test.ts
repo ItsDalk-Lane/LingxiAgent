@@ -116,7 +116,7 @@ describe("AgentManager.createAgent default skills.enabled", () => {
       }),
       getSkills: () => skillsMock,
       getSearchConfig: () => ({}),
-      resolveUtilityConfig: () => ({}),
+      resolveAuxiliaryModelFresh: async () => null,
       getSharedModels: () => ({}),
       getChannelManager: () => ({
         setupChannelsForNewAgent: vi.fn(),

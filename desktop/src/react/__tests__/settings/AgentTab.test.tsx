@@ -146,7 +146,7 @@ describe('AgentTab settings agent selection', () => {
       },
       currentPins: [],
       globalModelsConfig: {
-        models: { utility: { id: 'u' }, utility_large: { id: 'ul' } },
+        models: { memory: { id: 'mem' } },
       },
     });
   });

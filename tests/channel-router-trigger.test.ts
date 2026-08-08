@@ -43,7 +43,7 @@ describe("ChannelRouter trigger lifecycle", () => {
         agentsDir,
         agents: new Map(),
         isChannelsEnabled: () => true,
-        resolveUtilityConfig: () => ({}),
+        resolveAuxiliaryModelFresh: async () => null,
       },
       eventBus: { emit: vi.fn() },
       agentPhoneActivities: { record: vi.fn() },

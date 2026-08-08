@@ -250,7 +250,7 @@ describe('settings actions', () => {
           userProfile: 'user-profile',
           experience: 'agent-a-experience',
           pinned: { pins: ['agent-a-pin'] },
-          globalModels: { models: { utility: { id: 'u' }, utility_large: { id: 'ul' } } },
+          globalModels: { models: { memory: { id: 'mem' }, summarize: { id: 'sum' } } },
           preferences: {
             quickChat: { shortcut: 'CommandOrControl+Shift+K', reuseTimeoutMinutes: 12 },
             notifications: {
@@ -286,7 +286,7 @@ describe('settings actions', () => {
       _userProfile: 'user-profile',
       _experience: 'agent-a-experience',
     });
-    expect(mockState.globalModelsConfig.models.utility.id).toBe('u');
+    expect(mockState.globalModelsConfig.models.memory.id).toBe('mem');
     expect(mockState.homeFolder).toBe('/agent-a/home');
     expect(mockState.currentPins).toEqual(['agent-a-pin']);
     expect(mockState.pluginSettingsStatus).toBe('ready');

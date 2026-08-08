@@ -59,9 +59,12 @@ describe('OtherModelsSection', () => {
     useSettingsStore.setState({
       globalModelsConfig: {
         models: {
-          utility: null,
-          utility_large: null,
+          title: null,
+          summarize: null,
+          memory: null,
           vision: { id: 'gpt-4o', provider: 'openai' },
+          approval: null,
+          guard: null,
           vision_enabled: false,
         },
         search: { provider: '', api_key: '' },
@@ -79,7 +82,7 @@ describe('OtherModelsSection', () => {
 
     const visionLabel = screen.getByText('settings.api.visionModel');
     const toggle = screen.getByRole('button', { name: 'settings.api.visionAuxiliaryToggle' });
-    const firstModelWidget = screen.getAllByTestId('model-widget')[2];
+    const firstModelWidget = screen.getAllByTestId('model-widget')[3];
 
     expect(visionLabel.compareDocumentPosition(toggle) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(toggle.compareDocumentPosition(firstModelWidget) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();

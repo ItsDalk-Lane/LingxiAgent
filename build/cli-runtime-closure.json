@@ -306,6 +306,30 @@
       "reason": "Reached via esbuild source module graph, imported by core/agent-manager.ts (import-statement)."
     },
     {
+      "path": "core/auxiliary-model-resolver.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "core/engine.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by core/engine.ts (import-statement)."
+    },
+    {
+      "path": "core/auxiliary-slots.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "core/auxiliary-model-resolver.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by core/auxiliary-model-resolver.ts (import-statement)."
+    },
+    {
       "path": "core/bridge-session-manager.ts",
       "inputType": "source-graph",
       "provenance": [
@@ -1439,27 +1463,17 @@
       "provenance": [
         {
           "root": "server-bootstrap",
-          "from": "lib/approval-gateway.ts",
-          "kind": "import-statement"
-        },
-        {
-          "root": "server-bootstrap",
-          "from": "core/execution-router.ts",
-          "kind": "import-statement"
-        },
-        {
-          "root": "server-bootstrap",
           "from": "core/model-manager.ts",
           "kind": "import-statement"
         },
         {
           "root": "server-bootstrap",
-          "from": "core/vision-bridge.ts",
+          "from": "core/auxiliary-model-resolver.ts",
           "kind": "import-statement"
         },
         {
           "root": "server-bootstrap",
-          "from": "core/llm-utils.ts",
+          "from": "core/vision-bridge.ts",
           "kind": "import-statement"
         },
         {
@@ -1479,11 +1493,6 @@
         },
         {
           "root": "server-bootstrap",
-          "from": "lib/tools/install-skill.ts",
-          "kind": "import-statement"
-        },
-        {
-          "root": "server-bootstrap",
           "from": "lib/diary/diary-writer.ts",
           "kind": "import-statement"
         },
@@ -1494,21 +1503,11 @@
         },
         {
           "root": "server-bootstrap",
-          "from": "hub/channel-router.ts",
-          "kind": "import-statement"
-        },
-        {
-          "root": "server-bootstrap",
           "from": "core/slash-commands/rc-summary.ts",
-          "kind": "import-statement"
-        },
-        {
-          "root": "server-bootstrap",
-          "from": "server/index.ts",
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by lib/approval-gateway.ts (import-statement); core/execution-router.ts (import-statement); core/model-manager.ts (import-statement); +11 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by core/model-manager.ts (import-statement); core/auxiliary-model-resolver.ts (import-statement); core/vision-bridge.ts (import-statement); +6 more importer(s)."
     },
     {
       "path": "core/model-image-preprocess.ts",
@@ -2019,6 +2018,18 @@
     },
     {
       "path": "core/provider-compat/mimo.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "core/provider-compat.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by core/provider-compat.ts (import-statement)."
+    },
+    {
+      "path": "core/provider-compat/ollama.ts",
       "inputType": "source-graph",
       "provenance": [
         {
@@ -4647,6 +4658,11 @@
         },
         {
           "root": "server-bootstrap",
+          "from": "core/auxiliary-model-resolver.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
           "from": "core/skill-manager.ts",
           "kind": "import-statement"
         },
@@ -5016,7 +5032,7 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by core/migrations.ts (import-statement); core/plugin-config.ts (import-statement); lib/desk/cron-store.ts (import-statement); +81 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by core/migrations.ts (import-statement); core/plugin-config.ts (import-statement); lib/desk/cron-store.ts (import-statement); +82 more importer(s)."
     },
     {
       "path": "lib/default-models.json",
@@ -5620,6 +5636,16 @@
         },
         {
           "root": "server-bootstrap",
+          "from": "core/auxiliary-slots.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "core/auxiliary-model-resolver.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
           "from": "core/vision-prepare.ts",
           "kind": "import-statement"
         },
@@ -5969,7 +5995,7 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by lib/llm/provider-client.ts (import-statement); core/execution-router.ts (import-statement); core/model-manager.ts (import-statement); +70 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by lib/llm/provider-client.ts (import-statement); core/execution-router.ts (import-statement); core/model-manager.ts (import-statement); +72 more importer(s)."
     },
     {
       "path": "lib/identity-templates",
@@ -121182,6 +121208,16 @@
         },
         {
           "root": "server-bootstrap",
+          "from": "core/auxiliary-slots.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "core/auxiliary-model-resolver.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
           "from": "core/vision-prepare.ts",
           "kind": "import-statement"
         },
@@ -121251,7 +121287,7 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by core/message-sanitizer.ts (import-statement); core/provider-compat/reasoning-content-replay.ts (import-statement); core/provider-compat/deepseek.ts (import-statement); +26 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by core/message-sanitizer.ts (import-statement); core/provider-compat/reasoning-content-replay.ts (import-statement); core/provider-compat/deepseek.ts (import-statement); +28 more importer(s)."
     },
     {
       "path": "shared/model-ref.ts",
@@ -121343,9 +121379,14 @@
           "root": "server-bootstrap",
           "from": "core/model-manager.ts",
           "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "core/engine.ts",
+          "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by shared/provider-auth.ts (import-statement); core/execution-router.ts (import-statement); core/model-manager.ts (import-statement)."
+      "reason": "Reached via esbuild source module graph, imported by shared/provider-auth.ts (import-statement); core/execution-router.ts (import-statement); core/model-manager.ts (import-statement); +1 more importer(s)."
     },
     {
       "path": "shared/network-proxy.ts",
@@ -121497,11 +121538,6 @@
         },
         {
           "root": "server-bootstrap",
-          "from": "core/model-execution-config.ts",
-          "kind": "import-statement"
-        },
-        {
-          "root": "server-bootstrap",
           "from": "lib/llm/provider-client.ts",
           "kind": "import-statement"
         },
@@ -121513,6 +121549,11 @@
         {
           "root": "server-bootstrap",
           "from": "core/provider-registry.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "core/model-execution-config.ts",
           "kind": "import-statement"
         },
         {
@@ -121541,7 +121582,7 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by core/local-provider-plugin-store.ts (import-statement); core/model-execution-config.ts (import-statement); lib/llm/provider-client.ts (import-statement); +7 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by core/local-provider-plugin-store.ts (import-statement); lib/llm/provider-client.ts (import-statement); core/llm-client.ts (import-statement); +7 more importer(s)."
     },
     {
       "path": "shared/provider-model-validation.ts",
@@ -122370,9 +122411,9 @@
     }
   ],
   "stats": {
-    "totalFiles": 10528,
+    "totalFiles": 10531,
     "byInputType": {
-      "source-graph": 655,
+      "source-graph": 658,
       "runtime-asset": 11,
       "nft-runtime-trace": 9862
     }

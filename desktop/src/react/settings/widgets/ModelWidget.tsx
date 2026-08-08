@@ -26,16 +26,19 @@ interface ModelWidgetProps {
   /** @deprecated 不再使用，保留兼容签名 */
   providers?: Record<string, { models?: string[]; base_url?: string }>;
   value?: ModelRef | null;
-  onSelect: (ref: ModelRef) => void;
+  /** 选中模型时传 {id, provider}；选中"跟随主模型/默认"时传 null */
+  onSelect: (ref: ModelRef | null) => void;
   placeholder?: string;
   lookupModelMeta?: (id: string) => any;
   formatContext?: (n: number) => string;
   filterModel?: (model: ModelInfo) => boolean;
+  /** 传入时在下拉列表顶部显示一个特殊选项（如"跟随主模型"），点击后 onSelect(null) */
+  followLabel?: string;
 }
 
 export function ModelWidget({
   value, onSelect,
-  placeholder, formatContext, filterModel,
+  placeholder, formatContext, filterModel, followLabel,
 }: ModelWidgetProps) {
   const t = window.t || ((k: string) => k);
   const [open, setOpen] = useState(false);
@@ -111,7 +114,7 @@ export function ModelWidget({
         {value?.provider && (
           <ProviderIcon provider={value.provider} className={styles['mdw-provider-icon']} />
         )}
-        <span className={styles['mdw-value']}>{displayValue || `— ${placeholder || t('settings.api.selectModel')} —`}</span>
+        <span className={styles['mdw-value']}>{displayValue || (followLabel && !valueKey ? followLabel : `— ${placeholder || t('settings.api.selectModel')} —`)}</span>
         <span className={styles['mdw-arrow']}>▾</span>
       </button>
       <AnchoredPortal
@@ -135,6 +138,15 @@ export function ModelWidget({
           onClick={(e) => e.stopPropagation()}
         />
         <div className={styles['mdw-options']}>
+          {followLabel && (
+            <button
+              className={`${styles['mdw-option']} ${styles['mdw-option-follow']}${!valueKey ? ' ' + styles['selected'] : ''}`}
+              type="button"
+              onClick={() => { onSelect(null); setOpen(false); }}
+            >
+              <span className={styles['mdw-option-name']}>{followLabel}</span>
+            </button>
+          )}
           {Object.entries(grouped).map(([provider, items]) => (
             <div key={provider || '__none'}>
               {provider && <div className={styles['mdw-group-header']}>{provider}</div>}

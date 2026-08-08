@@ -1,4 +1,3 @@
-import { callTextConfigFromUtilityConfig } from "../core/model-execution-config.ts";
 import { createModuleLogger } from "./debug-log.ts";
 
 // ════════════════════════════════════════════════════════════════════════════
@@ -66,12 +65,8 @@ const REVIEWER_FAILURE_CODES = new Set([
   "reviewer_internal_error",
 ]);
 
-// New canonical reviewer identity (§四十四). Old identities remain readable in
-// persisted/historical data via the compat shim, but new decisions write only
-// the new identity.
+// Canonical reviewer identity (§四十四). New decisions write only this identity.
 const REVIEWER_ID = "authorization_model";
-// Legacy identities recognized on read for backward compatibility.
-const LEGACY_REVIEWER_IDS = new Set(["small_tool_model", "large_tool_model", "approval_model"]);
 
 const REVIEWER_FAILURE_REASON = "Automatic approval review could not produce a valid decision.";
 const REVIEWER_UNAVAILABLE_REASON = "Automatic approval reviewer unavailable.";
@@ -605,36 +600,40 @@ function authorizationResultFromFailure(failure: ReviewerFailure): Authorization
 
 // ════════════════════════════════════════════════════════════════════════════
 // The single Intent Authorization Reviewer factory (§四十二, §四十四)
-// Replaces the small→large cascade. Exactly one reviewer is constructed and
-// consulted. utility_large is NOT touched outside this approval path (§三).
+// Uses the semantic "approval" slot. approval slot has NO fallback —
+// unconfigured or misconfigured → reviewer unavailable → fail-closed (ask_user).
 // ════════════════════════════════════════════════════════════════════════════
 
 export function createModelApprovalReviewer({
-  role = "utility",
-  resolveUtilityConfig,
+  resolveApprovalModel,
   callText,
   timeoutMs = 15_000,
   maxTokens = 200,
 }: any = {}) {
   return async (input: any): Promise<ReviewerAttemptResult> => {
-    if (typeof resolveUtilityConfig !== "function") {
+    if (typeof resolveApprovalModel !== "function") {
       return failureResult("reviewer_not_configured", 0);
     }
     if (typeof callText !== "function") {
       return failureResult("reviewer_not_configured", 0);
     }
     const request = input?.request || {};
-    const utilityOptions = {
+    const approvalOptions = {
       ...(request.agentId ? { agentId: request.agentId } : {}),
       ...(request.sessionPath ? { sessionPath: request.sessionPath } : {}),
     };
-    let config: any;
+    let selected: any;
     try {
-      config = await resolveUtilityConfig(Object.keys(utilityOptions).length ? utilityOptions : undefined);
+      selected = await resolveApprovalModel(
+        Object.keys(approvalOptions).length ? approvalOptions : undefined,
+      );
     } catch (error) {
       return failureFromError(error, 0, "config");
     }
-    const selected = callTextConfigFromUtilityConfig(config, role);
+    // approval slot 未配置 → reviewer unavailable（不 fallback chat）
+    if (!selected) {
+      return failureResult("reviewer_not_configured", 0);
+    }
     if (!selected.model || !selected.api || !selected.baseUrl) {
       return failureResult("reviewer_config_missing", 0);
     }
@@ -654,7 +653,11 @@ export function createModelApprovalReviewer({
       try {
         // §二十八 Deterministic classification: temperature 0, small token budget.
         const text = await callText({
-          ...selected,
+          api: selected.api,
+          apiKey: selected.apiKey,
+          baseUrl: selected.baseUrl,
+          headers: selected.headers,
+          model: selected.model,
           systemPrompt: REVIEWER_SYSTEM_PROMPT,
           messages,
           temperature: 0,
@@ -888,26 +891,16 @@ function resolveExplicitness(request: any, context: any, auth: AuthorizationResu
 }
 
 // ════════════════════════════════════════════════════════════════════════════
-// §四十二 Gateway — single intent reviewer, deterministic decision engine.
-// Backward-compatible API: createApprovalGateway still accepts the legacy
-// { smallToolModelReviewer, largeToolModelReviewer } option shape, but the
-// cascade is gone — both are treated as a single intent authorization reviewer
-// (small preferred, large ignored) so existing wiring keeps working while the
-// engine is migrated.
+// §四十二/§四十四 Gateway — single intent reviewer, deterministic decision engine.
+// The gateway accepts exactly one intentAuthorizationReviewer sourced from the
+// semantic "approval" slot. Legacy smallToolModelReviewer / largeToolModelReviewer
+// cascade has been removed entirely.
 // ════════════════════════════════════════════════════════════════════════════
 
 export function createApprovalGateway({
-  smallToolModelReviewer = null,
-  // The large reviewer is intentionally NOT consulted: the small→large cascade
-  // was removed (§四十三). The option is accepted for backward compatibility so
-  // engine.ts can migrate one option at a time; a passed large reviewer is
-  // ignored and utility_large keeps all its non-approval duties (§三, §五十九).
   intentAuthorizationReviewer = null,
 }: any = {}) {
-  // §四十三 The cascade is removed. Exactly one reviewer is consulted.
-  // If the new intentAuthorizationReviewer is wired, use it; otherwise treat
-  // the small reviewer as the single intent reviewer.
-  const reviewer = intentAuthorizationReviewer || smallToolModelReviewer || null;
+  const reviewer = intentAuthorizationReviewer || null;
   return {
     async review(request: any, context: any = {}) {
       // §四十/§四十一 Deterministic policy short-circuit (deferred drafts).
@@ -972,5 +965,4 @@ export const __internals = {
   resolveExactGrant,
   authorizationResultFromFailure,
   REVIEWER_ID,
-  LEGACY_REVIEWER_IDS,
 };

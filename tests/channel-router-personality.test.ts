@@ -55,11 +55,11 @@ describe("ChannelRouter._executeCheck phone delivery", () => {
       config: { agent: { name: "Hana", yuan: "lingxi" } },
       personality: "我是 Hana，一个温柔的助手。这是内存中的 personality。",
     };
-    const resolveUtilityConfig = vi.fn(() => ({
-      utility_large: "test-model-large",
-      large_api_key: "test-key",
-      large_base_url: "https://test.api",
-      large_api: "openai-completions",
+    const resolveAuxiliaryModelFresh = vi.fn(async () => ({
+      model: "test-model-large",
+      apiKey: "test-key",
+      baseUrl: "https://test.api",
+      api: "openai-completions",
     }));
 
     const router = new ChannelRouter({
@@ -70,7 +70,7 @@ describe("ChannelRouter._executeCheck phone delivery", () => {
           userDir,
           agents: new Map([["hana", mockAgent]]),
           getAgent: (id) => (id === "hana" ? mockAgent : null),
-          resolveUtilityConfig,
+          resolveAuxiliaryModelFresh,
         },
         eventBus: { emit: vi.fn() },
         agentPhoneActivities: { record: vi.fn() },
@@ -87,7 +87,7 @@ describe("ChannelRouter._executeCheck phone delivery", () => {
     expect(result).toMatchObject({ replied: false, passed: true });
     expect(runAgentPhoneSessionMock).toHaveBeenCalledOnce();
     expect(callTextMock).not.toHaveBeenCalled();
-    expect(resolveUtilityConfig).not.toHaveBeenCalled();
+    expect(resolveAuxiliaryModelFresh).not.toHaveBeenCalled();
     fs.rmSync(root, { recursive: true, force: true });
   });
 });

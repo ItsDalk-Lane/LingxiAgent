@@ -3,8 +3,6 @@
  */
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { SelectWidget } from '@/ui';
-import type { SelectOption } from '@/ui';
 import { Toggle } from '../../settings/widgets/Toggle';
 import { lookupReferenceModelMeta } from '../../utils/model-metadata';
 import { describeOnboardingError, loadModels as loadModelsAction, saveModel as saveModelAction } from '../onboarding-actions';
@@ -96,8 +94,6 @@ export function ModelStep({
   const [manualModelId, setManualModelId] = useState('');
   const [addMenuOpen, setAddMenuOpen] = useState(false);
   const [modelLoading, setModelLoading] = useState('');
-  const [selectedUtility, setSelectedUtility] = useState('');
-  const [selectedUtilityLarge, setSelectedUtilityLarge] = useState('');
   const [editingModelId, setEditingModelId] = useState('');
   const [editName, setEditName] = useState('');
   const [editContext, setEditContext] = useState('');
@@ -126,8 +122,6 @@ export function ModelStep({
           return;
         }
         setFetchedModels(result.models);
-        setSelectedUtility('');
-        setSelectedUtilityLarge('');
         setAddedModels([]);
         setSelectedModel('');
         modelsLoadedFor.current = providerName;
@@ -182,11 +176,6 @@ export function ModelStep({
     return modelId;
   }, [addedModels, effectiveModelMeta]);
 
-  const modelSelectOptions: SelectOption[] = addedModels.map(model => ({
-    value: model.id,
-    label: labelForModel(model.id),
-  }));
-
   const addModel = useCallback((rawModelId: string, source: 'discovered' | 'manual' = 'discovered') => {
     const modelId = rawModelId.trim();
     if (!modelId || addedModelIds.has(modelId)) return;
@@ -211,10 +200,8 @@ export function ModelStep({
     const next = addedModels.filter(model => model.id !== modelId);
     setAddedModels(next);
     if (selectedModel === modelId) setSelectedModel(next[0]?.id || '');
-    if (selectedUtility === modelId) setSelectedUtility('');
-    if (selectedUtilityLarge === modelId) setSelectedUtilityLarge('');
     if (editingModelId === modelId) setEditingModelId('');
-  }, [addedModels, selectedModel, selectedUtility, selectedUtilityLarge, editingModelId]);
+  }, [addedModels, selectedModel, editingModelId]);
 
   const startEditing = useCallback((model: AddedModelDraft) => {
     const meta = effectiveModelMeta(model);
@@ -260,8 +247,6 @@ export function ModelStep({
   const canContinue = preview || (
     addedModels.length > 0
     && !!selectedModel
-    && !!selectedUtility
-    && !!selectedUtilityLarge
   );
 
   const candidateList = modelLoading
@@ -278,7 +263,6 @@ export function ModelStep({
       await saveModelAction({
         lingxiFetch, agentId, selectedModel, providerName,
         addedModels: addedModels.map(toSavedModelEntry),
-        selectedUtility, selectedUtilityLarge,
         verificationPlan,
       });
       goToStep(4);
@@ -286,7 +270,7 @@ export function ModelStep({
       console.error('[onboarding] save model failed:', err);
       showError(describeOnboardingError(err, t('onboarding.error')));
     }
-  }, [preview, canContinue, lingxiFetch, agentId, selectedModel, providerName, addedModels, selectedUtility, selectedUtilityLarge, verificationPlan, goToStep, showError]);
+  }, [preview, canContinue, lingxiFetch, agentId, selectedModel, providerName, addedModels, verificationPlan, goToStep, showError]);
 
   return (
     <StepContainer>
@@ -425,37 +409,6 @@ export function ModelStep({
             </div>
           </div>
         )}
-      </div>
-
-      <div className="ob-utility-section">
-        <div className="ob-utility-block">
-          <div className="ob-utility-header">
-            <span className="ob-utility-title">{t('onboarding.model.utility')}</span>
-            <span className="ob-utility-hint">{t('onboarding.model.utilityHint')}</span>
-          </div>
-          <SelectWidget
-            className="ob-select-widget"
-            options={modelSelectOptions}
-            value={selectedUtility}
-            onChange={setSelectedUtility}
-            placeholder={'\u2014'}
-            disabled={addedModels.length === 0}
-          />
-        </div>
-        <div className="ob-utility-block">
-          <div className="ob-utility-header">
-            <span className="ob-utility-title">{t('onboarding.model.utilityLarge')}</span>
-            <span className="ob-utility-hint">{t('onboarding.model.utilityLargeHint')}</span>
-          </div>
-          <SelectWidget
-            className="ob-select-widget"
-            options={modelSelectOptions}
-            value={selectedUtilityLarge}
-            onChange={setSelectedUtilityLarge}
-            placeholder={'\u2014'}
-            disabled={addedModels.length === 0}
-          />
-        </div>
       </div>
 
       <div className="onboarding-actions">

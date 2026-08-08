@@ -146,18 +146,18 @@ describe("LingxiEngine session manifest facade", () => {
     });
   });
 
-  it("resolveUtilityConfig 以 manifest 归属选择 agent 配置（不再从路径推导）", () => {
+  it("resolveAuxiliaryModelFresh 以 manifest 归属选择 agent 配置（不再从路径推导）", async () => {
     const sessionPath = path.join(tmpDir, "agents", "bob", "sessions", "utility.jsonl");
     engine._agentMgr = { agentIdFromSessionPath: () => "bob" }; // 旧链路：路径口径
     engine._sessionCoord = {
       resolveSessionOwnership: () => ({ agentId: "hana", source: "manifest", agentDeleted: false }),
     };
-    engine._configCoord = {
-      resolveUtilityConfig: (opts) => ({ requestedAgentId: opts?.agentId || null }),
+    engine._auxResolver = {
+      resolveAuxiliaryModelFresh: async (_slot, ctx) => ({ requestedAgentId: ctx?.agentId || null }),
     };
     engine._usageLedger = null;
 
-    const config = engine.resolveUtilityConfig({ sessionPath });
+    const config = await engine.resolveAuxiliaryModelFresh("summarize", { sessionPath });
 
     expect(config.requestedAgentId).toBe("hana");
     expect(config.usageAgentId).toBe("hana");

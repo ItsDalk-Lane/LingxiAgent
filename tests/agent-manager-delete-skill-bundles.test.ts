@@ -55,7 +55,7 @@ describe("AgentManager.deleteAgent skill bundle lifecycle", () => {
       }),
       getSkills: () => ({}),
       getSearchConfig: () => ({}),
-      resolveUtilityConfig: () => ({}),
+      resolveAuxiliaryModelFresh: async () => null,
       getSharedModels: () => ({}),
       getChannelManager: () => ({ cleanupAgentFromChannels: vi.fn() }),
       getSessionCoordinator: () => ({}),

@@ -24,7 +24,6 @@ import crypto from "crypto";
 import { Type } from "../pi-sdk/index.ts";
 import { t } from "../i18n.ts";
 import { callText } from "../../core/llm-client.ts";
-import { callTextConfigFromUtilityConfig } from "../../core/model-execution-config.ts";
 import { getLocale } from "../i18n.ts";
 import { getToolSessionPath } from "./tool-session.ts";
 import { serializeSessionFile } from "../session-files/session-file-response.ts";
@@ -69,18 +68,16 @@ function parseGithubUrl(url: any) {
 }
 
 /**
- * 通过 utility model 做安全审查
+ * 通过 guard slot 做安全审查
  * 返回 { safe: boolean, reason?: string }
+ *
+ * guard slot 未配置或不可用时 fail-closed（不 fallback chat）：
+ *   guard_model 未配置 → 返回 { safe: false, reason: ... }
+ *   guard_model 已配置但解析失败 → 返回 { safe: false, reason: ... }
+ *
+ * 调用方拿到 safe: false 后进入风险确认路径（risk_accepted 覆盖）。
  */
-function resolveSafetyReviewUtilityConfig(resolveUtilityConfig: any) {
-  if (typeof resolveUtilityConfig !== "function") return null;
-  return resolveUtilityConfig({
-    requireUtilityLarge: false,
-    purpose: "install_skill_safety",
-  });
-}
-
-export async function safetyReview(skillContent: any, resolveUtilityConfig: any) {
+export async function safetyReview(skillContent: any, resolveGuardModel: any) {
   const isZh = getLocale().startsWith("zh");
 
   // 大小上限检查
@@ -88,18 +85,18 @@ export async function safetyReview(skillContent: any, resolveUtilityConfig: any)
     return { safe: false, reason: t("error.installSkillSizeLimit", { size: Math.round(skillContent.length / 1000), max: MAX_SKILL_SIZE / 1000 }) };
   }
 
-  let utilCfg;
+  let resolved;
   try {
-    utilCfg = await resolveSafetyReviewUtilityConfig(resolveUtilityConfig);
+    resolved = typeof resolveGuardModel === "function" ? await resolveGuardModel() : null;
   } catch (err) {
     return { safe: false, reason: err instanceof Error && err.message ? err.message : t("error.installSkillNoUtility") };
   }
-  if (!utilCfg) {
+  // guard slot 未配置 → fail-closed（不 fallback chat）
+  if (!resolved) {
     return { safe: false, reason: t("error.installSkillNoUtility") };
   }
 
-  const execution = callTextConfigFromUtilityConfig(utilCfg);
-  if (!execution.model || !execution.baseUrl || !execution.api) {
+  if (!resolved.model || !resolved.baseUrl || !resolved.api) {
     return { safe: false, reason: t("error.installSkillUtilityIncomplete") };
   }
 
@@ -133,22 +130,26 @@ ${skillContent}`;
 
   try {
     const reply = await callText({
-      ...execution,
+      api: resolved.api,
+      apiKey: resolved.apiKey,
+      baseUrl: resolved.baseUrl,
+      headers: resolved.headers,
+      model: resolved.model,
       signal: undefined,
       messages: [{ role: "user", content: prompt }],
       temperature: 0,
       timeoutMs: SAFETY_REVIEW_TIMEOUT,
-      usageLedger: utilCfg.usageLedger,
+      usageLedger: resolved.usageLedger,
       usageContext: {
         source: {
-          subsystem: "utility",
+          subsystem: "guard",
           operation: "install_skill_safety",
           surface: "tool",
           trigger: "agent",
         },
         attribution: {
-          kind: "utility",
-          agentId: utilCfg.usageAgentId ?? null,
+          kind: "guard",
+          agentId: resolved.usageAgentId ?? null,
         },
       },
     } as any) as string;
@@ -173,7 +174,7 @@ ${skillContent}`;
  * @param {object} opts
  * @param {() => string} opts.getUserSkillsDir 返回用户级技能目录（延迟求值）
  * @param {() => object} opts.getConfig       返回 agent config 对象
- * @param {() => object} opts.resolveUtilityConfig  返回 { utility, api_key, base_url }
+ * @param {() => object} opts.resolveGuardModel  resolveAuxiliaryModelFresh("guard") 结果
  * @param {(skillName: string) => Promise<void>} opts.onInstalled  安装完成后的回调
  */
 function sourceRefFromParams(params: any = {}) {
@@ -258,7 +259,7 @@ function safetyReviewStatusNote({ safetyPassed, riskOverride, riskReason }: any 
   return "";
 }
 
-export function createInstallSkillTool({ getUserSkillsDir, getConfig, resolveUtilityConfig, onInstalled, registerSessionFile, resolveSessionFile }: any) {
+export function createInstallSkillTool({ getUserSkillsDir, getConfig, resolveGuardModel, onInstalled, registerSessionFile, resolveSessionFile }: any) {
   const pendingRiskConfirmations = new Map();
 
   return {
@@ -370,7 +371,7 @@ export function createInstallSkillTool({ getUserSkillsDir, getConfig, resolveUti
         let riskOverride = false;
         let riskReason = "";
         if (!skipSafetyReview) {
-          const review = await safetyReview(content, resolveUtilityConfig);
+          const review = await safetyReview(content, resolveGuardModel);
           if (!review.safe) {
             const riskAcceptance = consumeRiskAcceptance(pendingRiskConfirmations, params, {
               sourceKey,
@@ -486,7 +487,7 @@ export function createInstallSkillTool({ getUserSkillsDir, getConfig, resolveUti
         let riskReason = "";
         try {
           if (!skipSafetyReview) {
-            const review = await safetyReview(content, resolveUtilityConfig);
+            const review = await safetyReview(content, resolveGuardModel);
             if (!review.safe) {
               const riskAcceptance = consumeRiskAcceptance(pendingRiskConfirmations, params, {
                 sourceKey,

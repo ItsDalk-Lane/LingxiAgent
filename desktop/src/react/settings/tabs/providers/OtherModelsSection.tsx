@@ -71,92 +71,72 @@ function ToolModelTestBtn({ modelRef }: { modelRef: unknown }) {
 
 export function OtherModelsSection({ providers }: { providers: Record<string, { models?: string[]; base_url?: string }> }) {
   const globalModelsConfig = useSettingsStore(s => s.globalModelsConfig);
-
-  const utilityVal = toModelRef(globalModelsConfig?.models?.utility);
-  const utilityLargeVal = toModelRef(globalModelsConfig?.models?.utility_large);
-  const visionVal = toModelRef(globalModelsConfig?.models?.vision);
-  const visionAuxiliaryEnabled = globalModelsConfig ? globalModelsConfig.models?.vision_enabled === true : undefined;
   const imageCapableOnly = (model: { input?: string[] }) => (
     Array.isArray(model.input) && model.input.includes('image')
   );
   const searchProvider = globalModelsConfig?.search?.provider || AUTO_SEARCH_PROVIDER;
 
+  const slots: Array<{
+    field: string;
+    titleKey: string;
+    hintKey: string;
+    fallbackKey: string;
+    followKey: string;
+    imageOnly?: boolean;
+  }> = [
+    { field: 'title', titleKey: 'settings.api.auxTitleModel', hintKey: 'settings.api.auxTitleModelHint', fallbackKey: 'settings.api.auxFallbackChat', followKey: 'settings.api.auxFollowMain' },
+    { field: 'summarize', titleKey: 'settings.api.auxSummarizeModel', hintKey: 'settings.api.auxSummarizeModelHint', fallbackKey: 'settings.api.auxFallbackChat', followKey: 'settings.api.auxFollowMain' },
+    { field: 'memory', titleKey: 'settings.api.auxMemoryModel', hintKey: 'settings.api.auxMemoryModelHint', fallbackKey: 'settings.api.auxFallbackChat', followKey: 'settings.api.auxFollowMain' },
+    { field: 'vision', titleKey: 'settings.api.visionModel', hintKey: 'settings.api.visionModelHint', fallbackKey: 'settings.api.auxFallbackVision', followKey: 'settings.api.auxFollowMain', imageOnly: true },
+    { field: 'approval', titleKey: 'settings.api.auxApprovalModel', hintKey: 'settings.api.auxApprovalModelHint', fallbackKey: 'settings.api.auxFallbackApproval', followKey: 'settings.api.auxFollowDisabled' },
+    { field: 'guard', titleKey: 'settings.api.auxGuardModel', hintKey: 'settings.api.auxGuardModelHint', fallbackKey: 'settings.api.auxFallbackGuard', followKey: 'settings.api.auxFollowDisabled' },
+  ];
+
+  const visionAuxiliaryEnabled = globalModelsConfig ? globalModelsConfig.models?.vision_enabled === true : undefined;
+
   return (
     <div className={styles['pv-model-config']}>
-      {/* 每行：左侧标题 + 提示，右侧模型选择菜单 */}
-      <div className={styles['pv-model-config-row']}>
-        <div className={styles['pv-model-config-label']}>
-          <span className={styles['pv-model-config-title']}>{t('settings.api.utilityModel')}</span>
-          <span className={styles['settings-form-hint']}>{t('settings.api.utilityModelHint')}</span>
-        </div>
-        <div className={styles['pv-model-config-control']}>
-          <div className={styles['pv-tool-model-row']}>
-            <ModelWidget
-              providers={providers}
-              value={utilityVal}
-              onSelect={(ref) => {
-                autoSaveGlobalModels({ models: { utility: ref } });
-              }}
-              lookupModelMeta={lookupModelMeta}
-              formatContext={formatContext}
-            />
-            <ToolModelTestBtn modelRef={globalModelsConfig?.models?.utility || ''} />
+      {slots.map((slot) => {
+        const val = toModelRef(globalModelsConfig?.models?.[slot.field]);
+        const isVision = slot.field === 'vision';
+        return (
+          <div key={slot.field} className={styles['pv-model-config-row']}>
+            <div className={styles['pv-model-config-label']}>
+              <span className={styles['pv-model-config-title']}>{t(slot.titleKey)}</span>
+              <span className={styles['settings-form-hint']}>{t(slot.hintKey)}</span>
+              <span className={styles['settings-form-hint']}>{t(slot.fallbackKey)}</span>
+              {isVision && <span className={styles['settings-form-hint']}>{t('settings.api.visionModelMissingHint')}</span>}
+            </div>
+            <div className={styles['pv-model-config-control']}>
+              {isVision && (
+                <div className={styles['settings-toggle-row']}>
+                  <Toggle
+                    on={visionAuxiliaryEnabled}
+                    onChange={(on) => {
+                      autoSaveGlobalModels({ models: { vision_enabled: on } });
+                    }}
+                    label={t('settings.api.visionAuxiliaryToggle')}
+                  />
+                </div>
+              )}
+              <div className={styles['pv-tool-model-row']}>
+                <ModelWidget
+                  providers={providers}
+                  value={val}
+                  followLabel={t(slot.followKey)}
+                  onSelect={(ref) => {
+                    autoSaveGlobalModels({ models: { [slot.field]: ref } });
+                  }}
+                  lookupModelMeta={lookupModelMeta}
+                  formatContext={formatContext}
+                  filterModel={slot.imageOnly ? imageCapableOnly : undefined}
+                />
+                <ToolModelTestBtn modelRef={globalModelsConfig?.models?.[slot.field] || ''} />
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
-
-      <div className={styles['pv-model-config-row']}>
-        <div className={styles['pv-model-config-label']}>
-          <span className={styles['pv-model-config-title']}>{t('settings.api.utilityLargeModel')}</span>
-          <span className={styles['settings-form-hint']}>{t('settings.api.utilityLargeModelHint')}</span>
-        </div>
-        <div className={styles['pv-model-config-control']}>
-          <div className={styles['pv-tool-model-row']}>
-            <ModelWidget
-              providers={providers}
-              value={utilityLargeVal}
-              onSelect={(ref) => {
-                autoSaveGlobalModels({ models: { utility_large: ref } });
-              }}
-              lookupModelMeta={lookupModelMeta}
-              formatContext={formatContext}
-            />
-            <ToolModelTestBtn modelRef={globalModelsConfig?.models?.utility_large || ''} />
-          </div>
-        </div>
-      </div>
-
-      <div className={styles['pv-model-config-row']}>
-        <div className={styles['pv-model-config-label']}>
-          <span className={styles['pv-model-config-title']}>{t('settings.api.visionModel')}</span>
-          <span className={styles['settings-form-hint']}>{t('settings.api.visionModelHint')}</span>
-          <span className={styles['settings-form-hint']}>{t('settings.api.visionModelMissingHint')}</span>
-        </div>
-        <div className={styles['pv-model-config-control']}>
-          <div className={styles['settings-toggle-row']}>
-            <Toggle
-              on={visionAuxiliaryEnabled}
-              onChange={(on) => {
-                autoSaveGlobalModels({ models: { vision_enabled: on } });
-              }}
-              label={t('settings.api.visionAuxiliaryToggle')}
-            />
-          </div>
-          <div className={styles['pv-tool-model-row']}>
-            <ModelWidget
-              providers={providers}
-              value={visionVal}
-              onSelect={(ref) => {
-                autoSaveGlobalModels({ models: { vision: ref } });
-              }}
-              lookupModelMeta={lookupModelMeta}
-              formatContext={formatContext}
-              filterModel={imageCapableOnly}
-            />
-            <ToolModelTestBtn modelRef={globalModelsConfig?.models?.vision || ''} />
-          </div>
-        </div>
-      </div>
+        );
+      })}
 
       {/* 搜索引擎选择：与模型行对齐（左标题，右选择器） */}
       <div className={styles['pv-model-config-row']}>

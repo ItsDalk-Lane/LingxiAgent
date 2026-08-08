@@ -38,8 +38,8 @@ export function AgentTab() {
   const set = useSettingsStore(s => s.set);
   const getSettingsAgentId = useSettingsStore(s => s.getSettingsAgentId);
 
-  const hasUtilityModel = globalModelsConfig
-    ? !!(globalModelsConfig.models?.utility && globalModelsConfig.models?.utility_large)
+  const hasMemoryModel = globalModelsConfig
+    ? !!globalModelsConfig.models?.memory
     : undefined;
   const selectedSettingsAgentId = settingsAgentId || currentAgentId;
 
@@ -394,7 +394,7 @@ export function AgentTab() {
 
       <MemorySection
         agentId={selectedSettingsAgentId}
-        hasUtilityModel={hasUtilityModel}
+        hasUtilityModel={hasMemoryModel}
         memoryEnabled={memoryEnabled}
         currentPins={currentPins}
       />

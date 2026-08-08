@@ -47,7 +47,7 @@ describe("install_skill global skill-pool installation", () => {
           },
         },
       }),
-      resolveUtilityConfig: () => null,
+      resolveGuardModel: () => null,
       onInstalled,
       registerSessionFile,
     });
@@ -88,7 +88,7 @@ describe("install_skill global skill-pool installation", () => {
           },
         },
       }),
-      resolveUtilityConfig: () => null,
+      resolveGuardModel: () => null,
       onInstalled,
       registerSessionFile: vi.fn(),
     });
@@ -149,7 +149,7 @@ describe("install_skill global skill-pool installation", () => {
           },
         },
       }),
-      resolveUtilityConfig: () => null,
+      resolveGuardModel: () => null,
       onInstalled,
       registerSessionFile: vi.fn(),
     });
@@ -193,7 +193,7 @@ describe("install_skill global skill-pool installation", () => {
           },
         },
       }),
-      resolveUtilityConfig: () => null,
+      resolveGuardModel: () => null,
       onInstalled,
       registerSessionFile,
     });
@@ -234,7 +234,7 @@ describe("install_skill global skill-pool installation", () => {
           },
         },
       }),
-      resolveUtilityConfig: () => null,
+      resolveGuardModel: () => null,
       onInstalled,
       registerSessionFile: vi.fn(),
     });
@@ -292,7 +292,7 @@ describe("install_skill global skill-pool installation", () => {
           },
         },
       }),
-      resolveUtilityConfig: () => null,
+      resolveGuardModel: () => null,
       onInstalled,
       registerSessionFile: vi.fn(),
       resolveSessionFile,
@@ -353,7 +353,7 @@ describe("install_skill global skill-pool installation", () => {
           },
         },
       }),
-      resolveUtilityConfig: () => null,
+      resolveGuardModel: () => null,
       onInstalled,
       registerSessionFile: vi.fn(),
       resolveSessionFile,

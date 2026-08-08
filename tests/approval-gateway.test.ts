@@ -245,16 +245,17 @@ describe("Authorization Gateway — deterministic safety + intent authorization"
     ["invalid verdict", JSON.stringify({ verdict: "approve", scopeRelation: "exact", reason: "SECRET_BAD_VERDICT" })],
     ["invalid scopeRelation", JSON.stringify({ verdict: "authorized", scopeRelation: "wider", reason: "SECRET_BAD_SCOPE" })],
   ])("retries one recoverable %s once without echoing raw output", async (_label, firstResponse) => {
-    const resolveUtilityConfig = vi.fn(async () => ({
-      utility: { id: "reviewer", provider: "test" },
+    const resolveApprovalModel = vi.fn(async () => ({
       api: "openai-completions",
-      api_key: "test-key",
-      base_url: "https://example.test",
+      apiKey: "test-key",
+      baseUrl: "https://example.test",
+      headers: {},
+      model: { id: "reviewer", provider: "test" },
     }));
     const callText = vi.fn()
       .mockResolvedValueOnce(firstResponse)
       .mockResolvedValueOnce(JSON.stringify({ verdict: "authorized", scopeRelation: "exact", reason: "ok" }));
-    const reviewer = createModelApprovalReviewer({ resolveUtilityConfig, callText });
+    const reviewer = createModelApprovalReviewer({ resolveApprovalModel, callText });
 
     const result = await reviewer({ request: request() });
 
@@ -266,7 +267,7 @@ describe("Authorization Gateway — deterministic safety + intent authorization"
   it("returns a static config failure without calling the network boundary", async () => {
     const callText = vi.fn();
     const reviewer = createModelApprovalReviewer({
-      resolveUtilityConfig: vi.fn(async () => ({ utility: null, api: "", base_url: "" })),
+      resolveApprovalModel: vi.fn(async () => ({ api: "", apiKey: "", baseUrl: "", headers: {}, model: null })),
       callText,
     });
 
@@ -282,11 +283,12 @@ describe("Authorization Gateway — deterministic safety + intent authorization"
     const timeout = Object.assign(new Error("SECRET provider timeout at https://private.example"), { code: "LLM_TIMEOUT" });
     const callText = vi.fn(async () => { throw timeout; });
     const reviewer = createModelApprovalReviewer({
-      resolveUtilityConfig: vi.fn(async () => ({
-        utility: { id: "reviewer", provider: "test" },
+      resolveApprovalModel: vi.fn(async () => ({
         api: "openai-completions",
-        api_key: "test-key",
-        base_url: "https://example.test",
+        apiKey: "test-key",
+        baseUrl: "https://example.test",
+        headers: {},
+        model: { id: "reviewer", provider: "test" },
       })),
       callText,
     });
@@ -298,10 +300,10 @@ describe("Authorization Gateway — deterministic safety + intent authorization"
     expect(JSON.stringify(result)).not.toContain("private.example");
   });
 
-  it("does not call the network boundary when utility resolution fails", async () => {
+  it("does not call the network boundary when approval model resolution fails", async () => {
     const callText = vi.fn();
     const reviewer = createModelApprovalReviewer({
-      resolveUtilityConfig: vi.fn(async () => { throw new Error("oauth refresh failed"); }),
+      resolveApprovalModel: vi.fn(async () => { throw new Error("oauth refresh failed"); }),
       callText,
     });
 
@@ -315,15 +317,13 @@ describe("Authorization Gateway — deterministic safety + intent authorization"
 
   // ── Single model invocation (§五十七): no secondary reviewer exists ──
 
-  it("the gateway never calls a largeToolModelReviewer even if one is passed (cascade removed)", async () => {
-    const small = authReviewer("ambiguous", "unclear");
-    const large = vi.fn(async () => ({ verdict: "authorized", scopeRelation: "exact", reason: "should never run" }));
-    const gateway = createApprovalGateway({ smallToolModelReviewer: small, largeToolModelReviewer: large });
+  it("the gateway uses only intentAuthorizationReviewer (cascade removed, single-slot approval)", async () => {
+    const reviewer = authReviewer("ambiguous", "unclear");
+    const gateway = createApprovalGateway({ intentAuthorizationReviewer: reviewer });
 
     const decision = await gateway.review(request());
 
-    expect(small).toHaveBeenCalledOnce();
-    expect(large).not.toHaveBeenCalled();
+    expect(reviewer).toHaveBeenCalledOnce();
     expect(decision.action).toBe("ask_user");
   });
 
@@ -348,14 +348,15 @@ describe("Authorization Gateway — deterministic safety + intent authorization"
   // ── §五十四 Prompt injection: invocation data is data, not instruction ──
 
   it("treats a prompt-injection payload in the request as ordinary data (does not allow)", async () => {
-    const resolveUtilityConfig = vi.fn(async () => ({
-      utility: { id: "reviewer", provider: "test" },
+    const resolveApprovalModel = vi.fn(async () => ({
       api: "openai-completions",
-      api_key: "test-key",
-      base_url: "https://example.test",
+      apiKey: "test-key",
+      baseUrl: "https://example.test",
+      headers: {},
+      model: { id: "reviewer", provider: "test" },
     }));
     const callText = vi.fn(async () => JSON.stringify({ verdict: "ambiguous", scopeRelation: "unclear", reason: "data treated as data" }));
-    const reviewer = createModelApprovalReviewer({ resolveUtilityConfig, callText });
+    const reviewer = createModelApprovalReviewer({ resolveApprovalModel, callText });
 
     await reviewer({
       request: request({
@@ -376,14 +377,15 @@ describe("Authorization Gateway — deterministic safety + intent authorization"
   // ── §五十五 Sensitive data: credentials never reach the reviewer payload ──
 
   it("scrubs credential assignments from shell command labels", async () => {
-    const resolveUtilityConfig = vi.fn(async () => ({
-      utility: { id: "reviewer", provider: "test" },
+    const resolveApprovalModel = vi.fn(async () => ({
       api: "openai-completions",
-      api_key: "test-key",
-      base_url: "https://example.test",
+      apiKey: "test-key",
+      baseUrl: "https://example.test",
+      headers: {},
+      model: { id: "reviewer", provider: "test" },
     }));
     const callText = vi.fn(async () => JSON.stringify({ verdict: "authorized", scopeRelation: "exact", reason: "ok" }));
-    const reviewer = createModelApprovalReviewer({ resolveUtilityConfig, callText });
+    const reviewer = createModelApprovalReviewer({ resolveApprovalModel, callText });
 
     await reviewer({
       request: request({

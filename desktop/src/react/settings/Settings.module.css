@@ -7942,6 +7942,13 @@ a.about-link:hover {
     font-weight: 600;
 }
 
+.mdw-option-follow {
+    border-bottom: 1px solid var(--overlay-light);
+    margin-bottom: var(--space-4);
+    padding: 0.4rem 0.65rem;
+    color: var(--text-muted);
+}
+
 .mdw-star {
     flex-shrink: 0;
     font-size: var(--fs-ui);

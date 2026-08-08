@@ -167,20 +167,12 @@ describe('ModelStep', () => {
     fireEvent.click(screen.getByRole('button', { name: 'onboarding.model.addModel' }));
     fireEvent.click(await screen.findByRole('button', { name: 'custom-vllm-chat' }));
 
-    const utilityTriggers = document.querySelectorAll('.ob-select-widget button[aria-haspopup="listbox"]');
-    fireEvent.click(utilityTriggers[0]);
-    fireEvent.click(await screen.findByRole('option', { name: 'Custom vLLM Chat' }));
-    fireEvent.click(utilityTriggers[1]);
-    fireEvent.click(await screen.findByRole('option', { name: 'Custom vLLM Chat' }));
-
     fireEvent.click(screen.getByRole('button', { name: 'onboarding.model.next' }));
 
     await waitFor(() => {
       expect(mocks.saveModel).toHaveBeenCalledWith(expect.objectContaining({
         providerName: 'custom-vllm',
         selectedModel: 'custom-vllm-chat',
-        selectedUtility: 'custom-vllm-chat',
-        selectedUtilityLarge: 'custom-vllm-chat',
         addedModels: [
           {
             id: 'custom-vllm-chat',

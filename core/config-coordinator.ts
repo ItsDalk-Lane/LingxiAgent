@@ -35,12 +35,24 @@ export function normalizeAccessMode(mode, { legacyPlanMode = false } = {}) {
   return legacyPlanMode ? ACCESS_MODE_READ_ONLY : ACCESS_MODE_OPERATE;
 }
 
-/** 全局共享模型字段 → preferences key 映射 */
-export const SHARED_MODEL_KEYS = [
-  ["utility",        "utility_model"],
-  ["utility_large",  "utility_large_model"],
-  ["vision",         "vision_model"],
+/**
+ * 语义 Slot 字段 → preferences key 映射（canonical，从 auxiliary-slots 派生）。
+ * 业务层通过 resolveAuxiliaryModel(slot) 消费，不再关心 utility/utility_large。
+ * 旧 utility_model / utility_large_model preference key 在运行时完全忽略（一刀切）。
+ */
+export const AUXILIARY_MODEL_PREF_KEYS: ReadonlyArray<readonly [string, string]> = [
+  ["title",     "title_model"],
+  ["summarize", "summarize_model"],
+  ["memory",    "memory_model"],
+  ["vision",    "vision_model"],
+  ["approval",  "approval_model"],
+  ["guard",     "guard_model"],
 ];
+
+/**
+ * @deprecated 使用 AUXILIARY_MODEL_PREF_KEYS。仅为向后兼容 re-export（不再含 utility/utility_large）。
+ */
+export const SHARED_MODEL_KEYS = AUXILIARY_MODEL_PREF_KEYS;
 
 export const VISION_AUXILIARY_ENABLED_PREF_KEY = "vision_auxiliary_enabled";
 
@@ -50,7 +62,7 @@ function hasOwn(obj, key) {
 
 export function sharedModelsPatchRequiresModelSync(patch) {
   if (!patch || typeof patch !== "object") return false;
-  return SHARED_MODEL_KEYS.some(([field]) => hasOwn(patch, field));
+  return AUXILIARY_MODEL_PREF_KEYS.some(([field]) => hasOwn(patch, field));
 }
 
 export function normalizeSharedModelsPatch(partial) {
@@ -59,7 +71,7 @@ export function normalizeSharedModelsPatch(partial) {
   }
 
   const result: any = {};
-  for (const [field] of SHARED_MODEL_KEYS) {
+  for (const [field] of AUXILIARY_MODEL_PREF_KEYS) {
     if (!hasOwn(partial, field)) continue;
     const raw = partial[field];
     if (raw === undefined) continue;
@@ -185,12 +197,12 @@ export class ConfigCoordinator {
   getSharedModels() {
     const prefs = this._prefs();
     const result: any = {};
-    for (const [field, prefKey] of SHARED_MODEL_KEYS) {
+    for (const [field, prefKey] of AUXILIARY_MODEL_PREF_KEYS) {
       const raw = prefs[prefKey];
       if (typeof raw === "object" && raw?.id) {
-        result[field] = raw;  // new format {id, provider}
+        result[field] = raw;
       } else if (raw) {
-        result[field] = raw;  // old format string — kept as-is for backward compat
+        result[field] = raw;
       } else {
         result[field] = null;
       }
@@ -204,7 +216,7 @@ export class ConfigCoordinator {
     const prefs = this._prefs();
     const changed = [];
     let shouldSyncAgentRuntimeModels = false;
-    for (const [field, prefKey] of SHARED_MODEL_KEYS) {
+    for (const [field, prefKey] of AUXILIARY_MODEL_PREF_KEYS) {
       if (hasOwn(normalized, field)) {
         if (normalized[field] !== null && normalized[field] !== "") prefs[prefKey] = normalized[field];
         else delete prefs[prefKey];
@@ -213,7 +225,7 @@ export class ConfigCoordinator {
           : typeof v === "object" ? `${v.provider || "?"}/${v.id || "?"}`
           : String(v);
         changed.push(`${field}=${repr}`);
-        if (field === "utility" || field === "utility_large") {
+        if (field === "memory") {
           shouldSyncAgentRuntimeModels = true;
         }
       }
@@ -245,10 +257,10 @@ export class ConfigCoordinator {
   }
 
   _syncSharedModelsToAgent(agent, sharedModels) {
+    // 辅助模型角色不再缓存在 Agent 实例上。
+    // MemoryTicker 等消费方在调用边界通过 engine.resolveAuxiliaryExecution("memory")
+    // 现场解析，用户修改 memory_model 后下一次 tick 自动生效，无需同步。
     if (!agent) return;
-    const chatModel = agent.config?.models?.chat || null;
-    agent.setUtilityModel?.(sharedModels.utility || agent.config?.models?.utility || chatModel);
-    agent.setMemoryModel?.(sharedModels.utility_large || agent.config?.models?.utility_large || chatModel);
   }
 
   // ── Search Config ──
@@ -308,63 +320,6 @@ export class ConfigCoordinator {
     log.log(`setSearchConfig: provider=${nextProvider || "(cleared)"}`);
   }
 
-  // ── Utility API ──
-
-  getUtilityApi() {
-    const prefs = this._prefs();
-    return {
-      provider: prefs.utility_api_provider || null,
-      base_url: prefs.utility_api_base_url || null,
-      api_key: prefs.utility_api_key || null,
-    };
-  }
-
-  setUtilityApi(partial) {
-    const prefs = this._prefs();
-    for (const [key, prefKey] of [
-      ["provider", "utility_api_provider"],
-      ["base_url", "utility_api_base_url"],
-      ["api_key", "utility_api_key"],
-    ]) {
-      if (partial[key] !== undefined) {
-        if (partial[key]) prefs[prefKey] = partial[key];
-        else delete prefs[prefKey];
-      }
-    }
-    this._savePrefs(prefs);
-    log.log(`setUtilityApi: provider=${partial.provider || "-"}, base_url=${partial.base_url || "-"}`);
-  }
-
-  resolveUtilityConfig( options: any = {}) {
-    const { models, resolverArgs } = this._utilityResolverArgs(options);
-    return models.resolveUtilityConfig(...resolverArgs);
-  }
-
-  async resolveUtilityConfigFresh( options: any = {}) {
-    const { models, resolverArgs } = this._utilityResolverArgs(options);
-    return models.resolveUtilityConfigFresh(...resolverArgs);
-  }
-
-  _utilityResolverArgs( options: any = {}) {
-    const { agentId } = options || {};
-    const agent = agentId ? this._d.getAgentById?.(agentId) : this._d.getAgent();
-    if (!agent) {
-      throw new Error(`resolveUtilityConfig: agent ${agentId || "(focus)"} not found`);
-    }
-    const models = this._d.getModels();
-    const resolverArgs = [
-      agent.config,
-      this.getSharedModels(),
-      this.getUtilityApi(),
-    ];
-    if (options?.requireUtilityLarge !== undefined) {
-      resolverArgs.push({
-        requireUtilityLarge: options.requireUtilityLarge,
-      });
-    }
-    return { models, resolverArgs };
-  }
-
   // ── Agent Order ──
 
   readAgentOrder() {
@@ -381,9 +336,7 @@ export class ConfigCoordinator {
 
   async syncAndRefresh() {
     const models = this._d.getModels();
-    const synced = await models.syncAndRefresh();
-    this.normalizeUtilityApiPreferences();
-    return synced;
+    return await models.syncAndRefresh();
   }
 
   /**
@@ -521,41 +474,6 @@ export class ConfigCoordinator {
         }
       }
     }
-  }
-
-  normalizeUtilityApiPreferences(logFn = null) {
-    const prefs = this._prefs();
-    const hasOverride =
-      !!prefs.utility_api_provider ||
-      !!prefs.utility_api_base_url ||
-      !!prefs.utility_api_key;
-    if (!hasOverride) return false;
-
-    const shared = this.getSharedModels();
-    const utilityRef = shared.utility || this._d.getAgent()?.config?.models?.utility || null;
-    const parsed = parseModelRef(utilityRef);
-    const utilityEntry = (parsed?.id && parsed?.provider)
-      ? findModel(this._d.getModels().availableModels, parsed.id, parsed.provider)
-      : null;
-
-    let reason = "";
-    if (!prefs.utility_api_provider || !prefs.utility_api_base_url || !prefs.utility_api_key) {
-      reason = "override incomplete";
-    } else if (!utilityEntry?.provider) {
-      reason = "utility model unavailable";
-    } else if (prefs.utility_api_provider !== utilityEntry.provider) {
-      reason = `provider mismatch (${prefs.utility_api_provider} != ${utilityEntry.provider})`;
-    }
-
-    if (!reason) return false;
-
-    delete prefs.utility_api_provider;
-    delete prefs.utility_api_base_url;
-    delete prefs.utility_api_key;
-    this._savePrefs(prefs);
-    const logger = logFn || log.log.bind(log);
-    logger(`[config] cleared invalid utility_api override: ${reason}`);
-    return true;
   }
 
   // ── Channels Master ──

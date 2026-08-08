@@ -32,12 +32,13 @@ function makeOpaqueFetchError() {
   return err;
 }
 
-function makeUtilConfig() {
+function makeResolvedConfig() {
   return {
-    utility: "gpt-4o-mini",
-    api_key: "sk-test",
-    base_url: "https://api.deepseek.com",
+    model: { id: "gpt-4o-mini", provider: "openai" },
     api: "openai-completions",
+    apiKey: "sk-test",
+    baseUrl: "https://api.deepseek.com",
+    headers: {},
   };
 }
 
@@ -54,7 +55,7 @@ describe("llm-utils error cause passthrough", () => {
 
     vi.spyOn(globalThis, "fetch").mockRejectedValue(makeProxyCauseError());
 
-    const result = await summarizeTitle(makeUtilConfig(), "hello", "hello there");
+    const result = await summarizeTitle(makeResolvedConfig(), "hello", "hello there");
 
     // summarizeTitle must return null on failure
     expect(result).toBeNull();
@@ -74,7 +75,7 @@ describe("llm-utils error cause passthrough", () => {
 
     vi.spyOn(globalThis, "fetch").mockRejectedValue(makeProxyCauseError());
 
-    await summarizeTitle(makeUtilConfig(), "hello", "hello there");
+    await summarizeTitle(makeResolvedConfig(), "hello", "hello there");
 
     const allOutput = errorOutput.join("\n");
     // Either the cause message or its code should appear
@@ -89,7 +90,7 @@ describe("llm-utils error cause passthrough", () => {
 
     vi.spyOn(globalThis, "fetch").mockRejectedValue(makeOpaqueFetchError());
 
-    await summarizeTitle(makeUtilConfig(), "hello", "hello there");
+    await summarizeTitle(makeResolvedConfig(), "hello", "hello there");
 
     expect(errorOutput.length).toBeGreaterThan(0);
     const allOutput = errorOutput.join("\n");

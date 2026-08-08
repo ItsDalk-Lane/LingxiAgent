@@ -74,16 +74,9 @@ describe('onboarding saveModel', () => {
       agentId: 'hana-primary',
       providerName: 'deepseek',
       selectedModel: 'deepseek-v4-pro',
-      selectedUtility: 'deepseek-v4-flash',
-      selectedUtilityLarge: 'deepseek-v4-pro',
       addedModels: [
         'deepseek-v4-flash',
         { id: 'deepseek-v4-pro', name: 'DeepSeek V4 Pro', audio: true },
-      ],
-      fetchedModels: [
-        { id: 'deepseek-v4-flash' },
-        { id: 'deepseek-v4-pro' },
-        { id: 'deepseek-v4-unused' },
       ],
     } as Parameters<typeof saveModel>[0] & {
       addedModels: Array<string | { id: string; name?: string }>;

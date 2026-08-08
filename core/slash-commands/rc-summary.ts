@@ -1,17 +1,13 @@
 /**
- * rc-summary.js — 为 /rc 接管生成桌面 session 简述（三级 fallback）
+ * rc-summary.js — 为 /rc 接管生成桌面 session 简述（summarize slot fallback）
  *
  * 接管成功后要发一条带 summary 的回复给 bridge 用户，告诉 ta
- * "这个桌面会话之前聊了什么"。三级模型 fallback 提升 resilience：
+ * "这个桌面会话之前聊了什么"。
  *
- *   1. utility          ← 小工具模型（快/便宜）
- *   2. utility_large    ← 大工具模型（utility_large，准确度更好）
- *   3. chat             ← agent 主聊天模型（最权威，当前 bridge 也在用的这个）
- *   4. null             ← 上层自行兜底为 "已接管对话 <title>"
- *
- * 为什么三级而不是单点：utility/utility_large 常走更轻的端点，
- * 主模型做摘要浪费资源；但任何一级因为凭证/网络/限流失败时应能向下降级，
- * 用户感知是「summary 还是会出现，只是有时候来自不同模型」。
+ * 新 Slot 架构下，summary 由语义 Slot "summarize" 提供：
+ *   summarize slot 配置了模型 → 用该模型
+ *   summarize slot 未配置 → fallback 到 chat 主聊天模型
+ *   均失败 → null（上层自行兜底为 "已接管对话 <title>"）
  *
  * 不在此处做兜底文案；失败返回 null，调用方（/rc 选择 handler）决定最终文案，
  * 避免"摘要器"和"文案兜底"两个职责互相纠缠。
@@ -20,7 +16,6 @@ import fs from "fs";
 import { callText } from "../llm-client.ts";
 import {
   callTextConfigFromResolvedModel,
-  callTextConfigFromUtilityConfig,
 } from "../model-execution-config.ts";
 import { callTextWithLengthContract, type OutputLengthContract } from "../output-length-contract.ts";
 import { getLocale } from "../../lib/i18n.ts";
@@ -34,8 +29,8 @@ const CONTENT_CHAR_LIMIT = 1500;
 const MAX_TURNS_FROM_TAIL = 8;
 
 /**
- * @param {object} engine  engine.resolveUtilityConfigFresh()、engine.resolveModelWithCredentialsFresh(ref)
- * @param {object} agent   agent.config.models.chat 用于 tier 3
+ * @param {object} engine  engine.resolveAuxiliaryModelFresh()、engine.resolveModelWithCredentialsFresh(ref)
+ * @param {object} agent   agent.config.models.chat 用于 chat fallback
  * @param {string} sessionPath  桌面 session 绝对路径
  * @returns {Promise<string|null>}
  */
@@ -49,42 +44,29 @@ export async function summarizeSessionForRc(engine, agent, sessionPath) {
   const messages = _buildMessages(content, isZh);
   const lengthContract = _summaryLengthContract(isZh);
 
-  // Tier 1: utility
-  let utilConfig = null;
+  // summarize slot（未配置时 fallback 到 chat）
+  const ctx = agent?.id ? { agentId: agent.id } : {};
+  let summarizeResolved = null;
   try {
-    utilConfig = await engine.resolveUtilityConfigFresh?.(agent?.id ? { agentId: agent.id } : undefined);
-  } catch { /* ignore, fall through */ }
+    summarizeResolved = await engine.resolveAuxiliaryModelFresh?.("summarize", ctx);
+  } catch { /* ignore, fall through to chat */ }
 
-  const utilityExecution = utilConfig
-    ? callTextConfigFromUtilityConfig(utilConfig)
-    : null;
-  if (utilityExecution?.model && utilityExecution.baseUrl && utilityExecution.api) {
+  if (summarizeResolved?.model && summarizeResolved.baseUrl && summarizeResolved.api) {
     const text = await _safeCall({
-      ...utilityExecution,
-      usageLedger: utilConfig.usageLedger ?? engine.usageLedger,
-      usageContext: usageContextForRc(engine, agent, sessionPath, "rc_summary_utility"),
+      api: summarizeResolved.api,
+      apiKey: summarizeResolved.apiKey,
+      baseUrl: summarizeResolved.baseUrl,
+      headers: summarizeResolved.headers,
+      model: summarizeResolved.model,
+      usageLedger: summarizeResolved.usageLedger ?? engine.usageLedger,
+      usageContext: usageContextForRc(engine, agent, sessionPath, "rc_summary_summarize"),
       messages,
       lengthContract,
-    }, "utility");
+    }, "summarize");
     if (text) return text;
   }
 
-  // Tier 2: utility_large
-  const largeExecution = utilConfig
-    ? callTextConfigFromUtilityConfig(utilConfig, "utility_large")
-    : null;
-  if (largeExecution?.model && largeExecution.baseUrl && largeExecution.api) {
-    const text = await _safeCall({
-      ...largeExecution,
-      usageLedger: utilConfig.usageLedger ?? engine.usageLedger,
-      usageContext: usageContextForRc(engine, agent, sessionPath, "rc_summary_utility_large"),
-      messages,
-      lengthContract,
-    }, "utility_large");
-    if (text) return text;
-  }
-
-  // Tier 3: chat model
+  // chat model fallback（summarize slot 未配置或调用失败时）
   const chatRef = agent?.config?.models?.chat;
   if (chatRef?.id && chatRef?.provider) {
     try {

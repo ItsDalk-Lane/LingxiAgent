@@ -31,9 +31,9 @@ describe("install_skill safety review", () => {
     (callText as any).mockResolvedValueOnce("safe");
 
     const result = await safetyReview("---\nname: demo\n---\n# Demo\n", async () => ({
-      utility: "utility-model",
-      api_key: "key",
-      base_url: "https://example.test",
+      model: "guard-model",
+      apiKey: "key",
+      baseUrl: "https://example.test",
       api: "openai",
       headers: { "x-provider-contract": "install-skill" },
     }));
@@ -48,9 +48,9 @@ describe("install_skill safety review", () => {
     (callText as any).mockResolvedValueOnce("safe");
 
     const result = await safetyReview("---\nname: demo\n---\n# Demo\n", async () => ({
-      utility: "utility-model",
-      api_key: "",
-      base_url: "https://example.test",
+      model: "guard-model",
+      apiKey: "",
+      baseUrl: "https://example.test",
       api: "openai",
       headers: { Authorization: "Bearer header-owned-token" },
     }));
@@ -62,25 +62,19 @@ describe("install_skill safety review", () => {
     }));
   });
 
-  it("uses a small-utility-only resolver for install skill safety review", async () => {
+  it("uses a guard-slot resolver for install skill safety review", async () => {
     (callText as any).mockResolvedValueOnce("safe");
-    const resolveUtilityConfig = vi.fn(async (options) => {
-      expect(options).toMatchObject({
-        requireUtilityLarge: false,
-        purpose: "install_skill_safety",
-      });
-      return {
-        utility: "utility-model",
-        api_key: "key",
-        base_url: "https://example.test",
-        api: "openai",
-      };
-    });
+    const resolveGuardModel = vi.fn(async () => ({
+      model: "guard-model",
+      apiKey: "key",
+      baseUrl: "https://example.test",
+      api: "openai",
+    }));
 
-    const result = await safetyReview("---\nname: demo\n---\n# Demo\n", resolveUtilityConfig);
+    const result = await safetyReview("---\nname: demo\n---\n# Demo\n", resolveGuardModel);
 
     expect(result).toEqual({ safe: true });
-    expect(resolveUtilityConfig).toHaveBeenCalledOnce();
+    expect(resolveGuardModel).toHaveBeenCalledOnce();
     expect(callText).toHaveBeenCalledOnce();
   });
 
@@ -89,10 +83,10 @@ describe("install_skill safety review", () => {
     const managerSource = fs.readFileSync(path.join(process.cwd(), "core", "agent-manager.ts"), "utf-8");
 
     expect(agentSource).toContain(
-      "resolveUtilityConfig: (options) => this._cb?.resolveUtilityConfigFresh?.(options)",
+      'resolveGuardModel: () => this._cb?.getEngine?.()?.resolveAuxiliaryModelFresh?.("guard"',
     );
     expect(managerSource).toContain(
-      "resolveUtilityConfigFresh: (options) => getEngine()?.resolveUtilityConfigFresh?.({ ...(options || {}), agentId: ag.id })",
+      "resolveAuxiliaryModelFresh: (slot, options) => getEngine()?.resolveAuxiliaryModelFresh?.(slot, { ...(options || {}), agentId: ag.id })",
     );
   });
 
@@ -119,10 +113,10 @@ describe("install_skill safety review", () => {
       getConfig: () => ({
         capabilities: { learn_skills: { enabled: true, safety_review: true } },
       }),
-      resolveUtilityConfig: () => ({
-        utility: "utility-model",
-        api_key: "key",
-        base_url: "https://example.test",
+      resolveGuardModel: () => ({
+        model: "guard-model",
+        apiKey: "key",
+        baseUrl: "https://example.test",
         api: "openai",
       }),
       onInstalled,
@@ -160,10 +154,10 @@ describe("install_skill safety review", () => {
       getConfig: () => ({
         capabilities: { learn_skills: { enabled: true, safety_review: true } },
       }),
-      resolveUtilityConfig: () => ({
-        utility: "utility-model",
-        api_key: "key",
-        base_url: "https://example.test",
+      resolveGuardModel: () => ({
+        model: "guard-model",
+        apiKey: "key",
+        baseUrl: "https://example.test",
         api: "openai",
       }),
       onInstalled,
@@ -198,10 +192,10 @@ describe("install_skill safety review", () => {
       getConfig: () => ({
         capabilities: { learn_skills: { enabled: true, safety_review: true } },
       }),
-      resolveUtilityConfig: () => ({
-        utility: "utility-model",
-        api_key: "key",
-        base_url: "https://example.test",
+      resolveGuardModel: () => ({
+        model: "guard-model",
+        apiKey: "key",
+        baseUrl: "https://example.test",
         api: "openai",
       }),
       onInstalled,

@@ -94,18 +94,3 @@ export function callTextConfigFromResolvedModel(resolved: any) {
     model: resolved?.model || null,
   };
 }
-
-/** Map either utility role from ExecutionRouter's dual-model result to callText. */
-export function callTextConfigFromUtilityConfig(config: any, role = "utility") {
-  if (role !== "utility" && role !== "utility_large") {
-    throw new Error(`Unsupported utility role "${String(role)}"`);
-  }
-  const large = role === "utility_large";
-  return callTextConfigFromResolvedModel({
-    model: large ? config?.utility_large : config?.utility,
-    api: large ? config?.large_api : config?.api,
-    api_key: large ? config?.large_api_key : config?.api_key,
-    base_url: large ? config?.large_base_url : config?.base_url,
-    headers: large ? config?.large_headers : config?.headers,
-  });
-}

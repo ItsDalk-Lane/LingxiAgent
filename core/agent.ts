@@ -111,7 +111,6 @@ export class Agent {
   declare _installSkillTool: any;
   declare _listAgents: any;
   declare _memoryMasterEnabled: any;
-  declare _memoryModel: any;
   declare _memorySearchTool: any;
   declare _memorySessionEnabled: any;
   declare _memoryTicker: any;
@@ -136,7 +135,6 @@ export class Agent {
   declare _systemPrompt: any;
   declare _todoTool: any;
   declare _updateSettingsTool: any;
-  declare _utilityModel: any;
   declare _webFetchTool: any;
   declare _webSearchTool: any;
   declare _cardGuideTool: any;
@@ -385,53 +383,57 @@ export class Agent {
 
     log(`  [agent] 4. FactStore + SummaryManager 完成`);
 
-    // utility 模型：用户未配置时 fallback 到聊天模型
+    // 记忆系统使用语义 Slot "memory"（未配置时 fallback 到聊天模型）。
+    // 不再缓存 _utilityModel / _memoryModel——MemoryTicker 在调用边界
+    // 通过 engine.resolveAuxiliaryExecution("memory") 现场解析，用户改完
+    // memory_model 后下一次 tick 自动生效，无需重启 agent。
     const chatModelRef = this._config.models?.chat || null;
-    const userSetUtility = sharedModels.utility || this._config.models?.utility || null;
-    const userSetUtilityLarge = sharedModels.utility_large || this._config.models?.utility_large || null;
-
-    this._utilityModel = userSetUtility || chatModelRef;
-    this._memoryModel = userSetUtilityLarge || chatModelRef;
-
-    if (!userSetUtility && chatModelRef) {
-      moduleLog.log(`utility 模型未配置，使用聊天模型作为工具模型`);
-    }
-    if (!userSetUtilityLarge && chatModelRef) {
-      moduleLog.log(`utility_large 模型未配置，使用聊天模型作为记忆模型`);
-    }
 
     // 保存解析函数：每次 tick 现场调用，拿到最新凭证。
-    // 不缓存解析结果——provider key/url/api 变更后 tick 自动恢复，无需重启 agent。
     this._resolveModel = resolveModel || null;
     this._resolveModelFresh = resolveModelFresh || null;
 
-    // 启动时试探性 resolve 一次，只为打一条启动告警（运行时由 ticker 各调用点的 try/catch 处理）
-    if (this._memoryModel && this._resolveModel) {
+    // 启动时试探性探测 memory slot，只为打一条启动告警
+    if (chatModelRef) {
       try {
-        this._resolveModel(this._memoryModel, this._config);
+        const engine = this._cb?.getEngine?.();
+        if (engine?.resolveAuxiliaryExecution) {
+          await engine.resolveAuxiliaryExecution("memory", { agentId: this.id });
+        }
       } catch (err) {
-        const src = userSetUtilityLarge ? "utility_large" : "聊天模型 fallback";
-        moduleLog.warn(`记忆系统暂不可用：${src} 解析失败（改完凭证后 tick 会自动恢复） — ${err.message}`);
-        this._cb?.emitDevLog?.(`记忆系统暂不可用：${src} 解析失败 — ${err.message}`, "warn");
+        moduleLog.warn(`记忆系统暂不可用：memory slot 解析失败（改完凭证后 tick 会自动恢复） — ${err.message}`);
+        this._cb?.emitDevLog?.(`记忆系统暂不可用：memory slot 解析失败 — ${err.message}`, "warn");
       }
-    } else if (!this._memoryModel) {
-      moduleLog.warn("记忆系统未启动：utility_large 未配置且无聊天模型可 fallback");
-      this._cb?.emitDevLog?.("记忆系统未启动：未配置工具模型且无聊天模型可 fallback", "warn");
+    } else {
+      moduleLog.warn("记忆系统未启动：无聊天模型可 fallback");
+      this._cb?.emitDevLog?.("记忆系统未启动：无聊天模型可 fallback", "warn");
     }
 
-    if (this._memoryModel && this._resolveModel) {
+    if (chatModelRef) {
       log(`  [agent] 4. memoryTicker...`);
       this._memoryTicker = createMemoryTicker({
         summaryManager: this._summaryManager,
         configPath: this.configPath,
         factStore: this._factStore,
-        // 现场 resolve：每次 tick 拿到 yaml 最新凭证
+        // 现场 resolve memory slot：每次 tick 拿到最新凭证和模型配置
         getResolvedMemoryModel: async () => {
-          if (!this._resolveModelFresh) {
-            throw new Error("fresh memory model resolver is unavailable");
+          const engine = this._cb?.getEngine?.();
+          if (!engine?.resolveAuxiliaryExecution) {
+            throw new Error("memory slot resolver is unavailable");
+          }
+          const execution = await engine.resolveAuxiliaryExecution("memory", { agentId: this.id });
+          if (!execution) {
+            throw new Error("memory slot resolved to null (no model configured and no chat fallback)");
           }
           return {
-            ...await this._resolveModelFresh(this._memoryModel, this._config),
+            model: execution.model,
+            provider: execution.provider,
+            api: execution.api,
+            api_key: execution.apiKey,
+            base_url: execution.baseUrl,
+            headers: execution.headers,
+            ...(execution.credentialSource ? { credential_source: execution.credentialSource } : {}),
+            ...(execution.accountId ? { accountId: execution.accountId } : {}),
             usageLedger: this._cb?.getEngine?.()?.usageLedger,
             usageAgentId: this.id,
           };
@@ -487,7 +489,7 @@ export class Agent {
       // 避免 agent runtime 初始化时直接抢前台 CPU。
       this._memoryTicker.start();
     } else {
-      moduleLog.warn(`⚠ 未配置 utility 模型，记忆系统暂不可用（用户可在设置中配置后重启）`);
+      moduleLog.warn(`⚠ 未配置聊天模型，记忆系统暂不可用（用户可在设置中配置后重启）`);
     }
 
     // 7. 创建工具（记忆 + 通用）
@@ -623,7 +625,7 @@ export class Agent {
 
     }
 
-    // 10. install_skill 工具（需要 agentDir + config + engine.resolveUtilityConfig）
+    // 10. install_skill 工具（需要 agentDir + config + engine.resolveAuxiliaryModelFresh("guard")）
     this._installSkillTool = createInstallSkillTool({
       agentDir: this.agentDir,
       getUserSkillsDir: () => this._cb?.getSkillsDir?.(),
@@ -635,7 +637,7 @@ export class Agent {
         cfg.capabilities = { ...cfg.capabilities, learn_skills: globalLearn };
         return cfg;
       },
-      resolveUtilityConfig: (options) => this._cb?.resolveUtilityConfigFresh?.(options),
+      resolveGuardModel: () => this._cb?.getEngine?.()?.resolveAuxiliaryModelFresh?.("guard", { agentId: this.id }),
       onInstalled: async (skillName) => {
         await this._onInstallCallback?.(skillName);
       },
@@ -786,8 +788,6 @@ export class Agent {
   setDescriptionRefreshHandler(fn) { this._descriptionRefreshHandler = fn; }
   setDmSentHandler(fn) { this._dmSentHandler = fn; }
   setChannelPostHandler(fn) { this._channelPostHandler = fn; }
-  setUtilityModel(val) { this._utilityModel = val; }
-  setMemoryModel(val) { this._memoryModel = val; }
 
   /**
    * 为某个会话面创建带作用域的 search_memory 实例（同一 FactStore，不复制数据归属）。
@@ -824,8 +824,6 @@ export class Agent {
   get sessionMemoryEnabled() { return this._memorySessionEnabled; }
   get yuanPrompt() { return this._readYuan(); }
   get publicIshiki() { return this._readPublicIshiki(); }
-  get utilityModel() { return this._utilityModel; }
-  get memoryModel() { return this._memoryModel; }
   get runtimeInitialized() { return this._runtimeInitialized; }
   get needsRepair() { return !!this._repairState; }
   get repairState() { return this._repairState ? { ...this._repairState } : null; }
@@ -876,23 +874,26 @@ export class Agent {
   }
 
   /**
-   * 当前记忆模型凭证（现场 resolve，不缓存）
-   * 用户改完 provider key/url/api 后这里立即反映最新值
+   * 当前记忆模型凭证（现场 resolve memory slot，不缓存）
+   * 用户改完 provider key/url/api 或 memory_model 后这里立即反映最新值
    */
   get resolvedMemoryModel() {
-    if (!this._memoryModel || !this._resolveModel) return null;
+    const engine = this._cb?.getEngine?.();
+    if (!engine?.auxResolver) return null;
     try {
-      return this._resolveModel(this._memoryModel, this._config);
+      // 同步 resolve（使用缓存的 provider 凭证）
+      return engine.resolveAuxiliaryModel("memory", { agentId: this.id });
     } catch {
       return null;
     }
   }
-  /** 记忆模型不可用的原因（null 表示可用，现场 resolve） */
+  /** 记忆模型不可用的原因（null 表示可用，现场 resolve memory slot） */
   get memoryModelUnavailableReason() {
-    if (!this._memoryModel) return "utility_large 未配置且无聊天模型可 fallback";
-    if (!this._resolveModel) return null;
+    const engine = this._cb?.getEngine?.();
+    if (!engine?.auxResolver) return null;
     try {
-      this._resolveModel(this._memoryModel, this._config);
+      const resolved = engine.resolveAuxiliaryModel("memory", { agentId: this.id });
+      if (!resolved) return "memory slot 未配置且无聊天模型可 fallback";
       return null;
     } catch (err) {
       return err.message;

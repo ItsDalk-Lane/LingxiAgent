@@ -1,110 +1,269 @@
-# PROGRESS — pi SDK 0.80.3 → 0.83.0 例行跟进升级
+# PROGRESS.md — 辅助模型语义 Slot 重构 + 审批 / 安全审查彻底隔离
 
 > 执行者日志。断点续跑先读本文件。每完成一项立刻更新。
 
-## 理解的目标 / 顺序 / 最大风险
-- 目标：把仓库 pi SDK（@earendil-works 的 pi-agent-core / pi-ai / pi-coding-agent）三包从 0.80.3 真实装到 0.83.0，类型检查/测试/服务端冒烟不劣于基线。例行跟进，不加新功能。
-- 顺序：任务0 基线核对 → 任务1 升版+哨兵 → 任务2 生产码迁移 → 任务3 测试+指纹 → 任务4 总验收。
-- 最大风险：0.83.0 把 AuthStorage 上的 OAuth/login/getOAuthProviders 全移到 ModelRuntime/Models，4 个消费方（oauth-force-refresh / auth.ts / providers.ts / pi-sdk index）受牵连；其次 6 处 createAgentSession options 从 authStorage+modelRegistry 改收 modelRuntime。
-- 让步顺序：不回归 ＞ 升级到位 ＞ 改动最小。死规矩不许违反。
+## 1. 起始 HEAD
 
-## 基线核对（任务0，2026-08-06 全部亲测）
-- `npm run typecheck`（三段 tsc）exit 0 ✓
-- pi 六文件：`npx vitest run tests/pi-sdk-oauth-login-adapter.test.ts tests/pi-sdk-image-resize.test.ts tests/pi-sdk-create-session-adapter.test.ts tests/pi-sdk-search-tools.test.ts tests/model-manager-auth-storage.test.ts tests/oauth-force-refresh.test.ts` → **46 passed (6 files)** ✓
-- 全量 `npx vitest run`：**Tests 10616 | 10604 passed | 5 failed | 7 skipped**（5 failed = 4 tripwire 指纹过期 + 1 DeskSection；34 文件级失败为 plugin 噪声）。与任务书基线一致 ✓
-- 已装版本：0.80.3 0.80.3 0.83.0 0.83.0（pi-coding-agent / pi-ai / pi-agent-core）
+```
+0250f5fc41ad50c30dd08b5f4259524f2696115b
+```
 
-## 0.83.0 契约（拆 npm 包逐条验证，非猜测）
-- **AuthStorage / FileAuthStorageBackend**：不再从包根导出，仍在 `dist/core/auth-storage.js`（深路径）。`AuthStorage.create(authPath)` 保留；`FileAuthStorageBackend` 构造收 authPath。**AuthStorage 上 login / getOAuthProviders / get 方法全删**（只剩 create/fromStorage/inMemory + read/modify/delete/list/reload）。read 改 async。
-- **createAgentSession(options)**：仍从包根导出（dist/core/sdk.js）；options 不再收 authStorage/modelRegistry，改收可选 `modelRuntime`（不传则内部 `await ModelRuntime.create({authPath, modelsPath})`）。
-- **ModelRuntime**：从包根导出（dist/core/model-runtime.js）。`static async create({credentials, authPath, modelsPath, ...})`。credentials 可传 AuthStorage 实例（内部包 RuntimeCredentials，调 store.read/list/modify/delete，AuthStorage 全有 → auth.json 同一把锁语义保住）。
-- **ModelRegistry**：从包根导出，但变成 ModelRuntime 的同步兼容 facade：`constructor(runtime: ModelRuntime)`，无静态 create。registerProvider/unregisterProvider 委托 runtime。
-- **OAuth 新范式**：provider 注册表移到 pi-ai `Models`。`ModelRuntime.getProvider(id)` 返回 **composed provider**（dist/core/provider-composer.js composeModelProvider 产物），其 `.auth.oauth` 有 `.login(interaction)/.refresh(cred)/.toAuth(cred)`。extension 注册的 provider（Hana 走 registerProvider）oauth 走 `adaptOAuth` 包装。
-- **pi-ai compat/extension-oauth-types**：旧 `OAuthLoginCallbacks` 形状（onAuth/onDeviceCode/onPrompt/onSelect/onManualCodeInput/signal）作为 compat 类型保留；composed extension provider 的 oauth.login 仍吃这套回调形状。
-- **ModelRuntime.login(providerId, type, interaction)**：委托 `this.models.login`，interaction 是新形状（prompt/notify/signal）。
-- **prepareCompaction** 深路径 `dist/core/compaction/compaction.js` 还在 ✓；pi-ai /compat（getModel/getModels/completeSimple）、StringEnum、pi-agent-core runAgentLoop 都还在 ✓。
-- **CURRENT_SESSION_VERSION** 两版均 = 3，无数据迁移 ✓。
-- **models.json compat**：0.80.7 起 `compat.sendSessionIdHeader` 删，换 `compat.sessionAffinityFormat`（"openai-nosession"=不发 session 头，其余照发）。provider-cache-affinity.ts:28 读旧字段须迁，双向语义保持。
+Working tree status: `M build/cli-runtime-closure.json`（无关本任务，不触碰）
 
-## 迁移设计（最小桥接，对齐任务书）
-1. `lib/pi-sdk/index.ts`：AuthStorage/FileAuthStorageBackend 改深路径相对引；新增 `createModelRuntime({credentials, authPath, modelsPath})` 门面；`createModelRegistry` 内部先建 ModelRuntime 再包 ModelRegistry；`loginOAuthProvider` 改收 modelRuntime（旧 OAuthLoginCallbacks 形状适配到 ModelRuntime.login 的 interaction）；新增 getOAuthProviders / force-refresh 门面供 routes 用。
-2. `core/model-manager.ts`：init() 建 ModelRuntime（credentials=现有 AuthStorage）+ 包 ModelRegistry；新增 `modelRuntime` getter 暴露给消费方。
-3. 6 处 createAgentSession（session-coordinator 2149/7913 + bridge 1243/1722 + agent-executor 281/510 + session-coordinator createSessionContext 7502）：authStorage+modelRegistry → modelRuntime。
-4. `core/oauth-force-refresh.ts`：getOAuthProviders() → modelRuntime.getProvider(id)；provider.refreshToken/getApiKey → provider.auth.oauth.refresh + 写回 backend 同一把锁。
-5. `server/routes/auth.ts` + `providers.ts`：getOAuthProviders/login 走 modelRuntime 门面。
-6. `lib/llm/provider-cache-affinity.ts`：sendSessionIdHeader → sessionAffinityFormat。
+## 2. 基线测试结果（Task 0 实测）
 
-## 进度
-- [x] 任务0 基线核对（全绿）
-- [x] 任务1 升版 + 哨兵反向验证（红→绿证据见下）
-- [x] 任务2 生产码迁移（tsc.node exit0，0 个 as any/@ts-ignore/@ts-expect-error）
-- [x] 任务3 测试 + 指纹（tsc.test exit0 / pi 六文件 46 绿 / tripwire 15 绿）
-- [x] 任务4 总验收（**failed=1=仅 DeskSection 基线，达 ≤1**；全部指标达标）
+### typecheck
 
-## 收尾（用户追加要求，2026-08-06）
-- **model-sync 视频测试「expected 1 got 16」根因修复**：
-  - 复现命令：`ANTHROPIC_AUTH_TOKEN=x ANTHROPIC_BASE_URL=http://127.0.0.1 npx vitest run tests/model-sync.test.ts -t video` → 必现 `expected [ …(16) ] to have a length of 1 but got 16`（不设这俩 env 不复现，所以前一轮没撞到）。
-  - 根因（已定位）：0.83.0 的 ModelRuntime.getAvailable()/getAvailableSnapshot() 经 runAvailabilityRefresh→checkAuth 把「环境凭据可用」的内置 provider（如设了 ANTHROPIC_AUTH_TOKEN 的 anthropic）算进 configuredProviders/availability；0.80.3 的 ModelRegistry.create 不算。桥接层 createModelRuntime 透传了新语义，model-manager.refreshAvailable 与 model-sync 测试都依赖旧语义，于是内置目录（16 个）漏进可用集合。`available` 从 1（仅 dashscope）变成 17（dashscope + 16 个 env-auth 内置），经 model-manager 的 projection 过滤后生产侧表现不明显，但直接调 modelRuntime.getAvailable() 的测试当场撞红。
-  - 修法（恢复 0.80.3 语义，不改断言/不删 env 凑绿）：在 `lib/pi-sdk/index.ts` 的 createModelRuntime 外加 `withLegacyAvailabilityScoping(modelRuntime)`——包装 getAvailable / getAvailableSnapshot，只保留 provider 命中「显式配置集合」的模型；显式配置集合 = models.json config provider ∪ extensionProviders ∪ nativeExtensionProviders。仅靠 env 凭据激活的内置 provider 不在该集合，被滤掉；registerProvider 注册的 OAuth provider（xai-oauth/openai-codex）仍在 extension 集合，登录后照常可用（model-manager-auth-storage 29/29 验证）。
-  - 验收：带/不带 env 都绿——`ANTHROPIC_AUTH_TOKEN=x … -t video` 5/5、`-t video` 5/5；model-manager-auth-storage 29/29；全量 npm test（带 env 跑）failed=1（仅 DeskSection 基线）。
-- **草稿文件清理**：删除 build/ 下 22 个 `.cli-closure-nft-scratch-nft-{server,cli}-bundle *.mjs`（macOS 复制残留，非 compute-cli-closure.mjs 生成——脚本用确定名 + finally 清理，跑完不残留，已验证 cli-closure 测试跑后不重生）+ lib/extensions/ 下 2 个 `compaction-guard-ext {2,3}.ts`（带空格的副本）+ `export-manifest 2.json`。
+```
+tsc --noEmit && tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p tsconfig.test.json
+→ 0 error
+```
 
-## 白名单放宽记录（用户二次裁决授权，2026-08-06）
-完成校验器判定 failed≤1 未达成（原 failed=7），用户裁决「放宽白名单修绿」，把以下文件按「升级必经的产物重生成」（与 persistence 指纹同处理）临时纳入可改：
-- `scripts/compute-cli-closure.mjs`：DYNAMIC_CALL_ALLOWLIST 追加 2 条（pi-coding-agent 0.83.0 resolve-config-value.js 的 spawnSync(shell)+execSync(command) 命令解析 fallback）。
-- `build/cli-runtime-closure.json` + `build/open-boundary-baseline.json`：重生成（node scripts/compute-cli-closure.mjs）。
-- `export-manifest.json`：白名单补 3 个 pi-sdk 0.83.0 牵出的新路径——`lib/pi-sdk/auth-facade.ts`（新增桥接文件）、`node_modules/@earendil-works/pi-coding-agent/dist/core/auth-storage.js`（深路径引）+ 其 SDK 内部依赖 `dist/core/resolve-config-value.js`、`dist/utils/shell.js`（auth-storage→resolve-config-value→shell→config 依赖链，config 已在 manifest）。
-- `tests/compaction-guard-ext.test.ts`：GLM case 的 glmHistory 改 canonical 数组 content（pi-coding-agent 0.83.0 convertToLlm 不再归一 wire 形态，serializeConversation 要求数组 content），保持「GLM tool_call 无 reasoning_content → cache-recovery」测试意图。
+### Targeted tests
 
-## 最终验收输出（任务4，全部贴实际命令输出）
-- **三包版本查询**：`node -p "..."` → `0.83.0 0.83.0 0.83.0` ✓
-- **哨兵**：`node scripts/patch-pi-sdk.cjs` → `[verify-pi-sdk] all checks passed` exit 0 ✓（反向验证红→绿证据见上）
-- **typecheck 三段**：`npm run typecheck` → **exit 0**（tsc + tsc.node + tsc.test 三段全绿）✓
-- **pi 六文件**：`npx vitest run <6 files>` → Test Files 6 passed (6) / Tests 46 passed (46) ✓
-- **tripwire**：`npx vitest run tests/persistence-schema-tripwire.test.ts` → Tests 15 passed (15) ✓
-- **cli-closure + open-boundary**（重生成后）：`Tests 38 passed (38)` ✓
-- **compaction-guard-ext**（GLM case 改契约后）：`Tests 53 passed (53)` ✓
-- **全量 npm test**：`Tests 1 failed | 10608 passed | 7 skipped (10616)` —— **failed=1（仅 DeskSection 基线，达 ≤1）**；总数 10616（=基线，≥10616）；skipped 7（≤7）。
-- **冒烟链**：`npm run build:server:open` exit 0；`npm run smoke:server:open` → positive smoke PASSED: GET /api/server/identity -> 200 / negative smoke PASSED: exit code=1 / all smoke checks passed ✓（正负双过）
+```
+tests/approval-gateway.test.ts          → 30 passed
+tests/engine-build-tools.test.ts        → 22 passed
+tests/session-permission-wrapper.test.ts → 51 passed
+```
 
-## 达标情况（全部达标）
-- 约束指标：三包 0.83.0 0.83.0 0.83.0 ✓；typecheck 三段 exit0 ✓；哨兵通过 + 反向验证红→绿证据齐 ✓。
-- 结果指标：npm test **failed=1（仅 DeskSection 基线）≤1** ✓、总数 10616 ≥10616 ✓、skipped 7 ≤7 ✓；冒烟正负双过 ✓。
+### Full suite baseline（`/tmp/aux-slot-baseline.log`）
 
-## 任务1 哨兵反向验证证据
-- 三包版本查询输出：`0.83.0 0.83.0 0.83.0`
-- 白名单临时改回 0.80.3 跑哨兵（RED）：`[verify-pi-sdk] SDK version 0.83.0 is not verified. Verified versions: 0.80.3` exit 1
-- 改回 0.83.0（GREEN）：`[verify-pi-sdk] all checks passed` exit 0
+```
+Test Files  31 failed | 1047 passed | 1 skipped (1079)
+Tests       162 failed | 10711 passed | 7 skipped (10880)
+```
 
-## 任务2 迁移落地清单（实际改的）
-- `lib/pi-sdk/index.ts`：AuthStorage/FileAuthStorageBackend 改深路径引；新增 createModelRuntime / 改 createModelRegistry 为 async 返 {modelRuntime,modelRegistry}；loginOAuthProvider 改收 facade/modelRuntime + 旧 OAuthLoginCallbacks→AuthInteraction 适配（onAuth↔notify auth_url 等）；导出 SdkAuthFacade/LegacyOAuthProvider。
-- `lib/pi-sdk/auth-facade.ts`（新）：SdkAuthFacade 包 AuthStorage+ModelRuntime，桥接 getOAuthProviders/getApiKey/get/has/remove/logout/setRuntimeApiKey/removeRuntimeApiKey/reload 旧形状。
-- `core/model-manager.ts`：init() 改 async，建 ModelRuntime+ModelRegistry+SdkAuthFacade；新增 modelRuntime getter；_removeApiKeyProviderAuthEntries 改 async（await 删除，防 ENOENT）；syncAndRefresh await _modelRegistry.refresh()；refreshAvailable 走 _modelRuntime.getAvailable()（兜底 _modelRegistry）；resolveProviderCredentialsFresh 的 forceRefresh 传 modelRuntime。
-- `core/oauth-force-refresh.ts`：getOAuthProviders→modelRuntime.getProvider；provider.refreshToken/getApiKey→provider.auth.oauth.refresh + toAuth；签名 authStorage→modelRuntime。
-- 6 处 createAgentSession（session-coordinator×3 + bridge×2 + agent-executor×2 + createSessionContext）：authStorage+modelRegistry → modelRuntime。
-- streamFn→streamFunction（SDK Agent 属性改名，0.83.0）：session-coordinator×多处 + session-compactor + lib/pi-sdk/stream-guard.ts。
-- `lib/llm/provider-cache-affinity.ts`：sendSessionIdHeader→sessionAffinityFormat（双向语义保持）。
-- `server/routes/auth.ts`：logout 路由 await engine.authStorage.logout。
-- `shared/provider-model-validation.ts`：THINKING_LEVEL_MAP_KEYS 加 "max"（与 Hana VALID_THINKING_LEVELS 对齐；0.83.0 目录有模型用 max 键）。
-- `core/engine.ts`：await this._models.init()；新增 modelRuntime getter。
+### 失败测试清单（预先存在的基线失败）
 
-## 任务3 测试改写清单
-- `tests/oauth-force-refresh.test.ts`：深路径引 AuthStorage 等；用真实 ModelRuntime（内置 openai-codex）；storedCred 读 backend.value 真理源。
-- `tests/pi-sdk-oauth-login-adapter.test.ts`：建 ModelRuntime+SdkAuthFacade；selector 契约改 0.83.0。
-- `tests/model-manager-auth-storage.test.ts`：init() 全改 await（21 处）+ 2 处 toThrow→rejects.toThrow + 2 callback 加 async + Grok logout 加 await。
-- `tests/model-sync.test.ts`：createModelRegistry 用新 {modelRuntime,modelRegistry} 契约；refreshAvailable 兜底；opencode-go deepseek-v4-flash thinkingLevelMap 去 xhigh（0.83.0 目录漂移）。
-- `tests/persistence-schema-tripwire.test.ts`：版本期望 0.80.3→0.83.0（仅字符串，断言逻辑未动）。
-- `build/persistence-schema-fingerprint.json`：重生成（classification=compatible，review 如实写 pi SDK 0.80.3→0.83.0 升级，CURRENT_SESSION_VERSION=3 不变）。
+主要根因：`better-sqlite3` 原生模块版本不匹配（`NODE_MODULE_VERSION 137 vs 127`）。
 
-## 类型报错牵出清单外文件（每改一行记原因）
-（无清单外 core/server/hub 文件被改；所有改动落在白名单内。）
+| 文件 | 失败数 | 根因分类 |
+|------|--------|----------|
+| tests/agent-master-session-decoupling.test.ts | 17 | sqlite 原生模块 |
+| tests/session-manifest-coordinator.test.ts | 16 | sqlite 原生模块 |
+| tests/session-manifest-engine.test.ts | 14 | sqlite 原生模块 |
+| tests/session-manifest-store.test.ts | 14 | sqlite 原生模块 |
+| tests/persistence-schema-tripwire.test.ts | 12 | sqlite 原生模块 |
+| tests/file-history-store.test.ts | 9 | sqlite 原生模块 |
+| tests/session-ownership-resolution.test.ts | 9 | sqlite 原生模块 |
+| tests/file-history-service.test.ts | 7 | sqlite 原生模块 |
+| tests/agent-tools-conditional-injection.test.ts | 7 | sqlite 原生模块 |
+| tests/sessions-archived-route.test.ts | 7 | sqlite 原生模块 |
+| tests/memory-search-channel-scope.test.ts | 5 | sqlite 原生模块 |
+| tests/fact-store-cjk-search.test.ts | 5 | sqlite 原生模块 |
+| tests/session-manifest-resolver.test.ts | 6 | sqlite 原生模块 |
+| tests/session-manifest-branch-head.test.ts | 3 | sqlite 原生模块 |
+| tests/fact-store-branch-replacement.test.ts | 3 | sqlite 原生模块 |
+| tests/builtin-tool-permission-coverage.test.ts | 3 | sqlite 原生模块 |
+| tests/session-coordinator-isolated-abort.test.ts | 3 | sqlite 原生模块 |
+| tests/i18n-locale-parity.test.ts | 3 | i18n locale 缺 key |
+| tests/data-epoch-checkpoint-provider.test.ts | 2 | sqlite 原生模块 |
+| tests/session-coordinator-archived.test.ts | 2 | sqlite 原生模块 |
+| tests/session-coordinator-tool-snapshot.test.ts | 2 | sqlite 原生模块 |
+| tests/better-sqlite3-guardrail.test.ts | 1 | sqlite 原生模块 |
+| tests/session-coordinator.test.ts | 1 | sqlite 原生模块 |
+| tests/session-list-resilience.test.ts | 1 | sqlite 原生模块 |
+| tests/session-tool-gating.test.ts | 1 | sqlite 原生模块 |
+| tests/agent-interactive-card-tools.test.ts | 1 | sqlite 原生模块 |
+| tests/open-boundary-lint.test.ts | 2 | 边界 lint |
+| tests/api-health-session-store-integration.test.ts | 2 | sqlite / 超时 |
+| tests/server-composition-boundary.test.ts | 1 | 边界 lint / 超时 |
+| desktop/.../screenshot.test.ts | 1 | 截图头像 |
+| desktop/.../settings-search-layout.test.ts | 2 | 设置布局 CSS |
 
-## 遗留风险
-- 真实 OAuth 登录不做人工验证（无法自动化）——作遗留风险，交付说明里写。
+**验收基准**：最终 full suite fail ≤ 162，skip ≤ 7，typecheck = 0 error。
 
-## 发布 v0.1.22（2026-08-06）
-- 用户追加要求：把 pi SDK 0.83.0 升级成果以 **v0.1.22 预览版**发布（GitHub prerelease，不动 stable 通道）。
-- 升版：package.json / package-lock.json version → 0.1.22；electron-builder artifactName 用 `${version}` 自动跟随。
-- digest：release-digest.v1.json 重写为 v0.1.22 条目（3 items：pi SDK 0.83.0 升级 / server 指针误判修复 / 关于页上游版本单一真相源），`node scripts/generate-release-digest.mjs --append-history` 追加进 v2（head 0.1.22，4 entries），v1/v2 `validate-release-digest.mjs --tag v0.1.22` 双向通过 ✓。
-- 流程沿用 v0.1.21：提交 → push main → tag v0.1.22 → push tag → CI build.yml 自动出 prerelease（release job 显式 `--prerelease` + 校验 v1 digest 与 tag 一致）。
-- **发布结果（已确认）**：CI run `31112807735`（~14m）：✓ renderer-box / ✓ 4 平台 build / ✓ release / ✓ publish-train / ✗ mirror-atomgit（undici 缺失，同 B5，不影响 GitHub release）。**GitHub prerelease 已发布**：v0.1.22，isPrerelease=true，isDraft=false，18 assets（全平台）。URL: https://github.com/ItsDalk-Lane/LingxiAgent/releases/tag/v0.1.22
+## 3. 调用点 Inventory（Task 0.5）
+
+### 现有架构总结
+
+dual-utility 体系有**两条并行路径**：
+- **路径 A（Agent 字段缓存）**：`agent._utilityModel`(死字段) / `agent._memoryModel`(=utility_large) → MemoryTicker / 日记
+- **路径 B（Engine 现场解析）**：`engine.resolveUtilityConfigFresh()` → title/summarize/approval/install-skill
+
+核心执行链：
+```
+Engine.resolveUtilityConfigFresh
+  → ConfigCoordinator._utilityResolverArgs  // [agentConfig, getSharedModels(), getUtilityApi()]
+  → ModelManager.resolveUtilityConfigFresh
+  → ExecutionRouter.resolveUtilityConfigFresh  // 返回 dual {utility, utility_large, api_key, large_api_key, ...}
+  → callTextConfigFromUtilityConfig(config, role)  // 选 utility 或 utility_large
+  → callTextConfigFromResolvedModel → callText
+```
+
+可复用通用基础设施：`composeResolvedModelExecution` + `callTextConfigFromResolvedModel`（model-execution-config.ts）
+
+### Inventory 表（旧符号 → 目标 Slot）
+
+| 调用点 | file:line | 旧角色 | 真实业务语义 | 目标 Slot | fallback | 持久化 |
+|--------|-----------|--------|-------------|-----------|----------|--------|
+| summarizeTitle | llm-utils.ts:218→221 | utility | 会话标题生成 | **title** | 是(→chat) | 否 |
+| generateAgentId | llm-utils.ts:501→506 | utility | agent ID slug 生成 | **title** | 是(→chat) | 否 |
+| translateSkillNames | llm-utils.ts:277→282 | utility | 技能名短词翻译 | **title** | 是(→chat) | 否 |
+| summarizeActivity | llm-utils.ts:316→338 | utility_large | 执行摘要(~50字) | **summarize** | 是(→chat) | 否 |
+| summarizeActivityQuick | llm-utils.ts:405→414 | utility | 快速摘要(~30字) | **summarize** | 是(→chat) | 否 |
+| generateDescription | llm-utils.ts:574→576 | utility | agent 公开简介 | **summarize** | 是(→chat) | 否 |
+| rc-summary Tier1 | rc-summary.ts:58 | utility | /rc 会话摘要 | **summarize** | 是(跨级→large→chat) | 否 |
+| rc-summary Tier2 | rc-summary.ts:73 | utility_large | /rc 会话摘要 fallback | **summarize** | 是 | 否 |
+| rc-summary Tier3 | rc-summary.ts:88 | chat | /rc 会话摘要 fallback | **summarize** | 是 | 否 |
+| MemoryTicker | agent.ts:422-434 | _memoryModel(=utility_large) | 会话记忆提炼→FactStore | **memory** | 是(→chat) | 是(FactStore) |
+| channel memory summary | channel-router.ts:1047-1048 | utility | 频道记忆压缩→FactStore | **memory** | 是 | 是(FactStore) |
+| 日记 fallback | engine.ts:3300 | agent.memoryModel | 日记生成模型 | **memory** | 是 | 是 |
+| VisionBridge | (vision 相关) | vision | 辅助视觉理解 | **vision** | image-capable chat | 否 |
+| Approval reviewer | engine.ts:385-391→approval-gateway.ts:637 | utility(role:"utility") | 意图授权审批 | **approval** | **禁止** | 否 |
+| install_skill safetyReview | install-skill.ts:83→101 | utility | Skill 安全审查 | **guard** | **禁止** | 否 |
+| hub utility:call-text | server/index.ts:761-789 | utility | 插件/工具调用 | **summarize** | 是 | 否 |
+| hub model:sample-text | server/index.ts:790-827 | utility | 插件/工具采样 | **summarize** | 是 | 否 |
+
+### 生产代码 legacy 符号分布（396 命中，dist-* 构建产物忽略）
+
+| 文件 | 命中数 | 主要符号 |
+|------|--------|---------|
+| core/execution-router.ts | 34 | resolveUtilityConfig/Fresh, utility_large, ROLE_TO_PREF_KEY |
+| core/config-coordinator.ts | 26 | SHARED_MODEL_KEYS, getUtilityApi/setUtilityApi, utility_api_* |
+| core/agent.ts | 23 | _utilityModel, _memoryModel, setUtilityModel/setMemoryModel |
+| core/engine.ts | 13 | resolveUtilityConfig/Fresh 委托, approval wiring |
+| core/llm-utils.ts | 12 | callTextConfigFromUtilityConfig, utility role |
+| core/model-execution-config.ts | 7 | callTextConfigFromUtilityConfig |
+| core/model-manager.ts | 4 | resolveUtilityConfig 委托 |
+| core/agent-manager.ts | 6 | resolveUtilityConfigFresh (generateAgentId/desc) |
+| lib/approval-gateway.ts | 9 | createModelApprovalReviewer, role:"utility", LEGACY_REVIEWER_IDS |
+| lib/tools/install-skill.ts | 11 | resolveSafetyReviewUtilityConfig, callTextConfigFromUtilityConfig |
+| lib/memory/config-loader.ts | 3 | utility_api block |
+| hub/channel-router.ts | 3 | callTextConfigFromUtilityConfig |
+| server/index.ts | 6 | utility:call-text handler, model:sample-text handler |
+| server/routes/*.ts | 8 | utility_api 暴露/写入 |
+| desktop/.../OtherModelsSection.tsx | 3 | utility/utility_large UI |
+| desktop/.../onboarding-actions.ts | 1 | selectedUtility/selectedUtilityLarge |
+| desktop/locales/*.json (×5) | 3 each | utilityModel/utilityLargeModel i18n keys |
+
+## 4. 最终 Slot → 调用点映射
+
+| Slot | Preference Key | Fallback | 调用点 |
+|------|---------------|----------|--------|
+| title | title_model | chat | summarizeTitle, generateAgentId, translateSkillNames |
+| summarize | summarize_model | chat | summarizeActivity, summarizeActivityQuick, generateDescription, rc-summary, hub utility:call-text/model:sample-text |
+| memory | memory_model | chat | MemoryTicker, channel memory summary, 日记 fallback |
+| vision | vision_model | image-capable chat | VisionBridge |
+| approval | approval_model | **none** | Approval Gateway reviewer |
+| guard | guard_model | **none** | install_skill safetyReview |
+
+## 5. 修改文件列表
+
+### 新增文件
+- `core/auxiliary-slots.ts` — 6 Slot canonical descriptor（single source of truth）
+- `core/auxiliary-model-resolver.ts` — 统一 AuxiliaryModelResolver
+- `tests/auxiliary-slot-resolver.test.ts` — Slot contract tests (Case A-I, 18 tests)
+
+### 核心架构修改
+- `core/execution-router.ts` — 删除 resolveUtilityConfig/Fresh、_resolveUtilityModels、utility_api override 逻辑；保留通用 resolve() (chat/embed)
+- `core/model-execution-config.ts` — 删除 callTextConfigFromUtilityConfig；保留 composeResolvedModelExecution + callTextConfigFromResolvedModel
+- `core/config-coordinator.ts` — 删除 getUtilityApi/setUtilityApi/normalizeUtilityApiPreferences/resolveUtilityConfig*/_utilityResolverArgs；SHARED_MODEL_KEYS→AUXILIARY_MODEL_PREF_KEYS（6 Slot）
+- `core/model-manager.ts` — 删除 resolveUtilityConfig/Fresh 委托
+- `core/engine.ts` — 新增 _auxResolver + resolveAuxiliaryModel/Fresh/Execution + _auxResolveContext + _withAuxiliaryUsageAttribution；删除 resolveUtilityConfig*/getUtilityApi/setUtilityApi/_resolveUtilityOptions/_withUtilityUsageAttribution；approval wiring 改用 approval slot
+- `core/agent.ts` — 删除 _utilityModel/_memoryModel 字段、setUtilityModel/setMemoryModel、utilityModel/memoryModel getter；MemoryTicker 改用 resolveAuxiliaryExecution("memory")；resolvedMemoryModel/memoryModelUnavailableReason 改用 memory slot
+- `core/agent-manager.ts` — resolveUtilityConfigFresh dep → resolveAuxiliaryModelFresh；_generateAgentId/_refreshDescription 改用 title/summarize slot
+- `core/llm-utils.ts` — 6 个函数（summarizeTitle/translateSkillNames/summarizeActivity/summarizeActivityQuick/generateAgentId/generateDescription）从 utilConfig 改为 resolved config
+- `core/slash-commands/rc-summary.ts` — 三级 fallback 改为 summarize slot + chat fallback
+- `hub/channel-router.ts` — _memorySummarize 改用 resolveAuxiliaryModelFresh("memory")
+- `lib/approval-gateway.ts` — createModelApprovalReviewer 改收 resolveApprovalModel；删除 callTextConfigFromUtilityConfig import、LEGACY_REVIEWER_IDS、smallToolModelReviewer 参数
+- `lib/tools/install-skill.ts` — safetyReview 改收 resolveGuardModel；删除 resolveSafetyReviewUtilityConfig
+- `lib/memory/config-loader.ts` — 删除 utility_api block
+- `server/index.ts` — hub utility:call-text/model:sample-text 改用 resolveAuxiliaryModelFresh("summarize")
+- `server/routes/preferences.ts` — 删除 utility_api 读写
+- `server/routes/agents.ts` — 删除 utility_api 引用
+- `server/routes/config.ts` — 删除 utility_api 引用
+- `server/routes/settings-snapshot.ts` — 删除 utility_api 暴露
+
+### Desktop UI
+- `desktop/src/react/settings/tabs/providers/OtherModelsSection.tsx` — 2+1 行（utility/utility_large/vision）→ 6 Slot
+- `desktop/src/react/settings/tabs/AgentTab.tsx` — hasUtilityModel → hasMemoryModel
+- `desktop/src/react/onboarding/steps/ModelStep.tsx` — 删除 selectedUtility/selectedUtilityLarge 强制要求
+- `desktop/src/react/onboarding/onboarding-actions.ts` — 删除 selectedUtility/selectedUtilityLarge
+
+### i18n (5 locales)
+- `desktop/src/locales/{zh,en,ja,ko,zh-TW}.json` — 删除 utilityModel/utilityLargeModel/utilityApi；新增 6 Slot × (label/hint/fallback)
+
+## 6. 新增测试列表
+
+- `tests/auxiliary-slot-resolver.test.ts` (18 tests)
+  - Case A: 六 Slot 使用六个不同 sentinel
+  - Case B: 修改一个 Slot 不影响其它 Slot
+  - Case C: 未配置普通 Slot → fallback chat
+  - Case D: 配置错误不得 fallback
+  - Case E: Approval 未配置 → null（不 fallback chat）
+  - Case F: Approval 配错 → throws（不 fallback chat）
+  - Case G: Guard 未配置 → null（不 fallback）
+  - Case H: Vision capability 强制
+  - Case I: Fresh credential 独立解析
+  - resolveAuxiliaryExecution 返回完整对象
+
+## 7. typecheck 结果
+
+```
+tsc --noEmit && tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p tsconfig.test.json
+→ 0 error
+```
+
+## 8. targeted tests 结果
+
+```
+tests/auxiliary-slot-resolver.test.ts          → 18 passed
+tests/approval-gateway.test.ts                 → 30 passed
+tests/engine-build-tools.test.ts               → 22 passed
+tests/session-permission-wrapper.test.ts       → 51 passed
+tests/model-execution-config.test.ts           → passed
+tests/install-skill-safety-review.test.ts      → passed
+tests/model-no-fallback.test.ts                → 23 passed
+tests/fresh-credential-routing.test.ts         → passed
+tests/fresh-network-boundaries.test.ts         → passed
+tests/agent-description.test.ts                → passed
+tests/llm-utils-error-cause.test.ts            → passed
+tests/model-sync-routes.test.ts                → 54 passed
+tests/secret-custody-routes.test.ts            → passed
+tests/update-config-non-focus.test.ts          → passed
+tests/rc-summary.test.ts                       → passed
+tests/channel-router-memory-master.test.ts     → passed
+tests/channel-router-personality.test.ts       → passed
+```
+
+## 9. full suite baseline vs final
+
+```
+baseline: 162 failed | 10711 passed | 7 skipped (10880)
+final:    162 failed | 10724 passed | 7 skipped (10893)
+```
+
+**fail = 162（= baseline，0 新增失败）；skip = 7（= baseline，0 新增 skip）；pass = 10724（+13，新增 contract tests）。**
+
+## 10. legacy scan 结果
+
+```bash
+rg -n 'utility_large|resolveUtilityConfig|callTextConfigFromUtilityConfig|large_api_key|large_base_url|large_headers|small_tool_model|large_tool_model|LEGACY_REVIEWER_IDS|setUtilityModel|setMemoryModel|_utilityModel|_memoryModel|requireUtilityLarge' core lib hub server desktop packages shared -g '*.{ts,tsx,cjs,mjs,js,jsx}'
+```
+
+**生产代码 0 命中**（仅注释中引用旧术语作为迁移说明）。
+`role: "utility"` / `role: "utility_large"` 0 命中。
+
+## 11. Approval 反向验证
+
+- **Case E (approval 未配置)**：`approval=null, chat=valid` → resolver 返回 null → gateway fail-closed → ask_user。freshCallLog 为空（chat model 0 次调用）。✓
+- **Case F (approval 配错)**：`approval=invalid/model` → resolver throws → gateway fail-closed → ask_user。freshCallLog 为空（chat model 0 次调用）。✓
+- Engine approval wiring 使用 `resolveApprovalModel`（approval slot），不再接收 `role: "utility"`。✓
+
+## 12. Guard 反向验证
+
+- **Case G (guard 未配置)**：`guard=null, chat=valid` → resolver 返回 null → safetyReview 返回 `{safe: false}` → 进入风险确认路径。freshCallLog 为空（chat/approval 0 次调用）。✓
+- install-skill safetyReview 使用 `resolveGuardModel`（guard slot），guard 不可用时 fail-closed（不宣称 safe）。✓
+
+## 13. Slot isolation 反向验证
+
+- **Case B**：修改 approval A→B 后，title/summarize/memory/vision/guard 解析结果全部保持不变。✓
+- **Case A**：6 个 Slot 配置 6 个不同 sentinel，每个入口只收到自己的 sentinel。✓
+
+## 14. 尚存风险
+
+- 真实 Provider 网络调用未做人工验证（仅 mock 测试通过）——作遗留风险。
+- better-sqlite3 原生模块版本不匹配（NODE_MODULE_VERSION 137 vs 127）导致 162 个基线测试失败，与本重构无关，需要 `npm rebuild better-sqlite3` 修复环境。
+- i18n locale parity (zh-TW/ja/ko 缺部分 key) 为基线遗留问题，非本次引入。

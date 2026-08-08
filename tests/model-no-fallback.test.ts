@@ -359,7 +359,7 @@ describe("模型选择无 fallback", () => {
     });
   });
 
-  // ────── resolveUtilityConfig ──────
+  // ────── resolveModelWithCredentials ──────
 
   describe("resolveModelWithCredentials", () => {
     let ModelManager;
@@ -455,121 +455,86 @@ describe("模型选择无 fallback", () => {
     });
   });
 
-  describe("resolveUtilityConfig", () => {
-    // 直接测试 ModelManager 的 resolveUtilityConfig 方法（委托 ExecutionRouter）
-    let ModelManager, ExecutionRouter;
+  describe("resolveAuxiliaryModel (slot-based)", () => {
+    // 直接测试 AuxiliaryModelResolver：每个 Slot 独立解析，无 dual-utility 概念。
+    let AuxiliaryModelResolver;
 
     beforeEach(async () => {
-      const mod = await import("../core/model-manager.ts");
-      ModelManager = mod.ModelManager;
-      const routerMod = await import("../core/execution-router.ts");
-      ExecutionRouter = routerMod.ExecutionRouter;
+      const mod = await import("../core/auxiliary-model-resolver.ts");
+      AuxiliaryModelResolver = mod.AuxiliaryModelResolver;
     });
 
-    /** 给 ModelManager 注入 executionRouter（跳过 init） */
-    function setupRouter(mm) {
-      mm.executionRouter = new ExecutionRouter(
-        (ref) => {
-          // 测试 mock：支持 {id, provider} 对象（新契约）或 "provider/id" 字符串
-          if (!ref) return null;
-          if (typeof ref === "object" && ref.id && ref.provider) {
-            return mm._availableModels.find((m) => m.id === ref.id && m.provider === ref.provider);
-          }
-          return null;
-        },
-        {
-          getCredentials: (provider) => {
-            const model = mm._availableModels.find((m) => m.provider === provider);
-            if (!model?._cred) return null;
-            return model._cred;
-          },
-          allowsMissingApiKey: (provider) => {
-            const model = mm._availableModels.find((m) => m.provider === provider);
-            return model?._allowMissingApiKey === true;
-          },
-        },
-      );
+    /**
+     * 构造 resolver。
+     * @param {object[]} models  availableModels 列表（支持 _cred / _allowMissingApiKey 测试标记）
+     * @param {object} slotRefs  { summarize: {id, provider}, memory: {...} }
+     * @param {object|null} chatModel  chat fallback 模型（未配置 Slot 时用）
+     */
+    function makeResolver(models, slotRefs, chatModel = null) {
+      const resolveModel = (ref) => {
+        if (!ref || typeof ref !== "object") return null;
+        return models.find((m) => m.id === ref.id && m.provider === ref.provider) || null;
+      };
+      const getChatModel = () => chatModel;
+      const getSlotModelRef = (slot) => slotRefs?.[slot] || null;
+      const getProviderCredentials = (provider) => {
+        const model = models.find((m) => m.provider === provider);
+        return model?._cred || null;
+      };
+      const resolveProviderCredentialsFresh = async (provider) => getProviderCredentials(provider);
+      const allowsMissingApiKey = (provider, baseUrl) => {
+        const model = models.find((m) => m.provider === provider);
+        return model?._allowMissingApiKey === true || false;
+      };
+      return new AuxiliaryModelResolver({
+        resolveModel,
+        getChatModel,
+        getSlotModelRef,
+        resolveProviderCredentialsFresh,
+        getProviderCredentials,
+        allowsMissingApiKey,
+      });
     }
 
-    it("utility 未配置时抛错", () => {
-      const mm = new ModelManager({ lingxiHome: tempDir });
-      setupRouter(mm);
-      expect(() => mm.resolveUtilityConfig({}, {}, {}))
-        .toThrow(/noUtilityModel|utility 模型|utility model/);
-    });
-
-    it("utility_large 未配置时抛错", () => {
-      const mm = new ModelManager({ lingxiHome: tempDir });
-      setupRouter(mm);
-      mm._availableModels = [{ id: "some-model", provider: "x" }];
-      expect(() => mm.resolveUtilityConfig({}, { utility: { id: "some-model", provider: "x" } }, {}))
-        .toThrow(/noUtilityLargeModel|utility_large 模型|utility_large model/);
-    });
-
-    it("明确 small-only 调用时不要求 utility_large", () => {
-      const mm = new ModelManager({ lingxiHome: tempDir });
-      setupRouter(mm);
-      mm._availableModels = [
-        { id: "some-model", provider: "x", _cred: { api: "openai-completions", apiKey: "sk-test", baseUrl: "https://test.example.com/v1" } },
-      ];
-
-      const result = mm.resolveUtilityConfig(
-        {},
-        { utility: { id: "some-model", provider: "x" } },
-        {},
-        { requireUtilityLarge: false },
-      );
-
-      expect(result.utility).toMatchObject({ id: "some-model", provider: "x" });
-      expect(result.utility_large).toBeNull();
-    });
-
-    it("utility 和 utility_large 都配置时正常返回", () => {
-      const mm = new ModelManager({ lingxiHome: tempDir });
-      mm._availableModels = [
+    it("Slot 已配置时返回该 Slot 的模型（不再有 utility/utility_large 区分）", () => {
+      const models = [
         { id: "util-model", provider: "test-provider", _cred: { api: "openai-completions", apiKey: "sk-test", baseUrl: "https://test.example.com/v1" } },
         { id: "large-model", provider: "test-provider", _cred: { api: "openai-completions", apiKey: "sk-test", baseUrl: "https://test.example.com/v1" } },
       ];
-      setupRouter(mm);
-      const result = mm.resolveUtilityConfig(
-        {},
-        {
-          utility: { id: "util-model", provider: "test-provider" },
-          utility_large: { id: "large-model", provider: "test-provider" },
-        },
-        {},
-      );
-      expect(result.utility).toMatchObject({ id: "util-model", provider: "test-provider" });
-      expect(result.utility_large).toMatchObject({ id: "large-model", provider: "test-provider" });
-      expect(result.api_key).toBe("sk-test");
-      expect(result.api).toBe("openai-completions");
+      const resolver = makeResolver(models, {
+        summarize: { id: "util-model", provider: "test-provider" },
+        memory: { id: "large-model", provider: "test-provider" },
+      });
+
+      const summarize = resolver.resolveAuxiliaryModel("summarize");
+      const memory = resolver.resolveAuxiliaryModel("memory");
+
+      expect(summarize.model).toMatchObject({ id: "util-model", provider: "test-provider" });
+      expect(memory.model).toMatchObject({ id: "large-model", provider: "test-provider" });
+      expect(summarize.apiKey).toBe("sk-test");
+      expect(summarize.api).toBe("openai-completions");
     });
 
-    it("keeps per-model APIs distinct for utility models on the same provider", () => {
-      const mm = new ModelManager({ lingxiHome: tempDir });
+    it("同一 provider 下两个 Slot 保留各自的 model API", () => {
       const credential = { api: "", apiKey: "sk-test", baseUrl: "https://test.example.com/v1" };
-      mm._availableModels = [
+      const models = [
         { id: "util-model", provider: "test-provider", api: "openai-responses", _cred: credential },
         { id: "large-model", provider: "test-provider", api: "openai-completions", _cred: credential },
       ];
-      setupRouter(mm);
+      const resolver = makeResolver(models, {
+        summarize: { id: "util-model", provider: "test-provider" },
+        memory: { id: "large-model", provider: "test-provider" },
+      });
 
-      const result = mm.resolveUtilityConfig(
-        {},
-        {
-          utility: { id: "util-model", provider: "test-provider" },
-          utility_large: { id: "large-model", provider: "test-provider" },
-        },
-        {},
-      );
+      const summarize = resolver.resolveAuxiliaryModel("summarize");
+      const memory = resolver.resolveAuxiliaryModel("memory");
 
-      expect(result.api).toBe("openai-responses");
-      expect(result.large_api).toBe("openai-completions");
+      expect(summarize.api).toBe("openai-responses");
+      expect(memory.api).toBe("openai-completions");
     });
 
-    it("utility 模型携带 OAuth accountId，供 Codex Responses utility 请求使用", () => {
-      const mm = new ModelManager({ lingxiHome: tempDir });
-      mm._availableModels = [
+    it("Slot 模型携带 OAuth accountId，供请求归因使用", () => {
+      const models = [
         {
           id: "gpt-5.4-codex",
           provider: "openai-codex-oauth",
@@ -581,24 +546,20 @@ describe("模型选择无 fallback", () => {
           },
         },
       ];
-      setupRouter(mm);
+      const resolver = makeResolver(models, {
+        summarize: { id: "gpt-5.4-codex", provider: "openai-codex-oauth" },
+        memory: { id: "gpt-5.4-codex", provider: "openai-codex-oauth" },
+      });
 
-      const result = mm.resolveUtilityConfig(
-        {},
-        {
-          utility: { id: "gpt-5.4-codex", provider: "openai-codex-oauth" },
-          utility_large: { id: "gpt-5.4-codex", provider: "openai-codex-oauth" },
-        },
-        {},
-      );
+      const summarize = resolver.resolveAuxiliaryModel("summarize");
+      const memory = resolver.resolveAuxiliaryModel("memory");
 
-      expect(result.utility).toMatchObject({ accountId: "acct_123" });
-      expect(result.utility_large).toMatchObject({ accountId: "acct_123" });
+      expect(summarize.model).toMatchObject({ accountId: "acct_123" });
+      expect(memory.model).toMatchObject({ accountId: "acct_123" });
     });
 
-    it("provider 声明无须 key 时，utility 远程 baseUrl 可不填 apiKey", () => {
-      const mm = new ModelManager({ lingxiHome: tempDir });
-      mm._availableModels = [
+    it("provider 声明无须 key 时，远程 baseUrl 可不填 apiKey", () => {
+      const models = [
         {
           id: "util-model",
           provider: "ollama",
@@ -620,45 +581,63 @@ describe("模型选择无 fallback", () => {
           },
         },
       ];
-      setupRouter(mm);
+      const resolver = makeResolver(models, {
+        summarize: { id: "util-model", provider: "ollama" },
+        memory: { id: "large-model", provider: "ollama" },
+      });
 
-      const result = mm.resolveUtilityConfig(
-        {},
-        {
-          utility: { id: "util-model", provider: "ollama" },
-          utility_large: { id: "large-model", provider: "ollama" },
-        },
-        {},
-      );
+      const summarize = resolver.resolveAuxiliaryModel("summarize");
+      const memory = resolver.resolveAuxiliaryModel("memory");
 
-      expect(result.utility).toMatchObject({ id: "util-model", provider: "ollama" });
-      expect(result.utility_large).toMatchObject({ id: "large-model", provider: "ollama" });
-      expect(result.api_key).toBe("");
-      expect(result.base_url).toBe("http://192.168.1.20:11434/v1");
+      expect(summarize.model).toMatchObject({ id: "util-model", provider: "ollama" });
+      expect(memory.model).toMatchObject({ id: "large-model", provider: "ollama" });
+      expect(summarize.apiKey).toBe("");
+      expect(summarize.baseUrl).toBe("http://192.168.1.20:11434/v1");
     });
 
-    it("utility_api 与模型 provider 不一致时直接报错", () => {
-      const mm = new ModelManager({ lingxiHome: tempDir });
-      mm._availableModels = [
-        { id: "util-model", provider: "test-provider", _cred: { api: "openai-completions", apiKey: "sk-test", baseUrl: "https://test.example.com/v1" } },
-        { id: "large-model", provider: "test-provider", _cred: { api: "openai-completions", apiKey: "sk-test", baseUrl: "https://test.example.com/v1" } },
+    it("Slot 已配置但模型不在 availableModels 中时抛错（不 fallback）", () => {
+      const models = [
+        { id: "other-model", provider: "test-provider", _cred: { api: "openai-completions", apiKey: "sk-test", baseUrl: "https://test.example.com/v1" } },
       ];
-      setupRouter(mm);
-      expect(() => mm.resolveUtilityConfig(
-        {},
+      const resolver = makeResolver(models, {
+        summarize: { id: "missing-model", provider: "test-provider" },
+      });
+
+      expect(() => resolver.resolveAuxiliaryModel("summarize"))
+        .toThrow(/auxiliarySlotModelNotFound|modelNotFound|模型/);
+    });
+
+    it("Slot 未配置且有 chat fallback 时回退到 chat 模型", () => {
+      const chatModel = { id: "chat-model", provider: "openai", api: "openai-responses" };
+      const models = [
         {
-          utility: { id: "util-model", provider: "test-provider" },
-          utility_large: { id: "large-model", provider: "test-provider" },
+          id: "chat-model",
+          provider: "openai",
+          api: "openai-responses",
+          _cred: { api: "openai-responses", apiKey: "sk-chat", baseUrl: "https://chat.example/v1" },
         },
-        { provider: "openai", api_key: "sk-test", base_url: "https://api.openai.com/v1" },
-      )).toThrow(/utilityApiProviderMismatch|provider.*一致|provider.*match/);
+      ];
+      // summarize 未配置 → fallback chat
+      const resolver = makeResolver(models, {}, chatModel);
+
+      const summarize = resolver.resolveAuxiliaryModel("summarize");
+
+      expect(summarize.model).toMatchObject({ id: "chat-model", provider: "openai" });
+    });
+
+    it("approval/guard Slot 未配置时返回 null（不 fallback chat）", () => {
+      const chatModel = { id: "chat-model", provider: "openai", api: "openai-responses" };
+      const resolver = makeResolver([], {}, chatModel);
+
+      expect(resolver.resolveAuxiliaryModel("approval")).toBeNull();
+      expect(resolver.resolveAuxiliaryModel("guard")).toBeNull();
     });
 
     it("不再接受 hardcoded fallback 模型名", () => {
-      const mm = new ModelManager({ lingxiHome: tempDir });
-      // 以前会 fallback 到 "doubao-seed-2-0-mini-260215"，现在应该抛错
-      expect(() => mm.resolveUtilityConfig({}, {}, {}))
-        .toThrow(/noUtilityModel|utility 模型|utility model/);
+      const resolver = makeResolver([], {}, null);
+
+      // approval Slot 未配置、无 chat fallback → null（绝不静默 fallback 到硬编码模型）
+      expect(resolver.resolveAuxiliaryModel("approval")).toBeNull();
     });
   });
 });

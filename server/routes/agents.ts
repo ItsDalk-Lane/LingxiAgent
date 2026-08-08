@@ -107,7 +107,7 @@ function hasOwn(value, key) {
 function hasProviderMutationPatch(partial) {
   if (!partial || typeof partial !== "object") return false;
   if (hasOwn(partial, "providers")) return true;
-  return ["api", "embedding_api", "utility_api"].some((key) => hasInlineProviderCredentialPatch(partial[key]));
+  return ["api", "embedding_api"].some((key) => hasInlineProviderCredentialPatch(partial[key]));
 }
 
 function getGlobalValue(globalFields, key) {
@@ -166,7 +166,6 @@ function emitAgentConfigAppEvents(engine, agentId, { globalFields, agentPartial,
     providersChanged
     || hasOwn(agentPartial, "api")
     || hasOwn(agentPartial, "embedding_api")
-    || hasOwn(agentPartial, "utility_api")
     || hasOwn(agentPartial, "models")
   ) {
     emitAppEvent(engine, "models-changed", { agentId });
@@ -493,7 +492,6 @@ export function createAgentsRoute(engine) {
       config._raw = {
         api: { provider: config.api?.provider || "", base_url: config.api?.base_url || "" },
         embedding_api: { provider: config.embedding_api?.provider || "", base_url: config.embedding_api?.base_url || "" },
-        utility_api: { provider: config.utility_api?.provider || "", base_url: config.utility_api?.base_url || "" },
       };
 
       // 自动注入全局字段（schema-driven，替代手写逐个注入）
@@ -624,7 +622,7 @@ export function createAgentsRoute(engine) {
       }
 
       // 内联 API 凭证 → 全局 added-models.yaml 对应条目
-      for (const blockName of ["api", "embedding_api", "utility_api"]) {
+      for (const blockName of ["api", "embedding_api"]) {
         const block = agentPartial[blockName];
         if (hasInlineProviderCredentialPatch(block)) {
           const cfgPath = path.join(agentDir(engine, id), "config.yaml");

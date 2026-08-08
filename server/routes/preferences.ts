@@ -166,7 +166,6 @@ export function createPreferencesRoute(engine: any, options: Record<string, any>
     try {
       const models = engine.getSharedModels();
       const search = engine.getSearchConfig();
-      const utilityApi = engine.getUtilityApi();
 
       return c.json({
         models,
@@ -175,11 +174,6 @@ export function createPreferencesRoute(engine: any, options: Record<string, any>
           provider: search.provider || "",
           api_key: maskSecretValue(search.api_key || ""),
           api_keys: maskSearchApiKeys(search.api_keys || {}),
-        },
-        utility_api: {
-          provider: utilityApi.provider || "",
-          base_url: utilityApi.base_url || "",
-          api_key: maskSecretValue(utilityApi.api_key || ""),
         },
       });
     } catch (err) {
@@ -230,16 +224,6 @@ export function createPreferencesRoute(engine: any, options: Record<string, any>
       if (body.search) {
         engine.setSearchConfig(resolveSearchPreferencePatch(body.search, engine.getSearchConfig?.() || {}));
         sections.push("search");
-      }
-
-      // utility API 配置
-      if (body.utility_api) {
-        engine.setUtilityApi(resolveSecretPatch({
-          patch: body.utility_api,
-          existing: engine.getUtilityApi?.() || {},
-          secretKeys: new Set(["api_key"]),
-        }));
-        sections.push("utility_api");
       }
 
       if (needsModelSync) {

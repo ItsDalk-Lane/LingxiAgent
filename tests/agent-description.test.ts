@@ -10,6 +10,16 @@ vi.mock("../core/llm-client.js", () => ({
   callText: vi.fn().mockResolvedValue("温柔细腻的文学型助手，擅长写作、翻译和情感分析，沟通风格亲切自然。"),
 }));
 
+// 新的 resolved 辅助模型配置格式（resolveAuxiliaryModelFresh 的返回结构）
+const resolvedConfig = (overrides: Record<string, any> = {}) => ({
+  model: { id: "test-model", provider: "test" },
+  api: "openai",
+  apiKey: "key",
+  baseUrl: "http://test",
+  headers: {},
+  ...overrides,
+});
+
 describe("generateDescription", () => {
   beforeEach(() => {
     (callText as any).mockReset();
@@ -18,7 +28,7 @@ describe("generateDescription", () => {
 
   it("returns a description within 100 chars", async () => {
     const result = await generateDescription(
-      { utility: "test-model", api_key: "key", base_url: "http://test", api: "openai" },
+      resolvedConfig(),
       "你是 Hanako，一个温柔的助手...",
       "zh",
     );
@@ -28,13 +38,10 @@ describe("generateDescription", () => {
 
   it("uses a resolver-approved header-only execution without an api key", async () => {
     const result = await generateDescription(
-      {
-        utility: "test-model",
-        api_key: "",
-        base_url: "http://test",
-        api: "openai",
+      resolvedConfig({
+        apiKey: "",
         headers: { "X-Provider-Protocol": "v1" },
-      },
+      }),
       "personality text",
       "en",
     );
@@ -48,7 +55,7 @@ describe("generateDescription", () => {
     (callText as any).mockResolvedValueOnce("<mood>\nVibe: 平静专注\nSparks: 纸页、灯光、长句\n</mood>\n沉静细腻的写作型助手，适合文本整理和创意协作。");
 
     const result = await generateDescription(
-      { utility: "test-model", api_key: "key", base_url: "http://test", api: "openai" },
+      resolvedConfig(),
       "你是 Hanako，一个温柔的助手...",
       "zh",
     );
@@ -58,7 +65,7 @@ describe("generateDescription", () => {
 
   it("asks for a third-person roster description without internal tags", async () => {
     await generateDescription(
-      { utility: "test-model", api_key: "key", base_url: "http://test", api: "openai" },
+      resolvedConfig(),
       "identity and ishiki",
       "zh",
     );
@@ -80,7 +87,7 @@ describe("generateDescription", () => {
       .mockResolvedValueOnce(repaired);
 
     const result = await generateDescription(
-      { utility: "test-model", api_key: "key", base_url: "http://test", api: "openai" },
+      resolvedConfig(),
       "你是 Hanako，一个温柔的助手...",
       "zh",
     );
@@ -122,7 +129,7 @@ describe("llm utility soft output budgets", () => {
     (callText as any).mockResolvedValueOnce("写作协作");
 
     const result = await summarizeTitle(
-      { utility: "test-model", api_key: "key", base_url: "http://test", api: "openai" },
+      resolvedConfig(),
       "帮我整理这篇文章",
       "我会先梳理结构。",
     );
@@ -136,16 +143,12 @@ describe("llm utility soft output budgets", () => {
     (callText as any).mockResolvedValueOnce("请求头整理");
 
     await summarizeTitle(
-      {
-        utility: "test-model",
-        api_key: "key",
-        base_url: "http://test",
-        api: "openai",
+      resolvedConfig({
         headers: {
           "x-grok-client-version": "0.2.95",
           "x-grok-model-override": "grok-4.5",
         },
-      },
+      }),
       "整理供应商请求头",
       "我会统一执行配置。",
     );
@@ -161,7 +164,7 @@ describe("llm utility soft output budgets", () => {
     (callText as any).mockResolvedValueOnce("hanako");
 
     const result = await generateAgentId(
-      { utility: "test-model", api_key: "key", base_url: "http://test", api: "openai" },
+      resolvedConfig(),
       "花子",
       tmpDir,
     );

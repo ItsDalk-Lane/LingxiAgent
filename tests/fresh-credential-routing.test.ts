@@ -1,38 +1,34 @@
+/**
+ * AuxiliaryModelResolver fresh credential routing.
+ *
+ * 验证 Slot 解析在请求边界刷新 provider 凭证，且不同 provider 的 Slot 互不串扰。
+ */
 import { describe, expect, it, vi } from "vitest";
 
-import { ExecutionRouter } from "../core/execution-router.ts";
+import { AuxiliaryModelResolver } from "../core/auxiliary-model-resolver.ts";
 
-function createRouter(models, freshResolver = null) {
+function makeResolver(models, freshResolver, options: any = {}) {
   const modelList = Object.values(models) as any[];
-  const providerRegistry = {
-    get: vi.fn((provider) => ({ id: provider, api: `provider-api-${provider}` })),
-    getCredentials: vi.fn(() => ({
-      api: "stale-provider-api",
-      apiKey: "stale-provider-key",
-      baseUrl: "https://stale.example/v1",
-      headers: {
-        Authorization: "Bearer stale-header-token",
-        Cookie: "session=stale",
-      },
-      accountId: "acct_stale",
-    })),
-    allowsMissingApiKey: vi.fn(() => false),
+  const resolveModel = (ref: any) => {
+    if (!ref || typeof ref !== "object") return null;
+    return modelList.find((m) => m.id === ref.id && m.provider === ref.provider) || null;
   };
-  const router = new ExecutionRouter(
-    (ref) => {
-      if (!ref || typeof ref !== "object") return null;
-      return modelList.find((model) => model.id === ref.id && model.provider === ref.provider) || null;
-    },
-    providerRegistry,
-    freshResolver,
-  );
-  return { router, providerRegistry };
+  const getChatModel = () => options.chatModel ?? null;
+  const getSlotModelRef = (slot: string) => options.slotRefs?.[slot] || null;
+  const getProviderCredentials = () => null;
+  return new AuxiliaryModelResolver({
+    resolveModel,
+    getChatModel,
+    getSlotModelRef,
+    resolveProviderCredentialsFresh: freshResolver,
+    getProviderCredentials,
+  });
 }
 
-describe("ExecutionRouter fresh credential routing", () => {
-  it("refreshes once for same-provider utility models while preserving each model API", async () => {
+describe("AuxiliaryModelResolver fresh credential routing", () => {
+  it("refreshes the provider credential and keeps the model API authoritative", async () => {
     const models = {
-      utility: {
+      summarize: {
         id: "small",
         provider: "oauth-runtime",
         api: "openai-responses",
@@ -41,134 +37,100 @@ describe("ExecutionRouter fresh credential routing", () => {
           "x-grok-model-override": "small",
         },
       },
-      large: {
-        id: "large",
-        provider: "oauth-runtime",
-        api: "openai-codex-responses",
-        headers: {
-          Cookie: "model=stale",
-          "x-grok-model-override": "large",
-        },
-      },
     };
     const fresh = vi.fn(async () => ({
-      api_key: "fresh-token",
-      base_url: "https://fresh.example/v1",
+      apiKey: "fresh-token",
+      baseUrl: "https://fresh.example/v1",
       api: "provider-default",
       headers: {
         Authorization: "Bearer provider-stale",
         "x-grok-client-version": "0.2.95",
       },
       accountId: "acct_fresh",
-      credential_source: "auth-storage",
+      credentialSource: "auth-storage",
     }));
-    const { router } = createRouter(models, fresh);
+    const resolver = makeResolver(models, fresh, {
+      slotRefs: { summarize: { id: "small", provider: "oauth-runtime" } },
+    });
 
-    const config = await router.resolveUtilityConfigFresh({}, {
-      utility: { id: "small", provider: "oauth-runtime" },
-      utility_large: { id: "large", provider: "oauth-runtime" },
-    }, {});
+    const resolved = await resolver.resolveAuxiliaryModelFresh("summarize");
 
     expect(fresh).toHaveBeenCalledOnce();
     expect(fresh).toHaveBeenCalledWith("oauth-runtime");
-    expect(config).toMatchObject({
+    expect(resolved).toMatchObject({
       api: "openai-responses",
-      large_api: "openai-codex-responses",
-      api_key: "fresh-token",
-      large_api_key: "fresh-token",
+      apiKey: "fresh-token",
+      baseUrl: "https://fresh.example/v1",
     });
-    expect(config.headers).toEqual({
+    // model API wins over provider default
+    expect(resolved.headers).toEqual({
       "x-grok-client-version": "0.2.95",
       "x-grok-model-override": "small",
     });
-    expect(config.large_headers).toEqual({
-      "x-grok-client-version": "0.2.95",
-      "x-grok-model-override": "large",
-    });
-    expect(config.utility).toMatchObject({ accountId: "acct_fresh", headers: config.headers });
-    expect(config.utility_large).toMatchObject({ headers: config.large_headers });
+    expect(resolved.model).toMatchObject({ accountId: "acct_fresh", headers: resolved.headers });
   });
 
-  it("refreshes different utility providers independently", async () => {
+  it("refreshes different slot providers independently", async () => {
     const models = {
-      utility: { id: "small", provider: "provider-a", api: "api-small" },
-      large: { id: "large", provider: "provider-b", api: "api-large" },
+      summarize: { id: "small", provider: "provider-a", api: "api-small" },
+      memory: { id: "large", provider: "provider-b", api: "api-large" },
     };
-    const fresh = vi.fn(async (provider) => ({
-      api_key: `key-${provider}`,
-      base_url: `https://${provider}.example/v1`,
+    const fresh = vi.fn(async (provider: string) => ({
+      apiKey: `key-${provider}`,
+      baseUrl: `https://${provider}.example/v1`,
       api: `default-${provider}`,
       headers: {},
-      credential_source: "provider-catalog",
+      credentialSource: "provider-catalog",
     }));
-    const { router } = createRouter(models, fresh);
+    const resolver = makeResolver(models, fresh, {
+      slotRefs: {
+        summarize: { id: "small", provider: "provider-a" },
+        memory: { id: "large", provider: "provider-b" },
+      },
+    });
 
-    const config = await router.resolveUtilityConfigFresh({}, {
-      utility: { id: "small", provider: "provider-a" },
-      utility_large: { id: "large", provider: "provider-b" },
-    }, {});
+    const summarize = await resolver.resolveAuxiliaryModelFresh("summarize");
+    const memory = await resolver.resolveAuxiliaryModelFresh("memory");
 
     expect(fresh.mock.calls.map(([provider]) => provider)).toEqual(["provider-a", "provider-b"]);
-    expect(config).toMatchObject({
+    expect(summarize).toMatchObject({
       api: "api-small",
-      api_key: "key-provider-a",
-      large_api: "api-large",
-      large_api_key: "key-provider-b",
+      apiKey: "key-provider-a",
+    });
+    expect(memory).toMatchObject({
+      api: "api-large",
+      apiKey: "key-provider-b",
     });
   });
 
-  it("keeps an explicit utility endpoint authoritative and skips refresh without inheriting stale credentials", async () => {
+  it("fails closed when the fresh credential resolver is missing", async () => {
     const models = {
-      utility: {
-        id: "small",
-        provider: "oauth-runtime",
-        api: "api-small",
-        headers: { Authorization: "Bearer model-stale", Cookie: "model=stale" },
-        accountId: "acct_model_stale",
-      },
-      large: {
-        id: "large",
-        provider: "oauth-runtime",
-        api: "api-large",
-        headers: { Authorization: "Bearer large-stale" },
-      },
+      summarize: { id: "small", provider: "provider-a", api: "api-small" },
     };
-    const fresh = vi.fn(async () => {
-      throw new Error("must not refresh");
-    });
-    const { router, providerRegistry } = createRouter(models, fresh);
-
-    const config = await router.resolveUtilityConfigFresh({}, {
-      utility: { id: "small", provider: "oauth-runtime" },
-      utility_large: { id: "large", provider: "oauth-runtime" },
-    }, {
-      provider: "oauth-runtime",
-      api_key: "override-key",
-      base_url: "https://override.example/v1",
+    const resolver = makeResolver(models, null as any, {
+      slotRefs: { summarize: { id: "small", provider: "provider-a" } },
     });
 
+    await expect(resolver.resolveAuxiliaryModelFresh("summarize")).rejects.toThrow();
+  });
+
+  it("returns null for an unconfigured slot with no chat fallback", async () => {
+    const models = {
+      approval: { id: "approval-model", provider: "provider-a", api: "api-approval" },
+    };
+    const fresh = vi.fn(async () => ({
+      apiKey: "key",
+      baseUrl: "https://example/v1",
+      api: "openai",
+      headers: {},
+      credentialSource: "provider-catalog",
+    }));
+    // approval slot unconfigured, no chat fallback (fallback: none)
+    const resolver = makeResolver(models, fresh, { slotRefs: {} });
+
+    const resolved = await resolver.resolveAuxiliaryModelFresh("approval");
+
+    expect(resolved).toBeNull();
     expect(fresh).not.toHaveBeenCalled();
-    expect(providerRegistry.getCredentials).not.toHaveBeenCalled();
-    expect(config).toMatchObject({
-      api: "api-small",
-      api_key: "override-key",
-      base_url: "https://override.example/v1",
-      large_api: "api-large",
-      large_api_key: "override-key",
-    });
-    expect(config.utility).not.toHaveProperty("headers");
-    expect(config.utility).not.toHaveProperty("accountId");
-    expect(config.utility_large).not.toHaveProperty("headers");
-  });
-
-  it("fails closed when no fresh resolver is installed", async () => {
-    const models = {
-      utility: { id: "small", provider: "provider-a", api: "api-small" },
-    };
-    const { router } = createRouter(models);
-
-    await expect(router.resolveUtilityConfigFresh({}, {
-      utility: { id: "small", provider: "provider-a" },
-    }, {}, { requireUtilityLarge: false })).rejects.toThrow(/Fresh credential resolver/);
   });
 });

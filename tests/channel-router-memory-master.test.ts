@@ -90,16 +90,12 @@ function makeRouter(paths, options: any = {}) {
         agents: undefined,
         usageLedger: options.usageLedger ?? null,
         getAgent: () => null,
-        resolveUtilityConfigFresh: options.resolveUtilityConfigFresh || (async () => ({
-          utility: "test-model",
-          utility_large: "test-model-large",
-          api_key: "test-key",
-          base_url: "https://test.api",
+        resolveAuxiliaryModelFresh: options.resolveAuxiliaryModelFresh || (async () => ({
+          model: "test-model",
+          apiKey: "test-key",
+          baseUrl: "https://test.api",
           api: "openai-completions",
           headers: { "X-Provider-Protocol": "channel" },
-          large_api_key: "test-key",
-          large_base_url: "https://test.api",
-          large_api: "openai-completions",
         })),
       },
       eventBus: { emit: vi.fn() },
@@ -243,7 +239,7 @@ describe("ChannelRouter memory master fallback", () => {
   it("does not call the channel memory network boundary when fresh credentials fail", async () => {
     const paths = writeAgentFixture(true);
     const router = makeRouter(paths, {
-      resolveUtilityConfigFresh: async () => { throw new Error("oauth refresh failed"); },
+      resolveAuxiliaryModelFresh: async () => { throw new Error("oauth refresh failed"); },
     });
 
     await router._memorySummarize("hana", "general", "context");

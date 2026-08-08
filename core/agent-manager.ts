@@ -151,9 +151,8 @@ export class AgentManager {
    * @param {() => object|null} deps.getHub
    * @param {() => import('./skill-manager.ts').SkillManager} deps.getSkills
    * @param {() => object} deps.getSearchConfig
-   * @param {() => object} deps.resolveUtilityConfig
-   * @param {() => Promise<object>} deps.resolveUtilityConfigFresh
    * @param {() => object} deps.getSharedModels
+   * @param {(slot: string, options?: object) => Promise<object>} deps.resolveAuxiliaryModelFresh
    * @param {() => import('./channel-manager.ts').ChannelManager} deps.getChannelManager
    * @param {() => import('./session-coordinator.ts').SessionCoordinator} deps.getSessionCoordinator
    */
@@ -592,9 +591,9 @@ export class AgentManager {
         if (match?.[1] === hash) return; // 没变化，跳过
       } catch {} // 文件不存在，继续生成
 
-      const utilConfig = await this._d.resolveUtilityConfigFresh({ agentId });
+      const resolved = await this._d.resolveAuxiliaryModelFresh?.("summarize", { agentId });
       const locale = ag.resolveLocale();
-      const desc = await generateDescription(utilConfig, source, locale);
+      const desc = await generateDescription(resolved, source, locale);
       if (!desc) {
         log.log(`[description] ${agentId}: 生成跳过（LLM 不可用或返回空）`);
         return;
@@ -1176,8 +1175,7 @@ export class AgentManager {
       // 花名册唯一事实源：tombstone / 坏目录已在 AgentManager 层过滤
       listActiveAgents:     () => this.listActiveAgentsForRoster(),
       createChannelEntry:    (input) => getEngine()?.createChannelEntry?.(input),
-      resolveUtilityConfig: (options) => getEngine()?.resolveUtilityConfig?.({ ...(options || {}), agentId: ag.id }),
-      resolveUtilityConfigFresh: (options) => getEngine()?.resolveUtilityConfigFresh?.({ ...(options || {}), agentId: ag.id }),
+      resolveAuxiliaryModelFresh: (slot, options) => getEngine()?.resolveAuxiliaryModelFresh?.(slot, { ...(options || {}), agentId: ag.id }),
       getCwd:               () => getEngine()?.cwd ?? "",
       getTimezone:          () => getEngine()?.getTimezone?.() ?? "",
       getLocale:            () => getEngine()?.getLocale?.() ?? "",
@@ -1235,13 +1233,13 @@ export class AgentManager {
   }
 
   async _generateAgentId(name) {
-    let utilConfig;
+    let resolved;
     try {
-      utilConfig = await this._d.resolveUtilityConfigFresh();
+      resolved = await this._d.resolveAuxiliaryModelFresh?.("title");
     } catch {
-      // utility 模型未配置（新用户常见），直接走兜底 ID
+      // title 模型不可用（新用户常见），直接走兜底 ID
       return `agent-${Date.now().toString(36)}`;
     }
-    return _generateAgentId(utilConfig, name, this._d.agentsDir);
+    return _generateAgentId(resolved, name, this._d.agentsDir);
   }
 }

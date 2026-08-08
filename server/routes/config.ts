@@ -62,7 +62,7 @@ function hasOwn(value: any, key: string) {
 function hasProviderMutationPatch(partial: any) {
   if (!partial || typeof partial !== "object") return false;
   if (hasOwn(partial, "providers")) return true;
-  return ["api", "embedding_api", "utility_api"].some((key) => hasInlineProviderCredentialPatch(partial[key]));
+  return ["api", "embedding_api"].some((key) => hasInlineProviderCredentialPatch(partial[key]));
 }
 
 function getGlobalValue(globalFields: any[], key: string) {

@@ -2,7 +2,6 @@ import { describe, expect, it } from "vitest";
 
 import {
   callTextConfigFromResolvedModel,
-  callTextConfigFromUtilityConfig,
   composeResolvedModelExecution,
 } from "../core/model-execution-config.ts";
 
@@ -120,38 +119,5 @@ describe("model execution config", () => {
     expect(override.headers).toEqual({});
     expect(override.model).not.toHaveProperty("headers");
     expect(override.model).not.toHaveProperty("accountId");
-  });
-
-  it("maps both utility roles through the same resolved-model adapter", () => {
-    const utility = { id: "small", provider: "p" };
-    const large = { id: "large", provider: "p" };
-    const config = {
-      utility,
-      utility_large: large,
-      api: "api-small",
-      api_key: "key-small",
-      base_url: "https://small.example/v1",
-      headers: { "X-Model": "small" },
-      large_api: "api-large",
-      large_api_key: "key-large",
-      large_base_url: "https://large.example/v1",
-      large_headers: { "X-Model": "large" },
-    };
-
-    expect(callTextConfigFromUtilityConfig(config)).toEqual({
-      api: "api-small",
-      apiKey: "key-small",
-      baseUrl: "https://small.example/v1",
-      headers: { "X-Model": "small" },
-      model: utility,
-    });
-    expect(callTextConfigFromUtilityConfig(config, "utility_large")).toEqual({
-      api: "api-large",
-      apiKey: "key-large",
-      baseUrl: "https://large.example/v1",
-      headers: { "X-Model": "large" },
-      model: large,
-    });
-    expect(() => callTextConfigFromUtilityConfig(config, "embed")).toThrow(/Unsupported utility role/);
   });
 });

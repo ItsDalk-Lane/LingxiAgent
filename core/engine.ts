@@ -26,6 +26,7 @@ import { ResourceAccessService } from "./resource-access-service.ts";
 import { ResourceService } from "./resource-service.ts";
 import { appendSecurityAuditEvent } from "./security-audit-log.ts";
 import { findModel } from "../shared/model-ref.ts";
+import { isLocalBaseUrl } from "../shared/net-utils.ts";
 import {
   resolveWorkspaceSkillCatalogPaths,
   resolveWorkspaceSkillPaths,
@@ -94,6 +95,7 @@ function resolveChannelsEnabledForToolAvailability(engine) {
 import { PreferencesManager } from "./preferences-manager.ts";
 import { InputDraftsStore } from "./input-drafts-store.ts";
 import { ModelManager } from "./model-manager.ts";
+import { AuxiliaryModelResolver } from "./auxiliary-model-resolver.ts";
 import { SessionProjectCatalogStore } from "./session-project-catalog-store.ts";
 import { SkillManager } from "./skill-manager.ts";
 import { BridgeSessionManager } from "./bridge-session-manager.ts";
@@ -261,6 +263,7 @@ export class LingxiEngine {
   declare _computerHost: any;
   declare _computerProviders: any;
   declare _configCoord: any;
+  declare _auxResolver: AuxiliaryModelResolver;
   declare _confirmStore: any;
   declare _coreExtensionFactories: any;
   declare _currentTurnNativeMedia: any;
@@ -378,14 +381,12 @@ export class LingxiEngine {
     this._pluginInstallRecords = new PluginInstallRecords({ lingxiHome });
     this._automationSuggestionStore = new AutomationSuggestionStore();
     this._sessionCollabDraftStore = new SessionCollabDraftStore();
-    // §四十二/§四十三 Approval gateway now uses a single Intent Authorization
-    // Reviewer (role: utility). The small→large cascade is removed. utility_large
-    // is intentionally NOT used for approval — it remains available for all its
-    // other (memory/summary) duties (§三, §五十九).
+    // §四十二/§四十三/§四十四 Approval gateway uses the semantic "approval" slot.
+    // approval slot has NO fallback: unconfigured or misconfigured → reviewer
+    // unavailable → fail-closed (ask_user). Never silently falls back to chat.
     this._approvalGateway = createApprovalGateway({
       intentAuthorizationReviewer: createModelApprovalReviewer({
-        role: "utility",
-        resolveUtilityConfig: (options) => this.resolveUtilityConfigFresh(options || {}),
+        resolveApprovalModel: (options) => this.resolveAuxiliaryModelFresh("approval", options || {}),
         callText: (options) => this._callApprovalReviewerText(options),
       }),
     });
@@ -473,8 +474,7 @@ export class LingxiEngine {
       getHub: () => this._hubCallbacks,
       getSkills: () => this._skills,
       getSearchConfig: () => this.getSearchConfig(),
-      resolveUtilityConfig: (options) => this.resolveUtilityConfig(options),
-      resolveUtilityConfigFresh: (options) => this.resolveUtilityConfigFresh(options),
+      resolveAuxiliaryModelFresh: (slot, options) => this.resolveAuxiliaryModelFresh(slot, options),
       getSharedModels: () => this._configCoord.getSharedModels(),
       getChannelManager: () => this._channels,
       getSessionCoordinator: () => this._sessionCoord,
@@ -599,6 +599,26 @@ export class LingxiEngine {
       emitEvent: (e, sp) => this._emitEvent(e, sp),
       emitDevLog: (t, l) => this.emitDevLog(t, l),
       getCurrentModel: () => this.currentModel?.name,
+    });
+
+    // ── Auxiliary Model Resolver ──
+    // 统一的语义 Slot 解析器：业务层只认识 title/summarize/memory/vision/
+    // approval/guard，不再关心 utility/utility_large。Slot 不拥有 credential；
+    // Provider credential 基础设施是唯一执行凭证来源。
+    this._auxResolver = new AuxiliaryModelResolver({
+      resolveModel: (ref) => this._models._resolveFromAvailable(ref),
+      getChatModel: (agentId) => {
+        const ag = (agentId && this._agentMgr.getAgent(agentId)) || this.agent;
+        return this._models.resolveExecutionModel(ag?.config?.models?.chat || null);
+      },
+      getSlotModelRef: (slot) => this._configCoord.getSharedModels()?.[slot] || null,
+      resolveProviderCredentialsFresh: (provider) =>
+        this._models.resolveProviderCredentialsFresh(provider),
+      getProviderCredentials: (provider) =>
+        this._models.providerRegistry.getCredentials(provider),
+      allowsMissingApiKey: (provider, baseUrl) =>
+        this._models.providerRegistry?.allowsMissingApiKey?.(provider, baseUrl) ??
+        isLocalBaseUrl(baseUrl),
     });
 
     this._visionBridge = new VisionBridge({
@@ -1830,31 +1850,40 @@ export class LingxiEngine {
   }
   getSearchConfig() { return this._configCoord.getSearchConfig(); }
   setSearchConfig(p) { return this._configCoord.setSearchConfig(p); }
-  getUtilityApi() { return this._configCoord.getUtilityApi(); }
-  setUtilityApi(p) { return this._configCoord.setUtilityApi(p); }
-  resolveUtilityConfig( options: any = {}) {
-    const resolvedOptions = this._resolveUtilityOptions(options);
-    const config = this._configCoord.resolveUtilityConfig(resolvedOptions);
-    return this._withUtilityUsageAttribution(config, resolvedOptions);
+  _callApprovalReviewerText(options) { return callText(options); }
+
+  // ── Auxiliary Model Resolver (semantic slots) ──
+  // 统一的语义 Slot 解析入口。业务层只认识 title/summarize/memory/vision/
+  // approval/guard，不再关心 utility/utility_large。
+  resolveAuxiliaryModel(slot, options: any = {}) {
+    const ctx = this._auxResolveContext(options);
+    const config = this._auxResolver.resolveAuxiliaryModel(slot, ctx);
+    return this._withAuxiliaryUsageAttribution(config, ctx);
   }
-  async resolveUtilityConfigFresh( options: any = {}) {
-    const resolvedOptions = this._resolveUtilityOptions(options);
-    const config = await this._configCoord.resolveUtilityConfigFresh(resolvedOptions);
-    return this._withUtilityUsageAttribution(config, resolvedOptions);
+  async resolveAuxiliaryModelFresh(slot, options: any = {}) {
+    const ctx = this._auxResolveContext(options);
+    const config = await this._auxResolver.resolveAuxiliaryModelFresh(slot, ctx);
+    return this._withAuxiliaryUsageAttribution(config, ctx);
   }
-  _resolveUtilityOptions( options: any = {}) {
-    const resolvedOptions = { ...(options || {}) };
-    if (!resolvedOptions.agentId && resolvedOptions.sessionPath) {
-      const ownerAgentId = this.resolveSessionOwnership(resolvedOptions.sessionPath).agentId;
-      if (ownerAgentId) resolvedOptions.agentId = ownerAgentId;
+  async resolveAuxiliaryExecution(slot, options: any = {}) {
+    const ctx = this._auxResolveContext(options);
+    const execution = await this._auxResolver.resolveAuxiliaryExecution(slot, ctx);
+    return this._withAuxiliaryUsageAttribution(execution, ctx);
+  }
+  _auxResolveContext(options: any = {}) {
+    const ctx = { ...(options || {}) };
+    if (!ctx.agentId && ctx.sessionPath) {
+      const ownerAgentId = this.resolveSessionOwnership(ctx.sessionPath).agentId;
+      if (ownerAgentId) ctx.agentId = ownerAgentId;
     }
-    return resolvedOptions;
+    return ctx;
   }
-  _withUtilityUsageAttribution(config, resolvedOptions) {
-    let usageSessionId = resolvedOptions.sessionId || null;
-    if (!usageSessionId && resolvedOptions.sessionPath) {
+  _withAuxiliaryUsageAttribution(config, ctx) {
+    if (!config) return config;
+    let usageSessionId = ctx.sessionId || null;
+    if (!usageSessionId && ctx.sessionPath) {
       try {
-        usageSessionId = this.getSessionIdForPath?.(resolvedOptions.sessionPath) || null;
+        usageSessionId = this.getSessionIdForPath?.(ctx.sessionPath) || null;
       } catch {
         usageSessionId = null;
       }
@@ -1862,13 +1891,12 @@ export class LingxiEngine {
     return {
       ...config,
       usageLedger: this._usageLedger,
-      usageAgentId: resolvedOptions.agentId || this.currentAgentId || null,
-      usageSessionPath: resolvedOptions.sessionPath || null,
+      usageAgentId: ctx.agentId || this.currentAgentId || null,
+      usageSessionPath: ctx.sessionPath || null,
       usageSessionId,
     };
   }
-  _callApprovalReviewerText(options) { return callText(options); }
-  resolveUtilityConfigForAgent(agentId) { return this.resolveUtilityConfig({ agentId }); }
+  get auxResolver() { return this._auxResolver; }
   readAgentOrder() { return this._configCoord.readAgentOrder(); }
   saveAgentOrder(o) { return this._configCoord.saveAgentOrder(o); }
   async syncModelsAndRefresh() { return this._configCoord.syncAndRefresh(); }
@@ -2288,7 +2316,6 @@ export class LingxiEngine {
    */
   async onProviderChanged() {
     await this._models.reloadAndSync();
-    this._configCoord.normalizeUtilityApiPreferences();
     this._sessionCoord.refreshAllSessionsModels();
   }
   getRegistryModelsForProvider(name) { return this._models.getRegistryModelsForProvider(name); }
@@ -2489,7 +2516,6 @@ export class LingxiEngine {
     log(`[init] 4/5 发现可用模型...`);
     try { await this.syncModelsAndRefresh(); } catch (err) { moduleLog.warn(`[init] syncModelsAndRefresh failed: ${err?.message}`); }
     await this._models.refreshAvailable();
-    this._configCoord.normalizeUtilityApiPreferences(log);
     const availableModels = this._models.availableModels;
     log(`[init] 4/5 找到 ${availableModels.length} 个模型: ${availableModels.map(m => `${m.provider}/${m.id}`).join(", ")}`);
     if (availableModels.length === 0) {
@@ -3297,8 +3323,14 @@ export class LingxiEngine {
       await this.agent.memoryTicker.flushSession(currentPath);
     }
     const { writeDiary } = await import("../lib/diary/diary-writer.ts");
-    const diaryModelId = this.agent.config.models?.chat || this.agent.memoryModel;
-    const resolvedModel = await this._models.resolveModelWithCredentialsFresh(diaryModelId);
+    const chatRef = this.agent.config.models?.chat || null;
+    let resolvedModel = null;
+    if (chatRef) {
+      resolvedModel = await this._models.resolveModelWithCredentialsFresh(chatRef);
+    } else {
+      // chat 未配置时 fallback 到 memory slot
+      resolvedModel = await this.resolveAuxiliaryExecution("memory");
+    }
     // 写日记是用户主动触发的「读历史」功能，必须参考记忆，
     // 跟「在对话中潜移默化带入记忆」的 master 开关无关。所以不查 memoryMasterEnabled。
     // per-session 开关只决定缺摘要时是否写回 summaries；关闭时仍可为本次日记临时压缩。
@@ -3336,7 +3368,7 @@ export class LingxiEngine {
   }
 
   async summarizeTitle(ut, at, opts: any = {}) {
-    return _summarizeTitle(await this.resolveUtilityConfigFresh(this._utilityOptionsForContext(opts)), ut, at, opts);
+    return _summarizeTitle(await this.resolveAuxiliaryModelFresh("title", this._auxResolveContext(opts)), ut, at, opts);
   }
 
   async translateSkillNames(names, lang, opts: any = {}) {
@@ -3349,7 +3381,7 @@ export class LingxiEngine {
       names,
       lang,
       translateMissing: async (missingNames) => _translateSkillNames(
-        await this.resolveUtilityConfigFresh(opts.agentId ? { agentId: opts.agentId } : undefined),
+        await this.resolveAuxiliaryModelFresh("title", opts.agentId ? { agentId: opts.agentId } : undefined),
         missingNames,
         lang,
       ),
@@ -3357,8 +3389,8 @@ export class LingxiEngine {
   }
 
   async summarizeActivity(sp, preloaded, opts: any = {}) {
-    const utilityOptions = this._utilityOptionsForContext({ ...opts, sessionPath: opts.sessionPath || sp });
-    return _summarizeActivity(await this.resolveUtilityConfigFresh(utilityOptions), sp, (msg) => this.emitDevLog(msg), preloaded);
+    const ctx = this._auxResolveContext({ ...opts, sessionPath: opts.sessionPath || sp });
+    return _summarizeActivity(await this.resolveAuxiliaryModelFresh("summarize", ctx), sp, (msg) => this.emitDevLog(msg), preloaded);
   }
 
   async summarizeActivityQuick(activityId) {
@@ -3370,7 +3402,7 @@ export class LingxiEngine {
     }
     if (!entry?.sessionFile) return null;
     const sessionPath = path.join(this.agentsDir, foundAgentId, "activity", entry.sessionFile);
-    return _summarizeActivityQuick(await this.resolveUtilityConfigFresh({ agentId: foundAgentId }), sessionPath);
+    return _summarizeActivityQuick(await this.resolveAuxiliaryModelFresh("summarize", { agentId: foundAgentId }), sessionPath);
   }
 
   // ════════════════════════════

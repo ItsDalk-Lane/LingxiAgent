@@ -83,7 +83,6 @@ function maskSearchApiKeys(apiKeys: any) {
 
 function buildGlobalModels(engine: any) {
   const search = engine.getSearchConfig?.() || {};
-  const utilityApi = engine.getUtilityApi?.() || {};
   return {
     models: engine.getSharedModels?.() || {},
     thinking_level: engine.getThinkingLevel?.() || "medium",
@@ -91,11 +90,6 @@ function buildGlobalModels(engine: any) {
       provider: search.provider || "",
       api_key: maskSecretValue(search.api_key || ""),
       api_keys: maskSearchApiKeys(search.api_keys || {}),
-    },
-    utility_api: {
-      provider: utilityApi.provider || "",
-      base_url: utilityApi.base_url || "",
-      api_key: maskSecretValue(utilityApi.api_key || ""),
     },
   };
 }
@@ -139,7 +133,6 @@ async function buildAgentConfig(engine: any, id: string) {
   config._raw = {
     api: { provider: config.api?.provider || "", base_url: config.api?.base_url || "" },
     embedding_api: { provider: config.embedding_api?.provider || "", base_url: config.embedding_api?.base_url || "" },
-    utility_api: { provider: config.utility_api?.provider || "", base_url: config.utility_api?.base_url || "" },
   };
   injectGlobalFields(config, engine);
   addProviderSummary(config, engine);

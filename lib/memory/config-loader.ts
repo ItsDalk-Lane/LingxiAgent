@@ -4,10 +4,9 @@
  * 职责单一：读写 agent 的 config.yaml，提供缓存和原子写入。
  * 不做凭证解析（运行时凭证解析走 ProviderRegistry / AuthStore）。
  *
- * 支持三通道 API 区块：
+ * 支持双通道 API 区块：
  *   api          → 主通道（chat 模型）
  *   embedding_api → Embedding 专用通道（可选）
- *   utility_api   → 工具模型通道（可选，覆盖 utility / utility_large 凭证）
  */
 
 import fs from "fs";
@@ -50,14 +49,10 @@ export function loadConfig(configPath) {
   // Embedding 专用通道（可选）
   const embeddingApi = resolveApi(raw.embedding_api);
 
-  // Utility 通道（工具模型，可选）
-  const utilityApi = resolveApi(raw.utility_api);
-
   const cached = {
     ...raw,
     api,
     embedding_api: embeddingApi,
-    utility_api: utilityApi,
   };
 
   _cache.set(configPath, { cached, cachedRaw });

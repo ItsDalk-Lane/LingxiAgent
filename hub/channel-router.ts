@@ -21,7 +21,6 @@ import { appendMessage, formatMessagesForLLM, getChannelMembers, getChannelMeta,
 import { extractMentionedAgentIds } from "../lib/channels/channel-mentions.ts";
 import { loadConfig } from "../lib/memory/config-loader.ts";
 import { callText } from "../core/llm-client.ts";
-import { callTextConfigFromUtilityConfig } from "../core/model-execution-config.ts";
 import { runAgentPhoneSession } from "./agent-executor.ts";
 import { debugLog, createModuleLogger } from "../lib/debug-log.ts";
 import { getLocale } from "../lib/i18n.ts";
@@ -1044,9 +1043,8 @@ export class ChannelRouter {
         return;
       }
 
-      const utilCfg = await engine.resolveUtilityConfigFresh({ agentId }) || {};
-      const execution = callTextConfigFromUtilityConfig(utilCfg);
-      if (!execution.model || !execution.baseUrl || !execution.api) {
+      const resolved = await engine.resolveAuxiliaryModelFresh("memory", { agentId }) || {};
+      if (!resolved.model || !resolved.baseUrl || !resolved.api) {
         log.log(`${agentId} 无 API 配置，跳过记忆摘要`);
         return;
       }
@@ -1069,7 +1067,11 @@ export class ChannelRouter {
 
       const previousFacts = this._getPreviousChannelMemoryFacts(factStore, sessionId);
       const rawSummary = await (callText as any)({
-        ...execution,
+        api: resolved.api,
+        apiKey: resolved.apiKey,
+        baseUrl: resolved.baseUrl,
+        headers: resolved.headers,
+        model: resolved.model,
         systemPrompt: this._channelMemorySystemPrompt(isZhMem),
         messages: [{
           role: "user",

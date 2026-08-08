@@ -179,14 +179,14 @@ describe("model sync related routes", () => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         models: {
-          utility: { id: "test-model", provider: "test-provider" },
+          summarize: { id: "test-model", provider: "test-provider" },
         },
       }),
     });
 
     expect(res.status).toBe(200);
     expect(engine.setSharedModels).toHaveBeenCalledWith({
-      utility: { id: "test-model", provider: "test-provider" },
+      summarize: { id: "test-model", provider: "test-provider" },
     });
     expect(engine.syncModelsAndRefresh).toHaveBeenCalledTimes(1);
     // Shared model preferences are global: every agent's model list changes, so
@@ -200,11 +200,9 @@ describe("model sync related routes", () => {
     const engine = {
       getSharedModels: vi.fn(() => ({ vision_enabled: false })),
       getSearchConfig: vi.fn(() => ({ provider: null, api_key: null })),
-      getUtilityApi: vi.fn(() => ({ provider: null, base_url: null, api_key: null })),
       resolveModelWithCredentials: vi.fn(),
       setSharedModels: vi.fn(),
       setSearchConfig: vi.fn(),
-      setUtilityApi: vi.fn(),
       syncModelsAndRefresh: vi.fn().mockResolvedValue(true),
       currentAgentId: "hana",
       emitEvent: vi.fn(),
@@ -237,10 +235,8 @@ describe("model sync related routes", () => {
     const engine = {
       getSharedModels: vi.fn(() => ({})),
       getSearchConfig: vi.fn(() => ({ provider: null, api_key: null })),
-      getUtilityApi: vi.fn(() => ({ provider: null, base_url: null, api_key: null })),
       setSharedModels: vi.fn(),
       setSearchConfig: vi.fn(),
-      setUtilityApi: vi.fn(),
       syncModelsAndRefresh: vi.fn().mockRejectedValue(new Error("model refresh failed")),
       currentAgentId: "hana",
       emitEvent: vi.fn(),
@@ -253,7 +249,7 @@ describe("model sync related routes", () => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         models: {
-          utility: { id: "test-model", provider: "test-provider" },
+          summarize: { id: "test-model", provider: "test-provider" },
         },
       }),
     });
@@ -262,7 +258,7 @@ describe("model sync related routes", () => {
     expect(res.status).toBe(500);
     expect(data.error).toContain("model refresh failed");
     expect(engine.setSharedModels).toHaveBeenCalledWith({
-      utility: { id: "test-model", provider: "test-provider" },
+      summarize: { id: "test-model", provider: "test-provider" },
     });
     expect(engine.emitEvent).not.toHaveBeenCalled();
   });
@@ -273,10 +269,8 @@ describe("model sync related routes", () => {
     const engine = {
       getSharedModels: vi.fn(() => ({})),
       getSearchConfig: vi.fn(() => ({ provider: null, api_key: null })),
-      getUtilityApi: vi.fn(() => ({ provider: null, base_url: null, api_key: null })),
       setSharedModels: vi.fn(),
       setSearchConfig: vi.fn(),
-      setUtilityApi: vi.fn(),
       syncModelsAndRefresh: vi.fn().mockResolvedValue(true),
       emitEvent: vi.fn(),
     };
@@ -288,7 +282,7 @@ describe("model sync related routes", () => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         models: {
-          utility: { id: "test-model" },
+          summarize: { id: "test-model" },
         },
       }),
     });

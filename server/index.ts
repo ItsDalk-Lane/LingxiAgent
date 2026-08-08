@@ -89,7 +89,6 @@ import { Hub } from "../hub/index.ts";
 import { startCLI } from "./cli.ts";
 import { fromRoot } from "../shared/hana-root.ts";
 import { callText } from "../core/llm-client.ts";
-import { callTextConfigFromUtilityConfig } from "../core/model-execution-config.ts";
 
 const productDir = fromRoot("lib");
 
@@ -467,7 +466,7 @@ export async function startServer(root: CompositionRoot = {}): Promise<void> {
     model: engine.currentModel?.name || "(none)",
     agent: engine.agentName,
     agentId: engine.currentAgentId, // @ui-focus-ok: startup log
-    utilityModel: (() => { try { return engine.resolveUtilityConfig?.()?.utility?.id || "(none)"; } catch { return "(none)"; } })(),
+    utilityModel: (() => { try { return engine.resolveAuxiliaryModel?.("summarize")?.model?.id || engine.currentModel?.name || "(none)"; } catch { return "(none)"; } })(),
     channelsDir: engine.channelsDir,
   });
 
@@ -765,14 +764,19 @@ export async function startServer(root: CompositionRoot = {}): Promise<void> {
     const agentId = typeof payload.agentId === "string" && payload.agentId.trim()
       ? payload.agentId.trim()
       : (sessionPath ? engine.resolveSessionOwnership?.(sessionPath)?.agentId || null : null);
-    const utility = await engine.resolveUtilityConfigFresh({ agentId, sessionPath });
+    const resolved = await engine.resolveAuxiliaryModelFresh("summarize", { agentId, sessionPath });
+    if (!resolved) throw new Error("summarize slot unavailable (no model configured and no chat fallback)");
     const text = await callText({
-      ...callTextConfigFromUtilityConfig(utility),
+      api: resolved.api,
+      apiKey: resolved.apiKey,
+      baseUrl: resolved.baseUrl,
+      headers: resolved.headers,
+      model: resolved.model,
       systemPrompt: payload.systemPrompt || "",
       messages: Array.isArray(payload.messages) ? payload.messages : [],
       temperature: payload.temperature,
       maxTokens: payload.maxTokens,
-      usageLedger: utility.usageLedger,
+      usageLedger: resolved.usageLedger,
       usageContext: {
         source: {
           subsystem: "utility",
@@ -781,8 +785,8 @@ export async function startServer(root: CompositionRoot = {}): Promise<void> {
           trigger: "tool",
         },
         attribution: sessionPath
-          ? sessionUsageAttribution(sessionPath, utility.usageAgentId || agentId || null)
-          : { kind: "utility", agentId: utility.usageAgentId || agentId || null },
+          ? sessionUsageAttribution(sessionPath, resolved.usageAgentId || agentId || null)
+          : { kind: "utility", agentId: resolved.usageAgentId || agentId || null },
       },
     } as any);
     return { text };
@@ -800,14 +804,19 @@ export async function startServer(root: CompositionRoot = {}): Promise<void> {
     const pluginId = typeof payload.pluginId === "string" && payload.pluginId.trim()
       ? payload.pluginId.trim()
       : null;
-    const utility = await engine.resolveUtilityConfigFresh({ agentId, sessionPath });
+    const resolved = await engine.resolveAuxiliaryModelFresh("summarize", { agentId, sessionPath });
+    if (!resolved) throw new Error("summarize slot unavailable (no model configured and no chat fallback)");
     const text = await callText({
-      ...callTextConfigFromUtilityConfig(utility),
+      api: resolved.api,
+      apiKey: resolved.apiKey,
+      baseUrl: resolved.baseUrl,
+      headers: resolved.headers,
+      model: resolved.model,
       systemPrompt: payload.systemPrompt || "",
       messages: payload.messages,
       temperature: payload.temperature,
       maxTokens: payload.maxTokens,
-      usageLedger: utility.usageLedger,
+      usageLedger: resolved.usageLedger,
       usageContext: {
         source: {
           subsystem: pluginId ? "plugin" : "utility",
@@ -817,10 +826,10 @@ export async function startServer(root: CompositionRoot = {}): Promise<void> {
           actor: pluginId ? { kind: "plugin", pluginId, agentId: agentId || null, ...sessionUsageFields(sessionPath) } : undefined,
         },
         attribution: pluginId
-          ? { kind: "plugin", pluginId, agentId: utility.usageAgentId || agentId || null, ...sessionUsageFields(sessionPath) }
+          ? { kind: "plugin", pluginId, agentId: resolved.usageAgentId || agentId || null, ...sessionUsageFields(sessionPath) }
           : sessionPath
-            ? sessionUsageAttribution(sessionPath, utility.usageAgentId || agentId || null)
-            : { kind: "utility", agentId: utility.usageAgentId || agentId || null },
+            ? sessionUsageAttribution(sessionPath, resolved.usageAgentId || agentId || null)
+            : { kind: "utility", agentId: resolved.usageAgentId || agentId || null },
       },
     } as any);
     return { text };

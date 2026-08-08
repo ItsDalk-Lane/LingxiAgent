@@ -707,24 +707,6 @@ export class ModelManager {
   }
 
   /**
-   * 解析 utility 模型 + API 凭证完整配置
-   * 委托 ExecutionRouter
-   */
-  resolveUtilityConfig(agentConfig, sharedModels, utilApi, options = {}) {
-    if (!this.executionRouter) {
-      throw new Error(t("error.noUtilityModel"));
-    }
-    return this.executionRouter.resolveUtilityConfig(agentConfig, sharedModels, utilApi, options);
-  }
-
-  async resolveUtilityConfigFresh(agentConfig, sharedModels, utilApi, options = {}) {
-    if (!this.executionRouter) {
-      throw new Error(t("error.noUtilityModel"));
-    }
-    return this.executionRouter.resolveUtilityConfigFresh(agentConfig, sharedModels, utilApi, options);
-  }
-
-  /**
    * 从 Pi SDK registry 获取某 provider 的所有模型（不经过 Provider Catalog 过滤）
    * 用于模型发现（fetch-models），不影响主应用的 availableModels
    * @param {string} name - provider ID
