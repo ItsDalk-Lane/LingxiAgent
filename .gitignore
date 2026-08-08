@@ -42,7 +42,12 @@ dist-computer-use/
 dist-open-export/
 desktop/main.bundle.cjs
 desktop/preload.bundle.cjs
+# build/ 下的构建临时产物（被跟踪的是配置类 json/nsh/plist，产物不入库）
+build/.cli-closure-*
+build/*.mjs
 .cache/
+# 编辑器/同步工具生成的同名副本（"file 2.ts" 之类）
+*[ ][0-9]*.*
 desktop/dist-renderer/
 desktop/native/**/.build/
 vendor/

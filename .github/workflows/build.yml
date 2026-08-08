@@ -375,7 +375,7 @@ jobs:
         with:
           node-version: "24.15.0"
 
-      # 所有 Release 默认 pre-release，手动在 GitHub 上将稳定版本标记为 latest
+      # 普通版本标签发布为正式版；预览版应使用带预发布后缀的独立标签与流程。
 
       - name: Download all artifacts
         uses: actions/download-artifact@v4
@@ -393,7 +393,6 @@ jobs:
           else
             gh release create "${{ github.ref_name }}" \
               --draft \
-              --prerelease \
               --title "${{ github.ref_name }}" \
               --generate-notes
           fi
@@ -533,11 +532,11 @@ jobs:
           echo ""
           echo "✓ All required assets present"
 
-      - name: Publish release (un-draft, pre-release)
+      - name: Publish stable release (un-draft, latest)
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release edit "${{ github.ref_name }}" --prerelease --draft=false
+          gh release edit "${{ github.ref_name }}" --prerelease=false --draft=false --latest
 
   # Publishes the hot-update train that already-installed clients pull automatically —
   # separate from (and downstream of) the installer release above, so a failure here never

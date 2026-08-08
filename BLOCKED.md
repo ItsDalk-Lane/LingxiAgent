@@ -1,122 +1,27 @@
-# BLOCKED.md — pi SDK 0.80.3→0.83.0 升级
+# BLOCKED — `cce8e86..97595264` 对抗性审计与修复
 
-> 本任务书约定：拿不准的写这里；收不回的操作停下写这里；无关 bug/想做的不动。
-> 「断了、换新会话」：先读 PROGRESS.md 接着做，不重做。
+## 不阻塞审计结论
 
-## 当前状态：无（全部验收项达标）
+- 6 节审计已全部跑满，没有因证据不足而跳过的审计项。
+- 真实 xAI OAuth、真实远程审批供应商和真实 Ollama 服务未使用用户凭证做端到端测试；相关结论来自源码、官方接口契约、负向脚本和单元测试。
 
-升级牵出的 6 个新失败（cli-closure×3、open-boundary×2、compaction-guard-ext GLM×1）已全部转绿：
-- cli-closure / open-boundary：用户二次裁决放宽白名单，把 `scripts/compute-cli-closure.mjs`（DYNAMIC_CALL_ALLOWLIST 追加 2 条）+ `build/cli-runtime-closure.json` + `build/open-boundary-baseline.json`（重生成）+ `export-manifest.json`（补 3 个新路径）按「升级必经产物重生成」（与 persistence 指纹同处理）落地。详见 PROGRESS.md「白名单放宽记录」。
-- compaction-guard-ext GLM：tests/ 白名单内，glmHistory 改 canonical 数组 content（pi-coding-agent 0.83.0 convertToLlm 行为变化），保持测试意图。
+## 工作区外部变化
 
-最终 `npm test`：**Tests 1 failed | 10608 passed | 7 skipped (10616)**——failed=1 = 仅 DeskSection（基线允许），达 failed≤1。
+- 审计开始时主工作树已有 `BLOCKED.md`、`PROGRESS.md` 修改和未跟踪 `AUDIT-REPORT.md`；这些是前两次审计留下的材料，本轮已按独立证据重写。
+- 本轮执行期间 `.gitignore` 被其他进程修改，先前可见的重名临时副本也被其他进程移除。本轮没有编辑或回滚 `.gitignore`。因此原任务“最终状态只多三份报告”的字面条件目前不能满足。
+- 主工作树的 `node_modules/@types` 曾有 60 个带数字后缀的重名目录，污染类型检查和测试发现。基线改在干净临时工作树完成，避免把环境污染当回归。
 
-## 遗留风险（非阻塞，写进交付说明）
-- **真实 OAuth 登录不做人工验证**（无法自动化）：loginOAuthProvider 的旧 OAuthLoginCallbacks→0.83.0 AuthInteraction 适配（onAuth↔notify auth_url、onDeviceCode↔notify device_code、onPrompt/onSelect/onManualCodeInput↔prompt、signal）已用 pi-sdk-oauth-login-adapter 测试验证 selector 契约（browser 选项在 I/O 前触达），但端到端真实 OAuth 登录未人工跑通。
+## 任务文字与源码不一致
 
----
-（执行中未遇到需上层裁决的收不回操作或拿不准项；原 6 个白名单受限失败已由用户裁决放宽后全部转绿。）
+- 任务书称 `export-manifest.json` 有 4 个新增项，实际差异为 8 项；8 项文件都存在，生成边界检查通过，因此不是产物缺陷。
+- 任务书要求全仓 `hanaFetch|hanako|Hana` 为零，当前受版本控制文件实测有 1934 处历史命中。范围内生产代码没有新增命中；范围内新增测试残留已作为 P3 报告并进入修复。
 
----
+## 范围外观察
 
-# ========== upstream-0.444.1 + pi SDK 0.84.1 迁移任务（2026-08-08）==========
+- `core/server-identity.ts` 和 `desktop/src/react/services/server-connection.ts` 的历史可见品牌默认值不计入六提交缺陷，但用户要求按报告修复所有问题后已一并改为 Lingxi；持久化指纹因此按兼容变更重生成。
+- 审批权限的历史持久化键只描述能力种类、不描述具体目标，相关短路逻辑早于本范围；本次没有把它升级为六提交发现，也不会借本次修复扩大权限架构改造。
 
-> TASK_ID=upstream-0.444.1_pi-0.84.1。本 section 仅供本任务；上方旧 section 是历史记录。
+## 修复验证环境注记
 
-## 当前状态：无 blocker（STATUS: COMPLETE）
-
-本任务未遇到 Phase 23 定义的真正 blocker。所有验收项达标（详见 PROGRESS.md P20 验收矩阵）。最终 `npm test`（v24.16.0，sqlite rebuilt）：**10978 passed | 0 failed | 7 skipped**，exit 0。
-
-执行中遇到的"看似 blocker、实为正常迁移工作"的项（均已解决，不属 blocker）：
-- Lingxi 与 upstream 无共同 git 祖先 → 不能用 git merge，改逐文件 `git merge-file` 3-way（Phase 5）。
-- pi 0.84.1 `AuthStorage` 删了 has/remove → model-manager auth cleanup 适配（required migration，非 blocker）。
-- pi 0.84.1 OAuth provider `refreshToken` 加 signal 参数 → xai-oauth 适配（required migration）。
-- 衍生产物 stale → 用仓库自带 generator 重生成（Phase 12，非 blocker）。
-- `~/.local/bin/node`(v22) PATH 抢占 nvm → 显式 `export PATH=...v24.16.0/bin` 解决（环境，非 blocker）。
-
-## 遗留风险（非阻塞）
-- **真实 OAuth 登录 / 真实 Provider 网络调用未做人工端到端验证**（无法自动化）：refreshToken 的 signal 接入、AuthStorage has/remove→read/delete 适配、stream-guard 契约保持均用单元测试验证，但真实 OAuth refresh / 真实模型流式未人工跑通。
-- **better-sqlite3 native binary 已为 v24.16.0 (NODE_MODULE_VERSION 137) 重建**；若 CI/其他开发者默认 node 不同，需各自 `npm rebuild better-sqlite3`。这是环境前提，非本任务产物。
-
----
-
-# ========== 对抗性审计收口（adversarial closeout，2026-08-08）==========
-
-> TASK: adversarial closeout of upstream-0.444.1 + pi 0.84.1 迁移。本 section 记录
-> 收口阶段（ISSUE 1-4）的状态。详见 PROGRESS.md P22。
-
-## STATUS: COMPLETE（本收口阶段）
-## BLOCKERS: none
-
-收口阶段解决了审计指出的 4 个问题，均不构成 merge blocker：
-
-1. **ollama open-boundary 裁决（ISSUE 1）**：纠正 P13 的逻辑矛盾分类。
-   证据（dispatcher import + sibling 同型 + manifest 历史漏列 + 无 closed 语义）证明
-   ollama.ts 是 open provider-compat 架构的合法成员，真实分类为
-   "open-set omission"。manifest addition 保留；仅修正文档分类。boundary lint 17/17 ✓。
-
-2. **START_HEAD Node24 baseline 重建（ISSUE 2）**：原 P1 baseline 经 `nvm exec` 被
-   `~/.local/bin/node`(v22) PATH 抢占，证据链失效。用 disposable worktree + 真
-   process.execPath-verified v24.16.0 重建：13 test-level failures / 6 files。
-   screenshot.test.ts 在真 Node24 **不失败**（12/12），原 P1.1 清单为 v22 污染 →
-   INVALIDATED AND REPLACED。
-
-3. **当前 HEAD Node24 重新验证（ISSUE 3）**：typecheck 0 error；targeted SDK/boundary/
-   guardrail/screenshot 全绿；full suite **10979 passed | 0 failed | 7 skipped**，
-   exit 0（+1 pass 为新增 pi-agent-core 回归测试；7 skipped = baseline win32 platform）。
-
-4. **GitHub CI 证据（ISSUE 4）**：见下方 CI section。
-
-## CI section
-
-**GITHUB_CI: PASS**
-
-仓库 `.github/workflows/ci.yml` 的触发条件：`on.push.branches=[main]` +
-`on.pull_request.branches=[main]`。push 到 `chore/upstream-0.444.1-pi-0.84.1` 不触发
-CI（Situation B）——CI 只在 pull_request → main 时运行。为获得第二环境证据，按
-任务书 Section 16 情况 B 创建 **Draft PR #2**（base=main, head=chore/upstream-0.444.1-pi-0.84.1），
-仅用于触发 CI，**不 merge、不开 auto-merge**。
-
-首个 CI run（31255896664）在 "Install dependencies" 步骤失败——根因是 ci.yml 的
-`nick-fields/retry@v3` 步骤缺少必填的 `timeout_minutes`/`timeout_seconds` input
-（`@v3` moving tag 在 upstream 某次更新后强制了该 input）。这是**预存 workflow 缺陷**
-（ci.yml 在本迁移中未被修改；同一 bug 也使 main 上的 run 31250827363 失败），
-非代码回归。按 Section 17 做最小修复（ci.yml 单步加 `timeout_minutes: 15`，独立 commit，
-不动 release workflow / 权限 / 发布行为），push 后重新触发 CI。
-
-最终 CI run（31256058776，commit df6a9124，pull_request）**全部 5 job 通过**：
-
-```
-workflow : CI (.github/workflows/ci.yml)
-run id    : 31256058776
-commit    : df6a91242b47c4b99de515df95faa08117d3156c
-result    : SUCCESS
-jobs      :
-  ✓ persistence-schema-guard   (7s)
-  ✓ test (macos-latest, 24.15.0) (10m27s) — Test Files 1085 passed | 1 skipped; Tests 10979 passed | 7 skipped (0 failed)
-  ✓ test (windows-latest, 24.15.0) (20m24s)
-  ✓ open-build-smoke           (2m40s)
-  ✓ lint-open-boundary         (48s)
-```
-
-macOS CI 的 `npm test` 实测 **10979 passed | 0 failed | 7 skipped**，与本地 Node24
-结果完全一致——独立第二环境确认。
-
-### CI flake 说明（透明记录）
-
-CI 权威验证 run 是 **31256058776（commit df6a9124，含全部代码 + ci.yml 修复）**：
-macOS + Windows 双平台全绿。其后一个 docs-only commit（2a7626ae，仅 PROGRESS.md /
-BLOCKED.md markdown）触发的 run **31256879632** 在 Windows 上失败——失败是
-`persistence-schema-tripwire > uses real SQLite stores` 的 **test timeout**（10s），
-非断言失败；macOS 仍全绿。
-
-df6a9124 与 2a7626ae 之间 **零代码/测试/workflow 改动**（`git diff` 仅 2 个 .md 文件），
-且同一测试在 df6a9124 的 Windows run 通过、在两次 macOS run 均通过。判定为
-**Windows CI runner 上 SQLite-integration 测试的偶发 timeout flake**（Windows runner
-较慢 + 并发测试负载），非迁移回归。代码 CI 证据以 df6a9124 的全绿 run 为准。
-
-## 遗留风险（非阻塞，收口阶段未变）
-- 真实 OAuth 登录 / 真实 Provider 网络调用未做人工端到端验证（同迁移任务遗留）。
-- better-sqlite3 native binary 为 v24.16.0 重建，CI/其他开发者默认 node 不同时需各自 rebuild。
-- Windows CI runner 上 `persistence-schema-tripwire`（real SQLite）偶发 timeout flake（pre-existing 平台特性，非本迁移引入）。
-
+- 主工作树仍有 60 个 `node_modules/@types/* 2` 重名目录，直接 `npm run typecheck` 会报 `TS2688`。未删除这些外部文件；在干净临时工作树应用相同代码差异后，三组类型检查均为 0 error。
+- 最终全量为 1 failed / 10985 passed / 7 skipped；唯一失败仍是已确认预存的截图头像 SVG-vs-PNG 断言。

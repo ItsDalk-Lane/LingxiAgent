@@ -147,6 +147,22 @@ describe("provider-compat/ollama", () => {
       expect(result.options).toBeUndefined();
     });
 
+    it.each([8192.5, Number.POSITIVE_INFINITY, 1_048_577])(
+      "does not inject num_ctx for unsafe contextWindow %s",
+      (contextWindow) => {
+        const model = { ...ollamaModel, contextWindow };
+        const payload = {
+          model: "gemma4:12b-nvfp4",
+          messages: [{ role: "user", content: "hi" }],
+          options: { temperature: 0.2 },
+        };
+
+        const result = normalizeProviderPayload(payload, model, { mode: "chat" });
+
+        expect(result.options).toEqual({ temperature: 0.2 });
+      },
+    );
+
     it("merges num_ctx with existing options without clobbering them", () => {
       const model = { ...ollamaModel, contextWindow: 131072 };
       const payload = {

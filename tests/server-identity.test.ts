@@ -117,7 +117,7 @@ describe("server identity loader", () => {
     const serverNode = JSON.parse(fs.readFileSync(path.join(tmpDir, "server-node.json"), "utf-8"));
     expect(serverNode).toMatchObject({
       schemaVersion: 1,
-      label: "Local Hana",
+      label: "Local Lingxi",
       serverNodeId: serverNode.serverId,
       nodeKind: "local",
       transport: "loopback",

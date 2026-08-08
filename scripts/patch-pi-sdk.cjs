@@ -76,7 +76,7 @@ for (const marker of expectedExportMarkers) {
 //  re-export runAgentLoop 等属合法边界内消费——补齐以闭合静态覆盖。）
 const scanDirs = ["core", "server", "lib", "hub"].map(d => path.join(root, d));
 const adapterDir = path.join(root, "lib", "pi-sdk");
-const importPattern = /(?:from\s+["']@(?:mariozechner|earendil-works)\/(?:pi-ai|pi-coding-agent|pi-agent-core)|import\s*\(\s*["']@(?:mariozechner|earendil-works)\/(?:pi-ai|pi-coding-agent|pi-agent-core)|require\s*\(\s*["']@(?:mariozechner|earendil-works)\/(?:pi-ai|pi-coding-agent|pi-agent-core))/;
+const importPattern = /(?:from\s+["']@(?:mariozechner|earendil-works)\/(?:pi-ai|pi-coding-agent|pi-agent-core)|import\s*\(\s*["']@(?:mariozechner|earendil-works)\/(?:pi-ai|pi-coding-agent|pi-agent-core)|require\s*\(\s*["']@(?:mariozechner|earendil-works)\/(?:pi-ai|pi-coding-agent|pi-agent-core)|^[\t ]*import[\t ]+["']@(?:mariozechner|earendil-works)\/(?:pi-ai|pi-coding-agent|pi-agent-core))/m;
 const leaks = [];
 
 function scanDir(dir) {

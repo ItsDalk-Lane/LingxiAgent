@@ -398,6 +398,37 @@ describe("Authorization Gateway — deterministic safety + intent authorization"
     expect(payload).not.toContain("sk-secret123");
   });
 
+  it("scrubs credentials from every free-text field sent to the reviewer", async () => {
+    const { __internals } = await import("../lib/approval-gateway.ts");
+    const input = __internals.buildAuthorizationReviewInput(
+      request({
+        toolName: "bash",
+        target: {
+          type: "command",
+          label: "curl --user alice:s3cr3t --password supersecret -H 'Authorization: Bearer sk-12345678901234567890' https://api.example.com",
+        },
+      }),
+      {
+        visibleTranscript: [{ id: "u0", role: "user", text: "use token=transcript-secret" }],
+        userIntentSummary: "configure api_key=intent-secret",
+        explicitUserAuthorization: "aws configure set aws_secret_access_key explicit-secret",
+      },
+    );
+
+    const payload = JSON.stringify(input);
+    for (const secret of [
+      "alice:s3cr3t",
+      "supersecret",
+      "sk-12345678901234567890",
+      "transcript-secret",
+      "intent-secret",
+      "explicit-secret",
+    ]) {
+      expect(payload).not.toContain(secret);
+    }
+    expect(payload).toContain("[redacted]");
+  });
+
   it("strips sensitive query params from url targets but keeps benign ones", async () => {
     const { __internals } = await import("../lib/approval-gateway.ts");
     const cleaned = __internals.sanitizeUrl("https://api.example.com/file?token=leak&keep=1");

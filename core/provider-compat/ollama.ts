@@ -57,11 +57,17 @@ export function apply(payload, model, options: Record<string, any> = {}) {
   // num_ctx 主要影响 KV cache 预分配 + prompt cache 窗口大小：输入超过 num_ctx 时
   // ollama 会自动扩展以容纳输入（不截断），但超出部分无法命中 cache。
   const ctxWindow = typeof model?.contextWindow === "number" ? model.contextWindow : null;
-  if (ctxWindow && ctxWindow > 0) {
+  const safeContextWindow = Number.isFinite(ctxWindow)
+    && Number.isInteger(ctxWindow)
+    && ctxWindow > 0
+    && ctxWindow <= 1_048_576
+    ? ctxWindow
+    : null;
+  if (safeContextWindow !== null) {
     const existingOptions = isPlainObject(result.options) ? result.options : {};
     result = {
       ...result,
-      options: { ...existingOptions, num_ctx: ctxWindow },
+      options: { ...existingOptions, num_ctx: safeContextWindow },
     };
   }
 

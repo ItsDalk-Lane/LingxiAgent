@@ -1580,6 +1580,126 @@ describe("model sync related routes", () => {
     }
   });
 
+  it("reads Ollama capabilities and context from official-shaped /api/show responses", async () => {
+    const { createProvidersRoute } = await import("../server/routes/providers.ts");
+    const app = new Hono();
+    const fetchMock = vi.fn(async (url: string, init?: RequestInit) => {
+      if (url.endsWith("/v1/models")) {
+        return {
+          ok: true,
+          status: 200,
+          json: async () => ({ data: [{ id: "qwen3:8b" }] }),
+        };
+      }
+      if (url.endsWith("/api/show")) {
+        expect(JSON.parse(String(init?.body))).toEqual({ model: "qwen3:8b" });
+        return {
+          ok: true,
+          status: 200,
+          json: async () => ({
+            capabilities: ["completion", "tools", "thinking"],
+            model_info: { "qwen3.context_length": 131072 },
+          }),
+        };
+      }
+      throw new Error(`unexpected Ollama URL: ${url}`);
+    });
+    vi.stubGlobal("fetch", fetchMock);
+    const engine = withResolveCreds({
+      getRegistryModelsForProvider: vi.fn().mockReturnValue([]),
+      providerRegistry: {
+        getCredentials: () => null,
+        getAuthJsonKey: (id) => id,
+        getDefaultModels: () => [],
+      },
+      lingxiHome: fs.mkdtempSync(path.join(os.tmpdir(), "lingxi-ollama-show-")),
+    });
+
+    try {
+      app.route("/api", createProvidersRoute(engine));
+      const res = await app.request("/api/providers/fetch-models", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: "ollama",
+          base_url: "http://localhost:11434/v1",
+          api: "openai-completions",
+        }),
+      });
+      const data = await res.json();
+
+      expect(res.status).toBe(200);
+      expect(fetchMock.mock.calls.map(([url]) => url)).toEqual([
+        "http://localhost:11434/v1/models",
+        "http://localhost:11434/api/show",
+      ]);
+      expect(data.models[0]).toMatchObject({
+        id: "qwen3:8b",
+        context: 131072,
+        reasoning: true,
+        toolUse: { supportsTools: true, dialect: "openai", toolResultFormat: "message" },
+      });
+    } finally {
+      fs.rmSync(engine.lingxiHome, { recursive: true, force: true });
+    }
+  });
+
+  it("deduplicates, caps, and limits concurrent Ollama detail probes", async () => {
+    const { createProvidersRoute } = await import("../server/routes/providers.ts");
+    const app = new Hono();
+    const modelIds = Array.from({ length: 205 }, (_, index) => `model-${index}`);
+    let active = 0;
+    let maxActive = 0;
+    let showCalls = 0;
+    const fetchMock = vi.fn(async (url: string) => {
+      if (url.endsWith("/v1/models")) {
+        return {
+          ok: true,
+          status: 200,
+          json: async () => ({ data: [...modelIds.map((id) => ({ id })), { id: modelIds[0] }] }),
+        };
+      }
+      if (url.endsWith("/api/show")) {
+        showCalls += 1;
+        active += 1;
+        maxActive = Math.max(maxActive, active);
+        await new Promise((resolve) => setTimeout(resolve, 1));
+        active -= 1;
+        return { ok: true, status: 200, json: async () => ({ capabilities: ["completion"] }) };
+      }
+      throw new Error(`unexpected Ollama URL: ${url}`);
+    });
+    vi.stubGlobal("fetch", fetchMock);
+    const engine = withResolveCreds({
+      getRegistryModelsForProvider: vi.fn().mockReturnValue([]),
+      providerRegistry: {
+        getCredentials: () => null,
+        getAuthJsonKey: (id) => id,
+        getDefaultModels: () => [],
+      },
+      lingxiHome: fs.mkdtempSync(path.join(os.tmpdir(), "lingxi-ollama-limit-")),
+    });
+
+    try {
+      app.route("/api", createProvidersRoute(engine));
+      const res = await app.request("/api/providers/fetch-models", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: "ollama",
+          base_url: "http://localhost:11434/v1",
+          api: "openai-completions",
+        }),
+      });
+
+      expect(res.status).toBe(200);
+      expect(showCalls).toBe(200);
+      expect(maxActive).toBeLessThanOrEqual(6);
+    } finally {
+      fs.rmSync(engine.lingxiHome, { recursive: true, force: true });
+    }
+  });
+
   it("provider fetch-models uses saved request headers as credentials", async () => {
     const { createProvidersRoute } = await import("../server/routes/providers.ts");
     const app = new Hono();

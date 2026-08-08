@@ -19,6 +19,11 @@ import { enrichOllamaModelMetadata } from "../../shared/ollama-model-metadata.ts
 import { clearConfigCache } from "../../lib/memory/config-loader.ts";
 import { collectSecretPatchPaths, isMaskedSecretValue, maskSecretValue } from "../../shared/secret-custody.ts";
 import { denySecretMutationWithoutScope, denyWithoutScope } from "../http/capability-guard.ts";
+import { createModuleLogger } from "../../lib/debug-log.ts";
+
+const log = createModuleLogger("providers");
+const OLLAMA_PROBE_CONCURRENCY = 6;
+const OLLAMA_PROBE_MODEL_LIMIT = 200;
 
 // ── Models-cache helpers ──
 
@@ -323,10 +328,9 @@ export function createProvidersRoute(engine: any) {
 
   /**
    * Ollama 原生接口探测：/v1/models 不返回 context_length 和 capabilities，
-   * 需额外请求 /api/tags（批量 capabilities）和 /api/show（逐模型 context_length）。
+   * 需额外请求 /api/show（逐模型返回 context_length 和 capabilities）。
    *
-   * 探测是额外增强：任何失败（老版本无 capabilities 字段、网络错误、超时）都静默跳过，
-   * 保持原有 {id, context:null} 状态——这不是"静默降级"，而是探测本身是 best-effort。
+   * 探测是额外增强：单模型失败保留原模型，但必须记录汇总诊断，避免静默丢能力。
    *
    * @param baseUrl ollama OpenAI 兼容 baseUrl（通常含 /v1 后缀），内部剥离 /v1 拼原生路径
    * @param modelIds 待探测的模型 id 列表
@@ -340,62 +344,65 @@ export function createProvidersRoute(engine: any) {
     const root = stripOllamaV1Suffix(baseUrl);
     if (!root) return result;
 
-    // 1. /api/tags：一次请求拿全部模型的 capabilities
-    const capabilitiesMap: Record<string, string[]> = {};
-    try {
-      const tagsRes = await fetch(`${root}/api/tags`, {
-        signal: AbortSignal.timeout(15000),
-      });
-      if (tagsRes.ok) {
-        const tagsData = await tagsRes.json();
-        for (const m of tagsData?.models || []) {
-          const id = typeof m === "object" ? (m.name || m.model) : null;
-          if (id && Array.isArray(m?.capabilities)) {
-            capabilitiesMap[String(id)] = m.capabilities.map((c: any) => String(c).toLowerCase());
-          }
-        }
-      }
-    } catch {
-      // 老版本 ollama 可能没有 /api/tags 的 capabilities 字段，静默跳过
+    const uniqueModelIds = [...new Set(modelIds)].slice(0, OLLAMA_PROBE_MODEL_LIMIT);
+    if (new Set(modelIds).size > OLLAMA_PROBE_MODEL_LIMIT) {
+      log.warn(`Ollama 模型详情探测只处理前 ${OLLAMA_PROBE_MODEL_LIMIT} 个唯一模型`);
     }
 
-    // 2. /api/show：逐模型拿 context_length（model_info.<arch>.context_length）
-    //    并行请求，单个失败不影响其他
-    const showResults = await Promise.allSettled(
-      modelIds.map(async (modelId) => {
-        const res = await fetch(`${root}/api/show`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ model: modelId }),
-          signal: AbortSignal.timeout(15000),
-        });
-        if (!res.ok) return { modelId, context: null };
-        const data = await res.json();
-        // context_length 在 model_info.<architecture>.context_length
-        const modelInfo = data?.model_info || {};
-        let context: number | null = null;
-        for (const value of Object.values(modelInfo)) {
-          if (value && typeof value === "object" && typeof (value as any).context_length === "number") {
-            context = (value as any).context_length;
-            break;
+    let cursor = 0;
+    let failures = 0;
+    // 整批共用一个 15 秒期限，避免受限并发在连续超时时把请求拖成长达数分钟。
+    const probeSignal = AbortSignal.timeout(15000);
+    const workers = Array.from(
+      { length: Math.min(OLLAMA_PROBE_CONCURRENCY, uniqueModelIds.length) },
+      async () => {
+        while (cursor < uniqueModelIds.length) {
+          const modelId = uniqueModelIds[cursor++];
+          try {
+            const res = await fetch(`${root}/api/show`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ model: modelId }),
+              signal: probeSignal,
+            });
+            if (!res.ok) {
+              failures += 1;
+              continue;
+            }
+            const data = await res.json();
+            const modelInfo = data?.model_info || {};
+            let context: number | null = null;
+            for (const [key, value] of Object.entries(modelInfo)) {
+              if ((key === "context_length" || key.endsWith(".context_length"))
+                && typeof value === "number"
+                && Number.isFinite(value)
+                && Number.isInteger(value)
+                && value > 0) {
+                context = value;
+                break;
+              }
+              const nestedContext = value && typeof value === "object" ? (value as any).context_length : null;
+              if (typeof nestedContext === "number"
+                && Number.isFinite(nestedContext)
+                && Number.isInteger(nestedContext)
+                && nestedContext > 0) {
+                context = nestedContext;
+                break;
+              }
+            }
+            const capabilities = Array.isArray(data?.capabilities)
+              ? data.capabilities.map((capability: any) => String(capability).toLowerCase())
+              : null;
+            result[modelId] = { context, capabilities };
+          } catch {
+            failures += 1;
           }
         }
-        // model_info 顶层也可能是扁平的 context_length（部分版本）
-        if (context === null && typeof modelInfo?.context_length === "number") {
-          context = modelInfo.context_length;
-        }
-        return { modelId, context };
-      }),
+      },
     );
-
-    for (const settled of showResults) {
-      if (settled.status === "fulfilled") {
-        const { modelId, context } = settled.value;
-        result[modelId] = {
-          context,
-          capabilities: capabilitiesMap[modelId] || null,
-        };
-      }
+    await Promise.all(workers);
+    if (failures > 0) {
+      log.warn(`Ollama 模型详情探测失败 ${failures}/${uniqueModelIds.length}，已保留基础模型信息`);
     }
     return result;
   }
@@ -592,8 +599,8 @@ export function createProvidersRoute(engine: any) {
           let remoteModels = supplementRemoteModels(name, normalizeRemoteModels(data, effectiveApi));
 
           // Ollama 专用：/v1/models 不返回 context_length 和 capabilities，
-          // 探测原生 /api/tags（capabilities）+ /api/show（context_length）补充真实元数据。
-          // 探测失败保持原状（best-effort，非降级）。
+          // 探测原生 /api/show 补充 capabilities + context_length。
+          // 单模型失败保留原状，并由探测器写入汇总诊断。
           if (name === "ollama") {
             const modelIds = remoteModels
               .map((m: any) => (typeof m === "object" ? m?.id : null))

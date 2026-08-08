@@ -1,4 +1,5 @@
 import { createModuleLogger } from "./debug-log.ts";
+import { redactLogText } from "../shared/log-redactor.ts";
 
 // ════════════════════════════════════════════════════════════════════════════
 // Authorization Gateway — deterministic safety root + intent authorization model
@@ -348,13 +349,10 @@ function sanitizeUrl(rawUrl: string): string {
   }
 }
 
-// §二十五 Scrub credential-looking assignments from shell commands before
-// showing a command label to the model. Reuses the spirit of the repo redactor
-// without importing the full pipeline (which is CJS-coupled).
-const SECRET_ASSIGNMENT = /\b(TOKEN|API_KEY|APIKEY|SECRET|PASSWORD|PASSWD|PWD|AUTHORIZATION|AUTH|COOKIE|ACCESS_TOKEN|SECRET_KEY)\s*[:=]\s*(['"]?)[^\s'"]+\2/gi;
+// §二十五 所有发给审批模型的自由文本统一走共享脱敏器；命令标签再单独限长。
 function scrubShellCommand(cmd: string): string {
   if (typeof cmd !== "string" || !cmd) return "";
-  return cmd.replace(SECRET_ASSIGNMENT, (_m, name) => `${name}=***`).slice(0, 400);
+  return redactLogText(cmd).slice(0, 400);
 }
 
 function compactEvidence(items: any[]): any[] {
@@ -363,7 +361,7 @@ function compactEvidence(items: any[]): any[] {
     .filter((item) => item && typeof item === "object")
     .slice(0, MAX_EVIDENCE_ITEMS)
     .map((item) => {
-      const text = typeof item.text === "string" ? item.text : "";
+      const text = typeof item.text === "string" ? redactLogText(item.text) : "";
       return {
         ...(item.id != null ? { id: String(item.id).slice(0, 16) } : {}),
         ...(item.role ? { role: String(item.role).slice(0, 24) } : {}),
@@ -416,17 +414,17 @@ function buildAuthorizationReviewInput(request: any, context: any = {}) {
     if (request?.toolName && EXECUTE_TOOLS.has(request.toolName)) {
       return scrubShellCommand(typeof target.label === "string" ? target.label : "");
     }
-    return typeof target.label === "string" ? target.label.slice(0, 200) : "";
+    return typeof target.label === "string" ? redactLogText(target.label).slice(0, 200) : "";
   })();
 
   // §二十 Authorization evidence — only what the judgment needs. No raw params,
   // no full transcript, no trust-environment plumbing.
   const authorizationContext = compactEvidence(context?.visibleTranscript);
   const intentSummary = typeof context?.userIntentSummary === "string"
-    ? context.userIntentSummary.slice(0, MAX_EVIDENCE_CHARS)
+    ? redactLogText(context.userIntentSummary).slice(0, MAX_EVIDENCE_CHARS)
     : "";
   const explicitAuth = typeof context?.explicitUserAuthorization === "string"
-    ? context.explicitUserAuthorization.slice(0, MAX_EVIDENCE_CHARS)
+    ? redactLogText(context.explicitUserAuthorization).slice(0, MAX_EVIDENCE_CHARS)
     : "";
 
   const input = {

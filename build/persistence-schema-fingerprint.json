@@ -648,7 +648,7 @@
     ],
     "version": 3
   },
-  "payloadFingerprint": "sha256:124fa40ac4c9f413fb8a89d5f2b176b87145321bd1db58057b1748ca59176e1a",
+  "payloadFingerprint": "sha256:625044d0d39b1f6d0e1f8ee9dd204c0b6cb755c54a476837d8b387de60db815d",
   "registry": [
     {
       "affectedByEpochMigration": true,
@@ -2999,8 +2999,8 @@
   ],
   "review": {
     "classification": "compatible",
-    "compatibilityReason": "pi SDK 0.83.0->0.84.1 upgrade: CURRENT_SESSION_VERSION stays 3, DATA_EPOCH stays 1 (no data migration); schema surface unchanged, only the pinned external package version + sourceHash of version-bumped modules.",
-    "payloadFingerprint": "sha256:124fa40ac4c9f413fb8a89d5f2b176b87145321bd1db58057b1748ca59176e1a"
+    "compatibilityReason": "Renames local server display labels from Hana to Lingxi without changing persisted registry fields, types, or migration semantics.",
+    "payloadFingerprint": "sha256:625044d0d39b1f6d0e1f8ee9dd204c0b6cb755c54a476837d8b387de60db815d"
   },
   "schemas": [
     {
@@ -3385,7 +3385,7 @@
       "contract": "server-node identity parser and ensureLocalIdentityRegistries seed",
       "kind": "runtime-contract",
       "module": "core/server-identity.ts",
-      "sourceHash": "sha256:6a31bb1761705d84424074ce7d777c400cb7afa61759fa674c8eb53bfc02ba52",
+      "sourceHash": "sha256:6da523418655cf56b2ff3523e15f9de04ac6eef8c9119dc2fca1aa99db8dafc8",
       "storeId": "server-node-identity"
     },
     {
@@ -3575,7 +3575,7 @@
       "contract": "user/studio registry readers",
       "kind": "runtime-contract",
       "module": "core/server-identity.ts",
-      "sourceHash": "sha256:6a31bb1761705d84424074ce7d777c400cb7afa61759fa674c8eb53bfc02ba52",
+      "sourceHash": "sha256:6da523418655cf56b2ff3523e15f9de04ac6eef8c9119dc2fca1aa99db8dafc8",
       "storeId": "user-studio-registries"
     },
     {

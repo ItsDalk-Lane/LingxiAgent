@@ -31,7 +31,7 @@ describe("inferOllamaModelMetadata", () => {
     });
   });
 
-  describe("capabilities (from /api/tags)", () => {
+  describe("capabilities (from /api/show)", () => {
     it("infers toolUse when capabilities include tools", () => {
       const result = inferOllamaModelMetadata("ollama", {
         id: "gemma4:12b-nvfp4",

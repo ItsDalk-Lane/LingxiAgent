@@ -4902,6 +4902,11 @@
         },
         {
           "root": "server-bootstrap",
+          "from": "server/routes/providers.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
           "from": "server/routes/agents.ts",
           "kind": "import-statement"
         },
@@ -5081,7 +5086,7 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by core/migrations.ts (import-statement); core/plugin-config.ts (import-statement); lib/desk/cron-store.ts (import-statement); +82 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by core/migrations.ts (import-statement); core/plugin-config.ts (import-statement); lib/desk/cron-store.ts (import-statement); +83 more importer(s)."
     },
     {
       "path": "lib/default-models.json",
@@ -121978,11 +121983,16 @@
         },
         {
           "root": "server-bootstrap",
+          "from": "lib/approval-gateway.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
           "from": "lib/secret-fingerprint.ts",
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by shared/error-bus.ts (import-statement); lib/log-redactor.ts (import-statement); lib/secret-fingerprint.ts (import-statement)."
+      "reason": "Reached via esbuild source module graph, imported by shared/error-bus.ts (import-statement); lib/log-redactor.ts (import-statement); lib/approval-gateway.ts (import-statement); +1 more importer(s)."
     },
     {
       "path": "shared/model-capabilities.ts",

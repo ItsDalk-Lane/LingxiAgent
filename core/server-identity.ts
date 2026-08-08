@@ -169,7 +169,7 @@ function createLocalServerNodeIdentity({ now }) {
     execution: {
       kind: "local_process",
     },
-    label: "Local Hana",
+    label: "Local Lingxi",
     createdAt: now,
     updatedAt: now,
   };

@@ -31,6 +31,23 @@ describe("log redaction", () => {
     expect(cleaned).toContain("Cookie=[redacted]");
   });
 
+  it("redacts command-line credential flags and cloud CLI credential values", () => {
+    const raw = [
+      "curl --user alice:s3cr3t https://example.test",
+      "tool --password supersecret --api-key=api-secret",
+      "aws configure set aws_secret_access_key aws-secret",
+      "aws configure set aws_access_key_id access-secret",
+    ].join("\n");
+
+    const cleaned = redactLogText(raw);
+
+    expect(cleaned).not.toContain("alice:s3cr3t");
+    expect(cleaned).not.toContain("supersecret");
+    expect(cleaned).not.toContain("api-secret");
+    expect(cleaned).not.toContain("aws-secret");
+    expect(cleaned).not.toContain("access-secret");
+  });
+
   it("redacts local home paths across macOS, Linux, Windows, and file URLs", () => {
     const raw = [
       "/Users/alice/Desktop/private.txt",
