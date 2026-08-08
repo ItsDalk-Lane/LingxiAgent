@@ -38,3 +38,43 @@
 - **真实 OAuth 登录 / 真实 Provider 网络调用未做人工端到端验证**（无法自动化）：refreshToken 的 signal 接入、AuthStorage has/remove→read/delete 适配、stream-guard 契约保持均用单元测试验证，但真实 OAuth refresh / 真实模型流式未人工跑通。
 - **better-sqlite3 native binary 已为 v24.16.0 (NODE_MODULE_VERSION 137) 重建**；若 CI/其他开发者默认 node 不同，需各自 `npm rebuild better-sqlite3`。这是环境前提，非本任务产物。
 
+---
+
+# ========== 对抗性审计收口（adversarial closeout，2026-08-08）==========
+
+> TASK: adversarial closeout of upstream-0.444.1 + pi 0.84.1 迁移。本 section 记录
+> 收口阶段（ISSUE 1-4）的状态。详见 PROGRESS.md P22。
+
+## STATUS: COMPLETE（本收口阶段）
+## BLOCKERS: none
+
+收口阶段解决了审计指出的 4 个问题，均不构成 merge blocker：
+
+1. **ollama open-boundary 裁决（ISSUE 1）**：纠正 P13 的逻辑矛盾分类。
+   证据（dispatcher import + sibling 同型 + manifest 历史漏列 + 无 closed 语义）证明
+   ollama.ts 是 open provider-compat 架构的合法成员，真实分类为
+   "open-set omission"。manifest addition 保留；仅修正文档分类。boundary lint 17/17 ✓。
+
+2. **START_HEAD Node24 baseline 重建（ISSUE 2）**：原 P1 baseline 经 `nvm exec` 被
+   `~/.local/bin/node`(v22) PATH 抢占，证据链失效。用 disposable worktree + 真
+   process.execPath-verified v24.16.0 重建：13 test-level failures / 6 files。
+   screenshot.test.ts 在真 Node24 **不失败**（12/12），原 P1.1 清单为 v22 污染 →
+   INVALIDATED AND REPLACED。
+
+3. **当前 HEAD Node24 重新验证（ISSUE 3）**：typecheck 0 error；targeted SDK/boundary/
+   guardrail/screenshot 全绿；full suite **10979 passed | 0 failed | 7 skipped**，
+   exit 0（+1 pass 为新增 pi-agent-core 回归测试；7 skipped = baseline win32 platform）。
+
+4. **GitHub CI 证据（ISSUE 4）**：见下方 CI section。
+
+## CI section
+
+仓库 `.github/workflows/ci.yml` 的触发条件：`on.push.branches=[main]` +
+`on.pull_request.branches=[main]`。push 到 `chore/upstream-0.444.1-pi-0.84.1` 不触发
+CI（Situation B）——CI 只在 pull_request → main 时运行。为获得第二环境证据，按
+任务书 Section 16 情况 B 创建 **Draft PR**（base=main, head=chore/upstream-0.444.1-pi-0.84.1），
+仅用于触发 CI，**不 merge、不开 auto-merge**。CI 完成后结果记录于本文件 + 最终验收矩阵。
+
+## 遗留风险（非阻塞，收口阶段未变）
+- 真实 OAuth 登录 / 真实 Provider 网络调用未做人工端到端验证（同迁移任务遗留）。
+- better-sqlite3 native binary 为 v24.16.0 重建，CI/其他开发者默认 node 不同时需各自 rebuild。
