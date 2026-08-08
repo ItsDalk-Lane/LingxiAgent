@@ -648,7 +648,7 @@
     ],
     "version": 3
   },
-  "payloadFingerprint": "sha256:8231868767114f47b14516fac3ec8c4d2526d58faf27a60e9c7b355d1dd08c68",
+  "payloadFingerprint": "sha256:124fa40ac4c9f413fb8a89d5f2b176b87145321bd1db58057b1748ca59176e1a",
   "registry": [
     {
       "affectedByEpochMigration": true,
@@ -2999,8 +2999,8 @@
   ],
   "review": {
     "classification": "compatible",
-    "compatibilityReason": "pi SDK 0.80.3->0.83.0 upgrade: CURRENT_SESSION_VERSION stays 3 (no data migration); schema surface unchanged, only the pinned external package version + sourceHash of version-bumped modules.",
-    "payloadFingerprint": "sha256:8231868767114f47b14516fac3ec8c4d2526d58faf27a60e9c7b355d1dd08c68"
+    "compatibilityReason": "pi SDK 0.83.0->0.84.1 upgrade: CURRENT_SESSION_VERSION stays 3, DATA_EPOCH stays 1 (no data migration); schema surface unchanged, only the pinned external package version + sourceHash of version-bumped modules.",
+    "payloadFingerprint": "sha256:124fa40ac4c9f413fb8a89d5f2b176b87145321bd1db58057b1748ca59176e1a"
   },
   "schemas": [
     {
@@ -3082,7 +3082,7 @@
       "contract": "agent config and authored Markdown/image profile protocol",
       "kind": "directory-contract",
       "module": "core/agent-manager.ts",
-      "sourceHash": "sha256:a5180dca831b4f2bc9cc38c5be94813a59e4506d3700d869028a362a53af4638",
+      "sourceHash": "sha256:2e7681898214cff6c5c5bd4272b7a3cbb9f98d59d83aee10eec73e2aed98dd2c",
       "storeId": "agent-profile"
     },
     {
@@ -3197,7 +3197,7 @@
       "contract": "desktop window bounds, release announcement bookmark, and update cache version marker readers",
       "kind": "directory-contract",
       "module": "desktop/main.cjs",
-      "sourceHash": "sha256:3ac2b40731316216e0a070c5d10c4da0281b7950e9541303239c15497ea884d8",
+      "sourceHash": "sha256:43d4a428b0f3d22ef188e5f4d4bd02dea041dd5e187b4e5ba57bfd5aadc99754",
       "storeId": "desktop-window-version-state"
     },
     {
@@ -3392,7 +3392,7 @@
       "contract": "server-info writer and desktop bootstrap reader",
       "kind": "runtime-contract",
       "module": "server/index.ts",
-      "sourceHash": "sha256:16588bd776944103b76d1e2d7fce38fa5bf01256dcbd4bc7b9e58f36fb73ad25",
+      "sourceHash": "sha256:0e452ad75db20faec4f21e5d6c89c2b871e19914ec88d7f0d5745d21758095ed",
       "storeId": "server-runtime-info"
     },
     {
@@ -3424,10 +3424,10 @@
       ],
       "kind": "external-versioned",
       "lockfile": "package-lock.json",
-      "packageIntegrity": "sha512-uYhF+FsZxogoSX/AxBcUdiY+ZklubwaXyAoEGA2eQwsHcyEAhUYIKh/WLXe/a8+k8eTCmxb+ZN2Zo9mzQtzbWw==",
+      "packageIntegrity": "sha512-ncAqFrG+iybuPGOhMiZoEHkEzTpJgz3guYD32pD+M7ucc0WeHmauP6wa7qwP8V/KWvsZDVNa5XGsdZ7fkC7w7A==",
       "packageName": "@earendil-works/pi-coding-agent",
-      "packageVersion": "0.83.0",
-      "requestedVersion": "0.83.0",
+      "packageVersion": "0.84.1",
+      "requestedVersion": "0.84.1",
       "storeId": "session-jsonl",
       "versionSource": {
         "currentSessionVersion": 3,
@@ -3512,7 +3512,7 @@
       "contract": "bridge index, legacy session metadata, title, and vision sidecar readers",
       "kind": "runtime-contract",
       "module": "core/bridge-session-manager.ts",
-      "sourceHash": "sha256:38246e1bdbbf369720c0bcf776aed73e654e49babe86c8309bb9c5a88d18ce8c",
+      "sourceHash": "sha256:2f02505741c69ace39457736d4db377d4d2f035e3271d55e36734d13a5e03f0e",
       "storeId": "session-sidecars"
     },
     {
