@@ -692,3 +692,39 @@ oauth: {
 - desktop React tests（10 file）→ 全绿（context-ring 12 / message-parser 51 / file-mention / ExperimentsTab / etc.）。
 - typecheck = 0 error。
 
+## P12/P13. Phase 12 + 13 — 衍生产物重生成 + open-boundary
+
+**关键环境事实**：`nvm exec 24.16.0` / `nvm run 24.16.0` 在本机被 `~/.local/bin/node`(v22.23.2) **PATH 抢占**——`nvm use` 后 PATH 里 `~/.local/bin` 仍在 nvm bin 之前。所有验证必须用显式 `export PATH="/Users/study_superior/.nvm/versions/node/v24.16.0/bin:$PATH"` 把真 v24.16.0 二进制顶到最前。本任务 P0 基线（13 failed）实际是在 v22 跑的——better-sqlite3 在 v22/v24 都能加载（预编译兼容），所以 sqlite 测试在 v22 也过；但 v24 跑才暴露真正的 NODE_MODULE_VERSION 137 需求。
+
+### 产物重生成（用仓库自带 generator，非手编）
+- `build/persistence-schema-fingerprint.json`：`generate-persistence-schema-fingerprint.mjs --classification compatible --compatibility-reason "..."`。CURRENT_SESSION_VERSION=3 / DATA_EPOCH=1 不变；只 pinned pi 版本 + sourceHash 变。与 0.80.3→0.83.0 同类 compatible addition。
+- `build/cli-runtime-closure.json`：`compute-cli-closure.mjs` 重生成（10604 files，0.84.1 node_modules tree）。
+- `export-manifest.json`（open-set），5 处合法扩充：
+  - core/lossy-local-compaction.ts / lib/bridge/visible-text-accumulator.ts / shared/internal-mood-block.ts（上游新模块，与上游 manifest 一致）
+  - core/provider-compat/ollama.ts（Lingxi 预存遗漏：19 个 sibling 已在 set，独漏 ollama）
+  - node_modules/.../utils/abort.js（pi 0.84.1 auth-storage.js 新 import raceWithAbortSignal 的 transitive dep；auth-storage.js 已在 open-set/bundled）
+- `build/open-boundary-baseline.json`：内容与 START_HEAD 一致（1 edge: server/index→mobile-workbench），未变。
+
+### Phase 13 裁决
+- 5 个新 open→closed edge（lossy/visible-text/internal-mood 被 core/lib import）→ Class A（上游合法新公开路径）→ 加 open-set 解决。
+- provider-compat→ollama → Class B（Lingxi 代码越界）但修法是补 open-set（sibling 公开模块），非掩盖。
+- auth-storage→abort → Class D（SDK 包内 transitive dep，CLI closure stale）→ 补 open-set。
+- 结果：`lint:boundary ok`，open-boundary-lint 17/17（baseline 是 2 fail）。
+
+### persistence tripwire：fixture 版本号 0.83.0→0.84.1
+`tests/persistence-schema-tripwire.test.ts` 一处 fixture（packageVersion/requestedVersion）。guard 语义（currentSessionVersion=3、sha512- 完整性、extensions 列表、kind=external-versioned）未改。tripwire 15/15（baseline 4 fail）。
+
+## P15. Phase 15 — pre-existing 失败修复（独立 commit）
+
+- **i18n-locale-parity（3→0）**：ja/ko/zh-TW 缺 4 key（`settings.providers.subtab.{api,models,usage}` + `settings.api.searchConfig`），en/zh 已有。补真实翻译（非英文占位）。JSON reserialization 顺带合并了三 locale 在 settings.providers 内的 pre-existing 重复 `empty` key（last-wins，符合 runtime 语义）。
+- **model-sync-routes（1→0）**：stale attribution 断言 `kind:'utility'`，auxiliary-slot refactor 已改 `kind:'auxiliary'`（server/routes/models.ts:249）。更新断言到当前契约。54/54。
+
+## P15b. pi 0.84.1 AuthStorage 契约迁移（**required migration failure**）
+
+v24 跑暴露（v22 因 sqlite 兼容未暴露）：`model-manager-auth-storage` 3 fail。根因：pi 0.84.1 raw `AuthStorage` 删了 `has`/`remove`（CredentialStore 只剩 read/list/modify/delete）。`_removeApiKeyProviderAuthEntries` 在 init() 早期跑时 `this._authStorage` 还是 raw AuthStorage，`has?.()`/`remove()` 全 no-op → legacy API-key 条目未从 auth.json 清掉。
+
+修法（core/model-manager.ts）：存在性检查与删除按"任一可用 API"适配（has|read|get / remove|delete），不放宽语义（delete 仍 gate on presence）。29/29。
+
+## P17. Phase 17 — 版本收尾
+`lingxi.upstreamVersion` 0.443.46 → 0.444.1（package.json）。app version 保持 0.1.22。upstream-version-consistency 4/4。
+
