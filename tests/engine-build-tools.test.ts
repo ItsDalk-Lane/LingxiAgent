@@ -279,7 +279,7 @@ describe("LingxiEngine.buildTools", () => {
     expect(result.details.executed).toBe(true);
   });
 
-  it("wires utility model reviewers into the default approval gateway", async () => {
+  it("wires a single intent authorization reviewer into the default approval gateway", async () => {
     tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "hana-engine-approval-gateway-"));
     const engine = new LingxiEngine({
       lingxiHome: tmpDir,
@@ -297,10 +297,13 @@ describe("LingxiEngine.buildTools", () => {
       large_api_key: "large-key",
       large_base_url: "https://large.example.test",
     }));
+    // The approval reviewer now speaks the authorization schema (verdict +
+    // scopeRelation), not the legacy action shape.
     engine._callApprovalReviewerText = vi.fn(async () => JSON.stringify({
-      action: "allow",
+      verdict: "authorized",
+      scopeRelation: "exact",
+      evidenceIds: ["u0"],
       reason: "workspace edit is in scope",
-      risk: "low",
     }));
 
     const decision = await engine._approvalGateway.review({
@@ -319,14 +322,17 @@ describe("LingxiEngine.buildTools", () => {
     expect(engine.resolveUtilityConfigFresh).toHaveBeenCalledWith(expect.objectContaining({
       agentId: "hana",
     }));
+    // The single intent reviewer resolves to the utility (small) model. The
+    // large utility model is NOT consulted for approval any more.
     expect(engine._callApprovalReviewerText).toHaveBeenCalledWith(expect.objectContaining({
       model: { id: "small-reviewer", provider: "test" },
       apiKey: "small-key",
       baseUrl: "https://small.example.test",
     }));
+    expect(engine._callApprovalReviewerText).toHaveBeenCalledTimes(1);
     expect(decision).toMatchObject({
       action: "allow",
-      reviewer: "small_tool_model",
+      reviewer: "authorization_model",
       reason: "workspace edit is in scope",
     });
   });

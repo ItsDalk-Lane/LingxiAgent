@@ -378,14 +378,13 @@ export class LingxiEngine {
     this._pluginInstallRecords = new PluginInstallRecords({ lingxiHome });
     this._automationSuggestionStore = new AutomationSuggestionStore();
     this._sessionCollabDraftStore = new SessionCollabDraftStore();
+    // §四十二/§四十三 Approval gateway now uses a single Intent Authorization
+    // Reviewer (role: utility). The small→large cascade is removed. utility_large
+    // is intentionally NOT used for approval — it remains available for all its
+    // other (memory/summary) duties (§三, §五十九).
     this._approvalGateway = createApprovalGateway({
-      smallToolModelReviewer: createModelApprovalReviewer({
+      intentAuthorizationReviewer: createModelApprovalReviewer({
         role: "utility",
-        resolveUtilityConfig: (options) => this.resolveUtilityConfigFresh(options || {}),
-        callText: (options) => this._callApprovalReviewerText(options),
-      }),
-      largeToolModelReviewer: createModelApprovalReviewer({
-        role: "utility_large",
         resolveUtilityConfig: (options) => this.resolveUtilityConfigFresh(options || {}),
         callText: (options) => this._callApprovalReviewerText(options),
       }),

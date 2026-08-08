@@ -101,7 +101,7 @@ describe("session_folders tool", () => {
     const approvalGateway = {
       review: vi.fn(async () => ({
         action: "deny_and_continue",
-        reviewer: "large_tool_model",
+        reviewer: "approval_model",
         reason: "should not run",
         risk: "high",
       })),
@@ -146,7 +146,7 @@ describe("session_folders tool", () => {
     const approvalGateway = {
       review: vi.fn(async () => ({
         action: "allow",
-        reviewer: "large_tool_model",
+        reviewer: "approval_model",
         reason: "folder access matches the user request",
         risk: "high",
       })),
@@ -204,7 +204,7 @@ describe("session_folders tool", () => {
     const approvalGateway = {
       review: vi.fn(async () => ({
         action: "ask_user",
-        reviewer: "large_tool_model",
+        reviewer: "approval_model",
         reason: "broad folder access needs confirmation",
         risk: "high",
       })),
@@ -228,7 +228,7 @@ describe("session_folders tool", () => {
       status: "needs_user_approval_but_unavailable",
       reviewStatus: "ask_user",
       reason: "broad folder access needs confirmation",
-      reviewer: "large_tool_model",
+      reviewer: "approval_model",
       risk: "high",
     });
   });
@@ -245,7 +245,7 @@ describe("session_folders tool", () => {
     const approvalGateway = {
       review: vi.fn(async () => ({
         action: "ask_user",
-        reviewer: "large_tool_model",
+        reviewer: "approval_model",
         reason: "broad folder access needs confirmation",
         risk: "high",
       })),

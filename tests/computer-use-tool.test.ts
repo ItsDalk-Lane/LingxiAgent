@@ -621,7 +621,7 @@ describe("computer tool", () => {
     const approvalGateway = {
       review: vi.fn(async () => ({
         action: "deny_and_continue",
-        reviewer: "large_tool_model",
+        reviewer: "approval_model",
         reason: "should not run",
         risk: "high",
       })),
@@ -678,7 +678,7 @@ describe("computer tool", () => {
     const approvalGateway = {
       review: vi.fn(async () => ({
         action: "allow",
-        reviewer: "large_tool_model",
+        reviewer: "approval_model",
         reason: "app control matches the current user task",
         risk: "high",
       })),
@@ -711,7 +711,7 @@ describe("computer tool", () => {
     expect((result.details as any).confirmation).toMatchObject({
       kind: "computer_app_approval",
       status: "approved",
-      reviewer: "large_tool_model",
+      reviewer: "approval_model",
     });
     expect(approve).not.toHaveBeenCalled();
   });
@@ -720,7 +720,7 @@ describe("computer tool", () => {
     const approvalGateway = {
       review: vi.fn(async () => ({
         action: "allow",
-        reviewer: "large_tool_model",
+        reviewer: "approval_model",
         reason: "app control matches the current user task",
         risk: "high",
       })),
@@ -767,7 +767,7 @@ describe("computer tool", () => {
     const approvalGateway = {
       review: vi.fn(async () => ({
         action: "ask_user",
-        reviewer: "large_tool_model",
+        reviewer: "approval_model",
         reason: "new app target needs user confirmation",
         risk: "high",
       })),
@@ -801,7 +801,7 @@ describe("computer tool", () => {
     const approvalGateway = {
       review: vi.fn(async () => ({
         action: "ask_user",
-        reviewer: "large_tool_model",
+        reviewer: "approval_model",
         reason: "new app target needs user confirmation",
         risk: "high",
       })),
@@ -826,7 +826,7 @@ describe("computer tool", () => {
       status: "needs_user_approval_but_unavailable",
       reviewStatus: "ask_user",
       reason: "new app target needs user confirmation",
-      reviewer: "large_tool_model",
+      reviewer: "approval_model",
       risk: "high",
     });
     expect(approve).not.toHaveBeenCalled();

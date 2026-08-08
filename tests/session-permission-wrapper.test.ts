@@ -127,7 +127,7 @@ describe("session permission wrapper", () => {
       sessionPermission: { readOnly: true },
     });
     const approvalGateway = {
-      review: vi.fn(async () => ({ action: "allow", reviewer: "small_tool_model", risk: "low" })),
+      review: vi.fn(async () => ({ action: "allow", reviewer: "approval_model", risk: "low" })),
     };
     const [wrapped] = wrapWithSessionPermission([tool], {
       getPermissionMode: () => "read_only",
@@ -242,7 +242,7 @@ describe("session permission wrapper", () => {
     const approvalGateway = {
       review: vi.fn(async () => ({
         action: "deny_and_continue",
-        reviewer: "small_tool_model",
+        reviewer: "approval_model",
         reason: "should not run",
         risk: "high",
       })),
@@ -268,7 +268,7 @@ describe("session permission wrapper", () => {
     const approvalGateway = {
       review: vi.fn(async () => ({
         action: "deny_and_continue",
-        reviewer: "small_tool_model",
+        reviewer: "approval_model",
         reason: "should not review operate bash",
         risk: "high",
       })),
@@ -292,7 +292,7 @@ describe("session permission wrapper", () => {
     const tool = makeTool("bash");
     const confirmStore = { create: vi.fn() };
     const approvalGateway = {
-      review: vi.fn(async () => ({ action: "allow", reviewer: "small_tool_model", risk: "low" })),
+      review: vi.fn(async () => ({ action: "allow", reviewer: "approval_model", risk: "low" })),
     };
     const [wrapped] = wrapWithSessionPermission([tool], {
       getPermissionMode: () => "operate",
@@ -317,7 +317,7 @@ describe("session permission wrapper", () => {
     const approvalGateway = {
       review: vi.fn(async () => ({
         action: "allow",
-        reviewer: "small_tool_model",
+        reviewer: "approval_model",
         reason: "workspace write is in scope",
         risk: "low",
       })),
@@ -345,7 +345,7 @@ describe("session permission wrapper", () => {
     });
     const confirmStore = { create: vi.fn() };
     const approvalGateway = {
-      review: vi.fn(async () => ({ action: "deny_and_continue", reviewer: "small_tool_model", risk: "high" })),
+      review: vi.fn(async () => ({ action: "deny_and_continue", reviewer: "approval_model", risk: "high" })),
     };
     const [wrapped] = wrapWithSessionPermission([tool], {
       getPermissionMode: () => "auto",
@@ -378,7 +378,7 @@ describe("session permission wrapper", () => {
     const approvalGateway = {
       review: vi.fn(async () => ({
         action: "allow",
-        reviewer: "small_tool_model",
+        reviewer: "approval_model",
         reason: "generation matches user intent",
         risk: "low",
       })),
@@ -473,7 +473,7 @@ describe("session permission wrapper", () => {
     const approvalGateway = {
       review: vi.fn(async () => ({
         action: "allow",
-        reviewer: "small_tool_model",
+        reviewer: "approval_model",
         reason: "matches intent",
         risk: "low",
       })),
@@ -519,7 +519,7 @@ describe("session permission wrapper", () => {
     const approvalGateway = {
       review: vi.fn(async () => ({
         action: "allow",
-        reviewer: "small_tool_model",
+        reviewer: "approval_model",
         reason: "matches the requested interaction",
         risk: "low",
       })),
@@ -561,7 +561,7 @@ describe("session permission wrapper", () => {
         resolvedAgentId = "agent-b";
         return {
           action: "allow",
-          reviewer: "small_tool_model",
+          reviewer: "approval_model",
           reason: "approved agent-a",
           risk: "low",
         };
@@ -665,7 +665,7 @@ describe("session permission wrapper", () => {
         runtimeNativeSessionId = "019f7dca-b75c-7ffd-8071-44a8be0632c4";
         return {
           action: "allow",
-          reviewer: "small_tool_model",
+          reviewer: "approval_model",
           reason: "approved stable Hana session",
           risk: "low",
         };
@@ -714,7 +714,7 @@ describe("session permission wrapper", () => {
         mutableCtx.sessionId = sessions.b.sessionId;
         return {
           action: "allow",
-          reviewer: "small_tool_model",
+          reviewer: "approval_model",
           reason: "approved session A",
           risk: "low",
         };
@@ -777,7 +777,7 @@ describe("session permission wrapper", () => {
         mutableCtx.bridgeContext.sessionKey = "wechat_dm_owner-b@agent-a";
         return {
           action: "allow",
-          reviewer: "small_tool_model",
+          reviewer: "approval_model",
           reason: "approved owner A",
           risk: "low",
         };
@@ -866,7 +866,7 @@ describe("session permission wrapper", () => {
     const approvalGateway = {
       review: vi.fn(async () => ({
         action: "allow",
-        reviewer: "small_tool_model",
+        reviewer: "approval_model",
         reason: "approved session A",
         risk: "low",
       })),
@@ -1211,7 +1211,7 @@ describe("session permission wrapper", () => {
     const approvalGateway = {
       review: vi.fn(async () => ({
         action: "allow",
-        reviewer: "small_tool_model",
+        reviewer: "approval_model",
         reason: "the channel post matches the scheduled task",
         risk: "low",
       })),
@@ -1373,7 +1373,7 @@ describe("session permission wrapper", () => {
     const approvalGateway = {
       review: vi.fn(async () => ({
         action: "allow",
-        reviewer: "small_tool_model",
+        reviewer: "approval_model",
         reason: "default auto reviewer approved",
         risk: "low",
       })),
@@ -1395,7 +1395,7 @@ describe("session permission wrapper", () => {
     const approvalGateway = {
       review: vi.fn(async () => ({
         action: "deny_and_continue",
-        reviewer: "small_tool_model",
+        reviewer: "approval_model",
         reason: "use a safer local command",
         saferAlternative: "inspect files without shelling out",
         risk: "high",
@@ -1419,7 +1419,7 @@ describe("session permission wrapper", () => {
         // 拒绝文案署名（灰测修复 A3）：原因必须标明来源是审查网关，模型不会把
         // 拒绝脑补成沙箱限制。
         reason: "session permission auto-review: use a safer local command",
-        reviewer: "small_tool_model",
+        reviewer: "approval_model",
       },
     });
   });
@@ -1476,12 +1476,12 @@ describe("session permission wrapper", () => {
         reasonCode: "approval_review_failed",
         reviewerFailures: [
           {
-            reviewer: "small_tool_model",
+            reviewer: "approval_model",
             reasonCode: "reviewer_invalid_json",
             attempts: 2,
           },
           {
-            reviewer: "large_tool_model",
+            reviewer: "approval_model",
             reasonCode: "reviewer_timeout",
             errorCode: "LLM_TIMEOUT",
             attempts: 1,
@@ -1508,12 +1508,12 @@ describe("session permission wrapper", () => {
       reasonCode: "approval_review_failed",
       reviewerFailures: [
         {
-          reviewer: "small_tool_model",
+          reviewer: "approval_model",
           reasonCode: "reviewer_invalid_json",
           attempts: 2,
         },
         {
-          reviewer: "large_tool_model",
+          reviewer: "approval_model",
           reasonCode: "reviewer_timeout",
           errorCode: "LLM_TIMEOUT",
           attempts: 1,
@@ -1527,7 +1527,7 @@ describe("session permission wrapper", () => {
     const approvalGateway = {
       review: vi.fn(async () => ({
         action: "allow",
-        reviewer: "small_tool_model",
+        reviewer: "approval_model",
         reason: "trusted workspace target",
         risk: "low",
       })),
