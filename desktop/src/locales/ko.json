@@ -1566,7 +1566,7 @@
       "url": "Base URL",
       "apiKey": "API Key",
       "addBtn": "추가",
-      "empty": "아직 등록된 Provider가 없어요",
+      "empty": "등록된 Provider가 없어요. 위의 「Provider 추가」를 눌러 시작하세요.",
       "fetchModels": "모델 가져오기",
       "delete": "Provider 삭제",
       "modelCount": "{n}개 모델",
@@ -1595,7 +1595,11 @@
       "addService": "Provider 추가",
       "pickTitle": "Provider 선택",
       "backToList": "Provider 목록으로 돌아가기",
-      "empty": "등록된 Provider가 없어요. 위의 「Provider 추가」를 눌러 시작하세요."
+      "subtab": {
+        "api": "API 설정",
+        "models": "모델 설정",
+        "usage": "사용량"
+      }
     },
     "usage": {
       "title": "사용량",
@@ -1786,7 +1790,8 @@
         "audio": "오디오 입력 지원",
         "reasoning": "추론 지원",
         "tools": "도구 호출 지원"
-      }
+      },
+      "searchConfig": "검색 API 설정"
     },
     "memory": {
       "sectionTitle": "기억",

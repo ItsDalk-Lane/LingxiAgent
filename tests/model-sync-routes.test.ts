@@ -710,7 +710,7 @@ describe("model sync related routes", () => {
     expect(res.status).toBe(200);
     expect(callText).toHaveBeenCalledWith(expect.objectContaining({
       usageContext: expect.objectContaining({
-        attribution: { kind: "utility", agentId: null },
+        attribution: { kind: "auxiliary", agentId: null },
       }),
     }));
   });

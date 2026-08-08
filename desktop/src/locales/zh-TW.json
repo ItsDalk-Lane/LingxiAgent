@@ -1566,7 +1566,7 @@
       "url": "Base URL",
       "apiKey": "API Key",
       "addBtn": "新增",
-      "empty": "還沒有註冊供應商",
+      "empty": "尚未新增服務商，請點擊上方「新增服務商」開始設定。",
       "fetchModels": "讀取模型",
       "delete": "刪除供應商",
       "modelCount": "{n} 個模型",
@@ -1595,7 +1595,11 @@
       "addService": "新增服務商",
       "pickTitle": "選擇服務商",
       "backToList": "返回服務商列表",
-      "empty": "尚未新增服務商，請點擊上方「新增服務商」開始設定。"
+      "subtab": {
+        "api": "設定 API",
+        "models": "設定模型",
+        "usage": "用量統計"
+      }
     },
     "usage": {
       "title": "用量統計",
@@ -1786,7 +1790,8 @@
         "audio": "支援音訊輸入",
         "reasoning": "支援推理",
         "tools": "支援工具呼叫"
-      }
+      },
+      "searchConfig": "搜尋 API 設定"
     },
     "memory": {
       "sectionTitle": "記憶",
