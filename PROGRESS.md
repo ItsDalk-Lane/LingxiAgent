@@ -728,3 +728,61 @@ v24 跑暴露（v22 因 sqlite 兼容未暴露）：`model-manager-auth-storage`
 ## P17. Phase 17 — 版本收尾
 `lingxi.upstreamVersion` 0.443.46 → 0.444.1（package.json）。app version 保持 0.1.22。upstream-version-consistency 4/4。
 
+## P18/P19/P20/P21. 最终审计 + 验收矩阵（v24.16.0，sqlite rebuilt）
+
+**环境前提（关键）**：`nvm exec/run 24.16.0` 被 `~/.local/bin/node`(v22.23.2) PATH 抢占。所有最终验证一律 `export PATH="/Users/study_superior/.nvm/versions/node/v24.16.0/bin:$PATH"` 显式顶 v24.16.0 二进制。v22 下跑会掩盖 159 个 sqlite ABI 失败 + 3 个 model-manager-auth-storage 失败——只有真 v24 暴露全部 required migration failures。
+
+### Phase 19 反作弊（全 PASS）
+- `git diff START -- release-digest.v1/v2.json` = 空 ✓
+- conflict marker scan = 空 ✓
+- 新增 skip/todo scan = 空 ✓
+- guardrail assertion 文件：open-boundary-lint / upstream-version-consistency / i18n-locale-parity = 0 改动；persistence-schema-tripwire = 仅 packageVersion/requestedVersion 数据值 0.83.0→0.84.1（guard 语义 currentSessionVersion=3/sha512-/extensions/kind 全保留）✓
+
+### Phase 18 合并完整性（全 PASS）
+- 8 个 THEIRS-added 文件全部 PRESENT ✓
+- OMITTED_UPSTREAM_DELTAS: core/session-manifest/legacy-migration.ts（BOM fix，Lingxi 已删无消费方）+ release-digest（非 release）
+- OMITTED_OURS_DELTAS: none
+- Lingxi invariant 保留：engine.ts aux wiring 16/16 符号、bridge-manager 34/34 符号、lingxi.compaction.boundary、streamFunction、lingxiFetch、yuan='lingxi' ✓
+- production pi import leak = none（qwen.ts 的命中是注释中的文档引用，非真实 import；verifier 通过）✓
+
+### Phase 20 验收矩阵（实测）
+| Check | Result |
+|-------|--------|
+| node -v | v24.16.0 ✓ |
+| app version | 0.1.22 ✓ |
+| upstreamVersion | 0.444.1 ✓ |
+| pi-agent-core / pi-ai / pi-coding-agent | 0.84.1 / 0.84.1 / 0.84.1 ✓ |
+| postinstall verifier | `[verify-pi-sdk] all checks passed` exit 0 ✓ |
+| negative test (0.82.0) | `[verify-pi-sdk] SDK version 0.82.0 is not verified` exit 1 ✓ |
+| deep imports (auth-storage/compaction/compat) | 全 EXISTS + resolvable ✓ |
+| typecheck | 0 error ✓ |
+| full npm test | **1085 passed | 1 skipped (Test Files)**; **10978 passed | 0 failed | 7 skipped (Tests)**; exit 0 ✓ |
+| skipped ≤ baseline | 7 = baseline（全 win32 platform skip）✓ |
+| guardrail assertion semantics | 未改 ✓ |
+| release digest | 未改 ✓ |
+| conflict markers | 空 ✓ |
+| production pi import leak | none ✓ |
+
+### Phase 21 negative test
+sandbox 跑 verifier 对 mock 0.82.0 → `SDK version 0.82.0 is not verified. Verified versions: 0.80.3, 0.83.0, 0.84.1` exit 1。sandbox 清理后 working tree clean，无残留。
+
+### 最终 full suite（v24.16.0，sqlite rebuilt，权威）
+```
+Test Files  1085 passed | 1 skipped (1086)
+Tests       10978 passed | 7 skipped (10985)
+exit 0
+```
+7 skipped 全是 win32 platform smoke（macOS 上恒不运行）。**0 failed。**
+
+### 提交链（8 个语义 checkpoint，branch chore/upstream-0.444.1-pi-0.84.1）
+1. 5338cef6 chore: upgrade pi sdk to 0.84.1 + adapt refreshToken contract
+2. 140f5e59 sync: merge openhanako 0.444.1 semantics (per-file 3-way)
+3. 140b06e8 chore: regenerate sync artifacts for pi 0.84.1 + upstream 0.444.1
+4. 04336ed4 fix: restore pre-existing test baseline (i18n parity + model-sync attribution)
+5. d2241338 chore: set upstream version 0.444.1
+6. 8f77460a fix: adapt model-manager auth cleanup to pi 0.84.1 AuthStorage contract
+7. 55a31db6 docs: record task progress (Phases 12-17)
+8. ec44f188 fix: update settings-search-layout test for the responsive shell (d555c14e)
+
+START_HEAD a5d1e54 → FINAL_HEAD ec44f188。
+
