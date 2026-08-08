@@ -102,6 +102,21 @@ jobs      :
 macOS CI 的 `npm test` 实测 **10979 passed | 0 failed | 7 skipped**，与本地 Node24
 结果完全一致——独立第二环境确认。
 
+### CI flake 说明（透明记录）
+
+CI 权威验证 run 是 **31256058776（commit df6a9124，含全部代码 + ci.yml 修复）**：
+macOS + Windows 双平台全绿。其后一个 docs-only commit（2a7626ae，仅 PROGRESS.md /
+BLOCKED.md markdown）触发的 run **31256879632** 在 Windows 上失败——失败是
+`persistence-schema-tripwire > uses real SQLite stores` 的 **test timeout**（10s），
+非断言失败；macOS 仍全绿。
+
+df6a9124 与 2a7626ae 之间 **零代码/测试/workflow 改动**（`git diff` 仅 2 个 .md 文件），
+且同一测试在 df6a9124 的 Windows run 通过、在两次 macOS run 均通过。判定为
+**Windows CI runner 上 SQLite-integration 测试的偶发 timeout flake**（Windows runner
+较慢 + 并发测试负载），非迁移回归。代码 CI 证据以 df6a9124 的全绿 run 为准。
+
 ## 遗留风险（非阻塞，收口阶段未变）
 - 真实 OAuth 登录 / 真实 Provider 网络调用未做人工端到端验证（同迁移任务遗留）。
 - better-sqlite3 native binary 为 v24.16.0 重建，CI/其他开发者默认 node 不同时需各自 rebuild。
+- Windows CI runner 上 `persistence-schema-tripwire`（real SQLite）偶发 timeout flake（pre-existing 平台特性，非本迁移引入）。
+
