@@ -157,7 +157,7 @@ describe("xAI OAuth driver", () => {
       refresh: "refresh-old",
       expires: 0,
       tokenEndpoint: "https://auth.x.ai/oauth2/token",
-    })).resolves.toMatchObject({
+    }, new AbortController().signal)).resolves.toMatchObject({
       access: "access-new",
       refresh: "refresh-new",
       expires: 61_000,
@@ -175,7 +175,7 @@ describe("xAI OAuth driver", () => {
       refresh: "refresh-keep",
       expires: 0,
       tokenEndpoint: "https://auth.x.ai/oauth2/token",
-    })).resolves.toMatchObject({
+    }, new AbortController().signal)).resolves.toMatchObject({
       access: "access-newer",
       refresh: "refresh-keep",
       expires: 122_000,
@@ -191,7 +191,25 @@ describe("xAI OAuth driver", () => {
       refresh: "refresh-secret",
       expires: 0,
       tokenEndpoint: "https://evil.example/oauth2/token",
-    })).rejects.toThrow(/untrusted cached token_endpoint/i);
+    }, new AbortController().signal)).rejects.toThrow(/untrusted cached token_endpoint/i);
+    expect(fetchImpl).not.toHaveBeenCalled();
+  });
+
+  it("honors a pre-aborted refresh signal before sending credentials (0.84.1 refreshToken contract)", async () => {
+    // 0.84.1 起 pi 的 OAuth provider contract 给 refreshToken 传 AbortSignal。
+    // 本测试证明 signal 真实接入：预中止的 signal 在任何网络请求前即抛 AbortError，
+    // 不是 no-op（fetchImpl 不应被调用）。
+    const fetchImpl = vi.fn(async () => jsonResponse({ access_token: "should-not-reach" }));
+    const provider = createXaiOAuthProvider({ fetchImpl: fetchImpl as typeof fetch });
+    const abortController = new AbortController();
+    abortController.abort(new Error("refresh cancelled"));
+
+    await expect(provider.refreshToken({
+      access: "access-old",
+      refresh: "refresh-old",
+      expires: 0,
+      tokenEndpoint: "https://auth.x.ai/oauth2/token",
+    }, abortController.signal)).rejects.toThrow("refresh cancelled");
     expect(fetchImpl).not.toHaveBeenCalled();
   });
 
@@ -226,7 +244,7 @@ describe("xAI OAuth driver", () => {
       refresh: "old-refresh",
       expires: 0,
       tokenEndpoint: "https://auth.x.ai/oauth2/token",
-    })).resolves.toMatchObject({ expires: 1_234_000 });
+    }, new AbortController().signal)).resolves.toMatchObject({ expires: 1_234_000 });
   });
 
   it("honors AbortSignal while waiting for device authorization", async () => {

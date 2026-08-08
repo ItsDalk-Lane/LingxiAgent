@@ -19,8 +19,8 @@ const path = require("path");
 const root = path.join(__dirname, "..");
 const sdkRoot = path.join(root, "node_modules", "@earendil-works", "pi-coding-agent");
 const piAiRoot = path.join(root, "node_modules", "@earendil-works", "pi-ai");
-const verifiedVersions = new Set(["0.80.3", "0.83.0"]);
-const verifiedPiAiVersions = new Set(["0.80.3", "0.83.0"]);
+const verifiedVersions = new Set(["0.80.3", "0.83.0", "0.84.1"]);
+const verifiedPiAiVersions = new Set(["0.80.3", "0.83.0", "0.84.1"]);
 
 function fail(message) {
   console.error(`[verify-pi-sdk] ${message}`);

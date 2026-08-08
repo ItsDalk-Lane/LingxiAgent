@@ -328,18 +328,22 @@ export function createXaiOAuthProvider(options: XaiOAuthDriverOptions = {}): Sdk
       throw new Error("xAI OAuth device code expired");
     },
 
-    async refreshToken(credentials: OAuthCredentials): Promise<OAuthCredentials> {
+    async refreshToken(credentials: OAuthCredentials, signal?: AbortSignal): Promise<OAuthCredentials> {
       if (typeof credentials.refresh !== "string" || !credentials.refresh) {
         throw new Error("xAI OAuth credentials missing refresh token");
       }
+      // 0.84.1 起 pi 的 OAuth provider contract 要求 refreshToken 接收调用方
+      // 的 AbortSignal。把它真实接入：discover 与 postToken 都先 throwIfAborted，
+      // 再与 30s 请求超时合并成 requestSignal，取消立即抛 AbortError，不是 no-op。
+      throwIfAborted(signal);
       const tokenEndpoint = credentials.tokenEndpoint === undefined
-        ? (await discover()).tokenEndpoint
+        ? (await discover(signal)).tokenEndpoint
         : trustedXaiAuthEndpoint(credentials.tokenEndpoint, "cached token_endpoint");
       const { response, payload } = await postToken(tokenEndpoint, {
         grant_type: "refresh_token",
         refresh_token: credentials.refresh,
         client_id: XAI_OAUTH_CLIENT_ID,
-      });
+      }, signal);
       if (!response.ok || payload.error) {
         throw new Error(`xAI OAuth token refresh failed: ${oauthErrorMessage(payload, `HTTP ${response.status}`)}`);
       }
