@@ -1840,11 +1840,13 @@
       "video": "视频",
       "audio": "音频",
       "reasoning": "推理",
+      "toolUse": "工具调用",
       "capability": {
         "image": "支持图像输入",
         "video": "支持视频输入",
         "audio": "支持音频输入",
-        "reasoning": "支持推理"
+        "reasoning": "支持推理",
+        "tools": "支持工具调用"
       }
     },
     "memory": {

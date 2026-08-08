@@ -1840,11 +1840,13 @@
       "video": "Video",
       "audio": "Audio",
       "reasoning": "Reasoning",
+      "toolUse": "Tool calling",
       "capability": {
         "image": "Supports image input",
         "video": "Supports video input",
         "audio": "Supports audio input",
-        "reasoning": "Supports reasoning"
+        "reasoning": "Supports reasoning",
+        "tools": "Supports tool calling"
       }
     },
     "memory": {

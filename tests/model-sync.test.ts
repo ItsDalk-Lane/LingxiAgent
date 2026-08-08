@@ -1782,6 +1782,57 @@ describe("syncModels", () => {
     ]);
   });
 
+  it("projects user-set context, toolUse, and reasoning for Ollama models", async () => {
+    const syncModels = await loadSync();
+
+    const providers = {
+      ollama: {
+        base_url: "http://localhost:11434/v1",
+        api: "openai-completions",
+        auth_type: "none",
+        models: [
+          {
+            id: "gemma4:12b-nvfp4",
+            context: 262144,
+            toolUse: { supportsTools: true, dialect: "openai", toolResultFormat: "message" },
+            reasoning: true,
+          },
+        ],
+      },
+    };
+
+    syncModels(providers, { modelsJsonPath });
+
+    const result = JSON.parse(fs.readFileSync(modelsJsonPath, "utf-8"));
+    const model = result.providers.ollama.models[0];
+    expect(model.id).toBe("gemma4:12b-nvfp4");
+    expect(model.contextWindow).toBe(262144);
+    expect(model.toolUse).toEqual({
+      supportsTools: true,
+      dialect: "openai",
+      toolResultFormat: "message",
+    });
+    expect(model.reasoning).toBe(true);
+  });
+
+  it("projects gemma4 as image-capable (gemma[3-9] range)", async () => {
+    const syncModels = await loadSync();
+
+    const providers = {
+      ollama: {
+        base_url: "http://localhost:11434/v1",
+        api: "openai-completions",
+        auth_type: "none",
+        models: ["gemma4:12b-nvfp4"],
+      },
+    };
+
+    syncModels(providers, { modelsJsonPath });
+
+    const result = JSON.parse(fs.readFileSync(modelsJsonPath, "utf-8"));
+    expect(result.providers.ollama.models[0].input).toEqual(["text", "image"]);
+  });
+
   it("derives no-auth policy from ProviderRegistry for existing Ollama configs", async () => {
     const { ModelManager } = await import("../core/model-manager.ts");
     fs.writeFileSync(path.join(tmpDir, "added-models.yaml"), [

@@ -1768,11 +1768,13 @@
       "video": "動画",
       "audio": "音声",
       "reasoning": "推論",
+      "toolUse": "ツール呼び出し",
       "capability": {
         "image": "画像入力に対応",
         "video": "動画入力に対応",
         "audio": "音声入力に対応",
-        "reasoning": "推論に対応"
+        "reasoning": "推論に対応",
+        "tools": "ツール呼び出しに対応"
       }
     },
     "memory": {

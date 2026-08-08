@@ -32,6 +32,7 @@ import * as openaiVideoUrl from "./provider-compat/openai-video-url.ts";
 import * as openrouter from "./provider-compat/openrouter.ts";
 import * as anthropic from "./provider-compat/anthropic.ts";
 import * as codexResponses from "./provider-compat/codex-responses.ts";
+import * as ollama from "./provider-compat/ollama.ts";
 import { normalizeImplicitOutputBudget } from "./provider-compat/output-budget.ts";
 import { stripOrphanToolResults } from "./provider-compat/tool-pairing.ts";
 import { normalizeOpenAIInputAudioPayload } from "./provider-compat/input-audio.ts";
@@ -79,6 +80,7 @@ const PROVIDER_MODULES: ProviderModule[] = [
   openrouter,
   anthropic,
   codexResponses,
+  ollama,
 ];
 
 function lower(value) {

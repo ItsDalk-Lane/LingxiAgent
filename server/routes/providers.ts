@@ -22,6 +22,10 @@ import { denySecretMutationWithoutScope, denyWithoutScope } from "../http/capabi
 
 // ── Models-cache helpers ──
 
+function isPlainObject(value: any): value is Record<string, any> {
+  return !!value && typeof value === "object" && !Array.isArray(value);
+}
+
 function getCachePath(engine: any) {
   return path.join(engine.lingxiHome, "models-cache.json");
 }
@@ -317,6 +321,95 @@ export function createProvidersRoute(engine: any) {
     return models.map((model) => enrichOllamaModelMetadata(name, model));
   }
 
+  /**
+   * Ollama 原生接口探测：/v1/models 不返回 context_length 和 capabilities，
+   * 需额外请求 /api/tags（批量 capabilities）和 /api/show（逐模型 context_length）。
+   *
+   * 探测是额外增强：任何失败（老版本无 capabilities 字段、网络错误、超时）都静默跳过，
+   * 保持原有 {id, context:null} 状态——这不是"静默降级"，而是探测本身是 best-effort。
+   *
+   * @param baseUrl ollama OpenAI 兼容 baseUrl（通常含 /v1 后缀），内部剥离 /v1 拼原生路径
+   * @param modelIds 待探测的模型 id 列表
+   * @returns { modelId: { context, capabilities } }
+   */
+  async function probeOllamaModelDetails(baseUrl: string, modelIds: string[]): Promise<Record<string, { context: number | null; capabilities: string[] | null }>> {
+    const result: Record<string, { context: number | null; capabilities: string[] | null }> = {};
+    if (!modelIds.length) return result;
+
+    // 剥离 /v1 后缀，拼出 ollama 原生 API root（如 http://localhost:11434/v1 → http://localhost:11434）
+    const root = stripOllamaV1Suffix(baseUrl);
+    if (!root) return result;
+
+    // 1. /api/tags：一次请求拿全部模型的 capabilities
+    const capabilitiesMap: Record<string, string[]> = {};
+    try {
+      const tagsRes = await fetch(`${root}/api/tags`, {
+        signal: AbortSignal.timeout(15000),
+      });
+      if (tagsRes.ok) {
+        const tagsData = await tagsRes.json();
+        for (const m of tagsData?.models || []) {
+          const id = typeof m === "object" ? (m.name || m.model) : null;
+          if (id && Array.isArray(m?.capabilities)) {
+            capabilitiesMap[String(id)] = m.capabilities.map((c: any) => String(c).toLowerCase());
+          }
+        }
+      }
+    } catch {
+      // 老版本 ollama 可能没有 /api/tags 的 capabilities 字段，静默跳过
+    }
+
+    // 2. /api/show：逐模型拿 context_length（model_info.<arch>.context_length）
+    //    并行请求，单个失败不影响其他
+    const showResults = await Promise.allSettled(
+      modelIds.map(async (modelId) => {
+        const res = await fetch(`${root}/api/show`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ model: modelId }),
+          signal: AbortSignal.timeout(15000),
+        });
+        if (!res.ok) return { modelId, context: null };
+        const data = await res.json();
+        // context_length 在 model_info.<architecture>.context_length
+        const modelInfo = data?.model_info || {};
+        let context: number | null = null;
+        for (const value of Object.values(modelInfo)) {
+          if (value && typeof value === "object" && typeof (value as any).context_length === "number") {
+            context = (value as any).context_length;
+            break;
+          }
+        }
+        // model_info 顶层也可能是扁平的 context_length（部分版本）
+        if (context === null && typeof modelInfo?.context_length === "number") {
+          context = modelInfo.context_length;
+        }
+        return { modelId, context };
+      }),
+    );
+
+    for (const settled of showResults) {
+      if (settled.status === "fulfilled") {
+        const { modelId, context } = settled.value;
+        result[modelId] = {
+          context,
+          capabilities: capabilitiesMap[modelId] || null,
+        };
+      }
+    }
+    return result;
+  }
+
+  /**
+   * 把 ollama baseUrl（含 /v1）剥离为原生 API root。
+   * http://localhost:11434/v1 → http://localhost:11434
+   */
+  function stripOllamaV1Suffix(baseUrl: string): string {
+    const raw = String(baseUrl || "").trim();
+    if (!raw) return "";
+    return raw.replace(/\/v1\/?$/, "").replace(/\/+$/, "");
+  }
+
   async function refreshProviderModels() {
     (clearConfigCache as any)();
     await engine.onProviderChanged();
@@ -496,11 +589,43 @@ export function createProvidersRoute(engine: any) {
 
         if (res.ok) {
           const data = await res.json();
-          const remoteModels = enrichDiscoveredModelMetadata(
-            name,
-            supplementRemoteModels(name, normalizeRemoteModels(data, effectiveApi)),
-          );
-          const { models, ignoredModels } = filterDiscoveredProviderModels(name, remoteModels, {
+          let remoteModels = supplementRemoteModels(name, normalizeRemoteModels(data, effectiveApi));
+
+          // Ollama 专用：/v1/models 不返回 context_length 和 capabilities，
+          // 探测原生 /api/tags（capabilities）+ /api/show（context_length）补充真实元数据。
+          // 探测失败保持原状（best-effort，非降级）。
+          if (name === "ollama") {
+            const modelIds = remoteModels
+              .map((m: any) => (typeof m === "object" ? m?.id : null))
+              .filter((id: any): id is string => typeof id === "string" && id.length > 0);
+            const probe = await probeOllamaModelDetails(effectiveBaseUrl, modelIds);
+            remoteModels = remoteModels.map((m: any) => {
+              const id = typeof m === "object" ? m?.id : null;
+              if (!id || !probe[id]) return m;
+              const detail = probe[id];
+              const patched = { ...m };
+              // context：探测到非空值才覆盖（/v1/models 的 null 不覆盖 known-models 已有值）
+              if (detail.context !== null && detail.context !== undefined) {
+                patched.context = detail.context;
+              }
+              // capabilities：暂存到私有字段，供 enrichOllamaModelMetadata 读取
+              if (detail.capabilities !== null) {
+                patched._ollamaCapabilities = detail.capabilities;
+              }
+              return patched;
+            });
+          }
+
+          const enrichedRaw = enrichDiscoveredModelMetadata(name, remoteModels);
+          // 清理私有探测字段，避免污染缓存/前端
+          const enriched = enrichedRaw.map((m: any) => {
+            if (isPlainObject(m) && m._ollamaCapabilities !== undefined) {
+              const { _ollamaCapabilities, ...rest } = m;
+              return rest;
+            }
+            return m;
+          });
+          const { models, ignoredModels } = filterDiscoveredProviderModels(name, enriched, {
             baseUrl: effectiveBaseUrl,
           });
           if (models.length === 0 && ignoredModels.length > 0) {

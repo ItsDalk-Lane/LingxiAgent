@@ -50,6 +50,11 @@ export function ModelEditPanel({ modelId, providerId, modelMeta, anchorEl, onClo
   const [video, setVideo] = useState<boolean>(meta.video === true);
   const [audio, setAudio] = useState<boolean>(meta.audio === true);
   const [reasoning, setReasoning] = useState<boolean>(meta.reasoning === true);
+  // toolUse 契约：只读 supportsTools 布尔，保存时构造完整契约（dialect/toolResultFormat 默认 openai/message）
+  const initialToolUse = meta.toolUse && typeof meta.toolUse === 'object'
+    ? meta.toolUse.supportsTools === true
+    : false;
+  const [toolUse, setToolUse] = useState<boolean>(initialToolUse);
   const [dirtyCapabilities, setDirtyCapabilities] = useState<Record<string, boolean>>({});
   const panelRef = useRef<HTMLDivElement>(null);
   const [style, setStyle] = useState<React.CSSProperties>({});
@@ -77,6 +82,11 @@ export function ModelEditPanel({ modelId, providerId, modelMeta, anchorEl, onClo
     if (dirtyCapabilities.video) entry.video = video;
     if (dirtyCapabilities.audio) entry.audio = audio;
     if (dirtyCapabilities.reasoning) entry.reasoning = reasoning;
+    if (dirtyCapabilities.toolUse) {
+      entry.toolUse = toolUse
+        ? { supportsTools: true, dialect: 'openai', toolResultFormat: 'message' }
+        : { supportsTools: false, dialect: 'none', toolResultFormat: 'message' };
+    }
 
     try {
       await lingxiFetch(`/api/providers/${encodeURIComponent(providerId)}/models/${encodeURIComponent(modelId)}`, {
@@ -136,6 +146,10 @@ export function ModelEditPanel({ modelId, providerId, modelMeta, anchorEl, onClo
         <div className={styles['pv-model-edit-field']}>
           <label className={styles['pv-model-edit-label']}>{t('settings.api.reasoning')}</label>
           <Toggle ariaLabel={t('settings.api.reasoning')} on={reasoning} onChange={(value) => { setReasoning(value); setDirtyCapabilities(prev => ({ ...prev, reasoning: true })); }} />
+        </div>
+        <div className={styles['pv-model-edit-field']}>
+          <label className={styles['pv-model-edit-label']}>{t('settings.api.toolUse')}</label>
+          <Toggle ariaLabel={t('settings.api.toolUse')} on={toolUse} onChange={(value) => { setToolUse(value); setDirtyCapabilities(prev => ({ ...prev, toolUse: true })); }} />
         </div>
       </div>
       <div className={styles['pv-model-edit-actions']}>

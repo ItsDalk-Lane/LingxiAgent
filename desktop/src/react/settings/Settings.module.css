@@ -4443,7 +4443,9 @@ a.about-link:hover {
     display: flex;
     gap: 0;
     flex: 1;
-    min-height: 0;
+    /* 空状态（无供应商）下内容高度极小，但 overlay 用 position:absolute;inset:0
+       跟随本元素高度——若塌缩则「添加服务商」弹窗不可见。给 min-height 兜底。 */
+    min-height: 420px;
     max-width: 100%;
     min-width: 0;
     background: var(--bg-card, var(--bg));
