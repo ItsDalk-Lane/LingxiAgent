@@ -237,3 +237,4 @@
 - 实现只改摘要生成边界：密钥改为 `DEEPSEEK_API_KEY`，默认模型改为 `deepseek-v4-flash`，端点改为官方 `/responses`；原有来源采集、v1 schema、本地校验和 v2 史册追加逻辑保持不变。
 - 远端非 2xx 错误不再附带响应正文，避免服务端异常回显进入日志；非 completed 响应即使带有看似完整的部分 JSON 也会失败关闭。
 - 无密钥的真实命令验证为失败关闭：退出码 1、错误明确指向 `DEEPSEEK_API_KEY`、目标摘要文件不存在。
+- 真实 Responses 输出可先给出 reasoning 项，再给 message/output_text；不能遍历到任意 `text` 就返回，否则会把思考过程送进 JSON 解析。最终提取只接受 `output_text`。

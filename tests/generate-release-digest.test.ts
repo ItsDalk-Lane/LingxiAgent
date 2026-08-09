@@ -76,7 +76,10 @@ describe("generate-release-digest", () => {
       ok: true,
       json: vi.fn().mockResolvedValue({
         status: "completed",
-        output: [{ type: "message", content: [{ type: "output_text", text: JSON.stringify(digest) }] }],
+        output: [
+          { type: "reasoning", content: [{ type: "reasoning_text", text: "The user wants a release digest." }] },
+          { type: "message", content: [{ type: "output_text", text: JSON.stringify(digest) }] },
+        ],
       }),
     });
 

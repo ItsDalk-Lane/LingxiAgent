@@ -199,7 +199,7 @@ function extractResponseText(payload) {
   }
   for (const item of payload?.output || []) {
     for (const content of item?.content || []) {
-      if (typeof content?.text === "string" && content.text.trim()) {
+      if (content?.type === "output_text" && typeof content.text === "string" && content.text.trim()) {
         return content.text;
       }
     }
