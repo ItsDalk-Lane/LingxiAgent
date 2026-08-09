@@ -1,24 +1,24 @@
-# RESOLVED — 0.1.23 发布摘要生成
+# RESOLVED — 0.1.24 发布摘要生成
 
 ## 已解除
 
-- `release-digest.v1.json` 已由 DeepSeek Responses API 生成 `v0.1.23` 摘要，`release-digest.v2.json` 已把 `0.1.23` 插入史册头部。
+- `release-digest.v1.json` 已由 DeepSeek Responses API 生成 `v0.1.24` 摘要，`release-digest.v2.json` 已把 `0.1.24` 插入史册头部。
 - 生成器默认使用 `deepseek-v4-flash`；真实响应暴露的 reasoning/output_text 顺序差异已用 `3655c238` 修复并回归。
-- 两份摘要均已通过仓库校验器，摘要生成阶段不再阻断发布。
+- 两份摘要均已通过仓库校验器和人工事实复核，摘要生成阶段不再阻断发布。
 
 ## 解除结果
 
-- 摘要内容只引用 `v0.1.3..HEAD` 的三个真实提交，没有手工修改条目。
-- v2 史册版本顺序为 `0.1.23 > 0.1.3 > 0.1.2 > 0.1.0`，可以进入最终发布预检。
+- 最终摘要从最后一个真实 GitHub Release `v0.1.3` 汇总到 `HEAD`，没有手工修改条目；错误声称 Linux 安装损坏的首稿已被人工复核拒绝并由生成器覆盖。
+- v2 史册版本顺序为 `0.1.24 > 0.1.23 > 0.1.3 > 0.1.2 > 0.1.0`；失败 tag `v0.1.23` 作为透明历史保留，但没有对应 GitHub Release。
 
 ## 已执行步骤
 
-1. 在当前进程可读取 `DEEPSEEK_API_KEY` 后运行（默认模型为 `deepseek-v4-flash`）：
-   `node scripts/generate-release-digest.mjs --tag v0.1.23 --previous-tag v0.1.3 --ref HEAD`
+1. 在临时进程读取 `DEEPSEEK_API_KEY` 后运行（默认模型为 `deepseek-v4-flash`）：
+   `node scripts/generate-release-digest.mjs --tag v0.1.24 --previous-tag v0.1.3 --ref HEAD --release-notes-file <事实说明>`
 2. 运行：
-   `node scripts/validate-release-digest.mjs --tag v0.1.23 --file release-digest.v1.json`
+   `node scripts/validate-release-digest.mjs --tag v0.1.24 --file release-digest.v1.json`
 3. 再运行：
-   `node scripts/validate-release-digest.mjs --tag v0.1.23 --file release-digest.v2.json`
+   `node scripts/validate-release-digest.mjs --tag v0.1.24 --file release-digest.v2.json`
 4. 两份校验均通过后，才能推送 main、创建 tag/Release。
 
 ---

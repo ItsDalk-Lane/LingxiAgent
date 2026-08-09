@@ -87,4 +87,4 @@ GitHub `v0.1.3` 的 renderer 与 darwin-arm64 server 归档已抽检：哈希与
 
 ## 发布摘要状态
 
-`release-digest.v1.json` / `release-digest.v2.json` 已由仓库生成器通过 DeepSeek Responses API 与 `deepseek-v4-flash` 生成，没有手工修改条目。真实响应中 reasoning 先于最终正文的兼容问题已用测试复现并修复；两份文件对 `v0.1.23` 的校验现在均以退出码 0 通过，摘要发布阻塞已解除。
+`release-digest.v1.json` / `release-digest.v2.json` 已由仓库生成器通过 DeepSeek Responses API 与 `deepseek-v4-flash` 生成，没有手工修改条目。真实响应中 reasoning 顺序、输出额度和默认思考造成的兼容问题均已用失败证据和测试修复。由于 `v0.1.23` tag 的 Linux 质量夹具失败且未创建 Release，最终摘要目标为严格更高的 `v0.1.24` / generation 2；两份文件校验均退出 0。

@@ -3,6 +3,147 @@
   "entries": [
     {
       "schemaVersion": 1,
+      "tag": "v0.1.24",
+      "version": "0.1.24",
+      "previousTag": "v0.1.3",
+      "generatedAt": "2026-08-09T06:03:03.743Z",
+      "noUserFacingChanges": false,
+      "summary": {
+        "zh": "本版本修复了旧安装未能正确更新组件导致 Artifact 无法激活的问题，并增强了运行时信息显示和发布前的质量检查，确保安装与升级更稳定可靠。",
+        "en": "This release fixes an issue where older installations could not activate Artifact after update, improves runtime diagnostics, and adds preflight checks to make installation and upgrades more robust."
+      },
+      "counts": {
+        "feature": 0,
+        "fix": 1,
+        "improvement": 2,
+        "migration": 1
+      },
+      "source": {
+        "owner": "ItsDalk-Lane",
+        "repo": "LingxiAgent",
+        "commitRange": "v0.1.3..HEAD",
+        "releaseUrl": "https://github.com/ItsDalk-Lane/LingxiAgent/releases/tag/v0.1.24",
+        "releaseNotes": "LingxiAgent v0.1.24 contains intended product changes since v0.1.3. Key fixes include repairing Artifact activation for installations running older renderer/server, and adding runtime provenance and compatibility warnings. Release preflight now blocks product-version regression and ensures migration tests pass. Dependency updates removed critical/high npm audit findings. Digest generation moved to DeepSeek API as infrastructure."
+      },
+      "items": [
+        {
+          "id": "fix-artifact-activation",
+          "kind": "fix",
+          "importance": "high",
+          "title": {
+            "zh": "修复 Artifact 激活问题",
+            "en": "Fix Artifact activation issue"
+          },
+          "summary": {
+            "zh": "解决了安装新版后仍使用旧渲染器/服务导致 Artifact 无法激活的问题，同时保留用户数据与崩溃回滚机制。",
+            "en": "Resolves an issue where Artifact could not activate because older renderer/server remained in use after update, while preserving user data and crash rollback."
+          },
+          "details": [
+            {
+              "zh": "新发布的激活流程会自动修复旧安装，确保升级后组件一致。",
+              "en": "The new activation flow automatically repairs old installations to ensure component consistency after upgrade."
+            }
+          ],
+          "sources": [
+            {
+              "type": "commit",
+              "ref": "cf0be5bc392a",
+              "title": "release: repair artifact activation and harden 0.1.23"
+            },
+            {
+              "type": "release-notes",
+              "ref": "v0.1.24",
+              "title": "The user-facing repair fixes Artifact activation for installations that kept running the older 0.1.22 renderer/server"
+            }
+          ]
+        },
+        {
+          "id": "runtime-diagnostics",
+          "kind": "improvement",
+          "importance": "medium",
+          "title": {
+            "zh": "增强运行时诊断信息",
+            "en": "Enhanced runtime diagnostics"
+          },
+          "summary": {
+            "zh": "现在可以更方便地查看当前使用的 Shell、渲染器、服务器、版本、训练与提交信息，帮助排查兼容性问题。",
+            "en": "Easier access to active shell, renderer, server, version, train, and commit information to help diagnose compatibility issues."
+          },
+          "details": [
+            {
+              "zh": "新增兼容性警告，当检测到版本不匹配时会明确提示。",
+              "en": "Compatibility warnings now appear when version mismatches are detected."
+            }
+          ],
+          "sources": [
+            {
+              "type": "release-notes",
+              "ref": "v0.1.24",
+              "title": "Runtime provenance and compatibility warnings now make the active shell, renderer, server, source, version, train, release generation and commit visible"
+            }
+          ]
+        },
+        {
+          "id": "preflight-checks",
+          "kind": "improvement",
+          "importance": "medium",
+          "title": {
+            "zh": "发布前新增质量检查",
+            "en": "New preflight quality checks"
+          },
+          "summary": {
+            "zh": "在构建和发布前自动阻止版本回退、标签与包不匹配等问题，并要求通过引导与升级迁移测试，提升可靠性。",
+            "en": "Automatically blocks version regressions, tag/package mismatches, and requires bootstrap and migration tests to pass before build and publication."
+          },
+          "details": [
+            {
+              "zh": "这些检查有助于避免无效发布，减少用户遇到安装问题的风险。",
+              "en": "These checks help prevent invalid releases and reduce the risk of installation issues."
+            }
+          ],
+          "sources": [
+            {
+              "type": "release-notes",
+              "ref": "v0.1.24",
+              "title": "Release preflight now blocks product-version regression, tag/package mismatch and release-generation reuse"
+            },
+            {
+              "type": "commit",
+              "ref": "84d8cfefd068",
+              "title": "release: fix Linux gate and advance to 0.1.24"
+            }
+          ]
+        },
+        {
+          "id": "dependency-audit",
+          "kind": "migration",
+          "importance": "low",
+          "title": {
+            "zh": "安全依赖更新",
+            "en": "Security dependency updates"
+          },
+          "summary": {
+            "zh": "更新了依赖，消除了所有严重和高危的 npm 审计问题，同时避免强制升级可能带来风险的中低危项目。",
+            "en": "Updated dependencies to eliminate all critical and high npm audit findings, while avoiding forced upgrades of moderate/low risk items."
+          },
+          "details": [
+            {
+              "zh": "保持了兼容性，未采用不安全的强制升级方案。",
+              "en": "Compatibility is maintained without unsafe forced upgrades."
+            }
+          ],
+          "sources": [
+            {
+              "type": "release-notes",
+              "ref": "v0.1.24",
+              "title": "Compatible dependency updates removed all critical and high npm audit findings"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "schemaVersion": 1,
       "tag": "v0.1.23",
       "version": "0.1.23",
       "previousTag": "v0.1.3",
