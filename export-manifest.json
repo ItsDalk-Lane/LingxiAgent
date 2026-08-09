@@ -632,6 +632,7 @@
     "shared/artifact-core/pinned-keyset.json",
     "shared/artifact-core/pointer-channels.cjs",
     "shared/artifact-core/pointer-store.cjs",
+    "shared/artifact-core/release-order.cjs",
     "shared/artifact-core/ustar.cjs",
     "shared/audio-mime.ts",
     "shared/bridge-visible-text.ts",

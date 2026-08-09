@@ -56,6 +56,7 @@ const activation = require("../../../shared/artifact-core/activation.cjs");
 const pointerStore = require("../../../shared/artifact-core/pointer-store.cjs");
 const manifestModule = require("../../../shared/artifact-core/manifest.cjs");
 const pointerChannels = require("../../../shared/artifact-core/pointer-channels.cjs");
+const releaseOrder = require("../../../shared/artifact-core/release-order.cjs");
 
 const { SEED_CHANNEL, rendererPointerChannel } = pointerChannels;
 /**
@@ -130,73 +131,31 @@ function verifySeedManifest({ manifestBytes, sigBytes, keyset, platformArch, req
 }
 
 /**
- * 产品版本只接受完整的 major.minor.patch（可带 v 前缀）。不可解析返回 null，
- * 由启动决策回退到旧指针兼容规则，不猜测版本先后。
- * @param {unknown} version
- * @returns {number[]|null}
- */
-function parseProductVersion(version) {
-  const match = /^v?(\d+)\.(\d+)\.(\d+)$/.exec(String(version == null ? "" : version).trim());
-  if (!match) return null;
-  return [Number(match[1]), Number(match[2]), Number(match[3])];
-}
-
-/**
- * 检测两个可解析的版本号是否属于不同的版本号体系（不可直接做 semver 比较）。
- *
- * 两个版本都能通过 parseProductVersion 解析时，semver 比较默认假定它们在同一体系内
- * 递增。但下游分叉（如 Lingxi）可能用与上游不同的版本号方案：Lingxi 壳版本是
- * 0.1.x（minor 为 1~2 位数），上游 server 版本是 0.44x（minor 为 3 位数）。把它们
- * 直接比较会把 0.1.21 误判为比 0.442.0 更旧，从而永远挡住随包新版 server 激活。
- *
- * 判据：major 段相等且 minor 段跨越了一个数量级（一侧 ≤2 位数、另一侧 ≥3 位数），
- * 是不同版本号体系的强信号——同体系内 minor 不会无端跳一个数量级。此函数只标
- * "可疑"，由 decideBootAction 决定是否降级为不可比较。
- */
-function looksLikeDifferentVersionScheme(leftVersion, rightVersion) {
-  const left = parseProductVersion(leftVersion);
-  const right = parseProductVersion(rightVersion);
-  if (!left || !right) return false;
-  if (left[0] !== right[0]) return false;
-  // minor 段位数差 ≥1 个数量级（一边 <100、一边 ≥100）视为跨体系。
-  const minorDigits = (n) => (n <= 0 ? 1 : Math.floor(Math.log10(n)) + 1);
-  return Math.abs(minorDigits(left[1]) - minorDigits(right[1])) >= 1
-    && (left[1] < 100) !== (right[1] < 100);
-}
-
-/**
- * @param {unknown} leftVersion
- * @param {unknown} rightVersion
- * @returns {-1|0|1|null}
- */
-function compareProductVersions(leftVersion, rightVersion) {
-  const left = parseProductVersion(leftVersion);
-  const right = parseProductVersion(rightVersion);
-  if (!left || !right) return null;
-  for (let index = 0; index < 3; index += 1) {
-    if (left[index] !== right[index]) return left[index] > right[index] ? 1 : -1;
-  }
-  return 0;
-}
-
-/**
  * 纯决策：给定已解析指针、随包 seed 条目、是否处于三连败降级。
  * @param {{resolved: {slot: string, pointer: object} | null,
- *          seedEntry: {sha256: string, version?: string}, crashFallback: boolean}} opts
+ *          seedEntry: {sha256: string, version?: string}, seedManifest?: object,
+ *          crashFallback: boolean}} opts
  * @returns {"boot"|"activate-seed"}
  */
-function decideBootAction({ resolved, seedEntry, crashFallback }) {
+function decideBootAction({ resolved, seedEntry, seedManifest, crashFallback }) {
   if (!resolved) return "activate-seed";
   if (crashFallback) return "boot"; // 绝不把降级目标又顶回 seed
   const pointer = resolved.pointer;
   const pointerTrain = Number.isInteger(pointer.train) ? pointer.train : 0;
-  // 跨版本号体系（如 Lingxi 0.1.x 的 seed 遇到上游 0.44x 的历史指针）时，semver 比较
-  // 会把 0.1.x 误判为更旧，永远挡住新版 server 激活。检测到跨体系就把比较结果视为
-  // 不可比较，降级到下面的 train/sha 自愈规则。
-  const crossScheme = looksLikeDifferentVersionScheme(seedEntry.version, pointer.version);
-  const versionComparison = crossScheme ? null : compareProductVersions(seedEntry.version, pointer.version);
-  if (versionComparison !== null) {
-    return versionComparison > 0 ? "activate-seed" : "boot";
+  // 同一份内容或同一产品版本没有重装价值；后者还会撞上按产品版本命名的目录。
+  if (pointer.sha256 === seedEntry.sha256 || pointer.version === seedEntry.version) return "boot";
+
+  const seedGeneration = releaseOrder.normalizeReleaseGeneration(seedManifest && seedManifest.releaseGeneration);
+  const pointerGeneration = releaseOrder.normalizeReleaseGeneration(pointer.releaseGeneration);
+  const legacyCrossScheme = seedGeneration === null
+    && pointerGeneration === null
+    && releaseOrder.looksLikeDifferentVersionScheme(seedEntry.version, pointer.version);
+  const orderComparison = legacyCrossScheme ? null : releaseOrder.compareReleaseOrder(
+    { releaseGeneration: seedManifest && seedManifest.releaseGeneration, version: seedEntry.version },
+    pointer,
+  );
+  if (orderComparison !== null) {
+    return orderComparison > 0 ? "activate-seed" : "boot";
   }
 
   // 版本不可比较（或跨体系残留）：seed-era 的 train-0 指针按内容新鲜度自愈——sha256
@@ -293,7 +252,7 @@ async function prepareArtifactServerBoot({
     });
 
     let resolved = await activation.resolveBoot(channel, homeDir);
-    const action = decideBootAction({ resolved, seedEntry: serverEntry, crashFallback });
+    const action = decideBootAction({ resolved, seedEntry: serverEntry, seedManifest: manifest, crashFallback });
 
     let activatedSeed = false;
     if (action === "activate-seed") {
@@ -310,6 +269,7 @@ async function prepareArtifactServerBoot({
         kind: "server",
         platformArch,
         allowReplaceProtected: true,
+        source: "seed",
       });
       await pointerStore.promote(homeDir, channel);
       resolved = await activation.resolveBoot(channel, homeDir);
@@ -329,6 +289,11 @@ async function prepareArtifactServerBoot({
       quarantinedTrain,
       fromVersion,
       toVersion,
+      sha256: resolved.pointer.sha256,
+      releaseGeneration: releaseOrder.normalizeReleaseGeneration(resolved.pointer.releaseGeneration),
+      sourceCommit: resolved.pointer.sourceCommit || null,
+      releasedAt: resolved.pointer.releasedAt || null,
+      source: resolved.pointer.source || "legacy",
     };
   });
 }
@@ -426,7 +391,7 @@ async function prepareArtifactRendererBoot({
     });
 
     let resolved = await activation.resolveBoot(pointerChannel, homeDir);
-    const action = decideBootAction({ resolved, seedEntry: rendererEntry, crashFallback });
+    const action = decideBootAction({ resolved, seedEntry: rendererEntry, seedManifest: manifest, crashFallback });
 
     let activatedSeed = false;
     if (action === "activate-seed") {
@@ -443,6 +408,7 @@ async function prepareArtifactRendererBoot({
         channel: pointerChannel,
         kind: "renderer",
         allowReplaceProtected: true,
+        source: "seed",
       });
       await pointerStore.promote(homeDir, pointerChannel);
       resolved = await activation.resolveBoot(pointerChannel, homeDir);
@@ -462,6 +428,11 @@ async function prepareArtifactRendererBoot({
       quarantinedTrain,
       fromVersion,
       toVersion,
+      sha256: resolved.pointer.sha256,
+      releaseGeneration: releaseOrder.normalizeReleaseGeneration(resolved.pointer.releaseGeneration),
+      sourceCommit: resolved.pointer.sourceCommit || null,
+      releasedAt: resolved.pointer.releasedAt || null,
+      source: resolved.pointer.source || "legacy",
     };
   });
 }
@@ -506,7 +477,7 @@ async function prepareArtifactBoot({
   // 一次即可，下面的 per-kind 函数各自还会再验一次自己需要的那半（廉价：
   // 一次 ed25519 verify + 一次小文件读取），换来的是各函数可以独立调用/
   // 独立测试，不需要把已验证的 manifest 一路穿透传参。
-  verifySeedManifest({
+  const verifiedSeed = verifySeedManifest({
     manifestBytes: fs.readFileSync(manifestPath),
     sigBytes: fs.readFileSync(sigPath),
     keyset,
@@ -516,8 +487,25 @@ async function prepareArtifactBoot({
 
   const server = await prepareArtifactServerBoot({ homeDir, resourcesPath, platformArch, keyset, channel, onProgress, log });
   const renderer = await prepareArtifactRendererBoot({ homeDir, resourcesPath, platformArch, keyset, channel, onProgress, log });
+  const compatibility = releaseOrder.assessRuntimeCompatibility(server, renderer);
+  if (compatibility.status !== "compatible") {
+    log(
+      `[artifact-boot] runtime compatibility warning: ${compatibility.reason}; `
+        + `server=${server.version}/generation-${server.releaseGeneration ?? "legacy"}, `
+        + `renderer=${renderer.version}/generation-${renderer.releaseGeneration ?? "legacy"}`,
+    );
+  }
 
-  return { server, renderer };
+  return {
+    server,
+    renderer,
+    compatibility,
+    seed: {
+      releaseGeneration: releaseOrder.normalizeReleaseGeneration(verifiedSeed.manifest.releaseGeneration),
+      sourceCommit: verifiedSeed.manifest.sourceCommit || null,
+      releasedAt: verifiedSeed.manifest.releasedAt,
+    },
+  };
 }
 
 /**
@@ -591,6 +579,7 @@ module.exports = {
   hasSeed,
   verifySeedManifest,
   decideBootAction,
+  assessRuntimeCompatibility: releaseOrder.assessRuntimeCompatibility,
   rendererPointerChannel,
   prepareArtifactServerBoot,
   prepareArtifactRendererBoot,

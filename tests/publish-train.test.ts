@@ -614,6 +614,67 @@ describe("publish-train: publishChannel", () => {
     expect(deps.uploadAssets).not.toHaveBeenCalled();
   });
 
+  it("refuses to move a signed channel pointer to an older release generation before publish writes", async () => {
+    const current = buildSampleManifest({
+      version: "1.2.2",
+      train: 13,
+      releaseGeneration: 2,
+      sourceCommit: "b".repeat(40),
+    });
+    const deps = baseDeps({
+      releaseExists: vi.fn((tag: string) => tag === "channels"),
+      releaseAssetNames: vi.fn().mockReturnValue(["stable.json", "stable.json.sig"]),
+      downloadAssets: vi.fn((tag: string, _patterns: string[], destDir: string) => {
+        if (tag === "channels") writeSignedManifestFixture(destDir, "stable.json", current);
+      }),
+    });
+
+    await expect(publishChannel({
+      tag: "v1.2.3",
+      channel: "stable",
+      dryRun: false,
+      repo: "ItsDalk-Lane/LingxiAgent",
+      releasedAt: "2026-07-11T00:00:00.000Z",
+      releaseGeneration: 1,
+      sourceCommit: "a".repeat(40),
+      boxes,
+      env: makeSigningEnv(),
+      deps,
+      log: () => {},
+    })).rejects.toThrow(/generation-1.*older.*generation-2/i);
+
+    expect(deps.createRelease).not.toHaveBeenCalled();
+    expect(deps.uploadAssets).not.toHaveBeenCalled();
+    expect(deps.signManifest).not.toHaveBeenCalled();
+  });
+
+  it("allows the first generation-bearing train to migrate a legacy channel pointer", async () => {
+    const legacyCurrent = buildSampleManifest({ version: "1.2.2", train: 13 });
+    const deps = baseDeps({
+      releaseExists: vi.fn((tag: string) => tag === "channels"),
+      releaseAssetNames: vi.fn().mockReturnValue(["stable.json", "stable.json.sig"]),
+      downloadAssets: vi.fn((tag: string, _patterns: string[], destDir: string) => {
+        if (tag === "channels") writeSignedManifestFixture(destDir, "stable.json", legacyCurrent);
+      }),
+    });
+
+    const result = await publishChannel({
+      tag: "v1.2.3",
+      channel: "stable",
+      dryRun: true,
+      repo: "ItsDalk-Lane/LingxiAgent",
+      releasedAt: "2026-07-11T00:00:00.000Z",
+      releaseGeneration: 1,
+      sourceCommit: "a".repeat(40),
+      boxes,
+      env: makeSigningEnv(),
+      deps,
+      log: () => {},
+    });
+
+    expect(result).toMatchObject({ action: "dry-run", train: 14 });
+  });
+
   it("migrates a legacy pointer to a channel-scoped release even when the other channel already owns that train number", async () => {
     // Real divergence shape: stable last published train 13 using the legacy
     // global train-N layout, while beta has already consumed global trains 14

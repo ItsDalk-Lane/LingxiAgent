@@ -89,6 +89,7 @@ async function makeOtaFixture(root: string, keys: ReturnType<typeof makeKeys>, o
   contractPreload?: number;
   contractServerProtocol?: number;
   channel?: string;
+  releaseGeneration?: number;
 } = {}) {
   const version = opts.version ?? "2.0.0";
   const train = opts.train ?? 1;
@@ -128,6 +129,10 @@ async function makeOtaFixture(root: string, keys: ReturnType<typeof makeKeys>, o
     channel: opts.channel ?? "stable",
     releasedAt: "2026-07-11T00:00:00.000Z",
     keyId: keys.keyId,
+    ...(opts.releaseGeneration === undefined ? {} : {
+      releaseGeneration: opts.releaseGeneration,
+      sourceCommit: "a".repeat(40),
+    }),
     minShell: opts.minShell ?? "0.1.0",
     contract: { preload: opts.contractPreload ?? 1, serverProtocol: opts.contractServerProtocol ?? 1 },
     urgent: false,
@@ -532,6 +537,10 @@ describe("artifact-ota: isShellVersionSufficient (minShell gate)", () => {
     expect(isShellVersionSufficient("1.2.2", "1.2.3")).toBe(false);
     expect(isShellVersionSufficient("0.9.9", "1.0.0")).toBe(false);
   });
+  it("orders prerelease shells with standard SemVer", () => {
+    expect(isShellVersionSufficient("1.2.3-beta.1", "1.2.3")).toBe(false);
+    expect(isShellVersionSufficient("1.2.3", "1.2.3-beta.1")).toBe(true);
+  });
   it("blocks (conservative default) when either version is unparseable", () => {
     expect(isShellVersionSufficient("not-a-version", "1.0.0")).toBe(false);
     expect(isShellVersionSufficient("1.0.0", "not-a-version")).toBe(false);
@@ -814,6 +823,60 @@ describe("artifact-ota: checkOnce (gates, never downloads)", () => {
 
     expect(result.outcome).toBe("available");
     expect(result.version).toBe("0.101.0");
+  });
+
+  it("treats a generation-bearing manifest as newer than legacy pointers even when product SemVer looks lower", async () => {
+    const root = makeTempDir("lingxi-ota-generation-migration-");
+    const keys = makeKeys();
+    const { manifestPath } = await makeOtaFixture(root, keys, {
+      train: 5,
+      version: "0.1.3",
+      releaseGeneration: 1,
+    });
+    const homeDir = path.join(root, "home");
+    await pointerStore.writePointer(homeDir, SEED_CHANNEL, "current", {
+      train: 4,
+      kind: "server",
+      version: "0.1.22",
+      sha256: "a".repeat(64),
+    });
+    await pointerStore.writePointer(homeDir, artifactBoot.rendererPointerChannel(SEED_CHANNEL), "current", {
+      train: 4,
+      kind: "renderer",
+      version: "0.1.22",
+      sha256: "b".repeat(64),
+    });
+
+    const result = await runWithDevOverride(manifestPath, () =>
+      checkOnce({ homeDir, keyset: keys.keyset, currentShellVersion: SHELL_VERSION, platformArch: PLATFORM_ARCH, log: () => {} }),
+    );
+
+    expect(result).toMatchObject({ outcome: "available", version: "0.1.3" });
+    expect((await readOtaState(homeDir))[SEED_CHANNEL].available).toMatchObject({ releaseGeneration: 1 });
+  });
+
+  it("rejects a legacy manifest after current pointers have entered release-generation ordering", async () => {
+    const root = makeTempDir("lingxi-ota-generation-anti-rollback-");
+    const keys = makeKeys();
+    const { manifestPath } = await makeOtaFixture(root, keys, { train: 9, version: "9.9.9" });
+    const homeDir = path.join(root, "home");
+    for (const [channel, kind] of [
+      [SEED_CHANNEL, "server"],
+      [artifactBoot.rendererPointerChannel(SEED_CHANNEL), "renderer"],
+    ] as const) {
+      await pointerStore.writePointer(homeDir, channel, "current", {
+        train: 8,
+        kind,
+        version: "0.1.23",
+        releaseGeneration: 1,
+        sha256: kind === "server" ? "a".repeat(64) : "b".repeat(64),
+      });
+    }
+
+    const result = await runWithDevOverride(manifestPath, () =>
+      checkOnce({ homeDir, keyset: keys.keyset, currentShellVersion: SHELL_VERSION, platformArch: PLATFORM_ARCH, log: () => {} }),
+    );
+    expect(result.outcome).toBe("up-to-date");
   });
 
   it("reports up-to-date when only ONE kind's pointer is ahead of the manifest version (a half-behind train is conservatively not an update)", async () => {

@@ -3,7 +3,7 @@
   "generatedBy": "manual census",
   "purpose": "Census of everything the Electron shell asar/extraResources actually ship, plus which script (if any) produces each source. build:shell (scripts/build-shell.mjs) and its guard test (tests/shell-surface-manifest.test.ts) both key off this file so an unreviewed change to package.json's electron-builder `files`/`extraResources` fails a test instead of silently drifting from what build:shell knows how to build.",
   "electron": {
-    "version": "42.3.0",
+    "version": "42.8.1",
     "source": "package.json devDependencies.electron"
   },
   "nodeEngine": ">=24.12.0 <25",

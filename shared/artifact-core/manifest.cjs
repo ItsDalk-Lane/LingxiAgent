@@ -59,6 +59,17 @@ function validateManifest(value) {
   if (typeof value.keyId !== "string" || value.keyId.length === 0) {
     fail("keyId must be a non-empty string");
   }
+  const hasReleaseGeneration = value.releaseGeneration !== undefined;
+  const hasSourceCommit = value.sourceCommit !== undefined;
+  if (hasReleaseGeneration !== hasSourceCommit) {
+    fail("releaseGeneration and sourceCommit must either both be present or both be absent");
+  }
+  if (hasReleaseGeneration && (!Number.isInteger(value.releaseGeneration) || value.releaseGeneration <= 0)) {
+    fail("releaseGeneration must be a positive integer when present");
+  }
+  if (hasSourceCommit && (typeof value.sourceCommit !== "string" || !/^[0-9a-f]{40,64}$/i.test(value.sourceCommit))) {
+    fail("sourceCommit must be a 40-64 character hex commit id when present");
+  }
   if (typeof value.minShell !== "string" || value.minShell.length === 0) {
     fail("minShell must be a non-empty string");
   }

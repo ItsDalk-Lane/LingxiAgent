@@ -150,7 +150,8 @@
  * both next pointers exist afterward, or neither does") using only
  * exported, unmodified artifact-core functions.
  *
- * Node built-ins only (https/crypto/fs/path) — zero new dependencies.
+ * Runtime transport remains Node built-ins only; release ordering uses the
+ * repository's direct semver dependency through release-order.cjs.
  */
 
 const fs = require("fs");
@@ -163,6 +164,7 @@ const manifestModule = require("./manifest.cjs");
 const pointerStore = require("./pointer-store.cjs");
 const activation = require("./activation.cjs");
 const pointerChannels = require("./pointer-channels.cjs");
+const releaseOrder = require("./release-order.cjs");
 const { PRELOAD_API_VERSION } = require("../contract-versions.cjs");
 
 const { SEED_CHANNEL, rendererPointerChannel } = pointerChannels; // SEED_CHANNEL = "stable"
@@ -543,13 +545,7 @@ function cachedGithubEtags(channelState) {
     : {};
 }
 
-// ── minShell comparison (major.minor.patch only; no new semver dep) ───────
-
-function parseVersionTriplet(version) {
-  const match = /^v?(\d+)\.(\d+)\.(\d+)/.exec(String(version || "").trim());
-  if (!match) return null;
-  return [Number(match[1]), Number(match[2]), Number(match[3])];
-}
+// ── minShell comparison（标准 SemVer，含 prerelease）──────────────
 
 /**
  * Three-way semantic comparison of two `major.minor.patch` version strings:
@@ -560,13 +556,7 @@ function parseVersionTriplet(version) {
  * compare" means for its own gate instead of this function guessing.
  */
 function compareVersions(a, b) {
-  const left = parseVersionTriplet(a);
-  const right = parseVersionTriplet(b);
-  if (!left || !right) return null;
-  for (let i = 0; i < 3; i += 1) {
-    if (left[i] !== right[i]) return left[i] > right[i] ? 1 : -1;
-  }
-  return 0;
+  return releaseOrder.compareProductVersions(a, b);
 }
 
 /**
@@ -851,13 +841,23 @@ function isVersionAlreadyCurrent({ currentServerPointer, currentRendererPointer,
  * "behind" rather than guessing a direction.
  * @returns {boolean}
  */
-function isVersionBehindCurrent({ currentServerPointer, currentRendererPointer, serverEntry, rendererEntry }) {
+function isVersionBehindCurrent({
+  currentServerPointer,
+  currentRendererPointer,
+  serverEntry,
+  rendererEntry,
+  releaseGeneration,
+}) {
   const hasVersion = (pointer) => Boolean(
     pointer && typeof pointer.version === "string" && pointer.version.length > 0,
   );
   if (!hasVersion(currentServerPointer) || !hasVersion(currentRendererPointer)) return false;
-  const serverCmp = compareVersions(serverEntry.version, currentServerPointer.version);
-  const rendererCmp = compareVersions(rendererEntry.version, currentRendererPointer.version);
+  const candidate = { releaseGeneration, version: serverEntry.version };
+  const serverCmp = releaseOrder.compareReleaseOrder(candidate, currentServerPointer);
+  const rendererCmp = releaseOrder.compareReleaseOrder(
+    { releaseGeneration, version: rendererEntry.version },
+    currentRendererPointer,
+  );
   return (serverCmp !== null && serverCmp < 0) || (rendererCmp !== null && rendererCmp < 0);
 }
 
@@ -865,6 +865,8 @@ function buildAvailableDescriptor({ manifest, serverEntry, rendererEntry, versio
   return {
     train: manifest.train,
     version,
+    releaseGeneration: releaseOrder.normalizeReleaseGeneration(manifest.releaseGeneration),
+    sourceCommit: manifest.sourceCommit || null,
     serverSha256: serverEntry.sha256,
     rendererSha256: rendererEntry.sha256,
     sizes: { server: serverEntry.size, renderer: rendererEntry.size },
@@ -994,7 +996,13 @@ async function checkOnce(opts) {
     const versionAlreadyCurrent = !contentAlreadyCurrent
       && isVersionAlreadyCurrent({ currentServerPointer, currentRendererPointer, serverEntry, rendererEntry });
     const versionBehindCurrent = !contentAlreadyCurrent && !versionAlreadyCurrent
-      && isVersionBehindCurrent({ currentServerPointer, currentRendererPointer, serverEntry, rendererEntry });
+      && isVersionBehindCurrent({
+        currentServerPointer,
+        currentRendererPointer,
+        serverEntry,
+        rendererEntry,
+        releaseGeneration: manifest.releaseGeneration,
+      });
     if (contentAlreadyCurrent || versionAlreadyCurrent || versionBehindCurrent) {
       if (versionAlreadyCurrent) {
         log(
@@ -1235,10 +1243,17 @@ async function downloadAndApplyArtifacts(opts) {
     // Version direction gate (see `isVersionBehindCurrent`'s doc comment):
     // content version never goes backward. Also checked before acquiring
     // the lock so a downgrade train never triggers a doomed download.
-    if (isVersionBehindCurrent({ currentServerPointer: currentPointer, currentRendererPointer, serverEntry, rendererEntry })) {
+    if (isVersionBehindCurrent({
+      currentServerPointer: currentPointer,
+      currentRendererPointer,
+      serverEntry,
+      rendererEntry,
+      releaseGeneration: manifest.releaseGeneration,
+    })) {
       throw new Error(
-        `train ${manifest.train} (${version}) is older than the currently activated version ${currentPointer.version}; `
-          + "content version is never allowed to go backward — a rollback must be re-published under a higher version number",
+        `train ${manifest.train} (${version}, generation ${manifest.releaseGeneration ?? "legacy"}) is older than the `
+          + `currently activated release (${currentPointer.version}, generation `
+          + `${currentPointer.releaseGeneration ?? "legacy"}); release order is never allowed to go backward`,
       );
     }
 
@@ -1532,7 +1547,10 @@ async function downloadAndApplyRendererArtifact(opts) {
       && typeof currentRendererPointer.version === "string"
       && currentRendererPointer.version.length > 0
     ) {
-      const cmp = compareVersions(rendererEntry.version, currentRendererPointer.version);
+      const cmp = releaseOrder.compareReleaseOrder(
+        { releaseGeneration: manifest.releaseGeneration, version: rendererEntry.version },
+        currentRendererPointer,
+      );
       if (cmp !== null && cmp < 0) {
         throw new Error(
           `train ${manifest.train} (${rendererEntry.version}) is older than the currently activated version `
@@ -1657,7 +1675,11 @@ async function downloadAndApplyRendererArtifact(opts) {
 function bothNextPointersReady({ serverNext, rendererNext }) {
   if (!serverNext || !rendererNext) return false;
   if (!Number.isInteger(serverNext.train) || !Number.isInteger(rendererNext.train)) return false;
-  return serverNext.train === rendererNext.train;
+  if (serverNext.train !== rendererNext.train) return false;
+  const serverGeneration = releaseOrder.normalizeReleaseGeneration(serverNext.releaseGeneration);
+  const rendererGeneration = releaseOrder.normalizeReleaseGeneration(rendererNext.releaseGeneration);
+  if (serverGeneration === null && rendererGeneration === null) return true;
+  return serverGeneration !== null && serverGeneration === rendererGeneration;
 }
 
 /**
@@ -1696,8 +1718,8 @@ function resolveStagedTrainStatus({ serverNext, rendererNext }) {
 function isCachedAvailableSatisfied({ available, currentServerPointer, currentRendererPointer }) {
   if (!available || typeof available.version !== "string" || available.version.length === 0) return false;
   if (!currentServerPointer || !currentRendererPointer) return false;
-  const serverCmp = compareVersions(currentServerPointer.version, available.version);
-  const rendererCmp = compareVersions(currentRendererPointer.version, available.version);
+  const serverCmp = releaseOrder.compareReleaseOrder(currentServerPointer, available);
+  const rendererCmp = releaseOrder.compareReleaseOrder(currentRendererPointer, available);
   return serverCmp !== null && serverCmp >= 0 && rendererCmp !== null && rendererCmp >= 0;
 }
 

@@ -75,6 +75,8 @@ async function buildValidKit(root: string, opts: { platform?: string; arch?: str
     rendererArtifactOutDir: path.join(root, "dist-renderer-artifact"),
     artifactOutDir,
     version: "0.381.0",
+    releaseGeneration: 7,
+    sourceCommit: "a".repeat(40),
     platform,
     arch,
     env: { LINGXI_SIGN_KEY: identity.keyPath, LINGXI_SIGN_KEYSET: identity.keysetPath },
@@ -109,9 +111,34 @@ describe("verify-seed-kit: verifySeedKit (positive case)", () => {
 
     expect(result).toEqual({ ok: true, errors: [] });
   });
+
+  it("matches the signed seed provenance to the checked-out release metadata", async () => {
+    const root = makeTempDir("lingxi-verify-seed-provenance-");
+    const { artifactOutDir, platformArch, identity } = await buildValidKit(root);
+    const result = await verifySeedKit({
+      artifactOutDir,
+      platformArch,
+      keyset: identity.keyset,
+      expectedRelease: { version: "0.381.0", releaseGeneration: 7, sourceCommit: "a".repeat(40) },
+    });
+    expect(result).toEqual({ ok: true, errors: [] });
+  });
 });
 
 describe("verify-seed-kit: verifySeedKit (negative cases)", () => {
+  it("fails when signed seed provenance belongs to another release", async () => {
+    const root = makeTempDir("lingxi-verify-seed-provenance-mismatch-");
+    const { artifactOutDir, platformArch, identity } = await buildValidKit(root);
+    const result = await verifySeedKit({
+      artifactOutDir,
+      platformArch,
+      keyset: identity.keyset,
+      expectedRelease: { version: "0.381.1", releaseGeneration: 8, sourceCommit: "b".repeat(40) },
+    });
+    expect(result.ok).toBe(false);
+    expect(result.errors.join("\n")).toMatch(/releaseGeneration|sourceCommit|version/i);
+  });
+
   it("fails when the manifest signature is tampered", async () => {
     const root = makeTempDir("hana-verify-seed-kit-sig-");
     const { artifactOutDir, platformArch, identity } = await buildValidKit(root);

@@ -307,6 +307,14 @@ async function activateFromArchive(archivePath, manifest, opts) {
   const kindRoot = path.join(pointerStore.artifactsRoot(homeDir), kind);
   const versionedDir = path.join(kindRoot, dirName);
   const allowReplaceProtected = opts.allowReplaceProtected === true;
+  const provenance = {
+    ...(Number.isInteger(manifest.releaseGeneration) ? { releaseGeneration: manifest.releaseGeneration } : {}),
+    ...(typeof manifest.sourceCommit === "string" ? { sourceCommit: manifest.sourceCommit } : {}),
+    ...(typeof manifest.releasedAt === "string" ? { releasedAt: manifest.releasedAt } : {}),
+    source: typeof opts.source === "string" && opts.source.length > 0
+      ? opts.source
+      : manifest.train === 0 ? "seed" : "ota",
+  };
 
   const finalExists = await pathExists(versionedDir);
 
@@ -339,6 +347,7 @@ async function activateFromArchive(archivePath, manifest, opts) {
         versionDir: versionedDir,
         sha256: actualSha256,
         activatedAt,
+        ...provenance,
       };
       await pointerStore.writePointer(homeDir, channel, "next", pointerValue);
       return pointerValue;
@@ -359,6 +368,7 @@ async function activateFromArchive(archivePath, manifest, opts) {
       train: manifest.train,
       version: artifactEntry.version,
       activatedAt,
+      ...provenance,
     };
     await pointerStore.atomicWriteJson(path.join(tmpDir, ".verified"), receipt);
     await swapIntoPlace(tmpDir, versionedDir, finalExists);
@@ -372,6 +382,7 @@ async function activateFromArchive(archivePath, manifest, opts) {
       versionDir: versionedDir,
       sha256: actualSha256,
       activatedAt,
+      ...provenance,
     };
     await pointerStore.writePointer(homeDir, channel, "next", pointerValue);
     return pointerValue;

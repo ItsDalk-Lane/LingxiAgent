@@ -39,11 +39,21 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag }}
+          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "24.15.0"
+          cache: npm
+
+      - name: Install train publisher dependencies
+        run: npm ci --ignore-scripts
+
+      - name: Reject non-monotonic release metadata before any channel write
+        run: npm run release:preflight -- --tag "${{ inputs.tag }}"
 
       - name: Materialize train signing key
         shell: bash

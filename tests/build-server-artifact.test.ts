@@ -169,6 +169,8 @@ describe("build-server-artifact: dual-kind seed manifest shape", () => {
       arch: "arm64",
       keyId: "2026a",
       releasedAt: "2026-07-11T00:00:00.000Z",
+      releaseGeneration: 7,
+      sourceCommit: "a".repeat(40),
       renderer: { sha256: "b".repeat(64), size: 456, archiveName: "renderer-0.381.0.tar.gz" },
       server: { sha256: "a".repeat(64), size: 123, archiveName: "server-0.381.0-darwin-arm64.tar.gz" },
     });
@@ -176,6 +178,8 @@ describe("build-server-artifact: dual-kind seed manifest shape", () => {
     expect(manifest.train).toBe(0);
     expect(manifest.channel).toBe("stable");
     expect(manifest.keyId).toBe("2026a");
+    expect(manifest.releaseGeneration).toBe(7);
+    expect(manifest.sourceCommit).toBe("a".repeat(40));
     expect(manifest.minShell).toBe("0.381.0");
     expect(manifest.artifacts.renderer).toEqual({
       version: "0.381.0",
@@ -487,6 +491,8 @@ describe("build-server-artifact: packDualKindSeed guards and ordering", () => {
       rendererArtifactOutDir: path.join(root, "dist-renderer-artifact"),
       artifactOutDir: path.join(root, "dist-server-artifact", "mac-arm64"),
       version: "0.381.0",
+      releaseGeneration: 7,
+      sourceCommit: "a".repeat(40),
       platform: "linux",
       arch: "x64",
       log: () => {},
@@ -574,6 +580,8 @@ describe("build-server-artifact: packDualKindSeed prebuilt renderer archive reus
       rendererArtifactOutDir: path.join(root, "dist-renderer-artifact"),
       artifactOutDir: path.join(root, "dist-server-artifact", "mac-arm64"),
       version: "0.381.0",
+      releaseGeneration: 7,
+      sourceCommit: "a".repeat(40),
       platform: "linux",
       arch: "x64",
       log: () => {},
@@ -610,6 +618,8 @@ describe("build-server-artifact: packDualKindSeed prebuilt renderer archive reus
       rendererArtifactOutDir: path.join(root, "dist-renderer-artifact"),
       artifactOutDir: path.join(root, "dist-server-artifact", "mac-arm64"),
       version: "0.381.0",
+      releaseGeneration: 7,
+      sourceCommit: "a".repeat(40),
       platform: "linux",
       arch: "x64",
       log: () => {},

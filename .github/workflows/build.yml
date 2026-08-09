@@ -6,6 +6,73 @@ on:
   workflow_dispatch:
 
 jobs:
+  release-preflight:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24.15.0"
+          cache: npm
+
+      - name: Install release preflight dependencies
+        run: npm ci --ignore-scripts
+
+      - name: Reject non-monotonic release metadata
+        shell: bash
+        run: |
+          if [[ "${{ github.ref }}" == refs/tags/v* ]]; then
+            npm run release:preflight -- --tag "${{ github.ref_name }}"
+          else
+            npm run release:preflight
+          fi
+
+      # 两份摘要都必须在本地生成并提交。放在最早门禁里，避免缺摘要的 tag
+      # 继续消耗四平台构建资源，更不能等创建远端草稿后才发现。
+      - name: Validate committed release digests
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          node scripts/validate-release-digest.mjs \
+            --tag "${{ github.ref_name }}" \
+            --file release-digest.v1.json
+          node scripts/validate-release-digest.mjs \
+            --tag "${{ github.ref_name }}" \
+            --file release-digest.v2.json
+
+  quality-gate:
+    needs: release-preflight
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # 全量测试包含真实历史标签预检，浅克隆会把历史最高版本藏掉。
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24.15.0"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build packages
+        run: npm run build:packages
+
+      - name: Run full test suite
+        run: npm test
+
   # renderer 归档（renderer-<version>.tar.gz）是纯 web 静态资源，构建结果平台
   # 无关。这里单点构建一次，四个平台的 build job 下载同一份字节复用——避免
   # 各平台各自现场打包出"内容相同、字节不同、sha256 不同"的四份归档（packTree
@@ -13,6 +80,7 @@ jobs:
   # scripts/build-server-artifact.mjs 的 packDualKindSeed prebuiltRendererArchive
   # / LINGXI_PREBUILT_RENDERER_BOX 入参。
   renderer-box:
+    needs: release-preflight
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -358,8 +426,28 @@ jobs:
             dist-standalone/LingxiCore-*-Windows-x64.manifest.json
           if-no-files-found: error
 
+  artifact-release-smoke:
+    needs: [build, quality-gate]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24.15.0"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Artifact bootstrap and historical-upgrade smoke
+        run: npm run test:artifact-release-smoke
+
   release:
-    needs: build
+    needs: artifact-release-smoke
     if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     permissions:
@@ -375,7 +463,15 @@ jobs:
         with:
           node-version: "24.15.0"
 
-      # 普通版本标签发布为正式版；预览版应使用带预发布后缀的独立标签与流程。
+      - name: Install release metadata dependencies
+        run: npm ci --ignore-scripts
+
+      - name: Classify SemVer release
+        id: release_kind
+        shell: bash
+        run: |
+          IS_PRERELEASE=$(node -e "const semver=require('semver'); const v=require('./package.json').version; process.stdout.write(String(semver.prerelease(v)!==null))")
+          echo "is_prerelease=$IS_PRERELEASE" >> "$GITHUB_OUTPUT"
 
       - name: Download all artifacts
         uses: actions/download-artifact@v4
@@ -387,14 +483,15 @@ jobs:
       - name: Create draft release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          IS_PRERELEASE: ${{ steps.release_kind.outputs.is_prerelease }}
+        shell: bash
         run: |
           if gh release view "${{ github.ref_name }}" >/dev/null 2>&1; then
             echo "Release ${{ github.ref_name }} already exists, skipping create"
           else
-            gh release create "${{ github.ref_name }}" \
-              --draft \
-              --title "${{ github.ref_name }}" \
-              --generate-notes
+            args=(--draft --title "${{ github.ref_name }}" --generate-notes)
+            if [[ "$IS_PRERELEASE" == "true" ]]; then args+=(--prerelease); fi
+            gh release create "${{ github.ref_name }}" "${args[@]}"
           fi
 
       # 合并双架构的 latest-mac.yml（本地生成，不上传；上传由下一步统一处理）
@@ -532,11 +629,17 @@ jobs:
           echo ""
           echo "✓ All required assets present"
 
-      - name: Publish stable release (un-draft, latest)
+      - name: Publish release with SemVer channel classification
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          IS_PRERELEASE: ${{ steps.release_kind.outputs.is_prerelease }}
+        shell: bash
         run: |
-          gh release edit "${{ github.ref_name }}" --prerelease=false --draft=false --latest
+          if [[ "$IS_PRERELEASE" == "true" ]]; then
+            gh release edit "${{ github.ref_name }}" --prerelease=true --draft=false --latest=false
+          else
+            gh release edit "${{ github.ref_name }}" --prerelease=false --draft=false --latest
+          fi
 
   # Publishes the hot-update train that already-installed clients pull automatically —
   # separate from (and downstream of) the installer release above, so a failure here never
@@ -551,11 +654,19 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "24.15.0"
+
+      - name: Install train publisher dependencies
+        run: npm ci --ignore-scripts
+
+      - name: Re-run release preflight before any channel write
+        run: npm run release:preflight -- --tag "${{ github.ref_name }}"
 
       # Same materialization as the build job's "Materialize seed signing key" step:
       # LINGXI_SIGN_KEY secret content is the PEM text itself, written to a runner-temp

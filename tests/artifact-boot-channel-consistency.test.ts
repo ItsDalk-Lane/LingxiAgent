@@ -134,8 +134,10 @@ async function runResolvePackagedArtifactBoot(
     prepareArtifactBoot: async (bootOpts: { channel: string }) => {
       prepareArtifactBootChannels.push(bootOpts.channel);
       return {
+        seed: { productVersion: "0.446.14", releaseGeneration: 1 },
         server: bootResultStub({ versionDir: `/artifacts/server/0.446.14-darwin-arm64`, ...opts.serverBoot }),
         renderer: bootResultStub({ versionDir: `/artifacts/renderer/0.446.14`, ...opts.rendererBoot }),
+        compatibility: { status: "compatible", reason: "same release generation" },
       };
     },
   };
@@ -148,7 +150,7 @@ async function runResolvePackagedArtifactBoot(
 
   const context = vm.createContext({
     lingxiHome: "/tmp/hana-home-fixture",
-    app: { isPackaged: true },
+    app: { isPackaged: true, getVersion: () => "0.446.14" },
     process: { resourcesPath: "/tmp/resources", platform: "darwin", arch: "arm64" },
     path,
     artifactBoot,
@@ -160,11 +162,13 @@ async function runResolvePackagedArtifactBoot(
     notifyComponentQuarantined: () => {},
     broadcastToAllWindows: (channel: string, payload: unknown) => { broadcastCalls.push({ channel, payload }); },
     safeReadJSON: () => ({ update_channel: updateChannelPreference }),
+    buildArtifactRuntimeProvenance: (value: unknown) => value,
     console,
     _distRenderer: null,
     _rendererBootChannel: null,
     _rendererBootTrain: null,
     _artifactBootChannel: null,
+    _artifactRuntimeServer: null,
     _crashFallbackNotice: null,
   });
 

@@ -121,6 +121,26 @@ describe("manifest: parse/validate", () => {
     expect(() => validateManifest(manifest)).toThrow(/server/i);
   });
 
+  it("accepts signed release provenance while keeping legacy manifests readable", () => {
+    expect(() => validateManifest(baseManifest())).not.toThrow();
+    expect(() => validateManifest(baseManifest({
+      releaseGeneration: 1,
+      sourceCommit: "a".repeat(40),
+    }))).not.toThrow();
+  });
+
+  it("rejects partial or malformed release provenance", () => {
+    expect(() => validateManifest(baseManifest({ releaseGeneration: 1 }))).toThrow(/both be present/i);
+    expect(() => validateManifest(baseManifest({
+      releaseGeneration: 0,
+      sourceCommit: "a".repeat(40),
+    }))).toThrow(/positive integer/i);
+    expect(() => validateManifest(baseManifest({
+      releaseGeneration: 1,
+      sourceCommit: "not-a-commit",
+    }))).toThrow(/commit id/i);
+  });
+
   it("still fully validates a renderer entry when it is present", () => {
     const manifest = baseManifest();
     (manifest.artifacts as any).renderer.sha256 = "not-hex";

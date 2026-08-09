@@ -31,6 +31,7 @@ import { createRequire } from "module";
 import { fileURLToPath } from "url";
 
 import { resolveBuildKeyset, seedManifestFileName } from "./build-server-artifact.mjs";
+import { readReleaseMetadata } from "./release-metadata.mjs";
 
 const require = createRequire(import.meta.url);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -80,7 +81,7 @@ async function checkArchiveEntry({ artifactOutDir, label, entry }) {
  * @param {{artifactOutDir: string, platformArch: string, keyset: Array<{keyId: string, publicKey: string}>}} opts
  * @returns {Promise<{ok: boolean, errors: string[]}>}
  */
-export async function verifySeedKit({ artifactOutDir, platformArch, keyset }) {
+export async function verifySeedKit({ artifactOutDir, platformArch, keyset, expectedRelease }) {
   const errors = [];
   const manifestFileName = seedManifestFileName(platformArch);
   const manifestPath = path.join(artifactOutDir, manifestFileName);
@@ -114,6 +115,20 @@ export async function verifySeedKit({ artifactOutDir, platformArch, keyset }) {
     errors.push(`signature verification failed: ${err.message}`);
   }
 
+  if (expectedRelease) {
+    if (manifest.releaseGeneration !== expectedRelease.releaseGeneration) {
+      errors.push(
+        `manifest releaseGeneration=${manifest.releaseGeneration ?? "missing"} does not match package `
+          + `releaseGeneration=${expectedRelease.releaseGeneration}`,
+      );
+    }
+    if (manifest.sourceCommit !== expectedRelease.sourceCommit) {
+      errors.push(
+        `manifest sourceCommit=${manifest.sourceCommit ?? "missing"} does not match build sourceCommit=${expectedRelease.sourceCommit}`,
+      );
+    }
+  }
+
   // ── 2. manifest 平台键与目录平台一致 ──
   const serverEntry = manifest.artifacts && manifest.artifacts.server && manifest.artifacts.server[platformArch];
   if (!serverEntry) {
@@ -123,6 +138,9 @@ export async function verifySeedKit({ artifactOutDir, platformArch, keyset }) {
         + `${manifestFileName} lives in a directory for ${platformArch}`,
     );
   } else {
+    if (expectedRelease && serverEntry.version !== expectedRelease.version) {
+      errors.push(`server version ${serverEntry.version} does not match package version ${expectedRelease.version}`);
+    }
     errors.push(...(await checkArchiveEntry({ artifactOutDir, label: `artifacts.server["${platformArch}"]`, entry: serverEntry })));
   }
 
@@ -131,6 +149,9 @@ export async function verifySeedKit({ artifactOutDir, platformArch, keyset }) {
   if (!rendererEntry) {
     errors.push("manifest carries no artifacts.renderer entry");
   } else {
+    if (expectedRelease && rendererEntry.version !== expectedRelease.version) {
+      errors.push(`renderer version ${rendererEntry.version} does not match package version ${expectedRelease.version}`);
+    }
     errors.push(...(await checkArchiveEntry({ artifactOutDir, label: "artifacts.renderer", entry: rendererEntry })));
   }
 
@@ -150,7 +171,8 @@ async function main() {
   }
 
   console.log(`[verify-seed-kit] verifying ${artifactOutDir} (platformArch=${platformArch})...`);
-  const { ok, errors } = await verifySeedKit({ artifactOutDir, platformArch, keyset });
+  const expectedRelease = readReleaseMetadata(path.join(ROOT, "package.json"), { env: process.env });
+  const { ok, errors } = await verifySeedKit({ artifactOutDir, platformArch, keyset, expectedRelease });
 
   if (!ok) {
     console.error(`[verify-seed-kit] FAILED — ${errors.length} problem(s):`);

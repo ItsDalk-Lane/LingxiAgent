@@ -173,6 +173,8 @@ describe("activation: activateFromArchive", () => {
     const archivePath = await makeServerArchiveFixture(root);
     const sha256 = await sha256File(archivePath);
     const manifest = manifestFor(sha256, 7);
+    (manifest as any).releaseGeneration = 3;
+    (manifest as any).sourceCommit = "a".repeat(40);
 
     const pointerValue = await activateFromArchive(archivePath, manifest, {
       homeDir,
@@ -183,8 +185,19 @@ describe("activation: activateFromArchive", () => {
 
     expect(pointerValue.train).toBe(7);
     expect(pointerValue.sha256).toBe(sha256);
+    expect(pointerValue).toMatchObject({
+      releaseGeneration: 3,
+      sourceCommit: "a".repeat(40),
+      releasedAt: manifest.releasedAt,
+      source: "ota",
+    });
     expect(fs.existsSync(path.join(pointerValue.versionDir, "hana-server.js"))).toBe(true);
     expect(fs.existsSync(path.join(pointerValue.versionDir, ".verified"))).toBe(true);
+    expect(JSON.parse(fs.readFileSync(path.join(pointerValue.versionDir, ".verified"), "utf8"))).toMatchObject({
+      releaseGeneration: 3,
+      sourceCommit: "a".repeat(40),
+      source: "ota",
+    });
 
     const nextPointer = await readPointer(homeDir, "stable", "next");
     expect(nextPointer).toEqual(pointerValue);

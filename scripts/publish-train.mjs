@@ -83,6 +83,8 @@ import { createRequire } from "node:module";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 import { buildSeedManifest, resolveSignKeyId } from "./build-server-artifact.mjs";
+import { readReleaseMetadata } from "./release-metadata.mjs";
+import { runReleasePreflight } from "./release-preflight.mjs";
 
 const require = createRequire(import.meta.url);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -90,6 +92,7 @@ const ROOT = path.resolve(__dirname, "..");
 
 const manifestModule = require("../shared/artifact-core/manifest.cjs");
 const activation = require("../shared/artifact-core/activation.cjs");
+const releaseOrder = require("../shared/artifact-core/release-order.cjs");
 const { loadPinnedKeyset } = require("../shared/artifact-core/keyset.cjs");
 
 // Repo that hosts the train/channel releases. Installed clients do not read
@@ -251,6 +254,7 @@ export function computeMirrors({ repo, channel, train }) {
  * `SHELL_COMPAT_FLOOR` below.
  * @param {{
  *   version: string, releasedAt: string, keyId: string,
+ *   releaseGeneration?: number, sourceCommit?: string,
  *   channel: "stable"|"beta", train: number,
  *   rendererEntry: {sha256: string, size: number, archiveName: string},
  *   serverEntries: Array<{platform: string, arch: string, sha256: string, size: number, archiveName: string}>,
@@ -262,6 +266,8 @@ export function assembleTrainManifest({
   version,
   releasedAt,
   keyId,
+  releaseGeneration,
+  sourceCommit,
   channel,
   train,
   rendererEntry,
@@ -280,6 +286,8 @@ export function assembleTrainManifest({
       arch: entry.arch,
       keyId,
       releasedAt,
+      releaseGeneration,
+      sourceCommit,
       renderer: rendererEntry,
       server: entry,
     }));
@@ -302,6 +310,8 @@ export function assembleTrainManifest({
     channel,
     releasedAt,
     keyId,
+    ...(base.releaseGeneration === undefined ? {} : { releaseGeneration: base.releaseGeneration }),
+    ...(base.sourceCommit === undefined ? {} : { sourceCommit: base.sourceCommit }),
     minShell: SHELL_COMPAT_FLOOR,
     contract: base.contract,
     urgent: false,
@@ -325,6 +335,12 @@ export function assembleTrainManifest({
  */
 export function diffManifestArtifacts(a, b) {
   const mismatches = [];
+  if (a.releaseGeneration !== b.releaseGeneration) {
+    mismatches.push(`releaseGeneration: candidate=${a.releaseGeneration ?? "legacy"}, existing=${b.releaseGeneration ?? "legacy"}`);
+  }
+  if (a.sourceCommit !== b.sourceCommit) {
+    mismatches.push(`sourceCommit: candidate=${a.sourceCommit ?? "legacy"}, existing=${b.sourceCommit ?? "legacy"}`);
+  }
   const ar = a.artifacts && a.artifacts.renderer;
   const br = b.artifacts && b.artifacts.renderer;
   const describeEntryMismatch = (label, left, right) => {
@@ -598,7 +614,7 @@ export async function discoverBoxes({ tag, workDir, deps }) {
  * @param {{
  *   tag: string, channel: "stable"|"beta", dryRun: boolean, repo: string,
  *   releasedAt: string, boxes: object, env: NodeJS.ProcessEnv, deps: object,
- *   allowPrereleaseStable?: boolean,
+ *   allowPrereleaseStable?: boolean, releaseGeneration?: number, sourceCommit?: string,
  *   log: (msg: string) => void,
  * }} opts
  * @returns {Promise<{
@@ -619,6 +635,8 @@ export async function publishChannel({
   deps,
   log,
   allowPrereleaseStable = false,
+  releaseGeneration,
+  sourceCommit,
 }) {
   const sourceRelease = deps.releaseInfo(tag);
   assertSourceReleaseEligible({ tag, channel, sourceRelease, allowPrereleaseStable });
@@ -673,6 +691,8 @@ export async function publishChannel({
     version,
     releasedAt,
     keyId,
+    releaseGeneration,
+    sourceCommit,
     channel,
     train,
     rendererEntry: boxes.rendererEntry,
@@ -682,6 +702,20 @@ export async function publishChannel({
   });
 
   if (existingChannelManifest) {
+    const releaseComparison = releaseOrder.compareReleaseOrder(
+      { releaseGeneration: candidateManifest.releaseGeneration, version },
+      {
+        releaseGeneration: existingChannelManifest.releaseGeneration,
+        version: existingChannelManifest.artifacts?.renderer?.version,
+      },
+    );
+    if (releaseComparison !== null && releaseComparison < 0) {
+      throw new Error(
+        `publish-train: candidate ${version}/generation-${candidateManifest.releaseGeneration ?? "legacy"} is older `
+          + `than channel=${channel} ${existingChannelManifest.artifacts?.renderer?.version ?? "unknown"}`
+          + `/generation-${existingChannelManifest.releaseGeneration ?? "legacy"}; refusing to move the signed pointer backward`,
+      );
+    }
     const publishedDiff = diffManifestArtifacts(candidateManifest, existingChannelManifest);
     if (publishedDiff.matches) {
       log(
@@ -694,6 +728,12 @@ export async function publishChannel({
         train: existingChannelManifest.train,
         trainTag: null,
       };
+    }
+    if (releaseComparison === 0 && candidateManifest.releaseGeneration !== undefined) {
+      throw new Error(
+        `publish-train: releaseGeneration ${candidateManifest.releaseGeneration} is already present on channel=${channel}; `
+          + "one release generation cannot identify two different published trains",
+      );
     }
     if (manifestTargetsVersion(existingChannelManifest, version)) {
       throw new Error(
@@ -777,6 +817,14 @@ export async function publishChannel({
 export async function run(argv = process.argv.slice(2), env = process.env, depsOverride = {}) {
   const args = parseArgs(argv);
   const repo = env.GITHUB_REPOSITORY || DEFAULT_REPO;
+  const preflight = depsOverride.releasePreflight || runReleasePreflight;
+  preflight({ candidateTag: args.tag, cwd: ROOT });
+  const releaseMetadata = depsOverride.releaseMetadata
+    || readReleaseMetadata(path.join(ROOT, "package.json"), { env });
+  const expectedTag = `v${releaseMetadata.version}`;
+  if (args.tag !== expectedTag) {
+    throw new Error(`publish-train: requested tag ${args.tag} does not match checked-out package version ${expectedTag}`);
+  }
 
   const deps = {
     releaseInfo: defaultReleaseInfo,
@@ -815,6 +863,8 @@ export async function run(argv = process.argv.slice(2), env = process.env, depsO
     deps,
     log,
     allowPrereleaseStable,
+    releaseGeneration: releaseMetadata.releaseGeneration,
+    sourceCommit: releaseMetadata.sourceCommit,
   });
 
   log(`[publish-train] done: ${JSON.stringify(result)}`);

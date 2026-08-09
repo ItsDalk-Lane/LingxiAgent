@@ -55,7 +55,12 @@ function makeKeys(keyId = "boot-test") {
  * Builds a complete Resources-like dir carrying a signed server-only seed
  * (the exact layout build-server-artifact.mjs produces under seed/).
  */
-async function makeSeedResources(root: string, keys: ReturnType<typeof makeKeys>, opts: { version?: string; marker?: string; train?: number } = {}) {
+async function makeSeedResources(root: string, keys: ReturnType<typeof makeKeys>, opts: {
+  version?: string;
+  marker?: string;
+  train?: number;
+  releaseGeneration?: number;
+} = {}) {
   const version = opts.version ?? "1.0.0";
   const marker = opts.marker ?? "server-v1";
   const resourcesPath = path.join(root, `resources-${version}-${marker}`);
@@ -77,6 +82,10 @@ async function makeSeedResources(root: string, keys: ReturnType<typeof makeKeys>
     channel: "stable",
     releasedAt: "2026-07-11T00:00:00.000Z",
     keyId: keys.keyId,
+    ...(opts.releaseGeneration === undefined ? {} : {
+      releaseGeneration: opts.releaseGeneration,
+      sourceCommit: "a".repeat(40),
+    }),
     minShell: version,
     contract: { preload: 1, serverProtocol: 1 },
     urgent: false,
@@ -101,7 +110,13 @@ async function makeSeedResources(root: string, keys: ReturnType<typeof makeKeys>
 async function makeDualKindSeedResources(
   root: string,
   keys: ReturnType<typeof makeKeys>,
-  opts: { version?: string; marker?: string; train?: number; omitRenderer?: boolean } = {},
+  opts: {
+    version?: string;
+    marker?: string;
+    train?: number;
+    omitRenderer?: boolean;
+    releaseGeneration?: number;
+  } = {},
 ) {
   const version = opts.version ?? "1.0.0";
   const marker = opts.marker ?? "dual-v1";
@@ -139,6 +154,10 @@ async function makeDualKindSeedResources(
     channel: "stable",
     releasedAt: "2026-07-11T00:00:00.000Z",
     keyId: keys.keyId,
+    ...(opts.releaseGeneration === undefined ? {} : {
+      releaseGeneration: opts.releaseGeneration,
+      sourceCommit: "a".repeat(40),
+    }),
     minShell: version,
     contract: { preload: 1, serverProtocol: 1 },
     urgent: false,
@@ -257,6 +276,45 @@ describe("artifact-boot: decideBootAction (pure)", () => {
     const lowerSeed = { sha256: "a".repeat(64), version: "2.0.0" };
     const resolved = { slot: "current", pointer: { sha256: "b".repeat(64), train: 0, version: "2.0.1" } };
     expect(decideBootAction({ resolved, seedEntry: lowerSeed, crashFallback: false })).toBe("boot");
+  });
+
+  it("uses release generation to repair the 0.1.22 → 0.1.3 numbering accident", () => {
+    const repairedSeed = { sha256: "a".repeat(64), version: "0.1.23" };
+    const resolved = {
+      slot: "current",
+      pointer: { sha256: "b".repeat(64), train: 4, version: "0.1.22" },
+    };
+    expect(decideBootAction({
+      resolved,
+      seedEntry: repairedSeed,
+      seedManifest: { releaseGeneration: 1 },
+      crashFallback: false,
+    })).toBe("activate-seed");
+  });
+
+  it("never lets a legacy seed overwrite a pointer that already carries release generation", () => {
+    const resolved = {
+      slot: "current",
+      pointer: { sha256: "b".repeat(64), train: 8, version: "0.1.23", releaseGeneration: 1 },
+    };
+    expect(decideBootAction({
+      resolved,
+      seedEntry: { sha256: "a".repeat(64), version: "0.1.24" },
+      crashFallback: false,
+    })).toBe("boot");
+  });
+
+  it("keeps crash fallback authoritative even when the seed has a newer release generation", () => {
+    const resolved = {
+      slot: "previous",
+      pointer: { sha256: "b".repeat(64), train: 7, version: "0.1.22" },
+    };
+    expect(decideBootAction({
+      resolved,
+      seedEntry: { sha256: "a".repeat(64), version: "0.1.23" },
+      seedManifest: { releaseGeneration: 1 },
+      crashFallback: true,
+    })).toBe("boot");
   });
 });
 
@@ -720,6 +778,84 @@ describe("artifact-boot: prepareArtifactBoot dual-kind orchestrator", () => {
     expect(result.renderer).toMatchObject({ activatedSeed: true, train: 0, version: "2.0.0" });
     expect(fs.readFileSync(path.join(result.server.versionDir, "bundle", "index.js"), "utf8")).toContain("new-seed");
     expect(fs.readFileSync(path.join(result.renderer.versionDir, "index.html"), "utf8")).toContain("new-seed");
+  });
+
+  it.each(["0.1.22", "0.1.3"])(
+    "self-heals both active runtimes from legacy %s to the 0.1.23 repair release",
+    async (legacyVersion) => {
+      const root = makeTempDir("lingxi-artifact-incident-upgrade-");
+      const keys = makeKeys();
+      const legacy = await makeDualKindSeedResources(root, keys, {
+        version: legacyVersion,
+        marker: `legacy-${legacyVersion}`,
+      });
+      const repair = await makeDualKindSeedResources(root, keys, {
+        version: "0.1.23",
+        marker: "repair-generation-1",
+        releaseGeneration: 1,
+      });
+      const homeDir = path.join(root, "home");
+
+      await prepareArtifactBoot({
+        homeDir,
+        resourcesPath: legacy.resourcesPath,
+        platformArch: PLATFORM_ARCH,
+        keyset: keys.keyset,
+        log: () => {},
+      });
+      const repaired = await prepareArtifactBoot({
+        homeDir,
+        resourcesPath: repair.resourcesPath,
+        platformArch: PLATFORM_ARCH,
+        keyset: keys.keyset,
+        log: () => {},
+      });
+
+      expect(repaired.server).toMatchObject({
+        activatedSeed: true,
+        version: "0.1.23",
+        releaseGeneration: 1,
+        source: "seed",
+      });
+      expect(repaired.renderer).toMatchObject({
+        activatedSeed: true,
+        version: "0.1.23",
+        releaseGeneration: 1,
+        source: "seed",
+      });
+      expect(repaired.compatibility).toEqual({ status: "compatible", reason: "same-release-generation" });
+      expect(fs.readFileSync(path.join(repaired.server.versionDir, "bundle", "index.js"), "utf8"))
+        .toContain("repair-generation-1");
+      expect(fs.readFileSync(path.join(repaired.renderer.versionDir, "index.html"), "utf8"))
+        .toContain("repair-generation-1");
+    },
+  );
+
+  it("clean-installs generation metadata and treats a same-version reinstall as a no-op", async () => {
+    const root = makeTempDir("lingxi-artifact-clean-install-");
+    const keys = makeKeys();
+    const repair = await makeDualKindSeedResources(root, keys, {
+      version: "0.1.23",
+      marker: "clean-generation-1",
+      releaseGeneration: 1,
+    });
+    const homeDir = path.join(root, "home");
+    const boot = () => prepareArtifactBoot({
+      homeDir,
+      resourcesPath: repair.resourcesPath,
+      platformArch: PLATFORM_ARCH,
+      keyset: keys.keyset,
+      log: () => {},
+    });
+
+    const first = await boot();
+    const second = await boot();
+    expect(first.server.activatedSeed).toBe(true);
+    expect(first.renderer.activatedSeed).toBe(true);
+    expect(second.server).toMatchObject({ activatedSeed: false, releaseGeneration: 1 });
+    expect(second.renderer).toMatchObject({ activatedSeed: false, releaseGeneration: 1 });
+    expect(second.server.versionDir).toBe(first.server.versionDir);
+    expect(second.renderer.versionDir).toBe(first.renderer.versionDir);
   });
 
   // Mutation-check target: a manifest missing the

@@ -448,6 +448,7 @@ let _rendererBootTrain = null;
 // 同一个指针命名空间，用户中途切换偏好不能让同一条崩溃链的哨兵计数被
 // 撕成两半。dev 模式（无 seed）永远维持 null。
 let _artifactBootChannel = null;
+let _artifactRuntimeServer = null;
 
 // 一切面向用户的版本显示的单一源："已激活内容"的产品版本（renderer/server
 // 归档在启动时实际解析出的 version），不是壳（Electron/package.json）版本——
@@ -941,6 +942,7 @@ const {
 // 打包模式 server 的版本化启动：安装包携带签名 seed 归档，
 // 首启验签解压到 LINGXI_HOME/artifacts 后从版本化目录 spawn。dev 模式不经过它。
 const artifactBoot = require("./src/shared/artifact-boot.cjs");
+const { buildArtifactRuntimeProvenance } = require("./src/shared/artifact-runtime-provenance.cjs");
 // 后台静默 OTA 下载器：主窗口 shown 后台检查/下载/暂存
 // 新 train，只写 next 指针——真正的 promote(next→current) 仍然只发生在下次
 // 启动时的 artifact-boot 已覆盖 server 与 renderer。dev 模式默认不调度（见下方
@@ -1401,6 +1403,18 @@ async function resolvePackagedArtifactBoot() {
   });
   console.log(`[desktop] server artifact resolved: train ${boot.server.train} (${boot.server.version}) slot=${boot.server.slot}${boot.server.activatedSeed ? " [seed activated]" : ""}${boot.server.crashFallback ? " [crash fallback]" : ""}`);
   console.log(`[desktop] renderer artifact resolved: train ${boot.renderer.train} (${boot.renderer.version}) slot=${boot.renderer.slot}${boot.renderer.activatedSeed ? " [seed activated]" : ""}${boot.renderer.crashFallback ? " [crash fallback]" : ""}`);
+  const runtimeProvenance = buildArtifactRuntimeProvenance({
+    shellVersion: app.getVersion(),
+    seed: boot.seed,
+    server: boot.server,
+    renderer: boot.renderer,
+    compatibility: boot.compatibility,
+  });
+  console.log(`[desktop] artifact runtime provenance ${JSON.stringify(runtimeProvenance)}`);
+  if (boot.compatibility.status !== "compatible") {
+    console.warn(`[desktop] artifact runtime compatibility warning: ${boot.compatibility.reason}`);
+  }
+  _artifactRuntimeServer = boot.server;
   _distRenderer = boot.renderer.versionDir;
   _rendererBootChannel = artifactBoot.rendererPointerChannel(bootChannel);
   _rendererBootTrain = boot.renderer.train;
@@ -1558,6 +1572,21 @@ async function handleRendererArtifactLoadFailure({ win, pageName, opts, label, r
   } catch (err) {
     console.error(`[desktop] renderer artifact re-resolution failed after load failure: ${err.message}`);
     return; // 没有更安全的下一步了——保留窗口现状，不做二次尝试
+  }
+  const compatibility = artifactBoot.assessRuntimeCompatibility(_artifactRuntimeServer, resolved);
+  console.log(
+    `[desktop] renderer artifact re-resolved ${JSON.stringify({
+      version: resolved.version,
+      releaseGeneration: resolved.releaseGeneration,
+      train: resolved.train,
+      sha256: resolved.sha256,
+      source: resolved.source,
+      sourceCommit: resolved.sourceCommit,
+      compatibility,
+    })}`,
+  );
+  if (compatibility.status !== "compatible") {
+    console.warn(`[desktop] artifact runtime compatibility warning after renderer recovery: ${compatibility.reason}`);
   }
 
   _distRenderer = resolved.versionDir;

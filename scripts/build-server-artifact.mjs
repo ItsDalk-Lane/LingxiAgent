@@ -51,6 +51,7 @@ import fs from "fs";
 import path from "path";
 import { createRequire } from "module";
 import { fileURLToPath } from "url";
+import { normalizeReleaseGeneration, normalizeSourceCommit, resolveSourceCommit } from "./release-metadata.mjs";
 
 const require = createRequire(import.meta.url);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -541,16 +542,34 @@ async function usePrebuiltRendererArchive({ archivePath, rendererArtifactOutDir,
  * shared/contract-versions.cjs 这个唯一常量源（种子与之后 publish-train 组装的
  * 正式列车共用同一份值），不在这里维护字面量副本。
  * @param {{version: string, platform: string, arch: string, keyId: string, releasedAt: string,
+ *          releaseGeneration?: number, sourceCommit?: string,
  *          renderer: {sha256: string, size: number, archiveName: string},
  *          server: {sha256: string, size: number, archiveName: string}}} opts
  */
-export function buildSeedManifest({ version, platform, arch, keyId, releasedAt, renderer, server }) {
+export function buildSeedManifest({
+  version,
+  platform,
+  arch,
+  keyId,
+  releasedAt,
+  releaseGeneration,
+  sourceCommit,
+  renderer,
+  server,
+}) {
+  const provenance = releaseGeneration === undefined && sourceCommit === undefined
+    ? {}
+    : {
+        releaseGeneration: normalizeReleaseGeneration(releaseGeneration),
+        sourceCommit: normalizeSourceCommit(sourceCommit),
+      };
   return {
     schema: 1,
     train: 0,
     channel: "stable",
     releasedAt,
     keyId,
+    ...provenance,
     minShell: version,
     contract: { preload: PRELOAD_API_VERSION, serverProtocol: SERVER_PROTOCOL_VERSION },
     urgent: false,
@@ -576,6 +595,8 @@ export function buildSeedManifest({ version, platform, arch, keyId, releasedAt, 
  *   rendererArtifactOutDir: string,
  *   artifactOutDir: string,
  *   version: string,
+ *   releaseGeneration: number,
+ *   sourceCommit?: string,
  *   platform: string,
  *   arch: string,
  *   env?: NodeJS.ProcessEnv | Record<string, string | undefined>,
@@ -600,6 +621,8 @@ export async function packDualKindSeed({
   rendererArtifactOutDir,
   artifactOutDir,
   version,
+  releaseGeneration,
+  sourceCommit,
   platform,
   arch,
   env = process.env,
@@ -649,6 +672,8 @@ export async function packDualKindSeed({
   // ── seed train manifest（schema 1 / train 0 / stable，双 kind）──
   const manifest = buildSeedManifest({
     version,
+    releaseGeneration: normalizeReleaseGeneration(releaseGeneration),
+    sourceCommit: sourceCommit ? normalizeSourceCommit(sourceCommit) : resolveSourceCommit(env),
     platform,
     arch,
     keyId: resolveSignKeyId(signKeyPath, keyset),

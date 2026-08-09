@@ -217,6 +217,7 @@ await packDualKindSeed({
   rendererArtifactOutDir: path.join(ROOT, "dist-renderer-artifact"),
   artifactOutDir: path.join(ROOT, "dist-server-artifact", `${osDirName}-${arch}`),
   version: rootPkg.version,
+  releaseGeneration: rootPkg.lingxi && rootPkg.lingxi.releaseGeneration,
   platform,
   arch,
 });

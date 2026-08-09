@@ -648,7 +648,7 @@
     ],
     "version": 3
   },
-  "payloadFingerprint": "sha256:625044d0d39b1f6d0e1f8ee9dd204c0b6cb755c54a476837d8b387de60db815d",
+  "payloadFingerprint": "sha256:1e98baf9fc122b6db8d335328ea5d04f90d35636ea6a79e855f19aa557c26a53",
   "registry": [
     {
       "affectedByEpochMigration": true,
@@ -2999,8 +2999,8 @@
   ],
   "review": {
     "classification": "compatible",
-    "compatibilityReason": "Renames local server display labels from Hana to Lingxi without changing persisted registry fields, types, or migration semantics.",
-    "payloadFingerprint": "sha256:625044d0d39b1f6d0e1f8ee9dd204c0b6cb755c54a476837d8b387de60db815d"
+    "compatibilityReason": "Adds read-only Artifact runtime provenance logging and release ordering without changing any persisted field, store schema, data epoch, checkpoint, or migration behavior.",
+    "payloadFingerprint": "sha256:1e98baf9fc122b6db8d335328ea5d04f90d35636ea6a79e855f19aa557c26a53"
   },
   "schemas": [
     {
@@ -3197,7 +3197,7 @@
       "contract": "desktop window bounds, release announcement bookmark, and update cache version marker readers",
       "kind": "directory-contract",
       "module": "desktop/main.cjs",
-      "sourceHash": "sha256:43d4a428b0f3d22ef188e5f4d4bd02dea041dd5e187b4e5ba57bfd5aadc99754",
+      "sourceHash": "sha256:5c1fb69fab8d9c12a553f222343bde713e44e226c3f8d4f9c199cd9c0dbc4868",
       "storeId": "desktop-window-version-state"
     },
     {

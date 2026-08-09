@@ -1,4 +1,30 @@
-# BLOCKED — `cce8e86..97595264` 对抗性审计与修复
+# BLOCKED — 0.1.23 发布摘要生成
+
+## 阻塞项
+
+- `release-digest.v1.json` 与 `release-digest.v2.json` 当前头部仍是 `0.1.3`，不能通过 `v0.1.23` 的发布校验。
+- 项目规则要求摘要由 `scripts/generate-release-digest.mjs` 维护、不得手工改条目；当前环境没有 `OPENAI_API_KEY`。
+- 本任务改动当前也尚未提交，生成器即使只收集 Git 记录也无法看到这批修复。
+
+## 影响
+
+- 不影响源码修复、升级 smoke、类型检查、代码检查或本地构建。
+- 会按设计阻断 `v0.1.23` Release；在摘要生成并校验前，仓库是“代码与门禁就绪”，不是“可立即打 tag”。
+
+## 解除方式
+
+1. 先将本任务改动形成经过审查的提交。
+2. 在配置 `OPENAI_API_KEY` 的环境运行：
+   `node scripts/generate-release-digest.mjs --tag v0.1.23 --previous-tag v0.1.3 --ref HEAD`
+3. 运行：
+   `node scripts/validate-release-digest.mjs --tag v0.1.23 --file release-digest.v1.json`
+4. 再运行：
+   `node scripts/validate-release-digest.mjs --tag v0.1.23 --file release-digest.v2.json`
+5. 两份校验均通过后，才能创建 tag/Release。
+
+---
+
+# 历史记录 — `cce8e86..97595264` 对抗性审计与修复
 
 ## 不阻塞审计结论
 
