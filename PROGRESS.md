@@ -158,3 +158,13 @@ package.json 产品版本
 - 关闭思考后的真实生成在约 10 秒内 completed：v1 目标 `0.1.24`、范围 `v0.1.3..HEAD`，v2 头部版本顺序为 `0.1.24, 0.1.23, 0.1.3, 0.1.2, 0.1.0`。
 - v1/v2 结构校验均退出 0；人工事实复核确认最终四个条目准确覆盖 Artifact 激活、运行诊断、发布门禁与安全依赖更新，没有继续保留错误的 Linux 安装结论。
 - 最终摘要与无思考生成器进入工作树后，lint 再次为 0 errors / 7958 warnings，全量测试再次为 1088 文件通过、1 文件既有跳过，11021 passed / 7 skipped / 0 failed。
+
+## 2026-08-09：v0.1.24 正式发布收口
+
+- `v0.1.24` annotated tag 已推送并精确指向 `480603cb0bcddd89a1d8709d9ed4ba5986f50e31`；`origin/main` 在发布时指向同一提交，失败历史 tag `v0.1.23` 继续保留且没有对应 Release。
+- Build run `31298162755` 的预检、质量门禁、renderer、四个平台构建、Artifact release smoke、Release 和 Train 全部成功，质量门禁实证 Ubuntu 全量测试已恢复为 0 failed；该 run 的整体结论仅因独立 AtomGit 镜像失败而为 failure。
+- GitHub Release `v0.1.24` 为非草稿、非预发布并成为 Latest，共 18 个非空且不重名资产；`release-digest.v1.json` 的本地与 Release SHA-256 同为 `823b2a1c696bed6edacd467284f2631ea033729f037ce458ec5cad6243983bdb`，三个 `latest*.yml` 均声明 `0.1.24`。
+- `channels` Release 同时含 stable/beta JSON 与 64 字节签名。仓库固定公钥验签通过：stable train 3、beta train 6，发布世代均为 2，来源提交均为 `480603cb`，renderer 与四个平台 server 均为 `0.1.24`。
+- 两个频道 manifest 引用的 5 个运行时归档以及各自 `train.json`/签名，已逐项与物理 Train Release 的文件名、大小和 GitHub SHA-256 回读一致；stable/beta 各 7 项全部通过。
+- AtomGit 镜像是本次唯一未完成的外部副本：原 Build 在 442 MB 文件处 10 分钟超时；补救 run `31299345628` 使用 30 分钟有限上限仍在同一点超时，公共 Release 只有三个小更新清单。无效超时提交已撤回，平台契约缺口写入 `BLOCKED.md`。
+- 发布后的镜像改动定向验证：2 个文件、20 项通过；测试类型检查、定向 lint、`git diff --check` 均通过。DeepSeek 密钥只进入临时静默进程，没有写入仓库、配置或日志。

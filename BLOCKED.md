@@ -1,3 +1,19 @@
+# BLOCKED — AtomGit 大文件 Release 镜像
+
+## 不影响主发布的外部阻塞
+
+- GitHub `v0.1.24` 正式 Release、18 个资产、Latest 状态、stable/beta signed Train 均已完成；GitHub Releases 仍是项目规则指定的 single source of truth。
+- Build run `31298162755` 的 AtomGit 镜像在首个 `441559224` 字节 Linux 安装包上传 10 分钟后失败；补救提交 `54da6365` 把有限上限临时提高到 30 分钟，manual run `31299345628` 仍在同一文件、同一等待回执位置失败。
+- 两次失败后 AtomGit 公共 Release 只登记了三个小型 `latest*.yml`，没有把未完成大文件误报为成功；旧镜像 Release 也未被清理。
+- AtomGit 官方 Release 上传地址文档只公开单次上传地址，没有公开大文件分块或续传契约。继续放大等待时间没有证据，因此无效改动已由 `a72c7666` 撤回。
+
+## 解除条件
+
+- AtomGit/GitCode 提供可验证的大文件上传、分块或续传契约，或平台支持确认当前 Release 附件允许约 442–474 MB 单文件并给出可工作的传输方式。
+- 解除后必须精确重跑 `v0.1.24`，并按文件名与大小回读全部 18 个 GitHub Release 资产；不得仅凭上传请求返回或部分小文件存在判成功。
+
+---
+
 # RESOLVED — 0.1.24 发布摘要生成
 
 ## 已解除
