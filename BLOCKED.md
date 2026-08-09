@@ -1,17 +1,17 @@
-# BLOCKED — 0.1.23 发布摘要生成
+# RESOLVED — 0.1.23 发布摘要生成
 
-## 阻塞项
+## 已解除
 
-- `release-digest.v1.json` 与 `release-digest.v2.json` 当前头部仍是 `0.1.3`，不能通过 `v0.1.23` 的发布校验。
-- 项目规则要求摘要由 `scripts/generate-release-digest.mjs` 维护、不得手工改条目；生成器已切换到 DeepSeek Responses API，但当前环境没有 `DEEPSEEK_API_KEY`。
-- 本任务源码与门禁已提交为 `cf0be5bc`；DeepSeek 迁移在校验通过并提交后，摘要来源必须重新采集完整的 `v0.1.3..HEAD`。
+- `release-digest.v1.json` 已由 DeepSeek Responses API 生成 `v0.1.23` 摘要，`release-digest.v2.json` 已把 `0.1.23` 插入史册头部。
+- 生成器默认使用 `deepseek-v4-flash`；真实响应暴露的 reasoning/output_text 顺序差异已用 `3655c238` 修复并回归。
+- 两份摘要均已通过仓库校验器，摘要生成阶段不再阻断发布。
 
-## 影响
+## 解除结果
 
-- 不影响源码修复、升级 smoke、类型检查、代码检查或本地构建。
-- 会按设计阻断 `v0.1.23` Release；在摘要生成并校验前，仓库是“代码与门禁就绪”，不是“可立即打 tag”。
+- 摘要内容只引用 `v0.1.3..HEAD` 的三个真实提交，没有手工修改条目。
+- v2 史册版本顺序为 `0.1.23 > 0.1.3 > 0.1.2 > 0.1.0`，可以进入最终发布预检。
 
-## 解除方式
+## 已执行步骤
 
 1. 在当前进程可读取 `DEEPSEEK_API_KEY` 后运行（默认模型为 `deepseek-v4-flash`）：
    `node scripts/generate-release-digest.mjs --tag v0.1.23 --previous-tag v0.1.3 --ref HEAD`

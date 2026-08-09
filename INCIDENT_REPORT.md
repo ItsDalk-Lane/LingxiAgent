@@ -85,6 +85,6 @@ GitHub `v0.1.3` 的 renderer 与 darwin-arm64 server 归档已抽检：哈希与
 - 真实事故迁移覆盖旧 `0.1.22` 与旧 `0.1.3` 两种 current：安装 `0.1.23` 后，renderer/server 均切到 `0.1.23`、发布世代 `1`、来源 `seed`。
 - 干净安装、同版重装、旧 Train 倒灌、混合状态告警和崩溃回退均有正反用例。
 
-## 当前未决
+## 发布摘要状态
 
-`release-digest.v1.json` / `release-digest.v2.json` 必须由仓库生成器维护。主体修复已提交为 `cf0be5bc`，摘要生成器随后按用户要求切换到 DeepSeek Responses API 与 `deepseek-v4-flash`；当前环境仍没有 `DEEPSEEK_API_KEY`，因此没有手工篡改摘要。两份文件对 `v0.1.23` 的真实校验均以退出码 1 失败，早期 CI 门禁会按设计阻止构建和 Release；详细解除步骤见 `BLOCKED.md`。
+`release-digest.v1.json` / `release-digest.v2.json` 已由仓库生成器通过 DeepSeek Responses API 与 `deepseek-v4-flash` 生成，没有手工修改条目。真实响应中 reasoning 先于最终正文的兼容问题已用测试复现并修复；两份文件对 `v0.1.23` 的校验现在均以退出码 0 通过，摘要发布阻塞已解除。
