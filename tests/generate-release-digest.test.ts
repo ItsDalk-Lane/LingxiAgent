@@ -2,7 +2,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { appendDigestFileToHistoryFile, generateDigestWithOpenAI, parseArgs } from "../scripts/generate-release-digest.mjs";
+import { appendDigestFileToHistoryFile, generateDigestWithDeepSeek, parseArgs } from "../scripts/generate-release-digest.mjs";
 
 describe("generate-release-digest", () => {
   it("parses local pre-tag defaults without requiring release lookup", () => {
@@ -17,7 +17,16 @@ describe("generate-release-digest", () => {
       owner: "ItsDalk-Lane",
       repo: "LingxiAgent",
       out: "tmp/digest.json",
+      model: "deepseek-v4-flash",
     }));
+  });
+
+  it("allows DEEPSEEK_MODEL to override the default model", () => {
+    const args = parseArgs(["--tag", "v0.425.4"], {
+      DEEPSEEK_MODEL: "deepseek-v4-flash-canary",
+    });
+
+    expect(args.model).toBe("deepseek-v4-flash-canary");
   });
 
   it("accepts an explicit git ref and local release notes file", () => {
@@ -34,7 +43,7 @@ describe("generate-release-digest", () => {
     }));
   });
 
-  it("requests strict JSON schema output from OpenAI", async () => {
+  it("requests JSON schema output from DeepSeek Responses API", async () => {
     const digest = {
       schemaVersion: 1,
       tag: "v0.425.4",
@@ -65,29 +74,89 @@ describe("generate-release-digest", () => {
     };
     const fetchImpl = vi.fn().mockResolvedValue({
       ok: true,
-      json: vi.fn().mockResolvedValue({ output_text: JSON.stringify(digest) }),
+      json: vi.fn().mockResolvedValue({
+        status: "completed",
+        output: [{ type: "message", content: [{ type: "output_text", text: JSON.stringify(digest) }] }],
+      }),
     });
 
-    const result = await generateDigestWithOpenAI(
+    const result = await generateDigestWithDeepSeek(
       { tag: "v0.425.4", version: "0.425.4", commits: [] },
       {
-        env: { OPENAI_API_KEY: "test-key" },
+        env: { DEEPSEEK_API_KEY: "test-key" },
         fetchImpl,
-        model: "gpt-5.5",
+        model: "deepseek-v4-flash",
       },
     );
 
     expect(result.tag).toBe("v0.425.4");
-    expect(fetchImpl).toHaveBeenCalledWith("https://api.openai.com/v1/responses", expect.objectContaining({
+    expect(fetchImpl).toHaveBeenCalledWith("https://api.deepseek.com/responses", expect.objectContaining({
       method: "POST",
       headers: expect.objectContaining({ Authorization: "Bearer test-key" }),
     }));
     const body = JSON.parse(fetchImpl.mock.calls[0][1].body);
+    expect(body.model).toBe("deepseek-v4-flash");
     expect(body.text.format).toEqual(expect.objectContaining({
       type: "json_schema",
       name: "hana_release_digest",
-      strict: true,
+      schema: expect.any(Object),
     }));
+    expect(body.text.format).not.toHaveProperty("strict");
+    expect(body).not.toHaveProperty("store");
+  });
+
+  it("requires DEEPSEEK_API_KEY before making a request", async () => {
+    const fetchImpl = vi.fn();
+
+    await expect(generateDigestWithDeepSeek(
+      { tag: "v0.425.4", version: "0.425.4", commits: [] },
+      { env: {}, fetchImpl },
+    )).rejects.toThrow("DEEPSEEK_API_KEY is required");
+    expect(fetchImpl).not.toHaveBeenCalled();
+  });
+
+  it("rejects an incomplete DeepSeek response even when it contains partial JSON", async () => {
+    const fetchImpl = vi.fn().mockResolvedValue({
+      ok: true,
+      json: vi.fn().mockResolvedValue({
+        status: "incomplete",
+        incomplete_details: { reason: "max_output_tokens" },
+        output_text: JSON.stringify(digestFixture("0.425.4", "0.425.3")),
+      }),
+    });
+
+    await expect(generateDigestWithDeepSeek(
+      { tag: "v0.425.4", version: "0.425.4", commits: [] },
+      { env: { DEEPSEEK_API_KEY: "test-key" }, fetchImpl },
+    )).rejects.toThrow(/incomplete.*max_output_tokens/i);
+  });
+
+  it("does not include a DeepSeek error body in the thrown error", async () => {
+    const fetchImpl = vi.fn().mockResolvedValue({
+      ok: false,
+      status: 401,
+      text: vi.fn().mockResolvedValue("server echoed test-key"),
+    });
+
+    const operation = generateDigestWithDeepSeek(
+      { tag: "v0.425.4", version: "0.425.4", commits: [] },
+      { env: { DEEPSEEK_API_KEY: "test-key" }, fetchImpl },
+    );
+    await expect(operation).rejects.toThrow("HTTP 401");
+    await expect(operation).rejects.not.toThrow(/test-key/);
+  });
+
+  it("rejects a digest for a different release", async () => {
+    const digest = digestFixture("0.425.5", "0.425.4");
+    const fetchImpl = vi.fn().mockResolvedValue({
+      ok: true,
+      json: vi.fn().mockResolvedValue({ status: "completed", output_text: JSON.stringify(digest) }),
+    });
+
+    await expect(generateDigestWithDeepSeek(
+      { tag: "v0.425.4", version: "0.425.4", commits: [] },
+      { env: { DEEPSEEK_API_KEY: "test-key" }, fetchImpl },
+    )).rejects.toThrow(/tag.*v0\.425\.4.*v0\.425\.5/i);
   });
 });
 

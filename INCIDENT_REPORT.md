@@ -87,4 +87,4 @@ GitHub `v0.1.3` 的 renderer 与 darwin-arm64 server 归档已抽检：哈希与
 
 ## 当前未决
 
-`release-digest.v1.json` / `release-digest.v2.json` 必须由仓库生成器维护。当前环境没有 `OPENAI_API_KEY`，且本任务改动尚未形成可供生成器归纳的提交，因此没有手工篡改摘要。两份文件对 `v0.1.23` 的真实校验均以退出码 1 失败，早期 CI 门禁会按设计阻止构建和 Release；详细解除步骤见 `BLOCKED.md`。
+`release-digest.v1.json` / `release-digest.v2.json` 必须由仓库生成器维护。主体修复已提交为 `cf0be5bc`，摘要生成器随后按用户要求切换到 DeepSeek Responses API 与 `deepseek-v4-flash`；当前环境仍没有 `DEEPSEEK_API_KEY`，因此没有手工篡改摘要。两份文件对 `v0.1.23` 的真实校验均以退出码 1 失败，早期 CI 门禁会按设计阻止构建和 Release；详细解除步骤见 `BLOCKED.md`。

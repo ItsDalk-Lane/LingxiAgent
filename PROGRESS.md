@@ -127,3 +127,16 @@ package.json 产品版本
 - Artifact release smoke 8 文件、304 项全绿；发布工作流与 seed 守卫定向运行 2 文件、14 项全绿；`build:packages`、`build:client` 均退出 0。
 - darwin-arm64 独立服务端在升级后的真实依赖树上完成构建，签名 seed 校验通过；隔离 `LINGXI_HOME` 启动后身份接口返回 HTTP 200、协议 1、版本 `0.1.23`，一次性私钥和隔离目录随后删除。
 - 最终审计取证：生产依赖 9 moderate、0 critical/high/low；完整依赖 9 moderate、1 low、0 critical/high。两条 `npm audit` 都按真实风险退出 1，未把残余风险包装成全绿。
+- 本任务 40 个文件已提交为 `cf0be5bc`（`release: repair artifact activation and harden 0.1.23`）；提交前 staged diff 检查和私钥/常见令牌标记扫描通过。
+- 提交后 `v0.1.3..HEAD` 摘要来源包生成成功，准确包含 1 个提交；正式摘要生成仍因当前进程没有 `OPENAI_API_KEY` 退出 1。为保持发布门禁真实有效，尚未推送 main、创建 tag 或 Release。
+- 用户改选 DeepSeek：目标为 `DEEPSEEK_API_KEY`、`deepseek-v4-flash`、DeepSeek Responses API。已开始核对官方契约并规划最小生成器迁移与安全负向测试；未读取、写入或打印任何真实密钥。
+- DeepSeek 官方文档已确认 V4 Flash 和 JSON Output，但当前只找到 Chat Completions/Anthropic 接口，没有找到 Responses API 参考。下一步以无密钥官方端点探测裁决 `/responses` 是否实际存在；若不存在则保持用户选定模型/密钥，使用官方 Chat Completions JSON Output 并继续本地严格校验。
+- 无密钥端点探测被统一鉴权网关提前拦截，连故意伪造路径都得到同类结果，不能据此确认 `/responses`；当前环境也没有 `DEEPSEEK_API_KEY` 可做真实探测。继续查官方文档索引，不输出密钥、不使用假成功。
+- 已从 DeepSeek 官方站点地图确认 Responses API 指南和 Create Response 参考页面确实存在，用户说明正确；前一步只是搜索索引漏检。实现路线已定为官方 Responses API + `deepseek-v4-flash`。
+- 已提取官方契约：目标为 `POST /responses`，V4 Flash 是当前唯一受支持模型，结构化输出支持 JSON Schema。实现将去掉未列入 DeepSeek 契约的 `strict`/`store` 请求字段，并增加 completed 状态检查后再解析输出。
+- 迁移测试已先以旧实现运行：14 项中 7 项通过、7 项失败；失败逐一命中旧默认模型、旧密钥/端点、未完成响应、错误体泄露风险和摘要版本错配，证明新断言不是假绿。
+- 生成器已改为从 `DEEPSEEK_API_KEY` 取密钥、默认请求 `deepseek-v4-flash` 的 `POST https://api.deepseek.com/responses`；不再发送 DeepSeek 未支持的 `strict`/`store`，也不把远端错误体拼进异常。
+- 本地在解析正文前必须看到 `completed`，解析后还会依次执行摘要结构、目标 tag 和目标 version 校验；定向测试已由 7 项失败反转为 14/14 通过。
+- 摘要四个相关测试文件合计 43/43 通过，三段类型检查退出 0。首次 lint 的 959 个错误全部落在一个带 ` 2` 后缀的被忽略构建临时副本，不属于源码；已按精确路径核对后清理并重跑，不调整检查规则。
+- 清理该构建临时副本后 lint 恢复为 0 errors、7958 个历史 warnings、退出 0；随后全量 `npm test` 退出 0。
+- 真实命令在无 `DEEPSEEK_API_KEY` 时以退出码 1 明确失败，且没有创建摘要文件；当前唯一外部阻塞已从 OpenAI 密钥改为 DeepSeek 密钥。

@@ -3,8 +3,8 @@
 ## 阻塞项
 
 - `release-digest.v1.json` 与 `release-digest.v2.json` 当前头部仍是 `0.1.3`，不能通过 `v0.1.23` 的发布校验。
-- 项目规则要求摘要由 `scripts/generate-release-digest.mjs` 维护、不得手工改条目；当前环境没有 `OPENAI_API_KEY`。
-- 本任务改动当前也尚未提交，生成器即使只收集 Git 记录也无法看到这批修复。
+- 项目规则要求摘要由 `scripts/generate-release-digest.mjs` 维护、不得手工改条目；生成器已切换到 DeepSeek Responses API，但当前环境没有 `DEEPSEEK_API_KEY`。
+- 本任务源码与门禁已提交为 `cf0be5bc`；DeepSeek 迁移在校验通过并提交后，摘要来源必须重新采集完整的 `v0.1.3..HEAD`。
 
 ## 影响
 
@@ -13,14 +13,13 @@
 
 ## 解除方式
 
-1. 先将本任务改动形成经过审查的提交。
-2. 在配置 `OPENAI_API_KEY` 的环境运行：
+1. 在当前进程可读取 `DEEPSEEK_API_KEY` 后运行（默认模型为 `deepseek-v4-flash`）：
    `node scripts/generate-release-digest.mjs --tag v0.1.23 --previous-tag v0.1.3 --ref HEAD`
-3. 运行：
+2. 运行：
    `node scripts/validate-release-digest.mjs --tag v0.1.23 --file release-digest.v1.json`
-4. 再运行：
+3. 再运行：
    `node scripts/validate-release-digest.mjs --tag v0.1.23 --file release-digest.v2.json`
-5. 两份校验均通过后，才能创建 tag/Release。
+4. 两份校验均通过后，才能推送 main、创建 tag/Release。
 
 ---
 

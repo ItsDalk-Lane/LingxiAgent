@@ -220,3 +220,20 @@
 - 实际 `npm ci` 暴露出 `yauzl` 原本没有被项目直接声明，只是旧打包工具把它提升到了根目录；打包工具升级后生产代码和类型检查一起报缺包。这不是测试框架不兼容，而是隐藏依赖被可靠地揭露，现已把运行依赖和类型依赖显式归属到项目。
 - 修复隐藏依赖后，全量测试重新达到 1088 文件通过、1 文件既有跳过，11016 项通过、7 项既有跳过、0 失败；类型检查与 lint 也恢复通过，说明安全升级没有改变既有业务基线。
 - 升级后的独立服务端真实装包并运行：签名 seed 自验成功，隔离启动后的身份接口返回 HTTP 200、协议 1、版本 `0.1.23`。这覆盖了 Lark、网络、打包和原生依赖变动实际进入发布包的路径。
+
+## DeepSeek 摘要生成迁移
+
+- 用户明确选择 `DEEPSEEK_API_KEY`、`deepseek-v4-flash` 和 DeepSeek Responses API；不能只替换现有 `--model`，因为当前实现还把 OpenAI 域名、密钥名与响应提取格式写死。
+- 安全约束：密钥只进 Authorization 请求头，不写来源包、摘要、日志或错误；模型返回值必须继续通过本地严格 schema、tag/version 和 v2 历史顺序校验。
+- 2026-08-09 官方资料确认 `deepseek-v4-flash` 存在、OpenAI 格式 base URL 为 `https://api.deepseek.com`，且支持 JSON Output；公开 V4 公告和接口参考明确列出的却是 OpenAI Chat Completions 与 Anthropic API。
+- 对 DeepSeek 官方文档做 `Responses API`、`POST /responses`、`previous_response_id` 和 `responses.create` 精确检索均无结果。该能力与用户说明存在证据差异，不能未经端点实测直接落实现有 OpenAI Responses 请求体。
+- 对 `/responses`、`/v1/responses`、Chat Completions 和故意伪造路径做无密钥/假密钥探测，DeepSeek 网关都在路由判断前统一返回 401，OPTIONS 也统一返回 200；这些响应无法证明 Responses 路由存在。
+- 当前进程没有 `DEEPSEEK_API_KEY`，所以暂时不能用真实鉴权请求裁决 Responses 请求体。实现前还需查官方文档目录；若官方契约仍缺失，应显式阻断或改用已文档化的 Chat Completions，而不能把猜测当正式发布依赖。
+- DeepSeek 官方 `sitemap.xml` 实际列出了 `/guides/responses_api` 与 `/api/create-response`；搜索索引滞后造成了前述漏检。用户关于 Responses API 的说明成立，后续以这两份官方页面的请求/响应契约实现，不改用 Chat Completions。
+- 官方 Responses 契约：`POST https://api.deepseek.com/responses`，当前只支持 `deepseek-v4-flash`；`instructions`、`input`、`max_output_tokens` 和 `text.format` 均受支持。
+- `text.format` 支持 `json_schema`、`name` 与 `schema`，但官方字段没有 `strict`；现有 OpenAI 请求中的 `strict: true` 不应继续发送。服务端结构化输出后仍须执行仓库本地 `assertValidReleaseDigest`。
+- 非流式响应是 Responses 结构：`status` 可为 completed/incomplete/failed，正文位于 message 项的 `output_text` content；生成器应拒绝非 completed 状态，不能从失败/截断响应里捞部分正文。
+- DeepSeek Responses 是无状态接口，`store` 不支持且永远为 false；摘要是单轮生成，不需要 `previous_response_id` 或 conversation，现有请求也无需这些字段。
+- 实现只改摘要生成边界：密钥改为 `DEEPSEEK_API_KEY`，默认模型改为 `deepseek-v4-flash`，端点改为官方 `/responses`；原有来源采集、v1 schema、本地校验和 v2 史册追加逻辑保持不变。
+- 远端非 2xx 错误不再附带响应正文，避免服务端异常回显进入日志；非 completed 响应即使带有看似完整的部分 JSON 也会失败关闭。
+- 无密钥的真实命令验证为失败关闭：退出码 1、错误明确指向 `DEEPSEEK_API_KEY`、目标摘要文件不存在。

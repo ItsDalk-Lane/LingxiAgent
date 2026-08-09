@@ -14,7 +14,8 @@ import {
 } from "./release-digest-schema.mjs";
 
 const DEFAULT_REPOSITORY = "ItsDalk-Lane/LingxiAgent";
-const DEFAULT_MODEL = "gpt-5.5";
+const DEFAULT_MODEL = "deepseek-v4-flash";
+const DEEPSEEK_RESPONSES_URL = "https://api.deepseek.com/responses";
 
 export function parseArgs(argv = process.argv.slice(2), env = process.env) {
   const args = {
@@ -30,7 +31,7 @@ export function parseArgs(argv = process.argv.slice(2), env = process.env) {
     noLlm: false,
     appendHistory: false,
     historyFile: DIGEST_HISTORY_ASSET_NAME,
-    model: env.OPENAI_MODEL || DEFAULT_MODEL,
+    model: env.DEEPSEEK_MODEL || DEFAULT_MODEL,
   };
 
   for (let i = 0; i < argv.length; i += 1) {
@@ -76,8 +77,8 @@ Options:
   --source-out <path>       Write the LLM source packet for audit/debugging
   --release-notes-file <p>   Optional local release notes file
   --release-url <url>        Optional release URL embedded into digest source
-  --model <model>           OpenAI model. Default: ${DEFAULT_MODEL}
-  --no-llm                  Only collect/write the source packet; do not call OpenAI
+  --model <model>           DeepSeek model. Default: ${DEFAULT_MODEL}
+  --no-llm                  Only collect/write the source packet; do not call DeepSeek
   --append-history          Append the digest at --out into the v2 rolling history, then exit
                             (no git, no LLM; the hand-written digest workflow's second step)
   --history-file <path>     v2 rolling history JSON path. Default: ${DIGEST_HISTORY_ASSET_NAME}
@@ -203,22 +204,28 @@ function extractResponseText(payload) {
       }
     }
   }
-  throw new Error("OpenAI response did not include text output");
+  throw new Error("DeepSeek response did not include text output");
 }
 
-export async function generateDigestWithOpenAI(source, {
+function responseFailureDetail(payload) {
+  const candidate = payload?.incomplete_details?.reason || payload?.error?.code;
+  if (typeof candidate !== "string" || !/^[A-Za-z0-9_.:-]{1,80}$/.test(candidate)) return "";
+  return candidate;
+}
+
+export async function generateDigestWithDeepSeek(source, {
   env = process.env,
   fetchImpl = fetch,
   model = DEFAULT_MODEL,
 } = {}) {
-  if (!env.OPENAI_API_KEY) {
-    throw new Error("OPENAI_API_KEY is required to generate release digest");
+  if (!env.DEEPSEEK_API_KEY) {
+    throw new Error("DEEPSEEK_API_KEY is required to generate release digest");
   }
 
-  const response = await fetchImpl("https://api.openai.com/v1/responses", {
+  const response = await fetchImpl(DEEPSEEK_RESPONSES_URL, {
     method: "POST",
     headers: {
-      Authorization: `Bearer ${env.OPENAI_API_KEY}`,
+      Authorization: `Bearer ${env.DEEPSEEK_API_KEY}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
@@ -237,23 +244,31 @@ export async function generateDigestWithOpenAI(source, {
         format: {
           type: "json_schema",
           name: "hana_release_digest",
-          strict: true,
           schema: RELEASE_DIGEST_JSON_SCHEMA,
         },
       },
-      store: false,
       max_output_tokens: 4000,
     }),
   });
 
   if (!response.ok) {
-    throw new Error(`OpenAI release digest generation failed: ${response.status} ${await response.text()}`);
+    throw new Error(`DeepSeek release digest generation failed: HTTP ${response.status}`);
   }
 
   const payload = await response.json();
+  if (payload?.status !== "completed") {
+    const detail = responseFailureDetail(payload);
+    throw new Error(`DeepSeek response is not completed: ${payload?.status || "unknown"}${detail ? ` (${detail})` : ""}`);
+  }
   const text = extractResponseText(payload);
   const digest = JSON.parse(text);
   assertValidReleaseDigest(digest);
+  if (digest.tag !== source.tag) {
+    throw new Error(`DeepSeek digest tag mismatch: expected ${source.tag}, received ${digest.tag}`);
+  }
+  if (digest.version !== source.version) {
+    throw new Error(`DeepSeek digest version mismatch: expected ${source.version}, received ${digest.version}`);
+  }
   return digest;
 }
 
@@ -315,7 +330,7 @@ export async function run(argv = process.argv.slice(2), { env = process.env, fet
     return;
   }
 
-  const digest = await generateDigestWithOpenAI(source, {
+  const digest = await generateDigestWithDeepSeek(source, {
     env,
     fetchImpl,
     model: args.model,
