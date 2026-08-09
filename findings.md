@@ -244,3 +244,4 @@
 - `v0.1.23` 的四个平台构建成功，但 quality 失败使 Release、Artifact smoke、Train 全部 skipped；远端未产生 Release。由于 tag 已推送且禁止重写，下一候选必须是 `0.1.24` / generation 2，不能强行复用 `0.1.23` / generation 1。
 - 测试夹具与版本/世代修正后，本地 preflight、304 项 Artifact smoke、11021 项全量测试、类型和 lint 均通过；生产代码的平台支持判断未被放宽。
 - DeepSeek 在带完整发布事实的摘要任务上以 `incomplete/max_output_tokens` 结束，4000 额度不足；失败响应没有覆盖先前摘要。提高额度比接受部分正文或删除事实约束更安全。
+- 官方 Create Response 契约的 `reasoning.effort` 支持 `none`，并说明输出上限包含 reasoning tokens。8000 仍 incomplete 证明本任务不应保留默认思考；关闭思考比继续无上限加预算更确定。

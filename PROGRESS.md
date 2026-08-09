@@ -154,3 +154,4 @@ package.json 产品版本
 - 三段类型检查退出 0，lint 为 0 errors / 7958 个历史 warnings；全量测试 1088 文件通过、1 文件既有跳过，11021 tests passed、7 skipped、0 failed。
 - 首份 `0.1.24` 模型摘要虽通过结构校验，但人工复核判定“Linux 用户此前无法安装”缺乏证据，已拒绝提交并改用事实说明从最后一个真实 Release `v0.1.3` 重生成。
 - 事实约束后的首次重生成返回 incomplete/max_output_tokens，生成器按设计没有落盘；这证明 completed 门禁生效，也说明 4000 额度不足以同时容纳模型推理和完整结构化摘要。
+- 提升到 8000 后仍被默认思考耗尽。DeepSeek 官方 Responses 参考明确说明 `max_output_tokens` 同时计算思考与正文，且 `reasoning.effort=none` 可关闭思考；发布摘要属于结构化改写任务，改为无思考并保留 8000 正文额度。

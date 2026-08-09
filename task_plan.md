@@ -92,3 +92,4 @@
 | 最终全量测试的 JSON reporter 未生成指定报告文件 | 1 | 该次没有最终统计，不能当作通过证据；改用仓库原始 `npm test`、日志文件和显式退出码重跑 |
 | `v0.1.23` 远端 quality-gate 在 Linux 失败 8 项 | 1 | 6 项路由测试默认使用宿主平台、2 项引擎测试只在本机 macOS 成立；保留 Linux 不支持的生产行为，改为在正向夹具中显式指定 darwin |
 | `v0.1.24` 事实约束摘要首次生成 incomplete | 1 | DeepSeek 在 4000 输出额度内耗尽并返回 `max_output_tokens`；生成器按设计未落盘，增加请求额度契约测试后提升到 8000 |
+| 额度提升到 8000 后事实约束摘要仍 incomplete | 2 | 官方 Responses 契约确认默认启用思考且额度同时计算推理/正文；摘要任务改为 `reasoning.effort=none`，保留 8000 正文上限 |

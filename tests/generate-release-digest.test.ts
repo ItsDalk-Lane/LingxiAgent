@@ -107,6 +107,7 @@ describe("generate-release-digest", () => {
     expect(body.text.format).not.toHaveProperty("strict");
     expect(body).not.toHaveProperty("store");
     expect(body.max_output_tokens).toBe(8000);
+    expect(body.reasoning).toEqual({ effort: "none" });
   });
 
   it("requires DEEPSEEK_API_KEY before making a request", async () => {

@@ -247,6 +247,7 @@ export async function generateDigestWithDeepSeek(source, {
           schema: RELEASE_DIGEST_JSON_SCHEMA,
         },
       },
+      reasoning: { effort: "none" },
       max_output_tokens: 8000,
     }),
   });
