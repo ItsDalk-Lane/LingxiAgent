@@ -152,3 +152,5 @@ package.json 产品版本
 - `v0.1.23` tag 已成为公开历史且禁止移动/删除；继续发布版本提升为 `0.1.24`、发布世代提升为 2，使产品版本和 Artifact 发布顺序都严格大于失败 tag。
 - `0.1.24` 定向验证：4 文件、24 项通过；release preflight 确认 `0.1.24 > 0.1.23` 且 generation `2 > 1`；Artifact smoke 8 文件、304 项通过。
 - 三段类型检查退出 0，lint 为 0 errors / 7958 个历史 warnings；全量测试 1088 文件通过、1 文件既有跳过，11021 tests passed、7 skipped、0 failed。
+- 首份 `0.1.24` 模型摘要虽通过结构校验，但人工复核判定“Linux 用户此前无法安装”缺乏证据，已拒绝提交并改用事实说明从最后一个真实 Release `v0.1.3` 重生成。
+- 事实约束后的首次重生成返回 incomplete/max_output_tokens，生成器按设计没有落盘；这证明 completed 门禁生效，也说明 4000 额度不足以同时容纳模型推理和完整结构化摘要。
