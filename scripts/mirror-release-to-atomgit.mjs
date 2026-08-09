@@ -16,6 +16,8 @@ const ATOMGIT_WEB_API_BASE = "https://gitcode.com/api/v2";
 const ATOMGIT_RELEASE_PAGE_SIZE = 20;
 const ATOMGIT_MAX_RELEASE_PAGES = 100;
 const ATOMGIT_PRERELEASE_LIMIT = 20;
+export const ATOMGIT_UPLOAD_TIMEOUT_MS = 30 * 60 * 1000;
+const ATOMGIT_DISPATCHER_TIMEOUT_MS = 45 * 60 * 1000;
 
 export function parseArgs(argv = process.argv.slice(2), env = process.env) {
   const [defaultGithubOwner, defaultGithubRepo] = (env.GITHUB_REPOSITORY || DEFAULT_GITHUB_REPOSITORY).split("/");
@@ -336,14 +338,19 @@ async function downloadGithubAsset(asset, destination, { env, fetchImpl }) {
 // only sends headers AFTER receiving the whole body, so a ~430MB+ installer
 // reliably trips UND_ERR_HEADERS_TIMEOUT mid-upload even though the transfer
 // is healthy (observed: the deb upload died at exactly 5:00). We raise the
-// per-request dispatcher's headers/body timeouts well above our own 10-minute
-// AbortSignal so that signal stays the single, intentional ceiling. Lazy: undici
+// per-request dispatcher's headers/body timeouts well above our own 30-minute
+// AbortSignal so that signal stays the single, intentional ceiling. The first
+// 442 MB v0.1.24 upload exceeded the previous 10-minute ceiling on the real
+// AtomGit path, so the bound must cover that observed throughput. Lazy: undici
 // is only needed for real uploads, never in tests (which inject a mock fetch).
 let uploadDispatcher = null;
 async function getUploadDispatcher() {
   if (uploadDispatcher) return uploadDispatcher;
   const { Agent } = await import("undici");
-  uploadDispatcher = new Agent({ headersTimeout: 30 * 60 * 1000, bodyTimeout: 30 * 60 * 1000 });
+  uploadDispatcher = new Agent({
+    headersTimeout: ATOMGIT_DISPATCHER_TIMEOUT_MS,
+    bodyTimeout: ATOMGIT_DISPATCHER_TIMEOUT_MS,
+  });
   return uploadDispatcher;
 }
 
@@ -363,7 +370,7 @@ async function uploadAtomGitAsset(uploadTarget, filePath, asset, fetchImpl) {
       method: "PUT",
       headers,
       body: content,
-      signal: AbortSignal.timeout(10 * 60 * 1000),
+      signal: AbortSignal.timeout(ATOMGIT_UPLOAD_TIMEOUT_MS),
       dispatcher,
     });
   } catch (error) {

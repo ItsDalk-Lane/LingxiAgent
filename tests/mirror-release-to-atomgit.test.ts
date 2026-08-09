@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { readFileSync } from "node:fs";
 import {
+  ATOMGIT_UPLOAD_TIMEOUT_MS,
   buildAtomGitReleasePayload,
   getGithubLatestTag,
   listAtomGitReleases,
@@ -45,6 +46,10 @@ function githubRelease(tagName: string, prerelease = true) {
 }
 
 describe("mirror-release-to-atomgit", () => {
+  it("allows slow large AtomGit uploads while keeping a finite ceiling", () => {
+    expect(ATOMGIT_UPLOAD_TIMEOUT_MS).toBe(30 * 60 * 1000);
+  });
+
   it("defaults manual mirroring to the newest one release", () => {
     expect(parseArgs([], { GITHUB_REPOSITORY: "ItsDalk-Lane/LingxiAgent" })).toEqual(expect.objectContaining({
       githubOwner: "ItsDalk-Lane",
@@ -150,6 +155,7 @@ describe("mirror-release-to-atomgit", () => {
 
   it("uploads assets using the GitCode upload URL contract", async () => {
     const uploadBodies: unknown[] = [];
+    const uploadTimeout = vi.spyOn(AbortSignal, "timeout").mockReturnValue(new AbortController().signal);
     let releaseListCalls = 0;
     const fetchImpl = vi.fn(async (input, init = {}) => {
       const url = String(input);
@@ -217,14 +223,20 @@ describe("mirror-release-to-atomgit", () => {
       throw new Error(`unexpected fetch: ${method} ${url}`);
     });
 
-    const result = await mirrorRelease(mirrorOptions, githubRelease("v0.425.4"), {
-      env: { ATOMGIT_TOKEN: "atomgit-token" },
-      fetchImpl,
-    });
+    try {
+      const result = await mirrorRelease(mirrorOptions, githubRelease("v0.425.4"), {
+        env: { ATOMGIT_TOKEN: "atomgit-token" },
+        fetchImpl,
+      });
 
-    expect(result.dryRun).toBe(false);
-    expect(uploadBodies).toHaveLength(2);
-    expect(uploadBodies.every(body => Buffer.isBuffer(body))).toBe(true);
+      expect(result.dryRun).toBe(false);
+      expect(uploadBodies).toHaveLength(2);
+      expect(uploadBodies.every(body => Buffer.isBuffer(body))).toBe(true);
+      expect(uploadTimeout).toHaveBeenCalledTimes(2);
+      expect(uploadTimeout).toHaveBeenCalledWith(ATOMGIT_UPLOAD_TIMEOUT_MS);
+    } finally {
+      uploadTimeout.mockRestore();
+    }
   });
 
   it("skips already mirrored assets only after verifying their size", async () => {
