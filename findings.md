@@ -240,3 +240,6 @@
 - 真实 Responses 输出可先给出 reasoning 项，再给 message/output_text；不能遍历到任意 `text` 就返回，否则会把思考过程送进 JSON 解析。最终提取只接受 `output_text`。
 - 修复后真实生成成功：v1 为 `0.1.23`，v2 头部为 `0.1.23` 且保留三条旧记录；两个校验器都退出 0，模型条目的三个 commit ref 均能在本地 Git 解析。
 - 摘要进入工作树后，版本预检、304 项 Artifact release smoke 与 11021 项全量测试全部通过；因此摘要变化没有破坏发布链或包内历史读取。
+- 首次 tag CI 暴露本机无法发现的测试夹具问题：Ubuntu 上 Computer Use 正确判为不支持，但 6 项路由正向用例和 2 项引擎懒加载用例没有固定受支持平台。生产行为无需修改，测试必须显式声明 darwin；现有 Linux 负向用例继续证明不支持路径。
+- `v0.1.23` 的四个平台构建成功，但 quality 失败使 Release、Artifact smoke、Train 全部 skipped；远端未产生 Release。由于 tag 已推送且禁止重写，下一候选必须是 `0.1.24` / generation 2，不能强行复用 `0.1.23` / generation 1。
+- 测试夹具与版本/世代修正后，本地 preflight、304 项 Artifact smoke、11021 项全量测试、类型和 lint 均通过；生产代码的平台支持判断未被放宽。

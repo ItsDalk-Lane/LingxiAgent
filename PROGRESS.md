@@ -145,3 +145,10 @@ package.json 产品版本
 - v1/v2 两条正式校验命令均退出 0。摘要包含三个条目，分别引用 `cf0be5bc`、`1bdb501a`、`3655c238`，人工复核没有发现超出提交事实的内容。
 - 摘要落盘后的最终发布预检 PASS：候选 `0.1.23`、历史最高 `0.1.22`、发布世代 `1 > 0`；Artifact release smoke 为 8 文件、304 项通过。
 - 最终全量测试退出 0：1088 文件通过、1 文件既有跳过；11021 tests passed、7 skipped、0 failed。新增的 5 项正好来自 DeepSeek 迁移负向/契约覆盖。
+- `main` 四个提交已推送到 `1f24a039`，`v0.1.23` annotated tag 也已推送并精确指向该提交；Build run `31297037318` 的预检、摘要、renderer、macOS 双架构与 Linux 构建成功。
+- 远端 Ubuntu quality-gate 的全量测试出现 2 文件、8 项失败：正向 Computer Use 测试夹具错误依赖宿主平台，在 Linux 上触发生产代码预期的“不支持”保护。本机 macOS 全绿因此没有提前暴露。
+- 修复只约束测试环境：路由正向测试显式传入 darwin，Linux 负向测试继续显式传入 linux；引擎懒加载测试在自身 describe 内临时固定 darwin 并在 afterEach 恢复，不修改产品的平台支持范围。
+- 首次 Build 最终结论为 failure：四个平台构建全部成功，quality-gate 失败后 Release、Artifact smoke、Train 按设计全部 skipped，远端没有创建半成品 Release。
+- `v0.1.23` tag 已成为公开历史且禁止移动/删除；继续发布版本提升为 `0.1.24`、发布世代提升为 2，使产品版本和 Artifact 发布顺序都严格大于失败 tag。
+- `0.1.24` 定向验证：4 文件、24 项通过；release preflight 确认 `0.1.24 > 0.1.23` 且 generation `2 > 1`；Artifact smoke 8 文件、304 项通过。
+- 三段类型检查退出 0，lint 为 0 errors / 7958 个历史 warnings；全量测试 1088 文件通过、1 文件既有跳过，11021 tests passed、7 skipped、0 failed。

@@ -1,7 +1,7 @@
 import fs from "fs";
 import os from "os";
 import path from "path";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { LingxiEngine } from "../core/engine.ts";
 import { autoProjectIdForCwd, UNCATEGORIZED_PROJECT_ID } from "../shared/session-projects.ts";
 
@@ -10,8 +10,13 @@ import { autoProjectIdForCwd, UNCATEGORIZED_PROJECT_ID } from "../shared/session
 // ---------------------------------------------------------------------------
 
 describe("LingxiEngine Computer Use lazy runtime", () => {
+  const originalPlatform = process.platform;
   let tmpDir = null;
   let engines: LingxiEngine[] = [];
+
+  beforeEach(() => {
+    Object.defineProperty(process, "platform", { value: "darwin", configurable: true });
+  });
 
   afterEach(async () => {
     for (const engine of engines.splice(0).reverse()) {
@@ -19,6 +24,7 @@ describe("LingxiEngine Computer Use lazy runtime", () => {
     }
     if (tmpDir) fs.rmSync(tmpDir, { recursive: true, force: true });
     tmpDir = null;
+    Object.defineProperty(process, "platform", { value: originalPlatform, configurable: true });
   });
 
   function trackEngine(engine: LingxiEngine) {
