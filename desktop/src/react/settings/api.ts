@@ -60,6 +60,23 @@ export async function lingxiFetch(
 }
 
 /**
+ * 读取 JSON 成功响应，并把 HTTP 200 中的业务错误同样按失败处理。
+ * HTTP 非成功状态已经由 lingxiFetch 拒绝，这里补齐路由返回 `{ error }` 的边界。
+ */
+export async function lingxiFetchJson<T = Record<string, unknown>>(
+  path: string,
+  opts: RequestInit & { timeout?: number } = {},
+): Promise<T> {
+  const res = await lingxiFetch(path, opts);
+  const data = await res.json() as T & { error?: unknown };
+  if (data && typeof data === 'object' && 'error' in data && data.error) {
+    const message = typeof data.error === 'string' ? data.error : JSON.stringify(data.error);
+    throw new Error(message || `lingxiFetch ${path}: request failed`);
+  }
+  return data;
+}
+
+/**
  * 读错误响应：给调用方一句话，外加一个错误码。
  *
  * 同一个失败会有两种响应形状：route handler 自己应答的是扁平的 `{error, code}`，

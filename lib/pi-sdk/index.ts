@@ -313,7 +313,31 @@ export async function createModelRuntime(authStorage, authPath, modelsJsonPath) 
     ...(authPath ? { authPath } : {}),
     ...(modelsJsonPath ? { modelsPath: modelsJsonPath } : {}),
   });
-  return withLegacyAvailabilityScoping(modelRuntime);
+  return withLegacyAvailabilityScoping(withSerializedModelRefresh(modelRuntime));
+}
+
+/**
+ * Pi SDK 的 registerProvider / unregisterProvider 会在内部 fire-and-forget
+ * 调用 refresh()。供应商配置连续变化时，较早启动的 refresh 可能在较晚一次
+ * 之后才结束，并把旧 models.json 快照重新写回 runtime。
+ *
+ * 这里把同一个 ModelRuntime 上的 refresh 串行化。显式 await 的下一次刷新会
+ * 自然成为前面所有隐式刷新的完成屏障；某次失败不会阻断后续刷新。
+ */
+function withSerializedModelRefresh(modelRuntime) {
+  const originalRefresh = modelRuntime.refresh.bind(modelRuntime);
+  let refreshTail = Promise.resolve();
+  modelRuntime.refresh = (...args) => {
+    const refresh = refreshTail
+      .catch(() => undefined)
+      .then(() => originalRefresh(...args));
+    refreshTail = refresh.then(
+      () => undefined,
+      () => undefined,
+    );
+    return refresh;
+  };
+  return modelRuntime;
 }
 
 /**

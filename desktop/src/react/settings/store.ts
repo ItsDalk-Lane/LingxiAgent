@@ -53,6 +53,15 @@ export interface ProviderSummary {
   missing_fields?: string[];
 }
 
+export interface RuntimeModelInfo {
+  id: string;
+  name: string;
+  provider: string;
+  contextWindow?: number | null;
+  input?: string[];
+  [key: string]: unknown;
+}
+
 export interface SettingsSnapshot {
   agentId: string;
   config: Record<string, any>;
@@ -116,6 +125,7 @@ export interface SettingsState {
   settingsConfigError: string | null;
   settingsSnapshot: RemoteResource<SettingsSnapshot>;
   globalModelsConfig: Record<string, any> | null;
+  runtimeModels: RuntimeModelInfo[];
   homeFolder: string | null;
 
   // ui
@@ -178,6 +188,7 @@ export const useSettingsStore = create<SettingsStore>()((set, get) => ({
   settingsConfigError: null,
   settingsSnapshot: createRemoteResource<SettingsSnapshot>(),
   globalModelsConfig: null,
+  runtimeModels: [],
   homeFolder: null,
 
   // ui

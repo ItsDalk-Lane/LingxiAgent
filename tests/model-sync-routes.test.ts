@@ -1409,6 +1409,65 @@ describe("model sync related routes", () => {
     expect(JSON.stringify(fetchMock.mock.calls[0])).not.toContain("stale");
   });
 
+  it("fetch-models only caches discovery and never mutates the provider or runtime catalogs", async () => {
+    const { createProvidersRoute } = await import("../server/routes/providers.ts");
+    const app = new Hono();
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), "lingxi-provider-discovery-"));
+    agentTempRoots.push(root);
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({ data: [{ id: "discovered-only" }] }),
+    });
+    vi.stubGlobal("fetch", fetchMock);
+    const saveProvider = vi.fn();
+    const onProviderChanged = vi.fn();
+    const emitEvent = vi.fn();
+    const engine = {
+      resolveProviderCredentialsFresh: vi.fn(async () => ({
+        api_key: "fresh-token",
+        base_url: "https://discovery.example/v1",
+        api: "openai-completions",
+        headers: {},
+      })),
+      resolveProviderCredentials: vi.fn(() => ({
+        api_key: "fresh-token",
+        base_url: "https://discovery.example/v1",
+        api: "openai-completions",
+        headers: {},
+      })),
+      getRegistryModelsForProvider: vi.fn(() => []),
+      providerRegistry: {
+        resolveChatProvider: () => ({
+          sourceProviderId: "remote-provider",
+          projection: "models-json",
+          credentialSource: "provider-catalog",
+        }),
+        getAuthJsonKey: (id) => id,
+        getDefaultModels: () => [],
+        saveProvider,
+      },
+      onProviderChanged,
+      emitEvent,
+      lingxiHome: root,
+    };
+    app.route("/api", createProvidersRoute(engine));
+
+    const res = await app.request("/api/providers/fetch-models", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name: "remote-provider" }),
+    });
+
+    expect(res.status).toBe(200);
+    expect(await res.json()).toMatchObject({ models: [{ id: "discovered-only" }] });
+    expect(saveProvider).not.toHaveBeenCalled();
+    expect(onProviderChanged).not.toHaveBeenCalled();
+    expect(emitEvent).not.toHaveBeenCalled();
+    expect(JSON.parse(fs.readFileSync(path.join(root, "models-cache.json"), "utf-8")))
+      .toMatchObject({ "remote-provider": { models: [{ id: "discovered-only" }] } });
+  });
+
   it("fetch-models treats explicit body headers as authoritative and never mixes saved secrets", async () => {
     const { createProvidersRoute } = await import("../server/routes/providers.ts");
     const app = new Hono();

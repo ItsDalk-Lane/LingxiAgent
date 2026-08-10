@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useSettingsStore, type ProviderSummary } from '../../store';
-import { lingxiFetch } from '../../api';
+import { lingxiFetch, lingxiFetchJson } from '../../api';
 import { invalidateConfigCache } from '../../../hooks/use-config';
 import { t, API_FORMAT_OPTIONS } from '../../helpers';
 import { SelectWidget } from '@/ui';
@@ -22,21 +22,11 @@ function errorMessage(err: unknown): string {
 }
 
 async function saveProviderConfigPatch(providerId: string, patch: Record<string, unknown>): Promise<void> {
-  const res = await lingxiFetch('/api/config', {
+  await lingxiFetchJson('/api/config', {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ providers: { [providerId]: patch } }),
   });
-  const data: unknown = await res.json();
-  if (
-    data
-    && typeof data === 'object'
-    && 'error' in data
-    && typeof data.error === 'string'
-    && data.error.trim()
-  ) {
-    throw new Error(data.error.trim());
-  }
   invalidateConfigCache();
 }
 

@@ -10,7 +10,7 @@ import {
   type ServerConnection,
 } from '../services/server-connection';
 import { t } from './helpers';
-import { loadAgents, loadAvatars, loadSettingsSnapshot } from './actions';
+import { loadAgents, loadAvatars, loadSettingsModels, loadSettingsSnapshot } from './actions';
 import { ErrorBoundary } from '../components/ErrorBoundary';
 import { SettingsNav } from './SettingsNav';
 import { Toast } from './Toast';
@@ -150,10 +150,21 @@ export function SettingsContent({
     const platform = window.platform;
     if (!platform?.onSettingsChanged) return;
     const unsubscribe = platform.onSettingsChanged((type: string, data: unknown) => {
-      if (type !== 'skills-changed') return;
-      window.dispatchEvent(new CustomEvent('hana-skills-changed', { detail: data || {} }));
+      if (type === 'skills-changed') {
+        window.dispatchEvent(new CustomEvent('hana-skills-changed', { detail: data || {} }));
+      } else if (type === 'models-changed') {
+        void loadSettingsModels();
+      }
     });
     return typeof unsubscribe === 'function' ? unsubscribe : undefined;
+  }, []);
+
+  useEffect(() => {
+    const refreshModels = () => {
+      void loadSettingsModels();
+    };
+    window.addEventListener('hana-models-changed', refreshModels);
+    return () => window.removeEventListener('hana-models-changed', refreshModels);
   }, []);
 
   useEffect(() => {
@@ -187,6 +198,7 @@ export function SettingsContent({
       });
       loadAgents().catch(() => {});
       loadSettingsSnapshot().catch(() => {});
+      loadSettingsModels().catch(() => {});
     });
     return typeof unsubscribe === 'function' ? unsubscribe : undefined;
   }, []);
@@ -344,6 +356,7 @@ async function initSettings() {
 
     // Unified backend settings truth source.
     await loadSettingsSnapshot();
+    await loadSettingsModels();
 
     store.set({ ready: true });
   } catch (err) {

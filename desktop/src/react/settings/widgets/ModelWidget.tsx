@@ -1,21 +1,13 @@
 /**
  * MDW（模型下拉组件）的 React 版本
- * 从 /api/models 读取唯一信源，按 provider 分组、支持搜索和自定义输入。
+ * 消费设置窗口共享的 Runtime Model Catalog，按 provider 分组、支持搜索和自定义输入。
  * 下拉列表通过 AnchoredPortal 悬浮渲染（portal 到 body，position: fixed），
  * 内容少时按内容自适应高度，超过统一最大高度时内部滚动。
  */
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { ProviderIcon, AnchoredPortal } from '@/ui';
-import { lingxiFetch } from '../api';
+import { useSettingsStore, type RuntimeModelInfo } from '../store';
 import styles from '../Settings.module.css';
-
-interface ModelInfo {
-  id: string;
-  name: string;
-  provider: string;
-  contextWindow?: number | null;
-  input?: string[];
-}
 
 interface ModelRef {
   id: string;
@@ -31,7 +23,7 @@ interface ModelWidgetProps {
   placeholder?: string;
   lookupModelMeta?: (id: string) => any;
   formatContext?: (n: number) => string;
-  filterModel?: (model: ModelInfo) => boolean;
+  filterModel?: (model: RuntimeModelInfo) => boolean;
   /** 传入时在下拉列表顶部显示一个特殊选项（如"跟随主模型"），点击后 onSelect(null) */
   followLabel?: string;
 }
@@ -44,19 +36,9 @@ export function ModelWidget({
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState('');
   const [customInput, setCustomInput] = useState('');
-  const [models, setModels] = useState<ModelInfo[]>([]);
+  const models = useSettingsStore(state => state.runtimeModels);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const searchRef = useRef<HTMLInputElement>(null);
-
-  // 从唯一信源获取模型列表
-  const refreshModels = React.useCallback(() => {
-    lingxiFetch('/api/models').then(r => r.json()).then(data => {
-      setModels(data.models || []);
-    }).catch(() => {});
-  }, []);
-
-  // mount 时首次拉取
-  useEffect(() => { refreshModels(); }, [refreshModels]);
 
   useEffect(() => {
     if (open) {
@@ -79,7 +61,7 @@ export function ModelWidget({
 
   // 按 provider 分组
   const grouped = useMemo(() => {
-    const groups: Record<string, ModelInfo[]> = {};
+    const groups: Record<string, RuntimeModelInfo[]> = {};
     for (const m of visibleModels) {
       if (query && !m.id.toLowerCase().includes(query) && !m.name.toLowerCase().includes(query)) continue;
       const g = m.provider || '';
@@ -109,7 +91,7 @@ export function ModelWidget({
         className={styles['mdw-trigger']}
         type="button"
         data-open={open}
-        onClick={(e) => { e.stopPropagation(); if (!open) refreshModels(); setOpen(!open); }}
+        onClick={(e) => { e.stopPropagation(); setOpen(!open); }}
       >
         {value?.provider && (
           <ProviderIcon provider={value.provider} className={styles['mdw-provider-icon']} />

@@ -148,6 +148,7 @@ describe('AgentTab settings agent selection', () => {
       globalModelsConfig: {
         models: { memory: { id: 'mem' } },
       },
+      runtimeModels: [],
     });
   });
 
@@ -182,17 +183,13 @@ describe('AgentTab settings agent selection', () => {
   });
 
   it('shows the provider icon in the selected agent chat model trigger', async () => {
-    lingxiFetchMock.mockImplementation(async (_url: string, _opts?: RequestInit): Promise<MockResponse> => ({
-      json: async () => ({
-        models: [{ id: 'glm-5.2', name: 'GLM-5.2', provider: 'zhipu-coding' }],
-      }),
-    }));
     useSettingsStore.setState({
       settingsConfig: {
         agent: { name: 'Hana', yuan: 'lingxi' },
         memory: { enabled: true },
         models: { chat: { id: 'glm-5.2', provider: 'zhipu-coding' } },
       },
+      runtimeModels: [{ id: 'glm-5.2', name: 'GLM-5.2', provider: 'zhipu-coding' }],
     });
     const { AgentTab } = await import('../../settings/tabs/AgentTab');
 

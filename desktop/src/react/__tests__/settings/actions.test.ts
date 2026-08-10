@@ -29,6 +29,12 @@ const mockFetch = vi.fn();
 
 vi.mock('../../settings/api', () => ({
   lingxiFetch: (...args: unknown[]) => mockFetch(...args),
+  lingxiFetchJson: async (...args: unknown[]) => {
+    const response = await mockFetch(...args);
+    const data = await response.json();
+    if (data?.error) throw new Error(data.error);
+    return data;
+  },
   lingxiUrl: (path: string) => `http://127.0.0.1:3210${path}`,
 }));
 
@@ -59,6 +65,7 @@ function resetState() {
       updatedAt: null,
     },
     globalModelsConfig: null,
+    runtimeModels: [],
     homeFolder: null,
     currentPins: [],
     pluginSettingsStatus: 'idle',
@@ -233,6 +240,37 @@ describe('settings actions', () => {
       '[settings] load failed:',
       expect.objectContaining({ name: 'AbortError' }),
     );
+  });
+
+  it('旧的运行时模型响应晚到时不会覆盖最新共享目录', async () => {
+    let resolveFirst: (value: Response) => void = () => {};
+    mockFetch
+      .mockImplementationOnce((path: string) => {
+        expect(path).toBe('/api/models');
+        return new Promise<Response>((resolve) => {
+          resolveFirst = resolve;
+        });
+      })
+      .mockResolvedValueOnce(jsonResponse({
+        models: [{ id: 'model-new', name: 'New', provider: 'provider-b' }],
+      }));
+
+    const { loadSettingsModels } = await import('../../settings/actions');
+    const first = loadSettingsModels();
+    await loadSettingsModels();
+
+    expect(mockState.runtimeModels).toEqual([
+      { id: 'model-new', name: 'New', provider: 'provider-b' },
+    ]);
+
+    resolveFirst(jsonResponse({
+      models: [{ id: 'model-old', name: 'Old', provider: 'provider-a' }],
+    }));
+    await first;
+
+    expect(mockState.runtimeModels).toEqual([
+      { id: 'model-new', name: 'New', provider: 'provider-b' },
+    ]);
   });
 
   it('loadSettingsSnapshot hydrates config, preferences, and plugin settings from one backend truth source', async () => {

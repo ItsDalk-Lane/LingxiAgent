@@ -193,7 +193,7 @@ export class ModelManager {
     // 装上 SdkAuthFacade：把旧 AuthStorage 形状（getOAuthProviders/getApiKey/
     // setRuntimeApiKey 等）桥接到 ModelRuntime，下游与测试按旧形状调用即可。
     this._authStorage = new SdkAuthFacade({ authStorage: rawAuthStorage, modelRuntime });
-    this._applyRuntimeApiKeyOverrides(projection);
+    await this._applyRuntimeApiKeyOverrides(projection);
     this._syncSdkProviderRegistrations();
 
     this.executionRouter = new ExecutionRouter(
@@ -301,7 +301,7 @@ export class ModelManager {
       modelsJsonPath: this.modelsJsonPath,
       chatProjectionPlans: projection.planMap,
     });
-    this._applyRuntimeApiKeyOverrides(projection);
+    await this._applyRuntimeApiKeyOverrides(projection);
     if (changed) {
       // 0.83.0：ModelRegistry.refresh() 改 async（await runtime.refresh()）。
       // 不 await 会让下面的 refreshAvailable() 读到旧 availability 快照。
@@ -367,7 +367,7 @@ export class ModelManager {
     return { plans, providers, planMap };
   }
 
-  _applyRuntimeApiKeyOverrides(projection) {
+  async _applyRuntimeApiKeyOverrides(projection) {
     if (!this._authStorage?.setRuntimeApiKey) return;
     for (const plan of projection?.plans || []) {
       const provider = projection.providers?.[plan.sourceProviderId] || {};
@@ -376,12 +376,16 @@ export class ModelManager {
       if (plan.credentialSource === "provider-catalog"
         && typeof provider.api_key === "string"
         && provider.api_key.length > 0) {
-        this._authStorage.setRuntimeApiKey(runtimeProviderId, provider.api_key);
+        await this._authStorage.setRuntimeApiKey(runtimeProviderId, provider.api_key);
         for (const providerId of cleanupIds) {
-          if (providerId !== runtimeProviderId) this._authStorage.removeRuntimeApiKey?.(providerId);
+          if (providerId !== runtimeProviderId) {
+            await this._authStorage.removeRuntimeApiKey?.(providerId);
+          }
         }
       } else {
-        for (const providerId of cleanupIds) this._authStorage.removeRuntimeApiKey?.(providerId);
+        for (const providerId of cleanupIds) {
+          await this._authStorage.removeRuntimeApiKey?.(providerId);
+        }
       }
     }
   }

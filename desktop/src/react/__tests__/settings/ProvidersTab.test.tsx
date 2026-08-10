@@ -15,6 +15,12 @@ const mocks = vi.hoisted(() => ({
 
 vi.mock('../../settings/api', () => ({
   lingxiFetch: (...args: unknown[]) => mocks.lingxiFetch(...args),
+  lingxiFetchJson: async (...args: unknown[]) => {
+    const response = await mocks.lingxiFetch(...args);
+    const data = await response.json();
+    if (data?.error) throw new Error(data.error);
+    return data;
+  },
 }));
 
 vi.mock('../../settings/actions', () => ({
@@ -64,6 +70,7 @@ function providerSummary(overrides: Partial<ProviderSummary>): ProviderSummary {
     custom_models: [],
     has_credentials: false,
     supports_oauth: false,
+    is_configured: true,
     can_delete: false,
     ...overrides,
   };
@@ -86,6 +93,8 @@ describe('ProvidersTab provider-scoped form state', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    mocks.loadSettingsConfig.mockReset();
+    mocks.loadSettingsConfig.mockResolvedValue(undefined);
     mocks.lingxiFetch.mockImplementation((path: string) => {
       if (path === '/api/providers/summary') {
         return Promise.resolve(jsonResponse({ providers: providersSummary }));
@@ -111,14 +120,12 @@ describe('ProvidersTab provider-scoped form state', () => {
   it('does not carry an unsaved api key draft when switching providers', async () => {
     const { container } = render(<ProvidersTab />);
 
-    // 初始 selectedProviderId=deepseek 被纳入左栏列表，右栏直接显示 DeepSeek 配置
+    // 持久供应商由配置目录恢复，当前选择只决定右栏编辑对象。
     const deepseekInput = await screen.findByDisplayValue('saved-deepseek-key');
     fireEvent.change(deepseekInput, { target: { value: 'unsaved-deepseek-draft' } });
     expect(screen.getByDisplayValue('unsaved-deepseek-draft')).toBeInTheDocument();
 
-    // 通过选择界面加入 Groq 并切换
-    fireEvent.click(screen.getByRole('button', { name: /settings.providers.addService/ }));
-    fireEvent.click(await screen.findByRole('button', { name: /Groq/ }));
+    fireEvent.click(screen.getByRole('button', { name: /Groq/ }));
 
     await waitFor(() => {
       expect(useSettingsStore.getState().selectedProviderId).toBe('groq');
@@ -163,7 +170,8 @@ describe('ProvidersTab provider-scoped form state', () => {
     await waitFor(() => {
       expect(useSettingsStore.getState().selectedProviderId).toBe('deepseek');
     });
-    expect(screen.queryByRole('button', { name: 'settings.providers.delete' })).not.toBeInTheDocument();
+    // 这是当前页面的未保存草稿，必须提供本地移除入口，但不调用后端删除。
+    expect(screen.getByRole('button', { name: 'settings.providers.delete' })).toBeInTheDocument();
   });
 
   it('keeps registry-only non-preset providers visible as setup entries', async () => {
@@ -226,11 +234,14 @@ describe('ProvidersTab provider-scoped form state', () => {
     });
     useSettingsStore.setState({
       providersSummary: registryOnlySummary,
-      selectedProviderId: 'agnes',
+      selectedProviderId: null,
       settingsConfig: { providers: {} },
     });
 
     const { container } = render(<ProvidersTab />);
+
+    fireEvent.click(screen.getByRole('button', { name: /settings.providers.addService/ }));
+    fireEvent.click(await screen.findByRole('button', { name: /Agnes/ }));
 
     const input = await waitFor(() => container.querySelector('input[type="password"]') as HTMLInputElement);
     fireEvent.change(input, { target: { value: 'agnes-key' } });
@@ -254,13 +265,19 @@ describe('ProvidersTab provider-scoped form state', () => {
     });
   });
 
-  it('appends one provider row to the left list per pick', async () => {
+  it('restores every persisted provider after unmount while selection only controls styling', async () => {
     const mixedSummary = {
       deepseek: providerSummary({
         display_name: 'DeepSeek',
         base_url: 'https://api.deepseek.com',
         has_credentials: true,
         models: ['deepseek-chat'],
+      }),
+      groq: providerSummary({
+        display_name: 'Groq',
+        base_url: 'https://api.groq.com/openai/v1',
+        has_credentials: true,
+        models: ['groq-chat'],
       }),
       baichuan: providerSummary({
         display_name: 'Baichuan',
@@ -284,34 +301,169 @@ describe('ProvidersTab provider-scoped form state', () => {
     });
     useSettingsStore.setState({
       providersSummary: mixedSummary,
-      selectedProviderId: null,
+      selectedProviderId: 'my-proxy',
       settingsConfig: {
         providers: {
           deepseek: { api_key: 'deepseek-key' },
+          groq: { api_key: 'groq-key' },
           'my-proxy': { api_key: 'proxy-key' },
         },
       },
     });
 
+    const first = render(<ProvidersTab />);
+
+    expect(screen.getByRole('button', { name: /DeepSeek/ })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Groq/ })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /My Proxy/ })).toBeInTheDocument();
+    expect(useSettingsStore.getState().selectedProviderId).toBe('my-proxy');
+
+    first.unmount();
     render(<ProvidersTab />);
 
-    // 初始左栏只有「添加服务商」按钮
-    expect(screen.queryByRole('button', { name: /My Proxy/ })).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /DeepSeek/ })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Groq/ })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /My Proxy/ })).toBeInTheDocument();
+    expect(useSettingsStore.getState().selectedProviderId).toBe('my-proxy');
+  });
 
-    // 第一次点选：添加 My Proxy 一行并显示配置
-    fireEvent.click(screen.getByRole('button', { name: /settings.providers.addService/ }));
-    fireEvent.click(await screen.findByRole('button', { name: /My Proxy/ }));
-    await waitFor(() => {
-      expect(screen.getByRole('button', { name: /My Proxy/ })).toBeInTheDocument();
-      expect(useSettingsStore.getState().selectedProviderId).toBe('my-proxy');
+  it('keeps persisted providers when a draft is added, and drops only the draft after remount', async () => {
+    const mixedSummary = {
+      deepseek: providerSummary({ display_name: 'DeepSeek', has_credentials: true }),
+      groq: providerSummary({ display_name: 'Groq', has_credentials: true }),
+      baichuan: providerSummary({
+        display_name: 'Baichuan',
+        base_url: 'https://api.baichuan-ai.com/v1',
+        is_configured: false,
+      }),
+    };
+    mocks.lingxiFetch.mockImplementation((path: string) => Promise.resolve(jsonResponse(
+      path === '/api/providers/summary' ? { providers: mixedSummary } : { ok: true },
+    )));
+    useSettingsStore.setState({
+      providersSummary: mixedSummary,
+      selectedProviderId: 'deepseek',
+      settingsConfig: { providers: { deepseek: {}, groq: {} } },
     });
 
-    // 第二次点选：追加 DeepSeek 一行（每点一个添加一个）
+    const first = render(<ProvidersTab />);
     fireEvent.click(screen.getByRole('button', { name: /settings.providers.addService/ }));
-    fireEvent.click(await screen.findByRole('button', { name: /DeepSeek/ }));
-    await waitFor(() => {
-      expect(screen.getByRole('button', { name: /DeepSeek/ })).toBeInTheDocument();
-      expect(useSettingsStore.getState().selectedProviderId).toBe('deepseek');
+    fireEvent.click(await screen.findByRole('button', { name: /Baichuan/ }));
+
+    expect(screen.getByRole('button', { name: /DeepSeek/ })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Groq/ })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Baichuan/ })).toBeInTheDocument();
+
+    first.unmount();
+    useSettingsStore.setState({ selectedProviderId: 'deepseek' });
+    render(<ProvidersTab />);
+
+    expect(screen.getByRole('button', { name: /DeepSeek/ })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Groq/ })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Baichuan/ })).not.toBeInTheDocument();
+  });
+
+  it('removes an unsaved draft without touching persisted providers', async () => {
+    const mixedSummary = {
+      deepseek: providerSummary({ display_name: 'DeepSeek', has_credentials: true }),
+      groq: providerSummary({ display_name: 'Groq', has_credentials: true }),
+      baichuan: providerSummary({ display_name: 'Baichuan', is_configured: false }),
+    };
+    mocks.lingxiFetch.mockImplementation((path: string) => Promise.resolve(jsonResponse(
+      path === '/api/providers/summary' ? { providers: mixedSummary } : { ok: true },
+    )));
+    useSettingsStore.setState({
+      providersSummary: mixedSummary,
+      selectedProviderId: 'deepseek',
+      settingsConfig: { providers: { deepseek: {}, groq: {} } },
     });
+
+    render(<ProvidersTab />);
+    fireEvent.click(screen.getByRole('button', { name: /settings.providers.addService/ }));
+    fireEvent.click(await screen.findByRole('button', { name: /Baichuan/ }));
+    fireEvent.click(screen.getByRole('button', { name: 'settings.providers.delete' }));
+
+    expect(screen.queryByRole('button', { name: /Baichuan/ })).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /DeepSeek/ })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Groq/ })).toBeInTheDocument();
+    expect(mocks.lingxiFetch).not.toHaveBeenCalledWith('/api/config', expect.anything());
+  });
+
+  it('removes a deleted configured provider from the list and keeps a built-in provider in the picker', async () => {
+    let currentSummary: Record<string, ProviderSummary> = {
+      deepseek: providerSummary({
+        display_name: 'DeepSeek',
+        has_credentials: true,
+        can_delete: true,
+      }),
+      groq: providerSummary({ display_name: 'Groq', has_credentials: true }),
+    };
+    mocks.lingxiFetch.mockImplementation(async (path: string, options?: RequestInit) => {
+      if (path === '/api/config' && options?.method === 'PUT') {
+        currentSummary = {
+          ...currentSummary,
+          deepseek: providerSummary({ display_name: 'DeepSeek', is_configured: false }),
+        };
+        return jsonResponse({ ok: true });
+      }
+      if (path === '/api/providers/summary') return jsonResponse({ providers: currentSummary });
+      return jsonResponse({ ok: true });
+    });
+    mocks.loadSettingsConfig.mockImplementation(async () => {
+      useSettingsStore.setState({ settingsConfig: { providers: { groq: {} } } });
+    });
+    useSettingsStore.setState({
+      providersSummary: currentSummary,
+      selectedProviderId: 'deepseek',
+      settingsConfig: { providers: { deepseek: {}, groq: {} } },
+    });
+
+    render(<ProvidersTab />);
+    fireEvent.click(screen.getByRole('button', { name: 'settings.providers.delete' }));
+    fireEvent.click(screen.getAllByRole('button', { name: 'settings.providers.delete' }).at(-1) as HTMLButtonElement);
+
+    await waitFor(() => expect(screen.queryByRole('button', { name: /DeepSeek/ })).not.toBeInTheDocument());
+    expect(screen.getByRole('button', { name: /Groq/ })).toBeInTheDocument();
+    expect(mocks.lingxiFetch).toHaveBeenCalledWith('/api/config', expect.objectContaining({
+      method: 'PUT',
+      body: JSON.stringify({ providers: { deepseek: null } }),
+    }));
+
+    fireEvent.click(screen.getByRole('button', { name: /settings.providers.addService/ }));
+    expect(await screen.findByRole('button', { name: /DeepSeek/ })).toBeInTheDocument();
+  });
+
+  it('keeps a configured provider and skips authoritative reload when deletion returns an error', async () => {
+    const configuredSummary = {
+      deepseek: providerSummary({
+        display_name: 'DeepSeek',
+        has_credentials: true,
+        can_delete: true,
+      }),
+    };
+    mocks.lingxiFetch.mockImplementation(async (path: string, options?: RequestInit) => {
+      if (path === '/api/config' && options?.method === 'PUT') {
+        return jsonResponse({ error: 'delete sync failed' });
+      }
+      if (path === '/api/providers/summary') return jsonResponse({ providers: configuredSummary });
+      return jsonResponse({ ok: true });
+    });
+    useSettingsStore.setState({
+      providersSummary: configuredSummary,
+      selectedProviderId: 'deepseek',
+      settingsConfig: { providers: { deepseek: {} } },
+      toastMessage: '',
+      toastType: '',
+      toastVisible: false,
+    });
+
+    render(<ProvidersTab />);
+    fireEvent.click(screen.getByRole('button', { name: 'settings.providers.delete' }));
+    fireEvent.click(screen.getAllByRole('button', { name: 'settings.providers.delete' }).at(-1) as HTMLButtonElement);
+
+    await waitFor(() => expect(useSettingsStore.getState().toastMessage).toContain('delete sync failed'));
+    expect(screen.getByRole('button', { name: /DeepSeek/ })).toBeInTheDocument();
+    expect(useSettingsStore.getState().selectedProviderId).toBe('deepseek');
+    expect(mocks.loadSettingsConfig).not.toHaveBeenCalled();
   });
 });

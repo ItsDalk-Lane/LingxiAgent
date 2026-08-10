@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useSettingsStore } from '../../store';
 import { t, lookupModelMeta, CONTEXT_PRESETS, OUTPUT_PRESETS } from '../../helpers';
-import { lingxiFetch } from '../../api';
+import { lingxiFetchJson } from '../../api';
 import { ComboInput } from '../../widgets/ComboInput';
 import { Toggle } from '@/ui';
 import styles from '../../Settings.module.css';
@@ -89,13 +89,13 @@ export function ModelEditPanel({ modelId, providerId, modelMeta, anchorEl, onClo
     }
 
     try {
-      await lingxiFetch(`/api/providers/${encodeURIComponent(providerId)}/models/${encodeURIComponent(modelId)}`, {
+      await lingxiFetchJson(`/api/providers/${encodeURIComponent(providerId)}/models/${encodeURIComponent(modelId)}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(entry),
       });
-      showToast(t('settings.saved'), 'success');
       await onRefresh?.();
+      showToast(t('settings.saved'), 'success');
       onClose();
     } catch (err: any) {
       showToast(t('settings.saveFailed') + ': ' + err.message, 'error');
