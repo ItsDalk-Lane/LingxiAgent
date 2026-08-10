@@ -1536,6 +1536,7 @@ export function createSessionsRoute(engine, hub = null) {
               ...(agentReview ? { agentReview } : {}),
               ...(typeof agentReview?.displayText === "string" ? { displayText: agentReview.displayText } : {}),
               ...(typeof presentation?.displayText === "string" ? { displayText: presentation.displayText } : {}),
+              ...(Array.isArray(presentation?.skills) ? { skills: presentation.skills } : {}),
               ...(Array.isArray(presentation?.sessionRefs) ? { sessionRefs: presentation.sessionRefs } : {}),
               ...(Array.isArray(presentation?.agentMentions) ? { agentMentions: presentation.agentMentions } : {}),
               ...(presentation?.agentReviewRequest ? { agentReviewRequest: presentation.agentReviewRequest } : {}),

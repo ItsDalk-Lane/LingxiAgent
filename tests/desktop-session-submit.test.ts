@@ -493,6 +493,35 @@ describe("submitDesktopSessionMessage", () => {
     expect((session as any).sessionManager.appendCustomEntry).not.toHaveBeenCalled();
   });
 
+  it("persists a skills-only presentation even when its visible text matches the prompt", async () => {
+    const session = makeFakeSession();
+    const appendCustomEntry = vi.fn();
+    Object.assign(session, { sessionManager: { appendCustomEntry } });
+    const engine = {
+      ensureSessionLoaded: vi.fn(async () => session),
+      promptSession: vi.fn(async (sessionPath, text, opts) => session.prompt(text, opts)),
+      emitEvent: vi.fn(),
+      setUiContext: vi.fn(),
+    };
+
+    await submitDesktopSessionMessage(engine, {
+      sessionPath: "/tmp/desk.jsonl",
+      text: "你好",
+      displayMessage: {
+        text: "你好",
+        skills: ["persist-test-skill"],
+      },
+    });
+
+    expect(appendCustomEntry).toHaveBeenCalledWith(
+      MESSAGE_PRESENTATION_RECORD_TYPE,
+      expect.objectContaining({
+        displayText: "你好",
+        skills: ["persist-test-skill"],
+      }),
+    );
+  });
+
   it("persists review presentation and result as message-level custom entries", async () => {
     const session = makeFakeSession();
     const appendCustomEntry = vi.fn();
@@ -509,6 +538,7 @@ describe("submitDesktopSessionMessage", () => {
       text: "user request\n\n[另一位 Agent 的审阅结果]\nfindings",
       displayMessage: {
         text: "user request @Critic",
+        skills: ["persist-test-skill"],
         agentMentions: [{ agentId: "critic", label: "Critic" }],
         agentReview: {
           requestId: "review-1",
@@ -524,6 +554,7 @@ describe("submitDesktopSessionMessage", () => {
 
     expect(appendCustomEntry).toHaveBeenNthCalledWith(1, MESSAGE_PRESENTATION_RECORD_TYPE, expect.objectContaining({
       displayText: "user request @Critic",
+      skills: ["persist-test-skill"],
       agentMentions: [{ agentId: "critic", label: "Critic" }],
     }));
     expect(appendCustomEntry).toHaveBeenNthCalledWith(2, AGENT_REVIEW_RECORD_TYPE, expect.objectContaining({

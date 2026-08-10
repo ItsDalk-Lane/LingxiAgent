@@ -2908,6 +2908,52 @@ describe("sessions route", () => {
     ]);
   });
 
+  it("restores persisted skills on user message presentations", async () => {
+    const { createSessionsRoute } = await import("../server/routes/sessions.ts");
+    const msgUtils = await import("../core/message-utils.ts");
+    const app = new Hono();
+
+    vi.mocked(msgUtils.extractTextContent)
+      .mockReturnValueOnce({
+        text: "[Use skill: persist-test-skill]\n你好",
+        images: [],
+        thinking: "",
+        toolUses: [],
+      });
+    vi.mocked(msgUtils.loadSessionHistoryMessages).mockResolvedValueOnce([
+      {
+        role: "custom",
+        customType: "hana-message-presentation",
+        data: {
+          displayText: "你好",
+          skills: ["persist-test-skill"],
+        },
+      },
+      {
+        id: "entry-skill-user",
+        role: "user",
+        content: "[Use skill: persist-test-skill]\n你好",
+      },
+    ]);
+
+    app.route("/api", createSessionsRoute({
+      agentsDir: "/tmp/agents",
+      deferredResults: null,
+      subagentRuns: null,
+    }));
+
+    const res = await app.request("/api/sessions/messages");
+    const data = await res.json();
+
+    expect(res.status).toBe(200);
+    expect(data.messages).toContainEqual(expect.objectContaining({
+      entryId: "entry-skill-user",
+      role: "user",
+      displayText: "你好",
+      skills: ["persist-test-skill"],
+    }));
+  });
+
   it("projects the exact hidden turn input onto its assistant without relabeling the visible user", async () => {
     const { createSessionsRoute } = await import("../server/routes/sessions.ts");
     const msgUtils = await import("../core/message-utils.ts");

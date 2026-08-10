@@ -464,6 +464,7 @@ describe("retrySessionTurn", () => {
     const priorAssistantId = manager.appendMessage({ role: "assistant", content: "context answer" } as any);
     manager.appendCustomEntry(MESSAGE_PRESENTATION_RECORD_TYPE, {
       displayText: "hello @Critic",
+      skills: ["persist-test-skill"],
       agentMentions: [{ agentId: "critic", label: "Critic" }],
     });
     manager.appendCustomEntry(MESSAGE_ORIGIN_RECORD_TYPE, {
@@ -517,6 +518,7 @@ describe("retrySessionTurn", () => {
         text: "hello @Critic",
         source: "bridge_rc",
         bridgeSessionKey: "telegram:1",
+        skills: ["persist-test-skill"],
         agentMentions: [{ agentId: "critic", label: "Critic" }],
         agentReview: expect.objectContaining({
           requestId: "review-1",

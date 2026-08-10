@@ -152,7 +152,8 @@ export function recordMessagePresentationEntry(
 ): void {
   if (!displayMessage || typeof displayMessage !== "object") return;
   const displayText = typeof displayMessage.text === "string" ? displayMessage.text : null;
-  const hasStructuredPresentation = Array.isArray(displayMessage.sessionRefs)
+  const hasStructuredPresentation = Array.isArray(displayMessage.skills)
+    || Array.isArray(displayMessage.sessionRefs)
     || Array.isArray(displayMessage.agentMentions)
     || !!displayMessage.agentReview
     || !!displayMessage.agentReviewRequest;
@@ -163,6 +164,7 @@ export function recordMessagePresentationEntry(
     }
     session.sessionManager.appendCustomEntry(MESSAGE_PRESENTATION_RECORD_TYPE, {
       displayText,
+      skills: Array.isArray(displayMessage.skills) ? displayMessage.skills : null,
       sessionRefs: Array.isArray(displayMessage.sessionRefs) ? displayMessage.sessionRefs : null,
       agentMentions: Array.isArray(displayMessage.agentMentions) ? displayMessage.agentMentions : null,
       agentReviewRequest: displayMessage.agentReviewRequest || null,

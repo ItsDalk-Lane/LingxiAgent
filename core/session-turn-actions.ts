@@ -684,6 +684,7 @@ function displayMessageFromUserEnvelope(branch, userEntryId) {
     const data = entry?.data && typeof entry.data === "object" ? entry.data : {};
     if (entry.customType === MESSAGE_PRESENTATION_RECORD_TYPE) {
       if (typeof data.displayText === "string") displayMessage.text = data.displayText;
+      if (Array.isArray(data.skills)) displayMessage.skills = data.skills;
       if (Array.isArray(data.sessionRefs)) displayMessage.sessionRefs = data.sessionRefs;
       if (Array.isArray(data.agentMentions)) displayMessage.agentMentions = data.agentMentions;
       if (data.agentReviewRequest) displayMessage.agentReviewRequest = data.agentReviewRequest;
