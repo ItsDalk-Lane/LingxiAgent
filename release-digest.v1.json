@@ -3,16 +3,16 @@
   "tag": "v0.1.25",
   "version": "0.1.25",
   "previousTag": "v0.1.24",
-  "generatedAt": "2026-08-10T03:47:56.603Z",
+  "generatedAt": "2026-08-10T03:52:20.332Z",
   "noUserFacingChanges": false,
   "summary": {
-    "zh": "本次更新修复了技能徽章在历史会话中丢失的问题，并统一了提供商目录与运行时模型状态，使设置更可靠。",
-    "en": "This release fixes skill badges disappearing from history and unifies provider catalog with runtime model state for more reliable settings."
+    "zh": "本次更新修复了技能徽标在重试和分支会话中丢失的问题，统一了提供方与模型设置的状态管理，并优化了异步刷新与错误处理。",
+    "en": "This release fixes skill badges being lost on retry and forked sessions, unifies provider and model settings state, and improves async refresh and error handling."
   },
   "counts": {
     "feature": 0,
-    "fix": 2,
-    "improvement": 2,
+    "fix": 3,
+    "improvement": 1,
     "migration": 0
   },
   "source": {
@@ -24,29 +24,29 @@
   },
   "items": [
     {
-      "id": "skill-badge-persist",
+      "id": "fix-skill-badges-persistence",
       "kind": "fix",
       "importance": "high",
       "title": {
-        "zh": "修复技能徽章在历史与重试中丢失",
-        "en": "Fix skill badges lost in history and retries"
+        "zh": "修复技能徽标在会话历史与重试中丢失的问题",
+        "en": "Fix skill badges being lost in session history and retries"
       },
       "summary": {
-        "zh": "技能徽章现在会在历史会话、重试和分支会话中正确保留。",
-        "en": "Skill badges now persist correctly across history, retries, and forked sessions."
+        "zh": "技能徽标现在会跟随消息记录持久化，在查看历史、重试或恢复会话时依然保留，且分支会话也能正确读取。",
+        "en": "Skill badges now persist with message records, surviving history view, retry, and restore, and forked sessions can read them correctly."
       },
       "details": [
         {
-          "zh": "显示记录携带技能列表，通过结构化写入保护。",
-          "en": "Display records carry skill list through structured write guard."
+          "zh": "消息记录中新增可选的技能列表字段，并通过结构化写入校验。",
+          "en": "Added an optional skills array to message records, enforced by structured write validation."
         },
         {
-          "zh": "历史投影和重试/恢复路径均恢复技能。",
-          "en": "History projection and retry/restore path restore skills."
+          "zh": "历史投影在用户消息中恢复技能列表，重试和恢复路径也会保留。",
+          "en": "History projection restores skill list on user messages; retry and restore paths preserve it."
         },
         {
-          "zh": "分支会话复制显示记录，子会话通过修复后的投影读取。",
-          "en": "Forking copies display record, child sessions read via fixed projection."
+          "zh": "分叉会话复制相同的记录，从而通过修复的投影读取技能。",
+          "en": "Forked sessions copy the same display record, so they read skills via the fixed projection."
         }
       ],
       "sources": [
@@ -54,37 +54,42 @@
           "type": "commit",
           "ref": "fe5d70fd34c0",
           "title": "fix(session): persist skill badges across history and retries"
+        },
+        {
+          "type": "commit",
+          "ref": "af0e9340ced7",
+          "title": "build(persistence): repin schema fingerprint for skill list fields"
         }
       ]
     },
     {
-      "id": "provider-state-unify",
+      "id": "fix-provider-model-state",
       "kind": "fix",
       "importance": "high",
       "title": {
-        "zh": "统一提供商目录与运行时模型状态",
+        "zh": "统一提供方目录与运行时模型状态",
         "en": "Unify provider catalog and runtime model state"
       },
       "summary": {
-        "zh": "设置窗口现在从持久化的提供商目录和页面草稿派生状态，删除操作与运行时模型刷新更可靠。",
-        "en": "Settings window now derives state from persisted provider catalog and page drafts; deletion and model refresh are more reliable."
+        "zh": "左侧菜单现在基于持久化的提供方目录和页面草稿，删除提供方时状态会正确收敛，并且所有辅助选择器共享同一个运行时模型目录。",
+        "en": "The left rail now derives from the persisted provider catalog plus page drafts; deleting a provider converges state correctly, and all auxiliary selectors share one runtime model directory."
       },
       "details": [
         {
-          "zh": "左侧边栏不再依赖本地选择历史，删除提供商时收敛自权威状态。",
-          "en": "Left rail no longer depends on local selection history; deleting provider converges from authoritative state."
+          "zh": "删除提供方失败时卡片会保留，避免误删。",
+          "en": "Failed provider deletes keep the card, preventing accidental removal."
         },
         {
-          "zh": "所有辅助选择器共享运行时模型目录，主窗口通过既有 IPC 和事件触发刷新。",
-          "en": "All auxiliary selectors share runtime model directory; main window re-broadcasts changes over IPC and events."
+          "zh": "主窗口通过现有 IPC 和同窗口事件重新广播模型变更，已挂载的弹窗无需手动刷新即可更新。",
+          "en": "Main window re-broadcasts model changes over existing IPC and same-window events; mounted modals reload without manual refresh."
         },
         {
-          "zh": "异步凭据写入后等待再刷新模型，并序列化每次刷新，防止旧快照覆盖新值。",
-          "en": "Wait for async credential writes before refreshing; serialize refreshes to prevent stale snapshots overwriting."
+          "zh": "等待异步凭据写入完成后再刷新模型，并序列化每次刷新，防止过期快照覆盖新数据。",
+          "en": "Async credential writes complete before model refresh; refreshes are serialized to avoid stale snapshots overwriting newer data."
         },
         {
-          "zh": "提供商/模型写入路径会拒绝 HTTP 2xx 但包含 JSON 错误的情况，避免失败被当作成功。",
-          "en": "Write paths reject HTTP 2xx with JSON errors so failures are never treated as success."
+          "zh": "在模型写入路径拒绝 HTTP 2xx 且含 JSON 错误的情况，确保失败不会显示为成功。",
+          "en": "Reject HTTP 2xx with JSON error on write paths so failures never look successful."
         }
       ],
       "sources": [
@@ -96,25 +101,25 @@
       ]
     },
     {
-      "id": "upload-timeout-adjust",
+      "id": "improve-release-upload-timeout",
       "kind": "improvement",
       "importance": "low",
       "title": {
-        "zh": "调整 AtomGit 上传超时设置",
-        "en": "Adjust AtomGit upload timeout setting"
+        "zh": "回滚 AtomGit 上传超时放宽，保持默认稳定的发布配置",
+        "en": "Roll back AtomGit upload timeout relaxation, keeping release config stable"
       },
       "summary": {
-        "zh": "发布流程对慢速 AtomGit 上传的容忍度已调整，但随后又回滚了该改动。",
-        "en": "Release process tolerance for slow AtomGit uploads was adjusted and then reverted."
+        "zh": "撤销了允许 AtomGit 慢速上传的临时设置，恢复为默认的发布行为，确保发布流程的一致性。",
+        "en": "Reverted a temporary change that allowed slow AtomGit uploads, restoring default release behavior for consistency."
       },
       "details": [
         {
-          "zh": "曾尝试允许较慢的 AtomGit 上传，但该改动被回滚。",
-          "en": "Attempted to allow slower AtomGit uploads, but the change was reverted."
+          "zh": "移除了先前为慢速上传添加的超时放宽。",
+          "en": "Removed the previous timeout relaxation for slow uploads."
         },
         {
-          "zh": "当前版本维持原有超时行为。",
-          "en": "Current version retains original timeout behavior."
+          "zh": "发布流程现在恢复为标准配置。",
+          "en": "Release process now reverts to standard settings."
         }
       ],
       "sources": [
@@ -122,41 +127,6 @@
           "type": "commit",
           "ref": "a72c7666957c",
           "title": "Revert \"fix(release): allow slow AtomGit uploads\""
-        },
-        {
-          "type": "commit",
-          "ref": "54da63659aaf",
-          "title": "fix(release): allow slow AtomGit uploads"
-        }
-      ]
-    },
-    {
-      "id": "release-version-bump",
-      "kind": "improvement",
-      "importance": "low",
-      "title": {
-        "zh": "版本升级至 0.1.25",
-        "en": "Version bumped to 0.1.25"
-      },
-      "summary": {
-        "zh": "产品版本已提升至 0.1.25，并记录了修复与验证过程。",
-        "en": "Product version advanced to 0.1.25 with documented fix and verification phases."
-      },
-      "details": [
-        {
-          "zh": "记录了提供商/模型状态漂移修复、真实 UI 点击验证和技能徽章持久化工作。",
-          "en": "Documented provider/model state-drift fixes, real-UI click verification, and skill badge persistence."
-        },
-        {
-          "zh": "版本号严格大于历史 v0.1.24。",
-          "en": "Version is strictly greater than historical v0.1.24."
-        }
-      ],
-      "sources": [
-        {
-          "type": "commit",
-          "ref": "8d2067912cee",
-          "title": "chore(release): record v0.1.25 prep and advance version to 0.1.25 (generation 3)"
         }
       ]
     }
