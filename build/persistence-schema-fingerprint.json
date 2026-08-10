@@ -2999,7 +2999,7 @@
   ],
   "review": {
     "classification": "compatible",
-    "compatibilityReason": "Adds read-only Artifact runtime provenance logging and release ordering without changing any persisted field, store schema, data epoch, checkpoint, or migration behavior.",
+    "compatibilityReason": "Persist optional skill list array on display records, history projection, and retry/restore path; all additions are additive optional fields within existing message shapes, DATA_EPOCH unchanged.",
     "payloadFingerprint": "sha256:1e98baf9fc122b6db8d335328ea5d04f90d35636ea6a79e855f19aa557c26a53"
   },
   "schemas": [
