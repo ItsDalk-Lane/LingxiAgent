@@ -227,7 +227,14 @@ export function ProvidersTab() {
                 {addingProvider && (
                   <AddProviderOverlay
                     onDone={async () => {
-                      await loadSummary();
+                      // 自定义供应商提交成功后这里才被调用，配置已落盘。
+                      // 刷新摘要失败也不能让 overlay 卡住：关闭浮层，让已挂载的
+                      // 订阅和下次进入设置时重试加载。
+                      try {
+                        await loadSummary();
+                      } catch {
+                        /* loadSummary 已在 catch 里上报；不阻塞关闭 overlay */
+                      }
                       setAddingProvider(false);
                     }}
                     onCancel={() => setAddingProvider(false)}
