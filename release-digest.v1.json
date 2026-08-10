@@ -3,15 +3,15 @@
   "tag": "v0.1.25",
   "version": "0.1.25",
   "previousTag": "v0.1.24",
-  "generatedAt": "2026-08-10T03:52:20.332Z",
+  "generatedAt": "2026-08-10T04:05:44.706Z",
   "noUserFacingChanges": false,
   "summary": {
-    "zh": "本次更新修复了技能徽标在重试和分支会话中丢失的问题，统一了提供方与模型设置的状态管理，并优化了异步刷新与错误处理。",
-    "en": "This release fixes skill badges being lost on retry and forked sessions, unifies provider and model settings state, and improves async refresh and error handling."
+    "zh": "本次更新修复了技能徽章在对话历史与重试中的丢失问题，并统一了提供商与模型的状态管理，使页面显示与实际运行状态保持一致。",
+    "en": "This release fixes skill badges disappearing from conversation history and retries, and unifies provider/model state management so the UI reflects the actual runtime."
   },
   "counts": {
     "feature": 0,
-    "fix": 3,
+    "fix": 2,
     "improvement": 1,
     "migration": 0
   },
@@ -24,29 +24,25 @@
   },
   "items": [
     {
-      "id": "fix-skill-badges-persistence",
+      "id": "fix-skill-badges",
       "kind": "fix",
       "importance": "high",
       "title": {
-        "zh": "修复技能徽标在会话历史与重试中丢失的问题",
-        "en": "Fix skill badges being lost in session history and retries"
+        "zh": "修复技能徽章在历史记录和重试中丢失的问题",
+        "en": "Fix skill badges missing from history and retries"
       },
       "summary": {
-        "zh": "技能徽标现在会跟随消息记录持久化，在查看历史、重试或恢复会话时依然保留，且分支会话也能正确读取。",
-        "en": "Skill badges now persist with message records, surviving history view, retry, and restore, and forked sessions can read them correctly."
+        "zh": "技能徽章现在会正确显示在对话历史中，并且在重试或恢复对话时也不会消失。",
+        "en": "Skill badges now appear correctly in conversation history and persist across retries and restores."
       },
       "details": [
         {
-          "zh": "消息记录中新增可选的技能列表字段，并通过结构化写入校验。",
-          "en": "Added an optional skills array to message records, enforced by structured write validation."
+          "zh": "消息记录现在会保存技能列表，历史视图能正常恢复显示。",
+          "en": "Display records now carry the skill list, and history projection restores it on user messages."
         },
         {
-          "zh": "历史投影在用户消息中恢复技能列表，重试和恢复路径也会保留。",
-          "en": "History projection restores skill list on user messages; retry and restore paths preserve it."
-        },
-        {
-          "zh": "分叉会话复制相同的记录，从而通过修复的投影读取技能。",
-          "en": "Forked sessions copy the same display record, so they read skills via the fixed projection."
+          "zh": "重试或恢复提交时会保留技能信息，分叉会话也能正确读取。",
+          "en": "Retry/restore keeps skills when resubmitting, and forked sessions read skills via the fixed projection."
         }
       ],
       "sources": [
@@ -54,42 +50,33 @@
           "type": "commit",
           "ref": "fe5d70fd34c0",
           "title": "fix(session): persist skill badges across history and retries"
-        },
-        {
-          "type": "commit",
-          "ref": "af0e9340ced7",
-          "title": "build(persistence): repin schema fingerprint for skill list fields"
         }
       ]
     },
     {
-      "id": "fix-provider-model-state",
+      "id": "unify-provider-model-state",
       "kind": "fix",
       "importance": "high",
       "title": {
-        "zh": "统一提供方目录与运行时模型状态",
+        "zh": "统一提供商目录与运行时模型状态",
         "en": "Unify provider catalog and runtime model state"
       },
       "summary": {
-        "zh": "左侧菜单现在基于持久化的提供方目录和页面草稿，删除提供方时状态会正确收敛，并且所有辅助选择器共享同一个运行时模型目录。",
-        "en": "The left rail now derives from the persisted provider catalog plus page drafts; deleting a provider converges state correctly, and all auxiliary selectors share one runtime model directory."
+        "zh": "左侧导航现在基于持久化的提供商目录，删除提供商后界面会正确收敛；设置窗口与所有辅助选择器共享同一份运行时模型状态。",
+        "en": "The left rail now derives from the persisted provider catalog; deleting a provider converges correctly, and the settings window shares a single runtime model directory with all selectors."
       },
       "details": [
         {
-          "zh": "删除提供方失败时卡片会保留，避免误删。",
-          "en": "Failed provider deletes keep the card, preventing accidental removal."
+          "zh": "删除提供商失败时保留卡片，不会错误消失。",
+          "en": "Failed provider deletes keep the card instead of disappearing."
         },
         {
-          "zh": "主窗口通过现有 IPC 和同窗口事件重新广播模型变更，已挂载的弹窗无需手动刷新即可更新。",
-          "en": "Main window re-broadcasts model changes over existing IPC and same-window events; mounted modals reload without manual refresh."
+          "zh": "异步写入凭据后刷新模型，避免过期快照覆盖新状态。",
+          "en": "Waits for async runtime credential writes before refreshing models to prevent stale snapshots overwriting newer ones."
         },
         {
-          "zh": "等待异步凭据写入完成后再刷新模型，并序列化每次刷新，防止过期快照覆盖新数据。",
-          "en": "Async credential writes complete before model refresh; refreshes are serialized to avoid stale snapshots overwriting newer data."
-        },
-        {
-          "zh": "在模型写入路径拒绝 HTTP 2xx 且含 JSON 错误的情况，确保失败不会显示为成功。",
-          "en": "Reject HTTP 2xx with JSON error on write paths so failures never look successful."
+          "zh": "提供商或模型写入失败时不再显示成功。",
+          "en": "Rejects HTTP 2xx with JSON errors on write paths so failures are never shown as successful."
         }
       ],
       "sources": [
@@ -101,32 +88,32 @@
       ]
     },
     {
-      "id": "improve-release-upload-timeout",
+      "id": "persist-skill-schema",
       "kind": "improvement",
       "importance": "low",
       "title": {
-        "zh": "回滚 AtomGit 上传超时放宽，保持默认稳定的发布配置",
-        "en": "Roll back AtomGit upload timeout relaxation, keeping release config stable"
+        "zh": "持久化模式更新支持技能字段",
+        "en": "Persistence schema updated for skill fields"
       },
       "summary": {
-        "zh": "撤销了允许 AtomGit 慢速上传的临时设置，恢复为默认的发布行为，确保发布流程的一致性。",
-        "en": "Reverted a temporary change that allowed slow AtomGit uploads, restoring default release behavior for consistency."
+        "zh": "服务端数据模式已更新，可存储可选的技能数组，无需迁移数据。",
+        "en": "The server persistence schema now supports an optional skills array without requiring data migration."
       },
       "details": [
         {
-          "zh": "移除了先前为慢速上传添加的超时放宽。",
-          "en": "Removed the previous timeout relaxation for slow uploads."
+          "zh": "新增字段为可选字段，不影响现有消息结构。",
+          "en": "Additions are additive optional fields within existing message shapes."
         },
         {
-          "zh": "发布流程现在恢复为标准配置。",
-          "en": "Release process now reverts to standard settings."
+          "zh": "数据纪元保持为 1，现有数据无需处理。",
+          "en": "DATA_EPOCH stays at 1, so no migration needed."
         }
       ],
       "sources": [
         {
           "type": "commit",
-          "ref": "a72c7666957c",
-          "title": "Revert \"fix(release): allow slow AtomGit uploads\""
+          "ref": "af0e9340ced7",
+          "title": "build(persistence): repin schema fingerprint for skill list fields"
         }
       ]
     }
