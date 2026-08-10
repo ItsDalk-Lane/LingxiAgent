@@ -648,7 +648,7 @@
     ],
     "version": 3
   },
-  "payloadFingerprint": "sha256:1e98baf9fc122b6db8d335328ea5d04f90d35636ea6a79e855f19aa557c26a53",
+  "payloadFingerprint": "sha256:b2bf11236f9d2d6a864eb0c575655946a5f80430fb79d7a2faf343acde082d98",
   "registry": [
     {
       "affectedByEpochMigration": true,
@@ -2999,8 +2999,8 @@
   ],
   "review": {
     "classification": "compatible",
-    "compatibilityReason": "Adds read-only Artifact runtime provenance logging and release ordering without changing any persisted field, store schema, data epoch, checkpoint, or migration behavior.",
-    "payloadFingerprint": "sha256:1e98baf9fc122b6db8d335328ea5d04f90d35636ea6a79e855f19aa557c26a53"
+    "compatibilityReason": "Tune Windows rename retry budget (8 attempts, unlink target between tries); no persisted shape change, DATA_EPOCH unchanged.",
+    "payloadFingerprint": "sha256:b2bf11236f9d2d6a864eb0c575655946a5f80430fb79d7a2faf343acde082d98"
   },
   "schemas": [
     {
@@ -8981,6 +8981,14 @@
     {
       "exemptionId": "generic-secret-fs-primitives",
       "kind": "remove-path",
+      "ordinal": 0,
+      "reason": "Shared owner-only write primitives have no store ownership; callers are scanned and assigned to concrete descriptors.",
+      "sourceFile": "shared/secret-fs.ts",
+      "storeId": null
+    },
+    {
+      "exemptionId": "generic-secret-fs-primitives",
+      "kind": "remove-path",
       "ordinal": 1,
       "reason": "Shared owner-only write primitives have no store ownership; callers are scanned and assigned to concrete descriptors.",
       "sourceFile": "shared/secret-fs.ts",
@@ -9014,14 +9022,6 @@
       "exemptionId": "generic-secret-fs-primitives",
       "kind": "rename",
       "ordinal": 0,
-      "reason": "Shared owner-only write primitives have no store ownership; callers are scanned and assigned to concrete descriptors.",
-      "sourceFile": "shared/secret-fs.ts",
-      "storeId": null
-    },
-    {
-      "exemptionId": "generic-secret-fs-primitives",
-      "kind": "rename",
-      "ordinal": 1,
       "reason": "Shared owner-only write primitives have no store ownership; callers are scanned and assigned to concrete descriptors.",
       "sourceFile": "shared/secret-fs.ts",
       "storeId": null

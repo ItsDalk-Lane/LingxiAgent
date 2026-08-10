@@ -502,6 +502,102 @@ describe("ModelManager AuthStorage ownership", () => {
     }
   });
 
+  it("waits for async runtime API-key overrides before refreshing model availability", async () => {
+    const manager = new ModelManager({ lingxiHome: tmpDir });
+    let releaseRuntimeKey!: () => void;
+    const runtimeKeyReady = new Promise<void>((resolve) => {
+      releaseRuntimeKey = resolve;
+    });
+    const sequence: string[] = [];
+
+    manager._removeApiKeyProviderAuthEntries = vi.fn(async () => {});
+    manager._buildChatProjectionInputs = vi.fn(() => ({
+      plans: [{
+        sourceProviderId: "async-provider",
+        runtimeProviderId: "async-provider",
+        credentialSource: "provider-catalog",
+      }],
+      providers: {
+        "async-provider": {
+          base_url: "https://async.example/v1",
+          api: "openai-completions",
+          api_key: "sk-async",
+          models: ["async-model"],
+        },
+      },
+      planMap: {},
+    }));
+    manager._authStorage = {
+      setRuntimeApiKey: vi.fn(async () => {
+        await runtimeKeyReady;
+        sequence.push("runtime-key");
+      }),
+      removeRuntimeApiKey: vi.fn(async () => {}),
+    };
+    manager._modelRegistry = {
+      refresh: vi.fn(async () => {
+        sequence.push("registry-refresh");
+      }),
+    };
+    manager.refreshAvailable = vi.fn(async () => {
+      sequence.push("available-refresh");
+      return [];
+    });
+
+    const syncing = manager.syncAndRefresh();
+    await vi.waitFor(() => {
+      expect(manager._authStorage.setRuntimeApiKey).toHaveBeenCalledWith(
+        "async-provider",
+        "sk-async",
+      );
+    });
+    expect(manager._modelRegistry.refresh).not.toHaveBeenCalled();
+
+    releaseRuntimeKey();
+    await syncing;
+    expect(sequence).toEqual(["runtime-key", "registry-refresh", "available-refresh"]);
+  });
+
+  it("hot-reloads a custom provider model added after ModelManager initialization", async () => {
+    writeAuth({});
+    writeAddedModels({});
+
+    const manager = new ModelManager({ lingxiHome: tmpDir });
+    await manager.init();
+    await manager.refreshAvailable();
+    expect(manager.availableModels).toEqual([]);
+
+    manager.providerRegistry.saveProvider("runtime-added", {
+      display_name: "Runtime Added",
+      auth_type: "api-key",
+      base_url: "http://127.0.0.1:9/v1",
+      api: "openai-completions",
+      api_key: "sk-runtime-added",
+      models: [],
+    });
+    await manager.reloadAndSync();
+    expect(manager.availableModels).toEqual([]);
+
+    manager.providerRegistry.saveProvider("runtime-added", {
+      models: ["runtime-added-model"],
+    });
+
+    await manager.reloadAndSync();
+
+    expect(manager.modelRegistry.getAll()).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        provider: "runtime-added",
+        id: "runtime-added-model",
+      }),
+    ]));
+    expect(manager.availableModels).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        provider: "runtime-added",
+        id: "runtime-added-model",
+      }),
+    ]));
+  });
+
   it("migrates legacy API-key auth into added-models before clearing auth.json", async () => {
     writeAuth({
       deepseek: { type: "api_key", key: "sk-legacy-4d2a" },

@@ -8489,8 +8489,8 @@
     },
     {
       "sourceFile": "shared/secret-fs.ts",
-      "kind": "rename",
-      "excerpt": "fs.renameSync(tmp, filePath)",
+      "kind": "remove-path",
+      "excerpt": "fs.rmSync(to, { force: true })",
       "reason": "Shared owner-only write primitives have no store ownership; callers are scanned and assigned to concrete descriptors.",
       "storeId": null,
       "exemptionId": "generic-secret-fs-primitives",
@@ -8499,11 +8499,11 @@
     {
       "sourceFile": "shared/secret-fs.ts",
       "kind": "rename",
-      "excerpt": "fs.renameSync(tmp, filePath)",
+      "excerpt": "fs.renameSync(from, to)",
       "reason": "Shared owner-only write primitives have no store ownership; callers are scanned and assigned to concrete descriptors.",
       "storeId": null,
       "exemptionId": "generic-secret-fs-primitives",
-      "ordinal": 1
+      "ordinal": 0
     },
     {
       "sourceFile": "shared/secret-fs.ts",

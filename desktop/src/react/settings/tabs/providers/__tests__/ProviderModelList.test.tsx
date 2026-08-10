@@ -6,6 +6,7 @@ import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
+import { useSettingsStore } from '../../../store';
 
 const mocks = vi.hoisted(() => ({
   lingxiFetch: vi.fn(),
@@ -14,6 +15,12 @@ const mocks = vi.hoisted(() => ({
 
 vi.mock('../../../api', () => ({
   lingxiFetch: (...args: unknown[]) => mocks.lingxiFetch(...args),
+  lingxiFetchJson: async (...args: unknown[]) => {
+    const response = await mocks.lingxiFetch(...args);
+    const data = await response.json();
+    if (data?.error) throw new Error(data.error);
+    return data;
+  },
 }));
 
 vi.mock('../../../../hooks/use-config', () => ({
@@ -53,6 +60,7 @@ describe('ProviderModelList', () => {
     vi.clearAllMocks();
     mocks.lingxiFetch.mockResolvedValue(jsonResponse({ models: [{ id: 'kimi-for-coding' }] }));
     mocks.lookupModelMeta.mockReturnValue(null);
+    useSettingsStore.setState({ toastMessage: '', toastType: '', toastVisible: false });
     Object.defineProperty(window, 'innerWidth', { configurable: true, writable: true, value: 1200 });
     Object.defineProperty(window, 'innerHeight', { configurable: true, writable: true, value: 900 });
   });
@@ -194,6 +202,41 @@ describe('ProviderModelList', () => {
       body: JSON.stringify({ providers: { 'kimi-coding': { models: ['kimi-new-model'] } } }),
     })));
     expect(onRefresh).toHaveBeenCalled();
+  });
+
+  it('does not refresh or pretend success when enabling a model returns a JSON error', async () => {
+    const onRefresh = vi.fn(async () => {});
+    mocks.lingxiFetch
+      .mockResolvedValueOnce(jsonResponse({ models: [] }))
+      .mockResolvedValueOnce(jsonResponse({ models: [{ id: 'runtime-rejected' }] }))
+      .mockResolvedValueOnce(jsonResponse({ error: 'model sync failed' }));
+
+    render(
+      <ProviderModelList
+        providerId="custom-vllm"
+        summary={{
+          type: 'api-key',
+          auth_type: 'api-key',
+          display_name: 'Custom vLLM',
+          base_url: 'http://127.0.0.1:8000/v1',
+          api: 'openai-completions',
+          api_key: 'sk-test',
+          models: [],
+          custom_models: [],
+          has_credentials: true,
+          supports_oauth: false,
+          can_delete: true,
+        }}
+        onRefresh={onRefresh}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'settings.providers.fetchModels' }));
+    fireEvent.click(await screen.findByRole('button', { name: /runtime-rejected/ }));
+
+    await waitFor(() => expect(useSettingsStore.getState().toastMessage).toContain('model sync failed'));
+    expect(useSettingsStore.getState().toastType).toBe('error');
+    expect(onRefresh).not.toHaveBeenCalled();
   });
 
   it('writes OAuth custom models through Provider Catalog instead of the legacy preferences route', async () => {
@@ -364,6 +407,41 @@ describe('ProviderModelList', () => {
         name: 'MiMo V2.5 Pro',
       });
     });
+  });
+
+  it('keeps the model editor open and skips refresh when metadata mutation returns a JSON error', async () => {
+    const onRefresh = vi.fn(async () => {});
+    mocks.lingxiFetch
+      .mockResolvedValueOnce(jsonResponse({ models: [] }))
+      .mockResolvedValueOnce(jsonResponse({ error: 'metadata sync failed' }));
+
+    render(
+      <ProviderModelList
+        providerId="mimo"
+        summary={{
+          type: 'api-key',
+          auth_type: 'api-key',
+          display_name: 'Xiaomi (MiMo)',
+          base_url: 'https://api.xiaomimimo.com/v1',
+          api: 'openai-completions',
+          api_key: 'sk-test',
+          models: ['mimo-v2.5-pro'],
+          custom_models: [],
+          has_credentials: true,
+          supports_oauth: false,
+          can_delete: true,
+        }}
+        onRefresh={onRefresh}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'settings.api.editModel' }));
+    fireEvent.click(screen.getByRole('button', { name: 'settings.api.save' }));
+
+    await waitFor(() => expect(useSettingsStore.getState().toastMessage).toContain('metadata sync failed'));
+    expect(useSettingsStore.getState().toastType).toBe('error');
+    expect(onRefresh).not.toHaveBeenCalled();
+    expect(screen.getByRole('button', { name: 'settings.api.save' })).toBeTruthy();
   });
 
   it('serializes audio only after the user changes the audio capability toggle', async () => {

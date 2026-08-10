@@ -23,7 +23,7 @@ import {
 export function AgentTab() {
   const {
     agents, currentAgentId, settingsAgentId, settingsConfig, currentPins,
-    globalModelsConfig,
+    globalModelsConfig, availableModels,
   } = useSettingsStore(
     useShallow(s => ({
       agents: s.agents,
@@ -32,6 +32,7 @@ export function AgentTab() {
       settingsConfig: s.settingsConfig,
       currentPins: s.currentPins,
       globalModelsConfig: s.globalModelsConfig,
+      availableModels: s.runtimeModels,
     }))
   );
   const showToast = useSettingsStore(s => s.showToast);
@@ -76,14 +77,6 @@ export function AgentTab() {
     if (typeof chatRaw === 'string') return chatRaw;
     return '';
   })();
-
-  // 从唯一信源 /api/models 获取模型列表（和聊天页一致）
-  const [availableModels, setAvailableModels] = useState<Array<{ id: string; name: string; provider: string }>>([]);
-  useEffect(() => {
-    lingxiFetch('/api/models').then(r => r.json()).then(data => {
-      setAvailableModels(data.models || []);
-    }).catch(() => {});
-  }, [settingsConfig]); // settingsConfig 变化时刷新
 
   const modelOptions = useMemo(() => {
     const opts = availableModels.map(m => ({

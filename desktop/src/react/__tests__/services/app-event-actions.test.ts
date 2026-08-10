@@ -154,6 +154,29 @@ describe('handleAppEvent', () => {
     expect(mockLoadModels).toHaveBeenCalledTimes(1);
   });
 
+  it('forwards server models-changed through the existing settings window channel', async () => {
+    const settingsChanged = vi.fn();
+    (globalThis as any).window.platform = { settingsChanged };
+    const { handleAppEvent } = await import('../../services/app-event-actions');
+
+    handleAppEvent('models-changed', { reason: 'provider' }, { source: 'server' });
+
+    expect(mockLoadModels).toHaveBeenCalledTimes(1);
+    expect(settingsChanged).toHaveBeenCalledWith('models-changed', { reason: 'provider' });
+  });
+
+  it('emits a same-window models event for an already mounted settings modal', async () => {
+    const { handleAppEvent } = await import('../../services/app-event-actions');
+    const dispatchEvent = vi.mocked(globalThis.window.dispatchEvent);
+
+    handleAppEvent('models-changed', { reason: 'provider' }, { source: 'server' });
+
+    expect(dispatchEvent).toHaveBeenCalledTimes(1);
+    const event = dispatchEvent.mock.calls[0][0] as CustomEvent;
+    expect(event.type).toBe('hana-models-changed');
+    expect(event.detail).toEqual({ reason: 'provider' });
+  });
+
   it('models-changed requests context usage through the injected callback', async () => {
     Object.assign(mockState, { currentSessionPath: '/session/a.jsonl' });
     const requestContextUsage = vi.fn();

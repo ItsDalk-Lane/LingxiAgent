@@ -1,7 +1,7 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { useSettingsStore, type ProviderSummary } from '../store';
-import { lingxiFetch } from '../api';
+import { lingxiFetchJson } from '../api';
 import { t, PROVIDER_PRESETS } from '../helpers';
 import { loadSettingsConfig } from '../actions';
 import { ProviderDetail } from './providers/ProviderDetail';
@@ -25,31 +25,50 @@ export function ProvidersTab() {
   const { providersSummary, selectedProviderId, settingsConfig } = useSettingsStore(
     useShallow(s => ({ providersSummary: s.providersSummary, selectedProviderId: s.selectedProviderId, settingsConfig: s.settingsConfig }))
   );
-  const providers = settingsConfig?.providers || {};
+  const providers = useMemo<Record<string, Record<string, unknown>>>(
+    () => settingsConfig?.providers || {},
+    [settingsConfig?.providers],
+  );
   const [addingProvider, setAddingProvider] = useState(false);
   const [pickerOpen, setPickerOpen] = useState(false);
-  // 通过「添加服务商」界面点选加入的服务商（每点一个添加一行）。
-  // 初始纳入 store 里残留的 selectedProviderId（如从聊天模型设置跳转而来），
-  // 保证左栏与右栏一致，避免「左栏空、右栏却显示配置」。
-  const [pickedProviderIds, setPickedProviderIds] = useState<string[]>(() => {
-    const seed = useSettingsStore.getState().selectedProviderId;
-    return seed ? [seed] : [];
-  });
+  // 点击候选只打开当前页面的临时配置入口；真正保存后才进入 Provider Catalog。
+  // 持久成员始终从 settingsConfig.providers 恢复，不能由当前选择或点击历史推导。
+  const [draftProviderIds, setDraftProviderIds] = useState<string[]>([]);
   const [subTab, setSubTab] = useState<ProviderSubTab>('api');
 
   const loadSummary = useCallback(async () => {
-    try {
-      const res = await lingxiFetch('/api/providers/summary');
-      const data = await res.json();
-      useSettingsStore.setState({ providersSummary: data.providers || {} });
-    } catch { /* swallow */ }
+    const data = await lingxiFetchJson<{ providers?: Record<string, ProviderSummary> }>('/api/providers/summary');
+    useSettingsStore.setState({ providersSummary: data.providers || {} });
   }, []);
 
-  useEffect(() => { loadSummary(); }, [loadSummary]);
+  useEffect(() => { void loadSummary().catch(() => {}); }, [loadSummary]);
+
+  const refreshProviderState = useCallback(async () => {
+    await loadSettingsConfig();
+    const state = useSettingsStore.getState();
+    if (state.settingsConfigStatus === 'error') {
+      throw new Error(state.settingsConfigError || t('settings.refreshFailed'));
+    }
+    await loadSummary();
+  }, [loadSummary]);
 
   const providerIds = Object.keys(providersSummary);
+  const persistedProviderIds = useMemo(() => Object.keys(providers), [providers]);
+  const persistedProviderIdSet = useMemo(() => new Set(persistedProviderIds), [persistedProviderIds]);
+  const displayedProviderIds = useMemo(
+    () => [...persistedProviderIds, ...draftProviderIds.filter(id => !persistedProviderIdSet.has(id))],
+    [draftProviderIds, persistedProviderIdSet, persistedProviderIds],
+  );
   const presetValues = new Set(PROVIDER_PRESETS.map(p => p.value));
   const selected = selectedProviderId;
+
+  // 首次保存会让 draft 出现在权威目录中，此时只完成状态迁移，不保留双份成员。
+  useEffect(() => {
+    setDraftProviderIds(previous => {
+      const next = previous.filter(id => !persistedProviderIdSet.has(id));
+      return next.length === previous.length ? previous : next;
+    });
+  }, [persistedProviderIdSet]);
 
   const selectProvider = (id: string) => {
     useSettingsStore.setState({ selectedProviderId: id });
@@ -61,8 +80,7 @@ export function ProvidersTab() {
     return preset?.label || p?.display_name || id;
   };
 
-  // 左栏行：用户通过「添加服务商」界面点选加入的服务商（每点一个添加一行）
-  const renderPickedRow = (id: string) => {
+  const renderProviderRow = (id: string) => {
     const p = providersSummary[id];
     const modelCount = p ? (p.models || []).length : 0;
     return (
@@ -98,9 +116,18 @@ export function ProvidersTab() {
   ];
 
   const handlePick = (id: string) => {
-    setPickedProviderIds(prev => (prev.includes(id) ? prev : [...prev, id]));
+    if (!persistedProviderIdSet.has(id)) {
+      setDraftProviderIds(prev => (prev.includes(id) ? prev : [...prev, id]));
+    }
     selectProvider(id);
     setPickerOpen(false);
+  };
+
+  const removeDraftProvider = (id: string) => {
+    setDraftProviderIds(previous => previous.filter(providerId => providerId !== id));
+    if (useSettingsStore.getState().selectedProviderId === id) {
+      useSettingsStore.setState({ selectedProviderId: null });
+    }
   };
 
   return (
@@ -127,7 +154,7 @@ export function ProvidersTab() {
           <div className={styles['provider-sub-panel']}>
             <SettingsSection variant="double-column">
               <div className={styles['pv-layout']}>
-                {/* ── 左栏：添加服务商按钮 + 已添加的服务商行（初始为空） ── */}
+                {/* ── 左栏：Provider Catalog 持久成员 + 当前页面临时草稿 ── */}
                 <div className={styles['pv-list']}>
                   <button
                     type="button"
@@ -138,15 +165,16 @@ export function ProvidersTab() {
                     <span>{t('settings.providers.addService')}</span>
                   </button>
 
-                  {pickedProviderIds.map(renderPickedRow)}
+                  {displayedProviderIds.map(renderProviderRow)}
                 </div>
 
-                {/* ── 右栏：服务商配置详情（仅显示已点选列表内的服务商，否则空白） ── */}
+                {/* ── 右栏：当前编辑对象；成员集合由上面的独立状态决定 ── */}
                 <div className={styles['pv-detail']}>
-                  {selected && pickedProviderIds.includes(selected) ? (() => {
+                  {selected && displayedProviderIds.includes(selected) ? (() => {
                     const existing = providersSummary[selected];
                     const preset = PROVIDER_PRESETS.find(p => p.value === selected);
                     const isRegistryOnlySetup = existing?.is_configured === false;
+                    const isDraft = draftProviderIds.includes(selected) && !persistedProviderIdSet.has(selected);
                     const summary: ProviderSummary = existing || {
                       type: 'api-key' as const,
                       auth_type: 'api-key' as const,
@@ -168,6 +196,7 @@ export function ProvidersTab() {
                         summary={summary}
                         providerConfig={providers[selected]}
                         isPresetSetup={!existing || isRegistryOnlySetup}
+                        onRemoveDraft={isDraft ? () => removeDraftProvider(selected) : undefined}
                         presetInfo={preset || (isRegistryOnlySetup ? {
                           label: summary.display_name || selected,
                           value: selected,
@@ -175,7 +204,7 @@ export function ProvidersTab() {
                           api: summary.api,
                           local: summary.auth_type === 'none',
                         } : undefined)}
-                        onRefresh={async () => { await loadSettingsConfig(); await loadSummary(); }}
+                        onRefresh={refreshProviderState}
                       />
                     );
                   })() : null}
@@ -197,7 +226,17 @@ export function ProvidersTab() {
                 {/* 新建自定义供应商 overlay */}
                 {addingProvider && (
                   <AddProviderOverlay
-                    onDone={() => { setAddingProvider(false); loadSummary(); }}
+                    onDone={async () => {
+                      // 自定义供应商提交成功后这里才被调用，配置已落盘。
+                      // 刷新摘要失败也不能让 overlay 卡住：关闭浮层，让已挂载的
+                      // 订阅和下次进入设置时重试加载。
+                      try {
+                        await loadSummary();
+                      } catch {
+                        /* loadSummary 已在 catch 里上报；不阻塞关闭 overlay */
+                      }
+                      setAddingProvider(false);
+                    }}
                     onCancel={() => setAddingProvider(false)}
                   />
                 )}

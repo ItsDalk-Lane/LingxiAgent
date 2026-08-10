@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useSettingsStore } from '../../store';
-import { lingxiFetch } from '../../api';
+import { lingxiFetchJson } from '../../api';
 import { t, API_FORMAT_OPTIONS } from '../../helpers';
 import { loadSettingsConfig } from '../../actions';
 import { SelectWidget, ProviderIcon } from '@/ui';
@@ -56,7 +56,7 @@ export function ProviderPickerOverlay({ items, onSelect, onAddCustom, onCancel }
   );
 }
 
-export function AddProviderOverlay({ onDone, onCancel }: { onDone: () => void; onCancel: () => void }) {
+export function AddProviderOverlay({ onDone, onCancel }: { onDone: () => Promise<void>; onCancel: () => void }) {
   return (
     <div className={styles['pv-add-overlay']}>
       <div className={styles['pv-add-overlay-header']}>
@@ -75,7 +75,7 @@ export function AddProviderOverlay({ onDone, onCancel }: { onDone: () => void; o
   );
 }
 
-function AddProviderForm({ onDone }: { onDone: () => void }) {
+function AddProviderForm({ onDone }: { onDone: () => Promise<void> }) {
   const showToast = useSettingsStore(s => s.showToast);
   const [name, setName] = useState('');
   const [url, setUrl] = useState('');
@@ -90,7 +90,7 @@ function AddProviderForm({ onDone }: { onDone: () => void }) {
     if (!u) { showToast(t('settings.providers.urlRequired'), 'error'); return; }
     try {
       const headers = parseProviderHeaderLines(headersText);
-      const res = await lingxiFetch('/api/config', {
+      await lingxiFetchJson('/api/config', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ providers: { [n]: {
@@ -101,12 +101,14 @@ function AddProviderForm({ onDone }: { onDone: () => void }) {
           models: [] as string[],
         } } }),
       });
-      const data = await res.json();
-      if (data.error) throw new Error(data.error);
-      showToast(t('settings.providers.added', { name: n }), 'success');
       await loadSettingsConfig();
+      const state = useSettingsStore.getState();
+      if (state.settingsConfigStatus === 'error') {
+        throw new Error(state.settingsConfigError || t('settings.refreshFailed'));
+      }
       useSettingsStore.setState({ selectedProviderId: n });
-      onDone();
+      await onDone();
+      showToast(t('settings.providers.added', { name: n }), 'success');
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
       showToast(t('settings.saveFailed') + ': ' + msg, 'error');

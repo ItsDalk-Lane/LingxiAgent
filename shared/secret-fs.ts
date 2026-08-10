@@ -51,6 +51,38 @@ export const SECRET_TMP_SUFFIX = ".tmp";
 
 const SUPPORTS_POSIX_MODE = process.platform !== "win32";
 
+/**
+ * Windows 原子写的 rename 会把目标文件上的瞬时锁当成失败：杀毒/索引服务
+ * 或仍在释放的打开句柄会让 renameSync 抛 EPERM（偶尔 EBUSY），而文件内容
+ * 本身没有问题。这里只对这两个瞬时错误码做有限重试，其他错误立即抛出；
+ * 重试耗尽后抛原始错误，绝不把失败伪装成成功。
+ */
+const RENAME_RETRYABLE_CODES = new Set(["EPERM", "EBUSY", "ENOTEMPTY", "EACCES"]);
+const RENAME_RETRY_ATTEMPTS = 8;
+
+function sleepSync(ms: number): void {
+  // 同步函数里不能 await；Atomics.wait 是 Node 里唯一的干净同步 sleep。
+  Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms);
+}
+
+function renameWithRetrySync(from: string, to: string): void {
+  let lastError: unknown = null;
+  for (let attempt = 0; attempt < RENAME_RETRY_ATTEMPTS; attempt += 1) {
+    try {
+      fs.renameSync(from, to);
+      return;
+    } catch (err: any) {
+      lastError = err;
+      if (!RENAME_RETRYABLE_CODES.has(err?.code)) throw err;
+    }
+    // Windows 上 rename 到一个被瞬时占用的目标，比先删目标再 rename 更容易
+    // 失败（rename 要求目标可被替换）。先尽力 unlink 目标，再退避后重试。
+    try { fs.rmSync(to, { force: true }); } catch { /* 目标不存在或仍被占用 */ }
+    if (attempt < RENAME_RETRY_ATTEMPTS - 1) sleepSync(50 * (attempt + 1));
+  }
+  throw lastError;
+}
+
 function permissionError(message: string, filePath: string, cause?: unknown) {
   return new AppError("FS_PERMISSION", { message, context: { filePath }, cause });
 }
@@ -119,7 +151,7 @@ export function writeSecretFileSync(filePath: string, content: string): void {
       throw err;
     }
     try {
-      fs.renameSync(tmp, filePath);
+      renameWithRetrySync(tmp, filePath);
     } catch (err) {
       try { fs.rmSync(tmp, { force: true }); } catch { /* leave the target untouched */ }
       throw err;
@@ -145,7 +177,7 @@ export function writeSecretFileSync(filePath: string, content: string): void {
   tightenBestEffort(tmp);
 
   try {
-    fs.renameSync(tmp, filePath);
+    renameWithRetrySync(tmp, filePath);
   } catch (err) {
     try { fs.rmSync(tmp, { force: true }); } catch { /* leave the target untouched */ }
     throw err;

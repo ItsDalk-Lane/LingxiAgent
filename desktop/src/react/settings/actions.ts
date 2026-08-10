@@ -2,7 +2,7 @@
  * Settings shared actions — extracted from SettingsApp to avoid circular imports
  */
 import { useSettingsStore } from './store';
-import { lingxiFetch, lingxiUrl } from './api';
+import { lingxiFetch, lingxiFetchJson, lingxiUrl } from './api';
 import { t } from './helpers';
 import { errorWithCode, localizedReasonOrRaw } from '../errors/error-presenter';
 import { normalizeSessionRouteError } from '../../../../shared/error-user-messages.ts';
@@ -13,12 +13,14 @@ import {
   makeSettingsResourceKey,
   startRemoteLoad,
 } from './resource-state';
-import type { SettingsSnapshot } from './store';
+import type { RuntimeModelInfo, SettingsSnapshot } from './store';
 
 let _settingsConfigLoadVersion = 0;
 let _settingsConfigAbortController: AbortController | null = null;
 let _settingsSnapshotLoadVersion = 0;
 let _settingsSnapshotAbortController: AbortController | null = null;
+let _settingsModelsLoadVersion = 0;
+let _settingsModelsAbortController: AbortController | null = null;
 
 function isAbortError(err: unknown): boolean {
   return !!err && typeof err === 'object' && (err as { name?: string }).name === 'AbortError';
@@ -70,6 +72,35 @@ export async function loadAvatars() {
         : null,
     });
   } catch {}
+}
+
+/** 设置窗口里所有模型选择器共享的运行时模型目录。 */
+export async function loadSettingsModels(): Promise<void> {
+  const myVersion = ++_settingsModelsLoadVersion;
+  _settingsModelsAbortController?.abort();
+  const controller = new AbortController();
+  _settingsModelsAbortController = controller;
+
+  try {
+    const data = await lingxiFetchJson<{ models?: RuntimeModelInfo[] }>('/api/models', {
+      signal: controller.signal,
+    });
+    if (myVersion !== _settingsModelsLoadVersion || _settingsModelsAbortController !== controller) return;
+    const runtimeModels = Array.isArray(data.models)
+      ? data.models.filter(model => (
+          !!model
+          && typeof model.id === 'string'
+          && typeof model.provider === 'string'
+        ))
+      : [];
+    useSettingsStore.getState().set({ runtimeModels });
+  } catch (err) {
+    if (!isAbortError(err)) console.error('[settings] models load failed:', err);
+  } finally {
+    if (_settingsModelsAbortController === controller) {
+      _settingsModelsAbortController = null;
+    }
+  }
 }
 
 export async function loadSettingsConfig() {

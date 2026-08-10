@@ -151,6 +151,12 @@ export function handleAppEvent(type: string, data: any = {}, options: AppEventOp
       break;
     case 'models-changed': {
       loadModels();
+      // 设置页可能是主窗口里已经挂载的 modal。主进程广播会排除事件发送者，
+      // 所以这里同时通知当前 renderer；独立设置窗口仍走既有 IPC 通道。
+      window.dispatchEvent(new CustomEvent('hana-models-changed', { detail: data || {} }));
+      if (options.source === 'server') {
+        window.platform?.settingsChanged?.('models-changed', data || {});
+      }
       // 模型配置变更可能改变 contextWindow（用户把 1M 模型改成 256k 等），
       // 主动补发一次 context_usage 让 ContextRing 立即吃到新分母。
       const sp = useStore.getState().currentSessionPath;

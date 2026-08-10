@@ -34,6 +34,7 @@ vi.mock('../../settings/actions', () => ({
   loadAvatars: vi.fn(async () => {}),
   loadSettingsConfig: vi.fn(async () => {}),
   loadSettingsSnapshot: vi.fn(async () => {}),
+  loadSettingsModels: vi.fn(async () => {}),
   loadPluginSettings: vi.fn(async () => {}),
 }));
 

@@ -16,6 +16,12 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          # 全量测试里的 release-preflight 回归用例依赖真实历史 tags
+          # （collectProductReleases 用 git tag --list 枚举本地产品 tag），
+          # 浅克隆会把它藏成空集导致断言失败。与 build.yml 的 quality-gate
+          # 保持一致，拉完整历史 + 全部 tags。
+          fetch-depth: 0
 
       - name: Setup Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4

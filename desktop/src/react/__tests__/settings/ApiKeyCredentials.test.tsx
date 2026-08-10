@@ -14,6 +14,12 @@ const mocks = vi.hoisted(() => ({
 
 vi.mock('../../settings/api', () => ({
   lingxiFetch: (...args: unknown[]) => mocks.lingxiFetch(...args),
+  lingxiFetchJson: async (...args: unknown[]) => {
+    const response = await mocks.lingxiFetch(...args);
+    const data = await response.json();
+    if (data?.error) throw new Error(data.error);
+    return data;
+  },
 }));
 
 vi.mock('../../hooks/use-config', () => ({
