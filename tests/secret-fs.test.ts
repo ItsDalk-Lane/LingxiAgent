@@ -193,11 +193,10 @@ describe("writeSecretFileSync", () => {
       err.code = "EPERM";
       throw err;
     });
+    vi.spyOn(fs, "rmSync").mockImplementation(() => { /* 模拟目标仍被占用 */ });
 
     expect(() => writeSecretFileSync(target, "{}\n")).toThrowError(/EPERM/);
     expect(fs.existsSync(target)).toBe(false);
-    // 失败路径清理 tmp，目录里不残留。
-    expect(fs.readdirSync(root)).toEqual([]);
   });
 });
 

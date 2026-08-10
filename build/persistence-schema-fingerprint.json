@@ -648,7 +648,7 @@
     ],
     "version": 3
   },
-  "payloadFingerprint": "sha256:ee7fcea0488d72b4456486ff385c638c6d701b33348657760f52016c63cd8139",
+  "payloadFingerprint": "sha256:b2bf11236f9d2d6a864eb0c575655946a5f80430fb79d7a2faf343acde082d98",
   "registry": [
     {
       "affectedByEpochMigration": true,
@@ -2999,8 +2999,8 @@
   ],
   "review": {
     "classification": "compatible",
-    "compatibilityReason": "Windows transient-lock retry in writeSecretFileSync atomic rename; no persisted shape change, DATA_EPOCH unchanged.",
-    "payloadFingerprint": "sha256:ee7fcea0488d72b4456486ff385c638c6d701b33348657760f52016c63cd8139"
+    "compatibilityReason": "Tune Windows rename retry budget (8 attempts, unlink target between tries); no persisted shape change, DATA_EPOCH unchanged.",
+    "payloadFingerprint": "sha256:b2bf11236f9d2d6a864eb0c575655946a5f80430fb79d7a2faf343acde082d98"
   },
   "schemas": [
     {
@@ -8968,6 +8968,14 @@
       "ordinal": 0,
       "reason": "Shared atomic-write primitives have no store ownership; callers are scanned and assigned to concrete descriptors.",
       "sourceFile": "shared/safe-fs.ts",
+      "storeId": null
+    },
+    {
+      "exemptionId": "generic-secret-fs-primitives",
+      "kind": "remove-path",
+      "ordinal": 0,
+      "reason": "Shared owner-only write primitives have no store ownership; callers are scanned and assigned to concrete descriptors.",
+      "sourceFile": "shared/secret-fs.ts",
       "storeId": null
     },
     {

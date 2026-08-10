@@ -57,8 +57,8 @@ const SUPPORTS_POSIX_MODE = process.platform !== "win32";
  * 本身没有问题。这里只对这两个瞬时错误码做有限重试，其他错误立即抛出；
  * 重试耗尽后抛原始错误，绝不把失败伪装成成功。
  */
-const RENAME_RETRYABLE_CODES = new Set(["EPERM", "EBUSY"]);
-const RENAME_RETRY_ATTEMPTS = 4;
+const RENAME_RETRYABLE_CODES = new Set(["EPERM", "EBUSY", "ENOTEMPTY", "EACCES"]);
+const RENAME_RETRY_ATTEMPTS = 8;
 
 function sleepSync(ms: number): void {
   // 同步函数里不能 await；Atomics.wait 是 Node 里唯一的干净同步 sleep。
@@ -74,8 +74,11 @@ function renameWithRetrySync(from: string, to: string): void {
     } catch (err: any) {
       lastError = err;
       if (!RENAME_RETRYABLE_CODES.has(err?.code)) throw err;
-      if (attempt < RENAME_RETRY_ATTEMPTS - 1) sleepSync(20 * (attempt + 1));
     }
+    // Windows 上 rename 到一个被瞬时占用的目标，比先删目标再 rename 更容易
+    // 失败（rename 要求目标可被替换）。先尽力 unlink 目标，再退避后重试。
+    try { fs.rmSync(to, { force: true }); } catch { /* 目标不存在或仍被占用 */ }
+    if (attempt < RENAME_RETRY_ATTEMPTS - 1) sleepSync(50 * (attempt + 1));
   }
   throw lastError;
 }
