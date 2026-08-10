@@ -648,7 +648,7 @@
     ],
     "version": 3
   },
-  "payloadFingerprint": "sha256:1e98baf9fc122b6db8d335328ea5d04f90d35636ea6a79e855f19aa557c26a53",
+  "payloadFingerprint": "sha256:ee7fcea0488d72b4456486ff385c638c6d701b33348657760f52016c63cd8139",
   "registry": [
     {
       "affectedByEpochMigration": true,
@@ -2999,8 +2999,8 @@
   ],
   "review": {
     "classification": "compatible",
-    "compatibilityReason": "Persist optional skill list array on display records, history projection, and retry/restore path; all additions are additive optional fields within existing message shapes, DATA_EPOCH unchanged.",
-    "payloadFingerprint": "sha256:1e98baf9fc122b6db8d335328ea5d04f90d35636ea6a79e855f19aa557c26a53"
+    "compatibilityReason": "Windows transient-lock retry in writeSecretFileSync atomic rename; no persisted shape change, DATA_EPOCH unchanged.",
+    "payloadFingerprint": "sha256:ee7fcea0488d72b4456486ff385c638c6d701b33348657760f52016c63cd8139"
   },
   "schemas": [
     {
@@ -9014,14 +9014,6 @@
       "exemptionId": "generic-secret-fs-primitives",
       "kind": "rename",
       "ordinal": 0,
-      "reason": "Shared owner-only write primitives have no store ownership; callers are scanned and assigned to concrete descriptors.",
-      "sourceFile": "shared/secret-fs.ts",
-      "storeId": null
-    },
-    {
-      "exemptionId": "generic-secret-fs-primitives",
-      "kind": "rename",
-      "ordinal": 1,
       "reason": "Shared owner-only write primitives have no store ownership; callers are scanned and assigned to concrete descriptors.",
       "sourceFile": "shared/secret-fs.ts",
       "storeId": null

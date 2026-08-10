@@ -159,6 +159,46 @@ describe("writeSecretFileSync", () => {
     expect(() => writeSecretFileSync(target, "replacement\n")).toThrow();
     expect(fs.readFileSync(target, "utf-8")).toBe("original\n");
   });
+
+  it("retries a transient EPERM rename instead of failing the write", () => {
+    // Windows 杀毒/索引服务会瞬时锁住刚写入的 tmp 文件，renameSync 抛 EPERM
+    // 但文件内容没问题。重试应让写入成功；旧实现直接抛错，此断言即红灯。
+    const root = makeTmpDir();
+    const target = path.join(root, "credential.json");
+    const realRename = fs.renameSync;
+    let epermAttempts = 0;
+    vi.spyOn(fs, "renameSync").mockImplementation((from: any, to: any) => {
+      if (epermAttempts < 2) {
+        epermAttempts += 1;
+        const err: any = new Error("EPERM: operation not permitted");
+        err.code = "EPERM";
+        throw err;
+      }
+      return realRename(from, to);
+    });
+
+    writeSecretFileSync(target, '{"retried":true}\n');
+
+    expect(epermAttempts).toBe(2);
+    expect(fs.readFileSync(target, "utf-8")).toBe('{"retried":true}\n');
+    expect(fs.readdirSync(root)).toEqual(["credential.json"]);
+  });
+
+  it("still throws when the EPERM rename never recovers", () => {
+    // 重试上限耗尽后必须抛错，不能把失败的写入当成成功。
+    const root = makeTmpDir();
+    const target = path.join(root, "credential.json");
+    vi.spyOn(fs, "renameSync").mockImplementation(() => {
+      const err: any = new Error("EPERM: operation not permitted");
+      err.code = "EPERM";
+      throw err;
+    });
+
+    expect(() => writeSecretFileSync(target, "{}\n")).toThrowError(/EPERM/);
+    expect(fs.existsSync(target)).toBe(false);
+    // 失败路径清理 tmp，目录里不残留。
+    expect(fs.readdirSync(root)).toEqual([]);
+  });
 });
 
 describe("ensureSecretFileModeSync", () => {

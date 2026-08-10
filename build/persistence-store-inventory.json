@@ -8490,20 +8490,11 @@
     {
       "sourceFile": "shared/secret-fs.ts",
       "kind": "rename",
-      "excerpt": "fs.renameSync(tmp, filePath)",
+      "excerpt": "fs.renameSync(from, to)",
       "reason": "Shared owner-only write primitives have no store ownership; callers are scanned and assigned to concrete descriptors.",
       "storeId": null,
       "exemptionId": "generic-secret-fs-primitives",
       "ordinal": 0
-    },
-    {
-      "sourceFile": "shared/secret-fs.ts",
-      "kind": "rename",
-      "excerpt": "fs.renameSync(tmp, filePath)",
-      "reason": "Shared owner-only write primitives have no store ownership; callers are scanned and assigned to concrete descriptors.",
-      "storeId": null,
-      "exemptionId": "generic-secret-fs-primitives",
-      "ordinal": 1
     },
     {
       "sourceFile": "shared/secret-fs.ts",
