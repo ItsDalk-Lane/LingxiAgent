@@ -3,6 +3,170 @@
   "entries": [
     {
       "schemaVersion": 1,
+      "tag": "v0.1.25",
+      "version": "0.1.25",
+      "previousTag": "v0.1.24",
+      "generatedAt": "2026-08-10T03:47:56.603Z",
+      "noUserFacingChanges": false,
+      "summary": {
+        "zh": "本次更新修复了技能徽章在历史会话中丢失的问题，并统一了提供商目录与运行时模型状态，使设置更可靠。",
+        "en": "This release fixes skill badges disappearing from history and unifies provider catalog with runtime model state for more reliable settings."
+      },
+      "counts": {
+        "feature": 0,
+        "fix": 2,
+        "improvement": 2,
+        "migration": 0
+      },
+      "source": {
+        "owner": "ItsDalk-Lane",
+        "repo": "LingxiAgent",
+        "commitRange": "v0.1.24..HEAD",
+        "releaseUrl": "https://github.com/ItsDalk-Lane/LingxiAgent/releases/tag/v0.1.25",
+        "releaseNotes": ""
+      },
+      "items": [
+        {
+          "id": "skill-badge-persist",
+          "kind": "fix",
+          "importance": "high",
+          "title": {
+            "zh": "修复技能徽章在历史与重试中丢失",
+            "en": "Fix skill badges lost in history and retries"
+          },
+          "summary": {
+            "zh": "技能徽章现在会在历史会话、重试和分支会话中正确保留。",
+            "en": "Skill badges now persist correctly across history, retries, and forked sessions."
+          },
+          "details": [
+            {
+              "zh": "显示记录携带技能列表，通过结构化写入保护。",
+              "en": "Display records carry skill list through structured write guard."
+            },
+            {
+              "zh": "历史投影和重试/恢复路径均恢复技能。",
+              "en": "History projection and retry/restore path restore skills."
+            },
+            {
+              "zh": "分支会话复制显示记录，子会话通过修复后的投影读取。",
+              "en": "Forking copies display record, child sessions read via fixed projection."
+            }
+          ],
+          "sources": [
+            {
+              "type": "commit",
+              "ref": "fe5d70fd34c0",
+              "title": "fix(session): persist skill badges across history and retries"
+            }
+          ]
+        },
+        {
+          "id": "provider-state-unify",
+          "kind": "fix",
+          "importance": "high",
+          "title": {
+            "zh": "统一提供商目录与运行时模型状态",
+            "en": "Unify provider catalog and runtime model state"
+          },
+          "summary": {
+            "zh": "设置窗口现在从持久化的提供商目录和页面草稿派生状态，删除操作与运行时模型刷新更可靠。",
+            "en": "Settings window now derives state from persisted provider catalog and page drafts; deletion and model refresh are more reliable."
+          },
+          "details": [
+            {
+              "zh": "左侧边栏不再依赖本地选择历史，删除提供商时收敛自权威状态。",
+              "en": "Left rail no longer depends on local selection history; deleting provider converges from authoritative state."
+            },
+            {
+              "zh": "所有辅助选择器共享运行时模型目录，主窗口通过既有 IPC 和事件触发刷新。",
+              "en": "All auxiliary selectors share runtime model directory; main window re-broadcasts changes over IPC and events."
+            },
+            {
+              "zh": "异步凭据写入后等待再刷新模型，并序列化每次刷新，防止旧快照覆盖新值。",
+              "en": "Wait for async credential writes before refreshing; serialize refreshes to prevent stale snapshots overwriting."
+            },
+            {
+              "zh": "提供商/模型写入路径会拒绝 HTTP 2xx 但包含 JSON 错误的情况，避免失败被当作成功。",
+              "en": "Write paths reject HTTP 2xx with JSON errors so failures are never treated as success."
+            }
+          ],
+          "sources": [
+            {
+              "type": "commit",
+              "ref": "e3dabbf61a2d",
+              "title": "fix(settings): unify provider catalog and runtime model state"
+            }
+          ]
+        },
+        {
+          "id": "upload-timeout-adjust",
+          "kind": "improvement",
+          "importance": "low",
+          "title": {
+            "zh": "调整 AtomGit 上传超时设置",
+            "en": "Adjust AtomGit upload timeout setting"
+          },
+          "summary": {
+            "zh": "发布流程对慢速 AtomGit 上传的容忍度已调整，但随后又回滚了该改动。",
+            "en": "Release process tolerance for slow AtomGit uploads was adjusted and then reverted."
+          },
+          "details": [
+            {
+              "zh": "曾尝试允许较慢的 AtomGit 上传，但该改动被回滚。",
+              "en": "Attempted to allow slower AtomGit uploads, but the change was reverted."
+            },
+            {
+              "zh": "当前版本维持原有超时行为。",
+              "en": "Current version retains original timeout behavior."
+            }
+          ],
+          "sources": [
+            {
+              "type": "commit",
+              "ref": "a72c7666957c",
+              "title": "Revert \"fix(release): allow slow AtomGit uploads\""
+            },
+            {
+              "type": "commit",
+              "ref": "54da63659aaf",
+              "title": "fix(release): allow slow AtomGit uploads"
+            }
+          ]
+        },
+        {
+          "id": "release-version-bump",
+          "kind": "improvement",
+          "importance": "low",
+          "title": {
+            "zh": "版本升级至 0.1.25",
+            "en": "Version bumped to 0.1.25"
+          },
+          "summary": {
+            "zh": "产品版本已提升至 0.1.25，并记录了修复与验证过程。",
+            "en": "Product version advanced to 0.1.25 with documented fix and verification phases."
+          },
+          "details": [
+            {
+              "zh": "记录了提供商/模型状态漂移修复、真实 UI 点击验证和技能徽章持久化工作。",
+              "en": "Documented provider/model state-drift fixes, real-UI click verification, and skill badge persistence."
+            },
+            {
+              "zh": "版本号严格大于历史 v0.1.24。",
+              "en": "Version is strictly greater than historical v0.1.24."
+            }
+          ],
+          "sources": [
+            {
+              "type": "commit",
+              "ref": "8d2067912cee",
+              "title": "chore(release): record v0.1.25 prep and advance version to 0.1.25 (generation 3)"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "schemaVersion": 1,
       "tag": "v0.1.24",
       "version": "0.1.24",
       "previousTag": "v0.1.3",
