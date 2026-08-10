@@ -3,11 +3,11 @@
   "tag": "v0.1.25",
   "version": "0.1.25",
   "previousTag": "v0.1.24",
-  "generatedAt": "2026-08-10T04:21:31.222Z",
+  "generatedAt": "2026-08-10T04:50:46.647Z",
   "noUserFacingChanges": false,
   "summary": {
-    "zh": "本次更新带来更稳定的模型管理、更可靠的会话记录，以及更流畅的发布流程。技能标签现在会在历史记录和重试中保留。",
-    "en": "This update brings a more stable model management, more reliable session history, and smoother release process. Skill badges are now preserved across history and retries."
+    "zh": "本次更新强化了设置、会话记录与持久化可靠性：统一了提供商与模型状态，修复了 Windows 下的文件写入问题，并确保技能徽章在历史与重试中不丢失。",
+    "en": "This release strengthens settings, session records, and persistence reliability: unified provider and model state, fixed file-write issues on Windows, and ensured skill badges are preserved across history and retries."
   },
   "counts": {
     "feature": 0,
@@ -24,136 +24,118 @@
   },
   "items": [
     {
-      "id": "fix-skill-badges-persist",
+      "id": "fix-settings-state-unify",
       "kind": "fix",
       "importance": "high",
       "title": {
-        "zh": "技能标签在历史记录和重试中保留",
-        "en": "Skill badges are preserved in history and retries"
+        "zh": "统一提供商与模型状态管理",
+        "en": "Unify provider and model state management"
       },
       "summary": {
-        "zh": "技能标签现在会随会话历史保存，并在重试或恢复时正确显示。",
-        "en": "Skill badges are now saved with session history and correctly displayed on retry or restore."
+        "zh": "修复了设置窗口中提供商与模型状态不一致的问题，删除提供商后界面与运行状态能正确收敛，且失败的删除不会让卡片消失。",
+        "en": "Fixed inconsistencies between provider and model state in Settings; deleting a provider now correctly converges the interface and running state, and failed deletes keep the card visible."
       },
       "details": [
         {
-          "zh": "历史记录和重试时不再丢失技能标签。",
-          "en": "Skill badges no longer disappear from history or on retry."
+          "zh": "左侧导航栏改为基于持久化提供商目录与页面草稿，不再依赖本地选择历史。",
+          "en": "The left rail now derives from the persisted provider catalog plus page drafts instead of local selection history."
         },
         {
-          "zh": "分叉会话也能正确读取技能信息。",
-          "en": "Forked sessions can also read skill information correctly."
+          "zh": "设置窗口共享一个运行时模型目录，所有辅助选择器同步订阅；主窗口通过现有 IPC 与同窗口事件广播模型变更，无需手动重新拉取。",
+          "en": "Settings window owns a shared runtime model directory that all auxiliary selectors subscribe to; main window re-broadcasts changes over existing IPC and same-window events, so mounted modals reload automatically."
+        },
+        {
+          "zh": "异步写入凭据后等待完成再刷新模型，且串行化刷新，避免旧快照覆盖新状态；写入路径拒绝 HTTP 2xx 加 JSON 错误的情况。",
+          "en": "Wait for async runtime credential writes before refreshing models and serialize refreshes so stale snapshots can't overwrite newer ones; HTTP 2xx with JSON errors is rejected on write paths."
         }
       ],
       "sources": [
         {
           "type": "commit",
-          "ref": "fe5d70fd34c0",
-          "title": "fix(session): persist skill badges across history and retries"
-        },
-        {
-          "type": "commit",
-          "ref": "af0e9340ced7",
-          "title": "build(persistence): repin schema fingerprint for skill list fields"
-        }
-      ]
-    },
-    {
-      "id": "fix-provider-catalog-unify",
-      "kind": "fix",
-      "importance": "high",
-      "title": {
-        "zh": "统一模型列表与运行时状态",
-        "en": "Unify model list with runtime state"
-      },
-      "summary": {
-        "zh": "左侧栏模型列表现在与运行时状态保持一致，删除模型或切换设置时不会出现错误卡顿。",
-        "en": "The left rail model list is now consistent with runtime state, avoiding incorrect stalls when deleting models or switching settings."
-      },
-      "details": [
-        {
-          "zh": "删除模型后界面立即从权威状态更新，失败时保留卡片。",
-          "en": "The UI updates immediately from authoritative state after deleting a model, and keeps the card on failure."
-        },
-        {
-          "zh": "设置窗口持有统一的运行时目录，所有选择器同步刷新。",
-          "en": "The settings window owns a single runtime directory, all selectors sync refresh."
-        },
-        {
-          "zh": "模型刷新等待异步凭证写入，避免旧快照覆盖新数据。",
-          "en": "Model refresh waits for async credential writes to avoid stale snapshots overwriting newer ones."
-        },
-        {
-          "zh": "写入失败时正确报错，不再假装成功。",
-          "en": "Failures are properly reported on write, no longer appearing successful."
-        }
-      ],
-      "sources": [
-        {
-          "type": "commit",
-          "ref": "e3dabbf61a2d",
+          "ref": "e3dabbf61a2d4e3f642cba1240514bc78dc9743d",
           "title": "fix(settings): unify provider catalog and runtime model state"
         }
       ]
     },
     {
-      "id": "fix-release-preflight-version-snapshot",
+      "id": "fix-skill-badges-persistence",
       "kind": "fix",
-      "importance": "low",
+      "importance": "medium",
       "title": {
-        "zh": "更新发布前检查的版本快照",
-        "en": "Update version snapshot for release preflight"
+        "zh": "技能徽章在历史与重试中保持显示",
+        "en": "Skill badges persist across history and retries"
       },
       "summary": {
-        "zh": "发布前的自动检查现在正确识别 v0.1.25，确保发布流程顺畅。",
-        "en": "The automatic pre-release check now correctly recognizes v0.1.25, ensuring smooth release flow."
+        "zh": "修复了会话显示记录未保存技能列表的问题，现在历史回放与重试/恢复路径都会正确还原技能徽章，子会话也能读取。",
+        "en": "Fixed display records not saving skills; history projection and retry/restore paths now correctly restore skill badges, and child sessions can read them too."
       },
       "details": [
         {
-          "zh": "预检测试的快照已更新到新版本。",
-          "en": "The preflight test snapshot has been updated to the new version."
+          "zh": "显示记录在写入时携带技能列表，历史投影在用户消息上恢复。",
+          "en": "Display records carry the skill list through the structured write guard, and the history projection restores it on user messages."
+        },
+        {
+          "zh": "重试/恢复时重新提交会保留技能，分叉会话复制同一显示记录并读取修复后的投影。",
+          "en": "Retry/restore keeps skills when re-submitting; forking copies the same display record so child sessions read skills via the fixed projection."
         }
       ],
       "sources": [
         {
           "type": "commit",
-          "ref": "16496aa2a5e8",
-          "title": "fix(release): bump preflight snapshot to v0.1.25 / generation 3"
+          "ref": "fe5d70fd34c0787294253a0adb6f5f6790e3a39a",
+          "title": "fix(session): persist skill badges across history and retries"
         }
       ]
     },
     {
-      "id": "improvement-release-ci-reliability",
-      "kind": "improvement",
-      "importance": "low",
+      "id": "fix-windows-rename-epem",
+      "kind": "fix",
+      "importance": "medium",
       "title": {
-        "zh": "提升发布流程的可靠性",
-        "en": "Improve release process reliability"
+        "zh": "修复 Windows 下的临时文件重命名失败",
+        "en": "Fix transient rename failures on Windows"
       },
       "summary": {
-        "zh": "优化了测试和发布相关的自动化配置，减少因拉取深度不足导致的失败。",
-        "en": "Optimized test and release automation config to reduce failures from insufficient fetch depth."
+        "zh": "当杀毒软件或索引器短暂占用文件时，Windows 上重命名写入的临时文件可能失败；现在会自动重试并最终仍不会误报成功。",
+        "en": "When antivirus or indexer holds a transient handle, renaming the just-written temp file can fail on Windows; the app now retries and still won't falsely report success if it never recovers."
       },
       "details": [
         {
-          "zh": "测试获取完整历史，避免版本检查误判。",
-          "en": "Tests fetch full history to avoid version-check misjudgments."
-        },
-        {
-          "zh": "调整了上传超时设置，使其更稳定。",
-          "en": "Adjusted upload timeout settings for more stability."
+          "zh": "对 EPERM/EBUSY 错误最多重试 4 次，带退避；超过次数才抛出异常。",
+          "en": "Retries up to 4 times with backoff on EPERM/EBUSY, then throws only if it never recovers."
         }
       ],
       "sources": [
         {
           "type": "commit",
-          "ref": "469b110e5cd5",
-          "title": "ci(test): fetch full history so preflight tag test sees real tags"
-        },
+          "ref": "2a54152005ffeec9bd91bfe890e0f06c78cbba7b",
+          "title": "fix(secret-fs): retry transient EPERM rename on Windows"
+        }
+      ]
+    },
+    {
+      "id": "improvement-persistence-schema",
+      "kind": "improvement",
+      "importance": "low",
+      "title": {
+        "zh": "持久化模式更清晰，数据兼容性保持",
+        "en": "Cleaner persistence schema with backward compatibility"
+      },
+      "summary": {
+        "zh": "会话记录与技能字段的持久化结构已更新，全部为可选追加字段，现有数据无需迁移。",
+        "en": "Persistence structure updated for session records and skill fields, all additive optional fields; existing data requires no migration."
+      },
+      "details": [
+        {
+          "zh": "会话路由现在持久化可选的技能数组，数据时代码保持不变。",
+          "en": "Session routes now persist an optional skills array; DATA_EPOCH stays 1."
+        }
+      ],
+      "sources": [
         {
           "type": "commit",
-          "ref": "a72c7666957c",
-          "title": "Revert \"fix(release): allow slow AtomGit uploads\""
+          "ref": "af0e9340ced76be3a8b0981a46f2ac9d2aded181",
+          "title": "build(persistence): repin schema fingerprint for skill list fields"
         }
       ]
     }
