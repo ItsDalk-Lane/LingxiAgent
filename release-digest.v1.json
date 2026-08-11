@@ -1,129 +1,81 @@
 {
   "schemaVersion": 1,
-  "tag": "v0.1.25",
-  "version": "0.1.25",
-  "previousTag": "v0.1.24",
-  "generatedAt": "2026-08-10T05:12:08.294Z",
+  "tag": "v0.1.26",
+  "version": "0.1.26",
+  "previousTag": "v0.1.25",
+  "generatedAt": "2026-08-11T13:33:54.000Z",
   "noUserFacingChanges": false,
   "summary": {
-    "zh": "本版本修复了 Windows 上偶尔出现的文件写入失败，确保配置可靠保存；同时统一了模型服务商的管理状态，避免了删除或切换时的界面不同步，并让技能徽章在历史记录和重试后依然保留。",
-    "en": "This release fixes occasional file write failures on Windows, unifies provider management state to prevent UI desync, and ensures skill badges persist across history and retries."
+    "zh": "本版本让循环任务在聊天中清晰可见：启动、继续和通知都会显示为气泡，不再像凭空消失；同时新增多家模型供应商预设（Qwen Token Plan、Z.AI、蚂蚁百灵、MiniMax 国际版、小米 MiMo 国际节点等），配置模型更省事。",
+    "en": "Loop tasks are now visible in chat: kickoff, wakeup and notice events appear as bubbles instead of vanishing. This release also adds many new provider presets (Qwen Token Plan, Z.AI, Ant Ling, MiniMax International, Xiaomi MiMo international nodes and more), making model setup easier."
   },
   "counts": {
-    "feature": 0,
-    "fix": 3,
+    "feature": 2,
+    "fix": 0,
     "improvement": 0,
     "migration": 0
   },
   "source": {
     "owner": "ItsDalk-Lane",
     "repo": "LingxiAgent",
-    "commitRange": "v0.1.24..HEAD",
-    "releaseUrl": "https://github.com/ItsDalk-Lane/LingxiAgent/releases/tag/v0.1.25",
+    "commitRange": "v0.1.25..HEAD",
+    "releaseUrl": "https://github.com/ItsDalk-Lane/LingxiAgent/releases/tag/v0.1.26",
     "releaseNotes": ""
   },
   "items": [
     {
-      "id": "fix-secret-fs-windows",
-      "kind": "fix",
+      "id": "feat-loop-interlude-bubbles",
+      "kind": "feature",
       "importance": "high",
       "title": {
-        "zh": "修复 Windows 上配置文件写入偶发失败",
-        "en": "Fixed occasional config file write failures on Windows"
+        "zh": "循环任务在聊天中实时可见",
+        "en": "Loop tasks are now visible in chat in real time"
       },
       "summary": {
-        "zh": "在 Windows 系统中，写入配置文件（如模型列表）时可能因为安全软件或索引程序暂时占用文件而失败。现在会自动重试，并在需要时删除目标文件以确保成功。",
-        "en": "On Windows, writing config files (like the model list) could fail when antivirus or indexer temporarily held the file. Now the write automatically retries and may remove the target file between attempts to ensure success."
+        "zh": "以前启动循环任务后，你输入的任务内容会从聊天界面消失，看起来像消息丢了。现在循环任务的启动、每次唤醒继续和暂停/终止通知都会显示为一条气泡，点开来还能看到任务详情。",
+        "en": "Previously, after starting a loop task your input disappeared from the chat as if the message was lost. Loop kickoff, each scheduled wakeup, and pause/termination notices now appear as bubbles, with task details available on click."
       },
       "details": [
         {
-          "zh": "配置写入失败时自动重试，最多 8 次，并会在每次重试前删除目标文件，以应对 Windows 对重命名操作的严格锁定。",
-          "en": "Automatically retries up to 8 times, and removes the destination file before each retry to handle Windows' stricter locking on rename operations."
+          "zh": "新发起的循环任务会立即插入一条「循环任务已启动」气泡，不必等下次进入会话才看到。",
+          "en": "Starting a loop task immediately inserts a 'loop task started' bubble — no need to re-enter the session to see it."
         },
         {
-          "zh": "如果重试后仍然失败，会明确报错，避免用户误以为保存成功。",
-          "en": "If the retries are exhausted, it clearly throws an error so failed writes are never reported as successful."
+          "zh": "历史会话中的旧循环消息也会补显出任务内容，中英文界面均生效。",
+          "en": "Loop messages from older sessions are backfilled with their task content as well."
         }
       ],
       "sources": [
         {
           "type": "commit",
-          "ref": "4740e0bdaa7a",
-          "title": "fix(secret-fs): widen Windows rename retry budget and unlink target between tries"
-        },
-        {
-          "type": "commit",
-          "ref": "2a54152005ff",
-          "title": "fix(secret-fs): retry transient EPERM rename on Windows"
+          "ref": "ebe847ef9830",
+          "title": "feat(loop): surface loop kickoff/wakeup/notice as interlude bubbles"
         }
       ]
     },
     {
-      "id": "fix-provider-state-unification",
-      "kind": "fix",
-      "importance": "high",
-      "title": {
-        "zh": "统一模型服务商管理，修复界面状态不同步",
-        "en": "Unified provider management to fix UI state desync"
-      },
-      "summary": {
-        "zh": "现在左侧菜单的模型服务商列表始终根据已保存的配置显示，不再受本地历史选择影响。删除服务商时状态会正确收敛，失败的删除也会保留卡片。设置窗口中的模型下拉菜单也共享同一份运行时状态，无需手动刷新。",
-        "en": "The left rail's provider list now always reflects the saved provider catalog, not local selection history. Deleting a provider converges from authoritative state, and failed deletes keep the card. The settings window's model dropdowns share a single runtime state, so no manual refresh is needed."
-      },
-      "details": [
-        {
-          "zh": "删除服务商时，界面会从权威状态更新，不会再出现已删除项仍残留的情况。",
-          "en": "When deleting a provider, the UI updates from authoritative state, so no deleted entries linger."
-        },
-        {
-          "zh": "等待异步认证信息写入后再刷新模型列表，并防止旧的背景刷新覆盖新状态。",
-          "en": "Waits for async credential writes before refreshing models and prevents stale background refreshes from overwriting newer state."
-        },
-        {
-          "zh": "识别并拒绝返回错误 JSON 的 HTTP 2xx 响应，避免保存失败却被视为成功。",
-          "en": "Rejects HTTP 2xx responses that contain an error JSON, so failures never look successful."
-        }
-      ],
-      "sources": [
-        {
-          "type": "commit",
-          "ref": "e3dabbf61a2d",
-          "title": "fix(settings): unify provider catalog and runtime model state"
-        }
-      ]
-    },
-    {
-      "id": "fix-skill-badge-persistence",
-      "kind": "fix",
+      "id": "feat-more-provider-presets",
+      "kind": "feature",
       "importance": "medium",
       "title": {
-        "zh": "技能徽章在历史记录和重试后保持显示",
-        "en": "Skill badges persist across history and retries"
+        "zh": "新增多家模型供应商预设",
+        "en": "More model provider presets"
       },
       "summary": {
-        "zh": "会话中的技能徽章现在会正确保存，并在查看历史消息或重试/恢复对话时继续显示。从父会话分叉出的子会话也能看到相应的技能信息。",
-        "en": "Skill badges in a session are now saved correctly and remain visible when viewing history or retrying/resuming a conversation. Forked child sessions also see the skills from the parent."
+        "zh": "添加供应商时可选的预设更多了：Qwen Token Plan（国际/国内/个人版）、Moonshot 国际版、MiniMax 国际版、小米 MiMo Token Plan 新加坡与阿姆斯特丹节点、Z.AI Coding（国际/国内）和蚂蚁百灵（Ant Ling）。界面文案也统一为「供应商」。",
+        "en": "More presets when adding a provider: Qwen Token Plan (intl/CN/individual), Moonshot International, MiniMax International, Xiaomi MiMo Token Plan SGP/AMS nodes, Z.AI Coding (intl/CN), and Ant Ling. UI wording for providers was unified as well."
       },
       "details": [
         {
-          "zh": "显示记录中携带技能列表，历史投影能正确还原用户消息上的技能信息。",
-          "en": "Display records carry the skill list, and the history projection restores skill info on user messages."
-        },
-        {
-          "zh": "重试/恢复路径会保留技能信息，分叉会话复制相同的显示记录。",
-          "en": "The retry/restore path preserves skills, and forking copies the same display record."
+          "zh": "新预设自带正确的 Base URL 与 API 协议，填入 API Key 即可读取模型列表。",
+          "en": "Each new preset ships the correct Base URL and API protocol — just paste an API Key and fetch the model list."
         }
       ],
       "sources": [
         {
           "type": "commit",
-          "ref": "fe5d70fd34c0",
-          "title": "fix(session): persist skill badges across history and retries"
-        },
-        {
-          "type": "commit",
-          "ref": "af0e9340ced7",
-          "title": "build(persistence): repin schema fingerprint for skill list fields"
+          "ref": "a8deab38f844",
+          "title": "feat(providers): add token-plan/z.ai/ant-ling presets and unify provider wording"
         }
       ]
     }

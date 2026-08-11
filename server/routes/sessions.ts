@@ -59,6 +59,7 @@ import {
 } from "../../lib/tools/todo-compat.ts";
 import { SessionManager } from "../../lib/pi-sdk/index.ts";
 import { TODO_STATE_CUSTOM_TYPE } from "../../lib/tools/todo-constants.ts";
+import { LOOP_TURN_MESSAGE_TYPE, LOOP_NOTICE_MESSAGE_TYPE, buildLoopInterludeBlock } from "../../lib/loop/loop-messages.ts";
 import { mergeWorkspaceHistory } from "../../shared/workspace-history.ts";
 import { sanitizeBridgeVisibleText } from "../../shared/bridge-visible-text.ts";
 import {
@@ -1504,6 +1505,20 @@ export function createSessionsRoute(engine, hub = null) {
         });
         if (normalizedDeliveryId) deferredInterludeDeliveryIds.add(normalizedDeliveryId);
       };
+      const recordLoopInterlude = (message, afterIndex, sourceIndex = null) => {
+        // 循环任务的 kickoff/wakeup/notice 协议消息本身 display:false（含系统协议文本，
+        // 不宜直接展示）。这里把它提炼成一条用户可见的 interlude 气泡，让用户能看到自己
+        // 当初发起的任务，否则会在聊天界面以为"输入凭空消失"。block 构造与实时路径共用
+        // buildLoopInterludeBlock，保证文案一致；实时路径的 dedup id 说明见该函数注释。
+        if (!Number.isInteger(afterIndex) || afterIndex < 0) return;
+        const block = buildLoopInterludeBlock(message);
+        if (!block) return;
+        blocks.push({
+          ...block,
+          afterIndex,
+          ...(Number.isInteger(sourceIndex) ? { sourceIndex } : {}),
+        });
+      };
       let displayIdx = 0;
       let latestTurnInputEntryId: string | null = null;
       let latestTurnInputVisible = false;
@@ -1611,6 +1626,9 @@ export function createSessionsRoute(engine, hub = null) {
               historyDeferredDeliveryId(m, sourceIndex),
               sourceIndex,
             );
+          }
+          if (m.customType === LOOP_TURN_MESSAGE_TYPE || m.customType === LOOP_NOTICE_MESSAGE_TYPE) {
+            recordLoopInterlude(m, afterIndex, sourceIndex);
           }
         }
       }

@@ -29,6 +29,14 @@ LingxiAgent 是一个更加易用的 AI agent，有记忆，有性格，会主�
 
 如果你用过 claude code、codex、Manus 等 CLI 或是图形化的 Agent，你会在 LingxiAgent 这里找到熟悉又新奇的感觉。
 
+## 上游项目
+
+LingxiAgent（灵犀）基于 [openhanako](https://github.com/liliMozi/openhanako) 开发，是它的衍生项目。
+
+openhanako 提供了扎实的 Agent 运行时基础：完整的 Agent 框架、会话与记忆系统、工具与沙盒模型。LingxiAgent 在此之上完成了从 HanaAgent 到灵犀的品牌焕新、独立的 0.1.x 版本线，以及面向日常办公场景的大量产品化改造，并持续同步上游更新。
+
+衷心感谢 [openhanako](https://github.com/liliMozi/openhanako) 及其开发者：没有上游多年的工程积累与开放精神，就不会有今天的 LingxiAgent。
+
 ## 功能特性
 
 **记忆** — 结合主流的记忆方案，自己又发挥了一下，做了个记忆系统，近期的事情记得非常牢固，但目前确实有待优化。
@@ -163,6 +171,7 @@ npm run typecheck
 `npm run pack` / `npm run dist*` 走 electron-builder。`package.json` 里 `build.publish` 已指向发布仓库 [ItsDalk-Lane/LingxiAgent](https://github.com/ItsDalk-Lane/LingxiAgent)，`--publish` 发布与自动更新都走该仓库的 Releases；不带 `--publish` 的本地构建不受影响。
 ## 致谢
 
+- [liliMozi/openhanako](https://github.com/liliMozi/openhanako)：LingxiAgent 的上游项目，本项目基于其开发，致以诚挚感谢。
 - [tw93/kami](https://github.com/tw93/kami)：beautify 插件 HTML 美学规范的「路由器 + 平级章节按需获取」渐进披露结构受其启发。
 
 ## 许可证

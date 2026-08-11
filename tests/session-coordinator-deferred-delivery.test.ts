@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 
 import { SessionCoordinator } from "../core/session-coordinator.ts";
+import { buildLoopKickoffMessage, buildLoopNoticeMessage } from "../lib/loop/loop-messages.ts";
 
 const MODEL = { id: "gpt-5.6-sol", provider: "openai-codex" };
 
@@ -435,5 +436,81 @@ describe("SessionCoordinator deferred custom delivery", () => {
       { taskId: "task-img" },
     );
     expect(session.sendCustomMessage).not.toHaveBeenCalled();
+  });
+});
+
+describe("SessionCoordinator loop interlude emission", () => {
+  // loop 投递后应实时广播 loop_interlude，让前端立刻插入"循环任务已启动"气泡，
+  // 而不是等下次进会话 reload 才看到（避免用户以为输入凭空消失）。
+  const LOOP = {
+    key: "sid-loop",
+    prompt: "把上述四层全部补上",
+    turnCount: 1,
+    limits: { maxTurns: 50, maxConsecutiveFailures: 3, minDelaySec: 60, guardedMinDelaySec: 1200, fallbackDelaySec: 1200 },
+  };
+
+  it("emits a loop_interlude event when delivering a loop kickoff (triggerTurn)", async () => {
+    const emitEvent = vi.fn();
+    const coord = makeCoordinator({ emitEvent });
+    const session = makeSession({ isStreaming: false });
+    const sessionPath = "/tmp/fake/agents/test-agent/sessions/loop-trigger.jsonl";
+    coord.sessions.set(sessionPath, { session, agentId: "test-agent", lastTouchedAt: 0 });
+
+    const kickoff = { ...buildLoopKickoffMessage(LOOP), id: "kickoff-1" };
+    const result = await coord.deliverCustomMessage(sessionPath, kickoff, { triggerTurn: true });
+
+    expect(result).toMatchObject({ ok: true, mode: "triggerTurn" });
+    expect(emitEvent).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: "loop_interlude",
+        block: expect.objectContaining({
+          type: "interlude",
+          variant: "loop",
+          text: "🔁 循环任务已启动",
+          detailMarkdown: "把上述四层全部补上",
+          id: "loop:kickoff-1",
+        }),
+      }),
+      sessionPath,
+    );
+  });
+
+  it("emits a loop_interlude event when delivering a loop notice as a follow-up", async () => {
+    const emitEvent = vi.fn();
+    const coord = makeCoordinator({ emitEvent });
+    const session = makeSession({ isStreaming: true });
+    const sessionPath = "/tmp/fake/agents/test-agent/sessions/loop-followup.jsonl";
+    coord.sessions.set(sessionPath, { session, agentId: "test-agent", lastTouchedAt: 0 });
+
+    await coord.deliverCustomMessage(sessionPath, {
+      ...buildLoopNoticeMessage("（循环已暂停）"),
+      id: "notice-1",
+    });
+
+    expect(emitEvent).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: "loop_interlude",
+        block: expect.objectContaining({ text: "（循环已暂停）", id: "loop:notice-1" }),
+      }),
+      sessionPath,
+    );
+  });
+
+  it("does not emit loop_interlude for non-loop custom messages", async () => {
+    const emitEvent = vi.fn();
+    const coord = makeCoordinator({ emitEvent });
+    const session = makeSession({ isStreaming: false });
+    const sessionPath = "/tmp/fake/agents/test-agent/sessions/defer-only.jsonl";
+    coord.sessions.set(sessionPath, { session, agentId: "test-agent", lastTouchedAt: 0 });
+
+    await coord.deliverCustomMessage(sessionPath, {
+      customType: "hana-background-result",
+      content: '<hana-background-result task-id="t1" status="success" type="subagent">x</hana-background-result>',
+      display: false,
+      details: { deliveryId: "d1" },
+    });
+
+    const loopCalls = emitEvent.mock.calls.filter(([ev]) => ev?.type === "loop_interlude");
+    expect(loopCalls).toHaveLength(0);
   });
 });
