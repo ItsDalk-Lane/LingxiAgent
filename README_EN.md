@@ -24,6 +24,14 @@ LingxiAgent is a personal AI agent that is easier to use than traditional coding
 As an assistant, it is gentle: no complex configuration files, no obscure jargon. LingxiAgent is designed not just for coders, but for everyone who works at a computer.
 As a tool, it is powerful: it remembers everything you've said, operates your computer, browses the web, searches for information, reads and writes files, executes code, manages schedules, and can even learn new skills on its own.
 
+## Upstream Project
+
+LingxiAgent is developed on top of [openhanako](https://github.com/liliMozi/openhanako) and is a derivative of it.
+
+openhanako provides a solid Agent runtime foundation: a complete agent framework, session and memory systems, and a tool and sandbox model. On top of that, LingxiAgent has been rebranded from HanaAgent to Lingxi, started its own 0.1.x version line, and added a great deal of productization tailored for everyday office scenarios, while continuously syncing upstream updates.
+
+Our sincere thanks go to [openhanako](https://github.com/liliMozi/openhanako) and its developers: without their years of engineering and openness, LingxiAgent would not exist today.
+
 ## Features
 
 **Memory** — A custom memory system that keeps recent events sharp and lets older ones fade naturally.
@@ -154,6 +162,7 @@ npm run typecheck
 
 ## Acknowledgments
 
+- [liliMozi/openhanako](https://github.com/liliMozi/openhanako): the upstream project of LingxiAgent; this project is built on top of it, and we owe it our sincere gratitude.
 - [tw93/kami](https://github.com/tw93/kami): the progressive-disclosure structure of the beautify plugin's HTML aesthetic guide (a router entry with flat on-demand sections) was inspired by this project.
 
 ## License
