@@ -113,6 +113,7 @@ import {
   normalizeStringArray,
 } from "./session-prompt-snapshot.ts";
 import { buildTurnInputPresentationEvent } from "../lib/turn-input-presentation.ts";
+import { LOOP_TURN_MESSAGE_TYPE, LOOP_NOTICE_MESSAGE_TYPE, buildLoopInterludeBlock } from "../lib/loop/loop-messages.ts";
 import { ensureSessionRefForPath } from "./session-manifest/ref.ts";
 import { resolveSessionNodeTarget } from "./session-turn-actions.ts";
 import { acquireSessionOperation } from "./session-operation-lock.ts";
@@ -5066,6 +5067,18 @@ export class SessionCoordinator {
     this._d.emitEvent?.(event, sessionPath);
   }
 
+  _emitLoopInterludeIfLoop(sessionPath: any, message: any) {
+    // loop kickoff/wakeup/notice 投递成功后，发一个 loop_interlude 事件；chat.ts 会把它
+    // 转成 content_block 广播给前端，实时插入一条 interlude 气泡。让用户立刻看到自己发起
+    // 的循环任务，而不是等下次进会话 reload 才看到（避免"输入凭空消失"的错觉）。
+    // 仅对 loop-turn / loop-notice 生效；其它 custom 消息（如 deferred_result）走各自链路。
+    const customType = message?.customType;
+    if (customType !== LOOP_TURN_MESSAGE_TYPE && customType !== LOOP_NOTICE_MESSAGE_TYPE) return;
+    const block = buildLoopInterludeBlock(message);
+    if (!block) return;
+    this._d.emitEvent?.({ type: "loop_interlude", block }, sessionPath);
+  }
+
   async deliverCustomMessage(sessionPath: any, message: any, options: any = {}) {
     if (!sessionPath) throw new Error("deliverCustomMessage: sessionPath is required");
     this._assertActiveDesktopSessionPath(sessionPath, "deliverCustomMessage");
@@ -5092,6 +5105,7 @@ export class SessionCoordinator {
       await entry.session.sendCustomMessage(message, { deliverAs: "followUp" });
       this._syncSessionBranchHeadQuiet(sessionPath, entry.session.sessionManager, "custom_message_followup");
       this._emitTurnInputPresentation(sessionPath, message, "followUp");
+      this._emitLoopInterludeIfLoop(sessionPath, message);
       return { ok: true, mode: "followUp" };
     }
 
@@ -5110,6 +5124,7 @@ export class SessionCoordinator {
     }
     await entry.session.sendCustomMessage(message, { triggerTurn });
     this._syncSessionBranchHeadQuiet(sessionPath, entry.session.sessionManager, "custom_message_delivery");
+    this._emitLoopInterludeIfLoop(sessionPath, message);
     return { ok: true, mode: triggerTurn ? "triggerTurn" : "notifyOnly" };
   }
 

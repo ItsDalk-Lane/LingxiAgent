@@ -1412,6 +1412,12 @@ export function createChatRoute(engine: any, hub: any, {
     } else if (event.type === TURN_INPUT_PRESENTATION_EVENT_TYPE) {
       // Delivery notifications are advisory only. The timeline UI is bound to the
       // actual hidden custom_message once the SDK consumes it for an assistant turn.
+    } else if (event.type === "loop_interlude") {
+      // 循环任务 kickoff/wakeup/notice 投递时由 session-coordinator 发出，转成 content_block
+      // 广播；前端 streamBufferManager 会把它当作 interlude 插到当前流尾部（下一轮 assistant
+      // 消息之前），让用户实时看到自己发起的任务。
+      if (!ss) return;
+      emitStreamEvent(sessionPath, ss, { type: "content_block", block: event.block });
     } else if (event.type === "turn_start") {
       if (!ss) return;
       if (!ss.turnActive) {
