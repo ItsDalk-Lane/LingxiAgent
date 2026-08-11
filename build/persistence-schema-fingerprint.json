@@ -648,7 +648,7 @@
     ],
     "version": 3
   },
-  "payloadFingerprint": "sha256:b2bf11236f9d2d6a864eb0c575655946a5f80430fb79d7a2faf343acde082d98",
+  "payloadFingerprint": "sha256:369b32aad7c45a1189c03e01c228705eb20cfc9fc9accc486d5922d9d3ef27a2",
   "registry": [
     {
       "affectedByEpochMigration": true,
@@ -2999,8 +2999,8 @@
   ],
   "review": {
     "classification": "compatible",
-    "compatibilityReason": "Tune Windows rename retry budget (8 attempts, unlink target between tries); no persisted shape change, DATA_EPOCH unchanged.",
-    "payloadFingerprint": "sha256:b2bf11236f9d2d6a864eb0c575655946a5f80430fb79d7a2faf343acde082d98"
+    "compatibilityReason": "Add loop interlude emission (helper + import edges) in session-coordinator; no persisted shape change, DATA_EPOCH unchanged.",
+    "payloadFingerprint": "sha256:369b32aad7c45a1189c03e01c228705eb20cfc9fc9accc486d5922d9d3ef27a2"
   },
   "schemas": [
     {
@@ -3414,7 +3414,7 @@
         {
           "contract": "core/session-coordinator.ts Hana metadata extensions",
           "module": "core/session-coordinator.ts",
-          "sourceHash": "sha256:614005e0967445a0bd2206c3d6d42ef5ac92978ed677abd7d1cbb0a6a0308e3a"
+          "sourceHash": "sha256:956050e3d514f53ac435bb283a61a06cd24810267aabee748d945716975143ee"
         },
         {
           "contract": "core/session-jsonl-file.ts repair contract",
