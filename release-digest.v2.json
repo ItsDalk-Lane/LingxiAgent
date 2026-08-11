@@ -3,6 +3,89 @@
   "entries": [
     {
       "schemaVersion": 1,
+      "tag": "v0.1.26",
+      "version": "0.1.26",
+      "previousTag": "v0.1.25",
+      "generatedAt": "2026-08-11T13:33:54.000Z",
+      "noUserFacingChanges": false,
+      "summary": {
+        "zh": "本版本让循环任务在聊天中清晰可见：启动、继续和通知都会显示为气泡，不再像凭空消失；同时新增多家模型供应商预设（Qwen Token Plan、Z.AI、蚂蚁百灵、MiniMax 国际版、小米 MiMo 国际节点等），配置模型更省事。",
+        "en": "Loop tasks are now visible in chat: kickoff, wakeup and notice events appear as bubbles instead of vanishing. This release also adds many new provider presets (Qwen Token Plan, Z.AI, Ant Ling, MiniMax International, Xiaomi MiMo international nodes and more), making model setup easier."
+      },
+      "counts": {
+        "feature": 2,
+        "fix": 0,
+        "improvement": 0,
+        "migration": 0
+      },
+      "source": {
+        "owner": "ItsDalk-Lane",
+        "repo": "LingxiAgent",
+        "commitRange": "v0.1.25..HEAD",
+        "releaseUrl": "https://github.com/ItsDalk-Lane/LingxiAgent/releases/tag/v0.1.26",
+        "releaseNotes": ""
+      },
+      "items": [
+        {
+          "id": "feat-loop-interlude-bubbles",
+          "kind": "feature",
+          "importance": "high",
+          "title": {
+            "zh": "循环任务在聊天中实时可见",
+            "en": "Loop tasks are now visible in chat in real time"
+          },
+          "summary": {
+            "zh": "以前启动循环任务后，你输入的任务内容会从聊天界面消失，看起来像消息丢了。现在循环任务的启动、每次唤醒继续和暂停/终止通知都会显示为一条气泡，点开来还能看到任务详情。",
+            "en": "Previously, after starting a loop task your input disappeared from the chat as if the message was lost. Loop kickoff, each scheduled wakeup, and pause/termination notices now appear as bubbles, with task details available on click."
+          },
+          "details": [
+            {
+              "zh": "新发起的循环任务会立即插入一条「循环任务已启动」气泡，不必等下次进入会话才看到。",
+              "en": "Starting a loop task immediately inserts a 'loop task started' bubble — no need to re-enter the session to see it."
+            },
+            {
+              "zh": "历史会话中的旧循环消息也会补显出任务内容，中英文界面均生效。",
+              "en": "Loop messages from older sessions are backfilled with their task content as well."
+            }
+          ],
+          "sources": [
+            {
+              "type": "commit",
+              "ref": "ebe847ef9830",
+              "title": "feat(loop): surface loop kickoff/wakeup/notice as interlude bubbles"
+            }
+          ]
+        },
+        {
+          "id": "feat-more-provider-presets",
+          "kind": "feature",
+          "importance": "medium",
+          "title": {
+            "zh": "新增多家模型供应商预设",
+            "en": "More model provider presets"
+          },
+          "summary": {
+            "zh": "添加供应商时可选的预设更多了：Qwen Token Plan（国际/国内/个人版）、Moonshot 国际版、MiniMax 国际版、小米 MiMo Token Plan 新加坡与阿姆斯特丹节点、Z.AI Coding（国际/国内）和蚂蚁百灵（Ant Ling）。界面文案也统一为「供应商」。",
+            "en": "More presets when adding a provider: Qwen Token Plan (intl/CN/individual), Moonshot International, MiniMax International, Xiaomi MiMo Token Plan SGP/AMS nodes, Z.AI Coding (intl/CN), and Ant Ling. UI wording for providers was unified as well."
+          },
+          "details": [
+            {
+              "zh": "新预设自带正确的 Base URL 与 API 协议，填入 API Key 即可读取模型列表。",
+              "en": "Each new preset ships the correct Base URL and API protocol — just paste an API Key and fetch the model list."
+            }
+          ],
+          "sources": [
+            {
+              "type": "commit",
+              "ref": "a8deab38f844",
+              "title": "feat(providers): add token-plan/z.ai/ant-ling presets and unify provider wording"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "schemaVersion": 1,
       "tag": "v0.1.25",
       "version": "0.1.25",
       "previousTag": "v0.1.24",
