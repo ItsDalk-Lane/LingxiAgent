@@ -27,13 +27,20 @@ function makeHarness(overrides: any = {}) {
   const delivered: any[] = [];
   const notices: any[] = [];
   const deliverLoopMessage = overrides.deliverLoopMessage
-    ?? vi.fn(async (target, msg) => { delivered.push([target, msg]); return { ok: true, mode: "triggerTurn" }; });
+    ?? vi.fn(async (target, msg) => { order.push("deliver"); delivered.push([target, msg]); return { ok: true, mode: "triggerTurn" }; });
   const hasLiveBackgroundWork = overrides.hasLiveBackgroundWork ?? (() => false);
+  const userPrompts: any[] = [];
+  const statusEvents: any[] = [];
+  // 调用顺序记录：recordUserPrompt 必须先于 kickoff deliver（气泡排在 interlude 前）
+  const order: string[] = [];
   const controller = new LoopController({
     store,
     hasLiveBackgroundWork,
     deliverLoopMessage,
     recordNotice: async (target, msg) => { notices.push([target, msg]); return { ok: true, mode: "notifyOnly" }; },
+    recordUserPrompt: overrides.recordUserPrompt
+      ?? (async (target, prompt) => { order.push("recordUserPrompt"); userPrompts.push([target, prompt]); }),
+    emitLoopStatus: (target, loop) => { statusEvents.push([target, loop?.status]); },
     isTargetMidStream: overrides.isTargetMidStream ?? (() => false),
     isTargetRunnable: overrides.isTargetRunnable ?? (() => true),
     resolveSessionIdForPath: overrides.resolveSessionIdForPath ?? ((sp: string) => PATH_TO_ID[sp] ?? null),
@@ -48,7 +55,7 @@ function makeHarness(overrides: any = {}) {
     log: { warn: () => {} } as any,
   });
   controller.attachAlarm(alarm);
-  return { store, controller, alarm, delivered, notices, deliverLoopMessage };
+  return { store, controller, alarm, delivered, notices, userPrompts, statusEvents, deliverLoopMessage, order };
 }
 
 async function runTurn(controller, sessionPath, { error = false, aborted = false } = {}) {
@@ -264,5 +271,56 @@ describe("recoverAtBoot", () => {
     controller.recoverAtBoot();
     expect(store.get(BK).status).toBe("stopped");
     expect(store.get(DK).alarm).not.toBeNull();
+  });
+});
+
+describe("用户 prompt 记录与状态广播", () => {
+  it("start 在 kickoff 投递前记录用户 prompt，参数为 (target, prompt)", async () => {
+    const { controller, userPrompts, order } = makeHarness();
+    await controller.start(D, "watch the pipeline");
+    expect(userPrompts).toEqual([[D, "watch the pipeline"]]);
+    // recordUserPrompt 必须先于 kickoff deliver（用户气泡排在 kickoff interlude 之前）
+    expect(order.indexOf("recordUserPrompt")).toBeGreaterThanOrEqual(0);
+    expect(order.indexOf("recordUserPrompt")).toBeLessThan(order.indexOf("deliver"));
+  });
+
+  it("start / pause / resume / stop 后广播对应最新状态", async () => {
+    const { controller, statusEvents } = makeHarness();
+    await controller.start(D, "t");
+    expect(statusEvents.at(-1)).toEqual([D, "running"]);
+
+    await controller.pause(D, "user_paused");
+    expect(statusEvents.at(-1)).toEqual([D, "paused"]);
+
+    await controller.resume(D);
+    expect(statusEvents.at(-1)).toEqual([D, "running"]);
+
+    await controller.stop(D);
+    expect(statusEvents.at(-1)).toEqual([D, "stopped"]);
+  });
+
+  it("recordUserPrompt 抛错只 warn，start 仍正常建立循环并注入 kickoff", async () => {
+    const { controller, store, delivered } = makeHarness({
+      recordUserPrompt: vi.fn(async () => { throw new Error("disk full"); }),
+    });
+    const started = await controller.start(D, "t");
+    expect(started.status).toBe("running");
+    expect(store.get(DK).status).toBe("running");
+    expect(delivered.length).toBe(1);
+    expect(delivered[0][1].details.kind).toBe("kickoff");
+  });
+
+  it("resume 遇到 loop_target_reset 时终止循环（不停在 running 空转）并原样抛错", async () => {
+    const resetError = Object.assign(new Error("session reset"), { code: "loop_target_reset" });
+    const { controller, store, statusEvents } = makeHarness();
+    await controller.start(D, "t");
+    await controller.pause(D, "user_paused");
+    // resume 的 wakeup 注入阶段目标会话已换代
+    controller._injectLoopTurn = vi.fn(async () => { throw resetError; });
+
+    await expect(controller.resume(D)).rejects.toMatchObject({ code: "loop_target_reset" });
+    expect(store.get(DK).status).toBe("stopped");
+    expect(store.get(DK).pausedReason).toBe("session_reset");
+    expect(statusEvents.at(-1)).toEqual([D, "stopped"]);
   });
 });

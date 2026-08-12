@@ -857,6 +857,21 @@ export function handleServerMessage(msg: any): void {
       break;
     }
 
+    case 'loop_status': {
+      // 循环状态机变更（start/stop/pause/resume/complete/轮次刷新）。按 sessionId 写 store，
+      // 驱动会话列表徽章与 interlude 控制按钮态。stopped/completed 经 setLoopStatus 自动清除。
+      if (msg.sessionId) {
+        useStore.getState().setLoopStatus(msg.sessionId, {
+          status: msg.status,
+          turnCount: msg.turnCount ?? 0,
+          maxTurns: msg.maxTurns ?? null,
+          pausedReason: msg.pausedReason ?? null,
+          prompt: msg.prompt ?? null,
+        });
+      }
+      break;
+    }
+
     case 'voice_transcription_update': {
       applyVoiceTranscriptionUpdate(msg);
       break;

@@ -257,6 +257,8 @@ export type RichBlock =
     previewAgentId?: string;
     text: string;
     detailMarkdown?: string;
+    turnCount?: number;
+    maxTurns?: number;
   }
   | {
     type: 'subagent';

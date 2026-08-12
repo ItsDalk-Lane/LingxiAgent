@@ -904,6 +904,22 @@ export class LingxiEngine {
         }
         return requireBridgeHooks().sendNotice(target.sessionKey, target.agentId, message.content);
       },
+      recordUserPrompt: (target, prompt) => {
+        // 把用户发起循环时的任务 prompt 记成展示型 user 气泡（appendCustomEntry 写
+        // type:"custom" 无 content → buildSessionContext 阶段即被排除 → 永不进 model
+        // 输入）。仅桌面目标。
+        if (target.kind !== "desktop") return Promise.resolve();
+        const sessionPath = resolveDesktopPath(target.sessionId);
+        return this._sessionCoord.recordLoopUserPrompt(sessionPath, prompt);
+      },
+      emitLoopStatus: (target, loop) => {
+        // 状态变更广播。用软解析：stop/completed/会话换代时 locator 可能已失效，
+        // 解析不到则 path=null —— chat.ts 的 loop_status 分支走 broadcast 且前端按
+        // sessionId 路由（event.target.sessionId 随事件携带），path 缺失不影响投递，
+        // 绝不因推送抛错。
+        const path = resolveTargetSessionPathSoft(target);
+        this._emitEvent({ type: "loop_status", target, loop }, path);
+      },
       isTargetMidStream: (target) => {
         if (target.kind !== "desktop") return false;
         const sessionPath = resolveTargetSessionPathSoft(target);

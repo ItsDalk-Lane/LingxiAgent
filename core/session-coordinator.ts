@@ -113,7 +113,7 @@ import {
   normalizeStringArray,
 } from "./session-prompt-snapshot.ts";
 import { buildTurnInputPresentationEvent } from "../lib/turn-input-presentation.ts";
-import { LOOP_TURN_MESSAGE_TYPE, LOOP_NOTICE_MESSAGE_TYPE, buildLoopInterludeBlock } from "../lib/loop/loop-messages.ts";
+import { LOOP_TURN_MESSAGE_TYPE, LOOP_NOTICE_MESSAGE_TYPE, LOOP_USER_PROMPT_MESSAGE_TYPE, buildLoopInterludeBlock } from "../lib/loop/loop-messages.ts";
 import { ensureSessionRefForPath } from "./session-manifest/ref.ts";
 import { resolveSessionNodeTarget } from "./session-turn-actions.ts";
 import { acquireSessionOperation } from "./session-operation-lock.ts";
@@ -572,14 +572,6 @@ function recordAssistantUsage({ ledger, event, sessionPath, sessionId, agentId, 
       sessionPath,
     },
   };
-  if (event.message?.usage) {
-    return ledger.record({
-      model: modelMeta,
-      usage: event.message.usage,
-      usageContext,
-      costRates,
-    });
-  }
   const errorMessage = event.message?.errorMessage || event.message?.error?.message || null;
   if (event.message?.stopReason === "error" || errorMessage) {
     const request = ledger.start({
@@ -588,6 +580,14 @@ function recordAssistantUsage({ ledger, event, sessionPath, sessionId, agentId, 
       costRates,
     });
     return ledger.recordError(request.requestId, new Error(errorMessage || "provider request failed"));
+  }
+  if (event.message?.usage) {
+    return ledger.record({
+      model: modelMeta,
+      usage: event.message.usage,
+      usageContext,
+      costRates,
+    });
   }
   return null;
 }
@@ -5144,6 +5144,31 @@ export class SessionCoordinator {
     manager.appendCustomEntry(customType, data);
     this._syncSessionBranchHeadQuiet(sessionPath, manager, "custom_entry_file");
     return { ok: true, mode: "file" };
+  }
+
+  /**
+   * 循环启动时把用户的任务 prompt 记成一条展示型用户气泡。
+   *
+   * 持久化用 appendCustomEntry（type:"custom"，有 data 无 content）——构建 LLM 上下文时
+   * sessionEntryToContextMessages 只处理 message/custom_message/branch_summary/compaction，
+   * type:"custom" 条目在 buildSessionContext 阶段就被排除（SDK 文档亦写明 "Does NOT
+   * participate in LLM context"），因此这条 prompt 永不进入 model 输入，无论 reload /
+   * compaction 重建内存状态多少次。它纯粹是 UI 展示，让用户在聊天界面右侧看到自己发起
+   * 循环时的任务文本，而不是"输入凭空消失"。历史加载层（message-utils）识别此
+   * customType 后直接投影成标准 role:"user" 消息；实时显示复用 session_user_message 通道。
+   */
+  async recordLoopUserPrompt(sessionPath: any, prompt: any) {
+    if (!sessionPath) throw new Error("recordLoopUserPrompt: sessionPath is required");
+    const text = typeof prompt === "string" ? prompt : "";
+    this.recordCustomEntry(sessionPath, LOOP_USER_PROMPT_MESSAGE_TYPE, { prompt: text, timestamp: Date.now() });
+    this._d.emitEvent?.(
+      {
+        type: "session_user_message",
+        clientMessageId: null,
+        message: { text, timestamp: Date.now() },
+      },
+      sessionPath,
+    );
   }
 
   _cleanupAbortedSessionSidecars(sessionPath: any, reason: any) {

@@ -598,6 +598,22 @@ export async function loadSessions(): Promise<void> {
       };
     });
 
+    // 冷启动循环状态：用最新会话列表重建 loopStatusBySession（后端只对 running/paused 注入）。
+    // 运行时变更靠 loop_status WS 增量；这里每次重载都用列表快照替换，避免已停止的循环残留。
+    // 字段归一化与 WS 路径（ws-message-handler loop_status）保持一致，避免两种来源写入不同形状。
+    const nextLoopStatusBySession: Record<string, any> = {};
+    for (const s of serverSessions) {
+      if (!s || !s.sessionId || !s.loopStatus) continue;
+      nextLoopStatusBySession[s.sessionId] = {
+        status: s.loopStatus.status,
+        turnCount: s.loopStatus.turnCount ?? 0,
+        maxTurns: s.loopStatus.maxTurns ?? null,
+        pausedReason: s.loopStatus.pausedReason ?? null,
+        prompt: s.loopStatus.prompt ?? null,
+      };
+    }
+    useStore.setState({ loopStatusBySession: nextLoopStatusBySession });
+
     const latest = useStore.getState();
     if (
       sessions.length > 0

@@ -7,6 +7,7 @@
 import { lingxiFetch } from '../../hooks/use-hana-fetch';
 import { getWebSocket } from '../../services/websocket';
 import { useStore } from '../../stores';
+import { ensureSession, loadSessions } from '../../stores/session-actions';
 
 // ── Xing Prompt ──
 
@@ -189,6 +190,11 @@ export function executeCompact(
  * 以及用户直接敲出的同名 slash 文本；桌面已有 GUI 的 core 命令不从这里走。
  * 后端在 server/routes/chat.ts 接收 {type:'slash'}，走 engine.slashDispatcher.tryDispatch。
  *
+ * 会话身份必须在发送前落实：服务端把"slash 消息必须带会话身份"当内部契约，
+ * 什么都不带会被按 internal_contract 拒掉（用户看到"应用内部出了点问题"）。
+ * pending 新会话草稿还没有服务端会话，这里跟 prompt 通道一样先 ensureSession
+ * 把会话建出来——/loop 这类命令的执行目标就是这个会话，建不出来就不发。
+ *
  * agentId 由调用方显式传入，不在这里从任何全局指针推导：命令要在哪个助手身上执行，
  * 只有渲染这个输入框的会话说了算。服务端认的是会话清单里记着的归属，跟这个会话有没有
  * 被加载进内存无关；这个字段覆盖的是另一种情况——服务端根本不认识的草稿会话，它还没
@@ -200,6 +206,7 @@ export function executeCompact(
  * 一个防抖窗口，不代表命令已经执行完。
  */
 export function executeSlashViaWs(
+  t: (key: string) => string,
   cmd: string,
   agentId: string | null,
   setBusy: (name: string | null) => void,
@@ -214,13 +221,30 @@ export function executeSlashViaWs(
       ? inputText.trim()
       : `/${cmd}`;
     try {
+      let sessionPath = useStore.getState().currentSessionPath;
+      let resolvedAgentId = agentId || null;
+      if (!sessionPath) {
+        const state = useStore.getState();
+        if (!state.pendingNewSession) {
+          // 既没有活跃会话也不是草稿：命令没有执行目标，显式报错而非发出一条
+          // 注定被服务端按 internal_contract 拒掉的消息。
+          state.addToast(t('error.noActiveSession'), 'error', 6000);
+          return;
+        }
+        // ensureSession 失败时会自己弹出原因并返回 null，这里直接终止。
+        const ref = await ensureSession(state.pendingDraftId);
+        if (!ref) return;
+        loadSessions();
+        sessionPath = ref.sessionPath;
+        resolvedAgentId = resolvedAgentId || ref.agentId || null;
+      }
       const ws = getWebSocket();
       if (ws?.readyState === WebSocket.OPEN) {
         ws.send(JSON.stringify({
           type: 'slash',
           text: rawText,
-          sessionPath: useStore.getState().currentSessionPath,
-          agentId: agentId || null,
+          sessionPath,
+          agentId: resolvedAgentId,
         }));
       }
     } finally {

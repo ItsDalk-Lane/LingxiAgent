@@ -1,6 +1,8 @@
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import type { ContentBlock } from '../../stores/chat-types';
+import { useStore } from '../../stores';
+import { sessionIdForPathFromLocatorState } from '../../stores/session-slice';
 import { AssistantContentPreview } from './AssistantContentPreview';
 import { SubagentSessionPreview } from './SubagentSessionPreview';
 import styles from './Chat.module.css';
@@ -68,7 +70,61 @@ const InterludeDetailPreview = memo(function InterludeDetailPreview({ detailMark
   );
 });
 
-export const InterludeBlock = memo(function InterludeBlock({ block }: { block: InterludeContentBlock }) {
+/**
+ * 循环 interlude 气泡上的控制按钮（暂停/恢复 + 停止）。
+ *
+ * 按钮态由该 interlude **所属会话**的循环状态驱动：running → [⏸暂停][⏹停止]，paused →
+ * [▶恢复][⏹停止]，其它（completed/stopped/无）→ 不渲染。会话身份必须由渲染上下文透传
+ * （ChatTranscript/AssistantMessage 的 sessionPath+agentId）——InterludeBlock 会被
+ * SubagentSessionPreview/ChannelsPanel/BridgePanel/QuickChatApp 等非当前会话上下文复用，
+ * 读全局 current* 会把别的会话的气泡配上主会话的按钮态，点击停止会误停主会话的循环。
+ * 点击复用现有 /loop slash 通道（ws type:'slash'）。放在 interludeTrigger 内部，
+ * stopPropagation 防止冒泡触发浮层切换。仅在 loop interlude 上挂载，避免给
+ * deferred_result 等气泡加无用订阅。
+ */
+const LoopControls = memo(function LoopControls({ sessionPath, agentId }: {
+  sessionPath?: string | null;
+  agentId?: string | null;
+}) {
+  // 只按所属会话解析身份：sessionId 从 locator 反解（loopStatusBySession 以 sessionId 为键），
+  // 解析不到就不渲染——宁可少显示按钮，也不能把按钮接到错的会话上。
+  const sessionId = useStore((s) => (sessionPath ? sessionIdForPathFromLocatorState(s, sessionPath) : null));
+  const status = useStore((s) => (sessionId ? s.loopStatusBySession[sessionId] : undefined));
+  if (!status || (status.status !== 'running' && status.status !== 'paused')) return null;
+  // 动态 import websocket，避免组件顶层静态依赖触发 websocket.ts 的模块加载副作用
+  // （injectHandlers → stream-resume），那样会让所有 import 本组件的测试都得 mock 那条链。
+  const send = async (cmd: string) => {
+    const { getWebSocket } = await import('../../services/websocket');
+    const ws = getWebSocket();
+    if (!ws || ws.readyState !== WebSocket.OPEN || !sessionPath) return;
+    ws.send(JSON.stringify({ type: 'slash', text: cmd, sessionPath, agentId: agentId || undefined }));
+  };
+  const resumeOrPause = status.status === 'paused'
+    ? { label: '恢复循环', glyph: '▶', cmd: '/loop resume' }
+    : { label: '暂停循环', glyph: '⏸', cmd: '/loop pause' };
+  return (
+    <span
+      className={styles.loopControls}
+      onPointerDown={(e) => e.stopPropagation()}
+      onClick={(e) => e.stopPropagation()}
+    >
+      <span className={styles.loopControlBtn} title={resumeOrPause.label} onClick={() => send(resumeOrPause.cmd)}>
+        {resumeOrPause.glyph}
+      </span>
+      <span className={styles.loopControlBtn} title="停止循环" onClick={() => send('/loop stop')}>
+        ⏹
+      </span>
+    </span>
+  );
+});
+
+export const InterludeBlock = memo(function InterludeBlock({ block, sessionPath, agentId }: {
+  block: InterludeContentBlock;
+  /** 渲染该气泡的会话身份（由所属 transcript 透传）。LoopControls 据此查状态、发命令，
+   *  缺失时退化为不渲染控制按钮——绝不能回退到全局 current*（见 LoopControls 注释）。 */
+  sessionPath?: string | null;
+  agentId?: string | null;
+}) {
   const anchorRef = useRef<HTMLButtonElement | HTMLDivElement | null>(null);
   const popoverRef = useRef<HTMLDivElement | null>(null);
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
@@ -131,11 +187,17 @@ export const InterludeBlock = memo(function InterludeBlock({ block }: { block: I
     if (!canPreview) setPosition(null);
   }, [canPreview]);
 
+  // loop interlude 追加"第 X / M 轮"（显示值 = min(turnCount+1, maxTurns)，封顶防超）。
+  const loopTurnSuffix = block.variant === 'loop' && Number.isFinite(block.maxTurns as number)
+    ? ` · 第 ${Math.min((block.turnCount ?? 0) + 1, block.maxTurns as number)}/${block.maxTurns} 轮`
+    : null;
   const content = (
     <>
       <span className={styles.interludeLine} aria-hidden="true" />
       <span className={styles.interludeText}>{block.text}</span>
+      {loopTurnSuffix ? <span className={styles.interludeTurn}>{loopTurnSuffix}</span> : null}
       <span className={styles.interludeLine} aria-hidden="true" />
+      {block.variant === 'loop' ? <LoopControls sessionPath={sessionPath} agentId={agentId} /> : null}
     </>
   );
 

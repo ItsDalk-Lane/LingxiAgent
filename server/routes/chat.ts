@@ -360,6 +360,12 @@ export function createChatRoute(engine: any, hub: any, {
   function requireWsSessionContext(msg, ws) {
     const ctx = resolveWsSessionContext(engine, msg);
     if (ctx.ok === false) {
+      // 错误文案承诺"详情已记录"——尤其是 internal_contract（调用方 bug），
+      // 不落日志就等于故障现场被吃掉，排障无从谈起。
+      log.warn(
+        `ws ${msg?.type} rejected: ${ctx.code} — ${ctx.message}`
+        + ` (sessionId=${ctx.sessionId || "none"}, sessionPath=${ctx.sessionPath || "none"})`,
+      );
       wsSend(ws, {
         type: "error",
         code: ctx.code,
@@ -1418,6 +1424,22 @@ export function createChatRoute(engine: any, hub: any, {
       // 消息之前），让用户实时看到自己发起的任务。
       if (!ss) return;
       emitStreamEvent(sessionPath, ss, { type: "content_block", block: event.block });
+    } else if (event.type === "loop_status") {
+      // 循环状态机变更（start/stop/pause/resume/complete/轮次计数刷新）时由 loop-controller
+      // 经 engine 发出。走 broadcast（非 emitStreamEvent）：循环状态不属于某条流，不应进
+      // stream_resume 缓存。前端写 loopStatusBySession，驱动会话列表徽章与 interlude 按钮态。
+      const loop = event.loop;
+      if (!loop) return;
+      broadcast({
+        type: "loop_status",
+        sessionPath,
+        sessionId: event.target?.sessionId || null,
+        status: loop.status,
+        turnCount: loop.turnCount ?? 0,
+        maxTurns: loop.limits?.maxTurns ?? null,
+        pausedReason: loop.pausedReason ?? null,
+        prompt: loop.prompt ?? null,
+      });
     } else if (event.type === "turn_start") {
       if (!ss) return;
       if (!ss.turnActive) {
@@ -1910,6 +1932,7 @@ export function createChatRoute(engine: any, hub: any, {
               if (!agentId) {
                 // 走到这里说明服务端认不出这个会话的归属、调用方也没带身份——是内部契约被
                 // 破坏，不是用户操作错误。带上 code 让前端换成通用文案，英文原文进详情。
+                log.warn(`ws slash rejected: internal_contract — agent identity unresolved (sessionPath=${sp})`);
                 wsSend(ws, {
                   type: "error",
                   code: "internal_contract",

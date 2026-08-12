@@ -7,6 +7,18 @@
  */
 export const LOOP_TURN_MESSAGE_TYPE = "loop-turn";
 export const LOOP_NOTICE_MESSAGE_TYPE = "loop-notice";
+/**
+ * 循环启动时用户任务 prompt 的展示记录。
+ *
+ * 用 appendCustomEntry 写成 type:"custom"（有 data、无 content）——构建 LLM 上下文时
+ * sessionEntryToContextMessages 只处理 message/custom_message/branch_summary/compaction，
+ * type:"custom" 条目在 buildSessionContext 阶段就被排除 → 这条 prompt 永不进入 model
+ * 输入，无论 reload/compaction 多少次。它只用于在聊天界面把用户发起循环时的任务文本
+ * 显示成一条右侧用户气泡，避免"输入凭空消失"。历史加载层（core/message-utils.ts 的
+ * historyMessageFromEntry）识别此 customType 后直接投影成标准 role:"user" 消息，
+ * 下游分页/find/hub 等消费方按普通用户消息处理，无需各自特判。
+ */
+export const LOOP_USER_PROMPT_MESSAGE_TYPE = "loop-user-prompt";
 
 export function buildLoopKickoffMessage(loop) {
   const { maxTurns, maxConsecutiveFailures } = loop.limits;
@@ -30,7 +42,7 @@ export function buildLoopKickoffMessage(loop) {
     // 结构化保留用户原始 prompt，供历史渲染层（/api/sessions/messages）
     // 提炼成一条用户可见的 interlude 气泡。display:false 只隐藏协议正文，
     // 不影响 details 被读取——否则用户会看到自己输入的任务"凭空消失"。
-    details: { schemaVersion: 1, kind: "kickoff", prompt: loop.prompt },
+    details: { schemaVersion: 1, kind: "kickoff", prompt: loop.prompt, turnCount: loop.turnCount, maxTurns: loop.limits?.maxTurns },
   };
 }
 
@@ -47,7 +59,7 @@ export function buildLoopWakeupMessage(loop, reason) {
     customType: LOOP_TURN_MESSAGE_TYPE,
     content,
     display: false,
-    details: { schemaVersion: 1, kind: "wakeup", prompt: loop.prompt, reason: reason || null },
+    details: { schemaVersion: 1, kind: "wakeup", prompt: loop.prompt, reason: reason || null, turnCount: loop.turnCount, maxTurns: loop.limits?.maxTurns },
   };
 }
 
@@ -110,6 +122,16 @@ export function buildLoopInterludeBlock(message) {
     return null;
   }
 
+  // 优先用结构化轮次（新数据）；旧 loop 消息 details 无 turnCount/maxTurns，wakeup 回退到
+  // 协议正文的 "Progress: loop turn X/Y" 行（kickoff 旧数据无此行 → 无轮次显示，可接受）。
+  const detailsTurnCount = Number.isFinite(details?.turnCount) ? details.turnCount : null;
+  const detailsMaxTurns = Number.isFinite(details?.maxTurns) ? details.maxTurns : null;
+  const progressMatch = rawContent.match(/(?:^|\n)Progress: loop turn (\d+)\/(\d+)/);
+  const turnCount = detailsTurnCount != null ? detailsTurnCount
+    : (progressMatch ? Number(progressMatch[1]) : null);
+  const maxTurns = detailsMaxTurns != null ? detailsMaxTurns
+    : (progressMatch ? Number(progressMatch[2]) : null);
+
   const entryId = typeof message?.id === "string" && message.id.trim() ? message.id.trim() : null;
   const id = entryId
     ? `loop:${entryId}`
@@ -124,5 +146,6 @@ export function buildLoopInterludeBlock(message) {
     id,
     text,
     ...(detailMarkdown ? { detailMarkdown } : {}),
+    ...(Number.isFinite(turnCount) && Number.isFinite(maxTurns) ? { turnCount, maxTurns } : {}),
   };
 }

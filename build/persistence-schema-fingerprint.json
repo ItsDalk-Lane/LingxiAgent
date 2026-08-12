@@ -648,7 +648,7 @@
     ],
     "version": 3
   },
-  "payloadFingerprint": "sha256:369b32aad7c45a1189c03e01c228705eb20cfc9fc9accc486d5922d9d3ef27a2",
+  "payloadFingerprint": "sha256:35a9ed472650d2cb78de2e669c80cdfce99ff907c944decf883aabdfb6d84e9e",
   "registry": [
     {
       "affectedByEpochMigration": true,
@@ -2999,8 +2999,8 @@
   ],
   "review": {
     "classification": "compatible",
-    "compatibilityReason": "Add loop interlude emission (helper + import edges) in session-coordinator; no persisted shape change, DATA_EPOCH unchanged.",
-    "payloadFingerprint": "sha256:369b32aad7c45a1189c03e01c228705eb20cfc9fc9accc486d5922d9d3ef27a2"
+    "compatibilityReason": "loop 可见性改动：loop-user-prompt 复用现有 custom entry 持久化形状（appendCustomEntry），loop_status 仅 WS 瞬态事件；usage/error 记账顺序调整不改任何持久化 schema",
+    "payloadFingerprint": "sha256:35a9ed472650d2cb78de2e669c80cdfce99ff907c944decf883aabdfb6d84e9e"
   },
   "schemas": [
     {
@@ -3414,7 +3414,7 @@
         {
           "contract": "core/session-coordinator.ts Hana metadata extensions",
           "module": "core/session-coordinator.ts",
-          "sourceHash": "sha256:956050e3d514f53ac435bb283a61a06cd24810267aabee748d945716975143ee"
+          "sourceHash": "sha256:393ae00d146110bf65279a7033151aba3e36b3816f066084214240a3244e4b3c"
         },
         {
           "contract": "core/session-jsonl-file.ts repair contract",
@@ -3512,7 +3512,7 @@
       "contract": "bridge index, legacy session metadata, title, and vision sidecar readers",
       "kind": "runtime-contract",
       "module": "core/bridge-session-manager.ts",
-      "sourceHash": "sha256:2f02505741c69ace39457736d4db377d4d2f035e3271d55e36734d13a5e03f0e",
+      "sourceHash": "sha256:34bfe875cb88f8de1780003b90b4dff3ae6b0c6dc9b1d850dce3644fec93d99e",
       "storeId": "session-sidecars"
     },
     {

@@ -3,6 +3,135 @@
   "entries": [
     {
       "schemaVersion": 1,
+      "tag": "v0.1.27",
+      "version": "0.1.27",
+      "previousTag": "v0.1.26",
+      "generatedAt": "2026-08-12T04:57:04.000Z",
+      "noUserFacingChanges": false,
+      "summary": {
+        "zh": "循环任务现在全程可见、可控：气泡上直接显示进度轮次并能暂停/恢复/停止，会话列表有常驻状态徽章，重启应用后状态也不丢；发起循环时你的任务内容会像普通消息一样显示在聊天里，不再凭空消失。",
+        "en": "Loop tasks are now fully visible and controllable: bubbles show turn progress with pause/resume/stop controls, the session list carries a persistent status badge that survives app restarts, and the task you type when starting a loop appears in chat like a normal message instead of vanishing."
+      },
+      "counts": {
+        "feature": 2,
+        "fix": 2,
+        "improvement": 0,
+        "migration": 0
+      },
+      "source": {
+        "owner": "ItsDalk-Lane",
+        "repo": "LingxiAgent",
+        "commitRange": "v0.1.26..HEAD",
+        "releaseUrl": "https://github.com/ItsDalk-Lane/LingxiAgent/releases/tag/v0.1.27",
+        "releaseNotes": ""
+      },
+      "items": [
+        {
+          "id": "feat-loop-visibility-controls",
+          "kind": "feature",
+          "importance": "high",
+          "title": {
+            "zh": "循环任务全程可见、可控制",
+            "en": "Loop tasks are visible and controllable end to end"
+          },
+          "summary": {
+            "zh": "循环任务的进度现在直接显示在气泡上（第几轮、共几轮），气泡上就能暂停、恢复或停止；会话列表为运行中的循环显示常驻徽章，鼠标悬停（或触屏上直接）可以停止它；状态变化实时推送，重启应用后徽章依然在。",
+            "en": "Loop progress now appears right on the bubble (current turn out of total), with pause, resume and stop controls in place; the session list shows a persistent badge for active loops with a stop affordance on hover (always visible on touch); status changes stream in real time and survive app restarts."
+          },
+          "details": [
+            {
+              "zh": "循环气泡显示「第 X / M 轮」，老会话的历史循环消息也能识别。",
+              "en": "Loop bubbles show 'turn X of M', including loop messages from older sessions."
+            },
+            {
+              "zh": "运行中徽章带脉冲动画、已暂停为琥珀色；减少动态效果模式下自动关闭动画。",
+              "en": "The badge pulses while running and turns amber when paused; animations are disabled under reduced-motion."
+            },
+            {
+              "zh": "预览其他会话时，循环控制按钮只作用于它所属的会话，不会误停当前会话的循环。",
+              "en": "When previewing another session, loop controls only act on the session they belong to — they cannot stop the wrong loop."
+            }
+          ],
+          "sources": [
+            {
+              "type": "commit",
+              "ref": "89e02dd8",
+              "title": "feat(loop): loop visibility, controls, and start-prompt bubble"
+            }
+          ]
+        },
+        {
+          "id": "feat-loop-start-prompt-visible",
+          "kind": "feature",
+          "importance": "high",
+          "title": {
+            "zh": "发起循环时输入的任务不再「凭空消失」",
+            "en": "The task you type when starting a loop no longer vanishes"
+          },
+          "summary": {
+            "zh": "以前输入 /loop 加任务内容后，聊天里看不到自己写了什么。现在它会像普通消息一样显示在右侧，重新打开会话也还在；同时它被特殊保存，绝不会被重复发给模型，不会干扰循环的执行。",
+            "en": "Previously, after typing /loop with a task, your input disappeared from chat. It now appears on the right like a normal message and stays after reopening the session; it is stored specially so it is never re-sent to the model or interferes with the loop."
+          },
+          "details": [
+            {
+              "zh": "即使经过会话压缩，模型也不会收到重复的任务内容。",
+              "en": "Even across conversation compaction, the model never receives the task text twice."
+            }
+          ],
+          "sources": [
+            {
+              "type": "commit",
+              "ref": "89e02dd8",
+              "title": "feat(loop): loop visibility, controls, and start-prompt bubble"
+            }
+          ]
+        },
+        {
+          "id": "fix-slash-in-fresh-draft-session",
+          "kind": "fix",
+          "importance": "medium",
+          "title": {
+            "zh": "新会话里直接输入 /loop 等命令不再报「应用内部出了点问题」",
+            "en": "Typing /loop or similar commands in a brand-new session no longer errors"
+          },
+          "summary": {
+            "zh": "在还没发过消息的新会话里直接输入 /loop 之类的命令，以前会提示「应用内部出了点问题」。现在会先把会话建好再执行命令，和正常发消息的行为一致。",
+            "en": "Typing a command like /loop in a session that has no messages yet used to fail with a generic internal error. The session is now created first and the command runs, matching how sending a normal message behaves."
+          },
+          "details": [],
+          "sources": [
+            {
+              "type": "commit",
+              "ref": "89e02dd8",
+              "title": "feat(loop): loop visibility, controls, and start-prompt bubble"
+            }
+          ]
+        },
+        {
+          "id": "fix-usage-error-accounting",
+          "kind": "fix",
+          "importance": "low",
+          "title": {
+            "zh": "模型调用失败时的用量记账更准确",
+            "en": "More accurate usage accounting for failed model calls"
+          },
+          "summary": {
+            "zh": "模型请求失败但返回了部分用量数据时，以前会被记为一次成功调用。现在这类请求会正确记为失败，并保留失败原因，用量与费用统计更真实。",
+            "en": "When a model request failed but still returned partial usage data, it used to be counted as a successful call. Such requests are now correctly recorded as failures with their error reason, making usage and cost statistics more truthful."
+          },
+          "details": [],
+          "sources": [
+            {
+              "type": "commit",
+              "ref": "ab959f23",
+              "title": "fix(usage): record provider errors with precedence over usage"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "schemaVersion": 1,
       "tag": "v0.1.26",
       "version": "0.1.26",
       "previousTag": "v0.1.25",

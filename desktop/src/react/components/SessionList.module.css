@@ -423,6 +423,76 @@
     }
 }
 
+/* 循环任务徽章：running 脉冲、paused 静态琥珀色；hover 出现 × 停止按钮。
+   只在有循环的会话上出现（通常单个），脉冲开销可接受，reduced-motion 下关闭。 */
+.loopBadge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    flex-shrink: 0;
+    margin-left: var(--space-2);
+    color: var(--accent, #b89a7a);
+    font-size: 11px;
+    line-height: 1;
+}
+
+.loopBadgeDot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent, #b89a7a);
+    flex-shrink: 0;
+}
+
+.loopBadgeDot[data-state="running"] {
+    animation: hana-loop-pulse 1.6s ease-in-out infinite;
+}
+
+.loopBadgeDot[data-state="paused"] {
+    background: var(--warning, #c9a14a);
+    opacity: 0.85;
+    animation: none;
+}
+
+.loopBadgeStop {
+    display: none;
+    width: 14px;
+    height: 14px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-size: 12px;
+    line-height: 1;
+    color: var(--text-muted);
+    cursor: pointer;
+    user-select: none;
+}
+
+.loopBadge:hover .loopBadgeStop {
+    display: inline-flex;
+}
+
+/* 触屏（mobile-desktop-root）没有 hover，停止按钮常驻显示，否则移动端够不到停止入口。 */
+:global(.mobile-desktop-root) .loopBadgeStop {
+    display: inline-flex;
+}
+
+.loopBadgeStop:hover {
+    color: var(--danger, #c0473f);
+    background: color-mix(in srgb, var(--danger, #c0473f) 14%, transparent);
+}
+
+@keyframes hana-loop-pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.78); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .loopBadgeDot[data-state="running"] {
+        animation: none;
+    }
+}
+
 /* 浏览器标记 */
 .sessionBrowserBadge {
     display: flex;

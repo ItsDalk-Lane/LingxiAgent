@@ -6411,6 +6411,11 @@
         },
         {
           "root": "server-bootstrap",
+          "from": "core/message-utils.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
           "from": "core/session-coordinator.ts",
           "kind": "import-statement"
         },
@@ -6420,7 +6425,7 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by lib/loop/loop-controller.ts (import-statement); core/session-coordinator.ts (import-statement); server/routes/sessions.ts (import-statement)."
+      "reason": "Reached via esbuild source module graph, imported by lib/loop/loop-controller.ts (import-statement); core/message-utils.ts (import-statement); core/session-coordinator.ts (import-statement); +1 more importer(s)."
     },
     {
       "path": "lib/loop/loop-store.ts",

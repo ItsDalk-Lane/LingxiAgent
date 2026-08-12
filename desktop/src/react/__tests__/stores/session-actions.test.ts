@@ -1651,6 +1651,88 @@ function mockPermissionDefault(mode = 'ask') {
     });
   });
 
+  describe('loadSessions 冷启动循环状态注入', () => {
+    it('只把带 loopStatus 的会话注入 loopStatusBySession', async () => {
+      Object.assign(mockState, {
+        currentSessionId: 'sess_b',
+        currentSessionPath: '/session/b.jsonl',
+        pendingNewSession: false,
+        pendingSessionSwitchPath: null,
+        loopStatusBySession: {},
+      });
+      mockFetch.mockResolvedValueOnce(jsonResponse([
+        {
+          path: '/session/a.jsonl',
+          sessionId: 'sess_a',
+          loopStatus: { status: 'running', turnCount: 2, maxTurns: 50, pausedReason: null, prompt: 'x' },
+        },
+        { path: '/session/b.jsonl', sessionId: 'sess_b' },
+      ]));
+
+      await loadSessions();
+
+      expect(mockState.loopStatusBySession).toEqual({
+        sess_a: { status: 'running', turnCount: 2, maxTurns: 50, pausedReason: null, prompt: 'x' },
+      });
+    });
+
+    it('列表里没有 loopStatus 时旧 key 被全量替换清掉', async () => {
+      Object.assign(mockState, {
+        currentSessionId: 'sess_b',
+        currentSessionPath: '/session/b.jsonl',
+        pendingNewSession: false,
+        pendingSessionSwitchPath: null,
+        // 上一轮 WS 增量留下的运行态，这次列表快照里循环已结束
+        loopStatusBySession: {
+          sess_a: { status: 'running', turnCount: 2, maxTurns: 50, pausedReason: null, prompt: 'x' },
+        },
+      });
+      mockFetch.mockResolvedValueOnce(jsonResponse([
+        { path: '/session/a.jsonl', sessionId: 'sess_a' },
+        { path: '/session/b.jsonl', sessionId: 'sess_b' },
+      ]));
+
+      await loadSessions();
+
+      expect(mockState.loopStatusBySession).toEqual({});
+    });
+
+    it('再次 loadSessions 用新列表快照全量替换，不保留已下线会话的状态', async () => {
+      Object.assign(mockState, {
+        currentSessionId: 'sess_b',
+        currentSessionPath: '/session/b.jsonl',
+        pendingNewSession: false,
+        pendingSessionSwitchPath: null,
+        loopStatusBySession: {},
+      });
+      mockFetch.mockResolvedValueOnce(jsonResponse([
+        {
+          path: '/session/a.jsonl',
+          sessionId: 'sess_a',
+          loopStatus: { status: 'paused', turnCount: 5, maxTurns: null, pausedReason: 'manual', prompt: null },
+        },
+        { path: '/session/b.jsonl', sessionId: 'sess_b' },
+      ]));
+      await loadSessions();
+      expect(mockState.loopStatusBySession).toEqual({
+        sess_a: { status: 'paused', turnCount: 5, maxTurns: null, pausedReason: 'manual', prompt: null },
+      });
+
+      mockFetch.mockResolvedValueOnce(jsonResponse([
+        {
+          path: '/session/c.jsonl',
+          sessionId: 'sess_c',
+          loopStatus: { status: 'running', turnCount: 0, maxTurns: 10, pausedReason: null, prompt: 'y' },
+        },
+        { path: '/session/b.jsonl', sessionId: 'sess_b' },
+      ]));
+      await loadSessions();
+      expect(mockState.loopStatusBySession).toEqual({
+        sess_c: { status: 'running', turnCount: 0, maxTurns: 10, pausedReason: null, prompt: 'y' },
+      });
+    });
+  });
+
   describe('switchSession 的 hasData 语义（#405 直接回归）', () => {
     it('点回已提交的当前 session 会取消在途切换，旧响应不能把焦点切走', async () => {
       Object.assign(mockState, {

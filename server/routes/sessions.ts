@@ -932,6 +932,19 @@ export function createSessionsRoute(engine, hub = null) {
               title: s.title || null,
             }
             : null,
+          loopStatus: (() => {
+            // 冷启动循环状态：只对 running/paused 注入，让会话列表常驻显示循环徽章；
+            // stopped/completed 不注入（避免历史会话残留）。运行时变更靠 loop_status WS 增量。
+            const rec = engine.loopController?.toolStatus(s.path);
+            if (!rec || (rec.status !== "running" && rec.status !== "paused")) return null;
+            return {
+              status: rec.status,
+              turnCount: rec.turnCount ?? 0,
+              maxTurns: rec.limits?.maxTurns ?? null,
+              pausedReason: rec.pausedReason ?? null,
+              prompt: rec.prompt ?? null,
+            };
+          })(),
         });
       }));
     } catch (err) {
@@ -1628,6 +1641,14 @@ export function createSessionsRoute(engine, hub = null) {
             );
           }
           if (m.customType === LOOP_TURN_MESSAGE_TYPE || m.customType === LOOP_NOTICE_MESSAGE_TYPE) {
+            if (m.customType === LOOP_TURN_MESSAGE_TYPE) {
+              // kickoff/wakeup 协议消息才是驱动 loop 轮的输入，但它不是合法重试目标
+              // （isSessionTurnInputEntry 为 false）。指针不能停在 loop-user-prompt（custom
+              // 条目，重试必报错）或 /loop 之前的真实用户消息（重试会裁掉整个循环）——
+              // 置 null，让其后每个 loop 轮 assistant 回复不带 turnInputEntryId（无重试入口）。
+              latestTurnInputEntryId = null;
+              latestTurnInputVisible = false;
+            }
             recordLoopInterlude(m, afterIndex, sourceIndex);
           }
         }

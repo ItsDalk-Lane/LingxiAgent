@@ -294,14 +294,6 @@ function recordBridgeAssistantUsage({ ledger, event, sessionPath, agent, model, 
     modelId: model?.id ?? null,
     api: model?.api ?? null,
   };
-  if (event.message?.usage) {
-    return ledger.record({
-      model: modelMeta,
-      usage: event.message.usage,
-      usageContext,
-      costRates: model?.cost,
-    });
-  }
   const errorMessage = getProviderMessageEndError(event);
   if (errorMessage) {
     const request = ledger.start({
@@ -310,6 +302,14 @@ function recordBridgeAssistantUsage({ ledger, event, sessionPath, agent, model, 
       costRates: model?.cost,
     });
     return ledger.recordError(request.requestId, new Error(errorMessage));
+  }
+  if (event.message?.usage) {
+    return ledger.record({
+      model: modelMeta,
+      usage: event.message.usage,
+      usageContext,
+      costRates: model?.cost,
+    });
   }
   return null;
 }

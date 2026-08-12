@@ -1760,3 +1760,99 @@ describe('ws-message-handler error presentation', () => {
     warn.mockRestore();
   });
 });
+
+describe('ws-message-handler loop_status', () => {
+  beforeEach(() => {
+    useStore.setState({
+      currentSessionPath: null,
+      pendingNewSession: false,
+      sessions: [],
+      sessionLocatorsById: {},
+      loopStatusBySession: {},
+    } as never);
+  });
+
+  it('loop_status 消息把完整字段写入 loopStatusBySession', () => {
+    handleServerMessage({
+      type: 'loop_status',
+      sessionId: 's1',
+      sessionPath: '/p',
+      status: 'running',
+      turnCount: 2,
+      maxTurns: 50,
+      pausedReason: null,
+      prompt: 'x',
+    });
+
+    expect(useStore.getState().loopStatusBySession.s1).toEqual({
+      status: 'running',
+      turnCount: 2,
+      maxTurns: 50,
+      pausedReason: null,
+      prompt: 'x',
+    });
+  });
+
+  it('loop_status 缺省字段归一化为 0 / null', () => {
+    handleServerMessage({
+      type: 'loop_status',
+      sessionId: 's1',
+      sessionPath: '/p',
+      status: 'paused',
+    });
+
+    expect(useStore.getState().loopStatusBySession.s1).toEqual({
+      status: 'paused',
+      turnCount: 0,
+      maxTurns: null,
+      pausedReason: null,
+      prompt: null,
+    });
+  });
+
+  it('stopped / completed 消息清除该会话的 key，避免徽章残留', () => {
+    handleServerMessage({
+      type: 'loop_status',
+      sessionId: 's1',
+      sessionPath: '/p',
+      status: 'running',
+      turnCount: 2,
+      maxTurns: 50,
+    });
+    expect(useStore.getState().loopStatusBySession.s1).toBeDefined();
+
+    handleServerMessage({
+      type: 'loop_status',
+      sessionId: 's1',
+      sessionPath: '/p',
+      status: 'stopped',
+    });
+    expect(useStore.getState().loopStatusBySession.s1).toBeUndefined();
+
+    handleServerMessage({
+      type: 'loop_status',
+      sessionId: 's1',
+      sessionPath: '/p',
+      status: 'paused',
+      turnCount: 3,
+    });
+    handleServerMessage({
+      type: 'loop_status',
+      sessionId: 's1',
+      sessionPath: '/p',
+      status: 'completed',
+    });
+    expect(useStore.getState().loopStatusBySession).toEqual({});
+  });
+
+  it('无 sessionId 的 loop_status 消息不写 store', () => {
+    handleServerMessage({
+      type: 'loop_status',
+      status: 'running',
+      turnCount: 1,
+      maxTurns: 10,
+    });
+
+    expect(useStore.getState().loopStatusBySession).toEqual({});
+  });
+});
