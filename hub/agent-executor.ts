@@ -126,14 +126,6 @@ function recordAgentPhoneAssistantUsage({
     },
   };
   const modelMeta = agentPhoneModelMetaForUsage(event.message, model);
-  if (event.message?.usage) {
-    return ledger.record?.({
-      model: modelMeta,
-      usage: event.message.usage,
-      usageContext,
-      costRates: model?.cost,
-    });
-  }
   const errorMessage = event.message?.errorMessage || event.message?.error?.message || null;
   if (event.message?.stopReason === "error" || errorMessage) {
     const request = ledger.start?.({
@@ -142,6 +134,14 @@ function recordAgentPhoneAssistantUsage({
       costRates: model?.cost,
     });
     return ledger.recordError?.(request?.requestId, new Error(errorMessage || "provider request failed"));
+  }
+  if (event.message?.usage) {
+    return ledger.record?.({
+      model: modelMeta,
+      usage: event.message.usage,
+      usageContext,
+      costRates: model?.cost,
+    });
   }
   return null;
 }

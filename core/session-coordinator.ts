@@ -572,14 +572,6 @@ function recordAssistantUsage({ ledger, event, sessionPath, sessionId, agentId, 
       sessionPath,
     },
   };
-  if (event.message?.usage) {
-    return ledger.record({
-      model: modelMeta,
-      usage: event.message.usage,
-      usageContext,
-      costRates,
-    });
-  }
   const errorMessage = event.message?.errorMessage || event.message?.error?.message || null;
   if (event.message?.stopReason === "error" || errorMessage) {
     const request = ledger.start({
@@ -588,6 +580,14 @@ function recordAssistantUsage({ ledger, event, sessionPath, sessionId, agentId, 
       costRates,
     });
     return ledger.recordError(request.requestId, new Error(errorMessage || "provider request failed"));
+  }
+  if (event.message?.usage) {
+    return ledger.record({
+      model: modelMeta,
+      usage: event.message.usage,
+      usageContext,
+      costRates,
+    });
   }
   return null;
 }
