@@ -1360,6 +1360,7 @@
       "updateDownloadingVersion": "v{version} 다운로드 중…",
       "updateReady": "v{version} 다운로드 완료",
       "updatePreparing": "업데이트 준비 중…",
+      "updateInstalling": "업데이트를 설치하는 중입니다. 곧 재시작합니다…",
       "updateAutoFailed": "자동 업데이트 실패. 수동으로 다운로드하세요.",
       "updateDownloadManual": "수동 다운로드",
       "updateDmgHint": "DMG에서 실행 중일 때는 자동 업데이트를 사용할 수 없습니다. 다운로드 후 재설치하세요.",

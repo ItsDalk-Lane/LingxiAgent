@@ -1,0 +1,8 @@
+# 开发环境用的 electron-updater feed 配置。
+# 打包构建由 electron-builder 从 package.json 的 publish 字段自动生成 app-update.yml。
+# 这个文件仅在 !app.isPackaged 时被 auto-updater.cjs 的 nativeUpdateConfigPath() 读取，
+# 读取路径是 app.getAppPath()/dev-app-update.yml——必须放在应用根目录（package.json 旁），
+# 放 desktop/ 下不会被找到。打包 files 白名单不含它，不会进产物。
+provider: github
+owner: ItsDalk-Lane
+repo: LingxiAgent

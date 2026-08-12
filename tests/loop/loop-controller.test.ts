@@ -74,6 +74,45 @@ describe("start / 记账 / 守恒", () => {
     expect(delivered[0][1].details.kind).toBe("kickoff");
   });
 
+  it("kickoff 投递尚未完成时，running 状态已推给前端（不等投递结果）", async () => {
+    let release: () => void;
+    const gate = new Promise<void>((res) => { release = res; });
+    const { controller, statusEvents } = makeHarness({
+      deliverLoopMessage: vi.fn(async () => { await gate; return { ok: true, mode: "triggerTurn" }; }),
+    });
+    const pending = controller.start(D, "t");
+    for (let i = 0; i < 20 && statusEvents.length === 0; i++) await Promise.resolve();
+    // kickoff 还卡在投递里，但前端必须已经收到 running——这就是本次修复钉住的行为
+    expect(statusEvents).toContainEqual([D, "running"]);
+    release!();
+    await pending;
+  });
+
+  it("kickoff 撞上会话换代：循环被收尾 stopped，错误原样抛出", async () => {
+    const { controller, store, statusEvents } = makeHarness({
+      deliverLoopMessage: vi.fn(async () => {
+        const err: any = new Error("target session was reset");
+        err.code = "loop_target_reset";
+        throw err;
+      }),
+    });
+    await expect(controller.start(D, "t")).rejects.toMatchObject({ code: "loop_target_reset" });
+    // 与 resume 对齐：不能留下"徽章亮着但目标已死"的僵尸 running
+    expect(store.get(DK).status).toBe("stopped");
+    expect(store.get(DK).pausedReason).toBe("session_reset");
+    expect(statusEvents).toEqual([[D, "running"], [D, "stopped"]]);
+  });
+
+  it("kickoff 普通投递失败：错误抛出，循环保持 running 交由用户处置", async () => {
+    const { controller, store, statusEvents } = makeHarness({
+      deliverLoopMessage: vi.fn(async () => { throw new Error("network down"); }),
+    });
+    await expect(controller.start(D, "t")).rejects.toThrow("network down");
+    // 非换代失败不做自动收尾：前端已知情（running 已推送），用户可 /loop stop
+    expect(store.get(DK).status).toBe("running");
+    expect(statusEvents).toEqual([[D, "running"]]);
+  });
+
   it("counts only loop-triggered turns against the budget", async () => {
     const { controller, store } = makeHarness();
     await controller.start(D, "t");

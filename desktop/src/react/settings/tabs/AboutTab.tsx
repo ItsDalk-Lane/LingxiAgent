@@ -211,7 +211,20 @@ function ReleaseUpdateArea({
     );
   }
 
-  // auto-updater 出错（非 DMG 场景）：提供浏览器手动下载 fallback
+  // 安装中：quitAndInstall 已触发，应用即将重启。必须有专属分支——否则会
+  // 掉回 release 区，installing 期间露出「立即更新」按钮被重复触发。
+  if (shellUpdate?.status === 'installing') {
+    return (
+      <div className={updateStyles.root}>
+        <div className={updateStyles.row}>
+          <span className={updateStyles.message}>{t('settings.about.updateInstalling')}</span>
+        </div>
+      </div>
+    );
+  }
+
+  // auto-updater 出错（非 DMG 场景）：给「重试」再走一次自动更新，外加浏览器
+  // 手动下载 fallback——出错不等于自动通道永久不可用，不该只剩手动一条路。
   if (shellUpdate?.status === 'error' && shellUpdate.error !== 'running_from_dmg') {
     return (
       <div className={updateStyles.root}>
@@ -219,6 +232,9 @@ function ReleaseUpdateArea({
           <span className={`${updateStyles.message} ${updateStyles.error}`}>
             {t('settings.about.updateAutoFailed')}
           </span>
+          <button type="button" className={updateStyles.action} onClick={onStartUpdate}>
+            {t('settings.about.updateRetryBtn')}
+          </button>
           <button type="button" className={updateStyles.action} onClick={onFallbackDownload}>
             {t('settings.about.updateDownloadManual')}
           </button>

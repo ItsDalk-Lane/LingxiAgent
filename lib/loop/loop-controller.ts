@@ -103,7 +103,17 @@ export class LoopController {
       this._log.warn?.(`[loop] record user prompt failed for ${key}: ${err?.message}`);
     }
     const loop = this._store.get(key);
-    await this._injectLoopTurn(key, target, buildLoopKickoffMessage(loop));
+    try {
+      await this._injectLoopTurn(key, target, buildLoopKickoffMessage(loop));
+    } catch (err: any) {
+      // 与 resume 同一处理：kickoff 撞上会话换代时不能让循环留在 running 空转——
+      // running 状态已在 inject 前推给前端，不收尾就是"徽章亮着但目标已死"的僵尸
+      // 循环。终止后原样抛错，/loop start 的调用方要如实看到失败。
+      if (err?.code === "loop_target_reset") {
+        await this._stopForReset(key);
+      }
+      throw err;
+    }
     return this._store.get(key);
   }
 

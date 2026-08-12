@@ -1360,6 +1360,7 @@
       "updateDownloadingVersion": "v{version} をダウンロード中…",
       "updateReady": "v{version} のダウンロード完了",
       "updatePreparing": "アップデートを準備中…",
+      "updateInstalling": "アップデートをインストールしています。まもなく再起動します…",
       "updateAutoFailed": "自動更新に失敗しました。手動でダウンロードしてください。",
       "updateDownloadManual": "手動ダウンロード",
       "updateDmgHint": "DMGから実行している場合は自動更新できません。ダウンロードして再インストールしてください。",

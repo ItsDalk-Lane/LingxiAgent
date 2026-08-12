@@ -253,6 +253,33 @@ describe('AboutTab', () => {
     expect(openExternal).toHaveBeenCalledWith('https://github.com/ItsDalk-Lane/LingxiAgent/releases/tag/v0.2.0');
   });
 
+  it('shell error: offers a retry button that re-triggers autoUpdateCheck', () => {
+    const autoUpdateCheck = vi.fn();
+    installHana({ autoUpdateCheck });
+    useSettingsStore.setState({ settingsConfig: { auto_check_updates: true, update_channel: 'stable' } });
+    releaseOverride = { ...DEFAULT_RELEASE_OVERRIDE, status: 'available', latestVersion: '0.2.0', releaseUrl: null };
+    shellUpdateStateOverride = { ...IDLE_SHELL_STATE, status: 'error', error: 'network error' };
+
+    render(<AboutTab />);
+
+    fireEvent.click(screen.getByText('settings.about.updateRetryBtn'));
+    expect(autoUpdateCheck).toHaveBeenCalledTimes(1);
+  });
+
+  it('installing: shows the installing message and hides the update-now button', () => {
+    installHana();
+    useSettingsStore.setState({ settingsConfig: { auto_check_updates: true, update_channel: 'stable' } });
+    releaseOverride = { ...DEFAULT_RELEASE_OVERRIDE, status: 'available', latestVersion: '0.2.0', releaseUrl: null };
+    shellUpdateStateOverride = { ...IDLE_SHELL_STATE, status: 'installing', version: '0.2.0' };
+
+    render(<AboutTab />);
+
+    expect(screen.getByText('settings.about.updateInstalling')).toBeTruthy();
+    // installing 期间绝不能掉回 release 区露出「立即更新」被重复触发
+    expect(screen.queryByText('settings.about.updateNow')).toBeNull();
+    expect(screen.queryByText('settings.about.updateCheckBtn')).toBeNull();
+  });
+
   it('shell error: falls back to releases/latest page when releaseUrl is missing', () => {
     const openExternal = vi.fn();
     installHana({ openExternal });

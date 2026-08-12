@@ -1430,6 +1430,7 @@
       "updateDownloadingVersion": "正在下载 v{version}…",
       "updateReady": "v{version} 已下载完毕",
       "updatePreparing": "正在准备更新…",
+      "updateInstalling": "正在安装更新，应用即将重启…",
       "updateAutoFailed": "自动更新失败，请手动下载",
       "updateDownloadManual": "手动下载",
       "updateDmgHint": "从 DMG 运行时无法自动更新，请下载后重新安装",

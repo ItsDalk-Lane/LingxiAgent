@@ -1430,6 +1430,7 @@
       "updateDownloadingVersion": "Downloading v{version}…",
       "updateReady": "v{version} downloaded",
       "updatePreparing": "Preparing update…",
+      "updateInstalling": "Installing update, the app will restart…",
       "updateAutoFailed": "Auto-update failed. Please download manually.",
       "updateDownloadManual": "Download manually",
       "updateDmgHint": "Auto-update is unavailable when running from a DMG. Please download and reinstall.",
