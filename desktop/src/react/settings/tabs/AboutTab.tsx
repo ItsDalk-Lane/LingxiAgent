@@ -13,7 +13,7 @@ import { digestLocale, digestText, kindLabel } from '../../components/shared/rel
 import { useAutoUpdateState } from '../../hooks/use-auto-update-state';
 import { useReleaseCheck } from '../../hooks/use-release-check';
 import { ConfirmDialog, Overlay } from '../../ui';
-import type { InviteChannelStatus, UpdateDigestHistoryResult } from '../../types';
+import type { AutoUpdateState, InviteChannelStatus, UpdateDigestHistoryResult } from '../../types';
 import appIconUrl from '../../../icon.png';
 import styles from '../Settings.module.css';
 import updateStyles from '../../components/AutoUpdateStatus.module.css';
@@ -132,31 +132,103 @@ function formatCheckedAt(iso: string): string {
 }
 
 /**
- * 更新区状态机：GitHub Release 检测的呈现层。
+ * 更新区状态机：GitHub Release 检测 + electron-updater 自动下载安装。
  *
- * 与旧的 TrainUpdateArea 的根本区别——这里不再有任何"下载/应用中"的中间
- * 态，因为这个渠道本身就是"查到新版本 → 跳浏览器手动下载安装"，应用内不
- * 下载字节。三态互斥：checking（请求中）/ available（有新版，露"下载最新
- * 版本"按钮）/ latest（已是最新）/ error（失败，带重试）。失败态不会像 OTA
- * 那样残留在 ota-state.json 永不清除——每次 check 都是即时网络结果。
+ * 两层优先级：
+ *   1. shellUpdate 活跃时（checking/downloading/downloaded/error）优先展示
+ *      自动下载安装进度，用户在应用内完成更新，无需打开浏览器。
+ *   2. shellUpdate 不活跃时回退到 release check 结果：available 给「立即更新」
+ *      按钮触发 autoUpdateCheck；latest/error 各自展示对应文案。
+ *
+ * Fallback：auto-updater 出错（如网络异常、签名不匹配）或 macOS 从 DMG 运行
+ * 时，自动下载不可用，回退为浏览器手动下载。
  */
 function ReleaseUpdateArea({
   status,
   latestVersion,
-  releaseUrl,
   error,
   lastCheckedAt,
-  onDownload,
+  shellUpdate,
+  onStartUpdate,
+  onInstallShell,
+  onFallbackDownload,
   onRetry,
 }: {
   status: 'idle' | 'checking' | 'latest' | 'available' | 'error';
   latestVersion?: string;
-  releaseUrl?: string | null;
   error?: string;
   lastCheckedAt: string | null;
-  onDownload: () => void;
+  shellUpdate: AutoUpdateState | null;
+  onStartUpdate: () => void;
+  onInstallShell: () => void;
+  onFallbackDownload: () => void;
   onRetry: () => void;
 }) {
+  // ── shell update 活跃态优先 ──
+
+  // 下载中：进度条
+  if (shellUpdate?.status === 'downloading') {
+    const percent = shellUpdate.progress?.percent ?? 0;
+    return (
+      <div className={updateStyles.root}>
+        <div className={updateStyles.column}>
+          <div className={updateStyles.downloadHeader}>
+            <span className={updateStyles.message}>
+              {t('settings.about.updateDownloadingVersion', { version: shellUpdate.version || latestVersion })}
+            </span>
+            <span className={updateStyles.progressValue}>{percent}%</span>
+          </div>
+          <progress className={updateStyles.nativeProgress} value={percent} max={100} />
+        </div>
+      </div>
+    );
+  }
+
+  // 已下载就绪：重启安装
+  if (shellUpdate?.status === 'downloaded') {
+    return (
+      <div className={updateStyles.root}>
+        <div className={updateStyles.row}>
+          <span className={updateStyles.message}>
+            {t('settings.about.updateReady', { version: shellUpdate.version || latestVersion })}
+          </span>
+          <button type="button" className={updateStyles.action} onClick={onInstallShell}>
+            {t('settings.about.updateInstall')}
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // auto-updater 正在检查或准备下载
+  if (shellUpdate?.status === 'checking' || shellUpdate?.status === 'available') {
+    return (
+      <div className={updateStyles.root}>
+        <div className={updateStyles.row}>
+          <span className={updateStyles.message}>{t('settings.about.updatePreparing')}</span>
+        </div>
+      </div>
+    );
+  }
+
+  // auto-updater 出错（非 DMG 场景）：提供浏览器手动下载 fallback
+  if (shellUpdate?.status === 'error' && shellUpdate.error !== 'running_from_dmg') {
+    return (
+      <div className={updateStyles.root}>
+        <div className={updateStyles.row}>
+          <span className={`${updateStyles.message} ${updateStyles.error}`}>
+            {t('settings.about.updateAutoFailed')}
+          </span>
+          <button type="button" className={updateStyles.action} onClick={onFallbackDownload}>
+            {t('settings.about.updateDownloadManual')}
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // ── release check 状态（shell update 未活跃时）──
+
   if (status === 'checking') {
     return (
       <div className={updateStyles.root}>
@@ -168,18 +240,36 @@ function ReleaseUpdateArea({
   }
 
   if (status === 'available') {
+    // macOS 从 DMG 直接运行时 auto-updater 不可用，直接给浏览器下载
+    if (shellUpdate?.error === 'running_from_dmg') {
+      return (
+        <div className={updateStyles.root}>
+          <div className={updateStyles.row}>
+            <span className={updateStyles.message}>
+              {t('settings.about.updateAvailableGithub', { version: latestVersion })}
+            </span>
+            <button type="button" className={updateStyles.action} onClick={onFallbackDownload}>
+              {t('settings.about.updateDownloadManual')}
+            </button>
+          </div>
+          <div className={updateStyles.row}>
+            <span className={updateStyles.message}>{t('settings.about.updateDmgHint')}</span>
+          </div>
+        </div>
+      );
+    }
     return (
       <div className={updateStyles.root}>
         <div className={updateStyles.row}>
           <span className={updateStyles.message}>
             {t('settings.about.updateAvailableGithub', { version: latestVersion })}
           </span>
-          <button type="button" className={updateStyles.action} onClick={onDownload}>
-            {t('settings.about.updateDownloadLatest')}
+          <button type="button" className={updateStyles.action} onClick={onStartUpdate}>
+            {t('settings.about.updateNow')}
           </button>
         </div>
         <div className={updateStyles.row}>
-          <span className={updateStyles.message}>{t('settings.about.updateDownloadHint')}</span>
+          <span className={updateStyles.message}>{t('settings.about.updateAutoHint')}</span>
         </div>
       </div>
     );
@@ -423,9 +513,15 @@ export function AboutTab() {
     void checkReleaseNow();
   }, [checkReleaseNow]);
 
-  // 「下载最新版本」：在系统浏览器打开 release 页面，用户自己选对应平台
-  // 的安装包下载后手动安装。releaseUrl 缺失时回退到 releases/latest 总入口。
-  const handleDownloadLatest = useCallback(() => {
+  // 「立即更新」：触发 electron-updater 自动下载安装。auto-updater 检测到
+  // 新版本后自动下载，下载完成在 ReleaseUpdateArea 展示「重启更新」按钮。
+  const handleStartUpdate = useCallback(() => {
+    void hana?.autoUpdateCheck?.();
+  }, [hana]);
+
+  // Fallback：自动更新不可用时（网络异常 / macOS DMG 运行），在浏览器打开
+  // release 页面让用户手动下载安装。
+  const handleFallbackDownload = useCallback(() => {
     const url = releaseUrl || RELEASES_LATEST_PAGE_URL;
     void hana?.openExternal?.(url);
   }, [hana, releaseUrl]);
@@ -458,22 +554,19 @@ export function AboutTab() {
     await loadSettingsConfig();
   }, []);
 
-  // 平台（壳）更新条件行：仅当壳更新已下载待安装时出现，平时不渲染——一个
-  // 一年两次的事件不该常年占一行。这是唯一还会触发壳安装
-  // （autoUpdateInstall）的地方。
-  const showPlatformRow = shellUpdate?.status === 'downloaded';
-  const platformRowLabel = t('settings.about.shellStickerTitle');
-
-  // 检查中、已发现新版本（有专属"下载"按钮）、或失败态（有"重试"按钮）时，
-  // 这颗通用检查按钮就是多余的。只在 idle/latest 态出现。
-  const showCheckButton = releaseStatus === 'idle' || releaseStatus === 'latest';
+  // shell update 活跃时（checking/downloading/downloaded/error）隐藏通用
+  // 检查按钮——ReleaseUpdateArea 已经在展示对应状态。
+  const shellActive = shellUpdate != null
+    && shellUpdate.status !== 'idle'
+    && shellUpdate.status !== 'latest';
+  const showCheckButton = (releaseStatus === 'idle' || releaseStatus === 'latest') && !shellActive;
 
   return (
     <div className={`${styles['settings-tab-content']} ${styles['active']}`} data-tab="about">
       {/* Hero：版本号用 app.getVersion()（产品/壳版本，如 0.1.2），单一源、
           无歧义；上游版本 0.442.0 作为 Info 区独立信息行展示，不混进 Hero。
-          更新检测走 GitHub Releases（ReleaseUpdateArea）：查到新版本就给
-          「下载最新版本」按钮，跳浏览器手动下载安装，不依赖 OTA 签名通道。 */}
+          更新检测走 GitHub Releases（ReleaseUpdateArea）：查到新版本给「立即
+          更新」按钮触发 auto-updater 自动下载安装，不再跳浏览器。 */}
       <div className={styles['about-hero']}>
         <img className={styles['about-icon']} src={appIconUrl} alt="LingxiAgent" />
         <div className={styles['about-name']}>LingxiAgent</div>
@@ -482,10 +575,12 @@ export function AboutTab() {
         <ReleaseUpdateArea
           status={releaseStatus}
           latestVersion={latestVersion}
-          releaseUrl={releaseUrl}
           error={releaseError}
           lastCheckedAt={releaseLastCheckedAt}
-          onDownload={handleDownloadLatest}
+          shellUpdate={shellUpdate}
+          onStartUpdate={handleStartUpdate}
+          onInstallShell={handleInstallShell}
+          onFallbackDownload={handleFallbackDownload}
           onRetry={handleCheck}
         />
         <div className={styles['about-update-actions']}>
@@ -500,8 +595,7 @@ export function AboutTab() {
         </div>
       </div>
 
-      {/* Info：标准 row（license / copyright / auto-check / beta toggle）+
-          仅在壳更新待命时出现的条件行 */}
+      {/* Info：标准 row（license / copyright / auto-check / beta toggle） */}
       <SettingsSection>
         <SettingsRow
           label={t('settings.about.license')}
@@ -535,17 +629,6 @@ export function AboutTab() {
           label={t('settings.about.betaUpdates')}
           control={<Toggle on={isBeta} onChange={handleBetaToggle} />}
         />
-        {showPlatformRow && (
-          <SettingsRow
-            label={platformRowLabel}
-            hint={shellUpdate?.version ? `v${shellUpdate.version}` : undefined}
-            control={
-              <button type="button" className={styles['about-check-update-btn']} onClick={handleInstallShell}>
-                {t('settings.about.updateInstall')}
-              </button>
-            }
-          />
-        )}
       </SettingsSection>
 
       <InviteChannelSection />

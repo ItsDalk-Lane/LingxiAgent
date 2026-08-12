@@ -6,10 +6,26 @@ import React from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 
-let shellUpdateStateOverride: { status: string; version?: string | null } | null = null;
+import type { AutoUpdateState } from '../../../types';
+
+const IDLE_SHELL_STATE: AutoUpdateState = {
+  status: 'idle',
+  version: null,
+  releaseNotes: null,
+  releaseUrl: null,
+  downloadUrl: null,
+  progress: null,
+  error: null,
+  digest: null,
+  digestUrl: null,
+  digestError: null,
+  updateSource: null,
+};
+
+let shellUpdateStateOverride: AutoUpdateState | null = null;
 
 vi.mock('../../../hooks/use-auto-update-state', () => ({
-  useAutoUpdateState: () => shellUpdateStateOverride ?? { status: 'idle' },
+  useAutoUpdateState: (): AutoUpdateState => shellUpdateStateOverride ?? IDLE_SHELL_STATE,
 }));
 
 const checkReleaseNow = vi.fn();
@@ -97,7 +113,6 @@ afterEach(() => {
 function installHana(overrides: Record<string, unknown> = {}) {
   vi.stubGlobal('window', Object.assign(window, {
     hana: {
-      // Hero 版本号走 getAppVersion（app.getVersion()），不再是列车内容版本。
       getAppVersion: vi.fn().mockResolvedValue('0.1.2'),
       autoUpdateCheck: vi.fn(),
       autoUpdateInstall: vi.fn(),
@@ -174,34 +189,33 @@ describe('AboutTab', () => {
     expect(screen.getByText('v0.1.2')).toBeTruthy();
   });
 
-  it('does not render the platform-update row when no shell update is pending', () => {
+  it('does not render the install button when no shell update is pending', () => {
     installHana();
     useSettingsStore.setState({ settingsConfig: { auto_check_updates: true, update_channel: 'stable' } });
-    shellUpdateStateOverride = { status: 'idle' };
+    shellUpdateStateOverride = { ...IDLE_SHELL_STATE };
 
     render(<AboutTab />);
 
-    expect(screen.queryByText('settings.about.shellStickerTitle')).toBeNull();
+    expect(screen.queryByText('settings.about.updateInstall')).toBeNull();
+    expect(screen.queryByText('settings.about.updateReady')).toBeNull();
   });
 
-  it('renders the platform-update row only while a shell update is downloaded, and wires it to autoUpdateInstall', () => {
+  it('shows the install button in ReleaseUpdateArea while a shell update is downloaded, wired to autoUpdateInstall', () => {
     const autoUpdateInstall = vi.fn();
     installHana({ autoUpdateInstall });
     useSettingsStore.setState({ settingsConfig: { auto_check_updates: true, update_channel: 'stable' } });
-    shellUpdateStateOverride = { status: 'downloaded', version: '2.0.0' };
+    shellUpdateStateOverride = { ...IDLE_SHELL_STATE, status: 'downloaded', version: '2.0.0' };
 
     render(<AboutTab />);
 
-    expect(screen.getByText('settings.about.shellStickerTitle')).toBeTruthy();
-    expect(screen.getByText('v2.0.0')).toBeTruthy();
-
+    expect(screen.getByText('settings.about.updateReady')).toBeTruthy();
     fireEvent.click(screen.getByText('settings.about.updateInstall'));
     expect(autoUpdateInstall).toHaveBeenCalledTimes(1);
   });
 
-  it('available: shows the "new version available" headline with a "download latest" button that calls openExternal', async () => {
-    const openExternal = vi.fn();
-    installHana({ openExternal });
+  it('available: shows "Update now" button that triggers autoUpdateCheck', () => {
+    const autoUpdateCheck = vi.fn();
+    installHana({ autoUpdateCheck });
     useSettingsStore.setState({ settingsConfig: { auto_check_updates: true, update_channel: 'stable' } });
     releaseOverride = {
       ...DEFAULT_RELEASE_OVERRIDE,
@@ -213,24 +227,77 @@ describe('AboutTab', () => {
     render(<AboutTab />);
 
     expect(screen.getByText('settings.about.updateAvailableGithub')).toBeTruthy();
-    fireEvent.click(screen.getByText('settings.about.updateDownloadLatest'));
+    fireEvent.click(screen.getByText('settings.about.updateNow'));
 
-    expect(openExternal).toHaveBeenCalledTimes(1);
-    expect(openExternal).toHaveBeenCalledWith('https://github.com/ItsDalk-Lane/LingxiAgent/releases/tag/v0.2.0');
-    // No manual "check for updates" button while a download button is showing.
+    expect(autoUpdateCheck).toHaveBeenCalledTimes(1);
+    // No manual "check for updates" button while the update button is showing.
     expect(screen.queryByText('settings.about.updateCheckBtn')).toBeNull();
   });
 
-  it('available: falls back to the releases/latest page url when releaseUrl is missing', async () => {
+  it('shell error: shows manual download fallback that calls openExternal with the release url', () => {
+    const openExternal = vi.fn();
+    installHana({ openExternal });
+    useSettingsStore.setState({ settingsConfig: { auto_check_updates: true, update_channel: 'stable' } });
+    releaseOverride = {
+      ...DEFAULT_RELEASE_OVERRIDE,
+      status: 'available',
+      latestVersion: '0.2.0',
+      releaseUrl: 'https://github.com/ItsDalk-Lane/LingxiAgent/releases/tag/v0.2.0',
+    };
+    shellUpdateStateOverride = { ...IDLE_SHELL_STATE, status: 'error', error: 'network error' };
+
+    render(<AboutTab />);
+
+    expect(screen.getByText('settings.about.updateAutoFailed')).toBeTruthy();
+    fireEvent.click(screen.getByText('settings.about.updateDownloadManual'));
+    expect(openExternal).toHaveBeenCalledWith('https://github.com/ItsDalk-Lane/LingxiAgent/releases/tag/v0.2.0');
+  });
+
+  it('shell error: falls back to releases/latest page when releaseUrl is missing', () => {
     const openExternal = vi.fn();
     installHana({ openExternal });
     useSettingsStore.setState({ settingsConfig: { auto_check_updates: true, update_channel: 'stable' } });
     releaseOverride = { ...DEFAULT_RELEASE_OVERRIDE, status: 'available', latestVersion: '0.2.0', releaseUrl: null };
+    shellUpdateStateOverride = { ...IDLE_SHELL_STATE, status: 'error', error: 'download failed' };
 
     render(<AboutTab />);
 
-    fireEvent.click(screen.getByText('settings.about.updateDownloadLatest'));
+    fireEvent.click(screen.getByText('settings.about.updateDownloadManual'));
     expect(openExternal).toHaveBeenCalledWith('https://github.com/ItsDalk-Lane/LingxiAgent/releases/latest');
+  });
+
+  it('dmg: shows manual download when running from DMG, no auto-update button', () => {
+    const openExternal = vi.fn();
+    installHana({ openExternal });
+    useSettingsStore.setState({ settingsConfig: { auto_check_updates: true, update_channel: 'stable' } });
+    releaseOverride = { ...DEFAULT_RELEASE_OVERRIDE, status: 'available', latestVersion: '0.2.0', releaseUrl: null };
+    shellUpdateStateOverride = { ...IDLE_SHELL_STATE, status: 'error', error: 'running_from_dmg' };
+
+    render(<AboutTab />);
+
+    expect(screen.getByText('settings.about.updateAvailableGithub')).toBeTruthy();
+    expect(screen.getByText('settings.about.updateDmgHint')).toBeTruthy();
+    // No auto-update button when running from DMG
+    expect(screen.queryByText('settings.about.updateNow')).toBeNull();
+    fireEvent.click(screen.getByText('settings.about.updateDownloadManual'));
+    expect(openExternal).toHaveBeenCalledWith('https://github.com/ItsDalk-Lane/LingxiAgent/releases/latest');
+  });
+
+  it('downloading: shows download progress percentage', () => {
+    installHana();
+    useSettingsStore.setState({ settingsConfig: { auto_check_updates: true, update_channel: 'stable' } });
+    shellUpdateStateOverride = {
+      ...IDLE_SHELL_STATE,
+      status: 'downloading',
+      version: '0.2.0',
+      progress: { percent: 42, bytesPerSecond: 1000, transferred: 500, total: 1000 },
+    };
+
+    render(<AboutTab />);
+
+    expect(screen.getByText('42%')).toBeTruthy();
+    expect(screen.queryByText('settings.about.updateNow')).toBeNull();
+    expect(screen.queryByText('settings.about.updateCheckBtn')).toBeNull();
   });
 
   it('error: shows the error copy with a retry button that calls checkNow', () => {
@@ -419,7 +486,6 @@ describe('AboutTab', () => {
       await Promise.resolve();
     });
 
-    // 兑换成功只开对话框，绝不先落盘。
     expect(screen.getByText('settings.about.inviteConfirmTitle')).toBeTruthy();
     expect(inviteActivate).not.toHaveBeenCalled();
 
