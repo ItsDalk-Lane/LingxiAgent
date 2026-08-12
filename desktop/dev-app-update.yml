@@ -1,6 +1,0 @@
-# 开发环境用的 electron-updater feed 配置。
-# 打包构建由 electron-builder 从 package.json 的 publish 字段自动生成 app-update.yml。
-# 这个文件仅在 !app.isPackaged 时被 auto-updater.cjs 的 nativeUpdateConfigPath() 读取。
-provider: github
-owner: ItsDalk-Lane
-repo: LingxiAgent
