@@ -308,3 +308,49 @@ package.json 产品版本
 - 下一次直接以 Node 24 启动 Vitest，并保留相同排除项与 4 workers，避免重复同一失败方式。
 - 正确的 Node 24 低并发全量测试退出 0：1089 文件通过、1 文件跳过；11043 tests passed、7 skipped、0 failed。
 - Phase 4 完成：定向测试、三段类型检查、目标 lint、低并发全量测试均通过；进入最终差异与工作区边界回读。
+
+## 2026-08-12：Agent 工具循环内部协议块（reflect/mood/pulse）生命周期加固
+
+### 调查结论（代码级实证，非照抄任务书假设）
+
+- 任务书假设"整个 user turn 共享一个 MoodParser，导致工具后第二段 reflect 泄漏到正文"。对当前 0.444.1 / pi SDK 0.84.1 代码做实证追踪后，结论与该假设不同。
+- 用 pi-agent-core `runAgentLoop` 探针实证了一次用户交互（含工具调用）的真实事件序：SDK 把每段模型生成（含工具调用后的第二轮）都包在独立的 `turn_start / turn_end` 里，且每段开头有一次 `message_start(role=assistant)`。
+- `server/routes/chat.ts` 的 `ss.moodParser` 在 `turn_start`（经 `beginStreamingTurnState`）和 `turn_end` 两处都 `reset()`，因此 canonical 流下服务端**本来就**会按 SDK turn（= assistant segment）粒度重新武装 leading opener；第二段 `<reflect>` 被正确解析为 `mood_*`，不进 `text_delta`。
+- 用 `createChatRoute` 集成探针把该事件序喂进真实处理器，确认：两段 reflect 都进 mood，正文通道无裸标签。
+- 前端 `streamBufferManager` 在 `turn_end` 时 `finishBufferTurn` 清空 buffer，下一段进入新的 assistant 消息；前端测试实证两段各自带正确 mood block，互不覆盖。
+- 历史路径：`server/routes/sessions.ts` 把每个 JSONL assistant entry 投影成独立 message；`buildItemsFromHistory` → `buildAssistantBlocksFromContent` → `parseMoodFromContent`（leading-only）逐条解析，多段生成在重载后为多条消息、各自带 mood，正文不残留裸标签。
+- 结论：canonical 实时流 + 重载路径在当前代码里**不泄漏**。任务书描述的泄漏不复现；其根因叙述基于更早版本。
+
+### 真实存在的薄弱点与本次修复
+
+1. 服务端 segment 边界 re-arm 只"巧合地"依赖 SDK `turn_start/turn_end`。若任何路径（重试、重连、自定义工具在 user turn 内再次驱动模型、多文本块）没有干净分隔每段生成，第二段 leading 内部块就会泄漏。本次以 SDK 最权威的"新一次模型生成"信号 `message_start(role=assistant)` 做显式 re-arm，不再单凭 turn 巧合。
+2. 前端 `mood_start` 原本无条件 `moodAcc = ''`：若同 buffer 内出现第二个 mood cycle，后段会清掉前段。本次改为 pending-separator 追加语义（只有新段真正产生非空内容才插入 `\n\n`，空段不制造空白，turn reset 仍清零）。
+
+### 改动范围（仅 3 个源码文件）
+
+- `core/events.ts`：`MoodParser` / `ThinkTagParser` 新增 `beginAssistantSegment()`（segment 级重武装），`reset()` 委托给它（turn 级重置蕴含 segment 重武装）。命名表达 segment / eligibility 真实含义。
+- `server/routes/chat.ts`：新增 `message_start(role=assistant)` 分支，对 think/mood parser 调 `beginAssistantSegment()`。
+- `desktop/src/react/hooks/use-stream-buffer.ts`：Buffer 增加 `moodPendingSeparator`；`mood_start`/`mood_text` 改为追加语义；`resetTurnState` 清零。
+
+### 测试（新增 3 文件 + 扩展 1 文件）
+
+- `tests/mood-parser.test.ts`：保留旧"同 segment 不 reopen"契约，新增"flush 后仍不 reopen"、"显式 `beginAssistantSegment()` 可重开"、"mood/pulse/reflect 三标签跨段都工作"。
+- `tests/chat-route-mood-segment.test.ts`（新）：11 项集成测试覆盖 Case A/B/C/E/F/G/H/I + turn reset 隔离 + message_start 无 turn 边界也能 re-arm。反向验证已确认：去掉 message_start 分支后"无 turn 边界"用例变红，证明新分支是功能性代码。
+- `desktop/src/react/__tests__/hooks/use-stream-buffer.test.ts`：新增"mood 多段聚合"describe，5 项覆盖追加/三段顺序/空段不加分隔/首段无前导分隔/turn reset 不串。
+- `desktop/src/react/__tests__/utils/history-builder-mood.test.ts`（新）：4 项覆盖多 entry 各自抽 mood、三标签、leading-only 正文标签保留、inline/fenced 标签不误抽。
+
+### 验证
+
+- 定向 9 文件 213 项通过。
+- 三段 `tsc --noEmit`（base / node / test）均 0 error。
+- 改动文件 eslint 0 errors（warnings 全为既有 `declare ... : any` 字段声明，非本次新增）。
+- 全量 `npx vitest run --maxWorkers=4`：1092 文件通过、1 跳过、1 失败；11136 passed / 7 skipped。唯一失败 `tests/model-manager-auth-storage.test.ts > hot-reloads a custom provider model` 为 10s 超时；单跑 2.36s 通过，属 4-worker 全量争用下的文件系统时序型 flake，与本次改动无调用关系（ModelManager 热刷新 vs mood/chat-route）。
+- 未改依赖、版本、发布摘要、tag 或 Release；未提交。
+
+### 对抗性复审（2026-08-12 第二轮）
+
+- SDK 事件契约实证：`@earendil-works/pi-agent-core@0.84.1` `agent-loop.js` 中 `message_start(role=assistant)` 每次模型生成只发一次（stream `start` / 非流式 `done` / `handleRunFailure` 各一处）；user/custom/toolResult 角色的 `message_start` 均被 `role === "assistant"` 过滤；pi-coding-agent 不再产生其他 assistant 角色的 `message_start`。
+- **复审发现并修复一个由本次改动引入的边界 bug**：`message_start(assistant)` 分支直接 `beginAssistantSegment()` 清 parser 缓冲，未先 flush。`handleRunFailure` 路径（agent.js:361，message_start 先于 turn_end 到达）下，上一段被截断流挂起的半个 opener（如 `"<re"`，leading-only 下只有 segment 开头的 partial opener 会被挂起）会随缓冲清空被静默丢弃，违反仓库"禁止静默降级"红线。修复：re-arm 前先 `flushTerminalParsers()`（canonical 流缓冲已空，为 no-op）。
+- 回归测试 `message_start re-arm does not silently drop a partial tag tail`：反向验证确认去掉 flush 该行即变红，恢复后 12/12 通过。
+- 复审确认无需修改的点：reconnect/resume 走 `consumedSeqs` 序号去重（stream-resume.test.ts 已有"不重复 replay"契约），多段 mood 不会因重放重复 append；历史路径 sessions.ts 每条 assistant JSONL entry 投影为独立 message，逐条 leading-only 解析，与实时流（每个 SDK turn 一条前端消息）语义同构；`cleanMoodText` 只剥首尾换行/围栏，不破坏 `A\n\nB` 聚合。
+- 已知残余风险（未修，任务 §15 允许的范围裁决）：同 buffer 内第二个 native `thinking_start` 仍会清 `thinkingAcc`；canonical 流每段生成为独立消息不触发，仅"无 turn 边界"防御路径才会命中，与 mood 修复不同源（thinking 是服务端原生事件通道，不经 ThinkTagParser 文本协议）。

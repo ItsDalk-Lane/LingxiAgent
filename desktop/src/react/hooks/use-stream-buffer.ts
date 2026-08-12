@@ -39,6 +39,9 @@ interface Buffer {
   thinkingAcc: string;
   moodAcc: string;
   moodYuan: string;
+  /** 已有已封存 mood 段时，下一段首个非空 mood_text 到达前暂挂的分隔符（\n\n）。
+   *  只有新段真正产生可见内容才落地，避免空段制造多余空白。 */
+  moodPendingSeparator: boolean;
   inThinking: boolean;
   hasThinkingBlock: boolean;
   inMood: boolean;
@@ -58,6 +61,7 @@ function createBuffer(sessionPath: string): Buffer {
     thinkingAcc: '',
     moodAcc: '',
     moodYuan: 'lingxi',
+    moodPendingSeparator: false,
     inThinking: false,
     hasThinkingBlock: false,
     inMood: false,
@@ -172,6 +176,7 @@ class StreamBufferManager {
     buf.thinkingAcc = '';
     buf.hasThinkingBlock = false;
     buf.moodAcc = '';
+    buf.moodPendingSeparator = false;
     buf.inThinking = false;
     buf.inMood = false;
     buf.inCard = false;
@@ -343,12 +348,25 @@ class StreamBufferManager {
       case 'mood_start':
         this.ensureMessage(buf);
         buf.inMood = true;
-        buf.moodAcc = '';
+        // 同一 buffer 内若已有已封存的 mood 段（例如一个 user turn 内多段模型生成
+        // 聚合到同一条消息），新的 mood 段不能清掉前段：暂挂分隔符，等首个非空
+        // mood_text 到达再落地；首段则从空开始。
+        if (buf.moodAcc.trim().length > 0) {
+          buf.moodPendingSeparator = true;
+        } else {
+          buf.moodAcc = '';
+          buf.moodPendingSeparator = false;
+        }
         buf.moodYuan = resolveSessionYuan(sessionPath);
         this.flush(buf);
         break;
 
       case 'mood_text':
+        // pending separator 只在收到非空内容时落地，空段不制造多余空白
+        if (buf.moodPendingSeparator && (msg.delta || '').trim()) {
+          buf.moodAcc += '\n\n';
+          buf.moodPendingSeparator = false;
+        }
         buf.moodAcc += msg.delta || '';
         this.scheduleFlush(buf);
         break;

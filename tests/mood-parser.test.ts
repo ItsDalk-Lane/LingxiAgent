@@ -69,6 +69,58 @@ describe("MoodParser", () => {
     ]);
   });
 
+  it("does not reopen within a segment even after flush (leading-only safety holds)", () => {
+    // 同一段可见正文内，flush / feed 之间再次出现的标签仍必须保持普通正文。
+    const parser = new MoodParser();
+    const events: Array<{ type: string; data?: string }> = [];
+    parser.feed("<mood>A</mood>正文", (e) => events.push(e));
+    parser.feed("<reflect>literal</reflect>", (e) => events.push(e));
+    parser.flush((e) => events.push(e));
+    // 只允许一次 mood cycle（首段的 A），第二段标签不能再触发 mood_start
+    expect(events.filter((e) => e.type === "mood_start")).toHaveLength(1);
+    expect(events.filter((e) => e.type === "mood_end")).toHaveLength(1);
+    const visible = events.filter((e) => e.type === "text").map((e) => e.data || "").join("");
+    expect(visible).toBe("正文<reflect>literal</reflect>");
+  });
+
+  it("re-arms leading mood eligibility on an explicit new assistant segment", () => {
+    // 契约2：显式的下一段 assistant 生成可以重新识别 leading 内部块。
+    // 对应工具循环：segment1 <reflect>A</reflect> → 工具 → segment2 <reflect>B</reflect>。
+    const parser = new MoodParser();
+    const events: Array<{ type: string; data?: string }> = [];
+    parser.feed("<reflect>A</reflect>我先查一下", (e) => events.push(e));
+    // 工具执行结束、下一段模型生成开始的显式边界：
+    parser.beginAssistantSegment();
+    parser.feed("<reflect>B</reflect>最终答案", (e) => events.push(e));
+    parser.flush((e) => events.push(e));
+    expect(events).toEqual([
+      { type: "mood_start" },
+      { type: "mood_text", data: "A" },
+      { type: "mood_end" },
+      { type: "text", data: "我先查一下" },
+      { type: "mood_start" },
+      { type: "mood_text", data: "B" },
+      { type: "mood_end" },
+      { type: "text", data: "最终答案" },
+    ]);
+  });
+
+  it("re-arm is tag-agnostic across mood / pulse / reflect", () => {
+    // 三种协议都必须在新 segment 重新工作（任务要求不能只特判 reflect）。
+    for (const [first, second] of [["mood", "reflect"], ["pulse", "mood"], ["reflect", "pulse"]] as const) {
+      const parser = new MoodParser();
+      const events: Array<{ type: string; data?: string }> = [];
+      parser.feed(`<${first}>1</${first}>t1`, (e) => events.push(e));
+      parser.beginAssistantSegment();
+      parser.feed(`<${second}>2</${second}>t2`, (e) => events.push(e));
+      parser.flush((e) => events.push(e));
+      const moodTexts = events.filter((e) => e.type === "mood_text").map((e) => e.data || "");
+      expect(moodTexts).toEqual(["1", "2"]);
+      const visible = events.filter((e) => e.type === "text").map((e) => e.data || "").join("");
+      expect(visible).toBe("t1t2");
+    }
+  });
+
   it("requires the closer to match the leading opener", () => {
     expect(collect(["<mood>inside</pulse>still mood</mood>after"])).toEqual([
       { type: "mood_start" },

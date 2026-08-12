@@ -70,12 +70,27 @@ export class MoodParser {
     }
   }
 
-  reset() {
+  /**
+   * 新的 assistant segment 开始时调用：重新打开 leading internal opener 资格，
+   * 并清空只属于本 segment 的解析状态（buffer / 当前标签 / 刚结束标记）。
+   *
+   * 与 reset() 的区别在调用时机与意图，而非字段：reset() 用于整个 user turn 的
+   * 生命周期边界（turn_start / turn_end / abort），本方法用于"一次新的模型生成"
+   * 边界（message_start(role=assistant)）。一个 user turn 内可能包含多个 assistant
+   * segment（工具循环），每个 segment 都应重新获得一次 leading internal block 资格，
+   * 但不能因此把同一段可见正文里再次出现的标签误判为内部块。
+   */
+  beginAssistantSegment() {
     this.inMood = false;
     this.buffer = "";
     this._justEndedMood = false;
     this._currentTag = null;
     this._allowOpenTag = true;
+  }
+
+  /** 整个 user turn 边界（turn_start / turn_end / abort）：turn 重置蕴含 segment 重武装。 */
+  reset() {
+    this.beginAssistantSegment();
   }
 
   /** 内部：尽可能多地从 buffer 中提取完整事件 */
@@ -186,12 +201,21 @@ export class ThinkTagParser {
     }
   }
 
-  reset() {
+  /**
+   * 新的 assistant segment 开始：重新打开 leading <think>/<thinking> opener 资格，
+   * 清空 segment 内解析状态。语义同 MoodParser.beginAssistantSegment——区分"新的
+   * 模型生成"与"整个 user turn 重置"。
+   */
+  beginAssistantSegment() {
     this.inThink = false;
     this.buffer = "";
     this._justEnded = false;
     this._currentTag = null;
     this._allowOpenTag = true;
+  }
+
+  reset() {
+    this.beginAssistantSegment();
   }
 
   _findOpenTag() {

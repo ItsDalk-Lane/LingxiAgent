@@ -1234,7 +1234,22 @@ export function createChatRoute(engine: any, hub: any, {
       });
     };
 
-    if (event.type === "message_update") {
+    if (event.type === "message_start" && event.message?.role === "assistant") {
+      // 显式 assistant segment 边界：一次新的模型生成开始。重新打开 leading internal
+      // mood/think opener 资格。SDK 的 turn_start/turn_end 通常已经 reset 过 parser，
+      // 这里以 message_start(role=assistant) 作为最权威的"新一次模型生成"信号再做一次
+      // re-arm，覆盖重试 / 重连 / 多文本块等 turn 边界未必完整分割每段生成的路径。
+      // 一个 user turn 内的每段生成都应重新获得一次 leading 内部块资格；但同一段可见
+      // 正文开始后仍保持 leading-only（beginAssistantSegment 只重武装资格，不改下游聚合）。
+      if (!ss) return;
+      // re-arm 前先把上一段遗留的未冲刷缓冲按原管道冲出来：beginAssistantSegment 会清
+      // parser 缓冲，若不先 flush，上一段结尾被挂起的半个标签尾巴（如截断流只留下
+      // "<re"）会被静默丢弃——SDK handleRunFailure 等路径 message_start 会先于
+      // turn_end 到达。canonical 流里缓冲已在 turn_end 冲空，这里是无副作用 no-op。
+      flushTerminalParsers();
+      ss.thinkTagParser.beginAssistantSegment();
+      ss.moodParser.beginAssistantSegment();
+    } else if (event.type === "message_update") {
       if (!ss) return;
       const sub = event.assistantMessageEvent?.type;
 

@@ -151,6 +151,87 @@ describe('streamBufferManager.snapshot', () => {
   });
 });
 
+function getMoodBlock() {
+  return getAssistantMessage()?.blocks?.find((block) => block.type === 'mood') ?? null;
+}
+
+describe('streamBufferManager.mood 多段聚合', () => {
+  beforeEach(() => {
+    streamBufferManager.clearAll();
+    useStore.setState({
+      currentSessionId: null,
+      currentSessionPath: null,
+      sessions: [],
+      sessionLocatorsById: {},
+    } as never);
+    useStore.getState().clearSession(PATH);
+    useStore.getState().clearSession(MOVED_PATH);
+    useStore.getState().initSession(PATH, [userItem('u1', 'hi')], false);
+    useStore.setState({
+      sessions: [{
+        path: PATH,
+        agentId: 'owner',
+        title: null,
+        firstMessage: '',
+        modified: '',
+        messageCount: 0,
+      }],
+      agents: [{ id: 'owner', yuan: 'ming' }],
+      currentAgentId: 'focus',
+      agentYuan: 'lingxi',
+    } as never);
+  });
+
+  function moodCycle(text: string) {
+    streamBufferManager.handle({ type: 'mood_start', sessionPath: PATH });
+    streamBufferManager.handle({ type: 'mood_text', sessionPath: PATH, delta: text });
+    streamBufferManager.handle({ type: 'mood_end', sessionPath: PATH });
+  }
+
+  it('同一 buffer 内第二个 mood 段追加而非覆盖第一个', () => {
+    moodCycle('AAA');
+    moodCycle('BBB');
+    // 不发 turn_end，强制两段停留在同一个 buffer/message
+    expect(getMoodBlock()?.text).toBe('AAA\n\nBBB');
+  });
+
+  it('三个 mood 段按顺序聚合', () => {
+    moodCycle('A');
+    moodCycle('B');
+    moodCycle('C');
+    expect(getMoodBlock()?.text).toBe('A\n\nB\n\nC');
+  });
+
+  it('空 mood 段不制造多余分隔符', () => {
+    moodCycle('AAA');
+    // 空段：只有 mood_start + mood_end，没有 mood_text
+    streamBufferManager.handle({ type: 'mood_start', sessionPath: PATH });
+    streamBufferManager.handle({ type: 'mood_end', sessionPath: PATH });
+    moodCycle('BBB');
+    expect(getMoodBlock()?.text).toBe('AAA\n\nBBB');
+  });
+
+  it('首个 mood 段从空开始（无前导分隔符）', () => {
+    moodCycle('Solo');
+    expect(getMoodBlock()?.text).toBe('Solo');
+  });
+
+  it('turn reset 后新轮 mood 不串入上一轮', () => {
+    moodCycle('AAA');
+    streamBufferManager.handle({ type: 'turn_end', sessionPath: PATH });
+    moodCycle('BBB');
+    // turn_end 结算掉上一条消息；新轮 mood 进入新的 assistant 消息，且不含 AAA
+    const assistants = getItems().filter((i): i is ChatListItem & { type: 'message' } =>
+      i.type === 'message' && i.data.role === 'assistant');
+    const last = assistants[assistants.length - 1];
+    const lastMood = last?.data.blocks?.find((b) => b.type === 'mood');
+    expect(lastMood?.text).toBe('BBB');
+    // 上一条仍保留 AAA，互不串扰
+    const firstMood = assistants[0]?.data.blocks?.find((b) => b.type === 'mood');
+    expect(firstMood?.text).toBe('AAA');
+  });
+});
+
 describe('streamBufferManager.thinking 流式刷新', () => {
   beforeEach(() => {
     streamBufferManager.clearAll();
