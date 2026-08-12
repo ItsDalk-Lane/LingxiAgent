@@ -4522,4 +4522,223 @@ describe("sessions route", () => {
     expect(res.status).toBe(200);
     expect(data.revision).toBeNull();
   });
+
+  // ── 循环任务可见性：会话列表 loopStatus 注入 + loop-user-prompt 历史投影 ──
+
+  it("injects loopStatus for sessions whose loop is running", async () => {
+    const { createSessionsRoute } = await import("../server/routes/sessions.ts");
+    const app = new Hono();
+    const sessionPath = "/tmp/agents/hana/sessions/looping.jsonl";
+
+    const engine = {
+      listSessions: vi.fn(async () => [{
+        path: sessionPath,
+        title: "Loop thread",
+        firstMessage: "hello",
+        modified: new Date("2026-08-01T07:00:00.000Z"),
+        messageCount: 4,
+        cwd: "/tmp/work",
+        agentId: "hana",
+        agentName: "Hana",
+      }]),
+      rcState: null,
+      loopController: {
+        toolStatus: vi.fn((sp) => (sp === sessionPath ? {
+          status: "running",
+          turnCount: 3,
+          limits: { maxTurns: 50 },
+          pausedReason: null,
+          prompt: "每5分钟检查一次",
+        } : null)),
+      },
+    };
+
+    app.route("/api", createSessionsRoute(engine));
+
+    const res = await app.request("/api/sessions");
+    const data = await res.json();
+
+    expect(res.status).toBe(200);
+    expect(engine.loopController.toolStatus).toHaveBeenCalledWith(sessionPath);
+    expect(data[0].loopStatus).toEqual({
+      status: "running",
+      turnCount: 3,
+      maxTurns: 50,
+      pausedReason: null,
+      prompt: "每5分钟检查一次",
+    });
+  });
+
+  it("keeps loopStatus null when the loop is stopped, completed, absent, or no controller is wired", async () => {
+    const { createSessionsRoute } = await import("../server/routes/sessions.ts");
+    const app = new Hono();
+    const session = {
+      path: "/tmp/agents/hana/sessions/plain.jsonl",
+      title: "Plain thread",
+      firstMessage: "hello",
+      modified: new Date("2026-08-01T07:00:00.000Z"),
+      messageCount: 2,
+      cwd: "/tmp/work",
+      agentId: "hana",
+      agentName: "Hana",
+    };
+    const toolStatus = vi.fn();
+
+    app.route("/api", createSessionsRoute({
+      listSessions: vi.fn(async () => [session]),
+      rcState: null,
+      loopController: { toolStatus },
+    }));
+
+    // stopped / completed 终态不注入（避免历史会话残留徽章）
+    toolStatus.mockReturnValueOnce({ status: "stopped", turnCount: 50, limits: { maxTurns: 50 }, pausedReason: null, prompt: "t" });
+    const stoppedData = await (await app.request("/api/sessions")).json();
+    expect(stoppedData[0].loopStatus).toBeNull();
+
+    toolStatus.mockReturnValueOnce({ status: "completed", turnCount: 7, limits: { maxTurns: 50 }, pausedReason: null, prompt: "t" });
+    const completedData = await (await app.request("/api/sessions")).json();
+    expect(completedData[0].loopStatus).toBeNull();
+
+    // 无循环记录 → null
+    toolStatus.mockReturnValueOnce(null);
+    const noLoopData = await (await app.request("/api/sessions")).json();
+    expect(noLoopData[0].loopStatus).toBeNull();
+
+    // 引擎未接线 loopController → null 且不抛错
+    const noControllerApp = new Hono();
+    noControllerApp.route("/api", createSessionsRoute({
+      listSessions: vi.fn(async () => [session]),
+      rcState: null,
+    }));
+    const noControllerData = await (await noControllerApp.request("/api/sessions")).json();
+    expect(noControllerData[0].loopStatus).toBeNull();
+  });
+
+  it("renders loader-projected loop-user-prompt entries as ordinary user messages", async () => {
+    const { createSessionsRoute } = await import("../server/routes/sessions.ts");
+    const msgUtils = await import("../core/message-utils.ts");
+    const app = new Hono();
+
+    // 加载层（message-utils historyMessageFromEntry）已把 loop-user-prompt 投影成标准
+    // role:"user" 消息，路由层无需任何特判，按普通用户消息渲染即可。
+    vi.mocked(msgUtils.extractTextContent)
+      .mockImplementation((content: any) => ({
+        text: typeof content === "string" ? content : "助手回复",
+        images: [], thinking: "", toolUses: [],
+      }));
+    vi.mocked(msgUtils.loadSessionHistoryMessages).mockResolvedValueOnce([
+      {
+        role: "user",
+        content: "每5分钟检查一次",
+        id: "loop-prompt-entry-1",
+        timestamp: "2026-08-01T07:00:00.000Z",
+      },
+      { role: "assistant", content: "助手回复", id: "a1" },
+      { role: "assistant", content: "助手回复", id: "a2" },
+    ] as any);
+
+    const engine = {
+      agentsDir: "/tmp/agents",
+      currentSessionPath: "/tmp/agents/hana/sessions/looping.jsonl",
+      deferredResults: null,
+    };
+
+    app.route("/api", createSessionsRoute(engine));
+
+    const res = await app.request("/api/sessions/messages");
+    const data = await res.json();
+
+    expect(res.status).toBe(200);
+    expect(data.messages).toContainEqual(expect.objectContaining({
+      role: "user",
+      content: "每5分钟检查一次",
+      entryId: "loop-prompt-entry-1",
+      timestamp: "2026-08-01T07:00:00.000Z",
+    }));
+  });
+
+  // 分页一致性回归：投影后的 loop prompt 是标准 user 消息，分页 total 与 displayIdx
+  // 同源同语义——历史里只有这一条时 total=1、窗口 [0,1)，气泡必须渲染（加载层投影前
+  // 这条 role:"custom" 不计入 total，窗口为空，气泡整个消失）。
+  it("counts a loader-projected loop prompt toward the history page window", async () => {
+    const { createSessionsRoute } = await import("../server/routes/sessions.ts");
+    const msgUtils = await import("../core/message-utils.ts");
+    const app = new Hono();
+
+    vi.mocked(msgUtils.loadSessionHistoryMessages).mockResolvedValueOnce([
+      {
+        role: "user",
+        content: "每5分钟检查一次",
+        id: "loop-prompt-entry-1",
+        timestamp: "2026-08-01T07:00:00.000Z",
+      },
+    ] as any);
+
+    const engine = {
+      agentsDir: "/tmp/agents",
+      currentSessionPath: "/tmp/agents/hana/sessions/looping.jsonl",
+      deferredResults: null,
+    };
+
+    app.route("/api", createSessionsRoute(engine));
+
+    const res = await app.request("/api/sessions/messages");
+    const data = await res.json();
+
+    expect(res.status).toBe(200);
+    expect(data.messages).toEqual([
+      expect.objectContaining({ role: "user", content: "每5分钟检查一次" }),
+    ]);
+  });
+
+  // M1 回归：loop 轮 assistant 回复不得携带 turnInputEntryId。kickoff/wakeup 协议消息
+  // 会把 turn input 指针置 null——停在 loop-user-prompt（custom 条目）上重试必报错，
+  // 停在 /loop 之前的真实用户消息上重试会裁掉整个循环；null 时前端不提供重试入口。
+  // 同时钉住 /loop 之前的正常配对不受影响。
+  it("withholds turnInputEntryId from loop-turn assistant replies but keeps normal pairing", async () => {
+    const { createSessionsRoute } = await import("../server/routes/sessions.ts");
+    const msgUtils = await import("../core/message-utils.ts");
+    const app = new Hono();
+
+    vi.mocked(msgUtils.extractTextContent)
+      .mockImplementation((content: any) => ({
+        text: typeof content === "string" ? content : "助手回复",
+        images: [], thinking: "", toolUses: [],
+      }));
+    vi.mocked(msgUtils.loadSessionHistoryMessages).mockResolvedValueOnce([
+      { role: "user", content: "之前的问题", id: "u1" },
+      { role: "assistant", content: "之前的回答", id: "a1" },
+      // 加载层投影后的 loop prompt（标准 user 消息）
+      { role: "user", content: "每5分钟检查一次", id: "loop-prompt-entry-1" },
+      // kickoff 协议消息（custom_message → role:"custom"）
+      {
+        role: "custom",
+        customType: "loop-turn",
+        content: '<hana-loop kind="kickoff">\nTask: 每5分钟检查一次\n</hana-loop>',
+        display: false,
+        details: { schemaVersion: 1, kind: "kickoff", prompt: "每5分钟检查一次", turnCount: 0, maxTurns: 50 },
+        id: "kickoff-1",
+      },
+      { role: "assistant", content: "循环第 1 轮回复", id: "a2" },
+    ] as any);
+
+    const engine = {
+      agentsDir: "/tmp/agents",
+      currentSessionPath: "/tmp/agents/hana/sessions/looping.jsonl",
+      deferredResults: null,
+    };
+
+    app.route("/api", createSessionsRoute(engine));
+
+    const res = await app.request("/api/sessions/messages");
+    const data = await res.json();
+
+    expect(res.status).toBe(200);
+    const normalReply = data.messages.find((m: any) => m.entryId === "a1");
+    const loopReply = data.messages.find((m: any) => m.entryId === "a2");
+    // /loop 之前：正常配对保留
+    expect(normalReply.turnInputEntryId).toBe("u1");
+    // loop 轮：不带重试指针（既没有错配到 loop-user-prompt，也没有错配到 u1）
+    expect(loopReply).not.toHaveProperty("turnInputEntryId");
+  });
 });

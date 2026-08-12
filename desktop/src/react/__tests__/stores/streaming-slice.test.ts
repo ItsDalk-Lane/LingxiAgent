@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
-import { createStreamingSlice, type StreamingSlice } from '../../stores/streaming-slice';
+import { createStreamingSlice, type LoopStatus, type StreamingSlice } from '../../stores/streaming-slice';
 
 function makeSlice(locatorState: Record<string, unknown> = {}): StreamingSlice {
   let state: StreamingSlice & Record<string, unknown>;
@@ -136,6 +136,91 @@ describe('streaming-slice', () => {
     expect(slice.activeSessionStreams).toEqual({});
     expect(slice.unreadOutputSessionPaths).toEqual([]);
     expect(slice.inlineErrors).toEqual({ sess_1: null });
+  });
+});
+
+describe('streaming-slice · loopStatus', () => {
+  let slice: StreamingSlice;
+
+  const runningStatus: LoopStatus = {
+    status: 'running',
+    turnCount: 2,
+    maxTurns: 50,
+    pausedReason: null,
+    prompt: '跑 50 轮',
+  };
+  const pausedStatus: LoopStatus = {
+    status: 'paused',
+    turnCount: 5,
+    maxTurns: null,
+    pausedReason: 'manual',
+    prompt: null,
+  };
+
+  beforeEach(() => {
+    slice = makeSlice();
+  });
+
+  it('初始为空', () => {
+    expect(slice.loopStatusBySession).toEqual({});
+  });
+
+  it('setLoopStatus 写入 running 状态', () => {
+    slice.setLoopStatus('s1', runningStatus);
+    expect(slice.loopStatusBySession).toEqual({ s1: runningStatus });
+  });
+
+  it('setLoopStatus 写入 paused 状态并覆盖同会话旧状态', () => {
+    slice.setLoopStatus('s1', runningStatus);
+    slice.setLoopStatus('s1', pausedStatus);
+    expect(slice.loopStatusBySession).toEqual({ s1: pausedStatus });
+  });
+
+  it('stopped / completed / null 一律清除已有 key', () => {
+    slice.setLoopStatus('s1', runningStatus);
+    slice.setLoopStatus('s1', { ...runningStatus, status: 'stopped' });
+    expect(slice.loopStatusBySession.s1).toBeUndefined();
+
+    slice.setLoopStatus('s1', runningStatus);
+    slice.setLoopStatus('s1', { ...runningStatus, status: 'completed' });
+    expect(slice.loopStatusBySession.s1).toBeUndefined();
+
+    slice.setLoopStatus('s1', runningStatus);
+    slice.setLoopStatus('s1', null);
+    expect(slice.loopStatusBySession.s1).toBeUndefined();
+  });
+
+  it('stopped / completed 对不存在的 key 也保持空表', () => {
+    slice.setLoopStatus('s1', { ...runningStatus, status: 'stopped' });
+    expect(slice.loopStatusBySession).toEqual({});
+  });
+
+  it('空 sessionId 是 no-op，不写入也不换引用', () => {
+    const before = slice.loopStatusBySession;
+    slice.setLoopStatus('', runningStatus);
+    expect(slice.loopStatusBySession).toBe(before);
+    expect(slice.loopStatusBySession).toEqual({});
+  });
+
+  it('clearLoopStatus 删除已有 key', () => {
+    slice.setLoopStatus('s1', runningStatus);
+    slice.setLoopStatus('s2', pausedStatus);
+    slice.clearLoopStatus('s1');
+    expect(slice.loopStatusBySession).toEqual({ s2: pausedStatus });
+  });
+
+  it('clearLoopStatus 对不存在的 key 是 no-op，不触发新 state', () => {
+    slice.setLoopStatus('s1', runningStatus);
+    const before = slice.loopStatusBySession;
+    slice.clearLoopStatus('missing');
+    expect(slice.loopStatusBySession).toBe(before);
+  });
+
+  it('clearLoopStatus 空 sessionId 是 no-op', () => {
+    slice.setLoopStatus('s1', runningStatus);
+    const before = slice.loopStatusBySession;
+    slice.clearLoopStatus('');
+    expect(slice.loopStatusBySession).toBe(before);
   });
 });
 

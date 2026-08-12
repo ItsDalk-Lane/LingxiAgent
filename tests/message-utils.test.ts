@@ -24,6 +24,7 @@ import {
 } from "../core/message-utils.ts";
 import { SessionManager } from "../lib/pi-sdk/index.ts";
 import { TURN_INPUT_CONSUMPTION_EVENT_TYPE } from "../lib/turn-input-presentation.ts";
+import { LOOP_USER_PROMPT_MESSAGE_TYPE } from "../lib/loop/loop-messages.ts";
 
 let tmpDir;
 
@@ -542,6 +543,32 @@ describe("loadSessionHistoryMessages", () => {
       },
       display: false,
     });
+    expect(result[1].id).toEqual(expect.any(String));
+    expect(result[1].timestamp).toEqual(expect.any(String));
+  });
+
+  it("loop-user-prompt 自定义条目在加载层直接投影成普通 user 消息", async () => {
+    const sessionDir = path.join(tmpDir, "sessions-loop-prompt");
+    const manager = SessionManager.create(tmpDir, sessionDir);
+    manager.appendMessage({ role: "assistant", content: [{ type: "text", text: "submitted" }] } as any);
+    manager.appendCustomEntry(LOOP_USER_PROMPT_MESSAGE_TYPE, {
+      prompt: "每5分钟检查一次",
+      timestamp: 1760000000000,
+    });
+    // 未识别的 customType 仍然被丢弃，加载层没有放开成全收
+    manager.appendCustomEntry("some-unknown-custom-type", { foo: "bar" });
+
+    const result = await loadSessionHistoryMessages({}, manager.getSessionFile());
+
+    expect(result).toHaveLength(2);
+    // 投影成标准 user 消息（而非 role:"custom"）：分页 total / displayIdx / find 路由等
+    // 下游消费者按统一 user 语义处理，序号不会错位。
+    expect(result[1]).toMatchObject({
+      role: "user",
+      content: "每5分钟检查一次",
+    });
+    expect(result[1]).not.toHaveProperty("customType");
+    expect(result[1]).not.toHaveProperty("data");
     expect(result[1].id).toEqual(expect.any(String));
     expect(result[1].timestamp).toEqual(expect.any(String));
   });

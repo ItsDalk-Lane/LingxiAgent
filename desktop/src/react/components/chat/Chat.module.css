@@ -605,6 +605,47 @@
     white-space: nowrap;
 }
 
+/* loop interlude 的"第 X / M 轮"片段：独立于 .interludeText，避免被它的省略号截断。 */
+.interludeTurn {
+    flex-shrink: 0;
+    font-size: var(--fs-hint);
+    line-height: 1.45;
+    color: inherit;
+    opacity: 0.85;
+}
+
+/* loop interlude 上的暂停/恢复 + 停止按钮。父级 .interludeTrigger 在移动端被
+   pointer-events:none 关闭（见下方 :global(.mobile-desktop-root) 规则），这里显式恢复让按钮始终可点。 */
+.loopControls {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    flex-shrink: 0;
+    pointer-events: auto;
+    color: inherit;
+}
+
+.loopControlBtn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 var(--space-2);
+    border-radius: var(--radius-chat-surface, 6px);
+    font-size: 11px;
+    line-height: 1;
+    color: var(--text-muted);
+    cursor: pointer;
+    user-select: none;
+    transition: color var(--duration-instant) var(--ease-out), background var(--duration-instant) var(--ease-out);
+}
+
+.loopControlBtn:hover {
+    color: var(--text);
+    background: color-mix(in srgb, var(--text-muted) 14%, transparent);
+}
+
 .interludePopover {
     position: fixed;
     z-index: 2147482500;

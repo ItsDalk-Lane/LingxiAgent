@@ -17,6 +17,18 @@ export interface StreamingStatusIdentity {
   turnId?: string | null;
 }
 
+/**
+ * 循环任务的实时状态（按 sessionId 存）。来自 loop_status WS 推送 + 会话列表冷启动注入，
+ * 驱动会话列表循环徽章与 interlude 气泡上的控制按钮态。
+ */
+export type LoopStatus = {
+  status: 'running' | 'paused' | 'stopped' | 'completed';
+  turnCount: number;
+  maxTurns: number | null;
+  pausedReason: string | null;
+  prompt: string | null;
+};
+
 export interface StreamingSlice {
   /** 所有正在 streaming 的 session identity key 集合（legacy path 只做兼容 locator） */
   streamingSessions: string[];
@@ -39,6 +51,11 @@ export interface StreamingSlice {
   setInlineError: (path: string, error: string | InlineErrorEntry, ttlMs?: number) => void;
   /** 清除某个 session 的 inline error（同时取消其定时器）。 */
   clearInlineError: (path: string) => void;
+  /** 按 sessionId 存的循环任务状态（loop_status WS + 冷启动注入），驱动会话列表徽章与 interlude 按钮态。 */
+  loopStatusBySession: Record<string, LoopStatus>;
+  /** 写入/清除某会话的循环状态；传 null 或 stopped/completed 后续会清除，避免徽章残留。 */
+  setLoopStatus: (sessionId: string, status: LoopStatus | null) => void;
+  clearLoopStatus: (sessionId: string) => void;
   /** 模型切换进行中（阻止发送） */
   modelSwitching: boolean;
   setModelSwitching: (v: boolean) => void;
@@ -223,6 +240,24 @@ export const createStreamingSlice = (
     if (key !== path) cancelTimer(path);
     set((s) => ({ inlineErrors: putIdentityMapValue(s.inlineErrors, path, key, null) }));
   },
+  loopStatusBySession: {},
+  setLoopStatus: (sessionId, status) => set((s) => {
+    if (!sessionId) return {};
+    const next = { ...s.loopStatusBySession };
+    // running/paused 才常驻；stopped/completed/null 一律清除，让徽章与按钮立即消失。
+    if (status && (status.status === 'running' || status.status === 'paused')) {
+      next[sessionId] = status;
+    } else {
+      delete next[sessionId];
+    }
+    return { loopStatusBySession: next };
+  }),
+  clearLoopStatus: (sessionId) => set((s) => {
+    if (!sessionId || !Object.prototype.hasOwnProperty.call(s.loopStatusBySession, sessionId)) return {};
+    const next = { ...s.loopStatusBySession };
+    delete next[sessionId];
+    return { loopStatusBySession: next };
+  }),
   modelSwitching: false,
   setModelSwitching: (v) => set({ modelSwitching: v }),
 });

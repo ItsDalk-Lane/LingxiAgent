@@ -15,6 +15,7 @@ import {
   MESSAGE_PRESENTATION_RECORD_TYPE,
 } from "./desktop-session-submit.ts";
 import { SESSION_COLLAB_DECISION_RECORD_TYPE } from "../lib/session-collab/decision-record.ts";
+import { LOOP_USER_PROMPT_MESSAGE_TYPE } from "../lib/loop/loop-messages.ts";
 import {
   TURN_INPUT_CONSUMPTION_EVENT_TYPE,
   TURN_INPUT_PRESENTATION_EVENT_TYPE,
@@ -166,6 +167,19 @@ function historyMessageFromEntry(entry) {
       content: entry.content || "",
       display: entry.display,
       ...(entry.details !== undefined ? { details: entry.details } : {}),
+    };
+    if (entry.id) message.id = entry.id;
+    if (entry.timestamp) message.timestamp = entry.timestamp;
+    return message;
+  }
+  if (entry?.type === "custom" && entry.customType === LOOP_USER_PROMPT_MESSAGE_TYPE) {
+    // 循环启动时用户任务 prompt 的展示记录（appendCustomEntry 写入的 type:"custom" 无
+    // content 条目，buildSessionContext 阶段即被排除，永不进 model 输入）。在加载层直接
+    // 投影成普通 role:"user" 消息：分页 total / displayIdx / find 路由 / hub 历史等所有
+    // 下游消费者看到的是一条标准用户消息，不需要在任何消费路径上特判，序号语义天然一致。
+    const message: Record<string, any> = {
+      role: "user",
+      content: typeof entry.data?.prompt === "string" ? entry.data.prompt : "",
     };
     if (entry.id) message.id = entry.id;
     if (entry.timestamp) message.timestamp = entry.timestamp;

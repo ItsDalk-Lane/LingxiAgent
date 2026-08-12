@@ -365,7 +365,7 @@ const TranscriptItemView = memo(function TranscriptItemView({
   }, [messageId, registerMessageElement]);
 
   if (item.type === 'compaction') return null;
-  if (item.type === 'interlude') return <InterludeBlock block={item.data} />;
+  if (item.type === 'interlude') return <InterludeBlock block={item.data} sessionPath={sessionPath} agentId={agentId} />;
 
   const msg = item.data;
   const prevRole = prevItem?.type === 'message' ? prevItem.data.role : null;

@@ -1609,6 +1609,7 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
     }
     if (item.type === 'server-command') {
       void executeSlashViaWs(
+        t,
         item.name,
         slashAgentId,
         setSlashBusy,
@@ -1628,7 +1629,7 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
       .insertContent(' ')
       .run();
     setSlashMenuOpen(false);
-  }, [editor, inputLocked, inputText, slashAgentId]);
+  }, [editor, inputLocked, inputText, slashAgentId, t]);
 
   const handleFileMentionSelect = useCallback((item: FileMentionItem) => {
     if (inputLocked) return;

@@ -36,6 +36,8 @@ export class LoopController {
   declare _isTargetRunnable: any;
   declare _resolveSessionIdForPath: any;
   declare _resolveTargetFromSessionRef: any;
+  declare _recordUserPrompt: any;
+  declare _emitLoopStatus: any;
   declare _log: any;
   declare _pendingLoopTurn: Set<string>;
   declare _activeLoopTurn: Set<string>;
@@ -50,6 +52,8 @@ export class LoopController {
     isTargetRunnable,
     resolveSessionIdForPath,
     resolveTargetFromSessionRef,
+    recordUserPrompt,
+    emitLoopStatus,
     log = console,
   }) {
     this._store = store;
@@ -61,6 +65,8 @@ export class LoopController {
     this._isTargetRunnable = isTargetRunnable;                 // (target) => boolean
     this._resolveSessionIdForPath = resolveSessionIdForPath;   // (sessionPath) => sessionId|null
     this._resolveTargetFromSessionRef = resolveTargetFromSessionRef; // (ref, opts) => Promise<target|null>
+    this._recordUserPrompt = recordUserPrompt;                   // (target, prompt) => Promise；start 时把任务 prompt 记成展示型 user 气泡
+    this._emitLoopStatus = emitLoopStatus;                       // (target, loop) => void；状态变更时推 loop_status 给前端
     this._log = log;
     this._pendingLoopTurn = new Set();             // 键：loop key（sessionId）
     this._activeLoopTurn = new Set();
@@ -85,9 +91,18 @@ export class LoopController {
       throw new LoopError("loop_already_active", "该会话已有活跃循环，先 /loop stop 再启动新的");
     }
     this._store.create(target, prompt);
+    // 在 kickoff 之前把用户任务 prompt 记成展示型 user 气泡（排在 kickoff interlude 前）。
+    // recordUserPrompt 用 appendCustomEntry 写 type:"custom" 无 content，永不进 model 输入。
+    try {
+      await this._recordUserPrompt?.(target, prompt);
+    } catch (err) {
+      this._log.warn?.(`[loop] record user prompt failed for ${key}: ${err?.message}`);
+    }
     const loop = this._store.get(key);
     await this._injectLoopTurn(key, target, buildLoopKickoffMessage(loop));
-    return this._store.get(key);
+    const started = this._store.get(key);
+    this._emitStatus(key);
+    return started;
   }
 
   async stop(target) {
@@ -95,7 +110,9 @@ export class LoopController {
     this._requireLoop(key);
     this._alarm?.cancel(key);
     this._clearRuntimeMarks(key);
-    return this._store.update(key, { status: "stopped", pausedReason: null });
+    const stopped = this._store.update(key, { status: "stopped", pausedReason: null });
+    this._emitStatus(key);
+    return stopped;
   }
 
   async pause(target, reasonCode, noticeText = null) {
@@ -114,7 +131,18 @@ export class LoopController {
     if (loop.pausedReason === "budget_exhausted") patch.turnCount = 0;
     this._store.update(key, patch);
     const fresh = this._store.get(key);
-    await this._injectLoopTurn(key, fresh.target, buildLoopWakeupMessage(fresh, "loop resumed"));
+    this._emitStatus(key);
+    try {
+      await this._injectLoopTurn(key, fresh.target, buildLoopWakeupMessage(fresh, "loop resumed"));
+    } catch (err: any) {
+      // 与 deliverWakeupTurn 同一处理：会话已换代时不能把循环留在 running 空转
+      // （否则徽章亮起但目标已死，要等下次 wakeup 失败才被终止）。终止后原样抛错——
+      // resume 是用户发起的 slash，必须如实看到"目标会话已重置"而非虚假的成功。
+      if (err?.code === "loop_target_reset") {
+        await this._stopForReset(key);
+      }
+      throw err;
+    }
     return this._store.get(key);
   }
 
@@ -142,10 +170,12 @@ export class LoopController {
     this._requireRunning(key);
     this._alarm?.cancel(key);
     this._clearRuntimeMarks(key);
-    return this._store.update(key, {
+    const completed = this._store.update(key, {
       status: "completed",
       completedSummary: summary || null,
     });
+    this._emitStatus(key);
+    return completed;
   }
 
   // ── 闹钟回调面 ────────────────────────────────────────────
@@ -201,6 +231,7 @@ export class LoopController {
         turnCount: loop.turnCount + 1,
         consecutiveFailures: ok ? 0 : loop.consecutiveFailures + 1,
       });
+      this._emitStatus(key);
     }
 
     const fresh = this._store.get(key);
@@ -292,10 +323,23 @@ export class LoopController {
     }
   }
 
+  _emitStatus(key) {
+    // 状态写入后向接线层广播 loop_status（target + 最新 loop 记录），让前端会话列表徽章 /
+    // interlude 按钮态实时刷新。可选回调，缺失或抛错时循环本身不受影响。
+    const loop = this._store.get(key);
+    if (!loop) return;
+    try {
+      this._emitLoopStatus?.(loop.target, loop);
+    } catch (err) {
+      this._log.warn?.(`[loop] emit status failed for ${key}: ${err?.message}`);
+    }
+  }
+
   async _stopForReset(key) {
     this._alarm?.cancel(key);
     this._clearRuntimeMarks(key);
     const loop = this._store.update(key, { status: "stopped", pausedReason: "session_reset" });
+    this._emitStatus(key);
     // 尽力通知：桥接目标发到聊天；桌面目标会话已换代，通知投递失败仅记日志
     try {
       await this._recordNotice(loop.target, buildLoopNoticeMessage("（会话已重置，循环终止。需要的话在新会话里重新 /loop）"));
@@ -308,6 +352,7 @@ export class LoopController {
     this._alarm?.cancel(key);
     this._clearRuntimeMarks(key);
     this._store.update(key, { status: "paused", pausedReason: reasonCode });
+    this._emitStatus(key);
     if (noticeText) {
       const loop = this._store.get(key);
       try {

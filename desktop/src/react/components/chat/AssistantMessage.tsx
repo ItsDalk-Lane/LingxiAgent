@@ -283,7 +283,7 @@ const ContentBlockView = memo(function ContentBlockView({ block, agentName, agen
     case 'media_generation':
       return <MediaGenerationBlock block={block} sessionPath={sessionPath} readOnly={readOnly} />;
     case 'interlude':
-      return <InterludeBlock block={block} />;
+      return <InterludeBlock block={block} sessionPath={sessionPath} agentId={agentId} />;
     default: {
       const Renderer = BLOCK_RENDERERS[block.type];
       return Renderer ? <Renderer block={block} agentId={agentId} sessionPath={sessionPath} /> : null;

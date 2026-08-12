@@ -1539,6 +1539,15 @@ const SessionItem = memo(function SessionItem({ session: s, isActive, isPending,
   const [browserMenuPosition, setBrowserMenuPosition] = useState<{ x: number; y: number } | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const isDeletedAgentSession = s.agentDeleted === true;
+  // 循环任务状态（running/paused 才会有，来自 loop_status WS + 冷启动注入）。列表徽章据此渲染。
+  const loopStatus = useStore((st) => (s.sessionId ? st.loopStatusBySession[s.sessionId] : undefined));
+  // 动态 import websocket，避免顶层静态依赖 websocket.ts 的模块加载副作用（见 InterludeBlock 同款注释）。
+  const stopLoopForSession = useCallback(async (session: Session) => {
+    const { getWebSocket } = await import('../services/websocket');
+    const ws = getWebSocket();
+    if (!ws || ws.readyState !== WebSocket.OPEN || !session.path) return;
+    ws.send(JSON.stringify({ type: 'slash', text: '/loop stop', sessionPath: session.path, agentId: session.agentId || undefined }));
+  }, []);
 
   const handleClick = useCallback(() => {
     if (editing) return;
@@ -1684,6 +1693,18 @@ const SessionItem = memo(function SessionItem({ session: s, isActive, isPending,
               aria-hidden="true"
             />
           )}
+          {loopStatus ? (
+            <span
+              className={styles.loopBadge}
+              data-loop-state={loopStatus.status}
+              title={loopStatus.status === 'running' ? '循环运行中' : '循环已暂停'}
+              onPointerDown={(e) => e.stopPropagation()}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <span className={styles.loopBadgeDot} data-state={loopStatus.status} aria-hidden="true" />
+              <span className={styles.loopBadgeStop} title="停止循环" onClick={() => stopLoopForSession(s)}>×</span>
+            </span>
+          ) : null}
           {editing ? (
             <input
               ref={inputRef}

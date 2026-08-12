@@ -39,6 +39,18 @@ describe("loop messages", () => {
     expect(msg.customType).toBe(LOOP_NOTICE_MESSAGE_TYPE);
     expect(msg.content).toContain("循环已暂停");
   });
+
+  it("kickoff details carry structured turnCount/maxTurns", () => {
+    const msg = buildLoopKickoffMessage(loop);
+    expect(msg.details.turnCount).toBe(2);
+    expect(msg.details.maxTurns).toBe(50);
+  });
+
+  it("wakeup details carry structured turnCount/maxTurns", () => {
+    const msg = buildLoopWakeupMessage(loop, "check remote pipeline status");
+    expect(msg.details.turnCount).toBe(2);
+    expect(msg.details.maxTurns).toBe(50);
+  });
 });
 
 describe("buildLoopInterludeBlock", () => {
@@ -101,5 +113,44 @@ describe("buildLoopInterludeBlock", () => {
   it("returns null when a kickoff has no prompt anywhere to recover", () => {
     expect(buildLoopInterludeBlock({ customType: LOOP_TURN_MESSAGE_TYPE, content: "no task here", details: { kind: "kickoff" } })).toBeNull();
     expect(buildLoopInterludeBlock({ customType: LOOP_NOTICE_MESSAGE_TYPE, content: "   ", details: { kind: "notice" } })).toBeNull();
+  });
+
+  it("reads turnCount/maxTurns from details into the interlude block", () => {
+    const kickoff = buildLoopInterludeBlock({ ...buildLoopKickoffMessage(loop), id: "k1" });
+    expect(kickoff.turnCount).toBe(2);
+    expect(kickoff.maxTurns).toBe(50);
+
+    const wakeup = buildLoopInterludeBlock({ ...buildLoopWakeupMessage(loop, "check now"), id: "w1" });
+    expect(wakeup.turnCount).toBe(2);
+    expect(wakeup.maxTurns).toBe(50);
+  });
+
+  it("falls back to the Progress line in content for legacy wakeups (no details.turnCount)", () => {
+    // 旧 wakeup：details 无 turnCount/maxTurns，但协议正文带 "Progress: loop turn X/Y" 行
+    const legacy = {
+      customType: LOOP_TURN_MESSAGE_TYPE,
+      display: false,
+      id: "legacy-w",
+      content: `<hana-loop kind="wakeup">\nScheduled wakeup fired. Reason: check\nLoop task: watch the pipeline\nProgress: loop turn 3/50.\n</hana-loop>`,
+      details: { schemaVersion: 1, kind: "wakeup", prompt: "watch the pipeline" },
+    };
+    const block = buildLoopInterludeBlock(legacy);
+    expect(block).not.toBeNull();
+    expect(block.turnCount).toBe(3);
+    expect(block.maxTurns).toBe(50);
+  });
+
+  it("omits turnCount/maxTurns for legacy kickoffs whose content has no Progress line", () => {
+    const legacy = {
+      customType: LOOP_TURN_MESSAGE_TYPE,
+      display: false,
+      id: "legacy-k",
+      content: `<hana-loop kind="kickoff">\nThis session is now in recurring-loop mode.\nTask: watch the pipeline\n</hana-loop>`,
+      details: { schemaVersion: 1, kind: "kickoff" },
+    };
+    const block = buildLoopInterludeBlock(legacy);
+    expect(block).not.toBeNull();
+    expect(block).not.toHaveProperty("turnCount");
+    expect(block).not.toHaveProperty("maxTurns");
   });
 });
