@@ -91,6 +91,10 @@ export class LoopController {
       throw new LoopError("loop_already_active", "该会话已有活跃循环，先 /loop stop 再启动新的");
     }
     this._store.create(target, prompt);
+    // create 后立即推送 running——不依赖 kickoff 投递是否成功。store 此刻已是 running，
+    // 前端徽章/按钮应即时反映；kickoff 投递若失败，循环仍由护栏/用户 stop 收尾，避免
+    // "store=running 但前端毫不知情"的不一致。
+    this._emitStatus(key);
     // 在 kickoff 之前把用户任务 prompt 记成展示型 user 气泡（排在 kickoff interlude 前）。
     // recordUserPrompt 用 appendCustomEntry 写 type:"custom" 无 content，永不进 model 输入。
     try {
@@ -100,9 +104,7 @@ export class LoopController {
     }
     const loop = this._store.get(key);
     await this._injectLoopTurn(key, target, buildLoopKickoffMessage(loop));
-    const started = this._store.get(key);
-    this._emitStatus(key);
-    return started;
+    return this._store.get(key);
   }
 
   async stop(target) {
