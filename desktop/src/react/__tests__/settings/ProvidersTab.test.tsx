@@ -466,4 +466,12 @@ describe('ProvidersTab provider-scoped form state', () => {
     expect(useSettingsStore.getState().selectedProviderId).toBe('deepseek');
     expect(mocks.loadSettingsConfig).not.toHaveBeenCalled();
   });
+
+  it('no longer offers a usage sub tab after usage became its own settings page', () => {
+    render(<ProvidersTab />);
+
+    expect(screen.queryByRole('tab', { name: 'settings.providers.subtab.usage' })).not.toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: 'settings.providers.subtab.api' })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: 'settings.providers.subtab.models' })).toBeInTheDocument();
+  });
 });

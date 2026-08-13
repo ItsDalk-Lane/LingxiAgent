@@ -161,6 +161,40 @@ describe('AssistantMessage completion actions', () => {
     expect(screen.queryByTitle('重新生成')).not.toBeInTheDocument();
   });
 
+  it('gives collapsed task cards a stable full-width message host', () => {
+    const cardMessage: ChatMessage = {
+      id: 'a-card',
+      role: 'assistant',
+      blocks: [{
+        type: 'subagent',
+        taskId: 'task-card',
+        task: '检查卡片宽度',
+        taskTitle: '检查卡片宽度',
+        agentName: 'SORA',
+        streamKey: '/session/subagent-card.jsonl',
+        streamStatus: 'done',
+      }],
+    };
+
+    const { container } = render(
+      <AssistantMessage
+        agentDisplay={{ id: 'hana', displayName: 'Hana', avatarUrl: null, fallbackAvatar: null, yuan: 'hana', isUser: false }}
+        isStreaming={false}
+        isSelected={false}
+        message={cardMessage}
+        showAvatar={false}
+        sessionPath={sessionPath}
+      />,
+    );
+
+    const messageRoot = container.querySelector('[data-message-id="a-card"]');
+    const messageBody = Array.from(messageRoot?.children || []).find((element) => (
+      element.className.includes('messageAssistant')
+    ));
+    expect(messageBody?.className).toContain('messageHasWideBlock');
+    expect(screen.getByRole('button', { name: /SORA 检查卡片宽度/i })).toHaveAttribute('aria-expanded', 'false');
+  });
+
   it('keeps retry and fork available for older turn-ending assistant replies', async () => {
     const onForkCreated = vi.fn(async () => undefined);
     render(

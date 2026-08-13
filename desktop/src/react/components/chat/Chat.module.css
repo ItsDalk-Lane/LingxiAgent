@@ -82,10 +82,9 @@
     min-width: 0;
 }
 
-/* InteractiveCard 等宽内容块需要 message 撑满可用宽度。
+/* 卡片类内容块需要 message 撑满可用宽度。
  * 正常情况下 .messageGroupAssistant { align-items: flex-start }
- * 导致 .message shrink-wrap 到内容宽度；但当消息包含 interactive card 时，
- * 强制撑到 92% 以便卡片拿到合理的渲染宽度。 */
+ * 会让 .message 按内容收窄；包含卡片时强制撑到 92%，保证收起和展开同宽。 */
 .messageHasWideBlock {
     width: 92%;
 }
@@ -1351,6 +1350,7 @@
 /* ── 工具调用折叠组 ── */
 
 .toolGroup {
+    --chat-embedded-detail-height: 260px;
     position: relative;
     margin: var(--space-4) 0;
     border-radius: var(--radius-sm);
@@ -1394,6 +1394,10 @@
 
 .toolGroupContent {
     padding: 0 0.75rem 0.3rem;
+}
+
+.toolGroupExecContent {
+    padding: 0;
 }
 
 /* 单条工具时隐藏标题行 */
@@ -1498,6 +1502,7 @@
 }
 
 .processFoldPanel .message {
+    width: 100%;
     max-width: 100%;
 }
 
@@ -2180,8 +2185,16 @@
 
 /* ── Subagent 资源卡片 ── */
 
-.subagentResourceCard {
-    --subagent-preview-height: 260px;
+.subagentResourceCard[data-chat-resource-card] {
+    --chat-embedded-detail-height: 260px;
+}
+
+.subagentEmbeddedPreview {
+    box-sizing: border-box;
+    height: var(--chat-embedded-detail-height);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: var(--space-8) var(--space-12) var(--space-12);
 }
 
 /* 连续并列的 Subagent 卡融合为一个整块：零间隙、只留外圈圆角、内部细分隔线。
@@ -2243,6 +2256,120 @@
 
 .subagentPreviewTranscript {
     font-size: var(--fs-ui);
+}
+
+.execCommandCardHost {
+    width: 100%;
+}
+
+.execCommandCard[data-chat-resource-card] {
+    --chat-resource-card-width: 100%;
+    margin: 0;
+}
+
+.skillInvocationCardHost {
+    width: 100%;
+}
+
+.skillInvocationCard[data-chat-resource-card] {
+    --chat-resource-card-width: 100%;
+    margin: 0;
+}
+
+.skillInvocationIcon {
+    font-size: var(--fs-ui);
+}
+
+.skillInvocationDetails {
+    max-height: var(--chat-embedded-detail-height);
+    overflow: auto;
+    padding: var(--space-12) var(--space-16);
+    background: var(--tooltip-bg);
+    color: var(--tooltip-text);
+    font-size: var(--fs-caption);
+    line-height: 1.5;
+}
+
+.skillInvocationMetaRow {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: baseline;
+    gap: var(--space-8);
+    margin-bottom: var(--space-8);
+    color: var(--tooltip-text);
+}
+
+.skillInvocationMetaRow code,
+.skillInvocationMetaRow pre,
+.skillInvocationContent {
+    margin: 0;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: inherit;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+.skillInvocationMetaRow pre {
+    min-width: 0;
+}
+
+.skillInvocationContent {
+    padding-top: var(--space-8);
+    color: var(--tooltip-text);
+}
+
+.skillInvocationTruncated {
+    margin-top: var(--space-8);
+    color: var(--tooltip-text);
+    opacity: 0.7;
+}
+
+.execCommandIcon {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: var(--fs-caption);
+}
+
+.execCommandDetails {
+    display: flex;
+    height: var(--chat-embedded-detail-height);
+    min-height: 0;
+    flex-direction: column;
+    overflow: hidden;
+    background: var(--tooltip-bg);
+    color: var(--tooltip-text);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: var(--fs-caption);
+    line-height: 1.5;
+}
+
+.execCommandLine,
+.execCommandOutput {
+    margin: 0;
+    padding: var(--space-12) var(--space-16);
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    font: inherit;
+}
+
+.execCommandOutput {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: auto;
+    padding-top: 0;
+    color: var(--text-light);
+}
+
+.execCommandDetails :global([data-testid^="terminal-preview-"]) {
+    flex: 1 1 auto;
+    min-height: 0;
+    max-height: none;
+    overflow: auto;
+    border-top: 0;
+}
+
+.execCommandDetails :global([role="log"]) {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
 }
 
 .subagentPreviewTranscript .messageGroup {

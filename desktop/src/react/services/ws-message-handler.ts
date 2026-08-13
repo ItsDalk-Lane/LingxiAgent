@@ -39,6 +39,8 @@ import { TODO_TOOL_NAMES, type TodoToolName } from '../utils/todo-constants';
 import { applyTodoLifecycle, migrateLegacyTodos } from '../utils/todo-compat';
 import { renderMarkdown } from '../utils/markdown';
 import { bumpMessageLiveVersion } from '../stores/message-live-version';
+import { terminalOutputStream } from './terminal-output-stream';
+import { handleBackgroundProcessControlResult } from './background-process-control';
 
 declare function t(key: string, vars?: Record<string, string>): any;
 
@@ -54,6 +56,18 @@ function nonEmptyString(value: unknown): string | null {
   return typeof value === 'string' && value.trim() ? value.trim() : null;
 }
 
+// 高频事件（terminal_output）的身份告警节流：同一 key 每分钟最多一条，
+// 否则一条错配流会把 console 刷满。
+const IDENTITY_WARN_THROTTLE_MS = 60_000;
+const identityWarnLastAt = new Map<string, number>();
+
+function throttledIdentityWarn(key: string, message: string, details: unknown): void {
+  const now = Date.now();
+  if (now - (identityWarnLastAt.get(key) ?? -Infinity) < IDENTITY_WARN_THROTTLE_MS) return;
+  identityWarnLastAt.set(key, now);
+  console.warn(message, details);
+}
+
 function sessionIdentityFromMessage(msg: any): { sessionId: string | null; sessionPath: string | null } {
   const session = msg?.session && typeof msg.session === 'object' ? msg.session : null;
   return {
@@ -62,7 +76,7 @@ function sessionIdentityFromMessage(msg: any): { sessionId: string | null; sessi
   };
 }
 
-function rememberSessionLocatorFromMessage(msg: any): boolean {
+function rememberSessionLocatorFromMessage(msg: any, { write = true }: { write?: boolean } = {}): boolean {
   const { sessionId, sessionPath } = sessionIdentityFromMessage(msg);
   if (!sessionId || !sessionPath) return true;
   if (
@@ -80,7 +94,7 @@ function rememberSessionLocatorFromMessage(msg: any): boolean {
   const knownLocatorPath = snapshot.sessionLocatorsById?.[sessionId]?.path || null;
   const authoritativeLocatorUpdate = msg?.type === 'session_created';
   if (knownLocatorPath && knownLocatorPath !== sessionPath && !authoritativeLocatorUpdate) {
-    console.warn('[ws] session locator mismatch; dropping non-authoritative event', {
+    throttledIdentityWarn(`locator:${sessionId}:${sessionPath}`, '[ws] session locator mismatch; dropping non-authoritative event', {
       sessionId,
       sessionPath,
       knownLocatorPath,
@@ -92,9 +106,10 @@ function rememberSessionLocatorFromMessage(msg: any): boolean {
     || Object.entries(snapshot.sessionLocatorsById || {}).find(([, locator]: any) => locator?.path === sessionPath)?.[0]
     || null;
   if (knownPathSessionId && knownPathSessionId !== sessionId) {
-    console.warn('[ws] session identity mismatch; dropping event', { sessionId, sessionPath, knownPathSessionId });
+    throttledIdentityWarn(`identity:${sessionId}:${sessionPath}`, '[ws] session identity mismatch; dropping event', { sessionId, sessionPath, knownPathSessionId });
     return false;
   }
+  if (!write) return true;
   useStore.setState((state: any) => {
     const currentLocator = state.sessionLocatorsById?.[sessionId] || null;
     const patch: Record<string, any> = {};
@@ -515,7 +530,9 @@ function applyInputSessionConfirmationBlock(msg: any): void {
 // ── 消息分发（大 switch） ──
 
 export function handleServerMessage(msg: any): void {
-  if (!rememberSessionLocatorFromMessage(msg)) return;
+  // 高频 terminal_output 只能做只读身份校验；即使 locator 没变化，也不能调用
+  // Zustand setState，否则卡片折叠时仍会让整棵状态树持续更新。
+  if (!rememberSessionLocatorFromMessage(msg, { write: msg?.type !== 'terminal_output' })) return;
   const state = useStore.getState();
 
   const rebuildingFor = isStreamResumeRebuilding();
@@ -747,6 +764,34 @@ export function handleServerMessage(msg: any): void {
       if (msg.entry?.id) {
         useStore.getState().upsertAgentActivity(msg.entry);
       }
+      break;
+
+    case 'terminal_snapshot':
+      if (msg.sessionPath && Array.isArray(msg.terminals)) {
+        useStore.getState().replaceTerminalSnapshot({
+          sessionId: msg.sessionId ?? null,
+          sessionPath: msg.sessionPath,
+          terminals: msg.terminals,
+        });
+      }
+      break;
+
+    case 'terminal_state':
+      if (msg.terminal?.terminalId && msg.sessionPath) {
+        useStore.getState().upsertTerminal({
+          ...msg.terminal,
+          sessionId: msg.sessionId ?? msg.terminal.sessionId ?? null,
+          sessionPath: msg.sessionPath,
+        });
+      }
+      break;
+
+    case 'terminal_tail':
+      terminalOutputStream.handleTail(msg);
+      break;
+
+    case 'terminal_output':
+      terminalOutputStream.handleChunks(msg);
       break;
 
     case 'notification':
@@ -1128,6 +1173,12 @@ export function handleServerMessage(msg: any): void {
       const streamId = typeof msg.streamId === 'string' && msg.streamId.trim() ? msg.streamId.trim() : null;
       const applied = applyStreamingStatus(false, sp, { streamId }, { force: !streamId });
       if (sp && applied) streamBufferManager.finishTurn(sp, sid);
+      break;
+    }
+
+    case 'terminal_close_result':
+    case 'subagent_stop_result': {
+      handleBackgroundProcessControlResult(msg);
       break;
     }
 

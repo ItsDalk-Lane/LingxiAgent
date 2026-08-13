@@ -150,13 +150,13 @@ describe('UsageLedgerSection', () => {
     fireEvent.click(await screen.findByRole('tab', { name: 'Date' }));
 
     expect(await screen.findByRole('button', { name: 'Week' })).toHaveAttribute('aria-pressed', 'true');
-    expect(screen.getAllByTitle(/·/)).toHaveLength(7);
+    expect(screen.getAllByLabelText(/·/)).toHaveLength(7);
     expect(screen.getAllByText('Last 7 days').length).toBeGreaterThan(0);
 
     fireEvent.click(screen.getByRole('button', { name: 'Month' }));
 
     expect(screen.getByRole('button', { name: 'Month' })).toHaveAttribute('aria-pressed', 'true');
-    expect(screen.getAllByTitle(/·/)).toHaveLength(30);
+    expect(screen.getAllByLabelText(/·/)).toHaveLength(30);
     expect(screen.getAllByText('Last 30 days').length).toBeGreaterThan(0);
   });
 });

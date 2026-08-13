@@ -3,6 +3,236 @@
   "entries": [
     {
       "schemaVersion": 1,
+      "tag": "v0.1.28",
+      "version": "0.1.28",
+      "previousTag": "v0.1.27",
+      "generatedAt": "2026-08-13T12:53:31.593Z",
+      "noUserFacingChanges": false,
+      "summary": {
+        "zh": "本次更新为你带来全新的终端输出查看器、技能调用卡片和设置中的使用量标签页，同时修复了对话流中内部标记可能泄漏到聊天的问题，并优化了更新流程的稳定性。",
+        "en": "This update brings a new terminal output viewer, skill invocation cards, and a usage tab in settings, while fixing a potential leak of internal markers in chat and improving update flow stability."
+      },
+      "counts": {
+        "feature": 3,
+        "fix": 2,
+        "improvement": 1,
+        "migration": 0
+      },
+      "source": {
+        "owner": "ItsDalk-Lane",
+        "repo": "LingxiAgent",
+        "commitRange": "v0.1.27..HEAD",
+        "releaseUrl": "https://github.com/ItsDalk-Lane/LingxiAgent/releases/tag/v0.1.28",
+        "releaseNotes": ""
+      },
+      "items": [
+        {
+          "id": "terminal-output-viewer",
+          "kind": "feature",
+          "importance": "high",
+          "title": {
+            "zh": "终端输出查看器",
+            "en": "Terminal output viewer"
+          },
+          "summary": {
+            "zh": "在右侧栏新增只读终端输出查看器，可实时查看命令执行输出，支持安全停止和聊天卡片跳转。",
+            "en": "A read-only terminal output viewer in the right rail lets you see real-time command execution output, with safe stop and chat-card navigation."
+          },
+          "details": [
+            {
+              "zh": "输出采用批式实时展示，支持 ANSI 安全预览，并在断线时自动重连或补拉。",
+              "en": "Output is batched live with ANSI-safe preview, auto-reconnects, and gap recovery on disconnection."
+            },
+            {
+              "zh": "每条命令执行会渲染为独立卡片，并显示真实终端状态。",
+              "en": "Each command execution is rendered as a standalone card with real terminal status."
+            }
+          ],
+          "sources": [
+            {
+              "type": "commit",
+              "ref": "cf5b6541cb6f",
+              "title": "feat: terminal output viewer, card interaction rework, skill invocation cards, usage tab"
+            }
+          ]
+        },
+        {
+          "id": "skill-invocation-cards",
+          "kind": "feature",
+          "importance": "medium",
+          "title": {
+            "zh": "技能调用卡片",
+            "en": "Skill invocation cards"
+          },
+          "summary": {
+            "zh": "技能调用现在以卡片形式显示在对话中的真实调用位置，并带有清晰的参数说明。",
+            "en": "Skill invocations now appear as cards at their exact call position in the chat, with clear parameter semantics."
+          },
+          "details": [
+            {
+              "zh": "卡片支持用户提示词参数，并针对隐藏输入显示占位符。",
+              "en": "Cards support user-prompt parameters and show placeholders for hidden inputs."
+            }
+          ],
+          "sources": [
+            {
+              "type": "commit",
+              "ref": "cf5b6541cb6f",
+              "title": "feat: terminal output viewer, card interaction rework, skill invocation cards, usage tab"
+            }
+          ]
+        },
+        {
+          "id": "usage-tab",
+          "kind": "feature",
+          "importance": "low",
+          "title": {
+            "zh": "设置中的使用量标签页",
+            "en": "Usage tab in settings"
+          },
+          "summary": {
+            "zh": "在设置中新增“使用量”标签页，通过光标提示图展示用量情况。",
+            "en": "A new Usage tab in settings shows your usage with cursor tip charts."
+          },
+          "details": [
+            {
+              "zh": "更直观地了解 token 等资源消耗趋势。",
+              "en": "Get a clearer view of resource consumption trends such as tokens."
+            }
+          ],
+          "sources": [
+            {
+              "type": "commit",
+              "ref": "cf5b6541cb6f",
+              "title": "feat: terminal output viewer, card interaction rework, skill invocation cards, usage tab"
+            }
+          ]
+        },
+        {
+          "id": "internal-marker-leak-fix",
+          "kind": "fix",
+          "importance": "high",
+          "title": {
+            "zh": "修复内部标记可能泄漏到聊天的问题",
+            "en": "Fix potential leak of internal markers in chat"
+          },
+          "summary": {
+            "zh": "修复了在工具循环中，多段模型生成时内部标记（如心情、思考）可能被当作普通文本显示的问题。",
+            "en": "Fixed an issue where internal markers (like mood/think tags) could be shown as normal text during multi-segment model generation in tool loops."
+          },
+          "details": [
+            {
+              "zh": "现在每次新的助手输出段都会重置标记解析状态，确保只识别段首的标记。",
+              "en": "Marker parsing now re-arms per assistant segment, so only segment-leading markers are recognized."
+            },
+            {
+              "zh": "同时修复了缓冲区内多个心情段可能互相覆盖的问题。",
+              "en": "Also fixed an issue where multiple mood segments in the buffer could overwrite each other."
+            }
+          ],
+          "sources": [
+            {
+              "type": "commit",
+              "ref": "1cd20990addb",
+              "title": "fix(stream): re-arm leading internal mood/think opener per assistant segment"
+            }
+          ]
+        },
+        {
+          "id": "update-flow-stability",
+          "kind": "fix",
+          "importance": "medium",
+          "title": {
+            "zh": "优化更新流程稳定性",
+            "en": "Improve update flow stability"
+          },
+          "summary": {
+            "zh": "修复了开发版无法找到更新配置的问题，并在安装过程中显示正确的状态，支持更新失败后重试。",
+            "en": "Fixed a dev-mode issue where the update config wasn't found, now shows correct status during install, and allows retry after update failure."
+          },
+          "details": [
+            {
+              "zh": "将 dev-app-update.yml 移至应用根目录，确保开发模式下可检测更新。",
+              "en": "Moved dev-app-update.yml to app root so updates are found in dev mode."
+            },
+            {
+              "zh": "关于页面在安装中显示专用状态，并提供失败重试按钮。",
+              "en": "The About page shows a dedicated installing state and offers a retry button on failure."
+            }
+          ],
+          "sources": [
+            {
+              "type": "commit",
+              "ref": "e5e08721063f",
+              "title": "fix: address review findings from bbbce725"
+            }
+          ]
+        },
+        {
+          "id": "loop-status-desync-fix",
+          "kind": "fix",
+          "importance": "medium",
+          "title": {
+            "zh": "修复循环状态显示不同步",
+            "en": "Fix loop status display desync"
+          },
+          "summary": {
+            "zh": "修复了在 kickoff 处理较慢时，界面可能显示空闲而实际循环已在运行的问题，并确保循环目标重置时正确停止。",
+            "en": "Fixed a desync where the UI could show idle while the loop was actually running when kickoff was slow, and ensured the loop stops on target reset."
+          },
+          "details": [
+            {
+              "zh": "现在启动时立即发送运行状态，避免界面滞后。",
+              "en": "Status is now emitted immediately on start to prevent UI lag."
+            },
+            {
+              "zh": "当 kickoff 目标重置时，循环会停止，避免出现僵尸运行状态。",
+              "en": "The loop stops on kickoff target reset, preventing zombie 'running' states."
+            }
+          ],
+          "sources": [
+            {
+              "type": "commit",
+              "ref": "bbbce725e343",
+              "title": "feat(about): refactor AboutTab with multi-lang support (#6)"
+            },
+            {
+              "type": "commit",
+              "ref": "e5e08721063f",
+              "title": "fix: address review findings from bbbce725"
+            }
+          ]
+        },
+        {
+          "id": "about-multilang",
+          "kind": "improvement",
+          "importance": "low",
+          "title": {
+            "zh": "关于页面支持多语言",
+            "en": "About page multi-language support"
+          },
+          "summary": {
+            "zh": "关于页面的布局和内容已重构，并新增了中文、英文、日文、韩文和繁体中文翻译。",
+            "en": "The About tab layout and content were reworked, with translations added for zh, en, ja, ko, and zh-TW."
+          },
+          "details": [
+            {
+              "zh": "界面显示会根据系统语言自动适配。",
+              "en": "The UI now adapts to the system language automatically."
+            }
+          ],
+          "sources": [
+            {
+              "type": "commit",
+              "ref": "bbbce725e343",
+              "title": "feat(about): refactor AboutTab with multi-lang support (#6)"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "schemaVersion": 1,
       "tag": "v0.1.27",
       "version": "0.1.27",
       "previousTag": "v0.1.26",

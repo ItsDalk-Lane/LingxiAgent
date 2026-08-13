@@ -22,6 +22,7 @@ const TAB_ITEMS = [
   { id: 'mcp', key: 'settings.tabs.mcp', d: '<rect x="2" y="9" width="6" height="6" rx="1"/><rect x="16" y="9" width="6" height="6" rx="1"/><path d="M8 12h8"/>' },
   { id: 'bridge', key: 'settings.tabs.bridge', d: '<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>' },
   { id: 'providers', key: 'settings.tabs.providers', d: '<path d="M22 12h-4l-3 9L9 3l-3 9H2"/>' },
+  { id: 'usage', key: 'settings.tabs.usage', d: '<path d="M3 3v18h18"/><path d="M7 14v4"/><path d="M12 9v9"/><path d="M17 5v13"/>' },
   { id: 'media', key: 'settings.tabs.media', d: '<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>' },
   { id: 'sharing', key: 'settings.tabs.sharing', d: '<path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/>' },
   { id: 'access', key: 'settings.tabs.access', d: '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M8 12h8"/><path d="M12 8v8"/><path d="M7 19v2"/><path d="M17 19v2"/>' },

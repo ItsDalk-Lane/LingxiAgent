@@ -3,6 +3,12 @@ import path from "path";
 import { atomicWriteSync } from "../../shared/safe-fs.ts";
 import { randomBytes } from "crypto";
 import { assertExecutionCwd } from "../shell/execution-cwd.ts";
+import {
+  TERMINAL_TAIL_DEFAULT_MAX_BYTES,
+  TERMINAL_TAIL_DEFAULT_MAX_CHUNKS,
+  TERMINAL_TAIL_HARD_MAX_BYTES,
+  TERMINAL_TAIL_HARD_MAX_CHUNKS,
+} from "../../shared/terminal-ui-contract.ts";
 
 const TERMINAL_ROOT = path.join(".ephemeral", "terminal-sessions");
 
@@ -29,9 +35,12 @@ function normalizeString(value) {
   return typeof value === "string" ? value : "";
 }
 
-function publicEntry(entry) {
+function publicEntry(entry, sessionId = null) {
+  const toolCallId = normalizeString(entry.toolCallId);
   return {
     terminalId: entry.terminalId,
+    ...(toolCallId ? { toolCallId } : {}),
+    sessionId,
     sessionPath: entry.sessionPath,
     agentId: entry.agentId,
     cwd: entry.cwd,
@@ -46,6 +55,26 @@ function publicEntry(entry) {
     signal: entry.signal ?? null,
     transcriptPath: entry.transcriptPath,
   };
+}
+
+function boundedPositiveInteger(value, fallback, hardMax) {
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed) || parsed <= 0) return fallback;
+  return Math.min(Math.floor(parsed), hardMax);
+}
+
+function normalizedSinceSeq(value) {
+  if (value === undefined || value === null || value === "") return null;
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? Math.max(0, Math.floor(parsed)) : null;
+}
+
+function utf8Tail(text, maxBytes) {
+  const raw = Buffer.from(text, "utf8");
+  if (raw.length <= maxBytes) return text;
+  let start = raw.length - maxBytes;
+  while (start < raw.length && (raw[start] & 0xc0) === 0x80) start += 1;
+  return raw.subarray(start).toString("utf8");
 }
 
 export class TerminalSessionManager {
@@ -88,6 +117,7 @@ declare root: any;
   }
 
   async start({
+    toolCallId = "",
     sessionPath,
     agentId = "",
     cwd,
@@ -103,6 +133,7 @@ declare root: any;
     const now = this._now();
     const entry = {
       terminalId: id,
+      toolCallId: normalizeString(toolCallId),
       sessionPath: normalizedSessionPath,
       agentId: normalizeString(agentId),
       cwd: normalizedCwd,
@@ -141,7 +172,7 @@ declare root: any;
       this._bySession.get(this._sessionKeyForPath(normalizedSessionPath))?.delete(id);
       throw err;
     }
-    return { ...publicEntry(entry), output: "" };
+    return { ...this._publicEntry(entry), output: "" };
   }
 
   write({ sessionPath, terminalId, chars }: any = {}) {
@@ -161,9 +192,48 @@ declare root: any;
     const entry = this._requireOwned({ sessionPath, terminalId });
     const chunks = this._readTranscript(entry.transcriptPath, sinceSeq);
     return {
-      ...publicEntry(entry),
+      ...this._publicEntry(entry),
       output: chunks.map((chunk) => chunk.data).join(""),
       chunks,
+    };
+  }
+
+  /**
+   * 只给界面使用的有界 transcript 读取。
+   * 未传 sinceSeq 时返回最近窗口；传入后返回该序号之后仍能放进窗口的连续尾部。
+   */
+  readTail({
+    sessionPath,
+    terminalId,
+    sinceSeq,
+    maxBytes = TERMINAL_TAIL_DEFAULT_MAX_BYTES,
+    maxChunks = TERMINAL_TAIL_DEFAULT_MAX_CHUNKS,
+  }: any = {}) {
+    const entry = this._requireOwned({ sessionPath, terminalId });
+    const byteLimit = boundedPositiveInteger(
+      maxBytes,
+      TERMINAL_TAIL_DEFAULT_MAX_BYTES,
+      TERMINAL_TAIL_HARD_MAX_BYTES,
+    );
+    const chunkLimit = boundedPositiveInteger(
+      maxChunks,
+      TERMINAL_TAIL_DEFAULT_MAX_CHUNKS,
+      TERMINAL_TAIL_HARD_MAX_CHUNKS,
+    );
+    const normalizedSince = normalizedSinceSeq(sinceSeq);
+    const tail = this._readTranscriptTail(entry.transcriptPath, {
+      sinceSeq: normalizedSince,
+      maxBytes: byteLimit,
+      maxChunks: chunkLimit,
+      lastSeq: entry.seq,
+    });
+    return {
+      ...this._publicEntry(entry),
+      output: tail.chunks.map((chunk) => chunk.data).join(""),
+      chunks: tail.chunks,
+      sinceSeq: normalizedSince,
+      lastSeq: entry.seq,
+      truncated: tail.truncated,
     };
   }
 
@@ -188,7 +258,7 @@ declare root: any;
         this._emit("terminal_closed", entry);
       }
     }
-    return { ...publicEntry(entry), output: "" };
+    return { ...this._publicEntry(entry), output: "" };
   }
 
   closeForSession(sessionPath) {
@@ -218,8 +288,8 @@ declare root: any;
       .map((id) => this._terminals.get(id))
       .filter(Boolean)
       .map((entry) => this._entryMatchesSessionPath(entry, normalizedSessionPath)
-        ? publicEntry({ ...entry, sessionPath: normalizedSessionPath })
-        : publicEntry(entry))
+        ? this._publicEntry({ ...entry, sessionPath: normalizedSessionPath })
+        : this._publicEntry(entry))
       .sort((a, b) => a.createdAt - b.createdAt);
     return { sessionPath: normalizedSessionPath, terminals };
   }
@@ -229,6 +299,14 @@ declare root: any;
       this._backendPromise = Promise.resolve(this._createBackend());
     }
     return this._backendPromise;
+  }
+
+  _publicEntry(entry) {
+    const sessionId = this._getSessionIdForPath?.(entry.sessionPath);
+    const normalizedSessionId = typeof sessionId === "string" && sessionId.trim()
+      ? sessionId.trim()
+      : (typeof entry.sessionId === "string" && entry.sessionId.trim() ? entry.sessionId.trim() : null);
+    return publicEntry(entry, normalizedSessionId);
   }
 
   _requireOwned({ sessionPath, terminalId }) {
@@ -273,7 +351,7 @@ declare root: any;
 
   _persist(entry) {
     fs.mkdirSync(this.root, { recursive: true });
-    atomicWriteSync(this._metadataPath(entry.terminalId), JSON.stringify(publicEntry(entry), null, 2));
+    atomicWriteSync(this._metadataPath(entry.terminalId), JSON.stringify(this._publicEntry(entry), null, 2));
   }
 
   _appendTranscript(entry, data) {
@@ -327,6 +405,85 @@ declare root: any;
     return chunks;
   }
 
+  _readTranscriptTail(transcriptPath, { sinceSeq, maxBytes, maxChunks, lastSeq }) {
+    if (!fs.existsSync(transcriptPath)) return { chunks: [], truncated: false };
+    const size = fs.statSync(transcriptPath).size;
+    if (size <= 0) return { chunks: [], truncated: false };
+
+    // JSON 转义会放大控制字符；扫描窗口仍有固定硬上限，不会随 transcript 总大小增长。
+    const scanBudget = Math.min(
+      size,
+      Math.max(64 * 1024, maxBytes * 8) + Math.min(maxChunks * 256, 512 * 1024),
+    );
+    const start = Math.max(0, size - scanBudget);
+    const fd = fs.openSync(transcriptPath, "r");
+    let raw;
+    try {
+      const buffer = Buffer.alloc(scanBudget);
+      const bytesRead = fs.readSync(fd, buffer, 0, scanBudget, start);
+      raw = buffer.subarray(0, bytesRead).toString("utf8");
+    } finally {
+      fs.closeSync(fd);
+    }
+
+    let omittedBeforeScan = start > 0;
+    if (omittedBeforeScan) {
+      const firstNewline = raw.indexOf("\n");
+      if (firstNewline < 0) return { chunks: [], truncated: lastSeq > (sinceSeq ?? 0) };
+      raw = raw.slice(firstNewline + 1);
+    }
+
+    const parsed = [];
+    for (const line of raw.split(/\n/)) {
+      if (!line.trim()) continue;
+      try {
+        const item = JSON.parse(line);
+        const seq = Number(item?.seq);
+        if (!Number.isFinite(seq) || typeof item?.data !== "string") continue;
+        if (sinceSeq !== null && seq <= sinceSeq) continue;
+        parsed.push({ seq, data: item.data });
+      } catch {}
+    }
+    parsed.sort((a, b) => a.seq - b.seq);
+
+    const selected = [];
+    let usedBytes = 0;
+    let omittedByLimit = false;
+    for (let index = parsed.length - 1; index >= 0; index -= 1) {
+      const item = parsed[index];
+      if (selected.length >= maxChunks) {
+        omittedByLimit = true;
+        break;
+      }
+      const remainingBytes = maxBytes - usedBytes;
+      const itemBytes = Buffer.byteLength(item.data, "utf8");
+      if (itemBytes > remainingBytes) {
+        if (selected.length === 0 && remainingBytes > 0) {
+          selected.unshift({
+            seq: item.seq,
+            data: utf8Tail(item.data, remainingBytes),
+            truncatedStart: true,
+          });
+        }
+        omittedByLimit = true;
+        break;
+      }
+      selected.unshift(item);
+      usedBytes += itemBytes;
+    }
+
+    if (sinceSeq !== null && omittedBeforeScan) {
+      const firstParsedSeq = parsed[0]?.seq;
+      omittedBeforeScan = lastSeq > sinceSeq
+        && (!Number.isFinite(firstParsedSeq) || firstParsedSeq > sinceSeq + 1);
+    }
+
+    return {
+      chunks: selected,
+      truncated: omittedBeforeScan || omittedByLimit,
+    };
+  }
+
   _loadPersistedTerminals() {
     if (!fs.existsSync(this.root)) return;
     for (const file of fs.readdirSync(this.root)) {
@@ -348,12 +505,16 @@ declare root: any;
   }
 
   _emit(type, entry, extra: any = {}) {
-    this._emitEvent?.({
+    const event: any = {
       type,
       terminalId: entry.terminalId,
       status: entry.status,
       seq: entry.seq,
       ...(extra || {}),
-    }, entry.sessionPath);
+    };
+    if (type === "terminal_started" || type === "terminal_exited" || type === "terminal_closed") {
+      event.terminal = this._publicEntry(entry);
+    }
+    this._emitEvent?.(event, entry.sessionPath);
   }
 }

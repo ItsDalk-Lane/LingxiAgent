@@ -228,6 +228,7 @@ describe("exec_command tools", () => {
 
     expect(parsedStart.process_id).toBe("term_1");
     expect(manager.start).toHaveBeenCalledWith(expect.objectContaining({
+      toolCallId: "call-tty",
       sessionPath: "/tmp/session.jsonl",
       agentId: "hana",
       cwd: resolvedTestCwd(),

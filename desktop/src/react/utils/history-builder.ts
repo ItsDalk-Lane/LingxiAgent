@@ -63,6 +63,7 @@ export interface HistoryApiResponse {
       status?: 'succeeded' | 'failed' | 'unknown';
       success?: boolean;
       error?: string;
+      details?: Record<string, unknown>;
     }>;
     images?: Array<{ data: string; mimeType: string }>;
     timestamp?: number | string | null;

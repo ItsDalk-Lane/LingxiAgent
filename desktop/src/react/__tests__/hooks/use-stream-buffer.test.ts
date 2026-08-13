@@ -100,6 +100,36 @@ describe('streamBufferManager.snapshot', () => {
     expect(snap!.inMood).toBe(false);
   });
 
+  it('keeps a skill call between the prose emitted before and after it', () => {
+    streamBufferManager.handle({ type: 'text_delta', sessionPath: PATH, delta: '先读取技能。' });
+    streamBufferManager.handle({
+      type: 'tool_start',
+      sessionPath: PATH,
+      id: 'call-skill',
+      name: 'read',
+      args: { path: '/skills/leader/SKILL.md' },
+    });
+    streamBufferManager.handle({
+      type: 'tool_end',
+      sessionPath: PATH,
+      id: 'call-skill',
+      name: 'read',
+      success: true,
+      details: { skillInvocation: { content: '# Skill: leader' } },
+    });
+    streamBufferManager.handle({ type: 'text_delta', sessionPath: PATH, delta: '技能读取完成。' });
+    const snapshot = snapshotStreamBuffer(PATH);
+    expect(snapshot?.text).toBe('先读取技能。技能读取完成。');
+    expect(snapshot?.blocks?.map((block) => block.type)).toEqual(['text', 'tool_group', 'text']);
+    streamBufferManager.finishTurn(PATH);
+
+    expect(getAssistantMessage()?.blocks).toMatchObject([
+      { type: 'text', source: '先读取技能。' },
+      { type: 'tool_group', tools: [{ id: 'call-skill', name: 'read', done: true }] },
+      { type: 'text', source: '技能读取完成。' },
+    ]);
+  });
+
   it('invalidate 之后 snapshot 变 null（归属方清干净）', () => {
     streamBufferManager.handle({ type: 'text_delta', sessionPath: PATH, delta: 'abc' });
     expect(snapshotStreamBuffer(PATH)?.hasContent).toBe(true);

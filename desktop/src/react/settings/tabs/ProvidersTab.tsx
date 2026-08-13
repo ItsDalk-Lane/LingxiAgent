@@ -8,17 +8,15 @@ import { ProviderDetail } from './providers/ProviderDetail';
 import { ProviderPickerOverlay, AddProviderOverlay, type ProviderPickerItem } from './providers/ProviderList';
 import { OtherModelsSection } from './providers/OtherModelsSection';
 import { SearchApiKeyConfig } from './providers/SearchApiKeyConfig';
-import { UsageLedgerSection } from './providers/UsageLedgerSection';
 import { SettingsSection } from '../components/SettingsSection';
 import { ProviderIcon } from '@/ui';
 import styles from '../Settings.module.css';
 
-type ProviderSubTab = 'api' | 'models' | 'usage';
+type ProviderSubTab = 'api' | 'models';
 
 const PROVIDER_SUB_TABS: { key: ProviderSubTab; labelKey: string }[] = [
   { key: 'api', labelKey: 'settings.providers.subtab.api' },
   { key: 'models', labelKey: 'settings.providers.subtab.models' },
-  { key: 'usage', labelKey: 'settings.providers.subtab.usage' },
 ];
 
 export function ProvidersTab() {
@@ -253,12 +251,6 @@ export function ProvidersTab() {
         {subTab === 'models' && (
           <div className={styles['provider-sub-panel']}>
             <OtherModelsSection providers={providers} />
-          </div>
-        )}
-
-        {subTab === 'usage' && (
-          <div className={styles['provider-sub-panel']}>
-            <UsageLedgerSection />
           </div>
         )}
       </div>

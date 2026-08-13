@@ -648,7 +648,7 @@
     ],
     "version": 3
   },
-  "payloadFingerprint": "sha256:35a9ed472650d2cb78de2e669c80cdfce99ff907c944decf883aabdfb6d84e9e",
+  "payloadFingerprint": "sha256:5044d6afc3718cad839b03286e8e6191b63cce392e2cf817a93b4a3c5b49e8cf",
   "registry": [
     {
       "affectedByEpochMigration": true,
@@ -2782,7 +2782,7 @@
       "protocolModules": [],
       "restorePolicy": "Load through TerminalSessionManager; persisted running entries are historical metadata, not resumable processes.",
       "schemaContract": {
-        "compatibility": "The named runtime reader is canonical; this inventory does not imply stricter validation than runtime currently performs.",
+        "compatibility": "sessionId and toolCallId are optional additive metadata fields. Older entries without them still load; ownership resolves from the persisted sessionPath when no stable id is present, and chat navigation falls back to terminalId when no toolCallId is present.",
         "kind": "protocol",
         "source": "lib/terminal/terminal-session-manager.ts"
       },
@@ -2999,8 +2999,8 @@
   ],
   "review": {
     "classification": "compatible",
-    "compatibilityReason": "loop 可见性改动：loop-user-prompt 复用现有 custom entry 持久化形状（appendCustomEntry），loop_status 仅 WS 瞬态事件；usage/error 记账顺序调整不改任何持久化 schema",
-    "payloadFingerprint": "sha256:35a9ed472650d2cb78de2e669c80cdfce99ff907c944decf883aabdfb6d84e9e"
+    "compatibilityReason": "terminal-session-state adds optional toolCallId metadata; existing records without it still load, ownership remains session-scoped, and chat navigation falls back to terminalId",
+    "payloadFingerprint": "sha256:5044d6afc3718cad839b03286e8e6191b63cce392e2cf817a93b4a3c5b49e8cf"
   },
   "schemas": [
     {
@@ -3554,7 +3554,7 @@
       "contract": "terminal metadata JSON plus ordered transcript JSONL protocol",
       "kind": "directory-contract",
       "module": "lib/terminal/terminal-session-manager.ts",
-      "sourceHash": "sha256:f6924f5cf80039f864c7698349e5f8d4d08469ee31b02c58e05de38fb9fc7844",
+      "sourceHash": "sha256:741914067f9a4b1c375de2e8471f89b629ee58d0143d31802b0c1adeb09e33c2",
       "storeId": "terminal-session-state"
     },
     {

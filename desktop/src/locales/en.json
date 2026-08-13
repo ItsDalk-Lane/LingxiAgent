@@ -668,7 +668,18 @@
     "failed": "⚠ Something seems off · {n} steps",
     "countWithFail": "{total} tools ({fail} failed)",
     "count": "{n} tools",
-    "running": "{n} tools running"
+    "running": "{n} tools running",
+    "skill": {
+      "running": "Running skill {name}",
+      "completed": "Ran skill {name}",
+      "failed": "Skill failed {name}",
+      "skillLabel": "Skill",
+      "paramsLabel": "Parameters",
+      "promptUnavailable": "The user prompt for this invocation was not recorded",
+      "contentPending": "Loading skill content…",
+      "contentUnavailable": "Skill content is unavailable",
+      "truncated": "Skill content was truncated"
+    }
   },
   "processFold": {
     "summary": "✨ {name} worked for a while",
@@ -1064,6 +1075,7 @@
       "agent": "Agent",
       "me": "Me",
       "providers": "Providers",
+      "usage": "Usage",
       "media": "Media",
       "models": "Models",
       "memory": "Memory",
@@ -2675,6 +2687,21 @@
     "blockActions": "Block actions"
   },
   "rightWorkspace": {
+    "terminal": {
+      "title": "Terminal processes",
+      "running": "Running",
+      "done": "Done",
+      "failed": "Failed",
+      "aborted": "Aborted",
+      "stale": "Stale",
+      "count": "{n} running in background",
+      "runningFor": "Running for {text}",
+      "stop": "Stop",
+      "cwd": "Working directory",
+      "exitCode": "Exit code",
+      "preview": "Terminal output",
+      "staleHint": "This PTY no longer exists after Lingxi restarted, but its previous output is still available."
+    },
     "activity": {
       "title": "Activity"
     },
@@ -2683,7 +2710,14 @@
       "waitForOutput": "Wait for output to finish"
     },
     "subagent": {
-      "title": "Sub-agents"
+      "title": "Sub-agents",
+      "count": "{n} running in background",
+      "runningFor": "Running for {text}",
+      "stop": "Stop"
+    },
+    "process": {
+      "stopping": "Stopping",
+      "stopFailed": "Could not stop the process. Try again."
     },
     "workflow": {
       "title": "Workflow",

@@ -827,6 +827,7 @@ export const PERSISTENT_STORES: readonly StoreDescriptor[] = Object.freeze([
     firstPossibleWritePhase: "runtime_ready",
     checkpointPolicy: "Preserve metadata and transcript together only for diagnostic continuity; a live PTY handle is never checkpointed.",
     restorePolicy: "Load through TerminalSessionManager; persisted running entries are historical metadata, not resumable processes.",
+    compatibility: "sessionId and toolCallId are optional additive metadata fields. Older entries without them still load; ownership resolves from the persisted sessionPath when no stable id is present, and chat navigation falls back to terminalId when no toolCallId is present.",
     identityContract: "terminalId identifies metadata/transcript; session ownership must resolve to sessionId before keyed access.",
     siteRules: rules(["lib/terminal/terminal-session-manager.ts"], "Writes terminal metadata or appends ordered transcript chunks."),
   }),

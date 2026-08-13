@@ -60,6 +60,34 @@ function emitTool(subscriber, sessionPath, toolCallId = "t1", name = "read") {
 }
 
 describe("chat route mood segment lifecycle", () => {
+  it("projects model skill reads as bounded tool_end details", () => {
+    const { subscriber, sessionPath, payloads } = makeHarness();
+    subscriber?.({ type: "turn_start" }, sessionPath);
+    subscriber?.({
+      type: "tool_execution_start",
+      toolCallId: "skill-1",
+      toolName: "read",
+      args: { path: "/skills/leader/SKILL.md" },
+    }, sessionPath);
+    subscriber?.({
+      type: "tool_execution_end",
+      toolCallId: "skill-1",
+      toolName: "read",
+      result: { content: [{ type: "text", text: "# Skill: leader\n\nLead the work." }] },
+      isError: false,
+    }, sessionPath);
+
+    expect(payloads().find((payload) => payload.type === "tool_end" && payload.id === "skill-1")).toMatchObject({
+      name: "read",
+      success: true,
+      details: {
+        skillInvocation: {
+          content: "# Skill: leader\n\nLead the work.",
+        },
+      },
+    });
+  });
+
   it("Case A: single leading reflect → mood_start/mood_text/mood_end, answer as text", () => {
     const { subscriber, sessionPath, payloads } = makeHarness();
     subscriber?.({ type: "turn_start" }, sessionPath);

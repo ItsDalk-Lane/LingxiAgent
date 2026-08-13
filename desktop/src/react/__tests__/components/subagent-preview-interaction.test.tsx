@@ -9,6 +9,12 @@ import { SubagentCard } from '../../components/chat/SubagentCard';
 import { createSubagentPreviewSlice, type SubagentPreviewSlice } from '../../stores/subagent-preview-slice';
 import { dispatchStreamKey } from '../../services/stream-key-dispatcher';
 
+const controlMocks = vi.hoisted(() => ({
+  stopSubagentProcess: vi.fn(async () => ({ ok: true })),
+}));
+
+vi.mock('../../services/background-process-control', () => controlMocks);
+
 function makeSlice(): SubagentPreviewSlice {
   let state: SubagentPreviewSlice;
   const set = (partial: Partial<SubagentPreviewSlice> | ((s: SubagentPreviewSlice) => Partial<SubagentPreviewSlice>)) => {
@@ -110,10 +116,12 @@ describe('subagent preview state ownership', () => {
   });
 });
 
-describe('SubagentCard static resource card', () => {
+describe('SubagentCard expandable resource card', () => {
   beforeEach(() => {
-    vi.stubGlobal('fetch', vi.fn(async () => ({ ok: true })));
+    controlMocks.stopSubagentProcess.mockClear();
     useStore.setState({
+      currentSessionId: 'sess-parent',
+      currentSessionPath: '/session/parent',
       activeServerConnection: {
         kind: 'local',
         label: 'Local',
@@ -139,7 +147,7 @@ describe('SubagentCard static resource card', () => {
     } as never);
   });
 
-  it('只渲染静态卡面预览，不在聊天流内展开 child session', () => {
+  it('默认收起，点击标题后在聊天卡内展开 child session', async () => {
     render(
       <SubagentCard
         block={{
@@ -158,8 +166,9 @@ describe('SubagentCard static resource card', () => {
     expect(screen.getByText('任务：do work')).toBeTruthy();
     expect(screen.getByText('subagent.status.done')).toBeTruthy();
     expect(screen.queryByText('Preview A')).toBeNull();
-    expect(screen.queryByRole('button', { name: /SORA/i })).toBeNull();
-    expect(useStore.getState().subagentPreviewByTaskId).toEqual({});
+    fireEvent.click(screen.getByRole('button', { name: /SORA/i }));
+    expect(await screen.findByText('Preview A')).toBeTruthy();
+    expect(useStore.getState().subagentPreviewByTaskId['task-a']?.open).toBe(true);
     expect(document.querySelector('[data-chat-resource-card]')?.getAttribute('data-variant')).toBe('task');
   });
 
@@ -249,7 +258,7 @@ describe('SubagentCard static resource card', () => {
     expect(screen.queryByText('实时正文不该进概览')).toBeNull();
   });
 
-  it('运行中卡片只保留终止按钮，不提供展开入口', async () => {
+  it('运行中卡片可展开，停止时携带父会话身份且不乐观伪造终态', async () => {
     render(
       <SubagentCard
         block={{
@@ -267,9 +276,14 @@ describe('SubagentCard static resource card', () => {
     fireEvent.click(abort);
 
     await waitFor(() => {
-      expect(fetch).toHaveBeenCalledWith('http://127.0.0.1:3210/api/task/task-a/abort', { method: 'POST' });
+      expect(controlMocks.stopSubagentProcess).toHaveBeenCalledWith({
+        sessionId: 'sess-parent',
+        sessionPath: '/session/parent',
+        taskId: 'task-a',
+      });
     });
-    expect(screen.queryByText('Preview A')).toBeNull();
-    expect(useStore.getState().subagentPreviewByTaskId).toEqual({});
+    expect(screen.getByText('subagent.status.dispatched')).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: /SORA/i }));
+    expect(await screen.findByText('Preview A')).toBeTruthy();
   });
 });

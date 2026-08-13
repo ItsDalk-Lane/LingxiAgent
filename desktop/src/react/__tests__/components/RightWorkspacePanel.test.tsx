@@ -36,13 +36,18 @@ vi.mock('../../hooks/use-hana-fetch', () => ({
   lingxiFetch: vi.fn(),
 }));
 
-// 整列卡片栈的兄弟卡（Activity / Session 状态）各有独立测试；这里聚焦 desk 卡 tab
-// 逻辑，stub 掉它们避免「工作目录」等文案在多张卡里重复导致 getByText 命中多个。
+// 整列卡片栈的兄弟卡各有独立测试；这里聚焦 desk 卡 tab 与挂载顺序，使用无文案 marker。
+vi.mock('../../components/right-workspace/TerminalCard', () => ({
+  TerminalCard: () => <div data-testid="terminal-card-marker" />,
+}));
+vi.mock('../../components/right-workspace/WorkflowCard', () => ({
+  WorkflowCard: () => <div data-testid="workflow-card-marker" />,
+}));
 vi.mock('../../components/right-workspace/AgentActivityCard', () => ({
-  AgentActivityCard: () => null,
+  AgentActivityCard: () => <div data-testid="agent-card-marker" />,
 }));
 vi.mock('../../components/right-workspace/SessionStatusCard', () => ({
-  SessionStatusCard: () => null,
+  SessionStatusCard: () => <div data-testid="session-card-marker" />,
 }));
 
 const tMap: Record<string, string> = {
@@ -899,6 +904,21 @@ describe('RightWorkspacePanel', () => {
 
     expect(drawer).toHaveAttribute('data-open', 'true');
     expect(screen.getByRole('button', { name: '收起笺' })).toHaveAttribute('aria-expanded', 'true');
+  });
+
+  it('mounts terminal before workflow, agent activity, and session status only outside compact mode', () => {
+    const { container, rerender } = render(<RightWorkspacePanel />);
+    const markers = Array.from(container.querySelectorAll('[data-testid$="-card-marker"]'))
+      .map((node) => node.getAttribute('data-testid'));
+    expect(markers).toEqual([
+      'terminal-card-marker',
+      'workflow-card-marker',
+      'agent-card-marker',
+      'session-card-marker',
+    ]);
+
+    rerender(<RightWorkspacePanel compact />);
+    expect(container.querySelector('[data-testid$="-card-marker"]')).toBeNull();
   });
 
   it('hides raw Jian execution status while preserving it when editing the instruction body', async () => {

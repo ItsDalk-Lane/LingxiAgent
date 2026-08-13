@@ -413,6 +413,7 @@ export async function runExecCommandDirect({
 }
 
 export async function startExecCommandTty({
+  toolCallId,
   manager,
   getAgentId,
   getCwd,
@@ -438,6 +439,7 @@ export async function startExecCommandTty({
     });
   }
   const result = await manager.start({
+    toolCallId,
     sessionPath,
     agentId: getAgentId?.() || "",
     cwd: workdir || ctx?.sessionManager?.getCwd?.() || getCwd?.() || process.cwd(),

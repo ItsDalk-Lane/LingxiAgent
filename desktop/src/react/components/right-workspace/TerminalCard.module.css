@@ -1,0 +1,126 @@
+.card {
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-8);
+    overflow: hidden;
+    padding: var(--space-8) var(--space-16);
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-6);
+    padding: 0;
+}
+
+.title {
+    flex: 0 0 auto;
+    color: var(--accent);
+    font-family: "Songti SC", "Noto Serif CJK SC", serif;
+    font-size: var(--fs-body);
+    font-weight: 600;
+}
+
+.count {
+    color: var(--text-muted);
+    font-size: var(--fs-hint);
+}
+
+.list {
+    display: flex;
+    min-height: 0;
+    flex-direction: column;
+    gap: var(--space-12);
+}
+
+.item {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+.titleButton {
+    display: grid;
+    width: 100%;
+    min-width: 0;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: var(--space-8);
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.titleButton:hover .name {
+    color: var(--accent);
+}
+
+.terminalIcon {
+    color: var(--text-muted);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: var(--fs-hint);
+}
+
+.name {
+    min-width: 0;
+    overflow: hidden;
+    color: var(--text);
+    font-size: var(--fs-ui);
+    font-weight: 500;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.footer {
+    display: flex;
+    width: 100%;
+    min-width: 0;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-8);
+    padding-left: calc(var(--space-16) + var(--space-8));
+    color: var(--text-muted);
+    font-size: var(--fs-caption);
+}
+
+.stopButton {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-4);
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--text);
+    font: inherit;
+    cursor: pointer;
+}
+
+.stopButton:disabled { opacity: 0.55; }
+
+.preview {
+    max-height: 14rem;
+    overflow: auto;
+    overscroll-behavior: contain;
+    border-top: 1px solid var(--overlay-medium);
+    background: var(--tooltip-bg);
+    color: var(--tooltip-text);
+    outline: none;
+}
+
+.preview:focus-visible {
+    box-shadow: inset 0 0 0 1px var(--accent);
+}
+
+.output {
+    min-height: 2.5rem;
+    padding: var(--space-8) calc(var(--space-8) + 1px);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 11px;
+    line-height: 1.45;
+    white-space: pre;
+}

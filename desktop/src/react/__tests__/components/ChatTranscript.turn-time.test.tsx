@@ -62,6 +62,21 @@ function thinking(content: string): ContentBlock {
   return { type: 'thinking', content, sealed: true };
 }
 
+function skillCall(): ContentBlock {
+  return {
+    type: 'tool_group',
+    collapsed: false,
+    tools: [{
+      id: 'call-skill',
+      name: 'read',
+      args: { path: '/workspace/.agents/skills/leader/SKILL.md' },
+      done: true,
+      success: true,
+      details: { skillInvocation: { content: '# Skill: leader' } },
+    }],
+  };
+}
+
 function interlude(id: string, text: string): ChatListItem {
   return {
     type: 'interlude',
@@ -258,6 +273,45 @@ describe('ChatTranscript turn timestamps', () => {
       { role: 'assistant_turn', turnInputEntryId: 'entry-u1' },
       { message: expect.objectContaining({ id: 'u1', sourceEntryId: 'entry-u1', text: '第一轮' }) },
     );
+  });
+
+  it('shows the matched user-turn prompt as the skill invocation parameter', () => {
+    const prompt = '把模型的用量统计页面从供应商页面独立出来到设置主界面中。';
+    const { container } = render(
+      <ChatTranscript
+        items={[
+          user('u1', new Date(2026, 4, 7, 8, 0).getTime(), prompt),
+          assistant('a1-skill', new Date(2026, 4, 7, 8, 1).getTime(), [skillCall()], 'entry-u1'),
+        ]}
+        sessionPath={sessionPath}
+      />,
+    );
+
+    const card = container.querySelector('[data-skill-name="leader"]');
+    expect(card).not.toBeNull();
+    fireEvent.click(within(card as HTMLElement).getByRole('button'));
+
+    expect(within(card as HTMLElement).getByText(prompt)).toBeInTheDocument();
+    expect(within(card as HTMLElement).queryByText('/workspace/.agents/skills/leader/SKILL.md', { exact: false })).not.toBeInTheDocument();
+  });
+
+  it('does not borrow a visible user prompt for a hidden-input skill turn', () => {
+    const { container } = render(
+      <ChatTranscript
+        items={[
+          user('u1', new Date(2026, 4, 7, 8, 0).getTime(), '上一轮可见任务'),
+          assistant('a1-skill', new Date(2026, 4, 7, 8, 1).getTime(), [skillCall()], 'entry-hidden-input'),
+        ]}
+        sessionPath={sessionPath}
+      />,
+    );
+
+    const card = container.querySelector('[data-skill-name="leader"]');
+    expect(card).not.toBeNull();
+    fireEvent.click(within(card as HTMLElement).getByRole('button'));
+
+    expect(within(card as HTMLElement).queryByText('上一轮可见任务')).not.toBeInTheDocument();
+    expect(within(card as HTMLElement).queryByText('/workspace/.agents/skills/leader/SKILL.md', { exact: false })).not.toBeInTheDocument();
   });
 
   it('renders interlude timeline items without an assistant message wrapper', () => {

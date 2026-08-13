@@ -160,6 +160,7 @@ export function createExecCommandTools({
 
       if (value.tty) {
         return startExecCommandTty({
+          toolCallId,
           manager: getTerminalSessionManager?.(),
           getAgentId,
           getCwd,

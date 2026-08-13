@@ -3,13 +3,19 @@
 import '@testing-library/jest-dom/vitest';
 import fs from 'node:fs';
 import path from 'node:path';
-import { cleanup, render, screen, waitFor } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ToolGroupBlock } from '../../components/chat/ToolGroupBlock';
+import { useStore } from '../../stores';
 
 describe('ToolGroupBlock', () => {
   beforeEach(() => {
     window.t = ((key: string) => key) as typeof window.t;
+    useStore.setState({
+      currentSessionId: 'sess-a',
+      currentSessionPath: '/session/a.jsonl',
+      terminalsBySession: {},
+    } as never);
   });
 
   afterEach(() => {
@@ -73,8 +79,280 @@ describe('ToolGroupBlock', () => {
       />,
     );
 
-    expect(screen.getByText('💻 Hanako 用完电脑了')).toBeInTheDocument();
     expect(screen.getByText('npm test')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'npm test' })).toHaveAttribute('aria-expanded', 'false');
+  });
+
+  it('renders every exec_command as an expandable embedded command and output card', () => {
+    render(
+      <ToolGroupBlock
+        collapsed={false}
+        tools={[{
+          id: 'call-exec',
+          name: 'exec_command',
+          args: { cmd: 'npm test', workdir: '/workspace' },
+          done: true,
+          success: true,
+          details: {
+            output: '11172 tests passed',
+            execCommand: {
+              renderedCommand: 'cd /workspace && npm test',
+              workdir: '/workspace',
+              tty: false,
+              exitCode: 0,
+            },
+          },
+        }]}
+      />,
+    );
+
+    expect(screen.queryByText('11172 tests passed')).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: /npm test/i }));
+    expect(screen.getByText(/cd \/workspace && npm test/)).toBeInTheDocument();
+    expect(screen.getByText('11172 tests passed')).toBeInTheDocument();
+  });
+
+  it('renders a model read of SKILL.md as a full-width expandable skill card', () => {
+    window.t = ((key: string, vars?: Record<string, unknown>) => {
+      const name = String(vars?.name || '');
+      if (key === 'toolGroup.skill.running') return `正在运行技能 ${name}`;
+      if (key === 'toolGroup.skill.completed') return `已运行技能 ${name}`;
+      if (key === 'toolGroup.skill.failed') return `技能调用失败 ${name}`;
+      if (key === 'toolGroup.skill.skillLabel') return '技能';
+      if (key === 'toolGroup.skill.paramsLabel') return '参数';
+      return key;
+    }) as typeof window.t;
+
+    const { container } = render(
+      <ToolGroupBlock
+        collapsed={false}
+        skillPrompt="把模型的用量统计页面从供应商页面独立出来到设置主界面中。"
+        tools={[{
+          id: 'call-skill',
+          name: 'read',
+          args: { path: '/workspace/.agents/skills/leader/SKILL.md' },
+          done: true,
+          success: true,
+          details: {
+            skillInvocation: {
+              content: '# Skill: leader\n\nLead the work carefully.',
+            },
+          },
+        }]}
+      />,
+    );
+
+    const button = screen.getByRole('button', { name: '已运行技能 leader' });
+    expect(button).toHaveAttribute('aria-expanded', 'false');
+    expect(container.querySelector('[data-skill-name="leader"]')).toBeInTheDocument();
+    expect(screen.queryByText('Lead the work carefully.', { exact: false })).toBeNull();
+
+    fireEvent.click(button);
+    expect(button).toHaveAttribute('aria-expanded', 'true');
+    expect(screen.getByText('技能')).toBeInTheDocument();
+    expect(screen.getByText('leader')).toBeInTheDocument();
+    expect(screen.getByText('参数')).toBeInTheDocument();
+    expect(screen.getByText('把模型的用量统计页面从供应商页面独立出来到设置主界面中。')).toBeInTheDocument();
+    expect(screen.queryByText('/workspace/.agents/skills/leader/SKILL.md', { exact: false })).not.toBeInTheDocument();
+    expect(screen.getByText(/<skill_content name="leader">/)).toBeInTheDocument();
+    expect(screen.getByText(/Lead the work carefully\./)).toBeInTheDocument();
+  });
+
+  it('keeps skill cards visible when the surrounding multi-tool group is collapsed', () => {
+    window.t = ((key: string, vars?: Record<string, unknown>) => (
+      key === 'toolGroup.skill.completed' ? `已运行技能 ${vars?.name}` : key
+    )) as typeof window.t;
+
+    render(
+      <ToolGroupBlock
+        collapsed
+        tools={[
+          {
+            id: 'call-skill',
+            name: 'read',
+            args: { path: '/skills/leader/SKILL.md' },
+            done: true,
+            success: true,
+            details: { skillInvocation: { content: '# Skill: leader' } },
+          },
+          {
+            id: 'call-read',
+            name: 'read',
+            args: { path: '/tmp/report.md' },
+            done: true,
+            success: true,
+          },
+        ]}
+      />,
+    );
+
+    expect(screen.getByRole('button', { name: '已运行技能 leader' })).toBeInTheDocument();
+    expect(screen.queryByText('/tmp/report.md')).toBeNull();
+  });
+
+  it('keeps the chat command card running while its background terminal is still running', () => {
+    useStore.setState({
+      terminalsBySession: {
+        'sess-a': [{
+          terminalId: 'term-running',
+          toolCallId: 'call-running',
+          sessionId: 'sess-a',
+          sessionPath: '/session/a.jsonl',
+          agentId: 'hana',
+          cwd: '/workspace',
+          command: 'npm run dev',
+          label: 'npm run dev',
+          status: 'running',
+          seq: 0,
+          createdAt: 1,
+          lastActivityAt: 1,
+          exitedAt: null,
+          exitCode: null,
+          signal: null,
+          transcriptPath: '/state/term-running.jsonl',
+        }],
+      },
+    } as never);
+
+    render(
+      <ToolGroupBlock
+        collapsed={false}
+        tools={[{
+          id: 'call-running',
+          name: 'exec_command',
+          args: { cmd: 'npm run dev' },
+          done: true,
+          success: true,
+          status: 'succeeded',
+          details: { execCommand: { terminalId: 'term-running' } },
+        }]}
+      />,
+    );
+
+    expect(screen.getByText('…')).toBeInTheDocument();
+    expect(screen.queryByText('✓')).toBeNull();
+  });
+
+  function execTerminal(overrides: Record<string, unknown> = {}) {
+    return {
+      terminalId: 'term-1',
+      toolCallId: 'call-exec',
+      sessionId: 'sess-sub',
+      sessionPath: '/session/sub.jsonl',
+      agentId: 'hana',
+      cwd: '/workspace',
+      command: 'npm run dev',
+      label: 'npm run dev',
+      status: 'running',
+      seq: 0,
+      createdAt: 1,
+      lastActivityAt: 1,
+      exitedAt: null,
+      exitCode: null,
+      signal: null,
+      transcriptPath: '/state/term-1.jsonl',
+      ...overrides,
+    };
+  }
+
+  function renderExecCard(toolOverrides: Record<string, unknown> = {}) {
+    return render(
+      <ToolGroupBlock
+        collapsed={false}
+        tools={[{
+          id: 'call-exec',
+          name: 'exec_command',
+          args: { cmd: 'npm run dev' },
+          done: true,
+          success: true,
+          status: 'succeeded',
+          details: { execCommand: { terminalId: 'term-1' } },
+          ...toolOverrides,
+        }]}
+      />,
+    );
+  }
+
+  it('finds the terminal registered under a subagent session key (subagent preview context)', () => {
+    // 子助手预览用子会话路径渲染；tty 终端注册在子会话 key 下，卡片不能因此提前打勾。
+    useStore.setState({
+      currentSessionPath: '/session/parent.jsonl',
+      terminalsBySession: { 'sess-sub': [execTerminal()] },
+    } as never);
+
+    renderExecCard();
+
+    expect(screen.getByText('…')).toBeInTheDocument();
+    expect(screen.queryByText('✓')).toBeNull();
+  });
+
+  it('renders a stale terminal as neutral lost-contact, never as success or failure', () => {
+    useStore.setState({
+      terminalsBySession: { 'sess-sub': [execTerminal({ status: 'stale' })] },
+    } as never);
+
+    renderExecCard();
+
+    expect(screen.getByText('rightWorkspace.terminal.stale')).toBeInTheDocument();
+    expect(screen.queryByText('✓')).toBeNull();
+    expect(screen.queryByText('✗')).toBeNull();
+  });
+
+  it('falls back to the tool result when an exited terminal has no usable exit code', () => {
+    useStore.setState({
+      terminalsBySession: { 'sess-sub': [execTerminal({ status: 'exited', exitCode: null })] },
+    } as never);
+
+    renderExecCard({ done: true, success: true, status: 'succeeded' });
+    expect(screen.getByText('✓')).toBeInTheDocument();
+    expect(screen.queryByText('✗')).toBeNull();
+
+    cleanup();
+    renderExecCard({ done: true, success: false, status: 'failed' });
+    expect(screen.getByText('✗')).toBeInTheDocument();
+  });
+
+  it('maps a non-zero exit code to failure and zero to success', () => {
+    useStore.setState({
+      terminalsBySession: { 'sess-sub': [execTerminal({ status: 'exited', exitCode: 2 })] },
+    } as never);
+
+    renderExecCard();
+    expect(screen.getByText('✗')).toBeInTheDocument();
+
+    cleanup();
+    useStore.setState({
+      terminalsBySession: { 'sess-sub': [execTerminal({ status: 'exited', exitCode: 0 })] },
+    } as never);
+    renderExecCard();
+    expect(screen.getByText('✓')).toBeInTheDocument();
+  });
+
+  it('keeps exec_command cards visible even when the surrounding multi-tool group is collapsed', () => {
+    render(
+      <ToolGroupBlock
+        collapsed
+        tools={[
+          {
+            id: 'call-exec',
+            name: 'exec_command',
+            args: { cmd: 'npm run build' },
+            done: true,
+            success: true,
+          },
+          {
+            id: 'call-read',
+            name: 'read',
+            args: { file_path: '/tmp/report.md' },
+            done: true,
+            success: true,
+          },
+        ]}
+      />,
+    );
+
+    expect(screen.getByRole('button', { name: 'npm run build' })).toBeTruthy();
+    expect(screen.queryByText('/tmp/report.md')).toBeNull();
   });
 
   it('renders write_stdin with the legacy terminal user-facing copy', () => {
@@ -292,11 +570,47 @@ describe('ToolGroupBlock', () => {
       path.join(process.cwd(), 'desktop/src/react/components/chat/Chat.module.css'),
       'utf8',
     );
+    const rootCss = fs.readFileSync(
+      path.join(process.cwd(), 'desktop/src/styles.css'),
+      'utf8',
+    );
     const toolGroupRule = css.match(/\.toolGroup\s*\{(?<body>[^}]*)\}/)?.groups?.body || '';
 
+    expect(rootCss).toMatch(/--chat-task-block-width:\s*100%/);
     expect(toolGroupRule).toContain('width: var(--chat-task-block-width)');
     expect(toolGroupRule).toContain('max-width: 100%');
     expect(toolGroupRule).toContain('box-sizing: border-box');
+  });
+
+  it('lets terminal and subagent chat cards use the full message width', () => {
+    const css = fs.readFileSync(
+      path.join(process.cwd(), 'desktop/src/react/components/chat/Chat.module.css'),
+      'utf8',
+    );
+    const execContentRule = css.match(/\.toolGroupExecContent\s*\{(?<body>[^}]*)\}/)?.groups?.body || '';
+
+    expect(execContentRule).toContain('padding: 0');
+    expect(css).not.toContain('.toolGroupWithExec');
+  });
+
+  it('keeps embedded terminal and subagent details at one fixed scrollable height', () => {
+    const css = fs.readFileSync(
+      path.join(process.cwd(), 'desktop/src/react/components/chat/Chat.module.css'),
+      'utf8',
+    );
+    const subagentPreviewRule = css.match(/\.subagentEmbeddedPreview\s*\{(?<body>[^}]*)\}/)?.groups?.body || '';
+    const execDetailsRule = css.match(/\.execCommandDetails\s*\{(?<body>[^}]*)\}/)?.groups?.body || '';
+    const execOutputRules = [...css.matchAll(/\.execCommandOutput\s*\{(?<body>[^}]*)\}/g)];
+    const execOutputRule = execOutputRules.at(-1)?.groups?.body || '';
+    const nestedTerminalRule = css.match(/\.execCommandDetails\s+:global\(\[data-testid\^="terminal-preview-"\]\)\s*\{(?<body>[^}]*)\}/)?.groups?.body || '';
+
+    expect(subagentPreviewRule).toContain('height: var(--chat-embedded-detail-height)');
+    expect(subagentPreviewRule).toContain('overflow-y: auto');
+    expect(execDetailsRule).toContain('height: var(--chat-embedded-detail-height)');
+    expect(execDetailsRule).toContain('display: flex');
+    expect(execOutputRule).toContain('overflow: auto');
+    expect(nestedTerminalRule).toContain('max-height: none');
+    expect(nestedTerminalRule).toContain('overflow: auto');
   });
 
   it('fuses consecutive subagent cards into one rounded block', () => {

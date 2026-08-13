@@ -668,7 +668,18 @@
     "failed": "⚠ 何かおかしいようです · {n} ステップ",
     "countWithFail": "{total} 個のツール（{fail} 個失敗）",
     "count": "{n} 個のツール",
-    "running": "{n} 個のツール実行中"
+    "running": "{n} 個のツール実行中",
+    "skill": {
+      "running": "スキル {name} を実行中",
+      "completed": "スキル {name} を実行しました",
+      "failed": "スキル {name} の実行に失敗しました",
+      "skillLabel": "スキル",
+      "paramsLabel": "パラメータ",
+      "promptUnavailable": "この呼び出しのユーザープロンプトは記録されていません",
+      "contentPending": "スキル内容を読み込み中…",
+      "contentUnavailable": "スキル内容を表示できません",
+      "truncated": "スキル内容は省略されました"
+    }
   },
   "processFold": {
     "summary": "✨ {name} がしばらく動き回りました",
@@ -1064,6 +1075,7 @@
       "agent": "エージェント",
       "me": "自分",
       "providers": "プロバイダー",
+      "usage": "使用量",
       "media": "メディア",
       "models": "モデル",
       "memory": "記憶",
@@ -2674,6 +2686,21 @@
     "blockActions": "ブロック操作"
   },
   "rightWorkspace": {
+    "terminal": {
+      "title": "ターミナルプロセス",
+      "running": "実行中",
+      "done": "完了",
+      "failed": "失敗",
+      "aborted": "終了済み",
+      "stale": "失効",
+      "count": "バックグラウンドで {n} 件実行中",
+      "runningFor": "実行時間 {text}",
+      "stop": "停止",
+      "cwd": "作業ディレクトリ",
+      "exitCode": "終了コード",
+      "preview": "ターミナル出力",
+      "staleHint": "Lingxi の再起動後、この PTY は存在しませんが、過去の出力は引き続き確認できます。"
+    },
     "activity": {
       "title": "バックグラウンド"
     },
@@ -2682,7 +2709,14 @@
       "waitForOutput": "Wait for output to finish"
     },
     "subagent": {
-      "title": "サブエージェント"
+      "title": "サブエージェント",
+      "count": "バックグラウンドで {n} 件実行中",
+      "runningFor": "実行時間 {text}",
+      "stop": "停止"
+    },
+    "process": {
+      "stopping": "停止中",
+      "stopFailed": "停止できませんでした。もう一度お試しください。"
     },
     "workflow": {
       "title": "Workflow",

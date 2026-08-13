@@ -22,7 +22,7 @@ describe('ChatResourceCard layout', () => {
     const subtitle = cssRule(css, '.subtitle');
     const actions = cssRule(css, '.actions');
 
-    expect(card).toMatch(/--chat-resource-card-width:\s*var\(--chat-task-block-width,\s*348px\)/);
+    expect(card).toMatch(/--chat-resource-card-width:\s*var\(--chat-task-block-width,\s*100%\)/);
     expect(card).toMatch(/width:\s*var\(--chat-resource-card-width\)/);
     expect(card).toMatch(/max-width:\s*100%/);
     expect(title).toMatch(/text-overflow:\s*ellipsis/);
