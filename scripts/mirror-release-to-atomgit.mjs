@@ -336,14 +336,17 @@ async function downloadGithubAsset(asset, destination, { env, fetchImpl }) {
 // only sends headers AFTER receiving the whole body, so a ~430MB+ installer
 // reliably trips UND_ERR_HEADERS_TIMEOUT mid-upload even though the transfer
 // is healthy (observed: the deb upload died at exactly 5:00). We raise the
-// per-request dispatcher's headers/body timeouts well above our own 10-minute
-// AbortSignal so that signal stays the single, intentional ceiling. Lazy: undici
+// per-request dispatcher's headers/body timeouts well above our own 1-hour
+// AbortSignal so that signal stays the single, intentional ceiling. The 1-hour
+// ceiling comes from observed cross-border throughput: a ~450MB installer from
+// a GitHub runner to AtomGit sustains well under 1MB/s, so 10 minutes was not
+// enough (v0.1.24–v0.1.28 all died at exactly 10:00). Lazy: undici
 // is only needed for real uploads, never in tests (which inject a mock fetch).
 let uploadDispatcher = null;
 async function getUploadDispatcher() {
   if (uploadDispatcher) return uploadDispatcher;
   const { Agent } = await import("undici");
-  uploadDispatcher = new Agent({ headersTimeout: 30 * 60 * 1000, bodyTimeout: 30 * 60 * 1000 });
+  uploadDispatcher = new Agent({ headersTimeout: 70 * 60 * 1000, bodyTimeout: 70 * 60 * 1000 });
   return uploadDispatcher;
 }
 
@@ -363,7 +366,7 @@ async function uploadAtomGitAsset(uploadTarget, filePath, asset, fetchImpl) {
       method: "PUT",
       headers,
       body: content,
-      signal: AbortSignal.timeout(10 * 60 * 1000),
+      signal: AbortSignal.timeout(60 * 60 * 1000),
       dispatcher,
     });
   } catch (error) {
