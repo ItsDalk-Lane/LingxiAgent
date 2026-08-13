@@ -1,127 +1,228 @@
 {
   "schemaVersion": 1,
-  "tag": "v0.1.27",
-  "version": "0.1.27",
-  "previousTag": "v0.1.26",
-  "generatedAt": "2026-08-12T04:57:04.000Z",
+  "tag": "v0.1.28",
+  "version": "0.1.28",
+  "previousTag": "v0.1.27",
+  "generatedAt": "2026-08-13T12:53:31.593Z",
   "noUserFacingChanges": false,
   "summary": {
-    "zh": "循环任务现在全程可见、可控：气泡上直接显示进度轮次并能暂停/恢复/停止，会话列表有常驻状态徽章，重启应用后状态也不丢；发起循环时你的任务内容会像普通消息一样显示在聊天里，不再凭空消失。",
-    "en": "Loop tasks are now fully visible and controllable: bubbles show turn progress with pause/resume/stop controls, the session list carries a persistent status badge that survives app restarts, and the task you type when starting a loop appears in chat like a normal message instead of vanishing."
+    "zh": "本次更新为你带来全新的终端输出查看器、技能调用卡片和设置中的使用量标签页，同时修复了对话流中内部标记可能泄漏到聊天的问题，并优化了更新流程的稳定性。",
+    "en": "This update brings a new terminal output viewer, skill invocation cards, and a usage tab in settings, while fixing a potential leak of internal markers in chat and improving update flow stability."
   },
   "counts": {
-    "feature": 2,
+    "feature": 3,
     "fix": 2,
-    "improvement": 0,
+    "improvement": 1,
     "migration": 0
   },
   "source": {
     "owner": "ItsDalk-Lane",
     "repo": "LingxiAgent",
-    "commitRange": "v0.1.26..HEAD",
-    "releaseUrl": "https://github.com/ItsDalk-Lane/LingxiAgent/releases/tag/v0.1.27",
+    "commitRange": "v0.1.27..HEAD",
+    "releaseUrl": "https://github.com/ItsDalk-Lane/LingxiAgent/releases/tag/v0.1.28",
     "releaseNotes": ""
   },
   "items": [
     {
-      "id": "feat-loop-visibility-controls",
+      "id": "terminal-output-viewer",
       "kind": "feature",
       "importance": "high",
       "title": {
-        "zh": "循环任务全程可见、可控制",
-        "en": "Loop tasks are visible and controllable end to end"
+        "zh": "终端输出查看器",
+        "en": "Terminal output viewer"
       },
       "summary": {
-        "zh": "循环任务的进度现在直接显示在气泡上（第几轮、共几轮），气泡上就能暂停、恢复或停止；会话列表为运行中的循环显示常驻徽章，鼠标悬停（或触屏上直接）可以停止它；状态变化实时推送，重启应用后徽章依然在。",
-        "en": "Loop progress now appears right on the bubble (current turn out of total), with pause, resume and stop controls in place; the session list shows a persistent badge for active loops with a stop affordance on hover (always visible on touch); status changes stream in real time and survive app restarts."
+        "zh": "在右侧栏新增只读终端输出查看器，可实时查看命令执行输出，支持安全停止和聊天卡片跳转。",
+        "en": "A read-only terminal output viewer in the right rail lets you see real-time command execution output, with safe stop and chat-card navigation."
       },
       "details": [
         {
-          "zh": "循环气泡显示「第 X / M 轮」，老会话的历史循环消息也能识别。",
-          "en": "Loop bubbles show 'turn X of M', including loop messages from older sessions."
+          "zh": "输出采用批式实时展示，支持 ANSI 安全预览，并在断线时自动重连或补拉。",
+          "en": "Output is batched live with ANSI-safe preview, auto-reconnects, and gap recovery on disconnection."
         },
         {
-          "zh": "运行中徽章带脉冲动画、已暂停为琥珀色；减少动态效果模式下自动关闭动画。",
-          "en": "The badge pulses while running and turns amber when paused; animations are disabled under reduced-motion."
-        },
-        {
-          "zh": "预览其他会话时，循环控制按钮只作用于它所属的会话，不会误停当前会话的循环。",
-          "en": "When previewing another session, loop controls only act on the session they belong to — they cannot stop the wrong loop."
+          "zh": "每条命令执行会渲染为独立卡片，并显示真实终端状态。",
+          "en": "Each command execution is rendered as a standalone card with real terminal status."
         }
       ],
       "sources": [
         {
           "type": "commit",
-          "ref": "89e02dd8",
-          "title": "feat(loop): loop visibility, controls, and start-prompt bubble"
+          "ref": "cf5b6541cb6f",
+          "title": "feat: terminal output viewer, card interaction rework, skill invocation cards, usage tab"
         }
       ]
     },
     {
-      "id": "feat-loop-start-prompt-visible",
+      "id": "skill-invocation-cards",
       "kind": "feature",
-      "importance": "high",
+      "importance": "medium",
       "title": {
-        "zh": "发起循环时输入的任务不再「凭空消失」",
-        "en": "The task you type when starting a loop no longer vanishes"
+        "zh": "技能调用卡片",
+        "en": "Skill invocation cards"
       },
       "summary": {
-        "zh": "以前输入 /loop 加任务内容后，聊天里看不到自己写了什么。现在它会像普通消息一样显示在右侧，重新打开会话也还在；同时它被特殊保存，绝不会被重复发给模型，不会干扰循环的执行。",
-        "en": "Previously, after typing /loop with a task, your input disappeared from chat. It now appears on the right like a normal message and stays after reopening the session; it is stored specially so it is never re-sent to the model or interferes with the loop."
+        "zh": "技能调用现在以卡片形式显示在对话中的真实调用位置，并带有清晰的参数说明。",
+        "en": "Skill invocations now appear as cards at their exact call position in the chat, with clear parameter semantics."
       },
       "details": [
         {
-          "zh": "即使经过会话压缩，模型也不会收到重复的任务内容。",
-          "en": "Even across conversation compaction, the model never receives the task text twice."
+          "zh": "卡片支持用户提示词参数，并针对隐藏输入显示占位符。",
+          "en": "Cards support user-prompt parameters and show placeholders for hidden inputs."
         }
       ],
       "sources": [
         {
           "type": "commit",
-          "ref": "89e02dd8",
-          "title": "feat(loop): loop visibility, controls, and start-prompt bubble"
+          "ref": "cf5b6541cb6f",
+          "title": "feat: terminal output viewer, card interaction rework, skill invocation cards, usage tab"
         }
       ]
     },
     {
-      "id": "fix-slash-in-fresh-draft-session",
+      "id": "usage-tab",
+      "kind": "feature",
+      "importance": "low",
+      "title": {
+        "zh": "设置中的使用量标签页",
+        "en": "Usage tab in settings"
+      },
+      "summary": {
+        "zh": "在设置中新增“使用量”标签页，通过光标提示图展示用量情况。",
+        "en": "A new Usage tab in settings shows your usage with cursor tip charts."
+      },
+      "details": [
+        {
+          "zh": "更直观地了解 token 等资源消耗趋势。",
+          "en": "Get a clearer view of resource consumption trends such as tokens."
+        }
+      ],
+      "sources": [
+        {
+          "type": "commit",
+          "ref": "cf5b6541cb6f",
+          "title": "feat: terminal output viewer, card interaction rework, skill invocation cards, usage tab"
+        }
+      ]
+    },
+    {
+      "id": "internal-marker-leak-fix",
+      "kind": "fix",
+      "importance": "high",
+      "title": {
+        "zh": "修复内部标记可能泄漏到聊天的问题",
+        "en": "Fix potential leak of internal markers in chat"
+      },
+      "summary": {
+        "zh": "修复了在工具循环中，多段模型生成时内部标记（如心情、思考）可能被当作普通文本显示的问题。",
+        "en": "Fixed an issue where internal markers (like mood/think tags) could be shown as normal text during multi-segment model generation in tool loops."
+      },
+      "details": [
+        {
+          "zh": "现在每次新的助手输出段都会重置标记解析状态，确保只识别段首的标记。",
+          "en": "Marker parsing now re-arms per assistant segment, so only segment-leading markers are recognized."
+        },
+        {
+          "zh": "同时修复了缓冲区内多个心情段可能互相覆盖的问题。",
+          "en": "Also fixed an issue where multiple mood segments in the buffer could overwrite each other."
+        }
+      ],
+      "sources": [
+        {
+          "type": "commit",
+          "ref": "1cd20990addb",
+          "title": "fix(stream): re-arm leading internal mood/think opener per assistant segment"
+        }
+      ]
+    },
+    {
+      "id": "update-flow-stability",
       "kind": "fix",
       "importance": "medium",
       "title": {
-        "zh": "新会话里直接输入 /loop 等命令不再报「应用内部出了点问题」",
-        "en": "Typing /loop or similar commands in a brand-new session no longer errors"
+        "zh": "优化更新流程稳定性",
+        "en": "Improve update flow stability"
       },
       "summary": {
-        "zh": "在还没发过消息的新会话里直接输入 /loop 之类的命令，以前会提示「应用内部出了点问题」。现在会先把会话建好再执行命令，和正常发消息的行为一致。",
-        "en": "Typing a command like /loop in a session that has no messages yet used to fail with a generic internal error. The session is now created first and the command runs, matching how sending a normal message behaves."
+        "zh": "修复了开发版无法找到更新配置的问题，并在安装过程中显示正确的状态，支持更新失败后重试。",
+        "en": "Fixed a dev-mode issue where the update config wasn't found, now shows correct status during install, and allows retry after update failure."
       },
-      "details": [],
+      "details": [
+        {
+          "zh": "将 dev-app-update.yml 移至应用根目录，确保开发模式下可检测更新。",
+          "en": "Moved dev-app-update.yml to app root so updates are found in dev mode."
+        },
+        {
+          "zh": "关于页面在安装中显示专用状态，并提供失败重试按钮。",
+          "en": "The About page shows a dedicated installing state and offers a retry button on failure."
+        }
+      ],
       "sources": [
         {
           "type": "commit",
-          "ref": "89e02dd8",
-          "title": "feat(loop): loop visibility, controls, and start-prompt bubble"
+          "ref": "e5e08721063f",
+          "title": "fix: address review findings from bbbce725"
         }
       ]
     },
     {
-      "id": "fix-usage-error-accounting",
+      "id": "loop-status-desync-fix",
       "kind": "fix",
-      "importance": "low",
+      "importance": "medium",
       "title": {
-        "zh": "模型调用失败时的用量记账更准确",
-        "en": "More accurate usage accounting for failed model calls"
+        "zh": "修复循环状态显示不同步",
+        "en": "Fix loop status display desync"
       },
       "summary": {
-        "zh": "模型请求失败但返回了部分用量数据时，以前会被记为一次成功调用。现在这类请求会正确记为失败，并保留失败原因，用量与费用统计更真实。",
-        "en": "When a model request failed but still returned partial usage data, it used to be counted as a successful call. Such requests are now correctly recorded as failures with their error reason, making usage and cost statistics more truthful."
+        "zh": "修复了在 kickoff 处理较慢时，界面可能显示空闲而实际循环已在运行的问题，并确保循环目标重置时正确停止。",
+        "en": "Fixed a desync where the UI could show idle while the loop was actually running when kickoff was slow, and ensured the loop stops on target reset."
       },
-      "details": [],
+      "details": [
+        {
+          "zh": "现在启动时立即发送运行状态，避免界面滞后。",
+          "en": "Status is now emitted immediately on start to prevent UI lag."
+        },
+        {
+          "zh": "当 kickoff 目标重置时，循环会停止，避免出现僵尸运行状态。",
+          "en": "The loop stops on kickoff target reset, preventing zombie 'running' states."
+        }
+      ],
       "sources": [
         {
           "type": "commit",
-          "ref": "ab959f23",
-          "title": "fix(usage): record provider errors with precedence over usage"
+          "ref": "bbbce725e343",
+          "title": "feat(about): refactor AboutTab with multi-lang support (#6)"
+        },
+        {
+          "type": "commit",
+          "ref": "e5e08721063f",
+          "title": "fix: address review findings from bbbce725"
+        }
+      ]
+    },
+    {
+      "id": "about-multilang",
+      "kind": "improvement",
+      "importance": "low",
+      "title": {
+        "zh": "关于页面支持多语言",
+        "en": "About page multi-language support"
+      },
+      "summary": {
+        "zh": "关于页面的布局和内容已重构，并新增了中文、英文、日文、韩文和繁体中文翻译。",
+        "en": "The About tab layout and content were reworked, with translations added for zh, en, ja, ko, and zh-TW."
+      },
+      "details": [
+        {
+          "zh": "界面显示会根据系统语言自动适配。",
+          "en": "The UI now adapts to the system language automatically."
+        }
+      ],
+      "sources": [
+        {
+          "type": "commit",
+          "ref": "bbbce725e343",
+          "title": "feat(about): refactor AboutTab with multi-lang support (#6)"
         }
       ]
     }
