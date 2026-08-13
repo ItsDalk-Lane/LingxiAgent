@@ -22,6 +22,7 @@ interface Props {
   assistantTurnSelectionIdsByCompletionIndex?: ReadonlyMap<number, readonly string[]>;
   assistantTurnTargetsByCompletionIndex?: ReadonlyMap<number, SessionNodeTarget>;
   assistantTurnRetryMessagesByCompletionIndex?: ReadonlyMap<number, ChatMessage>;
+  assistantSkillPromptsByIndex?: ReadonlyMap<number, string>;
   completionTimePersistent?: boolean;
   agentDisplay: AgentDisplayInfo & { yuan: string };
   isStreaming: boolean;
@@ -40,6 +41,7 @@ export const ProcessFoldBlock = memo(function ProcessFoldBlock({
   assistantTurnSelectionIdsByCompletionIndex,
   assistantTurnTargetsByCompletionIndex,
   assistantTurnRetryMessagesByCompletionIndex,
+  assistantSkillPromptsByIndex,
   completionTimePersistent = false,
   agentDisplay,
   isStreaming,
@@ -127,6 +129,7 @@ export const ProcessFoldBlock = memo(function ProcessFoldBlock({
                 assistantTurnSelectionIds={assistantTurnSelectionIdsByCompletionIndex?.get(entry.originalIndex)}
                 turnTarget={assistantTurnTargetsByCompletionIndex?.get(entry.originalIndex) ?? null}
                 retrySourceMessage={assistantTurnRetryMessagesByCompletionIndex?.get(entry.originalIndex) ?? null}
+                skillPrompt={assistantSkillPromptsByIndex?.get(entry.originalIndex) ?? null}
                 onForkCreated={onForkCreated}
                 messageRef={messageRef(entry.item.data.id)}
               />

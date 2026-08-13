@@ -73,6 +73,83 @@ describe('process fold grouping', () => {
     expect(isProcessOnlyAssistantMessage(moodMessage)).toBe(false);
   });
 
+  it('never hides a model skill invocation inside the outer process fold', () => {
+    const skillMessage: ChatMessage = {
+      id: 'skill',
+      role: 'assistant',
+      blocks: [thinking(), toolGroup([{
+        name: 'read',
+        args: { path: '/skills/leader/SKILL.md' },
+        done: true,
+        success: true,
+      }])],
+    };
+
+    expect(isProcessOnlyAssistantMessage(skillMessage)).toBe(false);
+    const items: ChatListItem[] = [
+      user('u1'),
+      assistant('a1', [thinking(), toolGroup([tool('read')])]),
+      { type: 'message', data: skillMessage },
+      assistant('a3', [thinking(), toolGroup([tool('grep')])]),
+    ];
+    expect(buildTranscriptRenderItems(items, { isStreaming: false }).map((item) => item.type)).toEqual([
+      'source',
+      'source',
+      'source',
+      'source',
+    ]);
+  });
+
+  it('never folds messages whose exec_command card hosts a persistent terminal', () => {
+    // 折叠会卸载 ExecCommandCard 子树，右栏「点终端标题跳回卡片」的 listener 随之消失，
+    // 点击变成无反馈的死点击——与 skill invocation 一样排除在可折叠之外。
+    const execMessage: ChatMessage = {
+      id: 'exec',
+      role: 'assistant',
+      blocks: [toolGroup([{ name: 'exec_command', args: { cmd: 'npm run dev' }, done: true, success: true }])],
+    };
+
+    expect(isProcessOnlyAssistantMessage(execMessage)).toBe(false);
+    const items: ChatListItem[] = [
+      user('u1'),
+      assistant('a1', [thinking(), toolGroup([tool('read')])]),
+      { type: 'message', data: execMessage },
+      assistant('a3', [thinking(), toolGroup([tool('grep')])]),
+    ];
+    expect(buildTranscriptRenderItems(items, { isStreaming: false }).map((item) => item.type)).toEqual([
+      'source',
+      'source',
+      'source',
+      'source',
+    ]);
+  });
+
+  it('keeps an exec_command message with short narration out of the process fold', () => {
+    const items: ChatListItem[] = [
+      user('u1'),
+      assistant('a1', [thinking(), toolGroup([tool('read')])]),
+      assistant('a2', [thinking(), toolGroup([tool('write')])]),
+      assistant('a2b', [thinking(), toolGroup([tool('grep')])]),
+      assistant('a3', [
+        thinking(),
+        textBlock('<p>起个后台服务。</p>', '起个后台服务。'),
+        toolGroup([{ name: 'exec_command', args: { cmd: 'npm run dev' }, done: true, success: true }]),
+      ]),
+      assistant('a4', [textBlock('<p>服务已启动。</p>', '服务已启动。')]),
+    ];
+
+    const rendered = buildTranscriptRenderItems(items, { isStreaming: false });
+
+    expect(rendered.map((item) => item.type)).toEqual([
+      'source',
+      'process_fold',
+      'source',
+      'source',
+    ]);
+    expect(rendered[1]).toMatchObject({ id: 'process-fold-a1-a2b' });
+    expect(rendered[2]).toMatchObject({ type: 'source', item: items[4] });
+  });
+
   it('does not throw or fold malformed tool_group blocks', () => {
     const items: ChatListItem[] = [
       user('u1'),

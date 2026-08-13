@@ -1,9 +1,9 @@
 {
   "name": "lingxi",
-  "version": "0.1.27",
+  "version": "0.1.28",
   "lingxi": {
     "upstreamVersion": "0.444.1",
-    "releaseGeneration": 5
+    "releaseGeneration": 6
   },
   "type": "module",
   "description": "Lingxi - a personal AI agent with memory and soul",
@@ -49,10 +49,11 @@
     "build:shell": "node scripts/build-shell.mjs",
     "build:packages": "npm run build --workspaces --if-present",
     "generate:windows-icon": "node scripts/generate-windows-icon.cjs",
+    "generate:tray-icons": "node scripts/generate-tray-icons.cjs",
     "pack": "npm run build:computer-use-helper && npm run build:client && npm run build:server && npm run verify:seed-kit && electron-builder --dir",
     "install:local": "npm run pack && rm -rf /Applications/Lingxi.app /Applications/Lingxi.app && cp -R dist/mac-arm64/Lingxi.app /Applications/ && node scripts/sign-local.cjs",
     "dist": "npm run build:computer-use-helper && npm run build:client && npm run build:server && npm run verify:seed-kit && electron-builder --mac dmg",
-    "dist:win": "npm run build:computer-use-helper && npm run build:windows-sandbox-helper && npm run generate:windows-icon && npm run build:client && npm run build:server && npm run verify:seed-kit && npm run pack:server:standalone && npm run verify:standalone:server && electron-builder --win nsis",
+    "dist:win": "npm run build:computer-use-helper && npm run build:windows-sandbox-helper && npm run generate:windows-icon && npm run generate:tray-icons && npm run build:client && npm run build:server && npm run verify:seed-kit && npm run pack:server:standalone && npm run verify:standalone:server && electron-builder --win nsis",
     "dist:linux": "npm run build:client && npm run build:server && npm run verify:seed-kit && electron-builder --linux AppImage deb",
     "verify:seed-kit": "node scripts/verify-seed-kit.mjs",
     "pack:server:standalone": "node scripts/build-standalone-server-artifact.mjs x64",
@@ -64,6 +65,7 @@
     "build:server:open": "node scripts/build-server-open.mjs",
     "smoke:server:open": "node scripts/smoke-open-server.mjs",
     "smoke:skill-ws": "node scripts/smoke-skill-ws.mjs",
+    "benchmark:terminal-ui": "node scripts/benchmark-terminal-ui.mjs",
     "export:open": "node scripts/export-open-tree.mjs",
     "rehearse:open": "node scripts/rehearse-open-export.mjs",
     "lint": "eslint .",
@@ -91,6 +93,7 @@
     "@tiptap/react": "^3.22.0",
     "@tiptap/starter-kit": "^3.22.0",
     "@traptitech/markdown-it-katex": "^3.6.0",
+    "ansi_up": "6.0.6",
     "better-sqlite3": "^12.6.2",
     "chokidar": "^5.0.0",
     "codemirror": "^6.0.2",

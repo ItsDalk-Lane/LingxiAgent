@@ -67,6 +67,7 @@ interface Props {
   assistantTurnSelectionIds?: readonly string[];
   turnTarget?: SessionNodeTarget | null;
   retrySourceMessage?: ChatMessage | null;
+  skillPrompt?: string | null;
   onForkCreated?: ForkedSessionHandler;
   messageRef?: (element: HTMLDivElement | null) => void;
 }
@@ -89,6 +90,7 @@ export const AssistantMessage = memo(function AssistantMessage({
   assistantTurnSelectionIds,
   turnTarget = null,
   retrySourceMessage = null,
+  skillPrompt = null,
   onForkCreated,
   messageRef,
 }: Props) {
@@ -103,7 +105,9 @@ export const AssistantMessage = memo(function AssistantMessage({
     [message.blocks],
   );
   const isInterludeOnly = blocks.length > 0 && blocks.every(block => block.type === 'interlude');
-  const hasWideBlock = blocks.some(b => b.type === 'interactive_card');
+  const hasWideBlock = blocks.some((block) => (
+    block.type !== 'text' && block.type !== 'thinking' && block.type !== 'mood'
+  ));
 
   const [copied, setCopied] = useState(false);
   const handleCopy = useCallback(() => {
@@ -184,6 +188,7 @@ export const AssistantMessage = memo(function AssistantMessage({
               blockIdx={i}
               isStreaming={isStreaming}
               readOnly={readOnly}
+              skillPrompt={skillPrompt}
             />
           </ContentBlockErrorBoundary>
         ))}
@@ -242,7 +247,7 @@ class ContentBlockErrorBoundary extends Component<{
 
 // ── ContentBlock 分发 ──
 
-const ContentBlockView = memo(function ContentBlockView({ block, agentName, agentId, yuan: _yuan, sessionPath, messageId, blockIdx, isStreaming, readOnly }: {
+const ContentBlockView = memo(function ContentBlockView({ block, agentName, agentId, yuan: _yuan, sessionPath, messageId, blockIdx, isStreaming, readOnly, skillPrompt }: {
   block: ContentBlock;
   agentName: string;
   agentId?: string | null;
@@ -252,6 +257,7 @@ const ContentBlockView = memo(function ContentBlockView({ block, agentName, agen
   blockIdx: number;
   isStreaming: boolean;
   readOnly: boolean;
+  skillPrompt: string | null;
 }) {
   switch (block.type) {
     case 'thinking':
@@ -259,7 +265,14 @@ const ContentBlockView = memo(function ContentBlockView({ block, agentName, agen
     case 'mood':
       return <MoodBlock yuan={block.yuan} text={block.text} />;
     case 'tool_group':
-      return <ToolGroupBlock tools={block.tools} collapsed={block.collapsed} agentName={agentName} />;
+      return (
+        <ToolGroupBlock
+          tools={block.tools}
+          collapsed={block.collapsed}
+          agentName={agentName}
+          skillPrompt={skillPrompt}
+        />
+      );
     case 'text':
       return <StreamingMarkdownContent html={block.html} source={block.source} active={isStreaming} linkContext={{ origin: 'session', sessionPath, messageId, blockIdx }} />;
     case 'file':

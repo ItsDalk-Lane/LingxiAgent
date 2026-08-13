@@ -3197,6 +3197,55 @@ describe("sessions route", () => {
     ]);
   });
 
+  it("restores bounded skill content from the paired SKILL.md read result", async () => {
+    const { createSessionsRoute } = await import("../server/routes/sessions.ts");
+    const msgUtils = await import("../core/message-utils.ts");
+    const app = new Hono();
+
+    vi.mocked(msgUtils.loadSessionHistoryMessages).mockResolvedValueOnce([
+      {
+        role: "assistant",
+        content: [{
+          type: "toolCall",
+          id: "call-skill",
+          name: "read",
+          arguments: { path: "/skills/leader/SKILL.md" },
+        }],
+      },
+      {
+        role: "toolResult",
+        toolCallId: "call-skill",
+        toolName: "read",
+        content: [{ type: "text", text: "# Skill: leader\n\nLead the work." }],
+      },
+    ]);
+    vi.mocked(msgUtils.extractTextContent).mockReturnValueOnce({
+      text: "",
+      images: [],
+      thinking: "",
+      toolUses: [{ id: "call-skill", name: "read", args: { path: "/skills/leader/SKILL.md" } }],
+    });
+
+    app.route("/api", createSessionsRoute({
+      agentsDir: "/tmp/agents",
+      deferredResults: null,
+    }));
+
+    const res = await app.request("/api/sessions/messages");
+    const data = await res.json();
+
+    expect(res.status).toBe(200);
+    expect(data.messages[0].toolCalls[0]).toMatchObject({
+      id: "call-skill",
+      name: "read",
+      details: {
+        skillInvocation: {
+          content: "# Skill: leader\n\nLead the work.",
+        },
+      },
+    });
+  });
+
   it("does not return path-backed inline image base64 in session history", async () => {
     const { createSessionsRoute } = await import("../server/routes/sessions.ts");
     const msgUtils = await import("../core/message-utils.ts");
@@ -4736,9 +4785,13 @@ describe("sessions route", () => {
     expect(res.status).toBe(200);
     const normalReply = data.messages.find((m: any) => m.entryId === "a1");
     const loopReply = data.messages.find((m: any) => m.entryId === "a2");
-    // /loop 之前：正常配对保留
+    // /loop 之前：正常配对保留（可见用户输入）
     expect(normalReply.turnInputEntryId).toBe("u1");
-    // loop 轮：不带重试指针（既没有错配到 loop-user-prompt，也没有错配到 u1）
+    expect(normalReply.turnInputVisible).toBe(true);
+    // loop 轮：不带重试指针（既没有错配到 loop-user-prompt，也没有错配到 u1），
+    // 但必须显式下发 turnInputVisible:false——否则前端技能卡「参数」会回退乱猜成
+    // loop 之前最近一条可见用户消息（重载后依然张冠李戴）。
     expect(loopReply).not.toHaveProperty("turnInputEntryId");
+    expect(loopReply.turnInputVisible).toBe(false);
   });
 });

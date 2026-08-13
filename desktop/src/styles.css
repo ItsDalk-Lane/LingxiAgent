@@ -34,7 +34,7 @@
     --radius-sm: 5px;
     --radius-md: 8px;
     --radius-lg: 12px;
-    --chat-task-block-width: 348px;   /* 任务族块（工具条/Subagent/Workflow 卡）统一宽度 */
+    --chat-task-block-width: 100%;    /* 消息区任务卡统一占满当前消息的可用宽度 */
 
     /* 主题可覆盖的抽象 token（默认值和现有视觉一致；主题 CSS 可 override） */
     --radius-input: 6px;        /* input / select widget / textarea / ghost button / media dropdown */

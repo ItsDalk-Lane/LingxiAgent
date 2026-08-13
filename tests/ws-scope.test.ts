@@ -73,6 +73,16 @@ describe("websocket scope filtering", () => {
       type: "interject",
       sessionPath: "/s/new.jsonl",
     })).toBe(true);
+    expect(wsClientCanSendMessage(client, {
+      type: "terminal_close_request",
+      sessionPath: "/s/new.jsonl",
+      terminalId: "term_1",
+    })).toBe(false);
+    expect(wsClientCanSendMessage(client, {
+      type: "subagent_stop_request",
+      sessionPath: "/s/new.jsonl",
+      taskId: "task_1",
+    })).toBe(false);
   });
 
   it("allows same-Studio LAN clients to receive session-aware notifications", () => {
@@ -267,6 +277,66 @@ describe("websocket scope filtering", () => {
       type: "message",
       studioId: "studio_1",
       sessionPath: "/s/legacy/b.jsonl",
+    })).toBe(false);
+  });
+
+  it("allows terminal visualization only for local-owner websocket clients", () => {
+    const owner = createWsClientRecord({
+      principal: {
+        kind: "local_user",
+        credentialKind: "loopback_token",
+        connectionKind: "local",
+        userId: "user_1",
+        studioId: "studio_1",
+        serverNodeId: "node_1",
+      },
+    });
+    const remote = createWsClientRecord({
+      principal: {
+        kind: "device",
+        credentialKind: "device_credential",
+        connectionKind: "lan",
+        userId: "user_1",
+        studioId: "studio_1",
+        serverNodeId: "node_1",
+        scopes: ["chat"],
+      },
+      subscriptions: [{
+        kind: "session",
+        studioId: "studio_1",
+        sessionId: "sess_a",
+        sessionPath: "/s/a.jsonl",
+      }],
+    });
+    const terminalEvent = {
+      type: "terminal_output",
+      studioId: "studio_1",
+      sessionId: "sess_a",
+      sessionPath: "/s/a.jsonl",
+      terminalId: "term_1",
+      chunks: [{ seq: 1, data: "secret\n" }],
+    };
+
+    expect(wsClientCanReceiveEvent(owner, terminalEvent)).toBe(true);
+    expect(wsClientCanReceiveEvent(remote, terminalEvent)).toBe(false);
+    expect(wsClientCanReceiveEvent(remote, { ...terminalEvent, type: "terminal_state" })).toBe(false);
+    expect(wsClientCanReceiveEvent(remote, { ...terminalEvent, type: "terminal_snapshot" })).toBe(false);
+    expect(wsClientCanReceiveEvent(remote, { ...terminalEvent, type: "terminal_tail" })).toBe(false);
+    expect(wsClientCanSendMessage(owner, {
+      type: "terminal_snapshot_request",
+      sessionId: "sess_a",
+      sessionPath: "/s/a.jsonl",
+    })).toBe(true);
+    expect(wsClientCanSendMessage(remote, {
+      type: "terminal_snapshot_request",
+      sessionId: "sess_a",
+      sessionPath: "/s/a.jsonl",
+    })).toBe(false);
+    expect(wsClientCanSendMessage(remote, {
+      type: "terminal_tail_request",
+      sessionId: "sess_a",
+      sessionPath: "/s/a.jsonl",
+      terminalId: "term_1",
     })).toBe(false);
   });
 });

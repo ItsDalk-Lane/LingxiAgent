@@ -24,6 +24,7 @@ import { SkillsTab } from './tabs/SkillsTab';
 import { McpTab } from './tabs/McpTab';
 import { BridgeTab } from './tabs/BridgeTab';
 import { ProvidersTab } from './tabs/ProvidersTab';
+import { UsageTab } from './tabs/UsageTab';
 import { MediaTab } from './tabs/MediaTab';
 import { AboutTab } from './tabs/AboutTab';
 import { PluginsTab } from './tabs/PluginsTab';
@@ -55,6 +56,7 @@ const TAB_COMPONENTS: Record<string, React.ComponentType> = {
   mcp: McpTab,
   bridge: BridgeTab,
   providers: ProvidersTab,
+  usage: UsageTab,
   media: MediaTab,
   sharing: SharingTab,
   access: AccessTab,
@@ -94,6 +96,7 @@ const TAB_TITLE_KEYS: Record<string, string> = {
   mcp: 'settings.tabs.mcp',
   bridge: 'settings.tabs.bridge',
   providers: 'settings.tabs.providers',
+  usage: 'settings.usage.title',
   media: 'settings.tabs.media',
   sharing: 'settings.tabs.sharing',
   access: 'settings.tabs.access',

@@ -668,7 +668,18 @@
     "failed": "⚠ 好像出了點問題 · {n} 步",
     "countWithFail": "{total} 個工具（{fail} 個失敗）",
     "count": "{n} 個工具",
-    "running": "{n} 個工具運行中"
+    "running": "{n} 個工具運行中",
+    "skill": {
+      "running": "正在執行技能 {name}",
+      "completed": "已執行技能 {name}",
+      "failed": "技能執行失敗 {name}",
+      "skillLabel": "技能",
+      "paramsLabel": "參數",
+      "promptUnavailable": "未記錄此次調用的用戶提示詞",
+      "contentPending": "正在載入技能內容…",
+      "contentUnavailable": "暫無可用技能內容",
+      "truncated": "技能內容過長，已截斷顯示"
+    }
   },
   "processFold": {
     "summary": "✨ {name}忙活了一陣子",
@@ -1064,6 +1075,7 @@
       "agent": "助手",
       "me": "我",
       "providers": "供應商",
+      "usage": "用量統計",
       "media": "多媒體",
       "models": "模型",
       "memory": "記憶",
@@ -2674,6 +2686,21 @@
     "blockActions": "區塊操作"
   },
   "rightWorkspace": {
+    "terminal": {
+      "title": "終端程序",
+      "running": "執行中",
+      "done": "已完成",
+      "failed": "失敗",
+      "aborted": "已終止",
+      "stale": "已失效",
+      "count": "{n} 個背景執行",
+      "runningFor": "已執行 {text}",
+      "stop": "停止",
+      "cwd": "工作目錄",
+      "exitCode": "結束碼",
+      "preview": "終端輸出",
+      "staleHint": "Lingxi 重新啟動後，此 PTY 已不存在，但仍可查看歷史輸出。"
+    },
     "activity": {
       "title": "背景動態"
     },
@@ -2682,7 +2709,14 @@
       "waitForOutput": "輸出完成後再標記"
     },
     "subagent": {
-      "title": "子助手"
+      "title": "子助手",
+      "count": "{n} 個背景執行",
+      "runningFor": "已執行 {text}",
+      "stop": "停止"
+    },
+    "process": {
+      "stopping": "正在停止",
+      "stopFailed": "停止失敗，請重試"
     },
     "workflow": {
       "title": "Workflow",

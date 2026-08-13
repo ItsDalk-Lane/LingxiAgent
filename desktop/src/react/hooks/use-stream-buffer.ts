@@ -35,7 +35,12 @@ function nextStreamMessageId(): string {
 
 interface Buffer {
   sessionPath: string;
+  blocks: ContentBlock[];
+  /** 当前用户轮次的完整可见正文，供断线快照使用。 */
   textAcc: string;
+  /** 当前工具/富内容边界之后的正文段，只更新它自己对应的 text block。 */
+  textSegmentAcc: string;
+  textSegmentOrdinal: number | null;
   thinkingAcc: string;
   moodAcc: string;
   moodYuan: string;
@@ -57,7 +62,10 @@ interface Buffer {
 function createBuffer(sessionPath: string): Buffer {
   return {
     sessionPath,
+    blocks: [],
     textAcc: '',
+    textSegmentAcc: '',
+    textSegmentOrdinal: null,
     thinkingAcc: '',
     moodAcc: '',
     moodYuan: 'lingxi',
@@ -72,6 +80,53 @@ function createBuffer(sessionPath: string): Buffer {
     flushTimer: null,
     messageId: null,
   };
+}
+
+function renderBufferedBlocks(currentBlocks: ContentBlock[], buf: Buffer): ContentBlock[] {
+  const blocks = [...currentBlocks];
+
+  if (buf.thinkingAcc || buf.hasThinkingBlock || buf.inThinking) {
+    const idx = blocks.findIndex(b => b.type === 'thinking');
+    const thinkingBlock: ContentBlock = {
+      type: 'thinking',
+      content: buf.thinkingAcc,
+      sealed: !buf.inThinking,
+    };
+    if (idx >= 0) blocks[idx] = thinkingBlock;
+    else blocks.unshift(thinkingBlock);
+  }
+
+  if (buf.moodAcc || buf.inMood) {
+    const idx = blocks.findIndex(b => b.type === 'mood');
+    const moodBlock: ContentBlock = {
+      type: 'mood',
+      yuan: buf.moodYuan,
+      text: buf.inMood ? buf.moodAcc : cleanMoodText(buf.moodAcc),
+    };
+    if (idx >= 0) blocks[idx] = moodBlock;
+    else {
+      const insertAt = blocks.findIndex(b => b.type !== 'thinking');
+      blocks.splice(insertAt >= 0 ? insertAt : blocks.length, 0, moodBlock);
+    }
+  }
+
+  if (buf.textSegmentAcc) {
+    const displayText = buf.textSegmentAcc.replace(/<tool_code>[\s\S]*?<\/tool_code>\s*/g, '');
+    const textIndexes = blocks.reduce<number[]>((indexes, block, index) => {
+      if (block.type === 'text') indexes.push(index);
+      return indexes;
+    }, []);
+    const idx = buf.textSegmentOrdinal === null ? undefined : textIndexes[buf.textSegmentOrdinal];
+    const textBlock: ContentBlock = { type: 'text', html: renderMarkdown(displayText), source: displayText };
+    if (idx !== undefined) {
+      blocks[idx] = textBlock;
+    } else {
+      buf.textSegmentOrdinal = textIndexes.length;
+      blocks.push(textBlock);
+    }
+  }
+
+  return blocks;
 }
 
 function normalizeSessionId(value: unknown): string | null {
@@ -155,6 +210,7 @@ class StreamBufferManager {
   private hasTurnState(buf: Buffer): boolean {
     return !!(
       buf.messageId ||
+      buf.blocks.length > 0 ||
       buf.textAcc ||
       buf.thinkingAcc ||
       buf.hasThinkingBlock ||
@@ -173,6 +229,9 @@ class StreamBufferManager {
       buf.flushTimer = null;
     }
     buf.textAcc = '';
+    buf.blocks = [];
+    buf.textSegmentAcc = '';
+    buf.textSegmentOrdinal = null;
     buf.thinkingAcc = '';
     buf.hasThinkingBlock = false;
     buf.moodAcc = '';
@@ -211,6 +270,7 @@ class StreamBufferManager {
       : null;
     if (existing) {
       buf.messageId = targetId;
+      buf.blocks = existing.type === 'message' ? [...(existing.data.blocks || [])] : [];
       return;
     }
 
@@ -224,7 +284,11 @@ class StreamBufferManager {
   private updateTargetMessage(buf: Buffer, updater: (msg: ChatMessage) => ChatMessage): void {
     this.ensureMessage(buf);
     if (!buf.messageId) return;
-    const updated = useStore.getState().updateMessageById(buf.sessionPath, buf.messageId, updater);
+    const updated = useStore.getState().updateMessageById(buf.sessionPath, buf.messageId, (message) => {
+      const next = updater(message);
+      buf.blocks = [...(next.blocks || [])];
+      return next;
+    });
     if (!updated) {
       console.warn('[stream] target assistant message missing after ensureMessage:', buf.sessionPath, buf.messageId);
       return;
@@ -260,49 +324,7 @@ class StreamBufferManager {
     }
 
     this.updateTargetMessage(buf, (msg) => {
-      const blocks = [...(msg.blocks || [])];
-
-      // ── Thinking ──
-      if (buf.thinkingAcc || buf.hasThinkingBlock || buf.inThinking) {
-        const idx = blocks.findIndex(b => b.type === 'thinking');
-        const thinkingBlock: ContentBlock = {
-          type: 'thinking',
-          content: buf.thinkingAcc,
-          sealed: !buf.inThinking,
-        };
-        if (idx >= 0) blocks[idx] = thinkingBlock;
-        else blocks.unshift(thinkingBlock); // thinking 在最前面
-      }
-
-      // ── Mood ──
-      if (buf.moodAcc || buf.inMood) {
-        const idx = blocks.findIndex(b => b.type === 'mood');
-        const moodBlock: ContentBlock = {
-          type: 'mood',
-          yuan: buf.moodYuan,
-          text: buf.inMood ? buf.moodAcc : cleanMoodText(buf.moodAcc),
-        };
-        if (idx >= 0) blocks[idx] = moodBlock;
-        else {
-          // mood 在 thinking 后面
-          const insertAt = blocks.findIndex(b => b.type !== 'thinking');
-          blocks.splice(insertAt >= 0 ? insertAt : blocks.length, 0, moodBlock);
-        }
-      }
-
-      // ── Text ──
-      if (buf.textAcc) {
-        const displayText = buf.textAcc.replace(/<tool_code>[\s\S]*?<\/tool_code>\s*/g, '');
-        const html = renderMarkdown(displayText);
-        const idx = blocks.findIndex(b => b.type === 'text');
-        if (idx >= 0) {
-          blocks[idx] = { type: 'text', html, source: displayText };
-        } else {
-          blocks.push({ type: 'text', html, source: displayText });
-        }
-      }
-
-      return { ...msg, blocks };
+      return { ...msg, blocks: renderBufferedBlocks(msg.blocks || [], buf) };
     });
   }
 
@@ -321,6 +343,7 @@ class StreamBufferManager {
       case 'text_delta':
         this.ensureMessage(buf);
         buf.textAcc += msg.delta || '';
+        buf.textSegmentAcc += msg.delta || '';
         this.scheduleFlush(buf);
         break;
 
@@ -436,6 +459,9 @@ class StreamBufferManager {
           });
           return { ...m, blocks };
         });
+        // 工具之后的新正文必须形成新的文本块，不能继续覆盖工具之前的正文。
+        buf.textSegmentAcc = '';
+        buf.textSegmentOrdinal = null;
         break;
 
       case 'tool_end':
@@ -565,11 +591,12 @@ class StreamBufferManager {
   snapshot(sessionPath: string, sessionId: string | null = null): StreamBufferSnapshot | null {
     const buf = this.lookupBuffer(sessionPath, sessionId);
     if (!buf) return null;
-    const hasContent = !!(buf.textAcc || buf.thinkingAcc || buf.hasThinkingBlock || buf.moodAcc);
+    const hasContent = !!(buf.blocks.length || buf.textAcc || buf.thinkingAcc || buf.hasThinkingBlock || buf.moodAcc);
     if (!hasContent) return null;
     return {
       hasContent: true,
       messageId: buf.messageId,
+      blocks: renderBufferedBlocks(buf.blocks, buf),
       text: buf.textAcc,
       thinking: buf.thinkingAcc,
       mood: buf.inMood ? buf.moodAcc : cleanMoodText(buf.moodAcc),

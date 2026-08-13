@@ -668,7 +668,18 @@
     "failed": "⚠ 뭔가 이상한 것 같아요 · {n}단계",
     "countWithFail": "{total}개 도구 ({fail}개 실패)",
     "count": "{n}개 도구",
-    "running": "{n}개 도구 실행 중"
+    "running": "{n}개 도구 실행 중",
+    "skill": {
+      "running": "스킬 {name} 실행 중",
+      "completed": "스킬 {name} 실행 완료",
+      "failed": "스킬 {name} 실행 실패",
+      "skillLabel": "스킬",
+      "paramsLabel": "매개변수",
+      "promptUnavailable": "이 호출의 사용자 프롬프트가 기록되지 않았습니다",
+      "contentPending": "스킬 내용을 불러오는 중…",
+      "contentUnavailable": "스킬 내용을 표시할 수 없습니다",
+      "truncated": "스킬 내용이 잘려 표시됩니다"
+    }
   },
   "processFold": {
     "summary": "✨ {name}이(가) 한동안 바쁘게 움직였어요",
@@ -1064,6 +1075,7 @@
       "agent": "에이전트",
       "me": "나",
       "providers": "제공자",
+      "usage": "사용량",
       "media": "미디어",
       "models": "모델",
       "memory": "기억",
@@ -2674,6 +2686,21 @@
     "blockActions": "블록 작업"
   },
   "rightWorkspace": {
+    "terminal": {
+      "title": "터미널 프로세스",
+      "running": "실행 중",
+      "done": "완료",
+      "failed": "실패",
+      "aborted": "종료됨",
+      "stale": "만료됨",
+      "count": "백그라운드에서 {n}개 실행 중",
+      "runningFor": "실행 시간 {text}",
+      "stop": "중지",
+      "cwd": "작업 디렉터리",
+      "exitCode": "종료 코드",
+      "preview": "터미널 출력",
+      "staleHint": "Lingxi가 다시 시작되어 이 PTY는 더 이상 존재하지 않지만 이전 출력은 계속 볼 수 있습니다."
+    },
     "activity": {
       "title": "백그라운드 활동"
     },
@@ -2682,7 +2709,14 @@
       "waitForOutput": "Wait for output to finish"
     },
     "subagent": {
-      "title": "서브 에이전트"
+      "title": "서브 에이전트",
+      "count": "백그라운드에서 {n}개 실행 중",
+      "runningFor": "실행 시간 {text}",
+      "stop": "중지"
+    },
+    "process": {
+      "stopping": "중지 중",
+      "stopFailed": "중지하지 못했습니다. 다시 시도해 주세요."
     },
     "workflow": {
       "title": "Workflow",

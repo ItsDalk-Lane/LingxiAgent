@@ -2,6 +2,7 @@ import React, { type CSSProperties } from 'react';
 import { t } from '../../helpers';
 import styles from '../../Settings.module.css';
 import type { UsageLedgerEntry } from './usage-ledger-actions';
+import { UsageCursorTip, useUsageCursorTip } from './UsageCursorTip';
 import {
   USAGE_PERIOD_ORDER,
   aggregateEntries,
@@ -21,12 +22,15 @@ type CssVars = CSSProperties & Record<string, string | number>;
 
 export function ModelOrbit({ groups, totalTokens }: { groups: UsageAggregate[]; totalTokens: number }) {
   const radii = [82, 64, 46, 28];
+  const { tip, bindTip } = useUsageCursorTip();
   return (
     <div className={styles['usage-orbit-wrap']}>
       <svg className={styles['usage-orbit']} viewBox="0 0 200 200" aria-hidden="true">
         <g transform="rotate(-90 100 100)">
           {groups.map((group, index) => (
-            <RingCircles key={group.key} group={group} totalTokens={totalTokens} radius={radii[index] || 28} cx={100} cy={100} />
+            <g key={group.key} data-usage-tip={group.key} {...bindTip(group)}>
+              <RingCircles group={group} totalTokens={totalTokens} radius={radii[index] || 28} cx={100} cy={100} />
+            </g>
           ))}
         </g>
       </svg>
@@ -34,17 +38,24 @@ export function ModelOrbit({ groups, totalTokens }: { groups: UsageAggregate[]; 
         <span>{formatPercent(hitRate(aggregateEntries('visible', '', groups.flatMap(group => group.entries))))}</span>
         <small>{t('settings.usage.cacheHitRate')}</small>
       </div>
+      <UsageCursorTip tip={tip} />
     </div>
   );
 }
 
 export function SplitRing({ group, totalTokens, size }: { group: UsageAggregate; totalTokens: number; size: number }) {
+  const { tip, bindTip } = useUsageCursorTip();
   return (
-    <svg className={styles['usage-split-ring']} style={{ width: size, height: size }} viewBox="0 0 44 44" aria-hidden="true">
-      <g transform="rotate(-90 22 22)">
-        <RingCircles group={group} totalTokens={totalTokens} radius={17} cx={22} cy={22} />
-      </g>
-    </svg>
+    <>
+      <svg className={styles['usage-split-ring']} style={{ width: size, height: size }} viewBox="0 0 44 44" aria-hidden="true">
+        <g transform="rotate(-90 22 22)">
+          <g data-usage-tip={group.key} {...bindTip(group)}>
+            <RingCircles group={group} totalTokens={totalTokens} radius={17} cx={22} cy={22} />
+          </g>
+        </g>
+      </svg>
+      <UsageCursorTip tip={tip} />
+    </>
   );
 }
 
@@ -60,6 +71,7 @@ export function DailyBars({
   onPeriodChange: (period: UsagePeriod) => void;
 }) {
   const maxTotal = Math.max(1, ...groups.map(group => group.totalTokens));
+  const { tip, bindTip } = useUsageCursorTip();
   return (
     <div className={styles['usage-panel']}>
       <div className={styles['usage-panel-head']}>
@@ -76,8 +88,15 @@ export function DailyBars({
             '--usage-uncached-height': `${(group.nonCachedTokens / maxTotal) * 100}%`,
           } as CssVars;
           const edgeLabel = index === 0 || index === groups.length - 1 ? group.label : '';
+          const summary = `${group.label} · ${formatNumber(group.totalTokens)}`;
           return (
-            <div key={group.key} className={styles['usage-day']} title={`${group.label} · ${formatNumber(group.totalTokens)}`}>
+            <div
+              key={group.key}
+              className={styles['usage-day']}
+              data-usage-tip={group.key}
+              aria-label={summary}
+              {...bindTip(group)}
+            >
               <div className={styles['usage-day-bar']} style={style}>
                 <span className={styles['usage-day-cache']} />
                 <span className={styles['usage-day-uncached']} />
@@ -87,6 +106,7 @@ export function DailyBars({
           );
         })}
       </div>
+      <UsageCursorTip tip={tip} />
     </div>
   );
 }

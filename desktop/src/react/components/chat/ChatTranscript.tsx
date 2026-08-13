@@ -84,6 +84,7 @@ export const ChatTranscript = memo(function ChatTranscript({
           assistantTurnSelectionIdsByCompletionIndex={turnState.assistantTurnSelectionIdsByCompletionIndex}
           assistantTurnTargetsByCompletionIndex={turnState.assistantTurnTargetsByCompletionIndex}
           assistantTurnRetryMessagesByCompletionIndex={turnState.assistantTurnRetryMessagesByCompletionIndex}
+          assistantSkillPromptsByIndex={turnState.assistantSkillPromptsByIndex}
           isStreamingSession={isStreaming}
           agentDisplay={agentDisplay}
           viewerIdentity={viewerIdentity}
@@ -111,6 +112,7 @@ function buildTurnState(items: ChatListItem[]): {
   assistantTurnSelectionIdsByCompletionIndex: ReadonlyMap<number, readonly string[]>;
   assistantTurnTargetsByCompletionIndex: ReadonlyMap<number, SessionNodeTarget>;
   assistantTurnRetryMessagesByCompletionIndex: ReadonlyMap<number, ChatMessage>;
+  assistantSkillPromptsByIndex: ReadonlyMap<number, string>;
 } {
   let latestUserIndex = -1;
   let latestAssistantIndex = -1;
@@ -125,6 +127,8 @@ function buildTurnState(items: ChatListItem[]): {
   const assistantTurnSelectionIdsByCompletionIndex = new Map<number, readonly string[]>();
   const assistantTurnTargetsByCompletionIndex = new Map<number, SessionNodeTarget>();
   const assistantTurnRetryMessagesByCompletionIndex = new Map<number, ChatMessage>();
+  const assistantSkillPromptsByIndex = new Map<number, string>();
+  const visibleUsersByEntryId = new Map<string, ChatMessage>();
 
   const completePendingAssistantTurn = () => {
     if (pendingAssistantIndex < 0) return;
@@ -152,11 +156,20 @@ function buildTurnState(items: ChatListItem[]): {
       latestUserIndex = i;
       precedingUserEntryId = item.data.sourceEntryId || null;
       precedingUserMessage = item.data;
+      if (precedingUserEntryId) visibleUsersByEntryId.set(precedingUserEntryId, item.data);
       continue;
     }
 
     if (item.data.role === 'assistant') {
-      const turnInputEntryId = item.data.turnInputEntryId || precedingUserEntryId;
+      const explicitTurnInputEntryId = item.data.turnInputEntryId?.trim() || null;
+      const turnInputEntryId = explicitTurnInputEntryId || precedingUserEntryId;
+      const promptSource = item.data.turnInputVisible === false
+        ? null
+        : explicitTurnInputEntryId
+          ? visibleUsersByEntryId.get(explicitTurnInputEntryId) || null
+          : precedingUserMessage;
+      const prompt = promptSource?.text?.trim();
+      if (prompt) assistantSkillPromptsByIndex.set(i, prompt);
       if (
         pendingAssistantIndex >= 0
         && pendingAssistantTurnInputEntryId !== turnInputEntryId
@@ -190,6 +203,7 @@ function buildTurnState(items: ChatListItem[]): {
     assistantTurnSelectionIdsByCompletionIndex,
     assistantTurnTargetsByCompletionIndex,
     assistantTurnRetryMessagesByCompletionIndex,
+    assistantSkillPromptsByIndex,
   };
 }
 
@@ -207,6 +221,7 @@ const TranscriptRenderItemView = memo(function TranscriptRenderItemView({
   assistantTurnSelectionIdsByCompletionIndex,
   assistantTurnTargetsByCompletionIndex,
   assistantTurnRetryMessagesByCompletionIndex,
+  assistantSkillPromptsByIndex,
   isStreamingSession,
   agentDisplay,
   viewerIdentity,
@@ -227,6 +242,7 @@ const TranscriptRenderItemView = memo(function TranscriptRenderItemView({
   assistantTurnSelectionIdsByCompletionIndex: ReadonlyMap<number, readonly string[]>;
   assistantTurnTargetsByCompletionIndex: ReadonlyMap<number, SessionNodeTarget>;
   assistantTurnRetryMessagesByCompletionIndex: ReadonlyMap<number, ChatMessage>;
+  assistantSkillPromptsByIndex: ReadonlyMap<number, string>;
   isStreamingSession: boolean;
   agentDisplay: AgentDisplayInfo & { yuan: string };
   viewerIdentity: { name: string; avatarUrl: string | null };
@@ -250,6 +266,7 @@ const TranscriptRenderItemView = memo(function TranscriptRenderItemView({
         assistantTurnSelectionIdsByCompletionIndex={assistantTurnSelectionIdsByCompletionIndex}
         assistantTurnTargetsByCompletionIndex={assistantTurnTargetsByCompletionIndex}
         assistantTurnRetryMessagesByCompletionIndex={assistantTurnRetryMessagesByCompletionIndex}
+        assistantSkillPromptsByIndex={assistantSkillPromptsByIndex}
         completionTimePersistent={
           turnCompletionAssistantIndexes.has(groupLastOriginalIndex(renderItem))
           && groupLastOriginalIndex(renderItem) === latestAssistantIndex
@@ -296,6 +313,7 @@ const TranscriptRenderItemView = memo(function TranscriptRenderItemView({
       assistantTurnRetryMessage={showTurnCompletionTime
         ? assistantTurnRetryMessagesByCompletionIndex.get(originalIndex) ?? null
         : null}
+      skillPrompt={assistantSkillPromptsByIndex.get(originalIndex) ?? null}
       agentDisplay={agentDisplay}
       viewerIdentity={viewerIdentity}
       isStreaming={isStreamingSession}
@@ -332,6 +350,7 @@ const TranscriptItemView = memo(function TranscriptItemView({
   assistantTurnSelectionIds,
   assistantTurnTarget,
   assistantTurnRetryMessage,
+  skillPrompt,
   agentDisplay,
   viewerIdentity,
   isStreaming,
@@ -352,6 +371,7 @@ const TranscriptItemView = memo(function TranscriptItemView({
   assistantTurnSelectionIds?: readonly string[];
   assistantTurnTarget?: SessionNodeTarget | null;
   assistantTurnRetryMessage?: ChatMessage | null;
+  skillPrompt?: string | null;
   agentDisplay: AgentDisplayInfo & { yuan: string };
   viewerIdentity: { name: string; avatarUrl: string | null };
   isStreaming: boolean;
@@ -413,6 +433,7 @@ const TranscriptItemView = memo(function TranscriptItemView({
       assistantTurnSelectionIds={assistantTurnSelectionIds}
       turnTarget={assistantTurnTarget}
       retrySourceMessage={assistantTurnRetryMessage}
+      skillPrompt={skillPrompt}
       onForkCreated={onForkCreated}
       messageRef={messageRef}
     />

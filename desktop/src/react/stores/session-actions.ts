@@ -289,6 +289,8 @@ async function resetDeskForSessionWorkspace({
 
 function clearSessionRuntimeCaches(path: string): void {
   useStore.getState().clearSession?.(path);
+  // 终端 metadata 桶（terminalsBySession）也按会话清理，否则随归档数无界残留。
+  useStore.getState().clearTerminals?.(path);
   useStore.setState((s: Record<string, any>) => {
     const attachedFilesBySession = deleteSessionScopedStateValue(s, s.attachedFilesBySession || {}, path);
     const sessionRegistryFilesByPath = deleteSessionScopedStateValue(s, s.sessionRegistryFilesByPath || {}, path);
@@ -454,6 +456,14 @@ export async function completeSessionTodos(sessionPath: string): Promise<boolean
 }
 
 function buildInflightAssistantMessage(snap: StreamBufferSnapshot): ChatMessage {
+  if (snap.blocks?.length) {
+    return {
+      id: snap.messageId || `inflight-${Date.now()}`,
+      role: 'assistant',
+      blocks: snap.blocks,
+      timestamp: Date.now(),
+    };
+  }
   const blocks: ContentBlock[] = [];
   if (snap.thinking || snap.inThinking) {
     blocks.push({ type: 'thinking', content: snap.thinking, sealed: !snap.inThinking });
@@ -956,7 +966,10 @@ export async function switchSession(path: string): Promise<void> {
 
     // 切换会话后刷新 context ring
     useStore.setState({ contextTokens: null, contextWindow: null, contextPercent: null });
-    import('../services/websocket').then(({ getWebSocket }) => {
+    import('../services/websocket').then(({ getWebSocket, requestTerminalSnapshotForCurrentSession }) => {
+      // 终端快照走会话切换的通用路径：compact 布局不挂 TerminalCard，没人替它发请求。
+      // 服务端快照是幂等单播，与 ws 重连 / TerminalCard 挂载时的重复请求不冲突。
+      requestTerminalSnapshotForCurrentSession(useStore.getState());
       const wsConn = getWebSocket();
       if (wsConn?.readyState === WebSocket.OPEN) {
         const sessionId = sessionIdForPathFromState(useStore.getState() as Record<string, any>, path);

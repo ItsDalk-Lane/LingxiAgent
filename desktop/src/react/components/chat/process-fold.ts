@@ -1,5 +1,6 @@
 import type { ChatListItem, ChatMessage, ContentBlock, ToolCall } from '../../stores/chat-types';
 import { isToolCallHiddenFromProcessUi } from '../../utils/tool-call-visibility';
+import { skillInvocationName } from '../../../../../shared/tool-outcome.ts';
 
 export interface ProcessFoldStats {
   toolCount: number;
@@ -63,8 +64,27 @@ function visibleBlocks(message: ChatMessage): ContentBlock[] {
   );
 }
 
+function toolGroupHasTool(message: ChatMessage, match: (tool: ToolCall) => boolean): boolean {
+  return visibleBlocks(message).some((block) => (
+    block.type === 'tool_group'
+    && Array.isArray(block.tools)
+    && block.tools.some(match)
+  ));
+}
+
+function hasSkillInvocation(message: ChatMessage): boolean {
+  return toolGroupHasTool(message, (tool) => !!skillInvocationName({ toolName: tool.name, args: tool.args }));
+}
+
+// exec_command 卡承载持久终端：右栏「点终端标题跳回卡片」的 listener 挂在卡片上，
+// 折叠会卸载子树、点击变死点击——与 skill invocation 一样永不折叠。
+function hasExecCommand(message: ChatMessage): boolean {
+  return toolGroupHasTool(message, (tool) => tool.name === 'exec_command');
+}
+
 export function isProcessOnlyAssistantMessage(message: ChatMessage): boolean {
   if (message.role !== 'assistant') return false;
+  if (hasSkillInvocation(message) || hasExecCommand(message)) return false;
   const blocks = visibleBlocks(message);
   if (blocks.length === 0) return false;
   return blocks.every(isProcessBlock);
@@ -153,6 +173,7 @@ function protectedFinalTextIndexes(items: ChatListItem[]): Set<number> {
 }
 
 function isFoldableProcessAssistantMessage(message: ChatMessage, isProtectedFinalText: boolean): boolean {
+  if (hasSkillInvocation(message) || hasExecCommand(message)) return false;
   if (isProcessOnlyAssistantMessage(message)) return true;
   if (isProtectedFinalText) return false;
   return isShortProcessNarrationMessage(message);

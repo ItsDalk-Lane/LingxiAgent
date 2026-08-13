@@ -2170,7 +2170,7 @@
       "schemaContract": {
         "kind": "protocol",
         "source": "lib/terminal/terminal-session-manager.ts",
-        "compatibility": "The named runtime reader is canonical; this inventory does not imply stricter validation than runtime currently performs."
+        "compatibility": "sessionId and toolCallId are optional additive metadata fields. Older entries without them still load; ownership resolves from the persisted sessionPath when no stable id is present, and chat navigation falls back to terminalId when no toolCallId is present."
       },
       "openEntry": [
         "new TerminalSessionManager"
@@ -6978,7 +6978,7 @@
     {
       "sourceFile": "lib/terminal/terminal-session-manager.ts",
       "kind": "atomic-write",
-      "excerpt": "atomicWriteSync(this._metadataPath(entry.terminalId), JSON.stringify(publicEntry(entry), null, 2))",
+      "excerpt": "atomicWriteSync(this._metadataPath(entry.terminalId), JSON.stringify(this._publicEntry(entry), null, 2))",
       "reason": "Writes terminal metadata or appends ordered transcript chunks.",
       "storeId": "terminal-session-state",
       "exemptionId": null,

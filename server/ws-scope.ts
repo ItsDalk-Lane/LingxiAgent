@@ -4,6 +4,10 @@ import {
   principalHasScope,
   principalOwnsLocalConnection,
 } from "../core/security-principal.ts";
+import {
+  TERMINAL_CLIENT_MESSAGE_TYPES,
+  TERMINAL_SERVER_MESSAGE_TYPES,
+} from "../shared/terminal-ui-contract.ts";
 
 const SAFE_GLOBAL_EVENTS = new Set([
   "session_created",
@@ -57,6 +61,8 @@ export function wsClientCanReceiveEvent(client, event, { resolvedSessionId = nul
   const principal = normalizePrincipal(client.principal);
   if (principalOwnsLocalConnection(principal)) return true;
 
+  if (TERMINAL_SERVER_MESSAGE_TYPES.has(event.type)) return false;
+
   if (event.thumbnail && typeof event.thumbnail === "string") return false;
 
   const sessionPath = stringOrNull(event.sessionPath);
@@ -89,6 +95,7 @@ export function wsClientCanSendMessage(client, message) {
   const principal = normalizePrincipal(client.principal);
   if (principalOwnsLocalConnection(principal)) return true;
   const type = stringOrNull(message.type);
+  if (type && TERMINAL_CLIENT_MESSAGE_TYPES.has(type)) return false;
   if (WRITE_MESSAGE_TYPES.has(type)) return principalHasScope(principal, "chat.write");
   if (READ_MESSAGE_TYPES.has(type)) return principalHasScope(principal, "chat.read");
   return principalHasScope(principal, "chat");

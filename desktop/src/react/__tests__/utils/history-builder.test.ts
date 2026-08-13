@@ -29,6 +29,28 @@ describe('buildItemsFromHistory user image restoration', () => {
     });
   });
 
+  it('restores a skill card after the prose that preceded its invocation', () => {
+    const items = buildItemsFromHistory({
+      messages: [{
+        id: 'skill-history',
+        role: 'assistant',
+        content: '我先读取对应技能。',
+        toolCalls: [{
+          id: 'call-skill',
+          name: 'read',
+          args: { path: '/skills/leader/SKILL.md' },
+          status: 'succeeded',
+          details: { skillInvocation: { content: '# Skill: leader' } },
+        }],
+      }],
+    });
+
+    const first = items[0];
+    expect(first.type).toBe('message');
+    if (first.type !== 'message') throw new Error('expected message');
+    expect(first.data.blocks?.map((block) => block.type)).toEqual(['text', 'tool_group']);
+  });
+
   it('把服务端 ISO timestamp 归一成前端毫秒时间', () => {
     const items = buildItemsFromHistory({
       messages: [{

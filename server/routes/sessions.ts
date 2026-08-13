@@ -1534,7 +1534,10 @@ export function createSessionsRoute(engine, hub = null) {
       };
       let displayIdx = 0;
       let latestTurnInputEntryId: string | null = null;
-      let latestTurnInputVisible = false;
+      // 初始视为“可见”：会话尚无输入时投影不应带 turnInputVisible:false（如角色卡
+      // 开场白）。只有真实出现过隐藏输入（隐藏 user 消息 / 隐藏 custom 输入 / loop
+      // 协议消息置 null）时才为 false，从而对 entryId 为 null 的隐藏轮也显式下发。
+      let latestTurnInputVisible = true;
 
       for (let sourceIndex = 0; sourceIndex < sourceMessages.length; sourceIndex += 1) {
         const m = sourceMessages[sourceIndex];
@@ -1596,7 +1599,11 @@ export function createSessionsRoute(engine, hub = null) {
               ...(m.id ? { entryId: m.id } : {}),
               role: "assistant",
               content,
-              ...(turnInputEntryId ? { turnInputEntryId, turnInputVisible } : {}),
+              ...(turnInputEntryId
+                ? { turnInputEntryId, turnInputVisible }
+                // 隐藏输入轮次（如 loop 轮）entryId 被刻意置 null，但仍要显式下发
+                // turnInputVisible:false，否则前端技能卡「参数」会回退猜成前一条可见用户消息。
+                : (turnInputVisible === false ? { turnInputVisible: false } : {})),
               ...(contentHasThinkingBlock(m.content, { stripThink: true }) ? { thinking } : {}),
               toolCalls: projectedToolUses.length ? projectedToolUses : undefined,
               ...(m.timestamp ? { timestamp: m.timestamp } : {}),

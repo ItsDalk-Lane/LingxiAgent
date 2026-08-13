@@ -20,6 +20,10 @@ const streamResumeMocks = vi.hoisted(() => ({
   requestStreamResume: vi.fn(),
 }));
 
+const websocketMocks = vi.hoisted(() => ({
+  requestTerminalSnapshotForCurrentSession: vi.fn(() => true),
+}));
+
 const mockState: MockState = {};
 const initialStateFactory = (): MockState => ({
   currentSessionPath: null,
@@ -153,6 +157,7 @@ vi.mock('../../utils/markdown', () => ({
 
 vi.mock('../../services/websocket', () => ({
   getWebSocket: () => null,
+  requestTerminalSnapshotForCurrentSession: websocketMocks.requestTerminalSnapshotForCurrentSession,
 }));
 
 vi.mock('../../services/stream-resume', () => ({
@@ -205,6 +210,7 @@ function installStoreMethods() {
     delete (mockState.scrollPositions as Record<string, number>)[path];
     delete (mockState._sessionFilesFlightByPath as Record<string, unknown>)[path];
   });
+  s.clearTerminals = vi.fn();
   s.setSessionRegistryFiles = vi.fn((path: string, files: unknown[]) => {
     const bySession = mockState.sessionRegistryFilesByPath as Record<string, unknown>;
     bySession[path] = files;
@@ -327,6 +333,7 @@ function mockPermissionDefault(mode = 'ask') {
     mockClearChat.mockReset();
     mockLoadDeskFiles.mockReset();
     streamResumeMocks.requestStreamResume.mockReset();
+    websocketMocks.requestTerminalSnapshotForCurrentSession.mockClear();
     deskActionMocks.activateWorkspaceDesk.mockReset();
     deskActionMocks.activateWorkspaceDesk.mockImplementation(async (root?: string | null, options?: { mountId?: string | null; label?: string | null }) => {
       const mountId = options?.mountId || null;
@@ -477,6 +484,39 @@ function mockPermissionDefault(mode = 'ask') {
     expect(mockState.unreadOutputSessionPaths).toEqual(['/session/other.jsonl']);
     expect(mockState.currentSessionId).toBe('sess_next');
     expect(mockState.sessionLocatorsById).toMatchObject({ sess_next: { path: '/session/next.jsonl' } });
+  });
+
+  it('requests a terminal snapshot on the generic session-switch path (compact layout has no TerminalCard)', async () => {
+    Object.assign(mockState, {
+      currentSessionPath: '/session/current.jsonl',
+      sessions: [{ path: '/session/next.jsonl', sessionId: 'sess_next', cwd: '/tmp/work' }],
+    });
+    mockFetch.mockImplementation(async (url: string) => {
+      if (url === '/api/sessions/switch') {
+        return jsonResponse({
+          ok: true,
+          path: '/session/next.jsonl',
+          sessionId: 'sess_next',
+          cwd: '/tmp/work',
+          workspaceFolders: [],
+          memoryEnabled: true,
+          permissionMode: 'ask',
+          accessMode: 'ask',
+        });
+      }
+      if (String(url).startsWith('/api/sessions/messages')) {
+        return jsonResponse({ messages: [], blocks: [], todos: [], hasMore: false });
+      }
+      throw new Error(`unexpected fetch: ${url}`);
+    });
+
+    await switchSession('/session/next.jsonl');
+
+    await vi.waitFor(() => {
+      expect(websocketMocks.requestTerminalSnapshotForCurrentSession).toHaveBeenCalledWith(
+        expect.objectContaining({ currentSessionPath: '/session/next.jsonl', currentSessionId: 'sess_next' }),
+      );
+    });
   });
 
   it('clears unread output marker when switching into a deleted-agent history session', async () => {
@@ -1434,6 +1474,45 @@ function mockPermissionDefault(mode = 'ask') {
       const chat = mockState.chatSessions as Record<string, { items: unknown[] }>;
       expect(chat['/a'].items.length).toBe(1);
     });
+
+    it('uses ordered snapshot blocks so a skill call stays between surrounding prose', async () => {
+      mockSnapshot.mockReturnValue({
+        hasContent: true,
+        messageId: 'stream-skill',
+        text: '前文后文',
+        thinking: '',
+        mood: '',
+        moodYuan: 'lingxi',
+        inThinking: false,
+        inMood: false,
+        blocks: [
+          { type: 'text', html: '<p>前文</p>', source: '前文' },
+          {
+            type: 'tool_group',
+            collapsed: false,
+            tools: [{
+              name: 'read',
+              args: { path: '/skills/leader/SKILL.md' },
+              done: true,
+              success: true,
+            }],
+          },
+          { type: 'text', html: '<p>后文</p>', source: '后文' },
+        ],
+      });
+      mockFetch.mockResolvedValueOnce(jsonResponse({
+        messages: [{ text: 'u', role: 'user' }], blocks: [], todos: [], hasMore: false,
+      }));
+
+      await loadMessages('/a');
+
+      const chat = mockState.chatSessions as Record<string, { items: Array<{ type: string; data: { blocks?: Array<{ type: string }> } }> }>;
+      expect(chat['/a'].items[1].data.blocks?.map((block) => block.type)).toEqual([
+        'text',
+        'tool_group',
+        'text',
+      ]);
+    });
   });
 
   describe('loadSessions 首次自动切换', () => {
@@ -2283,6 +2362,9 @@ function mockPermissionDefault(mode = 'ask') {
       expect((mockState.todosBySession as Record<string, unknown>)['/archived']).toBeUndefined();
       expect((mockState.streamingSessions as string[])).toEqual(['/current']);
       expect((mockState.inlineErrors as Record<string, InlineErrorEntry | null>)['/archived']).toBeNull();
+      // 归档即离开列表：终端 metadata 桶也要清，否则 terminalsBySession 随归档数无界残留。
+      expect((mockState as unknown as { clearTerminals: ReturnType<typeof vi.fn> }).clearTerminals)
+        .toHaveBeenCalledWith('/archived');
       expect(mockClearChat).not.toHaveBeenCalled();
     });
 

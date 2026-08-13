@@ -9,9 +9,12 @@
  * 未注册时调用均 no-op，保证 store 的加载顺序不会导致崩溃。
  */
 
+import type { ContentBlock } from './chat-types';
+
 export interface StreamBufferSnapshot {
   hasContent: boolean;
   messageId: string | null;
+  blocks?: ContentBlock[];
   text: string;
   thinking: string;
   mood: string;

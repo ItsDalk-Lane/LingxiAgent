@@ -174,9 +174,12 @@ describe('ProcessFoldBlock', () => {
       'utf8',
     );
     const processFoldCollapseRule = css.match(/\.processFoldCollapse\s*\{(?<body>[^}]*)\}/)?.groups?.body || '';
+    const processFoldMessageRule = css.match(/\.processFoldPanel \.message\s*\{(?<body>[^}]*)\}/)?.groups?.body || '';
 
     expect(source).toContain('className={styles.processFoldCollapse}');
     expect(processFoldCollapseRule).toContain('width: 100%');
     expect(processFoldCollapseRule).toContain('box-sizing: border-box');
+    expect(processFoldMessageRule).toContain('width: 100%');
+    expect(processFoldMessageRule).toContain('max-width: 100%');
   });
 });

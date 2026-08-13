@@ -24,6 +24,11 @@ import {
 } from './server-connection';
 import { AppError } from '../../../../shared/errors.ts';
 import { errorBus } from '../../../../shared/error-bus.ts';
+import {
+  configureTerminalClientWebSocketGetter,
+  requestTerminalSnapshot,
+} from './terminal-client';
+import { configureBackgroundProcessWebSocketGetter } from './background-process-control';
 
 // ── 模块级 WS 实例 ──
 let _ws: WebSocket | null = null;
@@ -41,6 +46,8 @@ let _resourceForegroundCatchUpCleanup: (() => void) | null = null;
 // 注入循环依赖的 handlers
 injectHandlers(handleServerMessage, applyStreamingStatus);
 injectWebSocketGetter(() => _ws);
+configureTerminalClientWebSocketGetter(() => _ws);
+configureBackgroundProcessWebSocketGetter(() => _ws);
 
 export function resolveStreamingSessionResumeTargets(state: {
   streamingSessions?: string[];
@@ -58,6 +65,20 @@ export function resolveStreamingSessionResumeTargets(state: {
     targets.add(key);
   }
   return Array.from(targets);
+}
+
+export function requestTerminalSnapshotForCurrentSession(state: {
+  currentSessionId?: string | null;
+  currentSessionPath?: string | null;
+}): boolean {
+  const sessionPath = typeof state.currentSessionPath === 'string' && state.currentSessionPath.trim()
+    ? state.currentSessionPath
+    : null;
+  if (!sessionPath) return false;
+  return requestTerminalSnapshot({
+    sessionId: state.currentSessionId || null,
+    sessionPath,
+  });
 }
 
 /** 获取当前 WebSocket 实例 */
@@ -115,6 +136,7 @@ async function openConnectionWebSocket(connection: ServerConnection): Promise<vo
     });
 
     const s = useStore.getState();
+    requestTerminalSnapshotForCurrentSession(s);
     const streamingPaths = resolveStreamingSessionResumeTargets(s);
     if (streamingPaths.length > 0) {
       const myVersion = ++_wsResumeVersion;

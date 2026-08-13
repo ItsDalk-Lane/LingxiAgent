@@ -101,7 +101,7 @@ CRCCheck off
   Push $0
   Push $R2
   StrCpy $R2 ""
-  !insertmacro lingxiRequireInstallSurfaceFile "$INSTDIR\${APP_EXECUTABLE_FILENAME}" "HanaAgent.exe"
+  !insertmacro lingxiRequireInstallSurfaceFile "$INSTDIR\${APP_EXECUTABLE_FILENAME}" "Lingxi.exe"
   !insertmacro lingxiRequireInstallSurfaceFile "$INSTDIR\resources\app.asar" "resources\app.asar"
   !insertmacro lingxiRequireInstallSurfaceFile "$INSTDIR\resources\app-update.yml" "resources\app-update.yml"
   ; manifest 文件名带平台限定（seed-train-<platform>-<arch>.json，见
@@ -115,13 +115,13 @@ CRCCheck off
   !insertmacro lingxiRequireInstallSurfaceFile "$INSTDIR\resources\git\usr\bin\sh.exe" "MinGit sh.exe"
 
   ${If} $R2 != ""
-    DetailPrint "HanaAgent install surface self-check failed."
+    DetailPrint "LingxiAgent install surface self-check failed."
     FileOpen $0 "$INSTDIR\hanaagent-install-diagnostics.log" w
-    FileWrite $0 "HanaAgent install surface self-check failed.$\r$\n"
+    FileWrite $0 "LingxiAgent install surface self-check failed.$\r$\n"
     FileWrite $0 "Install dir: $INSTDIR$\r$\n"
     FileWrite $0 "Missing or unreadable files:$R2$\r$\n"
     FileClose $0
-    MessageBox MB_OK|MB_ICONSTOP "HanaAgent installation is incomplete. Missing or unreadable files:$R2$\r$\n$\r$\nDiagnostic file:$\r$\n$INSTDIR\hanaagent-install-diagnostics.log"
+    MessageBox MB_OK|MB_ICONSTOP "LingxiAgent installation is incomplete. Missing or unreadable files:$R2$\r$\n$\r$\nDiagnostic file:$\r$\n$INSTDIR\hanaagent-install-diagnostics.log"
     SetErrorLevel 1
     !insertmacro lingxiInstallTimingMark "installSurfaceSelfCheck" "failed"
     !insertmacro lingxiPersistInstallTiming
@@ -131,7 +131,7 @@ CRCCheck off
   ${Else}
     Delete "$INSTDIR\hanaagent-install-diagnostics.log"
     Delete "$INSTDIR\hanako-install-diagnostics.log"
-    DetailPrint "HanaAgent install surface self-check passed."
+    DetailPrint "LingxiAgent install surface self-check passed."
   ${EndIf}
   Pop $R2
   Pop $0
@@ -218,7 +218,7 @@ CRCCheck off
   FileWrite $0 `  $$_.ProcessId -ne $$selfPid -and $$_.ProcessId -ne $$installerPid -and ((Test-HanaPath $$_.ExecutablePath) -or (Test-HanaCommand $$_.CommandLine))$\r$\n`
   FileWrite $0 `})$\r$\n`
   FileWrite $0 `$$matches | ForEach-Object {$\r$\n`
-  FileWrite $0 `  Write-Output ("HanaAgent-owned process still running: {0} pid={1} path={2}" -f $$_.Name, $$_.ProcessId, $$_.ExecutablePath)$\r$\n`
+  FileWrite $0 `  Write-Output ("LingxiAgent-owned process still running: {0} pid={1} path={2}" -f $$_.Name, $$_.ProcessId, $$_.ExecutablePath)$\r$\n`
   FileWrite $0 `}$\r$\n`
   FileWrite $0 `if ($$matches.Count -gt 0) { exit 0 } else { exit 10 }$\r$\n`
   FileClose $0
@@ -259,7 +259,7 @@ CRCCheck off
 
 !macro lingxiBypassOldUninstallerForUpdate
   ${If} ${isUpdated}
-    DetailPrint "Update mode detected; bypassing the previous uninstaller and preparing a HanaAgent-owned overlay."
+    DetailPrint "Update mode detected; bypassing the previous uninstaller and preparing a LingxiAgent-owned overlay."
     !insertmacro lingxiPrepareOwnedOverlay
     DeleteRegKey SHELL_CONTEXT "${UNINSTALL_REGISTRY_KEY}"
     !ifdef UNINSTALL_REGISTRY_KEY_2
@@ -334,9 +334,9 @@ CRCCheck off
       !insertmacro lingxiFindInstallDirProcesses $R0
       ${If} $R0 == 0
         IntOp $R1 $R1 + 1
-        DetailPrint "Waiting for HanaAgent-owned install-directory processes to close."
+        DetailPrint "Waiting for LingxiAgent-owned install-directory processes to close."
         ${If} $R1 > 2
-          DetailPrint "HanaAgent-owned install-directory processes still running; asking user to retry."
+          DetailPrint "LingxiAgent-owned install-directory processes still running; asking user to retry."
           MessageBox MB_RETRYCANCEL|MB_ICONEXCLAMATION "$(appCannotBeClosed)" /SD IDCANCEL IDRETRY hanako_retry_install_dir_close
           Quit
           hanako_retry_install_dir_close:
@@ -346,11 +346,11 @@ CRCCheck off
         Sleep 1000
         Goto hanako_check_install_dir_processes
       ${ElseIf} $R0 != 10
-        DetailPrint "HanaAgent process query became unavailable (code $R0); switching to image-name cleanup."
+        DetailPrint "LingxiAgent process query became unavailable (code $R0); switching to image-name cleanup."
         StrCpy $R9 1
       ${EndIf}
   ${ElseIf} $R0 != 10
-    DetailPrint "HanaAgent process query unavailable (code $R0); falling back to image-name cleanup."
+    DetailPrint "LingxiAgent process query unavailable (code $R0); falling back to image-name cleanup."
     StrCpy $R9 1
   ${EndIf}
 
@@ -466,7 +466,7 @@ CRCCheck off
 
 !macro lingxiRemoveOwnedInstallTrees
   !insertmacro lingxiInstallTimingMark "removeOwnedInstallTrees" "start"
-  DetailPrint "Removing HanaAgent-owned install files"
+  DetailPrint "Removing LingxiAgent-owned install files"
   SetOutPath "$TEMP"
   ; 老版本安装面是散装 resources\server 目录；现在改成 resources\seed 归档，
   ; 这行只在升级覆盖老版本时才会真正命中，负责清掉旧安装留下的散装树。
@@ -518,9 +518,9 @@ CRCCheck off
 !macro customUnInstallCheck
   !insertmacro lingxiInstallTimingMark "customUnInstallCheck" "start"
   ${If} ${Errors}
-    DetailPrint `Previous uninstaller could not be launched; preparing a HanaAgent-owned overlay.`
+    DetailPrint `Previous uninstaller could not be launched; preparing a LingxiAgent-owned overlay.`
   ${ElseIf} $R0 != 0
-    DetailPrint `Previous uninstaller exited with code $R0; preparing a HanaAgent-owned overlay.`
+    DetailPrint `Previous uninstaller exited with code $R0; preparing a LingxiAgent-owned overlay.`
   ${EndIf}
   !insertmacro lingxiPrepareOwnedOverlay
   ClearErrors
@@ -530,9 +530,9 @@ CRCCheck off
 !macro customUnInstallCheckCurrentUser
   !insertmacro lingxiInstallTimingMark "customUnInstallCheckCurrentUser" "start"
   ${If} ${Errors}
-    DetailPrint `Previous current-user uninstaller could not be launched; continuing with HanaAgent-owned overlay.`
+    DetailPrint `Previous current-user uninstaller could not be launched; continuing with LingxiAgent-owned overlay.`
   ${ElseIf} $R0 != 0
-    DetailPrint `Previous current-user uninstaller exited with code $R0; continuing with HanaAgent-owned overlay.`
+    DetailPrint `Previous current-user uninstaller exited with code $R0; continuing with LingxiAgent-owned overlay.`
   ${EndIf}
   !insertmacro lingxiPrepareOwnedOverlay
   ClearErrors

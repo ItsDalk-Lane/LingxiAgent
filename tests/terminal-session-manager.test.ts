@@ -4,6 +4,23 @@ import os from "os";
 import path from "path";
 import { TerminalSessionManager } from "../lib/terminal/terminal-session-manager.ts";
 
+type CapturedTerminalEvent = {
+  type: string;
+  terminalId?: string;
+  status?: string;
+  seq?: number;
+  data?: string;
+  terminal?: {
+    terminalId?: string;
+    sessionId?: string | null;
+    sessionPath?: string;
+    status?: string;
+    exitCode?: number | null;
+    signal?: string | null;
+    seq?: number;
+  };
+};
+
 function makeFakeBackend() {
   const handles = [];
   return {
@@ -56,6 +73,7 @@ describe("TerminalSessionManager", () => {
     const otherSessionPath = path.join(tmpDir, "agents", "hana", "sessions", "s2.jsonl");
 
     const started = await manager.start({
+      toolCallId: "call-terminal-1",
       sessionPath,
       agentId: "hana",
       cwd: tmpDir,
@@ -76,6 +94,7 @@ describe("TerminalSessionManager", () => {
     expect(started.terminalId).toMatch(/^term_/);
 
     expect(manager.list(sessionPath).terminals).toHaveLength(1);
+    expect(manager.list(sessionPath).terminals[0].toolCallId).toBe("call-terminal-1");
     expect(manager.list(otherSessionPath).terminals).toEqual([]);
 
     const read = manager.read({
@@ -235,5 +254,167 @@ describe("TerminalSessionManager", () => {
       sessionPath,
       terminalId: started.terminalId,
     }).output).toBe("line before restart\n");
+
+    expect(restarted.readTail({
+      sessionPath,
+      terminalId: started.terminalId,
+    })).toMatchObject({
+      terminalId: started.terminalId,
+      status: "stale",
+      chunks: [{ seq: 1, data: "line before restart\n" }],
+      truncated: false,
+    });
+  });
+
+  it("emits complete lifecycle snapshots while keeping output events metadata-light", async () => {
+    const events: Array<{ event: CapturedTerminalEvent; sessionPath: string }> = [];
+    let now = 1770000000000;
+    const manager = new TerminalSessionManager({
+      lingxiHome: tmpDir,
+      createBackend: () => backend,
+      getSessionIdForPath: () => "sess_terminal",
+      now: () => now++,
+      emitEvent: (event, sessionPath) => events.push({ event, sessionPath }),
+    });
+    const sessionPath = path.join(tmpDir, "agents", "hana", "sessions", "events.jsonl");
+
+    const started = await manager.start({
+      sessionPath,
+      agentId: "hana",
+      cwd: tmpDir,
+      command: "npm test",
+      label: "tests",
+    });
+    backend.handles[0].emit("first\n");
+    backend.handles[0].exit(0);
+
+    expect(events.map(({ event }) => event.type)).toEqual([
+      "terminal_started",
+      "terminal_output",
+      "terminal_exited",
+    ]);
+    expect(events[0]).toMatchObject({
+      sessionPath,
+      event: {
+        terminalId: started.terminalId,
+        terminal: {
+          terminalId: started.terminalId,
+          sessionId: "sess_terminal",
+          sessionPath,
+          agentId: "hana",
+          cwd: tmpDir,
+          command: "npm test",
+          label: "tests",
+          status: "running",
+          seq: 0,
+        },
+      },
+    });
+    expect(events[1].event).toEqual({
+      type: "terminal_output",
+      terminalId: started.terminalId,
+      status: "running",
+      seq: 1,
+      data: "first\n",
+    });
+    expect(events[1].event).not.toHaveProperty("terminal");
+    expect(events[2].event.terminal).toMatchObject({
+      terminalId: started.terminalId,
+      sessionId: "sess_terminal",
+      status: "exited",
+      exitCode: 0,
+      signal: null,
+      seq: 1,
+    });
+  });
+
+  it("preserves nonzero exits and killed state in lifecycle snapshots", async () => {
+    const events: CapturedTerminalEvent[] = [];
+    const manager = new TerminalSessionManager({
+      lingxiHome: tmpDir,
+      createBackend: () => backend,
+      emitEvent: (event) => events.push(event),
+    });
+    const sessionPath = path.join(tmpDir, "agents", "hana", "sessions", "terminal-states.jsonl");
+    const failed = await manager.start({ sessionPath, cwd: tmpDir });
+    backend.handles[0].exit(7);
+    const killed = await manager.start({ sessionPath, cwd: tmpDir });
+    manager.close({ sessionPath, terminalId: killed.terminalId });
+    backend.handles[1].exit(0);
+
+    expect(manager.read({ sessionPath, terminalId: failed.terminalId })).toMatchObject({
+      status: "exited",
+      exitCode: 7,
+    });
+    expect(manager.read({ sessionPath, terminalId: killed.terminalId })).toMatchObject({
+      status: "killed",
+      exitCode: 0,
+    });
+    expect(events.filter((event) => event.type === "terminal_closed").at(-1)?.terminal).toMatchObject({
+      terminalId: killed.terminalId,
+      status: "killed",
+    });
+    expect(events.filter((event) => event.type === "terminal_exited").at(-1)?.terminal).toMatchObject({
+      terminalId: killed.terminalId,
+      status: "killed",
+      exitCode: 0,
+    });
+  });
+
+  it("reads a bounded transcript tail without crossing session ownership", async () => {
+    const manager = new TerminalSessionManager({
+      lingxiHome: tmpDir,
+      createBackend: () => backend,
+    });
+    const sessionPath = path.join(tmpDir, "agents", "hana", "sessions", "tail.jsonl");
+    const otherSessionPath = path.join(tmpDir, "agents", "hana", "sessions", "other.jsonl");
+    const started = await manager.start({ sessionPath, cwd: tmpDir });
+    backend.handles[0].emit("one\n");
+    backend.handles[0].emit("two\n");
+    backend.handles[0].emit("three\n");
+
+    expect(manager.readTail({
+      sessionPath,
+      terminalId: started.terminalId,
+      maxBytes: 64,
+      maxChunks: 2,
+    })).toMatchObject({
+      chunks: [
+        { seq: 2, data: "two\n" },
+        { seq: 3, data: "three\n" },
+      ],
+      truncated: true,
+      lastSeq: 3,
+    });
+
+    expect(manager.readTail({
+      sessionPath,
+      terminalId: started.terminalId,
+      sinceSeq: 1,
+      maxBytes: 64,
+      maxChunks: 2,
+    })).toMatchObject({
+      chunks: [
+        { seq: 2, data: "two\n" },
+        { seq: 3, data: "three\n" },
+      ],
+      truncated: false,
+      lastSeq: 3,
+    });
+
+    const byteBounded = manager.readTail({
+      sessionPath,
+      terminalId: started.terminalId,
+      maxBytes: 6,
+      maxChunks: 50,
+    });
+    expect(byteBounded.chunks).toEqual([{ seq: 3, data: "three\n" }]);
+    expect(Buffer.byteLength(byteBounded.output, "utf8")).toBeLessThanOrEqual(6);
+    expect(byteBounded.truncated).toBe(true);
+
+    expect(() => manager.readTail({
+      sessionPath: otherSessionPath,
+      terminalId: started.terminalId,
+    })).toThrow(/belongs to another session/);
   });
 });

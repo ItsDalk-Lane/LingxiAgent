@@ -1,5 +1,5 @@
 .card {
-  --chat-resource-card-width: var(--chat-task-block-width, 348px);
+  --chat-resource-card-width: var(--chat-task-block-width, 100%);
   --chat-resource-card-min-height: 56px;
   box-sizing: border-box;
   width: var(--chat-resource-card-width);

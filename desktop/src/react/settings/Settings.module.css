@@ -5233,6 +5233,50 @@ a.about-link:hover {
     white-space: nowrap;
 }
 
+.usage-cursor-tip {
+    position: fixed;
+    /* portal 到 body，必须压过设置 modal 壳（z-index: 1800）与设置内 fixed 浮层（9998/9999） */
+    z-index: 10000;
+    pointer-events: none;
+    min-width: 168px;
+    padding: var(--space-8) var(--space-12);
+    border-radius: var(--radius-md);
+    background: var(--bg-card);
+    border: 1px solid var(--overlay-light);
+    box-shadow: 0 4px 16px var(--shadow);
+    font-size: var(--fs-hint);
+    line-height: 1.5;
+    animation: usage-cursor-tip-in var(--duration-fast) ease-out;
+}
+
+.usage-cursor-tip-title {
+    font-weight: 600;
+    margin-bottom: var(--space-4);
+}
+
+.usage-cursor-tip-row {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-16);
+    color: var(--text-muted);
+}
+
+.usage-cursor-tip-value {
+    color: var(--text-primary, currentColor);
+    font-variant-numeric: tabular-nums;
+}
+
+@keyframes usage-cursor-tip-in {
+    from {
+        opacity: 0;
+        transform: scale(0.96);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
 .usage-request-list {
     max-height: 320px;
     overflow-y: auto;

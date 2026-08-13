@@ -18,6 +18,7 @@ import { createContextSlice, type ContextSlice } from './context-slice';
 import { createAutomationSlice, type AutomationSlice } from './automation-slice';
 import { createActivitySlice, type ActivitySlice } from './activity-slice';
 import { createAgentActivitySlice, type AgentActivitySlice } from './agent-activity-slice';
+import { createTerminalSlice, type TerminalSlice } from './terminal-slice';
 import { createBridgeSlice, type BridgeSlice } from './bridge-slice';
 import { createPluginUiSlice, type PluginUiSlice } from './plugin-ui-slice';
 import { createSelectionSlice, type SelectionSlice } from './selection-slice';
@@ -47,6 +48,7 @@ export type StoreState = ConnectionSlice &
   AutomationSlice &
   ActivitySlice &
   AgentActivitySlice &
+  TerminalSlice &
   BridgeSlice &
   PluginUiSlice &
   SelectionSlice &
@@ -76,6 +78,7 @@ export const useStore = create<StoreState>()((set, _get, _api) => ({
   ...createAutomationSlice(set),
   ...createActivitySlice(set),
   ...createAgentActivitySlice(set),
+  ...createTerminalSlice(set),
   ...createBridgeSlice(set),
   ...createPluginUiSlice(set),
   ...createSelectionSlice(set),
@@ -111,6 +114,7 @@ export type {
   AutomationSlice,
   ActivitySlice,
   AgentActivitySlice,
+  TerminalSlice,
   BridgeSlice,
   PluginUiSlice,
   SelectionSlice,

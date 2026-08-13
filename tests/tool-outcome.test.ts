@@ -58,6 +58,95 @@ describe("tool outcome projection", () => {
     expect(outcomes.has("call-missing")).toBe(false);
   });
 
+  it("projects bounded exec command details and text output for historical chat cards", () => {
+    const outcomes = collectToolOutcomesByCallId([{
+      role: "toolResult",
+      toolCallId: "call-exec",
+      toolName: "exec_command",
+      content: [{ type: "text", text: "tests passed\n" }],
+      details: {
+        execCommand: {
+          cmd: "npm test",
+          renderedCommand: "cd /workspace && npm test",
+          workdir: "/workspace",
+          tty: false,
+          ok: true,
+          exitCode: 0,
+        },
+      },
+    }]);
+
+    expect(outcomes.get("call-exec")).toMatchObject({
+      status: "succeeded",
+      details: {
+        output: "tests passed\n",
+        execCommand: {
+          cmd: "npm test",
+          workdir: "/workspace",
+          tty: false,
+        },
+      },
+    });
+  });
+
+  it("projects bounded skill content only for read calls targeting SKILL.md", () => {
+    const oversized = `# Skill\n${"x".repeat(70 * 1024)}`;
+    const skill = projectLiveToolResultOutcome({
+      content: [{ type: "text", text: oversized }],
+      details: {},
+    }, {
+      toolName: "read",
+      args: { path: "/workspace/.agents/skills/leader/SKILL.md" },
+    });
+
+    expect(skill).toMatchObject({
+      status: "succeeded",
+      details: {
+        skillInvocation: {
+          content: expect.stringMatching(/^# Skill/),
+          truncated: true,
+        },
+      },
+    });
+    expect(skill.details?.skillInvocation?.content.length).toBeLessThanOrEqual(64 * 1024);
+
+    expect(projectLiveToolResultOutcome({
+      content: [{ type: "text", text: "private notes" }],
+      details: {},
+    }, {
+      toolName: "read",
+      args: { path: "/workspace/private.md" },
+    })).toEqual({ status: "succeeded", success: true });
+  });
+
+  it("uses the paired assistant tool call to restore historical skill content", () => {
+    const outcomes = collectToolOutcomesByCallId([
+      {
+        role: "assistant",
+        content: [{
+          type: "toolCall",
+          id: "call-skill",
+          name: "read",
+          arguments: { path: "/skills/leader/SKILL.md" },
+        }],
+      },
+      {
+        role: "toolResult",
+        toolCallId: "call-skill",
+        toolName: "read",
+        content: [{ type: "text", text: "# Skill: leader\n\nFollow the plan." }],
+      },
+    ]);
+
+    expect(outcomes.get("call-skill")).toMatchObject({
+      details: {
+        skillInvocation: {
+          content: "# Skill: leader\n\nFollow the plan.",
+        },
+      },
+    });
+  });
+
   it("projects legacy failures for replay without mutating the stored messages", () => {
     const stored = [
       { role: "toolResult", toolCallId: "known", isError: false, content: [{ type: "text", text: "denied" }], details: { error: "denied" } },

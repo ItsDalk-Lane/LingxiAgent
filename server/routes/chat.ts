@@ -77,6 +77,8 @@ import {
   wsClientCanReceiveEvent,
   wsClientCanSendMessage,
 } from "../ws-scope.ts";
+import { createTerminalWsBridge } from "../terminal-ws-bridge.ts";
+import { ACTIVE_TASK_STATUSES } from "../../lib/task-registry.ts";
 
 const log = createModuleLogger("chat");
 const wsLog = createModuleLogger("ws");
@@ -378,6 +380,32 @@ export function createChatRoute(engine: any, hub: any, {
     return ctx;
   }
 
+  function stopOwnedSubagent(taskId, target) {
+    const registry = engine.taskRegistry;
+    if (!registry) return { status: "rejected", reason: "registry_unavailable" };
+    const task = registry.query?.(taskId) || null;
+    if (!task) return { status: "rejected", reason: "not_found" };
+    if (task.type !== "subagent") return { status: "rejected", reason: "unsupported_task" };
+    const parentSessionId = typeof task.parentSessionId === "string" && task.parentSessionId.trim()
+      ? task.parentSessionId.trim()
+      : (typeof task.parentSessionPath === "string" && task.parentSessionPath.trim()
+          ? engine.getSessionIdForPath?.(task.parentSessionPath.trim()) || null
+          : null);
+    if (!target.sessionId || !parentSessionId) {
+      return { status: "rejected", reason: "stable_session_required" };
+    }
+    if (target.sessionId !== parentSessionId) {
+      return { status: "rejected", reason: "session_mismatch" };
+    }
+    if (!ACTIVE_TASK_STATUSES.has(task.status)) {
+      return { status: "already_stopped" };
+    }
+    const result = registry.abort(taskId);
+    if (result === "aborted") return { status: "aborted" };
+    if (result === "already_aborted") return { status: "already_stopped" };
+    return { status: "rejected", reason: result || "abort_failed" };
+  }
+
   // compact 走 resolveCompactSessionTarget（错误回包形状与前端路由绑定，不能换成通用
   // 身份错误），拿不到解析结果里的归属标记，所以这一条分支仍单独问引擎要删除状态。
   // 问的是同一个归属权威，不是另开身份来源。
@@ -447,6 +475,7 @@ export function createChatRoute(engine: any, hub: any, {
         flushedTurnInputConsumptionKeys: new Set(),
         pendingTurnCompletionNotification: null,
         pendingPhaseTextByIndex: new Map(),
+        pendingToolContextsByCallId: new Map(),
         turnStallTimer: null,
         lastStreamActivityAt: 0,
         lastAccessed: Date.now(),
@@ -537,6 +566,12 @@ export function createChatRoute(engine: any, hub: any, {
       }
     }
   }
+
+  const terminalWsBridge = createTerminalWsBridge({
+    terminalSessions: engine.terminalSessions,
+    resolveSessionId: (sessionPath) => sessionIdForPath(sessionPath),
+    broadcast,
+  });
 
   const agentReviewTurns = new AgentReviewTurnCoordinator({
     engine,
@@ -669,6 +704,7 @@ export function createChatRoute(engine: any, hub: any, {
     ss.moodParser.reset();
     ss.cardParser.reset();
     ss.pendingPhaseTextByIndex?.clear?.();
+    ss.pendingToolContextsByCallId?.clear?.();
     ss._cardHints = [];
     ss._cardEmitted = false;
     ss.isThinking = false;
@@ -1085,6 +1121,10 @@ export function createChatRoute(engine: any, hub: any, {
       return;
     }
 
+    // 终端领域直接从 TerminalSessionManager 事件进入独立 WS 桥；不经过 ActivityHub
+    // 的活动条目投影，也不触碰聊天流 parser / resume 缓存。
+    if (terminalWsBridge.handleEvent(event, sessionPath)) return;
+
     const ss = sessionPath ? getState(sessionPath) : null;
     if (ss && event.type !== "session_status") {
       markTurnStreamActivity(sessionPath, ss);
@@ -1300,6 +1340,12 @@ export function createChatRoute(engine: any, hub: any, {
       }
       // 只保留前端 extractToolDetail 需要的字段，避免广播完整文件内容
       const args = summarizeToolStartArgs(event.toolName || "", event.args);
+      if (event.toolCallId) {
+        ss.pendingToolContextsByCallId?.set?.(event.toolCallId, {
+          toolName: event.toolName || "",
+          args,
+        });
+      }
       emitStreamEvent(sessionPath, ss, {
         type: "tool_start",
         id: event.toolCallId || undefined,
@@ -1308,10 +1354,14 @@ export function createChatRoute(engine: any, hub: any, {
       });
     } else if (event.type === "tool_execution_end") {
       if (!ss) return;
+      const toolContext = event.toolCallId
+        ? ss.pendingToolContextsByCallId?.get?.(event.toolCallId)
+        : null;
+      if (event.toolCallId) ss.pendingToolContextsByCallId?.delete?.(event.toolCallId);
       const outcome = projectLiveToolResultOutcome({
         ...event.result,
         isError: event.isError === true || event.result?.isError === true,
-      });
+      }, toolContext || { toolName: event.toolName || "" });
       emitStreamEvent(sessionPath, ss, {
         type: "tool_end",
         id: event.toolCallId || undefined,
@@ -1319,7 +1369,7 @@ export function createChatRoute(engine: any, hub: any, {
         status: outcome.status,
         success: outcome.success,
         ...(outcome.error ? { error: outcome.error } : {}),
-        details: event.result?.details,
+        details: outcome.details || event.result?.details,
       });
 
       // Unified content_block emission for all tool results
@@ -1713,6 +1763,7 @@ export function createChatRoute(engine: any, hub: any, {
       ss.moodParser.reset();
       ss.cardParser.reset();
       ss.pendingPhaseTextByIndex?.clear?.();
+      ss.pendingToolContextsByCallId?.clear?.();
       ss._cardHints = [];
       ss._cardEmitted = false;
       flushPendingDeferredContentEvents(sessionPath, ss);
@@ -1747,12 +1798,14 @@ export function createChatRoute(engine: any, hub: any, {
 
   restRoute.post("/task/:taskId/abort", async (c) => {
     const taskId = c.req.param("taskId");
-    const registry = engine.taskRegistry;
-    if (!registry) return c.json({ error: "registry unavailable" }, 500);
-    const result = registry.abort(taskId);
-    if (result === "not_found") return c.json({ error: "task not found" }, 404);
-    if (result === "no_handler") return c.json({ error: "task type does not support abort" }, 400);
-    return c.json({ ok: true, status: result });
+    const body = await c.req.json().catch(() => null);
+    const target = resolveWsSessionContext(engine, body);
+    if (target.ok === false) return c.json({ error: target.code }, 400);
+    const result = stopOwnedSubagent(taskId, target);
+    if (result.status === "aborted" || result.status === "already_stopped") {
+      return c.json({ ok: true, ...result });
+    }
+    return c.json({ ok: false, ...result }, result.reason === "not_found" ? 404 : 403);
   });
 
   // ── WebSocket 路由（挂载在 wsRoute，由 index.js 挂到根路径） ──
@@ -1795,6 +1848,79 @@ export function createChatRoute(engine: any, hub: any, {
 
           // Wrap the async handler with error handling (replaces wrapWsHandler)
           (async () => {
+            if (msg.type === "terminal_snapshot_request") {
+              const terminalTarget = requireWsSessionContext(msg, ws); if (!terminalTarget) return;
+              terminalWsBridge.sendSnapshot(ws, terminalTarget);
+              return;
+            }
+
+            if (msg.type === "terminal_tail_request") {
+              const terminalTarget = requireWsSessionContext(msg, ws); if (!terminalTarget) return;
+              terminalWsBridge.sendTail(ws, {
+                ...terminalTarget,
+                terminalId: msg.terminalId,
+                sinceSeq: msg.sinceSeq,
+              });
+              return;
+            }
+
+            if (msg.type === "terminal_close_request") {
+              const terminalTarget = requireWsSessionContext(msg, ws); if (!terminalTarget) return;
+              try {
+                if (typeof engine.terminalSessions?.close !== "function") {
+                  // 引擎未接线终端管理器：不能按 already_stopped 谎报成功形状
+                  wsSend(ws, {
+                    type: "terminal_close_result",
+                    ...(msg.requestId ? { requestId: msg.requestId } : {}),
+                    sessionId: terminalTarget.sessionId,
+                    sessionPath: terminalTarget.sessionPath,
+                    terminalId: msg.terminalId,
+                    status: "rejected",
+                    reason: "terminal_unavailable",
+                  });
+                  return;
+                }
+                const result = engine.terminalSessions.close({
+                  sessionPath: terminalTarget.sessionPath,
+                  terminalId: msg.terminalId,
+                });
+                wsSend(ws, {
+                  type: "terminal_close_result",
+                  ...(msg.requestId ? { requestId: msg.requestId } : {}),
+                  sessionId: terminalTarget.sessionId,
+                  sessionPath: terminalTarget.sessionPath,
+                  terminalId: msg.terminalId,
+                  status: result?.status === "killed" ? "killed" : "already_stopped",
+                });
+              } catch (err) {
+                log.warn(`terminal close rejected: ${err?.message || err}`);
+                wsSend(ws, {
+                  type: "terminal_close_result",
+                  ...(msg.requestId ? { requestId: msg.requestId } : {}),
+                  sessionId: terminalTarget.sessionId,
+                  sessionPath: terminalTarget.sessionPath,
+                  terminalId: msg.terminalId,
+                  status: "rejected",
+                  reason: "terminal_not_found_or_mismatch",
+                });
+              }
+              return;
+            }
+
+            if (msg.type === "subagent_stop_request") {
+              const taskTarget = requireWsSessionContext(msg, ws); if (!taskTarget) return;
+              const result = stopOwnedSubagent(msg.taskId, taskTarget);
+              wsSend(ws, {
+                type: "subagent_stop_result",
+                ...(msg.requestId ? { requestId: msg.requestId } : {}),
+                sessionId: taskTarget.sessionId,
+                sessionPath: taskTarget.sessionPath,
+                taskId: msg.taskId,
+                ...result,
+              });
+              return;
+            }
+
             if (msg.type === "abort") {
               const abortTarget = requireWsSessionContext(msg, ws); if (!abortTarget) return;
               const abortPath = abortTarget.sessionPath;
