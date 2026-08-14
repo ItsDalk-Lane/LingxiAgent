@@ -9,6 +9,9 @@ const ICONS = [
   'deepseek', 'qwen', 'openai', 'gemini', 'volcengine', 'moonshot',
   'kimi', 'zhipu', 'siliconcloud', 'groq', 'mistral', 'minimax',
   'openrouter', 'xiaomimimo', 'ollama',
+  'anthropic', 'baichuan', 'hunyuan', 'perplexity', 'together',
+  'modelscope', 'stepfun', 'xai', 'opencode', 'agnesai', 'antgroup',
+  'baiducloud', 'infinigence',
 ];
 
 // 本地图标源：用于 lobehub 未覆盖或需要项目内固定来源的 provider。

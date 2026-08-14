@@ -194,6 +194,39 @@ button.main:focus-visible {
   color: var(--tool-text);
 }
 
+/* ── compact：工具调用族的纯文字行形态。去掉卡壳背景/圆角/阴影与最小高度，
+   收起时只占一行普通文字的高度，供终端命令、技能调用等过程卡片使用。 ── */
+.compact {
+  --chat-resource-card-min-height: 0;
+  margin: 0.15rem 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.compact .header {
+  min-height: 0;
+}
+
+.compact .main {
+  grid-template-columns: 16px minmax(0, 1fr) auto;
+  gap: var(--space-6);
+  padding: 0.15rem 0;
+}
+
+.compact .icon {
+  width: 16px;
+  height: 16px;
+  flex-basis: 16px;
+  font-size: var(--fs-caption);
+}
+
+.compact .icon svg {
+  width: 14px;
+  height: 14px;
+}
+
 @media (max-width: 720px) {
   .card {
     width: 100%;

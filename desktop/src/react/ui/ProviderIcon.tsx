@@ -35,6 +35,22 @@ const PROVIDER_TO_ICON: Record<string, string> = {
   'mimo-token-plan-sgp': 'xiaomimimo',
   'mimo-token-plan-ams': 'xiaomimimo',
   ollama: 'ollama',
+  anthropic: 'anthropic',
+  baichuan: 'baichuan',
+  'baidu-cloud': 'baiducloud',
+  hunyuan: 'hunyuan',
+  infini: 'infinigence',
+  modelscope: 'modelscope',
+  opencode: 'opencode',
+  'opencode-go': 'opencode',
+  perplexity: 'perplexity',
+  stepfun: 'stepfun',
+  together: 'together',
+  xai: 'xai',
+  'xai-oauth': 'xai',
+  agnes: 'agnesai',
+  'ant-ling': 'antgroup',
+  'volcengine-speech': 'volcengine',
 };
 
 interface ProviderIconProps {

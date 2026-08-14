@@ -1279,8 +1279,9 @@
     border-radius: var(--radius-chat-card);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(0, 0, 0, 0.04);
     font-size: var(--fs-body);
-    min-width: 300px;
-    max-width: 460px;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
     animation: hana-chat-soft-up-in 130ms var(--ease-out) both;
 }
 
@@ -1353,8 +1354,6 @@
     --chat-embedded-detail-height: 260px;
     position: relative;
     margin: var(--space-4) 0;
-    border-radius: var(--radius-sm);
-    background: var(--tool-bg);
     overflow: hidden;
     width: var(--chat-task-block-width);
     max-width: 100%;
@@ -1366,7 +1365,7 @@
     display: flex;
     align-items: center;
     gap: 0.4rem;
-    padding: 0.4rem 0.75rem;
+    padding: 0.2rem 0;
     font-size: var(--fs-ui);
     color: var(--tool-text);
     line-height: 1.5;
@@ -1393,7 +1392,7 @@
 }
 
 .toolGroupContent {
-    padding: 0 0.75rem 0.3rem;
+    padding: 0 0 0.3rem;
 }
 
 .toolGroupExecContent {
@@ -1522,7 +1521,7 @@
 
 .toolGroupSingle .toolIndicator {
     font-size: var(--fs-ui);
-    padding: 0.4rem 0.75rem;
+    padding: 0.2rem 0;
 }
 
 .toolDesc {
@@ -2242,8 +2241,8 @@
 }
 
 .subagentAvatar {
-    width: 32px;
-    height: 32px;
+    width: 18px;
+    height: 18px;
     border-radius: 50%;
     flex-shrink: 0;
     object-fit: cover;
@@ -2264,7 +2263,7 @@
 
 .execCommandCard[data-chat-resource-card] {
     --chat-resource-card-width: 100%;
-    margin: 0;
+    margin: 0.15rem 0;
 }
 
 .skillInvocationCardHost {
@@ -2273,7 +2272,7 @@
 
 .skillInvocationCard[data-chat-resource-card] {
     --chat-resource-card-width: 100%;
-    margin: 0;
+    margin: 0.15rem 0;
 }
 
 .skillInvocationIcon {
