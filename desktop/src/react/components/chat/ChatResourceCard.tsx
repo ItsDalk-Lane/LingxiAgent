@@ -24,6 +24,8 @@ interface ChatResourceCardProps {
   className?: string;
   ariaLabel?: string;
   variant?: ChatResourceCardVariant;
+  /** 紧凑形态：去卡壳背景/圆角与最小高度，收起时只占一行文字高度（工具调用族用）。 */
+  compact?: boolean;
   /** 无头形态：跳过头部行（icon/title/subtitle/status），只渲染卡壳 + children。编辑态表单卡用。 */
   headerless?: boolean;
   children?: ReactNode;
@@ -86,6 +88,7 @@ export function ChatResourceCard({
   className,
   ariaLabel,
   variant = 'panel',
+  compact = false,
   headerless = false,
   children,
 }: ChatResourceCardProps) {
@@ -94,6 +97,7 @@ export function ChatResourceCard({
   const rootClass = cx(
     styles.card,
     variant === 'task' && styles.task,
+    compact && styles.compact,
     interactive && styles.interactive,
     expanded && styles.expanded,
     disabled && styles.disabled,

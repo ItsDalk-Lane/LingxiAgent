@@ -19,4 +19,19 @@ describe('ProviderIcon', () => {
     expect(path?.getAttribute('fill')).toBeNull();
     expect(container.querySelector('rect')).toBeNull();
   });
+
+  it('renders a real logo (not the placeholder dot) for every provider that previously lacked one', () => {
+    const providers = [
+      'agnes', 'anthropic', 'ant-ling', 'baichuan', 'baidu-cloud', 'hunyuan',
+      'infini', 'modelscope', 'opencode', 'opencode-go', 'perplexity', 'stepfun',
+      'together', 'xai', 'xai-oauth', 'volcengine-speech',
+    ];
+
+    for (const provider of providers) {
+      const { container } = render(<ProviderIcon provider={provider} />);
+      expect(container.querySelector('rect'), `${provider} should not fall back to the placeholder`).toBeNull();
+      expect(container.querySelector('path'), `${provider} should render a real path`).not.toBeNull();
+      cleanup();
+    }
+  });
 });

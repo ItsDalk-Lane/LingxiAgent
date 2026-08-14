@@ -264,6 +264,7 @@ const SkillInvocationCard = memo(function SkillInvocationCard({
     >
       <ChatResourceCard
         variant="task"
+        compact
         className={styles.skillInvocationCard}
         icon={<span className={styles.skillInvocationIcon}>✣</span>}
         title={title}
@@ -354,6 +355,7 @@ const ExecCommandCard = memo(function ExecCommandCard({ tool }: { tool: ToolCall
     >
       <ChatResourceCard
         variant="task"
+        compact
         className={styles.execCommandCard}
         icon={<span className={styles.execCommandIcon}>›_</span>}
         title={command}

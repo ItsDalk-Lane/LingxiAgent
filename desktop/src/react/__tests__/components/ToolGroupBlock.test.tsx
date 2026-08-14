@@ -630,13 +630,14 @@ describe('ToolGroupBlock', () => {
     expect(trailing).toContain('border-top: 1px solid var(--overlay-light');
   });
 
-  it('renders the task-family container: four-corner radius, no accent quote bar', () => {
+  it('renders the task-family container as a bare text row without a card shell', () => {
     const css = fs.readFileSync(
       path.join(process.cwd(), 'desktop/src/react/components/chat/Chat.module.css'),
       'utf8',
     );
     const toolGroupRule = css.match(/\.toolGroup\s*\{(?<body>[^}]*)\}/)?.groups?.body || '';
-    expect(toolGroupRule).toContain('border-radius: var(--radius-sm)');
+    expect(toolGroupRule).not.toContain('background:');
+    expect(toolGroupRule).not.toContain('border-radius');
     expect(toolGroupRule).not.toContain('padding-left');
     expect(css).not.toMatch(/\.toolGroup::before/);
     expect(css).not.toContain('hana-tool-bar-in');

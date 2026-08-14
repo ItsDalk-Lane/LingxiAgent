@@ -133,6 +133,7 @@ export const SubagentCard = memo(function SubagentCard({ block }: SubagentCardPr
     <div ref={rootRef} data-subagent-chat-card={block.taskId}>
       <ChatResourceCard
       variant="task"
+      compact
       className={`${styles.subagentResourceCard} ${styles[`subagent-${status}`]}`}
       icon={(
         <AgentAvatar
