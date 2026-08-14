@@ -1690,6 +1690,7 @@
       "subtab": {
         "api": "配置 API",
         "models": "配置模型",
+        "search": "搜索",
         "usage": "用量统计"
       }
     },
@@ -1779,7 +1780,14 @@
       "defaultOption": "默认",
       "qualityLow": "低",
       "qualityMedium": "中",
-      "qualityHigh": "高"
+      "qualityHigh": "高",
+      "imageProviderDefaults": "图片生成默认参数",
+      "videoProviderDefaults": "视频生成默认参数",
+      "runtimeUnavailable": "运行时状态暂不可用"
+    },
+    "models": {
+      "auxiliary": "辅助模型",
+      "globalDefaults": "全局默认"
     },
     "oauth": {
       "title": "快速登录",

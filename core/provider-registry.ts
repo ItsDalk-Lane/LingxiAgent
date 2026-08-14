@@ -482,6 +482,13 @@ const BUILTIN_PLUGINS = [
  * @property {boolean} isBuiltin     - 是否为内置插件
  */
 
+/**
+ * @typedef {object} ProviderMediaCapabilityBinding
+ * @property {"imageGeneration"|"videoGeneration"|"speechRecognition"} capability
+ * @property {string} runtimeProviderId - 实际承载媒体模型与媒体配置的 Provider
+ * @property {string} [credentialLaneId] - 能力通过 credential lane 暴露时记录 lane id
+ */
+
 // ── ProviderRegistry ─────────────────────────────────────────────────────────
 
 export class ProviderRegistry {
@@ -1172,6 +1179,73 @@ export class ProviderRegistry {
       unavailableReason: "no_credentials",
       lanes,
     };
+  }
+
+  /**
+   * 权威媒体能力绑定：credential provider id → capability → runtime provider id。
+   *
+   * 设置界面里的 Provider ID 与媒体 runtime Provider ID 只有 Registry 明确声明
+   * 相同时才相等。禁止通过 ID 字符串裁剪 / 品牌名匹配推断能力归属。
+   *
+   * 计算原则：
+   *   每种 media capability → 读取 getMediaProviders(capability)
+   *   → 每个 runtime provider → 若声明 credentialLanes，每个 lane.providerId 建立 binding
+   *   → 否则 runtimeProviderId 自身建立 binding。
+   *
+   * 一个 credential Provider 绑定多个 runtime Provider 时不静默覆盖，返回数组。
+   *
+   * @returns {Record<string, ProviderMediaCapabilityBinding[]>} key = credential provider id
+   */
+  getAllMediaCapabilityBindings() {
+    if (this._entries.size === 0) this.reload();
+    const bindings = {};
+    const addBinding = (credentialProviderId, binding) => {
+      if (!credentialProviderId) return;
+      if (!bindings[credentialProviderId]) bindings[credentialProviderId] = [];
+      const existing = bindings[credentialProviderId];
+      const duplicate = existing.some((item) => (
+        item.capability === binding.capability
+        && item.runtimeProviderId === binding.runtimeProviderId
+        && (item.credentialLaneId || null) === (binding.credentialLaneId || null)
+      ));
+      if (!duplicate) existing.push(binding);
+    };
+
+    for (const capability of ["imageGeneration", "videoGeneration", "speechRecognition"]) {
+      const runtimeProviders = this.getMediaProviders(capability);
+      for (const runtimeProvider of runtimeProviders) {
+        const runtimeProviderId = runtimeProvider.providerId;
+        // getMediaCredentialLanes 在无显式 lane 时返回 self-lane，因此这里总有至少一条。
+        const lanes = Array.isArray(runtimeProvider.credentialLanes)
+          ? runtimeProvider.credentialLanes
+          : [];
+        if (lanes.length === 0) {
+          addBinding(runtimeProviderId, { capability, runtimeProviderId });
+          continue;
+        }
+        for (const lane of lanes) {
+          const credentialProviderId = lane.providerId || runtimeProviderId;
+          const isSelfLane = lane.id === runtimeProviderId && lane.providerId === runtimeProviderId;
+          addBinding(credentialProviderId, {
+            capability,
+            runtimeProviderId,
+            ...(isSelfLane ? {} : { credentialLaneId: lane.id || credentialProviderId }),
+          });
+        }
+      }
+    }
+    return bindings;
+  }
+
+  /**
+   * 读取单个 credential provider 的媒体能力绑定。
+   * @param {string} providerId - 设置界面中的 credential provider id
+   * @returns {ProviderMediaCapabilityBinding[]}
+   */
+  getMediaCapabilityBindings(providerId) {
+    if (typeof providerId !== "string" || !providerId.trim()) return [];
+    const all = this.getAllMediaCapabilityBindings();
+    return cloneData(all[providerId] || []);
   }
 
   getMediaProviders(capability) {

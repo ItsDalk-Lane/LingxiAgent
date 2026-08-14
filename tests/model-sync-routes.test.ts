@@ -1282,6 +1282,51 @@ describe("model sync related routes", () => {
     }
   });
 
+  it("providers summary projects Registry media capability bindings without leaking credentials", async () => {
+    const { createProvidersRoute } = await import("../server/routes/providers.ts");
+    const { ProviderRegistry } = await import("../core/provider-registry.ts");
+    const tmpHome = fs.mkdtempSync(path.join(os.tmpdir(), "hana-provider-bindings-"));
+    try {
+      const registry = new ProviderRegistry(tmpHome);
+      registry.reload();
+      const engine = {
+        providerRegistry: registry,
+        authStorage: { getOAuthProviders: () => [] },
+        preferences: { getOAuthCustomModels: () => ({}) },
+        getRegistryModelsForProvider: () => [],
+        resolveProviderCredentials: () => ({ api_key: "", base_url: "", api: "" }),
+        lingxiHome: tmpHome,
+      };
+      const app = new Hono();
+      app.route("/api", createProvidersRoute(engine));
+
+      const data = await (await app.request("/api/providers/summary")).json();
+
+      expect(data.providers.agnes.media_capability_bindings).toEqual([
+        { capability: "imageGeneration", runtime_provider_id: "agnes" },
+        { capability: "videoGeneration", runtime_provider_id: "agnes" },
+      ]);
+      expect(data.providers["minimax-token-plan"].media_capability_bindings).toEqual([
+        { capability: "imageGeneration", runtime_provider_id: "minimax", credential_lane_id: "minimax-token-plan" },
+      ]);
+      expect(data.providers["volcengine-speech"].media_capability_bindings).toEqual([
+        { capability: "speechRecognition", runtime_provider_id: "volcengine-speech" },
+      ]);
+      // 投影必须与 Registry 一致：volcengine 不得通过名字继承 volcengine-speech。
+      const volcengineCaps = data.providers.volcengine.media_capability_bindings.map((b) => b.capability);
+      expect(volcengineCaps).not.toContain("speechRecognition");
+      // 投影不返回任何密钥字段：binding 只含能力三字段。
+      for (const binding of data.providers.agnes.media_capability_bindings) {
+        expect(Object.keys(binding).sort()).toEqual(["capability", "runtime_provider_id"]);
+      }
+      for (const binding of data.providers["minimax-token-plan"].media_capability_bindings) {
+        expect(Object.keys(binding).sort()).toEqual(["capability", "credential_lane_id", "runtime_provider_id"]);
+      }
+    } finally {
+      fs.rmSync(tmpHome, { recursive: true, force: true });
+    }
+  });
+
   it("oauth provider with empty registry falls back to defaults", async () => {
     const { createProvidersRoute } = await import("../server/routes/providers.ts");
     const app = new Hono();

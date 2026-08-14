@@ -56,6 +56,20 @@ function getProviderModelId(model: any) {
   return typeof model?.id === "string" ? model.id.trim() : "";
 }
 
+/**
+ * Registry 媒体能力绑定的只读 wire projection。
+ * 不返回密钥、不改变 Provider 配置、不写盘，只把 Registry 状态映射成 summary 字段。
+ */
+function projectMediaCapabilityBindings(registry: any, providerId: string) {
+  if (!registry || typeof registry.getMediaCapabilityBindings !== "function") return [];
+  const bindings = registry.getMediaCapabilityBindings(providerId) || [];
+  return bindings.map((binding: any) => ({
+    capability: binding.capability,
+    runtime_provider_id: binding.runtimeProviderId,
+    ...(binding.credentialLaneId ? { credential_lane_id: binding.credentialLaneId } : {}),
+  }));
+}
+
 function pickProbeModelId(providerRegistry: any, providerId: any, api: any, requestedModelId: any) {
   if (typeof requestedModelId === "string" && requestedModelId.trim()) {
     return requestedModelId.trim();
@@ -165,6 +179,7 @@ export function createProvidersRoute(engine: any) {
         config_status: p.config_error ? "invalid" : (missingFields.length > 0 ? "needs_setup" : "ok"),
         config_error: p.config_error || null,
         missing_fields: missingFields,
+        media_capability_bindings: projectMediaCapabilityBindings(provRegistry, name),
       };
     }
 
@@ -193,6 +208,7 @@ export function createProvidersRoute(engine: any) {
         config_status: effectiveModels.length > 0 && loginInfo?.loggedIn ? "ok" : "needs_setup",
         config_error: null,
         missing_fields: effectiveModels.length > 0 ? [] : ["models"],
+        media_capability_bindings: projectMediaCapabilityBindings(provRegistry, oauthId),
       };
     }
 
@@ -223,6 +239,7 @@ export function createProvidersRoute(engine: any) {
             ...(entry.authType === "none" ? [] : ["api_key"]),
             "models",
           ],
+          media_capability_bindings: projectMediaCapabilityBindings(provRegistry, id),
         };
       }
     }

@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { useSettingsStore, type ProviderSummary } from '../store';
 import { lingxiFetchJson } from '../api';
@@ -6,22 +6,28 @@ import { t, PROVIDER_PRESETS } from '../helpers';
 import { loadSettingsConfig } from '../actions';
 import { ProviderDetail } from './providers/ProviderDetail';
 import { ProviderPickerOverlay, AddProviderOverlay, type ProviderPickerItem } from './providers/ProviderList';
-import { OtherModelsSection } from './providers/OtherModelsSection';
+import { SearchProviderSection } from './providers/SearchProviderSection';
 import { SearchApiKeyConfig } from './providers/SearchApiKeyConfig';
+import { MediaCapabilityIcons } from './providers/MediaCapabilityIcons';
 import { SettingsSection } from '../components/SettingsSection';
 import { ProviderIcon } from '@/ui';
 import styles from '../Settings.module.css';
 
-type ProviderSubTab = 'api' | 'models';
+type ProviderSubTab = 'api' | 'search';
 
 const PROVIDER_SUB_TABS: { key: ProviderSubTab; labelKey: string }[] = [
   { key: 'api', labelKey: 'settings.providers.subtab.api' },
-  { key: 'models', labelKey: 'settings.providers.subtab.models' },
+  { key: 'search', labelKey: 'settings.providers.subtab.search' },
 ];
 
 export function ProvidersTab() {
-  const { providersSummary, selectedProviderId, settingsConfig } = useSettingsStore(
-    useShallow(s => ({ providersSummary: s.providersSummary, selectedProviderId: s.selectedProviderId, settingsConfig: s.settingsConfig }))
+  const { providersSummary, selectedProviderId, settingsConfig, activeSubTabs } = useSettingsStore(
+    useShallow(s => ({
+      providersSummary: s.providersSummary,
+      selectedProviderId: s.selectedProviderId,
+      settingsConfig: s.settingsConfig,
+      activeSubTabs: s.activeSubTabs,
+    }))
   );
   const providers = useMemo<Record<string, Record<string, unknown>>>(
     () => settingsConfig?.providers || {},
@@ -32,7 +38,7 @@ export function ProvidersTab() {
   // 点击候选只打开当前页面的临时配置入口；真正保存后才进入 Provider Catalog。
   // 持久成员始终从 settingsConfig.providers 恢复，不能由当前选择或点击历史推导。
   const [draftProviderIds, setDraftProviderIds] = useState<string[]>([]);
-  const [subTab, setSubTab] = useState<ProviderSubTab>('api');
+  const subTab: ProviderSubTab = activeSubTabs.providers === 'search' ? 'search' : 'api';
 
   const loadSummary = useCallback(async () => {
     const data = await lingxiFetchJson<{ providers?: Record<string, ProviderSummary> }>('/api/providers/summary');
@@ -90,6 +96,7 @@ export function ProvidersTab() {
         <span className={`${styles['pv-status-dot']}${p?.has_credentials ? ' ' + styles['on'] : ''}`} />
         <ProviderIcon provider={id} className={styles['pv-list-item-icon']} />
         <span className={styles['pv-list-item-name']}>{providerLabel(id)}</span>
+        <MediaCapabilityIcons bindings={p?.media_capability_bindings} />
         <span className={styles['pv-list-item-count']}>{modelCount}</span>
       </button>
     );
@@ -102,6 +109,7 @@ export function ProvidersTab() {
       label: p.label,
       hasCredentials: providersSummary[p.value]?.has_credentials,
       count: (providersSummary[p.value]?.models || []).length,
+      bindings: providersSummary[p.value]?.media_capability_bindings,
     })),
     ...providerIds
       .filter(id => !presetValues.has(id))
@@ -110,6 +118,7 @@ export function ProvidersTab() {
         label: providersSummary[id]?.display_name || id,
         hasCredentials: providersSummary[id]?.has_credentials,
         count: (providersSummary[id]?.models || []).length,
+        bindings: providersSummary[id]?.media_capability_bindings,
       })),
   ];
 
@@ -139,7 +148,7 @@ export function ProvidersTab() {
             role="tab"
             aria-selected={subTab === tab.key}
             className={`${styles['provider-sub-tab']}${subTab === tab.key ? ` ${styles.active}` : ''}`}
-            onClick={() => setSubTab(tab.key)}
+            onClick={() => useSettingsStore.getState().navigateSettings({ tabId: 'providers', subTabId: tab.key })}
           >
             {t(tab.labelKey)}
           </button>
@@ -205,7 +214,11 @@ export function ProvidersTab() {
                         onRefresh={refreshProviderState}
                       />
                     );
-                  })() : null}
+                  })() : (
+                    <div className={styles['pv-empty']}>
+                      {t('settings.providers.selectHint')}
+                    </div>
+                  )}
                 </div>
 
                 {/* 添加服务商选择弹层（3 列网格） */}
@@ -240,17 +253,15 @@ export function ProvidersTab() {
                 )}
               </div>
             </SettingsSection>
-
-            {/* 搜索 API 配置（区域标题 + 每行左标题右输入框） */}
-            <SettingsSection title={t('settings.api.searchSection')} surface="plain" className={styles['pv-search-config']}>
-              <SearchApiKeyConfig />
-            </SettingsSection>
           </div>
         )}
 
-        {subTab === 'models' && (
+        {subTab === 'search' && (
           <div className={styles['provider-sub-panel']}>
-            <OtherModelsSection providers={providers} />
+            <SettingsSection title={t('settings.api.searchSection')} surface="plain" className={styles['pv-search-config']}>
+              <SearchProviderSection />
+              <SearchApiKeyConfig />
+            </SettingsSection>
           </div>
         )}
       </div>

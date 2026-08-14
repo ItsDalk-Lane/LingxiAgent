@@ -1619,6 +1619,7 @@
       "subtab": {
         "api": "API 설정",
         "models": "모델 설정",
+        "search": "검색",
         "usage": "사용량"
       }
     },
@@ -1708,7 +1709,14 @@
       "defaultOption": "기본값",
       "qualityLow": "낮음",
       "qualityMedium": "중간",
-      "qualityHigh": "높음"
+      "qualityHigh": "높음",
+      "imageProviderDefaults": "이미지 생성 기본값",
+      "videoProviderDefaults": "비디오 생성 기본값",
+      "runtimeUnavailable": "런타임 상태를 사용할 수 없음"
+    },
+    "models": {
+      "auxiliary": "보조 모델",
+      "globalDefaults": "전역 기본값"
     },
     "oauth": {
       "title": "간편 로그인",

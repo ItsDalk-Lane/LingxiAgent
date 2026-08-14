@@ -6,6 +6,7 @@ export interface SettingsSearchNavItem {
 export interface SettingsSearchEntry {
   id: string;
   tabId: string;
+  subTabId?: string;
   titleKey?: string;
   title?: string;
   pathKeys?: string[];
@@ -16,6 +17,7 @@ export interface SettingsSearchEntry {
 export interface SettingsSearchResult {
   id: string;
   tabId: string;
+  subTabId?: string;
   title: string;
   path: string;
   score: number;
@@ -139,30 +141,40 @@ const BUILT_IN_SETTINGS_SEARCH_ENTRIES: SettingsSearchEntry[] = [
   {
     id: 'providers-api-key',
     tabId: 'providers',
+    subTabId: 'api',
     titleKey: 'settings.api.apiKey',
     pathKeys: ['settings.tabs.providers'],
-    aliases: ['api key', 'apikey', 'token', 'provider key', 'openai key', '模型 key', '供应商 key', '密钥', '令牌'],
+    aliases: ['api key', 'apikey', 'token', 'provider key', 'openai key', '模型 key', '供应商 key', '密钥', '令牌', 'base url', '凭据'],
   },
   {
     id: 'providers-models',
     tabId: 'providers',
+    subTabId: 'api',
     titleKey: 'settings.api.mainModelSection',
     pathKeys: ['settings.tabs.providers'],
-    aliases: ['model', 'models', 'provider', 'base url', 'context length', 'reasoning effort', '模型', '供应商', 'Base URL', '上下文', '思考强度'],
+    aliases: ['model', 'models', 'provider', 'base url', 'context length', 'reasoning effort', '模型列表', '供应商', 'Base URL', '上下文', '思考强度'],
   },
   {
     id: 'providers-search',
     tabId: 'providers',
+    subTabId: 'search',
     titleKey: 'settings.api.searchProvider',
     pathKeys: ['settings.tabs.providers'],
-    aliases: ['search', 'search engine', 'tavily', 'brave', 'serper', 'anysearch', '搜索', '搜索引擎', '联网搜索', '搜索服务'],
+    aliases: ['search', 'search engine', 'search api', 'tavily', 'brave', 'serper', 'anysearch', '搜索', '搜索引擎', '联网搜索', '搜索服务', '搜索 API'],
   },
   {
-    id: 'media-image-generation',
-    tabId: 'media',
-    titleKey: 'settings.media.imageGeneration',
-    pathKeys: ['settings.tabs.media'],
-    aliases: ['image generation', 'video generation', 'speech recognition', 'voice', '图片生成', '视频生成', '语音识别', '转录'],
+    id: 'models-auxiliary',
+    tabId: 'models',
+    titleKey: 'settings.models.auxiliary',
+    pathKeys: ['settings.tabs.models'],
+    aliases: ['auxiliary model', 'title', 'summarize', 'memory', 'vision', 'approval', 'guard', '辅助模型', '标题', '摘要', '记忆', '视觉', '审批', '守卫'],
+  },
+  {
+    id: 'models-global-defaults',
+    tabId: 'models',
+    titleKey: 'settings.models.globalDefaults',
+    pathKeys: ['settings.tabs.models'],
+    aliases: ['default image model', 'default video model', 'speech recognition', 'transcription', '默认图片模型', '默认视频模型', '语音识别', '转录模型', '语音条转录', '全局默认'],
   },
   {
     id: 'sharing-screenshot',
@@ -287,7 +299,7 @@ export function searchSettings(
       const { title, path } = translated(entry, translate);
       const fields = [title, path, ...(entry.aliases || [])];
       const score = scoreCandidate(normalizedQuery, fields);
-      return { id: entry.id, tabId: entry.tabId, title, path, score };
+      return { id: entry.id, tabId: entry.tabId, ...(entry.subTabId ? { subTabId: entry.subTabId } : {}), title, path, score };
     })
     .filter(result => result.score > 0)
     .sort((a, b) => b.score - a.score || a.title.localeCompare(b.title))

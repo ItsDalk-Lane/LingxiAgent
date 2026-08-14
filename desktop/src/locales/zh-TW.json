@@ -1619,6 +1619,7 @@
       "subtab": {
         "api": "設定 API",
         "models": "設定模型",
+        "search": "搜尋",
         "usage": "用量統計"
       }
     },
@@ -1708,7 +1709,14 @@
       "defaultOption": "預設",
       "qualityLow": "低",
       "qualityMedium": "中",
-      "qualityHigh": "高"
+      "qualityHigh": "高",
+      "imageProviderDefaults": "圖片生成預設參數",
+      "videoProviderDefaults": "影片生成預設參數",
+      "runtimeUnavailable": "執行階段狀態暫不可用"
+    },
+    "models": {
+      "auxiliary": "輔助模型",
+      "globalDefaults": "全域預設"
     },
     "oauth": {
       "title": "快速登入",

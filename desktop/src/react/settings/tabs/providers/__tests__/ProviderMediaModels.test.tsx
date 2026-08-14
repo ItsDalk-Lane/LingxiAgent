@@ -13,42 +13,30 @@ const mocks = vi.hoisted(() => ({
   showToast: vi.fn(),
 }));
 
-vi.mock('../../settings/api', () => ({
+vi.mock('../../../api', () => ({
   lingxiFetch: (...args: unknown[]) => mocks.lingxiFetch(...args),
 }));
 
-vi.mock('../../../hooks/use-config', () => ({
+vi.mock('../../../../hooks/use-config', () => ({
   invalidateConfigCache: () => mocks.invalidateConfigCache(),
 }));
 
-vi.mock('../../settings/store', () => ({
+vi.mock('../../../store', () => ({
   useSettingsStore: (selector: (state: { showToast: typeof mocks.showToast }) => unknown) =>
     selector({ showToast: mocks.showToast }),
 }));
 
-vi.mock('../../settings/helpers', () => ({
+vi.mock('../../../helpers', () => ({
   t: (key: string) => key,
 }));
 
-vi.mock('../../settings/hooks/useAnchoredDropdown', () => ({
+vi.mock('../../../hooks/useAnchoredDropdown', () => ({
   useAnchoredDropdown: () => ({ position: 'fixed', left: 0, top: 0, width: 280 }),
 }));
 
-vi.mock('@/ui', () => ({
-  SelectWidget: ({ value, onChange, options }: {
-    value: string;
-    onChange: (value: string) => void;
-    options: Array<{ value: string; label: string }>;
-  }) => (
-    <select value={value} onChange={(event) => onChange(event.target.value)}>
-      {options.map(option => <option key={option.value} value={option.value}>{option.label}</option>)}
-    </select>
-  ),
-}));
+import { ProviderMediaModels } from '../ProviderMediaModels';
 
-import { MediaProviderDetail } from '../../settings/tabs/media/MediaProviderDetail';
-
-describe('MediaProviderDetail', () => {
+describe('ProviderMediaModels', () => {
   afterEach(() => {
     cleanup();
     vi.clearAllMocks();
@@ -59,16 +47,16 @@ describe('MediaProviderDetail', () => {
     const onRefresh = vi.fn(async () => {});
 
     render(
-      <MediaProviderDetail
-        providerId="dashscope"
+      <ProviderMediaModels
+        capability="imageGeneration"
+        runtimeProviderId="dashscope"
         provider={{
+          providerId: 'dashscope',
           displayName: 'DashScope',
           hasCredentials: true,
           models: [],
           availableModels: [],
         }}
-        config={{}}
-        onSaveConfig={vi.fn(async () => {})}
         onRefresh={onRefresh}
       />,
     );
@@ -88,48 +76,19 @@ describe('MediaProviderDetail', () => {
     expect(onRefresh).toHaveBeenCalled();
   });
 
-  it('shows runtime discovery failures and keeps CLI-owned model controls read-only', () => {
+  it('does not offer add or remove controls for models discovered from a CLI', () => {
     render(
-      <MediaProviderDetail
-        providerId="jimeng-cli"
+      <ProviderMediaModels
+        capability="imageGeneration"
+        runtimeProviderId="jimeng-cli"
         provider={{
-          displayName: '即梦 CLI',
-          hasCredentials: false,
-          unavailableReason: 'output_unparseable',
-          unavailableMessage: 'Dreamina CLI help changed and could not be parsed',
-          runtimeCapability: {
-            status: 'error',
-            error: {
-              code: 'output_unparseable',
-              message: 'Dreamina CLI help changed and could not be parsed',
-            },
-          },
-          models: [],
-          availableModels: [],
-        }}
-        config={{}}
-        onSaveConfig={vi.fn(async () => {})}
-        onRefresh={vi.fn(async () => {})}
-      />,
-    );
-
-    expect(screen.getByText('Dreamina CLI help changed and could not be parsed')).toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: /settings\.media\.addModel/ })).not.toBeInTheDocument();
-  });
-
-  it('does not offer remove controls for models discovered from a CLI', () => {
-    render(
-      <MediaProviderDetail
-        providerId="jimeng-cli"
-        provider={{
+          providerId: 'jimeng-cli',
           displayName: '即梦 CLI',
           hasCredentials: true,
           runtimeCapability: { status: 'ready' },
           models: [{ id: 'jimeng-image-5.0', name: '即梦图片 5.0' }],
           availableModels: [],
         }}
-        config={{}}
-        onSaveConfig={vi.fn(async () => {})}
         onRefresh={vi.fn(async () => {})}
       />,
     );
@@ -137,5 +96,35 @@ describe('MediaProviderDetail', () => {
     expect(screen.getByText('jimeng-image-5.0')).toBeInTheDocument();
     expect(screen.queryByTitle('settings.api.removeModel')).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /settings\.media\.addModel/ })).not.toBeInTheDocument();
+  });
+
+  it('removes a non-runtime model through the media provider route', async () => {
+    mocks.lingxiFetch.mockResolvedValue({ json: async () => ({ ok: true }) });
+    const onRefresh = vi.fn(async () => {});
+
+    render(
+      <ProviderMediaModels
+        capability="videoGeneration"
+        runtimeProviderId="agnes"
+        provider={{
+          providerId: 'agnes',
+          displayName: 'Agnes',
+          hasCredentials: true,
+          models: [{ id: 'agnes-video-v2.0', name: 'Agnes Video V2.0' }],
+          availableModels: [],
+        }}
+        onRefresh={onRefresh}
+      />,
+    );
+
+    fireEvent.click(screen.getByTitle('settings.api.removeModel'));
+
+    await waitFor(() => {
+      expect(mocks.lingxiFetch).toHaveBeenCalledWith(
+        '/api/media/video/providers/agnes/models/agnes-video-v2.0',
+        expect.objectContaining({ method: 'DELETE' }),
+      );
+    });
+    expect(onRefresh).toHaveBeenCalled();
   });
 });

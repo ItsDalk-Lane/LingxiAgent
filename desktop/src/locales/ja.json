@@ -1619,6 +1619,7 @@
       "subtab": {
         "api": "API を設定",
         "models": "モデルを設定",
+        "search": "検索",
         "usage": "使用量"
       }
     },
@@ -1708,7 +1709,14 @@
       "defaultOption": "デフォルト",
       "qualityLow": "低",
       "qualityMedium": "中",
-      "qualityHigh": "高"
+      "qualityHigh": "高",
+      "imageProviderDefaults": "画像生成デフォルト",
+      "videoProviderDefaults": "動画生成デフォルト",
+      "runtimeUnavailable": "ランタイム状態を利用できません"
+    },
+    "models": {
+      "auxiliary": "補助モデル",
+      "globalDefaults": "グローバルデフォルト"
     },
     "oauth": {
       "title": "クイックログイン",

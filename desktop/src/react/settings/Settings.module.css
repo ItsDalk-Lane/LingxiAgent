@@ -323,10 +323,16 @@
     flex: 1;
     min-width: 0;
     min-height: 0;
+    display: flex;
+    flex-direction: column;
     overflow-y: auto;
     overscroll-behavior: contain;
     padding: 0 var(--settings-main-x-padding, var(--space-40)) var(--space-40);
     max-width: none;
+}
+
+.settings-main > .settings-tab-heading {
+    flex-shrink: 0;
 }
 
 .settings-main > .settings-tab-title,
@@ -1820,6 +1826,24 @@
     color: var(--accent);
     font-size: 0.6rem;
     font-weight: 500;
+}
+
+.media-capability-section {
+    margin-top: var(--space-16);
+    padding-top: var(--space-16);
+    border-top: 1px solid var(--overlay-light);
+}
+
+.media-capability-section:first-child {
+    border-top: none;
+    padding-top: 0;
+}
+
+.media-capability-title {
+    font-size: var(--fs-body);
+    font-weight: 600;
+    color: var(--text);
+    margin: 0 0 var(--space-8) 0;
 }
 
 .media-defaults {
@@ -5748,6 +5772,27 @@ a.about-link:hover {
     height: 13px;
     color: var(--text-muted);
     opacity: 0.72;
+    flex-shrink: 0;
+}
+
+/* Provider 能力图标组：与模型级 .pv-capability-icon 区分容器命名。
+   在 Provider 列表 / Picker 中按 图片 → 视频 → 语音 显示去重后的能力标识。 */
+.pv-provider-capability-icons {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    flex-shrink: 0;
+    margin-left: var(--space-4);
+}
+
+.pv-provider-capability-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 14px;
+    height: 14px;
+    color: var(--text-muted);
+    opacity: 0.82;
     flex-shrink: 0;
 }
 

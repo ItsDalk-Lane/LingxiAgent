@@ -24,8 +24,8 @@ import { SkillsTab } from './tabs/SkillsTab';
 import { McpTab } from './tabs/McpTab';
 import { BridgeTab } from './tabs/BridgeTab';
 import { ProvidersTab } from './tabs/ProvidersTab';
+import { ModelsTab } from './tabs/ModelsTab';
 import { UsageTab } from './tabs/UsageTab';
-import { MediaTab } from './tabs/MediaTab';
 import { AboutTab } from './tabs/AboutTab';
 import { PluginsTab } from './tabs/PluginsTab';
 import { PluginMarketplaceTab } from './tabs/PluginMarketplaceTab';
@@ -56,8 +56,8 @@ const TAB_COMPONENTS: Record<string, React.ComponentType> = {
   mcp: McpTab,
   bridge: BridgeTab,
   providers: ProvidersTab,
+  models: ModelsTab,
   usage: UsageTab,
-  media: MediaTab,
   sharing: SharingTab,
   access: AccessTab,
   plugins: PluginsTab,
@@ -96,8 +96,8 @@ const TAB_TITLE_KEYS: Record<string, string> = {
   mcp: 'settings.tabs.mcp',
   bridge: 'settings.tabs.bridge',
   providers: 'settings.tabs.providers',
+  models: 'settings.tabs.models',
   usage: 'settings.usage.title',
-  media: 'settings.tabs.media',
   sharing: 'settings.tabs.sharing',
   access: 'settings.tabs.access',
   plugins: 'settings.tabs.plugins',
@@ -111,8 +111,10 @@ const TAB_DESCRIPTION_KEYS: Record<string, string> = {
   experiments: 'settings.experiments.description',
 };
 
-function normalizeSettingsTab(tab: string): string {
-  return tab === 'computer' ? 'experiments' : tab;
+export function normalizeSettingsTab(tab: string): string {
+  if (tab === 'computer') return 'experiments';
+  if (tab === 'media') return 'models';
+  return tab;
 }
 
 interface SettingsContentProps {
@@ -271,7 +273,7 @@ export function SettingsContent({
                 </div>
               )}
               <ErrorBoundary region={effectiveActiveTab} resetKeys={[effectiveActiveTab]}>
-                <SettingsPage tab={effectiveActiveTab}>
+                <SettingsPage tab={effectiveActiveTab} layout={effectiveActiveTab === 'providers' ? 'fill' : 'flow'}>
                   <ActiveTab />
                 </SettingsPage>
               </ErrorBoundary>

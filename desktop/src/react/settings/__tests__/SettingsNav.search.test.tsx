@@ -46,6 +46,7 @@ describe('SettingsNav search', () => {
     };
     useSettingsStore.setState({
       activeTab: 'agent',
+      activeSubTabs: {},
     } as never);
   });
 
@@ -81,5 +82,17 @@ describe('SettingsNav search', () => {
 
     expect((screen.getByPlaceholderText('搜索设置') as HTMLInputElement).value).toBe('');
     expect(screen.getByRole('button', { name: '助手' })).toBeTruthy();
+  });
+
+  it('navigates to the providers search sub tab from a search result', () => {
+    const onTabChange = vi.fn();
+    render(React.createElement(SettingsNav, { onTabChange }));
+
+    fireEvent.change(screen.getByPlaceholderText('搜索设置'), { target: { value: '搜索 API' } });
+    fireEvent.click(screen.getByRole('button', { name: /搜索服务/ }));
+
+    expect(useSettingsStore.getState().activeTab).toBe('providers');
+    expect(useSettingsStore.getState().activeSubTabs.providers).toBe('search');
+    expect(onTabChange).toHaveBeenCalledWith('providers');
   });
 });

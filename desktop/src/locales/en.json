@@ -1690,6 +1690,7 @@
       "subtab": {
         "api": "Configure API",
         "models": "Configure Models",
+        "search": "Search",
         "usage": "Usage"
       }
     },
@@ -1779,7 +1780,14 @@
       "defaultOption": "Default",
       "qualityLow": "Low",
       "qualityMedium": "Medium",
-      "qualityHigh": "High"
+      "qualityHigh": "High",
+      "imageProviderDefaults": "Image Generation Defaults",
+      "videoProviderDefaults": "Video Generation Defaults",
+      "runtimeUnavailable": "Runtime status unavailable"
+    },
+    "models": {
+      "auxiliary": "Auxiliary Models",
+      "globalDefaults": "Global Defaults"
     },
     "oauth": {
       "title": "Quick Login",

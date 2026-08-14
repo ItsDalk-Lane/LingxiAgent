@@ -3,23 +3,11 @@
  */
 
 import React from 'react';
-import { describe, expect, it, vi } from 'vitest';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
 
-vi.mock('../../settings/api', () => ({
-  lingxiFetch: vi.fn(),
-}));
-
-vi.mock('../../../hooks/use-config', () => ({
-  invalidateConfigCache: vi.fn(),
-}));
-
-vi.mock('../../settings/store', () => ({
-  useSettingsStore: (selector: any) => selector({ showToast: vi.fn() }),
-}));
-
-vi.mock('../../settings/helpers', () => ({
+vi.mock('../../../helpers', () => ({
   t: (key: string) => key,
 }));
 
@@ -37,17 +25,27 @@ vi.mock('@/ui', () => ({
   ),
 }));
 
-import { MediaProviderDetail } from '../../settings/tabs/media/MediaProviderDetail';
+import { ProviderMediaDefaults } from '../ProviderMediaDefaults';
 
-describe('MediaProviderDetail schema-driven defaults', () => {
-  it('saves provider mode defaults under provider/model/mode', () => {
+function invokeUpdater(onSaveConfig: ReturnType<typeof vi.fn>) {
+  const updater = onSaveConfig.mock.calls[0][0];
+  return typeof updater === 'function' ? updater({}) : updater;
+}
+
+describe('ProviderMediaDefaults', () => {
+  afterEach(() => {
+    cleanup();
+  });
+
+  it('saves provider mode defaults under provider/model/mode keyed by runtimeProviderId', () => {
     const onSaveConfig = vi.fn();
 
     render(
-      <MediaProviderDetail
-        providerId="jimeng-cli"
+      <ProviderMediaDefaults
         capability="videoGeneration"
+        runtimeProviderId="jimeng-cli"
         provider={{
+          providerId: 'jimeng-cli',
           displayName: '即梦 CLI',
           hasCredentials: true,
           availableModels: [],
@@ -73,7 +71,6 @@ describe('MediaProviderDetail schema-driven defaults', () => {
         }}
         config={{}}
         onSaveConfig={onSaveConfig}
-        onRefresh={vi.fn()}
       />,
     );
 
@@ -81,7 +78,7 @@ describe('MediaProviderDetail schema-driven defaults', () => {
     const selects = screen.getAllByRole('combobox');
     fireEvent.change(selects[1], { target: { value: '1080p' } });
 
-    expect(onSaveConfig).toHaveBeenCalledWith({
+    expect(invokeUpdater(onSaveConfig)).toEqual({
       providerDefaults: {
         'jimeng-cli': {
           models: {
@@ -94,6 +91,42 @@ describe('MediaProviderDetail schema-driven defaults', () => {
             },
           },
         },
+      },
+    });
+  });
+
+  it('uses ratio/resolution fallback when there is no schema', () => {
+    const onSaveConfig = vi.fn();
+
+    render(
+      <ProviderMediaDefaults
+        capability="imageGeneration"
+        runtimeProviderId="volcengine"
+        provider={{
+          providerId: 'volcengine',
+          displayName: 'Volcengine',
+          hasCredentials: true,
+          availableModels: [],
+          models: [{
+            id: 'seedream-5',
+            name: 'Seedream 5.0',
+            ratios: ['1:1', '3:2'],
+            resolutions: ['1K', '2K'],
+          }],
+        }}
+        config={{}}
+        onSaveConfig={onSaveConfig}
+      />,
+    );
+
+    // 非 schema 回退：尺寸 + 长宽比两个选择器。
+    const selects = screen.getAllByRole('combobox');
+    expect(selects.length).toBe(2);
+
+    fireEvent.change(selects[1], { target: { value: '3:2' } });
+    expect(invokeUpdater(onSaveConfig)).toEqual({
+      providerDefaults: {
+        volcengine: { aspect_ratio: '3:2' },
       },
     });
   });

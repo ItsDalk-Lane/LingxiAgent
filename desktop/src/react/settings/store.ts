@@ -32,6 +32,14 @@ export interface SkillInfo {
   deletable?: boolean;
 }
 
+export type MediaCapabilityKind = 'imageGeneration' | 'videoGeneration' | 'speechRecognition';
+
+export interface ProviderMediaCapabilityBinding {
+  capability: MediaCapabilityKind;
+  runtime_provider_id: string;
+  credential_lane_id?: string;
+}
+
 export interface ProviderSummary {
   type: 'api-key' | 'oauth';
   auth_type: 'api-key' | 'oauth' | 'none' | 'optional';
@@ -51,6 +59,12 @@ export interface ProviderSummary {
   config_status?: 'ok' | 'needs_setup' | 'invalid';
   config_error?: string | null;
   missing_fields?: string[];
+  media_capability_bindings?: ProviderMediaCapabilityBinding[];
+}
+
+export interface SettingsLocation {
+  tabId: string;
+  subTabId?: string;
 }
 
 export interface RuntimeModelInfo {
@@ -130,6 +144,7 @@ export interface SettingsState {
 
   // ui
   activeTab: string;
+  activeSubTabs: Record<string, string>;
   platformName: string | null;
   ready: boolean;
 
@@ -157,6 +172,7 @@ export interface SettingsActions {
   set: (partial: Partial<SettingsState>) => void;
   getSettingsAgentId: () => string | null;
   showToast: (message: string, type: 'success' | 'error') => void;
+  navigateSettings: (location: SettingsLocation) => void;
 }
 
 export type SettingsStore = SettingsState & SettingsActions;
@@ -193,6 +209,7 @@ export const useSettingsStore = create<SettingsStore>()((set, get) => ({
 
   // ui
   activeTab: 'agent',
+  activeSubTabs: {},
   platformName: null,
   ready: false,
 
@@ -229,5 +246,15 @@ export const useSettingsStore = create<SettingsStore>()((set, get) => ({
     _toastTimer = setTimeout(() => {
       set({ toastVisible: false });
     }, 1500);
+  },
+
+  navigateSettings: (location) => {
+    const { activeSubTabs } = get();
+    set({
+      activeTab: location.tabId,
+      ...(location.subTabId !== undefined
+        ? { activeSubTabs: { ...activeSubTabs, [location.tabId]: location.subTabId } }
+        : {}),
+    });
   },
 }));
