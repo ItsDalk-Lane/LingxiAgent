@@ -4,7 +4,7 @@
 
 import React from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
 
 const mocks = vi.hoisted(() => ({
@@ -74,6 +74,33 @@ describe('ProviderMediaModels', () => {
       }));
     });
     expect(onRefresh).toHaveBeenCalled();
+  });
+
+  it('dedupes catalog candidates against added models by id in the add dropdown', () => {
+    render(
+      <ProviderMediaModels
+        capability="imageGeneration"
+        runtimeProviderId="dashscope"
+        provider={{
+          providerId: 'dashscope',
+          displayName: 'DashScope',
+          hasCredentials: true,
+          models: [{ id: 'wan2.7-image-pro', name: 'Wan 2.7 Image Pro' }],
+          // 旧服务端/缓存数据：目录仍含已添加 id，下拉不得出现重复条目
+          availableModels: [
+            { id: 'wan2.7-image-pro', name: 'Wan 2.7 Image Pro' },
+            { id: 'qwen-image-2.0-pro', name: 'Qwen Image 2.0 Pro' },
+          ],
+        }}
+        onRefresh={vi.fn(async () => {})}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: /settings\.media\.addModel/ }));
+    const panel = document.querySelector('[data-media-model-dropdown="true"]');
+    expect(panel).not.toBeNull();
+    expect(within(panel as HTMLElement).getAllByText('Wan 2.7 Image Pro')).toHaveLength(1);
+    expect(within(panel as HTMLElement).getByText('Qwen Image 2.0 Pro')).toBeInTheDocument();
   });
 
   it('does not offer add or remove controls for models discovered from a CLI', () => {

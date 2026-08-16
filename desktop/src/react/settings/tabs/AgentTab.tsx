@@ -221,8 +221,9 @@ export function AgentTab() {
 
   return (
     <div className={`${styles['settings-tab-content']} ${styles['active']}`} data-tab="agent">
-      {/* Agent 卡片堆叠 */}
-      <SettingsSection title={t('settings.agent.title')} surface="plain">
+      {/* Agent 卡片堆叠。不传 title：modal 头部/窗口页签头部已有「助手」标题，
+          再渲染一次小节标题会重复。 */}
+      <SettingsSection surface="plain">
         <AgentCardStack
           agents={agents}
           selectedId={selectedSettingsAgentId}

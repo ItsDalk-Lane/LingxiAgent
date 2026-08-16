@@ -62,6 +62,15 @@ export interface ProviderSummary {
   media_capability_bindings?: ProviderMediaCapabilityBinding[];
 }
 
+export interface ProviderCredentialDraft {
+  /** 输入框当前值；可能是脱敏占位（服务端会回落到已保存明文） */
+  api_key?: string;
+  base_url?: string;
+  api?: string;
+  /** 仅在用户本次编辑过 Headers 时携带（真实值）；未编辑时不传，服务端用已保存值 */
+  headers?: Record<string, string>;
+}
+
 export interface SettingsLocation {
   tabId: string;
   subTabId?: string;
@@ -154,6 +163,8 @@ export interface SettingsState {
   // providers (unified)
   providersSummary: Record<string, ProviderSummary>;
   selectedProviderId: string | null;
+  /** 各供应商配置面板的当前草稿凭证；「读取模型」在凭证尚未保存时用它直连远端目录 */
+  providerCredentialDrafts: Record<string, ProviderCredentialDraft>;
 
   // plugins
   pluginSettingsStatus: RemoteResourceStatus;
@@ -219,6 +230,7 @@ export const useSettingsStore = create<SettingsStore>()((set, get) => ({
   // providers (unified)
   providersSummary: {},
   selectedProviderId: null,
+  providerCredentialDrafts: {},
 
   // plugins
   pluginSettingsStatus: 'idle',

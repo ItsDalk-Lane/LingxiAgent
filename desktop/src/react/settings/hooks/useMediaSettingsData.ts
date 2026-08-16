@@ -62,6 +62,8 @@ export interface SpeechProvider {
   unavailableReason?: string | null;
   models: SpeechModel[];
   availableModels?: { id: string; name: string }[];
+  /** 内置声明（未被用户添加）的候选模型，仅用于「添加模型」下拉 */
+  catalogModels?: { id: string; name: string }[];
 }
 
 export interface SpeechConfig {

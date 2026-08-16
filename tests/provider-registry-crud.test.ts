@@ -1123,7 +1123,7 @@ describe("saveProvider", () => {
     expect(persisted.deepseek.models).toEqual(["deepseek-v4-pro"]);
   });
 
-  it("内置 provider 首次保存空 models 时填充默认模型列表", () => {
+  it("内置 provider 首次保存不再填充默认模型列表（seed_default_models 已废弃）", () => {
     writeAddedModels({});
     const reg = new ProviderRegistry(tmpDir);
 
@@ -1135,18 +1135,11 @@ describe("saveProvider", () => {
     });
 
     const persisted = readAddedModels();
-    expect(persisted.mimo.models).toEqual(reg.getDefaultModels("mimo"));
-    expect(persisted.mimo.models).toEqual(expect.arrayContaining([
-      "mimo-v2.5-pro",
-      "mimo-v2.5",
-      "mimo-v2.5-tts",
-      "mimo-v2.5-tts-voicedesign",
-      "mimo-v2.5-tts-voiceclone",
-    ]));
+    expect(persisted.mimo.models).toBeUndefined();
     expect(persisted.mimo.seed_default_models).toBeUndefined();
   });
 
-  it("MiMo Token Plan 首次保存空 models 时填充独立默认模型列表", () => {
+  it("token-plan 首次保存同样不填充默认模型列表，标志位被剥离", () => {
     writeAddedModels({});
     const reg = new ProviderRegistry(tmpDir);
 
@@ -1158,12 +1151,7 @@ describe("saveProvider", () => {
     });
 
     const persisted = readAddedModels();
-    expect(persisted["mimo-token-plan"].models).toEqual(reg.getDefaultModels("mimo-token-plan"));
-    expect(persisted["mimo-token-plan"].models).toEqual(expect.arrayContaining([
-      "mimo-v2.5-pro",
-      "mimo-v2.5",
-      "mimo-v2.5-tts",
-    ]));
+    expect(persisted["mimo-token-plan"].models).toBeUndefined();
     expect(persisted["mimo-token-plan"].seed_default_models).toBeUndefined();
   });
 

@@ -136,6 +136,25 @@ describe('SettingsContent title placement', () => {
     expect(screen.getByRole('heading', { name: 'settings.tabs.agent' })).toBeInTheDocument();
   });
 
+  it('resets the main scroll position when switching tabs', async () => {
+    const { SettingsContent } = await import('../../settings/SettingsContent');
+    const { container, rerender } = render(<SettingsContent variant="modal" onClose={() => {}} />);
+
+    const main = container.querySelector('[data-settings-main]') as HTMLElement | null;
+    expect(main).not.toBeNull();
+    // 模拟在供应商页滚到下方保存配置后切页：主内容区带着残留 scrollTop，
+    // 新页签首个元素（「助手」小节标题）会被顶到容器上沿、上半截被 sticky
+    // 渐变遮罩盖住。切页必须把 scrollTop 复位。
+    // （mock store 非响应式，点击导航不会触发重渲染，这里直接改状态后 rerender。）
+    (main as HTMLElement).scrollTop = 180;
+    mockState.activeTab = 'experiments';
+    rerender(<SettingsContent variant="modal" onClose={() => {}} />);
+
+    await waitFor(() => {
+      expect((main as HTMLElement).scrollTop).toBe(0);
+    });
+  });
+
   it('notifies the modal shell when the active settings tab changes', async () => {
     const onActiveTabChange = vi.fn();
     const { SettingsContent } = await import('../../settings/SettingsContent');

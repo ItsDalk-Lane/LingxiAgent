@@ -333,22 +333,9 @@ describe('ApiKeyCredentials', () => {
     });
   });
 
-  it('saves discovered Gemini models during preset setup instead of static defaults', async () => {
+  it('preset setup only saves credentials with an explicit empty model list, never seeds or fetches models', async () => {
     const onRefresh = vi.fn(async () => {});
-    mocks.lingxiFetch
-      .mockResolvedValueOnce(jsonResponse({ ok: true }))
-      .mockResolvedValueOnce(jsonResponse({
-        models: [
-          {
-            id: 'gemini-3-pro-preview',
-            name: 'Gemini 3 Pro Preview',
-            context: 1048576,
-            maxOutput: 65536,
-          },
-          { id: 'gemini-3-flash-preview' },
-        ],
-      }))
-      .mockResolvedValueOnce(jsonResponse({ ok: true }));
+    mocks.lingxiFetch.mockResolvedValue(jsonResponse({ ok: true }));
 
     const { container } = render(
       <ApiKeyCredentials
@@ -379,9 +366,7 @@ describe('ApiKeyCredentials', () => {
       '/api/config',
       expect.objectContaining({ method: 'PUT' }),
     ));
-    expect(mocks.lingxiFetch).toHaveBeenCalledWith('/api/providers/fetch-models', expect.objectContaining({
-      method: 'POST',
-    }));
+    expect(mocks.lingxiFetch).not.toHaveBeenCalledWith('/api/providers/fetch-models', expect.anything());
 
     const configCall = mocks.lingxiFetch.mock.calls.find(([path]) => path === '/api/config');
     const body = JSON.parse(String((configCall?.[1] as RequestInit).body));
@@ -389,15 +374,7 @@ describe('ApiKeyCredentials', () => {
       base_url: 'https://generativelanguage.googleapis.com/v1beta',
       api_key: 'gemini-key',
       api: 'google-generative-ai',
-      models: [
-        {
-          id: 'gemini-3-pro-preview',
-          name: 'Gemini 3 Pro Preview',
-          context: 1048576,
-          maxOutput: 65536,
-        },
-        'gemini-3-flash-preview',
-      ],
+      models: [],
     });
   });
 

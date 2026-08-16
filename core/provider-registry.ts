@@ -323,6 +323,24 @@ function providerProtocolContext(entry) {
   return { api: entry?.api, sourceKind: kind === "local-provider-plugin" ? "user" : kind };
 }
 
+/**
+ * 供应商在某 media capability 上声明的默认协议。
+ * 用于用户添加「不在内置目录中」的模型 id：协议跟着供应商走而不是模型 id 走
+ * （与 chat 模型「id 骑在 provider.api 上」同构），按 defaultModelId 声明的
+ * 协议取值，无声明时取该能力第一个声明模型。
+ */
+function mediaCapabilityDefaultProtocol(entry, camelKey) {
+  const mediaCapability = entry?.capabilities?.media?.[camelKey];
+  if (!mediaCapability) return "";
+  const models = Array.isArray(mediaCapability.models) ? mediaCapability.models : [];
+  const defaultModel = mediaCapability.defaultModelId
+    ? models.find((model) => model.id === mediaCapability.defaultModelId)
+    : null;
+  const source = defaultModel || models[0];
+  const protocolId = source?.protocolId || source?.protocol_id;
+  return typeof protocolId === "string" && protocolId ? protocolId : "";
+}
+
 function normalizeUserMediaModels(providerId, userConfig, capabilityName, declaredModels, entry) {
   const snake = capabilityName;
   const camel = capabilityKey(capabilityName);
@@ -332,13 +350,18 @@ function normalizeUserMediaModels(providerId, userConfig, capabilityName, declar
   if (camel === "imageGeneration" && Array.isArray(userConfig?.models)) {
     rawModels.push(...userConfig.models.filter((model) => getModelType(providerId, model) === "image"));
   }
+  const capabilityDefaultProtocol = mediaCapabilityDefaultProtocol(entry, camel);
   const declaredById = new Map(declaredModels.map((model) => [model.id, model]));
   const result = [];
   const seen = new Set();
   for (const raw of rawModels) {
     const id = getModelId(raw);
     const fallback = declaredById.get(id)
-      || { protocolId: inferMediaProtocolId(providerId, capabilityName, id, providerProtocolContext(entry)) || entry?.runtime?.protocolId };
+      || {
+        protocolId: inferMediaProtocolId(providerId, capabilityName, id, providerProtocolContext(entry))
+          || capabilityDefaultProtocol
+          || entry?.runtime?.protocolId,
+      };
     const model = normalizeMediaModel(raw, fallback);
     if (!model || seen.has(model.id)) continue;
     seen.add(model.id);
@@ -1088,25 +1111,60 @@ export class ProviderRegistry {
     return plans;
   }
 
+  /**
+   * 生效媒体模型列表。
+   * - 静态插件供应商：只返回用户显式添加的条目；内置声明不自动并入，
+   *   仅作为候选目录（getMediaModelCatalog）与元数据回落。
+   * - runtime 发现型供应商：快照就是生效列表（手动增删被禁止，无用户条目可言）。
+   */
   getMediaModels(providerId, capability) {
     if (this._entries.size === 0) this.reload();
     const entry = this._entries.get(providerId) || this.get(providerId);
     if (!entry) return [];
-    const key = capabilityKey(capability);
-    const hasRuntimeSource = this._runtimeMediaCapabilitySources.has(providerId);
-    const runtimeState = this._runtimeMediaCapabilities.get(providerId);
-    const declared = hasRuntimeSource
-      ? (runtimeState?.media?.[key]?.models || [])
-      : (entry.capabilities?.media?.[key]?.models || []);
+    const declared = this._declaredMediaModels(providerId, capability, entry);
+    if (this._runtimeMediaCapabilitySources.has(providerId)) {
+      return cloneData(declared);
+    }
     const userConfig = this.getAllProvidersRaw()[providerId] || {};
     const userModels = normalizeUserMediaModels(providerId, userConfig, capability, declared, entry);
-    const byId = new Map();
-    for (const model of declared) byId.set(model.id, model);
-    for (const model of userModels) {
-      if (hasRuntimeSource && !byId.has(model.id)) continue;
-      byId.set(model.id, { ...(byId.get(model.id) || {}), ...model });
+    // 用户条目覆盖到同名声明条目之上：声明的完整 schema（aliases/modes/ratios…）保留
+    const declaredById = new Map<string, Record<string, any>>();
+    for (const model of declared) declaredById.set(model.id, model);
+    return userModels.map((model) => {
+      const base = declaredById.get(model.id);
+      return base ? { ...base, ...model } : model;
+    });
+  }
+
+  /**
+   * 供应商声明的媒体模型目录（插件声明 / runtime 快照）。
+   * 仅用于设置页「添加模型」候选与 addMediaModel 的元数据回落，不进生效列表。
+   * 静态供应商：目录 = 声明模型 − 用户已添加（按 id/aliases 身份对齐，与
+   * resolveMediaModel 的解析规则一致），已添加条目不再出现在候选里，
+   * 否则设置页下拉会出现同一模型两条。runtime 发现型供应商快照即生效列表
+   * （禁止手动增删），目录保持声明快照原样。
+   */
+  getMediaModelCatalog(providerId, capability) {
+    if (this._entries.size === 0) this.reload();
+    const entry = this._entries.get(providerId) || this.get(providerId);
+    if (!entry) return [];
+    const declared = this._declaredMediaModels(providerId, capability, entry);
+    if (this._runtimeMediaCapabilitySources.has(providerId)) return cloneData(declared);
+    const added = this.getMediaModels(providerId, capability);
+    if (added.length === 0) return cloneData(declared);
+    const addedIds = new Set(added.flatMap((model) => [model.id, ...(model.aliases || [])]));
+    return cloneData(declared.filter((model) => (
+      !addedIds.has(model.id)
+      && !(model.aliases || []).some((alias) => addedIds.has(alias))
+    )));
+  }
+
+  _declaredMediaModels(providerId, capability, entry) {
+    const key = capabilityKey(capability);
+    if (this._runtimeMediaCapabilitySources.has(providerId)) {
+      return this._runtimeMediaCapabilities.get(providerId)?.media?.[key]?.models || [];
     }
-    return [...byId.values()];
+    return entry.capabilities?.media?.[key]?.models || [];
   }
 
   getMediaCredentialLanes(providerId, capability = "image_generation") {
@@ -1257,7 +1315,9 @@ export class ProviderRegistry {
       const runtimeCapability = this.getRuntimeMediaCapabilityState(entry.id);
       const runtimeMedia = this._runtimeMediaCapabilities.get(entry.id)?.media;
       const exposesCapability = entry.capabilities?.media?.[key] !== undefined || runtimeMedia?.[key] !== undefined;
-      if (models.length === 0 && (!runtimeCapability || !exposesCapability)) continue;
+      // 生效模型为空不再是跳过条件：只要供应商声明了该能力就保留在列表里，
+      // 设置页展示能力卡后由用户自行「添加模型」（内置声明只作候选目录）。
+      if (models.length === 0 && !exposesCapability) continue;
       providers.push({
         providerId: entry.id,
         displayName: entry.displayName,
@@ -1267,6 +1327,7 @@ export class ProviderRegistry {
         credentialLanes: this.getMediaCredentialLanes(entry.id, capability),
         ...(runtimeCapability ? { runtimeCapability } : {}),
         models,
+        availableModels: this.getMediaModelCatalog(entry.id, capability),
       });
     }
     return providers;
@@ -1734,8 +1795,14 @@ export class ProviderRegistry {
     const entry = this.get(providerId);
     const key = capabilityKey(capability);
     const declared = entry?.capabilities?.media?.[key]?.models || [];
+    // 不在内置目录中的 id 也允许添加：协议回落到供应商在该能力上声明的默认协议，
+    // 而不是被前缀规则锁死。
     return declared.find((model) => model.id === modelId)
-      || { protocolId: inferMediaProtocolId(providerId, capability, modelId, providerProtocolContext(entry)) || entry?.runtime?.protocolId };
+      || {
+        protocolId: inferMediaProtocolId(providerId, capability, modelId, providerProtocolContext(entry))
+          || mediaCapabilityDefaultProtocol(entry, key)
+          || entry?.runtime?.protocolId,
+      };
   }
 
   _assertMediaModelCatalogMutable(providerId) {
@@ -1811,18 +1878,15 @@ export class ProviderRegistry {
    */
   saveProvider(providerId, data) {
     const userConfig = this._loadAddedModels();
-    const { seed_default_models: seedDefaultModels, ...providerData } = data || {};
+    // seed_default_models 已废弃：内置模型列表不再写进用户配置。继续从 payload 剥离，
+    // 避免旧客户端发送的标志位被持久化进 Provider Catalog。
+    const { seed_default_models: _discardedSeedDefaultModels, ...providerData } = data || {};
     if (Object.prototype.hasOwnProperty.call(providerData, "headers")) {
       providerData.headers = normalizeProviderHeaders(providerData.headers);
     }
     const nextProvider = { ...(userConfig[providerId] || {}), ...providerData };
     const existingPlugin = this._plugins.get(providerId);
     const persistAsLocalPlugin = isLocalProviderPlugin(existingPlugin) || !existingPlugin;
-
-    if (seedDefaultModels && (!Array.isArray(nextProvider.models) || nextProvider.models.length === 0)) {
-      const defaults = this.getDefaultModelEntries(providerId);
-      if (defaults.length > 0) nextProvider.models = [...defaults];
-    }
 
     if (persistAsLocalPlugin) {
       userConfig[providerId] = this._writeLocalProviderPlugin(providerId, nextProvider, existingPlugin);

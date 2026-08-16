@@ -1016,8 +1016,14 @@ export class UniversalMediaManager {
           );
           return false;
         });
-      if (!models.length && !provider.runtimeCapability) continue;
-      const modelIds = new Set(models.map((model) => model.id));
+      // 候选目录：内置声明模型（未被用户添加），按适配器可用性过滤后供「添加模型」下拉。
+      const availableModels = (provider.availableModels || [])
+        .map((model) => projectMediaProviderModel(
+          model,
+          this.hasAdapterForImageModel(provider.providerId, model),
+        ))
+        .filter((model) => model.adapterAvailable);
+      if (!models.length && !provider.runtimeCapability && !availableModels.length) continue;
       providers[provider.providerId] = {
         ...provider,
         ...credentialStatus,
@@ -1028,9 +1034,7 @@ export class UniversalMediaManager {
         activeCredentialLaneId: credentialStatus.activeLaneId || null,
         activeCredentialProviderId: credentialStatus.activeProviderId || null,
         models,
-        availableModels: Array.isArray(provider.availableModels)
-          ? provider.availableModels.filter((model) => modelIds.has(model.id))
-          : [],
+        availableModels,
       };
     }
     return {
@@ -1064,8 +1068,14 @@ export class UniversalMediaManager {
           );
           return false;
         });
-      if (!models.length && !provider.runtimeCapability) continue;
-      const modelIds = new Set(models.map((model) => model.id));
+      // 候选目录：内置声明模型（未被用户添加），按适配器可用性过滤后供「添加模型」下拉。
+      const availableModels = (provider.availableModels || [])
+        .map((model) => projectMediaProviderModel(
+          model,
+          this.hasAdapterForVideoModel(provider.providerId, model),
+        ))
+        .filter((model) => model.adapterAvailable);
+      if (!models.length && !provider.runtimeCapability && !availableModels.length) continue;
       providers[provider.providerId] = {
         ...provider,
         ...credentialStatus,
@@ -1076,9 +1086,7 @@ export class UniversalMediaManager {
         activeCredentialLaneId: credentialStatus.activeLaneId || null,
         activeCredentialProviderId: credentialStatus.activeProviderId || null,
         models,
-        availableModels: Array.isArray(provider.availableModels)
-          ? provider.availableModels.filter((model) => modelIds.has(model.id))
-          : [],
+        availableModels,
       };
     }
     return {

@@ -264,7 +264,7 @@ describe('ProvidersTab provider-scoped form state', () => {
           base_url: 'https://apihub.agnes-ai.com/v1',
           api_key: 'agnes-key',
           api: 'openai-completions',
-          seed_default_models: true,
+          models: [],
         },
       },
     });

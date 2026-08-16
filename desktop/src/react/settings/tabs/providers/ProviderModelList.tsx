@@ -223,13 +223,27 @@ export function ProviderModelList({ providerId, summary, onRefresh }: {
   const fetchModels = async (btn: HTMLButtonElement | null) => {
     if (btn) btn.classList.add(styles['spinning']);
     try {
+      // 优先用面板里的草稿凭证：key 可能刚输入还没保存（onBlur 保存与点击有竞态），
+      // 脱敏占位由服务端回落到已保存明文。
+      const draft = useSettingsStore.getState().providerCredentialDrafts?.[providerId];
+      const body: Record<string, unknown> = {
+        name: providerId,
+        base_url: draft?.base_url || summary.base_url,
+        api: draft?.api || summary.api,
+      };
+      if (draft?.api_key) body.api_key = draft.api_key;
+      if (draft?.headers) body.headers = draft.headers;
       const res = await lingxiFetch('/api/providers/fetch-models', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: providerId, base_url: summary.base_url, api: summary.api }),
+        body: JSON.stringify(body),
       });
       const data = await res.json();
-      if (data.error) { showFetchHint(t('settings.providers.fetchFailed'), false); return; }
+      if (data.error) {
+        const detail = typeof data.error === 'string' && data.error.trim() ? `: ${data.error.trim()}` : '';
+        showFetchHint(t('settings.providers.fetchFailed') + detail, false);
+        return;
+      }
       const models = (data.models || []) as DiscoveredModel[];
       if (models.length === 0) { showFetchHint(t('settings.providers.fetchFailed'), false); return; }
       // Backend already cached the results; just refresh the dropdown

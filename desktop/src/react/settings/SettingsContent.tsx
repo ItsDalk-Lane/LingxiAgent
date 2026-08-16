@@ -135,6 +135,7 @@ export function SettingsContent({
   );
   const set = useSettingsStore(s => s.set);
   const lastReportedActiveTabRef = useRef<string | null>(null);
+  const settingsMainRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     initSettings();
@@ -211,6 +212,17 @@ export function SettingsContent({
   const effectiveActiveTab = normalizeSettingsTab(activeTab);
   const ActiveTab = TAB_COMPONENTS[effectiveActiveTab] || AgentTab;
   const isModal = variant === 'modal';
+
+  // 切换页签时把主内容区滚回顶部。settings-main 是唯一滚动容器，页签内容在
+  // 同一容器里原地替换，scrollTop 会带着上一个页签的滚动位置（如在供应商页
+  // 滚到下方保存配置后切回助手页），导致新页签第一个元素顶到容器上沿、
+  // 上半截再被 modal 顶部的 sticky 渐变遮罩盖住（settings-main::before）。
+  useEffect(() => {
+    // 直接赋 scrollTop（而非 scrollTo）：jsdom 未实现 Element.scrollTo，
+    // 测试环境里 scrollTo 会直接抛 TypeError。
+    if (settingsMainRef.current) settingsMainRef.current.scrollTop = 0;
+  }, [effectiveActiveTab]);
+
   const tabTitleKey = TAB_TITLE_KEYS[effectiveActiveTab];
   const activeTabTitle = tabTitleKey ? t(tabTitleKey) : '';
   const activeTabDescriptionKey = TAB_DESCRIPTION_KEYS[effectiveActiveTab];
@@ -263,7 +275,7 @@ export function SettingsContent({
           </div>
           <div className={styles['settings-body']}>
             <SettingsNav onTabChange={reportActiveTabChange} />
-            <div className={styles['settings-main']}>
+            <div className={styles['settings-main']} ref={settingsMainRef} data-settings-main>
               {!isModal && (
                 <div className={styles['settings-tab-heading']}>
                   <h1 className={styles['settings-tab-title']}>{activeTabTitle}</h1>

@@ -61,7 +61,8 @@ export function ProviderMediaModels({ capability, runtimeProviderId, provider, d
   const closeDropdown = useCallback(() => setDropdownOpen(false), []);
 
   const addedIds = new Set(provider.models.map(m => m.id));
-  const allModels = [...provider.models, ...provider.availableModels];
+  // 按 id 求并集：候选目录若仍含已添加 id（旧服务端/缓存数据），不再拼进下拉。
+  const allModels = [...provider.models, ...provider.availableModels.filter(m => !addedIds.has(m.id))];
   const trimmedSearch = search.trim();
   const query = trimmedSearch.toLowerCase();
   const filtered = query ? allModels.filter(m => m.id.toLowerCase().includes(query) || (m.name || m.id).toLowerCase().includes(query)) : allModels;
