@@ -11,7 +11,6 @@
 import type { ChatMessage, ContentBlock } from '../stores/chat-types';
 import { useStore } from '../stores';
 import { sessionScopedKey, sessionScopedValue } from '../stores/session-slice';
-import { renderMarkdown } from '../utils/markdown';
 import { cleanMoodText } from '../utils/message-parser';
 import { findOpenToolIndex, toolCallFromStartEvent, toolCallIdFromEvent } from '../utils/tool-call-identity';
 import {
@@ -136,7 +135,7 @@ function renderBufferedBlocks(currentBlocks: ContentBlock[], buf: Buffer): Conte
       return indexes;
     }, []);
     const idx = buf.textSegmentOrdinal === null ? undefined : textIndexes[buf.textSegmentOrdinal];
-    const textBlock: ContentBlock = { type: 'text', html: renderMarkdown(displayText), source: displayText };
+    const textBlock: ContentBlock = { type: 'text', source: displayText };
     if (idx !== undefined) {
       blocks[idx] = textBlock;
     } else {

@@ -256,7 +256,11 @@ export type TextDecorator = ContentBlockSemantics & (
   | { type: 'thinking'; content: string; sealed: boolean }
   | { type: 'mood'; yuan: string; text: string }
   | { type: 'tool_group'; tools: ToolCall[]; collapsed: boolean }
-  | { type: 'text'; html: string; source?: string }
+  // COMPAT(v0.128, remove no earlier than v0.133): 旧会话可能只有 html；新块必须写 source。
+  | (
+    | { type: 'text'; source: string; html?: string }
+    | { type: 'text'; source?: undefined; html: string }
+  )
 );
 
 // 物种 B：富内容块（通过 content_block 事件 push，不 upsert）

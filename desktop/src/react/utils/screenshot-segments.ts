@@ -38,7 +38,11 @@ function voiceTranscriptionVisibleLength(attachment: UserAttachment): number {
 }
 
 function blockVisibleWeight(block: ContentBlock): number {
-  if (block.type === 'text') return stripHtml(block.html).length;
+  if (block.type === 'text') {
+    return typeof block.source === 'string'
+      ? block.source.trim().length
+      : stripHtml(block.html).length;
+  }
   if (block.type === 'file' && isImageOrSvgExt(block.ext)) return IMAGE_BLOCK_VISIBLE_CHAR_WEIGHT;
   if (block.type === 'screenshot') return IMAGE_BLOCK_VISIBLE_CHAR_WEIGHT;
   return 0;

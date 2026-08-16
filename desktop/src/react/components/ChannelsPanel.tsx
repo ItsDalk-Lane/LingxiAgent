@@ -548,7 +548,7 @@ export function AgentPhoneSessionPreview({ sessionPath, agentId, agentYuan }: {
               blocks: upsertPhoneBlock(
                 blocks,
                 (block) => block.type === 'text',
-                { type: 'text', html: renderMarkdown(nextText), source: nextText },
+                { type: 'text', source: nextText },
               ),
             };
           });

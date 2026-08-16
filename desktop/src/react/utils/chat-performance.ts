@@ -1,6 +1,7 @@
 export type ChatPerformanceEventName =
   | 'stream_flush'
   | 'markdown_parse'
+  | 'markdown_incremental_boundary'
   | 'structural_message_update'
   | 'transcript_render'
   | 'transcript_projection'

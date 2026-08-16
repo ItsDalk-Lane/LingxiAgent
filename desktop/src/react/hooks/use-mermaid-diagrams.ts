@@ -15,8 +15,10 @@ function isMermaidRenderMutation(record: MutationRecord): boolean {
 export function useMermaidDiagrams(
   ref: RefObject<ParentNode | null>,
   deps: DependencyList,
+  enabled = true,
 ): void {
   useEffect(() => {
+    if (!enabled) return undefined;
     const root = ref.current;
     if (!root) return undefined;
 
@@ -55,5 +57,5 @@ export function useMermaidDiagrams(
       observer.disconnect();
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps -- caller owns the render dependencies for injected HTML
-  }, deps);
+  }, [...deps, enabled]);
 }

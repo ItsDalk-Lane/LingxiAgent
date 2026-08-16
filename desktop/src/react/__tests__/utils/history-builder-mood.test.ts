@@ -20,9 +20,9 @@ function getMoodText(item: any): string | undefined {
   return item.data.blocks?.find((b: any) => b.type === 'mood')?.text;
 }
 
-function getTextHtml(item: any): string | undefined {
+function getTextSource(item: any): string | undefined {
   if (item?.type !== 'message') return undefined;
-  return item.data.blocks?.find((b: any) => b.type === 'text')?.html;
+  return item.data.blocks?.find((b: any) => b.type === 'text')?.source;
 }
 
 describe('buildItemsFromHistory mood segment lifecycle', () => {
@@ -38,11 +38,11 @@ describe('buildItemsFromHistory mood segment lifecycle', () => {
     expect(assistants).toHaveLength(2);
     expect(getMoodText(assistants[0])).toBe('AAA');
     expect(getMoodText(assistants[1])).toBe('BBB');
-    expect(getTextHtml(assistants[0])).toContain('我先查一下');
-    expect(getTextHtml(assistants[1])).toContain('最终答案');
-    // 正文里绝不残留未转义的裸标签（renderMarkdown 会把标签转义；这里兜底断言）
-    expect(getTextHtml(assistants[0])).not.toMatch(/<\/?reflect>/);
-    expect(getTextHtml(assistants[1])).not.toMatch(/<\/?reflect>/);
+    expect(getTextSource(assistants[0])).toContain('我先查一下');
+    expect(getTextSource(assistants[1])).toContain('最终答案');
+    // 被抽离的内部标签不能残留在权威原文中。
+    expect(getTextSource(assistants[0])).not.toMatch(/<\/?reflect>/);
+    expect(getTextSource(assistants[1])).not.toMatch(/<\/?reflect>/);
   });
 
   it('mood / pulse / reflect 三种标签在历史里都正确抽离', () => {
@@ -55,7 +55,7 @@ describe('buildItemsFromHistory mood segment lifecycle', () => {
       });
       const asst = items.find((i) => i.type === 'message' && i.data.role === 'assistant');
       expect(getMoodText(asst)).toBe('内部');
-      expect(getTextHtml(asst)).toContain('正文');
+      expect(getTextSource(asst)).toContain('正文');
     }
   });
 
@@ -70,7 +70,7 @@ describe('buildItemsFromHistory mood segment lifecycle', () => {
     });
     const asst = items.find((i) => i.type === 'message' && i.data.role === 'assistant');
     expect(getMoodText(asst)).toBe('AAA');
-    expect(getTextHtml(asst)).toContain('正文里讲标签');
+    expect(getTextSource(asst)).toContain('正文里讲标签');
   });
 
   it('inline-code 与 fenced code 里的标签保持普通正文（不被抽成 mood）', () => {
@@ -81,8 +81,8 @@ describe('buildItemsFromHistory mood segment lifecycle', () => {
       ],
     });
     const asst = items.find((i) => i.type === 'message' && i.data.role === 'assistant');
-    // 没有 leading mood 块：整段都是正文（renderMarkdown 会转义标签字符）
+    // 没有 leading mood 块：整段都保留在权威原文中。
     expect(getMoodText(asst)).toBeUndefined();
-    expect(getTextHtml(asst)).toContain('reflect');
+    expect(getTextSource(asst)).toContain('reflect');
   });
 });

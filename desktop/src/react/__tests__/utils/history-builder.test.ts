@@ -67,6 +67,9 @@ describe('buildItemsFromHistory user image restoration', () => {
       controlBlockIds: [],
       status: 'completed',
     });
+    const textBlocks = first.data.blocks?.filter((block) => block.type === 'text') || [];
+    expect(textBlocks.map((block) => block.source)).toEqual(['内部检查', '最终答复']);
+    expect(textBlocks.every((block) => !('html' in block))).toBe(true);
   });
 
   it('把同一用户回合里的多段助手消息恢复成一个回合投影', () => {

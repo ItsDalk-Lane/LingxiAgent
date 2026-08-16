@@ -6,7 +6,6 @@ import type {
 } from '../stores/chat-types';
 import type { LiveAssistantSegment } from '../stores/live-turn-store';
 import { normalizeContentBlocks } from './content-semantics';
-import { renderMarkdown } from './markdown';
 
 export interface TurnProjectionDiagnostic {
   code: 'unresolved_phase_fallback';
@@ -74,7 +73,6 @@ function projectSegment(
     id: segmentBlockId(input.idPrefix, segment.id),
     type: 'text',
     source: segment.source,
-    html: renderMarkdown(segment.source),
     semanticPhase,
     surfaceRole: semanticPhase === 'commentary' ? 'process' : 'answer',
     lifecycle,

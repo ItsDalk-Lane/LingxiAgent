@@ -50,7 +50,7 @@ describe('chat rendering performance baseline', () => {
   });
 
   for (const deltaCount of [10_000, 50_000, 100_000]) {
-    it(`记录 ${deltaCount.toLocaleString('en-US')} 个 text_delta 的现状成本`, () => {
+    it(`${deltaCount.toLocaleString('en-US')} 个 text_delta 在状态层不预解析 Markdown`, () => {
       const events: ChatPerformanceEvent[] = [];
       const stop = observeChatPerformance((event) => events.push(event));
       const initialItems = currentItems();
@@ -65,11 +65,11 @@ describe('chat rendering performance baseline', () => {
       expect(currentTextSource()).toHaveLength(deltaCount);
       expect(currentItems()).not.toBe(initialItems);
       expect(count(events, 'stream_flush')).toBe(3);
-      expect(count(events, 'markdown_parse')).toBe(3);
+      expect(count(events, 'markdown_parse')).toBe(0);
       expect(count(events, 'structural_message_update')).toBe(1);
       expect(events
         .filter((event) => event.name === 'markdown_parse')
-        .map((event) => event.sourceLength)).toEqual([1, deltaCount, deltaCount]);
+        .map((event) => event.sourceLength)).toEqual([]);
     });
   }
 
@@ -91,7 +91,7 @@ describe('chat rendering performance baseline', () => {
   });
 
   for (const messageCount of [500, 2_000]) {
-    it(`记录 ${messageCount.toLocaleString('en-US')} 条历史消息的投影入口`, () => {
+    it(`${messageCount.toLocaleString('en-US')} 条历史消息不预解析助手正文`, () => {
       const data: HistoryApiResponse = {
         messages: Array.from({ length: messageCount }, (_, index) => ({
           id: `history-${index}`,
@@ -109,7 +109,13 @@ describe('chat rendering performance baseline', () => {
       expect(events.filter((event) => event.name === 'history_projection')).toEqual([
         expect.objectContaining({ itemCount: messageCount }),
       ]);
-      expect(count(events, 'markdown_parse')).toBe(messageCount);
+      expect(count(events, 'markdown_parse')).toBe(messageCount / 2);
+      const assistantBlocks = items
+        .filter((item) => item.type === 'message' && item.data.role === 'assistant')
+        .flatMap((item) => item.type === 'message' ? item.data.blocks || [] : [])
+        .filter((block) => block.type === 'text');
+      expect(assistantBlocks).toHaveLength(messageCount / 2);
+      expect(assistantBlocks.every((block) => typeof block.source === 'string' && !('html' in block))).toBe(true);
     });
   }
 });
