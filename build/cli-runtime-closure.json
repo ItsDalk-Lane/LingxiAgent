@@ -1444,6 +1444,11 @@
         },
         {
           "root": "server-bootstrap",
+          "from": "server/history-deferred-content.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
           "from": "server/routes/sessions.ts",
           "kind": "import-statement"
         },
@@ -1453,7 +1458,7 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by lib/session-collab/transcript.ts (import-statement); lib/tools/session-tool.ts (import-statement); core/agent-manager.ts (import-statement); +3 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by lib/session-collab/transcript.ts (import-statement); lib/tools/session-tool.ts (import-statement); core/agent-manager.ts (import-statement); +4 more importer(s)."
     },
     {
       "path": "core/migration-backups.ts",
@@ -119324,6 +119329,18 @@
       "reason": "Reached via esbuild source module graph, imported by lib/tools/update-settings-tool.ts (import-statement); server/routes/chat.ts (import-statement); server/routes/config.ts (import-statement); +4 more importer(s)."
     },
     {
+      "path": "server/assistant-event-normalizer.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "server/routes/chat.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by server/routes/chat.ts (import-statement)."
+    },
+    {
       "path": "server/block-extractors.ts",
       "inputType": "source-graph",
       "provenance": [
@@ -119334,11 +119351,16 @@
         },
         {
           "root": "server-bootstrap",
+          "from": "server/history-deferred-content.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
           "from": "server/routes/sessions.ts",
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by server/routes/chat.ts (import-statement); server/routes/sessions.ts (import-statement)."
+      "reason": "Reached via esbuild source module graph, imported by server/routes/chat.ts (import-statement); server/history-deferred-content.ts (import-statement); server/routes/sessions.ts (import-statement)."
     },
     {
       "path": "server/bootstrap.ts",
@@ -119404,6 +119426,18 @@
         }
       ],
       "reason": "Reached via esbuild source module graph, imported by server/routes/chat.ts (import-statement); server/routes/sessions.ts (import-statement)."
+    },
+    {
+      "path": "server/history-deferred-content.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "server/routes/sessions.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by server/routes/sessions.ts (import-statement)."
     },
     {
       "path": "server/hono-helpers.ts",
@@ -120862,6 +120896,23 @@
         }
       ],
       "reason": "Reached via esbuild source module graph, imported by shared/artifact-core/activation.cjs (require-call); shared/artifact-core/activation.cjs (require-call)."
+    },
+    {
+      "path": "shared/assistant-semantic-segments.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "server/history-deferred-content.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "server/routes/sessions.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by server/history-deferred-content.ts (import-statement); server/routes/sessions.ts (import-statement)."
     },
     {
       "path": "shared/audio-mime.ts",
@@ -122557,7 +122608,12 @@
         },
         {
           "root": "server-bootstrap",
-          "from": "server/routes/chat.ts",
+          "from": "server/assistant-event-normalizer.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "shared/assistant-semantic-segments.ts",
           "kind": "import-statement"
         },
         {
@@ -122566,7 +122622,7 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by core/message-utils.ts (import-statement); server/routes/chat.ts (import-statement); server/routes/sessions.ts (import-statement)."
+      "reason": "Reached via esbuild source module graph, imported by core/message-utils.ts (import-statement); server/assistant-event-normalizer.ts (import-statement); shared/assistant-semantic-segments.ts (import-statement); +1 more importer(s)."
     },
     {
       "path": "shared/tool-arg-summary.ts",
@@ -122854,9 +122910,9 @@
     }
   ],
   "stats": {
-    "totalFiles": 10562,
+    "totalFiles": 10565,
     "byInputType": {
-      "source-graph": 666,
+      "source-graph": 669,
       "runtime-asset": 11,
       "nft-runtime-trace": 9885
     }

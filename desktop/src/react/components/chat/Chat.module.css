@@ -309,9 +309,9 @@
 .deferredAttachmentButton {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: var(--space-6);
     max-width: 240px;
-    padding: 6px 10px;
+    padding: var(--space-6) var(--space-10);
     border: 1px solid var(--border);
     border-radius: var(--radius-chat-card);
     background: var(--attach-bg, rgba(0, 0, 0, 0.04));

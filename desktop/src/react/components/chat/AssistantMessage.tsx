@@ -20,7 +20,11 @@ import { useMessageFooterActions } from './MessageActions';
 import { MessageFooterActions, formatMessageTime } from './MessageFooterActions';
 import { ChatResourceCard } from './ChatResourceCard';
 import { FileResourceIcon, SkillResourceIcon } from './ChatResourceIcons';
-import { BLOCK_RENDERERS } from './block-renderers';
+import {
+  registerBlockRenderers,
+  renderRegisteredContentBlock,
+  type BlockRendererProps,
+} from './block-renderers';
 import { FileOutputActions } from './FileOutputActions';
 const lazyScreenshot = () => import('../../utils/screenshot').then(m => m.takeScreenshot);
 import type { ChatMessage, ContentBlock } from '../../stores/chat-types';
@@ -283,59 +287,17 @@ const ContentBlockView = memo(function ContentBlockView({ block, agentName, agen
   readOnly: boolean;
   skillPrompt: string | null;
 }) {
-  switch (block.type) {
-    case 'thinking':
-      return <ThinkingBlock content={block.content} sealed={block.sealed} sessionPath={sessionPath} deferred={block.deferred} />;
-    case 'mood':
-      return <MoodBlock yuan={block.yuan} text={block.text} />;
-    case 'tool_group':
-      return (
-        <ToolGroupBlock
-          tools={block.tools}
-          collapsed={block.collapsed}
-          agentName={agentName}
-          skillPrompt={skillPrompt}
-          sessionPath={sessionPath}
-        />
-      );
-    case 'text':
-      return <StreamingMarkdownContent html={block.html} source={block.source} active={isStreaming} linkContext={{ origin: 'session', sessionPath, messageId, blockIdx }} />;
-    case 'file':
-      return (
-        <FileBlock
-          block={block}
-          sessionPath={sessionPath}
-          messageId={messageId}
-          blockIdx={blockIdx}
-        />
-      );
-    case 'screenshot':
-      return (
-        <ScreenshotBlock
-          block={block}
-          sessionPath={sessionPath}
-          messageId={messageId}
-          blockIdx={blockIdx}
-        />
-      );
-    case 'media_generation':
-      return <MediaGenerationBlock block={block} sessionPath={sessionPath} readOnly={readOnly} />;
-    case 'interlude':
-      return <InterludeBlock block={block} sessionPath={sessionPath} agentId={agentId} />;
-    case 'turn_status': {
-      const t = window.t ?? ((key: string) => key);
-      const key = block.status === 'failed'
-        ? 'chat.turnStatus.failed'
-        : block.status === 'aborted'
-          ? 'chat.turnStatus.aborted'
-          : 'chat.turnStatus.missingFinalAnswer';
-      return <div className={styles.turnStatus}>{block.label || t(key)}</div>;
-    }
-    default: {
-      const Renderer = BLOCK_RENDERERS[block.type];
-      return Renderer ? <Renderer block={block} agentId={agentId} sessionPath={sessionPath} /> : null;
-    }
-  }
+  return renderRegisteredContentBlock(block, {
+    agentName,
+    agentId,
+    yuan: _yuan,
+    sessionPath,
+    messageId,
+    blockIdx,
+    isStreaming,
+    readOnly,
+    skillPrompt,
+  });
 });
 
 // ── 简单子块组件（物种 B，统一接受 { block: any }） ──
@@ -1247,8 +1209,8 @@ const CronConfirmBlock = memo(function CronConfirmBlock({ block, sessionPath }: 
 });
 
 // suggestion_card 分发：session 协作草稿（send / create）走 SessionCollabDraftCard，
-// 其余（automation_draft 等）沿用既有 CronConfirmBlock。BLOCK_RENDERERS 是「组件引用」表，
-// 保持表结构不变，只把 'suggestion_card' 注册成这个小分发器。
+// 其余（automation_draft 等）沿用既有 CronConfirmBlock；类型化注册表只把
+// suggestion_card 交给这个小分发器，具体卡片选择仍由显式 kind 决定。
 const SuggestionCardDispatch = memo(function SuggestionCardDispatch({ block, sessionPath }: { block: any; sessionPath?: string }) {
   if (block.kind === 'session_send_draft' || block.kind === 'session_create_draft') {
     return <SessionCollabDraftCard block={block} sessionPath={sessionPath} />;
@@ -1277,16 +1239,129 @@ const SettingsUpdateBlock = memo(function SettingsUpdateBlock({ block }: { block
   return <SettingsUpdateCard update={block.update} />;
 });
 
-// ── 注册所有物种 B 渲染器 ──
-// 注：`file` 与 `screenshot` 需 session 上下文（sessionPath/messageId/blockIdx），
-// 统一走 ContentBlockView 的 switch 内联分发，不注册到全局表中。
-BLOCK_RENDERERS['subagent'] = SubagentCard;
-BLOCK_RENDERERS['workflow'] = WorkflowInlineCard;
-BLOCK_RENDERERS['artifact'] = LegacyArtifactBlock;
-BLOCK_RENDERERS['plugin_card'] = PluginCardWrapper;
-BLOCK_RENDERERS['skill'] = SkillBlock;
-BLOCK_RENDERERS['cron_confirm'] = CronConfirmBlock;
-BLOCK_RENDERERS['suggestion_card'] = SuggestionCardDispatch;
-BLOCK_RENDERERS['settings_confirm'] = SettingsConfirmBlock;
-BLOCK_RENDERERS['settings_update'] = SettingsUpdateBlock;
-BLOCK_RENDERERS['interactive_card'] = InteractiveCard;
+// ── 类型化内容块渲染器 ──
+
+function ThinkingRenderer({ block, sessionPath }: BlockRendererProps<'thinking'>) {
+  return <ThinkingBlock content={block.content} sealed={block.sealed} sessionPath={sessionPath} deferred={block.deferred} />;
+}
+
+function MoodRenderer({ block }: BlockRendererProps<'mood'>) {
+  return <MoodBlock yuan={block.yuan} text={block.text} />;
+}
+
+function ToolGroupRenderer({ block, agentName, skillPrompt, sessionPath }: BlockRendererProps<'tool_group'>) {
+  return (
+    <ToolGroupBlock
+      tools={block.tools}
+      collapsed={block.collapsed}
+      agentName={agentName}
+      skillPrompt={skillPrompt}
+      sessionPath={sessionPath}
+    />
+  );
+}
+
+function TextRenderer({ block, isStreaming, sessionPath, messageId, blockIdx }: BlockRendererProps<'text'>) {
+  return (
+    <StreamingMarkdownContent
+      html={block.html}
+      source={block.source}
+      active={isStreaming}
+      linkContext={{ origin: 'session', sessionPath, messageId, blockIdx }}
+    />
+  );
+}
+
+function FileRenderer({ block, sessionPath, messageId, blockIdx }: BlockRendererProps<'file'>) {
+  return <FileBlock block={block} sessionPath={sessionPath} messageId={messageId} blockIdx={blockIdx} />;
+}
+
+function MediaGenerationRenderer({ block, sessionPath, readOnly }: BlockRendererProps<'media_generation'>) {
+  return <MediaGenerationBlock block={block} sessionPath={sessionPath} readOnly={readOnly} />;
+}
+
+function ArtifactRenderer({ block, sessionPath }: BlockRendererProps<'artifact'>) {
+  return <LegacyArtifactBlock block={block} sessionPath={sessionPath} />;
+}
+
+function ScreenshotRenderer({ block, sessionPath, messageId, blockIdx }: BlockRendererProps<'screenshot'>) {
+  return <ScreenshotBlock block={block} sessionPath={sessionPath} messageId={messageId} blockIdx={blockIdx} />;
+}
+
+function SkillRenderer({ block }: BlockRendererProps<'skill'>) {
+  return <SkillBlock block={block} />;
+}
+
+function CronConfirmRenderer({ block, sessionPath }: BlockRendererProps<'cron_confirm'>) {
+  return <CronConfirmBlock block={block} sessionPath={sessionPath} />;
+}
+
+function SuggestionCardRenderer({ block, sessionPath }: BlockRendererProps<'suggestion_card'>) {
+  return <SuggestionCardDispatch block={block} sessionPath={sessionPath} />;
+}
+
+function SettingsConfirmRenderer({ block }: BlockRendererProps<'settings_confirm'>) {
+  return <SettingsConfirmBlock block={block} />;
+}
+
+function SettingsUpdateRenderer({ block }: BlockRendererProps<'settings_update'>) {
+  return <SettingsUpdateBlock block={block} />;
+}
+
+function SessionConfirmationRenderer(_props: BlockRendererProps<'session_confirmation'>) {
+  // 输入区确认由 InputArea 持有；消息流沿用旧行为，不重复渲染第二张确认卡。
+  return null;
+}
+
+function InterludeRenderer({ block, sessionPath, agentId }: BlockRendererProps<'interlude'>) {
+  return <InterludeBlock block={block} sessionPath={sessionPath} agentId={agentId} />;
+}
+
+function SubagentRenderer({ block }: BlockRendererProps<'subagent'>) {
+  return <SubagentCard block={block} />;
+}
+
+function WorkflowRenderer({ block }: BlockRendererProps<'workflow'>) {
+  return <WorkflowInlineCard block={block} />;
+}
+
+function PluginCardRenderer({ block, agentId }: BlockRendererProps<'plugin_card'>) {
+  return <PluginCardWrapper block={block} agentId={agentId} />;
+}
+
+function InteractiveCardRenderer({ block }: BlockRendererProps<'interactive_card'>) {
+  return <InteractiveCard block={block} />;
+}
+
+function TurnStatusRenderer({ block }: BlockRendererProps<'turn_status'>) {
+  const t = window.t ?? ((key: string) => key);
+  const key = block.status === 'failed'
+    ? 'chat.turnStatus.failed'
+    : block.status === 'aborted'
+      ? 'chat.turnStatus.aborted'
+      : 'chat.turnStatus.missingFinalAnswer';
+  return <div className={styles.turnStatus}>{block.label || t(key)}</div>;
+}
+
+registerBlockRenderers({
+  thinking: ThinkingRenderer,
+  mood: MoodRenderer,
+  tool_group: ToolGroupRenderer,
+  text: TextRenderer,
+  file: FileRenderer,
+  media_generation: MediaGenerationRenderer,
+  artifact: ArtifactRenderer,
+  screenshot: ScreenshotRenderer,
+  skill: SkillRenderer,
+  cron_confirm: CronConfirmRenderer,
+  suggestion_card: SuggestionCardRenderer,
+  settings_confirm: SettingsConfirmRenderer,
+  settings_update: SettingsUpdateRenderer,
+  session_confirmation: SessionConfirmationRenderer,
+  interlude: InterludeRenderer,
+  subagent: SubagentRenderer,
+  workflow: WorkflowRenderer,
+  plugin_card: PluginCardRenderer,
+  interactive_card: InteractiveCardRenderer,
+  turn_status: TurnStatusRenderer,
+});

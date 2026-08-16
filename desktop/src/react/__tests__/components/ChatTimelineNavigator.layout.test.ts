@@ -87,7 +87,7 @@ describe('ChatTimelineNavigator layout', () => {
   it('keeps timeline anchor construction behind the active hover preparation gate', () => {
     const source = readChatMessageSurfaceSource();
 
-    expect(source).toContain('active && timelinePrepared ? buildTimelineAnchors(items) : EMPTY_TIMELINE_ANCHORS');
+    expect(source).toContain('active && timelinePrepared ? buildTimelineAnchors(visibleItems) : EMPTY_TIMELINE_ANCHORS');
     expect(source).toContain('if (active && inRailX && inRailY) setTimelinePrepared(true)');
     expect(source).toContain('setTimelinePrepared(false)');
   });
