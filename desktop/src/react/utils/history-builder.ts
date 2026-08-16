@@ -71,7 +71,7 @@ export interface HistoryApiResponse {
       error?: string;
       details?: Record<string, unknown>;
     }>;
-    images?: Array<{ data: string; mimeType: string }>;
+    images?: Array<{ data?: string; mimeType: string; deferred?: import('../stores/chat-types').DeferredHistoryContent }>;
     timestamp?: number | string | null;
     sourceIndex?: number;
     turnInputEntryId?: string;
@@ -562,8 +562,9 @@ export function buildItemsFromHistory(data: HistoryApiResponse): ChatListItem[] 
         path: `image-${idx}`,
         name: `image-${idx}.${(img.mimeType || 'image/png').split('/')[1] || 'png'}`,
         isDir: false,
-        base64Data: img.data,
+        ...(img.data ? { base64Data: img.data } : {}),
         mimeType: img.mimeType,
+        ...(img.deferred ? { deferred: img.deferred } : {}),
       }));
       const markerVideoAtts = attachedVideos.map((ref) => attachmentFromRef(ref, sessionFileLookup));
       const markerAudioAtts = attachedAudios.map((ref) => attachmentFromRef(ref, sessionFileLookup));

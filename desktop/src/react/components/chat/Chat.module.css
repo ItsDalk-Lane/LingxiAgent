@@ -306,6 +306,26 @@
     gap: 4px;
 }
 
+.deferredAttachmentButton {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    max-width: 240px;
+    padding: 6px 10px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-chat-card);
+    background: var(--attach-bg, rgba(0, 0, 0, 0.04));
+    color: inherit;
+    font: inherit;
+    cursor: default;
+}
+
+.deferredAttachmentButton span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 .visionAuxiliaryLabel {
     font-size: 11px;
     line-height: 1.3;

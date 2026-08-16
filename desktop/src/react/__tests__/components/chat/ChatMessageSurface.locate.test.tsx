@@ -290,4 +290,53 @@ describe('ChatMessageSurface locate intent consumption', () => {
     expect(useStore.getState().toasts.some((toast) => toast.type === 'error')).toBe(true);
     expect(loadMoreMessagesMock).not.toHaveBeenCalled();
   });
+
+  it('默认只挂载最近一百条，向上阅读每次再揭开五十条', async () => {
+    setSession({
+      items: Array.from({ length: 250 }, (_, index) => message(String(index))),
+      hasMore: false,
+      loadingMore: false,
+      oldestId: '0',
+    });
+    const { container } = render(<ChatMessageSurface sessionPath={SESSION} />);
+
+    expect(container.querySelectorAll('[data-message-id]')).toHaveLength(100);
+    expect(container.querySelector('[data-message-id="149"]')).toBeNull();
+    expect(container.querySelector('[data-message-id="150"]')).toBeInTheDocument();
+
+    const panel = container.querySelector('[data-chat-selection-root]') as HTMLElement;
+    Object.defineProperty(panel, 'scrollTop', { configurable: true, value: 0, writable: true });
+    fireEvent.scroll(panel);
+
+    await waitFor(() => {
+      expect(container.querySelectorAll('[data-message-id]')).toHaveLength(150);
+    });
+    expect(container.querySelector('[data-message-id="100"]')).toBeInTheDocument();
+    expect(loadMoreMessagesMock).not.toHaveBeenCalled();
+  });
+
+  it('定位已加载但尚未挂载的旧消息时先揭开窗口，再执行滚动', async () => {
+    setSession({
+      items: Array.from({ length: 250 }, (_, index) => message(String(index))),
+      hasMore: false,
+      loadingMore: false,
+      oldestId: '0',
+    });
+    const { container } = render(<ChatMessageSurface sessionPath={SESSION} />);
+    const panel = container.querySelector('[data-chat-selection-root]') as HTMLElement & { scrollTo?: unknown };
+    const scrollToSpy = vi.fn();
+    panel.scrollTo = scrollToSpy as never;
+
+    act(() => {
+      useStore.getState().requestMessageLocate({ sessionPath: SESSION, messageIndex: 50, term: 'msg-50' });
+    });
+
+    await waitFor(() => {
+      expect(container.querySelector('[data-message-id="50"]')).toBeInTheDocument();
+    });
+    await waitFor(() => {
+      expect(useStore.getState().pendingMessageLocate).toBeNull();
+    });
+    expect(scrollToSpy).toHaveBeenCalledTimes(1);
+  });
 });

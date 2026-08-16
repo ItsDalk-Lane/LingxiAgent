@@ -2,6 +2,64 @@ import { describe, expect, it } from 'vitest';
 import { buildItemsFromHistory } from '../../utils/history-builder';
 
 describe('buildItemsFromHistory user image restoration', () => {
+  it('保留历史重内容凭证，同时只把预览放进首屏投影', () => {
+    const reasoningDeferred = {
+      id: 'reasoning-heavy',
+      kind: 'assistant_segment' as const,
+      size: 9_000,
+      available: true as const,
+    };
+    const imageDeferred = {
+      id: 'image-heavy',
+      kind: 'inline_image' as const,
+      size: 12_000,
+      available: true as const,
+    };
+    const items = buildItemsFromHistory({
+      messages: [
+        {
+          id: '0',
+          role: 'user',
+          content: '看图',
+          images: [{ mimeType: 'image/png', deferred: imageDeferred }],
+        },
+        {
+          id: '1',
+          entryId: 'assistant-heavy',
+          role: 'assistant',
+          content: '完成',
+          assistantSegments: [
+            {
+              id: 'assistant:1:reasoning:default',
+              kind: 'reasoning',
+              semanticPhase: 'reasoning',
+              source: '思考预览',
+              lifecycle: 'sealed',
+              deferred: reasoningDeferred,
+            },
+            {
+              id: 'assistant:1:text:1',
+              kind: 'text',
+              semanticPhase: 'final_answer',
+              source: '完成',
+              lifecycle: 'sealed',
+            },
+          ],
+        },
+      ],
+    });
+
+    expect(items[0]?.type).toBe('message');
+    expect(items[1]?.type).toBe('message');
+    if (items[0]?.type !== 'message' || items[1]?.type !== 'message') throw new Error('expected messages');
+    expect(items[0].data.attachments?.[0]).not.toHaveProperty('base64Data');
+    expect(items[0].data.attachments?.[0]).toMatchObject({ deferred: imageDeferred });
+    expect(items[1].data.blocks?.find((block) => block.type === 'thinking')).toMatchObject({
+      content: '思考预览',
+      deferred: reasoningDeferred,
+    });
+  });
+
   it('按服务端语义恢复固定四区投影，不把过程文字冒充最终回复', () => {
     const items = buildItemsFromHistory({
       messages: [{

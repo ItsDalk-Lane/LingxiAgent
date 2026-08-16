@@ -4899,4 +4899,226 @@ describe("sessions route", () => {
     expect(loopReply).not.toHaveProperty("turnInputEntryId");
     expect(loopReply.turnInputVisible).toBe(false);
   });
+
+  it("defers large historical thinking and reads the full source only through its content id", async () => {
+    const { createSessionsRoute } = await import("../server/routes/sessions.ts");
+    const msgUtils = await import("../core/message-utils.ts");
+    const app = new Hono();
+    const sessionPath = "/tmp/agents/hana/sessions/heavy-thinking.jsonl";
+    const thinking = `thinking-start:${"想".repeat(9_000)}:thinking-end`;
+    const content = [{ type: "thinking", thinking }];
+    const sourceMessages = [{ id: "assistant-heavy", role: "assistant", content }];
+
+    vi.mocked(msgUtils.loadSessionHistoryMessages).mockResolvedValue(sourceMessages as never);
+    vi.mocked(msgUtils.extractTextContent).mockReturnValue({
+      text: "",
+      images: [],
+      thinking,
+      toolUses: [],
+    });
+    vi.mocked(msgUtils.contentHasThinkingBlock).mockImplementation((candidate) => candidate === content);
+
+    app.route("/api", createSessionsRoute({
+      agentsDir: "/tmp/agents",
+      currentSessionPath: sessionPath,
+      deferredResults: null,
+    }));
+
+    const listRes = await app.request(`/api/sessions/messages?path=${encodeURIComponent(sessionPath)}`);
+    const listData = await listRes.json();
+    const reasoning = listData.messages[0].assistantSegments[0];
+
+    expect(listRes.status).toBe(200);
+    expect(reasoning.source.length).toBeLessThan(thinking.length);
+    expect(reasoning.deferred).toMatchObject({
+      kind: "assistant_segment",
+      size: thinking.length,
+      available: true,
+    });
+    expect(JSON.stringify(listData)).not.toContain(":thinking-end");
+
+    const detailRes = await app.request(
+      `/api/sessions/content/${encodeURIComponent(reasoning.deferred.id)}?path=${encodeURIComponent(sessionPath)}`,
+    );
+    expect(detailRes.status).toBe(200);
+    await expect(detailRes.json()).resolves.toMatchObject({
+      id: reasoning.deferred.id,
+      kind: "assistant_segment",
+      content: thinking,
+    });
+  });
+
+  it("defers large command output and legacy screenshot/artifact payloads", async () => {
+    const { createSessionsRoute } = await import("../server/routes/sessions.ts");
+    const msgUtils = await import("../core/message-utils.ts");
+    const app = new Hono();
+    const sessionPath = "/tmp/agents/hana/sessions/heavy-results.jsonl";
+    const commandOutput = `command-start:${"o".repeat(70_000)}:command-end`;
+    const screenshot = `screenshot-start:${"b".repeat(12_000)}:screenshot-end`;
+    const artifact = `artifact-start:${"a".repeat(9_000)}:artifact-end`;
+    const sourceMessages = [
+      {
+        id: "assistant-tools",
+        role: "assistant",
+        content: [{
+          type: "toolCall",
+          id: "call-exec",
+          name: "exec_command",
+          arguments: { cmd: "npm test" },
+        }],
+      },
+      {
+        id: "result-exec",
+        role: "toolResult",
+        toolCallId: "call-exec",
+        toolName: "exec_command",
+        content: [{ type: "text", text: commandOutput }],
+        details: { execCommand: { cmd: "npm test", tty: false, exitCode: 0 } },
+      },
+      {
+        id: "result-screenshot",
+        role: "toolResult",
+        toolName: "browser",
+        details: { action: "screenshot", thumbnail: screenshot, mimeType: "image/jpeg" },
+      },
+      {
+        id: "result-artifact",
+        role: "toolResult",
+        toolName: "create_artifact",
+        details: {
+          artifactId: "artifact-1",
+          type: "markdown",
+          title: "Large report",
+          content: artifact,
+        },
+      },
+    ];
+
+    vi.mocked(msgUtils.loadSessionHistoryMessages).mockResolvedValue(sourceMessages as never);
+    vi.mocked(msgUtils.extractTextContent).mockReturnValue({
+      text: "",
+      images: [],
+      thinking: "",
+      toolUses: [{ id: "call-exec", name: "exec_command", args: { cmd: "npm test" } }],
+    });
+    vi.mocked(msgUtils.contentHasThinkingBlock).mockReturnValue(false);
+
+    app.route("/api", createSessionsRoute({
+      agentsDir: "/tmp/agents",
+      currentSessionPath: sessionPath,
+      deferredResults: null,
+    }));
+
+    const listRes = await app.request(`/api/sessions/messages?path=${encodeURIComponent(sessionPath)}`);
+    const listData = await listRes.json();
+    const toolDetails = listData.messages[0].toolCalls[0].details;
+    const screenshotBlock = listData.blocks.find((block) => block.type === "screenshot");
+    const artifactBlock = listData.blocks.find((block) => block.type === "artifact");
+
+    expect(toolDetails.output).not.toContain(":command-end");
+    expect(toolDetails.outputDeferred).toMatchObject({ kind: "tool_output", size: commandOutput.length });
+    expect(screenshotBlock).not.toHaveProperty("base64");
+    expect(screenshotBlock.deferred).toMatchObject({ kind: "screenshot", size: screenshot.length });
+    expect(artifactBlock.content).not.toContain(":artifact-end");
+    expect(artifactBlock.deferred).toMatchObject({ kind: "artifact", size: artifact.length });
+    expect(JSON.stringify(listData)).not.toContain(":command-end");
+    expect(JSON.stringify(listData)).not.toContain(":screenshot-end");
+    expect(JSON.stringify(listData)).not.toContain(":artifact-end");
+
+    for (const [deferred, expected] of [
+      [toolDetails.outputDeferred, commandOutput],
+      [screenshotBlock.deferred, screenshot],
+      [artifactBlock.deferred, artifact],
+    ]) {
+      const detailRes = await app.request(
+        `/api/sessions/content/${encodeURIComponent(deferred.id)}?path=${encodeURIComponent(sessionPath)}`,
+      );
+      expect(detailRes.status).toBe(200);
+      expect((await detailRes.json()).content).toBe(expected);
+    }
+  });
+
+  it("defers legacy unreferenced inline image base64", async () => {
+    const { createSessionsRoute } = await import("../server/routes/sessions.ts");
+    const msgUtils = await import("../core/message-utils.ts");
+    const app = new Hono();
+    const sessionPath = "/tmp/agents/hana/sessions/inline-image.jsonl";
+    const imageData = `inline-start:${"i".repeat(12_000)}:inline-end`;
+    const sourceMessages = [{ id: "user-image", role: "user", content: "image" }];
+
+    vi.mocked(msgUtils.loadSessionHistoryMessages).mockResolvedValue(sourceMessages as never);
+    vi.mocked(msgUtils.extractTextContent).mockReturnValue({
+      text: "image",
+      images: [{ data: imageData, mimeType: "image/png" }],
+      thinking: "",
+      toolUses: [],
+    });
+    vi.mocked(msgUtils.filterUnreferencedInlineImages).mockImplementation((_text, images) => images || []);
+
+    app.route("/api", createSessionsRoute({
+      agentsDir: "/tmp/agents",
+      currentSessionPath: sessionPath,
+      deferredResults: null,
+    }));
+
+    const listRes = await app.request(`/api/sessions/messages?path=${encodeURIComponent(sessionPath)}`);
+    const listData = await listRes.json();
+    const image = listData.messages[0].images[0];
+
+    expect(image).not.toHaveProperty("data");
+    expect(image.deferred).toMatchObject({ kind: "inline_image", size: imageData.length });
+    expect(JSON.stringify(listData)).not.toContain(":inline-end");
+
+    const detailRes = await app.request(
+      `/api/sessions/content/${encodeURIComponent(image.deferred.id)}?path=${encodeURIComponent(sessionPath)}`,
+    );
+    await expect(detailRes.json()).resolves.toMatchObject({
+      id: image.deferred.id,
+      kind: "inline_image",
+      content: imageData,
+      mimeType: "image/png",
+    });
+  });
+
+  it("fails closed for malformed or stale historical content ids", async () => {
+    const { createSessionsRoute } = await import("../server/routes/sessions.ts");
+    const msgUtils = await import("../core/message-utils.ts");
+    const app = new Hono();
+    const sessionPath = "/tmp/agents/hana/sessions/stale-heavy.jsonl";
+    const thinking = `thinking-start:${"想".repeat(9_000)}:thinking-end`;
+    const sourceMessages = [{
+      id: "assistant-original",
+      role: "assistant",
+      content: [{ type: "thinking", thinking }],
+    }];
+
+    vi.mocked(msgUtils.loadSessionHistoryMessages).mockResolvedValue(sourceMessages as never);
+    vi.mocked(msgUtils.extractTextContent).mockReturnValue({
+      text: "",
+      images: [],
+      thinking,
+      toolUses: [],
+    });
+    vi.mocked(msgUtils.contentHasThinkingBlock).mockReturnValue(true);
+
+    app.route("/api", createSessionsRoute({
+      agentsDir: "/tmp/agents",
+      currentSessionPath: sessionPath,
+      deferredResults: null,
+    }));
+
+    const malformed = await app.request(
+      `/api/sessions/content/not-a-valid-id?path=${encodeURIComponent(sessionPath)}`,
+    );
+    expect(malformed.status).toBe(404);
+
+    const list = await app.request(`/api/sessions/messages?path=${encodeURIComponent(sessionPath)}`);
+    const descriptor = (await list.json()).messages[0].assistantSegments[0].deferred;
+    sourceMessages[0].id = "assistant-rewritten";
+
+    const stale = await app.request(
+      `/api/sessions/content/${encodeURIComponent(descriptor.id)}?path=${encodeURIComponent(sessionPath)}`,
+    );
+    expect(stale.status).toBe(404);
+  });
 });

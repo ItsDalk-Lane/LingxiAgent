@@ -22,6 +22,14 @@ export interface ToolCall {
   details?: { card?: import('../types').PluginCardDetails; [key: string]: unknown };
 }
 
+export interface DeferredHistoryContent {
+  id: string;
+  kind: 'assistant_segment' | 'tool_output' | 'skill_content' | 'screenshot' | 'artifact' | 'inline_image';
+  size: number;
+  preview?: string;
+  available: true;
+}
+
 // ── 用户附件 ──
 
 export interface UserAttachment {
@@ -31,6 +39,7 @@ export interface UserAttachment {
   isDir: boolean;
   base64Data?: string;
   mimeType?: string;
+  deferred?: DeferredHistoryContent;
   presentation?: 'attachment' | 'voice-input' | string;
   listed?: boolean;
   status?: 'available' | 'expired' | string;
@@ -253,13 +262,13 @@ export interface SuggestionCardBlock {
 
 // 物种 A：文本装饰器（流式组装，upsert 到 blocks 数组）
 export type TextDecorator = ContentBlockSemantics & (
-  | { type: 'thinking'; content: string; sealed: boolean }
+  | { type: 'thinking'; content: string; sealed: boolean; deferred?: DeferredHistoryContent }
   | { type: 'mood'; yuan: string; text: string }
   | { type: 'tool_group'; tools: ToolCall[]; collapsed: boolean }
   // COMPAT(v0.128, remove no earlier than v0.133): 旧会话可能只有 html；新块必须写 source。
   | (
-    | { type: 'text'; source: string; html?: string }
-    | { type: 'text'; source?: undefined; html: string }
+    | { type: 'text'; source: string; html?: string; deferred?: DeferredHistoryContent }
+    | { type: 'text'; source?: undefined; html: string; deferred?: DeferredHistoryContent }
   )
 );
 
@@ -268,8 +277,8 @@ export type RichBlock = ContentBlockSemantics & (
   | { type: 'file'; fileId?: string; filePath: string; label: string; ext: string; mime?: string; kind?: string; storageKind?: string; presentation?: 'attachment' | 'voice-input' | string; listed?: boolean; status?: 'available' | 'expired' | string; missingAt?: number | null; resource?: ResourceEnvelope; mtimeMs?: number; size?: number | null; version?: FileVersion | null; waveform?: AudioWaveform; replacesTaskId?: string }
   | { type: 'media_generation'; taskId: string; kind: 'image' | 'video' | string; status: 'pending' | 'failed' | 'aborted' | string; prompt?: string; batchId?: string; reason?: string }
   // COMPAT(create_artifact, remove no earlier than v0.133 after legacy sessions are migrated)
-  | { type: 'artifact'; artifactId: string; artifactType: string; title: string; content: string; language?: string | null; fileId?: string; filePath?: string; label?: string; ext?: string; mime?: string; kind?: string; storageKind?: string; presentation?: 'attachment' | 'voice-input' | string; listed?: boolean; status?: 'available' | 'expired' | string; missingAt?: number | null; resource?: ResourceEnvelope; mtimeMs?: number; size?: number | null; version?: FileVersion | null }
-  | { type: 'screenshot'; base64: string; mimeType: string }
+  | { type: 'artifact'; artifactId: string; artifactType: string; title: string; content: string; deferred?: DeferredHistoryContent; language?: string | null; fileId?: string; filePath?: string; label?: string; ext?: string; mime?: string; kind?: string; storageKind?: string; presentation?: 'attachment' | 'voice-input' | string; listed?: boolean; status?: 'available' | 'expired' | string; missingAt?: number | null; resource?: ResourceEnvelope; mtimeMs?: number; size?: number | null; version?: FileVersion | null }
+  | { type: 'screenshot'; base64?: string; mimeType: string; deferred?: DeferredHistoryContent }
   | { type: 'skill'; skillName: string; skillFilePath: string; fileId?: string; installedFile?: Record<string, unknown>; installedSkillSource?: Record<string, unknown> }
   | { type: 'cron_confirm'; confirmId?: string; jobData: Record<string, unknown>; status: 'pending' | 'approved' | 'rejected' }
   | SuggestionCardBlock

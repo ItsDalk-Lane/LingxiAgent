@@ -1,4 +1,4 @@
-import type { AssistantTurnProjection, ContentBlock } from './chat-types';
+import type { AssistantTurnProjection, ContentBlock, DeferredHistoryContent } from './chat-types';
 
 export type LiveAssistantSegmentPhase = 'reasoning' | 'commentary' | 'final_answer' | 'unresolved';
 
@@ -7,6 +7,7 @@ export interface LiveAssistantSegment {
   kind: 'text' | 'reasoning';
   semanticPhase: LiveAssistantSegmentPhase;
   source: string;
+  deferred?: DeferredHistoryContent;
   lifecycle: 'streaming' | 'sealed';
 }
 

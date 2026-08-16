@@ -88,6 +88,11 @@ import { MountAwareFileError, MountAwareFileService } from "../../core/mount-awa
 import { isAssistantCommentaryTextBlock } from "../../shared/text-signature.ts";
 import { collectToolOutcomesByCallId } from "../../shared/tool-outcome.ts";
 import { extractPersistedAssistantSemanticSegments } from "../../shared/assistant-semantic-segments.ts";
+import {
+  createHistoryDeferredContent,
+  resolveHistoryDeferredContent,
+  shouldDeferHistoryContent,
+} from "../history-deferred-content.ts";
 
 const log = createModuleLogger("sessions");
 const lifecycleLog = createModuleLogger("sessions/lifecycle");
@@ -246,6 +251,40 @@ function hasAssistantSemanticTextContent(content) {
 function hasToolUseContent(content) {
   if (!Array.isArray(content)) return false;
   return content.some(block => (block?.type === "tool_use" || block?.type === "toolCall") && !!block.name);
+}
+
+function soleRawToolResultText(message) {
+  if (!Array.isArray(message?.content) || message.content.length !== 1) return null;
+  const block = message.content[0];
+  return block?.type === "text" && typeof block.text === "string" ? block.text : null;
+}
+
+function deferHeavyHistoryBlock(sourceMessages, sourceIndex, ordinal, block) {
+  if (block.type === "screenshot" && shouldDeferHistoryContent(block.base64)) {
+    const { base64, ...rest } = block;
+    return {
+      ...rest,
+      deferred: createHistoryDeferredContent(
+        sourceMessages,
+        sourceIndex,
+        "screenshot",
+        ordinal,
+        base64,
+        { preview: false },
+      ),
+    };
+  }
+  if (block.type === "artifact" && shouldDeferHistoryContent(block.content)) {
+    const deferred = createHistoryDeferredContent(
+      sourceMessages,
+      sourceIndex,
+      "artifact",
+      ordinal,
+      block.content,
+    );
+    return { ...block, content: deferred.preview || "", deferred };
+  }
+  return block;
 }
 
 function isDisplayableHistoryMessage(message) {
@@ -1282,6 +1321,45 @@ export function createSessionsRoute(engine, hub = null) {
     }
   });
 
+  // 历史重内容只在用户真正展开时读取。凭证只定位当前会话中的原始条目，
+  // 仍需经过与消息列表相同的路径校验和读取授权，不能把它当成文件路径使用。
+  route.get("/sessions/content/:contentId", async (c) => {
+    try {
+      const requestContext = createRequestContext(c, engine);
+      const querySessionId = c.req.query("sessionId") || null;
+      let queryPath = c.req.query("path") || null;
+      if (typeof querySessionId === "string" && querySessionId.trim()) {
+        const manifest = engine.getSessionManifest?.(querySessionId.trim()) || null;
+        if (!manifest?.currentLocator?.path) {
+          return c.json({ error: "Session manifest not found", code: "session_manifest_not_found" }, 404);
+        }
+        queryPath = manifest.currentLocator.path;
+      }
+      if (queryPath && !isValidSessionPath(queryPath, engine.agentsDir)) {
+        return c.json({ error: "Invalid session path" }, 403);
+      }
+      const resolvedSessionPath = queryPath || engine.currentSessionPath || null;
+      const auth = authorizeSessionRoute(requestContext, "sessions.read", {
+        kind: "session",
+        studioId: requestContext.studioId,
+        sessionPath: resolvedSessionPath,
+      });
+      if (!auth.allowed) return c.json({ error: "insufficient_scope", reason: auth.reason }, 403);
+      if (!resolvedSessionPath) return c.json({ error: "Session not found" }, 404);
+
+      const sourceMessages = await loadSessionHistoryMessages(engine, resolvedSessionPath);
+      const resolved = resolveHistoryDeferredContent(
+        sourceMessages,
+        c.req.param("contentId"),
+      );
+      return resolved
+        ? c.json(resolved)
+        : c.json({ error: "Historical content not found" }, 404);
+    } catch (err) {
+      return c.json({ error: err.message }, 500);
+    }
+  });
+
   // 获取 session 的消息（支持 ?path= 指定 session，否则读焦点 session）
   route.get("/sessions/messages", async (c) => {
     try {
@@ -1403,6 +1481,16 @@ export function createSessionsRoute(engine, hub = null) {
       // suggestion_card block 的 status，让重开 session 不再回弹 pending。
       const sessionCollabDecisions = collectSessionCollabDecisions(sourceMessages);
       const toolOutcomesByCallId = collectToolOutcomesByCallId(sourceMessages);
+      const toolResultSourceIndexByCallId = new Map<string, number>();
+      for (let sourceIndex = 0; sourceIndex < sourceMessages.length; sourceIndex += 1) {
+        const message = sourceMessages[sourceIndex];
+        const toolCallId = typeof message?.toolCallId === "string" && message.toolCallId.trim()
+          ? message.toolCallId.trim()
+          : null;
+        if (message?.role === "toolResult" && toolCallId) {
+          toolResultSourceIndexByCallId.set(toolCallId, sourceIndex);
+        }
+      }
       let projectedDisplayIndex = 0;
       for (let sourceIndex = 0; sourceIndex < sourceMessages.length; sourceIndex += 1) {
         const message = sourceMessages[sourceIndex];
@@ -1560,7 +1648,21 @@ export function createSessionsRoute(engine, hub = null) {
           displayIdx += 1;
           if (currentIndex >= pageBounds.startIdx && currentIndex < pageBounds.endIdx) {
             const { text, images } = extractTextContent(m.content);
-            const visibleImages = filterUnreferencedInlineImages(text, images);
+            const visibleImages = filterUnreferencedInlineImages(text, images).map((image, ordinal) => {
+              if (!shouldDeferHistoryContent(image?.data)) return image;
+              const { data, ...rest } = image;
+              return {
+                ...rest,
+                deferred: createHistoryDeferredContent(
+                  sourceMessages,
+                  sourceIndex,
+                  "inline_image",
+                  ordinal,
+                  data,
+                  { preview: false },
+                ),
+              };
+            });
             const content = sanitizeVisibleContent(text);
             const originInfo = originBySourceIndex.get(sourceIndex);
             const agentReview = agentReviewBySourceIndex.get(sourceIndex);
@@ -1597,10 +1699,21 @@ export function createSessionsRoute(engine, hub = null) {
           displayIdx += 1;
           if (currentIndex >= pageBounds.startIdx && currentIndex < pageBounds.endIdx) {
             const { text, thinking, toolUses } = extractTextContent(m.content, { stripThink: true });
-            const assistantSegments = extractPersistedAssistantSemanticSegments(
+            const extractedAssistantSegments = extractPersistedAssistantSemanticSegments(
               m.content,
               assistantOrdinalInTurn,
             );
+            const assistantSegments = extractedAssistantSegments.map((segment, ordinal) => {
+              if (segment.kind !== "reasoning" || !shouldDeferHistoryContent(segment.source)) return segment;
+              const deferred = createHistoryDeferredContent(
+                sourceMessages,
+                sourceIndex,
+                "assistant_segment",
+                ordinal,
+                segment.source,
+              );
+              return { ...segment, source: deferred.preview || "", deferred };
+            });
             const turnStatus = m.stopReason === "error"
               ? "failed"
               : m.stopReason === "aborted"
@@ -1609,11 +1722,46 @@ export function createSessionsRoute(engine, hub = null) {
             const content = sanitizeVisibleContent(text);
             const projectedToolUses = toolUses.map((toolUse) => {
               const outcome = toolUse.id ? toolOutcomesByCallId.get(toolUse.id) : null;
+              const outcomeSourceIndex = toolUse.id
+                ? toolResultSourceIndexByCallId.get(toolUse.id)
+                : undefined;
+              let projectedOutcome = outcome;
+              if (outcome?.details && Number.isInteger(outcomeSourceIndex)) {
+                const details = { ...outcome.details };
+                const rawResultContent = soleRawToolResultText(sourceMessages[outcomeSourceIndex]);
+                if (details.output !== undefined && shouldDeferHistoryContent(rawResultContent)) {
+                  const deferred = createHistoryDeferredContent(
+                    sourceMessages,
+                    outcomeSourceIndex,
+                    "tool_output",
+                    0,
+                    rawResultContent,
+                  );
+                  details.output = deferred.preview;
+                  details.outputDeferred = deferred;
+                }
+                if (details.skillInvocation && shouldDeferHistoryContent(rawResultContent)) {
+                  const deferred = createHistoryDeferredContent(
+                    sourceMessages,
+                    outcomeSourceIndex,
+                    "skill_content",
+                    0,
+                    rawResultContent,
+                  );
+                  details.skillInvocation = {
+                    ...details.skillInvocation,
+                    content: deferred.preview || "",
+                    deferred,
+                  };
+                }
+                projectedOutcome = { ...outcome, details };
+              }
               return {
                 ...toolUse,
-                ...(outcome || { status: "unknown", success: false }),
+                ...(projectedOutcome || { status: "unknown", success: false }),
               };
             });
+            const deferredThinking = assistantSegments.find((segment) => segment.kind === "reasoning")?.source;
             messages.push({
               id: String(currentIndex),
               sourceIndex,
@@ -1627,7 +1775,9 @@ export function createSessionsRoute(engine, hub = null) {
                 // 隐藏输入轮次（如 loop 轮）entryId 被刻意置 null，但仍要显式下发
                 // turnInputVisible:false，否则前端技能卡「参数」会回退猜成前一条可见用户消息。
                 : (turnInputVisible === false ? { turnInputVisible: false } : {})),
-              ...(contentHasThinkingBlock(m.content, { stripThink: true }) ? { thinking } : {}),
+              ...(contentHasThinkingBlock(m.content, { stripThink: true })
+                ? { thinking: deferredThinking ?? thinking }
+                : {}),
               toolCalls: projectedToolUses.length ? projectedToolUses : undefined,
               ...(m.timestamp ? { timestamp: m.timestamp } : {}),
             });
@@ -1636,9 +1786,14 @@ export function createSessionsRoute(engine, hub = null) {
           const afterIndex = displayIdx - 1;
           if (afterIndex >= pageBounds.startIdx && afterIndex < pageBounds.endIdx) {
             const extracted = extractBlocks(m.toolName, m.details, m);
-            for (const b of extracted) {
+            for (let ordinal = 0; ordinal < extracted.length; ordinal += 1) {
+              const b = extracted[ordinal];
               const overlaid = overlaySessionCollabDecision(b, sessionCollabDecisions);
-              blocks.push({ ...overlaid, afterIndex, sourceIndex });
+              blocks.push({
+                ...deferHeavyHistoryBlock(sourceMessages, sourceIndex, ordinal, overlaid),
+                afterIndex,
+                sourceIndex,
+              });
             }
           }
         } else if (m.role === "custom") {
@@ -1650,8 +1805,13 @@ export function createSessionsRoute(engine, hub = null) {
           const afterIndex = displayIdx - 1;
           if (m.display !== false && afterIndex >= pageBounds.startIdx && afterIndex < pageBounds.endIdx) {
             const extracted = extractBlocks(m.customType, m.details, m);
-            for (const b of extracted) {
-              blocks.push({ ...b, afterIndex, sourceIndex });
+            for (let ordinal = 0; ordinal < extracted.length; ordinal += 1) {
+              const b = extracted[ordinal];
+              blocks.push({
+                ...deferHeavyHistoryBlock(sourceMessages, sourceIndex, ordinal, b),
+                afterIndex,
+                sourceIndex,
+              });
             }
           }
           const parsed = parseHistoryDeferredResult(m);

@@ -55,6 +55,10 @@ import {
   readLiveAssistantMessage,
   subscribeLiveAssistantMessage,
 } from '../../stores/live-turn-store';
+import {
+  asDeferredHistoryContent,
+  useDeferredHistoryContent,
+} from '../../hooks/use-deferred-history-content';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -281,7 +285,7 @@ const ContentBlockView = memo(function ContentBlockView({ block, agentName, agen
 }) {
   switch (block.type) {
     case 'thinking':
-      return <ThinkingBlock content={block.content} sealed={block.sealed} />;
+      return <ThinkingBlock content={block.content} sealed={block.sealed} sessionPath={sessionPath} deferred={block.deferred} />;
     case 'mood':
       return <MoodBlock yuan={block.yuan} text={block.text} />;
     case 'tool_group':
@@ -291,6 +295,7 @@ const ContentBlockView = memo(function ContentBlockView({ block, agentName, agen
           collapsed={block.collapsed}
           agentName={agentName}
           skillPrompt={skillPrompt}
+          sessionPath={sessionPath}
         />
       );
     case 'text':
@@ -749,13 +754,16 @@ const FileBlock = memo(function FileBlock({ block, sessionPath, messageId, block
 // Old sessions may still contain `artifact` content blocks. New preview
 // surface consumes them as PreviewItem records.
 
-const LegacyArtifactBlock = memo(function LegacyArtifactBlock({ block }: { block: any }) {
-  const handleClick = () => {
+const LegacyArtifactBlock = memo(function LegacyArtifactBlock({ block, sessionPath = '' }: { block: any; sessionPath?: string }) {
+  const [requested, setRequested] = useState(false);
+  const deferred = asDeferredHistoryContent(block.deferred);
+  const loaded = useDeferredHistoryContent(sessionPath, deferred, requested && !!sessionPath);
+  const openArtifact = useCallback((content: string) => {
     const previewItem = {
       id: block.artifactId,
       type: block.artifactType,
       title: block.title,
-      content: block.content,
+      content,
       language: block.language,
       fileId: block.fileId,
       filePath: block.filePath,
@@ -767,7 +775,23 @@ const LegacyArtifactBlock = memo(function LegacyArtifactBlock({ block }: { block
       missingAt: block.missingAt,
     };
     openPreview(previewItem);
+  }, [block]);
+  const handleClick = () => {
+    if (deferred && !loaded.data) {
+      setRequested(true);
+      return;
+    }
+    openArtifact(loaded.data?.content || block.content);
   };
+  useEffect(() => {
+    if (!requested) return;
+    if (loaded.data) {
+      openArtifact(loaded.data.content);
+      setRequested(false);
+    } else if (loaded.error) {
+      setRequested(false);
+    }
+  }, [loaded.data, loaded.error, openArtifact, requested]);
   const expired = block.status === 'expired';
 
   return (
@@ -796,8 +820,13 @@ const ScreenshotBlock = memo(function ScreenshotBlock({ block, sessionPath, mess
   messageId: string;
   blockIdx: number;
 }) {
+  const [requested, setRequested] = useState(false);
+  const deferred = asDeferredHistoryContent(block.deferred);
+  const loaded = useDeferredHistoryContent(sessionPath, deferred, requested);
+  const base64 = loaded.data?.content || block.base64 || '';
+  const mimeType = loaded.data?.mimeType || block.mimeType || 'image/jpeg';
   // screenshot 无 path 但 id 由 buildFileRefId 生成，与 selectSessionFiles 一致，能命中 session 图片序列
-  const handleClick = () => {
+  const openScreenshot = useCallback((content: string, mime: string) => {
     const id = buildFileRefId({
       source: 'session-block-screenshot',
       sessionPath,
@@ -811,16 +840,43 @@ const ScreenshotBlock = memo(function ScreenshotBlock({ block, sessionPath, mess
       source: 'session-block-screenshot',
       name: `screenshot-${messageId}-${blockIdx}.png`,
       path: '',
-      mime: block.mimeType,
+      mime,
       sessionMessageId: messageId,
-      inlineData: { base64: block.base64, mimeType: block.mimeType },
+      inlineData: { base64: content, mimeType: mime },
     }, { origin: 'session', sessionPath });
+  }, [blockIdx, messageId, sessionPath]);
+  const handleClick = () => {
+    if (!base64 && deferred) {
+      setRequested(true);
+      return;
+    }
+    if (base64) openScreenshot(base64, mimeType);
   };
+  useEffect(() => {
+    if (!requested) return;
+    if (loaded.data) {
+      openScreenshot(loaded.data.content, loaded.data.mimeType || mimeType);
+      setRequested(false);
+    } else if (loaded.error) {
+      setRequested(false);
+    }
+  }, [loaded.data, loaded.error, mimeType, openScreenshot, requested]);
+
+  if (!base64) {
+    return (
+      <ChatResourceCard
+        icon={<span aria-hidden="true">▧</span>}
+        title={window.t('chat.browserScreenshot')}
+        onClick={handleClick}
+        ariaLabel={window.t('chat.browserScreenshot')}
+      />
+    );
+  }
 
   return (
     <div className={styles.browserScreenshot} onClick={handleClick} style={{ cursor: 'default' }}>
       <img
-        src={`data:${block.mimeType};base64,${block.base64}`}
+        src={`data:${mimeType};base64,${base64}`}
         alt={window.t('chat.browserScreenshot')}
       />
     </div>
