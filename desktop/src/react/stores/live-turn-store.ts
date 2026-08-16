@@ -1,4 +1,4 @@
-import type { ContentBlock } from './chat-types';
+import type { AssistantTurnProjection, ContentBlock } from './chat-types';
 
 export type LiveAssistantSegmentPhase = 'reasoning' | 'commentary' | 'final_answer' | 'unresolved';
 
@@ -16,6 +16,7 @@ export interface LiveAssistantMessageSnapshot {
   segmentsById: Readonly<Record<string, LiveAssistantSegment>>;
   segmentOrder: readonly string[];
   status: 'streaming' | 'sealed';
+  turnProjection?: AssistantTurnProjection;
   revision: number;
 }
 
@@ -55,6 +56,7 @@ export function publishLiveAssistantMessage(
     segmentsById?: Readonly<Record<string, LiveAssistantSegment>>;
     segmentOrder?: readonly string[];
     status?: 'streaming' | 'sealed';
+    turnProjection?: AssistantTurnProjection;
   } = {},
 ): LiveAssistantMessageSnapshot {
   const key = snapshotKey(sessionPath, messageId);
@@ -66,6 +68,9 @@ export function publishLiveAssistantMessage(
     segmentsById: semanticState.segmentsById || previous?.segmentsById || {},
     segmentOrder: semanticState.segmentOrder || previous?.segmentOrder || [],
     status: semanticState.status || previous?.status || 'streaming',
+    ...(semanticState.turnProjection || previous?.turnProjection
+      ? { turnProjection: semanticState.turnProjection || previous?.turnProjection }
+      : {}),
     revision: (previous?.revision || 0) + 1,
   };
   if (legacyKey !== key) snapshots.delete(legacyKey);

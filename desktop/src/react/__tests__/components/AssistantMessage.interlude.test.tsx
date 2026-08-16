@@ -78,6 +78,34 @@ describe('AssistantMessage interlude-only rendering', () => {
     expect(container.querySelector('[data-testid="assistant-completion-actions"]')).toBeNull();
   });
 
+  it('没有最终答复时显示明确状态，而不是空白消息', () => {
+    window.t = ((key: string) => ({
+      'chat.turnStatus.missingFinalAnswer': '未生成最终回复',
+    })[key] || key) as typeof window.t;
+    render(
+      <AssistantMessage
+        agentDisplay={{ id: 'hana', displayName: 'Hana', avatarUrl: null, fallbackAvatar: null, yuan: 'hana', isUser: false }}
+        isStreaming={false}
+        isSelected={false}
+        showAvatar={false}
+        sessionPath="/sessions/main.jsonl"
+        message={{
+          id: 'assistant-no-answer',
+          role: 'assistant',
+          blocks: [{
+            type: 'turn_status',
+            status: 'missing_final_answer',
+            id: 'assistant-no-answer:turn-status',
+            surfaceRole: 'result',
+            lifecycle: 'sealed',
+          }],
+        }}
+      />,
+    );
+
+    expect(screen.getByText('未生成最终回复')).toBeInTheDocument();
+  });
+
   it('实时内容只重渲染所属助手消息，不带动无关消息', () => {
     const sessionPath = '/sessions/live-overlay.jsonl';
     const agentDisplay = {

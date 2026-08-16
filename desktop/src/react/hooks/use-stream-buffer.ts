@@ -29,7 +29,9 @@ import {
 import { recordChatPerformance } from '../utils/chat-performance';
 import {
   normalizeContentBlocks,
+  rebaseGeneratedContentBlockIds,
 } from '../utils/content-semantics';
+import { projectAssistantTurn } from '../utils/turn-projector';
 
 /* eslint-disable @typescript-eslint/no-explicit-any -- 流式消息 handle(msg) 接收动态 JSON */
 
@@ -278,6 +280,8 @@ class StreamBufferManager {
     turnInputEntryId?: string | null;
     userEntryId?: string | null;
     assistantEntryId?: string | null;
+    assistantEntryIds?: string[];
+    status?: 'completed' | 'failed' | 'aborted';
   } = {}): void {
     if (this.hasTurnState(buf)) {
       buf.turnEnding = true;
@@ -342,10 +346,31 @@ class StreamBufferManager {
 
   private publishLiveTurn(buf: Buffer): void {
     if (!buf.messageId) return;
-    publishLiveAssistantMessage(buf.sessionPath, buf.messageId, buf.blocks, {
+    const store = useStore.getState();
+    const session = sessionScopedValue(store, store.chatSessions, buf.sessionPath);
+    const item = session?.items.find((entry) => (
+      entry.type === 'message'
+      && entry.data.role === 'assistant'
+      && entry.data.id === buf.messageId
+    ));
+    const message = item?.type === 'message' ? item.data : null;
+    const idPrefix = message?.sourceEntryId || message?.id || buf.messageId;
+    const segments = buf.segmentOrder
+      .map((segmentId) => buf.segmentsById.get(segmentId))
+      .filter((segment): segment is LiveAssistantSegment => !!segment);
+    const projected = projectAssistantTurn({
+      idPrefix,
+      inputMessageId: message?.turnInputEntryId || null,
+      assistantMessageIds: [message?.sourceEntryId || message?.id || buf.messageId],
+      segments,
+      legacyBlocks: buf.blocks,
+      status: 'streaming',
+    });
+    publishLiveAssistantMessage(buf.sessionPath, buf.messageId, projected.blocks, {
       segmentsById: Object.fromEntries(buf.segmentsById),
       segmentOrder: [...buf.segmentOrder],
       status: buf.turnEnding ? 'sealed' : 'streaming',
+      turnProjection: projected.projection,
     });
   }
 
@@ -403,12 +428,44 @@ class StreamBufferManager {
     turnInputEntryId?: string | null;
     userEntryId?: string | null;
     assistantEntryId?: string | null;
+    assistantEntryIds?: string[];
+    status?: 'completed' | 'failed' | 'aborted';
   }): void {
     if (!buf.messageId) return;
+    const store = useStore.getState();
+    const session = sessionScopedValue(store, store.chatSessions, buf.sessionPath);
+    const item = session?.items.find((entry) => (
+      entry.type === 'message'
+      && entry.data.role === 'assistant'
+      && entry.data.id === buf.messageId
+    ));
+    const message = item?.type === 'message' ? item.data : null;
+    const assistantId = persistedEntries.assistantEntryId || message?.sourceEntryId || buf.messageId;
+    const segments = buf.segmentOrder
+      .map((segmentId) => buf.segmentsById.get(segmentId))
+      .filter((segment): segment is LiveAssistantSegment => !!segment);
+    const legacyBlocks = message && assistantId !== message.id
+      ? rebaseGeneratedContentBlockIds(buf.blocks, message.id, assistantId)
+      : buf.blocks;
+    const projected = projectAssistantTurn({
+      idPrefix: assistantId,
+      inputMessageId: persistedEntries.turnInputEntryId || message?.turnInputEntryId || null,
+      assistantMessageIds: persistedEntries.assistantEntryIds?.length
+        ? persistedEntries.assistantEntryIds
+        : [assistantId],
+      segments,
+      legacyBlocks,
+      status: persistedEntries.status || 'completed',
+    });
+    for (const diagnostic of projected.diagnostics) {
+      console.warn('[stream] unresolved assistant segment finalized with fallback:', diagnostic.segmentId);
+    }
+    buf.blocks = projected.blocks;
     const committed = useStore.getState().bindPersistedTurnEntries(buf.sessionPath, {
       ...persistedEntries,
       assistantMessageId: buf.messageId,
-      assistantBlocks: buf.blocks,
+      assistantBlocks: projected.blocks,
+      assistantProjection: projected.projection,
     });
     clearLiveAssistantMessage(buf.sessionPath, buf.messageId);
     if (!committed) {
@@ -614,7 +671,7 @@ class StreamBufferManager {
                 success: !!msg.success,
                 status: msg.status || (msg.success ? 'succeeded' : 'failed'),
                 ...(typeof msg.error === 'string' && msg.error ? { error: msg.error } : {}),
-                details: msg.details,
+                ...(msg.details !== undefined ? { details: msg.details } : {}),
               };
               const allDone = tools.every(t => t.done);
               blocks[i] = { ...tg, tools, collapsed: allDone && tools.length > 1 };
@@ -669,10 +726,15 @@ class StreamBufferManager {
         break;
 
       case 'turn_end':
+        if ((msg.aborted || msg.failed) && !this.hasTurnState(buf)) {
+          this.ensureMessage(buf);
+        }
         this.finishBufferTurn(buf, {
           turnInputEntryId: msg.turnInputEntryId,
           userEntryId: msg.userEntryId,
           assistantEntryId: msg.assistantEntryId,
+          assistantEntryIds: Array.isArray(msg.assistantEntryIds) ? msg.assistantEntryIds : undefined,
+          status: msg.aborted ? 'aborted' : msg.failed ? 'failed' : 'completed',
         });
         break;
 

@@ -2903,6 +2903,13 @@ describe("sessions route", () => {
         sourceIndex: 1,
         role: "assistant",
         content: "hi back",
+        assistantSegments: [{
+          id: "assistant:1:text:default",
+          kind: "text",
+          semanticPhase: "final_answer",
+          source: "hi back",
+          lifecycle: "sealed",
+        }],
         timestamp: "2026-05-07T05:43:00.000Z",
       },
     ]);
@@ -3083,11 +3090,18 @@ describe("sessions route", () => {
       sourceIndex: 0,
       role: "assistant",
       content: "",
+      assistantSegments: [{
+        id: "assistant:1:reasoning:default",
+        kind: "reasoning",
+        semanticPhase: "reasoning",
+        source: "",
+        lifecycle: "sealed",
+      }],
       thinking: "",
     }]);
   });
 
-  it("does not return OpenAI commentary-only history messages as visible text", async () => {
+  it("preserves OpenAI commentary-only history as process semantics without exposing an answer", async () => {
     const { createSessionsRoute } = await import("../server/routes/sessions.ts");
     const msgUtils = await import("../core/message-utils.ts");
     const app = new Hono();
@@ -3120,8 +3134,99 @@ describe("sessions route", () => {
     const data = await res.json();
 
     expect(res.status).toBe(200);
-    expect(data.messages).toEqual([]);
-    expect(msgUtils.extractTextContent).not.toHaveBeenCalled();
+    expect(data.messages).toEqual([{
+      id: "0",
+      sourceIndex: 0,
+      role: "assistant",
+      content: "",
+      assistantSegments: [{
+        id: "assistant:1:text:0",
+        kind: "text",
+        semanticPhase: "commentary",
+        source: "I need to inspect the current state.",
+        lifecycle: "sealed",
+      }],
+    }]);
+    expect(msgUtils.extractTextContent).toHaveBeenCalledOnce();
+  });
+
+  it("numbers persisted assistant segments across one tool loop exactly like the live normalizer", async () => {
+    const { createSessionsRoute } = await import("../server/routes/sessions.ts");
+    const msgUtils = await import("../core/message-utils.ts");
+    const app = new Hono();
+    const commentary = [{
+      type: "text",
+      text: "先检查",
+      textSignature: JSON.stringify({ v: 1, id: "commentary", phase: "commentary" }),
+    }];
+    const answer = [{ type: "text", text: "检查完成。" }];
+
+    vi.mocked(msgUtils.extractTextContent)
+      .mockReturnValueOnce({ text: "问题", images: [], thinking: "", toolUses: [] })
+      .mockReturnValueOnce({ text: "", images: [], thinking: "", toolUses: [] })
+      .mockReturnValueOnce({ text: "检查完成。", images: [], thinking: "", toolUses: [] });
+    vi.mocked(msgUtils.contentHasThinkingBlock).mockReturnValue(false);
+    vi.mocked(msgUtils.loadSessionHistoryMessages).mockResolvedValueOnce([
+      { id: "entry-user-1", role: "user", content: "问题" },
+      { id: "entry-assistant-1", role: "assistant", content: commentary },
+      { id: "entry-assistant-2", role: "assistant", content: answer },
+    ]);
+
+    app.route("/api", createSessionsRoute({ agentsDir: "/tmp/agents", deferredResults: null }));
+    const res = await app.request("/api/sessions/messages");
+    const data = await res.json();
+
+    expect(res.status).toBe(200);
+    expect(data.messages.slice(1).map((message) => ({
+      entryId: message.entryId,
+      turnInputEntryId: message.turnInputEntryId,
+      segmentIds: message.assistantSegments.map((segment) => segment.id),
+    }))).toEqual([
+      {
+        entryId: "entry-assistant-1",
+        turnInputEntryId: "entry-user-1",
+        segmentIds: ["assistant:1:text:0"],
+      },
+      {
+        entryId: "entry-assistant-2",
+        turnInputEntryId: "entry-user-1",
+        segmentIds: ["assistant:2:text:0"],
+      },
+    ]);
+  });
+
+  it.each([
+    ["error", "failed"],
+    ["aborted", "aborted"],
+  ])("keeps an empty %s assistant turn as an explicit %s history status", async (stopReason, turnStatus) => {
+    const { createSessionsRoute } = await import("../server/routes/sessions.ts");
+    const msgUtils = await import("../core/message-utils.ts");
+    const app = new Hono();
+
+    vi.mocked(msgUtils.extractTextContent)
+      .mockReturnValueOnce({ text: "", images: [], thinking: "", toolUses: [] });
+    vi.mocked(msgUtils.contentHasThinkingBlock).mockReturnValue(false);
+    vi.mocked(msgUtils.loadSessionHistoryMessages).mockResolvedValueOnce([{
+      id: `entry-assistant-${turnStatus}`,
+      role: "assistant",
+      content: [],
+      stopReason,
+    }]);
+
+    app.route("/api", createSessionsRoute({ agentsDir: "/tmp/agents", deferredResults: null }));
+    const res = await app.request("/api/sessions/messages");
+    const data = await res.json();
+
+    expect(res.status).toBe(200);
+    expect(data.messages).toEqual([{
+      id: "0",
+      sourceIndex: 0,
+      entryId: `entry-assistant-${turnStatus}`,
+      role: "assistant",
+      content: "",
+      assistantSegments: [],
+      turnStatus,
+    }]);
   });
 
   it("hydrates only the requested display window for long session history", async () => {

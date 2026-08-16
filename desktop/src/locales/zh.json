@@ -318,6 +318,11 @@
       "submitting": "提交中",
       "retryLabel": "重新生成{kind}"
     },
+    "turnStatus": {
+      "missingFinalAnswer": "未生成最终回复",
+      "failed": "本轮回复失败",
+      "aborted": "本轮已停止"
+    },
     "subagentPreview": {
       "historyUnrecoverable": "历史 subagent 链接不可恢复",
       "noSession": "暂无可打开的 subagent session",

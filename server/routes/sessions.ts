@@ -87,6 +87,7 @@ import { SessionSearchTokenizerUnavailableError } from "../../lib/search/session
 import { MountAwareFileError, MountAwareFileService } from "../../core/mount-aware-file-service.ts";
 import { isAssistantCommentaryTextBlock } from "../../shared/text-signature.ts";
 import { collectToolOutcomesByCallId } from "../../shared/tool-outcome.ts";
+import { extractPersistedAssistantSemanticSegments } from "../../shared/assistant-semantic-segments.ts";
 
 const log = createModuleLogger("sessions");
 const lifecycleLog = createModuleLogger("sessions/lifecycle");
@@ -236,6 +237,12 @@ function hasTextBlockContent(content, { stripThink = false } = {}) {
   return content.some(block => block?.type === "text" && block.text && !isAssistantCommentaryTextBlock(block));
 }
 
+function hasAssistantSemanticTextContent(content) {
+  if (typeof content === "string") return stripInlineThinkText(content).length > 0;
+  if (!Array.isArray(content)) return false;
+  return content.some(block => block?.type === "text" && typeof block.text === "string" && block.text.length > 0);
+}
+
 function hasToolUseContent(content) {
   if (!Array.isArray(content)) return false;
   return content.some(block => (block?.type === "tool_use" || block?.type === "toolCall") && !!block.name);
@@ -247,7 +254,9 @@ function isDisplayableHistoryMessage(message) {
     return hasTextBlockContent(message.content) || hasInlineImageContent(message.content);
   }
   if (message.role === "assistant") {
-    return hasTextBlockContent(message.content, { stripThink: true })
+    return message.stopReason === "error"
+      || message.stopReason === "aborted"
+      || hasAssistantSemanticTextContent(message.content)
       || contentHasThinkingBlock(message.content, { stripThink: true })
       || hasToolUseContent(message.content);
   }
@@ -1534,6 +1543,7 @@ export function createSessionsRoute(engine, hub = null) {
       };
       let displayIdx = 0;
       let latestTurnInputEntryId: string | null = null;
+      let assistantOrdinalInTurn = 0;
       // 初始视为“可见”：会话尚无输入时投影不应带 turnInputVisible:false（如角色卡
       // 开场白）。只有真实出现过隐藏输入（隐藏 user 消息 / 隐藏 custom 输入 / loop
       // 协议消息置 null）时才为 false，从而对 entryId 为 null 的隐藏轮也显式下发。
@@ -1542,6 +1552,7 @@ export function createSessionsRoute(engine, hub = null) {
       for (let sourceIndex = 0; sourceIndex < sourceMessages.length; sourceIndex += 1) {
         const m = sourceMessages[sourceIndex];
         if (m.role === "user") {
+          assistantOrdinalInTurn = 0;
           latestTurnInputEntryId = typeof m.id === "string" && m.id.trim() ? m.id.trim() : null;
           latestTurnInputVisible = !isHiddenTurnInputMessage(m);
           if (!isDisplayableHistoryMessage(m)) continue;
@@ -1574,6 +1585,7 @@ export function createSessionsRoute(engine, hub = null) {
             });
           }
         } else if (m.role === "assistant") {
+          assistantOrdinalInTurn += 1;
           if (!isDisplayableHistoryMessage(m)) continue;
           const assistantEntryId = typeof m.id === "string" && m.id.trim() ? m.id.trim() : null;
           const consumedTurnInputEntryId = assistantEntryId
@@ -1585,6 +1597,15 @@ export function createSessionsRoute(engine, hub = null) {
           displayIdx += 1;
           if (currentIndex >= pageBounds.startIdx && currentIndex < pageBounds.endIdx) {
             const { text, thinking, toolUses } = extractTextContent(m.content, { stripThink: true });
+            const assistantSegments = extractPersistedAssistantSemanticSegments(
+              m.content,
+              assistantOrdinalInTurn,
+            );
+            const turnStatus = m.stopReason === "error"
+              ? "failed"
+              : m.stopReason === "aborted"
+                ? "aborted"
+                : "completed";
             const content = sanitizeVisibleContent(text);
             const projectedToolUses = toolUses.map((toolUse) => {
               const outcome = toolUse.id ? toolOutcomesByCallId.get(toolUse.id) : null;
@@ -1599,6 +1620,8 @@ export function createSessionsRoute(engine, hub = null) {
               ...(m.id ? { entryId: m.id } : {}),
               role: "assistant",
               content,
+              assistantSegments,
+              ...(turnStatus !== "completed" ? { turnStatus } : {}),
               ...(turnInputEntryId
                 ? { turnInputEntryId, turnInputVisible }
                 // 隐藏输入轮次（如 loop 轮）entryId 被刻意置 null，但仍要显式下发
@@ -1620,6 +1643,7 @@ export function createSessionsRoute(engine, hub = null) {
           }
         } else if (m.role === "custom") {
           if (isCustomTurnInputHistoryMessage(m)) {
+            assistantOrdinalInTurn = 0;
             latestTurnInputEntryId = typeof m.id === "string" && m.id.trim() ? m.id.trim() : null;
             latestTurnInputVisible = false;
           }

@@ -317,6 +317,15 @@ const ContentBlockView = memo(function ContentBlockView({ block, agentName, agen
       return <MediaGenerationBlock block={block} sessionPath={sessionPath} readOnly={readOnly} />;
     case 'interlude':
       return <InterludeBlock block={block} sessionPath={sessionPath} agentId={agentId} />;
+    case 'turn_status': {
+      const t = window.t ?? ((key: string) => key);
+      const key = block.status === 'failed'
+        ? 'chat.turnStatus.failed'
+        : block.status === 'aborted'
+          ? 'chat.turnStatus.aborted'
+          : 'chat.turnStatus.missingFinalAnswer';
+      return <div className={styles.turnStatus}>{block.label || t(key)}</div>;
+    }
     default: {
       const Renderer = BLOCK_RENDERERS[block.type];
       return Renderer ? <Renderer block={block} agentId={agentId} sessionPath={sessionPath} /> : null;

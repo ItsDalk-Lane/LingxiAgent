@@ -1756,6 +1756,13 @@
     border-style: dashed;
 }
 
+.turnStatus {
+    margin: var(--space-8) 0;
+    color: var(--text-muted);
+    font-size: var(--fs-ui);
+    line-height: 1.5;
+}
+
 .mediaGenerationSurface {
     position: relative;
     flex: 1;

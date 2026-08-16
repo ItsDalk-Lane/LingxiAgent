@@ -155,6 +155,20 @@ export interface ResourceEnvelope {
 export type AssistantSemanticPhase = 'reasoning' | 'commentary' | 'mood' | 'tool' | 'final_answer';
 export type ContentSurfaceRole = 'process' | 'answer' | 'result' | 'control';
 export type ContentLifecycle = 'streaming' | 'sealed';
+export type AssistantTurnStatus = 'streaming' | 'completed' | 'failed' | 'aborted';
+
+export interface AssistantTurnProjection {
+  id: string;
+  inputMessageId: string | null;
+  assistantMessageIds: string[];
+  processBlockIds: string[];
+  answerBlockIds: string[];
+  resultBlockIds: string[];
+  controlBlockIds: string[];
+  status: AssistantTurnStatus;
+  startedAt?: number;
+  completedAt?: number;
+}
 
 /**
  * 新聊天投影使用的统一语义字段。
@@ -306,6 +320,11 @@ export type RichBlock = ContentBlockSemantics & (
   }
   | { type: 'plugin_card'; card: import('../types').PluginCardDetails }
   | { type: 'interactive_card'; cardId: string; title: string; code: string }
+  | {
+    type: 'turn_status';
+    status: 'missing_final_answer' | 'failed' | 'aborted';
+    label?: string;
+  }
 );
 
 export type ContentBlock = TextDecorator | RichBlock;
@@ -337,6 +356,7 @@ export interface ChatMessage {
   origin?: { kind: 'agent'; agentId: string | null; agentName: string | null };
   // Assistant
   blocks?: ContentBlock[];
+  turnProjection?: AssistantTurnProjection;
   // 通用
   timestamp?: number;
 }

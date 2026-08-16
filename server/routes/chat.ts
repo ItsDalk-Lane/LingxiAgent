@@ -104,7 +104,7 @@ function extractText(content: any) {
 function persistedTurnEntryIds(engine: any, sessionPath: string) {
   const branch = engine.getSessionByPath?.(sessionPath)?.sessionManager?.getBranch?.();
   if (!Array.isArray(branch) || branch.length === 0) {
-    return { turnInputEntryId: null, userEntryId: null, assistantEntryId: null };
+    return { turnInputEntryId: null, userEntryId: null, assistantEntryId: null, assistantEntryIds: [] };
   }
 
   let lastTurnInputIndex = -1;
@@ -120,7 +120,7 @@ function persistedTurnEntryIds(engine: any, sessionPath: string) {
     if (lastTurnInputIndex >= 0 && lastAssistantIndex >= 0) break;
   }
   if (lastTurnInputIndex < 0) {
-    return { turnInputEntryId: null, userEntryId: null, assistantEntryId: null };
+    return { turnInputEntryId: null, userEntryId: null, assistantEntryId: null, assistantEntryIds: [] };
   }
 
   let turnInputIndex = lastTurnInputIndex;
@@ -139,10 +139,16 @@ function persistedTurnEntryIds(engine: any, sessionPath: string) {
   const visibleUserEntry = turnInputEntry?.type === "message"
     && turnInputEntry.message?.role === "user"
     && !isHiddenTurnInputMessage(turnInputEntry.message);
+  const assistantEntryIds = branch
+    .slice(turnInputIndex + 1)
+    .filter((entry) => entry?.type === "message" && entry.message?.role === "assistant")
+    .map((entry) => entry.id)
+    .filter((id) => typeof id === "string" && id.trim());
   return {
     turnInputEntryId,
     userEntryId: visibleUserEntry ? turnInputEntryId : null,
     assistantEntryId,
+    assistantEntryIds,
   };
 }
 
@@ -1731,6 +1737,8 @@ export function createChatRoute(engine: any, hub: any, {
       emitStreamEvent(sessionPath, ss, {
         type: "turn_end",
         ...persistedEntries,
+        ...(turnWasAborted ? { aborted: true } : {}),
+        ...(!turnWasAborted && ss.hasError ? { failed: true } : {}),
         ...(turnWasTruncated ? { truncated: true, stopReason: "length" } : {}),
       });
       finishSessionStream(ss);
