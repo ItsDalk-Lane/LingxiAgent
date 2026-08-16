@@ -20,6 +20,7 @@ import {
   type StreamBufferSnapshot,
 } from '../stores/stream-invalidator';
 import { bumpMessageLiveVersion } from '../stores/message-live-version';
+import { recordChatPerformance } from '../utils/chat-performance';
 
 /* eslint-disable @typescript-eslint/no-explicit-any -- 流式消息 handle(msg) 接收动态 JSON */
 
@@ -317,6 +318,12 @@ class StreamBufferManager {
 
   /** 把 buffer 中累积的内容一次性 flush 到 Zustand */
   private flush(buf: Buffer): void {
+    recordChatPerformance('stream_flush', {
+      sessionPath: buf.sessionPath,
+      messageId: buf.messageId || undefined,
+      sourceLength: buf.textSegmentAcc.length,
+      blockCount: buf.blocks.length,
+    });
     buf.lastFlushTime = Date.now();
     if (buf.flushTimer) {
       clearTimeout(buf.flushTimer);

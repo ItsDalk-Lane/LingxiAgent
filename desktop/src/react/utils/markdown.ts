@@ -9,6 +9,7 @@ import type StateCore from 'markdown-it/lib/rules_core/state_core.mjs';
 import type StateBlock from 'markdown-it/lib/rules_block/state_block.mjs';
 import type StateInline from 'markdown-it/lib/rules_inline/state_inline.mjs';
 import type Token from 'markdown-it/lib/token.mjs';
+import { measureChatPerformance } from './chat-performance';
 import mk from '@traptitech/markdown-it-katex';
 import taskLists from 'markdown-it-task-lists';
 import 'katex/dist/katex.min.css';
@@ -1075,7 +1076,11 @@ export function getPreviewMd(): MarkdownItInstance {
 }
 
 export function renderMarkdown(src: string): string {
-  return getMd().render(src, buildMarkdownEnv(src));
+  return measureChatPerformance(
+    'markdown_parse',
+    { sourceLength: src.length },
+    () => getMd().render(src, buildMarkdownEnv(src)),
+  );
 }
 
 export function renderMarkdownPreview(src: string, options: MarkdownPreviewOptions = {}): string {

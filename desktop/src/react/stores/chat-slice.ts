@@ -7,6 +7,7 @@ import { invalidateSessionCache } from './selectors/file-refs';
 import { invalidateStreamBuffer, invalidateStreamResumeMeta } from './stream-invalidator';
 import { bumpMessageLiveVersion, clearMessageLiveVersion } from './message-live-version';
 import { sessionScopedKey, sessionScopedValue } from './session-slice';
+import { recordChatPerformance } from '../utils/chat-performance';
 
 export interface ChatSlice {
   chatSessions: Record<string, SessionMessages>;
@@ -272,6 +273,12 @@ export const createChatSlice = (
       item.data.role === 'assistant',
     );
     if (targetIdx < 0) return false;
+
+    recordChatPerformance('structural_message_update', {
+      sessionPath: path,
+      messageId,
+      itemCount: session.items.length,
+    });
 
     set((s) => {
       const latest = scopedMapValue<SessionMessages>(s as any, s.chatSessions, path);

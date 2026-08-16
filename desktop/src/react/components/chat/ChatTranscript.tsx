@@ -13,6 +13,7 @@ import type {
   ForkedSessionHandler,
   SessionNodeTarget,
 } from '../../stores/message-turn-actions';
+import { recordChatPerformance } from '../../utils/chat-performance';
 
 interface Props {
   items: ChatListItem[];
@@ -37,6 +38,7 @@ export const ChatTranscript = memo(function ChatTranscript({
   enableProcessFold = false,
   onForkCreated,
 }: Props) {
+  recordChatPerformance('transcript_render', { sessionPath, itemCount: items.length });
   const isStreaming = useStore(s => selectIsStreamingSession(s, sessionPath));
   const agents = useStore(s => s.agents);
   const globalAgentName = useStore(s => s.agentName) || 'Lingxi';
@@ -114,6 +116,7 @@ function buildTurnState(items: ChatListItem[]): {
   assistantTurnRetryMessagesByCompletionIndex: ReadonlyMap<number, ChatMessage>;
   assistantSkillPromptsByIndex: ReadonlyMap<number, string>;
 } {
+  recordChatPerformance('turn_state_projection', { itemCount: items.length });
   let latestUserIndex = -1;
   let latestAssistantIndex = -1;
   let precedingUserEntryId: string | null = null;

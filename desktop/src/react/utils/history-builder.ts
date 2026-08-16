@@ -16,6 +16,7 @@ import { parseUserAttachments } from './message-parser';
 import { renderMarkdown } from './markdown';
 import { extOfName } from './file-kind';
 import { buildAssistantBlocksFromContent } from './assistant-block-builder';
+import { recordChatPerformance } from './chat-performance';
 
 /* eslint-disable @typescript-eslint/no-explicit-any -- API 历史消息 JSON 结构动态，难以静态收窄 */
 
@@ -496,6 +497,7 @@ function sourceOrderedItems(
 }
 
 export function buildItemsFromHistory(data: HistoryApiResponse): ChatListItem[] {
+  recordChatPerformance('history_projection', { itemCount: data.messages.length });
   const items: ChatListItem[] = [];
   const sessionFileLookup = buildSessionFileLookup(data.sessionFiles);
 

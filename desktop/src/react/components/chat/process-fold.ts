@@ -1,6 +1,7 @@
 import type { ChatListItem, ChatMessage, ContentBlock, ToolCall } from '../../stores/chat-types';
 import { isToolCallHiddenFromProcessUi } from '../../utils/tool-call-visibility';
 import { skillInvocationName } from '../../../../../shared/tool-outcome.ts';
+import { recordChatPerformance } from '../../utils/chat-performance';
 
 export interface ProcessFoldStats {
   toolCount: number;
@@ -222,6 +223,7 @@ export function buildTranscriptRenderItems(
   items: ChatListItem[],
   options: { isStreaming: boolean },
 ): TranscriptRenderItem[] {
+  recordChatPerformance('transcript_projection', { itemCount: items.length });
   const rendered: TranscriptRenderItem[] = [];
   const latestUserIndex = lastUserIndex(items);
   const protectedTextIndexes = protectedFinalTextIndexes(items);

@@ -50,6 +50,7 @@ import {
   type ScheduleDraft,
 } from '../automation/schedule-draft';
 import styles from './Chat.module.css';
+import { recordChatPerformance } from '../../utils/chat-performance';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -94,6 +95,11 @@ export const AssistantMessage = memo(function AssistantMessage({
   onForkCreated,
   messageRef,
 }: Props) {
+  recordChatPerformance('assistant_message_render', {
+    sessionPath,
+    messageId: message.id,
+    blockCount: message.blocks?.length || 0,
+  });
   const displayInfo = agentDisplay;
   const displayName = agentDisplay.displayName;
   const displayYuan = agentDisplay.yuan;
