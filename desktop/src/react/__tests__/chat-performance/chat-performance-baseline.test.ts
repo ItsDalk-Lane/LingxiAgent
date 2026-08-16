@@ -64,7 +64,8 @@ describe('chat rendering performance baseline', () => {
 
       expect(currentTextSource()).toHaveLength(deltaCount);
       expect(currentItems()).not.toBe(initialItems);
-      expect(count(events, 'stream_flush')).toBe(3);
+      // 首个增量和同一批后续增量各发布一次；无新内容的结束收口不再空刷。
+      expect(count(events, 'stream_flush')).toBe(2);
       expect(count(events, 'markdown_parse')).toBe(0);
       expect(count(events, 'structural_message_update')).toBe(1);
       expect(events

@@ -2,7 +2,7 @@
  * StreamBufferManager — per-session 流式事件节流缓冲
  *
  * WS 事件到达时写入 buffer（纯 JS 对象，不触发 React），
- * 每 FLUSH_INTERVAL ms 批量 flush 到 Zustand store。
+ * 普通增量按画面合并并受最高发布频率约束，语义边界立即发布。
  *
  * 设计为 singleton，不依赖 React 组件生命周期。
  * app-ws-shim 直接调用 streamBufferManager.handle(msg)。
@@ -68,6 +68,9 @@ interface Buffer {
   cardDescAcc: string;
   lastFlushTime: number;
   flushTimer: ReturnType<typeof setTimeout> | null;
+  flushFrame: number | null;
+  /** 自上次发布后，缓冲区里是否出现了新的可见变化。 */
+  publishPending: boolean;
   /** 当前 turn 绑定的 assistant message id */
   messageId: string | null;
   /** turn_end/中止收口时为 true，确保所有仍在流式的内容统一封口。 */
@@ -95,6 +98,8 @@ function createBuffer(sessionPath: string): Buffer {
     cardDescAcc: '',
     lastFlushTime: 0,
     flushTimer: null,
+    flushFrame: null,
+    publishPending: false,
     messageId: null,
     turnEnding: false,
   };
@@ -252,10 +257,7 @@ class StreamBufferManager {
   }
 
   private resetTurnState(buf: Buffer): void {
-    if (buf.flushTimer) {
-      clearTimeout(buf.flushTimer);
-      buf.flushTimer = null;
-    }
+    this.cancelScheduledFlush(buf);
     buf.textAcc = '';
     buf.blocks = [];
     buf.segmentsById.clear();
@@ -273,6 +275,7 @@ class StreamBufferManager {
     buf.cardDescAcc = '';
     buf.messageId = null;
     buf.turnEnding = false;
+    buf.publishPending = false;
   }
 
   private finishBufferTurn(buf: Buffer, persistedEntries: {
@@ -286,9 +289,8 @@ class StreamBufferManager {
       buf.turnEnding = true;
       this.flush(buf);
       this.commitLiveTurn(buf, persistedEntries);
-    } else if (buf.flushTimer) {
-      clearTimeout(buf.flushTimer);
-      buf.flushTimer = null;
+    } else {
+      this.cancelScheduledFlush(buf);
     }
     this.resetTurnState(buf);
   }
@@ -319,9 +321,9 @@ class StreamBufferManager {
     buf.messageId = id;
   }
 
-  private updateTargetMessage(buf: Buffer, updater: (msg: ChatMessage) => ChatMessage): void {
+  private updateTargetMessage(buf: Buffer, updater: (msg: ChatMessage) => ChatMessage): boolean {
     this.ensureMessage(buf);
-    if (!buf.messageId) return;
+    if (!buf.messageId) return false;
     const store = useStore.getState();
     const session = sessionScopedValue(store, store.chatSessions, buf.sessionPath);
     const item = session?.items.find((entry) => (
@@ -331,7 +333,7 @@ class StreamBufferManager {
     ));
     if (!item || item.type !== 'message') {
       console.warn('[stream] target assistant message missing after ensureMessage:', buf.sessionPath, buf.messageId);
-      return;
+      return false;
     }
     const next = updater({ ...item.data, blocks: buf.blocks });
     const blocks = normalizeContentBlocks(next.blocks || [], {
@@ -341,6 +343,7 @@ class StreamBufferManager {
     buf.blocks = blocks;
     this.publishLiveTurn(buf);
     bumpMessageLiveVersion(buf.sessionPath);
+    return true;
   }
 
   private publishLiveTurn(buf: Buffer): void {
@@ -420,7 +423,7 @@ class StreamBufferManager {
       });
     }
     if (msg.type === 'assistant_segment_delta') this.scheduleFlush(buf);
-    else this.flush(buf);
+    else this.publishBoundary(buf);
   }
 
   private commitLiveTurn(buf: Buffer, persistedEntries: {
@@ -478,21 +481,62 @@ class StreamBufferManager {
     return consumed;
   }
 
-  /** 调度节流 flush */
+  private cancelScheduledFlush(buf: Buffer): void {
+    if (buf.flushTimer !== null) {
+      clearTimeout(buf.flushTimer);
+      buf.flushTimer = null;
+    }
+    if (buf.flushFrame !== null) {
+      if (typeof globalThis.cancelAnimationFrame === 'function') {
+        globalThis.cancelAnimationFrame(buf.flushFrame);
+      }
+      buf.flushFrame = null;
+    }
+  }
+
+  private requestFlushFrame(buf: Buffer): void {
+    if (buf.flushFrame !== null) return;
+    if (typeof globalThis.requestAnimationFrame !== 'function') {
+      this.flush(buf);
+      return;
+    }
+    buf.flushFrame = globalThis.requestAnimationFrame(() => {
+      buf.flushFrame = null;
+      this.flush(buf);
+    });
+  }
+
+  /** 普通增量先合并到下一画面，再受最高发布频率约束。 */
   private scheduleFlush(buf: Buffer): void {
+    buf.publishPending = true;
+    if (buf.flushTimer !== null || buf.flushFrame !== null) return;
     const now = Date.now();
     if (now - buf.lastFlushTime >= FLUSH_INTERVAL) {
-      this.flush(buf);
-    } else if (!buf.flushTimer) {
+      this.requestFlushFrame(buf);
+    } else {
       buf.flushTimer = setTimeout(() => {
         buf.flushTimer = null;
-        this.flush(buf);
+        this.requestFlushFrame(buf);
       }, FLUSH_INTERVAL - (now - buf.lastFlushTime));
     }
   }
 
-  /** 把 buffer 中累积的内容一次性 flush 到 Zustand */
-  private flush(buf: Buffer): void {
+  private publishBufferedState(
+    buf: Buffer,
+    updater: (msg: ChatMessage) => ChatMessage,
+    force: boolean,
+  ): void {
+    if (!force && !buf.publishPending) {
+      this.cancelScheduledFlush(buf);
+      return;
+    }
+    this.cancelScheduledFlush(buf);
+    const published = this.updateTargetMessage(buf, (msg) => updater({
+      ...msg,
+      blocks: renderBufferedBlocks(msg.blocks || [], buf),
+    }));
+    if (!published) return;
+
     recordChatPerformance('stream_flush', {
       sessionPath: buf.sessionPath,
       messageId: buf.messageId || undefined,
@@ -500,14 +544,20 @@ class StreamBufferManager {
       blockCount: buf.blocks.length,
     });
     buf.lastFlushTime = Date.now();
-    if (buf.flushTimer) {
-      clearTimeout(buf.flushTimer);
-      buf.flushTimer = null;
-    }
+    buf.publishPending = false;
+  }
 
-    this.updateTargetMessage(buf, (msg) => {
-      return { ...msg, blocks: renderBufferedBlocks(msg.blocks || [], buf) };
-    });
+  /** 把普通增量一次性发布到当前回合。 */
+  private flush(buf: Buffer): void {
+    this.publishBufferedState(buf, (msg) => msg, false);
+  }
+
+  /** 语义边界立即发布，并把尚未发布的普通增量合并进同一次更新。 */
+  private publishBoundary(
+    buf: Buffer,
+    updater: (msg: ChatMessage) => ChatMessage = (msg) => msg,
+  ): void {
+    this.publishBufferedState(buf, updater, true);
   }
 
   // ── 公开事件处理器 ──
@@ -540,7 +590,7 @@ class StreamBufferManager {
         buf.inThinking = true;
         buf.hasThinkingBlock = true;
         buf.thinkingAcc = '';
-        this.flush(buf);
+        this.publishBoundary(buf);
         break;
 
       case 'thinking_delta':
@@ -553,7 +603,7 @@ class StreamBufferManager {
       case 'thinking_end':
         buf.hasThinkingBlock = true;
         buf.inThinking = false;
-        this.flush(buf);
+        this.publishBoundary(buf);
         break;
 
       case 'mood_start':
@@ -569,7 +619,7 @@ class StreamBufferManager {
           buf.moodPendingSeparator = false;
         }
         buf.moodYuan = resolveSessionYuan(sessionPath);
-        this.flush(buf);
+        this.publishBoundary(buf);
         break;
 
       case 'mood_text':
@@ -584,7 +634,7 @@ class StreamBufferManager {
 
       case 'mood_end':
         buf.inMood = false;
-        this.flush(buf);
+        this.publishBoundary(buf);
         break;
 
       case 'card_start':
@@ -601,7 +651,6 @@ class StreamBufferManager {
       case 'card_end': {
         buf.inCard = false;
         if (buf.cardAttrs) {
-          this.flush(buf); // flush pending text first
           const card = {
             type: buf.cardAttrs.type || 'iframe',
             pluginId: buf.cardAttrs.plugin || '',
@@ -609,7 +658,7 @@ class StreamBufferManager {
             title: buf.cardAttrs.title,
             description: buf.cardDescAcc,
           };
-          this.updateTargetMessage(buf, (m) => ({
+          this.publishBoundary(buf, (m) => ({
             ...m,
             blocks: [...(m.blocks || []), { type: 'plugin_card' as const, card }],
           }));
@@ -621,9 +670,7 @@ class StreamBufferManager {
 
       case 'tool_start':
         this.ensureMessage(buf);
-        // 工具事件频率低，直接写 store
-        this.flush(buf); // 先 flush 文本
-        this.updateTargetMessage(buf, (m) => {
+        this.publishBoundary(buf, (m) => {
           const blocks = [...(m.blocks || [])];
           // 找最后一个 tool_group 或创建新的
           let lastTg = blocks.length - 1;
@@ -653,7 +700,7 @@ class StreamBufferManager {
         break;
 
       case 'tool_end':
-        this.updateTargetMessage(buf, (m) => {
+        this.publishBoundary(buf, (m) => {
           const blocks = [...(m.blocks || [])];
           // 从后往前找含该 tool 名且未 done 的
           for (let i = blocks.length - 1; i >= 0; i--) {
@@ -710,8 +757,7 @@ class StreamBufferManager {
         }
 
         this.ensureMessage(buf);
-        this.flush(buf);
-        this.updateTargetMessage(buf, (m) => ({
+        this.publishBoundary(buf, (m) => ({
           ...m,
           blocks: mergeContentBlock([...(m.blocks || [])], block),
         }));
@@ -759,7 +805,7 @@ class StreamBufferManager {
     const key = bufferKeyForSession(sessionPath, sessionId);
     const aliasKey = this.bufferKeysByPath.get(sessionPath) || null;
     const buf = this.lookupBuffer(sessionPath, sessionId);
-    if (buf?.flushTimer) clearTimeout(buf.flushTimer);
+    if (buf) this.cancelScheduledFlush(buf);
     if (buf?.messageId) clearLiveAssistantMessage(buf.sessionPath, buf.messageId);
     this.deleteBufferKey(key);
     if (aliasKey && aliasKey !== key) this.deleteBufferKey(aliasKey);
@@ -769,7 +815,7 @@ class StreamBufferManager {
   /** 清理所有 */
   clearAll(): void {
     for (const [, buf] of this.buffers) {
-      if (buf.flushTimer) clearTimeout(buf.flushTimer);
+      this.cancelScheduledFlush(buf);
       if (buf.messageId) clearLiveAssistantMessage(buf.sessionPath, buf.messageId);
     }
     this.buffers.clear();
