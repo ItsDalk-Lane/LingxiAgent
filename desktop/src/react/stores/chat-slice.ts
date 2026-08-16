@@ -8,6 +8,7 @@ import { invalidateStreamBuffer, invalidateStreamResumeMeta } from './stream-inv
 import { bumpMessageLiveVersion, clearMessageLiveVersion } from './message-live-version';
 import { sessionScopedKey, sessionScopedValue } from './session-slice';
 import { recordChatPerformance } from '../utils/chat-performance';
+import { rebaseGeneratedContentBlockIds } from '../utils/content-semantics';
 
 export interface ChatSlice {
   chatSessions: Record<string, SessionMessages>;
@@ -334,12 +335,20 @@ export const createChatSlice = (
           (assistantEntryId && assistant.data.sourceEntryId !== assistantEntryId)
           || (turnInputEntryId && assistant.data.turnInputEntryId !== turnInputEntryId)
         )) {
+          const previousBlockIdPrefix = assistant.data.sourceEntryId || assistant.data.id;
           items[assistantIndex] = {
             type: 'message',
             data: {
               ...assistant.data,
               ...(assistantEntryId ? { sourceEntryId: assistantEntryId } : {}),
               ...(turnInputEntryId ? { turnInputEntryId } : {}),
+              ...(assistantEntryId && assistant.data.blocks ? {
+                blocks: rebaseGeneratedContentBlockIds(
+                  assistant.data.blocks,
+                  previousBlockIdPrefix,
+                  assistantEntryId,
+                ),
+              } : {}),
             },
           };
           changed = true;

@@ -142,6 +142,7 @@ describe('streamBufferManager.snapshot', () => {
     streamBufferManager.handle({ type: 'text_delta', sessionPath: PATH, delta: 'reply' });
     const assistantBefore = getAssistantMessage();
     expect(assistantBefore?.sourceEntryId).toBeUndefined();
+    expect(assistantBefore?.blocks?.[0]?.id).toBe(`${assistantBefore?.id}:text:0`);
 
     streamBufferManager.handle({
       type: 'turn_end',
@@ -155,6 +156,7 @@ describe('streamBufferManager.snapshot', () => {
     expect(items[0]?.type === 'message' ? items[0].data.sourceEntryId : null).toBe('entry-user-1');
     expect(getAssistantMessage()?.sourceEntryId).toBe('entry-assistant-1');
     expect(getAssistantMessage()?.turnInputEntryId).toBe('entry-user-1');
+    expect(getAssistantMessage()?.blocks?.[0]?.id).toBe('entry-assistant-1:text:0');
   });
 
   it('turn_end never overwrites a visible user with a hidden background input id', () => {
@@ -285,13 +287,37 @@ describe('streamBufferManager.thinking 流式刷新', () => {
       streamBufferManager.handle({ type: 'thinking_delta', sessionPath: PATH, delta: '第一段思考' });
 
       const beforeFlush = getThinkingBlock();
-      expect(beforeFlush).toEqual({ type: 'thinking', content: '', sealed: false });
+      expect(beforeFlush).toEqual({
+        type: 'thinking',
+        id: expect.stringMatching(/:thinking:0$/),
+        content: '',
+        sealed: false,
+        lifecycle: 'streaming',
+        semanticPhase: 'reasoning',
+        surfaceRole: 'process',
+      });
 
       vi.advanceTimersByTime(32);
-      expect(getThinkingBlock()).toEqual({ type: 'thinking', content: '', sealed: false });
+      expect(getThinkingBlock()).toEqual({
+        type: 'thinking',
+        id: expect.stringMatching(/:thinking:0$/),
+        content: '',
+        sealed: false,
+        lifecycle: 'streaming',
+        semanticPhase: 'reasoning',
+        surfaceRole: 'process',
+      });
 
       vi.advanceTimersByTime(1);
-      expect(getThinkingBlock()).toEqual({ type: 'thinking', content: '第一段思考', sealed: false });
+      expect(getThinkingBlock()).toEqual({
+        type: 'thinking',
+        id: expect.stringMatching(/:thinking:0$/),
+        content: '第一段思考',
+        sealed: false,
+        lifecycle: 'streaming',
+        semanticPhase: 'reasoning',
+        surfaceRole: 'process',
+      });
     } finally {
       streamBufferManager.clearAll();
       vi.useRealTimers();
@@ -300,10 +326,26 @@ describe('streamBufferManager.thinking 流式刷新', () => {
 
   it('空 thinking 结束后保留 sealed 完成态，而不是消失或停在活跃态', () => {
     streamBufferManager.handle({ type: 'thinking_start', sessionPath: PATH });
-    expect(getThinkingBlock()).toEqual({ type: 'thinking', content: '', sealed: false });
+    expect(getThinkingBlock()).toEqual({
+      type: 'thinking',
+      id: expect.stringMatching(/:thinking:0$/),
+      content: '',
+      sealed: false,
+      lifecycle: 'streaming',
+      semanticPhase: 'reasoning',
+      surfaceRole: 'process',
+    });
 
     streamBufferManager.handle({ type: 'thinking_end', sessionPath: PATH });
-    expect(getThinkingBlock()).toEqual({ type: 'thinking', content: '', sealed: true });
+    expect(getThinkingBlock()).toEqual({
+      type: 'thinking',
+      id: expect.stringMatching(/:thinking:0$/),
+      content: '',
+      sealed: true,
+      lifecycle: 'sealed',
+      semanticPhase: 'reasoning',
+      surfaceRole: 'process',
+    });
   });
 });
 

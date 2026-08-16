@@ -21,6 +21,7 @@ import {
 } from '../stores/stream-invalidator';
 import { bumpMessageLiveVersion } from '../stores/message-live-version';
 import { recordChatPerformance } from '../utils/chat-performance';
+import { normalizeContentBlocks } from '../utils/content-semantics';
 
 /* eslint-disable @typescript-eslint/no-explicit-any -- 流式消息 handle(msg) 接收动态 JSON */
 
@@ -58,6 +59,8 @@ interface Buffer {
   flushTimer: ReturnType<typeof setTimeout> | null;
   /** 当前 turn 绑定的 assistant message id */
   messageId: string | null;
+  /** turn_end/中止收口时为 true，确保所有仍在流式的内容统一封口。 */
+  turnEnding: boolean;
 }
 
 function createBuffer(sessionPath: string): Buffer {
@@ -80,6 +83,7 @@ function createBuffer(sessionPath: string): Buffer {
     lastFlushTime: 0,
     flushTimer: null,
     messageId: null,
+    turnEnding: false,
   };
 }
 
@@ -243,10 +247,12 @@ class StreamBufferManager {
     buf.cardAttrs = null;
     buf.cardDescAcc = '';
     buf.messageId = null;
+    buf.turnEnding = false;
   }
 
   private finishBufferTurn(buf: Buffer): void {
     if (this.hasTurnState(buf)) {
+      buf.turnEnding = true;
       this.flush(buf);
     } else if (buf.flushTimer) {
       clearTimeout(buf.flushTimer);
@@ -287,8 +293,12 @@ class StreamBufferManager {
     if (!buf.messageId) return;
     const updated = useStore.getState().updateMessageById(buf.sessionPath, buf.messageId, (message) => {
       const next = updater(message);
-      buf.blocks = [...(next.blocks || [])];
-      return next;
+      const blocks = normalizeContentBlocks(next.blocks || [], {
+        idPrefix: message.sourceEntryId || message.id,
+        turnLifecycle: buf.turnEnding ? 'sealed' : 'streaming',
+      });
+      buf.blocks = blocks;
+      return { ...next, blocks };
     });
     if (!updated) {
       console.warn('[stream] target assistant message missing after ensureMessage:', buf.sessionPath, buf.messageId);

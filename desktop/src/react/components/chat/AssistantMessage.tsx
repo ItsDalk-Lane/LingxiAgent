@@ -179,7 +179,7 @@ export const AssistantMessage = memo(function AssistantMessage({
       <div className={`${styles.message} ${styles.messageAssistant}${hasWideBlock ? ` ${styles.messageHasWideBlock}` : ''}${isInterludeOnly ? ` ${styles.messageAssistantInterludeOnly}` : ''}`}>
         {blocks.map((block, i) => (
           <ContentBlockErrorBoundary
-            key={`block-${i}`}
+            key={block.id || `block-${i}`}
             messageId={message.id}
             blockType={block.type}
             blockIdx={i}

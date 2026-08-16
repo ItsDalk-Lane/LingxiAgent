@@ -17,6 +17,7 @@ import { renderMarkdown } from './markdown';
 import { extOfName } from './file-kind';
 import { buildAssistantBlocksFromContent } from './assistant-block-builder';
 import { recordChatPerformance } from './chat-performance';
+import { normalizeContentBlocks } from './content-semantics';
 
 /* eslint-disable @typescript-eslint/no-explicit-any -- API 历史消息 JSON 结构动态，难以静态收窄 */
 
@@ -586,11 +587,14 @@ export function buildItemsFromHistory(data: HistoryApiResponse): ChatListItem[] 
       const interludeBlocks = msgBlocks.filter(isInterludeHistoryBlock);
       const beforeInterludes = interludeBlocks.filter((block) => shouldPlaceInterludeBeforeMessage(block, inlineBlocks));
       const afterInterludes = interludeBlocks.filter((block) => !shouldPlaceInterludeBeforeMessage(block, inlineBlocks));
-      const blocks = buildAssistantBlocksFromContent({
+      const blocks = normalizeContentBlocks(buildAssistantBlocksFromContent({
         content: m.content,
         thinking: m.thinking,
         toolCalls: m.toolCalls,
         extraBlocks: inlineBlocks,
+      }), {
+        idPrefix: m.entryId || id,
+        turnLifecycle: 'sealed',
       });
 
       for (let j = 0; j < beforeInterludes.length; j += 1) {

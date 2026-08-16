@@ -577,8 +577,12 @@ describe('buildItemsFromHistory user image restoration', () => {
     if (first.type !== 'message') throw new Error('expected message');
     expect(first.data.blocks).toEqual([{
       type: 'thinking',
+      id: 'a-empty-thinking:thinking:0',
       content: '',
       sealed: true,
+      lifecycle: 'sealed',
+      semanticPhase: 'reasoning',
+      surfaceRole: 'process',
     }]);
   });
 

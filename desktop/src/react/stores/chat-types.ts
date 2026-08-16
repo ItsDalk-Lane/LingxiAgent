@@ -152,6 +152,21 @@ export interface ResourceEnvelope {
 
 // ── 内容块 ──
 
+export type AssistantSemanticPhase = 'reasoning' | 'commentary' | 'mood' | 'tool' | 'final_answer';
+export type ContentSurfaceRole = 'process' | 'answer' | 'result' | 'control';
+export type ContentLifecycle = 'streaming' | 'sealed';
+
+/**
+ * 新聊天投影使用的统一语义字段。
+ * 字段在兼容期保持可选，旧会话仍可按原形状读取；所有新建内容块会在构建边界补齐。
+ */
+export interface ContentBlockSemantics {
+  id?: string;
+  semanticPhase?: AssistantSemanticPhase;
+  surfaceRole?: ContentSurfaceRole;
+  lifecycle?: ContentLifecycle;
+}
+
 export interface SessionConfirmationBlock {
   type: 'session_confirmation';
   confirmId: string;
@@ -223,14 +238,15 @@ export interface SuggestionCardBlock {
 }
 
 // 物种 A：文本装饰器（流式组装，upsert 到 blocks 数组）
-export type TextDecorator =
+export type TextDecorator = ContentBlockSemantics & (
   | { type: 'thinking'; content: string; sealed: boolean }
   | { type: 'mood'; yuan: string; text: string }
   | { type: 'tool_group'; tools: ToolCall[]; collapsed: boolean }
-  | { type: 'text'; html: string; source?: string };
+  | { type: 'text'; html: string; source?: string }
+);
 
 // 物种 B：富内容块（通过 content_block 事件 push，不 upsert）
-export type RichBlock =
+export type RichBlock = ContentBlockSemantics & (
   | { type: 'file'; fileId?: string; filePath: string; label: string; ext: string; mime?: string; kind?: string; storageKind?: string; presentation?: 'attachment' | 'voice-input' | string; listed?: boolean; status?: 'available' | 'expired' | string; missingAt?: number | null; resource?: ResourceEnvelope; mtimeMs?: number; size?: number | null; version?: FileVersion | null; waveform?: AudioWaveform; replacesTaskId?: string }
   | { type: 'media_generation'; taskId: string; kind: 'image' | 'video' | string; status: 'pending' | 'failed' | 'aborted' | string; prompt?: string; batchId?: string; reason?: string }
   // COMPAT(create_artifact, remove no earlier than v0.133 after legacy sessions are migrated)
@@ -289,7 +305,8 @@ export type RichBlock =
     finishedAt?: number | null;
   }
   | { type: 'plugin_card'; card: import('../types').PluginCardDetails }
-  | { type: 'interactive_card'; cardId: string; title: string; code: string };
+  | { type: 'interactive_card'; cardId: string; title: string; code: string }
+);
 
 export type ContentBlock = TextDecorator | RichBlock;
 
