@@ -254,7 +254,9 @@ const TranscriptRenderItemView = memo(function TranscriptRenderItemView({
   onForkCreated?: ForkedSessionHandler;
 }) {
   const originalIndex = renderItem.originalIndex;
-  const prevMessageItem = previousMessageItem(sourceItems, originalIndex);
+  const prevMessageItem = renderItem.type === 'source' && renderItem.continuesAssistantTurn
+    ? renderItem.item.type === 'message' ? renderItem.item : undefined
+    : previousMessageItem(sourceItems, originalIndex);
 
   if (renderItem.type === 'process_fold') {
     const prevRole = prevMessageItem?.data.role ?? null;
@@ -270,7 +272,7 @@ const TranscriptRenderItemView = memo(function TranscriptRenderItemView({
         assistantTurnTargetsByCompletionIndex={assistantTurnTargetsByCompletionIndex}
         assistantTurnRetryMessagesByCompletionIndex={assistantTurnRetryMessagesByCompletionIndex}
         assistantSkillPromptsByIndex={assistantSkillPromptsByIndex}
-        completionTimePersistent={
+        completionTimePersistent={renderItem.ownsTurnCompletion &&
           turnCompletionAssistantIndexes.has(groupLastOriginalIndex(renderItem))
           && groupLastOriginalIndex(renderItem) === latestAssistantIndex
           && latestAssistantIndex > latestUserIndex
