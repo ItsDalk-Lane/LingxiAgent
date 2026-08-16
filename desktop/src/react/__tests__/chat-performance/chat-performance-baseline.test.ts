@@ -66,7 +66,7 @@ describe('chat rendering performance baseline', () => {
       expect(currentItems()).not.toBe(initialItems);
       expect(count(events, 'stream_flush')).toBe(3);
       expect(count(events, 'markdown_parse')).toBe(3);
-      expect(count(events, 'structural_message_update')).toBe(3);
+      expect(count(events, 'structural_message_update')).toBe(1);
       expect(events
         .filter((event) => event.name === 'markdown_parse')
         .map((event) => event.sourceLength)).toEqual([1, deltaCount, deltaCount]);
@@ -86,7 +86,7 @@ describe('chat rendering performance baseline', () => {
     stop();
 
     expect(count(events, 'stream_flush')).toBe(3);
-    expect(count(events, 'structural_message_update')).toBe(3);
+    expect(count(events, 'structural_message_update')).toBe(0);
     expect(count(events, 'markdown_parse')).toBe(0);
   });
 

@@ -147,6 +147,7 @@ export function configureWsMessageHandler(options: {
 // ── 聊天事件集合（走 StreamBufferManager） ──
 
 const REACT_CHAT_EVENTS = new Set([
+  'assistant_segment_start', 'assistant_segment_delta', 'assistant_segment_end',
   'text_delta', 'thinking_start', 'thinking_delta', 'thinking_end',
   'mood_start', 'mood_text', 'mood_end',
   'tool_start', 'tool_end', 'turn_end',

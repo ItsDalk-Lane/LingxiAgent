@@ -20,8 +20,16 @@ import {
   type StreamBufferSnapshot,
 } from '../stores/stream-invalidator';
 import { bumpMessageLiveVersion } from '../stores/message-live-version';
+import {
+  clearLiveAssistantMessage,
+  publishLiveAssistantMessage,
+  type LiveAssistantSegment,
+  type LiveAssistantSegmentPhase,
+} from '../stores/live-turn-store';
 import { recordChatPerformance } from '../utils/chat-performance';
-import { normalizeContentBlocks } from '../utils/content-semantics';
+import {
+  normalizeContentBlocks,
+} from '../utils/content-semantics';
 
 /* eslint-disable @typescript-eslint/no-explicit-any -- 流式消息 handle(msg) 接收动态 JSON */
 
@@ -38,6 +46,8 @@ function nextStreamMessageId(): string {
 interface Buffer {
   sessionPath: string;
   blocks: ContentBlock[];
+  segmentsById: Map<string, LiveAssistantSegment>;
+  segmentOrder: string[];
   /** 当前用户轮次的完整可见正文，供断线快照使用。 */
   textAcc: string;
   /** 当前工具/富内容边界之后的正文段，只更新它自己对应的 text block。 */
@@ -67,6 +77,8 @@ function createBuffer(sessionPath: string): Buffer {
   return {
     sessionPath,
     blocks: [],
+    segmentsById: new Map(),
+    segmentOrder: [],
     textAcc: '',
     textSegmentAcc: '',
     textSegmentOrdinal: null,
@@ -136,6 +148,15 @@ function renderBufferedBlocks(currentBlocks: ContentBlock[], buf: Buffer): Conte
 
 function normalizeSessionId(value: unknown): string | null {
   return typeof value === 'string' && value.trim() ? value.trim() : null;
+}
+
+function normalizeLiveSegmentPhase(value: unknown): LiveAssistantSegmentPhase {
+  return value === 'reasoning'
+    || value === 'commentary'
+    || value === 'final_answer'
+    || value === 'unresolved'
+    ? value
+    : 'unresolved';
 }
 
 function bufferKeyForSession(sessionPath: string, sessionId: string | null = null): string {
@@ -216,6 +237,7 @@ class StreamBufferManager {
     return !!(
       buf.messageId ||
       buf.blocks.length > 0 ||
+      buf.segmentOrder.length > 0 ||
       buf.textAcc ||
       buf.thinkingAcc ||
       buf.hasThinkingBlock ||
@@ -235,6 +257,8 @@ class StreamBufferManager {
     }
     buf.textAcc = '';
     buf.blocks = [];
+    buf.segmentsById.clear();
+    buf.segmentOrder = [];
     buf.textSegmentAcc = '';
     buf.textSegmentOrdinal = null;
     buf.thinkingAcc = '';
@@ -250,10 +274,15 @@ class StreamBufferManager {
     buf.turnEnding = false;
   }
 
-  private finishBufferTurn(buf: Buffer): void {
+  private finishBufferTurn(buf: Buffer, persistedEntries: {
+    turnInputEntryId?: string | null;
+    userEntryId?: string | null;
+    assistantEntryId?: string | null;
+  } = {}): void {
     if (this.hasTurnState(buf)) {
       buf.turnEnding = true;
       this.flush(buf);
+      this.commitLiveTurn(buf, persistedEntries);
     } else if (buf.flushTimer) {
       clearTimeout(buf.flushTimer);
       buf.flushTimer = null;
@@ -277,7 +306,6 @@ class StreamBufferManager {
       : null;
     if (existing) {
       buf.messageId = targetId;
-      buf.blocks = existing.type === 'message' ? [...(existing.data.blocks || [])] : [];
       return;
     }
 
@@ -291,20 +319,101 @@ class StreamBufferManager {
   private updateTargetMessage(buf: Buffer, updater: (msg: ChatMessage) => ChatMessage): void {
     this.ensureMessage(buf);
     if (!buf.messageId) return;
-    const updated = useStore.getState().updateMessageById(buf.sessionPath, buf.messageId, (message) => {
-      const next = updater(message);
-      const blocks = normalizeContentBlocks(next.blocks || [], {
-        idPrefix: message.sourceEntryId || message.id,
-        turnLifecycle: buf.turnEnding ? 'sealed' : 'streaming',
-      });
-      buf.blocks = blocks;
-      return { ...next, blocks };
-    });
-    if (!updated) {
+    const store = useStore.getState();
+    const session = sessionScopedValue(store, store.chatSessions, buf.sessionPath);
+    const item = session?.items.find((entry) => (
+      entry.type === 'message'
+      && entry.data.role === 'assistant'
+      && entry.data.id === buf.messageId
+    ));
+    if (!item || item.type !== 'message') {
       console.warn('[stream] target assistant message missing after ensureMessage:', buf.sessionPath, buf.messageId);
       return;
     }
+    const next = updater({ ...item.data, blocks: buf.blocks });
+    const blocks = normalizeContentBlocks(next.blocks || [], {
+      idPrefix: item.data.sourceEntryId || item.data.id,
+      turnLifecycle: buf.turnEnding ? 'sealed' : 'streaming',
+    });
+    buf.blocks = blocks;
+    this.publishLiveTurn(buf);
     bumpMessageLiveVersion(buf.sessionPath);
+  }
+
+  private publishLiveTurn(buf: Buffer): void {
+    if (!buf.messageId) return;
+    publishLiveAssistantMessage(buf.sessionPath, buf.messageId, buf.blocks, {
+      segmentsById: Object.fromEntries(buf.segmentsById),
+      segmentOrder: [...buf.segmentOrder],
+      status: buf.turnEnding ? 'sealed' : 'streaming',
+    });
+  }
+
+  private updateCanonicalSegment(buf: Buffer, msg: any): void {
+    this.ensureMessage(buf);
+    if (!buf.messageId || typeof msg.segmentId !== 'string' || !msg.segmentId) return;
+    const existing = buf.segmentsById.get(msg.segmentId);
+    if (msg.type === 'assistant_segment_start') {
+      const semanticPhase = normalizeLiveSegmentPhase(msg.semanticPhase);
+      const segment: LiveAssistantSegment = {
+        id: msg.segmentId,
+        kind: msg.kind === 'reasoning' ? 'reasoning' : 'text',
+        semanticPhase,
+        source: existing?.source || '',
+        lifecycle: 'streaming',
+      };
+      if (!existing) buf.segmentOrder.push(msg.segmentId);
+      buf.segmentsById.set(msg.segmentId, segment);
+    } else if (msg.type === 'assistant_segment_delta') {
+      const semanticPhase = normalizeLiveSegmentPhase(msg.semanticPhase || existing?.semanticPhase);
+      const segment: LiveAssistantSegment = existing || {
+        id: msg.segmentId,
+        kind: semanticPhase === 'reasoning' ? 'reasoning' : 'text',
+        semanticPhase,
+        source: '',
+        lifecycle: 'streaming',
+      };
+      if (!existing) buf.segmentOrder.push(msg.segmentId);
+      buf.segmentsById.set(msg.segmentId, {
+        ...segment,
+        semanticPhase,
+        source: `${segment.source}${typeof msg.delta === 'string' ? msg.delta : ''}`,
+      });
+    } else if (msg.type === 'assistant_segment_end') {
+      const semanticPhase = normalizeLiveSegmentPhase(msg.semanticPhase || existing?.semanticPhase);
+      const segment: LiveAssistantSegment = existing || {
+        id: msg.segmentId,
+        kind: semanticPhase === 'reasoning' ? 'reasoning' : 'text',
+        semanticPhase,
+        source: '',
+        lifecycle: 'streaming',
+      };
+      if (!existing) buf.segmentOrder.push(msg.segmentId);
+      buf.segmentsById.set(msg.segmentId, {
+        ...segment,
+        semanticPhase,
+        lifecycle: 'sealed',
+      });
+    }
+    if (msg.type === 'assistant_segment_delta') this.scheduleFlush(buf);
+    else this.flush(buf);
+  }
+
+  private commitLiveTurn(buf: Buffer, persistedEntries: {
+    turnInputEntryId?: string | null;
+    userEntryId?: string | null;
+    assistantEntryId?: string | null;
+  }): void {
+    if (!buf.messageId) return;
+    const committed = useStore.getState().bindPersistedTurnEntries(buf.sessionPath, {
+      ...persistedEntries,
+      assistantMessageId: buf.messageId,
+      assistantBlocks: buf.blocks,
+    });
+    clearLiveAssistantMessage(buf.sessionPath, buf.messageId);
+    if (!committed) {
+      console.warn('[stream] failed to commit live assistant turn:', buf.sessionPath, buf.messageId);
+    }
   }
 
   private appendInterlude(buf: Buffer, block: InterludeContentBlock): boolean {
@@ -357,6 +466,12 @@ class StreamBufferManager {
     const buf = this.getBuffer(sessionPath, sessionId);
 
     switch (msg.type) {
+      case 'assistant_segment_start':
+      case 'assistant_segment_delta':
+      case 'assistant_segment_end':
+        this.updateCanonicalSegment(buf, msg);
+        break;
+
       case 'text_delta':
         this.ensureMessage(buf);
         buf.textAcc += msg.delta || '';
@@ -554,13 +669,11 @@ class StreamBufferManager {
         break;
 
       case 'turn_end':
-        useStore.getState().bindPersistedTurnEntries?.(buf.sessionPath, {
+        this.finishBufferTurn(buf, {
           turnInputEntryId: msg.turnInputEntryId,
           userEntryId: msg.userEntryId,
           assistantEntryId: msg.assistantEntryId,
-          assistantMessageId: buf.messageId,
         });
-        this.finishBufferTurn(buf);
         break;
 
     }
@@ -586,6 +699,7 @@ class StreamBufferManager {
     const aliasKey = this.bufferKeysByPath.get(sessionPath) || null;
     const buf = this.lookupBuffer(sessionPath, sessionId);
     if (buf?.flushTimer) clearTimeout(buf.flushTimer);
+    if (buf?.messageId) clearLiveAssistantMessage(buf.sessionPath, buf.messageId);
     this.deleteBufferKey(key);
     if (aliasKey && aliasKey !== key) this.deleteBufferKey(aliasKey);
     if (key !== sessionPath) this.deleteBufferKey(sessionPath);
@@ -595,6 +709,7 @@ class StreamBufferManager {
   clearAll(): void {
     for (const [, buf] of this.buffers) {
       if (buf.flushTimer) clearTimeout(buf.flushTimer);
+      if (buf.messageId) clearLiveAssistantMessage(buf.sessionPath, buf.messageId);
     }
     this.buffers.clear();
     this.bufferKeysByPath.clear();

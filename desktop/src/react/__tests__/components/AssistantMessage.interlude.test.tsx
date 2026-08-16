@@ -2,10 +2,12 @@
 
 import '@testing-library/jest-dom/vitest';
 import React from 'react';
-import { cleanup, render, screen } from '@testing-library/react';
+import { act, cleanup, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { AssistantMessage } from '../../components/chat/AssistantMessage';
 import { useStore } from '../../stores';
+import { clearLiveTurnStore, publishLiveAssistantMessage } from '../../stores/live-turn-store';
+import { observeChatPerformance } from '../../utils/chat-performance';
 
 vi.mock('../../utils/screenshot', () => ({
   takeScreenshot: vi.fn(),
@@ -38,6 +40,7 @@ describe('AssistantMessage interlude-only rendering', () => {
 
   afterEach(() => {
     cleanup();
+    clearLiveTurnStore();
     vi.restoreAllMocks();
   });
 
@@ -73,5 +76,64 @@ describe('AssistantMessage interlude-only rendering', () => {
     expect(container.textContent).not.toContain('Hanako');
     expect(container.querySelector('[data-message-actions]')).toBeNull();
     expect(container.querySelector('[data-testid="assistant-completion-actions"]')).toBeNull();
+  });
+
+  it('实时内容只重渲染所属助手消息，不带动无关消息', () => {
+    const sessionPath = '/sessions/live-overlay.jsonl';
+    const agentDisplay = {
+      id: 'hana',
+      displayName: 'Hana',
+      avatarUrl: null,
+      fallbackAvatar: null,
+      yuan: 'hana',
+      isUser: false,
+    };
+    render(
+      <>
+        <AssistantMessage
+          agentDisplay={agentDisplay}
+          isStreaming
+          isSelected={false}
+          showAvatar={false}
+          sessionPath={sessionPath}
+          message={{ id: 'assistant-live', role: 'assistant', blocks: [] }}
+        />
+        <AssistantMessage
+          agentDisplay={agentDisplay}
+          isStreaming={false}
+          isSelected={false}
+          showAvatar={false}
+          sessionPath={sessionPath}
+          message={{
+            id: 'assistant-history',
+            role: 'assistant',
+            blocks: [{ type: 'text', html: '<p>历史内容</p>', source: '历史内容' }],
+          }}
+        />
+      </>,
+    );
+
+    const renderedMessageIds: string[] = [];
+    const stop = observeChatPerformance((event) => {
+      if (event.name === 'assistant_message_render' && event.messageId) {
+        renderedMessageIds.push(event.messageId);
+      }
+    });
+    act(() => {
+      publishLiveAssistantMessage(sessionPath, 'assistant-live', [{
+        id: 'assistant-live:text:0',
+        type: 'text',
+        html: '<p>实时正文</p>',
+        source: '实时正文',
+        semanticPhase: 'final_answer',
+        surfaceRole: 'answer',
+        lifecycle: 'streaming',
+      }]);
+    });
+    stop();
+
+    expect(screen.getByText('实时正文')).toBeInTheDocument();
+    expect(screen.getByText('历史内容')).toBeInTheDocument();
+    expect(renderedMessageIds).toEqual(['assistant-live']);
   });
 });

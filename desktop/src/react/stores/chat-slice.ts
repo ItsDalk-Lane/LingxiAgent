@@ -38,6 +38,7 @@ export interface ChatSlice {
     userEntryId?: string | null;
     assistantEntryId?: string | null;
     assistantMessageId?: string | null;
+    assistantBlocks?: ContentBlock[] | null;
   }) => boolean;
   truncateSessionFromMessage: (path: string, messageId: string) => boolean;
   appendInterludeItem: (sessionPath: string, block: Extract<ContentBlock, { type: 'interlude' }>) => boolean;
@@ -314,7 +315,8 @@ export const createChatSlice = (
     const assistantMessageId = typeof entries?.assistantMessageId === 'string' && entries.assistantMessageId.trim()
       ? entries.assistantMessageId.trim()
       : null;
-    if (!turnInputEntryId && !userEntryId && !assistantEntryId) return false;
+    const assistantBlocks = Array.isArray(entries?.assistantBlocks) ? entries.assistantBlocks : null;
+    if (!turnInputEntryId && !userEntryId && !assistantEntryId && !assistantBlocks) return false;
 
     let changed = false;
     set((s) => {
@@ -329,13 +331,21 @@ export const createChatSlice = (
           ))
         : -1;
 
-      if ((assistantEntryId || turnInputEntryId) && assistantIndex >= 0) {
+      if ((assistantEntryId || turnInputEntryId || assistantBlocks) && assistantIndex >= 0) {
         const assistant = items[assistantIndex];
         if (assistant.type === 'message' && (
           (assistantEntryId && assistant.data.sourceEntryId !== assistantEntryId)
           || (turnInputEntryId && assistant.data.turnInputEntryId !== turnInputEntryId)
+          || assistantBlocks !== null
         )) {
           const previousBlockIdPrefix = assistant.data.sourceEntryId || assistant.data.id;
+          if (assistantBlocks) {
+            recordChatPerformance('structural_message_update', {
+              sessionPath: path,
+              messageId: assistant.data.id,
+              itemCount: session.items.length,
+            });
+          }
           items[assistantIndex] = {
             type: 'message',
             data: {
@@ -347,6 +357,13 @@ export const createChatSlice = (
                   assistant.data.blocks,
                   previousBlockIdPrefix,
                   assistantEntryId,
+                ),
+              } : {}),
+              ...(assistantBlocks ? {
+                blocks: rebaseGeneratedContentBlockIds(
+                  assistantBlocks,
+                  previousBlockIdPrefix,
+                  assistantEntryId || previousBlockIdPrefix,
                 ),
               } : {}),
             },

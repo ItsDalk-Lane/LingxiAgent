@@ -28,6 +28,7 @@ import { createScreenshotSlice, type ScreenshotSlice } from './screenshot-slice'
 import { createSidebarUiSlice, type SidebarUiSlice } from './sidebar-ui-slice';
 import { createFileHistorySlice, type FileHistorySlice } from './file-history-slice';
 import { configureMessageLiveVersionSessionKeyResolver } from './message-live-version';
+import { configureLiveTurnSessionKeyResolver } from './live-turn-store';
 
 export type StoreState = ConnectionSlice &
   SessionSlice &
@@ -90,6 +91,9 @@ export const useStore = create<StoreState>()((set, _get, _api) => ({
 }));
 
 configureMessageLiveVersionSessionKeyResolver((sessionPath) => (
+  sessionScopedKey(useStore.getState(), sessionPath)
+));
+configureLiveTurnSessionKeyResolver((sessionPath) => (
   sessionScopedKey(useStore.getState(), sessionPath)
 ));
 

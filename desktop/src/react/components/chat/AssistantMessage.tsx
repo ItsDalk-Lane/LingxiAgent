@@ -2,7 +2,7 @@
  * AssistantMessage — 助手消息，遍历 ContentBlock 按类型渲染
  */
 
-import { Component, memo, useCallback, useEffect, useMemo, useState, type ErrorInfo, type ReactNode } from 'react';
+import { Component, memo, useCallback, useEffect, useMemo, useState, useSyncExternalStore, type ErrorInfo, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { StreamingMarkdownContent } from './StreamingMarkdownContent';
 import { MoodBlock } from './MoodBlock';
@@ -51,6 +51,10 @@ import {
 } from '../automation/schedule-draft';
 import styles from './Chat.module.css';
 import { recordChatPerformance } from '../../utils/chat-performance';
+import {
+  readLiveAssistantMessage,
+  subscribeLiveAssistantMessage,
+} from '../../stores/live-turn-store';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -72,6 +76,8 @@ interface Props {
   onForkCreated?: ForkedSessionHandler;
   messageRef?: (element: HTMLDivElement | null) => void;
 }
+
+const EMPTY_CONTENT_BLOCKS: readonly ContentBlock[] = [];
 
 function isContentBlockCandidate(block: unknown): block is ContentBlock {
   return !!block && typeof block === 'object' && typeof (block as { type?: unknown }).type === 'string';
@@ -95,20 +101,28 @@ export const AssistantMessage = memo(function AssistantMessage({
   onForkCreated,
   messageRef,
 }: Props) {
+  const subscribeToLiveMessage = useCallback((listener: () => void) => (
+    subscribeLiveAssistantMessage(sessionPath, message.id, listener)
+  ), [message.id, sessionPath]);
+  const readLiveMessage = useCallback(() => (
+    readLiveAssistantMessage(sessionPath, message.id)
+  ), [message.id, sessionPath]);
+  const liveMessage = useSyncExternalStore(subscribeToLiveMessage, readLiveMessage, () => null);
+  const sourceBlocks = liveMessage?.blocks || message.blocks || EMPTY_CONTENT_BLOCKS;
   recordChatPerformance('assistant_message_render', {
     sessionPath,
     messageId: message.id,
-    blockCount: message.blocks?.length || 0,
+    blockCount: sourceBlocks.length,
   });
   const displayInfo = agentDisplay;
   const displayName = agentDisplay.displayName;
   const displayYuan = agentDisplay.yuan;
 
   const blocks = useMemo(
-    () => (message.blocks || [])
+    () => sourceBlocks
       .filter(isContentBlockCandidate)
       .filter(block => block.type !== 'session_confirmation' || block.surface !== 'input'),
-    [message.blocks],
+    [sourceBlocks],
   );
   const isInterludeOnly = blocks.length > 0 && blocks.every(block => block.type === 'interlude');
   const hasWideBlock = blocks.some((block) => (

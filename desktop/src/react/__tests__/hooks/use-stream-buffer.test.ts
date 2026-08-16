@@ -16,6 +16,7 @@ import {
 } from '../../stores/stream-invalidator';
 import { useStore } from '../../stores';
 import type { ChatListItem, ChatMessage } from '../../stores/chat-types';
+import { readLiveAssistantMessage } from '../../stores/live-turn-store';
 
 const PATH = '/test/session.jsonl';
 const MOVED_PATH = '/test/moved-session.jsonl';
@@ -42,7 +43,9 @@ function lastRole(): string | undefined {
 
 function getAssistantMessage(): ChatMessage | null {
   const item = getItems().find((entry) => entry.type === 'message' && entry.data.role === 'assistant');
-  return item?.type === 'message' ? item.data : null;
+  if (item?.type !== 'message') return null;
+  const live = readLiveAssistantMessage(PATH, item.data.id);
+  return live ? { ...item.data, blocks: [...live.blocks] } : item.data;
 }
 
 function getThinkingBlock() {
@@ -181,6 +184,47 @@ describe('streamBufferManager.snapshot', () => {
       turnInputEntryId: 'entry-hidden-background-input',
     });
   });
+
+  it('统一助手分段只写当前回合语义状态，不改结构消息内容', () => {
+    streamBufferManager.handle({
+      type: 'assistant_segment_start',
+      sessionPath: PATH,
+      segmentId: 'assistant:1:text:0',
+      kind: 'text',
+      semanticPhase: 'unresolved',
+    });
+    streamBufferManager.handle({
+      type: 'assistant_segment_delta',
+      sessionPath: PATH,
+      segmentId: 'assistant:1:text:0',
+      delta: '内部过程',
+      semanticPhase: 'unresolved',
+    });
+    streamBufferManager.handle({
+      type: 'assistant_segment_end',
+      sessionPath: PATH,
+      segmentId: 'assistant:1:text:0',
+      semanticPhase: 'commentary',
+    });
+
+    const assistant = getItems().find((item) => item.type === 'message' && item.data.role === 'assistant');
+    expect(assistant?.type).toBe('message');
+    if (assistant?.type !== 'message') throw new Error('expected assistant seat');
+    expect(assistant.data.blocks).toEqual([]);
+    expect(readLiveAssistantMessage(PATH, assistant.data.id)).toMatchObject({
+      segmentOrder: ['assistant:1:text:0'],
+      status: 'streaming',
+      segmentsById: {
+        'assistant:1:text:0': {
+          id: 'assistant:1:text:0',
+          kind: 'text',
+          semanticPhase: 'commentary',
+          source: '内部过程',
+          lifecycle: 'sealed',
+        },
+      },
+    });
+  });
 });
 
 function getMoodBlock() {
@@ -256,7 +300,8 @@ describe('streamBufferManager.mood 多段聚合', () => {
     const assistants = getItems().filter((i): i is ChatListItem & { type: 'message' } =>
       i.type === 'message' && i.data.role === 'assistant');
     const last = assistants[assistants.length - 1];
-    const lastMood = last?.data.blocks?.find((b) => b.type === 'mood');
+    const lastLive = last ? readLiveAssistantMessage(PATH, last.data.id) : null;
+    const lastMood = lastLive?.blocks.find((b) => b.type === 'mood');
     expect(lastMood?.text).toBe('BBB');
     // 上一条仍保留 AAA，互不串扰
     const firstMood = assistants[0]?.data.blocks?.find((b) => b.type === 'mood');
@@ -401,7 +446,8 @@ describe('streamBufferManager.ensureMessage 自愈', () => {
     expect(last.type).toBe('message');
     if (last.type !== 'message') throw new Error('expected assistant message');
     expect(last.data.id).toBe(assistantId);
-    expect(last.data.blocks?.some((block: { type: string }) => block.type === 'tool_group')).toBe(true);
+    expect(readLiveAssistantMessage(PATH, last.data.id)?.blocks
+      .some((block) => block.type === 'tool_group')).toBe(true);
   });
 
   it('keeps in-flight turn state attached to sessionId when the session path moves', () => {
@@ -430,7 +476,10 @@ describe('streamBufferManager.ensureMessage 自愈', () => {
       .find((item) => item.type === 'message' && item.data.role === 'assistant');
     expect(firstAssistantItem?.type).toBe('message');
     if (firstAssistantItem?.type !== 'message') throw new Error('expected first assistant message');
-    const firstAssistant = firstAssistantItem.data;
+    const firstLive = readLiveAssistantMessage(PATH, firstAssistantItem.data.id);
+    const firstAssistant = firstLive
+      ? { ...firstAssistantItem.data, blocks: [...firstLive.blocks] }
+      : firstAssistantItem.data;
     expect(firstAssistant?.blocks?.find((block) => block.type === 'text')).toMatchObject({
       type: 'text',
       source: 'first',
