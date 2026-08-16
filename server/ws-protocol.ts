@@ -11,6 +11,10 @@
  *   { type: "compact", sessionId: "..." }  (新客户端只发送 sessionId；sessionPath 仅旧客户端兼容输入，服务端会在边界解析为 sessionId 后丢弃)
  *
  * Server → Client:
+ *   { type: "assistant_segment_start", segmentId: "...", kind: "text"|"reasoning", semanticPhase: "reasoning"|"commentary"|"final_answer"|"unresolved" }
+ *   { type: "assistant_segment_delta", segmentId: "...", delta: "...", semanticPhase: "reasoning"|"commentary"|"final_answer"|"unresolved" }
+ *   { type: "assistant_segment_end", segmentId: "...", semanticPhase: "reasoning"|"commentary"|"final_answer" }
+ *     （新统一助手文字协议；兼容期仍并行发送旧 text_delta，迁移完成后移除旧事件。）
  *   { type: "text_delta", delta: "..." }
  *   { type: "mood_start" }
  *   { type: "mood_text", delta: "..." }
