@@ -1,6 +1,11 @@
 import { MediaAdapterRegistry } from "./media-adapter-registry.ts";
 import { builtinSpeechRecognitionAdapters } from "./speech-recognition/adapters.ts";
 import { createModuleLogger } from "../lib/debug-log.ts";
+import {
+  buildMediaModelEditPatch,
+  MediaModelEditValidationError,
+  requireExistingMediaModel,
+} from "../shared/media-model-edit.ts";
 
 const CAPABILITY = "speech_recognition";
 
@@ -112,6 +117,27 @@ export class SpeechRecognitionService {
 
   setProviderModel(providerId, model) {
     this._providers.addMediaModel(providerId, CAPABILITY, model);
+    return { ok: true };
+  }
+
+  /**
+   * 编辑已添加的语音识别模型（PUT 语义：只改 displayName / inputs / outputs）。
+   * 模型必须已存在；runtime-discovered 目录不可人工变更。
+   */
+  updateProviderModel(providerId, modelId, patch) {
+    if (this._providers.getRuntimeMediaCapabilitySourceOwner?.(providerId)) {
+      throw new MediaModelEditValidationError(
+        `Runtime-discovered provider "${providerId}" does not allow manual model changes`,
+      );
+    }
+    const existing = requireExistingMediaModel({
+      models: this._providers.getMediaModels(providerId, CAPABILITY),
+      providerId,
+      modelId,
+      capability: CAPABILITY,
+    });
+    const safePatch = buildMediaModelEditPatch({ capability: CAPABILITY, body: patch, existingModel: existing });
+    this._providers.updateMediaModelEntry(providerId, CAPABILITY, modelId, safePatch);
     return { ok: true };
   }
 

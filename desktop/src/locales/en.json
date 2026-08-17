@@ -1442,7 +1442,7 @@
       "updateDownloadingVersion": "Downloading v{version}…",
       "updateReady": "v{version} downloaded",
       "updatePreparing": "Preparing update…",
-      "updateInstalling": "Installing update, the app will restart…",
+      "updateInstalling": "Installing update. Lingxi will restart automatically…",
       "updateAutoFailed": "Auto-update failed. Please download manually.",
       "updateDownloadManual": "Download manually",
       "updateDmgHint": "Auto-update is unavailable when running from a DMG. Please download and reinstall.",
@@ -1450,7 +1450,6 @@
       "updateChecking": "Checking for updates…",
       "updateDownloading": "{agentName} is preparing a new home",
       "updateReadyInstall": "v{version} ready to install",
-      "updateInstalling": "Installing update. Lingxi will restart automatically…",
       "updateInstallManualHint": "Install after clicking Restart to update; quitting will not install automatically",
       "updateInstall": "Restart to update",
       "updateInstallNow": "Restart and update now",
@@ -1657,7 +1656,7 @@
       "url": "Base URL",
       "apiKey": "API Key",
       "addBtn": "Add",
-      "empty": "No providers registered yet",
+      "empty": "No providers yet. Click “Add Provider” above to start.",
       "fetchModels": "Fetch Models",
       "delete": "Delete provider",
       "modelCount": "{n} models",
@@ -1686,13 +1685,13 @@
       "addService": "Add Provider",
       "pickTitle": "Select Provider",
       "backToList": "Back to providers",
-      "empty": "No providers yet. Click “Add Provider” above to start.",
       "subtab": {
         "api": "Configure API",
         "models": "Configure Models",
         "search": "Search",
         "usage": "Usage"
-      }
+      },
+      "configMissingFields": "This provider config is incomplete. Missing: {fields}."
     },
     "usage": {
       "title": "Usage",
@@ -1783,7 +1782,12 @@
       "qualityHigh": "High",
       "imageProviderDefaults": "Image Generation Defaults",
       "videoProviderDefaults": "Video Generation Defaults",
-      "runtimeUnavailable": "Runtime status unavailable"
+      "noParameterDefaults": "Added models declare no parameter schema; there is nothing to configure yet.",
+      "runtimeUnavailable": "Runtime status unavailable",
+      "imageDefaultsButton": "Image generation defaults",
+      "videoDefaultsButton": "Video generation defaults",
+      "speechSynthesisDefaultsButton": "Speech synthesis defaults",
+      "runtimeProvider": "Runtime provider"
     },
     "models": {
       "auxiliary": "Auxiliary Models",
@@ -1890,7 +1894,43 @@
         "video": "Supports video input",
         "audio": "Supports audio input",
         "reasoning": "Supports reasoning",
-        "tools": "Supports tool calling"
+        "tools": "Supports tool calling",
+        "web": "Web search",
+        "structuredOutput": "Structured output"
+      },
+      "contextConfig": "Context",
+      "inputModalities": "Input modalities",
+      "outputModalities": "Output modalities",
+      "modelCapabilities": "Model capabilities",
+      "modalityRequired": "Modalities cannot be empty",
+      "webTooltip": "When enabled, normal chats use this provider's native web search; internal utility calls are unaffected.",
+      "structuredOutputTooltip": "When enabled, normal chats must produce valid standard JSON; internal utility calls are unaffected.",
+      "webUnsupported": "Protocol does not support native web search",
+      "structuredOutputUnsupported": "Protocol does not support structured output",
+      "modality": {
+        "text": "Text",
+        "image": "Vision",
+        "video": "Video",
+        "audio": "Audio"
+      },
+      "outputModality": {
+        "text": "Output: text",
+        "image": "Output: image",
+        "video": "Output: video",
+        "audio": "Output: audio"
+      },
+      "modelGroup": {
+        "chat": "Chat models",
+        "image": "Image models",
+        "video": "Video models",
+        "speech": "Speech recognition models"
+      },
+      "customModelCategory": {
+        "label": "Category",
+        "chat": "Chat",
+        "image": "Image",
+        "video": "Video",
+        "speech": "Speech recognition"
       }
     },
     "memory": {

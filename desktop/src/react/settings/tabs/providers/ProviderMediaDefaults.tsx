@@ -175,9 +175,11 @@ export function ProviderMediaDefaults({ capability, runtimeProviderId, provider,
   const defaultsTitle = capability === 'videoGeneration'
     ? t('settings.media.videoProviderDefaults')
     : t('settings.media.imageProviderDefaults');
+  const hasFallbackFields = fallbackRatios.length > 0
+    || (capability === 'imageGeneration' && fallbackResolutions.length > 0);
 
   return (
-    <div className={styles['media-defaults']}>
+    <div className={styles['media-defaults']} data-media-defaults="true">
       <div className={styles['media-defaults-title']}>
         {defaultsTitle}
       </div>
@@ -217,7 +219,7 @@ export function ProviderMediaDefaults({ capability, runtimeProviderId, provider,
             {schemaEntries.map(([key, property]) => renderSchemaControl(key, property))}
           </div>
         </div>
-      ) : (
+      ) : hasFallbackFields ? (
         <div className={styles['media-config-grid']}>
           {capability === 'imageGeneration' && fallbackResolutions.length > 0 && (
             <div className={styles['media-config-field']}>
@@ -249,6 +251,12 @@ export function ProviderMediaDefaults({ capability, runtimeProviderId, provider,
               />
             </div>
           )}
+        </div>
+      ) : (
+        // 已添加的模型没有声明参数 schema（自定义 id / chat 槽认领的媒体模型）：
+        // 显式空态，不能渲染成只剩标题的空白表单。
+        <div className={styles['media-defaults-empty']} data-media-defaults-empty="true">
+          {t('settings.media.noParameterDefaults')}
         </div>
       )}
     </div>

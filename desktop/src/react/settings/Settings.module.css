@@ -1831,17 +1831,6 @@
     font-weight: 500;
 }
 
-.media-capability-section {
-    margin-top: var(--space-16);
-    padding-top: var(--space-16);
-    border-top: 1px solid var(--overlay-light);
-}
-
-.media-capability-section:first-child {
-    border-top: none;
-    padding-top: 0;
-}
-
 .media-defaults {
     margin-top: var(--space-16);
     padding-top: var(--space-16);
@@ -1853,6 +1842,13 @@
     color: var(--text-secondary);
     font-size: var(--fs-caption);
     font-weight: 600;
+}
+
+/* 默认参数空态：已添加模型未声明参数 schema 时的显式提示 */
+.media-defaults-empty {
+    color: var(--text-muted);
+    font-size: var(--fs-caption);
+    padding: var(--space-4) 0;
 }
 
 .media-defaults-stack,
@@ -5739,8 +5735,10 @@ a.about-link:hover {
 
 .pv-fav-item:hover { background: var(--accent-light); }
 
+/* 名称与 ID 都只按内容收缩，剩余空间由行尾 spacer 吸收，
+   保证输出模态图标始终紧邻承担 ID 展示职责的文字。 */
 .pv-fav-item-name {
-    flex: 1;
+    flex: 0 1 auto;
     font-size: var(--fs-caption);
     color: var(--text);
     min-width: 0;
@@ -5753,11 +5751,18 @@ a.about-link:hover {
     font-size: var(--fs-hint);
     color: var(--text-muted);
     opacity: 0.6;
-    flex: 0 1 min(42%, 18rem);
+    /* 收缩到内容宽度（后面的模态图标才能紧邻 id），min(42%, 18rem) 只是溢出上限 */
+    flex: 0 1 auto;
+    max-width: min(42%, 18rem);
     min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+}
+
+.pv-fav-item-spacer {
+    flex: 1 1 auto;
+    min-width: 0;
 }
 
 .pv-capability-icon {
@@ -5881,6 +5886,174 @@ a.about-link:hover {
 .pv-model-edit-card .settings-input {
     font-size: var(--fs-caption);
     padding: 4px 8px;
+}
+
+/* ── 模型编辑：分区标题 / 模态与能力 chips ── */
+.pv-model-edit-section-title {
+    font-size: var(--fs-hint);
+    color: var(--text-muted);
+    margin-top: var(--space-4);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--border);
+}
+
+.pv-modality-chip-row {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: var(--space-4);
+}
+
+.pv-modality-chip {
+    flex: 1 1 0;
+    min-width: 0;
+    padding: var(--space-4) var(--space-6);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--text-secondary);
+    font-size: var(--fs-caption);
+    cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: center;
+}
+
+.pv-modality-chip:hover:not(:disabled) {
+    border-color: var(--accent, var(--border));
+    color: var(--text);
+}
+
+.pv-modality-chip.active {
+    background: var(--accent-soft, rgba(59, 130, 246, 0.12));
+    border-color: var(--accent, #3b82f6);
+    color: var(--text);
+    font-weight: 600;
+}
+
+.pv-modality-chip:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+/* ── 模型行：输出模态图标（紧邻 ID，不用 margin-left:auto） ── */
+.pv-output-modality-icons {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    flex: 0 0 auto;
+}
+
+.pv-output-modality-icon {
+    display: inline-flex;
+    align-items: center;
+    color: var(--text-muted);
+}
+
+/* ── 默认参数按钮：始终同一行 ── */
+.pv-default-params-row {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: var(--space-6);
+    margin-top: var(--space-6);
+}
+
+.pv-default-params-btn {
+    flex: 0 0 auto;
+    padding: var(--space-4) var(--space-10);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-card, 8px);
+    background: transparent;
+    color: var(--text-secondary);
+    font-size: var(--fs-caption);
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.pv-default-params-btn:hover {
+    border-color: var(--accent, var(--border));
+    color: var(--text);
+}
+
+/* ── 默认参数 modal ── */
+.pv-defaults-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.15);
+    z-index: 9998;
+}
+
+.pv-defaults-modal {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 9999;
+    width: min(520px, calc(100vw - 48px));
+    max-height: min(72vh, 720px);
+    display: flex;
+    flex-direction: column;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-card, 8px);
+    box-shadow: 0 8px 24px var(--shadow);
+    padding: var(--space-12);
+}
+
+.pv-defaults-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-8);
+    padding-bottom: var(--space-6);
+    border-bottom: 1px solid var(--border);
+}
+
+.pv-defaults-modal-title {
+    font-size: var(--fs-body);
+    font-weight: 600;
+    color: var(--text);
+}
+
+.pv-defaults-modal-close {
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 16px;
+    cursor: pointer;
+    padding: 0 var(--space-4);
+}
+
+.pv-defaults-modal-runtime-picker {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    padding-top: var(--space-8);
+}
+
+.pv-defaults-modal-body {
+    overflow-y: auto;
+    min-height: 0;
+    padding-top: var(--space-8);
+}
+
+/* ── 添加模型下拉：类别分组与自定义类别选择 ── */
+.pv-model-dropdown-group {
+    padding: var(--space-6) var(--space-10) var(--space-2);
+    font-size: var(--fs-hint);
+    color: var(--text-muted);
+    user-select: none;
+}
+
+.pv-custom-category-select {
+    flex: 0 0 auto;
+    max-width: 110px;
+    padding: var(--space-4) var(--space-6);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--bg);
+    color: var(--text);
+    font-size: var(--fs-caption);
 }
 
 /* ── 模型列表区（折叠式） ── */

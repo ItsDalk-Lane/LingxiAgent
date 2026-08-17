@@ -28,6 +28,7 @@ import { normalizeProviderHeaders, stripCredentialHeaders } from "../shared/prov
 import { syncModels } from "./model-sync.ts";
 import { enrichModelFromKnownMetadata } from "./model-known-enrichment.ts";
 import { lookupKnownProvider } from "../shared/known-models.ts";
+import { readModalityListLoose } from "../shared/modality.ts";
 import { migrateLegacyApiKeyAuthToProviders } from "./provider-auth-migration.ts";
 import {
   normalizePiSdkThinkingLevel,
@@ -80,7 +81,24 @@ function buildProviderModelMetadataMap(projectionPlans: unknown) {
         }
         if (modelEntry.toolUse !== undefined) meta.toolUse = structuredClone(modelEntry.toolUse);
         if (modelEntry.visionCapabilities !== undefined) meta.visionCapabilities = structuredClone(modelEntry.visionCapabilities);
+        // 统一模态/能力 metadata：Pi modelFromJson 会丢弃这些字段，这里统一挂回
+        const explicitInputs = readModalityListLoose(modelEntry.inputs);
+        if (explicitInputs) meta.inputs = explicitInputs;
+        const explicitOutputs = readModalityListLoose(modelEntry.outputs);
+        if (explicitOutputs) meta.outputs = explicitOutputs;
+        if (modelEntry.web !== undefined) meta.web = modelEntry.web === true;
+        if (modelEntry.structuredOutput !== undefined) meta.structuredOutput = modelEntry.structuredOutput === true;
       }
+      if (meta.inputs === undefined) {
+        const knownInputs = readModalityListLoose(known?.inputs);
+        if (knownInputs) meta.inputs = knownInputs;
+      }
+      if (meta.outputs === undefined) {
+        const knownOutputs = readModalityListLoose(known?.outputs);
+        if (knownOutputs) meta.outputs = knownOutputs;
+      }
+      if (meta.web === undefined && known?.web === true) meta.web = true;
+      if (meta.structuredOutput === undefined && known?.structuredOutput === true) meta.structuredOutput = true;
       const executionHeaders = normalizeProviderHeaders(plan?.modelExecutionHeaders?.[modelId]);
       if (Object.keys(executionHeaders).length > 0) meta.headers = executionHeaders;
       if (meta.defaultThinkingLevel === undefined && typeof known?.defaultThinkingLevel === "string") {

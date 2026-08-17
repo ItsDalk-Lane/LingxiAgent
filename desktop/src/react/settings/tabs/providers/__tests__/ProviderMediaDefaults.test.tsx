@@ -130,4 +130,51 @@ describe('ProviderMediaDefaults', () => {
       },
     });
   });
+
+  it('renders an explicit empty state when the added model declares no parameter schema', () => {
+    // 自定义添加的媒体模型（不在声明目录中，无 modes/ratios/resolutions）：
+    // 不能渲染成只剩标题的空白表单
+    render(
+      <ProviderMediaDefaults
+        capability="imageGeneration"
+        runtimeProviderId="openai"
+        provider={{
+          providerId: 'openai',
+          displayName: 'OpenAI',
+          hasCredentials: true,
+          availableModels: [],
+          models: [{ id: 'my-custom-image-model', name: 'my-custom-image-model' }],
+        }}
+        config={{}}
+        onSaveConfig={vi.fn()}
+      />,
+    );
+
+    expect(screen.queryAllByRole('combobox')).toHaveLength(0);
+    expect(screen.getByText('settings.media.noParameterDefaults')).toBeInTheDocument();
+    expect(document.querySelector('[data-media-defaults-empty="true"]')).not.toBeNull();
+  });
+
+  it('renders the same empty state when the runtime catalog has no added models at all', () => {
+    // chat 槽认领的媒体模型不进运行时目录：按钮亮但表单数据源为空，
+    // 同样必须给出显式空态而不是空白
+    render(
+      <ProviderMediaDefaults
+        capability="imageGeneration"
+        runtimeProviderId="dashscope"
+        provider={{
+          providerId: 'dashscope',
+          displayName: 'DashScope',
+          hasCredentials: true,
+          availableModels: [{ id: 'qwen-image', name: 'Qwen Image' }],
+          models: [],
+        }}
+        config={{}}
+        onSaveConfig={vi.fn()}
+      />,
+    );
+
+    expect(screen.queryAllByRole('combobox')).toHaveLength(0);
+    expect(screen.getByText('settings.media.noParameterDefaults')).toBeInTheDocument();
+  });
 });

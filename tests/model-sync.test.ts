@@ -1143,6 +1143,98 @@ describe("syncModels", () => {
     ]);
   });
 
+  it("resolves canonical inputs/outputs/web/structuredOutput with explicit-inputs priority", async () => {
+    const syncModels = await loadSync();
+
+    const providers = {
+      custom: {
+        base_url: "https://custom.api.com/v1",
+        api: "openai-completions",
+        api_key: "sk-test",
+        models: [
+          {
+            id: "m-explicit",
+            inputs: ["audio", "text", "image", "text"],
+            image: true,
+            video: true,
+            outputs: ["text", "text"],
+            web: true,
+            structuredOutput: true,
+          },
+          { id: "m-legacy", image: true, video: true },
+          "m-plain",
+        ],
+      },
+    };
+
+    syncModels(providers, { modelsJsonPath });
+
+    const result = JSON.parse(fs.readFileSync(modelsJsonPath, "utf-8"));
+    const [explicitModel, legacyModel, plainModel] = result.providers.custom.models;
+
+    // 显式 inputs 是唯一真理源：legacy image/video 布尔不再参与解析
+    expect(explicitModel.inputs).toEqual(["text", "image", "audio"]);
+    expect(explicitModel.input).toEqual(["text", "image"]);
+    expect(explicitModel.compat?.hanaVideoInput).toBeUndefined();
+    expect(explicitModel.compat?.hanaAudioInput).toBe(true);
+    expect(explicitModel.outputs).toEqual(["text"]);
+    expect(explicitModel.web).toBe(true);
+    expect(explicitModel.structuredOutput).toBe(true);
+
+    // legacy 布尔回退保持现有行为
+    expect(legacyModel.input).toEqual(["text", "image"]);
+    expect(legacyModel.compat?.hanaVideoInput).toBe(true);
+    expect(legacyModel.inputs).toBeUndefined();
+
+    // 无任何声明：默认 text 输入；outputs/web/structuredOutput 不虚构
+    expect(plainModel.input).toEqual(["text"]);
+    expect(plainModel.outputs).toBeUndefined();
+    expect(plainModel.web).toBeUndefined();
+    expect(plainModel.structuredOutput).toBeUndefined();
+  });
+
+  it("projects explicit inputs video/audio into the matching Hana compat entries", async () => {
+    const syncModels = await loadSync();
+
+    const providers = {
+      custom: {
+        base_url: "https://custom.api.com/v1",
+        api: "openai-completions",
+        api_key: "sk-test",
+        models: [
+          { id: "m-video-input", inputs: ["text", "video"] },
+          { id: "m-audio-input", inputs: ["text", "audio"] },
+          { id: "m-text-only", inputs: ["text"], image: true },
+        ],
+      },
+    };
+
+    syncModels(providers, { modelsJsonPath });
+
+    const result = JSON.parse(fs.readFileSync(modelsJsonPath, "utf-8"));
+    expect(result.providers.custom.models.map((m) => [m.id, m.input, m.compat?.hanaVideoInput, m.compat?.hanaAudioInput])).toEqual([
+      ["m-video-input", ["text"], true, undefined],
+      ["m-audio-input", ["text"], undefined, true],
+      ["m-text-only", ["text"], undefined, undefined],
+    ]);
+  });
+
+  it("rejects invalid modality metadata before writing models.json", async () => {
+    const syncModels = await loadSync();
+
+    const providers = {
+      custom: {
+        base_url: "https://custom.api.com/v1",
+        api: "openai-completions",
+        api_key: "sk-test",
+        models: [{ id: "m-bad", inputs: "text" }],
+      },
+    };
+
+    expect(() => syncModels(providers, { modelsJsonPath })).toThrow(/inputs/);
+    expect(fs.existsSync(modelsJsonPath)).toBe(false);
+  });
+
   it("projects known OpenAI audio models into Hana compat without invalid Pi input", async () => {
     const syncModels = await loadSync();
 
@@ -1918,6 +2010,44 @@ describe("syncModels", () => {
     expect(result.providers["dashscope-coding"]).toBeUndefined();
     expect(result.providers["string-provider"]).toBeUndefined();
     expect(mm.availableModels).toEqual([{ id: "deepseek-chat", provider: "deepseek" }]);
+  });
+
+  it("reattaches canonical modality and capability metadata through the full sync chain", async () => {
+    const { ModelManager } = await import("../core/model-manager.ts");
+    fs.writeFileSync(path.join(tmpDir, "added-models.yaml"), [
+      "providers:",
+      "  deepseek:",
+      "    base_url: https://api.deepseek.com/v1",
+      "    api: openai-completions",
+      "    api_key: sk-deep",
+      "    models:",
+      "      - id: deepseek-chat",
+      "        inputs: [text, image]",
+      "        outputs: [text]",
+      "        web: true",
+      "        structuredOutput: true",
+      "",
+    ].join("\n"), "utf-8");
+
+    const mm = new ModelManager({ lingxiHome: tmpDir });
+    // 模拟 Pi modelFromJson：registry 运行时对象只保留 Pi 认识的字段，
+    // Lingxi-only 的 inputs/outputs/web/structuredOutput 必须靠 metadata reattachment 挂回。
+    mm._modelRegistry = {
+      refresh: vi.fn(),
+      getAvailable: vi.fn().mockResolvedValue([
+        { id: "deepseek-chat", provider: "deepseek", input: ["text", "image"] },
+      ]),
+    };
+
+    await mm.syncAndRefresh();
+
+    const model = mm.availableModels.find((m) => m.id === "deepseek-chat");
+    expect(model).toBeTruthy();
+    expect(model.inputs).toEqual(["text", "image"]);
+    expect(model.outputs).toEqual(["text"]);
+    expect(model.web).toBe(true);
+    expect(model.structuredOutput).toBe(true);
+    expect(model.input).toEqual(["text", "image"]);
   });
 
   it("keeps SDK-auth alias providers available without a provider model allow list", async () => {

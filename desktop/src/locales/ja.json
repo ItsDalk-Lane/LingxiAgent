@@ -1372,7 +1372,7 @@
       "updateDownloadingVersion": "v{version} をダウンロード中…",
       "updateReady": "v{version} のダウンロード完了",
       "updatePreparing": "アップデートを準備中…",
-      "updateInstalling": "アップデートをインストールしています。まもなく再起動します…",
+      "updateInstalling": "アップデートをインストール中です。Lingxi は自動で再起動します…",
       "updateAutoFailed": "自動更新に失敗しました。手動でダウンロードしてください。",
       "updateDownloadManual": "手動ダウンロード",
       "updateDmgHint": "DMGから実行している場合は自動更新できません。ダウンロードして再インストールしてください。",
@@ -1380,7 +1380,6 @@
       "updateChecking": "アップデートを確認中…",
       "updateDownloading": "{agentName}が新しいお家を準備中",
       "updateReadyInstall": "v{version} インストール準備完了",
-      "updateInstalling": "アップデートをインストール中です。Lingxi は自動で再起動します…",
       "updateInstallManualHint": "「再起動して更新」を押すとインストールします。終了だけでは自動インストールしません",
       "updateInstall": "再起動して更新",
       "updateInstallNow": "今すぐ再起動して更新",
@@ -1621,7 +1620,8 @@
         "models": "モデルを設定",
         "search": "検索",
         "usage": "使用量"
-      }
+      },
+      "configMissingFields": "このプロバイダーの設定が不完全です。補完が必要：{fields}。"
     },
     "usage": {
       "title": "使用量",
@@ -1712,7 +1712,12 @@
       "qualityHigh": "高",
       "imageProviderDefaults": "画像生成デフォルト",
       "videoProviderDefaults": "動画生成デフォルト",
-      "runtimeUnavailable": "ランタイム状態を利用できません"
+      "noParameterDefaults": "追加されたモデルにはパラメータースキーマの宣言がなく、設定できる項目はまだありません。",
+      "runtimeUnavailable": "ランタイム状態を利用できません",
+      "imageDefaultsButton": "画像生成のデフォルト",
+      "videoDefaultsButton": "動画生成のデフォルト",
+      "speechSynthesisDefaultsButton": "音声合成のデフォルト",
+      "runtimeProvider": "ランタイムプロバイダー"
     },
     "models": {
       "auxiliary": "補助モデル",
@@ -1818,9 +1823,45 @@
         "video": "動画入力に対応",
         "audio": "音声入力に対応",
         "reasoning": "推論に対応",
-        "tools": "ツール呼び出しに対応"
+        "tools": "ツール呼び出しに対応",
+        "web": "Web検索",
+        "structuredOutput": "構造化出力"
       },
-      "searchConfig": "検索 API 設定"
+      "searchConfig": "検索 API 設定",
+      "contextConfig": "コンテキスト設定",
+      "inputModalities": "入力モダリティ",
+      "outputModalities": "出力モダリティ",
+      "modelCapabilities": "モデル機能",
+      "modalityRequired": "モダリティは空にできません",
+      "webTooltip": "有効にすると、通常チャットでこのプロバイダーのネイティブ Web 検索を使用します。内部ユーティリティ呼び出しには影響しません。",
+      "structuredOutputTooltip": "有効にすると、通常チャットは有効な標準 JSON を出力する必要があります。内部ユーティリティ呼び出しには影響しません。",
+      "webUnsupported": "プロトコルはネイティブ Web 検索に対応していません",
+      "structuredOutputUnsupported": "プロトコルは構造化出力に対応していません",
+      "modality": {
+        "text": "テキスト",
+        "image": "画像",
+        "video": "動画",
+        "audio": "音声"
+      },
+      "outputModality": {
+        "text": "出力：テキスト",
+        "image": "出力：画像",
+        "video": "出力：動画",
+        "audio": "出力：音声"
+      },
+      "modelGroup": {
+        "chat": "対話モデル",
+        "image": "画像モデル",
+        "video": "動画モデル",
+        "speech": "音声認識モデル"
+      },
+      "customModelCategory": {
+        "label": "カテゴリ",
+        "chat": "対話",
+        "image": "画像",
+        "video": "動画",
+        "speech": "音声認識"
+      }
     },
     "memory": {
       "sectionTitle": "記憶",

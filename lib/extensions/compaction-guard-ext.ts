@@ -47,6 +47,7 @@ import {
 import {
   normalizeProviderContextMessages,
 } from "../../core/provider-compat.ts";
+import { runWithProviderCompatPurpose } from "../../core/provider-compat/purpose-scope.ts";
 import {
   isReasoningReplayUnavailable,
   reasoningReplayCanClear,
@@ -462,9 +463,14 @@ export function createCompactionGuardExtension(opts: Record<string, any> = {}) {
             },
             sessionId: runtimeStreamOptions.sessionId ?? ctx.sessionManager?.getSessionId?.(),
             onPayload: async (payload, requestModel) => {
-              const ordinaryPayload = typeof runtimeStreamOptions.onPayload === "function"
-                ? await runtimeStreamOptions.onPayload(payload, requestModel || model)
-                : undefined;
+              // 显式标记 compaction 用途，session onPayload 扩展链中的
+              // capability 层（联网/结构化输出）不会注入压缩请求。
+              const ordinaryPayload = await runWithProviderCompatPurpose(
+                "compaction",
+                () => (typeof runtimeStreamOptions.onPayload === "function"
+                  ? runtimeStreamOptions.onPayload(payload, requestModel || model)
+                  : undefined),
+              );
               return normalizeCompactionProviderPayload(
                 ordinaryPayload === undefined ? payload : ordinaryPayload,
                 requestModel || model,

@@ -31,6 +31,23 @@ export function createSpeechRecognitionRoute(engine) {
     }
   });
 
+  route.put("/speech-recognition/providers/:providerId/models/:modelId", async (c) => {
+    try {
+      const denied = denyWithoutScope(c, "providers.manage");
+      if (denied) return denied;
+      const providerId = c.req.param("providerId");
+      const modelId = c.req.param("modelId");
+      const body = await safeJson(c);
+      const service = requireSpeechRecognitionService(engine);
+      const patch = body?.model && typeof body.model === "object" && !Array.isArray(body.model) ? body.model : body;
+      const result = service.updateProviderModel(providerId, modelId, patch);
+      await engine.onProviderChanged?.();
+      return c.json(result);
+    } catch (err) {
+      return c.json({ error: err.message }, err.statusCode || 400);
+    }
+  });
+
   route.delete("/speech-recognition/providers/:providerId/models/:modelId", async (c) => {
     try {
       const denied = denyWithoutScope(c, "providers.manage");

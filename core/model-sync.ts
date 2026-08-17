@@ -20,6 +20,7 @@ import {
 } from "../shared/model-capabilities.ts";
 import { normalizeProviderHeaders, providerCredentialAllowsMissingApiKey } from "../shared/provider-auth.ts";
 import { validateProviderModels } from "../shared/provider-model-validation.ts";
+import { readModalityListLoose, modalitiesFromLegacyFlags, unionModalities } from "../shared/modality.ts";
 import { buildRuntimeApiKeyRef } from "../shared/runtime-api-key-ref.ts";
 import { inferOllamaModelMetadata } from "../shared/ollama-model-metadata.ts";
 import { normalizeProviderBaseUrlForApi } from "../lib/llm/provider-client.ts";
@@ -186,12 +187,31 @@ function buildModelOverride(modelEntry, modelDefaults = {}, executionHeaders = {
   if (defaultThinkingLevel !== undefined) {
     override.defaultThinkingLevel = defaultThinkingLevel;
   }
-  const image = modelEntry.image ?? modelEntry.vision;
-  const video = modelEntry.video;
-  const audio = modelEntry.audio;
-  if (image !== undefined || video !== undefined) {
+  // 输入模态 canonical 解析（buildModelEntry 同款规则）：
+  // 用户显式 inputs > legacy image/vision/video/audio > known/Pi 目录/Ollama > 默认 text。
+  // 一旦存在显式 inputs，legacy 布尔与词典推断不再参与，避免双真理。
+  const explicitInputs = readModalityListLoose(modelEntry.inputs);
+  const userImage = modelEntry.image ?? modelEntry.vision;
+  const userVideo = modelEntry.video;
+  const userAudio = modelEntry.audio;
+  const legacyInputFlags = modalitiesFromLegacyFlags({ image: userImage, video: userVideo, audio: userAudio });
+  const resolvedInputs = explicitInputs
+    ?? legacyInputFlags
+    ?? ["text"];
+  const image = resolvedInputs.includes("image");
+  const video = resolvedInputs.includes("video");
+  const audio = resolvedInputs.includes("audio");
+  if (explicitInputs) override.inputs = explicitInputs;
+  const explicitOutputs = readModalityListLoose(modelEntry.outputs);
+  if (explicitOutputs) override.outputs = explicitOutputs;
+  if (modelEntry.web !== undefined) override.web = modelEntry.web === true;
+  if (modelEntry.structuredOutput !== undefined) override.structuredOutput = modelEntry.structuredOutput === true;
+  // Pi input 只支持 text|image；audio/video 走 Lingxi compat，不触发 override.input。
+  // 与旧逻辑一致：仅 audio 显式设置时不覆盖 Pi 内置 input。
+  const hasInputOverrideIntent = userImage !== undefined || userVideo !== undefined || explicitInputs;
+  if (hasInputOverrideIntent) {
     override.input = buildPiInputModalities({
-      image: image === true,
+      image,
     });
   }
   if (modelEntry.reasoning !== undefined) override.reasoning = modelEntry.reasoning;
@@ -248,18 +268,33 @@ function buildModelEntry(
     baseUrl,
   });
 
-  // 输入模态能力：用户设置 > known-models 词典 > 默认 false
+  // 输入模态 canonical 解析：
+  //   用户显式 inputs
+  //     > legacy image/vision/video/audio（逐模态回退 known-models / Pi 目录 / Ollama 检测）
+  //     > 默认 text
+  // 显式 inputs 存在时即为唯一真理源，legacy 布尔与词典推断全部不再参与。
   // 兼容读：migration #7 之前的旧数据用 vision 字段；两个版本后移除 vision fallback
+  const explicitInputs = isObj ? readModalityListLoose(modelEntry.inputs) : null;
   const userImage = isObj ? (modelEntry.image ?? modelEntry.vision) : undefined;
   const knownImage = known?.image ?? known?.vision ?? piProtocolBaseline?.input?.includes?.("image");
   const inferredImage = inferOllamaModelMetadata(provider, id)?.image;
-  const image = userImage !== undefined ? userImage : (knownImage === true || inferredImage === true);
   const userVideo = isObj ? modelEntry.video : undefined;
   const knownVideo = known?.video;
-  const video = userVideo !== undefined ? userVideo : (knownVideo === true);
   const userAudio = isObj ? modelEntry.audio : undefined;
   const knownAudio = known?.audio;
-  const audio = userAudio !== undefined ? userAudio : (knownAudio === true);
+  const imageByLegacy = userImage !== undefined ? userImage === true : (knownImage === true || inferredImage === true);
+  const videoByLegacy = userVideo !== undefined ? userVideo === true : (knownVideo === true);
+  const audioByLegacy = userAudio !== undefined ? userAudio === true : (knownAudio === true);
+  const resolvedInputs = explicitInputs
+    ?? unionModalities(
+      ["text"],
+      imageByLegacy ? ["image"] : [],
+      videoByLegacy ? ["video"] : [],
+      audioByLegacy ? ["audio"] : [],
+    );
+  const image = resolvedInputs.includes("image");
+  const video = resolvedInputs.includes("video");
+  const audio = resolvedInputs.includes("audio");
   const userXhigh = isObj ? modelEntry.xhigh : undefined;
   const xhigh = userXhigh !== undefined ? userXhigh : (known?.xhigh === true);
   const entry: Record<string, any> = {
@@ -280,6 +315,21 @@ function buildModelEntry(
   };
   if (baseUrl !== providerBaseUrl) entry.baseUrl = baseUrl;
   if (xhigh === true) entry.xhigh = true;
+  // Lingxi-only 模态/能力 metadata：Pi modelFromJson 会丢弃这些字段，
+  // 由 ModelManager.applyProviderModelMetadata 在 refreshAvailable 时重新挂回。
+  if (explicitInputs) entry.inputs = explicitInputs;
+  const explicitOutputs = isObj ? readModalityListLoose(modelEntry.outputs) : null;
+  const knownOutputs = readModalityListLoose(known?.outputs);
+  const resolvedOutputs = explicitOutputs ?? knownOutputs;
+  if (resolvedOutputs) entry.outputs = resolvedOutputs;
+  const resolvedWeb = (isObj && modelEntry.web !== undefined)
+    ? modelEntry.web === true
+    : (known?.web === true ? true : undefined);
+  if (resolvedWeb !== undefined) entry.web = resolvedWeb;
+  const resolvedStructuredOutput = (isObj && modelEntry.structuredOutput !== undefined)
+    ? modelEntry.structuredOutput === true
+    : (known?.structuredOutput === true ? true : undefined);
+  if (resolvedStructuredOutput !== undefined) entry.structuredOutput = resolvedStructuredOutput;
 
   const rawThinkingLevelMap = isObj && modelEntry.thinkingLevelMap !== undefined
     ? modelEntry.thinkingLevelMap
