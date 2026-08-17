@@ -878,6 +878,7 @@ describe("model sync related routes", () => {
         },
       ]),
       providerRegistry: {
+        isOAuth: () => true,
         getCredentials: () => ({ apiKey: "", baseUrl: "", api: "openai-codex-responses" }),
         getAuthJsonKey: (id) => id,
         getDefaultModels: () => [],
@@ -1218,6 +1219,46 @@ describe("model sync related routes", () => {
     });
   });
 
+  it("providers summary treats an empty model list as configured, not needs_setup", async () => {
+    const { createProvidersRoute } = await import("../server/routes/providers.ts");
+    const { ProviderRegistry } = await import("../core/provider-registry.ts");
+    const tmpHome = fs.mkdtempSync(path.join(os.tmpdir(), "hana-provider-empty-models-"));
+    try {
+      fs.writeFileSync(path.join(tmpHome, "added-models.yaml"), [
+        "providers:",
+        "  deepseek:",
+        "    api_key: sk-test",
+        "    base_url: https://api.deepseek.com",
+        "    api: openai-completions",
+        "    models: []",
+        "",
+      ].join("\n"), "utf-8");
+
+      const registry = new ProviderRegistry(tmpHome);
+      const engine = {
+        providerRegistry: registry,
+        authStorage: { getOAuthProviders: () => [] },
+        preferences: { getOAuthCustomModels: () => ({}) },
+        getRegistryModelsForProvider: () => [],
+        resolveProviderCredentials: () => ({ api_key: "", base_url: "", api: "" }),
+        lingxiHome: tmpHome,
+      };
+      const app = new Hono();
+      app.route("/api", createProvidersRoute(engine));
+
+      const data = await (await app.request("/api/providers/summary")).json();
+      expect(data.providers.deepseek).toMatchObject({
+        is_configured: true,
+        has_credentials: true,
+        config_status: "ok",
+        missing_fields: [],
+        models: [],
+      });
+    } finally {
+      fs.rmSync(tmpHome, { recursive: true, force: true });
+    }
+  });
+
   it("providers summary distinguishes configured providers from registry-only setup entries", async () => {
     const { createProvidersRoute } = await import("../server/routes/providers.ts");
     const { ProviderRegistry } = await import("../core/provider-registry.ts");
@@ -1282,12 +1323,58 @@ describe("model sync related routes", () => {
     }
   });
 
+  it("providers summary projects Registry media capability bindings without leaking credentials", async () => {
+    const { createProvidersRoute } = await import("../server/routes/providers.ts");
+    const { ProviderRegistry } = await import("../core/provider-registry.ts");
+    const tmpHome = fs.mkdtempSync(path.join(os.tmpdir(), "hana-provider-bindings-"));
+    try {
+      const registry = new ProviderRegistry(tmpHome);
+      registry.reload();
+      const engine = {
+        providerRegistry: registry,
+        authStorage: { getOAuthProviders: () => [] },
+        preferences: { getOAuthCustomModels: () => ({}) },
+        getRegistryModelsForProvider: () => [],
+        resolveProviderCredentials: () => ({ api_key: "", base_url: "", api: "" }),
+        lingxiHome: tmpHome,
+      };
+      const app = new Hono();
+      app.route("/api", createProvidersRoute(engine));
+
+      const data = await (await app.request("/api/providers/summary")).json();
+
+      expect(data.providers.agnes.media_capability_bindings).toEqual([
+        { capability: "imageGeneration", runtime_provider_id: "agnes" },
+        { capability: "videoGeneration", runtime_provider_id: "agnes" },
+      ]);
+      expect(data.providers["minimax-token-plan"].media_capability_bindings).toEqual([
+        { capability: "imageGeneration", runtime_provider_id: "minimax", credential_lane_id: "minimax-token-plan" },
+      ]);
+      expect(data.providers["volcengine-speech"].media_capability_bindings).toEqual([
+        { capability: "speechRecognition", runtime_provider_id: "volcengine-speech" },
+      ]);
+      // 投影必须与 Registry 一致：volcengine 不得通过名字继承 volcengine-speech。
+      const volcengineCaps = data.providers.volcengine.media_capability_bindings.map((b) => b.capability);
+      expect(volcengineCaps).not.toContain("speechRecognition");
+      // 投影不返回任何密钥字段：binding 只含能力三字段。
+      for (const binding of data.providers.agnes.media_capability_bindings) {
+        expect(Object.keys(binding).sort()).toEqual(["capability", "runtime_provider_id"]);
+      }
+      for (const binding of data.providers["minimax-token-plan"].media_capability_bindings) {
+        expect(Object.keys(binding).sort()).toEqual(["capability", "credential_lane_id", "runtime_provider_id"]);
+      }
+    } finally {
+      fs.rmSync(tmpHome, { recursive: true, force: true });
+    }
+  });
+
   it("oauth provider with empty registry falls back to defaults", async () => {
     const { createProvidersRoute } = await import("../server/routes/providers.ts");
     const app = new Hono();
     const engine = withResolveCreds({
       getRegistryModelsForProvider: vi.fn().mockReturnValue([]),
       providerRegistry: {
+        isOAuth: () => true,
         getCredentials: () => ({ apiKey: "", baseUrl: "", api: "openai-codex-responses" }),
         getAuthJsonKey: (id) => id,
         getDefaultModels: (id) => id === "openai-codex" ? ["gpt-5.4", "gpt-5.3-codex"] : [],
@@ -2012,7 +2099,7 @@ describe("model sync related routes", () => {
     expect(data.models.map((model) => model.id)).toContain("gpt-5.6-sol");
   });
 
-  it("remote 404 falls back to registry for ordinary remote catalogs", async () => {
+  it("remote 404 returns an error for api-key providers without falling back to built-in lists", async () => {
     const { createProvidersRoute } = await import("../server/routes/providers.ts");
     const app = new Hono();
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: false, status: 404, statusText: "Not Found" }));
@@ -2039,9 +2126,9 @@ describe("model sync related routes", () => {
 
     expect(res.status).toBe(200);
     const data = await res.json();
-    expect(data.source).toBe("registry");
-    expect(data.models[0].id).toBe("custom-chat");
-    expect(data.models[0].maxOutput).toBe(8192);
+    expect(data.error).toContain("404");
+    expect(data.models).toEqual([]);
+    expect(engine.getRegistryModelsForProvider).not.toHaveBeenCalled();
   });
 
   it("remote 401 returns error without fallback", async () => {
@@ -2081,6 +2168,7 @@ describe("model sync related routes", () => {
     const engine = withResolveCreds({
       getRegistryModelsForProvider: vi.fn().mockReturnValue([]),
       providerRegistry: {
+        isOAuth: () => true,
         getCredentials: () => ({ apiKey: "", baseUrl: "", api: "openai-codex-responses" }),
         getAuthJsonKey: () => "openai-codex",
         getDefaultModels: (id) => {
@@ -2254,7 +2342,7 @@ describe("model sync related routes", () => {
     ]);
   });
 
-  it("zhipu model discovery supplements incomplete remote catalogs with curated current GLM defaults", async () => {
+  it("zhipu model discovery returns only the remote catalog without curated defaults", async () => {
     const { createProvidersRoute } = await import("../server/routes/providers.ts");
     const app = new Hono();
     const fetchMock = vi.fn().mockResolvedValue({
@@ -2291,16 +2379,12 @@ describe("model sync related routes", () => {
 
     expect(res.status).toBe(200);
     const data = await res.json();
-    expect(data.models.slice(0, 4).map(m => m.id)).toEqual(["glm-5", "glm-5.2", "glm-5.1", "glm-4.7-flash"]);
-    expect(data.models.find(m => m.id === "glm-5.2")).toMatchObject({
-      name: "GLM-5.2",
-      context: 1000000,
-      maxOutput: 131072,
-    });
-    expect(data.models.map(m => m.id)).toEqual(expect.arrayContaining(["glm-5-turbo", "glm-4-flash"]));
+    expect(data.models).toEqual([
+      { id: "glm-5", name: "glm-5", context: 200000, maxOutput: 128000 },
+    ]);
   });
 
-  it("anthropic-messages falls back to defaults when remote 404s", async () => {
+  it("anthropic-messages returns an error when remote 404s instead of builtin defaults", async () => {
     const { createProvidersRoute } = await import("../server/routes/providers.ts");
     const app = new Hono();
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: false, status: 404, statusText: "Not Found" }));
@@ -2325,8 +2409,8 @@ describe("model sync related routes", () => {
 
     expect(res.status).toBe(200);
     const data = await res.json();
-    expect(data.source).toBe("builtin");
-    expect(data.models.map(m => m.id)).toEqual(["kimi-k2.6", "kimi-k2.5"]);
+    expect(data.error).toContain("404");
+    expect(data.models).toEqual([]);
   });
 
   it("normalizes MiniMax CN v1 base URLs for Anthropic-compatible model discovery", async () => {

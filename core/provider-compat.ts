@@ -36,6 +36,8 @@ import * as ollama from "./provider-compat/ollama.ts";
 import { normalizeImplicitOutputBudget } from "./provider-compat/output-budget.ts";
 import { stripOrphanToolResults } from "./provider-compat/tool-pairing.ts";
 import { normalizeOpenAIInputAudioPayload } from "./provider-compat/input-audio.ts";
+import { applyStructuredOutput } from "./provider-compat/structured-output.ts";
+import { applyNativeWebSearch } from "./provider-compat/web-search.ts";
 import {
   normalizeReasoningReplayContextMessages,
   normalizeReasoningReplayPayload,
@@ -345,7 +347,7 @@ function projectToolResultResourcesForModel(messages) {
  *
  * @param {object} payload — 即将发送的 HTTP body（OpenAI / Anthropic 风格）
  * @param {object|null|undefined} model — 完整 model 对象 {id, provider, baseUrl, reasoning, maxTokens, quirks, ...}
- * @param {{ mode?: "chat" | "utility", reasoningLevel?: string, outputBudgetSource?: "user" | "system" | "sdk-default", maxTokensSource?: string, userMaxTokens?: number }} [options]
+ * @param {{ mode?: "chat" | "utility", purpose?: "chat" | "utility" | "compaction", reasoningLevel?: string, outputBudgetSource?: "user" | "system" | "sdk-default", maxTokensSource?: string, userMaxTokens?: number }} [options]
  * @returns {object} 处理后的 payload
  */
 export function normalizeProviderPayload(payload, model, options = {}) {
@@ -380,6 +382,12 @@ export function normalizeProviderPayload(payload, model, options = {}) {
   // 3. reasoning replay 是协议级契约，不归任何单个 provider 模块所有。
   // 子模块决定本轮 thinking 开关后，中心层再校验最终请求状态。
   result = normalizeReasoningReplayPayload(result, model, normalizedOptions);
+
+  // 4. 通用 capability 层（结构化输出 / 原生联网）。
+  // 只有 purpose === "chat"（普通用户聊天）才继承模型级开关；
+  // utility / compaction 等内部用途不注入，也不会被静默联网或强制 JSON。
+  result = applyStructuredOutput(result, model, normalizedOptions);
+  result = applyNativeWebSearch(result, model, normalizedOptions);
 
   return result;
 }

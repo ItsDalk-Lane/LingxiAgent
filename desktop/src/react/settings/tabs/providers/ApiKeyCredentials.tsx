@@ -10,13 +10,6 @@ import { parseProviderHeaderLines, ProviderHeadersField, serializeProviderHeader
 import { isMaskedSecretValue } from '../../../../../../shared/secret-custody.ts';
 import styles from '../../Settings.module.css';
 
-interface DiscoveredProviderModel {
-  id?: unknown;
-  name?: unknown;
-  context?: unknown;
-  maxOutput?: unknown;
-}
-
 function errorMessage(err: unknown): string {
   return err instanceof Error ? err.message : String(err);
 }
@@ -28,57 +21,6 @@ async function saveProviderConfigPatch(providerId: string, patch: Record<string,
     body: JSON.stringify({ providers: { [providerId]: patch } }),
   });
   invalidateConfigCache();
-}
-
-function shouldDiscoverModelsBeforeSave(providerId: string, api: string, payload: Record<string, unknown>) {
-  return payload.seed_default_models === true
-    && (providerId === 'gemini' || api === 'google-generative-ai');
-}
-
-function compactDiscoveredModel(model: DiscoveredProviderModel): string | Record<string, unknown> | null {
-  if (typeof model.id !== 'string' || !model.id.trim()) return null;
-  const entry: Record<string, unknown> = { id: model.id };
-  if (typeof model.name === 'string' && model.name.trim()) entry.name = model.name;
-  if (typeof model.context === 'number' && Number.isFinite(model.context)) entry.context = model.context;
-  if (typeof model.maxOutput === 'number' && Number.isFinite(model.maxOutput)) entry.maxOutput = model.maxOutput;
-  return Object.keys(entry).length === 1 ? model.id : entry;
-}
-
-async function resolveModelsForInitialSave(
-  providerId: string,
-  plan: ReturnType<typeof getApiKeySavePlan>,
-  headers: Record<string, string>,
-  includeHeaders: boolean,
-): Promise<Record<string, unknown>> {
-  const payload = { ...plan.payload };
-  if (includeHeaders) payload.headers = headers;
-  if (!shouldDiscoverModelsBeforeSave(providerId, plan.api, payload)) return payload;
-
-  try {
-    const res = await lingxiFetch('/api/providers/fetch-models', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        name: providerId,
-        base_url: plan.effectiveUrl,
-        api: plan.api,
-        api_key: plan.key,
-        headers,
-      }),
-    });
-    const data = await res.json();
-    const models = Array.isArray(data.models)
-      ? data.models.map(compactDiscoveredModel).filter(Boolean)
-      : [];
-    if (!data.error && models.length > 0) {
-      payload.models = models;
-      delete payload.seed_default_models;
-    }
-  } catch {
-    // Keep seed_default_models as the explicit static fallback for initial setup.
-  }
-
-  return payload;
 }
 
 export function ApiKeyCredentials({ providerId, summary, providerConfig: _providerConfig, isPresetSetup, presetInfo, onRefresh }: {
@@ -126,6 +68,33 @@ export function ApiKeyCredentials({ providerId, summary, providerConfig: _provid
     if (summary.api === apiVal) setApiEdited(false);
   }, [apiEdited, apiVal, derivedApi, summary.api]);
 
+  // 把当前草稿凭证发布到 store：「读取模型」在凭证尚未落盘时
+  // （刚输入 key、onBlur 保存与点击存在竞态）也能直连远端模型目录。
+  // Headers 只在本次编辑过时携带真实值；未编辑时不传，服务端用已保存值，
+  // 避免脱敏占位被当作显式凭证覆盖掉存储里的真实 Headers。
+  useEffect(() => {
+    let headers: Record<string, string> | undefined;
+    if (headersEdited) {
+      try {
+        const parsed = parseProviderHeaderLines(headersText);
+        if (Object.keys(parsed).length > 0) headers = parsed;
+      } catch {
+        // 解析失败的草稿不发送；保存时 parseHeaders 会向用户报具体错误
+      }
+    }
+    useSettingsStore.setState(s => ({
+      providerCredentialDrafts: {
+        ...s.providerCredentialDrafts,
+        [providerId]: {
+          api_key: keyVal.trim() || undefined,
+          base_url: urlVal.trim() || derivedBaseUrl || undefined,
+          api: apiVal || undefined,
+          ...(headers ? { headers } : {}),
+        },
+      },
+    }));
+  }, [providerId, keyVal, urlVal, derivedBaseUrl, apiVal, headersText, headersEdited]);
+
   const refreshAfterSave = async (shouldReportFailure: () => boolean = () => true): Promise<boolean> => {
     try {
       await onRefresh();
@@ -167,7 +136,6 @@ export function ApiKeyCredentials({ providerId, summary, providerConfig: _provid
       derivedBaseUrl,
       isPresetSetup: !!isPresetSetup,
       isLocalPreset: !!presetInfo?.local,
-      seedDefaultModels: !!presetInfo && (summary.models?.length ?? 0) === 0,
       api: apiVal,
     });
     if (!plan.shouldSave) return;
@@ -176,6 +144,17 @@ export function ApiKeyCredentials({ providerId, summary, providerConfig: _provid
       const headers = parseHeaders();
       if (!headers) return;
       const includeHeaders = headersEdited || Object.keys(headers).length > 0;
+      // 先落盘再验证：验证失败不能丢弃用户输入的凭证。preset 首次保存若以
+      // 远端探测成功为前提，探测不可达时 provider 永远不落盘，setup 状态
+      // 退不出去（Base URL/Headers 一直锁死），key 也随刷新丢失。
+      const payload = { ...plan.payload };
+      if (includeHeaders) payload.headers = headers;
+      await saveProviderConfigPatch(providerId, payload);
+      if (isPresetSetup) useSettingsStore.setState({ selectedProviderId: providerId });
+      if (!await refreshAfterSave()) return;
+      setKeyEdited(false);
+      if (urlEdited) setUrlEdited(false);
+      if (headersEdited) setHeadersEdited(false);
       if (verify && plan.shouldVerify) {
         const testRes = await lingxiFetch('/api/providers/test', {
           method: 'POST',
@@ -188,14 +167,7 @@ export function ApiKeyCredentials({ providerId, summary, providerConfig: _provid
           return;
         }
       }
-      const payload = await resolveModelsForInitialSave(providerId, plan, headers, includeHeaders);
-      await saveProviderConfigPatch(providerId, payload);
-      if (isPresetSetup) useSettingsStore.setState({ selectedProviderId: providerId });
-      if (!await refreshAfterSave()) return;
       showToast(plan.shouldVerify ? t('settings.providers.verifySuccess') : t('settings.saved'), 'success');
-      setKeyEdited(false);
-      if (urlEdited) setUrlEdited(false);
-      if (headersEdited) setHeadersEdited(false);
     } catch (err: unknown) {
       reportSaveFailure(err);
     } finally {
@@ -286,7 +258,7 @@ export function ApiKeyCredentials({ providerId, summary, providerConfig: _provid
             value={headersText}
             onChange={(value) => { setHeadersText(value); setHeadersEdited(true); setConnStatus('idle'); }}
             onBlur={async () => {
-              if (!headersEdited || isPresetSetup) return;
+              if (!headersEdited) return;
               const headers = parseHeaders();
               if (!headers) return;
               try {
@@ -298,20 +270,21 @@ export function ApiKeyCredentials({ providerId, summary, providerConfig: _provid
                 reportSaveFailure(err);
               }
             }}
-            readOnly={!!isPresetSetup}
           />
         </div>
       </div>
       <div className={styles['pv-cred-row']}>
         <span className={styles['pv-cred-label']}>Base URL</span>
         <div className={styles['pv-cred-url-row']}>
+          {/* 预设 URL 只是默认值：网关/代理场景必须在首次保存前就能改，
+              否则 provider 未落盘时输入框永远只读（setup 死锁） */}
           <input
             className={styles['settings-input']}
             type="text"
             value={urlVal}
             onChange={(e) => { setUrlVal(e.target.value); setUrlEdited(true); }}
             onBlur={async () => {
-              if (!urlEdited || isPresetSetup) return;
+              if (!urlEdited) return;
               const trimmed = urlVal.trim();
               if (trimmed === derivedBaseUrl) { setUrlEdited(false); return; }
               try {
@@ -325,7 +298,6 @@ export function ApiKeyCredentials({ providerId, summary, providerConfig: _provid
             }}
             onKeyDown={(e) => { if (e.key === 'Enter') (e.target as HTMLInputElement).blur(); }}
             placeholder="https://api.example.com/v1"
-            readOnly={!!isPresetSetup}
           />
         </div>
       </div>

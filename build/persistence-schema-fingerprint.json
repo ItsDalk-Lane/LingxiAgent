@@ -2999,7 +2999,7 @@
   ],
   "review": {
     "classification": "compatible",
-    "compatibilityReason": "terminal-session-state adds optional toolCallId metadata; existing records without it still load, ownership remains session-scoped, and chat navigation falls back to terminalId",
+    "compatibilityReason": "Adds model capability metadata (modality/web/structuredOutput), unified media model edit APIs and provider detail view; no existing persisted shape is altered, only additive fields and new read/edit endpoints",
     "payloadFingerprint": "sha256:5044d6afc3718cad839b03286e8e6191b63cce392e2cf817a93b4a3c5b49e8cf"
   },
   "schemas": [

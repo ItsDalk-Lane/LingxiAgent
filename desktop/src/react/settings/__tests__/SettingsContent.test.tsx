@@ -3,7 +3,7 @@
 import { cleanup, render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { SettingsContent } from '../SettingsContent';
+import { SettingsContent, normalizeSettingsTab } from '../SettingsContent';
 import { useSettingsStore } from '../store';
 
 const actionMocks = vi.hoisted(() => ({
@@ -160,5 +160,28 @@ describe('SettingsContent tab heading', () => {
     }));
 
     await waitFor(() => expect(actionMocks.loadSettingsModels).toHaveBeenCalledTimes(1));
+  });
+
+  it('normalizes legacy media and computer tab ids to their replacements', () => {
+    expect(normalizeSettingsTab('media')).toBe('models');
+    expect(normalizeSettingsTab('computer')).toBe('experiments');
+    expect(normalizeSettingsTab('providers')).toBe('providers');
+    expect(normalizeSettingsTab('models')).toBe('models');
+  });
+
+  it('shows a models nav item and hides the legacy media nav item', async () => {
+    useSettingsStore.setState({
+      activeTab: 'agent',
+      platformName: 'darwin',
+      ready: true,
+    } as never);
+
+    render(React.createElement(SettingsContent, { variant: 'window' }));
+
+    const modelsNavButton = document.querySelector('button[data-tab="models"]');
+    const mediaNavButton = document.querySelector('button[data-tab="media"]');
+    expect(modelsNavButton).toBeTruthy();
+    expect(modelsNavButton?.textContent).toContain('settings.tabs.models');
+    expect(mediaNavButton).toBeFalsy();
   });
 });

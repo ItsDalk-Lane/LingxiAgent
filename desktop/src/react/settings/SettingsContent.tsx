@@ -24,8 +24,8 @@ import { SkillsTab } from './tabs/SkillsTab';
 import { McpTab } from './tabs/McpTab';
 import { BridgeTab } from './tabs/BridgeTab';
 import { ProvidersTab } from './tabs/ProvidersTab';
+import { ModelsTab } from './tabs/ModelsTab';
 import { UsageTab } from './tabs/UsageTab';
-import { MediaTab } from './tabs/MediaTab';
 import { AboutTab } from './tabs/AboutTab';
 import { PluginsTab } from './tabs/PluginsTab';
 import { PluginMarketplaceTab } from './tabs/PluginMarketplaceTab';
@@ -56,8 +56,8 @@ const TAB_COMPONENTS: Record<string, React.ComponentType> = {
   mcp: McpTab,
   bridge: BridgeTab,
   providers: ProvidersTab,
+  models: ModelsTab,
   usage: UsageTab,
-  media: MediaTab,
   sharing: SharingTab,
   access: AccessTab,
   plugins: PluginsTab,
@@ -96,8 +96,8 @@ const TAB_TITLE_KEYS: Record<string, string> = {
   mcp: 'settings.tabs.mcp',
   bridge: 'settings.tabs.bridge',
   providers: 'settings.tabs.providers',
+  models: 'settings.tabs.models',
   usage: 'settings.usage.title',
-  media: 'settings.tabs.media',
   sharing: 'settings.tabs.sharing',
   access: 'settings.tabs.access',
   plugins: 'settings.tabs.plugins',
@@ -111,8 +111,10 @@ const TAB_DESCRIPTION_KEYS: Record<string, string> = {
   experiments: 'settings.experiments.description',
 };
 
-function normalizeSettingsTab(tab: string): string {
-  return tab === 'computer' ? 'experiments' : tab;
+export function normalizeSettingsTab(tab: string): string {
+  if (tab === 'computer') return 'experiments';
+  if (tab === 'media') return 'models';
+  return tab;
 }
 
 interface SettingsContentProps {
@@ -133,6 +135,7 @@ export function SettingsContent({
   );
   const set = useSettingsStore(s => s.set);
   const lastReportedActiveTabRef = useRef<string | null>(null);
+  const settingsMainRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     initSettings();
@@ -209,6 +212,17 @@ export function SettingsContent({
   const effectiveActiveTab = normalizeSettingsTab(activeTab);
   const ActiveTab = TAB_COMPONENTS[effectiveActiveTab] || AgentTab;
   const isModal = variant === 'modal';
+
+  // 切换页签时把主内容区滚回顶部。settings-main 是唯一滚动容器，页签内容在
+  // 同一容器里原地替换，scrollTop 会带着上一个页签的滚动位置（如在供应商页
+  // 滚到下方保存配置后切回助手页），导致新页签第一个元素顶到容器上沿、
+  // 上半截再被 modal 顶部的 sticky 渐变遮罩盖住（settings-main::before）。
+  useEffect(() => {
+    // 直接赋 scrollTop（而非 scrollTo）：jsdom 未实现 Element.scrollTo，
+    // 测试环境里 scrollTo 会直接抛 TypeError。
+    if (settingsMainRef.current) settingsMainRef.current.scrollTop = 0;
+  }, [effectiveActiveTab]);
+
   const tabTitleKey = TAB_TITLE_KEYS[effectiveActiveTab];
   const activeTabTitle = tabTitleKey ? t(tabTitleKey) : '';
   const activeTabDescriptionKey = TAB_DESCRIPTION_KEYS[effectiveActiveTab];
@@ -261,7 +275,7 @@ export function SettingsContent({
           </div>
           <div className={styles['settings-body']}>
             <SettingsNav onTabChange={reportActiveTabChange} />
-            <div className={styles['settings-main']}>
+            <div className={styles['settings-main']} ref={settingsMainRef} data-settings-main>
               {!isModal && (
                 <div className={styles['settings-tab-heading']}>
                   <h1 className={styles['settings-tab-title']}>{activeTabTitle}</h1>
@@ -271,7 +285,7 @@ export function SettingsContent({
                 </div>
               )}
               <ErrorBoundary region={effectiveActiveTab} resetKeys={[effectiveActiveTab]}>
-                <SettingsPage tab={effectiveActiveTab}>
+                <SettingsPage tab={effectiveActiveTab} layout={effectiveActiveTab === 'providers' ? 'fill' : 'flow'}>
                   <ActiveTab />
                 </SettingsPage>
               </ErrorBoundary>

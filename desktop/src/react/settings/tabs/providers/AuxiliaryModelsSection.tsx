@@ -4,14 +4,9 @@ import { lingxiFetch } from '../../api';
 import {
   t, lookupModelMeta, formatContext, autoSaveGlobalModels,
 } from '../../helpers';
-import { Toggle, SelectWidget } from '@/ui';
+import { Toggle } from '@/ui';
 import { ModelWidget } from '../../widgets/ModelWidget';
 import styles from '../../Settings.module.css';
-import {
-  AUTO_SEARCH_PROVIDER,
-  isFreeSearchApiProvider,
-  isBrowserSearchProvider,
-} from '../../../../../../shared/search-providers.ts';
 import {
   AUXILIARY_SLOT_IDS,
   type AuxiliarySlot,
@@ -73,12 +68,29 @@ function ToolModelTestBtn({ modelRef }: { modelRef: unknown }) {
   );
 }
 
-export function OtherModelsSection({ providers }: { providers: Record<string, { models?: string[]; base_url?: string }> }) {
+// 工具模型配置可能来自老数据。展示层可读裸 id；保存路径必须重新选择成 {id, provider}。
+function toModelRef(raw: unknown): ModelRef | null {
+  if (!raw) return null;
+  if (typeof raw === 'object' && (raw as any).id) {
+    return {
+      id: String((raw as any).id || ''),
+      provider: String((raw as any).provider || ''),
+    };
+  }
+  const s = String(raw || '').trim();
+  if (!s) return null;
+  const slashIdx = s.indexOf('/');
+  if (slashIdx > 0 && slashIdx < s.length - 1) {
+    return { provider: s.slice(0, slashIdx), id: s.slice(slashIdx + 1) };
+  }
+  return { id: s, provider: '' };
+}
+
+export function AuxiliaryModelsSection({ providers }: { providers: Record<string, { models?: string[]; base_url?: string }> }) {
   const globalModelsConfig = useSettingsStore(s => s.globalModelsConfig);
   const imageCapableOnly = (model: { input?: string[] }) => (
     Array.isArray(model.input) && model.input.includes('image')
   );
-  const searchProvider = globalModelsConfig?.search?.provider || AUTO_SEARCH_PROVIDER;
 
   // UI-only metadata keyed by canonical Slot id。Slot 身份来自 shared 单一真理源
   // （shared/auxiliary-slot-ids.ts），不再手写 field 字符串数组；新增第 7 个 Slot 时，
@@ -144,53 +156,6 @@ export function OtherModelsSection({ providers }: { providers: Record<string, { 
           </div>
         );
       })}
-
-      {/* 搜索引擎选择：与模型行对齐（左标题，右选择器） */}
-      <div className={styles['pv-model-config-row']}>
-        <div className={styles['pv-model-config-label']}>
-          <span className={styles['pv-model-config-title']}>{t('settings.api.searchProviderField')}</span>
-        </div>
-        <div className={styles['pv-model-config-control']}>
-          <SelectWidget
-            className={styles['pv-model-config-select']}
-            options={[
-              { value: AUTO_SEARCH_PROVIDER, label: 'Auto (Paid API -> AnySearch free -> Browser)' },
-              { value: 'anysearch', label: 'AnySearch' },
-              { value: 'anysearch_free', label: 'AnySearch (free)' },
-              { value: 'bing_browser', label: 'Bing (Browser)' },
-              { value: 'google_browser', label: 'Google (Browser)' },
-              { value: 'duckduckgo_browser', label: 'DuckDuckGo (Browser)' },
-              { value: 'tavily', label: 'Tavily' },
-              { value: 'brave', label: 'Brave Search' },
-              { value: 'serper', label: 'Serper (Google)' },
-            ]}
-            value={searchProvider}
-            onChange={(val) => {
-              const keyless = val === AUTO_SEARCH_PROVIDER || isBrowserSearchProvider(val) || isFreeSearchApiProvider(val);
-              autoSaveGlobalModels({ search: keyless ? { provider: val, api_key: '' } : { provider: val } });
-            }}
-            placeholder={t('settings.api.searchProviderField')}
-          />
-        </div>
-      </div>
     </div>
   );
-}
-
-// 工具模型配置可能来自老数据。展示层可读裸 id；保存路径必须重新选择成 {id, provider}。
-function toModelRef(raw: unknown): ModelRef | null {
-  if (!raw) return null;
-  if (typeof raw === 'object' && (raw as any).id) {
-    return {
-      id: String((raw as any).id || ''),
-      provider: String((raw as any).provider || ''),
-    };
-  }
-  const s = String(raw || '').trim();
-  if (!s) return null;
-  const slashIdx = s.indexOf('/');
-  if (slashIdx > 0 && slashIdx < s.length - 1) {
-    return { provider: s.slice(0, slashIdx), id: s.slice(slashIdx + 1) };
-  }
-  return { id: s, provider: '' };
 }

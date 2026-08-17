@@ -3,6 +3,7 @@ import { useSettingsStore, type ProviderSummary } from '../../store';
 import { lingxiFetchJson } from '../../api';
 import { invalidateConfigCache } from '../../../hooks/use-config';
 import { t } from '../../helpers';
+import { useMediaSettingsData } from '../../hooks/useMediaSettingsData';
 import { OAuthCredentials } from './OAuthCredentials';
 import { ApiKeyCredentials } from './ApiKeyCredentials';
 import { ProviderModelList } from './ProviderModelList';
@@ -17,6 +18,16 @@ export function ProviderDetail({ providerId, summary, providerConfig, isPresetSe
   onRemoveDraft?: () => void;
   onRefresh: () => Promise<void>;
 }) {
+  const media = useMediaSettingsData();
+
+  // Chat 模型变化：刷新 settingsConfig + provider summary。
+  const onProviderRefresh = onRefresh;
+  // 凭据/OAuth 状态变化：额外刷新 image/video/speech，让能力状态立即可见。
+  const onCredentialRefresh = async () => {
+    await onRefresh();
+    await media.refreshAll();
+  };
+
   return (
     <div className={styles['pv-detail-inner']}>
       <div className={styles['pv-detail-header']}>
@@ -36,11 +47,18 @@ export function ProviderDetail({ providerId, summary, providerConfig, isPresetSe
       )}
       {summary.config_status === 'needs_setup' && summary.can_delete && !summary.config_error && (
         <div className={styles['pv-config-alert']}>
-          {t('settings.providers.configIncomplete')}
+          {t('settings.providers.configMissingFields', {
+            fields: (summary.missing_fields || [])
+              .map((field) => (field === 'api_key' ? 'API Key'
+                : field === 'base_url' ? 'Base URL'
+                : field === 'models' ? t('settings.api.addedModels')
+                : field))
+              .join('、'),
+          })}
         </div>
       )}
       {summary.supports_oauth ? (
-        <OAuthCredentials providerId={providerId} summary={summary} onRefresh={onRefresh} />
+        <OAuthCredentials providerId={providerId} summary={summary} onRefresh={onCredentialRefresh} />
       ) : (
         <ApiKeyCredentials
           providerId={providerId}
@@ -48,10 +66,12 @@ export function ProviderDetail({ providerId, summary, providerConfig, isPresetSe
           providerConfig={providerConfig}
           isPresetSetup={isPresetSetup}
           presetInfo={presetInfo}
-          onRefresh={onRefresh}
+          onRefresh={onCredentialRefresh}
         />
       )}
-      <ProviderModelList providerId={providerId} summary={summary} onRefresh={onRefresh} />
+      {/* 统一模型区：chat / image / video / speech recognition 的
+          已添加列表 + 添加/读取 + 默认参数弹窗 + 编辑弹窗都在这里 */}
+      <ProviderModelList providerId={providerId} summary={summary} media={media} onRefresh={onProviderRefresh} />
     </div>
   );
 }

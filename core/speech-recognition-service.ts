@@ -1,6 +1,11 @@
 import { MediaAdapterRegistry } from "./media-adapter-registry.ts";
 import { builtinSpeechRecognitionAdapters } from "./speech-recognition/adapters.ts";
 import { createModuleLogger } from "../lib/debug-log.ts";
+import {
+  buildMediaModelEditPatch,
+  MediaModelEditValidationError,
+  requireExistingMediaModel,
+} from "../shared/media-model-edit.ts";
 
 const CAPABILITY = "speech_recognition";
 
@@ -83,7 +88,15 @@ export class SpeechRecognitionService {
           adapterAvailable: this.hasAdapterForModel(providerId, model),
         }))
         .filter((model) => model.adapterAvailable);
-      if (!models.length) continue;
+      // 候选目录：内置声明模型（未被用户添加），仅用于「添加模型」下拉；
+      // availableModels 仍然只含已添加且可运行的模型（默认模型选择的合法集合）。
+      const catalogModels = (provider.availableModels || [])
+        .filter((model) => this.hasAdapterForModel(providerId, model))
+        .map((model) => ({
+          id: model.id,
+          name: model.displayName || model.name || model.id,
+        }));
+      if (!models.length && !catalogModels.length) continue;
       const credentialStatus = this._providers.getMediaProviderCredentialStatus?.(providerId, CAPABILITY) || {};
       next[providerId] = {
         ...provider,
@@ -93,12 +106,44 @@ export class SpeechRecognitionService {
           id: model.id,
           name: model.displayName || model.name || model.id,
         })),
+        catalogModels,
       };
     }
     return {
       providers: next,
       config: this.getConfig(),
     };
+  }
+
+  setProviderModel(providerId, model) {
+    this._providers.addMediaModel(providerId, CAPABILITY, model);
+    return { ok: true };
+  }
+
+  /**
+   * 编辑已添加的语音识别模型（PUT 语义：只改 displayName / inputs / outputs）。
+   * 模型必须已存在；runtime-discovered 目录不可人工变更。
+   */
+  updateProviderModel(providerId, modelId, patch) {
+    if (this._providers.getRuntimeMediaCapabilitySourceOwner?.(providerId)) {
+      throw new MediaModelEditValidationError(
+        `Runtime-discovered provider "${providerId}" does not allow manual model changes`,
+      );
+    }
+    const existing = requireExistingMediaModel({
+      models: this._providers.getMediaModels(providerId, CAPABILITY),
+      providerId,
+      modelId,
+      capability: CAPABILITY,
+    });
+    const safePatch = buildMediaModelEditPatch({ capability: CAPABILITY, body: patch, existingModel: existing });
+    this._providers.updateMediaModelEntry(providerId, CAPABILITY, modelId, safePatch);
+    return { ok: true };
+  }
+
+  removeProviderModel(providerId, modelId) {
+    this._providers.removeMediaModel(providerId, CAPABILITY, modelId);
+    return { ok: true };
   }
 
   getConfig() {

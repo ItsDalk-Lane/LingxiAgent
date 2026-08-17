@@ -151,6 +151,10 @@ describe("SpeechRecognitionService", () => {
         "    api_key: tp-mimo-key",
         "    base_url: https://token-plan-cn.xiaomimimo.com/v1",
         "    api: openai-completions",
+        "    media:",
+        "      speech_recognition:",
+        "        models:",
+        "          - mimo-v2.5-asr",
         "",
       ].join("\n"), "utf-8");
       const providerRegistry = new ProviderRegistry(tmpDir);

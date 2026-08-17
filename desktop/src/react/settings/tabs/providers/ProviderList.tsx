@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { useSettingsStore } from '../../store';
+import { useSettingsStore, type ProviderMediaCapabilityBinding } from '../../store';
 import { lingxiFetchJson } from '../../api';
 import { t, API_FORMAT_OPTIONS } from '../../helpers';
 import { loadSettingsConfig } from '../../actions';
 import { SelectWidget, ProviderIcon } from '@/ui';
 import { KeyInput } from '../../widgets/KeyInput';
 import { parseProviderHeaderLines, ProviderHeadersField } from './ProviderHeadersField';
+import { MediaCapabilityIcons } from './MediaCapabilityIcons';
 import styles from '../../Settings.module.css';
 
 export interface ProviderPickerItem {
@@ -14,6 +15,7 @@ export interface ProviderPickerItem {
   dim?: boolean;
   hasCredentials?: boolean;
   count?: number;
+  bindings?: ProviderMediaCapabilityBinding[];
 }
 
 export function ProviderPickerOverlay({ items, onSelect, onAddCustom, onCancel }: {
@@ -49,6 +51,7 @@ export function ProviderPickerOverlay({ items, onSelect, onAddCustom, onCancel }
             <span className={`${styles['pv-status-dot']}${item.hasCredentials ? ' ' + styles['on'] : ''}`} />
             <ProviderIcon provider={item.id} className={styles['pv-list-item-icon']} />
             <span className={styles['pv-picker-item-name']}>{item.label}</span>
+            <MediaCapabilityIcons bindings={item.bindings} />
           </button>
         ))}
       </div>

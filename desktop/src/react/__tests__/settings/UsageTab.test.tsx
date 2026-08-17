@@ -70,20 +70,20 @@ describe('UsageTab settings page registration', () => {
     cleanup();
   });
 
-  it('places the usage nav item strictly between providers and media', () => {
+  it('places the usage nav item strictly after providers and models', () => {
     render(<SettingsNav />);
 
     const tabIds = [...document.querySelectorAll('button[data-tab]')].map(
       el => el.getAttribute('data-tab'),
     );
     const providersIndex = tabIds.indexOf('providers');
+    const modelsIndex = tabIds.indexOf('models');
     const usageIndex = tabIds.indexOf('usage');
-    const mediaIndex = tabIds.indexOf('media');
 
     expect(providersIndex).toBeGreaterThanOrEqual(0);
-    expect(mediaIndex).toBeGreaterThan(providersIndex);
-    expect(usageIndex).toBe(providersIndex + 1);
-    expect(mediaIndex).toBe(usageIndex + 1);
+    expect(modelsIndex).toBe(providersIndex + 1);
+    expect(usageIndex).toBe(modelsIndex + 1);
+    expect(tabIds).not.toContain('media');
 
     const usageButton = document.querySelector('button[data-tab="usage"]') as HTMLButtonElement;
     expect(usageButton.textContent).toContain('settings.tabs.usage');
@@ -98,12 +98,13 @@ describe('UsageTab settings page registration', () => {
     });
     // 页标题复用既有 settings.usage.title
     expect(screen.getAllByText('settings.usage.title').length).toBeGreaterThan(0);
-    // 导航中 usage 依旧夹在 providers 与 media 之间（TAB_COMPONENTS 注册成功才会渲染 UsageTab）
+    // 导航中 usage 依旧位于 models 之后（TAB_COMPONENTS 注册成功才会渲染 UsageTab）
     const tabIds = [...container.querySelectorAll('button[data-tab]')].map(
       el => el.getAttribute('data-tab'),
     );
-    expect(tabIds.indexOf('usage')).toBe(tabIds.indexOf('providers') + 1);
-    expect(tabIds.indexOf('media')).toBe(tabIds.indexOf('usage') + 1);
+    expect(tabIds.indexOf('models')).toBe(tabIds.indexOf('providers') + 1);
+    expect(tabIds.indexOf('usage')).toBe(tabIds.indexOf('models') + 1);
+    expect(tabIds).not.toContain('media');
   });
 });
 

@@ -6,7 +6,6 @@ export interface ApiKeySavePlanInput {
   derivedBaseUrl: string;
   isPresetSetup: boolean;
   isLocalPreset: boolean;
-  seedDefaultModels?: boolean;
   api: string;
 }
 
@@ -34,13 +33,11 @@ export function getApiKeySavePlan(input: ApiKeySavePlanInput): ApiKeySavePlan {
     };
   }
 
+  // 首次 preset 保存写显式 models: []（三态语义中的「明确关闭」）：
+  // 内置默认模型列表不再出现，「已添加的模型」只由用户添加或「读取模型」填充。
   const payload: Record<string, unknown> = input.isPresetSetup
-    ? { base_url: effectiveUrl, api_key: key, api: input.api, seed_default_models: true }
+    ? { base_url: effectiveUrl, api_key: key, api: input.api, models: [] }
     : { api_key: key };
-
-  if (input.seedDefaultModels) {
-    payload.seed_default_models = true;
-  }
 
   if (input.urlEdited && !input.isPresetSetup) {
     payload.base_url = effectiveUrl;

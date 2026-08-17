@@ -1372,7 +1372,7 @@
       "updateDownloadingVersion": "v{version} 다운로드 중…",
       "updateReady": "v{version} 다운로드 완료",
       "updatePreparing": "업데이트 준비 중…",
-      "updateInstalling": "업데이트를 설치하는 중입니다. 곧 재시작합니다…",
+      "updateInstalling": "업데이트를 설치하는 중입니다. Lingxi가 자동으로 다시 시작됩니다…",
       "updateAutoFailed": "자동 업데이트 실패. 수동으로 다운로드하세요.",
       "updateDownloadManual": "수동 다운로드",
       "updateDmgHint": "DMG에서 실행 중일 때는 자동 업데이트를 사용할 수 없습니다. 다운로드 후 재설치하세요.",
@@ -1380,7 +1380,6 @@
       "updateChecking": "업데이트 확인 중…",
       "updateDownloading": "{agentName}이(가) 새 집을 준비하는 중",
       "updateReadyInstall": "v{version} 설치 준비 완료",
-      "updateInstalling": "업데이트를 설치하는 중입니다. Lingxi가 자동으로 다시 시작됩니다…",
       "updateInstallManualHint": "다시 시작하여 업데이트를 누른 뒤 설치합니다. 종료만으로는 자동 설치하지 않습니다",
       "updateInstall": "재시작하여 업데이트",
       "updateInstallNow": "지금 재시작하여 업데이트",
@@ -1607,7 +1606,7 @@
       "verifyFailed": "확인 실패",
       "setupHint": "API Key를 입력해서 이 Provider를 활성화하세요",
       "configInvalid": "이 Provider 설정이 손상되어 임시로 건너뛰었어요. 설정을 다시 저장하거나 삭제 후 다시 만들어 주세요.",
-      "configIncomplete": "이 Provider 설정이 완전하지 않아요. API Key, Base URL을 채우고 모델을 추가하거나 가져오세요.",
+      "configIncomplete": "이 Provider 설정이 완전하지 않아요. API Key와 Base URL을 채워주세요.",
       "selectHint": "Provider를 선택하면 상세 정보를 볼 수 있어요",
       "addCustom": "커스텀 Provider 추가",
       "noKey": "미설정",
@@ -1619,8 +1618,10 @@
       "subtab": {
         "api": "API 설정",
         "models": "모델 설정",
+        "search": "검색",
         "usage": "사용량"
-      }
+      },
+      "configMissingFields": "이 공급자 설정이 불완전합니다. 보완 필요: {fields}."
     },
     "usage": {
       "title": "사용량",
@@ -1677,7 +1678,6 @@
     "media": {
       "imageGeneration": "이미지 생성",
       "defaultModel": "기본 이미지 모델",
-      "credentialOk": "API Key 설정됨 (제공자 설정 공유)",
       "credentialMissing": "설정되지 않음, 제공자 설정으로 이동하세요",
       "adapterMissing": "이미지 생성 어댑터 없음",
       "addModel": "이미지 모델 추가",
@@ -1691,6 +1691,7 @@
       "speechRecognitionEnabled": "음성 메시지를 보낼 때 전사",
       "defaultSpeechModel": "음성 메시지 전사 모델",
       "speechModels": "전사 모델",
+      "addSpeechModel": "전사 모델 추가",
       "speechSynthesis": "음성 합성",
       "comingSoon": "곧 제공 예정",
       "noProvider": "제공자를 선택해 자세히 보기",
@@ -1708,7 +1709,19 @@
       "defaultOption": "기본값",
       "qualityLow": "낮음",
       "qualityMedium": "중간",
-      "qualityHigh": "높음"
+      "qualityHigh": "높음",
+      "imageProviderDefaults": "이미지 생성 기본값",
+      "videoProviderDefaults": "비디오 생성 기본값",
+      "noParameterDefaults": "추가된 모델에 파라미터 스키마가 선언되어 있지 않아 설정할 항목이 없습니다.",
+      "runtimeUnavailable": "런타임 상태를 사용할 수 없음",
+      "imageDefaultsButton": "이미지 생성 기본값",
+      "videoDefaultsButton": "비디오 생성 기본값",
+      "speechSynthesisDefaultsButton": "음성 합성 기본값",
+      "runtimeProvider": "런타임 공급자"
+    },
+    "models": {
+      "auxiliary": "보조 모델",
+      "globalDefaults": "전역 기본값"
     },
     "oauth": {
       "title": "간편 로그인",
@@ -1810,9 +1823,45 @@
         "video": "비디오 입력 지원",
         "audio": "오디오 입력 지원",
         "reasoning": "추론 지원",
-        "tools": "도구 호출 지원"
+        "tools": "도구 호출 지원",
+        "web": "웹 검색",
+        "structuredOutput": "구조화 출력"
       },
-      "searchConfig": "검색 API 설정"
+      "searchConfig": "검색 API 설정",
+      "contextConfig": "컨텍스트 설정",
+      "inputModalities": "입력 모달리티",
+      "outputModalities": "출력 모달리티",
+      "modelCapabilities": "모델 기능",
+      "modalityRequired": "모달리티는 비워 둘 수 없습니다",
+      "webTooltip": "켜면 일반 채팅에서 이 공급자의 네이티브 웹 검색을 사용합니다. 내부 유틸리티 호출에는 영향을 주지 않습니다.",
+      "structuredOutputTooltip": "켜면 일반 채팅에서 유효한 표준 JSON을 출력해야 합니다. 내부 유틸리티 호출에는 영향을 주지 않습니다.",
+      "webUnsupported": "프로토콜이 네이티브 웹 검색을 지원하지 않습니다",
+      "structuredOutputUnsupported": "프로토콜이 구조화 출력을 지원하지 않습니다",
+      "modality": {
+        "text": "텍스트",
+        "image": "이미지",
+        "video": "비디오",
+        "audio": "오디오"
+      },
+      "outputModality": {
+        "text": "출력: 텍스트",
+        "image": "출력: 이미지",
+        "video": "출력: 비디오",
+        "audio": "출력: 오디오"
+      },
+      "modelGroup": {
+        "chat": "대화 모델",
+        "image": "이미지 모델",
+        "video": "비디오 모델",
+        "speech": "음성 인식 모델"
+      },
+      "customModelCategory": {
+        "label": "분류",
+        "chat": "대화",
+        "image": "이미지",
+        "video": "비디오",
+        "speech": "음성 인식"
+      }
     },
     "memory": {
       "sectionTitle": "기억",

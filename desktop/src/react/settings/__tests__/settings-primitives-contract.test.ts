@@ -23,7 +23,7 @@ describe('settings primitive discipline', () => {
     const source = read('desktop/src/react/settings/SettingsContent.tsx');
 
     expect(source).toContain("import { SettingsPage } from './components/SettingsPrimitives';");
-    expect(source).toMatch(/<SettingsPage tab=\{effectiveActiveTab\}>\s*<ActiveTab \/>\s*<\/SettingsPage>/s);
+    expect(source).toMatch(/<SettingsPage tab=\{effectiveActiveTab\}[^>]*>\s*<ActiveTab \/>\s*<\/SettingsPage>/s);
   });
 
   it('has no layout-bypassing flush variant or tab-specific wide shell', () => {

@@ -25,25 +25,27 @@ function readPersistedProviders() {
 }
 
 describe("ProviderRegistry media capabilities", () => {
-  it("exposes built-in official image providers from media capabilities", () => {
+  it("keeps built-in official image providers as an add-candidate catalog, not the effective list", () => {
     const registry = new ProviderRegistry(tmpHome);
     registry.reload();
 
     const providers = registry.getMediaProviders("image_generation");
     const byId = new Map(providers.map((provider) => [provider.providerId, provider]));
 
-    expect(byId.get("openai")?.models).toEqual(expect.arrayContaining([
+    // 生效列表（models）默认为空；内置声明只进候选目录（availableModels）
+    expect(byId.get("openai")?.models).toEqual([]);
+    expect(byId.get("openai")?.availableModels).toEqual(expect.arrayContaining([
       expect.objectContaining({ id: "gpt-image-1.5", protocolId: "openai-images" }),
     ]));
-    expect(byId.get("openai")?.models).not.toEqual(expect.arrayContaining([
+    expect(byId.get("openai")?.availableModels).not.toEqual(expect.arrayContaining([
       expect.objectContaining({ id: "gpt-image-2" }),
     ]));
-    expect(byId.get("dashscope")?.models).toEqual(expect.arrayContaining([
+    expect(byId.get("dashscope")?.availableModels).toEqual(expect.arrayContaining([
       expect.objectContaining({ id: "wan2.7-image-pro", protocolId: "dashscope-wan-images" }),
       expect.objectContaining({ id: "qwen-image-2.0-pro", protocolId: "dashscope-qwen-multimodal-image" }),
       expect.objectContaining({ id: "qwen-image-plus", protocolId: "dashscope-qwen-text2image" }),
     ]));
-    expect(byId.get("minimax")?.models).toEqual(expect.arrayContaining([
+    expect(byId.get("minimax")?.availableModels).toEqual(expect.arrayContaining([
       expect.objectContaining({ id: "image-01", protocolId: "minimax-images" }),
       expect.objectContaining({ id: "image-01-live", protocolId: "minimax-images" }),
     ]));
@@ -52,17 +54,24 @@ describe("ProviderRegistry media capabilities", () => {
       expect.objectContaining({ id: "minimax-token-plan", providerId: "minimax-token-plan" }),
     ]));
     expect(byId.has("minimax-token-plan")).toBe(false);
-    expect(byId.get("gemini")?.models).toEqual(expect.arrayContaining([
+    expect(byId.get("gemini")?.availableModels).toEqual(expect.arrayContaining([
       expect.objectContaining({ id: "gemini-2.5-flash-image", protocolId: "gemini-generate-content-image" }),
       expect.objectContaining({ id: "gemini-3.1-flash-image", protocolId: "gemini-generate-content-image" }),
       expect.objectContaining({ id: "gemini-3-pro-image", protocolId: "gemini-generate-content-image" }),
     ]));
-    expect(byId.get("gemini")?.models.map((model) => model.id)).not.toContain("gemini-3.1-flash-image-preview");
-    expect(byId.get("gemini")?.models.map((model) => model.id)).not.toContain("gemini-3-pro-image-preview");
-    expect(byId.get("volcengine")?.models).toEqual(expect.arrayContaining([
+    expect(byId.get("gemini")?.availableModels.map((model) => model.id)).not.toContain("gemini-3.1-flash-image-preview");
+    expect(byId.get("gemini")?.availableModels.map((model) => model.id)).not.toContain("gemini-3-pro-image-preview");
+    expect(byId.get("volcengine")?.availableModels).toEqual(expect.arrayContaining([
       expect.objectContaining({ id: "doubao-seedream-5-0-lite-260128", displayName: "Seedream 5.0 Lite" }),
       expect.objectContaining({ id: "doubao-seedream-5-0-260128", displayName: "Seedream 5.0" }),
     ]));
+    // 未添加的内置模型不可解析；显式添加后按声明元数据解析（含别名归一）
+    expect(() => registry.resolveMediaModel({
+      providerId: "gemini",
+      modelId: "gemini-3.1-flash-image-preview",
+      capability: "image_generation",
+    })).toThrow(/not found/i);
+    registry.addMediaModel("gemini", "image_generation", { id: "gemini-3.1-flash-image" });
     expect(registry.resolveMediaModel({
       providerId: "gemini",
       modelId: "gemini-3.1-flash-image-preview",
@@ -72,18 +81,68 @@ describe("ProviderRegistry media capabilities", () => {
     });
   });
 
+  it("removes user-added models from the add-candidate catalog so the settings dropdown stays duplicate-free", () => {
+    const registry = new ProviderRegistry(tmpHome);
+    registry.reload();
+
+    registry.addMediaModel("dashscope", "image_generation", { id: "wan2.7-image-pro" });
+
+    let provider = registry.getMediaProviders("image_generation")
+      .find((item) => item.providerId === "dashscope");
+    expect(provider?.models.map((model) => model.id)).toContain("wan2.7-image-pro");
+    expect(provider?.availableModels.map((model) => model.id)).not.toContain("wan2.7-image-pro");
+    expect(provider?.availableModels.map((model) => model.id)).toContain("qwen-image-2.0-pro");
+
+    // aliases 身份对齐：添加声明模型的别名 id 后，该声明模型同样退出候选
+    registry.addMediaModel("gemini", "image_generation", { id: "gemini-3.1-flash-image-preview" });
+    provider = registry.getMediaProviders("image_generation")
+      .find((item) => item.providerId === "gemini");
+    expect(provider?.availableModels.map((model) => model.id)).not.toContain("gemini-3.1-flash-image");
+
+    // 语音目录同样排除已添加条目
+    registry.addMediaModel("openai", "speech_recognition", { id: "whisper-1" });
+    const speech = registry.getMediaProviders("speech_recognition")
+      .find((item) => item.providerId === "openai");
+    expect(speech?.models.map((model) => model.id)).toContain("whisper-1");
+    expect(speech?.availableModels.map((model) => model.id)).not.toContain("whisper-1");
+    expect(speech?.availableModels.map((model) => model.id)).toContain("gpt-4o-transcribe");
+  });
+
+  it("keeps runtime snapshot catalogs intact (CLI lists depend on them)", async () => {
+    const registry = new ProviderRegistry(tmpHome);
+    registry.registerProviderContribution({
+      id: "runtime-cli",
+      displayName: "Runtime CLI",
+      authType: "none",
+      _pluginId: "runtime-cli",
+      capabilities: { chat: { projection: "none" }, media: { imageGeneration: { models: [] } } },
+    });
+    registry.reload();
+    registry.registerRuntimeMediaCapabilitySource("runtime-cli", {
+      refresh: async () => ({
+        media: { imageGeneration: { models: [{ id: "discovered", protocolId: "runtime-cli-images" }] } },
+      }),
+    }, { pluginId: "runtime-cli" });
+    await registry.refreshRuntimeMediaCapabilities({ providerId: "runtime-cli" });
+
+    const provider = registry.getMediaProviders("image_generation")
+      .find((item) => item.providerId === "runtime-cli");
+    expect(provider?.models.map((model) => model.id)).toEqual(["discovered"]);
+    expect(provider?.availableModels.map((model) => model.id)).toEqual(["discovered"]);
+  });
+
   it("exposes media parameters and reference-image limits at model/mode granularity", () => {
     const registry = new ProviderRegistry(tmpHome);
     registry.reload();
 
     const providers = registry.getMediaProviders("image_generation");
     const byId = new Map(providers.map((provider) => [provider.providerId, provider]));
-    const openai = byId.get("openai");
-    const dashscope = byId.get("dashscope");
-    const gemini = byId.get("gemini");
+    const openai = byId.get("openai")?.availableModels;
+    const dashscope = byId.get("dashscope")?.availableModels;
+    const gemini = byId.get("gemini")?.availableModels;
 
-    const gptImage = openai?.models.find((model) => model.id === "gpt-image-1.5");
-    const dalle = openai?.models.find((model) => model.id === "dall-e-3");
+    const gptImage = openai?.find((model) => model.id === "gpt-image-1.5");
+    const dalle = openai?.find((model) => model.id === "dall-e-3");
     expect(gptImage?.modes).toEqual(expect.arrayContaining([
       expect.objectContaining({
         id: "image2image",
@@ -113,8 +172,8 @@ describe("ProviderRegistry media capabilities", () => {
       }),
     ]);
 
-    const qwen20 = dashscope?.models.find((model) => model.id === "qwen-image-2.0-pro");
-    const qwenPlus = dashscope?.models.find((model) => model.id === "qwen-image-plus");
+    const qwen20 = dashscope?.find((model) => model.id === "qwen-image-2.0-pro");
+    const qwenPlus = dashscope?.find((model) => model.id === "qwen-image-plus");
     expect(qwen20?.modes).toEqual(expect.arrayContaining([
       expect.objectContaining({ id: "text2image" }),
       expect.objectContaining({
@@ -133,8 +192,8 @@ describe("ProviderRegistry media capabilities", () => {
       }),
     ]);
 
-    const gemini25 = gemini?.models.find((model) => model.id === "gemini-2.5-flash-image");
-    const gemini31 = gemini?.models.find((model) => model.id === "gemini-3.1-flash-image");
+    const gemini25 = gemini?.find((model) => model.id === "gemini-2.5-flash-image");
+    const gemini31 = gemini?.find((model) => model.id === "gemini-3.1-flash-image");
     const gemini25ImageMode = gemini25?.modes?.find((mode) => mode.id === "image2image");
     const gemini31ImageMode = gemini31?.modes?.find((mode) => mode.id === "image2image");
     expect(gemini25?.modes?.[0]?.parameterSchema.properties).not.toHaveProperty("resolution");
@@ -150,7 +209,7 @@ describe("ProviderRegistry media capabilities", () => {
 
     const providers = registry.getMediaProviders("image_generation");
     const byId = new Map(providers.map((provider) => [provider.providerId, provider]));
-    const model = (providerId, modelId) => byId.get(providerId)?.models.find((item) => item.id === modelId);
+    const model = (providerId, modelId) => byId.get(providerId)?.availableModels.find((item) => item.id === modelId);
     const mode = (providerId, modelId, modeId = "text2image") => model(providerId, modelId)?.modes.find((item) => item.id === modeId);
     const prop = (providerId, modelId, modeId, key) => mode(providerId, modelId, modeId)?.parameterSchema.properties[key];
     const defaults = (providerId, modelId, modeId = "text2image") => mode(providerId, modelId, modeId)?.defaults || {};
@@ -242,6 +301,10 @@ describe("ProviderRegistry media capabilities", () => {
       api: "openai-completions",
     });
     expect(registry.getDefaultModels("agnes")).toEqual(["agnes-2.0-flash"]);
+    // 内置声明默认不在生效列表；显式添加后按声明元数据解析
+    expect(registry.getMediaModels("agnes", "image_generation")).toEqual([]);
+    registry.addMediaModel("agnes", "image_generation", { id: "agnes-image-2.1-flash" });
+    registry.addMediaModel("agnes", "video_generation", { id: "agnes-video-v2.0" });
     expect(registry.resolveMediaModel({
       providerId: "agnes",
       modelId: "agnes-image-2.1-flash",
@@ -330,6 +393,7 @@ describe("ProviderRegistry media capabilities", () => {
     registry.reload();
 
     const status = registry.getMediaProviderCredentialStatus("minimax", "image_generation");
+    registry.addMediaModel("minimax", "image_generation", { id: "image-01" });
     const resolved = registry.resolveMediaModel({
       providerId: "minimax",
       modelId: "image-01",
@@ -347,19 +411,20 @@ describe("ProviderRegistry media capabilities", () => {
     });
   });
 
-  it("exposes built-in speech recognition providers without exposing MiniMax Token Plan as STT", () => {
+  it("exposes built-in speech recognition providers as candidate catalogs without MiniMax Token Plan as STT", () => {
     const registry = new ProviderRegistry(tmpHome);
     registry.reload();
 
     const providers = registry.getMediaProviders("speech_recognition");
     const byId = new Map(providers.map((provider) => [provider.providerId, provider]));
 
-    expect(byId.get("openai")?.models).toEqual(expect.arrayContaining([
+    expect(byId.get("openai")?.models).toEqual([]);
+    expect(byId.get("openai")?.availableModels).toEqual(expect.arrayContaining([
       expect.objectContaining({ id: "gpt-4o-transcribe", protocolId: "openai-audio-transcriptions" }),
       expect.objectContaining({ id: "gpt-4o-mini-transcribe", protocolId: "openai-audio-transcriptions" }),
       expect.objectContaining({ id: "whisper-1", protocolId: "openai-audio-transcriptions" }),
     ]));
-    expect(byId.get("mimo")?.models).toEqual(expect.arrayContaining([
+    expect(byId.get("mimo")?.availableModels).toEqual(expect.arrayContaining([
       expect.objectContaining({ id: "mimo-v2.5-asr", protocolId: "mimo-chat-completions-asr" }),
     ]));
     expect(registry.get("mimo-token-plan")).toMatchObject({
@@ -371,16 +436,16 @@ describe("ProviderRegistry media capabilities", () => {
       providerId: "mimo-token-plan",
       displayName: "Xiaomi MiMo Token Plan",
     });
-    expect(byId.get("mimo-token-plan")?.models).toEqual(expect.arrayContaining([
+    expect(byId.get("mimo-token-plan")?.availableModels).toEqual(expect.arrayContaining([
       expect.objectContaining({ id: "mimo-v2.5-asr", protocolId: "mimo-chat-completions-asr" }),
     ]));
-    expect(byId.get("dashscope")?.models).toEqual(expect.arrayContaining([
+    expect(byId.get("dashscope")?.availableModels).toEqual(expect.arrayContaining([
       expect.objectContaining({ id: "qwen3-asr-flash", protocolId: "dashscope-qwen-asr-chat" }),
     ]));
-    expect(byId.get("volcengine-speech")?.models).toEqual(expect.arrayContaining([
+    expect(byId.get("volcengine-speech")?.availableModels).toEqual(expect.arrayContaining([
       expect.objectContaining({ id: "bigasr-flash", protocolId: "volcengine-bigasr-transcription" }),
     ]));
-    expect(byId.get("system-speech")?.models).toEqual(expect.arrayContaining([
+    expect(byId.get("system-speech")?.availableModels).toEqual(expect.arrayContaining([
       expect.objectContaining({ id: "system-speech", protocolId: "system-speech-recognition" }),
     ]));
     expect(byId.has("minimax-token-plan")).toBe(false);
@@ -397,7 +462,7 @@ describe("ProviderRegistry media capabilities", () => {
       providerId: "openai-codex-oauth",
       displayName: "OpenAI Codex (OAuth)",
     });
-    expect(codex.models).toContainEqual(expect.objectContaining({
+    expect(codex?.availableModels).toContainEqual(expect.objectContaining({
       id: "gpt-image-2",
       displayName: "GPT Image 2",
       protocolId: "openai-codex-responses-image",
@@ -493,6 +558,16 @@ describe("ProviderRegistry media capabilities", () => {
       source: { kind: "plugin", pluginId: "jimeng" },
       runtime: expect.objectContaining({ kind: "browser-cli" }),
     });
+    // 插件声明的 CLI 模型默认只进候选目录；用户添加后进入生效列表
+    expect(registry.getMediaModels("jimeng-cli", "image_generation")).toEqual([]);
+    expect(registry.getMediaModelCatalog("jimeng-cli", "image_generation")).toEqual([
+      expect.objectContaining({
+        id: "high_aes_general_v50",
+        displayName: "即梦 5.0 Lite",
+        protocolId: "browser-cli-media",
+      }),
+    ]);
+    registry.addMediaModel("jimeng-cli", "image_generation", { id: "high_aes_general_v50" });
     expect(registry.getMediaModels("jimeng-cli", "image_generation")).toEqual([
       expect.objectContaining({
         id: "high_aes_general_v50",
@@ -870,6 +945,87 @@ describe("custom provider image protocol inference (#1627)", () => {
     registry.reload();
 
     expect(() => registry.addMediaModel("my-anthropic-proxy", "image_generation", { id: "claude-image-x" }))
+      .toThrow(/missing protocolId/);
+  });
+});
+
+describe("media model protocol defaults follow the provider capability, not the id prefix", () => {
+  it("adds non-catalog video model ids on Agnes with the declared agnes-videos protocol", () => {
+    const registry = new ProviderRegistry(tmpHome);
+    registry.reload();
+
+    registry.addMediaModel("agnes", "video_generation", { id: "agnes-video-x9-preview" });
+
+    expect(registry.getMediaModels("agnes", "video_generation")).toEqual(expect.arrayContaining([
+      expect.objectContaining({ id: "agnes-video-x9-preview", protocolId: "agnes-videos" }),
+    ]));
+    expect(registry.resolveMediaModel({
+      providerId: "agnes",
+      modelId: "agnes-video-x9-preview",
+      capability: "video_generation",
+    })).toMatchObject({
+      model: expect.objectContaining({ id: "agnes-video-x9-preview", protocolId: "agnes-videos" }),
+    });
+  });
+
+  it("adds non-catalog speech model ids on built-in providers with the capability default protocol", () => {
+    const registry = new ProviderRegistry(tmpHome);
+    registry.reload();
+
+    registry.addMediaModel("openai", "speech_recognition", { id: "whisper-large-v3" });
+
+    expect(registry.getMediaModels("openai", "speech_recognition")).toEqual(expect.arrayContaining([
+      expect.objectContaining({ id: "whisper-large-v3", protocolId: "openai-audio-transcriptions" }),
+    ]));
+  });
+
+  it("adds non-catalog image model ids on Gemini even without the image id prefix", () => {
+    const registry = new ProviderRegistry(tmpHome);
+    registry.reload();
+
+    registry.addMediaModel("gemini", "image_generation", { id: "nano-banana-pro" });
+
+    expect(registry.getMediaModels("gemini", "image_generation")).toEqual(expect.arrayContaining([
+      expect.objectContaining({ id: "nano-banana-pro", protocolId: "gemini-generate-content-image" }),
+    ]));
+  });
+
+  it("adds speech models on custom OpenAI-compatible providers through the generic transcription protocol", () => {
+    fs.writeFileSync(path.join(tmpHome, "added-models.yaml"), YAML.dump({
+      providers: {
+        "my-proxy": {
+          api_key: "proxy-key",
+          base_url: "https://proxy.example.com/v1",
+          api: "openai-completions",
+        },
+      },
+    }), "utf-8");
+
+    const registry = new ProviderRegistry(tmpHome);
+    registry.reload();
+
+    registry.addMediaModel("my-proxy", "speech_recognition", { id: "proxy-asr-v2" });
+
+    expect(registry.getMediaModels("my-proxy", "speech_recognition")).toEqual([
+      expect.objectContaining({ id: "proxy-asr-v2", protocolId: "openai-audio-transcriptions" }),
+    ]);
+  });
+
+  it("still rejects video models on custom providers where no generic video protocol exists", () => {
+    fs.writeFileSync(path.join(tmpHome, "added-models.yaml"), YAML.dump({
+      providers: {
+        "my-proxy": {
+          api_key: "proxy-key",
+          base_url: "https://proxy.example.com/v1",
+          api: "openai-completions",
+        },
+      },
+    }), "utf-8");
+
+    const registry = new ProviderRegistry(tmpHome);
+    registry.reload();
+
+    expect(() => registry.addMediaModel("my-proxy", "video_generation", { id: "proxy-video-v1" }))
       .toThrow(/missing protocolId/);
   });
 });

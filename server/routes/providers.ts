@@ -14,7 +14,7 @@ import {
   resolveProviderHeadersPatch,
 } from "../../shared/provider-auth.ts";
 import { filterDiscoveredProviderModels } from "../../shared/provider-model-validation.ts";
-import { listKnownProviderModels, lookupKnown } from "../../shared/known-models.ts";
+import { lookupKnown } from "../../shared/known-models.ts";
 import { enrichOllamaModelMetadata } from "../../shared/ollama-model-metadata.ts";
 import { clearConfigCache } from "../../lib/memory/config-loader.ts";
 import { collectSecretPatchPaths, isMaskedSecretValue, maskSecretValue } from "../../shared/secret-custody.ts";
@@ -54,6 +54,20 @@ function writeModelsCache(engine: any, cache: any) {
 function getProviderModelId(model: any) {
   if (typeof model === "string") return model.trim();
   return typeof model?.id === "string" ? model.id.trim() : "";
+}
+
+/**
+ * Registry 媒体能力绑定的只读 wire projection。
+ * 不返回密钥、不改变 Provider 配置、不写盘，只把 Registry 状态映射成 summary 字段。
+ */
+function projectMediaCapabilityBindings(registry: any, providerId: string) {
+  if (!registry || typeof registry.getMediaCapabilityBindings !== "function") return [];
+  const bindings = registry.getMediaCapabilityBindings(providerId) || [];
+  return bindings.map((binding: any) => ({
+    capability: binding.capability,
+    runtime_provider_id: binding.runtimeProviderId,
+    ...(binding.credentialLaneId ? { credential_lane_id: binding.credentialLaneId } : {}),
+  }));
 }
 
 function pickProbeModelId(providerRegistry: any, providerId: any, api: any, requestedModelId: any) {
@@ -135,7 +149,11 @@ export function createProvidersRoute(engine: any) {
       const oauthInfo = getOAuthLoginInfo(name);
       // ProviderRegistry 暴露的 runtime provider 数据是模型列表入口；
       // 对本地 Provider Plugin，它已经合并了插件声明和 catalog overlay。
-      const rawModels = provRegistry.getChatModelEntries?.(name) || p.models || [];
+      // API-key 供应商只投影用户显式添加的模型（Provider Catalog overlay），
+      // 内置默认列表不进设置页；OAuth 供应商的模型目录来自 provider 插件，维持 registry 投影。
+      const rawModels = isOAuth
+        ? (provRegistry.getChatModelEntries?.(name) || p.models || [])
+        : p.models;
       const allowsMissingApiKey = !!p.base_url && provRegistry.allowsMissingApiKey?.(name, p.base_url);
       const hasHeaders = Object.keys(p.headers || {}).length > 0;
       const hasCredentials = !!(p.api_key || hasHeaders || (isOAuth && oauthInfo?.loggedIn) || (!isOAuth && allowsMissingApiKey));
@@ -144,7 +162,10 @@ export function createProvidersRoute(engine: any) {
         if (!p.base_url) missingFields.push("base_url");
         if (!hasCredentials) missingFields.push("api_key");
       }
-      if (rawModels.length === 0) missingFields.push("models");
+      // 模型列表为空不算「配置不完整」：API-key 供应商首次保存写显式 models: []，
+      // 空列表是等待用户「添加模型」/「读取模型」的正常状态，不是配置缺失。
+      // OAuth 供应商的模型目录是自动投影的，空目录意味着目录异常，保留标记。
+      if (isOAuth && rawModels.length === 0) missingFields.push("models");
 
       result[name] = {
         type: isOAuth ? "oauth" : "api-key",
@@ -165,6 +186,7 @@ export function createProvidersRoute(engine: any) {
         config_status: p.config_error ? "invalid" : (missingFields.length > 0 ? "needs_setup" : "ok"),
         config_error: p.config_error || null,
         missing_fields: missingFields,
+        media_capability_bindings: projectMediaCapabilityBindings(provRegistry, name),
       };
     }
 
@@ -193,6 +215,7 @@ export function createProvidersRoute(engine: any) {
         config_status: effectiveModels.length > 0 && loginInfo?.loggedIn ? "ok" : "needs_setup",
         config_error: null,
         missing_fields: effectiveModels.length > 0 ? [] : ["models"],
+        media_capability_bindings: projectMediaCapabilityBindings(provRegistry, oauthId),
       };
     }
 
@@ -223,6 +246,7 @@ export function createProvidersRoute(engine: any) {
             ...(entry.authType === "none" ? [] : ["api_key"]),
             "models",
           ],
+          media_capability_bindings: projectMediaCapabilityBindings(provRegistry, id),
         };
       }
     }
@@ -303,23 +327,6 @@ export function createProvidersRoute(engine: any) {
       context: known?.context ?? null,
       maxOutput: known?.maxOutput ?? null,
     };
-  }
-
-  function supplementRemoteModels(name: any, remoteModels: any[]) {
-    if (name !== "zhipu") return remoteModels;
-    const seen = new Set();
-    const merged = [];
-    const append = (model) => {
-      const id = typeof model === "string" ? model : model?.id;
-      if (!id || seen.has(id)) return;
-      seen.add(id);
-      merged.push(typeof model === "string" ? knownCatalogModel(name, id) : model);
-    };
-
-    for (const model of remoteModels) append(model);
-    for (const id of engine.providerRegistry.getDefaultModels?.(name) || []) append(id);
-    for (const id of listKnownProviderModels(name)) append(id);
-    return merged;
   }
 
   function enrichDiscoveredModelMetadata(name: any, models: any[]) {
@@ -499,13 +506,16 @@ export function createProvidersRoute(engine: any) {
 
   /**
    * 从供应商拉取模型列表
-   * 统一瀑布流：凭证解析 → 远程 list models → registry fallback → defaults fallback
    *
    * 远程端点按协议分岔：
    *   - anthropic-messages → GET {base}/v1/models?limit=1000（Anthropic Messages API）
    *   - 其他（openai-completions 等）→ GET {base}/models
    *
-   * body: { name, base_url?, api?, api_key? }
+   * 只返回远端目录的真实结果；OAuth（订阅制）供应商例外，回落到
+   * registry/default 目录。API-key 供应商探测失败时如实返回错误，
+   * 不再降级到内置模型列表。
+   *
+   * body: { name, base_url?, api?, api_key?, headers? }
    */
   route.post("/providers/fetch-models", async (c) => {
     const body = await safeJson(c);
@@ -568,6 +578,7 @@ export function createProvidersRoute(engine: any) {
       : saved.headers || {};
 
     // ── 2. 远程 list models（baseUrl 为空时跳过）──
+    let lastRemoteError = "";
     if (effectiveBaseUrl) {
       try {
         const base = effectiveBaseUrl.replace(/\/+$/, "");
@@ -596,7 +607,7 @@ export function createProvidersRoute(engine: any) {
 
         if (res.ok) {
           const data = await res.json();
-          let remoteModels = supplementRemoteModels(name, normalizeRemoteModels(data, effectiveApi));
+          let remoteModels = normalizeRemoteModels(data, effectiveApi);
 
           // Ollama 专用：/v1/models 不返回 context_length 和 capabilities，
           // 探测原生 /api/show 补充 capabilities + context_length。
@@ -646,14 +657,27 @@ export function createProvidersRoute(engine: any) {
           return c.json(ignoredModels.length > 0 ? { models, ignoredModels } : { models });
         }
 
-        // 404 / 其他 → 进入 step 3
-      } catch {
-        // 网络错误 → 进入 step 3
+        // 404 / 其他 → 记录原因，进入 step 3
+        lastRemoteError = `HTTP ${res.status}: ${res.statusText}`;
+      } catch (err) {
+        // 网络错误 → 记录原因，进入 step 3
+        lastRemoteError = err instanceof Error ? err.message : String(err);
       }
     }
 
-    // ── 3. Registry + defaults fallback ──
-    return c.json(registryOrDefaultsFallback(name));
+    // ── 3. OAuth 目录回落 / API-key 供应商如实报错 ──
+    // API-key 供应商的「读取模型」只认远端目录：探测失败时返回错误，
+    // 不再静默降级到内置模型列表。OAuth（订阅制）供应商没有公开 /models 端点，
+    // registry/default 清单就是它的模型目录，保留回落。
+    if (name && engine.providerRegistry.isOAuth?.(name)) {
+      return c.json(registryOrDefaultsFallback(name));
+    }
+    return c.json({
+      error: effectiveBaseUrl
+        ? `Remote model catalog unavailable for provider "${name}": ${lastRemoteError || "empty catalog"}`
+        : `No base URL configured for provider "${name}"`,
+      models: [],
+    });
   });
 
   /**

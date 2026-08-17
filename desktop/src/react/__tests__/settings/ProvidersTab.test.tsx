@@ -25,6 +25,7 @@ vi.mock('../../settings/api', () => ({
 
 vi.mock('../../settings/actions', () => ({
   loadSettingsConfig: () => mocks.loadSettingsConfig(),
+  updateSettingsSnapshot: vi.fn(),
 }));
 
 vi.mock('../../hooks/use-config', () => ({
@@ -44,8 +45,12 @@ vi.mock('../../settings/helpers', () => ({
   ],
 }));
 
-vi.mock('../../settings/tabs/providers/OtherModelsSection', () => ({
-  OtherModelsSection: () => <div data-testid="other-models-section" />,
+vi.mock('../../settings/tabs/providers/SearchProviderSection', () => ({
+  SearchProviderSection: () => <div data-testid="search-provider-section" />,
+}));
+
+vi.mock('../../settings/tabs/providers/SearchApiKeyConfig', () => ({
+  SearchApiKeyConfig: () => <div data-testid="search-api-key-config" />,
 }));
 
 vi.mock('../../settings/tabs/providers/ProviderModelList', () => ({
@@ -259,7 +264,7 @@ describe('ProvidersTab provider-scoped form state', () => {
           base_url: 'https://apihub.agnes-ai.com/v1',
           api_key: 'agnes-key',
           api: 'openai-completions',
-          seed_default_models: true,
+          models: [],
         },
       },
     });
@@ -467,11 +472,24 @@ describe('ProvidersTab provider-scoped form state', () => {
     expect(mocks.loadSettingsConfig).not.toHaveBeenCalled();
   });
 
-  it('no longer offers a usage sub tab after usage became its own settings page', () => {
+  it('offers api and search sub tabs instead of usage/models', () => {
     render(<ProvidersTab />);
 
     expect(screen.queryByRole('tab', { name: 'settings.providers.subtab.usage' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('tab', { name: 'settings.providers.subtab.models' })).not.toBeInTheDocument();
     expect(screen.getByRole('tab', { name: 'settings.providers.subtab.api' })).toBeInTheDocument();
-    expect(screen.getByRole('tab', { name: 'settings.providers.subtab.models' })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: 'settings.providers.subtab.search' })).toBeInTheDocument();
+  });
+
+  it('switches to the search sub tab through navigateSettings and renders search config', async () => {
+    render(<ProvidersTab />);
+
+    fireEvent.click(screen.getByRole('tab', { name: 'settings.providers.subtab.search' }));
+
+    await waitFor(() => {
+      expect(useSettingsStore.getState().activeSubTabs.providers).toBe('search');
+    });
+    expect(screen.getByTestId('search-provider-section')).toBeInTheDocument();
+    expect(screen.getByTestId('search-api-key-config')).toBeInTheDocument();
   });
 });

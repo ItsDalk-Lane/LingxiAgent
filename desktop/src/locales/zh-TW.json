@@ -1372,7 +1372,7 @@
       "updateDownloadingVersion": "正在下載 v{version}…",
       "updateReady": "v{version} 已下載完畢",
       "updatePreparing": "正在準備更新…",
-      "updateInstalling": "正在安裝更新，應用程式即將重新啟動…",
+      "updateInstalling": "正在安裝更新，靈犀 會自動重新啟動…",
       "updateAutoFailed": "自動更新失敗，請手動下載",
       "updateDownloadManual": "手動下載",
       "updateDmgHint": "從 DMG 執行時無法自動更新，請下載後重新安裝",
@@ -1380,7 +1380,6 @@
       "updateChecking": "正在檢查更新…",
       "updateDownloading": "{agentName}正在準備新家",
       "updateReadyInstall": "v{version} 已就緒",
-      "updateInstalling": "正在安裝更新，靈犀 會自動重新啟動…",
       "updateInstallManualHint": "點「重啟更新」後安裝，直接退出不會自動安裝",
       "updateInstall": "重新啟動更新",
       "updateInstallNow": "重新啟動立即更新",
@@ -1607,7 +1606,7 @@
       "verifyFailed": "驗證失敗",
       "setupHint": "輸入 API Key 以啟用此供應商",
       "configInvalid": "此供應商設定損壞，已被暫時略過。請重新儲存設定，或刪除後重建。",
-      "configIncomplete": "此供應商設定不完整，請補齊 API Key、Base URL，並新增或讀取模型。",
+      "configIncomplete": "此供應商設定不完整，請補齊 API Key 和 Base URL。",
       "selectHint": "選擇一個供應商查看詳情",
       "addCustom": "新增自訂供應商",
       "noKey": "未設定",
@@ -1619,8 +1618,10 @@
       "subtab": {
         "api": "設定 API",
         "models": "設定模型",
+        "search": "搜尋",
         "usage": "用量統計"
-      }
+      },
+      "configMissingFields": "該供應商設定不完整，需補全：{fields}。"
     },
     "usage": {
       "title": "用量統計",
@@ -1677,7 +1678,6 @@
     "media": {
       "imageGeneration": "圖片生成",
       "defaultModel": "預設圖片模型",
-      "credentialOk": "API Key 已設定（複用供應商設定）",
       "credentialMissing": "未設定，前往供應商設定",
       "adapterMissing": "缺少圖片生成適配器",
       "addModel": "新增圖片模型",
@@ -1691,6 +1691,7 @@
       "speechRecognitionEnabled": "傳送語音條時轉錄",
       "defaultSpeechModel": "語音條轉錄模型",
       "speechModels": "轉錄模型",
+      "addSpeechModel": "新增轉錄模型",
       "speechSynthesis": "語音合成",
       "comingSoon": "即將推出",
       "noProvider": "請選擇一個供應商查看詳情",
@@ -1708,7 +1709,19 @@
       "defaultOption": "預設",
       "qualityLow": "低",
       "qualityMedium": "中",
-      "qualityHigh": "高"
+      "qualityHigh": "高",
+      "imageProviderDefaults": "圖片生成預設參數",
+      "videoProviderDefaults": "影片生成預設參數",
+      "noParameterDefaults": "已新增的模型未宣告預設參數（無參數 schema），暫無可設定項目。",
+      "runtimeUnavailable": "執行階段狀態暫不可用",
+      "imageDefaultsButton": "圖片生成預設參數",
+      "videoDefaultsButton": "影片生成預設參數",
+      "speechSynthesisDefaultsButton": "語音合成預設參數",
+      "runtimeProvider": "執行時供應商"
+    },
+    "models": {
+      "auxiliary": "輔助模型",
+      "globalDefaults": "全域預設"
     },
     "oauth": {
       "title": "快速登入",
@@ -1810,9 +1823,45 @@
         "video": "支援影片輸入",
         "audio": "支援音訊輸入",
         "reasoning": "支援推理",
-        "tools": "支援工具呼叫"
+        "tools": "支援工具呼叫",
+        "web": "聯網",
+        "structuredOutput": "結構化輸出"
       },
-      "searchConfig": "搜尋 API 設定"
+      "searchConfig": "搜尋 API 設定",
+      "contextConfig": "上下文設定",
+      "inputModalities": "輸入模態",
+      "outputModalities": "輸出模態",
+      "modelCapabilities": "模型能力",
+      "modalityRequired": "模態不能為空",
+      "webTooltip": "開啟後，普通聊天將使用該供應商的原生聯網搜尋；內部輔助調用不受影響。",
+      "structuredOutputTooltip": "開啟後，普通聊天必須輸出合法標準 JSON；內部輔助調用不受影響。",
+      "webUnsupported": "協議不支援原生聯網",
+      "structuredOutputUnsupported": "協議不支援結構化輸出",
+      "modality": {
+        "text": "文字",
+        "image": "視覺",
+        "video": "影片",
+        "audio": "音訊"
+      },
+      "outputModality": {
+        "text": "輸出：文字",
+        "image": "輸出：圖片",
+        "video": "輸出：影片",
+        "audio": "輸出：音訊"
+      },
+      "modelGroup": {
+        "chat": "對話模型",
+        "image": "圖片模型",
+        "video": "影片模型",
+        "speech": "語音識別模型"
+      },
+      "customModelCategory": {
+        "label": "類別",
+        "chat": "對話",
+        "image": "圖片",
+        "video": "影片",
+        "speech": "語音識別"
+      }
     },
     "memory": {
       "sectionTitle": "記憶",

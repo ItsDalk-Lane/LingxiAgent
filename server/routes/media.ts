@@ -161,6 +161,38 @@ export function createMediaRoute(engine) {
     }
   });
 
+  route.put("/media/image/providers/:providerId/models/:modelId", async (c) => {
+    try {
+      const denied = denyWithoutScope(c, "providers.manage");
+      if (denied) return denied;
+      const body = await safeJson(c);
+      const result = await requireMediaManager(engine).updateImageProviderModel(
+        c.req.param("providerId"),
+        c.req.param("modelId"),
+        body?.model && typeof body.model === "object" && !Array.isArray(body.model) ? body.model : body,
+      );
+      return c.json(result);
+    } catch (err) {
+      return c.json({ error: err.message }, err.statusCode || 400);
+    }
+  });
+
+  route.put("/media/video/providers/:providerId/models/:modelId", async (c) => {
+    try {
+      const denied = denyWithoutScope(c, "providers.manage");
+      if (denied) return denied;
+      const body = await safeJson(c);
+      const result = await requireMediaManager(engine).updateVideoProviderModel(
+        c.req.param("providerId"),
+        c.req.param("modelId"),
+        body?.model && typeof body.model === "object" && !Array.isArray(body.model) ? body.model : body,
+      );
+      return c.json(result);
+    } catch (err) {
+      return c.json({ error: err.message }, err.statusCode || 400);
+    }
+  });
+
   route.delete("/media/image/providers/:providerId/models/:modelId", async (c) => {
     try {
       const denied = denyWithoutScope(c, "providers.manage");

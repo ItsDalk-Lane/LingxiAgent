@@ -32,6 +32,14 @@ export interface SkillInfo {
   deletable?: boolean;
 }
 
+export type MediaCapabilityKind = 'imageGeneration' | 'videoGeneration' | 'speechRecognition';
+
+export interface ProviderMediaCapabilityBinding {
+  capability: MediaCapabilityKind;
+  runtime_provider_id: string;
+  credential_lane_id?: string;
+}
+
 export interface ProviderSummary {
   type: 'api-key' | 'oauth';
   auth_type: 'api-key' | 'oauth' | 'none' | 'optional';
@@ -51,6 +59,21 @@ export interface ProviderSummary {
   config_status?: 'ok' | 'needs_setup' | 'invalid';
   config_error?: string | null;
   missing_fields?: string[];
+  media_capability_bindings?: ProviderMediaCapabilityBinding[];
+}
+
+export interface ProviderCredentialDraft {
+  /** 输入框当前值；可能是脱敏占位（服务端会回落到已保存明文） */
+  api_key?: string;
+  base_url?: string;
+  api?: string;
+  /** 仅在用户本次编辑过 Headers 时携带（真实值）；未编辑时不传，服务端用已保存值 */
+  headers?: Record<string, string>;
+}
+
+export interface SettingsLocation {
+  tabId: string;
+  subTabId?: string;
 }
 
 export interface RuntimeModelInfo {
@@ -130,6 +153,7 @@ export interface SettingsState {
 
   // ui
   activeTab: string;
+  activeSubTabs: Record<string, string>;
   platformName: string | null;
   ready: boolean;
 
@@ -139,6 +163,8 @@ export interface SettingsState {
   // providers (unified)
   providersSummary: Record<string, ProviderSummary>;
   selectedProviderId: string | null;
+  /** 各供应商配置面板的当前草稿凭证；「读取模型」在凭证尚未保存时用它直连远端目录 */
+  providerCredentialDrafts: Record<string, ProviderCredentialDraft>;
 
   // plugins
   pluginSettingsStatus: RemoteResourceStatus;
@@ -157,6 +183,7 @@ export interface SettingsActions {
   set: (partial: Partial<SettingsState>) => void;
   getSettingsAgentId: () => string | null;
   showToast: (message: string, type: 'success' | 'error') => void;
+  navigateSettings: (location: SettingsLocation) => void;
 }
 
 export type SettingsStore = SettingsState & SettingsActions;
@@ -193,6 +220,7 @@ export const useSettingsStore = create<SettingsStore>()((set, get) => ({
 
   // ui
   activeTab: 'agent',
+  activeSubTabs: {},
   platformName: null,
   ready: false,
 
@@ -202,6 +230,7 @@ export const useSettingsStore = create<SettingsStore>()((set, get) => ({
   // providers (unified)
   providersSummary: {},
   selectedProviderId: null,
+  providerCredentialDrafts: {},
 
   // plugins
   pluginSettingsStatus: 'idle',
@@ -229,5 +258,15 @@ export const useSettingsStore = create<SettingsStore>()((set, get) => ({
     _toastTimer = setTimeout(() => {
       set({ toastVisible: false });
     }, 1500);
+  },
+
+  navigateSettings: (location) => {
+    const { activeSubTabs } = get();
+    set({
+      activeTab: location.tabId,
+      ...(location.subTabId !== undefined
+        ? { activeSubTabs: { ...activeSubTabs, [location.tabId]: location.subTabId } }
+        : {}),
+    });
   },
 }));

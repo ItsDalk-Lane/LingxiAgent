@@ -70,6 +70,9 @@ export function inferMediaProtocolId(providerId, capability, modelId, provider: 
     if (providerId === "dashscope" && id.includes("asr")) return "dashscope-qwen-asr-chat";
     if (providerId === "volcengine-speech" && id.includes("bigasr")) return "volcengine-bigasr-transcription";
     if (providerId === "system-speech") return "system-speech-recognition";
+    // 用户自定义 provider：OpenAI 兼容网关的语音模型按 OpenAI Audio Transcriptions
+    // API（/audio/transcriptions）执行，与图片模型的 #1627 规则同理。
+    if (provider.sourceKind === "user" && OPENAI_COMPATIBLE_APIS.has(provider.api)) return "openai-audio-transcriptions";
     return "";
   }
 

@@ -1442,7 +1442,7 @@
       "updateDownloadingVersion": "正在下载 v{version}…",
       "updateReady": "v{version} 已下载完毕",
       "updatePreparing": "正在准备更新…",
-      "updateInstalling": "正在安装更新，应用即将重启…",
+      "updateInstalling": "正在安装更新，灵犀 会自动重启…",
       "updateAutoFailed": "自动更新失败，请手动下载",
       "updateDownloadManual": "手动下载",
       "updateDmgHint": "从 DMG 运行时无法自动更新，请下载后重新安装",
@@ -1450,7 +1450,6 @@
       "updateChecking": "正在检查更新…",
       "updateDownloading": "{agentName}正在准备新家",
       "updateReadyInstall": "v{version} 已就绪",
-      "updateInstalling": "正在安装更新，灵犀 会自动重启…",
       "updateInstallManualHint": "点「重启更新」后安装，直接退出不会自动安装",
       "updateInstall": "重启更新",
       "updateInstallNow": "重启立即更新",
@@ -1657,7 +1656,7 @@
       "url": "Base URL",
       "apiKey": "API Key",
       "addBtn": "添加",
-      "empty": "还没有注册供应商",
+      "empty": "还没有添加供应商，点击上方「添加供应商」开始配置。",
       "fetchModels": "读取模型",
       "delete": "删除供应商",
       "modelCount": "{n} 个模型",
@@ -1677,7 +1676,7 @@
       "verifyFailed": "验证失败",
       "setupHint": "输入 API Key 以启用此供应商",
       "configInvalid": "该供应商配置损坏，已被暂时跳过。请重新保存配置，或删除后重建。",
-      "configIncomplete": "该供应商配置不完整，请补全 API Key、Base URL，并添加或读取模型。",
+      "configIncomplete": "该供应商配置不完整，请补全 API Key 和 Base URL。",
       "selectHint": "选择一个供应商查看详情",
       "addCustom": "添加自定义供应商",
       "noKey": "未配置",
@@ -1686,12 +1685,13 @@
       "addService": "添加供应商",
       "pickTitle": "选择供应商",
       "backToList": "返回供应商列表",
-      "empty": "还没有添加供应商，点击上方「添加供应商」开始配置。",
       "subtab": {
         "api": "配置 API",
         "models": "配置模型",
+        "search": "搜索",
         "usage": "用量统计"
-      }
+      },
+      "configMissingFields": "该供应商配置不完整，需补全：{fields}。"
     },
     "usage": {
       "title": "用量统计",
@@ -1750,7 +1750,6 @@
       "videoGeneration": "视频生成",
       "defaultModel": "默认图片模型",
       "defaultVideoModel": "默认视频模型",
-      "credentialOk": "API Key 已配置（复用供应商设置）",
       "credentialMissing": "未配置，前往供应商设置",
       "adapterMissing": "缺少图片生成适配器",
       "videoAdapterMissing": "缺少视频生成适配器",
@@ -1768,6 +1767,7 @@
       "speechRecognitionEnabled": "发送语音条时转录",
       "defaultSpeechModel": "语音条转录模型",
       "speechModels": "转录模型",
+      "addSpeechModel": "添加转录模型",
       "speechSynthesis": "语音合成",
       "comingSoon": "即将推出",
       "noProvider": "请选择一个供应商查看详情",
@@ -1779,7 +1779,19 @@
       "defaultOption": "默认",
       "qualityLow": "低",
       "qualityMedium": "中",
-      "qualityHigh": "高"
+      "qualityHigh": "高",
+      "imageProviderDefaults": "图片生成默认参数",
+      "videoProviderDefaults": "视频生成默认参数",
+      "noParameterDefaults": "已添加的模型未声明默认参数（无参数 schema），暂无可配置项。",
+      "runtimeUnavailable": "运行时状态暂不可用",
+      "imageDefaultsButton": "图片生成默认参数",
+      "videoDefaultsButton": "视频生成默认参数",
+      "speechSynthesisDefaultsButton": "语音合成默认参数",
+      "runtimeProvider": "运行时供应商"
+    },
+    "models": {
+      "auxiliary": "辅助模型",
+      "globalDefaults": "全局默认"
     },
     "oauth": {
       "title": "快速登录",
@@ -1882,7 +1894,43 @@
         "video": "支持视频输入",
         "audio": "支持音频输入",
         "reasoning": "支持推理",
-        "tools": "支持工具调用"
+        "tools": "支持工具调用",
+        "web": "联网",
+        "structuredOutput": "结构化输出"
+      },
+      "contextConfig": "上下文配置",
+      "inputModalities": "输入模态",
+      "outputModalities": "输出模态",
+      "modelCapabilities": "模型能力",
+      "modalityRequired": "模态不能为空",
+      "webTooltip": "开启后，普通聊天将使用该供应商的原生联网搜索；内部辅助调用不受影响。",
+      "structuredOutputTooltip": "开启后，普通聊天必须输出合法标准 JSON；内部辅助调用不受影响。",
+      "webUnsupported": "协议不支持原生联网",
+      "structuredOutputUnsupported": "协议不支持结构化输出",
+      "modality": {
+        "text": "文本",
+        "image": "视觉",
+        "video": "视频",
+        "audio": "音频"
+      },
+      "outputModality": {
+        "text": "输出：文本",
+        "image": "输出：图片",
+        "video": "输出：视频",
+        "audio": "输出：音频"
+      },
+      "modelGroup": {
+        "chat": "对话模型",
+        "image": "图片模型",
+        "video": "视频模型",
+        "speech": "语音识别模型"
+      },
+      "customModelCategory": {
+        "label": "类别",
+        "chat": "对话",
+        "image": "图片",
+        "video": "视频",
+        "speech": "语音识别"
       }
     },
     "memory": {

@@ -22,7 +22,7 @@ describe('getApiKeySavePlan', () => {
     });
   });
 
-  it('asks the server to seed default models for preset setup', () => {
+  it('preset setup saves credentials with an explicit empty model list instead of seeding defaults', () => {
     expect(getApiKeySavePlan({
       keyEdited: true,
       keyVal: 'sk-test',
@@ -36,11 +36,11 @@ describe('getApiKeySavePlan', () => {
       base_url: 'https://api.xiaomimimo.com/v1',
       api_key: 'sk-test',
       api: 'openai-completions',
-      seed_default_models: true,
+      models: [],
     });
   });
 
-  it('can repair an existing preset provider with no saved models', () => {
+  it('saving an existing provider touches only the api key', () => {
     expect(getApiKeySavePlan({
       keyEdited: true,
       keyVal: 'sk-test',
@@ -49,11 +49,9 @@ describe('getApiKeySavePlan', () => {
       derivedBaseUrl: 'https://api.xiaomimimo.com/v1',
       isPresetSetup: false,
       isLocalPreset: false,
-      seedDefaultModels: true,
       api: 'openai-completions',
     }).payload).toEqual({
       api_key: 'sk-test',
-      seed_default_models: true,
     });
   });
 });

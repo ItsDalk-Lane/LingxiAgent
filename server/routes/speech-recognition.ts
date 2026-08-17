@@ -15,6 +15,55 @@ export function createSpeechRecognitionRoute(engine) {
     }
   });
 
+  route.post("/speech-recognition/providers/:providerId/models", async (c) => {
+    try {
+      const denied = denyWithoutScope(c, "providers.manage");
+      if (denied) return denied;
+      const providerId = c.req.param("providerId");
+      const body = await safeJson(c);
+      const model = body?.model || body;
+      const service = requireSpeechRecognitionService(engine);
+      const result = service.setProviderModel(providerId, model);
+      await engine.onProviderChanged?.();
+      return c.json(result);
+    } catch (err) {
+      return c.json({ error: err.message }, 400);
+    }
+  });
+
+  route.put("/speech-recognition/providers/:providerId/models/:modelId", async (c) => {
+    try {
+      const denied = denyWithoutScope(c, "providers.manage");
+      if (denied) return denied;
+      const providerId = c.req.param("providerId");
+      const modelId = c.req.param("modelId");
+      const body = await safeJson(c);
+      const service = requireSpeechRecognitionService(engine);
+      const patch = body?.model && typeof body.model === "object" && !Array.isArray(body.model) ? body.model : body;
+      const result = service.updateProviderModel(providerId, modelId, patch);
+      await engine.onProviderChanged?.();
+      return c.json(result);
+    } catch (err) {
+      return c.json({ error: err.message }, err.statusCode || 400);
+    }
+  });
+
+  route.delete("/speech-recognition/providers/:providerId/models/:modelId", async (c) => {
+    try {
+      const denied = denyWithoutScope(c, "providers.manage");
+      if (denied) return denied;
+      const service = requireSpeechRecognitionService(engine);
+      const result = service.removeProviderModel(
+        c.req.param("providerId"),
+        c.req.param("modelId"),
+      );
+      await engine.onProviderChanged?.();
+      return c.json(result);
+    } catch (err) {
+      return c.json({ error: err.message }, 400);
+    }
+  });
+
   route.put("/speech-recognition/config", async (c) => {
     try {
       const denied = denyWithoutScope(c, "settings.write");

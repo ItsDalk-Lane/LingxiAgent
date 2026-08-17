@@ -6,13 +6,14 @@ type SurfaceVariant = 'card' | 'plain';
 
 interface SettingsPageProps extends React.HTMLAttributes<HTMLDivElement> {
   tab: string;
+  layout?: 'flow' | 'fill';
 }
 
-export function SettingsPage({ tab, className, children, ...rest }: SettingsPageProps) {
+export function SettingsPage({ tab, layout = 'flow', className, children, ...rest }: SettingsPageProps) {
   return (
     <div
       {...rest}
-      className={[styles.page, className].filter(Boolean).join(' ')}
+      className={[styles.page, layout === 'fill' ? styles.pageFill : null, className].filter(Boolean).join(' ')}
       data-settings-page={tab}
       data-tab={tab}
     >

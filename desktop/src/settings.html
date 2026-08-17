@@ -8,7 +8,12 @@
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="themes/warm-paper.css" id="themeSheet">
     <style>
-        /* 窗口级覆盖：settings-panel 填满整个窗口 */
+        /* 窗口级覆盖：settings-panel 填满整个窗口。
+           选择器带 body 前缀提升优先级：dev 下 Vite 把 Settings.module.css 的
+           :global(.settings-panel){position:relative} 以 <style> 注入在文档
+           <style> 之后，同优先级时后者胜，会把这里的 fixed 压掉——面板变成
+           内容高度（2000px+），窗口内没有任何滚动容器、下方内容不可达，
+           还会触发超尺寸 layer 的绘制失败（标题只剩上半截）。 */
         body {
             --paper-texture-attachment: scroll;
             background-color: var(--bg);
@@ -17,7 +22,7 @@
         body.paper-texture {
             background-attachment: scroll;
         }
-        .settings-panel {
+        body .settings-panel {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
             width: 100%; height: 100%;
@@ -28,7 +33,7 @@
             z-index: 1;
             padding-top: 0;
         }
-        .settings-header {
+        body .settings-header {
             -webkit-app-region: drag;
             padding: 36px 0 var(--space-md, 12px) 20px;
         }
