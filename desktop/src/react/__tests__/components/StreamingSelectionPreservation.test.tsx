@@ -3,14 +3,8 @@
 // 根因回归测试：流式追加新 token 时，已完成段落的 DOM 节点身份必须保持
 // 稳定，用户在其中建立的原生文字选区不能被打断。
 //
-// 根因（修复前）：StreamBufferManager 每次 flush 都对累积全文重新跑
-// renderMarkdown，产出全新 HTML 字符串写回同一个 `text` block
-// (desktop/src/react/hooks/use-stream-buffer.ts:289-298)；MarkdownContent
-// 用 dangerouslySetInnerHTML 整体重写 innerHTML
-// (desktop/src/react/components/chat/MarkdownContent.tsx)，即使可见文字
-// 没有变化，已完成段落的 DOM 节点也会被连根拔起重建，选区的 Range 端点
-// 指向的旧文本节点被移出文档树，浏览器按 DOM 规范的边界点变更算法把
-// Range 坍缩为空，导致用户复制不到内容。
+// 当前助手正文以原文为权威，组件只解析活动尾部；即使尾部 HTML 更新，
+// 已冻结段落也必须保持原 DOM 节点，选区的 Range 端点不能被移出文档树。
 //
 // 修复：MarkdownContent 首次挂载用 dangerouslySetInnerHTML 整体写入，
 // 此后每次更新改用 reconcileTopLevelChildren 做顶层子节点级 diff——
@@ -52,9 +46,7 @@ describe('streaming selection preservation', () => {
     const firstTextNodeBefore = firstParagraphBefore!.firstChild;
     expect(firstTextNodeBefore).not.toBeNull();
 
-    // 第二批 flush：累积全文重新 renderMarkdown，第一段字面内容不变，
-    // 但作为完整字符串的一部分被重新解析——顶层 HTML 片段本身与上一次
-    // 完全相同，reconcile 应该识别出来并保留原节点。
+    // 第二批 flush 只更新活动尾部，第一段的顶层 HTML 不变。
     const secondFlushSource = `${firstFlushSource}\n\n第二段正在流式追加。`;
     const secondFlushHtml = '<p>第一段已经说完了。</p>\n<p>第二段正在流式追加。</p>';
 
@@ -111,7 +103,7 @@ describe('streaming selection preservation', () => {
   });
 
   it('still replaces only the block whose content actually changed (the streaming tail), not the whole tree', () => {
-    const firstFlushSource = '稳定不变的开头段落。';
+    const firstFlushSource = '稳定不变的开头段落。\n\n尾部正在流式追';
     const firstFlushHtml = '<p>稳定不变的开头段落。</p><p>尾部正在流式追</p>';
 
     const { container, rerender } = render(
@@ -122,7 +114,7 @@ describe('streaming selection preservation', () => {
     const stableParagraph = paragraphs[0];
     const changingParagraphBefore = paragraphs[1];
 
-    const secondFlushSource = `${firstFlushSource.slice(0, -6)}\n\n尾部正在流式追加中。`;
+    const secondFlushSource = '稳定不变的开头段落。\n\n尾部正在流式追加中。';
     const secondFlushHtml = '<p>稳定不变的开头段落。</p><p>尾部正在流式追加中。</p>';
 
     rerender(

@@ -318,6 +318,11 @@
       "submitting": "Submitting",
       "retryLabel": "Regenerate {kind}"
     },
+    "turnStatus": {
+      "missingFinalAnswer": "No final reply was generated",
+      "failed": "This reply failed",
+      "aborted": "This reply was stopped"
+    },
     "subagentPreview": {
       "historyUnrecoverable": "Historical sub-session link is unrecoverable",
       "noSession": "No openable sub-agent session",

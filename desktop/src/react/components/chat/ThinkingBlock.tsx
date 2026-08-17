@@ -4,17 +4,23 @@
 
 import { memo, useState, useCallback } from 'react';
 import { Collapse } from '@/ui';
+import type { DeferredHistoryContent } from '../../stores/chat-types';
+import { useDeferredHistoryContent } from '../../hooks/use-deferred-history-content';
 import styles from './Chat.module.css';
 
 interface Props {
   content: string;
   sealed: boolean;
+  sessionPath?: string;
+  deferred?: DeferredHistoryContent;
 }
 
-export const ThinkingBlock = memo(function ThinkingBlock({ content, sealed }: Props) {
+export const ThinkingBlock = memo(function ThinkingBlock({ content, sealed, sessionPath = '', deferred }: Props) {
   const t = window.t ?? ((p: string) => p);
   const [open, setOpen] = useState(false);
   const toggle = useCallback(() => setOpen(v => !v), []);
+  const loaded = useDeferredHistoryContent(sessionPath, deferred, open && !!sessionPath);
+  const displayedContent = loaded.data?.content || content;
 
   return (
     <details className={styles.thinkingBlock} open={open} onToggle={(e) => setOpen((e.target as HTMLDetailsElement).open)}>
@@ -24,8 +30,8 @@ export const ThinkingBlock = memo(function ThinkingBlock({ content, sealed }: Pr
           <>{t('thinking.active')}<span className={styles.thinkingDots} /></>
         )}
       </summary>
-      <Collapse open={open && !!content}>
-        <div className={styles.thinkingBlockBody}>{content}</div>
+      <Collapse open={open && !!displayedContent}>
+        <div className={styles.thinkingBlockBody}>{displayedContent}</div>
       </Collapse>
     </details>
   );

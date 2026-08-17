@@ -882,11 +882,17 @@ describe("chat route model switch guard", () => {
       assistantMessageEvent: { type: "text_delta", delta: "二" },
     }, movedPath);
 
-    const deltas = ws.send.mock.calls
-      .map(([raw]) => JSON.parse(raw))
+    const payloads = ws.send.mock.calls.map(([raw]) => JSON.parse(raw));
+    const deltas = payloads
       .filter((payload) => payload.type === "text_delta");
+    const segments = payloads.filter((payload) => payload.type.startsWith("assistant_segment_"));
 
-    expect(deltas.map((payload) => payload.seq)).toEqual([1, 2]);
+    expect(segments.map((payload) => [payload.type, payload.seq])).toEqual([
+      ["assistant_segment_start", 1],
+      ["assistant_segment_delta", 2],
+      ["assistant_segment_delta", 4],
+    ]);
+    expect(deltas.map((payload) => payload.seq)).toEqual([3, 5]);
     expect(deltas[1]).toMatchObject({
       sessionPath: movedPath,
       streamId: deltas[0].streamId,
@@ -930,10 +936,20 @@ describe("chat route model switch guard", () => {
         reasoning_content: "先判断 DeepSeek 的结构化推理字段。",
       },
     }, "/tmp/deepseek-thinking.jsonl");
+    subscriber?.({
+      type: "message_update",
+      assistantMessageEvent: {
+        type: "text_delta",
+        delta: "这是最终答复。",
+      },
+    }, "/tmp/deepseek-thinking.jsonl");
 
     const thinkingEvents = ws.send.mock.calls
       .map(([raw]) => JSON.parse(raw))
       .filter((payload) => payload.type === "thinking_start" || payload.type === "thinking_delta");
+    const reasoningSegments = ws.send.mock.calls
+      .map(([raw]) => JSON.parse(raw))
+      .filter((payload) => payload.type.startsWith("assistant_segment_"));
 
     expect(thinkingEvents).toEqual([
       expect.objectContaining({ type: "thinking_start" }),
@@ -942,11 +958,37 @@ describe("chat route model switch guard", () => {
         delta: "先判断 DeepSeek 的结构化推理字段。",
       }),
     ]);
+    expect(reasoningSegments).toEqual([
+      expect.objectContaining({
+        type: "assistant_segment_start",
+        kind: "reasoning",
+        semanticPhase: "reasoning",
+      }),
+      expect.objectContaining({
+        type: "assistant_segment_delta",
+        semanticPhase: "reasoning",
+        delta: "先判断 DeepSeek 的结构化推理字段。",
+      }),
+      expect.objectContaining({
+        type: "assistant_segment_end",
+        semanticPhase: "reasoning",
+      }),
+      expect.objectContaining({
+        type: "assistant_segment_start",
+        kind: "text",
+        semanticPhase: "final_answer",
+      }),
+      expect.objectContaining({
+        type: "assistant_segment_delta",
+        semanticPhase: "final_answer",
+        delta: "这是最终答复。",
+      }),
+    ]);
 
     handlers.onClose({}, ws);
   });
 
-  it("buffers OpenAI Responses text until text_end and suppresses commentary phase", () => {
+  it("publishes OpenAI Responses phase semantics while keeping commentary out of the legacy answer", () => {
     let createHandlers;
     let subscriber;
     const commentarySignature = JSON.stringify({
@@ -1049,8 +1091,54 @@ describe("chat route model switch guard", () => {
     const deltas = ws.send.mock.calls
       .map(([raw]) => JSON.parse(raw))
       .filter((payload) => payload.type === "text_delta");
+    const segments = ws.send.mock.calls
+      .map(([raw]) => JSON.parse(raw))
+      .filter((payload) => payload.type.startsWith("assistant_segment_"));
 
     expect(deltas.map((payload) => payload.delta)).toEqual(["已经查到状态。"]);
+    expect(segments.map((payload) => ({
+      type: payload.type,
+      segmentId: payload.segmentId,
+      semanticPhase: payload.semanticPhase,
+      delta: payload.delta,
+    }))).toEqual([
+      {
+        type: "assistant_segment_start",
+        segmentId: "assistant:1:text:0",
+        semanticPhase: "unresolved",
+        delta: undefined,
+      },
+      {
+        type: "assistant_segment_delta",
+        segmentId: "assistant:1:text:0",
+        semanticPhase: "unresolved",
+        delta: "I need to inspect the current state.",
+      },
+      {
+        type: "assistant_segment_end",
+        segmentId: "assistant:1:text:0",
+        semanticPhase: "commentary",
+        delta: undefined,
+      },
+      {
+        type: "assistant_segment_start",
+        segmentId: "assistant:1:text:1",
+        semanticPhase: "unresolved",
+        delta: undefined,
+      },
+      {
+        type: "assistant_segment_delta",
+        segmentId: "assistant:1:text:1",
+        semanticPhase: "unresolved",
+        delta: "已经查到状态。",
+      },
+      {
+        type: "assistant_segment_end",
+        segmentId: "assistant:1:text:1",
+        semanticPhase: "final_answer",
+        delta: undefined,
+      },
+    ]);
 
     handlers.onClose({}, ws);
   });

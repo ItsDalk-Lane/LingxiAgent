@@ -21,6 +21,7 @@ interface Props {
   className?: string;
   tailFadeCount?: number;
   linkContext?: LinkOpenContext;
+  enhanceMermaid?: boolean;
 }
 
 function shouldSkipTailFadeNode(node: Text): boolean {
@@ -145,7 +146,13 @@ function codeBlockToolbarLabels(): CodeBlockToolbarLabels {
   };
 }
 
-export const MarkdownContent = memo(function MarkdownContent({ html, className, tailFadeCount = 0, linkContext }: Props) {
+export const MarkdownContent = memo(function MarkdownContent({
+  html,
+  className,
+  tailFadeCount = 0,
+  linkContext,
+  enhanceMermaid = true,
+}: Props) {
   const ref = useRef<HTMLDivElement>(null);
   const [linkMenu, setLinkMenu] = useState<LinkContextMenuState | null>(null);
   const classes = className ? `md-content ${className}` : 'md-content';
@@ -251,7 +258,7 @@ export const MarkdownContent = memo(function MarkdownContent({ html, className, 
     applyTailFade(root, tailFadeCount);
   }, [renderedHtml, tailFadeCount]);
 
-  useMermaidDiagrams(ref, [renderedHtml]);
+  useMermaidDiagrams(ref, [renderedHtml], enhanceMermaid);
 
   return (
     <>

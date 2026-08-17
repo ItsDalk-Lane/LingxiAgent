@@ -9,6 +9,7 @@ import type StateCore from 'markdown-it/lib/rules_core/state_core.mjs';
 import type StateBlock from 'markdown-it/lib/rules_block/state_block.mjs';
 import type StateInline from 'markdown-it/lib/rules_inline/state_inline.mjs';
 import type Token from 'markdown-it/lib/token.mjs';
+import { measureChatPerformance } from './chat-performance';
 import mk from '@traptitech/markdown-it-katex';
 import taskLists from 'markdown-it-task-lists';
 import 'katex/dist/katex.min.css';
@@ -70,6 +71,7 @@ interface FootnoteState {
 }
 
 let _md: MarkdownItInstance | null = null;
+let _streamingMd: MarkdownItInstance | null = null;
 let _previewMd: MarkdownItInstance | null = null;
 
 const HEX_COLOR_RE = /^#[0-9a-fA-F]{3}(?:[0-9a-fA-F]{3})?(?:[0-9a-fA-F]{2})?$/;
@@ -943,9 +945,11 @@ function texBracketMath(md: MarkdownItInstance): void {
   });
 }
 
-function applyMarkdownPlugins(md: MarkdownItInstance): void {
-  md.use(mk, { throwOnError: false, strict: false });
-  md.use(texBracketMath);
+function applyMarkdownPlugins(md: MarkdownItInstance, options: { richMath: boolean }): void {
+  if (options.richMath) {
+    md.use(mk, { throwOnError: false, strict: false });
+    md.use(texBracketMath);
+  }
   md.use(taskLists, { enabled: false, label: true });
   md.use(obsidianImageEmbeds);
   md.use(obsidianHighlights);
@@ -1057,8 +1061,21 @@ export function getMd(): MarkdownItInstance {
     linkify: true,
     typographer: true,
   });
-  applyMarkdownPlugins(_md);
+  applyMarkdownPlugins(_md, { richMath: true });
   return _md;
+}
+
+/** 流式尾部使用的轻量实例：保留 Markdown 结构，延后公式排版。 */
+export function getStreamingMd(): MarkdownItInstance {
+  if (_streamingMd) return _streamingMd;
+  _streamingMd = markdownit({
+    html: false,
+    breaks: true,
+    linkify: true,
+    typographer: true,
+  });
+  applyMarkdownPlugins(_streamingMd, { richMath: false });
+  return _streamingMd;
 }
 
 /** 获取文件预览专用 md 实例（html: true，渲染后必须 sanitizer） */
@@ -1070,12 +1087,24 @@ export function getPreviewMd(): MarkdownItInstance {
     linkify: true,
     typographer: true,
   });
-  applyMarkdownPlugins(_previewMd);
+  applyMarkdownPlugins(_previewMd, { richMath: true });
   return _previewMd;
 }
 
 export function renderMarkdown(src: string): string {
-  return getMd().render(src, buildMarkdownEnv(src));
+  return measureChatPerformance(
+    'markdown_parse',
+    { sourceLength: src.length },
+    () => getMd().render(src, buildMarkdownEnv(src)),
+  );
+}
+
+export function renderStreamingMarkdown(src: string): string {
+  return measureChatPerformance(
+    'markdown_parse',
+    { sourceLength: src.length },
+    () => getStreamingMd().render(src, buildMarkdownEnv(src)),
+  );
 }
 
 export function renderMarkdownPreview(src: string, options: MarkdownPreviewOptions = {}): string {

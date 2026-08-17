@@ -17,7 +17,6 @@ export const AssistantContentPreview = memo(function AssistantContentPreview({
 }) {
   const blocks = useMemo(() => buildAssistantBlocksFromContent({
     content,
-    includeTextSource: true,
   }), [content]);
 
   return (

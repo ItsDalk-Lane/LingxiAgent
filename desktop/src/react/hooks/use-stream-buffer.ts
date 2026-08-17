@@ -2,7 +2,7 @@
  * StreamBufferManager — per-session 流式事件节流缓冲
  *
  * WS 事件到达时写入 buffer（纯 JS 对象，不触发 React），
- * 每 FLUSH_INTERVAL ms 批量 flush 到 Zustand store。
+ * 普通增量按画面合并并受最高发布频率约束，语义边界立即发布。
  *
  * 设计为 singleton，不依赖 React 组件生命周期。
  * app-ws-shim 直接调用 streamBufferManager.handle(msg)。
@@ -11,7 +11,6 @@
 import type { ChatMessage, ContentBlock } from '../stores/chat-types';
 import { useStore } from '../stores';
 import { sessionScopedKey, sessionScopedValue } from '../stores/session-slice';
-import { renderMarkdown } from '../utils/markdown';
 import { cleanMoodText } from '../utils/message-parser';
 import { findOpenToolIndex, toolCallFromStartEvent, toolCallIdFromEvent } from '../utils/tool-call-identity';
 import {
@@ -20,6 +19,18 @@ import {
   type StreamBufferSnapshot,
 } from '../stores/stream-invalidator';
 import { bumpMessageLiveVersion } from '../stores/message-live-version';
+import {
+  clearLiveAssistantMessage,
+  publishLiveAssistantMessage,
+  type LiveAssistantSegment,
+  type LiveAssistantSegmentPhase,
+} from '../stores/live-turn-store';
+import { recordChatPerformance } from '../utils/chat-performance';
+import {
+  normalizeContentBlocks,
+  rebaseGeneratedContentBlockIds,
+} from '../utils/content-semantics';
+import { projectAssistantTurn } from '../utils/turn-projector';
 
 /* eslint-disable @typescript-eslint/no-explicit-any -- 流式消息 handle(msg) 接收动态 JSON */
 
@@ -36,6 +47,8 @@ function nextStreamMessageId(): string {
 interface Buffer {
   sessionPath: string;
   blocks: ContentBlock[];
+  segmentsById: Map<string, LiveAssistantSegment>;
+  segmentOrder: string[];
   /** 当前用户轮次的完整可见正文，供断线快照使用。 */
   textAcc: string;
   /** 当前工具/富内容边界之后的正文段，只更新它自己对应的 text block。 */
@@ -55,14 +68,21 @@ interface Buffer {
   cardDescAcc: string;
   lastFlushTime: number;
   flushTimer: ReturnType<typeof setTimeout> | null;
+  flushFrame: number | null;
+  /** 自上次发布后，缓冲区里是否出现了新的可见变化。 */
+  publishPending: boolean;
   /** 当前 turn 绑定的 assistant message id */
   messageId: string | null;
+  /** turn_end/中止收口时为 true，确保所有仍在流式的内容统一封口。 */
+  turnEnding: boolean;
 }
 
 function createBuffer(sessionPath: string): Buffer {
   return {
     sessionPath,
     blocks: [],
+    segmentsById: new Map(),
+    segmentOrder: [],
     textAcc: '',
     textSegmentAcc: '',
     textSegmentOrdinal: null,
@@ -78,7 +98,10 @@ function createBuffer(sessionPath: string): Buffer {
     cardDescAcc: '',
     lastFlushTime: 0,
     flushTimer: null,
+    flushFrame: null,
+    publishPending: false,
     messageId: null,
+    turnEnding: false,
   };
 }
 
@@ -117,7 +140,7 @@ function renderBufferedBlocks(currentBlocks: ContentBlock[], buf: Buffer): Conte
       return indexes;
     }, []);
     const idx = buf.textSegmentOrdinal === null ? undefined : textIndexes[buf.textSegmentOrdinal];
-    const textBlock: ContentBlock = { type: 'text', html: renderMarkdown(displayText), source: displayText };
+    const textBlock: ContentBlock = { type: 'text', source: displayText };
     if (idx !== undefined) {
       blocks[idx] = textBlock;
     } else {
@@ -131,6 +154,15 @@ function renderBufferedBlocks(currentBlocks: ContentBlock[], buf: Buffer): Conte
 
 function normalizeSessionId(value: unknown): string | null {
   return typeof value === 'string' && value.trim() ? value.trim() : null;
+}
+
+function normalizeLiveSegmentPhase(value: unknown): LiveAssistantSegmentPhase {
+  return value === 'reasoning'
+    || value === 'commentary'
+    || value === 'final_answer'
+    || value === 'unresolved'
+    ? value
+    : 'unresolved';
 }
 
 function bufferKeyForSession(sessionPath: string, sessionId: string | null = null): string {
@@ -211,6 +243,7 @@ class StreamBufferManager {
     return !!(
       buf.messageId ||
       buf.blocks.length > 0 ||
+      buf.segmentOrder.length > 0 ||
       buf.textAcc ||
       buf.thinkingAcc ||
       buf.hasThinkingBlock ||
@@ -224,12 +257,11 @@ class StreamBufferManager {
   }
 
   private resetTurnState(buf: Buffer): void {
-    if (buf.flushTimer) {
-      clearTimeout(buf.flushTimer);
-      buf.flushTimer = null;
-    }
+    this.cancelScheduledFlush(buf);
     buf.textAcc = '';
     buf.blocks = [];
+    buf.segmentsById.clear();
+    buf.segmentOrder = [];
     buf.textSegmentAcc = '';
     buf.textSegmentOrdinal = null;
     buf.thinkingAcc = '';
@@ -242,14 +274,23 @@ class StreamBufferManager {
     buf.cardAttrs = null;
     buf.cardDescAcc = '';
     buf.messageId = null;
+    buf.turnEnding = false;
+    buf.publishPending = false;
   }
 
-  private finishBufferTurn(buf: Buffer): void {
+  private finishBufferTurn(buf: Buffer, persistedEntries: {
+    turnInputEntryId?: string | null;
+    userEntryId?: string | null;
+    assistantEntryId?: string | null;
+    assistantEntryIds?: string[];
+    status?: 'completed' | 'failed' | 'aborted';
+  } = {}): void {
     if (this.hasTurnState(buf)) {
+      buf.turnEnding = true;
       this.flush(buf);
-    } else if (buf.flushTimer) {
-      clearTimeout(buf.flushTimer);
-      buf.flushTimer = null;
+      this.commitLiveTurn(buf, persistedEntries);
+    } else {
+      this.cancelScheduledFlush(buf);
     }
     this.resetTurnState(buf);
   }
@@ -270,7 +311,6 @@ class StreamBufferManager {
       : null;
     if (existing) {
       buf.messageId = targetId;
-      buf.blocks = existing.type === 'message' ? [...(existing.data.blocks || [])] : [];
       return;
     }
 
@@ -281,19 +321,158 @@ class StreamBufferManager {
     buf.messageId = id;
   }
 
-  private updateTargetMessage(buf: Buffer, updater: (msg: ChatMessage) => ChatMessage): void {
+  private updateTargetMessage(buf: Buffer, updater: (msg: ChatMessage) => ChatMessage): boolean {
     this.ensureMessage(buf);
-    if (!buf.messageId) return;
-    const updated = useStore.getState().updateMessageById(buf.sessionPath, buf.messageId, (message) => {
-      const next = updater(message);
-      buf.blocks = [...(next.blocks || [])];
-      return next;
-    });
-    if (!updated) {
+    if (!buf.messageId) return false;
+    const store = useStore.getState();
+    const session = sessionScopedValue(store, store.chatSessions, buf.sessionPath);
+    const item = session?.items.find((entry) => (
+      entry.type === 'message'
+      && entry.data.role === 'assistant'
+      && entry.data.id === buf.messageId
+    ));
+    if (!item || item.type !== 'message') {
       console.warn('[stream] target assistant message missing after ensureMessage:', buf.sessionPath, buf.messageId);
-      return;
+      return false;
     }
+    const next = updater({ ...item.data, blocks: buf.blocks });
+    const blocks = normalizeContentBlocks(next.blocks || [], {
+      idPrefix: item.data.sourceEntryId || item.data.id,
+      turnLifecycle: buf.turnEnding ? 'sealed' : 'streaming',
+    });
+    buf.blocks = blocks;
+    this.publishLiveTurn(buf);
     bumpMessageLiveVersion(buf.sessionPath);
+    return true;
+  }
+
+  private publishLiveTurn(buf: Buffer): void {
+    if (!buf.messageId) return;
+    const store = useStore.getState();
+    const session = sessionScopedValue(store, store.chatSessions, buf.sessionPath);
+    const item = session?.items.find((entry) => (
+      entry.type === 'message'
+      && entry.data.role === 'assistant'
+      && entry.data.id === buf.messageId
+    ));
+    const message = item?.type === 'message' ? item.data : null;
+    const idPrefix = message?.sourceEntryId || message?.id || buf.messageId;
+    const segments = buf.segmentOrder
+      .map((segmentId) => buf.segmentsById.get(segmentId))
+      .filter((segment): segment is LiveAssistantSegment => !!segment);
+    const projected = projectAssistantTurn({
+      idPrefix,
+      inputMessageId: message?.turnInputEntryId || null,
+      assistantMessageIds: [message?.sourceEntryId || message?.id || buf.messageId],
+      segments,
+      legacyBlocks: buf.blocks,
+      status: 'streaming',
+    });
+    publishLiveAssistantMessage(buf.sessionPath, buf.messageId, projected.blocks, {
+      segmentsById: Object.fromEntries(buf.segmentsById),
+      segmentOrder: [...buf.segmentOrder],
+      status: buf.turnEnding ? 'sealed' : 'streaming',
+      turnProjection: projected.projection,
+    });
+  }
+
+  private updateCanonicalSegment(buf: Buffer, msg: any): void {
+    this.ensureMessage(buf);
+    if (!buf.messageId || typeof msg.segmentId !== 'string' || !msg.segmentId) return;
+    const existing = buf.segmentsById.get(msg.segmentId);
+    if (msg.type === 'assistant_segment_start') {
+      const semanticPhase = normalizeLiveSegmentPhase(msg.semanticPhase);
+      const segment: LiveAssistantSegment = {
+        id: msg.segmentId,
+        kind: msg.kind === 'reasoning' ? 'reasoning' : 'text',
+        semanticPhase,
+        source: existing?.source || '',
+        lifecycle: 'streaming',
+      };
+      if (!existing) buf.segmentOrder.push(msg.segmentId);
+      buf.segmentsById.set(msg.segmentId, segment);
+    } else if (msg.type === 'assistant_segment_delta') {
+      const semanticPhase = normalizeLiveSegmentPhase(msg.semanticPhase || existing?.semanticPhase);
+      const segment: LiveAssistantSegment = existing || {
+        id: msg.segmentId,
+        kind: semanticPhase === 'reasoning' ? 'reasoning' : 'text',
+        semanticPhase,
+        source: '',
+        lifecycle: 'streaming',
+      };
+      if (!existing) buf.segmentOrder.push(msg.segmentId);
+      buf.segmentsById.set(msg.segmentId, {
+        ...segment,
+        semanticPhase,
+        source: `${segment.source}${typeof msg.delta === 'string' ? msg.delta : ''}`,
+      });
+    } else if (msg.type === 'assistant_segment_end') {
+      const semanticPhase = normalizeLiveSegmentPhase(msg.semanticPhase || existing?.semanticPhase);
+      const segment: LiveAssistantSegment = existing || {
+        id: msg.segmentId,
+        kind: semanticPhase === 'reasoning' ? 'reasoning' : 'text',
+        semanticPhase,
+        source: '',
+        lifecycle: 'streaming',
+      };
+      if (!existing) buf.segmentOrder.push(msg.segmentId);
+      buf.segmentsById.set(msg.segmentId, {
+        ...segment,
+        semanticPhase,
+        lifecycle: 'sealed',
+      });
+    }
+    if (msg.type === 'assistant_segment_delta') this.scheduleFlush(buf);
+    else this.publishBoundary(buf);
+  }
+
+  private commitLiveTurn(buf: Buffer, persistedEntries: {
+    turnInputEntryId?: string | null;
+    userEntryId?: string | null;
+    assistantEntryId?: string | null;
+    assistantEntryIds?: string[];
+    status?: 'completed' | 'failed' | 'aborted';
+  }): void {
+    if (!buf.messageId) return;
+    const store = useStore.getState();
+    const session = sessionScopedValue(store, store.chatSessions, buf.sessionPath);
+    const item = session?.items.find((entry) => (
+      entry.type === 'message'
+      && entry.data.role === 'assistant'
+      && entry.data.id === buf.messageId
+    ));
+    const message = item?.type === 'message' ? item.data : null;
+    const assistantId = persistedEntries.assistantEntryId || message?.sourceEntryId || buf.messageId;
+    const segments = buf.segmentOrder
+      .map((segmentId) => buf.segmentsById.get(segmentId))
+      .filter((segment): segment is LiveAssistantSegment => !!segment);
+    const legacyBlocks = message && assistantId !== message.id
+      ? rebaseGeneratedContentBlockIds(buf.blocks, message.id, assistantId)
+      : buf.blocks;
+    const projected = projectAssistantTurn({
+      idPrefix: assistantId,
+      inputMessageId: persistedEntries.turnInputEntryId || message?.turnInputEntryId || null,
+      assistantMessageIds: persistedEntries.assistantEntryIds?.length
+        ? persistedEntries.assistantEntryIds
+        : [assistantId],
+      segments,
+      legacyBlocks,
+      status: persistedEntries.status || 'completed',
+    });
+    for (const diagnostic of projected.diagnostics) {
+      console.warn('[stream] unresolved assistant segment finalized with fallback:', diagnostic.segmentId);
+    }
+    buf.blocks = projected.blocks;
+    const committed = useStore.getState().bindPersistedTurnEntries(buf.sessionPath, {
+      ...persistedEntries,
+      assistantMessageId: buf.messageId,
+      assistantBlocks: projected.blocks,
+      assistantProjection: projected.projection,
+    });
+    clearLiveAssistantMessage(buf.sessionPath, buf.messageId);
+    if (!committed) {
+      console.warn('[stream] failed to commit live assistant turn:', buf.sessionPath, buf.messageId);
+    }
   }
 
   private appendInterlude(buf: Buffer, block: InterludeContentBlock): boolean {
@@ -302,30 +481,83 @@ class StreamBufferManager {
     return consumed;
   }
 
-  /** 调度节流 flush */
+  private cancelScheduledFlush(buf: Buffer): void {
+    if (buf.flushTimer !== null) {
+      clearTimeout(buf.flushTimer);
+      buf.flushTimer = null;
+    }
+    if (buf.flushFrame !== null) {
+      if (typeof globalThis.cancelAnimationFrame === 'function') {
+        globalThis.cancelAnimationFrame(buf.flushFrame);
+      }
+      buf.flushFrame = null;
+    }
+  }
+
+  private requestFlushFrame(buf: Buffer): void {
+    if (buf.flushFrame !== null) return;
+    if (typeof globalThis.requestAnimationFrame !== 'function') {
+      this.flush(buf);
+      return;
+    }
+    buf.flushFrame = globalThis.requestAnimationFrame(() => {
+      buf.flushFrame = null;
+      this.flush(buf);
+    });
+  }
+
+  /** 普通增量先合并到下一画面，再受最高发布频率约束。 */
   private scheduleFlush(buf: Buffer): void {
+    buf.publishPending = true;
+    if (buf.flushTimer !== null || buf.flushFrame !== null) return;
     const now = Date.now();
     if (now - buf.lastFlushTime >= FLUSH_INTERVAL) {
-      this.flush(buf);
-    } else if (!buf.flushTimer) {
+      this.requestFlushFrame(buf);
+    } else {
       buf.flushTimer = setTimeout(() => {
         buf.flushTimer = null;
-        this.flush(buf);
+        this.requestFlushFrame(buf);
       }, FLUSH_INTERVAL - (now - buf.lastFlushTime));
     }
   }
 
-  /** 把 buffer 中累积的内容一次性 flush 到 Zustand */
-  private flush(buf: Buffer): void {
-    buf.lastFlushTime = Date.now();
-    if (buf.flushTimer) {
-      clearTimeout(buf.flushTimer);
-      buf.flushTimer = null;
+  private publishBufferedState(
+    buf: Buffer,
+    updater: (msg: ChatMessage) => ChatMessage,
+    force: boolean,
+  ): void {
+    if (!force && !buf.publishPending) {
+      this.cancelScheduledFlush(buf);
+      return;
     }
+    this.cancelScheduledFlush(buf);
+    const published = this.updateTargetMessage(buf, (msg) => updater({
+      ...msg,
+      blocks: renderBufferedBlocks(msg.blocks || [], buf),
+    }));
+    if (!published) return;
 
-    this.updateTargetMessage(buf, (msg) => {
-      return { ...msg, blocks: renderBufferedBlocks(msg.blocks || [], buf) };
+    recordChatPerformance('stream_flush', {
+      sessionPath: buf.sessionPath,
+      messageId: buf.messageId || undefined,
+      sourceLength: buf.textSegmentAcc.length,
+      blockCount: buf.blocks.length,
     });
+    buf.lastFlushTime = Date.now();
+    buf.publishPending = false;
+  }
+
+  /** 把普通增量一次性发布到当前回合。 */
+  private flush(buf: Buffer): void {
+    this.publishBufferedState(buf, (msg) => msg, false);
+  }
+
+  /** 语义边界立即发布，并把尚未发布的普通增量合并进同一次更新。 */
+  private publishBoundary(
+    buf: Buffer,
+    updater: (msg: ChatMessage) => ChatMessage = (msg) => msg,
+  ): void {
+    this.publishBufferedState(buf, updater, true);
   }
 
   // ── 公开事件处理器 ──
@@ -340,6 +572,12 @@ class StreamBufferManager {
     const buf = this.getBuffer(sessionPath, sessionId);
 
     switch (msg.type) {
+      case 'assistant_segment_start':
+      case 'assistant_segment_delta':
+      case 'assistant_segment_end':
+        this.updateCanonicalSegment(buf, msg);
+        break;
+
       case 'text_delta':
         this.ensureMessage(buf);
         buf.textAcc += msg.delta || '';
@@ -352,7 +590,7 @@ class StreamBufferManager {
         buf.inThinking = true;
         buf.hasThinkingBlock = true;
         buf.thinkingAcc = '';
-        this.flush(buf);
+        this.publishBoundary(buf);
         break;
 
       case 'thinking_delta':
@@ -365,7 +603,7 @@ class StreamBufferManager {
       case 'thinking_end':
         buf.hasThinkingBlock = true;
         buf.inThinking = false;
-        this.flush(buf);
+        this.publishBoundary(buf);
         break;
 
       case 'mood_start':
@@ -381,7 +619,7 @@ class StreamBufferManager {
           buf.moodPendingSeparator = false;
         }
         buf.moodYuan = resolveSessionYuan(sessionPath);
-        this.flush(buf);
+        this.publishBoundary(buf);
         break;
 
       case 'mood_text':
@@ -396,7 +634,7 @@ class StreamBufferManager {
 
       case 'mood_end':
         buf.inMood = false;
-        this.flush(buf);
+        this.publishBoundary(buf);
         break;
 
       case 'card_start':
@@ -413,7 +651,6 @@ class StreamBufferManager {
       case 'card_end': {
         buf.inCard = false;
         if (buf.cardAttrs) {
-          this.flush(buf); // flush pending text first
           const card = {
             type: buf.cardAttrs.type || 'iframe',
             pluginId: buf.cardAttrs.plugin || '',
@@ -421,7 +658,7 @@ class StreamBufferManager {
             title: buf.cardAttrs.title,
             description: buf.cardDescAcc,
           };
-          this.updateTargetMessage(buf, (m) => ({
+          this.publishBoundary(buf, (m) => ({
             ...m,
             blocks: [...(m.blocks || []), { type: 'plugin_card' as const, card }],
           }));
@@ -433,9 +670,7 @@ class StreamBufferManager {
 
       case 'tool_start':
         this.ensureMessage(buf);
-        // 工具事件频率低，直接写 store
-        this.flush(buf); // 先 flush 文本
-        this.updateTargetMessage(buf, (m) => {
+        this.publishBoundary(buf, (m) => {
           const blocks = [...(m.blocks || [])];
           // 找最后一个 tool_group 或创建新的
           let lastTg = blocks.length - 1;
@@ -465,7 +700,7 @@ class StreamBufferManager {
         break;
 
       case 'tool_end':
-        this.updateTargetMessage(buf, (m) => {
+        this.publishBoundary(buf, (m) => {
           const blocks = [...(m.blocks || [])];
           // 从后往前找含该 tool 名且未 done 的
           for (let i = blocks.length - 1; i >= 0; i--) {
@@ -482,7 +717,7 @@ class StreamBufferManager {
                 success: !!msg.success,
                 status: msg.status || (msg.success ? 'succeeded' : 'failed'),
                 ...(typeof msg.error === 'string' && msg.error ? { error: msg.error } : {}),
-                details: msg.details,
+                ...(msg.details !== undefined ? { details: msg.details } : {}),
               };
               const allDone = tools.every(t => t.done);
               blocks[i] = { ...tg, tools, collapsed: allDone && tools.length > 1 };
@@ -522,8 +757,7 @@ class StreamBufferManager {
         }
 
         this.ensureMessage(buf);
-        this.flush(buf);
-        this.updateTargetMessage(buf, (m) => ({
+        this.publishBoundary(buf, (m) => ({
           ...m,
           blocks: mergeContentBlock([...(m.blocks || [])], block),
         }));
@@ -537,13 +771,16 @@ class StreamBufferManager {
         break;
 
       case 'turn_end':
-        useStore.getState().bindPersistedTurnEntries?.(buf.sessionPath, {
+        if ((msg.aborted || msg.failed) && !this.hasTurnState(buf)) {
+          this.ensureMessage(buf);
+        }
+        this.finishBufferTurn(buf, {
           turnInputEntryId: msg.turnInputEntryId,
           userEntryId: msg.userEntryId,
           assistantEntryId: msg.assistantEntryId,
-          assistantMessageId: buf.messageId,
+          assistantEntryIds: Array.isArray(msg.assistantEntryIds) ? msg.assistantEntryIds : undefined,
+          status: msg.aborted ? 'aborted' : msg.failed ? 'failed' : 'completed',
         });
-        this.finishBufferTurn(buf);
         break;
 
     }
@@ -568,7 +805,8 @@ class StreamBufferManager {
     const key = bufferKeyForSession(sessionPath, sessionId);
     const aliasKey = this.bufferKeysByPath.get(sessionPath) || null;
     const buf = this.lookupBuffer(sessionPath, sessionId);
-    if (buf?.flushTimer) clearTimeout(buf.flushTimer);
+    if (buf) this.cancelScheduledFlush(buf);
+    if (buf?.messageId) clearLiveAssistantMessage(buf.sessionPath, buf.messageId);
     this.deleteBufferKey(key);
     if (aliasKey && aliasKey !== key) this.deleteBufferKey(aliasKey);
     if (key !== sessionPath) this.deleteBufferKey(sessionPath);
@@ -577,7 +815,8 @@ class StreamBufferManager {
   /** 清理所有 */
   clearAll(): void {
     for (const [, buf] of this.buffers) {
-      if (buf.flushTimer) clearTimeout(buf.flushTimer);
+      this.cancelScheduledFlush(buf);
+      if (buf.messageId) clearLiveAssistantMessage(buf.sessionPath, buf.messageId);
     }
     this.buffers.clear();
     this.bufferKeysByPath.clear();

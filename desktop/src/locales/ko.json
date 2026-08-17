@@ -318,6 +318,11 @@
       "submitting": "제출 중",
       "retryLabel": "{kind} 재생성"
     },
+    "turnStatus": {
+      "missingFinalAnswer": "최종 답변이 생성되지 않았습니다",
+      "failed": "이번 답변에 실패했습니다",
+      "aborted": "이번 답변이 중지되었습니다"
+    },
     "subagentPreview": {
       "historyUnrecoverable": "과거 하위 세션 링크를 복구할 수 없어요",
       "noSession": "열 수 있는 하위 Agent 세션이 없어요",

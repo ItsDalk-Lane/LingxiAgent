@@ -17,6 +17,8 @@ import styles from './Chat.module.css';
 const EMPTY_ITEMS: ChatListItem[] = [];
 const EMPTY_TIMELINE_ANCHORS: TimelineAnchor[] = [];
 const LOAD_MORE_THRESHOLD = 200;
+const INITIAL_RENDER_WINDOW = 100;
+const RENDER_WINDOW_STEP = 50;
 const SCROLL_THRESHOLD = 50;
 const TIMELINE_HOVER_ZONE_PX = 64;
 const TIMELINE_TOP_OFFSET_PX = 76;
@@ -47,11 +49,23 @@ export const ChatMessageSurface = memo(function ChatMessageSurface({
   const isSessionStreaming = useStore(s => sessionScopedListIncludes(s, s.streamingSessions, sessionPath));
   const sessionAgentId = useStore(s => s.sessions.find(se => se.path === sessionPath)?.agentId ?? null);
   const sessionReadOnly = useStore(s => s.sessions.find(se => se.path === sessionPath)?.agentDeleted === true);
+  const pendingLocate = useStore(s => s.pendingMessageLocate);
   const ref = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const messageElementsRef = useRef(new Map<string, HTMLDivElement>());
   const [timelineRailVisible, setTimelineRailVisible] = useState(false);
   const [timelinePrepared, setTimelinePrepared] = useState(false);
+  const [renderWindow, setRenderWindow] = useState({
+    sessionPath,
+    limit: INITIAL_RENDER_WINDOW,
+  });
+  const renderedItemLimit = renderWindow.sessionPath === sessionPath
+    ? renderWindow.limit
+    : INITIAL_RENDER_WINDOW;
+  const visibleItems = useMemo(() => (
+    items.length > renderedItemLimit ? items.slice(-renderedItemLimit) : items
+  ), [items, renderedItemLimit]);
+  const hasHiddenItems = visibleItems.length < items.length;
   const bottomScroll = useContinuousBottomScroll({
     scrollRef: ref,
     contentRef,
@@ -59,8 +73,8 @@ export const ChatMessageSurface = memo(function ChatMessageSurface({
     stickyThreshold: SCROLL_THRESHOLD,
   });
   const timelineAnchors = useMemo(() => (
-    active && timelinePrepared ? buildTimelineAnchors(items) : EMPTY_TIMELINE_ANCHORS
-  ), [active, items, timelinePrepared]);
+    active && timelinePrepared ? buildTimelineAnchors(visibleItems) : EMPTY_TIMELINE_ANCHORS
+  ), [active, timelinePrepared, visibleItems]);
   const emitScrollButton = useCallback((state: ChatScrollButtonState) => {
     onScrollButtonChange?.(state);
   }, [onScrollButtonChange]);
@@ -73,11 +87,11 @@ export const ChatMessageSurface = memo(function ChatMessageSurface({
   }, []);
   const orderedIds = useMemo(() => {
     const ids: string[] = [];
-    for (const it of items) {
+    for (const it of visibleItems) {
       if (it.type === 'message') ids.push(it.data.id);
     }
     return ids;
-  }, [items]);
+  }, [visibleItems]);
   const boxSelection = useBoxSelection({ messageElementsRef, orderedIds, sessionPath, active });
   // 聊天选区提交不在组件层挂 mouseup/keyup：document 级 initQuotedSelectionLifecycle
   // 已按 surface 统一捕获（主窗口 + 每个拆窗子窗各注册一次，且查询各自 document 的
@@ -104,6 +118,10 @@ export const ChatMessageSurface = memo(function ChatMessageSurface({
   }, [active]);
 
   useEffect(() => {
+    setRenderWindow({ sessionPath, limit: INITIAL_RENDER_WINDOW });
+  }, [sessionPath]);
+
+  useEffect(() => {
     const el = ref.current;
     if (!el) return;
     let hideTimer: ReturnType<typeof setTimeout> | null = null;
@@ -121,7 +139,22 @@ export const ChatMessageSurface = memo(function ChatMessageSurface({
       if (el.scrollTop < LOAD_MORE_THRESHOLD) {
         const state = useStore.getState();
         const session = sessionScopedValue(state, state.chatSessions, sessionPath);
-        if (session?.hasMore && !session.loadingMore) {
+        if (session && session.items.length > renderedItemLimit) {
+          el.dataset.prevScrollHeight = String(el.scrollHeight);
+          setRenderWindow((current) => ({
+            sessionPath,
+            limit: Math.max(
+              current.sessionPath === sessionPath ? current.limit : INITIAL_RENDER_WINDOW,
+              renderedItemLimit + RENDER_WINDOW_STEP,
+            ),
+          }));
+        } else if (session?.hasMore && !session.loadingMore) {
+          el.dataset.prevScrollHeight = String(el.scrollHeight);
+          setRenderWindow((current) => ({
+            sessionPath,
+            limit: (current.sessionPath === sessionPath ? current.limit : INITIAL_RENDER_WINDOW)
+              + RENDER_WINDOW_STEP,
+          }));
           loadMoreMessages(sessionPath);
         }
       }
@@ -146,11 +179,11 @@ export const ChatMessageSurface = memo(function ChatMessageSurface({
       if (hideTimer) clearTimeout(hideTimer);
       emitScrollButton({ el: null, visible: false, scrollToBottom: null });
     };
-  }, [active, bottomScroll, emitScrollButton, sessionPath]);
+  }, [active, bottomScroll, emitScrollButton, renderedItemLimit, sessionPath]);
 
   const prevFirstId = useRef<string | undefined>(undefined);
   useEffect(() => {
-    const firstId = items.find((item) => item.type === 'message')?.data.id;
+    const firstId = visibleItems.find((item) => item.type === 'message')?.data.id;
     const el = ref.current;
     if (el && prevFirstId.current && firstId !== prevFirstId.current) {
       const prevHeight = el.dataset.prevScrollHeight;
@@ -159,7 +192,7 @@ export const ChatMessageSurface = memo(function ChatMessageSurface({
       }
     }
     prevFirstId.current = firstId;
-  }, [items]);
+  }, [visibleItems]);
 
   useEffect(() => {
     const el = ref.current;
@@ -195,7 +228,6 @@ export const ChatMessageSurface = memo(function ChatMessageSurface({
   }, [items, items.length, active, bottomScroll]);
 
   const { t } = useI18n();
-  const pendingLocate = useStore(s => s.pendingMessageLocate);
   const findState = useStore(s => sessionScopedValue(s, s.chatFindBySession, sessionPath));
   // 定位意图的进度守卫：同一意图下"同种 stall 无进展"即放弃，防无限重试——
   // load-more 后 oldestId 未前进，或 refresh（reconcile）后 revision 未前进
@@ -203,6 +235,26 @@ export const ChatMessageSurface = memo(function ChatMessageSurface({
   // 查找高亮：流式期间同一查询不重复标注 / 从未标注过则 clear 短路
   const markKeyRef = useRef<string | null>(null);
   const hadMarksRef = useRef(false);
+
+  // 搜索可能命中已经拉进内存、但在当前挂载窗口之外的旧消息。
+  // 先扩大窗口，下一次布局提交后原有定位流程就能拿到真实节点。
+  useLayoutEffect(() => {
+    if (variant === 'card' || !active || pendingLocate?.sessionPath !== sessionPath) return;
+    const targetId = String(pendingLocate.messageIndex);
+    const targetIndex = items.findIndex((item) => (
+      item.type === 'message' && item.data.id === targetId
+    ));
+    if (targetIndex < 0) return;
+    const requiredLimit = items.length - targetIndex;
+    if (requiredLimit <= renderedItemLimit) return;
+    setRenderWindow((current) => ({
+      sessionPath,
+      limit: Math.max(
+        current.sessionPath === sessionPath ? current.limit : INITIAL_RENDER_WINDOW,
+        requiredLimit,
+      ),
+    }));
+  }, [active, items, pendingLocate, renderedItemLimit, sessionPath, variant]);
 
   // —— 定位意图消费：补加载 → 滚动 → flash ——
   // 消费侧校验 sessionPath：意图不属于本 surface 就忽略（状态归属纪律）。
@@ -344,7 +396,7 @@ export const ChatMessageSurface = memo(function ChatMessageSurface({
     return () => {
       for (const dispose of cleanups) dispose();
     };
-  }, [active, pendingLocate, items, sessionPath, loadingMore, variant, t, bottomScroll]);
+  }, [active, pendingLocate, items, visibleItems, sessionPath, loadingMore, variant, t, bottomScroll]);
 
   // —— 查找高亮：查找条打开期间对已加载消息词级 mark ——
   useEffect(() => {
@@ -374,7 +426,7 @@ export const ChatMessageSurface = memo(function ChatMessageSurface({
       hadMarksRef.current = true;
     });
     return () => cancelAnimationFrame(raf);
-  }, [variant, active, findState?.open, findState?.query, findState?.tokens, items, isSessionStreaming]);
+  }, [variant, active, findState?.open, findState?.query, findState?.tokens, visibleItems, isSessionStreaming]);
 
   const shellClassName = variant === 'card'
     ? `${styles.sessionShell} ${styles.cardSessionShell}`
@@ -404,13 +456,13 @@ export const ChatMessageSurface = memo(function ChatMessageSurface({
           ref={contentRef}
           className={`${styles.sessionMessages}${boxSelection.selectionModeActive ? ` ${styles.selectionModeActive}` : ''}`}
         >
-          {hasMore && (
+          {(hasMore || hasHiddenItems) && (
             <div className={styles.loadMoreHint}>
               {loadingMore ? '...' : ''}
             </div>
           )}
           <ChatTranscript
-            items={items}
+            items={visibleItems}
             sessionPath={sessionPath}
             agentId={sessionAgentId}
             readOnly={sessionReadOnly}

@@ -15,9 +15,11 @@ import { useStore } from '../../stores';
 import { selectSelectedIdsBySession } from '../../stores/session-selectors';
 import { extractSelectedTexts } from '../../utils/message-text';
 import { openFilePreview } from '../../utils/file-preview';
-import { isImageOrSvgExt, extOfName, kindOfFileName } from '../../utils/file-kind';
+import { buildFileRefId, isImageOrSvgExt, extOfName, kindOfFileName } from '../../utils/file-kind';
 import { getUserAttachmentImageSrc } from '../../utils/user-attachment-media';
 import { AgentAvatar, resolveAgentDisplayInfo } from '../../utils/agent-display';
+import { openMediaViewerForRef } from '../../utils/open-media-viewer';
+import { useDeferredHistoryContent } from '../../hooks/use-deferred-history-content';
 import {
   retrySessionTurn,
   type ForkedSessionHandler,
@@ -295,6 +297,16 @@ const UserAttachmentsView = memo(function UserAttachmentsView({ attachments, des
         const expiredLabel = t('chat.fileExpired');
         const imageSrc = !expired && isImage(att) ? getUserAttachmentImageSrc(att) : null;
         const kind = att.isDir ? 'directory' : kindOfFileName(att.name || att.path, att.mimeType);
+        if (!expired && att.deferred && isImage(att)) {
+          return (
+            <DeferredUserImageAttachment
+              key={att.fileId || att.path || att.name || `att-${i}`}
+              attachment={att}
+              sessionPath={sessionPath}
+              messageId={messageId}
+            />
+          );
+        }
         if (!expired && kind === 'audio') {
           const isVoiceInput = att.presentation === 'voice-input';
           const transcriptText = isVoiceInput && att.transcription?.status === 'ready'
@@ -377,6 +389,77 @@ const UserAttachmentsView = memo(function UserAttachmentsView({ attachments, des
         />
       )}
     </div>
+  );
+});
+
+const DeferredUserImageAttachment = memo(function DeferredUserImageAttachment({
+  attachment,
+  sessionPath,
+  messageId,
+}: {
+  attachment: UserAttachment;
+  sessionPath: string;
+  messageId: string;
+}) {
+  const [requested, setRequested] = useState(false);
+  const loaded = useDeferredHistoryContent(sessionPath, attachment.deferred, requested);
+  const base64 = loaded.data?.content || attachment.base64Data || '';
+  const mimeType = loaded.data?.mimeType || attachment.mimeType || 'image/png';
+  const openImage = useCallback((content: string, mime: string) => {
+    openMediaViewerForRef({
+      id: buildFileRefId({
+        source: 'session-attachment',
+        sessionPath,
+        messageId,
+        path: attachment.path,
+      }),
+      kind: 'image',
+      source: 'session-attachment',
+      name: attachment.name,
+      path: attachment.path,
+      mime,
+      sessionMessageId: messageId,
+      inlineData: { base64: content, mimeType: mime },
+    }, { origin: 'session', sessionPath });
+  }, [attachment.name, attachment.path, messageId, sessionPath]);
+  const handleClick = () => {
+    if (!base64) {
+      setRequested(true);
+      return;
+    }
+    openImage(base64, mimeType);
+  };
+
+  useEffect(() => {
+    if (!requested) return;
+    if (loaded.data) {
+      openImage(loaded.data.content, loaded.data.mimeType || mimeType);
+      setRequested(false);
+    } else if (loaded.error) {
+      setRequested(false);
+    }
+  }, [loaded.data, loaded.error, mimeType, openImage, requested]);
+
+  if (base64) {
+    return (
+      <div className={styles.attachImageWrap}>
+        <img
+          className={styles.attachImage}
+          src={`data:${mimeType};base64,${base64}`}
+          alt={attachment.name}
+          loading="lazy"
+          onClick={handleClick}
+          style={{ cursor: 'default' }}
+        />
+      </div>
+    );
+  }
+
+  return (
+    <button type="button" className={styles.deferredAttachmentButton} onClick={handleClick}>
+      <FileKindIcon kind="image" size={14} />
+      <span>{attachment.name}</span>
+    </button>
   );
 });
 

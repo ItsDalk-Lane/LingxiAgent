@@ -242,7 +242,7 @@ export function selectSessionFiles(
             sessionMessageId: msg.id,
             sessionBlockIdx: i,
           });
-        } else if (b.type === 'screenshot') {
+        } else if (b.type === 'screenshot' && b.base64) {
           result.push({
             id: buildFileRefId({
               source: 'session-block-screenshot',

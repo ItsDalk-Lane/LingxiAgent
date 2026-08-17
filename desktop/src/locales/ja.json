@@ -318,6 +318,11 @@
       "submitting": "送信中",
       "retryLabel": "{kind}を再生成"
     },
+    "turnStatus": {
+      "missingFinalAnswer": "最終回答は生成されませんでした",
+      "failed": "この回答は失敗しました",
+      "aborted": "この回答は停止されました"
+    },
     "subagentPreview": {
       "historyUnrecoverable": "過去のサブセッションへのリンクは復元できません",
       "noSession": "開けるサブ Agent セッションがありません",

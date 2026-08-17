@@ -3,6 +3,7 @@
 import type { AudioWaveform, ChatMessage, ContentBlock, UserAttachment, VoiceTranscription } from '../stores/chat-types';
 import type { FileKind } from '../types/file-ref';
 import { extOfName, isImageOrSvgExt, kindOfFileName } from './file-kind';
+import { renderMarkdown } from './markdown';
 
 export type ScreenshotAttachmentKind = FileKind | 'directory';
 
@@ -50,7 +51,9 @@ function extractBlocks(blocks: ContentBlock[]): ScreenshotBlock[] {
   const result: ScreenshotBlock[] = [];
   for (const block of blocks) {
     if (block.type === 'text') {
-      result.push({ type: 'html', content: block.html });
+      result.push({ type: 'html', content: typeof block.source === 'string'
+        ? renderMarkdown(block.source)
+        : (block as { html: string }).html });
     } else if (block.type === 'file' && isImageOrSvgExt(block.ext)) {
       result.push({ type: 'image', content: block.filePath });
     } else if (block.type === 'screenshot') {

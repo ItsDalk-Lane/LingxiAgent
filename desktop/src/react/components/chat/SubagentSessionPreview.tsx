@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type RefObject } from 'react';
 import { subscribeStreamKey } from '../../services/stream-key-dispatcher';
-import { renderMarkdown } from '../../utils/markdown';
 import { findOpenToolIndex, toolCallFromStartEvent, toolCallIdFromEvent } from '../../utils/tool-call-identity';
 import type { ChatListItem, ChatMessage, ContentBlock } from '../../stores/chat-types';
 import { useStore } from '../../stores';
@@ -251,7 +250,7 @@ export function SubagentSessionPreview({ taskId, sessionId = null, sessionPath, 
               blocks: upsertBlock(
                 blocks,
                 (block) => block.type === 'text',
-                { type: 'text', html: renderMarkdown(nextText), source: nextText },
+                { type: 'text', source: nextText },
               ),
             };
           });

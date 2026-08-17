@@ -8,6 +8,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { StreamingMarkdownContent } from '../../components/chat/StreamingMarkdownContent';
 import { injectCopyButtons } from '../../utils/format';
 import { renderMarkdown } from '../../utils/markdown';
+import { renderMermaidDiagrams } from '../../utils/mermaid-renderer';
 
 vi.mock('../../utils/mermaid-renderer', () => ({
   renderMermaidDiagrams: vi.fn(async () => undefined),
@@ -24,6 +25,7 @@ vi.mock('../../utils/format', async (importOriginal) => {
 describe('StreamingMarkdownContent', () => {
   beforeEach(() => {
     vi.mocked(injectCopyButtons).mockClear();
+    vi.mocked(renderMermaidDiagrams).mockClear();
     vi.spyOn(window, 'requestAnimationFrame');
     vi.spyOn(window, 'cancelAnimationFrame');
     window.matchMedia = vi.fn().mockReturnValue({ matches: false, addEventListener: vi.fn(), removeEventListener: vi.fn() }) as unknown as typeof window.matchMedia;
@@ -33,6 +35,59 @@ describe('StreamingMarkdownContent', () => {
     cleanup();
     vi.useRealTimers();
     vi.restoreAllMocks();
+  });
+
+  it('treats source as authoritative when a stale legacy html cache is also present', () => {
+    const { container } = render(
+      <StreamingMarkdownContent source="**权威原文**" html="<p>过期缓存</p>" active={false} />,
+    );
+
+    expect(container.textContent).toContain('权威原文');
+    expect(container.querySelector('strong')?.textContent).toBe('权威原文');
+    expect(container.textContent).not.toContain('过期缓存');
+  });
+
+  it('defers mermaid enhancement until the turn is settled', async () => {
+    const source = '```mermaid\ngraph TD\n  A-->B\n```';
+    const { rerender } = render(
+      <StreamingMarkdownContent source={source} active />,
+    );
+
+    await Promise.resolve();
+    expect(renderMermaidDiagrams).not.toHaveBeenCalled();
+
+    rerender(<StreamingMarkdownContent source={source} active={false} />);
+    await waitFor(() => expect(renderMermaidDiagrams).toHaveBeenCalledTimes(1));
+  });
+
+  it('defers KaTeX layout until the turn is settled', () => {
+    const source = '$x^2 + y^2$';
+    const { container, rerender } = render(
+      <StreamingMarkdownContent source={source} active />,
+    );
+
+    expect(container.querySelector('.katex')).toBeNull();
+    expect(container.textContent).toContain('$x^2 + y^2$');
+
+    rerender(<StreamingMarkdownContent source={source} active={false} />);
+    expect(container.querySelector('.katex')).not.toBeNull();
+  });
+
+  it('uses a configurable plain-text circuit breaker for oversized active source', () => {
+    const source = '**很长但仍是权威原文**';
+    const { container, rerender } = render(
+      <StreamingMarkdownContent source={source} active richTextCharLimit={10} />,
+    );
+
+    expect(container.querySelector('[data-stream-plain-text="true"]')).not.toBeNull();
+    expect(container.querySelector('strong')).toBeNull();
+    expect(container.textContent).toContain('**很长但仍是权威原文**');
+
+    rerender(
+      <StreamingMarkdownContent source={source} active={false} richTextCharLimit={10} />,
+    );
+    expect(container.querySelector('[data-stream-plain-text="true"]')).toBeNull();
+    expect(container.querySelector('strong')?.textContent).toBe('很长但仍是权威原文');
   });
 
   it('renders active prose through markdown html instead of a plain-text fallback', () => {
@@ -167,7 +222,7 @@ describe('StreamingMarkdownContent', () => {
 
     const { container } = render(
       <StreamingMarkdownContent
-        source="```ts\nconst x = 1;\n```"
+        source={'```ts\nconst x = 1;\n```'}
         html="<pre><code>const x = 1;</code></pre>"
         active
       />,
@@ -178,13 +233,13 @@ describe('StreamingMarkdownContent', () => {
     const wrapBtn = buttons[0];
     const copyBtn = buttons[1];
 
-    expect(wrapper).not.toBeNull();
+    expect(wrapper, container.innerHTML).not.toBeNull();
     fireEvent.click(wrapBtn);
     expect(wrapper?.dataset.wrap).toBe('true');
     expect(wrapBtn.dataset.active).toBe('true');
 
     fireEvent.click(copyBtn);
-    await waitFor(() => expect(writeText).toHaveBeenCalledWith('const x = 1;'));
+    await waitFor(() => expect(writeText).toHaveBeenCalledWith('const x = 1;\n'));
     expect(copyBtn.dataset.copied).toBe('true');
     expect(copyBtn.getAttribute('aria-label')).toBe('已复制');
   });
@@ -233,7 +288,7 @@ describe('StreamingMarkdownContent', () => {
   });
 
   it('does not fall back to plain text when rendered html contains formatting', () => {
-    const source = '重点';
+    const source = '**重点**';
     const html = '<p><strong>重点</strong></p>';
 
     const { container } = render(

@@ -16,6 +16,10 @@ import { parseUserAttachments } from './message-parser';
 import { renderMarkdown } from './markdown';
 import { extOfName } from './file-kind';
 import { buildAssistantBlocksFromContent } from './assistant-block-builder';
+import { recordChatPerformance } from './chat-performance';
+import { normalizeContentBlocks } from './content-semantics';
+import { projectAssistantTurn } from './turn-projector';
+import type { LiveAssistantSegment } from '../stores/live-turn-store';
 
 /* eslint-disable @typescript-eslint/no-explicit-any -- API 历史消息 JSON 结构动态，难以静态收窄 */
 
@@ -54,6 +58,8 @@ export interface HistoryApiResponse {
     entryId?: string;
     role: string;
     content: string;
+    assistantSegments?: LiveAssistantSegment[];
+    turnStatus?: 'completed' | 'failed' | 'aborted';
     thinking?: string;
     toolCalls?: Array<{
       id?: string;
@@ -65,7 +71,7 @@ export interface HistoryApiResponse {
       error?: string;
       details?: Record<string, unknown>;
     }>;
-    images?: Array<{ data: string; mimeType: string }>;
+    images?: Array<{ data?: string; mimeType: string; deferred?: import('../stores/chat-types').DeferredHistoryContent }>;
     timestamp?: number | string | null;
     sourceIndex?: number;
     turnInputEntryId?: string;
@@ -496,6 +502,7 @@ function sourceOrderedItems(
 }
 
 export function buildItemsFromHistory(data: HistoryApiResponse): ChatListItem[] {
+  recordChatPerformance('history_projection', { itemCount: data.messages.length });
   const items: ChatListItem[] = [];
   const sessionFileLookup = buildSessionFileLookup(data.sessionFiles);
 
@@ -555,8 +562,9 @@ export function buildItemsFromHistory(data: HistoryApiResponse): ChatListItem[] 
         path: `image-${idx}`,
         name: `image-${idx}.${(img.mimeType || 'image/png').split('/')[1] || 'png'}`,
         isDir: false,
-        base64Data: img.data,
+        ...(img.data ? { base64Data: img.data } : {}),
         mimeType: img.mimeType,
+        ...(img.deferred ? { deferred: img.deferred } : {}),
       }));
       const markerVideoAtts = attachedVideos.map((ref) => attachmentFromRef(ref, sessionFileLookup));
       const markerAudioAtts = attachedAudios.map((ref) => attachmentFromRef(ref, sessionFileLookup));
@@ -579,16 +587,66 @@ export function buildItemsFromHistory(data: HistoryApiResponse): ChatListItem[] 
       };
       items.push({ type: 'message', data: msg });
     } else if (m.role === 'assistant') {
-      const msgBlocks = blockMap[i] || [];
-      const inlineBlocks = msgBlocks.filter((block) => !isInterludeHistoryBlock(block));
-      const interludeBlocks = msgBlocks.filter(isInterludeHistoryBlock);
-      const beforeInterludes = interludeBlocks.filter((block) => shouldPlaceInterludeBeforeMessage(block, inlineBlocks));
-      const afterInterludes = interludeBlocks.filter((block) => !shouldPlaceInterludeBeforeMessage(block, inlineBlocks));
-      const blocks = buildAssistantBlocksFromContent({
-        content: m.content,
-        thinking: m.thinking,
-        toolCalls: m.toolCalls,
-        extraBlocks: inlineBlocks,
+      let groupEnd = i;
+      if (m.assistantSegments && m.turnInputEntryId) {
+        while (
+          groupEnd + 1 < data.messages.length
+          && data.messages[groupEnd + 1].role === 'assistant'
+          && data.messages[groupEnd + 1].assistantSegments
+          && data.messages[groupEnd + 1].turnInputEntryId === m.turnInputEntryId
+        ) {
+          groupEnd += 1;
+        }
+      }
+      const groupMessages = data.messages.slice(i, groupEnd + 1);
+      const finalMessage = groupMessages[groupMessages.length - 1];
+      const finalIndex = groupEnd;
+      const finalId = finalMessage.id || `hist-${finalIndex}`;
+      const idPrefix = finalMessage.entryId || finalId;
+      const beforeInterludes: Array<Record<string, any>> = [];
+      const afterInterludes: Array<Record<string, any>> = [];
+      const legacyBlocks: ContentBlock[] = [];
+
+      for (let offset = 0; offset < groupMessages.length; offset += 1) {
+        const messageIndex = i + offset;
+        const assistantMessage = groupMessages[offset];
+        const messageBlocks = blockMap[messageIndex] || [];
+        const inlineBlocks = messageBlocks.filter((block) => !isInterludeHistoryBlock(block));
+        const interludeBlocks = messageBlocks.filter(isInterludeHistoryBlock);
+        beforeInterludes.push(...interludeBlocks.filter((block) => (
+          shouldPlaceInterludeBeforeMessage(block, inlineBlocks)
+        )));
+        afterInterludes.push(...interludeBlocks.filter((block) => (
+          !shouldPlaceInterludeBeforeMessage(block, inlineBlocks)
+        )));
+        legacyBlocks.push(...buildAssistantBlocksFromContent({
+          content: assistantMessage.content,
+          thinking: assistantMessage.thinking,
+          toolCalls: assistantMessage.toolCalls,
+          extraBlocks: inlineBlocks,
+        }));
+      }
+
+      const segments = groupMessages.flatMap((message) => message.assistantSegments || []);
+      const projectionResult = m.assistantSegments
+        ? projectAssistantTurn({
+            idPrefix,
+            inputMessageId: m.turnInputEntryId || null,
+            assistantMessageIds: groupMessages.map((message, offset) => (
+              message.entryId || message.id || `hist-${i + offset}`
+            )),
+            segments,
+            legacyBlocks,
+            status: groupMessages.some((message) => message.turnStatus === 'failed')
+              ? 'failed'
+              : groupMessages.some((message) => message.turnStatus === 'aborted')
+                ? 'aborted'
+                : 'completed',
+          })
+        : null;
+      const blocks = projectionResult?.blocks || normalizeContentBlocks(legacyBlocks, {
+        idPrefix,
+        turnLifecycle: 'sealed',
       });
 
       for (let j = 0; j < beforeInterludes.length; j += 1) {
@@ -601,10 +659,11 @@ export function buildItemsFromHistory(data: HistoryApiResponse): ChatListItem[] 
       }
 
       const msg: ChatMessage = {
-        id,
-        sourceEntryId: m.entryId,
+        id: finalId,
+        sourceEntryId: finalMessage.entryId,
         role: 'assistant',
         blocks,
+        ...(projectionResult ? { turnProjection: projectionResult.projection } : {}),
         ...(m.turnInputEntryId ? { turnInputEntryId: m.turnInputEntryId } : {}),
         ...(typeof m.turnInputVisible === 'boolean' ? { turnInputVisible: m.turnInputVisible } : {}),
       };
@@ -621,6 +680,7 @@ export function buildItemsFromHistory(data: HistoryApiResponse): ChatListItem[] 
           data,
         });
       }
+      i = groupEnd;
     }
   }
 

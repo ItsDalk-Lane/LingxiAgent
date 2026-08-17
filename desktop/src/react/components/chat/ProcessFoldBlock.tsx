@@ -1,4 +1,4 @@
-import { memo, useCallback, useId, useMemo, useState } from 'react';
+import { memo, useCallback, useEffect, useId, useMemo, useState } from 'react';
 import { Collapse } from '@/ui';
 import { AgentAvatar, type AgentDisplayInfo } from '../../utils/agent-display';
 import { AssistantMessage } from './AssistantMessage';
@@ -11,6 +11,7 @@ import type {
 } from '../../stores/message-turn-actions';
 import type { ChatMessage } from '../../stores/chat-types';
 import styles from './Chat.module.css';
+import { subscribeChatCardNavigation } from '../../services/chat-card-navigation';
 
 interface Props {
   group: ProcessFoldRenderItem;
@@ -49,7 +50,7 @@ export const ProcessFoldBlock = memo(function ProcessFoldBlock({
   registerMessageElement,
   onForkCreated,
 }: Props) {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(!group.defaultCollapsed);
   const panelId = useId();
   const t = window.t ?? ((p: string) => p);
 
@@ -65,10 +66,22 @@ export const ProcessFoldBlock = memo(function ProcessFoldBlock({
   );
 
   const toggle = useCallback(() => setOpen(value => !value), []);
+  useEffect(() => {
+    setOpen(!group.defaultCollapsed);
+  }, [group.defaultCollapsed, group.id]);
+  useEffect(() => subscribeChatCardNavigation((request) => {
+    const anchors = request.kind === 'terminal'
+      ? group.navigationAnchors.terminal
+      : group.navigationAnchors.subagent;
+    if (!request.ids.some((id) => anchors.includes(id))) return false;
+    // 这里只展开父级，不消费请求；子卡挂载后会接走 pending 请求并精确滚动。
+    setOpen(true);
+    return false;
+  }), [group.navigationAnchors]);
   const messageRef = useCallback((messageId: string) => (
     (element: HTMLDivElement | null) => registerMessageElement?.(messageId, element)
   ), [registerMessageElement]);
-  const turnCompletionEntry = turnCompletionAssistantIndexes
+  const turnCompletionEntry = group.ownsTurnCompletion && turnCompletionAssistantIndexes
     ? group.items.find((entry) => turnCompletionAssistantIndexes.has(entry.originalIndex))
     : null;
   const completionTimeText = formatMessageTime(turnCompletionEntry?.item.data.timestamp);
@@ -87,7 +100,12 @@ export const ProcessFoldBlock = memo(function ProcessFoldBlock({
 
   return (
     <>
-      <div className={`${styles.messageGroup} ${styles.messageGroupAssistant}`}>
+      <div
+        className={`${styles.messageGroup} ${styles.messageGroupAssistant}`}
+        data-process-group-id={group.id}
+        data-turn-id={group.turnId}
+        data-block-ids={group.blockIds.join(' ')}
+      >
         {showAvatar && (
           <div className={styles.avatarRow}>
             <AgentAvatar
@@ -124,14 +142,23 @@ export const ProcessFoldBlock = memo(function ProcessFoldBlock({
                 readOnly={readOnly}
                 agentDisplay={agentDisplay}
                 isStreaming={isStreaming}
-                isSelected={selectedIds.includes(entry.item.data.id)}
-                showTurnCompletionTime={turnCompletionAssistantIndexes?.has(entry.originalIndex) ?? false}
-                assistantTurnSelectionIds={assistantTurnSelectionIdsByCompletionIndex?.get(entry.originalIndex)}
-                turnTarget={assistantTurnTargetsByCompletionIndex?.get(entry.originalIndex) ?? null}
-                retrySourceMessage={assistantTurnRetryMessagesByCompletionIndex?.get(entry.originalIndex) ?? null}
+                isSelected={selectedIds.includes(entry.sourceMessageId)}
+                showTurnCompletionTime={group.ownsTurnCompletion
+                  && (turnCompletionAssistantIndexes?.has(entry.originalIndex) ?? false)}
+                assistantTurnSelectionIds={group.ownsTurnCompletion
+                  ? assistantTurnSelectionIdsByCompletionIndex?.get(entry.originalIndex)
+                  : undefined}
+                turnTarget={group.ownsTurnCompletion
+                  ? assistantTurnTargetsByCompletionIndex?.get(entry.originalIndex) ?? null
+                  : null}
+                retrySourceMessage={group.ownsTurnCompletion
+                  ? assistantTurnRetryMessagesByCompletionIndex?.get(entry.originalIndex) ?? null
+                  : null}
                 skillPrompt={assistantSkillPromptsByIndex?.get(entry.originalIndex) ?? null}
                 onForkCreated={onForkCreated}
-                messageRef={messageRef(entry.item.data.id)}
+                messageRef={entry.registerSourceMessageElement
+                  ? messageRef(entry.sourceMessageId)
+                  : undefined}
               />
             ))}
           </div>

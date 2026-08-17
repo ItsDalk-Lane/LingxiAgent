@@ -61,8 +61,10 @@ function messageItems() {
   return messages;
 }
 
-function textBlockHtml(message: ChatMessage): string {
-  return message.blocks?.find((block) => block.type === 'text')?.html ?? '';
+function textBlockSource(message: ChatMessage): string {
+  const block = message.blocks?.find((candidate) => candidate.type === 'text');
+  if (!block || block.type !== 'text') return '';
+  return block.source ?? block.html ?? '';
 }
 
 describe('ws stream lifecycle after abort', () => {
@@ -126,7 +128,7 @@ describe('ws stream lifecycle after abort', () => {
 
     const items = messageItems();
     expect(items.map((item) => item.role)).toEqual(['user', 'assistant', 'user', 'assistant']);
-    expect(textBlockHtml(items[1])).toContain('old partial');
-    expect(textBlockHtml(items[3])).toContain('new answer');
+    expect(textBlockSource(items[1])).toContain('old partial');
+    expect(textBlockSource(items[3])).toContain('new answer');
   });
 });

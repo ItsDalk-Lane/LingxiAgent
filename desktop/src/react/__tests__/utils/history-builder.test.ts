@@ -2,6 +2,186 @@ import { describe, expect, it } from 'vitest';
 import { buildItemsFromHistory } from '../../utils/history-builder';
 
 describe('buildItemsFromHistory user image restoration', () => {
+  it('保留历史重内容凭证，同时只把预览放进首屏投影', () => {
+    const reasoningDeferred = {
+      id: 'reasoning-heavy',
+      kind: 'assistant_segment' as const,
+      size: 9_000,
+      available: true as const,
+    };
+    const imageDeferred = {
+      id: 'image-heavy',
+      kind: 'inline_image' as const,
+      size: 12_000,
+      available: true as const,
+    };
+    const items = buildItemsFromHistory({
+      messages: [
+        {
+          id: '0',
+          role: 'user',
+          content: '看图',
+          images: [{ mimeType: 'image/png', deferred: imageDeferred }],
+        },
+        {
+          id: '1',
+          entryId: 'assistant-heavy',
+          role: 'assistant',
+          content: '完成',
+          assistantSegments: [
+            {
+              id: 'assistant:1:reasoning:default',
+              kind: 'reasoning',
+              semanticPhase: 'reasoning',
+              source: '思考预览',
+              lifecycle: 'sealed',
+              deferred: reasoningDeferred,
+            },
+            {
+              id: 'assistant:1:text:1',
+              kind: 'text',
+              semanticPhase: 'final_answer',
+              source: '完成',
+              lifecycle: 'sealed',
+            },
+          ],
+        },
+      ],
+    });
+
+    expect(items[0]?.type).toBe('message');
+    expect(items[1]?.type).toBe('message');
+    if (items[0]?.type !== 'message' || items[1]?.type !== 'message') throw new Error('expected messages');
+    expect(items[0].data.attachments?.[0]).not.toHaveProperty('base64Data');
+    expect(items[0].data.attachments?.[0]).toMatchObject({ deferred: imageDeferred });
+    expect(items[1].data.blocks?.find((block) => block.type === 'thinking')).toMatchObject({
+      content: '思考预览',
+      deferred: reasoningDeferred,
+    });
+  });
+
+  it('按服务端语义恢复固定四区投影，不把过程文字冒充最终回复', () => {
+    const items = buildItemsFromHistory({
+      messages: [{
+        id: '0',
+        entryId: 'entry-assistant-1',
+        role: 'assistant',
+        content: '最终答复',
+        turnInputEntryId: 'entry-user-1',
+        assistantSegments: [
+          {
+            id: 'assistant:1:text:0',
+            kind: 'text',
+            semanticPhase: 'commentary',
+            source: '内部检查',
+            lifecycle: 'sealed',
+          },
+          {
+            id: 'assistant:1:text:2',
+            kind: 'text',
+            semanticPhase: 'final_answer',
+            source: '最终答复',
+            lifecycle: 'sealed',
+          },
+        ],
+        toolCalls: [{ id: 'call-read', name: 'read', status: 'succeeded' }],
+      }],
+    });
+
+    const first = items[0];
+    expect(first.type).toBe('message');
+    if (first.type !== 'message') throw new Error('expected message');
+    expect(first.data.blocks?.map((block) => ({
+      type: block.type,
+      id: block.id,
+      role: block.surfaceRole,
+    }))).toEqual([
+      {
+        type: 'text',
+        id: 'entry-assistant-1:segment:assistant:1:text:0',
+        role: 'process',
+      },
+      {
+        type: 'tool_group',
+        id: 'entry-assistant-1:tool_group:tools:call-read',
+        role: 'process',
+      },
+      {
+        type: 'text',
+        id: 'entry-assistant-1:segment:assistant:1:text:2',
+        role: 'answer',
+      },
+    ]);
+    expect(first.data.turnProjection).toEqual({
+      id: 'entry-assistant-1:turn',
+      inputMessageId: 'entry-user-1',
+      assistantMessageIds: ['entry-assistant-1'],
+      processBlockIds: [
+        'entry-assistant-1:segment:assistant:1:text:0',
+        'entry-assistant-1:tool_group:tools:call-read',
+      ],
+      answerBlockIds: ['entry-assistant-1:segment:assistant:1:text:2'],
+      resultBlockIds: [],
+      controlBlockIds: [],
+      status: 'completed',
+    });
+    const textBlocks = first.data.blocks?.filter((block) => block.type === 'text') || [];
+    expect(textBlocks.map((block) => block.source)).toEqual(['内部检查', '最终答复']);
+    expect(textBlocks.every((block) => !('html' in block))).toBe(true);
+  });
+
+  it('把同一用户回合里的多段助手消息恢复成一个回合投影', () => {
+    const items = buildItemsFromHistory({
+      messages: [
+        {
+          id: '1',
+          entryId: 'entry-assistant-1',
+          role: 'assistant',
+          content: '',
+          turnInputEntryId: 'entry-user-1',
+          assistantSegments: [{
+            id: 'assistant:1:text:0',
+            kind: 'text',
+            semanticPhase: 'commentary',
+            source: '先检查',
+            lifecycle: 'sealed',
+          }],
+          toolCalls: [{ id: 'call-read', name: 'read', status: 'succeeded' }],
+        },
+        {
+          id: '2',
+          entryId: 'entry-assistant-2',
+          role: 'assistant',
+          content: '检查完成。',
+          turnInputEntryId: 'entry-user-1',
+          assistantSegments: [{
+            id: 'assistant:2:text:0',
+            kind: 'text',
+            semanticPhase: 'final_answer',
+            source: '检查完成。',
+            lifecycle: 'sealed',
+          }],
+        },
+      ],
+    });
+
+    expect(items).toHaveLength(1);
+    const turn = items[0];
+    expect(turn.type).toBe('message');
+    if (turn.type !== 'message') throw new Error('expected one assistant turn');
+    expect(turn.data.sourceEntryId).toBe('entry-assistant-2');
+    expect(turn.data.turnProjection).toMatchObject({
+      inputMessageId: 'entry-user-1',
+      assistantMessageIds: ['entry-assistant-1', 'entry-assistant-2'],
+      processBlockIds: [
+        'entry-assistant-2:segment:assistant:1:text:0',
+        'entry-assistant-2:tool_group:tools:call-read',
+      ],
+      answerBlockIds: ['entry-assistant-2:segment:assistant:2:text:0'],
+    });
+  });
+
+
   it('restores tool outcomes by toolCallId instead of tool name', () => {
     const items = buildItemsFromHistory({
       messages: [{
@@ -577,8 +757,12 @@ describe('buildItemsFromHistory user image restoration', () => {
     if (first.type !== 'message') throw new Error('expected message');
     expect(first.data.blocks).toEqual([{
       type: 'thinking',
+      id: 'a-empty-thinking:thinking:0',
       content: '',
       sealed: true,
+      lifecycle: 'sealed',
+      semanticPhase: 'reasoning',
+      surfaceRole: 'process',
     }]);
   });
 

@@ -22,7 +22,6 @@ import { computerOverlayForSession } from './computer-overlay-slice';
 import { snapshotStreamBuffer, type StreamBufferSnapshot } from './stream-invalidator';
 import { errorWithCode, presentError, presentErrorWithLabel } from '../errors/error-presenter';
 import { normalizeSessionRouteError } from '../../../../shared/error-user-messages.ts';
-import { renderMarkdown } from '../utils/markdown';
 import type { ChatMessage, ContentBlock } from './chat-types';
 import { readMessageLiveVersion } from './message-live-version';
 import type { SessionMetaRecoveryStatus, SessionPermissionMode } from '../types';
@@ -473,7 +472,7 @@ function buildInflightAssistantMessage(snap: StreamBufferSnapshot): ChatMessage 
   }
   if (snap.text) {
     const displayText = snap.text.replace(/<tool_code>[\s\S]*?<\/tool_code>\s*/g, '');
-    blocks.push({ type: 'text', html: renderMarkdown(displayText), source: displayText });
+    blocks.push({ type: 'text', source: displayText });
   }
   return { id: snap.messageId || `inflight-${Date.now()}`, role: 'assistant', blocks, timestamp: Date.now() };
 }

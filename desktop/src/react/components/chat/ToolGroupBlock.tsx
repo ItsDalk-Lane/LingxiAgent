@@ -18,6 +18,10 @@ import { TerminalPreview } from '../right-workspace/TerminalCard';
 import { selectTerminalById } from '../../stores/terminal-slice';
 import { subscribeChatCardNavigation } from '../../services/chat-card-navigation';
 import { skillInvocationName } from '../../../../../shared/tool-outcome.ts';
+import {
+  asDeferredHistoryContent,
+  useDeferredHistoryContent,
+} from '../../hooks/use-deferred-history-content';
 
 import type { ToolCall } from '../../stores/chat-types';
 
@@ -26,6 +30,7 @@ interface Props {
   collapsed: boolean;
   agentName?: string;
   skillPrompt?: string | null;
+  sessionPath?: string;
 }
 
 export const ToolGroupBlock = memo(function ToolGroupBlock({
@@ -33,6 +38,7 @@ export const ToolGroupBlock = memo(function ToolGroupBlock({
   collapsed: initialCollapsed,
   agentName = 'Lingxi',
   skillPrompt = null,
+  sessionPath = '',
 }: Props) {
   // 独立卡片或产物块承接状态的工具，不在工具组里重复显示。
   const tools = rawTools.filter(t => !isToolCallHiddenFromProcessUi(t));
@@ -90,13 +96,14 @@ export const ToolGroupBlock = memo(function ToolGroupBlock({
               tool={tool}
               agentName={agentName}
               skillPrompt={skillPrompt}
+              sessionPath={sessionPath}
             />
           ))}
         </div>
       )}
       {isSingle && standardTools.length === 1 ? (
         <div className={styles.toolGroupContent}>
-          <ToolIndicator tool={standardTools[0]} agentName={agentName} skillPrompt={skillPrompt} />
+          <ToolIndicator tool={standardTools[0]} agentName={agentName} skillPrompt={skillPrompt} sessionPath={sessionPath} />
         </div>
       ) : standardTools.length > 0 ? (
         <Collapse open={!collapsed}>
@@ -107,6 +114,7 @@ export const ToolGroupBlock = memo(function ToolGroupBlock({
                 tool={tool}
                 agentName={agentName}
                 skillPrompt={skillPrompt}
+                sessionPath={sessionPath}
               />
             ))}
           </div>
@@ -129,16 +137,18 @@ const ToolIndicator = memo(function ToolIndicator({
   tool,
   agentName,
   skillPrompt,
+  sessionPath,
 }: {
   tool: ToolCall;
   agentName: string;
   skillPrompt: string | null;
+  sessionPath: string;
 }) {
   if (tool.name === 'exec_command') {
-    return <ExecCommandCard tool={tool} />;
+    return <ExecCommandCard tool={tool} sessionPath={sessionPath} />;
   }
   if (skillInvocationName({ toolName: tool.name, args: tool.args })) {
-    return <SkillInvocationCard tool={tool} skillPrompt={skillPrompt} />;
+    return <SkillInvocationCard tool={tool} skillPrompt={skillPrompt} sessionPath={sessionPath} />;
   }
 
   return <StandardToolIndicator tool={tool} agentName={agentName} />;
@@ -233,9 +243,11 @@ function recordOf(value: unknown): Record<string, unknown> | null {
 const SkillInvocationCard = memo(function SkillInvocationCard({
   tool,
   skillPrompt,
+  sessionPath,
 }: {
   tool: ToolCall;
   skillPrompt: string | null;
+  sessionPath: string;
 }) {
   const [expanded, setExpanded] = useState(false);
   const _t = window.t ?? ((path: string) => path);
@@ -248,7 +260,10 @@ const SkillInvocationCard = memo(function SkillInvocationCard({
       : 'toolGroup.skill.completed';
   const title = _t(titleKey, { name: skillName });
   const invocation = recordOf(tool.details?.skillInvocation);
-  const content = typeof invocation?.content === 'string' ? invocation.content : '';
+  const deferred = asDeferredHistoryContent(invocation?.deferred);
+  const loaded = useDeferredHistoryContent(sessionPath, deferred, expanded && !!sessionPath);
+  const content = loaded.data?.content
+    || (typeof invocation?.content === 'string' ? invocation.content : '');
   const truncated = invocation?.truncated === true;
   const invocationPrompt = skillPrompt?.trim() || _t('toolGroup.skill.promptUnavailable');
   const displayedContent = content
@@ -294,7 +309,7 @@ const SkillInvocationCard = memo(function SkillInvocationCard({
   );
 });
 
-const ExecCommandCard = memo(function ExecCommandCard({ tool }: { tool: ToolCall }) {
+const ExecCommandCard = memo(function ExecCommandCard({ tool, sessionPath }: { tool: ToolCall; sessionPath: string }) {
   const [expanded, setExpanded] = useState(false);
   const rootRef = useRef<HTMLDivElement | null>(null);
   const _t = window.t ?? ((p: string) => p);
@@ -307,6 +322,12 @@ const ExecCommandCard = memo(function ExecCommandCard({ tool }: { tool: ToolCall
   // 终端注册在真正起 tty 的会话 key 下；子助手预览里渲染上下文是父会话 path，
   // 按 currentSessionPath 查永远查不到，必须按 terminalId 跨会话索引。
   const terminal = useStore(selectTerminalById(terminalId));
+  const outputDeferred = asDeferredHistoryContent(tool.details?.outputDeferred);
+  const loadedOutput = useDeferredHistoryContent(
+    sessionPath,
+    outputDeferred,
+    expanded && !terminal && !!sessionPath,
+  );
   const command = (
     (typeof tool.args?.cmd === 'string' && tool.args.cmd)
     || (typeof execDetails?.cmd === 'string' && execDetails.cmd)
@@ -318,7 +339,8 @@ const ExecCommandCard = memo(function ExecCommandCard({ tool }: { tool: ToolCall
     || (typeof execDetails?.commandWithWorkdir === 'string' && execDetails.commandWithWorkdir)
     || command
   );
-  const output = typeof tool.details?.output === 'string' ? tool.details.output : '';
+  const output = loadedOutput.data?.content
+    || (typeof tool.details?.output === 'string' ? tool.details.output : '');
   const toolStatus = tool.status || (tool.done ? (tool.success ? 'succeeded' : 'failed') : 'running');
   const exitCode = terminal && Number.isFinite(terminal.exitCode) ? terminal.exitCode as number : null;
   // 后台终端启动后，exec_command 工具调用本身会先结束；卡片状态仍应跟随真实进程，

@@ -112,6 +112,48 @@ describe('ToolGroupBlock', () => {
     expect(screen.getByText('11172 tests passed')).toBeInTheDocument();
   });
 
+  it('只在展开历史命令卡时读取完整输出', async () => {
+    useStore.setState({ serverPort: '30141' } as never);
+    const fetchMock = vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response(JSON.stringify({
+      id: 'deferred-output-1',
+      kind: 'tool_output',
+      content: '完整输出末尾',
+    }), { status: 200, headers: { 'Content-Type': 'application/json' } }));
+
+    render(
+      <ToolGroupBlock
+        collapsed={false}
+        sessionPath="/session/heavy.jsonl"
+        tools={[{
+          id: 'call-heavy',
+          name: 'exec_command',
+          args: { cmd: 'npm test' },
+          done: true,
+          success: true,
+          details: {
+            output: '输出预览',
+            outputDeferred: {
+              id: 'deferred-output-1',
+              kind: 'tool_output',
+              size: 9_000,
+              available: true,
+            },
+            execCommand: { tty: false, exitCode: 0 },
+          },
+        }]}
+      />,
+    );
+
+    expect(fetchMock).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole('button', { name: 'npm test' }));
+
+    await waitFor(() => {
+      expect(screen.getByText('完整输出末尾')).toBeInTheDocument();
+    });
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(String(fetchMock.mock.calls[0][0])).toContain('/api/sessions/content/deferred-output-1');
+  });
+
   it('renders a model read of SKILL.md as a full-width expandable skill card', () => {
     window.t = ((key: string, vars?: Record<string, unknown>) => {
       const name = String(vars?.name || '');

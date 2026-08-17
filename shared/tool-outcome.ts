@@ -6,10 +6,12 @@ export type ToolOutcome = {
   error?: string;
   details?: {
     output?: string;
+    outputDeferred?: unknown;
     execCommand?: Record<string, unknown>;
     skillInvocation?: {
       content: string;
       truncated?: boolean;
+      deferred?: unknown;
     };
   };
 };

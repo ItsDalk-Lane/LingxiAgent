@@ -16,6 +16,8 @@ import {
 } from '../../stores/stream-invalidator';
 import { useStore } from '../../stores';
 import type { ChatListItem, ChatMessage } from '../../stores/chat-types';
+import { readLiveAssistantMessage } from '../../stores/live-turn-store';
+import { buildItemsFromHistory } from '../../utils/history-builder';
 
 const PATH = '/test/session.jsonl';
 const MOVED_PATH = '/test/moved-session.jsonl';
@@ -42,7 +44,9 @@ function lastRole(): string | undefined {
 
 function getAssistantMessage(): ChatMessage | null {
   const item = getItems().find((entry) => entry.type === 'message' && entry.data.role === 'assistant');
-  return item?.type === 'message' ? item.data : null;
+  if (item?.type !== 'message') return null;
+  const live = readLiveAssistantMessage(PATH, item.data.id);
+  return live ? { ...item.data, blocks: [...live.blocks] } : item.data;
 }
 
 function getThinkingBlock() {
@@ -124,8 +128,8 @@ describe('streamBufferManager.snapshot', () => {
     streamBufferManager.finishTurn(PATH);
 
     expect(getAssistantMessage()?.blocks).toMatchObject([
-      { type: 'text', source: '先读取技能。' },
       { type: 'tool_group', tools: [{ id: 'call-skill', name: 'read', done: true }] },
+      { type: 'text', source: '先读取技能。' },
       { type: 'text', source: '技能读取完成。' },
     ]);
   });
@@ -142,6 +146,7 @@ describe('streamBufferManager.snapshot', () => {
     streamBufferManager.handle({ type: 'text_delta', sessionPath: PATH, delta: 'reply' });
     const assistantBefore = getAssistantMessage();
     expect(assistantBefore?.sourceEntryId).toBeUndefined();
+    expect(assistantBefore?.blocks?.[0]?.id).toBe(`${assistantBefore?.id}:text:0`);
 
     streamBufferManager.handle({
       type: 'turn_end',
@@ -155,6 +160,7 @@ describe('streamBufferManager.snapshot', () => {
     expect(items[0]?.type === 'message' ? items[0].data.sourceEntryId : null).toBe('entry-user-1');
     expect(getAssistantMessage()?.sourceEntryId).toBe('entry-assistant-1');
     expect(getAssistantMessage()?.turnInputEntryId).toBe('entry-user-1');
+    expect(getAssistantMessage()?.blocks?.[0]?.id).toBe('entry-assistant-1:text:0');
   });
 
   it('turn_end never overwrites a visible user with a hidden background input id', () => {
@@ -178,6 +184,180 @@ describe('streamBufferManager.snapshot', () => {
       sourceEntryId: 'entry-background-assistant',
       turnInputEntryId: 'entry-hidden-background-input',
     });
+  });
+
+  it.each([
+    ['failed', { failed: true }, 'failed'],
+    ['aborted', { aborted: true }, 'aborted'],
+  ] as const)('空的 %s 回合仍提交可见状态消息', (_label, flags, status) => {
+    streamBufferManager.handle({
+      type: 'turn_end',
+      sessionPath: PATH,
+      turnInputEntryId: 'entry-user-1',
+      userEntryId: 'entry-user-1',
+      assistantEntryId: `entry-assistant-${status}`,
+      assistantEntryIds: [`entry-assistant-${status}`],
+      ...flags,
+    });
+
+    expect(getAssistantMessage()).toMatchObject({
+      sourceEntryId: `entry-assistant-${status}`,
+      turnProjection: { status },
+      blocks: [{ type: 'turn_status', status, surfaceRole: 'result' }],
+    });
+  });
+
+  it('统一助手分段只写当前回合语义状态，不改结构消息内容', () => {
+    streamBufferManager.handle({
+      type: 'assistant_segment_start',
+      sessionPath: PATH,
+      segmentId: 'assistant:1:text:0',
+      kind: 'text',
+      semanticPhase: 'unresolved',
+    });
+    streamBufferManager.handle({
+      type: 'assistant_segment_delta',
+      sessionPath: PATH,
+      segmentId: 'assistant:1:text:0',
+      delta: '内部过程',
+      semanticPhase: 'unresolved',
+    });
+    streamBufferManager.handle({
+      type: 'assistant_segment_end',
+      sessionPath: PATH,
+      segmentId: 'assistant:1:text:0',
+      semanticPhase: 'commentary',
+    });
+
+    const assistant = getItems().find((item) => item.type === 'message' && item.data.role === 'assistant');
+    expect(assistant?.type).toBe('message');
+    if (assistant?.type !== 'message') throw new Error('expected assistant seat');
+    expect(assistant.data.blocks).toEqual([]);
+    expect(readLiveAssistantMessage(PATH, assistant.data.id)).toMatchObject({
+      segmentOrder: ['assistant:1:text:0'],
+      status: 'streaming',
+      segmentsById: {
+        'assistant:1:text:0': {
+          id: 'assistant:1:text:0',
+          kind: 'text',
+          semanticPhase: 'commentary',
+          source: '内部过程',
+          lifecycle: 'sealed',
+        },
+      },
+    });
+  });
+
+  it('语义流收口后的内容块与历史重载逐字段相等', () => {
+    const commentaryId = 'assistant:1:text:0';
+    const answerId = 'assistant:2:text:0';
+    streamBufferManager.handle({
+      type: 'assistant_segment_start',
+      sessionPath: PATH,
+      segmentId: commentaryId,
+      kind: 'text',
+      semanticPhase: 'commentary',
+    });
+    streamBufferManager.handle({
+      type: 'assistant_segment_delta',
+      sessionPath: PATH,
+      segmentId: commentaryId,
+      delta: '内部检查',
+      semanticPhase: 'commentary',
+    });
+    streamBufferManager.handle({
+      type: 'assistant_segment_end',
+      sessionPath: PATH,
+      segmentId: commentaryId,
+      semanticPhase: 'commentary',
+    });
+    streamBufferManager.handle({
+      type: 'tool_start',
+      sessionPath: PATH,
+      id: 'call-read',
+      name: 'read',
+      args: { path: '/tmp/a.md' },
+    });
+    streamBufferManager.handle({
+      type: 'tool_end',
+      sessionPath: PATH,
+      id: 'call-read',
+      name: 'read',
+      success: true,
+      status: 'succeeded',
+    });
+    streamBufferManager.handle({
+      type: 'assistant_segment_start',
+      sessionPath: PATH,
+      segmentId: answerId,
+      kind: 'text',
+      semanticPhase: 'final_answer',
+    });
+    streamBufferManager.handle({
+      type: 'assistant_segment_delta',
+      sessionPath: PATH,
+      segmentId: answerId,
+      delta: '最终答复',
+      semanticPhase: 'final_answer',
+    });
+    streamBufferManager.handle({
+      type: 'assistant_segment_end',
+      sessionPath: PATH,
+      segmentId: answerId,
+      semanticPhase: 'final_answer',
+    });
+    // 服务端兼容旧前端仍会发旧文字事件；新投影不能因此重复显示答案。
+    streamBufferManager.handle({ type: 'text_delta', sessionPath: PATH, delta: '最终答复' });
+    streamBufferManager.handle({
+      type: 'turn_end',
+      sessionPath: PATH,
+      turnInputEntryId: 'entry-user-1',
+      userEntryId: 'entry-user-1',
+      assistantEntryId: 'entry-assistant-2',
+      assistantEntryIds: ['entry-assistant-1', 'entry-assistant-2'],
+    });
+
+    const live = getAssistantMessage();
+    const reloadedItems = buildItemsFromHistory({
+      messages: [{
+        id: '1',
+        entryId: 'entry-assistant-1',
+        role: 'assistant',
+        content: '',
+        turnInputEntryId: 'entry-user-1',
+        assistantSegments: [{
+          id: commentaryId,
+          kind: 'text',
+          semanticPhase: 'commentary',
+          source: '内部检查',
+          lifecycle: 'sealed',
+        }],
+        toolCalls: [{
+          id: 'call-read',
+          name: 'read',
+          args: { path: '/tmp/a.md' },
+          status: 'succeeded',
+        }],
+      }, {
+        id: '2',
+        entryId: 'entry-assistant-2',
+        role: 'assistant',
+        content: '最终答复',
+        turnInputEntryId: 'entry-user-1',
+        assistantSegments: [{
+          id: answerId,
+          kind: 'text',
+          semanticPhase: 'final_answer',
+          source: '最终答复',
+          lifecycle: 'sealed',
+        }],
+      }],
+    });
+    const reloaded = reloadedItems[0];
+    expect(reloaded.type).toBe('message');
+    if (!live || reloaded.type !== 'message') throw new Error('expected assistant messages');
+    expect(live.blocks).toEqual(reloaded.data.blocks);
+    expect(live.turnProjection).toEqual(reloaded.data.turnProjection);
   });
 });
 
@@ -254,7 +434,8 @@ describe('streamBufferManager.mood 多段聚合', () => {
     const assistants = getItems().filter((i): i is ChatListItem & { type: 'message' } =>
       i.type === 'message' && i.data.role === 'assistant');
     const last = assistants[assistants.length - 1];
-    const lastMood = last?.data.blocks?.find((b) => b.type === 'mood');
+    const lastLive = last ? readLiveAssistantMessage(PATH, last.data.id) : null;
+    const lastMood = lastLive?.blocks.find((b) => b.type === 'mood');
     expect(lastMood?.text).toBe('BBB');
     // 上一条仍保留 AAA，互不串扰
     const firstMood = assistants[0]?.data.blocks?.find((b) => b.type === 'mood');
@@ -285,13 +466,37 @@ describe('streamBufferManager.thinking 流式刷新', () => {
       streamBufferManager.handle({ type: 'thinking_delta', sessionPath: PATH, delta: '第一段思考' });
 
       const beforeFlush = getThinkingBlock();
-      expect(beforeFlush).toEqual({ type: 'thinking', content: '', sealed: false });
+      expect(beforeFlush).toEqual({
+        type: 'thinking',
+        id: expect.stringMatching(/:thinking:0$/),
+        content: '',
+        sealed: false,
+        lifecycle: 'streaming',
+        semanticPhase: 'reasoning',
+        surfaceRole: 'process',
+      });
 
       vi.advanceTimersByTime(32);
-      expect(getThinkingBlock()).toEqual({ type: 'thinking', content: '', sealed: false });
+      expect(getThinkingBlock()).toEqual({
+        type: 'thinking',
+        id: expect.stringMatching(/:thinking:0$/),
+        content: '',
+        sealed: false,
+        lifecycle: 'streaming',
+        semanticPhase: 'reasoning',
+        surfaceRole: 'process',
+      });
 
       vi.advanceTimersByTime(1);
-      expect(getThinkingBlock()).toEqual({ type: 'thinking', content: '第一段思考', sealed: false });
+      expect(getThinkingBlock()).toEqual({
+        type: 'thinking',
+        id: expect.stringMatching(/:thinking:0$/),
+        content: '第一段思考',
+        sealed: false,
+        lifecycle: 'streaming',
+        semanticPhase: 'reasoning',
+        surfaceRole: 'process',
+      });
     } finally {
       streamBufferManager.clearAll();
       vi.useRealTimers();
@@ -300,10 +505,26 @@ describe('streamBufferManager.thinking 流式刷新', () => {
 
   it('空 thinking 结束后保留 sealed 完成态，而不是消失或停在活跃态', () => {
     streamBufferManager.handle({ type: 'thinking_start', sessionPath: PATH });
-    expect(getThinkingBlock()).toEqual({ type: 'thinking', content: '', sealed: false });
+    expect(getThinkingBlock()).toEqual({
+      type: 'thinking',
+      id: expect.stringMatching(/:thinking:0$/),
+      content: '',
+      sealed: false,
+      lifecycle: 'streaming',
+      semanticPhase: 'reasoning',
+      surfaceRole: 'process',
+    });
 
     streamBufferManager.handle({ type: 'thinking_end', sessionPath: PATH });
-    expect(getThinkingBlock()).toEqual({ type: 'thinking', content: '', sealed: true });
+    expect(getThinkingBlock()).toEqual({
+      type: 'thinking',
+      id: expect.stringMatching(/:thinking:0$/),
+      content: '',
+      sealed: true,
+      lifecycle: 'sealed',
+      semanticPhase: 'reasoning',
+      surfaceRole: 'process',
+    });
   });
 });
 
@@ -327,7 +548,7 @@ describe('streamBufferManager.ensureMessage 自愈', () => {
     expect(lastRole()).toBe('assistant');
   });
 
-  it('text block keeps source markdown for display-only streaming effects', () => {
+  it('text block keeps source markdown without pre-rendering canonical html', () => {
     streamBufferManager.handle({ type: 'text_delta', sessionPath: PATH, delta: '**你好**' });
 
     const textBlock = getAssistantMessage()?.blocks?.find((block) => block.type === 'text');
@@ -335,7 +556,7 @@ describe('streamBufferManager.ensureMessage 自愈', () => {
       type: 'text',
       source: '**你好**',
     });
-    expect(textBlock && 'html' in textBlock ? textBlock.html : '').toContain('<strong>');
+    expect(textBlock && 'html' in textBlock).toBe(false);
   });
 
   it('initSession 覆盖同 path 后，后续 tool 事件仍绑定回原 assistant 消息', () => {
@@ -359,7 +580,8 @@ describe('streamBufferManager.ensureMessage 自愈', () => {
     expect(last.type).toBe('message');
     if (last.type !== 'message') throw new Error('expected assistant message');
     expect(last.data.id).toBe(assistantId);
-    expect(last.data.blocks?.some((block: { type: string }) => block.type === 'tool_group')).toBe(true);
+    expect(readLiveAssistantMessage(PATH, last.data.id)?.blocks
+      .some((block) => block.type === 'tool_group')).toBe(true);
   });
 
   it('keeps in-flight turn state attached to sessionId when the session path moves', () => {
@@ -388,7 +610,10 @@ describe('streamBufferManager.ensureMessage 自愈', () => {
       .find((item) => item.type === 'message' && item.data.role === 'assistant');
     expect(firstAssistantItem?.type).toBe('message');
     if (firstAssistantItem?.type !== 'message') throw new Error('expected first assistant message');
-    const firstAssistant = firstAssistantItem.data;
+    const firstLive = readLiveAssistantMessage(PATH, firstAssistantItem.data.id);
+    const firstAssistant = firstLive
+      ? { ...firstAssistantItem.data, blocks: [...firstLive.blocks] }
+      : firstAssistantItem.data;
     expect(firstAssistant?.blocks?.find((block) => block.type === 'text')).toMatchObject({
       type: 'text',
       source: 'first',
@@ -548,6 +773,12 @@ describe('streamBufferManager.ensureMessage 自愈', () => {
         filePath: '/tmp/late-generated.png',
       }),
     ]);
+    expect(assistant.data.turnProjection).toMatchObject({
+      processBlockIds: [],
+      answerBlockIds: [],
+      resultBlockIds: [`${assistant.data.id}:file:sf_late_img`],
+      controlBlockIds: [],
+    });
   });
 
   it('显式 pre-reply 幕间不阻塞媒体结果，并按服务端顺序插到下一轮回复前', () => {
@@ -686,7 +917,7 @@ describe('streamBufferManager.ensureMessage 自愈', () => {
     const [workflowMessage] = assistantItems;
     expect(workflowMessage?.type).toBe('message');
     if (workflowMessage?.type !== 'message') throw new Error('expected assistant message');
-    expect(workflowMessage.data.blocks?.map((block) => block.type)).toEqual(['workflow']);
+    expect(workflowMessage.data.blocks?.map((block) => block.type)).toEqual(['workflow', 'turn_status']);
     const replyMessage = assistantItems[1];
     expect(replyMessage?.type).toBe('message');
     if (replyMessage?.type !== 'message') throw new Error('expected reply message');
@@ -759,7 +990,7 @@ describe('streamBufferManager.ensureMessage 自愈', () => {
     expect(workflowMessage?.type).toBe('message');
     if (workflowMessage?.type !== 'message') throw new Error('expected assistant message');
     expect(workflowMessage.data.id).toBe(firstAssistantId);
-    expect(workflowMessage.data.blocks?.map((block) => block.type)).toEqual(['workflow']);
+    expect(workflowMessage.data.blocks?.map((block) => block.type)).toEqual(['workflow', 'turn_status']);
     const replyMessage = assistantItems[1];
     expect(replyMessage?.type).toBe('message');
     if (replyMessage?.type !== 'message') throw new Error('expected reply message');

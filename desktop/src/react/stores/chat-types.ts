@@ -22,6 +22,14 @@ export interface ToolCall {
   details?: { card?: import('../types').PluginCardDetails; [key: string]: unknown };
 }
 
+export interface DeferredHistoryContent {
+  id: string;
+  kind: 'assistant_segment' | 'tool_output' | 'skill_content' | 'screenshot' | 'artifact' | 'inline_image';
+  size: number;
+  preview?: string;
+  available: true;
+}
+
 // ── 用户附件 ──
 
 export interface UserAttachment {
@@ -31,6 +39,7 @@ export interface UserAttachment {
   isDir: boolean;
   base64Data?: string;
   mimeType?: string;
+  deferred?: DeferredHistoryContent;
   presentation?: 'attachment' | 'voice-input' | string;
   listed?: boolean;
   status?: 'available' | 'expired' | string;
@@ -152,6 +161,35 @@ export interface ResourceEnvelope {
 
 // ── 内容块 ──
 
+export type AssistantSemanticPhase = 'reasoning' | 'commentary' | 'mood' | 'tool' | 'final_answer';
+export type ContentSurfaceRole = 'process' | 'answer' | 'result' | 'control';
+export type ContentLifecycle = 'streaming' | 'sealed';
+export type AssistantTurnStatus = 'streaming' | 'completed' | 'failed' | 'aborted';
+
+export interface AssistantTurnProjection {
+  id: string;
+  inputMessageId: string | null;
+  assistantMessageIds: string[];
+  processBlockIds: string[];
+  answerBlockIds: string[];
+  resultBlockIds: string[];
+  controlBlockIds: string[];
+  status: AssistantTurnStatus;
+  startedAt?: number;
+  completedAt?: number;
+}
+
+/**
+ * 新聊天投影使用的统一语义字段。
+ * 字段在兼容期保持可选，旧会话仍可按原形状读取；所有新建内容块会在构建边界补齐。
+ */
+export interface ContentBlockSemantics {
+  id?: string;
+  semanticPhase?: AssistantSemanticPhase;
+  surfaceRole?: ContentSurfaceRole;
+  lifecycle?: ContentLifecycle;
+}
+
 export interface SessionConfirmationBlock {
   type: 'session_confirmation';
   confirmId: string;
@@ -223,19 +261,24 @@ export interface SuggestionCardBlock {
 }
 
 // 物种 A：文本装饰器（流式组装，upsert 到 blocks 数组）
-export type TextDecorator =
-  | { type: 'thinking'; content: string; sealed: boolean }
+export type TextDecorator = ContentBlockSemantics & (
+  | { type: 'thinking'; content: string; sealed: boolean; deferred?: DeferredHistoryContent }
   | { type: 'mood'; yuan: string; text: string }
   | { type: 'tool_group'; tools: ToolCall[]; collapsed: boolean }
-  | { type: 'text'; html: string; source?: string };
+  // COMPAT(v0.128, remove no earlier than v0.133): 旧会话可能只有 html；新块必须写 source。
+  | (
+    | { type: 'text'; source: string; html?: string; deferred?: DeferredHistoryContent }
+    | { type: 'text'; source?: undefined; html: string; deferred?: DeferredHistoryContent }
+  )
+);
 
 // 物种 B：富内容块（通过 content_block 事件 push，不 upsert）
-export type RichBlock =
+export type RichBlock = ContentBlockSemantics & (
   | { type: 'file'; fileId?: string; filePath: string; label: string; ext: string; mime?: string; kind?: string; storageKind?: string; presentation?: 'attachment' | 'voice-input' | string; listed?: boolean; status?: 'available' | 'expired' | string; missingAt?: number | null; resource?: ResourceEnvelope; mtimeMs?: number; size?: number | null; version?: FileVersion | null; waveform?: AudioWaveform; replacesTaskId?: string }
   | { type: 'media_generation'; taskId: string; kind: 'image' | 'video' | string; status: 'pending' | 'failed' | 'aborted' | string; prompt?: string; batchId?: string; reason?: string }
   // COMPAT(create_artifact, remove no earlier than v0.133 after legacy sessions are migrated)
-  | { type: 'artifact'; artifactId: string; artifactType: string; title: string; content: string; language?: string | null; fileId?: string; filePath?: string; label?: string; ext?: string; mime?: string; kind?: string; storageKind?: string; presentation?: 'attachment' | 'voice-input' | string; listed?: boolean; status?: 'available' | 'expired' | string; missingAt?: number | null; resource?: ResourceEnvelope; mtimeMs?: number; size?: number | null; version?: FileVersion | null }
-  | { type: 'screenshot'; base64: string; mimeType: string }
+  | { type: 'artifact'; artifactId: string; artifactType: string; title: string; content: string; deferred?: DeferredHistoryContent; language?: string | null; fileId?: string; filePath?: string; label?: string; ext?: string; mime?: string; kind?: string; storageKind?: string; presentation?: 'attachment' | 'voice-input' | string; listed?: boolean; status?: 'available' | 'expired' | string; missingAt?: number | null; resource?: ResourceEnvelope; mtimeMs?: number; size?: number | null; version?: FileVersion | null }
+  | { type: 'screenshot'; base64?: string; mimeType: string; deferred?: DeferredHistoryContent }
   | { type: 'skill'; skillName: string; skillFilePath: string; fileId?: string; installedFile?: Record<string, unknown>; installedSkillSource?: Record<string, unknown> }
   | { type: 'cron_confirm'; confirmId?: string; jobData: Record<string, unknown>; status: 'pending' | 'approved' | 'rejected' }
   | SuggestionCardBlock
@@ -289,7 +332,13 @@ export type RichBlock =
     finishedAt?: number | null;
   }
   | { type: 'plugin_card'; card: import('../types').PluginCardDetails }
-  | { type: 'interactive_card'; cardId: string; title: string; code: string };
+  | { type: 'interactive_card'; cardId: string; title: string; code: string }
+  | {
+    type: 'turn_status';
+    status: 'missing_final_answer' | 'failed' | 'aborted';
+    label?: string;
+  }
+);
 
 export type ContentBlock = TextDecorator | RichBlock;
 
@@ -320,6 +369,7 @@ export interface ChatMessage {
   origin?: { kind: 'agent'; agentId: string | null; agentName: string | null };
   // Assistant
   blocks?: ContentBlock[];
+  turnProjection?: AssistantTurnProjection;
   // 通用
   timestamp?: number;
 }

@@ -2,11 +2,13 @@
  * chat-slice.ts — Per-session 消息数据 + 滚动位置
  */
 
-import type { ChatListItem, ChatMessage, ContentBlock, SessionMessages, SessionModel, SessionRegistryFile } from './chat-types';
+import type { AssistantTurnProjection, ChatListItem, ChatMessage, ContentBlock, SessionMessages, SessionModel, SessionRegistryFile } from './chat-types';
 import { invalidateSessionCache } from './selectors/file-refs';
 import { invalidateStreamBuffer, invalidateStreamResumeMeta } from './stream-invalidator';
 import { bumpMessageLiveVersion, clearMessageLiveVersion } from './message-live-version';
 import { sessionScopedKey, sessionScopedValue } from './session-slice';
+import { recordChatPerformance } from '../utils/chat-performance';
+import { normalizeContentBlocks, rebaseGeneratedContentBlockIds } from '../utils/content-semantics';
 
 export interface ChatSlice {
   chatSessions: Record<string, SessionMessages>;
@@ -36,6 +38,8 @@ export interface ChatSlice {
     userEntryId?: string | null;
     assistantEntryId?: string | null;
     assistantMessageId?: string | null;
+    assistantBlocks?: ContentBlock[] | null;
+    assistantProjection?: AssistantTurnProjection | null;
   }) => boolean;
   truncateSessionFromMessage: (path: string, messageId: string) => boolean;
   appendInterludeItem: (sessionPath: string, block: Extract<ContentBlock, { type: 'interlude' }>) => boolean;
@@ -273,6 +277,12 @@ export const createChatSlice = (
     );
     if (targetIdx < 0) return false;
 
+    recordChatPerformance('structural_message_update', {
+      sessionPath: path,
+      messageId,
+      itemCount: session.items.length,
+    });
+
     set((s) => {
       const latest = scopedMapValue<SessionMessages>(s as any, s.chatSessions, path);
       if (!latest) return {};
@@ -306,7 +316,9 @@ export const createChatSlice = (
     const assistantMessageId = typeof entries?.assistantMessageId === 'string' && entries.assistantMessageId.trim()
       ? entries.assistantMessageId.trim()
       : null;
-    if (!turnInputEntryId && !userEntryId && !assistantEntryId) return false;
+    const assistantBlocks = Array.isArray(entries?.assistantBlocks) ? entries.assistantBlocks : null;
+    const assistantProjection = entries?.assistantProjection || null;
+    if (!turnInputEntryId && !userEntryId && !assistantEntryId && !assistantBlocks && !assistantProjection) return false;
 
     let changed = false;
     set((s) => {
@@ -321,18 +333,43 @@ export const createChatSlice = (
           ))
         : -1;
 
-      if ((assistantEntryId || turnInputEntryId) && assistantIndex >= 0) {
+      if ((assistantEntryId || turnInputEntryId || assistantBlocks || assistantProjection) && assistantIndex >= 0) {
         const assistant = items[assistantIndex];
         if (assistant.type === 'message' && (
           (assistantEntryId && assistant.data.sourceEntryId !== assistantEntryId)
           || (turnInputEntryId && assistant.data.turnInputEntryId !== turnInputEntryId)
+          || assistantBlocks !== null
+          || assistantProjection !== null
         )) {
+          const previousBlockIdPrefix = assistant.data.sourceEntryId || assistant.data.id;
+          if (assistantBlocks) {
+            recordChatPerformance('structural_message_update', {
+              sessionPath: path,
+              messageId: assistant.data.id,
+              itemCount: session.items.length,
+            });
+          }
           items[assistantIndex] = {
             type: 'message',
             data: {
               ...assistant.data,
               ...(assistantEntryId ? { sourceEntryId: assistantEntryId } : {}),
               ...(turnInputEntryId ? { turnInputEntryId } : {}),
+              ...(assistantEntryId && assistant.data.blocks ? {
+                blocks: rebaseGeneratedContentBlockIds(
+                  assistant.data.blocks,
+                  previousBlockIdPrefix,
+                  assistantEntryId,
+                ),
+              } : {}),
+              ...(assistantBlocks ? {
+                blocks: rebaseGeneratedContentBlockIds(
+                  assistantBlocks,
+                  previousBlockIdPrefix,
+                  assistantEntryId || previousBlockIdPrefix,
+                ),
+              } : {}),
+              ...(assistantProjection ? { turnProjection: assistantProjection } : {}),
             },
           };
           changed = true;
@@ -463,9 +500,35 @@ export const createChatSlice = (
           return {};
         }
 
-        const nextBlocks = [...blocks];
-        nextBlocks[blockIdx] = resolution;
-        items[i] = { ...item, data: { ...item.data, blocks: nextBlocks } };
+        const idPrefix = item.data.sourceEntryId || item.data.id;
+        const normalizedResolution = normalizeContentBlocks([resolution], {
+          idPrefix,
+          turnLifecycle: 'sealed',
+        })[0];
+        let nextBlocks = [...blocks];
+        nextBlocks[blockIdx] = normalizedResolution;
+        if (normalizedResolution.surfaceRole === 'result') {
+          nextBlocks = nextBlocks.filter((block) => !(
+            block.type === 'turn_status' && block.status === 'missing_final_answer'
+          ));
+        }
+        const turnProjection = item.data.turnProjection
+          ? {
+              ...item.data.turnProjection,
+              processBlockIds: nextBlocks.filter((block) => block.surfaceRole === 'process').map((block) => block.id!),
+              answerBlockIds: nextBlocks.filter((block) => block.surfaceRole === 'answer').map((block) => block.id!),
+              resultBlockIds: nextBlocks.filter((block) => block.surfaceRole === 'result').map((block) => block.id!),
+              controlBlockIds: nextBlocks.filter((block) => block.surfaceRole === 'control').map((block) => block.id!),
+            }
+          : undefined;
+        items[i] = {
+          ...item,
+          data: {
+            ...item.data,
+            blocks: nextBlocks,
+            ...(turnProjection ? { turnProjection } : {}),
+          },
+        };
         invalidateSessionCache(sessionPath);
         return {
           chatSessions: putScopedMapValue(s as any, s.chatSessions, sessionPath, { ...session, items }),

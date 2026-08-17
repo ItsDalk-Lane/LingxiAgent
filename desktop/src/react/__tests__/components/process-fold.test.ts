@@ -39,6 +39,188 @@ function textBlock(html = '<p>完成</p>', source?: string): ContentBlock {
 }
 
 describe('process fold grouping', () => {
+  it('按显式四区把单条回合里的长过程折叠，并让短最终答复保持外显', () => {
+    const longCommentary = '持续检查过程。'.repeat(300);
+    const processText: ContentBlock = {
+      id: 'a1:commentary',
+      type: 'text',
+      html: `<p>${longCommentary}</p>`,
+      source: longCommentary,
+      semanticPhase: 'commentary',
+      surfaceRole: 'process',
+      lifecycle: 'sealed',
+    };
+    const execBlock: ContentBlock = {
+      id: 'a1:exec',
+      type: 'tool_group',
+      tools: [{
+        id: 'call-exec',
+        name: 'exec_command',
+        args: { cmd: 'npm test' },
+        done: true,
+        success: true,
+      }],
+      collapsed: false,
+      semanticPhase: 'tool',
+      surfaceRole: 'process',
+      lifecycle: 'sealed',
+    };
+    const answer: ContentBlock = {
+      id: 'a1:answer',
+      type: 'text',
+      html: '<p>测试通过。</p>',
+      source: '测试通过。',
+      semanticPhase: 'final_answer',
+      surfaceRole: 'answer',
+      lifecycle: 'sealed',
+    };
+    const turn = assistant('a1', [processText, execBlock, answer]);
+    if (turn.type !== 'message') throw new Error('expected assistant');
+    turn.data.turnProjection = {
+      id: 'a1:turn',
+      inputMessageId: 'u1',
+      assistantMessageIds: ['a1'],
+      processBlockIds: ['a1:commentary', 'a1:exec'],
+      answerBlockIds: ['a1:answer'],
+      resultBlockIds: [],
+      controlBlockIds: [],
+      status: 'completed',
+    };
+
+    const rendered = buildTranscriptRenderItems([user('u1'), turn], { isStreaming: false });
+
+    expect(rendered.map((item) => item.type)).toEqual(['source', 'process_fold', 'source']);
+    expect(rendered[1]).toMatchObject({
+      type: 'process_fold',
+      id: 'a1:turn:process',
+      turnId: 'a1:turn',
+      blockIds: ['a1:commentary', 'a1:exec'],
+      status: 'completed',
+      defaultCollapsed: true,
+      items: [{ item: { data: { blocks: [processText, execBlock] } } }],
+    });
+    expect(rendered[2]).toMatchObject({
+      type: 'source',
+      item: { data: { blocks: [answer] } },
+    });
+  });
+
+  it('单个过程块也形成稳定过程组，不再依赖消息数量', () => {
+    const processBlock: ContentBlock = {
+      id: 'a1:thinking',
+      type: 'thinking',
+      content: '只思考了一次',
+      sealed: true,
+      semanticPhase: 'reasoning',
+      surfaceRole: 'process',
+      lifecycle: 'sealed',
+    };
+    const turn = assistant('a1', [processBlock]);
+    if (turn.type !== 'message') throw new Error('expected assistant');
+    turn.data.turnProjection = {
+      id: 'a1:turn',
+      inputMessageId: 'u1',
+      assistantMessageIds: ['a1'],
+      processBlockIds: ['a1:thinking'],
+      answerBlockIds: [],
+      resultBlockIds: [],
+      controlBlockIds: [],
+      status: 'completed',
+    };
+
+    expect(buildTranscriptRenderItems([user('u1'), turn], { isStreaming: false })).toMatchObject([
+      { type: 'source' },
+      {
+        type: 'process_fold',
+        id: 'a1:turn:process',
+        blockIds: ['a1:thinking'],
+        ownsTurnCompletion: true,
+      },
+    ]);
+  });
+
+  it('结果和待操作卡始终留在过程组外', () => {
+    const processBlock: ContentBlock = {
+      id: 'a1:thinking',
+      type: 'thinking',
+      content: '准备结果',
+      sealed: true,
+      surfaceRole: 'process',
+    };
+    const resultBlock: ContentBlock = {
+      id: 'a1:file',
+      type: 'file',
+      filePath: '/workspace/result.md',
+      label: 'result.md',
+      ext: 'md',
+      surfaceRole: 'result',
+    };
+    const controlBlock: ContentBlock = {
+      id: 'a1:confirm',
+      type: 'session_confirmation',
+      confirmId: 'confirm-1',
+      kind: 'approval',
+      surface: 'message',
+      status: 'pending',
+      title: '是否继续？',
+      surfaceRole: 'control',
+    };
+    const turn = assistant('a1', [processBlock, resultBlock, controlBlock]);
+    if (turn.type !== 'message') throw new Error('expected assistant');
+    turn.data.turnProjection = {
+      id: 'a1:turn',
+      inputMessageId: 'u1',
+      assistantMessageIds: ['a1'],
+      processBlockIds: ['a1:thinking'],
+      answerBlockIds: [],
+      resultBlockIds: ['a1:file'],
+      controlBlockIds: ['a1:confirm'],
+      status: 'completed',
+    };
+
+    const rendered = buildTranscriptRenderItems([user('u1'), turn], { isStreaming: false });
+
+    expect(rendered).toMatchObject([
+      { type: 'source' },
+      { type: 'process_fold', items: [{ item: { data: { blocks: [processBlock] } } }] },
+      { type: 'source', item: { data: { blocks: [resultBlock, controlBlock] } } },
+    ]);
+  });
+
+  it.each(['failed', 'aborted'] as const)('%s 回合的过程组默认展开并保留失败状态', (status) => {
+    const processBlock: ContentBlock = {
+      id: `a1:${status}:thinking`,
+      type: 'thinking',
+      content: '执行过程',
+      sealed: true,
+      surfaceRole: 'process',
+    };
+    const statusBlock: ContentBlock = {
+      id: `a1:${status}:status`,
+      type: 'turn_status',
+      status,
+      surfaceRole: 'result',
+    };
+    const turn = assistant('a1', [processBlock, statusBlock]);
+    if (turn.type !== 'message') throw new Error('expected assistant');
+    turn.data.turnProjection = {
+      id: `a1:${status}:turn`,
+      inputMessageId: 'u1',
+      assistantMessageIds: ['a1'],
+      processBlockIds: [processBlock.id!],
+      answerBlockIds: [],
+      resultBlockIds: [statusBlock.id!],
+      controlBlockIds: [],
+      status,
+    };
+
+    expect(buildTranscriptRenderItems([user('u1'), turn], { isStreaming: false })[1]).toMatchObject({
+      type: 'process_fold',
+      status,
+      defaultCollapsed: false,
+    });
+  });
+
   it('folds consecutive process-only assistant messages into one render item', () => {
     const items: ChatListItem[] = [
       user('u1'),
@@ -63,17 +245,17 @@ describe('process fold grouping', () => {
     expect(rendered[2]).toMatchObject({ type: 'source', item: items[4] });
   });
 
-  it('does not treat assistant messages that contain mood, pulse, or reflect as foldable process', () => {
+  it('treats mood as process semantics instead of a fold exclusion', () => {
     const moodMessage: ChatMessage = {
       id: 'mood',
       role: 'assistant',
       blocks: [thinking(), { type: 'mood', yuan: 'butter', text: 'PULSE' }],
     };
 
-    expect(isProcessOnlyAssistantMessage(moodMessage)).toBe(false);
+    expect(isProcessOnlyAssistantMessage(moodMessage)).toBe(true);
   });
 
-  it('never hides a model skill invocation inside the outer process fold', () => {
+  it('allows a model skill invocation to join the process fold', () => {
     const skillMessage: ChatMessage = {
       id: 'skill',
       role: 'assistant',
@@ -85,46 +267,40 @@ describe('process fold grouping', () => {
       }])],
     };
 
-    expect(isProcessOnlyAssistantMessage(skillMessage)).toBe(false);
+    expect(isProcessOnlyAssistantMessage(skillMessage)).toBe(true);
     const items: ChatListItem[] = [
       user('u1'),
       assistant('a1', [thinking(), toolGroup([tool('read')])]),
       { type: 'message', data: skillMessage },
       assistant('a3', [thinking(), toolGroup([tool('grep')])]),
     ];
-    expect(buildTranscriptRenderItems(items, { isStreaming: false }).map((item) => item.type)).toEqual([
-      'source',
-      'source',
-      'source',
-      'source',
+    expect(buildTranscriptRenderItems(items, { isStreaming: false })).toMatchObject([
+      { type: 'source' },
+      { type: 'process_fold', items: [{}, {}, {}] },
     ]);
   });
 
-  it('never folds messages whose exec_command card hosts a persistent terminal', () => {
-    // 折叠会卸载 ExecCommandCard 子树，右栏「点终端标题跳回卡片」的 listener 随之消失，
-    // 点击变成无反馈的死点击——与 skill invocation 一样排除在可折叠之外。
+  it('allows exec_command to join the process fold with stable navigation anchors', () => {
     const execMessage: ChatMessage = {
       id: 'exec',
       role: 'assistant',
       blocks: [toolGroup([{ name: 'exec_command', args: { cmd: 'npm run dev' }, done: true, success: true }])],
     };
 
-    expect(isProcessOnlyAssistantMessage(execMessage)).toBe(false);
+    expect(isProcessOnlyAssistantMessage(execMessage)).toBe(true);
     const items: ChatListItem[] = [
       user('u1'),
       assistant('a1', [thinking(), toolGroup([tool('read')])]),
       { type: 'message', data: execMessage },
       assistant('a3', [thinking(), toolGroup([tool('grep')])]),
     ];
-    expect(buildTranscriptRenderItems(items, { isStreaming: false }).map((item) => item.type)).toEqual([
-      'source',
-      'source',
-      'source',
-      'source',
+    expect(buildTranscriptRenderItems(items, { isStreaming: false })).toMatchObject([
+      { type: 'source' },
+      { type: 'process_fold', items: [{}, {}, {}] },
     ]);
   });
 
-  it('keeps an exec_command message with short narration out of the process fold', () => {
+  it('folds exec_command while keeping its legacy narration outside as answer text', () => {
     const items: ChatListItem[] = [
       user('u1'),
       assistant('a1', [thinking(), toolGroup([tool('read')])]),
@@ -146,8 +322,8 @@ describe('process fold grouping', () => {
       'source',
       'source',
     ]);
-    expect(rendered[1]).toMatchObject({ id: 'process-fold-a1-a2b' });
-    expect(rendered[2]).toMatchObject({ type: 'source', item: items[4] });
+    expect(rendered[1]).toMatchObject({ id: 'process-fold-a1-a3' });
+    expect(rendered[2]).toMatchObject({ type: 'source', item: { data: { id: 'a3' } } });
   });
 
   it('does not throw or fold malformed tool_group blocks', () => {
@@ -184,7 +360,7 @@ describe('process fold grouping', () => {
     });
   });
 
-  it('folds short process narration before the final answer', () => {
+  it('does not use short text as a process heuristic for legacy messages', () => {
     const items: ChatListItem[] = [
       user('u1'),
       assistant('a1', [
@@ -210,17 +386,19 @@ describe('process fold grouping', () => {
 
     const rendered = buildTranscriptRenderItems(items, { isStreaming: false });
 
-    expect(rendered).toHaveLength(3);
+    expect(rendered).toHaveLength(6);
     expect(rendered[1]).toMatchObject({
       type: 'process_fold',
-      id: 'process-fold-a1-a3',
+      id: 'process-fold-a1-a4',
       stats: {
         toolCount: 3,
-        thinkingCount: 3,
+        thinkingCount: 4,
         unsuccessfulCount: 1,
       },
     });
-    expect(rendered[2]).toMatchObject({ type: 'source', item: items[4] });
+    expect(rendered.slice(2).map((item) => (
+      item.type === 'source' && item.item.type === 'message' ? item.item.data.id : null
+    ))).toEqual(['a1', 'a2', 'a3', 'a4']);
   });
 
   it('does not count card-backed tool calls in process fold stats', () => {
@@ -271,14 +449,14 @@ describe('process fold grouping', () => {
       'source',
       'process_fold',
       'source',
-      'source',
+      'process_fold',
       'source',
     ]);
     expect(rendered[1]).toMatchObject({ id: 'process-fold-a1-a3' });
     expect(rendered[2]).toMatchObject({ type: 'source', item: items[4] });
   });
 
-  it('never folds process-only messages across hidden custom turn inputs', () => {
+  it('creates separate process groups across hidden custom turn inputs', () => {
     const items: ChatListItem[] = [
       user('u1'),
       assistant('a1', [thinking(), toolGroup([tool('read')])], 'hidden-input-1'),
@@ -289,10 +467,15 @@ describe('process fold grouping', () => {
     const rendered = buildTranscriptRenderItems(items, { isStreaming: false });
 
     expect(rendered).toHaveLength(4);
-    expect(rendered.every((item) => item.type === 'source')).toBe(true);
+    expect(rendered.map((item) => item.type)).toEqual([
+      'source',
+      'process_fold',
+      'process_fold',
+      'process_fold',
+    ]);
   });
 
-  it('protects the final short narration of every hidden custom turn', () => {
+  it('keeps legacy final text outside each hidden-turn process group', () => {
     const shortFinal = (label: string) => [
       thinking(),
       textBlock(`<p>${label}</p>`, label),
@@ -311,10 +494,15 @@ describe('process fold grouping', () => {
     const rendered = buildTranscriptRenderItems(items, { isStreaming: false });
 
     expect(rendered).toHaveLength(7);
-    expect(rendered.every((item) => item.type === 'source')).toBe(true);
+    expect(rendered.map((item) => item.type)).toEqual([
+      'source',
+      'process_fold', 'source',
+      'process_fold', 'source',
+      'process_fold', 'source',
+    ]);
   });
 
-  it('keeps long middle text visible instead of treating it as process narration', () => {
+  it('keeps legacy text visible regardless of length while folding its process blocks', () => {
     const longText = '这段内容已经接近真正的阶段性说明，包含足够多的细节和判断，读者刷新页面以后也应该直接看见它。'.repeat(5);
     const items: ChatListItem[] = [
       user('u1'),
@@ -334,14 +522,13 @@ describe('process fold grouping', () => {
 
     expect(rendered.map((item) => item.type)).toEqual([
       'source',
-      'source',
-      'source',
       'process_fold',
       'source',
+      'source',
     ]);
-    expect(rendered[1]).toMatchObject({ type: 'source', item: items[1] });
-    expect(rendered[2]).toMatchObject({ type: 'source', item: items[2] });
-    expect(rendered[3]).toMatchObject({ id: 'process-fold-a3-a5' });
+    expect(rendered[1]).toMatchObject({ id: 'process-fold-a1-a5' });
+    expect(rendered[2]).toMatchObject({ type: 'source', item: { data: { id: 'a2' } } });
+    expect(rendered[3]).toMatchObject({ type: 'source', item: { data: { id: 'a6' } } });
   });
 
   it('leaves the current trailing process segment expanded while the session is streaming', () => {

@@ -1,5 +1,4 @@
 import type { ContentBlock, ToolCall } from '../stores/chat-types';
-import { renderMarkdown } from './markdown';
 import { parseCardFromContent, parseMoodFromContent } from './message-parser';
 import { skillInvocationName } from '../../../../shared/tool-outcome.ts';
 
@@ -17,7 +16,6 @@ interface AssistantBlockInput {
     details?: Record<string, unknown>;
   }> | null;
   extraBlocks?: ContentBlock[] | null;
-  includeTextSource?: boolean;
 }
 
 export function buildAssistantBlocksFromContent({
@@ -25,7 +23,6 @@ export function buildAssistantBlocksFromContent({
   thinking = null,
   toolCalls = null,
   extraBlocks = null,
-  includeTextSource = false,
 }: AssistantBlockInput): ContentBlock[] {
   const blocks: ContentBlock[] = [];
   const skillToolCalls = toolCalls?.filter((toolCall) => !!skillInvocationName({
@@ -70,8 +67,7 @@ export function buildAssistantBlocksFromContent({
   if (mainText) {
     blocks.push({
       type: 'text',
-      html: renderMarkdown(mainText),
-      ...(includeTextSource ? { source: mainText } : {}),
+      source: mainText,
     });
   }
 
