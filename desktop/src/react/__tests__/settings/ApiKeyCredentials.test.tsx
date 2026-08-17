@@ -501,4 +501,91 @@ describe('ApiKeyCredentials', () => {
     ));
     expect(screen.getByRole('button', { name: 'Anthropic Messages' })).toBeInTheDocument();
   });
+
+  it('saves the key even when remote verification fails (preset setup must not deadlock)', async () => {
+    // preset 首次保存若以远端探测成功为前提，探测不可达时 provider 永远不落盘，
+    // setup 状态退不出去（Base URL/Headers 一直锁死），key 也随刷新丢失。
+    const onRefresh = vi.fn(async () => {});
+    const { container } = render(
+      <ApiKeyCredentials
+        providerId="deepseek"
+        summary={providerSummary({})}
+        isPresetSetup
+        onRefresh={onRefresh}
+      />,
+    );
+
+    const keyInput = container.querySelector('input[type="password"]')!;
+    await waitFor(() => expect(keyInput).toBeEnabled());
+    fireEvent.change(keyInput, { target: { value: 'sk-typed-but-unreachable' } });
+    // 点击验证按钮（保存 + 验证）；远端探测失败
+    mocks.lingxiFetch.mockImplementation((url: unknown) => {
+      if (String(url) === '/api/providers/test') {
+        return Promise.resolve(jsonResponse({ ok: false, error: 'HTTP 401' }));
+      }
+      return Promise.resolve(jsonResponse({ ok: true }));
+    });
+    fireEvent.click(container.querySelector('button[title="settings.providers.verifyConnection"]')!);
+
+    await waitFor(() => expect(mocks.lingxiFetch).toHaveBeenCalledWith(
+      '/api/config',
+      expect.objectContaining({
+        method: 'PUT',
+        body: JSON.stringify({
+          providers: {
+            deepseek: {
+              base_url: 'https://api.deepseek.com',
+              api_key: 'sk-typed-but-unreachable',
+              api: 'openai-completions',
+              models: [],
+            },
+          },
+        }),
+      }),
+    ));
+    // 验证失败如实提示，但凭证已经落盘
+    await waitFor(() => expect(useSettingsStore.getState().toastMessage).toBe(
+      'settings.providers.verifyFailed',
+    ));
+  });
+
+  it('lets preset setup edit and save the Base URL immediately (gateway/proxy override)', async () => {
+    // 预设 URL 只是默认值：不输 key 也要能先改 Base URL（网关/自建中转场景），
+    // 失焦即保存，不能再等到「加模型」才解锁
+    const onRefresh = vi.fn(async () => {});
+    mocks.lingxiFetch.mockResolvedValue(jsonResponse({ ok: true }));
+    const { container } = render(
+      <ApiKeyCredentials
+        providerId="gemini"
+        summary={providerSummary({
+          display_name: 'Gemini',
+          base_url: 'https://generativelanguage.googleapis.com/v1beta',
+          api: 'google-generative-ai',
+        })}
+        isPresetSetup
+        presetInfo={{
+          label: 'Gemini',
+          value: 'gemini',
+          url: 'https://generativelanguage.googleapis.com/v1beta',
+          api: 'google-generative-ai',
+        }}
+        onRefresh={onRefresh}
+      />,
+    );
+
+    const baseUrlInput = container.querySelector('input[placeholder="https://api.example.com/v1"]') as HTMLInputElement;
+    expect(baseUrlInput.readOnly).toBe(false);
+    fireEvent.change(baseUrlInput, { target: { value: 'https://my-gateway.example.com/v1beta' } });
+    fireEvent.blur(baseUrlInput);
+
+    await waitFor(() => expect(mocks.lingxiFetch).toHaveBeenCalledWith(
+      '/api/config',
+      expect.objectContaining({
+        method: 'PUT',
+        body: JSON.stringify({
+          providers: { gemini: { base_url: 'https://my-gateway.example.com/v1beta' } },
+        }),
+      }),
+    ));
+  });
 });

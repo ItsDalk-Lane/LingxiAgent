@@ -5,6 +5,11 @@ import { t } from "../../lib/i18n.ts";
 import { MediaAdapterRegistry } from "../media-adapter-registry.ts";
 import { createPluginConfigStore, normalizePluginConfigSchema } from "../plugin-config.ts";
 import {
+  buildMediaModelEditPatch,
+  MediaModelEditValidationError,
+  requireExistingMediaModel,
+} from "../../shared/media-model-edit.ts";
+import {
   normalizeImageGenerationConfig,
   normalizeVideoGenerationConfig,
 } from "../preferences-manager.ts";
@@ -1129,6 +1134,12 @@ export class UniversalMediaManager {
     return { ok: true };
   }
 
+  async updateImageProviderModel(providerId, modelId, patch) {
+    await this._updateMediaProviderModel(providerId, IMAGE_CAPABILITY, modelId, patch);
+    await this._onProviderChanged();
+    return { ok: true };
+  }
+
   async removeImageProviderModel(providerId, modelId) {
     this._providers.removeMediaModel(providerId, IMAGE_CAPABILITY, modelId);
     await this._onProviderChanged();
@@ -1141,10 +1152,36 @@ export class UniversalMediaManager {
     return { ok: true };
   }
 
+  async updateVideoProviderModel(providerId, modelId, patch) {
+    await this._updateMediaProviderModel(providerId, VIDEO_CAPABILITY, modelId, patch);
+    await this._onProviderChanged();
+    return { ok: true };
+  }
+
   async removeVideoProviderModel(providerId, modelId) {
     this._providers.removeMediaModel(providerId, VIDEO_CAPABILITY, modelId);
     await this._onProviderChanged();
     return { ok: true };
+  }
+
+  /**
+   * 编辑已添加的媒体模型（PUT 语义：只改 displayName / inputs / outputs，
+   * 模型必须已存在，runtime-discovered 目录不可人工变更）。
+   */
+  async _updateMediaProviderModel(providerId, capability, modelId, patch) {
+    if (this._providers.getRuntimeMediaCapabilitySourceOwner?.(providerId)) {
+      throw new MediaModelEditValidationError(
+        `Runtime-discovered provider "${providerId}" does not allow manual model changes`,
+      );
+    }
+    const existing = requireExistingMediaModel({
+      models: this._providers.getMediaModels(providerId, capability),
+      providerId,
+      modelId,
+      capability,
+    });
+    const safePatch = buildMediaModelEditPatch({ capability, body: patch, existingModel: existing });
+    this._providers.updateMediaModelEntry(providerId, capability, modelId, safePatch);
   }
 
   async transcribeAudio(payload: any = {}) {

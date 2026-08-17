@@ -144,6 +144,17 @@ export function ApiKeyCredentials({ providerId, summary, providerConfig: _provid
       const headers = parseHeaders();
       if (!headers) return;
       const includeHeaders = headersEdited || Object.keys(headers).length > 0;
+      // 先落盘再验证：验证失败不能丢弃用户输入的凭证。preset 首次保存若以
+      // 远端探测成功为前提，探测不可达时 provider 永远不落盘，setup 状态
+      // 退不出去（Base URL/Headers 一直锁死），key 也随刷新丢失。
+      const payload = { ...plan.payload };
+      if (includeHeaders) payload.headers = headers;
+      await saveProviderConfigPatch(providerId, payload);
+      if (isPresetSetup) useSettingsStore.setState({ selectedProviderId: providerId });
+      if (!await refreshAfterSave()) return;
+      setKeyEdited(false);
+      if (urlEdited) setUrlEdited(false);
+      if (headersEdited) setHeadersEdited(false);
       if (verify && plan.shouldVerify) {
         const testRes = await lingxiFetch('/api/providers/test', {
           method: 'POST',
@@ -156,15 +167,7 @@ export function ApiKeyCredentials({ providerId, summary, providerConfig: _provid
           return;
         }
       }
-      const payload = { ...plan.payload };
-      if (includeHeaders) payload.headers = headers;
-      await saveProviderConfigPatch(providerId, payload);
-      if (isPresetSetup) useSettingsStore.setState({ selectedProviderId: providerId });
-      if (!await refreshAfterSave()) return;
       showToast(plan.shouldVerify ? t('settings.providers.verifySuccess') : t('settings.saved'), 'success');
-      setKeyEdited(false);
-      if (urlEdited) setUrlEdited(false);
-      if (headersEdited) setHeadersEdited(false);
     } catch (err: unknown) {
       reportSaveFailure(err);
     } finally {
@@ -255,7 +258,7 @@ export function ApiKeyCredentials({ providerId, summary, providerConfig: _provid
             value={headersText}
             onChange={(value) => { setHeadersText(value); setHeadersEdited(true); setConnStatus('idle'); }}
             onBlur={async () => {
-              if (!headersEdited || isPresetSetup) return;
+              if (!headersEdited) return;
               const headers = parseHeaders();
               if (!headers) return;
               try {
@@ -267,20 +270,21 @@ export function ApiKeyCredentials({ providerId, summary, providerConfig: _provid
                 reportSaveFailure(err);
               }
             }}
-            readOnly={!!isPresetSetup}
           />
         </div>
       </div>
       <div className={styles['pv-cred-row']}>
         <span className={styles['pv-cred-label']}>Base URL</span>
         <div className={styles['pv-cred-url-row']}>
+          {/* 预设 URL 只是默认值：网关/代理场景必须在首次保存前就能改，
+              否则 provider 未落盘时输入框永远只读（setup 死锁） */}
           <input
             className={styles['settings-input']}
             type="text"
             value={urlVal}
             onChange={(e) => { setUrlVal(e.target.value); setUrlEdited(true); }}
             onBlur={async () => {
-              if (!urlEdited || isPresetSetup) return;
+              if (!urlEdited) return;
               const trimmed = urlVal.trim();
               if (trimmed === derivedBaseUrl) { setUrlEdited(false); return; }
               try {
@@ -294,7 +298,6 @@ export function ApiKeyCredentials({ providerId, summary, providerConfig: _provid
             }}
             onKeyDown={(e) => { if (e.key === 'Enter') (e.target as HTMLInputElement).blur(); }}
             placeholder="https://api.example.com/v1"
-            readOnly={!!isPresetSetup}
           />
         </div>
       </div>

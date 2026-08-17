@@ -105,6 +105,7 @@ import { createSlashSystem } from "./slash-commands/index.ts";
 import { AgentManager } from "./agent-manager.ts";
 import { sanitizeMessagesForModel, stripHistoricalInlineMediaForReplay } from "./message-sanitizer.ts";
 import { normalizeProviderContextMessages, normalizeProviderPayload } from "./provider-compat.ts";
+import { currentProviderCompatPurpose } from "./provider-compat/purpose-scope.ts";
 import { VisionBridge } from "./vision-bridge.ts";
 import { SessionCoordinator } from "./session-coordinator.ts";
 import { SessionManifestResolver } from "./session-manifest/resolver.ts";
@@ -2488,6 +2489,9 @@ export class LingxiEngine {
           // unspecified here; output-budget removes only values matching that SDK default.
           return normalizeProviderPayload(p, requestModel, {
             mode: "chat",
+            // compaction 复用 session onPayload 扩展链；调用点用
+            // runWithProviderCompatPurpose 显式标记，未标记的默认是普通聊天。
+            purpose: currentProviderCompatPurpose(),
             reasoningLevel,
             deepseekRoleplayReasoningPatch,
             deepseekRoleplayReasoningContext,

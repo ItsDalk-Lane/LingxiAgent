@@ -1,3 +1,5 @@
+import { normalizeModalityList } from "./modality.ts";
+
 const OFFICIAL_DEEPSEEK_PROVIDER_ID = "deepseek";
 const OFFICIAL_DEEPSEEK_HOST = "api.deepseek.com";
 const OFFICIAL_DEEPSEEK_RESERVED_MODEL_IDS = new Set(["deepseek"]);
@@ -90,6 +92,38 @@ function validatePositiveNumber(providerId, modelId, model, field) {
   }
 }
 
+function validateBooleanField(providerId, modelId, model, field) {
+  if (!Object.prototype.hasOwnProperty.call(model, field)) return;
+  const value = model[field];
+  if (typeof value !== "boolean") {
+    throw new ProviderModelMetadataValidationError(providerId, modelId, field, "expected a boolean");
+  }
+}
+
+function validateModalityField(providerId, modelId, model, field) {
+  if (!Object.prototype.hasOwnProperty.call(model, field)) return;
+  const value = model[field];
+  if (!Array.isArray(value)) {
+    throw new ProviderModelMetadataValidationError(providerId, modelId, field, "expected a non-empty modality array (text|image|video|audio)");
+  }
+  if (normalizeModalityList(value) === null) {
+    throw new ProviderModelMetadataValidationError(providerId, modelId, field, "expected a non-empty modality array with only known values (text|image|video|audio)");
+  }
+}
+
+/**
+ * 校验并归一化模型条目上的模态字段（保存路径用）：
+ * 返回按 canonical 顺序去重排序后的数组；非法值显式抛 400。
+ */
+export function normalizeValidatedModalityField(providerId, modelId, field, value) {
+  if (value === undefined) return undefined;
+  const normalized = normalizeModalityList(value);
+  if (normalized === null) {
+    throw new ProviderModelMetadataValidationError(providerId, modelId, field, "expected a non-empty modality array with only known values (text|image|video|audio)");
+  }
+  return normalized;
+}
+
 function validateModelMetadata(providerId, model) {
   if (!model || typeof model !== "object" || Array.isArray(model)) return;
   const rawModelId = modelIdOf(model);
@@ -110,6 +144,12 @@ function validateModelMetadata(providerId, model) {
   }
   for (const field of ["context", "contextWindow", "maxOutput", "maxTokens", "maxOutputTokens"]) {
     validatePositiveNumber(providerId, modelId, model, field);
+  }
+  for (const field of ["web", "structuredOutput"]) {
+    validateBooleanField(providerId, modelId, model, field);
+  }
+  for (const field of ["inputs", "outputs"]) {
+    validateModalityField(providerId, modelId, model, field);
   }
   if (!Object.prototype.hasOwnProperty.call(model, "thinkingLevelMap")) return;
   const map = model.thinkingLevelMap;

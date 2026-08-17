@@ -11,6 +11,7 @@ import os from "os";
 import path from "path";
 import YAML from "js-yaml";
 import { ProviderRegistry } from "../core/provider-registry.ts";
+import { ProviderModelMetadataValidationError } from "../shared/provider-model-validation.ts";
 
 const tmpDir = path.join(os.tmpdir(), "hana-test-pr-crud-" + Date.now());
 
@@ -737,6 +738,25 @@ describe("addModel", () => {
     expect(entry).toBeTruthy();
   });
 
+  it("normalizes modality arrays to canonical order when adding an object model", () => {
+    writeAddedModels({
+      "test-provider": { api_key: "sk-x", models: [] },
+    });
+    const reg = makeRegistry();
+    reg.addModel("test-provider", {
+      id: "model-modal",
+      inputs: ["audio", "text", "image", "text"],
+      outputs: ["text", "text"],
+    });
+
+    const persisted = readAddedModels();
+    const entry = persisted["test-provider"].models.find(
+      (m) => (typeof m === "object" ? m.id : m) === "model-modal",
+    );
+    expect(entry.inputs).toEqual(["text", "image", "audio"]);
+    expect(entry.outputs).toEqual(["text"]);
+  });
+
   it("对象格式模型不与同 id 的已有条目重复", () => {
     writeAddedModels({
       "test-provider": { api_key: "sk-x", models: ["model-obj"] },
@@ -1319,6 +1339,125 @@ describe("updateModelEntry type field", () => {
   });
 });
 
+// ── updateModelEntry canonical modalities ────────────────────────────────────
+
+describe("updateModelEntry canonical modalities", () => {
+  it("saves inputs/outputs deduped and canonically ordered plus web/structuredOutput booleans", () => {
+    writeAddedModels({
+      "test-provider": {
+        api_key: "key-123",
+        models: ["model-a"],
+      },
+    });
+    const reg = makeRegistry();
+    reg.updateModelEntry("test-provider", "model-a", {
+      inputs: ["audio", "text", "image", "text"],
+      outputs: ["text", "text"],
+      web: true,
+      structuredOutput: false,
+    });
+
+    const raw = readAddedModels();
+    const entry = raw["test-provider"].models.find(
+      m => (typeof m === "object" ? m.id : m) === "model-a"
+    );
+    expect(entry.inputs).toEqual(["text", "image", "audio"]);
+    expect(entry.outputs).toEqual(["text"]);
+    expect(entry.web).toBe(true);
+    expect(entry.structuredOutput).toBe(false);
+  });
+
+  it("strips legacy image/video/audio booleans once explicit inputs are saved", () => {
+    writeAddedModels({
+      "test-provider": {
+        api_key: "key-123",
+        models: [{ id: "model-a", image: true, video: true, audio: false }],
+      },
+    });
+    const reg = makeRegistry();
+    reg.updateModelEntry("test-provider", "model-a", { inputs: ["text"] });
+
+    const raw = readAddedModels();
+    const entry = raw["test-provider"].models.find(
+      m => (typeof m === "object" ? m.id : m) === "model-a"
+    );
+    expect(entry).toEqual({ id: "model-a", inputs: ["text"] });
+  });
+
+  it("drops legacy booleans when inputs and image/video/audio arrive in the same request", () => {
+    writeAddedModels({
+      "test-provider": { api_key: "key-123", models: ["model-a"] },
+    });
+    const reg = makeRegistry();
+    reg.updateModelEntry("test-provider", "model-a", {
+      inputs: ["text"],
+      image: true,
+      video: true,
+      audio: false,
+    });
+
+    const raw = readAddedModels();
+    const entry = raw["test-provider"].models.find(
+      m => (typeof m === "object" ? m.id : m) === "model-a"
+    );
+    // 显式 inputs 是唯一真理源，同请求的 legacy 布尔不能持久化出双真理
+    expect(entry).toEqual({ id: "model-a", inputs: ["text"] });
+  });
+
+  it("rejects non-array modality fields with a 400 validation error", () => {
+    writeAddedModels({
+      "test-provider": { api_key: "key-123", models: ["model-a"] },
+    });
+    const reg = makeRegistry();
+
+    for (const bad of ["text", null, { 0: "text" }]) {
+      expect(() => reg.updateModelEntry("test-provider", "model-a", { inputs: bad }))
+        .toThrow(ProviderModelMetadataValidationError);
+    }
+  });
+
+  it("rejects unknown or empty modality members instead of silently dropping them", () => {
+    writeAddedModels({
+      "test-provider": { api_key: "key-123", models: ["model-a"] },
+    });
+    const reg = makeRegistry();
+
+    expect(() => reg.updateModelEntry("test-provider", "model-a", { inputs: ["text", "hologram"] }))
+      .toThrow(/inputs/);
+    expect(() => reg.updateModelEntry("test-provider", "model-a", { outputs: [] }))
+      .toThrow(/outputs/);
+  });
+
+  it("rejects non-boolean web/structuredOutput instead of coercing strings", () => {
+    writeAddedModels({
+      "test-provider": { api_key: "key-123", models: ["model-a"] },
+    });
+    const reg = makeRegistry();
+
+    expect(() => reg.updateModelEntry("test-provider", "model-a", { web: "true" }))
+      .toThrow(ProviderModelMetadataValidationError);
+    expect(() => reg.updateModelEntry("test-provider", "model-a", { structuredOutput: 1 }))
+      .toThrow(ProviderModelMetadataValidationError);
+    const entry = readAddedModels()["test-provider"].models[0];
+    expect(typeof entry === "object" ? entry.web : undefined).toBeUndefined();
+  });
+
+  it("maps validation errors to statusCode 400 for HTTP surfaces", () => {
+    writeAddedModels({
+      "test-provider": { api_key: "key-123", models: ["model-a"] },
+    });
+    const reg = makeRegistry();
+
+    try {
+      reg.updateModelEntry("test-provider", "model-a", { inputs: ["nope"] });
+      expect.unreachable("should have thrown");
+    } catch (err) {
+      expect(err.statusCode).toBe(400);
+      expect(err.code).toBe("INVALID_PROVIDER_MODEL_METADATA");
+    }
+  });
+});
+
 // ── media model CRUD ─────────────────────────────────────────────────────────
 
 describe("media model CRUD", () => {
@@ -1408,6 +1547,22 @@ describe("media model CRUD", () => {
     expect(readAddedModels().dashscope.media.image_generation.models).toEqual([
       { id: "qwen-image-2.0-pro", displayName: "qwen-image-2.0-pro", protocolId: "dashscope-qwen-multimodal-image" },
     ]);
+  });
+
+  it("removeMediaModel reports a missing model instead of pretending success", () => {
+    // 设置页的删除按钮依赖这个端点反馈真实结果；静默成功会让 UI 弹
+    // 「保存成功」却删不掉任何东西
+    writeAddedModels({
+      "test-provider": {
+        api_key: "key-123",
+        models: [],
+      },
+    });
+    const reg = makeRegistry();
+
+    expect(() => reg.removeMediaModel("test-provider", "image_generation", "not-added")).toThrow(
+      'media model "test-provider/not-added" not found in image_generation',
+    );
   });
 });
 

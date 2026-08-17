@@ -20,7 +20,7 @@ import {
   providerCredentialAllowsMissingApiKey,
   stripCredentialHeaders,
 } from "../shared/provider-auth.ts";
-import { validateProviderModels } from "../shared/provider-model-validation.ts";
+import { validateProviderModels, normalizeValidatedModalityField } from "../shared/provider-model-validation.ts";
 import {
   normalizeModelProtocolCompat,
   normalizeToolUseContract,
@@ -1700,7 +1700,19 @@ export class ProviderRegistry {
     );
     if (exists) return;
 
-    const nextModels = [...models, model];
+    // 模态字段按 canonical 顺序归一化后再持久化（与 updateModelEntry 一致），
+    // 保证「任何保存操作都按 text→image→video→audio 顺序去重排序」。
+    let normalizedModel = model;
+    if (model && typeof model === "object" && !Array.isArray(model)) {
+      const entry = { ...model };
+      for (const field of ["inputs", "outputs"]) {
+        const normalized = normalizeValidatedModalityField(ownerProviderId, newId, field, model[field]);
+        if (normalized !== undefined) entry[field] = normalized;
+      }
+      normalizedModel = entry;
+    }
+
+    const nextModels = [...models, normalizedModel];
     validateProviderModels(ownerProviderId, nextModels, { baseUrl: rawProvider.base_url });
     this.saveProvider(ownerProviderId, { models: nextModels });
   }
@@ -1728,8 +1740,13 @@ export class ProviderRegistry {
   updateModelEntry(providerId, modelId, meta) {
     const { ownerProviderId, rawProvider, models } = this._providerConfigForModelMutation(providerId);
 
-    // 兼容前端仍可能发来 vision 字段（过渡期）：转写为 image
-    if (meta && typeof meta === "object" && meta.vision !== undefined && meta.image === undefined) {
+    // 兼容前端仍可能发来 vision 字段（过渡期）：转写为 image。
+    // 显式 inputs 是输入模态唯一新真理源，此时不再接受 legacy 布尔改写。
+    if (
+      meta && typeof meta === "object"
+      && meta.inputs === undefined
+      && meta.vision !== undefined && meta.image === undefined
+    ) {
       meta = { ...meta, image: meta.vision };
     }
     if (meta && typeof meta === "object" && meta.contextWindow !== undefined && meta.context === undefined) {
@@ -1743,10 +1760,21 @@ export class ProviderRegistry {
     }
 
     // 白名单：只允许模型能力字段（image 是标准名，vision 为旧名不写入）
-    const ALLOWED = ["name", "api", "context", "maxOutput", "image", "video", "audio", "reasoning", "xhigh", "thinkingLevels", "thinkingLevelMap", "type", "defaultThinkingLevel"];
+    const ALLOWED = ["name", "api", "context", "maxOutput", "image", "video", "audio", "reasoning", "xhigh", "thinkingLevels", "thinkingLevelMap", "type", "defaultThinkingLevel", "web", "structuredOutput"];
     const safe: any = {};
     for (const key of ALLOWED) {
       if (meta[key] !== undefined) safe[key] = meta[key];
+    }
+    // 模态字段：保存时按 canonical 顺序去重排序；非法值显式 400
+    for (const modalityField of ["inputs", "outputs"]) {
+      const normalizedModality = normalizeValidatedModalityField(ownerProviderId, modelId, modalityField, meta?.[modalityField]);
+      if (normalizedModality !== undefined) safe[modalityField] = normalizedModality;
+    }
+    // 显式 inputs 是输入模态唯一真理源：同请求里若同时携带 legacy 布尔
+    // （image/video/audio），必须从本次写入中剔除，避免持久化两份互相冲突的
+    // 输入模态真理（任务书条款 2 明确禁止）。
+    if (safe.inputs !== undefined) {
+      for (const legacy of ["image", "video", "audio"]) delete safe[legacy];
     }
     const compat = normalizeModelProtocolCompat(meta?.compat);
     if (compat) safe.compat = compat;
@@ -1759,17 +1787,20 @@ export class ProviderRegistry {
     if (visionCapabilities) safe.visionCapabilities = visionCapabilities;
 
     let found = false;
+    const stripLegacyInputFlags = safe.inputs !== undefined;
     const nextModels = models.map((m) => {
       const mid = typeof m === "object" ? m.id : m;
       if (mid !== modelId) return m;
       found = true;
       const base = typeof m === "object" ? m : { id: mid };
-      // 删除旧字段 vision，避免残留
-      if (base.vision !== undefined) {
-        const { vision: _vision, ...cleaned } = base;
-        return mergeModelMetadata(cleaned, safe);
+      // 删除旧字段 vision，避免残留；显式 inputs 保存时同时剥离
+      // image/video/audio legacy 布尔，避免两份互相冲突的输入模态真理。
+      let cleaned: any = base;
+      if (base.vision !== undefined || stripLegacyInputFlags) {
+        const legacy = ["vision", ...(stripLegacyInputFlags ? ["image", "video", "audio"] : [])];
+        cleaned = Object.fromEntries(Object.entries(base).filter(([key]) => !legacy.includes(key)));
       }
-      return mergeModelMetadata(base, safe);
+      return mergeModelMetadata(cleaned, safe);
     });
 
     // upsert：模型不在列表中时自动添加
@@ -1865,8 +1896,12 @@ export class ProviderRegistry {
     const provider = userConfig[providerId];
     const mediaKey = mediaUserConfigKey(capability);
     const mediaConfig = provider?.media?.[mediaKey];
-    if (!Array.isArray(mediaConfig?.models)) return;
-    mediaConfig.models = mediaConfig.models.filter((item) => getModelId(item) !== modelId);
+    const models = Array.isArray(mediaConfig?.models) ? mediaConfig.models : [];
+    if (!models.some((item) => getModelId(item) === modelId)) {
+      // 如实报错而不是静默成功：设置页的删除按钮依赖这个端点反馈真实结果
+      throw new Error(`media model "${providerId}/${modelId}" not found in ${capability}`);
+    }
+    mediaConfig.models = models.filter((item) => getModelId(item) !== modelId);
     this._saveAddedModels(userConfig);
     this._entries.clear();
   }

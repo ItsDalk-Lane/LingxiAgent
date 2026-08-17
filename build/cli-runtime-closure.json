@@ -2136,6 +2136,28 @@
       "reason": "Reached via esbuild source module graph, imported by core/provider-compat.ts (import-statement); core/session-compactor.ts (import-statement)."
     },
     {
+      "path": "core/provider-compat/purpose-scope.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "core/session-compactor.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "core/engine.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/extensions/compaction-guard-ext.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by core/session-compactor.ts (import-statement); core/engine.ts (import-statement); lib/extensions/compaction-guard-ext.ts (import-statement)."
+    },
+    {
       "path": "core/provider-compat/qwen.ts",
       "inputType": "source-graph",
       "provenance": [
@@ -2200,6 +2222,18 @@
       "reason": "Reached via esbuild source module graph, imported by core/provider-compat/deepseek.ts (import-statement); core/provider-compat/kimi.ts (import-statement); core/provider-compat/mimo.ts (import-statement); +6 more importer(s)."
     },
     {
+      "path": "core/provider-compat/structured-output.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "core/provider-compat.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by core/provider-compat.ts (import-statement)."
+    },
+    {
       "path": "core/provider-compat/tool-pairing.ts",
       "inputType": "source-graph",
       "provenance": [
@@ -2224,7 +2258,7 @@
       "reason": "Reached via esbuild source module graph, imported by core/provider-compat.ts (import-statement)."
     },
     {
-      "path": "core/provider-compat/zhipu.ts",
+      "path": "core/provider-compat/web-search.ts",
       "inputType": "source-graph",
       "provenance": [
         {
@@ -2234,6 +2268,28 @@
         }
       ],
       "reason": "Reached via esbuild source module graph, imported by core/provider-compat.ts (import-statement)."
+    },
+    {
+      "path": "core/provider-compat/zhipu.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "core/provider-compat/structured-output.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "core/provider-compat/web-search.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "core/provider-compat.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by core/provider-compat/structured-output.ts (import-statement); core/provider-compat/web-search.ts (import-statement); core/provider-compat.ts (import-statement)."
     },
     {
       "path": "core/provider-media-serializer.ts",
@@ -121600,6 +121656,50 @@
       "reason": "Reached via esbuild source module graph, imported by shared/error-bus.ts (import-statement); lib/log-redactor.ts (import-statement); lib/approval-gateway.ts (import-statement); +1 more importer(s)."
     },
     {
+      "path": "shared/media-model-edit.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "core/speech-recognition-service.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "core/media/universal-media-manager.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by core/speech-recognition-service.ts (import-statement); core/media/universal-media-manager.ts (import-statement)."
+    },
+    {
+      "path": "shared/modality.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "shared/provider-model-validation.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "core/model-sync.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "core/model-manager.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "shared/media-model-edit.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by shared/provider-model-validation.ts (import-statement); core/model-sync.ts (import-statement); core/model-manager.ts (import-statement); +1 more importer(s)."
+    },
+    {
       "path": "shared/model-capabilities.ts",
       "inputType": "source-graph",
       "provenance": [
@@ -122910,9 +123010,9 @@
     }
   ],
   "stats": {
-    "totalFiles": 10565,
+    "totalFiles": 10570,
     "byInputType": {
-      "source-graph": 669,
+      "source-graph": 674,
       "runtime-asset": 11,
       "nft-runtime-trace": 9885
     }

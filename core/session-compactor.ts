@@ -1,4 +1,5 @@
 import { randomUUID } from "node:crypto";
+import { runWithProviderCompatPurpose } from "./provider-compat/purpose-scope.ts";
 import {
   buildNativeCompactionRequestShapes,
   convertAgentMessagesToLlm,
@@ -315,6 +316,8 @@ export function normalizeCompactionProviderPayload(payload, model, {
   let normalized = normalizeProviderPayload(payload, model, {
     ...providerOptions,
     mode: "chat",
+    // compaction 不继承模型级联网/结构化输出开关（模型开关只作用于普通聊天）
+    purpose: "compaction",
     outputBudgetSource: policy === COMPACTION_OUTPUT_POLICIES.BOUNDED ? "system" : "sdk-default",
   });
   const capability = resolveOutputCapCapability(model);
@@ -1854,7 +1857,12 @@ export async function runCachePreservingCompactionForSession(session: any, {
       streamFn: session.agent.streamFunction,
       streamOptions: {
         sessionId: session.agent.sessionId,
-        onPayload: session.agent.onPayload,
+        // 标记 compaction 用途：session onPayload 扩展链（engine before_provider_request）
+        // 读取该作用域，避免模型级联网/结构化输出开关注入压缩请求。
+        onPayload: (payload, requestModel) => runWithProviderCompatPurpose(
+          "compaction",
+          () => session.agent.onPayload?.(payload, requestModel),
+        ),
         onResponse: session.agent.onResponse,
         transport: session.agent.transport,
         thinkingBudgets: session.agent.thinkingBudgets,
