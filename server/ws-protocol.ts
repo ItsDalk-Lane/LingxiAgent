@@ -11,6 +11,9 @@
  *   { type: "compact", sessionId: "..." }  (新客户端只发送 sessionId；sessionPath 仅旧客户端兼容输入，服务端会在边界解析为 sessionId 后丢弃)
  *
  * Server → Client:
+ *   { type: "turn_start", turnId?: "..." }  (Turn 生命周期权威事件：一轮 Assistant 回答的正式开始；
+ *     与 status.isStreaming（Session Busy）正交——status 只决定输入框/Stop 等忙碌 UI，
+ *     Turn 的开始与结束只能由 turn_start / turn_end 决定。同 streamId 重复 turn_start 幂等。)
  *   { type: "assistant_segment_start", segmentId: "...", kind: "text"|"reasoning", semanticPhase: "reasoning"|"commentary"|"final_answer"|"unresolved" }
  *   { type: "assistant_segment_delta", segmentId: "...", delta: "...", semanticPhase: "reasoning"|"commentary"|"final_answer"|"unresolved" }
  *   { type: "assistant_segment_end", segmentId: "...", semanticPhase: "reasoning"|"commentary"|"final_answer" }

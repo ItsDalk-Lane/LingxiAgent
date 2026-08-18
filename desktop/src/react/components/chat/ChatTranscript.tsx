@@ -1,5 +1,5 @@
-import { memo, useCallback, useMemo } from 'react';
-import type { ChatListItem, ChatMessage } from '../../stores/chat-types';
+import { memo, useCallback, useMemo, useSyncExternalStore } from 'react';
+import type { AssistantTurnStatus, ChatListItem, ChatMessage } from '../../stores/chat-types';
 import { UserMessage } from './UserMessage';
 import { AgentOriginMessage } from './AgentOriginMessage';
 import { AssistantMessage } from './AssistantMessage';
@@ -7,6 +7,7 @@ import { ProcessFoldBlock } from './ProcessFoldBlock';
 import { InterludeBlock } from './InterludeBlock';
 import { buildTranscriptRenderItems, type TranscriptRenderItem } from './process-fold';
 import { useStore } from '../../stores';
+import { readLiveAssistantMessage, subscribeLiveAssistantMessage } from '../../stores/live-turn-store';
 import { selectIsStreamingSession, selectSelectedIdsBySession } from '../../stores/session-selectors';
 import { resolveAgentDisplayInfo, type AgentDisplayInfo } from '../../utils/agent-display';
 import type {
@@ -60,11 +61,41 @@ export const ChatTranscript = memo(function ChatTranscript({
     name: storeUserName || t('common.me'),
     avatarUrl: userAvatarUrl,
   }), [storeUserName, userAvatarUrl, t]);
+
+  // 最新一条 assistant 消息的 Turn 状态只存在于 live-turn-store（流式期 store 里
+  // 没有 turnProjection）。这里订阅它并只取 status 这个原始值：
+  // 只有 streaming → 终态 这一次变化才会触发重渲染，正文增量不会。
+  // Process Fold 的判定以此为准，Session Busy（isStreaming）只作 legacy 回退。
+  const latestAssistantMessageId = useMemo(() => {
+    for (let i = items.length - 1; i >= 0; i -= 1) {
+      const item = items[i];
+      if (item.type === 'message' && item.data.role === 'assistant') return item.data.id;
+    }
+    return null;
+  }, [items]);
+  const subscribeLatestLiveTurn = useCallback(
+    (listener: () => void) => (latestAssistantMessageId
+      ? subscribeLiveAssistantMessage(sessionPath, latestAssistantMessageId, listener)
+      : () => {}),
+    [sessionPath, latestAssistantMessageId],
+  );
+  const readLatestLiveTurnStatus = useCallback(
+    (): AssistantTurnStatus | null => (latestAssistantMessageId
+      ? readLiveAssistantMessage(sessionPath, latestAssistantMessageId)?.turnProjection?.status ?? null
+      : null),
+    [sessionPath, latestAssistantMessageId],
+  );
+  const liveTurnStatus = useSyncExternalStore(
+    subscribeLatestLiveTurn,
+    readLatestLiveTurnStatus,
+    () => null,
+  );
+
   const renderItems = useMemo(
     () => enableProcessFold
-      ? buildTranscriptRenderItems(items, { isStreaming })
+      ? buildTranscriptRenderItems(items, { isStreaming, liveTurnStatus })
       : items.map((item, originalIndex) => ({ type: 'source' as const, item, originalIndex })),
-    [enableProcessFold, isStreaming, items],
+    [enableProcessFold, isStreaming, liveTurnStatus, items],
   );
   const turnState = useMemo(() => buildTurnState(items), [items]);
 

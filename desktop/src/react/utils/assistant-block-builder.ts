@@ -1,5 +1,5 @@
 import type { ContentBlock, ToolCall } from '../stores/chat-types';
-import { parseCardFromContent, parseMoodFromContent } from './message-parser';
+import { extractMoodBlocksFromContent, parseCardFromContent } from './message-parser';
 import { skillInvocationName } from '../../../../shared/tool-outcome.ts';
 
 interface AssistantBlockInput {
@@ -56,8 +56,8 @@ export function buildAssistantBlocksFromContent({
     blocks.push({ type: 'thinking', content: thinking, sealed: true });
   }
 
-  const { mood, yuan, text: afterMood } = parseMoodFromContent(content || '');
-  if (mood && yuan) {
+  const { moods, text: afterMood } = extractMoodBlocksFromContent(content || '');
+  for (const { mood, yuan } of moods) {
     blocks.push({ type: 'mood', yuan, text: mood });
   }
 

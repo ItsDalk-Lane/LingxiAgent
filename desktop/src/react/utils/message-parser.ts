@@ -7,7 +7,8 @@
 
 import { QUOTE_ORIGINAL_END, QUOTE_ORIGINAL_START } from './quoted-selection';
 import { moodLabelForYuan } from '../../../../shared/yuan-visuals.ts';
-import { parseLeadingInternalMoodBlock } from '../../../../shared/internal-mood-block.ts';
+import { INTERNAL_MOOD_TAGS } from '../../../../shared/internal-mood-block.ts';
+import { splitReservedTagSegments } from '../../../../shared/reserved-tag-stream.ts';
 
 // ── Mood 解析 ──
 
@@ -40,14 +41,26 @@ export function cleanMoodText(raw: string): string {
     .replace(/\n+$/, '');
 }
 
-export function parseMoodFromContent(content: string): { mood: string | null; yuan: string | null; text: string } {
-  if (!content) return { mood: null, yuan: null, text: '' };
-  const block = parseLeadingInternalMoodBlock(content);
-  if (!block) return { mood: null, yuan: null, text: content };
-  const yuan = TAG_TO_YUAN[block.tag] || 'lingxi';
-  const mood = cleanMoodText(block.content.trim());
-  const text = block.rest.replace(/^\n+/, '').trim();
-  return { mood, yuan, text };
+/**
+ * 历史消息（全文已在手）的 mood 结构化：保留协议标签无论在正文什么位置都切成
+ * 独立 mood 块，一轮里允许多个；其余文本按原顺序拼回（转义与代码保护规则与
+ * 流式扫描一致）。
+ */
+export function extractMoodBlocksFromContent(content: string): { moods: Array<{ mood: string; yuan: string }>; text: string } {
+  if (!content) return { moods: [], text: '' };
+  const segments = splitReservedTagSegments(content, INTERNAL_MOOD_TAGS);
+  const moods: Array<{ mood: string; yuan: string }> = [];
+  const textParts: string[] = [];
+  for (const segment of segments) {
+    if (segment.type === 'block') {
+      const mood = cleanMoodText(segment.content.trim());
+      if (mood) moods.push({ mood, yuan: TAG_TO_YUAN[segment.tag] || 'lingxi' });
+    } else {
+      textParts.push(segment.text);
+    }
+  }
+  const text = textParts.join('\n').replace(/^\n+/, '').trim();
+  return { moods, text };
 }
 
 // ── 用户附件解析 ──

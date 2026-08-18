@@ -9,38 +9,43 @@
  * 禁止把这套逻辑放回主 renderer。
  */
 
-import { parseLeadingInternalMoodBlock } from '../../../../shared/internal-mood-block.ts';
+import { INTERNAL_MOOD_TAGS } from '../../../../shared/internal-mood-block.ts';
+import { splitReservedTagSegments } from '../../../../shared/reserved-tag-stream.ts';
 import type { LiveAssistantSegment } from '../stores/live-turn-store';
 
-const THINK_LEADING_RE = /^[ \t]*(?:<think>|<thinking>)/;
+/** 全部保留协议标签：mood 家族 + think 家族。 */
+const RESERVED_TAGS: readonly string[] = [...INTERNAL_MOOD_TAGS, 'think', 'thinking'];
 
 /** 剥离 segment 开头的内部协议块；只处理 leading 位置，正文内部的标签按普通文本保留。 */
 export function sanitizePersistedSegmentSource(
   source: string,
   options: { hasStructuredMood: boolean; hasStructuredThinking: boolean },
 ): string {
-  let text = source;
+  const segments = splitReservedTagSegments(source, RESERVED_TAGS);
+  let start = 0;
   let changed = false;
-  // 有限次循环：leading 位置可能有 mood + think 交错
-  for (let round = 0; round < 4; round += 1) {
-    const mood = parseLeadingInternalMoodBlock(text);
-    if (mood && options.hasStructuredMood) {
-      text = (mood.prefix || '') + mood.rest;
-      changed = true;
+  // leading 位置可能有 mood + think 交错；空白片段不阻断 leading 判定
+  while (start < segments.length) {
+    const segment = segments[start];
+    if (segment.type === 'text') {
+      if (segment.text.trim()) break;
+      start += 1;
       continue;
     }
-    if (options.hasStructuredThinking && THINK_LEADING_RE.test(text)) {
-      const closeMatch = text.match(/<\/(?:think|thinking)>/);
-      if (closeMatch && closeMatch.index !== undefined) {
-        text = text.slice(closeMatch.index + closeMatch[0].length);
-        changed = true;
-        continue;
-      }
+    const isMood = (INTERNAL_MOOD_TAGS as readonly string[]).includes(segment.tag);
+    if (isMood ? options.hasStructuredMood : options.hasStructuredThinking) {
+      changed = true;
+      start += 1;
+      continue;
     }
     break;
   }
-  if (changed) text = text.replace(/^[ \t]*\n+/, '');
-  return text;
+  if (!changed) return source;
+  // 非剥离部分的标签块按原字面量重建，保证正文内部标签一字不动
+  const rest = segments.slice(start).map((segment) => (
+    segment.type === 'text' ? segment.text : `<${segment.tag}>${segment.content}</${segment.tag}>`
+  )).join('');
+  return rest.replace(/^[ \t]*\n+/, '');
 }
 
 /** 对整组 segments 应用净化；结构化 block 存在性由调用方（history-builder）判定。 */

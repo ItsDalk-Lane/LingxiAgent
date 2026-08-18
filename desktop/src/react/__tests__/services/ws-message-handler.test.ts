@@ -1520,7 +1520,7 @@ describe('ws-message-handler turn_end side effects', () => {
     expect(useStore.getState().activeSessionStreams['/session/a.jsonl']?.streamId).toBe('stream_new');
   });
 
-  it('passes sessionId from status events into stream buffer lifecycle', () => {
+  it('passes sessionId from turn_start into stream buffer lifecycle; status never touches it', () => {
     const sessionId = 'sess_status_stream';
     vi.mocked(streamBufferManager.beginTurn).mockClear();
     vi.mocked(streamBufferManager.finishTurn).mockClear();
@@ -1540,6 +1540,7 @@ describe('ws-message-handler turn_end side effects', () => {
       activeSessionStreams: {},
     } as never);
 
+    // status 只负责 Session Busy：任何取值都不得触碰 Turn 生命周期
     handleServerMessage({
       type: 'status',
       sessionId,
@@ -1547,9 +1548,6 @@ describe('ws-message-handler turn_end side effects', () => {
       streamId: 'stream_status',
       isStreaming: true,
     });
-
-    expect(streamBufferManager.beginTurn).toHaveBeenCalledWith('/session/a-renamed.jsonl', sessionId);
-
     handleServerMessage({
       type: 'status',
       sessionId,
@@ -1558,7 +1556,27 @@ describe('ws-message-handler turn_end side effects', () => {
       isStreaming: false,
     });
 
-    expect(streamBufferManager.finishTurn).toHaveBeenCalledWith('/session/a-renamed.jsonl', sessionId);
+    expect(streamBufferManager.beginTurn).not.toHaveBeenCalled();
+    expect(streamBufferManager.finishTurn).not.toHaveBeenCalled();
+
+    // turn_start 携带 sessionId/streamId/turnId 路由进 StreamBufferManager，
+    // 由真实 manager 内部完成幂等 beginTurn（覆盖见 chat-turn-lifecycle.test.ts）。
+    vi.mocked(streamBufferManager.handle).mockClear();
+    handleServerMessage({
+      type: 'turn_start',
+      sessionId,
+      sessionPath: '/session/a-renamed.jsonl',
+      streamId: 'stream_status',
+      turnId: 'turn_status',
+    });
+
+    expect(streamBufferManager.handle).toHaveBeenCalledWith(expect.objectContaining({
+      type: 'turn_start',
+      sessionId,
+      sessionPath: '/session/a-renamed.jsonl',
+      streamId: 'stream_status',
+      turnId: 'turn_status',
+    }));
   });
 
   it('background status=false does not request input focus', () => {

@@ -1,20 +1,9 @@
 /**
- * StreamBufferManager - per-session 流式事件节流缓冲（canonical 单通道收口版）
- *
- * 数据流（任务书 §9/§10）：WS 事件按轮锁定 inputMode——
- *   canonical：assistant_segment_* / mood_*(moodOrdinal) / tool_* / content_block
- *              统一进入 blocksById + blockOrder（唯一 block 集合），投影走
- *              projectAssistantTurn；legacy text/thinking/mood 事件只维护
- *              断线快照 textAcc，不再进 blocks（禁止双源合并）。
- *   legacy：旧服务器（无 canonical 事件）走原 text/thinking/mood 聚合管线，
- *           在 commit 时由 projector 统一收口成 canonical 投影。
- *
- * Block 身份（不变量 4/5）：canonical 模式下 idPrefix 在首事件时就用
- * `turn:<streamId|messageId>` 稳定前缀；turn_end 绑定持久化 entry 只写
- * sourceEntryId / turnInputEntryId metadata，绝不 rebase 已有 block.id。
+ * StreamBufferManager — per-session 流式事件节流缓冲
  *
  * WS 事件到达时写入 buffer（纯 JS 对象，不触发 React），
  * 普通增量按画面合并并受最高发布频率约束，语义边界立即发布。
+ *
  * 设计为 singleton，不依赖 React 组件生命周期。
  * app-ws-shim 直接调用 streamBufferManager.handle(msg)。
  */
@@ -37,7 +26,10 @@ import {
   type LiveAssistantSegmentPhase,
 } from '../stores/live-turn-store';
 import { recordChatPerformance } from '../utils/chat-performance';
-import { normalizeContentBlocks } from '../utils/content-semantics';
+import {
+  normalizeContentBlocks,
+  rebaseGeneratedContentBlockIds,
+} from '../utils/content-semantics';
 import { projectAssistantTurn } from '../utils/turn-projector';
 
 /* eslint-disable @typescript-eslint/no-explicit-any -- 流式消息 handle(msg) 接收动态 JSON */
@@ -52,22 +44,11 @@ function nextStreamMessageId(): string {
   return `stream-${Date.now()}-${streamMessageSeq}`;
 }
 
-type TurnInputMode = 'canonical' | 'legacy';
-
 interface Buffer {
   sessionPath: string;
-  /** 本轮输入模式：首个 canonical 事件到达即锁定（任务书 §10），turn 结束释放。 */
-  inputMode: TurnInputMode;
-  /** canonical 模式的稳定 block id 前缀（首次事件分配，绝不随 turn_end 改变）。 */
-  canonicalIdPrefix: string | null;
-  /** 统一 block 集合（任务书 §9）：id -> block；blockOrder 记录到达顺序。 */
-  blocksById: Map<string, ContentBlock>;
-  blockOrder: string[];
+  blocks: ContentBlock[];
   segmentsById: Map<string, LiveAssistantSegment>;
   segmentOrder: string[];
-  /** legacy 管线（旧服务器兼容）：普通文本/思考/mood 聚合。 */
-  blocks: ContentBlock[];
-  segmentsLegacyTextAcc: string;
   /** 当前用户轮次的完整可见正文，供断线快照使用。 */
   textAcc: string;
   /** 当前工具/富内容边界之后的正文段，只更新它自己对应的 text block。 */
@@ -94,19 +75,24 @@ interface Buffer {
   messageId: string | null;
   /** turn_end/中止收口时为 true，确保所有仍在流式的内容统一封口。 */
   turnEnding: boolean;
+  /** 是否有活动 Turn。只能由 turn_start 开启、turn_end（或管理性 finishTurn/clear）关闭；
+   *  status（Session Busy）不得改变它。 */
+  turnActive: boolean;
+  /** 活动 Turn 的身份（优先 streamId，缺失时 turnId）；null 表示身份未知的隐式 Turn。 */
+  activeTurnKey: string | null;
+  /** 最近一次已完成 finalization 的 Turn 身份，用于重复 turn_end 的 exactly-once 去重。 */
+  lastFinalizedTurnKey: string | null;
+  /** 本轮已出现 canonical assistant_segment_*：legacy text/thinking 兼容事件
+   *  不得再产生 UI block（只能累积断线恢复快照）。 */
+  canonicalLocked: boolean;
 }
 
 function createBuffer(sessionPath: string): Buffer {
   return {
     sessionPath,
-    inputMode: 'legacy',
-    canonicalIdPrefix: null,
-    blocksById: new Map(),
-    blockOrder: [],
+    blocks: [],
     segmentsById: new Map(),
     segmentOrder: [],
-    blocks: [],
-    segmentsLegacyTextAcc: '',
     textAcc: '',
     textSegmentAcc: '',
     textSegmentOrdinal: null,
@@ -126,16 +112,11 @@ function createBuffer(sessionPath: string): Buffer {
     publishPending: false,
     messageId: null,
     turnEnding: false,
+    turnActive: false,
+    activeTurnKey: null,
+    lastFinalizedTurnKey: null,
+    canonicalLocked: false,
   };
-}
-
-function pushBlock(buf: Buffer, id: string, block: ContentBlock): void {
-  if (!buf.blocksById.has(id)) buf.blockOrder.push(id);
-  buf.blocksById.set(id, block);
-}
-
-function canonicalMoodBlockId(buf: Buffer, moodOrdinal: number): string {
-  return `${buf.canonicalIdPrefix}:mood:${moodOrdinal}`;
 }
 
 function renderBufferedBlocks(currentBlocks: ContentBlock[], buf: Buffer): ContentBlock[] {
@@ -187,6 +168,11 @@ function renderBufferedBlocks(currentBlocks: ContentBlock[], buf: Buffer): Conte
 
 function normalizeSessionId(value: unknown): string | null {
   return typeof value === 'string' && value.trim() ? value.trim() : null;
+}
+
+/** Turn 身份：优先 streamId，缺失时退回 turnId；都没有则身份未知（null）。 */
+function turnKeyFrom(identity: { streamId?: unknown; turnId?: unknown } | null | undefined): string | null {
+  return normalizeSessionId(identity?.streamId) || normalizeSessionId(identity?.turnId) || null;
 }
 
 function normalizeLiveSegmentPhase(value: unknown): LiveAssistantSegmentPhase {
@@ -276,7 +262,6 @@ class StreamBufferManager {
     return !!(
       buf.messageId ||
       buf.blocks.length > 0 ||
-      buf.blocksById.size > 0 ||
       buf.segmentOrder.length > 0 ||
       buf.textAcc ||
       buf.thinkingAcc ||
@@ -292,15 +277,10 @@ class StreamBufferManager {
 
   private resetTurnState(buf: Buffer): void {
     this.cancelScheduledFlush(buf);
-    buf.inputMode = 'legacy';
-    buf.canonicalIdPrefix = null;
-    buf.blocksById.clear();
-    buf.blockOrder = [];
     buf.textAcc = '';
     buf.blocks = [];
     buf.segmentsById.clear();
     buf.segmentOrder = [];
-    buf.segmentsLegacyTextAcc = '';
     buf.textSegmentAcc = '';
     buf.textSegmentOrdinal = null;
     buf.thinkingAcc = '';
@@ -315,33 +295,10 @@ class StreamBufferManager {
     buf.messageId = null;
     buf.turnEnding = false;
     buf.publishPending = false;
-  }
-
-  /**
-   * 本轮第一个 canonical 事件到达：锁定 canonical 模式并分配稳定 id 前缀。
-   * 前缀一经分配，turn 结束前绝不改变（不变量 4）。
-   * legacy 管线已积累的内容（旧服务器先发 text_delta 再发 tool_start 的场景）
-   * 冻结为 canonical 起点：原样搬进统一 block 集合，id 首次分配后同样不变。
-   */
-  private lockCanonicalMode(buf: Buffer): void {
-    if (buf.inputMode === 'canonical') return;
-    this.ensureMessage(buf);
-    buf.inputMode = 'canonical';
-    buf.canonicalIdPrefix = `turn:${buf.messageId || nextStreamMessageId()}`;
-    // legacy 聚合结果冻结入统一集合（一次性，不做语义改写）。legacy 渲染的
-    // thinking/mood 块在这里拿稳定 id；legacy text 块在 canonical 模式下改由
-    // synthetic segment 承载（见 ensureSyntheticTextSegment），冻结时跳过，
-    // 避免同一正文同时存在于 block 与 segment 两个通道（不变量 1）。
-    if (buf.blocks.length > 0) {
-      const frozen = buf.blocks.filter((block) => block.type !== 'text');
-      buf.blocks = [];
-      for (const block of frozen) {
-        const id = block.id?.trim()
-          || `${buf.canonicalIdPrefix}:${block.type}:${buf.blocksById.size}`;
-        if (!buf.blocksById.has(id)) buf.blockOrder.push(id);
-        buf.blocksById.set(id, { ...block, id });
-      }
-    }
+    buf.turnActive = false;
+    buf.activeTurnKey = null;
+    buf.canonicalLocked = false;
+    // lastFinalizedTurnKey 刻意保留：跨 reset 支撑重复 turn_end 的 exactly-once。
   }
 
   private finishBufferTurn(buf: Buffer, persistedEntries: {
@@ -402,13 +359,10 @@ class StreamBufferManager {
       return false;
     }
     const next = updater({ ...item.data, blocks: buf.blocks });
-    // legacy 模式：进入 store 前补齐语义字段；canonical 模式不经此路径。
-    const blocks = buf.inputMode === 'canonical'
-      ? next.blocks || []
-      : normalizeContentBlocks(next.blocks || [], {
-        idPrefix: item.data.sourceEntryId || item.data.id,
-        turnLifecycle: buf.turnEnding ? 'sealed' : 'streaming',
-      });
+    const blocks = normalizeContentBlocks(next.blocks || [], {
+      idPrefix: item.data.sourceEntryId || item.data.id,
+      turnLifecycle: buf.turnEnding ? 'sealed' : 'streaming',
+    });
     buf.blocks = blocks;
     this.publishLiveTurn(buf);
     bumpMessageLiveVersion(buf.sessionPath);
@@ -425,30 +379,6 @@ class StreamBufferManager {
       && entry.data.id === buf.messageId
     ));
     const message = item?.type === 'message' ? item.data : null;
-    if (buf.inputMode === 'canonical') {
-      // canonical 模式：统一 block 集合直接投影，前缀稳定不变。
-      const segments = buf.segmentOrder
-        .map((segmentId) => buf.segmentsById.get(segmentId))
-        .filter((segment): segment is LiveAssistantSegment => !!segment);
-      const orderedBlocks = buf.blockOrder
-        .map((blockId) => buf.blocksById.get(blockId))
-        .filter((block): block is ContentBlock => !!block);
-      const projected = projectAssistantTurn({
-        idPrefix: buf.canonicalIdPrefix!,
-        inputMessageId: message?.turnInputEntryId || null,
-        assistantMessageIds: [message?.sourceEntryId || message?.id || buf.messageId],
-        segments,
-        legacyBlocks: orderedBlocks,
-        status: 'streaming',
-      });
-      publishLiveAssistantMessage(buf.sessionPath, buf.messageId, projected.blocks, {
-        segmentsById: Object.fromEntries(buf.segmentsById),
-        segmentOrder: [...buf.segmentOrder],
-        status: buf.turnEnding ? 'sealed' : 'streaming',
-        turnProjection: projected.projection,
-      });
-      return;
-    }
     const idPrefix = message?.sourceEntryId || message?.id || buf.messageId;
     const segments = buf.segmentOrder
       .map((segmentId) => buf.segmentsById.get(segmentId))
@@ -470,7 +400,7 @@ class StreamBufferManager {
   }
 
   private updateCanonicalSegment(buf: Buffer, msg: any): void {
-    this.lockCanonicalMode(buf);
+    this.ensureMessage(buf);
     if (!buf.messageId || typeof msg.segmentId !== 'string' || !msg.segmentId) return;
     const existing = buf.segmentsById.get(msg.segmentId);
     if (msg.type === 'assistant_segment_start') {
@@ -519,55 +449,6 @@ class StreamBufferManager {
     else this.publishBoundary(buf);
   }
 
-  /**
-   * canonical mood 事件（带 moodOrdinal，服务端 parser 链产出）：
-   * 直接进统一 block 集合，一个 mood 一块，id 首次分配后不变。
-   */
-  private updateCanonicalMood(buf: Buffer, msg: any): void {
-    this.lockCanonicalMode(buf);
-    const moodOrdinal = Number.isInteger(msg.moodOrdinal) ? msg.moodOrdinal as number : null;
-    if (moodOrdinal === null) return;
-    const blockId = canonicalMoodBlockId(buf, moodOrdinal);
-    const existing = buf.blocksById.get(blockId);
-    const yuan = existing?.type === 'mood' ? existing.yuan : resolveSessionYuan(buf.sessionPath);
-    if (msg.type === 'mood_start') {
-      pushBlock(buf, blockId, {
-        id: blockId,
-        type: 'mood',
-        yuan,
-        text: '',
-        semanticPhase: 'mood',
-        surfaceRole: 'process',
-        lifecycle: 'streaming',
-      });
-      this.publishBoundary(buf);
-    } else if (msg.type === 'mood_text') {
-      const prev = existing?.type === 'mood' ? existing.text : '';
-      pushBlock(buf, blockId, {
-        id: blockId,
-        type: 'mood',
-        yuan,
-        text: `${prev}${typeof msg.delta === 'string' ? msg.delta : ''}`,
-        semanticPhase: 'mood',
-        surfaceRole: 'process',
-        lifecycle: 'streaming',
-      });
-      this.scheduleFlush(buf);
-    } else if (msg.type === 'mood_end') {
-      const prev = existing?.type === 'mood' ? existing.text : '';
-      pushBlock(buf, blockId, {
-        id: blockId,
-        type: 'mood',
-        yuan,
-        text: prev,
-        semanticPhase: 'mood',
-        surfaceRole: 'process',
-        lifecycle: 'sealed',
-      });
-      this.publishBoundary(buf);
-    }
-  }
-
   private commitLiveTurn(buf: Buffer, persistedEntries: {
     turnInputEntryId?: string | null;
     userEntryId?: string | null;
@@ -584,35 +465,27 @@ class StreamBufferManager {
       && entry.data.id === buf.messageId
     ));
     const message = item?.type === 'message' ? item.data : null;
-    const status = persistedEntries.status || 'completed';
+    const assistantId = persistedEntries.assistantEntryId || message?.sourceEntryId || buf.messageId;
     const segments = buf.segmentOrder
       .map((segmentId) => buf.segmentsById.get(segmentId))
       .filter((segment): segment is LiveAssistantSegment => !!segment);
-
-    // Block ID 在 canonical 模式下绝不 rebase（不变量 5）：持久化 entry 只是
-    // metadata。legacy 模式沿用消息 id 前缀收口。
-    const legacyBlocks = buf.inputMode === 'canonical'
-      ? buf.blockOrder
-        .map((blockId) => buf.blocksById.get(blockId))
-        .filter((block): block is ContentBlock => !!block)
+    const legacyBlocks = message && assistantId !== message.id
+      ? rebaseGeneratedContentBlockIds(buf.blocks, message.id, assistantId)
       : buf.blocks;
-    const idPrefix = buf.inputMode === 'canonical'
-      ? buf.canonicalIdPrefix!
-      : (persistedEntries.assistantEntryId || message?.sourceEntryId || buf.messageId);
     const projected = projectAssistantTurn({
-      idPrefix,
+      idPrefix: assistantId,
       inputMessageId: persistedEntries.turnInputEntryId || message?.turnInputEntryId || null,
       assistantMessageIds: persistedEntries.assistantEntryIds?.length
         ? persistedEntries.assistantEntryIds
-        : [persistedEntries.assistantEntryId || message?.sourceEntryId || buf.messageId],
+        : [assistantId],
       segments,
       legacyBlocks,
-      status,
+      status: persistedEntries.status || 'completed',
     });
     for (const diagnostic of projected.diagnostics) {
       console.warn('[stream] unresolved assistant segment finalized with fallback:', diagnostic.segmentId);
     }
-    if (buf.inputMode !== 'canonical') buf.blocks = projected.blocks;
+    buf.blocks = projected.blocks;
     const committed = useStore.getState().bindPersistedTurnEntries(buf.sessionPath, {
       ...persistedEntries,
       assistantMessageId: buf.messageId,
@@ -681,19 +554,6 @@ class StreamBufferManager {
       return;
     }
     this.cancelScheduledFlush(buf);
-    if (buf.inputMode === 'canonical') {
-      // canonical 模式：legacy 聚合管线已退役，直接投影发布。
-      this.publishLiveTurn(buf);
-      recordChatPerformance('stream_flush', {
-        sessionPath: buf.sessionPath,
-        messageId: buf.messageId || undefined,
-        sourceLength: buf.textSegmentAcc.length,
-        blockCount: buf.blocksById.size,
-      });
-      buf.lastFlushTime = Date.now();
-      buf.publishPending = false;
-      return;
-    }
     const published = this.updateTargetMessage(buf, (msg) => updater({
       ...msg,
       blocks: renderBufferedBlocks(msg.blocks || [], buf),
@@ -735,45 +595,53 @@ class StreamBufferManager {
     const buf = this.getBuffer(sessionPath, sessionId);
 
     switch (msg.type) {
+      case 'turn_start':
+        this.beginTurn(sessionPath, sessionId, { streamId: msg.streamId, turnId: msg.turnId });
+        break;
+
       case 'assistant_segment_start':
       case 'assistant_segment_delta':
-      case 'assistant_segment_end':
+      case 'assistant_segment_end': {
+        // canonical 锁定：本轮此后 legacy text/thinking 兼容事件不再产生 UI block。
+        buf.canonicalLocked = true;
+        // 诊断：Turn 已终结、且没有新 turn_start 的情况下又收到 canonical 事件
+        if (!buf.turnActive && buf.lastFinalizedTurnKey) {
+          console.warn('[stream] canonical_after_terminal: segment event after turn finalized:', {
+            type: msg.type,
+            segmentId: msg.segmentId,
+            lastFinalizedTurnKey: buf.lastFinalizedTurnKey,
+            sessionPath,
+          });
+        }
+        // 诊断：delta/end 落在从未 start 过的 segment 上，说明中间丢了事件
+        if (msg.type !== 'assistant_segment_start'
+          && typeof msg.segmentId === 'string'
+          && !buf.segmentsById.has(msg.segmentId)) {
+          console.warn('[stream] canonical_segment_gap: segment event without start:', {
+            type: msg.type,
+            segmentId: msg.segmentId,
+            sessionPath,
+          });
+        }
         this.updateCanonicalSegment(buf, msg);
         break;
-
-      // canonical mood 事件（带 moodOrdinal）：协议解析已前移到服务端
-      // AssistantEventNormalizer，这些事件直接进统一 block 集合。
-      case 'mood_start':
-      case 'mood_text':
-      case 'mood_end':
-        if (Number.isInteger(msg.moodOrdinal)) {
-          this.updateCanonicalMood(buf, msg);
-          break;
-        }
-        // 旧服务器（无 moodOrdinal）走 legacy 聚合管线
-        this.handleLegacyMood(buf, msg, sessionPath);
-        break;
+      }
 
       case 'text_delta':
-        // 断线快照永远记录完整可见正文（含 canonical 模式）。
+        // 断线恢复快照始终累积完整正文。
         buf.textAcc += msg.delta || '';
-        if (buf.inputMode === 'canonical') {
-          // canonical 模式：正文由 assistant_segment_delta 通道承载。但旧服务器
-          // 兼容期可能只发 text_delta（canonical 事件缺席的正文），此时把增量
-          // 记入 textSegmentAcc 并合成一个显式 text segment，保证内容不丢。
-          buf.textSegmentAcc += msg.delta || '';
-          this.ensureSyntheticTextSegment(buf);
-          this.scheduleFlush(buf);
-          break;
-        }
+        // canonical 模式：正文唯一真相源是 assistant_segment_*，legacy text_delta
+        // 不得再创建 text block / segment（只允许累积快照与诊断）。
+        if (buf.canonicalLocked) break;
         this.ensureMessage(buf);
-        buf.segmentsLegacyTextAcc += msg.delta || '';
         buf.textSegmentAcc += msg.delta || '';
         this.scheduleFlush(buf);
         break;
 
       case 'thinking_start':
-        if (buf.inputMode === 'canonical') break;
+        // canonical 模式：思考唯一真相源是 reasoning segment，legacy thinking_*
+        // 不再产生第二个 thinking block（thinkingAcc 仍累积供快照）。
+        if (buf.canonicalLocked) break;
         this.ensureMessage(buf);
         buf.inThinking = true;
         buf.hasThinkingBlock = true;
@@ -782,22 +650,51 @@ class StreamBufferManager {
         break;
 
       case 'thinking_delta':
-        if (buf.inputMode === 'canonical') break;
         buf.hasThinkingBlock = true;
         buf.thinkingAcc += msg.delta || '';
         // 与 text/mood 共用时间节流，避免思考流只能在结束后显示。
-        this.scheduleFlush(buf);
+        if (!buf.canonicalLocked) this.scheduleFlush(buf);
         break;
 
       case 'thinking_end':
-        if (buf.inputMode === 'canonical') break;
         buf.hasThinkingBlock = true;
+        if (buf.canonicalLocked) break;
         buf.inThinking = false;
         this.publishBoundary(buf);
         break;
 
+      case 'mood_start':
+        this.ensureMessage(buf);
+        buf.inMood = true;
+        // 同一 buffer 内若已有已封存的 mood 段（例如一个 user turn 内多段模型生成
+        // 聚合到同一条消息），新的 mood 段不能清掉前段：暂挂分隔符，等首个非空
+        // mood_text 到达再落地；首段则从空开始。
+        if (buf.moodAcc.trim().length > 0) {
+          buf.moodPendingSeparator = true;
+        } else {
+          buf.moodAcc = '';
+          buf.moodPendingSeparator = false;
+        }
+        buf.moodYuan = resolveSessionYuan(sessionPath);
+        this.publishBoundary(buf);
+        break;
+
+      case 'mood_text':
+        // pending separator 只在收到非空内容时落地，空段不制造多余空白
+        if (buf.moodPendingSeparator && (msg.delta || '').trim()) {
+          buf.moodAcc += '\n\n';
+          buf.moodPendingSeparator = false;
+        }
+        buf.moodAcc += msg.delta || '';
+        this.scheduleFlush(buf);
+        break;
+
+      case 'mood_end':
+        buf.inMood = false;
+        this.publishBoundary(buf);
+        break;
+
       case 'card_start':
-        if (buf.inputMode === 'canonical') break;
         this.ensureMessage(buf);
         buf.inCard = true;
         buf.cardAttrs = msg.attrs || null;
@@ -805,12 +702,10 @@ class StreamBufferManager {
         break;
 
       case 'card_text':
-        if (buf.inputMode === 'canonical') break;
         buf.cardDescAcc += msg.delta || '';
         break;
 
       case 'card_end': {
-        if (buf.inputMode === 'canonical') break;
         buf.inCard = false;
         if (buf.cardAttrs) {
           const card = {
@@ -831,47 +726,46 @@ class StreamBufferManager {
       }
 
       case 'tool_start':
-        this.lockCanonicalMode(buf);
         this.ensureMessage(buf);
-        {
-          const blockId = this.nextToolGroupKey(buf, msg);
-          const tools = (() => {
-            // 找当前打开的 tool_group（canonical：最后一个 tool_group block）
-            const openId = this.findOpenToolGroupId(buf);
-            if (openId !== null) {
-              const group = buf.blocksById.get(openId);
-              if (group?.type === 'tool_group') {
-                return [...group.tools, toolCallFromStartEvent(msg)];
-              }
+        this.publishBoundary(buf, (m) => {
+          const blocks = [...(m.blocks || [])];
+          // 找最后一个 tool_group 或创建新的
+          let lastTg = blocks.length - 1;
+          while (lastTg >= 0 && blocks[lastTg].type !== 'tool_group') lastTg--;
+          if (lastTg >= 0 && blocks[lastTg].type === 'tool_group') {
+            const tg = blocks[lastTg] as Extract<ContentBlock, { type: 'tool_group' }>;
+            // 如果上一个 group 里还有未完成的工具，追加到同一个 group
+            if (tg.tools.some(t => !t.done)) {
+              blocks[lastTg] = {
+                ...tg,
+                tools: [...tg.tools, toolCallFromStartEvent(msg)],
+              };
+              return { ...m, blocks };
             }
-            return [toolCallFromStartEvent(msg)];
-          })();
-          pushBlock(buf, blockId, {
-            id: blockId,
+          }
+          // 新建 tool_group
+          blocks.push({
             type: 'tool_group',
-            tools,
+            tools: [toolCallFromStartEvent(msg)],
             collapsed: false,
-            semanticPhase: 'tool',
-            surfaceRole: 'process',
-            lifecycle: 'streaming',
           });
-        }
+          return { ...m, blocks };
+        });
         // 工具之后的新正文必须形成新的文本块，不能继续覆盖工具之前的正文。
-        // 冻结点前先把尚未合成 segment 的兼容正文落盘，工具边界后再开新段。
-        if (buf.textSegmentAcc) this.ensureSyntheticTextSegment(buf);
         buf.textSegmentAcc = '';
         buf.textSegmentOrdinal = null;
-        this.publishBoundary(buf);
         break;
 
-      case 'tool_end': {
-        const openId = this.findOpenToolGroupId(buf);
-        if (openId !== null) {
-          const group = buf.blocksById.get(openId);
-          if (group?.type === 'tool_group') {
-            const toolIdx = findOpenToolIndex(group.tools, msg);
+      case 'tool_end':
+        this.publishBoundary(buf, (m) => {
+          const blocks = [...(m.blocks || [])];
+          // 从后往前找含该 tool 名且未 done 的
+          for (let i = blocks.length - 1; i >= 0; i--) {
+            if (blocks[i].type !== 'tool_group') continue;
+            const tg = blocks[i] as Extract<ContentBlock, { type: 'tool_group' }>;
+            const toolIdx = findOpenToolIndex(tg.tools, msg);
             if (toolIdx >= 0) {
-              const tools = [...group.tools];
+              const tools = [...tg.tools];
               const id = toolCallIdFromEvent(msg);
               tools[toolIdx] = {
                 ...tools[toolIdx],
@@ -883,47 +777,13 @@ class StreamBufferManager {
                 ...(msg.details !== undefined ? { details: msg.details } : {}),
               };
               const allDone = tools.every(t => t.done);
-              pushBlock(buf, openId, {
-                ...group,
-                tools,
-                collapsed: allDone && tools.length > 1,
-                lifecycle: allDone ? 'sealed' : 'streaming',
-              });
-              this.publishBoundary(buf);
-              break;
+              blocks[i] = { ...tg, tools, collapsed: allDone && tools.length > 1 };
+              return { ...m, blocks };
             }
           }
-        }
-        // legacy 模式：写 buf.blocks（保持旧路径行为）
-        if (buf.inputMode !== 'canonical') {
-          this.publishBoundary(buf, (m) => {
-            const blocks = [...(m.blocks || [])];
-            for (let i = blocks.length - 1; i >= 0; i--) {
-              if (blocks[i].type !== 'tool_group') continue;
-              const tg = blocks[i] as Extract<ContentBlock, { type: 'tool_group' }>;
-              const toolIdx = findOpenToolIndex(tg.tools, msg);
-              if (toolIdx >= 0) {
-                const tools = [...tg.tools];
-                const id = toolCallIdFromEvent(msg);
-                tools[toolIdx] = {
-                  ...tools[toolIdx],
-                  ...(id ? { id } : {}),
-                  done: true,
-                  success: !!msg.success,
-                  status: msg.status || (msg.success ? 'succeeded' : 'failed'),
-                  ...(typeof msg.error === 'string' && msg.error ? { error: msg.error } : {}),
-                  ...(msg.details !== undefined ? { details: msg.details } : {}),
-                };
-                const allDone = tools.every(t => t.done);
-                blocks[i] = { ...tg, tools, collapsed: allDone && tools.length > 1 };
-                return { ...m, blocks };
-              }
-            }
-            return m;
-          });
-        }
+          return m;
+        });
         break;
-      }
 
       case 'content_block': {
         let block = msg.block;
@@ -953,24 +813,6 @@ class StreamBufferManager {
           }
         }
 
-        if (buf.inputMode === 'canonical') {
-          this.lockCanonicalMode(buf);
-          const id = block.id?.trim()
-            || `${buf.canonicalIdPrefix}:${block.type}:${buf.blocksById.size}`;
-          const mergeKey = replacementTaskId(block);
-          if (mergeKey) {
-            const existingId = [...buf.blocksById.entries()]
-              .find(([, value]) => value.type === 'media_generation' && value.taskId === mergeKey)?.[0];
-            if (existingId) {
-              pushBlock(buf, existingId, { ...block, id: existingId });
-              this.publishBoundary(buf);
-              break;
-            }
-          }
-          pushBlock(buf, id, block);
-          this.publishBoundary(buf);
-          break;
-        }
         this.ensureMessage(buf);
         this.publishBoundary(buf, (m) => ({
           ...m,
@@ -985,10 +827,24 @@ class StreamBufferManager {
       case 'compaction_end':
         break;
 
-      case 'turn_end':
+      case 'turn_end': {
+        const turnKey = turnKeyFrom(msg);
+        // 不变量 D：同一个 Turn 的 finalization 最多执行一次。
+        if (!buf.turnActive && turnKey && turnKey === buf.lastFinalizedTurnKey) {
+          console.debug('[stream] duplicate turn_end ignored (exactly-once):', turnKey);
+          break;
+        }
+        if (buf.turnActive && turnKey && buf.activeTurnKey && turnKey !== buf.activeTurnKey) {
+          // 身份不匹配：Turn 仍必须终结（服务端是 Turn 结束的权威），但记录诊断。
+          console.warn('[stream] turn_end streamId mismatch; finalizing active turn:', {
+            activeTurnKey: buf.activeTurnKey,
+            turnEndKey: turnKey,
+          });
+        }
         if ((msg.aborted || msg.failed) && !this.hasTurnState(buf)) {
           this.ensureMessage(buf);
         }
+        const activeKeyBeforeFinish = buf.activeTurnKey;
         this.finishBufferTurn(buf, {
           turnInputEntryId: msg.turnInputEntryId,
           userEntryId: msg.userEntryId,
@@ -996,87 +852,49 @@ class StreamBufferManager {
           assistantEntryIds: Array.isArray(msg.assistantEntryIds) ? msg.assistantEntryIds : undefined,
           status: msg.aborted ? 'aborted' : msg.failed ? 'failed' : 'completed',
         });
+        buf.lastFinalizedTurnKey = turnKey || activeKeyBeforeFinish || buf.lastFinalizedTurnKey;
         break;
+      }
 
     }
   }
 
   /**
-   * canonical 模式下兼容双发的 text_delta：当本段正文没有对应 canonical
-   * segment 时（旧服务器只发 text_delta 的路径），把 textSegmentAcc 合成为
-   * 一个显式 text segment，保证内容不丢。canonical segment 已承载同段正文
-   * 时保持静默（禁止双源，不变量 3）。
+   * 权威 Turn 生命周期开始（只能由 WS turn_start 驱动；status 不得调用）。
+   *
+   * 状态机：
+   *   idle + turn_start(A)        → active(A)，初始化本轮状态
+   *   active(A) + turn_start(A)   → 幂等 no-op（不得 flush/commit/reset）
+   *   active(A) + turn_start(B)   → 协议异常：记录 protocol_interrupted 诊断，
+   *                                 把 A 以 aborted 终结（绝不产生 missing_final_answer
+   *                                 的误报以外的第二真相），再开启 B
    */
-  private ensureSyntheticTextSegment(buf: Buffer): void {
-    if (!buf.textSegmentAcc) return;
-    const segmentId = `legacy-text:${buf.segmentOrder.length}`;
-    const existing = buf.segmentsById.get(segmentId);
-    const canonicalTextSegments = buf.segmentOrder
-      .filter((id) => !id.startsWith('legacy-text:'))
-      .map((id) => buf.segmentsById.get(id))
-      .filter((segment): segment is LiveAssistantSegment => !!segment && segment.kind === 'text');
-    // 完全相同源文本 -> canonical segment 已承载，跳过（双发去重）
-    if (canonicalTextSegments.some((segment) => segment.source === buf.textSegmentAcc)) return;
-    if (!existing) buf.segmentOrder.push(segmentId);
-    buf.segmentsById.set(segmentId, {
-      id: segmentId,
-      kind: 'text',
-      semanticPhase: 'final_answer',
-      source: buf.textSegmentAcc,
-      lifecycle: 'streaming',
-    });
-  }
-
-  private handleLegacyMood(buf: Buffer, msg: any, sessionPath: string): void {
-    this.ensureMessage(buf);
-    if (msg.type === 'mood_start') {
-      buf.inMood = true;
-      // 同一 buffer 内若已有已封存的 mood 段（例如一个 user turn 内多段模型生成
-      // 聚合到同一条消息），新的 mood 段不能清掉前段：暂挂分隔符，等首个非空
-      // mood_text 到达再落地；首段则从空开始。
-      if (buf.moodAcc.trim().length > 0) {
-        buf.moodPendingSeparator = true;
-      } else {
-        buf.moodAcc = '';
-        buf.moodPendingSeparator = false;
-      }
-      buf.moodYuan = resolveSessionYuan(sessionPath);
-      this.publishBoundary(buf);
-    } else if (msg.type === 'mood_text') {
-      // pending separator 只在收到非空内容时落地，空段不制造多余空白
-      if (buf.moodPendingSeparator && (msg.delta || '').trim()) {
-        buf.moodAcc += '\n\n';
-        buf.moodPendingSeparator = false;
-      }
-      buf.moodAcc += msg.delta || '';
-      this.scheduleFlush(buf);
-    } else if (msg.type === 'mood_end') {
-      buf.inMood = false;
-      this.publishBoundary(buf);
-    }
-  }
-
-  /** canonical 统一集合里最后一个仍有未完成工具的 tool_group key。 */
-  private findOpenToolGroupId(buf: Buffer): string | null {
-    for (let i = buf.blockOrder.length - 1; i >= 0; i--) {
-      const block = buf.blocksById.get(buf.blockOrder[i]);
-      if (block?.type === 'tool_group' && block.tools.some(t => !t.done)) return buf.blockOrder[i];
-    }
-    return null;
-  }
-
-  private nextToolGroupKey(buf: Buffer, msg: any): string {
-    // 上一个 group 已全部完成 -> 新 group；否则并入打开中的 group（id 不变）。
-    const openId = this.findOpenToolGroupId(buf);
-    if (openId !== null) return openId;
-    const callId = toolCallIdFromEvent(msg as never) || `start-${buf.blocksById.size}`;
-    return `${buf.canonicalIdPrefix}:tool_group:tools:${callId}`;
-  }
-
-  /** 服务端确认新 turn 开始：释放任何遗留的本地 turn 绑定。 */
-  beginTurn(sessionPath: string, sessionId: string | null = null): void {
+  beginTurn(
+    sessionPath: string,
+    sessionId: string | null = null,
+    identity: { streamId?: unknown; turnId?: unknown } = {},
+  ): void {
     const buf = this.getBuffer(sessionPath, sessionId);
-    this.finishBufferTurn(buf);
+    const key = turnKeyFrom(identity);
+    if (buf.turnActive) {
+      if (key === null || buf.activeTurnKey === null || key === buf.activeTurnKey) {
+        // 同一 Turn（或一方身份未知）的重复 turn_start：幂等 no-op；
+        // 身份未知的一侧借机补上权威身份。
+        if (buf.activeTurnKey === null && key !== null) buf.activeTurnKey = key;
+        return;
+      }
+      console.warn('[stream] protocol_interrupted: turn_start while another turn is active:', {
+        activeTurnKey: buf.activeTurnKey,
+        incomingTurnKey: key,
+        sessionPath,
+      });
+      const interruptedKey = buf.activeTurnKey;
+      this.finishBufferTurn(buf, { status: 'aborted' });
+      // 被中断 Turn 迟到的 turn_end 不得二次 finalize。
+      if (interruptedKey) buf.lastFinalizedTurnKey = interruptedKey;
+    }
+    buf.turnActive = true;
+    buf.activeTurnKey = key;
   }
 
   /** 服务端确认当前 turn 结束或被中止：flush 可见内容，然后释放 turn-local 绑定。 */
@@ -1117,49 +935,6 @@ class StreamBufferManager {
   snapshot(sessionPath: string, sessionId: string | null = null): StreamBufferSnapshot | null {
     const buf = this.lookupBuffer(sessionPath, sessionId);
     if (!buf) return null;
-    if (buf.inputMode === 'canonical') {
-      const segments = buf.segmentOrder
-        .map((segmentId) => buf.segmentsById.get(segmentId))
-        .filter((segment): segment is LiveAssistantSegment => !!segment);
-      const blocks = buf.blockOrder
-        .map((blockId) => buf.blocksById.get(blockId))
-        .filter((block): block is ContentBlock => !!block);
-      const segmentTexts = segments
-        .filter((segment) => segment.kind === 'text')
-        .map((segment) => segment.source);
-      const hasContent = !!(blocks.length || segments.length || buf.textAcc);
-      if (!hasContent) return null;
-      return {
-        hasContent: true,
-        messageId: buf.messageId,
-        blocks: [
-          ...blocks,
-          ...segments.map((segment) => ({
-            type: segment.kind === 'reasoning' ? 'thinking' : 'text',
-            ...(segment.kind === 'reasoning'
-              ? { content: segment.source, sealed: segment.lifecycle === 'sealed' }
-              : { source: segment.source }),
-          } as ContentBlock)),
-        ],
-        text: buf.textAcc || segmentTexts.join(''),
-        thinking: segments
-          .filter((segment) => segment.kind === 'reasoning')
-          .map((segment) => segment.source)
-          .join(''),
-        mood: buf.blocksById.size
-          ? [...buf.blocksById.values()].filter((block): block is Extract<ContentBlock, { type: 'mood' }> => block.type === 'mood')
-            .map((block) => block.text).join('\n\n')
-          : (buf.inMood ? buf.moodAcc : cleanMoodText(buf.moodAcc)),
-        moodYuan: (() => {
-          for (const block of buf.blocksById.values()) {
-            if (block.type === 'mood') return block.yuan;
-          }
-          return buf.moodYuan;
-        })(),
-        inThinking: false,
-        inMood: false,
-      };
-    }
     const hasContent = !!(buf.blocks.length || buf.textAcc || buf.thinkingAcc || buf.hasThinkingBlock || buf.moodAcc);
     if (!hasContent) return null;
     return {

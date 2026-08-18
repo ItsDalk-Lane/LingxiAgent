@@ -838,16 +838,11 @@
       "provenance": [
         {
           "root": "server-bootstrap",
-          "from": "server/assistant-event-normalizer.ts",
-          "kind": "import-statement"
-        },
-        {
-          "root": "server-bootstrap",
           "from": "server/routes/chat.ts",
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by server/assistant-event-normalizer.ts (import-statement); server/routes/chat.ts (import-statement)."
+      "reason": "Reached via esbuild source module graph, imported by server/routes/chat.ts (import-statement)."
     },
     {
       "path": "core/execution-boundary.ts",
@@ -122223,6 +122218,18 @@
       "reason": "Reached via esbuild source module graph, imported by core/preferences-manager.ts (import-statement); server/routes/preferences.ts (import-statement); server/routes/settings-snapshot.ts (import-statement)."
     },
     {
+      "path": "shared/reserved-tag-stream.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "core/events.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by core/events.ts (import-statement)."
+    },
+    {
       "path": "shared/runtime-api-key-ref.ts",
       "inputType": "source-graph",
       "provenance": [
@@ -123015,9 +123022,9 @@
     }
   ],
   "stats": {
-    "totalFiles": 10570,
+    "totalFiles": 10571,
     "byInputType": {
-      "source-graph": 674,
+      "source-graph": 675,
       "runtime-asset": 11,
       "nft-runtime-trace": 9885
     }

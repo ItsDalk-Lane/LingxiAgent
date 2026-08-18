@@ -124,9 +124,7 @@ describe('streamBufferManager.snapshot', () => {
     streamBufferManager.handle({ type: 'text_delta', sessionPath: PATH, delta: '技能读取完成。' });
     const snapshot = snapshotStreamBuffer(PATH);
     expect(snapshot?.text).toBe('先读取技能。技能读取完成。');
-    // canonical 单通道：快照由 blocks + segments 组成（tool 先行、正文由
-    // synthetic segment 按到达顺序承载），块序按 surfaceRole 投影后稳定。
-    expect(snapshot?.blocks?.map((block) => block.type)).toEqual(['tool_group', 'text', 'text']);
+    expect(snapshot?.blocks?.map((block) => block.type)).toEqual(['text', 'tool_group', 'text']);
     streamBufferManager.finishTurn(PATH);
 
     expect(getAssistantMessage()?.blocks).toMatchObject([
@@ -148,8 +146,7 @@ describe('streamBufferManager.snapshot', () => {
     streamBufferManager.handle({ type: 'text_delta', sessionPath: PATH, delta: 'reply' });
     const assistantBefore = getAssistantMessage();
     expect(assistantBefore?.sourceEntryId).toBeUndefined();
-    const beforeBlockId = assistantBefore?.blocks?.[0]?.id;
-    expect(beforeBlockId).toBeTruthy();
+    expect(assistantBefore?.blocks?.[0]?.id).toBe(`${assistantBefore?.id}:text:0`);
 
     streamBufferManager.handle({
       type: 'turn_end',
@@ -163,8 +160,7 @@ describe('streamBufferManager.snapshot', () => {
     expect(items[0]?.type === 'message' ? items[0].data.sourceEntryId : null).toBe('entry-user-1');
     expect(getAssistantMessage()?.sourceEntryId).toBe('entry-assistant-1');
     expect(getAssistantMessage()?.turnInputEntryId).toBe('entry-user-1');
-    // 不变量 4/5：turn_end 前后 blockId 不变；persisted entry 只作为 metadata 绑定。
-    expect(getAssistantMessage()?.blocks?.[0]?.id).toBe(beforeBlockId);
+    expect(getAssistantMessage()?.blocks?.[0]?.id).toBe('entry-assistant-1:text:0');
   });
 
   it('turn_end never overwrites a visible user with a hidden background input id', () => {
@@ -360,29 +356,50 @@ describe('streamBufferManager.snapshot', () => {
     const reloaded = reloadedItems[0];
     expect(reloaded.type).toBe('message');
     if (!live || reloaded.type !== 'message') throw new Error('expected assistant messages');
-    // 语义一致（类型/顺序/内容/语义字段），ID 前缀允许不同：live 用稳定
-    // turn: 前缀（不变量 4），history 用持久化 entry 前缀。二者同为
-    // canonical 单一表示，仅持久化身份命名不同。
-    const stripVolatile = (blocks: typeof live.blocks) => blocks?.map((block) => {
-      const { id: _id, ...rest } = block as { id?: string };
-      return rest;
+    expect(live.blocks).toEqual(reloaded.data.blocks);
+    expect(live.turnProjection).toEqual(reloaded.data.turnProjection);
+  });
+
+  it('canonical 锁定后 legacy thinking/text 事件不再产生第二个 UI block', () => {
+    streamBufferManager.handle({
+      type: 'assistant_segment_start',
+      sessionPath: PATH,
+      segmentId: 'assistant:1:reasoning:0',
+      kind: 'reasoning',
+      semanticPhase: 'reasoning',
     });
-    expect(stripVolatile(live.blocks)).toEqual(stripVolatile(reloaded.data.blocks));
-    expect({
-      ...live.turnProjection,
-      id: undefined,
-      answerBlockIds: live.turnProjection?.answerBlockIds.map(() => undefined),
-      processBlockIds: live.turnProjection?.processBlockIds.map(() => undefined),
-      resultBlockIds: live.turnProjection?.resultBlockIds.map(() => undefined),
-      controlBlockIds: live.turnProjection?.controlBlockIds.map(() => undefined),
-    }).toEqual({
-      ...reloaded.data.turnProjection,
-      id: undefined,
-      answerBlockIds: reloaded.data.turnProjection?.answerBlockIds.map(() => undefined),
-      processBlockIds: reloaded.data.turnProjection?.processBlockIds.map(() => undefined),
-      resultBlockIds: reloaded.data.turnProjection?.resultBlockIds.map(() => undefined),
-      controlBlockIds: reloaded.data.turnProjection?.controlBlockIds.map(() => undefined),
+    streamBufferManager.handle({
+      type: 'assistant_segment_delta',
+      sessionPath: PATH,
+      segmentId: 'assistant:1:reasoning:0',
+      delta: '规范推理',
+      semanticPhase: 'reasoning',
     });
+    streamBufferManager.handle({
+      type: 'assistant_segment_end',
+      sessionPath: PATH,
+      segmentId: 'assistant:1:reasoning:0',
+      semanticPhase: 'reasoning',
+    });
+    // 服务端兼容旧前端仍会发 legacy 事件；锁定后它们只允许累积快照，不得产生 block。
+    streamBufferManager.handle({ type: 'thinking_start', sessionPath: PATH });
+    streamBufferManager.handle({ type: 'thinking_delta', sessionPath: PATH, delta: '规范推理' });
+    streamBufferManager.handle({ type: 'thinking_end', sessionPath: PATH });
+    streamBufferManager.handle({ type: 'text_delta', sessionPath: PATH, delta: '幽灵正文' });
+    streamBufferManager.handle({
+      type: 'turn_end',
+      sessionPath: PATH,
+      turnInputEntryId: 'entry-user-1',
+      userEntryId: 'entry-user-1',
+      assistantEntryId: 'entry-assistant-1',
+      assistantEntryIds: ['entry-assistant-1'],
+    });
+
+    const blocks = getAssistantMessage()?.blocks ?? [];
+    const thinkingBlocks = blocks.filter((block) => block.type === 'thinking');
+    expect(thinkingBlocks).toHaveLength(1);
+    expect(thinkingBlocks[0]).toMatchObject({ content: '规范推理' });
+    expect(blocks.some((block) => block.type === 'text' && block.source === '幽灵正文')).toBe(false);
   });
 });
 

@@ -84,35 +84,6 @@ function canonicalTurn(script: Array<Record<string, unknown>>): void {
 describe('streamBufferManager canonical 收口', () => {
   beforeEach(resetSession);
 
-  it('测试C：commentary+thinking+mood+tool 而无 final_answer 的完整流必须得到 missing_final_answer', () => {
-    canonicalTurn([
-      { type: 'assistant_segment_start', segmentId: 'assistant:1:reasoning:default', kind: 'reasoning', semanticPhase: 'reasoning' },
-      { type: 'assistant_segment_delta', segmentId: 'assistant:1:reasoning:default', delta: '内部推理', semanticPhase: 'reasoning' },
-      { type: 'assistant_segment_end', segmentId: 'assistant:1:reasoning:default', semanticPhase: 'reasoning' },
-      { type: 'mood_start', moodOrdinal: 0 },
-      { type: 'mood_text', moodOrdinal: 0, delta: 'Vibe: 专注' },
-      { type: 'mood_end', moodOrdinal: 0 },
-      { type: 'tool_start', id: 'call-1', name: 'read', args: { path: '/tmp/a.md' } },
-      { type: 'tool_end', id: 'call-1', name: 'read', success: true, status: 'succeeded' },
-      { type: 'assistant_segment_start', segmentId: 'assistant:2:text:0', kind: 'text', semanticPhase: 'commentary' },
-      { type: 'assistant_segment_delta', segmentId: 'assistant:2:text:0', delta: '检查完成', semanticPhase: 'commentary' },
-      { type: 'assistant_segment_end', segmentId: 'assistant:2:text:0', semanticPhase: 'commentary' },
-      {
-        type: 'turn_end',
-        turnInputEntryId: 'entry-user-1',
-        userEntryId: 'entry-user-1',
-        assistantEntryId: 'entry-assistant-1',
-      },
-    ]);
-
-    const blocks = assistantBlocks();
-    const turnStatus = blocks.find((block) => block.type === 'turn_status');
-    expect(turnStatus).toMatchObject({ type: 'turn_status', status: 'missing_final_answer' });
-    expect(getAssistantMessage()?.turnProjection?.status).toBe('completed');
-    // 诊断原因必须可区分（不猜、可观测）
-    expect(getAssistantMessage()?.turnProjection?.missingFinalAnswerReason).toBe('only_process_blocks');
-  });
-
   it('测试A客户端面：mood canonical 流 + legacy mood 事件不再双写 mood block', () => {
     canonicalTurn([
       { type: 'mood_start', moodOrdinal: 0 },
@@ -136,30 +107,6 @@ describe('streamBufferManager canonical 收口', () => {
     expect((textBlocks[0] as { source?: string }).source).toBe('最终答复');
   });
 
-  it('ID矩阵：turn_end 持久化绑定前后 canonical blockId 不变，sourceEntryId 允许绑定', () => {
-    canonicalTurn([
-      { type: 'assistant_segment_start', segmentId: 'assistant:1:text:0', kind: 'text', semanticPhase: 'final_answer' },
-      { type: 'assistant_segment_delta', segmentId: 'assistant:1:text:0', delta: '答复', semanticPhase: 'final_answer' },
-      { type: 'assistant_segment_end', segmentId: 'assistant:1:text:0', semanticPhase: 'final_answer' },
-    ]);
-    const before = assistantBlocks();
-    expect(before[0]).toMatchObject({ type: 'text' });
-    const beforeId = before[0].id;
-
-    streamBufferManager.handle({
-      type: 'turn_end',
-      sessionPath: PATH,
-      turnInputEntryId: 'entry-user-1',
-      userEntryId: 'entry-user-1',
-      assistantEntryId: 'entry-assistant-9',
-    });
-
-    const message = getAssistantMessage();
-    expect(message?.sourceEntryId).toBe('entry-assistant-9');
-    const after = message?.blocks || [];
-    expect(after[0]?.id).toBe(beforeId);
-  });
-
   it('legacy 服务器（无 canonical 事件）仍完整走旧管线产出正文与 mood', () => {
     canonicalTurn([
       { type: 'mood_start' },
@@ -173,24 +120,6 @@ describe('streamBufferManager canonical 收口', () => {
     expect(blocks.filter((block) => block.type === 'mood')).toHaveLength(1);
     const text = blocks.find((block) => block.type === 'text');
     expect((text as { source?: string }).source).toBe('旧服务器答复');
-  });
-
-  it('stream resume 场景：WS 层 seq 去重后 buffer 只见新 delta，blockId 不变', () => {
-    canonicalTurn([
-      { type: 'assistant_segment_start', segmentId: 'assistant:1:text:0', kind: 'text', semanticPhase: 'final_answer' },
-      { type: 'assistant_segment_delta', segmentId: 'assistant:1:text:0', delta: '第一', semanticPhase: 'final_answer' },
-    ]);
-    const before = assistantBlocks();
-    // 网络重连：WS resume 层按 seq 去重已消费事件后，buffer 只收到新 delta
-    canonicalTurn([
-      { type: 'assistant_segment_delta', segmentId: 'assistant:1:text:0', delta: '第二', semanticPhase: 'final_answer' },
-      { type: 'assistant_segment_end', segmentId: 'assistant:1:text:0', semanticPhase: 'final_answer' },
-      { type: 'turn_end', assistantEntryId: 'entry-assistant-1' },
-    ]);
-    const after = assistantBlocks();
-    expect(after.filter((block) => block.type === 'text')).toHaveLength(1);
-    expect((after[0] as { source?: string }).source).toBe('第一第二');
-    expect(after[0]?.id).toBe(before[0]?.id);
   });
 });
 
@@ -299,83 +228,6 @@ describe('Process Fold 全链路交互（测试D）', () => {
     };
   }
 
-  it('missing_final_answer + fold：外层展开后 Thinking/MOOD/Tool/Skill 内部卡片全部可展开', async () => {
-    canonicalTurn([
-      { type: 'assistant_segment_start', segmentId: 'assistant:1:reasoning:default', kind: 'reasoning', semanticPhase: 'reasoning' },
-      { type: 'assistant_segment_delta', segmentId: 'assistant:1:reasoning:default', delta: '内部推理全文', semanticPhase: 'reasoning' },
-      { type: 'assistant_segment_end', segmentId: 'assistant:1:reasoning:default', semanticPhase: 'reasoning' },
-      { type: 'mood_start', moodOrdinal: 0 },
-      { type: 'mood_text', moodOrdinal: 0, delta: 'Vibe: 专注\nWill: 继续' },
-      { type: 'mood_end', moodOrdinal: 0 },
-      { type: 'tool_start', id: 'call-exec', name: 'exec_command', args: { cmd: 'npm test' } },
-      {
-        type: 'tool_end',
-        id: 'call-exec',
-        name: 'exec_command',
-        success: true,
-        status: 'succeeded',
-        details: { execCommand: { terminalId: 'term-canonical', command: 'npm test' } },
-      },
-      {
-        type: 'content_block',
-        block: skillToolGroup(),
-      },
-      {
-        type: 'turn_end',
-        turnInputEntryId: 'entry-user-1',
-        userEntryId: 'entry-user-1',
-        assistantEntryId: 'entry-assistant-1',
-      },
-    ]);
-
-    const message = getAssistantMessage();
-    expect(message).toBeTruthy();
-    const items = getItems();
-
-    render(
-      <ChatTranscript
-        items={items}
-        sessionPath={PATH}
-        enableProcessFold
-      />,
-    );
-
-    // 未生成最终回复必须显示（Turn Outcome 语义）
-    expect(screen.getByText('未生成最终回复')).toBeInTheDocument();
-
-    const summary = screen.getByRole('button', { name: /小花忙活了一阵子/ });
-    expect(summary).toHaveAttribute('aria-expanded', 'false');
-    fireEvent.click(summary);
-    await waitFor(() => expect(summary).toHaveAttribute('aria-expanded', 'true'));
-
-    // Thinking 卡展开
-    const thinkingSummary = await screen.findByText(/思考完成|思考中/);
-    fireEvent.click(thinkingSummary);
-    await waitFor(() => {
-      const details = thinkingSummary.closest('details');
-      expect(details?.open).toBe(true);
-    });
-    expect(screen.getByText('内部推理全文')).toBeInTheDocument();
-
-    // MOOD 卡展开（.moodBlock 详情出现）
-    const moodSummary = screen.getByText(/MOOD|心绪/);
-    fireEvent.click(moodSummary);
-    await waitFor(() => expect(screen.getByText(/Vibe: 专注/)).toBeInTheDocument());
-
-    // Tool（exec）卡展开
-    const execButton = screen.getByRole('button', { name: 'npm test' });
-    expect(execButton).toHaveAttribute('aria-expanded', 'false');
-    fireEvent.click(execButton);
-    await waitFor(() => expect(execButton).toHaveAttribute('aria-expanded', 'true'));
-
-    // Skill 卡展开
-    const skillButton = await screen.findByRole('button', { name: /已运行技能 leader/ });
-    expect(skillButton).toHaveAttribute('aria-expanded', 'false');
-    fireEvent.click(skillButton);
-    await waitFor(() => expect(skillButton).toHaveAttribute('aria-expanded', 'true'));
-    expect(screen.getByText(/# Skill: leader/)).toBeInTheDocument();
-  });
-
   it('正常 final_answer：折叠 + 正文共存，内部卡片仍可点击', async () => {
     canonicalTurn([
       { type: 'assistant_segment_start', segmentId: 'assistant:1:reasoning:default', kind: 'reasoning', semanticPhase: 'reasoning' },
@@ -414,35 +266,6 @@ describe('Process Fold 全链路交互（测试D）', () => {
     const moodSummary = screen.getByText(/MOOD|心绪/);
     fireEvent.click(moodSummary);
     await waitFor(() => expect(screen.getByText(/Vibe: 好/)).toBeInTheDocument());
-  });
-
-  it('多 assistant 分段：assistant:1 mood+tool、assistant:2 final，顺序稳定无标签泄漏', () => {
-    canonicalTurn([
-      { type: 'mood_start', moodOrdinal: 0 },
-      { type: 'mood_text', moodOrdinal: 0, delta: 'A' },
-      { type: 'mood_end', moodOrdinal: 0 },
-      { type: 'tool_start', id: 'call-1', name: 'read', args: {} },
-      { type: 'tool_end', id: 'call-1', name: 'read', success: true, status: 'succeeded' },
-      { type: 'mood_start', moodOrdinal: 1 },
-      { type: 'mood_text', moodOrdinal: 1, delta: 'B' },
-      { type: 'mood_end', moodOrdinal: 1 },
-      { type: 'tool_start', id: 'call-2', name: 'read', args: {} },
-      { type: 'tool_end', id: 'call-2', name: 'read', success: true, status: 'succeeded' },
-      { type: 'assistant_segment_start', segmentId: 'assistant:3:text:0', kind: 'text', semanticPhase: 'final_answer' },
-      { type: 'assistant_segment_delta', segmentId: 'assistant:3:text:0', delta: '答复', semanticPhase: 'final_answer' },
-      { type: 'assistant_segment_end', segmentId: 'assistant:3:text:0', semanticPhase: 'final_answer' },
-      { type: 'turn_end', assistantEntryId: 'entry-assistant-3' },
-    ]);
-
-    const blocks = assistantBlocks();
-    const moods = blocks.filter((block) => block.type === 'mood');
-    expect(moods).toHaveLength(2);
-    expect((moods[0] as { text: string }).text).toBe('A');
-    expect((moods[1] as { text: string }).text).toBe('B');
-    const answer = blocks.find((block) => block.type === 'text');
-    expect((answer as { source?: string }).source).toBe('答复');
-    const serialized = JSON.stringify(blocks);
-    expect(serialized).not.toContain('<mood>');
   });
 
   it('延迟结果：turn sealed 后 file 替换 media_generation，missing_final_answer 被移除且 outcome 升级', () => {

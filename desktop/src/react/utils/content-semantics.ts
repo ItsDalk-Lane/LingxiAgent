@@ -161,3 +161,18 @@ export function normalizeContentBlocks(
     } as ContentBlock;
   });
 }
+
+/** 回合落盘后，仅把本地临时前缀替换为持久条目前缀；上游显式标识不改。 */
+export function rebaseGeneratedContentBlockIds(
+  blocks: readonly ContentBlock[],
+  previousPrefix: string,
+  nextPrefix: string,
+): ContentBlock[] {
+  if (!previousPrefix || !nextPrefix || previousPrefix === nextPrefix) return [...blocks];
+  const generatedPrefix = `${previousPrefix}:`;
+  return blocks.map((block) => (
+    block.id?.startsWith(generatedPrefix)
+      ? { ...block, id: `${nextPrefix}:${block.id.slice(generatedPrefix.length)}` } as ContentBlock
+      : block
+  ));
+}

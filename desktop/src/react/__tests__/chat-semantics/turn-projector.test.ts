@@ -13,7 +13,7 @@ function segment(
 }
 
 describe('turn projector', () => {
-  it('未决文字在流式期属于过程，结束后按供应商回退成为答案且不换标识', () => {
+  it('未决文字在流式期是 provisional（不算过程也不算答案），结束后按供应商回退成为答案且不换标识', () => {
     const unresolved = {
       ...segment('assistant:1:text:0', 'unresolved', '连接提前结束前的文字'),
       lifecycle: 'streaming' as const,
@@ -35,13 +35,20 @@ describe('turn projector', () => {
       status: 'completed',
     });
 
+    // 流式期：unresolved ≠ commentary。它是"还没判明身份"的临时文字，
+    // 不进过程折叠，也不冒称答案。
     expect(live.blocks[0]).toMatchObject({
       id: 'entry-assistant-1:segment:assistant:1:text:0',
       type: 'text',
-      semanticPhase: 'commentary',
-      surfaceRole: 'process',
+      semanticPhase: 'unresolved',
+      surfaceRole: 'provisional',
       lifecycle: 'streaming',
     });
+    expect(live.projection.provisionalBlockIds).toEqual([
+      'entry-assistant-1:segment:assistant:1:text:0',
+    ]);
+    expect(live.projection.processBlockIds).toEqual([]);
+    expect(live.projection.answerBlockIds).toEqual([]);
     expect(finalized.blocks[0]).toMatchObject({
       id: 'entry-assistant-1:segment:assistant:1:text:0',
       type: 'text',
@@ -49,6 +56,7 @@ describe('turn projector', () => {
       surfaceRole: 'answer',
       lifecycle: 'sealed',
     });
+    expect(finalized.projection.provisionalBlockIds ?? []).toEqual([]);
     expect(finalized.diagnostics).toEqual([
       expect.objectContaining({ code: 'unresolved_phase_fallback' }),
     ]);
@@ -106,6 +114,24 @@ describe('turn projector', () => {
     ]);
   });
 
+  it('流式期（非终结态）即使只有过程文字也绝不产生 turn_status 块', () => {
+    // 不变式 H：missing_final_answer 只允许在 Turn 终结后出现
+    const result = projectAssistantTurn({
+      idPrefix: 'entry-assistant-1',
+      inputMessageId: 'entry-user-1',
+      assistantMessageIds: ['entry-assistant-1'],
+      segments: [{
+        ...segment('assistant:1:text:0', 'commentary', '还在检查中'),
+        lifecycle: 'streaming' as const,
+      }],
+      legacyBlocks: [],
+      status: 'streaming',
+    });
+
+    expect(result.blocks.every((block) => block.type !== 'turn_status')).toBe(true);
+    expect(result.projection.resultBlockIds).toEqual([]);
+  });
+
   it('正常结束但没有答案和结果时，明确生成未回复状态而不晋升最后一段过程', () => {
     const result = projectAssistantTurn({
       idPrefix: 'entry-assistant-1',
@@ -126,7 +152,7 @@ describe('turn projector', () => {
     ]);
     expect(result.projection.answerBlockIds).toEqual([]);
     expect(result.projection.resultBlockIds).toEqual([
-      'entry-assistant-1:turn-status:missing-final-answer',
+      'entry-assistant-1:missing-final-answer',
     ]);
   });
 
