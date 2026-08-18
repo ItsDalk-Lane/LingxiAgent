@@ -463,6 +463,7 @@ export function createChatRoute(engine: any, hub: any, {
         thinkTagParser: new ThinkTagParser(),
         moodParser: new MoodParser(),
         cardParser: new CardParser(),
+        strippedTextKeys: new Set(),
         _cardHints: [],
         _cardEmitted: false,
         isThinking: false,
@@ -710,6 +711,7 @@ export function createChatRoute(engine: any, hub: any, {
     ss.moodParser.reset();
     ss.cardParser.reset();
     ss.assistantEventNormalizer.reset();
+    ss.strippedTextKeys?.clear?.();
     ss.pendingToolContextsByCallId?.clear?.();
     ss._cardHints = [];
     ss._cardEmitted = false;
@@ -1159,17 +1161,83 @@ export function createChatRoute(engine: any, hub: any, {
       });
     };
 
-    const feedMoodPipeline = (text) => {
-      ss.moodParser.feed(text, (evt) => {
-        if (evt.type === "text") {
-          feedCardPipeline(evt.data);
-        } else if (evt.type === "mood_start") {
-          emitStreamEvent(sessionPath, ss, { type: "mood_start" });
-        } else if (evt.type === "mood_text") {
-          emitStreamEvent(sessionPath, ss, { type: "mood_text", delta: evt.data });
-        } else if (evt.type === "mood_end") {
-          emitStreamEvent(sessionPath, ss, { type: "mood_end" });
+    const emitMoodPipelineEvent = (mEvt) => {
+      if (mEvt.type === "mood_start") {
+        emitStreamEvent(sessionPath, ss, { type: "mood_start" });
+      } else if (mEvt.type === "mood_text") {
+        // mood 也是可见产出：纯 mood 的 turn 不得被误判为「模型无响应」
+        ss.hasOutput = true;
+        emitStreamEvent(sessionPath, ss, { type: "mood_text", delta: mEvt.data });
+      } else if (mEvt.type === "mood_end") {
+        emitStreamEvent(sessionPath, ss, { type: "mood_end" });
+      }
+    };
+
+    // 脱掉保留标签的干净文本进入 normalizer 的唯一入口：
+    // canonical segment 与 visibleTextDeltas 都永远不带裸 <mood>/<think> 标签。
+    const feedCleanTextToNormalizer = (text, subEvent, message) => {
+      if (!text) return;
+      publishNormalizedAssistantBatch(ss.assistantEventNormalizer.handleTextEvent(
+        { ...subEvent, type: "text_delta", delta: text },
+        message,
+      ));
+    };
+
+    const feedMoodPipelineToNormalizer = (text, subEvent, message) => {
+      ss.moodParser.feed(text, (mEvt) => {
+        if (mEvt.type === "text") feedCleanTextToNormalizer(mEvt.data, subEvent, message);
+        else emitMoodPipelineEvent(mEvt);
+      });
+    };
+
+    // 保留协议（mood/think）在文字进入 normalizer 之前剥离：
+    // 标签在任何 semanticPhase 都结构化，canonical 文本从此不带协议标签。
+    const feedReservedTagText = (subEvent, message) => {
+      const raw = typeof subEvent?.delta === "string" ? subEvent.delta : "";
+      if (!raw) return;
+      flushPendingTurnInputConsumptions(sessionPath, ss, message);
+      const key = Number.isInteger(subEvent?.contentIndex) ? String(subEvent.contentIndex) : "default";
+      ss.strippedTextKeys.add(key);
+      ss.thinkTagParser.feed(raw, (tEvt) => {
+        switch (tEvt.type) {
+          case "think_start":
+            emitStreamEvent(sessionPath, ss, { type: "thinking_start" });
+            break;
+          case "think_text":
+            ss.hasThinking = true;
+            publishNormalizedAssistantBatch(ss.assistantEventNormalizer.handleReasoningDelta(tEvt.data));
+            emitStreamEvent(sessionPath, ss, { type: "thinking_delta", delta: tEvt.data });
+            break;
+          case "think_end":
+            publishNormalizedAssistantBatch(ss.assistantEventNormalizer.finishReasoning());
+            emitStreamEvent(sessionPath, ss, { type: "thinking_end" });
+            break;
+          case "text":
+            feedMoodPipelineToNormalizer(tEvt.data, subEvent, message);
+            break;
         }
+      });
+    };
+
+    // 段/消息/turn 边界：把解析器里挂起的尾巴（跨 delta 的半截标签）冲进当前 segment。
+    // 必须先于 normalizer 的 finishText/finishMessage/finishTurn 调用，
+    // 否则尾巴文字会落进下一个 segment 或被静默吞掉。
+    const flushReservedTagParsers = (subEvent, message) => {
+      ss.thinkTagParser.flush((tEvt) => {
+        if (tEvt.type === "think_text") {
+          ss.hasThinking = true;
+          publishNormalizedAssistantBatch(ss.assistantEventNormalizer.handleReasoningDelta(tEvt.data));
+          emitStreamEvent(sessionPath, ss, { type: "thinking_delta", delta: tEvt.data });
+        } else if (tEvt.type === "think_end") {
+          publishNormalizedAssistantBatch(ss.assistantEventNormalizer.finishReasoning());
+          emitStreamEvent(sessionPath, ss, { type: "thinking_end" });
+        } else if (tEvt.type === "text") {
+          feedMoodPipelineToNormalizer(tEvt.data, subEvent, message);
+        }
+      });
+      ss.moodParser.flush((mEvt) => {
+        if (mEvt.type === "text") feedCleanTextToNormalizer(mEvt.data, subEvent, message);
+        else emitMoodPipelineEvent(mEvt);
       });
     };
 
@@ -1179,24 +1247,6 @@ export function createChatRoute(engine: any, hub: any, {
         publishNormalizedAssistantBatch(ss.assistantEventNormalizer.finishReasoning());
         emitStreamEvent(sessionPath, ss, { type: "thinking_end" });
       }
-      ss.thinkTagParser.flush((tEvt) => {
-        if (tEvt.type === "think_text") {
-          publishNormalizedAssistantBatch(ss.assistantEventNormalizer.handleReasoningDelta(tEvt.data));
-          emitStreamEvent(sessionPath, ss, { type: "thinking_delta", delta: tEvt.data });
-        } else if (tEvt.type === "think_end") {
-          publishNormalizedAssistantBatch(ss.assistantEventNormalizer.finishReasoning());
-          emitStreamEvent(sessionPath, ss, { type: "thinking_end" });
-        } else if (tEvt.type === "text") {
-          feedMoodPipeline(tEvt.data);
-        }
-      });
-      ss.moodParser.flush((evt) => {
-        if (evt.type === "text") {
-          feedCardPipeline(evt.data);
-        } else if (evt.type === "mood_text") {
-          emitStreamEvent(sessionPath, ss, { type: "mood_text", delta: evt.data });
-        }
-      });
       ss.cardParser.flush((cEvt) => {
         if (cEvt.type === "text") {
           emitStreamEvent(sessionPath, ss, { type: "text_delta", delta: cEvt.data });
@@ -1209,6 +1259,19 @@ export function createChatRoute(engine: any, hub: any, {
           emitStreamEvent(sessionPath, ss, { type: "card_end" });
         }
       });
+    };
+
+    // normalizer 在 text_end 且没有流式 delta 时会回退读 message.content 的原始块文本；
+    // 该文本已走过保留协议管道时，把块文本置空防止裸标签二次回流（相位检测只看
+    // textSignature，不读 text，置空不影响相位判定）。
+    const blankAssistantTextBlocks = (message) => {
+      if (!message || !Array.isArray(message.content)) return message;
+      return {
+        ...message,
+        content: message.content.map((block) => (
+          block && typeof block === "object" && block.type === "text" ? { ...block, text: "" } : block
+        )),
+      };
     };
 
     const thinkingDeltaFromEvent = (subEvent) => {
@@ -1230,26 +1293,9 @@ export function createChatRoute(engine: any, hub: any, {
         emitStreamEvent(sessionPath, ss, { type: "thinking_end" });
       }
 
-      // ThinkTagParser（最外层）→ MoodParser → CardParser
-      ss.thinkTagParser.feed(text, (tEvt) => {
-        switch (tEvt.type) {
-          case "think_start":
-            emitStreamEvent(sessionPath, ss, { type: "thinking_start" });
-            break;
-          case "think_text":
-            publishNormalizedAssistantBatch(ss.assistantEventNormalizer.handleReasoningDelta(tEvt.data));
-            emitStreamEvent(sessionPath, ss, { type: "thinking_delta", delta: tEvt.data });
-            break;
-          case "think_end":
-            publishNormalizedAssistantBatch(ss.assistantEventNormalizer.finishReasoning());
-            emitStreamEvent(sessionPath, ss, { type: "thinking_end" });
-            break;
-          case "text":
-            // 非 think 内容继续走 MoodParser → CardParser 链
-            feedMoodPipeline(tEvt.data);
-            break;
-        }
-      });
+      // mood/think 保留协议已在进入 normalizer 之前剥离（见 feedReservedTagText），
+      // 这里的 final_answer 可见文本只剩 card 协议需要解析。
+      feedCardPipeline(text);
     };
 
     const publishNormalizedAssistantBatch = (batch) => {
@@ -1278,11 +1324,13 @@ export function createChatRoute(engine: any, hub: any, {
       // re-arm 前先把上一段遗留的未冲刷缓冲按原管道冲出来：beginAssistantSegment 会清
       // parser 缓冲，若不先 flush，上一段结尾被挂起的半个标签尾巴（如截断流只留下
       // "<re"）会被静默丢弃——SDK handleRunFailure 等路径 message_start 会先于
-      // turn_end 到达。canonical 流里缓冲已在 turn_end 冲空，这里是无副作用 no-op。
+      // turn_end 到达。flush 必须先于 finishMessage，尾巴文字才落回它所属的 segment。
+      flushReservedTagParsers({ type: "text_delta" }, event.message);
       publishNormalizedAssistantBatch(ss.assistantEventNormalizer.finishMessage(event.message));
       flushTerminalParsers();
       ss.thinkTagParser.beginAssistantSegment();
       ss.moodParser.beginAssistantSegment();
+      ss.strippedTextKeys.clear();
       ss.assistantEventNormalizer.beginAssistantMessage();
     } else if (event.type === "message_update") {
       if (!ss) return;
@@ -1295,13 +1343,25 @@ export function createChatRoute(engine: any, hub: any, {
           publishNormalizedAssistantBatch(ss.assistantEventNormalizer.finishReasoning());
           emitStreamEvent(sessionPath, ss, { type: "thinking_end" });
         }
-        publishNormalizedAssistantBatch(
-          ss.assistantEventNormalizer.handleTextEvent(subEvent, event.message),
-        );
+        feedReservedTagText(subEvent, event.message);
       } else if (sub === "text_end") {
         const subEvent = event.assistantMessageEvent;
+        // 先把挂起的半截标签冲进当前 segment，再关闭它
+        flushReservedTagParsers(subEvent, event.message);
+        // 无流式 delta、整段文字只在 text_end 到达的兜底路径：content 同样先过
+        // 保留协议管道，再把脱净后的事件交给 normalizer 收尾，避免裸标签回流。
+        const endContent = typeof subEvent?.content === "string" ? subEvent.content : "";
+        const key = Number.isInteger(subEvent?.contentIndex) ? String(subEvent.contentIndex) : "default";
+        let cleanSubEvent = subEvent;
+        let cleanMessage = event.message;
+        if (endContent && !ss.strippedTextKeys.has(key)) {
+          feedReservedTagText({ ...subEvent, type: "text_delta", delta: endContent }, event.message);
+          flushReservedTagParsers(subEvent, event.message);
+          cleanSubEvent = { ...subEvent, content: "" };
+          cleanMessage = blankAssistantTextBlocks(event.message);
+        }
         publishNormalizedAssistantBatch(
-          ss.assistantEventNormalizer.handleTextEvent(subEvent, event.message),
+          ss.assistantEventNormalizer.handleTextEvent(cleanSubEvent, cleanMessage),
         );
       } else if (sub === "thinking_delta") {
         flushPendingTurnInputConsumptions(sessionPath, ss, event.message);
@@ -1509,6 +1569,15 @@ export function createChatRoute(engine: any, hub: any, {
           streamId: statusStreamId,
         });
       }
+      // Turn 生命周期权威事件：与 Session Busy（status）正交。
+      // status 只回答「Session 忙不忙」；turn_start / turn_end 才决定一轮
+      // Assistant 回答从哪里开始、到哪里真正结束。
+      emitStreamEvent(sessionPath, ss, {
+        type: "turn_start",
+        ...(typeof event.turnId === "string" && event.turnId.trim()
+          ? { turnId: event.turnId.trim() }
+          : {}),
+      });
     } else if (event.type === "todo_update") {
       broadcast({
         type: "todo_update",
@@ -1572,6 +1641,7 @@ export function createChatRoute(engine: any, hub: any, {
           });
         } else if (ss.isStreaming) {
           statusStreamId = eventStreamId || ss.streamId || null;
+          flushReservedTagParsers({ type: "text_delta" }, event.message);
           publishNormalizedAssistantBatch(ss.assistantEventNormalizer.finishTurn(event.message));
           flushTerminalParsers();
           finishStreamingState(ss);
@@ -1649,6 +1719,7 @@ export function createChatRoute(engine: any, hub: any, {
       // Provider 级别错误（超时、连接断开等）通过 message_end 传递，不经过 message_update
       if (!ss) return;
       if (event.message?.role === "assistant") {
+        flushReservedTagParsers({ type: "text_delta" }, event.message);
         publishNormalizedAssistantBatch(ss.assistantEventNormalizer.finishMessage(event.message));
       }
       if (event.message?.role === "custom" && event.message.display === false) {
@@ -1684,6 +1755,9 @@ export function createChatRoute(engine: any, hub: any, {
       const turnWasAborted = ss.isAborted === true || event.aborted === true;
       const turnWasTruncated = ss.assistantStopReason === "length";
       const turnStreamId = ss.streamId || null;
+      // flush 必须先于 finishTurn：挂起的半截标签文字要落回仍开着的 segment，
+      // 然后 finishTurn 才能把完整、脱净的正文一次性关闭。
+      flushReservedTagParsers({ type: "text_delta" }, event.message);
       publishNormalizedAssistantBatch(ss.assistantEventNormalizer.finishTurn(event.message));
       flushTerminalParsers();
 
@@ -1763,6 +1837,7 @@ export function createChatRoute(engine: any, hub: any, {
       ss.moodParser.reset();
       ss.cardParser.reset();
       ss.assistantEventNormalizer.reset();
+      ss.strippedTextKeys?.clear?.();
       ss.pendingToolContextsByCallId?.clear?.();
       ss._cardHints = [];
       ss._cardEmitted = false;

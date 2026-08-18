@@ -359,6 +359,48 @@ describe('streamBufferManager.snapshot', () => {
     expect(live.blocks).toEqual(reloaded.data.blocks);
     expect(live.turnProjection).toEqual(reloaded.data.turnProjection);
   });
+
+  it('canonical 锁定后 legacy thinking/text 事件不再产生第二个 UI block', () => {
+    streamBufferManager.handle({
+      type: 'assistant_segment_start',
+      sessionPath: PATH,
+      segmentId: 'assistant:1:reasoning:0',
+      kind: 'reasoning',
+      semanticPhase: 'reasoning',
+    });
+    streamBufferManager.handle({
+      type: 'assistant_segment_delta',
+      sessionPath: PATH,
+      segmentId: 'assistant:1:reasoning:0',
+      delta: '规范推理',
+      semanticPhase: 'reasoning',
+    });
+    streamBufferManager.handle({
+      type: 'assistant_segment_end',
+      sessionPath: PATH,
+      segmentId: 'assistant:1:reasoning:0',
+      semanticPhase: 'reasoning',
+    });
+    // 服务端兼容旧前端仍会发 legacy 事件；锁定后它们只允许累积快照，不得产生 block。
+    streamBufferManager.handle({ type: 'thinking_start', sessionPath: PATH });
+    streamBufferManager.handle({ type: 'thinking_delta', sessionPath: PATH, delta: '规范推理' });
+    streamBufferManager.handle({ type: 'thinking_end', sessionPath: PATH });
+    streamBufferManager.handle({ type: 'text_delta', sessionPath: PATH, delta: '幽灵正文' });
+    streamBufferManager.handle({
+      type: 'turn_end',
+      sessionPath: PATH,
+      turnInputEntryId: 'entry-user-1',
+      userEntryId: 'entry-user-1',
+      assistantEntryId: 'entry-assistant-1',
+      assistantEntryIds: ['entry-assistant-1'],
+    });
+
+    const blocks = getAssistantMessage()?.blocks ?? [];
+    const thinkingBlocks = blocks.filter((block) => block.type === 'thinking');
+    expect(thinkingBlocks).toHaveLength(1);
+    expect(thinkingBlocks[0]).toMatchObject({ content: '规范推理' });
+    expect(blocks.some((block) => block.type === 'text' && block.source === '幽灵正文')).toBe(false);
+  });
 });
 
 function getMoodBlock() {

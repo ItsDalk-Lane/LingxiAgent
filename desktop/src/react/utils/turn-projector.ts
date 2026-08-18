@@ -55,18 +55,28 @@ function projectSegment(
     };
   }
 
+  // unresolved ≠ commentary：流式期身份未判明的文字是 provisional（临时区），
+  // 既不混进过程折叠，也不冒称答案；只有回合终结时才按供应商回退定身份。
+  if (segment.semanticPhase === 'unresolved' && input.status === 'streaming') {
+    return {
+      id: segmentBlockId(input.idPrefix, segment.id),
+      type: 'text',
+      source: segment.source,
+      ...(segment.deferred ? { deferred: segment.deferred } : {}),
+      semanticPhase: 'unresolved',
+      surfaceRole: 'provisional',
+      lifecycle,
+    };
+  }
+
   let semanticPhase: 'commentary' | 'final_answer';
   if (segment.semanticPhase === 'unresolved') {
-    if (input.status === 'streaming') {
-      semanticPhase = 'commentary';
-    } else {
-      semanticPhase = 'final_answer';
-      diagnostics.push({
-        code: 'unresolved_phase_fallback',
-        segmentId: segment.id,
-        fallbackPhase: 'final_answer',
-      });
-    }
+    semanticPhase = 'final_answer';
+    diagnostics.push({
+      code: 'unresolved_phase_fallback',
+      segmentId: segment.id,
+      fallbackPhase: 'final_answer',
+    });
   } else {
     semanticPhase = segment.semanticPhase === 'commentary' ? 'commentary' : 'final_answer';
   }
@@ -83,6 +93,7 @@ function projectSegment(
 
 function turnStatusBlock(
   input: ProjectAssistantTurnInput,
+  hasToolCalls: boolean,
 ): Extract<ContentBlock, { type: 'turn_status' }> | null {
   if (input.status === 'streaming') return null;
   if (input.status === 'failed') {
@@ -103,8 +114,12 @@ function turnStatusBlock(
       lifecycle: 'sealed',
     };
   }
+  // 工具循环豁免：本段生成带工具调用说明 agent 循环会继续（下一段生成跟上），
+  // 没给最终答复是循环的正常中间态；只有循环真正停下来才允许 missing。
+  if (hasToolCalls) return null;
   return {
-    id: `${input.idPrefix}:turn-status:missing-final-answer`,
+    // id 由轮次键派生：同一轮无论投影重算多少次都得到同一个 id，保证每轮至多一个
+    id: `${input.idPrefix}:missing-final-answer`,
     type: 'turn_status',
     status: 'missing_final_answer',
     surfaceRole: 'result',
@@ -130,21 +145,28 @@ export function projectAssistantTurn(input: ProjectAssistantTurnInput): ProjectA
   );
   const allBlocks = [...segmentBlocks, ...legacyBlocks];
   const processBlocks = allBlocks.filter((block) => block.surfaceRole === 'process');
+  const provisionalBlocks = allBlocks.filter((block) => block.surfaceRole === 'provisional');
   const answerBlocks = allBlocks.filter((block) => block.surfaceRole === 'answer');
   const resultBlocks = allBlocks.filter((block) => block.surfaceRole === 'result');
   const controlBlocks = allBlocks.filter((block) => block.surfaceRole === 'control');
 
+  // provisional 是"还没判明身份"的临时文字，不算答案：终结态下它已被回退成
+  // final_answer，这里的判空条件不会因为 provisional 而误免 missing_final_answer。
+  const hasToolCalls = allBlocks.some((block) => (
+    block.type === 'tool_group' && Array.isArray(block.tools) && block.tools.length > 0
+  ));
   if (answerBlocks.length === 0 && resultBlocks.length === 0 && controlBlocks.length === 0) {
-    const statusBlock = turnStatusBlock(input);
+    const statusBlock = turnStatusBlock(input, hasToolCalls);
     if (statusBlock) resultBlocks.push(statusBlock);
   }
 
-  const blocks = [...processBlocks, ...answerBlocks, ...resultBlocks, ...controlBlocks];
+  const blocks = [...processBlocks, ...provisionalBlocks, ...answerBlocks, ...resultBlocks, ...controlBlocks];
   const projection: AssistantTurnProjection = {
     id: `${input.idPrefix}:turn`,
     inputMessageId: input.inputMessageId || null,
     assistantMessageIds: [...input.assistantMessageIds],
     processBlockIds: processBlocks.map((block) => block.id!),
+    provisionalBlockIds: provisionalBlocks.map((block) => block.id!),
     answerBlockIds: answerBlocks.map((block) => block.id!),
     resultBlockIds: resultBlocks.map((block) => block.id!),
     controlBlockIds: controlBlocks.map((block) => block.id!),

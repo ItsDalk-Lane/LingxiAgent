@@ -92,13 +92,20 @@ describe('ws stream lifecycle after abort', () => {
     useStore.getState().initSession(PATH, [userItem('u1', 'start project')], false);
   });
 
-  it('status=false ends the local turn binding so the next reply lands after the new user message', () => {
+  it('turn_end(aborted) ends the local turn binding so the next reply lands after the new user message', () => {
     handleServerMessage({
       type: 'text_delta',
       sessionPath: PATH,
       delta: 'old partial',
     });
 
+    // 中止路径由服务端权威补发 turn_end(aborted)；status=false 只是 Session Busy
+    // 收尾，不再承担结束 Turn 的职责（旧契约已废除）。
+    handleServerMessage({
+      type: 'turn_end',
+      sessionPath: PATH,
+      aborted: true,
+    });
     handleServerMessage({
       type: 'status',
       sessionPath: PATH,
@@ -111,6 +118,10 @@ describe('ws stream lifecycle after abort', () => {
       message: { id: 'u2', text: 'new prompt', timestamp: Date.now() },
     });
 
+    handleServerMessage({
+      type: 'turn_start',
+      sessionPath: PATH,
+    });
     handleServerMessage({
       type: 'status',
       sessionPath: PATH,

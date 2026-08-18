@@ -73,6 +73,7 @@ function visibleBlocks(message: ChatMessage): ContentBlock[] {
 function blockSurface(message: ChatMessage, block: ContentBlock): ContentBlock['surfaceRole'] {
   if (block.id && message.turnProjection) {
     if (message.turnProjection.processBlockIds.includes(block.id)) return 'process';
+    if (message.turnProjection.provisionalBlockIds?.includes(block.id)) return 'provisional';
     if (message.turnProjection.answerBlockIds.includes(block.id)) return 'answer';
     if (message.turnProjection.resultBlockIds.includes(block.id)) return 'result';
     if (message.turnProjection.controlBlockIds.includes(block.id)) return 'control';
@@ -280,11 +281,12 @@ function projectedTurnItems(
 
 export function buildTranscriptRenderItems(
   items: ChatListItem[],
-  options: { isStreaming: boolean },
+  options: { isStreaming: boolean; liveTurnStatus?: AssistantTurnStatus | null },
 ): TranscriptRenderItem[] {
   recordChatPerformance('transcript_projection', { itemCount: items.length });
   const rendered: TranscriptRenderItem[] = [];
   const latestAssistantIndex = lastAssistantIndex(items);
+  const liveTurnStatus = options.liveTurnStatus ?? null;
 
   for (let index = 0; index < items.length;) {
     const item = items[index];
@@ -312,8 +314,18 @@ export function buildTranscriptRenderItems(
       cursor += 1;
     }
 
-    const segmentStreaming = segment.some(({ entry }) => entry.data.turnProjection?.status === 'streaming')
-      || (options.isStreaming && segment.some(({ originalIndex }) => originalIndex === latestAssistantIndex));
+    // Process Fold 只依赖 Turn 生命周期，不依赖 Session Busy：
+    //   1) 有 turnProjection 的现代消息：唯一依据是 turnProjection.status；
+    //   2) 正在流式的 live 消息（投影只存在于 live-turn-store）：依据 liveTurnStatus；
+    //   3) 只有两者都没有的 legacy 历史消息，才允许回退到 Session Busy。
+    // 因此 status（isStreaming）抖动绝不会让进行中的 Turn 折出 Process Fold。
+    const hasProjection = segment.some(({ entry }) => !!entry.data.turnProjection);
+    const touchesLatest = segment.some(({ originalIndex }) => originalIndex === latestAssistantIndex);
+    const segmentStreaming = hasProjection
+      ? segment.some(({ entry }) => entry.data.turnProjection?.status === 'streaming')
+      : touchesLatest && liveTurnStatus !== null
+        ? liveTurnStatus === 'streaming'
+        : options.isStreaming && touchesLatest;
     if (segmentStreaming) {
       rendered.push(...segment.map(({ entry, originalIndex }) => sourceItem(entry, originalIndex)));
     } else {

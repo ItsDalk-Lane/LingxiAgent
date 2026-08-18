@@ -19,9 +19,36 @@ describe("ThinkTagParser", () => {
     ]);
   });
 
-  it("keeps inline literal think tags visible as normal text", () => {
+  it("parses think tags anywhere in the text (reserved protocol, not leading-only)", () => {
+    // 新契约：<think> 出现在正文中间同样是协议，一律结构化为 thinking。
     expect(collect("正文里提到 <think> 标签时，后续内容不能被吞。")).toEqual([
-      { type: "text", data: "正文里提到 <think> 标签时，后续内容不能被吞。" },
+      { type: "text", data: "正文里提到 " },
+      { type: "think_start" },
+      { type: "think_text", data: " 标签时，后续内容不能被吞。" },
+      { type: "think_end" },
+    ]);
+  });
+
+  it("parses a mid-text think block with a closer", () => {
+    expect(collect("先说<think>想一下</think>再说")).toEqual([
+      { type: "text", data: "先说" },
+      { type: "think_start" },
+      { type: "think_text", data: "想一下" },
+      { type: "think_end" },
+      { type: "text", data: "再说" },
+    ]);
+  });
+
+  it("keeps inline-code think tags visible as normal text", () => {
+    // 需要字面量时由代码保护（或转义）表达，而不是靠位置侥幸。
+    expect(collect("正文里提到 `<think>` 标签时，后续内容不能被吞。")).toEqual([
+      { type: "text", data: "正文里提到 `<think>` 标签时，后续内容不能被吞。" },
+    ]);
+  });
+
+  it("treats an escaped think tag as literal text", () => {
+    expect(collect("正文里提到 \\<think> 标签")).toEqual([
+      { type: "text", data: "正文里提到 <think> 标签" },
     ]);
   });
 
@@ -31,11 +58,13 @@ describe("ThinkTagParser", () => {
     ]);
   });
 
-  it("does not hold a trailing inline tag prefix after visible text", () => {
+  it("holds a trailing partial tag across chunks and parses it when completed", () => {
     const chunks = ["正文里提到 <thi", "nk> 标签"];
     expect(collect(chunks.join(""), chunks)).toEqual([
-      { type: "text", data: "正文里提到 <thi" },
-      { type: "text", data: "nk> 标签" },
+      { type: "text", data: "正文里提到 " },
+      { type: "think_start" },
+      { type: "think_text", data: " 标签" },
+      { type: "think_end" },
     ]);
   });
 });

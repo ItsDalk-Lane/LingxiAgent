@@ -120,6 +120,7 @@ describe('buildItemsFromHistory user image restoration', () => {
         'entry-assistant-1:segment:assistant:1:text:0',
         'entry-assistant-1:tool_group:tools:call-read',
       ],
+      provisionalBlockIds: [],
       answerBlockIds: ['entry-assistant-1:segment:assistant:1:text:2'],
       resultBlockIds: [],
       controlBlockIds: [],

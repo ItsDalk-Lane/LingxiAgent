@@ -45,14 +45,18 @@ describe('quick chat detached session binding', () => {
       hasMore: false,
     });
 
+    // Turn 的开始只由 turn_start 驱动；status 只负责 Session Busy，不再触碰 Turn 生命周期。
     handleServerMessage({
-      type: 'status',
+      type: 'turn_start',
       sessionPath: '/sessions/quick.jsonl',
       sessionId: 'sess_quick',
-      isStreaming: true,
     });
 
-    expect(beginTurn).toHaveBeenCalledWith('/sessions/quick.jsonl', 'sess_quick');
+    expect(beginTurn).toHaveBeenCalledWith(
+      '/sessions/quick.jsonl',
+      'sess_quick',
+      { streamId: undefined, turnId: undefined },
+    );
 
     handleServerMessage({
       type: 'session_user_message',

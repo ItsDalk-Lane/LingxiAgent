@@ -516,6 +516,7 @@ export const createChatSlice = (
           ? {
               ...item.data.turnProjection,
               processBlockIds: nextBlocks.filter((block) => block.surfaceRole === 'process').map((block) => block.id!),
+              provisionalBlockIds: nextBlocks.filter((block) => block.surfaceRole === 'provisional').map((block) => block.id!),
               answerBlockIds: nextBlocks.filter((block) => block.surfaceRole === 'answer').map((block) => block.id!),
               resultBlockIds: nextBlocks.filter((block) => block.surfaceRole === 'result').map((block) => block.id!),
               controlBlockIds: nextBlocks.filter((block) => block.surfaceRole === 'control').map((block) => block.id!),

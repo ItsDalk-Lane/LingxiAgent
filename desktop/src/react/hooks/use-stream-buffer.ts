@@ -75,6 +75,16 @@ interface Buffer {
   messageId: string | null;
   /** turn_end/中止收口时为 true，确保所有仍在流式的内容统一封口。 */
   turnEnding: boolean;
+  /** 是否有活动 Turn。只能由 turn_start 开启、turn_end（或管理性 finishTurn/clear）关闭；
+   *  status（Session Busy）不得改变它。 */
+  turnActive: boolean;
+  /** 活动 Turn 的身份（优先 streamId，缺失时 turnId）；null 表示身份未知的隐式 Turn。 */
+  activeTurnKey: string | null;
+  /** 最近一次已完成 finalization 的 Turn 身份，用于重复 turn_end 的 exactly-once 去重。 */
+  lastFinalizedTurnKey: string | null;
+  /** 本轮已出现 canonical assistant_segment_*：legacy text/thinking 兼容事件
+   *  不得再产生 UI block（只能累积断线恢复快照）。 */
+  canonicalLocked: boolean;
 }
 
 function createBuffer(sessionPath: string): Buffer {
@@ -102,6 +112,10 @@ function createBuffer(sessionPath: string): Buffer {
     publishPending: false,
     messageId: null,
     turnEnding: false,
+    turnActive: false,
+    activeTurnKey: null,
+    lastFinalizedTurnKey: null,
+    canonicalLocked: false,
   };
 }
 
@@ -154,6 +168,11 @@ function renderBufferedBlocks(currentBlocks: ContentBlock[], buf: Buffer): Conte
 
 function normalizeSessionId(value: unknown): string | null {
   return typeof value === 'string' && value.trim() ? value.trim() : null;
+}
+
+/** Turn 身份：优先 streamId，缺失时退回 turnId；都没有则身份未知（null）。 */
+function turnKeyFrom(identity: { streamId?: unknown; turnId?: unknown } | null | undefined): string | null {
+  return normalizeSessionId(identity?.streamId) || normalizeSessionId(identity?.turnId) || null;
 }
 
 function normalizeLiveSegmentPhase(value: unknown): LiveAssistantSegmentPhase {
@@ -276,6 +295,10 @@ class StreamBufferManager {
     buf.messageId = null;
     buf.turnEnding = false;
     buf.publishPending = false;
+    buf.turnActive = false;
+    buf.activeTurnKey = null;
+    buf.canonicalLocked = false;
+    // lastFinalizedTurnKey 刻意保留：跨 reset 支撑重复 turn_end 的 exactly-once。
   }
 
   private finishBufferTurn(buf: Buffer, persistedEntries: {
@@ -572,20 +595,53 @@ class StreamBufferManager {
     const buf = this.getBuffer(sessionPath, sessionId);
 
     switch (msg.type) {
-      case 'assistant_segment_start':
-      case 'assistant_segment_delta':
-      case 'assistant_segment_end':
-        this.updateCanonicalSegment(buf, msg);
+      case 'turn_start':
+        this.beginTurn(sessionPath, sessionId, { streamId: msg.streamId, turnId: msg.turnId });
         break;
 
+      case 'assistant_segment_start':
+      case 'assistant_segment_delta':
+      case 'assistant_segment_end': {
+        // canonical 锁定：本轮此后 legacy text/thinking 兼容事件不再产生 UI block。
+        buf.canonicalLocked = true;
+        // 诊断：Turn 已终结、且没有新 turn_start 的情况下又收到 canonical 事件
+        if (!buf.turnActive && buf.lastFinalizedTurnKey) {
+          console.warn('[stream] canonical_after_terminal: segment event after turn finalized:', {
+            type: msg.type,
+            segmentId: msg.segmentId,
+            lastFinalizedTurnKey: buf.lastFinalizedTurnKey,
+            sessionPath,
+          });
+        }
+        // 诊断：delta/end 落在从未 start 过的 segment 上，说明中间丢了事件
+        if (msg.type !== 'assistant_segment_start'
+          && typeof msg.segmentId === 'string'
+          && !buf.segmentsById.has(msg.segmentId)) {
+          console.warn('[stream] canonical_segment_gap: segment event without start:', {
+            type: msg.type,
+            segmentId: msg.segmentId,
+            sessionPath,
+          });
+        }
+        this.updateCanonicalSegment(buf, msg);
+        break;
+      }
+
       case 'text_delta':
-        this.ensureMessage(buf);
+        // 断线恢复快照始终累积完整正文。
         buf.textAcc += msg.delta || '';
+        // canonical 模式：正文唯一真相源是 assistant_segment_*，legacy text_delta
+        // 不得再创建 text block / segment（只允许累积快照与诊断）。
+        if (buf.canonicalLocked) break;
+        this.ensureMessage(buf);
         buf.textSegmentAcc += msg.delta || '';
         this.scheduleFlush(buf);
         break;
 
       case 'thinking_start':
+        // canonical 模式：思考唯一真相源是 reasoning segment，legacy thinking_*
+        // 不再产生第二个 thinking block（thinkingAcc 仍累积供快照）。
+        if (buf.canonicalLocked) break;
         this.ensureMessage(buf);
         buf.inThinking = true;
         buf.hasThinkingBlock = true;
@@ -597,11 +653,12 @@ class StreamBufferManager {
         buf.hasThinkingBlock = true;
         buf.thinkingAcc += msg.delta || '';
         // 与 text/mood 共用时间节流，避免思考流只能在结束后显示。
-        this.scheduleFlush(buf);
+        if (!buf.canonicalLocked) this.scheduleFlush(buf);
         break;
 
       case 'thinking_end':
         buf.hasThinkingBlock = true;
+        if (buf.canonicalLocked) break;
         buf.inThinking = false;
         this.publishBoundary(buf);
         break;
@@ -770,10 +827,24 @@ class StreamBufferManager {
       case 'compaction_end':
         break;
 
-      case 'turn_end':
+      case 'turn_end': {
+        const turnKey = turnKeyFrom(msg);
+        // 不变量 D：同一个 Turn 的 finalization 最多执行一次。
+        if (!buf.turnActive && turnKey && turnKey === buf.lastFinalizedTurnKey) {
+          console.debug('[stream] duplicate turn_end ignored (exactly-once):', turnKey);
+          break;
+        }
+        if (buf.turnActive && turnKey && buf.activeTurnKey && turnKey !== buf.activeTurnKey) {
+          // 身份不匹配：Turn 仍必须终结（服务端是 Turn 结束的权威），但记录诊断。
+          console.warn('[stream] turn_end streamId mismatch; finalizing active turn:', {
+            activeTurnKey: buf.activeTurnKey,
+            turnEndKey: turnKey,
+          });
+        }
         if ((msg.aborted || msg.failed) && !this.hasTurnState(buf)) {
           this.ensureMessage(buf);
         }
+        const activeKeyBeforeFinish = buf.activeTurnKey;
         this.finishBufferTurn(buf, {
           turnInputEntryId: msg.turnInputEntryId,
           userEntryId: msg.userEntryId,
@@ -781,15 +852,49 @@ class StreamBufferManager {
           assistantEntryIds: Array.isArray(msg.assistantEntryIds) ? msg.assistantEntryIds : undefined,
           status: msg.aborted ? 'aborted' : msg.failed ? 'failed' : 'completed',
         });
+        buf.lastFinalizedTurnKey = turnKey || activeKeyBeforeFinish || buf.lastFinalizedTurnKey;
         break;
+      }
 
     }
   }
 
-  /** 服务端确认新 turn 开始：释放任何遗留的本地 turn 绑定。 */
-  beginTurn(sessionPath: string, sessionId: string | null = null): void {
+  /**
+   * 权威 Turn 生命周期开始（只能由 WS turn_start 驱动；status 不得调用）。
+   *
+   * 状态机：
+   *   idle + turn_start(A)        → active(A)，初始化本轮状态
+   *   active(A) + turn_start(A)   → 幂等 no-op（不得 flush/commit/reset）
+   *   active(A) + turn_start(B)   → 协议异常：记录 protocol_interrupted 诊断，
+   *                                 把 A 以 aborted 终结（绝不产生 missing_final_answer
+   *                                 的误报以外的第二真相），再开启 B
+   */
+  beginTurn(
+    sessionPath: string,
+    sessionId: string | null = null,
+    identity: { streamId?: unknown; turnId?: unknown } = {},
+  ): void {
     const buf = this.getBuffer(sessionPath, sessionId);
-    this.finishBufferTurn(buf);
+    const key = turnKeyFrom(identity);
+    if (buf.turnActive) {
+      if (key === null || buf.activeTurnKey === null || key === buf.activeTurnKey) {
+        // 同一 Turn（或一方身份未知）的重复 turn_start：幂等 no-op；
+        // 身份未知的一侧借机补上权威身份。
+        if (buf.activeTurnKey === null && key !== null) buf.activeTurnKey = key;
+        return;
+      }
+      console.warn('[stream] protocol_interrupted: turn_start while another turn is active:', {
+        activeTurnKey: buf.activeTurnKey,
+        incomingTurnKey: key,
+        sessionPath,
+      });
+      const interruptedKey = buf.activeTurnKey;
+      this.finishBufferTurn(buf, { status: 'aborted' });
+      // 被中断 Turn 迟到的 turn_end 不得二次 finalize。
+      if (interruptedKey) buf.lastFinalizedTurnKey = interruptedKey;
+    }
+    buf.turnActive = true;
+    buf.activeTurnKey = key;
   }
 
   /** 服务端确认当前 turn 结束或被中止：flush 可见内容，然后释放 turn-local 绑定。 */

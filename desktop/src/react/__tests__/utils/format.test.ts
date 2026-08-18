@@ -109,10 +109,11 @@ describe('parseMoodFromContent (format.ts)', () => {
     expect(parseMoodFromContent(input)).toEqual({ mood: null, text: input });
   });
 
-  it('解析 BOM/空白后的单个开头块并保留后续标签字面量', () => {
+  it('BOM/空白后的开头块与正文中间的标签都结构化', () => {
+    // 新契约：保留标签无论在什么位置都是协议，多个块内容合并展示
     expect(parseMoodFromContent('\uFEFF \n<pulse>inside</pulse>\nafter <mood>literal</mood>')).toEqual({
-      mood: 'inside',
-      text: 'after <mood>literal</mood>',
+      mood: 'inside\nliteral',
+      text: 'after',
     });
   });
 });

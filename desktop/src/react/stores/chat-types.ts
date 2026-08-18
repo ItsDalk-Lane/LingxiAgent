@@ -161,8 +161,8 @@ export interface ResourceEnvelope {
 
 // ── 内容块 ──
 
-export type AssistantSemanticPhase = 'reasoning' | 'commentary' | 'mood' | 'tool' | 'final_answer';
-export type ContentSurfaceRole = 'process' | 'answer' | 'result' | 'control';
+export type AssistantSemanticPhase = 'reasoning' | 'commentary' | 'mood' | 'tool' | 'final_answer' | 'unresolved';
+export type ContentSurfaceRole = 'process' | 'provisional' | 'answer' | 'result' | 'control';
 export type ContentLifecycle = 'streaming' | 'sealed';
 export type AssistantTurnStatus = 'streaming' | 'completed' | 'failed' | 'aborted';
 
@@ -171,6 +171,8 @@ export interface AssistantTurnProjection {
   inputMessageId: string | null;
   assistantMessageIds: string[];
   processBlockIds: string[];
+  /** 流式期身份未判明的临时文字（unresolved 段），只存在于 live 投影 */
+  provisionalBlockIds?: string[];
   answerBlockIds: string[];
   resultBlockIds: string[];
   controlBlockIds: string[];
