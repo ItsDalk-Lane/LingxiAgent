@@ -60,7 +60,7 @@ describe('assistant turn semantic baseline', () => {
     expect(processFold).toMatchObject({
       type: 'process_fold',
       defaultCollapsed: true,
-      items: [
+      refs: [
         { sourceMessageId: 'assistant-commentary' },
         { sourceMessageId: 'assistant-tools' },
       ],

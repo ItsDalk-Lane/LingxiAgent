@@ -97,7 +97,7 @@ describe('process fold grouping', () => {
       blockIds: ['a1:commentary', 'a1:exec'],
       status: 'completed',
       defaultCollapsed: true,
-      items: [{ item: { data: { blocks: [processText, execBlock] } } }],
+      refs: [{ sourceMessageId: 'a1', blocks: [processText, execBlock] }],
     });
     expect(rendered[2]).toMatchObject({
       type: 'source',
@@ -182,7 +182,7 @@ describe('process fold grouping', () => {
 
     expect(rendered).toMatchObject([
       { type: 'source' },
-      { type: 'process_fold', items: [{ item: { data: { blocks: [processBlock] } } }] },
+      { type: 'process_fold', refs: [{ sourceMessageId: 'a1', blocks: [processBlock] }] },
       { type: 'source', item: { data: { blocks: [resultBlock, controlBlock] } } },
     ]);
   });
@@ -276,7 +276,7 @@ describe('process fold grouping', () => {
     ];
     expect(buildTranscriptRenderItems(items, { isStreaming: false })).toMatchObject([
       { type: 'source' },
-      { type: 'process_fold', items: [{}, {}, {}] },
+      { type: 'process_fold', refs: [{}, {}, {}] },
     ]);
   });
 
@@ -296,7 +296,7 @@ describe('process fold grouping', () => {
     ];
     expect(buildTranscriptRenderItems(items, { isStreaming: false })).toMatchObject([
       { type: 'source' },
-      { type: 'process_fold', items: [{}, {}, {}] },
+      { type: 'process_fold', refs: [{}, {}, {}] },
     ]);
   });
 

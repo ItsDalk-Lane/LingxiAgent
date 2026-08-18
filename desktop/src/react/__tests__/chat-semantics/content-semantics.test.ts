@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest';
 import type { ContentBlock } from '../../stores/chat-types';
 import {
   normalizeContentBlocks,
-  rebaseGeneratedContentBlockIds,
   resolveContentLifecycle,
   resolveContentSemanticPhase,
   resolveContentSurface,
@@ -103,17 +102,5 @@ describe('content semantics', () => {
       surfaceRole: 'answer',
       lifecycle: 'streaming',
     });
-  });
-
-  it('回合落盘时只改写本地生成的临时标识', () => {
-    const blocks = rebaseGeneratedContentBlockIds([
-      { id: 'live-message:text:0', type: 'text', html: '<p>正文</p>' },
-      { id: 'provider-segment-1', type: 'thinking', content: '思考', sealed: true },
-    ], 'live-message', 'entry-assistant-1');
-
-    expect(blocks.map((block) => block.id)).toEqual([
-      'entry-assistant-1:text:0',
-      'provider-segment-1',
-    ]);
   });
 });
