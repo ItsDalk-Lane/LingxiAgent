@@ -40,7 +40,8 @@ export function parseCSV(text: string): string[][] {
 // 扩展名识别统一走 file-kind 中心表；禁止维护私有 IMAGE_EXTS 表。
 // 保留此 helper 纯粹是 API 形式（传 name，返回 boolean），内部委托给中心表。
 import { inferKindByExt, isImageOrSvgExt, extOfName } from './file-kind';
-import { parseLeadingInternalMoodBlock } from '../../../../shared/internal-mood-block.ts';
+import { INTERNAL_MOOD_TAGS } from '../../../../shared/internal-mood-block.ts';
+import { splitReservedTagSegments } from '../../../../shared/reserved-tag-stream.ts';
 
 export function isImageFile(name: string): boolean {
   return isImageOrSvgExt(extOfName(name));
@@ -103,17 +104,26 @@ export function cronToHuman(schedule: number | string): string {
 }
 
 /**
- * 从 assistant 回复中解析 mood 区块
+ * 从 assistant 回复中解析 mood 区块：保留协议标签无论在正文什么位置都结构化，
+ * 多个块的内容合并展示；其余文本按原顺序拼回。
  */
 export function parseMoodFromContent(content: string): { mood: string | null; text: string } {
   if (!content) return { mood: null, text: '' };
-  const block = parseLeadingInternalMoodBlock(content);
-  if (!block) return { mood: null, text: content };
-  const raw = block.content.trim()
-    .replace(/^```\w*\n?/, '').replace(/\n?```\s*$/, '')
-    .replace(/^\n+/, '').replace(/\n+$/, '');
-  const text = block.rest.replace(/^\n+/, '').trim();
-  return { mood: raw, text };
+  const segments = splitReservedTagSegments(content, INTERNAL_MOOD_TAGS);
+  const moods: string[] = [];
+  const textParts: string[] = [];
+  for (const segment of segments) {
+    if (segment.type === 'block') {
+      const cleaned = segment.content.trim()
+        .replace(/^```\w*\n?/, '').replace(/\n?```\s*$/, '')
+        .replace(/^\n+/, '').replace(/\n+$/, '');
+      if (cleaned) moods.push(cleaned);
+    } else {
+      textParts.push(segment.text);
+    }
+  }
+  const text = textParts.join('\n').replace(/^\n+/, '').trim();
+  return { mood: moods.length ? moods.join('\n') : null, text };
 }
 
 export interface CodeBlockToolbarLabels {

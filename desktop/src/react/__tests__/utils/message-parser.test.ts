@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import {
-  parseMoodFromContent,
+  extractMoodBlocksFromContent,
   parseUserAttachments,
   cleanMoodText,
   truncatePath,
@@ -10,83 +10,85 @@ import {
   moodLabel,
 } from '../../utils/message-parser';
 
-describe('parseMoodFromContent', () => {
+describe('extractMoodBlocksFromContent', () => {
   it('无 mood 标签返回原文', () => {
-    const result = parseMoodFromContent('hello world');
-    expect(result.mood).toBeNull();
-    expect(result.yuan).toBeNull();
+    const result = extractMoodBlocksFromContent('hello world');
+    expect(result.moods).toEqual([]);
     expect(result.text).toBe('hello world');
   });
 
   it('空内容返回空', () => {
-    const result = parseMoodFromContent('');
-    expect(result.mood).toBeNull();
+    const result = extractMoodBlocksFromContent('');
+    expect(result.moods).toEqual([]);
     expect(result.text).toBe('');
   });
 
   it('解析 <mood> 标签', () => {
     const input = '<mood>feeling good</mood>\n\nSome text here.';
-    const result = parseMoodFromContent(input);
-    expect(result.mood).toBe('feeling good');
-    expect(result.yuan).toBe('lingxi');
+    const result = extractMoodBlocksFromContent(input);
+    expect(result.moods).toEqual([{ mood: 'feeling good', yuan: 'lingxi' }]);
     expect(result.text).toBe('Some text here.');
   });
 
   it('解析 <pulse> 标签映射到 butter', () => {
     const input = '<pulse>energetic</pulse>\nContent.';
-    const result = parseMoodFromContent(input);
-    expect(result.mood).toBe('energetic');
-    expect(result.yuan).toBe('butter');
+    const result = extractMoodBlocksFromContent(input);
+    expect(result.moods).toEqual([{ mood: 'energetic', yuan: 'butter' }]);
   });
 
   it('解析 <reflect> 标签映射到 ming', () => {
     const input = '<reflect>pondering</reflect>\nContent.';
-    const result = parseMoodFromContent(input);
-    expect(result.mood).toBe('pondering');
-    expect(result.yuan).toBe('ming');
+    const result = extractMoodBlocksFromContent(input);
+    expect(result.moods).toEqual([{ mood: 'pondering', yuan: 'ming' }]);
   });
 
   it('mood 内容去除代码块包裹', () => {
     const input = '<mood>```\nline1\nline2\n```</mood>\nText.';
-    const result = parseMoodFromContent(input);
-    expect(result.mood).toBe('line1\nline2');
+    const result = extractMoodBlocksFromContent(input);
+    expect(result.moods).toEqual([{ mood: 'line1\nline2', yuan: 'lingxi' }]);
   });
 
   it('保留行内代码里的 mood 字面量及后文', () => {
     for (const tag of ['mood', 'pulse', 'reflect']) {
       const input = `\`<${tag}>\` 后半段不能消失`;
-      expect(parseMoodFromContent(input)).toEqual({ mood: null, yuan: null, text: input });
+      expect(extractMoodBlocksFromContent(input)).toEqual({ moods: [], text: input });
     }
   });
 
   it('保留代码栅里成对的内部标签字面量', () => {
     const input = '```xml\n<mood>literal</mood>\n```\nafter';
-    expect(parseMoodFromContent(input)).toEqual({ mood: null, yuan: null, text: input });
+    expect(extractMoodBlocksFromContent(input)).toEqual({ moods: [], text: input });
   });
 
-  it('正文开始后不再把成对标签当作内部块', () => {
+  it('正文中间的成对标签同样结构化为 mood 块', () => {
+    // 新契约：保留标签出现在正文中间同样是协议，不进正文
     const input = 'prefix <pulse>literal</pulse> suffix';
-    expect(parseMoodFromContent(input)).toEqual({ mood: null, yuan: null, text: input });
+    const result = extractMoodBlocksFromContent(input);
+    expect(result.moods).toEqual([{ mood: 'literal', yuan: 'butter' }]);
+    expect(result.text).not.toMatch(/<\/?pulse>/);
+    expect(result.text).toContain('prefix');
+    expect(result.text).toContain('suffix');
   });
 
   it('允许 BOM 与空白后的完整开头块', () => {
-    expect(parseMoodFromContent('\uFEFF \n<reflect>pondering</reflect>\nContent.')).toEqual({
-      mood: 'pondering',
-      yuan: 'ming',
+    expect(extractMoodBlocksFromContent('\uFEFF \n<reflect>pondering</reflect>\nContent.')).toEqual({
+      moods: [{ mood: 'pondering', yuan: 'ming' }],
       text: 'Content.',
     });
   });
 
-  it('拒绝不匹配的闭合标签', () => {
+  it('不匹配的闭合标签不构成块，整体按正文保留', () => {
     const input = '<mood>literal</pulse>\nContent.';
-    expect(parseMoodFromContent(input)).toEqual({ mood: null, yuan: null, text: input });
+    expect(extractMoodBlocksFromContent(input)).toEqual({ moods: [], text: input });
   });
 
-  it('只解析第一个合法开头块，后续标签保留为正文', () => {
-    expect(parseMoodFromContent('<mood>inside</mood>\nafter <pulse>literal</pulse>')).toEqual({
-      mood: 'inside',
-      yuan: 'lingxi',
-      text: 'after <pulse>literal</pulse>',
+  it('一轮里允许多个 mood 块，全部结构化', () => {
+    expect(extractMoodBlocksFromContent('<mood>inside</mood>\nafter <pulse>literal</pulse>')).toEqual({
+      moods: [
+        { mood: 'inside', yuan: 'lingxi' },
+        { mood: 'literal', yuan: 'butter' },
+      ],
+      text: 'after',
     });
   });
 });

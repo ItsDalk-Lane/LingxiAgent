@@ -1,44 +1,31 @@
 /**
- * MoodParser — 从 streaming text 中解析内省标签
+ * MoodParser / ThinkTagParser — 内部保留协议标签的流式解析
  *
- * 支持三种标签（对应三个 yuan 的思维框架）：
- *   <mood></mood>       — Hanako（MOOD 意识流四池）
- *   <pulse></pulse>     — Butter（PULSE 体感三拍）
- *   <reflect></reflect> — Ming（沉思两层）
+ * 契约（第二阶段收口）：<mood>/<pulse>/<reflect> 与 <think>/<thinking> 是保留协议，
+ * 不是普通文本。无论出现在一次生成的什么位置（开头、中段、结尾），都必须被结构化；
+ * 一次生成里允许出现多个同族块。需要字面量时由模型用 `\<tag>` 转义或放进
+ * 行内代码 / 围栏代码块（扫描器对这两种位置一律按文本透传）。
  *
- * 无论哪种标签，都输出统一的事件流：
- *   mood_start / mood_text / mood_end
- *
- * 用法：
- *   const parser = new MoodParser();
- *   parser.feed(delta, (evt) => {
- *     // evt: { type: 'text', data } | { type: 'mood_start' } | { type: 'mood_text', data } | { type: 'mood_end' }
- *   });
+ * 两个解析器共享同一个扫描内核（ReservedTagScanner），只是把 token 映射成各自的
+ * 事件名：
+ *   MoodParser:      mood_start / mood_text / mood_end / text
+ *   ThinkTagParser:  think_start / think_text / think_end / text
  */
 
-import { inspectLeadingInternalMoodOpener } from "../shared/internal-mood-block.ts";
+import { INTERNAL_MOOD_TAGS } from "../shared/internal-mood-block.ts";
+import { ReservedTagScanner } from "../shared/reserved-tag-stream.ts";
 
-/** 检查 buffer 末尾是否是 target 的前缀（1..target.length-1 个字符），返回匹配长度 */
-function trailingPrefixLen(buffer, target) {
-  const maxCheck = Math.min(buffer.length, target.length - 1);
-  for (let len = maxCheck; len >= 1; len--) {
-    if (buffer.endsWith(target.slice(0, len))) return len;
-  }
-  return 0;
-}
+class ReservedTagParserBase {
+  declare private scanner: ReservedTagScanner;
+  declare private inTag: boolean;
+  declare private justEnded: boolean;
+  declare private readonly eventNames: { start: string; text: string; end: string };
 
-export class MoodParser {
-  declare _allowOpenTag: boolean;
-  declare _currentTag: any;
-  declare _justEndedMood: any;
-  declare buffer: any;
-  declare inMood: any;
-  constructor() {
-    this.inMood = false;
-    this.buffer = "";
-    this._justEndedMood = false;
-    this._currentTag = null; // 当前打开的标签名
-    this._allowOpenTag = true;
+  constructor(tags: readonly string[], eventNames: { start: string; text: string; end: string }) {
+    this.scanner = new ReservedTagScanner(tags);
+    this.eventNames = eventNames;
+    this.inTag = false;
+    this.justEnded = false;
   }
 
   /**
@@ -47,115 +34,60 @@ export class MoodParser {
    * @param {(evt: {type: string, data?: string}) => void} emit
    */
   feed(delta, emit) {
-    this.buffer += delta;
-    this._drain(emit);
+    for (const token of this.scanner.feed(delta)) this.handleToken(token, emit);
   }
 
-  /** 强制输出 buffer 中剩余内容 */
+  /** 冲刷缓冲：半截标签按字面文本定界；未闭合的块补发结束事件。 */
   flush(emit) {
-    if (this.buffer) {
-      if (this.inMood) {
-        emit({ type: "mood_text", data: this.buffer });
-      } else {
-        emit({ type: "text", data: this.buffer });
-        if (this.buffer.trim().length > 0) this._allowOpenTag = false;
-      }
-      this.buffer = "";
-    }
-    if (this.inMood) {
-      emit({ type: "mood_end" });
-      this.inMood = false;
-      this._currentTag = null;
-      this._allowOpenTag = false;
+    for (const token of this.scanner.flush()) this.handleToken(token, emit);
+    if (this.inTag) {
+      emit({ type: this.eventNames.end });
+      this.inTag = false;
+      this.justEnded = true;
     }
   }
 
   /**
-   * 新的 assistant segment 开始时调用：重新打开 leading internal opener 资格，
-   * 并清空只属于本 segment 的解析状态（buffer / 当前标签 / 刚结束标记）。
-   *
-   * 与 reset() 的区别在调用时机与意图，而非字段：reset() 用于整个 user turn 的
-   * 生命周期边界（turn_start / turn_end / abort），本方法用于"一次新的模型生成"
-   * 边界（message_start(role=assistant)）。一个 user turn 内可能包含多个 assistant
-   * segment（工具循环），每个 segment 都应重新获得一次 leading internal block 资格，
-   * 但不能因此把同一段可见正文里再次出现的标签误判为内部块。
+   * 新的 assistant segment 边界（message_start(role=assistant)）：清空只属于本段
+   * 生成的解析状态。调用方必须先 flush，否则挂起的半截标签会随缓冲一起被丢弃。
    */
   beginAssistantSegment() {
-    this.inMood = false;
-    this.buffer = "";
-    this._justEndedMood = false;
-    this._currentTag = null;
-    this._allowOpenTag = true;
+    this.scanner.reset();
+    this.inTag = false;
+    this.justEnded = false;
   }
 
-  /** 整个 user turn 边界（turn_start / turn_end / abort）：turn 重置蕴含 segment 重武装。 */
+  /** 整个 user turn 边界（turn_start / turn_end / abort）：turn 重置蕴含 segment 重置。 */
   reset() {
     this.beginAssistantSegment();
   }
 
-  /** 内部：尽可能多地从 buffer 中提取完整事件 */
-  _drain(emit) {
-    while (this.buffer.length > 0) {
-      // mood 刚结束时，裁掉前导换行
-      if (this._justEndedMood && !this.inMood) {
-        this.buffer = this.buffer.replace(/^\n+/, "");
-        this._justEndedMood = false;
-        if (!this.buffer.length) break;
-      }
-
-      if (!this.inMood) {
-        if (!this._allowOpenTag) {
-          emit({ type: "text", data: this.buffer });
-          this.buffer = "";
-          continue;
-        }
-
-        const inspection = inspectLeadingInternalMoodOpener(this.buffer);
-        if (inspection.kind === "open") {
-          if (inspection.prefix) emit({ type: "text", data: inspection.prefix });
-          emit({ type: "mood_start" });
-          this.inMood = true;
-          this._currentTag = inspection.tag;
-          this.buffer = inspection.remainder;
-          continue;
-        }
-
-        if (inspection.kind === "pending") {
-          if (inspection.prefix) emit({ type: "text", data: inspection.prefix });
-          this.buffer = inspection.pending;
-          break;
-        }
-
-        emit({ type: "text", data: this.buffer });
-        if (this.buffer.trim().length > 0) this._allowOpenTag = false;
-        this.buffer = "";
-      } else {
-        // 寻找对应的关闭标签
-        const closeTag = `</${this._currentTag}>`;
-        const idx = this.buffer.indexOf(closeTag);
-        if (idx !== -1) {
-          const content = this.buffer.slice(0, idx);
-          if (content) emit({ type: "mood_text", data: content });
-          emit({ type: "mood_end" });
-          this.inMood = false;
-          this._justEndedMood = true;
-          this._allowOpenTag = false;
-          this.buffer = this.buffer.slice(idx + closeTag.length);
-          this._currentTag = null;
-          continue;
-        }
-        // buffer 末尾可能是关闭标签的前缀
-        const moodHoldLen = trailingPrefixLen(this.buffer, closeTag);
-        if (moodHoldLen > 0) {
-          const safe = this.buffer.slice(0, -moodHoldLen);
-          if (safe) emit({ type: "mood_text", data: safe });
-          this.buffer = this.buffer.slice(-moodHoldLen);
-          break;
-        }
-        emit({ type: "mood_text", data: this.buffer });
-        this.buffer = "";
-      }
+  handleToken(token, emit) {
+    if (token.type === "open") {
+      emit({ type: this.eventNames.start });
+      this.inTag = true;
+      return;
     }
+    if (token.type === "close") {
+      emit({ type: this.eventNames.end });
+      this.inTag = false;
+      this.justEnded = true;
+      return;
+    }
+    let text = token.text;
+    // 块刚结束时，裁掉紧跟着的前导换行（块与正文之间的排版空行不进正文）
+    if (!this.inTag && this.justEnded) {
+      text = text.replace(/^\n+/, "");
+      this.justEnded = false;
+    }
+    if (!text) return;
+    emit({ type: this.inTag ? this.eventNames.text : "text", data: text });
+  }
+}
+
+export class MoodParser extends ReservedTagParserBase {
+  constructor() {
+    super(INTERNAL_MOOD_TAGS, { start: "mood_start", text: "mood_text", end: "mood_end" });
   }
 }
 
@@ -165,146 +97,12 @@ export class MoodParser {
  * 链在 MoodParser 之前（最外层），输出事件流：
  *   think_start / think_text { data } / think_end
  *   text { data } — 非 think 内容透传
- *
- * 支持标签变体：<think>...</think> 和 <thinking>...</thinking>
  */
 const THINK_TAGS = ["think", "thinking"];
 
-export class ThinkTagParser {
-  declare _allowOpenTag: any;
-  declare _currentTag: any;
-  declare _justEnded: any;
-  declare buffer: any;
-  declare inThink: any;
+export class ThinkTagParser extends ReservedTagParserBase {
   constructor() {
-    this.inThink = false;
-    this.buffer = "";
-    this._justEnded = false;
-    this._currentTag = null;
-    this._allowOpenTag = true;
-  }
-
-  feed(delta, emit) {
-    this.buffer += delta;
-    this._drain(emit);
-  }
-
-  flush(emit) {
-    if (this.buffer) {
-      emit({ type: this.inThink ? "think_text" : "text", data: this.buffer });
-      this.buffer = "";
-    }
-    if (this.inThink) {
-      emit({ type: "think_end" });
-      this.inThink = false;
-      this._currentTag = null;
-    }
-  }
-
-  /**
-   * 新的 assistant segment 开始：重新打开 leading <think>/<thinking> opener 资格，
-   * 清空 segment 内解析状态。语义同 MoodParser.beginAssistantSegment——区分"新的
-   * 模型生成"与"整个 user turn 重置"。
-   */
-  beginAssistantSegment() {
-    this.inThink = false;
-    this.buffer = "";
-    this._justEnded = false;
-    this._currentTag = null;
-    this._allowOpenTag = true;
-  }
-
-  reset() {
-    this.beginAssistantSegment();
-  }
-
-  _findOpenTag() {
-    if (!this._allowOpenTag) return null;
-    let best = null;
-    for (const tag of THINK_TAGS) {
-      const openTag = `<${tag}>`;
-      const idx = this.buffer.indexOf(openTag);
-      if (idx !== -1 && this.buffer.slice(0, idx).trim().length > 0) continue;
-      if (idx !== -1 && (best === null || idx < best.idx)) {
-        best = { tag, idx, openTag };
-      }
-    }
-    return best;
-  }
-
-  _maxTrailingPrefix() {
-    if (!this._allowOpenTag) return 0;
-    let max = 0;
-    for (const tag of THINK_TAGS) {
-      const len = trailingPrefixLen(this.buffer, `<${tag}>`);
-      if (len > max) max = len;
-    }
-    return max;
-  }
-
-  _drain(emit) {
-    while (this.buffer.length > 0) {
-      // think 刚结束时裁掉前导换行
-      if (this._justEnded && !this.inThink) {
-        this.buffer = this.buffer.replace(/^\n+/, "");
-        this._justEnded = false;
-        if (!this.buffer.length) break;
-      }
-
-      if (!this.inThink) {
-        const found = this._findOpenTag();
-        if (found) {
-          const before = this.buffer.slice(0, found.idx);
-          if (before) emit({ type: "text", data: before });
-          emit({ type: "think_start" });
-          this.inThink = true;
-          this._currentTag = found.tag;
-          this.buffer = this.buffer.slice(found.idx + found.openTag.length);
-          continue;
-        }
-        // buffer 末尾可能是某个开始标签的前缀
-        const holdLen = this._maxTrailingPrefix();
-        if (holdLen > 0) {
-          const safe = this.buffer.slice(0, -holdLen);
-          if (safe.trim().length > 0) {
-            emit({ type: "text", data: this.buffer });
-            this._allowOpenTag = false;
-            this.buffer = "";
-            break;
-          }
-          if (safe) {
-            emit({ type: "text", data: safe });
-          }
-          this.buffer = this.buffer.slice(-holdLen);
-          break;
-        }
-        emit({ type: "text", data: this.buffer });
-        if (this.buffer.trim().length > 0) this._allowOpenTag = false;
-        this.buffer = "";
-      } else {
-        const closeTag = `</${this._currentTag}>`;
-        const idx = this.buffer.indexOf(closeTag);
-        if (idx !== -1) {
-          const content = this.buffer.slice(0, idx);
-          if (content) emit({ type: "think_text", data: content });
-          emit({ type: "think_end" });
-          this.inThink = false;
-          this._justEnded = true;
-          this._currentTag = null;
-          this.buffer = this.buffer.slice(idx + closeTag.length);
-          continue;
-        }
-        const holdLen = trailingPrefixLen(this.buffer, closeTag);
-        if (holdLen > 0) {
-          const safe = this.buffer.slice(0, -holdLen);
-          if (safe) emit({ type: "think_text", data: safe });
-          this.buffer = this.buffer.slice(-holdLen);
-          break;
-        }
-        emit({ type: "think_text", data: this.buffer });
-        this.buffer = "";
-      }
-    }
+    super(THINK_TAGS, { start: "think_start", text: "think_text", end: "think_end" });
   }
 }
 
@@ -317,6 +115,16 @@ export class ThinkTagParser {
  *   card_end
  *   text { data } — 非 card 内容透传
  */
+
+/** 检查 buffer 末尾是否是 target 的前缀（1..target.length-1 个字符），返回匹配长度 */
+function trailingPrefixLen(buffer, target) {
+  const maxCheck = Math.min(buffer.length, target.length - 1);
+  for (let len = maxCheck; len >= 1; len--) {
+    if (buffer.endsWith(target.slice(0, len))) return len;
+  }
+  return 0;
+}
+
 const CARD_ATTR_RE = /(\w+)="([^"]*)"/g;
 
 export class CardParser {

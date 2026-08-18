@@ -147,6 +147,7 @@ export function configureWsMessageHandler(options: {
 // ── 聊天事件集合（走 StreamBufferManager） ──
 
 const REACT_CHAT_EVENTS = new Set([
+  'turn_start',
   'assistant_segment_start', 'assistant_segment_delta', 'assistant_segment_end',
   'text_delta', 'thinking_start', 'thinking_delta', 'thinking_end',
   'mood_start', 'mood_text', 'mood_end',
@@ -1185,16 +1186,14 @@ export function handleServerMessage(msg: any): void {
 
     case 'status': {
       const sp = msg.sessionPath || null;
-      const sid = typeof msg.sessionId === 'string' && msg.sessionId.trim() ? msg.sessionId.trim() : null;
-      // streamingSessions 维护 + 焦点 UI 占位一并由 applyStreamingStatus 处理
-      const applied = applyStreamingStatus(msg.isStreaming, sp, {
+      // status 只回答「Session 是否忙」：streamingSessions 维护 + 焦点 UI 占位。
+      // 它没有资格决定 Assistant Turn 的生命周期——Turn 只能由
+      // turn_start / turn_end（见 REACT_CHAT_EVENTS → StreamBufferManager）开关，
+      // 因此这里绝不允许调用 beginTurn / finishTurn / commitLiveTurn。
+      applyStreamingStatus(msg.isStreaming, sp, {
         streamId: msg.streamId ?? null,
         turnId: msg.turnId ?? null,
       });
-      if (sp && applied) {
-        if (msg.isStreaming) streamBufferManager.beginTurn(sp, sid);
-        else streamBufferManager.finishTurn(sp, sid);
-      }
       break;
     }
 

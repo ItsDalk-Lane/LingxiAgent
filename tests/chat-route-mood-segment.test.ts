@@ -6,8 +6,9 @@ import { createChatRoute } from "../server/routes/chat.ts";
  *
  * 实证事件序（见调查）：一次 user turn 内，pi SDK 把每段模型生成（含工具调用后的
  * 第二轮）都包在独立的 turn_start/turn_end 里，且每段开头有一次 message_start(assistant)。
- * 服务端必须保证：每段开头的 leading 内部块都被识别为 mood_*，绝不作为 text_delta
- * 泄漏；同一段可见正文开始后的标签仍保持普通正文（leading-only 安全）。
+ * 服务端必须保证：保留协议标签（<mood>/<pulse>/<reflect>）无论出现在一段生成的什么
+ * 位置都被结构化为 mood_*，绝不作为 text_delta 泄漏；一段里允许多个 mood 块。
+ * 需要字面量时由模型用 \<tag> 转义或行内代码 / 围栏代码块表达。
  */
 
 function makeHarness(sessionPath = "/tmp/mood-segment.jsonl") {
@@ -164,7 +165,7 @@ describe("chat route mood segment lifecycle", () => {
     expect(moodEnds).toHaveLength(2);
   });
 
-  it("Case E: second segment prose-internal tag stays visible (leading-only safety)", () => {
+  it("Case E: prose-internal reserved tag is structured too (tags are protocol, not text)", () => {
     const { subscriber, sessionPath, payloads } = makeHarness();
     const msg = { role: "assistant" };
     subscriber?.({ type: "turn_start" }, sessionPath);
@@ -172,20 +173,32 @@ describe("chat route mood segment lifecycle", () => {
     emitTool(subscriber, sessionPath);
     subscriber?.({ type: "turn_end", message: msg, toolResults: [] }, sessionPath);
     subscriber?.({ type: "turn_start" }, sessionPath);
-    // 第二段：正文先出现，后面再带 <reflect> → 必须作为普通正文
+    // 新契约：保留标签出现在正文中间同样是协议，一律结构化为 mood，不进正文。
     emitAssistantText(subscriber, sessionPath, msg, "正文解释 <reflect>literal</reflect>");
     subscriber?.({ type: "turn_end", message: msg, toolResults: [] }, sessionPath);
 
     const textDeltas = payloads().filter((p) => p.type === "text_delta").map((p) => p.delta);
-    expect(textDeltas.join("")).toBe("正文解释 <reflect>literal</reflect>");
-    // 这种情况下 <reflect> 出现在正文是正确的（模型在讲解标签），不应被吞
+    expect(textDeltas.join("")).toBe("正文解释 ");
+    expect(textDeltas.join("")).not.toMatch(/<\/?reflect>/);
     const moodTexts = payloads().filter((p) => p.type === "mood_text").map((p) => p.delta);
-    expect(moodTexts).toEqual(["A"]);
+    expect(moodTexts).toEqual(["A", "literal"]);
   });
 
-  it("Case F: same-segment second tag stays visible even with explicit message_start re-arm", () => {
-    // 关键 guard：message_start(assistant) 只在"新一段模型生成"时重武装；
-    // 同一段内正文开始后的第二个标签不能因为"支持多 segment"被重新吞掉。
+  it("Case E2: a literal tag in prose is expressed with escape or code, and survives", () => {
+    // 模型要"讲解标签"时的正确表达：\<reflect> 转义 / 行内代码。两者都必须按字面量进正文。
+    const { subscriber, sessionPath, payloads } = makeHarness();
+    const msg = { role: "assistant" };
+    subscriber?.({ type: "turn_start" }, sessionPath);
+    emitAssistantText(subscriber, sessionPath, msg, "写法是 \\<reflect> 或 `<reflect>` 两种");
+    subscriber?.({ type: "turn_end", message: msg, toolResults: [] }, sessionPath);
+
+    const textDeltas = payloads().filter((p) => p.type === "text_delta").map((p) => p.delta);
+    expect(textDeltas.join("")).toBe("写法是 <reflect> 或 `<reflect>` 两种");
+    expect(payloads().filter((p) => p.type === "mood_start")).toHaveLength(0);
+  });
+
+  it("Case F: same-segment second tag is structured as a second mood block", () => {
+    // 新契约：同一段生成里允许多个 mood 块（mood:0/1/2 互不覆盖）。
     const { subscriber, sessionPath, payloads } = makeHarness();
     const msg = { role: "assistant" };
     subscriber?.({ type: "turn_start" }, sessionPath);
@@ -199,8 +212,8 @@ describe("chat route mood segment lifecycle", () => {
 
     const textDeltas = payloads().filter((p) => p.type === "text_delta").map((p) => p.delta);
     const moodTexts = payloads().filter((p) => p.type === "mood_text").map((p) => p.delta);
-    expect(moodTexts).toEqual(["A"]);
-    expect(textDeltas.join("")).toBe("普通正文<reflect>B</reflect>");
+    expect(moodTexts).toEqual(["A", "B"]);
+    expect(textDeltas.join("")).toBe("普通正文");
   });
 
   it("Case G: tool failure then new segment → second reflect still parses", () => {
