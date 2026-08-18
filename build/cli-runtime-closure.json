@@ -838,11 +838,16 @@
       "provenance": [
         {
           "root": "server-bootstrap",
+          "from": "server/assistant-event-normalizer.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
           "from": "server/routes/chat.ts",
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by server/routes/chat.ts (import-statement)."
+      "reason": "Reached via esbuild source module graph, imported by server/assistant-event-normalizer.ts (import-statement); server/routes/chat.ts (import-statement)."
     },
     {
       "path": "core/execution-boundary.ts",

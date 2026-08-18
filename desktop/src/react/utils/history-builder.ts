@@ -19,6 +19,7 @@ import { buildAssistantBlocksFromContent } from './assistant-block-builder';
 import { recordChatPerformance } from './chat-performance';
 import { normalizeContentBlocks } from './content-semantics';
 import { projectAssistantTurn } from './turn-projector';
+import { sanitizePersistedSegments } from './history-segment-sanitizer';
 import type { LiveAssistantSegment } from '../stores/live-turn-store';
 
 /* eslint-disable @typescript-eslint/no-explicit-any -- API 历史消息 JSON 结构动态，难以静态收窄 */
@@ -635,7 +636,12 @@ export function buildItemsFromHistory(data: HistoryApiResponse): ChatListItem[] 
             assistantMessageIds: groupMessages.map((message, offset) => (
               message.entryId || message.id || `hist-${i + offset}`
             )),
-            segments,
+            // 迁移边界一次性净化：旧落盘 segments 可能残留 leading 内部标签，
+            // 与结构化 mood/thinking block 双重表示时剥离（任务书 §23）。
+            segments: sanitizePersistedSegments(segments, {
+              hasStructuredMood: legacyBlocks.some((block) => block.type === 'mood'),
+              hasStructuredThinking: legacyBlocks.some((block) => block.type === 'thinking'),
+            }),
             legacyBlocks,
             status: groupMessages.some((message) => message.turnStatus === 'failed')
               ? 'failed'

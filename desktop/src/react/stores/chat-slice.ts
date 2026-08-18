@@ -8,7 +8,8 @@ import { invalidateStreamBuffer, invalidateStreamResumeMeta } from './stream-inv
 import { bumpMessageLiveVersion, clearMessageLiveVersion } from './message-live-version';
 import { sessionScopedKey, sessionScopedValue } from './session-slice';
 import { recordChatPerformance } from '../utils/chat-performance';
-import { normalizeContentBlocks, rebaseGeneratedContentBlockIds } from '../utils/content-semantics';
+import { normalizeContentBlocks } from '../utils/content-semantics';
+import { resolveAssistantTurnOutcome } from '../utils/turn-outcome';
 
 export interface ChatSlice {
   chatSessions: Record<string, SessionMessages>;
@@ -341,7 +342,6 @@ export const createChatSlice = (
           || assistantBlocks !== null
           || assistantProjection !== null
         )) {
-          const previousBlockIdPrefix = assistant.data.sourceEntryId || assistant.data.id;
           if (assistantBlocks) {
             recordChatPerformance('structural_message_update', {
               sessionPath: path,
@@ -355,20 +355,11 @@ export const createChatSlice = (
               ...assistant.data,
               ...(assistantEntryId ? { sourceEntryId: assistantEntryId } : {}),
               ...(turnInputEntryId ? { turnInputEntryId } : {}),
-              ...(assistantEntryId && assistant.data.blocks ? {
-                blocks: rebaseGeneratedContentBlockIds(
-                  assistant.data.blocks,
-                  previousBlockIdPrefix,
-                  assistantEntryId,
-                ),
-              } : {}),
-              ...(assistantBlocks ? {
-                blocks: rebaseGeneratedContentBlockIds(
-                  assistantBlocks,
-                  previousBlockIdPrefix,
-                  assistantEntryId || previousBlockIdPrefix,
-                ),
-              } : {}),
+              // Block ID 生命周期契约（不变量 5）：canonical block 的 id 在流式
+              // 首次创建后绝不改写；持久化 entry 只是 metadata 绑定。历史上
+              // 这里曾对本地临时前缀做 rebase，导致 turn_end 前后内容身份变化，
+              // 现在统一由 stream buffer 在提交时用最终 blocks 覆盖，不再重排。
+              ...(assistantBlocks ? { blocks: assistantBlocks } : {}),
               ...(assistantProjection ? { turnProjection: assistantProjection } : {}),
             },
           };
@@ -512,6 +503,11 @@ export const createChatSlice = (
             block.type === 'turn_status' && block.status === 'missing_final_answer'
           ));
         }
+        // 延迟结果到达必须重算 Turn Outcome（任务书 §16）：sealed 不禁止
+        // result 区域更新，missing_final_answer 需要升级为 completed_with_result。
+        const resolvedOutcome = item.data.turnProjection
+          ? resolveAssistantTurnOutcome({ blocks: nextBlocks, status: item.data.turnProjection.status })
+          : null;
         const turnProjection = item.data.turnProjection
           ? {
               ...item.data.turnProjection,
@@ -519,6 +515,10 @@ export const createChatSlice = (
               answerBlockIds: nextBlocks.filter((block) => block.surfaceRole === 'answer').map((block) => block.id!),
               resultBlockIds: nextBlocks.filter((block) => block.surfaceRole === 'result').map((block) => block.id!),
               controlBlockIds: nextBlocks.filter((block) => block.surfaceRole === 'control').map((block) => block.id!),
+              ...(resolvedOutcome ? { outcome: resolvedOutcome.outcome } : {}),
+              ...(resolvedOutcome?.missingFinalAnswerReason
+                ? { missingFinalAnswerReason: resolvedOutcome.missingFinalAnswerReason }
+                : { missingFinalAnswerReason: undefined }),
             }
           : undefined;
         items[i] = {

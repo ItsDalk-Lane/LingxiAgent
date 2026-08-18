@@ -22,11 +22,18 @@ export interface SourceTranscriptRenderItem {
   continuesAssistantTurn?: boolean;
 }
 
-export interface ProcessFoldMessage {
-  item: Extract<ChatListItem, { type: 'message' }>;
-  originalIndex: number;
+/**
+ * Process Fold 只持有引用（任务书 §17）：不复制 AssistantMessage，不重新
+ * 分配 id。blocks 直接引用源消息的 block 数组；外层折叠只是展示方式。
+ */
+export interface ProcessFoldBlockRef {
   sourceMessageId: string;
+  originalIndex: number;
+  blocks: ContentBlock[];
+  /** 该源消息是否还承载非 process 内容（answer/result）分屏渲染。 */
   registerSourceMessageElement: boolean;
+  /** 完成时间锚点：源消息 timestamp（completion footer 使用）。 */
+  timestamp?: number;
 }
 
 export interface ProcessFoldNavigationAnchors {
@@ -39,7 +46,7 @@ export interface ProcessFoldRenderItem {
   id: string;
   turnId: string;
   blockIds: string[];
-  items: ProcessFoldMessage[];
+  refs: ProcessFoldBlockRef[];
   originalIndex: number;
   stats: ProcessFoldStats;
   status: Exclude<AssistantTurnStatus, 'streaming'>;
@@ -129,28 +136,13 @@ function sourceItem(
   };
 }
 
-function clonedAssistantMessage(
-  entry: Extract<ChatListItem, { type: 'message' }>,
-  blocks: ContentBlock[],
-  id: string,
-): Extract<ChatListItem, { type: 'message' }> {
-  return {
-    type: 'message',
-    data: {
-      ...entry.data,
-      id,
-      blocks,
-    },
-  };
-}
-
-function collectStats(messages: ProcessFoldMessage[]): ProcessFoldStats {
+function collectStats(refs: ProcessFoldBlockRef[]): ProcessFoldStats {
   let toolCount = 0;
   let thinkingCount = 0;
   let unsuccessfulCount = 0;
 
-  for (const entry of messages) {
-    for (const block of entry.item.data.blocks || []) {
+  for (const ref of refs) {
+    for (const block of ref.blocks) {
       if (block.type === 'thinking') {
         thinkingCount += 1;
         continue;
@@ -171,12 +163,12 @@ function objectValue(value: unknown): Record<string, unknown> | null {
     : null;
 }
 
-function collectNavigationAnchors(messages: ProcessFoldMessage[]): ProcessFoldNavigationAnchors {
+function collectNavigationAnchors(refs: ProcessFoldBlockRef[]): ProcessFoldNavigationAnchors {
   const terminal = new Set<string>();
   const subagent = new Set<string>();
 
-  for (const entry of messages) {
-    for (const block of entry.item.data.blocks || []) {
+  for (const ref of refs) {
+    for (const block of ref.blocks) {
       if (block.type === 'subagent') {
         if (block.taskId) subagent.add(block.taskId);
         if (block.streamKey) subagent.add(block.streamKey);
@@ -205,10 +197,10 @@ function completedStatus(
   return 'completed';
 }
 
-function processFoldId(messages: ProcessFoldMessage[], turnId: string, hasProjection: boolean): string {
+function processFoldId(refs: ProcessFoldBlockRef[], turnId: string, hasProjection: boolean): string {
   if (hasProjection) return `${turnId}:process`;
-  const first = messages[0]?.sourceMessageId || 'start';
-  const last = messages[messages.length - 1]?.sourceMessageId || first;
+  const first = refs[0]?.sourceMessageId || 'start';
+  const last = refs[refs.length - 1]?.sourceMessageId || first;
   return `process-fold-${first}-${last}`;
 }
 
@@ -218,7 +210,7 @@ function projectedTurnItems(
   if (segment.some(({ entry }) => visibleBlocks(entry.data).some(isMalformedLegacyBlock))) {
     return segment.map(({ entry, originalIndex }) => sourceItem(entry, originalIndex));
   }
-  const processMessages: ProcessFoldMessage[] = [];
+  const blockRefs: ProcessFoldBlockRef[] = [];
   const sourceMessages: SourceTranscriptRenderItem[] = [];
   const blockIds: string[] = [];
 
@@ -228,13 +220,12 @@ function projectedTurnItems(
     const nonProcessBlocks = blocks.filter((block) => !isFoldableProcessBlock(entry.data, block));
 
     if (processBlocks.length > 0) {
-      const continuesAfterFold = nonProcessBlocks.length > 0;
-      const processMessageId = continuesAfterFold ? `${entry.data.id}:process` : entry.data.id;
-      processMessages.push({
-        item: clonedAssistantMessage(entry, processBlocks, processMessageId),
-        originalIndex,
+      blockRefs.push({
         sourceMessageId: entry.data.id,
-        registerSourceMessageElement: !continuesAfterFold,
+        originalIndex,
+        blocks: processBlocks,
+        registerSourceMessageElement: nonProcessBlocks.length === 0,
+        ...(entry.data.timestamp !== undefined ? { timestamp: entry.data.timestamp } : {}),
       });
       blockIds.push(...processBlocks.map((block, index) => (
         block.id || `${entry.data.id}:${block.type}:${index}`
@@ -242,8 +233,10 @@ function projectedTurnItems(
     }
 
     if (nonProcessBlocks.length > 0) {
+      // 非 process 内容留在源消息位置；process 块已由 fold 持有引用，
+      // 源消息渲染时按投影排除，不再克隆消息（不变量 6）。
       sourceMessages.push(sourceItem(
-        clonedAssistantMessage(entry, nonProcessBlocks, entry.data.id),
+        { type: 'message', data: { ...entry.data, blocks: nonProcessBlocks } },
         originalIndex,
         processBlocks.length > 0,
       ));
@@ -252,28 +245,28 @@ function projectedTurnItems(
     }
   }
 
-  if (processMessages.length === 0) return sourceMessages;
+  if (blockRefs.length === 0) return sourceMessages;
 
   const projection = [...segment]
     .reverse()
     .map(({ entry }) => entry.data.turnProjection)
     .find((value) => !!value);
-  const firstMessageId = processMessages[0].sourceMessageId;
-  const lastMessageId = processMessages[processMessages.length - 1].sourceMessageId;
+  const firstMessageId = blockRefs[0].sourceMessageId;
+  const lastMessageId = blockRefs[blockRefs.length - 1].sourceMessageId;
   const turnId = projection?.id || `legacy-turn-${firstMessageId}-${lastMessageId}`;
   const status = completedStatus(segment.map(({ entry }) => entry));
   const fold: ProcessFoldRenderItem = {
     type: 'process_fold',
-    id: processFoldId(processMessages, turnId, !!projection),
+    id: processFoldId(blockRefs, turnId, !!projection),
     turnId,
     blockIds,
-    items: processMessages,
-    originalIndex: processMessages[0].originalIndex,
-    stats: collectStats(processMessages),
+    refs: blockRefs,
+    originalIndex: blockRefs[0].originalIndex,
+    stats: collectStats(blockRefs),
     status,
     defaultCollapsed: status === 'completed',
     ownsTurnCompletion: sourceMessages.length === 0,
-    navigationAnchors: collectNavigationAnchors(processMessages),
+    navigationAnchors: collectNavigationAnchors(blockRefs),
   };
   return [fold, ...sourceMessages];
 }

@@ -338,7 +338,7 @@ function previousMessageItem(items: ChatListItem[], beforeIndex: number): Extrac
 }
 
 function groupLastOriginalIndex(renderItem: Extract<TranscriptRenderItem, { type: 'process_fold' }>): number {
-  return renderItem.items[renderItem.items.length - 1]?.originalIndex ?? renderItem.originalIndex;
+  return renderItem.refs[renderItem.refs.length - 1]?.originalIndex ?? renderItem.originalIndex;
 }
 
 const TranscriptItemView = memo(function TranscriptItemView({

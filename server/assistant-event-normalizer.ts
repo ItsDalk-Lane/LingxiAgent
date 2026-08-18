@@ -1,3 +1,4 @@
+import { ThinkTagParser, MoodParser, CardParser } from '../core/events.ts';
 import { getAssistantTextPhase } from '../shared/text-signature.ts';
 
 export type CanonicalAssistantPhase = 'reasoning' | 'commentary' | 'final_answer' | 'unresolved';
@@ -21,6 +22,22 @@ export type CanonicalAssistantSegmentEvent =
       semanticPhase: Exclude<CanonicalAssistantPhase, 'unresolved'>;
     };
 
+/**
+ * 内部协议解析副产物（任务书 §7）：parser 只回答"这是什么内容"，
+ * 不决定 provider phase。moodOrdinal / thinkingOrdinal 在首次识别时
+ * 分配，之后绝不改变（稳定内容身份）。
+ */
+export type CanonicalInternalProtocolEvent =
+  | { type: 'mood_start'; moodOrdinal: number }
+  | { type: 'mood_text'; moodOrdinal: number; delta: string }
+  | { type: 'mood_end'; moodOrdinal: number }
+  | { type: 'assistant_thinking_start' }
+  | { type: 'assistant_thinking_delta'; delta: string }
+  | { type: 'assistant_thinking_end' }
+  | { type: 'card_start'; attrs: { type: string; plugin: string; route: string; title?: string } }
+  | { type: 'card_text'; delta: string }
+  | { type: 'card_end' };
+
 export interface AssistantEventNormalizerDiagnostic {
   code: 'unresolved_phase_fallback';
   segmentId: string;
@@ -29,6 +46,12 @@ export interface AssistantEventNormalizerDiagnostic {
 
 export interface NormalizedAssistantEventBatch {
   canonicalEvents: CanonicalAssistantSegmentEvent[];
+  /** 内部协议结构化副产物（mood/thinking/card），供 WS 层直接下发。 */
+  internalProtocolEvents: CanonicalInternalProtocolEvent[];
+  /**
+   * 兼容期输出：剥净内部标签后的可见文本增量，供旧前端正文链使用。
+   * 前端迁完后可删除。
+   */
   visibleTextDeltas: string[];
   diagnostics: AssistantEventNormalizerDiagnostic[];
 }
@@ -49,7 +72,7 @@ const PHASE_AT_END_APIS = new Set([
 ]);
 
 function emptyBatch(): NormalizedAssistantEventBatch {
-  return { canonicalEvents: [], visibleTextDeltas: [], diagnostics: [] };
+  return { canonicalEvents: [], internalProtocolEvents: [], visibleTextDeltas: [], diagnostics: [] };
 }
 
 function objectValue(value: unknown): Record<string, unknown> | null {
@@ -113,13 +136,26 @@ function textFromEndEvent(event: Record<string, unknown>, fallbackMessage?: unkn
 }
 
 /**
- * 把各供应商的文字增量收敛为统一分段事件。
- * 兼容期同时返回旧正文链需要的文字；未来前端迁完后可删除该兼容输出。
+ * 把各供应商事件收敛为统一 canonical 语义分段。
+ *
+ * 数据流（任务书 §7）：raw provider text -> Think/Mood/Card 内部协议
+ * 解析链（复用 core/events.ts 跨 chunk 状态机）-> 纯净文本 + 结构化
+ * 副产物 -> canonical segment 事件。canonical 文本绝不包含已成功解析
+ * 的内部协议标签（不变量 2）；provider phase 仍只由 textSignature /
+ * semanticPhase / phase-at-end 决定（不变量 8）。
  */
 export class AssistantEventNormalizer {
   private messageOrdinal = 0;
   private readonly openTextSegments = new Map<string, OpenTextSegment>();
   private reasoningSegmentId: string | null = null;
+
+  // ── 内部协议解析链（每回合一条：Think -> Mood -> Card）──
+  private readonly thinkTagParser = new ThinkTagParser();
+  private readonly moodParser = new MoodParser();
+  private readonly cardParser = new CardParser();
+  private moodOrdinal = -1;
+  private inMood = false;
+  private inThink = false;
 
   beginAssistantMessage(): void {
     this.messageOrdinal += 1;
@@ -129,6 +165,154 @@ export class AssistantEventNormalizer {
     this.messageOrdinal = 0;
     this.openTextSegments.clear();
     this.reasoningSegmentId = null;
+    this.thinkTagParser.reset();
+    this.moodParser.reset();
+    this.cardParser.reset();
+    this.moodOrdinal = -1;
+    this.inMood = false;
+    this.inThink = false;
+  }
+
+  /** 一次新的模型生成开始：重新武装 leading opener 资格并冲空缓冲。 */
+  beginAssistantSegment(): void {
+    this.thinkTagParser.beginAssistantSegment();
+    this.moodParser.beginAssistantSegment();
+  }
+
+  /**
+   * 冲空解析链残留（turn/segment 边界调用）。返回解析出的剩余事件。
+   */
+  flushProtocolParsers(): NormalizedAssistantEventBatch {
+    const result = emptyBatch();
+    this.thinkTagParser.flush((evt) => this.consumeThinkEvent(evt, result));
+    this.moodParser.flush((evt) => this.consumeMoodEvent(evt, result));
+    this.cardParser.flush((evt) => this.consumeCardEvent(evt, result));
+    return result;
+  }
+
+  private consumeThinkEvent(
+    evt: { type: string; data?: string },
+    result: NormalizedAssistantEventBatch,
+  ): void {
+    switch (evt.type) {
+      case 'think_start':
+        if (!this.inThink) {
+          this.inThink = true;
+          result.internalProtocolEvents.push({ type: 'assistant_thinking_start' });
+        }
+        break;
+      case 'think_text':
+        if (evt.data) {
+          if (!this.inThink) {
+            this.inThink = true;
+            result.internalProtocolEvents.push({ type: 'assistant_thinking_start' });
+          }
+          result.internalProtocolEvents.push({ type: 'assistant_thinking_delta', delta: evt.data });
+        }
+        break;
+      case 'think_end':
+        if (this.inThink) {
+          this.inThink = false;
+          result.internalProtocolEvents.push({ type: 'assistant_thinking_end' });
+        }
+        break;
+      case 'text':
+        if (evt.data) this.feedMoodParser(evt.data, result);
+        break;
+    }
+  }
+
+  private feedMoodParser(text: string, result: NormalizedAssistantEventBatch): void {
+    this.moodParser.feed(text, (evt) => this.consumeMoodEvent(evt, result));
+  }
+
+  private consumeMoodEvent(
+    evt: { type: string; data?: string },
+    result: NormalizedAssistantEventBatch,
+  ): void {
+    switch (evt.type) {
+      case 'mood_start': {
+        this.moodOrdinal += 1;
+        this.inMood = true;
+        result.internalProtocolEvents.push({ type: 'mood_start', moodOrdinal: this.moodOrdinal });
+        break;
+      }
+      case 'mood_text':
+        if (evt.data) {
+          result.internalProtocolEvents.push({
+            type: 'mood_text',
+            moodOrdinal: this.inMood ? this.moodOrdinal : Math.max(this.moodOrdinal, 0),
+            delta: evt.data,
+          });
+        }
+        break;
+      case 'mood_end':
+        this.inMood = false;
+        result.internalProtocolEvents.push({ type: 'mood_end', moodOrdinal: this.moodOrdinal });
+        break;
+      case 'text':
+        if (evt.data) this.feedCardParser(evt.data, result);
+        break;
+    }
+  }
+
+  private feedCardParser(text: string, result: NormalizedAssistantEventBatch): void {
+    this.cardParser.feed(text, (evt) => this.consumeCardEvent(evt, result));
+  }
+
+  private consumeCardEvent(
+    evt: { type: string; data?: string; attrs?: unknown },
+    result: NormalizedAssistantEventBatch,
+  ): void {
+    switch (evt.type) {
+      case 'card_start': {
+        const attrs = objectValue(evt.attrs) || {};
+        result.internalProtocolEvents.push({
+          type: 'card_start',
+          attrs: {
+            type: stringValue(attrs.type) || 'iframe',
+            plugin: stringValue(attrs.plugin),
+            route: stringValue(attrs.route),
+            ...(stringValue(attrs.title) ? { title: stringValue(attrs.title) } : {}),
+          },
+        });
+        break;
+      }
+      case 'card_text':
+        if (evt.data) result.internalProtocolEvents.push({ type: 'card_text', delta: evt.data });
+        break;
+      case 'card_end':
+        result.internalProtocolEvents.push({ type: 'card_end' });
+        break;
+      case 'text':
+        // 纯净可见文本：同时进 canonical segment 与旧正文兼容链
+        if (evt.data) {
+          this.emitCleanText(evt.data, result);
+        }
+        break;
+    }
+  }
+
+  /** 纯净文本落地：写 canonical segment delta + 兼容 visibleTextDeltas。 */
+  private emitCleanText(text: string, result: NormalizedAssistantEventBatch): void {
+    for (const segment of this.openTextSegments.values()) {
+      // OpenTextSegment.semanticPhase 类型上不含 reasoning；运行时防御保留。
+      segment.bufferedText += text;
+      result.canonicalEvents.push({
+        type: 'assistant_segment_delta',
+        segmentId: segment.segmentId,
+        delta: text,
+        semanticPhase: segment.semanticPhase,
+      });
+      if (segment.semanticPhase === 'final_answer') {
+        segment.visiblePublished = true;
+        result.visibleTextDeltas.push(text);
+      }
+      return;
+    }
+    // 没有打开的 text segment（reasoning 阶段的 <think> 后直接出现正文等罕见路径）：
+    // 只发兼容输出，canonical segment 由 handleTextEvent 的常规路径补建。
+    result.visibleTextDeltas.push(text);
   }
 
   handleReasoningDelta(deltaValue: unknown): NormalizedAssistantEventBatch {
@@ -202,33 +386,26 @@ export class AssistantEventNormalizer {
     if (event.type === 'text_delta') {
       const delta = stringValue(event.delta);
       if (!delta) return result;
-      segment.bufferedText += delta;
-      result.canonicalEvents.push({
-        type: 'assistant_segment_delta',
-        segmentId: segment.segmentId,
-        delta,
-        semanticPhase: segment.semanticPhase,
-      });
-      if (segment.semanticPhase === 'final_answer') {
-        segment.visiblePublished = true;
-        result.visibleTextDeltas.push(delta);
-      }
+      // 原始增量先过内部协议解析链；canonical segment delta 由解析链的
+      // 纯净 text 输出驱动，保证 canonical 文本不含内部标签。
+      this.thinkTagParser.feed(delta, (evt) => this.consumeThinkEvent(evt, result));
       return result;
     }
 
     const endText = textFromEndEvent(event, fallbackMessage);
     if (!segment.bufferedText && endText) {
-      segment.bufferedText = endText;
-      result.canonicalEvents.push({
-        type: 'assistant_segment_delta',
-        segmentId: segment.segmentId,
-        delta: endText,
-        semanticPhase: segment.semanticPhase,
-      });
+      // text_end 直接给出全文（start/delta 从未到达）：解析整段再收口
+      this.thinkTagParser.feed(endText, (evt) => this.consumeThinkEvent(evt, result));
     }
-    const resolvedPhase = explicitTextPhase(event, fallbackMessage)
+    const flushed = this.flushProtocolParsers();
+    result.canonicalEvents.push(...flushed.canonicalEvents);
+    result.internalProtocolEvents.push(...flushed.internalProtocolEvents);
+    result.visibleTextDeltas.push(...flushed.visibleTextDeltas);
+
+    const explicitPhase = explicitTextPhase(event, fallbackMessage);
+    const resolvedPhase = explicitPhase
       || (segment.semanticPhase === 'commentary' ? 'commentary' : 'final_answer');
-    if (segment.semanticPhase === 'unresolved' && !explicitTextPhase(event, fallbackMessage)) {
+    if (segment.semanticPhase === 'unresolved' && !explicitPhase) {
       result.diagnostics.push({
         code: 'unresolved_phase_fallback',
         segmentId: segment.segmentId,
@@ -256,8 +433,14 @@ export class AssistantEventNormalizer {
   }
 
   private finishOpenSegments(message?: unknown): NormalizedAssistantEventBatch {
-    const result = this.finishReasoning();
-    for (const segment of this.openTextSegments.values()) {
+    const result = emptyBatch();
+    // 先冲空解析链：残留的半个标签/未闭合 mood 按 text/mood 落地
+    const flushed = this.flushProtocolParsers();
+    result.canonicalEvents.push(...flushed.canonicalEvents);
+    result.internalProtocolEvents.push(...flushed.internalProtocolEvents);
+    result.visibleTextDeltas.push(...flushed.visibleTextDeltas);
+
+    for (const segment of [...this.openTextSegments.values()]) {
       const phaseEvent: Record<string, unknown> = {
         contentIndex: segment.contentIndex,
         partial: message,

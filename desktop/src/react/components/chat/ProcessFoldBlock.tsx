@@ -1,7 +1,7 @@
 import { memo, useCallback, useEffect, useId, useMemo, useState } from 'react';
 import { Collapse } from '@/ui';
 import { AgentAvatar, type AgentDisplayInfo } from '../../utils/agent-display';
-import { AssistantMessage } from './AssistantMessage';
+import { AssistantBlockList } from './AssistantBlockList';
 import { MessageFooterActions, formatMessageTime } from './MessageFooterActions';
 import { buildProcessFoldSummary, type ProcessFoldRenderItem } from './process-fold';
 import { useSessionNodeActions } from './SessionNodeActions';
@@ -78,13 +78,16 @@ export const ProcessFoldBlock = memo(function ProcessFoldBlock({
     setOpen(true);
     return false;
   }), [group.navigationAnchors]);
-  const messageRef = useCallback((messageId: string) => (
+  const registerRefElement = useCallback((messageId: string) => (
     (element: HTMLDivElement | null) => registerMessageElement?.(messageId, element)
   ), [registerMessageElement]);
-  const turnCompletionEntry = group.ownsTurnCompletion && turnCompletionAssistantIndexes
-    ? group.items.find((entry) => turnCompletionAssistantIndexes.has(entry.originalIndex))
+  // 完成状态/操作取该轮最后一个源消息（与 turnCompletion 索引对齐）。
+  const lastRef = group.refs[group.refs.length - 1];
+  const turnCompletionEntry = group.ownsTurnCompletion && turnCompletionAssistantIndexes && lastRef
+    && turnCompletionAssistantIndexes.has(lastRef.originalIndex)
+    ? lastRef
     : null;
-  const completionTimeText = formatMessageTime(turnCompletionEntry?.item.data.timestamp);
+  const completionTimeText = formatMessageTime(turnCompletionEntry?.timestamp ?? undefined) || null;
   const completionTarget = turnCompletionEntry
     ? assistantTurnTargetsByCompletionIndex?.get(turnCompletionEntry.originalIndex) ?? null
     : null;
@@ -132,34 +135,23 @@ export const ProcessFoldBlock = memo(function ProcessFoldBlock({
         </div>
         <Collapse open={open} className={styles.processFoldCollapse}>
           <div id={panelId} className={`${styles.message} ${styles.messageAssistant} ${styles.processFoldPanel}`}>
-            {group.items.map((entry) => (
-              <AssistantMessage
-                key={entry.item.data.id}
-                message={entry.item.data}
-                showAvatar={false}
-                sessionPath={sessionPath}
-                agentId={agentId}
-                readOnly={readOnly}
-                agentDisplay={agentDisplay}
-                isStreaming={isStreaming}
-                isSelected={selectedIds.includes(entry.sourceMessageId)}
-                showTurnCompletionTime={group.ownsTurnCompletion
-                  && (turnCompletionAssistantIndexes?.has(entry.originalIndex) ?? false)}
-                assistantTurnSelectionIds={group.ownsTurnCompletion
-                  ? assistantTurnSelectionIdsByCompletionIndex?.get(entry.originalIndex)
-                  : undefined}
-                turnTarget={group.ownsTurnCompletion
-                  ? assistantTurnTargetsByCompletionIndex?.get(entry.originalIndex) ?? null
-                  : null}
-                retrySourceMessage={group.ownsTurnCompletion
-                  ? assistantTurnRetryMessagesByCompletionIndex?.get(entry.originalIndex) ?? null
-                  : null}
-                skillPrompt={assistantSkillPromptsByIndex?.get(entry.originalIndex) ?? null}
-                onForkCreated={onForkCreated}
-                messageRef={entry.registerSourceMessageElement
-                  ? messageRef(entry.sourceMessageId)
-                  : undefined}
-              />
+            {group.refs.map((ref) => (
+              <div
+                key={ref.sourceMessageId}
+                ref={ref.registerSourceMessageElement ? registerRefElement(ref.sourceMessageId) : undefined}
+              >
+                <AssistantBlockList
+                  blocks={ref.blocks}
+                  agentName={displayName}
+                  agentId={agentId}
+                  yuan={agentDisplay.yuan}
+                  sessionPath={sessionPath}
+                  messageId={ref.sourceMessageId}
+                  isStreaming={isStreaming}
+                  readOnly={readOnly}
+                  skillPrompt={assistantSkillPromptsByIndex?.get(ref.originalIndex) ?? null}
+                />
+              </div>
             ))}
           </div>
         </Collapse>

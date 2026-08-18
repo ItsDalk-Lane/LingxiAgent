@@ -165,6 +165,22 @@ export type AssistantSemanticPhase = 'reasoning' | 'commentary' | 'mood' | 'tool
 export type ContentSurfaceRole = 'process' | 'answer' | 'result' | 'control';
 export type ContentLifecycle = 'streaming' | 'sealed';
 export type AssistantTurnStatus = 'streaming' | 'completed' | 'failed' | 'aborted';
+/** 回合结局的唯一裁决来源（turn-outcome.ts）；渲染层不得自行猜测。 */
+export type AssistantTurnOutcome =
+  | 'streaming'
+  | 'completed_with_answer'
+  | 'completed_with_result'
+  | 'completed_with_control'
+  | 'completed_without_user_output'
+  | 'failed'
+  | 'aborted';
+export type MissingFinalAnswerReason = 'no_final_answer_segment' | 'only_process_blocks' | 'empty_final_answer';
+
+export interface AssistantTurnDiagnostics {
+  code: 'unresolved_phase_fallback' | 'no_final_answer_segment' | 'only_process_blocks' | 'empty_final_answer';
+  segmentId?: string;
+  fallbackPhase?: 'final_answer';
+}
 
 export interface AssistantTurnProjection {
   id: string;
@@ -175,6 +191,9 @@ export interface AssistantTurnProjection {
   resultBlockIds: string[];
   controlBlockIds: string[];
   status: AssistantTurnStatus;
+  outcome?: AssistantTurnOutcome;
+  missingFinalAnswerReason?: MissingFinalAnswerReason;
+  diagnostics?: AssistantTurnDiagnostics[];
   startedAt?: number;
   completedAt?: number;
 }

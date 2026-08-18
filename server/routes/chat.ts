@@ -1229,32 +1229,46 @@ export function createChatRoute(engine: any, hub: any, {
         publishNormalizedAssistantBatch(ss.assistantEventNormalizer.finishReasoning());
         emitStreamEvent(sessionPath, ss, { type: "thinking_end" });
       }
-
-      // ThinkTagParser（最外层）→ MoodParser → CardParser
-      ss.thinkTagParser.feed(text, (tEvt) => {
-        switch (tEvt.type) {
-          case "think_start":
-            emitStreamEvent(sessionPath, ss, { type: "thinking_start" });
-            break;
-          case "think_text":
-            publishNormalizedAssistantBatch(ss.assistantEventNormalizer.handleReasoningDelta(tEvt.data));
-            emitStreamEvent(sessionPath, ss, { type: "thinking_delta", delta: tEvt.data });
-            break;
-          case "think_end":
-            publishNormalizedAssistantBatch(ss.assistantEventNormalizer.finishReasoning());
-            emitStreamEvent(sessionPath, ss, { type: "thinking_end" });
-            break;
-          case "text":
-            // 非 think 内容继续走 MoodParser → CardParser 链
-            feedMoodPipeline(tEvt.data);
-            break;
-        }
-      });
+      // 兼容正文直发：增量已在 AssistantEventNormalizer 内部解析链剥净
+      // 内部协议标签，这里直接作为 text_delta 下发，不再二次解析。
+      ss.titlePreview += text;
+      emitStreamEvent(sessionPath, ss, { type: "text_delta", delta: text });
+      maybeGenerateFirstTurnTitle(sessionPath, ss);
     };
 
     const publishNormalizedAssistantBatch = (batch) => {
       for (const canonicalEvent of batch.canonicalEvents) {
         emitStreamEvent(sessionPath, ss, canonicalEvent);
+      }
+      // 内部协议解析副产物（mood/thinking/card）：parser 链已前移进
+      // AssistantEventNormalizer，这里只透传结构化事件。
+      for (const protocolEvent of batch.internalProtocolEvents || []) {
+        if (protocolEvent.type === "mood_start"
+          || protocolEvent.type === "mood_text"
+          || protocolEvent.type === "mood_end"
+          || protocolEvent.type === "card_start"
+          || protocolEvent.type === "card_text"
+          || protocolEvent.type === "card_end") {
+          emitStreamEvent(sessionPath, ss, protocolEvent);
+        } else if (protocolEvent.type === "assistant_thinking_start") {
+          if (!ss.isThinking) {
+            ss.isThinking = true;
+            ss.hasThinking = true;
+            emitStreamEvent(sessionPath, ss, { type: "thinking_start" });
+          }
+        } else if (protocolEvent.type === "assistant_thinking_delta") {
+          ss.hasThinking = true;
+          if (!ss.isThinking) {
+            ss.isThinking = true;
+            emitStreamEvent(sessionPath, ss, { type: "thinking_start" });
+          }
+          emitStreamEvent(sessionPath, ss, { type: "thinking_delta", delta: protocolEvent.delta });
+        } else if (protocolEvent.type === "assistant_thinking_end") {
+          if (ss.isThinking) {
+            ss.isThinking = false;
+            emitStreamEvent(sessionPath, ss, { type: "thinking_end" });
+          }
+        }
       }
       for (const delta of batch.visibleTextDeltas) {
         emitVisibleTextDelta(delta);
@@ -1277,13 +1291,14 @@ export function createChatRoute(engine: any, hub: any, {
       if (!ss) return;
       // re-arm 前先把上一段遗留的未冲刷缓冲按原管道冲出来：beginAssistantSegment 会清
       // parser 缓冲，若不先 flush，上一段结尾被挂起的半个标签尾巴（如截断流只留下
-      // "<re"）会被静默丢弃——SDK handleRunFailure 等路径 message_start 会先于
+      // "<re"）会被静默丢弃--SDK handleRunFailure 等路径 message_start 会先于
       // turn_end 到达。canonical 流里缓冲已在 turn_end 冲空，这里是无副作用 no-op。
       publishNormalizedAssistantBatch(ss.assistantEventNormalizer.finishMessage(event.message));
       flushTerminalParsers();
       ss.thinkTagParser.beginAssistantSegment();
       ss.moodParser.beginAssistantSegment();
       ss.assistantEventNormalizer.beginAssistantMessage();
+      ss.assistantEventNormalizer.beginAssistantSegment();
     } else if (event.type === "message_update") {
       if (!ss) return;
       const sub = event.assistantMessageEvent?.type;

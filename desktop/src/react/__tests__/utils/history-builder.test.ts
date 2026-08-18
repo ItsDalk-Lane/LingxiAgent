@@ -123,6 +123,7 @@ describe('buildItemsFromHistory user image restoration', () => {
       answerBlockIds: ['entry-assistant-1:segment:assistant:1:text:2'],
       resultBlockIds: [],
       controlBlockIds: [],
+      outcome: 'completed_with_answer',
       status: 'completed',
     });
     const textBlocks = first.data.blocks?.filter((block) => block.type === 'text') || [];
