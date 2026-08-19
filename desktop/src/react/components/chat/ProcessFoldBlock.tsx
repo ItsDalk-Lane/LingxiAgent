@@ -50,7 +50,10 @@ export const ProcessFoldBlock = memo(function ProcessFoldBlock({
   registerMessageElement,
   onForkCreated,
 }: Props) {
-  const [open, setOpen] = useState(!group.defaultCollapsed);
+  // ProcessRegion：live 模式不折叠、不显示 summary（任务书 §二十五/§三十一）；
+  // settled 模式才显示 summary 并默认折叠。
+  const isLive = group.mode === 'live';
+  const [open, setOpen] = useState(isLive ? true : !group.defaultCollapsed);
   const panelId = useId();
   const t = window.t ?? ((p: string) => p);
 
@@ -67,8 +70,8 @@ export const ProcessFoldBlock = memo(function ProcessFoldBlock({
 
   const toggle = useCallback(() => setOpen(value => !value), []);
   useEffect(() => {
-    setOpen(!group.defaultCollapsed);
-  }, [group.defaultCollapsed, group.id]);
+    setOpen(isLive ? true : !group.defaultCollapsed);
+  }, [group.defaultCollapsed, group.id, isLive]);
   useEffect(() => subscribeChatCardNavigation((request) => {
     const anchors = request.kind === 'terminal'
       ? group.navigationAnchors.terminal
@@ -119,20 +122,22 @@ export const ProcessFoldBlock = memo(function ProcessFoldBlock({
             <span className={styles.avatarName}>{displayName}</span>
           </div>
         )}
-        <div className={`${styles.message} ${styles.messageAssistant} ${styles.processFoldMessage}`}>
-          <button
-            type="button"
-            className={`${styles.processFoldSummary}${open ? ` ${styles.processFoldSummaryOpen}` : ''}`}
-            aria-expanded={open}
-            aria-controls={panelId}
-            onClick={toggle}
-          >
-            <span className={styles.processFoldTitle}>
-              <span className={styles.processFoldTitleText}>{summary}</span>
-              <span className={styles.processFoldArrow} aria-hidden="true">›</span>
-            </span>
-          </button>
-        </div>
+        {!isLive && (
+          <div className={`${styles.message} ${styles.messageAssistant} ${styles.processFoldMessage}`}>
+            <button
+              type="button"
+              className={`${styles.processFoldSummary}${open ? ` ${styles.processFoldSummaryOpen}` : ''}`}
+              aria-expanded={open}
+              aria-controls={panelId}
+              onClick={toggle}
+            >
+              <span className={styles.processFoldTitle}>
+                <span className={styles.processFoldTitleText}>{summary}</span>
+                <span className={styles.processFoldArrow} aria-hidden="true">›</span>
+              </span>
+            </button>
+          </div>
+        )}
         <Collapse open={open} className={styles.processFoldCollapse}>
           <div id={panelId} className={`${styles.message} ${styles.messageAssistant} ${styles.processFoldPanel}`}>
             {group.refs.map((ref) => (

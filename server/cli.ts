@@ -63,7 +63,7 @@ export function reduceCliStreamIdentity(current, msg) {
       return { ...state, streamId: null, isStreaming: false };
     }
   }
-  if (msg?.type === "turn_end") {
+  if (msg?.type === "assistant_run_end") {
     if (state.streamId && (!messageStreamId || state.streamId !== messageStreamId)) return state;
     return { ...state, streamId: null, isStreaming: false };
   }
@@ -168,10 +168,10 @@ ${c.dim}${t("cli.disconnected")}${c.reset}`);
       isStreaming,
     }, msg);
     activeStreamId = tracked.streamId;
-    if (msg.type === "status" || msg.type === "turn_end" || msg.streamId) {
+    if (msg.type === "status" || msg.type === "assistant_run_end" || msg.streamId) {
       isStreaming = tracked.isStreaming;
     }
-    if (msg.type === "turn_end" && tracked.isStreaming) return;
+    if (msg.type === "assistant_run_end" && tracked.isStreaming) return;
     switch (msg.type) {
       case "text_delta":
         if (!hasPrintedTurnOutput) {
@@ -230,7 +230,7 @@ ${c.dim}${t("cli.disconnected")}${c.reset}`);
         process.stdout.write("\n");
         break;
 
-      case "turn_end":
+      case "assistant_run_end":
         isStreaming = false;
         activeStreamId = null;
         hasPrintedTurnOutput = false;

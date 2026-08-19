@@ -474,6 +474,13 @@ export function createChatRoute(engine: any, hub: any, {
         assistantStopReason: null,
         isAborted: false,
         turnActive: false,
+        // Assistant Run（任务书 §三/§七）：一次用户输入到 agent_settled 的完整执行周期。
+        // 与 Pi Model Turn（turn_start/turn_end）正交；只由 agent_start / agent_settled 开关。
+        assistantRunActive: false,
+        assistantRunId: null,
+        assistantRunStatus: null,
+        assistantRunSettled: false,
+        modelTurnOrdinal: 0,
         titleRequested: false,
         titlePreview: "",
         pendingDeferredContentEvents: [],
@@ -702,11 +709,11 @@ export function createChatRoute(engine: any, hub: any, {
     });
   }
 
-  function beginStreamingTurnState(sessionPath, ss, { streamId = null, flushDeferred = false } = {}) {
-    if (flushDeferred) flushPendingDeferredContentEvents(sessionPath, ss);
-    ss.pendingTurnCompletionNotification = null;
-    ss.lastStreamActivityAt = Date.now();
-    ss.turnActive = true;
+  // ── Assistant Run 生命周期（任务书 §三/§七/§八/§十五）──
+  // Pi Model Turn（turn_start/turn_end）只推进 modelTurnOrdinal，绝不 reset 任何 Run 级
+  // semantic runtime。Run 级 semantic runtime（parser/normalizer/segment ordinal）只在
+  // agent_start → beginAssistantRun 与 agent_settled → finishAssistantRun 处 reset。
+  function resetAssistantRunParsers(ss) {
     ss.thinkTagParser.reset();
     ss.moodParser.reset();
     ss.cardParser.reset();
@@ -716,6 +723,18 @@ export function createChatRoute(engine: any, hub: any, {
     ss._cardHints = [];
     ss._cardEmitted = false;
     ss.isThinking = false;
+  }
+
+  function beginAssistantRun(sessionPath, ss) {
+    ss.pendingTurnCompletionNotification = null;
+    ss.lastStreamActivityAt = Date.now();
+    ss.assistantRunActive = true;
+    ss.assistantRunSettled = false;
+    ss.assistantRunStatus = "active";
+    ss.assistantRunId = crypto.randomUUID();
+    ss.modelTurnOrdinal = 0;
+    ss.turnActive = false;
+    resetAssistantRunParsers(ss);
     ss.hasOutput = false;
     ss.hasToolCall = false;
     ss.hasThinking = false;
@@ -724,9 +743,115 @@ export function createChatRoute(engine: any, hub: any, {
     ss.isAborted = false;
     ss.titleRequested = false;
     ss.titlePreview = "";
-    const statusStreamId = beginSessionStream(ss, streamId);
+    ss.pendingTurnInputConsumptions = [];
+    ss.consumedTurnInputsForCurrentTurn = [];
+    // 一个用户 Run = 一个 streamId。若 session_user_message 已提前开启流则复用；
+    // 否则现在开启，后续所有 Model Turn 复用同一个 streamId，绝不重新分配。
+    const streamId = ss.isStreaming ? ss.streamId : beginSessionStream(ss);
+    scheduleTurnStallWatchdog(sessionPath, ss);
+    broadcast({
+      type: "status",
+      isStreaming: true,
+      sessionPath,
+      streamId,
+    });
+    emitStreamEvent(sessionPath, ss, {
+      type: "assistant_run_start",
+      runId: ss.assistantRunId,
+    });
+    return streamId;
+  }
+
+  function beginSessionStreamForStatus(sessionPath, ss, { streamId = null, flushDeferred = false } = {}) {
+    if (flushDeferred) flushPendingDeferredContentEvents(sessionPath, ss);
+    ss.pendingTurnCompletionNotification = null;
+    ss.lastStreamActivityAt = Date.now();
+    const statusStreamId = ss.isStreaming ? ss.streamId : beginSessionStream(ss, streamId);
     scheduleTurnStallWatchdog(sessionPath, ss);
     return statusStreamId;
+  }
+
+  // 唯一正常 finalize 入口（任务书 §八/§三十四）：assistant_run_end 只从这里产生，
+  // exactly-once。agent_end 绝不调它；Pi Model Turn 也绝不调它。
+  function finishAssistantRun(sessionPath, ss, status) {
+    if (!ss.assistantRunActive || ss.assistantRunSettled) return null;
+    ss.assistantRunSettled = true;
+    ss.assistantRunActive = false;
+    ss.assistantRunStatus = status;
+
+    const persistedEntries = persistedTurnEntryIds(engine, sessionPath);
+    persistConsumedTurnInputs(sessionPath, ss, persistedEntries);
+
+    // token usage 记账（一次 agent run 记一次）。
+    // 中止的 run 没落盘任何 assistant 时跳过记账：branch 里最后一条 assistant 属于上一轮，
+    // 重复记会双计。
+    const skipUsageAccounting = status === "aborted" && !persistedEntries.assistantEntryId;
+    if (!skipUsageAccounting) {
+      try {
+        const sess = engine.getSessionByPath(sessionPath);
+        if (sess) {
+          const usage = getLastAssistantUsage(sess.entries ?? []);
+          if (usage) {
+            const model = sess.model;
+            logLlmUsage({
+              source: "chat",
+              api: model?.api ?? null,
+              modelId: model?.id ?? null,
+              provider: model?.provider ?? null,
+              usage,
+              costRates: model?.cost,
+            } as any);
+            hub.eventBus.emit({
+              type: "token_usage",
+              usage,
+              modelId: model?.id ?? null,
+              modelProvider: model?.provider ?? null,
+            }, sessionPath);
+          }
+        }
+      } catch (_) { /* 统计失败不阻塞主流程 */ }
+    }
+
+    const turnWasTruncated = ss.assistantStopReason === "length";
+    const runStreamId = ss.streamId || null;
+    emitStreamEvent(sessionPath, ss, {
+      type: "assistant_run_end",
+      runId: ss.assistantRunId,
+      status,
+      ...persistedEntries,
+      ...(status === "aborted" ? { aborted: true } : {}),
+      ...(status === "failed" ? { failed: true } : {}),
+      ...(turnWasTruncated ? { truncated: true, stopReason: "length" } : {}),
+    });
+    finishSessionStream(ss);
+    broadcast({
+      type: "status",
+      isStreaming: false,
+      sessionPath,
+      streamId: runStreamId,
+      ...(status === "aborted" ? { aborted: true } : {}),
+    });
+    clearTurnStallWatchdog(ss);
+    resetAssistantRunParsers(ss);
+    ss.hasOutput = false;
+    ss.hasToolCall = false;
+    ss.hasThinking = false;
+    ss.hasError = false;
+    ss.assistantStopReason = null;
+    ss.isAborted = false;
+    ss.pendingTurnInputConsumptions = [];
+    ss.consumedTurnInputsForCurrentTurn = [];
+    ss.pendingToolContextsByCallId?.clear?.();
+    ss._cardHints = [];
+    ss._cardEmitted = false;
+    ss.turnActive = false;
+    flushPendingDeferredContentEvents(sessionPath, ss);
+    deliverOrDeferTurnCompletionNotification(sessionPath, ss, {
+      wasAborted: status === "aborted",
+      wasSuccessful: status === "completed",
+      streamId: runStreamId,
+    });
+    return runStreamId;
   }
 
   function textOrNull(value) {
@@ -930,19 +1055,18 @@ export function createChatRoute(engine: any, hub: any, {
     return items;
   }
 
+  // 管理性终止兜底（任务书 §四十一）：只有 run 已 active 但 agent_settled 未到达时
+  // 才允许从这里 finalize（abort 未被接受、断线宽限等路径）。正常路径一律走 agent_settled。
   function finishStreamingState(ss, sessionPath = null) {
     if (!ss) return;
+    if (ss.assistantRunActive) {
+      const status = ss.isAborted ? "aborted" : "completed";
+      finishAssistantRun(sessionPath || ss.sessionPath, ss, status);
+      return;
+    }
     ss.turnActive = false;
     clearTurnStallWatchdog(ss);
-    if (sessionPath && ss.isThinking) {
-      ss.isThinking = false;
-      emitStreamEvent(sessionPath, ss, { type: "thinking_end" });
-    }
     if (ss.isStreaming) finishSessionStream(ss);
-    ss.thinkTagParser.reset();
-    ss.moodParser.reset();
-    ss.cardParser.reset();
-    ss.assistantEventNormalizer.reset();
   }
 
   function clearTurnStallWatchdog(ss) {
@@ -1314,12 +1438,12 @@ export function createChatRoute(engine: any, hub: any, {
     };
 
     if (event.type === "message_start" && event.message?.role === "assistant") {
-      // 显式 assistant segment 边界：一次新的模型生成开始。重新打开 leading internal
-      // mood/think opener 资格。SDK 的 turn_start/turn_end 通常已经 reset 过 parser，
-      // 这里以 message_start(role=assistant) 作为最权威的"新一次模型生成"信号再做一次
-      // re-arm，覆盖重试 / 重连 / 多文本块等 turn 边界未必完整分割每段生成的路径。
-      // 一个 user turn 内的每段生成都应重新获得一次 leading 内部块资格；但同一段可见
-      // 正文开始后仍保持 leading-only（beginAssistantSegment 只重武装资格，不改下游聚合）。
+      // Assistant Message 边界（任务书 §十三）：message_start(role=assistant) 才负责开启新的
+      // Assistant Message（assistantEventNormalizer.beginAssistantMessage → messageOrdinal 单调递增）。
+      // 重新打开 leading internal mood/think opener 资格，覆盖重试 / 重连 / 多文本块等
+      // Model Turn 边界未必完整分割每段生成的路径。一个 Assistant Run 内的每段生成都重新
+      // 获得一次 leading 内部块资格；但同一段可见正文开始后仍保持 leading-only。
+      // 注意：这里绝不复位 Run 级 ordinal（messageOrdinal 跨 Model Turn 单调递增）。
       if (!ss) return;
       // re-arm 前先把上一段遗留的未冲刷缓冲按原管道冲出来：beginAssistantSegment 会清
       // parser 缓冲，若不先 flush，上一段结尾被挂起的半个标签尾巴（如截断流只留下
@@ -1558,22 +1682,26 @@ export function createChatRoute(engine: any, hub: any, {
         pausedReason: loop.pausedReason ?? null,
         prompt: loop.prompt ?? null,
       });
-    } else if (event.type === "turn_start") {
+    } else if (event.type === "agent_start") {
+      // Assistant Run 开始（任务书 §七）：agent_start 幂等创建 Run；retry / continuation /
+      // 内部恢复再次出现的 agent_start 不得新建 Run、不得 reset blocks、不得重新分配 streamId。
       if (!ss) return;
-      if (!ss.turnActive) {
-        const statusStreamId = beginStreamingTurnState(sessionPath, ss);
-        broadcast({
-          type: "status",
-          isStreaming: true,
-          sessionPath,
-          streamId: statusStreamId,
-        });
+      if (!ss.assistantRunActive) {
+        beginAssistantRun(sessionPath, ss);
+      } else {
+        debugLog()?.log("ws", `agent_start while run active (cycle diagnostic, runId=${ss.assistantRunId})`);
       }
-      // Turn 生命周期权威事件：与 Session Busy（status）正交。
-      // status 只回答「Session 忙不忙」；turn_start / turn_end 才决定一轮
-      // Assistant 回答从哪里开始、到哪里真正结束。
+    } else if (event.type === "turn_start") {
+      // Pi Model Turn 开始（任务书 §十）：只推进 modelTurnOrdinal 供 diagnostics/metrics。
+      // 严禁 reset 整个 Assistant Run、重新 beginSessionStream、重新创建 AssistantMessage、
+      // 重新分配 Run ID。Session Busy（status）与 Model Turn 正交。
+      // turnActive 只标记「当前有一个 Model Turn 在流式」，供 deferred content 延迟决策，
+      // 不是 Run 生命周期状态。
+      if (!ss) return;
+      ss.modelTurnOrdinal += 1;
+      ss.turnActive = true;
       emitStreamEvent(sessionPath, ss, {
-        type: "turn_start",
+        type: "model_turn_start",
         ...(typeof event.turnId === "string" && event.turnId.trim()
           ? { turnId: event.turnId.trim() }
           : {}),
@@ -1629,22 +1757,32 @@ export function createChatRoute(engine: any, hub: any, {
         session: event.session || null,
       });
     } else if (event.type === "session_status") {
+      // session_status 只回答「Session 忙不忙」（任务书 §九/§十：status 与 Run 正交）。
+      // 不再 reset Run 级 parser，也不 finalize Run；Run 只由 agent_start / agent_settled 开关。
+      // 唯一的例外：agent_settled 在 hard-abort 等路径缺席时，此处作为明确管理性终止兜底。
       let statusStreamId = null;
       if (ss) {
         const eventStreamId = typeof event.streamId === "string" && event.streamId.trim()
           ? event.streamId
           : null;
         if (event.isStreaming) {
-          statusStreamId = beginStreamingTurnState(sessionPath, ss, {
+          statusStreamId = beginSessionStreamForStatus(sessionPath, ss, {
             streamId: eventStreamId,
             flushDeferred: true,
           });
-        } else if (ss.isStreaming) {
+        } else if (ss.assistantRunActive) {
+          // 管理性终止：run 已 active 但 agent_settled 未到达（hard-abort / 异常断流）。
           statusStreamId = eventStreamId || ss.streamId || null;
           flushReservedTagParsers({ type: "text_delta" }, event.message);
           publishNormalizedAssistantBatch(ss.assistantEventNormalizer.finishTurn(event.message));
           flushTerminalParsers();
-          finishStreamingState(ss);
+          const fallbackStatus = ss.isAborted === true ? "aborted" : "completed";
+          debugLog()?.log("ws", `session_status settled without agent_settled (fallback=${fallbackStatus})`);
+          finishAssistantRun(sessionPath, ss, fallbackStatus);
+        } else if (ss.isStreaming) {
+          statusStreamId = eventStreamId || ss.streamId || null;
+          ss.turnActive = false;
+          finishSessionStream(ss);
         } else {
           statusStreamId = eventStreamId || ss.streamId || null;
           ss.turnActive = false;
@@ -1749,101 +1887,59 @@ export function createChatRoute(engine: any, hub: any, {
         ss.assistantStopReason = event.message.stopReason;
       }
     } else if (event.type === "turn_end") {
+      // Pi Model Turn 结束（任务书 §十一/§二十二）：只关闭本 Model Turn 中仍悬空的
+      // message-level semantic 状态，记录 stopReason / tool 结果 / 是否产生 tool calls，
+      // 并 emit model_turn_end 供 diagnostics。
+      // 严禁：finishBufferTurn / commitLiveTurn / clearLiveAssistantMessage /
+      // resolveAssistantTurnOutcome / missing_final_answer / Process Fold 折叠 /
+      // reset 整个 Run / 重新绑定 block ID。
       if (!ss) return;
-      // 合成的中止事件带 event.aborted：中止源在 WS abort 之外时（断线宽限中止、
-      // 关机 abort_all）ss.isAborted 不会被置位，只能靠事件本身识别。
-      const turnWasAborted = ss.isAborted === true || event.aborted === true;
-      const turnWasTruncated = ss.assistantStopReason === "length";
-      const turnStreamId = ss.streamId || null;
-      // flush 必须先于 finishTurn：挂起的半截标签文字要落回仍开着的 segment，
-      // 然后 finishTurn 才能把完整、脱净的正文一次性关闭。
+      if (event.aborted === true) ss.isAborted = true;
+      if (typeof event.message?.stopReason === "string" && event.message.stopReason) {
+        ss.assistantStopReason = event.message.stopReason;
+      }
+      // flush 必须先于 finishTurn：挂起的半截标签文字要落回仍开着的 segment。
+      flushReservedTagParsers({ type: "text_delta" }, event.message);
+      publishNormalizedAssistantBatch(ss.assistantEventNormalizer.finishTurn(event.message));
+      flushTerminalParsers();
+      // per-Model-Turn 收口（非 Run finalize）：持久化本 Model Turn 的 turn input
+      // consumption 记录 + flush 本 Model Turn 排队中的 deferred content。
+      const modelTurnPersistedEntries = persistedTurnEntryIds(engine, sessionPath);
+      persistConsumedTurnInputs(sessionPath, ss, modelTurnPersistedEntries);
+      flushPendingDeferredContentEvents(sessionPath, ss);
+      ss.turnActive = false;
+      emitStreamEvent(sessionPath, ss, { type: "model_turn_end" });
+    } else if (event.type === "agent_end") {
+      // Pi agent_end（任务书 §九）：只记录 low-level run result（willRetry / error）。
+      // agent_end 之后仍可能自动 retry / compaction retry / queued continuation，
+      // 严禁在此 finalize Assistant Run。token usage 统一在 finishAssistantRun 记一次。
+      if (!ss) return;
+      debugLog()?.log("ws", `agent_end (willRetry=${event.willRetry === true})`);
+    } else if (event.type === "agent_settled") {
+      // Pi agent_settled（任务书 §八）：整个 session-level run 已完全 settled，
+      // 不再自动 retry / compaction retry / queued continuation。
+      // 这是 assistant_run_end 的唯一正常来源，且 exactly-once。
+      if (!ss) return;
+      // 先 flush 挂起尾巴，把最后一段正文落回它所属的 segment，再 finalize。
       flushReservedTagParsers({ type: "text_delta" }, event.message);
       publishNormalizedAssistantBatch(ss.assistantEventNormalizer.finishTurn(event.message));
       flushTerminalParsers();
 
-      // 空回复检测：本轮没有文本输出也没有工具调用，提示用户检查配置
-      // 被 abort 的 turn 不弹此提示（用户主动停止 / WS 断开 / 连接超时）；
-      // 合成中止事件同样豁免
-      const truncatedWithoutVisibleResult = turnWasTruncated && !ss.hasOutput && !ss.hasToolCall;
+      // 空回复检测（任务书 §三十三/§三十四）：只有整个 Agent settled 后才允许。
+      const runWasAborted = ss.isAborted === true;
+      const truncatedWithoutVisibleResult = ss.assistantStopReason === "length"
+        && !ss.hasOutput && !ss.hasToolCall;
       if (
         ((!ss.hasOutput && !ss.hasToolCall && !ss.hasThinking) || truncatedWithoutVisibleResult)
         && !ss.hasError
-        && !turnWasAborted
+        && !runWasAborted
       ) {
         ss.hasError = true;
         broadcast({ type: "error", message: t("error.modelNoResponse"), sessionPath });
       }
-      const turnWasSuccessful = !turnWasAborted && !ss.hasError && (ss.hasOutput || ss.hasToolCall || ss.hasThinking);
-
-      const persistedEntries = persistedTurnEntryIds(engine, sessionPath);
-
-      // ── token usage 事件（供插件监听做用量统计）──
-      // 中止的 turn 没落盘任何 assistant 时跳过记账：branch 里最后一条 assistant
-      // 属于上一轮，它的 usage 在上一轮 turn_end 已经记过一次，重复记会双计。
-      const skipUsageAccounting = event.aborted === true && !persistedEntries.assistantEntryId;
-      if (!skipUsageAccounting) {
-        try {
-          const sess = engine.getSessionByPath(sessionPath);
-          if (sess) {
-            const usage = getLastAssistantUsage(sess.entries ?? []);
-            if (usage) {
-              const model = sess.model;
-              logLlmUsage({
-                source: "chat",
-                api: model?.api ?? null,
-                modelId: model?.id ?? null,
-                provider: model?.provider ?? null,
-                usage,
-                costRates: model?.cost,
-              } as any);
-              hub.eventBus.emit({
-                type: "token_usage",
-                usage,
-                modelId: model?.id ?? null,
-                modelProvider: model?.provider ?? null,
-              }, sessionPath);
-            }
-          }
-        } catch (_) { /* 统计失败不阻塞主流程 */ }
-      }
-
-      persistConsumedTurnInputs(sessionPath, ss, persistedEntries);
-      emitStreamEvent(sessionPath, ss, {
-        type: "turn_end",
-        ...persistedEntries,
-        ...(turnWasAborted ? { aborted: true } : {}),
-        ...(!turnWasAborted && ss.hasError ? { failed: true } : {}),
-        ...(turnWasTruncated ? { truncated: true, stopReason: "length" } : {}),
-      });
-      finishSessionStream(ss);
-      ss.turnActive = false;
-      if (!isSessionRuntimeStreaming(sessionPath)) {
-        clearTurnStallWatchdog(ss);
-      }
-      deliverOrDeferTurnCompletionNotification(sessionPath, ss, {
-        wasAborted: turnWasAborted,
-        wasSuccessful: turnWasSuccessful,
-        streamId: turnStreamId,
-      });
-      ss.hasOutput = false;
-      ss.hasToolCall = false;
-      ss.hasThinking = false;
-      ss.hasError = false;
-      ss.assistantStopReason = null;
-      ss.isAborted = false;
-      ss.pendingTurnInputConsumptions = [];
-      ss.consumedTurnInputsForCurrentTurn = [];
-      ss.thinkTagParser.reset();
-      ss.moodParser.reset();
-      ss.cardParser.reset();
-      ss.assistantEventNormalizer.reset();
-      ss.strippedTextKeys?.clear?.();
-      ss.pendingToolContextsByCallId?.clear?.();
-      ss._cardHints = [];
-      ss._cardEmitted = false;
-      flushPendingDeferredContentEvents(sessionPath, ss);
-
-      debugLog()?.log("ws", `turn done (${sessionPath?.split("/").pop()})`);
+      const runStatus = runWasAborted ? "aborted" : (ss.hasError ? "failed" : "completed");
+      finishAssistantRun(sessionPath, ss, runStatus);
+      debugLog()?.log("ws", `assistant run done (${sessionPath?.split("/").pop()})`);
       maybeGenerateFirstTurnTitle(sessionPath, ss);
     } else if (event.type === "deferred_result") {
       if (!ss) return;

@@ -63,7 +63,7 @@ describe('live turn structural isolation', () => {
       if (state.chatSessions !== previous.chatSessions) structuralCommits += 1;
     });
     streamBufferManager.handle({
-      type: 'turn_end',
+      type: 'assistant_run_end',
       sessionPath: PATH,
       turnInputEntryId: 'entry-user-1',
       userEntryId: 'entry-user-1',

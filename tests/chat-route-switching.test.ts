@@ -51,14 +51,16 @@ describe("chat route model switch guard", () => {
     const ws = { readyState: 1, send: vi.fn() };
     handlers.onOpen({}, ws);
     subscriber?.({ type: "session_status", isStreaming: true }, sessionPath);
+    subscriber?.({ type: "agent_start" }, sessionPath);
     subscriber?.({ type: "turn_start" }, sessionPath);
     subscriber?.({ type: "message_update", assistantMessageEvent: { type: "text_delta", delta: "hi" } }, sessionPath);
     subscriber?.({ type: "turn_end" }, sessionPath);
+    subscriber?.({ type: "agent_settled" }, sessionPath);
 
-    const turnEnd = ws.send.mock.calls
+    const runEnd = ws.send.mock.calls
       .map(([raw]) => JSON.parse(raw))
-      .find((payload) => payload.type === "turn_end");
-    expect(turnEnd).toMatchObject({
+      .find((payload) => payload.type === "assistant_run_end");
+    expect(runEnd).toMatchObject({
       sessionPath,
       turnInputEntryId: "entry-user",
       userEntryId: "entry-user",
@@ -100,13 +102,16 @@ describe("chat route model switch guard", () => {
     const ws = { readyState: 1, send: vi.fn() };
     handlers.onOpen({}, ws);
     subscriber?.({ type: "session_status", isStreaming: true }, sessionPath);
+    subscriber?.({ type: "agent_start" }, sessionPath);
     subscriber?.({ type: "turn_start" }, sessionPath);
     subscriber?.({ type: "turn_end", aborted: true }, sessionPath);
+    subscriber?.({ type: "agent_settled" }, sessionPath);
 
     const payloads = ws.send.mock.calls.map(([raw]) => JSON.parse(raw));
-    const turnEnd = payloads.find((payload) => payload.type === "turn_end");
-    expect(turnEnd).toMatchObject({
+    const runEnd = payloads.find((payload) => payload.type === "assistant_run_end");
+    expect(runEnd).toMatchObject({
       sessionPath,
+      status: "aborted",
       turnInputEntryId: "entry-user",
       userEntryId: "entry-user",
       assistantEntryId: null,
@@ -153,6 +158,7 @@ describe("chat route model switch guard", () => {
     handlers.onOpen({}, ws);
 
     subscriber?.({ type: "session_status", isStreaming: true }, sessionPath);
+    subscriber?.({ type: "agent_start" }, sessionPath);
     subscriber?.({ type: "turn_start" }, sessionPath);
     subscriber?.({
       type: "message_update",
@@ -164,11 +170,12 @@ describe("chat route model switch guard", () => {
       message: { role: "assistant", content: [{ type: "thinking", thinking: "still reasoning" }], stopReason: "length" },
     }, sessionPath);
     subscriber?.({ type: "turn_end" }, sessionPath);
+    subscriber?.({ type: "agent_settled" }, sessionPath);
     await new Promise((resolve) => setTimeout(resolve, 0));
 
     const payloads = ws.send.mock.calls.map(([raw]) => JSON.parse(raw));
     expect(payloads.some((payload) => payload.type === "error")).toBe(true);
-    expect(payloads.find((payload) => payload.type === "turn_end")).toMatchObject({
+    expect(payloads.find((payload) => payload.type === "assistant_run_end")).toMatchObject({
       truncated: true,
       stopReason: "length",
     });
@@ -205,6 +212,7 @@ describe("chat route model switch guard", () => {
     handlers.onOpen({}, ws);
 
     subscriber?.({ type: "session_status", isStreaming: true }, sessionPath);
+    subscriber?.({ type: "agent_start" }, sessionPath);
     subscriber?.({ type: "turn_start" }, sessionPath);
     subscriber?.({
       type: "message_update",
@@ -216,10 +224,11 @@ describe("chat route model switch guard", () => {
       message: { role: "assistant", content: "visible partial reply", stopReason: "length" },
     }, sessionPath);
     subscriber?.({ type: "turn_end" }, sessionPath);
+    subscriber?.({ type: "agent_settled" }, sessionPath);
 
     const payloads = ws.send.mock.calls.map(([raw]) => JSON.parse(raw));
     expect(payloads.some((payload) => payload.type === "error")).toBe(false);
-    expect(payloads.find((payload) => payload.type === "turn_end")).toMatchObject({
+    expect(payloads.find((payload) => payload.type === "assistant_run_end")).toMatchObject({
       truncated: true,
       stopReason: "length",
     });
@@ -318,9 +327,12 @@ describe("chat route model switch guard", () => {
     const ws = { readyState: 1, send: vi.fn() };
     handlers.onOpen({}, ws);
     subscriber?.({ type: "session_status", isStreaming: true }, sessionPath);
+    subscriber?.({ type: "agent_start" }, sessionPath);
     subscriber?.({ type: "turn_start" }, sessionPath);
     subscriber?.({ type: "message_update", assistantMessageEvent: { type: "text_delta", delta: "done" } }, sessionPath);
     subscriber?.({ type: "turn_end" }, sessionPath);
+    subscriber?.({ type: "agent_end", messages: [assistant], willRetry: false }, sessionPath);
+    subscriber?.({ type: "agent_settled" }, sessionPath);
 
     const usageEmits = hub.eventBus.emit.mock.calls
       .filter(([event]) => event?.type === "token_usage");
@@ -369,14 +381,16 @@ describe("chat route model switch guard", () => {
     const ws = { readyState: 1, send: vi.fn() };
     handlers.onOpen({}, ws);
     subscriber?.({ type: "session_status", isStreaming: true }, sessionPath);
+    subscriber?.({ type: "agent_start" }, sessionPath);
     subscriber?.({ type: "turn_start" }, sessionPath);
     subscriber?.({ type: "message_update", assistantMessageEvent: { type: "text_delta", delta: "handled" } }, sessionPath);
     subscriber?.({ type: "turn_end" }, sessionPath);
+    subscriber?.({ type: "agent_settled" }, sessionPath);
 
-    const turnEnd = ws.send.mock.calls
+    const runEnd = ws.send.mock.calls
       .map(([raw]) => JSON.parse(raw))
-      .find((payload) => payload.type === "turn_end");
-    expect(turnEnd).toMatchObject({
+      .find((payload) => payload.type === "assistant_run_end");
+    expect(runEnd).toMatchObject({
       turnInputEntryId: "hidden-input",
       userEntryId: null,
       assistantEntryId: "background-assistant",
@@ -1710,7 +1724,7 @@ describe("chat route model switch guard", () => {
     subscriber?.({ type: "turn_end" }, "/tmp/interlude-session.jsonl");
 
     payloads = ws.send.mock.calls.map(([raw]) => JSON.parse(raw));
-    const turnEndIndex = payloads.findIndex((payload) => payload.type === "turn_end");
+    const turnEndIndex = payloads.findIndex((payload) => payload.type === "model_turn_end");
     expect(turnEndIndex).toBeGreaterThanOrEqual(0);
     expect(payloads.some((payload) => payload.type === "content_block" && payload.block?.type === "interlude")).toBe(false);
 
@@ -2439,11 +2453,13 @@ describe("chat route model switch guard", () => {
     handlers.onOpen({}, ws);
 
     subscriber?.({ type: "session_status", isStreaming: true }, "/tmp/notified-session.jsonl");
+    subscriber?.({ type: "agent_start" }, "/tmp/notified-session.jsonl");
     subscriber?.({
       type: "message_update",
       assistantMessageEvent: { type: "text_delta", delta: "完成了。" },
     }, "/tmp/notified-session.jsonl");
     subscriber?.({ type: "turn_end" }, "/tmp/notified-session.jsonl");
+    subscriber?.({ type: "agent_settled" }, "/tmp/notified-session.jsonl");
     await new Promise((resolve) => setTimeout(resolve, 0));
 
     expect(deliverNotification).toHaveBeenCalledWith(
@@ -2559,11 +2575,13 @@ describe("chat route model switch guard", () => {
     handlers.onOpen({}, ws);
 
     subscriber?.({ type: "session_status", isStreaming: true }, "/tmp/session-aware.jsonl");
+    subscriber?.({ type: "agent_start" }, "/tmp/session-aware.jsonl");
     subscriber?.({
       type: "message_update",
       assistantMessageEvent: { type: "text_delta", delta: "完成了。" },
     }, "/tmp/session-aware.jsonl");
     subscriber?.({ type: "turn_end" }, "/tmp/session-aware.jsonl");
+    subscriber?.({ type: "agent_settled" }, "/tmp/session-aware.jsonl");
     await new Promise((resolve) => setTimeout(resolve, 0));
 
     expect(deliverNotification).toHaveBeenCalledWith(
@@ -2623,11 +2641,13 @@ describe("chat route model switch guard", () => {
     handlers.onOpen({}, ws);
 
     subscriber?.({ type: "session_status", isStreaming: true }, "/tmp/deferred-notification.jsonl");
+    subscriber?.({ type: "agent_start" }, "/tmp/deferred-notification.jsonl");
     subscriber?.({
       type: "message_update",
       assistantMessageEvent: { type: "text_delta", delta: "工具前输出。" },
     }, "/tmp/deferred-notification.jsonl");
     subscriber?.({ type: "turn_end" }, "/tmp/deferred-notification.jsonl");
+    subscriber?.({ type: "agent_settled" }, "/tmp/deferred-notification.jsonl");
     await new Promise((resolve) => setTimeout(resolve, 0));
 
     expect(deliverNotification).not.toHaveBeenCalled();

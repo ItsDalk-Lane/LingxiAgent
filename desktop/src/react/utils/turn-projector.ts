@@ -114,11 +114,12 @@ function turnStatusBlock(
       lifecycle: 'sealed',
     };
   }
-  // 工具循环豁免：本段生成带工具调用说明 agent 循环会继续（下一段生成跟上），
-  // 没给最终答复是循环的正常中间态；只有循环真正停下来才允许 missing。
-  if (hasToolCalls) return null;
+  // 任务书 §三十四：turnStatusBlock 只在 Assistant Run 真正 terminal（sealed）时被投影，
+  // 此时 agent 循环已停，带工具但没有最终答复同样算 completed_without_user_output，
+  // 不再豁免（旧逻辑把「有工具调用」当成「循环还会继续」是 Model Turn 层级才成立的假设）。
+  void hasToolCalls;
   return {
-    // id 由轮次键派生：同一轮无论投影重算多少次都得到同一个 id，保证每轮至多一个
+    // id 由 Run 键派生：同一 Run 无论投影重算多少次都得到同一个 id，保证每 Run 至多一个
     id: `${input.idPrefix}:missing-final-answer`,
     type: 'turn_status',
     status: 'missing_final_answer',

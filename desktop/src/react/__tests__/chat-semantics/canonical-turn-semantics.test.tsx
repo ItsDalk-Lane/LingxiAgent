@@ -97,7 +97,7 @@ describe('streamBufferManager canonical 收口', () => {
       { type: 'mood_text', delta: 'Vibe: 专注' },
       { type: 'mood_end' },
       { type: 'text_delta', delta: '最终答复' },
-      { type: 'turn_end', assistantEntryId: 'entry-assistant-1' },
+      { type: 'assistant_run_end', assistantEntryId: 'entry-assistant-1' },
     ]);
 
     const blocks = assistantBlocks();
@@ -113,7 +113,7 @@ describe('streamBufferManager canonical 收口', () => {
       { type: 'mood_text', delta: 'Vibe: 专注' },
       { type: 'mood_end' },
       { type: 'text_delta', delta: '旧服务器答复' },
-      { type: 'turn_end', assistantEntryId: 'entry-assistant-legacy' },
+      { type: 'assistant_run_end', assistantEntryId: 'entry-assistant-legacy' },
     ]);
 
     const blocks = assistantBlocks();
@@ -242,7 +242,7 @@ describe('Process Fold 全链路交互（测试D）', () => {
       { type: 'assistant_segment_delta', segmentId: 'assistant:2:text:0', delta: '最终答复正文', semanticPhase: 'final_answer' },
       { type: 'assistant_segment_end', segmentId: 'assistant:2:text:0', semanticPhase: 'final_answer' },
       {
-        type: 'turn_end',
+        type: 'assistant_run_end',
         turnInputEntryId: 'entry-user-1',
         userEntryId: 'entry-user-1',
         assistantEntryId: 'entry-assistant-2',
@@ -271,7 +271,7 @@ describe('Process Fold 全链路交互（测试D）', () => {
   it('延迟结果：turn sealed 后 file 替换 media_generation，missing_final_answer 被移除且 outcome 升级', () => {
     canonicalTurn([
       { type: 'content_block', block: { type: 'media_generation', taskId: 'task-late', kind: 'image', status: 'pending', prompt: 'x' } },
-      { type: 'turn_end', assistantEntryId: 'entry-assistant-late' },
+      { type: 'assistant_run_end', assistantEntryId: 'entry-assistant-late' },
     ]);
     expect(assistantBlocks().some((block) => block.type === 'turn_status'
       && block.status === 'missing_final_answer')).toBe(true);

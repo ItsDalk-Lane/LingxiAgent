@@ -856,7 +856,7 @@ describe('initApp bridge indicator', () => {
     send.mockClear();
     const { handleServerMessage } = await import('../services/ws-message-handler');
     handleServerMessage({
-      type: 'turn_end',
+      type: 'assistant_run_end',
       sessionPath: '/session/a.jsonl',
     });
 

@@ -9,8 +9,8 @@ const previewRefreshMocks = vi.hoisted(() => ({
 vi.mock('../../hooks/use-stream-buffer', () => ({
   streamBufferManager: {
     handle: vi.fn(),
-    beginTurn: vi.fn(),
-    finishTurn: vi.fn(),
+    beginRun: vi.fn(),
+    finishRun: vi.fn(),
   },
 }));
 
@@ -1314,7 +1314,7 @@ describe('ws-message-handler turn_end side effects', () => {
 
   it('turn_end for the current session does not request input focus', () => {
     handleServerMessage({
-      type: 'turn_end',
+      type: 'assistant_run_end',
       sessionPath: '/session/a.jsonl',
     });
 
@@ -1344,7 +1344,7 @@ describe('ws-message-handler turn_end side effects', () => {
     } as never);
 
     handleServerMessage({
-      type: 'turn_end',
+      type: 'assistant_run_end',
       sessionPath: '/session/b.jsonl',
     });
 
@@ -1375,7 +1375,7 @@ describe('ws-message-handler turn_end side effects', () => {
   });
 
   it('stale status=false does not finish the newer local stream turn', () => {
-    vi.mocked(streamBufferManager.finishTurn).mockClear();
+    vi.mocked(streamBufferManager.finishRun).mockClear();
     useStore.setState({
       streamingSessions: ['/session/a.jsonl'],
       activeSessionStreams: {
@@ -1392,12 +1392,12 @@ describe('ws-message-handler turn_end side effects', () => {
     });
 
     expect(useStore.getState().streamingSessions).toEqual(['/session/a.jsonl']);
-    expect(streamBufferManager.finishTurn).not.toHaveBeenCalledWith('/session/a.jsonl');
+    expect(streamBufferManager.finishRun).not.toHaveBeenCalledWith('/session/a.jsonl');
     expect(useStore.getState().inputFocusTrigger).toBe(0);
   });
 
   it('identity-less status=false does not finish a stream with a known streamId', () => {
-    vi.mocked(streamBufferManager.finishTurn).mockClear();
+    vi.mocked(streamBufferManager.finishRun).mockClear();
     useStore.setState({
       streamingSessions: ['/session/a.jsonl'],
       activeSessionStreams: {
@@ -1413,12 +1413,12 @@ describe('ws-message-handler turn_end side effects', () => {
     });
 
     expect(useStore.getState().streamingSessions).toEqual(['/session/a.jsonl']);
-    expect(streamBufferManager.finishTurn).not.toHaveBeenCalledWith('/session/a.jsonl');
+    expect(streamBufferManager.finishRun).not.toHaveBeenCalledWith('/session/a.jsonl');
     expect(useStore.getState().inputFocusTrigger).toBe(0);
   });
 
   it('already_stopped abort_result clears a stale streaming marker when no stream identity exists', () => {
-    vi.mocked(streamBufferManager.finishTurn).mockClear();
+    vi.mocked(streamBufferManager.finishRun).mockClear();
     useStore.setState({
       streamingSessions: ['/session/a.jsonl'],
       activeSessionStreams: {},
@@ -1433,7 +1433,7 @@ describe('ws-message-handler turn_end side effects', () => {
     });
 
     expect(useStore.getState().streamingSessions).toEqual([]);
-    expect(streamBufferManager.finishTurn).toHaveBeenCalledWith('/session/a.jsonl', null);
+    expect(streamBufferManager.finishRun).toHaveBeenCalledWith('/session/a.jsonl', null);
     expect(useStore.getState().inputFocusTrigger).toBe(1);
   });
 
@@ -1467,7 +1467,7 @@ describe('ws-message-handler turn_end side effects', () => {
     } as never);
 
     handleServerMessage({
-      type: 'turn_end',
+      type: 'assistant_run_end',
       sessionPath: '/session/a.jsonl',
       streamId: 'stream_done',
     });
@@ -1487,7 +1487,7 @@ describe('ws-message-handler turn_end side effects', () => {
     } as never);
 
     handleServerMessage({
-      type: 'turn_end',
+      type: 'assistant_run_end',
       sessionPath: '/session/a.jsonl',
       streamId: 'stream_mid',
       turnId: 'turn_mid',
@@ -1511,7 +1511,7 @@ describe('ws-message-handler turn_end side effects', () => {
     } as never);
 
     handleServerMessage({
-      type: 'turn_end',
+      type: 'assistant_run_end',
       sessionPath: '/session/a.jsonl',
       streamId: 'stream_old',
     });
@@ -1522,8 +1522,8 @@ describe('ws-message-handler turn_end side effects', () => {
 
   it('passes sessionId from turn_start into stream buffer lifecycle; status never touches it', () => {
     const sessionId = 'sess_status_stream';
-    vi.mocked(streamBufferManager.beginTurn).mockClear();
-    vi.mocked(streamBufferManager.finishTurn).mockClear();
+    vi.mocked(streamBufferManager.beginRun).mockClear();
+    vi.mocked(streamBufferManager.finishRun).mockClear();
     useStore.setState({
       currentSessionId: sessionId,
       currentSessionPath: '/session/a-renamed.jsonl',
@@ -1556,14 +1556,14 @@ describe('ws-message-handler turn_end side effects', () => {
       isStreaming: false,
     });
 
-    expect(streamBufferManager.beginTurn).not.toHaveBeenCalled();
-    expect(streamBufferManager.finishTurn).not.toHaveBeenCalled();
+    expect(streamBufferManager.beginRun).not.toHaveBeenCalled();
+    expect(streamBufferManager.finishRun).not.toHaveBeenCalled();
 
     // turn_start 携带 sessionId/streamId/turnId 路由进 StreamBufferManager，
-    // 由真实 manager 内部完成幂等 beginTurn（覆盖见 chat-turn-lifecycle.test.ts）。
+    // 由真实 manager 内部完成幂等 beginRun（覆盖见 chat-turn-lifecycle.test.ts）。
     vi.mocked(streamBufferManager.handle).mockClear();
     handleServerMessage({
-      type: 'turn_start',
+      type: 'assistant_run_start',
       sessionId,
       sessionPath: '/session/a-renamed.jsonl',
       streamId: 'stream_status',
@@ -1571,7 +1571,7 @@ describe('ws-message-handler turn_end side effects', () => {
     });
 
     expect(streamBufferManager.handle).toHaveBeenCalledWith(expect.objectContaining({
-      type: 'turn_start',
+      type: 'assistant_run_start',
       sessionId,
       sessionPath: '/session/a-renamed.jsonl',
       streamId: 'stream_status',
@@ -1599,7 +1599,7 @@ describe('ws-message-handler turn_end side effects', () => {
     configureWsMessageHandler({ requestContextUsage });
 
     handleServerMessage({
-      type: 'turn_end',
+      type: 'assistant_run_end',
       sessionPath: '/session/a.jsonl',
     });
 
@@ -1710,11 +1710,11 @@ describe('ws-message-handler turn_end side effects', () => {
     configureWsMessageHandler({ requestContextUsage });
 
     handleServerMessage({
-      type: 'turn_end',
+      type: 'assistant_run_end',
       sessionPath: '/session/a.jsonl',
     });
     handleServerMessage({
-      type: 'turn_end',
+      type: 'assistant_run_end',
       sessionPath: '/session/a.jsonl',
     });
 

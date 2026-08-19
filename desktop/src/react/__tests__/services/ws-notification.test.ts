@@ -4,7 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 // handleServerMessage pulls in the full renderer dependency graph; stub the
 // heavy collaborators so this file can focus on the notification → showNotification hop.
 vi.mock('../../hooks/use-stream-buffer', () => ({
-  streamBufferManager: { handle: vi.fn(), beginTurn: vi.fn(), finishTurn: vi.fn() },
+  streamBufferManager: { handle: vi.fn(), beginRun: vi.fn(), finishRun: vi.fn() },
 }));
 vi.mock('../../stores/session-actions', () => ({ loadSessions: vi.fn() }));
 vi.mock('../../stores/desk-actions', () => ({ loadDeskFiles: vi.fn() }));

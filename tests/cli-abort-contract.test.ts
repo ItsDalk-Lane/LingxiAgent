@@ -53,7 +53,7 @@ describe("CLI abort stream identity contract", () => {
     })).toEqual(running);
 
     expect(reduceCliStreamIdentity(running, {
-      type: "turn_end",
+      type: "assistant_run_end",
       sessionId: "sess_cli",
       sessionPath: "/session/cli.jsonl",
       streamId: "stream_new",

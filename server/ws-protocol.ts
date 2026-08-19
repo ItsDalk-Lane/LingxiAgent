@@ -11,9 +11,13 @@
  *   { type: "compact", sessionId: "..." }  (新客户端只发送 sessionId；sessionPath 仅旧客户端兼容输入，服务端会在边界解析为 sessionId 后丢弃)
  *
  * Server → Client:
- *   { type: "turn_start", turnId?: "..." }  (Turn 生命周期权威事件：一轮 Assistant 回答的正式开始；
- *     与 status.isStreaming（Session Busy）正交——status 只决定输入框/Stop 等忙碌 UI，
- *     Turn 的开始与结束只能由 turn_start / turn_end 决定。同 streamId 重复 turn_start 幂等。)
+ *   { type: "assistant_run_start", runId: "..." }  (Assistant Run 生命周期权威开始：一次用户输入到
+ *     agent_settled 的完整执行周期。runId 从 Run 开始到结束稳定不变；多个 Pi Model Turn 复用同一个 runId。)
+ *   { type: "assistant_run_end", runId: "...", status: "completed"|"failed"|"aborted", turnInputEntryId, assistantEntryId, assistantEntryIds[], truncated?, stopReason? }
+ *     (Assistant Run 生命周期权威结束：只有 agent_settled 才 finalize，且 exactly-once。)
+ *   { type: "model_turn_start", turnId?: "..." }  (Pi Model Turn 开始：一次 assistant response + 工具调用；
+ *     仅供 diagnostics/metrics，绝不 finalize Assistant Run。)
+ *   { type: "model_turn_end" }  (Pi Model Turn 结束：仅供 diagnostics/metrics，绝不 finalize Assistant Run。)
  *   { type: "assistant_segment_start", segmentId: "...", kind: "text"|"reasoning", semanticPhase: "reasoning"|"commentary"|"final_answer"|"unresolved" }
  *   { type: "assistant_segment_delta", segmentId: "...", delta: "...", semanticPhase: "reasoning"|"commentary"|"final_answer"|"unresolved" }
  *   { type: "assistant_segment_end", segmentId: "...", semanticPhase: "reasoning"|"commentary"|"final_answer" }
@@ -27,7 +31,6 @@
  *   { type: "thinking_end" }
  *   { type: "tool_start", id?: "tool_call_id", name: "..." }
  *   { type: "tool_end", id?: "tool_call_id", name: "...", success: bool, details?: object }
- *   { type: "turn_end" }
  *   { type: "error", message: "..." }
  *   { type: "status", sessionId?: string, sessionPath: "...", isStreaming: bool, streamId?: string|null, turnId?: string|null }
  *   { type: "abort_rejected", reason: "stale_stream", sessionId?: string|null, sessionPath: "...", streamId?: string|null }
