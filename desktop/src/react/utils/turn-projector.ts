@@ -42,6 +42,9 @@ function projectSegment(
   const lifecycle: ContentLifecycle = input.status === 'streaming'
     ? segment.lifecycle
     : 'sealed';
+  const processOrder = segment.processOrder !== undefined
+    ? { processOrder: segment.processOrder }
+    : {};
   if (segment.semanticPhase === 'reasoning' || segment.kind === 'reasoning') {
     return {
       id: segmentBlockId(input.idPrefix, segment.id),
@@ -52,6 +55,7 @@ function projectSegment(
       semanticPhase: 'reasoning',
       surfaceRole: 'process',
       lifecycle,
+      ...processOrder,
     };
   }
 
@@ -66,6 +70,7 @@ function projectSegment(
       semanticPhase: 'unresolved',
       surfaceRole: 'provisional',
       lifecycle,
+      ...processOrder,
     };
   }
 
@@ -88,6 +93,7 @@ function projectSegment(
     semanticPhase,
     surfaceRole: semanticPhase === 'commentary' ? 'process' : 'answer',
     lifecycle,
+    ...processOrder,
   };
 }
 
@@ -145,7 +151,17 @@ export function projectAssistantTurn(input: ProjectAssistantTurnInput): ProjectA
     },
   );
   const allBlocks = [...segmentBlocks, ...legacyBlocks];
-  const processBlocks = allBlocks.filter((block) => block.surfaceRole === 'process');
+  // 过程区按"到达序号"交错回真实时间线（思考段与工具块在入口分别盖戳）；
+  // 没有序号的旧数据（+Infinity）稳定地排在带序号块之后，行为与旧版一致。
+  const processBlocks = allBlocks
+    .filter((block) => block.surfaceRole === 'process')
+    .map((block, index) => ({ block, index }))
+    .sort((a, b) => (
+      (a.block.processOrder ?? Number.POSITIVE_INFINITY)
+        - (b.block.processOrder ?? Number.POSITIVE_INFINITY)
+      || a.index - b.index
+    ))
+    .map(({ block }) => block);
   const provisionalBlocks = allBlocks.filter((block) => block.surfaceRole === 'provisional');
   const answerBlocks = allBlocks.filter((block) => block.surfaceRole === 'answer');
   const resultBlocks = allBlocks.filter((block) => block.surfaceRole === 'result');
@@ -161,7 +177,15 @@ export function projectAssistantTurn(input: ProjectAssistantTurnInput): ProjectA
     if (statusBlock) resultBlocks.push(statusBlock);
   }
 
-  const blocks = [...processBlocks, ...provisionalBlocks, ...answerBlocks, ...resultBlocks, ...controlBlocks];
+  const blocks = [...processBlocks, ...provisionalBlocks, ...answerBlocks, ...resultBlocks, ...controlBlocks]
+    // processOrder 只是投影排序的内部依据：交错完成后顺序已物化为数组位置，
+    // 输出块不再携带它（实时收口与历史重载才能保持逐字段相等）。
+    .map((block) => {
+      if (block.processOrder === undefined) return block;
+      const stripped = { ...block };
+      delete stripped.processOrder;
+      return stripped;
+    });
   const projection: AssistantTurnProjection = {
     id: `${input.idPrefix}:turn`,
     inputMessageId: input.inputMessageId || null,

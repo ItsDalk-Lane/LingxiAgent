@@ -175,8 +175,61 @@ describe('turn projector', () => {
     expect(result.projection.status).toBe(turnStatus);
   });
 
-  it('同一输入的实时收口与历史重载得到深度相等的块和投影', () => {
-    const input = {
+  it('过程区按到达序号交错思考段与工具块，输出不再携带排序字段', () => {
+    const toolGroup: ContentBlock = {
+      id: 'tool-group-1',
+      type: 'tool_group',
+      tools: [{ id: 'call-1', name: 'read', done: true, success: true }],
+      collapsed: false,
+      processOrder: 1,
+    };
+    const result = projectAssistantTurn({
+      idPrefix: 'entry-assistant-1',
+      inputMessageId: 'entry-user-1',
+      assistantMessageIds: ['entry-assistant-1'],
+      segments: [
+        { ...segment('assistant:1:reasoning:0', 'reasoning', '先想', 'reasoning'), processOrder: 0 },
+        { ...segment('assistant:1:reasoning:1', 'reasoning', '再想', 'reasoning'), processOrder: 2 },
+      ],
+      legacyBlocks: [toolGroup],
+      status: 'completed',
+    });
+
+    expect(
+      result.blocks
+        .filter((block) => block.surfaceRole === 'process')
+        .map((block) => block.type),
+    ).toEqual(['thinking', 'tool_group', 'thinking']);
+    expect(result.blocks.every((block) => block.processOrder === undefined)).toBe(true);
+  });
+
+  it('没有到达序号的旧数据保持原有顺序（思考段在前、工具块在后）', () => {
+    const toolGroup: ContentBlock = {
+      id: 'tool-group-1',
+      type: 'tool_group',
+      tools: [{ id: 'call-1', name: 'read', done: true, success: true }],
+      collapsed: false,
+    };
+    const result = projectAssistantTurn({
+      idPrefix: 'entry-assistant-1',
+      inputMessageId: 'entry-user-1',
+      assistantMessageIds: ['entry-assistant-1'],
+      segments: [
+        segment('assistant:1:reasoning:0', 'reasoning', '先想', 'reasoning'),
+        segment('assistant:1:reasoning:1', 'reasoning', '再想', 'reasoning'),
+      ],
+      legacyBlocks: [toolGroup],
+      status: 'completed',
+    });
+
+    expect(
+      result.blocks
+        .filter((block) => block.surfaceRole === 'process')
+        .map((block) => block.type),
+    ).toEqual(['thinking', 'thinking', 'tool_group']);
+  });
+
+  it('同一输入的实时收口与历史重载得到深度相等的块和投影', () => {    const input = {
       idPrefix: 'entry-assistant-1',
       inputMessageId: 'entry-user-1',
       assistantMessageIds: ['entry-assistant-1'],

@@ -53,6 +53,9 @@ const LEGACY_IMAGE_DIMENSION_NOTE_LINE_RE =
 
 // ── API 响应类型 ──
 
+/** 历史消息聚合时"消息内 content 索引 → 全 Turn 序号"的跨消息偏移步长。 */
+const HISTORY_MESSAGE_ORDER_STRIDE = 1000;
+
 export interface HistoryApiResponse {
   messages: Array<{
     id?: string;
@@ -71,6 +74,7 @@ export interface HistoryApiResponse {
       success?: boolean;
       error?: string;
       details?: Record<string, unknown>;
+      processOrder?: number;
     }>;
     images?: Array<{ data?: string; mimeType: string; deferred?: import('../stores/chat-types').DeferredHistoryContent }>;
     timestamp?: number | string | null;
@@ -620,15 +624,28 @@ export function buildItemsFromHistory(data: HistoryApiResponse): ChatListItem[] 
         afterInterludes.push(...interludeBlocks.filter((block) => (
           !shouldPlaceInterludeBeforeMessage(block, inlineBlocks)
         )));
+        // 服务器下发的 processOrder 是"消息内 content 数组索引"；同一会话轮次跨多条
+        // assistant 消息聚合时，按消息序加偏移，得到全 Turn 单调的全局序号。
+        const orderOffset = offset * HISTORY_MESSAGE_ORDER_STRIDE;
         legacyBlocks.push(...buildAssistantBlocksFromContent({
           content: assistantMessage.content,
           thinking: assistantMessage.thinking,
           toolCalls: assistantMessage.toolCalls,
           extraBlocks: inlineBlocks,
-        }));
+        }).map((block) => (
+          block.processOrder !== undefined
+            ? { ...block, processOrder: block.processOrder + orderOffset }
+            : block
+        )));
       }
 
-      const segments = groupMessages.flatMap((message) => message.assistantSegments || []);
+      const segments = groupMessages.flatMap((message, offset) => (
+        (message.assistantSegments || []).map((segment) => (
+          segment.processOrder !== undefined
+            ? { ...segment, processOrder: segment.processOrder + offset * HISTORY_MESSAGE_ORDER_STRIDE }
+            : segment
+        ))
+      ));
       const projectionResult = m.assistantSegments
         ? projectAssistantTurn({
             idPrefix,

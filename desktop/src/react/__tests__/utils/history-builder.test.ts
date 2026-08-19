@@ -183,8 +183,68 @@ describe('buildItemsFromHistory user image restoration', () => {
   });
 
 
-  it('restores tool outcomes by toolCallId instead of tool name', () => {
+  it('历史重载按服务器位置序号把多段思考与工具组交错回真实时间线', () => {
     const items = buildItemsFromHistory({
+      messages: [
+        {
+          id: '1',
+          entryId: 'entry-assistant-1',
+          role: 'assistant',
+          content: '',
+          turnInputEntryId: 'entry-user-1',
+          assistantSegments: [{
+            id: 'assistant:1:reasoning:default',
+            kind: 'reasoning',
+            semanticPhase: 'reasoning',
+            source: '先看文件',
+            lifecycle: 'sealed',
+            processOrder: 0,
+          }],
+          toolCalls: [{ id: 'call-read', name: 'read', status: 'succeeded', processOrder: 1 }],
+        },
+        {
+          id: '2',
+          entryId: 'entry-assistant-2',
+          role: 'assistant',
+          content: '检查完成。',
+          turnInputEntryId: 'entry-user-1',
+          assistantSegments: [
+            {
+              id: 'assistant:2:reasoning:default',
+              kind: 'reasoning',
+              semanticPhase: 'reasoning',
+              source: '再核对一遍',
+              lifecycle: 'sealed',
+              processOrder: 0,
+            },
+            {
+              id: 'assistant:2:text:1',
+              kind: 'text',
+              semanticPhase: 'final_answer',
+              source: '检查完成。',
+              lifecycle: 'sealed',
+              processOrder: 2,
+            },
+          ],
+          toolCalls: [{ id: 'call-verify', name: 'exec', status: 'succeeded', processOrder: 1 }],
+        },
+      ],
+    });
+
+    expect(items).toHaveLength(1);
+    const turn = items[0];
+    expect(turn.type).toBe('message');
+    if (turn.type !== 'message') throw new Error('expected one assistant turn');
+    expect(turn.data.blocks?.map((block) => block.type)).toEqual([
+      'thinking',
+      'tool_group',
+      'thinking',
+      'tool_group',
+      'text',
+    ]);
+  });
+
+  it('restores tool outcomes by toolCallId instead of tool name', () => {    const items = buildItemsFromHistory({
       messages: [{
         id: 'a1',
         role: 'assistant',

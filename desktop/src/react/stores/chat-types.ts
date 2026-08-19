@@ -209,6 +209,11 @@ export interface ContentBlockSemantics {
   semanticPhase?: AssistantSemanticPhase;
   surfaceRole?: ContentSurfaceRole;
   lifecycle?: ContentLifecycle;
+  /**
+   * 过程区内的到达序号（越小越早）：事件入口在块首次物化时盖戳，
+   * 投影层按它把思考段与工具块交错回真实时间线；旧数据没有此字段时保持原顺序。
+   */
+  processOrder?: number;
 }
 
 export interface SessionConfirmationBlock {

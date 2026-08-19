@@ -3096,6 +3096,7 @@ describe("sessions route", () => {
         semanticPhase: "reasoning",
         source: "",
         lifecycle: "sealed",
+        processOrder: 0,
       }],
       thinking: "",
     }]);
@@ -3145,6 +3146,7 @@ describe("sessions route", () => {
         semanticPhase: "commentary",
         source: "I need to inspect the current state.",
         lifecycle: "sealed",
+        processOrder: 0,
       }],
     }]);
     expect(msgUtils.extractTextContent).toHaveBeenCalledOnce();

@@ -163,6 +163,16 @@ describe("extractTextContent", () => {
     expect(result.toolUses[0].args).toEqual({ file_path: "/tmp/test.txt" });
   });
 
+  it("tool_use 携带在 content 数组中的位置索引，供前端交错思考与工具", () => {
+    const content = [
+      { type: "thinking", thinking: "先看一眼" },
+      { type: "tool_use", id: "call_read_1", name: "read_file", input: { file_path: "/tmp/a.md" } },
+      { type: "tool_use", id: "call_exec_1", name: "exec_command", arguments: { cmd: "ls" } },
+    ];
+    const result = extractTextContent(content);
+    expect(result.toolUses.map((toolUse) => toolUse.processOrder)).toEqual([1, 2]);
+  });
+
   it("content block 数组提取 exec_command / write_stdin 命令摘要", () => {
     const content = [
       { type: "toolCall", id: "call_exec_1", name: "exec_command", arguments: { cmd: "npm test", secret: "nope" } },
