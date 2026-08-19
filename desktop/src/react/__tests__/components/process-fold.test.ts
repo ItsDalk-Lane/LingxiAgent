@@ -92,7 +92,7 @@ describe('process fold grouping', () => {
     expect(rendered.map((item) => item.type)).toEqual(['source', 'process_fold', 'source']);
     expect(rendered[1]).toMatchObject({
       type: 'process_fold',
-      id: 'a1:turn:process',
+      id: 'a1:process',
       turnId: 'a1:turn',
       blockIds: ['a1:commentary', 'a1:exec'],
       status: 'completed',
@@ -132,7 +132,7 @@ describe('process fold grouping', () => {
       { type: 'source' },
       {
         type: 'process_fold',
-        id: 'a1:turn:process',
+        id: 'a1:process',
         blockIds: ['a1:thinking'],
         ownsTurnCompletion: true,
       },
@@ -235,7 +235,7 @@ describe('process fold grouping', () => {
     expect(rendered).toHaveLength(3);
     expect(rendered[1]).toMatchObject({
       type: 'process_fold',
-      id: 'process-fold-a1-a3',
+      id: 'a1:process',
       stats: {
         toolCount: 4,
         thinkingCount: 3,
@@ -322,7 +322,7 @@ describe('process fold grouping', () => {
       'source',
       'source',
     ]);
-    expect(rendered[1]).toMatchObject({ id: 'process-fold-a1-a3' });
+    expect(rendered[1]).toMatchObject({ id: 'a1:process' });
     expect(rendered[2]).toMatchObject({ type: 'source', item: { data: { id: 'a3' } } });
   });
 
@@ -389,7 +389,7 @@ describe('process fold grouping', () => {
     expect(rendered).toHaveLength(6);
     expect(rendered[1]).toMatchObject({
       type: 'process_fold',
-      id: 'process-fold-a1-a4',
+      id: 'a1:process',
       stats: {
         toolCount: 3,
         thinkingCount: 4,
@@ -452,7 +452,7 @@ describe('process fold grouping', () => {
       'process_fold',
       'source',
     ]);
-    expect(rendered[1]).toMatchObject({ id: 'process-fold-a1-a3' });
+    expect(rendered[1]).toMatchObject({ id: 'a1:process' });
     expect(rendered[2]).toMatchObject({ type: 'source', item: items[4] });
   });
 
@@ -526,7 +526,7 @@ describe('process fold grouping', () => {
       'source',
       'source',
     ]);
-    expect(rendered[1]).toMatchObject({ id: 'process-fold-a1-a5' });
+    expect(rendered[1]).toMatchObject({ id: 'a1:process' });
     expect(rendered[2]).toMatchObject({ type: 'source', item: { data: { id: 'a2' } } });
     expect(rendered[3]).toMatchObject({ type: 'source', item: { data: { id: 'a6' } } });
   });
@@ -545,17 +545,17 @@ describe('process fold grouping', () => {
 
     const rendered = buildTranscriptRenderItems(items, { isStreaming: true });
 
+    // live 段也走 projectedTurnItems，只是 mode='live'：同一个 ProcessRegion 保持
+    // 稳定 key，settled 只是切换展示模式（任务书 §二十四/§二十五/§二十七）。
     expect(rendered.map((item) => item.type)).toEqual([
       'source',
       'process_fold',
       'source',
       'source',
-      'source',
-      'source',
+      'process_fold',
     ]);
-    expect(rendered[1]).toMatchObject({ id: 'process-fold-old-a1-old-a3' });
-    expect(rendered[4]).toMatchObject({ type: 'source', item: items[6] });
-    expect(rendered[5]).toMatchObject({ type: 'source', item: items[7] });
+    expect(rendered[1]).toMatchObject({ id: 'old-a1:process', mode: 'settled' });
+    expect(rendered[4]).toMatchObject({ type: 'process_fold', id: 'live-a1:process', mode: 'live' });
   });
 
   it('formats unsuccessful attempts as light process copy', () => {

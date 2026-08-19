@@ -25,7 +25,7 @@ describe('quick chat detached session binding', () => {
   });
 
   it('makes a new detached session the current session for this quick-chat renderer', () => {
-    const beginTurn = vi.spyOn(streamBufferManager, 'beginTurn');
+    const beginRun = vi.spyOn(streamBufferManager, 'beginRun');
 
     bindQuickChatDetachedSession({
       path: '/sessions/quick.jsonl',
@@ -47,12 +47,12 @@ describe('quick chat detached session binding', () => {
 
     // Turn 的开始只由 turn_start 驱动；status 只负责 Session Busy，不再触碰 Turn 生命周期。
     handleServerMessage({
-      type: 'turn_start',
+      type: 'assistant_run_start',
       sessionPath: '/sessions/quick.jsonl',
       sessionId: 'sess_quick',
     });
 
-    expect(beginTurn).toHaveBeenCalledWith(
+    expect(beginRun).toHaveBeenCalledWith(
       '/sessions/quick.jsonl',
       'sess_quick',
       { streamId: undefined, turnId: undefined },

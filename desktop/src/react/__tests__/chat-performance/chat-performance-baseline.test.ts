@@ -59,7 +59,7 @@ describe('chat rendering performance baseline', () => {
         streamBufferManager.handle({ type: 'text_delta', sessionPath: PATH, delta: '字' });
       }
       vi.advanceTimersByTime(34);
-      streamBufferManager.finishTurn(PATH);
+      streamBufferManager.finishRun(PATH);
       stop();
 
       expect(currentTextSource()).toHaveLength(deltaCount);

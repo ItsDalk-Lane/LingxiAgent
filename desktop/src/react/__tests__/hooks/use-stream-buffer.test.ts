@@ -125,7 +125,7 @@ describe('streamBufferManager.snapshot', () => {
     const snapshot = snapshotStreamBuffer(PATH);
     expect(snapshot?.text).toBe('先读取技能。技能读取完成。');
     expect(snapshot?.blocks?.map((block) => block.type)).toEqual(['text', 'tool_group', 'text']);
-    streamBufferManager.finishTurn(PATH);
+    streamBufferManager.finishRun(PATH);
 
     expect(getAssistantMessage()?.blocks).toMatchObject([
       { type: 'tool_group', tools: [{ id: 'call-skill', name: 'read', done: true }] },
@@ -149,7 +149,7 @@ describe('streamBufferManager.snapshot', () => {
     expect(assistantBefore?.blocks?.[0]?.id).toBe(`${assistantBefore?.id}:text:0`);
 
     streamBufferManager.handle({
-      type: 'turn_end',
+      type: 'assistant_run_end',
       sessionPath: PATH,
       turnInputEntryId: 'entry-user-1',
       userEntryId: 'entry-user-1',
@@ -160,7 +160,9 @@ describe('streamBufferManager.snapshot', () => {
     expect(items[0]?.type === 'message' ? items[0].data.sourceEntryId : null).toBe('entry-user-1');
     expect(getAssistantMessage()?.sourceEntryId).toBe('entry-assistant-1');
     expect(getAssistantMessage()?.turnInputEntryId).toBe('entry-user-1');
-    expect(getAssistantMessage()?.blocks?.[0]?.id).toBe('entry-assistant-1:text:0');
+    // block.id 从创建那一刻起永久不变（任务书 §二十一/§二十二）：persisted entry 绑定
+    // 只增加 sourceEntryId，绝不改写 block.id。
+    expect(getAssistantMessage()?.blocks?.[0]?.id).toBe(`${assistantBefore?.id}:text:0`);
   });
 
   it('turn_end never overwrites a visible user with a hidden background input id', () => {
@@ -171,7 +173,7 @@ describe('streamBufferManager.snapshot', () => {
     streamBufferManager.handle({ type: 'text_delta', sessionPath: PATH, delta: 'background reply' });
 
     streamBufferManager.handle({
-      type: 'turn_end',
+      type: 'assistant_run_end',
       sessionPath: PATH,
       turnInputEntryId: 'entry-hidden-background-input',
       userEntryId: null,
@@ -191,7 +193,7 @@ describe('streamBufferManager.snapshot', () => {
     ['aborted', { aborted: true }, 'aborted'],
   ] as const)('空的 %s 回合仍提交可见状态消息', (_label, flags, status) => {
     streamBufferManager.handle({
-      type: 'turn_end',
+      type: 'assistant_run_end',
       sessionPath: PATH,
       turnInputEntryId: 'entry-user-1',
       userEntryId: 'entry-user-1',
@@ -309,7 +311,7 @@ describe('streamBufferManager.snapshot', () => {
     // 服务端兼容旧前端仍会发旧文字事件；新投影不能因此重复显示答案。
     streamBufferManager.handle({ type: 'text_delta', sessionPath: PATH, delta: '最终答复' });
     streamBufferManager.handle({
-      type: 'turn_end',
+      type: 'assistant_run_end',
       sessionPath: PATH,
       turnInputEntryId: 'entry-user-1',
       userEntryId: 'entry-user-1',
@@ -356,8 +358,13 @@ describe('streamBufferManager.snapshot', () => {
     const reloaded = reloadedItems[0];
     expect(reloaded.type).toBe('message');
     if (!live || reloaded.type !== 'message') throw new Error('expected assistant messages');
-    expect(live.blocks).toEqual(reloaded.data.blocks);
-    expect(live.turnProjection).toEqual(reloaded.data.turnProjection);
+    // block.id 从创建起永久不变（stream 前缀，任务书 §二十一/§二十二）：持久化 entry 绑定
+    // 只增加 sourceEntryId，不改写 block.id。因此 live 与 reload 的 block.id 前缀不同
+    // （stream vs entry），但语义内容逐字段一致。
+    const stripIds = (blocks: any[] | undefined) => (blocks ?? []).map(({ id, ...rest }) => rest);
+    expect(stripIds(live.blocks)).toEqual(stripIds(reloaded.data.blocks));
+    expect(live.turnProjection?.status).toBe(reloaded.data.turnProjection?.status);
+    expect(live.turnProjection?.assistantMessageIds).toEqual(reloaded.data.turnProjection?.assistantMessageIds);
   });
 
   it('canonical 锁定后 legacy thinking/text 事件不再产生第二个 UI block', () => {
@@ -387,7 +394,7 @@ describe('streamBufferManager.snapshot', () => {
     streamBufferManager.handle({ type: 'thinking_end', sessionPath: PATH });
     streamBufferManager.handle({ type: 'text_delta', sessionPath: PATH, delta: '幽灵正文' });
     streamBufferManager.handle({
-      type: 'turn_end',
+      type: 'assistant_run_end',
       sessionPath: PATH,
       turnInputEntryId: 'entry-user-1',
       userEntryId: 'entry-user-1',
@@ -470,7 +477,7 @@ describe('streamBufferManager.mood 多段聚合', () => {
 
   it('turn reset 后新轮 mood 不串入上一轮', () => {
     moodCycle('AAA');
-    streamBufferManager.handle({ type: 'turn_end', sessionPath: PATH });
+    streamBufferManager.handle({ type: 'assistant_run_end', sessionPath: PATH });
     moodCycle('BBB');
     // turn_end 结算掉上一条消息；新轮 mood 进入新的 assistant 消息，且不含 AAA
     const assistants = getItems().filter((i): i is ChatListItem & { type: 'message' } =>
@@ -683,7 +690,7 @@ describe('streamBufferManager.ensureMessage 自愈', () => {
 
     expect(snapshotStreamBuffer(MOVED_PATH)?.text).toBe('first second');
     expect(snapshotStreamBuffer(PATH)?.text).toBe('first second');
-    streamBufferManager.finishTurn(MOVED_PATH, SESSION_ID);
+    streamBufferManager.finishRun(MOVED_PATH, SESSION_ID);
 
     const movedItems = sessionScopedItems(MOVED_PATH);
     const movedAssistant = movedItems.find((item) => item.type === 'message' && item.data.role === 'assistant');
@@ -786,7 +793,7 @@ describe('streamBufferManager.ensureMessage 自愈', () => {
         prompt: 'a late night room',
       },
     });
-    streamBufferManager.handle({ type: 'turn_end', sessionPath: PATH });
+    streamBufferManager.handle({ type: 'assistant_run_end', sessionPath: PATH });
 
     streamBufferManager.handle({
       type: 'content_block',
@@ -835,7 +842,7 @@ describe('streamBufferManager.ensureMessage 自愈', () => {
         prompt: 'a quiet card',
       },
     });
-    streamBufferManager.handle({ type: 'turn_end', sessionPath: PATH });
+    streamBufferManager.handle({ type: 'assistant_run_end', sessionPath: PATH });
 
     streamBufferManager.handle({
       type: 'content_block',
@@ -862,7 +869,7 @@ describe('streamBufferManager.ensureMessage 自愈', () => {
     if (assistant?.type !== 'message') throw new Error('expected assistant message');
     expect(assistant.data.blocks?.map((block) => block.type)).toEqual(['file']);
 
-    streamBufferManager.beginTurn(PATH);
+    streamBufferManager.beginRun(PATH);
     streamBufferManager.handle({
       type: 'content_block',
       sessionPath: PATH,
@@ -884,7 +891,7 @@ describe('streamBufferManager.ensureMessage 自愈', () => {
       sessionPath: PATH,
       delta: '图片结果已收到。',
     });
-    streamBufferManager.finishTurn(PATH);
+    streamBufferManager.finishRun(PATH);
 
     items = getItems();
     expect(items.map((item) => (item.type === 'message' ? item.data.id : item.id))).toEqual([
@@ -915,9 +922,9 @@ describe('streamBufferManager.ensureMessage 自愈', () => {
         startedAt: 1000,
       },
     });
-    streamBufferManager.handle({ type: 'turn_end', sessionPath: PATH });
+    streamBufferManager.handle({ type: 'assistant_run_end', sessionPath: PATH });
 
-    streamBufferManager.beginTurn(PATH);
+    streamBufferManager.beginRun(PATH);
     streamBufferManager.handle({
       type: 'content_block',
       sessionPath: PATH,
@@ -941,7 +948,7 @@ describe('streamBufferManager.ensureMessage 自愈', () => {
       sessionPath: PATH,
       delta: '收到 workflow 结果。',
     });
-    streamBufferManager.finishTurn(PATH);
+    streamBufferManager.finishRun(PATH);
 
     const items = getItems();
     expect(items.map((item) => item.type)).toEqual(['message', 'message', 'interlude', 'message']);
@@ -969,7 +976,7 @@ describe('streamBufferManager.ensureMessage 自愈', () => {
     });
   });
 
-  it('beginTurn 后收到的 workflow 幕间会插在新 assistant 回复前', () => {
+  it('beginRun 后收到的 workflow 幕间会插在新 assistant 回复前', () => {
     streamBufferManager.handle({
       type: 'content_block',
       sessionPath: PATH,
@@ -981,7 +988,7 @@ describe('streamBufferManager.ensureMessage 自愈', () => {
         startedAt: 1000,
       },
     });
-    streamBufferManager.handle({ type: 'turn_end', sessionPath: PATH });
+    streamBufferManager.handle({ type: 'assistant_run_end', sessionPath: PATH });
 
     const firstItems = getItems();
     const firstAssistant = firstItems.find((item) => item.type === 'message' && item.data.role === 'assistant');
@@ -989,7 +996,7 @@ describe('streamBufferManager.ensureMessage 自愈', () => {
     if (firstAssistant?.type !== 'message') throw new Error('expected first assistant message');
     const firstAssistantId = firstAssistant.data.id;
 
-    streamBufferManager.beginTurn(PATH);
+    streamBufferManager.beginRun(PATH);
     streamBufferManager.handle({
       type: 'content_block',
       sessionPath: PATH,
@@ -1016,7 +1023,7 @@ describe('streamBufferManager.ensureMessage 自愈', () => {
       sessionPath: PATH,
       delta: '收到，workflow 已经完成。',
     });
-    streamBufferManager.finishTurn(PATH);
+    streamBufferManager.finishRun(PATH);
 
     const items = getItems();
     expect(items.map((item) => (item.type === 'message' ? item.data.id : item.id))).toEqual([
@@ -1043,7 +1050,7 @@ describe('streamBufferManager.ensureMessage 自愈', () => {
     });
   });
 
-  it('beginTurn 会清掉上一轮 assistant 绑定，让幕间后的正文创建新消息', () => {
+  it('beginRun 会清掉上一轮 assistant 绑定，让幕间后的正文创建新消息', () => {
     streamBufferManager.handle({
       type: 'content_block',
       sessionPath: PATH,
@@ -1060,7 +1067,7 @@ describe('streamBufferManager.ensureMessage 自愈', () => {
       sessionPath: PATH,
       delta: 'Workflow 已经提交后台运行了。',
     });
-    streamBufferManager.finishTurn(PATH);
+    streamBufferManager.finishRun(PATH);
 
     const firstItems = getItems();
     const firstAssistant = firstItems.find((item) => item.type === 'message' && item.data.role === 'assistant');
@@ -1068,7 +1075,7 @@ describe('streamBufferManager.ensureMessage 自愈', () => {
     if (firstAssistant?.type !== 'message') throw new Error('expected first assistant message');
     const firstAssistantId = firstAssistant.data.id;
 
-    streamBufferManager.beginTurn(PATH);
+    streamBufferManager.beginRun(PATH);
 
     streamBufferManager.handle({
       type: 'content_block',
@@ -1090,7 +1097,7 @@ describe('streamBufferManager.ensureMessage 自愈', () => {
       sessionPath: PATH,
       delta: '收到，workflow 已经完成。',
     });
-    streamBufferManager.finishTurn(PATH);
+    streamBufferManager.finishRun(PATH);
 
     const items = getItems();
     expect(items.map((item) => (item.type === 'message' ? item.data.id : item.id))).toEqual([

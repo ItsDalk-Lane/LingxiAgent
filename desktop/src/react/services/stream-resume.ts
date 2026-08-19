@@ -302,7 +302,7 @@ async function rebuildSessionFromResume(msg: any, opts: { finishTurnBeforeHydrat
   if (isCurrentSession) _streamResumeRebuildingFor = sessionPath;
   try {
     if (opts.finishTurnBeforeHydrate) {
-      streamBufferManager.finishTurn(sessionPath);
+      streamBufferManager.finishRun(sessionPath);
     } else {
       // 清掉旧 buffer 防止脏写
       streamBufferManager.clear(sessionPath);

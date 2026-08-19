@@ -147,11 +147,15 @@ export function configureWsMessageHandler(options: {
 // ── 聊天事件集合（走 StreamBufferManager） ──
 
 const REACT_CHAT_EVENTS = new Set([
-  'turn_start',
+  // Assistant Run 生命周期（权威）：assistant_run_start / assistant_run_end。
+  'assistant_run_start', 'assistant_run_end',
+  // Pi Model Turn 边界（仅 diagnostics）：model_turn_start / model_turn_end；
+  // turn_start / turn_end 是旧协议别名，兼容旧 server。
+  'model_turn_start', 'model_turn_end', 'turn_start', 'turn_end',
   'assistant_segment_start', 'assistant_segment_delta', 'assistant_segment_end',
   'text_delta', 'thinking_start', 'thinking_delta', 'thinking_end',
   'mood_start', 'mood_text', 'mood_end',
-  'tool_start', 'tool_end', 'turn_end',
+  'tool_start', 'tool_end',
   'content_block', 'plugin_card',
   'compaction_start', 'compaction_end',
 ]);
@@ -296,13 +300,13 @@ function requestInputFocusForCurrentSession(sessionPath: string | null): void {
   state.requestInputFocus?.('restore');
 }
 
-function applyTurnEndSideEffects(msg: any): void {
-  scheduleSessionsRefresh('turn_end');
-  const turnSp = msg.sessionPath;
-  if (turnSp) {
-    requestContextUsage(turnSp);
+function applyRunEndSideEffects(msg: any): void {
+  scheduleSessionsRefresh('assistant_run_end');
+  const runSp = msg.sessionPath;
+  if (runSp) {
+    requestContextUsage(runSp);
   } else {
-    console.warn('[ws] turn_end missing sessionPath, skipping context_usage request');
+    console.warn('[ws] assistant_run_end missing sessionPath, skipping context_usage request');
   }
 }
 
@@ -575,8 +579,8 @@ export function handleServerMessage(msg: any): void {
     if (isKnownChatSession(msg.sessionPath, state)) {
       streamBufferManager.handle(msg);
     }
-    if (msg.type === 'turn_end') {
-      applyTurnEndSideEffects(msg);
+    if (msg.type === 'assistant_run_end') {
+      applyRunEndSideEffects(msg);
     }
     dispatchStreamKey(msg.sessionPath, msg);
     applyTodoToolEnd(msg);
@@ -588,9 +592,9 @@ export function handleServerMessage(msg: any): void {
   // ── React 聊天渲染路径：聊天相关事件走 StreamBufferManager ──
   if (REACT_CHAT_EVENTS.has(msg.type)) {
     streamBufferManager.handle(msg);
-    // turn_end 后仍需执行部分通用逻辑（loadSessions、context_usage）
-    if (msg.type === 'turn_end') {
-      applyTurnEndSideEffects(msg);
+    // assistant_run_end 后仍需执行部分通用逻辑（loadSessions、context_usage）
+    if (msg.type === 'assistant_run_end') {
+      applyRunEndSideEffects(msg);
     }
     // tool_end 后更新 todo（兼容新旧工具名 + 新旧格式）
     applyTodoToolEnd(msg);
@@ -1174,7 +1178,7 @@ export function handleServerMessage(msg: any): void {
       const sid = typeof msg.sessionId === 'string' && msg.sessionId.trim() ? msg.sessionId.trim() : null;
       const streamId = typeof msg.streamId === 'string' && msg.streamId.trim() ? msg.streamId.trim() : null;
       const applied = applyStreamingStatus(false, sp, { streamId }, { force: !streamId });
-      if (sp && applied) streamBufferManager.finishTurn(sp, sid);
+      if (sp && applied) streamBufferManager.finishRun(sp, sid);
       break;
     }
 
@@ -1187,9 +1191,9 @@ export function handleServerMessage(msg: any): void {
     case 'status': {
       const sp = msg.sessionPath || null;
       // status 只回答「Session 是否忙」：streamingSessions 维护 + 焦点 UI 占位。
-      // 它没有资格决定 Assistant Turn 的生命周期——Turn 只能由
-      // turn_start / turn_end（见 REACT_CHAT_EVENTS → StreamBufferManager）开关，
-      // 因此这里绝不允许调用 beginTurn / finishTurn / commitLiveTurn。
+      // 它没有资格决定 Assistant Run 的生命周期——Run 只能由
+      // assistant_run_start / assistant_run_end（见 REACT_CHAT_EVENTS → StreamBufferManager）开关，
+      // 因此这里绝不允许调用 beginRun / finishRun / finalizeRun。
       applyStreamingStatus(msg.isStreaming, sp, {
         streamId: msg.streamId ?? null,
         turnId: msg.turnId ?? null,

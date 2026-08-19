@@ -177,7 +177,7 @@ afterEach(() => {
 
 describe('Turn 生命周期与 Session Busy 解耦', () => {
   it('重复的 status true 不得 finalize 当前 Turn', () => {
-    send({ type: 'turn_start' });
+    send({ type: 'assistant_run_start' });
     sendStatus(true);
     send({ type: 'thinking_start' });
     send({ type: 'thinking_delta', delta: '先想想' });
@@ -197,7 +197,7 @@ describe('Turn 生命周期与 Session Busy 解耦', () => {
     send({ type: 'tool_start', id: 'call-2', name: 'write', args: { path: '/b.md' } });
     send({ type: 'tool_end', id: 'call-2', name: 'write', success: true });
     send({ type: 'text_delta', delta: '最终回答。' });
-    send({ type: 'turn_end', assistantEntryId: 'entry-a1', turnInputEntryId: 'entry-u1' });
+    send({ type: 'assistant_run_end', assistantEntryId: 'entry-a1', turnInputEntryId: 'entry-u1' });
     sendStatus(false);
 
     expect(assistantMessages()).toHaveLength(1);
@@ -213,7 +213,7 @@ describe('Turn 生命周期与 Session Busy 解耦', () => {
   });
 
   it('status false 出现在真正的 turn_end 之前时，不得结束当前 Turn', () => {
-    send({ type: 'turn_start' });
+    send({ type: 'assistant_run_start' });
     sendStatus(true);
     send({ type: 'thinking_start' });
     send({ type: 'thinking_delta', delta: '思考中' });
@@ -239,7 +239,7 @@ describe('Turn 生命周期与 Session Busy 解耦', () => {
     send({ type: 'mood_text', delta: 'Vibe: 稳' });
     send({ type: 'mood_end' });
     send({ type: 'text_delta', delta: '做完了。' });
-    send({ type: 'turn_end', assistantEntryId: 'entry-a1', turnInputEntryId: 'entry-u1' });
+    send({ type: 'assistant_run_end', assistantEntryId: 'entry-a1', turnInputEntryId: 'entry-u1' });
 
     expect(assistantMessages()).toHaveLength(1);
     expect(foldCount()).toBe(1);
@@ -250,7 +250,7 @@ describe('Turn 生命周期与 Session Busy 解耦', () => {
   });
 
   it('status 高频抖动全程：turn_end 前 fold=0 / missing=0，turn_end 后各出现一次', () => {
-    send({ type: 'turn_start' });
+    send({ type: 'assistant_run_start' });
     sendStatus(true);
     sendStatus(false);
     sendStatus(true);
@@ -279,7 +279,7 @@ describe('Turn 生命周期与 Session Busy 解耦', () => {
     expect(committedTurnStatusCount()).toBe(0);
     expect(liveTurnStatus()).toBe('streaming');
 
-    send({ type: 'turn_end', assistantEntryId: 'entry-a1', turnInputEntryId: 'entry-u1' });
+    send({ type: 'assistant_run_end', assistantEntryId: 'entry-a1', turnInputEntryId: 'entry-u1' });
 
     expect(foldCount()).toBe(1);
     expect(committedTurnStatusCount()).toBe(0);
@@ -289,12 +289,12 @@ describe('Turn 生命周期与 Session Busy 解耦', () => {
   });
 
   it('重复 turn_end 幂等：commit 只发生一次，不产生第二个 AssistantMessage', () => {
-    send({ type: 'turn_start' });
+    send({ type: 'assistant_run_start' });
     sendStatus(true);
     send({ type: 'thinking_start' });
     send({ type: 'thinking_delta', delta: '想' });
     send({ type: 'thinking_end' });
-    send({ type: 'turn_end', assistantEntryId: 'entry-a1', turnInputEntryId: 'entry-u1' });
+    send({ type: 'assistant_run_end', assistantEntryId: 'entry-a1', turnInputEntryId: 'entry-u1' });
 
     expect(assistantMessages()).toHaveLength(1);
     expect(foldCount()).toBe(1);
@@ -302,7 +302,7 @@ describe('Turn 生命周期与 Session Busy 解耦', () => {
     expect(committedTurnStatusCount()).toBe(1);
 
     // 服务器重发同一个 turn_end（重连 replay 场景）
-    send({ type: 'turn_end', assistantEntryId: 'entry-a1', turnInputEntryId: 'entry-u1' });
+    send({ type: 'assistant_run_end', assistantEntryId: 'entry-a1', turnInputEntryId: 'entry-u1' });
 
     expect(assistantMessages()).toHaveLength(1);
     expect(foldCount()).toBe(1);
@@ -310,12 +310,12 @@ describe('Turn 生命周期与 Session Busy 解耦', () => {
   });
 
   it('turn_start 幂等：同一 streamId 重复 turn_start 不得结束当前 Turn', () => {
-    send({ type: 'turn_start' });
+    send({ type: 'assistant_run_start' });
     sendStatus(true);
     send({ type: 'tool_start', id: 'call-1', name: 'read', args: {} });
     send({ type: 'tool_end', id: 'call-1', name: 'read', success: true });
 
-    send({ type: 'turn_start' });
+    send({ type: 'assistant_run_start' });
 
     expect(liveTurnStatus()).toBe('streaming');
     expect(foldCount()).toBe(0);
@@ -323,7 +323,7 @@ describe('Turn 生命周期与 Session Busy 解耦', () => {
     expect(liveToolCount()).toBe(1);
 
     send({ type: 'text_delta', delta: '好。' });
-    send({ type: 'turn_end', assistantEntryId: 'entry-a1', turnInputEntryId: 'entry-u1' });
+    send({ type: 'assistant_run_end', assistantEntryId: 'entry-a1', turnInputEntryId: 'entry-u1' });
     expect(assistantMessages()).toHaveLength(1);
     expect(foldCount()).toBe(1);
     expect(committedTurnStatusCount()).toBe(0);

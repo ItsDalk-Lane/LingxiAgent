@@ -158,7 +158,7 @@ describe('semantic stream publication', () => {
     expect(requestAnimationFrame).toHaveBeenCalledTimes(1);
 
     streamBufferManager.handle({
-      type: 'turn_end',
+      type: 'assistant_run_end',
       sessionPath: PATH,
       assistantEntryId: 'entry-assistant-1',
     });

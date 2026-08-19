@@ -53,6 +53,13 @@ export interface ProcessFoldRenderItem {
   defaultCollapsed: boolean;
   ownsTurnCompletion: boolean;
   navigationAnchors: ProcessFoldNavigationAnchors;
+  /**
+   * ProcessRegion 展示模式（任务书 §二十四/§二十五/§二十六）：
+   *   live    → Assistant Run 进行中：显示过程块，不渲染 summary，不折叠。
+   *   settled → assistant_run_end 后：渲染 summary，默认折叠。
+   * 同一个 ProcessRegion（相同 key）只切换 mode，不重新创建。
+   */
+  mode: 'live' | 'settled';
 }
 
 export type TranscriptRenderItem = SourceTranscriptRenderItem | ProcessFoldRenderItem;
@@ -198,15 +205,16 @@ function completedStatus(
   return 'completed';
 }
 
-function processFoldId(refs: ProcessFoldBlockRef[], turnId: string, hasProjection: boolean): string {
-  if (hasProjection) return `${turnId}:process`;
+// ProcessRegion key 必须稳定（任务书 §二十七）：整个 Run 内 key = `${runId}:process`。
+// 前端以源消息 id（跨 live → settled 永久不变）作为 runId 的稳定等价物。
+function processFoldId(refs: ProcessFoldBlockRef[]): string {
   const first = refs[0]?.sourceMessageId || 'start';
-  const last = refs[refs.length - 1]?.sourceMessageId || first;
-  return `process-fold-${first}-${last}`;
+  return `${first}:process`;
 }
 
 function projectedTurnItems(
   segment: Array<{ entry: Extract<ChatListItem, { type: 'message' }>; originalIndex: number }>,
+  mode: 'live' | 'settled' = 'settled',
 ): TranscriptRenderItem[] {
   if (segment.some(({ entry }) => visibleBlocks(entry.data).some(isMalformedLegacyBlock))) {
     return segment.map(({ entry, originalIndex }) => sourceItem(entry, originalIndex));
@@ -258,16 +266,18 @@ function projectedTurnItems(
   const status = completedStatus(segment.map(({ entry }) => entry));
   const fold: ProcessFoldRenderItem = {
     type: 'process_fold',
-    id: processFoldId(blockRefs, turnId, !!projection),
+    id: processFoldId(blockRefs),
     turnId,
     blockIds,
     refs: blockRefs,
     originalIndex: blockRefs[0].originalIndex,
     stats: collectStats(blockRefs),
     status,
-    defaultCollapsed: status === 'completed',
+    // live：不折叠、不显示 summary；settled：completed 默认折叠。
+    defaultCollapsed: mode === 'settled' && status === 'completed',
     ownsTurnCompletion: sourceMessages.length === 0,
     navigationAnchors: collectNavigationAnchors(blockRefs),
+    mode,
   };
   return [fold, ...sourceMessages];
 }
@@ -307,11 +317,12 @@ export function buildTranscriptRenderItems(
       cursor += 1;
     }
 
-    // Process Fold 只依赖 Turn 生命周期，不依赖 Session Busy：
+    // ProcessRegion 只依赖 Assistant Run 生命周期，不依赖 Session Busy：
     //   1) 有 turnProjection 的现代消息：唯一依据是 turnProjection.status；
     //   2) 正在流式的 live 消息（投影只存在于 live-turn-store）：依据 liveTurnStatus；
     //   3) 只有两者都没有的 legacy 历史消息，才允许回退到 Session Busy。
-    // 因此 status（isStreaming）抖动绝不会让进行中的 Turn 折出 Process Fold。
+    // live 与 settled 都走 projectedTurnItems，只是 mode 不同：同一个 ProcessRegion
+    // 从第一个 process block 就存在，settled 只是切换展示模式（任务书 §二十四/§二十五）。
     const hasProjection = segment.some(({ entry }) => !!entry.data.turnProjection);
     const touchesLatest = segment.some(({ originalIndex }) => originalIndex === latestAssistantIndex);
     const segmentStreaming = hasProjection
@@ -320,9 +331,9 @@ export function buildTranscriptRenderItems(
         ? liveTurnStatus === 'streaming'
         : options.isStreaming && touchesLatest;
     if (segmentStreaming) {
-      rendered.push(...segment.map(({ entry, originalIndex }) => sourceItem(entry, originalIndex)));
+      rendered.push(...projectedTurnItems(segment, 'live'));
     } else {
-      rendered.push(...projectedTurnItems(segment));
+      rendered.push(...projectedTurnItems(segment, 'settled'));
     }
     index = cursor;
   }

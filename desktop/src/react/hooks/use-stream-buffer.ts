@@ -28,7 +28,6 @@ import {
 import { recordChatPerformance } from '../utils/chat-performance';
 import {
   normalizeContentBlocks,
-  rebaseGeneratedContentBlockIds,
 } from '../utils/content-semantics';
 import { projectAssistantTurn } from '../utils/turn-projector';
 
@@ -71,19 +70,20 @@ interface Buffer {
   flushFrame: number | null;
   /** 自上次发布后，缓冲区里是否出现了新的可见变化。 */
   publishPending: boolean;
-  /** 当前 turn 绑定的 assistant message id */
+  /** 当前 Assistant Run 绑定的 assistant message id */
   messageId: string | null;
-  /** turn_end/中止收口时为 true，确保所有仍在流式的内容统一封口。 */
-  turnEnding: boolean;
-  /** 是否有活动 Turn。只能由 turn_start 开启、turn_end（或管理性 finishTurn/clear）关闭；
-   *  status（Session Busy）不得改变它。 */
-  turnActive: boolean;
-  /** 活动 Turn 的身份（优先 streamId，缺失时 turnId）；null 表示身份未知的隐式 Turn。 */
-  activeTurnKey: string | null;
-  /** 最近一次已完成 finalization 的 Turn 身份，用于重复 turn_end 的 exactly-once 去重。 */
-  lastFinalizedTurnKey: string | null;
-  /** 本轮已出现 canonical assistant_segment_*：legacy text/thinking 兼容事件
-   *  不得再产生 UI block（只能累积断线恢复快照）。 */
+  /** assistant_run_end/中止收口时为 true，确保所有仍在流式的内容统一封口。 */
+  runEnding: boolean;
+  /** 是否有活动 Assistant Run。只能由 assistant_run_start 开启、assistant_run_end
+   *  （或管理性 finishRun/clear）关闭；status（Session Busy）与 Pi Model Turn（
+   *  model_turn_start/model_turn_end）都不得改变它。 */
+  runActive: boolean;
+  /** 活动 Run 的身份（优先 runId，缺失时 streamId）；null 表示身份未知的隐式 Run。 */
+  activeRunKey: string | null;
+  /** 最近一次已完成 finalization 的 Run 身份，用于重复 assistant_run_end 的 exactly-once 去重。 */
+  lastFinalizedRunKey: string | null;
+  /** 本 Run 内已出现 canonical assistant_segment_*：legacy text/thinking 兼容事件
+   *  不得再产生 UI block（只能累积断线恢复快照）。canonicalLocked 是 Run 级，跨 Model Turn 保留。 */
   canonicalLocked: boolean;
 }
 
@@ -111,10 +111,10 @@ function createBuffer(sessionPath: string): Buffer {
     flushFrame: null,
     publishPending: false,
     messageId: null,
-    turnEnding: false,
-    turnActive: false,
-    activeTurnKey: null,
-    lastFinalizedTurnKey: null,
+    runEnding: false,
+    runActive: false,
+    activeRunKey: null,
+    lastFinalizedRunKey: null,
     canonicalLocked: false,
   };
 }
@@ -170,7 +170,12 @@ function normalizeSessionId(value: unknown): string | null {
   return typeof value === 'string' && value.trim() ? value.trim() : null;
 }
 
-/** Turn 身份：优先 streamId，缺失时退回 turnId；都没有则身份未知（null）。 */
+/** Run 身份：优先 runId，缺失时退回 streamId；都没有则身份未知（null）。 */
+function runKeyFrom(identity: { runId?: unknown; streamId?: unknown } | null | undefined): string | null {
+  return normalizeSessionId(identity?.runId) || normalizeSessionId(identity?.streamId) || null;
+}
+
+/** Pi Model Turn 身份（仅 diagnostics 用）：优先 streamId，缺失时退回 turnId。 */
 function turnKeyFrom(identity: { streamId?: unknown; turnId?: unknown } | null | undefined): string | null {
   return normalizeSessionId(identity?.streamId) || normalizeSessionId(identity?.turnId) || null;
 }
@@ -258,7 +263,7 @@ class StreamBufferManager {
     return buf;
   }
 
-  private hasTurnState(buf: Buffer): boolean {
+  private hasRunState(buf: Buffer): boolean {
     return !!(
       buf.messageId ||
       buf.blocks.length > 0 ||
@@ -275,7 +280,7 @@ class StreamBufferManager {
     );
   }
 
-  private resetTurnState(buf: Buffer): void {
+  private resetRunState(buf: Buffer): void {
     this.cancelScheduledFlush(buf);
     buf.textAcc = '';
     buf.blocks = [];
@@ -293,32 +298,32 @@ class StreamBufferManager {
     buf.cardAttrs = null;
     buf.cardDescAcc = '';
     buf.messageId = null;
-    buf.turnEnding = false;
+    buf.runEnding = false;
     buf.publishPending = false;
-    buf.turnActive = false;
-    buf.activeTurnKey = null;
+    buf.runActive = false;
+    buf.activeRunKey = null;
     buf.canonicalLocked = false;
-    // lastFinalizedTurnKey 刻意保留：跨 reset 支撑重复 turn_end 的 exactly-once。
+    // lastFinalizedRunKey 刻意保留：跨 reset 支撑重复 assistant_run_end 的 exactly-once。
   }
 
-  private finishBufferTurn(buf: Buffer, persistedEntries: {
+  private finalizeRun(buf: Buffer, persistedEntries: {
     turnInputEntryId?: string | null;
     userEntryId?: string | null;
     assistantEntryId?: string | null;
     assistantEntryIds?: string[];
     status?: 'completed' | 'failed' | 'aborted';
   } = {}): void {
-    if (this.hasTurnState(buf)) {
-      buf.turnEnding = true;
+    if (this.hasRunState(buf)) {
+      buf.runEnding = true;
       this.flush(buf);
-      this.commitLiveTurn(buf, persistedEntries);
+      this.commitLiveRun(buf, persistedEntries);
     } else {
       this.cancelScheduledFlush(buf);
     }
-    this.resetTurnState(buf);
+    this.resetRunState(buf);
   }
 
-  /** 确保 store 中已存在当前 turn 绑定的 assistant message */
+  /** 确保 store 中已存在当前 Run 绑定的 assistant message */
   private ensureMessage(buf: Buffer): void {
     const store = useStore.getState();
     const session = sessionScopedValue(store, store.chatSessions, buf.sessionPath);
@@ -361,15 +366,15 @@ class StreamBufferManager {
     const next = updater({ ...item.data, blocks: buf.blocks });
     const blocks = normalizeContentBlocks(next.blocks || [], {
       idPrefix: item.data.sourceEntryId || item.data.id,
-      turnLifecycle: buf.turnEnding ? 'sealed' : 'streaming',
+      turnLifecycle: buf.runEnding ? 'sealed' : 'streaming',
     });
     buf.blocks = blocks;
-    this.publishLiveTurn(buf);
+    this.publishLiveRun(buf);
     bumpMessageLiveVersion(buf.sessionPath);
     return true;
   }
 
-  private publishLiveTurn(buf: Buffer): void {
+  private publishLiveRun(buf: Buffer): void {
     if (!buf.messageId) return;
     const store = useStore.getState();
     const session = sessionScopedValue(store, store.chatSessions, buf.sessionPath);
@@ -394,7 +399,7 @@ class StreamBufferManager {
     publishLiveAssistantMessage(buf.sessionPath, buf.messageId, projected.blocks, {
       segmentsById: Object.fromEntries(buf.segmentsById),
       segmentOrder: [...buf.segmentOrder],
-      status: buf.turnEnding ? 'sealed' : 'streaming',
+      status: buf.runEnding ? 'sealed' : 'streaming',
       turnProjection: projected.projection,
     });
   }
@@ -449,7 +454,7 @@ class StreamBufferManager {
     else this.publishBoundary(buf);
   }
 
-  private commitLiveTurn(buf: Buffer, persistedEntries: {
+  private commitLiveRun(buf: Buffer, persistedEntries: {
     turnInputEntryId?: string | null;
     userEntryId?: string | null;
     assistantEntryId?: string | null;
@@ -469,11 +474,13 @@ class StreamBufferManager {
     const segments = buf.segmentOrder
       .map((segmentId) => buf.segmentsById.get(segmentId))
       .filter((segment): segment is LiveAssistantSegment => !!segment);
-    const legacyBlocks = message && assistantId !== message.id
-      ? rebaseGeneratedContentBlockIds(buf.blocks, message.id, assistantId)
-      : buf.blocks;
+    // block.id 从创建那一刻起永久不变（任务书 §二十一/§二十二）：persisted assistant
+    // entry 绑定只增加 sourceEntryId / assistantEntryIds，绝不改写 block.id。
+    const legacyBlocks = buf.blocks;
     const projected = projectAssistantTurn({
-      idPrefix: assistantId,
+      // idPrefix 用稳定 Run 身份（buf.messageId，跨流式 → 提交不变），而不是持久化 assistant
+      // entry id：保证 block.id / segment.id 从创建起永久不变（任务书 §二十一/§二十二）。
+      idPrefix: buf.messageId,
       inputMessageId: persistedEntries.turnInputEntryId || message?.turnInputEntryId || null,
       assistantMessageIds: persistedEntries.assistantEntryIds?.length
         ? persistedEntries.assistantEntryIds
@@ -494,7 +501,7 @@ class StreamBufferManager {
     });
     clearLiveAssistantMessage(buf.sessionPath, buf.messageId);
     if (!committed) {
-      console.warn('[stream] failed to commit live assistant turn:', buf.sessionPath, buf.messageId);
+      console.warn('[stream] failed to commit live assistant run:', buf.sessionPath, buf.messageId);
     }
   }
 
@@ -595,8 +602,14 @@ class StreamBufferManager {
     const buf = this.getBuffer(sessionPath, sessionId);
 
     switch (msg.type) {
+      case 'assistant_run_start':
+        // Assistant Run 开始（任务书 §十七）：唯一能 beginRun 的事件。
+        this.beginRun(sessionPath, sessionId, { runId: msg.runId, streamId: msg.streamId });
+        break;
+
+      case 'model_turn_start':
       case 'turn_start':
-        this.beginTurn(sessionPath, sessionId, { streamId: msg.streamId, turnId: msg.turnId });
+        // Pi Model Turn 开始：仅 diagnostics，绝不得 beginRun / finishRun / reset blocks。
         break;
 
       case 'assistant_segment_start':
@@ -604,12 +617,12 @@ class StreamBufferManager {
       case 'assistant_segment_end': {
         // canonical 锁定：本轮此后 legacy text/thinking 兼容事件不再产生 UI block。
         buf.canonicalLocked = true;
-        // 诊断：Turn 已终结、且没有新 turn_start 的情况下又收到 canonical 事件
-        if (!buf.turnActive && buf.lastFinalizedTurnKey) {
-          console.warn('[stream] canonical_after_terminal: segment event after turn finalized:', {
+        // 诊断：Run 已终结、且没有新 assistant_run_start 的情况下又收到 canonical 事件
+        if (!buf.runActive && buf.lastFinalizedRunKey) {
+          console.warn('[stream] canonical_after_terminal: segment event after run finalized:', {
             type: msg.type,
             segmentId: msg.segmentId,
-            lastFinalizedTurnKey: buf.lastFinalizedTurnKey,
+            lastFinalizedRunKey: buf.lastFinalizedRunKey,
             sessionPath,
           });
         }
@@ -666,7 +679,7 @@ class StreamBufferManager {
       case 'mood_start':
         this.ensureMessage(buf);
         buf.inMood = true;
-        // 同一 buffer 内若已有已封存的 mood 段（例如一个 user turn 内多段模型生成
+        // 同一 buffer 内若已有已封存的 mood 段（例如一个 Assistant Run 内多段模型生成
         // 聚合到同一条消息），新的 mood 段不能清掉前段：暂挂分隔符，等首个非空
         // mood_text 到达再落地；首段则从空开始。
         if (buf.moodAcc.trim().length > 0) {
@@ -798,14 +811,14 @@ class StreamBufferManager {
         }
 
         if (isInterludeBlock(block)) {
-          if (this.hasTurnState(buf)) this.flush(buf);
+          if (this.hasRunState(buf)) this.flush(buf);
           this.appendInterlude(buf, block);
           break;
         }
 
         const taskId = replacementTaskId(block);
         if (taskId) {
-          if (this.hasTurnState(buf)) this.flush(buf);
+          if (this.hasRunState(buf)) this.flush(buf);
           const consumed = useStore.getState().resolveBlockByTaskId(buf.sessionPath, taskId, block);
           if (consumed) {
             bumpMessageLiveVersion(buf.sessionPath);
@@ -827,82 +840,91 @@ class StreamBufferManager {
       case 'compaction_end':
         break;
 
-      case 'turn_end': {
-        const turnKey = turnKeyFrom(msg);
-        // 不变量 D：同一个 Turn 的 finalization 最多执行一次。
-        if (!buf.turnActive && turnKey && turnKey === buf.lastFinalizedTurnKey) {
-          console.debug('[stream] duplicate turn_end ignored (exactly-once):', turnKey);
+      case 'assistant_run_end': {
+        // Assistant Run 结束（任务书 §十七/§二十二）：唯一能 finalize 的事件。
+        // 严禁在 Pi Model Turn 边界执行 commit / reset / rebase block ID。
+        const runKey = runKeyFrom(msg);
+        // 不变量：同一个 Run 的 finalization 最多执行一次。
+        if (!buf.runActive && runKey && runKey === buf.lastFinalizedRunKey) {
+          console.debug('[stream] duplicate assistant_run_end ignored (exactly-once):', runKey);
           break;
         }
-        if (buf.turnActive && turnKey && buf.activeTurnKey && turnKey !== buf.activeTurnKey) {
-          // 身份不匹配：Turn 仍必须终结（服务端是 Turn 结束的权威），但记录诊断。
-          console.warn('[stream] turn_end streamId mismatch; finalizing active turn:', {
-            activeTurnKey: buf.activeTurnKey,
-            turnEndKey: turnKey,
+        if (buf.runActive && runKey && buf.activeRunKey && runKey !== buf.activeRunKey) {
+          // 身份不匹配：Run 仍必须终结（服务端是 Run 结束的权威），但记录诊断。
+          console.warn('[stream] assistant_run_end identity mismatch; finalizing active run:', {
+            activeRunKey: buf.activeRunKey,
+            runEndKey: runKey,
           });
         }
-        if ((msg.aborted || msg.failed) && !this.hasTurnState(buf)) {
+        if ((msg.aborted || msg.failed) && !this.hasRunState(buf)) {
           this.ensureMessage(buf);
         }
-        const activeKeyBeforeFinish = buf.activeTurnKey;
-        this.finishBufferTurn(buf, {
+        const activeKeyBeforeFinish = buf.activeRunKey;
+        this.finalizeRun(buf, {
           turnInputEntryId: msg.turnInputEntryId,
           userEntryId: msg.userEntryId,
           assistantEntryId: msg.assistantEntryId,
           assistantEntryIds: Array.isArray(msg.assistantEntryIds) ? msg.assistantEntryIds : undefined,
           status: msg.aborted ? 'aborted' : msg.failed ? 'failed' : 'completed',
         });
-        buf.lastFinalizedTurnKey = turnKey || activeKeyBeforeFinish || buf.lastFinalizedTurnKey;
+        buf.lastFinalizedRunKey = runKey || activeKeyBeforeFinish || buf.lastFinalizedRunKey;
         break;
       }
+
+      case 'model_turn_end':
+      case 'turn_end':
+        // Pi Model Turn 结束（任务书 §十一）：仅 diagnostics，绝不 finalize / commit /
+        // reset / rebase block ID / 产生 missing_final_answer。
+        break;
 
     }
   }
 
   /**
-   * 权威 Turn 生命周期开始（只能由 WS turn_start 驱动；status 不得调用）。
+   * 权威 Assistant Run 生命周期开始（只能由 WS assistant_run_start 驱动；
+   * status / Pi Model Turn 不得调用）。
    *
    * 状态机：
-   *   idle + turn_start(A)        → active(A)，初始化本轮状态
-   *   active(A) + turn_start(A)   → 幂等 no-op（不得 flush/commit/reset）
-   *   active(A) + turn_start(B)   → 协议异常：记录 protocol_interrupted 诊断，
+   *   idle + assistant_run_start(A)        → active(A)，初始化本轮状态
+   *   active(A) + assistant_run_start(A)   → 幂等 no-op（不得 flush/commit/reset）
+   *   active(A) + assistant_run_start(B)   → 协议异常：记录 protocol_interrupted 诊断，
    *                                 把 A 以 aborted 终结（绝不产生 missing_final_answer
    *                                 的误报以外的第二真相），再开启 B
    */
-  beginTurn(
+  beginRun(
     sessionPath: string,
     sessionId: string | null = null,
-    identity: { streamId?: unknown; turnId?: unknown } = {},
+    identity: { runId?: unknown; streamId?: unknown } = {},
   ): void {
     const buf = this.getBuffer(sessionPath, sessionId);
-    const key = turnKeyFrom(identity);
-    if (buf.turnActive) {
-      if (key === null || buf.activeTurnKey === null || key === buf.activeTurnKey) {
-        // 同一 Turn（或一方身份未知）的重复 turn_start：幂等 no-op；
+    const key = runKeyFrom(identity);
+    if (buf.runActive) {
+      if (key === null || buf.activeRunKey === null || key === buf.activeRunKey) {
+        // 同一 Run（或一方身份未知）的重复 assistant_run_start：幂等 no-op；
         // 身份未知的一侧借机补上权威身份。
-        if (buf.activeTurnKey === null && key !== null) buf.activeTurnKey = key;
+        if (buf.activeRunKey === null && key !== null) buf.activeRunKey = key;
         return;
       }
-      console.warn('[stream] protocol_interrupted: turn_start while another turn is active:', {
-        activeTurnKey: buf.activeTurnKey,
-        incomingTurnKey: key,
+      console.warn('[stream] protocol_interrupted: assistant_run_start while another run is active:', {
+        activeRunKey: buf.activeRunKey,
+        incomingRunKey: key,
         sessionPath,
       });
-      const interruptedKey = buf.activeTurnKey;
-      this.finishBufferTurn(buf, { status: 'aborted' });
-      // 被中断 Turn 迟到的 turn_end 不得二次 finalize。
-      if (interruptedKey) buf.lastFinalizedTurnKey = interruptedKey;
+      const interruptedKey = buf.activeRunKey;
+      this.finalizeRun(buf, { status: 'aborted' });
+      // 被中断 Run 迟到的 assistant_run_end 不得二次 finalize。
+      if (interruptedKey) buf.lastFinalizedRunKey = interruptedKey;
     }
-    buf.turnActive = true;
-    buf.activeTurnKey = key;
+    buf.runActive = true;
+    buf.activeRunKey = key;
   }
 
-  /** 服务端确认当前 turn 结束或被中止：flush 可见内容，然后释放 turn-local 绑定。 */
-  finishTurn(sessionPath: string, sessionId: string | null = null): void {
+  /** 服务端确认当前 Run 结束或被中止：flush 可见内容，然后释放 Run 绑定。 */
+  finishRun(sessionPath: string, sessionId: string | null = null): void {
     const buf = this.lookupBuffer(sessionPath, sessionId);
     if (!buf) return;
     buf.sessionPath = sessionPath;
-    this.finishBufferTurn(buf);
+    this.finalizeRun(buf);
   }
 
   /** 清理指定 session 的 buffer */

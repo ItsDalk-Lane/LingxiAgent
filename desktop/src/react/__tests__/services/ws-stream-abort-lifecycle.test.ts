@@ -102,7 +102,7 @@ describe('ws stream lifecycle after abort', () => {
     // 中止路径由服务端权威补发 turn_end(aborted)；status=false 只是 Session Busy
     // 收尾，不再承担结束 Turn 的职责（旧契约已废除）。
     handleServerMessage({
-      type: 'turn_end',
+      type: 'assistant_run_end',
       sessionPath: PATH,
       aborted: true,
     });
@@ -119,7 +119,7 @@ describe('ws stream lifecycle after abort', () => {
     });
 
     handleServerMessage({
-      type: 'turn_start',
+      type: 'assistant_run_start',
       sessionPath: PATH,
     });
     handleServerMessage({
@@ -133,7 +133,7 @@ describe('ws stream lifecycle after abort', () => {
       delta: 'new answer',
     });
     handleServerMessage({
-      type: 'turn_end',
+      type: 'assistant_run_end',
       sessionPath: PATH,
     });
 

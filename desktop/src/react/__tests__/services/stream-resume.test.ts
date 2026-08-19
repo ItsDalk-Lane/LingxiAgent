@@ -7,7 +7,7 @@ const mocks = vi.hoisted(() => ({
   clearChat: vi.fn(),
   streamBufferManager: {
     clear: vi.fn(),
-    finishTurn: vi.fn(),
+    finishRun: vi.fn(),
   },
   ws: {
     readyState: 1,
@@ -85,7 +85,7 @@ describe('stream-resume', () => {
       expect(mocks.loadMessages).toHaveBeenCalledWith('/background.jsonl');
     });
 
-    expect(mocks.streamBufferManager.finishTurn).toHaveBeenCalledWith('/background.jsonl');
+    expect(mocks.streamBufferManager.finishRun).toHaveBeenCalledWith('/background.jsonl');
     expect(mocks.streamBufferManager.clear).not.toHaveBeenCalledWith('/background.jsonl');
     expect(statuses).toContainEqual({ isStreaming: false, sessionPath: '/background.jsonl' });
     expect(useStore.getState().streamingSessions).toEqual([]);
