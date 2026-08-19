@@ -1093,6 +1093,16 @@ describe("MCP app resources", () => {
       dataDir: path.join(os.tmpdir(), "hana-mcp-apps-test"),
       config: { get: vi.fn(() => stored), set: vi.fn() },
       log: console,
+    }, {
+      // start() 触发的自动启动不许真的去连 mcp.acme.test：连不上会留下一个
+      // 后台重连定时器，测试结束后仍在重试，迟到的日志会打进已关闭的测试
+      // worker，在 Windows 上触发 EnvironmentTeardownError（PR #18 CI）。
+      clientFactory: () => ({
+        running: true,
+        start: async () => {},
+        stop: async () => {},
+        listTools: async () => [],
+      }),
     });
   }
 
