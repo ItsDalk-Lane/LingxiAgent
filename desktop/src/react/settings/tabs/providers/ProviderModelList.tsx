@@ -529,12 +529,10 @@ export function ProviderModelList({ providerId, summary, media, onRefresh }: {
                   ?? numberFromMeta(knownMeta.context)
                   ?? numberFromMeta(knownMeta.contextWindow))
                 : undefined;
-              const showModelId = item.displayName !== item.id;
               return (
                 <div key={item.key} className={styles['pv-fav-item']} data-unified-kind={item.kind} data-model-id={item.id}>
                   <span className={styles['pv-fav-item-name']} title={String(item.displayName)}>{item.displayName}</span>
-                  {showModelId && <span className={styles['pv-fav-item-id']} title={item.id}>{item.id}</span>}
-                  {/* 输出模态图标：紧邻承担 ID 展示职责的文字元素，剩余空间由 spacer 吸收 */}
+                  {/* 输出模态图标：紧邻显示名，剩余空间由 spacer 吸收 */}
                   <OutputModalityIcons outputs={item.outputs} />
                   <span className={styles['pv-fav-item-spacer']} aria-hidden="true" />
                   {/* 输入能力图标：所有类别都渲染——媒体模型同样要表达它接受的输入模态

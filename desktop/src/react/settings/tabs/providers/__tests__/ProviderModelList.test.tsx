@@ -157,7 +157,7 @@ describe('ProviderModelList (chat)', () => {
     });
   });
 
-  it('shows the output-modality icons directly after the model id, before capability badges', () => {
+  it('shows the output-modality icons directly after the display name, before capability badges', () => {
     mocks.lookupModelMeta.mockImplementation((id: unknown, provider: unknown) => {
       if (id === 'doubao-seed-2-0-lite-260428' && provider === 'volcengine') {
         return {
@@ -190,11 +190,11 @@ describe('ProviderModelList (chat)', () => {
       />,
     );
 
-    const id = screen.getByText('doubao-seed-2-0-lite-260428');
-    // 输出模态图标紧跟 ID：chat 默认 outputs ["text"]
-    expect(id.nextElementSibling).toHaveAttribute('data-output-modalities', 'text');
+    const name = screen.getByText('Doubao Seed 2.0 Lite');
+    // 输出模态图标紧跟显示名：chat 默认 outputs ["text"]
+    expect(name.nextElementSibling).toHaveAttribute('data-output-modalities', 'text');
     // 图标之后是 flex spacer，再之后才轮到输入能力 badge
-    const spacer = id.nextElementSibling?.nextElementSibling;
+    const spacer = name.nextElementSibling?.nextElementSibling;
     expect(spacer).toHaveClass(/pv-fav-item-spacer/);
     const firstCapability = spacer?.nextElementSibling;
     expect(firstCapability).toHaveAttribute('title', 'settings.api.capability.image');
@@ -684,7 +684,7 @@ describe('ProviderModelList (unified chat/image/video/speech)', () => {
     expect(container.querySelectorAll('[data-unified-model-list="true"]')).toHaveLength(1);
   });
 
-  it('shows output icons adjacent to the model id with the right modality per kind', () => {
+  it('shows output icons adjacent to the display name with the right modality per kind', () => {
     renderUnified();
     const chatRow = document.querySelector('[data-unified-kind="chat"]')!;
     const imageRow = document.querySelector('[data-unified-kind="image"]')!;
@@ -693,12 +693,12 @@ describe('ProviderModelList (unified chat/image/video/speech)', () => {
 
     const outputsOf = (row: Element) => row.querySelector('[data-output-modalities]') as HTMLElement | null;
     const chatOutputs = outputsOf(chatRow)!;
-    // chat 模型名与 id 相同时，图标紧跟承担 ID 展示职责的名称元素
+    // 图标紧跟显示名（该 chat 模型的显示名就是 id）
     expect(chatOutputs.previousElementSibling!.textContent).toBe('qwen3.8-max');
     expect(chatOutputs).toHaveAttribute('data-output-modalities', 'text');
 
     const imageOutputs = outputsOf(imageRow)!;
-    expect(imageOutputs.previousElementSibling!.textContent).toBe('wan-image-x');
+    expect(imageOutputs.previousElementSibling!.textContent).toBe('Wan 2.7 Image Pro');
     expect(imageOutputs).toHaveAttribute('data-output-modalities', 'image');
 
     expect(outputsOf(videoRow)).toHaveAttribute('data-output-modalities', 'video');
