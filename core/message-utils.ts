@@ -68,17 +68,20 @@ export function extractTextContent(content, { stripThink = false } = {}) {
       .filter(block => block.type === "thinking" && block.thinking)
       .map(block => block.thinking),
   ].filter(Boolean).join("\n");
-  const toolUses = content
-    .filter(isToolCallBlock)
-    .map(block => {
-      const params = getToolArgs(block);
-      const args = summarizeToolArgs(params);
-      return {
-        id: typeof block.id === "string" && block.id ? block.id : undefined,
-        name: block.name,
-        ...(args ? { args } : {}),
-      };
+  const toolUses = [];
+  for (let index = 0; index < content.length; index += 1) {
+    const block = content[index];
+    if (!isToolCallBlock(block)) continue;
+    const params = getToolArgs(block);
+    const args = summarizeToolArgs(params);
+    toolUses.push({
+      id: typeof block.id === "string" && block.id ? block.id : undefined,
+      name: block.name,
+      ...(args ? { args } : {}),
+      // 在原始 content 数组中的位置索引，供前端按真实时间线交错思考与工具
+      processOrder: index,
     });
+  }
   return { text, thinking, toolUses, images };
 }
 

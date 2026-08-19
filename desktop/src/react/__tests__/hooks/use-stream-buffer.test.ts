@@ -577,6 +577,93 @@ describe('streamBufferManager.thinking 流式刷新', () => {
   });
 });
 
+describe('streamBufferManager 过程块交错顺序', () => {
+  beforeEach(() => {
+    streamBufferManager.clearAll();
+    useStore.setState({
+      currentSessionId: null,
+      currentSessionPath: null,
+      sessions: [],
+      sessionLocatorsById: {},
+    } as never);
+    useStore.getState().clearSession(PATH);
+    useStore.getState().initSession(PATH, [userItem('u1', 'hi')], false);
+  });
+
+  function reasoningSegment(segmentId: string, delta: string): void {
+    streamBufferManager.handle({
+      type: 'assistant_segment_start',
+      sessionPath: PATH,
+      segmentId,
+      kind: 'reasoning',
+      semanticPhase: 'reasoning',
+    });
+    streamBufferManager.handle({
+      type: 'assistant_segment_delta',
+      sessionPath: PATH,
+      segmentId,
+      delta,
+      semanticPhase: 'reasoning',
+    });
+    streamBufferManager.handle({
+      type: 'assistant_segment_end',
+      sessionPath: PATH,
+      segmentId,
+      semanticPhase: 'reasoning',
+    });
+  }
+
+  it('canonical 事件流里思考段与工具组按真实到达顺序交错，不再全部堆在顶部', () => {
+    streamBufferManager.handle({ type: 'assistant_run_start', sessionPath: PATH, runId: 'run-1' });
+    reasoningSegment('assistant:1:reasoning:0', '先看文件');
+    streamBufferManager.handle({
+      type: 'tool_start',
+      sessionPath: PATH,
+      id: 'call-read',
+      name: 'read',
+      args: { path: '/tmp/a.md' },
+    });
+    streamBufferManager.handle({
+      type: 'tool_end',
+      sessionPath: PATH,
+      id: 'call-read',
+      name: 'read',
+      success: true,
+      status: 'succeeded',
+    });
+    reasoningSegment('assistant:1:reasoning:1', '再改代码');
+    streamBufferManager.handle({
+      type: 'assistant_segment_start',
+      sessionPath: PATH,
+      segmentId: 'assistant:1:text:0',
+      kind: 'text',
+      semanticPhase: 'final_answer',
+    });
+    streamBufferManager.handle({
+      type: 'assistant_segment_delta',
+      sessionPath: PATH,
+      segmentId: 'assistant:1:text:0',
+      delta: '完成',
+      semanticPhase: 'final_answer',
+    });
+    streamBufferManager.handle({
+      type: 'assistant_segment_end',
+      sessionPath: PATH,
+      segmentId: 'assistant:1:text:0',
+      semanticPhase: 'final_answer',
+    });
+    streamBufferManager.handle({ type: 'assistant_run_end', sessionPath: PATH, runId: 'run-1' });
+
+    const message = getAssistantMessage();
+    expect(message?.blocks?.map((block) => block.type)).toEqual([
+      'thinking',
+      'tool_group',
+      'thinking',
+      'text',
+    ]);
+  });
+});
+
 describe('streamBufferManager.ensureMessage 自愈', () => {
   beforeEach(() => {
     streamBufferManager.clearAll();

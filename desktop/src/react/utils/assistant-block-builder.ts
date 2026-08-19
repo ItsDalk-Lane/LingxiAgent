@@ -14,6 +14,8 @@ interface AssistantBlockInput {
     success?: boolean;
     error?: string;
     details?: Record<string, unknown>;
+    /** 该调用在原始 content 数组中的位置索引（历史重载时由服务器下发）。 */
+    processOrder?: number;
   }> | null;
   extraBlocks?: ContentBlock[] | null;
 }
@@ -36,6 +38,10 @@ export function buildAssistantBlocksFromContent({
 
   const pushToolGroup = (calls: NonNullable<AssistantBlockInput['toolCalls']>) => {
     if (!calls.length) return;
+    // 工具组的位置 = 组内最早一次调用的位置，用于与思考段交错回真实时间线
+    const orders = calls
+      .map((call) => call.processOrder)
+      .filter((order): order is number => order !== undefined);
     blocks.push({
       type: 'tool_group',
       tools: calls.map<ToolCall>((tc) => ({
@@ -49,6 +55,7 @@ export function buildAssistantBlocksFromContent({
         ...(tc.details ? { details: tc.details } : {}),
       })),
       collapsed: calls.length > 1,
+      ...(orders.length ? { processOrder: Math.min(...orders) } : {}),
     });
   };
 

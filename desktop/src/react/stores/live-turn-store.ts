@@ -9,6 +9,8 @@ export interface LiveAssistantSegment {
   source: string;
   deferred?: DeferredHistoryContent;
   lifecycle: 'streaming' | 'sealed';
+  /** 过程区到达序号：segment 首次出现时的全 Run 单调序号，用于与工具块交错排序。 */
+  processOrder?: number;
 }
 
 export interface LiveAssistantMessageSnapshot {

@@ -6,6 +6,9 @@ export interface PersistedAssistantSemanticSegment {
   semanticPhase: 'reasoning' | 'commentary' | 'final_answer';
   source: string;
   lifecycle: 'sealed';
+  /** 该段在原始 content 数组中的位置索引：与 toolCalls 的位置索引同坐标系，
+   *  供前端把思考段与工具块按真实时间线交错。 */
+  processOrder?: number;
 }
 
 function objectValue(value: unknown): Record<string, unknown> | null {
@@ -33,23 +36,25 @@ export function extractPersistedAssistantSemanticSegments(
   if (!Array.isArray(content)) return [];
 
   const segments: PersistedAssistantSemanticSegment[] = [];
-  const reasoning = content
-    .map(objectValue)
-    .filter((block) => block?.type === 'thinking')
-    .map((block) => typeof block?.thinking === 'string' ? block.thinking : '')
-    .join('\n');
-  if (content.some((block) => objectValue(block)?.type === 'thinking')) {
+  const objectBlocks = content.map(objectValue);
+  const firstThinkingIndex = objectBlocks.findIndex((block) => block?.type === 'thinking');
+  if (firstThinkingIndex >= 0) {
+    const reasoning = objectBlocks
+      .filter((block) => block?.type === 'thinking')
+      .map((block) => typeof block?.thinking === 'string' ? block.thinking : '')
+      .join('\n');
     segments.push({
       id: `assistant:${messageOrdinal}:reasoning:default`,
       kind: 'reasoning',
       semanticPhase: 'reasoning',
       source: reasoning,
       lifecycle: 'sealed',
+      processOrder: firstThinkingIndex,
     });
   }
 
   for (let index = 0; index < content.length; index += 1) {
-    const block = objectValue(content[index]);
+    const block = objectBlocks[index];
     if (block?.type !== 'text' || typeof block.text !== 'string' || !block.text) continue;
     segments.push({
       id: `assistant:${messageOrdinal}:text:${index}`,
@@ -57,6 +62,7 @@ export function extractPersistedAssistantSemanticSegments(
       semanticPhase: getAssistantTextPhase(block) || 'final_answer',
       source: block.text,
       lifecycle: 'sealed',
+      processOrder: index,
     });
   }
   return segments;

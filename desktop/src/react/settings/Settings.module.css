@@ -5747,19 +5747,6 @@ a.about-link:hover {
     white-space: nowrap;
 }
 
-.pv-fav-item-id {
-    font-size: var(--fs-hint);
-    color: var(--text-muted);
-    opacity: 0.6;
-    /* 收缩到内容宽度（后面的模态图标才能紧邻 id），min(42%, 18rem) 只是溢出上限 */
-    flex: 0 1 auto;
-    max-width: min(42%, 18rem);
-    min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
 .pv-fav-item-spacer {
     flex: 1 1 auto;
     min-width: 0;

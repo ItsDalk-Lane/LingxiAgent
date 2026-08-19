@@ -85,6 +85,9 @@ interface Buffer {
   /** 本 Run 内已出现 canonical assistant_segment_*：legacy text/thinking 兼容事件
    *  不得再产生 UI block（只能累积断线恢复快照）。canonicalLocked 是 Run 级，跨 Model Turn 保留。 */
   canonicalLocked: boolean;
+  /** 过程区到达序号计数器：思考段/工具组/卡片首次物化时各取一个单调递增的戳，
+   *  投影层据此把两条"车道"交错回真实时间线。 */
+  nextProcessOrder: number;
 }
 
 function createBuffer(sessionPath: string): Buffer {
@@ -116,6 +119,7 @@ function createBuffer(sessionPath: string): Buffer {
     activeRunKey: null,
     lastFinalizedRunKey: null,
     canonicalLocked: false,
+    nextProcessOrder: 0,
   };
 }
 
@@ -124,10 +128,12 @@ function renderBufferedBlocks(currentBlocks: ContentBlock[], buf: Buffer): Conte
 
   if (buf.thinkingAcc || buf.hasThinkingBlock || buf.inThinking) {
     const idx = blocks.findIndex(b => b.type === 'thinking');
+    const existing = idx >= 0 ? blocks[idx] : null;
     const thinkingBlock: ContentBlock = {
       type: 'thinking',
       content: buf.thinkingAcc,
       sealed: !buf.inThinking,
+      processOrder: existing?.processOrder ?? buf.nextProcessOrder++,
     };
     if (idx >= 0) blocks[idx] = thinkingBlock;
     else blocks.unshift(thinkingBlock);
@@ -135,10 +141,12 @@ function renderBufferedBlocks(currentBlocks: ContentBlock[], buf: Buffer): Conte
 
   if (buf.moodAcc || buf.inMood) {
     const idx = blocks.findIndex(b => b.type === 'mood');
+    const existing = idx >= 0 ? blocks[idx] : null;
     const moodBlock: ContentBlock = {
       type: 'mood',
       yuan: buf.moodYuan,
       text: buf.inMood ? buf.moodAcc : cleanMoodText(buf.moodAcc),
+      processOrder: existing?.processOrder ?? buf.nextProcessOrder++,
     };
     if (idx >= 0) blocks[idx] = moodBlock;
     else {
@@ -303,6 +311,7 @@ class StreamBufferManager {
     buf.runActive = false;
     buf.activeRunKey = null;
     buf.canonicalLocked = false;
+    buf.nextProcessOrder = 0;
     // lastFinalizedRunKey 刻意保留：跨 reset 支撑重复 assistant_run_end 的 exactly-once。
   }
 
@@ -408,6 +417,8 @@ class StreamBufferManager {
     this.ensureMessage(buf);
     if (!buf.messageId || typeof msg.segmentId !== 'string' || !msg.segmentId) return;
     const existing = buf.segmentsById.get(msg.segmentId);
+    // 首次见到该 segment 时盖到达序号；delta/end 只更新内容，不抢新戳。
+    const processOrder = existing?.processOrder ?? buf.nextProcessOrder++;
     if (msg.type === 'assistant_segment_start') {
       const semanticPhase = normalizeLiveSegmentPhase(msg.semanticPhase);
       const segment: LiveAssistantSegment = {
@@ -416,6 +427,7 @@ class StreamBufferManager {
         semanticPhase,
         source: existing?.source || '',
         lifecycle: 'streaming',
+        processOrder,
       };
       if (!existing) buf.segmentOrder.push(msg.segmentId);
       buf.segmentsById.set(msg.segmentId, segment);
@@ -427,6 +439,7 @@ class StreamBufferManager {
         semanticPhase,
         source: '',
         lifecycle: 'streaming',
+        processOrder,
       };
       if (!existing) buf.segmentOrder.push(msg.segmentId);
       buf.segmentsById.set(msg.segmentId, {
@@ -442,6 +455,7 @@ class StreamBufferManager {
         semanticPhase,
         source: '',
         lifecycle: 'streaming',
+        processOrder,
       };
       if (!existing) buf.segmentOrder.push(msg.segmentId);
       buf.segmentsById.set(msg.segmentId, {
@@ -756,11 +770,12 @@ class StreamBufferManager {
               return { ...m, blocks };
             }
           }
-          // 新建 tool_group
+          // 新建 tool_group（盖到达序号，与思考段按真实时间线交错）
           blocks.push({
             type: 'tool_group',
             tools: [toolCallFromStartEvent(msg)],
             collapsed: false,
+            processOrder: buf.nextProcessOrder++,
           });
           return { ...m, blocks };
         });
@@ -829,7 +844,7 @@ class StreamBufferManager {
         this.ensureMessage(buf);
         this.publishBoundary(buf, (m) => ({
           ...m,
-          blocks: mergeContentBlock([...(m.blocks || [])], block),
+          blocks: mergeContentBlock([...(m.blocks || [])], block, () => buf.nextProcessOrder++),
         }));
         break;
       }
@@ -976,21 +991,31 @@ class StreamBufferManager {
 /** 全局 singleton */
 export const streamBufferManager = new StreamBufferManager();
 
-function mergeContentBlock(blocks: ContentBlock[], block: ContentBlock): ContentBlock[] {
+function mergeContentBlock(
+  blocks: ContentBlock[],
+  block: ContentBlock,
+  claimProcessOrder?: () => number,
+): ContentBlock[] {
   if (isInterludeBlock(block)) return blocks;
   if (block.type === 'media_generation' && block.status === 'pending') {
     const resolved = blocks.some((existing) => isResolvedTaskBlock(existing, block.taskId));
     if (resolved) return blocks;
   }
+  // 追加新块时盖到达序号；任务块被终态替换时保留原戳，位置不漂。
+  const stamped = block.processOrder !== undefined
+    ? block
+    : { ...block, processOrder: claimProcessOrder?.() };
   const taskId = replacementTaskId(block);
-  if (!taskId) return [...blocks, block];
+  if (!taskId) return [...blocks, stamped];
   const idx = blocks.findIndex((existing) => (
     existing.type === 'media_generation' &&
     existing.taskId === taskId
   ));
-  if (idx < 0) return [...blocks, block];
+  if (idx < 0) return [...blocks, stamped];
   const next = [...blocks];
-  next[idx] = block;
+  next[idx] = blocks[idx].processOrder !== undefined
+    ? { ...stamped, processOrder: blocks[idx].processOrder }
+    : stamped;
   return next;
 }
 
