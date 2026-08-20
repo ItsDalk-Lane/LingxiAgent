@@ -7,7 +7,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = 051f6117c10846dbb244e0dd0fb86004ba0e7e66  (最终验证所针对的源码树；2026-08-20 归档修复后推进)
+VERIFIED_SOURCE_SHA   = fabd6dbf86fb5234fff319918ca164eea68548b1  (最终验证所针对的源码树；2026-08-20 v0.1.29 release 后推进)
 工作分支              = feature/upstream-sync-0.447.4
 ```
 
@@ -177,6 +177,14 @@ seal 不是一次性终点，而是"当前被验证树"的游标；每次审计�
   提交（归档标题回退 + 手动批量删除，14 files / +327-7，含 persistence fingerprint
   compatible repin）。复跑 typecheck x3（绿）+ eslint（0 error）+ 全量 npm test
   （11560 passed，唯一失败为 seal allowlist 预期红）后推进。
+- **2026-08-20 v0.1.29 release**（fabd6dbf86fb5234fff319918ca164eea68548b1）：release 元数据
+  提交（package.json/package-lock 版本 0.1.29 + releaseGeneration 7，release-digest.v1/v2
+  v0.1.29 条目，release-preflight 活体测试随版本推进；5 files / +385-119，数据-only，
+  零生产代码变化）。验证：typecheck x3（绿）+ validate-release-digest（v1/v2 均过）+
+  release-preflight --tag v0.1.29（PASS）+ 目标套件 8 文件 64 tests（release-digest-schema /
+  validate-release-digest / update-digest-history / generate-release-digest /
+  release-preflight / release-workflow-gates / post-verification-audit-seal /
+  upstream-sync-matrix 全绿）后推进。
 
 ## 最终状态：READY TO MERGE
 
@@ -184,10 +192,10 @@ seal 不是一次性终点，而是"当前被验证树"的游标；每次审计�
 - Disposition：ADOPTED 25 + ADAPTED 100 + REGENERATED 4 + INTENTIONAL_DIVERGENCE 4 = 133
   （脚本计算，`build-sync-matrix.mjs --check`：missing=0 / extra=0 / duplicate=0 / unknown=0）。
 - 4 个 `hanako.md → lingxi.md` 品牌映射统一分类为 ADAPTED。
-- `VERIFIED_SOURCE_SHA = 051f6117c10846dbb244e0dd0fb86004ba0e7e66`：被完整测试验证的代码树
+- `VERIFIED_SOURCE_SHA = fabd6dbf86fb5234fff319918ca164eea68548b1`：被完整测试验证的代码树
   （含收口树 d4cf92a8 的全部验证 + 文档清场树复跑验证 + 归档修复树 051f6117 复跑的
-  typecheck/lint/全量测试，见「Seal 推进记录」）。当前 HEAD 只比 VERIFIED_SOURCE_SHA
-  多审计收口内容。
+  typecheck/lint/全量测试 + v0.1.29 release 树 fabd6dbf 复跑的 typecheck/目标套件，
+  见「Seal 推进记录」）。当前 HEAD 只比 VERIFIED_SOURCE_SHA 多审计收口内容。
 
 ### Post-verification diff 记录（`git diff --name-only VERIFIED_SOURCE_SHA..HEAD`）
 
