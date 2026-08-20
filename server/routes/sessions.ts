@@ -2726,7 +2726,11 @@ export function createSessionsRoute(engine, hub = null) {
   route.get("/sessions/archived", async (c) => {
     try {
       const list = await engine.listArchivedSessions();
-      return c.json(list);
+      // firstMessage 截断与 /api/sessions 列表投影保持一致（100 字符）。
+      return c.json((Array.isArray(list) ? list : []).map((s: any) => ({
+        ...s,
+        firstMessage: (s?.firstMessage || "").slice(0, 100),
+      })));
     } catch (err) {
       return c.json({ error: err.message }, 500);
     }

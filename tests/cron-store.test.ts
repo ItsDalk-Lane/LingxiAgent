@@ -1092,12 +1092,69 @@ describe("CronStore _load 错误处理", () => {
     spy.mockRestore();
   });
 
-  it("JSON 损坏 + .tmp 存在 → 从 .tmp 恢复", () => {
+  it("JSON 损坏且没有有效 .tmp 时显式失败", () => {
+    const { jobsPath, runsDir } = makeTmpPaths();
+    fs.mkdirSync(path.dirname(jobsPath), { recursive: true });
+    fs.writeFileSync(jobsPath, "{ broken json !!!", "utf-8");
+
+    expect(() => new CronStore(jobsPath, runsDir)).toThrow(expect.objectContaining({
+      code: "cron_store_corrupt",
+      status: 500,
+      message: "automation task storage is corrupt",
+    }));
+    expect(fs.readFileSync(jobsPath, "utf-8")).toBe("{ broken json !!!");
+  });
+
+  it("主文件缺失但 .tmp 损坏时显式失败", () => {
+    const { jobsPath, runsDir } = makeTmpPaths();
+    fs.mkdirSync(path.dirname(jobsPath), { recursive: true });
+    fs.writeFileSync(jobsPath + ".tmp", "{ broken recovery !!!", "utf-8");
+
+    expect(() => new CronStore(jobsPath, runsDir)).toThrow(expect.objectContaining({
+      code: "cron_store_corrupt",
+      status: 500,
+    }));
+    expect(fs.existsSync(jobsPath)).toBe(false);
+    expect(fs.readFileSync(jobsPath + ".tmp", "utf-8")).toBe("{ broken recovery !!!");
+  });
+
+  it.each([
+    ["null root", "null"],
+    ["array root", "[]"],
+    ["primitive root", "42"],
+    ["non-array jobs", JSON.stringify({ jobs: {} })],
+  ])("主文件拒绝无效存储结构：%s", (_label, payload) => {
+    const { jobsPath, runsDir } = makeTmpPaths();
+    fs.mkdirSync(path.dirname(jobsPath), { recursive: true });
+    fs.writeFileSync(jobsPath, payload, "utf-8");
+
+    expect(() => new CronStore(jobsPath, runsDir)).toThrow(expect.objectContaining({
+      code: "cron_store_corrupt",
+      status: 500,
+    }));
+  });
+
+  it(".tmp 拒绝无效存储结构且不会覆盖损坏主文件", () => {
+    const { jobsPath, runsDir } = makeTmpPaths();
+    fs.mkdirSync(path.dirname(jobsPath), { recursive: true });
+    fs.writeFileSync(jobsPath, "broken primary", "utf-8");
+    fs.writeFileSync(jobsPath + ".tmp", "null", "utf-8");
+
+    expect(() => new CronStore(jobsPath, runsDir)).toThrow(expect.objectContaining({
+      code: "cron_store_corrupt",
+      status: 500,
+    }));
+    expect(fs.readFileSync(jobsPath, "utf-8")).toBe("broken primary");
+    expect(fs.readFileSync(jobsPath + ".tmp", "utf-8")).toBe("null");
+  });
+
+  it("JSON 损坏 + .tmp 存在 → 保留原始字节并从 .tmp 恢复", () => {
     const { jobsPath, runsDir } = makeTmpPaths();
     fs.mkdirSync(path.dirname(jobsPath), { recursive: true });
 
     // 写损坏的主文件
-    fs.writeFileSync(jobsPath, "{ broken json !!!", "utf-8");
+    const brokenBytes = Buffer.from([0x7b, 0x20, 0x62, 0x72, 0x6f, 0x6b, 0x65, 0x6e, 0xff]);
+    fs.writeFileSync(jobsPath, brokenBytes);
 
     // 写有效的 .tmp 文件
     const tmpData = {
@@ -1112,9 +1169,108 @@ describe("CronStore _load 错误处理", () => {
     const store = new CronStore(jobsPath, runsDir);
     expect(store.size).toBe(1);
     expect(store.getJob("job_1").prompt).toBe("recovered");
+    expect(JSON.parse(fs.readFileSync(jobsPath, "utf-8")).jobs[0].prompt).toBe("recovered");
+    expect(fs.existsSync(jobsPath + ".tmp")).toBe(false);
+    const backups = fs.readdirSync(path.dirname(jobsPath))
+      .filter(name => name.startsWith("cron-jobs.json.corrupt-") && name.endsWith(".bak"));
+    expect(backups).toHaveLength(1);
+    expect(fs.readFileSync(path.join(path.dirname(jobsPath), backups[0]))).toEqual(brokenBytes);
     // 应该有恢复日志
     expect(spy).toHaveBeenCalledWith(expect.stringContaining("从 .tmp 恢复"));
     spy.mockRestore();
+  });
+
+  it("重复恢复使用唯一 backup，不覆盖已有副本", () => {
+    const { jobsPath, runsDir } = makeTmpPaths();
+    fs.mkdirSync(path.dirname(jobsPath), { recursive: true });
+    fs.writeFileSync(jobsPath, "first broken payload", "utf-8");
+    fs.writeFileSync(jobsPath + ".tmp", JSON.stringify({ jobs: [], nextNum: 1 }), "utf-8");
+    new CronStore(jobsPath, runsDir);
+
+    fs.writeFileSync(jobsPath, "second broken payload", "utf-8");
+    fs.writeFileSync(jobsPath + ".tmp", JSON.stringify({ jobs: [], nextNum: 1 }), "utf-8");
+    new CronStore(jobsPath, runsDir);
+
+    const backups = fs.readdirSync(path.dirname(jobsPath))
+      .filter(name => name.startsWith("cron-jobs.json.corrupt-") && name.endsWith(".bak"));
+    expect(backups).toHaveLength(2);
+    expect(backups.map(name => fs.readFileSync(path.join(path.dirname(jobsPath), name), "utf-8")).sort())
+      .toEqual(["first broken payload", "second broken payload"]);
+  });
+
+  it("backup 写入失败时显式失败且不覆盖主文件或 .tmp", () => {
+    const { jobsPath, runsDir } = makeTmpPaths();
+    fs.mkdirSync(path.dirname(jobsPath), { recursive: true });
+    fs.writeFileSync(jobsPath, "broken primary", "utf-8");
+    const recoveryPayload = JSON.stringify({ jobs: [], nextNum: 1 });
+    fs.writeFileSync(jobsPath + ".tmp", recoveryPayload, "utf-8");
+    const originalWriteFileSync = fs.writeFileSync.bind(fs);
+    const writeSpy = vi.spyOn(fs, "writeFileSync").mockImplementation((file, data, options) => {
+      if (String(file).includes(".corrupt-")) {
+        throw Object.assign(new Error("backup denied"), { code: "EACCES" });
+      }
+      return originalWriteFileSync(file, data, options as never);
+    });
+
+    try {
+      expect(() => new CronStore(jobsPath, runsDir)).toThrow(expect.objectContaining({
+        code: "cron_store_recovery_failed",
+        status: 500,
+      }));
+    } finally {
+      writeSpy.mockRestore();
+    }
+    expect(fs.readFileSync(jobsPath, "utf-8")).toBe("broken primary");
+    expect(fs.readFileSync(jobsPath + ".tmp", "utf-8")).toBe(recoveryPayload);
+  });
+
+  it("恢复 rename 失败时显式失败并保留主文件、.tmp 与 backup", () => {
+    const { jobsPath, runsDir } = makeTmpPaths();
+    fs.mkdirSync(path.dirname(jobsPath), { recursive: true });
+    fs.writeFileSync(jobsPath, "broken primary", "utf-8");
+    const recoveryPayload = JSON.stringify({ jobs: [], nextNum: 1 });
+    fs.writeFileSync(jobsPath + ".tmp", recoveryPayload, "utf-8");
+    const originalRenameSync = fs.renameSync.bind(fs);
+    const renameSpy = vi.spyOn(fs, "renameSync").mockImplementation((source, destination) => {
+      if (source === jobsPath + ".tmp" && destination === jobsPath) {
+        throw Object.assign(new Error("rename denied"), { code: "EACCES" });
+      }
+      return originalRenameSync(source, destination);
+    });
+
+    try {
+      expect(() => new CronStore(jobsPath, runsDir)).toThrow(expect.objectContaining({
+        code: "cron_store_recovery_failed",
+        status: 500,
+      }));
+    } finally {
+      renameSpy.mockRestore();
+    }
+    expect(fs.readFileSync(jobsPath, "utf-8")).toBe("broken primary");
+    expect(fs.readFileSync(jobsPath + ".tmp", "utf-8")).toBe(recoveryPayload);
+    const backups = fs.readdirSync(path.dirname(jobsPath))
+      .filter(name => name.startsWith("cron-jobs.json.corrupt-") && name.endsWith(".bak"));
+    expect(backups).toHaveLength(1);
+    expect(fs.readFileSync(path.join(path.dirname(jobsPath), backups[0]), "utf-8"))
+      .toBe("broken primary");
+  });
+
+  it("主文件缺失但 .tmp 有效时恢复并持久化主文件", () => {
+    const { jobsPath, runsDir } = makeTmpPaths();
+    fs.mkdirSync(path.dirname(jobsPath), { recursive: true });
+    fs.writeFileSync(jobsPath + ".tmp", JSON.stringify({
+      jobs: [
+        { id: "job_1", type: "cron", schedule: "0 9 * * *", prompt: "recovered", enabled: true, model: "", consecutiveErrors: 0 },
+      ],
+      nextNum: 2,
+    }), "utf-8");
+
+    const store = new CronStore(jobsPath, runsDir);
+
+    expect(store.getJob("job_1").prompt).toBe("recovered");
+    expect(JSON.parse(fs.readFileSync(jobsPath, "utf-8")).jobs[0].prompt).toBe("recovered");
+    expect(fs.existsSync(jobsPath + ".tmp")).toBe(false);
+    expect(fs.readdirSync(path.dirname(jobsPath)).filter(name => name.includes(".corrupt-"))).toEqual([]);
   });
 
   it("every schedule < 60000 自动 clamp", () => {

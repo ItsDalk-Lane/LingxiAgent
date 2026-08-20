@@ -71,7 +71,7 @@ export function lookupModelMeta(modelId: string, provider?: string): any {
 }
 
 /**
- * 刷新 settingsConfig 快照，保留 _identity / _ishiki / _publicIshiki / _userProfile / _experience。
+ * 刷新 settingsConfig 快照，保留 _identity / _agents / _publicAgents / _userProfile / _experience。
  * 调用方：per-agent 保存成功后同步刷新，避免下次读到 stale 快照。
  */
 export async function refreshSettingsConfigSnapshot(): Promise<void> {
@@ -82,7 +82,7 @@ export async function refreshSettingsConfigSnapshot(): Promise<void> {
   // 刷新期间 settings owner 可能已切换，晚到的响应不覆盖新 owner 的快照
   if (useSettingsStore.getState().getSettingsAgentId() !== ownerId) return;
   const prev = useSettingsStore.getState().settingsConfig || {};
-  for (const k of ['_identity', '_ishiki', '_publicIshiki', '_userProfile', '_experience']) {
+  for (const k of ['_identity', '_agents', '_publicAgents', '_userProfile', '_experience']) {
     if (k in prev && !(k in newConfig)) newConfig[k] = (prev as any)[k];
   }
   useSettingsStore.setState({ settingsConfig: newConfig });

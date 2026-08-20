@@ -1,0 +1,2574 @@
+{
+  "coordinates": {
+    "U0": "cc19cb49b0786d61ed723764e0a83baf87887270",
+    "U1": "c6d0405294be67cb134c2758f6472748ee73e2be",
+    "L0": "97595264ead8735a04559507ddaade25db8a4e15",
+    "L1": "ca0b417e36a6a1f80947458aaed328a25718e41b",
+    "VERIFIED_SOURCE_SHA": "051f6117c10846dbb244e0dd0fb86004ba0e7e66"
+  },
+  "summary": {
+    "total": 133,
+    "ADOPTED": 25,
+    "ADAPTED": 100,
+    "REGENERATED": 4,
+    "INTENTIONAL_DIVERGENCE": 4
+  },
+  "records": [
+    {
+      "upstream_path": "build/cli-runtime-closure.json",
+      "renamed_from": null,
+      "upstream_change": "M",
+      "upstream_commits": [
+        "9dd70cd5",
+        "408b7a18",
+        "f29d15f2",
+        "def3e661",
+        "bed24b93",
+        "d96b5d67"
+      ],
+      "upstream_clusters": [
+        "dream",
+        "build-receipts",
+        "agents-md-persona"
+      ],
+      "lingxi_overlap": "生成物",
+      "conflict_class": "D",
+      "disposition": "REGENERATED",
+      "lingxi_implementation": "Lingxi 生成器（scripts/compute-cli-closure.mjs）在最终源码树重新生成，禁止从 upstream 复制",
+      "test_evidence": "二次生成 git diff 为零（deterministic 验证）+ npm run build 链路",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "build/installer.nsh",
+      "renamed_from": null,
+      "upstream_change": "M",
+      "upstream_commits": [
+        "ecc2c055"
+      ],
+      "upstream_clusters": [
+        "windows-seed-cleanup"
+      ],
+      "lingxi_overlap": "L0 后有改",
+      "conflict_class": "B",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "overlay 更新时 RMDir /r \"$INSTDIR\\resources\\seed\"；严格限于安装目录应用自有 seed，禁触 LINGXI_HOME/用户数据",
+      "test_evidence": "tests/windows-installer-contract.test.ts（19 用例）",
+      "notes": "真实 Windows 安装器执行未进行（宿主平台限制），contract 测试为门禁",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "build/persistence-schema-fingerprint.json",
+      "renamed_from": null,
+      "upstream_change": "M",
+      "upstream_commits": [
+        "9dd70cd5",
+        "61a2a6bf",
+        "bed24b93"
+      ],
+      "upstream_clusters": [
+        "dream",
+        "automation-recovery",
+        "agents-md-persona"
+      ],
+      "lingxi_overlap": "生成物",
+      "conflict_class": "D",
+      "disposition": "REGENERATED",
+      "lingxi_implementation": "Lingxi 生成器重新生成；compatible 增补 + compatibility-reason，DATA_EPOCH 不变",
+      "test_evidence": "persistence fingerprint 定向校验 + 二次生成零漂移",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "build/persistence-store-inventory.json",
+      "renamed_from": null,
+      "upstream_change": "M",
+      "upstream_commits": [
+        "9dd70cd5",
+        "408b7a18",
+        "61a2a6bf",
+        "bed24b93"
+      ],
+      "upstream_clusters": [
+        "dream",
+        "automation-recovery",
+        "agents-md-persona"
+      ],
+      "lingxi_overlap": "生成物",
+      "conflict_class": "D",
+      "disposition": "REGENERATED",
+      "lingxi_implementation": "Lingxi 生成器重新生成",
+      "test_evidence": "persistence store inventory 定向校验 + 二次生成零漂移",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "core/agent-manager.ts",
+      "renamed_from": null,
+      "upstream_change": "M",
+      "upstream_commits": [
+        "bed24b93"
+      ],
+      "upstream_clusters": [
+        "agents-md-persona"
+      ],
+      "lingxi_overlap": "无",
+      "conflict_class": "A",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "默认人格文件创建改 AGENTS 命名；本轮 setCallbacks 接线 getFailedPersonaRename",
+      "test_evidence": "tests/agent-manager-create-defaults.test.ts（26 用例）+ migration smoke",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "core/agent.ts",
+      "renamed_from": null,
+      "upstream_change": "M",
+      "upstream_commits": [
+        "9dd70cd5",
+        "bed24b93"
+      ],
+      "upstream_clusters": [
+        "dream",
+        "agents-md-persona"
+      ],
+      "lingxi_overlap": "双方均改（dream 模型槽 + persona）",
+      "conflict_class": "C",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "人格路径 + workspace excludeFiles + getResolvedMemoryModel 闭包；本轮 readAgentsMdSource/_readPublicAgentsMd 消费 migration-degraded fallback",
+      "test_evidence": "tests/agents-md-startup-migration.test.ts（Agent 真实链路断言）+ tests/memory-dream-memory-slot.test.ts + agent 系列定向测试",
+      "notes": "上游 dream 与 persona 两集群均触及",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "core/agents-md-migration.ts",
+      "renamed_from": null,
+      "upstream_change": "A",
+      "upstream_commits": [
+        "bed24b93"
+      ],
+      "upstream_clusters": [
+        "agents-md-persona"
+      ],
+      "lingxi_overlap": "无",
+      "conflict_class": "A",
+      "disposition": "ADOPTED",
+      "lingxi_implementation": "同名移植 + 品牌检查；本轮扩展 failedDetails 结构化失败记录 + buildFailedPersonaRenameIndex（migration-degraded 运行时状态）",
+      "test_evidence": "tests/agents-md-startup-migration.test.ts（11 用例，含 5 个 degraded fallback 用例）+ migration smoke 23/23",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "core/bridge-session-manager.ts",
+      "renamed_from": null,
+      "upstream_change": "M",
+      "upstream_commits": [
+        "bed24b93"
+      ],
+      "upstream_clusters": [
+        "agents-md-persona"
+      ],
+      "lingxi_overlap": "L0 后有改",
+      "conflict_class": "B",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "结构化合并（workspace excludeFiles 接线之一）",
+      "test_evidence": "tests/bridge-session-orphan-repair.test.ts + tests/bridge-session-teardown.test.ts + tests/workspace-instruction-files-exclude.test.ts（bridge 路径用例）",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "core/engine.ts",
+      "renamed_from": null,
+      "upstream_change": "M",
+      "upstream_commits": [
+        "bed24b93"
+      ],
+      "upstream_clusters": [
+        "agents-md-persona"
+      ],
+      "lingxi_overlap": "L0 后有改",
+      "conflict_class": "B",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "结构化合并 + 启动步 agents-md-rename；本轮把失败结果保留为 _failedPersonaRenames 运行时状态并暴露 getFailedPersonaRename",
+      "test_evidence": "tests/agents-md-startup-migration.test.ts + migration smoke 23/23 + 全量套件 engine 启动链路",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "core/first-run.ts",
+      "renamed_from": null,
+      "upstream_change": "M",
+      "upstream_commits": [
+        "bed24b93"
+      ],
+      "upstream_clusters": [
+        "agents-md-persona"
+      ],
+      "lingxi_overlap": "无",
+      "conflict_class": "A",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "种子人格文件名改 AGENTS 命名",
+      "test_evidence": "tests/first-run-default-workspace.test.ts + migration smoke（首跑清洁断言）",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "core/llm-utils.ts",
+      "renamed_from": null,
+      "upstream_change": "M",
+      "upstream_commits": [
+        "bed24b93"
+      ],
+      "upstream_clusters": [
+        "agents-md-persona"
+      ],
+      "lingxi_overlap": "无",
+      "conflict_class": "A",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "合并命名更新",
+      "test_evidence": "全量套件内 llm-utils 消费链路（agent/system prompt 组装测试）",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "core/persona-source.ts",
+      "renamed_from": null,
+      "upstream_change": "M",
+      "upstream_commits": [
+        "bed24b93"
+      ],
+      "upstream_clusters": [
+        "agents-md-persona"
+      ],
+      "lingxi_overlap": "无",
+      "conflict_class": "A",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "PersonaKind identity|agents + agentPersonaFilePaths()；本轮新增显式 migrationFallback 参数（仅启动失败记录可构造）",
+      "test_evidence": "tests/persona-source.test.ts（15 用例）+ tests/agents-md-startup-migration.test.ts",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "core/session-coordinator.ts",
+      "renamed_from": null,
+      "upstream_change": "M",
+      "upstream_commits": [
+        "bed24b93"
+      ],
+      "upstream_clusters": [
+        "agents-md-persona"
+      ],
+      "lingxi_overlap": "L0 后有改",
+      "conflict_class": "B",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "结构化合并（workspace excludeFiles 接线之一）",
+      "test_evidence": "tests/workspace-instruction-files-exclude.test.ts（desktop session 路径用例）+ tests/session-tool-gating.test.ts",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "core/workspace-instruction-files.ts",
+      "renamed_from": null,
+      "upstream_change": "M",
+      "upstream_commits": [
+        "bed24b93"
+      ],
+      "upstream_clusters": [
+        "agents-md-persona"
+      ],
+      "lingxi_overlap": "无",
+      "conflict_class": "A",
+      "disposition": "ADOPTED",
+      "lingxi_implementation": "新增 excludeFiles（精确绝对路径排除，杜绝人格文件重复注入）",
+      "test_evidence": "tests/workspace-instruction-files-exclude.test.ts（4 用例）",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "desktop/src/locales/en.json",
+      "renamed_from": null,
+      "upstream_change": "M",
+      "upstream_commits": [
+        "9dd70cd5",
+        "d356e6ce",
+        "408b7a18",
+        "06e17341",
+        "bed24b93"
+      ],
+      "upstream_clusters": [
+        "dream",
+        "context-ring",
+        "agents-md-persona"
+      ],
+      "lingxi_overlap": "L0 后有改",
+      "conflict_class": "B",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "key-level merge（同 zh）；本轮追加 dream revisions diff 5 key",
+      "test_evidence": "tests/i18n-locale-parity.test.ts + tests/react-locale-coverage.test.ts",
+      "notes": "禁止整文件覆盖",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "desktop/src/locales/ja.json",
+      "renamed_from": null,
+      "upstream_change": "M",
+      "upstream_commits": [
+        "9dd70cd5",
+        "d356e6ce",
+        "408b7a18",
+        "06e17341",
+        "bed24b93"
+      ],
+      "upstream_clusters": [
+        "dream",
+        "context-ring",
+        "agents-md-persona"
+      ],
+      "lingxi_overlap": "L0 后有改",
+      "conflict_class": "B",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "key-level merge（同 zh）；本轮追加 dream revisions diff 5 key",
+      "test_evidence": "tests/i18n-locale-parity.test.ts + tests/react-locale-coverage.test.ts + scripts/i18n-backfill-ja.json",
+      "notes": "禁止整文件覆盖",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "desktop/src/locales/ko.json",
+      "renamed_from": null,
+      "upstream_change": "M",
+      "upstream_commits": [
+        "9dd70cd5",
+        "d356e6ce",
+        "408b7a18",
+        "06e17341",
+        "bed24b93"
+      ],
+      "upstream_clusters": [
+        "dream",
+        "context-ring",
+        "agents-md-persona"
+      ],
+      "lingxi_overlap": "L0 后有改",
+      "conflict_class": "B",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "key-level merge（同 zh）；本轮追加 dream revisions diff 5 key",
+      "test_evidence": "tests/i18n-locale-parity.test.ts + tests/react-locale-coverage.test.ts + scripts/i18n-backfill-ko.json",
+      "notes": "禁止整文件覆盖",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "desktop/src/locales/zh-TW.json",
+      "renamed_from": null,
+      "upstream_change": "M",
+      "upstream_commits": [
+        "9dd70cd5",
+        "d356e6ce",
+        "408b7a18",
+        "06e17341",
+        "bed24b93"
+      ],
+      "upstream_clusters": [
+        "dream",
+        "context-ring",
+        "agents-md-persona"
+      ],
+      "lingxi_overlap": "L0 后有改",
+      "conflict_class": "B",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "key-level merge（同 zh）；本轮追加 dream revisions diff 5 key",
+      "test_evidence": "tests/i18n-locale-parity.test.ts + tests/react-locale-coverage.test.ts",
+      "notes": "禁止整文件覆盖",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "desktop/src/locales/zh.json",
+      "renamed_from": null,
+      "upstream_change": "M",
+      "upstream_commits": [
+        "9dd70cd5",
+        "d356e6ce",
+        "408b7a18",
+        "06e17341",
+        "bed24b93"
+      ],
+      "upstream_clusters": [
+        "dream",
+        "context-ring",
+        "agents-md-persona"
+      ],
+      "lingxi_overlap": "L0 后有改",
+      "conflict_class": "B",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "key-level merge：删 ishiki* 增 agentsMd*/dream 树/error.code.dream*；本轮追加 dream revisions diff 5 key",
+      "test_evidence": "tests/i18n-locale-parity.test.ts + tests/react-locale-coverage.test.ts",
+      "notes": "禁止整文件覆盖",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "desktop/src/react/__tests__/components/AssistantMessage.automation-suggestion.test.tsx",
+      "renamed_from": null,
+      "upstream_change": "M",
+      "upstream_commits": [
+        "a14a13bc"
+      ],
+      "upstream_clusters": [
+        "automation-recovery"
+      ],
+      "lingxi_overlap": "无",
+      "conflict_class": "A",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "对齐 ContentBlock 架构后重写",
+      "test_evidence": "本文件自身全绿",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "desktop/src/react/__tests__/components/AutomationPanel.test.tsx",
+      "renamed_from": null,
+      "upstream_change": "A",
+      "upstream_commits": [
+        "a14a13bc"
+      ],
+      "upstream_clusters": [
+        "automation-recovery"
+      ],
+      "lingxi_overlap": "无",
+      "conflict_class": "A",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "移植",
+      "test_evidence": "本文件自身全绿",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "desktop/src/react/__tests__/components/context-ring.test.tsx",
+      "renamed_from": null,
+      "upstream_change": "M",
+      "upstream_commits": [
+        "d356e6ce"
+      ],
+      "upstream_clusters": [
+        "context-ring"
+      ],
+      "lingxi_overlap": "无",
+      "conflict_class": "A",
+      "disposition": "ADOPTED",
+      "lingxi_implementation": "移植",
+      "test_evidence": "本文件自身全绿",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "desktop/src/react/__tests__/editor/md-decorations.test.ts",
+      "renamed_from": null,
+      "upstream_change": "M",
+      "upstream_commits": [
+        "2870af8e"
+      ],
+      "upstream_clusters": [
+        "markdown-bare-url"
+      ],
+      "lingxi_overlap": "无",
+      "conflict_class": "A",
+      "disposition": "ADOPTED",
+      "lingxi_implementation": "移植",
+      "test_evidence": "本文件自身全绿",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "desktop/src/react/__tests__/settings/AgentMemory.test.tsx",
+      "renamed_from": null,
+      "upstream_change": "M",
+      "upstream_commits": [
+        "9dd70cd5",
+        "06e17341"
+      ],
+      "upstream_clusters": [
+        "dream"
+      ],
+      "lingxi_overlap": "无",
+      "conflict_class": "A",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "合并断言",
+      "test_evidence": "本文件自身全绿（5 用例）",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "desktop/src/react/__tests__/settings/AgentTab.test.tsx",
+      "renamed_from": null,
+      "upstream_change": "M",
+      "upstream_commits": [
+        "bed24b93"
+      ],
+      "upstream_clusters": [
+        "agents-md-persona"
+      ],
+      "lingxi_overlap": "3 个 desktop 测试 overlap 之一",
+      "conflict_class": "B",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "合并",
+      "test_evidence": "本文件自身全绿",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "desktop/src/react/__tests__/settings/BridgeTab.credentials.test.tsx",
+      "renamed_from": null,
+      "upstream_change": "M",
+      "upstream_commits": [
+        "bed24b93"
+      ],
+      "upstream_clusters": [
+        "agents-md-persona"
+      ],
+      "lingxi_overlap": "3 个 desktop 测试 overlap 之一",
+      "conflict_class": "B",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "合并",
+      "test_evidence": "本文件自身全绿",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "desktop/src/react/__tests__/settings/BridgeTab.permission-mode.test.tsx",
+      "renamed_from": null,
+      "upstream_change": "M",
+      "upstream_commits": [
+        "bed24b93"
+      ],
+      "upstream_clusters": [
+        "agents-md-persona"
+      ],
+      "lingxi_overlap": "3 个 desktop 测试 overlap 之一",
+      "conflict_class": "B",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "合并",
+      "test_evidence": "本文件自身全绿",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "desktop/src/react/__tests__/settings/actions.test.ts",
+      "renamed_from": null,
+      "upstream_change": "M",
+      "upstream_commits": [
+        "bed24b93"
+      ],
+      "upstream_clusters": [
+        "agents-md-persona"
+      ],
+      "lingxi_overlap": "无",
+      "conflict_class": "A",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "合并",
+      "test_evidence": "本文件自身全绿",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "desktop/src/react/__tests__/settings/helpers.test.ts",
+      "renamed_from": null,
+      "upstream_change": "M",
+      "upstream_commits": [
+        "bed24b93"
+      ],
+      "upstream_clusters": [
+        "agents-md-persona"
+      ],
+      "lingxi_overlap": "无",
+      "conflict_class": "A",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "合并",
+      "test_evidence": "本文件自身全绿",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "desktop/src/react/__tests__/settings/useBridgeState.snapshot.test.tsx",
+      "renamed_from": null,
+      "upstream_change": "M",
+      "upstream_commits": [
+        "bed24b93"
+      ],
+      "upstream_clusters": [
+        "agents-md-persona"
+      ],
+      "lingxi_overlap": "无",
+      "conflict_class": "A",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "合并",
+      "test_evidence": "本文件自身全绿",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "desktop/src/react/__tests__/shared/error-user-messages.test.ts",
+      "renamed_from": null,
+      "upstream_change": "M",
+      "upstream_commits": [
+        "06e17341"
+      ],
+      "upstream_clusters": [
+        "dream"
+      ],
+      "lingxi_overlap": "无",
+      "conflict_class": "A",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "合并断言",
+      "test_evidence": "本文件自身全绿（26 用例）",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "desktop/src/react/components/AutomationPanel.tsx",
+      "renamed_from": null,
+      "upstream_change": "M",
+      "upstream_commits": [
+        "a14a13bc"
+      ],
+      "upstream_clusters": [
+        "automation-recovery"
+      ],
+      "lingxi_overlap": "无",
+      "conflict_class": "A",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "reload 失败保留上一次 jobs + badge；Add 防重复（addingManualJob 锁）",
+      "test_evidence": "desktop/src/react/__tests__/components/AutomationPanel.test.tsx",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "desktop/src/react/components/chat/AssistantMessage.tsx",
+      "renamed_from": null,
+      "upstream_change": "M",
+      "upstream_commits": [
+        "a14a13bc"
+      ],
+      "upstream_clusters": [
+        "automation-recovery"
+      ],
+      "lingxi_overlap": "L0 后已重构（聊天语义管线）",
+      "conflict_class": "C",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "automation suggestion 失败 UI 经 Lingxi ContentBlock/renderer registry 架构表达，未套 upstream 旧 JSX patch",
+      "test_evidence": "desktop/src/react/__tests__/components/AssistantMessage.automation-suggestion.test.tsx",
+      "notes": "禁止回退聊天架构",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "desktop/src/react/components/input/ContextRing.tsx",
+      "renamed_from": null,
+      "upstream_change": "M",
+      "upstream_commits": [
+        "d356e6ce"
+      ],
+      "upstream_clusters": [
+        "context-ring"
+      ],
+      "lingxi_overlap": "无",
+      "conflict_class": "A",
+      "disposition": "ADOPTED",
+      "lingxi_implementation": "移植：压缩动作优先级排序",
+      "test_evidence": "desktop/src/react/__tests__/components/context-ring.test.tsx",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "desktop/src/react/editor/md-decorations.ts",
+      "renamed_from": null,
+      "upstream_change": "M",
+      "upstream_commits": [
+        "2870af8e"
+      ],
+      "upstream_clusters": [
+        "markdown-bare-url"
+      ],
+      "lingxi_overlap": "无",
+      "conflict_class": "A",
+      "disposition": "ADOPTED",
+      "lingxi_implementation": "移植 patch：裸 URL 不再被装饰/破坏",
+      "test_evidence": "desktop/src/react/__tests__/editor/md-decorations.test.ts",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "desktop/src/react/settings/Settings.module.css",
+      "renamed_from": null,
+      "upstream_change": "M",
+      "upstream_commits": [
+        "9dd70cd5",
+        "bed24b93"
+      ],
+      "upstream_clusters": [
+        "dream",
+        "agents-md-persona"
+      ],
+      "lingxi_overlap": "L0 后有改",
+      "conflict_class": "B",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "追加 dream 样式段（不整文件覆盖）",
+      "test_evidence": "desktop/src/react/settings/__tests__/SettingsContent.test.tsx + DreamRevisionBrowser/AgentMemory 组件测试",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "desktop/src/react/settings/__tests__/SettingsContent.test.tsx",
+      "renamed_from": null,
+      "upstream_change": "M",
+      "upstream_commits": [
+        "bed24b93"
+      ],
+      "upstream_clusters": [
+        "agents-md-persona"
+      ],
+      "lingxi_overlap": "无",
+      "conflict_class": "A",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "合并",
+      "test_evidence": "本文件自身全绿",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "desktop/src/react/settings/actions.ts",
+      "renamed_from": null,
+      "upstream_change": "M",
+      "upstream_commits": [
+        "bed24b93"
+      ],
+      "upstream_clusters": [
+        "agents-md-persona"
+      ],
+      "lingxi_overlap": "部分 overlap",
+      "conflict_class": "B",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "ishiki→agents 文案/API 逐文件合并",
+      "test_evidence": "desktop/src/react/__tests__/settings/actions.test.ts",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "desktop/src/react/settings/helpers.ts",
+      "renamed_from": null,
+      "upstream_change": "M",
+      "upstream_commits": [
+        "bed24b93"
+      ],
+      "upstream_clusters": [
+        "agents-md-persona"
+      ],
+      "lingxi_overlap": "部分 overlap",
+      "conflict_class": "B",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "ishiki→agents 文案/API 逐文件合并",
+      "test_evidence": "desktop/src/react/__tests__/settings/helpers.test.ts",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "desktop/src/react/settings/overlays/CharacterCardPreviewOverlay.tsx",
+      "renamed_from": null,
+      "upstream_change": "M",
+      "upstream_commits": [
+        "bed24b93"
+      ],
+      "upstream_clusters": [
+        "agents-md-persona"
+      ],
+      "lingxi_overlap": "部分 overlap",
+      "conflict_class": "B",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "ishiki→agents 文案/API 逐文件合并",
+      "test_evidence": "desktop/src/react/settings/__tests__/SettingsContent.test.tsx",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "desktop/src/react/settings/settings-search-index.ts",
+      "renamed_from": null,
+      "upstream_change": "M",
+      "upstream_commits": [
+        "bed24b93"
+      ],
+      "upstream_clusters": [
+        "agents-md-persona"
+      ],
+      "lingxi_overlap": "L0 后有改",
+      "conflict_class": "B",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "追加 dream 搜索项",
+      "test_evidence": "desktop/src/react/settings/__tests__/SettingsContent.test.tsx（搜索索引消费侧）",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "desktop/src/react/settings/store.ts",
+      "renamed_from": null,
+      "upstream_change": "M",
+      "upstream_commits": [
+        "bed24b93"
+      ],
+      "upstream_clusters": [
+        "agents-md-persona"
+      ],
+      "lingxi_overlap": "部分 overlap",
+      "conflict_class": "B",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "ishiki→agents 文案/API 逐文件合并",
+      "test_evidence": "desktop/src/react/__tests__/settings/actions.test.ts + helpers.test.ts + useBridgeState.snapshot.test.tsx",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "desktop/src/react/settings/tabs/AgentTab.tsx",
+      "renamed_from": null,
+      "upstream_change": "M",
+      "upstream_commits": [
+        "9dd70cd5",
+        "bed24b93"
+      ],
+      "upstream_clusters": [
+        "dream",
+        "agents-md-persona"
+      ],
+      "lingxi_overlap": "L0 后有改",
+      "conflict_class": "C",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "按当前结构合并 persona 文案 + dream 入口",
+      "test_evidence": "desktop/src/react/__tests__/settings/AgentTab.test.tsx",
+      "notes": "dream 与 agents-md-persona 两集群均触及",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "desktop/src/react/settings/tabs/BridgeTab.tsx",
+      "renamed_from": null,
+      "upstream_change": "M",
+      "upstream_commits": [
+        "bed24b93"
+      ],
+      "upstream_clusters": [
+        "agents-md-persona"
+      ],
+      "lingxi_overlap": "部分 overlap",
+      "conflict_class": "B",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "ishiki→agents 文案/API 逐文件合并",
+      "test_evidence": "desktop/src/react/__tests__/settings/BridgeTab.credentials.test.tsx + BridgeTab.permission-mode.test.tsx",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "desktop/src/react/settings/tabs/agent/AgentMemory.tsx",
+      "renamed_from": null,
+      "upstream_change": "M",
+      "upstream_commits": [
+        "9dd70cd5"
+      ],
+      "upstream_clusters": [
+        "dream"
+      ],
+      "lingxi_overlap": "无",
+      "conflict_class": "A",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "Dream 区嵌入合并进当前组件",
+      "test_evidence": "desktop/src/react/__tests__/settings/AgentMemory.test.tsx（5 用例）",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "desktop/src/react/settings/tabs/agent/AgentMemoryDream.tsx",
+      "renamed_from": null,
+      "upstream_change": "A",
+      "upstream_commits": [
+        "9dd70cd5",
+        "408b7a18",
+        "06e17341"
+      ],
+      "upstream_clusters": [
+        "dream"
+      ],
+      "lingxi_overlap": "无",
+      "conflict_class": "A",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "移植并对齐 Lingxi settings API client（saveDreamAutoEnabled 走 /api/agents/:id/config）",
+      "test_evidence": "desktop/src/react/__tests__/settings/AgentMemory.test.tsx（5 用例）",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "desktop/src/react/settings/tabs/agent/DreamRevisionBrowser.module.css",
+      "renamed_from": null,
+      "upstream_change": "A",
+      "upstream_commits": [
+        "408b7a18"
+      ],
+      "upstream_clusters": [
+        "dream"
+      ],
+      "lingxi_overlap": "无",
+      "conflict_class": "A",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "移植 + 本轮追加 diff 行样式（lineAdded/lineRemoved/lineSame，沿用 FileHistoryModal 色板约定）",
+      "test_evidence": "DreamRevisionBrowser.test.tsx（diff 标记渲染断言）",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "desktop/src/react/settings/tabs/agent/DreamRevisionBrowser.tsx",
+      "renamed_from": null,
+      "upstream_change": "A",
+      "upstream_commits": [
+        "408b7a18",
+        "06e17341"
+      ],
+      "upstream_clusters": [
+        "dream"
+      ],
+      "lingxi_overlap": "无",
+      "conflict_class": "A",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "移植；本轮升级为 current-vs-revision 统一 diff（复用 desktop/src/react/utils/line-diff.ts），确认前现取 current，相同版本禁用恢复",
+      "test_evidence": "desktop/src/react/settings/tabs/agent/__tests__/DreamRevisionBrowser.test.tsx（6 用例，含 A–F diff/确认/刷新契约）",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "desktop/src/react/settings/tabs/agent/__tests__/DreamRevisionBrowser.test.tsx",
+      "renamed_from": null,
+      "upstream_change": "A",
+      "upstream_commits": [
+        "408b7a18",
+        "06e17341"
+      ],
+      "upstream_clusters": [
+        "dream"
+      ],
+      "lingxi_overlap": "无",
+      "conflict_class": "A",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "移植；本轮重写为 current-vs-revision diff 契约（任务书 A–F 用例）",
+      "test_evidence": "本文件自身全绿（6 用例）",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "desktop/src/react/settings/tabs/agent/agent-memory-dream-actions.ts",
+      "renamed_from": null,
+      "upstream_change": "A",
+      "upstream_commits": [
+        "9dd70cd5",
+        "408b7a18",
+        "06e17341"
+      ],
+      "upstream_clusters": [
+        "dream"
+      ],
+      "lingxi_overlap": "无",
+      "conflict_class": "A",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "移植；本轮 loadDreamRevision 改返回 { revision, current } 并新增 dreamSectionsEqual",
+      "test_evidence": "DreamRevisionBrowser.test.tsx（经 importOriginal 保留纯函数真实实现）",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "desktop/src/react/settings/tabs/agent/dream-error-presenter.ts",
+      "renamed_from": null,
+      "upstream_change": "A",
+      "upstream_commits": [
+        "06e17341"
+      ],
+      "upstream_clusters": [
+        "dream"
+      ],
+      "lingxi_overlap": "无",
+      "conflict_class": "A",
+      "disposition": "ADOPTED",
+      "lingxi_implementation": "同名移植：dream_* 错误码 → i18n",
+      "test_evidence": "DreamRevisionBrowser.test.tsx（本地化恢复错误用例）",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "desktop/src/react/settings/tabs/bridge/useBridgeState.ts",
+      "renamed_from": null,
+      "upstream_change": "M",
+      "upstream_commits": [
+        "bed24b93"
+      ],
+      "upstream_clusters": [
+        "agents-md-persona"
+      ],
+      "lingxi_overlap": "部分 overlap",
+      "conflict_class": "B",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "ishiki→agents 文案/API 逐文件合并",
+      "test_evidence": "desktop/src/react/__tests__/settings/useBridgeState.snapshot.test.tsx",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "export-manifest.json",
+      "renamed_from": null,
+      "upstream_change": "M",
+      "upstream_commits": [
+        "9dd70cd5",
+        "408b7a18",
+        "f29d15f2",
+        "bed24b93"
+      ],
+      "upstream_clusters": [
+        "dream",
+        "agents-md-persona"
+      ],
+      "lingxi_overlap": "生成物",
+      "conflict_class": "D",
+      "disposition": "REGENERATED",
+      "lingxi_implementation": "Lingxi 手工策展权威源重新生成（704→712）",
+      "test_evidence": "export manifest 定向校验（tests 内 manifest 一致性用例）",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "hub/agent-executor.ts",
+      "renamed_from": null,
+      "upstream_change": "M",
+      "upstream_commits": [
+        "bed24b93"
+      ],
+      "upstream_clusters": [
+        "agents-md-persona"
+      ],
+      "lingxi_overlap": "L0 后有改",
+      "conflict_class": "B",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "结构化合并",
+      "test_evidence": "全量套件内 agent-executor 链路（hub 执行测试）",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "lib/agents-public-templates/butter.md",
+      "renamed_from": "lib/public-ishiki-templates/butter.md",
+      "upstream_change": "R100",
+      "upstream_commits": [
+        "bed24b93"
+      ],
+      "upstream_clusters": [
+        "agents-md-persona"
+      ],
+      "lingxi_overlap": "无（纯改名）",
+      "conflict_class": "A",
+      "disposition": "ADOPTED",
+      "lingxi_implementation": "R100 目录改名落地",
+      "test_evidence": "tests/agents-md-startup-migration.test.ts（public 变体迁移用例）+ 打包 smoke",
+      "notes": "R100 纯改名",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "lib/agents-public-templates/en/butter.md",
+      "renamed_from": "lib/public-ishiki-templates/en/butter.md",
+      "upstream_change": "R100",
+      "upstream_commits": [
+        "bed24b93"
+      ],
+      "upstream_clusters": [
+        "agents-md-persona"
+      ],
+      "lingxi_overlap": "无（纯改名）",
+      "conflict_class": "A",
+      "disposition": "ADOPTED",
+      "lingxi_implementation": "R100 目录改名落地",
+      "test_evidence": "tests/agents-md-startup-migration.test.ts + 打包 smoke",
+      "notes": "R100 纯改名",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "lib/agents-public-templates/en/hanako.md",
+      "renamed_from": "lib/public-ishiki-templates/en/hanako.md",
+      "upstream_change": "R100",
+      "upstream_commits": [
+        "bed24b93"
+      ],
+      "upstream_clusters": [
+        "agents-md-persona"
+      ],
+      "lingxi_overlap": "品牌路径映射",
+      "conflict_class": "A",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "上游 AGENTS 模板行为与内容同步；Lingxi 保留产品品牌路径 hanako.md → lingxi.md",
+      "test_evidence": "tests/agents-md-startup-migration.test.ts + 打包 smoke",
+      "notes": "品牌级路径映射，分类为 ADAPTED",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "lib/agents-public-templates/en/ming.md",
+      "renamed_from": "lib/public-ishiki-templates/en/ming.md",
+      "upstream_change": "R100",
+      "upstream_commits": [
+        "bed24b93"
+      ],
+      "upstream_clusters": [
+        "agents-md-persona"
+      ],
+      "lingxi_overlap": "无（纯改名）",
+      "conflict_class": "A",
+      "disposition": "ADOPTED",
+      "lingxi_implementation": "R100 目录改名落地",
+      "test_evidence": "tests/agents-md-startup-migration.test.ts + 打包 smoke",
+      "notes": "R100 纯改名",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "lib/agents-public-templates/hanako.md",
+      "renamed_from": "lib/public-ishiki-templates/hanako.md",
+      "upstream_change": "R100",
+      "upstream_commits": [
+        "bed24b93"
+      ],
+      "upstream_clusters": [
+        "agents-md-persona"
+      ],
+      "lingxi_overlap": "品牌路径映射",
+      "conflict_class": "A",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "上游 AGENTS 模板行为与内容同步；Lingxi 保留产品品牌路径 hanako.md → lingxi.md",
+      "test_evidence": "tests/agents-md-startup-migration.test.ts + 打包 smoke",
+      "notes": "品牌级路径映射，分类为 ADAPTED",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "lib/agents-public-templates/ming.md",
+      "renamed_from": "lib/public-ishiki-templates/ming.md",
+      "upstream_change": "R100",
+      "upstream_commits": [
+        "bed24b93"
+      ],
+      "upstream_clusters": [
+        "agents-md-persona"
+      ],
+      "lingxi_overlap": "无（纯改名）",
+      "conflict_class": "A",
+      "disposition": "ADOPTED",
+      "lingxi_implementation": "R100 目录改名落地",
+      "test_evidence": "tests/agents-md-startup-migration.test.ts + 打包 smoke",
+      "notes": "R100 纯改名",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "lib/agents-templates/butter.md",
+      "renamed_from": "lib/ishiki-templates/butter.md",
+      "upstream_change": "R100",
+      "upstream_commits": [
+        "bed24b93"
+      ],
+      "upstream_clusters": [
+        "agents-md-persona"
+      ],
+      "lingxi_overlap": "无（纯改名）",
+      "conflict_class": "A",
+      "disposition": "ADOPTED",
+      "lingxi_implementation": "R100 目录改名落地",
+      "test_evidence": "tests/persona-source.test.ts（模板回落链）+ 打包 smoke（agents-templates 存在、ishiki-templates 不残留）",
+      "notes": "R100 纯改名",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "lib/agents-templates/en/butter.md",
+      "renamed_from": "lib/ishiki-templates/en/butter.md",
+      "upstream_change": "R100",
+      "upstream_commits": [
+        "bed24b93"
+      ],
+      "upstream_clusters": [
+        "agents-md-persona"
+      ],
+      "lingxi_overlap": "无（纯改名）",
+      "conflict_class": "A",
+      "disposition": "ADOPTED",
+      "lingxi_implementation": "R100 目录改名落地",
+      "test_evidence": "tests/persona-source.test.ts（en 语言模板回落用例）+ 打包 smoke",
+      "notes": "R100 纯改名",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "lib/agents-templates/en/hanako.md",
+      "renamed_from": "lib/ishiki-templates/en/hanako.md",
+      "upstream_change": "R100",
+      "upstream_commits": [
+        "bed24b93"
+      ],
+      "upstream_clusters": [
+        "agents-md-persona"
+      ],
+      "lingxi_overlap": "品牌路径映射",
+      "conflict_class": "A",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "上游 AGENTS 模板行为与内容同步；Lingxi 保留产品品牌路径 hanako.md → lingxi.md",
+      "test_evidence": "tests/persona-source.test.ts + 打包 smoke",
+      "notes": "品牌级路径映射，分类为 ADAPTED",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "lib/agents-templates/en/ming.md",
+      "renamed_from": "lib/ishiki-templates/en/ming.md",
+      "upstream_change": "R100",
+      "upstream_commits": [
+        "bed24b93"
+      ],
+      "upstream_clusters": [
+        "agents-md-persona"
+      ],
+      "lingxi_overlap": "无（纯改名）",
+      "conflict_class": "A",
+      "disposition": "ADOPTED",
+      "lingxi_implementation": "R100 目录改名落地",
+      "test_evidence": "tests/persona-source.test.ts + 打包 smoke",
+      "notes": "R100 纯改名",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "lib/agents-templates/hanako.md",
+      "renamed_from": "lib/ishiki-templates/hanako.md",
+      "upstream_change": "R100",
+      "upstream_commits": [
+        "bed24b93"
+      ],
+      "upstream_clusters": [
+        "agents-md-persona"
+      ],
+      "lingxi_overlap": "品牌路径映射",
+      "conflict_class": "A",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "上游 AGENTS 模板行为与内容同步；Lingxi 保留产品品牌路径 hanako.md → lingxi.md",
+      "test_evidence": "tests/persona-source.test.ts + 打包 smoke",
+      "notes": "品牌级路径映射，分类为 ADAPTED",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "lib/agents-templates/ming.md",
+      "renamed_from": "lib/ishiki-templates/ming.md",
+      "upstream_change": "R100",
+      "upstream_commits": [
+        "bed24b93"
+      ],
+      "upstream_clusters": [
+        "agents-md-persona"
+      ],
+      "lingxi_overlap": "无（纯改名）",
+      "conflict_class": "A",
+      "disposition": "ADOPTED",
+      "lingxi_implementation": "R100 目录改名落地",
+      "test_evidence": "tests/persona-source.test.ts + 打包 smoke",
+      "notes": "R100 纯改名",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "lib/agents.example.md",
+      "renamed_from": "lib/ishiki.example.md",
+      "upstream_change": "R100",
+      "upstream_commits": [
+        "bed24b93"
+      ],
+      "upstream_clusters": [
+        "agents-md-persona"
+      ],
+      "lingxi_overlap": "有 Lingxi 品牌内容",
+      "conflict_class": "A",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "改名并保留 Lingxi 品牌内容（example 兜底人格）",
+      "test_evidence": "tests/persona-source.test.ts（example 兜底层用例）",
+      "notes": "R100 但内容含品牌差异，故 ADAPTED",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "lib/character-cards/service.ts",
+      "renamed_from": null,
+      "upstream_change": "M",
+      "upstream_commits": [
+        "bed24b93"
+      ],
+      "upstream_clusters": [
+        "agents-md-persona"
+      ],
+      "lingxi_overlap": "无",
+      "conflict_class": "A",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "导出写新 key（prompts.agents/publicAgents），导入永久兼容 legacy key",
+      "test_evidence": "tests/character-card-import.test.ts",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "lib/desk/cron-store.ts",
+      "renamed_from": null,
+      "upstream_change": "M",
+      "upstream_commits": [
+        "a14a13bc"
+      ],
+      "upstream_clusters": [
+        "automation-recovery"
+      ],
+      "lingxi_overlap": "Lingxi 扩展在 L0 前并入",
+      "conflict_class": "B",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "行为不变量提取后合并：tmp 校验→逐字节损坏备份→原子提升；保留 configRevision/storeRevision/重入保护",
+      "test_evidence": "tests/cron-store.test.ts",
+      "notes": "稳定错误码 cron_store_corrupt/unavailable/recovery_failed；禁止静默返回 []",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "lib/diary/diary-writer.ts",
+      "renamed_from": null,
+      "upstream_change": "M",
+      "upstream_commits": [
+        "bed24b93"
+      ],
+      "upstream_clusters": [
+        "agents-md-persona"
+      ],
+      "lingxi_overlap": "无",
+      "conflict_class": "A",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "合并命名更新",
+      "test_evidence": "全量套件内 diary 链路测试",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "lib/memory/dream/memory-units.ts",
+      "renamed_from": null,
+      "upstream_change": "A",
+      "upstream_commits": [
+        "408b7a18",
+        "f29d15f2",
+        "ca6dbf95"
+      ],
+      "upstream_clusters": [
+        "dream"
+      ],
+      "lingxi_overlap": "无",
+      "conflict_class": "A",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "同名移植，接 Lingxi memory 数据布局（facts/today/week/longterm）",
+      "test_evidence": "tests/memory-dream-units.test.ts（11 用例）",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "lib/memory/dream/model-runner.ts",
+      "renamed_from": null,
+      "upstream_change": "A",
+      "upstream_commits": [
+        "9dd70cd5",
+        "476b2d7c",
+        "408b7a18",
+        "f29d15f2",
+        "ca6dbf95",
+        "483c5fe0"
+      ],
+      "upstream_clusters": [
+        "dream"
+      ],
+      "lingxi_overlap": "无",
+      "conflict_class": "A",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "模型解析改走 engine.resolveAuxiliaryExecution(\"memory\", { agentId })，禁止 utility/chat 回落",
+      "test_evidence": "tests/memory-dream-model-runner.test.ts（10 用例）+ tests/memory-dream-memory-slot.test.ts（3 用例，锁槽位契约）",
+      "notes": "软目标 + 5000 字符硬上限",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "lib/memory/dream/revision-store.ts",
+      "renamed_from": null,
+      "upstream_change": "A",
+      "upstream_commits": [
+        "9dd70cd5",
+        "408b7a18"
+      ],
+      "upstream_clusters": [
+        "dream"
+      ],
+      "lingxi_overlap": "无",
+      "conflict_class": "A",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "同名移植，入 Lingxi store registry；snapshotDreamSections 复用为 current-vs-revision diff 的当前快照源",
+      "test_evidence": "tests/memory-dream-revision.test.ts（8 用例）",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "lib/memory/dream/runner.ts",
+      "renamed_from": null,
+      "upstream_change": "A",
+      "upstream_commits": [
+        "9dd70cd5",
+        "476b2d7c",
+        "408b7a18",
+        "f29d15f2",
+        "ca6dbf95",
+        "483c5fe0",
+        "06e17341"
+      ],
+      "upstream_clusters": [
+        "dream"
+      ],
+      "lingxi_overlap": "无",
+      "conflict_class": "A",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "同名移植：编排 + per-agent 并发锁 + memory_changed 竞态 + revision-before-write",
+      "test_evidence": "tests/memory-dream-runner.test.ts（11 用例）+ tests/memory-dream-memory-slot.test.ts",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "lib/memory/dream/state-store.ts",
+      "renamed_from": null,
+      "upstream_change": "A",
+      "upstream_commits": [
+        "9dd70cd5",
+        "408b7a18",
+        "06e17341"
+      ],
+      "upstream_clusters": [
+        "dream"
+      ],
+      "lingxi_overlap": "无",
+      "conflict_class": "A",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "同名移植：Dream 状态持久化 + dream_* 稳定错误码",
+      "test_evidence": "tests/memory-dream-runner.test.ts + tests/memory-dream-route.test.ts（错误码映射断言）",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "lib/memory/memory-ticker.ts",
+      "renamed_from": null,
+      "upstream_change": "M",
+      "upstream_commits": [
+        "9dd70cd5",
+        "408b7a18",
+        "f29d15f2",
+        "06e17341"
+      ],
+      "upstream_clusters": [
+        "dream"
+      ],
+      "lingxi_overlap": "无（L0 后未改）",
+      "conflict_class": "A",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "合并 Dream 触发钩子进当前 ticker，gated on getDreamAutoEnabled()===true",
+      "test_evidence": "tests/memory-ticker-dream.test.ts（4 用例）",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "lib/memory/prompts/dream.ts",
+      "renamed_from": null,
+      "upstream_change": "A",
+      "upstream_commits": [
+        "9dd70cd5",
+        "476b2d7c",
+        "408b7a18",
+        "f29d15f2",
+        "ca6dbf95",
+        "483c5fe0"
+      ],
+      "upstream_clusters": [
+        "dream"
+      ],
+      "lingxi_overlap": "无",
+      "conflict_class": "A",
+      "disposition": "ADOPTED",
+      "lingxi_implementation": "同名移植（5 阶段 prompt，校对 Lingxi 术语）",
+      "test_evidence": "tests/memory-dream-model-runner.test.ts / tests/memory-dream-runner.test.ts（prompt 经 runner 链路断言）",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "lib/sandbox/policy.ts",
+      "renamed_from": null,
+      "upstream_change": "M",
+      "upstream_commits": [
+        "bed24b93"
+      ],
+      "upstream_clusters": [
+        "agents-md-persona"
+      ],
+      "lingxi_overlap": "无",
+      "conflict_class": "A",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "合并命名更新",
+      "test_evidence": "全量套件内 sandbox policy 测试",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "package-lock.json",
+      "renamed_from": null,
+      "upstream_change": "M",
+      "upstream_commits": [
+        "9dd70cd5",
+        "d356e6ce",
+        "476b2d7c",
+        "408b7a18",
+        "f29d15f2",
+        "ca6dbf95",
+        "483c5fe0",
+        "06e17341",
+        "2870af8e",
+        "def3e661",
+        "a14a13bc",
+        "61a2a6bf",
+        "bed24b93",
+        "b3927f07",
+        "d96b5d67",
+        "ecc2c055",
+        "c6d04052"
+      ],
+      "upstream_clusters": [
+        "dream",
+        "context-ring",
+        "markdown-bare-url",
+        "build-receipts",
+        "automation-recovery",
+        "agents-md-persona",
+        "windows-seed-cleanup",
+        "release-digest"
+      ],
+      "lingxi_overlap": "产品差异",
+      "conflict_class": "D",
+      "disposition": "INTENTIONAL_DIVERGENCE",
+      "lingxi_implementation": "随 package.json；上游无新依赖可移植",
+      "test_evidence": "npm install 链路 + 全量套件",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "package.json",
+      "renamed_from": null,
+      "upstream_change": "M",
+      "upstream_commits": [
+        "9dd70cd5",
+        "d356e6ce",
+        "476b2d7c",
+        "408b7a18",
+        "f29d15f2",
+        "ca6dbf95",
+        "483c5fe0",
+        "06e17341",
+        "2870af8e",
+        "def3e661",
+        "a14a13bc",
+        "61a2a6bf",
+        "bed24b93",
+        "b3927f07",
+        "d96b5d67",
+        "ecc2c055",
+        "c6d04052"
+      ],
+      "upstream_clusters": [
+        "dream",
+        "context-ring",
+        "markdown-bare-url",
+        "build-receipts",
+        "automation-recovery",
+        "agents-md-persona",
+        "windows-seed-cleanup",
+        "release-digest"
+      ],
+      "lingxi_overlap": "产品差异",
+      "conflict_class": "D",
+      "disposition": "INTENTIONAL_DIVERGENCE",
+      "lingxi_implementation": "Lingxi 自有 name/version/pi 0.84.1/发布体系；上游 U0..U1 仅 version bump 无新依赖",
+      "test_evidence": "npm run typecheck + 全量套件（依赖未变更前提下的回归证据）",
+      "notes": "lingxi.upstreamVersion=0.447.4 保留",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "release-digest.v1.json",
+      "renamed_from": null,
+      "upstream_change": "M",
+      "upstream_commits": [
+        "5f08a4f3",
+        "c6d04052"
+      ],
+      "upstream_clusters": [
+        "release-digest"
+      ],
+      "lingxi_overlap": "产品差异",
+      "conflict_class": "D",
+      "disposition": "INTENTIONAL_DIVERGENCE",
+      "lingxi_implementation": "Lingxi 发布历史独立；上游 digest 拷贝即伪造",
+      "test_evidence": "release-digest 由 scripts/generate-release-digest 系列维护（包内回退数据）",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "release-digest.v2.json",
+      "renamed_from": null,
+      "upstream_change": "M",
+      "upstream_commits": [
+        "5f08a4f3",
+        "c6d04052"
+      ],
+      "upstream_clusters": [
+        "release-digest"
+      ],
+      "lingxi_overlap": "产品差异",
+      "conflict_class": "D",
+      "disposition": "INTENTIONAL_DIVERGENCE",
+      "lingxi_implementation": "同上",
+      "test_evidence": "release-digest 由 scripts/generate-release-digest 系列维护（包内回退数据）",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "scripts/build-server-open.mjs",
+      "renamed_from": null,
+      "upstream_change": "M",
+      "upstream_commits": [
+        "bed24b93"
+      ],
+      "upstream_clusters": [
+        "agents-md-persona"
+      ],
+      "lingxi_overlap": "无",
+      "conflict_class": "A",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "同上（模板目录改名）",
+      "test_evidence": "tests/build-server-open.test.ts",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "scripts/build-server.mjs",
+      "renamed_from": null,
+      "upstream_change": "M",
+      "upstream_commits": [
+        "bed24b93"
+      ],
+      "upstream_clusters": [
+        "agents-md-persona"
+      ],
+      "lingxi_overlap": "L0 后有改",
+      "conflict_class": "B",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "仅套用模板目录改名（ishiki-templates→agents-templates）",
+      "test_evidence": "tests/build-server-open.test.ts + npm run build:server 产物抽检（seed 含 agents-templates）",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "scripts/compute-cli-closure.mjs",
+      "renamed_from": null,
+      "upstream_change": "M",
+      "upstream_commits": [
+        "bed24b93",
+        "d96b5d67"
+      ],
+      "upstream_clusters": [
+        "agents-md-persona",
+        "build-receipts"
+      ],
+      "lingxi_overlap": "无",
+      "conflict_class": "A",
+      "disposition": "ADOPTED",
+      "lingxi_implementation": "移植：justification 不再引用易变行号",
+      "test_evidence": "build/cli-runtime-closure.json 由该生成器重新生成且二次生成零漂移（确定性验证）",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "scripts/export-open-tree.mjs",
+      "renamed_from": null,
+      "upstream_change": "M",
+      "upstream_commits": [
+        "bed24b93"
+      ],
+      "upstream_clusters": [
+        "agents-md-persona"
+      ],
+      "lingxi_overlap": "无",
+      "conflict_class": "A",
+      "disposition": "ADOPTED",
+      "lingxi_implementation": "注释同步",
+      "test_evidence": "export-manifest.json 重新生成 + export manifest 定向校验",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "scripts/i18n-backfill-ja.json",
+      "renamed_from": null,
+      "upstream_change": "M",
+      "upstream_commits": [
+        "bed24b93"
+      ],
+      "upstream_clusters": [
+        "agents-md-persona"
+      ],
+      "lingxi_overlap": "无",
+      "conflict_class": "A",
+      "disposition": "ADOPTED",
+      "lingxi_implementation": "noIshiki→noAgentsMd key 改名",
+      "test_evidence": "tests/i18n-locale-parity.test.ts",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "scripts/i18n-backfill-ko.json",
+      "renamed_from": null,
+      "upstream_change": "M",
+      "upstream_commits": [
+        "bed24b93"
+      ],
+      "upstream_clusters": [
+        "agents-md-persona"
+      ],
+      "lingxi_overlap": "无",
+      "conflict_class": "A",
+      "disposition": "ADOPTED",
+      "lingxi_implementation": "noIshiki→noAgentsMd key 改名",
+      "test_evidence": "tests/i18n-locale-parity.test.ts",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "server/composition/open-root.ts",
+      "renamed_from": null,
+      "upstream_change": "M",
+      "upstream_commits": [
+        "9dd70cd5"
+      ],
+      "upstream_clusters": [
+        "dream"
+      ],
+      "lingxi_overlap": "无",
+      "conflict_class": "A",
+      "disposition": "ADOPTED",
+      "lingxi_implementation": "同位置挂载 createMemoryDreamRoute",
+      "test_evidence": "tests/server-composition-boundary.test.ts（8 用例）+ npm run lint:boundary",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "server/http/route-security.ts",
+      "renamed_from": null,
+      "upstream_change": "M",
+      "upstream_commits": [
+        "9dd70cd5",
+        "bed24b93"
+      ],
+      "upstream_clusters": [
+        "dream",
+        "agents-md-persona"
+      ],
+      "lingxi_overlap": "无",
+      "conflict_class": "A",
+      "disposition": "ADOPTED",
+      "lingxi_implementation": "dream 路由安全分级同步",
+      "test_evidence": "tests/http-route-security.test.ts",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "server/routes/agents.ts",
+      "renamed_from": null,
+      "upstream_change": "M",
+      "upstream_commits": [
+        "9dd70cd5",
+        "bed24b93"
+      ],
+      "upstream_clusters": [
+        "dream",
+        "agents-md-persona"
+      ],
+      "lingxi_overlap": "无",
+      "conflict_class": "A",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "persona 双路由（canonical /agents-md + legacy /ishiki alias 同 handler）+ dream auto_enabled 布尔校验（400 先于 updateConfig）",
+      "test_evidence": "tests/agents-route.test.ts（30 用例）+ tests/agent-config-tools-disabled.test.ts（12 用例，含本轮补齐的 3 个 dream 契约）",
+      "notes": "upstream 两个集群（dream + agents-md-persona）都改了此文件，此处只记一行",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "server/routes/desk.ts",
+      "renamed_from": null,
+      "upstream_change": "M",
+      "upstream_commits": [
+        "a14a13bc"
+      ],
+      "upstream_clusters": [
+        "automation-recovery"
+      ],
+      "lingxi_overlap": "无",
+      "conflict_class": "A",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "错误传播不泄露 fs 绝对路径",
+      "test_evidence": "tests/desk-route-cron.test.ts",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "server/routes/memory-dream.ts",
+      "renamed_from": null,
+      "upstream_change": "A",
+      "upstream_commits": [
+        "9dd70cd5",
+        "408b7a18",
+        "06e17341"
+      ],
+      "upstream_clusters": [
+        "dream"
+      ],
+      "lingxi_overlap": "无",
+      "conflict_class": "A",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "同名移植对齐 Lingxi 路由约定；本轮扩展 revision detail 响应附带后端现读的 current 快照（current-vs-revision diff 数据源）",
+      "test_evidence": "tests/memory-dream-route.test.ts（7 用例，含 current 快照断言）",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "server/routes/settings-snapshot.ts",
+      "renamed_from": null,
+      "upstream_change": "M",
+      "upstream_commits": [
+        "bed24b93"
+      ],
+      "upstream_clusters": [
+        "agents-md-persona"
+      ],
+      "lingxi_overlap": "无",
+      "conflict_class": "A",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "合并命名更新",
+      "test_evidence": "tests/settings-snapshot-route.test.ts",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "shared/error-user-messages.ts",
+      "renamed_from": null,
+      "upstream_change": "M",
+      "upstream_commits": [
+        "06e17341"
+      ],
+      "upstream_clusters": [
+        "dream"
+      ],
+      "lingxi_overlap": "无",
+      "conflict_class": "A",
+      "disposition": "ADOPTED",
+      "lingxi_implementation": "dream_* 错误码 → 用户文案映射合并",
+      "test_evidence": "desktop/src/react/__tests__/shared/error-user-messages.test.ts（26 用例）",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "shared/persistence/store-registry.ts",
+      "renamed_from": null,
+      "upstream_change": "M",
+      "upstream_commits": [
+        "9dd70cd5",
+        "bed24b93"
+      ],
+      "upstream_clusters": [
+        "dream",
+        "agents-md-persona"
+      ],
+      "lingxi_overlap": "L0 后有改",
+      "conflict_class": "B",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "结构化合并：dream state/revision store 登记 + AGENTS.md 路径模式/rename 规则",
+      "test_evidence": "persistence fingerprint 校验（build/persistence-schema-fingerprint.json 重新生成 + compatible 判定）+ migration smoke 23/23",
+      "notes": "DATA_EPOCH 不变",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "skills2set/character-creator/SKILL.md",
+      "renamed_from": null,
+      "upstream_change": "M",
+      "upstream_commits": [
+        "b3927f07"
+      ],
+      "upstream_clusters": [
+        "agents-md-persona"
+      ],
+      "lingxi_overlap": "Lingxi 品牌",
+      "conflict_class": "A",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "保留品牌文案，命名对齐 AGENTS.md 协议",
+      "test_evidence": "打包 smoke 抽检（bundled skills 随产物带出）+ 全量套件 skills 链路",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "skills2set/character-creator/references/anti-slop.md",
+      "renamed_from": null,
+      "upstream_change": "M",
+      "upstream_commits": [
+        "b3927f07"
+      ],
+      "upstream_clusters": [
+        "agents-md-persona"
+      ],
+      "lingxi_overlap": "Lingxi 品牌",
+      "conflict_class": "A",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "保留品牌文案，命名对齐 AGENTS.md 协议",
+      "test_evidence": "打包 smoke 抽检（bundled skills 随产物带出）",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "skills2set/character-creator/references/card-format.md",
+      "renamed_from": null,
+      "upstream_change": "M",
+      "upstream_commits": [
+        "b3927f07"
+      ],
+      "upstream_clusters": [
+        "agents-md-persona"
+      ],
+      "lingxi_overlap": "Lingxi 品牌",
+      "conflict_class": "A",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "保留品牌文案，命名对齐 AGENTS.md 协议",
+      "test_evidence": "打包 smoke 抽检（bundled skills 随产物带出）",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "skills2set/user-guide/SKILL.md",
+      "renamed_from": null,
+      "upstream_change": "M",
+      "upstream_commits": [
+        "b3927f07"
+      ],
+      "upstream_clusters": [
+        "agents-md-persona"
+      ],
+      "lingxi_overlap": "Lingxi 品牌",
+      "conflict_class": "A",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "保留品牌文案，命名对齐 AGENTS.md 协议",
+      "test_evidence": "打包 smoke 抽检（bundled skills 随产物带出）",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "tests/agent-config-tools-disabled.test.ts",
+      "renamed_from": null,
+      "upstream_change": "M",
+      "upstream_commits": [
+        "9dd70cd5"
+      ],
+      "upstream_clusters": [
+        "dream"
+      ],
+      "lingxi_overlap": "无",
+      "conflict_class": "A",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "合并；本轮补齐 upstream 的 dream auto_enabled 正反契约（200 透传 / 400 拒非布尔且 updateConfig 未被调用）",
+      "test_evidence": "本文件自身全绿（12 用例，含 3 个 dream 契约）",
+      "notes": "上一轮矩阵误标 ✅，本轮实补后转真绿",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "tests/agent-description.test.ts",
+      "renamed_from": null,
+      "upstream_change": "M",
+      "upstream_commits": [
+        "bed24b93"
+      ],
+      "upstream_clusters": [
+        "agents-md-persona"
+      ],
+      "lingxi_overlap": "无",
+      "conflict_class": "A",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "命名/行为断言更新",
+      "test_evidence": "本文件自身全绿",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "tests/agent-experience-toggle.test.ts",
+      "renamed_from": null,
+      "upstream_change": "M",
+      "upstream_commits": [
+        "bed24b93"
+      ],
+      "upstream_clusters": [
+        "agents-md-persona"
+      ],
+      "lingxi_overlap": "无",
+      "conflict_class": "A",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "命名/行为断言更新",
+      "test_evidence": "本文件自身全绿",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "tests/agent-interactive-card-tools.test.ts",
+      "renamed_from": null,
+      "upstream_change": "M",
+      "upstream_commits": [
+        "bed24b93"
+      ],
+      "upstream_clusters": [
+        "agents-md-persona"
+      ],
+      "lingxi_overlap": "无",
+      "conflict_class": "A",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "命名/行为断言更新",
+      "test_evidence": "本文件自身全绿",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "tests/agent-locale-resolution.test.ts",
+      "renamed_from": null,
+      "upstream_change": "M",
+      "upstream_commits": [
+        "bed24b93"
+      ],
+      "upstream_clusters": [
+        "agents-md-persona"
+      ],
+      "lingxi_overlap": "无",
+      "conflict_class": "A",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "命名/行为断言更新",
+      "test_evidence": "本文件自身全绿（4 用例）",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "tests/agent-manager-create-defaults.test.ts",
+      "renamed_from": null,
+      "upstream_change": "M",
+      "upstream_commits": [
+        "bed24b93"
+      ],
+      "upstream_clusters": [
+        "agents-md-persona"
+      ],
+      "lingxi_overlap": "无",
+      "conflict_class": "A",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "命名/行为断言更新",
+      "test_evidence": "本文件自身全绿（26 用例）",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "tests/agent-master-session-decoupling.test.ts",
+      "renamed_from": null,
+      "upstream_change": "M",
+      "upstream_commits": [
+        "bed24b93"
+      ],
+      "upstream_clusters": [
+        "agents-md-persona"
+      ],
+      "lingxi_overlap": "无",
+      "conflict_class": "A",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "命名/行为断言更新",
+      "test_evidence": "本文件自身全绿",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "tests/agent-system-prompt-section-order.test.ts",
+      "renamed_from": null,
+      "upstream_change": "M",
+      "upstream_commits": [
+        "bed24b93"
+      ],
+      "upstream_clusters": [
+        "agents-md-persona"
+      ],
+      "lingxi_overlap": "无",
+      "conflict_class": "A",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "命名/行为断言更新",
+      "test_evidence": "本文件自身全绿（2 用例）",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "tests/agent-tools-conditional-injection.test.ts",
+      "renamed_from": null,
+      "upstream_change": "M",
+      "upstream_commits": [
+        "bed24b93"
+      ],
+      "upstream_clusters": [
+        "agents-md-persona"
+      ],
+      "lingxi_overlap": "无",
+      "conflict_class": "A",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "命名/行为断言更新",
+      "test_evidence": "本文件自身全绿",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "tests/agents-md-startup-migration.test.ts",
+      "renamed_from": null,
+      "upstream_change": "A",
+      "upstream_commits": [
+        "bed24b93"
+      ],
+      "upstream_clusters": [
+        "agents-md-persona"
+      ],
+      "lingxi_overlap": "无",
+      "conflict_class": "A",
+      "disposition": "ADOPTED",
+      "lingxi_implementation": "移植；本轮新增 5 个 migration-degraded 用例（失败保人格/无永久双读/新文件优先/下次成功/public 变体）",
+      "test_evidence": "本文件自身全绿（11 用例）",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "tests/agents-route.test.ts",
+      "renamed_from": null,
+      "upstream_change": "M",
+      "upstream_commits": [
+        "bed24b93"
+      ],
+      "upstream_clusters": [
+        "agents-md-persona"
+      ],
+      "lingxi_overlap": "无",
+      "conflict_class": "A",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "命名/行为断言更新（canonical + legacy alias 双路由）",
+      "test_evidence": "本文件自身全绿（30 用例）",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "tests/bridge-session-orphan-repair.test.ts",
+      "renamed_from": null,
+      "upstream_change": "M",
+      "upstream_commits": [
+        "bed24b93"
+      ],
+      "upstream_clusters": [
+        "agents-md-persona"
+      ],
+      "lingxi_overlap": "无",
+      "conflict_class": "A",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "命名/行为断言更新",
+      "test_evidence": "本文件自身全绿",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "tests/bridge-session-teardown.test.ts",
+      "renamed_from": null,
+      "upstream_change": "M",
+      "upstream_commits": [
+        "bed24b93"
+      ],
+      "upstream_clusters": [
+        "agents-md-persona"
+      ],
+      "lingxi_overlap": "无",
+      "conflict_class": "A",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "命名/行为断言更新",
+      "test_evidence": "本文件自身全绿",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "tests/build-server-open.test.ts",
+      "renamed_from": null,
+      "upstream_change": "M",
+      "upstream_commits": [
+        "bed24b93"
+      ],
+      "upstream_clusters": [
+        "agents-md-persona"
+      ],
+      "lingxi_overlap": "无",
+      "conflict_class": "A",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "命名/行为断言更新（模板目录改名）",
+      "test_evidence": "本文件自身全绿",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "tests/builtin-tool-permission-coverage.test.ts",
+      "renamed_from": null,
+      "upstream_change": "M",
+      "upstream_commits": [
+        "bed24b93"
+      ],
+      "upstream_clusters": [
+        "agents-md-persona"
+      ],
+      "lingxi_overlap": "无",
+      "conflict_class": "A",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "命名/行为断言更新",
+      "test_evidence": "本文件自身全绿",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "tests/channel-router-memory-master.test.ts",
+      "renamed_from": null,
+      "upstream_change": "M",
+      "upstream_commits": [
+        "bed24b93"
+      ],
+      "upstream_clusters": [
+        "agents-md-persona"
+      ],
+      "lingxi_overlap": "无",
+      "conflict_class": "A",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "命名/行为断言更新",
+      "test_evidence": "本文件自身全绿",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "tests/character-card-import.test.ts",
+      "renamed_from": null,
+      "upstream_change": "M",
+      "upstream_commits": [
+        "bed24b93"
+      ],
+      "upstream_clusters": [
+        "agents-md-persona"
+      ],
+      "lingxi_overlap": "无",
+      "conflict_class": "A",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "命名/行为断言更新（legacy key 导入兼容）",
+      "test_evidence": "本文件自身全绿",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "tests/cron-store.test.ts",
+      "renamed_from": null,
+      "upstream_change": "M",
+      "upstream_commits": [
+        "a14a13bc"
+      ],
+      "upstream_clusters": [
+        "automation-recovery"
+      ],
+      "lingxi_overlap": "无",
+      "conflict_class": "A",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "合并恢复断言（含 Lingxi 扩展字段保全）",
+      "test_evidence": "本文件自身全绿",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "tests/desk-route-cron.test.ts",
+      "renamed_from": null,
+      "upstream_change": "M",
+      "upstream_commits": [
+        "a14a13bc"
+      ],
+      "upstream_clusters": [
+        "automation-recovery"
+      ],
+      "lingxi_overlap": "无",
+      "conflict_class": "A",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "合并错误传播断言",
+      "test_evidence": "本文件自身全绿",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "tests/first-run-default-workspace.test.ts",
+      "renamed_from": null,
+      "upstream_change": "M",
+      "upstream_commits": [
+        "bed24b93"
+      ],
+      "upstream_clusters": [
+        "agents-md-persona"
+      ],
+      "lingxi_overlap": "无",
+      "conflict_class": "A",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "命名/行为断言更新",
+      "test_evidence": "本文件自身全绿",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "tests/http-route-security.test.ts",
+      "renamed_from": null,
+      "upstream_change": "M",
+      "upstream_commits": [
+        "9dd70cd5"
+      ],
+      "upstream_clusters": [
+        "dream"
+      ],
+      "lingxi_overlap": "无",
+      "conflict_class": "A",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "合并 dream 路由断言",
+      "test_evidence": "本文件自身全绿",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "tests/memory-dream-model-runner.test.ts",
+      "renamed_from": null,
+      "upstream_change": "A",
+      "upstream_commits": [
+        "9dd70cd5",
+        "476b2d7c",
+        "408b7a18",
+        "f29d15f2",
+        "ca6dbf95",
+        "483c5fe0"
+      ],
+      "upstream_clusters": [
+        "dream"
+      ],
+      "lingxi_overlap": "无",
+      "conflict_class": "A",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "移植 + 新增 memory-slot 专项断言",
+      "test_evidence": "本文件自身全绿（10 用例）",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "tests/memory-dream-revision.test.ts",
+      "renamed_from": null,
+      "upstream_change": "A",
+      "upstream_commits": [
+        "9dd70cd5",
+        "408b7a18"
+      ],
+      "upstream_clusters": [
+        "dream"
+      ],
+      "lingxi_overlap": "无",
+      "conflict_class": "A",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "移植",
+      "test_evidence": "本文件自身全绿（8 用例）",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "tests/memory-dream-route.test.ts",
+      "renamed_from": null,
+      "upstream_change": "A",
+      "upstream_commits": [
+        "9dd70cd5",
+        "408b7a18",
+        "06e17341"
+      ],
+      "upstream_clusters": [
+        "dream"
+      ],
+      "lingxi_overlap": "无",
+      "conflict_class": "A",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "移植；本轮新增 detail 响应 current 快照断言",
+      "test_evidence": "本文件自身全绿（7 用例）",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "tests/memory-dream-runner.test.ts",
+      "renamed_from": null,
+      "upstream_change": "A",
+      "upstream_commits": [
+        "9dd70cd5",
+        "476b2d7c",
+        "408b7a18",
+        "f29d15f2",
+        "ca6dbf95",
+        "483c5fe0",
+        "06e17341"
+      ],
+      "upstream_clusters": [
+        "dream"
+      ],
+      "lingxi_overlap": "无",
+      "conflict_class": "A",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "移植",
+      "test_evidence": "本文件自身全绿（11 用例）",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "tests/memory-dream-units.test.ts",
+      "renamed_from": null,
+      "upstream_change": "A",
+      "upstream_commits": [
+        "408b7a18",
+        "f29d15f2",
+        "ca6dbf95"
+      ],
+      "upstream_clusters": [
+        "dream"
+      ],
+      "lingxi_overlap": "无",
+      "conflict_class": "A",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "移植",
+      "test_evidence": "本文件自身全绿（11 用例）",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "tests/memory-ticker-dream.test.ts",
+      "renamed_from": null,
+      "upstream_change": "A",
+      "upstream_commits": [
+        "9dd70cd5",
+        "f29d15f2"
+      ],
+      "upstream_clusters": [
+        "dream"
+      ],
+      "lingxi_overlap": "无",
+      "conflict_class": "A",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "移植",
+      "test_evidence": "本文件自身全绿（4 用例）",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "tests/persona-source.test.ts",
+      "renamed_from": null,
+      "upstream_change": "M",
+      "upstream_commits": [
+        "bed24b93"
+      ],
+      "upstream_clusters": [
+        "agents-md-persona"
+      ],
+      "lingxi_overlap": "无",
+      "conflict_class": "A",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "命名/行为断言更新",
+      "test_evidence": "本文件自身全绿（15 用例）",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "tests/server-composition-boundary.test.ts",
+      "renamed_from": null,
+      "upstream_change": "M",
+      "upstream_commits": [
+        "9dd70cd5"
+      ],
+      "upstream_clusters": [
+        "dream"
+      ],
+      "lingxi_overlap": "无",
+      "conflict_class": "A",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "命名/行为断言更新（含 dream 路由挂载清单）",
+      "test_evidence": "本文件自身全绿（8 用例）",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "tests/session-tool-gating.test.ts",
+      "renamed_from": null,
+      "upstream_change": "M",
+      "upstream_commits": [
+        "bed24b93"
+      ],
+      "upstream_clusters": [
+        "agents-md-persona"
+      ],
+      "lingxi_overlap": "无",
+      "conflict_class": "A",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "命名/行为断言更新",
+      "test_evidence": "本文件自身全绿",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "tests/settings-snapshot-route.test.ts",
+      "renamed_from": null,
+      "upstream_change": "M",
+      "upstream_commits": [
+        "bed24b93"
+      ],
+      "upstream_clusters": [
+        "agents-md-persona"
+      ],
+      "lingxi_overlap": "无",
+      "conflict_class": "A",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "命名/行为断言更新",
+      "test_evidence": "本文件自身全绿",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "tests/windows-installer-contract.test.ts",
+      "renamed_from": null,
+      "upstream_change": "M",
+      "upstream_commits": [
+        "ecc2c055"
+      ],
+      "upstream_clusters": [
+        "windows-seed-cleanup"
+      ],
+      "lingxi_overlap": "无",
+      "conflict_class": "A",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "合并断言 + lingxiRemoveOwnedInstallTrees 宏名修正",
+      "test_evidence": "本文件自身全绿（19 用例）",
+      "notes": "",
+      "status": "✅"
+    },
+    {
+      "upstream_path": "tests/workspace-instruction-files-exclude.test.ts",
+      "renamed_from": null,
+      "upstream_change": "A",
+      "upstream_commits": [
+        "bed24b93"
+      ],
+      "upstream_clusters": [
+        "agents-md-persona"
+      ],
+      "lingxi_overlap": "无",
+      "conflict_class": "A",
+      "disposition": "ADOPTED",
+      "lingxi_implementation": "移植",
+      "test_evidence": "本文件自身全绿（4 用例）",
+      "notes": "",
+      "status": "✅"
+    }
+  ]
+}

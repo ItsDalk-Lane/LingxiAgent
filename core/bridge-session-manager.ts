@@ -62,6 +62,7 @@ import {
 import { sameToolNames } from "./tool-snapshot-repair.ts";
 import { formatWorkspaceScopePrompt } from "../shared/workspace-scope.ts";
 import { buildWorkspaceInstructionPrompt } from "./workspace-instruction-files.ts";
+import { agentPersonaFilePaths } from "./persona-source.ts";
 
 const log = createModuleLogger("bridge-session");
 const BRIDGE_OWNER_DENIED_TOOL_NAMES = Object.freeze([
@@ -859,6 +860,7 @@ export class BridgeSessionManager {
       cwd: homeCwd,
       workspaceContext: agent.config?.workspace_context,
       locale,
+      excludeFiles: agentPersonaFilePaths(agent.agentDir),
     });
     return this._buildPromptSnapshot(agent, systemPrompt, {
       appendSystemPrompt: [
@@ -871,7 +873,7 @@ export class BridgeSessionManager {
 
   _buildGuestPromptSnapshot(agent, bridgeContext, opts: any = {}) {
     const bridgePromptLine = appendBridgePromptLine("", bridgeContext, getLocale()).trim();
-    const parts = [agent.yuanPrompt, agent.publicIshiki, opts.contextTag, bridgePromptLine].filter(Boolean);
+    const parts = [agent.yuanPrompt, agent.publicAgentsMd, opts.contextTag, bridgePromptLine].filter(Boolean);
     return this._buildPromptSnapshot(agent, parts.join("\n\n"), {
       appendSystemPrompt: [],
       skillsResult: { skills: [], diagnostics: [] },
@@ -1187,7 +1189,7 @@ export class BridgeSessionManager {
       const targetModelRef = { current: null };
 
       if (isGuest) {
-        // guest 模式：yuan + public-ishiki + contextTag，主模型，无工具
+        // guest 模式：yuan + AGENTS.public.md + contextTag，主模型，无工具
         promptSnapshot ||= this._buildGuestPromptSnapshot(agent, bridgeContext, opts);
         const guestResourceLoaderBase = createPromptSnapshotResourceLoader(
           this._deps.getResourceLoader?.(),

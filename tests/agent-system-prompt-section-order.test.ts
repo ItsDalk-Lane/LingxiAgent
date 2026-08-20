@@ -1,4 +1,4 @@
-// 用户档案 / ishiki / 样貌三段属于事件驱动的稳定段（只在用户改档案或换人格时变），
+// 用户档案 / AGENTS.md / 样貌三段属于事件驱动的稳定段（只在用户改档案或换人格时变），
 // 因此排在静态前缀里；记忆与时间会被后台 compile 和时钟自动推动，留在 cache 分界线之后。
 // 这个测试锁住那条分界线，防止有人把稳定段又挪回尾部、或把动态段提到前缀里。
 import fs from "fs";
@@ -30,7 +30,7 @@ function makeAgent(locale: string) {
   fs.mkdirSync(path.join(agentDir, "avatars"), { recursive: true });
   fs.mkdirSync(path.join(productDir, "yuan"), { recursive: true });
   fs.mkdirSync(userDir, { recursive: true });
-  fs.writeFileSync(path.join(productDir, "yuan", "lingxi.md"), "ISHIKI-TEMPLATE-MARKER", "utf-8");
+  fs.writeFileSync(path.join(productDir, "yuan", "lingxi.md"), "AGENTSMD-TEMPLATE-MARKER", "utf-8");
   fs.writeFileSync(path.join(userDir, "user.md"), "PROFILE-MARKER\n", "utf-8");
   fs.writeFileSync(path.join(agentDir, "pinned.md"), "PINNED-MARKER\n", "utf-8");
   fs.writeFileSync(path.join(agentDir, "memory", "memory.md"), "MEMORY-MARKER\n", "utf-8");
@@ -83,7 +83,7 @@ describe("system prompt section order", () => {
     const indexes = orderedIndexes(prompt, [
       "# 执行环境",
       "# 用户档案",
-      "ISHIKI-TEMPLATE-MARKER",
+      "AGENTSMD-TEMPLATE-MARKER",
       "## 你的样子",
       "## 工具使用纪律",
       "## 记忆使用规则",
@@ -103,7 +103,7 @@ describe("system prompt section order", () => {
     const indexes = orderedIndexes(prompt, [
       "# Environment",
       "# User Profile",
-      "ISHIKI-TEMPLATE-MARKER",
+      "AGENTSMD-TEMPLATE-MARKER",
       "## Your Appearance",
       "## Tool Usage Discipline",
       "## Memory Rules",

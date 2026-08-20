@@ -56,6 +56,19 @@ function codedError(message, code, status = 409) {
   return Object.assign(new Error(message), { code, status });
 }
 
+function parseCronStoreDocument(bytes) {
+  let data;
+  try {
+    data = JSON.parse(bytes.toString("utf-8"));
+  } catch {
+    throw codedError("automation task storage is corrupt", "cron_store_corrupt", 500);
+  }
+  if (!data || typeof data !== "object" || Array.isArray(data) || !Array.isArray(data.jobs)) {
+    throw codedError("automation task storage is corrupt", "cron_store_corrupt", 500);
+  }
+  return data;
+}
+
 function configRevisionProjection(job) {
   return Object.fromEntries(CONFIG_REVISION_FIELDS.map((key) => [key, clonePlain(job?.[key])]));
 }
@@ -165,35 +178,93 @@ export class CronStore {
   //  持久化
   // ════════════════════════════
 
-  _readState({ strict = false }: { strict?: boolean } = {}) {
-    let raw;
+  _readRecoveryFile({ mainExists, mainBytes, primaryFailure }) {
+    const tmpPath = this._jobsPath + ".tmp";
+    let tmpBytes;
     try {
-      raw = fs.readFileSync(this._jobsPath, "utf-8");
+      tmpBytes = fs.readFileSync(tmpPath);
     } catch (err) {
-      if (err.code === "ENOENT") {
-        return { jobs: [], nextNum: 1, storeRevision: 0, dirty: false };
+      if (err?.code === "ENOENT" && primaryFailure === "missing") {
+        return null;
       }
-      if (strict) throw err;
-      log.error(`读取 jobs 文件失败: ${err.message}`);
-      return { jobs: [], nextNum: 1, storeRevision: 0, dirty: false };
+      if (err?.code === "ENOENT" && primaryFailure === "corrupt") {
+        throw codedError("automation task storage is corrupt", "cron_store_corrupt", 500);
+      }
+      throw codedError("automation task storage is unavailable", "cron_store_unavailable", 500);
     }
 
+    const data = parseCronStoreDocument(tmpBytes);
+
+    let backupPath = null;
+    try {
+      if (mainExists) {
+        backupPath = this._preservePrimaryForRecovery(mainBytes);
+      }
+      fs.renameSync(tmpPath, this._jobsPath);
+    } catch (err) {
+      log.error(`恢复 cron jobs 文件失败: ${err instanceof Error ? err.message : String(err)}`);
+      throw codedError("automation task recovery failed", "cron_store_recovery_failed", 500);
+    }
+    log.error(backupPath
+      ? "主文件 JSON 损坏或不可读，已保留备份并从 .tmp 恢复"
+      : "主文件缺失，已从 .tmp 恢复");
+    return data;
+  }
+
+  _preservePrimaryForRecovery(mainBytes) {
+    const stem = `${this._jobsPath}.corrupt-${Date.now().toString(36)}-${process.pid}`;
+    for (let attempt = 0; attempt < 10_000; attempt += 1) {
+      const backupPath = `${stem}-${attempt}.bak`;
+      try {
+        if (mainBytes) {
+          fs.writeFileSync(backupPath, mainBytes, { flag: "wx" });
+        } else {
+          fs.copyFileSync(this._jobsPath, backupPath, fs.constants.COPYFILE_EXCL);
+        }
+        return backupPath;
+      } catch (err) {
+        if (err?.code === "EEXIST") continue;
+        throw err;
+      }
+    }
+    throw new Error("unable to allocate cron store backup name");
+  }
+
+  _readState() {
+    let mainBytes;
     let data;
     try {
-      data = JSON.parse(raw);
-    } catch {
-      // JSON 损坏，尝试从 .tmp 恢复
-      const tmpPath = this._jobsPath + ".tmp";
-      try {
-        const tmpRaw = fs.readFileSync(tmpPath, "utf-8");
-        data = JSON.parse(tmpRaw);
-        log.error("主文件 JSON 损坏，已从 .tmp 恢复");
-      } catch (recoveryError) {
-        if (strict) {
-          throw codedError("cron jobs store is corrupt", "cron_store_corrupt", 500);
+      mainBytes = fs.readFileSync(this._jobsPath);
+    } catch (err) {
+      if (err?.code === "ENOENT") {
+        data = this._readRecoveryFile({
+          mainExists: false,
+          mainBytes: null,
+          primaryFailure: "missing",
+        });
+        if (data === null) {
+          return { jobs: [], nextNum: 1, storeRevision: 0, dirty: false };
         }
-        log.error("JSON 解析失败且无可用 .tmp，重置为空");
-        return { jobs: [], nextNum: 1, storeRevision: 0, dirty: false };
+      } else {
+        log.error(`读取 jobs 文件失败: ${err instanceof Error ? err.message : String(err)}`);
+        data = this._readRecoveryFile({
+          mainExists: true,
+          mainBytes: null,
+          primaryFailure: "unavailable",
+        });
+      }
+    }
+
+    if (mainBytes) {
+      try {
+        data = parseCronStoreDocument(mainBytes);
+      } catch (err) {
+        if (err?.code !== "cron_store_corrupt") throw err;
+        data = this._readRecoveryFile({
+          mainExists: true,
+          mainBytes,
+          primaryFailure: "corrupt",
+        });
       }
     }
 
@@ -285,7 +356,7 @@ export class CronStore {
     }
     ACTIVE_STORE_MUTATIONS.add(key);
     try {
-      const base = this._readState({ strict: true });
+      const base = this._readState();
       const draft = {
         jobs: clonePlain(base.jobs),
         nextNum: base.nextNum,

@@ -409,6 +409,7 @@ describe("GET /api/sessions/archived", () => {
       {
         path: "/x/a1.jsonl",
         title: "Hi",
+        firstMessage: "first user message",
         archivedAt: "2026-04-22T00:00:00.000Z",
         sizeBytes: 1024,
         agentId: "a",
@@ -427,8 +428,27 @@ describe("GET /api/sessions/archived", () => {
     expect(Array.isArray(body)).toBe(true);
     expect(body.length).toBe(1);
     expect(body[0].title).toBe("Hi");
+    expect(body[0].firstMessage).toBe("first user message");
     expect(body[0].sizeBytes).toBe(1024);
     expect(engine.listArchivedSessions).toHaveBeenCalled();
+  });
+
+  it("truncates firstMessage to 100 characters like the active session list", async () => {
+    engine.listArchivedSessions = vi.fn(async () => [
+      {
+        path: "/x/long.jsonl",
+        title: null,
+        firstMessage: "x".repeat(250),
+        archivedAt: "2026-04-22T00:00:00.000Z",
+        sizeBytes: 1,
+        agentId: "a",
+        agentName: "AgentA",
+      },
+    ]);
+    const res = await app.request("/api/sessions/archived");
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body[0].firstMessage).toHaveLength(100);
   });
 });
 

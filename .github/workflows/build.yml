@@ -28,7 +28,11 @@ jobs:
           if [[ "${{ github.ref }}" == refs/tags/v* ]]; then
             npm run release:preflight -- --tag "${{ github.ref_name }}"
           else
-            npm run release:preflight
+            # workflow_dispatch 从分支触发时没有 release candidate；release-preflight.mjs
+            # 无 --tag 时会回退到 GITHUB_REF_NAME（分支名），必然与 package version
+            # 不匹配而硬失败——这是 workflow 预存缺陷，与分支代码无关。release 门禁
+            # 语义只在 tag 上成立，非 tag ref 显式跳过（tag 路径行为不变，不是降级）。
+            echo "Non-tag ref (${{ github.ref }}): no release candidate, skipping release preflight."
           fi
 
       # 两份摘要都必须在本地生成并提交。放在最早门禁里，避免缺摘要的 tag

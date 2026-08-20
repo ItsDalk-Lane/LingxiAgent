@@ -19,6 +19,7 @@ import {
 import { createModuleLogger } from "../lib/debug-log.ts";
 import { USER_PROFILE_FILENAME } from "../lib/user-profile-store.ts";
 import { isValidAgentId } from "../shared/agent-id.ts";
+import { PUBLIC_PERSONA_FILE_NAME, PUBLIC_PERSONA_TEMPLATE_DIR } from "./persona-source.ts";
 
 const log = createModuleLogger("first-run");
 
@@ -224,21 +225,21 @@ function seedDefaultAgent(agentsDir, productDir, userDir) {
   const langDir = isZh ? "" : "en/";
   const firstExisting = (paths) => paths.find((p) => fs.existsSync(p));
 
-  // identity.md / ishiki.md 不再在首启播种时落盘（惰性材料化）：缺失时运行时
+  // identity.md / AGENTS.md 不再在首启播种时落盘（惰性材料化）：缺失时运行时
   // 按 agent.resolveLocale() 现选 lib 模板（core/persona-source.ts 的
   // resolvePersonaSource，与 core/agent.ts personality getter 同一条回落
   // 链），用户日后改语言，未定制人格自动跟着换。文件只在用户于设置页编辑
   // 保存时才落盘。yuan 由 buildSystemPrompt 实时从 lib/yuan/ 读取，同样无需
   // 复制。
 
-  // public-ishiki.md（对外意识模板）：消费侧 Agent._readPublicIshiki 本来就
+  // AGENTS.public.md（对外人格模板）：消费侧 Agent._readPublicAgentsMd 本来就
   // 有独立回落链，不受此改动影响，这里继续按原策略播种。
-  const publicIshikiSrc = firstExisting([
-    path.join(productDir, "public-ishiki-templates", `${langDir}${agentId}.md`),
-    path.join(productDir, "public-ishiki-templates", `${agentId}.md`),
+  const publicAgentsSrc = firstExisting([
+    path.join(productDir, PUBLIC_PERSONA_TEMPLATE_DIR, `${langDir}${agentId}.md`),
+    path.join(productDir, PUBLIC_PERSONA_TEMPLATE_DIR, `${agentId}.md`),
   ]);
-  if (publicIshikiSrc) {
-    fs.copyFileSync(publicIshikiSrc, path.join(agentDir, "public-ishiki.md"));
+  if (publicAgentsSrc) {
+    fs.copyFileSync(publicAgentsSrc, path.join(agentDir, PUBLIC_PERSONA_FILE_NAME));
   }
 
   log.log(`默认助手 "${agentId}" 已创建`);

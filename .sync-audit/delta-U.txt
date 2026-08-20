@@ -1,0 +1,133 @@
+M	build/cli-runtime-closure.json
+M	build/installer.nsh
+M	build/persistence-schema-fingerprint.json
+M	build/persistence-store-inventory.json
+M	core/agent-manager.ts
+M	core/agent.ts
+A	core/agents-md-migration.ts
+M	core/bridge-session-manager.ts
+M	core/engine.ts
+M	core/first-run.ts
+M	core/llm-utils.ts
+M	core/persona-source.ts
+M	core/session-coordinator.ts
+M	core/workspace-instruction-files.ts
+M	desktop/src/locales/en.json
+M	desktop/src/locales/ja.json
+M	desktop/src/locales/ko.json
+M	desktop/src/locales/zh-TW.json
+M	desktop/src/locales/zh.json
+M	desktop/src/react/__tests__/components/AssistantMessage.automation-suggestion.test.tsx
+A	desktop/src/react/__tests__/components/AutomationPanel.test.tsx
+M	desktop/src/react/__tests__/components/context-ring.test.tsx
+M	desktop/src/react/__tests__/editor/md-decorations.test.ts
+M	desktop/src/react/__tests__/settings/AgentMemory.test.tsx
+M	desktop/src/react/__tests__/settings/AgentTab.test.tsx
+M	desktop/src/react/__tests__/settings/BridgeTab.credentials.test.tsx
+M	desktop/src/react/__tests__/settings/BridgeTab.permission-mode.test.tsx
+M	desktop/src/react/__tests__/settings/actions.test.ts
+M	desktop/src/react/__tests__/settings/helpers.test.ts
+M	desktop/src/react/__tests__/settings/useBridgeState.snapshot.test.tsx
+M	desktop/src/react/__tests__/shared/error-user-messages.test.ts
+M	desktop/src/react/components/AutomationPanel.tsx
+M	desktop/src/react/components/chat/AssistantMessage.tsx
+M	desktop/src/react/components/input/ContextRing.tsx
+M	desktop/src/react/editor/md-decorations.ts
+M	desktop/src/react/settings/Settings.module.css
+M	desktop/src/react/settings/__tests__/SettingsContent.test.tsx
+M	desktop/src/react/settings/actions.ts
+M	desktop/src/react/settings/helpers.ts
+M	desktop/src/react/settings/overlays/CharacterCardPreviewOverlay.tsx
+M	desktop/src/react/settings/settings-search-index.ts
+M	desktop/src/react/settings/store.ts
+M	desktop/src/react/settings/tabs/AgentTab.tsx
+M	desktop/src/react/settings/tabs/BridgeTab.tsx
+M	desktop/src/react/settings/tabs/agent/AgentMemory.tsx
+A	desktop/src/react/settings/tabs/agent/AgentMemoryDream.tsx
+A	desktop/src/react/settings/tabs/agent/DreamRevisionBrowser.module.css
+A	desktop/src/react/settings/tabs/agent/DreamRevisionBrowser.tsx
+A	desktop/src/react/settings/tabs/agent/__tests__/DreamRevisionBrowser.test.tsx
+A	desktop/src/react/settings/tabs/agent/agent-memory-dream-actions.ts
+A	desktop/src/react/settings/tabs/agent/dream-error-presenter.ts
+M	desktop/src/react/settings/tabs/bridge/useBridgeState.ts
+M	export-manifest.json
+M	hub/agent-executor.ts
+R100	lib/public-ishiki-templates/butter.md	lib/agents-public-templates/butter.md
+R100	lib/public-ishiki-templates/en/butter.md	lib/agents-public-templates/en/butter.md
+R100	lib/public-ishiki-templates/en/hanako.md	lib/agents-public-templates/en/hanako.md
+R100	lib/public-ishiki-templates/en/ming.md	lib/agents-public-templates/en/ming.md
+R100	lib/public-ishiki-templates/hanako.md	lib/agents-public-templates/hanako.md
+R100	lib/public-ishiki-templates/ming.md	lib/agents-public-templates/ming.md
+R100	lib/ishiki-templates/butter.md	lib/agents-templates/butter.md
+R100	lib/ishiki-templates/en/butter.md	lib/agents-templates/en/butter.md
+R100	lib/ishiki-templates/en/hanako.md	lib/agents-templates/en/hanako.md
+R100	lib/ishiki-templates/en/ming.md	lib/agents-templates/en/ming.md
+R100	lib/ishiki-templates/hanako.md	lib/agents-templates/hanako.md
+R100	lib/ishiki-templates/ming.md	lib/agents-templates/ming.md
+R100	lib/ishiki.example.md	lib/agents.example.md
+M	lib/character-cards/service.ts
+M	lib/desk/cron-store.ts
+M	lib/diary/diary-writer.ts
+A	lib/memory/dream/memory-units.ts
+A	lib/memory/dream/model-runner.ts
+A	lib/memory/dream/revision-store.ts
+A	lib/memory/dream/runner.ts
+A	lib/memory/dream/state-store.ts
+M	lib/memory/memory-ticker.ts
+A	lib/memory/prompts/dream.ts
+M	lib/sandbox/policy.ts
+M	package-lock.json
+M	package.json
+M	release-digest.v1.json
+M	release-digest.v2.json
+M	scripts/build-server-open.mjs
+M	scripts/build-server.mjs
+M	scripts/compute-cli-closure.mjs
+M	scripts/export-open-tree.mjs
+M	scripts/i18n-backfill-ja.json
+M	scripts/i18n-backfill-ko.json
+M	server/composition/open-root.ts
+M	server/http/route-security.ts
+M	server/routes/agents.ts
+M	server/routes/desk.ts
+A	server/routes/memory-dream.ts
+M	server/routes/settings-snapshot.ts
+M	shared/error-user-messages.ts
+M	shared/persistence/store-registry.ts
+M	skills2set/character-creator/SKILL.md
+M	skills2set/character-creator/references/anti-slop.md
+M	skills2set/character-creator/references/card-format.md
+M	skills2set/user-guide/SKILL.md
+M	tests/agent-config-tools-disabled.test.ts
+M	tests/agent-description.test.ts
+M	tests/agent-experience-toggle.test.ts
+M	tests/agent-interactive-card-tools.test.ts
+M	tests/agent-locale-resolution.test.ts
+M	tests/agent-manager-create-defaults.test.ts
+M	tests/agent-master-session-decoupling.test.ts
+M	tests/agent-system-prompt-section-order.test.ts
+M	tests/agent-tools-conditional-injection.test.ts
+A	tests/agents-md-startup-migration.test.ts
+M	tests/agents-route.test.ts
+M	tests/bridge-session-orphan-repair.test.ts
+M	tests/bridge-session-teardown.test.ts
+M	tests/build-server-open.test.ts
+M	tests/builtin-tool-permission-coverage.test.ts
+M	tests/channel-router-memory-master.test.ts
+M	tests/character-card-import.test.ts
+M	tests/cron-store.test.ts
+M	tests/desk-route-cron.test.ts
+M	tests/first-run-default-workspace.test.ts
+M	tests/http-route-security.test.ts
+A	tests/memory-dream-model-runner.test.ts
+A	tests/memory-dream-revision.test.ts
+A	tests/memory-dream-route.test.ts
+A	tests/memory-dream-runner.test.ts
+A	tests/memory-dream-units.test.ts
+A	tests/memory-ticker-dream.test.ts
+M	tests/persona-source.test.ts
+M	tests/server-composition-boundary.test.ts
+M	tests/session-tool-gating.test.ts
+M	tests/settings-snapshot-route.test.ts
+M	tests/windows-installer-contract.test.ts
+A	tests/workspace-instruction-files-exclude.test.ts

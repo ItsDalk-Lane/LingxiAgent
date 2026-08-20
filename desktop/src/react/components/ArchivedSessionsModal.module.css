@@ -122,6 +122,59 @@
   overflow: hidden;
 }
 
+.listToolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-12);
+  padding: var(--space-8) var(--space-12);
+  border-bottom: 1px solid var(--border, rgba(0, 0, 0, 0.08));
+  flex-shrink: 0;
+}
+
+.selectAll {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-8);
+  font-size: var(--fs-caption);
+  color: var(--text-muted, rgba(0, 0, 0, 0.6));
+  cursor: pointer;
+  user-select: none;
+}
+
+.selectAll input,
+.rowCheck {
+  accent-color: var(--accent, #b8860b);
+  width: 15px;
+  height: 15px;
+  cursor: pointer;
+  flex-shrink: 0;
+  margin: 0;
+}
+
+.deleteSelectedBtn {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--bg-card, #fff) 92%, white 8%), var(--bg-card, #fff));
+  border: 1px solid var(--border, rgba(0, 0, 0, 0.15));
+  border-radius: var(--radius-input, 6px);
+  min-height: 32px;
+  padding: 0 var(--space-16);
+  cursor: default;
+  font-size: var(--fs-caption);
+  color: var(--text, inherit);
+  font-family: inherit;
+  transition: background var(--duration-fast) ease, border-color var(--duration-fast) ease;
+}
+
+.deleteSelectedBtn:hover:not(:disabled) {
+  background: var(--bg-hover, color-mix(in srgb, var(--bg-card, #fff) 92%, transparent));
+  border-color: var(--overlay-light, rgba(0, 0, 0, 0.18));
+}
+
+.deleteSelectedBtn:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
 .list {
   flex: 1;
   overflow-y: auto;
@@ -138,7 +191,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: var(--space-16);
+  gap: var(--space-12);
   padding: 5px var(--space-12);
   background: transparent;
   transition: background var(--duration-fast) ease;

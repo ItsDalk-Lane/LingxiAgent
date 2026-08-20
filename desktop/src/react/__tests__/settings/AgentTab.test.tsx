@@ -211,7 +211,7 @@ describe('AgentTab settings agent selection', () => {
               agentId: 'hana',
               packageName: 'hana-charactercard.zip',
               agent: { name: 'Hana', yuan: 'lingxi', description: '花名册描述' },
-              prompts: { identity: 'identity', ishiki: 'ishiki', publicIshiki: 'public' },
+              prompts: { identity: 'identity', agents: 'agents-md', publicAgents: 'public' },
               memory: {
                 available: true,
                 count: 1,

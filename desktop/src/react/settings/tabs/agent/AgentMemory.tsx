@@ -5,6 +5,7 @@ import { lingxiFetch } from '../../api';
 import { PinItem } from './AgentPins';
 import { SettingsSection } from '../../components/SettingsSection';
 import { Toggle } from '@/ui';
+import { AgentMemoryDream } from './AgentMemoryDream';
 import styles from '../../Settings.module.css';
 
 type MemoryHealthStatus = 'healthy' | 'degraded' | 'unhealthy' | 'disabled' | 'unavailable';
@@ -104,10 +105,11 @@ function MemoryHealthNotice({ health, error }: {
   );
 }
 
-export function MemorySection({ agentId, hasUtilityModel, memoryEnabled, currentPins }: {
+export function MemorySection({ agentId, hasUtilityModel, memoryEnabled, autoDreamEnabled = false, currentPins }: {
   agentId: string | null;
   hasUtilityModel: boolean | undefined;
   memoryEnabled: boolean | undefined;
+  autoDreamEnabled?: boolean;
   currentPins: string[];
 }) {
   const [pinInput, setPinInput] = useState('');
@@ -226,6 +228,10 @@ export function MemorySection({ agentId, hasUtilityModel, memoryEnabled, current
               {t('settings.memory.compiledView')}
             </button>
           </div>
+
+          {agentId && (
+            <AgentMemoryDream agentId={agentId} autoEnabled={autoDreamEnabled} />
+          )}
 
           <div className={styles['settings-subsection']}>
             <h3 className={styles['settings-subsection-title']}>{t('settings.memory.allMemories')}</h3>

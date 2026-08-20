@@ -35,8 +35,8 @@
   },
   "prompts": {
     "identity": "identity.md 全文（与 identity.content 保持一致）",
-    "ishiki": "ishiki.md 全文（人格定义主文件：性格、说话方式、原则。省略则回落到 yuan 默认模板，内容与角色无关，务必提供）",
-    "publicIshiki": "可选但推荐，public-ishiki.md 全文（对外意识：接待外部访客时的人格与边界）"
+    "agents": "AGENTS.md 全文（人格定义主文件：性格、说话方式、原则。省略则回落到 yuan 默认模板，内容与角色无关，务必提供）",
+    "publicAgents": "可选但推荐，AGENTS.public.md 全文（对外 AGENTS.md：接待外部访客时的人格与边界）"
   },
   "assets": { "avatar": "assets/avatar.png" },
   "skills": {
@@ -51,7 +51,8 @@
 
 - `agent.name` 必填；`agent.id` 可省，合法字符为 ASCII 字母/数字/`_`/`-`，且至少含一个字母或数字
 - `yuan` 只认 `hanako` `butter` `ming` `kong`，填错静默回落到 `hanako`
-- 内心独白格式（MOOD / PULSE / 沉思）由 `yuan` 在系统层自带，**不写进 ishiki.md**；ishiki.md 只写角色的人格定义。三层分工：identity.md 是"他是谁"（几行速写），ishiki.md 是"他怎样想、怎样说话"（人格主文件），public-ishiki.md 是"他对外人时的样子"
+- 内心独白格式（MOOD / PULSE / 沉思）由 `yuan` 在系统层自带，**不写进 AGENTS.md**；AGENTS.md 只写角色的人格定义。三层分工：identity.md 是"他是谁"（几行速写），AGENTS.md 是"他怎样想、怎样说话"（人格主文件），对外 AGENTS.md（`AGENTS.public.md`）是"他对外人时的样子"
+- **新包一律写 `prompts.agents` / `prompts.publicAgents`**，这两个 key 是当前的正式写法，导出通道产出的也是它们。人格文本的 key 历史上换过几轮名字，老卡包里是旧写法；卡包一旦分享出去就装在别人硬盘和分享链接里，改不动，所以导入端对旧 key 的兼容是永久的，不是过渡期措施。你只管按新 key 写，同一份包里新旧并存时新 key 优先
 - `assets.avatar` 是**包内相对路径**，图片类型仅 png/jpg/jpeg/webp
 - `skills.bundles[].skills[]` 填技能目录的包内相对路径，每个目录里必须有带 `name` frontmatter 的 `SKILL.md`
 - 包内**禁止符号链接**，导入端会拒绝

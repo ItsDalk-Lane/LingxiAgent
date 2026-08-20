@@ -70,7 +70,7 @@ function bootstrapAgentDir(rootDir) {
     "utf-8",
   );
   fs.writeFileSync(path.join(agentDir, "identity.md"), "I am the test agent.\n", "utf-8");
-  fs.writeFileSync(path.join(agentDir, "ishiki.md"), "ishiki body\n", "utf-8");
+  fs.writeFileSync(path.join(agentDir, "AGENTS.md"), "persona body\n", "utf-8");
   fs.writeFileSync(path.join(agentDir, "pinned.md"), "PINNED_MEMORY_BEACON\n", "utf-8");
   fs.writeFileSync(path.join(agentDir, "memory", "memory.md"), "MEMORY_MD_BEACON\n", "utf-8");
   fs.writeFileSync(path.join(rootDir, "user", "user.md"), "user profile\n", "utf-8");
@@ -265,7 +265,7 @@ describe("agent.systemPrompt: master / per-session 解耦", { timeout: AGENT_INI
     expect(prompt).toContain("你的形象是银白色短发，神情安静，穿着深色外套。");
     expect(prompt).not.toContain("来自图片分析");
     expect(prompt).not.toContain("这张头像");
-    expect(prompt.indexOf("ishiki body")).toBeLessThan(prompt.indexOf("## 你的样子"));
+    expect(prompt.indexOf("persona body")).toBeLessThan(prompt.indexOf("## 你的样子"));
 
     const subagentPrompt = agent.buildSystemPrompt({ forceMemoryEnabled: false, forSubagent: true, targetModel });
     expect(subagentPrompt).not.toContain("## 你的样子");

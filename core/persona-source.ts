@@ -1,7 +1,11 @@
 /**
- * persona-source.ts — identity.md / ishiki.md 的统一回落链（惰性材料化）
+ * persona-source.ts — identity.md / AGENTS.md 的统一回落链（惰性材料化）
  *
- * 人格模板不再在创建 agent 时落盘：agentDir 里没有 identity.md / ishiki.md
+ * 每个 agent 的人格文件叫 AGENTS.md，对外变体叫 AGENTS.public.md。这套命名
+ * 跟随业界的 AGENTS.md 约定：人格文件是跟着 agent 走的全局层，工作区目录里
+ * 的 AGENTS.md 是项目层，两层各注入一次是预期常态而不是重复。
+ *
+ * 人格模板不再在创建 agent 时落盘：agentDir 里没有 identity.md / AGENTS.md
  * 时，运行时按当前 locale 现选 lib 模板；用户在设置页编辑保存后才真正落盘
  * （落盘 = 用户显式定制）。这份回落链必须是全仓唯一实现——runtime system
  * prompt 组装（core/agent.ts）、GET 路由（server/routes/agents.ts、
@@ -10,22 +14,31 @@
  * 全部消费这一份实现，禁止各自复制回落顺序，否则多份拷贝会在未来某次模板
  * 改名/加语言时悄悄漂移。
  *
- * 回落顺序（与改动前 core/agent.ts personality getter 逐字节等价）：
+ * 回落顺序：
  *   1. agentDir 下的落盘文件（用户定制内容）
  *   2. 该 yuan 的语言专属模板（identity-templates/en/xxx.md 等）
  *   3. 该 yuan 的通用模板（不分语言）
- *   4. 通用 example 兜底（identity.example.md / ishiki.example.md）
+ *   4. 通用 example 兜底（identity.example.md / agents.example.md）
  */
 
 import path from "path";
 import { safeReadFile } from "../shared/safe-fs.ts";
 
-export type PersonaKind = "identity" | "ishiki";
+export type PersonaKind = "identity" | "agents";
 
 export interface PersonaSourceResult {
   content: string;
   /** true = 内容来自模板回落（agentDir 没有落盘文件）；false = 用户已定制落盘 */
   fromTemplate: boolean;
+}
+
+export interface PersonaMigrationFallback {
+  /**
+   * 本次启动改名失败、仍在磁盘上的旧人格文件绝对路径。只允许由启动迁移的
+   * 失败记录构造（core/agents-md-migration.ts），调用方不许凭空拼一个旧文件
+   * 路径传进来——那等于重建永久双读协议。
+   */
+  legacyFilePath: string;
 }
 
 export interface ResolvePersonaSourceArgs {
@@ -34,6 +47,12 @@ export interface ResolvePersonaSourceArgs {
   yuanType: string;
   locale: string;
   kind: PersonaKind;
+  /**
+   * 启动级 migration-degraded 状态：仅当本次启动 ishiki.md → AGENTS.md 改名
+   * 明确失败时由 Agent 传入。新文件存在时永远优先（在 fallback 之前返回），
+   * 没有失败记录时旧文件一律不读。
+   */
+  migrationFallback?: PersonaMigrationFallback | null;
 }
 
 const KIND_CONFIG: Record<PersonaKind, { fileName: string; templateDir: string; exampleFile: string }> = {
@@ -42,12 +61,28 @@ const KIND_CONFIG: Record<PersonaKind, { fileName: string; templateDir: string; 
     templateDir: "identity-templates",
     exampleFile: "identity.example.md",
   },
-  ishiki: {
-    fileName: "ishiki.md",
-    templateDir: "ishiki-templates",
-    exampleFile: "ishiki.example.md",
+  agents: {
+    fileName: "AGENTS.md",
+    templateDir: "agents-templates",
+    exampleFile: "agents.example.md",
   },
 };
+
+/** 对外人格文件名。它有自己的回落链（core/agent.ts），不走 KIND_CONFIG。 */
+export const PUBLIC_PERSONA_FILE_NAME = "AGENTS.public.md";
+export const PUBLIC_PERSONA_TEMPLATE_DIR = "agents-public-templates";
+
+/**
+ * agent 自己的人格文件绝对路径。会话工作目录落在 agent 目录里时，工作区注入
+ * 要靠这份清单把人格文件排除掉，否则同一份内容会被注入两次。文件名只在这个
+ * 模块里定义一次，调用方不许自己拼。
+ */
+export function agentPersonaFilePaths(agentDir: string): string[] {
+  return [
+    path.join(agentDir, KIND_CONFIG.agents.fileName),
+    path.join(agentDir, PUBLIC_PERSONA_FILE_NAME),
+  ];
+}
 
 export function resolvePersonaSource({
   agentDir,
@@ -55,6 +90,7 @@ export function resolvePersonaSource({
   yuanType,
   locale,
   kind,
+  migrationFallback = null,
 }: ResolvePersonaSourceArgs): PersonaSourceResult {
   const { fileName, templateDir, exampleFile } = KIND_CONFIG[kind];
   const isZh = String(locale).startsWith("zh");
@@ -63,6 +99,11 @@ export function resolvePersonaSource({
 
   const own = readFile(path.join(agentDir, fileName));
   if (own) return { content: own, fromTemplate: false };
+
+  // migration-degraded：改名失败的旧文件仍是用户定制内容，本次运行以它为准
+  // （fromTemplate=false），下次启动改名成功后自动回到上面的新文件分支。
+  const legacy = migrationFallback ? readFile(migrationFallback.legacyFilePath) : "";
+  if (legacy) return { content: legacy, fromTemplate: false };
 
   const langTemplate = readFile(path.join(productDir, templateDir, `${langDir}${yuanType}.md`));
   if (langTemplate) return { content: langTemplate, fromTemplate: true };

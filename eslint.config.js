@@ -61,6 +61,8 @@ export default [
       'server/**/*.{js,ts}',
       'shared/**/*.{js,ts}',
       'tests/**/*.{js,ts,tsx}',
+      // 同步审计脚本是入版本控制的 node 工具（build-sync-matrix/migration-smoke 等）
+      '.sync-audit/**/*.{js,mjs}',
     ],
     languageOptions: {
       globals: {

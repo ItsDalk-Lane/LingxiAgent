@@ -37,6 +37,17 @@ describe("Windows NSIS installer contract", () => {
     expect(source).toContain('RMDir /r "$INSTDIR\\resources\\server"');
   });
 
+  it("removes all versioned seed payloads before replacing the install surface", () => {
+    const source = fs.readFileSync(path.join(root, "build", "installer.nsh"), "utf-8");
+    const macro = extractMacro(source, "lingxiRemoveOwnedInstallTrees");
+    const seedRemoval = 'RMDir /r "$INSTDIR\\resources\\seed"';
+    const resourcesRemoval = 'RMDir "$INSTDIR\\resources"';
+
+    expect(macro).toContain(seedRemoval);
+    expect(macro).toContain(resourcesRemoval);
+    expect(macro.indexOf(seedRemoval)).toBeLessThan(macro.indexOf(resourcesRemoval));
+  });
+
   it("removes legacy unpacked Electron app directories before overlaying new files", () => {
     const source = fs.readFileSync(path.join(root, "build", "installer.nsh"), "utf-8");
     const macro = extractMacro(source, "lingxiRemoveOwnedInstallTrees");

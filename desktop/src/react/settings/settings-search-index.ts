@@ -31,7 +31,9 @@ const BUILT_IN_SETTINGS_SEARCH_ENTRIES: SettingsSearchEntry[] = [
     tabId: 'agent',
     titleKey: 'settings.tabs.agent',
     pathKeys: ['settings.tabs.agent'],
-    aliases: ['assistant', 'agent', 'persona', 'role', 'avatar', 'memory', 'yuan', '助手', '人设', '角色', '头像', '记忆', '源'],
+    // 'AGENTS.md' 同时是工作区条目的别名，一个词命中两个设置项是预期的：
+    // 人格文件和工作区注入都叫这个名字，用户搜它时两处都该出现。
+    aliases: ['assistant', 'agent', 'persona', 'role', 'avatar', 'memory', 'yuan', 'AGENTS.md', '助手', '人设', '角色', '头像', '记忆', '源'],
   },
   {
     id: 'me-profile',

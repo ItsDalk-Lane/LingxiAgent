@@ -8,7 +8,11 @@ import fs from "fs";
 import path from "path";
 import { loadConfig, saveConfig } from "../lib/memory/config-loader.ts";
 import { safeReadFile, safeReadJSON } from "../shared/safe-fs.ts";
-import { resolvePersonaSource } from "./persona-source.ts";
+import {
+  PUBLIC_PERSONA_FILE_NAME,
+  PUBLIC_PERSONA_TEMPLATE_DIR,
+  resolvePersonaSource,
+} from "./persona-source.ts";
 import { FactStore } from "../lib/memory/fact-store.ts";
 import { SessionSummaryManager } from "../lib/memory/session-summary.ts";
 import { createMemoryTicker } from "../lib/memory/memory-ticker.ts";
@@ -162,7 +166,7 @@ export class Agent {
    * @param {object} opts
    * @param {string} opts.id         - 助手 ID（唯一信源，等于数据目录名）
    * @param {string} opts.agentsDir  - 所有助手的父目录（从中派生 agentDir）
-   * @param {string} opts.productDir - 产品模板目录（ishiki.example.md, yuan 模板等）
+   * @param {string} opts.productDir - 产品模板目录（agents.example.md, yuan 模板等）
    * @param {string} opts.userDir    - 用户数据目录（user.md, 用户头像）—— 跨助手共享
    */
   constructor({ id, agentsDir, productDir, userDir, channelsDir, searchConfigResolver }) {
@@ -454,6 +458,7 @@ export class Agent {
           };
         },
         getMemoryMasterEnabled: () => this._memoryMasterEnabled,
+        getDreamAutoEnabled: () => this._config?.memory?.dream?.auto_enabled === true,
         isSessionMemoryEnabled: (sessionPath) => this.isSessionMemoryEnabledFor(sessionPath),
         getTimezone: () => this._cb?.getTimezone?.() || Intl.DateTimeFormat().resolvedOptions().timeZone,
         getCacheSnapshotReflectionMode: () => getResolvedExperimentValue(
@@ -836,7 +841,7 @@ export class Agent {
   /** per-session 级别（持久化、API 返回用，不受 master 影响） */
   get sessionMemoryEnabled() { return this._memorySessionEnabled; }
   get yuanPrompt() { return this._readYuan(); }
-  get publicIshiki() { return this._readPublicIshiki(); }
+  get publicAgentsMd() { return this._readPublicAgentsMd(); }
   get runtimeInitialized() { return this._runtimeInitialized; }
   get needsRepair() { return !!this._repairState; }
   get repairState() { return this._repairState ? { ...this._repairState } : null; }
@@ -1099,7 +1104,7 @@ export class Agent {
     // 重建 system prompt（按 master 构建，与 per-session 开关解耦）
     this._systemPrompt = this.buildSystemPrompt({ forceMemoryEnabled: this._memoryMasterEnabled });
 
-    // identity / ishiki 文件变化由调用方显式传入 refreshDescription；yuan 变化来自 config patch。
+    // identity / AGENTS.md 文件变化由调用方显式传入 refreshDescription；yuan 变化来自 config patch。
     if (options.refreshDescription || partial.agent?.yuan) {
       this._descriptionRefreshHandler?.();
     }
@@ -1130,18 +1135,31 @@ export class Agent {
     });
   }
 
-  /** 读取 ishiki.md 的实际生效内容，回落规则同 readIdentitySource()。 */
-  readIshikiSource() {
+  /** 读取 AGENTS.md 的实际生效内容，回落规则同 readIdentitySource()。 */
+  readAgentsMdSource() {
     return resolvePersonaSource({
       agentDir: this.agentDir,
       productDir: this.productDir,
       yuanType: this._config?.agent?.yuan || "lingxi",
       locale: this.resolveLocale(),
-      kind: "ishiki",
+      kind: "agents",
+      migrationFallback: this._personaMigrationFallback("AGENTS.md"),
     });
   }
 
-  /** 返回纯人格 prompt（identity + yuan + ishiki），不含记忆、用户档案等 */
+  /**
+   * 启动级 migration-degraded 状态：仅当本次启动 agents-md-rename 明确记录
+   * 该文件改名失败时，返回旧文件的读取坐标；否则返回 null（旧文件一律不读，
+   * 避免重新形成永久 legacy 双读协议）。新文件存在时 resolvePersonaSource
+   * 永远先命中新文件，fallback 不会覆盖它。
+   */
+  _personaMigrationFallback(currentFileName) {
+    const legacyFileName = this._cb?.getFailedPersonaRename?.(this.id, currentFileName);
+    if (!legacyFileName) return null;
+    return { legacyFilePath: path.join(this.agentDir, legacyFileName) };
+  }
+
+  /** 返回纯人格 prompt（identity + yuan + AGENTS.md），不含记忆、用户档案等 */
   get personality() {
     const fill = (text) => text
       .replace(/\{\{userName\}\}/g, this.userName)
@@ -1149,8 +1167,8 @@ export class Agent {
       .replace(/\{\{agentId\}\}/g, this.id);
     const identityMd = this.readIdentitySource().content;
     const yuanMd = this._readYuan();
-    const ishikiMd = this.readIshikiSource().content;
-    return fill(identityMd) + "\n\n" + fill(yuanMd || "") + "\n\n" + fill(ishikiMd);
+    const agentsMd = this.readAgentsMdSource().content;
+    return fill(identityMd) + "\n\n" + fill(yuanMd || "") + "\n\n" + fill(agentsMd);
   }
 
   /** 返回花名册描述生成用的人格来源，不包含 yuan 输出协议。 */
@@ -1160,8 +1178,8 @@ export class Agent {
       .replace(/\{\{agentName\}\}/g, this.agentName)
       .replace(/\{\{agentId\}\}/g, this.id);
     const identityMd = this.readIdentitySource().content;
-    const ishikiMd = this.readIshikiSource().content;
-    return fill(identityMd) + "\n\n" + fill(ishikiMd);
+    const agentsMd = this.readAgentsMdSource().content;
+    return fill(identityMd) + "\n\n" + fill(agentsMd);
   }
 
   /** 读取 yuan 模板（能力定义） */
@@ -1173,8 +1191,8 @@ export class Agent {
       || safeReadFile(path.join(this.productDir, "yuan", `${yuanType}.md`), "");
   }
 
-  /** 读取对外意识（public-ishiki.md），guest 会话使用 */
-  _readPublicIshiki() {
+  /** 读取对外人格文件（AGENTS.public.md），guest 会话使用 */
+  _readPublicAgentsMd() {
     const readFile = (p) => safeReadFile(p, "");
     const fill = (text) => text
       .replace(/\{\{userName\}\}/g, this.userName)
@@ -1183,9 +1201,13 @@ export class Agent {
     const yuanType = this._config?.agent?.yuan || "lingxi";
     const isZh = String(this.resolveLocale()).startsWith("zh");
     const langDir = isZh ? "" : "en/";
-    const raw = readFile(path.join(this.agentDir, "public-ishiki.md"))
-      || readFile(path.join(this.productDir, "public-ishiki-templates", `${langDir}${yuanType}.md`))
-      || readFile(path.join(this.productDir, "public-ishiki-templates", `${yuanType}.md`))
+    // migration-degraded：改名失败的 public-ishiki.md 同样是用户定制内容，
+    // 本次运行以它为准（规则与 readAgentsMdSource 一致，新文件永远优先）。
+    const fallback = this._personaMigrationFallback(PUBLIC_PERSONA_FILE_NAME);
+    const raw = readFile(path.join(this.agentDir, PUBLIC_PERSONA_FILE_NAME))
+      || (fallback ? readFile(fallback.legacyFilePath) : "")
+      || readFile(path.join(this.productDir, PUBLIC_PERSONA_TEMPLATE_DIR, `${langDir}${yuanType}.md`))
+      || readFile(path.join(this.productDir, PUBLIC_PERSONA_TEMPLATE_DIR, `${yuanType}.md`))
       || "";
     return fill(raw);
   }
@@ -1266,10 +1288,10 @@ export class Agent {
 
     const readFile = (filePath) => safeReadFile(filePath, "");
 
-    // identity + yuan + ishiki（复用 personality getter）
+    // identity + yuan + AGENTS.md（复用 personality getter）
     const yuanType = this._config?.agent?.yuan || "lingxi";
     if (!this._readYuan()) throw new Error(`Cannot find yuan "${yuanType}". Check lib/yuan/`);
-    const ishiki = this.personality;
+    const agentsMd = this.personality;
 
     // 可选文件
     const userMd = readFile(userProfilePath(this.userDir));
@@ -1281,7 +1303,7 @@ export class Agent {
 
     // Prompt 拼接遵循「静态前缀在前、动态尾部在后」原则，最大化跨 session 的 prefix
     // cache 命中率（KV cache / Anthropic prompt cache 都按严格前缀匹配）。
-    // 顺序：平台 → 环境 → 用户档案 → ishiki（依赖 userName）→ 样貌
+    // 顺序：平台 → 环境 → 用户档案 → AGENTS.md（依赖 userName）→ 样貌
     //      → 行为指南（任务/经验/工具/安全/网页/设置/技能/团队）
     //      ── cache 分界线 ──
     //      记忆规则/置顶/记忆 → 会话开始时间
@@ -1291,7 +1313,7 @@ export class Agent {
     // 属于事件驱动的稳定段，放在尾部只会白白撑大动态区。记忆会被后台 compile 推动、
     // 时间每次构建都在走，这两段才是真正的自动漂移源，继续留在 cache 分界线之后。
     //
-    // ishiki 放在用户档案之后：模板里有「你和{userName}是认识很久的人」这类引用，
+    // AGENTS.md 放在用户档案之后：模板里有「你和{userName}是认识很久的人」这类引用，
     // 叙事顺序上先告诉模型"用户是谁"，再告诉它"你是谁、你和用户什么关系"。
     const parts = [
       isZh
@@ -1327,9 +1349,9 @@ export class Agent {
       userProfileLines.join("\n")
     ));
 
-    // ishiki（identity + yuan + ishiki 模板，含 {{userName}} 等替换）
+    // 人格（identity + yuan + AGENTS.md 模板，含 {{userName}} 等替换）
     // 放在用户档案之后：先建立"用户是谁"的语境，再讲"你是谁、你和用户什么关系"。
-    parts.push(ishiki);
+    parts.push(agentsMd);
 
     if (!forSubagent && this._canInjectAppearancePrompt(targetModel)) {
       const appearance = readAgentAppearanceProfileResource(this.agentDir);

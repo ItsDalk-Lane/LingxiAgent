@@ -245,26 +245,26 @@ describe("AgentManager.createAgent default skills.enabled", () => {
     expect(cfg.models.chat).toEqual({ id: "test-model", provider: "test-provider" });
   });
 
-  it("does not seed identity.md/ishiki.md to disk for newly created agents (lazy materialization)", async () => {
+  it("does not seed identity.md/AGENTS.md to disk for newly created agents (lazy materialization)", async () => {
     fs.mkdirSync(path.join(productDir, "identity-templates"), { recursive: true });
     fs.writeFileSync(
       path.join(productDir, "identity-templates", "lingxi.md"),
       "# {{agentName}}\n\n{{userName}}的个人助手。\n",
       "utf-8",
     );
-    fs.mkdirSync(path.join(productDir, "ishiki-templates"), { recursive: true });
+    fs.mkdirSync(path.join(productDir, "agents-templates"), { recursive: true });
     fs.writeFileSync(
-      path.join(productDir, "ishiki-templates", "lingxi.md"),
-      "Ishiki template\n",
+      path.join(productDir, "agents-templates", "lingxi.md"),
+      "AGENTS.md template\n",
       "utf-8",
     );
 
     const { id: newId } = await mgr.createAgent({ name: "TemplateAgent", yuan: "lingxi" });
 
-    // identity.md / ishiki.md 不再在创建时落盘：未定制人格靠运行时回落到
+    // identity.md / AGENTS.md 不再在创建时落盘：未定制人格靠运行时回落到
     // lib 模板（core/persona-source.ts），不是靠此刻就把模板拷进 agentDir。
     expect(fs.existsSync(path.join(agentsDir, newId, "identity.md"))).toBe(false);
-    expect(fs.existsSync(path.join(agentsDir, newId, "ishiki.md"))).toBe(false);
+    expect(fs.existsSync(path.join(agentsDir, newId, "AGENTS.md"))).toBe(false);
 
     // 运行时回落链仍必须解析到同一份模板内容（带原始占位符，留给
     // system-prompt 组装阶段渲染，不在这里提前替换）。
@@ -279,15 +279,15 @@ describe("AgentManager.createAgent default skills.enabled", () => {
     expect(identity).toContain("# {{agentName}}");
     expect(identity).toContain("{{userName}}的个人助手");
 
-    const { content: ishiki, fromTemplate: ishikiFromTemplate } = resolvePersonaSource({
+    const { content: agentsMd, fromTemplate: agentsMdFromTemplate } = resolvePersonaSource({
       agentDir: path.join(agentsDir, newId),
       productDir,
       yuanType: "lingxi",
       locale: "zh-CN",
-      kind: "ishiki",
+      kind: "agents",
     });
-    expect(ishikiFromTemplate).toBe(true);
-    expect(ishiki).toContain("Ishiki template");
+    expect(agentsMdFromTemplate).toBe(true);
+    expect(agentsMd).toContain("AGENTS.md template");
   });
 
   it("defaults patrol to disabled with a 31 minute interval for newly created agents", async () => {
@@ -323,8 +323,8 @@ describe("AgentManager.createAgent default skills.enabled", () => {
       enabledSkills: ["card-skill"],
       initialFiles: {
         identity: "Imported identity",
-        ishiki: "Imported ishiki",
-        publicIshiki: "Imported public ishiki",
+        agents: "Imported persona",
+        publicAgents: "Imported public persona",
       },
       initialMemory: {
         compiled: {
@@ -344,8 +344,8 @@ describe("AgentManager.createAgent default skills.enabled", () => {
     const cfg = YAML.load(fs.readFileSync(cfgPath, "utf-8"));
     expect(cfg.skills.enabled).toEqual(["card-skill"]);
     expect(fs.readFileSync(path.join(agentsDir, newId, "identity.md"), "utf-8")).toBe("Imported identity");
-    expect(fs.readFileSync(path.join(agentsDir, newId, "ishiki.md"), "utf-8")).toBe("Imported ishiki");
-    expect(fs.readFileSync(path.join(agentsDir, newId, "public-ishiki.md"), "utf-8")).toBe("Imported public ishiki");
+    expect(fs.readFileSync(path.join(agentsDir, newId, "AGENTS.md"), "utf-8")).toBe("Imported persona");
+    expect(fs.readFileSync(path.join(agentsDir, newId, "AGENTS.public.md"), "utf-8")).toBe("Imported public persona");
     expect(fs.readFileSync(path.join(memoryDir, "today.md"), "utf-8")).toBe("今天迁移角色卡。");
     expect(fs.readFileSync(path.join(memoryDir, "memory.md"), "utf-8")).toContain("用户长期关注本地优先迁移。");
     expect(seed.imported.packageName).toBe("imported-package.zip");

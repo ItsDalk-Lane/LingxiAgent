@@ -28,7 +28,12 @@ import { relativePathInsideBase } from "./message-utils.ts";
 import { detachAgentFromBundles } from "../lib/skill-bundles/store.ts";
 import { assertKnownYuan, getAgentConfigRepairState } from "./yuan-registry.ts";
 import { assertValidAgentId, isValidAgentId } from "../shared/agent-id.ts";
-import { resolvePersonaLocale, resolvePersonaSource } from "./persona-source.ts";
+import {
+  PUBLIC_PERSONA_FILE_NAME,
+  PUBLIC_PERSONA_TEMPLATE_DIR,
+  resolvePersonaLocale,
+  resolvePersonaSource,
+} from "./persona-source.ts";
 
 const log = createModuleLogger("agent-mgr");
 const DELETED_AGENT_TOMBSTONE = ".deleted-agent.json";
@@ -682,11 +687,11 @@ export class AgentManager {
       "utf-8",
     );
 
-    // identity.md / ishiki.md 不再在创建 agent 时播种落盘（惰性材料化）：
+    // identity.md / AGENTS.md 不再在创建 agent 时播种落盘（惰性材料化）：
     // 缺失时运行时按 agent.resolveLocale() 现选 lib 模板（core/persona-source.ts
     // 的 resolvePersonaSource，与 core/agent.ts personality getter 同一条回落
     // 链），用户日后改语言，未定制人格自动跟着换。文件只在用户于设置页编辑
-    // 保存时才落盘。public-ishiki.md 的消费侧（Agent._readPublicIshiki）本来
+    // 保存时才落盘。AGENTS.public.md 的消费侧（Agent._readPublicAgentsMd）本来
     // 就有独立回落链，不受此改动影响，这里继续按原策略播种。
     const isZh = String(
       currentAgent?.resolveLocale?.() || this._d.getEngine?.()?.getLocale?.() || "en"
@@ -694,20 +699,20 @@ export class AgentManager {
     const langDir = isZh ? "" : "en/";
     const firstExisting = (paths) => paths.find((p) => fs.existsSync(p));
 
-    // public-ishiki.md（对外意识模板）
-    const publicIshikiSrc = firstExisting([
-      path.join(this._d.productDir, "public-ishiki-templates", `${langDir}${yuanType}.md`),
-      path.join(this._d.productDir, "public-ishiki-templates", `${yuanType}.md`),
+    // AGENTS.public.md（对外人格模板）
+    const publicAgentsSrc = firstExisting([
+      path.join(this._d.productDir, PUBLIC_PERSONA_TEMPLATE_DIR, `${langDir}${yuanType}.md`),
+      path.join(this._d.productDir, PUBLIC_PERSONA_TEMPLATE_DIR, `${yuanType}.md`),
     ]);
-    if (publicIshikiSrc) {
-      fs.copyFileSync(publicIshikiSrc, path.join(agentDir, "public-ishiki.md"));
+    if (publicAgentsSrc) {
+      fs.copyFileSync(publicAgentsSrc, path.join(agentDir, PUBLIC_PERSONA_FILE_NAME));
     }
 
     if (initialFiles && typeof initialFiles === "object") {
       const fileMap = {
         identity: "identity.md",
-        ishiki: "ishiki.md",
-        publicIshiki: "public-ishiki.md",
+        agents: "AGENTS.md",
+        publicAgents: PUBLIC_PERSONA_FILE_NAME,
       };
       for (const [key, fileName] of Object.entries(fileMap)) {
         if (typeof initialFiles[key] === "string") {
@@ -1149,6 +1154,7 @@ export class AgentManager {
       getAutomationSuggestionStore: () => getEngine()?.automationSuggestionStore ?? null,
       getApprovalGateway:   () => getEngine()?.approvalGateway ?? null,
       getCurrentSessionPath:() => getEngine()?.currentSessionPath ?? null,
+      getFailedPersonaRename: (agentId, fileName) => getEngine()?.getFailedPersonaRename?.(agentId, fileName) ?? null,
       getSessionPermissionMode: (sp) => getEngine()?.getSessionPermissionMode?.(sp) ?? null,
       getSessionCwd:        (sp) => getEngine()?.getSessionByPath?.(sp)?.sessionManager?.getCwd?.() ?? null,
       getSessionWorkspaceFolders: (sp) => getEngine()?.getSessionWorkspaceFolders?.(sp) ?? [],

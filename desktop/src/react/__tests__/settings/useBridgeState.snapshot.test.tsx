@@ -10,7 +10,7 @@ import { useBridgeState } from '../../settings/tabs/bridge/useBridgeState';
 
 interface MockSnapshot extends Record<string, unknown> {
   agentId: string;
-  publicIshiki: string;
+  publicAgents: string;
   bridgeStatus: Record<string, unknown>;
 }
 
@@ -68,7 +68,7 @@ function BridgeProbe() {
     dtClientSecretDraft,
     qqAppSecret,
     qqAppSecretDraft,
-    publicIshiki,
+    publicAgentsMd,
     loadStatus,
     selectedAgentId,
     setSelectedAgentId,
@@ -86,7 +86,7 @@ function BridgeProbe() {
       <span data-testid="dingtalk-secret-stored">{String(dtClientSecretDraft.hasStored)}</span>
       <span data-testid="qq-secret">{qqAppSecret}</span>
       <span data-testid="qq-secret-stored">{String(qqAppSecretDraft.hasStored)}</span>
-      <span data-testid="public-ishiki">{publicIshiki}</span>
+      <span data-testid="public-agents-md">{publicAgentsMd}</span>
       <span data-testid="selected-agent">{selectedAgentId || 'none'}</span>
       <span data-testid="wechat-status">{status?.wechat?.status || 'none'}</span>
       <button type="button" onClick={() => loadStatus()}>reload status</button>
@@ -215,15 +215,15 @@ function bridgeStatus(overrides: Record<string, unknown> = {}) {
 }
 
 function BridgeEditorProbe() {
-  const { publicIshiki, setPublicIshiki, savePublicIshiki } = useBridgeState();
+  const { publicAgentsMd, setPublicAgentsMd, savePublicAgentsMd } = useBridgeState();
   return (
     <div>
       <textarea
-        data-testid="public-ishiki-input"
-        value={publicIshiki}
-        onChange={(event) => setPublicIshiki(event.target.value)}
+        data-testid="public-agents-md-input"
+        value={publicAgentsMd}
+        onChange={(event) => setPublicAgentsMd(event.target.value)}
       />
-      <button type="button" onClick={savePublicIshiki}>save</button>
+      <button type="button" onClick={savePublicAgentsMd}>save</button>
     </div>
   );
 }
@@ -249,7 +249,7 @@ describe('useBridgeState snapshot hydration', () => {
         status: 'ready',
         data: {
           agentId: 'hana',
-          publicIshiki: 'snapshot-public-ishiki',
+          publicAgents: 'snapshot-public-agents-md',
           bridgeStatus: bridgeStatus(),
         },
         error: null,
@@ -287,7 +287,7 @@ describe('useBridgeState snapshot hydration', () => {
     expect(screen.getByTestId('dingtalk-secret-stored')).toHaveTextContent('true');
     expect(screen.getByTestId('qq-secret')).toBeEmptyDOMElement();
     expect(screen.getByTestId('qq-secret-stored')).toHaveTextContent('true');
-    expect(screen.getByTestId('public-ishiki')).toHaveTextContent('snapshot-public-ishiki');
+    expect(screen.getByTestId('public-agents-md')).toHaveTextContent('snapshot-public-agents-md');
     expect(mockLingxiFetch).toHaveBeenCalledWith(
       '/api/bridge/status?agentId=hana',
       expect.objectContaining({ signal: expect.any(AbortSignal) }),
@@ -344,7 +344,7 @@ describe('useBridgeState snapshot hydration', () => {
           wechat: { enabled: false, status: 'disconnected', token: '', agentId: 'mio' },
         }))));
       }
-      if (url === '/api/agents/mio/public-ishiki') {
+      if (url === '/api/agents/mio/public-agents-md') {
         return Promise.resolve(new Response(JSON.stringify({ content: '' })));
       }
       throw new Error(`unexpected request: ${url}`);
@@ -371,17 +371,17 @@ describe('useBridgeState snapshot hydration', () => {
     expect(screen.getByTestId('wechat-status')).toHaveTextContent('disconnected');
   });
 
-  it('keeps saved public ishiki in the settings snapshot for remounts', async () => {
-    mockState.settingsSnapshot.data.publicIshiki = '';
+  it('keeps saved public agents md in the settings snapshot for remounts', async () => {
+    mockState.settingsSnapshot.data.publicAgents = '';
     mockLingxiFetch.mockImplementation((url: string, opts?: RequestInit) => {
       if (url === '/api/bridge/status?agentId=hana') {
         return new Promise<Response>(() => {});
       }
-      if (url === '/api/agents/hana/public-ishiki') {
+      if (url === '/api/agents/hana/public-agents-md') {
         expect(opts).toMatchObject({
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ content: 'saved public ishiki' }),
+          body: JSON.stringify({ content: 'saved public agents md' }),
         });
         return Promise.resolve(new Response(JSON.stringify({ ok: true })));
       }
@@ -390,20 +390,20 @@ describe('useBridgeState snapshot hydration', () => {
 
     const first = render(<BridgeEditorProbe />);
 
-    fireEvent.change(screen.getByTestId('public-ishiki-input'), {
-      target: { value: 'saved public ishiki' },
+    fireEvent.change(screen.getByTestId('public-agents-md-input'), {
+      target: { value: 'saved public agents md' },
     });
     fireEvent.click(screen.getByRole('button', { name: 'save' }));
 
     await waitFor(() => {
       expect(mockState.showToast).toHaveBeenCalledWith('settings.saved', 'success');
     });
-    expect(mockState.settingsSnapshot.data.publicIshiki).toBe('saved public ishiki');
+    expect(mockState.settingsSnapshot.data.publicAgents).toBe('saved public agents md');
 
     first.unmount();
     render(<BridgeEditorProbe />);
 
-    expect(screen.getByTestId('public-ishiki-input')).toHaveValue('saved public ishiki');
+    expect(screen.getByTestId('public-agents-md-input')).toHaveValue('saved public agents md');
   });
 
   it('applies owner status returned by setOwner without waiting for a later refresh', async () => {
@@ -582,7 +582,7 @@ describe('useBridgeState snapshot hydration', () => {
     let resolveMioTest!: (response: Response) => void;
     mockLingxiFetch.mockImplementation((url: string) => {
       if (url.startsWith('/api/bridge/status?agentId=')) return new Promise<Response>(() => {});
-      if (url === '/api/agents/mio/public-ishiki') return new Promise<Response>(() => {});
+      if (url === '/api/agents/mio/public-agents-md') return new Promise<Response>(() => {});
       if (url === '/api/bridge/test?agentId=hana') {
         return new Promise<Response>((resolve) => { resolveLingxiTest = resolve; });
       }
@@ -660,7 +660,7 @@ describe('useBridgeState snapshot hydration', () => {
     let resolveSave!: (response: Response) => void;
     mockLingxiFetch.mockImplementation((url: string) => {
       if (url.startsWith('/api/bridge/status?agentId=')) return new Promise<Response>(() => {});
-      if (url === '/api/agents/mio/public-ishiki') return new Promise<Response>(() => {});
+      if (url === '/api/agents/mio/public-agents-md') return new Promise<Response>(() => {});
       if (url === '/api/bridge/config?agentId=hana') {
         return new Promise<Response>((resolve) => { resolveSave = resolve; });
       }
@@ -735,7 +735,7 @@ describe('useBridgeState snapshot hydration', () => {
 
     mockState.settingsSnapshot.data = {
       ...mockState.settingsSnapshot.data,
-      publicIshiki: 'locally updated ishiki',
+      publicAgents: 'locally updated agents md',
       bridgeStatus: staleBridgeStatus,
     };
     view.rerender(<BridgeProbe />);
@@ -747,7 +747,7 @@ describe('useBridgeState snapshot hydration', () => {
   it('hides the previous Agent status in the same render that changes selection', () => {
     mockLingxiFetch.mockImplementation((url: string) => {
       if (url.startsWith('/api/bridge/status?agentId=')) return new Promise<Response>(() => {});
-      if (url === '/api/agents/mio/public-ishiki') return new Promise<Response>(() => {});
+      if (url === '/api/agents/mio/public-agents-md') return new Promise<Response>(() => {});
       throw new Error(`unexpected request: ${url}`);
     });
 
@@ -789,7 +789,7 @@ describe('useBridgeState snapshot hydration', () => {
   it('drops plaintext drafts when the selected Agent changes', async () => {
     mockLingxiFetch.mockImplementation((url: string) => {
       if (url.startsWith('/api/bridge/status?agentId=')) return new Promise<Response>(() => {});
-      if (url === '/api/agents/mio/public-ishiki') return new Promise<Response>(() => {});
+      if (url === '/api/agents/mio/public-agents-md') return new Promise<Response>(() => {});
       throw new Error(`unexpected request: ${url}`);
     });
 

@@ -31,11 +31,11 @@
  *       default-models.json
  *       config.example.yaml
  *       identity.example.md
- *       ishiki.example.md
+ *       agents.example.md
  *       pinned.example.md
  *       identity-templates/
- *       ishiki-templates/
- *       public-ishiki-templates/
+ *       agents-templates/
+ *       agents-public-templates/
  *       yuan/
  *     desktop/src/assets/     ← server 运行时读取的默认头像、角色卡背、Yuan 图标
  *     desktop/src/locales/    ← i18n 资源
@@ -105,13 +105,13 @@ const LIB_DATA_GLOBS = [
   "default-models.json",
   "config.example.yaml",
   "identity.example.md",
-  "ishiki.example.md",
+  "agents.example.md",
   "pinned.example.md",
 ];
 const LIB_TEMPLATE_DIRS = [
   "identity-templates",
-  "ishiki-templates",
-  "public-ishiki-templates",
+  "agents-templates",
+  "agents-public-templates",
   "yuan",
 ];
 copyServerDataFiles({

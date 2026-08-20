@@ -85,10 +85,10 @@ function buildPayload(agentId: string, endpoint: string) {
       return { agent: { id: agentId, name: `${agentId}-name` }, desk: { home_folder: `/${agentId}/home` } };
     case 'identity':
       return { content: `${agentId}-identity` };
-    case 'ishiki':
-      return { content: `${agentId}-ishiki` };
-    case 'public-ishiki':
-      return { content: `${agentId}-public-ishiki` };
+    case 'agents-md':
+      return { content: `${agentId}-agents-md` };
+    case 'public-agents-md':
+      return { content: `${agentId}-public-agents-md` };
     case 'pinned':
       return { pins: [`${agentId}-pin`] };
     case 'experience':
@@ -283,8 +283,8 @@ describe('settings actions', () => {
             desk: { home_folder: '/agent-a/home' },
           },
           identity: 'agent-a-identity',
-          ishiki: 'agent-a-ishiki',
-          publicIshiki: 'agent-a-public',
+          agents: 'agent-a-agents-md',
+          publicAgents: 'agent-a-public',
           userProfile: 'user-profile',
           experience: 'agent-a-experience',
           pinned: { pins: ['agent-a-pin'] },
@@ -319,8 +319,8 @@ describe('settings actions', () => {
     expect(mockState.settingsConfig).toMatchObject({
       agent: { name: 'Agent A' },
       _identity: 'agent-a-identity',
-      _ishiki: 'agent-a-ishiki',
-      _publicIshiki: 'agent-a-public',
+      _agents: 'agent-a-agents-md',
+      _publicAgents: 'agent-a-public',
       _userProfile: 'user-profile',
       _experience: 'agent-a-experience',
     });
@@ -351,8 +351,8 @@ describe('settings actions', () => {
         agentId: 'agent-a',
         config: { agent: { id: 'agent-a', name: 'Stale Agent' }, keep_awake: false },
         identity: 'old-identity',
-        ishiki: '',
-        publicIshiki: '',
+        agents: '',
+        publicAgents: '',
         userProfile: '',
         experience: '',
         pinned: { pins: ['old-pin'] },
@@ -405,8 +405,8 @@ describe('settings actions', () => {
       agentId: 'agent-a',
       config: { agent: { id: 'agent-a', name: 'Fresh Agent' }, keep_awake: true },
       identity: 'fresh-identity',
-      ishiki: '',
-      publicIshiki: '',
+      agents: '',
+      publicAgents: '',
       userProfile: '',
       experience: '',
       pinned: { pins: ['fresh-pin'] },

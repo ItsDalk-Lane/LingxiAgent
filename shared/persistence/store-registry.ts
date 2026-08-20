@@ -458,8 +458,8 @@ export const PERSISTENT_STORES: readonly StoreDescriptor[] = Object.freeze([
     pathPatterns: [
       "agents/{agentId}/config.yaml",
       "agents/{agentId}/identity.md",
-      "agents/{agentId}/ishiki.md",
-      "agents/{agentId}/public-ishiki.md",
+      "agents/{agentId}/AGENTS.md",
+      "agents/{agentId}/AGENTS.public.md",
       "agents/{agentId}/appearance-summary.json",
       "agents/{agentId}/avatars/{fileName}",
       "agents/{agentId}/pinned.md",
@@ -470,14 +470,18 @@ export const PERSISTENT_STORES: readonly StoreDescriptor[] = Object.freeze([
     format: "mixed-directory",
     schemaSource: directorySource("core/agent-manager.ts", "agent config and authored Markdown/image profile protocol"),
     openEntry: ["AgentManager.loadAgents", "new LingxiAgent"],
-    migrationEntry: ["lib/compat/checks/config-yaml.ts"],
+    migrationEntry: ["lib/compat/checks/config-yaml.ts", "core/agents-md-migration.ts"],
     firstPossibleOpenPhase: "first_run_seed",
     firstPossibleWritePhase: "first_run_seed",
     identityContract: "agentId owns the profile; each filename has a fixed semantic role.",
     siteRules: [
       ...rules(["core/agent-manager.ts"], "Creates, rolls back, or edits agent profile material.", ["write-file", "copy-file", "mkdir", "remove-path"]),
+      // Startup pass that moves each agent's persona file from its former name
+      // onto AGENTS.md / AGENTS.public.md. It only ever renames within one
+      // agent directory, which is why "rename" is the single kind it may use.
+      ...rules(["core/agents-md-migration.ts"], "Renames agent persona files onto their current names.", ["rename"]),
       // server/routes/config.ts removed from this rule: its only fs write sites were the bare
-      // GET/PUT /api/identity and /api/ishiki handlers, deleted as dead legacy routes; the file
+      // GET/PUT /api/identity and persona-file handlers, deleted as dead legacy routes; the file
       // now only reads agent profile material directly (writes for /pinned and /user-profile go
       // through library helpers, not literal fs calls in this file).
       ...rules(["lib/agent-appearance-summary.ts", "lib/compat/checks/config-yaml.ts", "server/routes/agents.ts", "server/routes/avatar.ts"], "Reads, repairs, removes, or edits agent/user profile material.", ["write-file", "copy-file", "rename", "mkdir", "remove-path", "atomic-write"]),
@@ -513,6 +517,9 @@ export const PERSISTENT_STORES: readonly StoreDescriptor[] = Object.freeze([
       "agents/{agentId}/memory/pinned-memory.json",
       "agents/{agentId}/memory/summaries/{sessionId}.json",
       "agents/{agentId}/memory/daily/{date}.md",
+      "agents/{agentId}/memory/dream/state.json",
+      "agents/{agentId}/memory/dream/pending-apply.json",
+      "agents/{agentId}/memory/dream/revisions/{revisionId}.json",
       "agents/{agentId}/memory/memories.db",
       "agents/{agentId}/memory/.v2-migrated",
     ],
@@ -529,10 +536,12 @@ export const PERSISTENT_STORES: readonly StoreDescriptor[] = Object.freeze([
         "lib/memory/compiled-memory-snapshot.ts",
         "lib/memory/compiled-memory-state.ts",
         "lib/memory/config-loader.ts",
+        "lib/memory/dream/revision-store.ts",
+        "lib/memory/dream/state-store.ts",
         "lib/memory/memory-ticker.ts",
         "lib/memory/pinned-memory-store.ts",
         "lib/memory/session-summary.ts",
-      ], "Writes a named per-agent memory protocol file."),
+      ], "Writes a named per-agent memory or Dream revision protocol file."),
     ],
   }),
   defineStore({

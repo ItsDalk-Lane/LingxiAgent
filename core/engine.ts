@@ -16,6 +16,7 @@ import fs from "fs";
 import os from "os";
 import path from "path";
 import { runMigrations } from "./migrations.ts";
+import { buildFailedPersonaRenameIndex, migrateAgentPersonaFileNames } from "./agents-md-migration.ts";
 import { healCredentialFileModes } from "./credential-file-healer.ts";
 import { PLUGIN_DATA_DIRNAME } from "./plugin-config.ts";
 import { pruneStaleCredentialBackups } from "./credential-backup-retention.ts";
@@ -303,6 +304,8 @@ export class LingxiEngine {
   declare _resourceWatchRegistry: any;
   declare _resources: any;
   declare _runtimeContext: any;
+  /** 启动迁移 agents-md-rename 的失败索引：agentId → (新文件名 → 旧文件名)。 */
+  declare _failedPersonaRenames: Map<string, Map<string, string>>;
   declare _sessionCoord: any;
   declare _sessionFiles: any;
   declare _sessionExecutions: any;
@@ -350,6 +353,10 @@ export class LingxiEngine {
     this._resourceAccess = null;
     this._resourceIO = null;
     this._resourceEventBus = null;
+    // 启动级 migration-degraded 状态：agentId → (新文件名 → 旧文件名)。
+    // 仅记录本次启动 agents-md-rename 明确失败的条目；改名成功后（下次启动）
+    // 该条目自然消失，旧文件读取不是永久协议。
+    this._failedPersonaRenames = new Map();
     this.agentsDir = path.join(lingxiHome, "agents");
     this.userDir = path.join(lingxiHome, "user");
     this.channelsDir = path.join(lingxiHome, "channels");
@@ -996,6 +1003,15 @@ export class LingxiEngine {
 
   get runtimeContext() {
     return this._runtimeContext;
+  }
+
+  /**
+   * 启动迁移（agents-md-rename）明确记录的改名失败：返回该 agent 的某个新
+   * 人格文件对应的旧文件名；没有失败记录时返回 null。Agent 凭它在本进程内
+   * 临时读取旧文件——这是 migration-degraded 状态，不是永久双读协议。
+   */
+  getFailedPersonaRename(agentId, currentFileName) {
+    return this._failedPersonaRenames?.get(agentId)?.get(currentFileName) ?? null;
   }
 
   getRuntimeContext() {
@@ -2395,6 +2411,20 @@ export class LingxiEngine {
       const healed = healCredentialFileModes({ lingxiHome: this.lingxiHome, log });
       if (healed.failed.length > 0) {
         log(`[credential-custody] ${healed.failed.length} 个文件未能收紧权限，已记录；应用继续启动`);
+      }
+    }, log);
+
+    // 0f. 人格文件改名（旧 ishiki.md / public-ishiki.md → AGENTS.md /
+    // AGENTS.public.md）。必须在 agent 初始化之前跑完，之后任何 persona 读取
+    // 都只认新名字，回落链里不留双读。每次启动都跑：从备份或同步恢复回来的
+    // 旧目录同样要在边界上被改过来。
+    runBestEffortStartupMigrationStep("agents-md-rename", () => {
+      const renames = migrateAgentPersonaFileNames({ agentsDir: this.agentsDir, log });
+      // 失败记录必须成为运行时可消费状态：agent 初始化时凭它把仍留在磁盘上
+      // 的旧人格文件作为本进程的临时 persona source，而不是静默回落到模板。
+      this._failedPersonaRenames = buildFailedPersonaRenameIndex(renames.failedDetails);
+      if (renames.failed.length > 0) {
+        log(`[agents-md-rename] ${renames.failed.length} 个人格文件未能改名，本次运行将临时读取旧文件；应用继续启动，下次启动重试改名`);
       }
     }, log);
 

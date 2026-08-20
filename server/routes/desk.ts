@@ -109,6 +109,32 @@ function deskRouteError(c, code, message, status) {
   return jsonRouteError(c, { code, message, status });
 }
 
+const SAFE_CRON_STORE_ERRORS = Object.freeze({
+  cron_store_corrupt: Object.freeze({ message: "automation task storage is corrupt", status: 500 }),
+  cron_store_unavailable: Object.freeze({ message: "automation task storage is unavailable", status: 500 }),
+  cron_store_recovery_failed: Object.freeze({ message: "automation task recovery failed", status: 500 }),
+  cron_store_reentrant_write: Object.freeze({ message: "cron store does not allow reentrant writes", status: 409 }),
+  cron_store_async_mutator_forbidden: Object.freeze({ message: "cron store mutator must be synchronous", status: 409 }),
+});
+
+function isSafeCronStoreError(err) {
+  if (!err || typeof err !== "object" || typeof err.code !== "string") return false;
+  const expected = SAFE_CRON_STORE_ERRORS[err.code];
+  return !!expected && err.message === expected.message && err.status === expected.status;
+}
+
+function cronStoreRouteFailure(c, err) {
+  if (isSafeCronStoreError(err)) {
+    return deskRouteError(c, err.code, err.message, err.status);
+  }
+  return deskRouteError(
+    c,
+    "cron_store_operation_failed",
+    "Unable to access automation tasks",
+    500,
+  );
+}
+
 function deskFileActionErrorMessage(err) {
   if (err?.code === "resource_not_found") return "not found";
   if (err?.code === "target_already_exists") return "target already exists";
@@ -1026,22 +1052,37 @@ export function createDeskRoute(engine, hub) {
 
   /** 列出 cron 任务 */
   route.get("/desk/cron", async (c) => {
-    const scope = bindCronRequestScope(c);
+    let scope;
+    try {
+      scope = bindCronRequestScope(c);
+    } catch (err) {
+      return cronStoreRouteFailure(c, err);
+    }
     if (scope.error) return scope.error;
     const { store } = scope;
-    return c.json({ jobs: store.listJobs() });
+    try {
+      return c.json({ jobs: store.listJobs() });
+    } catch (err) {
+      return cronStoreRouteFailure(c, err);
+    }
   });
 
   /** 操作 cron 任务 */
   route.post("/desk/cron", async (c) => {
-    const scope = bindCronRequestScope(c);
+    let scope;
+    try {
+      scope = bindCronRequestScope(c);
+    } catch (err) {
+      return cronStoreRouteFailure(c, err);
+    }
     if (scope.error) return scope.error;
     const { store, studioId } = scope;
 
     const body = await safeJson(c);
     const { action, ...params } = body;
 
-    switch (action) {
+    try {
+      switch (action) {
       case "apply_suggestion": {
         const suggestionId = typeof params.suggestionId === "string" && params.suggestionId.trim()
           ? params.suggestionId.trim()
@@ -1076,6 +1117,7 @@ export function createDeskRoute(engine, hub) {
           }
           return c.json({ ok: true, job: applied.result, jobs: store.listJobs() });
         } catch (err) {
+          if (isSafeCronStoreError(err)) return cronStoreRouteFailure(c, err);
           const message = err instanceof Error ? err.message : String(err);
           const code = typeof err?.code === "string" ? err.code : "automation_suggestion_invalid";
           const status = [400, 404, 409, 410].includes(err?.status)
@@ -1158,6 +1200,7 @@ export function createDeskRoute(engine, hub) {
         try {
           job = store.toggleJob(params.id);
         } catch (err) {
+          if (isSafeCronStoreError(err)) return cronStoreRouteFailure(c, err);
           const message = err instanceof Error ? err.message : String(err);
           return c.json({ error: message }, 400);
         }
@@ -1218,6 +1261,7 @@ export function createDeskRoute(engine, hub) {
         try {
           job = store.updateJob(id, fields);
         } catch (err) {
+          if (isSafeCronStoreError(err)) return cronStoreRouteFailure(c, err);
           const message = err instanceof Error ? err.message : String(err);
           return c.json({ error: message }, 400);
         }
@@ -1226,6 +1270,9 @@ export function createDeskRoute(engine, hub) {
 
       default:
         return deskRouteError(c, "unknown_cron_action", `unknown action: ${action}`, 400);
+      }
+    } catch (err) {
+      return cronStoreRouteFailure(c, err);
     }
   });
 

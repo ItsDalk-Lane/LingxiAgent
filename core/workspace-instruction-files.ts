@@ -64,7 +64,16 @@ function readInstructionFile(filePath) {
   }
 }
 
-export function collectWorkspaceInstructionFiles({ cwd, workspaceContext }: { cwd?: any; workspaceContext?: any } = {}) {
+/**
+ * excludeFiles: absolute paths that must not be injected as workspace
+ * instructions. The agent's own persona files (AGENTS.md / AGENTS.public.md)
+ * live in its agent directory, and a session whose working directory is that
+ * directory would otherwise pick the persona up a second time here, on top of
+ * the system prompt that already carries it. Matching is on the exact resolved
+ * path, so a same-named file anywhere else in the directory chain is still
+ * injected.
+ */
+export function collectWorkspaceInstructionFiles({ cwd, workspaceContext, excludeFiles }: { cwd?: any; workspaceContext?: any; excludeFiles?: any } = {}) {
   const enabled = new Set();
   const config = workspaceContext && typeof workspaceContext === "object" ? workspaceContext : {};
   for (const item of WORKSPACE_INSTRUCTION_FILES) {
@@ -75,6 +84,12 @@ export function collectWorkspaceInstructionFiles({ cwd, workspaceContext }: { cw
   const startDir = existingDirectory(cwd);
   if (!startDir) return [];
 
+  const excluded = new Set(
+    (Array.isArray(excludeFiles) ? excludeFiles : [])
+      .filter((entry) => typeof entry === "string" && entry)
+      .map(normalizeComparePath),
+  );
+
   const gitRoot = findGitRoot(startDir);
   const searchRoot = gitRoot || startDir;
   const dirs = directoriesFromRootToCwd(searchRoot, startDir);
@@ -83,6 +98,7 @@ export function collectWorkspaceInstructionFiles({ cwd, workspaceContext }: { cw
     for (const item of WORKSPACE_INSTRUCTION_FILES) {
       if (!enabled.has(item.filename)) continue;
       const filePath = path.join(dir, item.filename);
+      if (excluded.has(normalizeComparePath(filePath))) continue;
       const result = readInstructionFile(filePath);
       if (!result) continue;
       files.push({
@@ -118,9 +134,9 @@ export function formatWorkspaceInstructionFiles(files: any, { locale }: { locale
     : `\n## Workspace Instructions\n\nThe following content comes from AGENTS.md / CLAUDE.md files in the primary workbench's directory chain. Treat them as project-level working rules for this workspace context.\n\n${body}`;
 }
 
-export function buildWorkspaceInstructionPrompt({ cwd, workspaceContext, locale }: { cwd?: string; workspaceContext?: unknown; locale?: string } = {}) {
+export function buildWorkspaceInstructionPrompt({ cwd, workspaceContext, locale, excludeFiles }: { cwd?: string; workspaceContext?: unknown; locale?: string; excludeFiles?: string[] } = {}) {
   return formatWorkspaceInstructionFiles(
-    collectWorkspaceInstructionFiles({ cwd, workspaceContext }),
+    collectWorkspaceInstructionFiles({ cwd, workspaceContext, excludeFiles }),
     { locale },
   );
 }

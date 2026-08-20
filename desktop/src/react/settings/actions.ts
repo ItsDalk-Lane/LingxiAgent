@@ -138,12 +138,12 @@ export async function loadSettingsConfig() {
   }
   try {
     const agentBase = `/api/agents/${agentId}`;
-    const [configRes, identityRes, ishikiRes, publicIshikiRes, userProfileRes, pinnedRes, globalModelsRes] =
+    const [configRes, identityRes, agentsMdRes, publicAgentsMdRes, userProfileRes, pinnedRes, globalModelsRes] =
       await Promise.all([
         lingxiFetch(`${agentBase}/config`, { signal: controller.signal }),
         lingxiFetch(`${agentBase}/identity`, { signal: controller.signal }),
-        lingxiFetch(`${agentBase}/ishiki`, { signal: controller.signal }),
-        lingxiFetch(`${agentBase}/public-ishiki`, { signal: controller.signal }),
+        lingxiFetch(`${agentBase}/agents-md`, { signal: controller.signal }),
+        lingxiFetch(`${agentBase}/public-agents-md`, { signal: controller.signal }),
         lingxiFetch('/api/user-profile', { signal: controller.signal }),
         lingxiFetch(`${agentBase}/pinned`, { signal: controller.signal }),
         lingxiFetch('/api/preferences/models', { signal: controller.signal }),
@@ -153,10 +153,10 @@ export async function loadSettingsConfig() {
     const globalModels = await globalModelsRes.json();
     const identityData = await identityRes.json();
     config._identity = identityData.content || '';
-    const ishikiData = await ishikiRes.json();
-    config._ishiki = ishikiData.content || '';
-    const publicIshikiData = await publicIshikiRes.json();
-    config._publicIshiki = publicIshikiData.content || '';
+    const agentsMdData = await agentsMdRes.json();
+    config._agents = agentsMdData.content || '';
+    const publicAgentsMdData = await publicAgentsMdRes.json();
+    config._publicAgents = publicAgentsMdData.content || '';
     const userProfileData = await userProfileRes.json();
     config._userProfile = userProfileData.content || '';
     const pinnedData = await pinnedRes.json();
@@ -201,8 +201,8 @@ function configFromSnapshot(snapshot: SettingsSnapshot): Record<string, any> {
   return {
     ...(snapshot.config || {}),
     _identity: snapshot.identity || '',
-    _ishiki: snapshot.ishiki || '',
-    _publicIshiki: snapshot.publicIshiki || '',
+    _agents: snapshot.agents || '',
+    _publicAgents: snapshot.publicAgents || '',
     _userProfile: snapshot.userProfile || '',
     _experience: snapshot.experience || '',
   };

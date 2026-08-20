@@ -471,6 +471,9 @@ CRCCheck off
   ; 老版本安装面是散装 resources\server 目录；现在改成 resources\seed 归档，
   ; 这行只在升级覆盖老版本时才会真正命中，负责清掉旧安装留下的散装树。
   RMDir /r "$INSTDIR\resources\server"
+  ; seed 归档文件名包含版本号，覆盖复制不会替换旧版本；写入新安装面前必须
+  ; 清空整个安装目录下的 seed。这里仅处理 $INSTDIR，不触碰 LINGXI_HOME 用户数据。
+  RMDir /r "$INSTDIR\resources\seed"
   RMDir /r "$INSTDIR\resources\git"
   RMDir /r "$INSTDIR\resources\screenshot-themes"
   RMDir /r "$INSTDIR\resources\app"

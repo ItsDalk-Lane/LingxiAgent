@@ -181,10 +181,10 @@ export function useBridgeState() {
     if (currentAgentId) setSelectedAgentId(currentAgentId);
   }, [currentAgentId, selectedAgentId]);
 
-  // Public Ishiki — keyed to selectedAgentId
-  const initialPublicIshiki = settingsSnapshot?.agentId === currentAgentId ? settingsSnapshot.publicIshiki || '' : '';
-  const [publicIshiki, setPublicIshiki] = useState(initialPublicIshiki);
-  const [publicIshikiOriginal, setPublicIshikiOriginal] = useState(initialPublicIshiki);
+  // Public AGENTS.md — keyed to selectedAgentId
+  const initialPublicAgentsMd = settingsSnapshot?.agentId === currentAgentId ? settingsSnapshot.publicAgents || '' : '';
+  const [publicAgentsMd, setPublicAgentsMd] = useState(initialPublicAgentsMd);
+  const [publicAgentsMdOriginal, setPublicAgentsMdOriginal] = useState(initialPublicAgentsMd);
 
   const {
     drafts: secretDrafts,
@@ -227,36 +227,36 @@ export function useBridgeState() {
     applyStatus(nextStatus, selectedAgentId);
   }, [applyStatus, selectedAgentId, settingsSnapshot?.agentId, settingsSnapshot?.bridgeStatus]);
 
-  // Fetch public ishiki for selected agent (abort stale requests on agent switch)
+  // Fetch public AGENTS.md for selected agent (abort stale requests on agent switch)
   useEffect(() => {
     if (!selectedAgentId) return;
     if (settingsSnapshot?.agentId === selectedAgentId) {
-      const content = settingsSnapshot.publicIshiki || '';
-      setPublicIshiki(content);
-      setPublicIshikiOriginal(content);
+      const content = settingsSnapshot.publicAgents || '';
+      setPublicAgentsMd(content);
+      setPublicAgentsMdOriginal(content);
       return;
     }
     const ac = new AbortController();
-    lingxiFetch(`/api/agents/${selectedAgentId}/public-ishiki`, { signal: ac.signal })
+    lingxiFetch(`/api/agents/${selectedAgentId}/public-agents-md`, { signal: ac.signal })
       .then(r => r.json())
-      .then(data => { setPublicIshiki(data.content || ''); setPublicIshikiOriginal(data.content || ''); })
-      .catch(err => { if (err?.name !== 'AbortError') console.warn('[bridge] fetch public-ishiki failed:', err); });
+      .then(data => { setPublicAgentsMd(data.content || ''); setPublicAgentsMdOriginal(data.content || ''); })
+      .catch(err => { if (err?.name !== 'AbortError') console.warn('[bridge] fetch public-agents-md failed:', err); });
     return () => ac.abort();
   }, [selectedAgentId, settingsSnapshot]);
 
-  const savePublicIshiki = async () => {
+  const savePublicAgentsMd = async () => {
     const agentId = selectedAgentId;
-    if (!agentId || publicIshiki === publicIshikiOriginal) return;
+    if (!agentId || publicAgentsMd === publicAgentsMdOriginal) return;
     try {
-      await lingxiFetch(`/api/agents/${agentId}/public-ishiki`, {
+      await lingxiFetch(`/api/agents/${agentId}/public-agents-md`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ content: publicIshiki }),
+        body: JSON.stringify({ content: publicAgentsMd }),
       });
       updateSettingsSnapshot(snapshot => (
-        snapshot.agentId === agentId ? { ...snapshot, publicIshiki } : snapshot
+        snapshot.agentId === agentId ? { ...snapshot, publicAgents: publicAgentsMd } : snapshot
       ));
-      setPublicIshikiOriginal(publicIshiki);
+      setPublicAgentsMdOriginal(publicAgentsMd);
       showToast(t('settings.saved'), 'success');
     } catch (err: unknown) {
       showToast(t('settings.saveFailed') + ': ' + (err instanceof Error ? err.message : String(err)), 'error');
@@ -481,7 +481,7 @@ export function useBridgeState() {
   return {
     status, testingPlatform, globalSettingsSaving, showToast, loadStatus,
     selectedAgentId, setSelectedAgentId,
-    publicIshiki, setPublicIshiki, savePublicIshiki,
+    publicAgentsMd, setPublicAgentsMd, savePublicAgentsMd,
     tgToken: secretDrafts.telegramToken.value,
     tgTokenDraft: secretDrafts.telegramToken,
     setTgToken,

@@ -76,6 +76,124 @@ describe('ArchivedSessionsModal', () => {
     });
   });
 
+  it('falls back to firstMessage when title is missing', async () => {
+    listMock.mockResolvedValue([
+      {
+        path: '/x/a.jsonl',
+        title: null,
+        firstMessage: 'First user message',
+        archivedAt: new Date().toISOString(),
+        sizeBytes: 100,
+        agentId: 'a',
+        agentName: 'Hana',
+      },
+      {
+        path: '/x/b.jsonl',
+        title: null,
+        firstMessage: null,
+        archivedAt: new Date().toISOString(),
+        sizeBytes: 100,
+        agentId: 'a',
+        agentName: 'Hana',
+      },
+    ]);
+    render(<ArchivedSessionsModal open={true} onClose={() => {}} />);
+    await waitFor(() => {
+      expect(screen.getByText('First user message')).toBeInTheDocument();
+    });
+    expect(screen.getByText('session.untitled')).toBeInTheDocument();
+    expect(screen.queryByText('session.archived.empty')).not.toBeInTheDocument();
+  });
+
+  it('deletes only the checked sessions after confirm', async () => {
+    listMock.mockResolvedValue([
+      {
+        path: '/x/a.jsonl',
+        sessionId: 'sess_archived_a',
+        title: 'Alpha',
+        archivedAt: new Date().toISOString(),
+        sizeBytes: 100,
+        agentId: 'a',
+        agentName: 'Hana',
+      },
+      {
+        path: '/x/b.jsonl',
+        sessionId: 'sess_archived_b',
+        title: 'Beta',
+        archivedAt: new Date().toISOString(),
+        sizeBytes: 100,
+        agentId: 'a',
+        agentName: 'Hana',
+      },
+    ]);
+    deleteMock.mockResolvedValue(true);
+    window.confirm = vi.fn(() => true);
+    render(<ArchivedSessionsModal open={true} onClose={() => {}} />);
+    await waitFor(() => screen.getByText('Alpha'));
+
+    const checkboxes = screen.getAllByRole('checkbox');
+    // 第 0 个是「全选」，第 1、2 个是行勾选框
+    fireEvent.click(checkboxes[1]);
+    const deleteSelected = screen.getByRole('button', { name: /session\.archived\.deleteSelected/ });
+    fireEvent.click(deleteSelected);
+
+    await waitFor(() => expect(deleteMock).toHaveBeenCalledTimes(1));
+    expect(deleteMock).toHaveBeenCalledWith(expect.objectContaining({ path: '/x/a.jsonl' }));
+    await waitFor(() => expect(toastMock).toHaveBeenCalledWith(
+      'session.archived.deleteSelectedDone[{"count":1}]',
+    ));
+  });
+
+  it('selects all rows via the select-all checkbox', async () => {
+    listMock.mockResolvedValue([
+      {
+        path: '/x/a.jsonl',
+        sessionId: 'sess_archived_a',
+        title: 'Alpha',
+        archivedAt: new Date().toISOString(),
+        sizeBytes: 100,
+        agentId: 'a',
+        agentName: 'Hana',
+      },
+      {
+        path: '/x/b.jsonl',
+        sessionId: 'sess_archived_b',
+        title: 'Beta',
+        archivedAt: new Date().toISOString(),
+        sizeBytes: 100,
+        agentId: 'a',
+        agentName: 'Hana',
+      },
+    ]);
+    deleteMock.mockResolvedValue(true);
+    window.confirm = vi.fn(() => true);
+    render(<ArchivedSessionsModal open={true} onClose={() => {}} />);
+    await waitFor(() => screen.getByText('Alpha'));
+
+    fireEvent.click(screen.getAllByRole('checkbox')[0]);
+    fireEvent.click(screen.getByRole('button', { name: /session\.archived\.deleteSelected/ }));
+
+    await waitFor(() => expect(deleteMock).toHaveBeenCalledTimes(2));
+    expect(deleteMock).toHaveBeenCalledWith(expect.objectContaining({ path: '/x/a.jsonl' }));
+    expect(deleteMock).toHaveBeenCalledWith(expect.objectContaining({ path: '/x/b.jsonl' }));
+  });
+
+  it('keeps delete-selected disabled when nothing is checked', async () => {
+    listMock.mockResolvedValue([
+      {
+        path: '/x/a.jsonl',
+        title: 'Alpha',
+        archivedAt: new Date().toISOString(),
+        sizeBytes: 100,
+        agentId: 'a',
+        agentName: 'Hana',
+      },
+    ]);
+    render(<ArchivedSessionsModal open={true} onClose={() => {}} />);
+    await waitFor(() => screen.getByText('Alpha'));
+    expect(screen.getByRole('button', { name: /session\.archived\.deleteSelected/ })).toBeDisabled();
+  });
+
   it('returns null when closed (no render side-effect)', () => {
     listMock.mockResolvedValue([]);
     const { container } = render(<ArchivedSessionsModal open={false} onClose={() => {}} />);

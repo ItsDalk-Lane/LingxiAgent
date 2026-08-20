@@ -57,17 +57,17 @@ describe("first run default workspace", () => {
     expect(cfg.memory.enabled).toBe(true);
   });
 
-  it("does not seed identity.md/ishiki.md to disk on first run (lazy materialization)", async () => {
+  it("does not seed identity.md/AGENTS.md to disk on first run (lazy materialization)", async () => {
     fs.mkdirSync(path.join(productDir, "identity-templates"), { recursive: true });
     fs.writeFileSync(
       path.join(productDir, "identity-templates", "lingxi.md"),
       "# {{agentName}}\n\n{{userName}}的个人助手。\n",
       "utf-8",
     );
-    fs.mkdirSync(path.join(productDir, "ishiki-templates"), { recursive: true });
+    fs.mkdirSync(path.join(productDir, "agents-templates"), { recursive: true });
     fs.writeFileSync(
-      path.join(productDir, "ishiki-templates", "lingxi.md"),
-      "Ishiki template\n",
+      path.join(productDir, "agents-templates", "lingxi.md"),
+      "AGENTS.md template\n",
       "utf-8",
     );
     const { ensureFirstRun } = await import("../core/first-run.ts");
@@ -75,11 +75,11 @@ describe("first run default workspace", () => {
     ensureFirstRun(lingxiHome, productDir);
 
     const hanakoDir = path.join(lingxiHome, "agents", "lingxi");
-    // config.yaml 仍然照常播种，只是 identity.md / ishiki.md 不再落盘：
+    // config.yaml 仍然照常播种，只是 identity.md / AGENTS.md 不再落盘：
     // 未定制人格靠运行时按 agent.resolveLocale() 回落到 lib 模板。
     expect(fs.existsSync(path.join(hanakoDir, "config.yaml"))).toBe(true);
     expect(fs.existsSync(path.join(hanakoDir, "identity.md"))).toBe(false);
-    expect(fs.existsSync(path.join(hanakoDir, "ishiki.md"))).toBe(false);
+    expect(fs.existsSync(path.join(hanakoDir, "AGENTS.md"))).toBe(false);
   });
 
   it("keeps userName as a dynamic identity placeholder for first-run Hanako (resolved via template fallback)", async () => {

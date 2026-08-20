@@ -66,12 +66,12 @@ export const OPEN_LIB_DATA_FILES = [
   "default-models.json",
   "config.example.yaml",
   "identity.example.md",
-  "ishiki.example.md",
+  "agents.example.md",
 ];
 export const OPEN_LIB_TEMPLATE_DIRS = [
   "identity-templates",
-  "ishiki-templates",
-  "public-ishiki-templates",
+  "agents-templates",
+  "agents-public-templates",
   "yuan",
 ];
 

@@ -46,11 +46,11 @@ describe('refreshSettingsConfigSnapshot', () => {
     resetState();
   });
 
-  it('保留 _identity/_ishiki/_publicIshiki/_userProfile/_experience 下划线键', async () => {
+  it('保留 _identity/_agents/_publicAgents/_userProfile/_experience 下划线键', async () => {
     mockState.settingsConfig = {
       _identity: 'identity-content',
-      _ishiki: 'ishiki-content',
-      _publicIshiki: 'public-ishiki-content',
+      _agents: 'agents-md-content',
+      _publicAgents: 'public-agents-md-content',
       _userProfile: 'profile-content',
       _experience: 'experience-content',
       desk: { home_folder: '/old-home' },
@@ -67,8 +67,8 @@ describe('refreshSettingsConfigSnapshot', () => {
 
     expect(mockState.settingsConfig).toEqual({
       _identity: 'identity-content',
-      _ishiki: 'ishiki-content',
-      _publicIshiki: 'public-ishiki-content',
+      _agents: 'agents-md-content',
+      _publicAgents: 'public-agents-md-content',
       _userProfile: 'profile-content',
       _experience: 'experience-content',
       desk: { home_folder: '/new-home' },

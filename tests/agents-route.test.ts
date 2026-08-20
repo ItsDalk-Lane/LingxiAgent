@@ -673,7 +673,7 @@ describe("agents route", () => {
     expectAppEvent(engine.emitEvent, "agent-updated", { agentId });
   });
 
-  it("GET identity/ishiki fall back to template content with fromTemplate: true when nothing is seeded on disk", async () => {
+  it("GET identity/agents-md fall back to template content with fromTemplate: true when nothing is seeded on disk", async () => {
     const agentId = "hana";
     const agentDir = path.join(tempRoot, agentId);
     const productDir = path.join(tempRoot, "product");
@@ -681,11 +681,11 @@ describe("agents route", () => {
     fs.writeFileSync(path.join(agentDir, "config.yaml"), "agent:\n  name: Hana\n  yuan: lingxi\n", "utf-8");
     fs.mkdirSync(path.join(productDir, "identity-templates"), { recursive: true });
     fs.writeFileSync(path.join(productDir, "identity-templates", "lingxi.md"), "template identity content", "utf-8");
-    fs.mkdirSync(path.join(productDir, "ishiki-templates"), { recursive: true });
-    fs.writeFileSync(path.join(productDir, "ishiki-templates", "lingxi.md"), "template ishiki content", "utf-8");
-    // identity.md / ishiki.md 惰性材料化：agentDir 下确实没有落盘文件
+    fs.mkdirSync(path.join(productDir, "agents-templates"), { recursive: true });
+    fs.writeFileSync(path.join(productDir, "agents-templates", "lingxi.md"), "template persona content", "utf-8");
+    // identity.md / AGENTS.md 惰性材料化：agentDir 下确实没有落盘文件
     expect(fs.existsSync(path.join(agentDir, "identity.md"))).toBe(false);
-    expect(fs.existsSync(path.join(agentDir, "ishiki.md"))).toBe(false);
+    expect(fs.existsSync(path.join(agentDir, "AGENTS.md"))).toBe(false);
 
     const { createAgentsRoute } = await import("../server/routes/agents.ts");
     const app = new Hono();
@@ -701,19 +701,19 @@ describe("agents route", () => {
     expect(identityRes.status).toBe(200);
     expect(await identityRes.json()).toEqual({ content: "template identity content", fromTemplate: true });
 
-    const ishikiRes = await app.request(`/api/agents/${agentId}/ishiki`);
-    expect(ishikiRes.status).toBe(200);
-    expect(await ishikiRes.json()).toEqual({ content: "template ishiki content", fromTemplate: true });
+    const agentsMdRes = await app.request(`/api/agents/${agentId}/agents-md`);
+    expect(agentsMdRes.status).toBe(200);
+    expect(await agentsMdRes.json()).toEqual({ content: "template persona content", fromTemplate: true });
   });
 
-  it("GET identity/ishiki return the on-disk file content with fromTemplate: false when the user has customized it", async () => {
+  it("GET identity/agents-md return the on-disk file content with fromTemplate: false when the user has customized it", async () => {
     const agentId = "hana";
     const agentDir = path.join(tempRoot, agentId);
     const productDir = path.join(tempRoot, "product");
     fs.mkdirSync(agentDir, { recursive: true });
     fs.writeFileSync(path.join(agentDir, "config.yaml"), "agent:\n  name: Hana\n  yuan: lingxi\n", "utf-8");
     fs.writeFileSync(path.join(agentDir, "identity.md"), "user customized identity", "utf-8");
-    fs.writeFileSync(path.join(agentDir, "ishiki.md"), "user customized ishiki", "utf-8");
+    fs.writeFileSync(path.join(agentDir, "AGENTS.md"), "user customized persona", "utf-8");
     // 模板目录故意留空/不存在，证明命中的是落盘文件而不是误落到模板兜底
     fs.mkdirSync(productDir, { recursive: true });
 
@@ -731,9 +731,68 @@ describe("agents route", () => {
     expect(identityRes.status).toBe(200);
     expect(await identityRes.json()).toEqual({ content: "user customized identity", fromTemplate: false });
 
-    const ishikiRes = await app.request(`/api/agents/${agentId}/ishiki`);
-    expect(ishikiRes.status).toBe(200);
-    expect(await ishikiRes.json()).toEqual({ content: "user customized ishiki", fromTemplate: false });
+    const agentsMdRes = await app.request(`/api/agents/${agentId}/agents-md`);
+    expect(agentsMdRes.status).toBe(200);
+    expect(await agentsMdRes.json()).toEqual({ content: "user customized persona", fromTemplate: false });
+  });
+
+  it("serves the persona file under the pre-rename route segments so older clients keep working", async () => {
+    const agentId = "hana";
+    const agentDir = path.join(tempRoot, agentId);
+    const productDir = path.join(tempRoot, "product");
+    fs.mkdirSync(agentDir, { recursive: true });
+    fs.writeFileSync(path.join(agentDir, "config.yaml"), "agent:\n  name: Hana\n  yuan: hanako\n", "utf-8");
+    fs.writeFileSync(path.join(agentDir, "AGENTS.md"), "user customized persona", "utf-8");
+    fs.writeFileSync(path.join(agentDir, "AGENTS.public.md"), "public persona", "utf-8");
+    fs.mkdirSync(productDir, { recursive: true });
+
+    const { createAgentsRoute } = await import("../server/routes/agents.ts");
+    const app = new Hono();
+    const engine = {
+      agentsDir: tempRoot,
+      productDir,
+      getLocale: () => "en",
+    };
+
+    app.route("/api", createAgentsRoute(engine));
+
+    const legacyRes = await app.request(`/api/agents/${agentId}/ishiki`);
+    expect(legacyRes.status).toBe(200);
+    expect(await legacyRes.json()).toEqual({ content: "user customized persona", fromTemplate: false });
+
+    const legacyPublicRes = await app.request(`/api/agents/${agentId}/public-ishiki`);
+    expect(legacyPublicRes.status).toBe(200);
+    expect(await legacyPublicRes.json()).toEqual({ content: "public persona" });
+  });
+
+  it("writes through the pre-rename route segment to the current file name", async () => {
+    const agentId = "hana";
+    const agentDir = path.join(tempRoot, agentId);
+    fs.mkdirSync(agentDir, { recursive: true });
+    fs.writeFileSync(path.join(agentDir, "config.yaml"), "agent:\n  name: Hana\n  yuan: hanako\n", "utf-8");
+
+    const { createAgentsRoute } = await import("../server/routes/agents.ts");
+    const app = new Hono();
+    const engine = {
+      agentsDir: tempRoot,
+      productDir: path.join(tempRoot, "product"),
+      getLocale: () => "en",
+      updateConfig: vi.fn(),
+      invalidateAgentListCache: vi.fn(),
+      emitEvent: vi.fn(),
+    };
+
+    app.route("/api", createAgentsRoute(engine));
+
+    const res = await app.request(`/api/agents/${agentId}/ishiki`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ content: "written through the old segment" }),
+    });
+
+    expect(res.status).toBe(200);
+    expect(fs.readFileSync(path.join(agentDir, "AGENTS.md"), "utf-8")).toBe("written through the old segment");
+    expect(fs.existsSync(path.join(agentDir, "ishiki.md"))).toBe(false);
   });
 
   it("rejects dangerous experience headings without overwriting agent files", async () => {

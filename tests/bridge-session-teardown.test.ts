@@ -56,7 +56,7 @@ function makeAgent(rootDir, id = "agent-a") {
     agentDir,
     tools: [],
     yuanPrompt: "yuan",
-    publicIshiki: "public-ishiki",
+    publicAgentsMd: "public persona",
     config: {
       locale: "",
       workspace_context: {},
@@ -1170,10 +1170,10 @@ describe("BridgeSessionManager teardown", () => {
       }),
     );
     const snapshot = manager.readIndex(agent)["fs_group_guest-snapshot@agent-a"].promptSnapshot;
-    expect(snapshot?.systemPrompt).toContain("public-ishiki");
+    expect(snapshot?.systemPrompt).toContain("public persona");
     expect(snapshot?.systemPrompt).toContain("group v1");
 
-    agent.publicIshiki = "public-ishiki v2";
+    agent.publicAgentsMd = "public persona v2";
     await manager.executeExternalMessage("hello again", "fs_group_guest-snapshot@agent-a", {
       userId: "guest-user",
       chatId: "guest-chat",
@@ -1231,14 +1231,14 @@ describe("BridgeSessionManager teardown", () => {
     expect(sessionManagerCreateMock).toHaveBeenCalledOnce();
     const ownerCreateArgs = createAgentSessionMock.mock.calls.at(-1)[0];
     expect(ownerCreateArgs.resourceLoader.getSystemPrompt()).toContain("owner prompt");
-    expect(ownerCreateArgs.resourceLoader.getSystemPrompt()).not.toContain("public-ishiki");
+    expect(ownerCreateArgs.resourceLoader.getSystemPrompt()).not.toContain("public persona");
     const entry = manager.readIndex(agent)[sessionKey];
     expect(entry).toMatchObject({
       file: "owner/owner-after.jsonl",
       role: "owner",
     });
     expect(entry.promptSnapshot.systemPrompt).toContain("owner prompt");
-    expect(entry.promptSnapshot.systemPrompt).not.toContain("public-ishiki");
+    expect(entry.promptSnapshot.systemPrompt).not.toContain("public persona");
   });
 
   it("adds a low-salience platform line and records bridge context metadata for owner sessions", async () => {

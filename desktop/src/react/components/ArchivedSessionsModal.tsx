@@ -35,10 +35,12 @@ export function ArchivedSessionsModal({ open, onClose, zIndex = 1000 }: Props) {
   const { t } = useI18n();
   const [list, setList] = useState<ArchivedSession[]>([]);
   const [loading, setLoading] = useState(false);
+  const [selected, setSelected] = useState<Set<string>>(new Set());
 
   const refresh = useCallback(async () => {
     setLoading(true);
     setList(await listArchivedSessions());
+    setSelected(new Set());
     setLoading(false);
   }, []);
 
@@ -47,6 +49,20 @@ export function ArchivedSessionsModal({ open, onClose, zIndex = 1000 }: Props) {
   }, [open, refresh]);
 
   const totalSize = list.reduce((s, x) => s + x.sizeBytes, 0);
+  const allSelected = list.length > 0 && selected.size === list.length;
+
+  const toggleSelected = (item: ArchivedSession) => {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(item.path)) next.delete(item.path);
+      else next.add(item.path);
+      return next;
+    });
+  };
+
+  const toggleAll = () => {
+    setSelected(allSelected ? new Set() : new Set(list.map((x) => x.path)));
+  };
 
   const handleRestore = async (item: ArchivedSession) => {
     if (!window.confirm(t('session.archived.restoreConfirm'))) return;
@@ -67,6 +83,27 @@ export function ArchivedSessionsModal({ open, onClose, zIndex = 1000 }: Props) {
     const ok = await deleteArchivedSession(item);
     if (ok) await refresh();
     else showSidebarToast(t('session.archived.deleteFailed'));
+  };
+
+  const handleDeleteSelected = async () => {
+    const targets = list.filter((x) => selected.has(x.path));
+    if (targets.length === 0) return;
+    const size = targets.reduce((s, x) => s + x.sizeBytes, 0);
+    const msg = t('session.archived.deleteSelectedConfirm', {
+      count: targets.length,
+      size: formatBytes(size),
+    });
+    if (!window.confirm(msg)) return;
+    let deleted = 0;
+    for (const item of targets) {
+      if (await deleteArchivedSession(item)) deleted += 1;
+    }
+    if (deleted < targets.length) {
+      showSidebarToast(t('session.archived.deleteSelectedPartial', { deleted, total: targets.length }));
+    } else {
+      showSidebarToast(t('session.archived.deleteSelectedDone', { count: deleted }));
+    }
+    await refresh();
   };
 
   const handleCleanup = async (days: 30 | 90) => {
@@ -124,6 +161,24 @@ export function ArchivedSessionsModal({ open, onClose, zIndex = 1000 }: Props) {
           </div>
 
           <div className={styles.listCard}>
+            <div className={styles.listToolbar}>
+              <label className={styles.selectAll}>
+                <input
+                  type="checkbox"
+                  checked={allSelected}
+                  onChange={toggleAll}
+                  disabled={list.length === 0}
+                />
+                <span>{t('session.archived.selectAll')}</span>
+              </label>
+              <button
+                className={styles.deleteSelectedBtn}
+                onClick={handleDeleteSelected}
+                disabled={selected.size === 0}
+              >
+                {t('session.archived.deleteSelected', { count: selected.size })}
+              </button>
+            </div>
             <div className={styles.list}>
               {loading ? (
                 <div className={styles.loading}>{t('common.loading')}</div>
@@ -132,9 +187,16 @@ export function ArchivedSessionsModal({ open, onClose, zIndex = 1000 }: Props) {
               ) : (
                 list.map((item) => (
                   <div key={item.path} className={styles.row}>
+                    <input
+                      type="checkbox"
+                      className={styles.rowCheck}
+                      checked={selected.has(item.path)}
+                      onChange={() => toggleSelected(item)}
+                      aria-label={item.title || item.firstMessage || t('session.untitled')}
+                    />
                     <div className={styles.rowMain}>
                       <div className={styles.rowTitle}>
-                        {item.title || t('session.untitled')}
+                        {item.title || item.firstMessage || t('session.untitled')}
                       </div>
                       <div className={styles.rowMeta}>
                         {item.agentName} · {formatAgo(item.archivedAt, t)} ·{' '}

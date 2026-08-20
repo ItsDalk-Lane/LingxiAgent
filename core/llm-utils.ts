@@ -583,7 +583,7 @@ Examples:
 /**
  * 为 agent 生成能力描述摘要
  * @param {object} resolved - resolveAuxiliaryModelFresh("summarize") 结果
- * @param {string} personality - Agent.descriptionSource 全文（identity + ishiki，不含 yuan 运行协议）
+ * @param {string} personality - Agent.descriptionSource 全文（identity + AGENTS.md，不含 yuan 运行协议）
  * @param {string} locale - agent 的 config.locale（"zh" / "en" 等）
  * @returns {Promise<string|null>}
  */

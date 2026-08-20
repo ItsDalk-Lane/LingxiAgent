@@ -45,6 +45,7 @@ import {
 import { stripClosedInternalNarrationBlocks } from "../lib/text/internal-narration.ts";
 import { formatWorkspaceScopePrompt } from "../shared/workspace-scope.ts";
 import { buildWorkspaceInstructionPrompt } from "../core/workspace-instruction-files.ts";
+import { agentPersonaFilePaths } from "../core/persona-source.ts";
 
 function resolveAgentPhoneModel(engine, ctx, agentConfig, modelOverride) {
   if (!modelOverride) return ctx.resolveModel(agentConfig);
@@ -158,6 +159,7 @@ function buildAgentPhonePromptSnapshot(agent, ctx, systemPrompt, cwd) {
     cwd,
     workspaceContext: agent.config?.workspace_context,
     locale,
+    excludeFiles: agentPersonaFilePaths(agent.agentDir),
   });
   return buildSessionPromptSnapshot({
     systemPrompt,
@@ -218,7 +220,7 @@ export async function runAgentSession(agentId, rounds, { engine, signal, session
   const ctx = engine.createSessionContext();
   const tempResourceLoader = Object.create(ctx.resourceLoader);
 
-  // noMemory 模式：只用 personality（identity + yuan + ishiki），不注入记忆/用户档案等
+  // noMemory 模式：只用 personality（identity + yuan + AGENTS.md），不注入记忆/用户档案等
   const basePrompt = noMemory ? agent.personality : agent.systemPrompt;
   tempResourceLoader.getSystemPrompt = () =>
     systemAppend ? `${basePrompt}\n\n${systemAppend}` : basePrompt;

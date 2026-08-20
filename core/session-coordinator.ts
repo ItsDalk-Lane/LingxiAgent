@@ -52,6 +52,7 @@ import {
 import { isActiveSessionPath, isArchivedDesktopSessionPath } from "./message-utils.ts";
 import { formatWorkspaceScopePrompt, normalizeSessionFolderScope, normalizeWorkspaceScope } from "../shared/workspace-scope.ts";
 import { buildWorkspaceInstructionPrompt } from "./workspace-instruction-files.ts";
+import { agentPersonaFilePaths } from "./persona-source.ts";
 import { getProviderPromptPatches } from "./provider-prompt-patches.ts";
 import {
   DEEPSEEK_ROLEPLAY_REASONING_PATCH_EXPERIMENT_ID,
@@ -804,6 +805,7 @@ function buildAppendSystemPromptSnapshot({
   locale,
   workspaceScope,
   workspaceContext,
+  agentDir,
 }: any) {
   const parts = [
     ...(Array.isArray(baseAppend) ? baseAppend : []),
@@ -822,6 +824,7 @@ function buildAppendSystemPromptSnapshot({
     cwd: workspaceScope.primaryCwd,
     workspaceContext,
     locale,
+    excludeFiles: agentDir ? agentPersonaFilePaths(agentDir) : [],
   });
   if (workspaceInstructions) parts.push(workspaceInstructions);
   return normalizeStringArray(parts);
@@ -2018,6 +2021,7 @@ export class SessionCoordinator {
         locale: localeSnapshot,
         workspaceScope,
         workspaceContext: agent.config?.workspace_context,
+        agentDir: agent.agentDir,
       });
     const rawSkillsResultSnapshot = restoredPromptSnapshot?.skillsResult
       ?? (
@@ -6872,6 +6876,7 @@ export class SessionCoordinator {
   /**
    * 列出所有 agent 的已归档 session（`<agentDir>/sessions/archived/*.jsonl`）。
    * title 的存储 key 仍是活跃路径——从 archived 路径反推活跃路径再查 titles.json。
+   * 显式标题缺失时回退到 jsonl 首条用户消息（firstMessage），与活跃列表投影一致。
    */
   async listArchivedSessions() {
     const activeAgents = this._d.listAgents();
@@ -6886,6 +6891,10 @@ export class SessionCoordinator {
       let files;
       try { files = await fsp.readdir(archDir); } catch { return []; }
       const titles = await this._loadSessionTitlesFor(sessionDir).catch(() => ({}));
+      const projections = await this._sessionListProjectionCache.list(archDir).catch(() => []);
+      const projectionByPath = new Map(
+        projections.filter(Boolean).map((projection) => [projection.path, projection]),
+      );
       const rows = await Promise.all(files
         .filter(isSessionJsonlFilename)
         .map(async (f) => {
@@ -6916,6 +6925,7 @@ export class SessionCoordinator {
               path: full,
               sessionId: manifest?.sessionId || null,
               title: this._sessionTitleFromMap(titles, full, [activeKey]) || null,
+              firstMessage: projectionByPath.get(full)?.firstMessage || null,
               archivedAt: stat.mtime.toISOString(),
               sizeBytes: stat.size,
               agentId: agent.id,
@@ -7930,6 +7940,7 @@ export class SessionCoordinator {
               cwd: execWorkspaceScope.primaryCwd,
               workspaceContext: targetAgent.config?.workspace_context,
               locale: targetAgent.config?.locale || getLocale(),
+              excludeFiles: agentPersonaFilePaths(targetAgent.agentDir),
             });
             return [
               ...base,

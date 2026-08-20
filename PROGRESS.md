@@ -1,37 +1,218 @@
-# PROGRESS — 用量统计独立成页 + 图表悬浮提示
+# PROGRESS — openhanako v0.444.1 → v0.447.4 上游同步
 
-## 终态：完成（未触 8 轮上限）
+## 审计坐标（固定，执行期间从未移动）
 
-## 目标
-把「用量统计」从供应商页拎出，做成设置左侧导航独立一页（夹在 providers 与 media 之间），并给各图表加跟随鼠标、实时显示数值的悬浮提示。
+```
+UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0.444.1)
+UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
+LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
+LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
+VERIFIED_SOURCE_SHA   = 051f6117c10846dbb244e0dd0fb86004ba0e7e66  (最终验证所针对的源码树；2026-08-20 归档修复后推进)
+工作分支              = feature/upstream-sync-0.447.4
+```
 
-## 基线数（2026-08-13）
-- `npx vitest run desktop/src/react/__tests__/settings/`：30 文件 174 用例全过，skipped=0
-- `npx vitest run desktop/src/react/settings/__tests__/`：6 文件 23 用例全过，skipped=0
-- `npm run typecheck`（tsc x3）：绿
-- locale key 完整性校验测试：grep 无，不纳入验收
+`VERIFIED_SOURCE_SHA` 是最终 typecheck、lint、tests、build、package 所验证的源码树；
+它不是 commit 内容的一部分，因而不存在 Git 自引用（`SHA = hash(contents)`）。
 
-## 最终数
-- `desktop/src/react/__tests__/settings/`：31 文件 179 用例全过（+1 文件 +5 用例：UsageTab.test.tsx 4 条、ProvidersTab.test.tsx 1 条），skipped=0
-- `desktop/src/react/settings/__tests__/`：6 文件 23 用例全过（= 基线），skipped=0
-- `npm run typecheck`：绿
-- 反向验证：UsageCursorTip 渲染出口改 return null → UsageTab.test 2 条提示用例如期变红；还原 → 4 条全绿
+### Post-verification audit seal
 
-## 最大风险（实际发生与化解）
-1. SettingsContent.test.tsx（白名单外）逐模块 mock tab：未 mock UsageTab，但它从不把 activeTab 设为 usage，真实 UsageTab 不会被渲染；UsageTab 保持薄壳，模块级 import 无副作用 → 全程绿。
-2. UsageLedgerSection.test.tsx（白名单外）用 `getAllByTitle(/·/)` 数原生 title 探针（7/30）。任务 2 要求 `.usage-day` 删 title。化解：title 从 `.usage-day` 移到其子元素 `.usage-day-label`（每柱仍恰好 1 个，计数不变；柱体本身不再触发原生提示，光标提示是唯一柱体悬浮层；`.usage-day` 改挂等价 aria-label）。属「靠调整白名单内实现修好」，已在 BLOCKED.md 记为待裁决观感项。
-3. settings-primitives-contract.test.ts（白名单外）对 tabs/ 下 `style={{` 计数棘轮 ≤48。初版 UsageCursorTip 用 inline style 定位导致 49。化解：改 ref 直写 DOM style（第 2 轮失败是注释里含 `style={{` 字面量被正则计入，改写注释后通过）。
+`VERIFIED_SOURCE_SHA` 之后只允许审计材料变更；生产代码、测试逻辑、runtime
+generated artifacts 不允许改变。当前 branch HEAD 由 Git ref 自身标识
+（`git rev-parse HEAD`），不写入自身 commit 内容。完整性由
+`.sync-audit/verify-post-verification-diff.mjs`（`git diff --name-only
+VERIFIED_SOURCE_SHA..HEAD` 仅允许审计 allowlist）与
+`tests/post-verification-audit-seal.test.ts` 机器门禁保证。
 
-## 记录
-- settings.providers.subtab.usage 变死 key：按已拍板事项保留不删（5 文件同步删除无收益）。
-- 任务 1（独立成页）：nav TAB_ITEMS 插入 usage（柱状图 icon）、SettingsContent 注册 TAB_COMPONENTS/TAB_TITLE_KEYS（标题复用 settings.usage.title）、新建薄壳 UsageTab、ProvidersTab 移除 usage 子页（api/models 不动）、5 locale 加 settings.tabs.usage。一轮通过（新断言 role button→tab 属当轮内修正）。
-- 任务 2（悬浮提示）：新建 UsageCursorTip（portal→body、position:fixed、pointer-events:none、data-testid="usage-cursor-tip"、useUsageCursorTip 每图表一份状态、enter 显示/move 跟手+贴边翻转/leave 立即卸载、进入向 fade+scale）；ModelOrbit 每环段包 `<g>` 挂事件、SplitRing 环段挂事件、DailyBars 每根 .usage-day 挂事件；RingCircles 保持纯展示。提示文案全部复用 settings.usage.totalTokens/cacheRead/uncached/requests/cacheHitRate。
+ΔU = 18 commits / 133 paths（7850+/738-）；ΔL = 346 paths；overlap = 29 paths。
+原始数据：`.sync-audit/delta-U-final.txt`（重算并与旧 delta-U.txt 逐字节一致）、
+`delta-L.txt`、`overlap-paths.txt`、`per-commit-paths.txt`。
 
-## 2026-08-13 真机反馈修复
-用户在桌面 app 实测悬停无提示。根因：提示 portal 到 `document.body`，原 z-index 1000 低于设置 modal 壳（`SettingsModalShell.module.css` z-index:1800）与设置内 fixed 浮层（9998/9999），提示被压在设置面板下面不可见；jsdom 不断言层叠所以测试全绿没暴露。修复：`.usage-cursor-tip` z-index 提至 10000；顺手把定位从 useEffect 改 useLayoutEffect，避免首帧出现在左上角再跳变。复跑：两目录 202 用例全绿、typecheck 绿。
+## 收口轮执行顺序（2026-08-20 第二轮）
 
-## 2026-08-13 用户拍板：彻底删除原生 title
-经用户确认，`.usage-day-label` 上的兼容 title 已移除，DailyBars 不再有任何原生 tooltip；
-`UsageLedgerSection.test.tsx`（经用户授权修改）的周/月窗口探针从 `getAllByTitle(/·/)` 换成
-`getAllByLabelText(/·/)`（7/30 计数不变，语义等价——aria-label 承接了原 title 的信息）。
-复跑：两目录 202 用例全绿、typecheck 绿。BLOCKED.md 清空为「无」。
+按任务书要求的顺序执行，全部完成：
+
+```
+code fixes（f3a1525a persona degraded fallback / 382907c4 dream config 契约 / 0271c4e9 dream diff）
+  ↓
+matrix rebuilt（40525fd4：机器真相源 JSON + 生成投影 + 审计测试，29+96+4+4=133）
+  ↓
+generated artifacts regenerated（12d87d44：closure/fingerprint/inventory；二次生成零漂移）
+  ↓
+upstreamVersion already 0.447.4（345d6b54 已写入，本轮未回退）
+  ↓
+final typecheck → final lint → final boundary lint（def7ec74 修齐 lint/tsc 后全绿）
+  ↓
+final targeted tests（26 文件 355 用例）→ final full npm test（1137 文件 11551 用例 0 failed）
+  ↓
+final builds（build:server / build:server:open / build:client 全绿）
+  ↓
+final package（npm run pack exit 0 → dist/mac-arm64/Lingxi.app + 产物抽检）
+  ↓
+VERIFIED_SOURCE_SHA（本文件与 UPSTREAM_SYNC_AUDIT.md / UPSTREAM_SYNC_MATRIX.md 记录同一 40 位 SHA）
+```
+
+## 收口轮修复清单（第一轮遗留的 4 个核心问题）
+
+| 项 | 内容 | 状态 | 证据 |
+|---|---|---|---|
+| P1-A | 133-path 审计矩阵重建 | ✅ | 40525fd4；`.sync-audit/upstream-sync-matrix.json` 机器真相源 + `build-sync-matrix.mjs` 生成投影 + tests/upstream-sync-matrix.test.ts 7 用例机器校验；旧矩阵 18+102+5+4=129 不闭合问题消除 |
+| P1-B | AGENTS.md migration 失败时 Persona 运行时丢失 | ✅ | f3a1525a；失败记录结构化（`failedDetails` + `buildFailedPersonaRenameIndex`）→ engine 运行时状态 → Agent `_personaMigrationFallback` → `resolvePersonaSource(migrationFallback)`；新文件永远优先、无失败记录不读旧文件、下次启动成功后 fallback 自动消失；public 变体同规则；11 迁移用例 + smoke 23/23 |
+| P2-A | Dream revision current-vs-revision diff | ✅ | 0271c4e9；detail 响应带后端现读 current 快照（`snapshotDreamSections`，不落文件路径）；UI 逐段统一 diff（复用 line-diff 工具）；确认前现取 current；相同则禁用恢复；恢复后刷新列表与对比；组件测试 A–F 全绿 |
+| P2-B | upstreamVersion=0.447.4 最终源码树重跑构建/打包 | ✅ | 见下「已执行测试」6–9；renderer 产物 grep 到 0.447.4 |
+
+## 第一轮已完成的 14 个同步提交
+
+保留未动：4f5b2d00（基线）→ f781f10f / cb4647d1 / f32c3f64（persona）→
+e715b8e4 / 9e2fa339 / 8f249913（dream）→ 27d14477 / ba9cb461（automation）→
+fb032eea（markdown URL）→ 63bc92b7（context ring）→ 18727d24（windows seed）→
+abbfb593（派生物）→ 345d6b54（upstreamVersion 0.447.4）。
+
+## 已执行测试（最终源码树，全部指向 VERIFIED_SOURCE_SHA 对应树）
+
+1. `npm run typecheck` — tsc×3（root + node + test）全绿。
+2. `npm run lint` — **0 errors** / 8118 warnings（main 基线 8037；新增均为既有风格类 warning）。
+   `.sync-audit/*.mjs` 纳入 node-globals lint 域（def7ec74）。
+3. `npm run lint:boundary` — ok（1 条 known open→closed edge，ratchet 基线内既有债务）。
+4. 定向测试 26 文件 **355 用例全绿**：persona migration / persona-source / workspace-exclude /
+   agents-route / agent-config（dream 契约）/ dream 全链路 7 件套 / DreamRevisionBrowser /
+   AgentMemory / cron-store / desk-route-cron / AutomationPanel / AssistantMessage suggestion /
+   md-decorations / context-ring / windows-installer-contract / upstream-version-consistency /
+   persistence-schema-tripwire / export-open-tree / server-composition-boundary /
+   upstream-sync-matrix。
+5. `npm test` 全量 — **1137 文件通过 | 1 skipped；11551 用例通过 | 7 skipped；0 failed**（66.8s）。
+   （较第一轮 1136/11532：+1 文件 = upstream-sync-matrix 审计测试；+19 用例 = 矩阵 7 +
+   persona degraded 5 + dream config 3 + dream diff 组件 4。）
+6. `npm run build:server` + `npm run build:server:open` + `build:client` 全绿
+   （签名用 /tmp 一次性 throwaway keypair，未入库；第一次后台运行因缺 LINGXI_SIGN_KEY 硬报错，
+   补 keypair 后重跑通过——硬报错是设计行为，非静默降级）。
+7. renderer 产物验证：`desktop/dist-renderer/assets/SettingsContent-*.js` grep 到 `0.447.4`
+   （vite define 注入 lingxi.upstreamVersion 生效；构建发生在 0.447.4 写入之后）。
+8. `npm run pack`（SKIP_NOTARIZE=true，electron-builder --dir）**exit 0** →
+   `dist/mac-arm64/Lingxi.app` 产出；seed resources verified（renderer+server archive+manifest+sig）；
+   ad-hoc resign verified。
+9. 打包产物抽检：seed tarball 含 `lib/agents-templates/`、`lib/agents-public-templates/`
+   （含 Lingxi 品牌 lingxi.md）；**无** ishiki-templates/public-ishiki-templates/ishiki.example.md
+   残留；packed server bundle 含 Dream 后端（"Dream may not rewrite Today or Week"、
+   pending-apply.json、dream/revisions）与全部 dream_* 稳定错误码、agents-md-rename 迁移步骤、
+   getFailedPersonaRename 接线；`/ishiki`、`public-ishiki` 字符串仅存于合法 legacy API alias
+   与迁移 rename 字面量（API/数据兼容，非旧协议复活）。
+10. migration smoke（`.sync-audit/migration-smoke.mjs`）**23/23**——含本轮升级的语义断言：
+    failed rename → effective persona 仍是用户自定义内容（fromTemplate=false）；
+    无失败记录 → 旧文件不读；下次启动改名成功 → fallback 消失、内容不丢。
+11. 派生物确定性：closure / inventory / fingerprint 生成器连跑两次，第二次 `git diff` 为零。
+12. Windows installer contract（tests/windows-installer-contract.test.ts，19 用例）通过。
+    CI 触发记录：见下「Windows CI」。
+
+## Windows CI（任务书 §30 补强）
+
+仓库已有 Windows runner 配置，本轮未新增 CI 定义（已存在即满足"合理增加"）：
+
+- `.github/workflows/ci.yml`：matrix 含 `windows-latest`，跑全量 vitest（含
+  windows-installer-contract 19 用例）；触发条件 push/PR → main。
+- `.github/workflows/build.yml`：matrix 含 `windows-latest + nsis`，
+  `npx electron-builder --win nsis --publish never` 构建真实安装器；
+  触发条件 tag v* 或 workflow_dispatch。
+
+收口触发记录：
+
+- 第一次 dispatch（run 32329281129，headSha c3e9fbc5）在 release-preflight 硬失败：
+  `release-preflight.mjs` 无 `--tag` 时回退到 `GITHUB_REF_NAME`（分支名），与 package
+  version 必然不匹配——workflow 预存缺陷，分支 dispatch 从未可用。最小修复：非 tag ref
+  显式跳过 release 门禁（tag 路径行为不变，3707a450，含注释说明；3 个 workflow 契约
+  测试 22 用例本地验证通过）。
+- 第二次 dispatch（run 32329515438，headSha 3707a45053517f20c36888e092dc6a4579471608）
+  **全绿**：release-preflight / quality-gate（ubuntu 全量 npm test，含
+  windows-installer-contract 19 用例与 upstream-sync-matrix 审计）/ renderer-box /
+  build×4 / artifact-release-smoke 全部 success；release、publish-train、
+  mirror-atomgit 按设计 tag-gated 跳过。
+- Windows leg（windows-latest, nsis, x64）关键步骤全部 success：Download/Smoke-test
+  MinGit、Materialize seed signing key、Build server bundle、Build Windows sandbox
+  helper、Build Windows standalone server archive、Verify Windows standalone server
+  archive（--smoke，package smoke）、Verify seed kit (Windows)、Build Windows
+  installer（`electron-builder --win nsis --publish never`）。
+- 证据链接：https://github.com/ItsDalk-Lane/LingxiAgent/actions/runs/32329515438
+- CI headSha 3707a450 与 VERIFIED_SOURCE_SHA 之间仅有本文件记录与 VERIFIED_SOURCE_SHA
+  标注（docs-only），代码/测试/构建输入零差异
+  （`git diff 3707a450..VERIFIED_SOURCE_SHA --stat` 可核）。
+
+真实 Windows 安装器执行（在本机运行 NSIS）受宿主平台限制未进行——不伪造"真机通过"。
+
+## 关于 upstreamVersion 的更正（任务书 §36）
+
+~~旧说法："upstreamVersion 是纯元数据，所以 bump 后无需重跑 build"~~ —— 更正为：
+
+`lingxi.upstreamVersion` 不改变业务逻辑，但属于 renderer build-time metadata
+（package.json → vite.config.ts define → import.meta.env.LINGXI_UPSTREAM_VERSION →
+AboutTab），因此最终源码树重新执行了 renderer build / package smoke（本文件第 6–9 项），
+产物中已验证 0.447.4 注入。
+
+## 第一轮发现与处置（保留）
+
+1. 上游 package.json 在 U0..U1 区间仅有 version 字段变化，Dream 无新增运行时依赖 →
+   package.json/lock 整体 INTENTIONAL_DIVERGENCE；Pi SDK 保持 0.84.1 未降级。
+2. Lingxi 人格体系原 ishiki 命名整体迁往 AGENTS.md 协议；模板 lingxi.md 与上游 hanako.md
+   内容同步，但产品品牌路径不同（hanako.md → lingxi.md），故矩阵中 4 个 hanako.md
+   路径分类为 ADAPTED（品牌级路径映射），非 ADOPTED。
+3. Dream 绑定 Lingxi 辅助模型槽（memory slot），tests/memory-dream-memory-slot.test.ts 锁定，
+   未复活 utility 架构；本轮 diff 功能未触碰该链路。
+4. overlap 29 路径中 C 类最高风险 AssistantMessage.tsx 以干净三方合并落地，automation
+   suggestion 失败走 ContentBlock 架构。
+5. cron-store / memory-ticker 上游 patch 基线一致性好；Lingxi 扩展（configRevision/
+   storeRevision）保全。
+6. 派生物两轮重新生成（abbfb593、12d87d44）；persistence fingerprint 两轮 compatible
+   review（persona 改名 + dream additive stores；agent-manager 回调接线），DATA_EPOCH=1 不变。
+
+## Seal 推进记录
+
+seal 不是一次性终点，而是"当前被验证树"的游标；每次审计期后的结构性收尾都需复跑验证并推进：
+
+- **2026-08-20 收口**（d4cf92a8）：全部最终验证（typecheck/lint/测试/构建/打包/CI）针对的树。
+- **2026-08-20 文档清场**（6e28d74e4717ee36631bd9e3384c57cc1ced4487）：删除三份已完成的历史
+  流水文档（findings.md / task_plan.md / chat_rendering_progress.md，事件结论已沉淀在
+  INCIDENT_REPORT.md 并随之归档至 gitignored `archived/`），移除临时 worktree
+  /tmp/lingxi-main-lint。复跑 typecheck（绿）+ 全量 npm test（11553 passed，唯一失败为
+  seal allowlist 预期红）后推进。生产代码、测试逻辑、runtime artifacts 零变化
+  （`git diff d4cf92a8..6e28d74e --stat` 仅 6 个 .md 删除）。
+- **2026-08-20 归档修复**（051f6117c10846dbb244e0dd0fb86004ba0e7e66）：合并后首个正常开发
+  提交（归档标题回退 + 手动批量删除，14 files / +327-7，含 persistence fingerprint
+  compatible repin）。复跑 typecheck x3（绿）+ eslint（0 error）+ 全量 npm test
+  （11560 passed，唯一失败为 seal allowlist 预期红）后推进。
+
+## 最终状态：READY TO MERGE
+
+- Upstream ΔU：133 / 133 paths。
+- Disposition：ADOPTED 25 + ADAPTED 100 + REGENERATED 4 + INTENTIONAL_DIVERGENCE 4 = 133
+  （脚本计算，`build-sync-matrix.mjs --check`：missing=0 / extra=0 / duplicate=0 / unknown=0）。
+- 4 个 `hanako.md → lingxi.md` 品牌映射统一分类为 ADAPTED。
+- `VERIFIED_SOURCE_SHA = 051f6117c10846dbb244e0dd0fb86004ba0e7e66`：被完整测试验证的代码树
+  （含收口树 d4cf92a8 的全部验证 + 文档清场树复跑验证 + 归档修复树 051f6117 复跑的
+  typecheck/lint/全量测试，见「Seal 推进记录」）。当前 HEAD 只比 VERIFIED_SOURCE_SHA
+  多审计收口内容。
+
+### Post-verification diff 记录（`git diff --name-only VERIFIED_SOURCE_SHA..HEAD`）
+
+```
+.sync-audit/verified-source-sha.txt
+.sync-audit/upstream-sync-matrix.json
+.sync-audit/build-sync-matrix.mjs
+.sync-audit/verify-post-verification-diff.mjs
+UPSTREAM_SYNC_MATRIX.md
+UPSTREAM_SYNC_AUDIT.md
+PROGRESS.md
+tests/upstream-sync-matrix.test.ts
+tests/post-verification-audit-seal.test.ts
+```
+
+以上全部为审计材料 / 审计测试 / 审计脚本；无任何生产代码、测试逻辑或 runtime
+generated artifacts 变化。
+
+### 合并交接（重要）
+
+post-verification diff guard 在 `npm test` 中运行。本分支合入 main 后，任何非 allowlist
+的正常开发提交都会挂该门禁——合并后第一件事是推进（复跑全量验证后更新 seal）或退役
+（删除 seal 文件与 guard 测试）`verified-source-sha.txt`。本文件「Seal 推进记录」即推进范例。
+
+### Known limitation（保留）
+
+Windows NSIS 已在 windows-latest 构建成功；尚未在真实 Windows 桌面环境执行安装/升级
+交互 smoke（宿主平台 macOS 无法运行 NSIS 安装包）。不伪造真机安装通过。

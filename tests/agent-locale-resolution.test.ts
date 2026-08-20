@@ -98,42 +98,42 @@ describe("Agent locale resolution", () => {
   });
 });
 
-describe("Agent persona lazy materialization (identity.md/ishiki.md not seeded)", () => {
-  // identity.md / ishiki.md 不再在创建 agent 时落盘：agentDir 里没有这两个
+describe("Agent persona lazy materialization (identity.md/AGENTS.md not seeded)", () => {
+  // identity.md / AGENTS.md 不再在创建 agent 时落盘：agentDir 里没有这两个
   // 文件时，personality getter 必须按 agent.resolveLocale() 现选 lib 模板，
   // 且用户改语言后（同一个 agent、同一份未落盘文件）人格模板要跟着换语言，
   // 而不是被锁死在创建时刻的语言。
 
-  function writeIdentityIshikiTemplates(productDir: string) {
+  function writeIdentityAgentsMdTemplates(productDir: string) {
     fs.mkdirSync(path.join(productDir, "identity-templates", "en"), { recursive: true });
     fs.writeFileSync(path.join(productDir, "identity-templates", "lingxi.md"), "中文身份模板\n", "utf-8");
     fs.writeFileSync(path.join(productDir, "identity-templates", "en", "lingxi.md"), "English identity template\n", "utf-8");
-    fs.mkdirSync(path.join(productDir, "ishiki-templates", "en"), { recursive: true });
-    fs.writeFileSync(path.join(productDir, "ishiki-templates", "lingxi.md"), "中文意识模板\n", "utf-8");
-    fs.writeFileSync(path.join(productDir, "ishiki-templates", "en", "lingxi.md"), "English ishiki template\n", "utf-8");
+    fs.mkdirSync(path.join(productDir, "agents-templates", "en"), { recursive: true });
+    fs.writeFileSync(path.join(productDir, "agents-templates", "lingxi.md"), "中文意识模板\n", "utf-8");
+    fs.writeFileSync(path.join(productDir, "agents-templates", "en", "lingxi.md"), "English AGENTS.md template\n", "utf-8");
   }
 
-  it("resolves the locale-appropriate template with no identity.md/ishiki.md on disk, and follows a live locale switch", () => {
+  it("resolves the locale-appropriate template with no identity.md/AGENTS.md on disk, and follows a live locale switch", () => {
     const agent = makeAgent(); // 不显式设置 config.locale，走全局 prefs
-    writeIdentityIshikiTemplates(agent.productDir);
+    writeIdentityAgentsMdTemplates(agent.productDir);
     agent._cb = { getTimezone: () => "Asia/Shanghai", getLocale: () => "zh-CN" };
 
     expect(fs.existsSync(path.join(agent.agentDir, "identity.md"))).toBe(false);
-    expect(fs.existsSync(path.join(agent.agentDir, "ishiki.md"))).toBe(false);
+    expect(fs.existsSync(path.join(agent.agentDir, "AGENTS.md"))).toBe(false);
 
     expect(agent.readIdentitySource()).toEqual({ content: "中文身份模板\n", fromTemplate: true });
-    expect(agent.readIshikiSource()).toEqual({ content: "中文意识模板\n", fromTemplate: true });
+    expect(agent.readAgentsMdSource()).toEqual({ content: "中文意识模板\n", fromTemplate: true });
     expect(agent.personality).toContain("中文身份模板");
     expect(agent.personality).toContain("中文意识模板");
 
     // 用户在设置里把全局语言切到英文；agentDir 里仍然没有落盘的
-    // identity.md/ishiki.md（未定制），惰性回落必须立刻跟着换语言。
+    // identity.md/AGENTS.md（未定制），惰性回落必须立刻跟着换语言。
     agent._cb = { getTimezone: () => "Asia/Shanghai", getLocale: () => "en" };
 
     expect(agent.readIdentitySource()).toEqual({ content: "English identity template\n", fromTemplate: true });
-    expect(agent.readIshikiSource()).toEqual({ content: "English ishiki template\n", fromTemplate: true });
+    expect(agent.readAgentsMdSource()).toEqual({ content: "English AGENTS.md template\n", fromTemplate: true });
     expect(agent.personality).toContain("English identity template");
-    expect(agent.personality).toContain("English ishiki template");
+    expect(agent.personality).toContain("English AGENTS.md template");
     expect(agent.personality).not.toContain("中文身份模板");
     expect(agent.personality).not.toContain("中文意识模板");
   });

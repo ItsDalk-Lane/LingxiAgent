@@ -163,6 +163,45 @@ describe("agents route: tools.disabled", () => {
     expect(body.error).toContain("must be an array");
   });
 
+  it("stores the explicit per-Agent automatic Dream boolean", async () => {
+    const res = await app.request(`/api/agents/${agentId}/config`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ memory: { dream: { auto_enabled: true } } }),
+    });
+
+    expect(res.status).toBe(200);
+    expect(engine.updateConfig).toHaveBeenCalledWith({
+      memory: { dream: { auto_enabled: true } },
+    }, { agentId });
+  });
+
+  it("rejects a non-boolean automatic Dream setting", async () => {
+    const res = await app.request(`/api/agents/${agentId}/config`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ memory: { dream: { auto_enabled: "yes" } } }),
+    });
+
+    expect(res.status).toBe(400);
+    expect((await res.json()).error).toContain("memory.dream.auto_enabled must be a boolean");
+    expect(engine.updateConfig).not.toHaveBeenCalled();
+  });
+
+  it("rejects numeric and null automatic Dream settings without touching config", async () => {
+    for (const auto_enabled of [1, null]) {
+      const res = await app.request(`/api/agents/${agentId}/config`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ memory: { dream: { auto_enabled } } }),
+      });
+
+      expect(res.status).toBe(400);
+      expect((await res.json()).error).toContain("memory.dream.auto_enabled must be a boolean");
+    }
+    expect(engine.updateConfig).not.toHaveBeenCalled();
+  });
+
   it("GET response hides global Computer Use while the global gate is disabled", async () => {
     const res = await app.request(`/api/agents/${agentId}/config`);
     expect(res.status).toBe(200);
