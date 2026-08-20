@@ -174,8 +174,7 @@ AboutTab），因此最终源码树重新执行了 renderer build / package smok
 ### Post-verification diff 记录（`git diff --name-only VERIFIED_SOURCE_SHA..HEAD`）
 
 ```
-.sync-audit/final-sha.txt            → 已改名为 .sync-audit/verified-source-sha.txt（审计坐标文件）
-.sync-audit/verified-source-sha.txt
+.sync-audit/verified-source-sha.txt   （本轮由原 .sync-audit/final-sha.txt 改名而来）
 .sync-audit/upstream-sync-matrix.json
 .sync-audit/build-sync-matrix.mjs
 .sync-audit/verify-post-verification-diff.mjs

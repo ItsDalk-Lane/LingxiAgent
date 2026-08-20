@@ -30,7 +30,6 @@ const AUDIT_ALLOWLIST = [
   ".sync-audit/verified-source-sha.txt",
   ".sync-audit/build-sync-matrix.mjs",
   ".sync-audit/verify-post-verification-diff.mjs",
-  ".sync-audit/final-sha.txt", // 旧坐标文件（改名残留，允许保留为删除痕迹）
   "tests/upstream-sync-matrix.test.ts",
   "tests/post-verification-audit-seal.test.ts",
 ];
