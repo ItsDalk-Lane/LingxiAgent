@@ -4,12 +4,12 @@
     "U1": "c6d0405294be67cb134c2758f6472748ee73e2be",
     "L0": "97595264ead8735a04559507ddaade25db8a4e15",
     "L1": "ca0b417e36a6a1f80947458aaed328a25718e41b",
-    "FINAL_SHA": "d4cf92a838a78845893a7b6733375c0cc7a46834"
+    "VERIFIED_SOURCE_SHA": "d4cf92a838a78845893a7b6733375c0cc7a46834"
   },
   "summary": {
     "total": 133,
-    "ADOPTED": 29,
-    "ADAPTED": 96,
+    "ADOPTED": 25,
+    "ADAPTED": 100,
     "REGENERATED": 4,
     "INTENTIONAL_DIVERGENCE": 4
   },
@@ -1095,12 +1095,12 @@
       "upstream_clusters": [
         "agents-md-persona"
       ],
-      "lingxi_overlap": "无（纯改名）",
+      "lingxi_overlap": "品牌路径映射",
       "conflict_class": "A",
-      "disposition": "ADOPTED",
-      "lingxi_implementation": "R100 目录改名落地",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "上游 AGENTS 模板行为与内容同步；Lingxi 保留产品品牌路径 hanako.md → lingxi.md",
       "test_evidence": "tests/agents-md-startup-migration.test.ts + 打包 smoke",
-      "notes": "R100 纯改名",
+      "notes": "品牌级路径映射，分类为 ADAPTED",
       "status": "✅"
     },
     {
@@ -1131,12 +1131,12 @@
       "upstream_clusters": [
         "agents-md-persona"
       ],
-      "lingxi_overlap": "无（纯改名）",
+      "lingxi_overlap": "品牌路径映射",
       "conflict_class": "A",
-      "disposition": "ADOPTED",
-      "lingxi_implementation": "R100 目录改名落地",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "上游 AGENTS 模板行为与内容同步；Lingxi 保留产品品牌路径 hanako.md → lingxi.md",
       "test_evidence": "tests/agents-md-startup-migration.test.ts + 打包 smoke",
-      "notes": "R100 纯改名",
+      "notes": "品牌级路径映射，分类为 ADAPTED",
       "status": "✅"
     },
     {
@@ -1203,12 +1203,12 @@
       "upstream_clusters": [
         "agents-md-persona"
       ],
-      "lingxi_overlap": "无（纯改名）",
+      "lingxi_overlap": "品牌路径映射",
       "conflict_class": "A",
-      "disposition": "ADOPTED",
-      "lingxi_implementation": "R100 目录改名落地（Lingxi 侧对应品牌文件 lingxi.md 另行保留）",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "上游 AGENTS 模板行为与内容同步；Lingxi 保留产品品牌路径 hanako.md → lingxi.md",
       "test_evidence": "tests/persona-source.test.ts + 打包 smoke",
-      "notes": "R100 纯改名",
+      "notes": "品牌级路径映射，分类为 ADAPTED",
       "status": "✅"
     },
     {
@@ -1239,12 +1239,12 @@
       "upstream_clusters": [
         "agents-md-persona"
       ],
-      "lingxi_overlap": "无（纯改名）",
+      "lingxi_overlap": "品牌路径映射",
       "conflict_class": "A",
-      "disposition": "ADOPTED",
-      "lingxi_implementation": "R100 目录改名落地（与 Lingxi lingxi.md 字节一致，纯品牌改名）",
+      "disposition": "ADAPTED",
+      "lingxi_implementation": "上游 AGENTS 模板行为与内容同步；Lingxi 保留产品品牌路径 hanako.md → lingxi.md",
       "test_evidence": "tests/persona-source.test.ts + 打包 smoke",
-      "notes": "R100 纯改名",
+      "notes": "品牌级路径映射，分类为 ADAPTED",
       "status": "✅"
     },
     {

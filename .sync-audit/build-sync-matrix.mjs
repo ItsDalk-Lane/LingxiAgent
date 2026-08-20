@@ -32,7 +32,13 @@ const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), "..")
 const DELTA_FILE = path.join(ROOT, ".sync-audit", "delta-U-final.txt");
 const JSON_OUT = path.join(ROOT, ".sync-audit", "upstream-sync-matrix.json");
 const MD_OUT = path.join(ROOT, "UPSTREAM_SYNC_MATRIX.md");
-const FINAL_SHA_FILE = path.join(ROOT, ".sync-audit", "final-sha.txt");
+const VERIFIED_SOURCE_SHA_FILE = path.join(ROOT, ".sync-audit", "verified-source-sha.txt");
+
+// VERIFIED_SOURCE_SHA 是被 typecheck/lint/测试/构建/打包等最终验证所针对的源码树。
+// 它不属于任何 commit 内容，因而是"内容的一部分函数"之前的固定坐标，可安全引用。
+// 当前 branch HEAD 可能在其后存在纯审计 seal 提交，HEAD 由 Git ref 自身标识，
+// 不允许在 commit 内容里自引用（SHA = hash(contents)，自引用会无限漂移）。
+const VERIFIED_SOURCE_SHA = "d4cf92a838a78845893a7b6733375c0cc7a46834";
 
 const ALLOWED_DISPOSITIONS = ["ADOPTED", "ADAPTED", "REGENERATED", "INTENTIONAL_DIVERGENCE"];
 
@@ -470,10 +476,10 @@ const CURATED = {
   },
   "lib/agents-templates/en/hanako.md": {
     renamedFrom: "lib/ishiki-templates/en/hanako.md",
-    conflictClass: "A", disposition: "ADOPTED", overlap: "无（纯改名）",
-    implementation: "R100 目录改名落地（Lingxi 侧对应品牌文件 lingxi.md 另行保留）",
+    conflictClass: "A", disposition: "ADAPTED", overlap: "品牌路径映射",
+    implementation: "上游 AGENTS 模板行为与内容同步；Lingxi 保留产品品牌路径 hanako.md → lingxi.md",
     testEvidence: "tests/persona-source.test.ts + 打包 smoke",
-    notes: "R100 纯改名",
+    notes: "品牌级路径映射，分类为 ADAPTED",
   },
   "lib/agents-templates/en/ming.md": {
     renamedFrom: "lib/ishiki-templates/en/ming.md",
@@ -484,10 +490,10 @@ const CURATED = {
   },
   "lib/agents-templates/hanako.md": {
     renamedFrom: "lib/ishiki-templates/hanako.md",
-    conflictClass: "A", disposition: "ADOPTED", overlap: "无（纯改名）",
-    implementation: "R100 目录改名落地（与 Lingxi lingxi.md 字节一致，纯品牌改名）",
+    conflictClass: "A", disposition: "ADAPTED", overlap: "品牌路径映射",
+    implementation: "上游 AGENTS 模板行为与内容同步；Lingxi 保留产品品牌路径 hanako.md → lingxi.md",
     testEvidence: "tests/persona-source.test.ts + 打包 smoke",
-    notes: "R100 纯改名",
+    notes: "品牌级路径映射，分类为 ADAPTED",
   },
   "lib/agents-templates/ming.md": {
     renamedFrom: "lib/ishiki-templates/ming.md",
@@ -512,10 +518,10 @@ const CURATED = {
   },
   "lib/agents-public-templates/en/hanako.md": {
     renamedFrom: "lib/public-ishiki-templates/en/hanako.md",
-    conflictClass: "A", disposition: "ADOPTED", overlap: "无（纯改名）",
-    implementation: "R100 目录改名落地",
+    conflictClass: "A", disposition: "ADAPTED", overlap: "品牌路径映射",
+    implementation: "上游 AGENTS 模板行为与内容同步；Lingxi 保留产品品牌路径 hanako.md → lingxi.md",
     testEvidence: "tests/agents-md-startup-migration.test.ts + 打包 smoke",
-    notes: "R100 纯改名",
+    notes: "品牌级路径映射，分类为 ADAPTED",
   },
   "lib/agents-public-templates/en/ming.md": {
     renamedFrom: "lib/public-ishiki-templates/en/ming.md",
@@ -526,10 +532,10 @@ const CURATED = {
   },
   "lib/agents-public-templates/hanako.md": {
     renamedFrom: "lib/public-ishiki-templates/hanako.md",
-    conflictClass: "A", disposition: "ADOPTED", overlap: "无（纯改名）",
-    implementation: "R100 目录改名落地",
+    conflictClass: "A", disposition: "ADAPTED", overlap: "品牌路径映射",
+    implementation: "上游 AGENTS 模板行为与内容同步；Lingxi 保留产品品牌路径 hanako.md → lingxi.md",
     testEvidence: "tests/agents-md-startup-migration.test.ts + 打包 smoke",
-    notes: "R100 纯改名",
+    notes: "品牌级路径映射，分类为 ADAPTED",
   },
   "lib/agents-public-templates/ming.md": {
     renamedFrom: "lib/public-ishiki-templates/ming.md",
@@ -986,7 +992,7 @@ export function renderMarkdown(records, meta) {
   lines.push(`U1 = ${U1}  (openhanako v0.447.4)`);
   lines.push(`L0 = ${L0}  (Lingxi v0.444.1 同步完成点, PR #2)`);
   lines.push(`L1 = ${L1}  (本轮同步开始时 main)`);
-  lines.push(`FINAL_SHA = ${meta.finalSha}`);
+  lines.push(`VERIFIED_SOURCE_SHA = ${meta.verifiedSourceSha}`);
   lines.push("```");
   lines.push("");
   lines.push("## 统计（脚本计算，禁止人工填写）");
@@ -1038,21 +1044,35 @@ function main() {
     process.exit(1);
   }
 
-  const finalSha = fs.existsSync(FINAL_SHA_FILE)
-    ? fs.readFileSync(FINAL_SHA_FILE, "utf-8").trim()
-    : "（待收口：最终验证完成后写入 .sync-audit/final-sha.txt 并重新生成本矩阵）";
+  // VERIFIED_SOURCE_SHA 优先读独立文件 .sync-audit/verified-source-sha.txt；
+  // 若文件缺失或与常量不一致则失败（不允许静默回退），保证审计坐标单一。
+  let verifiedSourceSha;
+  if (fs.existsSync(VERIFIED_SOURCE_SHA_FILE)) {
+    verifiedSourceSha = fs.readFileSync(VERIFIED_SOURCE_SHA_FILE, "utf-8").trim();
+    if (verifiedSourceSha !== VERIFIED_SOURCE_SHA) {
+      console.error(`✗ .sync-audit/verified-source-sha.txt 与常量不一致: ${verifiedSourceSha}`);
+      process.exit(1);
+    }
+    if (!/^[0-9a-f]{40}$/.test(verifiedSourceSha)) {
+      console.error(`✗ VERIFIED_SOURCE_SHA 非 40 位十六进制: ${verifiedSourceSha}`);
+      process.exit(1);
+    }
+  } else {
+    console.error("✗ 缺少 .sync-audit/verified-source-sha.txt（审计坐标文件）");
+    process.exit(1);
+  }
 
   const jsonDoc = {
-    coordinates: { U0, U1, L0, L1, FINAL_SHA: finalSha },
+    coordinates: { U0, U1, L0, L1, VERIFIED_SOURCE_SHA: verifiedSourceSha },
     summary,
     records,
   };
   const jsonText = `${JSON.stringify(jsonDoc, null, 2)}\n`;
-  // JSON 内含 FINAL_SHA；MD 的哈希只覆盖 records+summary，避免 FINAL_SHA 写入时双产物互相追逐。
+  // JSON 内含 VERIFIED_SOURCE_SHA；MD 的哈希只覆盖 records+summary，避免 SHA 写入时双产物互相追逐。
   const projectionSha = crypto.createHash("sha256")
     .update(JSON.stringify({ summary, records }))
     .digest("hex");
-  const mdText = renderMarkdown(records, { jsonSha: projectionSha, finalSha });
+  const mdText = renderMarkdown(records, { jsonSha: projectionSha, verifiedSourceSha });
 
   if (checkOnly) {
     let stale = false;

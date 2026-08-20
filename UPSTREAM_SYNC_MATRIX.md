@@ -1,7 +1,7 @@
 # UPSTREAM_SYNC_MATRIX — v0.444.1 → v0.447.4
 
 > 本文件由 `node .sync-audit/build-sync-matrix.mjs` 从 `.sync-audit/upstream-sync-matrix.json` 生成，禁止手改。
-> Source-JSON-SHA256: f79d1eebdfe10d1a12f62ee8d8ac52268f6b179ec03008de77a6e894a84188bb
+> Source-JSON-SHA256: dd8740eac1f73f08b90a89838a45bdebe4ec063f64ac7dd400f50494646c4951
 
 ## 审计坐标
 
@@ -10,21 +10,21 @@ U0 = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0.444.1)
 U1 = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 L0 = 97595264ead8735a04559507ddaade25db8a4e15  (Lingxi v0.444.1 同步完成点, PR #2)
 L1 = ca0b417e36a6a1f80947458aaed328a25718e41b  (本轮同步开始时 main)
-FINAL_SHA = d4cf92a838a78845893a7b6733375c0cc7a46834
+VERIFIED_SOURCE_SHA = d4cf92a838a78845893a7b6733375c0cc7a46834
 ```
 
 ## 统计（脚本计算，禁止人工填写）
 
 ```
 Total upstream paths: 133
-ADOPTED: 29
-ADAPTED: 96
+ADOPTED: 25
+ADAPTED: 100
 REGENERATED: 4
 INTENTIONAL_DIVERGENCE: 4
 UNKNOWN: 0
 MISSING: 0
 DUPLICATE: 0
-29 + 96 + 4 + 4 = 133
+25 + 100 + 4 + 4 = 133
 ```
 
 冲突等级：A=Lingxi未改动 / B=双方改同文件职责不冲突 / C=Lingxi已重构该职责 / D=产品差异或生成物。
@@ -89,15 +89,15 @@ DUPLICATE: 0
 | 54 | hub/agent-executor.ts | M | bed24b93 | agents-md-persona | L0 后有改 | B | ADAPTED | 结构化合并 | 全量套件内 agent-executor 链路（hub 执行测试） |  | ✅ |
 | 55 | lib/agents-public-templates/butter.md<br>← lib/public-ishiki-templates/butter.md | R100 | bed24b93 | agents-md-persona | 无（纯改名） | A | ADOPTED | R100 目录改名落地 | tests/agents-md-startup-migration.test.ts（public 变体迁移用例）+ 打包 smoke | R100 纯改名 | ✅ |
 | 56 | lib/agents-public-templates/en/butter.md<br>← lib/public-ishiki-templates/en/butter.md | R100 | bed24b93 | agents-md-persona | 无（纯改名） | A | ADOPTED | R100 目录改名落地 | tests/agents-md-startup-migration.test.ts + 打包 smoke | R100 纯改名 | ✅ |
-| 57 | lib/agents-public-templates/en/hanako.md<br>← lib/public-ishiki-templates/en/hanako.md | R100 | bed24b93 | agents-md-persona | 无（纯改名） | A | ADOPTED | R100 目录改名落地 | tests/agents-md-startup-migration.test.ts + 打包 smoke | R100 纯改名 | ✅ |
+| 57 | lib/agents-public-templates/en/hanako.md<br>← lib/public-ishiki-templates/en/hanako.md | R100 | bed24b93 | agents-md-persona | 品牌路径映射 | A | ADAPTED | 上游 AGENTS 模板行为与内容同步；Lingxi 保留产品品牌路径 hanako.md → lingxi.md | tests/agents-md-startup-migration.test.ts + 打包 smoke | 品牌级路径映射，分类为 ADAPTED | ✅ |
 | 58 | lib/agents-public-templates/en/ming.md<br>← lib/public-ishiki-templates/en/ming.md | R100 | bed24b93 | agents-md-persona | 无（纯改名） | A | ADOPTED | R100 目录改名落地 | tests/agents-md-startup-migration.test.ts + 打包 smoke | R100 纯改名 | ✅ |
-| 59 | lib/agents-public-templates/hanako.md<br>← lib/public-ishiki-templates/hanako.md | R100 | bed24b93 | agents-md-persona | 无（纯改名） | A | ADOPTED | R100 目录改名落地 | tests/agents-md-startup-migration.test.ts + 打包 smoke | R100 纯改名 | ✅ |
+| 59 | lib/agents-public-templates/hanako.md<br>← lib/public-ishiki-templates/hanako.md | R100 | bed24b93 | agents-md-persona | 品牌路径映射 | A | ADAPTED | 上游 AGENTS 模板行为与内容同步；Lingxi 保留产品品牌路径 hanako.md → lingxi.md | tests/agents-md-startup-migration.test.ts + 打包 smoke | 品牌级路径映射，分类为 ADAPTED | ✅ |
 | 60 | lib/agents-public-templates/ming.md<br>← lib/public-ishiki-templates/ming.md | R100 | bed24b93 | agents-md-persona | 无（纯改名） | A | ADOPTED | R100 目录改名落地 | tests/agents-md-startup-migration.test.ts + 打包 smoke | R100 纯改名 | ✅ |
 | 61 | lib/agents-templates/butter.md<br>← lib/ishiki-templates/butter.md | R100 | bed24b93 | agents-md-persona | 无（纯改名） | A | ADOPTED | R100 目录改名落地 | tests/persona-source.test.ts（模板回落链）+ 打包 smoke（agents-templates 存在、ishiki-templates 不残留） | R100 纯改名 | ✅ |
 | 62 | lib/agents-templates/en/butter.md<br>← lib/ishiki-templates/en/butter.md | R100 | bed24b93 | agents-md-persona | 无（纯改名） | A | ADOPTED | R100 目录改名落地 | tests/persona-source.test.ts（en 语言模板回落用例）+ 打包 smoke | R100 纯改名 | ✅ |
-| 63 | lib/agents-templates/en/hanako.md<br>← lib/ishiki-templates/en/hanako.md | R100 | bed24b93 | agents-md-persona | 无（纯改名） | A | ADOPTED | R100 目录改名落地（Lingxi 侧对应品牌文件 lingxi.md 另行保留） | tests/persona-source.test.ts + 打包 smoke | R100 纯改名 | ✅ |
+| 63 | lib/agents-templates/en/hanako.md<br>← lib/ishiki-templates/en/hanako.md | R100 | bed24b93 | agents-md-persona | 品牌路径映射 | A | ADAPTED | 上游 AGENTS 模板行为与内容同步；Lingxi 保留产品品牌路径 hanako.md → lingxi.md | tests/persona-source.test.ts + 打包 smoke | 品牌级路径映射，分类为 ADAPTED | ✅ |
 | 64 | lib/agents-templates/en/ming.md<br>← lib/ishiki-templates/en/ming.md | R100 | bed24b93 | agents-md-persona | 无（纯改名） | A | ADOPTED | R100 目录改名落地 | tests/persona-source.test.ts + 打包 smoke | R100 纯改名 | ✅ |
-| 65 | lib/agents-templates/hanako.md<br>← lib/ishiki-templates/hanako.md | R100 | bed24b93 | agents-md-persona | 无（纯改名） | A | ADOPTED | R100 目录改名落地（与 Lingxi lingxi.md 字节一致，纯品牌改名） | tests/persona-source.test.ts + 打包 smoke | R100 纯改名 | ✅ |
+| 65 | lib/agents-templates/hanako.md<br>← lib/ishiki-templates/hanako.md | R100 | bed24b93 | agents-md-persona | 品牌路径映射 | A | ADAPTED | 上游 AGENTS 模板行为与内容同步；Lingxi 保留产品品牌路径 hanako.md → lingxi.md | tests/persona-source.test.ts + 打包 smoke | 品牌级路径映射，分类为 ADAPTED | ✅ |
 | 66 | lib/agents-templates/ming.md<br>← lib/ishiki-templates/ming.md | R100 | bed24b93 | agents-md-persona | 无（纯改名） | A | ADOPTED | R100 目录改名落地 | tests/persona-source.test.ts + 打包 smoke | R100 纯改名 | ✅ |
 | 67 | lib/agents.example.md<br>← lib/ishiki.example.md | R100 | bed24b93 | agents-md-persona | 有 Lingxi 品牌内容 | A | ADAPTED | 改名并保留 Lingxi 品牌内容（example 兜底人格） | tests/persona-source.test.ts（example 兜底层用例） | R100 但内容含品牌差异，故 ADAPTED | ✅ |
 | 68 | lib/character-cards/service.ts | M | bed24b93 | agents-md-persona | 无 | A | ADAPTED | 导出写新 key（prompts.agents/publicAgents），导入永久兼容 legacy key | tests/character-card-import.test.ts |  | ✅ |

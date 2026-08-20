@@ -3,13 +3,25 @@
 ## 审计坐标（固定，执行期间从未移动）
 
 ```
-UPSTREAM_BASE_SHA   = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0.444.1)
-UPSTREAM_TARGET_SHA = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
-LINGXI_BASE_SHA     = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
-LINGXI_START_SHA    = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-LINGXI_FINAL_SHA    = d4cf92a838a78845893a7b6733375c0cc7a46834  (收口提交；其后仅有一个写入该 SHA 的 seal 提交)
-工作分支            = feature/upstream-sync-0.447.4
+UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0.444.1)
+UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
+LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
+LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
+VERIFIED_SOURCE_SHA   = d4cf92a838a78845893a7b6733375c0cc7a46834  (最终验证所针对的源码树)
+工作分支              = feature/upstream-sync-0.447.4
 ```
+
+`VERIFIED_SOURCE_SHA` 是最终 typecheck、lint、tests、build、package 所验证的源码树；
+它不是 commit 内容的一部分，因而不存在 Git 自引用（`SHA = hash(contents)`）。
+
+### Post-verification audit seal
+
+`VERIFIED_SOURCE_SHA` 之后只允许审计材料变更；生产代码、测试逻辑、runtime
+generated artifacts 不允许改变。当前 branch HEAD 由 Git ref 自身标识
+（`git rev-parse HEAD`），不写入自身 commit 内容。完整性由
+`.sync-audit/verify-post-verification-diff.mjs`（`git diff --name-only
+VERIFIED_SOURCE_SHA..HEAD` 仅允许审计 allowlist）与
+`tests/post-verification-audit-seal.test.ts` 机器门禁保证。
 
 ΔU = 18 commits / 133 paths（7850+/738-）；ΔL = 346 paths；overlap = 29 paths。
 原始数据：`.sync-audit/delta-U-final.txt`（重算并与旧 delta-U.txt 逐字节一致）、
@@ -36,7 +48,7 @@ final builds（build:server / build:server:open / build:client 全绿）
   ↓
 final package（npm run pack exit 0 → dist/mac-arm64/Lingxi.app + 产物抽检）
   ↓
-FINAL_SHA（本文件与 UPSTREAM_SYNC_AUDIT.md / UPSTREAM_SYNC_MATRIX.md 记录同一 40 位 SHA）
+VERIFIED_SOURCE_SHA（本文件与 UPSTREAM_SYNC_AUDIT.md / UPSTREAM_SYNC_MATRIX.md 记录同一 40 位 SHA）
 ```
 
 ## 收口轮修复清单（第一轮遗留的 4 个核心问题）
@@ -55,7 +67,7 @@ e715b8e4 / 9e2fa339 / 8f249913（dream）→ 27d14477 / ba9cb461（automation）
 fb032eea（markdown URL）→ 63bc92b7（context ring）→ 18727d24（windows seed）→
 abbfb593（派生物）→ 345d6b54（upstreamVersion 0.447.4）。
 
-## 已执行测试（最终源码树，全部指向 FINAL_SHA 对应树）
+## 已执行测试（最终源码树，全部指向 VERIFIED_SOURCE_SHA 对应树）
 
 1. `npm run typecheck` — tsc×3（root + node + test）全绿。
 2. `npm run lint` — **0 errors** / 8118 warnings（main 基线 8037；新增均为既有风格类 warning）。
@@ -119,8 +131,9 @@ abbfb593（派生物）→ 345d6b54（upstreamVersion 0.447.4）。
   archive（--smoke，package smoke）、Verify seed kit (Windows)、Build Windows
   installer（`electron-builder --win nsis --publish never`）。
 - 证据链接：https://github.com/ItsDalk-Lane/LingxiAgent/actions/runs/32329515438
-- CI headSha 3707a450 与 FINAL_SHA 之间仅有本文件记录与 FINAL_SHA 标注（docs-only），
-  代码/测试/构建输入零差异（`git diff 3707a450..FINAL_SHA --stat` 可核）。
+- CI headSha 3707a450 与 VERIFIED_SOURCE_SHA 之间仅有本文件记录与 VERIFIED_SOURCE_SHA
+  标注（docs-only），代码/测试/构建输入零差异
+  （`git diff 3707a450..VERIFIED_SOURCE_SHA --stat` 可核）。
 
 真实 Windows 安装器执行（在本机运行 NSIS）受宿主平台限制未进行——不伪造"真机通过"。
 
@@ -138,7 +151,8 @@ AboutTab），因此最终源码树重新执行了 renderer build / package smok
 1. 上游 package.json 在 U0..U1 区间仅有 version 字段变化，Dream 无新增运行时依赖 →
    package.json/lock 整体 INTENTIONAL_DIVERGENCE；Pi SDK 保持 0.84.1 未降级。
 2. Lingxi 人格体系原 ishiki 命名整体迁往 AGENTS.md 协议；模板 lingxi.md 与上游 hanako.md
-   字节一致（纯品牌改名）→ 模板迁移=目录改名+保留品牌文件。
+   内容同步，但产品品牌路径不同（hanako.md → lingxi.md），故矩阵中 4 个 hanako.md
+   路径分类为 ADAPTED（品牌级路径映射），非 ADOPTED。
 3. Dream 绑定 Lingxi 辅助模型槽（memory slot），tests/memory-dream-memory-slot.test.ts 锁定，
    未复活 utility 架构；本轮 diff 功能未触碰该链路。
 4. overlap 29 路径中 C 类最高风险 AssistantMessage.tsx 以干净三方合并落地，automation
@@ -147,3 +161,35 @@ AboutTab），因此最终源码树重新执行了 renderer build / package smok
    storeRevision）保全。
 6. 派生物两轮重新生成（abbfb593、12d87d44）；persistence fingerprint 两轮 compatible
    review（persona 改名 + dream additive stores；agent-manager 回调接线），DATA_EPOCH=1 不变。
+
+## 最终状态：READY TO MERGE
+
+- Upstream ΔU：133 / 133 paths。
+- Disposition：ADOPTED 25 + ADAPTED 100 + REGENERATED 4 + INTENTIONAL_DIVERGENCE 4 = 133
+  （脚本计算，`build-sync-matrix.mjs --check`：missing=0 / extra=0 / duplicate=0 / unknown=0）。
+- 4 个 `hanako.md → lingxi.md` 品牌映射统一分类为 ADAPTED。
+- `VERIFIED_SOURCE_SHA = d4cf92a838a78845893a7b6733375c0cc7a46834`：被完整测试、构建、
+  打包验证的代码树。当前 HEAD 只比 VERIFIED_SOURCE_SHA 多审计收口内容。
+
+### Post-verification diff 记录（`git diff --name-only VERIFIED_SOURCE_SHA..HEAD`）
+
+```
+.sync-audit/final-sha.txt            → 已改名为 .sync-audit/verified-source-sha.txt（审计坐标文件）
+.sync-audit/verified-source-sha.txt
+.sync-audit/upstream-sync-matrix.json
+.sync-audit/build-sync-matrix.mjs
+.sync-audit/verify-post-verification-diff.mjs
+UPSTREAM_SYNC_MATRIX.md
+UPSTREAM_SYNC_AUDIT.md
+PROGRESS.md
+tests/upstream-sync-matrix.test.ts
+tests/post-verification-audit-seal.test.ts
+```
+
+以上全部为审计材料 / 审计测试 / 审计脚本；无任何生产代码、测试逻辑或 runtime
+generated artifacts 变化。
+
+### Known limitation（保留）
+
+Windows NSIS 已在 windows-latest 构建成功；尚未在真实 Windows 桌面环境执行安装/升级
+交互 smoke（宿主平台 macOS 无法运行 NSIS 安装包）。不伪造真机安装通过。

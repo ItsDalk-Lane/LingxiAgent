@@ -19,7 +19,6 @@ const ROOT = path.resolve(__dirname, "..");
 const DELTA_FILE = path.join(ROOT, ".sync-audit", "delta-U-final.txt");
 const JSON_FILE = path.join(ROOT, ".sync-audit", "upstream-sync-matrix.json");
 const MD_FILE = path.join(ROOT, "UPSTREAM_SYNC_MATRIX.md");
-const FINAL_SHA_FILE = path.join(ROOT, ".sync-audit", "final-sha.txt");
 
 const ALLOWED_DISPOSITIONS = ["ADOPTED", "ADAPTED", "REGENERATED", "INTENTIONAL_DIVERGENCE"];
 
@@ -104,13 +103,28 @@ describe("upstream sync matrix audit (Gate A)", () => {
     expect(md).toContain(`Total upstream paths: ${matrix.summary.total}`);
   });
 
-  it("once pinned, FINAL_SHA is consistent across coordinates, JSON and MD", () => {
-    if (!fs.existsSync(FINAL_SHA_FILE)) return; // 收口前跳过；收口后此断言强制生效
-    const finalSha = fs.readFileSync(FINAL_SHA_FILE, "utf-8").trim();
-    expect(finalSha).toMatch(/^[0-9a-f]{40}$/);
+  it("VERIFIED_SOURCE_SHA is a 40-hex audit coordinate, consistent across sources", () => {
+    // 审计坐标：被最终验证（typecheck/lint/测试/构建/打包）所针对的源码树。
+    // 它与当前 branch HEAD 无直接相等约束（允许其后存在纯审计 seal 提交），
+    // 只需一致且合法；HEAD 与 VERIFIED_SOURCE_SHA 之间的 diff 由 post-verification
+    // audit-seal 测试另行门禁（只允许审计文件变化）。
+    const shaFile = path.join(ROOT, ".sync-audit", "verified-source-sha.txt");
+    expect(fs.existsSync(shaFile)).toBe(true);
+    const verifiedSourceSha = fs.readFileSync(shaFile, "utf-8").trim();
+    expect(verifiedSourceSha).toMatch(/^[0-9a-f]{40}$/);
+
     const matrix = loadMatrix();
-    expect(matrix.coordinates.FINAL_SHA).toBe(finalSha);
+    expect(matrix.coordinates.VERIFIED_SOURCE_SHA, "JSON coordinates").toBe(verifiedSourceSha);
+    expect(matrix.coordinates.FINAL_SHA, "legacy FINAL_SHA must be gone").toBeUndefined();
+
     const md = fs.readFileSync(MD_FILE, "utf-8");
-    expect(md).toContain(`FINAL_SHA = ${finalSha}`);
+    expect(md).toContain(`VERIFIED_SOURCE_SHA = ${verifiedSourceSha}`);
+    expect(md).not.toContain("FINAL_SHA");
+
+    // 审计文档坐标亦须一致。
+    for (const doc of ["UPSTREAM_SYNC_AUDIT.md", "PROGRESS.md"]) {
+      expect(fs.readFileSync(path.join(ROOT, doc), "utf-8"))
+        .toContain(verifiedSourceSha);
+    }
   });
 });

@@ -1,5 +1,7 @@
 # Upstream v0.444.1 → v0.447.4 同步审计
 
+> **状态：READY TO MERGE。**
+>
 > 逐路径处置矩阵（机器真相源 + 生成投影）见 UPSTREAM_SYNC_MATRIX.md 与
 > `.sync-audit/upstream-sync-matrix.json`；逐阶段测试记录见 PROGRESS.md；
 > 矩阵不变量由 tests/upstream-sync-matrix.test.ts 机器校验。
@@ -12,10 +14,18 @@
 | U1：上游目标 | `c6d0405294be67cb134c2758f6472748ee73e2be` | openhanako `v0.447.4` |
 | L0：Lingxi 同步基线 | `97595264ead8735a04559507ddaade25db8a4e15` | chore: sync upstream 0.444.1 and pi SDK 0.84.1 (PR #2) |
 | L1：同步开始 Lingxi | `ca0b417e36a6a1f80947458aaed328a25718e41b` | 2026-08-20 main HEAD |
-| FINAL_SHA | `d4cf92a838a78845893a7b6733375c0cc7a46834` | 收口提交：全部最终验证（typecheck/lint/测试/构建/打包）所针对的源码树 |
+| VERIFIED_SOURCE_SHA | `d4cf92a838a78845893a7b6733375c0cc7a46834` | 最终验证（typecheck/lint/测试/构建/打包）所针对的源码树 |
 
-FINAL_SHA 之后只允许一个 seal 提交（仅向三个审计文档与 `.sync-audit/final-sha.txt`
-写入该 SHA 标注，不触碰任何被审计的代码、测试或生成物）。
+## Audit seal model
+
+`VERIFIED_SOURCE_SHA` 是被最终测试、构建、打包验证的源码树。
+
+其后的 commit 只允许修改审计元数据。当前 branch HEAD 不在自身 commit 内容中记录
+（以避免 Git SHA 自引用：`SHA = hash(contents)`，自引用会无限漂移）。完整性由
+post-verification diff guard（`.sync-audit/verify-post-verification-diff.mjs` +
+`tests/post-verification-audit-seal.test.ts`）保证：`git diff --name-only
+VERIFIED_SOURCE_SHA..HEAD` 仅允许审计文件变化，任何生产代码、测试逻辑、
+runtime generated artifacts 变更都会使 guard 失败（exit 1）。
 
 ## 上游变更统计（ΔU）
 
@@ -29,16 +39,19 @@ FINAL_SHA 之后只允许一个 seal 提交（仅向三个审计文档与 `.sync
 
 ```
 Total upstream paths: 133
-ADOPTED: 29
-ADAPTED: 96
+ADOPTED: 25
+ADAPTED: 100
 REGENERATED: 4
 INTENTIONAL_DIVERGENCE: 4
 UNKNOWN: 0 / MISSING: 0 / DUPLICATE: 0
-29 + 96 + 4 + 4 = 133
+25 + 100 + 4 + 4 = 133
 ```
 
 13 个 R100 模板重命名逐 path 独立成行（含 renamed_from），不再聚合；
 5 个 locale、21+7 个测试文件同样逐 path 独立成行。
+其中 4 个 `hanako.md`（lib/agents-templates/{,en/}hanako.md 与
+lib/agents-public-templates/{,en/}hanako.md）因品牌路径映射
+（upstream `hanako.md` → Lingxi `lingxi.md`）分类为 ADAPTED，而非 ADOPTED。
 
 ## Key adaptations
 
