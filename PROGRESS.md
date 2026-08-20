@@ -173,6 +173,10 @@ seal 不是一次性终点，而是"当前被验证树"的游标；每次审计�
   /tmp/lingxi-main-lint。复跑 typecheck（绿）+ 全量 npm test（11553 passed，唯一失败为
   seal allowlist 预期红）后推进。生产代码、测试逻辑、runtime artifacts 零变化
   （`git diff d4cf92a8..6e28d74e --stat` 仅 6 个 .md 删除）。
+- **2026-08-20 归档修复**（051f6117c10846dbb244e0dd0fb86004ba0e7e66）：合并后首个正常开发
+  提交（归档标题回退 + 手动批量删除，14 files / +327-7，含 persistence fingerprint
+  compatible repin）。复跑 typecheck x3（绿）+ eslint（0 error）+ 全量 npm test
+  （11560 passed，唯一失败为 seal allowlist 预期红）后推进。
 
 ## 最终状态：READY TO MERGE
 
