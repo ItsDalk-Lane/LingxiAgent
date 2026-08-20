@@ -304,6 +304,8 @@ export class LingxiEngine {
   declare _resourceWatchRegistry: any;
   declare _resources: any;
   declare _runtimeContext: any;
+  /** 启动迁移 agents-md-rename 的失败索引：agentId → (新文件名 → 旧文件名)。 */
+  declare _failedPersonaRenames: Map<string, Map<string, string>>;
   declare _sessionCoord: any;
   declare _sessionFiles: any;
   declare _sessionExecutions: any;

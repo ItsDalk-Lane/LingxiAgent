@@ -1048,7 +1048,6 @@ function main() {
     records,
   };
   const jsonText = `${JSON.stringify(jsonDoc, null, 2)}\n`;
-  const jsonSha = crypto.createHash("sha256").update(jsonText).digest("hex");
   // JSON 内含 FINAL_SHA；MD 的哈希只覆盖 records+summary，避免 FINAL_SHA 写入时双产物互相追逐。
   const projectionSha = crypto.createHash("sha256")
     .update(JSON.stringify({ summary, records }))
