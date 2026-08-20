@@ -208,6 +208,15 @@ export function ContextRing() {
         offset={6}
         onClose={() => setMenuOpen(false)}
       >
+        <button
+          type="button"
+          className={styles['context-ring-menu-item']}
+          role="menuitem"
+          onClick={handleCompact}
+          disabled={busy}
+        >
+          {t('input.compact')}
+        </button>
         <Tooltip
           content={t('input.refreshAndCompactTooltip')}
           placement="left"
@@ -227,15 +236,6 @@ export function ContextRing() {
             </button>
           )}
         </Tooltip>
-        <button
-          type="button"
-          className={styles['context-ring-menu-item']}
-          role="menuitem"
-          onClick={handleCompact}
-          disabled={busy}
-        >
-          {t('input.compact')}
-        </button>
         {instantSimpleEnabled && (
           <button
             type="button"

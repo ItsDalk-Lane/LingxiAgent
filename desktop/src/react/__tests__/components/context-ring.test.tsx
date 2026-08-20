@@ -125,8 +125,10 @@ describe('ContextRing', () => {
     fireEvent.click(button);
 
     expect(screen.getByRole('menu')).toBeInTheDocument();
-    expect(screen.getByText('input.refreshAndCompact')).toBeInTheDocument();
-    expect(screen.getByText('input.compact')).toBeInTheDocument();
+    expect(screen.getAllByRole('menuitem').map(item => item.textContent)).toEqual([
+      'input.compact',
+      'input.refreshAndCompact',
+    ]);
     expect(screen.queryByText('chat.instantSimpleCompaction')).not.toBeInTheDocument();
     expect(sendMock).not.toHaveBeenCalled();
   });
@@ -140,7 +142,13 @@ describe('ContextRing', () => {
     const { container } = render(<ContextRing />);
     await waitFor(() => expect(lingxiFetchMock).toHaveBeenCalledWith('/api/experiments'));
     fireEvent.click(container.querySelector('button') as HTMLButtonElement);
-    fireEvent.click(await screen.findByText('chat.instantSimpleCompaction'));
+    const actions = await screen.findAllByRole('menuitem');
+    expect(actions.map(item => item.textContent)).toEqual([
+      'input.compact',
+      'input.refreshAndCompact',
+      'chat.instantSimpleCompaction',
+    ]);
+    fireEvent.click(actions[2]);
 
     expect(sendMock).toHaveBeenCalledWith(JSON.stringify({
       type: 'compact',
