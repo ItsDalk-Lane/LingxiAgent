@@ -7,7 +7,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = d4cf92a838a78845893a7b6733375c0cc7a46834  (最终验证所针对的源码树)
+VERIFIED_SOURCE_SHA   = 6e28d74e4717ee36631bd9e3384c57cc1ced4487  (最终验证所针对的源码树)
 工作分支              = feature/upstream-sync-0.447.4
 ```
 
@@ -162,19 +162,32 @@ AboutTab），因此最终源码树重新执行了 renderer build / package smok
 6. 派生物两轮重新生成（abbfb593、12d87d44）；persistence fingerprint 两轮 compatible
    review（persona 改名 + dream additive stores；agent-manager 回调接线），DATA_EPOCH=1 不变。
 
+## Seal 推进记录
+
+seal 不是一次性终点，而是"当前被验证树"的游标；每次审计期后的结构性收尾都需复跑验证并推进：
+
+- **2026-08-20 收口**（d4cf92a8）：全部最终验证（typecheck/lint/测试/构建/打包/CI）针对的树。
+- **2026-08-20 文档清场**（6e28d74e4717ee36631bd9e3384c57cc1ced4487）：删除三份已完成的历史
+  流水文档（findings.md / task_plan.md / chat_rendering_progress.md，事件结论已沉淀在
+  INCIDENT_REPORT.md 并随之归档至 gitignored `archived/`），移除临时 worktree
+  /tmp/lingxi-main-lint。复跑 typecheck（绿）+ 全量 npm test（11553 passed，唯一失败为
+  seal allowlist 预期红）后推进。生产代码、测试逻辑、runtime artifacts 零变化
+  （`git diff d4cf92a8..6e28d74e --stat` 仅 6 个 .md 删除）。
+
 ## 最终状态：READY TO MERGE
 
 - Upstream ΔU：133 / 133 paths。
 - Disposition：ADOPTED 25 + ADAPTED 100 + REGENERATED 4 + INTENTIONAL_DIVERGENCE 4 = 133
   （脚本计算，`build-sync-matrix.mjs --check`：missing=0 / extra=0 / duplicate=0 / unknown=0）。
 - 4 个 `hanako.md → lingxi.md` 品牌映射统一分类为 ADAPTED。
-- `VERIFIED_SOURCE_SHA = d4cf92a838a78845893a7b6733375c0cc7a46834`：被完整测试、构建、
-  打包验证的代码树。当前 HEAD 只比 VERIFIED_SOURCE_SHA 多审计收口内容。
+- `VERIFIED_SOURCE_SHA = 6e28d74e4717ee36631bd9e3384c57cc1ced4487`：被完整测试验证的代码树
+  （含收口树 d4cf92a8 的全部验证 + 文档清场树复跑的 typecheck/全量测试）。当前 HEAD 只比
+  VERIFIED_SOURCE_SHA 多审计收口内容。
 
 ### Post-verification diff 记录（`git diff --name-only VERIFIED_SOURCE_SHA..HEAD`）
 
 ```
-.sync-audit/verified-source-sha.txt   （本轮由原 .sync-audit/final-sha.txt 改名而来）
+.sync-audit/verified-source-sha.txt
 .sync-audit/upstream-sync-matrix.json
 .sync-audit/build-sync-matrix.mjs
 .sync-audit/verify-post-verification-diff.mjs
@@ -187,6 +200,12 @@ tests/post-verification-audit-seal.test.ts
 
 以上全部为审计材料 / 审计测试 / 审计脚本；无任何生产代码、测试逻辑或 runtime
 generated artifacts 变化。
+
+### 合并交接（重要）
+
+post-verification diff guard 在 `npm test` 中运行。本分支合入 main 后，任何非 allowlist
+的正常开发提交都会挂该门禁——合并后第一件事是推进（复跑全量验证后更新 seal）或退役
+（删除 seal 文件与 guard 测试）`verified-source-sha.txt`。本文件「Seal 推进记录」即推进范例。
 
 ### Known limitation（保留）
 
