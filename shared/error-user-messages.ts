@@ -52,6 +52,17 @@ export const ERROR_CODE_MESSAGE_KEYS: Readonly<Record<string, string>> = Object.
   workspace_not_found: 'error.code.workspaceNotFound',
   capability_denied: 'error.code.capabilityDenied',
 
+  // Memory Dream：route 与持久化 run report 共用同一组稳定码，前端不展示英文 detail。
+  dream_unavailable: 'error.code.dreamUnavailable',
+  dream_memory_disabled: 'error.code.dreamMemoryDisabled',
+  dream_memory_busy: 'error.code.dreamMemoryBusy',
+  dream_already_running: 'error.code.dreamAlreadyRunning',
+  dream_no_memory: 'error.code.dreamNoMemory',
+  dream_memory_changed: 'error.code.dreamMemoryChanged',
+  dream_revision_not_found: 'error.code.dreamRevisionNotFound',
+  dream_restore_failed: 'error.code.dreamRestoreFailed',
+  dream_run_failed: 'error.code.dreamRunFailed',
+
   // 内部契约违规：某个调用方漏了它本该显式携带的东西。用户无从下手，
   // 只告诉他这是应用的问题、原文已经记下来了。
   internal_contract: 'error.code.internalContract',

@@ -54,6 +54,12 @@ import { validateRollingSummaryFormat } from "./rolling-summary-format.ts";
 import { CACHE_STRATEGIES } from "../llm/cache-strategy-contract.ts";
 import { atomicWriteSync } from "../../shared/safe-fs.ts";
 import { invalidateSessionDerivedStateSync } from "./session-derived-state.ts";
+import { createMemoryDreamRunner } from "./dream/runner.ts";
+import type { DreamErrorCode } from "./dream/state-store.ts";
+import {
+  listDreamRevisions as listDreamRevisionFiles,
+  readDreamRevision as readDreamRevisionFile,
+} from "./dream/revision-store.ts";
 
 const log = createModuleLogger("memory-ticker");
 
@@ -70,6 +76,12 @@ const DAILY_STATE_FILE = "daily-state.json";
 // 步骤内部语义变了，版本号提升让旧 schema 的断点续跑状态失效，走一次性重算。
 const DAILY_STATE_SCHEMA_VERSION = 4;
 const DAILY_STEP_KEYS = ["compileDaily", "compileToday", "rollDailyWindow", "compileFacts", "deepMemory"];
+
+function dreamTickerError(code: DreamErrorCode, message: string, cause?: unknown) {
+  const error: Error & { code: DreamErrorCode; cause?: unknown } = Object.assign(new Error(message), { code });
+  if (cause !== undefined) error.cause = cause;
+  return error;
+}
 
 // ── 主调度器 ──
 
@@ -89,6 +101,7 @@ const DAILY_STEP_KEYS = ["compileDaily", "compileToday", "rollDailyWindow", "com
  * @param {string} opts.longtermMdPath
  * @param {string} opts.factsMdPath
  * @param {function} [opts.getMemoryMasterEnabled] - 返回 agent 级别记忆总开关状态
+ * @param {function} [opts.getDreamAutoEnabled] - 返回当前 agent 的每日自动 Dream 开关
  * @param {(sessionPath: string) => boolean} [opts.isSessionMemoryEnabled] - 返回指定 session 的记忆状态
  * @param {function} [opts.getTimezone] - 返回用户配置时区
  * @param {(sessionPath: string) => object|null} [opts.getSessionBranchHeadForPath] - 读取持久化 branch head 元数据
@@ -114,6 +127,7 @@ export function createMemoryTicker(opts) {
     longtermMdPath,
     factsMdPath,
     getMemoryMasterEnabled,
+    getDreamAutoEnabled,
     isSessionMemoryEnabled,
     getTimezone,
     readMemoryReflectionSnapshot,
@@ -129,6 +143,13 @@ export function createMemoryTicker(opts) {
   } = opts;
   const _memoryReflectionRunner = memoryReflectionRunner || { runMemoryReflection: defaultRunMemoryReflection };
   let _aggregateCompileInFlight = 0;
+  const _dreamRunner = createMemoryDreamRunner({
+    memoryDir,
+    memoryMdPath,
+    getResolvedMemoryModel,
+    getLogicalDate: () => getLogicalDay().logicalDate,
+    onCompiled,
+  });
 
   // 一次性、幂等的读时迁移：把 alpha 阶段遗留的 editable-facts.md 并入 facts.md。
   // 必须早于 assemble/compileEditableFacts 首次读取 facts.md 之前跑完。
@@ -804,6 +825,7 @@ export function createMemoryTicker(opts) {
   // ── 内部：今天编译 + 组装 ──
 
   async function _doCompileTodayAndAssemble() {
+    if (_dreamRunner.isRunning()) return;
     _aggregateCompileInFlight += 1;
     try {
       const resetAt = _getCompiledResetAt();
@@ -824,7 +846,7 @@ export function createMemoryTicker(opts) {
   // ── 内部：每日任务 ──
 
   async function _doDaily() {
-    if (_dailyRunning) return;
+    if (_dailyRunning || _dreamRunner.isRunning()) return;
     _dailyRunning = true;
     try {
       const todayStr = getLogicalDay().logicalDate;
@@ -972,9 +994,23 @@ export function createMemoryTicker(opts) {
           debugLog()?.error("memory", `daily state final write failed: ${err?.message || err}`);
         }
         log.log(`每日任务完成`);
+        _maybeStartAutomaticDream(todayStr);
       }
     } finally {
       _dailyRunning = false;
+    }
+  }
+
+  function _maybeStartAutomaticDream(logicalDate = getLogicalDay().logicalDate) {
+    // 这是 Dream 的休眠边界：配置缺失或 false 时只做一次布尔判断，不读取/创建
+    // Dream state，也不改变既有 daily checkpoint、模型调用或记忆文件。
+    if (getDreamAutoEnabled?.() !== true) return null;
+    if (_stopped || !_isMemoryMasterOn() || _branchReplacementPending.size > 0) return null;
+    try {
+      return _dreamRunner.startAutomaticIfEligible(logicalDate);
+    } catch (err) {
+      _logStepError("automatic Dream", err);
+      return null;
     }
   }
 
@@ -982,9 +1018,12 @@ export function createMemoryTicker(opts) {
     if (_stopped) return;
     if (!_isMemoryMasterOn()) return;
     if (_branchReplacementPending.size > 0) return;
+    if (_dreamRunner.isRunning()) return;
     const context = _restoreDailyProgress();
     if (_lastDailyJobDate !== context.logicalDate) {
       _trackJob(_doDaily()); // 后台，不 await
+    } else {
+      _maybeStartAutomaticDream(context.logicalDate);
     }
   }
 
@@ -1116,6 +1155,7 @@ export function createMemoryTicker(opts) {
       clearInterval(_timer);
       _timer = null;
     }
+    await _dreamRunner.stop();
     if (_tickInFlight) await _tickInFlight.catch(() => {});
     while (_activeJobs.size > 0) {
       await Promise.allSettled([..._activeJobs]);
@@ -1278,6 +1318,55 @@ export function createMemoryTicker(opts) {
     return snapshot;
   }
 
+  function startDream(options: any = {}) {
+    if (_stopped) throw dreamTickerError("dream_unavailable", "Memory ticker is stopped");
+    if (!_isMemoryMasterOn()) {
+      throw dreamTickerError("dream_memory_disabled", "Memory is disabled for this agent");
+    }
+    if (_dailyRunning || _aggregateCompileInFlight > 0) {
+      throw dreamTickerError(
+        "dream_memory_busy",
+        "Memory maintenance is currently running; try Dream again shortly",
+      );
+    }
+    return _dreamRunner.start({
+      trigger: options.trigger === "automatic" ? "automatic" : "manual",
+      logicalDate: options.logicalDate || getLogicalDay().logicalDate,
+    });
+  }
+
+  function getDreamStatus() {
+    return _dreamRunner.getStatus();
+  }
+
+  function listDreamRevisions() {
+    return listDreamRevisionFiles(memoryDir);
+  }
+
+  function getDreamRevision(revisionId) {
+    try {
+      return readDreamRevisionFile(memoryDir, revisionId);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      if (/dream revision not found/i.test(message)) {
+        throw dreamTickerError("dream_revision_not_found", message, error);
+      }
+      throw error;
+    }
+  }
+
+  async function restoreDreamRevision(revisionId) {
+    if (_stopped) throw dreamTickerError("dream_unavailable", "Memory ticker is stopped");
+    if (_dailyRunning || _aggregateCompileInFlight > 0) {
+      throw dreamTickerError(
+        "dream_memory_busy",
+        "Memory maintenance is currently running; try restore again shortly",
+      );
+    }
+    const result = await _dreamRunner.restoreRevision(revisionId);
+    return result;
+  }
+
   return {
     start,
     stop,
@@ -1292,5 +1381,10 @@ export function createMemoryTicker(opts) {
     flushSessionAndCompile,
     invalidateSessionDerivedState,
     getHealthStatus,
+    startDream,
+    getDreamStatus,
+    listDreamRevisions,
+    getDreamRevision,
+    restoreDreamRevision,
   };
 }
