@@ -169,8 +169,8 @@ describe("build-server-open.mjs: never imports build-server-artifact.mjs or read
   it("declares the same lib/ template dirs list used for the whitelist assertion", () => {
     expect(OPEN_LIB_TEMPLATE_DIRS).toEqual([
       "identity-templates",
-      "ishiki-templates",
-      "public-ishiki-templates",
+      "agents-templates",
+      "agents-public-templates",
       "yuan",
     ]);
   });

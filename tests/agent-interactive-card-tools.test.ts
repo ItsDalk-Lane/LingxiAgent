@@ -48,7 +48,7 @@ function bootstrapAgent(rootDir: string) {
     "utf-8",
   );
   fs.writeFileSync(path.join(agentDir, "identity.md"), "identity\n", "utf-8");
-  fs.writeFileSync(path.join(agentDir, "ishiki.md"), "ishiki\n", "utf-8");
+  fs.writeFileSync(path.join(agentDir, "AGENTS.md"), "persona\n", "utf-8");
   fs.writeFileSync(path.join(userDir, "user.md"), "user profile\n", "utf-8");
 
   const productDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "lib");

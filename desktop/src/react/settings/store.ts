@@ -89,8 +89,8 @@ export interface SettingsSnapshot {
   agentId: string;
   config: Record<string, any>;
   identity: string;
-  ishiki: string;
-  publicIshiki: string;
+  agents: string;
+  publicAgents: string;
   userProfile: string;
   experience: string;
   pinned: { pins: string[] };

@@ -372,10 +372,11 @@ function isSettingsReadRoute(verb, routePath) {
     || routePath === "/api/memories/health"
     || routePath === "/api/memories/compiled"
     || routePath === "/api/memories/compiled/week/days"
+    || routePath === "/api/memories/dream/status"
     || routePath === "/api/memories/export"
     || routePath === "/api/preferences/notifications"
     || routePath === "/api/preferences/computer-use"
-    || /^\/api\/agents\/[^/]+\/(?:identity|ishiki|public-ishiki|pinned|experience)$/.test(routePath)
+    || /^\/api\/agents\/[^/]+\/(?:identity|agents-md|public-agents-md|ishiki|public-ishiki|pinned|experience)$/.test(routePath)
     || /^\/api\/agents\/[^/]+\/config$/.test(routePath);
 }
 
@@ -441,7 +442,7 @@ function isSettingsWriteRoute(verb, routePath) {
     || routePath === "/api/preferences/notifications"
     || routePath === "/api/preferences/computer-use"
     || routePath === "/api/speech-recognition/config"
-    || /^\/api\/agents\/[^/]+\/(?:identity|ishiki|public-ishiki|pinned|experience)$/.test(routePath)
+    || /^\/api\/agents\/[^/]+\/(?:identity|agents-md|public-agents-md|ishiki|public-ishiki|pinned|experience)$/.test(routePath)
     || /^\/api\/agents\/[^/]+\/config$/.test(routePath)
     || routePath === "/api/memories/compiled/facts"
     || routePath === "/api/memories/compiled/today"
@@ -452,7 +453,11 @@ function isSettingsWriteRoute(verb, routePath) {
       routePath === "/api/memories"
       || routePath === "/api/memories/compiled"
     ))
-    || (verb === "POST" && routePath === "/api/memories/import");
+    || (verb === "POST" && (
+      routePath === "/api/memories/import"
+      || routePath === "/api/memories/dream/runs"
+      || /^\/api\/memories\/dream\/revisions\/[^/]+\/restore$/.test(routePath)
+    ));
 }
 
 function isSkillSettingsReadRoute(verb, routePath) {

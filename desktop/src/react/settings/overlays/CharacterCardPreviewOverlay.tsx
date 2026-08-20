@@ -18,8 +18,8 @@ export type CharacterCardPlan = {
   };
   prompts?: {
     identity?: string;
-    ishiki?: string;
-    publicIshiki?: string;
+    agents?: string;
+    publicAgents?: string;
   };
   memory: {
     available: boolean;
@@ -71,7 +71,7 @@ export function CharacterCardPreviewOverlay({
   const memoryUnavailableLabel = mode === 'export' ? t('settings.characterCard.noExportableMemory') : t('settings.characterCard.noImportableMemory');
   const confirmLabel = processing ? (mode === 'export' ? t('settings.characterCard.exporting') : t('settings.characterCard.importing')) : t('settings.characterCard.confirm');
   const descriptionText = plan.agent.description || t('settings.characterCard.noDescription');
-  const ishikiText = plan.prompts?.ishiki || t('settings.characterCard.noIshiki');
+  const agentsMdText = plan.prompts?.agents || t('settings.characterCard.noAgentsMd');
   const yuanKey = (plan.agent.yuan || 'lingxi').toLowerCase();
   const memoryInputId = `character-card-memory-${plan.token || plan.agentId || 'preview'}`;
   const memoryAvailable = plan.memory.available;
@@ -121,8 +121,8 @@ export function CharacterCardPreviewOverlay({
               <p>{plan.prompts?.identity || plan.agent.identitySummary || t('settings.characterCard.noIdentity')}</p>
             </section>
             <section>
-              <h4>Ishiki</h4>
-              <p>{ishikiText}</p>
+              <h4>AGENTS.md</h4>
+              <p>{agentsMdText}</p>
             </section>
             <section>
               <h4>Yuan</h4>

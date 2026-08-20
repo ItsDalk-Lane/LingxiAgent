@@ -587,7 +587,7 @@ export async function collectDiaryMaterials(opts) {
  * @param {import('../memory/session-summary.ts').SessionSummaryManager} opts.summaryManager
  * @param {string} opts.configPath
  * @param {string} opts.model - 模型名
- * @param {string} opts.agentPersonality - agent 的人格 prompt（identity + yuan + ishiki）
+ * @param {string} opts.agentPersonality - agent 的人格 prompt（identity + yuan + AGENTS.md）
  * @param {string} opts.memory - agent 的 memory.md 内容
  * @param {string} opts.userName
  * @param {string} opts.agentName

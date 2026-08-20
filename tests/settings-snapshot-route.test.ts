@@ -102,8 +102,8 @@ async function makeEngine() {
     "",
   ].join("\n"));
   await writeFile(path.join(agentDir, "identity.md"), "identity");
-  await writeFile(path.join(agentDir, "ishiki.md"), "ishiki");
-  await writeFile(path.join(agentDir, "public-ishiki.md"), "public");
+  await writeFile(path.join(agentDir, "AGENTS.md"), "persona");
+  await writeFile(path.join(agentDir, "AGENTS.public.md"), "public");
   await writeFile(path.join(agentDir, "pinned.md"), "keep this");
   await writeFile(path.join(userDir, "user.md"), "user profile");
 
@@ -183,21 +183,21 @@ describe("settings snapshot route", () => {
     expect(body.plugins.allowFullAccess).toBe(false);
     expect(body.plugins.devToolsEnabled).toBe(false);
     expect(body.identity).toBe("identity");
-    expect(body.ishiki).toBe("ishiki");
-    expect(body.publicIshiki).toBe("public");
+    expect(body.agents).toBe("persona");
+    expect(body.publicAgents).toBe("public");
     expect(body.userProfile).toBe("user profile");
   });
 
-  it("falls back to template content for identity/ishiki when the agent has not customized them (lazy materialization)", async () => {
+  it("falls back to template content for identity/AGENTS.md when the agent has not customized them (lazy materialization)", async () => {
     const engine = await makeEngine();
     const agentDir = path.join(engine.agentsDir, "agent-a");
-    // 惰性材料化：模拟一个从未定制过人格的 agent，identity.md/ishiki.md 都
+    // 惰性材料化：模拟一个从未定制过人格的 agent，identity.md/AGENTS.md 都
     // 没有落盘（覆盖掉 makeEngine 里默认写好的两个落盘文件）。
     await fs.rm(path.join(agentDir, "identity.md"));
-    await fs.rm(path.join(agentDir, "ishiki.md"));
+    await fs.rm(path.join(agentDir, "AGENTS.md"));
     const productDir = path.join(tmpRoot!, "product");
     await writeFile(path.join(productDir, "identity-templates", "lingxi.md"), "Template identity content");
-    await writeFile(path.join(productDir, "ishiki-templates", "lingxi.md"), "Template ishiki content");
+    await writeFile(path.join(productDir, "agents-templates", "lingxi.md"), "Template persona content");
     (engine as any).productDir = productDir;
 
     const app = new Hono();
@@ -209,9 +209,9 @@ describe("settings snapshot route", () => {
 
     // 快照必须反映 agent 此刻实际生效的内容（回落到模板），不能是空字符串。
     expect(body.identity).toBe("Template identity content");
-    expect(body.ishiki).toBe("Template ishiki content");
-    // public-ishiki.md 不在本次惰性材料化范围内，行为不变（原样读落盘文件）。
-    expect(body.publicIshiki).toBe("public");
+    expect(body.agents).toBe("Template persona content");
+    // AGENTS.public.md 不在本次惰性材料化范围内，行为不变（原样读落盘文件）。
+    expect(body.publicAgents).toBe("public");
   });
 
   it("answers for the primary agent when the request omits an agent id", async () => {

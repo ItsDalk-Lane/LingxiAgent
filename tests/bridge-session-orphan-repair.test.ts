@@ -90,7 +90,7 @@ function makeAgent(rootDir, id = "agent-a") {
     agentDir,
     tools: [],
     yuanPrompt: "yuan",
-    publicIshiki: "public-ishiki",
+    publicAgentsMd: "public persona",
     config: {
       models: { chat: { id: "gpt-4o", provider: "openai" } },
       bridge: {},

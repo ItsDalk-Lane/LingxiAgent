@@ -19,7 +19,7 @@ function makeAgent({ experienceEnabled }) {
   fs.mkdirSync(userDir, { recursive: true });
   fs.writeFileSync(path.join(productDir, "yuan", "lingxi.md"), "yuan", "utf-8");
   fs.writeFileSync(path.join(agentDir, "identity.md"), "identity", "utf-8");
-  fs.writeFileSync(path.join(agentDir, "ishiki.md"), "ishiki", "utf-8");
+  fs.writeFileSync(path.join(agentDir, "AGENTS.md"), "persona", "utf-8");
 
   const agent = new Agent({
     id: "hana",

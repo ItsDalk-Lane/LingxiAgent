@@ -18,6 +18,10 @@ export const BLOCKED_DIRS = ["browser-data", "playwright-browsers"];
 
 /** agentDir 下只读的文件 */
 export const READ_ONLY_AGENT_FILES = [
+  "AGENTS.md",
+  // 人格文件的旧名字。启动时会把它改名成 AGENTS.md，但改名可能因为权限或文件
+  // 被占用而失败；那种情况下旧文件还躺在 agent 目录里，这里留着它，免得一份
+  // 本该只读的人格文件因为改名没成功就变成可写的。
   "ishiki.md",
   "config.yaml",
   "identity.md",

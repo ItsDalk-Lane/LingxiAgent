@@ -204,6 +204,7 @@ describe("HTTP route security policy", () => {
       ["GET", "/api/memories/compiled"],
       ["GET", "/api/memories/export"],
       ["GET", "/api/memories/compiled/week/days"],
+      ["GET", "/api/memories/dream/status"],
     ]) {
       expect(authorizeHttpRoute({ method, path, principal: reader }), `${method} ${path}`)
         .toMatchObject({ allowed: true });
@@ -219,6 +220,8 @@ describe("HTTP route security policy", () => {
       ["PUT", "/api/memories/compiled/today"],
       ["PUT", "/api/memories/compiled/longterm"],
       ["PUT", "/api/memories/compiled/week/days/2026-07-05"],
+      ["POST", "/api/memories/dream/runs"],
+      ["POST", "/api/memories/dream/revisions/rev-1/restore"],
     ]) {
       expect(authorizeHttpRoute({ method, path, principal: writer }), `${method} ${path}`)
         .toMatchObject({ allowed: true });

@@ -19,10 +19,10 @@ afterEach(() => {
 });
 
 describe("resolvePersonaSource", () => {
-  for (const kind of ["identity", "ishiki"] as const) {
-    const templateDir = kind === "identity" ? "identity-templates" : "ishiki-templates";
-    const exampleFile = kind === "identity" ? "identity.example.md" : "ishiki.example.md";
-    const fileName = kind === "identity" ? "identity.md" : "ishiki.md";
+  for (const kind of ["identity", "agents"] as const) {
+    const templateDir = kind === "identity" ? "identity-templates" : "agents-templates";
+    const exampleFile = kind === "identity" ? "identity.example.md" : "agents.example.md";
+    const fileName = kind === "identity" ? "identity.md" : "AGENTS.md";
 
     describe(`kind: ${kind}`, () => {
       it("prefers the agentDir on-disk file over any template (level 1)", () => {

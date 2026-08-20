@@ -16,6 +16,7 @@ import fs from "fs";
 import os from "os";
 import path from "path";
 import { runMigrations } from "./migrations.ts";
+import { migrateAgentPersonaFileNames } from "./agents-md-migration.ts";
 import { healCredentialFileModes } from "./credential-file-healer.ts";
 import { PLUGIN_DATA_DIRNAME } from "./plugin-config.ts";
 import { pruneStaleCredentialBackups } from "./credential-backup-retention.ts";
@@ -2395,6 +2396,17 @@ export class LingxiEngine {
       const healed = healCredentialFileModes({ lingxiHome: this.lingxiHome, log });
       if (healed.failed.length > 0) {
         log(`[credential-custody] ${healed.failed.length} 个文件未能收紧权限，已记录；应用继续启动`);
+      }
+    }, log);
+
+    // 0f. 人格文件改名（旧 ishiki.md / public-ishiki.md → AGENTS.md /
+    // AGENTS.public.md）。必须在 agent 初始化之前跑完，之后任何 persona 读取
+    // 都只认新名字，回落链里不留双读。每次启动都跑：从备份或同步恢复回来的
+    // 旧目录同样要在边界上被改过来。
+    runBestEffortStartupMigrationStep("agents-md-rename", () => {
+      const renames = migrateAgentPersonaFileNames({ agentsDir: this.agentsDir, log });
+      if (renames.failed.length > 0) {
+        log(`[agents-md-rename] ${renames.failed.length} 个人格文件未能改名，已记录；应用继续启动，下次启动重试`);
       }
     }, log);
 

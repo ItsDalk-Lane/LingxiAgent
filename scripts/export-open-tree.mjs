@@ -28,7 +28,7 @@
  *     silently swept in)
  *   - every other entry is nominally "an exact file" per the manifest's own
  *     stated contract. Four manifest entries — lib/identity-templates,
- *     lib/ishiki-templates, lib/public-ishiki-templates, lib/yuan — are
+ *     lib/agents-templates, lib/agents-public-templates, lib/yuan — are
  *     directories on disk despite lacking a trailing "/". Copying a
  *     directory as if it were one opaque file is not a coherent filesystem
  *     operation, and scripts/build-server-open.mjs's own
