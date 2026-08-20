@@ -1,7 +1,8 @@
-# Upstream v0.447.4 同步审计（已完成）
+# Upstream v0.444.1 → v0.447.4 同步审计
 
-> 上一轮（v0.444.1）审计见 git 历史（L0=97595264 时的 UPSTREAM_SYNC_AUDIT.md）。
-> 逐路径处置矩阵见 UPSTREAM_SYNC_MATRIX.md；逐阶段测试记录见 PROGRESS.md。
+> 逐路径处置矩阵（机器真相源 + 生成投影）见 UPSTREAM_SYNC_MATRIX.md 与
+> `.sync-audit/upstream-sync-matrix.json`；逐阶段测试记录见 PROGRESS.md；
+> 矩阵不变量由 tests/upstream-sync-matrix.test.ts 机器校验。
 
 ## 审计坐标
 
@@ -9,80 +10,112 @@
 | --- | --- | --- |
 | U0：上游基线 | `cc19cb49b0786d61ed723764e0a83baf87887270` | openhanako `v0.444.1` |
 | U1：上游目标 | `c6d0405294be67cb134c2758f6472748ee73e2be` | openhanako `v0.447.4` |
-| L0：Lingxi 同步基线 | `97595264` | chore: sync upstream 0.444.1 and pi SDK 0.84.1 (PR #2) |
+| L0：Lingxi 同步基线 | `97595264ead8735a04559507ddaade25db8a4e15` | chore: sync upstream 0.444.1 and pi SDK 0.84.1 (PR #2) |
 | L1：同步开始 Lingxi | `ca0b417e36a6a1f80947458aaed328a25718e41b` | 2026-08-20 main HEAD |
-| 最终 Lingxi | 本提交（`git log` 中标题 `chore(sync): mark upstream compatibility as v0.447.4`；最后代码提交 `abbfb593e9a969b1cad394475ac22782e2d4953f`） | feature/upstream-sync-0.447.4 收尾提交链末端 |
+| FINAL_SHA | `__FINAL_SHA__` | 收口提交：全部最终验证（typecheck/lint/测试/构建/打包）所针对的源码树 |
 
-坐标在同步执行期间从未移动。
+FINAL_SHA 之后只允许一个 seal 提交（仅向三个审计文档与 `.sync-audit/final-sha.txt`
+写入该 SHA 标注，不触碰任何被审计的代码、测试或生成物）。
 
-## 上游变更统计
+## 上游变更统计（ΔU）
 
 - commit count：18（U0..U1）
-- changed path count：133（ΔU = U0..U1，`git diff --name-status` 条目数）
-- 分布：**added 23 / modified 97 / renamed 13（全部 R100 纯改名）/ deleted 0**
-- 处置分布：ADOPTED 18 / ADAPTED 102 / REGENERATED 5 / INTENTIONAL_DIVERGENCE 4 / UNKNOWN 0 / IGNORED 0
-- 13 个 R100 均为 `*-templates/ishiki*` → `*-templates/agents*` 模板目录改名（计入 ADOPTED）。
+- changed path count：133（`git diff --name-status U0 U1`，原始输入 `.sync-audit/delta-U-final.txt`）
+- 分布：added 23 / modified 97 / renamed 13（全部 R100 纯改名）/ deleted 0
+- ΔL（L0..L1 Lingxi 侧变更）：346 paths；overlap（ΔU∩ΔL）：29 paths
+  （原始数据：`.sync-audit/delta-L.txt`、`.sync-audit/overlap-paths.txt`）
 
-## 功能审计
+## Disposition summary（脚本计算）
 
-### 1. AGENTS.md 人格协议迁移（上游核心变更）
-- **ADOPTED**：`core/agents-md-migration.ts` 原样落地。启动迁移规则：ishiki.md→AGENTS.md、public-ishiki.md→AGENTS.public.md；新旧并存时旧文件保留为 `.pre-agents-rename.bak`；**从不删除用户文件**，失败下次启动重试、不阻塞启动。
-- **ADAPTED**：`core/persona-source.ts`（PersonaKind `identity|agents`、`agentPersonaFilePaths()`）、`core/engine.ts` 启动步 `agents-md-rename`、`shared/persistence/store-registry.ts` 路径模式与 rename 规则；workspace 注入增加 `excludeFiles` 精确绝对路径排除，杜绝人格文件重复注入（session-coordinator + bridge-session-manager 三处接线）。
-- API 兼容：canonical `/agents-md` + `/public-agents-md` 路由 + 旧 `/ishiki` + `/public-ishiki` 别名绑定同一 handler；角色卡导出写新 key（`prompts.agents/publicAgents`），导入永久接受旧 key。
-- 验证：persona migration 定向测试 + workspace 注入测试 + 旧数据 migration smoke 16/16。
+```
+Total upstream paths: 133
+ADOPTED: 29
+ADAPTED: 96
+REGENERATED: 4
+INTENTIONAL_DIVERGENCE: 4
+UNKNOWN: 0 / MISSING: 0 / DUPLICATE: 0
+29 + 96 + 4 + 4 = 133
+```
 
-### 2. Memory Dream（上游新增子系统）
-- **ADOPTED**：`lib/memory/dream/` 五阶段管线（atomize/dedupe/optimize/compose/verify）、软目标（facts~400 / longterm~800）+ 5000 字符硬上限、per-agent 运行锁、input-hash 复核（`dream_memory_changed`）、revision-before-write、`auto_enabled` 默认 false、稳定错误码 `dream_*`（9 条 user-message 映射）。
-- **ADAPTED（Lingxi 架构接入）**：`core/agent.ts` `getResolvedMemoryModel` 闭包走 `engine.resolveAuxiliaryExecution("memory", { agentId })`——**复用 Lingxi 辅助模型槽，未复活 utility 架构**；`memory-ticker.ts` 合并上游 Dream 触发逻辑并 gated on `getDreamAutoEnabled()===true`；server 路由 `createMemoryDreamRoute` 挂载 + route-security 放行；设置页 Dream 控制与 DreamRevisionBrowser UI。
-- 契约锁定：tests/memory-dream-memory-slot.test.ts 断言 runner 仅解析 `("memory", { agentId })` 且正确映射 execution shape。
+13 个 R100 模板重命名逐 path 独立成行（含 renamed_from），不再聚合；
+5 个 locale、21+7 个测试文件同样逐 path 独立成行。
 
-### 3. Automation store 损坏恢复
-- `lib/desk/cron-store.ts` 上游 patch 直接落地（基线与 U0 字节一致）：tmp 校验后提升、逐字节损坏备份（时间戳+pid+冲突后缀）、稳定错误码（`cron_store_corrupt/unavailable/recovery_failed`）、**禁止静默返回 []**。
-- UI（AutomationPanel）：`addingManualJob` 锁、`throwOnHttpError:false` 显式降级、reload 失败保留现有数据；AssistantMessage 走 ContentBlock 架构呈现 AutomationSubmissionError。
-- Lingxi 扩展（configRevision/storeRevision）保全。
+## Key adaptations
 
-### 4. Markdown 裸 URL（fb032eea）
-- `md-decorations.ts` 合并：裸 URL 不再被装饰/破坏；编辑器与聊天渲染链路定向测试通过。
+1. **AGENTS.md 人格协议迁移 + migration-degraded fallback（本轮修复）**
+   `ishiki.md → AGENTS.md`、`public-ishiki.md → AGENTS.public.md` 启动改名（不删用户文件、
+   新旧并存置 `.pre-agents-rename.bak`、每次启动重试）。**本轮补齐缺口**：改名失败的结果
+   从"仅打 log"升级为结构化运行时状态（`engine._failedPersonaRenames`，
+   `buildFailedPersonaRenameIndex`），`resolvePersonaSource` 增加显式 `migrationFallback`
+   参数——仅当本次启动明确记录改名失败、且新文件不存在时，才临时读取旧文件
+   （`fromTemplate=false`）；新文件永远优先；无失败记录的 out-of-band 旧文件一律不读
+   （不重建永久双读协议）；public 变体同规则。下次启动改名成功后 fallback 自动消失。
+   证据：tests/agents-md-startup-migration.test.ts 11 用例（含 5 个 degraded 场景）、
+   migration smoke 23/23（含语义断言：failed rename 后 effective persona 仍是用户自定义内容）。
+2. **Memory Dream + Lingxi memory 语义槽**：`Agent.getResolvedMemoryModel` 闭包 →
+   `engine.resolveAuxiliaryExecution("memory", { agentId })` → MemoryTicker → DreamRunner。
+   不复活 utility/utility_large，不回落 chat/title/summarize/approval/vision/guard。
+   契约锁定：tests/memory-dream-memory-slot.test.ts。
+3. **Dream revision current-vs-revision diff（本轮新增）**：revision detail 响应携带后端
+   现读的当前记忆快照（`snapshotDreamSections`，与 `revision.before` 同构
+   facts/today/weekDays/longterm，不暴露文件路径）；DreamRevisionBrowser 渲染逐段统一 diff
+   （复用 `desktop/src/react/utils/line-diff.ts`，+ = 恢复后出现 / − = 恢复后移除 / 相同段
+   折叠标注），进入确认前重新现取 current，current == revision 时显示"相同"并禁用恢复按钮，
+   恢复成功后刷新版本列表与对比。证据：DreamRevisionBrowser.test.tsx 6 用例（任务书 A–F）、
+   tests/memory-dream-route.test.ts 7 用例（含 current 快照断言）。
+4. **Dream config 契约补齐（本轮）**：`PUT /api/agents/:id/config` 的
+   `memory.dream.auto_enabled` 布尔校验——生产实现本就与 upstream 逐字节一致，本轮补齐
+   缺失的 3 个契约测试（200 透传 / "yes"、1、null → 400 且 `updateConfig` 未被调用）。
+5. **Automation store 恢复**：tmp 校验 → 逐字节损坏备份 → 原子提升；稳定错误码
+   `cron_store_corrupt/unavailable/recovery_failed`；禁止静默返回 []；未知错误不透传
+   本地绝对路径；UI 保留上一次 jobs/badge、Add 防重复；suggestion 失败走 ContentBlock
+   架构（不回退 AssistantMessage 聊天语义管线）。证据：tests/cron-store.test.ts、
+   tests/desk-route-cron.test.ts、AutomationPanel/AssistantMessage 组件测试。
+6. **Markdown 裸 URL**：`md-decorations.ts` 保持裸 URL 可见（fb032eea）。
+7. **Context Ring**：压缩动作优先级与上游对齐（63bc92b7）。
+8. **Windows seed 清理**：`RMDir /r "$INSTDIR\resources\seed"` 严格限于安装目录应用自有
+   seed，不触 LINGXI_HOME / agents / providers / memory / sessions（18727d24）。
+   证据：tests/windows-installer-contract.test.ts 19 用例。
+9. **i18n（5 locale key-level merge）**：zh/zh-TW/en/ja/ko 逐 key 合并（删 ishiki*、
+   增 agentsMd*/dream 树/error.code.dream*）；本轮追加 dream revisions diff 5 个 key。
+   证据：tests/i18n-locale-parity.test.ts、tests/react-locale-coverage.test.ts。
+10. **bundled skills**：人格相关 skill 文档对齐 AGENTS.md 命名，保留 Lingxi 品牌文案。
+11. **依赖（INTENTIONAL_DIVERGENCE）**：package.json/package-lock.json（上游 U0..U1 仅
+    version bump、无新依赖）；release-digest.v1/v2.json（Lingxi 发布历史独立，拷贝即伪造）。
+    Pi SDK 保持 0.84.1 未降级；`lingxi.upstreamVersion = 0.447.4`。
+12. **生成物（REGENERATED，全部由 Lingxi 生成器在最终源码树重新生成）**：
+    cli-runtime-closure（dream 模块入闭包；本轮新增 memory-dream → revision-store 边）、
+    persistence-schema-fingerprint（两轮 compatible review；DATA_EPOCH=1 不变）、
+    persistence-store-inventory（59 stores / 702 sites）、export-manifest（704→712，
+    手工策展权威源；本轮无新增生产文件故不变）。确定性验证：全部生成器连跑两次，
+    第二次 git diff 为零。
 
-### 5. Context Ring 顺序（63bc92b7）
-- 压缩动作优先级与上游对齐；ContextRing 组件定向测试通过。
+## Lingxi invariants（下游保全确认）
 
-### 6. Windows seed 清理（18727d24）
-- `build/installer.nsh`：`RMDir /r "$INSTDIR\resources\seed"`，注释已品牌化为 LINGXI_HOME；**清理范围严格限于安装目录应用自有 seed resource，绝不触及 LINGXI_HOME 或任何用户数据**。
-- tests/windows-installer-contract.test.ts 宏名修正为 `lingxiRemoveOwnedInstallTrees`，19 用例通过。
-
-### 7. i18n（5 locale，key-level merge）
-- zh / zh-TW / en / ja / ko 五语言按 key 级合并（脚本化）：删除 `settings.agent.ishiki*`/`publicIshiki*`/`noIshiki`，新增 `agentsMd*`/`publicAgentsMd*`/`noAgentsMd`/`settings.memory.dream` 树/`error.code.dream*`，更新 `input.refreshAndCompact*` 措辞。**未整文件覆盖任何 locale**。
-
-### 8. bundled skills（f32c3f64）
-- 人格相关 skill 文档对齐 AGENTS.md 协议措辞。
-
-### 9. 依赖与派生物
-- **INTENTIONAL_DIVERGENCE**：package.json / package-lock.json（上游 U0..U1 仅 version bump，无新依赖）；release-digest.v1/v2.json（上游 digest 是上游发布历史，拷贝即伪造）；Pi SDK 保持 0.84.1 未降级。
-- **REGENERATED**：CLI runtime closure、persistence schema fingerprint（compatible 增补 + compatibility-reason，DATA_EPOCH 不变）、persistent store inventory、export-manifest（704→712，手工策展权威源）。
-
-## 下游保全审计
-
-以下 Lingxi 下游能力全部以「全量测试套件 + 定向契约测试 + 构建/打包/migration smoke」确认零回归：
-
-| 能力 | 保全证据 |
+| 能力 | 状态与证据 |
 | --- | --- |
-| Provider / Ollama | 全量套件内 provider/ollama 测试全绿；providers 数据在 migration smoke 中逐字节完好 |
-| 辅助模型槽（chat/title/summarize/memory/vision/approval） | auxiliary slot 契约测试全绿；Dream 新增消费方走同一 contract 并被专项测试锁定 |
-| 审批槽（approval slot） | 全量套件审批链路测试全绿 |
-| 聊天语义管线（canonical 单通道 / 稳定 ID / Outcome / fold） | AssistantMessage 合并走 ContentBlock 架构；聊天语义测试全绿 |
-| thinking / mood | 全量套件相关用例全绿；mood 剥离与 stepEnd 段/轮区分未受影响 |
+| Provider / Ollama 统一架构 | 全量套件 provider/ollama 用例全绿；migration smoke 断言 providers 数据逐字节完好 |
+| 辅助模型语义槽（title/summarize/memory/vision/approval/guard） | 全量套件 auxiliary slot 契约全绿；Dream 仅消费 memory 槽（专项测试锁定） |
+| 审批槽独立 | 未重新绑定 memory/utility；全量套件审批链路全绿 |
+| 聊天语义管线（canonical 单通道 / ContentBlock registry / live-turn store / deferred history / 稳定 ID / thinking/mood/tool/skill fold） | AssistantMessage automation suggestion 走 ContentBlock 架构；聊天语义测试全绿 |
 | ReservedTagScanner | 全量套件扫描器用例全绿 |
-| Memory（memory slot / facts / daily） | migration smoke 断言 memory/facts/daily 全量完好；memory 相关测试全绿 |
-| Automation Lingxi 扩展（configRevision/storeRevision） | cron-store 定向测试断言扩展字段保全 |
-| 用户数据 | migration smoke 16/16：sessions/cron/providers/user/persona 全部完好；persona 迁移只改名/备份、从不删除 |
-| 发布签名公钥集 | `shared/artifact-core/pinned-keyset.json` 未触碰（轮换只追加规则未被触发） |
+| Memory（facts/today/week/longterm） | Dream 只改 Facts/Long-term（Today/Week 受保护：applyDreamSections 拒绝改写）；revision-before-write；memory_changed 竞态保护；5000 字符硬上限 |
+| Automation 下游扩展（configRevision/storeRevision/重入保护） | cron-store 定向测试断言扩展字段保全 |
+| 用户数据 | migration smoke 23/23：persona 只改名/备份从不删除；memory/cron/sessions/providers/user 全量完好 |
+| 发布签名公钥集 | `shared/artifact-core/pinned-keyset.json` 未触碰；本地构建签名用一次性 throwaway keypair（/tmp，未入库） |
 
 ## 红线复核
 
-- 未 merge upstream main、未整体 cherry-pick、未 `checkout --theirs`——全部经三方合并或行为级重写。
-- 未拷贝上游 receipt/digest/fingerprint——派生物全部由 Lingxi 脚本在本仓库重新生成。
-- 无静默降级：cron-store 错误显式抛出带稳定码；UI 显式降级均标注（`throwOnHttpError:false` + toast）。
-- 无私钥/密钥写入代码或报告；构建签名使用一次性 throwaway keypair（/tmp，未入库）。
-- `upstreamVersion` 在全部验证通过后才 bump（本审计收口时执行）。
-- 全程未删除或跳过任何失败测试（vitest 误捕获的 3way 草稿非测试文件，删除草稿后全绿）。
+- 未 merge upstream main、未整体 cherry-pick、未 `checkout --theirs`——全部三方合并或行为级重写。
+- 未复制上游 package.json/package-lock.json/release digest/persistence receipts/CLI closure。
+- 无静默降级：cron-store 错误显式抛出带稳定码；persona degraded fallback 由启动失败记录
+  显式驱动并打 log；Dream diff 超上限时显式降级为"无法计算差异"标注（不做假 diff）。
+- 未删除/skip 任何失败测试；本轮新增测试 19 个全部通过。
+- 无私钥/密钥入库；构建签名密钥对为 /tmp 一次性 throwaway。
+
+## Known limitations
+
+- **Windows 真实安装器执行未在本机进行**（宿主平台 macOS 无法执行 NSIS 安装包）。
+  Windows contract 由 tests/windows-installer-contract.test.ts（19 用例）门禁；
+  仓库 CI 已有 windows-latest runner（ci.yml 全量套件含该 contract；build.yml
+  windows-latest + nsis 腿构建真实 NSIS 安装器）。收口后在 CI 触发记录见 PROGRESS.md。

@@ -25,7 +25,7 @@ import path from "path";
 
 const U0 = "cc19cb49b0786d61ed723764e0a83baf87887270"; // openhanako v0.444.1
 const U1 = "c6d0405294be67cb134c2758f6472748ee73e2be"; // openhanako v0.447.4
-const L0 = "97595264"; // Lingxi v0.444.1 同步完成点（PR #2）
+const L0 = "97595264ead8735a04559507ddaade25db8a4e15"; // Lingxi v0.444.1 同步完成点（PR #2）
 const L1 = "ca0b417e36a6a1f80947458aaed328a25718e41b"; // 本轮同步开始时 main
 
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), "..");
