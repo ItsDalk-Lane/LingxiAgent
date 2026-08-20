@@ -1,37 +1,55 @@
-# PROGRESS — 用量统计独立成页 + 图表悬浮提示
+# PROGRESS — openhanako v0.444.1 → v0.447.4 上游同步
 
-## 终态：完成（未触 8 轮上限）
+## 审计坐标（已固定，执行期间不得移动）
 
-## 目标
-把「用量统计」从供应商页拎出，做成设置左侧导航独立一页（夹在 providers 与 media 之间），并给各图表加跟随鼠标、实时显示数值的悬浮提示。
+```
+UPSTREAM_BASE_SHA   = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0.444.1)
+UPSTREAM_TARGET_SHA = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
+LINGXI_BASE_SHA     = 97595264  (chore: sync upstream 0.444.1 and pi SDK 0.84.1, PR #2)
+LINGXI_START_SHA    = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
+工作分支            = feature/upstream-sync-0.447.4
+```
 
-## 基线数（2026-08-13）
-- `npx vitest run desktop/src/react/__tests__/settings/`：30 文件 174 用例全过，skipped=0
-- `npx vitest run desktop/src/react/settings/__tests__/`：6 文件 23 用例全过，skipped=0
-- `npm run typecheck`（tsc x3）：绿
-- locale key 完整性校验测试：grep 无，不纳入验收
+ΔU = 18 commits / 133 paths（7850+/738-）；ΔL = 346 paths；overlap = 29 paths。
+原始数据：`.sync-audit/delta-U.txt`、`delta-L.txt`、`overlap-paths.txt`、`per-commit-paths.txt`。
 
-## 最终数
-- `desktop/src/react/__tests__/settings/`：31 文件 179 用例全过（+1 文件 +5 用例：UsageTab.test.tsx 4 条、ProvidersTab.test.tsx 1 条），skipped=0
-- `desktop/src/react/settings/__tests__/`：6 文件 23 用例全过（= 基线），skipped=0
-- `npm run typecheck`：绿
-- 反向验证：UsageCursorTip 渲染出口改 return null → UsageTab.test 2 条提示用例如期变红；还原 → 4 条全绿
+## 当前阶段
 
-## 最大风险（实际发生与化解）
-1. SettingsContent.test.tsx（白名单外）逐模块 mock tab：未 mock UsageTab，但它从不把 activeTab 设为 usage，真实 UsageTab 不会被渲染；UsageTab 保持薄壳，模块级 import 无副作用 → 全程绿。
-2. UsageLedgerSection.test.tsx（白名单外）用 `getAllByTitle(/·/)` 数原生 title 探针（7/30）。任务 2 要求 `.usage-day` 删 title。化解：title 从 `.usage-day` 移到其子元素 `.usage-day-label`（每柱仍恰好 1 个，计数不变；柱体本身不再触发原生提示，光标提示是唯一柱体悬浮层；`.usage-day` 改挂等价 aria-label）。属「靠调整白名单内实现修好」，已在 BLOCKED.md 记为待裁决观感项。
-3. settings-primitives-contract.test.ts（白名单外）对 tabs/ 下 `style={{` 计数棘轮 ≤48。初版 UsageCursorTip 用 inline style 定位导致 49。化解：改 ref 直写 DOM style（第 2 轮失败是注释里含 `style={{` 字面量被正则计入，改写注释后通过）。
+Phase 0 完成，Phase 1（基线测试）进行中。
 
-## 记录
-- settings.providers.subtab.usage 变死 key：按已拍板事项保留不删（5 文件同步删除无收益）。
-- 任务 1（独立成页）：nav TAB_ITEMS 插入 usage（柱状图 icon）、SettingsContent 注册 TAB_COMPONENTS/TAB_TITLE_KEYS（标题复用 settings.usage.title）、新建薄壳 UsageTab、ProvidersTab 移除 usage 子页（api/models 不动）、5 locale 加 settings.tabs.usage。一轮通过（新断言 role button→tab 属当轮内修正）。
-- 任务 2（悬浮提示）：新建 UsageCursorTip（portal→body、position:fixed、pointer-events:none、data-testid="usage-cursor-tip"、useUsageCursorTip 每图表一份状态、enter 显示/move 跟手+贴边翻转/leave 立即卸载、进入向 fade+scale）；ModelOrbit 每环段包 `<g>` 挂事件、SplitRing 环段挂事件、DailyBars 每根 .usage-day 挂事件；RingCircles 保持纯展示。提示文案全部复用 settings.usage.totalTokens/cacheRead/uncached/requests/cacheHitRate。
+## 阶段状态
 
-## 2026-08-13 真机反馈修复
-用户在桌面 app 实测悬停无提示。根因：提示 portal 到 `document.body`，原 z-index 1000 低于设置 modal 壳（`SettingsModalShell.module.css` z-index:1800）与设置内 fixed 浮层（9998/9999），提示被压在设置面板下面不可见；jsdom 不断言层叠所以测试全绿没暴露。修复：`.usage-cursor-tip` z-index 提至 10000；顺手把定位从 useEffect 改 useLayoutEffect，避免首帧出现在左上角再跳变。复跑：两目录 202 用例全绿、typecheck 绿。
+| Phase | 内容 | 状态 |
+|---|---|---|
+| 0 | 执行保护文件 + 坐标 + 矩阵 | ✅ |
+| 1 | Lingxi 功能基线（全量测试基线） | 🔄 |
+| 2 | AGENTS.md 人格协议迁移 | ⬜ |
+| 3 | Memory Dream 全链路 | ⬜ |
+| 4 | Automation store 恢复 | ⬜ |
+| 5 | Markdown 裸 URL | ⬜ |
+| 6 | Context Ring 顺序 | ⬜ |
+| 7 | Windows seed 清理 | ⬜ |
+| 8 | i18n key-level merge | ⬜ |
+| 9 | bundled skills 同步 | ⬜ |
+| 10 | 依赖判断（上游仅 version bump、无新依赖 → 不动 package.json/lock） | ✅ |
+| 11 | release digest → INTENTIONAL_DIVERGENCE | ✅ |
+| 12 | derived artifacts 重新生成 | ⬜ |
+| 13-15 | typecheck / lint / 定向+全量测试 | ⬜ |
+| 16-17 | 构建 + 打包 + 旧数据 migration smoke | ⬜ |
+| 收尾 | upstreamVersion→0.447.4 + 最终审计 + 语义提交 | ⬜ |
 
-## 2026-08-13 用户拍板：彻底删除原生 title
-经用户确认，`.usage-day-label` 上的兼容 title 已移除，DailyBars 不再有任何原生 tooltip；
-`UsageLedgerSection.test.tsx`（经用户授权修改）的周/月窗口探针从 `getAllByTitle(/·/)` 换成
-`getAllByLabelText(/·/)`（7/30 计数不变，语义等价——aria-label 承接了原 title 的信息）。
-复跑：两目录 202 用例全绿、typecheck 绿。BLOCKED.md 清空为「无」。
+## 已执行测试
+
+（待记录）
+
+## 尚未执行测试
+
+全部。
+
+## 当前发现
+
+1. 上游 package.json 在 U0..U1 区间**仅有 version 字段变化**，Dream 无新增运行时依赖 → package.json/lock 整体 INTENTIONAL_DIVERGENCE。
+2. Lingxi 人格体系仍在 `ishiki` 命名（13 个 TS 文件引用）；模板内含 `lingxi.md` 品牌文件（上游对应 hanako.md）→ 模板迁移=目录改名+保留 lingxi.md。
+3. Lingxi 模型解析锚点：`engine.resolveAuxiliaryExecution("memory", { agentId })`（core/engine.ts:1907 + core/auxiliary-model-resolver.ts）→ Dream 与 MemoryTicker 共用此 contract。
+4. overlap 29 路径中 C 类最高风险：`AssistantMessage.tsx`（Lingxi 聊天语义架构已重构，automation suggestion 失败必须走 ContentBlock）。
+5. `lib/desk/cron-store.ts`、`lib/memory/memory-ticker.ts` 不在 overlap——Lingxi 扩展均在 L0 前并入，上游 patch 基线一致性好，可按 B 类合并。
