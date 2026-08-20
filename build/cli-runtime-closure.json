@@ -24,13 +24,13 @@
       "id": "nft-cli-bundle",
       "path": "cli/entry.ts",
       "inputType": "nft-runtime-trace",
-      "reason": "@vercel/nft trace of an esbuild-compiled bundle of cli/entry.ts (internal repo source inlined, npm packages left external) -- bundle externals / runtime dependency files for the CLI's own direct npm dependency (ws) and its transitive files. Same nft usage pattern as scripts/build-server.mjs:491-535 (read-only precedent)."
+      "reason": "@vercel/nft trace of an esbuild-compiled bundle of cli/entry.ts (internal repo source inlined, npm packages left external) -- bundle externals / runtime dependency files for the CLI's own direct npm dependency (ws) and its transitive files. Same nft usage pattern as the server build's pruneServerNodeModulesViaNft() in scripts/build-server-phases.mjs (read-only precedent)."
     },
     {
       "id": "nft-server-bundle",
       "path": "server/index.ts",
       "inputType": "nft-runtime-trace",
-      "reason": "@vercel/nft trace of an esbuild-compiled bundle of server/index.ts (internal repo source inlined, npm packages left external) -- bundle externals / runtime dependency files for the open server composition's npm dependency surface. Since the route-composition split this file no longer imports the closed-product route files (see the server-bootstrap root's reason above), so this trace no longer pulls in their npm dependencies either -- narrower, and more accurate, than before the split. The packaged product bundle (vite.config.server.js's build.lib.entry) is compiled from server/main-full.ts instead, which statically includes this file plus the closed-product routes; that closed bundle is out of scope for this open-closure trace by design. Same nft usage pattern as scripts/build-server.mjs:491-535 (read-only precedent)."
+      "reason": "@vercel/nft trace of an esbuild-compiled bundle of server/index.ts (internal repo source inlined, npm packages left external) -- bundle externals / runtime dependency files for the open server composition's npm dependency surface. Since the route-composition split this file no longer imports the closed-product route files (see the server-bootstrap root's reason above), so this trace no longer pulls in their npm dependencies either -- narrower, and more accurate, than before the split. The packaged product bundle (vite.config.server.js's build.lib.entry) is compiled from server/main-full.ts instead, which statically includes this file plus the closed-product routes; that closed bundle is out of scope for this open-closure trace by design. Same nft usage pattern as the server build's pruneServerNodeModulesViaNft() in scripts/build-server-phases.mjs (read-only precedent)."
     },
     {
       "id": "create-require-root:shared/artifact-core/activation.cjs",
@@ -304,6 +304,18 @@
         }
       ],
       "reason": "Reached via esbuild source module graph, imported by core/agent-manager.ts (import-statement)."
+    },
+    {
+      "path": "core/agents-md-migration.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "core/engine.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by core/engine.ts (import-statement)."
     },
     {
       "path": "core/auxiliary-model-resolver.ts",
@@ -986,6 +998,11 @@
         },
         {
           "root": "server-bootstrap",
+          "from": "lib/memory/dream/model-runner.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
           "from": "lib/tools/install-skill.ts",
           "kind": "import-statement"
         },
@@ -1025,7 +1042,7 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by core/vision-bridge.ts (import-statement); core/llm-utils.ts (import-statement); lib/memory/session-summary.ts (import-statement); +10 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by core/vision-bridge.ts (import-statement); core/llm-utils.ts (import-statement); lib/memory/session-summary.ts (import-statement); +11 more importer(s)."
     },
     {
       "path": "core/llm-request-policy.ts",
@@ -1530,6 +1547,11 @@
         },
         {
           "root": "server-bootstrap",
+          "from": "lib/memory/dream/model-runner.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
           "from": "lib/diary/diary-writer.ts",
           "kind": "import-statement"
         },
@@ -1539,7 +1561,7 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by core/model-manager.ts (import-statement); core/auxiliary-model-resolver.ts (import-statement); core/vision-bridge.ts (import-statement); +5 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by core/model-manager.ts (import-statement); core/auxiliary-model-resolver.ts (import-statement); core/vision-bridge.ts (import-statement); +6 more importer(s)."
     },
     {
       "path": "core/model-image-preprocess.ts",
@@ -1666,12 +1688,27 @@
       "provenance": [
         {
           "root": "server-bootstrap",
+          "from": "core/bridge-session-manager.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
           "from": "core/agent.ts",
           "kind": "import-statement"
         },
         {
           "root": "server-bootstrap",
           "from": "core/agent-manager.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "core/session-coordinator.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "core/first-run.ts",
           "kind": "import-statement"
         },
         {
@@ -1683,9 +1720,14 @@
           "root": "server-bootstrap",
           "from": "server/routes/settings-snapshot.ts",
           "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "hub/agent-executor.ts",
+          "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by core/agent.ts (import-statement); core/agent-manager.ts (import-statement); server/routes/agents.ts (import-statement); +1 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by core/bridge-session-manager.ts (import-statement); core/agent.ts (import-statement); core/agent-manager.ts (import-statement); +5 more importer(s)."
     },
     {
       "path": "core/platform-prompt.ts",
@@ -3821,6 +3863,39 @@
       "reason": "Reached via esbuild source module graph, imported by server/routes/chat.ts (import-statement)."
     },
     {
+      "path": "lib/agents-public-templates",
+      "inputType": "runtime-asset",
+      "provenance": [
+        {
+          "root": "declared-asset",
+          "kind": "directory"
+        }
+      ],
+      "reason": "core/first-run.ts and core/agent.ts read path.join(productDir, \"agents-public-templates\", ...)."
+    },
+    {
+      "path": "lib/agents-templates",
+      "inputType": "runtime-asset",
+      "provenance": [
+        {
+          "root": "declared-asset",
+          "kind": "directory"
+        }
+      ],
+      "reason": "core/persona-source.ts KIND_CONFIG reads path.join(productDir, \"agents-templates\", ...)."
+    },
+    {
+      "path": "lib/agents.example.md",
+      "inputType": "runtime-asset",
+      "provenance": [
+        {
+          "root": "declared-asset",
+          "kind": "file"
+        }
+      ],
+      "reason": "core/persona-source.ts KIND_CONFIG falls back to path.join(productDir, \"agents.example.md\")."
+    },
+    {
       "path": "lib/approval-gateway.ts",
       "inputType": "source-graph",
       "provenance": [
@@ -4558,7 +4633,7 @@
           "kind": "file"
         }
       ],
-      "reason": "core/first-run.ts:180 and core/agent-manager.ts:605 read path.join(productDir, \"config.example.yaml\") (productDir = fromRoot(\"lib\"))."
+      "reason": "core/first-run.ts's seedDefaultAgent() and core/agent-manager.ts's createAgent() read path.join(productDir, \"config.example.yaml\") (productDir = fromRoot(\"lib\"))."
     },
     {
       "path": "lib/confirm-store.ts",
@@ -5158,7 +5233,7 @@
           "kind": "file"
         }
       ],
-      "reason": "core/provider-registry.ts:43 reads fromRoot(\"lib\", \"default-models.json\") via fs.readFileSync."
+      "reason": "core/provider-registry.ts reads fromRoot(\"lib\", \"default-models.json\") via fs.readFileSync at module load, into its _defaultModels constant."
     },
     {
       "path": "lib/deferred-result-coordinator.ts",
@@ -5801,6 +5876,11 @@
         },
         {
           "root": "server-bootstrap",
+          "from": "lib/memory/dream/model-runner.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
           "from": "lib/memory/memory-search.ts",
           "kind": "import-statement"
         },
@@ -6110,7 +6190,7 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by lib/llm/provider-client.ts (import-statement); core/execution-router.ts (import-statement); core/model-manager.ts (import-statement); +72 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by lib/llm/provider-client.ts (import-statement); core/execution-router.ts (import-statement); core/model-manager.ts (import-statement); +73 more importer(s)."
     },
     {
       "path": "lib/identity-templates",
@@ -6121,7 +6201,7 @@
           "kind": "directory"
         }
       ],
-      "reason": "core/first-run.ts:214-215 and core/agent.ts read path.join(productDir, \"identity-templates\", ...)."
+      "reason": "core/persona-source.ts KIND_CONFIG reads path.join(productDir, \"identity-templates\", ...)."
     },
     {
       "path": "lib/identity.example.md",
@@ -6132,29 +6212,7 @@
           "kind": "file"
         }
       ],
-      "reason": "core/first-run.ts:216 and core/agent.ts fall back to path.join(productDir, \"identity.example.md\")."
-    },
-    {
-      "path": "lib/ishiki-templates",
-      "inputType": "runtime-asset",
-      "provenance": [
-        {
-          "root": "declared-asset",
-          "kind": "directory"
-        }
-      ],
-      "reason": "core/first-run.ts:227-228 and core/agent.ts read path.join(productDir, \"ishiki-templates\", ...)."
-    },
-    {
-      "path": "lib/ishiki.example.md",
-      "inputType": "runtime-asset",
-      "provenance": [
-        {
-          "root": "declared-asset",
-          "kind": "file"
-        }
-      ],
-      "reason": "core/first-run.ts:229 and core/agent.ts fall back to path.join(productDir, \"ishiki.example.md\")."
+      "reason": "core/persona-source.ts KIND_CONFIG falls back to path.join(productDir, \"identity.example.md\")."
     },
     {
       "path": "lib/known-model-fallbacks.json",
@@ -6165,7 +6223,7 @@
           "kind": "file"
         }
       ],
-      "reason": "shared/known-models.ts:35 reads fromRoot(\"lib\", \"known-model-fallbacks.json\") via readFileSync."
+      "reason": "shared/known-models.ts's _ensureLoaded() reads fromRoot(\"lib\", \"known-model-fallbacks.json\") via readFileSync."
     },
     {
       "path": "lib/known-models.json",
@@ -6176,7 +6234,7 @@
           "kind": "file"
         }
       ],
-      "reason": "shared/known-models.ts:34 reads fromRoot(\"lib\", \"known-models.json\") via readFileSync."
+      "reason": "shared/known-models.ts's _ensureLoaded() reads fromRoot(\"lib\", \"known-models.json\") via readFileSync."
     },
     {
       "path": "lib/llm/cache-prefix-contract.ts",
@@ -6304,9 +6362,14 @@
           "root": "server-bootstrap",
           "from": "lib/memory/deep-memory.ts",
           "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/memory/dream/model-runner.ts",
+          "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by lib/memory/session-summary.ts (import-statement); lib/memory/compile.ts (import-statement); lib/memory/deep-memory.ts (import-statement)."
+      "reason": "Reached via esbuild source module graph, imported by lib/memory/session-summary.ts (import-statement); lib/memory/compile.ts (import-statement); lib/memory/deep-memory.ts (import-statement); +1 more importer(s)."
     },
     {
       "path": "lib/llm/provider-cache-affinity.ts",
@@ -6528,6 +6591,16 @@
       "provenance": [
         {
           "root": "server-bootstrap",
+          "from": "lib/memory/dream/revision-store.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/memory/dream/runner.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
           "from": "lib/memory/memory-ticker.ts",
           "kind": "import-statement"
         },
@@ -6547,7 +6620,7 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by lib/memory/memory-ticker.ts (import-statement); lib/tools/update-settings-tool.ts (import-statement); lib/memory/compiled-memory-snapshot.ts (import-statement); +1 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by lib/memory/dream/revision-store.ts (import-statement); lib/memory/dream/runner.ts (import-statement); lib/memory/memory-ticker.ts (import-statement); +3 more importer(s)."
     },
     {
       "path": "lib/memory/compiled-memory-snapshot.ts",
@@ -6673,6 +6746,81 @@
       "reason": "Reached via esbuild source module graph, imported by lib/memory/memory-ticker.ts (import-statement)."
     },
     {
+      "path": "lib/memory/dream/memory-units.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "lib/memory/dream/model-runner.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by lib/memory/dream/model-runner.ts (import-statement)."
+    },
+    {
+      "path": "lib/memory/dream/model-runner.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "lib/memory/dream/runner.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by lib/memory/dream/runner.ts (import-statement)."
+    },
+    {
+      "path": "lib/memory/dream/revision-store.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "lib/memory/dream/runner.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/memory/memory-ticker.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by lib/memory/dream/runner.ts (import-statement); lib/memory/memory-ticker.ts (import-statement)."
+    },
+    {
+      "path": "lib/memory/dream/runner.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "lib/memory/memory-ticker.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by lib/memory/memory-ticker.ts (import-statement)."
+    },
+    {
+      "path": "lib/memory/dream/state-store.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "lib/memory/dream/revision-store.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/memory/dream/runner.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "server/routes/memory-dream.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by lib/memory/dream/revision-store.ts (import-statement); lib/memory/dream/runner.ts (import-statement); server/routes/memory-dream.ts (import-statement)."
+    },
+    {
       "path": "lib/memory/fact-store.ts",
       "inputType": "source-graph",
       "provenance": [
@@ -6707,9 +6855,14 @@
           "root": "server-bootstrap",
           "from": "lib/memory/compile.ts",
           "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/memory/dream/model-runner.ts",
+          "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by lib/memory/session-summary.ts (import-statement); lib/memory/compile.ts (import-statement)."
+      "reason": "Reached via esbuild source module graph, imported by lib/memory/session-summary.ts (import-statement); lib/memory/compile.ts (import-statement); lib/memory/dream/model-runner.ts (import-statement)."
     },
     {
       "path": "lib/memory/memory-reflection-runner.ts",
@@ -6780,6 +6933,18 @@
         }
       ],
       "reason": "Reached via esbuild source module graph, imported by lib/memory/compile.ts (import-statement)."
+    },
+    {
+      "path": "lib/memory/prompts/dream.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "lib/memory/dream/model-runner.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by lib/memory/dream/model-runner.ts (import-statement)."
     },
     {
       "path": "lib/memory/prompts/fact-extraction.ts",
@@ -7963,17 +8128,6 @@
         }
       ],
       "reason": "Reached via esbuild source module graph, imported by core/provider-registry.ts (import-statement)."
-    },
-    {
-      "path": "lib/public-ishiki-templates",
-      "inputType": "runtime-asset",
-      "provenance": [
-        {
-          "root": "declared-asset",
-          "kind": "directory"
-        }
-      ],
-      "reason": "core/first-run.ts:237-238 and core/agent.ts read path.join(productDir, \"public-ishiki-templates\", ...)."
     },
     {
       "path": "lib/resource-io/agent-tools.ts",
@@ -10228,7 +10382,7 @@
           "kind": "directory"
         }
       ],
-      "reason": "core/agent.ts:1088-1089 reads path.join(this.productDir, \"yuan\", ...) at prompt-build time (the identity/personality template data the system prompt draws from)."
+      "reason": "core/agent.ts's _readYuan() reads path.join(this.productDir, \"yuan\", ...) at prompt-build time (the identity/personality template data the system prompt draws from)."
     },
     {
       "path": "lib/zip-writer.ts",
@@ -119328,7 +119482,7 @@
           "kind": "file"
         }
       ],
-      "reason": "server/index.ts:266 reads fromRoot(\"package.json\") via fs.readFileSync for version display."
+      "reason": "server/index.ts's startServer() reads fromRoot(\"package.json\") via fs.readFileSync for version display."
     },
     {
       "path": "packages/plugin-protocol/src/index.ts",
@@ -119737,9 +119891,14 @@
           "root": "server-bootstrap",
           "from": "server/routes/speech-recognition.ts",
           "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "server/routes/memory-dream.ts",
+          "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by server/http/security-audit.ts (import-statement); server/routes/config.ts (import-statement); server/routes/providers.ts (import-statement); +11 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by server/http/security-audit.ts (import-statement); server/routes/config.ts (import-statement); server/routes/providers.ts (import-statement); +12 more importer(s)."
     },
     {
       "path": "server/http/cors-policy.ts",
@@ -120278,6 +120437,18 @@
       "reason": "Reached via esbuild source module graph, imported by server/composition/open-root.ts (import-statement)."
     },
     {
+      "path": "server/routes/memory-dream.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "server/composition/open-root.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by server/composition/open-root.ts (import-statement)."
+    },
+    {
       "path": "server/routes/mobile-static.ts",
       "inputType": "source-graph",
       "provenance": [
@@ -120673,9 +120844,14 @@
           "root": "server-bootstrap",
           "from": "server/routes/bridge.ts",
           "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "server/routes/memory-dream.ts",
+          "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by server/routes/config.ts (import-statement); server/routes/channels.ts (import-statement); server/routes/dm.ts (import-statement); +1 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by server/routes/config.ts (import-statement); server/routes/channels.ts (import-statement); server/routes/dm.ts (import-statement); +2 more importer(s)."
     },
     {
       "path": "server/utils/uploaded-skill-package.ts",
@@ -122317,12 +122493,12 @@
         },
         {
           "root": "server-bootstrap",
-          "from": "core/bridge-session-manager.ts",
+          "from": "core/persona-source.ts",
           "kind": "import-statement"
         },
         {
           "root": "server-bootstrap",
-          "from": "core/persona-source.ts",
+          "from": "core/bridge-session-manager.ts",
           "kind": "import-statement"
         },
         {
@@ -122338,6 +122514,16 @@
         {
           "root": "server-bootstrap",
           "from": "lib/memory/cache-snapshot-observation.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/memory/dream/state-store.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/memory/dream/revision-store.ts",
           "kind": "import-statement"
         },
         {
@@ -122466,7 +122652,7 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by core/execution-lease-registry.ts (import-statement); core/grant-registry.ts (import-statement); core/server-network-config.ts (import-statement); +41 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by core/execution-lease-registry.ts (import-statement); core/grant-registry.ts (import-statement); core/server-network-config.ts (import-statement); +43 more importer(s)."
     },
     {
       "path": "shared/safe-parse.ts",
@@ -123022,9 +123208,9 @@
     }
   ],
   "stats": {
-    "totalFiles": 10571,
+    "totalFiles": 10579,
     "byInputType": {
-      "source-graph": 675,
+      "source-graph": 683,
       "runtime-asset": 11,
       "nft-runtime-trace": 9885
     }
