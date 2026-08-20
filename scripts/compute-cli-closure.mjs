@@ -112,6 +112,80 @@ function repoRelative(rootDir, absolutePath) {
   return toPosix(path.relative(rootDir, absolutePath));
 }
 
+function isPathInside(parentPath, candidatePath) {
+  const relative = path.relative(parentPath, candidatePath);
+  return relative === "" || (!relative.startsWith(`..${path.sep}`) && relative !== ".." && !path.isAbsolute(relative));
+}
+
+/**
+ * 构建器会把软链接后的真实路径写进模块图。这里把它重新映射成当前工作树里的逻辑路径，
+ * 让普通仓库、工作树和共享依赖目录生成同一份闭包清单。
+ */
+export function normalizeSourceGraphPath({ rootDir, sourcePath }) {
+  const absolutePath = path.resolve(rootDir, sourcePath);
+  if (isPathInside(rootDir, absolutePath)) return repoRelative(rootDir, absolutePath);
+
+  const logicalNodeModules = path.join(rootDir, "node_modules");
+  let linkedNodeModules;
+  try {
+    linkedNodeModules = fs.realpathSync(logicalNodeModules);
+  } catch {
+    return toPosix(path.normalize(sourcePath));
+  }
+
+  let canonicalSourcePath = absolutePath;
+  try {
+    canonicalSourcePath = fs.realpathSync(absolutePath);
+  } catch {
+    // 构建器报告的缺失路径仍保留原样，交给后续的失败关闭检查处理。
+  }
+
+  if (isPathInside(linkedNodeModules, canonicalSourcePath)) {
+    return toPosix(path.join("node_modules", path.relative(linkedNodeModules, canonicalSourcePath)));
+  }
+
+  // 工作区包可能是 node_modules 里的二次软链接，真实路径会落到依赖仓库的 packages 目录。
+  const linkedRepository = path.dirname(linkedNodeModules);
+  if (linkedNodeModules !== logicalNodeModules && isPathInside(linkedRepository, canonicalSourcePath)) {
+    const candidate = path.relative(linkedRepository, canonicalSourcePath);
+    if (fs.existsSync(path.join(rootDir, candidate))) return toPosix(candidate);
+  }
+
+  return toPosix(path.normalize(sourcePath));
+}
+
+export function normalizeSourceGraphMetafile({ rootDir, metafile }) {
+  const inputs = {};
+  for (const [inputPath, data] of Object.entries(metafile.inputs)) {
+    const normalizedInput = normalizeSourceGraphPath({ rootDir, sourcePath: inputPath });
+    if (Object.prototype.hasOwnProperty.call(inputs, normalizedInput)) {
+      throw new Error(
+        `[compute-cli-closure] source graph path normalization collision: ${normalizedInput}`,
+      );
+    }
+    inputs[normalizedInput] = {
+      ...data,
+      imports: data.imports.map((entry) => (entry.external
+        ? entry
+        : {
+          ...entry,
+          path: normalizeSourceGraphPath({ rootDir, sourcePath: entry.path }),
+        })),
+    };
+  }
+  return { ...metafile, inputs };
+}
+
+function commonAncestor(paths) {
+  let candidate = path.resolve(paths[0]);
+  while (!paths.every((entry) => isPathInside(candidate, path.resolve(entry)))) {
+    const parent = path.dirname(candidate);
+    if (parent === candidate) return parent;
+    candidate = parent;
+  }
+  return candidate;
+}
+
 // ---------------------------------------------------------------------------
 // Declared roots (evidence sources 1 + 2, plus the nft half of source 3).
 // ---------------------------------------------------------------------------
@@ -482,7 +556,7 @@ export async function traceSourceGraph({ rootDir, root }) {
       + `fail-closed rather than risk an incomplete graph:\n${text}`,
     );
   }
-  return result.metafile;
+  return normalizeSourceGraphMetafile({ rootDir, metafile: result.metafile });
 }
 
 // ---------------------------------------------------------------------------
@@ -796,7 +870,7 @@ export function normalizeNftTraceFiles({ fileList, scratchRel }) {
   const kept = [...fileList]
     .map(toPosix)
     .filter((relPath) => {
-      if (relPath === scratchRel || relPath === "package.json") return false;
+      if (relPath === scratchRel || relPath === "package.json" || relPath === "node_modules") return false;
       // Native addon bytes are produced for a specific OS, architecture, and
       // Node ABI. The packaged server installs them with its target runtime;
       // including a locally rebuilt copy here would make this source closure
@@ -877,14 +951,25 @@ export async function traceNftRoot({ rootDir, root }) {
       );
     }
     const { nodeFileTrace } = await import("@vercel/nft");
+    let linkedNodeModules = path.join(rootDir, "node_modules");
+    try {
+      linkedNodeModules = fs.realpathSync(linkedNodeModules);
+    } catch {
+      // 缺失依赖会由追踪器按原有路径报告，不在这里吞掉错误。
+    }
+    const traceBase = commonAncestor([rootDir, linkedNodeModules]);
     const { fileList, warnings } = await nodeFileTrace([scratchPath], {
-      base: rootDir,
+      base: traceBase,
       conditions: ["node", "import"],
       analysis: { emitGlobs: false },
-      ignore: [...NFT_IGNORE_PATTERNS, repoRelative(rootDir, scratchPath)],
+      ignore: [...NFT_IGNORE_PATTERNS, repoRelative(traceBase, scratchPath)],
     });
     const scratchRel = repoRelative(rootDir, scratchPath);
-    const files = normalizeNftTraceFiles({ fileList, scratchRel });
+    const logicalFiles = new Set([...fileList].map((relPath) => normalizeSourceGraphPath({
+      rootDir,
+      sourcePath: path.join(traceBase, relPath),
+    })));
+    const files = normalizeNftTraceFiles({ fileList: logicalFiles, scratchRel });
     return { files, warnings: [...warnings].map((w) => w.message) };
   } finally {
     fs.rmSync(scratchPath, { force: true });

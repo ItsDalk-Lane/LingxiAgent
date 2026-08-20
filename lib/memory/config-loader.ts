@@ -4,9 +4,9 @@
  * 职责单一：读写 agent 的 config.yaml，提供缓存和原子写入。
  * 不做凭证解析（运行时凭证解析走 ProviderRegistry / AuthStore）。
  *
- * 支持双通道 API 区块：
- *   api          → 主通道（chat 模型）
- *   embedding_api → Embedding 专用通道（可选）
+ * 兼容读取旧双通道 API 区块，仅供设置展示和迁移：
+ *   api / embedding_api 中的凭证字段不是运行时凭证源，禁止用于模型发送；
+ *   设置保存会把它们迁到 Provider Catalog 并清空内联值。
  */
 
 import fs from "fs";
@@ -17,7 +17,7 @@ import { writeSecretFileSync } from "../../shared/secret-fs.ts";
 const _cache = new Map(); // configPath → { cached, cachedRaw }
 
 /**
- * 解析一个 API 区块（仅返回 config.yaml 中的原始值）
+ * 解析一个旧 API 区块（仅返回 config.yaml 中的原始值，禁止用于运行时发送）
  * @private
  */
 function resolveApi(block) {
@@ -43,10 +43,10 @@ export function loadConfig(configPath) {
   const raw = YAML.load(fs.readFileSync(configPath, "utf-8"));
   const cachedRaw = structuredClone(raw);  // 保存原始配置（resolve 前）
 
-  // API 通道（仅提取 config.yaml 中的原始值，UI 展示用）
+  // 旧 API 通道：仅供 UI 展示和迁移，运行时不得消费其中的凭证。
   const api = resolveApi(raw.api) || { provider: "", api_key: "", base_url: "" };
 
-  // Embedding 专用通道（可选）
+  // 旧 Embedding 通道：同样只读兼容，不是第二条执行通道。
   const embeddingApi = resolveApi(raw.embedding_api);
 
   const cached = {

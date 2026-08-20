@@ -2521,4 +2521,51 @@ describe("syncModels", () => {
     });
     expect(result.providers["gateway-provider"].models[0].id).toBe("gateway-chat");
   });
+
+  it("keeps credential headers owner-only and removes stale values across refreshes", async () => {
+    const syncModels = await loadSync();
+    const provider = {
+      base_url: "https://gateway.example/v1",
+      api: "openai-completions",
+      headers: { Authorization: "Bearer first-secret" },
+      models: ["gateway-chat"],
+    };
+
+    expect(syncModels({ gateway: provider }, { modelsJsonPath })).toBe(true);
+    if (process.platform !== "win32") {
+      expect(fs.statSync(modelsJsonPath).mode & 0o777).toBe(0o600);
+    }
+
+    expect(syncModels({
+      gateway: {
+        ...provider,
+        headers: { Authorization: "Bearer replacement-secret" },
+      },
+    }, { modelsJsonPath })).toBe(true);
+    let persisted = fs.readFileSync(modelsJsonPath, "utf-8");
+    expect(persisted).toContain("replacement-secret");
+    expect(persisted).not.toContain("first-secret");
+
+    expect(syncModels({
+      gateway: {
+        ...provider,
+        api_key: "replacement-api-key",
+        headers: {},
+      },
+    }, { modelsJsonPath })).toBe(true);
+    persisted = fs.readFileSync(modelsJsonPath, "utf-8");
+    expect(persisted).not.toContain("replacement-secret");
+    expect(JSON.parse(persisted).providers.gateway).not.toHaveProperty("headers");
+
+    expect(syncModels({}, { modelsJsonPath })).toBe(true);
+    persisted = fs.readFileSync(modelsJsonPath, "utf-8");
+    expect(JSON.parse(persisted).providers).toEqual({});
+    expect(persisted).not.toContain("replacement-api-key");
+
+    if (process.platform !== "win32") {
+      fs.chmodSync(modelsJsonPath, 0o644);
+      expect(syncModels({}, { modelsJsonPath })).toBe(false);
+      expect(fs.statSync(modelsJsonPath).mode & 0o777).toBe(0o600);
+    }
+  });
 });

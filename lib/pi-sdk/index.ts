@@ -313,7 +313,9 @@ export async function createModelRuntime(authStorage, authPath, modelsJsonPath) 
     ...(authPath ? { authPath } : {}),
     ...(modelsJsonPath ? { modelsPath: modelsJsonPath } : {}),
   });
-  return withLegacyAvailabilityScoping(withSerializedModelRefresh(modelRuntime));
+  return withLingxiCredentialBoundary(
+    withLegacyAvailabilityScoping(withSerializedModelRefresh(modelRuntime)),
+  );
 }
 
 /**
@@ -371,6 +373,51 @@ function withLegacyAvailabilityScoping(modelRuntime) {
   modelRuntime.getAvailable = async (...args) => scope(await originalGetAvailable(...args));
   if (typeof originalGetAvailableSnapshot === "function") {
     modelRuntime.getAvailableSnapshot = (...args) => scope(originalGetAvailableSnapshot(...args));
+  }
+  return modelRuntime;
+}
+
+/**
+ * 禁止 Pi SDK 在 Lingxi 已声明 Provider、但统一凭证边界没有凭证时，
+ * 偷偷读取宿主环境变量、云配置文件或运行时身份继续发送请求。
+ *
+ * 请求级显式 Key 只由已经完成 Fresh Resolve 的 Lingxi 调用传入，需要保留；
+ * 空字符串不算有效覆盖，避免 SDK 再次回退到宿主环境。
+ */
+function withLingxiCredentialBoundary(modelRuntime) {
+  const originalGetAuth = modelRuntime.getAuth.bind(modelRuntime);
+  const originalGetAvailable = modelRuntime.getAvailable.bind(modelRuntime);
+  const originalGetAvailableSnapshot = modelRuntime.getAvailableSnapshot?.bind(modelRuntime);
+
+  const providerIdOf = (providerOrModel) => (
+    typeof providerOrModel === "string" ? providerOrModel : providerOrModel?.provider
+  );
+  const hasExplicitKey = (overrides) => (
+    typeof overrides?.apiKey === "string" && overrides.apiKey.length > 0
+  );
+  const usesAmbientCredential = (providerId) => (
+    !!providerId && modelRuntime.getProviderAuthStatus?.(providerId)?.source === "environment"
+  );
+  const allowedModels = (models) => (
+    Array.isArray(models)
+      ? models.filter(model => model && !usesAmbientCredential(model.provider))
+      : models
+  );
+
+  modelRuntime.getAuth = async (providerOrModel, overrides = {}) => {
+    const resolution = await originalGetAuth(providerOrModel, overrides);
+    const providerId = providerIdOf(providerOrModel);
+    if (resolution && !hasExplicitKey(overrides) && usesAmbientCredential(providerId)) {
+      const error: any = new Error(`Lingxi credential boundary rejected ambient credentials for provider "${providerId}"`);
+      error.code = "LINGXI_AMBIENT_CREDENTIAL_FORBIDDEN";
+      error.providerId = providerId;
+      throw error;
+    }
+    return resolution;
+  };
+  modelRuntime.getAvailable = async (...args) => allowedModels(await originalGetAvailable(...args));
+  if (typeof originalGetAvailableSnapshot === "function") {
+    modelRuntime.getAvailableSnapshot = (...args) => allowedModels(originalGetAvailableSnapshot(...args));
   }
   return modelRuntime;
 }

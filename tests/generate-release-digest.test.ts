@@ -2,7 +2,12 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { appendDigestFileToHistoryFile, generateDigestWithDeepSeek, parseArgs } from "../scripts/generate-release-digest.mjs";
+import {
+  appendDigestFileToHistoryFile,
+  generateDigestWithDeepSeek,
+  parseArgs,
+  resolveReleaseDigestCredentials,
+} from "../scripts/generate-release-digest.mjs";
 
 describe("generate-release-digest", () => {
   it("parses local pre-tag defaults without requiring release lookup", () => {
@@ -86,7 +91,12 @@ describe("generate-release-digest", () => {
     const result = await generateDigestWithDeepSeek(
       { tag: "v0.425.4", version: "0.425.4", commits: [] },
       {
-        env: { DEEPSEEK_API_KEY: "test-key" },
+        credentials: {
+          api_key: "test-key",
+          base_url: "https://api.deepseek.com",
+          api: "openai-responses",
+          credential_source: "provider-catalog",
+        },
         fetchImpl,
         model: "deepseek-v4-flash",
       },
@@ -110,14 +120,38 @@ describe("generate-release-digest", () => {
     expect(body.reasoning).toEqual({ effort: "none" });
   });
 
-  it("requires DEEPSEEK_API_KEY before making a request", async () => {
+  it("拒绝环境里的模型密钥，只接受凭据服务显式返回的结果", async () => {
     const fetchImpl = vi.fn();
 
     await expect(generateDigestWithDeepSeek(
       { tag: "v0.425.4", version: "0.425.4", commits: [] },
-      { env: {}, fetchImpl },
-    )).rejects.toThrow("DEEPSEEK_API_KEY is required");
+      { env: { DEEPSEEK_API_KEY: "ambient-key" }, fetchImpl } as any,
+    )).rejects.toThrow(/explicit credentials/i);
     expect(fetchImpl).not.toHaveBeenCalled();
+  });
+
+  it("通过 ModelManager 的 Fresh Resolver 取得发布摘要凭据", async () => {
+    const init = vi.fn(async () => {});
+    const resolveProviderCredentialsFresh = vi.fn(async () => ({
+      api_key: "fresh-key",
+      base_url: "https://api.deepseek.com",
+      api: "openai-responses",
+      credential_source: "provider-catalog",
+    }));
+    const createModelManager = vi.fn(() => ({
+      init,
+      resolveProviderCredentialsFresh,
+    }));
+
+    await expect(resolveReleaseDigestCredentials({
+      lingxiHome: "/tmp/lingxi-release-digest-test",
+      createModelManager,
+    })).resolves.toMatchObject({ api_key: "fresh-key" });
+    expect(createModelManager).toHaveBeenCalledWith({
+      lingxiHome: "/tmp/lingxi-release-digest-test",
+    });
+    expect(init).toHaveBeenCalledOnce();
+    expect(resolveProviderCredentialsFresh).toHaveBeenCalledWith("deepseek");
   });
 
   it("rejects an incomplete DeepSeek response even when it contains partial JSON", async () => {
@@ -132,7 +166,7 @@ describe("generate-release-digest", () => {
 
     await expect(generateDigestWithDeepSeek(
       { tag: "v0.425.4", version: "0.425.4", commits: [] },
-      { env: { DEEPSEEK_API_KEY: "test-key" }, fetchImpl },
+      { credentials: { api_key: "test-key", credential_source: "provider-catalog" }, fetchImpl },
     )).rejects.toThrow(/incomplete.*max_output_tokens/i);
   });
 
@@ -145,7 +179,7 @@ describe("generate-release-digest", () => {
 
     const operation = generateDigestWithDeepSeek(
       { tag: "v0.425.4", version: "0.425.4", commits: [] },
-      { env: { DEEPSEEK_API_KEY: "test-key" }, fetchImpl },
+      { credentials: { api_key: "test-key", credential_source: "provider-catalog" }, fetchImpl },
     );
     await expect(operation).rejects.toThrow("HTTP 401");
     await expect(operation).rejects.not.toThrow(/test-key/);
@@ -160,7 +194,7 @@ describe("generate-release-digest", () => {
 
     await expect(generateDigestWithDeepSeek(
       { tag: "v0.425.4", version: "0.425.4", commits: [] },
-      { env: { DEEPSEEK_API_KEY: "test-key" }, fetchImpl },
+      { credentials: { api_key: "test-key", credential_source: "provider-catalog" }, fetchImpl },
     )).rejects.toThrow(/tag.*v0\.425\.4.*v0\.425\.5/i);
   });
 });

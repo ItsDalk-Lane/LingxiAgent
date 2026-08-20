@@ -15,6 +15,7 @@
 import { dirname, join as pathJoin } from "node:path";
 import { readImageSize } from "./image-size.ts";
 import { isResponseDelivery } from "./image-task-runner.ts";
+import { withModelRequestAccounting } from "../../lib/llm/model-request-accounting.ts";
 
 const TICK_MS = 5_000;
 const TWO_MINUTES = 2 * 60 * 1000;
@@ -70,6 +71,7 @@ export class Poller {
   declare _store: any;
   declare _tickCount: any;
   declare _timer: any;
+  declare _usageLedger: any;
   /**
    * @param {{
    *   store: import("./task-store.ts").TaskStore,
@@ -79,9 +81,10 @@ export class Poller {
 	 *   generatedDir: string,
 	 *   log: object,
 	 *   registerSessionFile?: Function,
+	 *   usageLedger?: object,
 	 * }} opts
 	 */
-  constructor({ store, registry, bus, dataDir, generatedDir, log, registerSessionFile }) {
+  constructor({ store, registry, bus, dataDir, generatedDir, log, registerSessionFile, usageLedger = null }) {
     this._store        = store;
     this._registry     = registry;
     this._bus          = bus;
@@ -89,6 +92,7 @@ export class Poller {
     this._generatedDir = generatedDir;
     this._log          = createSafeLogger(log);
     this._registerSessionFile = registerSessionFile || null;
+    this._usageLedger = usageLedger;
 
     /** @type {Set<string>} taskIds being tracked */
     this._active    = new Set();
@@ -385,7 +389,23 @@ export class Poller {
 
     let result;
     try {
-      result = await adapter.query(task.adapterTaskId || taskId, ctx);
+      result = await withModelRequestAccounting({
+        usageLedger: this._usageLedger,
+        model: {
+          provider: task.providerId || task.adapterId,
+          modelId: task.modelId,
+          api: task.protocolId || adapter?.protocolId,
+        },
+        usageContext: {
+          source: { subsystem: "media", operation: "query", surface: "background", trigger: "poller" },
+          attribution: {
+            kind: "session",
+            ...(task.sessionId ? { sessionId: task.sessionId } : {}),
+            ...(task.sessionPath ? { sessionPath: task.sessionPath } : {}),
+          },
+        },
+        metadata: { taskId, mediaType: task.type || null },
+      }, () => adapter.query(task.adapterTaskId || taskId, ctx));
       // Re-check cancellation fence after await — cancel() may have fired while query was in-flight
       if (this._cancelled.has(taskId)) return;
     } catch (err) {

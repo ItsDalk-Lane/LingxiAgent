@@ -1,5 +1,6 @@
 import path from "node:path";
 import { t } from "../../lib/i18n.ts";
+import { withModelRequestAccounting } from "../../lib/llm/model-request-accounting.ts";
 
 export function createTaskId() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
@@ -74,6 +75,9 @@ export function createSubmitContext(ctx) {
     log: ctx.log,
     generatedDir: generatedDirForCtx(ctx),
     config: ctx.config,
+    usageLedger: ctx.usageLedger,
+    sessionId: ctx.sessionId,
+    sessionPath: ctx.sessionPath,
   };
 }
 
@@ -394,7 +398,24 @@ export function markSubmitFailed({ taskId, err, store, ctx }) {
 
 export async function runSubmitInBackground({ taskId, adapter, params, submitCtx, store, poller, ctx }) {
   try {
-    const result = await adapter.submit(params, submitCtx);
+    const sessionTarget = normalizeSessionRef(ctx);
+    const result = await withModelRequestAccounting({
+      usageLedger: ctx?.usageLedger,
+      model: {
+        provider: params?.providerId || adapter?.id,
+        modelId: params?.modelId || params?.model,
+        api: params?.protocolId || adapter?.protocolId,
+      },
+      usageContext: {
+        source: { subsystem: "media", operation: "submit", surface: "tool", trigger: "user" },
+        attribution: {
+          kind: "session",
+          ...(sessionTarget.sessionId ? { sessionId: sessionTarget.sessionId } : {}),
+          ...(sessionTarget.sessionPath ? { sessionPath: sessionTarget.sessionPath } : {}),
+        },
+      },
+      metadata: { taskId, mediaType: "image" },
+    }, () => adapter.submit(params, submitCtx));
     const hasProviderTaskId = typeof result?.taskId === "string" && result.taskId.trim();
     const adapterTaskId = hasProviderTaskId ? result.taskId : taskId;
     const files = Array.isArray(result?.files) ? result.files.filter(Boolean) : [];

@@ -207,11 +207,11 @@ export function createPreferencesRoute(engine: any, options: Record<string, any>
         if (modelsPatch.vision) {
           let resolved;
           try {
-            resolved = engine.resolveModelWithCredentials(modelsPatch.vision);
+            resolved = engine.resolveModelForValidation(modelsPatch.vision);
           } catch (err) {
             return c.json({ error: err.message }, 400);
           }
-          if (!modelSupportsImage(resolved?.model)) {
+          if (!modelSupportsImage(resolved)) {
             return c.json({ error: "vision model must support image input" }, 400);
           }
         }

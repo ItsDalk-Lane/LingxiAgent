@@ -34,6 +34,13 @@ function createProviderRegistry() {
       ? { source: { kind: "plugin", pluginId: "jimeng-cli" } }
       : null),
     getCredentials: vi.fn(() => ({})),
+    authorizeExternalCredentialUse: vi.fn((_providerId, request) => ({
+      providerId: "jimeng-cli",
+      boundaryId: request.boundaryId,
+      kind: "external-cli",
+      operation: request.operation,
+      credentialSource: "external",
+    })),
     getModelsByType: vi.fn(() => []),
     getAllModelsByType: vi.fn(() => []),
     getRuntimeMediaCapabilitySourceOwner: vi.fn(() => null),
@@ -184,5 +191,63 @@ describe("Jimeng runtime provider capability integration", () => {
       error: expect.stringContaining("cannot manage"),
     });
     expect(providerRegistry.registerRuntimeMediaCapabilitySource).not.toHaveBeenCalled();
+  });
+
+  it("只代理 Provider 所属插件的外部凭证许可请求", async () => {
+    const providerRegistry = createProviderRegistry();
+    const engine = createEngine(providerRegistry);
+    const usageLedger = {
+      start: vi.fn()
+        .mockReturnValueOnce({ requestId: "jimeng-boundary-1" })
+        .mockReturnValueOnce({ requestId: "jimeng-boundary-2" }),
+      finish: vi.fn(),
+      recordError: vi.fn(),
+    };
+    engine.usageLedger = usageLedger;
+    const hub = new Hub({ engine });
+
+    await expect(hub.eventBus.request(
+      "provider:authorize-external-credential-use",
+      {
+        providerId: "jimeng-cli",
+        boundaryId: "dreamina-cli-login",
+        operation: "submit",
+      },
+      { caller: { kind: "plugin", pluginId: "jimeng-cli" } },
+    )).resolves.toMatchObject({
+      ok: true,
+      permit: {
+        providerId: "jimeng-cli",
+        boundaryId: "dreamina-cli-login",
+        operation: "submit",
+        credentialSource: "external",
+      },
+    });
+    expect(providerRegistry.authorizeExternalCredentialUse).toHaveBeenCalledWith(
+      "jimeng-cli",
+      {
+        boundaryId: "dreamina-cli-login",
+        operation: "submit",
+        pluginId: "jimeng-cli",
+      },
+    );
+    expect(usageLedger.finish).toHaveBeenCalledWith("jimeng-boundary-1", expect.any(Object));
+
+    await expect(hub.eventBus.request(
+      "provider:authorize-external-credential-use",
+      {
+        providerId: "jimeng-cli",
+        boundaryId: "dreamina-cli-login",
+        operation: "query",
+      },
+      { caller: { kind: "plugin", pluginId: "other-plugin" } },
+    )).resolves.toMatchObject({ ok: false });
+    expect(usageLedger.recordError).toHaveBeenCalledWith(
+      "jimeng-boundary-2",
+      expect.any(Error),
+      "error",
+      expect.any(Object),
+    );
+    expect(JSON.stringify(usageLedger.start.mock.calls)).not.toContain("credential");
   });
 });

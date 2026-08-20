@@ -87,9 +87,7 @@ describe("secret custody across HTTP routes", () => {
         getAll: () => new Map(),
       },
       preferences: { getOAuthCustomModels: () => ({}) },
-      resolveProviderCredentials: (name) => name === "deepseek"
-        ? { api_key: "sk-provider-secret", base_url: "https://api.deepseek.com", api: "openai-completions" }
-        : { api_key: "", base_url: "", api: "" },
+      readSavedProviderApiKey: (name) => name === "deepseek" ? "sk-provider-secret" : "",
       lingxiHome: "/tmp",
     };
 
@@ -121,7 +119,7 @@ describe("secret custody across HTTP routes", () => {
         getAll: () => new Map(),
       },
       preferences: { getOAuthCustomModels: () => ({}) },
-      resolveProviderCredentials: () => ({ api_key: "sk-provider-secret", base_url: "", api: "" }),
+      readSavedProviderApiKey: () => "sk-provider-secret",
       lingxiHome: "/tmp",
     };
 

@@ -38,9 +38,18 @@ export default class JimengCliPlugin {
     });
 
     const getCapabilitySnapshot = (options: any) => discovery.refresh(options);
+    const authorizeExternalCredentialUse = async (request: any) => {
+      const result = await bus.request("provider:authorize-external-credential-use", request);
+      if (result?.ok !== true || !result.permit) {
+        const error: any = new Error(result?.error || "external credential boundary denied");
+        error.code = "external_credential_denied";
+        throw error;
+      }
+      return result.permit;
+    };
     const adapters = [
-      createJimengImageAdapter({ resolveCommand, getCapabilitySnapshot }),
-      createJimengVideoAdapter({ resolveCommand, getCapabilitySnapshot }),
+      createJimengImageAdapter({ resolveCommand, getCapabilitySnapshot, authorizeExternalCredentialUse }),
+      createJimengVideoAdapter({ resolveCommand, getCapabilitySnapshot, authorizeExternalCredentialUse }),
     ];
 
     for (const adapter of adapters) {

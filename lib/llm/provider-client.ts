@@ -7,6 +7,7 @@
 
 import { t } from "../i18n.ts";
 import { normalizeProviderHeaders } from "../../shared/provider-auth.ts";
+import { withModelRequestAccounting } from "./model-request-accounting.ts";
 
 export const DEFAULT_PROVIDER_USER_AGENT = "LingxiAgent/1.0";
 const DEFAULT_ANTHROPIC_PROBE_MODEL = "claude-sonnet-4-6";
@@ -244,25 +245,37 @@ export function buildProbeUrl(baseUrl, api) {
  * 不把代理层 404 HTML 当作连通，也不把整页 HTML 暴露给设置页。
  * Codex Responses API 因 Cloudflare 反爬无法探测，直接跳过返回 ok。
  *
- * @param {{ baseUrl: string, api: string, apiKey: string, modelId?: string, headers?: Record<string, string> }} params
+ * @param {{ providerId: string, baseUrl: string, api: string, credentialBoundary: {consume: Function}, modelId?: string }} params
  * @returns {Promise<{ ok: boolean, status: number, skipped?: string, error?: string }>}
  */
 export async function probeProvider({
+  providerId,
   baseUrl,
   api,
-  apiKey = "",
+  credentialBoundary,
   modelId,
-  headers: customHeaders,
+  usageLedger = null,
+  usageContext = null,
 }: {
+  providerId: string;
   baseUrl: string;
   api: string;
-  apiKey?: string;
+  credentialBoundary: { consume: (request: {providerId: string; operation: "connectivity-probe"}) => {apiKey: string; headers: Record<string, string>} };
   modelId?: string;
-  headers?: Record<string, string>;
+  usageLedger?: any;
+  usageContext?: any;
 }) {
   if (api === "openai-codex-responses") {
     return { ok: true, status: 0, skipped: t("error.codexNoHealthCheck") };
   }
+
+  if (!credentialBoundary || typeof credentialBoundary.consume !== "function") {
+    throw new Error("Provider probe requires a temporary credential boundary");
+  }
+  const { apiKey, headers: customHeaders } = credentialBoundary.consume({
+    providerId,
+    operation: "connectivity-probe",
+  });
 
   const probe = buildProbeUrl(baseUrl, api);
 
@@ -273,22 +286,30 @@ export async function probeProvider({
     allowMissingApiKey: true,
   });
 
-  if (api === "anthropic-messages") {
-    const res = await fetch(probe.url, {
-      method: probe.method,
-      headers,
-      body: JSON.stringify({
-        model: modelId || DEFAULT_ANTHROPIC_PROBE_MODEL,
-        max_tokens: 1,
-        messages: [{ role: "user", content: "." }],
-      }),
-      signal: AbortSignal.timeout(10000),
-    });
-    return buildProbeResult(res);
-  }
+  const effectiveModelId = modelId || (api === "anthropic-messages" ? DEFAULT_ANTHROPIC_PROBE_MODEL : null);
+  return withModelRequestAccounting({
+    usageLedger,
+    model: { provider: providerId, modelId: effectiveModelId, api },
+    usageContext,
+    metadata: { operation: "connectivity-probe" },
+  }, async () => {
+    if (api === "anthropic-messages") {
+      const res = await fetch(probe.url, {
+        method: probe.method,
+        headers,
+        body: JSON.stringify({
+          model: effectiveModelId,
+          max_tokens: 1,
+          messages: [{ role: "user", content: "." }],
+        }),
+        signal: AbortSignal.timeout(10000),
+      });
+      return buildProbeResult(res);
+    }
 
-  const res = await fetch(probe.url, { headers, signal: AbortSignal.timeout(10000) });
-  return buildProbeResult(res);
+    const res = await fetch(probe.url, { headers, signal: AbortSignal.timeout(10000) });
+    return buildProbeResult(res);
+  });
 }
 
 async function buildProbeResult(res) {

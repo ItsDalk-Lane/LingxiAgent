@@ -449,6 +449,34 @@ function createAuthFailure(code, message) {
   };
 }
 
+const EXTERNAL_CREDENTIAL_PROVIDER_ID = "jimeng-cli";
+const EXTERNAL_CREDENTIAL_BOUNDARY_ID = "dreamina-cli-login";
+
+async function requireExternalCredentialPermit(authorizeExternalCredentialUse, operation) {
+  if (typeof authorizeExternalCredentialUse !== "function") {
+    const error: any = new Error("即梦 CLI 外部凭证边界未注册");
+    error.code = "external_credential_boundary_unavailable";
+    throw error;
+  }
+  const request = {
+    providerId: EXTERNAL_CREDENTIAL_PROVIDER_ID,
+    boundaryId: EXTERNAL_CREDENTIAL_BOUNDARY_ID,
+    operation,
+  };
+  const permit = await authorizeExternalCredentialUse(request);
+  if (
+    permit?.providerId !== request.providerId
+    || permit?.boundaryId !== request.boundaryId
+    || permit?.operation !== operation
+    || permit?.credentialSource !== "external"
+  ) {
+    const error: any = new Error("即梦 CLI 外部凭证许可无效");
+    error.code = "external_credential_permit_invalid";
+    throw error;
+  }
+  return permit;
+}
+
 function createJimengAdapter({
   id,
   name,
@@ -459,6 +487,7 @@ function createJimengAdapter({
   resolveCommand = () => resolveDreaminaCommand(),
   runCommand = defaultRunCommand,
   getCapabilitySnapshot,
+  authorizeExternalCredentialUse,
 }: any) {
   return {
     id,
@@ -473,6 +502,7 @@ function createJimengAdapter({
         return createAuthFailure("cli_missing", cliMissingMessage());
       }
       try {
+        await requireExternalCredentialPermit(authorizeExternalCredentialUse, "check-auth");
         await runDreaminaCommand(runCommand, command, ["user_credit"], commandOptions({ timeout: 30_000 }));
         return { ok: true };
       } catch (err: any) {
@@ -489,6 +519,7 @@ function createJimengAdapter({
 
     async submit(params: any = {}, ctx: any = {}) {
       const command = ensureCommand(resolveCommand);
+      await requireExternalCredentialPermit(authorizeExternalCredentialUse, "submit");
       if (typeof getCapabilitySnapshot !== "function") {
         throw createRuntimeCapabilityError("即梦 CLI 运行时能力发现器未注册");
       }
@@ -506,6 +537,7 @@ function createJimengAdapter({
 
     async query(providerTaskId, ctx: any = {}) {
       const command = ensureCommand(resolveCommand);
+      await requireExternalCredentialPermit(authorizeExternalCredentialUse, "query");
       const outputDir = ensureWorkingDirectory(ctx.generatedDir || path.join(ctx.dataDir, "generated"));
       const before = new Set(listResultFiles(outputDir));
       const { stdout } = await runDreaminaCommand(runCommand, command, [

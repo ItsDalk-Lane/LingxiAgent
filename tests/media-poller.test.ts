@@ -86,6 +86,7 @@ function makePoller( overrides: any = {}) {
     generatedDir: "/tmp/media-generated",
     log,
     registerSessionFile: overrides.registerSessionFile,
+    usageLedger: overrides.usageLedger,
   });
 
   return { poller, mockStore, mockBus, mockRegistry, mockAdapter, log };
@@ -280,7 +281,12 @@ describe("Poller", () => {
     const mockAdapter = makeAdapter({
       query: vi.fn(async () => ({ status: "pending" })),
     });
-    const { poller, mockStore } = makePoller({ adapter: mockAdapter });
+    const usageLedger = {
+      start: vi.fn(() => ({ requestId: "media-query-1" })),
+      finish: vi.fn(),
+      recordError: vi.fn(),
+    };
+    const { poller, mockStore } = makePoller({ adapter: mockAdapter, usageLedger });
 
     mockStore.get.mockReturnValue({
       taskId: "task1",
@@ -302,6 +308,13 @@ describe("Poller", () => {
         generatedDir: "/tmp/media-generated",
       })
     );
+    expect(usageLedger.start).toHaveBeenCalledWith(expect.objectContaining({
+      model: expect.objectContaining({ provider: "test-adapter" }),
+      usageContext: expect.objectContaining({
+        source: expect.objectContaining({ subsystem: "media", operation: "query" }),
+      }),
+    }));
+    expect(usageLedger.finish).toHaveBeenCalledWith("media-query-1", expect.any(Object));
 
     poller.stop();
   });
