@@ -1919,7 +1919,12 @@
           "confirmRestore": "復元を確認",
           "cancel": "キャンセル",
           "close": "閉じる",
-          "restored": "選択したバージョンを復元し、復元前の現在のバージョンも保存しました。"
+          "restored": "選択したバージョンを復元し、復元前の現在のバージョンも保存しました。",
+          "diffLegendAdded": "＋ 復元後に表示される内容（この版のみ）",
+          "diffLegendRemoved": "－ 復元後に取り除かれる内容（現在のメモリのみ）",
+          "noDifference": "現在のメモリはこの版と同一です",
+          "sectionUnchanged": "変更なし",
+          "diffUnavailable": "内容が大きすぎるため差分を計算できません"
         },
         "failed": "Dream に失敗しました。元の記憶は変更されていません",
         "errors": {

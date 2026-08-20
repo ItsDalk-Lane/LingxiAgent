@@ -1988,7 +1988,12 @@
           "confirmRestore": "Confirm restore",
           "cancel": "Cancel",
           "close": "Close",
-          "restored": "The selected version was restored, and the previous current version was saved."
+          "restored": "The selected version was restored, and the previous current version was saved.",
+          "diffLegendAdded": "+ Lines that restoring will bring back (only in this revision)",
+          "diffLegendRemoved": "− Lines that restoring will remove (only in current memory)",
+          "noDifference": "Current memory is identical to this revision",
+          "sectionUnchanged": "No changes",
+          "diffUnavailable": "Content too large to compute a diff"
         },
         "failed": "Dream failed; the original memory was not changed",
         "errors": {

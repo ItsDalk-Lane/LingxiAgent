@@ -1919,7 +1919,12 @@
           "confirmRestore": "복원 확인",
           "cancel": "취소",
           "close": "닫기",
-          "restored": "선택한 버전으로 복원했고, 복원 전 현재 버전도 저장했어요."
+          "restored": "선택한 버전으로 복원했고, 복원 전 현재 버전도 저장했어요.",
+          "diffLegendAdded": "＋ 복원 후에 나타날 내용(이 버전에만 있음)",
+          "diffLegendRemoved": "－ 복원 후에 제거될 내용(현재 메모리에만 있음)",
+          "noDifference": "현재 메모리가 이 버전과 동일합니다",
+          "sectionUnchanged": "변경 없음",
+          "diffUnavailable": "내용이 너무 커서 차이를 계산할 수 없습니다"
         },
         "failed": "Dream에 실패했어요. 기존 기억은 변경되지 않았어요",
         "errors": {

@@ -46,14 +46,32 @@ export type DreamRevisionSummary = {
   };
 };
 
-export type DreamRevisionDetail = Omit<DreamRevisionSummary, 'bodyChars' | 'sectionChars'> & {
-  before: {
-    facts: string;
-    today: string;
-    weekDays: Array<{ date: string; body: string }>;
-    longterm: string;
-  };
+export type DreamSectionsSnapshot = {
+  facts: string;
+  today: string;
+  weekDays: Array<{ date: string; body: string }>;
+  longterm: string;
 };
+
+export type DreamRevisionDetail = Omit<DreamRevisionSummary, 'bodyChars' | 'sectionChars'> & {
+  before: DreamSectionsSnapshot;
+};
+
+/** revision detail 响应：恢复目标快照 + 后端现读的当前记忆快照（diff 的两侧）。 */
+export type DreamRevisionDetailPayload = {
+  revision: DreamRevisionDetail;
+  current: DreamSectionsSnapshot;
+};
+
+/** 四段全等判断：决定 UI 展示"当前记忆与此版本相同"并禁用恢复按钮。 */
+export function dreamSectionsEqual(a: DreamSectionsSnapshot, b: DreamSectionsSnapshot): boolean {
+  if (a.facts !== b.facts || a.today !== b.today || a.longterm !== b.longterm) return false;
+  if (a.weekDays.length !== b.weekDays.length) return false;
+  return a.weekDays.every((day, index) => {
+    const other = b.weekDays[index];
+    return !!other && day.date === other.date && day.body === other.body;
+  });
+}
 
 async function responseJson<T>(response: Response): Promise<T> {
   const data = await response.json();
@@ -94,8 +112,8 @@ export async function loadDreamRevision(agentId: string, revisionId: string, sig
     `/api/memories/dream/revisions/${encodeURIComponent(revisionId)}?agentId=${encodeURIComponent(agentId)}`,
     { signal, timeout: 10_000 },
   );
-  const data = await responseJson<{ revision: DreamRevisionDetail }>(response);
-  return data.revision;
+  const data = await responseJson<DreamRevisionDetailPayload>(response);
+  return data;
 }
 
 export async function restoreDream(agentId: string, revisionId: string) {

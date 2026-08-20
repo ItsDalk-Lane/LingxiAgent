@@ -1,12 +1,15 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Button, Overlay } from '@/ui';
 import { t } from '../../helpers';
+import { diffLines, type DiffLine } from '../../../utils/line-diff';
 import {
+  dreamSectionsEqual,
   loadDreamRevision,
   loadDreamRevisions,
   restoreDream,
-  type DreamRevisionDetail,
+  type DreamRevisionDetailPayload,
   type DreamRevisionSummary,
+  type DreamSectionsSnapshot,
 } from './agent-memory-dream-actions';
 import styles from './DreamRevisionBrowser.module.css';
 import { dreamErrorText } from './dream-error-presenter';
@@ -14,6 +17,61 @@ import { dreamErrorText } from './dream-error-presenter';
 function formatTime(value: string) {
   const date = new Date(value);
   return Number.isNaN(date.getTime()) ? value : date.toLocaleString();
+}
+
+type SectionDiff = {
+  changed: boolean;
+  /** null 且 changed：超过 line-diff 输入上限，显式降级为不展示差异（不做假 diff）。 */
+  lines: DiffLine[] | null;
+};
+
+/**
+ * diff 方向固定为 current → revision：added 行是"恢复后会出现"的内容，
+ * removed 行是"恢复后会被移除"的当前内容。用户看到的就是恢复后的变化。
+ */
+function diffSectionBodies(currentBody: string, revisionBody: string): SectionDiff {
+  if (currentBody === revisionBody) return { changed: false, lines: null };
+  return { changed: true, lines: diffLines(currentBody, revisionBody) };
+}
+
+function diffWeekDays(
+  current: DreamSectionsSnapshot,
+  revision: DreamSectionsSnapshot,
+): Array<SectionDiff & { date: string }> {
+  const currentByDate = new Map(current.weekDays.map((day) => [day.date, day.body]));
+  const revisionByDate = new Map(revision.weekDays.map((day) => [day.date, day.body]));
+  const dates = [...new Set([...revisionByDate.keys(), ...currentByDate.keys()])].sort();
+  return dates.map((date) => ({
+    date,
+    ...diffSectionBodies(currentByDate.get(date) ?? '', revisionByDate.get(date) ?? ''),
+  }));
+}
+
+function SectionDiffView({ diff }: { diff: SectionDiff }) {
+  if (!diff.changed) {
+    return <div className={styles.unchanged}>{t('settings.memory.dream.revisions.sectionUnchanged')}</div>;
+  }
+  if (diff.lines === null) {
+    return <div className={styles.unchanged}>{t('settings.memory.dream.revisions.diffUnavailable')}</div>;
+  }
+  return (
+    <pre className={`${styles.sectionBody} ${styles.diffBody}`}>
+      {diff.lines.map((line, index) => (
+        <span
+          key={index}
+          className={line.kind === 'added'
+            ? styles.lineAdded
+            : line.kind === 'removed'
+              ? styles.lineRemoved
+              : styles.lineSame}
+        >
+          {line.kind === 'added' ? '+ ' : line.kind === 'removed' ? '- ' : '  '}
+          {line.text}
+          {'\n'}
+        </span>
+      ))}
+    </pre>
+  );
 }
 
 export function DreamRevisionBrowser({
@@ -27,7 +85,10 @@ export function DreamRevisionBrowser({
 }) {
   const [revisions, setRevisions] = useState<DreamRevisionSummary[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [detail, setDetail] = useState<DreamRevisionDetail | null>(null);
+  const [detail, setDetail] = useState<DreamRevisionDetailPayload | null>(null);
+  // detail effect 的显式刷新信号：恢复成功后 current 已变，但选中项没变，
+  // 靠 nonce 强制重取，保证 diff 永远反映真实当前状态。
+  const [detailNonce, setDetailNonce] = useState(0);
   const [loading, setLoading] = useState(false);
   const [detailLoading, setDetailLoading] = useState(false);
   const [restoring, setRestoring] = useState(false);
@@ -87,7 +148,24 @@ export function DreamRevisionBrowser({
         if (!controller.signal.aborted) setDetailLoading(false);
       });
     return () => controller.abort();
-  }, [agentId, open, selectedId]);
+  }, [agentId, open, selectedId, detailNonce]);
+
+  const enterConfirm = async () => {
+    if (!selectedId) return;
+    setDetailLoading(true);
+    try {
+      // 进入确认前现取一次：浏览器开着期间记忆可能已被改写，
+      // 确认时看到的 current-vs-revision 差异必须是最新的。
+      const fresh = await loadDreamRevision(agentId, selectedId);
+      setDetail(fresh);
+      setError(null);
+      setConfirming(true);
+    } catch (err: unknown) {
+      setError(dreamErrorText(err, 'settings.memory.dream.errors.revisionLoadFailed'));
+    } finally {
+      setDetailLoading(false);
+    }
+  };
 
   const restoreSelected = async () => {
     if (!selectedId) return;
@@ -98,6 +176,7 @@ export function DreamRevisionBrowser({
       setConfirming(false);
       setError(null);
       await refresh();
+      setDetailNonce((nonce) => nonce + 1);
     } catch (err: unknown) {
       setError(dreamErrorText(err, 'settings.memory.dream.errors.restoreFailed'));
     } finally {
@@ -105,10 +184,18 @@ export function DreamRevisionBrowser({
     }
   };
 
-  const sections = detail ? [
-    { key: 'facts', title: t('settings.memory.editableFactsLabel'), body: detail.before.facts },
-    { key: 'today', title: t('settings.memory.sections.today'), body: detail.before.today },
-  ] : [];
+  const sectionDiffs = useMemo(() => {
+    if (!detail) return null;
+    const { current, revision } = detail;
+    return {
+      facts: diffSectionBodies(current.facts, revision.before.facts),
+      today: diffSectionBodies(current.today, revision.before.today),
+      longterm: diffSectionBodies(current.longterm, revision.before.longterm),
+      week: diffWeekDays(current, revision.before),
+    };
+  }, [detail]);
+
+  const identical = detail ? dreamSectionsEqual(detail.current, detail.revision.before) : false;
 
   return (
     <Overlay
@@ -160,30 +247,37 @@ export function DreamRevisionBrowser({
         <div className={styles.detail}>
           {detailLoading ? (
             <div className={styles.empty}>{t('settings.memory.dream.revisions.loading')}</div>
-          ) : detail ? (
+          ) : detail && sectionDiffs ? (
             <>
-              {sections.map((section) => (
+              <div className={styles.diffLegend}>
+                <span>{t('settings.memory.dream.revisions.diffLegendAdded')}</span>
+                <span>{t('settings.memory.dream.revisions.diffLegendRemoved')}</span>
+              </div>
+              {identical && (
+                <div className={styles.noDifference} role="status">
+                  {t('settings.memory.dream.revisions.noDifference')}
+                </div>
+              )}
+              {([
+                { key: 'facts', title: t('settings.memory.editableFactsLabel'), diff: sectionDiffs.facts },
+                { key: 'today', title: t('settings.memory.sections.today'), diff: sectionDiffs.today },
+                { key: 'longterm', title: t('settings.memory.sections.longterm'), diff: sectionDiffs.longterm },
+              ] as const).map((section) => (
                 <section className={styles.section} key={section.key}>
                   <h4 className={styles.sectionTitle}>{section.title}</h4>
-                  <pre className={styles.sectionBody}>{section.body || t('settings.memory.dream.revisions.noContent')}</pre>
+                  <SectionDiffView diff={section.diff} />
                 </section>
               ))}
               <section className={styles.section}>
                 <h4 className={styles.sectionTitle}>{t('settings.memory.sections.week')}</h4>
-                {detail.before.weekDays.length === 0 ? (
+                {sectionDiffs.week.length === 0 ? (
                   <pre className={styles.sectionBody}>{t('settings.memory.dream.revisions.noContent')}</pre>
-                ) : detail.before.weekDays.map((day) => (
+                ) : sectionDiffs.week.map((day) => (
                   <div className={styles.weekDay} key={day.date}>
                     <span className={styles.weekDate}>{day.date}</span>
-                    <pre className={styles.sectionBody}>{day.body || t('settings.memory.dream.revisions.noContent')}</pre>
+                    <SectionDiffView diff={day} />
                   </div>
                 ))}
-              </section>
-              <section className={styles.section}>
-                <h4 className={styles.sectionTitle}>{t('settings.memory.sections.longterm')}</h4>
-                <pre className={styles.sectionBody}>
-                  {detail.before.longterm || t('settings.memory.dream.revisions.noContent')}
-                </pre>
               </section>
             </>
           ) : null}
@@ -210,8 +304,9 @@ export function DreamRevisionBrowser({
           <Button
             variant="primary"
             size="sm"
-            disabled={!detail || detail.revisionId !== selectedId || detailLoading}
-            onClick={() => setConfirming(true)}
+            disabled={!detail || detail.revision.revisionId !== selectedId || detailLoading || identical}
+            onClick={() => { void enterConfirm(); }}
+            title={identical ? t('settings.memory.dream.revisions.noDifference') : undefined}
           >
             {t('settings.memory.dream.revisions.restoreThis')}
           </Button>

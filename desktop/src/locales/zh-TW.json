@@ -1919,7 +1919,12 @@
           "confirmRestore": "確認恢復",
           "cancel": "取消",
           "close": "關閉",
-          "restored": "已恢復到所選版本；恢復前的目前版本也已儲存。"
+          "restored": "已恢復到所選版本；恢復前的目前版本也已儲存。",
+          "diffLegendAdded": "＋ 恢復後會出現的內容（此版本獨有）",
+          "diffLegendRemoved": "－ 恢復後會被移除的內容（目前記憶獨有）",
+          "noDifference": "目前記憶與此版本相同",
+          "sectionUnchanged": "無變化",
+          "diffUnavailable": "內容過大，無法計算差異"
         },
         "failed": "Dream 整理失敗，原記憶未改動",
         "errors": {

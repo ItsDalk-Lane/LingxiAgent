@@ -1,6 +1,21 @@
+import fs from "fs";
+import os from "os";
+import path from "path";
 import { Hono } from "hono";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { createMemoryDreamRoute } from "../server/routes/memory-dream.ts";
+
+const tempDirs: string[] = [];
+
+function temporaryMemoryDir() {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "hana-dream-route-"));
+  tempDirs.push(dir);
+  return dir;
+}
+
+afterEach(() => {
+  for (const dir of tempDirs.splice(0)) fs.rmSync(dir, { recursive: true, force: true });
+});
 
 function mount(agent: any) {
   const engine = {
@@ -62,9 +77,13 @@ describe("Memory Dream routes", () => {
       before: { facts: "- fact", today: "", weekDays: [], longterm: "" },
     }));
     const restoreDreamRevision = vi.fn(async () => ({ revisionId: "rev-1", restoredChars: 3200 }));
+    // 真实 memory 目录：detail 响应的 current 一侧由后端现读编译快照。
+    const memoryDir = temporaryMemoryDir();
+    fs.writeFileSync(path.join(memoryDir, "facts.md"), "- live fact\n", "utf-8");
     const { app } = mount({
       id: "hana",
       memoryMasterEnabled: true,
+      memoryMdPath: path.join(memoryDir, "memory.md"),
       memoryTicker: {
         getDreamStatus,
         listDreamRevisions,
@@ -88,6 +107,7 @@ describe("Memory Dream routes", () => {
     expect(detailResponse.status).toBe(200);
     expect(await detailResponse.json()).toMatchObject({
       revision: { revisionId: "rev-1", before: { facts: "- fact" } },
+      current: { facts: "- live fact", today: "", weekDays: [], longterm: "" },
     });
 
     const restoreResponse = await app.request(

@@ -1988,7 +1988,12 @@
           "confirmRestore": "确认恢复",
           "cancel": "取消",
           "close": "关闭",
-          "restored": "已恢复到所选版本；恢复前的当前版本也已保存。"
+          "restored": "已恢复到所选版本；恢复前的当前版本也已保存。",
+          "diffLegendAdded": "＋ 恢复后会出现的内容（该版本独有）",
+          "diffLegendRemoved": "－ 恢复后会被移除的内容（当前记忆独有）",
+          "noDifference": "当前记忆与此版本相同",
+          "sectionUnchanged": "无变化",
+          "diffUnavailable": "内容过大，无法计算差异"
         },
         "failed": "Dream 整理失败，原记忆未改动",
         "errors": {

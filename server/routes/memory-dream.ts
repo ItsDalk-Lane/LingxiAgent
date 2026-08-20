@@ -1,4 +1,6 @@
+import path from "path";
 import { Hono } from "hono";
+import { snapshotDreamSections } from "../../lib/memory/dream/revision-store.ts";
 import { isDreamErrorCode, type DreamErrorCode } from "../../lib/memory/dream/state-store.ts";
 import { denyWithoutScope } from "../http/capability-guard.ts";
 import { AgentNotFoundError, resolveAgentStrict } from "../utils/resolve-agent.ts";
@@ -99,7 +101,13 @@ export function createMemoryDreamRoute(engine: any) {
       const agent = resolveAgentStrict(engine, c);
       const ticker = agent.memoryTicker;
       if (!ticker?.getDreamRevision) return unavailable(c);
-      return c.json({ agentId: agent.id, revision: ticker.getDreamRevision(c.req.param("revisionId")) });
+      const revision = ticker.getDreamRevision(c.req.param("revisionId"));
+      // current-vs-revision diff 的"当前"一侧必须来自后端真实编译快照，
+      // 与 revision.before 同构（facts/today/weekDays/longterm），前端不许
+      // 从 DOM 拼、也不许直接读本地文件。每次取 detail 都现读，保证浏览器
+      // 打开期间记忆变化后切到这个 revision 看到的仍是最新对比。
+      const current = snapshotDreamSections(path.dirname(agent.memoryMdPath));
+      return c.json({ agentId: agent.id, revision, current });
     } catch (err: any) {
       if (err instanceof AgentNotFoundError) return c.json({ error: err.message }, 404);
       if (/not found/i.test(dreamErrorMessage(err))) {
