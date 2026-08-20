@@ -132,6 +132,127 @@ describe("desk cron route", () => {
     });
   });
 
+  it("preserves structured cron store failures for GET", async () => {
+    const store = {
+      studioId: TEST_STUDIO_ID,
+      listJobs: () => {
+        throw Object.assign(new Error("automation task storage is corrupt"), {
+          code: "cron_store_corrupt",
+          status: 500,
+        });
+      },
+    };
+    const app = await createApp({
+      getStudioCronStore: () => createBoundStoreService(store),
+      listAgents: () => [],
+    });
+
+    const res = await app.request("/api/desk/cron");
+
+    expect(res.status).toBe(500);
+    expect(await res.json()).toEqual({
+      error: {
+        code: "cron_store_corrupt",
+        message: "automation task storage is corrupt",
+      },
+    });
+  });
+
+  it("preserves structured cron store failures for POST", async () => {
+    const store = {
+      studioId: TEST_STUDIO_ID,
+      addJob: () => {
+        throw Object.assign(new Error("automation task storage is unavailable"), {
+          code: "cron_store_unavailable",
+          status: 500,
+        });
+      },
+    };
+    const app = await createApp({
+      getAgent: (id) => ({ id }),
+      getStudioCronStore: () => createBoundStoreService(store),
+      listAgents: () => [],
+    });
+
+    const res = await app.request("/api/desk/cron", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        action: "add",
+        scheduleType: "cron",
+        schedule: "0 9 * * *",
+        prompt: "run task",
+        actorAgentId: "agent-a",
+        executionContext: {
+          kind: "ui_manual",
+          cwd: "/workspace/a",
+          workspaceFolders: [],
+          sourceSessionPath: TEST_SESSION_PATH,
+          createdByAgentId: "agent-a",
+        },
+      }),
+    });
+
+    expect(res.status).toBe(500);
+    expect(await res.json()).toEqual({
+      error: {
+        code: "cron_store_unavailable",
+        message: "automation task storage is unavailable",
+      },
+    });
+  });
+
+  it("does not leak unknown storage paths through route errors", async () => {
+    const store = {
+      studioId: TEST_STUDIO_ID,
+      listJobs: () => {
+        throw new Error("EACCES: permission denied, open '/private/user/cron-jobs.json'");
+      },
+    };
+    const app = await createApp({
+      getStudioCronStore: () => createBoundStoreService(store),
+      listAgents: () => [],
+    });
+
+    const res = await app.request("/api/desk/cron");
+    const body = await res.json();
+
+    expect(res.status).toBe(500);
+    expect(body).toEqual({
+      error: {
+        code: "cron_store_operation_failed",
+        message: "Unable to access automation tasks",
+      },
+    });
+    expect(JSON.stringify(body)).not.toContain("/private/user");
+  });
+
+  it("does not trust an unrecognized cron_store code as a safe error", async () => {
+    const store = {
+      studioId: TEST_STUDIO_ID,
+      listJobs: () => {
+        throw Object.assign(new Error("failed at /private/user/cron-jobs.json"), {
+          code: "cron_store_future_failure",
+          status: 500,
+        });
+      },
+    };
+    const app = await createApp({
+      getStudioCronStore: () => createBoundStoreService(store),
+      listAgents: () => [],
+    });
+
+    const res = await app.request("/api/desk/cron");
+
+    expect(res.status).toBe(500);
+    expect(await res.json()).toEqual({
+      error: {
+        code: "cron_store_operation_failed",
+        message: "Unable to access automation tasks",
+      },
+    });
+  });
+
   it("returns a route error for unknown cron actions", async () => {
     const store = { studioId: TEST_STUDIO_ID, listJobs: () => [] };
     const app = await createApp({
