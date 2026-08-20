@@ -48,6 +48,13 @@ export interface MigrateAgentPersonaFileNamesOptions {
   log?: (line: string) => void;
 }
 
+export interface PersonaRenameFailure {
+  /** Agent directory name (equals the agent id). */
+  agentDirName: string;
+  legacyFileName: string;
+  currentFileName: string;
+}
+
 export interface MigrateAgentPersonaFileNamesResult {
   /** "<agentDirName>/<currentFileName>" for each file renamed into place. */
   renamed: string[];
@@ -55,6 +62,30 @@ export interface MigrateAgentPersonaFileNamesResult {
   superseded: string[];
   /** "<agentDirName>/<legacyFileName>" for each file that could not be moved. */
   failed: string[];
+  /** Structured form of `failed`, for the migration-degraded runtime fallback. */
+  failedDetails: PersonaRenameFailure[];
+}
+
+/**
+ * Index this startup's rename failures as agentDirName → (currentFileName →
+ * legacyFileName). The engine keeps the result for the process lifetime so the
+ * persona fallback chain can tell "legacy file was never migrated" (read it,
+ * this run only) apart from "legacy file appeared out of band" (ignore it --
+ * reading it unconditionally would re-establish a permanent dual-read protocol).
+ */
+export function buildFailedPersonaRenameIndex(
+  failures: PersonaRenameFailure[],
+): Map<string, Map<string, string>> {
+  const index = new Map<string, Map<string, string>>();
+  for (const { agentDirName, legacyFileName, currentFileName } of failures) {
+    let perAgent = index.get(agentDirName);
+    if (!perAgent) {
+      perAgent = new Map();
+      index.set(agentDirName, perAgent);
+    }
+    perAgent.set(currentFileName, legacyFileName);
+  }
+  return index;
 }
 
 function agentDirectories(agentsDir: string): string[] {
@@ -98,7 +129,7 @@ export function migrateAgentPersonaFileNames({
   agentsDir,
   log = () => {},
 }: MigrateAgentPersonaFileNamesOptions): MigrateAgentPersonaFileNamesResult {
-  const result: MigrateAgentPersonaFileNamesResult = { renamed: [], superseded: [], failed: [] };
+  const result: MigrateAgentPersonaFileNamesResult = { renamed: [], superseded: [], failed: [], failedDetails: [] };
   if (!agentsDir) throw new Error("AGENTS.md migration requires an agents directory");
 
   for (const agentDirName of agentDirectories(agentsDir)) {
@@ -125,9 +156,10 @@ export function migrateAgentPersonaFileNames({
       } catch (err: any) {
         const record = `${agentDirName}/${legacyFileName}`;
         result.failed.push(record);
-        // Logged and carried, never fatal: the persona still resolves from the
-        // template fallback, and the untouched legacy file stays where it is
-        // for the next startup to retry.
+        result.failedDetails.push({ agentDirName, legacyFileName, currentFileName });
+        // Logged and carried, never fatal: this run falls back to reading the
+        // untouched legacy file (see buildFailedPersonaRenameIndex), and the
+        // rename itself is retried on the next startup.
         log(`[agents-md-rename] could not migrate ${record}: ${err?.code || err?.message || "unknown error"}`);
       }
     }

@@ -6,8 +6,10 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   LEGACY_PERSONA_FILE_RENAMES,
   SUPERSEDED_LEGACY_PERSONA_SUFFIX,
+  buildFailedPersonaRenameIndex,
   migrateAgentPersonaFileNames,
 } from "../core/agents-md-migration.ts";
+import { Agent } from "../core/agent.ts";
 import { resolvePersonaSource } from "../core/persona-source.ts";
 
 const tempDirs: string[] = [];
@@ -157,5 +159,131 @@ describe("AGENTS.md startup migration", () => {
       { legacyFileName: "ishiki.md", currentFileName: "AGENTS.md" },
       { legacyFileName: "public-ishiki.md", currentFileName: "AGENTS.public.md" },
     ]);
+  });
+});
+
+/**
+ * Migration-degraded mode: when the startup rename fails, the untouched legacy
+ * file is the user's customized persona and must stay effective for this run.
+ * The fallback is keyed to this startup's explicit failure record — a legacy
+ * file that appears without one is never read, so this cannot quietly become a
+ * permanent dual-read protocol.
+ */
+describe("migration-degraded runtime fallback", () => {
+  const MISSING_PRODUCT_DIR = "missing-product-dir";
+
+  function denyAllRenames() {
+    vi.spyOn(fs, "renameSync").mockImplementation((() => {
+      const error: any = new Error("permission denied");
+      error.code = "EACCES";
+      throw error;
+    }) as any);
+  }
+
+  /** Wire an Agent exactly the way agent-manager wires it to the engine. */
+  function makeRuntimeAgent(agentsDir: string, agentId: string, failedIndex: Map<string, Map<string, string>>) {
+    const agent = new Agent({
+      id: agentId,
+      agentsDir,
+      productDir: path.join(agentsDir, MISSING_PRODUCT_DIR),
+    } as any);
+    agent.setCallbacks({
+      getFailedPersonaRename: (id: string, fileName: string) =>
+        failedIndex.get(id)?.get(fileName) ?? null,
+    });
+    return agent;
+  }
+
+  it("keeps the customized legacy persona as the effective runtime persona when the rename fails", () => {
+    const agentsDir = temporaryAgentsDir();
+    const agentDir = makeAgent(agentsDir, "hana", { "ishiki.md": "CUSTOM PERSONA" });
+    denyAllRenames();
+
+    const result = migrateAgentPersonaFileNames({ agentsDir });
+    expect(result.failed).toEqual(["hana/ishiki.md"]);
+    expect(result.failedDetails).toEqual([
+      { agentDirName: "hana", legacyFileName: "ishiki.md", currentFileName: "AGENTS.md" },
+    ]);
+    expect(fs.existsSync(path.join(agentDir, "AGENTS.md"))).toBe(false);
+
+    const agent = makeRuntimeAgent(agentsDir, "hana", buildFailedPersonaRenameIndex(result.failedDetails));
+    // The real runtime read path: Agent → resolvePersonaSource.
+    expect(agent.readAgentsMdSource()).toEqual({ content: "CUSTOM PERSONA", fromTemplate: false });
+  });
+
+  it("never reads a legacy file that has no migration failure record for this startup", () => {
+    const agentsDir = temporaryAgentsDir();
+    // e.g. a file sync dropped ishiki.md in after the startup migration had run.
+    makeAgent(agentsDir, "hana", { "ishiki.md": "out-of-band legacy persona" });
+
+    const agent = makeRuntimeAgent(agentsDir, "hana", new Map());
+    const resolved = agent.readAgentsMdSource();
+    expect(resolved.content).not.toBe("out-of-band legacy persona");
+    expect(resolved.fromTemplate).toBe(true);
+
+    // The resolver without an explicit fallback context must not find it either.
+    const direct = resolvePersonaSource({
+      agentDir: path.join(agentsDir, "hana"),
+      productDir: path.join(agentsDir, MISSING_PRODUCT_DIR),
+      yuanType: "lingxi",
+      locale: "en",
+      kind: "agents",
+    });
+    expect(direct.content).not.toBe("out-of-band legacy persona");
+    expect(direct.fromTemplate).toBe(true);
+  });
+
+  it("prefers the new file over the legacy one even when a failure is recorded", () => {
+    const agentsDir = temporaryAgentsDir();
+    // Both names exist and even the set-aside rename failed: a failure is on
+    // record, but AGENTS.md is right there and must always win.
+    makeAgent(agentsDir, "hana", { "ishiki.md": "OLD", "AGENTS.md": "NEW" });
+    denyAllRenames();
+
+    const result = migrateAgentPersonaFileNames({ agentsDir });
+    expect(result.failed).toEqual(["hana/ishiki.md"]);
+
+    const agent = makeRuntimeAgent(agentsDir, "hana", buildFailedPersonaRenameIndex(result.failedDetails));
+    expect(agent.readAgentsMdSource()).toEqual({ content: "NEW", fromTemplate: false });
+  });
+
+  it("drops the degraded fallback on the next startup once the rename succeeds", () => {
+    const agentsDir = temporaryAgentsDir();
+    const agentDir = makeAgent(agentsDir, "hana", { "ishiki.md": "CUSTOM PERSONA" });
+
+    // First startup: rename fails, runtime persona comes from the legacy file.
+    denyAllRenames();
+    const firstRun = migrateAgentPersonaFileNames({ agentsDir });
+    const firstAgent = makeRuntimeAgent(agentsDir, "hana", buildFailedPersonaRenameIndex(firstRun.failedDetails));
+    expect(firstAgent.readAgentsMdSource()).toEqual({ content: "CUSTOM PERSONA", fromTemplate: false });
+    vi.restoreAllMocks();
+
+    // Second startup: the rename now succeeds, so no failure record exists and
+    // the fallback is gone — the new file carries the persona.
+    const secondRun = migrateAgentPersonaFileNames({ agentsDir });
+    expect(secondRun.failed).toEqual([]);
+    expect(fs.existsSync(path.join(agentDir, "ishiki.md"))).toBe(false);
+
+    const secondIndex = buildFailedPersonaRenameIndex(secondRun.failedDetails);
+    const secondAgent = makeRuntimeAgent(agentsDir, "hana", secondIndex);
+    expect(secondAgent._personaMigrationFallback("AGENTS.md")).toBeNull();
+    expect(secondAgent.readAgentsMdSource()).toEqual({ content: "CUSTOM PERSONA", fromTemplate: false });
+  });
+
+  it("applies the same degraded fallback to the public persona variant", () => {
+    const agentsDir = temporaryAgentsDir();
+    const agentDir = makeAgent(agentsDir, "hana", { "public-ishiki.md": "CUSTOM PUBLIC PERSONA" });
+    denyAllRenames();
+
+    const result = migrateAgentPersonaFileNames({ agentsDir });
+    expect(result.failed).toEqual(["hana/public-ishiki.md"]);
+    expect(fs.existsSync(path.join(agentDir, "AGENTS.public.md"))).toBe(false);
+
+    const agent = makeRuntimeAgent(agentsDir, "hana", buildFailedPersonaRenameIndex(result.failedDetails));
+    expect(agent._readPublicAgentsMd()).toBe("CUSTOM PUBLIC PERSONA");
+
+    // And without a failure record the public legacy file is never read.
+    const plainAgent = makeRuntimeAgent(agentsDir, "hana", new Map());
+    expect(plainAgent._readPublicAgentsMd()).not.toBe("CUSTOM PUBLIC PERSONA");
   });
 });

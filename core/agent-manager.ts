@@ -1154,6 +1154,7 @@ export class AgentManager {
       getAutomationSuggestionStore: () => getEngine()?.automationSuggestionStore ?? null,
       getApprovalGateway:   () => getEngine()?.approvalGateway ?? null,
       getCurrentSessionPath:() => getEngine()?.currentSessionPath ?? null,
+      getFailedPersonaRename: (agentId, fileName) => getEngine()?.getFailedPersonaRename?.(agentId, fileName) ?? null,
       getSessionPermissionMode: (sp) => getEngine()?.getSessionPermissionMode?.(sp) ?? null,
       getSessionCwd:        (sp) => getEngine()?.getSessionByPath?.(sp)?.sessionManager?.getCwd?.() ?? null,
       getSessionWorkspaceFolders: (sp) => getEngine()?.getSessionWorkspaceFolders?.(sp) ?? [],

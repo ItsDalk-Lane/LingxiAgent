@@ -32,12 +32,27 @@ export interface PersonaSourceResult {
   fromTemplate: boolean;
 }
 
+export interface PersonaMigrationFallback {
+  /**
+   * 本次启动改名失败、仍在磁盘上的旧人格文件绝对路径。只允许由启动迁移的
+   * 失败记录构造（core/agents-md-migration.ts），调用方不许凭空拼一个旧文件
+   * 路径传进来——那等于重建永久双读协议。
+   */
+  legacyFilePath: string;
+}
+
 export interface ResolvePersonaSourceArgs {
   agentDir: string;
   productDir: string;
   yuanType: string;
   locale: string;
   kind: PersonaKind;
+  /**
+   * 启动级 migration-degraded 状态：仅当本次启动 ishiki.md → AGENTS.md 改名
+   * 明确失败时由 Agent 传入。新文件存在时永远优先（在 fallback 之前返回），
+   * 没有失败记录时旧文件一律不读。
+   */
+  migrationFallback?: PersonaMigrationFallback | null;
 }
 
 const KIND_CONFIG: Record<PersonaKind, { fileName: string; templateDir: string; exampleFile: string }> = {
@@ -75,6 +90,7 @@ export function resolvePersonaSource({
   yuanType,
   locale,
   kind,
+  migrationFallback = null,
 }: ResolvePersonaSourceArgs): PersonaSourceResult {
   const { fileName, templateDir, exampleFile } = KIND_CONFIG[kind];
   const isZh = String(locale).startsWith("zh");
@@ -83,6 +99,11 @@ export function resolvePersonaSource({
 
   const own = readFile(path.join(agentDir, fileName));
   if (own) return { content: own, fromTemplate: false };
+
+  // migration-degraded：改名失败的旧文件仍是用户定制内容，本次运行以它为准
+  // （fromTemplate=false），下次启动改名成功后自动回到上面的新文件分支。
+  const legacy = migrationFallback ? readFile(migrationFallback.legacyFilePath) : "";
+  if (legacy) return { content: legacy, fromTemplate: false };
 
   const langTemplate = readFile(path.join(productDir, templateDir, `${langDir}${yuanType}.md`));
   if (langTemplate) return { content: langTemplate, fromTemplate: true };

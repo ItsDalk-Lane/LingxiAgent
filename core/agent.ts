@@ -1143,7 +1143,20 @@ export class Agent {
       yuanType: this._config?.agent?.yuan || "lingxi",
       locale: this.resolveLocale(),
       kind: "agents",
+      migrationFallback: this._personaMigrationFallback("AGENTS.md"),
     });
+  }
+
+  /**
+   * 启动级 migration-degraded 状态：仅当本次启动 agents-md-rename 明确记录
+   * 该文件改名失败时，返回旧文件的读取坐标；否则返回 null（旧文件一律不读，
+   * 避免重新形成永久 legacy 双读协议）。新文件存在时 resolvePersonaSource
+   * 永远先命中新文件，fallback 不会覆盖它。
+   */
+  _personaMigrationFallback(currentFileName) {
+    const legacyFileName = this._cb?.getFailedPersonaRename?.(this.id, currentFileName);
+    if (!legacyFileName) return null;
+    return { legacyFilePath: path.join(this.agentDir, legacyFileName) };
   }
 
   /** 返回纯人格 prompt（identity + yuan + AGENTS.md），不含记忆、用户档案等 */
@@ -1188,7 +1201,11 @@ export class Agent {
     const yuanType = this._config?.agent?.yuan || "lingxi";
     const isZh = String(this.resolveLocale()).startsWith("zh");
     const langDir = isZh ? "" : "en/";
+    // migration-degraded：改名失败的 public-ishiki.md 同样是用户定制内容，
+    // 本次运行以它为准（规则与 readAgentsMdSource 一致，新文件永远优先）。
+    const fallback = this._personaMigrationFallback(PUBLIC_PERSONA_FILE_NAME);
     const raw = readFile(path.join(this.agentDir, PUBLIC_PERSONA_FILE_NAME))
+      || (fallback ? readFile(fallback.legacyFilePath) : "")
       || readFile(path.join(this.productDir, PUBLIC_PERSONA_TEMPLATE_DIR, `${langDir}${yuanType}.md`))
       || readFile(path.join(this.productDir, PUBLIC_PERSONA_TEMPLATE_DIR, `${yuanType}.md`))
       || "";

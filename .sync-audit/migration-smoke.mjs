@@ -7,8 +7,9 @@
 import fs from "fs";
 import os from "os";
 import path from "path";
-import { migrateAgentPersonaFileNames } from "../core/agents-md-migration.ts";
+import { buildFailedPersonaRenameIndex, migrateAgentPersonaFileNames } from "../core/agents-md-migration.ts";
 import { ensureFirstRun } from "../core/first-run.ts";
+import { resolvePersonaSource } from "../core/persona-source.ts";
 
 const root = fs.mkdtempSync(path.join(os.tmpdir(), "lingxi-migration-smoke-"));
 const lingxiHome = path.join(root, "home");
@@ -71,6 +72,57 @@ ok("新旧并存：旧文件安全保留为 .pre-agents-rename.bak",
   fs.existsSync(path.join(agentDir, "ishiki.md.pre-agents-rename.bak"))
   && fs.readFileSync(path.join(agentDir, "ishiki.md.pre-agents-rename.bak"), "utf-8").includes("备份恢复"));
 ok("新旧并存：无 failed", second.failed.length === 0 && second.superseded.length === 1);
+
+// ── 改名失败 → 运行时人格语义（migration-degraded fallback）─────────────
+// 语义 smoke：失败不能只保证"文件没删、应用不阻塞"，必须保证用户自定义人格
+// 在本次运行中仍然是实际生效的 persona。fs.renameSync 在 CJS interop 下是可
+// 写的 plain property，这里直接替换来确定性制造 EACCES（与 vitest spy 同构）。
+const lockedDir = path.join(agentsDir, "locked-agent");
+fs.mkdirSync(lockedDir, { recursive: true });
+fs.writeFileSync(path.join(lockedDir, "ishiki.md"), "锁定人格：改名失败也要生效。\n", "utf-8");
+fs.writeFileSync(path.join(lockedDir, "public-ishiki.md"), "锁定对外人格。\n", "utf-8");
+
+const realRenameSync = fs.renameSync;
+fs.renameSync = () => {
+  const err = new Error("permission denied");
+  err.code = "EACCES";
+  throw err;
+};
+const lockedMigration = migrateAgentPersonaFileNames({ agentsDir, log: () => {} });
+fs.renameSync = realRenameSync;
+
+ok("改名失败被结构化记录（ishiki + public-ishiki）",
+  lockedMigration.failed.length === 2 && lockedMigration.failedDetails.length === 2);
+ok("改名失败：旧文件原地保留未删",
+  fs.readFileSync(path.join(lockedDir, "ishiki.md"), "utf-8").includes("改名失败也要生效"));
+
+const failedIndex = buildFailedPersonaRenameIndex(lockedMigration.failedDetails);
+const degraded = resolvePersonaSource({
+  agentDir: lockedDir,
+  productDir,
+  yuanType: "lingxi",
+  locale: "zh",
+  kind: "agents",
+  migrationFallback: { legacyFilePath: path.join(lockedDir, failedIndex.get("locked-agent").get("AGENTS.md")) },
+});
+ok("改名失败：effective persona 仍是用户自定义内容", degraded.content.includes("改名失败也要生效"));
+ok("改名失败：fromTemplate=false（不是模板回落）", degraded.fromTemplate === false);
+
+const noRecord = resolvePersonaSource({
+  agentDir: lockedDir, productDir, yuanType: "lingxi", locale: "zh", kind: "agents",
+});
+ok("无失败记录：旧文件不读（无永久双读协议）",
+  noRecord.fromTemplate === true && !noRecord.content.includes("改名失败也要生效"));
+
+// 下次启动改名成功：degraded fallback 自动消失，人格内容不丢
+const healed = migrateAgentPersonaFileNames({ agentsDir, log: () => {} });
+ok("下次启动改名成功：locked-agent 完成迁移",
+  healed.renamed.includes("locked-agent/AGENTS.md") && healed.failed.length === 0);
+const healedPersona = resolvePersonaSource({
+  agentDir: lockedDir, productDir, yuanType: "lingxi", locale: "zh", kind: "agents",
+});
+ok("改名成功后：人格内容从 AGENTS.md 读出且不丢",
+  healedPersona.fromTemplate === false && healedPersona.content.includes("改名失败也要生效"));
 
 fs.rmSync(root, { recursive: true, force: true });
 
