@@ -11,6 +11,8 @@ const { autoUpdater } = require("electron-updater");
 const path = require("path");
 const fs = require("fs");
 const crypto = require("crypto");
+const os = require("os");
+const macSelfInstall = require("./mac-self-install.cjs");
 
 const CHECK_INTERVAL = 4 * 60 * 60 * 1000; // 4 小时
 const DIGEST_ASSET_NAME = "release-digest.v1.json";
@@ -29,6 +31,8 @@ let _ipcHandlersRegistered = false;
 let _updaterConfigured = false;
 let _installPromise = null;
 let _digestRequestId = 0;
+let _downloadedUpdateFile = null; // mac 自安装路径用的 zip（update-downloaded 事件携带）
+let _macInstallMode = null;       // darwin 上首次判定时缓存：squirrel | self-install
 
 function trimTrailingSlash(value) {
   return String(value || "").replace(/\/+$/, "");
@@ -463,9 +467,69 @@ function getQuitAndInstallOptions() {
   };
 }
 
-function invokeQuitAndInstallSoon() {
+/**
+ * darwin 上判定安装路径。ad-hoc 签名的构建走不了 Squirrel.Mac——它的
+ * designated requirement 含本次构建的 cdhash，任何新版本的 cdhash 都不同，
+ * ShipIt 换壳前的校验必然报「代码未能满足指定的代码要求」。这类构建改走
+ * mac-self-install.cjs 的自安装路径。配上 Developer ID 证书后检测自动
+ * 回到 squirrel，无需改这里。
+ */
+function resolveMacInstallMode() {
+  if (process.platform !== "darwin") return "squirrel";
+  if (_macInstallMode) return _macInstallMode;
+  const bundlePath = macSelfInstall.bundlePathFromExePath(app.getPath("exe"));
+  const detection = macSelfInstall.detectMacInstallMode({ bundlePath });
+  _macInstallMode = detection.mode;
+  logUpdate(`mac install mode: ${detection.mode}${detection.teamId ? ` (team ${detection.teamId})` : ` (${detection.reason || "no-team-id"})`}`);
+  return _macInstallMode;
+}
+
+function macPendingDir() {
+  return macSelfInstall.defaultPendingDir({
+    appUpdateYmlPath: nativeUpdateConfigPath(),
+    appName: (() => { try { return app.getName(); } catch { return ""; } })(),
+  });
+}
+
+/**
+ * ad-hoc 构建的自安装：armed 成功即退出本进程，把换壳交给 detached 脚本；
+ * 失败则显式落错误态（About 页给出「重试/手动下载」），不静默降级。
+ */
+function runMacSelfInstall() {
+  const version = _updateState.version;
+  const zipPath = macSelfInstall.resolveDownloadedZip({
+    explicitPath: _downloadedUpdateFile,
+    pendingDir: macPendingDir(),
+  });
+  const bundlePath = macSelfInstall.bundlePathFromExePath(app.getPath("exe"));
+  const result = macSelfInstall.armSelfInstall({
+    bundlePath,
+    zipPath,
+    expectedVersion: version,
+    mainPid: process.pid,
+    serverInfoPath: _lingxiHome ? path.join(_lingxiHome, "server-info.json") : "",
+    lingxiHome: _lingxiHome || os.homedir(),
+    logPath: _lingxiHome ? path.join(_lingxiHome, "logs", "auto-update.log") : path.join(os.tmpdir(), "lingxi-auto-update.log"),
+  });
+  if (!result.ok) {
+    logUpdate(`mac self-install aborted: ${result.error}`);
+    if (_setIsUpdating) _setIsUpdating(false);
+    setState({ status: "error", error: result.error });
+    return false;
+  }
+  logUpdate(`mac self-install armed: version=${version || "unknown"}, quitting for bundle swap`);
+  // 让 installing 状态先广播到 renderer，下一拍再退——脚本里有界等待本进程消失。
+  setImmediate(() => { try { app.exit(0); } catch {} });
+  return true;
+}
+
+function invokeInstallSoon() {
   return new Promise((resolve) => {
     setImmediate(() => {
+      if (process.platform === "darwin" && resolveMacInstallMode() === "self-install") {
+        resolve(runMacSelfInstall());
+        return;
+      }
       try {
         const { isSilent, isForceRunAfter } = getQuitAndInstallOptions();
         logUpdate(`quitAndInstall invoked: silent=${isSilent}, forceRunAfter=${isForceRunAfter}`);
@@ -498,8 +562,9 @@ async function installDownloadedUpdate(source = "manual") {
 
     try {
       // Defer one tick so the IPC/state handoff finishes before electron-updater
-      // closes windows and starts the NSIS installer.
-      return await invokeQuitAndInstallSoon();
+      // closes windows and starts the NSIS installer (or, on ad-hoc mac builds,
+      // before we exit and hand the bundle swap to the detached script).
+      return await invokeInstallSoon();
     } finally {
       _installPromise = null;
     }
@@ -682,6 +747,7 @@ function setupAutoUpdater() {
 
   autoUpdater.on("update-downloaded", (info) => {
     logUpdate(`update downloaded: version=${info.version || "unknown"}`);
+    _downloadedUpdateFile = typeof info.downloadedFile === "string" ? info.downloadedFile : null;
     setState({
       status: "downloaded",
       version: info.version,

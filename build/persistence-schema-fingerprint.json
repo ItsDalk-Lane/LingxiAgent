@@ -648,7 +648,7 @@
     ],
     "version": 3
   },
-  "payloadFingerprint": "sha256:f38d88f1920b193e9c202b3629f1914e22f2d5bf3fb022a32b81418a22450f24",
+  "payloadFingerprint": "sha256:a8f8f14cf92b03a63fa329b690ef77b11ec01de3a639dde68d5c5833a96a7396",
   "registry": [
     {
       "affectedByEpochMigration": true,
@@ -3003,8 +3003,8 @@
   ],
   "review": {
     "classification": "compatible",
-    "compatibilityReason": "listArchivedSessions adds a read-only firstMessage projection (reusing SessionListProjectionCache over agents/{agentId}/sessions/archived/) and the archived route truncates it for display; no persisted schema, write path, or store format changes.",
-    "payloadFingerprint": "sha256:f38d88f1920b193e9c202b3629f1914e22f2d5bf3fb022a32b81418a22450f24"
+    "compatibilityReason": "mac auto-update self-install: adds mac-self-install.cjs (writes only to os.tmpdir at runtime; no persistent store) and edits auto-updater.cjs without changing any store schema, site, or write shape",
+    "payloadFingerprint": "sha256:a8f8f14cf92b03a63fa329b690ef77b11ec01de3a639dde68d5c5833a96a7396"
   },
   "schemas": [
     {
@@ -3187,7 +3187,7 @@
       "contract": "update channel record version, device identifier, activation flag, update feed address, activation time, and held invite codes",
       "kind": "runtime-contract",
       "module": "desktop/auto-updater.cjs",
-      "sourceHash": "sha256:f55e2773b413f40bd5c3de4606035bce7d7006d7b7ad984f4952ed8e1d0d4c2b",
+      "sourceHash": "sha256:9e965966c1f425b294b29def6b1609a00953d873b3ce5018db82605a463be162",
       "storeId": "desktop-update-channel"
     },
     {

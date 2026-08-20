@@ -1,6 +1,8 @@
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
+import Module from "node:module";
+import { createRequire } from "node:module";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
 // ── Mocks（必须在 import 之前声明）──
@@ -19,6 +21,7 @@ const mockAutoUpdater = {
 
 const mockWindows = [];
 let mockExePath = "/Applications/LingxiAgent.app/Contents/MacOS/LingxiAgent";
+const mockAppExit = vi.fn();
 
 vi.mock("electron", () => ({
   ipcMain: { handle: vi.fn() },
@@ -31,12 +34,37 @@ vi.mock("electron", () => ({
       if (name === "userData") return "/tmp/test-userdata";
       return "/tmp";
     },
+    exit: mockAppExit,
   },
 }));
 
 vi.mock("electron-updater", () => ({
   autoUpdater: mockAutoUpdater,
 }));
+
+// mac-self-install.cjs 默认走 Squirrel（等价于已签名构建），
+// ad-hoc 自安装的用例在各测试里单独翻 mode。
+const mockMacSelfInstall = {
+  bundlePathFromExePath: vi.fn((): any => "/Applications/LingxiAgent.app"),
+  detectMacInstallMode: vi.fn((): any => ({ mode: "squirrel", teamId: "TESTTEAMID" })),
+  defaultPendingDir: vi.fn((): any => "/tmp/test-pending"),
+  resolveDownloadedZip: vi.fn((opts: any) => opts?.explicitPath || null),
+  armSelfInstall: vi.fn((): any => ({ ok: true, scriptPath: "/tmp/lingxi-self-install-test/install.sh" })),
+};
+
+vi.mock("../desktop/mac-self-install.cjs", () => mockMacSelfInstall);
+
+// auto-updater.cjs 的 require("./mac-self-install.cjs") 是 CJS require，
+// 可能绕过 vi.mock 的 ESM registry（同 electron/electron-updater 的既有问题，
+// 见 setup-auto-updater.ts）。双保险：把同一个 mock 对象预置进 require.cache。
+const requireForStub = createRequire(import.meta.url);
+const macSelfInstallResolved = requireForStub.resolve("../desktop/mac-self-install.cjs");
+{
+  const stubModule = new Module(macSelfInstallResolved);
+  stubModule.exports = mockMacSelfInstall;
+  stubModule.loaded = true;
+  requireForStub.cache[macSelfInstallResolved] = stubModule;
+}
 
 describe("auto-updater", () => {
   let handlers;
@@ -78,6 +106,12 @@ describe("auto-updater", () => {
     mockAutoUpdater.allowPrerelease = false;
     mockAutoUpdater.installDirectory = undefined;
     mockExePath = "/Applications/LingxiAgent.app/Contents/MacOS/LingxiAgent";
+    // mockReturnValue/mockImplementation 跨测试残留，beforeEach 里显式复位
+    mockMacSelfInstall.bundlePathFromExePath.mockReturnValue("/Applications/LingxiAgent.app");
+    mockMacSelfInstall.detectMacInstallMode.mockReturnValue({ mode: "squirrel", teamId: "TESTTEAMID" });
+    mockMacSelfInstall.defaultPendingDir.mockReturnValue("/tmp/test-pending");
+    mockMacSelfInstall.resolveDownloadedZip.mockImplementation((opts) => opts?.explicitPath || null);
+    mockMacSelfInstall.armSelfInstall.mockReturnValue({ ok: true, scriptPath: "/tmp/lingxi-self-install-test/install.sh" });
     delete process.env.LINGXI_UPDATE_FEED_URL;
     delete process.env.LINGXI_UPDATE_SOURCE;
     delete process.env.LINGXI_UPDATE_PROVIDER;
@@ -444,6 +478,88 @@ describe("auto-updater", () => {
       await new Promise(resolve => setImmediate(resolve));
       expect(mockAutoUpdater.quitAndInstall).toHaveBeenCalledWith(true, true);
       await expect(installPromise).resolves.toBe(true);
+    } finally {
+      Object.defineProperty(process, "platform", { value: originalPlatform });
+    }
+  });
+
+  // ── mac ad-hoc 自安装（Squirrel.Mac 对 ad-hoc 签名结构性不可用）──
+
+  it("ad-hoc mac builds self-install via the detached script instead of quitAndInstall", async () => {
+    const originalPlatform = process.platform;
+    Object.defineProperty(process, "platform", { value: "darwin" });
+    try {
+      vi.resetModules();
+      mod = await import("../desktop/auto-updater.cjs");
+      handlers = {};
+      mockAutoUpdater.on.mockImplementation((event, handler) => {
+        handlers[event] = handler;
+      });
+      mockMacSelfInstall.detectMacInstallMode.mockReturnValue({ mode: "self-install", reason: "adhoc-no-team-id" });
+
+      const setIsUpdating = vi.fn();
+      initWithMockWindow({ setIsUpdating });
+
+      if (handlers["update-downloaded"]) {
+        handlers["update-downloaded"]({ version: "2.0.0", downloadedFile: "/tmp/test-pending/Lingxi-2.0.0-macOS-arm64.zip" });
+      }
+
+      const installPromise = mod.installDownloadedUpdate("manual");
+      await Promise.resolve();
+      await new Promise(resolve => setImmediate(resolve));
+
+      expect(mockAutoUpdater.quitAndInstall).not.toHaveBeenCalled();
+      expect(mockMacSelfInstall.resolveDownloadedZip).toHaveBeenCalledWith(expect.objectContaining({
+        explicitPath: "/tmp/test-pending/Lingxi-2.0.0-macOS-arm64.zip",
+      }));
+      expect(mockMacSelfInstall.armSelfInstall).toHaveBeenCalledWith(expect.objectContaining({
+        bundlePath: "/Applications/LingxiAgent.app",
+        zipPath: "/tmp/test-pending/Lingxi-2.0.0-macOS-arm64.zip",
+        expectedVersion: "2.0.0",
+        mainPid: process.pid,
+      }));
+      // 状态已广播 installing，本进程退出让位给换壳脚本
+      expect(mod.getState()).toEqual(expect.objectContaining({ status: "installing", version: "2.0.0" }));
+      await expect(installPromise).resolves.toBe(true);
+      await new Promise(resolve => setImmediate(resolve));
+      expect(mockAppExit).toHaveBeenCalledWith(0);
+    } finally {
+      Object.defineProperty(process, "platform", { value: originalPlatform });
+    }
+  });
+
+  it("surfaces a visible error instead of quitting when self-install preconditions fail", async () => {
+    const originalPlatform = process.platform;
+    Object.defineProperty(process, "platform", { value: "darwin" });
+    try {
+      vi.resetModules();
+      mod = await import("../desktop/auto-updater.cjs");
+      handlers = {};
+      mockAutoUpdater.on.mockImplementation((event, handler) => {
+        handlers[event] = handler;
+      });
+      mockMacSelfInstall.detectMacInstallMode.mockReturnValue({ mode: "self-install", reason: "adhoc-no-team-id" });
+      mockMacSelfInstall.armSelfInstall.mockReturnValue({ ok: false, error: "mac_app_not_writable" });
+
+      const setIsUpdating = vi.fn();
+      initWithMockWindow({ setIsUpdating });
+
+      if (handlers["update-downloaded"]) {
+        handlers["update-downloaded"]({ version: "2.0.0", downloadedFile: "/tmp/test-pending/update.zip" });
+      }
+
+      const installPromise = mod.installDownloadedUpdate("manual");
+      await Promise.resolve();
+      await new Promise(resolve => setImmediate(resolve));
+
+      expect(mockAutoUpdater.quitAndInstall).not.toHaveBeenCalled();
+      expect(mockAppExit).not.toHaveBeenCalled();
+      expect(setIsUpdating).toHaveBeenLastCalledWith(false);
+      expect(mod.getState()).toEqual(expect.objectContaining({
+        status: "error",
+        error: "mac_app_not_writable",
+      }));
+      await expect(installPromise).resolves.toBe(false);
     } finally {
       Object.defineProperty(process, "platform", { value: originalPlatform });
     }
