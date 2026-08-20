@@ -7,7 +7,7 @@ UPSTREAM_BASE_SHA   = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0.4
 UPSTREAM_TARGET_SHA = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA     = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA    = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-LINGXI_FINAL_SHA    = __FINAL_SHA__  (收口提交；其后仅有一个写入该 SHA 的 seal 提交)
+LINGXI_FINAL_SHA    = d4cf92a838a78845893a7b6733375c0cc7a46834  (收口提交；其后仅有一个写入该 SHA 的 seal 提交)
 工作分支            = feature/upstream-sync-0.447.4
 ```
 
