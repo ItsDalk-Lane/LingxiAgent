@@ -7,7 +7,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = fabd6dbf86fb5234fff319918ca164eea68548b1  (最终验证所针对的源码树；2026-08-20 v0.1.29 release 后推进)
+VERIFIED_SOURCE_SHA   = dcf3546adb3c41bbc32d4c2fd2899e3f28f47566  (最终验证所针对的源码树；2026-08-20 mac self-install 功能树后推进)
 工作分支              = feature/upstream-sync-0.447.4
 ```
 
@@ -185,6 +185,12 @@ seal 不是一次性终点，而是"当前被验证树"的游标；每次审计�
   validate-release-digest / update-digest-history / generate-release-digest /
   release-preflight / release-workflow-gates / post-verification-audit-seal /
   upstream-sync-matrix 全绿）后推进。
+- **2026-08-20 mac self-install 功能**（dcf3546adb3c41bbc32d4c2fd2899e3f28f47566）：mac
+  ad-hoc 签名构建的自动更新自安装路径（新增 desktop/mac-self-install.cjs + 对应测试，
+  auto-updater 集成与测试；5 files / +796-7）。验证：PR CI typecheck/lint/build 全绿 +
+  全量测试 macos 1138 passed（旧坐标 fabd6dbf 下仅 post-verification-audit-seal 预期红）；
+  windows 首轮暴露 defaultPendingDir 用例硬编码 POSIX 路径断言失败，改为 path.join 构造
+  期望值（本地 52 tests 绿 + win32 路径语义一致）后推进。
 
 ## 最终状态：READY TO MERGE
 
@@ -192,9 +198,10 @@ seal 不是一次性终点，而是"当前被验证树"的游标；每次审计�
 - Disposition：ADOPTED 25 + ADAPTED 100 + REGENERATED 4 + INTENTIONAL_DIVERGENCE 4 = 133
   （脚本计算，`build-sync-matrix.mjs --check`：missing=0 / extra=0 / duplicate=0 / unknown=0）。
 - 4 个 `hanako.md → lingxi.md` 品牌映射统一分类为 ADAPTED。
-- `VERIFIED_SOURCE_SHA = fabd6dbf86fb5234fff319918ca164eea68548b1`：被完整测试验证的代码树
+- `VERIFIED_SOURCE_SHA = dcf3546adb3c41bbc32d4c2fd2899e3f28f47566`：被完整测试验证的代码树
   （含收口树 d4cf92a8 的全部验证 + 文档清场树复跑验证 + 归档修复树 051f6117 复跑的
-  typecheck/lint/全量测试 + v0.1.29 release 树 fabd6dbf 复跑的 typecheck/目标套件，
+  typecheck/lint/全量测试 + v0.1.29 release 树 fabd6dbf 复跑的 typecheck/目标套件 +
+  mac self-install 树 dcf3546a 的 PR CI typecheck/lint/build/全量测试，
   见「Seal 推进记录」）。当前 HEAD 只比 VERIFIED_SOURCE_SHA 多审计收口内容。
 
 ### Post-verification diff 记录（`git diff --name-only VERIFIED_SOURCE_SHA..HEAD`）
