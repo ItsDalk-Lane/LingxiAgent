@@ -52,6 +52,7 @@ import {
 import { isActiveSessionPath, isArchivedDesktopSessionPath } from "./message-utils.ts";
 import { formatWorkspaceScopePrompt, normalizeSessionFolderScope, normalizeWorkspaceScope } from "../shared/workspace-scope.ts";
 import { buildWorkspaceInstructionPrompt } from "./workspace-instruction-files.ts";
+import { agentPersonaFilePaths } from "./persona-source.ts";
 import { getProviderPromptPatches } from "./provider-prompt-patches.ts";
 import {
   DEEPSEEK_ROLEPLAY_REASONING_PATCH_EXPERIMENT_ID,
@@ -804,6 +805,7 @@ function buildAppendSystemPromptSnapshot({
   locale,
   workspaceScope,
   workspaceContext,
+  agentDir,
 }: any) {
   const parts = [
     ...(Array.isArray(baseAppend) ? baseAppend : []),
@@ -822,6 +824,7 @@ function buildAppendSystemPromptSnapshot({
     cwd: workspaceScope.primaryCwd,
     workspaceContext,
     locale,
+    excludeFiles: agentDir ? agentPersonaFilePaths(agentDir) : [],
   });
   if (workspaceInstructions) parts.push(workspaceInstructions);
   return normalizeStringArray(parts);
@@ -2018,6 +2021,7 @@ export class SessionCoordinator {
         locale: localeSnapshot,
         workspaceScope,
         workspaceContext: agent.config?.workspace_context,
+        agentDir: agent.agentDir,
       });
     const rawSkillsResultSnapshot = restoredPromptSnapshot?.skillsResult
       ?? (
@@ -7930,6 +7934,7 @@ export class SessionCoordinator {
               cwd: execWorkspaceScope.primaryCwd,
               workspaceContext: targetAgent.config?.workspace_context,
               locale: targetAgent.config?.locale || getLocale(),
+              excludeFiles: agentPersonaFilePaths(targetAgent.agentDir),
             });
             return [
               ...base,
