@@ -38,7 +38,7 @@ const VERIFIED_SOURCE_SHA_FILE = path.join(ROOT, ".sync-audit", "verified-source
 // 它不属于任何 commit 内容，因而是"内容的一部分函数"之前的固定坐标，可安全引用。
 // 当前 branch HEAD 可能在其后存在纯审计 seal 提交，HEAD 由 Git ref 自身标识，
 // 不允许在 commit 内容里自引用（SHA = hash(contents)，自引用会无限漂移）。
-const VERIFIED_SOURCE_SHA = "051f6117c10846dbb244e0dd0fb86004ba0e7e66";
+const VERIFIED_SOURCE_SHA = "fabd6dbf86fb5234fff319918ca164eea68548b1";
 
 const ALLOWED_DISPOSITIONS = ["ADOPTED", "ADAPTED", "REGENERATED", "INTENTIONAL_DIVERGENCE"];
 
