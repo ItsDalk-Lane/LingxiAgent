@@ -28,6 +28,14 @@ describe('error-user-messages · code → i18n key', () => {
     expect(userMessageKeyForCode('subagent_run_busy')).toBe('error.code.subagentRunBusy');
   });
 
+  it('maps every user-visible Memory Dream code', () => {
+    expect(userMessageKeyForCode('dream_memory_busy')).toBe('error.code.dreamMemoryBusy');
+    expect(userMessageKeyForCode('dream_already_running')).toBe('error.code.dreamAlreadyRunning');
+    expect(userMessageKeyForCode('dream_no_memory')).toBe('error.code.dreamNoMemory');
+    expect(userMessageKeyForCode('dream_revision_not_found')).toBe('error.code.dreamRevisionNotFound');
+    expect(userMessageKeyForCode('dream_run_failed')).toBe('error.code.dreamRunFailed');
+  });
+
   it('gives internal contract violations their own copy instead of the generic fallback', () => {
     // These only fire when a caller skipped part of an explicit contract. The user
     // cannot act on the English assertion, so it needs a sentence that says "this is
