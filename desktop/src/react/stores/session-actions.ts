@@ -1379,6 +1379,7 @@ export interface ArchivedSession {
   path: string;
   sessionId?: string | null;
   title: string | null;
+  firstMessage?: string | null;
   archivedAt: string;
   sizeBytes: number;
   agentId: string;

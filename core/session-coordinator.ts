@@ -6876,6 +6876,7 @@ export class SessionCoordinator {
   /**
    * 列出所有 agent 的已归档 session（`<agentDir>/sessions/archived/*.jsonl`）。
    * title 的存储 key 仍是活跃路径——从 archived 路径反推活跃路径再查 titles.json。
+   * 显式标题缺失时回退到 jsonl 首条用户消息（firstMessage），与活跃列表投影一致。
    */
   async listArchivedSessions() {
     const activeAgents = this._d.listAgents();
@@ -6890,6 +6891,10 @@ export class SessionCoordinator {
       let files;
       try { files = await fsp.readdir(archDir); } catch { return []; }
       const titles = await this._loadSessionTitlesFor(sessionDir).catch(() => ({}));
+      const projections = await this._sessionListProjectionCache.list(archDir).catch(() => []);
+      const projectionByPath = new Map(
+        projections.filter(Boolean).map((projection) => [projection.path, projection]),
+      );
       const rows = await Promise.all(files
         .filter(isSessionJsonlFilename)
         .map(async (f) => {
@@ -6920,6 +6925,7 @@ export class SessionCoordinator {
               path: full,
               sessionId: manifest?.sessionId || null,
               title: this._sessionTitleFromMap(titles, full, [activeKey]) || null,
+              firstMessage: projectionByPath.get(full)?.firstMessage || null,
               archivedAt: stat.mtime.toISOString(),
               sizeBytes: stat.size,
               agentId: agent.id,

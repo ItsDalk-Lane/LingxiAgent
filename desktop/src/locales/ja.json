@@ -243,6 +243,11 @@
       "deleteForever": "完全に削除",
       "deleteConfirm": "このアーカイブを完全に削除しますか？取り消せません。",
       "deleteFailed": "削除に失敗しました",
+      "selectAll": "すべて選択",
+      "deleteSelected": "選択項目を削除（{count}）",
+      "deleteSelectedConfirm": "選択した {count} 件のアーカイブ（合計 {size}）を完全に削除します。取り消せません。続けますか？",
+      "deleteSelectedDone": "{count} 件を削除しました",
+      "deleteSelectedPartial": "一部のみ削除：{deleted}/{total}",
       "daysAgo": "{days} 日前にアーカイブ"
     },
     "rcTakingOver": "{platform} 接続中",

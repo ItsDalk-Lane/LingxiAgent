@@ -118,6 +118,37 @@ describe("session-coordinator: archived helpers", () => {
     expect(list[0].title).toBe("Preserved");
   });
 
+  it("listArchivedSessions falls back to first user message when title is missing", async () => {
+    const sessDir = path.join(tmpDir, "agents", "a", "sessions");
+    const aArch = path.join(sessDir, "archived");
+    await fs.mkdir(aArch, { recursive: true });
+    await fs.writeFile(
+      path.join(aArch, "f.jsonl"),
+      [
+        JSON.stringify({ type: "session", version: 3, id: "f", timestamp: "2026-06-25T01:00:00.000Z", cwd: "/tmp" }),
+        JSON.stringify({ type: "message", id: "u1", parentId: null, timestamp: "2026-06-25T01:01:00.000Z", message: { role: "user", content: [{ type: "text", text: "first user message" }], timestamp: 1 } }),
+        "",
+      ].join("\n"),
+    );
+
+    const coord = await loadCoord(tmpDir);
+    const list = await coord.listArchivedSessions();
+    expect(list[0].title).toBe(null);
+    expect(list[0].firstMessage).toBe("first user message");
+  });
+
+  it("listArchivedSessions keeps firstMessage null for non-session jsonl files", async () => {
+    const sessDir = path.join(tmpDir, "agents", "a", "sessions");
+    const aArch = path.join(sessDir, "archived");
+    await fs.mkdir(aArch, { recursive: true });
+    await fs.writeFile(path.join(aArch, "plain.jsonl"), "{}\n");
+
+    const coord = await loadCoord(tmpDir);
+    const list = await coord.listArchivedSessions();
+    expect(list[0].title).toBe(null);
+    expect(list[0].firstMessage).toBe(null);
+  });
+
   it("listArchivedSessions reads title from legacy active-path sessionId", async () => {
     const sessDir = path.join(tmpDir, "agents", "a", "sessions");
     const aArch = path.join(sessDir, "archived");

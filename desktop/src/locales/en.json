@@ -243,6 +243,11 @@
       "deleteForever": "Delete forever",
       "deleteConfirm": "Permanently delete this archive? This cannot be undone.",
       "deleteFailed": "Delete failed",
+      "selectAll": "Select all",
+      "deleteSelected": "Delete selected ({count})",
+      "deleteSelectedConfirm": "Permanently delete {count} selected archives ({size} total)? This cannot be undone.",
+      "deleteSelectedDone": "Deleted {count} archives",
+      "deleteSelectedPartial": "Partially deleted: {deleted}/{total}",
       "daysAgo": "Archived {days} days ago"
     },
     "rcTakingOver": "{platform} active",

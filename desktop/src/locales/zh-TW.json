@@ -243,6 +243,11 @@
       "deleteForever": "永久刪除",
       "deleteConfirm": "永久刪除此封存？此操作無法復原。",
       "deleteFailed": "刪除失敗",
+      "selectAll": "全選",
+      "deleteSelected": "刪除所選（{count}）",
+      "deleteSelectedConfirm": "將永久刪除選中的 {count} 條封存（共 {size}），無法復原。繼續？",
+      "deleteSelectedDone": "已刪除 {count} 條封存",
+      "deleteSelectedPartial": "部分刪除成功：{deleted}/{total}",
       "daysAgo": "封存於 {days} 天前"
     },
     "rcTakingOver": "{platform} 接管中",

@@ -243,6 +243,11 @@
       "deleteForever": "永久删除",
       "deleteConfirm": "永久删除此归档？此操作无法撤销。",
       "deleteFailed": "删除失败",
+      "selectAll": "全选",
+      "deleteSelected": "删除所选（{count}）",
+      "deleteSelectedConfirm": "将永久删除选中的 {count} 条归档（共 {size}），无法撤销。继续？",
+      "deleteSelectedDone": "已删除 {count} 条归档",
+      "deleteSelectedPartial": "部分删除成功：{deleted}/{total}",
       "daysAgo": "归档于 {days} 天前"
     },
     "subagentRunStateUnrecoverable": "历史 subagent 运行状态不可恢复",

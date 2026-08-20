@@ -648,7 +648,7 @@
     ],
     "version": 3
   },
-  "payloadFingerprint": "sha256:20f93ca9347b4552bca7a7513301ba6396605cd5ad1c74899952e3e22b053a42",
+  "payloadFingerprint": "sha256:f38d88f1920b193e9c202b3629f1914e22f2d5bf3fb022a32b81418a22450f24",
   "registry": [
     {
       "affectedByEpochMigration": true,
@@ -3003,8 +3003,8 @@
   ],
   "review": {
     "classification": "compatible",
-    "compatibilityReason": "upstream v0.447.4 sync closeout: core/agent-manager.ts wires the agents-md-rename failure index into Agent callbacks (runtime-only wiring, the agent-profile directory contract is unchanged); carries forward the persona file rename ishiki.md/public-ishiki.md -> AGENTS.md/AGENTS.public.md (startup migration, no data loss) and the additive memory/dream stores from the previous review; no DATA_EPOCH change",
-    "payloadFingerprint": "sha256:20f93ca9347b4552bca7a7513301ba6396605cd5ad1c74899952e3e22b053a42"
+    "compatibilityReason": "listArchivedSessions adds a read-only firstMessage projection (reusing SessionListProjectionCache over agents/{agentId}/sessions/archived/) and the archived route truncates it for display; no persisted schema, write path, or store format changes.",
+    "payloadFingerprint": "sha256:f38d88f1920b193e9c202b3629f1914e22f2d5bf3fb022a32b81418a22450f24"
   },
   "schemas": [
     {
@@ -3418,7 +3418,7 @@
         {
           "contract": "core/session-coordinator.ts Hana metadata extensions",
           "module": "core/session-coordinator.ts",
-          "sourceHash": "sha256:13194c2c359a442297a0c83fe31683dd6d185725032e194eec57ab61c404855a"
+          "sourceHash": "sha256:54bcbd6b8a1e8149f710024ee5b61490ef6d1d1a4541405713e95d3db71ecb2e"
         },
         {
           "contract": "core/session-jsonl-file.ts repair contract",
