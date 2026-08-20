@@ -6782,9 +6782,14 @@
           "root": "server-bootstrap",
           "from": "lib/memory/memory-ticker.ts",
           "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "server/routes/memory-dream.ts",
+          "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by lib/memory/dream/runner.ts (import-statement); lib/memory/memory-ticker.ts (import-statement)."
+      "reason": "Reached via esbuild source module graph, imported by lib/memory/dream/runner.ts (import-statement); lib/memory/memory-ticker.ts (import-statement); server/routes/memory-dream.ts (import-statement)."
     },
     {
       "path": "lib/memory/dream/runner.ts",

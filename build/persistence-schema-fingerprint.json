@@ -648,7 +648,7 @@
     ],
     "version": 3
   },
-  "payloadFingerprint": "sha256:e99e646cbb819633bfd7fd6917d36471289d6d418ba87fa95ff4888e01a424b9",
+  "payloadFingerprint": "sha256:20f93ca9347b4552bca7a7513301ba6396605cd5ad1c74899952e3e22b053a42",
   "registry": [
     {
       "affectedByEpochMigration": true,
@@ -3003,8 +3003,8 @@
   ],
   "review": {
     "classification": "compatible",
-    "compatibilityReason": "upstream v0.447.4 sync: rename agent persona files ishiki.md/public-ishiki.md -> AGENTS.md/AGENTS.public.md (startup migration renames in place, no data loss) and add per-agent memory/dream state.json, pending-apply.json and revisions/{revisionId}.json stores (purely additive); no DATA_EPOCH change",
-    "payloadFingerprint": "sha256:e99e646cbb819633bfd7fd6917d36471289d6d418ba87fa95ff4888e01a424b9"
+    "compatibilityReason": "upstream v0.447.4 sync closeout: core/agent-manager.ts wires the agents-md-rename failure index into Agent callbacks (runtime-only wiring, the agent-profile directory contract is unchanged); carries forward the persona file rename ishiki.md/public-ishiki.md -> AGENTS.md/AGENTS.public.md (startup migration, no data loss) and the additive memory/dream stores from the previous review; no DATA_EPOCH change",
+    "payloadFingerprint": "sha256:20f93ca9347b4552bca7a7513301ba6396605cd5ad1c74899952e3e22b053a42"
   },
   "schemas": [
     {
@@ -3086,7 +3086,7 @@
       "contract": "agent config and authored Markdown/image profile protocol",
       "kind": "directory-contract",
       "module": "core/agent-manager.ts",
-      "sourceHash": "sha256:e16b98fba0b7f3b42d92a917f7b56c026fca1989e7742b6d2ff641875d3c2ed1",
+      "sourceHash": "sha256:1022b75ef4b3ba75a8a3f53ca3cbeabe42cf8bd0ecf9673daec577c1fc852f34",
       "storeId": "agent-profile"
     },
     {
