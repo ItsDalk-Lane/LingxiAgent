@@ -11,6 +11,7 @@ import type { CronJob, ModelOption } from './automation/automation-types';
 import { jobAgentId } from './automation/automation-utils';
 import type { Agent } from '../types';
 import { sessionScopedValue } from '../stores/session-slice';
+import { normalizeSessionRouteError } from '../../../../shared/error-user-messages.ts';
 
 const EMPTY_FOLDERS: string[] = [];
 
@@ -67,13 +68,21 @@ export function AutomationPanel() {
   const [availableModels, setAvailableModels] = useState<ModelOption[]>([]);
   const [selectedAgentId, setSelectedAgentId] = useState<string | null>(currentAgentId);
   const [openJobs, setOpenJobs] = useState<Record<string, boolean>>({});
+  const [addingManualJob, setAddingManualJob] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   const loadData = useCallback(async () => {
     try {
       const [cronRes, modelsRes] = await Promise.all([
-        lingxiFetch('/api/desk/cron'),
+        lingxiFetch('/api/desk/cron', { throwOnHttpError: false }),
         lingxiFetch('/api/models'),
       ]);
+      if (!cronRes.ok) {
+        const body = await cronRes.json().catch(() => ({}));
+        const detail = normalizeSessionRouteError(body).message;
+        setLoadError(detail || (window.t ?? ((key: string) => key))('error.code.unexpected'));
+        return;
+      }
       const cronData = await cronRes.json();
       const modelsData = await modelsRes.json().catch(() => ({ models: [] }));
       const modelOptions = (modelsData.models || [])
@@ -86,9 +95,11 @@ export function AutomationPanel() {
       const nextJobs = cronData.jobs || [];
       setJobs(nextJobs);
       setAvailableModels(modelOptions);
+      setLoadError(null);
       updateBadge(nextJobs);
     } catch (err) {
       console.error('[automation] load failed:', err);
+      setLoadError((window.t ?? ((key: string) => key))('error.code.unexpected'));
     }
   }, []);
 
@@ -122,6 +133,7 @@ export function AutomationPanel() {
   }, [loadData]);
 
   const addManualJob = useCallback(async () => {
+    if (addingManualJob) return;
     const tr = window.t ?? ((p: string) => p);
     const tabAgentId = selectedAgentId && selectedAgentId !== '__unknown__' ? selectedAgentId : null;
     const actorAgentId = tabAgentId || primaryAgentId(agents, currentAgentId);
@@ -140,39 +152,49 @@ export function AutomationPanel() {
     const workspaceFolders = keepsSourceSession
       ? (currentWorkspaceFolders.length > 0 ? currentWorkspaceFolders : (cwd ? [cwd] : []))
       : (cwd ? [cwd] : []);
-    const res = await lingxiFetch('/api/desk/cron', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        action: 'add',
-        scheduleType: 'cron',
-        schedule: '0 9 * * *',
-        label: tr('automation.newAutomation'),
-        prompt: '',
-        enabled: false,
-        actorAgentId,
-        executionContext: {
-          kind: 'ui_manual',
-          cwd,
-          workspaceFolders,
-          authorizedFolders: keepsSourceSession ? currentAuthorizedFolders : [],
-          sourceSessionId: keepsSourceSession ? currentSessionId : null,
-          sourceBridgeSessionKey: null,
-          sourceSessionPath: keepsSourceSession ? currentSessionPath : null,
-          createdByAgentId: actorAgentId,
-        },
-        createdBy: { kind: 'user' },
-      }),
-    });
-    if (!res.ok) {
-      const data = await res.json().catch(() => ({}));
-      addToast(data.error || tr('automation.createFailed'), 'error');
-      return;
+    setAddingManualJob(true);
+    try {
+      const res = await lingxiFetch('/api/desk/cron', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'add',
+          scheduleType: 'cron',
+          schedule: '0 9 * * *',
+          label: tr('automation.newAutomation'),
+          prompt: '',
+          enabled: false,
+          actorAgentId,
+          executionContext: {
+            kind: 'ui_manual',
+            cwd,
+            workspaceFolders,
+            authorizedFolders: keepsSourceSession ? currentAuthorizedFolders : [],
+            sourceSessionId: keepsSourceSession ? currentSessionId : null,
+            sourceBridgeSessionKey: null,
+            sourceSessionPath: keepsSourceSession ? currentSessionPath : null,
+            createdByAgentId: actorAgentId,
+          },
+          createdBy: { kind: 'user' },
+        }),
+        throwOnHttpError: false,
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        const detail = normalizeSessionRouteError(data).message;
+        const prefix = tr('automation.createFailed');
+        addToast(detail ? `${prefix}: ${detail}` : prefix, 'error');
+        return;
+      }
+      const data = await res.json();
+      await loadData();
+      if (data.job?.id) setOpenJobs(prev => ({ ...prev, [data.job.id]: true }));
+    } catch {
+      addToast(tr('automation.createFailed'), 'error');
+    } finally {
+      setAddingManualJob(false);
     }
-    const data = await res.json();
-    await loadData();
-    if (data.job?.id) setOpenJobs(prev => ({ ...prev, [data.job.id]: true }));
-  }, [addToast, agents, currentAgentId, currentAuthorizedFolders, currentSessionId, currentSessionPath, currentSessionProjection?.cwd, currentWorkspaceFolders, deskBasePath, deskWorkspaceMountId, homeFolder, loadData, selectedAgentId]);
+  }, [addToast, addingManualJob, agents, currentAgentId, currentAuthorizedFolders, currentSessionId, currentSessionPath, currentSessionProjection?.cwd, currentWorkspaceFolders, deskBasePath, deskWorkspaceMountId, homeFolder, loadData, selectedAgentId]);
 
   const groups = useMemo(() => groupJobs(jobs, currentAgentId), [currentAgentId, jobs]);
   const tabs = useMemo(() => agentTabIds(agents, groups), [agents, groups]);
@@ -217,7 +239,7 @@ export function AutomationPanel() {
         </div>
         <div className={fp.floatingPanelBody}>
           <div className={styles.toolbar}>
-            <button className={styles.iconButton} type="button" onClick={addManualJob} title={t('automation.add')} aria-label={t('automation.add')}>
+            <button className={styles.iconButton} type="button" onClick={addManualJob} title={t('automation.add')} aria-label={t('automation.add')} disabled={addingManualJob} aria-busy={addingManualJob}>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                 <line x1="12" y1="5" x2="12" y2="19" />
                 <line x1="5" y1="12" x2="19" y2="12" />
@@ -225,9 +247,12 @@ export function AutomationPanel() {
             </button>
           </div>
           <div className={fp.automationList} id="automationList">
-            {tabs.length === 0 ? (
+            {loadError && (
+              <div className={fp.automationEmpty} role="alert">{loadError}</div>
+            )}
+            {tabs.length === 0 ? (!loadError && (
               <div className={fp.automationEmpty}>{t('automation.empty')}</div>
-            ) : (
+            )) : (
               <>
                 <AgentTabScroller
                   items={agentTabItems}
@@ -238,9 +263,9 @@ export function AutomationPanel() {
                   onSelect={setSelectedAgentId}
                 />
                 <div className={styles.groupList}>
-                  {activeJobs.length === 0 ? (
+                  {activeJobs.length === 0 ? (!loadError && (
                     <div className={fp.automationEmpty}>{t('automation.emptyForAgent')}</div>
-                  ) : activeJobs.map(job => (
+                  )) : activeJobs.map(job => (
                     <AutomationCard
                       key={job.id}
                       job={job}

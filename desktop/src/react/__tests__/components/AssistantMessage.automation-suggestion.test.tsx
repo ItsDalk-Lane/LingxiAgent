@@ -7,6 +7,8 @@ import { AssistantMessage } from '../../components/chat/AssistantMessage';
 import { lingxiFetch } from '../../hooks/use-hana-fetch';
 import { useStore } from '../../stores';
 
+const addToast = vi.fn();
+
 vi.mock('../../hooks/use-hana-fetch', () => ({
   lingxiFetch: vi.fn(async () => new Response(JSON.stringify({ ok: true }), { status: 200 })),
   lingxiUrl: (path: string) => `http://127.0.0.1:3210${path}`,
@@ -70,7 +72,9 @@ describe('AssistantMessage automation suggestion card', () => {
       sessions: [{ sessionId: 'session-main', path: '/sessions/main.jsonl' }],
       streamingSessions: [],
       selectedMessageIdsBySession: {},
+      addToast,
     } as never);
+    addToast.mockReset();
     vi.mocked(lingxiFetch).mockReset();
     vi.mocked(lingxiFetch).mockResolvedValue(new Response(JSON.stringify({ ok: true }), { status: 200 }));
   });
@@ -166,5 +170,38 @@ describe('AssistantMessage automation suggestion card', () => {
       expect(body.jobData.type).toBe('every');
       expect(body.jobData.schedule).toBe(7_200_000);
     });
+  });
+
+  it('shows a structured create failure, keeps the draft open, and allows retry', async () => {
+    vi.mocked(lingxiFetch)
+      .mockResolvedValueOnce(new Response(JSON.stringify({
+        error: {
+          code: 'cron_store_corrupt',
+          message: 'automation task storage is corrupt',
+        },
+      }), { status: 500 }))
+      .mockResolvedValueOnce(new Response(JSON.stringify({ ok: true }), { status: 200 }));
+    renderSuggestion('pending');
+
+    fireEvent.click(screen.getByRole('button', { name: 'automation.openDraft' }));
+    fireEvent.click(screen.getByRole('button', { name: 'automation.confirmCreate' }));
+
+    await waitFor(() => {
+      expect(addToast).toHaveBeenCalledWith(
+        'automation.createFailed: automation task storage is corrupt',
+        'error',
+      );
+    });
+    expect(screen.getByRole('dialog', { name: 'automation.draftTitle' })).toBeInTheDocument();
+    expect(vi.mocked(lingxiFetch).mock.calls[0][1]).toEqual(expect.objectContaining({
+      throwOnHttpError: false,
+    }));
+
+    fireEvent.click(screen.getByRole('button', { name: 'automation.confirmCreate' }));
+
+    await waitFor(() => {
+      expect(screen.queryByRole('dialog', { name: 'automation.draftTitle' })).not.toBeInTheDocument();
+    });
+    expect(lingxiFetch).toHaveBeenCalledTimes(2);
   });
 });
