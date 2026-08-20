@@ -17,7 +17,7 @@
  * 约束：branch HEAD 可能比 VERIFIED_SOURCE_SHA 多出审计收口提交；但绝不允许
  * 在 VERIFIED_SOURCE_SHA 之后偷偷修改业务实现却继续声称验证有效。
  */
-import { execSync } from "node:child_process";
+import { execFileSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -46,8 +46,11 @@ function verifiedSourceSha(): string {
 
 function diffNamesSinceVerified(): string[] {
   const sha = verifiedSourceSha();
-  const out = execSync(
-    `git diff --name-only ${sha}..HEAD`,
+  // execFileSync 数组传参（不经 shell）：execSync 在 Windows 走 cmd.exe，
+  // rev-parse 的 `^{commit}` 里 ^ 是 cmd 转义符会被吞掉，导致坐标误判为不可达。
+  const out = execFileSync(
+    "git",
+    ["diff", "--name-only", `${sha}..HEAD`],
     { cwd: ROOT, encoding: "utf-8" },
   );
   return out.split("\n").map((s) => s.trim()).filter(Boolean);
@@ -58,7 +61,7 @@ describe("post-verification audit seal (diff guard)", () => {
     const sha = verifiedSourceSha();
     expect(sha).toMatch(/^[0-9a-f]{40}$/);
     // 若坐标不可达，下方 git diff 直接失败；这里显式给出可读错误。
-    expect(() => execSync(`git rev-parse --verify ${sha}^{commit}`, { cwd: ROOT }))
+    expect(() => execFileSync("git", ["rev-parse", "--verify", `${sha}^{commit}`], { cwd: ROOT }))
       .not.toThrow();
   });
 
