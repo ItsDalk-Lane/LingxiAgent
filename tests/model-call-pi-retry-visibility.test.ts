@@ -18,7 +18,6 @@
 import { describe, it, expect, afterEach, vi } from "vitest";
 // 深路径引入被测实现本身——这就是 runtime 实证，不是复述源码结论。
 // pi-ai 的 exports map 不公开该模块，测试按文件路径直引（仅测试用）。
-// @ts-expect-error 无类型声明的内部模块
 import { retryProviderRequest } from "../node_modules/@earendil-works/pi-ai/dist/utils/provider-retry.js";
 import { createAssistantMessageEventStream } from "@earendil-works/pi-ai";
 import { installModelCallStreamObserver } from "../lib/pi-sdk/model-call-stream-observer.ts";
@@ -76,7 +75,7 @@ describe("transport retry 对 Observer 的可见性（Scenario H）", () => {
 
     // 模拟 pi-ai streamSimple 内部结构：streamFn 被调用一次，内部经
     // retryProviderRequest 发出多个真实网络 attempt。
-    const innerStreamFn = async () => {
+    const innerStreamFn = async (..._args: unknown[]) => {
       const body = await retryProviderRequest(networkAttempts, { maxRetries: 3 });
       expect(body).toBe("response-body");
       const stream = createAssistantMessageEventStream();
