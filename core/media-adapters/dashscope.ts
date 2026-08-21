@@ -6,6 +6,7 @@ import {
   saveBase64Images,
 } from "./common.ts";
 import { t } from "../../lib/i18n.ts";
+import { observedProviderFetch } from "../../lib/llm/model-call-integration.ts";
 
 const DEFAULT_BASE_URL = "https://dashscope.aliyuncs.com/api/v1";
 const WAN_IMAGE_RATIOS = new Set(["1:1", "16:9", "9:16", "4:3", "3:4", "3:2", "2:3", "21:9"]);
@@ -258,10 +259,17 @@ export const dashscopeImageAdapter = {
     };
     if (family !== "qwen-multimodal") headers["X-DashScope-Async"] = "enable";
 
-    const res = await fetch(`${resolveDashScopeBaseUrl(creds.baseUrl)}${endpoint}`, {
+    const res = await observedProviderFetch(ctx, () => fetch(`${resolveDashScopeBaseUrl(creds.baseUrl)}${endpoint}`, {
       method: "POST",
       headers,
       body: JSON.stringify(body),
+    }), {
+      requestDetails: {
+        protocol: family,
+        mediaType: "image",
+        asyncTask: family !== "qwen-multimodal",
+        hasReferenceMedia: images.length > 0,
+      },
     });
 
     if (!res.ok) {

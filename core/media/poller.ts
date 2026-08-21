@@ -15,7 +15,9 @@
 import { dirname, join as pathJoin } from "node:path";
 import { readImageSize } from "./image-size.ts";
 import { isResponseDelivery } from "./image-task-runner.ts";
-import { withModelRequestAccounting } from "../../lib/llm/model-request-accounting.ts";
+// Control-plane poller：媒体任务查询不是 Model Call（§四十七），不使用
+// model-request-accounting。usageLedger 构造参数保留以兼容既有装配，
+// 但 query 不再写模型用量账本。
 
 const TICK_MS = 5_000;
 const TWO_MINUTES = 2 * 60 * 1000;
@@ -389,23 +391,11 @@ export class Poller {
 
     let result;
     try {
-      result = await withModelRequestAccounting({
-        usageLedger: this._usageLedger,
-        model: {
-          provider: task.providerId || task.adapterId,
-          modelId: task.modelId,
-          api: task.protocolId || adapter?.protocolId,
-        },
-        usageContext: {
-          source: { subsystem: "media", operation: "query", surface: "background", trigger: "poller" },
-          attribution: {
-            kind: "session",
-            ...(task.sessionId ? { sessionId: task.sessionId } : {}),
-            ...(task.sessionPath ? { sessionPath: task.sessionPath } : {}),
-          },
-        },
-        metadata: { taskId, mediaType: task.type || null },
-      }, () => adapter.query(task.adapterTaskId || taskId, ctx));
+      // 控制面（§四十七/§四十八）：query 只查询已提交任务的状态，不触发生成
+      // ——不是 Model Call。不进 ModelCallObserver，也不再写 Usage Ledger
+      // （原先每次 poll 产生一条 media/query usage_missing，污染模型统计）；
+      // 诊断继续走日志与 TaskStore 状态。
+      result = await adapter.query(task.adapterTaskId || taskId, ctx);
       // Re-check cancellation fence after await — cancel() may have fired while query was in-flight
       if (this._cancelled.has(taskId)) return;
     } catch (err) {

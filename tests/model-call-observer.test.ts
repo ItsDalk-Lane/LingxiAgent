@@ -8,6 +8,7 @@ import {
   MODEL_CALL_EVENT_TYPES,
   NOOP_MODEL_CALL_OBSERVER,
   getModelCallObserver,
+  markModelCallSafeMessage,
   modelCallFieldsFromUsageContext,
   normalizeModelCallError,
   safeEmitModelCallEvent,
@@ -168,7 +169,9 @@ describe("ModelCallObserver contract", () => {
       "logical_call_end",
     ]);
     expect(observer.events.at(-1)).toMatchObject({ status: "error" });
-    expect(observer.events[2].error).toEqual({ name: "Error", message: "network down" });
+    // Phase 2.5 错误安全契约：未标记 safe 的 error.message 不进事件（null），
+    // 只保留 name + code 结构事实。
+    expect(observer.events[2].error).toEqual({ name: "Error", message: null, code: null });
   });
 
   it("endLogicalCall 恰好投递一次（幂等）", () => {
@@ -237,12 +240,27 @@ describe("model call identity", () => {
 });
 
 describe("context helpers", () => {
-  it("normalizeModelCallError 只保留 name + 截断 message", () => {
-    expect(normalizeModelCallError(null)).toEqual({ name: null, message: null });
-    expect(normalizeModelCallError(new TypeError("bad"))).toEqual({ name: "TypeError", message: "bad" });
-    const long = normalizeModelCallError(new Error("x".repeat(5_000)));
-    expect(long.message!.length).toBeLessThan(1_100);
-    expect(long.message).toContain("[truncated]");
+  it("normalizeModelCallError 只保留 name/code + 显式标记的 safe message", () => {
+    expect(normalizeModelCallError(null)).toEqual({ name: null, message: null, code: null });
+    expect(normalizeModelCallError(new TypeError("bad"))).toEqual({ name: "TypeError", message: null, code: null });
+    // Provider raw body 的典型入口（error.message）不再进入 Observer。
+    const providerBody = new Error("TOP_SECRET_PROVIDER_RESPONSE_8F91C2");
+    expect(normalizeModelCallError(providerBody).message).toBeNull();
+    // 内部固定文案经 markModelCallSafeMessage 显式标记后放行（截断仍生效）。
+    expect(normalizeModelCallError(markModelCallSafeMessage(new Error("ok"), "internal fixed text")).message)
+      .toBe("internal fixed text");
+    const long = markModelCallSafeMessage(new Error("x"), "x".repeat(5_000));
+    const normalizedLong = normalizeModelCallError(long);
+    expect(normalizedLong.message!.length).toBeLessThan(1_100);
+    expect(normalizedLong.message).toContain("[truncated]");
+    // code 是内部错误码（AppError 等），属于安全结构事实。
+    const appErr: any = new Error("provider echoed secret");
+    appErr.code = "LLM_RATE_LIMITED";
+    expect(normalizeModelCallError(appErr)).toEqual({
+      name: "Error",
+      message: null,
+      code: "LLM_RATE_LIMITED",
+    });
   });
 
   it("modelCallFieldsFromUsageContext 复用 usage-context 归一化，不为 unknown 造假", () => {

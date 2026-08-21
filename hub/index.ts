@@ -16,7 +16,6 @@ import path from "path";
 import fs from "fs";
 import crypto from "crypto";
 import { EventBus } from "./event-bus.ts";
-import { withModelRequestAccounting } from "../lib/llm/model-request-accounting.ts";
 import { ChannelRouter } from "./channel-router.ts";
 import { GuestHandler } from "./guest-handler.ts";
 import { Scheduler } from "./scheduler.ts";
@@ -750,24 +749,15 @@ export class Hub {
       operation,
     }: any = {}, requestContext: any = null) => {
       try {
-        const callerPluginId = requestContext?.caller?.kind === "plugin"
-          ? requestContext.caller.pluginId
-          : null;
-        const permit = await withModelRequestAccounting({
-          usageLedger: engine.usageLedger,
-          model: { provider: providerId, modelId: null, api: "external-cli" },
-          usageContext: {
-            source: { subsystem: "media", operation, surface: "plugin", trigger: "adapter" },
-            attribution: { kind: "external-boundary", providerId, pluginId: callerPluginId },
-          },
-          metadata: { boundaryId, operation },
-        }, async () => {
-          const owner = assertProviderPluginOwner(engine.providerRegistry, providerId, requestContext);
-          return engine.providerRegistry.authorizeExternalCredentialUse(providerId, {
-            boundaryId,
-            operation,
-            pluginId: owner.pluginId,
-          });
+        // 控制面（§三十二/§四十八）：外部凭证许可只是安全控制面动作，不是模型
+        // 请求——不进 ModelCallObserver，也不再写 Usage Ledger（原先每次许可
+        // 签发都会多出一条 external-cli「模型用量」，污染统计）。凭证审计继续
+        // 走本 handler 的返回值与 providerRegistry 诊断。
+        const owner = assertProviderPluginOwner(engine.providerRegistry, providerId, requestContext);
+        const permit = await engine.providerRegistry.authorizeExternalCredentialUse(providerId, {
+          boundaryId,
+          operation,
+          pluginId: owner.pluginId,
         });
         return { ok: true, permit };
       } catch (err) {

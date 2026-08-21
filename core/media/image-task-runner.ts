@@ -1,6 +1,10 @@
 import path from "node:path";
 import { t } from "../../lib/i18n.ts";
 import { withModelRequestAccounting } from "../../lib/llm/model-request-accounting.ts";
+import {
+  beginObservedModelCall,
+  failObservedModelCall,
+} from "../../lib/llm/model-call-integration.ts";
 
 export function createTaskId() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
@@ -397,15 +401,37 @@ export function markSubmitFailed({ taskId, err, store, ctx }) {
 }
 
 export async function runSubmitInBackground({ taskId, adapter, params, submitCtx, store, poller, ctx }) {
+  // MC-06 逻辑调用边界（§二十三）：一次 image generation submit = 一个 logical
+  // call；poll / 资产下载不是。callId 在 adapter 网络请求之前铸好，同时写进
+  // ledger metadata（observer.callId ↔ ledger.metadata.modelCallId）。
+  const sessionTarget = normalizeSessionRef(ctx);
+  const modelIdentity = {
+    provider: params?.providerId || adapter?.id || null,
+    modelId: params?.modelId || params?.model || null,
+    api: params?.protocolId || adapter?.protocolId || null,
+  };
+  const referenceCount = countReferenceImages(params?.image);
+  const recorder = beginObservedModelCall({
+    model: modelIdentity,
+    source: { subsystem: "media", operation: "submit", surface: "tool", trigger: "user" },
+    attribution: {
+      kind: "session",
+      ...(sessionTarget.sessionId ? { sessionId: sessionTarget.sessionId } : {}),
+      ...(sessionTarget.sessionPath ? { sessionPath: sessionTarget.sessionPath } : {}),
+    },
+    details: {
+      path: "media_image_submit",
+      mediaType: "image",
+      hasReferenceMedia: referenceCount > 0,
+      referenceCount,
+      taskId,
+    },
+  });
+  const observedSubmitCtx = { ...submitCtx, modelCall: recorder };
   try {
-    const sessionTarget = normalizeSessionRef(ctx);
     const result = await withModelRequestAccounting({
       usageLedger: ctx?.usageLedger,
-      model: {
-        provider: params?.providerId || adapter?.id,
-        modelId: params?.modelId || params?.model,
-        api: params?.protocolId || adapter?.protocolId,
-      },
+      model: modelIdentity,
       usageContext: {
         source: { subsystem: "media", operation: "submit", surface: "tool", trigger: "user" },
         attribution: {
@@ -414,8 +440,8 @@ export async function runSubmitInBackground({ taskId, adapter, params, submitCtx
           ...(sessionTarget.sessionPath ? { sessionPath: sessionTarget.sessionPath } : {}),
         },
       },
-      metadata: { taskId, mediaType: "image" },
-    }, () => adapter.submit(params, submitCtx));
+      metadata: { taskId, mediaType: "image", modelCallId: recorder.callId },
+    }, () => adapter.submit(params, observedSubmitCtx));
     const hasProviderTaskId = typeof result?.taskId === "string" && result.taskId.trim();
     const adapterTaskId = hasProviderTaskId ? result.taskId : taskId;
     const files = Array.isArray(result?.files) ? result.files.filter(Boolean) : [];
@@ -423,6 +449,17 @@ export async function runSubmitInBackground({ taskId, adapter, params, submitCtx
     if (!hasProviderTaskId && files.length === 0) {
       throw new Error(t("plugin.imageGen.noTaskIdOrFile"));
     }
+
+    // Provider 接受 generation task（或直接产出文件）即语义完成（§二十八）：
+    // 异步 Provider 的后续 poll 不是这次 Model Call 的一部分。
+    recorder.semanticResponseCompleted({
+      details: {
+        deferred: files.length === 0,
+        providerTaskId: hasProviderTaskId ? result.taskId : null,
+        fileCount: files.length,
+      },
+    });
+    recorder.endLogicalCall("ok");
 
     store.update(taskId, {
       submitState: "submitted",
@@ -434,6 +471,7 @@ export async function runSubmitInBackground({ taskId, adapter, params, submitCtx
       void poller.checkNow(taskId);
     }
   } catch (err) {
+    failObservedModelCall(recorder, err, { errorKind: "adapter_error" });
     markSubmitFailed({ taskId, err, store, ctx });
   }
 }

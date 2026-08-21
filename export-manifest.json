@@ -323,6 +323,7 @@
     "lib/llm/model-call-identity.ts",
     "lib/llm/model-call-observer.ts",
     "lib/llm/model-call-observer-testing.ts",
+    "lib/llm/model-call-integration.ts",
     "lib/llm/model-call-recorder.ts",
     "lib/llm/model-call-scope.ts",
     "lib/llm/model-request-accounting.ts",

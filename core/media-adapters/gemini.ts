@@ -5,6 +5,7 @@ import {
   saveBase64Images,
 } from "./common.ts";
 import { t } from "../../lib/i18n.ts";
+import { observedProviderFetch } from "../../lib/llm/model-call-integration.ts";
 
 const DEFAULT_BASE_URL = "https://generativelanguage.googleapis.com/v1beta";
 const GEMINI_25_RATIOS = ["1:1", "3:2", "2:3", "3:4", "4:3", "4:5", "5:4", "9:16", "16:9", "21:9"];
@@ -228,13 +229,20 @@ export const geminiImageAdapter = {
       },
     };
 
-    const res = await fetch(`${normalizeBaseUrl(creds.baseUrl, DEFAULT_BASE_URL)}/models/${encodeURIComponent(modelId)}:generateContent`, {
+    const res = await observedProviderFetch(ctx, () => fetch(`${normalizeBaseUrl(creds.baseUrl, DEFAULT_BASE_URL)}/models/${encodeURIComponent(modelId)}:generateContent`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         "x-goog-api-key": creds.apiKey,
       },
       body: JSON.stringify(body),
+    }), {
+      // 注意：remoteImageToInlinePart 的参考图下载是资产传输，不是模型 attempt。
+      requestDetails: {
+        protocol: "gemini-generate-content-image",
+        mediaType: "image",
+        hasReferenceMedia: inputImages.length > 0,
+      },
     });
 
     if (!res.ok) {

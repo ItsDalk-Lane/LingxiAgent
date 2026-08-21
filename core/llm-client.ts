@@ -7,6 +7,7 @@ import { appendProviderApiPath, withDefaultProviderHeaders } from '../lib/llm/pr
 import { mergeProviderHeaders } from '../shared/provider-auth.ts';
 import {
   extractProviderRequestId,
+  markModelCallSafeMessage,
   modelCallFieldsFromUsageContext,
   summarizeProviderRequestPayload,
   type ModelCallObserver,
@@ -674,7 +675,11 @@ export async function callText({
     try {
       data = rawText ? JSON.parse(rawText) : null;
     } catch {
-      throw new Error(`LLM returned invalid JSON (status=${res.status})`);
+      // 内部固定文案（只含 status）——按 safe-message contract 标记后可进 Observer。
+      throw markModelCallSafeMessage(
+        new Error(`LLM returned invalid JSON (status=${res.status})`),
+        `LLM returned invalid JSON (status=${res.status})`,
+      );
     }
   }
   observedUsagePayload = data?.usage ?? null;
@@ -738,16 +743,20 @@ export async function callText({
     if (combinedSignal.aborted) {
       throw new AppError('LLM_TIMEOUT', { context: { model: modelId } });
     }
-    throw new AppError('LLM_EMPTY_RESPONSE', {
-      message: emptyAfterThinking
-        ? EMPTY_AFTER_THINKING_MESSAGE
-        : undefined,
-      context: {
-        model: modelId,
-        ...(emptyAfterThinking ? { reason: "empty_after_thinking" } : {}),
-        ...(stopReason ? { stopReason } : {}),
-      },
-    });
+    // EMPTY_AFTER_THINKING_MESSAGE 是仓库固定文案 → 标记 safe；其余 message=null。
+    throw markModelCallSafeMessage(
+      new AppError('LLM_EMPTY_RESPONSE', {
+        message: emptyAfterThinking
+          ? EMPTY_AFTER_THINKING_MESSAGE
+          : undefined,
+        context: {
+          model: modelId,
+          ...(emptyAfterThinking ? { reason: "empty_after_thinking" } : {}),
+          ...(stopReason ? { stopReason } : {}),
+        },
+      }),
+      emptyAfterThinking ? EMPTY_AFTER_THINKING_MESSAGE : "LLM_EMPTY_RESPONSE",
+    );
   }
 
   const usage = normalizeLlmUsage(data?.usage, { costRates: modelObj?.cost });

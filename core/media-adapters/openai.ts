@@ -2,6 +2,7 @@
 import fs from "fs";
 import path from "path";
 import { saveImage } from "../media/download.ts";
+import { observedProviderFetch } from "../../lib/llm/model-call-integration.ts";
 import { resolveModelId } from "./model-catalog.ts";
 import {
   OPENAI_FLEXIBLE_IMAGE_RATIOS,
@@ -206,10 +207,17 @@ export const openaiImageAdapter = {
     };
     if (!multipartEditBody) headers["Content-Type"] = "application/json";
 
-    const res = await fetch(endpoint, {
+    const res = await observedProviderFetch(ctx, () => fetch(endpoint, {
       method: "POST",
       headers,
       body: requestBody,
+    }), {
+      requestDetails: {
+        protocol: "openai-images",
+        mediaType: "image",
+        multipart: Boolean(multipartEditBody),
+        hasReferenceMedia: images.length > 0,
+      },
     });
 
     if (!res.ok) {

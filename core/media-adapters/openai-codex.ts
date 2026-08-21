@@ -2,6 +2,7 @@
 import fs from "fs";
 import path from "path";
 import { saveImage } from "../media/download.ts";
+import { observedProviderFetch } from "../../lib/llm/model-call-integration.ts";
 import {
   CODEX_IMAGE_RESOLUTION_TIERS,
   OPENAI_FLEXIBLE_IMAGE_RATIOS,
@@ -235,7 +236,7 @@ export const openaiCodexImageAdapter = {
       parallel_tool_calls: false,
     };
 
-    const performRequest = (credentials) => fetch(resolveCodexResponsesUrl(credentials.baseUrl), {
+    const performRequest = (credentials) => observedProviderFetch(ctx, () => fetch(resolveCodexResponsesUrl(credentials.baseUrl), {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -245,12 +246,23 @@ export const openaiCodexImageAdapter = {
         "originator": "pi",
       },
       body: JSON.stringify(body),
+    }), {
+      // MC-06 HTTP attempt 结构摘要：只描述形状，绝不携带 prompt/参考图。
+      requestDetails: {
+        protocol: "openai-codex-responses",
+        mediaType: "image",
+        streaming: true,
+        hasReferenceMedia: normalizeImages(params.image).length > 0,
+      },
     });
 
+    // attempt 1
     let res = await performRequest(creds);
     if (res.status === 401) {
       // The backend can reject an access token before the locally recorded
       // expiry, so rotate the credential once and retry with the new token.
+      // 401 的 attempt_error 已由 observedProviderFetch 投递；credential refresh
+      // 本身是控制面，不是新的 logical call（§二十六）。attempt 2 = 新 attemptId。
       creds = await getCredentials(ctx, { forceRefresh: true, staleApiKey: creds.apiKey });
       res = await performRequest(creds);
     }

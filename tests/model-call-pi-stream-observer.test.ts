@@ -182,7 +182,11 @@ describe("installModelCallStreamObserver — MC-01 普通 chat", () => {
       "logical_call_error",
       "logical_call_end",
     ]);
-    expect(observer.eventsOfType("logical_call_error")[0].error?.message).toContain("provider exploded");
+    // Phase 2.5 错误安全契约：provider 流错误正文（errorMessage）不得进入
+    // Observer——message=null，只留 name 结构事实。
+    const logicalError = observer.eventsOfType("logical_call_error")[0];
+    expect(logicalError.error).toEqual({ name: "Error", message: null, code: null });
+    expect(JSON.stringify(observer.events)).not.toContain("provider exploded");
     expect(observer.eventsOfType("logical_call_end")[0].status).toBe("error");
   });
 

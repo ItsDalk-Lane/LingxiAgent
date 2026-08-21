@@ -2,6 +2,7 @@
 import fs from "fs";
 import path from "path";
 import { saveImage } from "../media/download.ts";
+import { observedProviderFetch } from "../../lib/llm/model-call-integration.ts";
 import { resolveModelId } from "./model-catalog.ts";
 import { t } from "../../lib/i18n.ts";
 
@@ -209,13 +210,19 @@ export const volcengineImageAdapter = {
 
     // 6. Call HTTP API
     const url = `${baseUrl.replace(/\/+$/, "")}/images/generations`;
-    const res = await fetch(url, {
+    const res = await observedProviderFetch(ctx, () => fetch(url, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${apiKey}`,
       },
       body: JSON.stringify(body),
+    }), {
+      requestDetails: {
+        protocol: "volcengine-images",
+        mediaType: "image",
+        hasReferenceMedia: Boolean(params.image),
+      },
     });
 
     if (!res.ok) {

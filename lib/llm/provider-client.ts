@@ -8,6 +8,7 @@
 import { t } from "../i18n.ts";
 import { normalizeProviderHeaders } from "../../shared/provider-auth.ts";
 import { withModelRequestAccounting } from "./model-request-accounting.ts";
+import { beginObservedModelCall, failObservedModelCall, observedProviderFetch } from "./model-call-integration.ts";
 
 export const DEFAULT_PROVIDER_USER_AGENT = "LingxiAgent/1.0";
 const DEFAULT_ANTHROPIC_PROBE_MODEL = "claude-sonnet-4-6";
@@ -287,14 +288,34 @@ export async function probeProvider({
   });
 
   const effectiveModelId = modelId || (api === "anthropic-messages" ? DEFAULT_ANTHROPIC_PROBE_MODEL : null);
-  return withModelRequestAccounting({
-    usageLedger,
+
+  // MC-05 语义拆分（§十八/§二十一）：Anthropic 分支是真实最小生成调用
+  // （POST /v1/messages，固定 prompt、max_tokens=1）→ 进入 ModelCallObserver，
+  // 请求前铸 callId 并写进 ledger metadata。其它协议只是 GET /models 模型
+  // 目录发现 → CONTROL_PLANE：0 observer 事件、不进 Usage Ledger。
+  if (api !== "anthropic-messages") {
+    const res = await fetch(probe.url, { headers, signal: AbortSignal.timeout(10000) });
+    return buildProbeResult(res);
+  }
+
+  const recorder = beginObservedModelCall({
     model: { provider: providerId, modelId: effectiveModelId, api },
     usageContext,
-    metadata: { operation: "connectivity-probe" },
-  }, async () => {
-    if (api === "anthropic-messages") {
-      const res = await fetch(probe.url, {
+    details: {
+      path: "provider_probe",
+      probeKind: "generation",
+      protocol: api,
+      operation: "connectivity-probe",
+    },
+  });
+  try {
+    const result = await withModelRequestAccounting({
+      usageLedger,
+      model: { provider: providerId, modelId: effectiveModelId, api },
+      usageContext,
+      metadata: { operation: "connectivity-probe", modelCallId: recorder.callId },
+    }, async () => {
+      const res = await observedProviderFetch({ modelCall: recorder }, () => fetch(probe.url, {
         method: probe.method,
         headers,
         body: JSON.stringify({
@@ -303,13 +324,28 @@ export async function probeProvider({
           messages: [{ role: "user", content: "." }],
         }),
         signal: AbortSignal.timeout(10000),
-      });
+      }), { requestDetails: { protocol: api, messageCount: 1 } });
       return buildProbeResult(res);
+    });
+    if (result?.ok) {
+      recorder.semanticResponseCompleted({
+        details: { probeAccepted: true, httpStatus: result?.status ?? null },
+      });
+      recorder.endLogicalCall("ok");
+    } else {
+      recorder.logicalCallError(new Error(`connectivity probe rejected`), {
+        details: { probeAccepted: false, httpStatus: result?.status ?? null, errorKind: "http_error" },
+      });
+      recorder.endLogicalCall("error", { details: { errorKind: "http_error" } });
     }
-
-    const res = await fetch(probe.url, { headers, signal: AbortSignal.timeout(10000) });
-    return buildProbeResult(res);
-  });
+    return result;
+  } catch (err) {
+    const errorKind = err?.name === "TimeoutError" || err?.name === "AbortError" || err?.type === "aborted"
+      ? "timeout"
+      : "provider_or_network";
+    failObservedModelCall(recorder, err, { errorKind });
+    throw err;
+  }
 }
 
 async function buildProbeResult(res) {

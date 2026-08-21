@@ -3003,7 +3003,7 @@
   ],
   "review": {
     "classification": "compatible",
-    "compatibilityReason": "Model call observer wiring only: registerSessionModelCallContext/streamFn wrapper registration and extension factory registration in guarded modules; no store shape, schema, key, or persistence format changed.",
+    "compatibilityReason": "Model Call Observer runtime-only integration (Phase 2.5/3A/3B): guarded modules (media adapters, universal-media-manager submit, hub credential handler) gain observer lifecycle calls; media poll + external credential authorization leave the usage ledger (control-plane cleanup). No store shape, format, or schema change.",
     "payloadFingerprint": "sha256:252cdf1226105980a227290c65f5d98165a3a0b559e146e445511ed3edee68c5"
   },
   "schemas": [

@@ -87,11 +87,57 @@ export type ModelCallEvent = {
   status?: ModelCallTerminalStatus | null;
   /**
    * 小型安全 metadata 包：只放不可逆结构信息（messageCount、stopReason、
-   * usagePresent、attemptVisibility、errorKind…）。禁止正文与秘密。
+   * usagePresent、attemptVisibility、errorKind…）。进入事件前统一经过
+   * sanitizeModelCallDetails 机器安全门（fail closed），禁止正文与秘密。
    */
   details?: Record<string, unknown> | null;
-  /** 错误摘要：仅 name + message（截断），与 Usage Ledger 的风险口径一致。 */
-  error?: { name: string | null; message: string | null } | null;
+  /**
+   * 安全错误事实：name + code（内部固定错误码）+ message（仅显式 safe 标记的
+   * 内部固定文案）。Provider 返回的不可信错误正文（error.message fallback
+   * rawText 等）一律 message=null——缺少错误正文好过泄漏进 Observer。
+   */
+  error?: ModelCallErrorSummary | null;
+};
+
+/**
+ * Attempt 可见度统一枚举（§五十三）：一个 attemptId 的事实精确到什么程度。
+ *   exact                    Lingxi 亲眼看到这次网络请求的全部边界（自有 fetch）
+ *   logical_boundary         一个逻辑边界（streamFn 调用）折叠为一次 attempt，
+ *                            SDK 内部 transport retry 不可见（Pi MC-01/02/03）
+ *   external_process_boundary 请求发生在外部进程内（CLI），只见进程边界
+ * 禁止自由字符串；未来 Query 依赖该枚举判断数据精度。
+ */
+export const MODEL_CALL_ATTEMPT_VISIBILITY = [
+  "exact",
+  "logical_boundary",
+  "external_process_boundary",
+] as const;
+export type ModelCallAttemptVisibility = typeof MODEL_CALL_ATTEMPT_VISIBILITY[number];
+
+/**
+ * Provider wire 可见度（§五十四）：Lingxi 对该 attempt 的 Provider 请求/响应
+ * 边界究竟看到多少。opaque（CLI）与「没捕获」不是同一种缺失——不捕获时不
+ * 写该字段，不伪造。
+ */
+export const MODEL_CALL_PROVIDER_WIRE_VISIBILITY = [
+  "request_response",
+  "response_only",
+  "opaque",
+] as const;
+export type ModelCallProviderWireVisibility = typeof MODEL_CALL_PROVIDER_WIRE_VISIBILITY[number];
+
+/**
+ * Safe-message contract 标记：错误对象带此 symbol 且值为 string 时，其
+ * message 才允许进入 Observer 事件。只允许标记仓库内部固定文案（如
+ * "LLM returned invalid JSON (status=…)"）；任何来自 Provider 响应正文、
+ * 网络对端、外部 stdout 的文本都不得标记。
+ */
+export const MODEL_CALL_SAFE_MESSAGE: unique symbol = Symbol.for("lingxi.modelCallSafeMessage");
+
+export type ModelCallErrorSummary = {
+  name: string | null;
+  message: string | null;
+  code: string | null;
 };
 
 export interface ModelCallObserver {
@@ -139,6 +185,8 @@ export function safeEmitModelCallEvent(
 }
 
 const ERROR_MESSAGE_MAX_CHARS = 1_000;
+const ERROR_NAME_MAX_CHARS = 128;
+const PROVIDER_REQUEST_ID_MAX_CHARS = 128;
 
 /**
  * Provider request id 抽取：只认响应头里的常见 id 字段（allowlist），
@@ -164,22 +212,54 @@ export function extractProviderRequestId(headers: unknown): string | null {
       const record = headers as Record<string, unknown>;
       value = record[name] ?? record[name.toLowerCase()];
     }
-    if (typeof value === "string" && value.trim()) return value.trim();
+    if (typeof value === "string" && value.trim()) return sanitizeProviderRequestId(value);
   }
   return null;
 }
 
-/** 错误摘要只允许 name + 截断 message（同 Usage Ledger 口径），不保存堆栈/正文。 */
-export function normalizeModelCallError(error: unknown): { name: string | null; message: string | null } {
-  if (!error) return { name: null, message: null };
-  const name = typeof (error as any)?.name === "string" ? (error as any).name : null;
-  let message: string | null;
-  if (typeof (error as any)?.message === "string") message = (error as any).message;
-  else message = typeof error === "string" ? error : String(error);
-  if (typeof message === "string" && message.length > ERROR_MESSAGE_MAX_CHARS) {
-    message = `${message.slice(0, ERROR_MESSAGE_MAX_CHARS)}…[truncated]`;
+/**
+ * providerRequestId 基本边界（§五十二）：string only、trim、长度上限。
+ * 异常超长值（恶意 Provider 经 x-request-id 塞内容）整体丢弃为 null，
+ * 不截断保留。
+ */
+export function sanitizeProviderRequestId(value: unknown): string | null {
+  if (typeof value !== "string") return null;
+  const trimmed = value.trim();
+  if (!trimmed || trimmed.length > PROVIDER_REQUEST_ID_MAX_CHARS) return null;
+  return trimmed;
+}
+
+function boundedErrorText(value: unknown, max: number): string | null {
+  if (typeof value !== "string" || !value.trim()) return null;
+  const trimmed = value.trim();
+  return trimmed.length > max ? `${trimmed.slice(0, max)}…[truncated]` : trimmed;
+}
+
+/**
+ * 错误摘要 = 安全错误事实（§七）：name（截断）+ code（内部错误码）+
+ * message（仅 MODEL_CALL_SAFE_MESSAGE 显式标记的内部固定文案）。
+ * Provider raw error body 的唯一入口是 error.message fallback——该链在
+ * 这里被切断：无标记 → message=null。
+ */
+export function normalizeModelCallError(error: unknown): ModelCallErrorSummary {
+  if (!error) return { name: null, message: null, code: null };
+  const source = (error && typeof error === "object" ? error : {}) as Record<string, unknown>;
+  const safeMessage = source[MODEL_CALL_SAFE_MESSAGE as unknown as string];
+  return {
+    name: boundedErrorText(source.name, ERROR_NAME_MAX_CHARS),
+    message: typeof safeMessage === "string" ? boundedErrorText(safeMessage, ERROR_MESSAGE_MAX_CHARS) : null,
+    code: boundedErrorText(source.code, ERROR_NAME_MAX_CHARS),
+  };
+}
+
+/** 给内部固定错误文案打 safe 标记（唯一合法入口）。 */
+export function markModelCallSafeMessage<T extends object>(error: T, message: string): T {
+  try {
+    (error as any)[MODEL_CALL_SAFE_MESSAGE] = message;
+  } catch {
+    // frozen/sealed 对象打不上标记 → message 保持 null（fail closed）。
   }
-  return { name, message };
+  return error;
 }
 
 export function normalizeModelCallIdentity(model: unknown): ModelCallModelIdentity {
@@ -258,4 +338,90 @@ function detectMediaInMessages(messages: any[]): boolean {
 
 function textOrNull(value: unknown): string | null {
   return typeof value === "string" && value.trim() ? value.trim() : null;
+}
+
+/* ── Metadata Safety Gate（§九/§十/§十一）──────────────────────────────
+ *
+ * details 的安全契约不能只靠注释：所有事件在投递前统一经过本 gate，
+ * 机器执行、fail closed——禁入键直接丢弃，值形状不合法直接丢弃。
+ *
+ * 两层防线：
+ *   1. 键 denylist（大小写/分隔符归一后整键匹配）：prompt/systemPrompt/
+ *      messages/message/content/text/body/rawBody/… （§十全表）。
+ *      hasText/messageCount 这类布尔/计数键与被禁的 text/message 是不同
+ *      的归一键，不受影响（整键匹配，不做子串猜测）。
+ *   2. 值形状 gate：只放行 string（截断）/finite number/boolean/null，
+ *      嵌套 plain object（深度 ≤2）/array（≤32 项）递归同规则；其余
+ *      （function/symbol/bigint/超深结构）一律丢弃。
+ *
+ * gate 是最终防线，不是脱敏管道：调用方仍应只构造结构性 metadata
+ * （typed builders = summarize* helpers）。
+ */
+
+const DENIED_DETAIL_KEYS = new Set([
+  "prompt", "systemprompt", "messages", "message", "content", "text", "body",
+  "rawbody", "rawresponse", "responsebody", "responsetext", "rawtext",
+  "reasoning", "thinking", "toolresult", "toolschema", "headers",
+  "authorization", "cookie", "apikey", "accesstoken", "refreshtoken",
+  "credential", "credentials", "secret", "token", "base64", "audio", "video",
+  "image", "imagedata", "imageurl", "stdout", "stderr", "commandargs", "args",
+  "environment", "env", "detail", "error", "errormessage", "errortext",
+  "transcription", "transcript", "payload", "request", "response", "filename",
+  "filepath", "signedurl",
+]);
+
+const DETAIL_STRING_MAX_CHARS = 256;
+const DETAIL_ARRAY_MAX_ITEMS = 32;
+const DETAIL_KEY_MAX_CHARS = 64;
+
+function normalizeDetailKey(key: string): string {
+  return key.toLowerCase().replace(/[^a-z0-9]/g, "");
+}
+
+function sanitizeDetailValue(value: unknown, depth: number): unknown {
+  if (value === null) return null;
+  const type = typeof value;
+  if (type === "string") {
+    const text = value as string;
+    return text.length > DETAIL_STRING_MAX_CHARS
+      ? `${text.slice(0, DETAIL_STRING_MAX_CHARS)}…[truncated]`
+      : text;
+  }
+  if (type === "number") return Number.isFinite(value as number) ? value : null;
+  if (type === "boolean") return value;
+  if (type !== "object") return undefined; // function/symbol/bigint/undefined：丢弃
+  if (depth <= 0) return undefined;
+  if (Array.isArray(value)) {
+    const items = value
+      .slice(0, DETAIL_ARRAY_MAX_ITEMS)
+      .map((item) => sanitizeDetailValue(item, depth - 1))
+      .filter((item) => item !== undefined);
+    return items;
+  }
+  const nested = value as Record<string, unknown>;
+  if (Object.keys(nested).length > DETAIL_ARRAY_MAX_ITEMS) return undefined;
+  const out: Record<string, unknown> = {};
+  for (const [key, child] of Object.entries(nested)) {
+    if (!key || key.length > DETAIL_KEY_MAX_CHARS) continue;
+    if (DENIED_DETAIL_KEYS.has(normalizeDetailKey(key))) continue;
+    const safe = sanitizeDetailValue(child, depth - 1);
+    if (safe !== undefined) out[key] = safe;
+  }
+  return Object.keys(out).length > 0 ? out : undefined; // 空壳（被剥空的嵌套对象）不保留
+}
+
+/**
+ * 事件 details 的最终安全门：禁入键丢弃、值形状过滤、空包归 null。
+ * Recorder 在每次 emit 前调用——集成点无法绕过。
+ */
+export function sanitizeModelCallDetails(details: unknown): Record<string, unknown> | null {
+  if (!details || typeof details !== "object" || Array.isArray(details)) return null;
+  const out: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(details as Record<string, unknown>)) {
+    if (!key || key.length > DETAIL_KEY_MAX_CHARS) continue;
+    if (DENIED_DETAIL_KEYS.has(normalizeDetailKey(key))) continue; // fail closed
+    const safe = sanitizeDetailValue(value, 2);
+    if (safe !== undefined) out[key] = safe;
+  }
+  return Object.keys(out).length > 0 ? out : null;
 }

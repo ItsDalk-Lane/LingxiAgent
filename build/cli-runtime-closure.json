@@ -6349,6 +6349,38 @@
       "reason": "Reached via esbuild source module graph, imported by lib/llm/model-call-recorder.ts (import-statement); lib/pi-sdk/model-call-stream-observer.ts (import-statement); lib/llm/cache-preserving-compaction-agent-run.ts (import-statement)."
     },
     {
+      "path": "lib/llm/model-call-integration.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "lib/llm/provider-client.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "core/speech-recognition/adapters.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "core/speech-recognition-service.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "core/media/image-task-runner.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "core/media/universal-media-manager.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by lib/llm/provider-client.ts (import-statement); core/speech-recognition/adapters.ts (import-statement); core/speech-recognition-service.ts (import-statement); +2 more importer(s)."
+    },
+    {
       "path": "lib/llm/model-call-observer.ts",
       "inputType": "source-graph",
       "provenance": [
@@ -6369,6 +6401,11 @@
         },
         {
           "root": "server-bootstrap",
+          "from": "lib/llm/model-call-integration.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
           "from": "core/llm-client.ts",
           "kind": "import-statement"
         },
@@ -6378,7 +6415,7 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by lib/llm/model-call-recorder.ts (import-statement); lib/pi-sdk/model-call-stream-observer.ts (import-statement); lib/llm/cache-preserving-compaction-agent-run.ts (import-statement); +2 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by lib/llm/model-call-recorder.ts (import-statement); lib/pi-sdk/model-call-stream-observer.ts (import-statement); lib/llm/cache-preserving-compaction-agent-run.ts (import-statement); +3 more importer(s)."
     },
     {
       "path": "lib/llm/model-call-recorder.ts",
@@ -6391,6 +6428,11 @@
         },
         {
           "root": "server-bootstrap",
+          "from": "lib/llm/model-call-integration.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
           "from": "core/llm-client.ts",
           "kind": "import-statement"
         },
@@ -6400,7 +6442,7 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by lib/pi-sdk/model-call-stream-observer.ts (import-statement); core/llm-client.ts (import-statement); lib/extensions/model-call-observer-ext.ts (import-statement)."
+      "reason": "Reached via esbuild source module graph, imported by lib/pi-sdk/model-call-stream-observer.ts (import-statement); lib/llm/model-call-integration.ts (import-statement); core/llm-client.ts (import-statement); +1 more importer(s)."
     },
     {
       "path": "lib/llm/model-call-scope.ts",
@@ -6445,21 +6487,11 @@
         },
         {
           "root": "server-bootstrap",
-          "from": "core/media/poller.ts",
-          "kind": "import-statement"
-        },
-        {
-          "root": "server-bootstrap",
           "from": "core/media/universal-media-manager.ts",
-          "kind": "import-statement"
-        },
-        {
-          "root": "server-bootstrap",
-          "from": "hub/index.ts",
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by lib/llm/provider-client.ts (import-statement); core/speech-recognition-service.ts (import-statement); core/media/image-task-runner.ts (import-statement); +3 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by lib/llm/provider-client.ts (import-statement); core/speech-recognition-service.ts (import-statement); core/media/image-task-runner.ts (import-statement); +1 more importer(s)."
     },
     {
       "path": "lib/llm/prompt-layout.ts",
@@ -123313,9 +123345,9 @@
     }
   ],
   "stats": {
-    "totalFiles": 10584,
+    "totalFiles": 10585,
     "byInputType": {
-      "source-graph": 688,
+      "source-graph": 689,
       "runtime-asset": 11,
       "nft-runtime-trace": 9885
     }

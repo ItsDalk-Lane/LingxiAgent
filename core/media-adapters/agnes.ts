@@ -8,6 +8,7 @@ import {
   saveBase64Images,
 } from "./common.ts";
 import { t } from "../../lib/i18n.ts";
+import { observedProviderFetch } from "../../lib/llm/model-call-integration.ts";
 
 const DEFAULT_BASE_URL = "https://apihub.agnes-ai.com/v1";
 const DEFAULT_IMAGE_MODEL = "agnes-image-2.1-flash";
@@ -252,13 +253,19 @@ export const agnesImageAdapter = {
     const size = resolveImageSize(params, providerDefaults);
     if (size) body.size = size;
 
-    const res = await fetch(`${agnesV1Base(creds.baseUrl)}/images/generations`, {
+    const res = await observedProviderFetch(ctx, () => fetch(`${agnesV1Base(creds.baseUrl)}/images/generations`, {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${creds.apiKey}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify(body),
+    }), {
+      requestDetails: {
+        protocol: "agnes-images",
+        mediaType: "image",
+        hasReferenceMedia: images.length > 0,
+      },
     });
 
     if (!res.ok) {
@@ -327,13 +334,32 @@ export const agnesVideoAdapter = {
       body.extra_body = { image: images };
     }
 
-    const res = await fetch(`${agnesV1Base(creds.baseUrl)}/videos`, {
+    // MC-08：video generation task submit 是一次 Model Call；返回的 taskId
+    // 之后由 poller 查询（控制面，不观测）。资产下载（downloadVideoUrl）在
+    // query 内，同样不是 attempt。
+    const res = await observedProviderFetch(ctx, () => fetch(`${agnesV1Base(creds.baseUrl)}/videos`, {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${creds.apiKey}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify(body),
+    }), {
+      requestDetails: {
+        protocol: "agnes-videos",
+        mediaType: "video",
+        asyncTask: true,
+        hasReferenceMedia: images.length > 0,
+        durationConfigured: params.duration !== undefined || params.seconds !== undefined
+          || providerDefaults.duration !== undefined || providerDefaults.seconds !== undefined,
+        resolutionConfigured: params.video_resolution !== undefined || params.resolution !== undefined
+          || params.size !== undefined || params.width !== undefined || params.height !== undefined
+          || providerDefaults.video_resolution !== undefined || providerDefaults.resolution !== undefined
+          || providerDefaults.size !== undefined,
+        fpsConfigured: params.frameRate !== undefined || params.frame_rate !== undefined
+          || params.numFrames !== undefined || params.num_frames !== undefined
+          || providerDefaults.frameRate !== undefined || providerDefaults.frame_rate !== undefined,
+      },
     });
 
     if (!res.ok) {

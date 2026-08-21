@@ -23,6 +23,14 @@ import {
 } from "./image-task-runner.ts";
 import { resolveMediaParameters } from "./media-parameters.ts";
 import { withModelRequestAccounting } from "../../lib/llm/model-request-accounting.ts";
+import {
+  beginObservedModelCall,
+  failObservedModelCall,
+} from "../../lib/llm/model-call-integration.ts";
+
+function hasAnyKey(source: Record<string, unknown>, keys: string[]): boolean {
+  return keys.some((key) => source?.[key] !== undefined && source?.[key] !== null);
+}
 
 const log = createModuleLogger("media");
 const IMAGE_CAPABILITY = "image_generation";
@@ -746,24 +754,72 @@ export class UniversalMediaManager {
       ...(target?.credentialLaneId ? { credentialLaneId: target.credentialLaneId } : {}),
       ...(target?.credentialProviderId ? { credentialProviderId: target.credentialProviderId } : {}),
     };
-    const result = await withModelRequestAccounting({
-      usageLedger: this._getUsageLedger(),
+    // MC-08 逻辑调用边界（§三十四）：video generation submit = 一个 logical
+    // call；callId 在 adapter 网络请求之前铸好并写进 ledger metadata。
+    // providerTaskId 响应后才出现——先有 callId，后关联（§三十五）。
+    const resolvedParams = parameterResolution.resolvedParameters || {};
+    const recorder = beginObservedModelCall({
       model: {
         provider: target.providerId,
         modelId: target.modelId,
         api: target.protocolId,
       },
-      usageContext: {
-        source: { subsystem: "media", operation: "submit", surface: "tool", trigger: "user" },
-        attribution: {
-          kind: "session",
-          ...(sessionId ? { sessionId } : {}),
-          ...(sessionPath ? { sessionPath } : {}),
-        },
+      source: { subsystem: "media", operation: "submit", surface: "tool", trigger: "user" },
+      attribution: {
+        kind: "session",
+        ...(sessionId ? { sessionId } : {}),
+        ...(sessionPath ? { sessionPath } : {}),
       },
-      metadata: { mediaType: "video" },
-    }, () => adapter.submit(params, this._submitContextForAdapter(adapter)));
-    if (!result?.taskId) throw new Error(t("toolDef.generateVideo.submitFailedUnknown"));
+      details: {
+        path: "media_video_submit",
+        mediaType: "video",
+        hasReferenceMedia: Boolean(input.image),
+        ...(Array.isArray(input.image) ? { referenceCount: input.image.length } : {}),
+        durationConfigured: hasAnyKey(resolvedParams, ["duration", "seconds", "numFrames", "num_frames"]),
+        resolutionConfigured: hasAnyKey(resolvedParams, ["resolution", "video_resolution", "size", "width", "height"]),
+        fpsConfigured: hasAnyKey(resolvedParams, ["fps", "frameRate", "frame_rate", "numFrames", "num_frames"]),
+      },
+    });
+    const observedSubmitCtx = { ...this._submitContextForAdapter(adapter), modelCall: recorder };
+    let result;
+    try {
+      result = await withModelRequestAccounting({
+        usageLedger: this._getUsageLedger(),
+        model: {
+          provider: target.providerId,
+          modelId: target.modelId,
+          api: target.protocolId,
+        },
+        usageContext: {
+          source: { subsystem: "media", operation: "submit", surface: "tool", trigger: "user" },
+          attribution: {
+            kind: "session",
+            ...(sessionId ? { sessionId } : {}),
+            ...(sessionPath ? { sessionPath } : {}),
+          },
+        },
+        metadata: { mediaType: "video", modelCallId: recorder.callId },
+      }, () => adapter.submit(params, observedSubmitCtx));
+    } catch (err) {
+      failObservedModelCall(recorder, err, { errorKind: "adapter_error" });
+      throw err;
+    }
+    if (!result?.taskId) {
+      const submitUnknown = new Error(t("toolDef.generateVideo.submitFailedUnknown"));
+      failObservedModelCall(recorder, submitUnknown, { errorKind: "adapter_error" });
+      throw submitUnknown;
+    }
+    // Provider 接受 generation task 即语义完成（§二十八）：taskId 之后的 poll
+    // 属于控制面，不属于这次 Model Call。
+    recorder.semanticResponseCompleted({
+      details: {
+        deferred: true,
+        providerTaskId: typeof result?.providerTaskId === "string" && result.providerTaskId.trim()
+          ? result.providerTaskId
+          : null,
+      },
+    });
+    recorder.endLogicalCall("ok");
 
     this._store.add({
       taskId: result.taskId,
