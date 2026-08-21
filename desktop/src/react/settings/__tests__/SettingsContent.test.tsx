@@ -8,6 +8,7 @@ import { useSettingsStore } from '../store';
 
 const actionMocks = vi.hoisted(() => ({
   loadSettingsModels: vi.fn(async () => {}),
+  loadProvidersSummary: vi.fn(async () => {}),
 }));
 
 vi.mock('../actions', () => ({
@@ -16,6 +17,7 @@ vi.mock('../actions', () => ({
   loadSettingsConfig: vi.fn(async () => {}),
   loadSettingsSnapshot: vi.fn(async () => {}),
   loadSettingsModels: actionMocks.loadSettingsModels,
+  loadProvidersSummary: actionMocks.loadProvidersSummary,
   loadPluginSettings: vi.fn(async () => {}),
   updateSettingsSnapshot: vi.fn(),
 }));
@@ -35,6 +37,8 @@ describe('SettingsContent tab heading', () => {
   beforeEach(() => {
     settingsChangedHandler = undefined;
     actionMocks.loadSettingsModels.mockClear();
+    actionMocks.loadProvidersSummary.mockReset();
+    actionMocks.loadProvidersSummary.mockResolvedValue(undefined);
     window.t = ((key: string) => key) as typeof window.t;
     window.i18n = {
       locale: 'zh-CN',
@@ -183,5 +187,47 @@ describe('SettingsContent tab heading', () => {
     expect(modelsNavButton).toBeTruthy();
     expect(modelsNavButton?.textContent).toContain('settings.tabs.models');
     expect(mediaNavButton).toBeFalsy();
+  });
+
+  it('loads the provider summary inside init, only after the server connection is ready', async () => {
+    // 回归：供应商摘要曾由 ProvidersTab 挂载时自行拉取——子组件 effect 先于
+    // initSettings 执行，连接未就绪时 fetch 必败且静默后无重试，供应商页打开即空白。
+    useSettingsStore.setState({
+      activeTab: 'providers',
+      serverPort: null,
+      serverToken: null,
+      activeServerConnection: null,
+      activeServerConnectionId: null,
+      serverConnections: {},
+      ready: false,
+    } as never);
+    actionMocks.loadProvidersSummary.mockImplementation(async () => {
+      // 被调用时连接三要素必须已经写入 store（init 先并行解析 port/token/platform）
+      expect(useSettingsStore.getState().serverPort).toBe(3000);
+    });
+
+    render(React.createElement(SettingsContent, { variant: 'window' }));
+
+    await waitFor(() => expect(actionMocks.loadProvidersSummary).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(useSettingsStore.getState().ready).toBe(true));
+  });
+
+  it('reopens without the loading mask when cached config exists (silent background refresh)', async () => {
+    // 回归：store 是模块级 singleton，重开设置时上次数据还在。旧行为每次打开都
+    // 强制 ready:false 用全屏 mask 盖住已有内容（用户感知的「空白一段」）。
+    useSettingsStore.setState({
+      activeTab: 'providers',
+      ready: true,
+      settingsConfig: { providers: { deepseek: { api_key: 'k' } } },
+      providersSummary: {},
+      platformName: 'darwin',
+    } as never);
+
+    render(React.createElement(SettingsContent, { variant: 'window' }));
+
+    // 有缓存数据：绝不显示全屏 mask，但 init 仍在后台静默刷新
+    expect(document.querySelector('.settings-loading-mask')).toBeNull();
+    await waitFor(() => expect(actionMocks.loadProvidersSummary).toHaveBeenCalledTimes(1));
+    expect(useSettingsStore.getState().ready).toBe(true);
   });
 });

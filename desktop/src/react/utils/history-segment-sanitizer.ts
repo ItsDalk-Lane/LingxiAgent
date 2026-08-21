@@ -53,9 +53,13 @@ export function sanitizePersistedSegments(
   segments: readonly LiveAssistantSegment[],
   options: { hasStructuredMood: boolean; hasStructuredThinking: boolean },
 ): LiveAssistantSegment[] {
-  return segments.map((segment) => (
-    segment.kind === 'text'
-      ? { ...segment, source: sanitizePersistedSegmentSource(segment.source, options) }
-      : segment
-  ));
+  return segments.flatMap((segment) => {
+    if (segment.kind !== 'text') return [segment];
+    const source = sanitizePersistedSegmentSource(segment.source, options);
+    // 不变量 4（没有 visible text 就没有 text segment）：净化后为空白的 text segment
+    // 是假 final_answer 段——整条内容都是 mood/think 的消息不允许它占住 answer 区
+    // （会错误豁免 missing_final_answer），也不允许它与实时投影产生块序列差。
+    if (!source.trim()) return [];
+    return [{ ...segment, source }];
+  });
 }

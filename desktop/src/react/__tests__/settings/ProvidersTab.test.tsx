@@ -11,6 +11,7 @@ import { useSettingsStore, type ProviderSummary } from '../../settings/store';
 const mocks = vi.hoisted(() => ({
   lingxiFetch: vi.fn(),
   loadSettingsConfig: vi.fn(async () => {}),
+  loadProvidersSummary: vi.fn(async () => {}),
 }));
 
 vi.mock('../../settings/api', () => ({
@@ -25,6 +26,7 @@ vi.mock('../../settings/api', () => ({
 
 vi.mock('../../settings/actions', () => ({
   loadSettingsConfig: () => mocks.loadSettingsConfig(),
+  loadProvidersSummary: () => mocks.loadProvidersSummary(),
   updateSettingsSnapshot: vi.fn(),
 }));
 
@@ -491,5 +493,19 @@ describe('ProvidersTab provider-scoped form state', () => {
     });
     expect(screen.getByTestId('search-provider-section')).toBeInTheDocument();
     expect(screen.getByTestId('search-api-key-config')).toBeInTheDocument();
+  });
+
+  it('does not fetch the provider summary on mount (init pipeline owns the initial load)', async () => {
+    // 回归：挂载时抢跑 fetch 会先于 initSettings 的连接设置执行，必败且静默后
+    // 无重试——供应商摘要只能由 init 链（或用户操作后的显式刷新）加载。
+    useSettingsStore.setState({ activeSubTabs: { providers: 'api' } } as never);
+    render(<ProvidersTab />);
+
+    expect(await screen.findByRole('button', { name: /DeepSeek/ })).toBeInTheDocument();
+    const summaryCalls = mocks.lingxiFetch.mock.calls.filter(
+      ([path]) => path === '/api/providers/summary',
+    );
+    expect(summaryCalls).toEqual([]);
+    expect(mocks.loadProvidersSummary).not.toHaveBeenCalled();
   });
 });

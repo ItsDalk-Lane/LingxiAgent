@@ -463,7 +463,10 @@ export function createChatRoute(engine: any, hub: any, {
         thinkTagParser: new ThinkTagParser(),
         moodParser: new MoodParser(),
         cardParser: new CardParser(),
-        strippedTextKeys: new Set(),
+        // raw-source 单次消费不变量（任务书 §一）：按 contentIndex 记录「该 raw assistant
+        // text 已经过 ReservedTagPipeline」。一旦置位，这份 raw source 永久失去作为
+        // normalizer 正文 fallback 的资格（text_end/content、partial、message 三入口同关）。
+        reservedProcessedTextKeys: new Set(),
         _cardHints: [],
         _cardEmitted: false,
         isThinking: false,
@@ -718,7 +721,7 @@ export function createChatRoute(engine: any, hub: any, {
     ss.moodParser.reset();
     ss.cardParser.reset();
     ss.assistantEventNormalizer.reset();
-    ss.strippedTextKeys?.clear?.();
+    ss.reservedProcessedTextKeys?.clear?.();
     ss.pendingToolContextsByCallId?.clear?.();
     ss._cardHints = [];
     ss._cardEmitted = false;
@@ -1321,7 +1324,7 @@ export function createChatRoute(engine: any, hub: any, {
       if (!raw) return;
       flushPendingTurnInputConsumptions(sessionPath, ss, message);
       const key = Number.isInteger(subEvent?.contentIndex) ? String(subEvent.contentIndex) : "default";
-      ss.strippedTextKeys.add(key);
+      ss.reservedProcessedTextKeys.add(key);
       ss.thinkTagParser.feed(raw, (tEvt) => {
         switch (tEvt.type) {
           case "think_start":
@@ -1387,7 +1390,8 @@ export function createChatRoute(engine: any, hub: any, {
 
     // normalizer 在 text_end 且没有流式 delta 时会回退读 message.content 的原始块文本；
     // 该文本已走过保留协议管道时，把块文本置空防止裸标签二次回流（相位检测只看
-    // textSignature，不读 text，置空不影响相位判定）。
+    // textSignature，不读 text，置空不影响相位判定）。event.partial 与 fallbackMessage
+    // 都是 normalizer 的文本来源，两处必须同时置空。
     const blankAssistantTextBlocks = (message) => {
       if (!message || !Array.isArray(message.content)) return message;
       return {
@@ -1454,7 +1458,7 @@ export function createChatRoute(engine: any, hub: any, {
       flushTerminalParsers();
       ss.thinkTagParser.beginAssistantSegment();
       ss.moodParser.beginAssistantSegment();
-      ss.strippedTextKeys.clear();
+      ss.reservedProcessedTextKeys.clear();
       ss.assistantEventNormalizer.beginAssistantMessage();
     } else if (event.type === "message_update") {
       if (!ss) return;
@@ -1472,16 +1476,28 @@ export function createChatRoute(engine: any, hub: any, {
         const subEvent = event.assistantMessageEvent;
         // 先把挂起的半截标签冲进当前 segment，再关闭它
         flushReservedTagParsers(subEvent, event.message);
-        // 无流式 delta、整段文字只在 text_end 到达的兜底路径：content 同样先过
-        // 保留协议管道，再把脱净后的事件交给 normalizer 收尾，避免裸标签回流。
         const endContent = typeof subEvent?.content === "string" ? subEvent.content : "";
         const key = Number.isInteger(subEvent?.contentIndex) ? String(subEvent.contentIndex) : "default";
         let cleanSubEvent = subEvent;
         let cleanMessage = event.message;
-        if (endContent && !ss.strippedTextKeys.has(key)) {
+        // 「是否需要 parse」与「是否允许 raw fallback」是两个独立判断：
+        // raw content 未进过保留协议管道时（text_end-only Provider）先送入管道；
+        // 无论刚刚送入还是 delta 阶段已送入，一旦 raw source 被消费过，就从 normalizer
+        // 的全部文本 fallback 入口（content / partial.content[].text / message.content[].text）
+        // 同时关闭，只保留 textSignature 等 phase 元数据。
+        const rawAlreadyConsumed = ss.reservedProcessedTextKeys.has(key);
+        if (endContent && !rawAlreadyConsumed) {
           feedReservedTagText({ ...subEvent, type: "text_delta", delta: endContent }, event.message);
           flushReservedTagParsers(subEvent, event.message);
-          cleanSubEvent = { ...subEvent, content: "" };
+        }
+        if (endContent || rawAlreadyConsumed) {
+          cleanSubEvent = {
+            ...subEvent,
+            content: "",
+            ...(subEvent?.partial && typeof subEvent.partial === "object"
+              ? { partial: blankAssistantTextBlocks(subEvent.partial) }
+              : {}),
+          };
           cleanMessage = blankAssistantTextBlocks(event.message);
         }
         publishNormalizedAssistantBatch(

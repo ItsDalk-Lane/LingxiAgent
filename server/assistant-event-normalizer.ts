@@ -178,6 +178,11 @@ export class AssistantEventNormalizer {
     const result = emptyBatch();
 
     if (!segment) {
+      // 没有可见文字就没有 text segment：text_end 不得凭空制造空 final_answer 段
+      // （全部内容属于 mood/think 的消息不因此产生假正文段，也不豁免 missing_final_answer）。
+      if (event.type === 'text_end' && !textFromEndEvent(event, fallbackMessage)) {
+        return result;
+      }
       const explicitPhase = explicitTextPhase(event, fallbackMessage);
       const semanticPhase = event.type === 'text_delta' && phaseKnownAtEnd(event, fallbackMessage)
         ? 'unresolved'
