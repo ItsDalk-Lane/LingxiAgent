@@ -1378,6 +1378,44 @@ describe("model sync related routes", () => {
     }
   });
 
+  it("providers summary computes media capability bindings once per request, not per provider", async () => {
+    const { createProvidersRoute } = await import("../server/routes/providers.ts");
+    const { ProviderRegistry } = await import("../core/provider-registry.ts");
+    const tmpHome = fs.mkdtempSync(path.join(os.tmpdir(), "hana-provider-bindings-once-"));
+    try {
+      const registry = new ProviderRegistry(tmpHome);
+      registry.reload();
+      const allSpy = vi.spyOn(registry, "getAllMediaCapabilityBindings");
+      const singleSpy = vi.spyOn(registry, "getMediaCapabilityBindings");
+      const engine = {
+        providerRegistry: registry,
+        authStorage: { getOAuthProviders: () => [] },
+        preferences: { getOAuthCustomModels: () => ({}) },
+        getRegistryModelsForProvider: () => [],
+        resolveProviderCredentials: () => ({ api_key: "", base_url: "", api: "" }),
+        lingxiHome: tmpHome,
+      };
+      const app = new Hono();
+      app.route("/api", createProvidersRoute(engine));
+
+      const res = await app.request("/api/providers/summary");
+      expect(res.status).toBe(200);
+      const data = await res.json();
+      // 行为不变：绑定投影内容仍然正确
+      expect(data.providers.agnes.media_capability_bindings).toEqual([
+        { capability: "imageGeneration", runtime_provider_id: "agnes" },
+        { capability: "videoGeneration", runtime_provider_id: "agnes" },
+      ]);
+      // 性能契约：全量绑定每请求恰好计算一次。
+      // 单 provider 查询内部同样是全量计算，逐 provider 调用会退化成 O(N²)，
+      // 本机实测 summary 从 ~30ms 恶化到 ~1.25s（供应商设置页打开延迟的来源）。
+      expect(allSpy).toHaveBeenCalledTimes(1);
+      expect(singleSpy).not.toHaveBeenCalled();
+    } finally {
+      fs.rmSync(tmpHome, { recursive: true, force: true });
+    }
+  });
+
   it("oauth provider with empty registry falls back to defaults", async () => {
     const { createProvidersRoute } = await import("../server/routes/providers.ts");
     const app = new Hono();

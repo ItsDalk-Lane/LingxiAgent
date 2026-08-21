@@ -3003,7 +3003,7 @@
   ],
   "review": {
     "classification": "compatible",
-    "compatibilityReason": "models.json custody repair: re-applies the existing secret-file mode when projected content is unchanged; file schema, fields, paths, and migration semantics remain unchanged",
+    "compatibilityReason": "providers.ts media capability bindings 改为一次性全量计算（getAllMediaCapabilityBindings），纯性能优化，不改变任何持久化 schema 形状/字段/数据类型",
     "payloadFingerprint": "sha256:ea43072abfdaae264090f44699e72180d6a18e243f5245a5d6be167445d8a2f9"
   },
   "schemas": [

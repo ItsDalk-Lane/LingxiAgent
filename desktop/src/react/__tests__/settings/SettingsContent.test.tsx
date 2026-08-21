@@ -35,6 +35,7 @@ vi.mock('../../settings/actions', () => ({
   loadSettingsConfig: vi.fn(async () => {}),
   loadSettingsSnapshot: vi.fn(async () => {}),
   loadSettingsModels: vi.fn(async () => {}),
+  loadProvidersSummary: vi.fn(async () => {}),
   loadPluginSettings: vi.fn(async () => {}),
 }));
 

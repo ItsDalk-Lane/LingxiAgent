@@ -1,9 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { useSettingsStore, type ProviderSummary } from '../store';
-import { lingxiFetchJson } from '../api';
 import { t, PROVIDER_PRESETS } from '../helpers';
-import { loadSettingsConfig } from '../actions';
+import { loadProvidersSummary, loadSettingsConfig } from '../actions';
 import { ProviderDetail } from './providers/ProviderDetail';
 import { ProviderPickerOverlay, AddProviderOverlay, type ProviderPickerItem } from './providers/ProviderList';
 import { SearchProviderSection } from './providers/SearchProviderSection';
@@ -40,21 +39,17 @@ export function ProvidersTab() {
   const [draftProviderIds, setDraftProviderIds] = useState<string[]>([]);
   const subTab: ProviderSubTab = activeSubTabs.providers === 'search' ? 'search' : 'api';
 
-  const loadSummary = useCallback(async () => {
-    const data = await lingxiFetchJson<{ providers?: Record<string, ProviderSummary> }>('/api/providers/summary');
-    useSettingsStore.setState({ providersSummary: data.providers || {} });
-  }, []);
-
-  useEffect(() => { void loadSummary().catch(() => {}); }, [loadSummary]);
-
+  // 供应商摘要由 initSettings 在连接就绪后统一加载（见 actions.loadProvidersSummary）。
+  // 这里只在用户操作（保存/删除/刷新）后显式重拉，绝不在挂载时抢跑：
+  // 子组件 effect 先于父组件 initSettings 执行，连接未就绪时 fetch 必败。
   const refreshProviderState = useCallback(async () => {
     await loadSettingsConfig();
     const state = useSettingsStore.getState();
     if (state.settingsConfigStatus === 'error') {
       throw new Error(state.settingsConfigError || t('settings.refreshFailed'));
     }
-    await loadSummary();
-  }, [loadSummary]);
+    await loadProvidersSummary();
+  }, []);
 
   const providerIds = Object.keys(providersSummary);
   const persistedProviderIds = useMemo(() => Object.keys(providers), [providers]);
@@ -242,9 +237,9 @@ export function ProvidersTab() {
                       // 刷新摘要失败也不能让 overlay 卡住：关闭浮层，让已挂载的
                       // 订阅和下次进入设置时重试加载。
                       try {
-                        await loadSummary();
+                        await loadProvidersSummary();
                       } catch {
-                        /* loadSummary 已在 catch 里上报；不阻塞关闭 overlay */
+                        /* 摘要刷新失败不阻塞关闭 overlay */
                       }
                       setAddingProvider(false);
                     }}

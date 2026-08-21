@@ -43,4 +43,21 @@ describe('history-segment-sanitizer（迁移边界一次性净化）', () => {
     expect(result[0]?.source).toBe('过程');
     expect(result[1]?.source).toBe('<mood>不应被动</mood>');
   });
+
+  it('净化后为空白的 text segment 被丢弃（不变量 4：没有 visible text 就没有 text segment）', () => {
+    const segments = [
+      textSegment('assistant:1:text:0', '<mood>A</mood>'),
+      textSegment('assistant:1:text:1', '<mood>B</mood>正文'),
+    ];
+    const result = sanitizePersistedSegments(segments, { hasStructuredMood: true, hasStructuredThinking: false });
+    expect(result).toHaveLength(1);
+    expect(result[0]).toMatchObject({ id: 'assistant:1:text:1', source: '正文' });
+  });
+
+  it('没有结构化 mood 时全 mood 的 segment 原样保留（内容不得凭空消失）', () => {
+    const segments = [textSegment('assistant:1:text:0', '<mood>A</mood>')];
+    const result = sanitizePersistedSegments(segments, { hasStructuredMood: false, hasStructuredThinking: false });
+    expect(result).toHaveLength(1);
+    expect(result[0]?.source).toBe('<mood>A</mood>');
+  });
 });

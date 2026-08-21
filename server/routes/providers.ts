@@ -60,10 +60,12 @@ function getProviderModelId(model: any) {
 /**
  * Registry 媒体能力绑定的只读 wire projection。
  * 不返回密钥、不改变 Provider 配置、不写盘，只把 Registry 状态映射成 summary 字段。
+ * allBindings 必须由调用方一次性算好（getAllMediaCapabilityBindings）：
+ * 单 provider 查询内部同样是全量计算，在 provider 循环里逐次调用会退化成 O(N²)。
  */
-function projectMediaCapabilityBindings(registry: any, providerId: string) {
-  if (!registry || typeof registry.getMediaCapabilityBindings !== "function") return [];
-  const bindings = registry.getMediaCapabilityBindings(providerId) || [];
+function projectMediaCapabilityBindings(allBindings: any, providerId: string) {
+  if (!allBindings || typeof allBindings !== "object") return [];
+  const bindings = allBindings[providerId] || [];
   return bindings.map((binding: any) => ({
     capability: binding.capability,
     runtime_provider_id: binding.runtimeProviderId,
@@ -137,6 +139,13 @@ export function createProvidersRoute(engine: any) {
     // Pi SDK 内置的危险 OAuth（anthropic/github-copilot 等）不在 Registry 中，不会泄露
     const provRegistry = engine.providerRegistry;
 
+    // 媒体能力绑定一次性全量取回，下面三个 provider 循环共用。
+    // 单 provider 查询（getMediaCapabilityBindings）内部也是全量计算，
+    // 在循环里逐 provider 调用会把 summary 拖成 O(N²)（本机实测 ~1.25s → ~30ms）。
+    const allMediaCapabilityBindings = typeof provRegistry.getAllMediaCapabilityBindings === "function"
+      ? provRegistry.getAllMediaCapabilityBindings()
+      : {};
+
     // OAuth provider 登录状态（Pi SDK AuthStorage，key 是 authJsonKey）
     const oauthProviders = engine.authStorage?.getOAuthProviders?.() || [];
     const oauthLoginMap = new Map();
@@ -200,7 +209,7 @@ export function createProvidersRoute(engine: any) {
         config_status: p.config_error ? "invalid" : (missingFields.length > 0 ? "needs_setup" : "ok"),
         config_error: p.config_error || null,
         missing_fields: missingFields,
-        media_capability_bindings: projectMediaCapabilityBindings(provRegistry, name),
+        media_capability_bindings: projectMediaCapabilityBindings(allMediaCapabilityBindings, name),
       };
     }
 
@@ -229,7 +238,7 @@ export function createProvidersRoute(engine: any) {
         config_status: effectiveModels.length > 0 && loginInfo?.loggedIn ? "ok" : "needs_setup",
         config_error: null,
         missing_fields: effectiveModels.length > 0 ? [] : ["models"],
-        media_capability_bindings: projectMediaCapabilityBindings(provRegistry, oauthId),
+        media_capability_bindings: projectMediaCapabilityBindings(allMediaCapabilityBindings, oauthId),
       };
     }
 
@@ -260,7 +269,7 @@ export function createProvidersRoute(engine: any) {
             ...(entry.authType === "none" ? [] : ["api_key"]),
             "models",
           ],
-          media_capability_bindings: projectMediaCapabilityBindings(provRegistry, id),
+          media_capability_bindings: projectMediaCapabilityBindings(allMediaCapabilityBindings, id),
         };
       }
     }

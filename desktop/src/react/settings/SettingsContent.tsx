@@ -10,7 +10,7 @@ import {
   type ServerConnection,
 } from '../services/server-connection';
 import { t } from './helpers';
-import { loadAgents, loadAvatars, loadSettingsModels, loadSettingsSnapshot } from './actions';
+import { loadAgents, loadAvatars, loadProvidersSummary, loadSettingsModels, loadSettingsSnapshot } from './actions';
 import { ErrorBoundary } from '../components/ErrorBoundary';
 import { SettingsNav } from './SettingsNav';
 import { Toast } from './Toast';
@@ -205,6 +205,7 @@ export function SettingsContent({
       loadAgents().catch(() => {});
       loadSettingsSnapshot().catch(() => {});
       loadSettingsModels().catch(() => {});
+      loadProvidersSummary().catch(() => {});
     });
     return typeof unsubscribe === 'function' ? unsubscribe : undefined;
   }, []);
@@ -317,11 +318,15 @@ export function SettingsContent({
   );
 }
 
-/** 初始化：加载 port/token → i18n → agents → 头像 → config */
+/** 初始化：连接三要素并行 → 连接就绪后全部数据加载并行（含供应商摘要） */
 async function initSettings() {
   const platform = window.platform;
   const store = useSettingsStore.getState();
-  store.set({ ready: false });
+  // store 是模块级 singleton：重开设置时上次的完整数据还在。有缓存就静默后台
+  // 刷新、直接渲染旧数据，绝不用全屏 loading mask 挡住用户；只有冷启动（连
+  // settingsConfig 都没有）才显示 mask。
+  const hasCachedConfig = store.settingsConfig != null;
+  if (!hasCachedConfig) store.set({ ready: false });
 
   // 超时保护：15 秒后强制显示，防止无限白屏
   const timeout = setTimeout(() => {
@@ -332,21 +337,21 @@ async function initSettings() {
   }, 15_000);
 
   try {
-    const rawServerPort = typeof platform?.getServerPort === 'function'
-      ? await platform.getServerPort()
-      : null;
+    // port/token/platform 是三个互不依赖的 IPC：串行会白送两轮往返的 mask 时间
+    const [rawServerPort, serverToken, platformName] = await Promise.all([
+      typeof platform?.getServerPort === 'function' ? platform.getServerPort() : null,
+      typeof platform?.getServerToken === 'function' ? platform.getServerToken() : null,
+      (async () => {
+        try {
+          return typeof platform?.getPlatform === 'function' ? await platform.getPlatform() : null;
+        } catch {
+          return null;
+        }
+      })(),
+    ]);
     const serverPort = rawServerPort === null || rawServerPort === undefined
       ? null
       : Number(rawServerPort);
-    const serverToken = typeof platform?.getServerToken === 'function'
-      ? await platform.getServerToken()
-      : null;
-    let platformName: string | null = null;
-    try {
-      platformName = typeof platform?.getPlatform === 'function' ? await platform.getPlatform() : null;
-    } catch {
-      platformName = null;
-    }
     store.set({
       serverPort,
       serverToken,
@@ -354,28 +359,35 @@ async function initSettings() {
       ...connectionState(createLocalServerConnection({ serverPort, serverToken })),
     });
 
-    // i18n
-    const i18n = window.i18n;
-    try {
-      const cfgRes = await lingxiFetch('/api/config');
-      const cfg = await cfgRes.json();
-      const locale = cfg.locale || 'zh-CN';
-      await i18n.load(locale);
-    } catch {
-      try { await i18n.load('zh-CN'); } catch { /* i18n fallback failed, continue */ }
-    }
+    // i18n（依赖 /api/config 的 locale，内部全容错，绝不阻塞 ready）
+    const i18nReady = (async () => {
+      const i18n = window.i18n;
+      try {
+        const cfgRes = await lingxiFetch('/api/config');
+        const cfg = await cfgRes.json();
+        const locale = cfg.locale || 'zh-CN';
+        await i18n.load(locale);
+      } catch {
+        try { await i18n.load('zh-CN'); } catch { /* i18n fallback failed, continue */ }
+      }
+    })();
 
-    // agents
-    await loadAgents();
-
-    // avatars
-    await loadAvatars();
-
-    // Unified backend settings truth source.
-    await loadSettingsSnapshot();
-    await loadSettingsModels();
+    // 连接已就绪：全部数据加载并行。供应商摘要由 init 统一发起（原来 ProvidersTab
+    // 挂载时抢跑 fetch，连接未就绪必败且静默后无重试，供应商页数据残缺）。
+    // retainSameKeyData：重开设置时保留同 key 旧数据直到新数据到达，避免内容区闪空。
+    await Promise.all([
+      i18nReady,
+      loadAgents(),
+      loadAvatars(),
+      loadSettingsSnapshot({ retainSameKeyData: true }),
+      loadSettingsModels(),
+    ]);
 
     store.set({ ready: true });
+
+    // 供应商摘要不阻塞 ready：列表可先由 settingsConfig 渲染，计数/凭证点随后补齐；
+    // 失败不拖垮整个 init（保持原 ProvidersTab 的容错语义）。
+    void loadProvidersSummary().catch(() => {});
   } catch (err) {
     console.error('[settings] init failed:', err);
     store.set({ ready: true }); // 即使失败也移除 mask，让用户能操作

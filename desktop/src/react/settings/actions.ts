@@ -13,7 +13,7 @@ import {
   makeSettingsResourceKey,
   startRemoteLoad,
 } from './resource-state';
-import type { RuntimeModelInfo, SettingsSnapshot } from './store';
+import type { ProviderSummary, RuntimeModelInfo, SettingsSnapshot } from './store';
 
 let _settingsConfigLoadVersion = 0;
 let _settingsConfigAbortController: AbortController | null = null;
@@ -55,6 +55,16 @@ export async function loadAgents() {
  * agent 头像属于设置页当前选中的那个 agent —— 它未必是服务端正在聚焦的
  * agent，所以可用性从 agents 列表里那一条读，URL 也显式带上 agentId。
  */
+/**
+ * 供应商摘要（列表徽标/模型计数/凭证状态）。与其它 tab 数据一样由 initSettings 在
+ * 连接就绪后统一加载——ProvidersTab 挂载时不得自行抢跑（子组件 effect 先于父组件
+ * initSettings 执行，连接未就绪时 fetch 必败且静默吞掉后无重试）。
+ */
+export async function loadProvidersSummary() {
+  const data = await lingxiFetchJson<{ providers?: Record<string, ProviderSummary> }>('/api/providers/summary');
+  useSettingsStore.setState({ providersSummary: data.providers || {} });
+}
+
 export async function loadAvatars() {
   const ts = Date.now();
   const store = useSettingsStore.getState();

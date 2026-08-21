@@ -194,6 +194,95 @@ describe('AssistantEventNormalizer', () => {
     expect(commentary.visibleTextDeltas).toEqual([]);
   });
 
+  it('text_end 契约表：无 existing segment + 空 endText → 不创建 text segment', () => {
+    // mood/think 独占的消息：raw text 已被保留协议管道消费，endText 已置空。
+    // 此时不得凭空制造空 final_answer 段（不变量 4：没有 visible text 就没有 text segment）。
+    const normalizer = new AssistantEventNormalizer();
+    normalizer.beginAssistantMessage();
+
+    const end = normalizer.handleTextEvent({
+      type: 'text_end',
+      contentIndex: 0,
+      content: '',
+      partial: {
+        role: 'assistant',
+        api: 'anthropic-messages',
+        content: [{ type: 'text', text: '' }],
+      },
+    });
+
+    expect(end.canonicalEvents).toEqual([]);
+    expect(end.visibleTextDeltas).toEqual([]);
+    expect(end.diagnostics).toEqual([]);
+    // finishMessage 也不得再补出任何 segment
+    const finish = normalizer.finishMessage();
+    expect(finish.canonicalEvents).toEqual([]);
+  });
+
+  it('text_end 契约表：无 existing segment + 有 endText → 创建 segment 并直接使用该文本', () => {
+    const normalizer = new AssistantEventNormalizer();
+    normalizer.beginAssistantMessage();
+
+    const end = normalizer.handleTextEvent({
+      type: 'text_end',
+      contentIndex: 0,
+      content: '只在结束时到达的完整正文',
+      partial: { role: 'assistant', api: 'anthropic-messages' },
+    });
+
+    expect(end.canonicalEvents).toEqual([
+      expect.objectContaining({
+        type: 'assistant_segment_start',
+        segmentId: 'assistant:1:text:0',
+        kind: 'text',
+        semanticPhase: 'final_answer',
+      }),
+      expect.objectContaining({
+        type: 'assistant_segment_delta',
+        segmentId: 'assistant:1:text:0',
+        delta: '只在结束时到达的完整正文',
+      }),
+      expect.objectContaining({
+        type: 'assistant_segment_end',
+        segmentId: 'assistant:1:text:0',
+        semanticPhase: 'final_answer',
+      }),
+    ]);
+    expect(end.visibleTextDeltas).toEqual(['只在结束时到达的完整正文']);
+  });
+
+  it('text_end 契约表：有 existing segment + 空 endText → 正常结束，不重复正文', () => {
+    const normalizer = new AssistantEventNormalizer();
+    normalizer.beginAssistantMessage();
+    normalizer.handleTextEvent({
+      type: 'text_delta',
+      contentIndex: 0,
+      delta: '已经流出的正文',
+      partial: { role: 'assistant', api: 'anthropic-messages' },
+    });
+
+    const end = normalizer.handleTextEvent({
+      type: 'text_end',
+      contentIndex: 0,
+      content: '',
+      partial: {
+        role: 'assistant',
+        api: 'anthropic-messages',
+        content: [{ type: 'text', text: '' }],
+      },
+    });
+
+    expect(end.canonicalEvents).toEqual([
+      expect.objectContaining({
+        type: 'assistant_segment_end',
+        segmentId: 'assistant:1:text:0',
+        semanticPhase: 'final_answer',
+      }),
+    ]);
+    // 已在 delta 阶段发布过可见文本，end 不再重复发布
+    expect(end.visibleTextDeltas).toEqual([]);
+  });
+
   it('回合结束仍未拿到阶段时使用供应商约定的最终答复回退，并留下诊断', () => {
     const normalizer = new AssistantEventNormalizer();
     normalizer.beginAssistantMessage();
