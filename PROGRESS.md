@@ -7,7 +7,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = b868889569fb4dbeef5deb7dcfee6c78fa9ac32e  (最终验证所针对的源码树；2026-08-21 凭证边界修复树后推进)
+VERIFIED_SOURCE_SHA   = c83d238ad6bede9c169a5be66ab74cd4cdde0eb4  (最终验证所针对的源码树；2026-08-21 保留标签管道修复树后推进)
 工作分支              = feature/upstream-sync-0.447.4
 ```
 
@@ -198,6 +198,12 @@ seal 不是一次性终点，而是"当前被验证树"的游标；每次审计�
   （绿）+ 新增 6 个边界测试 13 用例全绿 + 改动涉及 16 个核心测试文件 414 用例全绿 +
   PR CI macos/windows 全量测试仅 post-verification-audit-seal 预期红（旧坐标 dcf3546a 下，
   11599+ 用例绿）后推进。
+- **2026-08-21 保留标签管道修复**（c83d238ad6bede9c169a5be66ab74cd4cdde0eb4）：聊天历史
+  保留标签管道 raw 单次消费与段净化边界（15 files / +1073-68，含净化后空 text 段删除、
+  text_end 不制造假 final_answer 段、reservedProcessedTextKeys 三入口同关、providers
+  summary 媒体绑定一次性计算）。验证：本地 typecheck×3（绿）+ 新增/改动测试 125 用例全绿 +
+  全量测试 11625 用例绿（旧坐标 b8688895 下仅 post-verification-audit-seal 预期红；
+  release-preflight 本地偶发超时、单独重跑 6/6 绿）后推进。
 
 ## 最终状态：READY TO MERGE
 
@@ -205,11 +211,12 @@ seal 不是一次性终点，而是"当前被验证树"的游标；每次审计�
 - Disposition：ADOPTED 25 + ADAPTED 100 + REGENERATED 4 + INTENTIONAL_DIVERGENCE 4 = 133
   （脚本计算，`build-sync-matrix.mjs --check`：missing=0 / extra=0 / duplicate=0 / unknown=0）。
 - 4 个 `hanako.md → lingxi.md` 品牌映射统一分类为 ADAPTED。
-- `VERIFIED_SOURCE_SHA = b868889569fb4dbeef5deb7dcfee6c78fa9ac32e`：被完整测试验证的代码树
+- `VERIFIED_SOURCE_SHA = c83d238ad6bede9c169a5be66ab74cd4cdde0eb4`：被完整测试验证的代码树
   （含收口树 d4cf92a8 的全部验证 + 文档清场树复跑验证 + 归档修复树 051f6117 复跑的
   typecheck/lint/全量测试 + v0.1.29 release 树 fabd6dbf 复跑的 typecheck/目标套件 +
   mac self-install 树 dcf3546a 的 PR CI typecheck/lint/build/全量测试 +
-  凭证边界修复树 b8688895 的本地 typecheck/定向测试 + PR CI typecheck/lint/build/全量测试，
+  凭证边界修复树 b8688895 的本地 typecheck/定向测试 + PR CI typecheck/lint/build/全量测试 +
+  保留标签管道修复树 c83d238a 的本地 typecheck/定向测试 + 全量测试，
   见「Seal 推进记录」）。当前 HEAD 只比 VERIFIED_SOURCE_SHA 多审计收口内容。
 
 ### Post-verification diff 记录（`git diff --name-only VERIFIED_SOURCE_SHA..HEAD`）
