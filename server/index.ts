@@ -15,6 +15,7 @@ import { Hono } from "hono";
 import { createAdaptorServer } from "@hono/node-server";
 import { createNodeWebSocket } from "@hono/node-ws";
 import { WebSocketServer } from "ws";
+import { runWithModelTraceRoot } from "../lib/llm/model-trace-scope.ts";
 import { AppError } from "../shared/errors.ts";
 import { errorBus } from "../shared/error-bus.ts";
 import { LingxiEngine } from "../core/engine.ts";
@@ -771,7 +772,11 @@ export async function startServer(root: CompositionRoot = {}): Promise<void> {
       : (sessionPath ? engine.resolveSessionOwnership?.(sessionPath)?.agentId || null : null);
     const resolved = await engine.resolveAuxiliaryModelFresh("summarize", { agentId, sessionPath });
     if (!resolved) throw new Error("summarize slot unavailable (no model configured and no chat fallback)");
-    const text = await callText({
+    // Plugin 模型调用（§二十四）：chat 工具内触发 → 继承该工具的 trace；
+    // 插件后台/route 直接触发 → 新 trace 根（origin=plugin）。
+    const text = await runWithModelTraceRoot(
+      { origin: "plugin", refs: { ...(payload.pluginId ? { pluginId: String(payload.pluginId) } : {}) } },
+      () => callText({
       api: resolved.api,
       apiKey: resolved.apiKey,
       baseUrl: resolved.baseUrl,
@@ -793,7 +798,8 @@ export async function startServer(root: CompositionRoot = {}): Promise<void> {
           ? sessionUsageAttribution(sessionPath, resolved.usageAgentId || agentId || null)
           : { kind: "auxiliary", agentId: resolved.usageAgentId || agentId || null },
       },
-    } as any);
+    } as any),
+    );
     return { text };
   });
   hub.eventBus.handle("model:sample-text", async (payload: any = {}) => {
@@ -811,7 +817,11 @@ export async function startServer(root: CompositionRoot = {}): Promise<void> {
       : null;
     const resolved = await engine.resolveAuxiliaryModelFresh("summarize", { agentId, sessionPath });
     if (!resolved) throw new Error("summarize slot unavailable (no model configured and no chat fallback)");
-    const text = await callText({
+    // Plugin 模型调用（§二十四）：chat 工具内触发 → 继承该工具的 trace；
+    // 插件后台/route 直接触发 → 新 trace 根（origin=plugin）。
+    const text = await runWithModelTraceRoot(
+      { origin: "plugin", refs: { ...(pluginId ? { pluginId } : {}) } },
+      () => callText({
       api: resolved.api,
       apiKey: resolved.apiKey,
       baseUrl: resolved.baseUrl,
@@ -836,7 +846,8 @@ export async function startServer(root: CompositionRoot = {}): Promise<void> {
             ? sessionUsageAttribution(sessionPath, resolved.usageAgentId || agentId || null)
             : { kind: "utility", agentId: resolved.usageAgentId || agentId || null },
       },
-    } as any);
+    } as any),
+    );
     return { text };
   });
   hub.eventBus.handle("usage:list", (filter = {}) => {

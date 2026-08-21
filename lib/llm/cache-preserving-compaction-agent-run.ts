@@ -15,6 +15,7 @@ import { stripClosedInternalNarrationBlocks } from "../text/internal-narration.t
 import { mintModelCallId } from "./model-call-identity.ts";
 import { modelCallFieldsFromUsageContext } from "./model-call-observer.ts";
 import { runWithModelCallScope } from "./model-call-scope.ts";
+import { resolveModelTraceContext } from "./model-trace-scope.ts";
 
 const SUMMARY_HEADINGS = [
   "Goal",
@@ -404,10 +405,19 @@ export async function runCachePreservingCompactionAgentRun({
     // ledger.start 铸造，经 metadata.modelCallId 建立 callId↔ledger 关联，
     // 并经 ALS scope 交给 streamFn wrapper 接管为同一身份（单点发射）。
     const modelCallId = mintModelCallId();
+    // Trace 身份走统一解析（§四十一）：mid-turn compaction 继承当前任务 trace，
+    // 独立 fresh-compact/deleted-continuation 在无 scope 处铸 singleton。每个
+    // recovery turn 解析一次——同链顺序 turn 的 parent 由 scope.lastCallId 推进。
+    const traceContext = resolveModelTraceContext();
     const usageRequest = usageLedger?.start?.({
       model: modelLedgerIdentity(model),
       usageContext,
-      metadata: { ...(metadata || {}), modelCallId },
+      metadata: {
+        ...(metadata || {}),
+        modelCallId,
+        traceId: traceContext.traceId,
+        parentCallId: traceContext.parentCallId,
+      },
       costRates: model?.cost,
     }) || {};
     const pending = { requestId: usageRequest.requestId, settled: false };
@@ -416,8 +426,8 @@ export async function runCachePreservingCompactionAgentRun({
       callId: modelCallId,
       model: modelLedgerIdentity(model),
       ...modelCallFieldsFromUsageContext(usageContext),
-      traceId: null,
-      parentCallId: null,
+      traceId: traceContext.traceId,
+      parentCallId: traceContext.parentCallId,
       details: {
         compactionPhase: requestPhase,
         providerRequestOrdinal: diagnostics.providerRequests,

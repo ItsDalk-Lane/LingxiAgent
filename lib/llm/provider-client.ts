@@ -8,7 +8,13 @@
 import { t } from "../i18n.ts";
 import { normalizeProviderHeaders } from "../../shared/provider-auth.ts";
 import { withModelRequestAccounting } from "./model-request-accounting.ts";
-import { beginObservedModelCall, failObservedModelCall, observedProviderFetch } from "./model-call-integration.ts";
+import {
+  beginObservedModelCall,
+  failObservedModelCall,
+  observedModelCallLedgerMetadata,
+  observedProviderFetch,
+} from "./model-call-integration.ts";
+import { runWithNewModelTrace } from "./model-trace-scope.ts";
 
 export const DEFAULT_PROVIDER_USER_AGENT = "LingxiAgent/1.0";
 const DEFAULT_ANTHROPIC_PROBE_MODEL = "claude-sonnet-4-6";
@@ -298,54 +304,58 @@ export async function probeProvider({
     return buildProbeResult(res);
   }
 
-  const recorder = beginObservedModelCall({
-    model: { provider: providerId, modelId: effectiveModelId, api },
-    usageContext,
-    details: {
-      path: "provider_probe",
-      probeKind: "generation",
-      protocol: api,
-      operation: "connectivity-probe",
-    },
-  });
-  try {
-    const result = await withModelRequestAccounting({
-      usageLedger,
+  // Provider 连接测试按钮 = 独立用户任务（§二十五）：singleton trace，
+  // origin=provider_probe；不继承任何外层 scope。
+  return runWithNewModelTrace({ origin: "provider_probe", refs: { providerId } }, async () => {
+    const recorder = beginObservedModelCall({
       model: { provider: providerId, modelId: effectiveModelId, api },
       usageContext,
-      metadata: { operation: "connectivity-probe", modelCallId: recorder.callId },
-    }, async () => {
-      const res = await observedProviderFetch({ modelCall: recorder }, () => fetch(probe.url, {
-        method: probe.method,
-        headers,
-        body: JSON.stringify({
-          model: effectiveModelId,
-          max_tokens: 1,
-          messages: [{ role: "user", content: "." }],
-        }),
-        signal: AbortSignal.timeout(10000),
-      }), { requestDetails: { protocol: api, messageCount: 1 } });
-      return buildProbeResult(res);
+      details: {
+        path: "provider_probe",
+        probeKind: "generation",
+        protocol: api,
+        operation: "connectivity-probe",
+      },
     });
-    if (result?.ok) {
-      recorder.semanticResponseCompleted({
-        details: { probeAccepted: true, httpStatus: result?.status ?? null },
+    try {
+      const result = await withModelRequestAccounting({
+        usageLedger,
+        model: { provider: providerId, modelId: effectiveModelId, api },
+        usageContext,
+        metadata: { operation: "connectivity-probe", ...observedModelCallLedgerMetadata(recorder) },
+      }, async () => {
+        const res = await observedProviderFetch({ modelCall: recorder }, () => fetch(probe.url, {
+          method: probe.method,
+          headers,
+          body: JSON.stringify({
+            model: effectiveModelId,
+            max_tokens: 1,
+            messages: [{ role: "user", content: "." }],
+          }),
+          signal: AbortSignal.timeout(10000),
+        }), { requestDetails: { protocol: api, messageCount: 1 } });
+        return buildProbeResult(res);
       });
-      recorder.endLogicalCall("ok");
-    } else {
-      recorder.logicalCallError(new Error(`connectivity probe rejected`), {
-        details: { probeAccepted: false, httpStatus: result?.status ?? null, errorKind: "http_error" },
-      });
-      recorder.endLogicalCall("error", { details: { errorKind: "http_error" } });
+      if (result?.ok) {
+        recorder.semanticResponseCompleted({
+          details: { probeAccepted: true, httpStatus: result?.status ?? null },
+        });
+        recorder.endLogicalCall("ok");
+      } else {
+        recorder.logicalCallError(new Error(`connectivity probe rejected`), {
+          details: { probeAccepted: false, httpStatus: result?.status ?? null, errorKind: "http_error" },
+        });
+        recorder.endLogicalCall("error", { details: { errorKind: "http_error" } });
+      }
+      return result;
+    } catch (err) {
+      const errorKind = err?.name === "TimeoutError" || err?.name === "AbortError" || err?.type === "aborted"
+        ? "timeout"
+        : "provider_or_network";
+      failObservedModelCall(recorder, err, { errorKind });
+      throw err;
     }
-    return result;
-  } catch (err) {
-    const errorKind = err?.name === "TimeoutError" || err?.name === "AbortError" || err?.type === "aborted"
-      ? "timeout"
-      : "provider_or_network";
-    failObservedModelCall(recorder, err, { errorKind });
-    throw err;
-  }
+  });
 }
 
 async function buildProbeResult(res) {

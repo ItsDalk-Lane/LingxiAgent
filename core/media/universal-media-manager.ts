@@ -26,7 +26,9 @@ import { withModelRequestAccounting } from "../../lib/llm/model-request-accounti
 import {
   beginObservedModelCall,
   failObservedModelCall,
+  observedModelCallLedgerMetadata,
 } from "../../lib/llm/model-call-integration.ts";
+import { runWithModelTraceRoot } from "../../lib/llm/model-trace-scope.ts";
 
 function hasAnyKey(source: Record<string, unknown>, keys: string[]): boolean {
   return keys.some((key) => source?.[key] !== undefined && source?.[key] !== null);
@@ -684,12 +686,17 @@ export class UniversalMediaManager {
 
   async submitImage({ input, sessionId = null, sessionPath, sessionRef = null, metadata = null, deliveryTarget = undefined, bridgeContext = null }: any = {}) {
     if (!this._bus || !this._poller) throw new Error(t("plugin.imageGen.notInitialized"));
-    return submitImageGeneration({
+    // 媒体提交 = inherit-or-mint（§二十六）：chat 工具内生成图片/视频继承该
+    // Chat 的 trace（工具子 scope 已就位）；独立提交（无 scope）铸新根 origin=media。
+    return runWithModelTraceRoot(
+      { origin: "media", refs: { ...(sessionId ? { sessionId } : {}), ...(sessionPath ? { sessionPath } : {}) } },
+      () => submitImageGeneration({
       input,
-      ctx: this._toolContext({ sessionId, sessionPath, sessionRef, bridgeContext }),
-      metadata,
-      deliveryTarget,
-    } as any);
+        ctx: this._toolContext({ sessionId, sessionPath, sessionRef, bridgeContext }),
+        metadata,
+        deliveryTarget,
+      } as any),
+    );
   }
 
   async generateVideoFromBus(payload: any = {}) {
@@ -718,6 +725,14 @@ export class UniversalMediaManager {
 
   async submitVideo({ input = {}, sessionId = null, sessionPath = null, sessionRef = null }: any = {}) {
     if (!this._bus || !this._poller) throw new Error(t("plugin.imageGen.notInitialized"));
+    // 同 submitImage：媒体任务继承调用它的 Chat trace；独立提交铸新根。
+    return runWithModelTraceRoot(
+      { origin: "media", refs: { ...(sessionId ? { sessionId } : {}), ...(sessionPath ? { sessionPath } : {}) } },
+      () => this._submitVideoWithinTrace(input, sessionId, sessionPath, sessionRef),
+    );
+  }
+
+  async _submitVideoWithinTrace(input: any = {}, sessionId: any = null, sessionPath: any = null, sessionRef: any = null) {
     if (!textOrNull(input.prompt)) throw new Error("prompt is required");
     const delivery = normalizeMediaDelivery(input);
     const responseDelivery = isResponseDelivery(delivery);
@@ -798,7 +813,7 @@ export class UniversalMediaManager {
             ...(sessionPath ? { sessionPath } : {}),
           },
         },
-        metadata: { mediaType: "video", modelCallId: recorder.callId },
+        metadata: { mediaType: "video", ...observedModelCallLedgerMetadata(recorder) },
       }, () => adapter.submit(params, observedSubmitCtx));
     } catch (err) {
       failObservedModelCall(recorder, err, { errorKind: "adapter_error" });

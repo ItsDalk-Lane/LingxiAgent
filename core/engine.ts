@@ -55,6 +55,7 @@ import {
 } from "../lib/tools/tool-session.ts";
 import { loadLocale } from "../lib/i18n.ts";
 import { createApprovalGateway, createModelApprovalReviewer } from "../lib/approval-gateway.ts";
+import { runWithNewModelTrace } from "../lib/llm/model-trace-scope.ts";
 import { callText } from "./llm-client.ts";
 import { SESSION_APPROVAL_POLICIES } from "./session-permission-mode.ts";
 import { readCompiledResetAt } from "../lib/memory/compiled-memory-state.ts";
@@ -3393,6 +3394,16 @@ export class LingxiEngine {
   // ════════════════════════════
 
   async writeDiary(opts: any = {}) {
+    // /diary 是一项独立用户任务（§四十七）：一次 diary = N 次 MC-10 临时摘要 +
+    // 1 次 MC-04 终稿，全部同一 traceId；force-new 切断 REST 路由异步链可能
+    // 携带的外层 scope。
+    return runWithNewModelTrace(
+      { origin: "diary", refs: opts?.targetDate ? { targetDate: opts.targetDate } : null },
+      () => this._writeDiaryWithinTrace(opts),
+    );
+  }
+
+  async _writeDiaryWithinTrace(opts: any = {}) {
     const currentPath = this.currentSessionPath;
     if (currentPath && this.agent.memoryTicker) {
       await this.agent.memoryTicker.flushSession(currentPath);

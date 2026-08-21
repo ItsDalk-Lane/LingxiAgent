@@ -3,6 +3,11 @@
  *
  * 无界数组，仅供测试与临时调试接线；生产默认 observer 是 noop（§四十二：
  * 测试 collector 单独实现，不让它偷偷成为生产常驻内存日志）。
+ *
+ * Phase 4 起附带 Trace Explorer 测试辅助（任务书 §八十二/§八十三）：
+ * eventsForTrace / callsForTrace / childrenOf / rootsForTrace +
+ * assertTraceGraphValid（图不变量机器校验）——仅供测试，不是生产 Query
+ * Service。
  */
 
 import type {
@@ -17,10 +22,20 @@ export type TestModelCallObserver = ModelCallObserver & {
   eventsOfType(type: ModelCallEventType): ModelCallEvent[];
   /** 按 callId 过滤，保持投递顺序。 */
   eventsForCall(callId: string): ModelCallEvent[];
-  /** 事件序列压缩成类型名数组，便于断言生命周期顺序。 */
-  sequence(): ModelCallEventType[];
+  /** 按 traceId 过滤，保持投递顺序。 */
+  eventsForTrace(traceId: string): ModelCallEvent[];
   /** 收集到的全部不同 callId（按首次出现顺序）。 */
   callIds(): string[];
+  /** 某 trace 内的全部 callId（按首次出现顺序）。 */
+  callsForTrace(traceId: string): string[];
+  /** parentCallId === callId 的下游 callId 列表。 */
+  childrenOf(callId: string): string[];
+  /** trace 内 parentCallId 为 null/undefined 的根 callId 列表。 */
+  rootsForTrace(traceId: string): string[];
+  /** callId → {traceId, parentCallId}（首个事件的身份快照）。 */
+  callIdentity(callId: string): { traceId: string | null; parentCallId: string | null } | null;
+  /** 事件序列压缩成类型名数组，便于断言生命周期顺序。 */
+  sequence(): ModelCallEventType[];
   /** 收集到的全部不同 attemptId（按首次出现顺序，跳过 null/undefined）。 */
   attemptIds(): string[];
   /** 同一 call 的全部 attemptId（按首次出现顺序）。 */
@@ -32,6 +47,16 @@ export type TestModelCallObserver = ModelCallObserver & {
   assertNoSensitiveContent(markers: string[]): void;
   /** 断言某 call 的生命周期序列（事件类型逐项相等）。 */
   assertLifecycle(callId: string, expected: ModelCallEventType[]): void;
+  /**
+   * Trace 图不变量（§五十六～§六十）：
+   *   - 每个 call 都有非空 traceId；
+   *   - 同一 callId 的全部事件 traceId/parentCallId 稳定不变；
+   *   - callId != parentCallId（无自环）；
+   *   - parent 若在本 observer 可见集合内，必须与 child 同 trace（无跨 trace
+   *     parent）；parent 不可见时放行（运行时子集是合法事实，不猜）；
+   *   - parent 链无环。
+   */
+  assertTraceGraphValid(): void;
   reset(): void;
 };
 
@@ -39,6 +64,15 @@ export function createTestModelCallObserver(): TestModelCallObserver {
   const events: ModelCallEvent[] = [];
   const eventsForCall = (source: ModelCallEvent[], callId: string): ModelCallEvent[] =>
     source.filter((event) => event.callId === callId);
+  const callIdentityMap = (): Map<string, { traceId: string | null; parentCallId: string | null }> => {
+    const map = new Map<string, { traceId: string | null; parentCallId: string | null }>();
+    for (const event of events) {
+      if (!map.has(event.callId)) {
+        map.set(event.callId, { traceId: event.traceId ?? null, parentCallId: event.parentCallId ?? null });
+      }
+    }
+    return map;
+  };
   return {
     events,
     handleModelCallEvent(event: ModelCallEvent) {
@@ -50,11 +84,35 @@ export function createTestModelCallObserver(): TestModelCallObserver {
     eventsForCall(callId: string) {
       return eventsForCall(events, callId);
     },
+    eventsForTrace(traceId: string) {
+      return events.filter((event) => event.traceId === traceId);
+    },
     sequence() {
       return events.map((event) => event.eventType);
     },
     callIds() {
       return [...new Set(events.map((event) => event.callId))];
+    },
+    callsForTrace(traceId: string) {
+      return [...new Set(eventsForTrace(traceId).map((event) => event.callId))];
+    },
+    childrenOf(callId: string) {
+      const identities = callIdentityMap();
+      return [...new Set(events
+        .map((event) => event.callId)
+        .filter((child) => identities.get(child)?.parentCallId === callId))];
+    },
+    rootsForTrace(traceId: string) {
+      const identities = callIdentityMap();
+      return [...new Set(eventsForTrace(traceId)
+        .map((event) => event.callId)
+        .filter((callId) => {
+          const parent = identities.get(callId)?.parentCallId;
+          return parent === null || parent === undefined;
+        }))];
+    },
+    callIdentity(callId: string) {
+      return callIdentityMap().get(callId) ?? null;
     },
     attemptIds() {
       return [...new Set(
@@ -86,6 +144,59 @@ export function createTestModelCallObserver(): TestModelCallObserver {
         throw new Error(
           `lifecycle mismatch for ${callId}:\n  actual:   ${JSON.stringify(actual)}\n  expected: ${JSON.stringify(expected)}`,
         );
+      }
+    },
+    assertTraceGraphValid(): void {
+      const problems: string[] = [];
+      const identities = callIdentityMap();
+      for (const [callId, identity] of identities) {
+        if (!identity.traceId) {
+          problems.push(`call ${callId} has empty traceId`);
+        }
+        if (identity.parentCallId && identity.parentCallId === callId) {
+          problems.push(`call ${callId} parents itself`);
+        }
+      }
+      // 同 call 生命周期内 trace/parent 不得漂移（§五十六/§五十七）。
+      for (const callId of identities.keys()) {
+        const scoped = eventsForCall(events, callId);
+        for (const event of scoped) {
+          if ((event.traceId ?? null) !== identities.get(callId)!.traceId) {
+            problems.push(`call ${callId} traceId drifted across events`);
+            break;
+          }
+          if ((event.parentCallId ?? null) !== identities.get(callId)!.parentCallId) {
+            problems.push(`call ${callId} parentCallId drifted across events`);
+            break;
+          }
+        }
+      }
+      // parent 可见时必须同 trace（§六十）；不可见时放行（不猜）。
+      for (const [callId, identity] of identities) {
+        const parent = identity.parentCallId;
+        if (!parent) continue;
+        const parentIdentity = identities.get(parent);
+        if (parentIdentity && parentIdentity.traceId !== identity.traceId) {
+          problems.push(
+            `call ${callId} (trace ${identity.traceId}) parents ${parent} (trace ${parentIdentity.traceId})`,
+          );
+        }
+      }
+      // parent 链无环。
+      for (const callId of identities.keys()) {
+        const seen = new Set<string>([callId]);
+        let cursor = identities.get(callId)?.parentCallId ?? null;
+        while (cursor && identities.has(cursor)) {
+          if (seen.has(cursor)) {
+            problems.push(`parent cycle detected at ${callId} -> ${cursor}`);
+            break;
+          }
+          seen.add(cursor);
+          cursor = identities.get(cursor)?.parentCallId ?? null;
+        }
+      }
+      if (problems.length > 0) {
+        throw new Error(`trace graph invariants violated:\n  - ${problems.join("\n  - ")}`);
       }
     },
     reset() {

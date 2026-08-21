@@ -113,11 +113,17 @@ describe("MC-04 callText × ModelCallObserver", () => {
 
     expect(observer.events.at(-1)).toMatchObject({ eventType: "logical_call_end", status: "ok" });
 
-    // Ledger 关联：同一次调用，metadata.modelCallId === callId，且只记一条（无双计）
+    // Ledger 关联：同一次调用，metadata.{modelCallId,traceId,parentCallId} ===
+    // observer 身份，且只记一条（无双计）。Phase 4 起 traceId 恒非空（§二十二）。
     const entries = ledger.list({}).entries;
     expect(entries).toHaveLength(1);
     expect(entries[0]).toMatchObject({ status: "ok" });
-    expect(entries[0].metadata).toEqual({ modelCallId: callId });
+    expect(entries[0].metadata).toEqual({
+      modelCallId: callId,
+      traceId: observer.callIdentity(callId)!.traceId,
+      parentCallId: null,
+    });
+    expect(entries[0].metadata!.traceId).toMatch(/^mt_/);
   });
 
   it("Scenario B: Provider HTTP error（400/500）有完整错误终态", async () => {
@@ -265,13 +271,14 @@ describe("MC-04 callText × ModelCallObserver", () => {
     expect(observer.eventsOfType("logical_call_end")).toHaveLength(2);
   });
 
-  it("traceId/parentCallId 仅由调用方显式提供，缺省为 null 不造假", async () => {
+  it("Phase 4 trace 解析：无 explicit/无 scope → singleton traceId（非空）+ parent=null 不猜；explicit 优先", async () => {
     vi.stubGlobal("fetch", okFetch());
     await callText(baseOptions());
-    expect(observer.eventsOfType("logical_call_start")[0]).toMatchObject({
-      traceId: null,
-      parentCallId: null,
-    });
+    const defaultStart = observer.eventsOfType("logical_call_start")[0];
+    // §二十二：独立 callText 形成单 call 的 singleton trace——traceId 恒非空；
+    // §二十三：无 parent 事实 → null，不猜。
+    expect(defaultStart.traceId).toMatch(/^mt_/);
+    expect(defaultStart.parentCallId).toBeNull();
 
     observer.reset();
     await callText(baseOptions({

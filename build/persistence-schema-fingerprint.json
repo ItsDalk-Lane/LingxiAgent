@@ -648,7 +648,7 @@
     ],
     "version": 3
   },
-  "payloadFingerprint": "sha256:252cdf1226105980a227290c65f5d98165a3a0b559e146e445511ed3edee68c5",
+  "payloadFingerprint": "sha256:7fd4b13f1038b69905a40bad89299158014ae7a59fcca0c127939305449153ac",
   "registry": [
     {
       "affectedByEpochMigration": true,
@@ -3003,8 +3003,8 @@
   ],
   "review": {
     "classification": "compatible",
-    "compatibilityReason": "Model Call Observer runtime-only integration (Phase 2.5/3A/3B): guarded modules (media adapters, universal-media-manager submit, hub credential handler) gain observer lifecycle calls; media poll + external credential authorization leave the usage ledger (control-plane cleanup). No store shape, format, or schema change.",
-    "payloadFingerprint": "sha256:252cdf1226105980a227290c65f5d98165a3a0b559e146e445511ed3edee68c5"
+    "compatibilityReason": "Observer trace propagation only: session-coordinator/bridge/executor/engine/diary/memory-ticker/media-manager/server gained ModelTraceScope wiring + ledger metadata keys (additive metadata object fields, no persisted store shape/format change); usage-ledger entries keep schemaVersion 1",
+    "payloadFingerprint": "sha256:7fd4b13f1038b69905a40bad89299158014ae7a59fcca0c127939305449153ac"
   },
   "schemas": [
     {
@@ -3396,7 +3396,7 @@
       "contract": "server-info writer and desktop bootstrap reader",
       "kind": "runtime-contract",
       "module": "server/index.ts",
-      "sourceHash": "sha256:9175501eff25be3e225e5ec472c71f81e71bff0dff1b0ecc917ddc534907c7f3",
+      "sourceHash": "sha256:76d82308c49f56d97311ba98e57bf7b2ba5956d86b2340ef0cba67ac6cc6d323",
       "storeId": "server-runtime-info"
     },
     {
@@ -3418,7 +3418,7 @@
         {
           "contract": "core/session-coordinator.ts Hana metadata extensions",
           "module": "core/session-coordinator.ts",
-          "sourceHash": "sha256:60351a1dab7b5049b0b14a65e008ac6de1e6c9b0b2894d613e99524906638c12"
+          "sourceHash": "sha256:e2c847023fdd7fb21b1324ec8175453555237aa55a698ac4e3de9b4aa901fe27"
         },
         {
           "contract": "core/session-jsonl-file.ts repair contract",
@@ -3516,7 +3516,7 @@
       "contract": "bridge index, legacy session metadata, title, and vision sidecar readers",
       "kind": "runtime-contract",
       "module": "core/bridge-session-manager.ts",
-      "sourceHash": "sha256:09857a567434c49c5ee3ac9a87477b7dcb367234491e979e17191d11a6f479b5",
+      "sourceHash": "sha256:3da441d6a8ec19fa7b2d0aaa4789969f7d0fa42cce44c5def7a868eea3d90de2",
       "storeId": "session-sidecars"
     },
     {

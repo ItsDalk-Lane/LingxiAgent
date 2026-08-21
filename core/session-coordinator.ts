@@ -10,6 +10,8 @@ import fsp from "fs/promises";
 import path from "path";
 import { createAgentSession, SessionManager, estimateTokens, refreshSessionModelFromRegistry } from "../lib/pi-sdk/index.ts";
 import { registerSessionModelCallContext } from "../lib/pi-sdk/model-call-stream-observer.ts";
+import { runWithModelTraceRoot } from "../lib/llm/model-trace-scope.ts";
+import { modelCallLedgerMetadataForMessage } from "../lib/llm/model-call-correlation.ts";
 import { isSessionJsonlFilename } from "../lib/session-jsonl.ts";
 import { createDefaultSettings } from "./session-defaults.ts";
 import { isDefaultWorkspacePath, restoreDefaultWorkspaceIfMissing } from "../shared/default-workspace.ts";
@@ -575,11 +577,16 @@ function recordAssistantUsage({ ledger, event, sessionPath, sessionId, agentId, 
     },
   };
   const errorMessage = event.message?.errorMessage || event.message?.error?.message || null;
+  // Observer ↔ Ledger 关联（§六十四）：stream observer 已把 assembled message →
+  // {callId, traceId, parentCallId} 登进 WeakMap；message_end 补账处读取同一
+  // 对象。对象被复制/未观测调用 → null，不猜（关联缺失不影响记账）。
+  const modelCallMetadata = modelCallLedgerMetadataForMessage(event.message);
   if (event.message?.stopReason === "error" || errorMessage) {
     const request = ledger.start({
       model: modelMeta,
       usageContext,
       costRates,
+      ...(modelCallMetadata ? { metadata: modelCallMetadata } : {}),
     });
     return ledger.recordError(request.requestId, new Error(errorMessage || "provider request failed"));
   }
@@ -589,6 +596,7 @@ function recordAssistantUsage({ ledger, event, sessionPath, sessionId, agentId, 
       usage: event.message.usage,
       usageContext,
       costRates,
+      ...(modelCallMetadata ? { metadata: modelCallMetadata } : {}),
     });
   }
   return null;
@@ -4892,6 +4900,25 @@ export class SessionCoordinator {
   }
 
   async prompt(text: any, opts: any) {
+    // Agent Turn = Trace 根（§二十七/§二十八）：整个用户 turn 的全部模型调用
+    // （Chat 流式、工具内 Vision/Approval/Media/Subagent、compaction、turn 后
+    // 派生 summary/title）共享同一个 traceId；外层已有 trace（嵌套/恢复场景）
+    // 则原样继承。
+    const spForTrace = this._session?.sessionManager?.getSessionFile?.() || this.currentSessionPath;
+    const sessionIdForTrace = this._session?.sessionManager?.getSessionId?.() || null;
+    return runWithModelTraceRoot(
+      {
+        origin: "user_turn",
+        refs: {
+          ...(sessionIdForTrace ? { sessionId: sessionIdForTrace } : {}),
+          ...(spForTrace ? { sessionPath: spForTrace } : {}),
+        },
+      },
+      () => this._promptWithinTrace(text, opts),
+    );
+  }
+
+  async _promptWithinTrace(text: any, opts: any) {
     const turnContext = normalizeSessionTurnContext(opts?.context);
     if (!this._session) {
       const currentPath = this.currentSessionPath;

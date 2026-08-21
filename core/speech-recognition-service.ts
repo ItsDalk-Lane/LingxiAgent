@@ -11,7 +11,9 @@ import { withModelRequestAccounting } from "../lib/llm/model-request-accounting.
 import {
   beginObservedModelCall,
   failObservedModelCall,
+  observedModelCallLedgerMetadata,
 } from "../lib/llm/model-call-integration.ts";
+import { runWithNewModelTrace } from "../lib/llm/model-trace-scope.ts";
 
 const CAPABILITY = "speech_recognition";
 
@@ -211,6 +213,15 @@ export class SpeechRecognitionService {
   }
 
   async transcribeAudio(payload: any = {}) {
+    // 独立语音转写 = 新 Trace（§三十八/§二十五）：REST/后台触发的 ASR 是独立
+    // 任务；转写结果后续触发的新消息属于新的用户 turn，有自己的 trace。
+    return runWithNewModelTrace(
+      { origin: "speech", refs: { ...(payload?.fileId ? { fileId: String(payload.fileId) } : {}) } },
+      () => this._transcribeAudioWithinTrace(payload),
+    );
+  }
+
+  async _transcribeAudioWithinTrace(payload: any = {}) {
     const {
       fileId,
       language,
@@ -293,6 +304,15 @@ export class SpeechRecognitionService {
   }
 
   async transcribeVoiceAttachment(payload: any = {}) {
+    // 同 transcribeAudio：voice 附件转写是独立后台派生任务（fire-and-forget），
+    // force-new 防止沿队列异步链继承任何外层 scope（§五十）。
+    return runWithNewModelTrace(
+      { origin: "speech", refs: { ...(payload?.fileId ? { fileId: String(payload.fileId) } : {}) } },
+      () => this._transcribeVoiceAttachmentWithinTrace(payload),
+    );
+  }
+
+  async _transcribeVoiceAttachmentWithinTrace(payload: any = {}) {
     const { fileId, language } = payload;
     const sessionTarget = normalizeSessionRef(payload);
     const { sessionId, sessionPath, sessionRef } = sessionTarget;
@@ -429,7 +449,7 @@ export class SpeechRecognitionService {
             ...(sessionPath ? { sessionPath } : {}),
           },
         },
-        metadata: { capability: CAPABILITY, modelCallId: recorder.callId },
+        metadata: { capability: CAPABILITY, ...observedModelCallLedgerMetadata(recorder) },
       }, () => adapter.transcribe({
         file,
         provider: target.provider,

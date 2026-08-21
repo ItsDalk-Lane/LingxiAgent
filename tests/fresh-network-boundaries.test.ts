@@ -31,7 +31,9 @@ describe("fresh credential network boundaries", () => {
     for (const handler of [utilityHandler, sampleHandler]) {
       expect(handler).toContain('await engine.resolveAuxiliaryModelFresh("summarize"');
       expect(handler).not.toMatch(/engine\.resolveUtilityConfig(Fresh)?\s*\(/);
-      expect(handler).toContain("await callText");
+      // callText 可能经 ModelTraceScope 包装（Phase 4）——契约是"真实经
+      // callText 发送"而非固定调用文本形状。
+      expect(handler).toMatch(/await\s+runWithModelTraceRoot[\s\S]*?=>\s*callText\(|await callText/);
       expect(handler).not.toContain("callTextConfigFromUtilityConfig");
       expect(handler).toContain("resolved.api");
       expect(handler).toContain("resolved.apiKey");

@@ -1,287 +1,211 @@
-# Model Call Observer — 实现报告（Phase 1 契约 + Phase 2 文本运行时 + Phase 2.5 安全收口 + Phase 3 全路径）
+# Model Call Observer — 实现报告（Phase 1 契约 + Phase 2 文本运行时 + Phase 2.5 安全收口 + Phase 3 全路径 + Phase 3.5 残余闭合 + Phase 4 Trace）
 
-基线：`feature/model-call-observability`（第一轮 main @ e62bb535 之上）。Pi 三件套 0.84.1。
-本文档以当前最终代码为准；Phase 1/2 implemented = 第一轮（MC-01～04），Phase 2.5 + Phase 3 implemented = 本轮。
+基线：`feature/model-call-observability`。Pi 三件套 0.84.1。
+本文档以当前最终代码为准；Phase 1/2 = 第一轮，Phase 2.5/3 = 第二轮，
+Phase 3.5 + Phase 4 = 本轮（trace 传播 + MC-10）。
 
-## Current Observer Contract
+## Residual Boundary Closure（Phase 3.5，本轮新增）
 
-`lib/llm/model-call-observer.ts`：9 个生命周期事件（名称即契约，第一轮冻结未变）：
+修正旧「9 paths」结论：重新全仓出口反扫发现 diary temporary summary 是
+**生产可达的第 10 条独立架构路径**（MC-10）：
 
-```
-logical_call_start → attempt_start → provider_request_prepared
-→ provider_response_received → semantic_response_completed → logical_call_end
-（失败：attempt_error / logical_call_error；中止：logical_call_aborted）
-```
-
-公共字段：eventType/timestamp/callId/attemptId/traceId/parentCallId/
-providerRequestId/model{provider,modelId,api}/source{subsystem,operation,surface,trigger}/
-attribution（与 usage attribution 同形状）/status/details/error{name,message,code}。
-
-投递纪律：所有事件经 `safeEmitModelCallEvent`——observer 抛错/缺失/序列化失败
-就地吞掉，绝不影响模型调用（自动化测试锁定：成功/失败双路径）。生产默认
-observer 为 noop（`NOOP_MODEL_CALL_OBSERVER`），测试经 `setModelCallObserver`
-注入 `TestModelCallObserver`（含 `eventsForCall/attemptsForCall/
-assertNoSensitiveContent/assertLifecycle` 辅助断言）。
-
-Recorder 状态机（`lib/llm/model-call-recorder.ts`，§十二）：
-- callId 创建即存在（Provider 请求之前）；`beginAttempt` 可重复调用（同 call
-  多 attempt）；`endLogicalCall` 恰好一次；
-- **logical_call_end 之后一切生命周期方法为 silent no-op**（不 throw、不补
-  假事件）——晚到事件被状态机丢弃（Safety D 测试锁定）；
-- `attemptErrored` getter 跟踪当前 attempt 是否已投递 attempt_error，避免
-  业务层 catch 重复投递。
-
-## Identity Contract
-
-`lib/llm/model-call-identity.ts`：三层身份不变——
-
-- `callId`（`mc_`）：logical model call 稳定身份，**请求/外部执行之前**生成；
-  success/error/abort 同一 callId；业务级重发（repair/recovery/retry-image）
-  铸新 callId。
-- `attemptId`（`ma_`）：每个真实/可观察 attempt 唯一。Codex image 401
-  credential refresh = 同 callId 两个 attemptId（自动化测试锁定）。
-- `traceId`（`mt_`）/`parentCallId`：caller 显式提供才传，缺省 null，不猜。
-- `providerRequestId`：响应头 allowlist（6 个 id 头）+ **string only/trim/
-  ≤128 chars**（超长整体丢弃为 null——恶意 Provider 经 x-request-id 塞内容
-  无法进入事件；Safety C 测试锁定）。Ledger 侧错误 body 的 request_id 回落
-  路径同样过 sanitize。
-
-## Metadata Safety Contract
-
-`sanitizeModelCallDetails`（`lib/llm/model-call-observer.ts`）——Recorder 的
-emit 是唯一出口，**所有集成点无法绕过**（机器可执行，不再靠注释）：
-
-1. **键 denylist**：归一化（lowercase + 去非字母数字）后整键匹配 §十全表
-   （prompt/systemPrompt/messages/message/content/text/body/rawBody/
-   rawResponse/responseBody/responseText/reasoning/toolResult/toolSchema/
-   headers/authorization/cookie/apiKey/accessToken/refreshToken/credential/
-   secret/token/base64/audio/video/image/imageData/stdout/stderr/commandArgs/
-   args/environment/detail/error/transcription/payload/request/response/
-   filename/filepath/signedUrl…）。命中即丢弃（fail closed）。
-   `hasText`/`messageCount` 等布尔/计数键与被禁的 `text`/`message` 是不同
-   归一键，不受影响（整键匹配，无子串误伤）。
-2. **值形状 gate**：string（≤256 截断）/finite number/boolean/null 放行；
-   嵌套 plain object（深度 ≤2、键 ≤32）/array（≤32 项）递归同规则；
-   function/symbol/bigint/超深结构/剥空的嵌套对象一律丢弃。
-3. typed builders（`summarizeProviderRequestPayload`/
-   `summarizeAssistantMessage`/各 adapter requestDetails）继续作为第一层：
-   只构造结构性 metadata；runtime gate 是最终防线，不是脱敏管道。
-
-## Error Safety Contract
-
-`normalizeModelCallError` 重定义为**安全错误事实**：
-
-```
-{ name（截断）, code（内部错误码，如 LLM_RATE_LIMITED）, message（仅 safe 标记） }
+```text
+POST /api/diary/write → engine.writeDiary → collectDiaryMaterialResult
+→ generateTemporarySummary × N → generateDiaryCompactionSummary
+→ Pi generateSummary()（未传 streamFn）→ completeSimple() → Provider
 ```
 
-- Safe-message contract：唯一合法入口 `markModelCallSafeMessage(err, text)`
-  （`Symbol.for("lingxi.modelCallSafeMessage")`）。只有仓库内部固定文案
-  被标记（callText 的 invalid-JSON、empty-after-thinking）。
-- **Provider 返回的不可信文本（error.message fallback rawText、error.detail、
-  JSON error body、CLI stdout、stream errorMessage）一律 message=null**。
-  第一轮的泄漏链（provider body → AppError.message → observer event.error.
-  message）在唯一出口被切断；业务层错误信息对调用方保持原样（测试断言
-  设置页 probe error 仍含 provider message、transcription 失败态不变）。
-- `logical_call_error`/`attempt_error` 的 details 继续携带 errorKind
-  （abort/timeout/network/http_error/provider_or_network/adapter_error/
-  external_process）+ httpStatus 数值。
+- 原状态：不经 streamFunction/callText/MC-05～09、不进 ledger、不可观测。
+- 接入：`lib/pi-sdk/index.ts` 的 `generateSummary` re-export 包装为
+  Observed direct summary（`lib/llm/observed-pi-direct-summary.ts`，
+  复用 ModelCallRecorder/Observer/Identity，**无** DiaryObserver/SummaryObserver）。
+  diary 传第 14 参 observerContext（usageContext + usageLedger）获得归属与账本。
+- attemptVisibility=logical_boundary（transport retry 不可见，不伪造 exact）；
+  无 provider_request_prepared/provider_response_received（summarizer options
+  无 onPayload、不在 session 扩展链——事件缺失即真相，同 MC-03）。
+- ledger：每临时摘要 1 条 entry，metadata.{modelCallId,traceId,parentCallId}。
+- `session-snapshot-side-task-runner` completeSimple 回落：唯一上层
+  memory-reflection-runner 仍无生产 caller → **LATENT / NOT_CURRENTLY_REACHABLE**
+  （不制造生产行为；facade completeSimple 保持裸 re-export）。
+- 全部事实记录在 `MODEL_CALL_CLOSURE_DELTA.md`（Audit Addendum，原始审计
+  报告保持 bf3c80b5 历史快照不改写）。
 
-## Attempt Visibility Contract
+## Trace Contract（Phase 4，本轮新增）
 
-`MODEL_CALL_ATTEMPT_VISIBILITY = exact | logical_boundary | external_process_boundary`
-（§五十三，禁止自由字符串）：
+### 第一性原理定义
 
-- `exact`：Lingxi 亲见网络边界——MC-04/05/06/08/09 的每个 fetch。
-- `logical_boundary`：MC-01/02/03 的一个 streamFn 调用折叠一次 attempt；
-  pi-ai `retryProviderRequest` 内部 transport retry 不可见（0.84.1 实证，
-  `tests/model-call-pi-retry-visibility.test.ts` 直驱真实实现锁定）。
-- `external_process_boundary`：MC-07 Dreamina CLI 的 execFile 边界。
+- `traceId` = 一次具有共同因果根源的完整任务执行。不是 sessionId/
+  conversationId/taskId/callId；一个 session 可以有很多 trace，一个 trace
+  可以跨多个 session（subagent）。禁止 `traceId = sessionId`。
+- `parentCallId` = 直接造成当前 Model Call 的上游 Model Call。不是"最近的"、
+  不按时间/session/数组顺序猜。无事实 → null（允许 null；不造假 parent）。
+- Trace root 不一定是 Model Call（用户输入不是调用）——trace 可以只有
+  traceId 而无 rootCallId，不造 UserRequestModelCall。
+- 数据依赖 ≠ 触发因果（§四十八）：diary 素材 A 拼进 prompt B 不构成
+  B.parent=A；本轮只表达直接执行因果。
 
-## Provider Wire Visibility Contract
+### ModelTraceScope（`lib/llm/model-trace-scope.ts`）
 
-`MODEL_CALL_PROVIDER_WIRE_VISIBILITY = request_response | response_only | opaque`
-（§五十四）。HTTP attempt helper 发 `request_response`；CLI 发 `opaque`。
-「没捕获」（MC-03 summarizer 不触发 payload hook）不写该字段——与「理论上
-不可捕获」（opaque）不是同一种缺失，不混用。
+与 ModelCallScope 分层：TraceScope 生命周期=整个任务；ModelCallScope=
+单次 Provider 调用。实现=AsyncLocalStorage（并发隔离/异步传播/嵌套 child
+task），禁止 global currentTraceId / module-level mutable parent。
 
-## MC-01～MC-09 Coverage Matrix（§六十五）
-
-| Path | Logical Call | Pre-request callId | Attempt visibility | Request boundary | Response boundary | Semantic response | Ledger correlation | Provider wire visibility | Control-plane clean |
-| ---- | ------------ | ------------------ | ------------------ | ---------------- | ----------------- | ----------------- | ------------------ | ------------------------ | ------------------- |
-| MC-01 Pi AgentSession（Chat/Bridge/Phone/Subagent） | FULL | FULL | PARTIAL | FULL | FULL | FULL | NONE | FULL | FULL |
-| MC-02 Pi cache-preserving AgentRun | FULL | FULL | PARTIAL | FULL | FULL | FULL | FULL | FULL | FULL |
-| MC-03 Pi native compaction summarizer | FULL | FULL | PARTIAL | NONE | NONE | FULL | NONE | NONE | FULL |
-| MC-04 callText() utility | FULL | FULL | FULL | FULL | FULL | FULL | FULL | FULL | FULL |
-| MC-05 Anthropic generation probe | FULL | FULL | FULL | FULL | FULL | FULL | FULL | FULL | FULL |
-| MC-06 图片 HTTP adapters（7 个） | FULL | FULL | FULL | FULL | FULL | FULL | FULL | FULL | FULL |
-| MC-07 Dreamina/Jimeng CLI | FULL | FULL | OPAQUE | NONE | NONE | FULL | FULL | OPAQUE | FULL |
-| MC-08 视频 HTTP（Agnes video） | FULL | FULL | FULL | FULL | FULL | FULL | FULL | FULL | FULL |
-| MC-09 Speech Recognition（4 个 adapter） | FULL | FULL | FULL | FULL | FULL | FULL | FULL | FULL | FULL |
-
-口径说明：
-
-- **Pre-request callId**：所有 9 条路径的 callId 都在网络请求/外部进程执行
-  之前生成（矩阵全 FULL；第一轮已达成 MC-01~04，本轮补 05~09）。
-- **MC-01/03 Ledger correlation NONE**：message_end 事后 record / compaction
-  entry 不携带 callId——第一轮明确留给「Observer → Accounting Projection」
-  阶段，本轮任务书 §50 只要求 MC-05～09 关联（全 FULL）。
-- **MC-07 Request/Response boundary NONE + wire OPAQUE**：CLI 内部 HTTP 对
-  Lingxi 理论上不可捕获——诚实缺失，不伪造 provider_request_prepared/
-  provider_response_received（§八十六）。
-- **MC-03 Request/Response boundary NONE**：0.84.1 summarizer options 不含
-  onPayload/onResponse，事件缺失即真相（第一轮实证）。
-- **Attempt visibility PARTIAL（MC-01/02/03）**= logical_boundary；FULL =
-  exact；MC-07 = OPAQUE（external_process_boundary）。
-- **Control-plane clean FULL**：probe GET /models、media poll、credential
-  authorization 已全部出 ledger 且 0 observer 事件（§六十四测试锁定）。
-
-## 接入位置（本轮 MC-05～MC-09）
-
-统一 helper：`lib/llm/model-call-integration.ts`（唯一 integration layer，
-复用同一 Recorder/Observer，无第二套事实系统）：
-
-- `observedProviderFetch(carrier, fetchFn, {requestDetails})`——HTTP attempt：
-  attempt_start(exact/request_response) → provider_request_prepared →
-  provider_response_received(status+allowlist id) → !2xx 自动 attempt_error
-  （http_error）→ fetch throw attempt_error（abort/timeout/network）+ rethrow。
-  **可重复调用**（同 call 多 attempt）。
-- `observedExternalProcessRun(carrier, runFn, {details})`——CLI attempt：
-  external_process_boundary + opaque，不伪造 wire 事件。
-- `beginObservedModelCall({model, usageContext/source/attribution, details})`
-  ——业务边界 bootstrap：铸 callId + logical_call_start。
-- `failObservedModelCall(recorder, err, {errorKind})`——logical_call_error +
-  end(error)；attempt 级错误已在失败点投递，不重复。
-
-| 路径 | logical call 边界 | attempt 边界 |
-|---|---|---|
-| MC-05 | `lib/llm/provider-client.ts` probeProvider（仅 anthropic-messages 分支） | 同文件 observedProviderFetch |
-| MC-06 | `core/media/image-task-runner.ts` runSubmitInBackground | 7 个 adapter 的 submit fetch：volcengine/openai/openai-codex(×2)/minimax/dashscope/gemini/agnes-image |
-| MC-07 | 同 MC-06（dreamina adapter 经同一 runSubmitInBackground） | `plugins/jimeng-cli/adapters/dreamina.ts` observedExternalProcessRun |
-| MC-08 | `core/media/universal-media-manager.ts` submitVideo | `core/media-adapters/agnes.ts` agnesVideoAdapter.submit fetch |
-| MC-09 | `core/speech-recognition-service.ts` _transcribeWithAccounting | `core/speech-recognition/adapters.ts` 4 个 adapter 的 fetchImpl |
-
-Recorder 经业务边界显式注入（`ctx.modelCall` / `input.modelCall`）——
-「用了 accounting wrapper」不自动推断「是模型调用」（§十五/§十六）；无
-recorder 的调用点是纯 passthrough。
-
-## Usage Ledger Correlation
-
-- MC-05～09 每个真实 logical call 的 ledger entry 都带
-  `metadata.modelCallId === observer.callId`（probe/media-image/media-video/
-  speech 四处写入点，自动化测试逐路径断言）。
-- 无双计（§七十七）：observer 不写 usage record；每条 generation 恰好 1 条
-  ledger entry（Codex 401 refresh 的 2 次 HTTP attempt 共享同一条 entry——
-  这正是 attempt/call 两层身份分离的意义）；usage_missing 保留
-  （真实模型调用 + Provider 无 usage 仍是 1 条 record）。
-
-## Control Plane Exclusions（§七十三）
-
-ModelCallObserver 明确不接收控制面事件；以下动作保留行为/诊断但不进
-observer、不进模型用量 ledger（`tests/model-call-control-plane.test.ts` +
-`tests/model-call-probe-observer.test.ts` + `tests/media-poller.test.ts` +
-`tests/jimeng-cli-runtime-integration.test.ts` 锁定）：
-
-- **媒体 poll/query**（`core/media/poller.ts`：withModelRequestAccounting
-  移除；原先每次 poll 产生一条 media/query usage_missing 污染统计）。
-- **非生成 probe GET /models**（`lib/llm/provider-client.ts`：accounting
-  只保留 Anthropic generation 分支）。
-- **外部 CLI credential authorization**（`hub/index.ts`
-  provider:authorize-external-credential-use：withModelRequestAccounting
-  移除；许可签发/拒绝逻辑与诊断不变）。
-- credential resolve/refresh（bus handler 本就不记账）、asset download、
-  local file save、Gemini 参考图下载（remoteImageToInlinePart 不经 attempt
-  helper）均不是 Model Call。
-- codex 401 的 credential refresh 本身：0 logical call（callIds 长度 1 锁定）。
-
-## OpenAI Codex 401 refresh 实际事件序列（§二十六验收）
-
-```
-logical_call_start
-attempt_start A / provider_request_prepared A / provider_response_received A (401)
-attempt_error A (http_error 401)
-[credential refresh —— 控制面，0 事件]
-attempt_start B / provider_request_prepared B / provider_response_received B (200)
-semantic_response_completed / logical_call_end(ok)
+```ts
+{
+  traceId, origin（有限枚举）, causalParentCallId（建立时快照）,
+  refs（≤8 键 string 安全业务引用）,
+  lastCallId（mutable：仅 agent-loop 流式调用推进）
+}
 ```
 
-same callId、distinct attemptId、A 错 B 成、end=ok——
-`tests/model-call-media-observer.test.ts` 精确断言此序列。
+API：`runWithModelTrace` / `runWithNewModelTrace`（force-new，detach 语义）/
+`runWithoutModelTrace` / `runWithModelTraceRoot`（inherit-or-mint，顶层任务
+入口用）/ `runToolExecutionWithModelTrace`（工具子 scope）/ `noteAgentStreamCallStarted`
+/ `resolveModelTraceContext`（唯一身份解析入口）。
 
-## Retry Reality（第一轮结论保持）
+### 身份解析优先级（所有接点统一，§四十一/四十二/四十三）
 
-pi-ai transport retry（408/409/429/5xx）循环内部无 hook → MC-01/02/03
-仍是 logical_boundary 折叠；pi-coding-agent 语义 retry 重新调用 streamFn =
-新 logical call（诚实建模）；MC-02 tool/format recovery 每次新 callId；
-MC-04 无内部 retry（exact）。
+```text
+explicit caller context → current ModelTraceScope → (session 注册 trace) → singleton trace
+```
 
-## Safety（毒丸测试矩阵）
+singleton 兜底保证**所有生产 Model Call traceId != null**（独立
+Health Check/Probe/后台任务形成单 call trace）；自动生成 traceId 安全、
+自动猜 parentCallId 不安全（无事实 → null）。
 
-- Safety A：provider error body（message/detail/raw/HTML 三形态毒丸
-  `TOP_SECRET_PROVIDER_RESPONSE_8F91C2`）不进任何事件序列化。
-- Safety B：details 毒丸键（prompt/authorization/rawBody/apiKey/… +
-  raw_body/RESPONSE-TEXT 变体）被 gate 剥离；值形状 gate 剥 function/
-  超深/超长。
-- Safety C：providerRequestId 超长丢弃。
-- Safety D：end 后 no-op。
-- Safety E：observer throw 业务正常。
-- 媒体：prompt/参考图 URL/apiKey/CLI args/stdout/本地路径毒丸不进事件；
-  语音：音频字节/base64/转写正文/apiKey（含 Volcengine body 内 user.uid
-  credential——前提用断言复现）不进事件；允许 fileId/audioFormat/
-  languageSpecified/inputSizeBucket（只读 size，不复制 Buffer、不 hash）。
-- 性能（§七十）：无 payload stringify、无深拷贝、无媒体哈希、无同步持久
-  化；结构摘要只遍历顶层数组计数。
+### Trace Origin（closed enum，§六十八/六十九）
 
-## Tests（第一轮 42 + 本轮新增）
+user_turn / bridge_message / phone_message / slash_command / automation /
+background / plugin / media / speech / provider_probe / health_check /
+diary / unknown。prompt 类别（memory/approval/vision/summary）继续由
+subsystem/operation 表达，不进 origin。事件侧只落 `logical_call_start.details.traceOrigin`。
 
-本轮新增 5 个测试文件（37 用例）+ 更新 4 个既有文件锁定新契约：
+## Trace Root Semantics — Root Ingress Matrix
 
-- `tests/model-call-safety-gate.test.ts`（8）：Safety A–E + 多 attempt 状态。
-- `tests/model-call-probe-observer.test.ts`（6）：MC-05 双分支。
-- `tests/model-call-media-observer.test.ts`（15）：7 adapter coverage registry
-  （经真实 runSubmitInBackground 业务链）+ Codex 401 硬验收 + Dreamina
-  opaque + Agnes video + poll 0 事件。
-- `tests/model-call-speech-observer.test.ts`（6）：4 adapter coverage（经真实
-  SpeechRecognitionService）+ 500 错误态 + Volcengine credential-in-body。
-- `tests/model-call-control-plane.test.ts`（2）：poll / credential auth
-  0-event + 0-ledger。
-- 更新：`model-call-observer.test.ts`（错误契约）、`model-call-pi-stream-
-  observer.test.ts`（provider 流错误正文不进事件）、`media-poller.test.ts`
-  （query 0 ledger）、`jimeng-cli-runtime-integration.test.ts`（许可 0 ledger）。
+| Task ingress | New Trace | Inherit Trace | Parent source | Detach behavior |
+| ------------ | --------- | ------------- | ------------- | --------------- |
+| Desktop user turn（coordinator.prompt） | runWithModelTraceRoot origin=user_turn | 外层 scope 原样继承 | scope.lastCallId 链 | turn 内派生任务继承；cron/timer 类强制新根 |
+| Bridge inbound（executeExternalMessage） | origin=bridge_message | 同上 | 同上 | 同上 |
+| Phone inbound（runAgentPhoneSession） | origin=phone_message | 同上 | 同上 | 同上 |
+| Slash command（dispatcher.tryDispatch） | origin=slash_command | bridge turn 内继承 | 同上 | 同上 |
+| Automation/Cron（scheduler._executeCronJob） | **force-new** origin=automation | 不继承（每 run 新 trace） | null | 天然 detach |
+| Diary（engine.writeDiary） | **force-new** origin=diary | 不继承 | null | 天然 detach |
+| Memory daily/compile（memory-ticker） | **force-new** origin=background | 不继承（checkpoint 可能在 turn 链内触发，必须切断） | null | 天然 detach |
+| Dream（startAutomaticIfEligible） | **force-new** origin=background | 不继承 | null | 天然 detach |
+| Speech（transcribeAudio/transcribeVoiceAttachment） | **force-new** origin=speech | 不继承（REST/队列独立任务） | null | 天然 detach |
+| Provider Probe（probeProvider anthropic 分支） | **force-new** origin=provider_probe | 不继承 | null | 天然 detach |
+| Health Check（/models/health） | **force-new** origin=health_check | 不继承 | null | 天然 detach |
+| Plugin（model:sample-text / utility:call-text） | runWithModelTraceRoot origin=plugin | chat 工具内触发 → 继承工具子 scope | 同上 | 后台触发铸新根 |
+| Media（submitImage/submitVideo） | runWithModelTraceRoot origin=media | 工具内生成继承 Chat trace | 工具子 scope 快照 | 独立提交铸新根 |
+| Subagent（executeIsolated → session.prompt） | facade trace ingress 兜底 inherit-or-mint | 工具 spawn → 继承（§三十五不 mint）；调度器已包 automation trace | 工具子 scope 快照 | — |
+| Compaction（MC-02 runner / MC-03 native） | 无独立 ingress：mid-turn 继承 turn trace；slash /compact 走 slash ingress | 继承 | scope.lastCallId | — |
 
-## 门禁（仓库既有机制，按规程处理）
+## ParentCall Semantics — Causal Edge Matrix（代码/测试已证明的边）
 
-- `export-manifest.json`：收录 `lib/llm/model-call-integration.ts`（同组先例）。
-- `build/open-boundary-baseline.json` + `build/cli-runtime-closure.json`：
-  compute-cli-closure.mjs 复核后无新 debt（新边全部因 manifest 收录消失）。
-- `build/persistence-schema-fingerprint.json`：compatible review repin
-  （Observer runtime only，无 store 形状/格式变更；guarded 模块 agnes/
-  universal-media-manager/hub 只有观测接线）。
-- post-verification seal：本轮完成后按既有机制推进 VERIFIED_SOURCE_SHA
-  （单独 audit commit，见下）。
+| Parent model call | transition | child model call | 证明 |
+| ----------------- | ---------- | ---------------- | ---- |
+| Chat C1（agent loop 流式） | 同一 runAgentLoop 工具结果回流后继续推理 | Chat C2（C2.parent=C1） | tests/model-call-trace-propagation.test.ts 测试2 |
+| Chat C1 | parallel toolCall tc_a → 工具执行边界子 scope | Vision/工具内任意辅助 call（parent=C1） | 测试3（并行动作双双 parent=C1，绝不互为 parent） |
+| Chat C1 | spawn_subagent 工具 → child session.prompt | Child Chat C2（parent=C1，跨 session 同 trace） | 测试4 |
+| Chat C1 | media 工具 → bus → submitImage/submitVideo | Media submit call（parent=C1） | 测试5 |
+| AgentRun turn N | recovery/repair 下一 turn | turn N+1（parent=N，经 scope.lastCallId 推进） | runner 统一解析 + 测试2 同机制 |
+| diary task root | 直接触发的临时摘要×N + 终稿 | 全部 parent=null、same trace | 测试8 / diary 测试 |
 
-## Remaining Gaps（本轮不做，§八十七）
+无法证明直接因果的位置（数据依赖 / 后台扫描派生）保持 `parentCallId=null`
+（TRACE_ONLY）：diary 临时摘要之间、turn 后 title/summary（若 fire-and-forget
+脱离链则 singleton）、memory 后台各调用间。不按时间/session 猜。
 
-- 全局 Trace propagation 尚未实现（traceId/parentCallId 契约就绪，caller
-  不提供即 null；不根据 sessionId/taskId/时间猜）。
-- Prompt provenance 尚未实现。
-- Request/Response capture 尚未实现（fetch 前位置已被 lifecycle 命中并
-  验证，但本轮零 body 保存）。
-- Redaction Pipeline 尚未实现（metadata gate 是 fail-closed 门，不是脱敏
-  管道）。
-- Trace/Payload/Blob Store 尚未实现；Query/Export/UI 尚未实现。
-- Pi SDK transport retries 仍只有 logical_boundary（事实仍如此；需 pi-ai
-  上游 onAttempt 或 fetch 层埋点）。
-- Dreamina provider wire 仍 OPAQUE（结构性不可见）。
-- MC-01 message_end ledger record / MC-03 compaction entry 未携带 callId
-  （Observer → Accounting Projection 阶段）。
-- diary-writer `generateSummary` 直发（不走 agent.streamFunction/callText）
-  与 session-snapshot-side-task-runner 的 completeSimple 回落（无生产
-  caller）——范围外已知旁路，未接 observer。
-- MC-01 CLI surface 落 desktop 的既有偏差（第一轮已记录）。
+工具边界实现：`session-options.ts wrapToolDefinitionExecutionOnce`（全部
+base+custom 工具的唯一收口，execute 首参即 toolCallId）→ 进入时快照
+`causalParentCallId = scope.lastCallId`。toolCallId（Tool Invocation
+Identity）只进 scope refs 保留，不冒充 parentCallId（§三十三/三十四）。
+并行安全：子 scope 冻结快照 + 每 ALS 链独立对象，无全局 lastCall。
+
+## Concurrency / Detach Contract
+
+- 并发 Session A/B：各自 root scope，trace 内不出现对方 callId（测试9）。
+- 并行工具：双双 parent=C1（测试3）。
+- detached background：T1 内创建的 delayed 任务执行时强制新 trace，不泄漏
+  T1（测试10；memory-ticker/dream/scheduler/diary/speech/probe/health 均
+  force-new 入口）。
+- ALS 泄漏边界（§四十九）：进程内 bus 是 promise 链（工具→媒体提交可传播）；
+  已知 fire-and-forget（queueVoiceTranscription）入口已 force-new。未接线的
+  未知延迟回调最坏回落 singleton trace（诚实缺失，不串线到错误 trace 需要
+  显式 force-new 入口遗漏才会发生——见 Known Trace Gaps）。
+
+## MC-01～MC-10 Trace Coverage Matrix
+
+| Path | Observer | traceId | Root creation | Trace inheritance | parentCallId | Concurrency safe | Ledger trace metadata |
+| ---- | -------- | ------- | ------------- | ----------------- | ------------ | ---------------- | --------------------- |
+| MC-01 Pi AgentSession | FULL | 恒非空 | prompt ingress（desktop/bridge/phone/subagent 兜底） | turn 内全调用+工具派生 | C2.parent=C1（loop 链）；工具内辅助 parent=C1 | ALS 隔离 | **FULL（本轮补）**：message_end 补账 metadata.{modelCallId,traceId,parentCallId}（WeakMap 关联） |
+| MC-02 cache-preserving AgentRun | FULL | 恒非空 | mid-turn 继承 / slash、独立 compact 新根 | runner 统一解析 | recovery turn 链 parent 链 | 同上 | FULL（metadata 加 traceId/parentCallId） |
+| MC-03 native compaction | FULL | 恒非空 | mid-turn 继承 | 同上 | scope.lastCallId | 同上 | NONE（compaction entry 不带——Remaining Gap） |
+| MC-04 callText | FULL | 恒非空 | caller scope / singleton | 工具内辅助继承 | 工具内 parent=C1；独立 null | 同上 | FULL |
+| MC-05 Anthropic probe | FULL | 恒非空 | force-new origin=provider_probe | 不继承 | null | n/a | FULL |
+| MC-06 图片 HTTP | FULL | 恒非空 | 工具内继承 / 独立 origin=media | 同上 | 工具内 parent=C1 | 同上 | FULL |
+| MC-07 Dreamina CLI | FULL | 恒非空 | 同 MC-06 | 同上 | 同上 | 同上 | FULL |
+| MC-08 视频 HTTP | FULL | 恒非空 | 同 MC-06 | 同上 | 同上 | 同上 | FULL |
+| MC-09 Speech | FULL | 恒非空 | force-new origin=speech | 不继承 | null | n/a | FULL |
+| **MC-10 Pi direct summary（diary 临时摘要，本轮新增）** | FULL | 恒非空 | diary force-new origin=diary | diary 任务内全摘要+终稿同 trace | 全部 null（任务根直接触发） | 同上 | FULL |
+
+## Usage Ledger（§六十二/六十三）
+
+Observer 仍是 Trace Truth Source；Ledger 只是 Accounting Projection（不反向
+推导 trace）。低风险增补（无 schema version 变化，metadata 容器自由字段）：
+
+- MC-04：`metadata.{modelCallId,traceId,parentCallId}`（llm-client start）。
+- MC-05～09：四处写入点 spread `observedModelCallLedgerMetadata(recorder)`。
+- MC-02：runner ledger.start metadata 加 traceId/parentCallId。
+- MC-10：observed direct summary 内 ledger start/finish/recordError。
+- MC-01（原 correlation=NONE，本轮补齐）：assembled message ↔ 身份经
+  `lib/llm/model-call-correlation.ts` WeakMap 关联（对象 GC 自动回收，无
+  生命周期负担），三处 message_end 补账（session-coordinator /
+  bridge-session-manager / agent-executor）读取注入 metadata。**无侵入**：
+  不改 session message schema、不污染 assistant content、不给 Provider 发
+  标记（§六十五）；对象被复制/未观测调用 → null，不猜（fail-open）。
+
+## 测试（本轮新增 3 文件 35 用例 + 更新 1 文件）
+
+- `tests/model-trace-scope.test.ts`（17）：解析优先级/singleton/并发隔离/
+  detach/工具子 scope 快照与并行不串线/origin 枚举/refs 边界。
+- `tests/model-call-trace-propagation.test.ts`（14）：任务书测试 1～11 场景
+  （单 call、多 provider turn、并行工具、subagent 跨 session、media、speech、
+  automation 两 run、diary 三调用同 trace、并发 session、detached
+  background、毒丸 safety）+ MC-01 WeakMap 关联；全部场景收尾断言
+  `assertTraceGraphValid()`（traceId 非空/parent≠self/parent 同 trace 或
+  null/无环/生命周期身份稳定，§五十六～六十机器校验）。
+- `tests/model-call-diary-observer.test.ts`（4）：**真实 Pi generateSummary
+  链**（stub 全局 fetch 伪 SSE Provider）证明 MC-10 旁路闭合——生命周期、
+  ledger 关联、错误终态、错误正文不泄漏、空消息短路。
+- 更新 `tests/model-call-calltext-observer.test.ts`：锁定 Phase 4 新契约
+  （traceId 恒非空 singleton + parent 不猜；metadata 三元组）。
+- 第一/二轮全部回归（96 用例）通过。
+
+## 门禁（按仓库既有规程处理）
+
+- `export-manifest.json`：收录 model-trace-scope / model-call-correlation /
+  observed-pi-direct-summary。
+- `lint:boundary`：绿（新边全部因 manifest 收录消失；基线 debt 不变）。
+- `compute-cli-closure`：复核重写（新增 3 源模块 + importers，无新 debt）。
+- `persistence-schema-fingerprint`：compatible repin（观测接线 + additive
+  metadata，无 store 形状/格式变更）。
+- post-verification seal：完成后按既有机制推进 VERIFIED_SOURCE_SHA。
+
+## Known Trace Gaps（本轮不做/诚实缺失）
+
+- MC-03 compaction entry 不带 callId/traceId（Observer 可见、Ledger 侧
+  accounting 留给 Accounting Projection 阶段）。
+- Pi transport retry 仍 logical_boundary（需 pi-ai 上游 onAttempt）。
+- Dreamina wire 仍 OPAQUE（结构性）。
+- turn 后 fire-and-forget 派生（title/activity summary 若经 postMessage 事件
+  总线等非 ALS 链触发）可能各自 singleton——真实任务边界模糊处保持诚实，
+  不强行并 trace。
+- 未经 ingress 接线的未来新入口（直接调 session.prompt/callText 的新代码）
+  由 facade 兜底（session.prompt inherit-or-mint）与 singleton 兜底覆盖，
+  origin=unknown。
+- runAgentPhoneSession 的 runAgentSession（非 phone）仍无生产 caller——LATENT。
 
 ## Next Phase
 
-Trace propagation（全局 traceId 根系 + parentCallId 自动建立）→ Prompt
-provenance → Request/Response capture + Redaction Contract → Payload/Blob
-Store → Query Service → Export → UI。
+Prompt Provenance（sections/source/version/ref）→ Request/Response capture +
+Redaction Contract → Payload/Blob Store → Query Service → Export → UI。

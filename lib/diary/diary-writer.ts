@@ -344,6 +344,11 @@ async function defaultGenerateTemporarySummary({
     apiKey,
     headers,
     previousSummary,
+    // MC-10 观测归属 + 账本投影：resolvedModel 与终稿 callText 同源
+    // （memory slot），临时摘要与终稿共享本次 /diary 的 trace（engine.writeDiary
+    // 的 ModelTraceScope 经 ALS 传播到这里）。
+    usageLedger: resolvedModel.usageLedger ?? null,
+    agentId: resolvedModel.usageAgentId ?? null,
   });
 }
 
@@ -353,6 +358,8 @@ export async function generateDiaryCompactionSummary({
   apiKey,
   headers,
   previousSummary = "",
+  usageLedger = null,
+  agentId = null,
 }) {
   if (!Array.isArray(messages) || messages.length === 0) return "";
   const isZh = getLocale().startsWith("zh");
@@ -369,6 +376,28 @@ export async function generateDiaryCompactionSummary({
     undefined,
     customInstructions,
     previousSummary || undefined,
+    // thinkingLevel / streamFn / env / retry / callbacks：保持与接入前一致
+    // （无 streamFn → MC-10 observed direct summary 边界生效）。
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    {
+      usageContext: {
+        source: {
+          subsystem: "memory",
+          operation: "diary_temporary_summary",
+          surface: "background",
+          trigger: "system",
+        },
+        attribution: {
+          kind: "memory",
+          agentId: agentId ?? null,
+        },
+      },
+      usageLedger: usageLedger ?? null,
+    },
   )).trim();
 }
 

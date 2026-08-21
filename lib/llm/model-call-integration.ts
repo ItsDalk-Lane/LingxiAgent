@@ -24,6 +24,7 @@ import {
   type ModelCallSource,
 } from "./model-call-observer.ts";
 import { createModelCallRecorder, type ModelCallRecorder } from "./model-call-recorder.ts";
+import { resolveModelTraceContext } from "./model-trace-scope.ts";
 
 /** 携带 in-flight recorder 的最小契约（media submitCtx / speech input 等）。 */
 export type ObservedModelCallCarrier = { modelCall?: unknown } | null | undefined;
@@ -126,6 +127,11 @@ export async function observedExternalProcessRun<T>(
  * 业务 Model Call 边界的 bootstrap：铸 callId（Provider/外部执行之前）+
  * beginLogicalCall。media/video/speech/probe 的逻辑调用都从真实 caller 处
  * 显式调用本函数（§十六），不从 accounting wrapper 自动推断。
+ *
+ * Trace 身份统一解析（§四十二）：explicit（caller 传 traceId/parentCallId）
+ * → 当前任务 TraceScope（chat 工具内生成的媒体/语音继承调用它的 Chat trace）
+ * → singleton trace（独立 Health Check / Provider 测试 / 独立语音，单 call
+ * trace，traceId 恒非空、parentCallId=null 不猜）。
  */
 export function beginObservedModelCall({
   model,
@@ -147,17 +153,34 @@ export function beginObservedModelCall({
   const fields = usageContext !== null && usageContext !== undefined
     ? modelCallFieldsFromUsageContext(usageContext)
     : { source: source ?? null, attribution: attribution ?? null };
+  const trace = resolveModelTraceContext({ traceId, parentCallId });
   const recorder = createModelCallRecorder({
     context: {
-      traceId,
-      parentCallId,
+      traceId: trace.traceId,
+      parentCallId: trace.parentCallId,
       model: normalizeModelCallIdentity(model),
       source: fields.source,
       attribution: fields.attribution,
     },
   });
-  recorder.beginLogicalCall({ details });
+  recorder.beginLogicalCall({
+    details: {
+      ...(trace.origin ? { traceOrigin: trace.origin } : {}),
+      ...(details || {}),
+    },
+  });
   return recorder;
+}
+
+/** recorder 的 trace 三元组（ledger metadata 用；身份在创建时即冻结）。 */
+export function observedModelCallLedgerMetadata(
+  recorder: ModelCallRecorder,
+): { modelCallId: string; traceId: string | null; parentCallId: string | null } {
+  return {
+    modelCallId: recorder.callId,
+    traceId: recorder.traceId,
+    parentCallId: recorder.parentCallId,
+  };
 }
 
 /**

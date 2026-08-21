@@ -16,6 +16,7 @@ import {
   resolveModelAudioInputTransport,
   resolveModelVideoInputTransport,
 } from "../../shared/model-capabilities.ts";
+import { runWithNewModelTrace } from "../../lib/llm/model-trace-scope.ts";
 import { callText } from "../../core/llm-client.ts";
 import { callTextConfigFromResolvedModel } from "../../core/model-execution-config.ts";
 import { getModelThinkingLevels, modelSupportsXhigh, resolveModelDefaultThinkingLevel } from "../../core/session-thinking-level.ts";
@@ -230,7 +231,10 @@ export function createModelsRoute(engine) {
         return c.json({ ok: true, status: 0, provider: resolved.provider, skipped: t("error.codexNoHealthCheck") });
       }
 
-      await callText({
+      // Health Check = 独立用户任务（§二十五）：singleton trace，origin=health_check。
+      await runWithNewModelTrace(
+        { origin: "health_check", refs: { provider: resolved.provider, modelId: resolved.id } },
+        () => callText({
         ...callTextConfigFromResolvedModel(resolved),
         temperature: undefined as any,
         signal: undefined as any,
@@ -254,7 +258,8 @@ export function createModelsRoute(engine) {
             agentId: null,
           },
         },
-      });
+        }),
+      );
 
       return c.json({ ok: true, status: 200, provider: resolved.provider });
     } catch (err) {

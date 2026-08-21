@@ -4,6 +4,7 @@ import { withModelRequestAccounting } from "../../lib/llm/model-request-accounti
 import {
   beginObservedModelCall,
   failObservedModelCall,
+  observedModelCallLedgerMetadata,
 } from "../../lib/llm/model-call-integration.ts";
 
 export function createTaskId() {
@@ -440,7 +441,7 @@ export async function runSubmitInBackground({ taskId, adapter, params, submitCtx
           ...(sessionTarget.sessionPath ? { sessionPath: sessionTarget.sessionPath } : {}),
         },
       },
-      metadata: { taskId, mediaType: "image", modelCallId: recorder.callId },
+      metadata: { taskId, mediaType: "image", ...observedModelCallLedgerMetadata(recorder) },
     }, () => adapter.submit(params, observedSubmitCtx));
     const hasProviderTaskId = typeof result?.taskId === "string" && result.taskId.trim();
     const adapterTaskId = hasProviderTaskId ? result.taskId : taskId;

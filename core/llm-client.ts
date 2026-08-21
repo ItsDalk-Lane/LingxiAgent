@@ -13,6 +13,7 @@ import {
   type ModelCallObserver,
 } from '../lib/llm/model-call-observer.ts';
 import { createModelCallRecorder } from '../lib/llm/model-call-recorder.ts';
+import { resolveModelTraceContext } from '../lib/llm/model-trace-scope.ts';
 import {
   serializeOpenAICompatibleContentBlock,
   serializeResponsesContentBlock,
@@ -477,11 +478,18 @@ export async function callText({
   // ── 0. ModelCallObserver：logical call 身份在 Provider 请求之前生成 ──
   // 验证性错误（上面的 output policy / adapter 检查）发生在调用成立之前，不进入
   // 生命周期；从这里起的一切失败（构造/网络/解析/中止）都必须有终态事件。
+  // Trace 身份走统一解析（§四十一）：caller 显式传（modelCallContext）优先，
+  // 其次当前任务 TraceScope（工具/turn 内的辅助调用继承 trace 与 parent），
+  // 都没有 → singleton trace（traceId 恒非空，parentCallId=null 不猜）。
+  const modelCallTrace = resolveModelTraceContext({
+    traceId: modelCallContext?.traceId ?? null,
+    parentCallId: modelCallContext?.parentCallId ?? null,
+  });
   const modelCallRecorder = createModelCallRecorder({
     observer: modelCallObserver,
     context: {
-      traceId: modelCallContext?.traceId ?? null,
-      parentCallId: modelCallContext?.parentCallId ?? null,
+      traceId: modelCallTrace.traceId,
+      parentCallId: modelCallTrace.parentCallId,
       model: { provider, modelId, api: api || null },
       ...modelCallFieldsFromUsageContext(usageContext),
     },
@@ -489,6 +497,7 @@ export async function callText({
   modelCallRecorder.beginLogicalCall({
     details: {
       path: "callText",
+      ...(modelCallTrace.origin ? { traceOrigin: modelCallTrace.origin } : {}),
       ...(typeof callPurpose === "string" && callPurpose ? { callPurpose } : {}),
     },
   });
@@ -630,7 +639,11 @@ export async function callText({
     usageContext,
     costRates: modelObj?.cost,
     // Observer ↔ Ledger 最小关联：复用既有 metadata 字段，无 storage version 变更。
-    metadata: { modelCallId: modelCallRecorder.callId },
+    metadata: {
+      modelCallId: modelCallRecorder.callId,
+      traceId: modelCallRecorder.traceId,
+      parentCallId: modelCallRecorder.parentCallId,
+    },
   }) || null;
   const SLOW_THRESHOLD_MS = 15_000;
   const slowTimer = setTimeout(() => {

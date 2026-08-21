@@ -44,8 +44,16 @@ import {
   type ModelCallScope,
 } from "../llm/model-call-scope.ts";
 import { mintModelCallId } from "../llm/model-call-identity.ts";
+import {
+  currentModelTraceScope,
+  noteAgentStreamCallStarted,
+  runWithModelTraceRoot,
+  resolveModelTraceContext,
+} from "../llm/model-trace-scope.ts";
+import { noteModelCallMessageIdentity } from "../llm/model-call-correlation.ts";
 
 const INSTALLED = Symbol.for("lingxi.modelCallStreamObserver.installed");
+const TRACE_INGRESS_INSTALLED = Symbol.for("lingxi.modelCallTraceIngress.installed");
 
 /** 每个 session 的静态归属（由创建方注册）；per-call 分类优先走 ALS scope。 */
 export type ModelCallSessionContextProvider = () => {
@@ -97,6 +105,31 @@ export function installModelCallStreamObserver(
     const registered = readRegisteredContext(session, sessionContextProviders.get(session));
     const nativeSummarization = !explicitScope && session?.isCompacting === true;
 
+    // Trace 身份解析（§四十三）：显式 call scope trace > 当前任务 trace scope
+    // （parent = scope.lastCallId，即同一异步链上最近一次 agent-loop 流式调用）
+    // > session 注册归属 trace > 新铸 singleton trace。全部经统一 resolver，
+    // 各接点不自建解析（§四十一/§四十二）。
+    const traceFromScope = currentModelTraceScope();
+    const explicitTraceId = explicitScope?.traceId ?? null;
+    const registeredTraceId = registered?.traceId ?? null;
+    let traceId: string | null;
+    let parentCallId: string | null;
+    let traceOrigin: string | null = null;
+    if (explicitTraceId) {
+      traceId = explicitTraceId;
+      parentCallId = explicitScope?.parentCallId ?? null;
+    } else if (traceFromScope) {
+      traceId = traceFromScope.traceId;
+      parentCallId = traceFromScope.lastCallId;
+      traceOrigin = traceFromScope.origin;
+    } else if (registeredTraceId) {
+      traceId = registeredTraceId;
+      parentCallId = registered?.parentCallId ?? null;
+    } else {
+      traceId = resolveModelTraceContext().traceId;
+      parentCallId = null;
+    }
+
     // 分类优先级：显式 ALS scope（MC-02 runner）> native summarization（MC-03）
     // > session 注册归属（MC-01 各 surface）> 诚实 unknown。
     const effectiveSource = explicitScope?.source
@@ -106,8 +139,6 @@ export function installModelCallStreamObserver(
     const effectiveAttribution = explicitScope?.attribution
       ?? registered?.attribution
       ?? unknownAttributionWithSessionIds(session);
-    const traceId = explicitScope?.traceId ?? registered?.traceId ?? null;
-    const parentCallId = explicitScope?.parentCallId ?? registered?.parentCallId ?? null;
     // MC-02 runner 先铸 callId 写进 ledger metadata，这里接管同一身份（单点发射）。
     const callId = explicitScope?.callId ?? mintModelCallId();
 
@@ -125,6 +156,7 @@ export function installModelCallStreamObserver(
     recorder.beginLogicalCall({
       details: {
         path: "pi_stream",
+        ...(traceOrigin ? { traceOrigin } : {}),
         ...(nativeSummarization ? { nativeSummarization: true } : {}),
         ...(explicitScope?.details && typeof explicitScope.details === "object"
           ? explicitScope.details
@@ -135,6 +167,11 @@ export function installModelCallStreamObserver(
       // 一个 streamFn 调用 = 一个逻辑网络 attempt；pi-ai 传输层 retry 折叠在内。
       details: { attemptVisibility: "logical_boundary" },
     });
+
+    // Agent-loop 流式调用推进任务链的 causal parent 指针（§二十九/§三十）：
+    // 同一 runAgentLoop 的顺序调用 C1→C2，C2 解析 parent=C1；工具子 scope 在
+    // 建立时已冻结快照，不受此处推进影响（§三十一并行分支）。
+    noteAgentStreamCallStarted(callId);
 
     const scope: ModelCallScope = {
       callId,
@@ -170,6 +207,29 @@ function readRegisteredContext(session: any, provider: ModelCallSessionContextPr
   } catch {
     return null;
   }
+}
+
+/**
+ * Agent Turn trace 入口（§二十七/§二十八）：把整个 `session.prompt()`（含其
+ * 全部 streamFn 调用、工具执行、compaction、派生任务）置于同一个
+ * ModelTraceScope。
+ *
+ * 语义 = inherit-or-mint：外层已有 trace scope（chat 工具内 spawn 的子代理
+ * session、处于用户 turn 中的恢复调用）→ 原样继承（§二十六/§三十五：媒体/
+ * 子代理不得 mint 新 trace）；没有 → 铸新 trace 根（独立桌面/桥接/Phone turn、
+ * 定时自动化）。origin 用 "unknown"——本包装是兜底接点，真实 ingress 在
+ * coordinator/bridge/executor/scheduler 显式包装并带准确 origin；外层显式
+ * 包装先于本包装生效时这里只会继承。
+ */
+export function installModelCallTraceIngress(session: any): void {
+  const originalPrompt = session?.prompt;
+  if (typeof originalPrompt !== "function" || session[TRACE_INGRESS_INSTALLED]) return;
+  session[TRACE_INGRESS_INSTALLED] = true;
+  session.prompt = async function traceIngressPrompt(...args: any[]) {
+    return runWithModelTraceRoot({ origin: "unknown" }, () =>
+      originalPrompt.apply(this, args as []),
+    );
+  };
 }
 
 function NATIVE_SUMMARIZATION_SOURCE(registered: ReturnType<typeof readRegisteredContext>) {
@@ -214,6 +274,13 @@ function observeStreamTerminal(inner: any, recorder: ReturnType<typeof createMod
     Promise.resolve(inner.result()).then(
       (message: any) => {
         try {
+          // message_end 补账关联（§六十四）：agent loop 持有的与 message_end 事件
+          // 携带的是同一个 assembled message 对象；WeakMap 登记，ledger 补账处读取。
+          noteModelCallMessageIdentity(message, {
+            modelCallId: recorder.callId,
+            traceId: recorder.traceId,
+            parentCallId: recorder.parentCallId,
+          });
           const stopReason = typeof message?.stopReason === "string" ? message.stopReason : null;
           if (stopReason === "aborted") {
             recorder.logicalCallAborted({ details: { stopReason } });
