@@ -22,6 +22,7 @@ import type {
   ModelCallModelIdentity,
   ModelCallSource,
 } from "./model-call-observer.ts";
+import type { ModelSemanticInputProvenance } from "./semantic-input-provenance.ts";
 
 export type ModelCallScope = {
   callId: string;
@@ -34,6 +35,13 @@ export type ModelCallScope = {
   attribution?: ModelCallAttribution | null;
   /** 上游（如 MC-02 runner）附带的小型安全 metadata，merge 进 logical_call_start details。 */
   details?: Record<string, unknown> | null;
+  /**
+   * Phase 5：上游构造的 Semantic Input Provenance（MC-02 runner 拥有
+   * instruction/liveMessages 的来源知识）。stream observer 读取并 attach 到
+   * recorder；未提供时 observer 走 MC-01 自动分类。仅安全 locator/source
+   * metadata，不含内容（§八十）。
+   */
+  semanticInputProvenance?: ModelSemanticInputProvenance | null;
 };
 
 const MODEL_CALL_STORAGE = new AsyncLocalStorage<ModelCallScope>();

@@ -28,6 +28,10 @@ import {
   failObservedModelCall,
   observedModelCallLedgerMetadata,
 } from "../../lib/llm/model-call-integration.ts";
+import {
+  createSemanticInputProvenance,
+  provenanceSection,
+} from "../../lib/llm/semantic-input-provenance.ts";
 import { runWithModelTraceRoot } from "../../lib/llm/model-trace-scope.ts";
 
 function hasAnyKey(source: Record<string, unknown>, keys: string[]): boolean {
@@ -772,7 +776,37 @@ export class UniversalMediaManager {
     // MC-08 逻辑调用边界（§三十四）：video generation submit = 一个 logical
     // call；callId 在 adapter 网络请求之前铸好并写进 ledger metadata。
     // providerTaskId 响应后才出现——先有 callId，后关联（§三十五）。
+    // Phase 5（§七十三）：语义输入 = prompt + 参考图；duration/resolution/fps
+    // 是 adapter config，不进 provenance。locator 只指参数位，不携带值。
     const resolvedParams = parameterResolution.resolvedParameters || {};
+    const videoProvenanceShape = typeof adapter?.id === "string" && adapter.id.startsWith("jimeng-cli-")
+      ? "external_cli_media"
+      : "media_video";
+    const videoProvenanceSections = [];
+    if (typeof params.prompt === "string" && params.prompt.length > 0) {
+      videoProvenanceSections.push(provenanceSection(
+        { root: "parameters", path: ["prompt"] },
+        "media_prompt",
+        { role: "input", source: { type: "runtime", id: "media.prompt" } },
+      ));
+    }
+    if (Array.isArray(params.image)) {
+      params.image.forEach((item: unknown, index: number) => {
+        if (typeof item === "string" && item.trim()) {
+          videoProvenanceSections.push(provenanceSection(
+            { root: "parameters", path: ["image", index] },
+            "media_reference",
+            { role: "input", source: { type: "runtime", id: "media.reference" } },
+          ));
+        }
+      });
+    } else if (typeof params.image === "string" && params.image.trim()) {
+      videoProvenanceSections.push(provenanceSection(
+        { root: "parameters", path: ["image"] },
+        "media_reference",
+        { role: "input", source: { type: "runtime", id: "media.reference" } },
+      ));
+    }
     const recorder = beginObservedModelCall({
       model: {
         provider: target.providerId,
@@ -794,6 +828,7 @@ export class UniversalMediaManager {
         resolutionConfigured: hasAnyKey(resolvedParams, ["resolution", "video_resolution", "size", "width", "height"]),
         fpsConfigured: hasAnyKey(resolvedParams, ["fps", "frameRate", "frame_rate", "numFrames", "num_frames"]),
       },
+      semanticInputProvenance: createSemanticInputProvenance(videoProvenanceShape, videoProvenanceSections),
     });
     const observedSubmitCtx = { ...this._submitContextForAdapter(adapter), modelCall: recorder };
     let result;

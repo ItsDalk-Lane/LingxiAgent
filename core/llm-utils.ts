@@ -8,6 +8,13 @@
 import fs from "fs";
 import path from "path";
 import { callText } from "./llm-client.ts";
+import {
+  createSemanticInputProvenance,
+  provenanceSection,
+  provenancedSegment,
+  renderProvenancedText,
+  type ProvenancedTextSegment,
+} from "../lib/llm/semantic-input-provenance.ts";
 import { callTextWithLengthContract, type OutputLengthContract } from "./output-length-contract.ts";
 import { getLocale } from "../lib/i18n.ts";
 import { normalizePlainDescription } from "../lib/text/internal-narration.ts";
@@ -63,6 +70,7 @@ async function callLlm({
   usageLedger,
   usageContext,
   lengthContract,
+  semanticInputProvenance = null,
 }: {
   model: any;
   api: any;
@@ -79,9 +87,11 @@ async function callLlm({
   usageLedger?: any;
   usageContext?: any;
   lengthContract?: OutputLengthContract;
+  semanticInputProvenance?: unknown;
 }): Promise<string> {
   const request = {
     api, model,
+    semanticInputProvenance,
     apiKey,
     baseUrl,
     headers,
@@ -105,6 +115,31 @@ async function callLlm({
     ...request,
     ...(max_tokens != null && { maxTokens: max_tokens, outputBudgetSource }),
   }) as Promise<string>;
+}
+
+
+/** Phase 5：system 模板（task_instruction exact）+ user 分段（callLlm 调用共用）。 */
+function utilityCallProvenance(
+  userSegments: Array<{ text: string; category: import("../lib/llm/semantic-input-provenance.ts").SemanticInputCategory; sourceId: string; sourceType?: string }>,
+  userSeparator: string,
+) {
+  const userRendered = renderProvenancedText(
+    userSegments.map((segment): ProvenancedTextSegment => ({
+      text: segment.text,
+      category: segment.category,
+      source: { type: (segment.sourceType || "runtime") as import("../lib/llm/semantic-input-provenance.ts").SemanticSourceType, id: segment.sourceId },
+    })),
+    userSeparator,
+    { root: "messages", path: [1] },
+  );
+  return createSemanticInputProvenance("calltext", [
+    provenanceSection(
+      { root: "messages", path: [0] },
+      "task_instruction",
+      { role: "system", source: { type: "template", id: "utility.system-instruction" } },
+    ),
+    ...userRendered.sections,
+  ]);
 }
 
 function auxiliaryUsageContext(resolved, operation, trigger = "tool") {
@@ -266,6 +301,10 @@ Rules:
       signal: opts.signal,
       usageLedger: resolved.usageLedger,
       usageContext: auxiliaryUsageContext(resolved, "title", "user"),
+      semanticInputProvenance: utilityCallProvenance([
+        { text: `${userLabel}：${(userText || "").slice(0, 500)}`, category: "task_input", sourceId: "title.user-text" },
+        { text: `${assistantLabel}：${(assistantText || "").slice(0, 500)}`, category: "task_input", sourceId: "title.assistant-text" },
+      ], "\n"),
     });
   } catch (err) {
     // AbortError（超时）不算失败，静默返回 null 让调用方走 fallback
@@ -304,6 +343,18 @@ export async function translateSkillNames(resolved, names, lang) {
       max_tokens: 200,
       usageLedger: resolved.usageLedger,
       usageContext: auxiliaryUsageContext(resolved, "translate_skill_names", "startup"),
+      semanticInputProvenance: createSemanticInputProvenance("calltext", [
+        provenanceSection(
+          { root: "messages", path: [0] },
+          "task_instruction",
+          { role: "system", source: { type: "template", id: "translate-skill-names.system" } },
+        ),
+        provenanceSection(
+          { root: "messages", path: [1] },
+          "task_input",
+          { role: "user", source: { type: "runtime", id: "translate-skill-names.payload" } },
+        ),
+      ]),
     });
     if (!text) return {};
     const jsonMatch = text.match(/\{[\s\S]*\}/);
@@ -387,6 +438,10 @@ Rules:
         temperature: 0.3,
         usageLedger: resolved.usageLedger,
         usageContext: auxiliaryUsageContext(resolved, "activity_summary", "scheduled"),
+        semanticInputProvenance: utilityCallProvenance([
+          { text: `${contextLabel}：\n${userText.slice(0, 600)}`, category: "task_input", sourceId: "activity-summary.patrol-context" },
+          { text: `${replyLabel}：\n${assistantText.slice(0, 600)}${toolInfo}`, category: "task_input", sourceId: "activity-summary.agent-reply" },
+        ], "\n\n"),
       },
       contract: localeLengthContract({
         isZh,
@@ -449,6 +504,10 @@ export async function summarizeActivityQuick(resolved, sessionPath) {
         temperature: 0.3,
         usageLedger: resolved.usageLedger,
         usageContext: auxiliaryUsageContext(resolved, "activity_summary_quick", "scheduled"),
+        semanticInputProvenance: utilityCallProvenance([
+          { text: `${contextLabel}：\n${userText.slice(0, 400)}`, category: "task_input", sourceId: "activity-summary-quick.patrol-context" },
+          { text: `${replyLabel}：\n${assistantText.slice(0, 400)}`, category: "task_input", sourceId: "activity-summary-quick.agent-reply" },
+        ], "\n\n"),
       },
       contract: localeLengthContract({
         isZh,
@@ -555,6 +614,18 @@ Examples:
       ],
       usageLedger: resolved?.usageLedger,
       usageContext: auxiliaryUsageContext(resolved, "generate_agent_id", "manual"),
+      semanticInputProvenance: createSemanticInputProvenance("calltext", [
+        provenanceSection(
+          { root: "messages", path: [0] },
+          "task_instruction",
+          { role: "system", source: { type: "template", id: "generate-agent-id.system" } },
+        ),
+        provenanceSection(
+          { root: "messages", path: [1] },
+          "task_input",
+          { role: "user", source: { type: "runtime", id: "generate-agent-id.display-name" } },
+        ),
+      ]),
     });
 
     base = sanitizeAgentId(text);
@@ -620,6 +691,9 @@ export async function generateDescription(resolved, personality, locale) {
       }),
       usageLedger: resolved.usageLedger,
       usageContext: auxiliaryUsageContext(resolved, "generate_description", "manual"),
+      semanticInputProvenance: utilityCallProvenance([
+        { text: personality.slice(0, 3000), category: "task_input", sourceId: "generate-description.personality", sourceType: "runtime" },
+      ], "\n"),
     });
     if (!raw) return null;
 

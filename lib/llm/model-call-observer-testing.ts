@@ -15,6 +15,10 @@ import type {
   ModelCallEventType,
   ModelCallObserver,
 } from "./model-call-observer.ts";
+import {
+  MODEL_CALL_SEMANTIC_PROVENANCE,
+  type ModelSemanticInputProvenance,
+} from "./semantic-input-provenance.ts";
 
 export type TestModelCallObserver = ModelCallObserver & {
   events: ModelCallEvent[];
@@ -36,10 +40,17 @@ export type TestModelCallObserver = ModelCallObserver & {
   callIdentity(callId: string): { traceId: string | null; parentCallId: string | null } | null;
   /** 事件序列压缩成类型名数组，便于断言生命周期顺序。 */
   sequence(): ModelCallEventType[];
-  /** 收集到的全部不同 attemptId（按首次出现顺序，跳过 null/undefined）。 */
+  /** 收集到的全部不同 attemptId（按首次出现顺序）。 */
   attemptIds(): string[];
   /** 同一 call 的全部 attemptId（按首次出现顺序）。 */
   attemptsForCall(callId: string): string[];
+  /**
+   * Phase 5（§八十七）：callId → 事件 symbol 引用携带的完整 Semantic Input
+   * Provenance。仅测试路径——生产不建内存 Trace Store。
+   */
+  provenanceForCall(callId: string): ModelSemanticInputProvenance | null;
+  /** callId → 去重 category 列表（section 顺序）。 */
+  categoriesForCall(callId: string): string[];
   /**
    * 毒丸断言：全部事件的 JSON 序列化不得包含任何敏感标记（§八/§五十七）。
    * 违规时直接 fail（message 指明命中的毒丸）。
@@ -62,6 +73,7 @@ export type TestModelCallObserver = ModelCallObserver & {
 
 export function createTestModelCallObserver(): TestModelCallObserver {
   const events: ModelCallEvent[] = [];
+  const provenanceByCall = new Map<string, ModelSemanticInputProvenance>();
   const eventsForCall = (source: ModelCallEvent[], callId: string): ModelCallEvent[] =>
     source.filter((event) => event.callId === callId);
   const eventsForTrace = (traceId: string): ModelCallEvent[] =>
@@ -77,8 +89,14 @@ export function createTestModelCallObserver(): TestModelCallObserver {
   };
   return {
     events,
-    handleModelCallEvent(event: ModelCallEvent) {
+    handleModelCallEvent(event) {
       events.push(event);
+      const provenance = (event as any)[MODEL_CALL_SEMANTIC_PROVENANCE] as
+        | ModelSemanticInputProvenance
+        | undefined;
+      if (provenance && !provenanceByCall.has(event.callId)) {
+        provenanceByCall.set(event.callId, provenance);
+      }
     },
     eventsOfType(type: ModelCallEventType) {
       return events.filter((event) => event.eventType === type);
@@ -130,6 +148,18 @@ export function createTestModelCallObserver(): TestModelCallObserver {
           .map((event) => event.attemptId)
           .filter((id): id is string => typeof id === "string" && id.length > 0),
       )];
+    },
+    provenanceForCall(callId: string): ModelSemanticInputProvenance | null {
+      return provenanceByCall.get(callId) ?? null;
+    },
+    categoriesForCall(callId: string): string[] {
+      const provenance = provenanceByCall.get(callId);
+      if (!provenance) return [];
+      const categories: string[] = [];
+      for (const section of provenance.sections) {
+        if (!categories.includes(section.category)) categories.push(section.category);
+      }
+      return categories;
     },
     assertNoSensitiveContent(markers: string[]): void {
       const serialized = JSON.stringify(events);
@@ -203,6 +233,7 @@ export function createTestModelCallObserver(): TestModelCallObserver {
     },
     reset() {
       events.length = 0;
+      provenanceByCall.clear();
     },
   };
 }

@@ -15,6 +15,10 @@ import {
   observedProviderFetch,
 } from "./model-call-integration.ts";
 import { runWithNewModelTrace } from "./model-trace-scope.ts";
+import {
+  createSemanticInputProvenance,
+  provenanceSection,
+} from "./semantic-input-provenance.ts";
 
 export const DEFAULT_PROVIDER_USER_AGENT = "LingxiAgent/1.0";
 const DEFAULT_ANTHROPIC_PROBE_MODEL = "claude-sonnet-4-6";
@@ -307,6 +311,8 @@ export async function probeProvider({
   // Provider 连接测试按钮 = 独立用户任务（§二十五）：singleton trace，
   // origin=provider_probe；不继承任何外层 scope。
   return runWithNewModelTrace({ origin: "provider_probe", refs: { providerId } }, async () => {
+    // Phase 5（§七十一）：probe 的语义输入 = 固定占位消息（exact）。
+    // 不保存 "." 值本身——locator 只指向 messages[0]。
     const recorder = beginObservedModelCall({
       model: { provider: providerId, modelId: effectiveModelId, api },
       usageContext,
@@ -316,6 +322,13 @@ export async function probeProvider({
         protocol: api,
         operation: "connectivity-probe",
       },
+      semanticInputProvenance: createSemanticInputProvenance("provider_probe", [
+        provenanceSection(
+          { root: "messages", path: [0] },
+          "task_instruction",
+          { role: "user", source: { type: "runtime", id: "provider-probe.fixed-prompt" } },
+        ),
+      ]),
     });
     try {
       const result = await withModelRequestAccounting({

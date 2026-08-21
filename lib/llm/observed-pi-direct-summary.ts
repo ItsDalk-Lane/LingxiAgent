@@ -47,6 +47,12 @@ export type ObservedDirectSummaryContext = {
   /** 显式 trace 覆盖（缺省走统一解析：scope → singleton）。 */
   traceId?: string | null;
   parentCallId?: string | null;
+  /**
+   * Phase 5：facade 参数边界构造的 Semantic Input Provenance
+   * （messages/customInstructions/previousSummary 三元组，§七十）。仅安全
+   * metadata；经 recorder sanitize fail closed。
+   */
+  semanticInputProvenance?: unknown;
 };
 
 export type ObservedDirectSummaryRunner<T> = () => Promise<T>;
@@ -77,6 +83,9 @@ export async function observePiDirectSummary<T>(
       attribution: fields.attribution,
     },
   });
+  if (context.semanticInputProvenance) {
+    recorder.attachSemanticInputProvenance(context.semanticInputProvenance);
+  }
   recorder.beginLogicalCall({
     details: {
       path: "pi_direct_summary",

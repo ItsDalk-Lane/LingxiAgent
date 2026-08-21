@@ -15,6 +15,13 @@ import {
 import { createModelCallRecorder } from '../lib/llm/model-call-recorder.ts';
 import { resolveModelTraceContext } from '../lib/llm/model-trace-scope.ts';
 import {
+  buildCallTextFallbackProvenance,
+  createSemanticInputProvenance,
+  provenanceSection,
+  remapCallTextProvenance,
+  sanitizeSemanticInputProvenance,
+} from '../lib/llm/semantic-input-provenance.ts';
+import {
   serializeOpenAICompatibleContentBlock,
   serializeResponsesContentBlock,
 } from './provider-media-serializer.ts';
@@ -80,6 +87,13 @@ export type CallTextOptions = {
     traceId?: string | null;
     parentCallId?: string | null;
   } | null;
+  /**
+   * Phase 5：调用方按**传入形状**（root=systemPrompt + root=messages
+   * path=[原始 index]）描述的 Semantic Input Provenance。callText 在 system
+   * 消息 merge 的同一变换里同步 remap（§六十）；未提供 → structural fallback
+   * （§六十一，不得 exact）。经 sanitize fail closed，非法输入等价于未提供。
+   */
+  semanticInputProvenance?: unknown;
 };
 
 /**
@@ -455,6 +469,7 @@ export async function callText({
   usageLedger,
   modelCallObserver = null,
   modelCallContext = null,
+  semanticInputProvenance = null,
 }: CallTextOptions) {
   // 同时接受完整 model 对象和裸 id。modelObj 用于 provider-compat 决策；modelId 入 payload。
   const modelObj = typeof model === "object" && model !== null ? model : null;
@@ -494,13 +509,6 @@ export async function callText({
       ...modelCallFieldsFromUsageContext(usageContext),
     },
   });
-  modelCallRecorder.beginLogicalCall({
-    details: {
-      path: "callText",
-      ...(modelCallTrace.origin ? { traceOrigin: modelCallTrace.origin } : {}),
-      ...(typeof callPurpose === "string" && callPurpose ? { callPurpose } : {}),
-    },
-  });
   let observedProviderRequestId: string | null = null;
   let usageRequest: { requestId?: string | null } | null = null;
   let observedUsagePayload = null;
@@ -520,6 +528,38 @@ export async function callText({
       });
     }
   }
+
+  // ── 1.5 Semantic Input Provenance（MC-04 boundary，§五十九/§六十/§六十一）──
+  // Boundary 定义：system merge 完成 + normalizedMessages 形成、Provider body
+  // 尚未构造。caller 显式 provenance（传入形状）随 merge 同步 remap；未提供 →
+  // structural fallback；codex 空系统注入的固定 instruction 在注入点标记
+  // adapter_injected（§八十二）。构造失败绝不影响调用。
+  try {
+    let provenance = remapCallTextProvenance(
+      sanitizeSemanticInputProvenance(semanticInputProvenance),
+      { systemPrompt, messages, systemTextOf: (m) => normalizeTextFromContent(m.content) },
+    ) ?? buildCallTextFallbackProvenance({ systemPrompt, messages });
+    if (api === "openai-codex-responses" && !mergedSystem.trim()) {
+      provenance = createSemanticInputProvenance("calltext", [
+        ...(provenance?.sections ?? []),
+        provenanceSection(
+          { root: "systemPrompt", span: { start: 0, end: DEFAULT_CODEX_UTILITY_INSTRUCTIONS.length } },
+          "adapter_injected",
+          { role: "system", source: { type: "adapter", id: "codex-utility-default-instructions" } },
+        ),
+      ]);
+    }
+    if (provenance) modelCallRecorder.attachSemanticInputProvenance(provenance);
+  } catch {
+    // provenance 失败 = 无 provenance，不影响模型调用
+  }
+  modelCallRecorder.beginLogicalCall({
+    details: {
+      path: "callText",
+      ...(modelCallTrace.origin ? { traceOrigin: modelCallTrace.origin } : {}),
+      ...(typeof callPurpose === "string" && callPurpose ? { callPurpose } : {}),
+    },
+  });
 
   // ── 2. 超时信号 ──
   const timeoutSignal = AbortSignal.timeout(timeoutMs);

@@ -2,6 +2,10 @@
  * 模型管理 REST 路由
  */
 import { Hono } from "hono";
+import {
+  createSemanticInputProvenance,
+  provenanceSection,
+} from "../../lib/llm/semantic-input-provenance.ts";
 import { safeJson } from "../hono-helpers.ts";
 import { t } from "../../lib/i18n.ts";
 import { modelRefEquals, parseModelRef } from "../../shared/model-ref.ts";
@@ -239,6 +243,13 @@ export function createModelsRoute(engine) {
         temperature: undefined as any,
         signal: undefined as any,
         messages: [{ role: "user", content: HEALTH_CHECK_PROMPT }],
+        semanticInputProvenance: createSemanticInputProvenance("provider_probe", [
+          provenanceSection(
+            { root: "messages", path: [0] },
+            "task_instruction",
+            { role: "user", source: { type: "runtime", id: "model-health-check.fixed-prompt" } },
+          ),
+        ]),
         maxTokens: HEALTH_CHECK_MAX_TOKENS,
         timeoutMs: 15_000,
         usageLedger: engine.usageLedger,

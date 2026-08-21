@@ -209,3 +209,153 @@ Observer 仍是 Trace Truth Source；Ledger 只是 Accounting Projection（不�
 
 Prompt Provenance（sections/source/version/ref）→ Request/Response capture +
 Redaction Contract → Payload/Blob Store → Query Service → Export → UI。
+
+---
+
+# Phase 5 — Semantic Input Provenance（第四轮，2026-08-21）
+
+> 审计入口：SEMANTIC_INPUT_PROVENANCE_AUDIT.md（Step 1 交付，含 Prompt
+> Construction Matrix 与 caller 迁移清单）。本节记录契约语义与最终矩阵。
+
+## Provenance Contract
+
+统一 `ModelSemanticInputProvenance`（lib/llm/semantic-input-provenance.ts）：
+
+```
+{ schemaVersion: 1, inputShape, sections[] }
+section = { category, role, precision, locator, source }
+```
+
+- **不包含任何输入内容**（§五/§三十七）：section 只有五个维度；sanitize gate
+  fail closed（非法 category/locator/source 逐段丢弃，source.id 与 path 拒绝
+  绝对路径/UNC/drive letter/URL）。
+- **不新增内容 hash**（§二十四）：template identity 复用 prompt-layout 的
+  cacheGroup/templateVersion（source.id/source.version），cachePrefixHash 行为
+  不变。
+- 生命周期 = model call lifecycle：recorder 持有（per-call sidecar，随 recorder
+  GC），无全局 Map（§四十一/四十二）。完整 map 经事件 non-enumerable symbol
+  （`MODEL_CALL_SEMANTIC_PROVENANCE`）随事件传递——JSON.stringify 与 Metadata
+  Safety Gate 均不可见；Observer 事件只携带安全 summary（§三十九/七十六）：
+  `inputShape / provenancePrecision / inputSectionCount / inputCategories(去重≤32)
+  / opaqueSectionCount`。TestModelCallObserver 提供 `provenanceForCall` /
+  `categoriesForCall`（§八十七，仅测试路径）。
+
+## Category Taxonomy（24 值闭集，全部有真实使用点）
+
+platform_instruction / persona / user_profile / memory_context /
+skill_instruction / agents_file / session_instruction / agent_roster /
+conversation_history / current_user_input / tool_definition / tool_result /
+task_instruction / task_input / format_constraint / previous_summary /
+compaction_summary / media_prompt / media_reference / audio_input /
+language_hint / adapter_injected / sdk_internal / unknown。
+
+Category 与 subsystem/operation/callPurpose 严格正交（§十九：callPurpose 表达
+「为什么调」，category 表达「这段输入是什么来源」）。role（system/developer/
+user/assistant/tool/input/parameter）是独立第二维度。
+
+## Locator Contract
+
+`{ root: systemPrompt|messages|tools|input|parameters, path?: (index|key)[], span? }`
+
+- 文本根（systemPrompt）与文本内容（messages[i].content 字符串）用 UTF-16
+  code unit 闭开区间 `[start, end)`，即 `text.slice(start, end) === sectionText`
+  （§二十七；中文/emoji/代理对/ZWJ 有单测锁定）。
+- messages/tools/parameters 用 index/key 寻址（span 可省略——index 寻址本身
+  exact）；`span: null` = identity-only（知道存在与身份、无法定位），只允许
+  structural/opaque。
+- section 顺序 = Semantic Request 实际顺序（§一百一十一）；ordinal = 数组下标，
+  未来持久化以 callId + ordinal 引用（§一百一十二）；单 call 上限 1024 段，
+  超限尾段折叠并记录（§一百一十）。
+
+## Precision Contract
+
+- `exact`：来源已知 + 位置由运行时实际对象证明。禁止「重建 = exact」（§三十二）
+  ——唯一例外是被描述对象与冻结快照/构造产物为同一数据结构且经 runtime 验证
+  （MC-01 的 `startsWith(customPrompt)` 前缀验证对**真实冻结快照对象**执行，
+  验证失败降级 structural）。
+- `structural`：位置/范围已知但来源只能粗分类；identity-only 段（skills/
+  agentsFiles/append、MC-02 system、MC-03 全部）属此档。
+- `opaque`：SDK/Adapter 在该位置加入输入但 Lingxi 无法定位（本轮实际使用：
+  MC-07 CLI 内部 wire 由 attempt 级 external_process_boundary 表达，无 section
+  级 opaque 段）。
+- Call 级 rollup：全部 exact → exact；有 exact 且有 structural/opaque →
+  partial；全部 opaque → opaque。无百分比（§一百一十五）。
+
+## MC-01～MC-10 Provenance Matrix（Step 14 最终矩阵）
+
+| Path | Semantic Boundary | System Provenance | Messages | Tools | Media/Audio | Overall Precision | Snapshot-safe | Provider Payload Changed |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| MC-01 chat | streamFn wrapper（model-call-stream-observer.ts:117） | 快照前缀验证 exact（platform/persona/user_profile/memory_context/agent_roster/session_instruction）+ SDK 尾段 structural + skills/agentsFile/append identity-only | conversation_history / current_user_input（turn 证明）/ tool_result 全 exact | tool_definition exact（source=tool name） | N/A | **partial**（SDK 尾段 structural） | ✅（快照冻结 provenance；persona V1→V2 不漂移） | 否 |
+| MC-02 compaction run | isolatedStreamFn（runner :430+） | session_instruction 整段 structural | live→conversation_history exact；instruction strict→task_instruction / repair→format_constraint；recovery toolResult→tool_result（observer 尾段扩展） | tool_definition exact（placeholder name） | N/A | **partial**（system structural） | N/A（runner 不做快照证明，诚实） | 否 |
+| MC-03 native compaction | streamFn（isCompacting 分支） | task_instruction structural（SDK 镜像非同源，不伪造 exact） | task_input structural（serializeConversation 拍平不可拆） | 无 | N/A | **partial**（全部 structural，无 exact 伪造） | N/A | 否 |
+| MC-04 callText | merge 完成 + normalizedMessages（llm-client.ts §1.5） | task_instruction（layout: template exact；fallback structural）；codex 空系统 → adapter_injected exact | task_input/task_instruction 段级（caller 显式）或 structural fallback；system merge 同步 remap | 无 | vision/appearance multimodal content 寻址 | 显式 caller **exact** / 未迁移 **partial** | N/A | 否（有字节一致测试） |
+| MC-05 probe | 请求体构造（provider-client.ts） | 无 | task_instruction exact（固定占位消息） | 无 | N/A | **exact** | N/A | 否 |
+| MC-06 image HTTP | submit params（image-task-runner.ts） | codex 固定 instructions；其余无 | N/A | codex image tool | media_prompt + media_reference（parameters 寻址，不含值） | **exact** | N/A | 否 |
+| MC-07 CLI | argv 构造（dreamina.ts；provenance 在 runner 边界） | 无 | N/A | 无 | media_prompt/media_reference exact；CLI 内部 wire opaque（attempt 表达） | **partial**（结构性） | N/A | 否 |
+| MC-08 video HTTP | submit params（universal-media-manager.ts） | 无 | N/A | 无 | media_prompt/media_reference；duration/resolution/fps 为 config 不进 provenance | **exact** | N/A | 否 |
+| MC-09 speech | _transcribeWithAccounting | 无 | mimo/dashscope 包裹层 | 无 | audio_input + language_hint（input/parameters 寻址） | **exact** | N/A | 否 |
+| MC-10 direct summary | generateSummary facade 参数边界 | （SDK 内部，不在本边界） | conversation_history/tool_result 段级 exact | 无 | customInstructions→task_instruction / previousSummary→previous_summary（parameters 寻址） | **exact** | N/A | 否 |
+
+## Prompt Source Matrix（§一百一十七）
+
+| Source Category | Producer | Render Point | Semantic Target | Exact Locator | Template/Source Identity | Known Gaps |
+| --- | --- | --- | --- | --- | --- | --- |
+| platform | agent.ts buildSystemPromptArtifact 各 runtime 块 | chunk 装配 | systemPrompt | ✅ span | runtime: platform.* | — |
+| persona | yuan/identity/AGENTS.md 模板 + appearance | 同上 | systemPrompt | ✅ span | runtime: persona / agent.appearance | — |
+| user_profile | user.md + resolveUserName | 同上 | systemPrompt | ✅ span | runtime: user.profile | — |
+| memory | pinned.md/memory.md/规则模板 | 同上 + memory 域 utility | systemPrompt / userContent | ✅ span | memory: memory.pinned/longterm/time-context | rolling summary system 内嵌 persona/memory/roster 的 span 未拆（整段 template exact） |
+| skills | Pi SDK formatSkillsForPrompt（快照 skillsResult） | SDK customPrompt 尾部 | systemPrompt | ❌ identity-only | skill: <names≤8> | SDK 拼装位置不可定位（等待 SDK extension） |
+| agents_file | SDK agents files 注入 | SDK customPrompt 尾部 | systemPrompt | ❌ identity-only | runtime: <basename≤8> | 同上；绝对路径禁入 |
+| history | sessionManager JSONL → convertToLlm | streamFn context.messages | messages[i] | ✅ index | — | — |
+| user_input | session.prompt() 输入 | streamFn context.messages | messages[lastUser] | ✅ index（turn 证明） | — | agent.continue 等无 turn 标记场景诚实归 conversation_history |
+| tools | agent.state.tools | streamFn context.tools | tools[i] | ✅ index | tool: <name>（不存 schema） | — |
+| tool_results | agent loop toolResult | streamFn context.messages | messages[i] | ✅ index + toolName/toolCallId | — | — |
+| task templates | memory/diary/approval/vision 等 prompt builder | 各 caller 构造点 | systemPrompt / messages | ✅ span/index | template: cacheGroup+templateVersion 或 template id | — |
+| format constraints | repair/预算/格式指令 | 各 caller 构造点 | userContent 段 / 独立 message | ✅ | runtime/template id | — |
+| summaries | previousSummary/prevDraft/草稿 | 各 caller 构造点 | userContent 段 / parameters | ✅ | memory: *.previous | — |
+| media | image/video submit params | runner 边界 | parameters | ✅ key/index | runtime: media.prompt/reference | 值（URL/路径/base64）绝不入 provenance |
+| speech | audio + language | service 边界 | input/parameters | ✅ key | runtime: speech.* | 音频字节/转写文本绝不入 provenance |
+
+## Session Snapshot Semantics
+
+- `SessionPromptSnapshot` v1 **不升级版本**：`systemPromptProvenance` 为附加可选
+  字段（安全 metadata：category/locator/source/precision，无 sections[].content
+  ——§十四禁止内容副本）。旧快照 normalize 后无该字段 → streamFn 侧整段
+  structural session_instruction（§八十五诚实降级，不伪造 FULL）。
+- 新建 session 经 `buildSystemPromptArtifact`（与旧 buildSystemPrompt 同一装配，
+  golden 字节锁定）冻结 text+provenance；restore 优先用快照 provenance；
+  `finalSystemPrompt` 覆盖路径下 customPrompt 前缀性质保持（前缀验证兜底）。
+- 持久化指纹已按 compatible repin（无 store schema/payload 形状变化）。
+
+## Known Opaque Sources（诚实清单）
+
+1. Pi native summarizer system prompt（MC-03）：SDK 常量不随包出口，Lingxi 镜像
+   为手工副本 → structural（runtime 等值不作 exact 依据）。
+2. Pi native summarizer messages[0] 内部组成：serializeConversation 在 SDK 内，
+   按标签解析最终字符串属禁止的反推 → structural。
+3. SDK system prompt 尾部（append+project_context+skills+cwd 混合段）：单段
+   structural + identity-only 子段；不猜 span。
+4. MC-02 system prompt 整段：runner 取 session 最终 prompt，不做前缀证明。
+5. Dreamina/Jimeng CLI 内部 wire：外部进程边界（attempt 级 opaque 表达）。
+6. rolling summary system 内嵌 persona/userProfile/memory/roster：整段按 template
+   identity exact，子 span 未拆（模板字面量拆分转录风险 > 收益，记录为 gap）。
+7. provider-compat normalizeProviderPayload 的字段改名/搬移：Phase 6 Provider
+   Request Capture 处理（唯一例外 codex 空系统注入已标 adapter_injected）。
+
+## Prompt Equivalence Tests / Safety Tests
+
+- 等价：agent golden（改造前 fixture，zh/en 字节一致 + span 首尾相接）；renderer
+  单测（join 语义/空段/UTF-16）；compile/_compactLLM、rolling repair、
+  install-skill、dream 四处运行时「渲染===原串」防御；callText 传/不传
+  provenance wire body 逐字节一致；memory/dream/approval/vision/diary/appearance
+  域既有测试（11776 全绿）锁定内容。
+- 安全：毒丸（TOP_SECRET_PERSONA/MEMORY/USER/TOOL_RESULT + image/speech 场景）
+  JSON.stringify 不可见；Metadata Safety Gate 回归；Observer/Trace/Control-plane
+  既有测试全绿；事件 symbol 引用不参与序列化。
+
+## Next Phase
+
+Phase 6：Request/Response Capture + Redaction Contract + Sensitive Payload
+Boundary——届时在既有 callId 下同时取得 Semantic Request + Provenance，由
+Redaction Pipeline 决定内容保存策略；Provider Request 层（compat 变换后的 wire
+payload）的 provenance 也在该轮处理。

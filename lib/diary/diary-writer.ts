@@ -9,6 +9,12 @@
  */
 
 import fs from "fs";
+import {
+  createSemanticInputProvenance,
+  provenanceSection,
+  provenancedSegment,
+  renderProvenancedText,
+} from "../llm/semantic-input-provenance.ts";
 import path from "path";
 import { scrubPII } from "../pii-guard.ts";
 import { getLogicalDay, getLogicalDayForDate } from "../time-utils.ts";
@@ -687,58 +693,97 @@ export async function writeDiary(opts) {
   const { cleaned: summaryText } = scrubPII(rawSummaryText);
 
   // 3. 构建 LLM prompt
+  // Phase 5：userPrompt 按 chunk 装配（flatMap 后 join("\n") 与旧 push 序列字节
+  // 一致）；每 chunk 在构造点登记 category/source，段级 provenance 随 callText
+  // 附着——摘要/活动/长期背景/写作指导/约束/日期指令各自可定位。
   const systemPrompt = agentPersonality;
 
-  const userPrompt = [
-    isZh ? "# 今日对话摘要" : "# Today's conversation summaries",
-    "",
-    summaryText,
+  const promptChunks: Array<{ lines: string[]; category: string; sourceId: string; sourceType?: string }> = [
+    {
+      lines: [
+        isZh ? "# 今日对话摘要" : "# Today's conversation summaries",
+        "",
+        summaryText,
+      ],
+      category: "task_input",
+      sourceId: "memory.diary.summaries",
+      sourceType: "memory",
+    },
   ];
 
   // 活动记录（巡检 + 定时任务）
   const activitiesText = collectActivities(activityStore, rangeStart, rangeEnd);
   if (activitiesText) {
-    userPrompt.push("", "---", "",
-      isZh ? "# 今日后台活动（巡检与定时任务）" : "# Today's background activities (patrols & cron jobs)",
-      "", activitiesText);
+    promptChunks.push({
+      lines: ["", "---", "",
+        isZh ? "# 今日后台活动（巡检与定时任务）" : "# Today's background activities (patrols & cron jobs)",
+        "", activitiesText],
+      category: "task_input",
+      sourceId: "memory.diary.activities",
+      sourceType: "memory",
+    });
   }
 
   if (memory?.trim()) {
-    userPrompt.push("", "---", "",
-      isZh ? "# 你的长期背景（只用于语气，不作为当天事实）" : "# Your long-term background (voice only, not diary facts)",
-      "", memory);
+    promptChunks.push({
+      lines: ["", "---", "",
+        isZh ? "# 你的长期背景（只用于语气，不作为当天事实）" : "# Your long-term background (voice only, not diary facts)",
+        "", memory],
+      category: "memory_context",
+      sourceId: "memory.diary.longterm",
+      sourceType: "memory",
+    });
   }
 
   // 写作指导和约束放最后，LLM 先看完数据再看怎么写
-  userPrompt.push(
-    "", "---", "",
-    buildDiaryPrompt(),
-    "", "---", "",
-    isZh ? "# 写作约束" : "# Writing constraints",
-    "",
-    ...(isZh
-      ? [
-          `- 你叫${agentName}，用户叫${userName}`,
-          "- 用你自己的人格和语气写，保持一致性",
-          "- 当天发生了什么、人物关系和双链判断，只能依据“今日对话摘要”和“今日后台活动”；长期背景不能作为当天事实来源",
-          "- 隐私信息（手机号、身份证、银行卡、地址等）如果出现在摘要中，不要写入日记",
-          "- 不要输出 MOOD 区块，日记本身就是你的内心表达",
-          "- 直接输出 Markdown 正文，不要代码块包裹",
-          "- 第一行用 `# ` 开头写一个标题，标题要包含日期，风格自由",
-          "- 篇幅按材料自然展开，通常 400-1200 字；不要为了凑长度重复，也不要硬压缩关键情绪和事实",
-        ]
-      : [
-          `- Your name is ${agentName}; the user's name is ${userName}`,
-          "- Write in your own personality and tone — stay consistent",
-          "- For what happened today, people involved, and backlink decisions, use only Today's conversation summaries and background activities; long-term background is not an event source",
-          "- If PII (phone numbers, IDs, bank cards, addresses, etc.) appears in the summaries, do NOT include it in the diary",
-          "- Do NOT output a MOOD block — the diary itself is your inner expression",
-          "- Output raw Markdown — no code-block wrapping",
-          "- Start with a `# ` heading that includes the date; style is up to you",
-          "- Let the length follow the material naturally, usually 250-800 words; do not pad or compress away important feelings and facts",
-        ]),
-    "",
-    isZh ? `请为 ${logicalDate} 写一篇日记。` : `Write a diary entry for ${logicalDate}.`,
+  promptChunks.push(
+    {
+      lines: ["", "---", "", buildDiaryPrompt()],
+      category: "task_instruction",
+      sourceId: "memory.diary.writing-guide",
+    },
+    {
+      lines: [
+        "", "---", "",
+        isZh ? "# 写作约束" : "# Writing constraints",
+        "",
+        ...(isZh
+          ? [
+              `- 你叫${agentName}，用户叫${userName}`,
+              "- 用你自己的人格和语气写，保持一致性",
+              "- 当天发生了什么、人物关系和双链判断，只能依据“今日对话摘要”和“今日后台活动”；长期背景不能作为当天事实来源",
+              "- 隐私信息（手机号、身份证、银行卡、地址等）如果出现在摘要中，不要写入日记",
+              "- 不要输出 MOOD 区块，日记本身就是你的内心表达",
+              "- 直接输出 Markdown 正文，不要代码块包裹",
+              "- 第一行用 `# ` 开头写一个标题，标题要包含日期，风格自由",
+              "- 篇幅按材料自然展开，通常 400-1200 字；不要为了凑长度重复，也不要硬压缩关键情绪和事实",
+            ]
+          : [
+              `- Your name is ${agentName}; the user's name is ${userName}`,
+              "- Write in your own personality and tone — stay consistent",
+              "- For what happened today, people involved, and backlink decisions, use only Today's conversation summaries and background activities; long-term background is not an event source",
+              "- If PII (phone numbers, IDs, bank cards, addresses, etc.) appears in the summaries, do NOT include it in the diary",
+              "- Do NOT output a MOOD block — the diary itself is your inner expression",
+              "- Output raw Markdown — no code-block wrapping",
+              "- Start with a `# ` heading that includes the date; style is up to you",
+              "- Let the length follow the material naturally, usually 250-800 words; do not pad or compress away important feelings and facts",
+            ]),
+        "",
+        isZh ? `请为 ${logicalDate} 写一篇日记。` : `Write a diary entry for ${logicalDate}.`,
+      ],
+      category: "format_constraint",
+      sourceId: "memory.diary.constraints",
+    },
+  );
+  const userPrompt = promptChunks.flatMap((chunk) => chunk.lines);
+  const diaryUserRendered = renderProvenancedText(
+    promptChunks.map((chunk) => provenancedSegment(
+      chunk.lines.join("\n"),
+      chunk.category as any,
+      { type: (chunk.sourceType || "runtime") as any, id: chunk.sourceId },
+    )),
+    "\n",
+    { root: "messages", path: [0] },
   );
 
   // 5. 调 LLM
@@ -748,6 +793,14 @@ export async function writeDiary(opts) {
       ...callTextConfigFromResolvedModel(resolvedModel),
       systemPrompt,
       messages: [{ role: "user", content: userPrompt.join("\n") }],
+      semanticInputProvenance: createSemanticInputProvenance("calltext", [
+        provenanceSection(
+          { root: "systemPrompt", span: { start: 0, end: systemPrompt.length } },
+          "persona",
+          { role: "system", source: { type: "runtime", id: "persona" } },
+        ),
+        ...diaryUserRendered.sections,
+      ]),
       temperature: 0.7,
       timeoutMs: 120_000,
       signal: undefined,

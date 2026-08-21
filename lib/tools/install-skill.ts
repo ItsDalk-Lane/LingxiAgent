@@ -19,6 +19,11 @@
  */
 
 import fs from "fs";
+import {
+  createSemanticInputProvenance,
+  provenancedSegment,
+  renderProvenancedText,
+} from "../llm/semantic-input-provenance.ts";
 import path from "path";
 import crypto from "crypto";
 import { Type } from "../pi-sdk/index.ts";
@@ -128,6 +133,23 @@ SKILL.md content:
 
 ${skillContent}`;
 
+  // Phase 5：审查指令模板（task_instruction）与被审查 SKILL.md 内容（task_input）
+  // 同一 user 消息内分段——前缀由构造切出（prompt 去掉尾部 skillContent），
+  // 字节一致由 join("\n\n") 保证。
+  const guardProvenance = createSemanticInputProvenance("calltext", (() => {
+    const prefix = skillContent.length > 0
+      ? prompt.slice(0, prompt.length - skillContent.length)
+      : prompt;
+    // 模板尾自带 "\n\n"（...如下：\n\n${skillContent}），因此段间分隔符为 ""
+    // 才能字节还原（prefix + skillContent === prompt）。
+    const rendered = renderProvenancedText([
+      provenancedSegment(prefix, "task_instruction", { type: "template", id: "install-skill.guard-instructions" }),
+      ...(skillContent.length > 0
+        ? [provenancedSegment(skillContent, "task_input", { type: "skill", id: "install-skill.skill-content" })]
+        : []),
+    ], "", { root: "messages", path: [0] });
+    return rendered.text === prompt ? rendered.sections : [];
+  })());
   try {
     const reply = await callText({
       api: resolved.api,
@@ -137,6 +159,7 @@ ${skillContent}`;
       model: resolved.model,
       signal: undefined,
       messages: [{ role: "user", content: prompt }],
+      semanticInputProvenance: guardProvenance,
       temperature: 0,
       timeoutMs: SAFETY_REVIEW_TIMEOUT,
       usageLedger: resolved.usageLedger,

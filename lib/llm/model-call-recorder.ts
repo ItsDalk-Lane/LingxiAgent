@@ -46,6 +46,12 @@ import {
   type ModelCallSource,
   type ModelCallTerminalStatus,
 } from "./model-call-observer.ts";
+import {
+  MODEL_CALL_SEMANTIC_PROVENANCE,
+  sanitizeSemanticInputProvenance,
+  summarizeSemanticInputProvenance,
+  type ModelSemanticInputProvenance,
+} from "./semantic-input-provenance.ts";
 
 export type ModelCallRecorderContext = {
   /** 显式接管 callId（调用方需要先于 logical_call_start 把身份写进别处时用）。 */
@@ -92,27 +98,42 @@ export function createModelCallRecorder({
     : null;
   let currentAttemptErrored = false;
   let ended = false;
+  /** Phase 5：per-call Semantic Input Provenance sidecar（随 recorder GC，无全局 Map）。 */
+  let semanticInputProvenance: ModelSemanticInputProvenance | null = null;
 
   /** 终态后返回 null：logical_call_end 已关闭该 call 的事实边界。 */
   const buildEvent = (
     eventType: ModelCallEventType,
     extras: Partial<ModelCallEvent> = {},
-  ): ModelCallEvent => ({
-    eventType,
-    timestamp: new Date(now()).toISOString(),
-    callId,
-    attemptId: extras.attemptId !== undefined ? extras.attemptId : currentAttemptId,
-    traceId,
-    parentCallId,
-    model,
-    source,
-    attribution,
-    ...extras,
-    details: extras.details !== undefined ? sanitizeModelCallDetails(extras.details) : null,
-    providerRequestId: extras.providerRequestId !== undefined
-      ? sanitizeProviderRequestId(extras.providerRequestId)
-      : null,
-  });
+  ): ModelCallEvent => {
+    const event: ModelCallEvent = {
+      eventType,
+      timestamp: new Date(now()).toISOString(),
+      callId,
+      attemptId: extras.attemptId !== undefined ? extras.attemptId : currentAttemptId,
+      traceId,
+      parentCallId,
+      model,
+      source,
+      attribution,
+      ...extras,
+      details: extras.details !== undefined ? sanitizeModelCallDetails(extras.details) : null,
+      providerRequestId: extras.providerRequestId !== undefined
+        ? sanitizeProviderRequestId(extras.providerRequestId)
+        : null,
+    };
+    if (semanticInputProvenance) {
+      // 非 enumerable symbol 引用：完整 provenance map 不进 details（§三十九），
+      // 仅以引用形态随事件传递；JSON.stringify / Metadata Safety Gate 均不可见。
+      Object.defineProperty(event, MODEL_CALL_SEMANTIC_PROVENANCE, {
+        value: semanticInputProvenance,
+        enumerable: false,
+        writable: false,
+        configurable: true,
+      });
+    }
+    return event;
+  };
 
   /** 唯一非终态出口：logical_call_end 之后一切生命周期事件 silent no-op（§十二）。 */
   const emit = (
@@ -142,8 +163,28 @@ export function createModelCallRecorder({
       return ended;
     },
 
+    /** 当前 provenance（未 attach 时 null；测试/诊断读取）。 */
+    get semanticInputProvenance() {
+      return semanticInputProvenance;
+    },
+
+    /**
+     * 附着 Semantic Input Provenance（§四十/§八十）：sanitize fail closed，
+     * 非法输入整体为 null 不影响业务。须在 beginLogicalCall 之前调用，
+     * summary 才会并入 logical_call_start details（§三十九）。
+     */
+    attachSemanticInputProvenance(provenance: unknown) {
+      semanticInputProvenance = sanitizeSemanticInputProvenance(provenance);
+    },
+
     beginLogicalCall({ details = null }: { details?: Record<string, unknown> | null } = {}) {
-      emit("logical_call_start", { attemptId: null, details });
+      // Provenance 安装在 recorder 上（per-call sidecar），beginLogicalCall
+      // 只投递安全 summary；完整 map 经事件 symbol 引用传递，不进 details。
+      const provenanceSummary = summarizeSemanticInputProvenance(semanticInputProvenance);
+      emit("logical_call_start", {
+        attemptId: null,
+        details: { ...(details || {}), ...(provenanceSummary || {}) },
+      });
     },
 
     /** 每次调用生成新 attemptId 并投递 attempt_start。返回 attemptId。 */

@@ -13,6 +13,10 @@ import {
   failObservedModelCall,
   observedModelCallLedgerMetadata,
 } from "../lib/llm/model-call-integration.ts";
+import {
+  createSemanticInputProvenance,
+  provenanceSection,
+} from "../lib/llm/semantic-input-provenance.ts";
 import { runWithNewModelTrace } from "../lib/llm/model-trace-scope.ts";
 
 const CAPABILITY = "speech_recognition";
@@ -66,6 +70,30 @@ function normalizeSessionRef(input: any = {}) {
   return { sessionId, sessionPath, sessionRef };
 }
 const log = createModuleLogger("speech-recognition");
+
+export /** Phase 5：speech 语义输入 provenance 组装（input.audio + parameters.language）。 */
+function buildSpeechProvenanceSections(language) {
+  const sections = [
+    provenanceSection(
+      { root: "input", path: ["audio"] },
+      "audio_input",
+      { role: "input", source: { type: "runtime", id: "speech.audio" } },
+    ),
+  ];
+  if (typeof language === "string" && language.trim()) {
+    sections.push(provenanceSection(
+      { root: "parameters", path: ["language"] },
+      "language_hint",
+      { role: "parameter", source: { type: "runtime", id: "speech.language" } },
+    ));
+  }
+  return sections;
+}
+
+/** Phase 5 测试入口。 */
+export function buildSpeechProvenanceForTest({ language }) {
+  return createSemanticInputProvenance("speech_transcribe", buildSpeechProvenanceSections(language));
+}
 
 export class SpeechRecognitionService {
   declare _emitEvent: any;
@@ -402,6 +430,9 @@ export class SpeechRecognitionService {
     // MC-09（§三十七/§三十八）：在 file/provider/model/protocol/language/session
     // 都确定之后、真正 Adapter HTTP 请求之前铸 callId。fileId 是业务引用
     // （不是音频内容），进入安全 attribution。
+    // Phase 5（§七十四）：语义输入 = audio + language hint；locator 只指
+    // input.audio / parameters.language，不携带字节/base64/路径/转写文本。
+    const speechProvenanceSections = buildSpeechProvenanceSections(language);
     const recorder = beginObservedModelCall({
       model: {
         provider: target.providerId,
@@ -427,6 +458,7 @@ export class SpeechRecognitionService {
         languageSpecified: Boolean(language),
         inputSizeBucket: audioInputSizeBucket(file),
       },
+      semanticInputProvenance: createSemanticInputProvenance("speech_transcribe", speechProvenanceSections),
     });
     try {
       const result = await withModelRequestAccounting({

@@ -46,3 +46,57 @@
 
 本轮功能提交后，VERIFIED_SOURCE_SHA 按仓库既有机制推进到新验证树
 （单独 audit commit：verified-source-sha.txt + matrix 文件）。
+
+## Phase 5 — Semantic Input Provenance（2026-08-21 第四轮）
+
+- Semantic Input Provenance Contract（lib/llm/semantic-input-provenance.ts）：
+  统一 `ModelSemanticInputProvenance`（schemaVersion/inputShape/sections）；
+  section 只含 category（24 值闭集）/role（7 值）/source（9 类型 + 安全逻辑 id，
+  绝对路径与 URL fail-closed 拒绝）/locator（5 根 + path + UTF-16 [start,end) span，
+  span=null 为 identity-only）/precision（exact/structural/opaque）。
+  renderer `renderProvenancedText` 与调用方 join 字节级一致（空段语义保持）；
+  sanitize gate fail closed（非法段丢弃、exact 必须可定位）。
+- Sidecar：recorder 持有 per-call provenance（随 call GC，无全局 Map）；完整 map
+  经事件 non-enumerable symbol 引用传递（JSON.stringify/安全门不可见），
+  Observer 事件只带 summary（inputShape/provenancePrecision/sectionCount/
+  去重 categories/opaqueCount）。rollup：exact/partial/opaque（无百分比）。
+- MC-01：stream observer 在 streamFn 边界构造——session 冻结快照 runtime 前缀
+  验证（startsWith(真实冻结对象)，非模板重建）→ 快照 sections exact（平移 0）；
+  SDK 尾段（append+project_context+skills+cwd）单段 structural + skills/
+  agentsFile identity-only（basename）；messages 按 role 分类（toolResult→
+  tool_result；turn 内最后 user → current_user_input，依据 prompt ingress ALS
+  turn 标记 + loop 只追加 assistant/toolResult 的 runtime 不变量；无标记不猜）；
+  tools 逐项 tool_definition。快照 provenance 持久化为 v1 附加可选字段
+  systemPromptProvenance（无内容副本；旧快照恢复 → structural 诚实降级）。
+- MC-02：runner 在 isolatedStreamFn 按实际 providerContext 构造（system 整段
+  structural；strict → task_instruction / repair → format_constraint 可区分；
+  recovery placeholder toolResult → tool_result；observer 对未覆盖尾段扩展分类）。
+- MC-03：isCompacting → system=structural task_instruction（SDK 常量不随包出口，
+  镜像为手工副本非同源数据结构，不伪造 exact）；messages[0]=structural task_input。
+- MC-04：callText 归一化 boundary（merge 完成 + normalizedMessages）——caller
+  显式 provenance 随 system merge 同步 remap（span 平移 + index 重排）；未提供 →
+  structural fallback；codex 空系统注入 DEFAULT_CODEX_UTILITY_INSTRUCTIONS →
+  adapter_injected 段（注入点标记，§八十二）。length-contract 二次 repair 重建
+  provenance（追加 format_constraint 段）。
+- Utility callers 显式迁移（~20 call site）：fact extraction（timeContext/
+  prevSnapshot/currentSummary 三段）、compile×4、rolling summary+repair、dream
+  全阶段+两类 repair、approval（含二调 format_constraint）、vision×2（指令段/
+  user request 段/图片 media_reference）、diary 终稿（≥5 chunk）、appearance、
+  title/translate/activity×2/agent-id/description、rc-summary、install-skill、
+  health check。多段拼接处全部改为构造点分段渲染；四处（compile/_compactLLM、
+  rolling repair、install-skill、dream）带「渲染必须与原串字节一致否则回退无
+  provenance」零漂移防御。
+- MC-05..09：probe（固定消息 task_instruction exact）、image/video（media_prompt/
+  media_reference locator 指参数位不含值；jimeng-cli-* → external_cli_media 形状）、
+  speech（audio_input/language_hint）。
+- MC-10：generateSummary facade 在参数边界构造三元组 provenance（messages 段级 +
+  customInstructions/previousSummary parameters 寻址）。
+- 审计：SEMANTIC_INPUT_PROVENANCE_AUDIT.md（Step 1 交付，Prompt Construction
+  Matrix + caller 迁移清单 + Known Gaps）。
+- 等价与安全：Agent system prompt golden fixture（改造前生成，zh/en 字节一致）；
+  renderer Unicode（中文/emoji/代理对/ZWJ）span 单测；毒丸测试（TOP_SECRET×4
+  JSON 序列化不可见）；payload 不变测试（callText 传/不传 provenance body 一致）；
+  snapshot roundtrip + persona V1→V2；Trace/safety/control-plane 回归全绿。
+- 验证：typecheck ×3 0 error；eslint 0 error；lint:boundary 绿（manifest 收录
+  semantic-input-provenance(-payload)）；cli-runtime-closure 重算；persistence
+  fingerprint compatible repin；full npm test 11776 通过。

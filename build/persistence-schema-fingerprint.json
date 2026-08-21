@@ -648,7 +648,7 @@
     ],
     "version": 3
   },
-  "payloadFingerprint": "sha256:7fd4b13f1038b69905a40bad89299158014ae7a59fcca0c127939305449153ac",
+  "payloadFingerprint": "sha256:b3a5d2b700fb8f784a01567a9c18a4c1f46c0e46930238581b54b93b01aba854",
   "registry": [
     {
       "affectedByEpochMigration": true,
@@ -3003,8 +3003,8 @@
   ],
   "review": {
     "classification": "compatible",
-    "compatibilityReason": "Observer trace propagation only: session-coordinator/bridge/executor/engine/diary/memory-ticker/media-manager/server gained ModelTraceScope wiring + ledger metadata keys (additive metadata object fields, no persisted store shape/format change); usage-ledger entries keep schemaVersion 1",
-    "payloadFingerprint": "sha256:7fd4b13f1038b69905a40bad89299158014ae7a59fcca0c127939305449153ac"
+    "compatibilityReason": "Phase 5 semantic input provenance: session prompt snapshot gains an additive-optional systemPromptProvenance metadata field (no content copies; legacy snapshots normalize without it and degrade to structural provenance); no store schema or payload shape change",
+    "payloadFingerprint": "sha256:b3a5d2b700fb8f784a01567a9c18a4c1f46c0e46930238581b54b93b01aba854"
   },
   "schemas": [
     {
@@ -3418,7 +3418,7 @@
         {
           "contract": "core/session-coordinator.ts Hana metadata extensions",
           "module": "core/session-coordinator.ts",
-          "sourceHash": "sha256:e2c847023fdd7fb21b1324ec8175453555237aa55a698ac4e3de9b4aa901fe27"
+          "sourceHash": "sha256:18396377b41487388a939f3062df252c7fe829290aadfba1f622be500acf346d"
         },
         {
           "contract": "core/session-jsonl-file.ts repair contract",

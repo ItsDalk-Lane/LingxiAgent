@@ -141,6 +141,7 @@ export function beginObservedModelCall({
   details = null,
   traceId = null,
   parentCallId = null,
+  semanticInputProvenance = null,
 }: {
   model: unknown;
   usageContext?: unknown;
@@ -149,6 +150,7 @@ export function beginObservedModelCall({
   details?: Record<string, unknown> | null;
   traceId?: string | null;
   parentCallId?: string | null;
+  semanticInputProvenance?: unknown;
 }): ModelCallRecorder {
   const fields = usageContext !== null && usageContext !== undefined
     ? modelCallFieldsFromUsageContext(usageContext)
@@ -163,6 +165,7 @@ export function beginObservedModelCall({
       attribution: fields.attribution,
     },
   });
+  if (semanticInputProvenance) recorder.attachSemanticInputProvenance(semanticInputProvenance);
   recorder.beginLogicalCall({
     details: {
       ...(trace.origin ? { traceOrigin: trace.origin } : {}),

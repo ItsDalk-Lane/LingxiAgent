@@ -6,6 +6,10 @@ import {
   failObservedModelCall,
   observedModelCallLedgerMetadata,
 } from "../../lib/llm/model-call-integration.ts";
+import {
+  createSemanticInputProvenance,
+  provenanceSection,
+} from "../../lib/llm/semantic-input-provenance.ts";
 
 export function createTaskId() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
@@ -401,6 +405,39 @@ export function markSubmitFailed({ taskId, err, store, ctx }) {
   ctx.log?.error?.(`[media] submit failed for ${taskId}:`, message);
 }
 
+/** Phase 5 测试入口：组装 image submit 的语义输入 provenance（不触网络/存储）。 */
+export function buildImageTaskProvenanceForTest({ prompt, image, adapterId }) {
+  const sections = [];
+  if (typeof prompt === "string" && prompt.length > 0) {
+    sections.push(provenanceSection(
+      { root: "parameters", path: ["prompt"] },
+      "media_prompt",
+      { role: "input", source: { type: "runtime", id: "media.prompt" } },
+    ));
+  }
+  if (Array.isArray(image)) {
+    image.forEach((item, index) => {
+      if (typeof item === "string" && item.trim()) {
+        sections.push(provenanceSection(
+          { root: "parameters", path: ["image", index] },
+          "media_reference",
+          { role: "input", source: { type: "runtime", id: "media.reference" } },
+        ));
+      }
+    });
+  } else if (typeof image === "string" && image.trim()) {
+    sections.push(provenanceSection(
+      { root: "parameters", path: ["image"] },
+      "media_reference",
+      { role: "input", source: { type: "runtime", id: "media.reference" } },
+    ));
+  }
+  return createSemanticInputProvenance(
+    typeof adapterId === "string" && adapterId.startsWith("jimeng-cli-") ? "external_cli_media" : "media_image",
+    sections,
+  );
+}
+
 export async function runSubmitInBackground({ taskId, adapter, params, submitCtx, store, poller, ctx }) {
   // MC-06 逻辑调用边界（§二十三）：一次 image generation submit = 一个 logical
   // call；poll / 资产下载不是。callId 在 adapter 网络请求之前铸好，同时写进
@@ -412,6 +449,10 @@ export async function runSubmitInBackground({ taskId, adapter, params, submitCtx
     api: params?.protocolId || adapter?.protocolId || null,
   };
   const referenceCount = countReferenceImages(params?.image);
+  // Phase 5（§七十二）：图片生成的语义输入 = prompt + 参考图。locator 只指向
+  // 参数位置（parameters.prompt / parameters.image[i]），绝不携带值（URL/路径
+  // 禁入 provenance，§二十二）。CLI adapter（jimeng-cli-*）用 external_cli_media
+  // 形状；其 wire 在进程内不可见，由 attempt 的 external_process_boundary 表达。
   const recorder = beginObservedModelCall({
     model: modelIdentity,
     source: { subsystem: "media", operation: "submit", surface: "tool", trigger: "user" },
@@ -427,6 +468,11 @@ export async function runSubmitInBackground({ taskId, adapter, params, submitCtx
       referenceCount,
       taskId,
     },
+    semanticInputProvenance: buildImageTaskProvenanceForTest({
+      prompt: params?.prompt,
+      image: params?.image,
+      adapterId: adapter?.id,
+    }),
   });
   const observedSubmitCtx = { ...submitCtx, modelCall: recorder };
   try {

@@ -30,6 +30,7 @@
  *   - Pi 原生 summarizer 的请求 options 不含 onPayload（0.84.1 实证），因此
  *     MC-03 不会触发 provider_request_prepared——事件缺失即真相，不补假事件。
  */
+import { AsyncLocalStorage } from "node:async_hooks";
 import {
   getModelCallObserver,
   modelCallFieldsFromUsageContext,
@@ -45,6 +46,11 @@ import {
 } from "../llm/model-call-scope.ts";
 import { mintModelCallId } from "../llm/model-call-identity.ts";
 import {
+  buildChatContextProvenance,
+  extendChatContextProvenance,
+  type SessionPromptProvenancePayload,
+} from "../llm/semantic-input-provenance.ts";
+import {
   currentModelTraceScope,
   noteAgentStreamCallStarted,
   runWithModelTraceRoot,
@@ -55,12 +61,28 @@ import { noteModelCallMessageIdentity } from "../llm/model-call-correlation.ts";
 const INSTALLED = Symbol.for("lingxi.modelCallStreamObserver.installed");
 const TRACE_INGRESS_INSTALLED = Symbol.for("lingxi.modelCallTraceIngress.installed");
 
+/**
+ * Agent prompt turn 标记（Phase 5）：session.prompt() 执行期内为 true。
+ * current_user_input 的判定依据（§五十一）：pi-ai Message 中 toolResult 是独立
+ * role（非 user 包装），agent loop 在 turn 内只追加 assistant/toolResult，因此
+ * 「turn 内最后一条 role=user 消息」由 runtime 不变量证明为触发输入——不是
+ * 「数组最后一项」启发式。无 turn 标记（agent.continue / 无 ingress）→ 不判
+ * current_user_input，宁可 conversation_history。
+ */
+const AGENT_PROMPT_TURN_STORAGE = new AsyncLocalStorage<boolean>();
+
+function currentAgentPromptTurn(): boolean {
+  return AGENT_PROMPT_TURN_STORAGE.getStore() === true;
+}
+
 /** 每个 session 的静态归属（由创建方注册）；per-call 分类优先走 ALS scope。 */
 export type ModelCallSessionContextProvider = () => {
   source?: ModelCallSource | null;
   attribution?: ModelCallAttribution | null;
   traceId?: string | null;
   parentCallId?: string | null;
+  /** Phase 5：冻结快照 provenance payload（无/旧快照 → null，诚实 structural）。 */
+  promptProvenance?: SessionPromptProvenancePayload | null;
 } | null;
 
 const sessionContextProviders = new WeakMap<object, ModelCallSessionContextProvider>();
@@ -153,6 +175,37 @@ export function installModelCallStreamObserver(
         attribution: effectiveAttribution,
       },
     });
+
+    // Phase 5：Semantic Input Provenance 构造（来源仍可知的 streamFn 边界）。
+    // 优先级：MC-02 runner 的 scope provenance（覆盖 recovery/repair 尾段扩展）
+    // > native summarization（MC-03，structural）> MC-01 自动分类（快照前缀证明
+    // + turn 标记 + role 分类）。构造/附着失败绝不影响业务（try/catch 兜底）。
+    let semanticProvenance = null;
+    try {
+      if (explicitScope?.semanticInputProvenance) {
+        semanticProvenance = extendChatContextProvenance(
+          explicitScope.semanticInputProvenance,
+          Array.isArray(context?.messages) ? context.messages : [],
+        );
+      } else {
+        semanticProvenance = buildChatContextProvenance(
+          {
+            systemPrompt: context?.systemPrompt,
+            messages: context?.messages,
+            tools: context?.tools,
+          },
+          {
+            promptTurn: currentAgentPromptTurn(),
+            promptSnapshot: registered?.promptProvenance ?? null,
+            nativeSummarization,
+          },
+        );
+      }
+      if (semanticProvenance) recorder.attachSemanticInputProvenance(semanticProvenance);
+    } catch {
+      // Provenance 构造失败 → 无 provenance（observer 事件照常，只是无 summary）。
+    }
+
     recorder.beginLogicalCall({
       details: {
         path: "pi_stream",
@@ -226,8 +279,13 @@ export function installModelCallTraceIngress(session: any): void {
   if (typeof originalPrompt !== "function" || session[TRACE_INGRESS_INSTALLED]) return;
   session[TRACE_INGRESS_INSTALLED] = true;
   session.prompt = async function traceIngressPrompt(...args: any[]) {
-    return runWithModelTraceRoot({ origin: "unknown" }, () =>
-      originalPrompt.apply(this, args as []),
+    // Agent prompt turn 标记：整个 prompt() 执行期（含全部 streamFn 调用与工具
+    // continuation）currentAgentPromptTurn() === true，供 current_user_input
+    // 判定（§五十一：runtime turn 证明，非数组末项启发式）。
+    return AGENT_PROMPT_TURN_STORAGE.run(true, () =>
+      runWithModelTraceRoot({ origin: "unknown" }, () =>
+        originalPrompt.apply(this, args as []),
+      ),
     );
   };
 }

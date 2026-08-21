@@ -23,6 +23,10 @@ import { getLocale } from "../i18n.ts";
 import { readCompiledResetAt } from "./compiled-memory-state.ts";
 import { attachPromptLayoutMetadata, buildUtilityPromptLayout } from "../llm/prompt-layout.ts";
 import {
+  provenancedSegment,
+  renderProvenancedText,
+} from "../llm/semantic-input-provenance.ts";
+import {
   buildSourceTimeRange,
   formatZonedDateTime,
   resolveMemoryTimeZone,
@@ -726,11 +730,33 @@ export class SessionSummaryManager {
   async _callRollingRepairLLM(summaryText, issues, resolvedModel, turnCount = 10, opts: Record<string, any> = {}) {
     const locale = getLocale();
     const { visibleMaxTokens } = this._rollingSummaryBudget(turnCount);
+    // Phase 5（§六十七）：repair 输入两段（校验失败原因 format_constraint + 待修复
+    // 草稿 compaction_summary）；渲染必须与 buildRollingSummaryRepairInput 字节一致，
+    // 不一致则回退无段级 provenance（零漂移防御）。
+    const userContent = buildRollingSummaryRepairInput({ locale, issues, summaryText });
+    let repairUserSections = null;
+    try {
+      const isZh = locale.startsWith("zh");
+      const issuesLabel = isZh ? "## 校验失败原因" : "## Validation Failures";
+      const draftLabel = isZh ? "## 待修复草稿" : "## Draft To Repair";
+      const issueLines = (Array.isArray(issues) ? issues : [])
+        .map((issue) => `- ${String(issue || "").trim()}`)
+        .filter((line) => line !== "- ")
+        .join("\n");
+      const rendered = renderProvenancedText([
+        provenancedSegment(`${issuesLabel}\n\n${issueLines || (isZh ? "- 未知" : "- unknown")}`, "format_constraint", { id: "memory.rolling-summary-repair.issues" }),
+        provenancedSegment(`${draftLabel}\n\n<draft-summary>\n${String(summaryText || "")}\n</draft-summary>`, "compaction_summary", { type: "memory", id: "memory.rolling-summary-repair.draft" }),
+      ], "\n\n", { root: "messages", path: [0] });
+      if (rendered.text === userContent) repairUserSections = rendered.sections;
+    } catch {
+      repairUserSections = null;
+    }
     const layout = buildUtilityPromptLayout({
       cacheGroup: "memory.rolling_summary",
       templateVersion: "rolling-summary-repair.v1",
       systemPrompt: buildRollingSummaryRepairPrompt(locale),
-      userContent: buildRollingSummaryRepairInput({ locale, issues, summaryText }),
+      userContent,
+      userProvenanceSections: repairUserSections,
     });
     const usageContext = attachPromptLayoutMetadata({
       source: {
@@ -757,6 +783,7 @@ export class SessionSummaryManager {
       returnUsage: opts.returnUsage === true,
       usageLedger: resolvedModel.usageLedger,
       usageContext,
+      semanticInputProvenance: layout.semanticInputProvenance,
     });
   }
 
@@ -925,16 +952,24 @@ Word limit: follow the per-run summary budget. If three sentences suffice, don't
     const budgetText = isZh
       ? `${factTitle}最多${factsBudget}字。${timelineTitle}最多${eventsBudget}字。`
       : `${factTitle} max ${factsWordBudget} words. ${timelineTitle} max ${eventsWordBudget} words.`;
-    const userContent = [
-      hasPrev ? `${prevLabel}\n\n${prevSummary}` : "",
-      `${newLabel}\n\n${convText}`,
-      `${budgetLabel}\n\n${budgetText}`,
-    ].filter(Boolean).join("\n\n");
+    // Phase 5（§六十七）：userContent 三段（prevSummary/convText/budget）在拼接前
+    // 渲染 provenance——与旧 filter(Boolean).join("\n\n") 字节一致。system 侧整段
+    // = template 实例（layout 赋 task_instruction exact + cacheGroup/version），
+    // 其内部嵌值（persona/memory/roster）的 span 拆分见 Known Gaps。
+    const userRendered = renderProvenancedText([
+      ...(hasPrev
+        ? [provenancedSegment(`${prevLabel}\n\n${prevSummary}`, "previous_summary", { type: "memory", id: "memory.rolling-summary.previous" })]
+        : []),
+      provenancedSegment(`${newLabel}\n\n${convText}`, "task_input", { type: "memory", id: "memory.rolling-summary.conversation" }),
+      provenancedSegment(`${budgetLabel}\n\n${budgetText}`, "format_constraint", { id: "memory.rolling-summary.budget" }),
+    ], "\n\n", { root: "messages", path: [0] });
+    const userContent = userRendered.text;
     const layout = buildUtilityPromptLayout({
       cacheGroup: "memory.rolling_summary",
       templateVersion: "rolling-summary.v1",
       systemPrompt,
       userContent,
+      userProvenanceSections: userRendered.sections,
     });
     const usageContext = attachPromptLayoutMetadata({
       source: {
@@ -962,6 +997,7 @@ Word limit: follow the per-run summary budget. If three sentences suffice, don't
       returnUsage: opts.returnUsage === true,
       usageLedger: resolvedModel.usageLedger,
       usageContext,
+      semanticInputProvenance: layout.semanticInputProvenance,
     });
   }
 

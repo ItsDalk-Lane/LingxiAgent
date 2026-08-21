@@ -1,3 +1,7 @@
+import {
+  createSemanticInputProvenance,
+  provenanceSection,
+} from "./llm/semantic-input-provenance.ts";
 import { createModuleLogger } from "./debug-log.ts";
 import { redactLogText } from "../shared/log-redactor.ts";
 
@@ -647,6 +651,28 @@ export function createModelApprovalReviewer({
     if (attempt === 2 && retry?.formatCorrection) {
       messages.push({ role: "user", content: FORMAT_CORRECTION_PROMPT });
     }
+    // Phase 5（§六十八）：attempt=1 → task_instruction(system) + task_input(payload)；
+    // attempt=2 的 format repair → 追加 FORMAT_CORRECTION_PROMPT 独立 user 消息，
+    // provenance 显式出现 format_constraint（两次调用可区分）。
+    const approvalProvenance = createSemanticInputProvenance("calltext", [
+      provenanceSection(
+        { root: "systemPrompt", span: { start: 0, end: REVIEWER_SYSTEM_PROMPT.length } },
+        "task_instruction",
+        { role: "system", source: { type: "template", id: "approval.reviewer-system" } },
+      ),
+      provenanceSection(
+        { root: "messages", path: [0] },
+        "task_input",
+        { role: "user", source: { type: "runtime", id: "approval.authorization-review-input" } },
+      ),
+      ...(attempt === 2 && retry?.formatCorrection
+        ? [provenanceSection(
+            { root: "messages", path: [1] },
+            "format_constraint",
+            { role: "user", source: { type: "template", id: "approval.format-correction" } },
+          )]
+        : []),
+    ]);
     try {
       // 格式修正预算只由网关持有；工厂每次调用只产生一次外部请求。
       const text = await callText({
@@ -657,6 +683,7 @@ export function createModelApprovalReviewer({
         model: selected.model,
         systemPrompt: REVIEWER_SYSTEM_PROMPT,
         messages,
+        semanticInputProvenance: approvalProvenance,
         temperature: 0,
         maxTokens,
         timeoutMs,

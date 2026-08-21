@@ -231,6 +231,7 @@ import {
   observePiDirectSummary,
   type ObservedDirectSummaryContext,
 } from "../llm/observed-pi-direct-summary.ts";
+import { buildDirectSummaryProvenance } from "../llm/semantic-input-provenance.ts";
 
 export async function generateSummary(
   currentMessages,
@@ -255,6 +256,19 @@ export async function generateSummary(
   if (streamFn) return invokeRaw();
   const context: ObservedDirectSummaryContext | null =
     observerContext && typeof observerContext === "object" ? observerContext : {};
+  // Phase 5（§七十）：direct summary 的三元组（messages/customInstructions/
+  // previousSummary）在 facade 参数边界全部结构化可见——在此构造 provenance
+  // （messages 段级分类 + 参数 root=parameters 寻址），随 context 附着到
+  // recorder。构造失败不影响业务。
+  try {
+    context.semanticInputProvenance = buildDirectSummaryProvenance({
+      messages: Array.isArray(currentMessages) ? currentMessages : [],
+      customInstructions: typeof customInstructions === "string" ? customInstructions : null,
+      previousSummary: typeof previousSummary === "string" ? previousSummary : null,
+    });
+  } catch {
+    context.semanticInputProvenance = null;
+  }
   return observePiDirectSummary(model, context, invokeRaw);
 }
 export {

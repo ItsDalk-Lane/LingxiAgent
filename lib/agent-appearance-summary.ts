@@ -1,4 +1,10 @@
 import crypto from "node:crypto";
+import {
+  createSemanticInputProvenance,
+  provenanceSection,
+  provenancedSegment,
+  renderProvenancedText,
+} from "./llm/semantic-input-provenance.ts";
 import fs from "node:fs";
 import path from "node:path";
 
@@ -285,6 +291,20 @@ export async function refreshAgentAppearanceSummary(
     throw new Error("callText is required to refresh agent appearance summary");
   }
 
+  // Phase 5：指令模板（task_instruction）与 agent 名（task_input）分段渲染；
+  // filter(Boolean).join("\n") 的字节语义 = REQUEST + (name ? "\n"+name : "")。
+  const appearanceNameLine = options.agentName ? `Agent 名字：${options.agentName}` : "";
+  const appearanceText = [
+    AGENT_APPEARANCE_SUMMARY_REQUEST,
+    "",
+    appearanceNameLine,
+  ].filter(Boolean).join("\n");
+  const appearanceSegments = renderProvenancedText([
+    provenancedSegment(AGENT_APPEARANCE_SUMMARY_REQUEST, "task_instruction", { type: "template", id: "agent.appearance-summary-request" }),
+    ...(appearanceNameLine
+      ? [provenancedSegment(appearanceNameLine, "task_input", { id: "agent.appearance-agent-name" })]
+      : []),
+  ], "\n", { root: "messages", path: [0, "content", 0] });
   const { text } = await callTextWithLengthContract({
     callText: options.callText,
     request: {
@@ -296,17 +316,18 @@ export async function refreshAgentAppearanceSummary(
       messages: [{
         role: "user",
         content: [
-          {
-            type: "text",
-            text: [
-              AGENT_APPEARANCE_SUMMARY_REQUEST,
-              "",
-              options.agentName ? `Agent 名字：${options.agentName}` : "",
-            ].filter(Boolean).join("\n"),
-          },
+          { type: "text", text: appearanceText },
           avatar.image,
         ],
       }],
+      semanticInputProvenance: createSemanticInputProvenance("calltext", [
+        ...appearanceSegments.sections,
+        provenanceSection(
+          { root: "messages", path: [0, "content", 1] },
+          "media_reference",
+          { role: "input", source: { type: "runtime", id: "agent.appearance-avatar" } },
+        ),
+      ]),
       temperature: 0.2,
       timeoutMs: APPEARANCE_SUMMARY_TIMEOUT_MS,
       signal: options.signal,
