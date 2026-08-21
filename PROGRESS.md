@@ -7,7 +7,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = a9a5f3f4689051cbba708d584479eb47eeace2e2  (最终验证所针对的源码树；2026-08-21 模型调用可观测性树后推进)
+VERIFIED_SOURCE_SHA   = b92385330563ca6fe6f4e71c908ddfbf90115804  (最终验证所针对的源码树；2026-08-21 模型调用可观测性树后推进)
 工作分支              = feature/upstream-sync-0.447.4
 ```
 
@@ -208,7 +208,7 @@ seal 不是一次性终点，而是"当前被验证树"的游标；每次审计�
   persistence-schema-guard 要求受护源文件被 touch 时同次重钉指纹；providers.ts（受护源）
   在 c83d238a 被改，本次以 compatible 分类补钉 build/persistence-schema-fingerprint.json
   （review 记录更新，schema 形状不变）。验证：tripwire 15 用例绿 + guard 前哨通过后推进。
-- **2026-08-21 模型调用可观测性**（a9a5f3f4689051cbba708d584479eb47eeace2e2）：Model Call
+- **2026-08-21 模型调用可观测性**（b92385330563ca6fe6f4e71c908ddfbf90115804）：Model Call
   Observer 实现（lib/llm/model-call-observer 系列 + lib/pi-sdk/model-call-stream-observer +
   lib/extensions/model-call-observer-ext；core/llm-client、bridge-session-manager、
   session-coordinator、hub/agent-executor、approval-gateway 等接入；4 个新测试；闭包清单与
@@ -222,7 +222,7 @@ seal 不是一次性终点，而是"当前被验证树"的游标；每次审计�
 - Disposition：ADOPTED 25 + ADAPTED 100 + REGENERATED 4 + INTENTIONAL_DIVERGENCE 4 = 133
   （脚本计算，`build-sync-matrix.mjs --check`：missing=0 / extra=0 / duplicate=0 / unknown=0）。
 - 4 个 `hanako.md → lingxi.md` 品牌映射统一分类为 ADAPTED。
-- `VERIFIED_SOURCE_SHA = a9a5f3f4689051cbba708d584479eb47eeace2e2`：被完整测试验证的代码树
+- `VERIFIED_SOURCE_SHA = b92385330563ca6fe6f4e71c908ddfbf90115804`：被完整测试验证的代码树
   （含收口树 d4cf92a8 的全部验证 + 文档清场树复跑验证 + 归档修复树 051f6117 复跑的
   typecheck/lint/全量测试 + v0.1.29 release 树 fabd6dbf 复跑的 typecheck/目标套件 +
   mac self-install 树 dcf3546a 的 PR CI typecheck/lint/build/全量测试 +
