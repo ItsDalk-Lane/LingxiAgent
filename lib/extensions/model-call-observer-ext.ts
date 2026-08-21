@@ -36,6 +36,16 @@ export function createModelCallObserverExtension() {
         }).providerRequestPrepared({
           details: summarizeProviderRequestPayload(event?.payload),
         });
+        // Phase 6（§七十四/§七十五）：event.payload 是 compat 转换后、序列化前的
+        // 最终 provider body 活引用（pi-ai 0.84.1 实证，audit §1.1）→
+        // fidelity=runtime_exact；hook 不暴露 headers/endpoint（诚实 null）；
+        // 凭证不在 payload（vendor SDK fetch 层拼装）。capture 前经统一 Redactor。
+        scope.payloadCapture?.captureProviderRequest({
+          attemptId: scope.attemptId ?? null,
+          protocol: scope.model?.api ?? null,
+          transport: { body: event?.payload ?? null },
+          fidelity: "runtime_exact",
+        });
       } catch {
         // Observability must never break the model request path.
       }
@@ -55,6 +65,16 @@ export function createModelCallObserverExtension() {
           details: {
             httpStatus: typeof event?.status === "number" ? event.status : null,
           },
+        });
+        // Phase 6（§七十八）：hook 只有 status+headers、无 body（audit §1.2）→
+        // metadata_only，不推测 body。headers 进 sink 前经统一 Redactor
+        // （set-cookie 等凭证键替换）。
+        scope.payloadCapture?.captureProviderResponse({
+          attemptId: scope.attemptId ?? null,
+          status: typeof event?.status === "number" ? event.status : null,
+          headers: event?.headers ?? null,
+          body: null,
+          fidelity: "metadata_only",
         });
       } catch {
         // Observability must never break the model request path.

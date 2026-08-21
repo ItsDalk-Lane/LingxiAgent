@@ -100,3 +100,37 @@
 - 验证：typecheck ×3 0 error；eslint 0 error；lint:boundary 绿（manifest 收录
   semantic-input-provenance(-payload)）；cli-runtime-closure 重算；persistence
   fingerprint compatible repin；full npm test 11776 通过。
+
+## Phase 6 — Sensitive Payload Capture + Redaction + Provider-Wire Provenance（2026-08-22 第五轮）
+
+**状态：完成。** 交付：
+
+- 契约五模块：`lib/llm/model-call-payload-types.ts`（record/kind/visibility/
+  fidelity/sanitization/资源上限/ProviderRequestProvenance）、
+  `model-call-payload-redaction.ts`（copy-on-capture redactor：credential 键、
+  协议专项路径 volcengine→user.uid、inline secret 正反例、URL/本地路径/二进制
+  externalization、span offset remap）、`model-call-payload-capture.ts`（sink
+  注册表 + capture session + ordinal 计数）、`provider-request-provenance.ts`
+  （callText 四协议 mapping，构造时产生 + post-compat 校验降级）、
+  `model-call-payload-testing.ts`（Test sink）。
+- 通道架构：Observer（metadata，契约冻结）‖ PayloadCapture（正文，先统一
+  Redaction 后入 sink，detached only）；生产默认 sink=NOOP，session=null 快路径
+  （spy 锁定 redactor 不运行）；sink throw 不影响业务（callText/Pi/media/speech
+  测试锁定）。
+- 全路径接入：MC-04 四层 + 四协议 mapping（anthropic system/messages 重排、
+  openai messages[0] 平移、responses/codex instructions/input、codex 空系统
+  adapter_injected）；MC-01 streamFn context + before/after_provider_request
+  hook（payload=最终 body，runtime_exact；response=metadata_only）；MC-02/03/10
+  provider wire 显式 unavailable（options 无 onPayload 运行时判定 / summarizer
+  无 hook）；google response hook 缺失显式 unavailable；MC-05 probe（"." 允许
+  捕获；GET /models 0 record）；MC-06 ×7 + MC-08 agnes wire 层（构造点 body +
+  响应解析点）+ codex 401 双 ordinal；MC-07 CLI 显式 opaque（argv/stdout 不进
+  sink）；MC-09 ×4（audio externalize、Volcengine body credential 协议专项）。
+- Recorder/Scope/Integration 扩展：recorder.payloadCapture handle（attachPayload
+  Chat）、scope.payloadCapture（ALS 共享给 hooks）、observedProviderFetch capture
+  描述符 + captureProviderHttpResponse helper。
+- 审计：MODEL_CALL_PAYLOAD_CAPTURE_AUDIT.md（Step 1：四层边界矩阵、credential
+  位置总表、Pi hook 实证、控制面清单、opaque 清单）。
+- 验证：typecheck ×3 0 error；eslint 0 error；lint:boundary 绿（manifest 收录
+  5 个新共享模块）；既有观测测试 14 文件 131 用例全绿无回归；新增 7 文件
+  103 用例全绿；full npm test 见下。

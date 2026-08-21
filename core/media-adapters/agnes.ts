@@ -8,7 +8,7 @@ import {
   saveBase64Images,
 } from "./common.ts";
 import { t } from "../../lib/i18n.ts";
-import { observedProviderFetch } from "../../lib/llm/model-call-integration.ts";
+import { captureProviderHttpResponse, observedProviderFetch } from "../../lib/llm/model-call-integration.ts";
 
 const DEFAULT_BASE_URL = "https://apihub.agnes-ai.com/v1";
 const DEFAULT_IMAGE_MODEL = "agnes-image-2.1-flash";
@@ -252,13 +252,15 @@ export const agnesImageAdapter = {
     };
     const size = resolveImageSize(params, providerDefaults);
     if (size) body.size = size;
+    const requestUrl = `${agnesV1Base(creds.baseUrl)}/images/generations`;
+    const requestHeaders = {
+      "Authorization": `Bearer ${creds.apiKey}`,
+      "Content-Type": "application/json",
+    };
 
-    const res = await observedProviderFetch(ctx, () => fetch(`${agnesV1Base(creds.baseUrl)}/images/generations`, {
+    const res = await observedProviderFetch(ctx, () => fetch(requestUrl, {
       method: "POST",
-      headers: {
-        "Authorization": `Bearer ${creds.apiKey}`,
-        "Content-Type": "application/json",
-      },
+      headers: requestHeaders,
       body: JSON.stringify(body),
     }), {
       requestDetails: {
@@ -266,19 +268,31 @@ export const agnesImageAdapter = {
         mediaType: "image",
         hasReferenceMedia: images.length > 0,
       },
+      // Phase 6：真实构造点 body/headers；Authorization 在入 sink 前被 Redactor 替换。
+      capture: { method: "POST", url: requestUrl, headers: requestHeaders, body, protocol: "agnes-images" },
     });
 
     if (!res.ok) {
       let msg = `API error ${res.status}`;
       try {
         const err = await res.json();
+        captureProviderHttpResponse(ctx, {
+          status: res.status, headers: res.headers, body: err, fidelity: "parsed_equivalent",
+        });
         if (err.error?.message) msg = `${msg}: ${err.error.message}`;
         else if (err.message) msg = `${msg}: ${err.message}`;
-      } catch {}
+      } catch {
+        captureProviderHttpResponse(ctx, {
+          status: res.status, headers: res.headers, body: null, fidelity: "metadata_only",
+        });
+      }
       throw new Error(msg);
     }
 
     const data = await res.json();
+    captureProviderHttpResponse(ctx, {
+      status: res.status, headers: res.headers, body: data, fidelity: "parsed_equivalent",
+    });
     const { base64, urls } = collectResponseImages(data);
     if (base64.length > 0) {
       const files = await saveBase64Images(base64, "image/png", ctx.dataDir, params.filename);
@@ -337,12 +351,14 @@ export const agnesVideoAdapter = {
     // MC-08：video generation task submit 是一次 Model Call；返回的 taskId
     // 之后由 poller 查询（控制面，不观测）。资产下载（downloadVideoUrl）在
     // query 内，同样不是 attempt。
-    const res = await observedProviderFetch(ctx, () => fetch(`${agnesV1Base(creds.baseUrl)}/videos`, {
+    const videoRequestUrl = `${agnesV1Base(creds.baseUrl)}/videos`;
+    const videoRequestHeaders = {
+      "Authorization": `Bearer ${creds.apiKey}`,
+      "Content-Type": "application/json",
+    };
+    const res = await observedProviderFetch(ctx, () => fetch(videoRequestUrl, {
       method: "POST",
-      headers: {
-        "Authorization": `Bearer ${creds.apiKey}`,
-        "Content-Type": "application/json",
-      },
+      headers: videoRequestHeaders,
       body: JSON.stringify(body),
     }), {
       requestDetails: {
@@ -360,19 +376,31 @@ export const agnesVideoAdapter = {
           || params.numFrames !== undefined || params.num_frames !== undefined
           || providerDefaults.frameRate !== undefined || providerDefaults.frame_rate !== undefined,
       },
+      // Phase 6：真实构造点 body/headers。
+      capture: { method: "POST", url: videoRequestUrl, headers: videoRequestHeaders, body, protocol: "agnes-videos" },
     });
 
     if (!res.ok) {
       let msg = `API error ${res.status}`;
       try {
         const err = await res.json();
+        captureProviderHttpResponse(ctx, {
+          status: res.status, headers: res.headers, body: err, fidelity: "parsed_equivalent",
+        });
         if (err.error?.message) msg = `${msg}: ${err.error.message}`;
         else if (err.message) msg = `${msg}: ${err.message}`;
-      } catch {}
+      } catch {
+        captureProviderHttpResponse(ctx, {
+          status: res.status, headers: res.headers, body: null, fidelity: "metadata_only",
+        });
+      }
       throw new Error(msg);
     }
 
     const data = await res.json();
+    captureProviderHttpResponse(ctx, {
+      status: res.status, headers: res.headers, body: data, fidelity: "parsed_equivalent",
+    });
     const taskId = data?.task_id || data?.id || data?.video_id || createLocalTaskId();
     const providerTaskId = data?.video_id || data?.task_id || data?.id || taskId;
     return { taskId, providerTaskId };

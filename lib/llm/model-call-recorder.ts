@@ -52,6 +52,17 @@ import {
   summarizeSemanticInputProvenance,
   type ModelSemanticInputProvenance,
 } from "./semantic-input-provenance.ts";
+import type { ModelCallPayloadCaptureSession } from "./model-call-payload-capture.ts";
+
+/** duck-typed capture session 校验（fail closed：形状不对即视为未安装）。 */
+function isPayloadCaptureSession(value: unknown): value is ModelCallPayloadCaptureSession {
+  if (!value || typeof value !== "object") return false;
+  const session = value as Record<string, unknown>;
+  return typeof session.captureSemanticRequest === "function"
+    && typeof session.captureProviderRequest === "function"
+    && typeof session.captureProviderResponse === "function"
+    && typeof session.captureSemanticResponse === "function";
+}
 
 export type ModelCallRecorderContext = {
   /** 显式接管 callId（调用方需要先于 logical_call_start 把身份写进别处时用）。 */
@@ -66,6 +77,12 @@ export type ModelCallRecorderContext = {
   model?: ModelCallModelIdentity | null;
   source?: ModelCallSource | null;
   attribution?: ModelCallAttribution | null;
+  /**
+   * Phase 6：Sensitive Payload Capture session handle（§一百二十一）。
+   * 只允许 capture capability 引用（身份+计数器+sink 引用）——session 本身
+   * 不持有正文，事件也不暴露它；集成点经 recorder.payloadCapture 短路快路径。
+   */
+  payloadCapture?: unknown;
 };
 
 export type ModelCallRecorderOptions = {
@@ -92,6 +109,10 @@ export function createModelCallRecorder({
   const model = context.model ?? null;
   const source = context.source ?? null;
   const attribution = context.attribution ?? null;
+  /** Phase 6 capture session handle（duck-typed 校验，防错型注入；非对象一律 null）。 */
+  let payloadCaptureHandle = isPayloadCaptureSession(context.payloadCapture)
+    ? (context.payloadCapture as ModelCallPayloadCaptureSession)
+    : null;
 
   let currentAttemptId: string | null = typeof context.attemptId === "string" && context.attemptId.trim()
     ? context.attemptId.trim()
@@ -169,12 +190,30 @@ export function createModelCallRecorder({
     },
 
     /**
+     * Phase 6 capture session handle（null = sink 未安装的快路径）。
+     * 集成点只经此引用调用 capture，绝不让它进入事件/ledger。
+     */
+    get payloadCapture() {
+      return payloadCaptureHandle;
+    },
+
+    /**
      * 附着 Semantic Input Provenance（§四十/§八十）：sanitize fail closed，
      * 非法输入整体为 null 不影响业务。须在 beginLogicalCall 之前调用，
      * summary 才会并入 logical_call_start details（§三十九）。
      */
     attachSemanticInputProvenance(provenance: unknown) {
       semanticInputProvenance = sanitizeSemanticInputProvenance(provenance);
+    },
+
+    /**
+     * Phase 6：附着/替换 capture session handle（beginObservedModelCall 等
+     * 先铸 callId 再建 session 的场景）。形状校验 fail closed。
+     */
+    attachPayloadCapture(session: unknown) {
+      payloadCaptureHandle = isPayloadCaptureSession(session)
+        ? (session as ModelCallPayloadCaptureSession)
+        : null;
     },
 
     beginLogicalCall({ details = null }: { details?: Record<string, unknown> | null } = {}) {
@@ -192,6 +231,10 @@ export function createModelCallRecorder({
       if (ended) return currentAttemptId;
       currentAttemptId = identity ? identity.mintAttemptId() : mintModelAttemptId();
       currentAttemptErrored = false;
+      // Phase 6：capture session 的 attempt 归属随 recorder 推进（§一百二十二）。
+      try {
+        payloadCaptureHandle?.setAttempt(currentAttemptId);
+      } catch { /* capture 故障不影响观测主链路 */ }
       emit("attempt_start", { attemptId: currentAttemptId, details });
       return currentAttemptId;
     },

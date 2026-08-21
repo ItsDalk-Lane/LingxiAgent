@@ -23,6 +23,7 @@ import type {
   ModelCallSource,
 } from "./model-call-observer.ts";
 import type { ModelSemanticInputProvenance } from "./semantic-input-provenance.ts";
+import type { ModelCallPayloadCaptureSession } from "./model-call-payload-capture.ts";
 
 export type ModelCallScope = {
   callId: string;
@@ -42,6 +43,13 @@ export type ModelCallScope = {
    * metadata，不含内容（§八十）。
    */
   semanticInputProvenance?: ModelSemanticInputProvenance | null;
+  /**
+   * Phase 6（§七十六～§七十八）：capture session 的**能力引用**——只含身份/
+   * 计数器/sink 引用，绝不含正文；使 provider hooks（在 SDK 内部触发、只能
+   * 靠 ALS 关联）能与 streamFn 边界的 recorder 共享同一 capture 通道（§一二三：
+   * hook 里的临时 recorder 看不到原 recorder 实例，共享的是 session handle）。
+   */
+  payloadCapture?: ModelCallPayloadCaptureSession | null;
 };
 
 const MODEL_CALL_STORAGE = new AsyncLocalStorage<ModelCallScope>();

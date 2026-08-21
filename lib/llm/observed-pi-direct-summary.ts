@@ -29,6 +29,7 @@ import {
   type ModelCallSource,
 } from "./model-call-observer.ts";
 import { createModelCallRecorder } from "./model-call-recorder.ts";
+import { createModelCallPayloadCaptureSession } from "./model-call-payload-capture.ts";
 
 /** Ledger 的最小结构契约（usage-ledger.ts 的 start/finish/recordError 投影）。 */
 export type ObservedDirectSummaryLedger = {
@@ -53,6 +54,16 @@ export type ObservedDirectSummaryContext = {
    * metadata；经 recorder sanitize fail closed。
    */
   semanticInputProvenance?: unknown;
+  /**
+   * Phase 6（§一百零二）：direct summary 的语义输入正文——facade 参数边界
+   * 结构可见（messages/customInstructions/previousSummary），经统一 Redactor
+   * 进 capture sink。
+   */
+  payloadSemanticRequest?: {
+    messages: unknown[];
+    customInstructions?: string | null;
+    previousSummary?: string | null;
+  } | null;
 };
 
 export type ObservedDirectSummaryRunner<T> = () => Promise<T>;
@@ -83,6 +94,17 @@ export async function observePiDirectSummary<T>(
       attribution: fields.attribution,
     },
   });
+  // Phase 6：capture session 与 recorder 共用 callId（recorder 先铸）；
+  // sink 未安装 = null 快路径。
+  recorder.attachPayloadCapture(createModelCallPayloadCaptureSession({
+    callId: recorder.callId,
+    traceId: recorder.traceId,
+    parentCallId: recorder.parentCallId,
+    model: normalizeModelCallIdentity(model),
+    source: fields.source,
+    attribution: fields.attribution,
+  }));
+  const payloadCapture = recorder.payloadCapture;
   if (context.semanticInputProvenance) {
     recorder.attachSemanticInputProvenance(context.semanticInputProvenance);
   }
@@ -96,6 +118,36 @@ export async function observePiDirectSummary<T>(
     // 一个 direct summary 边界 = 一次逻辑 attempt；SDK 内部重试不可见。
     details: { attemptVisibility: "logical_boundary" },
   });
+
+  // Phase 6（§一百零二/§一百零三/§一百零四）：semantic request 全参捕获；
+  // provider wire 结构性不可见（pi 0.84.1 completeSummarization options 无
+  // onPayload/onResponse——audit §1.4 实证）→ 显式 unavailable，不重建；
+  // semantic response 捕获实际 summary 字符串。
+  if (payloadCapture) {
+    payloadCapture.captureSemanticRequest({
+      inputShape: "pi_direct_summary",
+      messages: context.payloadSemanticRequest?.messages ?? [],
+      parameters: {
+        ...(context.payloadSemanticRequest?.customInstructions
+          ? { customInstructions: context.payloadSemanticRequest.customInstructions }
+          : {}),
+        ...(context.payloadSemanticRequest?.previousSummary
+          ? { previousSummary: context.payloadSemanticRequest.previousSummary }
+          : {}),
+      },
+      provenance: recorder.semanticInputProvenance,
+    });
+    payloadCapture.noteProviderWireUnavailable("provider_request", {
+      reason: "pi-summarizer-no-provider-hook",
+      visibility: "unavailable",
+      fidelity: "opaque",
+    });
+    payloadCapture.noteProviderWireUnavailable("provider_response", {
+      reason: "pi-summarizer-no-provider-hook",
+      visibility: "unavailable",
+      fidelity: "opaque",
+    });
+  }
 
   const ledgerMetadata = {
     modelCallId: recorder.callId,
@@ -136,6 +188,12 @@ export async function observePiDirectSummary<T>(
     throw error;
   }
 
+  recorder.payloadCapture?.captureSemanticResponse({
+    response: {
+      text: typeof result === "string" ? result : null,
+      completeness: "complete",
+    },
+  });
   recorder.semanticResponseCompleted({
     details: {
       hasText: typeof result === "string" ? result.trim().length > 0 : Boolean(result),

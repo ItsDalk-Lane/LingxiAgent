@@ -475,6 +475,36 @@ export async function runSubmitInBackground({ taskId, adapter, params, submitCtx
     }),
   });
   const observedSubmitCtx = { ...submitCtx, modelCall: recorder };
+  // Phase 6 Semantic Request Capture（§八十七）：prompt 文本允许捕获；参考图
+  // 是本地路径/data URL/URL——统一 Redactor 转 local_file_reference /
+  // external_blob / external_reference descriptor，不保存字节。
+  const payloadCapture = recorder.payloadCapture;
+  const isCliAdapter = typeof adapter?.id === "string" && adapter.id.startsWith("jimeng-cli-");
+  if (payloadCapture) {
+    payloadCapture.captureSemanticRequest({
+      inputShape: isCliAdapter ? "external_cli_media" : "media_image",
+      parameters: {
+        ...(typeof params?.prompt === "string" ? { prompt: params.prompt } : {}),
+        ...(params?.image !== undefined && params?.image !== null ? { image: params.image } : {}),
+        ...(typeof params?.modelId === "string" ? { modelId: params.modelId } : {}),
+      },
+      provenance: recorder.semanticInputProvenance,
+    });
+    if (isCliAdapter) {
+      // MC-07（§九十五）：CLI 的 provider wire 在外部进程内——显式 opaque，
+      // 绝不 capture argv/stdout 冒充 wire。
+      payloadCapture.noteProviderWireUnavailable("provider_request", {
+        reason: "external-process-opaque",
+        visibility: "opaque",
+        fidelity: "external_process",
+      });
+      payloadCapture.noteProviderWireUnavailable("provider_response", {
+        reason: "external-process-opaque",
+        visibility: "opaque",
+        fidelity: "external_process",
+      });
+    }
+  }
   try {
     const result = await withModelRequestAccounting({
       usageLedger: ctx?.usageLedger,
@@ -499,6 +529,20 @@ export async function runSubmitInBackground({ taskId, adapter, params, submitCtx
 
     // Provider 接受 generation task（或直接产出文件）即语义完成（§二十八）：
     // 异步 Provider 的后续 poll 不是这次 Model Call 的一部分。
+    recorder.payloadCapture?.captureSemanticResponse({
+      response: {
+        // §一五六：media logical call 语义 = task submission；文件名是本地
+        // generated 路径（descriptor 化），taskId 可保留。
+        media: {
+          taskId: hasProviderTaskId ? result.taskId : null,
+          providerTaskId: hasProviderTaskId ? result.taskId : null,
+          fileCount: files.length,
+          deferred: files.length === 0,
+          files: files.length > 0 ? files : null,
+        },
+        completeness: "complete",
+      },
+    });
     recorder.semanticResponseCompleted({
       details: {
         deferred: files.length === 0,

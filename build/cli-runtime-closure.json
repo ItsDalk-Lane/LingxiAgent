@@ -6455,6 +6455,67 @@
       "reason": "Reached via esbuild source module graph, imported by lib/llm/model-call-recorder.ts (import-statement); lib/pi-sdk/model-call-stream-observer.ts (import-statement); lib/llm/observed-pi-direct-summary.ts (import-statement); +4 more importer(s)."
     },
     {
+      "path": "lib/llm/model-call-payload-capture.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "lib/pi-sdk/model-call-stream-observer.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/llm/observed-pi-direct-summary.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/llm/model-call-integration.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "core/llm-client.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by lib/pi-sdk/model-call-stream-observer.ts (import-statement); lib/llm/observed-pi-direct-summary.ts (import-statement); lib/llm/model-call-integration.ts (import-statement); +1 more importer(s)."
+    },
+    {
+      "path": "lib/llm/model-call-payload-redaction.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "lib/llm/model-call-payload-capture.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by lib/llm/model-call-payload-capture.ts (import-statement)."
+    },
+    {
+      "path": "lib/llm/model-call-payload-types.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "lib/llm/model-call-payload-redaction.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/llm/model-call-payload-capture.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/llm/provider-request-provenance.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by lib/llm/model-call-payload-redaction.ts (import-statement); lib/llm/model-call-payload-capture.ts (import-statement); lib/llm/provider-request-provenance.ts (import-statement)."
+    },
+    {
       "path": "lib/llm/model-call-recorder.ts",
       "inputType": "source-graph",
       "provenance": [
@@ -6709,6 +6770,18 @@
         }
       ],
       "reason": "Reached via esbuild source module graph, imported by core/llm-client.ts (import-statement); core/model-sync.ts (import-statement); server/routes/providers.ts (import-statement)."
+    },
+    {
+      "path": "lib/llm/provider-request-provenance.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "core/llm-client.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by core/llm-client.ts (import-statement)."
     },
     {
       "path": "lib/llm/semantic-input-provenance-payload.ts",
@@ -123640,9 +123713,9 @@
     }
   ],
   "stats": {
-    "totalFiles": 10590,
+    "totalFiles": 10594,
     "byInputType": {
-      "source-graph": 694,
+      "source-graph": 698,
       "runtime-asset": 11,
       "nft-runtime-trace": 9885
     }

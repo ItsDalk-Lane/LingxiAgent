@@ -2,7 +2,7 @@
 import fs from "fs";
 import path from "path";
 import { saveImage } from "../media/download.ts";
-import { observedProviderFetch } from "../../lib/llm/model-call-integration.ts";
+import { captureProviderHttpResponse, observedProviderFetch } from "../../lib/llm/model-call-integration.ts";
 import { resolveModelId } from "./model-catalog.ts";
 import {
   OPENAI_FLEXIBLE_IMAGE_RATIOS,
@@ -218,18 +218,35 @@ export const openaiImageAdapter = {
         multipart: Boolean(multipartEditBody),
         hasReferenceMedia: images.length > 0,
       },
+      // Phase 6：pre-serialization 对象（multipart 时为 FormData——文件字节由
+      // Redactor externalize，Authorization 头替换）。
+      capture: {
+        method: "POST", url: endpoint, headers,
+        body: images.length > 0 ? (multipartEditBody || jsonEditBody) : body,
+        protocol: "openai-images",
+      },
     });
 
     if (!res.ok) {
       let msg = `API error ${res.status}`;
       try {
         const err = await res.json();
+        captureProviderHttpResponse(ctx, {
+          status: res.status, headers: res.headers, body: err, fidelity: "parsed_equivalent",
+        });
         if (err.error?.message) msg = `${msg}: ${err.error.message}`;
-      } catch {}
+      } catch {
+        captureProviderHttpResponse(ctx, {
+          status: res.status, headers: res.headers, body: null, fidelity: "metadata_only",
+        });
+      }
       throw new Error(msg);
     }
 
     const data = await res.json();
+    captureProviderHttpResponse(ctx, {
+      status: res.status, headers: res.headers, body: data, fidelity: "parsed_equivalent",
+    });
     const responseImages = data.data || [];
     if (responseImages.length === 0) {
       throw new Error("API returned no images");

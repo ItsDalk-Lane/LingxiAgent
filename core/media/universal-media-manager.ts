@@ -831,6 +831,34 @@ export class UniversalMediaManager {
       semanticInputProvenance: createSemanticInputProvenance(videoProvenanceShape, videoProvenanceSections),
     });
     const observedSubmitCtx = { ...this._submitContextForAdapter(adapter), modelCall: recorder };
+    // Phase 6 Semantic Request Capture（§九十八）：prompt/reference image 是语义
+    // 输入（正文捕获）；duration/resolution/fps 仍不因此变成 semantic prompt
+    // section（§九十八的 Phase 5 定义不变）。CLI adapter wire = opaque。
+    const videoPayloadCapture = recorder.payloadCapture;
+    const videoIsCliAdapter = typeof adapter?.id === "string" && adapter.id.startsWith("jimeng-cli-");
+    if (videoPayloadCapture) {
+      videoPayloadCapture.captureSemanticRequest({
+        inputShape: videoProvenanceShape,
+        parameters: {
+          ...(typeof params.prompt === "string" ? { prompt: params.prompt } : {}),
+          ...(params.image !== undefined && params.image !== null ? { image: params.image } : {}),
+          ...(target?.modelId ? { model: target.modelId } : {}),
+        },
+        provenance: recorder.semanticInputProvenance,
+      });
+      if (videoIsCliAdapter) {
+        videoPayloadCapture.noteProviderWireUnavailable("provider_request", {
+          reason: "external-process-opaque",
+          visibility: "opaque",
+          fidelity: "external_process",
+        });
+        videoPayloadCapture.noteProviderWireUnavailable("provider_response", {
+          reason: "external-process-opaque",
+          visibility: "opaque",
+          fidelity: "external_process",
+        });
+      }
+    }
     let result;
     try {
       result = await withModelRequestAccounting({
@@ -861,6 +889,18 @@ export class UniversalMediaManager {
     }
     // Provider 接受 generation task 即语义完成（§二十八）：taskId 之后的 poll
     // 属于控制面，不属于这次 Model Call。
+    recorder.payloadCapture?.captureSemanticResponse({
+      response: {
+        media: {
+          taskId: result.taskId,
+          providerTaskId: typeof result?.providerTaskId === "string" && result.providerTaskId.trim()
+            ? result.providerTaskId
+            : null,
+          deferred: true,
+        },
+        completeness: "complete",
+      },
+    });
     recorder.semanticResponseCompleted({
       details: {
         deferred: true,

@@ -25,6 +25,12 @@ import {
 } from "./model-call-observer.ts";
 import { createModelCallRecorder, type ModelCallRecorder } from "./model-call-recorder.ts";
 import { resolveModelTraceContext } from "./model-trace-scope.ts";
+import {
+  createModelCallPayloadCaptureSession,
+  type ModelCallPayloadCaptureSession,
+  type ProviderResponseCaptureInput,
+} from "./model-call-payload-capture.ts";
+import type { ProviderRequestProvenance } from "./model-call-payload-types.ts";
 
 /** 携带 in-flight recorder 的最小契约（media submitCtx / speech input 等）。 */
 export type ObservedModelCallCarrier = { modelCall?: unknown } | null | undefined;
@@ -38,6 +44,14 @@ function recorderFrom(carrier: ObservedModelCallCarrier): ModelCallRecorder | nu
     : null;
 }
 
+function captureFrom(carrier: ObservedModelCallCarrier): ModelCallPayloadCaptureSession | null {
+  const recorder = recorderFrom(carrier);
+  const session = recorder?.payloadCapture;
+  return session && typeof (session as ModelCallPayloadCaptureSession).captureProviderRequest === "function"
+    ? (session as ModelCallPayloadCaptureSession)
+    : null;
+}
+
 function transportErrorKind(error: unknown): string {
   const name = (error as any)?.name;
   if (name === "AbortError" || (error as any)?.type === "aborted") return "abort";
@@ -46,13 +60,30 @@ function transportErrorKind(error: unknown): string {
 }
 
 /**
+ * observedProviderFetch 的 Phase 6 捕获描述（§八十九）：adapter 在真正构造完
+ * body/headers 的地方显式给出；helper 只做搬运，不从 closure 反射 fetch 参数。
+ */
+export type ProviderFetchCaptureDescriptor = {
+  method?: string | null;
+  url?: string | null;
+  headers?: unknown;
+  /** pre-serialization body 对象 / FormData / 字符串。 */
+  body?: unknown;
+  /** provider/protocol id（body 内 credential 路径规则的 key）。 */
+  protocol?: string | null;
+  provenance?: ProviderRequestProvenance | null;
+};
+
+/**
  * 观测一次真实 HTTP attempt（MC-05/06/08/09 的每个 fetch 调用点）。
  *
  *   attempt_start（attemptVisibility=exact, providerWireVisibility=request_response）
  *   provider_request_prepared（只带调用方的结构 metadata）
+ *   [Phase 6] capture.provider_request（body/headers/url 经统一 Redaction 后入 sink）
  *   fetch → provider_response_received（status + allowlist id）
  *   !res.ok → attempt_error（http_error；同一 call 再调用本函数即新 attempt，
- *             覆盖 Codex image 401 credential refresh 的 1 call + 2 attempts）
+ *             覆盖 Codex image 401 credential refresh 的 1 call + 2 attempts，
+ *             Phase 6 下两次调用各得独立 providerRequestOrdinal）
  *   fetch throw → attempt_error（abort/timeout/network）+ rethrow
  *
  * logical call 的终态（semantic_response_completed / logical_call_end）由业务
@@ -61,7 +92,10 @@ function transportErrorKind(error: unknown): string {
 export async function observedProviderFetch<T extends Response>(
   carrier: ObservedModelCallCarrier,
   fetchFn: () => Promise<T>,
-  { requestDetails = null }: { requestDetails?: Record<string, unknown> | null } = {},
+  { requestDetails = null, capture = null }: {
+    requestDetails?: Record<string, unknown> | null;
+    capture?: ProviderFetchCaptureDescriptor | null;
+  } = {},
 ): Promise<T> {
   const recorder = recorderFrom(carrier);
   if (!recorder || recorder.ended) return fetchFn();
@@ -72,6 +106,20 @@ export async function observedProviderFetch<T extends Response>(
     },
   });
   recorder.providerRequestPrepared({ details: requestDetails });
+  const session = captureFrom(carrier);
+  if (session && capture) {
+    session.captureProviderRequest({
+      attemptId: recorder.currentAttemptId,
+      protocol: capture.protocol ?? (typeof requestDetails?.protocol === "string" ? requestDetails.protocol : null),
+      transport: {
+        method: capture.method ?? "POST",
+        url: capture.url ?? null,
+        headers: capture.headers ?? null,
+        body: capture.body ?? null,
+      },
+      provenance: capture.provenance ?? null,
+    });
+  }
   let response: T;
   try {
     response = await fetchFn();
@@ -90,6 +138,22 @@ export async function observedProviderFetch<T extends Response>(
     });
   }
   return response;
+}
+
+/**
+ * Phase 6：adapter 在本来消费 response body 的位置（res.json()/res.text() 之后）
+ * 捕获 provider_response。未安装 sink 时为 no-op（O(1)）；捕获的是业务已解析的
+ * 对象（§一百六十七：复用业务已解析结果，不重复 parse）。
+ */
+export function captureProviderHttpResponse(
+  carrier: ObservedModelCallCarrier,
+  input: Omit<ProviderResponseCaptureInput, "attemptId">,
+): void {
+  const recorder = recorderFrom(carrier);
+  if (!recorder || recorder.ended) return;
+  const session = captureFrom(carrier);
+  if (!session) return;
+  session.captureProviderResponse({ ...input, attemptId: recorder.currentAttemptId });
 }
 
 /**
@@ -156,15 +220,26 @@ export function beginObservedModelCall({
     ? modelCallFieldsFromUsageContext(usageContext)
     : { source: source ?? null, attribution: attribution ?? null };
   const trace = resolveModelTraceContext({ traceId, parentCallId });
+  const modelIdentity = normalizeModelCallIdentity(model);
   const recorder = createModelCallRecorder({
     context: {
       traceId: trace.traceId,
       parentCallId: trace.parentCallId,
-      model: normalizeModelCallIdentity(model),
+      model: modelIdentity,
       source: fields.source,
       attribution: fields.attribution,
     },
   });
+  // Phase 6：capture session 与 recorder 共用同一 callId（recorder 先铸）；
+  // sink 未安装时为 null——集成点以 recorder.payloadCapture 短路（快路径）。
+  recorder.attachPayloadCapture(createModelCallPayloadCaptureSession({
+    callId: recorder.callId,
+    traceId: recorder.traceId,
+    parentCallId: recorder.parentCallId,
+    model: modelIdentity,
+    source: fields.source,
+    attribution: fields.attribution,
+  }));
   if (semanticInputProvenance) recorder.attachSemanticInputProvenance(semanticInputProvenance);
   recorder.beginLogicalCall({
     details: {

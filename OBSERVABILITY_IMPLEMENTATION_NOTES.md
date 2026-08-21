@@ -359,3 +359,204 @@ Phase 6：Request/Response Capture + Redaction Contract + Sensitive Payload
 Boundary——届时在既有 callId 下同时取得 Semantic Request + Provenance，由
 Redaction Pipeline 决定内容保存策略；Provider Request 层（compat 变换后的 wire
 payload）的 provenance 也在该轮处理。
+
+---
+
+# Phase 6 — Sensitive Payload Capture + Redaction + Provider-Wire Provenance（第五轮）
+
+第一性原理目标：在运行时真实可见的位置取得每一次 Model Call 的
+**Semantic Request / Provider Request / Provider Response / Semantic Response**
+四层正文，经统一、机器可执行、不可绕过的 Redaction/Externalization 后送入独立
+的 Sensitive Payload Channel——与 ModelCallObserver（safe metadata channel）完全
+隔离的第二契约。无法观察的 provider wire 显式标记 unavailable/opaque，绝不重建
+（§八十四/§一百零三）。
+
+## Phase 6 Sensitive Payload Contract
+
+- `lib/llm/model-call-payload-types.ts`：`ModelCallPayloadRecord`（schemaVersion/
+  kind/identity/attemptId/providerRequestOrdinal/visibility/fidelity/sanitization/
+  payload/provenance sidecar）。kind 闭集 = semantic_request|provider_request|
+  provider_response|semantic_response。metadata 复用 Observer 既有 safe identity
+  （model/source/attribution），不建第二套身份。
+- 一个 logical call 的基数（§十八）：1 semantic_request、N provider_request、
+  N provider_response、0..1 semantic_response；N 由 transport 边界决定。
+  `providerRequestOrdinal` 由 capture session 单调分配（§十九）：codex image
+  401 refresh = 同 call 两条 provider_request（ordinal 1/2、两个 attemptId）。
+- 资源上限（§四十三，测试锁定）：maxDepth=24 / maxNodes=20000 / maxArrayItems=256 /
+  maxObjectKeys=128 / maxStringChars=131072 / maxRecordChars=1000000。超限显式
+  truncated/degraded，绝不静默 slice。
+
+## Capture Channel Architecture（§九/§十一/§十四）
+
+```
+Model Call Runtime ─┬─ ModelCallObserver（SAFE METADATA，事件无正文——契约冻结）
+                    └─ ModelCallPayloadCapture（SENSITIVE DATA）
+                           ↓ 统一 Redaction（先脱敏后入 sink）
+                         ModelCallPayloadSink（sanitized detached copy only）
+```
+
+- 生产默认 sink = `NOOP_MODEL_CALL_PAYLOAD_SINK`：不安装 sink 时
+  `createModelCallPayloadCaptureSession` 返回 null，集成点以 null 短路——不深
+  遍历、不脱敏、不复制（§四十五，测试用 spy 锁定 redactor 不运行）。
+- session 只持身份 + ordinal 计数器 + sink 引用（§一百二十），不持 Prompt
+  history；capture 后即释放原始引用。
+- 本轮只实现 Noop + Test sink；未来 Payload Store 只能作为新 sink 接入（§十二）。
+- sink throw/redaction error 全部就地吞掉（§十三，测试锁定 callText/Pi/media/
+  speech 业务照常）。
+- 关联通道：recorder 持 session handle（`recorder.payloadCapture`）；Pi 路径经
+  ALS scope（`scope.payloadCapture`）共享给 provider hooks——hook 里的临时
+  recorder 看不到原 recorder 实例，共享的是 session capability 引用（§一二三）。
+
+## Redaction Contract（§二十三～§三十七/§三十八～§四十三）
+
+`lib/llm/model-call-payload-redaction.ts`，copy-on-capture（原始对象绝不修改，
+§十五，测试锁定 before/after 逐字节一致；§一百七十：secret 不进第二份副本——
+遍历时直接构造安全副本，无 blind structuredClone）：
+
+1. **credential 键**（任意嵌套，归一化整键匹配）：authorization/x-api-key/
+   api-key/x-goog-api-key/cookie/set-cookie/access_token/refresh_token/
+   client_secret/private_key/password/secret/signature… → 值替换
+   `<redacted:credential>`，键名与安全 header（content-type/anthropic-version/
+   chatgpt-account-id）保留（§二十六/§一百一十四）。
+2. **协议专项 body credential 路径**（§二十五/§一百四十九）：
+   `PROVIDER_BODY_CREDENTIAL_PATHS["volcengine-bigasr-transcription"] = ["user.uid"]`
+   ——Volcengine ASR 的 body 内 credential 由结构化规则处理，不依赖 generic key
+   名（专项硬验收测试锁定 reason=protocol-body-credential；generic `uid` 键不
+   受影响）。
+3. **高置信 inline secret**（§三十五/§三十六，正例+反例测试锁定）：PEM 私钥整块
+   （含 BEGIN/END 行）、JWT、sk-/sk-ant-/ghp_/AIza/AKIA、Bearer/Basic token 部分
+   （保留字面量）、`api_key=…`/`access_token: …` 等 kv 形态（值 ≥16 token 字符）。
+   反例：UUID、file id、`token count`/`model=` 研究文本、sha256 hash、多语言
+   普通文本全部存活（§一百二十九）。
+4. **URL**（§二十八/§二十九）：query credential（key/token/signature/X-Amz-*/
+   X-Goog-* 前缀）→ `{kind:"external_reference", scheme, host, path, redacted:true}`
+   descriptor；普通 endpoint 原样保留。
+5. **本地绝对路径**（§三十）：整串 → `{kind:"local_file_reference", basename}`；
+   文本内嵌 `/Users/…`/`C:\Users\…` inline 替换 `<redacted:secret>`。
+6. **二进制**（§三十一/§三十二）：Buffer/TypedArray/ArrayBuffer/Blob →
+   `{kind:"external_blob", mediaType, byteLength, captureStatus:"externalized"}`；
+   data URL / 已知媒体键（b64_json/image_base64/audio/data/result…） /
+   ≥1024 字符 base64 采样（256 字符有界采样，§三十三）→ descriptor。不写字节、
+   不 hash 大媒体。FormData → `{kind:"multipart_form_data", fields, files[]}`。
+   AbortSignal（google payload 内嵌）按 unsupported 剔除。
+7. **offset mapping**（§四十八～§五十）：`redactTextWithMap` 返回 replacements；
+  semantic_request capture 用 `remapSpanAfterRedaction` 把 Phase 5 systemPrompt
+  span 平移到脱敏后文本（无重叠 → 平移；重叠/截断越界 → span=null + precision
+  降级 structural + action 记录），绝不保留错位位置。
+
+Sanitization summary（§三十八～§四十二）：`{redacted, truncated, degraded,
+actions[]}`——actions 是 `{path, action, reason}` 闭集（removed/replaced/
+externalized/truncated/unsupported），**绝不携带原值**（§三十九）。visibility
+（观测能力）与 sanitization（安全变换）正交（§四十一）：provider request 完整
+可见但 Authorization 被替换 = visibility full + sanitization.redacted。
+
+## Payload Fidelity Contract（§二十二）
+
+runtime_exact（发送前 body 对象/invalid-JSON rawText）｜parsed_equivalent（业务
+JSON.parse 结果）｜stream_aggregate（codex SSE aggregate/Pi assembled message）｜
+normalized（semantic response 外壳）｜metadata_only（probe 成功不读 body、Pi
+after_provider_response、codex 401 首响应）｜external_process（CLI opaque）｜
+opaque（unavailable record）。严禁自称 raw。
+
+## Semantic Request Capture（§四十六/§四十七）
+
+boundary = Phase 5 provenance boundary：MC-01/02/03 = streamFn context
+（systemPrompt/messages/tools，含 tool definition schema——正文级，§七十三）；
+MC-04 = merge 后 mergedSystem(+codex 注入) + normalizedMessages；MC-05 = 固定
+占位消息 "."（Phase 6 起允许捕获值，§八十六）；MC-06/08 = {prompt, image refs}；
+MC-09 = {audio→local_file_reference, language}；MC-10 = 三元组全参。
+capture 副本上的 systemPrompt locator 保持可解析（span remap 后 slice 验证，
+测试锁定）；provenance 契约本身保持 content-free（§一百一十六）。
+
+## Provider Request Capture（§六十四/§七十四）
+
+- MC-04：`normalizeProviderPayload` 之后、`JSON.stringify` 之前的最终 body +
+  真实 headers/endpoint（构造点局部变量，非重建）。
+- MC-01：`before_provider_request` hook 的 `event.payload`——pi-ai 0.84.1 实证
+  为 compat 转换后、序列化前的最终 body 活引用（runtime_exact，audit §1.1）；
+  hook 不暴露 headers/endpoint（诚实 null）；凭证不在 payload（vendor SDK fetch
+  层拼装；body 内意外出现的 credential 由 redactor 防御纵深替换）。
+- MC-05/06/08/09：adapter 真实构造点 body（observedProviderFetch 的 capture
+  描述符，§八十九——helper 只搬运，不反射 closure）。
+- MC-02/03（options 无 onPayload，运行时判定）与 MC-10（summarizer options 无
+  hook）→ 显式 unavailable record（§八十四/§一百零三），不从 semantic 重建。
+- MC-07 CLI → 显式 opaque/external_process record；argv/stdout 绝不冒充 wire
+  （§九十五，测试锁定 stdout 毒丸不可见）。
+
+## Provider-Wire Provenance（§五十三～§六十一）
+
+`lib/llm/provider-request-provenance.ts`：`ProviderRequestProvenance`
+（semanticSectionOrdinal → providerLocator{path,span?} + transformation 闭集
+10 值 + mappingPrecision exact/structural/opaque）。mapping 在 **transformation
+发生时**由构造代码产生（§五十九）：callText 四协议的落点（body.system /
+messages[0].content / instructions / input[i]）在 llm-client 构造分支内与 body
+同源产生；`normalizeProviderPayload` 之后做 locator 存在性 + 长度校验（构造
+产物自检，非内容搜索，§五十八），失配降级 structural（§一三八——structural
+语义 section 不产生 exact mapping）。compat mutation 测试锁定降级行为。
+Pi 路径 body 由 vendor SDK 构造，无法在 transformation 处产生 sidecar →
+`providerRequestProvenance = null`（不为矩阵全绿重写 serializer，§六十一）。
+
+## Provider Response Capture（§六十六～§七十一/§一百五十一/§一百五十二）
+
+自有 fetch 路径在业务解析点捕获（复用已解析对象，§一百六十七；不 tee/clone
+stream，§六十九）：success = parsed body；error body 同样捕获（先捕获后抛错）；
+codex = stream_aggregate；probe 成功 = metadata_only（业务不读 body，诚实）。
+Pi = after_provider_response 仅 status+headers（metadata_only）；google/
+mistral-conversations adapter 不触发 onResponse（audit §1.2）→ 显式 unavailable。
+network error 无 provider_response record（§一百一十二）；error body 中的普通
+diagnostic 保留、credential 删除（§一百五十二，测试锁定）。
+
+## Semantic Response Capture（§七十/§一百零五～§一百一十/§一百五十四）
+
+统一外壳 `ModelSemanticResponse`（text/reasoning/toolCalls/structuredOutput/
+media/transcription/finishReason/usage/completeness）。MC-04 = parser + thinking
+strip 之后、业务校验之前；MC-01 = assembled message content blocks（toolCall
+name/arguments/id 捕获，§一百零七；redacted_thinking 只留结构标记不解密，
+§一百一十）；aborted/error 有已组装内容 → completeness=partial（§八十），完全
+无输出不制造（§一百五十五）；MC-06/08 = task submission 语义（taskId/deferred/
+fileCount，§一五六）；MC-09 = transcription 正文（§一百零一）。
+
+## MC-01～MC-10 Capture Matrix（Step 20 最终矩阵）
+
+|MC Path|Semantic Request|Provider Request|Provider Response|Semantic Response|Provider Fidelity|Binary Policy|Redaction|Provider Provenance|
+|---|---|---|---|---|---|---|---|---|
+|MC-01 Pi Chat|FULL|FULL（hook payload）|METADATA_ONLY（hook；google=UNAVAILABLE）|FULL|runtime_exact / metadata_only|externalize|统一 Redactor|null（SDK 构造，无 sidecar）|
+|MC-02 AgentRun|FULL|UNAVAILABLE（options 无 onPayload）|UNAVAILABLE|FULL|opaque|externalize|统一 Redactor|null|
+|MC-03 Native Compaction|FULL|UNAVAILABLE|UNAVAILABLE|FULL|opaque|externalize|统一 Redactor|null|
+|MC-04 callText|FULL|FULL（构造点）|FULL（parsed/stream_aggregate/rawText）|FULL|runtime_exact / parsed_equivalent / stream_aggregate|externalize|统一 Redactor（含 mapping remap）|exact×4 协议（构造时产生 + post-compat 校验）|
+|MC-05 Probe|FULL（"." 允许捕获）|FULL（构造点）|METADATA_ONLY（成功）/FULL（error body）|FULL（structuredOutput）|runtime_exact|externalize|统一 Redactor|null（固定形状）|
+|MC-06 Image ×7|FULL|FULL（构造点）|FULL（parsed）|FULL（media submission）|runtime_exact / parsed_equivalent / stream_aggregate(codex)|reference+b64 externalize|统一 Redactor（含 FormData）|null|
+|MC-07 Dreamina CLI|FULL|OPAQUE|OPAQUE|FULL（taskId）|external_process|argv 不捕获|统一 Redactor|null|
+|MC-08 Video|FULL|FULL（agnes 构造点；CLI=OPAQUE）|FULL（parsed）|FULL（taskId/deferred）|runtime_exact / parsed_equivalent|reference externalize|统一 Redactor|null|
+|MC-09 Speech ×4|FULL（audio descriptor）|FULL（构造点；含 body.user.uid 协议规则）|FULL（parsed）|FULL（transcription）|runtime_exact / parsed_equivalent|audio externalize|统一 Redactor（协议专项硬验收）|null|
+|MC-10 Direct Summary|FULL（三元组）|UNAVAILABLE|UNAVAILABLE|FULL（summary text）|opaque|externalize|统一 Redactor|null|
+
+## Known Opaque Payloads（§一六二）
+
+1. MC-07 CLI provider wire（external_process）。2. MC-02/03/10 provider wire
+（pi 0.84.1 summarizer options 无 onPayload——audit §1.4 实证）。3. google/
+mistral-conversations 的 provider_response。4. Pi provider request 的 headers/
+endpoint（hook 不暴露）。5. 全部二进制（无 Blob Store，本轮不写字节，§一六二）。
+
+## Tests（Step 18-19/24，103 个新用例 + 131 个既有观测回归）
+
+`tests/model-call-payload-redaction.test.ts`（49：毒丸正例/反例、credential 键、
+Volcengine 协议专项、URL、本地路径、二进制/FormData/AbortSignal、原对象不可变、
+资源上限、循环引用、span remap）；`-capture.test.ts`（9：noop 快路径、sink
+throw、record 形状、ordinal、unavailable、provenance remap、毒丸断言）；
+`-calltext.test.ts`（12：四协议四层、codex 注入、system merge mapping、
+400/401/429/500 error body、invalid JSON、network/abort、wire 等价 + redactor
+不运行、sink throw、inline secret）；`-pi.test.ts`（8：hook fidelity 锁定、
+MC-02/03 unavailable、google、aborted partial、toolCall/redacted_thinking、
+快路径）；`-media.test.ts`（13：7 adapter coverage、本地参考图、codex 401 双
+ordinal、CLI opaque、agnes video、500、快路径）；`-speech.test.ts`（7：4 adapter
+coverage、Volcengine 专项、500、快路径）；`-summary.test.ts`（5：probe 四层 +
+401 + GET /models 0 record、diary 三元组 + unavailable + 网络失败）。
+
+## Next Phase
+
+- Payload Store / Blob Store / Query API / Export / Usage UI（全部明示本轮不做）。
+- 未来 sink 接入：持久化 sink 只能实现 ModelCallPayloadSink，永远收 sanitized
+  detached copy。
+- Pi provider mapping sidecar：需上游在 buildParams 处暴露 mapping（或 Lingxi
+  侧 serializer 包装修改），当前诚实为 null。

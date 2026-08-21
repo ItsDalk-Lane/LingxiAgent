@@ -6,7 +6,7 @@ import {
   saveBase64Images,
 } from "./common.ts";
 import { t } from "../../lib/i18n.ts";
-import { observedProviderFetch } from "../../lib/llm/model-call-integration.ts";
+import { captureProviderHttpResponse, observedProviderFetch } from "../../lib/llm/model-call-integration.ts";
 
 const DEFAULT_BASE_URL = "https://dashscope.aliyuncs.com/api/v1";
 const WAN_IMAGE_RATIOS = new Set(["1:1", "16:9", "9:16", "4:3", "3:4", "3:2", "2:3", "21:9"]);
@@ -258,8 +258,9 @@ export const dashscopeImageAdapter = {
       "Authorization": `Bearer ${creds.apiKey}`,
     };
     if (family !== "qwen-multimodal") headers["X-DashScope-Async"] = "enable";
+    const requestUrl = `${resolveDashScopeBaseUrl(creds.baseUrl)}${endpoint}`;
 
-    const res = await observedProviderFetch(ctx, () => fetch(`${resolveDashScopeBaseUrl(creds.baseUrl)}${endpoint}`, {
+    const res = await observedProviderFetch(ctx, () => fetch(requestUrl, {
       method: "POST",
       headers,
       body: JSON.stringify(body),
@@ -270,18 +271,30 @@ export const dashscopeImageAdapter = {
         asyncTask: family !== "qwen-multimodal",
         hasReferenceMedia: images.length > 0,
       },
+      // Phase 6：真实构造点 body/headers（Authorization 经 Redactor）。
+      capture: { method: "POST", url: requestUrl, headers, body, protocol: family },
     });
 
     if (!res.ok) {
       let msg = `API error ${res.status}`;
       try {
         const err = await res.json();
+        captureProviderHttpResponse(ctx, {
+          status: res.status, headers: res.headers, body: err, fidelity: "parsed_equivalent",
+        });
         if (err.message) msg = `${msg}: ${err.message}`;
-      } catch {}
+      } catch {
+        captureProviderHttpResponse(ctx, {
+          status: res.status, headers: res.headers, body: null, fidelity: "metadata_only",
+        });
+      }
       throw new Error(msg);
     }
 
     const data = await res.json();
+    captureProviderHttpResponse(ctx, {
+      status: res.status, headers: res.headers, body: data, fidelity: "parsed_equivalent",
+    });
     if (data.code && data.code !== "Success") {
       throw new Error(`DashScope API error ${data.code}: ${data.message || "unknown error"}`);
     }

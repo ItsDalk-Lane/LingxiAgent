@@ -5,7 +5,7 @@ import {
   saveBase64Images,
 } from "./common.ts";
 import { t } from "../../lib/i18n.ts";
-import { observedProviderFetch } from "../../lib/llm/model-call-integration.ts";
+import { captureProviderHttpResponse, observedProviderFetch } from "../../lib/llm/model-call-integration.ts";
 
 const DEFAULT_BASE_URL = "https://generativelanguage.googleapis.com/v1beta";
 const GEMINI_25_RATIOS = ["1:1", "3:2", "2:3", "3:4", "4:3", "4:5", "5:4", "9:16", "16:9", "21:9"];
@@ -229,12 +229,15 @@ export const geminiImageAdapter = {
       },
     };
 
-    const res = await observedProviderFetch(ctx, () => fetch(`${normalizeBaseUrl(creds.baseUrl, DEFAULT_BASE_URL)}/models/${encodeURIComponent(modelId)}:generateContent`, {
+    const requestUrl = `${normalizeBaseUrl(creds.baseUrl, DEFAULT_BASE_URL)}/models/${encodeURIComponent(modelId)}:generateContent`;
+    const requestHeaders = {
+      "Content-Type": "application/json",
+      "x-goog-api-key": creds.apiKey,
+    };
+
+    const res = await observedProviderFetch(ctx, () => fetch(requestUrl, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-goog-api-key": creds.apiKey,
-      },
+      headers: requestHeaders,
       body: JSON.stringify(body),
     }), {
       // 注意：remoteImageToInlinePart 的参考图下载是资产传输，不是模型 attempt。
@@ -243,14 +246,25 @@ export const geminiImageAdapter = {
         mediaType: "image",
         hasReferenceMedia: inputImages.length > 0,
       },
+      // Phase 6：真实构造点 body/headers（x-goog-api-key 经 Redactor）。
+      capture: {
+        method: "POST", url: requestUrl, headers: requestHeaders, body,
+        protocol: "gemini-generate-content-image",
+      },
     });
 
     if (!res.ok) {
       let googleError: Record<string, unknown> | null = null;
       try {
         const payload = await res.json();
+        captureProviderHttpResponse(ctx, {
+          status: res.status, headers: res.headers, body: payload, fidelity: "parsed_equivalent",
+        });
         if (isRecord(payload?.error)) googleError = payload.error;
       } catch {
+        captureProviderHttpResponse(ctx, {
+          status: res.status, headers: res.headers, body: null, fidelity: "metadata_only",
+        });
         // Some proxy errors are HTML/plain text. HTTP status still provides
         // a stable classification even when no Google error object exists.
       }
@@ -258,6 +272,9 @@ export const geminiImageAdapter = {
     }
 
     const data = await res.json();
+    captureProviderHttpResponse(ctx, {
+      status: res.status, headers: res.headers, body: data, fidelity: "parsed_equivalent",
+    });
     const images = collectInlineImages(data);
     if (images.length === 0) throw new Error(noImageResponseDetail(data));
 

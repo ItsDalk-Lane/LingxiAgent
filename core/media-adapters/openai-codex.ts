@@ -2,7 +2,7 @@
 import fs from "fs";
 import path from "path";
 import { saveImage } from "../media/download.ts";
-import { observedProviderFetch } from "../../lib/llm/model-call-integration.ts";
+import { captureProviderHttpResponse, observedProviderFetch } from "../../lib/llm/model-call-integration.ts";
 import {
   CODEX_IMAGE_RESOLUTION_TIERS,
   OPENAI_FLEXIBLE_IMAGE_RATIOS,
@@ -236,29 +236,45 @@ export const openaiCodexImageAdapter = {
       parallel_tool_calls: false,
     };
 
-    const performRequest = (credentials) => observedProviderFetch(ctx, () => fetch(resolveCodexResponsesUrl(credentials.baseUrl), {
-      method: "POST",
-      headers: {
+    const performRequest = (credentials) => {
+      const requestUrl = resolveCodexResponsesUrl(credentials.baseUrl);
+      const requestHeaders = {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${credentials.apiKey}`,
         "chatgpt-account-id": credentials.accountId,
         "OpenAI-Beta": "responses=experimental",
         "originator": "pi",
-      },
-      body: JSON.stringify(body),
-    }), {
-      // MC-06 HTTP attempt 结构摘要：只描述形状，绝不携带 prompt/参考图。
-      requestDetails: {
-        protocol: "openai-codex-responses",
-        mediaType: "image",
-        streaming: true,
-        hasReferenceMedia: normalizeImages(params.image).length > 0,
-      },
-    });
+      };
+      return observedProviderFetch(ctx, () => fetch(requestUrl, {
+        method: "POST",
+        headers: requestHeaders,
+        body: JSON.stringify(body),
+      }), {
+        // MC-06 HTTP attempt 结构摘要：只描述形状，绝不携带 prompt/参考图。
+        requestDetails: {
+          protocol: "openai-codex-responses",
+          mediaType: "image",
+          streaming: true,
+          hasReferenceMedia: normalizeImages(params.image).length > 0,
+        },
+        // Phase 6：每次 performRequest（含 401 refresh 后的重试）各得独立
+        // providerRequestOrdinal（§九十二）；Authorization 经 Redactor，
+        // chatgpt-account-id 是账号标识（非 secret）保留。
+        capture: {
+          method: "POST", url: requestUrl, headers: requestHeaders, body,
+          protocol: "openai-codex-responses",
+        },
+      });
+    };
 
     // attempt 1
     let res = await performRequest(creds);
     if (res.status === 401) {
+      // Phase 6：第一次 401 response 是独立观测事实（body 未被业务消费 → 诚实
+      // metadata_only），refresh 后的第二次请求在下方正常路径捕获。
+      captureProviderHttpResponse(ctx, {
+        status: res.status, headers: res.headers, body: null, fidelity: "metadata_only",
+      });
       // The backend can reject an access token before the locally recorded
       // expiry, so rotate the credential once and retry with the new token.
       // 401 的 attempt_error 已由 observedProviderFetch 投递；credential refresh
@@ -271,13 +287,25 @@ export const openaiCodexImageAdapter = {
       let msg = `API error ${res.status}`;
       try {
         const err = await res.json();
+        captureProviderHttpResponse(ctx, {
+          status: res.status, headers: res.headers, body: err, fidelity: "parsed_equivalent",
+        });
         if (err.error?.message) msg = `${msg}: ${err.error.message}`;
         else if (err.detail) msg = `${msg}: ${err.detail}`;
-      } catch {}
+      } catch {
+        captureProviderHttpResponse(ctx, {
+          status: res.status, headers: res.headers, body: null, fidelity: "metadata_only",
+        });
+      }
       throw new Error(msg);
     }
 
     const data = await readResponsePayload(res);
+    // Phase 6：codex image 响应是 SSE 流（readResponsePayload 聚合）→
+    // stream_aggregate，不自称 raw。
+    captureProviderHttpResponse(ctx, {
+      status: res.status, headers: res.headers, body: data, fidelity: "stream_aggregate",
+    });
     const images = collectImageResults(data);
     if (images.length === 0) {
       throw new Error("API returned no images");

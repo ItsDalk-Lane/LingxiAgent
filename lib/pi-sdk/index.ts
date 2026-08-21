@@ -269,6 +269,12 @@ export async function generateSummary(
   } catch {
     context.semanticInputProvenance = null;
   }
+  // Phase 6（§一百零二）：同一三元组的正文捕获输入（经统一 Redactor 入 sink）。
+  context.payloadSemanticRequest = {
+    messages: Array.isArray(currentMessages) ? currentMessages : [],
+    customInstructions: typeof customInstructions === "string" ? customInstructions : null,
+    previousSummary: typeof previousSummary === "string" ? previousSummary : null,
+  };
   return observePiDirectSummary(model, context, invokeRaw);
 }
 export {

@@ -51,6 +51,10 @@ import {
   type SessionPromptProvenancePayload,
 } from "../llm/semantic-input-provenance.ts";
 import {
+  createModelCallPayloadCaptureSession,
+  type ModelCallPayloadCaptureSession,
+} from "../llm/model-call-payload-capture.ts";
+import {
   currentModelTraceScope,
   noteAgentStreamCallStarted,
   runWithModelTraceRoot,
@@ -60,6 +64,18 @@ import { noteModelCallMessageIdentity } from "../llm/model-call-correlation.ts";
 
 const INSTALLED = Symbol.for("lingxi.modelCallStreamObserver.installed");
 const TRACE_INGRESS_INSTALLED = Symbol.for("lingxi.modelCallTraceIngress.installed");
+
+/**
+ * Phase 6（MODEL_CALL_PAYLOAD_CAPTURE_AUDIT.md §1.2）：pi-ai 的
+ * google-generative-ai / google-vertex / mistral-conversations adapter 从不调用
+ * onResponse → 这些协议的 after_provider_response 结构性不触发（诚实缺失，
+ * 显式 unavailable record 表达，不伪造）。
+ */
+const PROTOCOLS_WITHOUT_RESPONSE_HOOK = new Set([
+  "google-generative-ai",
+  "google-vertex",
+  "mistral-conversations",
+]);
 
 /**
  * Agent prompt turn 标记（Phase 5）：session.prompt() 执行期内为 true。
@@ -164,6 +180,18 @@ export function installModelCallStreamObserver(
     // MC-02 runner 先铸 callId 写进 ledger metadata，这里接管同一身份（单点发射）。
     const callId = explicitScope?.callId ?? mintModelCallId();
 
+    // Phase 6：Sensitive Payload Capture session（sink 未安装 = null 快路径）。
+    // 只含身份/计数器/sink 引用；经 recorder + ALS scope 双通道共享给
+    // provider hooks（§一百二十二/§一二三）。
+    const payloadCapture = createModelCallPayloadCaptureSession({
+      callId,
+      traceId,
+      parentCallId,
+      model: modelIdentity,
+      source: effectiveSource,
+      attribution: effectiveAttribution,
+    });
+
     const recorder = createModelCallRecorder({
       observer,
       context: {
@@ -173,6 +201,7 @@ export function installModelCallStreamObserver(
         model: modelIdentity,
         source: effectiveSource,
         attribution: effectiveAttribution,
+        payloadCapture,
       },
     });
 
@@ -226,6 +255,45 @@ export function installModelCallStreamObserver(
     // 建立时已冻结快照，不受此处推进影响（§三十一并行分支）。
     noteAgentStreamCallStarted(callId);
 
+    // Phase 6 Semantic Request Capture（§七十二/§七十三/§八十三）：streamFn 边界
+    // 的真实 context（systemPrompt/messages/tools——MC-02 为冻结 providerContext，
+    // MC-03 为 SDK serializeConversation 拍平输入，payload 层仍可捕获正文）。
+    if (payloadCapture) {
+      payloadCapture.captureSemanticRequest({
+        inputShape: semanticProvenance?.inputShape ?? "chat_context",
+        systemPrompt: typeof context?.systemPrompt === "string" ? context.systemPrompt : null,
+        messages: Array.isArray(context?.messages) ? context.messages : null,
+        tools: Array.isArray(context?.tools) ? context.tools : null,
+        provenance: semanticProvenance,
+      });
+    }
+
+    // Phase 6 Provider Wire 可用性（§八十四/§一百零三，运行时精确判定）：
+    // options 无 onPayload（MC-02 runner / MC-03 native summarizer 的 options
+    // 来自 createSummarizationOptions，无 hook）→ provider wire 结构性不可见，
+    // 显式 unavailable，绝不从 semantic request 重建。
+    if (payloadCapture) {
+      const hasProviderHook = typeof options?.onPayload === "function";
+      if (!hasProviderHook) {
+        payloadCapture.noteProviderWireUnavailable("provider_request", {
+          reason: "pi-streamfn-no-onpayload-hook",
+          visibility: "unavailable",
+          fidelity: "opaque",
+        });
+        payloadCapture.noteProviderWireUnavailable("provider_response", {
+          reason: "pi-streamfn-no-onpayload-hook",
+          visibility: "unavailable",
+          fidelity: "opaque",
+        });
+      } else if (PROTOCOLS_WITHOUT_RESPONSE_HOOK.has(String(modelIdentity?.api ?? ""))) {
+        payloadCapture.noteProviderWireUnavailable("provider_response", {
+          reason: "pi-adapter-no-onresponse",
+          visibility: "unavailable",
+          fidelity: "opaque",
+        });
+      }
+    }
+
     const scope: ModelCallScope = {
       callId,
       attemptId,
@@ -234,6 +302,8 @@ export function installModelCallStreamObserver(
       model: modelIdentity,
       source: effectiveSource,
       attribution: effectiveAttribution,
+      // Phase 6：provider hooks 经 ALS 读到的 capture 能力引用（无正文）。
+      payloadCapture,
     };
 
     let inner: any;
@@ -340,6 +410,28 @@ function observeStreamTerminal(inner: any, recorder: ReturnType<typeof createMod
             parentCallId: recorder.parentCallId,
           });
           const stopReason = typeof message?.stopReason === "string" ? message.stopReason : null;
+          // Phase 6 Semantic Response Capture（§七十九/§八十/§一百一十）：
+          // assembled message 的 content blocks（text/thinking/toolCall）；
+          // aborted/error 下有已组装内容则诚实 partial，完全无输出不制造
+          // semantic_response（§一百五十五）。Observer 终态语义不变（§八十一）。
+          const payloadCapture = recorder.payloadCapture;
+          if (payloadCapture) {
+            const semantic = semanticResponseFromAssistantMessage(message);
+            const hasContent = Boolean(
+              semantic.text || semantic.reasoning || (semantic.toolCalls && semantic.toolCalls.length > 0),
+            );
+            const partial = stopReason === "aborted" || stopReason === "error";
+            if (hasContent || !partial) {
+              payloadCapture.captureSemanticResponse({
+                response: {
+                  ...semantic,
+                  finishReason: stopReason,
+                  usage: message?.usage ?? null,
+                  completeness: partial ? "partial" : "complete",
+                },
+              });
+            }
+          }
           if (stopReason === "aborted") {
             recorder.logicalCallAborted({ details: { stopReason } });
             recorder.endLogicalCall("aborted");
@@ -411,6 +503,46 @@ function summarizeAssistantMessage(message: any): Record<string, unknown> {
     usagePresent: Boolean(message?.usage),
     errorPresent: typeof message?.errorMessage === "string" && message.errorMessage.length > 0,
     ...(usage ? { usage } : {}),
+  };
+}
+
+/**
+ * Phase 6（§七十九/§一百零七/§一百一十）：assembled assistant message →
+ * Semantic Response 输入。只捕获运行时实际可见内容：text 拼接、thinking 文本、
+ * toolCall（name/arguments/id）；redacted_thinking 只作为结构标记（加密数据
+ * 丢弃，不解密不保存）。
+ */
+function semanticResponseFromAssistantMessage(message: any): {
+  text: string | null;
+  reasoning: string | null;
+  toolCalls: Array<{ name: string | null; id: string | null; arguments: unknown }> | null;
+} {
+  const content = Array.isArray(message?.content) ? message.content : [];
+  let text = "";
+  let reasoning = "";
+  let sawRedactedThinking = false;
+  const toolCalls: Array<{ name: string | null; id: string | null; arguments: unknown }> = [];
+  for (const block of content) {
+    if (!block || typeof block !== "object") continue;
+    if (block.type === "text" && typeof block.text === "string") {
+      text += block.text;
+    } else if (block.type === "thinking" && typeof block.thinking === "string") {
+      reasoning += (reasoning ? "\n" : "") + block.thinking;
+    } else if (block.type === "redacted_thinking") {
+      sawRedactedThinking = true;
+    } else if (block.type === "toolCall") {
+      toolCalls.push({
+        name: typeof block.name === "string" ? block.name : null,
+        id: typeof block.id === "string" ? block.id : null,
+        arguments: block.arguments ?? null,
+      });
+    }
+  }
+  return {
+    text: text || null,
+    reasoning: reasoning
+      + (sawRedactedThinking ? (reasoning ? "\n[redacted_thinking]" : "[redacted_thinking]") : ""),
+    toolCalls: toolCalls.length > 0 ? toolCalls : null,
   };
 }
 

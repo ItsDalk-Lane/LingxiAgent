@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 import { randomUUID } from "crypto";
-import { observedProviderFetch } from "../../lib/llm/model-call-integration.ts";
+import { captureProviderHttpResponse, observedProviderFetch } from "../../lib/llm/model-call-integration.ts";
 
 const DEFAULT_MIME = "audio/wav";
 
@@ -18,11 +18,13 @@ export const openaiSpeechRecognitionAdapter = {
     form.set("model", model.id);
     if (input.language) form.set("language", input.language);
     form.set("file", await audioFileBlob(file), path.basename(file.filePath || file.realPath || "audio.wav"));
-    const response = await observedProviderFetch(input, () => fetchImpl(`${baseUrl}/audio/transcriptions`, {
+    const requestUrl = `${baseUrl}/audio/transcriptions`;
+    const requestHeaders = {
+      Authorization: `Bearer ${credentials?.apiKey || ""}`,
+    };
+    const response = await observedProviderFetch(input, () => fetchImpl(requestUrl, {
       method: "POST",
-      headers: {
-        Authorization: `Bearer ${credentials?.apiKey || ""}`,
-      },
+      headers: requestHeaders,
       body: form,
     }), {
       requestDetails: {
@@ -31,8 +33,17 @@ export const openaiSpeechRecognitionAdapter = {
         audioFormat: file?.mime || DEFAULT_MIME,
         languageSpecified: Boolean(input.language),
       },
+      // Phase 6：FormData 捕获——文本字段保留、file Blob externalize、
+      // Authorization 替换（§一百四十八）。
+      capture: {
+        method: "POST", url: requestUrl, headers: requestHeaders, body: form,
+        protocol: "openai-audio-transcriptions",
+      },
     });
     const body = await parseJsonResponse(response);
+    captureProviderHttpResponse(input, {
+      status: response.status, headers: response.headers, body, fidelity: "parsed_equivalent",
+    });
     assertOk(response, body, "OpenAI transcription failed");
     return {
       text: String(body.text || "").trim(),
@@ -49,19 +60,22 @@ export const mimoSpeechRecognitionAdapter = {
   async transcribe(input) {
     const fetchImpl = resolveFetch(input);
     const baseUrl = trimTrailingSlash(input.credentials?.baseUrl || input.provider?.baseUrl || "https://api.xiaomimimo.com/v1");
-    const response = await observedProviderFetch(input, () => fetchImpl(`${baseUrl}/chat/completions`, {
-      method: "POST",
-      headers: {
-        "api-key": input.credentials?.apiKey || "",
-        "Content-Type": "application/json",
+    const requestUrl = `${baseUrl}/chat/completions`;
+    const requestHeaders = {
+      "api-key": input.credentials?.apiKey || "",
+      "Content-Type": "application/json",
+    };
+    const requestBody = {
+      model: input.model.id,
+      messages: [audioChatMessage(audioDataUrl(input.file))],
+      asr_options: {
+        language: input.language || "auto",
       },
-      body: JSON.stringify({
-        model: input.model.id,
-        messages: [audioChatMessage(audioDataUrl(input.file))],
-        asr_options: {
-          language: input.language || "auto",
-        },
-      }),
+    };
+    const response = await observedProviderFetch(input, () => fetchImpl(requestUrl, {
+      method: "POST",
+      headers: requestHeaders,
+      body: JSON.stringify(requestBody),
     }), {
       requestDetails: {
         protocol: "mimo-chat-completions-asr",
@@ -69,8 +83,16 @@ export const mimoSpeechRecognitionAdapter = {
         audioFormat: input.file?.mime || DEFAULT_MIME,
         languageSpecified: Boolean(input.language),
       },
+      // Phase 6：api-key 头 + data URL 音频（externalize）。
+      capture: {
+        method: "POST", url: requestUrl, headers: requestHeaders, body: requestBody,
+        protocol: "mimo-chat-completions-asr",
+      },
     });
     const body = await parseJsonResponse(response);
+    captureProviderHttpResponse(input, {
+      status: response.status, headers: response.headers, body, fidelity: "parsed_equivalent",
+    });
     assertOk(response, body, "MiMo transcription failed");
     return {
       text: extractChatCompletionText(body),
@@ -91,18 +113,21 @@ export const dashscopeSpeechRecognitionAdapter = {
       ...(input.language ? { language: input.language } : {}),
       enable_itn: false,
     };
-    const response = await observedProviderFetch(input, () => fetchImpl(`${baseUrl}/chat/completions`, {
+    const requestUrl = `${baseUrl}/chat/completions`;
+    const requestHeaders = {
+      Authorization: `Bearer ${input.credentials?.apiKey || ""}`,
+      "Content-Type": "application/json",
+    };
+    const requestBody = {
+      model: input.model.id,
+      messages: [audioChatMessage(audioDataUrl(input.file))],
+      stream: false,
+      asr_options: asrOptions,
+    };
+    const response = await observedProviderFetch(input, () => fetchImpl(requestUrl, {
       method: "POST",
-      headers: {
-        Authorization: `Bearer ${input.credentials?.apiKey || ""}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: input.model.id,
-        messages: [audioChatMessage(audioDataUrl(input.file))],
-        stream: false,
-        asr_options: asrOptions,
-      }),
+      headers: requestHeaders,
+      body: JSON.stringify(requestBody),
     }), {
       requestDetails: {
         protocol: "dashscope-qwen-asr-chat",
@@ -110,8 +135,16 @@ export const dashscopeSpeechRecognitionAdapter = {
         audioFormat: input.file?.mime || DEFAULT_MIME,
         languageSpecified: Boolean(input.language),
       },
+      // Phase 6：Authorization 头 + data URL 音频（externalize）。
+      capture: {
+        method: "POST", url: requestUrl, headers: requestHeaders, body: requestBody,
+        protocol: "dashscope-qwen-asr-chat",
+      },
     });
     const body = await parseJsonResponse(response);
+    captureProviderHttpResponse(input, {
+      status: response.status, headers: response.headers, body, fidelity: "parsed_equivalent",
+    });
     assertOk(response, body, "DashScope transcription failed");
     return {
       text: extractChatCompletionText(body),
@@ -129,24 +162,30 @@ export const volcengineSpeechRecognitionAdapter = {
     const fetchImpl = resolveFetch(input);
     const baseUrl = trimTrailingSlash(input.credentials?.baseUrl || input.provider?.baseUrl || "https://openspeech.bytedance.com");
     const apiKey = input.credentials?.apiKey || "";
-    const response = await observedProviderFetch(input, () => fetchImpl(`${baseUrl}/api/v3/auc/bigmodel/recognize/flash`, {
-      method: "POST",
-      headers: {
-        "X-Api-Key": apiKey,
-        "X-Api-Resource-Id": "volc.bigasr.auc_turbo",
-        "X-Api-Request-Id": randomUUID(),
-        "X-Api-Sequence": "-1",
-        "Content-Type": "application/json",
+    const requestUrl = `${baseUrl}/api/v3/auc/bigmodel/recognize/flash`;
+    const requestHeaders = {
+      "X-Api-Key": apiKey,
+      "X-Api-Resource-Id": "volc.bigasr.auc_turbo",
+      "X-Api-Request-Id": randomUUID(),
+      "X-Api-Sequence": "-1",
+      "Content-Type": "application/json",
+    };
+    // 该协议把 credential 同时放进 JSON body（user.uid）——Observer 从一开始
+    // 就只接收结构摘要（§四十一）。Phase 6 的 payload capture 经 protocol-
+    // specific 结构化规则（PROVIDER_BODY_CREDENTIAL_PATHS 登记
+    // volcengine-bigasr-transcription → user.uid）替换该值，不依赖 generic
+    // key denylist（§一百四十九专项测试锁定）。
+    const requestBody = {
+      user: { uid: apiKey },
+      audio: { data: audioBase64(input.file) },
+      request: {
+        model_name: "bigmodel",
       },
-      // 该协议把 credential 同时放进 JSON body（user.uid）——Observer 从一开始
-      // 就只接收结构摘要，body 绝不进入事件（§四十一），测试锁定 apiKey 不泄。
-      body: JSON.stringify({
-        user: { uid: apiKey },
-        audio: { data: audioBase64(input.file) },
-        request: {
-          model_name: "bigmodel",
-        },
-      }),
+    };
+    const response = await observedProviderFetch(input, () => fetchImpl(requestUrl, {
+      method: "POST",
+      headers: requestHeaders,
+      body: JSON.stringify(requestBody),
     }), {
       requestDetails: {
         protocol: "volcengine-bigasr-transcription",
@@ -154,8 +193,17 @@ export const volcengineSpeechRecognitionAdapter = {
         audioFormat: input.file?.mime || DEFAULT_MIME,
         languageSpecified: Boolean(input.language),
       },
+      // Phase 6：X-Api-Key 头 + body.user.uid（协议专项规则）+ 裸 base64 音频
+      // （externalize）。
+      capture: {
+        method: "POST", url: requestUrl, headers: requestHeaders, body: requestBody,
+        protocol: "volcengine-bigasr-transcription",
+      },
     });
     const body = await parseJsonResponse(response);
+    captureProviderHttpResponse(input, {
+      status: response.status, headers: response.headers, body, fidelity: "parsed_equivalent",
+    });
     const statusCode = response.headers?.get?.("X-Api-Status-Code");
     if (statusCode && statusCode !== "20000000") {
       throw new Error(`Volcengine transcription failed: ${statusCode}`);

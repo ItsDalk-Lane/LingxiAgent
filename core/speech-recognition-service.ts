@@ -460,6 +460,16 @@ export class SpeechRecognitionService {
       },
       semanticInputProvenance: createSemanticInputProvenance("speech_transcribe", speechProvenanceSections),
     });
+    // Phase 6 Semantic Request Capture（§九十九）：audio 本地路径 →
+    // local_file_reference descriptor（不保存字节），language 允许保留。
+    recorder.payloadCapture?.captureSemanticRequest({
+      inputShape: "speech_transcribe",
+      parameters: {
+        ...(file?.realPath || file?.filePath ? { audio: file.realPath || file.filePath } : {}),
+        ...(language ? { language } : {}),
+      },
+      provenance: recorder.semanticInputProvenance,
+    });
     try {
       const result = await withModelRequestAccounting({
         usageLedger: this._getUsageLedger(),
@@ -491,7 +501,15 @@ export class SpeechRecognitionService {
         fetch: this._fetch,
         modelCall: recorder,
       }));
-      // 语义响应（§四十二）：只记录结构事实；绝不记录 transcription text。
+      // 语义响应（§四十二）：Observer 只记录结构事实；transcription text 是
+      // 模型输出正文——Phase 6 经统一 Redactor 进 payload capture（§一百零一）。
+      recorder.payloadCapture?.captureSemanticResponse({
+        response: {
+          transcription: typeof result?.text === "string" && result.text.trim() ? result.text : null,
+          finishReason: null,
+          completeness: "complete",
+        },
+      });
       recorder.semanticResponseCompleted({
         details: {
           hasText: Boolean(result?.text && String(result.text).trim()),

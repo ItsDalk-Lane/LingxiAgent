@@ -331,25 +331,46 @@ export async function probeProvider({
       ]),
     });
     try {
+      // Phase 6 Semantic Request Capture（§八十六）：probe 固定占位消息 "." 的
+      // 正文由 capture 层负责（经统一 Redactor）——provenance 仍只存 locator。
+      const payloadCapture = recorder.payloadCapture;
+      if (payloadCapture) {
+        payloadCapture.captureSemanticRequest({
+          inputShape: "provider_probe",
+          messages: [{ role: "user", content: "." }],
+          provenance: recorder.semanticInputProvenance,
+        });
+      }
       const result = await withModelRequestAccounting({
         usageLedger,
         model: { provider: providerId, modelId: effectiveModelId, api },
         usageContext,
         metadata: { operation: "connectivity-probe", ...observedModelCallLedgerMetadata(recorder) },
       }, async () => {
+        const probeBody = {
+          model: effectiveModelId,
+          max_tokens: 1,
+          messages: [{ role: "user", content: "." }],
+        };
         const res = await observedProviderFetch({ modelCall: recorder }, () => fetch(probe.url, {
           method: probe.method,
           headers,
-          body: JSON.stringify({
-            model: effectiveModelId,
-            max_tokens: 1,
-            messages: [{ role: "user", content: "." }],
-          }),
+          body: JSON.stringify(probeBody),
           signal: AbortSignal.timeout(10000),
-        }), { requestDetails: { protocol: api, messageCount: 1 } });
-        return buildProbeResult(res);
+        }), {
+          requestDetails: { protocol: api, messageCount: 1 },
+          // Phase 6：真实构造点 body + 真实 headers（x-api-key 经 Redactor）。
+          capture: { method: probe.method, url: probe.url, headers, body: probeBody, protocol: api },
+        });
+        return buildProbeResult(res, { modelCall: recorder });
       });
       if (result?.ok) {
+        recorder.payloadCapture?.captureSemanticResponse({
+          response: {
+            structuredOutput: { probeAccepted: true, httpStatus: result?.status ?? null },
+            completeness: "complete",
+          },
+        });
         recorder.semanticResponseCompleted({
           details: { probeAccepted: true, httpStatus: result?.status ?? null },
         });
@@ -371,23 +392,42 @@ export async function probeProvider({
   });
 }
 
-async function buildProbeResult(res) {
-  if (res.ok) return { ok: true, status: res.status };
+async function buildProbeResult(res, captureCarrier = null) {
+  // Phase 6 Provider Response Capture：成功路径 probe 不读 body（业务只看 2xx）
+  // → 诚实 metadata_only；错误 body 在业务读取的同一位置捕获（不重复消费）。
+  const captureResponse = (body, fidelity) => {
+    if (!captureCarrier?.modelCall?.payloadCapture) return;
+    captureCarrier.modelCall.payloadCapture.captureProviderResponse({
+      status: res.status,
+      headers: res.headers,
+      body,
+      fidelity,
+    });
+  };
+  if (res.ok) {
+    captureResponse(null, "metadata_only");
+    return { ok: true, status: res.status };
+  }
   const fallback = `HTTP ${res.status}${res.statusText ? ` ${res.statusText}` : ""}`;
   const contentType = res.headers.get("content-type") || "";
   try {
     if (contentType.includes("application/json")) {
       const payload = await res.json();
+      captureResponse(payload, "parsed_equivalent");
       const message = payload?.error?.message || payload?.error || payload?.message;
       if (typeof message === "string" && message.trim()) {
         return { ok: false, status: res.status, error: message.trim().slice(0, 500) };
       }
     } else if (contentType.startsWith("text/") && !contentType.includes("html")) {
       const message = (await res.text()).trim();
+      captureResponse(message || null, "runtime_exact");
       if (message) return { ok: false, status: res.status, error: message.slice(0, 500) };
+    } else {
+      captureResponse(null, "metadata_only");
     }
   } catch {
     // Malformed error bodies fall back to the HTTP status below.
+    captureResponse(null, "metadata_only");
   }
   return { ok: false, status: res.status, error: fallback };
 }
