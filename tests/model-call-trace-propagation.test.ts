@@ -434,6 +434,10 @@ describe("测试 8（§七十七）：/diary = 一个 trace、三个 MC-10/MC-04
       undefined,
       undefined,
       async () => streamOf(assistantMessage({ content: [{ type: "text", text: "summarized" }] })),
+      undefined,
+      undefined,
+      undefined,
+      undefined,
     );
     expect(text).toBe("summarized");
     await flushTerminal();

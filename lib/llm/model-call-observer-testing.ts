@@ -64,6 +64,8 @@ export function createTestModelCallObserver(): TestModelCallObserver {
   const events: ModelCallEvent[] = [];
   const eventsForCall = (source: ModelCallEvent[], callId: string): ModelCallEvent[] =>
     source.filter((event) => event.callId === callId);
+  const eventsForTrace = (traceId: string): ModelCallEvent[] =>
+    events.filter((event) => event.traceId === traceId);
   const callIdentityMap = (): Map<string, { traceId: string | null; parentCallId: string | null }> => {
     const map = new Map<string, { traceId: string | null; parentCallId: string | null }>();
     for (const event of events) {
@@ -85,7 +87,7 @@ export function createTestModelCallObserver(): TestModelCallObserver {
       return eventsForCall(events, callId);
     },
     eventsForTrace(traceId: string) {
-      return events.filter((event) => event.traceId === traceId);
+      return eventsForTrace(traceId);
     },
     sequence() {
       return events.map((event) => event.eventType);

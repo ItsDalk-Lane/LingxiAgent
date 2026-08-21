@@ -78,12 +78,7 @@ describe("resolveModelTraceContext — 三级优先（§二十一）", () => {
 
 describe("并发隔离与异步传播（§五十二）", () => {
   it("两个并行任务链的 scope 互不可见", async () => {
-    const seen: string[] = [];
-    const task = (marker: string) => runWithNewModelTrace({ origin: "user_turn" }, async () => {
-      await tick();
-      seen.push(`${marker}:${currentModelTraceScope()?.traceId === marker ? "own" : "wrong"}`);
-    });
-    // 先手动建立两个已知 traceId 的 scope：用 refs 传 marker，traceId 比对用 map
+    // 各自建立独立 scope；tick 之后读到的必须仍是自己的 scope
     const ids: string[] = [];
     const taskWithId = () => runWithNewModelTrace({ origin: "user_turn" }, async () => {
       const scope = currentModelTraceScope()!;
@@ -96,7 +91,6 @@ describe("并发隔离与异步传播（§五十二）", () => {
     expect(ids[0]).not.toBe(ids[1]);
     expect(a).toBe(ids[0]);
     expect(b).toBe(ids[1]);
-    expect(seen).toHaveLength(0);
   });
 
   it("异步 continuation 继承 scope（setTimeout 回调内仍可读）", async () => {
@@ -227,7 +221,7 @@ describe("runWithModelTrace（显式 scope 进入）", () => {
       const parentScope = currentModelTraceScope()!;
       const childScope = {
         traceId: parentScope.traceId,
-        origin: "user_turn",
+        origin: "user_turn" as const,
         causalParentCallId: "mc_c9",
         refs: null,
         lastCallId: "mc_c9",

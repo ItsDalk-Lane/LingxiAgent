@@ -127,11 +127,11 @@ describe("MC-10 diary temporary summary — 旁路闭合", () => {
     await runWithNewModelTrace({ origin: "diary" }, async () => {
       await generateDiaryCompactionSummary({
         messages: [{ role: "user", content: [{ type: "text", text: "a" }], timestamp: 1 }] as any,
-        model: MODEL as any, apiKey: "k", usageLedger: ledger, agentId: "agent-1",
+        model: MODEL as any, apiKey: "k", headers: undefined, usageLedger: ledger, agentId: "agent-1",
       });
       await generateDiaryCompactionSummary({
         messages: [{ role: "user", content: [{ type: "text", text: "b" }], timestamp: 2 }] as any,
-        model: MODEL as any, apiKey: "k", usageLedger: ledger, agentId: "agent-1",
+        model: MODEL as any, apiKey: "k", headers: undefined, usageLedger: ledger, agentId: "agent-1",
       });
     });
     await flushTerminal();
@@ -156,7 +156,7 @@ describe("MC-10 diary temporary summary — 旁路闭合", () => {
     await expect(runWithNewModelTrace({ origin: "diary" }, () =>
       generateDiaryCompactionSummary({
         messages: [{ role: "user", content: [{ type: "text", text: "x" }], timestamp: 1 }] as any,
-        model: MODEL as any, apiKey: "k", usageLedger: ledger, agentId: "agent-1",
+        model: MODEL as any, apiKey: "k", headers: undefined, usageLedger: ledger, agentId: "agent-1",
       }),
     )).rejects.toThrow();
     await flushTerminal();
@@ -186,6 +186,7 @@ describe("MC-10 diary temporary summary — 旁路闭合", () => {
       messages: [],
       model: MODEL as any,
       apiKey: "k",
+      headers: undefined,
     });
     expect(result).toBe("");
     expect(fetchSpy).not.toHaveBeenCalled();
