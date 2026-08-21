@@ -256,12 +256,33 @@ describe("Authorization Gateway — deterministic safety + intent authorization"
       .mockResolvedValueOnce(firstResponse)
       .mockResolvedValueOnce(JSON.stringify({ verdict: "authorized", scopeRelation: "exact", reason: "ok" }));
     const reviewer = createModelApprovalReviewer({ resolveApprovalModel, callText });
+    const gateway = createApprovalGateway({ intentAuthorizationReviewer: reviewer });
 
-    const result = await reviewer({ request: request() });
+    const result = await gateway.review(request());
 
-    expect(result).toMatchObject({ kind: "decision", attempts: 2 });
+    expect(result.action).toBe("allow");
     expect(callText).toHaveBeenCalledTimes(2);
     expect(JSON.stringify(callText.mock.calls[1]?.[0])).not.toContain("SECRET_");
+  });
+
+  it("uses one shared format-correction budget across the gateway and model reviewer", async () => {
+    const callText = vi.fn(async () => "invalid JSON");
+    const modelReviewer = createModelApprovalReviewer({
+      resolveApprovalModel: vi.fn(async () => ({
+        api: "openai-completions",
+        apiKey: "test-key",
+        baseUrl: "https://example.test",
+        headers: {},
+        model: { id: "reviewer", provider: "test" },
+      })),
+      callText,
+    });
+    const gateway = createApprovalGateway({ intentAuthorizationReviewer: modelReviewer });
+
+    const decision = await gateway.review(request());
+
+    expect(decision.action).toBe("ask_user");
+    expect(callText).toHaveBeenCalledTimes(2);
   });
 
   it("returns a static config failure without calling the network boundary", async () => {
@@ -277,6 +298,30 @@ describe("Authorization Gateway — deterministic safety + intent authorization"
       attempts: 0,
     });
     expect(callText).not.toHaveBeenCalled();
+  });
+
+  it("passes the shared usage ledger to every approval model request", async () => {
+    const usageLedger = { start: vi.fn(), finish: vi.fn(), recordError: vi.fn() };
+    const callText = vi.fn(async () => JSON.stringify({
+      verdict: "authorized",
+      scopeRelation: "exact",
+      reason: "ok",
+    }));
+    const reviewer = createModelApprovalReviewer({
+      resolveApprovalModel: vi.fn(async () => ({
+        api: "openai-completions",
+        apiKey: "test-key",
+        baseUrl: "https://example.test",
+        headers: {},
+        model: { id: "reviewer", provider: "test" },
+      })),
+      callText,
+      getUsageLedger: () => usageLedger,
+    });
+
+    await reviewer({ request: request() });
+
+    expect(callText).toHaveBeenCalledWith(expect.objectContaining({ usageLedger }));
   });
 
   it("does not retry timeout failures and exposes no raw error", async () => {

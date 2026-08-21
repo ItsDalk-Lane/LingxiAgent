@@ -20,7 +20,6 @@ import {
 import { forceRefreshOAuthApiKey } from "./oauth-force-refresh.ts";
 import { t } from "../lib/i18n.ts";
 import { ProviderRegistry } from "./provider-registry.ts";
-import { ExecutionRouter } from "./execution-router.ts";
 import { composeResolvedModelExecution } from "./model-execution-config.ts";
 import { findModel, parseModelRef } from "../shared/model-ref.ts";
 import { isLocalBaseUrl } from "../shared/net-utils.ts";
@@ -153,7 +152,6 @@ export class ModelManager {
   declare _modelRegistry: any;
   declare _modelRuntime: any;
   declare _registeredSdkProviderIds: Set<string>;
-  declare executionRouter: any;
   declare providerRegistry: any;
   /**
    * @param {object} opts
@@ -171,7 +169,6 @@ export class ModelManager {
 
     // 新架构模块（init() 后可用）
     this.providerRegistry = new ProviderRegistry(lingxiHome);
-    this.executionRouter = null;
   }
 
   /**
@@ -214,11 +211,6 @@ export class ModelManager {
     await this._applyRuntimeApiKeyOverrides(projection);
     this._syncSdkProviderRegistrations();
 
-    this.executionRouter = new ExecutionRouter(
-      (ref) => this._resolveFromAvailable(ref),
-      this.providerRegistry,
-      (provider) => this.resolveProviderCredentialsFresh(provider),
-    );
   }
 
   // ── Getters ──
@@ -553,25 +545,18 @@ export class ModelManager {
     throw new Error(t("error.modelNotFound", { id }));
   }
 
-  /**
-   * 根据 provider 名称查找凭证
-   * 委托 ProviderRegistry，返回 snake_case 格式（兼容 callProviderText 消费方）
-   * @param {string} provider
-   * @returns {{ api_key: string, base_url: string, api: string, headers?: Record<string, string>, accountId?: string }}
-   */
-  resolveProviderCredentials(provider) {
-    if (!provider) return { api_key: "", base_url: "", api: "" };
-    const cred = this.providerRegistry.getCredentials(provider);
-    if (cred) {
-      return {
-        api_key: cred.apiKey || "",
-        base_url: cred.baseUrl || "",
-        api: cred.api || "",
-        headers: cred.headers || {},
-        ...(cred.accountId ? { accountId: cred.accountId } : {}),
-      };
-    }
-    return { api_key: "", base_url: "", api: "" };
+  /** 同步设置校验只返回模型目录对象，不读取或返回任何凭据。 */
+  resolveModelForValidation(modelRef) {
+    return this.resolveExecutionModel(modelRef);
+  }
+
+  /** 仅供受权限保护的设置明文查看端点读取 Provider Catalog 中已保存的 API Key。 */
+  readSavedProviderApiKey(provider) {
+    if (!provider) return "";
+    const entry = this.providerRegistry.get?.(provider);
+    const allRawProviders = this.providerRegistry.getAllProvidersRaw?.() || {};
+    const raw = allRawProviders[entry?.id || provider] || allRawProviders[provider] || {};
+    return typeof raw.api_key === "string" ? raw.api_key : "";
   }
 
   /**
@@ -713,24 +698,6 @@ export class ModelManager {
     this.providerRegistry.reload();
     this._syncSdkProviderRegistrations();
     await this.syncAndRefresh();
-  }
-
-  /**
-   * 统一解析：模型引用 -> { model, provider, api, api_key, base_url }
-   *
-   * model 字段是**完整 model 对象**（不再是裸 id 字符串）。所有 callText 消费方
-   * 解构出 model 后直接传给 callText，由 callText 内部走 provider-compat。
-   *
-   * @param {string|object} modelRef
-   * @returns {{ model: object, provider: string, api: string, api_key: string, base_url: string }}
-   */
-  resolveModelWithCredentials(modelRef) {
-    const entry = this.resolveExecutionModel(modelRef);
-    const provider = entry?.provider;
-    if (!provider) {
-      throw new Error(t("error.modelNoProvider", { role: "resolve", model: String(modelRef) }));
-    }
-    return this._resolvedModelCredentialResult(entry, this.resolveProviderCredentials(provider));
   }
 
   /**

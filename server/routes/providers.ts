@@ -20,6 +20,7 @@ import { clearConfigCache } from "../../lib/memory/config-loader.ts";
 import { collectSecretPatchPaths, isMaskedSecretValue, maskSecretValue } from "../../shared/secret-custody.ts";
 import { denySecretMutationWithoutScope, denyWithoutScope } from "../http/capability-guard.ts";
 import { createModuleLogger } from "../../lib/debug-log.ts";
+import { createTemporaryProviderCredentialBoundary } from "../../core/temporary-provider-credential-boundary.ts";
 
 const log = createModuleLogger("providers");
 const OLLAMA_PROBE_CONCURRENCY = 6;
@@ -85,6 +86,19 @@ function pickProbeModelId(providerRegistry: any, providerId: any, api: any, requ
 
 export function createProvidersRoute(engine: any) {
   const route = new Hono();
+
+  function createCredentialBoundary({ providerId, source, operation, apiKey, headers }: any) {
+    return createTemporaryProviderCredentialBoundary({
+      providerId: providerId || "custom-provider",
+      source,
+      operation,
+      apiKey,
+      headers,
+      audit: typeof engine.recordSecurityAuditEvent === "function"
+        ? (event) => engine.recordSecurityAuditEvent(event)
+        : null,
+    });
+  }
 
   // ── Cache helper: persist discovered models per-provider ──
   function saveToCache(providerName: any, models: any) {
@@ -267,8 +281,8 @@ export function createProvidersRoute(engine: any) {
     if (secretDenied) return secretDenied;
 
     const providerName = c.req.param("name");
-    const creds = engine.resolveProviderCredentials?.(providerName) || {};
-    return c.json({ api_key: typeof creds.api_key === "string" ? creds.api_key : "" });
+    const apiKey = engine.readSavedProviderApiKey?.(providerName) || "";
+    return c.json({ api_key: typeof apiKey === "string" ? apiKey : "" });
   });
 
   // ── Fetch / Test ──
@@ -589,10 +603,21 @@ export function createProvidersRoute(engine: any) {
         if (effectiveKey && !effectiveApi) {
           return c.json({ error: "api is required when api_key is present", models: [] });
         }
-        const headers = (buildProviderRequestHeaders as any)({
-          api: effectiveApi,
+        const credentialBoundary = createCredentialBoundary({
+          providerId: name,
+          source: hasExplicitBodyCredentials ? "request-draft" : "fresh-provider",
+          operation: "catalog-read",
           apiKey: effectiveKey,
           headers: effectiveHeaders,
+        });
+        const temporaryCredentials = credentialBoundary.consume({
+          providerId: name || "custom-provider",
+          operation: "catalog-read",
+        });
+        const headers = (buildProviderRequestHeaders as any)({
+          api: effectiveApi,
+          apiKey: temporaryCredentials.apiKey,
+          headers: temporaryCredentials.headers,
           allowMissingApiKey: true,
         });
         const res = await fetch(url, {
@@ -691,8 +716,8 @@ export function createProvidersRoute(engine: any) {
     const cache = readModelsCache(engine);
     const entry = cache[providerName];
     if (!entry) return c.json({ models: [], fetchedAt: null });
-    const creds = engine.resolveProviderCredentials?.(providerName) || {};
-    const payload = filterProviderModels(providerName, entry.models || [], creds.base_url || "");
+    const providerBaseUrl = engine.providerRegistry.get?.(providerName)?.baseUrl || "";
+    const payload = filterProviderModels(providerName, entry.models || [], providerBaseUrl);
     return c.json({ ...payload, fetchedAt: entry.fetchedAt || null });
   });
 
@@ -766,11 +791,28 @@ export function createProvidersRoute(engine: any) {
 
     try {
       const modelId = pickProbeModelId(engine.providerRegistry, name, api, body.model_id);
-      const result = await (probeProvider as any)({
-        baseUrl: base_url,
-        api,
+      const credentialBoundary = createCredentialBoundary({
+        providerId: name,
+        source: hasExplicitBodyCredentials ? "request-draft" : "fresh-provider",
+        operation: "connectivity-probe",
         apiKey: api_key,
         headers,
+      });
+      const result = await (probeProvider as any)({
+        providerId: name || "custom-provider",
+        baseUrl: base_url,
+        api,
+        credentialBoundary,
+        usageLedger: engine.usageLedger,
+        usageContext: {
+          source: {
+            subsystem: "provider-management",
+            operation: "connectivity-probe",
+            surface: "settings",
+            trigger: "user",
+          },
+          attribution: { kind: "provider", providerId: name || "custom-provider" },
+        },
         ...(modelId ? { modelId } : {}),
       });
       return c.json(result);

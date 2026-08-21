@@ -82,6 +82,11 @@ const TEST_CAPABILITY_SNAPSHOT: any = {
 function createJimengImageAdapter(options: any = {}) {
   return createRawJimengImageAdapter({
     getCapabilitySnapshot: async () => TEST_CAPABILITY_SNAPSHOT,
+    authorizeExternalCredentialUse: async (request) => ({
+      ...request,
+      kind: "external-cli",
+      credentialSource: "external",
+    }),
     ...options,
   });
 }
@@ -89,6 +94,11 @@ function createJimengImageAdapter(options: any = {}) {
 function createJimengVideoAdapter(options: any = {}) {
   return createRawJimengVideoAdapter({
     getCapabilitySnapshot: async () => TEST_CAPABILITY_SNAPSHOT,
+    authorizeExternalCredentialUse: async (request) => ({
+      ...request,
+      kind: "external-cli",
+      credentialSource: "external",
+    }),
     ...options,
   });
 }
@@ -194,6 +204,66 @@ describe("Jimeng CLI adapters", () => {
     for (const root of roots.splice(0)) {
       fs.rmSync(root, { recursive: true, force: true });
     }
+  });
+
+  it("外部凭证许可被拒绝时不会启动 CLI", async () => {
+    const run = vi.fn();
+    const authorize = vi.fn(async () => {
+      throw Object.assign(new Error("external credential denied"), {
+        code: "external_credential_denied",
+      });
+    });
+    const adapter = createJimengImageAdapter({
+      resolveCommand: () => "/usr/local/bin/dreamina",
+      runCommand: run,
+      authorizeExternalCredentialUse: authorize,
+    });
+
+    await expect(adapter.submit({
+      prompt: "一只猫",
+      model: "jimeng-image-5.0",
+    }, { generatedDir: "/tmp/out" } as any)).rejects.toMatchObject({
+      code: "external_credential_denied",
+    });
+    expect(authorize).toHaveBeenCalledWith({
+      providerId: "jimeng-cli",
+      boundaryId: "dreamina-cli-login",
+      operation: "submit",
+    });
+    expect(run).not.toHaveBeenCalled();
+  });
+
+  it("认证检查和轮询也要分别领取外部凭证许可", async () => {
+    const root = makeTempDir();
+    roots.push(root);
+    const outputFile = path.join(root, "result.mp4");
+    const authorize = vi.fn(async (request) => ({
+      ...request,
+      kind: "external-cli",
+      credentialSource: "external",
+    }));
+    const run = vi.fn(async (_command, args) => {
+      if (args[0] === "user_credit") return { stdout: "{}", stderr: "" };
+      fs.writeFileSync(outputFile, "video");
+      return {
+        stdout: JSON.stringify({ gen_status: "success", files: [outputFile] }),
+        stderr: "",
+      };
+    });
+    const adapter = createJimengVideoAdapter({
+      resolveCommand: () => "/usr/local/bin/dreamina",
+      runCommand: run,
+      authorizeExternalCredentialUse: authorize,
+    });
+
+    await expect(adapter.checkAuth({} as any)).resolves.toEqual({ ok: true });
+    await expect(adapter.query("task-1", { generatedDir: root } as any)).resolves.toMatchObject({
+      status: "success",
+    });
+    expect(authorize.mock.calls.map(([request]) => request.operation)).toEqual([
+      "check-auth",
+      "query",
+    ]);
   });
 
   it("submits text-to-image through dreamina without shell execution", async () => {

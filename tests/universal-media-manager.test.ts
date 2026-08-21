@@ -44,6 +44,7 @@ function makeManager(root, preferences, extra: any = {}) {
       },
     },
     registerSessionFile: () => {},
+    usageLedger: extra.usageLedger,
   });
 }
 
@@ -627,7 +628,12 @@ describe("UniversalMediaManager response delivery", () => {
   it("submits image generation without a sessionPath when delivery mode is response", async () => {
     const root = makeRoot();
     roots.push(root);
-    const manager = makeManager(root, makePreferences(root));
+    const usageLedger = {
+      start: vi.fn(() => ({ requestId: "image-submit-1" })),
+      finish: vi.fn(),
+      recordError: vi.fn(),
+    };
+    const manager = makeManager(root, makePreferences(root), { usageLedger });
     const bus = makeBus();
     manager.start(bus);
     manager.registerAdapter({
@@ -653,6 +659,14 @@ describe("UniversalMediaManager response delivery", () => {
     });
     expect(bus.request).not.toHaveBeenCalledWith("deferred:register", expect.anything());
     expect(bus.request).not.toHaveBeenCalledWith("task:register", expect.anything());
+    await flushBackgroundWork();
+    expect(usageLedger.start).toHaveBeenCalledWith(expect.objectContaining({
+      model: expect.objectContaining({ provider: "response-image" }),
+      usageContext: expect.objectContaining({
+        source: expect.objectContaining({ subsystem: "media", operation: "submit" }),
+      }),
+    }));
+    expect(usageLedger.finish).toHaveBeenCalledWith("image-submit-1", expect.any(Object));
 
     manager.stop();
   });
@@ -660,7 +674,12 @@ describe("UniversalMediaManager response delivery", () => {
   it("submits video generation without a sessionPath when delivery mode is response", async () => {
     const root = makeRoot();
     roots.push(root);
-    const manager = makeManager(root, makePreferences(root));
+    const usageLedger = {
+      start: vi.fn(() => ({ requestId: "media-submit-1" })),
+      finish: vi.fn(),
+      recordError: vi.fn(),
+    };
+    const manager = makeManager(root, makePreferences(root), { usageLedger });
     const bus = makeBus();
     manager.start(bus);
     manager.registerAdapter({
@@ -687,6 +706,13 @@ describe("UniversalMediaManager response delivery", () => {
     });
     expect(bus.request).not.toHaveBeenCalledWith("deferred:register", expect.anything());
     expect(bus.request).not.toHaveBeenCalledWith("task:register", expect.anything());
+    expect(usageLedger.start).toHaveBeenCalledWith(expect.objectContaining({
+      model: expect.objectContaining({ provider: "response-video" }),
+      usageContext: expect.objectContaining({
+        source: expect.objectContaining({ subsystem: "media", operation: "submit" }),
+      }),
+    }));
+    expect(usageLedger.finish).toHaveBeenCalledWith("media-submit-1", expect.any(Object));
 
     manager.stop();
   });

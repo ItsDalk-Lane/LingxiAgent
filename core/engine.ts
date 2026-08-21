@@ -398,6 +398,7 @@ export class LingxiEngine {
       intentAuthorizationReviewer: createModelApprovalReviewer({
         resolveApprovalModel: (options) => this.resolveAuxiliaryModelFresh("approval", options || {}),
         callText: (options) => this._callApprovalReviewerText(options),
+        getUsageLedger: () => this._usageLedger,
       }),
     });
 
@@ -411,9 +412,11 @@ export class LingxiEngine {
     this._models = new ModelManager({ lingxiHome });
     this._speechRecognition = new SpeechRecognitionService({
       providerRegistry: this._models.providerRegistry,
+      resolveProviderCredentialsFresh: (providerId) => this._models.resolveProviderCredentialsFresh(providerId),
       preferences: this._prefs,
       sessionFiles: this._sessionFiles,
       emitEvent: (event, sessionPath) => this._emitEvent(event, sessionPath),
+      getUsageLedger: () => this._usageLedger,
     });
     this._media = new UniversalMediaManager({
       lingxiHome: this.lingxiHome,
@@ -424,6 +427,7 @@ export class LingxiEngine {
       registerSessionFile: (entry) => this.serializeSessionFile(this.registerSessionFile(entry)),
       onProviderChanged: () => this.onProviderChanged(),
       builtinAdapters: builtinMediaAdapters,
+      getUsageLedger: () => this._usageLedger,
     });
     // The data directory keeps the historical `plugin-data/mcp` location: it is
     // where existing installs already store their connector config.
@@ -1893,15 +1897,11 @@ export class LingxiEngine {
   revokeComputerUseApp(approval) { return this._prefs.revokeComputerUseApp(approval); }
   resolveVisionConfig() {
     if (!this.isVisionAuxiliaryEnabled()) return null;
-    const ref = this.getSharedModels()?.vision || null;
-    if (!ref) return null;
-    return this.resolveModelWithCredentials(ref);
+    return this.resolveAuxiliaryModel("vision");
   }
   async resolveVisionConfigFresh() {
     if (!this.isVisionAuxiliaryEnabled()) return null;
-    const ref = this.getSharedModels()?.vision || null;
-    if (!ref) return null;
-    return this.resolveModelWithCredentialsFresh(ref);
+    return this.resolveAuxiliaryExecution("vision");
   }
   getSearchConfig() { return this._configCoord.getSearchConfig(); }
   setSearchConfig(p) { return this._configCoord.setSearchConfig(p); }
@@ -2358,10 +2358,9 @@ export class LingxiEngine {
 
   _resolveThinkingLevel(l) { return this._models.resolveThinkingLevel(l); }
   _resolveExecutionModel(r) { return this._models.resolveExecutionModel(r); }
-  _resolveProviderCredentials(p) { return this._models.resolveProviderCredentials(p); }
-  resolveProviderCredentials(p) { return this._resolveProviderCredentials(p); }
+  readSavedProviderApiKey(provider) { return this._models.readSavedProviderApiKey(provider); }
   resolveProviderCredentialsFresh(p, options) { return this._models.resolveProviderCredentialsFresh(p, options); }
-  resolveModelWithCredentials(ref) { return this._models.resolveModelWithCredentials(ref); }
+  resolveModelForValidation(ref) { return this._models.resolveModelForValidation(ref); }
   resolveModelWithCredentialsFresh(ref) { return this._models.resolveModelWithCredentialsFresh(ref); }
   async refreshAvailableModels() { return this._models.refreshAvailable(); }
   /**
@@ -3351,6 +3350,10 @@ export class LingxiEngine {
   }
 
   emitEvent(event, sessionPath) { this._emitEvent(event, sessionPath); }
+
+  recordSecurityAuditEvent(event) {
+    return appendSecurityAuditEvent(this.lingxiHome, event);
+  }
 
   _emitAppEvent(type, payload: any = {}) {
     if (typeof type !== "string" || !type) return;

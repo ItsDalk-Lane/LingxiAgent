@@ -648,7 +648,7 @@
     ],
     "version": 3
   },
-  "payloadFingerprint": "sha256:a8f8f14cf92b03a63fa329b690ef77b11ec01de3a639dde68d5c5833a96a7396",
+  "payloadFingerprint": "sha256:ea43072abfdaae264090f44699e72180d6a18e243f5245a5d6be167445d8a2f9",
   "registry": [
     {
       "affectedByEpochMigration": true,
@@ -3003,8 +3003,8 @@
   ],
   "review": {
     "classification": "compatible",
-    "compatibilityReason": "mac auto-update self-install: adds mac-self-install.cjs (writes only to os.tmpdir at runtime; no persistent store) and edits auto-updater.cjs without changing any store schema, site, or write shape",
-    "payloadFingerprint": "sha256:a8f8f14cf92b03a63fa329b690ef77b11ec01de3a639dde68d5c5833a96a7396"
+    "compatibilityReason": "models.json custody repair: re-applies the existing secret-file mode when projected content is unchanged; file schema, fields, paths, and migration semantics remain unchanged",
+    "payloadFingerprint": "sha256:ea43072abfdaae264090f44699e72180d6a18e243f5245a5d6be167445d8a2f9"
   },
   "schemas": [
     {
@@ -3086,7 +3086,7 @@
       "contract": "agent config and authored Markdown/image profile protocol",
       "kind": "directory-contract",
       "module": "core/agent-manager.ts",
-      "sourceHash": "sha256:1022b75ef4b3ba75a8a3f53ca3cbeabe42cf8bd0ecf9673daec577c1fc852f34",
+      "sourceHash": "sha256:38c274221c81654f80b8740886fca8fd8f45a4741c63e852abf404e5a7dfd4be",
       "storeId": "agent-profile"
     },
     {
@@ -4522,6 +4522,14 @@
       "exemptionId": null,
       "kind": "secret-write",
       "ordinal": 0,
+      "reason": "Owns provider catalog, authentication, model compatibility, local provider plugin state, or the retention of their migration backups.",
+      "sourceFile": "core/model-sync.ts",
+      "storeId": "provider-state"
+    },
+    {
+      "exemptionId": null,
+      "kind": "secret-write",
+      "ordinal": 1,
       "reason": "Owns provider catalog, authentication, model compatibility, local provider plugin state, or the retention of their migration backups.",
       "sourceFile": "core/model-sync.ts",
       "storeId": "provider-state"

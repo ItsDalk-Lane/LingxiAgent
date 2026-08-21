@@ -46,10 +46,19 @@ function makeProviderRegistry() {
   };
 }
 
+async function resolveMimoCredentialsFresh() {
+  return {
+    apiKey: "mimo-key",
+    baseUrl: "https://api.xiaomimimo.com/v1",
+    api: "openai-completions",
+  };
+}
+
 describe("SpeechRecognitionService", () => {
   it("lists only provider models with registered speech adapters", () => {
     const service = new SpeechRecognitionService({
       providerRegistry: makeProviderRegistry(),
+      resolveProviderCredentialsFresh: resolveMimoCredentialsFresh,
       preferences: { getSpeechRecognitionConfig: () => ({ enabled: false }) },
       sessionFiles: new SessionFileRegistry(),
       emitEvent: vi.fn(),
@@ -97,8 +106,20 @@ describe("SpeechRecognitionService", () => {
         types: ["speechRecognition"],
         transcribe: vi.fn(async () => ({ text: "今晚我们先把语音输入跑通。", language: "zh" })),
       };
+      const providerRegistry = makeProviderRegistry();
+      const resolveProviderCredentialsFresh = vi.fn(async () => ({
+        apiKey: "fresh-mimo-key",
+        baseUrl: "https://api.xiaomimimo.com/v1",
+        api: "openai-completions",
+      }));
+      const usageLedger = {
+        start: vi.fn(() => ({ requestId: "speech-request-1" })),
+        finish: vi.fn(),
+        recordError: vi.fn(),
+      };
       const service = new SpeechRecognitionService({
-        providerRegistry: makeProviderRegistry(),
+        providerRegistry,
+        resolveProviderCredentialsFresh,
         preferences: {
           getSpeechRecognitionConfig: () => ({
             enabled: true,
@@ -107,6 +128,7 @@ describe("SpeechRecognitionService", () => {
         },
         sessionFiles,
         emitEvent,
+        usageLedger,
       });
       service.registerAdapter(adapter);
 
@@ -117,8 +139,18 @@ describe("SpeechRecognitionService", () => {
       expect(adapter.transcribe).toHaveBeenCalledWith(expect.objectContaining({
         file: expect.objectContaining({ id: file.id, filePath: voicePath }),
         model: expect.objectContaining({ id: "mimo-v2.5-asr" }),
-        credentials: expect.objectContaining({ apiKey: "mimo-key" }),
+        credentials: expect.objectContaining({ apiKey: "fresh-mimo-key" }),
       }));
+      expect(resolveProviderCredentialsFresh).toHaveBeenCalledWith("mimo");
+      expect(providerRegistry.getCredentials).not.toHaveBeenCalled();
+      expect(usageLedger.start).toHaveBeenCalledWith(expect.objectContaining({
+        model: expect.objectContaining({ provider: "mimo", modelId: "mimo-v2.5-asr" }),
+        usageContext: expect.objectContaining({
+          source: expect.objectContaining({ subsystem: "speech-recognition", operation: "transcribe" }),
+          attribution: expect.objectContaining({ kind: "session", sessionPath }),
+        }),
+      }));
+      expect(usageLedger.finish).toHaveBeenCalledWith("speech-request-1", expect.any(Object));
       expect(sessionFiles.get(file.id, { sessionPath })?.transcription).toMatchObject({
         status: "ready",
         text: "今晚我们先把语音输入跑通。",
@@ -182,6 +214,7 @@ describe("SpeechRecognitionService", () => {
       };
       const service = new SpeechRecognitionService({
         providerRegistry,
+        resolveProviderCredentialsFresh: async providerId => providerRegistry.getCredentials(providerId),
         preferences: {
           getSpeechRecognitionConfig: () => ({
             enabled: true,
@@ -241,6 +274,7 @@ describe("SpeechRecognitionService", () => {
       };
       const service = new SpeechRecognitionService({
         providerRegistry: makeProviderRegistry(),
+        resolveProviderCredentialsFresh: resolveMimoCredentialsFresh,
         preferences: {
           getSpeechRecognitionConfig: () => ({
             enabled: true,
@@ -296,6 +330,7 @@ describe("SpeechRecognitionService", () => {
       };
       const service = new SpeechRecognitionService({
         providerRegistry: makeProviderRegistry(),
+        resolveProviderCredentialsFresh: resolveMimoCredentialsFresh,
         preferences: {
           getSpeechRecognitionConfig: () => ({
             enabled: true,
@@ -323,6 +358,7 @@ describe("SpeechRecognitionService", () => {
     const warn = vi.fn();
     const service = new SpeechRecognitionService({
       providerRegistry: makeProviderRegistry(),
+      resolveProviderCredentialsFresh: resolveMimoCredentialsFresh,
       preferences: {
         getSpeechRecognitionConfig: () => ({
           enabled: true,

@@ -22,6 +22,7 @@ import {
   retryImageTask,
 } from "./image-task-runner.ts";
 import { resolveMediaParameters } from "./media-parameters.ts";
+import { withModelRequestAccounting } from "../../lib/llm/model-request-accounting.ts";
 
 const log = createModuleLogger("media");
 const IMAGE_CAPABILITY = "image_generation";
@@ -275,6 +276,7 @@ export class UniversalMediaManager {
   declare _config: any;
   declare _dataDir: any;
   declare _generatedDir: any;
+  declare _getUsageLedger: any;
   declare _handlerCleanups: any;
   declare _legacyConfig: any;
   declare _log: any;
@@ -298,6 +300,8 @@ export class UniversalMediaManager {
     onProviderChanged,
     logger = log,
     builtinAdapters = [],
+    usageLedger = null,
+    getUsageLedger = null,
   }: any = {}) {
     if (!lingxiHome) throw new Error("UniversalMediaManager requires lingxiHome");
     if (!providerRegistry) throw new Error("UniversalMediaManager requires providerRegistry");
@@ -311,6 +315,7 @@ export class UniversalMediaManager {
     this._registerSessionFile = registerSessionFile;
     this._onProviderChanged = typeof onProviderChanged === "function" ? onProviderChanged : async () => {};
     this._log = logger;
+    this._getUsageLedger = typeof getUsageLedger === "function" ? getUsageLedger : () => usageLedger;
     // dataDir/schema id keep the "image-gen" name on purpose: SessionFile
     // records reference generated/ bytes by absolute filePath (including
     // media this native runtime generates every day), so renaming this
@@ -497,6 +502,7 @@ export class UniversalMediaManager {
       generatedDir: this._generatedDir,
       log: this._log,
       registerSessionFile: this._registerSessionFile,
+      usageLedger: this._getUsageLedger(),
     });
     this._registerBusHandlers(bus);
     this._poller.start();
@@ -580,6 +586,7 @@ export class UniversalMediaManager {
       generatedDir: this._generatedDir,
       config: this._config,
       videoConfig: this._createVideoConfigBridge(),
+      usageLedger: this._getUsageLedger(),
     };
   }
 
@@ -599,6 +606,7 @@ export class UniversalMediaManager {
       sessionPath,
       sessionRef,
       bridgeContext,
+      usageLedger: this._getUsageLedger(),
       _mediaGen: this.runtime,
     };
   }
@@ -738,7 +746,23 @@ export class UniversalMediaManager {
       ...(target?.credentialLaneId ? { credentialLaneId: target.credentialLaneId } : {}),
       ...(target?.credentialProviderId ? { credentialProviderId: target.credentialProviderId } : {}),
     };
-    const result = await adapter.submit(params, this._submitContextForAdapter(adapter));
+    const result = await withModelRequestAccounting({
+      usageLedger: this._getUsageLedger(),
+      model: {
+        provider: target.providerId,
+        modelId: target.modelId,
+        api: target.protocolId,
+      },
+      usageContext: {
+        source: { subsystem: "media", operation: "submit", surface: "tool", trigger: "user" },
+        attribution: {
+          kind: "session",
+          ...(sessionId ? { sessionId } : {}),
+          ...(sessionPath ? { sessionPath } : {}),
+        },
+      },
+      metadata: { mediaType: "video" },
+    }, () => adapter.submit(params, this._submitContextForAdapter(adapter)));
     if (!result?.taskId) throw new Error(t("toolDef.generateVideo.submitFailedUnknown"));
 
     this._store.add({

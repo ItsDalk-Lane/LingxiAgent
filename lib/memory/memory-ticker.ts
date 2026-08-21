@@ -29,7 +29,6 @@
 
 import fs from "fs";
 import path from "path";
-import crypto from "crypto";
 import { debugLog, createModuleLogger } from "../debug-log.ts";
 import {
   compileToday,
@@ -48,10 +47,6 @@ import { readCompiledResetAt } from "./compiled-memory-state.ts";
 import { listSessionFiles, readCurrentSessionBranch, sessionIdFromFilename } from "../session-jsonl.ts";
 import { isAgentPhoneSessionPath } from "../conversations/agent-phone-session.ts";
 import { buildSourceTimeRange } from "./time-context.ts";
-import { writeCacheSnapshotObservation } from "./cache-snapshot-observation.ts";
-import { runMemoryReflection as defaultRunMemoryReflection } from "./memory-reflection-runner.ts";
-import { validateRollingSummaryFormat } from "./rolling-summary-format.ts";
-import { CACHE_STRATEGIES } from "../llm/cache-strategy-contract.ts";
 import { atomicWriteSync } from "../../shared/safe-fs.ts";
 import { invalidateSessionDerivedStateSync } from "./session-derived-state.ts";
 import { createMemoryDreamRunner } from "./dream/runner.ts";
@@ -64,7 +59,6 @@ import {
 const log = createModuleLogger("memory-ticker");
 
 const TURNS_PER_SUMMARY = 10;   // 每隔多少轮触发一次滚动摘要
-const CACHE_SNAPSHOT_PREVIEW_LIMIT = 16_000;
 const DAILY_STATE_FILE = "daily-state.json";
 // v3：week 段 LLM 编译（compileWeek/compileLongterm-from-week）退役，
 // 换成 compileDaily（编译昨天）+ rollDailyWindow（滚出窗口的 daily fold 进
@@ -106,16 +100,13 @@ function dreamTickerError(code: DreamErrorCode, message: string, cause?: unknown
  * @param {function} [opts.getTimezone] - 返回用户配置时区
  * @param {(sessionPath: string) => object|null} [opts.getSessionBranchHeadForPath] - 读取持久化 branch head 元数据
  * @param {(sessionPath: string, options?: object) => object} [opts.readSessionBranchForPath] - 读取 manifest 选中的当前 branch
- * @param {function} [opts.getCacheSnapshotReflectionMode] - retired; runtime is hard-gated to off
  * @param {(sessionPath: string) => object|null} [opts.readMemoryReflectionSnapshot] - 返回 session 创建时冻结的记忆反思快照
  * @param {string} [opts.agentId] - 当前 agent id；启用 envChangeLedger 时也是 reminder 归属的必填项
- * @param {string} [opts.agentDir] - 当前 agent 数据目录，用于实验观察产物落盘
  * @param {import('../../core/env-change-ledger.ts').EnvChangeLedger} [opts.envChangeLedger] - 进程内环境变更台账
  */
 export function createMemoryTicker(opts) {
   const {
     agentId,
-    agentDir,
     summaryManager,
     factStore,
     getResolvedMemoryModel,
@@ -131,17 +122,12 @@ export function createMemoryTicker(opts) {
     isSessionMemoryEnabled,
     getTimezone,
     readMemoryReflectionSnapshot,
-    memoryReflectionRunner,
-    buildSessionCacheSnapshot,
-    ensureSessionLoaded,
-    getSessionStreamFn,
     getSessionIdForPath,
     getSessionBranchHeadForPath,
     readSessionBranchForPath,
     envChangeLedger,
     memoryDir = path.dirname(memoryMdPath),
   } = opts;
-  const _memoryReflectionRunner = memoryReflectionRunner || { runMemoryReflection: defaultRunMemoryReflection };
   let _aggregateCompileInFlight = 0;
   const _dreamRunner = createMemoryDreamRunner({
     memoryDir,
@@ -189,9 +175,6 @@ export function createMemoryTicker(opts) {
       ? projection.rootLineageHash
       : projection.prefixHashes?.[cursor.coveredLeafId];
     return lineageHash === cursor.lineageHash;
-  };
-  const _getCacheSnapshotReflectionMode = () => {
-    return "off";
   };
   const _factsSourcePath = () => {
     ensureEditableFactsBaseline(memoryDir, summaryManager, {
@@ -476,245 +459,6 @@ export function createMemoryTicker(opts) {
 
   // ── 内部：滚动摘要 ──
 
-  function _textPreview(text) {
-    const value = String(text || "");
-    return value.length > CACHE_SNAPSHOT_PREVIEW_LIMIT
-      ? value.slice(0, CACHE_SNAPSHOT_PREVIEW_LIMIT)
-      : value;
-  }
-
-  function _sha256(text) {
-    if (!text) return "";
-    return crypto.createHash("sha256").update(String(text)).digest("hex");
-  }
-
-  function _readMemoryMdPreview() {
-    try {
-      return _textPreview(fs.readFileSync(memoryMdPath, "utf-8"));
-    } catch (err) {
-      if (err?.code === "ENOENT") return "";
-      throw err;
-    }
-  }
-
-  function _firstNumber(...values) {
-    for (const value of values) {
-      const n = Number(value);
-      if (Number.isFinite(n)) return n;
-    }
-    return 0;
-  }
-
-  function _observationUsage(usage, resolvedModel, latencyMs) {
-    return {
-      model: String(resolvedModel?.model?.id || resolvedModel?.id || resolvedModel?.model || ""),
-      cachedTokens: _firstNumber(
-        usage?.cachedTokens,
-        usage?.cacheReadTokens,
-        usage?.cache?.readTokens,
-      ),
-      missTokens: _firstNumber(
-        usage?.missTokens,
-        usage?.cacheMissTokens,
-        usage?.cache?.missTokens,
-        usage?.input?.uncachedTokens,
-      ),
-      latencyMs,
-    };
-  }
-
-  function _requestModelDiagnostics(model) {
-    if (!model || typeof model !== "object" || Array.isArray(model)) return null;
-    return {
-      id: String(model.id || model.model || ""),
-      provider: String(model.provider || ""),
-      api: String(model.api || ""),
-      hasBaseUrl: Boolean(model.baseUrl || model.base_url),
-      hasQuirks: Array.isArray(model.quirks),
-    };
-  }
-
-  function _errorDiagnostics(err, requestModel) {
-    return {
-      errorName: String(err?.name || ""),
-      stack: typeof err?.stack === "string" ? err.stack.split("\n").slice(0, 4) : [],
-      requestModel: _requestModelDiagnostics(requestModel),
-    };
-  }
-
-  function _isRecoverableSessionSnapshotUnavailable(err) {
-    const message = String(err?.message || err || "");
-    if (/session cache snapshot unavailable/i.test(message)) return true;
-    return /snapshot/i.test(message) && /unknown session/i.test(message);
-  }
-
-  async function _buildSessionCacheSnapshotWithRecovery(sessionPath, options) {
-    try {
-      return buildSessionCacheSnapshot(sessionPath, options);
-    } catch (err) {
-      if (!_isRecoverableSessionSnapshotUnavailable(err) || typeof ensureSessionLoaded !== "function") {
-        throw err;
-      }
-      debugLog()?.warn?.(
-        "memory",
-        `cache snapshot runtime missing for ${path.basename(sessionPath)}; loading session before retry`,
-      );
-      try {
-        await ensureSessionLoaded(sessionPath);
-        return buildSessionCacheSnapshot(sessionPath, options);
-      } catch (retryErr) {
-        if (_isRecoverableSessionSnapshotUnavailable(retryErr)) throw retryErr;
-        const wrapped: any = new Error(`Session cache snapshot unavailable after runtime recovery: ${retryErr?.message || retryErr}`);
-        wrapped.cause = retryErr;
-        throw wrapped;
-      }
-    }
-  }
-
-  async function _runSessionSnapshotMemoryReflection({
-    sessionPath,
-    sessionId,
-    messages,
-    resolvedModel,
-    rollingOptions,
-    mode,
-    trigger,
-  }) {
-    const startedAt = Date.now();
-    let baseMemoryMd = "";
-    let requestModel = null;
-    try {
-      baseMemoryMd = _readMemoryMdPreview();
-    } catch (err) {
-      debugLog()?.error("memory", `cache snapshot memory.md preview failed: ${err?.message || err}`);
-    }
-    try {
-      if (!agentDir) {
-        throw new Error("agentDir is required for cache snapshot reflection observation");
-      }
-      if (typeof _memoryReflectionRunner.runMemoryReflection !== "function") {
-        throw new Error("memoryReflectionRunner.runMemoryReflection is required for session snapshot reflection");
-      }
-      if (typeof buildSessionCacheSnapshot !== "function") {
-        throw new Error("buildSessionCacheSnapshot is required for session snapshot reflection");
-      }
-
-      const snapshot = await _buildSessionCacheSnapshotWithRecovery(sessionPath, {
-        reason: "memory.reflection",
-        messages,
-      });
-      const previousSummary = summaryManager.getSummary?.(sessionId)?.summary || "";
-      requestModel = snapshot.requestModel || snapshot.model || resolvedModel?.model || resolvedModel;
-      const reflection = await _memoryReflectionRunner.runMemoryReflection({
-        snapshot,
-        model: requestModel,
-        cacheKeyParams: snapshot.cacheKeyParams || {},
-        previousSummary,
-        sessionId,
-        messages,
-        sourceTimeRange: buildSourceTimeRange(messages, { timeZone: rollingOptions.timeZone }),
-        timeZone: rollingOptions.timeZone,
-        streamFn: getSessionStreamFn?.(sessionPath),
-        options: {
-          ...(snapshot.cacheKeyParams?.thinkingLevel && snapshot.cacheKeyParams.thinkingLevel !== "off"
-            ? { reasoning: snapshot.cacheKeyParams.thinkingLevel }
-            : {}),
-          toolChoice: "none",
-        },
-        usageLedger: resolvedModel?.usageLedger,
-        usageContext: {
-          source: {
-            subsystem: "memory",
-            operation: "cache_snapshot_reflection",
-            surface: "system",
-            trigger,
-          },
-          attribution: {
-            kind: "memory",
-            agentId: agentId || resolvedModel?.usageAgentId || null,
-          },
-        },
-      });
-      const metadata = reflection?.metadata || {};
-      const strictSessionSnapshot = metadata.cacheStrategy === CACHE_STRATEGIES.SESSION_SNAPSHOT && metadata.strict === true;
-
-      if (!strictSessionSnapshot) {
-        const err: any = new Error("Cache snapshot memory write requires a strict session_snapshot result");
-        err.cacheMetadata = metadata;
-        throw err;
-      }
-
-      if (mode === "write" && reflection?.data) {
-        // 写入前结构校验（#1628）：reflection runner 是可注入依赖，落盘边界
-        // 不信任上游；不满足 compileFacts 提取假设的摘要禁止覆盖旧摘要。
-        const formatValidation = validateRollingSummaryFormat(String(reflection.data.summary || ""));
-        if (!formatValidation.ok) {
-          const err: any = new Error(
-            `cache snapshot reflection summary violates the rolling summary format: ${formatValidation.issues.join("; ")}`,
-          );
-          err.cacheMetadata = metadata;
-          throw err;
-        }
-        summaryManager.saveSummary(sessionId, reflection.data);
-      }
-
-      const observation = writeCacheSnapshotObservation(agentDir, {
-        agentId: agentId || resolvedModel?.usageAgentId || path.basename(agentDir),
-        sessionPath,
-        trigger,
-        mode,
-        status: "success",
-        reason: reflection?.reason || "",
-        usage: _observationUsage(reflection?.usage, requestModel, Date.now() - startedAt),
-        summaryPreview: _textPreview(reflection?.summary || ""),
-        memoryMdPreview: baseMemoryMd,
-        baseMemoryMdHash: _sha256(baseMemoryMd),
-        cacheStrategy: metadata.cacheStrategy,
-        strict: metadata.strict === true,
-        cachePrefixHash: metadata.cachePrefixHash || "",
-        parentCachePrefixHash: metadata.parentCachePrefixHash || "",
-        contractDiffs: metadata.contractDiffs || [],
-        degradeReason: metadata.degradeReason || "",
-      });
-      _markSuccess("cacheSnapshotReflection");
-      return observation.summaryPreview;
-    } catch (err) {
-      const metadata = err?.cacheMetadata || {};
-      _markFailure("cacheSnapshotReflection", err);
-      if (err?.stack) {
-        debugLog()?.error("memory", `cache snapshot reflection stack: ${err.stack}`);
-      }
-      try {
-        if (agentDir) {
-          writeCacheSnapshotObservation(agentDir, {
-            agentId: agentId || resolvedModel?.usageAgentId || path.basename(agentDir),
-            sessionPath,
-            trigger,
-            mode,
-            status: "failed",
-            reason: err?.message || String(err),
-            usage: _observationUsage(null, resolvedModel, Date.now() - startedAt),
-            summaryPreview: "",
-            memoryMdPreview: baseMemoryMd,
-            baseMemoryMdHash: _sha256(baseMemoryMd),
-            cacheStrategy: metadata.cacheStrategy || CACHE_STRATEGIES.CACHE_RECOVERY,
-            strict: metadata.strict === true,
-            cachePrefixHash: metadata.cachePrefixHash || "",
-            parentCachePrefixHash: metadata.parentCachePrefixHash || "",
-            contractDiffs: metadata.contractDiffs || [],
-            degradeReason: metadata.degradeReason || err?.message || String(err),
-            diagnostics: _errorDiagnostics(err, requestModel),
-          });
-        }
-      } catch (writeErr) {
-        debugLog()?.error("memory", `cache snapshot observation write failed: ${writeErr?.message || writeErr}`);
-      }
-      _logStepError(`cache snapshot reflection (${path.basename(sessionPath)})`, err);
-      if (mode === "write") throw err;
-      return "";
-    }
-  }
-
   async function _doRollingSummary(sessionPath, trigger = "threshold") {
     const sessionId = _sessionIdentityForPath(sessionPath);
     if (_summaryInProgress.has(sessionId)) return; // 并发保护
@@ -737,62 +481,28 @@ export function createMemoryTicker(opts) {
         rollingOptions.memoryReflectionSnapshot = memoryReflectionSnapshot;
       }
       const resolvedModel = await getResolvedMemoryModel();
-      const cacheSnapshotMode = _getCacheSnapshotReflectionMode();
-      let summaryResult = null;
-      if (cacheSnapshotMode === "write") {
-        try {
-          await _runSessionSnapshotMemoryReflection({
-            sessionPath,
-            sessionId,
-            messages,
-            resolvedModel,
-            rollingOptions,
-            mode: "write",
-            trigger,
-          });
-        } catch (err) {
-          if (!_isRecoverableSessionSnapshotUnavailable(err)) throw err;
-          debugLog()?.warn?.(
-            "memory",
-            `cache snapshot unavailable for ${path.basename(sessionPath)}; falling back to rolling summary`,
-          );
-          summaryResult = await summaryManager.rollingSummary(sessionId, messages, resolvedModel, rollingOptions);
-        }
-      } else {
-        summaryResult = await summaryManager.rollingSummary(
-          sessionId,
-          messages,
-          resolvedModel,
-          rollingOptions,
-        );
-        if (summaryResult?.reason === "branch_changed") {
-          throw new Error("session branch changed while rebuilding its memory summary");
-        }
-        if (summaryResult?.mode === "replace" && !summaryResult?.data) {
-          throw new Error(`branch memory replacement was not committed (${summaryResult?.reason || "unknown"})`);
-        }
+      const summaryResult = await summaryManager.rollingSummary(
+        sessionId,
+        messages,
+        resolvedModel,
+        rollingOptions,
+      );
+      if (summaryResult?.reason === "branch_changed") {
+        throw new Error("session branch changed while rebuilding its memory summary");
+      }
+      if (summaryResult?.mode === "replace" && !summaryResult?.data) {
+        throw new Error(`branch memory replacement was not committed (${summaryResult?.reason || "unknown"})`);
+      }
+      if (summaryManager.getSummary(sessionId)?.factReplacementRequired === true) {
+        await processDirtySessions(summaryManager, factStore, resolvedModel, {
+          since: resetAt,
+          timeZone: _getTimezone(),
+          getSourceTimeRange: _createSourceTimeRangeResolver(),
+          getCurrentBranchProjection: () => _readSessionBranch(sessionPath),
+          sessionIds: [sessionId],
+        });
         if (summaryManager.getSummary(sessionId)?.factReplacementRequired === true) {
-          await processDirtySessions(summaryManager, factStore, resolvedModel, {
-            since: resetAt,
-            timeZone: _getTimezone(),
-            getSourceTimeRange: _createSourceTimeRangeResolver(),
-            getCurrentBranchProjection: () => _readSessionBranch(sessionPath),
-            sessionIds: [sessionId],
-          });
-          if (summaryManager.getSummary(sessionId)?.factReplacementRequired === true) {
-            throw new Error("branch fact replacement remains pending");
-          }
-        }
-        if (cacheSnapshotMode === "shadow") {
-          await _runSessionSnapshotMemoryReflection({
-            sessionPath,
-            sessionId,
-            messages,
-            resolvedModel,
-            rollingOptions,
-            mode: "shadow",
-            trigger,
-          });
+          throw new Error("branch fact replacement remains pending");
         }
       }
       debugLog()?.log("memory", `rolling summary updated: ${sessionId.slice(0, 8)}...`);
@@ -807,9 +517,6 @@ export function createMemoryTicker(opts) {
     } catch (err) {
       _markFailure("rollingSummary", err);
       _logStepError(`滚动摘要 (${path.basename(sessionPath)})`, err);
-      if (trigger === "manual" && _getCacheSnapshotReflectionMode() === "write") {
-        throw err;
-      }
       return { ok: false, error: err };
     } finally {
       _summaryInProgress.delete(sessionId);

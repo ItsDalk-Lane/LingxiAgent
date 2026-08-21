@@ -4,6 +4,16 @@ import {
   normalizeProviderBaseUrlForApi,
   probeProvider,
 } from "../lib/llm/provider-client.ts";
+import { createTemporaryProviderCredentialBoundary } from "../core/temporary-provider-credential-boundary.ts";
+
+function probeCredentialBoundary(providerId = "opencode") {
+  return createTemporaryProviderCredentialBoundary({
+    providerId,
+    source: "request-draft",
+    operation: "connectivity-probe",
+    apiKey: "test-key",
+  });
+}
 
 afterEach(() => {
   vi.unstubAllGlobals();
@@ -77,17 +87,32 @@ describe("provider connectivity probe", () => {
       return new Response("{}", { status: 200, headers: { "Content-Type": "application/json" } });
     });
     vi.stubGlobal("fetch", fetchMock);
+    const usageLedger = {
+      start: vi.fn(() => ({ requestId: "provider-probe-1" })),
+      finish: vi.fn(),
+      recordError: vi.fn(),
+    };
 
     await expect(probeProvider({
+      providerId: "opencode",
       baseUrl: "https://opencode.ai/zen/v1/messages",
       api: "anthropic-messages",
-      apiKey: "test-key",
+      credentialBoundary: probeCredentialBoundary(),
       modelId: "claude-sonnet-4-6",
+      usageLedger,
+      usageContext: {
+        source: { subsystem: "provider-management", operation: "connectivity-probe", surface: "settings", trigger: "user" },
+        attribution: { kind: "provider", providerId: "opencode" },
+      },
     })).resolves.toEqual({ ok: true, status: 200 });
     expect(fetchMock).toHaveBeenCalledWith(
       "https://opencode.ai/zen/v1/messages",
       expect.any(Object),
     );
+    expect(usageLedger.start).toHaveBeenCalledWith(expect.objectContaining({
+      model: { provider: "opencode", modelId: "claude-sonnet-4-6", api: "anthropic-messages" },
+    }));
+    expect(usageLedger.finish).toHaveBeenCalledWith("provider-probe-1", expect.any(Object));
   });
 
   it("rejects 404 HTML instead of treating it as connectivity success", async () => {
@@ -98,9 +123,10 @@ describe("provider connectivity probe", () => {
     })));
 
     await expect(probeProvider({
+      providerId: "opencode",
       baseUrl: "https://opencode.ai/zen",
       api: "anthropic-messages",
-      apiKey: "test-key",
+      credentialBoundary: probeCredentialBoundary(),
       modelId: "claude-sonnet-4-6",
     })).resolves.toEqual({
       ok: false,

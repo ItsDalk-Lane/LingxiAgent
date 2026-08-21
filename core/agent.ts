@@ -123,8 +123,6 @@ export class Agent {
   declare _onInstallCallback: any;
   declare _pinnedMemoryTools: any;
   declare _repairState: any;
-  declare _resolveModel: any;
-  declare _resolveModelFresh: any;
   declare _runtimeInitialized: any;
   declare _searchConfigResolver: any;
   declare _sessionFoldersTool: any;
@@ -318,9 +316,7 @@ export class Agent {
 
   async init(
     log: (msg?: string) => void = () => {},
-    sharedModels: any = {},
-    resolveModel = null,
-    resolveModelFresh = null,
+    _sharedModels: any = {},
   ) {
     if (this._runtimeInitialized) return;
 
@@ -398,10 +394,6 @@ export class Agent {
     //   memory_model 未配置   → fallback 到目标 agent 的 chat
     //   两者皆无              → resolver 返回 null，tick 时报告 memory unavailable
     // 因此即使 chat=null 但 memory_model 有效（Case M-2），ticker 仍要创建。
-
-    // 保存解析函数：每次 tick 现场调用，拿到最新凭证。
-    this._resolveModel = resolveModel || null;
-    this._resolveModelFresh = resolveModelFresh || null;
 
     // 启动时试探性探测 memory slot，只为打一条启动告警。
     // 探测的是 memory slot（由 resolver 决定最终模型），不是 chat。

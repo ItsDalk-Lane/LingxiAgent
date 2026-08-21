@@ -1,6 +1,11 @@
 export const id = "jimeng-cli";
 export const displayName = "即梦 CLI";
 export const authType = "none";
+export const externalCredentialBoundary = {
+  id: "dreamina-cli-login",
+  kind: "external-cli",
+  operations: ["check-auth", "submit", "query"],
+};
 
 // Provider identity is static, while models and mode schemas are discovered
 // from the locally installed dreamina executable at runtime. Empty declarations

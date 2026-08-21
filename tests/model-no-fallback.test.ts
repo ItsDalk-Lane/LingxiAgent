@@ -359,9 +359,9 @@ describe("模型选择无 fallback", () => {
     });
   });
 
-  // ────── resolveModelWithCredentials ──────
+  // ────── resolveModelForValidation ──────
 
-  describe("resolveModelWithCredentials", () => {
+  describe("resolveModelForValidation", () => {
     let ModelManager;
 
     beforeEach(async () => {
@@ -378,64 +378,36 @@ describe("模型选择无 fallback", () => {
         contextWindow: 262144,
       };
       mm._availableModels = [fullModel];
-      mm.providerRegistry = {
-        getCredentials: vi.fn((provider) => (
-          provider === "kimi-coding"
-            ? {
-                api: "anthropic-messages",
-                apiKey: "sk-test",
-                baseUrl: "https://api.kimi.com/coding/",
-              }
-            : null
-        )),
-      };
-
-      const result = mm.resolveModelWithCredentials({
+      const result = mm.resolveModelForValidation({
         id: "kimi-k2.6",
         provider: "kimi-coding",
       });
 
-      expect(result.model).toBe(fullModel);
-      expect(result.model.input).toEqual(["text", "image"]);
+      expect(result).toBe(fullModel);
+      expect(result.input).toEqual(["text", "image"]);
     });
 
-    it("provider 声明无须 key 时，远程 baseUrl 也能解析执行凭证", () => {
+    it("同步校验不会读取 Provider 凭据", () => {
       const mm = new ModelManager({ lingxiHome: tempDir });
       const fullModel = {
         id: "llama3",
         provider: "ollama",
         input: ["text"],
       };
-      const allowsMissingApiKey = vi.fn(() => true);
+      const getCredentials = vi.fn();
       mm._availableModels = [fullModel];
-      mm.providerRegistry = {
-        getCredentials: vi.fn((provider) => (
-          provider === "ollama"
-            ? {
-                api: "openai-completions",
-                apiKey: "",
-                baseUrl: "http://192.168.1.20:11434/v1",
-              }
-            : null
-        )),
-        allowsMissingApiKey,
-      };
+      mm.providerRegistry = { getCredentials };
 
-      const result = mm.resolveModelWithCredentials({
+      const result = mm.resolveModelForValidation({
         id: "llama3",
         provider: "ollama",
       });
 
-      expect(result.model).toBe(fullModel);
-      expect(result.api_key).toBe("");
-      expect(result.base_url).toBe("http://192.168.1.20:11434/v1");
-      expect(allowsMissingApiKey).toHaveBeenCalledWith(
-        "ollama",
-        "http://192.168.1.20:11434/v1",
-      );
+      expect(result).toBe(fullModel);
+      expect(getCredentials).not.toHaveBeenCalled();
     });
 
-    it("uses the model API even when the provider-wide API is empty", () => {
+    it("保留模型自身的协议元数据", () => {
       const mm = new ModelManager({ lingxiHome: tempDir });
       const fullModel = {
         id: "gpt-5.6-sol",
@@ -443,15 +415,7 @@ describe("模型选择无 fallback", () => {
         api: "openai-responses",
       };
       mm._availableModels = [fullModel];
-      mm.providerRegistry = {
-        getCredentials: vi.fn(() => ({
-          api: "",
-          apiKey: "sk-test",
-          baseUrl: "https://api.openai.com/v1",
-        })),
-      };
-
-      expect(mm.resolveModelWithCredentials(fullModel).api).toBe("openai-responses");
+      expect(mm.resolveModelForValidation(fullModel).api).toBe("openai-responses");
     });
   });
 

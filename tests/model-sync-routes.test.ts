@@ -302,12 +302,8 @@ describe("model sync related routes", () => {
       getSharedModels: vi.fn(() => ({ vision: null })),
       getSearchConfig: vi.fn(() => ({ provider: null, api_key: null })),
       getUtilityApi: vi.fn(() => ({ provider: null, base_url: null, api_key: null })),
-      resolveModelWithCredentials: vi.fn(() => ({
-        model: { id: "qwen-vl", provider: "dashscope", input: ["text", "image"] },
-        provider: "dashscope",
-        api: "openai-completions",
-        api_key: "sk-test",
-        base_url: "https://example.test/v1",
+      resolveModelForValidation: vi.fn(() => ({
+        id: "qwen-vl", provider: "dashscope", input: ["text", "image"],
       })),
       setSharedModels: vi.fn(),
       setSearchConfig: vi.fn(),
@@ -328,7 +324,7 @@ describe("model sync related routes", () => {
     });
 
     expect(res.status).toBe(200);
-    expect(engine.resolveModelWithCredentials).toHaveBeenCalledWith({
+    expect(engine.resolveModelForValidation).toHaveBeenCalledWith({
       id: "qwen-vl",
       provider: "dashscope",
     });
@@ -345,12 +341,8 @@ describe("model sync related routes", () => {
       getSharedModels: vi.fn(() => ({ vision: null })),
       getSearchConfig: vi.fn(() => ({ provider: null, api_key: null })),
       getUtilityApi: vi.fn(() => ({ provider: null, base_url: null, api_key: null })),
-      resolveModelWithCredentials: vi.fn(() => ({
-        model: { id: "deepseek-chat", provider: "deepseek", input: ["text"] },
-        provider: "deepseek",
-        api: "openai-completions",
-        api_key: "sk-test",
-        base_url: "https://example.test/v1",
+      resolveModelForValidation: vi.fn(() => ({
+        id: "deepseek-chat", provider: "deepseek", input: ["text"],
       })),
       setSharedModels: vi.fn(),
       setSearchConfig: vi.fn(),
@@ -562,18 +554,13 @@ describe("model sync related routes", () => {
         vision_enabled: true,
         vision: { id: "qwen-vl", provider: "dashscope" },
       })),
-      resolveModelWithCredentials: vi.fn(() => ({
-        model: {
-          id: "qwen-vl",
-          provider: "dashscope",
-          name: "Qwen VL",
-          input: ["text", "image"],
-        },
+      resolveModelForValidation: vi.fn(() => ({
+        id: "qwen-vl",
         provider: "dashscope",
-        api: "openai-completions",
-        api_key: "sk-test-secret",
-        base_url: "https://dashscope.example/v1",
+        name: "Qwen VL",
+        input: ["text", "image"],
       })),
+      resolveModelWithCredentials: vi.fn(() => { throw new Error("sync credentials must not be read"); }),
     };
 
     app.route("/api", createModelsRoute(engine));
@@ -593,6 +580,8 @@ describe("model sync related routes", () => {
     });
     expect(JSON.stringify(data)).not.toContain("sk-test-secret");
     expect(JSON.stringify(data)).not.toContain("dashscope.example");
+    expect(engine.resolveModelForValidation).toHaveBeenCalledWith({ id: "qwen-vl", provider: "dashscope" });
+    expect(engine.resolveModelWithCredentials).not.toHaveBeenCalled();
   });
 
   it("auxiliary vision route reports text-only configured models as unavailable", async () => {
@@ -606,10 +595,12 @@ describe("model sync related routes", () => {
         vision_enabled: true,
         vision: { id: "deepseek-chat", provider: "deepseek" },
       })),
-      resolveModelWithCredentials: vi.fn(() => ({
-        model: { id: "deepseek-chat", provider: "deepseek", input: ["text"] },
+      resolveModelForValidation: vi.fn(() => ({
+        id: "deepseek-chat",
         provider: "deepseek",
+        input: ["text"],
       })),
+      resolveModelWithCredentials: vi.fn(() => { throw new Error("sync credentials must not be read"); }),
     };
 
     app.route("/api", createModelsRoute(engine));
@@ -625,6 +616,7 @@ describe("model sync related routes", () => {
       unavailableReason: "model_without_image_input",
       model: { id: "deepseek-chat", provider: "deepseek" },
     });
+    expect(engine.resolveModelWithCredentials).not.toHaveBeenCalled();
   });
 
   it("model health accepts explicit model refs and uses the utility LLM path", async () => {
@@ -1018,12 +1010,19 @@ describe("model sync related routes", () => {
     expect(res.status).toBe(200);
     expect(resolveProviderCredentialsFresh).toHaveBeenCalledWith("oauth-provider");
     expect(resolveProviderCredentials).not.toHaveBeenCalled();
-    expect(probeProvider).toHaveBeenCalledWith({
+    expect(probeProvider).toHaveBeenCalledWith(expect.objectContaining({
+      providerId: "oauth-provider",
       baseUrl: "https://fresh.example/v1",
       api: "openai-completions",
-      apiKey: "fresh-token",
-      headers: {},
-    });
+      credentialBoundary: expect.objectContaining({ consume: expect.any(Function) }),
+      usageContext: expect.objectContaining({
+        source: expect.objectContaining({ operation: "connectivity-probe" }),
+      }),
+    }));
+    expect(probeProvider.mock.calls[0][0].credentialBoundary.consume({
+      providerId: "oauth-provider",
+      operation: "connectivity-probe",
+    })).toEqual({ apiKey: "fresh-token", headers: {} });
   });
 
   it("provider connection test probes a configured model matching the active protocol", async () => {
@@ -1055,13 +1054,16 @@ describe("model sync related routes", () => {
     });
 
     expect(res.status).toBe(200);
-    expect(probeProvider).toHaveBeenCalledWith({
+    expect(probeProvider).toHaveBeenCalledWith(expect.objectContaining({
+      providerId: "opencode",
       baseUrl: "https://opencode.ai/zen",
       api: "anthropic-messages",
-      apiKey: "zen-key",
-      headers: {},
+      credentialBoundary: expect.objectContaining({ consume: expect.any(Function) }),
       modelId: "claude-sonnet-4-6",
-    });
+      usageContext: expect.objectContaining({
+        attribution: { kind: "provider", providerId: "opencode" },
+      }),
+    }));
   });
 
   it("provider connection test treats explicit body headers as the only credentials", async () => {
@@ -1095,13 +1097,21 @@ describe("model sync related routes", () => {
 
     expect(resolveProviderCredentialsFresh).not.toHaveBeenCalled();
     expect(resolveProviderCredentials).not.toHaveBeenCalled();
-    expect(probeProvider).toHaveBeenCalledWith({
+    expect(probeProvider).toHaveBeenCalledWith(expect.objectContaining({
+      providerId: "oauth-provider",
       baseUrl: "https://entry.example/v1",
       api: "openai-completions",
-      apiKey: "",
-      headers: { Authorization: "Bearer explicit-header-token" },
-    });
+      credentialBoundary: expect.objectContaining({ consume: expect.any(Function) }),
+      usageContext: expect.objectContaining({
+        source: expect.objectContaining({ subsystem: "provider-management" }),
+      }),
+    }));
     expect(JSON.stringify(probeProvider.mock.calls[0][0])).not.toContain("stale");
+    expect(JSON.stringify(probeProvider.mock.calls[0][0])).not.toContain("explicit-header-token");
+    expect(probeProvider.mock.calls[0][0].credentialBoundary.consume({
+      providerId: "oauth-provider",
+      operation: "connectivity-probe",
+    })).toEqual({ apiKey: "", headers: { Authorization: "Bearer explicit-header-token" } });
   });
 
   it("provider connection test never probes after fresh credential resolution fails", async () => {

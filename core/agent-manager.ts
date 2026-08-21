@@ -384,11 +384,7 @@ export class AgentManager {
     if (typeof ag.init !== "function") return ag;
 
     const sharedModels = this._d.getSharedModels?.() || {};
-    const resolveModel = (bareId) =>
-      this._d.getModels().resolveModelWithCredentials(bareId);
-    const resolveModelFresh = (bareId) =>
-      this._d.getModels().resolveModelWithCredentialsFresh(bareId);
-    await ag.init(task.log, sharedModels, resolveModel, resolveModelFresh);
+    await ag.init(task.log, sharedModels);
     this._d.getSkills()?.syncAgentSkills?.(ag);
     this._d.getHub()?.scheduler?.startAgentHeartbeat?.(task.agentId, ag);
     return ag;
@@ -764,12 +760,8 @@ export class AgentManager {
     // 初始化并加入长驻 Map
     const ag = this._createAgentInstance(agentId, () => ({}));
     ag.setGetOwnerIds(this._makeOwnerIdsFn(ag));
-    const resolveModel = (bareId) =>
-      this._d.getModels().resolveModelWithCredentials(bareId);
-    const resolveModelFresh = (bareId) =>
-      this._d.getModels().resolveModelWithCredentialsFresh(bareId);
     try {
-      await ag.init(() => {}, this._d.getSharedModels(), resolveModel, resolveModelFresh);
+      await ag.init(() => {}, this._d.getSharedModels());
     } catch (err) {
       // init 失败：回滚已创建的目录和频道状态，防止孤儿残留
       await this._rollbackAgentCreation(agentDir, agentId);

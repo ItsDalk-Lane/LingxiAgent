@@ -605,10 +605,11 @@ function authorizationResultFromFailure(failure: ReviewerFailure): Authorization
 export function createModelApprovalReviewer({
   resolveApprovalModel,
   callText,
+  getUsageLedger = null,
   timeoutMs = 15_000,
   maxTokens = 200,
 }: any = {}) {
-  return async (input: any): Promise<ReviewerAttemptResult> => {
+  return async (input: any, retry: any = null): Promise<ReviewerAttemptResult> => {
     if (typeof resolveApprovalModel !== "function") {
       return failureResult("reviewer_not_configured", 0);
     }
@@ -641,40 +642,31 @@ export function createModelApprovalReviewer({
     if (payloadStr.length > MAX_PAYLOAD_CHARS) {
       payloadStr = `${payloadStr.slice(0, MAX_PAYLOAD_CHARS)}...[truncated]`;
     }
-    let priorFormatFailure = "";
-    for (let attempt = 1; attempt <= 2; attempt += 1) {
-      const messages = [{ role: "user", content: payloadStr }];
-      if (priorFormatFailure) {
-        messages.push({ role: "user", content: FORMAT_CORRECTION_PROMPT });
-      }
-      let result: ReviewerAttemptResult;
-      try {
-        // §二十八 Deterministic classification: temperature 0, small token budget.
-        const text = await callText({
-          api: selected.api,
-          apiKey: selected.apiKey,
-          baseUrl: selected.baseUrl,
-          headers: selected.headers,
-          model: selected.model,
-          systemPrompt: REVIEWER_SYSTEM_PROMPT,
-          messages,
-          temperature: 0,
-          maxTokens,
-          timeoutMs,
-          usageContext: "approval_reviewer_authorization",
-        });
-        result = parseReviewerOutput(text, attempt);
-      } catch (error) {
-        result = failureFromError(error, attempt, "call");
-      }
-      if (result.kind === "decision") return result;
-      if (attempt === 1 && FORMAT_FAILURE_CODES.has(result.reasonCode)) {
-        priorFormatFailure = result.reasonCode;
-        continue;
-      }
-      return result;
+    const attempt = retry?.attempt === 2 ? 2 : 1;
+    const messages = [{ role: "user", content: payloadStr }];
+    if (attempt === 2 && retry?.formatCorrection) {
+      messages.push({ role: "user", content: FORMAT_CORRECTION_PROMPT });
     }
-    return failureResult("reviewer_internal_error", 2);
+    try {
+      // 格式修正预算只由网关持有；工厂每次调用只产生一次外部请求。
+      const text = await callText({
+        api: selected.api,
+        apiKey: selected.apiKey,
+        baseUrl: selected.baseUrl,
+        headers: selected.headers,
+        model: selected.model,
+        systemPrompt: REVIEWER_SYSTEM_PROMPT,
+        messages,
+        temperature: 0,
+        maxTokens,
+        timeoutMs,
+        usageContext: "approval_reviewer_authorization",
+        usageLedger: typeof getUsageLedger === "function" ? getUsageLedger() : null,
+      });
+      return parseReviewerOutput(text, attempt);
+    } catch (error) {
+      return failureFromError(error, attempt, "call");
+    }
   };
 }
 

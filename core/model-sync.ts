@@ -8,7 +8,7 @@
 import fs from "fs";
 import { getPiModel } from "../lib/pi-sdk/index.ts";
 import { lookupKnown, lookupKnownProvider } from "../shared/known-models.ts";
-import { writeSecretFileSync } from "../shared/secret-fs.ts";
+import { SECRET_FILE_MODE, writeSecretFileSync } from "../shared/secret-fs.ts";
 import {
   getEndpointDefaultReasoningCapability,
   normalizeModelProtocolCompat,
@@ -537,7 +537,18 @@ export function syncModels(providers, opts: Record<string, any> = {}) {
   } catch {
     // 文件不存在，视为有变化
   }
-  if (oldStr === newStr) return false;
+  if (oldStr === newStr) {
+    if (process.platform !== "win32") {
+      let mode = null;
+      try {
+        mode = fs.statSync(modelsJsonPath).mode & 0o777;
+      } catch {
+        // 文件在读取后被移动时，让秘密写入器按正常保存路径重建或抛出原始错误。
+      }
+      if (mode !== SECRET_FILE_MODE) writeSecretFileSync(modelsJsonPath, newStr);
+    }
+    return false;
+  }
 
   // 原子写入：先写 tmp 文件，再 rename
   writeSecretFileSync(modelsJsonPath, newStr);

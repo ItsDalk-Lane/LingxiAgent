@@ -15,7 +15,7 @@ import {
 
 const DEFAULT_REPOSITORY = "ItsDalk-Lane/LingxiAgent";
 const DEFAULT_MODEL = "deepseek-v4-flash";
-const DEEPSEEK_RESPONSES_URL = "https://api.deepseek.com/responses";
+const DEFAULT_DEEPSEEK_BASE_URL = "https://api.deepseek.com";
 
 export function parseArgs(argv = process.argv.slice(2), env = process.env) {
   const args = {
@@ -213,19 +213,50 @@ function responseFailureDetail(payload) {
   return candidate;
 }
 
-export async function generateDigestWithDeepSeek(source, {
+function resolveResponsesUrl(baseUrl = DEFAULT_DEEPSEEK_BASE_URL) {
+  const normalized = String(baseUrl || DEFAULT_DEEPSEEK_BASE_URL).replace(/\/+$/, "");
+  const root = normalized.endsWith("/v1") ? normalized.slice(0, -3) : normalized;
+  return `${root}/responses`;
+}
+
+export async function resolveReleaseDigestCredentials({
   env = process.env,
+  lingxiHome,
+  createModelManager,
+} = {}) {
+  let factory = createModelManager;
+  if (typeof factory !== "function") {
+    const [{ ModelManager }, runtimePaths] = await Promise.all([
+      import("../core/model-manager.ts"),
+      import("../shared/hana-runtime-paths.cjs"),
+    ]);
+    const resolveLingxiHome = runtimePaths.resolveLingxiHome || runtimePaths.default?.resolveLingxiHome;
+    factory = options => new ModelManager(options);
+    lingxiHome ||= resolveLingxiHome(env.LINGXI_HOME);
+  }
+  if (!lingxiHome) {
+    throw new Error("Lingxi home is required to resolve release digest credentials");
+  }
+  const manager = factory({ lingxiHome });
+  await manager.init();
+  return manager.resolveProviderCredentialsFresh("deepseek");
+}
+
+export async function generateDigestWithDeepSeek(source, {
+  credentials,
   fetchImpl = fetch,
   model = DEFAULT_MODEL,
 } = {}) {
-  if (!env.DEEPSEEK_API_KEY) {
-    throw new Error("DEEPSEEK_API_KEY is required to generate release digest");
+  const apiKey = credentials?.api_key || credentials?.apiKey || "";
+  const credentialSource = credentials?.credential_source || credentials?.credentialSource || "";
+  if (!apiKey || !["provider-catalog", "auth-storage"].includes(credentialSource)) {
+    throw new Error("Explicit credentials from Lingxi Credential Service are required to generate release digest");
   }
 
-  const response = await fetchImpl(DEEPSEEK_RESPONSES_URL, {
+  const response = await fetchImpl(resolveResponsesUrl(credentials.base_url || credentials.baseUrl), {
     method: "POST",
     headers: {
-      Authorization: `Bearer ${env.DEEPSEEK_API_KEY}`,
+      Authorization: `Bearer ${apiKey}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
@@ -306,7 +337,11 @@ export async function appendDigestFileToHistoryFile(digestPath, historyPath) {
   return history;
 }
 
-export async function run(argv = process.argv.slice(2), { env = process.env, fetchImpl = fetch } = {}) {
+export async function run(argv = process.argv.slice(2), {
+  env = process.env,
+  fetchImpl = fetch,
+  resolveCredentials = resolveReleaseDigestCredentials,
+} = {}) {
   const args = parseArgs(argv, env);
   if (args.help) {
     printHelp();
@@ -331,8 +366,9 @@ export async function run(argv = process.argv.slice(2), { env = process.env, fet
     return;
   }
 
+  const credentials = await resolveCredentials({ env });
   const digest = await generateDigestWithDeepSeek(source, {
-    env,
+    credentials,
     fetchImpl,
     model: args.model,
   });

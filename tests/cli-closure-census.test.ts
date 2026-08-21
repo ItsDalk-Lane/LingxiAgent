@@ -11,6 +11,7 @@ import {
   computeCliRuntimeClosure,
   computeOpenBoundaryBaseline,
   normalizeNftTraceFiles,
+  normalizeSourceGraphMetafile,
   scanAndValidateDynamicCallSites,
   scanDynamicCallSites,
   traceSourceGraph,
@@ -49,6 +50,50 @@ describe("compute-cli-closure: fail-closed validation", () => {
 
   it("does not throw when every declared runtime asset exists", () => {
     expect(() => validateRuntimeAssets({ rootDir: REPOSITORY_ROOT })).not.toThrow();
+  });
+
+  it("maps source graph paths behind a shared node_modules symlink back into the worktree", () => {
+    const rootDir = fs.mkdtempSync(path.join(os.tmpdir(), "hana-closure-worktree-"));
+    const linkedRepository = fs.mkdtempSync(path.join(os.tmpdir(), "hana-closure-dependencies-"));
+    try {
+      const dependencyFile = path.join(linkedRepository, "node_modules", "fixture-package", "index.js");
+      const linkedWorkspaceFile = path.join(linkedRepository, "packages", "fixture-workspace", "index.ts");
+      const localWorkspaceFile = path.join(rootDir, "packages", "fixture-workspace", "index.ts");
+      fs.mkdirSync(path.dirname(dependencyFile), { recursive: true });
+      fs.mkdirSync(path.dirname(linkedWorkspaceFile), { recursive: true });
+      fs.mkdirSync(path.dirname(localWorkspaceFile), { recursive: true });
+      fs.writeFileSync(dependencyFile, "export const dependency = true;\n", "utf-8");
+      fs.writeFileSync(linkedWorkspaceFile, "export const workspace = true;\n", "utf-8");
+      fs.writeFileSync(localWorkspaceFile, "export const workspace = true;\n", "utf-8");
+      fs.symlinkSync(path.join(linkedRepository, "node_modules"), path.join(rootDir, "node_modules"), "dir");
+
+      const dependencyPath = path.relative(rootDir, dependencyFile);
+      const workspacePath = path.relative(rootDir, linkedWorkspaceFile);
+      const normalized = normalizeSourceGraphMetafile({
+        rootDir,
+        metafile: {
+          inputs: {
+            [dependencyPath]: {
+              bytes: 1,
+              imports: [{ path: workspacePath, kind: "import-statement", external: false }],
+              format: "esm",
+            },
+            [workspacePath]: { bytes: 1, imports: [], format: "esm" },
+          },
+          outputs: {},
+        },
+      });
+
+      expect(Object.keys(normalized.inputs).sort()).toEqual([
+        "node_modules/fixture-package/index.js",
+        "packages/fixture-workspace/index.ts",
+      ]);
+      expect(normalized.inputs["node_modules/fixture-package/index.js"].imports[0].path)
+        .toBe("packages/fixture-workspace/index.ts");
+    } finally {
+      fs.rmSync(rootDir, { recursive: true, force: true });
+      fs.rmSync(linkedRepository, { recursive: true, force: true });
+    }
   });
 
   it("keeps nft closure output stable whether a local native binding exists", () => {

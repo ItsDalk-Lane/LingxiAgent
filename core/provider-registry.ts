@@ -266,6 +266,24 @@ function normalizeCapabilities(plugin, entry) {
   return capabilities;
 }
 
+function normalizeExternalCredentialBoundary(value, providerId, authType) {
+  if (!isPlainObject(value)) {
+    throw new Error(`Invalid external credential boundary for provider "${providerId}"`);
+  }
+  const id = typeof value.id === "string" ? value.id.trim() : "";
+  const kind = value.kind;
+  const operations = Array.isArray(value.operations)
+    ? [...new Set(value.operations.filter((item) => typeof item === "string" && item.trim()).map((item) => item.trim()))]
+    : [];
+  if (!id || kind !== "external-cli" || operations.length === 0) {
+    throw new Error(`Invalid external credential boundary for provider "${providerId}"`);
+  }
+  if (authType !== "none") {
+    throw new Error(`External credential provider "${providerId}" must use authType "none"`);
+  }
+  return { id, kind, operations };
+}
+
 function getModelId(modelEntry) {
   return typeof modelEntry === "object" && modelEntry !== null ? modelEntry.id : modelEntry;
 }
@@ -490,6 +508,7 @@ const BUILTIN_PLUGINS = [
  *   Provider-owned per-model protocol/routing headers. Credential-bearing names are filtered from this lane.
  * @property {object} [capabilities]
  * @property {object} [runtime]
+ * @property {{id: string, kind: "external-cli", operations: string[]}} [externalCredentialBoundary]
  * @property {{providerId: string, config: import('../lib/pi-sdk/index.ts').SdkProviderRegistrationConfig}} [sdkProvider]
  * @property {object} [source]
  */
@@ -503,6 +522,7 @@ const BUILTIN_PLUGINS = [
  * @property {string} api            - 生效的 API 协议
  * @property {string} [authJsonKey]
  * @property {boolean} isBuiltin     - 是否为内置插件
+ * @property {{id: string, kind: "external-cli", operations: string[]}} [externalCredentialBoundary]
  */
 
 /**
@@ -842,6 +862,13 @@ export class ProviderRegistry {
       authJsonKey: plugin.authJsonKey || plugin.id,
       isBuiltin,
       source: normalizeProviderSource(plugin, isBuiltin),
+      ...(plugin.externalCredentialBoundary ? {
+        externalCredentialBoundary: normalizeExternalCredentialBoundary(
+          plugin.externalCredentialBoundary,
+          plugin.id,
+          normalizeProviderAuthType(userConfig.auth_type || plugin.authType),
+        ),
+      } : {}),
       ...(runtime ? { runtime } : {}),
     };
     assertAllowedOAuthHttpBaseUrl(entry.id, entry.baseUrl, runtime);
@@ -1514,6 +1541,39 @@ export class ProviderRegistry {
   }
 
   // ── credential read + model CRUD ──────────────────────────────────────────
+
+  /**
+   * 给 Provider 所属插件签发外部凭证使用许可。许可只描述边界和用途，绝不携带秘密。
+   */
+  authorizeExternalCredentialUse(providerId, request: any = {}) {
+    const entry = this.get(providerId);
+    if (!entry) throw new Error(`Provider "${providerId}" not found`);
+    const boundary = entry.externalCredentialBoundary;
+    if (!boundary) {
+      throw new Error(`Provider "${providerId}" has no external credential boundary`);
+    }
+    const ownerPluginId = entry.source?.kind === "plugin" ? entry.source.pluginId : null;
+    if (!ownerPluginId || request.pluginId !== ownerPluginId) {
+      throw new Error(
+        `Plugin "${request.pluginId || "unknown"}" cannot authorize external credentials for provider "${providerId}"`,
+      );
+    }
+    if (request.boundaryId !== boundary.id) {
+      throw new Error(`External credential boundary mismatch for provider "${providerId}"`);
+    }
+    if (!boundary.operations.includes(request.operation)) {
+      throw new Error(
+        `External credential operation "${request.operation || "unknown"}" is not allowed for provider "${providerId}"`,
+      );
+    }
+    return {
+      providerId: entry.id,
+      boundaryId: boundary.id,
+      kind: boundary.kind,
+      operation: request.operation,
+      credentialSource: "external",
+    };
+  }
 
   /**
    * 读取 provider 的凭证信息（apiKey, baseUrl, api）

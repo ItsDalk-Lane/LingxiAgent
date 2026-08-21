@@ -413,16 +413,6 @@ describe("ModelManager AuthStorage ownership", () => {
       baseUrl: "https://api.kimi.com/coding/v1",
     });
 
-    expect(manager.resolveModelWithCredentials({
-      id: "k3",
-      provider: "kimi-coding",
-    })).toMatchObject({
-      api: "openai-completions",
-      api_key: "sk-kimi",
-      base_url: "https://api.kimi.com/coding/v1",
-      credential_source: "provider-catalog",
-    });
-
     const resolved = await manager.resolveModelWithCredentialsFresh({
       id: "k3",
       provider: "kimi-coding",

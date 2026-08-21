@@ -439,7 +439,7 @@ describe("agent.systemPrompt: master / per-session 解耦", { timeout: AGENT_INI
       isChannelsEnabled: () => false,
     });
 
-    await agent.init(() => {}, {}, () => ({ id: "gpt-4", provider: "openai" }));
+    await agent.init(() => {}, {});
 
     expect(memoryTickerTickMock).not.toHaveBeenCalled();
     expect(scheduleMemoryMaintenance).toHaveBeenCalledWith("test-agent", "runtime-init");

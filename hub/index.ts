@@ -16,6 +16,7 @@ import path from "path";
 import fs from "fs";
 import crypto from "crypto";
 import { EventBus } from "./event-bus.ts";
+import { withModelRequestAccounting } from "../lib/llm/model-request-accounting.ts";
 import { ChannelRouter } from "./channel-router.ts";
 import { GuestHandler } from "./guest-handler.ts";
 import { Scheduler } from "./scheduler.ts";
@@ -47,6 +48,22 @@ function assertRuntimeMediaCapabilityOwner(providerRegistry, providerId, request
   if (caller.pluginId !== expectedPluginId) {
     throw new Error(
       `Plugin "${caller.pluginId}" cannot manage runtime media capabilities for provider "${providerId}"`,
+    );
+  }
+  return { pluginId: caller.pluginId };
+}
+
+function assertProviderPluginOwner(providerRegistry, providerId, requestContext) {
+  const caller = requestContext?.caller;
+  const expectedPluginId = providerRegistry.get?.(providerId)?.source?.pluginId;
+  if (
+    caller?.kind !== "plugin"
+    || typeof caller.pluginId !== "string"
+    || !expectedPluginId
+    || caller.pluginId !== expectedPluginId
+  ) {
+    throw new Error(
+      `Plugin "${caller?.pluginId || "unknown"}" cannot use external credentials for provider "${providerId}"`,
     );
   }
   return { pluginId: caller.pluginId };
@@ -726,6 +743,37 @@ export class Hub {
     }));
 
     // ── provider & agent handlers ──
+
+    this._sessionHandlerCleanups.push(bus.handle("provider:authorize-external-credential-use", async ({
+      providerId,
+      boundaryId,
+      operation,
+    }: any = {}, requestContext: any = null) => {
+      try {
+        const callerPluginId = requestContext?.caller?.kind === "plugin"
+          ? requestContext.caller.pluginId
+          : null;
+        const permit = await withModelRequestAccounting({
+          usageLedger: engine.usageLedger,
+          model: { provider: providerId, modelId: null, api: "external-cli" },
+          usageContext: {
+            source: { subsystem: "media", operation, surface: "plugin", trigger: "adapter" },
+            attribution: { kind: "external-boundary", providerId, pluginId: callerPluginId },
+          },
+          metadata: { boundaryId, operation },
+        }, async () => {
+          const owner = assertProviderPluginOwner(engine.providerRegistry, providerId, requestContext);
+          return engine.providerRegistry.authorizeExternalCredentialUse(providerId, {
+            boundaryId,
+            operation,
+            pluginId: owner.pluginId,
+          });
+        });
+        return { ok: true, permit };
+      } catch (err) {
+        return { ok: false, error: err?.message || String(err) };
+      }
+    }));
 
     this._sessionHandlerCleanups.push(bus.handle("provider:credentials", async ({ providerId, forceRefresh, staleApiKey }) => {
       if (typeof engine.resolveProviderCredentialsFresh !== "function") {

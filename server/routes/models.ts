@@ -142,9 +142,9 @@ function buildAuxiliaryVisionStatus(engine) {
     };
   }
 
-  let resolved = null;
+  let model = null;
   try {
-    resolved = engine.resolveModelWithCredentials?.(shared.vision) || null;
+    model = engine.resolveModelForValidation?.(shared.vision) || null;
   } catch {
     return {
       enabled: true,
@@ -155,24 +155,24 @@ function buildAuxiliaryVisionStatus(engine) {
     };
   }
 
-  const model = serializeAuxiliaryVisionModel(resolved?.model, shared.vision);
-  if (!resolved?.model) {
+  const serializedModel = serializeAuxiliaryVisionModel(model, shared.vision);
+  if (!model) {
     return {
       enabled: true,
       configured: true,
       available: false,
       unavailableReason: "model_not_found",
-      model,
+      model: serializedModel,
     };
   }
 
-  if (!modelSupportsImageInput(resolved.model)) {
+  if (!modelSupportsImageInput(model)) {
     return {
       enabled: true,
       configured: true,
       available: false,
       unavailableReason: "model_without_image_input",
-      model,
+      model: serializedModel,
     };
   }
 
@@ -181,7 +181,7 @@ function buildAuxiliaryVisionStatus(engine) {
     configured: true,
     available: true,
     unavailableReason: null,
-    model,
+    model: serializedModel,
   };
 }
 

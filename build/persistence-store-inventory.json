@@ -3443,6 +3443,15 @@
       "ordinal": 0
     },
     {
+      "sourceFile": "core/model-sync.ts",
+      "kind": "secret-write",
+      "excerpt": "writeSecretFileSync(modelsJsonPath, newStr)",
+      "reason": "Owns provider catalog, authentication, model compatibility, local provider plugin state, or the retention of their migration backups.",
+      "storeId": "provider-state",
+      "exemptionId": null,
+      "ordinal": 1
+    },
+    {
       "sourceFile": "core/mount-aware-file-service.ts",
       "kind": "mkdir",
       "excerpt": "fs.mkdirSync(rootPath, { recursive: true })",

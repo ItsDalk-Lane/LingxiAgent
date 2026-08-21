@@ -6,6 +6,7 @@ import {
   MediaModelEditValidationError,
   requireExistingMediaModel,
 } from "../shared/media-model-edit.ts";
+import { withModelRequestAccounting } from "../lib/llm/model-request-accounting.ts";
 
 const CAPABILITY = "speech_recognition";
 
@@ -39,28 +40,38 @@ export class SpeechRecognitionService {
   declare _emitEvent: any;
   declare _fetch: any;
   declare _logger: any;
+  declare _getUsageLedger: any;
   declare _prefs: any;
   declare _providers: any;
+  declare _resolveProviderCredentialsFresh: any;
   declare _registry: any;
   declare _sessionFiles: any;
   constructor({
     providerRegistry,
+    resolveProviderCredentialsFresh,
     preferences,
     sessionFiles,
     emitEvent,
     fetch,
     logger = log,
     adapters = builtinSpeechRecognitionAdapters,
+    usageLedger = null,
+    getUsageLedger = null,
   }: any = {}) {
     if (!providerRegistry) throw new Error("SpeechRecognitionService requires providerRegistry");
+    if (typeof resolveProviderCredentialsFresh !== "function") {
+      throw new Error("SpeechRecognitionService requires resolveProviderCredentialsFresh");
+    }
     if (!preferences) throw new Error("SpeechRecognitionService requires preferences");
     if (!sessionFiles) throw new Error("SpeechRecognitionService requires sessionFiles");
     this._providers = providerRegistry;
+    this._resolveProviderCredentialsFresh = resolveProviderCredentialsFresh;
     this._prefs = preferences;
     this._sessionFiles = sessionFiles;
     this._emitEvent = typeof emitEvent === "function" ? emitEvent : () => {};
     this._fetch = fetch;
     this._logger = logger;
+    this._getUsageLedger = typeof getUsageLedger === "function" ? getUsageLedger : () => usageLedger;
     this._registry = new MediaAdapterRegistry();
     for (const adapter of adapters || []) this.registerAdapter(adapter);
   }
@@ -216,15 +227,15 @@ export class SpeechRecognitionService {
     this._emitTranscriptionUpdate({ sessionId, sessionPath, sessionRef }, fileId, pending.transcription);
 
     try {
-      const credentialProviderId = target.credentialLane?.providerId || target.providerId;
-      const credentials = this._providers.getCredentials(credentialProviderId) || {};
-      const result = await adapter.transcribe({
+      const credentials = await this._resolveCredentialsFresh(target);
+      const result = await this._transcribeWithAccounting({
+        adapter,
         file,
-        provider: target.provider,
-        model: target.model,
+        target,
         credentials,
         language,
-        fetch: this._fetch,
+        sessionId,
+        sessionPath,
       });
       const ready = this._updateTranscription({ sessionId, sessionPath }, fileId, {
         status: "ready",
@@ -283,15 +294,15 @@ export class SpeechRecognitionService {
     this._emitTranscriptionUpdate({ sessionId, sessionPath, sessionRef }, fileId, pending.transcription);
 
     try {
-      const credentialProviderId = target.credentialLane?.providerId || target.providerId;
-      const credentials = this._providers.getCredentials(credentialProviderId) || {};
-      const result = await adapter.transcribe({
+      const credentials = await this._resolveCredentialsFresh(target);
+      const result = await this._transcribeWithAccounting({
+        adapter,
         file,
-        provider: target.provider,
-        model: target.model,
+        target,
         credentials,
         language,
-        fetch: this._fetch,
+        sessionId,
+        sessionPath,
       });
       const ready = this._updateTranscription({ sessionId, sessionPath }, fileId, {
         status: "ready",
@@ -320,6 +331,51 @@ export class SpeechRecognitionService {
 
   _updateTranscription(sessionRef, fileId, transcription) {
     return this._sessionFiles.updateTranscription(fileId, transcription, sessionRef);
+  }
+
+  async _resolveCredentialsFresh(target) {
+    const credentialProviderId = target.credentialLane?.providerId || target.providerId;
+    return this._resolveProviderCredentialsFresh(credentialProviderId);
+  }
+
+  async _transcribeWithAccounting({
+    adapter,
+    file,
+    target,
+    credentials,
+    language,
+    sessionId,
+    sessionPath,
+  }) {
+    return withModelRequestAccounting({
+      usageLedger: this._getUsageLedger(),
+      model: {
+        provider: target.providerId,
+        modelId: target.model.id,
+        api: target.model.protocolId,
+      },
+      usageContext: {
+        source: {
+          subsystem: "speech-recognition",
+          operation: "transcribe",
+          surface: "media",
+          trigger: "user",
+        },
+        attribution: {
+          kind: "session",
+          ...(sessionId ? { sessionId } : {}),
+          ...(sessionPath ? { sessionPath } : {}),
+        },
+      },
+      metadata: { capability: CAPABILITY },
+    }, () => adapter.transcribe({
+      file,
+      provider: target.provider,
+      model: target.model,
+      credentials,
+      language,
+      fetch: this._fetch,
+    }));
   }
 
   _emitTranscriptionUpdate(sessionRef, fileId, transcription) {
