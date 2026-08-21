@@ -7,7 +7,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = dcf3546adb3c41bbc32d4c2fd2899e3f28f47566  (最终验证所针对的源码树；2026-08-20 mac self-install 功能树后推进)
+VERIFIED_SOURCE_SHA   = b868889569fb4dbeef5deb7dcfee6c78fa9ac32e  (最终验证所针对的源码树；2026-08-21 凭证边界修复树后推进)
 工作分支              = feature/upstream-sync-0.447.4
 ```
 
@@ -191,6 +191,13 @@ seal 不是一次性终点，而是"当前被验证树"的游标；每次审计�
   全量测试 macos 1138 passed（旧坐标 fabd6dbf 下仅 post-verification-audit-seal 预期红）；
   windows 首轮暴露 defaultPendingDir 用例硬编码 POSIX 路径断言失败，改为 path.join 构造
   期望值（本地 52 tests 绿 + win32 路径语义一致）后推进。
+- **2026-08-21 凭证边界修复**（b868889569fb4dbeef5deb7dcfee6c78fa9ac32e）：全仓模型调用与
+  凭证边界断点修复（P0/P1/P2 12 风险项；53 files / +1692-829，含删除退役
+  core/execution-router.ts、新增 temporary-provider-credential-boundary 与
+  model-request-accounting、6 个新边界测试；审计/过程文档未入库）。验证：本地 typecheck×3
+  （绿）+ 新增 6 个边界测试 13 用例全绿 + 改动涉及 16 个核心测试文件 414 用例全绿 +
+  PR CI macos/windows 全量测试仅 post-verification-audit-seal 预期红（旧坐标 dcf3546a 下，
+  11599+ 用例绿）后推进。
 
 ## 最终状态：READY TO MERGE
 
@@ -198,10 +205,11 @@ seal 不是一次性终点，而是"当前被验证树"的游标；每次审计�
 - Disposition：ADOPTED 25 + ADAPTED 100 + REGENERATED 4 + INTENTIONAL_DIVERGENCE 4 = 133
   （脚本计算，`build-sync-matrix.mjs --check`：missing=0 / extra=0 / duplicate=0 / unknown=0）。
 - 4 个 `hanako.md → lingxi.md` 品牌映射统一分类为 ADAPTED。
-- `VERIFIED_SOURCE_SHA = dcf3546adb3c41bbc32d4c2fd2899e3f28f47566`：被完整测试验证的代码树
+- `VERIFIED_SOURCE_SHA = b868889569fb4dbeef5deb7dcfee6c78fa9ac32e`：被完整测试验证的代码树
   （含收口树 d4cf92a8 的全部验证 + 文档清场树复跑验证 + 归档修复树 051f6117 复跑的
   typecheck/lint/全量测试 + v0.1.29 release 树 fabd6dbf 复跑的 typecheck/目标套件 +
-  mac self-install 树 dcf3546a 的 PR CI typecheck/lint/build/全量测试，
+  mac self-install 树 dcf3546a 的 PR CI typecheck/lint/build/全量测试 +
+  凭证边界修复树 b8688895 的本地 typecheck/定向测试 + PR CI typecheck/lint/build/全量测试，
   见「Seal 推进记录」）。当前 HEAD 只比 VERIFIED_SOURCE_SHA 多审计收口内容。
 
 ### Post-verification diff 记录（`git diff --name-only VERIFIED_SOURCE_SHA..HEAD`）
@@ -210,12 +218,9 @@ seal 不是一次性终点，而是"当前被验证树"的游标；每次审计�
 .sync-audit/verified-source-sha.txt
 .sync-audit/upstream-sync-matrix.json
 .sync-audit/build-sync-matrix.mjs
-.sync-audit/verify-post-verification-diff.mjs
 UPSTREAM_SYNC_MATRIX.md
 UPSTREAM_SYNC_AUDIT.md
 PROGRESS.md
-tests/upstream-sync-matrix.test.ts
-tests/post-verification-audit-seal.test.ts
 ```
 
 以上全部为审计材料 / 审计测试 / 审计脚本；无任何生产代码、测试逻辑或 runtime
