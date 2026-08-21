@@ -30,6 +30,8 @@ const VERIFIED_SOURCE_SHA_FILE = path.join(ROOT, ".sync-audit", "verified-source
 // 若为支持本 guard 本身新增/改名脚本，须同步加入此列表。
 const AUDIT_ALLOWLIST = [
   "PROGRESS.md",
+  // Phase 6 payload capture 跨会话进度活文档（对应 PROGRESS.md 角色）。
+  "PAYLOAD_CAPTURE_PROGRESS.md",
   "UPSTREAM_SYNC_AUDIT.md",
   "UPSTREAM_SYNC_MATRIX.md",
   // 模型调用可观测性审计报告（e62bb535 合入的纯审计材料）。

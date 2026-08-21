@@ -7,7 +7,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = 3cf0e6ed336673b6d7348c3e59ecbe3c344284cf  (最终验证所针对的源码树；2026-08-21 模型调用可观测性第四轮 provenance 树后推进)
+VERIFIED_SOURCE_SHA   = 7374e0d6b61a2a6d5fb29522c99168ebf5177486  (最终验证所针对的源码树；2026-08-22 模型调用可观测性第五轮 payload capture 树后推进)
 工作分支              = feature/upstream-sync-0.447.4
 ```
 
@@ -220,21 +220,34 @@ seal 不是一次性终点，而是"当前被验证树"的游标；每次审计�
   前两轮 96 用例回归全绿 + 全量测试 11741/11740 用例绿（两轮旧坐标下唯一失败均为
   post-verification-audit-seal 预期红）后推进。
 
+- **2026-08-22 模型调用可观测性第四、五轮（provenance + payload capture）**（第四轮
+  功能树 3cf0e6ed/seal ea909c6e；第五轮 7374e0d6b61a2a6d5fb29522c99168ebf5177486）：第四轮 Phase 5 Semantic Input
+  Provenance（统一契约 + MC-01～10 全路径 provenance sidecar，全量 11776 通过）；
+  第五轮 Phase 6 Sensitive Payload Capture——四层级正文通道（Semantic/Provider
+  Request/Response × MC-01～10）+ Redaction Contract（credential 键 / Volcengine
+  body.user.uid 协议专项 / inline secret 正反例 / URL / 本地路径 / 二进制
+  externalization / span offset remap）+ Provider-Wire Provenance（callText 四协议
+  构造时 mapping + post-compat 校验降级）。38 files / +5302-121（契约五模块 +
+  全路径集成 + 7 测试文件 103 用例 + 审计/进度文档；export-manifest 收录 5 新
+  模块；cli-runtime-closure 重 pin）。第五轮验证：typecheck ×3（绿）+ eslint
+  0 error + lint:boundary 绿 + 既有观测 131 用例回归 + full npm test 11881 通过；
+  seal/matrix/tripwire/boundary 推进后复验。
+
 ## 最终状态：READY TO MERGE
 
 - Upstream ΔU：133 / 133 paths。
 - Disposition：ADOPTED 25 + ADAPTED 100 + REGENERATED 4 + INTENTIONAL_DIVERGENCE 4 = 133
   （脚本计算，`build-sync-matrix.mjs --check`：missing=0 / extra=0 / duplicate=0 / unknown=0）。
 - 4 个 `hanako.md → lingxi.md` 品牌映射统一分类为 ADAPTED。
-- `VERIFIED_SOURCE_SHA = 3cf0e6ed336673b6d7348c3e59ecbe3c344284cf`：被完整测试验证的代码树
+- `VERIFIED_SOURCE_SHA = 7374e0d6b61a2a6d5fb29522c99168ebf5177486`：被完整测试验证的代码树
   （含收口树 d4cf92a8 的全部验证 + 文档清场树复跑验证 + 归档修复树 051f6117 复跑的
   typecheck/lint/全量测试 + v0.1.29 release 树 fabd6dbf 复跑的 typecheck/目标套件 +
   mac self-install 树 dcf3546a 的 PR CI typecheck/lint/build/全量测试 +
   凭证边界修复树 b8688895 的本地 typecheck/定向测试 + PR CI typecheck/lint/build/全量测试 +
   保留标签管道修复树 c83d238a 的本地 typecheck/定向测试 + 全量测试 +
   保留标签指纹补钉树 be95b344 的 tripwire/guard 验证 +
-  模型调用可观测性三轮树 a9a5f3f4 / b9238533 / 53fa4575 的本地
-  typecheck/定向测试 + 全量测试，见「Seal 推进记录」）。当前 HEAD 只比 VERIFIED_SOURCE_SHA 多审计收口内容。
+  模型调用可观测性五轮树 a9a5f3f4 / b9238533 / 53fa4575 / 3cf0e6ed / 7374e0d6b61a2a6d5fb29522c99168ebf5177486
+  的本地 typecheck/定向测试 + 全量测试，见「Seal 推进记录」）。当前 HEAD 只比 VERIFIED_SOURCE_SHA 多审计收口内容。
 
 ### Post-verification diff 记录（`git diff --name-only VERIFIED_SOURCE_SHA..HEAD`）
 
