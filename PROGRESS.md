@@ -7,7 +7,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = be95b34412ea2636a983a1cb681239ddcdfb59ee  (最终验证所针对的源码树；2026-08-21 保留标签管道修复树后推进)
+VERIFIED_SOURCE_SHA   = a9a5f3f4689051cbba708d584479eb47eeace2e2  (最终验证所针对的源码树；2026-08-21 模型调用可观测性树后推进)
 工作分支              = feature/upstream-sync-0.447.4
 ```
 
@@ -208,6 +208,13 @@ seal 不是一次性终点，而是"当前被验证树"的游标；每次审计�
   persistence-schema-guard 要求受护源文件被 touch 时同次重钉指纹；providers.ts（受护源）
   在 c83d238a 被改，本次以 compatible 分类补钉 build/persistence-schema-fingerprint.json
   （review 记录更新，schema 形状不变）。验证：tripwire 15 用例绿 + guard 前哨通过后推进。
+- **2026-08-21 模型调用可观测性**（a9a5f3f4689051cbba708d584479eb47eeace2e2）：Model Call
+  Observer 实现（lib/llm/model-call-observer 系列 + lib/pi-sdk/model-call-stream-observer +
+  lib/extensions/model-call-observer-ext；core/llm-client、bridge-session-manager、
+  session-coordinator、hub/agent-executor、approval-gateway 等接入；4 个新测试；闭包清单与
+  persistence 指纹 compatible repin；seal allowlist 收录 MODEL_CALL_OBSERVABILITY_AUDIT.md）。
+  验证：本地 typecheck×3（绿）+ 定向测试（model-call 42 用例 + tripwire/闭包 52 用例）全绿 +
+  全量测试 11668 用例绿（旧坐标 be95b344 下仅 post-verification-audit-seal 预期红）后推进。
 
 ## 最终状态：READY TO MERGE
 
@@ -215,13 +222,14 @@ seal 不是一次性终点，而是"当前被验证树"的游标；每次审计�
 - Disposition：ADOPTED 25 + ADAPTED 100 + REGENERATED 4 + INTENTIONAL_DIVERGENCE 4 = 133
   （脚本计算，`build-sync-matrix.mjs --check`：missing=0 / extra=0 / duplicate=0 / unknown=0）。
 - 4 个 `hanako.md → lingxi.md` 品牌映射统一分类为 ADAPTED。
-- `VERIFIED_SOURCE_SHA = be95b34412ea2636a983a1cb681239ddcdfb59ee`：被完整测试验证的代码树
+- `VERIFIED_SOURCE_SHA = a9a5f3f4689051cbba708d584479eb47eeace2e2`：被完整测试验证的代码树
   （含收口树 d4cf92a8 的全部验证 + 文档清场树复跑验证 + 归档修复树 051f6117 复跑的
   typecheck/lint/全量测试 + v0.1.29 release 树 fabd6dbf 复跑的 typecheck/目标套件 +
   mac self-install 树 dcf3546a 的 PR CI typecheck/lint/build/全量测试 +
   凭证边界修复树 b8688895 的本地 typecheck/定向测试 + PR CI typecheck/lint/build/全量测试 +
   保留标签管道修复树 c83d238a 的本地 typecheck/定向测试 + 全量测试 +
-  保留标签指纹补钉树 be95b344 的 tripwire/guard 验证，
+  保留标签指纹补钉树 be95b344 的 tripwire/guard 验证 +
+  模型调用可观测性树 a9a5f3f4 的本地 typecheck/定向测试 + 全量测试，
   见「Seal 推进记录」）。当前 HEAD 只比 VERIFIED_SOURCE_SHA 多审计收口内容。
 
 ### Post-verification diff 记录（`git diff --name-only VERIFIED_SOURCE_SHA..HEAD`）
