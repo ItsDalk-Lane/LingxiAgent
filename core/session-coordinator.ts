@@ -9,6 +9,7 @@ import fs from "fs";
 import fsp from "fs/promises";
 import path from "path";
 import { createAgentSession, SessionManager, estimateTokens, refreshSessionModelFromRegistry } from "../lib/pi-sdk/index.ts";
+import { registerSessionModelCallContext } from "../lib/pi-sdk/model-call-stream-observer.ts";
 import { isSessionJsonlFilename } from "../lib/session-jsonl.ts";
 import { createDefaultSettings } from "./session-defaults.ts";
 import { isDefaultWorkspacePath, restoreDefaultWorkspaceIfMissing } from "../shared/default-workspace.ts";
@@ -2546,6 +2547,18 @@ export class SessionCoordinator {
       : promptSnapshotForPersist;
     this._renewCachePrefixContract(mapKey, sessionEntry, restore ? "session_restore" : "new_session");
     this._installCachePrefixGuard(mapKey, sessionEntry);
+    // Model call 归属注册（MC-01 desktop chat 主路径）：provider 每次调用时
+    // 才求值，sessionId 后补也能读到。surface 固定 desktop——该 coordinator
+    // 的 chat 主路径即 desktop；其它入口（CLI）的差异记入实现报告 gap。
+    registerSessionModelCallContext(session, () => ({
+      source: { subsystem: "session", operation: "reply", surface: "desktop", trigger: "user" },
+      attribution: {
+        kind: "session",
+        agentId: creatingAgentId || null,
+        ...(sessionEntry.sessionId ? { sessionId: sessionEntry.sessionId } : {}),
+        ...(sessionPath ? { sessionPath } : {}),
+      },
+    }));
     installDynamicCompactionReserve(session);
     installMidRunCompaction(session, {
       usageLedger: this._d.getUsageLedger?.() || null,
@@ -8051,6 +8064,40 @@ export class SessionCoordinator {
           sessionPath: childSessionPath,
         });
       } catch (err) { log.warn(`isolated onSessionReady callback failed: ${err?.message}`); }
+
+      // Model call 归属注册（MC-01 isolated subagent/automation 路径）。
+      // source/attribution 与下方 isolated usage context（subscribe 回调内）
+      // 同一语义，不发明第二套形状；parent 字段的规范化口径与 :8123 一致。
+      const modelCallParentSessionPath = typeof opts.parentSessionPath === "string" && opts.parentSessionPath.trim()
+        ? opts.parentSessionPath
+        : null;
+      const modelCallParentSessionId = typeof opts.parentSessionId === "string" && opts.parentSessionId.trim()
+        ? opts.parentSessionId.trim()
+        : (modelCallParentSessionPath ? this._sessionIdForPath(modelCallParentSessionPath) : null);
+      registerSessionModelCallContext(session, () => ({
+        source: {
+          subsystem: opts.subagentContext ? "subagent" : "automation",
+          operation: "run",
+          surface: opts.subagentContext ? "desktop" : "system",
+          trigger: opts.subagentContext ? "tool" : "scheduled",
+        },
+        attribution: modelCallParentSessionPath
+          ? {
+              kind: "session",
+              agentId: this.resolveSessionOwnership(modelCallParentSessionPath).agentId || null,
+              ...(modelCallParentSessionId ? { sessionId: modelCallParentSessionId } : {}),
+              sessionPath: modelCallParentSessionPath,
+              childAgentId: opts.subagentContext ? targetAgent.id || null : undefined,
+              childSessionId: opts.subagentContext ? readyChildSessionId || undefined : undefined,
+              childSessionPath: opts.subagentContext ? childSessionPath : undefined,
+              taskId: opts.subagentContext ? opts.subagentTaskId || null : undefined,
+            }
+          : {
+              kind: opts.subagentContext ? "utility" : "automation",
+              agentId: targetAgent.id || null,
+              ...(childSessionPath ? { childSessionPath } : {}),
+            },
+      }));
 
       let replyText = "";
       let finalAssistantText = "";

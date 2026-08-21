@@ -660,7 +660,23 @@ export function createModelApprovalReviewer({
         temperature: 0,
         maxTokens,
         timeoutMs,
-        usageContext: "approval_reviewer_authorization",
+        // 结构化 usage context（审计 P1 修复：字符串实参会被 normalizeUsageContext
+        // 归一为全 unknown，导致 Approval 调用在 Ledger/Observer 里丢失归属）。
+        usageContext: {
+          source: {
+            subsystem: "approval",
+            operation: "review_authorization",
+            surface: "system",
+            trigger: "policy",
+          },
+          attribution: {
+            kind: "agent",
+            agentId: request.agentId || null,
+            ...(typeof request.sessionPath === "string" && request.sessionPath
+              ? { sessionPath: request.sessionPath }
+              : {}),
+          },
+        },
         usageLedger: typeof getUsageLedger === "function" ? getUsageLedger() : null,
       });
       return parseReviewerOutput(text, attempt);

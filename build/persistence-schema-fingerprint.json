@@ -648,7 +648,7 @@
     ],
     "version": 3
   },
-  "payloadFingerprint": "sha256:ea43072abfdaae264090f44699e72180d6a18e243f5245a5d6be167445d8a2f9",
+  "payloadFingerprint": "sha256:252cdf1226105980a227290c65f5d98165a3a0b559e146e445511ed3edee68c5",
   "registry": [
     {
       "affectedByEpochMigration": true,
@@ -3003,8 +3003,8 @@
   ],
   "review": {
     "classification": "compatible",
-    "compatibilityReason": "providers.ts media capability bindings 改为一次性全量计算（getAllMediaCapabilityBindings），纯性能优化，不改变任何持久化 schema 形状/字段/数据类型",
-    "payloadFingerprint": "sha256:ea43072abfdaae264090f44699e72180d6a18e243f5245a5d6be167445d8a2f9"
+    "compatibilityReason": "Model call observer wiring only: registerSessionModelCallContext/streamFn wrapper registration and extension factory registration in guarded modules; no store shape, schema, key, or persistence format changed.",
+    "payloadFingerprint": "sha256:252cdf1226105980a227290c65f5d98165a3a0b559e146e445511ed3edee68c5"
   },
   "schemas": [
     {
@@ -3396,7 +3396,7 @@
       "contract": "server-info writer and desktop bootstrap reader",
       "kind": "runtime-contract",
       "module": "server/index.ts",
-      "sourceHash": "sha256:0e452ad75db20faec4f21e5d6c89c2b871e19914ec88d7f0d5745d21758095ed",
+      "sourceHash": "sha256:9175501eff25be3e225e5ec472c71f81e71bff0dff1b0ecc917ddc534907c7f3",
       "storeId": "server-runtime-info"
     },
     {
@@ -3418,7 +3418,7 @@
         {
           "contract": "core/session-coordinator.ts Hana metadata extensions",
           "module": "core/session-coordinator.ts",
-          "sourceHash": "sha256:54bcbd6b8a1e8149f710024ee5b61490ef6d1d1a4541405713e95d3db71ecb2e"
+          "sourceHash": "sha256:60351a1dab7b5049b0b14a65e008ac6de1e6c9b0b2894d613e99524906638c12"
         },
         {
           "contract": "core/session-jsonl-file.ts repair contract",
@@ -3516,7 +3516,7 @@
       "contract": "bridge index, legacy session metadata, title, and vision sidecar readers",
       "kind": "runtime-contract",
       "module": "core/bridge-session-manager.ts",
-      "sourceHash": "sha256:5fe5f40f41ad3a2d1887786feed4b6f15c2f6846b4231fc94fcaaaac350e5dae",
+      "sourceHash": "sha256:09857a567434c49c5ee3ac9a87477b7dcb367234491e979e17191d11a6f479b5",
       "storeId": "session-sidecars"
     },
     {

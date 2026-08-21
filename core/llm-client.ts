@@ -6,6 +6,13 @@ import { logLlmUsage, normalizeLlmUsage } from '../lib/llm/usage-observer.ts';
 import { appendProviderApiPath, withDefaultProviderHeaders } from '../lib/llm/provider-client.ts';
 import { mergeProviderHeaders } from '../shared/provider-auth.ts';
 import {
+  extractProviderRequestId,
+  modelCallFieldsFromUsageContext,
+  summarizeProviderRequestPayload,
+  type ModelCallObserver,
+} from '../lib/llm/model-call-observer.ts';
+import { createModelCallRecorder } from '../lib/llm/model-call-recorder.ts';
+import {
   serializeOpenAICompatibleContentBlock,
   serializeResponsesContentBlock,
 } from './provider-media-serializer.ts';
@@ -61,6 +68,16 @@ export type CallTextOptions = {
   returnUsage?: boolean;
   usageContext?: unknown;
   usageLedger?: CallTextUsageLedger | null;
+  /**
+   * ModelCallObserver 覆盖注入（默认走进程级注册表，生产为 noop）。
+   * 观测是纯旁路：observer 抛错/缺失都不改变调用行为。
+   */
+  modelCallObserver?: ModelCallObserver | null;
+  /** 可选 trace 关联（§三十二）：调用方无法提供时保持 null，不造假关系。 */
+  modelCallContext?: {
+    traceId?: string | null;
+    parentCallId?: string | null;
+  } | null;
 };
 
 /**
@@ -371,6 +388,23 @@ function convertContentForApi(content, api) {
   return content.map(serializeOpenAICompatibleContentBlock);
 }
 
+// ── ModelCallObserver 安全 metadata ──
+// 只提取不可逆结构信息：消息/工具计数、system 存在性、媒体存在性、字节估算。
+// 绝不读取或携带正文内容（§八）。
+function summarizeCallTextRequest(body, api, serializedByteLength) {
+  const summary = summarizeProviderRequestPayload(body);
+  return {
+    protocol: api,
+    streaming: body?.stream === true,
+    messageCount: summary.messageCount,
+    toolCount: summary.toolCount,
+    hasSystemPrompt: summary.hasSystemPrompt === true,
+    // callText 历史字段名保持 hasImages；共享 helper 统一输出 hasMedia
+    hasImages: summary.hasMedia,
+    inputByteEstimate: Number.isFinite(serializedByteLength) ? serializedByteLength : null,
+  };
+}
+
 /**
  * 统一非流式文本生成。
  *
@@ -417,6 +451,8 @@ export async function callText({
   returnUsage = false,
   usageContext,
   usageLedger,
+  modelCallObserver = null,
+  modelCallContext = null,
 }: CallTextOptions) {
   // 同时接受完整 model 对象和裸 id。modelObj 用于 provider-compat 决策；modelId 入 payload。
   const modelObj = typeof model === "object" && model !== null ? model : null;
@@ -436,6 +472,30 @@ export async function callText({
   if (!SUPPORTED_BUFFERED_APIS.has(api)) {
     throw new Error(`No Hana buffered adapter is registered for API "${api || "unknown"}"`);
   }
+
+  // ── 0. ModelCallObserver：logical call 身份在 Provider 请求之前生成 ──
+  // 验证性错误（上面的 output policy / adapter 检查）发生在调用成立之前，不进入
+  // 生命周期；从这里起的一切失败（构造/网络/解析/中止）都必须有终态事件。
+  const modelCallRecorder = createModelCallRecorder({
+    observer: modelCallObserver,
+    context: {
+      traceId: modelCallContext?.traceId ?? null,
+      parentCallId: modelCallContext?.parentCallId ?? null,
+      model: { provider, modelId, api: api || null },
+      ...modelCallFieldsFromUsageContext(usageContext),
+    },
+  });
+  modelCallRecorder.beginLogicalCall({
+    details: {
+      path: "callText",
+      ...(typeof callPurpose === "string" && callPurpose ? { callPurpose } : {}),
+    },
+  });
+  let observedProviderRequestId: string | null = null;
+  let usageRequest: { requestId?: string | null } | null = null;
+  let observedUsagePayload = null;
+  let usageRequestClosed = false;
+  try {
   // ── 1. 消息归一化：提取 system 消息合并到 systemPrompt ──
   let mergedSystem = systemPrompt || "";
   const normalizedMessages = [];
@@ -557,14 +617,20 @@ export async function callText({
   }));
 
   // ── 4. 发送请求 ──
-  const usageRequest = usageLedger?.start?.({
+  // attempt 边界：callText 无内部网络 retry，一次调用 = 一个真实网络 attempt。
+  modelCallRecorder.beginAttempt({ details: { attemptVisibility: "exact" } });
+  const serializedBody = JSON.stringify(body);
+  // provider_request_prepared 只带结构 metadata，绝不携带 body（§八）。
+  modelCallRecorder.providerRequestPrepared({
+    details: summarizeCallTextRequest(body, api, serializedBody.length),
+  });
+  usageRequest = usageLedger?.start?.({
     model: { provider, modelId, api },
     usageContext,
     costRates: modelObj?.cost,
+    // Observer ↔ Ledger 最小关联：复用既有 metadata 字段，无 storage version 变更。
+    metadata: { modelCallId: modelCallRecorder.callId },
   }) || null;
-  let observedUsagePayload = null;
-  let usageRequestClosed = false;
-  try {
   const SLOW_THRESHOLD_MS = 15_000;
   const slowTimer = setTimeout(() => {
     errorBus.report(new AppError('LLM_SLOW_RESPONSE', {
@@ -575,11 +641,18 @@ export async function callText({
   const res = await fetch(endpoint, {
     method: "POST",
     headers,
-    body: JSON.stringify(body),
+    body: serializedBody,
     signal: combinedSignal,
   }).catch(err => {
     clearTimeout(slowTimer);
     throwAbortOrTimeout(err, signal, modelId);
+  });
+
+  // Provider response 到达（不含 body；id 只取响应头 allowlist）。
+  observedProviderRequestId = extractProviderRequestId(res.headers);
+  modelCallRecorder.providerResponseReceived({
+    httpStatus: res.status,
+    providerRequestId: observedProviderRequestId,
   });
 
   // ── 5. 解析响应 ──
@@ -686,15 +759,54 @@ export async function callText({
     usage: data?.usage,
     costRates: modelObj?.cost,
   });
+  // 语义响应解析完成（parser 之后、业务裁剪之前）。只带结构/数值 metadata。
+  modelCallRecorder.semanticResponseCompleted({
+    details: {
+      stopReason: stopReason ?? null,
+      hasReasoning: reasoning.length > 0 || removedStructuredThinking,
+      usagePresent: Boolean(data?.usage),
+      ...(usage ? { usage } : {}),
+    },
+  });
   usageLedger?.finish?.(usageRequest?.requestId, {
     usage: data?.usage,
     model: { provider, modelId, api },
     costRates: modelObj?.cost,
   });
   usageRequestClosed = true;
+  modelCallRecorder.endLogicalCall("ok");
 
   return returnUsage ? { text, usage } : text;
   } catch (err) {
+    // timeout 与用户 abort 在业务错误体系里本就区分（LLM_TIMEOUT vs AbortError），
+    // Observer 原样保留这一区分，不改变 AppError 行为（§十五）。
+    const callAborted = err?.name === "AbortError" || err?.type === "aborted";
+    const errorKind = callAborted
+      ? "abort"
+      : (err as any)?.code === "LLM_TIMEOUT" ? "timeout" : "provider_or_network";
+    // headers 没有 id 时，回落到 provider error body 已提取的 request_id（
+    // providerErrorContext 会把它放进 AppError context）。没有就是 null，不猜。
+    const errorRequestId = typeof (err as any)?.context?.requestId === "string"
+      ? (err as any).context.requestId
+      : null;
+    const terminalProviderRequestId = observedProviderRequestId ?? errorRequestId;
+    if (!callAborted && modelCallRecorder.currentAttemptId) {
+      modelCallRecorder.attemptError(err, {
+        providerRequestId: terminalProviderRequestId,
+        details: { errorKind },
+      });
+    }
+    if (callAborted) {
+      modelCallRecorder.logicalCallAborted();
+    } else {
+      modelCallRecorder.logicalCallError(err, {
+        providerRequestId: terminalProviderRequestId,
+        details: { errorKind },
+      });
+    }
+    modelCallRecorder.endLogicalCall(callAborted ? "aborted" : "error", {
+      details: { errorKind },
+    });
     if (usageRequest?.requestId && !usageRequestClosed) {
       const status = err?.name === "AbortError" || err?.type === "aborted" ? "aborted" : "error";
       usageLedger?.recordError?.(usageRequest.requestId, err, status, {

@@ -12,6 +12,9 @@ import {
   buildCacheStrategyMetadata,
 } from "./cache-strategy-contract.ts";
 import { stripClosedInternalNarrationBlocks } from "../text/internal-narration.ts";
+import { mintModelCallId } from "./model-call-identity.ts";
+import { modelCallFieldsFromUsageContext } from "./model-call-observer.ts";
+import { runWithModelCallScope } from "./model-call-scope.ts";
 
 const SUMMARY_HEADINGS = [
   "Goal",
@@ -396,16 +399,33 @@ export async function runCachePreservingCompactionAgentRun({
         cacheMetadata,
         requestPhase === "format_repair" ? "summary_format_repair" : "tool_intent_recovery",
       );
+    // 每次 isolatedStreamFn 调用 = 一次真实的 logical model call（业务级
+    // recovery/repair 是新 call，不复用 callId——§十七）。callId 先于
+    // ledger.start 铸造，经 metadata.modelCallId 建立 callId↔ledger 关联，
+    // 并经 ALS scope 交给 streamFn wrapper 接管为同一身份（单点发射）。
+    const modelCallId = mintModelCallId();
     const usageRequest = usageLedger?.start?.({
       model: modelLedgerIdentity(model),
       usageContext,
-      metadata,
+      metadata: { ...(metadata || {}), modelCallId },
       costRates: model?.cost,
     }) || {};
     const pending = { requestId: usageRequest.requestId, settled: false };
     pendingUsage.push(pending);
+    const modelCallScope = {
+      callId: modelCallId,
+      model: modelLedgerIdentity(model),
+      ...modelCallFieldsFromUsageContext(usageContext),
+      traceId: null,
+      parentCallId: null,
+      details: {
+        compactionPhase: requestPhase,
+        providerRequestOrdinal: diagnostics.providerRequests,
+        ...(metadata?.cacheStrategy ? { cacheStrategy: metadata.cacheStrategy } : {}),
+      },
+    };
     try {
-      return await streamFn(selectedModel, providerContext, options);
+      return await runWithModelCallScope(modelCallScope, () => streamFn(selectedModel, providerContext, options));
     } catch (error) {
       pending.settled = true;
       if (pending.requestId) usageLedger?.recordError?.(pending.requestId, error);

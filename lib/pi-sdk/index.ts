@@ -37,6 +37,7 @@ import {
   PI_BUILTIN_TOOL_NAMES,
 } from "./session-options.ts";
 import { installAssistantStreamGuard } from "./stream-guard.ts";
+import { installModelCallStreamObserver } from "./model-call-stream-observer.ts";
 import { installToolOutcomeAdapter } from "./tool-outcome-adapter.ts";
 import {
   createFindTool,
@@ -80,6 +81,7 @@ export async function createAgentSession(options) {
   const result = await rawCreateAgentSession(normalizeCreateAgentSessionOptions(sessionOptions));
   installToolOutcomeAdapter(result?.session);
   installAssistantStreamGuard(result?.session);
+  installModelCallStreamObserver(result?.session);
   return result;
 }
 

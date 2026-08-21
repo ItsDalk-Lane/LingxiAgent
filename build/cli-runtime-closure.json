@@ -5628,6 +5628,18 @@
       "reason": "Reached via esbuild source module graph, imported by server/index.ts (import-statement)."
     },
     {
+      "path": "lib/extensions/model-call-observer-ext.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "server/index.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by server/index.ts (import-statement)."
+    },
+    {
       "path": "lib/extract-zip.ts",
       "inputType": "source-graph",
       "provenance": [
@@ -6315,6 +6327,104 @@
       "reason": "Reached via esbuild source module graph, imported by core/session-compactor.ts (import-statement); core/session-reminders.ts (import-statement); core/tool-catalog.ts (import-statement)."
     },
     {
+      "path": "lib/llm/model-call-identity.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "lib/llm/model-call-recorder.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/pi-sdk/model-call-stream-observer.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/llm/cache-preserving-compaction-agent-run.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by lib/llm/model-call-recorder.ts (import-statement); lib/pi-sdk/model-call-stream-observer.ts (import-statement); lib/llm/cache-preserving-compaction-agent-run.ts (import-statement)."
+    },
+    {
+      "path": "lib/llm/model-call-observer.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "lib/llm/model-call-recorder.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/pi-sdk/model-call-stream-observer.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/llm/cache-preserving-compaction-agent-run.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "core/llm-client.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/extensions/model-call-observer-ext.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by lib/llm/model-call-recorder.ts (import-statement); lib/pi-sdk/model-call-stream-observer.ts (import-statement); lib/llm/cache-preserving-compaction-agent-run.ts (import-statement); +2 more importer(s)."
+    },
+    {
+      "path": "lib/llm/model-call-recorder.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "lib/pi-sdk/model-call-stream-observer.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "core/llm-client.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/extensions/model-call-observer-ext.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by lib/pi-sdk/model-call-stream-observer.ts (import-statement); core/llm-client.ts (import-statement); lib/extensions/model-call-observer-ext.ts (import-statement)."
+    },
+    {
+      "path": "lib/llm/model-call-scope.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "lib/pi-sdk/model-call-stream-observer.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/llm/cache-preserving-compaction-agent-run.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/extensions/model-call-observer-ext.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by lib/pi-sdk/model-call-stream-observer.ts (import-statement); lib/llm/cache-preserving-compaction-agent-run.ts (import-statement); lib/extensions/model-call-observer-ext.ts (import-statement)."
+    },
+    {
       "path": "lib/llm/model-request-accounting.ts",
       "inputType": "source-graph",
       "provenance": [
@@ -6423,11 +6533,16 @@
       "provenance": [
         {
           "root": "server-bootstrap",
+          "from": "lib/llm/model-call-observer.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
           "from": "lib/llm/usage-ledger.ts",
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by lib/llm/usage-ledger.ts (import-statement)."
+      "reason": "Reached via esbuild source module graph, imported by lib/llm/model-call-observer.ts (import-statement); lib/llm/usage-ledger.ts (import-statement)."
     },
     {
       "path": "lib/llm/usage-ledger.ts",
@@ -7419,6 +7534,33 @@
         }
       ],
       "reason": "Reached via esbuild source module graph, imported by core/compaction-utils.ts (import-statement); lib/llm/cache-preserving-compaction-agent-run.ts (import-statement); core/session-compactor.ts (import-statement); +50 more importer(s)."
+    },
+    {
+      "path": "lib/pi-sdk/model-call-stream-observer.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "lib/pi-sdk/index.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "core/bridge-session-manager.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "core/session-coordinator.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "hub/agent-executor.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by lib/pi-sdk/index.ts (import-statement); core/bridge-session-manager.ts (import-statement); core/session-coordinator.ts (import-statement); +1 more importer(s)."
     },
     {
       "path": "lib/pi-sdk/search-tools.ts",
@@ -123171,9 +123313,9 @@
     }
   ],
   "stats": {
-    "totalFiles": 10578,
+    "totalFiles": 10584,
     "byInputType": {
-      "source-graph": 682,
+      "source-graph": 688,
       "runtime-asset": 11,
       "nft-runtime-trace": 9885
     }

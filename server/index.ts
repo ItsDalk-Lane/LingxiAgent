@@ -84,6 +84,7 @@ import { ActivityHub } from "../lib/activity-hub.ts";
 import { WorkflowActivityStore } from "../lib/workflow-activity-store.ts";
 import { createDeferredResultExtension } from "../lib/extensions/deferred-result-ext.ts";
 import { createCompactionGuardExtension } from "../lib/extensions/compaction-guard-ext.ts";
+import { createModelCallObserverExtension } from "../lib/extensions/model-call-observer-ext.ts";
 import { getResolvedCompactionMode } from "../shared/compaction-mode.ts";
 import { Hub } from "../hub/index.ts";
 import { startCLI } from "./cli.ts";
@@ -541,6 +542,10 @@ export async function startServer(root: CompositionRoot = {}): Promise<void> {
       };
     },
   }));
+
+  // Model call observer：provider 请求/响应 hook 经 ALS scope 关联到
+  // streamFn wrapper 建立的 callId/attemptId；纯旁路，不改 payload。
+  await engine.registerExtensionFactory(createModelCallObserverExtension());
 
   // ── 初始化插件系统 ──
   await engine.initPlugins(hub.eventBus);

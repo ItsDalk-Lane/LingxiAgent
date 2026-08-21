@@ -10,6 +10,7 @@
 import fs from "fs";
 import path from "path";
 import { createAgentSession, SessionManager } from "../lib/pi-sdk/index.ts";
+import { registerSessionModelCallContext } from "../lib/pi-sdk/model-call-stream-observer.ts";
 import { debugLog } from "../lib/debug-log.ts";
 import { getLocale, t } from "../lib/i18n.ts";
 import { createDefaultSettings } from "../core/session-defaults.ts";
@@ -519,6 +520,23 @@ export async function runAgentPhoneSession(agentId, rounds, {
     tools,
     customTools: sessionCustomTools,
   });
+  // Model call 归属注册（MC-01 phone 会话路径）：与 recordPhoneAssistantUsage
+  // 的 usageContext 同一语义。
+  registerSessionModelCallContext(session, () => ({
+    source: {
+      subsystem: "session",
+      operation: "phone_reply",
+      surface: conversationType === "channel" ? "channel" : "dm",
+      trigger: "delivery",
+    },
+    attribution: {
+      kind: "phone",
+      agentId: agentId || null,
+      conversationId,
+      conversationType,
+      sessionPath: session?.sessionManager?.getSessionFile?.() || null,
+    },
+  }));
   installDynamicCompactionReserve(session);
   installMidRunCompaction(session, {
     usageLedger: engine.usageLedger || engine.getUsageLedger?.() || null,
