@@ -26,6 +26,8 @@ const AUDIT_ALLOWLIST = [
   "PROGRESS.md",
   // Phase 6 payload capture 跨会话进度活文档（对应 PROGRESS.md 角色）。
   "PAYLOAD_CAPTURE_PROGRESS.md",
+  // Phase 7 durable storage 跨会话进度活文档（对应 PROGRESS.md 角色）。
+  "OBSERVABILITY_STORAGE_PROGRESS.md",
   "UPSTREAM_SYNC_AUDIT.md",
   "UPSTREAM_SYNC_MATRIX.md",
   ".sync-audit/upstream-sync-matrix.json",
