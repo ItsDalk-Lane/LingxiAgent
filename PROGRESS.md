@@ -7,7 +7,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = 3f20b58ebe0648aa4389447913b58642075ff73c  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-08-22 第九轮 Phase 10 E2E truth audit feature commit；坐标一律为 commit 对象——第八轮 tree sha 之误见 Phase 10 F-4)
+VERIFIED_SOURCE_SHA   = 81cdb2d86f8bc226baffe925b886096fd98b2c5f  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-08-22 第十~十一轮：Phase 10.1 修复树（dba9a6b1/4f95e17d）+ Phase 11 合并收口（81cdb2d8 scratchpad 清场）；坐标一律为 commit 对象——第八轮 tree sha 之误见 Phase 10 F-4)
 工作分支              = feature/upstream-sync-0.447.4
 ```
 
@@ -280,6 +280,25 @@ seal 不是一次性终点，而是"当前被验证树"的游标；每次审计�
   desktop-observability-export-output + scanner receipt 重生成 + fingerprint
   compatible repin（sha256:15591e09…）/ 新增 10 测试文件 83 用例 /
   full npm test 12052 全绿；seal/matrix/tripwire 推进后复验。
+
+
+- **2026-08-22 模型调用可观测性第十~十一轮（Phase 10.1 修复 + Phase 11 合并收口）**
+  （功能树 81cdb2d8/seal 本提交）：Phase 10.1 从 codex worktree 抢救并入
+  （dba9a6b1+merge 4f95e17d）：AR-01～AR-20（P1×18 + P2×2）全 FIXED——IANA
+  timezone/DST 步进扫描、同字段 OR 跨字段 AND、NULL/unknown/corrupt/not_correlated
+  语义、聚合三态、Trace 全链统计、partial payload dropped、Blob 两阶段写+retry
+  不重写文件+无悬空引用+流式 GET、动态重配代际（四类在途切换+有界排空）、
+  schema v3（usage_correlation_state 真实列，v1/v2→v3 单事务迁移+rollback+future）。
+  Phase 11（81cdb2d8）：仅删除 codex scratchpad（task_plan.md/findings.md，
+  对齐 2026-08-20 文档清场先例），零生产代码变化；egress 独立重扫 MC-01～10
+  全 OBSERVED、无 MC-11+，plugin network.fetch 开口登记（LATENT/ARCHITECTURAL）。
+  验证：typecheck ×3 / eslint 0 error / boundary 基线不变 / 三 generator 重生成
+  零漂移（fingerprint sha256:f4cfa1e8…）/ full npm test 12134 passed（唯一失败
+  = seal guard 预期红）/ build:server（临时密钥，构建后删除）/ build:server:open /
+  build:client / pack 冒烟（ad-hoc 签名验证）。远端：81cdb2d8 轮 4/5 job 绿、
+  mac test 仅 seal guard 红（分类 E）、win fail-fast 取消；seal commit 轮
+  （PR HEAD）目标全绿。Release Acceptance V3 见
+  MODEL_OBSERVATORY_RELEASE_ACCEPTANCE_V3.md；V2 保留历史。
 
 
 ## 最终状态：READY TO MERGE

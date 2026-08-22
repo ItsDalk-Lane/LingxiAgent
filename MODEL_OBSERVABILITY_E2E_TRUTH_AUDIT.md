@@ -58,12 +58,14 @@ server / packages / cli 生产代码。
 | --- | --- | --- |
 | `lib/llm/session-snapshot-side-task-runner.ts:94` completeSimple | 唯一上层 memory-reflection-runner 仍无生产 caller | 沿用 Phase 3.5 结论 |
 | **`core/media/local-cli-wrapper.ts` runLocalCliMedia**（本轮重扫登记） | 通用「本地 CLI 媒体生成」包装（可执行任意 CLI 产图/产视频）；全仓零 importer（provider-registry 只 import 同目录 media-runtime-contract 类型），无生产路径 | LATENT。若未来接线必须先走 MC-07 式 external_process observer；写入本文档防遗漏 |
+| **`core/plugin-context.ts` 插件 `network.fetch` 能力**（Phase 11 重扫登记） | 插件运行时网络出口不经 observedProviderFetch 包装；当前 bundled 插件（beautify/media/office/jimeng-cli）无模型调用使用，属潜在第三方架构开口而非现存旁路 | LATENT/ARCHITECTURAL。若未来允许第三方插件直连模型 API，必须先定义观测边界（接入 observer 或显式声明为受信域外）；已同步登记于 Release Acceptance V3 §C/§J
 
 ### 1.4 修正声明
 
 ```text
 Phase 3.5 结论：10 Host-managed production-reachable paths
 Phase 10 重扫：仍为 10；新增登记 1 个 LATENT（local-cli-wrapper，非本轮引入，
+Phase 11 重扫：仍为 10；新登记 1 个插件网络能力开口（plugin-context network.fetch，LATENT/ARCHITECTURAL）
 基线 d5275e56 之前已存在）
 ```
 
