@@ -34,11 +34,13 @@ const JSON_OUT = path.join(ROOT, ".sync-audit", "upstream-sync-matrix.json");
 const MD_OUT = path.join(ROOT, "UPSTREAM_SYNC_MATRIX.md");
 const VERIFIED_SOURCE_SHA_FILE = path.join(ROOT, ".sync-audit", "verified-source-sha.txt");
 
-// VERIFIED_SOURCE_SHA 是被 typecheck/lint/测试/构建/打包等最终验证所针对的源码树。
-// 它不属于任何 commit 内容，因而是"内容的一部分函数"之前的固定坐标，可安全引用。
-// 当前 branch HEAD 可能在其后存在纯审计 seal 提交，HEAD 由 Git ref 自身标识，
-// 不允许在 commit 内容里自引用（SHA = hash(contents)，自引用会无限漂移）。
-const VERIFIED_SOURCE_SHA = "61779cbdda5b46082f32a554b99279149980c0b4";
+// VERIFIED_SOURCE_SHA 是被 typecheck/lint/测试/构建/打包等最终验证所针对的
+// feature commit（其 tree 即被验证的源码树）。必须是 commit 对象：post-verification
+// audit-seal guard 以 `^{commit}` 校验可达性并做 VERIFIED..HEAD diff（第八轮曾误存
+// tree sha，导致 seal guard 在 HEAD 长期红色——Phase 10 F-4 修复）。
+// 该 commit 早于记录它的审计提交落地，无自引用（SHA = hash(contents)）问题。
+// 当前 branch HEAD 可能在其后存在纯审计 seal 提交，HEAD 由 Git ref 自身标识。
+const VERIFIED_SOURCE_SHA = "3f20b58ebe0648aa4389447913b58642075ff73c";
 
 const ALLOWED_DISPOSITIONS = ["ADOPTED", "ADAPTED", "REGENERATED", "INTENTIONAL_DIVERGENCE"];
 
