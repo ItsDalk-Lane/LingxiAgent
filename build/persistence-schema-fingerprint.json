@@ -648,7 +648,7 @@
     ],
     "version": 3
   },
-  "payloadFingerprint": "sha256:b3a5d2b700fb8f784a01567a9c18a4c1f46c0e46930238581b54b93b01aba854",
+  "payloadFingerprint": "sha256:f3d6c1f95ebc656f9a2a4bde849c656302cc097002b1ab9a3354ebbfabf4848c",
   "registry": [
     {
       "affectedByEpochMigration": true,
@@ -1816,6 +1816,81 @@
         "contract": "normalizeMcpConfig read-time normalization (servers/connectors alias, auth and OAuth field defaults, per-connector permission policy defaults, deferred-loading defaults)",
         "kind": "runtime-contract",
         "module": "core/mcp/manager.ts"
+      }
+    },
+    {
+      "affectedByEpochMigration": false,
+      "bootstrapSafety": null,
+      "checkpointPolicy": "Excluded from epoch checkpoints: blob bytes are privileged observability captures whose lifetime is governed by payload retention and ref-count GC, not by business epoch transitions.",
+      "epochPolicy": "compatible",
+      "exemption": null,
+      "firstPossibleOpenPhase": "engine_construct",
+      "firstPossibleWritePhase": "engine_construct",
+      "format": "mixed-directory",
+      "id": "model-observability-blobs",
+      "identityContract": "blobId is a random observatory identity (mb_<random>); files never carry original filenames and metadata keeps only mime type and byte length.",
+      "migrationEntry": [],
+      "openEntry": [
+        "createModelObservabilityBlobStore"
+      ],
+      "ownerModule": "lib/llm/model-observability-blob-store.ts",
+      "pathExclusions": [],
+      "pathKind": "tree",
+      "pathPattern": "model-observability/blobs/**",
+      "pathPatterns": [
+        "model-observability/blobs/**"
+      ],
+      "preCoordinatorReadProjection": null,
+      "protocolModules": [],
+      "restorePolicy": "Never restored by epoch migrations; orphan blob files left by crashes are reclaimed through the observatory's own grace-period recovery, never replayed as business state.",
+      "schemaContract": {
+        "compatibility": "The named runtime reader is canonical; this inventory does not imply stricter validation than runtime currently performs.",
+        "kind": "protocol",
+        "source": "lib/llm/model-observability-blob-store.ts"
+      },
+      "schemaSource": {
+        "contract": "observatory blob shard layout, random blobId file names, atomic staging rename, owner-only permissions, and ref-count-based GC protocol",
+        "kind": "directory-contract",
+        "module": "lib/llm/model-observability-blob-store.ts"
+      }
+    },
+    {
+      "affectedByEpochMigration": false,
+      "bootstrapSafety": null,
+      "checkpointPolicy": "Excluded from business data-epoch migration checkpoints: the observatory is not required to restore Agent/Session correctness and may be very large. Its own schema evolves through SQLite user_version migrations, never through DATA_EPOCH transitions.",
+      "epochPolicy": "compatible",
+      "exemption": null,
+      "firstPossibleOpenPhase": "engine_construct",
+      "firstPossibleWritePhase": "engine_construct",
+      "format": "sqlite",
+      "id": "model-observability-db",
+      "identityContract": "One global observatory database per LINGXI_HOME; callId/attemptId/traceId are runtime observation identities correlated with (but never owned by) business epoch identities.",
+      "migrationEntry": [],
+      "openEntry": [
+        "openModelObservabilityDatabase",
+        "installModelObservabilityPersistence"
+      ],
+      "ownerModule": "lib/llm/model-observability-schema.ts",
+      "pathExclusions": [],
+      "pathKind": "file",
+      "pathPattern": "model-observability/observability.sqlite",
+      "pathPatterns": [
+        "model-observability/observability.sqlite",
+        "model-observability/observability.sqlite-wal",
+        "model-observability/observability.sqlite-shm"
+      ],
+      "preCoordinatorReadProjection": null,
+      "protocolModules": [],
+      "restorePolicy": "Never restored by epoch migrations. Observability rows that reference sessions rolled back by an epoch restore are allowed historical facts; query surfaces report them as session-unavailable rather than deleting them.",
+      "schemaContract": {
+        "compatibility": "The named runtime reader is canonical; this inventory does not imply stricter validation than runtime currently performs.",
+        "kind": "runtime-source",
+        "source": "lib/llm/model-observability-schema.ts"
+      },
+      "schemaSource": {
+        "contract": "Model Observatory runtime DDL, PRAGMA user_version open/migration contract, and disable-on-failure semantics",
+        "kind": "sqlite-runtime",
+        "module": "lib/llm/model-observability-schema.ts"
       }
     },
     {
@@ -3003,8 +3078,8 @@
   ],
   "review": {
     "classification": "compatible",
-    "compatibilityReason": "Phase 5 semantic input provenance: session prompt snapshot gains an additive-optional systemPromptProvenance metadata field (no content copies; legacy snapshots normalize without it and degrade to structural provenance); no store schema or payload shape change",
-    "payloadFingerprint": "sha256:b3a5d2b700fb8f784a01567a9c18a4c1f46c0e46930238581b54b93b01aba854"
+    "compatibilityReason": "Phase 7 durable model observability: add model-observability-db (SQLite user_version=1, disable-on-failure open contract) and model-observability-blobs stores; engine/server wiring adds constructor pass-through and dispose flush only — no existing store's on-disk shape, format, or migration path changes.",
+    "payloadFingerprint": "sha256:f3d6c1f95ebc656f9a2a4bde849c656302cc097002b1ab9a3354ebbfabf4848c"
   },
   "schemas": [
     {
@@ -3303,6 +3378,175 @@
       "storeId": "mcp-config"
     },
     {
+      "contract": "observatory blob shard layout, random blobId file names, atomic staging rename, owner-only permissions, and ref-count-based GC protocol",
+      "kind": "directory-contract",
+      "module": "lib/llm/model-observability-blob-store.ts",
+      "sourceHash": "sha256:d78a4d54fda49718420649d7ec99c9a1b0c8c75d75859be490673a2680d6c067",
+      "storeId": "model-observability-blobs"
+    },
+    {
+      "contract": "Model Observatory runtime DDL, PRAGMA user_version open/migration contract, and disable-on-failure semantics",
+      "kind": "sqlite-runtime",
+      "module": "lib/llm/model-observability-schema.ts",
+      "runtimeSchema": {
+        "objects": [
+          {
+            "name": "idx_blob_objects_created",
+            "sql": "CREATE INDEX idx_blob_objects_created ON blob_objects(created_at)",
+            "tableName": "blob_objects",
+            "type": "index"
+          },
+          {
+            "name": "idx_blob_objects_state",
+            "sql": "CREATE INDEX idx_blob_objects_state ON blob_objects(state)",
+            "tableName": "blob_objects",
+            "type": "index"
+          },
+          {
+            "name": "idx_model_attempts_call",
+            "sql": "CREATE INDEX idx_model_attempts_call ON model_attempts(call_id)",
+            "tableName": "model_attempts",
+            "type": "index"
+          },
+          {
+            "name": "idx_model_calls_agent",
+            "sql": "CREATE INDEX idx_model_calls_agent ON model_calls(agent_id)",
+            "tableName": "model_calls",
+            "type": "index"
+          },
+          {
+            "name": "idx_model_calls_attribution_kind",
+            "sql": "CREATE INDEX idx_model_calls_attribution_kind ON model_calls(attribution_kind)",
+            "tableName": "model_calls",
+            "type": "index"
+          },
+          {
+            "name": "idx_model_calls_model",
+            "sql": "CREATE INDEX idx_model_calls_model ON model_calls(provider, model_id)",
+            "tableName": "model_calls",
+            "type": "index"
+          },
+          {
+            "name": "idx_model_calls_session",
+            "sql": "CREATE INDEX idx_model_calls_session ON model_calls(session_id)",
+            "tableName": "model_calls",
+            "type": "index"
+          },
+          {
+            "name": "idx_model_calls_started",
+            "sql": "CREATE INDEX idx_model_calls_started ON model_calls(started_at)",
+            "tableName": "model_calls",
+            "type": "index"
+          },
+          {
+            "name": "idx_model_calls_subsystem",
+            "sql": "CREATE INDEX idx_model_calls_subsystem ON model_calls(subsystem, operation)",
+            "tableName": "model_calls",
+            "type": "index"
+          },
+          {
+            "name": "idx_model_calls_task",
+            "sql": "CREATE INDEX idx_model_calls_task ON model_calls(task_id)",
+            "tableName": "model_calls",
+            "type": "index"
+          },
+          {
+            "name": "idx_model_calls_terminal",
+            "sql": "CREATE INDEX idx_model_calls_terminal ON model_calls(terminal_status)",
+            "tableName": "model_calls",
+            "type": "index"
+          },
+          {
+            "name": "idx_model_calls_trace",
+            "sql": "CREATE INDEX idx_model_calls_trace ON model_calls(trace_id)",
+            "tableName": "model_calls",
+            "type": "index"
+          },
+          {
+            "name": "idx_payload_blob_refs_blob",
+            "sql": "CREATE INDEX idx_payload_blob_refs_blob ON payload_blob_refs(blob_id)",
+            "tableName": "payload_blob_refs",
+            "type": "index"
+          },
+          {
+            "name": "idx_payload_records_attempt",
+            "sql": "CREATE INDEX idx_payload_records_attempt ON payload_records(attempt_id)",
+            "tableName": "payload_records",
+            "type": "index"
+          },
+          {
+            "name": "idx_payload_records_call",
+            "sql": "CREATE INDEX idx_payload_records_call ON payload_records(call_id)",
+            "tableName": "payload_records",
+            "type": "index"
+          },
+          {
+            "name": "idx_payload_records_call_kind",
+            "sql": "CREATE INDEX idx_payload_records_call_kind ON payload_records(call_id, kind)",
+            "tableName": "payload_records",
+            "type": "index"
+          },
+          {
+            "name": "idx_payload_records_call_ordinal",
+            "sql": "CREATE INDEX idx_payload_records_call_ordinal ON payload_records(call_id, provider_request_ordinal)",
+            "tableName": "payload_records",
+            "type": "index"
+          },
+          {
+            "name": "idx_traces_last_seen",
+            "sql": "CREATE INDEX idx_traces_last_seen ON traces(last_seen_at)",
+            "tableName": "traces",
+            "type": "index"
+          },
+          {
+            "name": "blob_objects",
+            "sql": "CREATE TABLE blob_objects ( blob_id TEXT PRIMARY KEY, created_at TEXT NOT NULL, byte_length INTEGER NOT NULL, media_type TEXT, state TEXT NOT NULL, relative_path TEXT NOT NULL )",
+            "tableName": "blob_objects",
+            "type": "table"
+          },
+          {
+            "name": "model_attempts",
+            "sql": "CREATE TABLE model_attempts ( attempt_id TEXT PRIMARY KEY, call_id TEXT NOT NULL, started_at TEXT, request_prepared_at TEXT, response_received_at TEXT, error_at TEXT, provider_request_id TEXT, http_status INTEGER, attempt_visibility TEXT, provider_wire_visibility TEXT, error_name TEXT, error_code TEXT, safe_details_json TEXT )",
+            "tableName": "model_attempts",
+            "type": "table"
+          },
+          {
+            "name": "model_calls",
+            "sql": "CREATE TABLE model_calls ( call_id TEXT PRIMARY KEY, trace_id TEXT, parent_call_id TEXT, provider TEXT, model_id TEXT, api TEXT, subsystem TEXT, operation TEXT, surface TEXT, trigger TEXT, attribution_kind TEXT, session_id TEXT, session_path TEXT, conversation_id TEXT, conversation_type TEXT, agent_id TEXT, child_agent_id TEXT, child_session_id TEXT, child_session_path TEXT, task_id TEXT, call_purpose TEXT, started_at TEXT, semantic_completed_at TEXT, ended_at TEXT, terminal_status TEXT, error_name TEXT, error_code TEXT, input_shape TEXT, provenance_precision TEXT, provenance_section_count INTEGER, provenance_categories_json TEXT, provenance_opaque_count INTEGER, attribution_json TEXT, source_json TEXT, safe_details_json TEXT, persistence_completeness TEXT NOT NULL DEFAULT 'partial', interrupted_by_restart INTEGER NOT NULL DEFAULT 0, payload_availability TEXT )",
+            "tableName": "model_calls",
+            "type": "table"
+          },
+          {
+            "name": "observability_meta",
+            "sql": "CREATE TABLE observability_meta ( key TEXT PRIMARY KEY, value_json TEXT NOT NULL )",
+            "tableName": "observability_meta",
+            "type": "table"
+          },
+          {
+            "name": "payload_blob_refs",
+            "sql": "CREATE TABLE payload_blob_refs ( payload_record_id INTEGER NOT NULL, blob_id TEXT NOT NULL, created_at TEXT NOT NULL, PRIMARY KEY (payload_record_id, blob_id) )",
+            "tableName": "payload_blob_refs",
+            "type": "table"
+          },
+          {
+            "name": "payload_records",
+            "sql": "CREATE TABLE payload_records ( id INTEGER PRIMARY KEY AUTOINCREMENT, call_id TEXT NOT NULL, kind TEXT NOT NULL, attempt_id TEXT, provider_request_ordinal INTEGER, captured_at TEXT NOT NULL, visibility TEXT NOT NULL, fidelity TEXT NOT NULL, sanitization_status TEXT NOT NULL, redacted INTEGER NOT NULL, truncated INTEGER NOT NULL, degraded INTEGER NOT NULL, payload_json TEXT, semantic_input_provenance_json TEXT, provider_request_provenance_json TEXT, record_char_count INTEGER )",
+            "tableName": "payload_records",
+            "type": "table"
+          },
+          {
+            "name": "traces",
+            "sql": "CREATE TABLE traces ( trace_id TEXT PRIMARY KEY, origin TEXT, first_seen_at TEXT NOT NULL, last_seen_at TEXT NOT NULL, call_count INTEGER NOT NULL DEFAULT 0, created_at TEXT NOT NULL, updated_at TEXT NOT NULL )",
+            "tableName": "traces",
+            "type": "table"
+          }
+        ],
+        "userVersion": 1
+      },
+      "sourceHash": "sha256:bd51692c8d2b3caa14460cd5eb59071ef8aa5a3ed22c63f54a36ba4a54e7a5de",
+      "storeId": "model-observability-db"
+    },
+    {
       "contract": "job.json/input.html request contract and generated PDF output lifecycle",
       "kind": "directory-contract",
       "module": "plugins/office/lib/html-to-pdf.ts",
@@ -3396,7 +3640,7 @@
       "contract": "server-info writer and desktop bootstrap reader",
       "kind": "runtime-contract",
       "module": "server/index.ts",
-      "sourceHash": "sha256:76d82308c49f56d97311ba98e57bf7b2ba5956d86b2340ef0cba67ac6cc6d323",
+      "sourceHash": "sha256:cd511f1d4c6aa4258841cceb78e2029cb7c416f3c1e728796b68a1bf8c6ff83e",
       "storeId": "server-runtime-info"
     },
     {
@@ -6573,6 +6817,110 @@
       "reason": "Writes an explicit tool output path supplied by the caller; no LINGXI_HOME store is implied.",
       "sourceFile": "lib/file-ref/resource-io.ts",
       "storeId": null
+    },
+    {
+      "exemptionId": null,
+      "kind": "mkdir",
+      "ordinal": 0,
+      "reason": "Writes, renames, or removes observatory blob files under the private blob tree.",
+      "sourceFile": "lib/llm/model-observability-blob-store.ts",
+      "storeId": "model-observability-blobs"
+    },
+    {
+      "exemptionId": null,
+      "kind": "mkdir",
+      "ordinal": 0,
+      "reason": "Writes, renames, or removes observatory blob files under the private blob tree.",
+      "sourceFile": "lib/llm/model-observability-blob-store.ts",
+      "storeId": "model-observability-blobs"
+    },
+    {
+      "exemptionId": null,
+      "kind": "mkdir",
+      "ordinal": 1,
+      "reason": "Writes, renames, or removes observatory blob files under the private blob tree.",
+      "sourceFile": "lib/llm/model-observability-blob-store.ts",
+      "storeId": "model-observability-blobs"
+    },
+    {
+      "exemptionId": null,
+      "kind": "remove-path",
+      "ordinal": 0,
+      "reason": "Writes, renames, or removes observatory blob files under the private blob tree.",
+      "sourceFile": "lib/llm/model-observability-blob-store.ts",
+      "storeId": "model-observability-blobs"
+    },
+    {
+      "exemptionId": null,
+      "kind": "remove-path",
+      "ordinal": 0,
+      "reason": "Writes, renames, or removes observatory blob files under the private blob tree.",
+      "sourceFile": "lib/llm/model-observability-blob-store.ts",
+      "storeId": "model-observability-blobs"
+    },
+    {
+      "exemptionId": null,
+      "kind": "remove-path",
+      "ordinal": 0,
+      "reason": "Writes, renames, or removes observatory blob files under the private blob tree.",
+      "sourceFile": "lib/llm/model-observability-blob-store.ts",
+      "storeId": "model-observability-blobs"
+    },
+    {
+      "exemptionId": null,
+      "kind": "rename",
+      "ordinal": 0,
+      "reason": "Writes, renames, or removes observatory blob files under the private blob tree.",
+      "sourceFile": "lib/llm/model-observability-blob-store.ts",
+      "storeId": "model-observability-blobs"
+    },
+    {
+      "exemptionId": null,
+      "kind": "write-file",
+      "ordinal": 0,
+      "reason": "Writes, renames, or removes observatory blob files under the private blob tree.",
+      "sourceFile": "lib/llm/model-observability-blob-store.ts",
+      "storeId": "model-observability-blobs"
+    },
+    {
+      "exemptionId": null,
+      "kind": "write-file",
+      "ordinal": 0,
+      "reason": "Writes, renames, or removes observatory blob files under the private blob tree.",
+      "sourceFile": "lib/llm/model-observability-blob-store.ts",
+      "storeId": "model-observability-blobs"
+    },
+    {
+      "exemptionId": null,
+      "kind": "mkdir",
+      "ordinal": 0,
+      "reason": "Creates the observatory store directory while tightening at-rest permissions.",
+      "sourceFile": "lib/llm/model-observability-persistence.ts",
+      "storeId": "model-observability-db"
+    },
+    {
+      "exemptionId": null,
+      "kind": "database-open",
+      "ordinal": 0,
+      "reason": "Opens or creates the observatory database.",
+      "sourceFile": "lib/llm/model-observability-schema.ts",
+      "storeId": "model-observability-db"
+    },
+    {
+      "exemptionId": null,
+      "kind": "mkdir",
+      "ordinal": 0,
+      "reason": "Opens or creates the observatory database.",
+      "sourceFile": "lib/llm/model-observability-schema.ts",
+      "storeId": "model-observability-db"
+    },
+    {
+      "exemptionId": null,
+      "kind": "remove-path",
+      "ordinal": 0,
+      "reason": "Removes a throwaway test-harness copy of the observatory store tree under os.tmpdir().",
+      "sourceFile": "lib/llm/model-observability-testing.ts",
+      "storeId": "model-observability-db"
     },
     {
       "exemptionId": null,

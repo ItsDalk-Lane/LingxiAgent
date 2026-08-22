@@ -25,6 +25,7 @@ import {
   MODEL_CALL_PAYLOAD_CAPTURE_LIMITS,
   MODEL_CALL_PAYLOAD_SCHEMA_VERSION,
   NO_SANITIZATION,
+  type ModelCallBlobExternalizer,
   type ModelCallPayloadFidelity,
   type ModelCallPayloadKind,
   type ModelCallPayloadRecord,
@@ -76,6 +77,24 @@ export function setModelCallPayloadSink(sink: ModelCallPayloadSink | null | unde
 
 export function getModelCallPayloadSink(): ModelCallPayloadSink {
   return currentSink;
+}
+
+/* ── Blob Externalizer 注册表（Phase 7，§六十一；默认 null）─────────── */
+
+let currentBlobExternalizer: ModelCallBlobExternalizer | null = null;
+
+/**
+ * privileged blob externalizer 注入点：只在显式启用 blob persistence 时由
+ * observability persistence coordinator 安装；uninstall 时恢复 null。
+ */
+export function setModelCallBlobExternalizer(externalizer: ModelCallBlobExternalizer | null | undefined): void {
+  currentBlobExternalizer = externalizer && typeof externalizer.stageBinary === "function"
+    ? externalizer
+    : null;
+}
+
+export function getModelCallBlobExternalizer(): ModelCallBlobExternalizer | null {
+  return currentBlobExternalizer;
 }
 
 /* ── 内部投递类型 ────────────────────────────────────────────────────── */
@@ -169,6 +188,8 @@ export function createModelCallPayloadCaptureSession(
   let currentAttemptId: string | null = null;
   let nextOrdinal = 0;
   let lastOrdinal: number | null = null;
+  // Phase 7：externalizer 在 session 创建时解析一次（与 sink 同语义；§六十一）。
+  const blobExternalizer: ModelCallBlobExternalizer | null = getModelCallBlobExternalizer();
 
   const deliver: Deliver = (kind, extras) => {
     try {
@@ -206,7 +227,7 @@ export function createModelCallPayloadCaptureSession(
     },
     captureSemanticRequest(input) {
       try {
-        captureSemanticRequestImpl(deliver, input);
+        captureSemanticRequestImpl(deliver, input, blobExternalizer);
       } catch { /* never break */ }
     },
     captureProviderRequest(input) {
@@ -214,17 +235,17 @@ export function createModelCallPayloadCaptureSession(
         nextOrdinal += 1;
         const ordinal = nextOrdinal;
         lastOrdinal = ordinal;
-        captureProviderRequestImpl(deliver, ordinal, input);
+        captureProviderRequestImpl(deliver, ordinal, input, blobExternalizer);
       } catch { /* never break */ }
     },
     captureProviderResponse(input) {
       try {
-        captureProviderResponseImpl(deliver, input, lastOrdinal);
+        captureProviderResponseImpl(deliver, input, lastOrdinal, blobExternalizer);
       } catch { /* never break */ }
     },
     captureSemanticResponse(input) {
       try {
-        captureSemanticResponseImpl(deliver, input);
+        captureSemanticResponseImpl(deliver, input, blobExternalizer);
       } catch { /* never break */ }
     },
     noteProviderWireUnavailable(kind, options) {
@@ -243,7 +264,11 @@ export function createModelCallPayloadCaptureSession(
 
 /* ── 各层级 capture 实现 ────────────────────────────────────────────── */
 
-function captureSemanticRequestImpl(deliver: Deliver, input: SemanticRequestCaptureInput): void {
+function captureSemanticRequestImpl(
+  deliver: Deliver,
+  input: SemanticRequestCaptureInput,
+  blobExternalizer: ModelCallBlobExternalizer | null = null,
+): void {
   const actions: ModelCallPayloadSanitization["actions"] = [];
   let redacted = false;
   let truncated = false;
@@ -280,7 +305,7 @@ function captureSemanticRequestImpl(deliver: Deliver, input: SemanticRequestCapt
   for (const key of ["messages", "tools", "parameters"] as const) {
     const value = input[key];
     if (value === undefined || value === null) continue;
-    const result = sanitizeValueForCapture(value);
+    const result = sanitizeValueForCapture(value, { blobExternalizer });
     redacted ||= result.sanitization.redacted;
     truncated ||= result.sanitization.truncated;
     degraded ||= result.sanitization.degraded;
@@ -332,6 +357,7 @@ function captureProviderRequestImpl(
   deliver: Deliver,
   ordinal: number,
   input: ProviderRequestCaptureInput,
+  blobExternalizer: ModelCallBlobExternalizer | null = null,
 ): void {
   const transport = input.transport ?? null;
   const hasBody = transport !== null && transport.body !== undefined && transport.body !== null;
@@ -361,13 +387,14 @@ function captureProviderRequestImpl(
       sanitizedTransport.url = url;
     }
     if (transport.headers !== undefined && transport.headers !== null) {
-      const result = sanitizeValueForCapture(headersToPlain(transport.headers));
+      const result = sanitizeValueForCapture(headersToPlain(transport.headers), { blobExternalizer });
       merge(result, "transport");
       sanitizedTransport.headers = result.value;
     }
     if (hasBody) {
       const result = sanitizeValueForCapture(transport.body, {
         secretPaths: secretPathsForProtocol(input.protocol),
+        blobExternalizer,
       });
       merge(result, "transport");
       sanitizedTransport.body = result.value;
@@ -388,6 +415,7 @@ function captureProviderResponseImpl(
   deliver: Deliver,
   input: ProviderResponseCaptureInput,
   lastOrdinal: number | null,
+  blobExternalizer: ModelCallBlobExternalizer | null = null,
 ): void {
   const hasBody = input.body !== undefined && input.body !== null;
   const payload: Record<string, unknown> = {};
@@ -398,7 +426,7 @@ function captureProviderResponseImpl(
 
   if (typeof input.status === "number" && Number.isFinite(input.status)) payload.status = input.status;
   if (input.headers !== undefined && input.headers !== null) {
-    const result = sanitizeValueForCapture(headersToPlain(input.headers));
+    const result = sanitizeValueForCapture(headersToPlain(input.headers), { blobExternalizer });
     redacted ||= result.sanitization.redacted;
     truncated ||= result.sanitization.truncated;
     degraded ||= result.sanitization.degraded;
@@ -408,7 +436,7 @@ function captureProviderResponseImpl(
     payload.headers = result.value;
   }
   if (hasBody) {
-    const result = sanitizeValueForCapture(input.body);
+    const result = sanitizeValueForCapture(input.body, { blobExternalizer });
     redacted ||= result.sanitization.redacted;
     truncated ||= result.sanitization.truncated;
     degraded ||= result.sanitization.degraded;
@@ -427,7 +455,11 @@ function captureProviderResponseImpl(
   });
 }
 
-function captureSemanticResponseImpl(deliver: Deliver, input: SemanticResponseCaptureInput): void {
+function captureSemanticResponseImpl(
+  deliver: Deliver,
+  input: SemanticResponseCaptureInput,
+  blobExternalizer: ModelCallBlobExternalizer | null = null,
+): void {
   const source = input.response;
   const actions: ModelCallPayloadSanitization["actions"] = [];
   let redacted = false;
@@ -457,7 +489,7 @@ function captureSemanticResponseImpl(deliver: Deliver, input: SemanticResponseCa
   for (const key of ["toolCalls", "structuredOutput", "media", "usage"] as const) {
     const value = source[key];
     if (value === undefined || value === null) continue;
-    const result = sanitizeValueForCapture(value);
+    const result = sanitizeValueForCapture(value, { blobExternalizer });
     redacted ||= result.sanitization.redacted;
     truncated ||= result.sanitization.truncated;
     degraded ||= result.sanitization.degraded;

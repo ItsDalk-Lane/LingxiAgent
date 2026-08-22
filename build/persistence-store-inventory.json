@@ -1215,6 +1215,81 @@
       "exemption": null
     },
     {
+      "id": "model-observability-blobs",
+      "ownerModule": "lib/llm/model-observability-blob-store.ts",
+      "pathPattern": "model-observability/blobs/**",
+      "pathPatterns": [
+        "model-observability/blobs/**"
+      ],
+      "pathExclusions": [],
+      "pathKind": "tree",
+      "format": "mixed-directory",
+      "schemaSource": {
+        "kind": "directory-contract",
+        "module": "lib/llm/model-observability-blob-store.ts",
+        "contract": "observatory blob shard layout, random blobId file names, atomic staging rename, owner-only permissions, and ref-count-based GC protocol"
+      },
+      "schemaContract": {
+        "kind": "protocol",
+        "source": "lib/llm/model-observability-blob-store.ts",
+        "compatibility": "The named runtime reader is canonical; this inventory does not imply stricter validation than runtime currently performs."
+      },
+      "openEntry": [
+        "createModelObservabilityBlobStore"
+      ],
+      "migrationEntry": [],
+      "protocolModules": [],
+      "firstPossibleOpenPhase": "engine_construct",
+      "firstPossibleWritePhase": "engine_construct",
+      "epochPolicy": "compatible",
+      "checkpointPolicy": "Excluded from epoch checkpoints: blob bytes are privileged observability captures whose lifetime is governed by payload retention and ref-count GC, not by business epoch transitions.",
+      "restorePolicy": "Never restored by epoch migrations; orphan blob files left by crashes are reclaimed through the observatory's own grace-period recovery, never replayed as business state.",
+      "affectedByEpochMigration": false,
+      "bootstrapSafety": null,
+      "preCoordinatorReadProjection": null,
+      "identityContract": "blobId is a random observatory identity (mb_<random>); files never carry original filenames and metadata keeps only mime type and byte length.",
+      "exemption": null
+    },
+    {
+      "id": "model-observability-db",
+      "ownerModule": "lib/llm/model-observability-schema.ts",
+      "pathPattern": "model-observability/observability.sqlite",
+      "pathPatterns": [
+        "model-observability/observability.sqlite",
+        "model-observability/observability.sqlite-wal",
+        "model-observability/observability.sqlite-shm"
+      ],
+      "pathExclusions": [],
+      "pathKind": "file",
+      "format": "sqlite",
+      "schemaSource": {
+        "kind": "sqlite-runtime",
+        "module": "lib/llm/model-observability-schema.ts",
+        "contract": "Model Observatory runtime DDL, PRAGMA user_version open/migration contract, and disable-on-failure semantics"
+      },
+      "schemaContract": {
+        "kind": "runtime-source",
+        "source": "lib/llm/model-observability-schema.ts",
+        "compatibility": "The named runtime reader is canonical; this inventory does not imply stricter validation than runtime currently performs."
+      },
+      "openEntry": [
+        "openModelObservabilityDatabase",
+        "installModelObservabilityPersistence"
+      ],
+      "migrationEntry": [],
+      "protocolModules": [],
+      "firstPossibleOpenPhase": "engine_construct",
+      "firstPossibleWritePhase": "engine_construct",
+      "epochPolicy": "compatible",
+      "checkpointPolicy": "Excluded from business data-epoch migration checkpoints: the observatory is not required to restore Agent/Session correctness and may be very large. Its own schema evolves through SQLite user_version migrations, never through DATA_EPOCH transitions.",
+      "restorePolicy": "Never restored by epoch migrations. Observability rows that reference sessions rolled back by an epoch restore are allowed historical facts; query surfaces report them as session-unavailable rather than deleting them.",
+      "affectedByEpochMigration": false,
+      "bootstrapSafety": null,
+      "preCoordinatorReadProjection": null,
+      "identityContract": "One global observatory database per LINGXI_HOME; callId/attemptId/traceId are runtime observation identities correlated with (but never owned by) business epoch identities.",
+      "exemption": null
+    },
+    {
       "id": "office-render-jobs",
       "ownerModule": "plugins/office/lib/html-to-pdf.ts",
       "pathPattern": "plugin-data/office/jobs",
@@ -5744,6 +5819,123 @@
       "reason": "Writes an explicit tool output path supplied by the caller; no LINGXI_HOME store is implied.",
       "storeId": null,
       "exemptionId": "external-file-ref-io",
+      "ordinal": 0
+    },
+    {
+      "sourceFile": "lib/llm/model-observability-blob-store.ts",
+      "kind": "mkdir",
+      "excerpt": "fs.mkdirSync(dir, { recursive: true })",
+      "reason": "Writes, renames, or removes observatory blob files under the private blob tree.",
+      "storeId": "model-observability-blobs",
+      "exemptionId": null,
+      "ordinal": 0
+    },
+    {
+      "sourceFile": "lib/llm/model-observability-blob-store.ts",
+      "kind": "mkdir",
+      "excerpt": "fs.mkdirSync(root, { recursive: true })",
+      "reason": "Writes, renames, or removes observatory blob files under the private blob tree.",
+      "storeId": "model-observability-blobs",
+      "exemptionId": null,
+      "ordinal": 0
+    },
+    {
+      "sourceFile": "lib/llm/model-observability-blob-store.ts",
+      "kind": "mkdir",
+      "excerpt": "fs.mkdirSync(root, { recursive: true })",
+      "reason": "Writes, renames, or removes observatory blob files under the private blob tree.",
+      "storeId": "model-observability-blobs",
+      "exemptionId": null,
+      "ordinal": 1
+    },
+    {
+      "sourceFile": "lib/llm/model-observability-blob-store.ts",
+      "kind": "remove-path",
+      "excerpt": "fs.rmSync(abs, { force: true })",
+      "reason": "Writes, renames, or removes observatory blob files under the private blob tree.",
+      "storeId": "model-observability-blobs",
+      "exemptionId": null,
+      "ordinal": 0
+    },
+    {
+      "sourceFile": "lib/llm/model-observability-blob-store.ts",
+      "kind": "remove-path",
+      "excerpt": "fs.rmSync(absolutePathFor(row.relative_path), { force: true })",
+      "reason": "Writes, renames, or removes observatory blob files under the private blob tree.",
+      "storeId": "model-observability-blobs",
+      "exemptionId": null,
+      "ordinal": 0
+    },
+    {
+      "sourceFile": "lib/llm/model-observability-blob-store.ts",
+      "kind": "remove-path",
+      "excerpt": "fs.rmSync(staging, { force: true })",
+      "reason": "Writes, renames, or removes observatory blob files under the private blob tree.",
+      "storeId": "model-observability-blobs",
+      "exemptionId": null,
+      "ordinal": 0
+    },
+    {
+      "sourceFile": "lib/llm/model-observability-blob-store.ts",
+      "kind": "rename",
+      "excerpt": "fs.renameSync(staging, abs)",
+      "reason": "Writes, renames, or removes observatory blob files under the private blob tree.",
+      "storeId": "model-observability-blobs",
+      "exemptionId": null,
+      "ordinal": 0
+    },
+    {
+      "sourceFile": "lib/llm/model-observability-blob-store.ts",
+      "kind": "write-file",
+      "excerpt": "fs.writeFileSync(staging, bytes, { mode: 0o600 })",
+      "reason": "Writes, renames, or removes observatory blob files under the private blob tree.",
+      "storeId": "model-observability-blobs",
+      "exemptionId": null,
+      "ordinal": 0
+    },
+    {
+      "sourceFile": "lib/llm/model-observability-blob-store.ts",
+      "kind": "write-file",
+      "excerpt": "fs.writeFileSync(staging, bytes)",
+      "reason": "Writes, renames, or removes observatory blob files under the private blob tree.",
+      "storeId": "model-observability-blobs",
+      "exemptionId": null,
+      "ordinal": 0
+    },
+    {
+      "sourceFile": "lib/llm/model-observability-persistence.ts",
+      "kind": "mkdir",
+      "excerpt": "fs.mkdirSync(storeDir, { recursive: true })",
+      "reason": "Creates the observatory store directory while tightening at-rest permissions.",
+      "storeId": "model-observability-db",
+      "exemptionId": null,
+      "ordinal": 0
+    },
+    {
+      "sourceFile": "lib/llm/model-observability-schema.ts",
+      "kind": "database-open",
+      "excerpt": "new Database(dbPath)",
+      "reason": "Opens or creates the observatory database.",
+      "storeId": "model-observability-db",
+      "exemptionId": null,
+      "ordinal": 0
+    },
+    {
+      "sourceFile": "lib/llm/model-observability-schema.ts",
+      "kind": "mkdir",
+      "excerpt": "fs.mkdirSync(path.dirname(dbPath), { recursive: true })",
+      "reason": "Opens or creates the observatory database.",
+      "storeId": "model-observability-db",
+      "exemptionId": null,
+      "ordinal": 0
+    },
+    {
+      "sourceFile": "lib/llm/model-observability-testing.ts",
+      "kind": "remove-path",
+      "excerpt": "fs.rmSync(tempDir, { recursive: true, force: true })",
+      "reason": "Removes a throwaway test-harness copy of the observatory store tree under os.tmpdir().",
+      "storeId": "model-observability-db",
+      "exemptionId": null,
       "ordinal": 0
     },
     {

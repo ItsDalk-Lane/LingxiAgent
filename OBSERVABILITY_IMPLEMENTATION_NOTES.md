@@ -560,3 +560,197 @@ coverage、Volcengine 专项、500、快路径）；`-summary.test.ts`（5：pro
   detached copy。
 - Pi provider mapping sidecar：需上游在 buildParams 处暴露 mapping（或 Lingxi
   侧 serializer 包装修改），当前诚实为 null。
+
+---
+
+# Phase 7 — Durable Model Observatory Storage（第六轮，2026-08-22）
+
+> 审计入口：MODEL_OBSERVABILITY_STORAGE_AUDIT.md（Step 1 十问交付 + 架构决策 +
+> pragma 表 + At-Rest 结论）。断点文件：OBSERVABILITY_STORAGE_PROGRESS.md。
+
+第一性原理目标：把 Phase 1～6 建立的模型调用事实安全投影为**跨进程重启可恢复的
+Durable Model Observatory**——Storage 永远是 Observer/Capture 的消费者，而不是
+模型执行依赖。
+
+## Storage Architecture
+
+```text
+Model Runtime ─┬─ ModelCallObserver（SAFE METADATA，契约未动）
+                └─ Payload Capture（统一 Redaction 后 sanitized copy）
+                         │
+              ModelObservabilityPersistenceCoordinator（handler 只 enqueue）
+                         │  bounded trace/payload/blob queues + setImmediate batch
+              {LINGXI_HOME}/model-observability/observability.sqlite（单 DB 逻辑分表）
+                         └─ blobs/{shard}/{blobId}.bin（privileged externalizer 通道）
+```
+
+- 模块（lib/llm/）：model-observability-schema（DDL + user_version migration +
+  disable-on-failure open）/ -trace-store（事件→SQL 投影）/ -payload-store（sanitized
+  record 持久化 + blob descriptor 存储态归一）/ -blob-store（atomic 文件写 + GC +
+  orphan/missing recovery）/ -retention（policy + maintenance）/ -persistence
+  （coordinator + install/uninstall/composite wiring）/ -testing（测试 harness）。
+- SQLite：WAL / synchronous=NORMAL / busy_timeout=5000 / secure_delete=ON /
+  auto_vacuum=INCREMENTAL / foreign_keys=OFF（容忍 out-of-order + partial crash，
+  关联完整性由 shell upsert 与读侧解释承担，§二十四）。
+
+## SQLite Schema（v1，PRAGMA user_version 自管）
+
+traces（trace_id PK/origin/first_seen/last_seen/call_count）｜model_calls（call_id PK
++ trace/parent + model 三元组 + source 四元组 + attribution 十列独立索引列 +
+call_purpose + 生命周期时间戳 + terminal_status/error + provenance 摘要列 +
+attribution/source/safe_details JSON + persistence_completeness +
+interrupted_by_restart + payload_availability）｜model_attempts（attempt_id PK/call_id/
+四时间戳/provider_request_id/http_status/attempt_visibility/provider_wire_visibility/
+error）｜payload_records（自增 id PK + kind/attempt/ordinal/captured_at/visibility/
+fidelity/sanitization 三布尔/正文与双 provenance JSON/字符数）｜blob_objects｜
+payload_blob_refs｜observability_meta（drop 计数等 health 元数据持久化）。
+
+## Trace Store（事件投影，§二十）
+
+logical_call_start→call+trace upsert（origin 进 traces）；attempt_start→attempt 行
+（attemptVisibility/providerWireVisibility 落列）；provider_request_prepared/
+provider_response_received→attempt 时间戳/httpStatus/providerRequestId（attempt
+shell 幂等，允许 NULL=事件缺失即真相，§二十一）；semantic_response_completed→
+semantic_completed_at；attempt_error/logical_call_error/aborted→安全 error 事实；
+logical_call_end→ended_at+terminal_status+persistence_completeness=complete。
+不从 payload 反推 observer 事件（§二十二）；payload 先到→partial call shell
+（started_at NULL，§二十三）。
+
+## Payload Store
+
+只实现 ModelCallPayloadSink（sanitized detached copy only，§四/十七）；无第二次
+业务 redaction——只做 serialization safety/size hard limit（1M chars）/kind 闭集
+校验（fail closed drop，§十八）；staged blob descriptor 在 commit 期归一
+stored/store_failed（存储态记账；失败降级移除 blobId，绝不 dangling ref，§七十一）；
+跨批 blob 以 metadata row 存在性验证 durable（isBlobDurable）；排序 = 自增 id。
+
+## Blob Store（privileged contract，§六十/六十一）
+
+- 通道：Redactor（describeBinary）在统一脱敏时咨询 `ModelCallBlobExternalizer`
+  （进程级注册点，默认 null=Phase 6 externalized 行为，§六十二）；字节经
+  externalizer bounded 复制进 blob queue，Payload 通道只拿 descriptor
+  （blobId=mb_<random>，无内容 hash，§六十六；磁盘文件名=<blobId>.bin，§六十七）。
+- eligible：仅 runtime 真实 materialized 的 Buffer/TypedArray/ArrayBuffer（§六十三）；
+  绝不自动读本地文件/下载 URL/fetch signed URL（§六十四）。**Blob/base64/dataURL
+  保持 externalized（PARTIAL，§七十四）**。
+- 写入：随机 staging 文件（0600）→ rename 发布（§七十）；flush 顺序 = blob 文件
+  先写 → 同一 SQLite transaction 提交 blob_objects + payload_records + refs
+  （§七十二）；GC 只删 0-live-ref（§九十一）；orphan 文件 24h grace 回收（§九十二）；
+  missing 标 state=missing 不 crash（§九十三）。
+
+## Persistence Queue（coordinator，§三十四～四十一）
+
+- handler 只 enqueue（零同步 fs/SQLite）；trace(4096)/payload(2048)/blob(256 个，
+  64MB) 独立 bounded queue——1MB response 拖不死 trace metadata（§一百一十）。
+- overflow：drop newest + 显式计数 + call 标 payload_availability='dropped'；
+  计数持久化 observability_meta、跨 restart 恢复（§四十三）。
+- flush：setImmediate coalesce + 2s interval（unref）；transaction throw → 整批
+  rollback 后单次 retry → 再失败诚实 drop（§四十九）。
+- crash 诚实语义（§四十四）：接受崩溃丢最后一个未 flush batch，不要求
+  logical_call_start 落盘后才发 Provider 请求；graceful shutdown flush（engine
+  .dispose 5s bounded timeout，§四十五）。
+
+## Crash Semantics（§四十六/四十七）
+
+Startup Reconciliation 只做 `interrupted_by_restart=1`（persistence inference），
+terminal_status 保持 NULL——用户杀进程 ≠ Provider error，不伪造 logical_call_end。
+
+## Retention Contract（§五十三～五十八）
+
+policy 六维度；safe fallback 集中定义（trace 180d/payload 30d/blob 30d）；产品
+默认值留 Phase 8（§五十四）。payload 可先于 trace 过期：整 trace 单位删除正文、
+call 标 payload_availability='expired'，metadata 保留；blobMaxAge 只作用于 refless
+blob（删仍被引用的 blob 会制造 dangling ref，违反 §七十一——其寿命由 payload
+retention 决定）。maintenance = startup once + 1h unref timer + 显式
+runMaintenance()，runWithoutModelTrace detach（§八十六/八十七），compact =
+wal_checkpoint(TRUNCATE)+incremental_vacuum（§八十八）。
+
+## At-Rest Protection（§七十五～七十七/一百三十七）
+
+**Is observability content cryptographically encrypted at rest? NO.** 全仓无
+keytar/safeStorage/libsecret（audit Q6 实证）→ 不实现伪加密（§七十六）。保护 =
+private 目录 Unix 0700 + DB/WAL/SHM/blob 0600（目录先收紧，§七十八；Windows
+依赖 profile 继承 ACL，不假装 POSIX 等价）+ payload persistence 显式 opt-in +
+bounded retention。剩余威胁：同用户进程直读、备份/同步渠道明文复制、SSD
+wear-leveling（删除语义 = logical deletion + secure_delete + blob unlink，不承诺
+物理不可恢复，§九十）。
+
+## Data Epoch Classification & Store Registry（§三十～三十二）
+
+两个新 descriptor：`model-observability-db`（sqlite-runtime + fingerprint
+introspector 开真实 store）、`model-observability-blobs`（tree）。均
+epochPolicy=compatible、affectedByEpochMigration=false、checkpoint/restorePolicy
+显式写明排除理由（结构性排除：migration 批次引用即 fail-closed）。scanner 61
+stores 全绿；fingerprint compatible repin。
+
+## Persistence Lifecycle（§七十九～八十五）
+
+默认 policy disabled（不建文件，生产=Phase 6）；`new LingxiEngine({
+modelObservability })` + `startServer` CompositionRoot 透传（engine_construct 安装，
+早于一切模型调用；Phase 8 接 UI/settings，无隐藏 env 开关）；persistTraceMetadata/
+persistPayloads/persistBlobs 独立开关（persistBlobs⊆persistPayloads）；composite
+observer/sink 保持既有 test/debug sink 工作；close/uninstall 恢复先前注册对象。
+
+## MC-01～MC-10 Durable Matrix（§一百三十四）
+
+|MC Path|Trace Durable|Attempts|Semantic Req|Provider Req|Provider Resp|Semantic Resp|Provenance|Restart Safe|
+|---|---|---|---|---|---|---|---|---|
+|MC-01 Pi Chat|✅|logical_boundary（1）|FULL|FULL（hook body）|**METADATA_ONLY**（持久化不升级）|FULL|provider mapping **null** 保留|✅|
+|MC-02 AgentRun|✅|logical_boundary|FULL|**UNAVAILABLE**|**UNAVAILABLE**|FULL|—|✅|
+|MC-03 Native Compaction|✅|logical_boundary|FULL|**UNAVAILABLE**|**UNAVAILABLE**|FULL|—|✅|
+|MC-04 callText|✅|exact + request_response|FULL|FULL|FULL|FULL|四协议 mapping exact 持久化|✅|
+|MC-05 Probe|✅|exact|FULL（"." 值）|FULL|**METADATA_ONLY**|FULL（structuredOutput）|—|✅|
+|MC-06 Image ×7（codex 401）|✅|exact ×2|FULL|FULL ×2（ordinal 1/2）|FULL ×2（401/200）|FULL|—|✅|
+|MC-07 Dreamina CLI|✅|external_process_boundary + **opaque**|FULL|**OPAQUE**/external_process|**OPAQUE**|FULL|—|✅|
+|MC-08 Video|✅|exact|FULL|FULL|FULL|FULL（taskId/deferred）|—|✅|
+|MC-09 Speech ×4|✅|exact|FULL（audio→blob stored）|FULL（Volcengine uid 协议脱敏持久化）|FULL|FULL（transcription）|—|✅|
+|MC-10 Direct Summary|✅|logical_boundary|FULL（三元组）|**UNAVAILABLE**|**UNAVAILABLE**|FULL|—|✅|
+
+Persistence 未把任何 UNAVAILABLE/OPAQUE/METADATA_ONLY 升级为 FULL（durable-matrix
+测试锁定）。
+
+## Storage Completeness Matrix（§一百三十五）
+
+|Fact|Runtime Source|Persistent Table/Store|Key|Missing-state Semantics|
+|---|---|---|---|---|
+|Trace|ModelTraceScope traceId|traces|trace_id|事件缺失即真相；无假 trace|
+|Logical Call|logical_call_start|model_calls|call_id|start 事件丢→partial shell（started_at NULL）；payload 先到同|
+|Attempt|attempt_start|model_attempts|attempt_id|request/response/error 时间戳 NULL=事件未发生（MC-03）|
+|Semantic Request|capture session|payload_records kind=semantic_request|(call_id,id)|无行=not captured（capture 层未捕获或 persistPayloads=false）|
+|Provider Request|capture/hook|payload_records kind=provider_request|(call_id,provider_request_ordinal)|unavailable/opaque 行保留原语义|
+|Provider Response|capture/hook|payload_records kind=provider_response|同上|同上；network error 无行=真相|
+|Semantic Response|capture session|payload_records kind=semantic_response|(call_id,id)|0..1 基数；无输出不制造|
+|Semantic Provenance|Phase 5 sidecar|payload_records.semantic_input_provenance_json|(call_id,id)|span remap 后仍可定位（locator roundtrip 测试）|
+|Provider Provenance|构造点 sidecar|payload_records.provider_request_provenance_json|(call_id,id)|Pi 路径 null 保留|
+|Blob|externalizer|blob_objects + payload_blob_refs + blobs/*.bin|blob_id|state=missing（文件丢失不 crash）；store_failed descriptor 无 blobId|
+|Usage correlation|ledger metadata.modelCallId|（不进本 store；Usage Ledger 独立）|modelCallId|两系统经 modelCallId 关联，互不替代|
+|Drop/失败计数|coordinator health|observability_meta|key|Phase 8 可诚实告知「这一段观测有缺失」|
+
+## Retention Matrix（§一百三十六）
+
+|Data Class|Retention Policy|Deletion Unit|GC Dependency|Survives Payload Expiry|
+|---|---|---|---|---|
+|Trace|traceMaxAgeMs（fallback 180d）/maxTraceRows?|完整 trace|—|—（本体）|
+|Call|随 trace|完整 trace 内|trace 删除|✅（metadata 属 trace）|
+|Attempt|随 call|完整 trace 内|trace 删除|✅|
+|Payload|payloadMaxAgeMs（fallback 30d）/maxPayloadBytes?|完整 trace 的全部 payload|删除后 call 标 expired|—（本体先删）|
+|Blob|blobMaxAgeMs（仅 refless）/maxBlobBytes?|refless blob|payload 删除 → ref 消失 → GC|被引用 blob 随 payload 删除后 GC|
+|Health metadata|不按年龄删除（observability_meta）|—|—|✅|
+
+## Tests（Step 14-17）
+
+新增 6 文件 44 用例（详见 OBSERVABILITY_STORAGE_PROGRESS.md）。关键硬测试：
+毒丸落盘字节级扫描（DB+wal+shm Buffer.includes，§一百零一）；codex 401 双 ordinal
+durable（§九十七）；opaque/unavailable 不升级（§九十八/九十九）；crash 不伪造终态
+（§一百零六）；write failure/queue overflow/trace 优先/graceful flush（§一百零八～
+一百一十一）；restart roundtrip/retention/blob 全套。
+
+## Known Storage Gaps
+
+见 OBSERVABILITY_STORAGE_PROGRESS.md（Blob PARTIAL、无加密、同用户进程威胁、
+多进程长期双写未仲裁、同步 flush 无 worker、Phase 8 全未实现）。
+
+## Next Phase
+
+Phase 8：Unified Query Service + Filters + Group By + Drill Down + Trace Explorer
+Backend + Payload Retrieval + Export Contract——建立在已稳定的 durable facts 上。

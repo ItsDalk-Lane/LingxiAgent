@@ -34,6 +34,7 @@
 import path from "node:path";
 import {
   MODEL_CALL_PAYLOAD_CAPTURE_LIMITS,
+  type ModelCallBlobExternalizer,
   type ModelCallPayloadSanitization,
   type ModelCallRedactionActionEntry,
 } from "./model-call-payload-types.ts";
@@ -61,9 +62,14 @@ class Sanitizer {
   degraded = false;
 
   private secretPathSet: ReadonlySet<string>;
+  readonly blobExternalizer: ModelCallBlobExternalizer | null;
 
-  constructor(options: { secretPaths?: ReadonlySet<string> } = {}) {
+  constructor(options: {
+    secretPaths?: ReadonlySet<string>;
+    blobExternalizer?: ModelCallBlobExternalizer | null;
+  } = {}) {
     this.secretPathSet = options.secretPaths ?? EMPTY_SET;
+    this.blobExternalizer = options.blobExternalizer ?? null;
   }
 
   action(path: Array<string | number>, action: ModelCallRedactionActionEntry["action"], reason: string): void {
@@ -99,6 +105,12 @@ export type SanitizeValueResult = {
 export type SanitizeValueOptions = {
   /** provider/protocol-specific body credential 路径（相对 body 根，"." 连接）。 */
   secretPaths?: ReadonlySet<string>;
+  /**
+   * privileged blob externalizer（Phase 7，§六十一）：null 时维持 Phase 6
+   * externalized 行为。只影响可同步复制字节的二进制（ArrayBuffer/TypedArray）；
+   * Blob/base64/dataURL 始终 externalized。
+   */
+  blobExternalizer?: ModelCallBlobExternalizer | null;
 };
 
 /**
@@ -109,7 +121,7 @@ export function sanitizeValueForCapture(
   value: unknown,
   options: SanitizeValueOptions = {},
 ): SanitizeValueResult {
-  const sanitizer = new Sanitizer({ secretPaths: options.secretPaths });
+  const sanitizer = new Sanitizer({ secretPaths: options.secretPaths, blobExternalizer: options.blobExternalizer });
   const budget = new CaptureBudget();
   const seen = new WeakMap<object, true>();
   let out: unknown = null;
@@ -148,7 +160,7 @@ function walk(
 
   // type === "object"
   // 二进制与特殊容器先于普通对象处理。
-  const binary = describeBinary(value);
+  const binary = describeBinary(value, sanitizer.blobExternalizer);
   if (binary) {
     sanitizer.action(trail, "externalized", binary.reason);
     return binary.descriptor;
@@ -282,7 +294,7 @@ function walkFormData(
         fields[key] = walkString(raw, [...trail, "fields", key], sanitizer, budget);
         continue;
       }
-      const binary = describeBinary(raw);
+      const binary = describeBinary(raw, sanitizer.blobExternalizer);
       if (binary) {
         sanitizer.action([...trail, "fields", key], "externalized", "form-file");
         files.push({ field: key, ...binary.descriptor as Record<string, unknown> });
@@ -353,31 +365,46 @@ type BinaryOutcome = {
   reason: string;
 };
 
-function describeBinary(value: unknown): BinaryOutcome | null {
+/**
+ * 二进制 externalization（§三十一/§三十二：不保存字节、不 hash；Phase 7
+ * §六十一：可咨询 blobExternalizer——字节只在 externalizer 内部 bounded 复制，
+ * 这里不复制、不 hash）。Blob 实例无法同步读取字节 → 保持 externalized
+ * （诚实 PARTIAL，§七十四）；externalizer 为 null 时维持 Phase 6 行为。
+ */
+function describeBinary(value: unknown, externalizer: ModelCallBlobExternalizer | null): BinaryOutcome | null {
+  const stageWithExternalizer = (bytes: Uint8Array, mediaType: string, fallback: Record<string, unknown>, reason: string): BinaryOutcome => {
+    if (!externalizer) return { descriptor: fallback, reason };
+    try {
+      const staged = externalizer.stageBinary({ bytes, mediaType });
+      if (staged && typeof staged.blobId === "string" && staged.blobId) {
+        return { descriptor: { ...fallback, blobId: staged.blobId, captureStatus: "staged" }, reason: `${reason}+blob-staged` };
+      }
+    } catch {
+      // externalizer 故障 → 降级 externalized（绝不影响捕获）。
+    }
+    return { descriptor: fallback, reason };
+  };
   if (typeof ArrayBuffer !== "undefined" && value instanceof ArrayBuffer) {
-    return {
-      descriptor: {
-        kind: "external_blob",
-        mediaType: "application/octet-stream",
-        byteLength: value.byteLength,
-        encoding: "binary",
-        captureStatus: "externalized",
-      },
-      reason: "arraybuffer",
+    const fallback = {
+      kind: "external_blob",
+      mediaType: "application/octet-stream",
+      byteLength: value.byteLength,
+      encoding: "binary",
+      captureStatus: "externalized",
     };
+    return stageWithExternalizer(new Uint8Array(value), "application/octet-stream", fallback, "arraybuffer");
   }
   if (ArrayBuffer.isView(value)) {
     const view = value as ArrayBufferView & { length?: number };
-    return {
-      descriptor: {
-        kind: "external_blob",
-        mediaType: "application/octet-stream",
-        byteLength: typeof view.byteLength === "number" ? view.byteLength : (view.length ?? null),
-        encoding: "binary",
-        captureStatus: "externalized",
-      },
-      reason: "typed-array",
+    const byteLength = typeof view.byteLength === "number" ? view.byteLength : (view.length ?? null);
+    const fallback = {
+      kind: "external_blob",
+      mediaType: "application/octet-stream",
+      byteLength,
+      encoding: "binary",
+      captureStatus: "externalized",
     };
+    return stageWithExternalizer(view as Uint8Array, "application/octet-stream", fallback, "typed-array");
   }
   if (typeof Blob !== "undefined" && value instanceof Blob) {
     const blob = value as Blob & { name?: unknown };

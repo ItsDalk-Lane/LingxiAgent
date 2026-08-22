@@ -134,3 +134,21 @@
 - 验证：typecheck ×3 0 error；eslint 0 error；lint:boundary 绿（manifest 收录
   5 个新共享模块）；既有观测测试 14 文件 131 用例全绿无回归；新增 7 文件
   103 用例全绿；full npm test 见下。
+
+## Phase 7 — Durable Model Observatory Storage（2026-08-22 第六轮）
+
+**状态：完成。** 交付：单 SQLite（user_version=1）逻辑分表 traces/model_calls/
+model_attempts/payload_records/blob_objects/payload_blob_refs/observability_meta +
+外置 blobs 树；bounded 异步 coordinator（handler 只 enqueue，trace/payload/blob
+三队列独立容量，overflow 显式计数并持久化跨 restart）；crash reconciliation 只标
+interrupted_by_restart 不伪造终态；retention 六维度 policy + 集中 safe fallback
+（trace 180d/payload 30d/blob 30d，payload 可先过期）；privileged Blob
+Externalizer contract（Buffer/TypedArray/ArrayBuffer 可存，Blob/base64 诚实
+externalized；atomic 写 + ref-count GC + orphan/missing recovery）；engine/server
+真实生产 wiring（默认 disabled，显式 policy 开启，dispose 5s bounded flush）。
+毒丸落盘字节级扫描（DB+wal+shm）零命中。Store Registry ×2 登记 + fingerprint
+introspector + compatible repin（sha256:f3d6c1f9…）。新增 6 测试文件 44 用例；
+既有观测 302 用例回归全绿；full npm test 11925 通过。详见
+OBSERVABILITY_STORAGE_PROGRESS.md / MODEL_OBSERVABILITY_STORAGE_AUDIT.md /
+OBSERVABILITY_IMPLEMENTATION_NOTES.md Phase 7 节（含 Durable/Completeness/
+Retention 三矩阵与 At-Rest NO 结论）。

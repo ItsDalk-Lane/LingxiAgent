@@ -213,6 +213,7 @@ import {
   translateSkillNamesWithCache,
 } from "../lib/skills/skill-name-translation-cache.ts";
 import { createUsageLedger } from "../lib/llm/usage-ledger.ts";
+import { installModelObservabilityPersistence } from "../lib/llm/model-observability-persistence.ts";
 import {
   autoProjectIdForCwd,
   isAutoProjectId,
@@ -313,6 +314,7 @@ export class LingxiEngine {
   declare _sessionManifestResolver: any;
   declare _sessionManifestStore: any;
   declare _sessionManifestStoreRecovery: any;
+  declare _modelObservability: any;
   declare _sessionProjects: any;
   declare _skills: any;
   declare _slashSystem: any;
@@ -344,8 +346,13 @@ export class LingxiEngine {
    *   implementations (core/media-adapters/), supplied by the composition
    *   root. Absent/empty means an open composition: the media runtime
    *   constructs with zero built-in adapters, never an implicit import.
+   * @param {object} [dirs.modelObservability] Durable Model Observatory
+   *   persistence policy (Phase 7). Absent or enabled !== true keeps
+   *   persistence disabled — production behavior is identical to Phase 6.
+   *   Storage open/migration failure disables observability persistence and
+   *   never fails engine startup (MODEL_OBSERVABILITY_STORAGE_AUDIT.md Q9).
    */
-  constructor({ lingxiHome, productDir, agentId, appVersion, builtinMediaAdapters }) {
+  constructor({ lingxiHome, productDir, agentId, appVersion, builtinMediaAdapters, modelObservability }) {
     this.lingxiHome = lingxiHome;
     this.productDir = productDir;
     this.appVersion = appVersion || "0.0.0";
@@ -388,6 +395,27 @@ export class LingxiEngine {
     this._sessionManifestResolver = this._sessionManifestStore
       ? new SessionManifestResolver({ store: this._sessionManifestStore })
       : null;
+    // ── Phase 7：Durable Model Observatory persistence（engine_construct 阶段，
+    // 早于任何模型调用；默认 disabled。打开失败 → disabled handle，engine 正常继续。）──
+    this._modelObservability = null;
+    if (modelObservability && modelObservability.enabled === true) {
+      try {
+        this._modelObservability = installModelObservabilityPersistence({
+          lingxiHome,
+          policy: modelObservability,
+        });
+        const health = this._modelObservability.getHealth();
+        if (health.status === "disabled") {
+          moduleLog.warn(
+            `model observability persistence disabled (${health.storeDisabledReasonCode}); model runtime continues`,
+          );
+          this._modelObservability = null;
+        }
+      } catch (error) {
+        moduleLog.warn(`model observability persistence install failed: ${error?.message ?? error}`);
+        this._modelObservability = null;
+      }
+    }
     this._currentTurnNativeMedia = createCurrentTurnNativeMediaStore();
     this._pluginInstallRecords = new PluginInstallRecords({ lingxiHome });
     this._automationSuggestionStore = new AutomationSuggestionStore();
@@ -827,6 +855,14 @@ export class LingxiEngine {
 
   get deferredResults() {
     return this._deferredResultStore || null;
+  }
+
+  /**
+   * Phase 7 Durable Model Observatory persistence handle（disabled/未安装时
+   * null）。只读诊断用途；close 归 engine.dispose() 所有。
+   */
+  get modelObservabilityPersistence() {
+    return this._modelObservability || null;
   }
 
   /**
@@ -2691,7 +2727,27 @@ export class LingxiEngine {
       try {
         await this.disposeComputerRuntime();
       } finally {
-        this._sessionManifestStore?.close?.();
+        try {
+          // Phase 7：bounded flush 后关闭 observability store（任务书 §四十五：
+          // 必须有 bounded timeout，不能无限阻塞退出）。
+          if (this._modelObservability) {
+            const closing = this._modelObservability;
+            this._modelObservability = null;
+            try {
+              await Promise.race([
+                closing.close(),
+                new Promise((resolve) => {
+                  const timer = setTimeout(resolve, 5000);
+                  timer.unref?.();
+                }),
+              ]);
+            } catch {
+              // observability 关闭失败不阻塞退出
+            }
+          }
+        } finally {
+          this._sessionManifestStore?.close?.();
+        }
       }
     }
   }

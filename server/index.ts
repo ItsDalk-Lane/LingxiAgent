@@ -440,6 +440,8 @@ export async function startServer(root: CompositionRoot = {}): Promise<void> {
     productDir,
     appVersion,
     builtinMediaAdapters: root.builtinMediaAdapters,
+    // Phase 7：默认 disabled（root.modelObservability 缺省时生产行为与 Phase 6 一致）。
+    modelObservability: root.modelObservability,
   } as any);
   log.log("② LingxiEngine 构造完成，开始 init...");
   await engine.init((msg: any) => log.log(msg));

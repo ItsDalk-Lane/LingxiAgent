@@ -246,6 +246,33 @@ export type ProviderRequestProvenance = {
   mappings: ProviderRequestProvenanceMapping[];
 };
 
+/* ── Blob Externalization 契约（Phase 7，§六十/§六十一）───────────────── */
+
+/**
+ * privileged Blob Externalizer contract——与 ModelCallPayloadSink 完全不同的
+ * 第二通道：Redactor 在统一脱敏时把 runtime 中**真实 materialized 的二进制**
+ * （Buffer/TypedArray/ArrayBuffer；Blob/base64/dataURL 因无法同步读取字节而
+ * 保持 externalized，诚实 PARTIAL）交给它换取 blob descriptor。字节走
+ * externalizer → Blob Store；Payload 通道只拿到 descriptor。
+ *
+ * 生产默认 null（维持 Phase 6 externalized 行为，§六十二）；只在显式启用
+ * blob persistence 时安装。externalizer 绝不自动读取本地文件/下载 URL
+ * （§六十三/§六十四）；stage 超出 size/queue cap 时返回 null（降级 externalized）。
+ */
+export interface ModelCallBlobExternalizer {
+  stageBinary(input: { bytes: Uint8Array; mediaType: string | null }): { blobId: string } | null;
+}
+
+/**
+ * external_blob descriptor 的 captureStatus 语义（Phase 6 起 + Phase 7 扩展）：
+ *   externalized —— bytes 未进入任何存储（Phase 6 默认/不可同步读取的类型）
+ *   staged       —— bytes 已进入 externalizer 的 bounded 暂存队列（Redactor 产物）
+ *   stored       —— blob 文件已 durable 且 metadata 已 commit（持久化层归一后）
+ *   store_failed —— blob 写盘失败；descriptor 不携带 blobId（无 dangling ref）
+ * 「staged → stored/store_failed」是持久化层的存储态记账，不是第二次业务
+ * redaction（payload-store normalizeStagedBlobDescriptors）。
+ */
+
 /* ── Capture Record（§十六）─────────────────────────────────────────── */
 
 export type ModelCallPayloadRecord = {

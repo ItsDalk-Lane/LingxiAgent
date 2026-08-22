@@ -6448,11 +6448,16 @@
         },
         {
           "root": "server-bootstrap",
+          "from": "lib/llm/model-observability-persistence.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
           "from": "lib/extensions/model-call-observer-ext.ts",
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by lib/llm/model-call-recorder.ts (import-statement); lib/pi-sdk/model-call-stream-observer.ts (import-statement); lib/llm/observed-pi-direct-summary.ts (import-statement); +4 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by lib/llm/model-call-recorder.ts (import-statement); lib/pi-sdk/model-call-stream-observer.ts (import-statement); lib/llm/observed-pi-direct-summary.ts (import-statement); +5 more importer(s)."
     },
     {
       "path": "lib/llm/model-call-payload-capture.ts",
@@ -6477,9 +6482,14 @@
           "root": "server-bootstrap",
           "from": "core/llm-client.ts",
           "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/llm/model-observability-persistence.ts",
+          "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by lib/pi-sdk/model-call-stream-observer.ts (import-statement); lib/llm/observed-pi-direct-summary.ts (import-statement); lib/llm/model-call-integration.ts (import-statement); +1 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by lib/pi-sdk/model-call-stream-observer.ts (import-statement); lib/llm/observed-pi-direct-summary.ts (import-statement); lib/llm/model-call-integration.ts (import-statement); +2 more importer(s)."
     },
     {
       "path": "lib/llm/model-call-payload-redaction.ts",
@@ -6511,9 +6521,14 @@
           "root": "server-bootstrap",
           "from": "lib/llm/provider-request-provenance.ts",
           "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/llm/model-observability-payload-store.ts",
+          "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by lib/llm/model-call-payload-redaction.ts (import-statement); lib/llm/model-call-payload-capture.ts (import-statement); lib/llm/provider-request-provenance.ts (import-statement)."
+      "reason": "Reached via esbuild source module graph, imported by lib/llm/model-call-payload-redaction.ts (import-statement); lib/llm/model-call-payload-capture.ts (import-statement); lib/llm/provider-request-provenance.ts (import-statement); +1 more importer(s)."
     },
     {
       "path": "lib/llm/model-call-recorder.ts",
@@ -6568,6 +6583,88 @@
         }
       ],
       "reason": "Reached via esbuild source module graph, imported by lib/pi-sdk/model-call-stream-observer.ts (import-statement); lib/llm/cache-preserving-compaction-agent-run.ts (import-statement); lib/extensions/model-call-observer-ext.ts (import-statement)."
+    },
+    {
+      "path": "lib/llm/model-observability-blob-store.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "lib/llm/model-observability-persistence.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by lib/llm/model-observability-persistence.ts (import-statement)."
+    },
+    {
+      "path": "lib/llm/model-observability-payload-store.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "lib/llm/model-observability-persistence.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by lib/llm/model-observability-persistence.ts (import-statement)."
+    },
+    {
+      "path": "lib/llm/model-observability-persistence.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "core/engine.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by core/engine.ts (import-statement)."
+    },
+    {
+      "path": "lib/llm/model-observability-retention.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "lib/llm/model-observability-persistence.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by lib/llm/model-observability-persistence.ts (import-statement)."
+    },
+    {
+      "path": "lib/llm/model-observability-schema.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "lib/llm/model-observability-blob-store.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/llm/model-observability-retention.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/llm/model-observability-persistence.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by lib/llm/model-observability-blob-store.ts (import-statement); lib/llm/model-observability-retention.ts (import-statement); lib/llm/model-observability-persistence.ts (import-statement)."
+    },
+    {
+      "path": "lib/llm/model-observability-trace-store.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "lib/llm/model-observability-persistence.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by lib/llm/model-observability-persistence.ts (import-statement)."
     },
     {
       "path": "lib/llm/model-request-accounting.ts",
@@ -6667,6 +6764,11 @@
         },
         {
           "root": "server-bootstrap",
+          "from": "lib/llm/model-observability-persistence.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
           "from": "core/engine.ts",
           "kind": "import-statement"
         },
@@ -6691,7 +6793,7 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by lib/pi-sdk/session-options.ts (import-statement); lib/pi-sdk/model-call-stream-observer.ts (import-statement); lib/llm/observed-pi-direct-summary.ts (import-statement); +15 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by lib/pi-sdk/session-options.ts (import-statement); lib/pi-sdk/model-call-stream-observer.ts (import-statement); lib/llm/observed-pi-direct-summary.ts (import-statement); +16 more importer(s)."
     },
     {
       "path": "lib/llm/observed-pi-direct-summary.ts",
@@ -123306,6 +123408,16 @@
         },
         {
           "root": "server-bootstrap",
+          "from": "lib/llm/model-observability-blob-store.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/llm/model-observability-persistence.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
           "from": "core/first-run.ts",
           "kind": "import-statement"
         },
@@ -123320,7 +123432,7 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by core/local-provider-plugin-store.ts (import-statement); core/plugin-config.ts (import-statement); core/credential-file-healer.ts (import-statement); +7 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by core/local-provider-plugin-store.ts (import-statement); core/plugin-config.ts (import-statement); core/credential-file-healer.ts (import-statement); +9 more importer(s)."
     },
     {
       "path": "shared/server-info-probe.cjs",
@@ -123713,9 +123825,9 @@
     }
   ],
   "stats": {
-    "totalFiles": 10594,
+    "totalFiles": 10600,
     "byInputType": {
-      "source-graph": 698,
+      "source-graph": 704,
       "runtime-asset": 11,
       "nft-runtime-trace": 9885
     }
