@@ -334,6 +334,7 @@
     "lib/llm/model-call-scope.ts",
     "lib/llm/model-observability-accounting-projection.ts",
     "lib/llm/model-observability-blob-store.ts",
+    "lib/llm/model-observability-engine.ts",
     "lib/llm/model-observability-export.ts",
     "lib/llm/model-observability-persistence.ts",
     "lib/llm/model-observability-preferences.ts",

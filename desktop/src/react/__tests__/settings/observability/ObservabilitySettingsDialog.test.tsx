@@ -90,6 +90,7 @@ function makeHealth(): ModelObservabilityHealthResponse {
       payloadRecordCount: 0,
       usageProjectionCount: 0,
       dataCompleteness: {
+        status: 'known',
         droppedTraceEvents: 0, droppedPayloadRecords: 0, droppedBlobs: 0, interruptedByRestartCalls: 0,
       },
     },
@@ -131,6 +132,30 @@ describe('ObservabilitySettingsDialog', () => {
     const mismatch = await screen.findByRole('status');
     expect(mismatch.textContent).toContain('settings.observability.recording.configuredButInactive');
     expect(mismatch.textContent).toContain('disabled_by_policy');
+  });
+
+  it('degraded 是仍在记录的告警态，不伪装成未生效', async () => {
+    const degraded: ModelObservabilitySettingsResponse = {
+      ...SETTINGS_ACTIVE,
+      effective: {
+        ...SETTINGS_ACTIVE.effective,
+        recordingStatus: 'degraded',
+        storeDisabledReasonCode: 'write_failed_pending_receipt',
+      },
+    };
+    render(
+      <ObservabilitySettingsDialog
+        open isLocalOwner settings={degraded} health={{
+          ...makeHealth(),
+          recordingStatus: 'degraded',
+          storeDisabledReasonCode: 'write_failed_pending_receipt',
+        }}
+        onClose={() => {}} onApplied={() => {}}
+      />,
+    );
+    const effective = document.querySelector('[class*="observability-settings-effective"]');
+    expect(effective?.textContent).toContain('degraded');
+    expect(effective?.textContent).not.toContain('settings.observability.recording.configuredButInactive');
   });
 
   it('states the honest at-rest encryption fact (never claims encrypted storage, §一百零三)', async () => {

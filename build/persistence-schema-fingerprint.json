@@ -660,7 +660,7 @@
     ],
     "version": 3
   },
-  "payloadFingerprint": "sha256:15591e090fdf48f4f4f0234a3d32d774cde09a288366cd83a3752cbecd1a1dc2",
+  "payloadFingerprint": "sha256:f4cfa1e85848f7b621a87f5cc638a3d0c9229d71acae9f662e34b438358a3d49",
   "registry": [
     {
       "affectedByEpochMigration": true,
@@ -3090,8 +3090,8 @@
   ],
   "review": {
     "classification": "compatible",
-    "compatibilityReason": "Phase 9 UI: observability query service gained read-only getStoredBlob (blob exact retrieval) and error-code additions (invalid_blob_id/blob_missing); no table, column, or epoch change — the exported schema surface is unchanged for existing readers.",
-    "payloadFingerprint": "sha256:15591e090fdf48f4f4f0234a3d32d774cde09a288366cd83a3752cbecd1a1dc2"
+    "compatibilityReason": "Model Observatory schema v3 adds one nullable constrained usage-correlation column through a single-transaction v2 migration while retaining v1/v2 read compatibility; the new blob shard layout recomputes paths from blobId and preserves legacy blobs/mb reads, so existing data remains readable without a DATA_EPOCH change.",
+    "payloadFingerprint": "sha256:f4cfa1e85848f7b621a87f5cc638a3d0c9229d71acae9f662e34b438358a3d49"
   },
   "schemas": [
     {
@@ -3393,7 +3393,7 @@
       "contract": "observatory blob shard layout, random blobId file names, atomic staging rename, owner-only permissions, and ref-count-based GC protocol",
       "kind": "directory-contract",
       "module": "lib/llm/model-observability-blob-store.ts",
-      "sourceHash": "sha256:d78a4d54fda49718420649d7ec99c9a1b0c8c75d75859be490673a2680d6c067",
+      "sourceHash": "sha256:c0d972a607e1f2f4e2538337ae33a89fb1dfc1848cf38c5b0a9e5c0d6f93a6e0",
       "storeId": "model-observability-blobs"
     },
     {
@@ -3542,7 +3542,7 @@
           },
           {
             "name": "model_calls",
-            "sql": "CREATE TABLE model_calls ( call_id TEXT PRIMARY KEY, trace_id TEXT, parent_call_id TEXT, provider TEXT, model_id TEXT, api TEXT, subsystem TEXT, operation TEXT, surface TEXT, trigger TEXT, attribution_kind TEXT, session_id TEXT, session_path TEXT, conversation_id TEXT, conversation_type TEXT, agent_id TEXT, child_agent_id TEXT, child_session_id TEXT, child_session_path TEXT, task_id TEXT, call_purpose TEXT, started_at TEXT, semantic_completed_at TEXT, ended_at TEXT, terminal_status TEXT, error_name TEXT, error_code TEXT, input_shape TEXT, provenance_precision TEXT, provenance_section_count INTEGER, provenance_categories_json TEXT, provenance_opaque_count INTEGER, attribution_json TEXT, source_json TEXT, safe_details_json TEXT, persistence_completeness TEXT NOT NULL DEFAULT 'partial', interrupted_by_restart INTEGER NOT NULL DEFAULT 0, payload_availability TEXT )",
+            "sql": "CREATE TABLE model_calls ( call_id TEXT PRIMARY KEY, trace_id TEXT, parent_call_id TEXT, provider TEXT, model_id TEXT, api TEXT, subsystem TEXT, operation TEXT, surface TEXT, trigger TEXT, attribution_kind TEXT, session_id TEXT, session_path TEXT, conversation_id TEXT, conversation_type TEXT, agent_id TEXT, child_agent_id TEXT, child_session_id TEXT, child_session_path TEXT, task_id TEXT, call_purpose TEXT, started_at TEXT, semantic_completed_at TEXT, ended_at TEXT, terminal_status TEXT, error_name TEXT, error_code TEXT, input_shape TEXT, provenance_precision TEXT, provenance_section_count INTEGER, provenance_categories_json TEXT, provenance_opaque_count INTEGER, attribution_json TEXT, source_json TEXT, safe_details_json TEXT, persistence_completeness TEXT NOT NULL DEFAULT 'partial', interrupted_by_restart INTEGER NOT NULL DEFAULT 0, payload_availability TEXT , usage_correlation_state TEXT CHECK (usage_correlation_state IS NULL OR usage_correlation_state = 'not_correlated'))",
             "tableName": "model_calls",
             "type": "table"
           },
@@ -3571,9 +3571,9 @@
             "type": "table"
           }
         ],
-        "userVersion": 2
+        "userVersion": 3
       },
-      "sourceHash": "sha256:5f6f1858bab7b5eb0faa9a796eeab17e461d533877b14fe1ddc4b0f574456577",
+      "sourceHash": "sha256:fd88815a4f0cc6176aaff3100f6aa68e106abc2472467fc435031cd7f4b2b788",
       "storeId": "model-observability-db"
     },
     {
@@ -3628,7 +3628,7 @@
       "contract": "debug logs, browser cold state, switch diagnostics, and WeChat cache readers",
       "kind": "directory-contract",
       "module": "lib/debug-log.ts",
-      "sourceHash": "sha256:e8ae38e9f015d1964e34cca8e2ad0aa3523691e4d34038700955382412bf6861",
+      "sourceHash": "sha256:b00e06acf8b03d84961776376b19ca4ff07b2453e74916e66e32932f0907c7be",
       "storeId": "runtime-diagnostics"
     },
     {
@@ -3839,7 +3839,7 @@
       "contract": "UsageLedger reader and atomic serializer",
       "kind": "runtime-contract",
       "module": "lib/llm/usage-ledger.ts",
-      "sourceHash": "sha256:00a7790fb4ac8bd6bb3ea801272e804fd222dd3314c66f5d68c7e1a5953e7af8",
+      "sourceHash": "sha256:f24828cd048dfdd917c8112325090709f631613b9d8c0793295a0ea26747141c",
       "storeId": "usage-ledger"
     },
     {
@@ -6892,6 +6892,14 @@
       "exemptionId": null,
       "kind": "mkdir",
       "ordinal": 1,
+      "reason": "Writes, renames, or removes observatory blob files under the private blob tree.",
+      "sourceFile": "lib/llm/model-observability-blob-store.ts",
+      "storeId": "model-observability-blobs"
+    },
+    {
+      "exemptionId": null,
+      "kind": "mkdir",
+      "ordinal": 2,
       "reason": "Writes, renames, or removes observatory blob files under the private blob tree.",
       "sourceFile": "lib/llm/model-observability-blob-store.ts",
       "storeId": "model-observability-blobs"

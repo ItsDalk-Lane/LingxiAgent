@@ -9,7 +9,10 @@ import fs from "fs";
 import path from "path";
 import { createModelObservabilityTestHarness } from "../lib/llm/model-observability-testing.ts";
 import { createModelCallPayloadCaptureSession } from "../lib/llm/model-call-payload-capture.ts";
-import { MODEL_OBSERVABILITY_BLOB_MAX_BYTES } from "../lib/llm/model-observability-blob-store.ts";
+import {
+  MODEL_OBSERVABILITY_BLOB_MAX_BYTES,
+  modelObservabilityBlobPathCandidates,
+} from "../lib/llm/model-observability-blob-store.ts";
 
 describe("Model Observability Blob Store", () => {
   let harness: ReturnType<typeof createModelObservabilityTestHarness>;
@@ -50,6 +53,8 @@ describe("Model Observability Blob Store", () => {
       expect(meta).toMatchObject({ state: "ready", byte_length: audio.byteLength, media_type: "application/octet-stream" });
       // 文件名 = blobId.bin（绝不使用原文件名，§六十七）；相对路径在 blobs/ 下。
       expect(meta!.relative_path).toMatch(/^blobs\/[^/]+\/mb_[^/]+\.bin$/);
+      // 新写入使用随机 token 前两位分片，不能再被固定 mb_ 前缀钉死在 mb 目录。
+      expect(meta!.relative_path.split("/")[1]).toBe(blobId.slice(3, 5));
       const bytes = reader.blobStore.readBlob(blobId);
       expect(bytes?.toString("utf-8")).toBe("FAKE_MP3_BYTES_0123456789ABCDEF");
       // payload ↔ blob ref 已登记。
@@ -105,7 +110,7 @@ describe("Model Observability Blob Store", () => {
       expect(removed).toEqual([blobId]);
       expect(reader.blobStore.getBlobMetadata(blobId)).toBeNull();
       // 文件已 unlink。
-      const abs = path.join(harness.lingxiHome, "model-observability", "blobs", blobId.slice(0, 2), `${blobId}.bin`);
+      const abs = modelObservabilityBlobPathCandidates(harness.lingxiHome, blobId)[0];
       expect(fs.existsSync(abs)).toBe(false);
     } finally {
       reader.close();
@@ -142,7 +147,7 @@ describe("Model Observability Blob Store", () => {
     try {
       const rows = reader.payloadStore.getPayloadRecords("mc_missing");
       const blobId = reader.payloadStore.getBlobIdsForRecord(rows[0].id)[0];
-      const abs = path.join(harness.lingxiHome, "model-observability", "blobs", blobId.slice(0, 2), `${blobId}.bin`);
+      const abs = modelObservabilityBlobPathCandidates(harness.lingxiHome, blobId)[0];
       fs.rmSync(abs);
       expect(reader.blobStore.readBlob(blobId)).toBeNull();
       expect(reader.blobStore.getBlobMetadata(blobId)).toMatchObject({ state: "missing" });
@@ -163,6 +168,81 @@ describe("Model Observability Blob Store", () => {
       const body = JSON.parse(rows[0].payload_json!);
       expect(body.parameters.audio.captureStatus).toBe("externalized");
       expect(body.parameters.audio.blobId).toBeUndefined();
+    } finally {
+      reader.close();
+    }
+  });
+
+  it("数据库 relative_path 不是文件权限：篡改为 SQLite 文件名也只能读删 canonical blob", async () => {
+    captureWithBinary("mc_path_authority", { audio: Buffer.from("CANONICAL_ONLY") });
+    harness.flush();
+    await harness.close();
+    const reader = harness.openReader();
+    try {
+      const payload = reader.payloadStore.getPayloadRecords("mc_path_authority")[0];
+      const blobId = reader.payloadStore.getBlobIdsForRecord(payload.id)[0];
+      const canonical = modelObservabilityBlobPathCandidates(harness.lingxiHome, blobId)[0];
+      const sqlitePath = path.join(harness.lingxiHome, "model-observability", "observability.sqlite");
+      reader.db.prepare(`UPDATE blob_objects SET relative_path = 'observability.sqlite' WHERE blob_id = ?`).run(blobId);
+
+      expect(reader.blobStore.readBlob(blobId)?.toString("utf-8")).toBe("CANONICAL_ONLY");
+      expect(reader.blobStore.recoverMissingBlobs()).toBe(0);
+      reader.db.prepare(`DELETE FROM payload_blob_refs WHERE blob_id = ?`).run(blobId);
+      reader.blobStore.deleteBlobs([blobId]);
+
+      expect(fs.existsSync(sqlitePath)).toBe(true);
+      expect(fs.existsSync(canonical)).toBe(false);
+    } finally {
+      reader.close();
+    }
+  });
+
+  it("历史 blobs/mb 布局继续可读可清理，且同样不信任 relative_path", async () => {
+    await harness.close();
+    const reader = harness.openReader();
+    try {
+      const blobId = "mb_legacyblob1234";
+      const [, legacy] = modelObservabilityBlobPathCandidates(harness.lingxiHome, blobId);
+      fs.mkdirSync(path.dirname(legacy), { recursive: true });
+      fs.writeFileSync(legacy, "LEGACY_BYTES");
+      reader.db.prepare(`
+        INSERT INTO blob_objects (blob_id, created_at, byte_length, media_type, state, relative_path)
+        VALUES (?, ?, ?, ?, 'ready', ?)
+      `).run(blobId, new Date().toISOString(), 12, "application/octet-stream", "../../observability.sqlite");
+
+      expect(reader.blobStore.readBlob(blobId)?.toString("utf-8")).toBe("LEGACY_BYTES");
+      expect(reader.blobStore.recoverMissingBlobs()).toBe(0);
+      expect(reader.blobStore.deleteBlobs([blobId])).toBe(1);
+      expect(fs.existsSync(legacy)).toBe(false);
+      expect(fs.existsSync(path.join(harness.lingxiHome, "model-observability", "observability.sqlite"))).toBe(true);
+    } finally {
+      reader.close();
+    }
+  });
+
+  it.skipIf(process.platform === "win32")("分片目录符号链接指向 blobs 外部时拒绝读取和删除目标", async () => {
+    await harness.close();
+    const reader = harness.openReader();
+    try {
+      const blobId = "mb_escapeprobe1234";
+      const [canonical] = modelObservabilityBlobPathCandidates(harness.lingxiHome, blobId);
+      const outsideDir = path.join(harness.lingxiHome, "model-observability", "outside-blobs");
+      const victim = path.join(outsideDir, `${blobId}.bin`);
+      fs.mkdirSync(outsideDir, { recursive: true });
+      fs.writeFileSync(victim, "MUST_SURVIVE");
+      fs.mkdirSync(path.dirname(path.dirname(canonical)), { recursive: true });
+      fs.symlinkSync(outsideDir, path.dirname(canonical), "dir");
+      expect(reader.blobStore.writeBlobFile(blobId, Buffer.from("OVERWRITE"))).toBe(false);
+      expect(fs.readFileSync(victim, "utf-8")).toBe("MUST_SURVIVE");
+      reader.db.prepare(`
+        INSERT INTO blob_objects (blob_id, created_at, byte_length, media_type, state, relative_path)
+        VALUES (?, ?, ?, ?, 'ready', ?)
+      `).run(blobId, new Date().toISOString(), 12, "application/octet-stream", "observability.sqlite");
+
+      expect(reader.blobStore.readBlob(blobId)).toBeNull();
+      expect(reader.blobStore.getBlobMetadata(blobId)).toMatchObject({ state: "missing" });
+      expect(reader.blobStore.deleteBlobs([blobId])).toBe(1);
+      expect(fs.readFileSync(victim, "utf-8")).toBe("MUST_SURVIVE");
     } finally {
       reader.close();
     }

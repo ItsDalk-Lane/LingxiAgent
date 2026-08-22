@@ -24,16 +24,22 @@ import { createModelObservabilityRoute } from '../../../../../../server/routes/m
 import { beginObservedModelCall } from '../../../../../../lib/llm/model-call-integration.ts';
 import { createUsageLedger } from '../../../../../../lib/llm/usage-ledger.ts';
 import { ObservabilityCallLedger } from '../../../settings/tabs/observability/ObservabilityCallLedger';
-import { DEFAULT_OBSERVABILITY_FILTER } from '../../../settings/tabs/observability/model-observability-filter';
+import {
+  dateBucketForGroupBy,
+  DEFAULT_OBSERVABILITY_FILTER,
+} from '../../../settings/tabs/observability/model-observability-filter';
+import { queryObservabilityAggregate } from '../../../settings/tabs/observability/model-observability-actions';
 import { useSettingsStore } from '../../../settings/store';
 
 let lingxiHome = '';
 let handle: ReturnType<typeof installModelObservabilityPersistence> | null = null;
 let route: Hono | null = null;
 let expectedCallId = '';
+let lastAggregateBody: Record<string, unknown> | null = null;
 
 beforeEach(async () => {
   vi.clearAllMocks();
+  lastAggregateBody = null;
   window.t = ((key: string, params?: Record<string, unknown>) => {
     if (params && Object.keys(params).length > 0) return `${key}:${JSON.stringify(params)}`;
     return key;
@@ -114,6 +120,9 @@ beforeEach(async () => {
       ? (() => { const parsed = new URL(raw); return `${parsed.pathname}${parsed.search}`; })()
       : raw;
     if (pathWithQuery.startsWith('/api/model-observability')) {
+      if (pathWithQuery === '/api/model-observability/query/aggregate' && typeof init?.body === 'string') {
+        lastAggregateBody = JSON.parse(init.body) as Record<string, unknown>;
+      }
       // route 子应用挂在 /model-observability（server 层加 /api 前缀）。
       return route!.request(pathWithQuery.replace(/^\/api/, ''), {
         method: init?.method ?? 'GET',
@@ -140,6 +149,29 @@ afterEach(async () => {
 });
 
 describe('UI vertical slice — Call Ledger（S34 §八十四）', () => {
+  it('UI 日期分组经 action → route → query 发送浏览器 IANA 时区', async () => {
+    const resolvedOptions = vi.spyOn(Intl.DateTimeFormat.prototype, 'resolvedOptions')
+      .mockReturnValue({
+        locale: 'en-US',
+        calendar: 'gregory',
+        numberingSystem: 'latn',
+        timeZone: 'America/Los_Angeles',
+      });
+    const dateBucket = dateBucketForGroupBy(['date']);
+    resolvedOptions.mockRestore();
+    const result = await queryObservabilityAggregate({
+      filter: {},
+      groupBy: ['date'],
+      dateBucket,
+    });
+
+    expect(lastAggregateBody).toMatchObject({
+      groupBy: ['date'],
+      dateBucket: { bucket: 'day', timeZone: 'America/Los_Angeles' },
+    });
+    expect(result.overall.callCount).toBe(2);
+  });
+
   it('DOM 行 ≡ HTTP JSON ≡ Query DTO：model/status/tokens/attempts/payload 全一致', async () => {
     render(
       <ObservabilityCallLedger

@@ -237,6 +237,28 @@ describe("model call identity", () => {
     recorder.beginLogicalCall();
     expect(observer.events[0].callId).toBe("mc_explicit");
   });
+
+  it("usage correlation 只接受显式闭集事实，并贯穿同一 call 的全部事件", () => {
+    const observer = createTestModelCallObserver();
+    const recorder = createModelCallRecorder({
+      observer,
+      context: { ...CONTEXT, usageCorrelation: "not_correlated" },
+    });
+    recorder.beginLogicalCall();
+    recorder.beginAttempt();
+    recorder.endLogicalCall("ok");
+
+    expect(observer.events).toHaveLength(3);
+    expect(observer.events.every((event) => event.usageCorrelation === "not_correlated")).toBe(true);
+
+    const invalidObserver = createTestModelCallObserver();
+    const invalid = createModelCallRecorder({
+      observer: invalidObserver,
+      context: { ...CONTEXT, usageCorrelation: "guessed_from_time" } as any,
+    });
+    invalid.beginLogicalCall();
+    expect(invalidObserver.events[0]).not.toHaveProperty("usageCorrelation");
+  });
 });
 
 describe("context helpers", () => {

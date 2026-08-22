@@ -1,5 +1,7 @@
 # Model Observatory — Release Acceptance（Phase 10 最终验收）
 
+> **SUPERSEDED BY PHASE 10.1**：本文是当时的历史验收记录，保留原结论与当时遗漏，不代表当前发布状态。后续对抗性审查发现 AR-01～AR-20，并由 `MODEL_OBSERVATORY_RELEASE_ACCEPTANCE_V2.md` 重新给出四态验收；禁止继续引用本文的“可以（有界）”作为当前发布结论。
+
 > 基线：`feature/model-call-observability`（Phase 10 完成树）。审计设计：
 > MODEL_OBSERVABILITY_E2E_TRUTH_AUDIT.md；过程与 findings：
 > OBSERVABILITY_VALIDATION_PROGRESS.md。

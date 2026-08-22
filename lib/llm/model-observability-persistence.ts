@@ -36,6 +36,7 @@ import { getModelCallObserver, setModelCallObserver } from "./model-call-observe
 import type { ModelCallPayloadRecord } from "./model-call-payload-types.ts";
 import type { ModelCallPayloadSink } from "./model-call-payload-capture.ts";
 import {
+  getModelCallBlobExternalizer,
   getModelCallPayloadSink,
   setModelCallBlobExternalizer,
   setModelCallPayloadSink,
@@ -133,7 +134,7 @@ export function normalizeModelObservabilityPersistencePolicy(
 /* ── Health state（§四十二：绝不包含正文）─────────────────────────────── */
 
 export type ModelObservabilityHealth = {
-  status: "active" | "disabled" | "closed";
+  status: "active" | "degraded" | "disabled" | "closed";
   storeDisabledReasonCode: string | null;
   persistTraceMetadata: boolean;
   persistPayloads: boolean;
@@ -185,6 +186,21 @@ export type ModelObservabilityPersistenceHandle = {
 /* ── 内部队列 item ───────────────────────────────────────────────────── */
 
 type StagedBlob = { blobId: string; bytes: Uint8Array; mediaType: string | null };
+type PreparedBlob = {
+  blobId: string;
+  byteLength: number;
+  mediaType: string | null;
+  durable: boolean;
+};
+type TransactionHealthDelta = {
+  droppedPayloadRecords: number;
+  droppedUsageEntries: number;
+};
+
+const EMPTY_TRANSACTION_HEALTH_DELTA: TransactionHealthDelta = {
+  droppedPayloadRecords: 0,
+  droppedUsageEntries: 0,
+};
 
 function nowIso(): string {
   return new Date().toISOString();
@@ -243,12 +259,15 @@ export function installModelObservabilityPersistence({
   now = nowIso,
   Database = null,
   randomBlobToken = null,
+  reconcileAfterRestart = true,
 }: {
   lingxiHome: string;
   policy?: ModelObservabilityPersistencePolicy | null;
   now?: () => string;
   Database?: any;
   randomBlobToken?: (() => string) | null;
+  /** 同一进程内 generation 切换不是 restart，调用方应传 false。 */
+  reconcileAfterRestart?: boolean;
 }): ModelObservabilityPersistenceHandle {
   const normalized = normalizeModelObservabilityPersistencePolicy(policy ?? DISABLED_MODEL_OBSERVABILITY_PERSISTENCE_POLICY);
   if (!normalized.enabled) return createDisabledHandle("disabled_by_policy", normalized);
@@ -293,9 +312,11 @@ export function installModelObservabilityPersistence({
 
   // Startup Reconciliation（§四十六）：崩溃遗留 call 只标记 interrupted，不伪造终态。
   let interruptedCalls = 0;
-  try {
-    interruptedCalls = traceStore.reconcileAfterRestart();
-  } catch { /* reconciliation 失败不阻止 store 可用 */ }
+  if (reconcileAfterRestart) {
+    try {
+      interruptedCalls = traceStore.reconcileAfterRestart();
+    } catch { /* reconciliation 失败不阻止 store 可用 */ }
+  }
 
   /* ── Coordinator 状态 ── */
   const traceQueue: ModelCallEvent[] = [];
@@ -338,6 +359,11 @@ export function installModelObservabilityPersistence({
   let flushScheduled = false;
   let flushTimer: NodeJS.Timeout | null = null;
   let maintenanceTimer: NodeJS.Timeout | null = null;
+  /**
+   * 最终写失败后的内存回执。队列已经被取走时也必须让 timer/maintenance/close
+   * 继续尝试把 drop/writeFailures 计数补进 DB。
+   */
+  let pendingHealthMetaDirty = false;
 
   const upsertMeta = db.prepare(
     `INSERT INTO observability_meta (key, value_json) VALUES (?, ?)
@@ -366,15 +392,57 @@ export function installModelObservabilityPersistence({
   }
   restorePersistedCounters();
 
-  function persistHealthMeta(): void {
+  function persistHealthMeta({
+    delta = EMPTY_TRANSACTION_HEALTH_DELTA,
+    successfulFlushAt = health.lastSuccessfulFlushAt,
+  }: {
+    delta?: TransactionHealthDelta;
+    successfulFlushAt?: string | null;
+  } = {}): void {
     upsertMeta.run("droppedTraceEvents", JSON.stringify(health.droppedTraceEvents));
-    upsertMeta.run("droppedPayloadRecords", JSON.stringify(health.droppedPayloadRecords));
+    upsertMeta.run(
+      "droppedPayloadRecords",
+      JSON.stringify(health.droppedPayloadRecords + delta.droppedPayloadRecords),
+    );
     upsertMeta.run("droppedBlobs", JSON.stringify(health.droppedBlobs));
-    upsertMeta.run("droppedUsageEntries", JSON.stringify(health.droppedUsageEntries));
+    upsertMeta.run(
+      "droppedUsageEntries",
+      JSON.stringify(health.droppedUsageEntries + delta.droppedUsageEntries),
+    );
     upsertMeta.run("writeFailures", JSON.stringify(health.writeFailures));
     upsertMeta.run("schemaVersion", JSON.stringify(MODEL_OBSERVABILITY_SCHEMA_VERSION));
-    upsertMeta.run("lastSuccessfulFlushAt", JSON.stringify(health.lastSuccessfulFlushAt));
+    upsertMeta.run("lastSuccessfulFlushAt", JSON.stringify(successfulFlushAt));
     upsertMeta.run("lastMaintenanceAt", JSON.stringify(health.lastMaintenanceAt));
+  }
+
+  function applyTransactionHealthDelta(delta: TransactionHealthDelta): void {
+    health.droppedPayloadRecords += delta.droppedPayloadRecords;
+    health.droppedUsageEntries += delta.droppedUsageEntries;
+  }
+
+  function acknowledgePersistedHealthMeta(): void {
+    pendingHealthMetaDirty = false;
+    if (!closed && health.status === "degraded") health.status = "active";
+    if (health.storeDisabledReasonCode === "write_failed_pending_receipt") {
+      health.storeDisabledReasonCode = null;
+    }
+  }
+
+  function markFailureReceiptPending(): void {
+    pendingHealthMetaDirty = true;
+    health.status = "degraded";
+    health.storeDisabledReasonCode = "write_failed_pending_receipt";
+  }
+
+  function persistPendingHealthMeta(): boolean {
+    if (!pendingHealthMetaDirty || closed) return !pendingHealthMetaDirty;
+    try {
+      db.transaction(() => persistHealthMeta())();
+      acknowledgePersistedHealthMeta();
+      return true;
+    } catch {
+      return false;
+    }
   }
 
   function refreshQueueHealth(): void {
@@ -496,7 +564,7 @@ export function installModelObservabilityPersistence({
     traceEvents: ModelCallEvent[];
     payloadRecords: ModelCallPayloadRecord[];
     usageEntries: UsageLedgerEntryLike[];
-    blobs: Array<StagedBlob & { byteLength?: number }>;
+    blobs: StagedBlob[];
     droppedCalls: string[];
     notCapturedCalls: string[];
   };
@@ -512,24 +580,51 @@ export function installModelObservabilityPersistence({
     };
   }
 
-  function commitBatch(batch: FlushBatch): void {
-    const failedBlobIds = new Set<string>();
-    // ① blob 文件先写（§七十二：blob durable 先于 committed payload ref）。
+  /**
+   * Filesystem phase：每批只执行一次。后续 SQLite rollback/retry 复用这个不可变
+   * 结果，绝不再拿已经释放或改变过的 bytes 重写文件。
+   */
+  function prepareBlobFiles(batch: FlushBatch): PreparedBlob[] {
+    const prepared: PreparedBlob[] = [];
     for (const staged of batch.blobs) {
       const byteLength = staged.bytes.byteLength;
-      const ok = blobStore.writeBlobFile(staged.blobId, staged.bytes);
-      if (!ok) {
-        failedBlobIds.add(staged.blobId);
-        health.droppedBlobs += 1;
-      }
-      staged.bytes = new Uint8Array(0); // 释放 staged 字节引用（byteLength 已记下）。
-      staged.byteLength = byteLength;
+      const durable = blobStore.writeBlobFile(staged.blobId, staged.bytes);
+      if (!durable) health.droppedBlobs += 1;
+      prepared.push({
+        blobId: staged.blobId,
+        byteLength,
+        mediaType: staged.mediaType,
+        durable,
+      });
     }
-    // ② 单 transaction：blob metadata + trace 投影 + payload + refs + health meta。
+    return prepared;
+  }
+
+  function releaseBatchBlobBytes(batch: FlushBatch): void {
+    for (const staged of batch.blobs) staged.bytes = new Uint8Array(0);
+  }
+
+  /** SQLite phase：可以安全重试；这里不做任何文件写入，也不直接改 JS health。 */
+  function commitDatabaseBatch(
+    batch: FlushBatch,
+    preparedBlobs: readonly PreparedBlob[],
+  ): { delta: TransactionHealthDelta; successfulFlushAt: string } {
+    const failedBlobIds = new Set(
+      preparedBlobs.filter((blob) => !blob.durable).map((blob) => blob.blobId),
+    );
+    const durableBlobIds = new Set(
+      preparedBlobs.filter((blob) => blob.durable).map((blob) => blob.blobId),
+    );
+    const delta: TransactionHealthDelta = {
+      droppedPayloadRecords: 0,
+      droppedUsageEntries: 0,
+    };
+    const serializationDroppedCalls: string[] = [];
+    const successfulFlushAt = now();
     const commit = db.transaction(() => {
-      for (const staged of batch.blobs) {
-        if (!failedBlobIds.has(staged.blobId)) {
-          blobStore.insertBlobRow(staged.blobId, staged.byteLength, staged.mediaType);
+      for (const prepared of preparedBlobs) {
+        if (prepared.durable) {
+          blobStore.insertBlobRow(prepared.blobId, prepared.byteLength, prepared.mediaType);
         }
       }
       for (const event of batch.traceEvents) {
@@ -540,7 +635,7 @@ export function installModelObservabilityPersistence({
         try {
           accountingProjection.upsertLedgerEntry(entry, { now });
         } catch {
-          health.droppedUsageEntries += 1;
+          delta.droppedUsageEntries += 1;
         }
       }
       if (batch.notCapturedCalls.length > 0) {
@@ -549,17 +644,24 @@ export function installModelObservabilityPersistence({
       for (const record of batch.payloadRecords) {
         const inserted = payloadStore.insertRecord(record, {
           failedBlobIds,
-          isBlobDurable: (blobId) => blobStore.getBlobMetadata(blobId) != null,
+          isBlobDurable: (blobId) => durableBlobIds.has(blobId) || blobStore.getBlobMetadata(blobId) != null,
           now,
         });
-        if (inserted === null) health.droppedPayloadRecords += 1;
+        if (inserted === null) {
+          delta.droppedPayloadRecords += 1;
+          if (typeof record?.callId === "string" && record.callId) {
+            serializationDroppedCalls.push(record.callId);
+          }
+        }
       }
-      if (batch.droppedCalls.length > 0) {
-        traceStore.markPayloadAvailability(batch.droppedCalls, "dropped");
+      const allDroppedCalls = [...batch.droppedCalls, ...serializationDroppedCalls];
+      if (allDroppedCalls.length > 0) {
+        traceStore.markPayloadAvailability(allDroppedCalls, "dropped");
       }
-      persistHealthMeta();
+      persistHealthMeta({ delta, successfulFlushAt });
     });
     commit();
+    return { delta, successfulFlushAt };
   }
 
   function flushOnce(): void {
@@ -567,27 +669,38 @@ export function installModelObservabilityPersistence({
     if (traceQueue.length === 0 && payloadQueue.length === 0 && blobQueue.length === 0
       && usageQueue.length === 0
       && droppedPayloadCallIds.length === 0 && notCapturedCallIds.length === 0) {
+      // 最终失败后队列已经为空，仍需主动补写 health 回执。
+      persistPendingHealthMeta();
       return;
     }
     flushing = true;
     try {
       const batch = takeBatch();
+      const preparedBlobs = prepareBlobFiles(batch);
       try {
-        commitBatch(batch);
-        health.lastSuccessfulFlushAt = now();
+        const committed = commitDatabaseBatch(batch, preparedBlobs);
+        applyTransactionHealthDelta(committed.delta);
+        health.lastSuccessfulFlushAt = committed.successfulFlushAt;
+        acknowledgePersistedHealthMeta();
       } catch (firstError) {
         // rollback 后才允许 retry（§四九）：同一批整体重试一次；再失败 → 诚实 drop。
         try {
-          commitBatch(batch);
-          health.lastSuccessfulFlushAt = now();
+          const committed = commitDatabaseBatch(batch, preparedBlobs);
+          applyTransactionHealthDelta(committed.delta);
+          health.lastSuccessfulFlushAt = committed.successfulFlushAt;
+          acknowledgePersistedHealthMeta();
         } catch (secondError) {
           health.droppedTraceEvents += batch.traceEvents.length;
           health.droppedPayloadRecords += batch.payloadRecords.length;
           health.droppedUsageEntries += batch.usageEntries.length;
-          health.droppedBlobs += batch.blobs.length;
+          // Filesystem phase 已失败的 blob 在 prepare 时计过；这里只计文件已
+          // durable、但 metadata/ref 因最终 DB 失败而丢失的 blob。
+          health.droppedBlobs += preparedBlobs.filter((blob) => blob.durable).length;
           health.writeFailures += 1;
+          markFailureReceiptPending();
         }
       }
+      releaseBatchBlobBytes(batch);
       health.lastFlushAt = now();
     } finally {
       flushing = false;
@@ -616,6 +729,7 @@ export function installModelObservabilityPersistence({
           upsertMeta.run("lastMaintenanceAt", JSON.stringify(health.lastMaintenanceAt));
           persistHealthMeta();
         })();
+        acknowledgePersistedHealthMeta();
       } catch { /* meta 持久化 best-effort */ }
       return stats;
     } catch {
@@ -628,9 +742,9 @@ export function installModelObservabilityPersistence({
 
   const priorObserver = getModelCallObserver();
   const priorSink = getModelCallPayloadSink();
-  const priorExternalizer = null; // registry 在 capture 模块内默认 null。
+  const priorExternalizer = getModelCallBlobExternalizer();
 
-  const observerImpl: ModelCallObserver = normalized.persistTraceMetadata
+  const observerImpl: ModelCallObserver | null = normalized.persistTraceMetadata
     ? {
       handleModelCallEvent(event) {
         handleTraceEvent(event);
@@ -641,7 +755,7 @@ export function installModelObservabilityPersistence({
     }
     : null;
 
-  const sinkImpl: ModelCallPayloadSink = normalized.persistPayloads
+  const sinkImpl: ModelCallPayloadSink | null = normalized.persistPayloads
     ? {
       handleModelCallPayloadRecord(record) {
         handlePayloadRecord(record);
@@ -679,7 +793,9 @@ export function installModelObservabilityPersistence({
     uninstalled = true;
     if (observerImpl && getModelCallObserver() === observerImpl) setModelCallObserver(priorObserver);
     if (sinkImpl && getModelCallPayloadSink() === sinkImpl) setModelCallPayloadSink(priorSink);
-    if (externalizer) setModelCallBlobExternalizer(priorExternalizer);
+    if (externalizer && getModelCallBlobExternalizer() === externalizer) {
+      setModelCallBlobExternalizer(priorExternalizer);
+    }
   }
 
   /* ── Phase 8：Usage Ledger → projection wiring（§十四/十五）────────── */
@@ -764,4 +880,3 @@ export function installModelObservabilityPersistence({
   };
   return handle;
 }
-

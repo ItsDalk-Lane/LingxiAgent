@@ -8,8 +8,8 @@
  *
  * 关键语义：
  *   - since inclusive / until exclusive（§四十四，全接口统一）。
- *   - dateBucket.utcOffsetMinutes 东半球为正；JS Date.getTimezoneOffset()
- *     符号相反（西为正）——localUtcOffsetMinutes() 是唯一换算点（§十六）。
+ *   - dateBucket 优先发送浏览器提供的 IANA 时区；只有无法取得合法时区时，
+ *     才回退到当前固定偏移。固定偏移无法表达历史 DST 变化。
  *   - 空数组/空字符串不进入 wire（少发字段 = 不过滤该维度）。
  */
 import type {
@@ -144,6 +144,24 @@ export function localUtcOffsetMinutes(date: Date = new Date()): number {
   return -date.getTimezoneOffset();
 }
 
+/**
+ * 读取并校验浏览器当前 IANA 时区。只信任 Intl 自身提供的时区，不按语言或
+ * 地区猜测；运行环境缺少 Intl 数据时返回 null，由调用方退回固定偏移。
+ */
+export function localIanaTimeZone(
+  resolveTimeZone: () => unknown = () => Intl.DateTimeFormat().resolvedOptions().timeZone,
+): string | null {
+  try {
+    const candidate = resolveTimeZone();
+    if (typeof candidate !== 'string' || !candidate.trim()) return null;
+    return new Intl.DateTimeFormat('en-US', { timeZone: candidate.trim() })
+      .resolvedOptions()
+      .timeZone || null;
+  } catch {
+    return null;
+  }
+}
+
 /* ── → wire filter input ──────────────────────────────────────────────── */
 
 const MULTI_FIELD_WIRE: Record<ObservabilityMultiFilterKey, keyof ModelObservabilityCallFilterInput> = {
@@ -191,12 +209,18 @@ export function buildCallFilterInput(
   return out;
 }
 
-/** groupBy 含 date 时的 bucket 参数（时区偏移唯一换算点）。 */
+/** groupBy 含 date 时的 bucket 参数：IANA 时区优先，固定偏移只作兜底。 */
 export function dateBucketForGroupBy(
   groupBy: readonly ModelObservabilityGroupByDimension[],
-): { bucket: 'day'; utcOffsetMinutes: number } | undefined {
+  options: {
+    now?: Date;
+    resolveTimeZone?: () => unknown;
+  } = {},
+): { bucket: 'day'; timeZone: string } | { bucket: 'day'; utcOffsetMinutes: number } | undefined {
   if (!groupBy.includes('date')) return undefined;
-  return { bucket: 'day', utcOffsetMinutes: localUtcOffsetMinutes() };
+  const timeZone = localIanaTimeZone(options.resolveTimeZone);
+  if (timeZone) return { bucket: 'day', timeZone };
+  return { bucket: 'day', utcOffsetMinutes: localUtcOffsetMinutes(options.now) };
 }
 
 /* ── Filter Chips（§二十五：单独可删 + Clear All）───────────────────────── */

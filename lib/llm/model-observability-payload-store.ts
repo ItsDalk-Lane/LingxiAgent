@@ -82,13 +82,15 @@ export function normalizeStagedBlobDescriptors(
   if (payload && typeof payload === "object") {
     if (isStagedBlobDescriptor(payload)) {
       const blobId = payload.blobId as string;
-      stagedBlobIds.push(blobId);
       if (failedBlobIds.has(blobId) || !isBlobDurable(blobId)) {
         const degraded: Record<string, unknown> = { ...payload };
         delete degraded.blobId;
         degraded.captureStatus = "store_failed";
         return degraded;
       }
+      // 只有 durable blob 才能登记 payload_blob_refs；失败 descriptor 已移除
+      // blobId，不能让数据库留下指向不存在 blob_objects 的悬空引用。
+      stagedBlobIds.push(blobId);
       return { ...payload, captureStatus: "stored" };
     }
     const out: Record<string, unknown> = {};

@@ -17,7 +17,6 @@ import { runSubmitInBackground } from "../core/media/image-task-runner.ts";
 import { builtinImageGenAdapters } from "../core/media-adapters/builtin-adapters.ts";
 import { SpeechRecognitionService } from "../core/speech-recognition-service.ts";
 import { builtinSpeechRecognitionAdapters } from "../core/speech-recognition/adapters.ts";
-import { createUsageLedger } from "../lib/llm/usage-ledger.ts";
 import {
   createScenarioHarness,
   flushAsync,
@@ -60,7 +59,7 @@ function witnessCredentialBus() {
 
 async function runImageSubmit(adapterId: string, root: string, extraParams: Record<string, unknown> = {}) {
   const adapter = builtinImageGenAdapters.find((a: any) => a.id === adapterId);
-  const ledger = createUsageLedger({});
+  const ledger = harness.createLedger();
   const bus = witnessCredentialBus();
   const shared = {
     dataDir: root,
@@ -156,10 +155,10 @@ describe("E2E truth — MC-06 image（S12 normal + S13 codex 401）", () => {
       expect(body.prompt).toBe(witnessBody.prompt);
       expect(body.model).toBe(witnessBody.model);
     }
-    // §三十六：usage_missing ≠ error；terminal ok + usage not_correlated（独立维度）
+    // §三十六：usage 维度不改变调用终态；真实 ledger 关联后必须显示 present。
     const call = detail.value.call;
     expect(call.terminalStatus).toBe("ok");
-    expect(call.usage?.availability).toBe("not_correlated");
+    expect(call.usage?.availability).toBe("present");
     // 媒体 ledger entry 带 modelCallId（MC-06 FULL correlation）
     expect(ledger.list({}).entries[0].metadata?.modelCallId).toBe(callId);
     harness.observer!.assertNoSensitiveContent([POISON_KEY]);

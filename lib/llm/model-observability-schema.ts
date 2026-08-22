@@ -11,8 +11,8 @@
  *   - 单 DB 逻辑分表（traces / model_calls / model_attempts / payload_records /
  *     blob_objects / payload_blob_refs / observability_meta）：call/attempt/
  *     payload/blob ref 的 retention 与 GC 需要事务一致性（任务书 §九）。
- *   - PRAGMA user_version 管理 schema 版本；SCHEMA_VERSION=1 起；v1→v2 必须
- *     显式 migration（§二十六）。
+ *   - PRAGMA user_version 管理 schema 版本；每次升级都必须显式
+ *     migration，并在同一个 transaction 内单调推进。
  *   - 未知高版本 / migration 失败 / 损坏：**禁用 persistence、保留数据库、
  *     主程序正常继续**——observability 永远不能阻止主程序启动（§二十七～二十九）。
  *   - WAL + busy_timeout：同 LINGXI_HOME 多进程短暂并发安全（audit Q3）。
@@ -27,13 +27,14 @@ import fs from "fs";
 import path from "path";
 import { createRequire } from "module";
 
-export const MODEL_OBSERVABILITY_SCHEMA_VERSION = 2;
+export const MODEL_OBSERVABILITY_SCHEMA_VERSION = 3;
 
 /**
  * read side 支持的 schema 版本闭集（Phase 8 §七）：v1 历史库不迁移也可读
- * （accounting projection 标 unavailable）；v2 起有 model_call_usage。
+ * （accounting projection 标 unavailable）；v2 起有 model_call_usage；
+ * v3 起有运行时显式 usage correlation 事实。
  */
-export const MODEL_OBSERVABILITY_SUPPORTED_READ_VERSIONS: readonly number[] = [1, 2];
+export const MODEL_OBSERVABILITY_SUPPORTED_READ_VERSIONS: readonly number[] = [1, 2, 3];
 
 /** store 目录约定（audit Q1 决策）。 */
 export const MODEL_OBSERVABILITY_DIR_NAME = "model-observability";
@@ -254,6 +255,17 @@ CREATE INDEX idx_model_call_usage_status ON model_call_usage(usage_status);
 CREATE INDEX idx_model_calls_conversation ON model_calls(conversation_id);
 `;
 
+/* ── v3 DDL（Phase 10.1：explicit usage correlation truth）─────────
+ *
+ * 缺 usage row 可能是投影丢失、历史不完整或真的无法关联，不能由
+ * Query 猜测。该列只允许运行时明确写入 not_correlated；NULL 表示
+ * 没有这个明确事实。
+ */
+const V3_DDL = `
+ALTER TABLE model_calls ADD COLUMN usage_correlation_state TEXT
+  CHECK (usage_correlation_state IS NULL OR usage_correlation_state = 'not_correlated');
+`;
+
 /**
  * 打开（必要时创建）observability 数据库并应用到受支持 schema。
  *
@@ -333,6 +345,10 @@ export function migrateModelObservabilitySchema(db: any, currentVersion: number)
             // v1 → v2：只新增 model_call_usage + conversation index；
             // v1 既有行不动（§九十四 data preservation）。
             db.exec(V2_DDL);
+            break;
+          case 2:
+            // v2 → v3：只新增闭集事实列；既有 call/usage 行原样保留。
+            db.exec(V3_DDL);
             break;
           default:
             throw new Error(`no migration step from observability schema ${version}`);

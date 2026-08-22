@@ -682,12 +682,17 @@ describe("Model Observability Unified Query", () => {
     expect(idList({ filter: { payloadAvailability: ["dropped"] } })).toEqual(["mc_a1"]);
   });
 
-  it("usage availability：present / not_correlated（§二十三/二十四）", () => {
+  it("usage availability：present / unknown / explicit not_correlated", () => {
     seedFixture();
     wireUsage([
       usageFixture("mc_a1"),
       usageFixture("mc_m1", { status: "usage_missing", usage: null }),
     ]);
+    const db = openModelObservabilityDatabase(modelObservabilityDbPath(home));
+    db.prepare(
+      `UPDATE model_calls SET usage_correlation_state = 'not_correlated' WHERE call_id = ?`,
+    ).run("mc_v1");
+    db.close();
     service = createModelObservabilityQueryService({ lingxiHome: home });
     const all = query({ filter: {} });
     if (all.ok !== true) throw new Error("query failed");
@@ -696,6 +701,7 @@ describe("Model Observability Unified Query", () => {
     expect(byId.get("mc_a1")?.summary?.inputTokens).toBe(100);
     // logical ok + usage_missing 完全合法（§二十四 两字段分开）。
     expect(byId.get("mc_m1")).toMatchObject({ availability: "present", status: "usage_missing" });
+    expect(byId.get("mc_a2")).toMatchObject({ availability: "unknown" });
     expect(byId.get("mc_v1")).toMatchObject({ availability: "not_correlated" });
   });
 

@@ -2582,7 +2582,12 @@
         "avgDuration": "平均耗時",
         "durationObserved": "基於 {count} 條觀測",
         "cost": "成本",
-        "usageCoverage": "用量涵蓋：{covered} 條已關聯 / {missing} 條缺失"
+        "usageCoverage": "用量涵蓋：{covered} 條已關聯 / {missing} 條缺失",
+        "usageCoverageComplete": "用量涵蓋完整：{covered} 條已關聯，{notCorrelated} 條明確不關聯",
+        "usageCoveragePartial": "用量僅部分涵蓋：共 {total} 條，{covered} 條已關聯，{unknown} 條未知",
+        "usageCoverageCorrupt": "用量資料損壞：{corrupt} 條記錄無法可信彙總",
+        "usageCoverageProjectionUnavailable": "用量投影不可用，以下數字不能視為零",
+        "usageCoverageUnknown": "用量涵蓋狀態未知：共 {total} 條，{unknown} 條無法確認"
       },
       "groups": {
         "loading": "載入分组统计…",
@@ -2599,7 +2604,8 @@
         "interruptedAria": "該呼叫曾被重新啟動中斷",
         "interruptedTooltip": "應用重新啟動導致該呼叫的記錄不完整",
         "usageMissingAria": "該呼叫缺少用量資料",
-        "completenessNote": "資料完整性：丟棄軌跡事件 {droppedEvents} 條 / 丟棄 payload {droppedPayloads} 條 / 重新啟動中斷 {interrupted} 次",
+        "completenessNote": "資料完整性：丟棄軌跡事件 {droppedEvents} 條 / 丟棄 payload {droppedPayloads} 條 / 丟棄檔案 {droppedBlobs} 個 / 重新啟動中斷 {interrupted} 次",
+        "completenessUnknown": "資料完整性計數無法讀取，目前遺失量未知",
         "filterBySession": "按工作階段篩選：{id}",
         "filterByTask": "按任務篩選：{id}",
         "col": {
@@ -2717,6 +2723,7 @@
         "listAria": "輸入分區列表",
         "selectSection": "選擇左側分區檢視詳情",
         "absent": "該呼叫沒有語義溯源記錄",
+        "corrupt": "語義溯源記錄已損壞，不能視為沒有記錄",
         "structural": "結構级定位（值類型：{kind}），無文字 span",
         "emptySpan": "該分區是空文字段",
         "field": {
@@ -2739,6 +2746,7 @@
         "jump": "跳轉到對應輸入分區",
         "noLocator": "該對應沒有欄位级定位信息",
         "absent": "該呼叫沒有供應商請求對應記錄",
+        "corrupt": "供應商請求對應記錄已損壞，不能視為沒有記錄",
         "empty": "對應列表為空",
         "loadSemanticFirst": "先載入語義請求內文，再檢視對應跳轉"
       },
@@ -2787,6 +2795,13 @@
         "stats": {
           "calls": "{count} 次呼叫",
           "payload": "payload：{present} 存在 / {expired} 過期 / {dropped} 丟棄"
+        },
+        "usageAvailability": {
+          "complete": "用量涵蓋完整（{covered}/{total}）",
+          "partial": "用量部分涵蓋（{covered}/{total}，{unknown} 條未知）",
+          "corrupt": "用量資料損壞（{corrupt}/{total}）",
+          "projection_unavailable": "用量投影不可用",
+          "unknown": "用量涵蓋未知（{unknown}/{total}）"
         },
         "missingParent": "父呼叫缺失",
         "cycle": "检测到環，已截斷展開",
@@ -2909,6 +2924,7 @@
         },
         "usageAvailability": {
           "present": "已關聯",
+          "corrupt": "資料損壞",
           "not_correlated": "未關聯",
           "projection_unavailable": "投影不可用",
           "unknown": "未知"
@@ -3082,6 +3098,7 @@
         },
         "recordingStatus": {
           "active": "記錄中",
+          "degraded": "記錄降級",
           "disabled": "已停用",
           "closed": "已關閉"
         },

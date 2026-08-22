@@ -230,7 +230,8 @@ export function ModelObservabilitySection() {
               {t('settings.observability.recording.reason', { code: health.storeDisabledReasonCode })}
             </span>
           )}
-          {settings?.desired.enabled && health.recordingStatus !== 'active' && (
+          {settings?.desired.enabled
+            && (health.recordingStatus === 'disabled' || health.recordingStatus === 'closed') && (
             <span className={styles['observability-recording-reason']}>
               {t('settings.observability.recording.configuredButInactive')}
             </span>

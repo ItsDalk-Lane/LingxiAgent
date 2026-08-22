@@ -29,6 +29,7 @@ import {
 } from "../lib/llm/model-call-observer.ts";
 import { createTestModelCallObserver } from "../lib/llm/model-call-observer-testing.ts";
 import { runCachePreservingCompactionAgentRun } from "../lib/llm/cache-preserving-compaction-agent-run.ts";
+import { createModelObservabilityTestHarness } from "../lib/llm/model-observability-testing.ts";
 
 const usage = {
   input: 10,
@@ -261,7 +262,41 @@ describe("installModelCallStreamObserver — MC-03 native compaction", () => {
     const start = observer.eventsOfType("logical_call_start")[0];
     expect(start.source).toMatchObject({ subsystem: "compaction", operation: "compact" });
     expect(start.details).toMatchObject({ path: "pi_stream", nativeSummarization: true });
+    expect(start.usageCorrelation).toBe("not_correlated");
+    expect(observer.events.every((event) => event.usageCorrelation === "not_correlated")).toBe(true);
     expect(observer.eventsOfType("logical_call_end")[0].status).toBe("ok");
+  });
+
+  it("真实 native stream wrapper 把 not_correlated 作为运行时事实持久化", async () => {
+    const harness = createModelObservabilityTestHarness();
+    setModelCallObserver(harness.handle.observer);
+    try {
+      const session = fakeSession(async () => streamOf(assistantMessage()), { isCompacting: true });
+      installModelCallStreamObserver(session);
+
+      const stream = await session.agent.streamFunction(MODEL, {}, {});
+      await stream.result();
+      await flushTerminal();
+      harness.flush();
+
+      const reader = harness.openReader();
+      try {
+        const rows = reader.db.prepare(
+          `SELECT subsystem, operation, usage_correlation_state FROM model_calls`,
+        ).all();
+        expect(rows).toEqual([{
+          subsystem: "compaction",
+          operation: "compact",
+          usage_correlation_state: "not_correlated",
+        }]);
+      } finally {
+        reader.close();
+      }
+    } finally {
+      setModelCallObserver(null);
+      await harness.close();
+      harness.cleanup();
+    }
   });
 });
 
@@ -287,6 +322,7 @@ describe("installModelCallStreamObserver — MC-02 显式 scope", () => {
     expect(start.source).toMatchObject({ operation: "fresh_compact" });
     expect(start.details).toMatchObject({ compactionPhase: "strict" });
     expect(start.details).not.toHaveProperty("nativeSummarization");
+    expect(start).not.toHaveProperty("usageCorrelation");
     expect(observer.callIds()).toEqual(["mc_runner_owned"]);
   });
 });

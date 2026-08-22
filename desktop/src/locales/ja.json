@@ -2582,7 +2582,12 @@
         "avgDuration": "平均時間",
         "durationObserved": "{count} 件の観測に基づく",
         "cost": "コスト",
-        "usageCoverage": "使用量カバレッジ：{covered} 件紐付け / {missing} 件欠落"
+        "usageCoverage": "使用量カバレッジ：{covered} 件紐付け / {missing} 件欠落",
+        "usageCoverageComplete": "使用量カバレッジ完了：{covered} 件紐付け、{notCorrelated} 件は明示的に対象外",
+        "usageCoveragePartial": "使用量は一部のみ：全 {total} 件中 {covered} 件紐付け、{unknown} 件不明",
+        "usageCoverageCorrupt": "使用量データが破損しています：{corrupt} 件を信頼できる形で集計できません",
+        "usageCoverageProjectionUnavailable": "使用量プロジェクションを利用できないため、以下の値はゼロではありません",
+        "usageCoverageUnknown": "使用量カバレッジ不明：全 {total} 件中 {unknown} 件を確認できません"
       },
       "groups": {
         "loading": "集計を読み込み中…",
@@ -2599,7 +2604,8 @@
         "interruptedAria": "この呼び出しは再起動で中断されました",
         "interruptedTooltip": "アプリの再起動によりこの呼び出しの記録は不完全です",
         "usageMissingAria": "この呼び出しには使用量データがありません",
-        "completenessNote": "データ完全性：ドロップしたトレースイベント {droppedEvents} 件 / ペイロード {droppedPayloads} 件 / 再起動中断 {interrupted} 件",
+        "completenessNote": "データ完全性：ドロップしたトレースイベント {droppedEvents} 件 / ペイロード {droppedPayloads} 件 / ファイル {droppedBlobs} 件 / 再起動中断 {interrupted} 件",
+        "completenessUnknown": "データ完全性カウンターを読み取れず、欠落量は不明です",
         "filterBySession": "セッションでフィルター：{id}",
         "filterByTask": "タスクでフィルター：{id}",
         "col": {
@@ -2717,6 +2723,7 @@
         "listAria": "入力セクション一覧",
         "selectSection": "左のセクションを選択して詳細を表示",
         "absent": "この呼び出しにはセマンティックプロベナンス記録がありません",
+        "corrupt": "セマンティックプロベナンス記録が破損しており、欠落として扱えません",
         "structural": "構造ロケーター（値の種類：{kind}）、テキスト span なし",
         "emptySpan": "このセクションは空のテキストセグメントです",
         "field": {
@@ -2739,6 +2746,7 @@
         "jump": "対応する入力セクションへジャンプ",
         "noLocator": "このマッピングにはフィールドレベルのロケーターがありません",
         "absent": "この呼び出しにはプロバイダーリクエストマッピング記録がありません",
+        "corrupt": "プロバイダーリクエストマッピング記録が破損しており、欠落として扱えません",
         "empty": "マッピング一覧は空です",
         "loadSemanticFirst": "先にセマンティックリクエスト本文を読み込んでからマッピングを辿ってください"
       },
@@ -2787,6 +2795,13 @@
         "stats": {
           "calls": "{count} 回の呼び出し",
           "payload": "ペイロード：{present} 存在 / {expired} 期限切れ / {dropped} ドロップ"
+        },
+        "usageAvailability": {
+          "complete": "使用量カバレッジ完了（{covered}/{total}）",
+          "partial": "使用量は一部のみ（{covered}/{total}、{unknown} 件不明）",
+          "corrupt": "使用量データ破損（{corrupt}/{total}）",
+          "projection_unavailable": "使用量プロジェクション利用不可",
+          "unknown": "使用量カバレッジ不明（{unknown}/{total}）"
         },
         "missingParent": "親呼び出しが欠落",
         "cycle": "循環を検出したため展開を打ち切りました",
@@ -2909,6 +2924,7 @@
         },
         "usageAvailability": {
           "present": "紐付け済み",
+          "corrupt": "データ破損",
           "not_correlated": "未紐付け",
           "projection_unavailable": "プロジェクション不可",
           "unknown": "不明"
@@ -3082,6 +3098,7 @@
         },
         "recordingStatus": {
           "active": "記録中",
+          "degraded": "記録が劣化",
           "disabled": "無効",
           "closed": "クローズ"
         },

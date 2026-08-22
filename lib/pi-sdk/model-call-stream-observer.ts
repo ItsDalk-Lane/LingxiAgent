@@ -201,6 +201,9 @@ export function installModelCallStreamObserver(
         model: modelIdentity,
         source: effectiveSource,
         attribution: effectiveAttribution,
+        // MC-03 的 native summarizer 不经 Usage Ledger 的 exact modelCallId
+        // 关联点；这里是唯一知道该事实的真实运行时边界。
+        usageCorrelation: nativeSummarization ? "not_correlated" : null,
         payloadCapture,
       },
     });

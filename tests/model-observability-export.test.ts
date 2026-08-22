@@ -151,7 +151,7 @@ describe("Model Observability Export", () => {
       exportSchemaVersion: MODEL_OBSERVABILITY_EXPORT_SCHEMA_VERSION,
       includePayloads: false,
       totalCalls: 2,
-      storageSchemaVersion: 2,
+      storageSchemaVersion: 3,
       backfillSource: "bounded_usage_ledger",
     });
     const bundle1 = JSON.parse(lines[1]);
@@ -204,6 +204,32 @@ describe("Model Observability Export", () => {
     expect(opaque.payload).toBeNull();
     // 没有 includeRaw 这种选项（§七十六）：显式 unknown_field 拒绝。
     expect(normalizeModelObservabilityExportOptions({ includeRaw: true }).ok).toBe(false);
+  });
+
+  it("损坏的 usage/payload 状态原样进入 export，不被改写成零或空正文", async () => {
+    seedCall(harness, "mc_corrupt_export", Date.UTC(2026, 7, 1));
+    harness.flush();
+    const reader = harness.openReader();
+    try {
+      reader.db.prepare(`INSERT INTO model_call_usage (
+        model_call_id, usage_status, input_total_tokens, total_tokens, cost_total,
+        created_at, updated_at
+      ) VALUES ('mc_corrupt_export', 'ok', 'broken', 'broken', 'broken',
+        '2026-08-01T00:00:00.000Z', '2026-08-01T00:00:00.000Z')`).run();
+      reader.db.prepare("UPDATE payload_records SET payload_json = '{broken' WHERE call_id = ?")
+        .run("mc_corrupt_export");
+    } finally {
+      reader.close();
+    }
+    service = createModelObservabilityQueryService({ lingxiHome: home });
+    const lines = await collectExport(startExport({ includePayloads: true }));
+    const bundle = JSON.parse(lines[1]);
+    expect(bundle.usage).toEqual({ availability: "corrupt", status: "ok", summary: null });
+    expect(bundle.payloads[0]).toMatchObject({
+      contentAvailable: false,
+      contentState: "corrupt",
+      payload: null,
+    });
   });
 
   it("export limit：超 maxCalls → limit_error（§八十一）", () => {

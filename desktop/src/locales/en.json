@@ -2581,7 +2581,12 @@
         "avgDuration": "Avg duration",
         "durationObserved": "Based on {count} observations",
         "cost": "Cost",
-        "usageCoverage": "Usage coverage: {covered} linked / {missing} missing"
+        "usageCoverage": "Usage coverage: {covered} linked / {missing} missing",
+        "usageCoverageComplete": "Usage coverage complete: {covered} linked, {notCorrelated} explicitly not correlated",
+        "usageCoveragePartial": "Usage coverage is partial: {covered} of {total} linked, {unknown} unknown",
+        "usageCoverageCorrupt": "Usage data is corrupt: {corrupt} records cannot be aggregated reliably",
+        "usageCoverageProjectionUnavailable": "Usage projection unavailable; the values below are not zero",
+        "usageCoverageUnknown": "Usage coverage unknown: {unknown} of {total} calls could not be verified"
       },
       "groups": {
         "loading": "Loading aggregates…",
@@ -2598,7 +2603,8 @@
         "interruptedAria": "This call was interrupted by a restart",
         "interruptedTooltip": "An app restart left this call's records incomplete",
         "usageMissingAria": "This call has no usage data",
-        "completenessNote": "Data completeness: {droppedEvents} trace events dropped / {droppedPayloads} payloads dropped / {interrupted} restarts interrupted",
+        "completenessNote": "Data completeness: {droppedEvents} trace events dropped / {droppedPayloads} payloads dropped / {droppedBlobs} files dropped / {interrupted} restarts interrupted",
+        "completenessUnknown": "Data completeness counters could not be read; the amount of missing data is unknown",
         "filterBySession": "Filter by session: {id}",
         "filterByTask": "Filter by task: {id}",
         "col": {
@@ -2716,6 +2722,7 @@
         "listAria": "Input section list",
         "selectSection": "Select a section on the left to inspect",
         "absent": "This call has no semantic provenance record",
+        "corrupt": "The semantic provenance record is corrupt; it is not an absent record",
         "structural": "Structural locator (value kind: {kind}); no text span",
         "emptySpan": "This section is an empty text segment",
         "field": {
@@ -2738,6 +2745,7 @@
         "jump": "Jump to the corresponding input section",
         "noLocator": "This mapping has no field-level locator",
         "absent": "This call has no provider request mapping record",
+        "corrupt": "The provider request mapping record is corrupt; it is not an absent record",
         "empty": "Mapping list is empty",
         "loadSemanticFirst": "Load the semantic request body first to follow mapping jumps"
       },
@@ -2786,6 +2794,13 @@
         "stats": {
           "calls": "{count} calls",
           "payload": "payloads: {present} present / {expired} expired / {dropped} dropped"
+        },
+        "usageAvailability": {
+          "complete": "Usage coverage complete ({covered}/{total})",
+          "partial": "Usage coverage partial ({covered}/{total}, {unknown} unknown)",
+          "corrupt": "Usage data corrupt ({corrupt}/{total})",
+          "projection_unavailable": "Usage projection unavailable",
+          "unknown": "Usage coverage unknown ({unknown}/{total})"
         },
         "missingParent": "Missing parent call",
         "cycle": "Cycle detected; expansion truncated",
@@ -2908,6 +2923,7 @@
         },
         "usageAvailability": {
           "present": "Linked",
+          "corrupt": "Corrupt",
           "not_correlated": "Not correlated",
           "projection_unavailable": "Projection unavailable",
           "unknown": "Unknown"
@@ -3081,6 +3097,7 @@
         },
         "recordingStatus": {
           "active": "Recording",
+          "degraded": "Recording degraded",
           "disabled": "Disabled",
           "closed": "Closed"
         },

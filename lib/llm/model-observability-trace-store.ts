@@ -39,6 +39,10 @@ function intOrNull(value: unknown): number | null {
   return typeof value === "number" && Number.isFinite(value) ? value : null;
 }
 
+function usageCorrelationStateOrNull(value: unknown): "not_correlated" | null {
+  return value === "not_correlated" ? value : null;
+}
+
 function jsonOrNull(value: unknown): string | null {
   if (value === null || value === undefined) return null;
   try {
@@ -131,6 +135,7 @@ export function createModelObservabilityTraceStore({ db, now = () => new Date().
         input_shape, provenance_precision, provenance_section_count,
         provenance_categories_json, provenance_opaque_count,
         attribution_json, source_json, safe_details_json,
+        usage_correlation_state,
         persistence_completeness
       ) VALUES (
         @call_id, @trace_id, @parent_call_id,
@@ -143,6 +148,7 @@ export function createModelObservabilityTraceStore({ db, now = () => new Date().
         @input_shape, @provenance_precision, @provenance_section_count,
         @provenance_categories_json, @provenance_opaque_count,
         @attribution_json, @source_json, @safe_details_json,
+        @usage_correlation_state,
         'partial'
       )
       ON CONFLICT(call_id) DO UPDATE SET
@@ -175,6 +181,10 @@ export function createModelObservabilityTraceStore({ db, now = () => new Date().
         attribution_json = COALESCE(model_calls.attribution_json, excluded.attribution_json),
         source_json = COALESCE(model_calls.source_json, excluded.source_json),
         safe_details_json = COALESCE(model_calls.safe_details_json, excluded.safe_details_json),
+        usage_correlation_state = COALESCE(
+          model_calls.usage_correlation_state,
+          excluded.usage_correlation_state
+        ),
         persistence_completeness = CASE
           WHEN model_calls.persistence_completeness = 'complete' THEN 'complete'
           ELSE 'partial' END
@@ -245,6 +255,7 @@ export function createModelObservabilityTraceStore({ db, now = () => new Date().
       attribution_json: jsonOrNull(event.attribution),
       source_json: jsonOrNull(event.source),
       safe_details_json: jsonOrNull(event.details),
+      usage_correlation_state: usageCorrelationStateOrNull(event.usageCorrelation),
     });
     if (event.traceId) {
       stmts.touchTrace.run({ trace_id: event.traceId, ts: event.timestamp || now() });
@@ -277,6 +288,7 @@ export function createModelObservabilityTraceStore({ db, now = () => new Date().
           attribution_json: jsonOrNull(event.attribution),
           source_json: jsonOrNull(event.source),
           safe_details_json: jsonOrNull(details),
+          usage_correlation_state: usageCorrelationStateOrNull(event.usageCorrelation),
         });
         if (event.traceId) {
           stmts.upsertTrace.run({
@@ -414,6 +426,7 @@ export function createModelObservabilityTraceStore({ db, now = () => new Date().
         attribution_json: jsonOrNull(identity.attribution),
         source_json: jsonOrNull(identity.source),
         safe_details_json: null,
+        usage_correlation_state: null,
       });
       if (identity.traceId) {
         stmts.touchTrace.run({ trace_id: identity.traceId, ts: now() });
@@ -450,10 +463,16 @@ export function createModelObservabilityTraceStore({ db, now = () => new Date().
     markPayloadAvailability(callIds: string[], availability: "expired" | "dropped" | "not_captured"): void {
       if (callIds.length === 0) return;
       const update = db.prepare(
-        `UPDATE model_calls SET payload_availability = ? WHERE call_id = ? AND payload_availability IS NULL`,
+        `UPDATE model_calls SET payload_availability = CASE
+           WHEN @availability = 'dropped' THEN 'dropped'
+           WHEN @availability = 'expired' AND payload_availability IS NOT 'dropped' THEN 'expired'
+           WHEN @availability = 'not_captured' AND payload_availability IS NULL THEN 'not_captured'
+           ELSE payload_availability
+         END
+         WHERE call_id = @call_id`,
       );
       for (const callId of callIds) {
-        if (typeof callId === "string" && callId) update.run(availability, callId);
+        if (typeof callId === "string" && callId) update.run({ availability, call_id: callId });
       }
     },
   };

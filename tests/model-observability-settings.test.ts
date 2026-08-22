@@ -144,7 +144,7 @@ describe("Model Observability Settings / Control Plane", () => {
       expect(calls.ok === true && calls.value.calls.map((c) => c.callId)).toEqual(["mc_keep"]);
       const health = service.getHealth();
       expect(health.ok === true && health.value.queryStatus).toBe("ready");
-      expect(health.ok === true && health.value.schemaVersion).toBe(2);
+      expect(health.ok === true && health.value.schemaVersion).toBe(3);
     } finally {
       service.close();
     }

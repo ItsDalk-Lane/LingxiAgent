@@ -25,6 +25,7 @@ import type {
   ModelObservabilityCallDetail,
   ModelObservabilityCallFilterInput,
   ModelObservabilityCallPage,
+  ModelObservabilityDateBucket,
   ModelObservabilityExportRequest,
   ModelObservabilityGroupByDimension,
   ModelObservabilityHealthResponse,
@@ -240,7 +241,7 @@ export function queryObservabilityTraces(
 export type ObservabilityAggregateQuery = {
   filter?: ModelObservabilityCallFilterInput;
   groupBy: ModelObservabilityGroupByDimension[];
-  dateBucket?: { bucket: 'day'; utcOffsetMinutes: number };
+  dateBucket?: ModelObservabilityDateBucket;
 };
 
 export function queryObservabilityAggregate(

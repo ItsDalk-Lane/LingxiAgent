@@ -35,7 +35,7 @@ describe('Model Observatory wire contract closed sets (Phase 9)', () => {
       'present', 'expired', 'dropped', 'not_captured', 'unknown',
     ]);
     expect([...MODEL_OBSERVABILITY_USAGE_AVAILABILITIES]).toEqual([
-      'present', 'not_correlated', 'projection_unavailable', 'unknown',
+      'present', 'corrupt', 'not_correlated', 'projection_unavailable', 'unknown',
     ]);
     expect([...MODEL_OBSERVABILITY_PAYLOAD_CONTENT_STATES]).toEqual([
       'present', 'null_payload', 'opaque_or_unavailable', 'corrupt',

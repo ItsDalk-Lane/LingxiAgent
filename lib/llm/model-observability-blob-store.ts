@@ -29,6 +29,7 @@ import fs from "fs";
 import path from "path";
 import { randomBytes } from "crypto";
 import { SECRET_DIR_MODE, ensureSecretDirModeSync } from "../../shared/secret-fs.ts";
+import { MODEL_OBSERVABILITY_BLOB_ID_PATTERN } from "../../shared/model-observability-api-contract.ts";
 import {
   MODEL_OBSERVABILITY_BLOBS_DIR_NAME,
   modelObservabilityBlobsRoot,
@@ -41,7 +42,11 @@ export const MODEL_OBSERVABILITY_BLOB_MAX_BYTES = 64 * 1024 * 1024;
 export const MODEL_OBSERVABILITY_BLOB_ORPHAN_GRACE_MS = 24 * 60 * 60 * 1000;
 
 export function mintModelObservabilityBlobId(random: () => string = defaultRandomToken): string {
-  return `mb_${random()}`;
+  const blobId = `mb_${random()}`;
+  if (!MODEL_OBSERVABILITY_BLOB_ID_PATTERN.test(blobId)) {
+    throw new Error("generated model observability blob id is invalid");
+  }
+  return blobId;
 }
 
 function defaultRandomToken(): string {
@@ -57,6 +62,89 @@ export type ModelObservabilityBlobRow = {
   relative_path: string;
 };
 
+function assertValidBlobId(blobId: string): void {
+  if (typeof blobId !== "string" || !MODEL_OBSERVABILITY_BLOB_ID_PATTERN.test(blobId)) {
+    throw new Error("invalid model observability blob id");
+  }
+}
+
+/** 新写入 Blob 的真实分片：跳过固定的 `mb_` 前缀，使用随机 token 前两位。 */
+export function modelObservabilityBlobRelativePath(blobId: string): string {
+  assertValidBlobId(blobId);
+  return path.posix.join(
+    MODEL_OBSERVABILITY_BLOBS_DIR_NAME,
+    blobId.slice(3, 5),
+    `${blobId}.bin`,
+  );
+}
+
+/** Phase 7/9 历史布局固定落在 `blobs/mb/`；仅用于兼容读取与清理。 */
+export function legacyModelObservabilityBlobRelativePath(blobId: string): string {
+  assertValidBlobId(blobId);
+  return path.posix.join(MODEL_OBSERVABILITY_BLOBS_DIR_NAME, "mb", `${blobId}.bin`);
+}
+
+function isPathInside(root: string, candidate: string): boolean {
+  const resolvedRoot = path.resolve(root);
+  const resolvedCandidate = path.resolve(candidate);
+  return resolvedCandidate.startsWith(`${resolvedRoot}${path.sep}`);
+}
+
+/**
+ * 只由闭集 blobId 推导候选路径；数据库 relative_path 永远不参与文件寻址。
+ * 第一项是新分片，第二项是历史 `mb` 布局。
+ */
+export function modelObservabilityBlobPathCandidates(lingxiHome: string, blobId: string): string[] {
+  assertValidBlobId(blobId);
+  const root = modelObservabilityBlobsRoot(lingxiHome);
+  const relativeCandidates = [
+    modelObservabilityBlobRelativePath(blobId),
+    legacyModelObservabilityBlobRelativePath(blobId),
+  ];
+  const candidates = relativeCandidates.map((relative) =>
+    path.resolve(root, path.posix.relative(MODEL_OBSERVABILITY_BLOBS_DIR_NAME, relative))
+  );
+  const unique = [...new Set(candidates)];
+  if (unique.some((candidate) => !isPathInside(root, candidate))) {
+    throw new Error("model observability blob path escapes blob root");
+  }
+  return unique;
+}
+
+/**
+ * 返回 blobs 根目录内真实存在的普通文件。realpath 二次校验会拒绝把分片目录
+ * 换成指向外部位置的符号链接，避免读取/删除任意本地文件。
+ */
+export function resolveExistingModelObservabilityBlobPath(
+  lingxiHome: string,
+  blobId: string,
+): string | null {
+  let candidates: string[];
+  try {
+    candidates = modelObservabilityBlobPathCandidates(lingxiHome, blobId);
+  } catch {
+    return null;
+  }
+  const root = modelObservabilityBlobsRoot(lingxiHome);
+  let realRoot: string;
+  try {
+    realRoot = fs.realpathSync(root);
+  } catch {
+    return null;
+  }
+  for (const candidate of candidates) {
+    try {
+      const realCandidate = fs.realpathSync(candidate);
+      if (!isPathInside(realRoot, realCandidate)) continue;
+      const stat = fs.statSync(realCandidate);
+      if (stat.isFile()) return realCandidate;
+    } catch {
+      // 尝试下一个历史兼容候选。
+    }
+  }
+  return null;
+}
+
 export function createModelObservabilityBlobStore({ lingxiHome, db, now = () => new Date().toISOString() }: {
   lingxiHome: string;
   db: any;
@@ -65,22 +153,22 @@ export function createModelObservabilityBlobStore({ lingxiHome, db, now = () => 
   const root = modelObservabilityBlobsRoot(lingxiHome);
 
   function relativePathFor(blobId: string): string {
-    const shard = blobId.slice(0, 2).replace(/[^a-z0-9]/gi, "0") || "00";
-    return path.posix.join(MODEL_OBSERVABILITY_BLOBS_DIR_NAME, shard, `${blobId}.bin`);
+    return modelObservabilityBlobRelativePath(blobId);
   }
 
-  function absolutePathFor(relativePath: string): string {
-    // relativePath 由本模块生成（blobs/<shard>/<id>.bin）；resolve 后仍强制落在 root 内。
-    const abs = path.resolve(root, "..", relativePath);
-    if (!abs.startsWith(path.resolve(root, "..") + path.sep)) {
-      throw new Error("blob relative path escapes observability directory");
-    }
-    return abs;
+  function canonicalAbsolutePathFor(blobId: string): string {
+    return modelObservabilityBlobPathCandidates(lingxiHome, blobId)[0];
   }
 
   function ensureShardDir(absFilePath: string): void {
     const dir = path.dirname(absFilePath);
+    fs.mkdirSync(root, { recursive: true });
     fs.mkdirSync(dir, { recursive: true });
+    const realRoot = fs.realpathSync(root);
+    const realDir = fs.realpathSync(dir);
+    if (realDir !== realRoot && !isPathInside(realRoot, realDir)) {
+      throw new Error("model observability blob shard escapes blob root");
+    }
     if (SUPPORTS_POSIX_MODE) {
       try {
         ensureSecretDirModeSync(dir);
@@ -112,8 +200,7 @@ export function createModelObservabilityBlobStore({ lingxiHome, db, now = () => 
     writeBlobFile(blobId: string, bytes: Uint8Array): boolean {
       if (!this.isEligibleSize(bytes.byteLength)) return false;
       try {
-        const relativePath = relativePathFor(blobId);
-        const abs = absolutePathFor(relativePath);
+        const abs = canonicalAbsolutePathFor(blobId);
         ensureShardDir(abs);
         const staging = path.join(path.dirname(abs), `.${path.basename(abs)}.tmp-${randomBytes(6).toString("hex")}`);
         try {
@@ -159,7 +246,9 @@ export function createModelObservabilityBlobStore({ lingxiHome, db, now = () => 
       const row = this.getBlobMetadata(blobId);
       if (!row) return null;
       try {
-        return fs.readFileSync(absolutePathFor(row.relative_path));
+        const abs = resolveExistingModelObservabilityBlobPath(lingxiHome, blobId);
+        if (!abs) throw new Error("blob file missing or outside blob root");
+        return fs.readFileSync(abs);
       } catch {
         try {
           db.prepare(`UPDATE blob_objects SET state = 'missing' WHERE blob_id = ? AND state = 'ready'`).run(blobId);
@@ -177,9 +266,20 @@ export function createModelObservabilityBlobStore({ lingxiHome, db, now = () => 
         const row = this.getBlobMetadata(blobId);
         if (!row) continue;
         deleteRow.run(blobId);
+        // 新旧布局都只由 blobId 重算；数据库 relative_path 只是历史 metadata。
+        let candidateCount = 0;
         try {
-          fs.rmSync(absolutePathFor(row.relative_path), { force: true });
-        } catch { /* 文件删除失败：metadata 已删，文件成为 orphan 由 recovery 清理 */ }
+          candidateCount = modelObservabilityBlobPathCandidates(lingxiHome, blobId).length;
+        } catch {
+          // 非法历史 id 没有任何文件删除权限；metadata 行已安全移除。
+        }
+        for (let index = 0; index < candidateCount; index += 1) {
+          try {
+            const safeExisting = resolveExistingModelObservabilityBlobPath(lingxiHome, blobId);
+            if (!safeExisting) break;
+            fs.rmSync(safeExisting, { force: true });
+          } catch { /* 文件删除失败：metadata 已删，文件成为 orphan 由 recovery 清理 */ }
+        }
         deleted += 1;
       }
       return deleted;
@@ -201,9 +301,16 @@ export function createModelObservabilityBlobStore({ lingxiHome, db, now = () => 
      */
     recoverOrphanBlobFiles({ graceMs = MODEL_OBSERVABILITY_BLOB_ORPHAN_GRACE_MS }: { graceMs?: number } = {}): number {
       let removed = 0;
-      const knownPaths = new Set(
-        db.prepare(`SELECT relative_path FROM blob_objects`).all().map((row: any) => row.relative_path),
-      );
+      const knownPaths = new Set<string>();
+      for (const row of db.prepare(`SELECT blob_id FROM blob_objects`).all()) {
+        try {
+          for (const candidate of modelObservabilityBlobPathCandidates(lingxiHome, row.blob_id)) {
+            knownPaths.add(path.relative(root, candidate).split(path.sep).join("/"));
+          }
+        } catch {
+          // 非法历史 id 不得给任何磁盘路径授权。
+        }
+      }
       const walk = (dir: string): void => {
         let entries: fs.Dirent[];
         try {
@@ -217,7 +324,7 @@ export function createModelObservabilityBlobStore({ lingxiHome, db, now = () => 
             walk(abs);
             continue;
           }
-          const relative = path.relative(path.resolve(root, ".."), abs).split(path.sep).join("/");
+          const relative = path.relative(root, abs).split(path.sep).join("/");
           if (knownPaths.has(relative)) continue;
           let mtimeMs: number;
           try {
@@ -248,7 +355,9 @@ export function createModelObservabilityBlobStore({ lingxiHome, db, now = () => 
       let missing = 0;
       for (const row of rows) {
         try {
-          fs.accessSync(absolutePathFor(row.relative_path));
+          if (!resolveExistingModelObservabilityBlobPath(lingxiHome, row.blob_id)) {
+            throw new Error("blob file missing or outside blob root");
+          }
         } catch {
           db.prepare(`UPDATE blob_objects SET state = 'missing' WHERE blob_id = ?`).run(row.blob_id);
           missing += 1;

@@ -141,7 +141,8 @@ export function ObservabilitySettingsDialog({ open, isLocalOwner, settings, heal
 
   const effectiveMismatch = settings
     && settings.desired.enabled
-    && settings.effective.recordingStatus !== 'active';
+    && (settings.effective.recordingStatus === 'disabled'
+      || settings.effective.recordingStatus === 'closed');
 
   return (
     <>
