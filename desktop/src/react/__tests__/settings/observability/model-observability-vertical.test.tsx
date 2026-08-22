@@ -34,6 +34,9 @@ import { useSettingsStore } from '../../../settings/store';
 let lingxiHome = '';
 let handle: ReturnType<typeof installModelObservabilityPersistence> | null = null;
 let route: Hono | null = null;
+// query service 惰性持有独立的只读 SQLite 连接；afterEach 必须显式关闭，
+// 否则 Windows 上 rmSync 撞开着的库文件 EPERM（macOS 允许删除打开文件）。
+let queryService: ReturnType<typeof createModelObservabilityQueryService> | null = null;
 let expectedCallId = '';
 let lastAggregateBody: Record<string, unknown> | null = null;
 
@@ -105,7 +108,7 @@ beforeEach(async () => {
   handle.flushSync();
   await new Promise((resolve) => setImmediate(resolve));
 
-  const queryService = createModelObservabilityQueryService({ lingxiHome });
+  queryService = createModelObservabilityQueryService({ lingxiHome });
   route = createModelObservabilityRoute({
     getModelObservabilityHealth: () => handle?.getHealth() ?? null,
     getModelObservabilitySettings: () => null,
@@ -143,6 +146,9 @@ beforeEach(async () => {
 afterEach(async () => {
   cleanup();
   vi.unstubAllGlobals();
+  route = null;
+  queryService?.close();
+  queryService = null;
   await handle?.close();
   handle = null;
   // Windows：close() 返回后 WAL/SHM/blob 句柄释放存在滞后，rmSync 会瞬时
