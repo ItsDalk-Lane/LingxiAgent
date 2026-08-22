@@ -7,7 +7,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = bfde47bcc6617751e19b94b138ee23a3fcd0d946  (最终验证所针对的源码树；2026-08-22 模型调用可观测性第六轮 durable storage 树后推进)
+VERIFIED_SOURCE_SHA   = cfab85564d6ad5b53de19862545535f084be223d  (最终验证所针对的源码树；2026-08-22 模型调用可观测性第七轮 unified query 树后推进)
 工作分支              = feature/upstream-sync-0.447.4
 ```
 
@@ -244,20 +244,36 @@ seal 不是一次性终点，而是"当前被验证树"的游标；每次审计�
   data-epoch 80 / 既有观测 302 回归 / full npm test 11925 全绿；seal/matrix/
   tripwire 推进后复验。
 
+- **2026-08-22 模型调用可观测性第七轮（unified query & control plane）**（功能树
+  cfab8556/seal 本提交）：Phase 8 Unified Observatory Query & Control Plane——
+  统一 Query Contract（Filters + Group By + Drill Down，category≡subsystem）+
+  keyset pagination（cursor 与 query fingerprint 绑定）+ SQLite 内聚合（date
+  bucket 显式 utcOffsetMinutes）+ schema v2（model_call_usage durable accounting
+  projection：llm_usage live ingestion + bounded ledger 幂等 backfill，
+  error.message 不入库）+ read-only query side（v1 历史库不迁移可读）+ trace
+  explorer 后端（cycle-safe）+ payload exact retrieval（OPAQUE/UNAVAILABLE 不
+  升级）+ observability settings 持久化 preference（默认 disabled，payload/blob
+  额外 opt-in，runtime reconfigure 不删历史）+ HTTP surface（route-security
+  显式登记：metadata=STUDIO_OWNER，正文/settings/export=LOCAL_ONLY）+ JSONL
+  streaming export。第七轮验证：typecheck ×3 / eslint 0 error / lint:boundary /
+  scanner 站点登记 + fingerprint compatible repin（sha256:b0712be2…）/
+  新增 7 测试文件 53 用例 / full npm test 11975 全绿；seal/matrix/tripwire
+  推进后复验。
+
 ## 最终状态：READY TO MERGE
 
 - Upstream ΔU：133 / 133 paths。
 - Disposition：ADOPTED 25 + ADAPTED 100 + REGENERATED 4 + INTENTIONAL_DIVERGENCE 4 = 133
   （脚本计算，`build-sync-matrix.mjs --check`：missing=0 / extra=0 / duplicate=0 / unknown=0）。
 - 4 个 `hanako.md → lingxi.md` 品牌映射统一分类为 ADAPTED。
-- `VERIFIED_SOURCE_SHA = bfde47bcc6617751e19b94b138ee23a3fcd0d946`：被完整测试验证的代码树
+- `VERIFIED_SOURCE_SHA = cfab85564d6ad5b53de19862545535f084be223d`：被完整测试验证的代码树
   （含收口树 d4cf92a8 的全部验证 + 文档清场树复跑验证 + 归档修复树 051f6117 复跑的
   typecheck/lint/全量测试 + v0.1.29 release 树 fabd6dbf 复跑的 typecheck/目标套件 +
   mac self-install 树 dcf3546a 的 PR CI typecheck/lint/build/全量测试 +
   凭证边界修复树 b8688895 的本地 typecheck/定向测试 + PR CI typecheck/lint/build/全量测试 +
   保留标签管道修复树 c83d238a 的本地 typecheck/定向测试 + 全量测试 +
   保留标签指纹补钉树 be95b344 的 tripwire/guard 验证 +
-  模型调用可观测性五轮树 a9a5f3f4 / b9238533 / 53fa4575 / 3cf0e6ed / bfde47bcc6617751e19b94b138ee23a3fcd0d946
+  模型调用可观测性六轮树 a9a5f3f4 / b9238533 / 53fa4575 / 3cf0e6ed / bfde47bc / cfab85564d6ad5b53de19862545535f084be223d
   的本地 typecheck/定向测试 + 全量测试，见「Seal 推进记录」）。当前 HEAD 只比 VERIFIED_SOURCE_SHA 多审计收口内容。
 
 ### Post-verification diff 记录（`git diff --name-only VERIFIED_SOURCE_SHA..HEAD`）
