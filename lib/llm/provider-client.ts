@@ -8,6 +8,17 @@
 import { t } from "../i18n.ts";
 import { normalizeProviderHeaders } from "../../shared/provider-auth.ts";
 import { withModelRequestAccounting } from "./model-request-accounting.ts";
+import {
+  beginObservedModelCall,
+  failObservedModelCall,
+  observedModelCallLedgerMetadata,
+  observedProviderFetch,
+} from "./model-call-integration.ts";
+import { runWithNewModelTrace } from "./model-trace-scope.ts";
+import {
+  createSemanticInputProvenance,
+  provenanceSection,
+} from "./semantic-input-provenance.ts";
 
 export const DEFAULT_PROVIDER_USER_AGENT = "LingxiAgent/1.0";
 const DEFAULT_ANTHROPIC_PROBE_MODEL = "claude-sonnet-4-6";
@@ -287,48 +298,136 @@ export async function probeProvider({
   });
 
   const effectiveModelId = modelId || (api === "anthropic-messages" ? DEFAULT_ANTHROPIC_PROBE_MODEL : null);
-  return withModelRequestAccounting({
-    usageLedger,
-    model: { provider: providerId, modelId: effectiveModelId, api },
-    usageContext,
-    metadata: { operation: "connectivity-probe" },
-  }, async () => {
-    if (api === "anthropic-messages") {
-      const res = await fetch(probe.url, {
-        method: probe.method,
-        headers,
-        body: JSON.stringify({
+
+  // MC-05 语义拆分（§十八/§二十一）：Anthropic 分支是真实最小生成调用
+  // （POST /v1/messages，固定 prompt、max_tokens=1）→ 进入 ModelCallObserver，
+  // 请求前铸 callId 并写进 ledger metadata。其它协议只是 GET /models 模型
+  // 目录发现 → CONTROL_PLANE：0 observer 事件、不进 Usage Ledger。
+  if (api !== "anthropic-messages") {
+    const res = await fetch(probe.url, { headers, signal: AbortSignal.timeout(10000) });
+    return buildProbeResult(res);
+  }
+
+  // Provider 连接测试按钮 = 独立用户任务（§二十五）：singleton trace，
+  // origin=provider_probe；不继承任何外层 scope。
+  return runWithNewModelTrace({ origin: "provider_probe", refs: { providerId } }, async () => {
+    // Phase 5（§七十一）：probe 的语义输入 = 固定占位消息（exact）。
+    // 不保存 "." 值本身——locator 只指向 messages[0]。
+    const recorder = beginObservedModelCall({
+      model: { provider: providerId, modelId: effectiveModelId, api },
+      usageContext,
+      details: {
+        path: "provider_probe",
+        probeKind: "generation",
+        protocol: api,
+        operation: "connectivity-probe",
+      },
+      semanticInputProvenance: createSemanticInputProvenance("provider_probe", [
+        provenanceSection(
+          { root: "messages", path: [0] },
+          "task_instruction",
+          { role: "user", source: { type: "runtime", id: "provider-probe.fixed-prompt" } },
+        ),
+      ]),
+    });
+    try {
+      // Phase 6 Semantic Request Capture（§八十六）：probe 固定占位消息 "." 的
+      // 正文由 capture 层负责（经统一 Redactor）——provenance 仍只存 locator。
+      const payloadCapture = recorder.payloadCapture;
+      if (payloadCapture) {
+        payloadCapture.captureSemanticRequest({
+          inputShape: "provider_probe",
+          messages: [{ role: "user", content: "." }],
+          provenance: recorder.semanticInputProvenance,
+        });
+      }
+      const result = await withModelRequestAccounting({
+        usageLedger,
+        model: { provider: providerId, modelId: effectiveModelId, api },
+        usageContext,
+        metadata: { operation: "connectivity-probe", ...observedModelCallLedgerMetadata(recorder) },
+      }, async () => {
+        const probeBody = {
           model: effectiveModelId,
           max_tokens: 1,
           messages: [{ role: "user", content: "." }],
-        }),
-        signal: AbortSignal.timeout(10000),
+        };
+        const res = await observedProviderFetch({ modelCall: recorder }, () => fetch(probe.url, {
+          method: probe.method,
+          headers,
+          body: JSON.stringify(probeBody),
+          signal: AbortSignal.timeout(10000),
+        }), {
+          requestDetails: { protocol: api, messageCount: 1 },
+          // Phase 6：真实构造点 body + 真实 headers（x-api-key 经 Redactor）。
+          capture: { method: probe.method, url: probe.url, headers, body: probeBody, protocol: api },
+        });
+        return buildProbeResult(res, { modelCall: recorder });
       });
-      return buildProbeResult(res);
+      if (result?.ok) {
+        recorder.payloadCapture?.captureSemanticResponse({
+          response: {
+            structuredOutput: { probeAccepted: true, httpStatus: result?.status ?? null },
+            completeness: "complete",
+          },
+        });
+        recorder.semanticResponseCompleted({
+          details: { probeAccepted: true, httpStatus: result?.status ?? null },
+        });
+        recorder.endLogicalCall("ok");
+      } else {
+        recorder.logicalCallError(new Error(`connectivity probe rejected`), {
+          details: { probeAccepted: false, httpStatus: result?.status ?? null, errorKind: "http_error" },
+        });
+        recorder.endLogicalCall("error", { details: { errorKind: "http_error" } });
+      }
+      return result;
+    } catch (err) {
+      const errorKind = err?.name === "TimeoutError" || err?.name === "AbortError" || err?.type === "aborted"
+        ? "timeout"
+        : "provider_or_network";
+      failObservedModelCall(recorder, err, { errorKind });
+      throw err;
     }
-
-    const res = await fetch(probe.url, { headers, signal: AbortSignal.timeout(10000) });
-    return buildProbeResult(res);
   });
 }
 
-async function buildProbeResult(res) {
-  if (res.ok) return { ok: true, status: res.status };
+async function buildProbeResult(res, captureCarrier = null) {
+  // Phase 6 Provider Response Capture：成功路径 probe 不读 body（业务只看 2xx）
+  // → 诚实 metadata_only；错误 body 在业务读取的同一位置捕获（不重复消费）。
+  const captureResponse = (body, fidelity) => {
+    if (!captureCarrier?.modelCall?.payloadCapture) return;
+    captureCarrier.modelCall.payloadCapture.captureProviderResponse({
+      status: res.status,
+      headers: res.headers,
+      body,
+      fidelity,
+    });
+  };
+  if (res.ok) {
+    captureResponse(null, "metadata_only");
+    return { ok: true, status: res.status };
+  }
   const fallback = `HTTP ${res.status}${res.statusText ? ` ${res.statusText}` : ""}`;
   const contentType = res.headers.get("content-type") || "";
   try {
     if (contentType.includes("application/json")) {
       const payload = await res.json();
+      captureResponse(payload, "parsed_equivalent");
       const message = payload?.error?.message || payload?.error || payload?.message;
       if (typeof message === "string" && message.trim()) {
         return { ok: false, status: res.status, error: message.trim().slice(0, 500) };
       }
     } else if (contentType.startsWith("text/") && !contentType.includes("html")) {
       const message = (await res.text()).trim();
+      captureResponse(message || null, "runtime_exact");
       if (message) return { ok: false, status: res.status, error: message.slice(0, 500) };
+    } else {
+      captureResponse(null, "metadata_only");
     }
   } catch {
     // Malformed error bodies fall back to the HTTP status below.
+    captureResponse(null, "metadata_only");
   }
   return { ok: false, status: res.status, error: fallback };
 }

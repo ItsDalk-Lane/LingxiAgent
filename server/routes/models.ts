@@ -2,6 +2,10 @@
  * 模型管理 REST 路由
  */
 import { Hono } from "hono";
+import {
+  createSemanticInputProvenance,
+  provenanceSection,
+} from "../../lib/llm/semantic-input-provenance.ts";
 import { safeJson } from "../hono-helpers.ts";
 import { t } from "../../lib/i18n.ts";
 import { modelRefEquals, parseModelRef } from "../../shared/model-ref.ts";
@@ -16,6 +20,7 @@ import {
   resolveModelAudioInputTransport,
   resolveModelVideoInputTransport,
 } from "../../shared/model-capabilities.ts";
+import { runWithNewModelTrace } from "../../lib/llm/model-trace-scope.ts";
 import { callText } from "../../core/llm-client.ts";
 import { callTextConfigFromResolvedModel } from "../../core/model-execution-config.ts";
 import { getModelThinkingLevels, modelSupportsXhigh, resolveModelDefaultThinkingLevel } from "../../core/session-thinking-level.ts";
@@ -230,11 +235,21 @@ export function createModelsRoute(engine) {
         return c.json({ ok: true, status: 0, provider: resolved.provider, skipped: t("error.codexNoHealthCheck") });
       }
 
-      await callText({
+      // Health Check = 独立用户任务（§二十五）：singleton trace，origin=health_check。
+      await runWithNewModelTrace(
+        { origin: "health_check", refs: { provider: resolved.provider, modelId: resolved.id } },
+        () => callText({
         ...callTextConfigFromResolvedModel(resolved),
         temperature: undefined as any,
         signal: undefined as any,
         messages: [{ role: "user", content: HEALTH_CHECK_PROMPT }],
+        semanticInputProvenance: createSemanticInputProvenance("provider_probe", [
+          provenanceSection(
+            { root: "messages", path: [0] },
+            "task_instruction",
+            { role: "user", source: { type: "runtime", id: "model-health-check.fixed-prompt" } },
+          ),
+        ]),
         maxTokens: HEALTH_CHECK_MAX_TOKENS,
         timeoutMs: 15_000,
         usageLedger: engine.usageLedger,
@@ -254,7 +269,8 @@ export function createModelsRoute(engine) {
             agentId: null,
           },
         },
-      });
+        }),
+      );
 
       return c.json({ ok: true, status: 200, provider: resolved.provider });
     } catch (err) {

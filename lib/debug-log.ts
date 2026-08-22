@@ -14,16 +14,16 @@ import os from "os";
 import { redactLogLabel, redactLogText } from "./log-redactor.ts";
 
 class DebugLog {
-  declare _dedup: any;
-  declare _filePath: any;
-  declare _logDir: any;
+  declare _dedup: { level: string | null; module: string | null; msg: string | null; count: number };
+  declare _filePath: string;
+  declare _logDir: string;
   declare _redactOptions: any;
-  declare _size: any;
-  declare _truncated: any;
+  declare _size: number;
+  declare _truncated: boolean;
   /**
    * @param {string} logDir - 日志目录路径（如 ~/.lingxi/logs）
    */
-  constructor(logDir) {
+  constructor(logDir: string) {
     fs.mkdirSync(logDir, { recursive: true });
 
     const now = new Date();
@@ -57,7 +57,7 @@ class DebugLog {
    * @param {string} version - 应用版本号
    * @param {object} info - 启动信息
    */
-  header(version, info: any = {}) {
+  header(version: string, info: any = {}) {
     const lines = [
       "═".repeat(60),
       `LingxiAgent v${version} — started at ${new Date().toISOString()}`,
@@ -88,17 +88,17 @@ class DebugLog {
   }
 
   /** INFO 级别日志 */
-  log(module, msg) {
+  log(module: string, msg: unknown) {
     this._write("INFO", module, msg);
   }
 
   /** ERROR 级别日志 */
-  error(module, msg) {
+  error(module: string, msg: unknown) {
     this._write("ERROR", module, msg);
   }
 
   /** WARN 级别日志 */
-  warn(module, msg) {
+  warn(module: string, msg: unknown) {
     this._write("WARN", module, msg);
   }
 
@@ -118,7 +118,7 @@ class DebugLog {
   }
 
   /** 对消息做隐私清洗后写入（含去重判断） */
-  _write(level, module, msg) {
+  _write(level: string, module: string, msg: unknown) {
     const cleanModule = redactLogLabel(module || "unknown");
     const cleaned = redactLogText(String(msg), this._redactOptions);
 
@@ -148,7 +148,7 @@ class DebugLog {
   }
 
   /** 底层写入（单文件上限 5MB，超限后写一次截断通知再静默丢弃） */
-  _append(level, module, msg) {
+  _append(level: string, module: string, msg: string) {
     const MAX = 5 * 1024 * 1024;
 
     if (this._truncated) return;
@@ -180,7 +180,7 @@ class DebugLog {
   }
 
   /** 清理超过 maxDays 天的旧日志 */
-  _cleanup(maxDays) {
+  _cleanup(maxDays: number) {
     try {
       const cutoff = Date.now() - maxDays * 24 * 60 * 60 * 1000;
       const files = fs.readdirSync(this._logDir).filter(f => f.endsWith(".log"));
@@ -200,14 +200,14 @@ class DebugLog {
 
 // ── 全局单例 ──
 
-let _instance = null;
+let _instance: DebugLog | null = null;
 
 /**
  * 初始化全局日志实例
  * @param {string} logDir - 日志目录路径
  * @returns {DebugLog}
  */
-export function initDebugLog(logDir) {
+export function initDebugLog(logDir: string) {
   _instance = new DebugLog(logDir);
   return _instance;
 }
@@ -234,19 +234,19 @@ export function debugLog() {
  * // console: [bridge] connection failed
  * // file:    [HH:MM:SS.mmm] [ERROR] [bridge] connection failed
  */
-export function createModuleLogger(module) {
-  const info = (msg) => {
+export function createModuleLogger(module: string) {
+  const info = (msg: string) => {
     console.log(`[${module}] ${msg}`);
     _instance?.log(module, msg);
   };
   return {
     log: info,
     info,
-    warn(msg) {
+    warn(msg: string) {
       console.warn(`[${module}] ${msg}`);
       _instance?.warn(module, msg);
     },
-    error(msg) {
+    error(msg: string) {
       console.error(`[${module}] ${msg}`);
       _instance?.error(module, msg);
     },

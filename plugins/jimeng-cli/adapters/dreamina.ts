@@ -8,6 +8,7 @@ import {
   findDreaminaMode,
   findDreaminaModel,
 } from "../lib/dreamina-capabilities.ts";
+import { observedExternalProcessRun } from "../../../lib/llm/model-call-integration.ts";
 
 const execFileAsync = promisify(execFile);
 
@@ -528,10 +529,19 @@ function createJimengAdapter({
       });
       const args = buildSubmitArgs(params, ctx, snapshot);
       const workingDirectory = ensureWorkingDirectory(ctx.generatedDir || ctx.dataDir);
-      const { stdout } = await runDreaminaCommand(runCommand, command, args, commandOptions({
+      // MC-07（§二十九/§三十）：请求真正发生在外部 CLI 进程内——Lingxi 看不到
+      // CLI 内的 HTTP/retry/response，诚实标记 external_process_boundary + opaque，
+      // 绝不伪造 provider_request_prepared / provider_response_received。
+      // 绝不记录 command args / prompt / stdout（安全红线 §三十一）。
+      const { stdout } = await observedExternalProcessRun(ctx, () => runDreaminaCommand(runCommand, command, args, commandOptions({
         cwd: workingDirectory,
         timeout: 120_000,
-      }));
+      })), {
+        details: {
+          adapterId: id,
+          mediaType: type,
+        },
+      });
       return assertSubmitAccepted(parseDreaminaTaskOutput(stdout));
     },
 

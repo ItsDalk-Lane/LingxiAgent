@@ -5592,6 +5592,94 @@ wrapIpcBestEffortHandler("select-plugin", async (event) => {
   return result.filePaths[0];
 });
 
+// ── Model Observatory 导出流式保存（Phase 9 §一百一十五～一百一十八）──
+// 安全模型：路径只来自用户亲手操作的系统保存对话框；renderer 拿到的是
+// 绑定发起 webContents 的不透明 exportId（capability token），没有任何任意
+// 文件写能力。分块写入（单块 ≤4MB）；abort/窗口销毁 → 关闭 fd 并删除
+// 部分文件（部分文件策略显式：宁可没有文件，不留半成品伪装完整导出）。
+const observabilityExportSessions = new Map(); // exportId → { fd, filePath, senderId, sender, bytesWritten, onDestroyed }
+const OBSERVABILITY_EXPORT_CHUNK_MAX_BYTES = 4 * 1024 * 1024;
+
+function closeObservabilityExportSession(exportId, { deletePartial }) {
+  const sessionInfo = observabilityExportSessions.get(exportId);
+  if (!sessionInfo) return null;
+  observabilityExportSessions.delete(exportId);
+  if (sessionInfo.onDestroyed) {
+    try { sessionInfo.sender.removeListener("destroyed", sessionInfo.onDestroyed); } catch { /* best-effort */ }
+  }
+  try { fs.closeSync(sessionInfo.fd); } catch { /* already closed */ }
+  if (deletePartial) {
+    try { fs.unlinkSync(sessionInfo.filePath); } catch { /* 删除失败：部分文件残留由用户可见 */ }
+  }
+  return sessionInfo;
+}
+
+wrapIpcHandler("observability-export:begin", async (event, payload) => {
+  const win = BrowserWindow.fromWebContents(event.sender);
+  if (!win) throw new Error("observability-export: window not found");
+  const requestedName = typeof payload?.defaultFileName === "string" ? payload.defaultFileName : "";
+  const defaultFileName = /^[A-Za-z0-9._-]{1,128}$/.test(requestedName)
+    ? requestedName
+    : "lingxi-model-observability.jsonl";
+  const result = await dialog.showSaveDialog(win, {
+    title: mt("dialog.saveObservabilityExport", null, "Export Model Observatory"),
+    defaultPath: defaultFileName,
+    filters: [
+      { name: "JSONL", extensions: ["jsonl"] },
+      { name: "All Files", extensions: ["*"] },
+    ],
+  });
+  if (result.canceled || !result.filePath) return { canceled: true };
+  const fd = fs.openSync(result.filePath, "w");
+  const exportId = crypto.randomUUID();
+  const sender = event.sender;
+  const sessionInfo = { fd, filePath: result.filePath, senderId: sender.id, sender, bytesWritten: 0, onDestroyed: null };
+  sessionInfo.onDestroyed = () => {
+    if (observabilityExportSessions.get(exportId) === sessionInfo) {
+      closeObservabilityExportSession(exportId, { deletePartial: true });
+    }
+  };
+  sender.once("destroyed", sessionInfo.onDestroyed);
+  observabilityExportSessions.set(exportId, sessionInfo);
+  return { canceled: false, exportId, filePath: result.filePath };
+});
+
+wrapIpcHandler("observability-export:write", (event, payload) => {
+  const sessionInfo = observabilityExportSessions.get(payload?.exportId);
+  if (!sessionInfo || sessionInfo.senderId !== event.sender.id) {
+    throw new Error("observability-export: unknown or foreign exportId");
+  }
+  const chunk = payload?.chunk;
+  const buffer = chunk instanceof Uint8Array
+    ? Buffer.from(chunk.buffer, chunk.byteOffset, chunk.byteLength)
+    : chunk instanceof ArrayBuffer
+      ? Buffer.from(new Uint8Array(chunk))
+      : null;
+  if (!buffer) throw new Error("observability-export: chunk must be bytes");
+  if (buffer.byteLength > OBSERVABILITY_EXPORT_CHUNK_MAX_BYTES) {
+    throw new Error("observability-export: chunk exceeds 4MB bound");
+  }
+  fs.writeSync(sessionInfo.fd, buffer);
+  sessionInfo.bytesWritten += buffer.byteLength;
+  return { bytesWritten: sessionInfo.bytesWritten };
+});
+
+wrapIpcHandler("observability-export:end", (event, payload) => {
+  const sessionInfo = observabilityExportSessions.get(payload?.exportId);
+  if (!sessionInfo || sessionInfo.senderId !== event.sender.id) {
+    throw new Error("observability-export: unknown or foreign exportId");
+  }
+  const info = closeObservabilityExportSession(payload.exportId, { deletePartial: false });
+  return { bytesWritten: info.bytesWritten, filePath: info.filePath };
+});
+
+wrapIpcHandler("observability-export:abort", (event, payload) => {
+  const sessionInfo = observabilityExportSessions.get(payload?.exportId);
+  if (!sessionInfo || sessionInfo.senderId !== event.sender.id) return { aborted: false };
+  closeObservabilityExportSession(payload.exportId, { deletePartial: true });
+  return { aborted: true };
+});
+
 // ── Skill 预览窗口 IPC ──
 wrapIpcBestEffortHandler("open-skill-viewer", (_event, data) => {
   if (!data) return;

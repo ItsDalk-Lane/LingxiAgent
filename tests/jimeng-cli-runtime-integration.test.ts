@@ -197,9 +197,7 @@ describe("Jimeng runtime provider capability integration", () => {
     const providerRegistry = createProviderRegistry();
     const engine = createEngine(providerRegistry);
     const usageLedger = {
-      start: vi.fn()
-        .mockReturnValueOnce({ requestId: "jimeng-boundary-1" })
-        .mockReturnValueOnce({ requestId: "jimeng-boundary-2" }),
+      start: vi.fn(),
       finish: vi.fn(),
       recordError: vi.fn(),
     };
@@ -231,7 +229,6 @@ describe("Jimeng runtime provider capability integration", () => {
         pluginId: "jimeng-cli",
       },
     );
-    expect(usageLedger.finish).toHaveBeenCalledWith("jimeng-boundary-1", expect.any(Object));
 
     await expect(hub.eventBus.request(
       "provider:authorize-external-credential-use",
@@ -242,12 +239,10 @@ describe("Jimeng runtime provider capability integration", () => {
       },
       { caller: { kind: "plugin", pluginId: "other-plugin" } },
     )).resolves.toMatchObject({ ok: false });
-    expect(usageLedger.recordError).toHaveBeenCalledWith(
-      "jimeng-boundary-2",
-      expect.any(Error),
-      "error",
-      expect.any(Object),
-    );
-    expect(JSON.stringify(usageLedger.start.mock.calls)).not.toContain("credential");
+    // 控制面锁定（§三十二/§四十八）：凭证许可只是安全控制面动作——成功或
+    // 拒绝都不再产生任何「模型用量」ledger entry。
+    expect(usageLedger.start).not.toHaveBeenCalled();
+    expect(usageLedger.finish).not.toHaveBeenCalled();
+    expect(usageLedger.recordError).not.toHaveBeenCalled();
   });
 });

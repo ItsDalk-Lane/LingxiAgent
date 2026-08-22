@@ -15,6 +15,7 @@ import { Hono } from "hono";
 import { createAdaptorServer } from "@hono/node-server";
 import { createNodeWebSocket } from "@hono/node-ws";
 import { WebSocketServer } from "ws";
+import { runWithModelTraceRoot } from "../lib/llm/model-trace-scope.ts";
 import { AppError } from "../shared/errors.ts";
 import { errorBus } from "../shared/error-bus.ts";
 import { LingxiEngine } from "../core/engine.ts";
@@ -84,6 +85,7 @@ import { ActivityHub } from "../lib/activity-hub.ts";
 import { WorkflowActivityStore } from "../lib/workflow-activity-store.ts";
 import { createDeferredResultExtension } from "../lib/extensions/deferred-result-ext.ts";
 import { createCompactionGuardExtension } from "../lib/extensions/compaction-guard-ext.ts";
+import { createModelCallObserverExtension } from "../lib/extensions/model-call-observer-ext.ts";
 import { getResolvedCompactionMode } from "../shared/compaction-mode.ts";
 import { Hub } from "../hub/index.ts";
 import { startCLI } from "./cli.ts";
@@ -438,6 +440,8 @@ export async function startServer(root: CompositionRoot = {}): Promise<void> {
     productDir,
     appVersion,
     builtinMediaAdapters: root.builtinMediaAdapters,
+    // Phase 7：默认 disabled（root.modelObservability 缺省时生产行为与 Phase 6 一致）。
+    modelObservability: root.modelObservability,
   } as any);
   log.log("② LingxiEngine 构造完成，开始 init...");
   await engine.init((msg: any) => log.log(msg));
@@ -541,6 +545,10 @@ export async function startServer(root: CompositionRoot = {}): Promise<void> {
       };
     },
   }));
+
+  // Model call observer：provider 请求/响应 hook 经 ALS scope 关联到
+  // streamFn wrapper 建立的 callId/attemptId；纯旁路，不改 payload。
+  await engine.registerExtensionFactory(createModelCallObserverExtension());
 
   // ── 初始化插件系统 ──
   await engine.initPlugins(hub.eventBus);
@@ -766,7 +774,11 @@ export async function startServer(root: CompositionRoot = {}): Promise<void> {
       : (sessionPath ? engine.resolveSessionOwnership?.(sessionPath)?.agentId || null : null);
     const resolved = await engine.resolveAuxiliaryModelFresh("summarize", { agentId, sessionPath });
     if (!resolved) throw new Error("summarize slot unavailable (no model configured and no chat fallback)");
-    const text = await callText({
+    // Plugin 模型调用（§二十四）：chat 工具内触发 → 继承该工具的 trace；
+    // 插件后台/route 直接触发 → 新 trace 根（origin=plugin）。
+    const text = await runWithModelTraceRoot(
+      { origin: "plugin", refs: { ...(payload.pluginId ? { pluginId: String(payload.pluginId) } : {}) } },
+      () => callText({
       api: resolved.api,
       apiKey: resolved.apiKey,
       baseUrl: resolved.baseUrl,
@@ -788,7 +800,8 @@ export async function startServer(root: CompositionRoot = {}): Promise<void> {
           ? sessionUsageAttribution(sessionPath, resolved.usageAgentId || agentId || null)
           : { kind: "auxiliary", agentId: resolved.usageAgentId || agentId || null },
       },
-    } as any);
+    } as any),
+    );
     return { text };
   });
   hub.eventBus.handle("model:sample-text", async (payload: any = {}) => {
@@ -806,7 +819,11 @@ export async function startServer(root: CompositionRoot = {}): Promise<void> {
       : null;
     const resolved = await engine.resolveAuxiliaryModelFresh("summarize", { agentId, sessionPath });
     if (!resolved) throw new Error("summarize slot unavailable (no model configured and no chat fallback)");
-    const text = await callText({
+    // Plugin 模型调用（§二十四）：chat 工具内触发 → 继承该工具的 trace；
+    // 插件后台/route 直接触发 → 新 trace 根（origin=plugin）。
+    const text = await runWithModelTraceRoot(
+      { origin: "plugin", refs: { ...(pluginId ? { pluginId } : {}) } },
+      () => callText({
       api: resolved.api,
       apiKey: resolved.apiKey,
       baseUrl: resolved.baseUrl,
@@ -831,7 +848,8 @@ export async function startServer(root: CompositionRoot = {}): Promise<void> {
             ? sessionUsageAttribution(sessionPath, resolved.usageAgentId || agentId || null)
             : { kind: "utility", agentId: resolved.usageAgentId || agentId || null },
       },
-    } as any);
+    } as any),
+    );
     return { text };
   });
   hub.eventBus.handle("usage:list", (filter = {}) => {

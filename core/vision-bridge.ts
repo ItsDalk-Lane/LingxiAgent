@@ -2,6 +2,11 @@ import crypto from "crypto";
 import fs from "fs";
 import path from "path";
 import { callText as defaultCallText } from "./llm-client.ts";
+import {
+  createSemanticInputProvenance,
+  provenanceSection,
+  renderProvenancedText,
+} from "../lib/llm/semantic-input-provenance.ts";
 import { callTextConfigFromResolvedModel } from "./model-execution-config.ts";
 import {
   prepareSingleModelImageInputForPrompt,
@@ -886,30 +891,36 @@ export class VisionBridge {
   }
 
   async _analyzeImageAsNote(config, img, userRequest, signal, sessionPath = null) {
+    // Phase 5（§六十九）：text block 尾行 = 构造已知的 user request，与指令段
+    // 用同一 lines 数组切分（字节一致）；图片 block → media_reference（不含值）。
+    const userRequestLine = `User request:\n${userRequest || "(no explicit text request)"}`;
+    const noteLines = [
+      "Analyze this image for another text-only model.",
+      "Return a concise paper note with these exact sections:",
+      "image_overview: fixed basic description of what the image is.",
+      "visible_text: important OCR or readable text.",
+      "objects_and_layout: important objects, positions, counts, and relationships.",
+      "charts_or_data: chart/table/data details if present; otherwise say none.",
+      "user_request: restate the user's request in one short sentence.",
+      "user_request_answer: answer the user's request using the image when possible.",
+      "evidence: the visual evidence supporting that answer.",
+      "uncertainty: anything unclear, hidden, or guessed.",
+      "Do not mention that you are a tool or a separate model.",
+      "",
+      userRequestLine,
+    ];
+    const noteText = noteLines.join("\n");
+    const noteSegments = renderProvenancedText([
+      { text: noteLines.slice(0, -2).join("\n"), category: "task_instruction", source: { type: "template", id: "vision.note-instructions" } },
+      { text: userRequestLine, category: "task_input", source: { type: "runtime", id: "vision.user-request" } },
+    ], "\n\n", { root: "messages", path: [0, "content", 0] });
     return truncate(await this._callText({
       ...callTextConfigFromResolvedModel(config),
       systemPrompt: AUXILIARY_VISION_SYSTEM_PROMPT,
       messages: [{
         role: "user",
         content: [
-          {
-            type: "text",
-            text: [
-              "Analyze this image for another text-only model.",
-              "Return a concise paper note with these exact sections:",
-              "image_overview: fixed basic description of what the image is.",
-              "visible_text: important OCR or readable text.",
-              "objects_and_layout: important objects, positions, counts, and relationships.",
-              "charts_or_data: chart/table/data details if present; otherwise say none.",
-              "user_request: restate the user's request in one short sentence.",
-              "user_request_answer: answer the user's request using the image when possible.",
-              "evidence: the visual evidence supporting that answer.",
-              "uncertainty: anything unclear, hidden, or guessed.",
-              "Do not mention that you are a tool or a separate model.",
-              "",
-              `User request:\n${userRequest || "(no explicit text request)"}`,
-            ].join("\n"),
-          },
+          { type: "text", text: noteText },
           img,
         ],
       }],
@@ -918,44 +929,62 @@ export class VisionBridge {
       signal,
       usageLedger: this._getUsageLedger?.(),
       usageContext: this._usageContextForImageAnalysis(sessionPath),
+      semanticInputProvenance: createSemanticInputProvenance("calltext", [
+        provenanceSection(
+          { root: "systemPrompt", span: { start: 0, end: AUXILIARY_VISION_SYSTEM_PROMPT.length } },
+          "task_instruction",
+          { role: "system", source: { type: "template", id: "vision.auxiliary-system" } },
+        ),
+        ...noteSegments.sections,
+        provenanceSection(
+          { root: "messages", path: [0, "content", 1] },
+          "media_reference",
+          { role: "input", source: { type: "runtime", id: "vision.reference-image" } },
+        ),
+      ]),
     }));
   }
 
   async _analyzeImageWithPrimitives(config, img, userRequest, visionCapabilities, signal, sessionPath = null) {
     const primitiveShape = primitivePromptShape(visionCapabilities);
+    // Phase 5：同 _analyzeImageAsNote——同一 lines 数组切分指令段/user request 段。
+    const userRequestLine = `User request:\n${userRequest || "(no explicit text request)"}`;
+    const primitiveLines = [
+      "Analyze this image for another text-only model.",
+      "Return only one valid JSON object. Do not wrap it in Markdown.",
+      "Use this exact shape:",
+      "{",
+      '  "image_overview": "fixed basic description of what the image is",',
+      '  "visible_text": ["important OCR or readable text"],',
+      '  "objects_and_layout": "important objects, positions, counts, and relationships",',
+      '  "charts_or_data": "chart/table/data details if present; otherwise none",',
+      '  "user_request": "restate the user request in one short sentence",',
+      '  "user_request_answer": "answer the user request using the image when possible",',
+      '  "evidence": "visual evidence supporting that answer",',
+      '  "uncertainty": "anything unclear, hidden, or guessed",',
+      ...primitiveShape.slice(0, 3),
+      "}",
+      primitiveShape[3],
+      visionCapabilities.points
+        ? "You may include point or center coordinates as [x, y] normalized to 0-1000."
+        : "Do not output point primitives.",
+      "Include only coordinates that matter for the user request or key spatial evidence.",
+      "Do not mention that you are a tool or a separate model.",
+      "",
+      userRequestLine,
+    ];
+    const primitiveText = primitiveLines.join("\n");
+    const primitiveSegments = renderProvenancedText([
+      { text: primitiveLines.slice(0, -2).join("\n"), category: "task_instruction", source: { type: "template", id: "vision.primitives-instructions" } },
+      { text: userRequestLine, category: "task_input", source: { type: "runtime", id: "vision.user-request" } },
+    ], "\n\n", { root: "messages", path: [0, "content", 0] });
     const responseText = await this._callText({
       ...callTextConfigFromResolvedModel(config),
       systemPrompt: AUXILIARY_VISION_SYSTEM_PROMPT,
       messages: [{
         role: "user",
         content: [
-          {
-            type: "text",
-            text: [
-              "Analyze this image for another text-only model.",
-              "Return only one valid JSON object. Do not wrap it in Markdown.",
-              "Use this exact shape:",
-              "{",
-              '  "image_overview": "fixed basic description of what the image is",',
-              '  "visible_text": ["important OCR or readable text"],',
-              '  "objects_and_layout": "important objects, positions, counts, and relationships",',
-              '  "charts_or_data": "chart/table/data details if present; otherwise none",',
-              '  "user_request": "restate the user request in one short sentence",',
-              '  "user_request_answer": "answer the user request using the image when possible",',
-              '  "evidence": "visual evidence supporting that answer",',
-              '  "uncertainty": "anything unclear, hidden, or guessed",',
-              ...primitiveShape.slice(0, 3),
-              "}",
-              primitiveShape[3],
-              visionCapabilities.points
-                ? "You may include point or center coordinates as [x, y] normalized to 0-1000."
-                : "Do not output point primitives.",
-              "Include only coordinates that matter for the user request or key spatial evidence.",
-              "Do not mention that you are a tool or a separate model.",
-              "",
-              `User request:\n${userRequest || "(no explicit text request)"}`,
-            ].join("\n"),
-          },
+          { type: "text", text: primitiveText },
           img,
         ],
       }],
@@ -964,6 +993,19 @@ export class VisionBridge {
       signal,
       usageLedger: this._getUsageLedger?.(),
       usageContext: this._usageContextForImageAnalysis(sessionPath),
+      semanticInputProvenance: createSemanticInputProvenance("calltext", [
+        provenanceSection(
+          { root: "systemPrompt", span: { start: 0, end: AUXILIARY_VISION_SYSTEM_PROMPT.length } },
+          "task_instruction",
+          { role: "system", source: { type: "template", id: "vision.auxiliary-system" } },
+        ),
+        ...primitiveSegments.sections,
+        provenanceSection(
+          { root: "messages", path: [0, "content", 1] },
+          "media_reference",
+          { role: "input", source: { type: "runtime", id: "vision.reference-image" } },
+        ),
+      ]),
     });
 
     const analysis = extractJsonObject(responseText);

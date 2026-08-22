@@ -568,6 +568,17 @@ export interface PlatformApi {
   unwatchWorkspace?(rootPath: string): Promise<boolean>;
   onWorkspaceChanged?(callback: (payload: WorkspaceChangePayload) => void): void;
   readFileBase64(path: string): Promise<string | null>;
+  /**
+   * Model Observatory 导出流式保存桥（Phase 9 §一百一十五）：capability token
+   * 模式——begin 弹系统保存对话框并返回 exportId；write 分块（≤4MB）；
+   * end 落盘完成；abort 删除部分文件。仅 Electron 桌面提供；Web fallback 判空。
+   */
+  observabilityExportBegin?(payload: { defaultFileName: string }): Promise<
+    { canceled: true } | { canceled: false; exportId: string; filePath: string }
+  >;
+  observabilityExportWrite?(payload: { exportId: string; chunk: Uint8Array }): Promise<{ bytesWritten: number }>;
+  observabilityExportEnd?(payload: { exportId: string }): Promise<{ bytesWritten: number; filePath: string }>;
+  observabilityExportAbort?(payload: { exportId: string }): Promise<{ aborted: boolean }>;
   /** 把本地路径转成 <img>/<video> 可用的 file:// URL（同步，纯路径转换）。Web fallback 无此方法，消费侧需运行时判空。 */
   getFileUrl?(path: string): string;
   readDocxHtml(path: string): Promise<string | null>;

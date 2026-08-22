@@ -6,6 +6,30 @@ import { logLlmUsage, normalizeLlmUsage } from '../lib/llm/usage-observer.ts';
 import { appendProviderApiPath, withDefaultProviderHeaders } from '../lib/llm/provider-client.ts';
 import { mergeProviderHeaders } from '../shared/provider-auth.ts';
 import {
+  extractProviderRequestId,
+  markModelCallSafeMessage,
+  modelCallFieldsFromUsageContext,
+  summarizeProviderRequestPayload,
+  type ModelCallObserver,
+} from '../lib/llm/model-call-observer.ts';
+import { createModelCallRecorder } from '../lib/llm/model-call-recorder.ts';
+import { resolveModelTraceContext } from '../lib/llm/model-trace-scope.ts';
+import {
+  createModelCallPayloadCaptureSession,
+  type ModelCallPayloadCaptureSession,
+} from '../lib/llm/model-call-payload-capture.ts';
+import {
+  buildCallTextProviderProvenance,
+  validateProviderProvenanceAgainstBody,
+} from '../lib/llm/provider-request-provenance.ts';
+import {
+  buildCallTextFallbackProvenance,
+  createSemanticInputProvenance,
+  provenanceSection,
+  remapCallTextProvenance,
+  sanitizeSemanticInputProvenance,
+} from '../lib/llm/semantic-input-provenance.ts';
+import {
   serializeOpenAICompatibleContentBlock,
   serializeResponsesContentBlock,
 } from './provider-media-serializer.ts';
@@ -61,6 +85,23 @@ export type CallTextOptions = {
   returnUsage?: boolean;
   usageContext?: unknown;
   usageLedger?: CallTextUsageLedger | null;
+  /**
+   * ModelCallObserver 覆盖注入（默认走进程级注册表，生产为 noop）。
+   * 观测是纯旁路：observer 抛错/缺失都不改变调用行为。
+   */
+  modelCallObserver?: ModelCallObserver | null;
+  /** 可选 trace 关联（§三十二）：调用方无法提供时保持 null，不造假关系。 */
+  modelCallContext?: {
+    traceId?: string | null;
+    parentCallId?: string | null;
+  } | null;
+  /**
+   * Phase 5：调用方按**传入形状**（root=systemPrompt + root=messages
+   * path=[原始 index]）描述的 Semantic Input Provenance。callText 在 system
+   * 消息 merge 的同一变换里同步 remap（§六十）；未提供 → structural fallback
+   * （§六十一，不得 exact）。经 sanitize fail closed，非法输入等价于未提供。
+   */
+  semanticInputProvenance?: unknown;
 };
 
 /**
@@ -371,6 +412,23 @@ function convertContentForApi(content, api) {
   return content.map(serializeOpenAICompatibleContentBlock);
 }
 
+// ── ModelCallObserver 安全 metadata ──
+// 只提取不可逆结构信息：消息/工具计数、system 存在性、媒体存在性、字节估算。
+// 绝不读取或携带正文内容（§八）。
+function summarizeCallTextRequest(body, api, serializedByteLength) {
+  const summary = summarizeProviderRequestPayload(body);
+  return {
+    protocol: api,
+    streaming: body?.stream === true,
+    messageCount: summary.messageCount,
+    toolCount: summary.toolCount,
+    hasSystemPrompt: summary.hasSystemPrompt === true,
+    // callText 历史字段名保持 hasImages；共享 helper 统一输出 hasMedia
+    hasImages: summary.hasMedia,
+    inputByteEstimate: Number.isFinite(serializedByteLength) ? serializedByteLength : null,
+  };
+}
+
 /**
  * 统一非流式文本生成。
  *
@@ -417,6 +475,9 @@ export async function callText({
   returnUsage = false,
   usageContext,
   usageLedger,
+  modelCallObserver = null,
+  modelCallContext = null,
+  semanticInputProvenance = null,
 }: CallTextOptions) {
   // 同时接受完整 model 对象和裸 id。modelObj 用于 provider-compat 决策；modelId 入 payload。
   const modelObj = typeof model === "object" && model !== null ? model : null;
@@ -436,6 +497,46 @@ export async function callText({
   if (!SUPPORTED_BUFFERED_APIS.has(api)) {
     throw new Error(`No Hana buffered adapter is registered for API "${api || "unknown"}"`);
   }
+
+  // ── 0. ModelCallObserver：logical call 身份在 Provider 请求之前生成 ──
+  // 验证性错误（上面的 output policy / adapter 检查）发生在调用成立之前，不进入
+  // 生命周期；从这里起的一切失败（构造/网络/解析/中止）都必须有终态事件。
+  // Trace 身份走统一解析（§四十一）：caller 显式传（modelCallContext）优先，
+  // 其次当前任务 TraceScope（工具/turn 内的辅助调用继承 trace 与 parent），
+  // 都没有 → singleton trace（traceId 恒非空，parentCallId=null 不猜）。
+  const modelCallTrace = resolveModelTraceContext({
+    traceId: modelCallContext?.traceId ?? null,
+    parentCallId: modelCallContext?.parentCallId ?? null,
+  });
+  const modelCallRecorder = createModelCallRecorder({
+    observer: modelCallObserver,
+    context: {
+      traceId: modelCallTrace.traceId,
+      parentCallId: modelCallTrace.parentCallId,
+      model: { provider, modelId, api: api || null },
+      ...modelCallFieldsFromUsageContext(usageContext),
+    },
+  });
+  // Phase 6：Sensitive Payload Capture session（sink 未安装 = null，快路径）。
+  const payloadCapture: ModelCallPayloadCaptureSession | null = (() => {
+    try {
+      return createModelCallPayloadCaptureSession({
+        callId: modelCallRecorder.callId,
+        traceId: modelCallRecorder.traceId,
+        parentCallId: modelCallRecorder.parentCallId,
+        model: { provider, modelId, api: api || null },
+        ...modelCallFieldsFromUsageContext(usageContext),
+      });
+    } catch {
+      return null;
+    }
+  })();
+  if (payloadCapture) modelCallRecorder.attachPayloadCapture(payloadCapture);
+  let observedProviderRequestId: string | null = null;
+  let usageRequest: { requestId?: string | null } | null = null;
+  let observedUsagePayload = null;
+  let usageRequestClosed = false;
+  try {
   // ── 1. 消息归一化：提取 system 消息合并到 systemPrompt ──
   let mergedSystem = systemPrompt || "";
   const normalizedMessages = [];
@@ -451,6 +552,57 @@ export async function callText({
     }
   }
 
+  // ── 1.5 Semantic Input Provenance（MC-04 boundary，§五十九/§六十/§六十一）──
+  // Boundary 定义：system merge 完成 + normalizedMessages 形成、Provider body
+  // 尚未构造。caller 显式 provenance（传入形状）随 merge 同步 remap；未提供 →
+  // structural fallback；codex 空系统注入的固定 instruction 在注入点标记
+  // adapter_injected（§八十二）。构造失败绝不影响调用。
+  let attachedProvenance = null;
+  try {
+    let provenance = remapCallTextProvenance(
+      sanitizeSemanticInputProvenance(semanticInputProvenance),
+      { systemPrompt, messages, systemTextOf: (m) => normalizeTextFromContent(m.content) },
+    ) ?? buildCallTextFallbackProvenance({ systemPrompt, messages });
+    if (api === "openai-codex-responses" && !mergedSystem.trim()) {
+      provenance = createSemanticInputProvenance("calltext", [
+        ...(provenance?.sections ?? []),
+        provenanceSection(
+          { root: "systemPrompt", span: { start: 0, end: DEFAULT_CODEX_UTILITY_INSTRUCTIONS.length } },
+          "adapter_injected",
+          { role: "system", source: { type: "adapter", id: "codex-utility-default-instructions" } },
+        ),
+      ]);
+    }
+    if (provenance) modelCallRecorder.attachSemanticInputProvenance(provenance);
+    attachedProvenance = provenance ?? null;
+  } catch {
+    // provenance 失败 = 无 provenance，不影响模型调用
+  }
+  modelCallRecorder.beginLogicalCall({
+    details: {
+      path: "callText",
+      ...(modelCallTrace.origin ? { traceOrigin: modelCallTrace.origin } : {}),
+      ...(typeof callPurpose === "string" && callPurpose ? { callPurpose } : {}),
+    },
+  });
+
+  // ── 1.6 Semantic Request Capture（Phase 6，§四十六）──
+  // 捕获 boundary 与 provenance 相同（merge 完成 + normalizedMessages 形成）；
+  // codex 空系统注入时语义层 systemPrompt 含注入的默认 instruction（与 §八十二
+  // adapter_injected span 一致）。正文经统一 Redactor 后入 sink；provenance 的
+  // systemPrompt span 随 redaction offset remap。
+  if (payloadCapture) {
+    const semanticSystemPrompt = api === "openai-codex-responses" && !mergedSystem.trim()
+      ? DEFAULT_CODEX_UTILITY_INSTRUCTIONS
+      : mergedSystem;
+    payloadCapture.captureSemanticRequest({
+      inputShape: "calltext",
+      systemPrompt: semanticSystemPrompt,
+      messages: normalizedMessages,
+      provenance: attachedProvenance,
+    });
+  }
+
   // ── 2. 超时信号 ──
   const timeoutSignal = AbortSignal.timeout(timeoutMs);
   const combinedSignal = signal
@@ -460,6 +612,9 @@ export async function callText({
   // ── 3. 按协议构造请求 ──
   const base = (baseUrl || "").replace(/\/+$/, "");
   let endpoint, headers, body;
+  // Phase 6：provider mapping 的构造事实（各分支内填充，§五十九）。
+  let anthropicMessageIndexMap = null;
+  let openaiSystemMessageSlot = false;
 
   if (api === "anthropic-messages") {
     // Anthropic Messages API：baseUrl + /v1/messages（和 Pi SDK Anthropic provider 一致）
@@ -467,8 +622,18 @@ export async function callText({
     headers = { "Content-Type": "application/json", "anthropic-version": "2023-06-01" };
     if (apiKey) headers["x-api-key"] = apiKey;
 
-    // Anthropic 格式：system 和 messages 分离
-    const anthropicMessages = normalizedMessages.filter(m => m.role === "user" || m.role === "assistant");
+    // Anthropic 格式：system 和 messages 分离。index map 与 body 构造同源产生
+    // （-1 = 被 role 过滤，供 provider mapping 表达 filtered）。
+    const anthropicMessages = [];
+    anthropicMessageIndexMap = [];
+    for (let i = 0; i < normalizedMessages.length; i++) {
+      if (normalizedMessages[i].role === "user" || normalizedMessages[i].role === "assistant") {
+        anthropicMessageIndexMap.push(anthropicMessages.length);
+        anthropicMessages.push(normalizedMessages[i]);
+      } else {
+        anthropicMessageIndexMap.push(-1);
+      }
+    }
     if (anthropicMessages.length === 0) anthropicMessages.push({ role: "user", content: "" });
     body = {
       model: modelId,
@@ -522,7 +687,10 @@ export async function callText({
     if (apiKey) headers["Authorization"] = `Bearer ${apiKey}`;
 
     const allMessages = [];
-    if (mergedSystem) allMessages.push({ role: "system", content: mergedSystem });
+    if (mergedSystem) {
+      allMessages.push({ role: "system", content: mergedSystem });
+      openaiSystemMessageSlot = true;
+    }
     allMessages.push(...normalizedMessages);
     body = {
       model: modelId,
@@ -556,15 +724,59 @@ export async function callText({
     outputBudgetSource,
   }));
 
+  // ── 3.5 Provider Request Provenance（Phase 6，§五十九/§一三八）──
+  // mapping 在 body 构造分支产生（构造事实），normalizeProviderPayload 之后做
+  // locator 存在性校验（路径解析，非内容匹配）；compat 改写导致失配 → structural。
+  let providerProvenance = null;
+  if (payloadCapture) {
+    try {
+      providerProvenance = validateProviderProvenanceAgainstBody(
+        buildCallTextProviderProvenance({
+          protocol: api,
+          provenance: attachedProvenance,
+          anthropicMessageIndex: anthropicMessageIndexMap,
+          systemMessageSlot: openaiSystemMessageSlot,
+          semanticSystemPromptLength: (api === "openai-codex-responses" && !mergedSystem.trim()
+            ? DEFAULT_CODEX_UTILITY_INSTRUCTIONS
+            : mergedSystem).length,
+        }),
+        body,
+      );
+    } catch {
+      providerProvenance = null; // mapping 失败不影响调用与 capture
+    }
+  }
+
   // ── 4. 发送请求 ──
-  const usageRequest = usageLedger?.start?.({
+  // attempt 边界：callText 无内部网络 retry，一次调用 = 一个真实网络 attempt。
+  modelCallRecorder.beginAttempt({ details: { attemptVisibility: "exact" } });
+  const serializedBody = JSON.stringify(body);
+  // provider_request_prepared 只带结构 metadata，绝不携带 body（§八）。
+  modelCallRecorder.providerRequestPrepared({
+    details: summarizeCallTextRequest(body, api, serializedBody.length),
+  });
+  // Phase 6 Provider Request Capture（§六十四）：normalize 完成、stringify/fetch
+  // 之前的最终 body + 真实 headers/endpoint；凭证（x-api-key/Authorization）在
+  // sink 之前被统一 Redactor 替换（§六十五）。
+  if (payloadCapture) {
+    payloadCapture.captureProviderRequest({
+      attemptId: modelCallRecorder.currentAttemptId,
+      protocol: api,
+      transport: { method: "POST", url: endpoint, headers, body },
+      provenance: providerProvenance,
+    });
+  }
+  usageRequest = usageLedger?.start?.({
     model: { provider, modelId, api },
     usageContext,
     costRates: modelObj?.cost,
+    // Observer ↔ Ledger 最小关联：复用既有 metadata 字段，无 storage version 变更。
+    metadata: {
+      modelCallId: modelCallRecorder.callId,
+      traceId: modelCallRecorder.traceId,
+      parentCallId: modelCallRecorder.parentCallId,
+    },
   }) || null;
-  let observedUsagePayload = null;
-  let usageRequestClosed = false;
-  try {
   const SLOW_THRESHOLD_MS = 15_000;
   const slowTimer = setTimeout(() => {
     errorBus.report(new AppError('LLM_SLOW_RESPONSE', {
@@ -575,20 +787,29 @@ export async function callText({
   const res = await fetch(endpoint, {
     method: "POST",
     headers,
-    body: JSON.stringify(body),
+    body: serializedBody,
     signal: combinedSignal,
   }).catch(err => {
     clearTimeout(slowTimer);
     throwAbortOrTimeout(err, signal, modelId);
   });
 
+  // Provider response 到达（不含 body；id 只取响应头 allowlist）。
+  observedProviderRequestId = extractProviderRequestId(res.headers);
+  modelCallRecorder.providerResponseReceived({
+    httpStatus: res.status,
+    providerRequestId: observedProviderRequestId,
+  });
+
   // ── 5. 解析响应 ──
   let rawText;
   let data;
+  let streamedAggregate = false;
   try {
     if (res.ok && api === "openai-codex-responses" && res.body && typeof res.body.getReader === "function") {
       data = await readCodexResponsesStream(res.body);
       rawText = JSON.stringify(data);
+      streamedAggregate = true;
     } else {
       rawText = await res.text();
     }
@@ -597,14 +818,36 @@ export async function callText({
     throwAbortOrTimeout(err, signal, modelId);
   }
   clearTimeout(slowTimer);
+  let parseFailed = false;
   if (!data) {
     try {
       data = rawText ? JSON.parse(rawText) : null;
     } catch {
-      throw new Error(`LLM returned invalid JSON (status=${res.status})`);
+      parseFailed = true;
     }
   }
   observedUsagePayload = data?.usage ?? null;
+  // Phase 6 Provider Response Capture（§六十六/§六十八/§七十一）：业务已解析的
+  // 对象复用（不重复 parse）；codex SSE 只保留 aggregate → stream_aggregate；
+  // 非 2xx 的 error body 与 invalid JSON rawText 同样是有效观测事实（先捕获
+  // 后抛错，§一百五十二）。
+  if (payloadCapture) {
+    payloadCapture.captureProviderResponse({
+      status: res.status,
+      headers: res.headers,
+      body: data ?? (rawText || null),
+      fidelity: data
+        ? (streamedAggregate ? "stream_aggregate" : "parsed_equivalent")
+        : "runtime_exact",
+    });
+  }
+  if (parseFailed) {
+    // 内部固定文案（只含 status）——按 safe-message contract 标记后可进 Observer。
+    throw markModelCallSafeMessage(
+      new Error(`LLM returned invalid JSON (status=${res.status})`),
+      `LLM returned invalid JSON (status=${res.status})`,
+    );
+  }
 
   if (!res.ok) {
     const message = providerErrorMessage(data, rawText, res.status);
@@ -658,6 +901,21 @@ export async function callText({
     || (thinkingStripped.removedThinking && rawTextBeforeThinkingStrip.trim())
   );
 
+  // Phase 6 Semantic Response Capture（§七十）：parser + thinking extraction 完成、
+  // 业务 caller 接收之前。当前 API 无 reasoning 时 null，不制造；空回复业务校验
+  // （LLM_EMPTY_RESPONSE）在其后——parser 已完成的输出是真实观测事实。
+  if (payloadCapture) {
+    payloadCapture.captureSemanticResponse({
+      response: {
+        text,
+        reasoning: reasoning || null,
+        finishReason: stopReason ?? null,
+        usage: data?.usage ?? null,
+        completeness: "complete",
+      },
+    });
+  }
+
   if (!text) {
     if (signal?.aborted) {
       throw createUserAbortError();
@@ -665,16 +923,20 @@ export async function callText({
     if (combinedSignal.aborted) {
       throw new AppError('LLM_TIMEOUT', { context: { model: modelId } });
     }
-    throw new AppError('LLM_EMPTY_RESPONSE', {
-      message: emptyAfterThinking
-        ? EMPTY_AFTER_THINKING_MESSAGE
-        : undefined,
-      context: {
-        model: modelId,
-        ...(emptyAfterThinking ? { reason: "empty_after_thinking" } : {}),
-        ...(stopReason ? { stopReason } : {}),
-      },
-    });
+    // EMPTY_AFTER_THINKING_MESSAGE 是仓库固定文案 → 标记 safe；其余 message=null。
+    throw markModelCallSafeMessage(
+      new AppError('LLM_EMPTY_RESPONSE', {
+        message: emptyAfterThinking
+          ? EMPTY_AFTER_THINKING_MESSAGE
+          : undefined,
+        context: {
+          model: modelId,
+          ...(emptyAfterThinking ? { reason: "empty_after_thinking" } : {}),
+          ...(stopReason ? { stopReason } : {}),
+        },
+      }),
+      emptyAfterThinking ? EMPTY_AFTER_THINKING_MESSAGE : "LLM_EMPTY_RESPONSE",
+    );
   }
 
   const usage = normalizeLlmUsage(data?.usage, { costRates: modelObj?.cost });
@@ -686,15 +948,54 @@ export async function callText({
     usage: data?.usage,
     costRates: modelObj?.cost,
   });
+  // 语义响应解析完成（parser 之后、业务裁剪之前）。只带结构/数值 metadata。
+  modelCallRecorder.semanticResponseCompleted({
+    details: {
+      stopReason: stopReason ?? null,
+      hasReasoning: reasoning.length > 0 || removedStructuredThinking,
+      usagePresent: Boolean(data?.usage),
+      ...(usage ? { usage } : {}),
+    },
+  });
   usageLedger?.finish?.(usageRequest?.requestId, {
     usage: data?.usage,
     model: { provider, modelId, api },
     costRates: modelObj?.cost,
   });
   usageRequestClosed = true;
+  modelCallRecorder.endLogicalCall("ok");
 
   return returnUsage ? { text, usage } : text;
   } catch (err) {
+    // timeout 与用户 abort 在业务错误体系里本就区分（LLM_TIMEOUT vs AbortError），
+    // Observer 原样保留这一区分，不改变 AppError 行为（§十五）。
+    const callAborted = err?.name === "AbortError" || err?.type === "aborted";
+    const errorKind = callAborted
+      ? "abort"
+      : (err as any)?.code === "LLM_TIMEOUT" ? "timeout" : "provider_or_network";
+    // headers 没有 id 时，回落到 provider error body 已提取的 request_id（
+    // providerErrorContext 会把它放进 AppError context）。没有就是 null，不猜。
+    const errorRequestId = typeof (err as any)?.context?.requestId === "string"
+      ? (err as any).context.requestId
+      : null;
+    const terminalProviderRequestId = observedProviderRequestId ?? errorRequestId;
+    if (!callAborted && modelCallRecorder.currentAttemptId) {
+      modelCallRecorder.attemptError(err, {
+        providerRequestId: terminalProviderRequestId,
+        details: { errorKind },
+      });
+    }
+    if (callAborted) {
+      modelCallRecorder.logicalCallAborted();
+    } else {
+      modelCallRecorder.logicalCallError(err, {
+        providerRequestId: terminalProviderRequestId,
+        details: { errorKind },
+      });
+    }
+    modelCallRecorder.endLogicalCall(callAborted ? "aborted" : "error", {
+      details: { errorKind },
+    });
     if (usageRequest?.requestId && !usageRequestClosed) {
       const status = err?.name === "AbortError" || err?.type === "aborted" ? "aborted" : "error";
       usageLedger?.recordError?.(usageRequest.requestId, err, status, {

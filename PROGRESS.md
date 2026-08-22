@@ -7,7 +7,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = be95b34412ea2636a983a1cb681239ddcdfb59ee  (最终验证所针对的源码树；2026-08-21 保留标签管道修复树后推进)
+VERIFIED_SOURCE_SHA   = 8c94044bd921765c30df705ff95d4f8994bea4d0  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-08-22 第十~十一轮：Phase 10.1 修复树（dba9a6b1/4f95e17d）+ Phase 11 合并收口（81cdb2d8 scratchpad 清场）；坐标一律为 commit 对象——第八轮 tree sha 之误见 Phase 10 F-4)
 工作分支              = feature/upstream-sync-0.447.4
 ```
 
@@ -208,6 +208,105 @@ seal 不是一次性终点，而是"当前被验证树"的游标；每次审计�
   persistence-schema-guard 要求受护源文件被 touch 时同次重钉指纹；providers.ts（受护源）
   在 c83d238a 被改，本次以 compatible 分类补钉 build/persistence-schema-fingerprint.json
   （review 记录更新，schema 形状不变）。验证：tripwire 15 用例绿 + guard 前哨通过后推进。
+- **2026-08-21 模型调用可观测性**（三轮：a9a5f3f4 → b9238533 → 53fa4575，
+  第三轮 = e25079a2 功能树 + 53fa4575 strict-typecheck 收尾树）：
+  Model Call Observer 全量实现（第一轮契约+文本运行时 a9a5f3f4；第二轮 MC-05～09 接入+
+  安全收口+控制面分离 b9238533；第三轮 Phase 3.5 残余旁路闭合 + Phase 4 全局 Trace 传播
+  e25079a2：MC-10 diary direct summary 接入、ModelTraceScope/统一身份解析/ingress 接线/
+  工具因果边界/MC-01 WeakMap ledger 关联，闭包差量 MODEL_CALL_CLOSURE_DELTA.md，export
+  manifest 收录 3 新模块，persistence 指纹 compatible repin）。第三轮验证：本地 typecheck×3
+  （e25079a2 树上的新测试文件存在 6 处 tsc 类型缺陷，53fa4575 收尾修复——与第二轮
+  a9a5f3f4 同类收尾）+ eslint 0 error + lint:boundary/闭包清单 + 新增 3 测试文件 35 用例 +
+  前两轮 96 用例回归全绿 + 全量测试 11741/11740 用例绿（两轮旧坐标下唯一失败均为
+  post-verification-audit-seal 预期红）后推进。
+
+- **2026-08-22 模型调用可观测性第四、五轮（provenance + payload capture）**（第四轮
+  功能树 3cf0e6ed/seal ea909c6e；第五轮 bfde47bcc6617751e19b94b138ee23a3fcd0d946）：第四轮 Phase 5 Semantic Input
+  Provenance（统一契约 + MC-01～10 全路径 provenance sidecar，全量 11776 通过）；
+  第五轮 Phase 6 Sensitive Payload Capture——四层级正文通道（Semantic/Provider
+  Request/Response × MC-01～10）+ Redaction Contract（credential 键 / Volcengine
+  body.user.uid 协议专项 / inline secret 正反例 / URL / 本地路径 / 二进制
+  externalization / span offset remap）+ Provider-Wire Provenance（callText 四协议
+  构造时 mapping + post-compat 校验降级）。38 files / +5302-121（契约五模块 +
+  全路径集成 + 7 测试文件 103 用例 + 审计/进度文档；export-manifest 收录 5 新
+  模块；cli-runtime-closure 重 pin）。第五轮验证：typecheck ×3（绿）+ eslint
+  0 error + lint:boundary 绿 + 既有观测 131 用例回归 + full npm test 11881 通过；
+  seal/matrix/tripwire/boundary 推进后复验。
+
+- **2026-08-22 模型调用可观测性第六轮（durable storage）**（功能树
+  bfde47bc/seal 本提交）：Phase 7 Durable Model Observatory Storage——单
+  SQLite（user_version=1）Trace/Payload Store + 外置 Blob Store + privileged
+  Blob Externalizer contract + bounded 异步 coordinator + retention/GC（payload
+  可先过期）+ crash reconciliation（不伪造终态）+ engine/server 生产 wiring
+  （默认 disabled）。Store Registry ×2 登记 + fingerprint introspector +
+  compatible repin；毒丸 DB+wal+shm 字节级扫描零命中；新增 6 测试文件 44 用例；
+  第六轮验证：typecheck ×3 / eslint 0 error / lint:boundary / scanner 61 stores /
+  data-epoch 80 / 既有观测 302 回归 / full npm test 11925 全绿；seal/matrix/
+  tripwire 推进后复验。
+
+- **2026-08-22 模型调用可观测性第七轮（unified query & control plane）**（功能树
+  cfab8556/seal 本提交）：Phase 8 Unified Observatory Query & Control Plane——
+  统一 Query Contract（Filters + Group By + Drill Down，category≡subsystem）+
+  keyset pagination（cursor 与 query fingerprint 绑定）+ SQLite 内聚合（date
+  bucket 显式 utcOffsetMinutes）+ schema v2（model_call_usage durable accounting
+  projection：llm_usage live ingestion + bounded ledger 幂等 backfill，
+  error.message 不入库）+ read-only query side（v1 历史库不迁移可读）+ trace
+  explorer 后端（cycle-safe）+ payload exact retrieval（OPAQUE/UNAVAILABLE 不
+  升级）+ observability settings 持久化 preference（默认 disabled，payload/blob
+  额外 opt-in，runtime reconfigure 不删历史）+ HTTP surface（route-security
+  显式登记：metadata=STUDIO_OWNER，正文/settings/export=LOCAL_ONLY）+ JSONL
+  streaming export。第七轮验证：typecheck ×3 / eslint 0 error / lint:boundary /
+  scanner 站点登记 + fingerprint compatible repin（sha256:b0712be2…）/
+  新增 7 测试文件 53 用例 / full npm test 11975 全绿；seal/matrix/tripwire
+  推进后复验。
+- **2026-08-22 模型调用可观测性第八轮（Model Observatory UI）**（功能树
+  61779cbd/seal 本提交；进度 OBSERVABILITY_UI_PROGRESS.md）：Phase 9 把 Phase 1–8 事实层
+  变成用户工作台，替换旧 Usage 页——browser-safe wire 单一事实源
+  shared/model-observability-api-contract.ts（renderer 不 import lib/llm）+
+  独立 API client（error contract 全字段保留）+ FilterBar/Metrics/Groups/
+  Ledger（cursor+stale 防护）+ Call Inspector（overview/attempts/payload
+  管线）+ provenance locator-only 解析器 + provider mapping + TraceExplorer
+  （buildTraceForest orphan/环/未覆盖防御）+ payload 卡四态正文 + 纯文本
+  JsonViewer + blob 预览状态机 + Recording Settings（desired≠effective 诚实、
+  blob⊆payload、opt-in 确认、无加密事实文案）+ onboarding 安全默认 + 导出
+  双通道流式保存（IPC 桥 abort 删部分文件；FSA partialLeft 如实标注）。
+  Backend 白名单增量：getStoredBlob（路径从 blobId 重算，不信任 DB
+  relative_path）+ blobs exact route（GET/HEAD LOCAL_ONLY + 安全
+  content-type）。Legacy 退休：8 文件 + 650 行 CSS + settings.usage.* 五语言
+  删除；内部 tab id `usage` 不变、可见名五语言升级为模型观测/Model
+  Observatory。i18n settings.observability.* 完整子树（含 values 23 组闭集
+  矩阵）+ parity 绿。第八轮验证：typecheck ×3 / eslint 0 新增 error /
+  lint:boundary（closure 重生成后）/ persistence 豁免
+  desktop-observability-export-output + scanner receipt 重生成 + fingerprint
+  compatible repin（sha256:15591e09…）/ 新增 10 测试文件 83 用例 /
+  full npm test 12052 全绿；seal/matrix/tripwire 推进后复验。
+
+
+- **2026-08-22 模型调用可观测性第十~十一轮（Phase 10.1 修复 + Phase 11 合并收口）**
+  （功能树 8c94044b/seal 本提交；中间链 81cdb2d8 清场 → da1a66c1 首次推进 →
+  b9933da8 allowlist 拼写修复 → 9f494205 Windows 测试修复① → dc1fd8bb 二次
+  推进 → 8c94044b Windows 测试修复②（vertical 读连接泄漏））：Phase 10.1 从 codex worktree 抢救并入
+  （dba9a6b1+merge 4f95e17d）：AR-01～AR-20（P1×18 + P2×2）全 FIXED——IANA
+  timezone/DST 步进扫描、同字段 OR 跨字段 AND、NULL/unknown/corrupt/not_correlated
+  语义、聚合三态、Trace 全链统计、partial payload dropped、Blob 两阶段写+retry
+  不重写文件+无悬空引用+流式 GET、动态重配代际（四类在途切换+有界排空）、
+  schema v3（usage_correlation_state 真实列，v1/v2→v3 单事务迁移+rollback+future）。
+  Phase 11（81cdb2d8）：仅删除 codex scratchpad（task_plan.md/findings.md，
+  对齐 2026-08-20 文档清场先例），零生产代码变化；egress 独立重扫 MC-01～10
+  全 OBSERVED、无 MC-11+，plugin network.fetch 开口登记（LATENT/ARCHITECTURAL）。
+  验证：typecheck ×3 / eslint 0 error / boundary 基线不变 / 三 generator 重生成
+  零漂移（fingerprint sha256:f4cfa1e8…）/ full npm test 12134 passed（唯一失败
+  = seal guard 预期红）/ build:server（临时密钥，构建后删除）/ build:server:open /
+  build:client / pack 冒烟（ad-hoc 签名验证）。远端：81cdb2d8 轮 4/5 job 绿、mac test 仅 seal guard 红（分类 E）、
+  win fail-fast 取消；b9933da8 轮 macOS 全绿（guard 转绿）+ Windows 首次
+  完整执行暴露 2 处测试层跨平台缺陷（10k 播种超时 / vertical rmSync EPERM，
+  均非生产逻辑，此前各轮被 fail-fast 掩盖）；9f494205 修复①（超时预算+rmSync 重试）后 dc1fd8bb 二次推进，Windows 证明
+  重试无效 → 真根因是 vertical 测试 query service 只读连接泄漏（macOS 允许
+  删打开文件故本地不可见），8c94044b 显式关闭后第三次重走。首次推进（da1a66c1）因 seal allowlist 三处
+  OBSERVATORY/OBSERVABILITY 拼写错位失效（含一处 cda8dbe5 起的死条目），
+  b9933da8 逐字符修复。最终 seal commit 轮（PR HEAD）目标全绿。Release Acceptance V3 见
+  MODEL_OBSERVATORY_RELEASE_ACCEPTANCE_V3.md；V2 保留历史。
+
 
 ## 最终状态：READY TO MERGE
 
@@ -215,14 +314,15 @@ seal 不是一次性终点，而是"当前被验证树"的游标；每次审计�
 - Disposition：ADOPTED 25 + ADAPTED 100 + REGENERATED 4 + INTENTIONAL_DIVERGENCE 4 = 133
   （脚本计算，`build-sync-matrix.mjs --check`：missing=0 / extra=0 / duplicate=0 / unknown=0）。
 - 4 个 `hanako.md → lingxi.md` 品牌映射统一分类为 ADAPTED。
-- `VERIFIED_SOURCE_SHA = be95b34412ea2636a983a1cb681239ddcdfb59ee`：被完整测试验证的代码树
+- `VERIFIED_SOURCE_SHA = 61779cbdda5b46082f32a554b99279149980c0b4`：被完整测试验证的代码树
   （含收口树 d4cf92a8 的全部验证 + 文档清场树复跑验证 + 归档修复树 051f6117 复跑的
   typecheck/lint/全量测试 + v0.1.29 release 树 fabd6dbf 复跑的 typecheck/目标套件 +
   mac self-install 树 dcf3546a 的 PR CI typecheck/lint/build/全量测试 +
   凭证边界修复树 b8688895 的本地 typecheck/定向测试 + PR CI typecheck/lint/build/全量测试 +
   保留标签管道修复树 c83d238a 的本地 typecheck/定向测试 + 全量测试 +
-  保留标签指纹补钉树 be95b344 的 tripwire/guard 验证，
-  见「Seal 推进记录」）。当前 HEAD 只比 VERIFIED_SOURCE_SHA 多审计收口内容。
+  保留标签指纹补钉树 be95b344 的 tripwire/guard 验证 +
+  模型调用可观测性七轮树 a9a5f3f4 / b9238533 / 53fa4575 / 3cf0e6ed / bfde47bc / cfab85564d6ad5b53de19862545535f084be223d / 61779cbdda5b46082f32a554b99279149980c0b4
+  的本地 typecheck/定向测试 + 全量测试，见「Seal 推进记录」）。当前 HEAD 只比 VERIFIED_SOURCE_SHA 多审计收口内容。
 
 ### Post-verification diff 记录（`git diff --name-only VERIFIED_SOURCE_SHA..HEAD`）
 

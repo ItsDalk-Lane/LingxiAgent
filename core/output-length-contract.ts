@@ -1,3 +1,9 @@
+import {
+  createSemanticInputProvenance,
+  provenanceSection,
+  sanitizeSemanticInputProvenance,
+} from "../lib/llm/semantic-input-provenance.ts";
+
 type TextCaller<TResponse = unknown> = (request: Record<string, unknown>) => Promise<TResponse>;
 
 export type OutputLengthUnit = "chars" | "words";
@@ -138,6 +144,39 @@ function buildRepairMessages(
   ];
 }
 
+/**
+ * Phase 5（§五十六）：length-contract repair 的第二次调用在原 messages 后追加
+ * assistant 候选 + user 修复指令。provenance 同步重建：保留原前缀段（index <
+ * originalMessageCount）+ 追加「上一轮候选（task_input/assistant）」与
+ * 「修复指令（format_constraint/user）」——两次 logical call 可区分。
+ * base 无 provenance → 原样返回（callText fallback 兜底）。
+ */
+function buildRepairProvenance(
+  base: unknown,
+  originalMessageCount: number,
+): unknown {
+  const provenance = sanitizeSemanticInputProvenance(base);
+  if (!provenance) return base;
+  const sections = provenance.sections.filter((section) => {
+    if (section.locator.root !== "messages") return true;
+    const first = section.locator.path?.[0];
+    return typeof first !== "number" || first < originalMessageCount;
+  });
+  sections.push(
+    provenanceSection(
+      { root: "messages", path: [originalMessageCount] },
+      "task_input",
+      { role: "assistant", source: { type: "runtime", id: "length-contract.previous-candidate" } },
+    ),
+    provenanceSection(
+      { root: "messages", path: [originalMessageCount + 1] },
+      "format_constraint",
+      { role: "user", source: { type: "runtime", id: "length-contract.repair-instruction" } },
+    ),
+  );
+  return createSemanticInputProvenance(provenance.inputShape, sections);
+}
+
 function candidateScore(candidate: Candidate<unknown>): number {
   const length = candidate.evaluation.length;
   if (length <= 0) return Number.POSITIVE_INFINITY;
@@ -187,6 +226,10 @@ export async function callTextWithLengthContract<TResponse = unknown>({
     nextRequest = {
       ...baseRequest,
       messages: buildRepairMessages(baseRequest.messages, text, contract, evaluation),
+      semanticInputProvenance: buildRepairProvenance(
+        baseRequest.semanticInputProvenance,
+        Array.isArray(baseRequest.messages) ? baseRequest.messages.length : 0,
+      ),
     };
   }
 

@@ -12,6 +12,14 @@ import {
   buildCacheStrategyMetadata,
 } from "./cache-strategy-contract.ts";
 import { stripClosedInternalNarrationBlocks } from "../text/internal-narration.ts";
+import { mintModelCallId } from "./model-call-identity.ts";
+import { modelCallFieldsFromUsageContext } from "./model-call-observer.ts";
+import { runWithModelCallScope } from "./model-call-scope.ts";
+import { resolveModelTraceContext } from "./model-trace-scope.ts";
+import {
+  createSemanticInputProvenance,
+  provenanceSection,
+} from "./semantic-input-provenance.ts";
 
 const SUMMARY_HEADINGS = [
   "Goal",
@@ -396,16 +404,108 @@ export async function runCachePreservingCompactionAgentRun({
         cacheMetadata,
         requestPhase === "format_repair" ? "summary_format_repair" : "tool_intent_recovery",
       );
+    // 每次 isolatedStreamFn 调用 = 一次真实的 logical model call（业务级
+    // recovery/repair 是新 call，不复用 callId——§十七）。callId 先于
+    // ledger.start 铸造，经 metadata.modelCallId 建立 callId↔ledger 关联，
+    // 并经 ALS scope 交给 streamFn wrapper 接管为同一身份（单点发射）。
+    const modelCallId = mintModelCallId();
+    // Trace 身份走统一解析（§四十一）：mid-turn compaction 继承当前任务 trace，
+    // 独立 fresh-compact/deleted-continuation 在无 scope 处铸 singleton。每个
+    // recovery turn 解析一次——同链顺序 turn 的 parent 由 scope.lastCallId 推进。
+    const traceContext = resolveModelTraceContext();
     const usageRequest = usageLedger?.start?.({
       model: modelLedgerIdentity(model),
       usageContext,
-      metadata,
+      metadata: {
+        ...(metadata || {}),
+        modelCallId,
+        traceId: traceContext.traceId,
+        parentCallId: traceContext.parentCallId,
+      },
       costRates: model?.cost,
     }) || {};
     const pending = { requestId: usageRequest.requestId, settled: false };
     pendingUsage.push(pending);
+    // Phase 5：per-call Semantic Input Provenance（§五十五/§五十六）。
+    // 在 isolatedStreamFn 边界用**实际 providerContext** 构造：system 整段
+    // structural（runner 不做快照前缀证明）；messages 按 role 分类，本 run 内
+    // 最后一条 user 消息 = runner 推入的 instruction/repair（loop 只在其后追加
+    // assistant/toolResult，runtime 不变量可证）——strict → task_instruction、
+    // repair → format_constraint，两次 logical call 的 provenance 可区分；
+    // placeholder recovery toolResult → tool_result。构造失败不影响业务。
+    let semanticInputProvenance = null;
     try {
-      return await streamFn(selectedModel, providerContext, options);
+      const sections = [];
+      const systemPromptText = typeof providerContext?.systemPrompt === "string"
+        ? providerContext.systemPrompt
+        : "";
+      if (systemPromptText.length > 0) {
+        sections.push(provenanceSection(
+          { root: "systemPrompt", span: { start: 0, end: systemPromptText.length } },
+          "session_instruction",
+          { precision: "structural", role: "system", source: { type: "snapshot", id: "session.systemPrompt" } },
+        ));
+      }
+      const messages = Array.isArray(providerContext?.messages) ? providerContext.messages : [];
+      let lastUserIndex = -1;
+      for (let i = messages.length - 1; i >= 0; i--) {
+        if ((messages[i] as any)?.role === "user") { lastUserIndex = i; break; }
+      }
+      for (let i = 0; i < messages.length; i++) {
+        const message = messages[i] as any;
+        const role = typeof message?.role === "string" ? message.role : null;
+        const locator = { root: "messages" as const, path: [i] };
+        if (role === "toolResult") {
+          const toolName = typeof message.toolName === "string" && message.toolName.trim()
+            ? message.toolName.trim()
+            : null;
+          sections.push(provenanceSection(
+            locator,
+            "tool_result",
+            { role: "tool", source: { type: "tool", ...(toolName ? { id: toolName } : {}) } },
+          ));
+        } else if (role === "user" && i === lastUserIndex) {
+          sections.push(provenanceSection(
+            locator,
+            requestPhase === "format_repair" ? "format_constraint" : "task_instruction",
+            { role: "user", source: { type: "runtime", id: requestPhase === "format_repair" ? "compaction.repair-instruction" : "compaction.instruction" } },
+          ));
+        } else if (role === "user" || role === "assistant") {
+          sections.push(provenanceSection(locator, "conversation_history", { role }));
+        } else {
+          sections.push(provenanceSection(locator, "conversation_history", { precision: "structural", role: null }));
+        }
+      }
+      const tools = Array.isArray(providerContext?.tools) ? providerContext.tools : [];
+      for (let i = 0; i < tools.length; i++) {
+        const name = typeof (tools[i] as any)?.name === "string" && (tools[i] as any).name.trim()
+          ? (tools[i] as any).name.trim()
+          : null;
+        sections.push(provenanceSection(
+          { root: "tools", path: [i] },
+          "tool_definition",
+          { source: { type: "tool", ...(name ? { id: name } : {}) } },
+        ));
+      }
+      semanticInputProvenance = createSemanticInputProvenance("chat_context", sections);
+    } catch {
+      semanticInputProvenance = null;
+    }
+    const modelCallScope = {
+      callId: modelCallId,
+      model: modelLedgerIdentity(model),
+      ...modelCallFieldsFromUsageContext(usageContext),
+      traceId: traceContext.traceId,
+      parentCallId: traceContext.parentCallId,
+      semanticInputProvenance,
+      details: {
+        compactionPhase: requestPhase,
+        providerRequestOrdinal: diagnostics.providerRequests,
+        ...(metadata?.cacheStrategy ? { cacheStrategy: metadata.cacheStrategy } : {}),
+      },
+    };
+    try {
+      return await runWithModelCallScope(modelCallScope, () => streamFn(selectedModel, providerContext, options));
     } catch (error) {
       pending.settled = true;
       if (pending.requestId) usageLedger?.recordError?.(pending.requestId, error);

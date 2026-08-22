@@ -1085,7 +1085,7 @@
       "agent": "Agent",
       "me": "Me",
       "providers": "Providers",
-      "usage": "Usage",
+      "usage": "Model Observatory",
       "media": "Media",
       "models": "Models",
       "memory": "Memory",
@@ -1702,58 +1702,6 @@
         "usage": "Usage"
       },
       "configMissingFields": "This provider config is incomplete. Missing: {fields}."
-    },
-    "usage": {
-      "title": "Usage",
-      "note": "Usage is for reference only. Final totals are determined by the provider.",
-      "refresh": "Refresh usage",
-      "total": "All usage",
-      "requests": "Requests",
-      "totalTokens": "Total tokens",
-      "cacheRead": "Cache read",
-      "cacheHitRate": "Hit rate",
-      "uncached": "Uncached",
-      "modelMix": "Model mix",
-      "dailyUsage": "Daily usage",
-      "requestLedger": "Request ledger",
-      "loading": "Loading usage…",
-      "empty": "No usage records yet",
-      "groupMeta": "{requests} requests · {errors} errors",
-      "cacheShort": "cache {tokens}",
-      "tokensShort": "{tokens} tok",
-      "cacheSummary": "Cache {cache} · uncached {uncached}",
-      "window": {
-        "week": "Last 7 days",
-        "month": "Last 30 days"
-      },
-      "period": {
-        "week": "Week",
-        "month": "Month"
-      },
-      "view": {
-        "overall": "Overall",
-        "daily": "By date",
-        "category": "Category",
-        "model": "Model"
-      },
-      "category": {
-        "session": "Session",
-        "phone": "Phone",
-        "memory": "Memory",
-        "automation": "Automation",
-        "subagent": "Subagent",
-        "compaction": "Compaction",
-        "plugin": "Plugin",
-        "utility": "Utility",
-        "vision": "Vision",
-        "unknown": "Unknown"
-      },
-      "status": {
-        "ok": "Ok",
-        "error": "Error",
-        "aborted": "Aborted",
-        "usage_missing": "No usage"
-      }
     },
     "media": {
       "imageGeneration": "Image Generation",
@@ -2553,6 +2501,611 @@
       "dropOrClick": "Drop a character card or click to open",
       "readFailed": "Character card read failed",
       "importFailed": "Character card import failed"
+    },
+    "observability": {
+      "actions": {
+        "refresh": "Refresh",
+        "cancel": "Cancel",
+        "save": "Save",
+        "close": "Close"
+      },
+      "datePreset": {
+        "24h": "Last 24 hours",
+        "7d": "Last 7 days",
+        "30d": "Last 30 days",
+        "custom": "Custom",
+        "all": "All time"
+      },
+      "customRange": {
+        "since": "Start",
+        "untilExclusive": "End (exclusive)"
+      },
+      "filter": {
+        "date": "Date",
+        "provider": "Provider",
+        "model": "Model",
+        "category": "Category",
+        "status": "Status",
+        "operation": "Operation",
+        "callPurpose": "Call purpose",
+        "attributionKind": "Attribution",
+        "inputShape": "Input shape",
+        "provenancePrecision": "Provenance precision",
+        "payloadAvailability": "Payload availability",
+        "hasPayload": "Has payload",
+        "interruptedByRestart": "Interrupted by restart",
+        "groupBy": "Group by",
+        "more": "More filters",
+        "sessionId": "Session ID",
+        "conversationId": "Conversation ID",
+        "agentId": "Agent ID",
+        "taskId": "Task ID"
+      },
+      "advanced": {
+        "facetsTitle": "Facet values",
+        "exactIdsTitle": "Exact IDs",
+        "shapesTitle": "Shapes & availability",
+        "apply": "Apply",
+        "sessionIdPlaceholder": "Type session ID and press Enter",
+        "conversationIdPlaceholder": "Type conversation ID and press Enter",
+        "agentIdPlaceholder": "Type agent ID and press Enter",
+        "taskIdPlaceholder": "Type task ID and press Enter"
+      },
+      "groupBy": {
+        "hint": "Up to {max} dimensions"
+      },
+      "tri": {
+        "any": "Any",
+        "yes": "Yes",
+        "no": "No"
+      },
+      "facets": {
+        "loading": "Loading options…",
+        "empty": "No values under current filters"
+      },
+      "chips": {
+        "ariaLabel": "Active filters",
+        "clearAll": "Clear all",
+        "remove": "Remove filter: {label}"
+      },
+      "metrics": {
+        "calls": "Calls",
+        "tracesHint": "{count} traces",
+        "totalTokens": "Total tokens",
+        "inputTokens": "Input tokens",
+        "outputTokens": "Output tokens",
+        "cacheRead": "Cache read",
+        "cacheHitRate": "Hit rate {rate}",
+        "errors": "Errors",
+        "incompleteHint": "Plus {count} incomplete",
+        "avgDuration": "Avg duration",
+        "durationObserved": "Based on {count} observations",
+        "cost": "Cost",
+        "usageCoverage": "Usage coverage: {covered} linked / {missing} missing",
+        "usageCoverageComplete": "Usage coverage complete: {covered} linked, {notCorrelated} explicitly not correlated",
+        "usageCoveragePartial": "Usage coverage is partial: {covered} of {total} linked, {unknown} unknown",
+        "usageCoverageCorrupt": "Usage data is corrupt: {corrupt} records cannot be aggregated reliably",
+        "usageCoverageProjectionUnavailable": "Usage projection unavailable; the values below are not zero",
+        "usageCoverageUnknown": "Usage coverage unknown: {unknown} of {total} calls could not be verified"
+      },
+      "groups": {
+        "loading": "Loading aggregates…",
+        "empty": "No aggregate data under current filters",
+        "dateChartAria": "Call volume by date",
+        "dateSummary": "{total} calls total, peak on {peakDate} ({peakCount})",
+        "filterByValue": "Filter by value: {value}",
+        "unknownValue": "(unknown)"
+      },
+      "ledger": {
+        "title": "Call ledger",
+        "loadMore": "Load more",
+        "attemptsTooltip": "Includes {providerRequests} provider requests",
+        "interruptedAria": "This call was interrupted by a restart",
+        "interruptedTooltip": "An app restart left this call's records incomplete",
+        "usageMissingAria": "This call has no usage data",
+        "completenessNote": "Data completeness: {droppedEvents} trace events dropped / {droppedPayloads} payloads dropped / {droppedBlobs} files dropped / {interrupted} restarts interrupted",
+        "completenessUnknown": "Data completeness counters could not be read; the amount of missing data is unknown",
+        "filterBySession": "Filter by session: {id}",
+        "filterByTask": "Filter by task: {id}",
+        "col": {
+          "time": "Time",
+          "model": "Model",
+          "operation": "Operation",
+          "category": "Category",
+          "status": "Status",
+          "tokens": "Tokens",
+          "cache": "Cache",
+          "cost": "Cost",
+          "duration": "Duration",
+          "attempts": "Attempts",
+          "payload": "Payload",
+          "context": "Context"
+        },
+        "usageMissing": {
+          "present": "Usage linked",
+          "not_correlated": "This call could not be correlated to a usage record",
+          "projection_unavailable": "Usage projection unavailable",
+          "unknown": "Usage correlation state unknown"
+        }
+      },
+      "empty": {
+        "noResults": "No calls match the current filters",
+        "noTraces": "No traces match the current filters",
+        "storeAbsent": "Observability storage is not initialized yet — enable recording and new model calls will appear here"
+      },
+      "error": {
+        "invalid_query": "Invalid query",
+        "invalid_cursor": "Pagination cursor has expired",
+        "invalid_json": "Invalid request format",
+        "not_initialized": "Observability storage is not initialized",
+        "not_found": "Record not found or already pruned by retention",
+        "export_limit": "Export limit exceeded",
+        "query_failed": "Query failed",
+        "local_only_route": "This content is only accessible on this machine",
+        "studio_owner_required": "Studio owner permission required",
+        "forbidden": "You don't have permission to access this content",
+        "invalid_blob_id": "Invalid blob identifier",
+        "blob_missing": "Blob file is missing (possibly pruned by retention)",
+        "network": "Network request failed — check the local service and retry",
+        "invalidCursorHint": "Filters have changed — reload the list from the beginning"
+      },
+      "loading": {
+        "ledger": "Loading calls…",
+        "detail": "Loading call detail…",
+        "payload": "Loading payload body…",
+        "blob": "Loading blob…",
+        "traces": "Loading traces…",
+        "traceDetail": "Loading trace detail…"
+      },
+      "payloadAvailabilityHint": {
+        "present": "This call has captured payload records",
+        "expired": "Payloads were pruned by retention; only metadata remains",
+        "dropped": "Payloads were dropped at capture time (storage-pressure protection)",
+        "not_captured": "No payloads were captured for this call (recording settings or capture timing)",
+        "unknown": "Payload availability unknown"
+      },
+      "visibilityHint": {
+        "full": "Content at this layer is fully visible at runtime and captured (the copy may be redacted/truncated)",
+        "partial": "Content is partially visible (e.g. streams only keep aggregates)",
+        "metadata_only": "Structural/status metadata only, no body",
+        "opaque": "The boundary exists but content lives in an external process Lingxi cannot observe",
+        "unavailable": "The boundary event shape is known but not observable this round (no hook / protocol not triggered)"
+      },
+      "fidelityHint": {
+        "runtime_exact": "Captured copy is byte-identical to runtime content (except redaction)",
+        "parsed_equivalent": "Rebuilt from parsing; semantically equivalent",
+        "stream_aggregate": "Aggregated from streamed chunks",
+        "normalized": "Normalized transformation applied",
+        "metadata_only": "Metadata only, no body",
+        "external_process": "Content lives in an external process; not captured",
+        "opaque": "Not observable"
+      },
+      "sanitizationHint": {
+        "none": "Captured copy was not sanitized",
+        "redacted": "Captured copy has been credential-redacted",
+        "truncated": "Captured copy was truncated by length limits",
+        "degraded": "Capture degraded; content may be incomplete",
+        "redacted_truncated": "Redacted and truncated",
+        "redacted_degraded": "Redacted and degraded",
+        "truncated_degraded": "Truncated and degraded",
+        "redacted_truncated_degraded": "Redacted, truncated and degraded"
+      },
+      "payload": {
+        "loadBody": "Load body",
+        "loadMetadataOnly": "Only metadata is available for this layer",
+        "localOnly": "Body is viewable on this machine only",
+        "recordChars": "Recorded characters",
+        "contentStateLabel": "Content state",
+        "contentState": {
+          "present": "Body available",
+          "null_payload": "This record has no body",
+          "opaque_or_unavailable": "Body is opaque or unavailable",
+          "corrupt": "Record data is corrupt and cannot be parsed"
+        },
+        "contentStateOpaque": {
+          "full": "Content is visible at runtime but was not captured as a body",
+          "partial": "Only part of the content is observable",
+          "metadata_only": "This layer is metadata-only by design",
+          "opaque": "Content lives in an external process and cannot be shown",
+          "unavailable": "Not observable this round"
+        },
+        "availabilityEmpty": {
+          "present": "Record exists but its body is unavailable",
+          "expired": "Payloads were pruned by retention",
+          "dropped": "Payloads were dropped at capture time",
+          "not_captured": "No payloads were captured for this call",
+          "unknown": "No payload records"
+        }
+      },
+      "provenance": {
+        "title": "Semantic input provenance",
+        "listAria": "Input section list",
+        "selectSection": "Select a section on the left to inspect",
+        "absent": "This call has no semantic provenance record",
+        "corrupt": "The semantic provenance record is corrupt; it is not an absent record",
+        "structural": "Structural locator (value kind: {kind}); no text span",
+        "emptySpan": "This section is an empty text segment",
+        "field": {
+          "category": "Category",
+          "role": "Role",
+          "precision": "Precision",
+          "source": "Source",
+          "locator": "Locator"
+        },
+        "unavailable": {
+          "root_missing": "Resolution failed: root container missing",
+          "path_missing": "Resolution failed: path missing",
+          "span_out_of_range": "Resolution failed: span out of range",
+          "not_text": "Resolution target is not text"
+        }
+      },
+      "providerMapping": {
+        "title": "Provider request mapping",
+        "protocol": "Protocol: {protocol}",
+        "jump": "Jump to the corresponding input section",
+        "noLocator": "This mapping has no field-level locator",
+        "absent": "This call has no provider request mapping record",
+        "corrupt": "The provider request mapping record is corrupt; it is not an absent record",
+        "empty": "Mapping list is empty",
+        "loadSemanticFirst": "Load the semantic request body first to follow mapping jumps"
+      },
+      "inspector": {
+        "title": "Call detail",
+        "ariaLabel": "Model call detail drawer",
+        "closeAria": "Close detail",
+        "overview": "Overview",
+        "attempts": "Attempts",
+        "pipeline": "Payload pipeline",
+        "traceSection": "Trace",
+        "openTrace": "Open in trace view",
+        "parentCall": "Parent call: {id}",
+        "childCalls": "Child calls ({count})",
+        "model": "Model",
+        "start": "Started",
+        "field": {
+          "attempts": "Attempts",
+          "attribution": "Attribution",
+          "callPurpose": "Call purpose",
+          "inputShape": "Input shape",
+          "interruptedByRestart": "Interrupted by restart",
+          "payloadRecords": "Payload records",
+          "persistence": "Persistence completeness",
+          "provenancePrecision": "Provenance precision",
+          "surfaceTrigger": "Surface / trigger",
+          "usage": "Usage"
+        }
+      },
+      "attempts": {
+        "col": {
+          "attemptId": "Attempt",
+          "started": "Started",
+          "responded": "Responded",
+          "httpStatus": "HTTP",
+          "error": "Error"
+        },
+        "empty": "No attempt records",
+        "notEqualNote": "Note: {attempts} attempts ≠ {providerRequests} provider requests (retries/replays change the counts)"
+      },
+      "pipeline": {
+        "attemptLabel": "Attempt {id}"
+      },
+      "trace": {
+        "title": "Call traces",
+        "stats": {
+          "calls": "{count} calls",
+          "payload": "payloads: {present} present / {expired} expired / {dropped} dropped"
+        },
+        "usageAvailability": {
+          "complete": "Usage coverage complete ({covered}/{total})",
+          "partial": "Usage coverage partial ({covered}/{total}, {unknown} unknown)",
+          "corrupt": "Usage data corrupt ({corrupt}/{total})",
+          "projection_unavailable": "Usage projection unavailable",
+          "unknown": "Usage coverage unknown ({unknown}/{total})"
+        },
+        "missingParent": "Missing parent call",
+        "cycle": "Cycle detected; expansion truncated",
+        "degradedWarning": "This trace has missing data; the tree below may be incomplete"
+      },
+      "recording": {
+        "title": "Recording settings",
+        "openSettings": "Recording settings",
+        "dialogAria": "Model observability recording settings",
+        "enabled": "Enable observability recording",
+        "enabledHintOn": "Recording trace metadata for model calls",
+        "enabledHintOff": "Start recording model call metadata once enabled",
+        "effectiveStatus": "Effective status",
+        "queryStatus": "Query service",
+        "configuredButInactive": "Configured but not active",
+        "reason": "Reason code: {code}",
+        "disabledBrowsing": "Recording is off; you can still browse existing data",
+        "persistTraceMetadata": "Persist trace metadata",
+        "persistPayloads": "Persist payload bodies",
+        "persistPayloadsHint": "Store redacted copies of request/response bodies for later auditing",
+        "persistBlobs": "Persist media blobs",
+        "persistBlobsHint": "Store binary content such as images, audio and video",
+        "persistBlobsRequiresPayloads": "Requires payload body persistence first",
+        "retentionTitle": "Retention days",
+        "retentionInvalid": "Retention must be an integer between {min} and {max}",
+        "atRestEncryption": "At-rest encryption",
+        "atRestEncryptionNo": "None (protected by local file permissions)",
+        "localOnlyHint": "Observability data stays on this machine and is never uploaded",
+        "lastFlush": "Last flush",
+        "confirmPayloadsTitle": "Enable payload body persistence?",
+        "confirmPayloadsBody": "Once enabled, the following content will be stored on this machine as redacted copies:",
+        "confirmPayloadsItemPrompt": "Request prompts and system instructions",
+        "confirmPayloadsItemReasoning": "Model reasoning text",
+        "confirmPayloadsItemResponse": "Model response bodies",
+        "confirmPayloadsItemToolResult": "Tool call arguments and results",
+        "confirmPayloadsItemTranscription": "Speech transcription text",
+        "confirmPayloadsEncryptionFact": "Content is credential-redacted, but on-disk storage is not cryptographically encrypted; it relies on local file permissions.",
+        "confirmPayloadsConfirm": "Enable body persistence",
+        "confirmBlobsTitle": "Enable media blob persistence?",
+        "confirmBlobsBody": "Once enabled, images/audio/video involved in model calls will be stored as files on this machine. Content is credential-redacted, but on-disk storage is not cryptographically encrypted; it relies on local file permissions.",
+        "confirmBlobsConfirm": "Enable blob persistence",
+        "retentionTrace": "Trace",
+        "retentionPayload": "Payload bodies",
+        "retentionBlob": "Media blobs"
+      },
+      "export": {
+        "title": "Export observability data",
+        "open": "Export",
+        "dialogAria": "Export model observability data",
+        "currentFilter": "Current filters will be applied",
+        "filterDefault": "(No filters: export all records)",
+        "includePayloads": "Include payload bodies",
+        "includePayloadsHint": "Bodies are redacted copies; blob binaries are not included",
+        "maxCalls": "Max calls",
+        "maxCallsPlaceholder": "Default 10000",
+        "maxCallsInvalid": "Max calls must be an integer between 1 and {max}",
+        "noCapability": "This environment cannot save streamed files",
+        "localOnlyHint": "Export happens entirely on this machine; no data leaves it",
+        "start": "Start export",
+        "progress": "{bytes} bytes written…",
+        "saved": "Export complete, {bytes} bytes",
+        "savedTo": "Saved to: {path}",
+        "aborted": "Export cancelled",
+        "abortedPartialLeft": "Export cancelled; the partially written content remains in the target file",
+        "limitError": "{matched} calls matched, exceeding the limit of {max} — narrow the time range or add filters"
+      },
+      "blob": {
+        "preview": "Preview",
+        "previewAnyway": "Load anyway",
+        "largeWarning": "This blob is large ({size} bytes) and may load slowly",
+        "opaqueNote": "Type {type} ({size} bytes) cannot be previewed inline",
+        "download": "Download",
+        "missing": "Blob file is missing (possibly pruned by retention)",
+        "invalid": "Invalid blob identifier",
+        "localOnly": "Blob content is only accessible on this machine",
+        "close": "Close preview"
+      },
+      "copy": {
+        "callIdAria": "Copy call ID",
+        "traceIdAria": "Copy trace ID",
+        "capturedPayloadAria": "Copy captured payload"
+      },
+      "onboarding": {
+        "title": "Model Observatory",
+        "body": "Record the trace, usage and cost of every model call, auditable on this machine at any time. Once enabled, only metadata is stored; payload bodies and media blobs are off by default and can be enabled separately in recording settings. All data stays on this machine; on-disk storage is not cryptographically encrypted and relies on local file permissions.",
+        "enable": "Enable observability recording"
+      },
+      "jsonViewer": {
+        "wrap": "Wrap lines",
+        "copy": "Copy",
+        "copied": "Copied",
+        "copyAria": "Copy JSON content",
+        "showAll": "Show all ({chars} chars)",
+        "collapse": "Collapse",
+        "stringifyFailed": "JSON serialization failed: {error}"
+      },
+      "semanticResponse": {
+        "completeness": "Completeness",
+        "finishReason": "Finish reason",
+        "toolCalls": "Tool calls ({count})",
+        "structuredOutput": "Structured output",
+        "media": "Media",
+        "mediaDeferred": "Media content is stored as blobs",
+        "showRawJson": "Show raw JSON",
+        "hideRawJson": "Hide raw JSON"
+      },
+      "values": {
+        "terminalStatus": {
+          "ok": "Succeeded",
+          "error": "Failed",
+          "aborted": "Aborted",
+          "incomplete": "Incomplete"
+        },
+        "payloadAvailability": {
+          "present": "Captured",
+          "expired": "Expired",
+          "dropped": "Dropped",
+          "not_captured": "Not captured",
+          "unknown": "Unknown"
+        },
+        "usageAvailability": {
+          "present": "Linked",
+          "corrupt": "Corrupt",
+          "not_correlated": "Not correlated",
+          "projection_unavailable": "Projection unavailable",
+          "unknown": "Unknown"
+        },
+        "usageStatus": {
+          "ok": "OK",
+          "error": "Error",
+          "aborted": "Aborted",
+          "usage_missing": "Usage missing"
+        },
+        "provenancePrecision": {
+          "exact": "Exact",
+          "partial": "Partial",
+          "opaque": "Opaque"
+        },
+        "inputShape": {
+          "chat_context": "Chat context",
+          "calltext": "callText",
+          "pi_direct_summary": "Direct summary",
+          "media_image": "Image generation",
+          "media_video": "Video generation",
+          "external_cli_media": "External CLI media",
+          "speech_transcribe": "Speech transcription",
+          "provider_probe": "Provider probe"
+        },
+        "payloadKind": {
+          "semantic_request": "Semantic request",
+          "provider_request": "Provider request",
+          "provider_response": "Provider response",
+          "semantic_response": "Semantic response"
+        },
+        "payloadVisibility": {
+          "full": "Fully visible",
+          "partial": "Partially visible",
+          "metadata_only": "Metadata only",
+          "opaque": "Opaque",
+          "unavailable": "Unavailable"
+        },
+        "payloadFidelity": {
+          "runtime_exact": "Runtime-exact",
+          "parsed_equivalent": "Parsed-equivalent",
+          "stream_aggregate": "Stream aggregate",
+          "normalized": "Normalized",
+          "metadata_only": "Metadata only",
+          "external_process": "External process",
+          "opaque": "Opaque"
+        },
+        "sanitizationStatus": {
+          "none": "None",
+          "redacted": "Redacted",
+          "truncated": "Truncated",
+          "degraded": "Degraded",
+          "redacted_truncated": "Redacted+truncated",
+          "redacted_degraded": "Redacted+degraded",
+          "truncated_degraded": "Truncated+degraded",
+          "redacted_truncated_degraded": "Redacted+truncated+degraded"
+        },
+        "contentState": {
+          "present": "Body available",
+          "null_payload": "No body",
+          "opaque_or_unavailable": "Opaque or unavailable",
+          "corrupt": "Corrupt"
+        },
+        "transformation": {
+          "pass_through": "Pass-through",
+          "renamed": "Renamed",
+          "moved": "Moved",
+          "merged": "Merged",
+          "split": "Split",
+          "filtered": "Filtered",
+          "injected": "Injected",
+          "externalized": "Externalized",
+          "dropped": "Dropped",
+          "opaque": "Opaque"
+        },
+        "mappingPrecision": {
+          "exact": "Exact",
+          "structural": "Structural",
+          "opaque": "Opaque"
+        },
+        "semanticCategory": {
+          "platform_instruction": "Platform instruction",
+          "persona": "Persona",
+          "user_profile": "User profile",
+          "memory_context": "Memory context",
+          "skill_instruction": "Skill instruction",
+          "agents_file": "Agents file",
+          "session_instruction": "Session instruction",
+          "agent_roster": "Agent roster",
+          "conversation_history": "Conversation history",
+          "current_user_input": "Current user input",
+          "tool_definition": "Tool definition",
+          "tool_result": "Tool result",
+          "task_instruction": "Task instruction",
+          "task_input": "Task input",
+          "format_constraint": "Format constraint",
+          "previous_summary": "Previous summary",
+          "compaction_summary": "Compaction summary",
+          "media_prompt": "Media prompt",
+          "media_reference": "Media reference",
+          "audio_input": "Audio input",
+          "language_hint": "Language hint",
+          "adapter_injected": "Adapter-injected",
+          "sdk_internal": "SDK internal",
+          "unknown": "Unknown"
+        },
+        "semanticRole": {
+          "system": "System",
+          "developer": "Developer",
+          "user": "User",
+          "assistant": "Assistant",
+          "tool": "Tool",
+          "input": "Input",
+          "parameter": "Parameter"
+        },
+        "semanticSourceType": {
+          "template": "Template",
+          "runtime": "Runtime",
+          "snapshot": "Snapshot",
+          "memory": "Memory",
+          "skill": "Skill",
+          "tool": "Tool",
+          "sdk": "SDK",
+          "adapter": "Adapter",
+          "unknown": "Unknown"
+        },
+        "semanticRoot": {
+          "systemPrompt": "systemPrompt",
+          "messages": "messages",
+          "tools": "tools",
+          "input": "input",
+          "parameters": "parameters"
+        },
+        "persistenceCompleteness": {
+          "complete": "Complete",
+          "partial": "Partial"
+        },
+        "attributionKind": {
+          "agent": "Agent",
+          "auxiliary": "Auxiliary",
+          "direct": "Direct",
+          "memory": "Memory",
+          "plugin": "Plugin",
+          "provider": "Provider",
+          "task": "Task",
+          "utility": "Utility",
+          "workflow": "Workflow",
+          "unknown": "Unknown"
+        },
+        "groupByDimension": {
+          "date": "Date",
+          "provider": "Provider",
+          "model": "Model",
+          "category": "Category",
+          "operation": "Operation",
+          "callPurpose": "Call purpose",
+          "status": "Status",
+          "attributionKind": "Attribution",
+          "session": "Session",
+          "conversation": "Conversation",
+          "agent": "Agent",
+          "task": "Task",
+          "inputShape": "Input shape",
+          "provenancePrecision": "Provenance precision"
+        },
+        "queryStatus": {
+          "ready": "Ready",
+          "absent": "Absent",
+          "unavailable": "Unavailable",
+          "degraded": "Degraded"
+        },
+        "recordingStatus": {
+          "active": "Recording",
+          "degraded": "Recording degraded",
+          "disabled": "Disabled",
+          "closed": "Closed"
+        },
+        "completeness": {
+          "complete": "Complete",
+          "partial": "Partial"
+        }
+      }
     }
   },
   "onboarding": {

@@ -23,6 +23,20 @@ import {
 } from "./image-task-runner.ts";
 import { resolveMediaParameters } from "./media-parameters.ts";
 import { withModelRequestAccounting } from "../../lib/llm/model-request-accounting.ts";
+import {
+  beginObservedModelCall,
+  failObservedModelCall,
+  observedModelCallLedgerMetadata,
+} from "../../lib/llm/model-call-integration.ts";
+import {
+  createSemanticInputProvenance,
+  provenanceSection,
+} from "../../lib/llm/semantic-input-provenance.ts";
+import { runWithModelTraceRoot } from "../../lib/llm/model-trace-scope.ts";
+
+function hasAnyKey(source: Record<string, unknown>, keys: string[]): boolean {
+  return keys.some((key) => source?.[key] !== undefined && source?.[key] !== null);
+}
 
 const log = createModuleLogger("media");
 const IMAGE_CAPABILITY = "image_generation";
@@ -676,12 +690,17 @@ export class UniversalMediaManager {
 
   async submitImage({ input, sessionId = null, sessionPath, sessionRef = null, metadata = null, deliveryTarget = undefined, bridgeContext = null }: any = {}) {
     if (!this._bus || !this._poller) throw new Error(t("plugin.imageGen.notInitialized"));
-    return submitImageGeneration({
+    // 媒体提交 = inherit-or-mint（§二十六）：chat 工具内生成图片/视频继承该
+    // Chat 的 trace（工具子 scope 已就位）；独立提交（无 scope）铸新根 origin=media。
+    return runWithModelTraceRoot(
+      { origin: "media", refs: { ...(sessionId ? { sessionId } : {}), ...(sessionPath ? { sessionPath } : {}) } },
+      () => submitImageGeneration({
       input,
-      ctx: this._toolContext({ sessionId, sessionPath, sessionRef, bridgeContext }),
-      metadata,
-      deliveryTarget,
-    } as any);
+        ctx: this._toolContext({ sessionId, sessionPath, sessionRef, bridgeContext }),
+        metadata,
+        deliveryTarget,
+      } as any),
+    );
   }
 
   async generateVideoFromBus(payload: any = {}) {
@@ -710,6 +729,14 @@ export class UniversalMediaManager {
 
   async submitVideo({ input = {}, sessionId = null, sessionPath = null, sessionRef = null }: any = {}) {
     if (!this._bus || !this._poller) throw new Error(t("plugin.imageGen.notInitialized"));
+    // 同 submitImage：媒体任务继承调用它的 Chat trace；独立提交铸新根。
+    return runWithModelTraceRoot(
+      { origin: "media", refs: { ...(sessionId ? { sessionId } : {}), ...(sessionPath ? { sessionPath } : {}) } },
+      () => this._submitVideoWithinTrace(input, sessionId, sessionPath, sessionRef),
+    );
+  }
+
+  async _submitVideoWithinTrace(input: any = {}, sessionId: any = null, sessionPath: any = null, sessionRef: any = null) {
     if (!textOrNull(input.prompt)) throw new Error("prompt is required");
     const delivery = normalizeMediaDelivery(input);
     const responseDelivery = isResponseDelivery(delivery);
@@ -746,24 +773,143 @@ export class UniversalMediaManager {
       ...(target?.credentialLaneId ? { credentialLaneId: target.credentialLaneId } : {}),
       ...(target?.credentialProviderId ? { credentialProviderId: target.credentialProviderId } : {}),
     };
-    const result = await withModelRequestAccounting({
-      usageLedger: this._getUsageLedger(),
+    // MC-08 逻辑调用边界（§三十四）：video generation submit = 一个 logical
+    // call；callId 在 adapter 网络请求之前铸好并写进 ledger metadata。
+    // providerTaskId 响应后才出现——先有 callId，后关联（§三十五）。
+    // Phase 5（§七十三）：语义输入 = prompt + 参考图；duration/resolution/fps
+    // 是 adapter config，不进 provenance。locator 只指参数位，不携带值。
+    const resolvedParams = parameterResolution.resolvedParameters || {};
+    const videoProvenanceShape = typeof adapter?.id === "string" && adapter.id.startsWith("jimeng-cli-")
+      ? "external_cli_media"
+      : "media_video";
+    const videoProvenanceSections = [];
+    if (typeof params.prompt === "string" && params.prompt.length > 0) {
+      videoProvenanceSections.push(provenanceSection(
+        { root: "parameters", path: ["prompt"] },
+        "media_prompt",
+        { role: "input", source: { type: "runtime", id: "media.prompt" } },
+      ));
+    }
+    if (Array.isArray(params.image)) {
+      params.image.forEach((item: unknown, index: number) => {
+        if (typeof item === "string" && item.trim()) {
+          videoProvenanceSections.push(provenanceSection(
+            { root: "parameters", path: ["image", index] },
+            "media_reference",
+            { role: "input", source: { type: "runtime", id: "media.reference" } },
+          ));
+        }
+      });
+    } else if (typeof params.image === "string" && params.image.trim()) {
+      videoProvenanceSections.push(provenanceSection(
+        { root: "parameters", path: ["image"] },
+        "media_reference",
+        { role: "input", source: { type: "runtime", id: "media.reference" } },
+      ));
+    }
+    const recorder = beginObservedModelCall({
       model: {
         provider: target.providerId,
         modelId: target.modelId,
         api: target.protocolId,
       },
-      usageContext: {
-        source: { subsystem: "media", operation: "submit", surface: "tool", trigger: "user" },
-        attribution: {
-          kind: "session",
-          ...(sessionId ? { sessionId } : {}),
-          ...(sessionPath ? { sessionPath } : {}),
-        },
+      source: { subsystem: "media", operation: "submit", surface: "tool", trigger: "user" },
+      attribution: {
+        kind: "session",
+        ...(sessionId ? { sessionId } : {}),
+        ...(sessionPath ? { sessionPath } : {}),
       },
-      metadata: { mediaType: "video" },
-    }, () => adapter.submit(params, this._submitContextForAdapter(adapter)));
-    if (!result?.taskId) throw new Error(t("toolDef.generateVideo.submitFailedUnknown"));
+      details: {
+        path: "media_video_submit",
+        mediaType: "video",
+        hasReferenceMedia: Boolean(input.image),
+        ...(Array.isArray(input.image) ? { referenceCount: input.image.length } : {}),
+        durationConfigured: hasAnyKey(resolvedParams, ["duration", "seconds", "numFrames", "num_frames"]),
+        resolutionConfigured: hasAnyKey(resolvedParams, ["resolution", "video_resolution", "size", "width", "height"]),
+        fpsConfigured: hasAnyKey(resolvedParams, ["fps", "frameRate", "frame_rate", "numFrames", "num_frames"]),
+      },
+      semanticInputProvenance: createSemanticInputProvenance(videoProvenanceShape, videoProvenanceSections),
+    });
+    const observedSubmitCtx = { ...this._submitContextForAdapter(adapter), modelCall: recorder };
+    // Phase 6 Semantic Request Capture（§九十八）：prompt/reference image 是语义
+    // 输入（正文捕获）；duration/resolution/fps 仍不因此变成 semantic prompt
+    // section（§九十八的 Phase 5 定义不变）。CLI adapter wire = opaque。
+    const videoPayloadCapture = recorder.payloadCapture;
+    const videoIsCliAdapter = typeof adapter?.id === "string" && adapter.id.startsWith("jimeng-cli-");
+    if (videoPayloadCapture) {
+      videoPayloadCapture.captureSemanticRequest({
+        inputShape: videoProvenanceShape,
+        parameters: {
+          ...(typeof params.prompt === "string" ? { prompt: params.prompt } : {}),
+          ...(params.image !== undefined && params.image !== null ? { image: params.image } : {}),
+          ...(target?.modelId ? { model: target.modelId } : {}),
+        },
+        provenance: recorder.semanticInputProvenance,
+      });
+      if (videoIsCliAdapter) {
+        videoPayloadCapture.noteProviderWireUnavailable("provider_request", {
+          reason: "external-process-opaque",
+          visibility: "opaque",
+          fidelity: "external_process",
+        });
+        videoPayloadCapture.noteProviderWireUnavailable("provider_response", {
+          reason: "external-process-opaque",
+          visibility: "opaque",
+          fidelity: "external_process",
+        });
+      }
+    }
+    let result;
+    try {
+      result = await withModelRequestAccounting({
+        usageLedger: this._getUsageLedger(),
+        model: {
+          provider: target.providerId,
+          modelId: target.modelId,
+          api: target.protocolId,
+        },
+        usageContext: {
+          source: { subsystem: "media", operation: "submit", surface: "tool", trigger: "user" },
+          attribution: {
+            kind: "session",
+            ...(sessionId ? { sessionId } : {}),
+            ...(sessionPath ? { sessionPath } : {}),
+          },
+        },
+        metadata: { mediaType: "video", ...observedModelCallLedgerMetadata(recorder) },
+      }, () => adapter.submit(params, observedSubmitCtx));
+    } catch (err) {
+      failObservedModelCall(recorder, err, { errorKind: "adapter_error" });
+      throw err;
+    }
+    if (!result?.taskId) {
+      const submitUnknown = new Error(t("toolDef.generateVideo.submitFailedUnknown"));
+      failObservedModelCall(recorder, submitUnknown, { errorKind: "adapter_error" });
+      throw submitUnknown;
+    }
+    // Provider 接受 generation task 即语义完成（§二十八）：taskId 之后的 poll
+    // 属于控制面，不属于这次 Model Call。
+    recorder.payloadCapture?.captureSemanticResponse({
+      response: {
+        media: {
+          taskId: result.taskId,
+          providerTaskId: typeof result?.providerTaskId === "string" && result.providerTaskId.trim()
+            ? result.providerTaskId
+            : null,
+          deferred: true,
+        },
+        completeness: "complete",
+      },
+    });
+    recorder.semanticResponseCompleted({
+      details: {
+        deferred: true,
+        providerTaskId: typeof result?.providerTaskId === "string" && result.providerTaskId.trim()
+          ? result.providerTaskId
+          : null,
+      },
+    });
+    recorder.endLogicalCall("ok");
 
     this._store.add({
       taskId: result.taskId,

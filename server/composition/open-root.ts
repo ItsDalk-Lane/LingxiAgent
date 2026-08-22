@@ -46,6 +46,7 @@ import { createResourcesRoute } from "../routes/resources.ts";
 import { createResourceIoRoute } from "../routes/resource-io.ts";
 import { createFileHistoryRoute } from "../routes/file-history.ts";
 import { createUsageRoute } from "../routes/usage.ts";
+import { createModelObservabilityRoute } from "../routes/model-observability.ts";
 import { createWebAuthRoute } from "../routes/web-auth.ts";
 import { createWebSocketAuthRoute } from "../routes/ws-auth.ts";
 import { createStudioWorkspacesRoute } from "../routes/studio-workspaces.ts";
@@ -131,6 +132,8 @@ export function registerOpenRoutes(app: Hono, ctx: CompositionContext): void {
   app.route("/api", createFileHistoryRoute(engine));
   app.route("/api", createResourcesRoute(engine));
   app.route("/api", createUsageRoute(engine));
+  // Phase 8：Model Observatory 独立 route（与 Usage Ledger 不同领域，§六十三）。
+  app.route("/api", createModelObservabilityRoute(engine));
   app.route("/api", createSpeechRecognitionRoute(engine));
   app.route("/api", createServerIdentityRoute({
     lingxiHome: engine.lingxiHome,

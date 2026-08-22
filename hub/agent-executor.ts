@@ -10,6 +10,9 @@
 import fs from "fs";
 import path from "path";
 import { createAgentSession, SessionManager } from "../lib/pi-sdk/index.ts";
+import { registerSessionModelCallContext } from "../lib/pi-sdk/model-call-stream-observer.ts";
+import { runWithModelTraceRoot } from "../lib/llm/model-trace-scope.ts";
+import { modelCallLedgerMetadataForMessage } from "../lib/llm/model-call-correlation.ts";
 import { debugLog } from "../lib/debug-log.ts";
 import { getLocale, t } from "../lib/i18n.ts";
 import { createDefaultSettings } from "../core/session-defaults.ts";
@@ -128,11 +131,14 @@ function recordAgentPhoneAssistantUsage({
   };
   const modelMeta = agentPhoneModelMetaForUsage(event.message, model);
   const errorMessage = event.message?.errorMessage || event.message?.error?.message || null;
+  // Observer ↔ Ledger 关联（§六十四，同 desktop recordAssistantUsage）。
+  const modelCallMetadata = modelCallLedgerMetadataForMessage(event.message);
   if (event.message?.stopReason === "error" || errorMessage) {
     const request = ledger.start?.({
       model: modelMeta,
       usageContext,
       costRates: model?.cost,
+      ...(modelCallMetadata ? { metadata: modelCallMetadata } : {}),
     });
     return ledger.recordError?.(request?.requestId, new Error(errorMessage || "provider request failed"));
   }
@@ -142,6 +148,7 @@ function recordAgentPhoneAssistantUsage({
       usage: event.message.usage,
       usageContext,
       costRates: model?.cost,
+      ...(modelCallMetadata ? { metadata: modelCallMetadata } : {}),
     });
   }
   return null;
@@ -406,6 +413,40 @@ export async function runAgentPhoneSession(agentId, rounds, {
   returnDiagnostics = false,
   now = new Date(),
 }: { engine?: any; signal?: any; conversationId?: any; conversationType?: string; systemAppend?: any; noMemory?: boolean; toolMode?: string; modelOverride?: any; onActivity?: any; onSessionReady?: any; emitEvents?: boolean; extraCustomTools?: any[]; returnDiagnostics?: boolean; now?: Date } = {}) {
+  // Phone 入站消息 = Trace 根（§二十四/§二十五）：整轮 phone session 的模型
+  // 调用共享 traceId；外层已有 trace 原样继承。
+  return runWithModelTraceRoot(
+    {
+      origin: "phone_message",
+      refs: {
+        ...(conversationId ? { conversationId: String(conversationId) } : {}),
+        ...(conversationType ? { conversationType } : {}),
+      },
+    },
+    () => runAgentPhoneSessionWithinTrace(agentId, rounds, {
+      engine, signal, conversationId, conversationType, systemAppend, noMemory,
+      toolMode, modelOverride, onActivity, onSessionReady, emitEvents,
+      extraCustomTools, returnDiagnostics, now,
+    }),
+  );
+}
+
+async function runAgentPhoneSessionWithinTrace(agentId, rounds, {
+  engine,
+  signal,
+  conversationId,
+  conversationType = "channel",
+  systemAppend,
+  noMemory = false,
+  toolMode = "read_only",
+  modelOverride = null,
+  onActivity,
+  onSessionReady,
+  emitEvents = false,
+  extraCustomTools = [],
+  returnDiagnostics = false,
+  now = new Date(),
+}: { engine?: any; signal?: any; conversationId?: any; conversationType?: string; systemAppend?: any; noMemory?: boolean; toolMode?: string; modelOverride?: any; onActivity?: any; onSessionReady?: any; emitEvents?: boolean; extraCustomTools?: any[]; returnDiagnostics?: boolean; now?: Date } = {}) {
   if (!conversationId) throw new Error("conversationId is required for agent phone session");
   assertAgentPhoneEnabled(engine);
 
@@ -519,6 +560,23 @@ export async function runAgentPhoneSession(agentId, rounds, {
     tools,
     customTools: sessionCustomTools,
   });
+  // Model call 归属注册（MC-01 phone 会话路径）：与 recordPhoneAssistantUsage
+  // 的 usageContext 同一语义。
+  registerSessionModelCallContext(session, () => ({
+    source: {
+      subsystem: "session",
+      operation: "phone_reply",
+      surface: conversationType === "channel" ? "channel" : "dm",
+      trigger: "delivery",
+    },
+    attribution: {
+      kind: "phone",
+      agentId: agentId || null,
+      conversationId,
+      conversationType,
+      sessionPath: session?.sessionManager?.getSessionFile?.() || null,
+    },
+  }));
   installDynamicCompactionReserve(session);
   installMidRunCompaction(session, {
     usageLedger: engine.usageLedger || engine.getUsageLedger?.() || null,

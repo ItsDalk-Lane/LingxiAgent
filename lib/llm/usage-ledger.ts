@@ -12,6 +12,21 @@ import {
 const DEFAULT_MAX_ENTRIES = 5_000;
 const STORAGE_VERSION = 1;
 
+type UsageLedgerEventBus = {
+  emit(event: { type: "llm_usage"; entry: Record<string, any> }, sessionPath?: string | null): void;
+};
+
+type UsageLedgerLogger = { warn?(message: string): void };
+
+type UsageLedgerOptions = {
+  maxEntries?: number;
+  eventBus?: UsageLedgerEventBus | null;
+  logger?: UsageLedgerLogger | null;
+  now?: () => number;
+  requestIdFactory?: (() => unknown) | null;
+  storagePath?: string | null;
+};
+
 export function createUsageLedger({
   maxEntries = DEFAULT_MAX_ENTRIES,
   eventBus = null,
@@ -19,9 +34,9 @@ export function createUsageLedger({
   now = () => Date.now(),
   requestIdFactory = null,
   storagePath = null,
-} = {}) {
+}: UsageLedgerOptions = {}) {
   const entries = loadPersistedEntries({ storagePath, maxEntries, logger, now });
-  const pending = new Map();
+  const pending = new Map<string, Record<string, any>>();
   let sequence = 0;
 
   const nextRequestId = () => {
@@ -30,7 +45,7 @@ export function createUsageLedger({
     return `llm_${now().toString(36)}_${sequence.toString(36)}`;
   };
 
-  const append = (entry) => {
+  const append = (entry: Record<string, any>) => {
     const normalizedEntry = normalizeEntry(entry, now);
     if (entryHasUnknownUsageContext(normalizedEntry)) {
       warn(logger, `unknown usage context for LLM request ${normalizedEntry.requestId}`);
@@ -144,23 +159,42 @@ export function createUsageLedger({
   };
 }
 
-function loadPersistedEntries({ storagePath, maxEntries, logger, now }) {
+function loadPersistedEntries({
+  storagePath,
+  maxEntries,
+  logger,
+  now,
+}: {
+  storagePath: string | null;
+  maxEntries: number;
+  logger: UsageLedgerLogger | null;
+  now: () => number;
+}): Array<Record<string, any>> {
   if (!storagePath) return [];
   try {
     const raw = JSON.parse(fs.readFileSync(storagePath, "utf-8"));
     const rawEntries = Array.isArray(raw?.entries) ? raw.entries : [];
     return rawEntries
-      .map(entry => normalizeEntry(entry, now))
-      .filter(entry => entry.requestId)
+      .map((entry: any) => normalizeEntry(entry, now))
+      .filter((entry: Record<string, any>) => entry.requestId)
       .slice(-maxEntries);
-  } catch (err) {
-    if (err?.code === "ENOENT") return [];
-    warn(logger, `failed to read usage ledger storage ${storagePath}: ${err.message}`);
+  } catch (err: unknown) {
+    const fsError = err as NodeJS.ErrnoException;
+    if (fsError.code === "ENOENT") return [];
+    warn(logger, `failed to read usage ledger storage ${storagePath}: ${fsError.message}`);
     return [];
   }
 }
 
-function persistEntries({ storagePath, entries, logger }) {
+function persistEntries({
+  storagePath,
+  entries,
+  logger,
+}: {
+  storagePath: string | null;
+  entries: Array<Record<string, any>>;
+  logger: UsageLedgerLogger | null;
+}): void {
   if (!storagePath) return;
   try {
     fs.mkdirSync(path.dirname(storagePath), { recursive: true });
@@ -168,12 +202,13 @@ function persistEntries({ storagePath, entries, logger }) {
       version: STORAGE_VERSION,
       entries,
     }, null, 2)}\n`);
-  } catch (err) {
-    warn(logger, `failed to write usage ledger storage ${storagePath}: ${err.message}`);
+  } catch (err: unknown) {
+    const fsError = err as NodeJS.ErrnoException;
+    warn(logger, `failed to write usage ledger storage ${storagePath}: ${fsError.message}`);
   }
 }
 
-function normalizeEntry(entry, now) {
+function normalizeEntry(entry: Record<string, any>, now: () => number): Record<string, any> {
   const usageContext = normalizeUsageContext({
     source: entry.source,
     attribution: entry.attribution,
@@ -197,7 +232,7 @@ function normalizeEntry(entry, now) {
   };
 }
 
-function normalizeUsage(usage, options) {
+function normalizeUsage(usage: any, options: Record<string, any>): any {
   if (!usage) return null;
   if (usage.input && usage.output && usage.cache && Object.prototype.hasOwnProperty.call(usage, "totalTokens")) {
     return usage;
@@ -213,7 +248,7 @@ function normalizeModel(model: Record<string, any> = {}) {
   };
 }
 
-function normalizeError(error) {
+function normalizeError(error: any): { name: string | null; message: string | null } {
   if (!error) return { name: null, message: null };
   return {
     name: typeof error.name === "string" ? error.name : null,
@@ -221,23 +256,23 @@ function normalizeError(error) {
   };
 }
 
-function normalizeStatus(status) {
+function normalizeStatus(status: unknown): "ok" | "error" | "aborted" | "usage_missing" {
   if (status === "ok" || status === "error" || status === "aborted" || status === "usage_missing") {
     return status;
   }
   return "usage_missing";
 }
 
-function rawUsageShape(usage) {
+function rawUsageShape(usage: unknown): string | null {
   if (!usage || typeof usage !== "object" || Array.isArray(usage)) return null;
   return Object.keys(usage).sort().join(",");
 }
 
-function isPlainObject(value) {
-  return value && typeof value === "object" && !Array.isArray(value);
+function isPlainObject(value: unknown): value is Record<string, any> {
+  return value !== null && typeof value === "object" && !Array.isArray(value);
 }
 
-function matchesFilter(entry, filter) {
+function matchesFilter(entry: Record<string, any>, filter: Record<string, any>): boolean {
   if (filter.since && entry.endedAt && entry.endedAt < filter.since) return false;
   if (filter.until && entry.startedAt && entry.startedAt > filter.until) return false;
   if (filter.status && entry.status !== filter.status) return false;
@@ -254,13 +289,13 @@ function matchesFilter(entry, filter) {
   return true;
 }
 
-function normalizeLimit(limit) {
+function normalizeLimit(limit: unknown): number | null {
   const n = Number(limit);
   if (!Number.isFinite(n) || n <= 0) return null;
   return Math.floor(n);
 }
 
-function emit(eventBus, entry) {
+function emit(eventBus: UsageLedgerEventBus | null, entry: Record<string, any>): void {
   if (!eventBus || typeof eventBus.emit !== "function") return;
   try {
     eventBus.emit({ type: "llm_usage", entry }, attributionSessionPath(entry.attribution));
@@ -269,7 +304,7 @@ function emit(eventBus, entry) {
   }
 }
 
-function warn(logger, message) {
+function warn(logger: UsageLedgerLogger | null, message: string): void {
   try {
     logger?.warn?.(message);
   } catch {
@@ -277,28 +312,28 @@ function warn(logger, message) {
   }
 }
 
-function entryHasUnknownUsageContext(entry) {
+function entryHasUnknownUsageContext(entry: Record<string, any>): boolean {
   return isUnknownUsageContextValue({
     source: entry.source,
     attribution: entry.attribution,
   });
 }
 
-function clone(value) {
+function clone<T>(value: T): T {
   return typeof structuredClone === "function"
     ? structuredClone(value)
     : JSON.parse(JSON.stringify(value));
 }
 
-function toIso(ms) {
+function toIso(ms: number): string {
   return new Date(ms).toISOString();
 }
 
-function textOrNull(value) {
+function textOrNull(value: unknown): string | null {
   return typeof value === "string" && value.trim() ? value.trim() : null;
 }
 
-function numberOrNull(value) {
+function numberOrNull(value: unknown): number | null {
   const n = Number(value);
   return Number.isFinite(n) ? n : null;
 }

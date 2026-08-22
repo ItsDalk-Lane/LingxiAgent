@@ -316,10 +316,21 @@ async function fileHistorySchema(rootDir) {
   );
 }
 
+async function modelObservabilitySchema(rootDir) {
+  const modulePath = "lib/llm/model-observability-schema.ts";
+  const runtime = await import(pathToFileURL(path.join(rootDir, ...modulePath.split("/"))).href);
+  return withTemporaryDatabase(
+    "hana-model-observability-schema-",
+    (tempDir) => runtime.openModelObservabilityDatabase(path.join(tempDir, "observability.sqlite")),
+    (db) => readSqliteRuntimeSchema(db),
+  );
+}
+
 async function introspectSqliteStore(rootDir, storeId) {
   if (storeId === "session-manifest-sqlite") return sessionManifestSchema(rootDir);
   if (storeId === "agent-facts-sqlite") return factStoreSchema(rootDir);
   if (storeId === "file-history-sqlite") return fileHistorySchema(rootDir);
+  if (storeId === "model-observability-db") return modelObservabilitySchema(rootDir);
   throw new Error(
     `SQLite store ${storeId} has no runtime introspector. Add one that opens the real store; do not copy DDL into the fingerprint generator.`,
   );

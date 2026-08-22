@@ -6,6 +6,7 @@ import {
   saveBase64Images,
 } from "./common.ts";
 import { t } from "../../lib/i18n.ts";
+import { captureProviderHttpResponse, observedProviderFetch } from "../../lib/llm/model-call-integration.ts";
 
 const DEFAULT_BASE_URL = "https://api.minimaxi.com/v1";
 const MINIMAX_IMAGE_RATIOS = new Set(["1:1", "16:9", "9:16", "4:3", "3:4", "3:2", "2:3", "21:9"]);
@@ -105,26 +106,47 @@ export const minimaxImageAdapter = {
       }));
     }
 
-    const res = await fetch(`${resolveMiniMaxBaseUrl(creds.baseUrl)}/image_generation`, {
+    const requestUrl = `${resolveMiniMaxBaseUrl(creds.baseUrl)}/image_generation`;
+    const requestHeaders = {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${creds.apiKey}`,
+    };
+
+    const res = await observedProviderFetch(ctx, () => fetch(requestUrl, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${creds.apiKey}`,
-      },
+      headers: requestHeaders,
       body: JSON.stringify(body),
+    }), {
+      requestDetails: {
+        protocol: "minimax-images",
+        mediaType: "image",
+        hasReferenceMedia: images.length > 0,
+      },
+      // Phase 6：真实构造点 body/headers（Authorization 经 Redactor）。
+      capture: { method: "POST", url: requestUrl, headers: requestHeaders, body, protocol: "minimax-images" },
     });
 
     if (!res.ok) {
       let msg = `API error ${res.status}`;
       try {
         const err = await res.json();
+        captureProviderHttpResponse(ctx, {
+          status: res.status, headers: res.headers, body: err, fidelity: "parsed_equivalent",
+        });
         if (err.base_resp?.status_msg) msg = `${msg}: ${err.base_resp.status_msg}`;
         else if (err.error?.message) msg = `${msg}: ${err.error.message}`;
-      } catch {}
+      } catch {
+        captureProviderHttpResponse(ctx, {
+          status: res.status, headers: res.headers, body: null, fidelity: "metadata_only",
+        });
+      }
       throw new Error(msg);
     }
 
     const data = await res.json();
+    captureProviderHttpResponse(ctx, {
+      status: res.status, headers: res.headers, body: data, fidelity: "parsed_equivalent",
+    });
     const statusCode = data?.base_resp?.status_code;
     if (statusCode !== undefined && Number(statusCode) !== 0) {
       throw new Error(`MiniMax API error ${statusCode}: ${data?.base_resp?.status_msg || "unknown error"}`);

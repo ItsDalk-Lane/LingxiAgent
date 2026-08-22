@@ -30,8 +30,35 @@ const VERIFIED_SOURCE_SHA_FILE = path.join(ROOT, ".sync-audit", "verified-source
 // 若为支持本 guard 本身新增/改名脚本，须同步加入此列表。
 const AUDIT_ALLOWLIST = [
   "PROGRESS.md",
+  // Phase 6 payload capture 跨会话进度活文档（对应 PROGRESS.md 角色）。
+  "PAYLOAD_CAPTURE_PROGRESS.md",
+  // Phase 7 durable storage 跨会话进度活文档（对应 PROGRESS.md 角色）。
+  "OBSERVABILITY_STORAGE_PROGRESS.md",
   "UPSTREAM_SYNC_AUDIT.md",
   "UPSTREAM_SYNC_MATRIX.md",
+  // 模型调用可观测性审计报告（e62bb535 合入的纯审计材料）。
+  "MODEL_CALL_OBSERVABILITY_AUDIT.md",
+  // Phase 10 E2E truth audit / release acceptance / 跨会话进度（纯审计材料）。
+  "MODEL_OBSERVABILITY_E2E_TRUTH_AUDIT.md",
+  "MODEL_OBSERVABILITY_RELEASE_ACCEPTANCE.md",
+  "OBSERVABILITY_VALIDATION_PROGRESS.md",
+  // Phase 10.1/11 同族审计材料：V2/V3 验收、对抗性台账、修复进度与各 Phase
+  // 审计/进度文档（与上方既有条目同类，均为纯 markdown 审计材料）。
+  "MODEL_OBSERVATORY_RELEASE_ACCEPTANCE_V2.md",
+  "MODEL_OBSERVATORY_RELEASE_ACCEPTANCE_V3.md",
+  "MODEL_OBSERVATORY_ADVERSARIAL_REVIEW.md",
+  "OBSERVABILITY_REMEDIATION_PROGRESS.md",
+  "MODEL_CALL_CLOSURE_DELTA.md",
+  "MODEL_CALL_PAYLOAD_CAPTURE_AUDIT.md",
+  "MODEL_OBSERVABILITY_QUERY_AUDIT.md",
+  "MODEL_OBSERVABILITY_STORAGE_AUDIT.md",
+  "MODEL_OBSERVABILITY_UI_AUDIT.md",
+  "SEMANTIC_INPUT_PROVENANCE_AUDIT.md",
+  "OBSERVABILITY_PROGRESS.md",
+  "OBSERVABILITY_QUERY_PROGRESS.md",
+  "OBSERVABILITY_UI_PROGRESS.md",
+  "OBSERVABILITY_IMPLEMENTATION_NOTES.md",
+  "PROMPT_PROVENANCE_PROGRESS.md",
   ".sync-audit/upstream-sync-matrix.json",
   ".sync-audit/verified-source-sha.txt",
   ".sync-audit/build-sync-matrix.mjs",

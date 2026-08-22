@@ -57,7 +57,21 @@ export interface CompositionRoot {
   /**
    * Closed-content media adapter implementations (core/media-adapters/) to
    * inject into the media runtime's built-in adapter list. Absent means the
-   * open composition: zero built-in adapters, not an implicit closed import.
+   * open composition: zero built-in adapters, never an implicit closed import.
    */
   builtinMediaAdapters?: readonly any[];
+  /**
+   * Durable Model Observatory persistence policy (Phase 7), passed through to
+   * the engine. Absent or `enabled !== true` keeps persistence disabled — the
+   * default production behavior. This is the Phase 7 integration contract;
+   * user-facing settings arrive in Phase 8 (no hidden env-var switch).
+   */
+  modelObservability?: {
+    enabled?: boolean;
+    persistTraceMetadata?: boolean;
+    persistPayloads?: boolean;
+    persistBlobs?: boolean;
+    retention?: Record<string, unknown>;
+    limits?: Record<string, number>;
+  };
 }

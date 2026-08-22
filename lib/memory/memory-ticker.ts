@@ -49,6 +49,7 @@ import { isAgentPhoneSessionPath } from "../conversations/agent-phone-session.ts
 import { buildSourceTimeRange } from "./time-context.ts";
 import { atomicWriteSync } from "../../shared/safe-fs.ts";
 import { invalidateSessionDerivedStateSync } from "./session-derived-state.ts";
+import { runWithNewModelTrace } from "../llm/model-trace-scope.ts";
 import { createMemoryDreamRunner } from "./dream/runner.ts";
 import type { DreamErrorCode } from "./dream/state-store.ts";
 import {
@@ -533,6 +534,9 @@ export function createMemoryTicker(opts) {
 
   async function _doCompileTodayAndAssemble() {
     if (_dreamRunner.isRunning()) return;
+    // 后台记忆任务 = 独立新 Trace（§四十四）：checkpoint 可能从某个 turn 的
+    // 异步链内触发，force-new 切断继承，按任务边界归属。
+    return runWithNewModelTrace({ origin: "background" }, async () => {
     _aggregateCompileInFlight += 1;
     try {
       const resetAt = _getCompiledResetAt();
@@ -548,12 +552,15 @@ export function createMemoryTicker(opts) {
     } finally {
       _aggregateCompileInFlight = Math.max(0, _aggregateCompileInFlight - 1);
     }
+    });
   }
 
   // ── 内部：每日任务 ──
 
   async function _doDaily() {
     if (_dailyRunning || _dreamRunner.isRunning()) return;
+    // 同 _doCompileTodayAndAssemble：每日记忆任务独立成 trace。
+    return runWithNewModelTrace({ origin: "background" }, async () => {
     _dailyRunning = true;
     try {
       const todayStr = getLogicalDay().logicalDate;
@@ -706,6 +713,7 @@ export function createMemoryTicker(opts) {
     } finally {
       _dailyRunning = false;
     }
+    });
   }
 
   function _maybeStartAutomaticDream(logicalDate = getLogicalDay().logicalDate) {
@@ -714,7 +722,11 @@ export function createMemoryTicker(opts) {
     if (getDreamAutoEnabled?.() !== true) return null;
     if (_stopped || !_isMemoryMasterOn() || _branchReplacementPending.size > 0) return null;
     try {
-      return _dreamRunner.startAutomaticIfEligible(logicalDate);
+      // Dream = 独立后台任务（§四十四）：每次 run 新 trace。
+      return runWithNewModelTrace(
+        { origin: "background", refs: { logicalDate } },
+        () => _dreamRunner.startAutomaticIfEligible(logicalDate),
+      );
     } catch (err) {
       _logStepError("automatic Dream", err);
       return null;
