@@ -348,15 +348,34 @@ export function normalizeModelObservabilityAggregateQuery(input: unknown): Norma
     if (!bucket || typeof bucket !== "object" || Array.isArray(bucket)) {
       return { ok: false, error: { code: "invalid_filter", message: "dateBucket must be an object", field: "dateBucket" } };
     }
+    for (const key of Object.keys(bucket)) {
+      if (key !== "bucket" && key !== "utcOffsetMinutes" && key !== "timeZone") {
+        // 未知字段显式拒绝（Phase 10 DST 专项：修复前 timeZone 被静默忽略成 UTC）。
+        return { ok: false, error: { code: "unknown_field", message: `unknown dateBucket field "${key}"`, field: `dateBucket.${key}` } };
+      }
+    }
     if (bucket.bucket !== "day") {
       return { ok: false, error: { code: "invalid_enum", message: `dateBucket.bucket "${String(bucket.bucket)}" is not supported (only "day")`, field: "dateBucket.bucket" } };
     }
-    const offsetRaw = bucket.utcOffsetMinutes === undefined ? 0 : bucket.utcOffsetMinutes;
-    const offset = Number(offsetRaw);
-    if (!Number.isInteger(offset) || offset < -1440 || offset > 1440) {
-      return { ok: false, error: { code: "invalid_filter", message: "dateBucket.utcOffsetMinutes must be an integer in -1440..1440", field: "dateBucket.utcOffsetMinutes" } };
+    const hasTimeZone = bucket.timeZone !== undefined && bucket.timeZone !== null;
+    const hasOffset = bucket.utcOffsetMinutes !== undefined && bucket.utcOffsetMinutes !== null;
+    if (hasTimeZone && hasOffset) {
+      return { ok: false, error: { code: "invalid_filter", message: "dateBucket: specify either timeZone or utcOffsetMinutes, not both", field: "dateBucket.timeZone" } };
     }
-    dateBucket = { bucket: "day", utcOffsetMinutes: offset };
+    if (hasTimeZone) {
+      const timeZone = String(bucket.timeZone);
+      if (!isValidIanaTimeZone(timeZone)) {
+        return { ok: false, error: { code: "invalid_filter", message: `dateBucket.timeZone "${timeZone}" is not a valid IANA time zone`, field: "dateBucket.timeZone" } };
+      }
+      dateBucket = { bucket: "day", timeZone };
+    } else {
+      const offsetRaw = bucket.utcOffsetMinutes === undefined ? 0 : bucket.utcOffsetMinutes;
+      const offset = Number(offsetRaw);
+      if (!Number.isInteger(offset) || offset < -1440 || offset > 1440) {
+        return { ok: false, error: { code: "invalid_filter", message: "dateBucket.utcOffsetMinutes must be an integer in -1440..1440", field: "dateBucket.utcOffsetMinutes" } };
+      }
+      dateBucket = { bucket: "day", utcOffsetMinutes: offset };
+    }
   }
   if (groupBy.includes("date") && !dateBucket) {
     dateBucket = { bucket: "day", utcOffsetMinutes: 0 };
@@ -594,3 +613,23 @@ export function decodeModelObservabilityTraceCursor(
  * DTO 定义已迁移到 shared/model-observability-api-contract.ts（browser-safe
  * 单一事实源），经本文件头部 re-export 保持既有 import 站点不变。
  */
+
+/* ── IANA time zone 校验（Phase 10 DST 专项）──────────────────────────── */
+
+const ianaTimeZoneCache = new Map<string, boolean>();
+
+/** Intl 构造试探（无网络/无磁盘；失败 = invalid_filter，不静默回落 UTC）。 */
+export function isValidIanaTimeZone(timeZone: string): boolean {
+  if (typeof timeZone !== "string" || !timeZone || timeZone.length > 64) return false;
+  const cached = ianaTimeZoneCache.get(timeZone);
+  if (cached !== undefined) return cached;
+  let valid = false;
+  try {
+    new Intl.DateTimeFormat("en-US", { timeZone, timeZoneName: "longOffset" });
+    valid = true;
+  } catch {
+    valid = false;
+  }
+  ianaTimeZoneCache.set(timeZone, valid);
+  return valid;
+}

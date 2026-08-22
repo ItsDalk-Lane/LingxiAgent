@@ -1079,3 +1079,71 @@ sha256:15591e09…）/ i18n parity + locale coverage / 新测试 10 文件 83 �
 full npm test。新增文件集改变 CLI closure → `compute-cli-closure.mjs` 重生成
 （source-graph 712）——教训：**改 desktop/server 文件集后全量测试前先跑
 closure 重生成，否则 census 测试全量互踩**。
+
+# Phase 10 — End-to-End Truth Audit + Adversarial Validation（2026-08-22 第九轮）
+
+进度：OBSERVABILITY_VALIDATION_PROGRESS.md；审计设计：
+MODEL_OBSERVABILITY_E2E_TRUTH_AUDIT.md；最终验收：
+MODEL_OBSERVABILITY_RELEASE_ACCEPTANCE.md。本轮不加功能，只证明链：
+真实 Model Call = Observer 记录 = Durable Store = Query API = UI 展示 =
+Export，各层表达同一事实；缺失只能以真缺失态表达，不得伪装成
+0/{}/[]/null/"normal"。
+
+## Truth Oracle 纪律（本轮方法论核心）
+
+- **Fake Provider Witness**：tests/helpers/model-observability-scenario-harness.ts
+  内真实 node:http server（127.0.0.1 随机端口），带 request journal
+  （method/path/headers/body/ordinal）+ 可编程 SSE/JSON/error/hang/reset
+  fixture。期望值只来自 witness journal，**绝不复用 Observer 输出或
+  observedProviderFetch capture 当 expected**。
+- SSE fixture 必须以空行分隔事件（`events.join("\n\n")`）——单行 "\n"
+  会被 SSE 规范合并为一个 data 块导致 JSON.parse 失败（实测踩坑）。
+- 毒丸（poison credential）只在测试进程内存/temp dir；断言 = DB/WAL/SHM
+  字节级扫描零命中 + witness 侧可见（证明 redaction 只改 copy 不改请求）。
+- 生产等价 wiring：Pi 测试用真 ModelRuntime.registerProvider +
+  DefaultResourceLoader({extensionFactories})（镜像 engine.ts/server/index.ts
+  注入路径）——SDK 只从 resourceLoader.getExtensions() 取扩展，
+  options.extensions 无效（实测踩坑）。
+
+## 场景覆盖（32 用例 / 8 新测试文件）
+
+- S1/S2 MC-01 真 Pi AgentSession：四层 payload、hook body≡witness body、
+  tool loop C2.parent=C1.callId（非 toolCallId）。
+- S7 MC-04 四协议 mapping exact（/v1/messages、/chat/completions、/responses、
+  /codex/responses）；S23 ON/OFF witness body 字节级等价。
+- S11~S17 media/speech：probe GET /models 0 记录、codex 401 双 attempt 双
+  ordinal、CLI OPAQUE 不升级、video poll 0 event、speech uid 协议脱敏。
+- S18 diary：temporary×2+final 同 trace、parent=null 不伪造。
+- S19 错误矩阵：429/500/invalid JSON/hang/reset/abort；aborted≠error；毒丸
+  错误正文不入 durable DTO。
+- S20 并发双 session 隔离；S24 crash→interruptedByRestart≠Error；S29 80 call
+  keyset 全遍历零重零漏；S34 UI vertical（真 SQLite→query→Hono→client→DOM
+  ≡）；S35 export manifest/identity/filter 真实；S37 100 call OFF vs ON 无
+  数量级回归。
+
+## Findings（详见 progress 文档 Findings Ledger）
+
+- **F-1（P1，已修）**：IANA timeZone date bucket——旧实现 silently ignore
+  timeZone 且 DST 跨界分桶错误。failing-test-first（fake Date only，网络
+  定时器保持真实）→ 契约 `{bucket:"day", timeZone}` + normalizer 校验
+  （Intl probe + 未知字段显式拒绝 + 与 offset 互斥）→ 查询侧 DST 段二分
+  （Intl，≤16 段）展开有界 CASE SQL。反向回归：固定 offset 路径不变。
+- **F-2（P3）**：durable matrix 曾过实表述 "audio→blob stored"——实际
+  web Blob/base64 字符串为 externalized descriptor（runtime 未 materialize
+  Node Buffer）。文档修正，行为本就诚实。
+- **F-3（P2）**：blob GET/HEAD 路由零测试 → 补 6 用例（安全/traversal/
+  HEAD stat-only 性能/missing/disk-deleted）。
+- **F-4（P1）**：.sync-audit/verified-source-sha.txt 第八轮误存 tree sha
+  （`commit^{tree}`）→ 修正为 feature commit sha；seal guard 复绿。教训：
+  seal 坐标必须是 commit 对象。
+
+## Gates（本轮）
+
+typecheck ×3 / eslint 0 error / lint:boundary / persistence scanner 61 stores
+720 sites / fingerprint 未变 sha256:15591e09… / i18n parity+coverage /
+closure 重生成 / Phase 1~9 回归 134+161+157 / Phase 10 新增 32 / full npm
+test 12084 passed 0 failed（seal 修复后复跑）/ build:server +
+build:server:open + build:client 全绿（throwaway 签名 key，不入库）/
+package smoke：renderer bundle 含 observability client、server bundle 含
+route+query+storage 标记、seed kit manifest+签名 verify 通过。
+Windows/Linux：NOT EXECUTED（如实记录，不伪造 PASS）。

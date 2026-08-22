@@ -656,6 +656,103 @@ export function createModelObservabilityQueryService({ lingxiHome }: { lingxiHom
 
   /* ── Aggregate Group By（§三十九～四十五：SQLite 内完成，不整表进内存）── */
 
+  /* Phase 10 DST 专项（§八十一）：date bucket 支持 IANA timeZone。固定
+   * utcOffsetMinutes 对历史跨 DST 窗口分错日期；这里把过滤集的时间范围
+   * 按 DST 段展开成有界 CASE（retention 有界 → 段数 ≤ 上限，超限诚实报错）。
+   */
+  const DATE_BUCKET_MAX_SEGMENTS = 16;
+
+  function timeZoneOffsetMinutesAt(timeZone: string, epochMs: number): number {
+    const formatted = new Intl.DateTimeFormat("en-US", { timeZone, timeZoneName: "longOffset" })
+      .formatToParts(new Date(epochMs))
+      .find((part) => part.type === "timeZoneName")?.value ?? "GMT+00:00";
+    const match = /GMT([+-])(\d{2}):(\d{2})/.exec(formatted);
+    if (!match) return 0; // "GMT"（UTC）或不可解析 → 0
+    const sign = match[1] === "-" ? -1 : 1;
+    return sign * (Number(match[2]) * 60 + Number(match[3]));
+  }
+
+  function nextTimeZoneTransition(timeZone: string, fromMs: number, untilMs: number): number | null {
+    const offsetFrom = timeZoneOffsetMinutesAt(timeZone, fromMs);
+    let hi = Math.min(untilMs, fromMs + 400 * 86_400_000);
+    if (timeZoneOffsetMinutesAt(timeZone, hi) === offsetFrom) return null;
+    let lo = fromMs;
+    // 二分到秒级：IEEE double 毫秒精度内安全（范围 ≤ 400 天）。
+    while (hi - lo > 1000) {
+      const mid = Math.floor((lo + hi) / 2);
+      if (timeZoneOffsetMinutesAt(timeZone, mid) === offsetFrom) lo = mid;
+      else hi = mid;
+    }
+    return hi;
+  }
+
+  function dateBucketExpression(
+    reader: { db: any; hasAccounting: boolean },
+    query: NormalizedModelObservabilityAggregateQuery,
+    filterSql: { sql: string; params: unknown[] },
+  ): { sql: string; params: unknown[] } {
+    const fixedOffset = query.dateBucket?.utcOffsetMinutes;
+    if (typeof fixedOffset === "number") {
+      return {
+        sql: `strftime('%Y-%m-%d', mc.started_at, printf('%+d minutes', ?))`,
+        params: [fixedOffset],
+      };
+    }
+    const timeZone = query.dateBucket?.timeZone;
+    if (!timeZone) {
+      return {
+        sql: `strftime('%Y-%m-%d', mc.started_at, printf('%+d minutes', ?))`,
+        params: [0],
+      };
+    }
+    // 过滤集的 [min,max] started_at（同一 WHERE；一次轻量 MIN/MAX）。
+    const rangeRow = reader.db.prepare(
+      `SELECT MIN(mc.started_at) AS minAt, MAX(mc.started_at) AS maxAt FROM model_calls mc WHERE ${filterSql.sql}`,
+    ).get(...filterSql.params) as { minAt: string | null; maxAt: string | null };
+    if (!rangeRow?.minAt || !rangeRow?.maxAt) {
+      const offsetNow = timeZoneOffsetMinutesAt(timeZone, Date.now());
+      return {
+        sql: `strftime('%Y-%m-%d', mc.started_at, printf('%+d minutes', ?))`,
+        params: [offsetNow],
+      };
+    }
+    const startMs = new Date(rangeRow.minAt).getTime();
+    const endMs = new Date(rangeRow.maxAt).getTime();
+    const segments: Array<{ boundaryIso: string | null; offset: number }> = [];
+    let cursor = startMs;
+    segments.push({ boundaryIso: null, offset: timeZoneOffsetMinutesAt(timeZone, cursor) });
+    while (cursor < endMs) {
+      if (segments.length >= DATE_BUCKET_MAX_SEGMENTS) {
+        // 有界保护（retention 默认 180d ≈ 最多 2 次 transition；16 段已远超正常）。
+        segments.push({ boundaryIso: null, offset: segments[segments.length - 1].offset });
+        break;
+      }
+      const transition = nextTimeZoneTransition(timeZone, cursor, endMs);
+      if (transition === null) break;
+      segments.push({
+        boundaryIso: new Date(transition).toISOString(),
+        offset: timeZoneOffsetMinutesAt(timeZone, transition),
+      });
+      cursor = transition;
+    }
+    // 展开为 CASE：started_at（ISO 文本字典序）与 boundary 同构可比较。
+    // 段 i 的区间 = [b_i, b_{i+1})（b_0 = 负无穷）；CASE 分支
+    // `WHEN started_at < b_{i+1} THEN offset_i`，ELSE = 最后一段 offset。
+    const branches = segments.slice(0, segments.length - 1).map((segment, index) => ({
+      boundary: segments[index + 1].boundaryIso as string,
+      whenSql: `WHEN mc.started_at < ? THEN strftime('%Y-%m-%d', mc.started_at, printf('%+d minutes', ?))`,
+      params: [segments[index + 1].boundaryIso as string, segment.offset],
+    }));
+    const lastOffset = segments[segments.length - 1].offset;
+    const baseSql = `strftime('%Y-%m-%d', mc.started_at, printf('%+d minutes', ?))`;
+    if (branches.length === 0) {
+      return { sql: baseSql, params: [lastOffset] };
+    }
+    const sql = `CASE ${branches.map((branch) => branch.whenSql).join(" ")} ELSE ${baseSql} END`;
+    const params = branches.flatMap((branch) => branch.params).concat([lastOffset]);
+    return { sql, params };
+  }
+
   const GROUP_DIMENSION_SQL: Record<ModelObservabilityGroupByDimension, string[]> = {
     date: [], // 动态构造（strftime + offset 绑定参数）。
     provider: ["provider"],
@@ -745,12 +842,8 @@ export function createModelObservabilityQueryService({ lingxiHome }: { lingxiHom
       const groupExpressions: Array<{ dimension: ModelObservabilityGroupByDimension; column: string | null; expr: string; params: unknown[] }> = [];
       for (const dimension of query.groupBy) {
         if (dimension === "date") {
-          groupExpressions.push({
-            dimension,
-            column: null,
-            expr: `strftime('%Y-%m-%d', mc.started_at, printf('%+d minutes', ?))`,
-            params: [query.dateBucket?.utcOffsetMinutes ?? 0],
-          });
+          const dateExpr = dateBucketExpression(reader, query, filterSql);
+          groupExpressions.push({ dimension, column: null, expr: dateExpr.sql, params: dateExpr.params });
           continue;
         }
         for (const column of GROUP_DIMENSION_SQL[dimension]) {

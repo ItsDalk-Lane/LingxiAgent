@@ -38,6 +38,10 @@ const AUDIT_ALLOWLIST = [
   "UPSTREAM_SYNC_MATRIX.md",
   // 模型调用可观测性审计报告（e62bb535 合入的纯审计材料）。
   "MODEL_CALL_OBSERVABILITY_AUDIT.md",
+  // Phase 10 E2E truth audit / release acceptance / 跨会话进度（纯审计材料）。
+  "MODEL_OBSERVABILITY_E2E_TRUTH_AUDIT.md",
+  "MODEL_OBSERVABILITY_RELEASE_ACCEPTANCE.md",
+  "OBSERVABILITY_VALIDATION_PROGRESS.md",
   ".sync-audit/upstream-sync-matrix.json",
   ".sync-audit/verified-source-sha.txt",
   ".sync-audit/build-sync-matrix.mjs",

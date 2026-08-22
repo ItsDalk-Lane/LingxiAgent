@@ -131,8 +131,18 @@ export const MODEL_OBSERVABILITY_GROUP_BY_MAX_DIMENSIONS = 3;
 
 export type ModelObservabilityDateBucket = {
   bucket: "day";
-  /** 本地时区偏移（分钟，东半球为正）；server timezone 不入局。 */
-  utcOffsetMinutes: number;
+  /**
+   * 本地时区偏移（分钟，东半球为正）；server timezone 不入局。
+   * 与 timeZone 二选一：固定 offset 对历史跨 DST 窗口会分错日期
+   * （Phase 10 DST 专项），需要历史正确分桶时用 IANA timeZone。
+   */
+  utcOffsetMinutes?: number;
+  /**
+   * IANA 时区（如 "America/Los_Angeles"）。指定后按每行 started_at 的
+   * 真实本地日期分桶（SQL 内按 DST 段展开，段数有界）。
+   * 与 utcOffsetMinutes 二选一（同时给出 → invalid_filter）。
+   */
+  timeZone?: string;
 };
 
 /* ── 闭集值数组（UI 与 normalizer 共享的唯一事实源）───────────────────── */
