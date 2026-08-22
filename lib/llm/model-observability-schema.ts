@@ -27,7 +27,13 @@ import fs from "fs";
 import path from "path";
 import { createRequire } from "module";
 
-export const MODEL_OBSERVABILITY_SCHEMA_VERSION = 1;
+export const MODEL_OBSERVABILITY_SCHEMA_VERSION = 2;
+
+/**
+ * read side 支持的 schema 版本闭集（Phase 8 §七）：v1 历史库不迁移也可读
+ * （accounting projection 标 unavailable）；v2 起有 model_call_usage。
+ */
+export const MODEL_OBSERVABILITY_SUPPORTED_READ_VERSIONS: readonly number[] = [1, 2];
 
 /** store 目录约定（audit Q1 决策）。 */
 export const MODEL_OBSERVABILITY_DIR_NAME = "model-observability";
@@ -211,6 +217,43 @@ CREATE INDEX idx_blob_objects_state ON blob_objects(state);
 CREATE INDEX idx_blob_objects_created ON blob_objects(created_at);
 `;
 
+/* ── v2 DDL（Phase 8：Durable Accounting Projection，任务书 §十/十一）─────
+ *
+ * model_call_usage 是 Usage Ledger 的 read-optimized durable projection，
+ * 不是 Ledger replacement（§十二）：Provider → Usage Ledger（truth）→
+ * projection。只存 numeric accounting + status + identity；**绝不存**
+ * ledger error.message / error.name（Observable Metadata Safe Contract，
+ * §十一）。写入幂等（PK = model_call_id，同 callId 重复 upsert 不产生
+ * duplicate，§十三/十四）；retention 随对应 trace 删除（§十六，retention.ts）。
+ */
+const V2_DDL = `
+CREATE TABLE model_call_usage (
+  model_call_id TEXT PRIMARY KEY,
+  usage_request_id TEXT,
+  started_at TEXT,
+  ended_at TEXT,
+  duration_ms INTEGER,
+  usage_status TEXT NOT NULL,
+  input_total_tokens INTEGER,
+  input_uncached_tokens INTEGER,
+  output_total_tokens INTEGER,
+  reasoning_tokens INTEGER,
+  cache_read_tokens INTEGER,
+  cache_write_tokens INTEGER,
+  cache_miss_tokens INTEGER,
+  cache_hit INTEGER,
+  cache_created INTEGER,
+  cache_hit_ratio REAL,
+  total_tokens INTEGER,
+  cost_total REAL,
+  raw_usage_shape TEXT,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL
+);
+CREATE INDEX idx_model_call_usage_status ON model_call_usage(usage_status);
+CREATE INDEX idx_model_calls_conversation ON model_calls(conversation_id);
+`;
+
 /**
  * 打开（必要时创建）observability 数据库并应用到受支持 schema。
  *
@@ -285,6 +328,11 @@ export function migrateModelObservabilitySchema(db: any, currentVersion: number)
         switch (version) {
           case 0:
             db.exec(V1_DDL);
+            break;
+          case 1:
+            // v1 → v2：只新增 model_call_usage + conversation index；
+            // v1 既有行不动（§九十四 data preservation）。
+            db.exec(V2_DDL);
             break;
           default:
             throw new Error(`no migration step from observability schema ${version}`);

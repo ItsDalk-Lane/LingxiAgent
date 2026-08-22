@@ -447,7 +447,7 @@ export function createModelObservabilityTraceStore({ db, now = () => new Date().
       return db.prepare(`SELECT * FROM model_attempts WHERE call_id = ? ORDER BY started_at, rowid`).all(callId);
     },
 
-    markPayloadAvailability(callIds: string[], availability: "expired" | "dropped"): void {
+    markPayloadAvailability(callIds: string[], availability: "expired" | "dropped" | "not_captured"): void {
       if (callIds.length === 0) return;
       const update = db.prepare(
         `UPDATE model_calls SET payload_availability = ? WHERE call_id = ? AND payload_availability IS NULL`,

@@ -25,6 +25,7 @@ const EXPECTED_TABLES = [
   "payload_records",
   "blob_objects",
   "payload_blob_refs",
+  "model_call_usage", // Phase 8 v2
 ];
 
 const EXPECTED_INDEXES = [
@@ -46,6 +47,8 @@ const EXPECTED_INDEXES = [
   "idx_payload_blob_refs_blob",
   "idx_blob_objects_state",
   "idx_blob_objects_created",
+  "idx_model_call_usage_status", // Phase 8 v2
+  "idx_model_calls_conversation", // Phase 8 v2
 ];
 
 function makeTempHome(): string {
@@ -62,11 +65,11 @@ describe("Model Observability Store Schema", () => {
     try { fs.rmSync(home, { recursive: true, force: true }); } catch { /* tmp */ }
   });
 
-  it("fresh DB：建 v1 全部表 + 索引，user_version=1", () => {
+  it("fresh DB：建全部表 + 索引，user_version=SCHEMA_VERSION（Phase 8 起 =2）", () => {
     const db = openModelObservabilityDatabase(modelObservabilityDbPath(home));
     try {
       expect(readModelObservabilitySchemaVersion(db)).toBe(MODEL_OBSERVABILITY_SCHEMA_VERSION);
-      expect(MODEL_OBSERVABILITY_SCHEMA_VERSION).toBe(1);
+      expect(MODEL_OBSERVABILITY_SCHEMA_VERSION).toBe(2);
       const tables = db.prepare(
         `SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' ORDER BY name`,
       ).all().map((row: any) => row.name);
@@ -93,7 +96,7 @@ describe("Model Observability Store Schema", () => {
     first.close();
     const second = openModelObservabilityDatabase(modelObservabilityDbPath(home));
     try {
-      expect(readModelObservabilitySchemaVersion(second)).toBe(1);
+      expect(readModelObservabilitySchemaVersion(second)).toBe(MODEL_OBSERVABILITY_SCHEMA_VERSION);
       const row = second.prepare(`SELECT trace_id FROM traces`).get();
       expect(row).toMatchObject({ trace_id: "mt_persist" });
     } finally {

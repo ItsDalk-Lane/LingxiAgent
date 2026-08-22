@@ -152,3 +152,64 @@ introspector + compatible repin（sha256:f3d6c1f9…）。新增 6 测试文件 
 OBSERVABILITY_STORAGE_PROGRESS.md / MODEL_OBSERVABILITY_STORAGE_AUDIT.md /
 OBSERVABILITY_IMPLEMENTATION_NOTES.md Phase 7 节（含 Durable/Completeness/
 Retention 三矩阵与 At-Rest NO 结论）。
+
+## Phase 8 — Unified Observatory Query & Control Plane（2026-08-22 第七轮）
+
+**状态：完成。** 把 Phase 1～7 的 Durable Fact Store 提升为统一、可分页、可分组、
+可追溯的 Read Model，并让 observability recording preference 第一次成为真正的
+持久化产品配置：
+
+- **统一 Query Contract**（lib/llm/model-observability-query-types.ts）：同一份
+  Filter Contract 驱动 Call 列表 / Trace 列表 / Aggregate / Drill-down / Export；
+  category ≡ subsystem（与旧 Usage UI 一致）；字段内 OR（≤32 值）字段间 AND；
+  unknown field / invalid enum / invalid date / invalid cursor 显式 400；维度/排序
+  全部闭集映射 SQL、值全绑定（注入测试锁定）。
+- **Keyset pagination**：call（started_at DESC, call_id DESC，NULL 稳定最后——
+  跨 NULL 边界条件专门修正）/ trace（last_seen_at DESC, trace_id DESC）各自独立
+  cursor；cursor opaque 且与 normalized query fingerprint 绑定（filter 改变 →
+  400 invalid_cursor）；default 50 / max 200。
+- **Aggregate Group By 全在 SQLite 内完成**：date（day + 显式 utcOffsetMinutes，
+  server timezone 不入局）/provider/model/category/operation/callPurpose/status/
+  attributionKind/session/conversation/agent/task/inputShape/provenancePrecision，
+  多级 ≤3 维；指标含 token/cache/cost/usage coverage；无 usage 的 call 仍计入
+  callCount（coverage 诚实分列）。
+- **Durable Accounting Projection**（schema v2 `model_call_usage`）：Provider →
+  Usage Ledger（truth）→ projection 单向；live ingestion 复用 llm_usage 事件；
+  bounded ledger（≤5000）幂等 backfill（标注 bounded_usage_ledger，不声称完整
+  历史）；error.message/name 不入库；无 modelCallId 不投影（MC-03 NONE 保留）；
+  retention 随 trace 删除 + orphan 清理；Ledger 自身行为不变。
+- **Read side**：openModelObservabilityReadDatabase（readonly + fileMustExist +
+  query_only，绝不创建/迁移；absent ≠ 500）；supportedReadVersions=[1,2]，v1
+  历史库照常可查（accounting 标 projection_unavailable）；稳定 facade +
+  mtime/size 失效重开（reconfigure 不持已关 handle）。
+- **Trace Explorer 后端**：roots/orphanParent 显式、orphanEdges、functional-graph
+  染色 cycle 检测（含无根纯环 → degraded 不 crash）；call detail 保留 attempt ≠
+  provider request（MC-06 codex 401 = 1 call/2 attempts/2 ordinals 测试锁定）；
+  payload 正文只在 exact retrieval 返回，OPAQUE/UNAVAILABLE/METADATA_ONLY 不升级，
+  JSON 损坏 → corrupt 不 500。
+- **Settings/Control Plane**：preferences.json `model_observability` namespace
+  （enabled/persistTraceMetadata/persistPayloads/persistBlobs/retention days）；
+  canonical normalizer 单一来源；默认 disabled、payload/blob 额外 opt-in；
+  落盘原始意图（读取侧归一）；startup 自动加载（engine install 移到
+  PreferencesManager 之后，显式 CompositionRoot option 优先）；运行中
+  enable/disable/reconfigure（close 旧 handle → install 新 → invalidate reader）；
+  disable 不删历史数据；desired ≠ effective 显式（schema_newer 等）；
+  atRestEncryption=false 诚实暴露；not_captured 运行时标记（v1 NULL 不回填）。
+- **HTTP surface**（server/routes/model-observability.ts，与 usage route 分离）：
+  health/settings GET+PUT/query calls+traces+aggregate(POST JSON)/detail/payload
+  metadata/payload exact/export(NDJSON streaming)；route-security 显式登记——
+  metadata=STUDIO_OWNER，payload 正文/settings PUT/export=LOCAL_ONLY，未认证全拒，
+  前缀内未登记 verb fail closed。
+- **Export Contract**：独立 EXPORT_SCHEMA_VERSION=1；默认 metadata-only；
+  includePayloads 只导 sanitized store（无 includeRaw）；blob 无 bytes；JSONL
+  streaming 按 keyset 页；maxCalls 50k/上限 100k 超限 413。
+- 旧 /api/usage/llm、Usage Ledger、Usage UI 零改动。
+
+审计 MODEL_OBSERVABILITY_QUERY_AUDIT.md（十二问 + MC correlation：9/10 FULL、
+MC-03 NONE）；进度 OBSERVABILITY_QUERY_PROGRESS.md。schema v1→v2 显式单事务
+migration（只新增，rollback 安全）。新增 7 测试文件 53 用例 + 既有
+store-schema/route-security/composition-boundary 扩展；typecheck ×3 / eslint
+0 error / lint:boundary 绿（manifest 收录 7 新模块）；scanner 站点登记
+（read-database 只读打开）；fingerprint compatible repin（sha256:b0712be2…）。
+Phase 9（Usage Observatory UI：Unified Filter Bar + Group By + Metrics Dashboard +
+Call Ledger + Trace Explorer + Prompt/Response Inspector + Export UI）待开始。

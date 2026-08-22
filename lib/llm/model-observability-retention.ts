@@ -103,6 +103,14 @@ function chunkIds(ids: string[]): string[][] {
   return chunks;
 }
 
+/** v1 历史库没有 model_call_usage；maintenance 必须能在 v1 上安全运行。 */
+function hasTable(db: any, table: string): boolean {
+  const row = db.prepare(
+    `SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = ?`,
+  ).get(table);
+  return row != null;
+}
+
 /** 删除一组 trace 的全部 payload_records + refs，并把 call 标记 expired（§五十七）。 */
 function deletePayloadsForTraces(ctx: MaintenanceContext, traceIds: string[]): { calls: number } {
   if (traceIds.length === 0) return { calls: 0 };
@@ -126,11 +134,20 @@ function deletePayloadsForTraces(ctx: MaintenanceContext, traceIds: string[]): {
   return { calls: callIds.length };
 }
 
-/** 删除完整 trace（payload refs → payloads → attempts → calls → trace row）。 */
+/** 删除完整 trace（usage projection → payload refs → payloads → attempts → calls → trace row）。 */
 function deleteTraces(ctx: MaintenanceContext, traceIds: string[]): void {
   if (traceIds.length === 0) return;
   for (const chunk of chunkIds(traceIds)) {
     const placeholders = chunk.map(() => "?").join(",");
+    // Phase 8 §十六：usage projection 随对应 trace 删除，不产生 orphan
+    // （projection 引用 model_call_id；trace 删除后该 call 不再可查）。
+    if (hasTable(ctx.db, "model_call_usage")) {
+      ctx.db.prepare(
+        `DELETE FROM model_call_usage WHERE model_call_id IN (
+           SELECT call_id FROM model_calls WHERE trace_id IN (${placeholders})
+         )`,
+      ).run(...chunk);
+    }
     ctx.db.prepare(
       `DELETE FROM payload_blob_refs WHERE payload_record_id IN (
          SELECT id FROM payload_records WHERE call_id IN (
@@ -248,7 +265,17 @@ export function runModelObservabilityMaintenance(
     })();
   }
 
-  // ⑤ blob GC：先清 refless（立即，§九十一），再按 blobMaxAge/maxBlobBytes 约束。
+  // ⑤ orphan usage projection 清理（§十六）：trace/call 已删除（或 trace 事件
+  // 整批丢失）后遗留的 model_call_usage 不允许永久 orphan。
+  if (hasTable(db, "model_call_usage")) {
+    db.transaction(() => {
+      db.prepare(
+        `DELETE FROM model_call_usage WHERE model_call_id NOT IN (SELECT call_id FROM model_calls)`,
+      ).run();
+    })();
+  }
+
+  // ⑥ blob GC：先清 refless（立即，§九十一），再按 blobMaxAge/maxBlobBytes 约束。
   const refless = blobStore.collectGarbageBlobs();
   stats.gcBlobs += refless.length;
   if (policy.blobMaxAgeMs !== null) {
@@ -281,11 +308,11 @@ export function runModelObservabilityMaintenance(
     }
   }
 
-  // ⑥ orphan / missing recovery（§九十二/九十三）。
+  // ⑦ orphan / missing recovery（§九十二/九十三）。
   stats.orphanBlobFiles = blobStore.recoverOrphanBlobFiles();
   stats.missingBlobs = blobStore.recoverMissingBlobs();
 
-  // ⑦ 文件收缩（§八十八：不在模型热路径执行）。
+  // ⑧ 文件收缩（§八十八：不在模型热路径执行）。
   compactModelObservabilityDatabase(db);
   stats.compacted = true;
   return stats;

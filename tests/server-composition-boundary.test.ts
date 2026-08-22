@@ -70,6 +70,7 @@ const PRE_REFACTOR_MOUNT_CALLS = Object.freeze([
   '"/api" :: createMediaRoute',
   '"/api" :: createMemoryDreamRoute',
   '"/api" :: createMobileWorkbenchRoute',
+  '"/api" :: createModelObservabilityRoute',
   '"/api" :: createModelsRoute',
   '"/api" :: createPluginsRoute',
   '"/api" :: createPreferencesRoute',

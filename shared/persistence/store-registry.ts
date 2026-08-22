@@ -886,7 +886,8 @@ export const PERSISTENT_STORES: readonly StoreDescriptor[] = Object.freeze([
     identityContract: "One global observatory database per LINGXI_HOME; callId/attemptId/traceId are runtime observation identities correlated with (but never owned by) business epoch identities.",
     siteRules: [
       ...rules(["lib/llm/model-observability-schema.ts"], "Opens or creates the observatory database.", ["database-open", "mkdir"]),
-      ...rules(["lib/llm/model-observability-persistence.ts"], "Creates the observatory store directory while tightening at-rest permissions.", ["mkdir"]),
+      ...rules(["lib/llm/model-observability-read-database.ts"], "Opens the observatory database strictly read-only (query side; fileMustExist, never creates or migrates).", ["database-open"]),
+      ...rules(["lib/llm/model-observability-persistence.ts"], "Creates the observability store directory while tightening at-rest permissions.", ["mkdir"]),
       ...rules(["lib/llm/model-observability-testing.ts"], "Removes a throwaway test-harness copy of the observatory store tree under os.tmpdir().", ["remove-path"]),
     ],
   }),

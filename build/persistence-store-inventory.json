@@ -5906,7 +5906,16 @@
       "sourceFile": "lib/llm/model-observability-persistence.ts",
       "kind": "mkdir",
       "excerpt": "fs.mkdirSync(storeDir, { recursive: true })",
-      "reason": "Creates the observatory store directory while tightening at-rest permissions.",
+      "reason": "Creates the observability store directory while tightening at-rest permissions.",
+      "storeId": "model-observability-db",
+      "exemptionId": null,
+      "ordinal": 0
+    },
+    {
+      "sourceFile": "lib/llm/model-observability-read-database.ts",
+      "kind": "database-open",
+      "excerpt": "new Database(dbPath, { readonly: true, fileMustExist: true })",
+      "reason": "Opens the observatory database strictly read-only (query side; fileMustExist, never creates or migrates).",
       "storeId": "model-observability-db",
       "exemptionId": null,
       "ordinal": 0

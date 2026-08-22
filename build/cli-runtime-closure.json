@@ -6585,6 +6585,18 @@
       "reason": "Reached via esbuild source module graph, imported by lib/pi-sdk/model-call-stream-observer.ts (import-statement); lib/llm/cache-preserving-compaction-agent-run.ts (import-statement); lib/extensions/model-call-observer-ext.ts (import-statement)."
     },
     {
+      "path": "lib/llm/model-observability-accounting-projection.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "lib/llm/model-observability-persistence.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by lib/llm/model-observability-persistence.ts (import-statement)."
+    },
+    {
       "path": "lib/llm/model-observability-blob-store.ts",
       "inputType": "source-graph",
       "provenance": [
@@ -6595,6 +6607,18 @@
         }
       ],
       "reason": "Reached via esbuild source module graph, imported by lib/llm/model-observability-persistence.ts (import-statement)."
+    },
+    {
+      "path": "lib/llm/model-observability-export.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "server/routes/model-observability.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by server/routes/model-observability.ts (import-statement)."
     },
     {
       "path": "lib/llm/model-observability-payload-store.ts",
@@ -6619,6 +6643,69 @@
         }
       ],
       "reason": "Reached via esbuild source module graph, imported by core/engine.ts (import-statement)."
+    },
+    {
+      "path": "lib/llm/model-observability-preferences.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "core/preferences-manager.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "core/engine.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by core/preferences-manager.ts (import-statement); core/engine.ts (import-statement)."
+    },
+    {
+      "path": "lib/llm/model-observability-query-types.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "lib/llm/model-observability-query.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/llm/model-observability-export.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "server/routes/model-observability.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by lib/llm/model-observability-query.ts (import-statement); lib/llm/model-observability-export.ts (import-statement); server/routes/model-observability.ts (import-statement)."
+    },
+    {
+      "path": "lib/llm/model-observability-query.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "core/engine.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by core/engine.ts (import-statement)."
+    },
+    {
+      "path": "lib/llm/model-observability-read-database.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "lib/llm/model-observability-query.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by lib/llm/model-observability-query.ts (import-statement)."
     },
     {
       "path": "lib/llm/model-observability-retention.ts",
@@ -6650,9 +6737,19 @@
           "root": "server-bootstrap",
           "from": "lib/llm/model-observability-persistence.ts",
           "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/llm/model-observability-read-database.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/llm/model-observability-query.ts",
+          "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by lib/llm/model-observability-blob-store.ts (import-statement); lib/llm/model-observability-retention.ts (import-statement); lib/llm/model-observability-persistence.ts (import-statement)."
+      "reason": "Reached via esbuild source module graph, imported by lib/llm/model-observability-blob-store.ts (import-statement); lib/llm/model-observability-retention.ts (import-statement); lib/llm/model-observability-persistence.ts (import-statement); +2 more importer(s)."
     },
     {
       "path": "lib/llm/model-observability-trace-store.ts",
@@ -121080,6 +121177,18 @@
       "reason": "Reached via esbuild source module graph, imported by server/index.ts (import-statement)."
     },
     {
+      "path": "server/routes/model-observability.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "server/composition/open-root.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by server/composition/open-root.ts (import-statement)."
+    },
+    {
       "path": "server/routes/models.ts",
       "inputType": "source-graph",
       "provenance": [
@@ -123825,9 +123934,9 @@
     }
   ],
   "stats": {
-    "totalFiles": 10600,
+    "totalFiles": 10607,
     "byInputType": {
-      "source-graph": 704,
+      "source-graph": 711,
       "runtime-asset": 11,
       "nft-runtime-trace": 9885
     }

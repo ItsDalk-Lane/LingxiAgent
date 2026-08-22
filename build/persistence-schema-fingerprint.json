@@ -648,7 +648,7 @@
     ],
     "version": 3
   },
-  "payloadFingerprint": "sha256:f3d6c1f95ebc656f9a2a4bde849c656302cc097002b1ab9a3354ebbfabf4848c",
+  "payloadFingerprint": "sha256:b0712be2cd46a74b426092262d0060a2c28a45fc98a73939d7c3c525eced9025",
   "registry": [
     {
       "affectedByEpochMigration": true,
@@ -3078,8 +3078,8 @@
   ],
   "review": {
     "classification": "compatible",
-    "compatibilityReason": "Phase 7 durable model observability: add model-observability-db (SQLite user_version=1, disable-on-failure open contract) and model-observability-blobs stores; engine/server wiring adds constructor pass-through and dispose flush only — no existing store's on-disk shape, format, or migration path changes.",
-    "payloadFingerprint": "sha256:f3d6c1f95ebc656f9a2a4bde849c656302cc097002b1ab9a3354ebbfabf4848c"
+    "compatibilityReason": "Phase 8 observability query round: model-observability-db gains a read-only open site (query service) and its SQLite runtime DDL extends with the v2 model_call_usage projection table plus conversation index; additive-only, user_version migration v1->v2, no existing store shape changes.",
+    "payloadFingerprint": "sha256:b0712be2cd46a74b426092262d0060a2c28a45fc98a73939d7c3c525eced9025"
   },
   "schemas": [
     {
@@ -3409,6 +3409,12 @@
             "type": "index"
           },
           {
+            "name": "idx_model_call_usage_status",
+            "sql": "CREATE INDEX idx_model_call_usage_status ON model_call_usage(usage_status)",
+            "tableName": "model_call_usage",
+            "type": "index"
+          },
+          {
             "name": "idx_model_calls_agent",
             "sql": "CREATE INDEX idx_model_calls_agent ON model_calls(agent_id)",
             "tableName": "model_calls",
@@ -3417,6 +3423,12 @@
           {
             "name": "idx_model_calls_attribution_kind",
             "sql": "CREATE INDEX idx_model_calls_attribution_kind ON model_calls(attribution_kind)",
+            "tableName": "model_calls",
+            "type": "index"
+          },
+          {
+            "name": "idx_model_calls_conversation",
+            "sql": "CREATE INDEX idx_model_calls_conversation ON model_calls(conversation_id)",
             "tableName": "model_calls",
             "type": "index"
           },
@@ -3511,6 +3523,12 @@
             "type": "table"
           },
           {
+            "name": "model_call_usage",
+            "sql": "CREATE TABLE model_call_usage ( model_call_id TEXT PRIMARY KEY, usage_request_id TEXT, started_at TEXT, ended_at TEXT, duration_ms INTEGER, usage_status TEXT NOT NULL, input_total_tokens INTEGER, input_uncached_tokens INTEGER, output_total_tokens INTEGER, reasoning_tokens INTEGER, cache_read_tokens INTEGER, cache_write_tokens INTEGER, cache_miss_tokens INTEGER, cache_hit INTEGER, cache_created INTEGER, cache_hit_ratio REAL, total_tokens INTEGER, cost_total REAL, raw_usage_shape TEXT, created_at TEXT NOT NULL, updated_at TEXT NOT NULL )",
+            "tableName": "model_call_usage",
+            "type": "table"
+          },
+          {
             "name": "model_calls",
             "sql": "CREATE TABLE model_calls ( call_id TEXT PRIMARY KEY, trace_id TEXT, parent_call_id TEXT, provider TEXT, model_id TEXT, api TEXT, subsystem TEXT, operation TEXT, surface TEXT, trigger TEXT, attribution_kind TEXT, session_id TEXT, session_path TEXT, conversation_id TEXT, conversation_type TEXT, agent_id TEXT, child_agent_id TEXT, child_session_id TEXT, child_session_path TEXT, task_id TEXT, call_purpose TEXT, started_at TEXT, semantic_completed_at TEXT, ended_at TEXT, terminal_status TEXT, error_name TEXT, error_code TEXT, input_shape TEXT, provenance_precision TEXT, provenance_section_count INTEGER, provenance_categories_json TEXT, provenance_opaque_count INTEGER, attribution_json TEXT, source_json TEXT, safe_details_json TEXT, persistence_completeness TEXT NOT NULL DEFAULT 'partial', interrupted_by_restart INTEGER NOT NULL DEFAULT 0, payload_availability TEXT )",
             "tableName": "model_calls",
@@ -3541,9 +3559,9 @@
             "type": "table"
           }
         ],
-        "userVersion": 1
+        "userVersion": 2
       },
-      "sourceHash": "sha256:bd51692c8d2b3caa14460cd5eb59071ef8aa5a3ed22c63f54a36ba4a54e7a5de",
+      "sourceHash": "sha256:5f6f1858bab7b5eb0faa9a796eeab17e461d533877b14fe1ddc4b0f574456577",
       "storeId": "model-observability-db"
     },
     {
@@ -3816,7 +3834,7 @@
       "contract": "PreferencesManager defaults, coercion, and _dataVersion migration driver",
       "kind": "runtime-contract",
       "module": "core/preferences-manager.ts",
-      "sourceHash": "sha256:08db73ab9defe36e3c0f64e4a37298785293e89031f82379e13ba7b47be09def",
+      "sourceHash": "sha256:24f6a1238c655e9d12914ef020e7eca515dfa937985969ae396798319a700321",
       "storeId": "user-preferences"
     },
     {
@@ -6894,8 +6912,16 @@
       "exemptionId": null,
       "kind": "mkdir",
       "ordinal": 0,
-      "reason": "Creates the observatory store directory while tightening at-rest permissions.",
+      "reason": "Creates the observability store directory while tightening at-rest permissions.",
       "sourceFile": "lib/llm/model-observability-persistence.ts",
+      "storeId": "model-observability-db"
+    },
+    {
+      "exemptionId": null,
+      "kind": "database-open",
+      "ordinal": 0,
+      "reason": "Opens the observatory database strictly read-only (query side; fileMustExist, never creates or migrates).",
+      "sourceFile": "lib/llm/model-observability-read-database.ts",
       "storeId": "model-observability-db"
     },
     {

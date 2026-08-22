@@ -214,6 +214,11 @@ import {
 } from "../lib/skills/skill-name-translation-cache.ts";
 import { createUsageLedger } from "../lib/llm/usage-ledger.ts";
 import { installModelObservabilityPersistence } from "../lib/llm/model-observability-persistence.ts";
+import { createModelObservabilityQueryService } from "../lib/llm/model-observability-query.ts";
+import {
+  DEFAULT_MODEL_OBSERVABILITY_PREFERENCE,
+  modelObservabilityPreferenceToPolicy,
+} from "../lib/llm/model-observability-preferences.ts";
 import {
   autoProjectIdForCwd,
   isAutoProjectId,
@@ -315,6 +320,8 @@ export class LingxiEngine {
   declare _sessionManifestStore: any;
   declare _sessionManifestStoreRecovery: any;
   declare _modelObservability: any;
+  /** Phase 8：稳定 query facade（read-only 连接随 reconfigure invalidate/reopen）。 */
+  declare _modelObservabilityQuery: any;
   declare _sessionProjects: any;
   declare _skills: any;
   declare _slashSystem: any;
@@ -395,27 +402,12 @@ export class LingxiEngine {
     this._sessionManifestResolver = this._sessionManifestStore
       ? new SessionManifestResolver({ store: this._sessionManifestStore })
       : null;
-    // ── Phase 7：Durable Model Observatory persistence（engine_construct 阶段，
-    // 早于任何模型调用；默认 disabled。打开失败 → disabled handle，engine 正常继续。）──
+    // ── Phase 7/8：Durable Model Observatory persistence。安装点在
+    // PreferencesManager 之后（audit Q10/补充决策 1：单一 parser，无第四套
+    // default），仍早于任何模型调用。默认 disabled（preference 未开启且无
+    // 显式 option）；打开失败 → disabled handle，engine 正常继续。──
     this._modelObservability = null;
-    if (modelObservability && modelObservability.enabled === true) {
-      try {
-        this._modelObservability = installModelObservabilityPersistence({
-          lingxiHome,
-          policy: modelObservability,
-        });
-        const health = this._modelObservability.getHealth();
-        if (health.status === "disabled") {
-          moduleLog.warn(
-            `model observability persistence disabled (${health.storeDisabledReasonCode}); model runtime continues`,
-          );
-          this._modelObservability = null;
-        }
-      } catch (error) {
-        moduleLog.warn(`model observability persistence install failed: ${error?.message ?? error}`);
-        this._modelObservability = null;
-      }
-    }
+    this._modelObservabilityQuery = null;
     this._currentTurnNativeMedia = createCurrentTurnNativeMediaStore();
     this._pluginInstallRecords = new PluginInstallRecords({ lingxiHome });
     this._automationSuggestionStore = new AutomationSuggestionStore();
@@ -437,6 +429,7 @@ export class LingxiEngine {
 
     // ── Core managers ──
     this._prefs = new PreferencesManager({ userDir: this.userDir, agentsDir: this.agentsDir });
+    this._installModelObservability(modelObservability);
     this._inputDrafts = new InputDraftsStore({ lingxiHome: this.lingxiHome });
     this._models = new ModelManager({ lingxiHome });
     this._speechRecognition = new SpeechRecognitionService({
@@ -781,6 +774,9 @@ export class LingxiEngine {
       },
       logger: moduleLog,
     });
+    // Phase 8：ledger 就绪后接线 accounting projection（构造期 install 时
+    // ledger 尚未创建，_wireModelObservabilityAccounting 会提前返回）。
+    this._wireModelObservabilityAccounting();
 
     // 首次剥媒体通知去重：sessionPath → 已通知。由 context extension handler 维护，
     // 避免每一轮对话都重复广播 stripped_notice 事件。
@@ -863,6 +859,181 @@ export class LingxiEngine {
    */
   get modelObservabilityPersistence() {
     return this._modelObservability || null;
+  }
+
+  /**
+   * Phase 8 §五十四：安装 observability persistence。优先级：CompositionRoot
+   * 显式 option（enabled=true，测试/dev wiring）> 已保存用户 preference
+   * （preferences.json model_observability，canonical normalizer 单一来源）。
+   * 默认 disabled；打开失败 → disabled handle，主程序不受影响。
+   */
+  _installModelObservability(explicitOption) {
+    this._modelObservability = null;
+    let policy = null;
+    if (explicitOption && explicitOption.enabled === true) {
+      policy = explicitOption;
+    } else if (this._prefs?.getModelObservability) {
+      const preference = this._prefs.getModelObservability();
+      if (preference.enabled) policy = modelObservabilityPreferenceToPolicy(preference);
+    }
+    if (!policy) return;
+    try {
+      this._modelObservability = installModelObservabilityPersistence({
+        lingxiHome: this.lingxiHome,
+        policy,
+      });
+      const health = this._modelObservability.getHealth();
+      if (health.status === "disabled") {
+        moduleLog.warn(
+          `model observability persistence disabled (${health.storeDisabledReasonCode}); model runtime continues`,
+        );
+        this._modelObservability = null;
+      } else {
+        this._wireModelObservabilityAccounting();
+      }
+    } catch (error) {
+      moduleLog.warn(`model observability persistence install failed: ${error?.message ?? error}`);
+      this._modelObservability = null;
+    }
+  }
+
+  /**
+   * Phase 8 §十四：Usage Ledger append → llm_usage 事件 → accounting projection。
+   * 复用既有 ledger append 通道，不改任何模型调用点；含 bounded ledger
+   * best-effort backfill（§十五，只做一次）。usageLedger 创建后调用。
+   */
+  _wireModelObservabilityAccounting() {
+    const handle = this._modelObservability;
+    if (!handle?.initializeAccounting || !this._usageLedger) return;
+    try {
+      handle.initializeAccounting({
+        listLedgerEntries: () => this._usageLedger.list({}).entries ?? [],
+        subscribeUsage: (consumer) => this.subscribe((event) => consumer(event)),
+      });
+    } catch (error) {
+      moduleLog.warn(`model observability accounting wiring failed: ${error?.message ?? error}`);
+    }
+  }
+
+  /** Phase 8 §十七：统一 Query Service（稳定 facade；route 只经此查询）。 */
+  getModelObservabilityQueryService() {
+    if (!this._modelObservabilityQuery) {
+      this._modelObservabilityQuery = createModelObservabilityQueryService({
+        lingxiHome: this.lingxiHome,
+      });
+    }
+    return this._modelObservabilityQuery;
+  }
+
+  /**
+   * Phase 8 §五十八/五十九：settings 读取。desired（用户偏好）与 effective
+   * （运行态，含 schema_newer 等 disable 原因）是两个概念，分开返回。
+   */
+  getModelObservabilitySettings() {
+    const desired = this._prefs?.getModelObservability
+      ? this._prefs.getModelObservability()
+      : DEFAULT_MODEL_OBSERVABILITY_PREFERENCE;
+    const health = this._modelObservability?.getHealth?.() ?? null;
+    return {
+      desired,
+      effective: {
+        recordingStatus: health ? health.status : "disabled",
+        storeDisabledReasonCode: health?.storeDisabledReasonCode ?? (desired.enabled ? "not_installed" : "disabled_by_policy"),
+        persistTraceMetadata: health ? health.persistTraceMetadata : false,
+        persistPayloads: health ? health.persistPayloads : false,
+        persistBlobs: health ? health.persistBlobs : false,
+        schemaVersion: health?.schemaVersion ?? null,
+      },
+      // §六十二：诚实暴露 at-rest 安全事实——filesystem permissions，非加密。
+      cryptographicallyEncryptedAtRest: false,
+    };
+  }
+
+  /**
+   * Phase 8 §五十七/五十九：运行中 enable/disable/reconfigure。
+   * 顺序：normalize → persist desired preference → close 旧 handle →
+   * install 新 handle（不删除历史数据，§六十）→ invalidate query reader →
+   * 返回 desired + effective。disable 只停止新记录。
+   */
+  async setModelObservabilitySettings(partial) {
+    const desired = this._prefs.setModelObservability(partial);
+    const previous = this._modelObservability;
+    if (previous) {
+      this._modelObservability = null;
+      try {
+        await Promise.race([
+          previous.close(),
+          new Promise((resolve) => {
+            const timer = setTimeout(resolve, 5000);
+            timer.unref?.();
+          }),
+        ]);
+      } catch {
+        // 旧 handle 关闭失败：继续安装新 handle（失败已被计数/日志）。
+      }
+    }
+    // preference（days）→ policy（ms）经 canonical 转换，不能直接把 preference
+    // 形状喂给 install（retention 字段名不同，会被静默换成 safe fallback）。
+    this._installModelObservability(
+      desired.enabled ? modelObservabilityPreferenceToPolicy(desired) : { enabled: false },
+    );
+    this._modelObservabilityQuery?.invalidate?.();
+    const settings = this.getModelObservabilitySettings();
+    const queryHealth = this.getModelObservabilityQueryService().getHealth();
+    return {
+      ...settings,
+      queryHealth: queryHealth.ok === true ? queryHealth.value : null,
+      queryError: queryHealth.ok === true ? null : queryHealth.error,
+    };
+  }
+
+  /**
+   * Phase 8 §四十九：Query Health read model（query side + recording side，
+   * 绝不包含正文）。recording disabled 时仍可读历史（§五 desired/effective
+   * 解耦：queryStatus 独立于 recordingStatus）。
+   */
+  getModelObservabilityHealth() {
+    const recording = this._modelObservability?.getHealth?.() ?? null;
+    const query = this.getModelObservabilityQueryService().getHealth();
+    const queryHealth = query.ok === true ? query.value : null;
+    return {
+      recordingStatus: recording ? recording.status : "disabled",
+      storeDisabledReasonCode: recording?.storeDisabledReasonCode ?? null,
+      persistTraceMetadata: recording ? recording.persistTraceMetadata : false,
+      persistPayloads: recording ? recording.persistPayloads : false,
+      persistBlobs: recording ? recording.persistBlobs : false,
+      queuedTraceEvents: recording?.queuedTraceEvents ?? 0,
+      queuedPayloadRecords: recording?.queuedPayloadRecords ?? 0,
+      queuedBlobs: recording?.queuedBlobs ?? 0,
+      queuedUsageEntries: recording?.queuedUsageEntries ?? 0,
+      droppedTraceEvents: recording?.droppedTraceEvents ?? queryHealth?.dataCompleteness.droppedTraceEvents ?? 0,
+      droppedPayloadRecords: recording?.droppedPayloadRecords ?? queryHealth?.dataCompleteness.droppedPayloadRecords ?? 0,
+      droppedBlobs: recording?.droppedBlobs ?? queryHealth?.dataCompleteness.droppedBlobs ?? 0,
+      droppedUsageEntries: recording?.droppedUsageEntries ?? 0,
+      writeFailures: recording?.writeFailures ?? 0,
+      maintenanceErrors: recording?.maintenanceErrors ?? 0,
+      lastSuccessfulFlushAt: recording?.lastSuccessfulFlushAt ?? null,
+      interruptedByRestartCalls: queryHealth?.dataCompleteness.interruptedByRestartCalls ?? 0,
+      atRestEncryption: false,
+      query: queryHealth ?? {
+        queryStatus: "unavailable",
+        queryStatusReason: query.ok === true ? null : query.error.code,
+        schemaVersion: null,
+        accountingProjectionAvailable: false,
+        oldestCallAt: null,
+        newestCallAt: null,
+        callCount: 0,
+        traceCount: 0,
+        payloadRecordCount: 0,
+        usageProjectionCount: 0,
+        dataCompleteness: {
+          droppedTraceEvents: 0,
+          droppedPayloadRecords: 0,
+          droppedBlobs: 0,
+          interruptedByRestartCalls: 0,
+        },
+      },
+    };
   }
 
   /**
@@ -2744,6 +2915,12 @@ export class LingxiEngine {
             } catch {
               // observability 关闭失败不阻塞退出
             }
+          }
+          // Phase 8：read-only query facade 一并释放（§九十一生命周期）。
+          try {
+            this._modelObservabilityQuery?.close?.();
+          } catch {
+            // query facade 关闭失败不阻塞退出
           }
         } finally {
           this._sessionManifestStore?.close?.();

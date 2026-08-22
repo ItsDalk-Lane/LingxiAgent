@@ -115,6 +115,8 @@ export function classifyHttpRoute({ method = "GET", path = "" } = {}) {
   if (isDeskFileReadRoute(verb, routePath)) return scoped("files.read");
   if (isDeskFileWriteRoute(verb, routePath)) return scoped("files.write");
   if (routePath === "/api/usage/llm") return verb === "GET" ? STUDIO_OWNER : LOCAL_ONLY;
+  // ── Model Observatory（Phase 8；显式登记，不吃 /api/* STUDIO_OWNER fallback）──
+  if (isModelObservatoryRoute(verb, routePath)) return modelObservabilityRoutePolicy(verb, routePath);
   if (routePath === "/api/session-projects" || routePath.startsWith("/api/session-projects/")) {
     return scoped("chat");
   }
@@ -267,6 +269,53 @@ function isAvatarRoutePath(routePath) {
   return routePath === "/api/avatar/agent"
     || routePath === "/api/avatar/user"
     || /^\/api\/agents\/[^/]+\/avatar$/.test(routePath);
+}
+
+/**
+ * Model Observatory surface（Phase 8 Security Matrix，§六十七～七十）：
+ *   - metadata 查询（health/settings GET/query/detail/payload metadata）=
+ *     STUDIO_OWNER，与既有 Usage Ledger 权限一致；
+ *   - Prompt/Response 正文（payloads/:id）、开启永久记录（settings PUT）、
+ *     export（可能含正文）= LOCAL_ONLY——远程 principal 默认不可。
+ * route 前缀必须显式匹配；未列出的 verb 一律 LOCAL_ONLY（fail closed）。
+ */
+const MODEL_OBSERVABILITY_STUDIO_OWNER_GET = new Set([
+  "/api/model-observability/health",
+  "/api/model-observability/settings",
+]);
+
+function isModelObservatoryRoute(verb, routePath) {
+  return routePath === "/api/model-observability/health"
+    || routePath === "/api/model-observability/settings"
+    || routePath === "/api/model-observability/query/calls"
+    || routePath === "/api/model-observability/query/traces"
+    || routePath === "/api/model-observability/query/aggregate"
+    || routePath === "/api/model-observability/export"
+    || /^\/api\/model-observability\/calls\/[^/]+$/.test(routePath)
+    || /^\/api\/model-observability\/calls\/[^/]+\/payloads$/.test(routePath)
+    || /^\/api\/model-observability\/traces\/[^/]+$/.test(routePath)
+    || /^\/api\/model-observability\/payloads\/[^/]+$/.test(routePath);
+}
+
+function modelObservabilityRoutePolicy(verb, routePath) {
+  // 正文 / 变更 / 导出 = LOCAL_ONLY（更严的默认）。
+  if (verb === "PUT" && routePath === "/api/model-observability/settings") return LOCAL_ONLY;
+  if (verb === "POST" && routePath === "/api/model-observability/export") return LOCAL_ONLY;
+  if (verb === "GET" && /^\/api\/model-observability\/payloads\/[^/]+$/.test(routePath)) return LOCAL_ONLY;
+  // metadata 查询 = STUDIO_OWNER。
+  if (verb === "GET" && MODEL_OBSERVABILITY_STUDIO_OWNER_GET.has(routePath)) return STUDIO_OWNER;
+  if (verb === "POST" && (
+    routePath === "/api/model-observability/query/calls"
+    || routePath === "/api/model-observability/query/traces"
+    || routePath === "/api/model-observability/query/aggregate"
+  )) return STUDIO_OWNER;
+  if (verb === "GET" && (
+    /^\/api\/model-observability\/calls\/[^/]+$/.test(routePath)
+    || /^\/api\/model-observability\/calls\/[^/]+\/payloads$/.test(routePath)
+    || /^\/api\/model-observability\/traces\/[^/]+$/.test(routePath)
+  )) return STUDIO_OWNER;
+  // 前缀内但 verb 不匹配（如 DELETE settings）→ fail closed。
+  return LOCAL_ONLY;
 }
 
 function isAvatarReadRoute(verb, routePath) {

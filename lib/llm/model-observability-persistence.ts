@@ -50,6 +50,12 @@ import {
 import { createModelObservabilityTraceStore } from "./model-observability-trace-store.ts";
 import { createModelObservabilityPayloadStore } from "./model-observability-payload-store.ts";
 import {
+  backfillModelCallUsageFromLedgerEntries,
+  createModelObservabilityAccountingProjection,
+  MODEL_OBSERVABILITY_USAGE_BACKFILL_META_KEY,
+  type UsageLedgerEntryLike,
+} from "./model-observability-accounting-projection.ts";
+import {
   createModelObservabilityBlobStore,
   mintModelObservabilityBlobId,
 } from "./model-observability-blob-store.ts";
@@ -135,10 +141,14 @@ export type ModelObservabilityHealth = {
   queuedTraceEvents: number;
   queuedPayloadRecords: number;
   queuedBlobs: number;
+  /** Phase 8：待投影的 llm_usage entries（accounting projection 队列）。 */
+  queuedUsageEntries: number;
   pendingBlobBytes: number;
   droppedTraceEvents: number;
   droppedPayloadRecords: number;
   droppedBlobs: number;
+  /** Phase 8：accounting projection 队列溢出/写入失败计数。 */
+  droppedUsageEntries: number;
   writeFailures: number;
   maintenanceErrors: number;
   lastFlushAt: string | null;
@@ -157,6 +167,15 @@ export type ModelObservabilityPersistenceHandle = {
   /** 立即 flush 队列（测试/显式触发；模型热路径永远不调用它等待）。 */
   flushSync(): void;
   runMaintenance(): ModelObservabilityMaintenanceStats | null;
+  /**
+   * Phase 8（§十四）：接入 Usage Ledger → llm_usage 事件流。幂等（重复调用
+   * 先退订旧 consumer）。包含 bounded ledger best-effort backfill（§十五，
+   * 只做一次，meta key 标记）。返回 backfill 报告（disabled 时 null）。
+   */
+  initializeAccounting(options: {
+    listLedgerEntries: () => unknown[];
+    subscribeUsage: (consumer: (entry: unknown) => void) => () => void;
+  }): { backfilled: number; skipped: number; backfillSource: "bounded_usage_ledger" } | null;
   /** flush（bounded）+ 停 timer + close DB + uninstall（恢复先前注册对象）。幂等。 */
   close(): Promise<void>;
   /** 只恢复先前 observer/sink/externalizer，不关 DB（close 会一并做）。 */
@@ -189,10 +208,12 @@ function createDisabledHandle(
         queuedTraceEvents: 0,
         queuedPayloadRecords: 0,
         queuedBlobs: 0,
+        queuedUsageEntries: 0,
         pendingBlobBytes: 0,
         droppedTraceEvents: 0,
         droppedPayloadRecords: 0,
         droppedBlobs: 0,
+        droppedUsageEntries: 0,
         writeFailures: 0,
         maintenanceErrors: 0,
         lastFlushAt: null,
@@ -204,6 +225,7 @@ function createDisabledHandle(
     },
     flushSync() { /* disabled：快路径 no-op */ },
     runMaintenance() { return null; },
+    initializeAccounting() { return null; },
     async close() { /* disabled：无资源 */ },
     uninstall() { /* 无安装 */ },
   };
@@ -266,6 +288,8 @@ export function installModelObservabilityPersistence({
   /** blob store 总是创建（maintenance 需要）；externalizer 只在 persistBlobs 时安装。 */
   const blobStore = createModelObservabilityBlobStore({ lingxiHome, db, now });
   if (normalized.persistBlobs) blobStore.ensurePrivateRoot();
+  /** Phase 8：accounting projection writer（幂等 upsert，flush 事务内提交）。 */
+  const accountingProjection = createModelObservabilityAccountingProjection({ db });
 
   // Startup Reconciliation（§四十六）：崩溃遗留 call 只标记 interrupted，不伪造终态。
   let interruptedCalls = 0;
@@ -277,8 +301,13 @@ export function installModelObservabilityPersistence({
   const traceQueue: ModelCallEvent[] = [];
   const payloadQueue: ModelCallPayloadRecord[] = [];
   const blobQueue: StagedBlob[] = [];
+  /** Phase 8：待投影的 llm_usage entries（§十四 live ingestion 队列）。 */
+  const usageQueue: UsageLedgerEntryLike[] = [];
+  const MAX_QUEUED_USAGE_ENTRIES = Math.min(normalized.limits.maxQueuedPayloadRecords, 2048);
   /** queue overflow drop 的 payload callId（flush 时落 payload_availability='dropped'）。 */
   const droppedPayloadCallIds: string[] = [];
+  /** §三十八：persistPayloads=false 时 call end 的 not_captured 标记队列。 */
+  const notCapturedCallIds: string[] = [];
   const MAX_DROPPED_CALL_IDS = 512;
   const health: ModelObservabilityHealth = {
     status: "active",
@@ -289,10 +318,12 @@ export function installModelObservabilityPersistence({
     queuedTraceEvents: 0,
     queuedPayloadRecords: 0,
     queuedBlobs: 0,
+    queuedUsageEntries: 0,
     pendingBlobBytes: 0,
     droppedTraceEvents: 0,
     droppedPayloadRecords: 0,
     droppedBlobs: 0,
+    droppedUsageEntries: 0,
     writeFailures: 0,
     maintenanceErrors: 0,
     lastFlushAt: null,
@@ -329,6 +360,7 @@ export function installModelObservabilityPersistence({
       health.droppedTraceEvents += readCounter("droppedTraceEvents");
       health.droppedPayloadRecords += readCounter("droppedPayloadRecords");
       health.droppedBlobs += readCounter("droppedBlobs");
+      health.droppedUsageEntries += readCounter("droppedUsageEntries");
       health.writeFailures += readCounter("writeFailures");
     } catch { /* 计数恢复 best-effort */ }
   }
@@ -338,6 +370,7 @@ export function installModelObservabilityPersistence({
     upsertMeta.run("droppedTraceEvents", JSON.stringify(health.droppedTraceEvents));
     upsertMeta.run("droppedPayloadRecords", JSON.stringify(health.droppedPayloadRecords));
     upsertMeta.run("droppedBlobs", JSON.stringify(health.droppedBlobs));
+    upsertMeta.run("droppedUsageEntries", JSON.stringify(health.droppedUsageEntries));
     upsertMeta.run("writeFailures", JSON.stringify(health.writeFailures));
     upsertMeta.run("schemaVersion", JSON.stringify(MODEL_OBSERVABILITY_SCHEMA_VERSION));
     upsertMeta.run("lastSuccessfulFlushAt", JSON.stringify(health.lastSuccessfulFlushAt));
@@ -348,6 +381,7 @@ export function installModelObservabilityPersistence({
     health.queuedTraceEvents = traceQueue.length;
     health.queuedPayloadRecords = payloadQueue.length;
     health.queuedBlobs = blobQueue.length;
+    health.queuedUsageEntries = usageQueue.length;
     health.pendingBlobBytes = blobQueue.reduce((sum, item) => sum + item.bytes.byteLength, 0);
   }
 
@@ -362,6 +396,16 @@ export function installModelObservabilityPersistence({
         return;
       }
       traceQueue.push(event);
+      // §三十八（v2 运行时证据）：persistTraceMetadata=true 且 persistPayloads=false
+      // 时，call 结束即可明确标 not_captured（仅当前 NULL，不覆盖既有事实）。
+      if (
+        event.eventType === "logical_call_end"
+        && normalized.persistTraceMetadata
+        && !normalized.persistPayloads
+        && typeof event.callId === "string" && event.callId
+      ) {
+        notCapturedCallIds.push(event.callId);
+      }
       refreshQueueHealth();
       scheduleFlush();
     } catch { /* enqueue 失败绝不影响模型调用 */ }
@@ -385,6 +429,24 @@ export function installModelObservabilityPersistence({
     if (droppedPayloadCallIds.length < MAX_DROPPED_CALL_IDS && typeof record?.callId === "string") {
       droppedPayloadCallIds.push(record.callId);
     }
+  }
+
+  /**
+   * Phase 8（§十四）：llm_usage consumer——Usage Ledger append 事件的 live
+   * accounting ingestion。无 metadata.modelCallId 的 entry 由 projection
+   * 静默跳过（§十三不猜）；queue 溢出显式计数。
+   */
+  function handleUsageEntry(entry: unknown): void {
+    if (closed) return;
+    try {
+      if (usageQueue.length >= MAX_QUEUED_USAGE_ENTRIES) {
+        health.droppedUsageEntries += 1;
+        return;
+      }
+      usageQueue.push(entry as UsageLedgerEntryLike);
+      refreshQueueHealth();
+      scheduleFlush();
+    } catch { /* accounting ingestion 失败绝不影响模型调用 */ }
   }
 
   /** privileged externalizer（§六十一）：只在 persistBlobs 时创建；size/queue cap 内复制字节。 */
@@ -433,16 +495,20 @@ export function installModelObservabilityPersistence({
   type FlushBatch = {
     traceEvents: ModelCallEvent[];
     payloadRecords: ModelCallPayloadRecord[];
+    usageEntries: UsageLedgerEntryLike[];
     blobs: Array<StagedBlob & { byteLength?: number }>;
     droppedCalls: string[];
+    notCapturedCalls: string[];
   };
 
   function takeBatch(): FlushBatch {
     return {
       traceEvents: traceQueue.splice(0, traceQueue.length),
       payloadRecords: payloadQueue.splice(0, payloadQueue.length),
+      usageEntries: usageQueue.splice(0, usageQueue.length),
       blobs: blobQueue.splice(0, blobQueue.length),
       droppedCalls: droppedPayloadCallIds.splice(0, droppedPayloadCallIds.length),
+      notCapturedCalls: notCapturedCallIds.splice(0, notCapturedCallIds.length),
     };
   }
 
@@ -469,6 +535,17 @@ export function installModelObservabilityPersistence({
       for (const event of batch.traceEvents) {
         traceStore.applyEvent(event);
       }
+      // Phase 8：accounting projection（幂等 upsert；无 modelCallId 静默跳过）。
+      for (const entry of batch.usageEntries) {
+        try {
+          accountingProjection.upsertLedgerEntry(entry, { now });
+        } catch {
+          health.droppedUsageEntries += 1;
+        }
+      }
+      if (batch.notCapturedCalls.length > 0) {
+        traceStore.markPayloadAvailability(batch.notCapturedCalls, "not_captured");
+      }
       for (const record of batch.payloadRecords) {
         const inserted = payloadStore.insertRecord(record, {
           failedBlobIds,
@@ -488,7 +565,8 @@ export function installModelObservabilityPersistence({
   function flushOnce(): void {
     if (closed || flushing) return;
     if (traceQueue.length === 0 && payloadQueue.length === 0 && blobQueue.length === 0
-      && droppedPayloadCallIds.length === 0) {
+      && usageQueue.length === 0
+      && droppedPayloadCallIds.length === 0 && notCapturedCallIds.length === 0) {
       return;
     }
     flushing = true;
@@ -505,6 +583,7 @@ export function installModelObservabilityPersistence({
         } catch (secondError) {
           health.droppedTraceEvents += batch.traceEvents.length;
           health.droppedPayloadRecords += batch.payloadRecords.length;
+          health.droppedUsageEntries += batch.usageEntries.length;
           health.droppedBlobs += batch.blobs.length;
           health.writeFailures += 1;
         }
@@ -603,6 +682,49 @@ export function installModelObservabilityPersistence({
     if (externalizer) setModelCallBlobExternalizer(priorExternalizer);
   }
 
+  /* ── Phase 8：Usage Ledger → projection wiring（§十四/十五）────────── */
+
+  let usageUnsubscribe: (() => void) | null = null;
+
+  function initializeAccounting(options: {
+    listLedgerEntries: () => unknown[];
+    subscribeUsage: (consumer: (entry: unknown) => void) => () => void;
+  }): { backfilled: number; skipped: number; backfillSource: "bounded_usage_ledger" } | null {
+    if (closed) return null;
+    // 幂等：重复调用先退订旧 consumer（engine reconfigure 后重新 wire）。
+    if (usageUnsubscribe) {
+      try { usageUnsubscribe(); } catch { /* best-effort */ }
+      usageUnsubscribe = null;
+    }
+    let report: { backfilled: number; skipped: number; backfillSource: "bounded_usage_ledger" } | null = null;
+    try {
+      // §十五：bounded ledger best-effort backfill——只做一次（meta key 标记），
+      // 不是完整历史 backfill；报告标注 backfill source。
+      const alreadyBackfilled = db
+        .prepare(`SELECT 1 FROM observability_meta WHERE key = ?`)
+        .get(MODEL_OBSERVABILITY_USAGE_BACKFILL_META_KEY);
+      if (!alreadyBackfilled) {
+        const entries = options.listLedgerEntries();
+        const result = db.transaction(() =>
+          backfillModelCallUsageFromLedgerEntries(accountingProjection, entries, db, { now }),
+        )();
+        report = { backfilled: result.projected, skipped: result.skipped, backfillSource: "bounded_usage_ledger" };
+      }
+    } catch {
+      // backfill 失败：live ingestion 照常；下次启动可重试（meta 未写）。
+    }
+    try {
+      usageUnsubscribe = options.subscribeUsage((entry) => {
+        if (entry && typeof entry === "object" && (entry as Record<string, unknown>).type === "llm_usage") {
+          handleUsageEntry((entry as Record<string, unknown>).entry);
+        }
+      });
+    } catch {
+      usageUnsubscribe = null;
+    }
+    return report ?? { backfilled: 0, skipped: 0, backfillSource: "bounded_usage_ledger" };
+  }
+
   const handle: ModelObservabilityPersistenceHandle = {
     policy: normalized,
     observer: observerImpl,
@@ -617,6 +739,7 @@ export function installModelObservabilityPersistence({
     runMaintenance() {
       return runMaintenanceInternal();
     },
+    initializeAccounting,
     async close() {
       if (closed) return;
       try {
@@ -627,6 +750,10 @@ export function installModelObservabilityPersistence({
       } finally {
         closed = true;
         uninstallRegistries();
+        if (usageUnsubscribe) {
+          try { usageUnsubscribe(); } catch { /* best-effort */ }
+          usageUnsubscribe = null;
+        }
         try { db.close(); } catch { /* close 失败不阻塞退出 */ }
         health.status = "closed";
       }

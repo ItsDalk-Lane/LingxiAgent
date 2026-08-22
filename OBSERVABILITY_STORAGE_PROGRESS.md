@@ -17,8 +17,10 @@ scanner / fingerprint compatible repin / targeted + full test）→ 24-25（文�
 
 ## DB schema version
 
-`MODEL_OBSERVABILITY_SCHEMA_VERSION = 1`（`PRAGMA user_version` 自管；v1→v2 必须显式
-migration；未知高版本/迁移失败/损坏 → disabled handle + reasonCode，主程序不受影响）。
+`MODEL_OBSERVABILITY_SCHEMA_VERSION = 2`（Phase 8 起；v1→v2 显式单事务 migration
+只新增 model_call_usage + conversation index；`PRAGMA user_version` 自管；未知高
+版本/迁移失败/损坏 → disabled handle + reasonCode，主程序不受影响；read side
+supportedReadVersions=[1,2]，v1 历史库不迁移可读——见 OBSERVABILITY_QUERY_PROGRESS.md）。
 
 ## Store paths
 
@@ -120,7 +122,7 @@ cli-runtime-closure 重算；data-epoch 80 用例绿（affectedByEpochMigration=
    长期双写未做应用级仲裁（当前拓扑唯一写者是 server 进程）。
 5. flush 为同步 SQLite batch（≤ queue caps + busy_timeout 5s/语句），未引入
   worker_threads（§三十八：测量证明不可接受才引入）。
-6. Query/API/Export/UI 全部未实现（Phase 8；本轮 §一百一十七～一百二十四禁做）。
+6. Query/API/Export 已由 Phase 8 交付（OBSERVABILITY_QUERY_PROGRESS.md）；最终 UI 留 Phase 9。
 
 ## Seal
 

@@ -754,3 +754,245 @@ durable（§九十七）；opaque/unavailable 不升级（§九十八/九十九�
 
 Phase 8：Unified Query Service + Filters + Group By + Drill Down + Trace Explorer
 Backend + Payload Retrieval + Export Contract——建立在已稳定的 durable facts 上。
+
+---
+
+# Phase 8 — Unified Query & Control Plane（2026-08-22 第七轮）
+
+> 审计：MODEL_OBSERVABILITY_QUERY_AUDIT.md（十二问 + Security/Dimension 矩阵）；
+> 断点：OBSERVABILITY_QUERY_PROGRESS.md。本轮不实现最终 Usage UI（Phase 9）。
+
+## Phase 8 Query Contract
+
+统一模型 = Filters + Group By + Drill Down（§三）：同一 Filter Contract 驱动
+Logical Call 列表（不分组）、Trace 列表、统计 Group By、Drill-down
+（Group → Calls → Trace → Call → Attempt → Payload）、Export。**不是**四套
+割裂的 overall/daily/category/model API。Query 唯一入口
+`createModelObservabilityQueryService({ lingxiHome })`（lib/llm/model-observability-query.ts）；
+route 只调它、export 复用同一 normalized query、UI 未来只调 API。
+Query 层 read-only（§一百二十七）：不 DELETE/UPDATE/INSERT、不 flush writer、
+不读 blob 文件、不调用模型 runtime（缺数据就是缺，不重建）。
+
+## Filter Contract
+
+- 时间：since inclusive / until exclusive（`started_at >= since AND < until`，
+  全接口统一）；ISO-8601 严格校验。
+- 身份等值：traceId / parentCallId / callId。
+- 多值（字段内 OR ≤32 值，字段间 AND）：provider / modelId / api / subsystem /
+  operation / surface / trigger / callPurpose / terminalStatus / attributionKind /
+  sessionId / sessionPath / conversationId / conversationType / agentId /
+  childAgentId / childSessionId / taskId / inputShape / provenancePrecision /
+  payloadAvailability。
+- **category ≡ subsystem**（§十九 alias；与旧 Usage UI `entry.source.subsystem`
+  一致——不是 callPurpose）；callPurpose / operation 是独立维度。
+- terminalStatus 支持 `incomplete` 伪值（terminal_status IS NULL——logical
+  incomplete 是合法事实）；payloadAvailability 的 `present`/`unknown` 由 payload
+  row 存在性派生（§三十七真相枚举：present/expired/dropped/not_captured/unknown，
+  NULL 不折叠）；interruptedByRestart / hasPayload 布尔。
+- normalize（normalizeModelObservabilityQuery / …TraceQuery / …AggregateQuery）：
+  unknown field / invalid enum / oversized array / invalid date / invalid limit /
+  invalid cursor → 显式 error code（route 层 400），绝不静默忽略。
+- SQL 纪律（§二十一）：字段→列闭集映射（MULTI_FIELD_COLUMNS），维度/排序闭集，
+  所有值绑定参数；注入测试（groupBy DROP TABLE / sort 注入 / value 含 SQL
+  payload）锁定 DB 结构不受影响。
+
+## Pagination Contract
+
+- Call：`ORDER BY (started_at IS NULL) ASC, started_at DESC, call_id DESC`
+  （NULL started_at 稳定最后，§一百）；keyset 条件分两态：cursor 在非空域
+  （`started_at IS NULL OR (非空域比较)`——NULL 行整体在非空行之后，不受
+  call_id 上界约束）vs 已在 NULL 域（`IS NULL AND call_id < ?`）。
+- Trace：`ORDER BY last_seen_at DESC, trace_id DESC`，独立 cursor（不复用
+  call cursor，§二十九）。
+- Cursor：opaque base64url JSON `{v:1, kind, fp, s, c|t}`；fp = normalized
+  filter（+origin）+sort 的 canonical JSON sha256 前 16 hex——filter 改变 →
+  invalid_cursor；长度 ≤512；损坏/伪造 version/换 filter 复用全 fail-safe
+  （400 语义，不 SQL error / OOM）。
+- limit default 50 / max 200；`limit=all` 禁止（export 有独立机制）。
+- 测试：100 calls×17 连续翻页无重复无遗漏、末页 cursor=null；40 同时间戳
+  callId tie-break；NULL started_at 排最后且分页终止。
+
+## Group By Contract
+
+维度（≤3 级）：date / provider / model（provider+modelId 复合）/ category
+（≡subsystem）/ operation / callPurpose / status / attributionKind / session /
+conversation / agent / task / inputShape / provenancePrecision。
+date bucket 显式 `{bucket:"day", utcOffsetMinutes}`（§四十三：同一 query 在
+不同时区 server 结果一致；SQL `strftime('%Y-%m-%d', started_at,
+printf('%+d minutes', ?))`；NULL started_at → date=null 组）。
+指标（§四十一全集）：callCount/traceCount(DISTINCT trace_id)/ok/error/aborted/
+incomplete/attemptCount(相关子查询按 idx_model_attempts_call)/
+durationObservedCount/durationTotalMs/durationAverageMs（julianday 毫秒算术）/
+usageCoveredCalls/usageMissingCalls（§二十四：与 terminalStatus 正交）/
+inputTokens/outputTokens/reasoningTokens/cacheRead/cacheWrite/totalTokens/
+costTotal/cacheHitCount/cacheObservedCount。全部 SQLite 聚合（LEFT JOIN
+model_call_usage），UI 只接 aggregate result；无 usage 的 call 仍计入 callCount
+（§一百零四 coverage 测试）。percentile 本轮不做（§四十二）。
+
+## Accounting Projection（schema v2）
+
+- 关系单向：Provider → **Usage Ledger（accounting truth source）** →
+  model_call_usage（read-optimized durable projection）。Ledger 保留全部职责
+  （5000 retention / 原子重写 / list 行为不变）。
+- 表（§十一）：model_call_id PK / usage_request_id / started_at / ended_at /
+  duration_ms / usage_status / input_total+uncached / output_total+reasoning /
+  cache_read+write+miss / cache_hit / cache_created / cache_hit_ratio /
+  total_tokens / cost_total / raw_usage_shape / created_at+updated_at。
+  **不存 error.message / error.name**（Observable Metadata Safe Contract）。
+- 关联（§十三）：只有 `entry.metadata.modelCallId` 存在才投影；不通过时间/
+  modelId/session/顺序猜。幂等 upsert（同 modelCallId 重复 → 一行，latest wins）。
+- Live ingestion（§十四）：engine 在 usageLedger 创建后
+  `handle.initializeAccounting({listLedgerEntries, subscribeUsage})`——复用
+  ledger append → `llm_usage` 事件（engine.subscribe），不改任何模型调用点；
+  bounded usage queue（2048，溢出显式计数）随 coordinator flush 事务提交。
+- Backfill（§十五）：首次 v2 启用对当前 bounded ledger（≤5000 条）best-effort
+  幂等 backfill，meta key `usageLedgerBackfillCompletedAt` 只做一次；报告
+  backfillSource=`bounded_usage_ledger`，**不声称完整历史**。
+- Retention（§十六）：deleteTraces 随 trace 删 usage 行 + maintenance 清
+  orphan usage（model_call_id 不在 model_calls）。
+
+## Usage Correlation Matrix（Phase 8 实测）
+
+| MC Path | Observer | Durable Call | Usage Ledger | modelCallId Correlation | Durable Usage Projection |
+| --- | --- | --- | --- | --- | --- |
+| MC-01 Pi Chat | ✅ | ✅ | ✅ | FULL（message_end WeakMap 补账：session-coordinator + bridge-session-manager） | ✅（有 correlation 即投影） |
+| MC-02 AgentRun compaction | ✅ | ✅ | ✅ | FULL（runner ledger.start metadata） | ✅ |
+| MC-03 native compaction | ✅ | ✅ | ✅ | **NONE（ledger entry 不带 modelCallId——Phase 4 遗留 gap，如实标注）** | ❌（不猜，not_correlated） |
+| MC-04 callText | ✅ | ✅ | ✅ | FULL（llm-client start metadata） | ✅ |
+| MC-05 probe | ✅ | ✅ | ✅ | FULL（provider-client spread） | ✅ |
+| MC-06 image HTTP | ✅ | ✅ | ✅ | FULL（image-task-runner ledger.start） | ✅ |
+| MC-07 CLI | ✅ | ✅ | ✅ | FULL（同 MC-06 位点） | ✅ |
+| MC-08 video HTTP | ✅ | ✅ | ✅ | FULL（universal-media-manager） | ✅ |
+| MC-09 speech | ✅ | ✅ | ✅ | FULL（speech-recognition-service） | ✅ |
+| MC-10 direct summary | ✅ | ✅ | ✅ | FULL（observed-pi-direct-summary） | ✅ |
+
+9/10 FULL；usageAvailability 枚举 present / not_correlated /
+projection_unavailable（v1）；无 unknown/ledger_expired（不声称无法证明的事）。
+
+## Trace Explorer Backend
+
+- listTraces（§二十八）：filter 语义 = 「trace 内至少存在一条符合 filter 的
+  call」（JOIN model_calls + GROUP BY trace），origin 是 trace 自身维度；
+  keyset 分页。
+- getTraceDetail（§三十/三十一）：roots（parent=NULL；parent 指向 trace 外/
+  不存在 → orphanParent=true 显式标记，不偷偷变 root）/ edges（parent 存在）/
+  orphanEdges（missingParentCallId）/ cycle 检测 = parent 指针 functional
+  graph 三色迭代染色（O(n)、不递归、**无根纯环也能检出**）→ graphIntegrity=
+  degraded（不 crash；针对损坏/旧版本/partial write/手工修改）；usage
+  aggregate + payload completeness summary + drop/health context。
+- getCallDetail（§三十二/三十三）：trace summary + parent/child refs + attempts
+  + usage + payload record metadata（§三十四：metadata 与 body 分离，正文不
+  inline）。**attempt ≠ provider request**（§三十三）：MC-06 codex 401 =
+  1 call + 2 attempts + 2 provider_request（ordinal 1/2）+ 2 provider_response
+  + 1 semantic_request + 1 semantic_response（测试锁定不折叠成 2 个 logical call）。
+
+## Payload Retrieval
+
+- getPayloadRecord(id)（§三十五）：只允许 exact identity retrieval；无 FTS/
+  contains search（§一百二十二持续禁止）。返回 sanitized payload +
+  semanticInputProvenance + providerRequestProvenance + sanitization +
+  visibility/fidelity。
+- Fail safe（§三十六）：JSON.parse 失败 → contentState=corrupt（不 500、不返回
+  raw malformed string）；OPAQUE/UNAVAILABLE → contentAvailable=false +
+  contentState=opaque_or_unavailable（payload=null，不冒充空对象——即使磁盘
+  被手工塞值也不返回）。
+- Query service 不读 blob 文件（§八十五）；blob raw route 不做（Phase 9）。
+
+## Persistence Settings / Control Plane
+
+- preference namespace `model_observability`（§五十二）：{enabled,
+  persistTraceMetadata, persistPayloads, persistBlobs, retention:{traceDays,
+  payloadDays, blobDays}}——days（用户语义），转 policy 才 ×DAY_MS。
+- canonical normalizer 单一来源（§五十三）：lib/llm/model-observability-
+  preferences.ts；PreferencesManager / engine startup / coordinator 共用。
+  PreferencesManager 落盘**原始意图**（raw merge，未表达字段不落盘），语义
+  归一在读取侧——disabled 派生 false 不固化，关掉再打开不丢开启默认。
+- 安全默认（§六十一）：enabled=false；开启后 trace=true、payload=false、
+  blob=false（额外显式 opt-in；persistBlobs ⊆ persistPayloads）。
+- Startup（§五十四/五十六）：engine install 移到 PreferencesManager 创建之后
+  （audit 决策：单一 parser，无第四套 fs.readFileSync 解析）；优先级 =
+  CompositionRoot 显式 option（enabled=true）> 用户 preference；重启自动生效。
+- Runtime（§五十七～六十）：engine.setModelObservabilitySettings = normalize →
+  persist desired → close 旧 handle（5s bounded）→ install 新 → invalidate
+  query reader → 返回 desired+effective+queryHealth；disable 只停新记录，
+  **绝不删 observability.sqlite/blobs**；reconfigure 不泄漏旧 sink/observer
+  （close uninstall 恢复先前注册对象）；query facade mtime/size 失效重开。
+- desired ≠ effective（§五十九）：schema_newer 等 → effective.status=disabled
+  + reasonCode，不返回假 success。Settings API 返回
+  cryptographicallyEncryptedAtRest=false（§六十二：filesystem permissions ≠ 加密）。
+- §三十八：persistTraceMetadata=true && persistPayloads=false 时 call end 写
+  payload_availability='not_captured'（仅 NULL 时；v1 历史 NULL 不回填）。
+- §一百一十六：开启 payload persistence 后**绝不**从 session history/memory/
+  persona 重建过去 Prompt——历史没有 capture 就是没有（测试锁定）。
+
+## Security Boundary（Phase 8 Security Matrix）
+
+| Endpoint | Data Sensitivity | Required Principal/Scope |
+| --- | --- | --- |
+| GET /api/model-observability/health | 统计（无正文） | STUDIO_OWNER（显式登记） |
+| GET /api/model-observability/settings | 配置（无正文） | STUDIO_OWNER |
+| PUT /api/model-observability/settings | 开启永久 recording | **LOCAL_ONLY** |
+| POST /api/model-observability/query/calls | call metadata | STUDIO_OWNER |
+| POST /api/model-observability/query/traces | trace metadata | STUDIO_OWNER |
+| POST /api/model-observability/query/aggregate | 聚合 | STUDIO_OWNER |
+| GET /api/model-observability/calls/:callId | call metadata + attempts | STUDIO_OWNER |
+| GET /api/model-observability/traces/:traceId | trace graph metadata | STUDIO_OWNER |
+| GET /api/model-observability/calls/:callId/payloads | payload metadata（无正文） | STUDIO_OWNER |
+| GET /api/model-observability/payloads/:recordId | **Prompt/Response 正文** | **LOCAL_ONLY** |
+| POST /api/model-observability/export | 可能含正文 | **LOCAL_ONLY** |
+
+依据（§六十七～七十）：metadata 与既有 /api/usage/llm（STUDIO_OWNER）同级；
+正文/开启记录/导出是更高敏感面，远程 principal（含远程 owner）默认不可；
+未认证全拒；前缀内未登记 verb fail closed（DELETE → LOCAL_ONLY deny）。
+复杂 query 用 POST JSON body（多值 filter + groupBy + cursor + dateBucket；
+read-only operation，§六十五）。absent store → 404 not_initialized（§九十三
+No-Store UX，非 500 ENOENT）；query 不隐式创建 store（§九十二，测试锁定）。
+
+## Export Contract
+
+- 独立版本 `MODEL_OBSERVABILITY_EXPORT_SCHEMA_VERSION=1`（与 SQLite
+  user_version 各自演化，§七十四）。
+- 默认 metadata-only（includePayloads=false / includeBlobs 无此选项）；
+  includePayloads=true 只导 **Sanitized Payload Store** 内容；**没有 includeRaw**
+  （系统不存在 raw payload store，§七十六）；blob 只导 descriptor/metadata +
+  blobIds，绝不 base64 bytes（§七十七）。
+- 复用统一 Filter Contract（§七十八：NormalizedModelObservabilityQuery）。
+- JSONL streaming（§七十九/一百一十九）：manifest 首行（exportSchemaVersion/
+  exportedAt/includePayloads/storageSchemaVersion/totalCalls/backfillSource/
+  dataCompleteness）+ 每 logical call 一行 bundle {call, trace summary,
+  attempts, usage, payloads}；async generator 按 keyset 页迭代（200/页）。
+- Bounded（§八十一）：maxCalls 默认 50k、上限 100k；预 count 超限 → 413
+  limit_error（不 OOM、不静默截断）。毒丸纪律（§一百一十八）：只读 sanitized
+  store；OPAQUE/UNAVAILABLE 原样保留。
+
+## Query Performance
+
+- EXPLAIN QUERY PLAN 验证（§四十七，测试锁定）：date（idx_model_calls_started）/
+  trace（idx_model_calls_trace）/ provider+model（idx_model_calls_model）/
+  subsystem+operation（idx_model_calls_subsystem）/ session（idx_model_calls_session）/
+  agent（idx_model_calls_agent）/ task（idx_model_calls_task）/ status
+  （idx_model_calls_terminal）/ conversation（idx_model_calls_conversation，v2 新增）
+  全部走 index。
+- 不为所有可能 filter 建 index（§四十八）：api/surface/trigger/conversation_type/
+  session_path/call_purpose/input_shape/provenance_precision 等走顺序扫
+  （retention 有界行集，audit Q3 决策）。
+- 防 N+1（§四十六）：call page 50 = 1×calls + 1×attempts(IN) + 1×payload
+  summary(IN) + 1×usage(IN)。
+- 10k calls 宽松性能 guard（§一百二十一：page+filter+aggregate < 10s，不做
+  严格 wall-clock）。
+
+## Known Query Gaps
+
+1. percentile（p50/p95/p99）未做（§四十二）。
+2. trace 自身时间窗 filter（first_seen/last_seen 区间）未做（本轮 call 级 join 语义已覆盖产品需求）。
+3. blob raw retrieval / blob HTTP route 未做（Phase 9 配 UI/access control 设计）。
+4. usageAvailability 无 unknown 档（三态：present/not_correlated/
+   projection_unavailable——代码事实能证明的极限）。
+5. 部分维度 filter 无 index（顺序扫，见 Query Performance）。
+6. prompt/response/reasoning/blob FTS 持续禁止（§一百二十二/一百二十三）。
+
+## Next Phase
+
+Phase 9：Usage Observatory UI——Usage 页面重构（Unified Filter Bar + Group By +
+Metrics Dashboard + Call Ledger + Trace Explorer + Prompt/Response Inspector +
+Export UI），全部消费 Phase 8 API；不改 Query Contract。
