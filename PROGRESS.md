@@ -7,7 +7,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = 9f4942058667c0301f15475bdb4b9a9e5776a6eb  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-08-22 第十~十一轮：Phase 10.1 修复树（dba9a6b1/4f95e17d）+ Phase 11 合并收口（81cdb2d8 scratchpad 清场）；坐标一律为 commit 对象——第八轮 tree sha 之误见 Phase 10 F-4)
+VERIFIED_SOURCE_SHA   = 8c94044bd921765c30df705ff95d4f8994bea4d0  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-08-22 第十~十一轮：Phase 10.1 修复树（dba9a6b1/4f95e17d）+ Phase 11 合并收口（81cdb2d8 scratchpad 清场）；坐标一律为 commit 对象——第八轮 tree sha 之误见 Phase 10 F-4)
 工作分支              = feature/upstream-sync-0.447.4
 ```
 
@@ -283,8 +283,9 @@ seal 不是一次性终点，而是"当前被验证树"的游标；每次审计�
 
 
 - **2026-08-22 模型调用可观测性第十~十一轮（Phase 10.1 修复 + Phase 11 合并收口）**
-  （功能树 9f494205/seal 本提交；中间链 81cdb2d8 清场 → da1a66c1 首次推进 →
-  b9933da8 allowlist 拼写修复 → 9f494205 Windows 测试修复）：Phase 10.1 从 codex worktree 抢救并入
+  （功能树 8c94044b/seal 本提交；中间链 81cdb2d8 清场 → da1a66c1 首次推进 →
+  b9933da8 allowlist 拼写修复 → 9f494205 Windows 测试修复① → dc1fd8bb 二次
+  推进 → 8c94044b Windows 测试修复②（vertical 读连接泄漏））：Phase 10.1 从 codex worktree 抢救并入
   （dba9a6b1+merge 4f95e17d）：AR-01～AR-20（P1×18 + P2×2）全 FIXED——IANA
   timezone/DST 步进扫描、同字段 OR 跨字段 AND、NULL/unknown/corrupt/not_correlated
   语义、聚合三态、Trace 全链统计、partial payload dropped、Blob 两阶段写+retry
@@ -299,8 +300,9 @@ seal 不是一次性终点，而是"当前被验证树"的游标；每次审计�
   build:client / pack 冒烟（ad-hoc 签名验证）。远端：81cdb2d8 轮 4/5 job 绿、mac test 仅 seal guard 红（分类 E）、
   win fail-fast 取消；b9933da8 轮 macOS 全绿（guard 转绿）+ Windows 首次
   完整执行暴露 2 处测试层跨平台缺陷（10k 播种超时 / vertical rmSync EPERM，
-  均非生产逻辑，此前各轮被 fail-fast 掩盖）；9f494205 修复后重走
-  Function→Validation→CI→Seal。首次推进（da1a66c1）因 seal allowlist 三处
+  均非生产逻辑，此前各轮被 fail-fast 掩盖）；9f494205 修复①（超时预算+rmSync 重试）后 dc1fd8bb 二次推进，Windows 证明
+  重试无效 → 真根因是 vertical 测试 query service 只读连接泄漏（macOS 允许
+  删打开文件故本地不可见），8c94044b 显式关闭后第三次重走。首次推进（da1a66c1）因 seal allowlist 三处
   OBSERVATORY/OBSERVABILITY 拼写错位失效（含一处 cda8dbe5 起的死条目），
   b9933da8 逐字符修复。最终 seal commit 轮（PR HEAD）目标全绿。Release Acceptance V3 见
   MODEL_OBSERVATORY_RELEASE_ACCEPTANCE_V3.md；V2 保留历史。

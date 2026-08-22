@@ -12,8 +12,8 @@
 | MERGE_BASE_SHA | `bf3c80b5681c99fc7ff05b9c168898e9ca317587` | 验收期间 `origin/main`（未漂移；merge-base == origin/main，feature 严格领先） |
 | PHASE11_START_SHA | `4f95e17df29b466e80c22957e30aa8e0566debfd` | Phase 11 审计起点（Phase 10.1 WIP 抢救合并树） |
 | Phase 10.1 生产内容提交 | `dba9a6b1` + `dba9a6b1` 的合并 `4f95e17d` | AR-01～AR-20 修复 + schema v3 + truth integrity 测试 |
-| FUNCTION_COMMIT_SHA | `9f4942058667c0301f15475bdb4b9a5776a6eb` | 最终被验证源码树：Phase 10.1 全部生产内容 + Phase 11 scratchpad 清场（81cdb2d8）+ Windows 测试层缺陷修复（9f494205，仅测试文件：10k 用例显式超时预算、vertical 清理 rmSync 重试） |
-| VERIFIED_SOURCE_SHA（本 commit 推进后） | `9f4942058667c0301f15475bdb4b9a5776a6eb` | 指向 FUNCTION_COMMIT_SHA（commit 对象）；首次推进 da1a66c1 因 allowlist 拼写错位作废重走（见 B 表注） |
+| FUNCTION_COMMIT_SHA | `8c94044bd921765c30df705ff95d4f8994bea4d0` | 最终被验证源码树：Phase 10.1 全部生产内容 + Phase 11 scratchpad 清场（81cdb2d8）+ Windows 测试层缺陷修复（9f494205：10k 显式超时预算、vertical rmSync 重试；8c94044b：vertical query-service 读连接泄漏关闭——第三/五两轮完整 Windows 运行实证的唯一泄漏文件） |
+| VERIFIED_SOURCE_SHA（本 commit 推进后） | `8c94044bd921765c30df705ff95d4f8994bea4d0` | 指向 FUNCTION_COMMIT_SHA（commit 对象）；首次推进 da1a66c1 因 allowlist 拼写错位作废重走（见 B 表注） |
 | SEAL_COMMIT_SHA（本 commit） | 见 PROGRESS.md「Seal 推进记录」 | audit-only：V3 + allowlist 扩展 + 坐标同步 + truth audit §1.3 登记 |
 
 要求核对：PR HEAD = seal commit；`VERIFIED_SOURCE_SHA` 指向 FUNCTION_COMMIT_SHA（不是 audit commit）；
@@ -26,6 +26,7 @@
 | `4f95e17d`（Phase 10.1 生产树, run 32570435501） | PASS | PASS | PASS | FAIL — 唯一失败 `post-verification-audit-seal` diff guard（seal 尚指 3f20b58e，分类 E 预期红；其余 12134/12142 tests PASS、7 skipped） | CANCELLED（fail-fast，随 macos guard 红被取消；非测试失败） |
 | `81cdb2d8`（FUNCTION_COMMIT_SHA, run 32575517105） | PASS | PASS | PASS | FAIL — 仅 seal guard 预期红（同上；生产树与 4f95e17d 仅差两个 .md 删除；12134/12142 passed、7 skipped） | CANCELLED（同上 fail-fast） |
 | `da1a66c1`+`b9933da8`（第一轮 seal 尝试, run 32576183957） | PASS | PASS | PASS | **PASS**（guard 转绿；12142 全过） | FAIL — **Windows 首次完整执行**（此前各轮均被 fail-fast 取消），暴露 2 处测试层缺陷：10k 播种超默认超时、vertical rmSync EPERM；均为测试基础设施，非生产逻辑 |
+| `dc1fd8bb`（第二轮 seal 尝试, run 32579372828） | PASS | PASS | PASS | **PASS** | FAIL — 10k 修复生效；vertical EPERM 仍在：rmSync 重试无效证明非时序而是**句柄泄漏**（query service 读连接未关闭），8c94044b 根因修复 |
 | `9f494205`（FUNCTION_COMMIT_SHA） | PASS | PASS | PASS | FAIL — 仅 seal guard 预期红（seal 已按规程重走） | CANCELLED（fail-fast） |
 | 最终 seal commit（PR HEAD） | PASS | PASS | PASS | **PASS** | **PASS**（含两处 Windows 修复后的 observability 全套） |
 
