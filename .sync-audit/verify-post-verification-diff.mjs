@@ -24,6 +24,15 @@ const VERIFIED_SOURCE_SHA_FILE = path.join(ROOT, ".sync-audit", "verified-source
 // 审计文件 allowlist：新增/改名审计脚本时须同步维护。
 const AUDIT_ALLOWLIST = [
   "PROGRESS.md",
+  // Phase 6 payload capture 跨会话进度活文档（对应 PROGRESS.md 角色）。
+  "PAYLOAD_CAPTURE_PROGRESS.md",
+  // Phase 7 durable storage 跨会话进度活文档（对应 PROGRESS.md 角色）。
+  "OBSERVABILITY_STORAGE_PROGRESS.md",
+  // Phase 8 unified query 跨会话进度/审计活文档（对应 PROGRESS.md 角色）。
+  "OBSERVABILITY_QUERY_PROGRESS.md",
+  "MODEL_OBSERVABILITY_QUERY_AUDIT.md",
+  "OBSERVABILITY_UI_PROGRESS.md",
+  "MODEL_OBSERVABILITY_UI_AUDIT.md",
   "UPSTREAM_SYNC_AUDIT.md",
   "UPSTREAM_SYNC_MATRIX.md",
   ".sync-audit/upstream-sync-matrix.json",

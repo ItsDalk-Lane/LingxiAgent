@@ -8,7 +8,7 @@ export const UNKNOWN_USAGE_CONTEXT = Object.freeze({
   attribution: Object.freeze({ kind: "unknown" }),
 });
 
-export function normalizeUsageContext(input) {
+export function normalizeUsageContext(input: any) {
   if (!input || typeof input !== "object" || Array.isArray(input)) {
     return UNKNOWN_USAGE_CONTEXT;
   }
@@ -32,31 +32,31 @@ export function normalizeUsageContext(input) {
   };
 }
 
-export function isUnknownUsageContext(ctx) {
+export function isUnknownUsageContext(ctx: any) {
   return !ctx
     || ctx.source?.subsystem === "unknown"
     || ctx.source?.operation === "unknown"
     || ctx.attribution?.kind === "unknown";
 }
 
-export function attributionSessionPath(attribution) {
+export function attributionSessionPath(attribution: any): string | null {
   if (!attribution || typeof attribution !== "object") return null;
   return typeof attribution.sessionPath === "string" && attribution.sessionPath
     ? attribution.sessionPath
     : null;
 }
 
-export function attributionSessionId(attribution) {
+export function attributionSessionId(attribution: any): string | null {
   if (!attribution || typeof attribution !== "object") return null;
   return typeof attribution.sessionId === "string" && attribution.sessionId.trim()
     ? attribution.sessionId.trim()
     : null;
 }
 
-function isRecord(value) {
-  return value && typeof value === "object" && !Array.isArray(value);
+function isRecord(value: unknown): value is Record<string, any> {
+  return value !== null && typeof value === "object" && !Array.isArray(value);
 }
 
-function stringOr(value, fallback) {
+function stringOr(value: unknown, fallback: string): string {
   return typeof value === "string" && value.trim() ? value.trim() : fallback;
 }

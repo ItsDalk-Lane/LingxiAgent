@@ -1,11 +1,11 @@
 import { debugLog } from "../debug-log.ts";
 
-function numberOrNull(value) {
+function numberOrNull(value: unknown): number | null {
   const n = Number(value);
   return Number.isFinite(n) ? n : null;
 }
 
-function firstNumber(...values) {
+function firstNumber(...values: unknown[]): number {
   for (const value of values) {
     const n = numberOrNull(value);
     if (n !== null) return n;
@@ -13,7 +13,7 @@ function firstNumber(...values) {
   return 0;
 }
 
-function maybeNumber(...values) {
+function maybeNumber(...values: unknown[]): number | null {
   for (const value of values) {
     const n = numberOrNull(value);
     if (n !== null) return n;
@@ -21,7 +21,7 @@ function maybeNumber(...values) {
   return null;
 }
 
-function cacheCreationTokens(usage) {
+function cacheCreationTokens(usage: any): number {
   const direct = maybeNumber(usage?.cacheWrite, usage?.cacheWriteTokens, usage?.cache_creation_input_tokens);
   if (direct !== null) return direct;
 
@@ -31,11 +31,11 @@ function cacheCreationTokens(usage) {
     + firstNumber(creation.ephemeral_1h_input_tokens);
 }
 
-function costTotalFromUsage(usage) {
+function costTotalFromUsage(usage: any): number | null {
   return maybeNumber(usage?.costTotal, usage?.cost?.total);
 }
 
-function costTotalFromRates(normalized, costRates) {
+function costTotalFromRates(normalized: any, costRates: any): number | null {
   if (!costRates || typeof costRates !== "object") return null;
   const inputTokens = normalized.input.uncachedTokens ?? normalized.input.totalTokens ?? 0;
   const outputTokens = normalized.output.totalTokens ?? 0;
@@ -49,13 +49,13 @@ function costTotalFromRates(normalized, costRates) {
   return Number.isFinite(total) ? total : null;
 }
 
-function cacheSupport(options) {
+function cacheSupport(options: any): "reported" | "not_reported" | "not_supported" {
   const support = options?.cacheSupport;
   if (support === "not_reported" || support === "not_supported") return support;
   return "reported";
 }
 
-function reasoningTokens(usage) {
+function reasoningTokens(usage: any): number | null {
   return maybeNumber(
     usage?.reasoningTokens,
     usage?.reasoning_tokens,
@@ -72,7 +72,7 @@ function reasoningTokens(usage) {
  * input to the cache has to know which of the two shapes it is holding, so the
  * test lives here once instead of being restated at each use.
  */
-function inputIncludesCachedTokens(usage) {
+function inputIncludesCachedTokens(usage: any): boolean {
   // OpenAI Chat Completions.
   if (numberOrNull(usage?.prompt_tokens) !== null) return true;
   if (numberOrNull(usage?.completion_tokens) !== null) return true;
@@ -85,14 +85,25 @@ function inputIncludesCachedTokens(usage) {
 }
 
 /** Whole prompt as the provider counted it, cached portions included. */
-function promptTokens(inputTokens, cacheReadTokens, cacheWriteTokens, inputCoversCache) {
+function promptTokens(
+  inputTokens: number | null,
+  cacheReadTokens: number | null,
+  cacheWriteTokens: number | null,
+  inputCoversCache: boolean,
+): number | null {
   if (inputTokens === null) return null;
   if (inputCoversCache) return inputTokens;
   if (cacheReadTokens === null || cacheWriteTokens === null) return null;
   return inputTokens + cacheReadTokens + cacheWriteTokens;
 }
 
-function uncachedTokens(inputTokens, cacheReadTokens, cacheMissTokens, support, inputCoversCache) {
+function uncachedTokens(
+  inputTokens: number | null,
+  cacheReadTokens: number | null,
+  cacheMissTokens: number | null,
+  support: "reported" | "not_reported" | "not_supported",
+  inputCoversCache: boolean,
+): number | null {
   if (support !== "reported") return null;
   if (cacheMissTokens !== null) return cacheMissTokens;
   if (inputTokens === null) return null;
@@ -103,7 +114,13 @@ function uncachedTokens(inputTokens, cacheReadTokens, cacheMissTokens, support, 
   return Math.max(0, inputTokens - cacheReadTokens);
 }
 
-function hitRatio(inputTokens, cacheReadTokens, cacheWriteTokens, support, inputCoversCache) {
+function hitRatio(
+  inputTokens: number | null,
+  cacheReadTokens: number | null,
+  cacheWriteTokens: number | null,
+  support: "reported" | "not_reported" | "not_supported",
+  inputCoversCache: boolean,
+): number | null {
   if (support !== "reported") return null;
   if (cacheReadTokens === null) return null;
   const prompt = promptTokens(inputTokens, cacheReadTokens, cacheWriteTokens, inputCoversCache);
@@ -119,7 +136,7 @@ function hitRatio(inputTokens, cacheReadTokens, cacheWriteTokens, support, input
  * - Anthropic: { input_tokens, output_tokens, cache_read_input_tokens, cache_creation_input_tokens }
  * - OpenAI-compatible: { prompt_tokens, completion_tokens, total_tokens, prompt_tokens_details.cached_tokens }
  */
-export function normalizeLlmUsage(usage, options: Record<string, any> = {}) {
+export function normalizeLlmUsage(usage: any, options: Record<string, any> = {}) {
   if (!usage || typeof usage !== "object") return null;
 
   const inputTokens = firstNumber(usage.input, usage.inputTokens, usage.input_tokens, usage.prompt_tokens);
@@ -140,7 +157,7 @@ export function normalizeLlmUsage(usage, options: Record<string, any> = {}) {
   const inputCoversCache = inputIncludesCachedTokens(usage);
   const fallbackTotal = inputCoversCache
     ? inputTokens + outputTokens
-    : inputTokens + outputTokens + cacheReadTokens + cacheWriteTokens;
+    : inputTokens + outputTokens + (cacheReadTokens ?? 0) + (cacheWriteTokens ?? 0);
   const totalTokens = firstNumber(
     usage.totalTokens,
     usage.total_tokens,
@@ -159,8 +176,8 @@ export function normalizeLlmUsage(usage, options: Record<string, any> = {}) {
       readTokens: cacheReadTokens,
       writeTokens: cacheWriteTokens,
       missTokens: support === "reported" ? cacheMissTokens : null,
-      hit: support === "reported" ? cacheReadTokens > 0 : null,
-      created: support === "reported" ? cacheWriteTokens > 0 : null,
+      hit: support === "reported" ? (cacheReadTokens ?? 0) > 0 : null,
+      created: support === "reported" ? (cacheWriteTokens ?? 0) > 0 : null,
       hitRatio: hitRatio(inputTokens, cacheReadTokens, cacheWriteTokens, support, inputCoversCache),
       support,
     },
@@ -175,7 +192,7 @@ export function normalizeLlmUsage(usage, options: Record<string, any> = {}) {
   };
 }
 
-export function flattenNormalizedUsage(normalized) {
+export function flattenNormalizedUsage(normalized: any) {
   if (!normalized) return null;
   const flat: Record<string, any> = {
     inputTokens: normalized.input?.totalTokens ?? 0,

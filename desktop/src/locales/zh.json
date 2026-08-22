@@ -1085,7 +1085,7 @@
       "agent": "助手",
       "me": "我",
       "providers": "供应商",
-      "usage": "用量统计",
+      "usage": "模型观测",
       "media": "多媒体",
       "models": "模型",
       "memory": "记忆",
@@ -1702,58 +1702,6 @@
         "usage": "用量统计"
       },
       "configMissingFields": "该供应商配置不完整，需补全：{fields}。"
-    },
-    "usage": {
-      "title": "用量统计",
-      "note": "用量仅作参考，具体以供应商的统计为准。",
-      "refresh": "刷新用量",
-      "total": "全部",
-      "requests": "请求数",
-      "totalTokens": "Tokens",
-      "cacheRead": "缓存命中",
-      "cacheHitRate": "命中率",
-      "uncached": "未缓存消耗",
-      "modelMix": "模型分布",
-      "dailyUsage": "每日用量",
-      "requestLedger": "请求明细",
-      "loading": "正在读取用量…",
-      "empty": "暂无用量记录",
-      "groupMeta": "{requests} 次 · {errors} 错误",
-      "cacheShort": "缓存 {tokens}",
-      "tokensShort": "{tokens} tok",
-      "cacheSummary": "缓存 {cache} · 未缓存 {uncached}",
-      "window": {
-        "week": "近 7 天",
-        "month": "近 30 天"
-      },
-      "period": {
-        "week": "周",
-        "month": "月"
-      },
-      "view": {
-        "overall": "总览",
-        "daily": "按日期",
-        "category": "按类别",
-        "model": "按模型"
-      },
-      "category": {
-        "session": "Session",
-        "phone": "Phone",
-        "memory": "记忆",
-        "automation": "自动化",
-        "subagent": "Subagent",
-        "compaction": "压缩",
-        "plugin": "插件",
-        "utility": "工具",
-        "vision": "视觉",
-        "unknown": "未知"
-      },
-      "status": {
-        "ok": "完成",
-        "error": "错误",
-        "aborted": "中止",
-        "usage_missing": "无用量"
-      }
     },
     "media": {
       "imageGeneration": "图片生成",
@@ -2553,6 +2501,611 @@
       "dropOrClick": "拖入角色卡或点击打开",
       "readFailed": "角色卡读取失败",
       "importFailed": "角色卡导入失败"
+    },
+    "observability": {
+      "actions": {
+        "refresh": "刷新",
+        "cancel": "取消",
+        "save": "保存",
+        "close": "关闭"
+      },
+      "datePreset": {
+        "24h": "近 24 小时",
+        "7d": "近 7 天",
+        "30d": "近 30 天",
+        "custom": "自定义",
+        "all": "全部"
+      },
+      "customRange": {
+        "since": "开始时间",
+        "untilExclusive": "结束时间（不含）"
+      },
+      "filter": {
+        "date": "日期",
+        "provider": "供应商",
+        "model": "模型",
+        "category": "类别",
+        "status": "状态",
+        "operation": "操作",
+        "callPurpose": "调用用途",
+        "attributionKind": "归因",
+        "inputShape": "输入形状",
+        "provenancePrecision": "溯源精度",
+        "payloadAvailability": "Payload 可用性",
+        "hasPayload": "有 Payload",
+        "interruptedByRestart": "重启中断",
+        "groupBy": "分组",
+        "more": "更多筛选",
+        "sessionId": "会话 ID",
+        "conversationId": "对话 ID",
+        "agentId": "Agent ID",
+        "taskId": "任务 ID"
+      },
+      "advanced": {
+        "facetsTitle": "维度值",
+        "exactIdsTitle": "精确 ID",
+        "shapesTitle": "形状与可用性",
+        "apply": "应用",
+        "sessionIdPlaceholder": "输入会话 ID 后回车",
+        "conversationIdPlaceholder": "输入对话 ID 后回车",
+        "agentIdPlaceholder": "输入 Agent ID 后回车",
+        "taskIdPlaceholder": "输入任务 ID 后回车"
+      },
+      "groupBy": {
+        "hint": "最多 {max} 维"
+      },
+      "tri": {
+        "any": "不限",
+        "yes": "是",
+        "no": "否"
+      },
+      "facets": {
+        "loading": "加载选项…",
+        "empty": "当前过滤下无可选值"
+      },
+      "chips": {
+        "ariaLabel": "当前筛选条件",
+        "clearAll": "清空全部",
+        "remove": "移除筛选：{label}"
+      },
+      "metrics": {
+        "calls": "调用次数",
+        "tracesHint": "{count} 条轨迹",
+        "totalTokens": "总 Token",
+        "inputTokens": "输入 Token",
+        "outputTokens": "输出 Token",
+        "cacheRead": "缓存读取",
+        "cacheHitRate": "命中率 {rate}",
+        "errors": "错误",
+        "incompleteHint": "另有 {count} 条不完整",
+        "avgDuration": "平均耗时",
+        "durationObserved": "基于 {count} 条观测",
+        "cost": "成本",
+        "usageCoverage": "用量覆盖：{covered} 条已关联 / {missing} 条缺失",
+        "usageCoverageComplete": "用量覆盖完整：{covered} 条已关联，{notCorrelated} 条明确不关联",
+        "usageCoveragePartial": "用量仅部分覆盖：共 {total} 条，{covered} 条已关联，{unknown} 条未知",
+        "usageCoverageCorrupt": "用量数据损坏：{corrupt} 条记录无法可信汇总",
+        "usageCoverageProjectionUnavailable": "用量投影不可用，以下数字不能当作零",
+        "usageCoverageUnknown": "用量覆盖状态未知：共 {total} 条，{unknown} 条无法确认"
+      },
+      "groups": {
+        "loading": "加载分组统计…",
+        "empty": "当前过滤下无分组数据",
+        "dateChartAria": "按日期的调用量柱状图",
+        "dateSummary": "共 {total} 次调用，峰值 {peakDate}（{peakCount} 次）",
+        "filterByValue": "按此值筛选：{value}",
+        "unknownValue": "（未知）"
+      },
+      "ledger": {
+        "title": "调用台账",
+        "loadMore": "加载更多",
+        "attemptsTooltip": "含 {providerRequests} 次供应商请求",
+        "interruptedAria": "该调用曾被重启中断",
+        "interruptedTooltip": "应用重启导致该调用的记录不完整",
+        "usageMissingAria": "该调用缺少用量数据",
+        "completenessNote": "数据完整性：丢弃轨迹事件 {droppedEvents} 条 / 丢弃 payload {droppedPayloads} 条 / 丢弃文件 {droppedBlobs} 个 / 重启中断 {interrupted} 次",
+        "completenessUnknown": "数据完整性计数不可读，当前丢失量未知",
+        "filterBySession": "按会话筛选：{id}",
+        "filterByTask": "按任务筛选：{id}",
+        "col": {
+          "time": "时间",
+          "model": "模型",
+          "operation": "操作",
+          "category": "类别",
+          "status": "状态",
+          "tokens": "Token",
+          "cache": "缓存",
+          "cost": "成本",
+          "duration": "耗时",
+          "attempts": "尝试",
+          "payload": "Payload",
+          "context": "上下文"
+        },
+        "usageMissing": {
+          "present": "用量已关联",
+          "not_correlated": "该调用未能关联到用量记录",
+          "projection_unavailable": "用量投影不可用",
+          "unknown": "用量关联状态未知"
+        }
+      },
+      "empty": {
+        "noResults": "当前过滤条件下没有调用记录",
+        "noTraces": "当前过滤条件下没有轨迹",
+        "storeAbsent": "观测存储尚未初始化——开启记录后，新的模型调用会出现在这里"
+      },
+      "error": {
+        "invalid_query": "查询条件无效",
+        "invalid_cursor": "分页游标已失效",
+        "invalid_json": "请求格式无效",
+        "not_initialized": "观测存储尚未初始化",
+        "not_found": "记录不存在或已被保留策略清理",
+        "export_limit": "导出超出上限",
+        "query_failed": "查询失败",
+        "local_only_route": "该内容仅限本机访问",
+        "studio_owner_required": "需要本机所有者权限",
+        "forbidden": "没有访问该内容的权限",
+        "invalid_blob_id": "Blob 标识无效",
+        "blob_missing": "Blob 文件已缺失（可能被保留策略清理）",
+        "network": "网络请求失败，请检查本地服务后重试",
+        "invalidCursorHint": "筛选条件已变化，请从头重新加载列表"
+      },
+      "loading": {
+        "ledger": "加载调用记录…",
+        "detail": "加载调用详情…",
+        "payload": "加载 payload 正文…",
+        "blob": "加载 blob…",
+        "traces": "加载轨迹…",
+        "traceDetail": "加载轨迹详情…"
+      },
+      "payloadAvailabilityHint": {
+        "present": "该调用有已捕获的 payload 记录",
+        "expired": "payload 已按保留策略清理，只剩元数据",
+        "dropped": "payload 在捕获时被丢弃（存储压力保护）",
+        "not_captured": "该调用未捕获 payload（记录设置或捕获时机所致）",
+        "unknown": "payload 可用性未知"
+      },
+      "visibilityHint": {
+        "full": "该层级内容在运行时完整可见并被捕获（副本可能已脱敏/截断）",
+        "partial": "内容部分可见（如流式只保留聚合）",
+        "metadata_only": "只有结构与状态元数据，无正文",
+        "opaque": "边界存在，但内容在外部进程内，Lingxi 无法观察",
+        "unavailable": "边界事件结构已知，但本轮不可观察（无 hook 或协议不触发）"
+      },
+      "fidelityHint": {
+        "runtime_exact": "捕获副本与运行时内容逐字节一致（脱敏除外）",
+        "parsed_equivalent": "经解析重建，语义等价",
+        "stream_aggregate": "由流式片段聚合而成",
+        "normalized": "已经过归一化变换",
+        "metadata_only": "仅元数据，无正文",
+        "external_process": "内容在外部进程，未捕获",
+        "opaque": "不可观测"
+      },
+      "sanitizationHint": {
+        "none": "捕获副本未做脱敏处理",
+        "redacted": "捕获副本已经凭证脱敏",
+        "truncated": "捕获副本因长度限制被截断",
+        "degraded": "捕获过程降级，内容可能不完整",
+        "redacted_truncated": "已脱敏且已截断",
+        "redacted_degraded": "已脱敏且捕获降级",
+        "truncated_degraded": "已截断且捕获降级",
+        "redacted_truncated_degraded": "已脱敏、截断且捕获降级"
+      },
+      "payload": {
+        "loadBody": "加载正文",
+        "loadMetadataOnly": "该层级只有元数据可展示",
+        "localOnly": "正文仅限本机查看",
+        "recordChars": "记录字符数",
+        "contentStateLabel": "内容状态",
+        "contentState": {
+          "present": "正文可用",
+          "null_payload": "该记录无正文",
+          "opaque_or_unavailable": "正文不透明或不可用",
+          "corrupt": "记录数据损坏，无法解析"
+        },
+        "contentStateOpaque": {
+          "full": "内容在运行时可见但未被捕获为正文",
+          "partial": "只有部分内容可观测",
+          "metadata_only": "该层级设计上只有元数据",
+          "opaque": "内容在外部进程内，无法展示",
+          "unavailable": "本轮不可观测"
+        },
+        "availabilityEmpty": {
+          "present": "记录存在但正文不可用",
+          "expired": "payload 已按保留策略清理",
+          "dropped": "payload 在捕获时被丢弃",
+          "not_captured": "该调用未捕获 payload",
+          "unknown": "无 payload 记录"
+        }
+      },
+      "provenance": {
+        "title": "语义输入溯源",
+        "listAria": "输入分区列表",
+        "selectSection": "选择左侧分区查看详情",
+        "absent": "该调用没有语义溯源记录",
+        "corrupt": "语义溯源记录已损坏，不能当作没有记录",
+        "structural": "结构级定位（值类型：{kind}），无文本 span",
+        "emptySpan": "该分区是空文本段",
+        "field": {
+          "category": "类别",
+          "role": "角色",
+          "precision": "精度",
+          "source": "来源",
+          "locator": "定位"
+        },
+        "unavailable": {
+          "root_missing": "定位失败：根容器不存在",
+          "path_missing": "定位失败：路径不存在",
+          "span_out_of_range": "定位失败：span 越界",
+          "not_text": "定位目标不是文本"
+        }
+      },
+      "providerMapping": {
+        "title": "供应商请求映射",
+        "protocol": "协议：{protocol}",
+        "jump": "跳转到对应输入分区",
+        "noLocator": "该映射没有字段级定位信息",
+        "absent": "该调用没有供应商请求映射记录",
+        "corrupt": "供应商请求映射记录已损坏，不能当作没有记录",
+        "empty": "映射列表为空",
+        "loadSemanticFirst": "先加载语义请求正文，再查看映射跳转"
+      },
+      "inspector": {
+        "title": "调用详情",
+        "ariaLabel": "模型调用详情抽屉",
+        "closeAria": "关闭详情",
+        "overview": "概览",
+        "attempts": "尝试记录",
+        "pipeline": "Payload 管线",
+        "traceSection": "所属轨迹",
+        "openTrace": "在轨迹视图中打开",
+        "parentCall": "父调用：{id}",
+        "childCalls": "子调用（{count}）",
+        "model": "模型",
+        "start": "开始时间",
+        "field": {
+          "attempts": "尝试次数",
+          "attribution": "归因",
+          "callPurpose": "调用用途",
+          "inputShape": "输入形状",
+          "interruptedByRestart": "重启中断",
+          "payloadRecords": "Payload 记录",
+          "persistence": "持久化完整性",
+          "provenancePrecision": "溯源精度",
+          "surfaceTrigger": "入口 / 触发",
+          "usage": "用量"
+        }
+      },
+      "attempts": {
+        "col": {
+          "attemptId": "尝试",
+          "started": "开始",
+          "responded": "响应",
+          "httpStatus": "HTTP",
+          "error": "错误"
+        },
+        "empty": "没有尝试记录",
+        "notEqualNote": "注意：{attempts} 次尝试 ≠ {providerRequests} 次供应商请求（重试/回放会改变计数）"
+      },
+      "pipeline": {
+        "attemptLabel": "尝试 {id}"
+      },
+      "trace": {
+        "title": "调用轨迹",
+        "stats": {
+          "calls": "{count} 次调用",
+          "payload": "payload：{present} 存在 / {expired} 过期 / {dropped} 丢弃"
+        },
+        "usageAvailability": {
+          "complete": "用量覆盖完整（{covered}/{total}）",
+          "partial": "用量部分覆盖（{covered}/{total}，{unknown} 条未知）",
+          "corrupt": "用量数据损坏（{corrupt}/{total}）",
+          "projection_unavailable": "用量投影不可用",
+          "unknown": "用量覆盖未知（{unknown}/{total}）"
+        },
+        "missingParent": "父调用缺失",
+        "cycle": "检测到环，已截断展开",
+        "degradedWarning": "该轨迹存在数据缺失，以下树形可能不完整"
+      },
+      "recording": {
+        "title": "记录设置",
+        "openSettings": "记录设置",
+        "dialogAria": "模型观测记录设置",
+        "enabled": "启用观测记录",
+        "enabledHintOn": "记录模型调用的轨迹元数据",
+        "enabledHintOff": "开启后开始记录模型调用元数据",
+        "effectiveStatus": "实际状态",
+        "queryStatus": "查询服务",
+        "configuredButInactive": "已配置但未生效",
+        "reason": "原因代码：{code}",
+        "disabledBrowsing": "记录未启用，仅可浏览已有数据",
+        "persistTraceMetadata": "持久化轨迹元数据",
+        "persistPayloads": "持久化 payload 正文",
+        "persistPayloadsHint": "保存请求/响应正文的脱敏副本，用于事后审计",
+        "persistBlobs": "持久化媒体 blob",
+        "persistBlobsHint": "保存图片/音频/视频等二进制内容",
+        "persistBlobsRequiresPayloads": "需先开启 payload 正文持久化",
+        "retentionTitle": "保留天数",
+        "retentionInvalid": "保留天数须为 {min}–{max} 的整数",
+        "atRestEncryption": "静态加密",
+        "atRestEncryptionNo": "无（依赖本机文件权限保护）",
+        "localOnlyHint": "观测数据仅保存在本机，不会上传",
+        "lastFlush": "最近写入",
+        "confirmPayloadsTitle": "开启 payload 正文持久化？",
+        "confirmPayloadsBody": "开启后，以下内容将以脱敏副本形式保存到本机磁盘：",
+        "confirmPayloadsItemPrompt": "请求提示词与系统指令",
+        "confirmPayloadsItemReasoning": "模型推理过程文本",
+        "confirmPayloadsItemResponse": "模型响应正文",
+        "confirmPayloadsItemToolResult": "工具调用参数与结果",
+        "confirmPayloadsItemTranscription": "语音转写文本",
+        "confirmPayloadsEncryptionFact": "内容会经过凭证脱敏，但磁盘存储没有密码学加密；依赖本机文件权限保护。",
+        "confirmPayloadsConfirm": "开启正文持久化",
+        "confirmBlobsTitle": "开启媒体 blob 持久化？",
+        "confirmBlobsBody": "开启后，模型调用涉及的图片/音频/视频将以文件形式保存到本机磁盘。内容会经过凭证脱敏，但磁盘存储没有密码学加密；依赖本机文件权限保护。",
+        "confirmBlobsConfirm": "开启 blob 持久化",
+        "retentionTrace": "轨迹",
+        "retentionPayload": "Payload 正文",
+        "retentionBlob": "媒体 Blob"
+      },
+      "export": {
+        "title": "导出观测数据",
+        "open": "导出",
+        "dialogAria": "导出模型观测数据",
+        "currentFilter": "将应用当前筛选条件",
+        "filterDefault": "（无筛选：导出全部记录）",
+        "includePayloads": "包含 payload 正文",
+        "includePayloadsHint": "正文为脱敏副本；不包含 blob 二进制",
+        "maxCalls": "最大调用数",
+        "maxCallsPlaceholder": "默认 10000",
+        "maxCallsInvalid": "最大调用数须为 1–{max} 的整数",
+        "noCapability": "当前环境不支持流式保存文件",
+        "localOnlyHint": "导出仅在本机进行，数据不经过任何外部服务",
+        "start": "开始导出",
+        "progress": "已写入 {bytes} 字节…",
+        "saved": "导出完成，共 {bytes} 字节",
+        "savedTo": "已保存到：{path}",
+        "aborted": "导出已取消",
+        "abortedPartialLeft": "导出已取消，但已写入的部分内容保留在目标文件中",
+        "limitError": "匹配 {matched} 条，超过上限 {max}——请缩小时间范围或增加筛选条件"
+      },
+      "blob": {
+        "preview": "预览",
+        "previewAnyway": "仍然加载",
+        "largeWarning": "该 blob 较大（{size} 字节），加载可能较慢",
+        "opaqueNote": "类型 {type}（{size} 字节）不支持内嵌预览",
+        "download": "下载",
+        "missing": "Blob 文件已缺失（可能被保留策略清理）",
+        "invalid": "Blob 标识无效",
+        "localOnly": "Blob 内容仅限本机访问",
+        "close": "关闭预览"
+      },
+      "copy": {
+        "callIdAria": "复制调用 ID",
+        "traceIdAria": "复制轨迹 ID",
+        "capturedPayloadAria": "复制捕获的 payload"
+      },
+      "onboarding": {
+        "title": "模型观测",
+        "body": "记录每一次模型调用的轨迹、用量与成本，在本机随时审计。开启后仅保存元数据；payload 正文与媒体 blob 默认不保存，可在记录设置中另行开启。所有数据只存本机，磁盘存储没有密码学加密，依赖本机文件权限保护。",
+        "enable": "开启观测记录"
+      },
+      "jsonViewer": {
+        "wrap": "自动换行",
+        "copy": "复制",
+        "copied": "已复制",
+        "copyAria": "复制 JSON 内容",
+        "showAll": "展开全部（{chars} 字符）",
+        "collapse": "收起",
+        "stringifyFailed": "JSON 序列化失败：{error}"
+      },
+      "semanticResponse": {
+        "completeness": "完整性",
+        "finishReason": "结束原因",
+        "toolCalls": "工具调用（{count}）",
+        "structuredOutput": "结构化输出",
+        "media": "媒体",
+        "mediaDeferred": "媒体内容以 blob 形式存储",
+        "showRawJson": "查看原始 JSON",
+        "hideRawJson": "收起原始 JSON"
+      },
+      "values": {
+        "terminalStatus": {
+          "ok": "成功",
+          "error": "失败",
+          "aborted": "已中止",
+          "incomplete": "不完整"
+        },
+        "payloadAvailability": {
+          "present": "已捕获",
+          "expired": "已过期清理",
+          "dropped": "已丢弃",
+          "not_captured": "未捕获",
+          "unknown": "未知"
+        },
+        "usageAvailability": {
+          "present": "已关联",
+          "corrupt": "数据损坏",
+          "not_correlated": "未关联",
+          "projection_unavailable": "投影不可用",
+          "unknown": "未知"
+        },
+        "usageStatus": {
+          "ok": "正常",
+          "error": "异常",
+          "aborted": "中止",
+          "usage_missing": "缺用量"
+        },
+        "provenancePrecision": {
+          "exact": "精确",
+          "partial": "部分",
+          "opaque": "不透明"
+        },
+        "inputShape": {
+          "chat_context": "对话上下文",
+          "calltext": "callText",
+          "pi_direct_summary": "直接摘要",
+          "media_image": "图片生成",
+          "media_video": "视频生成",
+          "external_cli_media": "外部 CLI 媒体",
+          "speech_transcribe": "语音转写",
+          "provider_probe": "供应商探测"
+        },
+        "payloadKind": {
+          "semantic_request": "语义请求",
+          "provider_request": "供应商请求",
+          "provider_response": "供应商响应",
+          "semantic_response": "语义响应"
+        },
+        "payloadVisibility": {
+          "full": "完整可见",
+          "partial": "部分可见",
+          "metadata_only": "仅元数据",
+          "opaque": "不透明",
+          "unavailable": "不可观测"
+        },
+        "payloadFidelity": {
+          "runtime_exact": "运行时精确",
+          "parsed_equivalent": "解析等价",
+          "stream_aggregate": "流式聚合",
+          "normalized": "归一化",
+          "metadata_only": "仅元数据",
+          "external_process": "外部进程",
+          "opaque": "不透明"
+        },
+        "sanitizationStatus": {
+          "none": "未处理",
+          "redacted": "已脱敏",
+          "truncated": "已截断",
+          "degraded": "已降级",
+          "redacted_truncated": "脱敏+截断",
+          "redacted_degraded": "脱敏+降级",
+          "truncated_degraded": "截断+降级",
+          "redacted_truncated_degraded": "脱敏+截断+降级"
+        },
+        "contentState": {
+          "present": "正文可用",
+          "null_payload": "无正文",
+          "opaque_or_unavailable": "不透明或不可用",
+          "corrupt": "数据损坏"
+        },
+        "transformation": {
+          "pass_through": "原样透传",
+          "renamed": "重命名",
+          "moved": "移动",
+          "merged": "合并",
+          "split": "拆分",
+          "filtered": "过滤",
+          "injected": "注入",
+          "externalized": "外部化",
+          "dropped": "丢弃",
+          "opaque": "不透明"
+        },
+        "mappingPrecision": {
+          "exact": "精确",
+          "structural": "结构级",
+          "opaque": "不透明"
+        },
+        "semanticCategory": {
+          "platform_instruction": "平台指令",
+          "persona": "人格",
+          "user_profile": "用户档案",
+          "memory_context": "记忆上下文",
+          "skill_instruction": "技能指令",
+          "agents_file": "Agents 文件",
+          "session_instruction": "会话指令",
+          "agent_roster": "Agent 名单",
+          "conversation_history": "对话历史",
+          "current_user_input": "当前用户输入",
+          "tool_definition": "工具定义",
+          "tool_result": "工具结果",
+          "task_instruction": "任务指令",
+          "task_input": "任务输入",
+          "format_constraint": "格式约束",
+          "previous_summary": "上次摘要",
+          "compaction_summary": "压缩摘要",
+          "media_prompt": "媒体提示词",
+          "media_reference": "参考媒体",
+          "audio_input": "音频输入",
+          "language_hint": "语言提示",
+          "adapter_injected": "适配器注入",
+          "sdk_internal": "SDK 内部",
+          "unknown": "未知"
+        },
+        "semanticRole": {
+          "system": "系统",
+          "developer": "开发者",
+          "user": "用户",
+          "assistant": "助手",
+          "tool": "工具",
+          "input": "输入",
+          "parameter": "参数"
+        },
+        "semanticSourceType": {
+          "template": "模板",
+          "runtime": "运行时",
+          "snapshot": "快照",
+          "memory": "记忆",
+          "skill": "技能",
+          "tool": "工具",
+          "sdk": "SDK",
+          "adapter": "适配器",
+          "unknown": "未知"
+        },
+        "semanticRoot": {
+          "systemPrompt": "systemPrompt",
+          "messages": "messages",
+          "tools": "tools",
+          "input": "input",
+          "parameters": "parameters"
+        },
+        "persistenceCompleteness": {
+          "complete": "完整",
+          "partial": "部分"
+        },
+        "attributionKind": {
+          "agent": "Agent",
+          "auxiliary": "辅助调用",
+          "direct": "直接调用",
+          "memory": "记忆",
+          "plugin": "插件",
+          "provider": "供应商",
+          "task": "任务",
+          "utility": "工具任务",
+          "workflow": "工作流",
+          "unknown": "未知"
+        },
+        "groupByDimension": {
+          "date": "日期",
+          "provider": "供应商",
+          "model": "模型",
+          "category": "类别",
+          "operation": "操作",
+          "callPurpose": "调用用途",
+          "status": "状态",
+          "attributionKind": "归因",
+          "session": "会话",
+          "conversation": "对话",
+          "agent": "Agent",
+          "task": "任务",
+          "inputShape": "输入形状",
+          "provenancePrecision": "溯源精度"
+        },
+        "queryStatus": {
+          "ready": "就绪",
+          "absent": "未初始化",
+          "unavailable": "不可用",
+          "degraded": "降级"
+        },
+        "recordingStatus": {
+          "active": "记录中",
+          "degraded": "记录降级",
+          "disabled": "已停用",
+          "closed": "已关闭"
+        },
+        "completeness": {
+          "complete": "完整",
+          "partial": "部分"
+        }
+      }
     }
   },
   "onboarding": {

@@ -1,4 +1,5 @@
 import fs from "node:fs";
+import { runToolExecutionWithModelTrace } from "../llm/model-trace-scope.ts";
 
 export const PI_BUILTIN_TOOL_NAMES = Object.freeze([
   "read",
@@ -118,12 +119,25 @@ function wrapToolDefinitionExecutionOnce(definition: any, state = createToolExec
     ...definition,
     execute: async (toolCallId, params, signal, onUpdate, ctx) => {
       const key = toolExecutionKey(definition.name, toolCallId, params, signal, ctx);
-      if (!key) return execute(toolCallId, params, signal, onUpdate, ctx);
+      if (!key) {
+        return runToolExecutionWithModelTrace(
+          { toolName: definition.name, toolCallId },
+          () => execute(toolCallId, params, signal, onUpdate, ctx),
+        );
+      }
 
       const existing = state.get(key);
       if (existing) return existing;
 
-      const promise = Promise.resolve().then(() => execute(toolCallId, params, signal, onUpdate, ctx));
+      // 工具执行边界（§三十二）：继承当前 trace，causalParentCallId 冻结为进入
+      // 时的 scope.lastCallId（= 产生本 toolCall 的模型调用）。工具内触发的
+      // Vision/Approval/Media/Subagent/callText 自动继承 trace 与 parent。
+      // 执行去重包装之外再包 trace——dedupe 命中复用首个 promise，其 trace
+      // 上下文已在首次执行时建立。
+      const promise = Promise.resolve().then(() => runToolExecutionWithModelTrace(
+        { toolName: definition.name, toolCallId },
+        () => execute(toolCallId, params, signal, onUpdate, ctx),
+      ));
       state.set(key, promise);
       return promise;
     },

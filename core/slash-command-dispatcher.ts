@@ -1,5 +1,6 @@
 import { createModuleLogger } from "../lib/debug-log.ts";
 import { t } from "../lib/i18n.ts";
+import { runWithModelTraceRoot } from "../lib/llm/model-trace-scope.ts";
 
 const log = createModuleLogger("slash");
 const CMD_RE = /^\s*\/([a-zA-Z0-9_-]+)(?:\s+([\s\S]*?))?\s*$/;
@@ -73,7 +74,12 @@ export class SlashCommandDispatcher {
         this._timeoutMs,
       );
     });
-    const handlerPromise = Promise.resolve().then(() => def.handler(fullCtx));
+    // Slash command = Trace 根（§二十四：/compact、/fresh-compact、/rc-summary
+    // 等会触发模型调用的命令）；bridge 已有 turn scope 时原样继承。
+    const handlerPromise = Promise.resolve().then(() => runWithModelTraceRoot(
+      { origin: "slash_command", refs: { command: parsed.commandName } },
+      () => def.handler(fullCtx),
+    ));
     // C1 fix：handler 输掉 race 后其 Promise 仍会 settle；attach no-op catch 防 UnhandledPromiseRejection 进程崩溃（Node ≥15）
     handlerPromise.catch(() => {});
 

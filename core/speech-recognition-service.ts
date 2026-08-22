@@ -1,14 +1,49 @@
 import { MediaAdapterRegistry } from "./media-adapter-registry.ts";
 import { builtinSpeechRecognitionAdapters } from "./speech-recognition/adapters.ts";
 import { createModuleLogger } from "../lib/debug-log.ts";
+import fs from "node:fs";
 import {
   buildMediaModelEditPatch,
   MediaModelEditValidationError,
   requireExistingMediaModel,
 } from "../shared/media-model-edit.ts";
 import { withModelRequestAccounting } from "../lib/llm/model-request-accounting.ts";
+import {
+  beginObservedModelCall,
+  failObservedModelCall,
+  observedModelCallLedgerMetadata,
+} from "../lib/llm/model-call-integration.ts";
+import {
+  createSemanticInputProvenance,
+  provenanceSection,
+} from "../lib/llm/semantic-input-provenance.ts";
+import { runWithNewModelTrace } from "../lib/llm/model-trace-scope.ts";
 
 const CAPABILITY = "speech_recognition";
+
+/**
+ * 输入体积桶（§四十）：只读已有 length/size——一次 stat 元数据读取，
+ * 不复制 Buffer、不 hash 音频。
+ */
+function audioInputSizeBucket(file: any): string | null {
+  const filePath = file?.realPath || file?.filePath;
+  if (typeof filePath !== "string" || !filePath.trim()) {
+    return typeof file?.size === "number" && Number.isFinite(file.size) ? bucketForSize(file.size) : null;
+  }
+  try {
+    return bucketForSize(fs.statSync(filePath).size);
+  } catch {
+    return null;
+  }
+}
+
+function bucketForSize(bytes: number): string | null {
+  if (!Number.isFinite(bytes) || bytes < 0) return null;
+  if (bytes <= 256 * 1024) return "<=256KB";
+  if (bytes <= 1024 * 1024) return "<=1MB";
+  if (bytes <= 10 * 1024 * 1024) return "<=10MB";
+  return ">10MB";
+}
 
 function textOrNull(value) {
   return typeof value === "string" && value.trim() ? value.trim() : null;
@@ -35,6 +70,30 @@ function normalizeSessionRef(input: any = {}) {
   return { sessionId, sessionPath, sessionRef };
 }
 const log = createModuleLogger("speech-recognition");
+
+export /** Phase 5：speech 语义输入 provenance 组装（input.audio + parameters.language）。 */
+function buildSpeechProvenanceSections(language) {
+  const sections = [
+    provenanceSection(
+      { root: "input", path: ["audio"] },
+      "audio_input",
+      { role: "input", source: { type: "runtime", id: "speech.audio" } },
+    ),
+  ];
+  if (typeof language === "string" && language.trim()) {
+    sections.push(provenanceSection(
+      { root: "parameters", path: ["language"] },
+      "language_hint",
+      { role: "parameter", source: { type: "runtime", id: "speech.language" } },
+    ));
+  }
+  return sections;
+}
+
+/** Phase 5 测试入口。 */
+export function buildSpeechProvenanceForTest({ language }) {
+  return createSemanticInputProvenance("speech_transcribe", buildSpeechProvenanceSections(language));
+}
 
 export class SpeechRecognitionService {
   declare _emitEvent: any;
@@ -182,6 +241,15 @@ export class SpeechRecognitionService {
   }
 
   async transcribeAudio(payload: any = {}) {
+    // 独立语音转写 = 新 Trace（§三十八/§二十五）：REST/后台触发的 ASR 是独立
+    // 任务；转写结果后续触发的新消息属于新的用户 turn，有自己的 trace。
+    return runWithNewModelTrace(
+      { origin: "speech", refs: { ...(payload?.fileId ? { fileId: String(payload.fileId) } : {}) } },
+      () => this._transcribeAudioWithinTrace(payload),
+    );
+  }
+
+  async _transcribeAudioWithinTrace(payload: any = {}) {
     const {
       fileId,
       language,
@@ -236,6 +304,7 @@ export class SpeechRecognitionService {
         language,
         sessionId,
         sessionPath,
+        fileId,
       });
       const ready = this._updateTranscription({ sessionId, sessionPath }, fileId, {
         status: "ready",
@@ -263,6 +332,15 @@ export class SpeechRecognitionService {
   }
 
   async transcribeVoiceAttachment(payload: any = {}) {
+    // 同 transcribeAudio：voice 附件转写是独立后台派生任务（fire-and-forget），
+    // force-new 防止沿队列异步链继承任何外层 scope（§五十）。
+    return runWithNewModelTrace(
+      { origin: "speech", refs: { ...(payload?.fileId ? { fileId: String(payload.fileId) } : {}) } },
+      () => this._transcribeVoiceAttachmentWithinTrace(payload),
+    );
+  }
+
+  async _transcribeVoiceAttachmentWithinTrace(payload: any = {}) {
     const { fileId, language } = payload;
     const sessionTarget = normalizeSessionRef(payload);
     const { sessionId, sessionPath, sessionRef } = sessionTarget;
@@ -303,6 +381,7 @@ export class SpeechRecognitionService {
         language,
         sessionId,
         sessionPath,
+        fileId,
       });
       const ready = this._updateTranscription({ sessionId, sessionPath }, fileId, {
         status: "ready",
@@ -346,36 +425,104 @@ export class SpeechRecognitionService {
     language,
     sessionId,
     sessionPath,
+    fileId = null,
   }) {
-    return withModelRequestAccounting({
-      usageLedger: this._getUsageLedger(),
+    // MC-09（§三十七/§三十八）：在 file/provider/model/protocol/language/session
+    // 都确定之后、真正 Adapter HTTP 请求之前铸 callId。fileId 是业务引用
+    // （不是音频内容），进入安全 attribution。
+    // Phase 5（§七十四）：语义输入 = audio + language hint；locator 只指
+    // input.audio / parameters.language，不携带字节/base64/路径/转写文本。
+    const speechProvenanceSections = buildSpeechProvenanceSections(language);
+    const recorder = beginObservedModelCall({
       model: {
         provider: target.providerId,
         modelId: target.model.id,
         api: target.model.protocolId,
       },
-      usageContext: {
-        source: {
-          subsystem: "speech-recognition",
-          operation: "transcribe",
-          surface: "media",
-          trigger: "user",
-        },
-        attribution: {
-          kind: "session",
-          ...(sessionId ? { sessionId } : {}),
-          ...(sessionPath ? { sessionPath } : {}),
-        },
+      source: {
+        subsystem: "speech-recognition",
+        operation: "transcribe",
+        surface: "media",
+        trigger: "user",
       },
-      metadata: { capability: CAPABILITY },
-    }, () => adapter.transcribe({
-      file,
-      provider: target.provider,
-      model: target.model,
-      credentials,
-      language,
-      fetch: this._fetch,
-    }));
+      attribution: {
+        kind: "session",
+        ...(sessionId ? { sessionId } : {}),
+        ...(sessionPath ? { sessionPath } : {}),
+        ...(fileId ? { fileId } : {}),
+      },
+      details: {
+        path: "speech_transcribe",
+        mediaType: "audio",
+        protocol: target.model.protocolId,
+        languageSpecified: Boolean(language),
+        inputSizeBucket: audioInputSizeBucket(file),
+      },
+      semanticInputProvenance: createSemanticInputProvenance("speech_transcribe", speechProvenanceSections),
+    });
+    // Phase 6 Semantic Request Capture（§九十九）：audio 本地路径 →
+    // local_file_reference descriptor（不保存字节），language 允许保留。
+    recorder.payloadCapture?.captureSemanticRequest({
+      inputShape: "speech_transcribe",
+      parameters: {
+        ...(file?.realPath || file?.filePath ? { audio: file.realPath || file.filePath } : {}),
+        ...(language ? { language } : {}),
+      },
+      provenance: recorder.semanticInputProvenance,
+    });
+    try {
+      const result = await withModelRequestAccounting({
+        usageLedger: this._getUsageLedger(),
+        model: {
+          provider: target.providerId,
+          modelId: target.model.id,
+          api: target.model.protocolId,
+        },
+        usageContext: {
+          source: {
+            subsystem: "speech-recognition",
+            operation: "transcribe",
+            surface: "media",
+            trigger: "user",
+          },
+          attribution: {
+            kind: "session",
+            ...(sessionId ? { sessionId } : {}),
+            ...(sessionPath ? { sessionPath } : {}),
+          },
+        },
+        metadata: { capability: CAPABILITY, ...observedModelCallLedgerMetadata(recorder) },
+      }, () => adapter.transcribe({
+        file,
+        provider: target.provider,
+        model: target.model,
+        credentials,
+        language,
+        fetch: this._fetch,
+        modelCall: recorder,
+      }));
+      // 语义响应（§四十二）：Observer 只记录结构事实；transcription text 是
+      // 模型输出正文——Phase 6 经统一 Redactor 进 payload capture（§一百零一）。
+      recorder.payloadCapture?.captureSemanticResponse({
+        response: {
+          transcription: typeof result?.text === "string" && result.text.trim() ? result.text : null,
+          finishReason: null,
+          completeness: "complete",
+        },
+      });
+      recorder.semanticResponseCompleted({
+        details: {
+          hasText: Boolean(result?.text && String(result.text).trim()),
+          languagePresent: Boolean(result?.language),
+          durationPresent: result?.durationMs !== undefined,
+        },
+      });
+      recorder.endLogicalCall("ok");
+      return result;
+    } catch (err) {
+      failObservedModelCall(recorder, err, { errorKind: "adapter_error" });
+      throw err;
+    }
   }
 
   _emitTranscriptionUpdate(sessionRef, fileId, transcription) {

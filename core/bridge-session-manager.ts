@@ -7,6 +7,9 @@
 import fs from "fs";
 import path from "path";
 import { createAgentSession, SessionManager } from "../lib/pi-sdk/index.ts";
+import { registerSessionModelCallContext } from "../lib/pi-sdk/model-call-stream-observer.ts";
+import { runWithModelTraceRoot } from "../lib/llm/model-trace-scope.ts";
+import { modelCallLedgerMetadataForMessage } from "../lib/llm/model-call-correlation.ts";
 import { createDefaultSettings } from "./session-defaults.ts";
 import { compactSessionWithCachePreservation } from "./session-compactor.ts";
 import {
@@ -223,6 +226,46 @@ function formatAutomationSuggestionText(payload, deps: any = {}) {
  * Mirrors the reply attribution so compaction cost lands on the same
  * conversation, with its own subsystem/trigger.
  */
+/**
+ * MC-01 bridge/phone 会话的 model call 归属：与 recordBridgeAssistantUsage
+ * 的 usageContext 同一语义（phone_conversation / bridge session 两种形状）。
+ * sessionPath 在 provider 求值时从 session 读取（注册时可能尚未落盘）。
+ */
+function buildBridgeModelCallContext(bridgeContext, agent, session) {
+  const conversationType = bridgeContext?.chatType === "channel" ? "channel" : "dm";
+  const sessionPath = session?.sessionManager?.getSessionFile?.() || null;
+  if (bridgeContext?.isBridgeSession) {
+    return {
+      source: {
+        subsystem: "phone",
+        operation: "reply",
+        surface: conversationType,
+        trigger: "user",
+      },
+      attribution: {
+        kind: "phone_conversation",
+        agentId: agent?.id || bridgeContext?.agentId || null,
+        conversationId: bridgeContext?.sessionKey || bridgeContext?.chatId || sessionPath || "unknown",
+        conversationType,
+        ...(sessionPath ? { sessionPath } : {}),
+      },
+    };
+  }
+  return {
+    source: {
+      subsystem: "session",
+      operation: "reply",
+      surface: "bridge",
+      trigger: "user",
+    },
+    attribution: {
+      kind: "session",
+      agentId: agent?.id || null,
+      ...(sessionPath ? { sessionPath } : {}),
+    },
+  };
+}
+
 function buildBridgeCompactionUsageContext({ sessionPath, agent, bridgeContext }) {
   const conversationType = bridgeContext?.chatType === "channel" ? "channel" : "dm";
   if (bridgeContext?.isBridgeSession) {
@@ -296,11 +339,14 @@ function recordBridgeAssistantUsage({ ledger, event, sessionPath, agent, model, 
     api: model?.api ?? null,
   };
   const errorMessage = getProviderMessageEndError(event);
+  // Observer ↔ Ledger 关联（§六十四，同 desktop recordAssistantUsage）。
+  const modelCallMetadata = modelCallLedgerMetadataForMessage(event.message);
   if (errorMessage) {
     const request = ledger.start({
       model: modelMeta,
       usageContext,
       costRates: model?.cost,
+      ...(modelCallMetadata ? { metadata: modelCallMetadata } : {}),
     });
     return ledger.recordError(request.requestId, new Error(errorMessage));
   }
@@ -310,6 +356,7 @@ function recordBridgeAssistantUsage({ ledger, event, sessionPath, agent, model, 
       usage: event.message.usage,
       usageContext,
       costRates: model?.cost,
+      ...(modelCallMetadata ? { metadata: modelCallMetadata } : {}),
     });
   }
   return null;
@@ -1110,6 +1157,15 @@ export class BridgeSessionManager {
    * @returns {Promise<{text: string|null, toolMedia: any[], error: string|null, truncated: boolean}|null>}
    */
   async executeExternalMessage(prompt, sessionKey, meta, opts: any = {}) {
+    // Bridge 入站消息 = Trace 根（§二十四/§二十五）：整条 inbound turn 共享
+    // traceId；外层已有 trace（嵌套场景）原样继承。
+    return runWithModelTraceRoot(
+      { origin: "bridge_message", refs: { conversationId: sessionKey } },
+      () => this._executeExternalMessageWithinTrace(prompt, sessionKey, meta, opts),
+    );
+  }
+
+  async _executeExternalMessageWithinTrace(prompt, sessionKey, meta, opts: any = {}) {
     // 捕获状态提升到 try 外：错误路径（含 transport throw）也必须拿得到已生成内容（#1607）
     const visibleText = createVisibleTextAccumulator();
     let providerErrorMessage = null;
@@ -1250,6 +1306,8 @@ export class BridgeSessionManager {
         ...sessionOpts,
       });
 
+      // Model call 归属注册（MC-01 bridge/phone 会话路径）。
+      registerSessionModelCallContext(session, () => buildBridgeModelCallContext(bridgeContext, agent, session));
       installDynamicCompactionReserve(session);
       installMidRunCompaction(session, {
         usageLedger: this._deps.getUsageLedger?.() || null,
@@ -1734,6 +1792,8 @@ export class BridgeSessionManager {
       ...sessionOpts,
     });
 
+    // Model call 归属注册（MC-01 bridge/phone 会话路径）。
+    registerSessionModelCallContext(session, () => buildBridgeModelCallContext(bridgeContext, agent, session));
     installDynamicCompactionReserve(session);
     installMidRunCompaction(session, {
       usageLedger: this._deps.getUsageLedger?.() || null,

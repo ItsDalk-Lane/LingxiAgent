@@ -37,6 +37,7 @@ import {
   PI_BUILTIN_TOOL_NAMES,
 } from "./session-options.ts";
 import { installAssistantStreamGuard } from "./stream-guard.ts";
+import { installModelCallStreamObserver, installModelCallTraceIngress } from "./model-call-stream-observer.ts";
 import { installToolOutcomeAdapter } from "./tool-outcome-adapter.ts";
 import {
   createFindTool,
@@ -80,6 +81,8 @@ export async function createAgentSession(options) {
   const result = await rawCreateAgentSession(normalizeCreateAgentSessionOptions(sessionOptions));
   installToolOutcomeAdapter(result?.session);
   installAssistantStreamGuard(result?.session);
+  installModelCallStreamObserver(result?.session);
+  installModelCallTraceIngress(result?.session);
   return result;
 }
 
@@ -214,7 +217,66 @@ export {
 } from "@earendil-works/pi-coding-agent";
 
 // Diary material summarization only. Context compaction must go through core/session-compactor.ts.
-export { generateSummary } from "@earendil-works/pi-coding-agent";
+//
+// MC-10 观测边界（Phase 3.5 确认的生产可达旁路，见 MODEL_CALL_CLOSURE_DELTA.md）：
+// Pi generateSummary 未传 streamFn 时回落 completeSimple() 直连 Provider——
+// 不经 AgentSession streamFunction / callText。这里包一层 Observed direct
+// summary（复用 ModelCallRecorder/Observer，不造第二套 Observer）；caller 可
+// 以在第 14 参传 observerContext（usageContext/usageLedger）获得归属与账本
+// 关联，不传则按 unknown 归属观测（防御未来新 caller 裸调）。
+// 传了 streamFn 的调用不经此观测——那种调用的观测发生在 streamFn 边界，
+// 在此再观测会双计。
+import { generateSummary as rawGenerateSummary } from "@earendil-works/pi-coding-agent";
+import {
+  observePiDirectSummary,
+  type ObservedDirectSummaryContext,
+} from "../llm/observed-pi-direct-summary.ts";
+import { buildDirectSummaryProvenance } from "../llm/semantic-input-provenance.ts";
+
+export async function generateSummary(
+  currentMessages,
+  model,
+  reserveTokens,
+  apiKey,
+  headers,
+  signal,
+  customInstructions,
+  previousSummary,
+  thinkingLevel,
+  streamFn,
+  env,
+  retry,
+  callbacks,
+  observerContext,
+) {
+  const invokeRaw = () => rawGenerateSummary(
+    currentMessages, model, reserveTokens, apiKey, headers, signal,
+    customInstructions, previousSummary, thinkingLevel, streamFn, env, retry, callbacks,
+  );
+  if (streamFn) return invokeRaw();
+  const context: ObservedDirectSummaryContext | null =
+    observerContext && typeof observerContext === "object" ? observerContext : {};
+  // Phase 5（§七十）：direct summary 的三元组（messages/customInstructions/
+  // previousSummary）在 facade 参数边界全部结构化可见——在此构造 provenance
+  // （messages 段级分类 + 参数 root=parameters 寻址），随 context 附着到
+  // recorder。构造失败不影响业务。
+  try {
+    context.semanticInputProvenance = buildDirectSummaryProvenance({
+      messages: Array.isArray(currentMessages) ? currentMessages : [],
+      customInstructions: typeof customInstructions === "string" ? customInstructions : null,
+      previousSummary: typeof previousSummary === "string" ? previousSummary : null,
+    });
+  } catch {
+    context.semanticInputProvenance = null;
+  }
+  // Phase 6（§一百零二）：同一三元组的正文捕获输入（经统一 Redactor 入 sink）。
+  context.payloadSemanticRequest = {
+    messages: Array.isArray(currentMessages) ? currentMessages : [],
+    customInstructions: typeof customInstructions === "string" ? customInstructions : null,
+    previousSummary: typeof previousSummary === "string" ? previousSummary : null,
+  };
+  return observePiDirectSummary(model, context, invokeRaw);
+}
 export {
   buildNativeCompactionRequestShapes,
   NATIVE_SUMMARIZATION_SYSTEM_PROMPT,

@@ -1,4 +1,5 @@
 import { resolveSessionSkillsForRuntime } from "../lib/skills/session-skill-snapshot.ts";
+import { sanitizeSemanticInputSection } from "../lib/llm/semantic-input-provenance.ts";
 
 export const SESSION_PROMPT_SNAPSHOT_VERSION = 1;
 
@@ -29,18 +30,37 @@ export function freezeAgentsFilesResult(value) {
   return jsonClone(next, { agentsFiles: [] });
 }
 
+/**
+ * Phase 5（§十三/§十四）：冻结快照附带的安全 provenance metadata——
+ * 只有 category/locator/source/precision，不含任何 Prompt 内容副本。
+ * 逐段 sanitize（fail closed）；非法段丢弃，全部非法/缺失 → null。
+ * 旧 snapshot 无此字段 → null（恢复后诚实 structural，§八十五）。
+ */
+export function freezeSystemPromptProvenance(value) {
+  if (!Array.isArray(value)) return null;
+  const sections = [];
+  for (const section of value) {
+    const safe = sanitizeSemanticInputSection(section);
+    if (safe) sections.push(safe);
+  }
+  return sections.length > 0 ? sections : null;
+}
+
 export function buildSessionPromptSnapshot({
   systemPrompt = "",
   appendSystemPrompt = [],
   skillsResult = null,
   agentsFilesResult = null,
+  systemPromptProvenance = null,
 } = {}) {
+  const provenance = freezeSystemPromptProvenance(systemPromptProvenance);
   return {
     version: SESSION_PROMPT_SNAPSHOT_VERSION,
     systemPrompt: String(systemPrompt || ""),
     appendSystemPrompt: normalizeStringArray(appendSystemPrompt),
     skillsResult: freezeSkillsResult(skillsResult),
     agentsFilesResult: freezeAgentsFilesResult(agentsFilesResult),
+    ...(provenance ? { systemPromptProvenance: provenance } : {}),
   };
 }
 
@@ -48,6 +68,7 @@ export function normalizeSessionPromptSnapshot(value) {
   if (!value || typeof value !== "object") return null;
   if (value.version !== SESSION_PROMPT_SNAPSHOT_VERSION) return null;
   if (typeof value.systemPrompt !== "string") return null;
+  const provenance = freezeSystemPromptProvenance(value.systemPromptProvenance);
   return {
     version: SESSION_PROMPT_SNAPSHOT_VERSION,
     systemPrompt: value.systemPrompt,
@@ -57,6 +78,7 @@ export function normalizeSessionPromptSnapshot(value) {
     ...(typeof value.finalSystemPrompt === "string"
       ? { finalSystemPrompt: value.finalSystemPrompt }
       : {}),
+    ...(provenance ? { systemPromptProvenance: provenance } : {}),
   };
 }
 

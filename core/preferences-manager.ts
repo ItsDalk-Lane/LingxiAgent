@@ -48,6 +48,9 @@ import {
 import { createModuleLogger } from "../lib/debug-log.ts";
 import { isValidAgentId } from "../shared/agent-id.ts";
 import { normalizeSessionThinkingLevel } from "./session-thinking-level.ts";
+import {
+  normalizeModelObservabilityPreferences,
+} from "../lib/llm/model-observability-preferences.ts";
 
 const log = createModuleLogger("preferences");
 const RETIRED_EXPERIMENT_IDS = new Set([
@@ -917,6 +920,49 @@ export class PreferencesManager {
   /** 读取 primary agent ID */
   getPrimaryAgent() {
     return this._cache.primaryAgent || null;
+  }
+
+  /**
+   * 读取 Model Observatory recording preference（Phase 8 §五十一）。
+   * canonical normalizer 位于 lib/llm/model-observability-preferences.ts——
+   * 这里只做存取，不散落第二套 default。
+   */
+  getModelObservability() {
+    return normalizeModelObservabilityPreferences(this._cache.model_observability);
+  }
+
+  /**
+   * 合并写入 Model Observatory preference。落盘的是**原始意图**（raw merge，
+   * 只保留已知字段；未表达的字段不落盘），语义归一只发生在 getModelObservability
+   * 读取侧——否则 disabled 态归一出的派生 false 会被固化成用户显式选择，
+   * 「关掉再打开」会丢失 §六十一 的开启默认（trace=true / payload=false）。
+   */
+  setModelObservability(partial) {
+    const current = this._cache.model_observability
+      && typeof this._cache.model_observability === "object"
+      && !Array.isArray(this._cache.model_observability)
+      ? this._cache.model_observability
+      : {};
+    const input = partial && typeof partial === "object" && !Array.isArray(partial) ? partial : {};
+    const merged: Record<string, unknown> = { ...current };
+    for (const key of ["enabled", "persistTraceMetadata", "persistPayloads", "persistBlobs"]) {
+      if (input[key] !== undefined) merged[key] = input[key] === true;
+    }
+    if (input.retention !== undefined) {
+      const retention = input.retention as Record<string, unknown>;
+      const next: Record<string, number> = {
+        ...(typeof merged.retention === "object" && merged.retention ? merged.retention as Record<string, number> : {}),
+      };
+      for (const key of ["traceDays", "payloadDays", "blobDays"]) {
+        const n = Number(retention?.[key]);
+        if (Number.isFinite(n) && n > 0) next[key] = Math.floor(n);
+      }
+      merged.retention = next;
+    }
+    const prefs = this._mutableCopy();
+    prefs.model_observability = merged;
+    this.savePreferences(prefs);
+    return this.getModelObservability();
   }
 
   /** 保存 primary agent ID */

@@ -1085,7 +1085,7 @@
       "agent": "エージェント",
       "me": "自分",
       "providers": "プロバイダー",
-      "usage": "使用量",
+      "usage": "モデル観測",
       "media": "メディア",
       "models": "モデル",
       "memory": "記憶",
@@ -1632,58 +1632,6 @@
         "usage": "使用量"
       },
       "configMissingFields": "このプロバイダーの設定が不完全です。補完が必要：{fields}。"
-    },
-    "usage": {
-      "title": "使用量",
-      "note": "使用量は参考値です。正確な集計はプロバイダー側の統計を基準にしてください。",
-      "refresh": "使用量を更新",
-      "total": "すべて",
-      "requests": "リクエスト",
-      "totalTokens": "合計 Tokens",
-      "cacheRead": "キャッシュ読込",
-      "cacheHitRate": "ヒット率",
-      "uncached": "非キャッシュ",
-      "modelMix": "モデル分布",
-      "dailyUsage": "日別使用量",
-      "requestLedger": "リクエスト明細",
-      "loading": "使用量を読み込み中…",
-      "empty": "使用量の記録はまだありません",
-      "groupMeta": "{requests} 件 · {errors} エラー",
-      "cacheShort": "cache {tokens}",
-      "tokensShort": "{tokens} tok",
-      "cacheSummary": "キャッシュ {cache} · 非キャッシュ {uncached}",
-      "window": {
-        "week": "直近 7 日",
-        "month": "直近 30 日"
-      },
-      "period": {
-        "week": "週",
-        "month": "月"
-      },
-      "view": {
-        "overall": "概要",
-        "daily": "日別",
-        "category": "カテゴリ",
-        "model": "モデル"
-      },
-      "category": {
-        "session": "Session",
-        "phone": "Phone",
-        "memory": "Memory",
-        "automation": "Automation",
-        "subagent": "Subagent",
-        "compaction": "Compaction",
-        "plugin": "Plugin",
-        "utility": "Utility",
-        "vision": "Vision",
-        "unknown": "Unknown"
-      },
-      "status": {
-        "ok": "完了",
-        "error": "エラー",
-        "aborted": "中止",
-        "usage_missing": "使用量なし"
-      }
     },
     "media": {
       "imageGeneration": "画像生成",
@@ -2554,6 +2502,611 @@
       "dropOrClick": "キャラクターカードをドロップするか、クリックして開く",
       "readFailed": "キャラクターカードの読み込みに失敗しました",
       "importFailed": "キャラクターカードのインポートに失敗しました"
+    },
+    "observability": {
+      "actions": {
+        "refresh": "更新",
+        "cancel": "キャンセル",
+        "save": "保存",
+        "close": "閉じる"
+      },
+      "datePreset": {
+        "24h": "過去24時間",
+        "7d": "過去7日",
+        "30d": "過去30日",
+        "custom": "カスタム",
+        "all": "すべて"
+      },
+      "customRange": {
+        "since": "開始",
+        "untilExclusive": "終了（含まない）"
+      },
+      "filter": {
+        "date": "日付",
+        "provider": "プロバイダー",
+        "model": "モデル",
+        "category": "カテゴリ",
+        "status": "ステータス",
+        "operation": "操作",
+        "callPurpose": "呼び出し用途",
+        "attributionKind": "帰属",
+        "inputShape": "入力形状",
+        "provenancePrecision": "プロベナンス精度",
+        "payloadAvailability": "ペイロード可用性",
+        "hasPayload": "ペイロードあり",
+        "interruptedByRestart": "再起動による中断",
+        "groupBy": "グループ化",
+        "more": "その他のフィルター",
+        "sessionId": "セッション ID",
+        "conversationId": "会話 ID",
+        "agentId": "エージェント ID",
+        "taskId": "タスク ID"
+      },
+      "advanced": {
+        "facetsTitle": "ファセット値",
+        "exactIdsTitle": "厳密な ID",
+        "shapesTitle": "形状と可用性",
+        "apply": "適用",
+        "sessionIdPlaceholder": "セッション ID を入力して Enter",
+        "conversationIdPlaceholder": "会話 ID を入力して Enter",
+        "agentIdPlaceholder": "エージェント ID を入力して Enter",
+        "taskIdPlaceholder": "タスク ID を入力して Enter"
+      },
+      "groupBy": {
+        "hint": "最大 {max} 次元"
+      },
+      "tri": {
+        "any": "すべて",
+        "yes": "はい",
+        "no": "いいえ"
+      },
+      "facets": {
+        "loading": "選択肢を読み込み中…",
+        "empty": "現在のフィルターでは値がありません"
+      },
+      "chips": {
+        "ariaLabel": "現在のフィルター",
+        "clearAll": "すべてクリア",
+        "remove": "フィルターを削除：{label}"
+      },
+      "metrics": {
+        "calls": "呼び出し数",
+        "tracesHint": "{count} 件のトレース",
+        "totalTokens": "合計トークン",
+        "inputTokens": "入力トークン",
+        "outputTokens": "出力トークン",
+        "cacheRead": "キャッシュ読み取り",
+        "cacheHitRate": "ヒット率 {rate}",
+        "errors": "エラー",
+        "incompleteHint": "ほかに {count} 件が不完全",
+        "avgDuration": "平均時間",
+        "durationObserved": "{count} 件の観測に基づく",
+        "cost": "コスト",
+        "usageCoverage": "使用量カバレッジ：{covered} 件紐付け / {missing} 件欠落",
+        "usageCoverageComplete": "使用量カバレッジ完了：{covered} 件紐付け、{notCorrelated} 件は明示的に対象外",
+        "usageCoveragePartial": "使用量は一部のみ：全 {total} 件中 {covered} 件紐付け、{unknown} 件不明",
+        "usageCoverageCorrupt": "使用量データが破損しています：{corrupt} 件を信頼できる形で集計できません",
+        "usageCoverageProjectionUnavailable": "使用量プロジェクションを利用できないため、以下の値はゼロではありません",
+        "usageCoverageUnknown": "使用量カバレッジ不明：全 {total} 件中 {unknown} 件を確認できません"
+      },
+      "groups": {
+        "loading": "集計を読み込み中…",
+        "empty": "現在のフィルターでは集計データがありません",
+        "dateChartAria": "日付別の呼び出し量",
+        "dateSummary": "合計 {total} 回、ピークは {peakDate}（{peakCount} 回）",
+        "filterByValue": "この値でフィルター：{value}",
+        "unknownValue": "（不明）"
+      },
+      "ledger": {
+        "title": "呼び出し台帳",
+        "loadMore": "さらに読み込む",
+        "attemptsTooltip": "{providerRequests} 件のプロバイダーリクエストを含む",
+        "interruptedAria": "この呼び出しは再起動で中断されました",
+        "interruptedTooltip": "アプリの再起動によりこの呼び出しの記録は不完全です",
+        "usageMissingAria": "この呼び出しには使用量データがありません",
+        "completenessNote": "データ完全性：ドロップしたトレースイベント {droppedEvents} 件 / ペイロード {droppedPayloads} 件 / ファイル {droppedBlobs} 件 / 再起動中断 {interrupted} 件",
+        "completenessUnknown": "データ完全性カウンターを読み取れず、欠落量は不明です",
+        "filterBySession": "セッションでフィルター：{id}",
+        "filterByTask": "タスクでフィルター：{id}",
+        "col": {
+          "time": "時刻",
+          "model": "モデル",
+          "operation": "操作",
+          "category": "カテゴリ",
+          "status": "ステータス",
+          "tokens": "トークン",
+          "cache": "キャッシュ",
+          "cost": "コスト",
+          "duration": "時間",
+          "attempts": "試行",
+          "payload": "ペイロード",
+          "context": "コンテキスト"
+        },
+        "usageMissing": {
+          "present": "使用量は紐付け済み",
+          "not_correlated": "この呼び出しは使用量レコードに紐付けできませんでした",
+          "projection_unavailable": "使用量プロジェクションは利用できません",
+          "unknown": "使用量の紐付け状態は不明です"
+        }
+      },
+      "empty": {
+        "noResults": "現在のフィルター条件に一致する呼び出しがありません",
+        "noTraces": "現在のフィルター条件に一致するトレースがありません",
+        "storeAbsent": "観測ストレージはまだ初期化されていません——記録を有効にすると、新しいモデル呼び出しがここに表示されます"
+      },
+      "error": {
+        "invalid_query": "クエリ条件が無効です",
+        "invalid_cursor": "ページネーションカーソルが失効しました",
+        "invalid_json": "リクエスト形式が無効です",
+        "not_initialized": "観測ストレージが初期化されていません",
+        "not_found": "レコードが存在しないか、保持ポリシーで削除されました",
+        "export_limit": "エクスポート上限を超えました",
+        "query_failed": "クエリに失敗しました",
+        "local_only_route": "このコンテンツはこのマシンからのみアクセスできます",
+        "studio_owner_required": "スタジオオーナー権限が必要です",
+        "forbidden": "このコンテンツへのアクセス権限がありません",
+        "invalid_blob_id": "Blob 識別子が無効です",
+        "blob_missing": "Blob ファイルが見つかりません（保持ポリシーで削除された可能性があります）",
+        "network": "ネットワークリクエストに失敗しました。ローカルサービスを確認して再試行してください",
+        "invalidCursorHint": "フィルター条件が変わりました。リストを最初から読み込み直してください"
+      },
+      "loading": {
+        "ledger": "呼び出しを読み込み中…",
+        "detail": "呼び出し詳細を読み込み中…",
+        "payload": "ペイロード本文を読み込み中…",
+        "blob": "Blob を読み込み中…",
+        "traces": "トレースを読み込み中…",
+        "traceDetail": "トレース詳細を読み込み中…"
+      },
+      "payloadAvailabilityHint": {
+        "present": "この呼び出しにはキャプチャ済みのペイロードレコードがあります",
+        "expired": "ペイロードは保持ポリシーで削除され、メタデータのみ残っています",
+        "dropped": "ペイロードはキャプチャ時にドロップされました（ストレージ負荷保護）",
+        "not_captured": "この呼び出しではペイロードはキャプチャされていません（記録設定またはキャプチャタイミング）",
+        "unknown": "ペイロード可用性は不明です"
+      },
+      "visibilityHint": {
+        "full": "このレイヤーの内容は実行時に完全に可視でキャプチャされています（コピーはマスキング/切り詰めの場合あり）",
+        "partial": "内容は部分的に可視です（ストリームは集約のみ保持など）",
+        "metadata_only": "構造/状態メタデータのみで本文はありません",
+        "opaque": "境界は存在しますが、内容は外部プロセス内にあり Lingxi からは観測できません",
+        "unavailable": "境界イベントの構造は既知ですが、今回は観測できません（フックなし/プロトコル未トリガー）"
+      },
+      "fidelityHint": {
+        "runtime_exact": "キャプチャコピーは実行時内容とバイト単位で一致します（マスキングを除く）",
+        "parsed_equivalent": "パースから再構築され、意味的に同等です",
+        "stream_aggregate": "ストリームチャンクから集約されました",
+        "normalized": "正規化変換が適用されています",
+        "metadata_only": "メタデータのみ、本文なし",
+        "external_process": "内容は外部プロセスにありキャプチャされていません",
+        "opaque": "観測できません"
+      },
+      "sanitizationHint": {
+        "none": "キャプチャコピーはサニタイズされていません",
+        "redacted": "キャプチャコピーは認証情報がマスキングされています",
+        "truncated": "キャプチャコピーは長さ制限で切り詰められました",
+        "degraded": "キャプチャが劣化し、内容が不完全な可能性があります",
+        "redacted_truncated": "マスキング済み・切り詰め済み",
+        "redacted_degraded": "マスキング済み・劣化",
+        "truncated_degraded": "切り詰め済み・劣化",
+        "redacted_truncated_degraded": "マスキング・切り詰め・劣化"
+      },
+      "payload": {
+        "loadBody": "本文を読み込む",
+        "loadMetadataOnly": "このレイヤーはメタデータのみ表示できます",
+        "localOnly": "本文はこのマシンでのみ閲覧できます",
+        "recordChars": "記録文字数",
+        "contentStateLabel": "コンテンツ状態",
+        "contentState": {
+          "present": "本文あり",
+          "null_payload": "このレコードには本文がありません",
+          "opaque_or_unavailable": "本文は不透明または利用できません",
+          "corrupt": "レコードデータが破損しており解析できません"
+        },
+        "contentStateOpaque": {
+          "full": "内容は実行時に可視ですが本文としてキャプチャされていません",
+          "partial": "内容の一部のみ観測できます",
+          "metadata_only": "このレイヤーは設計上メタデータのみです",
+          "opaque": "内容は外部プロセス内にあり表示できません",
+          "unavailable": "今回は観測できません"
+        },
+        "availabilityEmpty": {
+          "present": "レコードは存在しますが本文は利用できません",
+          "expired": "ペイロードは保持ポリシーで削除されました",
+          "dropped": "ペイロードはキャプチャ時にドロップされました",
+          "not_captured": "この呼び出しではペイロードはキャプチャされていません",
+          "unknown": "ペイロードレコードがありません"
+        }
+      },
+      "provenance": {
+        "title": "セマンティック入力プロベナンス",
+        "listAria": "入力セクション一覧",
+        "selectSection": "左のセクションを選択して詳細を表示",
+        "absent": "この呼び出しにはセマンティックプロベナンス記録がありません",
+        "corrupt": "セマンティックプロベナンス記録が破損しており、欠落として扱えません",
+        "structural": "構造ロケーター（値の種類：{kind}）、テキスト span なし",
+        "emptySpan": "このセクションは空のテキストセグメントです",
+        "field": {
+          "category": "カテゴリ",
+          "role": "ロール",
+          "precision": "精度",
+          "source": "ソース",
+          "locator": "ロケーター"
+        },
+        "unavailable": {
+          "root_missing": "解決失敗：ルートコンテナがありません",
+          "path_missing": "解決失敗：パスがありません",
+          "span_out_of_range": "解決失敗：span が範囲外です",
+          "not_text": "解決対象がテキストではありません"
+        }
+      },
+      "providerMapping": {
+        "title": "プロバイダーリクエストマッピング",
+        "protocol": "プロトコル：{protocol}",
+        "jump": "対応する入力セクションへジャンプ",
+        "noLocator": "このマッピングにはフィールドレベルのロケーターがありません",
+        "absent": "この呼び出しにはプロバイダーリクエストマッピング記録がありません",
+        "corrupt": "プロバイダーリクエストマッピング記録が破損しており、欠落として扱えません",
+        "empty": "マッピング一覧は空です",
+        "loadSemanticFirst": "先にセマンティックリクエスト本文を読み込んでからマッピングを辿ってください"
+      },
+      "inspector": {
+        "title": "呼び出し詳細",
+        "ariaLabel": "モデル呼び出し詳細ドロワー",
+        "closeAria": "詳細を閉じる",
+        "overview": "概要",
+        "attempts": "試行記録",
+        "pipeline": "ペイロードパイプライン",
+        "traceSection": "所属トレース",
+        "openTrace": "トレースビューで開く",
+        "parentCall": "親呼び出し：{id}",
+        "childCalls": "子呼び出し（{count}）",
+        "model": "モデル",
+        "start": "開始時刻",
+        "field": {
+          "attempts": "試行回数",
+          "attribution": "帰属",
+          "callPurpose": "呼び出し用途",
+          "inputShape": "入力形状",
+          "interruptedByRestart": "再起動による中断",
+          "payloadRecords": "ペイロードレコード",
+          "persistence": "永続化の完全性",
+          "provenancePrecision": "プロベナンス精度",
+          "surfaceTrigger": "サーフェス / トリガー",
+          "usage": "使用量"
+        }
+      },
+      "attempts": {
+        "col": {
+          "attemptId": "試行",
+          "started": "開始",
+          "responded": "応答",
+          "httpStatus": "HTTP",
+          "error": "エラー"
+        },
+        "empty": "試行記録がありません",
+        "notEqualNote": "注意：{attempts} 回の試行 ≠ {providerRequests} 件のプロバイダーリクエスト（リトライ/リプレイで件数は変わります）"
+      },
+      "pipeline": {
+        "attemptLabel": "試行 {id}"
+      },
+      "trace": {
+        "title": "呼び出しトレース",
+        "stats": {
+          "calls": "{count} 回の呼び出し",
+          "payload": "ペイロード：{present} 存在 / {expired} 期限切れ / {dropped} ドロップ"
+        },
+        "usageAvailability": {
+          "complete": "使用量カバレッジ完了（{covered}/{total}）",
+          "partial": "使用量は一部のみ（{covered}/{total}、{unknown} 件不明）",
+          "corrupt": "使用量データ破損（{corrupt}/{total}）",
+          "projection_unavailable": "使用量プロジェクション利用不可",
+          "unknown": "使用量カバレッジ不明（{unknown}/{total}）"
+        },
+        "missingParent": "親呼び出しが欠落",
+        "cycle": "循環を検出したため展開を打ち切りました",
+        "degradedWarning": "このトレースには欠落データがあり、以下のツリーは不完全な可能性があります"
+      },
+      "recording": {
+        "title": "記録設定",
+        "openSettings": "記録設定",
+        "dialogAria": "モデル観測の記録設定",
+        "enabled": "観測記録を有効化",
+        "enabledHintOn": "モデル呼び出しのトレースメタデータを記録中",
+        "enabledHintOff": "有効にするとモデル呼び出しメタデータの記録を開始します",
+        "effectiveStatus": "実際の状態",
+        "queryStatus": "クエリサービス",
+        "configuredButInactive": "設定済みですが有効ではありません",
+        "reason": "理由コード：{code}",
+        "disabledBrowsing": "記録はオフですが、既存データは閲覧できます",
+        "persistTraceMetadata": "トレースメタデータを永続化",
+        "persistPayloads": "ペイロード本文を永続化",
+        "persistPayloadsHint": "リクエスト/レスポンス本文のマスキング済みコピーを保存し、後で監査できます",
+        "persistBlobs": "メディア Blob を永続化",
+        "persistBlobsHint": "画像/音声/動画などのバイナリを保存します",
+        "persistBlobsRequiresPayloads": "先にペイロード本文の永続化を有効にしてください",
+        "retentionTitle": "保持日数",
+        "retentionInvalid": "保持日数は {min}〜{max} の整数である必要があります",
+        "atRestEncryption": "保存時暗号化",
+        "atRestEncryptionNo": "なし（ローカルのファイル権限で保護）",
+        "localOnlyHint": "観測データはこのマシンにのみ保存され、アップロードされません",
+        "lastFlush": "最終書き込み",
+        "confirmPayloadsTitle": "ペイロード本文の永続化を有効にしますか？",
+        "confirmPayloadsBody": "有効にすると、以下の内容がマスキング済みコピーとしてこのマシンのディスクに保存されます：",
+        "confirmPayloadsItemPrompt": "リクエストプロンプトとシステム指示",
+        "confirmPayloadsItemReasoning": "モデルの推論テキスト",
+        "confirmPayloadsItemResponse": "モデルレスポンス本文",
+        "confirmPayloadsItemToolResult": "ツール呼び出しの引数と結果",
+        "confirmPayloadsItemTranscription": "音声書き起こしテキスト",
+        "confirmPayloadsEncryptionFact": "内容は認証情報がマスキングされますが、ディスク保存に暗号学的な暗号化はありません。ローカルのファイル権限に依存します。",
+        "confirmPayloadsConfirm": "本文の永続化を有効化",
+        "confirmBlobsTitle": "メディア Blob の永続化を有効にしますか？",
+        "confirmBlobsBody": "有効にすると、モデル呼び出しに関わる画像/音声/動画がファイルとしてこのマシンのディスクに保存されます。内容は認証情報がマスキングされますが、ディスク保存に暗号学的な暗号化はなく、ローカルのファイル権限に依存します。",
+        "confirmBlobsConfirm": "Blob 永続化を有効化",
+        "retentionTrace": "トレース",
+        "retentionPayload": "ペイロード本文",
+        "retentionBlob": "メディア Blob"
+      },
+      "export": {
+        "title": "観測データのエクスポート",
+        "open": "エクスポート",
+        "dialogAria": "モデル観測データのエクスポート",
+        "currentFilter": "現在のフィルター条件が適用されます",
+        "filterDefault": "（フィルターなし：すべてのレコードをエクスポート）",
+        "includePayloads": "ペイロード本文を含める",
+        "includePayloadsHint": "本文はマスキング済みコピーです。Blob バイナリは含まれません",
+        "maxCalls": "最大呼び出し数",
+        "maxCallsPlaceholder": "デフォルト 10000",
+        "maxCallsInvalid": "最大呼び出し数は 1〜{max} の整数である必要があります",
+        "noCapability": "この環境ではストリーム保存を利用できません",
+        "localOnlyHint": "エクスポートはこのマシン上でのみ行われ、データは外部サービスを経由しません",
+        "start": "エクスポート開始",
+        "progress": "{bytes} バイト書き込み済み…",
+        "saved": "エクスポート完了：{bytes} バイト",
+        "savedTo": "保存先：{path}",
+        "aborted": "エクスポートをキャンセルしました",
+        "abortedPartialLeft": "エクスポートをキャンセルしました。書き込み済みの部分は対象ファイルに残っています",
+        "limitError": "{matched} 件が一致し、上限 {max} を超えています——期間を狭めるかフィルターを追加してください"
+      },
+      "blob": {
+        "preview": "プレビュー",
+        "previewAnyway": "それでも読み込む",
+        "largeWarning": "この Blob は大きい（{size} バイト）ため読み込みに時間がかかる場合があります",
+        "opaqueNote": "タイプ {type}（{size} バイト）はインラインプレビューできません",
+        "download": "ダウンロード",
+        "missing": "Blob ファイルが見つかりません（保持ポリシーで削除された可能性があります）",
+        "invalid": "Blob 識別子が無効です",
+        "localOnly": "Blob コンテンツはこのマシンからのみアクセスできます",
+        "close": "プレビューを閉じる"
+      },
+      "copy": {
+        "callIdAria": "呼び出し ID をコピー",
+        "traceIdAria": "トレース ID をコピー",
+        "capturedPayloadAria": "キャプチャ済みペイロードをコピー"
+      },
+      "onboarding": {
+        "title": "モデル観測",
+        "body": "すべてのモデル呼び出しのトレース・使用量・コストを記録し、このマシンでいつでも監査できます。有効化後はメタデータのみ保存されます。ペイロード本文とメディア Blob はデフォルトでは保存されず、記録設定で個別に有効化できます。すべてのデータはこのマシンにのみ保存され、ディスク保存に暗号学的な暗号化はなく、ローカルのファイル権限に依存します。",
+        "enable": "観測記録を有効化"
+      },
+      "jsonViewer": {
+        "wrap": "折り返し",
+        "copy": "コピー",
+        "copied": "コピーしました",
+        "copyAria": "JSON 内容をコピー",
+        "showAll": "すべて表示（{chars} 文字）",
+        "collapse": "折りたたむ",
+        "stringifyFailed": "JSON シリアライズに失敗しました：{error}"
+      },
+      "semanticResponse": {
+        "completeness": "完全性",
+        "finishReason": "終了理由",
+        "toolCalls": "ツール呼び出し（{count}）",
+        "structuredOutput": "構造化出力",
+        "media": "メディア",
+        "mediaDeferred": "メディア内容は Blob として保存されています",
+        "showRawJson": "生 JSON を表示",
+        "hideRawJson": "生 JSON を隠す"
+      },
+      "values": {
+        "terminalStatus": {
+          "ok": "成功",
+          "error": "失敗",
+          "aborted": "中止",
+          "incomplete": "不完全"
+        },
+        "payloadAvailability": {
+          "present": "キャプチャ済み",
+          "expired": "期限切れ",
+          "dropped": "ドロップ",
+          "not_captured": "未キャプチャ",
+          "unknown": "不明"
+        },
+        "usageAvailability": {
+          "present": "紐付け済み",
+          "corrupt": "データ破損",
+          "not_correlated": "未紐付け",
+          "projection_unavailable": "プロジェクション不可",
+          "unknown": "不明"
+        },
+        "usageStatus": {
+          "ok": "正常",
+          "error": "エラー",
+          "aborted": "中止",
+          "usage_missing": "使用量欠落"
+        },
+        "provenancePrecision": {
+          "exact": "厳密",
+          "partial": "部分的",
+          "opaque": "不透明"
+        },
+        "inputShape": {
+          "chat_context": "チャットコンテキスト",
+          "calltext": "callText",
+          "pi_direct_summary": "直接サマリー",
+          "media_image": "画像生成",
+          "media_video": "動画生成",
+          "external_cli_media": "外部 CLI メディア",
+          "speech_transcribe": "音声書き起こし",
+          "provider_probe": "プロバイダープローブ"
+        },
+        "payloadKind": {
+          "semantic_request": "セマンティックリクエスト",
+          "provider_request": "プロバイダーリクエスト",
+          "provider_response": "プロバイダーレスポンス",
+          "semantic_response": "セマンティックレスポンス"
+        },
+        "payloadVisibility": {
+          "full": "完全に可視",
+          "partial": "部分的に可視",
+          "metadata_only": "メタデータのみ",
+          "opaque": "不透明",
+          "unavailable": "観測不可"
+        },
+        "payloadFidelity": {
+          "runtime_exact": "実行時厳密",
+          "parsed_equivalent": "パース同等",
+          "stream_aggregate": "ストリーム集約",
+          "normalized": "正規化済み",
+          "metadata_only": "メタデータのみ",
+          "external_process": "外部プロセス",
+          "opaque": "不透明"
+        },
+        "sanitizationStatus": {
+          "none": "未処理",
+          "redacted": "マスキング済み",
+          "truncated": "切り詰め済み",
+          "degraded": "劣化",
+          "redacted_truncated": "マスキング+切り詰め",
+          "redacted_degraded": "マスキング+劣化",
+          "truncated_degraded": "切り詰め+劣化",
+          "redacted_truncated_degraded": "マスキング+切り詰め+劣化"
+        },
+        "contentState": {
+          "present": "本文あり",
+          "null_payload": "本文なし",
+          "opaque_or_unavailable": "不透明または不可",
+          "corrupt": "破損"
+        },
+        "transformation": {
+          "pass_through": "そのまま透過",
+          "renamed": "リネーム",
+          "moved": "移動",
+          "merged": "マージ",
+          "split": "分割",
+          "filtered": "フィルター済み",
+          "injected": "注入",
+          "externalized": "外部化",
+          "dropped": "ドロップ",
+          "opaque": "不透明"
+        },
+        "mappingPrecision": {
+          "exact": "厳密",
+          "structural": "構造レベル",
+          "opaque": "不透明"
+        },
+        "semanticCategory": {
+          "platform_instruction": "プラットフォーム指示",
+          "persona": "ペルソナ",
+          "user_profile": "ユーザープロフィール",
+          "memory_context": "メモリコンテキスト",
+          "skill_instruction": "スキル指示",
+          "agents_file": "Agents ファイル",
+          "session_instruction": "セッション指示",
+          "agent_roster": "エージェント名簿",
+          "conversation_history": "会話履歴",
+          "current_user_input": "現在のユーザー入力",
+          "tool_definition": "ツール定義",
+          "tool_result": "ツール結果",
+          "task_instruction": "タスク指示",
+          "task_input": "タスク入力",
+          "format_constraint": "形式制約",
+          "previous_summary": "前回のサマリー",
+          "compaction_summary": "コンパクションサマリー",
+          "media_prompt": "メディアプロンプト",
+          "media_reference": "参照メディア",
+          "audio_input": "音声入力",
+          "language_hint": "言語ヒント",
+          "adapter_injected": "アダプター注入",
+          "sdk_internal": "SDK 内部",
+          "unknown": "不明"
+        },
+        "semanticRole": {
+          "system": "システム",
+          "developer": "開発者",
+          "user": "ユーザー",
+          "assistant": "アシスタント",
+          "tool": "ツール",
+          "input": "入力",
+          "parameter": "パラメータ"
+        },
+        "semanticSourceType": {
+          "template": "テンプレート",
+          "runtime": "ランタイム",
+          "snapshot": "スナップショット",
+          "memory": "メモリ",
+          "skill": "スキル",
+          "tool": "ツール",
+          "sdk": "SDK",
+          "adapter": "アダプター",
+          "unknown": "不明"
+        },
+        "semanticRoot": {
+          "systemPrompt": "systemPrompt",
+          "messages": "messages",
+          "tools": "tools",
+          "input": "input",
+          "parameters": "parameters"
+        },
+        "persistenceCompleteness": {
+          "complete": "完全",
+          "partial": "部分的"
+        },
+        "attributionKind": {
+          "agent": "エージェント",
+          "auxiliary": "補助呼び出し",
+          "direct": "直接呼び出し",
+          "memory": "メモリ",
+          "plugin": "プラグイン",
+          "provider": "プロバイダー",
+          "task": "タスク",
+          "utility": "ユーティリティ",
+          "workflow": "ワークフロー",
+          "unknown": "不明"
+        },
+        "groupByDimension": {
+          "date": "日付",
+          "provider": "プロバイダー",
+          "model": "モデル",
+          "category": "カテゴリ",
+          "operation": "操作",
+          "callPurpose": "呼び出し用途",
+          "status": "ステータス",
+          "attributionKind": "帰属",
+          "session": "セッション",
+          "conversation": "会話",
+          "agent": "エージェント",
+          "task": "タスク",
+          "inputShape": "入力形状",
+          "provenancePrecision": "プロベナンス精度"
+        },
+        "queryStatus": {
+          "ready": "準備完了",
+          "absent": "未初期化",
+          "unavailable": "利用不可",
+          "degraded": "劣化"
+        },
+        "recordingStatus": {
+          "active": "記録中",
+          "degraded": "記録が劣化",
+          "disabled": "無効",
+          "closed": "クローズ"
+        },
+        "completeness": {
+          "complete": "完全",
+          "partial": "部分的"
+        }
+      }
     }
   },
   "onboarding": {

@@ -13,6 +13,7 @@ import path from "path";
 import { createHeartbeat } from "../lib/desk/heartbeat.ts";
 import { createCronScheduler } from "../lib/desk/cron-scheduler.ts";
 import { getAutomationExecutor } from "../lib/desk/automation-executors.ts";
+import { runWithNewModelTrace } from "../lib/llm/model-trace-scope.ts";
 import {
   automationExecutionScopeKey,
   normalizeAutomationExecutionContext,
@@ -227,6 +228,16 @@ export class Scheduler {
   // ──────────── 执行 ────────────
 
   async _executeCronJob(job) {
+    // 每次调度执行 = 独立新 Trace（§四十四/§七十六）：same automationId 的
+    // Run A / Run B 不得共享 trace；force-new 同时切断调度器自身异步链可能
+    // 携带的任何外层 scope（§五十）。
+    return runWithNewModelTrace(
+      { origin: "automation", refs: { automationId: job?.id, studioId: job?.studioId } },
+      () => this._executeCronJobWithinTrace(job),
+    );
+  }
+
+  async _executeCronJobWithinTrace(job) {
     const executor = getAutomationExecutor(job);
     if (executor.kind !== "agent_session") {
       throw new Error(`unsupported automation executor: ${executor.kind}`);

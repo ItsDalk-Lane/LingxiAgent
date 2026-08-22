@@ -2,6 +2,7 @@ import { callText } from "../../../core/llm-client.ts";
 import { callTextConfigFromResolvedModel } from "../../../core/model-execution-config.ts";
 import { getLocale } from "../../i18n.ts";
 import { attachPromptLayoutMetadata, buildUtilityPromptLayout } from "../../llm/prompt-layout.ts";
+import { renderProvenancedText } from "../../llm/semantic-input-provenance.ts";
 import { withMemoryReasoningBuffer } from "../llm-budget.ts";
 import {
   buildDreamAtomizerPrompt,
@@ -62,12 +63,21 @@ async function callStructured(options: {
   maxTokens: number;
   signal?: AbortSignal;
 }) {
-  const run = async (userContent: string, operation: string) => {
+  // Phase 5（§六十六）：dream 各阶段初次调用 = 单段 task_input；JSON/validation
+  // repair 追加的指令段标 format_constraint——不同 logical call 的 provenance
+  // 可区分。segments 渲染必须与 userContent 字节一致（零漂移防御）。
+  const run = async (userContent: string, operation: string, segments: any[] | null = null) => {
+    let userProvenanceSections = null;
+    if (Array.isArray(segments) && segments.length > 0) {
+      const rendered = renderProvenancedText(segments, "\n\n", { root: "messages", path: [0] });
+      if (rendered.text === userContent) userProvenanceSections = rendered.sections;
+    }
     const layout = buildUtilityPromptLayout({
       cacheGroup: options.promptSpec.cacheGroup,
       templateVersion: options.promptSpec.templateVersion,
       systemPrompt: options.promptSpec.systemPrompt,
       userContent,
+      userProvenanceSections,
     });
     return callText({
       ...callTextConfigFromResolvedModel(options.resolvedModel),
@@ -79,15 +89,23 @@ async function callStructured(options: {
       signal: options.signal,
       usageLedger: options.resolvedModel?.usageLedger,
       usageContext: usageContext(operation, options.trigger, options.resolvedModel, layout),
+      semanticInputProvenance: layout.semanticInputProvenance,
     }) as Promise<string>;
   };
+  const initialSegments = (userContent: string, operation: string) => ([
+    { text: userContent, category: "task_input", source: { type: "memory", id: `memory.dream.${operation}` } },
+  ]);
 
-  const raw = await run(options.userContent, options.operation);
+  const raw = await run(options.userContent, options.operation, initialSegments(options.userContent, options.operation));
   try {
     return parseObject(raw);
   } catch (err: any) {
-    const repairInput = `${options.userContent}\n\nThe previous response was invalid JSON (${err?.message || err}). Return one corrected JSON object only. Previous response:\n${String(raw).slice(0, 12_000)}`;
-    return parseObject(await run(repairInput, `${options.operation}_repair`));
+    const repairTail = `The previous response was invalid JSON (${err?.message || err}). Return one corrected JSON object only. Previous response:\n${String(raw).slice(0, 12_000)}`;
+    const repairInput = `${options.userContent}\n\n${repairTail}`;
+    return parseObject(await run(repairInput, `${options.operation}_repair`, [
+      ...initialSegments(options.userContent, options.operation),
+      { text: repairTail, category: "format_constraint", source: { type: "runtime", id: "memory.dream.json-repair" } },
+    ]));
   }
 }
 
@@ -115,9 +133,10 @@ async function runValidatedStage<T>(options: {
   try {
     return options.validate(raw);
   } catch (err: any) {
+    const validationTail = `Validation error: ${err?.message || err}. ${options.repairInstruction}`;
     const repaired = await callStructured({
       promptSpec: options.promptSpec,
-      userContent: `${userContent}\n\nValidation error: ${err?.message || err}. ${options.repairInstruction}`,
+      userContent: `${userContent}\n\n${validationTail}`,
       resolvedModel: options.resolvedModel,
       operation: `${options.operation}_validation_repair`,
       trigger: options.trigger,

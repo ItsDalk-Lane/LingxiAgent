@@ -97,7 +97,7 @@ const TAB_TITLE_KEYS: Record<string, string> = {
   bridge: 'settings.tabs.bridge',
   providers: 'settings.tabs.providers',
   models: 'settings.tabs.models',
-  usage: 'settings.usage.title',
+  usage: 'settings.tabs.usage',
   sharing: 'settings.tabs.sharing',
   access: 'settings.tabs.access',
   plugins: 'settings.tabs.plugins',

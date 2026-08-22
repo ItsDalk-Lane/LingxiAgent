@@ -19,6 +19,11 @@
  * 避免"摘要器"和"文案兜底"两个职责互相纠缠。
  */
 import fs from "fs";
+import {
+  createSemanticInputProvenance,
+  provenanceSection,
+  renderProvenancedText,
+} from "../../lib/llm/semantic-input-provenance.ts";
 import { callText } from "../llm-client.ts";
 import { callTextWithLengthContract, type OutputLengthContract } from "../output-length-contract.ts";
 import { getLocale } from "../../lib/i18n.ts";
@@ -46,6 +51,7 @@ export async function summarizeSessionForRc(engine, agent, sessionPath) {
 
   const isZh = getLocale().startsWith("zh");
   const messages = _buildMessages(content, isZh);
+  const messagesProvenance = (messages as any).semanticInputProvenance ?? null;
   const lengthContract = _summaryLengthContract(isZh);
 
   // 一次 resolve，一次 fallback——完全收口在 resolver。
@@ -80,6 +86,7 @@ export async function summarizeSessionForRc(engine, agent, sessionPath) {
     usageLedger: summarizeResolved.usageLedger ?? engine.usageLedger,
     usageContext: usageContextForRc(engine, agent, sessionPath, "rc_summary_summarize"),
     messages,
+    semanticInputProvenance: messagesProvenance,
     lengthContract,
   }, "summarize");
   return text;
@@ -111,7 +118,7 @@ function _summaryLengthContract(isZh): OutputLengthContract {
     : { label: "/rc summary", target: 60, unit: "words", min: 1, locale: "en" };
 }
 
-async function _safeCall({ api, model, apiKey, baseUrl, headers, messages, usageLedger, usageContext, lengthContract }, tierLabel) {
+async function _safeCall({ api, model, apiKey, baseUrl, headers, messages, semanticInputProvenance, usageLedger, usageContext, lengthContract }, tierLabel) {
   try {
     const { text } = await callTextWithLengthContract({
       callText,
@@ -121,6 +128,7 @@ async function _safeCall({ api, model, apiKey, baseUrl, headers, messages, usage
         messages,
         temperature: 0.3,
         timeoutMs: SUMMARY_TIMEOUT_MS,
+        semanticInputProvenance,
         usageLedger,
         usageContext,
       },
@@ -181,11 +189,33 @@ Rules: output 1-3 direct English sentences, aiming for about 60 words; 36-120 wo
     : "";
 
   const contextLabel = isZh ? "对话片段" : "Conversation";
-  return [
-    { role: "system", content: system },
+  const userLabel = isZh ? "用户：" : "User: ";
+  const assistantLabel = isZh ? "助手：" : "Assistant: ";
+  // Phase 5：userContent 三段（标签/用户段/助手段）拼接前渲染 provenance，
+  // 与旧模板字符串字节一致；provenance 挂在返回对象的 provenance 字段供
+  // callText 使用。
+  const userRendered = renderProvenancedText([
+    { text: `${contextLabel}：`, category: "task_instruction", source: { type: "template", id: "rc-summary.context-label" } },
+    { text: `${userLabel}${userText}`, category: "task_input", source: { type: "runtime", id: "rc-summary.user-text" } },
+    { text: `${assistantLabel}${assistantText}${toolStr}`, category: "task_input", source: { type: "runtime", id: "rc-summary.assistant-text" } },
+  ], "\n\n", { root: "messages", path: [1] });
+  return Object.assign(
+    [
+      { role: "system", content: system },
+      {
+        role: "user",
+        content: userRendered.text,
+      },
+    ],
     {
-      role: "user",
-      content: `${contextLabel}：\n\n${isZh ? "用户：" : "User: "}${userText}\n\n${isZh ? "助手：" : "Assistant: "}${assistantText}${toolStr}`,
+      semanticInputProvenance: createSemanticInputProvenance("calltext", [
+        provenanceSection(
+          { root: "messages", path: [0] },
+          "task_instruction",
+          { role: "system", source: { type: "template", id: "rc-summary.system" } },
+        ),
+        ...userRendered.sections,
+      ]),
     },
-  ];
+  );
 }

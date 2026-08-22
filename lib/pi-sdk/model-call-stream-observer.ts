@@ -1,0 +1,560 @@
+/**
+ * model-call-stream-observer.ts — Pi streamFunction 统一观测接点（审计 Boundary A）。
+ *
+ * 覆盖范围（0.84.1 实证）：
+ *   - MC-01 普通 Chat / Bridge / Phone / Subagent：Agent.prompt → runAgentLoop
+ *     → `this.streamFunction`（pi-agent-core agent.js:272/277）。
+ *   - MC-02 cache-preserving AgentRun：Lingxi 侧 `getSessionAgentRunRuntime()`
+ *     读取 `agent.streamFunction` 传给 runAgentLoop（自动经过本包装）；runner
+ *     另用 ALS scope 显式标记 compaction 分类并把 callId 写进 ledger metadata。
+ *   - MC-03 原生 compaction/branch summarizer：Pi `compact()` /
+ *     `_runAutoCompaction()` / `generateBranchSummary()` 都把
+ *     `this.agent.streamFunction` 传给 `completeSummarization()`。
+ *
+ * 因此包装 `agent.streamFunction` 是三条路径唯一公共边界——与
+ * `stream-guard.ts` / `_installCachePrefixGuard` 同一包装先例。
+ *
+ * 生命周期映射（streamFn 契约：返回 AssistantMessageEventStream，provider
+ * 错误经 stream 的 error/done 事件传递，`result()` 总是 resolve 终态消息）：
+ *   - 包装被调用（= Provider 请求之前）→ logical_call_start + attempt_start
+ *   - `before_provider_request` hook（经 ALS scope 关联）→ provider_request_prepared
+ *   - `after_provider_response` hook（同 scope）→ provider_response_received
+ *   - result() resolve 出 assembled message → semantic_response_completed
+ *     （stopReason=error/aborted 时转为对应错误/中止终态）
+ *
+ * 诚实性（§四十）：
+ *   - attemptVisibility: "logical_boundary"——一个 streamFn 调用对 Lingxi 是一次
+ *     逻辑网络 attempt；pi-ai `retryProviderRequest` 的内部 transport retry
+ *     （408/409/429/5xx/网络错误）没有 attempt hook，被折叠在这一个 attempt 里，
+ *     不伪造多个 attemptId。
+ *   - Pi 原生 summarizer 的请求 options 不含 onPayload（0.84.1 实证），因此
+ *     MC-03 不会触发 provider_request_prepared——事件缺失即真相，不补假事件。
+ */
+import { AsyncLocalStorage } from "node:async_hooks";
+import {
+  getModelCallObserver,
+  modelCallFieldsFromUsageContext,
+  normalizeModelCallIdentity,
+  type ModelCallAttribution,
+  type ModelCallSource,
+} from "../llm/model-call-observer.ts";
+import { createModelCallRecorder } from "../llm/model-call-recorder.ts";
+import {
+  currentModelCallScope,
+  runWithModelCallScope,
+  type ModelCallScope,
+} from "../llm/model-call-scope.ts";
+import { mintModelCallId } from "../llm/model-call-identity.ts";
+import {
+  buildChatContextProvenance,
+  extendChatContextProvenance,
+  type SessionPromptProvenancePayload,
+} from "../llm/semantic-input-provenance.ts";
+import {
+  createModelCallPayloadCaptureSession,
+  type ModelCallPayloadCaptureSession,
+} from "../llm/model-call-payload-capture.ts";
+import {
+  currentModelTraceScope,
+  noteAgentStreamCallStarted,
+  runWithModelTraceRoot,
+  resolveModelTraceContext,
+} from "../llm/model-trace-scope.ts";
+import { noteModelCallMessageIdentity } from "../llm/model-call-correlation.ts";
+
+const INSTALLED = Symbol.for("lingxi.modelCallStreamObserver.installed");
+const TRACE_INGRESS_INSTALLED = Symbol.for("lingxi.modelCallTraceIngress.installed");
+
+/**
+ * Phase 6（MODEL_CALL_PAYLOAD_CAPTURE_AUDIT.md §1.2）：pi-ai 的
+ * google-generative-ai / google-vertex / mistral-conversations adapter 从不调用
+ * onResponse → 这些协议的 after_provider_response 结构性不触发（诚实缺失，
+ * 显式 unavailable record 表达，不伪造）。
+ */
+const PROTOCOLS_WITHOUT_RESPONSE_HOOK = new Set([
+  "google-generative-ai",
+  "google-vertex",
+  "mistral-conversations",
+]);
+
+/**
+ * Agent prompt turn 标记（Phase 5）：session.prompt() 执行期内为 true。
+ * current_user_input 的判定依据（§五十一）：pi-ai Message 中 toolResult 是独立
+ * role（非 user 包装），agent loop 在 turn 内只追加 assistant/toolResult，因此
+ * 「turn 内最后一条 role=user 消息」由 runtime 不变量证明为触发输入——不是
+ * 「数组最后一项」启发式。无 turn 标记（agent.continue / 无 ingress）→ 不判
+ * current_user_input，宁可 conversation_history。
+ */
+const AGENT_PROMPT_TURN_STORAGE = new AsyncLocalStorage<boolean>();
+
+function currentAgentPromptTurn(): boolean {
+  return AGENT_PROMPT_TURN_STORAGE.getStore() === true;
+}
+
+/** 每个 session 的静态归属（由创建方注册）；per-call 分类优先走 ALS scope。 */
+export type ModelCallSessionContextProvider = () => {
+  source?: ModelCallSource | null;
+  attribution?: ModelCallAttribution | null;
+  traceId?: string | null;
+  parentCallId?: string | null;
+  /** Phase 5：冻结快照 provenance payload（无/旧快照 → null，诚实 structural）。 */
+  promptProvenance?: SessionPromptProvenancePayload | null;
+} | null;
+
+const sessionContextProviders = new WeakMap<object, ModelCallSessionContextProvider>();
+
+/**
+ * 由 session 创建方（session-coordinator / bridge-session-manager /
+ * agent-executor）在 createAgentSession 之后注册该 session 的归属上下文。
+ * provider 在每次模型调用时求值，保持 cheap + 无副作用。
+ */
+export function registerSessionModelCallContext(
+  session: unknown,
+  provider: ModelCallSessionContextProvider,
+): void {
+  if (!session || typeof session !== "object" || typeof provider !== "function") return;
+  sessionContextProviders.set(session as object, provider);
+}
+
+const UNKNOWN_CHAT_CONTEXT = {
+  source: Object.freeze({
+    subsystem: "session",
+    operation: "reply",
+    surface: "unknown",
+    trigger: "unknown",
+  }),
+  attribution: Object.freeze({ kind: "unknown" }),
+} as const;
+
+export function installModelCallStreamObserver(
+  session: any,
+  contextProvider: ModelCallSessionContextProvider | null = null,
+): void {
+  const agent = session?.agent;
+  if (!agent || typeof agent.streamFunction !== "function" || agent[INSTALLED]) return;
+  if (contextProvider) registerSessionModelCallContext(session, contextProvider);
+  const originalStreamFn = agent.streamFunction;
+  agent[INSTALLED] = true;
+
+  agent.streamFunction = async (model: any, context: any, options: any) => {
+    const observer = getModelCallObserver();
+    const modelIdentity = normalizeModelCallIdentity(model);
+    const explicitScope = currentModelCallScope();
+    const registered = readRegisteredContext(session, sessionContextProviders.get(session));
+    const nativeSummarization = !explicitScope && session?.isCompacting === true;
+
+    // Trace 身份解析（§四十三）：显式 call scope trace > 当前任务 trace scope
+    // （parent = scope.lastCallId，即同一异步链上最近一次 agent-loop 流式调用）
+    // > session 注册归属 trace > 新铸 singleton trace。全部经统一 resolver，
+    // 各接点不自建解析（§四十一/§四十二）。
+    const traceFromScope = currentModelTraceScope();
+    const explicitTraceId = explicitScope?.traceId ?? null;
+    const registeredTraceId = registered?.traceId ?? null;
+    let traceId: string | null;
+    let parentCallId: string | null;
+    let traceOrigin: string | null = null;
+    if (explicitTraceId) {
+      traceId = explicitTraceId;
+      parentCallId = explicitScope?.parentCallId ?? null;
+    } else if (traceFromScope) {
+      traceId = traceFromScope.traceId;
+      parentCallId = traceFromScope.lastCallId;
+      traceOrigin = traceFromScope.origin;
+    } else if (registeredTraceId) {
+      traceId = registeredTraceId;
+      parentCallId = registered?.parentCallId ?? null;
+    } else {
+      traceId = resolveModelTraceContext().traceId;
+      parentCallId = null;
+    }
+
+    // 分类优先级：显式 ALS scope（MC-02 runner）> native summarization（MC-03）
+    // > session 注册归属（MC-01 各 surface）> 诚实 unknown。
+    const effectiveSource = explicitScope?.source
+      ?? (nativeSummarization ? NATIVE_SUMMARIZATION_SOURCE(registered) : null)
+      ?? registered?.source
+      ?? UNKNOWN_CHAT_CONTEXT.source;
+    const effectiveAttribution = explicitScope?.attribution
+      ?? registered?.attribution
+      ?? unknownAttributionWithSessionIds(session);
+    // MC-02 runner 先铸 callId 写进 ledger metadata，这里接管同一身份（单点发射）。
+    const callId = explicitScope?.callId ?? mintModelCallId();
+
+    // Phase 6：Sensitive Payload Capture session（sink 未安装 = null 快路径）。
+    // 只含身份/计数器/sink 引用；经 recorder + ALS scope 双通道共享给
+    // provider hooks（§一百二十二/§一二三）。
+    const payloadCapture = createModelCallPayloadCaptureSession({
+      callId,
+      traceId,
+      parentCallId,
+      model: modelIdentity,
+      source: effectiveSource,
+      attribution: effectiveAttribution,
+    });
+
+    const recorder = createModelCallRecorder({
+      observer,
+      context: {
+        callId,
+        traceId,
+        parentCallId,
+        model: modelIdentity,
+        source: effectiveSource,
+        attribution: effectiveAttribution,
+        // MC-03 的 native summarizer 不经 Usage Ledger 的 exact modelCallId
+        // 关联点；这里是唯一知道该事实的真实运行时边界。
+        usageCorrelation: nativeSummarization ? "not_correlated" : null,
+        payloadCapture,
+      },
+    });
+
+    // Phase 5：Semantic Input Provenance 构造（来源仍可知的 streamFn 边界）。
+    // 优先级：MC-02 runner 的 scope provenance（覆盖 recovery/repair 尾段扩展）
+    // > native summarization（MC-03，structural）> MC-01 自动分类（快照前缀证明
+    // + turn 标记 + role 分类）。构造/附着失败绝不影响业务（try/catch 兜底）。
+    let semanticProvenance = null;
+    try {
+      if (explicitScope?.semanticInputProvenance) {
+        semanticProvenance = extendChatContextProvenance(
+          explicitScope.semanticInputProvenance,
+          Array.isArray(context?.messages) ? context.messages : [],
+        );
+      } else {
+        semanticProvenance = buildChatContextProvenance(
+          {
+            systemPrompt: context?.systemPrompt,
+            messages: context?.messages,
+            tools: context?.tools,
+          },
+          {
+            promptTurn: currentAgentPromptTurn(),
+            promptSnapshot: registered?.promptProvenance ?? null,
+            nativeSummarization,
+          },
+        );
+      }
+      if (semanticProvenance) recorder.attachSemanticInputProvenance(semanticProvenance);
+    } catch {
+      // Provenance 构造失败 → 无 provenance（observer 事件照常，只是无 summary）。
+    }
+
+    recorder.beginLogicalCall({
+      details: {
+        path: "pi_stream",
+        ...(traceOrigin ? { traceOrigin } : {}),
+        ...(nativeSummarization ? { nativeSummarization: true } : {}),
+        ...(explicitScope?.details && typeof explicitScope.details === "object"
+          ? explicitScope.details
+          : {}),
+      },
+    });
+    const attemptId = recorder.beginAttempt({
+      // 一个 streamFn 调用 = 一个逻辑网络 attempt；pi-ai 传输层 retry 折叠在内。
+      details: { attemptVisibility: "logical_boundary" },
+    });
+
+    // Agent-loop 流式调用推进任务链的 causal parent 指针（§二十九/§三十）：
+    // 同一 runAgentLoop 的顺序调用 C1→C2，C2 解析 parent=C1；工具子 scope 在
+    // 建立时已冻结快照，不受此处推进影响（§三十一并行分支）。
+    noteAgentStreamCallStarted(callId);
+
+    // Phase 6 Semantic Request Capture（§七十二/§七十三/§八十三）：streamFn 边界
+    // 的真实 context（systemPrompt/messages/tools——MC-02 为冻结 providerContext，
+    // MC-03 为 SDK serializeConversation 拍平输入，payload 层仍可捕获正文）。
+    if (payloadCapture) {
+      payloadCapture.captureSemanticRequest({
+        inputShape: semanticProvenance?.inputShape ?? "chat_context",
+        systemPrompt: typeof context?.systemPrompt === "string" ? context.systemPrompt : null,
+        messages: Array.isArray(context?.messages) ? context.messages : null,
+        tools: Array.isArray(context?.tools) ? context.tools : null,
+        provenance: semanticProvenance,
+      });
+    }
+
+    // Phase 6 Provider Wire 可用性（§八十四/§一百零三，运行时精确判定）：
+    // options 无 onPayload（MC-02 runner / MC-03 native summarizer 的 options
+    // 来自 createSummarizationOptions，无 hook）→ provider wire 结构性不可见，
+    // 显式 unavailable，绝不从 semantic request 重建。
+    if (payloadCapture) {
+      const hasProviderHook = typeof options?.onPayload === "function";
+      if (!hasProviderHook) {
+        payloadCapture.noteProviderWireUnavailable("provider_request", {
+          reason: "pi-streamfn-no-onpayload-hook",
+          visibility: "unavailable",
+          fidelity: "opaque",
+        });
+        payloadCapture.noteProviderWireUnavailable("provider_response", {
+          reason: "pi-streamfn-no-onpayload-hook",
+          visibility: "unavailable",
+          fidelity: "opaque",
+        });
+      } else if (PROTOCOLS_WITHOUT_RESPONSE_HOOK.has(String(modelIdentity?.api ?? ""))) {
+        payloadCapture.noteProviderWireUnavailable("provider_response", {
+          reason: "pi-adapter-no-onresponse",
+          visibility: "unavailable",
+          fidelity: "opaque",
+        });
+      }
+    }
+
+    const scope: ModelCallScope = {
+      callId,
+      attemptId,
+      traceId,
+      parentCallId,
+      model: modelIdentity,
+      source: effectiveSource,
+      attribution: effectiveAttribution,
+      // Phase 6：provider hooks 经 ALS 读到的 capture 能力引用（无正文）。
+      payloadCapture,
+    };
+
+    let inner: any;
+    try {
+      inner = await runWithModelCallScope(
+        scope,
+        () => originalStreamFn.call(agent, model, context, options),
+      );
+    } catch (error) {
+      // streamFn 在返回 stream 之前抛错（罕见：sdk 闭包读 settings、凭证边界等）。
+      emitTerminalError(recorder, error, "pre_stream_throw");
+      throw error;
+    }
+
+    observeStreamTerminal(inner, recorder);
+    return inner;
+  };
+}
+
+function readRegisteredContext(session: any, provider: ModelCallSessionContextProvider | undefined) {
+  if (!provider) return null;
+  try {
+    return provider() ?? null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Agent Turn trace 入口（§二十七/§二十八）：把整个 `session.prompt()`（含其
+ * 全部 streamFn 调用、工具执行、compaction、派生任务）置于同一个
+ * ModelTraceScope。
+ *
+ * 语义 = inherit-or-mint：外层已有 trace scope（chat 工具内 spawn 的子代理
+ * session、处于用户 turn 中的恢复调用）→ 原样继承（§二十六/§三十五：媒体/
+ * 子代理不得 mint 新 trace）；没有 → 铸新 trace 根（独立桌面/桥接/Phone turn、
+ * 定时自动化）。origin 用 "unknown"——本包装是兜底接点，真实 ingress 在
+ * coordinator/bridge/executor/scheduler 显式包装并带准确 origin；外层显式
+ * 包装先于本包装生效时这里只会继承。
+ */
+export function installModelCallTraceIngress(session: any): void {
+  const originalPrompt = session?.prompt;
+  if (typeof originalPrompt !== "function" || session[TRACE_INGRESS_INSTALLED]) return;
+  session[TRACE_INGRESS_INSTALLED] = true;
+  session.prompt = async function traceIngressPrompt(...args: any[]) {
+    // Agent prompt turn 标记：整个 prompt() 执行期（含全部 streamFn 调用与工具
+    // continuation）currentAgentPromptTurn() === true，供 current_user_input
+    // 判定（§五十一：runtime turn 证明，非数组末项启发式）。
+    return AGENT_PROMPT_TURN_STORAGE.run(true, () =>
+      runWithModelTraceRoot({ origin: "unknown" }, () =>
+        originalPrompt.apply(this, args as []),
+      ),
+    );
+  };
+}
+
+function NATIVE_SUMMARIZATION_SOURCE(registered: ReturnType<typeof readRegisteredContext>) {
+  return {
+    subsystem: "compaction",
+    // Pi 原生 summarizer：manual/auto/branch summary 共用 isCompacting 信号，
+    // 这里无法进一步区分，operation 保持通用 "compact"（见实现报告 Retry Reality）。
+    operation: "compact",
+    surface: registered?.source?.surface ?? "unknown",
+    trigger: "unknown",
+  } as ModelCallSource;
+}
+
+function unknownAttributionWithSessionIds(session: any): ModelCallAttribution {
+  const sessionId = safeString(() => session?.sessionManager?.getSessionId?.());
+  const sessionPath = safeString(() => session?.sessionManager?.getSessionFile?.());
+  return {
+    kind: "unknown",
+    ...(sessionId ? { sessionId } : {}),
+    ...(sessionPath ? { sessionPath } : {}),
+  };
+}
+
+function safeString(read: () => unknown): string | null {
+  try {
+    const value = read();
+    return typeof value === "string" && value.trim() ? value.trim() : null;
+  } catch {
+    return null;
+  }
+}
+
+function observeStreamTerminal(inner: any, recorder: ReturnType<typeof createModelCallRecorder>): void {
+  try {
+    if (!inner || typeof inner.result !== "function") {
+      // 非标准 stream：终态不可见。不伪造——logical_call_start 已经留下事实。
+      recorder.endLogicalCall("error", {
+        details: { terminalVisibility: "stream_result_unavailable" },
+      });
+      return;
+    }
+    Promise.resolve(inner.result()).then(
+      (message: any) => {
+        try {
+          // message_end 补账关联（§六十四）：agent loop 持有的与 message_end 事件
+          // 携带的是同一个 assembled message 对象；WeakMap 登记，ledger 补账处读取。
+          noteModelCallMessageIdentity(message, {
+            modelCallId: recorder.callId,
+            traceId: recorder.traceId,
+            parentCallId: recorder.parentCallId,
+          });
+          const stopReason = typeof message?.stopReason === "string" ? message.stopReason : null;
+          // Phase 6 Semantic Response Capture（§七十九/§八十/§一百一十）：
+          // assembled message 的 content blocks（text/thinking/toolCall）；
+          // aborted/error 下有已组装内容则诚实 partial，完全无输出不制造
+          // semantic_response（§一百五十五）。Observer 终态语义不变（§八十一）。
+          const payloadCapture = recorder.payloadCapture;
+          if (payloadCapture) {
+            const semantic = semanticResponseFromAssistantMessage(message);
+            const hasContent = Boolean(
+              semantic.text || semantic.reasoning || (semantic.toolCalls && semantic.toolCalls.length > 0),
+            );
+            const partial = stopReason === "aborted" || stopReason === "error";
+            if (hasContent || !partial) {
+              payloadCapture.captureSemanticResponse({
+                response: {
+                  ...semantic,
+                  finishReason: stopReason,
+                  usage: message?.usage ?? null,
+                  completeness: partial ? "partial" : "complete",
+                },
+              });
+            }
+          }
+          if (stopReason === "aborted") {
+            recorder.logicalCallAborted({ details: { stopReason } });
+            recorder.endLogicalCall("aborted");
+            return;
+          }
+          if (stopReason === "error") {
+            const error = new Error(
+              typeof message?.errorMessage === "string" && message.errorMessage
+                ? message.errorMessage
+                : "provider stream error",
+            );
+            recorder.attemptError(error, { details: { stopReason } });
+            recorder.logicalCallError(error, { details: { stopReason } });
+            recorder.endLogicalCall("error");
+            return;
+          }
+          recorder.semanticResponseCompleted({ details: summarizeAssistantMessage(message) });
+          recorder.endLogicalCall("ok");
+        } catch {
+          // 观测代码自身失败不得影响业务（§九）
+        }
+      },
+      (error: unknown) => {
+        // result() 按 EventStream 契约不 reject；防御性兜底。
+        try {
+          emitTerminalError(recorder, error, "stream_result_rejected");
+        } catch { /* never break */ }
+      },
+    );
+  } catch {
+    // 观测代码自身失败不得影响业务（§九）
+  }
+}
+
+function emitTerminalError(
+  recorder: ReturnType<typeof createModelCallRecorder>,
+  error: unknown,
+  errorKind: string,
+): void {
+  const aborted = (error as any)?.name === "AbortError" || (error as any)?.type === "aborted";
+  if (aborted) {
+    recorder.logicalCallAborted({ details: { errorKind } });
+    recorder.endLogicalCall("aborted");
+    return;
+  }
+  recorder.attemptError(error, { details: { errorKind } });
+  recorder.logicalCallError(error, { details: { errorKind } });
+  recorder.endLogicalCall("error");
+}
+
+/** Assembled assistant message 的安全结构 metadata——只看类型/计数/数值，不看正文。 */
+function summarizeAssistantMessage(message: any): Record<string, unknown> {
+  const content = Array.isArray(message?.content) ? message.content : [];
+  let hasText = false;
+  let hasReasoning = false;
+  let toolCallCount = 0;
+  for (const block of content) {
+    const type = block?.type;
+    if (type === "text" && typeof block?.text === "string" && block.text.length > 0) hasText = true;
+    if (type === "thinking" || type === "redacted_thinking" || type === "reasoning") hasReasoning = true;
+    if (type === "toolCall") toolCallCount += 1;
+  }
+  const usage = compactUsageNumbers(message?.usage);
+  return {
+    stopReason: typeof message?.stopReason === "string" ? message.stopReason : null,
+    hasText,
+    hasReasoning,
+    toolCallCount,
+    usagePresent: Boolean(message?.usage),
+    errorPresent: typeof message?.errorMessage === "string" && message.errorMessage.length > 0,
+    ...(usage ? { usage } : {}),
+  };
+}
+
+/**
+ * Phase 6（§七十九/§一百零七/§一百一十）：assembled assistant message →
+ * Semantic Response 输入。只捕获运行时实际可见内容：text 拼接、thinking 文本、
+ * toolCall（name/arguments/id）；redacted_thinking 只作为结构标记（加密数据
+ * 丢弃，不解密不保存）。
+ */
+function semanticResponseFromAssistantMessage(message: any): {
+  text: string | null;
+  reasoning: string | null;
+  toolCalls: Array<{ name: string | null; id: string | null; arguments: unknown }> | null;
+} {
+  const content = Array.isArray(message?.content) ? message.content : [];
+  let text = "";
+  let reasoning = "";
+  let sawRedactedThinking = false;
+  const toolCalls: Array<{ name: string | null; id: string | null; arguments: unknown }> = [];
+  for (const block of content) {
+    if (!block || typeof block !== "object") continue;
+    if (block.type === "text" && typeof block.text === "string") {
+      text += block.text;
+    } else if (block.type === "thinking" && typeof block.thinking === "string") {
+      reasoning += (reasoning ? "\n" : "") + block.thinking;
+    } else if (block.type === "redacted_thinking") {
+      sawRedactedThinking = true;
+    } else if (block.type === "toolCall") {
+      toolCalls.push({
+        name: typeof block.name === "string" ? block.name : null,
+        id: typeof block.id === "string" ? block.id : null,
+        arguments: block.arguments ?? null,
+      });
+    }
+  }
+  return {
+    text: text || null,
+    reasoning: reasoning
+      + (sawRedactedThinking ? (reasoning ? "\n[redacted_thinking]" : "[redacted_thinking]") : ""),
+    toolCalls: toolCalls.length > 0 ? toolCalls : null,
+  };
+}
+
+function compactUsageNumbers(usage: any): Record<string, number> | null {
+  if (!usage || typeof usage !== "object") return null;
+  const out: Record<string, number> = {};
+  for (const key of ["input", "output", "cacheRead", "cacheWrite", "totalTokens"]) {
+    const value = Number(usage[key]);
+    if (Number.isFinite(value)) out[key] = value;
+  }
+  return Object.keys(out).length > 0 ? out : null;
+}

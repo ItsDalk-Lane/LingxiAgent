@@ -28,6 +28,7 @@ import {
   stripThinkTagBlocks,
 } from "./compiled-memory-state.ts";
 import { attachPromptLayoutMetadata, buildUtilityPromptLayout } from "../llm/prompt-layout.ts";
+import { renderProvenancedText } from "../llm/semantic-input-provenance.ts";
 import {
   buildCompileDailyPrompt,
   buildCompileEditableFactsPrompt,
@@ -364,6 +365,14 @@ export async function compileToday(summaryManager, outputPath, resolvedModel, op
     : (isZh
         ? `## 新增或修订的时间线条目（delta）\n\n${delta}`
         : `## New or revised timeline entries (delta)\n\n${delta}`);
+  const inputSegments = previousDraft
+    ? [
+        { text: isZh ? `## 上一版今日草稿\n\n${previousDraft}` : `## Previous today draft\n\n${previousDraft}`, category: "previous_summary", source: { type: "memory", id: "memory.compile.today.previous-draft" } },
+        { text: isZh ? `## 新增或修订的时间线条目（delta）\n\n${delta}` : `## New or revised timeline entries (delta)\n\n${delta}`, category: "task_input", source: { type: "memory", id: "memory.compile.today.delta" } },
+      ]
+    : [
+        { text: isZh ? `## 新增或修订的时间线条目（delta）\n\n${delta}` : `## New or revised timeline entries (delta)\n\n${delta}`, category: "task_input", source: { type: "memory", id: "memory.compile.today.delta" } },
+      ];
 
   const result = await _compactLLM(
     input,
@@ -371,6 +380,7 @@ export async function compileToday(summaryManager, outputPath, resolvedModel, op
     resolvedModel,
     450,
     "compile_today",
+    inputSegments,
   );
 
   atomicWrite(outputPath, normalizeCompiledLLMResult(result, "compileToday"));
@@ -452,6 +462,10 @@ export async function compileDaily(summaryManager, dailyDir, logicalDate, resolv
     // 保证 6 条装配起来的总量不超过原 week 段体量。
     100,
     "compile_daily",
+    [
+      // 单一输入源（timeline events 或旧草稿），整段 task_input。
+      { text: input, category: "task_input", source: { type: "memory", id: "memory.compile.daily.input" } },
+    ],
   );
 
   const body = normalizeCompiledLLMResult(result, "compileDaily");
@@ -670,6 +684,14 @@ export async function compileLongterm(content, longtermPath, resolvedModel) {
     : (isZh
         ? `## 新沉淀内容\n\n${newContent}`
         : `## Newly settled content\n\n${newContent}`);
+  const longtermSegments = prevLongterm
+    ? [
+        { text: isZh ? `## 上一份长期情况\n\n${prevLongterm}` : `## Previous long-term context\n\n${prevLongterm}`, category: "previous_summary", source: { type: "memory", id: "memory.compile.longterm.previous" } },
+        { text: isZh ? `## 新沉淀内容\n\n${newContent}` : `## Newly settled content\n\n${newContent}`, category: "task_input", source: { type: "memory", id: "memory.compile.longterm.new" } },
+      ]
+    : [
+        { text: isZh ? `## 新沉淀内容\n\n${newContent}` : `## Newly settled content\n\n${newContent}`, category: "task_input", source: { type: "memory", id: "memory.compile.longterm.new" } },
+      ];
 
   const result = await _compactLLM(
     input,
@@ -677,6 +699,7 @@ export async function compileLongterm(content, longtermPath, resolvedModel) {
     resolvedModel,
     600,
     "compile_longterm",
+    longtermSegments,
   );
 
   atomicWrite(longtermPath, normalizeCompiledLLMResult(result, "compileLongterm"));
@@ -995,12 +1018,21 @@ export async function compileEditableFacts(summaryManager, outputPath, resolvedM
     : (isZh
         ? `## 新增候选 Facts\n\n${newFacts}`
         : `## New Candidate Facts\n\n${newFacts}`);
+  const editableFactsSegments = prevFacts
+    ? [
+        { text: isZh ? `## 当前可信 Facts\n\n${prevFacts}` : `## Current Trusted Facts\n\n${prevFacts}`, category: "previous_summary", source: { type: "memory", id: "memory.compile.editable-facts.previous" } },
+        { text: isZh ? `## 新增候选 Facts\n\n${newFacts}` : `## New Candidate Facts\n\n${newFacts}`, category: "task_input", source: { type: "memory", id: "memory.compile.editable-facts.new" } },
+      ]
+    : [
+        { text: isZh ? `## 新增候选 Facts\n\n${newFacts}` : `## New Candidate Facts\n\n${newFacts}`, category: "task_input", source: { type: "memory", id: "memory.compile.editable-facts.new" } },
+      ];
   const result = await _compactLLM(
     combined,
     buildCompileEditableFactsPrompt(getLocale()),
     resolvedModel,
     300,
     "compile_editable_facts",
+    editableFactsSegments,
   );
 
   atomicWrite(outputPath, normalizeCompiledLLMResult(result, "compileEditableFacts"));
@@ -1051,7 +1083,7 @@ export function buildCompiledMemoryMarkdown({ facts = "", today = "", week = "",
  * @param {{ model: string, api: string, api_key: string, base_url: string }} resolvedModel
  * @param {number} maxTokens
  */
-async function _compactLLM(input, systemPrompt, resolvedModel, maxTokens, operation) {
+async function _compactLLM(input, systemPrompt, resolvedModel, maxTokens, operation, inputSegments = null) {
   const fallbackPromptSpec = {
     systemPrompt,
     templateVersion: `${operation || "compile"}.v1`,
@@ -1060,11 +1092,23 @@ async function _compactLLM(input, systemPrompt, resolvedModel, maxTokens, operat
   const promptSpec = typeof systemPrompt === "object" && systemPrompt !== null
     ? systemPrompt
     : _compilePromptSpecForOperation(operation, systemPrompt) || fallbackPromptSpec;
+  // Phase 5（§六十五）：caller 传入语义段时按段渲染 provenance；渲染文本必须
+  // 与原 input 字节一致（防御性校验，不一致则回退旧 input、不附段级 provenance，
+  // 保证 prompt 零变化）。
+  let userContent = input;
+  let userProvenanceSections = null;
+  if (Array.isArray(inputSegments) && inputSegments.length > 0) {
+    const rendered = renderProvenancedText(inputSegments, "\n\n", { root: "messages", path: [0] });
+    if (rendered.text === input) {
+      userProvenanceSections = rendered.sections;
+    }
+  }
   const layout = buildUtilityPromptLayout({
     cacheGroup: promptSpec.cacheGroup,
     templateVersion: promptSpec.templateVersion,
     systemPrompt: promptSpec.systemPrompt,
-    userContent: input,
+    userContent,
+    userProvenanceSections,
   });
   const usageContext = attachPromptLayoutMetadata({
     source: {
@@ -1088,6 +1132,7 @@ async function _compactLLM(input, systemPrompt, resolvedModel, maxTokens, operat
     signal: undefined,
     usageLedger: resolvedModel.usageLedger,
     usageContext,
+    semanticInputProvenance: layout.semanticInputProvenance,
   });
 }
 

@@ -858,3 +858,68 @@ describe("HTTP route security policy", () => {
     });
   });
 });
+
+describe("Model Observatory route security（Phase 8 §六十七～七十）", () => {
+  it("metadata 查询：studio owner 允许，未认证拒绝（§一百一十）", async () => {
+    const { authorizeHttpRoute } = await import("../server/http/route-security.ts");
+    const owner = desktopOwnerPrincipal();
+    for (const [method, path] of [
+      ["GET", "/api/model-observability/health"],
+      ["GET", "/api/model-observability/settings"],
+      ["POST", "/api/model-observability/query/calls"],
+      ["POST", "/api/model-observability/query/traces"],
+      ["POST", "/api/model-observability/query/aggregate"],
+      ["GET", "/api/model-observability/calls/mc_1"],
+      ["GET", "/api/model-observability/calls/mc_1/payloads"],
+      ["GET", "/api/model-observability/traces/mt_1"],
+    ]) {
+      expect(authorizeHttpRoute({ method, path, principal: owner })).toMatchObject({ allowed: true });
+      expect(authorizeHttpRoute({ method, path, principal: null })).toMatchObject({
+        allowed: false,
+        status: 403,
+      });
+    }
+    // 本地 owner 全部允许。
+    for (const [method, path] of [
+      ["GET", "/api/model-observability/health"],
+      ["POST", "/api/model-observability/query/calls"],
+    ]) {
+      expect(authorizeHttpRoute({ method, path, principal: localPrincipal })).toMatchObject({ allowed: true });
+    }
+  });
+
+  it("payload 正文：远程 owner 拒绝（LOCAL_ONLY），本地 owner 允许（§一百零九）", async () => {
+    const { authorizeHttpRoute } = await import("../server/http/route-security.ts");
+    expect(authorizeHttpRoute({
+      method: "GET",
+      path: "/api/model-observability/payloads/42",
+      principal: desktopOwnerPrincipal(),
+    })).toMatchObject({ allowed: false, status: 403, error: "local_only_route" });
+    expect(authorizeHttpRoute({
+      method: "GET",
+      path: "/api/model-observability/payloads/42",
+      principal: localPrincipal,
+    })).toMatchObject({ allowed: true });
+  });
+
+  it("settings PUT / export POST：远程 owner 拒绝，本地 owner 允许（§七十/八十二/一百一十一）", async () => {
+    const { authorizeHttpRoute } = await import("../server/http/route-security.ts");
+    for (const [method, path] of [
+      ["PUT", "/api/model-observability/settings"],
+      ["POST", "/api/model-observability/export"],
+    ]) {
+      expect(authorizeHttpRoute({ method, path, principal: desktopOwnerPrincipal() }))
+        .toMatchObject({ allowed: false, status: 403, error: "local_only_route" });
+      expect(authorizeHttpRoute({ method, path, principal: localPrincipal }))
+        .toMatchObject({ allowed: true });
+      expect(authorizeHttpRoute({ method, path, principal: null }))
+        .toMatchObject({ allowed: false, status: 403 });
+    }
+    // 前缀内未登记 verb fail closed（如 DELETE settings）。
+    expect(authorizeHttpRoute({
+      method: "DELETE",
+      path: "/api/model-observability/settings",
+      principal: desktopOwnerPrincipal(),
+    })).toMatchObject({ allowed: false, error: "local_only_route" });
+  });
+});

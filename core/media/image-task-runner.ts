@@ -1,6 +1,15 @@
 import path from "node:path";
 import { t } from "../../lib/i18n.ts";
 import { withModelRequestAccounting } from "../../lib/llm/model-request-accounting.ts";
+import {
+  beginObservedModelCall,
+  failObservedModelCall,
+  observedModelCallLedgerMetadata,
+} from "../../lib/llm/model-call-integration.ts";
+import {
+  createSemanticInputProvenance,
+  provenanceSection,
+} from "../../lib/llm/semantic-input-provenance.ts";
 
 export function createTaskId() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
@@ -396,16 +405,110 @@ export function markSubmitFailed({ taskId, err, store, ctx }) {
   ctx.log?.error?.(`[media] submit failed for ${taskId}:`, message);
 }
 
+/** Phase 5 测试入口：组装 image submit 的语义输入 provenance（不触网络/存储）。 */
+export function buildImageTaskProvenanceForTest({ prompt, image, adapterId }) {
+  const sections = [];
+  if (typeof prompt === "string" && prompt.length > 0) {
+    sections.push(provenanceSection(
+      { root: "parameters", path: ["prompt"] },
+      "media_prompt",
+      { role: "input", source: { type: "runtime", id: "media.prompt" } },
+    ));
+  }
+  if (Array.isArray(image)) {
+    image.forEach((item, index) => {
+      if (typeof item === "string" && item.trim()) {
+        sections.push(provenanceSection(
+          { root: "parameters", path: ["image", index] },
+          "media_reference",
+          { role: "input", source: { type: "runtime", id: "media.reference" } },
+        ));
+      }
+    });
+  } else if (typeof image === "string" && image.trim()) {
+    sections.push(provenanceSection(
+      { root: "parameters", path: ["image"] },
+      "media_reference",
+      { role: "input", source: { type: "runtime", id: "media.reference" } },
+    ));
+  }
+  return createSemanticInputProvenance(
+    typeof adapterId === "string" && adapterId.startsWith("jimeng-cli-") ? "external_cli_media" : "media_image",
+    sections,
+  );
+}
+
 export async function runSubmitInBackground({ taskId, adapter, params, submitCtx, store, poller, ctx }) {
+  // MC-06 逻辑调用边界（§二十三）：一次 image generation submit = 一个 logical
+  // call；poll / 资产下载不是。callId 在 adapter 网络请求之前铸好，同时写进
+  // ledger metadata（observer.callId ↔ ledger.metadata.modelCallId）。
+  const sessionTarget = normalizeSessionRef(ctx);
+  const modelIdentity = {
+    provider: params?.providerId || adapter?.id || null,
+    modelId: params?.modelId || params?.model || null,
+    api: params?.protocolId || adapter?.protocolId || null,
+  };
+  const referenceCount = countReferenceImages(params?.image);
+  // Phase 5（§七十二）：图片生成的语义输入 = prompt + 参考图。locator 只指向
+  // 参数位置（parameters.prompt / parameters.image[i]），绝不携带值（URL/路径
+  // 禁入 provenance，§二十二）。CLI adapter（jimeng-cli-*）用 external_cli_media
+  // 形状；其 wire 在进程内不可见，由 attempt 的 external_process_boundary 表达。
+  const recorder = beginObservedModelCall({
+    model: modelIdentity,
+    source: { subsystem: "media", operation: "submit", surface: "tool", trigger: "user" },
+    attribution: {
+      kind: "session",
+      ...(sessionTarget.sessionId ? { sessionId: sessionTarget.sessionId } : {}),
+      ...(sessionTarget.sessionPath ? { sessionPath: sessionTarget.sessionPath } : {}),
+    },
+    details: {
+      path: "media_image_submit",
+      mediaType: "image",
+      hasReferenceMedia: referenceCount > 0,
+      referenceCount,
+      taskId,
+    },
+    semanticInputProvenance: buildImageTaskProvenanceForTest({
+      prompt: params?.prompt,
+      image: params?.image,
+      adapterId: adapter?.id,
+    }),
+  });
+  const observedSubmitCtx = { ...submitCtx, modelCall: recorder };
+  // Phase 6 Semantic Request Capture（§八十七）：prompt 文本允许捕获；参考图
+  // 是本地路径/data URL/URL——统一 Redactor 转 local_file_reference /
+  // external_blob / external_reference descriptor，不保存字节。
+  const payloadCapture = recorder.payloadCapture;
+  const isCliAdapter = typeof adapter?.id === "string" && adapter.id.startsWith("jimeng-cli-");
+  if (payloadCapture) {
+    payloadCapture.captureSemanticRequest({
+      inputShape: isCliAdapter ? "external_cli_media" : "media_image",
+      parameters: {
+        ...(typeof params?.prompt === "string" ? { prompt: params.prompt } : {}),
+        ...(params?.image !== undefined && params?.image !== null ? { image: params.image } : {}),
+        ...(typeof params?.modelId === "string" ? { modelId: params.modelId } : {}),
+      },
+      provenance: recorder.semanticInputProvenance,
+    });
+    if (isCliAdapter) {
+      // MC-07（§九十五）：CLI 的 provider wire 在外部进程内——显式 opaque，
+      // 绝不 capture argv/stdout 冒充 wire。
+      payloadCapture.noteProviderWireUnavailable("provider_request", {
+        reason: "external-process-opaque",
+        visibility: "opaque",
+        fidelity: "external_process",
+      });
+      payloadCapture.noteProviderWireUnavailable("provider_response", {
+        reason: "external-process-opaque",
+        visibility: "opaque",
+        fidelity: "external_process",
+      });
+    }
+  }
   try {
-    const sessionTarget = normalizeSessionRef(ctx);
     const result = await withModelRequestAccounting({
       usageLedger: ctx?.usageLedger,
-      model: {
-        provider: params?.providerId || adapter?.id,
-        modelId: params?.modelId || params?.model,
-        api: params?.protocolId || adapter?.protocolId,
-      },
+      model: modelIdentity,
       usageContext: {
         source: { subsystem: "media", operation: "submit", surface: "tool", trigger: "user" },
         attribution: {
@@ -414,8 +517,8 @@ export async function runSubmitInBackground({ taskId, adapter, params, submitCtx
           ...(sessionTarget.sessionPath ? { sessionPath: sessionTarget.sessionPath } : {}),
         },
       },
-      metadata: { taskId, mediaType: "image" },
-    }, () => adapter.submit(params, submitCtx));
+      metadata: { taskId, mediaType: "image", ...observedModelCallLedgerMetadata(recorder) },
+    }, () => adapter.submit(params, observedSubmitCtx));
     const hasProviderTaskId = typeof result?.taskId === "string" && result.taskId.trim();
     const adapterTaskId = hasProviderTaskId ? result.taskId : taskId;
     const files = Array.isArray(result?.files) ? result.files.filter(Boolean) : [];
@@ -423,6 +526,31 @@ export async function runSubmitInBackground({ taskId, adapter, params, submitCtx
     if (!hasProviderTaskId && files.length === 0) {
       throw new Error(t("plugin.imageGen.noTaskIdOrFile"));
     }
+
+    // Provider 接受 generation task（或直接产出文件）即语义完成（§二十八）：
+    // 异步 Provider 的后续 poll 不是这次 Model Call 的一部分。
+    recorder.payloadCapture?.captureSemanticResponse({
+      response: {
+        // §一五六：media logical call 语义 = task submission；文件名是本地
+        // generated 路径（descriptor 化），taskId 可保留。
+        media: {
+          taskId: hasProviderTaskId ? result.taskId : null,
+          providerTaskId: hasProviderTaskId ? result.taskId : null,
+          fileCount: files.length,
+          deferred: files.length === 0,
+          files: files.length > 0 ? files : null,
+        },
+        completeness: "complete",
+      },
+    });
+    recorder.semanticResponseCompleted({
+      details: {
+        deferred: files.length === 0,
+        providerTaskId: hasProviderTaskId ? result.taskId : null,
+        fileCount: files.length,
+      },
+    });
+    recorder.endLogicalCall("ok");
 
     store.update(taskId, {
       submitState: "submitted",
@@ -434,6 +562,7 @@ export async function runSubmitInBackground({ taskId, adapter, params, submitCtx
       void poller.checkNow(taskId);
     }
   } catch (err) {
+    failObservedModelCall(recorder, err, { errorKind: "adapter_error" });
     markSubmitFailed({ taskId, err, store, ctx });
   }
 }

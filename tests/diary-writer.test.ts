@@ -124,6 +124,18 @@ describe("writeDiary hybrid material collection", () => {
       undefined,
       expect.any(String),
       undefined,
+      // thinkingLevel / streamFn / env / retry / callbacks 保持未传；
+      // 第 14 参 = MC-10 observerContext（归属 + 账本投影）。
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      expect.objectContaining({
+        usageContext: expect.objectContaining({
+          source: expect.objectContaining({ subsystem: "memory", operation: "diary_temporary_summary" }),
+        }),
+      }),
     );
   });
 

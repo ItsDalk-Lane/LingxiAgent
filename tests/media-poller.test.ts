@@ -308,13 +308,11 @@ describe("Poller", () => {
         generatedDir: "/tmp/media-generated",
       })
     );
-    expect(usageLedger.start).toHaveBeenCalledWith(expect.objectContaining({
-      model: expect.objectContaining({ provider: "test-adapter" }),
-      usageContext: expect.objectContaining({
-        source: expect.objectContaining({ subsystem: "media", operation: "query" }),
-      }),
-    }));
-    expect(usageLedger.finish).toHaveBeenCalledWith("media-query-1", expect.any(Object));
+    // 控制面锁定（§四十八）：媒体任务查询只查已提交任务的状态，不产生模型
+    // 用量记录，也不再被计入 usage_missing 统计。
+    expect(usageLedger.start).not.toHaveBeenCalled();
+    expect(usageLedger.finish).not.toHaveBeenCalled();
+    expect(usageLedger.recordError).not.toHaveBeenCalled();
 
     poller.stop();
   });

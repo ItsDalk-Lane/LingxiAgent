@@ -9,6 +9,9 @@ import fs from "fs";
 import fsp from "fs/promises";
 import path from "path";
 import { createAgentSession, SessionManager, estimateTokens, refreshSessionModelFromRegistry } from "../lib/pi-sdk/index.ts";
+import { registerSessionModelCallContext } from "../lib/pi-sdk/model-call-stream-observer.ts";
+import { runWithModelTraceRoot } from "../lib/llm/model-trace-scope.ts";
+import { modelCallLedgerMetadataForMessage } from "../lib/llm/model-call-correlation.ts";
 import { isSessionJsonlFilename } from "../lib/session-jsonl.ts";
 import { createDefaultSettings } from "./session-defaults.ts";
 import { isDefaultWorkspacePath, restoreDefaultWorkspaceIfMissing } from "../shared/default-workspace.ts";
@@ -110,9 +113,11 @@ import {
   SESSION_PROMPT_SNAPSHOT_VERSION,
   freezeAgentsFilesResult,
   freezeSkillsResult,
+  freezeSystemPromptProvenance,
   normalizeSessionPromptSnapshot,
   normalizeStringArray,
 } from "./session-prompt-snapshot.ts";
+import { buildSessionPromptProvenancePayload } from "../lib/llm/semantic-input-provenance-payload.ts";
 import { buildTurnInputPresentationEvent } from "../lib/turn-input-presentation.ts";
 import { LOOP_TURN_MESSAGE_TYPE, LOOP_NOTICE_MESSAGE_TYPE, LOOP_USER_PROMPT_MESSAGE_TYPE, buildLoopInterludeBlock } from "../lib/loop/loop-messages.ts";
 import { ensureSessionRefForPath } from "./session-manifest/ref.ts";
@@ -574,11 +579,16 @@ function recordAssistantUsage({ ledger, event, sessionPath, sessionId, agentId, 
     },
   };
   const errorMessage = event.message?.errorMessage || event.message?.error?.message || null;
+  // Observer ↔ Ledger 关联（§六十四）：stream observer 已把 assembled message →
+  // {callId, traceId, parentCallId} 登进 WeakMap；message_end 补账处读取同一
+  // 对象。对象被复制/未观测调用 → null，不猜（关联缺失不影响记账）。
+  const modelCallMetadata = modelCallLedgerMetadataForMessage(event.message);
   if (event.message?.stopReason === "error" || errorMessage) {
     const request = ledger.start({
       model: modelMeta,
       usageContext,
       costRates,
+      ...(modelCallMetadata ? { metadata: modelCallMetadata } : {}),
     });
     return ledger.recordError(request.requestId, new Error(errorMessage || "provider request failed"));
   }
@@ -588,6 +598,7 @@ function recordAssistantUsage({ ledger, event, sessionPath, sessionId, agentId, 
       usage: event.message.usage,
       usageContext,
       costRates,
+      ...(modelCallMetadata ? { metadata: modelCallMetadata } : {}),
     });
   }
   return null;
@@ -2001,12 +2012,27 @@ export class SessionCoordinator {
 
     // 快照当前 system prompt，per-session 隔离。
     // 后续记忆编译、技能变更只影响新对话，已有对话的 prompt 不变（保护 prefix cache）。
+    // Phase 5：新建 session 走 buildSystemPromptArtifact（同一装配，text 与旧
+    // buildSystemPrompt 字节级一致），把 provenance sections 一并冻结进快照——
+    // restart/hibernate 后 provenance 描述「当时实际 prompt」，不随 Persona/Memory
+    // 演进漂移（§四十七/§八十六）；旧快照无 provenance → null，恢复后诚实 structural。
+    const systemPromptArtifact = !restoredPromptSnapshot?.systemPrompt
+      && typeof agent.buildSystemPromptArtifact === "function"
+      ? agent.buildSystemPromptArtifact({
+        forceMemoryEnabled: frozenMemoryEnabled,
+        forceExperienceEnabled: frozenExperienceEnabled,
+        targetModel: promptPatchModel,
+      })
+      : null;
     const systemPromptSnapshot = restoredPromptSnapshot?.systemPrompt
+      ?? systemPromptArtifact?.text
       ?? agent.buildSystemPrompt({
         forceMemoryEnabled: frozenMemoryEnabled,
         forceExperienceEnabled: frozenExperienceEnabled,
         targetModel: promptPatchModel,
       });
+    const systemPromptProvenanceSnapshot = restoredPromptSnapshot?.systemPromptProvenance
+      ?? freezeSystemPromptProvenance(systemPromptArtifact?.provenance);
     const memoryReflectionSnapshot = (!restore && typeof agent.buildMemoryReflectionSnapshot === "function")
       ? agent.buildMemoryReflectionSnapshot({ forceMemoryEnabled: frozenMemoryEnabled })
       : null;
@@ -2042,6 +2068,9 @@ export class SessionCoordinator {
       appendSystemPrompt: appendSystemPromptSnapshot,
       skillsResult: skillsResultSnapshot,
       agentsFilesResult: agentsFilesResultSnapshot,
+      ...(systemPromptProvenanceSnapshot
+        ? { systemPromptProvenance: systemPromptProvenanceSnapshot }
+        : {}),
     };
 
     const sessionPathRef = { current: sessionPathForMeta };
@@ -2546,6 +2575,28 @@ export class SessionCoordinator {
       : promptSnapshotForPersist;
     this._renewCachePrefixContract(mapKey, sessionEntry, restore ? "session_restore" : "new_session");
     this._installCachePrefixGuard(mapKey, sessionEntry);
+    // Model call 归属注册（MC-01 desktop chat 主路径）：provider 每次调用时
+    // 才求值，sessionId 后补也能读到。surface 固定 desktop——该 coordinator
+    // 的 chat 主路径即 desktop；其它入口（CLI）的差异记入实现报告 gap。
+    registerSessionModelCallContext(session, () => ({
+      source: { subsystem: "session", operation: "reply", surface: "desktop", trigger: "user" },
+      attribution: {
+        kind: "session",
+        agentId: creatingAgentId || null,
+        ...(sessionEntry.sessionId ? { sessionId: sessionEntry.sessionId } : {}),
+        ...(sessionPath ? { sessionPath } : {}),
+      },
+      // Phase 5：冻结快照的 provenance payload——stream observer 在每次模型调用
+      // 时对最终 systemPrompt 做 runtime 前缀验证（startsWith(customPrompt)），
+      // 通过则快照 sections 以平移 0 成立（exact），失败/缺失诚实降级 structural。
+      promptProvenance: buildSessionPromptProvenancePayload({
+        systemPrompt: systemPromptSnapshot,
+        provenanceSections: systemPromptProvenanceSnapshot,
+        appendSystemPrompt: appendSystemPromptSnapshot,
+        skillsResult: skillsResultSnapshot,
+        agentsFilesResult: agentsFilesResultSnapshot,
+      }),
+    }));
     installDynamicCompactionReserve(session);
     installMidRunCompaction(session, {
       usageLedger: this._d.getUsageLedger?.() || null,
@@ -4879,6 +4930,25 @@ export class SessionCoordinator {
   }
 
   async prompt(text: any, opts: any) {
+    // Agent Turn = Trace 根（§二十七/§二十八）：整个用户 turn 的全部模型调用
+    // （Chat 流式、工具内 Vision/Approval/Media/Subagent、compaction、turn 后
+    // 派生 summary/title）共享同一个 traceId；外层已有 trace（嵌套/恢复场景）
+    // 则原样继承。
+    const spForTrace = this._session?.sessionManager?.getSessionFile?.() || this.currentSessionPath;
+    const sessionIdForTrace = this._session?.sessionManager?.getSessionId?.() || null;
+    return runWithModelTraceRoot(
+      {
+        origin: "user_turn",
+        refs: {
+          ...(sessionIdForTrace ? { sessionId: sessionIdForTrace } : {}),
+          ...(spForTrace ? { sessionPath: spForTrace } : {}),
+        },
+      },
+      () => this._promptWithinTrace(text, opts),
+    );
+  }
+
+  async _promptWithinTrace(text: any, opts: any) {
     const turnContext = normalizeSessionTurnContext(opts?.context);
     if (!this._session) {
       const currentPath = this.currentSessionPath;
@@ -7917,10 +7987,19 @@ export class SessionCoordinator {
       const skills = this._d.getSkills();
       const resourceLoader = this._d.getResourceLoader();
       let isolatedPrompt;
+      let isolatedPromptProvenance = null;
       if (opts.subagentContext) {
         // Subagent 专用 prompt：跳过长期记忆、pinned、记忆规则、团队 agent 名单。
         // 不走 cached systemPrompt getter，因为它返回"完整 prompt"的缓存。
-        isolatedPrompt = targetAgent.buildSystemPrompt({ forSubagent: true });
+        // Phase 5：同一装配产出 text + provenance（automation 路径用 master prompt
+        // cache，时间戳会漂移，不伪造 provenance——observer 侧诚实 structural）。
+        const isolatedArtifact = typeof targetAgent.buildSystemPromptArtifact === "function"
+          ? targetAgent.buildSystemPromptArtifact({ forSubagent: true })
+          : null;
+        isolatedPrompt = isolatedArtifact
+          ? isolatedArtifact.text
+          : targetAgent.buildSystemPrompt({ forSubagent: true });
+        isolatedPromptProvenance = freezeSystemPromptProvenance(isolatedArtifact?.provenance);
       } else {
         // 非 session 路径（巡检/cron 等）统一用 master 版本的 systemPrompt cache。
         // per-session 开关只管该 session 自己的对话窗口，不影响这里。
@@ -8020,6 +8099,7 @@ export class SessionCoordinator {
           appendSystemPrompt: normalizeStringArray(execResourceLoader.getAppendSystemPrompt?.()),
           skillsResult: freezeSkillsResult(await snapshotSkillsForSession(isolatedSkillsResult, promotedSessionPath)),
           agentsFilesResult: freezeAgentsFilesResult(resourceLoader.getAgentsFiles?.()),
+          ...(isolatedPromptProvenance ? { systemPromptProvenance: isolatedPromptProvenance } : {}),
           ...(this._getFinalSystemPrompt(session)
             ? { finalSystemPrompt: this._getFinalSystemPrompt(session) }
             : {}),
@@ -8051,6 +8131,51 @@ export class SessionCoordinator {
           sessionPath: childSessionPath,
         });
       } catch (err) { log.warn(`isolated onSessionReady callback failed: ${err?.message}`); }
+
+      // Model call 归属注册（MC-01 isolated subagent/automation 路径）。
+      // source/attribution 与下方 isolated usage context（subscribe 回调内）
+      // 同一语义，不发明第二套形状；parent 字段的规范化口径与 :8123 一致。
+      const modelCallParentSessionPath = typeof opts.parentSessionPath === "string" && opts.parentSessionPath.trim()
+        ? opts.parentSessionPath
+        : null;
+      const modelCallParentSessionId = typeof opts.parentSessionId === "string" && opts.parentSessionId.trim()
+        ? opts.parentSessionId.trim()
+        : (modelCallParentSessionPath ? this._sessionIdForPath(modelCallParentSessionPath) : null);
+      registerSessionModelCallContext(session, () => ({
+        source: {
+          subsystem: opts.subagentContext ? "subagent" : "automation",
+          operation: "run",
+          surface: opts.subagentContext ? "desktop" : "system",
+          trigger: opts.subagentContext ? "tool" : "scheduled",
+        },
+        attribution: modelCallParentSessionPath
+          ? {
+              kind: "session",
+              agentId: this.resolveSessionOwnership(modelCallParentSessionPath).agentId || null,
+              ...(modelCallParentSessionId ? { sessionId: modelCallParentSessionId } : {}),
+              sessionPath: modelCallParentSessionPath,
+              childAgentId: opts.subagentContext ? targetAgent.id || null : undefined,
+              childSessionId: opts.subagentContext ? readyChildSessionId || undefined : undefined,
+              childSessionPath: opts.subagentContext ? childSessionPath : undefined,
+              taskId: opts.subagentContext ? opts.subagentTaskId || null : undefined,
+            }
+          : {
+              kind: opts.subagentContext ? "utility" : "automation",
+              agentId: targetAgent.id || null,
+              ...(childSessionPath ? { childSessionPath } : {}),
+            },
+        // Phase 5：subagent prompt provenance（同一装配冻结）；automation 无冻结
+        // 快照（master cache 时间戳漂移）→ null，observer 诚实 structural。
+        promptProvenance: isolatedPromptProvenance
+          ? buildSessionPromptProvenancePayload({
+            systemPrompt: isolatedPrompt,
+            provenanceSections: isolatedPromptProvenance,
+            appendSystemPrompt: null,
+            skillsResult: null,
+            agentsFilesResult: null,
+          })
+          : null,
+      }));
 
       let replyText = "";
       let finalAssistantText = "";

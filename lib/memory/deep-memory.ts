@@ -12,6 +12,7 @@ import { callText } from "../../core/llm-client.ts";
 import { callTextConfigFromResolvedModel } from "../../core/model-execution-config.ts";
 import { getLocale } from "../i18n.ts";
 import { attachPromptLayoutMetadata, buildUtilityPromptLayout } from "../llm/prompt-layout.ts";
+import { renderProvenancedText } from "../llm/semantic-input-provenance.ts";
 import { buildFactExtractionPrompt as buildFactExtractionPromptSpec } from "./prompts/fact-extraction.ts";
 import {
   buildFactTimeContext,
@@ -258,15 +259,30 @@ async function extractFactsFromDiff(currentSummary, previousSnapshot, resolvedMo
 
   const isZh = getLocale().startsWith("zh");
 
+  // Phase 5（§六十四）：不再把 timeContext/previousSnapshot/currentSummary 拍平后
+  // 粗分类——在拼接前按语义段渲染（renderer 与旧模板字符串字节级一致），
+  // 段级 provenance 经 layout → callText 附着。
   let userContent;
+  let userProvenanceSegments;
   const timeContextBlock = buildTimeContextBlock(timeContext, isZh);
   if (hasPrevious) {
     const prevLabel = isZh ? "## 上次快照" : "## Previous Snapshot";
     const currLabel = isZh ? "## 当前摘要" : "## Current Summary";
-    userContent = `${timeContextBlock}\n\n${prevLabel}\n\n${previousSnapshot}\n\n${currLabel}\n\n${currentSummary}`;
+    const rendered = renderProvenancedText([
+      { text: timeContextBlock, category: "task_input", source: { type: "runtime", id: "memory.time-context" } },
+      { text: `${prevLabel}\n\n${previousSnapshot}`, category: "previous_summary", source: { type: "memory", id: "memory.previous-snapshot" } },
+      { text: `${currLabel}\n\n${currentSummary}`, category: "task_input", source: { type: "memory", id: "memory.current-summary" } },
+    ], "\n\n", { root: "messages", path: [0] });
+    userContent = rendered.text;
+    userProvenanceSegments = rendered.sections;
   } else {
     const label = isZh ? "## 摘要内容" : "## Summary Content";
-    userContent = `${timeContextBlock}\n\n${label}\n\n${currentSummary}`;
+    const rendered = renderProvenancedText([
+      { text: timeContextBlock, category: "task_input", source: { type: "runtime", id: "memory.time-context" } },
+      { text: `${label}\n\n${currentSummary}`, category: "task_input", source: { type: "memory", id: "memory.current-summary" } },
+    ], "\n\n", { root: "messages", path: [0] });
+    userContent = rendered.text;
+    userProvenanceSegments = rendered.sections;
   }
 
   const promptSpec = buildFactExtractionPromptSpec({ locale: getLocale(), hasPrevious });
@@ -275,6 +291,7 @@ async function extractFactsFromDiff(currentSummary, previousSnapshot, resolvedMo
     templateVersion: promptSpec.templateVersion,
     systemPrompt: promptSpec.systemPrompt,
     userContent,
+    userProvenanceSections: userProvenanceSegments,
   });
   const usageContext = attachPromptLayoutMetadata({
     source: {
@@ -299,6 +316,7 @@ async function extractFactsFromDiff(currentSummary, previousSnapshot, resolvedMo
     timeoutMs: 60_000,
     usageLedger: resolvedModel.usageLedger,
     usageContext,
+    semanticInputProvenance: layout.semanticInputProvenance,
   }) as string;
 
   const jsonStr = normalizeFactJsonOutput(raw);
