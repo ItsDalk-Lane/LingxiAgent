@@ -160,6 +160,18 @@
     },
     {
       "expiresOn": "2027-01-31",
+      "id": "desktop-observability-export-output",
+      "kinds": [
+        "write-file",
+        "remove-path"
+      ],
+      "linePattern": "(?:result[.]filePath|sessionInfo[.]fd|sessionInfo[.]filePath)",
+      "ownerModule": "desktop/main.cjs",
+      "reason": "Streams the Model Observatory NDJSON export into a user-selected save-dialog path and deletes the partial file when the renderer aborts; no LINGXI_HOME store is implied.",
+      "sourceFile": "desktop/main.cjs"
+    },
+    {
+      "expiresOn": "2027-01-31",
       "id": "desktop-office-render-output",
       "kinds": [
         "database-open",
@@ -648,7 +660,7 @@
     ],
     "version": 3
   },
-  "payloadFingerprint": "sha256:b0712be2cd46a74b426092262d0060a2c28a45fc98a73939d7c3c525eced9025",
+  "payloadFingerprint": "sha256:15591e090fdf48f4f4f0234a3d32d774cde09a288366cd83a3752cbecd1a1dc2",
   "registry": [
     {
       "affectedByEpochMigration": true,
@@ -3078,8 +3090,8 @@
   ],
   "review": {
     "classification": "compatible",
-    "compatibilityReason": "Phase 8 observability query round: model-observability-db gains a read-only open site (query service) and its SQLite runtime DDL extends with the v2 model_call_usage projection table plus conversation index; additive-only, user_version migration v1->v2, no existing store shape changes.",
-    "payloadFingerprint": "sha256:b0712be2cd46a74b426092262d0060a2c28a45fc98a73939d7c3c525eced9025"
+    "compatibilityReason": "Phase 9 UI: observability query service gained read-only getStoredBlob (blob exact retrieval) and error-code additions (invalid_blob_id/blob_missing); no table, column, or epoch change — the exported schema surface is unchanged for existing readers.",
+    "payloadFingerprint": "sha256:15591e090fdf48f4f4f0234a3d32d774cde09a288366cd83a3752cbecd1a1dc2"
   },
   "schemas": [
     {
@@ -3276,7 +3288,7 @@
       "contract": "desktop window bounds, release announcement bookmark, and update cache version marker readers",
       "kind": "directory-contract",
       "module": "desktop/main.cjs",
-      "sourceHash": "sha256:5c1fb69fab8d9c12a553f222343bde713e44e226c3f8d4f9c199cd9c0dbc4868",
+      "sourceHash": "sha256:b9d44f3f2940b563371ab0a7d92edf9b4b9a94fe3abf347019f0826dc0e66fca",
       "storeId": "desktop-window-version-state"
     },
     {
@@ -5797,6 +5809,14 @@
       "storeId": "server-runtime-info"
     },
     {
+      "exemptionId": "desktop-observability-export-output",
+      "kind": "remove-path",
+      "ordinal": 0,
+      "reason": "Streams the Model Observatory NDJSON export into a user-selected save-dialog path and deletes the partial file when the renderer aborts; no LINGXI_HOME store is implied.",
+      "sourceFile": "desktop/main.cjs",
+      "storeId": null
+    },
+    {
       "exemptionId": "desktop-screenshot-html-temp",
       "kind": "remove-path",
       "ordinal": 0,
@@ -5819,6 +5839,14 @@
       "reason": "Deletes stale desktop server discovery state before or after a server lifecycle.",
       "sourceFile": "desktop/main.cjs",
       "storeId": "server-runtime-info"
+    },
+    {
+      "exemptionId": "desktop-observability-export-output",
+      "kind": "write-file",
+      "ordinal": 0,
+      "reason": "Streams the Model Observatory NDJSON export into a user-selected save-dialog path and deletes the partial file when the renderer aborts; no LINGXI_HOME store is implied.",
+      "sourceFile": "desktop/main.cjs",
+      "storeId": null
     },
     {
       "exemptionId": null,
@@ -5881,6 +5909,14 @@
       "kind": "write-file",
       "ordinal": 0,
       "reason": "Writes and removes one request-scoped screenshot HTML file under the operating-system temporary directory.",
+      "sourceFile": "desktop/main.cjs",
+      "storeId": null
+    },
+    {
+      "exemptionId": "desktop-observability-export-output",
+      "kind": "write-file",
+      "ordinal": 0,
+      "reason": "Streams the Model Observatory NDJSON export into a user-selected save-dialog path and deletes the partial file when the renderer aborts; no LINGXI_HOME store is implied.",
       "sourceFile": "desktop/main.cjs",
       "storeId": null
     },

@@ -18,8 +18,10 @@
  */
 
 import fs from "fs";
-import { modelObservabilityDbPath } from "./model-observability-schema.ts";
+import path from "path";
+import { modelObservabilityBlobsRoot, modelObservabilityDbPath } from "./model-observability-schema.ts";
 import { openModelObservabilityReadDatabase } from "./model-observability-read-database.ts";
+import { MODEL_OBSERVABILITY_BLOB_ID_PATTERN } from "../../shared/model-observability-api-contract.ts";
 import {
   decodeModelObservabilityCallCursor,
   decodeModelObservabilityTraceCursor,
@@ -47,7 +49,9 @@ export type ModelObservabilityQueryErrorCode =
   | "absent"
   | "unavailable"
   | "invalid_cursor"
+  | "invalid_blob_id"
   | "not_found"
+  | "blob_missing"
   | "query_failed";
 
 export type ModelObservabilityQueryResult<T> =
@@ -64,6 +68,8 @@ class NotFoundError extends Error {
     this.reasonCode = reasonCode;
   }
 }
+/** §一百二十九：DB ref 存在但磁盘文件缺失——显式 blob_missing（绝不 500）。 */
+class BlobMissingError extends Error {}
 
 /* ── Filter → SQL（闭集映射；值全绑定）───────────────────────────────── */
 
@@ -238,109 +244,30 @@ function payloadAvailabilityOf(columnValue: unknown, recordCount: number): Model
   return "unknown";
 }
 
-/* ── 公共 DTO（route / export 消费）─────────────────────────────────── */
-
-export type ModelObservabilityQueryHealth = {
-  queryStatus: "ready" | "absent" | "unavailable" | "degraded";
-  queryStatusReason: string | null;
-  schemaVersion: number | null;
-  accountingProjectionAvailable: boolean;
-  oldestCallAt: string | null;
-  newestCallAt: string | null;
-  callCount: number;
-  traceCount: number;
-  payloadRecordCount: number;
-  usageProjectionCount: number;
-  /** global cumulative drop counters（§八十八/八十九：DB 全局事实，不绑具体 call）。 */
-  dataCompleteness: ModelObservabilityDataCompleteness;
-};
-
-export type ModelObservabilityPayloadRecordMetadata = {
-  id: number;
-  callId: string;
-  kind: string;
-  attemptId: string | null;
-  providerRequestOrdinal: number | null;
-  capturedAt: string;
-  visibility: string;
-  fidelity: string;
-  sanitizationStatus: string;
-  redacted: boolean;
-  truncated: boolean;
-  degraded: boolean;
-  recordCharCount: number | null;
-  hasBody: boolean;
-  hasSemanticProvenance: boolean;
-  hasProviderProvenance: boolean;
-  blobIds: string[];
-};
-
-export type ModelObservabilityPayloadRecordDetail = ModelObservabilityPayloadRecordMetadata & {
-  contentAvailable: boolean;
-  contentState: "present" | "null_payload" | "opaque_or_unavailable" | "corrupt";
-  payload: unknown;
-  semanticInputProvenance: unknown;
-  providerRequestProvenance: unknown;
-};
-
-export type ModelObservabilityCallRef = {
-  callId: string;
-  startedAt: string | null;
-  terminalStatus: string | null;
-  modelId: string | null;
-};
-
-export type ModelObservabilityAttemptSummary = {
-  attemptId: string;
-  startedAt: string | null;
-  requestPreparedAt: string | null;
-  responseReceivedAt: string | null;
-  errorAt: string | null;
-  providerRequestId: string | null;
-  httpStatus: number | null;
-  attemptVisibility: string | null;
-  providerWireVisibility: string | null;
-  errorName: string | null;
-  errorCode: string | null;
-};
-
-export type ModelObservabilityCallDetail = {
-  call: ModelObservabilityCallListItem;
-  trace: { traceId: string; origin: string | null; firstSeenAt: string | null; lastSeenAt: string | null } | null;
-  parentCall: ModelObservabilityCallRef | null;
-  childCalls: ModelObservabilityCallRef[];
-  attempts: ModelObservabilityAttemptSummary[];
-  payloadRecords: ModelObservabilityPayloadRecordMetadata[];
-};
-
-export type ModelObservabilityTraceDetail = {
-  trace: ModelObservabilityTraceListItem;
-  calls: ModelObservabilityCallListItem[];
-  roots: Array<{ callId: string; orphanParent: boolean }>;
-  edges: Array<{ parentCallId: string; childCallId: string }>;
-  orphanEdges: Array<{ childCallId: string; missingParentCallId: string }>;
-  graphIntegrity: "ok" | "degraded";
-  usageAggregate: {
-    availability: ModelObservabilityUsageAvailability;
-    summary: {
-      inputTokens: number;
-      outputTokens: number;
-      reasoningTokens: number;
-      cacheReadTokens: number;
-      cacheWriteTokens: number;
-      totalTokens: number;
-      costTotal: number | null;
-    } | null;
-  };
-  payloadCompleteness: {
-    present: number;
-    expired: number;
-    dropped: number;
-    notCaptured: number;
-    unknown: number;
-  };
-  dataCompleteness: ModelObservabilityDataCompleteness;
-};
+/* ── 公共 DTO（route / export 消费）───────────────────────────────────
+ *
+ * Drill-down/health DTO 定义在 shared/model-observability-api-contract.ts
+ * （browser-safe 单一事实源，Phase 9 §九），此处 re-export 保持既有 import
+ * 站点不变。
+ */
+export type {
+  ModelObservabilityQueryHealth,
+  ModelObservabilityPayloadRecordMetadata,
+  ModelObservabilityPayloadRecordDetail,
+  ModelObservabilityCallRef,
+  ModelObservabilityAttemptSummary,
+  ModelObservabilityCallDetail,
+  ModelObservabilityTraceDetail,
+} from "../../shared/model-observability-api-contract.ts";
+import type {
+  ModelObservabilityQueryHealth,
+  ModelObservabilityPayloadRecordMetadata,
+  ModelObservabilityPayloadRecordDetail,
+  ModelObservabilityCallRef,
+  ModelObservabilityAttemptSummary,
+  ModelObservabilityCallDetail,
+  ModelObservabilityTraceDetail,
+} from "../../shared/model-observability-api-contract.ts";
 
 type CachedReader = {
   db: any;
@@ -448,6 +375,9 @@ export function createModelObservabilityQueryService({ lingxiHome }: { lingxiHom
       }
       if (error instanceof NotFoundError) {
         return fail("not_found", error.message, error.reasonCode);
+      }
+      if (error instanceof BlobMissingError) {
+        return fail("blob_missing", error.message, "blob_file_missing");
       }
       // 连接可能已失效（writer close / 文件被替换）：失效缓存，下次查询重开。
       invalidate();
@@ -1245,6 +1175,56 @@ export function createModelObservabilityQueryService({ lingxiHome }: { lingxiHom
     });
   }
 
+  /* ── Stored blob exact retrieval（Phase 9 §一百一十九～一百三十一）──────
+   *
+   * 唯一允许的 blob 读取面：exact blobId，无 list/search/path 参数。
+   *   - blobId 格式闭集校验（mb_ + bounded token），非法一律显式 invalid_blob_id。
+   *   - 路径由 blobId 重算（shard 规则与 blob-store relativePathFor 同源）——
+   *     绝不信任 DB 的 relative_path（篡改后 traversal 防线）；resolve 后强制
+   *     落在 blobs root 内。
+   *   - 只读：不 mkdir、不建库、不做 missing 标记写回（readBlob 的
+   *     UPDATE-on-missing 是写侧语义，readonly 连接不可用）。
+   *   - 绝不访问外部引用（local_file_reference / signed URL / external URL）。
+   */
+
+  function getStoredBlob(blobId: string, { includeBytes = true }: { includeBytes?: boolean } = {}): ModelObservabilityQueryResult<ModelObservabilityStoredBlob> {
+    if (typeof blobId !== "string" || !MODEL_OBSERVABILITY_BLOB_ID_PATTERN.test(blobId)) {
+      return fail("invalid_blob_id", "blob id has an invalid format", "invalid_blob_id");
+    }
+    return runQuery((reader) => {
+      const row = reader.db.prepare(
+        `SELECT blob_id, byte_length, media_type, state FROM blob_objects WHERE blob_id = ?`,
+      ).get(blobId);
+      if (!row) throw new NotFoundError("blob not found", "blob_not_found");
+      if (row.state === "missing") throw new BlobMissingError("blob file is marked missing");
+      const shard = blobId.slice(0, 2).replace(/[^a-z0-9]/gi, "0") || "00";
+      const root = modelObservabilityBlobsRoot(lingxiHome);
+      const abs = path.resolve(root, shard, `${blobId}.bin`);
+      if (!abs.startsWith(path.resolve(root) + path.sep)) {
+        // 理论上 blobId 闭集已杜绝；双保险，命中即数据异常，不当 500 抛出去。
+        throw new BlobMissingError("blob path escapes store root");
+      }
+      let bytes: Buffer | null = null;
+      let byteLength = Number(row.byte_length ?? 0) || 0;
+      try {
+        if (includeBytes) {
+          bytes = fs.readFileSync(abs);
+          byteLength = bytes.byteLength;
+        } else {
+          byteLength = fs.statSync(abs).size;
+        }
+      } catch {
+        throw new BlobMissingError("blob file is missing on disk");
+      }
+      return {
+        blobId,
+        mediaType: typeof row.media_type === "string" && row.media_type ? row.media_type : null,
+        byteLength,
+        bytes,
+      };
+    });
+  }
+
   return {
     queryCalls,
     queryTraces,
@@ -1252,10 +1232,19 @@ export function createModelObservabilityQueryService({ lingxiHome }: { lingxiHom
     queryCallDetail,
     queryTraceDetail,
     getPayloadRecord,
+    getStoredBlob,
     getHealth,
     invalidate,
     close,
   };
 }
+
+/** Stored blob 读取结果（server-only：bytes 是 Buffer，不进 browser 契约）。 */
+export type ModelObservabilityStoredBlob = {
+  blobId: string;
+  mediaType: string | null;
+  byteLength: number;
+  bytes: Buffer | null;
+};
 
 export type ModelObservabilityQueryService = ReturnType<typeof createModelObservabilityQueryService>;

@@ -32,135 +32,58 @@
  * 禁止百分比（§一百一十五）。
  */
 
-export const SEMANTIC_INPUT_PROVENANCE_SCHEMA_VERSION = 1;
-
-/** Category 有限枚举：每个值必须有真实生产使用点（§十八，禁空枚举）。 */
-export const SEMANTIC_INPUT_CATEGORIES = [
-  "platform_instruction", // agent system prompt 的平台/环境/运行纪律块
-  "persona", // identity + yuan + AGENTS.md 人格；样貌
-  "user_profile", // user.md 用户档案
-  "memory_context", // 记忆规则/置顶/长期记忆/记忆域上下文
-  "skill_instruction", // SDK 注入的 skills prompt（identity-only）
-  "agents_file", // SDK 注入的 agents files（identity-only）
-  "session_instruction", // appendSystemPrompt / 会话时间快照等会话级指令
-  "agent_roster", // 团队 agent 名单
-  "conversation_history", // 历史对话消息（user/assistant/tool continuation）
-  "current_user_input", // 本 turn 触发输入（runtime turn 证明，非数组末项启发式）
-  "tool_definition", // tools[i] 定义
-  "tool_result", // role=toolResult 消息
-  "task_instruction", // utility/compaction/summarizer 的任务指令（模板或固定文案）
-  "task_input", // 任务的数据输入段（被处理的对话/事实/草稿/画像等）
-  "format_constraint", // 格式约束/修复指令
-  "previous_summary", // 上一次摘要/快照
-  "compaction_summary", // compaction 草稿/检查点类内容
-  "media_prompt", // 图片/视频生成 prompt
-  "media_reference", // 参考图/参考媒体（locator 指向参数位置，不含值）
-  "audio_input", // 语音识别音频
-  "language_hint", // 语音识别语言提示
-  "adapter_injected", // adapter 在系统为空时注入的真实文本指令（§八十二）
-  "sdk_internal", // SDK 内部拼装、Lingxi 无法拆分的输入段
-  "unknown", // 诚实兜底
-] as const;
-export type SemanticInputCategory = typeof SEMANTIC_INPUT_CATEGORIES[number];
-
-/** Semantic role 有限枚举（§二十）：category 与 role 是两个正交维度。 */
-export const SEMANTIC_INPUT_ROLES = [
-  "system",
-  "developer",
-  "user",
-  "assistant",
-  "tool",
-  "input",
-  "parameter",
-] as const;
-export type SemanticInputRole = typeof SEMANTIC_INPUT_ROLES[number];
-
-/** Source type 有限枚举（§二十一，按代码事实裁剪）。 */
-export const SEMANTIC_SOURCE_TYPES = [
-  "template",
-  "runtime",
-  "snapshot",
-  "memory",
-  "skill",
-  "tool",
-  "sdk",
-  "adapter",
-  "unknown",
-] as const;
-export type SemanticSourceType = typeof SEMANTIC_SOURCE_TYPES[number];
-
-/** Semantic Request 的根容器（§二十六）。 */
-export const SEMANTIC_INPUT_ROOTS = [
-  "systemPrompt",
-  "messages",
-  "tools",
-  "input",
-  "parameters",
-] as const;
-export type SemanticInputRoot = typeof SEMANTIC_INPUT_ROOTS[number];
-
-/** Semantic Input 整体形状（Observer summary 的 inputShape，闭集）。 */
-export const SEMANTIC_INPUT_SHAPES = [
-  "chat_context", // MC-01/02/03：Pi streamFn 三元组
-  "calltext", // MC-04：callText 归一化后形状
-  "pi_direct_summary", // MC-10：generateSummary 参数
-  "media_image", // MC-06
-  "media_video", // MC-08
-  "external_cli_media", // MC-07
-  "speech_transcribe", // MC-09
-  "provider_probe", // MC-05
-] as const;
-export type SemanticInputShape = typeof SEMANTIC_INPUT_SHAPES[number];
-
-export type SemanticInputSpan = {
-  /** UTF-16 code unit，含；负数/NaN/倒置在 sanitize 中 fail closed。 */
-  start: number;
-  /** UTF-16 code unit，不含。 */
-  end: number;
-};
-
-export type SemanticInputLocator = {
-  root: SemanticInputRoot;
-  /** root 内的寻址路径（messages/tools 用 index，input/parameters 用 key）。 */
-  path?: Array<number | string>;
-  /**
-   * 文本 span；null = identity-only（知道存在与类别，无法定位到具体 span，
-   * precision 必须为 structural/opaque）。非文本根（tools/input 引用位）可为
-   * undefined（该根不按 span 寻址）。
-   */
-  span?: SemanticInputSpan | null;
-};
-
-export type SemanticInputSource = {
-  type: SemanticSourceType;
-  /** 安全逻辑 id（persona / memory.today / skill:<id> / tool:<name>…）；禁绝对路径与 URL。 */
-  id?: string | null;
-  /** 真实存在的版本（如 templateVersion）；没有则省略，禁止占位 "v1"（§一百一十三）。 */
-  version?: string | null;
-};
-
-export type SemanticInputProvenanceSection = {
-  category: SemanticInputCategory;
-  role?: SemanticInputRole | null;
-  precision: "exact" | "structural" | "opaque";
-  locator: SemanticInputLocator;
-  source?: SemanticInputSource | null;
-};
-
-export type SemanticInputProvenancePrecision = "exact" | "partial" | "opaque";
-
-export type ModelSemanticInputProvenance = {
-  schemaVersion: typeof SEMANTIC_INPUT_PROVENANCE_SCHEMA_VERSION;
-  inputShape: SemanticInputShape;
-  /**
-   * 按 Semantic Request 实际顺序排列（§一百一十一）；ordinal = 数组下标，
-   * 未来持久化以 callId + ordinal 形成稳定引用（§一百一十二）。
-   */
-  sections: SemanticInputProvenanceSection[];
-};
-
-/** 单 call 的 section 上限（§一百一十：消息级/工具级粒度；超限折叠尾段）。 */
-export const MAX_PROVENANCE_SECTIONS = 1024;
+/* ── 闭集与 wire 类型：已迁移到 shared/model-observability-api-contract.ts ──
+ *
+ * Phase 9（§九）：renderer 的 Provenance Inspector 需要消费 category/role/
+ * source/root/shape 闭集与 section/locator/span wire 形状，但本文件链路在
+ * server 侧。全部枚举数组与纯 JSON wire 类型收拢到 shared 单一事实源，此处
+ * re-export 保持全部既有 import 站点（observer/capture/builder/tests）不变；
+ * sanitize/rollup/summarize/renderer 等 server 逻辑留在本文件。
+ */
+export {
+  SEMANTIC_INPUT_PROVENANCE_SCHEMA_VERSION,
+  SEMANTIC_INPUT_CATEGORIES,
+  SEMANTIC_INPUT_ROLES,
+  SEMANTIC_SOURCE_TYPES,
+  SEMANTIC_INPUT_ROOTS,
+  SEMANTIC_INPUT_SHAPES,
+  MAX_PROVENANCE_SECTIONS,
+} from "../../shared/model-observability-api-contract.ts";
+export type {
+  SemanticInputCategory,
+  SemanticInputRole,
+  SemanticSourceType,
+  SemanticInputRoot,
+  SemanticInputShape,
+  SemanticInputSpan,
+  SemanticInputLocator,
+  SemanticInputSource,
+  SemanticInputProvenanceSection,
+  SemanticInputProvenancePrecision,
+  ModelSemanticInputProvenance,
+} from "../../shared/model-observability-api-contract.ts";
+import {
+  SEMANTIC_INPUT_PROVENANCE_SCHEMA_VERSION,
+  SEMANTIC_INPUT_CATEGORIES,
+  SEMANTIC_INPUT_ROLES,
+  SEMANTIC_SOURCE_TYPES,
+  SEMANTIC_INPUT_ROOTS,
+  SEMANTIC_INPUT_SHAPES,
+  MAX_PROVENANCE_SECTIONS,
+} from "../../shared/model-observability-api-contract.ts";
+import type {
+  SemanticInputCategory,
+  SemanticInputRole,
+  SemanticSourceType,
+  SemanticInputRoot,
+  SemanticInputShape,
+  SemanticInputSpan,
+  SemanticInputLocator,
+  SemanticInputSource,
+  SemanticInputProvenanceSection,
+  SemanticInputProvenancePrecision,
+  ModelSemanticInputProvenance,
+} from "../../shared/model-observability-api-contract.ts";
 
 /* ── Sanitize gate（fail closed，§三十七机器防线）────────────────────── */
 

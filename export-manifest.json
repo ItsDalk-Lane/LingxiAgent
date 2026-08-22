@@ -710,6 +710,7 @@
     "shared/media-model-edit.ts",
     "shared/modality.ts",
     "shared/model-capabilities.ts",
+    "shared/model-observability-api-contract.ts",
     "shared/model-ref.ts",
     "shared/net-utils.ts",
     "shared/network-proxy.ts",

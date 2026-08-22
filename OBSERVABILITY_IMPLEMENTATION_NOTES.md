@@ -996,3 +996,86 @@ No-Store UX，非 500 ENOENT）；query 不隐式创建 store（§九十二，�
 Phase 9：Usage Observatory UI——Usage 页面重构（Unified Filter Bar + Group By +
 Metrics Dashboard + Call Ledger + Trace Explorer + Prompt/Response Inspector +
 Export UI），全部消费 Phase 8 API；不改 Query Contract。
+
+---
+
+# Phase 9 — Model Observatory UI（2026-08-22 第八轮）
+
+进度：OBSERVABILITY_UI_PROGRESS.md；预审计：MODEL_OBSERVABILITY_UI_AUDIT.md。
+
+## Architecture
+
+- **单一 wire 事实源**：`shared/model-observability-api-contract.ts`（browser-safe，
+  无 node 依赖）；renderer 只 import 它（§九）；`lib/llm` 五模块 re-export +
+  本地 import type。`export-manifest.json` 收录。
+- **API client**：`model-observability-actions.ts`，独立于 lingxiFetch（后者压扁
+  结构化错误）；error contract 全字段保留；export/blob 返回原始 Response。
+- **状态分层**：canonical appliedFilter（纯函数模块）→ FilterBar/Metrics/
+  Groups/Ledger/Export 共享；useObservabilityQueryState hook 管 applied/draft/
+  groupBy/selectedCall/selectedTrace；facet 懒加载 + 有界 cache（24）。
+- **懒加载边界**：ledger 行只有 metadata；payload 正文按需 exact retrieval
+  （LOCAL_ONLY）；blob 先 HEAD probe 再按需 GET。
+- **Export save bridge**：renderer 流式 reader → IPC write（≤4MB）→ main
+  openSync/writeSync/closeSync；abort → unlinkSync 部分文件；sender 绑定 +
+  destroyed 清扫；FSA 通道 partialLeft 如实标注。persistence 豁免
+  `desktop-observability-export-output`（用户选路径，非 LINGXI_HOME store）。
+- **Blob exact route**：`GET/HEAD /api/model-observability/blobs/:blobId`
+  LOCAL_ONLY；路径由 blobId 重算（不信任 DB relative_path）；安全
+  content-type 只放行 image/audio/video；错误码 invalid_blob_id(400)/
+  blob_missing(404)/not_found(404)。
+- **i18n**：`settings.observability.*` 五语言完整子树（含 values 23 组闭集
+  标签矩阵）；tab 标签 `settings.tabs.usage` 五语言升级；`settings.usage.*`
+  退休删除。变量传入键（retentionTrace/Payload/Blob）已入册。
+- **CSS**：Settings.module.css legacy usage 块删除；observability 块 157 类
+  纯 token；style-discipline 基线下调；`style={{` 棘轮零新增（tabs/ 48→…）。
+
+## UI Capability Matrix（哪些能力在哪里可见）
+
+| 能力 | 可见位置 | 数据源 | 不可见/无能力时 |
+| --- | --- | --- | --- |
+| 健康状态 | Recording Settings dialog | GET health | health null → queryStatus「—」 |
+| desired/effective 设置 | Settings dialog（LOCAL_OWNER 可改） | GET/PUT settings | 远端 viewer 只读 + localOnlyHint |
+| 指标总览 | Metrics 8 卡 | aggregate(overall) | 未初始化 → onboarding/空态 |
+| 分组统计 | Groups（date 柱图/ranked/多维列表） | aggregate(groupBy) | 空态文案 |
+| 调用台账 | Ledger 12 列 + Load More | query/calls | invalid_cursor 提示重载；其余按 kind |
+| 调用详情 | Inspector 抽屉 | GET calls/:id | not_found → 记录已被保留策略清理 |
+| payload 正文 | Inspector payload 管线（懒加载） | GET payloads/:id（LOCAL_ONLY） | 远端 403 → 「仅本机可看」，不算 call 失败 |
+| 语义溯源 | provenance inspector（semantic_request 卡内） | payload provenance + locator 解析 | absent/null → 诚实 absent |
+| 供应商映射 | provider mapping（provider_request 卡内） | payload mapping | 无 locator → noLocator |
+| 轨迹树 | Trace Explorer | query/traces + GET traces/:id | orphan→Missing parent；cycle 截断；degraded 警告 |
+| blob 预览 | payload 卡 blob 块 | HEAD+GET blobs/:id | missing/opaque/local_only/invalid 四诚实态 |
+| 导出 | ExportDialog（双通道） | POST export 流式 | 无能力禁用；413 提示缩小范围 |
+| onboarding | disabled+storeAbsent 空态 | health+settings | 单按钮安全默认开启 |
+
+## Payload Presentation Matrix（每个层级如何呈现）
+
+| payload kind | 呈现 | 正文来源 | 红线落实 |
+| --- | --- | --- | --- |
+| semantic_request | provenance inspector（分区列表+详情+解析窗） | exact retrieval 正文 + locator 切片 | locator-only（§七十六）；无内容搜索反推 |
+| provider_request | provider mapping 行 + transport.body 定位 | exact retrieval | 无 locator → 诚实 noLocator；span 越界 → unavailable |
+| provider_response | JsonValueViewer 纯文本 | exact retrieval | 无 HTML/执行（§一百五十四） |
+| semantic_response | 友好视图（text/toolCalls/structured/media）+ raw JSON 切换 | exact retrieval | redacted_thinking 原样展示（§七十）；copy 文案 Copy captured payload（§一百五十六） |
+| blob | 安全 major 预览 / octet-stream 下载 | HEAD+GET blobs/:id | 不读外部引用/URL（§一百二十四） |
+
+contentState 4 态（present/null_payload/opaque_or_unavailable/corrupt）×
+visibility 5 态均有诚实文案；atRestEncryption 恒「无（本机文件权限）」（§一百零三）。
+
+## Legacy Retirement Matrix
+
+| 旧物 | 处置 | 残留 |
+| --- | --- | --- |
+| UsageLedgerSection/Charts/CursorTip + usage-ledger-actions/model + 3 测试 | git rm | 无 |
+| Settings.module.css legacy usage 块（650 行） | 删除，基线下调 | 无 |
+| `settings.usage.*` i18n 子树（五语言） | 删除（零引用） | 无 |
+| `settings.tabs.usage` 键 | 保留键名、升级值（模型观测） | nav/标题/搜索同源 |
+| lib/llm/usage-ledger.ts + GET /api/usage/llm | **保留**（§一百四十二） | 后端只读不动 |
+| 内部 tab id `usage` | 保留（§五） | data-tab/路由不变 |
+
+## Gates（本轮）
+
+typecheck ×3 / eslint（本轮 0 新增 error）/ lint:boundary（closure 重生成后绿）/
+persistence（新豁免 + receipt 重生成 + fingerprint compatible repin
+sha256:15591e09…）/ i18n parity + locale coverage / 新测试 10 文件 83 用例 /
+full npm test。新增文件集改变 CLI closure → `compute-cli-closure.mjs` 重生成
+（source-graph 712）——教训：**改 desktop/server 文件集后全量测试前先跑
+closure 重生成，否则 census 测试全量互踩**。

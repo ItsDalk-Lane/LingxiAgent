@@ -23,6 +23,7 @@ import {
   normalizeModelObservabilityExportOptions,
   startModelObservabilityExport,
 } from "../../lib/llm/model-observability-export.ts";
+import { MODEL_OBSERVABILITY_BLOB_SAFE_MEDIA_MAJOR } from "../../shared/model-observability-api-contract.ts";
 
 function badRequest(c: any, error: { code: string; message: string; field?: string }) {
   return c.json({ error: "invalid_query", code: error.code, message: error.message, field: error.field ?? null }, 400);
@@ -36,10 +37,36 @@ function serviceError(c: any, error: { code: string; message: string; reasonCode
   if (error.code === "invalid_cursor") {
     return c.json({ error: "invalid_cursor", code: "invalid_cursor", message: error.message }, 400);
   }
+  if (error.code === "invalid_blob_id") {
+    return c.json({ error: "invalid_blob_id", code: "invalid_blob_id", message: error.message }, 400);
+  }
+  if (error.code === "blob_missing") {
+    // §一百二十九：DB ref 在但文件缺失 → 显式 404 blob_missing（不是 500）。
+    return c.json({ error: "blob_missing", code: "blob_missing", message: error.message }, 404);
+  }
   if (error.code === "not_found") {
     return c.json({ error: "not_found", code: "not_found", message: error.message }, 404);
   }
   return c.json({ error: "query_failed", code: error.code, message: error.message }, 500);
+}
+
+/* ── Stored blob 响应头（§一百二十七/一百二十八）─────────────────────────
+ *
+ *   - Cache-Control: no-store；X-Content-Type-Options: nosniff。
+ *   - Content-Type 只来自保存的 media_type 且经安全校验：只允许
+ *     image/audio/video 主类型 + 合法 token 形态；其余一律
+ *     application/octet-stream（绝不 text/html / 可执行形态）。
+ *   - 永不返回 relative_path / absolute_path / LINGXI_HOME。
+ */
+function safeBlobContentType(mediaType: string | null): string {
+  if (typeof mediaType !== "string") return "application/octet-stream";
+  const match = /^([a-z]+)\/([a-z0-9.+-]+)$/i.exec(mediaType.trim());
+  if (!match) return "application/octet-stream";
+  const major = match[1].toLowerCase();
+  if (!(MODEL_OBSERVABILITY_BLOB_SAFE_MEDIA_MAJOR as readonly string[]).includes(major)) {
+    return "application/octet-stream";
+  }
+  return `${major}/${match[2].toLowerCase()}`;
 }
 
 export function createModelObservabilityRoute(engine) {
@@ -216,6 +243,35 @@ export function createModelObservabilityRoute(engine) {
       },
     });
   });
+
+  /* ── stored blob exact retrieval（Phase 9 §一百一十九～一百三十一）─────
+   *
+   * 唯一 blob 面：GET/HEAD /blobs/:blobId（LOCAL_ONLY，route-security 登记）。
+   * exact id 寻址；无 list/search/path 参数；绝不自动访问外部引用。
+   * HEAD 供 UI 懒加载探测 content-type/length（不下载字节）。
+   */
+
+  const blobHandler = (c: any, includeBytes: boolean) => {
+    const result = engine.getModelObservabilityQueryService().getStoredBlob(
+      c.req.param("blobId"),
+      { includeBytes },
+    );
+    if (result.ok === false) return serviceError(c, result.error);
+    const blob = result.value;
+    const headers: Record<string, string> = {
+      "content-type": safeBlobContentType(blob.mediaType),
+      "content-length": String(blob.byteLength),
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+    };
+    if (!includeBytes || blob.bytes === null) {
+      return new Response(null, { status: 200, headers });
+    }
+    return new Response(new Uint8Array(blob.bytes), { status: 200, headers });
+  };
+
+  route.get("/model-observability/blobs/:blobId", (c) => blobHandler(c, true));
+  route.on("HEAD", "/model-observability/blobs/:blobId", (c) => blobHandler(c, false));
 
   return route;
 }

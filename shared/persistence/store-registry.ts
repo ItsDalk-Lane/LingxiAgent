@@ -1445,6 +1445,15 @@ export const PERSISTENCE_EXEMPTIONS: readonly PersistenceExemption[] = Object.fr
     "(?:filePath, content|path[.]dirname\\(resolved\\)|resolved, Buffer|path[.]dirname\\(destinationPath\\)|sourcePath, destinationPath|mkdirSync\\(dir|filePath, pngBuffer)",
   ),
   exemption(
+    "desktop-observability-export-output",
+    "desktop/main.cjs",
+    "desktop/main.cjs",
+    "Streams the Model Observatory NDJSON export into a user-selected save-dialog path and deletes the partial file when the renderer aborts; no LINGXI_HOME store is implied.",
+    "2027-01-31",
+    ["write-file", "remove-path"],
+    "(?:result[.]filePath|sessionInfo[.]fd|sessionInfo[.]filePath)",
+  ),
+  exemption(
     "desktop-office-render-output",
     "desktop/src/office-pdf-helper.cjs",
     "desktop/src/office-pdf-helper.cjs",

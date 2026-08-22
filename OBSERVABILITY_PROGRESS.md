@@ -213,3 +213,28 @@ store-schema/route-security/composition-boundary 扩展；typecheck ×3 / eslint
 （read-database 只读打开）；fingerprint compatible repin（sha256:b0712be2…）。
 Phase 9（Usage Observatory UI：Unified Filter Bar + Group By + Metrics Dashboard +
 Call Ledger + Trace Explorer + Prompt/Response Inspector + Export UI）待开始。
+
+## Phase 9 — Model Observatory UI（2026-08-22 第八轮）
+
+详细进度：OBSERVABILITY_UI_PROGRESS.md；实现注记 + UI Capability /
+Payload Presentation / Legacy Retirement 三矩阵：OBSERVABILITY_IMPLEMENTATION_NOTES.md。
+
+- Wire 单一事实源 `shared/model-observability-api-contract.ts`（renderer 不碰
+  lib/llm）；API client 保留完整 error contract；FilterBar（7 维快捷 + 高级
+  4 组 + chips 单删）/ Metrics 8 卡 / Groups（date 柱图 + ranked + BarTrack）/
+  Ledger 12 列 cursor 分页 stale 防护 / Inspector 抽屉（overview + attempts +
+  payload 管线）/ provenance locator-only 解析器 + provider mapping /
+  TraceExplorer buildTraceForest（orphan/环/未覆盖防御）/ payload 卡四态正文 +
+  纯文本 JsonViewer / blob 预览状态机 / Recording Settings（desired≠effective
+  诚实、blob⊆payload 不变量、opt-in 确认、无加密事实文案）/ onboarding 安全
+ 默认 / Export 双通道流式保存（IPC 桥 abort 删部分文件）。
+- Backend 白名单增量：getStoredBlob（路径从 blobId 重算）+ blobs exact route
+  （GET/HEAD LOCAL_ONLY + 安全 content-type）；旧 usage 后端零改动。
+- Legacy 退休：8 文件 + 650 行 CSS + settings.usage.* 五语言删除；tab id 不变、
+  可见名五语言升级；i18n settings.observability.* 完整子树（含 values 23 组
+  矩阵）；style-discipline 基线下调。
+- 新测试 10 文件 83 用例（含闭集按值锁定、错误契约、blob 正则反注入、
+  buildTraceForest 环/orphan、导出 abort 语义、Settings 不变量）。
+- Gates：typecheck×3、eslint 0 新增、lint:boundary（closure 重生成后）、
+  persistence 豁免+repin（sha256:15591e09…）、i18n parity、full npm test
+  （数字见 PROGRESS.md 第八轮）。

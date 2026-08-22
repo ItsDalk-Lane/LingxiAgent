@@ -24,36 +24,31 @@ import {
   type NormalizedModelObservabilityQuery,
 } from "./model-observability-query-types.ts";
 import type { ModelObservabilityQueryService } from "./model-observability-query.ts";
+import {
+  MODEL_OBSERVABILITY_EXPORT_SCHEMA_VERSION,
+  MODEL_OBSERVABILITY_EXPORT_DEFAULT_MAX_CALLS,
+  MODEL_OBSERVABILITY_EXPORT_MAX_CALLS_LIMIT,
+} from "../../shared/model-observability-api-contract.ts";
 
-export const MODEL_OBSERVABILITY_EXPORT_SCHEMA_VERSION = 1;
-
-export const MODEL_OBSERVABILITY_EXPORT_DEFAULT_MAX_CALLS = 50_000;
-export const MODEL_OBSERVABILITY_EXPORT_MAX_CALLS_LIMIT = 100_000;
+/* Export wire 常数与 bundle/manifest DTO 的单一事实源在 shared（Phase 9 §九）；
+ * 此处 re-export 保持既有 import 站点（routes/tests）不变。 */
+export {
+  MODEL_OBSERVABILITY_EXPORT_SCHEMA_VERSION,
+  MODEL_OBSERVABILITY_EXPORT_DEFAULT_MAX_CALLS,
+  MODEL_OBSERVABILITY_EXPORT_MAX_CALLS_LIMIT,
+} from "../../shared/model-observability-api-contract.ts";
+export type {
+  ModelObservabilityExportManifest,
+  ModelObservabilityExportCallBundle,
+} from "../../shared/model-observability-api-contract.ts";
+import type {
+  ModelObservabilityExportManifest,
+  ModelObservabilityExportCallBundle,
+} from "../../shared/model-observability-api-contract.ts";
 
 export type ModelObservabilityExportOptions = {
   includePayloads: boolean;
   maxCalls: number;
-};
-
-export type ModelObservabilityExportManifest = {
-  type: "manifest";
-  exportSchemaVersion: number;
-  exportedAt: string;
-  includePayloads: boolean;
-  storageSchemaVersion: number | null;
-  totalCalls: number;
-  backfillSource: string | null;
-  dataCompleteness: Record<string, number> | null;
-};
-
-export type ModelObservabilityExportCallBundle = {
-  type: "model_call";
-  schemaVersion: number;
-  call: unknown;
-  trace: unknown;
-  attempts: unknown;
-  usage: unknown;
-  payloads: unknown;
 };
 
 export type ModelObservabilityExportLimitError = {

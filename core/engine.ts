@@ -219,6 +219,12 @@ import {
   DEFAULT_MODEL_OBSERVABILITY_PREFERENCE,
   modelObservabilityPreferenceToPolicy,
 } from "../lib/llm/model-observability-preferences.ts";
+import type {
+  ModelObservabilitySettingsResponse,
+  ModelObservabilitySettingsUpdateRequest,
+  ModelObservabilitySettingsUpdateResponse,
+  ModelObservabilityHealthResponse,
+} from "../shared/model-observability-api-contract.ts";
 import {
   autoProjectIdForCwd,
   isAutoProjectId,
@@ -929,7 +935,7 @@ export class LingxiEngine {
    * Phase 8 §五十八/五十九：settings 读取。desired（用户偏好）与 effective
    * （运行态，含 schema_newer 等 disable 原因）是两个概念，分开返回。
    */
-  getModelObservabilitySettings() {
+  getModelObservabilitySettings(): ModelObservabilitySettingsResponse {
     const desired = this._prefs?.getModelObservability
       ? this._prefs.getModelObservability()
       : DEFAULT_MODEL_OBSERVABILITY_PREFERENCE;
@@ -955,7 +961,7 @@ export class LingxiEngine {
    * install 新 handle（不删除历史数据，§六十）→ invalidate query reader →
    * 返回 desired + effective。disable 只停止新记录。
    */
-  async setModelObservabilitySettings(partial) {
+  async setModelObservabilitySettings(partial: ModelObservabilitySettingsUpdateRequest): Promise<ModelObservabilitySettingsUpdateResponse> {
     const desired = this._prefs.setModelObservability(partial);
     const previous = this._modelObservability;
     if (previous) {
@@ -992,7 +998,7 @@ export class LingxiEngine {
    * 绝不包含正文）。recording disabled 时仍可读历史（§五 desired/effective
    * 解耦：queryStatus 独立于 recordingStatus）。
    */
-  getModelObservabilityHealth() {
+  getModelObservabilityHealth(): ModelObservabilityHealthResponse {
     const recording = this._modelObservability?.getHealth?.() ?? null;
     const query = this.getModelObservabilityQueryService().getHealth();
     const queryHealth = query.ok === true ? query.value : null;

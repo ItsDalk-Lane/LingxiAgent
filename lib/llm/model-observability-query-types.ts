@@ -18,69 +18,59 @@
  */
 
 import { createHash } from "node:crypto";
+import {
+  MODEL_OBSERVABILITY_FILTER_MAX_VALUES,
+  MODEL_OBSERVABILITY_GROUP_BY_DIMENSIONS,
+  MODEL_OBSERVABILITY_GROUP_BY_MAX_DIMENSIONS,
+  MODEL_OBSERVABILITY_PAGE_DEFAULT_LIMIT,
+  MODEL_OBSERVABILITY_PAGE_MAX_LIMIT,
+  MODEL_OBSERVABILITY_SORT_KEYS,
+  type ModelObservabilityDateBucket,
+  type ModelObservabilityGroupByDimension,
+  type ModelObservabilityMultiValueField,
+  type ModelObservabilitySortKey,
+} from "../../shared/model-observability-api-contract.ts";
+
+/* ── Browser-safe wire contract re-export（Phase 9 §九）───────────────────
+ *
+ * 纯 JSON wire DTO/枚举的唯一事实源是
+ * shared/model-observability-api-contract.ts（无 node 依赖，renderer 可用）。
+ * 本文件继续负责 normalize / cursor / fingerprint / server 侧类型；既有
+ * import 站点不变（全部经此 re-export）。
+ */
+export {
+  MODEL_OBSERVABILITY_FILTER_MAX_VALUES,
+  MODEL_OBSERVABILITY_GROUP_BY_DIMENSIONS,
+  MODEL_OBSERVABILITY_GROUP_BY_MAX_DIMENSIONS,
+  MODEL_OBSERVABILITY_PAGE_DEFAULT_LIMIT,
+  MODEL_OBSERVABILITY_PAGE_MAX_LIMIT,
+  MODEL_OBSERVABILITY_SORT_KEYS,
+  MODEL_OBSERVABILITY_TERMINAL_STATUSES,
+  MODEL_OBSERVABILITY_PAYLOAD_AVAILABILITIES,
+  MODEL_OBSERVABILITY_USAGE_AVAILABILITIES,
+} from "../../shared/model-observability-api-contract.ts";
+export type {
+  ModelObservabilityCallFilterInput,
+  ModelObservabilityMultiValueField,
+  ModelObservabilitySortKey,
+  ModelObservabilityGroupByDimension,
+  ModelObservabilityDateBucket,
+  ModelObservabilityTerminalStatus,
+  ModelObservabilityPayloadAvailability,
+  ModelObservabilityUsageAvailability,
+  ModelObservabilityUsageSummary,
+  ModelObservabilityCallListItem,
+  ModelObservabilityDataCompleteness,
+  ModelObservabilityCallPage,
+  ModelObservabilityTraceListItem,
+  ModelObservabilityTracePage,
+  ModelObservabilityGroupMetrics,
+  ModelObservabilityGroupValues,
+  ModelObservabilityGroupBucket,
+  ModelObservabilityAggregateResult,
+} from "../../shared/model-observability-api-contract.ts";
 
 /* ── Filter contract ─────────────────────────────────────────────────── */
-
-/** 每字段最大多值数量（§二十：避免巨大 IN (...)）。 */
-export const MODEL_OBSERVABILITY_FILTER_MAX_VALUES = 32;
-
-/** 多值字段：字段内 OR，字段间 AND（§二十）。 */
-export type ModelObservabilityMultiValueField =
-  | "provider"
-  | "modelId"
-  | "api"
-  | "subsystem"
-  | "operation"
-  | "surface"
-  | "trigger"
-  | "callPurpose"
-  | "terminalStatus"
-  | "attributionKind"
-  | "sessionId"
-  | "sessionPath"
-  | "conversationId"
-  | "conversationType"
-  | "agentId"
-  | "childAgentId"
-  | "childSessionId"
-  | "taskId"
-  | "inputShape"
-  | "provenancePrecision"
-  | "payloadAvailability";
-
-/** filter 的原始（用户输入）形状；normalize 后才可用。 */
-export type ModelObservabilityCallFilterInput = {
-  since?: unknown;
-  until?: unknown;
-  traceId?: unknown;
-  parentCallId?: unknown;
-  callId?: unknown;
-  provider?: unknown;
-  modelId?: unknown;
-  api?: unknown;
-  subsystem?: unknown;
-  /** category ≡ subsystem（§十九 alias，不另立语义）。 */
-  category?: unknown;
-  operation?: unknown;
-  surface?: unknown;
-  trigger?: unknown;
-  callPurpose?: unknown;
-  terminalStatus?: unknown;
-  attributionKind?: unknown;
-  sessionId?: unknown;
-  sessionPath?: unknown;
-  conversationId?: unknown;
-  conversationType?: unknown;
-  agentId?: unknown;
-  childAgentId?: unknown;
-  childSessionId?: unknown;
-  taskId?: unknown;
-  inputShape?: unknown;
-  provenancePrecision?: unknown;
-  payloadAvailability?: unknown;
-  interruptedByRestart?: unknown;
-  hasPayload?: unknown;
-};
 
 export type ModelObservabilityNormalizedFilter = {
   since: string | null;
@@ -92,13 +82,6 @@ export type ModelObservabilityNormalizedFilter = {
   interruptedByRestart: boolean | null;
   hasPayload: boolean | null;
 };
-
-export type ModelObservabilitySortKey = "started_at_desc";
-
-export const MODEL_OBSERVABILITY_SORT_KEYS: readonly ModelObservabilitySortKey[] = ["started_at_desc"];
-
-export const MODEL_OBSERVABILITY_PAGE_DEFAULT_LIMIT = 50;
-export const MODEL_OBSERVABILITY_PAGE_MAX_LIMIT = 200;
 
 export type NormalizedModelObservabilityQuery = {
   filter: ModelObservabilityNormalizedFilter;
@@ -120,48 +103,6 @@ export const EMPTY_MODEL_OBSERVABILITY_FILTER: ModelObservabilityNormalizedFilte
 };
 
 /* ── Group By contract ──────────────────────────────────────────────── */
-
-export type ModelObservabilityGroupByDimension =
-  | "date"
-  | "provider"
-  | "model"
-  | "category"
-  | "operation"
-  | "callPurpose"
-  | "status"
-  | "attributionKind"
-  | "session"
-  | "conversation"
-  | "agent"
-  | "task"
-  | "inputShape"
-  | "provenancePrecision";
-
-export const MODEL_OBSERVABILITY_GROUP_BY_DIMENSIONS: readonly ModelObservabilityGroupByDimension[] = [
-  "date",
-  "provider",
-  "model",
-  "category",
-  "operation",
-  "callPurpose",
-  "status",
-  "attributionKind",
-  "session",
-  "conversation",
-  "agent",
-  "task",
-  "inputShape",
-  "provenancePrecision",
-];
-
-/** 多级 groupBy 上限（§四十：最多 2～3 维，不支持无限嵌套）。 */
-export const MODEL_OBSERVABILITY_GROUP_BY_MAX_DIMENSIONS = 3;
-
-export type ModelObservabilityDateBucket = {
-  bucket: "day";
-  /** 本地时区偏移（分钟，东半球为正）；server timezone 不入局（§四十三）。 */
-  utcOffsetMinutes: number;
-};
 
 export type NormalizedModelObservabilityAggregateQuery = {
   filter: ModelObservabilityNormalizedFilter;
@@ -648,141 +589,8 @@ export function decodeModelObservabilityTraceCursor(
   return { ok: true, value: { lastSeenAt, lastTraceId } };
 }
 
-/* ── Response DTO（§二十二：列表永远是轻量 metadata，无正文）────────── */
-
-export type ModelObservabilityUsageAvailability =
-  | "present"
-  | "not_correlated"
-  | "projection_unavailable"
-  | "unknown";
-
-export type ModelObservabilityPayloadAvailability =
-  | "present"
-  | "expired"
-  | "dropped"
-  | "not_captured"
-  | "unknown";
-
-export type ModelObservabilityUsageSummary = {
-  inputTokens: number | null;
-  outputTokens: number | null;
-  reasoningTokens: number | null;
-  cacheReadTokens: number | null;
-  cacheWriteTokens: number | null;
-  totalTokens: number | null;
-  costTotal: number | null;
-};
-
-export type ModelObservabilityCallListItem = {
-  callId: string;
-  traceId: string | null;
-  parentCallId: string | null;
-  startedAt: string | null;
-  endedAt: string | null;
-  durationMs: number | null;
-  terminalStatus: string | null;
-  persistenceCompleteness: string;
-  interruptedByRestart: boolean;
-  model: { provider: string | null; modelId: string | null; api: string | null };
-  source: { subsystem: string | null; operation: string | null; surface: string | null; trigger: string | null };
-  attribution: {
-    kind: string | null;
-    sessionId: string | null;
-    sessionPath: string | null;
-    conversationId: string | null;
-    conversationType: string | null;
-    agentId: string | null;
-    childAgentId: string | null;
-    childSessionId: string | null;
-    taskId: string | null;
-  };
-  callPurpose: string | null;
-  inputShape: string | null;
-  provenancePrecision: string | null;
-  provenance: { sectionCount: number | null; opaqueCount: number | null; categories: string[] };
-  payloadAvailability: ModelObservabilityPayloadAvailability;
-  payloadRecordCount: number;
-  usage: {
-    availability: ModelObservabilityUsageAvailability;
-    status: string | null;
-    summary: ModelObservabilityUsageSummary | null;
-  };
-  attemptCount: number;
-  providerRequestCount: number;
-};
-
-export type ModelObservabilityDataCompleteness = {
-  droppedTraceEvents: number;
-  droppedPayloadRecords: number;
-  droppedBlobs: number;
-  interruptedByRestartCalls: number;
-};
-
-export type ModelObservabilityCallPage = {
-  calls: ModelObservabilityCallListItem[];
-  nextCursor: string | null;
-  dataCompleteness: ModelObservabilityDataCompleteness | null;
-};
-
-export type ModelObservabilityTraceListItem = {
-  traceId: string;
-  origin: string | null;
-  firstSeenAt: string;
-  lastSeenAt: string;
-  callCount: number;
-  terminalOk: number;
-  terminalError: number;
-  terminalAborted: number;
-  incomplete: number;
-};
-
-export type ModelObservabilityTracePage = {
-  traces: ModelObservabilityTraceListItem[];
-  nextCursor: string | null;
-};
-
-export type ModelObservabilityGroupMetrics = {
-  callCount: number;
-  traceCount: number;
-  okCount: number;
-  errorCount: number;
-  abortedCount: number;
-  incompleteCount: number;
-  attemptCount: number;
-  durationObservedCount: number;
-  durationTotalMs: number;
-  durationAverageMs: number | null;
-  usageCoveredCalls: number;
-  usageMissingCalls: number;
-  inputTokens: number;
-  outputTokens: number;
-  reasoningTokens: number;
-  cacheReadTokens: number;
-  cacheWriteTokens: number;
-  totalTokens: number;
-  costTotal: number | null;
-  cacheHitCount: number;
-  cacheObservedCount: number;
-};
-
-/**
- * group 维度值：model 维度展开为 provider + modelId 两列（§三十九：逻辑 key
- * = provider + modelId），其余维度单列。
+/* ── Response DTO（§二十二：列表永远是轻量 metadata，无正文）────────────
+ *
+ * DTO 定义已迁移到 shared/model-observability-api-contract.ts（browser-safe
+ * 单一事实源），经本文件头部 re-export 保持既有 import 站点不变。
  */
-export type ModelObservabilityGroupValues = Partial<
-  Record<Exclude<ModelObservabilityGroupByDimension, "model">, string | null>
-> & {
-  provider?: string | null;
-  modelId?: string | null;
-};
-
-export type ModelObservabilityGroupBucket = {
-  key: string;
-  values: ModelObservabilityGroupValues;
-  metrics: ModelObservabilityGroupMetrics;
-};
-
-export type ModelObservabilityAggregateResult = {
-  groups: ModelObservabilityGroupBucket[];
-  overall: ModelObservabilityGroupMetrics;
-};

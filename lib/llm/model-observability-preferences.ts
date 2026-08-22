@@ -16,14 +16,12 @@
  */
 
 import type { ModelObservabilityPersistencePolicy } from "./model-observability-persistence.ts";
+import type { ModelObservabilityRetentionDays } from "../../shared/model-observability-api-contract.ts";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
-export type ModelObservabilityRetentionDays = {
-  traceDays: number;
-  payloadDays: number;
-  blobDays: number;
-};
+/** wire 形状单一事实源在 shared（Phase 9 §九）；此处 re-export 保持既有 import 站点。 */
+export type { ModelObservabilityRetentionDays } from "../../shared/model-observability-api-contract.ts";
 
 export type ModelObservabilityUserPreference = {
   enabled: boolean;

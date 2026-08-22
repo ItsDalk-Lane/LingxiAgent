@@ -122754,6 +122754,58 @@
       "reason": "Reached via esbuild source module graph, imported by core/message-sanitizer.ts (import-statement); core/provider-compat/reasoning-content-replay.ts (import-statement); core/provider-compat/deepseek.ts (import-statement); +28 more importer(s)."
     },
     {
+      "path": "shared/model-observability-api-contract.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "lib/llm/semantic-input-provenance.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/llm/semantic-input-provenance.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/llm/model-call-payload-types.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/llm/model-observability-query-types.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/llm/model-observability-query-types.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/llm/model-observability-query.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/llm/model-observability-export.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/llm/model-observability-export.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "server/routes/model-observability.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by lib/llm/semantic-input-provenance.ts (import-statement); lib/llm/semantic-input-provenance.ts (import-statement); lib/llm/model-call-payload-types.ts (import-statement); +6 more importer(s)."
+    },
+    {
       "path": "shared/model-ref.ts",
       "inputType": "source-graph",
       "provenance": [
@@ -123934,9 +123986,9 @@
     }
   ],
   "stats": {
-    "totalFiles": 10607,
+    "totalFiles": 10608,
     "byInputType": {
-      "source-graph": 711,
+      "source-graph": 712,
       "runtime-asset": 11,
       "nft-runtime-trace": 9885
     }

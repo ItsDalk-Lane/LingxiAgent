@@ -294,14 +294,17 @@ function isModelObservatoryRoute(verb, routePath) {
     || /^\/api\/model-observability\/calls\/[^/]+$/.test(routePath)
     || /^\/api\/model-observability\/calls\/[^/]+\/payloads$/.test(routePath)
     || /^\/api\/model-observability\/traces\/[^/]+$/.test(routePath)
-    || /^\/api\/model-observability\/payloads\/[^/]+$/.test(routePath);
+    || /^\/api\/model-observability\/payloads\/[^/]+$/.test(routePath)
+    || /^\/api\/model-observability\/blobs\/[^/]+$/.test(routePath);
 }
 
 function modelObservabilityRoutePolicy(verb, routePath) {
-  // 正文 / 变更 / 导出 = LOCAL_ONLY（更严的默认）。
+  // 正文 / 变更 / 导出 / stored blob 字节 = LOCAL_ONLY（更严的默认）。
   if (verb === "PUT" && routePath === "/api/model-observability/settings") return LOCAL_ONLY;
   if (verb === "POST" && routePath === "/api/model-observability/export") return LOCAL_ONLY;
   if (verb === "GET" && /^\/api\/model-observability\/payloads\/[^/]+$/.test(routePath)) return LOCAL_ONLY;
+  // Phase 9 §一百二十：stored blob exact retrieval（GET + HEAD 探测）LOCAL_ONLY。
+  if ((verb === "GET" || verb === "HEAD") && /^\/api\/model-observability\/blobs\/[^/]+$/.test(routePath)) return LOCAL_ONLY;
   // metadata 查询 = STUDIO_OWNER。
   if (verb === "GET" && MODEL_OBSERVABILITY_STUDIO_OWNER_GET.has(routePath)) return STUDIO_OWNER;
   if (verb === "POST" && (

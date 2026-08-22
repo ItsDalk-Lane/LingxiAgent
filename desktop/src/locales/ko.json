@@ -1085,7 +1085,7 @@
       "agent": "에이전트",
       "me": "나",
       "providers": "제공자",
-      "usage": "사용량",
+      "usage": "모델 관측",
       "media": "미디어",
       "models": "모델",
       "memory": "기억",
@@ -1632,58 +1632,6 @@
         "usage": "사용량"
       },
       "configMissingFields": "이 공급자 설정이 불완전합니다. 보완 필요: {fields}."
-    },
-    "usage": {
-      "title": "사용량",
-      "note": "사용량은 참고용이며, 정확한 집계는 제공자의 통계를 기준으로 합니다.",
-      "refresh": "사용량 새로고침",
-      "total": "전체",
-      "requests": "요청",
-      "totalTokens": "총 Tokens",
-      "cacheRead": "캐시 읽기",
-      "cacheHitRate": "히트율",
-      "uncached": "비캐시 사용",
-      "modelMix": "모델 분포",
-      "dailyUsage": "일별 사용량",
-      "requestLedger": "요청 내역",
-      "loading": "사용량을 불러오는 중…",
-      "empty": "아직 사용량 기록이 없습니다",
-      "groupMeta": "{requests}회 · 오류 {errors}개",
-      "cacheShort": "cache {tokens}",
-      "tokensShort": "{tokens} tok",
-      "cacheSummary": "캐시 {cache} · 비캐시 {uncached}",
-      "window": {
-        "week": "최근 7일",
-        "month": "최근 30일"
-      },
-      "period": {
-        "week": "주",
-        "month": "월"
-      },
-      "view": {
-        "overall": "전체",
-        "daily": "날짜별",
-        "category": "카테고리",
-        "model": "모델"
-      },
-      "category": {
-        "session": "Session",
-        "phone": "Phone",
-        "memory": "Memory",
-        "automation": "Automation",
-        "subagent": "Subagent",
-        "compaction": "Compaction",
-        "plugin": "Plugin",
-        "utility": "Utility",
-        "vision": "Vision",
-        "unknown": "Unknown"
-      },
-      "status": {
-        "ok": "완료",
-        "error": "오류",
-        "aborted": "중단",
-        "usage_missing": "사용량 없음"
-      }
     },
     "media": {
       "imageGeneration": "이미지 생성",
@@ -2554,6 +2502,594 @@
       "dropOrClick": "캐릭터 카드를 끌어다 놓거나 클릭해 열기",
       "readFailed": "캐릭터 카드 읽기 실패",
       "importFailed": "캐릭터 카드 가져오기 실패"
+    },
+    "observability": {
+      "actions": {
+        "refresh": "새로고침",
+        "cancel": "취소",
+        "save": "저장",
+        "close": "닫기"
+      },
+      "datePreset": {
+        "24h": "최근 24시간",
+        "7d": "최근 7일",
+        "30d": "최근 30일",
+        "custom": "사용자 지정",
+        "all": "전체"
+      },
+      "customRange": {
+        "since": "시작",
+        "untilExclusive": "종료(제외)"
+      },
+      "filter": {
+        "date": "날짜",
+        "provider": "제공자",
+        "model": "모델",
+        "category": "카테고리",
+        "status": "상태",
+        "operation": "작업",
+        "callPurpose": "호출 용도",
+        "attributionKind": "귀속",
+        "inputShape": "입력 형태",
+        "provenancePrecision": "출처 정밀도",
+        "payloadAvailability": "페이로드 가용성",
+        "hasPayload": "페이로드 있음",
+        "interruptedByRestart": "재시작으로 중단됨",
+        "groupBy": "그룹화",
+        "more": "필터 더 보기",
+        "sessionId": "세션 ID",
+        "conversationId": "대화 ID",
+        "agentId": "에이전트 ID",
+        "taskId": "작업 ID"
+      },
+      "advanced": {
+        "facetsTitle": "패싯 값",
+        "exactIdsTitle": "정확한 ID",
+        "shapesTitle": "형태 및 가용성",
+        "apply": "적용",
+        "sessionIdPlaceholder": "세션 ID 입력 후 Enter",
+        "conversationIdPlaceholder": "대화 ID 입력 후 Enter",
+        "agentIdPlaceholder": "에이전트 ID 입력 후 Enter",
+        "taskIdPlaceholder": "작업 ID 입력 후 Enter"
+      },
+      "groupBy": {
+        "hint": "최대 {max}개 차원"
+      },
+      "tri": {
+        "any": "전체",
+        "yes": "예",
+        "no": "아니요"
+      },
+      "facets": {
+        "loading": "옵션 로드 중…",
+        "empty": "현재 필터에서 선택 가능한 값이 없습니다"
+      },
+      "chips": {
+        "ariaLabel": "현재 필터",
+        "clearAll": "모두 지우기",
+        "remove": "필터 제거: {label}"
+      },
+      "metrics": {
+        "calls": "호출 수",
+        "tracesHint": "트레이스 {count}개",
+        "totalTokens": "총 토큰",
+        "inputTokens": "입력 토큰",
+        "outputTokens": "출력 토큰",
+        "cacheRead": "캐시 읽기",
+        "cacheHitRate": "적중률 {rate}",
+        "errors": "오류",
+        "incompleteHint": "불완전 {count}건 추가",
+        "avgDuration": "평균 소요 시간",
+        "durationObserved": "{count}건 관측 기준",
+        "cost": "비용",
+        "usageCoverage": "사용량 커버리지: {covered}건 연결됨 / {missing}건 누락"
+      },
+      "groups": {
+        "loading": "집계 로드 중…",
+        "empty": "현재 필터에서 집계 데이터가 없습니다",
+        "dateChartAria": "날짜별 호출량",
+        "dateSummary": "총 {total}회 호출, 최다 {peakDate}({peakCount}회)",
+        "filterByValue": "이 값으로 필터: {value}",
+        "unknownValue": "(알 수 없음)"
+      },
+      "ledger": {
+        "title": "호출 장부",
+        "loadMore": "더 보기",
+        "attemptsTooltip": "제공자 요청 {providerRequests}건 포함",
+        "interruptedAria": "이 호출은 재시작으로 중단되었습니다",
+        "interruptedTooltip": "앱 재시작으로 이 호출의 기록이 불완전합니다",
+        "usageMissingAria": "이 호출에는 사용량 데이터가 없습니다",
+        "completenessNote": "데이터 완전성: 누락된 트레이스 이벤트 {droppedEvents}건 / 페이로드 {droppedPayloads}건 / 재시작 중단 {interrupted}건",
+        "filterBySession": "세션으로 필터: {id}",
+        "filterByTask": "작업으로 필터: {id}",
+        "col": {
+          "time": "시간",
+          "model": "모델",
+          "operation": "작업",
+          "category": "카테고리",
+          "status": "상태",
+          "tokens": "토큰",
+          "cache": "캐시",
+          "cost": "비용",
+          "duration": "소요 시간",
+          "attempts": "시도",
+          "payload": "페이로드",
+          "context": "컨텍스트"
+        },
+        "usageMissing": {
+          "present": "사용량 연결됨",
+          "not_correlated": "이 호출을 사용량 레코드와 연결할 수 없습니다",
+          "projection_unavailable": "사용량 프로젝션을 사용할 수 없습니다",
+          "unknown": "사용량 연결 상태를 알 수 없습니다"
+        }
+      },
+      "empty": {
+        "noResults": "현재 필터 조건에 맞는 호출이 없습니다",
+        "noTraces": "현재 필터 조건에 맞는 트레이스가 없습니다",
+        "storeAbsent": "관측 스토리지가 아직 초기화되지 않았습니다. 기록을 활성화하면 새 모델 호출이 여기에 표시됩니다"
+      },
+      "error": {
+        "invalid_query": "쿼리 조건이 유효하지 않습니다",
+        "invalid_cursor": "페이지네이션 커서가 만료되었습니다",
+        "invalid_json": "요청 형식이 유효하지 않습니다",
+        "not_initialized": "관측 스토리지가 초기화되지 않았습니다",
+        "not_found": "레코드가 없거나 보존 정책으로 삭제되었습니다",
+        "export_limit": "내보내기 한도 초과",
+        "query_failed": "쿼리 실패",
+        "local_only_route": "이 콘텐츠는 이 머신에서만 접근할 수 있습니다",
+        "studio_owner_required": "스튜디오 소유자 권한이 필요합니다",
+        "forbidden": "이 콘텐츠에 접근할 권한이 없습니다",
+        "invalid_blob_id": "Blob 식별자가 유효하지 않습니다",
+        "blob_missing": "Blob 파일이 없습니다(보존 정책으로 삭제되었을 수 있음)",
+        "network": "네트워크 요청에 실패했습니다. 로컬 서비스를 확인한 후 다시 시도하세요",
+        "invalidCursorHint": "필터 조건이 변경되었습니다. 목록을 처음부터 다시 로드하세요"
+      },
+      "loading": {
+        "ledger": "호출 로드 중…",
+        "detail": "호출 상세 로드 중…",
+        "payload": "페이로드 본문 로드 중…",
+        "blob": "Blob 로드 중…",
+        "traces": "트레이스 로드 중…",
+        "traceDetail": "트레이스 상세 로드 중…"
+      },
+      "payloadAvailabilityHint": {
+        "present": "이 호출에는 캡처된 페이로드 레코드가 있습니다",
+        "expired": "페이로드가 보존 정책으로 삭제되어 메타데이터만 남아 있습니다",
+        "dropped": "캡처 시 페이로드가 삭제되었습니다(스토리지 부하 보호)",
+        "not_captured": "이 호출에서는 페이로드가 캡처되지 않았습니다(기록 설정 또는 캡처 시점)",
+        "unknown": "페이로드 가용성을 알 수 없습니다"
+      },
+      "visibilityHint": {
+        "full": "이 계층의 콘텐츠는 런타임에 완전히 보이며 캡처됩니다(복사본은 마스킹/절단될 수 있음)",
+        "partial": "콘텐츠가 부분적으로만 보입니다(스트림은 집계만 유지하는 등)",
+        "metadata_only": "구조/상태 메타데이터만 있고 본문은 없습니다",
+        "opaque": "경계는 존재하지만 콘텐츠는 외부 프로세스 안에 있어 Lingxi가 관측할 수 없습니다",
+        "unavailable": "경계 이벤트 구조는 알려져 있지만 이번에는 관측할 수 없습니다(훅 없음/프로토콜 미트리거)"
+      },
+      "fidelityHint": {
+        "runtime_exact": "캡처 복사본이 런타임 콘텐츠와 바이트 단위로 동일합니다(마스킹 제외)",
+        "parsed_equivalent": "파싱에서 재구성되어 의미상 동일합니다",
+        "stream_aggregate": "스트림 청크에서 집계되었습니다",
+        "normalized": "정규화 변환이 적용되었습니다",
+        "metadata_only": "메타데이터만, 본문 없음",
+        "external_process": "콘텐츠가 외부 프로세스에 있어 캡처되지 않았습니다",
+        "opaque": "관측할 수 없습니다"
+      },
+      "sanitizationHint": {
+        "none": "캡처 복사본이 새니타이즈되지 않았습니다",
+        "redacted": "캡처 복사본에서 자격 증명이 마스킹되었습니다",
+        "truncated": "캡처 복사본이 길이 제한으로 절단되었습니다",
+        "degraded": "캡처가 저하되어 내용이 불완전할 수 있습니다",
+        "redacted_truncated": "마스킹+절단됨",
+        "redacted_degraded": "마스킹+저하됨",
+        "truncated_degraded": "절단+저하됨",
+        "redacted_truncated_degraded": "마스킹+절단+저하됨"
+      },
+      "payload": {
+        "loadBody": "본문 로드",
+        "loadMetadataOnly": "이 계층은 메타데이터만 표시할 수 있습니다",
+        "localOnly": "본문은 이 머신에서만 볼 수 있습니다",
+        "recordChars": "기록된 문자 수",
+        "contentStateLabel": "콘텐츠 상태",
+        "contentState": {
+          "present": "본문 사용 가능",
+          "null_payload": "이 레코드에는 본문이 없습니다",
+          "opaque_or_unavailable": "본문이 불투명하거나 사용할 수 없습니다",
+          "corrupt": "레코드 데이터가 손상되어 파싱할 수 없습니다"
+        },
+        "contentStateOpaque": {
+          "full": "콘텐츠는 런타임에 보이지만 본문으로 캡처되지 않았습니다",
+          "partial": "콘텐츠 일부만 관측할 수 있습니다",
+          "metadata_only": "이 계층은 설계상 메타데이터만 있습니다",
+          "opaque": "콘텐츠가 외부 프로세스 안에 있어 표시할 수 없습니다",
+          "unavailable": "이번에는 관측할 수 없습니다"
+        },
+        "availabilityEmpty": {
+          "present": "레코드는 있지만 본문을 사용할 수 없습니다",
+          "expired": "페이로드가 보존 정책으로 삭제되었습니다",
+          "dropped": "캡처 시 페이로드가 삭제되었습니다",
+          "not_captured": "이 호출에서는 페이로드가 캡처되지 않았습니다",
+          "unknown": "페이로드 레코드가 없습니다"
+        }
+      },
+      "provenance": {
+        "title": "시맨틱 입력 출처",
+        "listAria": "입력 섹션 목록",
+        "selectSection": "왼쪽에서 섹션을 선택해 상세 보기",
+        "absent": "이 호출에는 시맨틱 출처 기록이 없습니다",
+        "structural": "구조 로케이터(값 종류: {kind}), 텍스트 span 없음",
+        "emptySpan": "이 섹션은 빈 텍스트 세그먼트입니다",
+        "field": {
+          "category": "카테고리",
+          "role": "역할",
+          "precision": "정밀도",
+          "source": "소스",
+          "locator": "로케이터"
+        },
+        "unavailable": {
+          "root_missing": "해석 실패: 루트 컨테이너가 없습니다",
+          "path_missing": "해석 실패: 경로가 없습니다",
+          "span_out_of_range": "해석 실패: span이 범위를 벗어났습니다",
+          "not_text": "해석 대상이 텍스트가 아닙니다"
+        }
+      },
+      "providerMapping": {
+        "title": "제공자 요청 매핑",
+        "protocol": "프로토콜: {protocol}",
+        "jump": "해당 입력 섹션으로 이동",
+        "noLocator": "이 매핑에는 필드 수준 로케이터가 없습니다",
+        "absent": "이 호출에는 제공자 요청 매핑 기록이 없습니다",
+        "empty": "매핑 목록이 비어 있습니다",
+        "loadSemanticFirst": "먼저 시맨틱 요청 본문을 로드한 후 매핑 이동을 사용하세요"
+      },
+      "inspector": {
+        "title": "호출 상세",
+        "ariaLabel": "모델 호출 상세 드로어",
+        "closeAria": "상세 닫기",
+        "overview": "개요",
+        "attempts": "시도 기록",
+        "pipeline": "페이로드 파이프라인",
+        "traceSection": "소속 트레이스",
+        "openTrace": "트레이스 보기에서 열기",
+        "parentCall": "부모 호출: {id}",
+        "childCalls": "자식 호출({count})",
+        "model": "모델",
+        "start": "시작 시각",
+        "field": {
+          "attempts": "시도 횟수",
+          "attribution": "귀속",
+          "callPurpose": "호출 용도",
+          "inputShape": "입력 형태",
+          "interruptedByRestart": "재시작으로 중단됨",
+          "payloadRecords": "페이로드 레코드",
+          "persistence": "영속화 완전성",
+          "provenancePrecision": "출처 정밀도",
+          "surfaceTrigger": "서피스 / 트리거",
+          "usage": "사용량"
+        }
+      },
+      "attempts": {
+        "col": {
+          "attemptId": "시도",
+          "started": "시작",
+          "responded": "응답",
+          "httpStatus": "HTTP",
+          "error": "오류"
+        },
+        "empty": "시도 기록이 없습니다",
+        "notEqualNote": "참고: {attempts}회 시도 ≠ {providerRequests}건 제공자 요청(재시도/리플레이로 건수가 달라집니다)"
+      },
+      "pipeline": {
+        "attemptLabel": "시도 {id}"
+      },
+      "trace": {
+        "title": "호출 트레이스",
+        "stats": {
+          "calls": "호출 {count}회",
+          "payload": "페이로드: {present} 있음 / {expired} 만료 / {dropped} 삭제"
+        },
+        "missingParent": "부모 호출 누락",
+        "cycle": "순환을 감지하여 확장을 중단했습니다",
+        "degradedWarning": "이 트레이스에는 누락된 데이터가 있어 아래 트리가 불완전할 수 있습니다"
+      },
+      "recording": {
+        "title": "기록 설정",
+        "openSettings": "기록 설정",
+        "dialogAria": "모델 관측 기록 설정",
+        "enabled": "관측 기록 활성화",
+        "enabledHintOn": "모델 호출의 트레이스 메타데이터를 기록 중",
+        "enabledHintOff": "활성화하면 모델 호출 메타데이터 기록을 시작합니다",
+        "effectiveStatus": "실제 상태",
+        "queryStatus": "쿼리 서비스",
+        "configuredButInactive": "구성되었지만 활성화되지 않음",
+        "reason": "사유 코드: {code}",
+        "disabledBrowsing": "기록이 꺼져 있지만 기존 데이터는 볼 수 있습니다",
+        "persistTraceMetadata": "트레이스 메타데이터 영속화",
+        "persistPayloads": "페이로드 본문 영속화",
+        "persistPayloadsHint": "요청/응답 본문의 마스킹된 복사본을 저장해 나중에 감사할 수 있습니다",
+        "persistBlobs": "미디어 Blob 영속화",
+        "persistBlobsHint": "이미지/오디오/비디오 등 바이너리를 저장합니다",
+        "persistBlobsRequiresPayloads": "먼저 페이로드 본문 영속화를 활성화하세요",
+        "retentionTitle": "보존 일수",
+        "retentionInvalid": "보존 일수는 {min}~{max}의 정수여야 합니다",
+        "atRestEncryption": "저장 시 암호화",
+        "atRestEncryptionNo": "없음(로컬 파일 권한으로 보호)",
+        "localOnlyHint": "관측 데이터는 이 머신에만 저장되며 업로드되지 않습니다",
+        "lastFlush": "최근 쓰기",
+        "confirmPayloadsTitle": "페이로드 본문 영속화를 활성화할까요?",
+        "confirmPayloadsBody": "활성화하면 다음 콘텐츠가 마스킹된 복사본으로 이 머신의 디스크에 저장됩니다:",
+        "confirmPayloadsItemPrompt": "요청 프롬프트와 시스템 지시",
+        "confirmPayloadsItemReasoning": "모델 추론 텍스트",
+        "confirmPayloadsItemResponse": "모델 응답 본문",
+        "confirmPayloadsItemToolResult": "도구 호출 인수와 결과",
+        "confirmPayloadsItemTranscription": "음성 전사 텍스트",
+        "confirmPayloadsEncryptionFact": "콘텐츠는 자격 증명이 마스킹되지만 디스크 저장에는 암호학적 암호화가 없으며 로컬 파일 권한에 의존합니다.",
+        "confirmPayloadsConfirm": "본문 영속화 활성화",
+        "confirmBlobsTitle": "미디어 Blob 영속화를 활성화할까요?",
+        "confirmBlobsBody": "활성화하면 모델 호출에 관련된 이미지/오디오/비디오가 파일로 이 머신의 디스크에 저장됩니다. 콘텐츠는 자격 증명이 마스킹되지만 디스크 저장에는 암호학적 암호화가 없으며 로컬 파일 권한에 의존합니다.",
+        "confirmBlobsConfirm": "Blob 영속화 활성화",
+        "retentionTrace": "트레이스",
+        "retentionPayload": "페이로드 본문",
+        "retentionBlob": "미디어 Blob"
+      },
+      "export": {
+        "title": "관측 데이터 내보내기",
+        "open": "내보내기",
+        "dialogAria": "모델 관측 데이터 내보내기",
+        "currentFilter": "현재 필터 조건이 적용됩니다",
+        "filterDefault": "(필터 없음: 모든 레코드 내보내기)",
+        "includePayloads": "페이로드 본문 포함",
+        "includePayloadsHint": "본문은 마스킹된 복사본이며 Blob 바이너리는 포함되지 않습니다",
+        "maxCalls": "최대 호출 수",
+        "maxCallsPlaceholder": "기본값 10000",
+        "maxCallsInvalid": "최대 호출 수는 1~{max}의 정수여야 합니다",
+        "noCapability": "이 환경에서는 스트림 저장을 사용할 수 없습니다",
+        "localOnlyHint": "내보내기은 이 머신에서만 이루어지며 데이터는 외부 서비스를 거치지 않습니다",
+        "start": "내보내기 시작",
+        "progress": "{bytes}바이트 기록됨…",
+        "saved": "내보내기 완료, {bytes}바이트",
+        "savedTo": "저장 위치: {path}",
+        "aborted": "내보내기이 취소되었습니다",
+        "abortedPartialLeft": "내보내기이 취소되었지만 기록된 부분 내용은 대상 파일에 남아 있습니다",
+        "limitError": "{matched}건이 일치해 한도 {max}를 초과했습니다. 기간을 좁히거나 필터를 추가하세요"
+      },
+      "blob": {
+        "preview": "미리 보기",
+        "previewAnyway": "그래도 로드",
+        "largeWarning": "이 Blob은 크기가 커서({size}바이트) 로드가 느릴 수 있습니다",
+        "opaqueNote": "유형 {type}({size}바이트)은 인라인 미리 보기를 지원하지 않습니다",
+        "download": "다운로드",
+        "missing": "Blob 파일이 없습니다(보존 정책으로 삭제되었을 수 있음)",
+        "invalid": "Blob 식별자가 유효하지 않습니다",
+        "localOnly": "Blob 콘텐츠는 이 머신에서만 접근할 수 있습니다",
+        "close": "미리 보기 닫기"
+      },
+      "copy": {
+        "callIdAria": "호출 ID 복사",
+        "traceIdAria": "트레이스 ID 복사",
+        "capturedPayloadAria": "캡처된 페이로드 복사"
+      },
+      "onboarding": {
+        "title": "모델 관측",
+        "body": "모든 모델 호출의 트레이스, 사용량, 비용을 기록하여 이 머신에서 언제든 감사할 수 있습니다. 활성화 후에는 메타데이터만 저장되며, 페이로드 본문과 미디어 Blob은 기본적으로 저장되지 않고 기록 설정에서 별도로 켤 수 있습니다. 모든 데이터는 이 머신에만 저장되며 디스크 저장에는 암호학적 암호화가 없고 로컬 파일 권한에 의존합니다.",
+        "enable": "관측 기록 활성화"
+      },
+      "jsonViewer": {
+        "wrap": "자동 줄바꿈",
+        "copy": "복사",
+        "copied": "복사됨",
+        "copyAria": "JSON 내용 복사",
+        "showAll": "모두 보기({chars}자)",
+        "collapse": "접기",
+        "stringifyFailed": "JSON 직렬화 실패: {error}"
+      },
+      "semanticResponse": {
+        "completeness": "완전성",
+        "finishReason": "종료 사유",
+        "toolCalls": "도구 호출({count})",
+        "structuredOutput": "구조화된 출력",
+        "media": "미디어",
+        "mediaDeferred": "미디어 콘텐츠는 Blob으로 저장됩니다",
+        "showRawJson": "원시 JSON 보기",
+        "hideRawJson": "원시 JSON 숨기기"
+      },
+      "values": {
+        "terminalStatus": {
+          "ok": "성공",
+          "error": "실패",
+          "aborted": "중단됨",
+          "incomplete": "불완전"
+        },
+        "payloadAvailability": {
+          "present": "캡처됨",
+          "expired": "만료 삭제됨",
+          "dropped": "삭제됨",
+          "not_captured": "캡처 안 됨",
+          "unknown": "알 수 없음"
+        },
+        "usageAvailability": {
+          "present": "연결됨",
+          "not_correlated": "연결 안 됨",
+          "projection_unavailable": "프로젝션 사용 불가",
+          "unknown": "알 수 없음"
+        },
+        "usageStatus": {
+          "ok": "정상",
+          "error": "오류",
+          "aborted": "중단됨",
+          "usage_missing": "사용량 누락"
+        },
+        "provenancePrecision": {
+          "exact": "정확",
+          "partial": "부분적",
+          "opaque": "불투명"
+        },
+        "inputShape": {
+          "chat_context": "채팅 컨텍스트",
+          "calltext": "callText",
+          "pi_direct_summary": "직접 요약",
+          "media_image": "이미지 생성",
+          "media_video": "비디오 생성",
+          "external_cli_media": "외부 CLI 미디어",
+          "speech_transcribe": "음성 전사",
+          "provider_probe": "제공자 프로브"
+        },
+        "payloadKind": {
+          "semantic_request": "시맨틱 요청",
+          "provider_request": "제공자 요청",
+          "provider_response": "제공자 응답",
+          "semantic_response": "시맨틱 응답"
+        },
+        "payloadVisibility": {
+          "full": "완전히 보임",
+          "partial": "부분적으로 보임",
+          "metadata_only": "메타데이터만",
+          "opaque": "불투명",
+          "unavailable": "관측 불가"
+        },
+        "payloadFidelity": {
+          "runtime_exact": "런타임 정확",
+          "parsed_equivalent": "파싱 동등",
+          "stream_aggregate": "스트림 집계",
+          "normalized": "정규화됨",
+          "metadata_only": "메타데이터만",
+          "external_process": "외부 프로세스",
+          "opaque": "불투명"
+        },
+        "sanitizationStatus": {
+          "none": "처리 안 됨",
+          "redacted": "마스킹됨",
+          "truncated": "절단됨",
+          "degraded": "저하됨",
+          "redacted_truncated": "마스킹+절단",
+          "redacted_degraded": "마스킹+저하",
+          "truncated_degraded": "절단+저하",
+          "redacted_truncated_degraded": "마스킹+절단+저하"
+        },
+        "contentState": {
+          "present": "본문 있음",
+          "null_payload": "본문 없음",
+          "opaque_or_unavailable": "불투명 또는 사용 불가",
+          "corrupt": "손상됨"
+        },
+        "transformation": {
+          "pass_through": "그대로 통과",
+          "renamed": "이름 변경",
+          "moved": "이동",
+          "merged": "병합",
+          "split": "분할",
+          "filtered": "필터링됨",
+          "injected": "주입됨",
+          "externalized": "외부화",
+          "dropped": "삭제됨",
+          "opaque": "불투명"
+        },
+        "mappingPrecision": {
+          "exact": "정확",
+          "structural": "구조 수준",
+          "opaque": "불투명"
+        },
+        "semanticCategory": {
+          "platform_instruction": "플랫폼 지시",
+          "persona": "페르소나",
+          "user_profile": "사용자 프로필",
+          "memory_context": "메모리 컨텍스트",
+          "skill_instruction": "스킬 지시",
+          "agents_file": "Agents 파일",
+          "session_instruction": "세션 지시",
+          "agent_roster": "에이전트 명단",
+          "conversation_history": "대화 기록",
+          "current_user_input": "현재 사용자 입력",
+          "tool_definition": "도구 정의",
+          "tool_result": "도구 결과",
+          "task_instruction": "작업 지시",
+          "task_input": "작업 입력",
+          "format_constraint": "형식 제약",
+          "previous_summary": "이전 요약",
+          "compaction_summary": "압축 요약",
+          "media_prompt": "미디어 프롬프트",
+          "media_reference": "참조 미디어",
+          "audio_input": "오디오 입력",
+          "language_hint": "언어 힌트",
+          "adapter_injected": "어댑터 주입",
+          "sdk_internal": "SDK 내부",
+          "unknown": "알 수 없음"
+        },
+        "semanticRole": {
+          "system": "시스템",
+          "developer": "개발자",
+          "user": "사용자",
+          "assistant": "어시스턴트",
+          "tool": "도구",
+          "input": "입력",
+          "parameter": "매개변수"
+        },
+        "semanticSourceType": {
+          "template": "템플릿",
+          "runtime": "런타임",
+          "snapshot": "스냅샷",
+          "memory": "메모리",
+          "skill": "스킬",
+          "tool": "도구",
+          "sdk": "SDK",
+          "adapter": "어댑터",
+          "unknown": "알 수 없음"
+        },
+        "semanticRoot": {
+          "systemPrompt": "systemPrompt",
+          "messages": "messages",
+          "tools": "tools",
+          "input": "input",
+          "parameters": "parameters"
+        },
+        "persistenceCompleteness": {
+          "complete": "완전",
+          "partial": "부분"
+        },
+        "attributionKind": {
+          "agent": "에이전트",
+          "auxiliary": "보조 호출",
+          "direct": "직접 호출",
+          "memory": "메모리",
+          "plugin": "플러그인",
+          "provider": "제공자",
+          "task": "작업",
+          "utility": "유틸리티",
+          "workflow": "워크플로",
+          "unknown": "알 수 없음"
+        },
+        "groupByDimension": {
+          "date": "날짜",
+          "provider": "제공자",
+          "model": "모델",
+          "category": "카테고리",
+          "operation": "작업",
+          "callPurpose": "호출 용도",
+          "status": "상태",
+          "attributionKind": "귀속",
+          "session": "세션",
+          "conversation": "대화",
+          "agent": "에이전트",
+          "task": "작업",
+          "inputShape": "입력 형태",
+          "provenancePrecision": "출처 정밀도"
+        },
+        "queryStatus": {
+          "ready": "준비됨",
+          "absent": "초기화 안 됨",
+          "unavailable": "사용 불가",
+          "degraded": "저하됨"
+        },
+        "recordingStatus": {
+          "active": "기록 중",
+          "disabled": "비활성화됨",
+          "closed": "닫힘"
+        },
+        "completeness": {
+          "complete": "완전",
+          "partial": "부분"
+        }
+      }
     }
   },
   "onboarding": {

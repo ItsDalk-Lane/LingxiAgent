@@ -122,6 +122,12 @@ contextBridge.exposeInMainWorld("hana", {
   unwatchWorkspace: (rootPath) => ipcRenderer.invoke("unwatch-workspace", rootPath),
   onWorkspaceChanged: (cb) => ipcRenderer.on("workspace-changed", (_, payload) => cb(payload)),
   readFileBase64: (path) => ipcRenderer.invoke("read-file-base64", path),
+  // Model Observatory 导出流式保存桥（Phase 9）：capability token 模式，
+  // renderer 无任意文件写——路径只来自用户亲手操作的保存对话框。
+  observabilityExportBegin: (payload) => ipcRenderer.invoke("observability-export:begin", payload),
+  observabilityExportWrite: (payload) => ipcRenderer.invoke("observability-export:write", payload),
+  observabilityExportEnd: (payload) => ipcRenderer.invoke("observability-export:end", payload),
+  observabilityExportAbort: (payload) => ipcRenderer.invoke("observability-export:abort", payload),
   // 本地路径 → file:// URL（同步，纯字符串转换，无 IPC）。逻辑见 src/shared/path-to-file-url.cjs
   getFileUrl: (filePath) => pathToFileUrl(filePath),
   readDocxHtml: (path) => ipcRenderer.invoke("read-docx-html", path),

@@ -31,8 +31,8 @@
   },
   "desktop/src/react/components/SessionList.module.css": {
     "bare-spacing": 31,
-    "hardcoded-color": 10,
-    "bare-duration": 2
+    "hardcoded-color": 9,
+    "bare-duration": 1
   },
   "desktop/src/react/components/SettingsModalShell.module.css": {
     "bare-spacing": 0,
@@ -66,8 +66,8 @@
   },
   "desktop/src/react/components/chat/Chat.module.css": {
     "bare-spacing": 35,
-    "hardcoded-color": 51,
-    "bare-duration": 19
+    "hardcoded-color": 49,
+    "bare-duration": 17
   },
   "desktop/src/react/components/chat/ChatResourceCard.module.css": {
     "bare-spacing": 4,
@@ -101,7 +101,7 @@
   },
   "desktop/src/react/components/input/InputArea.module.css": {
     "bare-spacing": 17,
-    "hardcoded-color": 56,
+    "hardcoded-color": 54,
     "bare-duration": 8
   },
   "desktop/src/react/components/input/SkillBadgeView.module.css": {
@@ -111,7 +111,7 @@
   },
   "desktop/src/react/components/notices/SidebarNoticeSlot.module.css": {
     "bare-spacing": 2,
-    "hardcoded-color": 4,
+    "hardcoded-color": 2,
     "bare-duration": 0
   },
   "desktop/src/react/components/plugin/PluginPageView.module.css": {
@@ -140,7 +140,7 @@
     "bare-duration": 1
   },
   "desktop/src/react/components/preview/MarkdownChrome.module.css": {
-    "bare-spacing": 12,
+    "bare-spacing": 10,
     "hardcoded-color": 0,
     "bare-duration": 0
   },
@@ -150,9 +150,9 @@
     "bare-duration": 0
   },
   "desktop/src/react/components/right-workspace/AgentActivityCard.module.css": {
-    "bare-spacing": 7,
-    "hardcoded-color": 4,
-    "bare-duration": 1
+    "bare-spacing": 1,
+    "hardcoded-color": 0,
+    "bare-duration": 0
   },
   "desktop/src/react/components/right-workspace/RightWorkspacePanel.module.css": {
     "bare-spacing": 9,
@@ -211,7 +211,7 @@
   },
   "desktop/src/react/mobile/mobile-entry.css": {
     "bare-spacing": 30,
-    "hardcoded-color": 22,
+    "hardcoded-color": 21,
     "bare-duration": 1
   },
   "desktop/src/react/quick-chat/QuickChatApp.module.css": {
@@ -220,8 +220,8 @@
     "bare-duration": 0
   },
   "desktop/src/react/settings/Settings.module.css": {
-    "bare-spacing": 174,
-    "hardcoded-color": 150,
+    "bare-spacing": 170,
+    "hardcoded-color": 147,
     "bare-duration": 11
   },
   "desktop/src/react/settings/components/settings-components.module.css": {
@@ -246,7 +246,7 @@
   },
   "desktop/src/react/ui/Overlay.module.css": {
     "bare-spacing": 0,
-    "hardcoded-color": 3,
+    "hardcoded-color": 1,
     "bare-duration": 0
   },
   "desktop/src/react/ui/ProviderIcon.module.css": {
@@ -261,37 +261,37 @@
   },
   "desktop/src/screenshot-themes/sakura-light-desktop.css": {
     "bare-spacing": 0,
-    "hardcoded-color": 21,
+    "hardcoded-color": 10,
     "bare-duration": 0
   },
   "desktop/src/screenshot-themes/sakura-light.css": {
     "bare-spacing": 0,
-    "hardcoded-color": 21,
+    "hardcoded-color": 10,
     "bare-duration": 0
   },
   "desktop/src/screenshot-themes/solarized-dark-desktop.css": {
     "bare-spacing": 0,
-    "hardcoded-color": 20,
+    "hardcoded-color": 4,
     "bare-duration": 0
   },
   "desktop/src/screenshot-themes/solarized-dark.css": {
     "bare-spacing": 0,
-    "hardcoded-color": 20,
+    "hardcoded-color": 4,
     "bare-duration": 0
   },
   "desktop/src/screenshot-themes/solarized-light-desktop.css": {
     "bare-spacing": 0,
-    "hardcoded-color": 21,
+    "hardcoded-color": 5,
     "bare-duration": 0
   },
   "desktop/src/screenshot-themes/solarized-light.css": {
     "bare-spacing": 0,
-    "hardcoded-color": 21,
+    "hardcoded-color": 5,
     "bare-duration": 0
   },
   "desktop/src/styles.css": {
     "bare-spacing": 109,
-    "hardcoded-color": 62,
+    "hardcoded-color": 50,
     "bare-duration": 2
   }
 }

@@ -259,6 +259,28 @@ seal 不是一次性终点，而是"当前被验证树"的游标；每次审计�
   scanner 站点登记 + fingerprint compatible repin（sha256:b0712be2…）/
   新增 7 测试文件 53 用例 / full npm test 11975 全绿；seal/matrix/tripwire
   推进后复验。
+- **2026-08-22 模型调用可观测性第八轮（Model Observatory UI）**（功能树
+  待 seal／进度 OBSERVABILITY_UI_PROGRESS.md）：Phase 9 把 Phase 1–8 事实层
+  变成用户工作台，替换旧 Usage 页——browser-safe wire 单一事实源
+  shared/model-observability-api-contract.ts（renderer 不 import lib/llm）+
+  独立 API client（error contract 全字段保留）+ FilterBar/Metrics/Groups/
+  Ledger（cursor+stale 防护）+ Call Inspector（overview/attempts/payload
+  管线）+ provenance locator-only 解析器 + provider mapping + TraceExplorer
+  （buildTraceForest orphan/环/未覆盖防御）+ payload 卡四态正文 + 纯文本
+  JsonViewer + blob 预览状态机 + Recording Settings（desired≠effective 诚实、
+  blob⊆payload、opt-in 确认、无加密事实文案）+ onboarding 安全默认 + 导出
+  双通道流式保存（IPC 桥 abort 删部分文件；FSA partialLeft 如实标注）。
+  Backend 白名单增量：getStoredBlob（路径从 blobId 重算，不信任 DB
+  relative_path）+ blobs exact route（GET/HEAD LOCAL_ONLY + 安全
+  content-type）。Legacy 退休：8 文件 + 650 行 CSS + settings.usage.* 五语言
+  删除；内部 tab id `usage` 不变、可见名五语言升级为模型观测/Model
+  Observatory。i18n settings.observability.* 完整子树（含 values 23 组闭集
+  矩阵）+ parity 绿。第八轮验证：typecheck ×3 / eslint 0 新增 error /
+  lint:boundary（closure 重生成后）/ persistence 豁免
+  desktop-observability-export-output + scanner receipt 重生成 + fingerprint
+  compatible repin（sha256:15591e09…）/ 新增 10 测试文件 83 用例 /
+  full npm test 12052 全绿；seal/matrix/tripwire 推进后复验。
+
 
 ## 最终状态：READY TO MERGE
 
