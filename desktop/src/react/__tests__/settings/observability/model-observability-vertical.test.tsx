@@ -145,7 +145,9 @@ afterEach(async () => {
   vi.unstubAllGlobals();
   await handle?.close();
   handle = null;
-  fs.rmSync(lingxiHome, { recursive: true, force: true });
+  // Windows：close() 返回后 WAL/SHM/blob 句柄释放存在滞后，rmSync 会瞬时
+  // EPERM；用 rm 内建重试（EPERM 属其重试范围），macOS/Linux 行为不变。
+  fs.rmSync(lingxiHome, { recursive: true, force: true, maxRetries: 10, retryDelay: 100 });
 });
 
 describe('UI vertical slice — Call Ledger（S34 §八十四）', () => {

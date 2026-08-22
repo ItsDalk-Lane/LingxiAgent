@@ -748,6 +748,8 @@ describe("Model Observability Unified Query", () => {
     expect(plan(`SELECT * FROM model_calls WHERE conversation_id = 'c1'`)).toContain("idx_model_calls_conversation");
   });
 
+  // 10k 行播种在 2 核 Windows runner 上远超默认 10s testTimeout（播种本身
+  // 不是被测对象；下方 elapsed 断言才是 §一百二十一 的查询预算）。
   it("10k calls 性能：query page / filter / aggregate 在宽松上限内完成（§一百二十一）", () => {
     for (let i = 0; i < 10_000; i++) {
       seedCall({
@@ -773,5 +775,7 @@ describe("Model Observability Unified Query", () => {
     const elapsed = Date.now() - started;
     // 宽松 guard（防 flaky）：不做严格 wall-clock 断言以外的任何假设。
     expect(elapsed).toBeLessThan(10_000);
-  });
+    // 播种预算与查询预算分离：慢速 runner 上播种 10k 行可能吃掉整个默认
+    // testTimeout，显式给整个用例 120s（查询自身的预算仍由 elapsed 断言约束）。
+  }, 120_000);
 });
