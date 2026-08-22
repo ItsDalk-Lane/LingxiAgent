@@ -7,7 +7,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = cfab85564d6ad5b53de19862545535f084be223d  (最终验证所针对的源码树；2026-08-22 模型调用可观测性第七轮 unified query 树后推进)
+VERIFIED_SOURCE_SHA   = 61779cbdda5b46082f32a554b99279149980c0b4  (最终验证所针对的源码树；2026-08-22 模型调用可观测性第八轮 Model Observatory UI 树后推进)
 工作分支              = feature/upstream-sync-0.447.4
 ```
 
@@ -260,7 +260,7 @@ seal 不是一次性终点，而是"当前被验证树"的游标；每次审计�
   新增 7 测试文件 53 用例 / full npm test 11975 全绿；seal/matrix/tripwire
   推进后复验。
 - **2026-08-22 模型调用可观测性第八轮（Model Observatory UI）**（功能树
-  待 seal／进度 OBSERVABILITY_UI_PROGRESS.md）：Phase 9 把 Phase 1–8 事实层
+  61779cbd/seal 本提交；进度 OBSERVABILITY_UI_PROGRESS.md）：Phase 9 把 Phase 1–8 事实层
   变成用户工作台，替换旧 Usage 页——browser-safe wire 单一事实源
   shared/model-observability-api-contract.ts（renderer 不 import lib/llm）+
   独立 API client（error contract 全字段保留）+ FilterBar/Metrics/Groups/
@@ -288,14 +288,14 @@ seal 不是一次性终点，而是"当前被验证树"的游标；每次审计�
 - Disposition：ADOPTED 25 + ADAPTED 100 + REGENERATED 4 + INTENTIONAL_DIVERGENCE 4 = 133
   （脚本计算，`build-sync-matrix.mjs --check`：missing=0 / extra=0 / duplicate=0 / unknown=0）。
 - 4 个 `hanako.md → lingxi.md` 品牌映射统一分类为 ADAPTED。
-- `VERIFIED_SOURCE_SHA = cfab85564d6ad5b53de19862545535f084be223d`：被完整测试验证的代码树
+- `VERIFIED_SOURCE_SHA = 61779cbdda5b46082f32a554b99279149980c0b4`：被完整测试验证的代码树
   （含收口树 d4cf92a8 的全部验证 + 文档清场树复跑验证 + 归档修复树 051f6117 复跑的
   typecheck/lint/全量测试 + v0.1.29 release 树 fabd6dbf 复跑的 typecheck/目标套件 +
   mac self-install 树 dcf3546a 的 PR CI typecheck/lint/build/全量测试 +
   凭证边界修复树 b8688895 的本地 typecheck/定向测试 + PR CI typecheck/lint/build/全量测试 +
   保留标签管道修复树 c83d238a 的本地 typecheck/定向测试 + 全量测试 +
   保留标签指纹补钉树 be95b344 的 tripwire/guard 验证 +
-  模型调用可观测性六轮树 a9a5f3f4 / b9238533 / 53fa4575 / 3cf0e6ed / bfde47bc / cfab85564d6ad5b53de19862545535f084be223d
+  模型调用可观测性七轮树 a9a5f3f4 / b9238533 / 53fa4575 / 3cf0e6ed / bfde47bc / cfab85564d6ad5b53de19862545535f084be223d / 61779cbdda5b46082f32a554b99279149980c0b4
   的本地 typecheck/定向测试 + 全量测试，见「Seal 推进记录」）。当前 HEAD 只比 VERIFIED_SOURCE_SHA 多审计收口内容。
 
 ### Post-verification diff 记录（`git diff --name-only VERIFIED_SOURCE_SHA..HEAD`）

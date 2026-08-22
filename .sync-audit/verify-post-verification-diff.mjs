@@ -31,6 +31,8 @@ const AUDIT_ALLOWLIST = [
   // Phase 8 unified query 跨会话进度/审计活文档（对应 PROGRESS.md 角色）。
   "OBSERVABILITY_QUERY_PROGRESS.md",
   "MODEL_OBSERVABILITY_QUERY_AUDIT.md",
+  "OBSERVABILITY_UI_PROGRESS.md",
+  "MODEL_OBSERVABILITY_UI_AUDIT.md",
   "UPSTREAM_SYNC_AUDIT.md",
   "UPSTREAM_SYNC_MATRIX.md",
   ".sync-audit/upstream-sync-matrix.json",
