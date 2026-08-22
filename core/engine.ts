@@ -213,7 +213,7 @@ import {
   translateSkillNamesWithCache,
 } from "../lib/skills/skill-name-translation-cache.ts";
 import { createUsageLedger } from "../lib/llm/usage-ledger.ts";
-import { installModelObservabilityPersistence } from "../lib/llm/model-observability-persistence.ts";
+import { createModelObservabilityGenerationManager } from "../lib/llm/model-observability-engine.ts";
 import { createModelObservabilityQueryService } from "../lib/llm/model-observability-query.ts";
 import {
   DEFAULT_MODEL_OBSERVABILITY_PREFERENCE,
@@ -326,6 +326,7 @@ export class LingxiEngine {
   declare _sessionManifestStore: any;
   declare _sessionManifestStoreRecovery: any;
   declare _modelObservability: any;
+  declare _modelObservabilityGenerations: any;
   /** Phase 8：稳定 query facade（read-only 连接随 reconfigure invalidate/reopen）。 */
   declare _modelObservabilityQuery: any;
   declare _sessionProjects: any;
@@ -413,6 +414,10 @@ export class LingxiEngine {
     // default），仍早于任何模型调用。默认 disabled（preference 未开启且无
     // 显式 option）；打开失败 → disabled handle，engine 正常继续。──
     this._modelObservability = null;
+    this._modelObservabilityGenerations = createModelObservabilityGenerationManager({
+      lingxiHome: this.lingxiHome,
+      drainTimeoutMs: 5000,
+    });
     this._modelObservabilityQuery = null;
     this._currentTurnNativeMedia = createCurrentTurnNativeMediaStore();
     this._pluginInstallRecords = new PluginInstallRecords({ lingxiHome });
@@ -882,12 +887,13 @@ export class LingxiEngine {
       const preference = this._prefs.getModelObservability();
       if (preference.enabled) policy = modelObservabilityPreferenceToPolicy(preference);
     }
-    if (!policy) return;
+    if (!policy) {
+      this._modelObservabilityGenerations.reconfigure(null);
+      return;
+    }
     try {
-      this._modelObservability = installModelObservabilityPersistence({
-        lingxiHome: this.lingxiHome,
-        policy,
-      });
+      this._modelObservability = this._modelObservabilityGenerations.reconfigure(policy);
+      if (!this._modelObservability) return;
       const health = this._modelObservability.getHealth();
       if (health.status === "disabled") {
         moduleLog.warn(
@@ -957,27 +963,12 @@ export class LingxiEngine {
 
   /**
    * Phase 8 §五十七/五十九：运行中 enable/disable/reconfigure。
-   * 顺序：normalize → persist desired preference → close 旧 handle →
-   * install 新 handle（不删除历史数据，§六十）→ invalidate query reader →
-   * 返回 desired + effective。disable 只停止新记录。
+   * 顺序：normalize → persist desired preference → 旧 generation 退出全局入口并
+   * 排水 → install 新 generation（不删除历史数据，§六十）→ invalidate query
+   * reader → 返回 desired + effective。设置变化只影响新开始的调用。
    */
   async setModelObservabilitySettings(partial: ModelObservabilitySettingsUpdateRequest): Promise<ModelObservabilitySettingsUpdateResponse> {
     const desired = this._prefs.setModelObservability(partial);
-    const previous = this._modelObservability;
-    if (previous) {
-      this._modelObservability = null;
-      try {
-        await Promise.race([
-          previous.close(),
-          new Promise((resolve) => {
-            const timer = setTimeout(resolve, 5000);
-            timer.unref?.();
-          }),
-        ]);
-      } catch {
-        // 旧 handle 关闭失败：继续安装新 handle（失败已被计数/日志）。
-      }
-    }
     // preference（days）→ policy（ms）经 canonical 转换，不能直接把 preference
     // 形状喂给 install（retention 字段名不同，会被静默换成 safe fallback）。
     this._installModelObservability(
@@ -1002,6 +993,7 @@ export class LingxiEngine {
     const recording = this._modelObservability?.getHealth?.() ?? null;
     const query = this.getModelObservabilityQueryService().getHealth();
     const queryHealth = query.ok === true ? query.value : null;
+    const dataCompletenessKnown = queryHealth?.dataCompleteness.status === "known";
     return {
       recordingStatus: recording ? recording.status : "disabled",
       storeDisabledReasonCode: recording?.storeDisabledReasonCode ?? null,
@@ -1012,14 +1004,22 @@ export class LingxiEngine {
       queuedPayloadRecords: recording?.queuedPayloadRecords ?? 0,
       queuedBlobs: recording?.queuedBlobs ?? 0,
       queuedUsageEntries: recording?.queuedUsageEntries ?? 0,
-      droppedTraceEvents: recording?.droppedTraceEvents ?? queryHealth?.dataCompleteness.droppedTraceEvents ?? 0,
-      droppedPayloadRecords: recording?.droppedPayloadRecords ?? queryHealth?.dataCompleteness.droppedPayloadRecords ?? 0,
-      droppedBlobs: recording?.droppedBlobs ?? queryHealth?.dataCompleteness.droppedBlobs ?? 0,
+      droppedTraceEvents: dataCompletenessKnown
+        ? (recording?.droppedTraceEvents ?? queryHealth.dataCompleteness.droppedTraceEvents)
+        : null,
+      droppedPayloadRecords: dataCompletenessKnown
+        ? (recording?.droppedPayloadRecords ?? queryHealth.dataCompleteness.droppedPayloadRecords)
+        : null,
+      droppedBlobs: dataCompletenessKnown
+        ? (recording?.droppedBlobs ?? queryHealth.dataCompleteness.droppedBlobs)
+        : null,
       droppedUsageEntries: recording?.droppedUsageEntries ?? 0,
       writeFailures: recording?.writeFailures ?? 0,
       maintenanceErrors: recording?.maintenanceErrors ?? 0,
       lastSuccessfulFlushAt: recording?.lastSuccessfulFlushAt ?? null,
-      interruptedByRestartCalls: queryHealth?.dataCompleteness.interruptedByRestartCalls ?? 0,
+      interruptedByRestartCalls: dataCompletenessKnown
+        ? queryHealth.dataCompleteness.interruptedByRestartCalls
+        : null,
       atRestEncryption: false,
       query: queryHealth ?? {
         queryStatus: "unavailable",
@@ -1033,10 +1033,11 @@ export class LingxiEngine {
         payloadRecordCount: 0,
         usageProjectionCount: 0,
         dataCompleteness: {
-          droppedTraceEvents: 0,
-          droppedPayloadRecords: 0,
-          droppedBlobs: 0,
-          interruptedByRestartCalls: 0,
+          status: "unknown",
+          droppedTraceEvents: null,
+          droppedPayloadRecords: null,
+          droppedBlobs: null,
+          interruptedByRestartCalls: null,
         },
       },
     };
@@ -2907,20 +2908,11 @@ export class LingxiEngine {
         try {
           // Phase 7：bounded flush 后关闭 observability store（任务书 §四十五：
           // 必须有 bounded timeout，不能无限阻塞退出）。
-          if (this._modelObservability) {
-            const closing = this._modelObservability;
-            this._modelObservability = null;
-            try {
-              await Promise.race([
-                closing.close(),
-                new Promise((resolve) => {
-                  const timer = setTimeout(resolve, 5000);
-                  timer.unref?.();
-                }),
-              ]);
-            } catch {
-              // observability 关闭失败不阻塞退出
-            }
+          this._modelObservability = null;
+          try {
+            await this._modelObservabilityGenerations?.close?.();
+          } catch {
+            // observability 关闭失败不阻塞退出
           }
           // Phase 8：read-only query facade 一并释放（§九十一生命周期）。
           try {

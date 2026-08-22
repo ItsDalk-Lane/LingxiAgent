@@ -14,8 +14,11 @@ import os from "node:os";
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { callText } from "../core/llm-client.ts";
+import { createApprovalGateway, createModelApprovalReviewer } from "../lib/approval-gateway.ts";
 import { generateDiaryCompactionSummary } from "../lib/diary/diary-writer.ts";
 import { runWithNewModelTrace } from "../lib/llm/model-trace-scope.ts";
+import { compileToday } from "../lib/memory/compile.ts";
+import { getLogicalDay } from "../lib/time-utils.ts";
 import { createJimengImageAdapter } from "../plugins/jimeng-cli/adapters/dreamina.ts";
 import { agnesVideoAdapter } from "../core/media-adapters/agnes.ts";
 import { beginObservedModelCall } from "../lib/llm/model-call-integration.ts";
@@ -61,6 +64,144 @@ function diaryModel() {
     cost: { input: 1, output: 2, cacheRead: 0.1, cacheWrite: 1.25, total: 0 },
   };
 }
+
+function semanticProvenanceCategories(callId: string): string[] {
+  const query = harness.query();
+  const detail = query.queryCallDetail(callId);
+  expect(detail.ok).toBe(true);
+  if (!detail.ok) return [];
+  const semanticRequest = detail.value.payloadRecords.find((record: any) => record.kind === "semantic_request");
+  expect(semanticRequest).toBeTruthy();
+  if (!semanticRequest) return [];
+  const payload = query.getPayloadRecord(semanticRequest.id);
+  expect(payload.ok).toBe(true);
+  if (!payload.ok) return [];
+  expect(payload.value.semanticInputProvenanceState).toBe("present");
+  return ((payload.value.semanticInputProvenance as any)?.sections ?? [])
+    .map((section: any) => String(section.category));
+}
+
+describe("E2E truth — approval format repair（S9）", () => {
+  it("两次真实请求分别落成调用，只有修复请求带 format_constraint", async () => {
+    const ledger = harness.createLedger();
+    harness.witness.scriptNext(
+      { kind: "json", body: openaiCompletionsJson({ content: "not-json" }) },
+      {
+        kind: "json",
+        body: openaiCompletionsJson({
+          content: JSON.stringify({
+            verdict: "authorized",
+            scopeRelation: "exact",
+            evidenceIds: ["u0"],
+            reason: "范围一致",
+          }),
+        }),
+      },
+    );
+    const reviewer = createModelApprovalReviewer({
+      resolveApprovalModel: async () => ({
+        api: "openai-completions",
+        apiKey: POISON_KEY,
+        baseUrl: harness.witness.baseUrl,
+        headers: {},
+        model: { id: "witness-model", provider: "witness-provider" },
+      }),
+      callText,
+      getUsageLedger: () => ledger,
+    });
+    const gateway = createApprovalGateway({ intentAuthorizationReviewer: reviewer });
+
+    const decision = await gateway.review({
+      id: "approval-e2e-repair",
+      kind: "tool_action",
+      sessionPath: "/sessions/approval-e2e.jsonl",
+      agentId: "agent-e2e",
+      toolName: "write",
+      actionName: "execute",
+      params: { path: "notes.md" },
+      target: { type: "file", label: "notes.md" },
+      blastRadius: "workspace",
+      reversibility: "easy",
+    });
+    await flushAsync(5);
+    harness.flush();
+    await flushAsync(3);
+
+    expect(decision.action).toBe("allow");
+    expect(harness.witness.requestCount()).toBe(2);
+    const callIds = harness.observer!.callIds();
+    expect(callIds).toHaveLength(2);
+    expect(new Set(callIds).size).toBe(2);
+    for (const callId of callIds) {
+      const detail = harness.query().queryCallDetail(callId);
+      expect(detail.ok).toBe(true);
+      if (detail.ok) {
+        expect(detail.value.call.source).toMatchObject({
+          subsystem: "approval",
+          operation: "review_authorization",
+        });
+        expect(detail.value.call.terminalStatus).toBe("ok");
+        expect(detail.value.call.usage.availability).toBe("present");
+      }
+    }
+    expect(semanticProvenanceCategories(callIds[0])).not.toContain("format_constraint");
+    expect(semanticProvenanceCategories(callIds[1])).toContain("format_constraint");
+    harness.observer!.assertNoSensitiveContent([POISON_KEY]);
+  });
+});
+
+describe("E2E truth — memory representative prompt（S8）", () => {
+  it("compileToday 生产提示经真实请求、持久化与查询保持 task_input 来源", async () => {
+    const ledger = harness.createLedger();
+    const root = makeRoot();
+    const todayPath = path.join(root, "today.md");
+    const logicalDate = getLogicalDay().logicalDate;
+    const eventText = "E2E_MEMORY_EVENT 用户要求保留真实记忆证据";
+    harness.witness.scriptNext({
+      kind: "json",
+      body: openaiCompletionsJson({ content: "E2E_MEMORY_COMPILED" }),
+    });
+    const summaryManager = {
+      getAllSummaries: vi.fn(() => [{
+        session_id: "memory-e2e",
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        summary: `## 事情经过\n- ${logicalDate} 10:00 ${eventText}`,
+      }]),
+    };
+
+    await compileToday(summaryManager, todayPath, {
+      api: "openai-completions",
+      apiKey: POISON_KEY,
+      baseUrl: harness.witness.baseUrl,
+      model: { id: "witness-model", provider: "witness-provider", maxTokens: 8192 },
+      usageLedger: ledger,
+      usageAgentId: "agent-e2e",
+    });
+    await flushAsync(5);
+    harness.flush();
+    await flushAsync(3);
+
+    expect(fs.readFileSync(todayPath, "utf8")).toBe("E2E_MEMORY_COMPILED");
+    expect(harness.witness.requestCount()).toBe(1);
+    expect(harness.witness.lastRequest()?.bodyText).toContain(eventText);
+    const callIds = harness.observer!.callIds();
+    expect(callIds).toHaveLength(1);
+    const detail = harness.query().queryCallDetail(callIds[0]);
+    expect(detail.ok).toBe(true);
+    if (detail.ok) {
+      expect(detail.value.call.source).toMatchObject({
+        subsystem: "memory",
+        operation: "compile_today",
+      });
+      expect(detail.value.call.usage.availability).toBe("present");
+    }
+    expect(semanticProvenanceCategories(callIds[0])).toEqual(
+      expect.arrayContaining(["task_instruction", "task_input"]),
+    );
+    harness.observer!.assertNoSensitiveContent([POISON_KEY]);
+  });
+});
 
 describe("E2E truth — MC-10 diary（S18）", () => {
   it("同一 diary trace：2 临时摘要（MC-10）+ 终稿（MC-04）同 trace、parent=null、凭证不入库", async () => {

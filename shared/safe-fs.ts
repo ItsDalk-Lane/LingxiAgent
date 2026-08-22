@@ -3,20 +3,21 @@ import path from 'path';
 import { AppError } from './errors.ts';
 import { errorBus } from './error-bus.ts';
 
-export function safeReadFile(filePath, fallback = '') {
+export function safeReadFile(filePath: string, fallback: any = ''): any {
   try {
     return fs.readFileSync(filePath, 'utf-8');
-  } catch (err) {
+  } catch (err: unknown) {
+    const fsError = err as NodeJS.ErrnoException;
     // ENOENT 是 fallback 的合法场景（可选文件不存在），不上报 ErrorBus
-    if (err.code !== 'ENOENT') {
-      const code = err.code === 'EACCES' ? 'FS_PERMISSION' : 'UNKNOWN';
+    if (fsError.code !== 'ENOENT') {
+      const code = fsError.code === 'EACCES' ? 'FS_PERMISSION' : 'UNKNOWN';
       errorBus.report(new AppError(code, { cause: err, context: { filePath } }));
     }
     return fallback;
   }
 }
 
-export function safeReadJSON(filePath, fallback = null) {
+export function safeReadJSON(filePath: string, fallback: any = null): any {
   const text = safeReadFile(filePath, null);
   if (text === null) return fallback;
   try {
@@ -27,7 +28,7 @@ export function safeReadJSON(filePath, fallback = null) {
   }
 }
 
-export async function safeReadYAML(filePath, fallback = null) {
+export async function safeReadYAML(filePath: string, fallback: any = null): Promise<any> {
   const text = safeReadFile(filePath, null);
   if (text === null) return fallback;
   try {
@@ -39,7 +40,7 @@ export async function safeReadYAML(filePath, fallback = null) {
   }
 }
 
-export function safeReadYAMLSync(filePath, fallback = null, yaml) {
+export function safeReadYAMLSync(filePath: string, fallback: any = null, yaml: any = null): any {
   const text = safeReadFile(filePath, null);
   if (text === null) return fallback;
   try {
@@ -58,7 +59,7 @@ export function safeReadYAMLSync(filePath, fallback = null, yaml) {
  * @param {object} [opts]
  * @param {number} [opts.mode] - file permission bits (e.g. 0o600 for sensitive credentials)
  */
-export function atomicWriteSync(filePath, content, { mode }: { mode?: number } = {}) {
+export function atomicWriteSync(filePath: string, content: string, { mode }: { mode?: number } = {}) {
   const tmp = filePath + ".tmp";
   fs.writeFileSync(tmp, content, mode !== undefined ? { encoding: "utf-8", mode } : "utf-8");
   if (mode !== undefined) {
@@ -75,7 +76,7 @@ export function atomicWriteSync(filePath, content, { mode }: { mode?: number } =
  * 4. Delete dst.bak_{ts}
  * Recovery: if step 3 fails, rename dst.bak_{ts} back to dst, clean up tmp.
  */
-export function safeCopyDir(src, dst) {
+export function safeCopyDir(src: string, dst: string) {
   const ts = Date.now();
   const tmpDst = `${dst}.tmp_${ts}`;
   const bakDst = `${dst}.bak_${ts}`;
@@ -106,7 +107,7 @@ export function safeCopyDir(src, dst) {
   }
 }
 
-function _copyDirRecursive(src, dst) {
+function _copyDirRecursive(src: string, dst: string) {
   fs.mkdirSync(dst, { recursive: true });
   for (const entry of fs.readdirSync(src, { withFileTypes: true })) {
     const s = path.join(src, entry.name);
@@ -137,6 +138,6 @@ function _copyDirRecursive(src, dst) {
   }
 }
 
-function _cleanupDir(dir) {
+function _cleanupDir(dir: string) {
   try { fs.rmSync(dir, { recursive: true, force: true }); } catch { /* best effort */ }
 }

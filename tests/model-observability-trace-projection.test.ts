@@ -258,4 +258,46 @@ describe("Model Observability Trace Projection", () => {
       reader.close();
     }
   });
+
+  it("explicit not_correlated 是 lifecycle 的持久事实，普通 call 保持 NULL", () => {
+    const explicit = createModelCallRecorder({
+      observer: harness.handle.observer,
+      context: {
+        callId: "mc_usage_explicit",
+        traceId: "mt_usage_truth",
+        model: MODEL,
+        source: SOURCE,
+        attribution: attribution(),
+        usageCorrelation: "not_correlated",
+      },
+    });
+    explicit.beginLogicalCall();
+    explicit.endLogicalCall("ok");
+
+    const ordinary = createModelCallRecorder({
+      observer: harness.handle.observer,
+      context: {
+        callId: "mc_usage_unknown",
+        traceId: "mt_usage_truth",
+        model: MODEL,
+        source: SOURCE,
+        attribution: attribution(),
+      },
+    });
+    ordinary.beginLogicalCall();
+    ordinary.endLogicalCall("ok");
+    harness.flush();
+
+    const reader = harness.openReader();
+    try {
+      expect(reader.traceStore.getCall("mc_usage_explicit")).toMatchObject({
+        usage_correlation_state: "not_correlated",
+      });
+      expect(reader.traceStore.getCall("mc_usage_unknown")).toMatchObject({
+        usage_correlation_state: null,
+      });
+    } finally {
+      reader.close();
+    }
+  });
 });

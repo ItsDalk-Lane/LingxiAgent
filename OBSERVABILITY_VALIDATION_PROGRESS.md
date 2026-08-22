@@ -222,3 +222,42 @@
 - query/aggregate 输入是 normalized 形状：normalizeModelObservabilityQuery({filter:{...}})；
   aggregate 显式 {filter, groupBy:[], dateBucket:null}。
 - tsconfig.test 非 strict：`if (!x.ok)` 不收窄 union——用 `x.ok === false`。
+
+## Phase 10.1 对账追加（2026-08-22）
+
+> 本节不改写上面的 Phase 10 当时清单。它用 Phase 10.1 新增或重新核对的独立证据解释原有未勾选项；状态只使用 `PASS`、`BOUNDED`、`FAIL`、`NOT_EXECUTED`。
+
+| 原步骤/场景 | Phase 10.1 状态 | 独立证据与真值判断 |
+| --- | --- | --- |
+| Step 7 parallel tools | PASS | `model-observability-detail-vertical.test.tsx`：“并行工具的两个子调用经真实工具边界落入 Store、Query 和 Trace UI 同一棵树”；真实工具转换边界，C2/C3 均以 C1 为父。 |
+| Step 7 subagent | PASS | 同文件：“子代理跨会话调用经真实 spawn 工具边界落入 Store、Query 和 Trace UI 父子树”；真实 spawn 工具边界，父子跨会话但共享调用链。 |
+| Step 8 MC-02 | BOUNDED | 同文件：“MC-02 AgentRun 的语义输入、响应、usage 和 unavailable provider wire 纵向一致”；真实压缩运行入口，Provider wire 因上游能力不可见而保持 unavailable。 |
+| Step 8 MC-03 | BOUNDED | 同文件：“MC-03 native compaction 从真实 isCompacting 边界写入显式 not_correlated，不用缺行猜测”；真实压缩边界与 v3 持久事实，精确 usage 关联结构性不可得。 |
+| Step 10 approval repair | PASS | `model-observability-e2e-utility.test.ts`：“两次真实请求分别落成调用，只有修复请求带 format_constraint”；本地 Provider Witness 实收两次 HTTP，请求各有独立调用标识。 |
+| Step 10 memory representative prompt | PASS | 同文件：“compileToday 生产提示经真实请求、持久化与查询保持 task_input 来源”；生产记忆编译提示、真实 HTTP、SQLite 与 Query 闭环。 |
+| Step 18 ALS detached/background | PASS | `model-call-trace-propagation.test.ts`：“T1 内创建的 delayed 任务执行时不得仍属 T1”；独立异步任务不继承已经结束的父调用链。 |
+| Step 18 concurrent sessions | PASS | 同文件：“Session A/B 并行 chat+auxiliary：trace 内不出现对方 callId”；两路并行身份集合互斥。 |
+| Step 20 crash/restart | PASS | `model-observability-e2e-security-blob.test.ts`：“provider request 已 durable、无 logical_call_end → 重启后 incomplete + interruptedByRestart，绝不 Error”。 |
+| Step 21 retention | PASS | `model-observability-persistence.test.ts` 的 payload retention 与 trace retention 两项；调用元数据保留或整树删除均按既定策略完成，不生成半棵树。 |
+| Step 21 Blob GC | PASS | `model-observability-blob.test.ts` 的 ref-count GC 与 orphan recovery；以引用表和宽限期为独立判断源。 |
+| Step 22 queue overflow | PASS | `model-observability-persistence.test.ts`：“queue overflow…call 标记 dropped”；队列计数和逐调用状态同时核对。 |
+| Step 22 write failure | PASS | 同文件写失败用例，加 `model-observability-persistence-truth-integrity.test.ts` 的最终失败/关闭补记用例；业务不抛错，健康状态不冒充成功。 |
+| Step 23 Query/filter/group/pagination | PASS | `model-observability-query.test.ts` 与 `model-observability-query-truth-integrity.test.ts`；真实 SQLite、参数绑定、集合并集、完整调用链统计和损坏状态。 |
+| Step 24 timezone/DST | PASS | `model-observability-e2e-dst.test.ts`、Query truth 两个 DST 用例、UI action→route→query 纵向用例；IANA 时区与复杂度上限均有明确结果。 |
+| Step 25 HTTP/security/SSRF/path/XSS | PASS | `model-observability-e2e-security-blob.test.ts` 的本地访问、标识/路径、流式 Blob 用例；`ObservabilityPayloadCard.test.tsx` 与既有界面 JSON 文本渲染测试锁定损坏内容和无 HTML 执行。 |
+| Step 26 credential poison | PASS | Chat、CallText、Media/Speech、Utility E2E 均使用 Witness 可见但持久层不可见的毒丸；数据库/WAL/SHM 与 Observer 事件独立扫描。 |
+| Step 27/28 Call Inspector、Payload、Trace vertical | PASS | `model-observability-detail-vertical.test.tsx` 前两项：真实生产调用→SQLite→Query→Hono→界面动作；正文只在详情阶段按需读取。 |
+| Step 29 Export vertical | PASS | `model-observability-e2e-security-blob.test.ts`：“真实 export：manifest + bundle 身份 ≡ query”；`model-observability-export.test.ts` 另锁定损坏、null、unknown、dropped 与 metadata-only。 |
+| Step 30 Blob performance/security | PASS | 64MB GET 流式读取期间计时器继续推进；HEAD 只检查元数据；数据库路径篡改、legacy 路径、标识遍历和本地访问均回归。 |
+| Step 31 performance/backpressure | PASS | Query 10k 宽松性能、Export 分页流式与持久化队列溢出测试通过；这些是回归门槛，不宣称生产服务等级。 |
+| Step 32/33 proven P0/P1 | PASS | AR-01～AR-20 本地代码项均转为 FIXED；P0=0，已知本地 P1=0。发布权限与平台验证另列，不混入代码发现。 |
+| Step 34 failing scenarios rerun | PASS | 修复前 Query 9/9 RED、DST 2/2 RED 已保留；修复后相关真值套件全绿。 |
+| Step 35 schema/persistence artifacts | PASS | schema v3 迁移/回滚/只读兼容通过；scanner 61 stores/721 sites；指纹 `sha256:f4cfa1e85848f7b621a87f5cc638a3d0c9229d71acae9f662e34b438358a3d49`。 |
+| Step 36～40 静态门禁 | PASS | Node 24.16.0 下 typecheck、lint、lint:boundary、持久化扫描/指纹、命令行闭包和多语言校验均通过；闭包 10609 files，保留 1 条既有基线边。 |
+| Step 41 targeted observability | PASS | 最后新增的审批、记忆和详情纵向证据定向复跑为 2 files / 17 tests passed；完整定向套件结果见 Phase 10.1 进度日志。 |
+| Step 42 full npm test | PASS | 最终复跑：1201 files passed / 1 skipped；12135 tests passed / 7 skipped；0 failed；134.40s。 |
+| Step 43 三个 build | PASS | `build:server`、`build:server:open`、`build:client` 在本机均 exit 0；正式构建所需签名输入使用临时本地密钥，验证后已删除。 |
+| Step 44 package smoke | PASS | macOS arm64 应用目录成功打包、临时签名验证通过；notarization 明确未执行，不把它算作 package smoke。 |
+| Step 45/46 V2 与文档 | PASS | 新 V2 十矩阵、AR 台账 After、历史报告取代提示及本节对账均已写入。 |
+| Step 47 VERIFIED_SOURCE_SHA seal | NOT_EXECUTED | 用户要求原地修复但未授权创建功能提交、审计提交或推送；当前旧 seal 仍是 commit 对象，但不覆盖本轮未提交工作树。 |
+| Remote Windows/Linux CI | NOT_EXECUTED | 本轮没有被授权形成并推送功能提交，无法对本轮树触发可信远端流水线；不得把本机结果外推为跨平台通过。 |

@@ -420,8 +420,8 @@ describe("session prompt snapshot provenance (Step 7)", () => {
 });
 
 describe("media/speech provenance descriptors (MC-06/08/09)", () => {
-  it("image: prompt + references produce category/locator only, values never recorded", () => {
-    const { buildImageTaskProvenanceForTest } = require("../core/media/image-task-runner.ts");
+  it("image: prompt + references produce category/locator only, values never recorded", async () => {
+    const { buildImageTaskProvenanceForTest } = await import("../core/media/image-task-runner.ts");
     const provenance = buildImageTaskProvenanceForTest({
       prompt: "TOP_SECRET_IMAGE_PROMPT 画一只猫",
       image: ["https://secret.example/ref-1.png", "https://secret.example/ref-2.png"],
@@ -440,8 +440,8 @@ describe("media/speech provenance descriptors (MC-06/08/09)", () => {
     expect(serialized.includes("secret.example")).toBe(false);
   });
 
-  it("speech: audio + language hint distinguishable, no audio/transcript content", () => {
-    const { buildSpeechProvenanceForTest } = require("../core/speech-recognition-service.ts");
+  it("speech: audio + language hint distinguishable, no audio/transcript content", async () => {
+    const { buildSpeechProvenanceForTest } = await import("../core/speech-recognition-service.ts");
     const provenance = buildSpeechProvenanceForTest({ language: "zh" })!;
     expect(provenance.inputShape).toBe("speech_transcribe");
     expect(provenance.sections.map((s: any) => `${s.category}:${s.role}`)).toEqual([

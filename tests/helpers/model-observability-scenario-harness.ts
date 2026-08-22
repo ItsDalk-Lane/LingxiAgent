@@ -310,6 +310,7 @@ export async function createScenarioHarness(options: ScenarioHarnessOptions = {}
     route() {
       if (!route) {
         const engineFacade = {
+          lingxiHome,
           getModelObservabilityHealth: () => handle.getHealth(),
           getModelObservabilitySettings: () => { throw new Error("settings via engine only; harness route tests use query endpoints"); },
           setModelObservabilitySettings: async () => { throw new Error("settings mutation not wired in harness facade"); },

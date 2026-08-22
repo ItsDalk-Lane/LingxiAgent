@@ -165,6 +165,11 @@ function TraceDetailPanel({ detail, onSelectCall }: {
           {t('settings.observability.trace.degradedWarning')}
         </div>
       )}
+      {detail.dataCompleteness.status === 'unknown' && (
+        <div className={styles['observability-completeness-note']} role="status" data-completeness="unknown">
+          {t('settings.observability.ledger.completenessUnknown')}
+        </div>
+      )}
       <div className={styles['observability-trace-stats']}>
         <span title={summary.traceId}><code>{shortId(summary.traceId)}</code></span>
         <span>{summary.origin ?? '—'}</span>
@@ -176,7 +181,15 @@ function TraceDetailPanel({ detail, onSelectCall }: {
         <span data-status="error">{formatCompactNumber(summary.terminalError)}</span>
         <span data-status="aborted">{formatCompactNumber(summary.terminalAborted)}</span>
         <span data-status="incomplete">{formatCompactNumber(summary.incomplete)}</span>
-        {detail.usageAggregate?.summary && (
+        <span data-usage-availability={detail.usageAggregate.availability}>
+          {t(`settings.observability.trace.usageAvailability.${detail.usageAggregate.availability}`, {
+            covered: formatNumber(detail.usageAggregate.coveredCalls),
+            corrupt: formatNumber(detail.usageAggregate.corruptCalls),
+            unknown: formatNumber(detail.usageAggregate.unknownCalls),
+            total: formatNumber(detail.usageAggregate.totalCalls),
+          })}
+        </span>
+        {detail.usageAggregate.summary && (
           <>
             <span>{formatCompactNumber(detail.usageAggregate.summary.totalTokens)} tok</span>
             <span>{formatCost(detail.usageAggregate.summary.costTotal)}</span>

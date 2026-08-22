@@ -14,6 +14,8 @@
  */
 
 import { Hono } from "hono";
+import fs from "node:fs";
+import { Readable } from "node:stream";
 import {
   normalizeModelObservabilityAggregateQuery,
   normalizeModelObservabilityQuery,
@@ -69,7 +71,7 @@ function safeBlobContentType(mediaType: string | null): string {
   return `${major}/${match[2].toLowerCase()}`;
 }
 
-export function createModelObservabilityRoute(engine) {
+export function createModelObservabilityRoute(engine: any) {
   const route = new Hono();
 
   /* ── health / settings（控制面，§四十九/五十八～六十二）────────────── */
@@ -251,11 +253,11 @@ export function createModelObservabilityRoute(engine) {
    * HEAD 供 UI 懒加载探测 content-type/length（不下载字节）。
    */
 
-  const blobHandler = (c: any, includeBytes: boolean) => {
-    const result = engine.getModelObservabilityQueryService().getStoredBlob(
-      c.req.param("blobId"),
-      { includeBytes },
-    );
+  const blobHandler = (c: any, includeBody: boolean) => {
+    const blobId = c.req.param("blobId");
+    // GET 与 HEAD 都只让 query service 做 exact-id metadata/stat 探测；正文由
+    // createReadStream 分块输出，不能把 64MB 文件同步装进一个 Buffer。
+    const result = engine.getModelObservabilityQueryService().getStoredBlob(blobId);
     if (result.ok === false) return serviceError(c, result.error);
     const blob = result.value;
     const headers: Record<string, string> = {
@@ -264,14 +266,25 @@ export function createModelObservabilityRoute(engine) {
       "cache-control": "no-store",
       "x-content-type-options": "nosniff",
     };
-    if (!includeBytes || blob.bytes === null) {
+    if (!includeBody) {
       return new Response(null, { status: 200, headers });
     }
-    return new Response(new Uint8Array(blob.bytes), { status: 200, headers });
+    try {
+      // 先打开文件描述符，避免 stat 与真正开始读取之间的删除竞态；不会把正文
+      // 同步读进内存。autoClose 会在流结束或失败时释放描述符。
+      const fileDescriptor = fs.openSync(blob.filePath, "r");
+      const nodeStream = fs.createReadStream(blob.filePath, { fd: fileDescriptor, autoClose: true });
+      const stream = Readable.toWeb(nodeStream) as ReadableStream<Uint8Array>;
+      return new Response(stream, { status: 200, headers });
+    } catch {
+      return serviceError(c, { code: "blob_missing", message: "blob file is missing on disk" });
+    }
   };
 
-  route.get("/model-observability/blobs/:blobId", (c) => blobHandler(c, true));
+  // Hono 的 GET 路由也会兜底匹配 HEAD。显式 HEAD 负责正常分流，GET
+  // handler 再按实际方法兜底，确保框架匹配顺序变化时也不会打开正文文件。
   route.on("HEAD", "/model-observability/blobs/:blobId", (c) => blobHandler(c, false));
+  route.get("/model-observability/blobs/:blobId", (c) => blobHandler(c, c.req.method !== "HEAD"));
 
   return route;
 }

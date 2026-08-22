@@ -18,8 +18,8 @@
  */
 
 import fs from "fs";
-import path from "path";
-import { modelObservabilityBlobsRoot, modelObservabilityDbPath } from "./model-observability-schema.ts";
+import { modelObservabilityDbPath } from "./model-observability-schema.ts";
+import { resolveExistingModelObservabilityBlobPath } from "./model-observability-blob-store.ts";
 import { openModelObservabilityReadDatabase } from "./model-observability-read-database.ts";
 import { MODEL_OBSERVABILITY_BLOB_ID_PATTERN } from "../../shared/model-observability-api-contract.ts";
 import {
@@ -70,6 +70,7 @@ class NotFoundError extends Error {
 }
 /** §一百二十九：DB ref 存在但磁盘文件缺失——显式 blob_missing（绝不 500）。 */
 class BlobMissingError extends Error {}
+class DateBucketTooComplexError extends Error {}
 
 /* ── Filter → SQL（闭集映射；值全绑定）───────────────────────────────── */
 
@@ -136,30 +137,33 @@ function buildCallFilterSql(
     [ModelObservabilityMultiValueField, string[]]
   >) {
     if (field === "terminalStatus") {
+      const alternatives: string[] = [];
       const concrete = values.filter((v) => v !== "incomplete");
       if (concrete.length > 0) {
-        clauses.push(`${col("terminal_status")} IN (${concrete.map(() => "?").join(",")})`);
+        alternatives.push(`${col("terminal_status")} IN (${concrete.map(() => "?").join(",")})`);
         params.push(...concrete);
       }
       if (values.includes("incomplete")) {
-        clauses.push(`(${col("terminal_status")} IS NULL OR ${col("terminal_status")} = '')`);
+        alternatives.push(`(${col("terminal_status")} IS NULL OR ${col("terminal_status")} = '')`);
       }
+      if (alternatives.length > 0) clauses.push(`(${alternatives.join(" OR ")})`);
       continue;
     }
     if (field === "payloadAvailability") {
-      const columnStates = values.filter((v) => v !== "present" && v !== "unknown");
-      if (columnStates.length > 0) {
-        clauses.push(`${col("payload_availability")} IN (${columnStates.map(() => "?").join(",")})`);
-        params.push(...columnStates);
+      const alternatives: string[] = [];
+      const explicitStates = ["dropped", "expired", "not_captured"];
+      const noExplicitState = `(${col("payload_availability")} IS NULL OR ${col("payload_availability")} NOT IN ('dropped','expired','not_captured'))`;
+      for (const value of values) {
+        if (explicitStates.includes(value)) {
+          alternatives.push(`${col("payload_availability")} = ?`);
+          params.push(value);
+        } else if (value === "present") {
+          alternatives.push(`(${noExplicitState} AND EXISTS (SELECT 1 FROM payload_records pr WHERE pr.call_id = ${col("call_id")}))`);
+        } else if (value === "unknown") {
+          alternatives.push(`(${noExplicitState} AND NOT EXISTS (SELECT 1 FROM payload_records pr WHERE pr.call_id = ${col("call_id")}))`);
+        }
       }
-      if (values.includes("present")) {
-        clauses.push(`EXISTS (SELECT 1 FROM payload_records pr WHERE pr.call_id = ${col("call_id")})`);
-      }
-      if (values.includes("unknown")) {
-        clauses.push(
-          `${col("payload_availability")} IS NULL AND NOT EXISTS (SELECT 1 FROM payload_records pr WHERE pr.call_id = ${col("call_id")})`,
-        );
-      }
+      if (alternatives.length > 0) clauses.push(`(${alternatives.join(" OR ")})`);
       continue;
     }
     const column = MULTI_FIELD_COLUMNS[field];
@@ -209,9 +213,15 @@ function textOrNull(value: unknown): string | null {
   return typeof value === "string" && value ? value : null;
 }
 
-function intOrNull(value: unknown): number | null {
+function finiteNumberOrNull(value: unknown): number | null {
+  if (value === null || value === undefined || value === "") return null;
   const n = Number(value);
   return Number.isFinite(n) ? n : null;
+}
+
+function finiteIntegerOrNull(value: unknown): number | null {
+  const n = finiteNumberOrNull(value);
+  return n !== null && Number.isInteger(n) ? n : null;
 }
 
 function boolFlag(value: unknown): boolean {
@@ -226,21 +236,25 @@ function durationMs(startedAt: string | null, endedAt: string | null): number | 
   return Math.max(0, end - start);
 }
 
-function parseCategories(raw: unknown): string[] {
-  if (typeof raw !== "string" || !raw) return [];
+function parseCategories(raw: unknown): { values: string[]; state: "present" | "absent" | "corrupt" } {
+  if (typeof raw !== "string" || !raw) return { values: [], state: "absent" };
   try {
     const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed.filter((c): c is string => typeof c === "string") : [];
+    if (!Array.isArray(parsed)) return { values: [], state: "corrupt" };
+    return {
+      values: parsed.filter((category): category is string => typeof category === "string"),
+      state: "present",
+    };
   } catch {
-    return [];
+    return { values: [], state: "corrupt" };
   }
 }
 
 /** payload_availability 真相枚举（§三十七：NULL 不折叠，无 payload row → unknown）。 */
 function payloadAvailabilityOf(columnValue: unknown, recordCount: number): ModelObservabilityPayloadAvailability {
-  if (recordCount > 0) return "present";
   const value = textOrNull(columnValue);
   if (value === "expired" || value === "dropped" || value === "not_captured") return value;
+  if (recordCount > 0) return "present";
   return "unknown";
 }
 
@@ -379,6 +393,9 @@ export function createModelObservabilityQueryService({ lingxiHome }: { lingxiHom
       if (error instanceof BlobMissingError) {
         return fail("blob_missing", error.message, "blob_file_missing");
       }
+      if (error instanceof DateBucketTooComplexError) {
+        return fail("query_failed", error.message, "date_bucket_segment_limit_exceeded");
+      }
       // 连接可能已失效（writer close / 文件被替换）：失效缓存，下次查询重开。
       invalidate();
       if (process.env.LINGXI_OBS_QUERY_DEBUG) console.error("[obs-query]", error);
@@ -388,34 +405,43 @@ export function createModelObservabilityQueryService({ lingxiHome }: { lingxiHom
 
   /* ── 全局 drop counters（observability_meta 持久化 + DB 内事实）──────── */
 
-  function readDataCompleteness(db: any): ModelObservabilityDataCompleteness {
-    const out: ModelObservabilityDataCompleteness = {
-      droppedTraceEvents: 0,
-      droppedPayloadRecords: 0,
-      droppedBlobs: 0,
-      interruptedByRestartCalls: 0,
+  function unknownDataCompleteness(): ModelObservabilityDataCompleteness {
+    return {
+      status: "unknown",
+      droppedTraceEvents: null,
+      droppedPayloadRecords: null,
+      droppedBlobs: null,
+      interruptedByRestartCalls: null,
     };
+  }
+
+  function readDataCompleteness(db: any): ModelObservabilityDataCompleteness {
     try {
       const readMeta = (key: string): number => {
         const row = db.prepare(`SELECT value_json FROM observability_meta WHERE key = ?`).get(key);
         if (!row) return 0;
-        try {
-          const value = JSON.parse(row.value_json);
-          return typeof value === "number" && Number.isFinite(value) && value > 0 ? Math.floor(value) : 0;
-        } catch {
-          return 0;
+        const value = JSON.parse(row.value_json);
+        if (typeof value !== "number" || !Number.isFinite(value) || value < 0) {
+          throw new Error("invalid observability completeness counter");
         }
+        return Math.floor(value);
       };
-      out.droppedTraceEvents = readMeta("droppedTraceEvents");
-      out.droppedPayloadRecords = readMeta("droppedPayloadRecords");
-      out.droppedBlobs = readMeta("droppedBlobs");
-      out.interruptedByRestartCalls = Number(
-        db.prepare(`SELECT COUNT(*) AS n FROM model_calls WHERE interrupted_by_restart = 1`).get().n ?? 0,
+      const interruptedByRestartCalls = finiteIntegerOrNull(
+        db.prepare(`SELECT COUNT(*) AS n FROM model_calls WHERE interrupted_by_restart = 1`).get()?.n,
       );
+      if (interruptedByRestartCalls === null || interruptedByRestartCalls < 0) {
+        throw new Error("invalid interrupted call count");
+      }
+      return {
+        status: "known",
+        droppedTraceEvents: readMeta("droppedTraceEvents"),
+        droppedPayloadRecords: readMeta("droppedPayloadRecords"),
+        droppedBlobs: readMeta("droppedBlobs"),
+        interruptedByRestartCalls,
+      };
     } catch {
-      // meta 读取失败：诚实返回保守 0 计数。
+      return unknownDataCompleteness();
     }
-    return out;
   }
 
   /* ── batch summaries（§四十六：一次 IN 查询，不做 N+1）──────────────── */
@@ -454,27 +480,77 @@ export function createModelObservabilityQueryService({ lingxiHome }: { lingxiHom
     return out;
   }
 
+  const USAGE_INTEGER_FIELDS = [
+    "duration_ms",
+    "input_total_tokens",
+    "input_uncached_tokens",
+    "output_total_tokens",
+    "reasoning_tokens",
+    "cache_read_tokens",
+    "cache_write_tokens",
+    "cache_miss_tokens",
+    "total_tokens",
+  ] as const;
+
+  const USAGE_BOOLEAN_FIELDS = ["cache_hit", "cache_created"] as const;
+
+  function isUsageRowCorrupt(usage: Record<string, unknown>): boolean {
+    for (const field of USAGE_INTEGER_FIELDS) {
+      const value = usage[field];
+      if (value !== null && value !== undefined
+        && (typeof value !== "number" || !Number.isSafeInteger(value) || value < 0)) {
+        return true;
+      }
+    }
+    const cost = usage.cost_total;
+    if (cost !== null && cost !== undefined
+      && (typeof cost !== "number" || !Number.isFinite(cost) || cost < 0)) {
+      return true;
+    }
+    const ratio = usage.cache_hit_ratio;
+    if (ratio !== null && ratio !== undefined
+      && (typeof ratio !== "number" || !Number.isFinite(ratio) || ratio < 0 || ratio > 1)) {
+      return true;
+    }
+    return USAGE_BOOLEAN_FIELDS.some((field) => {
+      const value = usage[field];
+      return value !== null && value !== undefined && value !== 0 && value !== 1;
+    });
+  }
+
   function usageOf(
     reader: CachedReader,
     usage: Record<string, unknown> | undefined,
+    correlationState: unknown,
   ): ModelObservabilityCallListItem["usage"] {
     if (!reader.hasAccounting) {
       return { availability: "projection_unavailable", status: null, summary: null };
     }
     if (!usage) {
-      return { availability: "not_correlated", status: null, summary: null };
+      return {
+        availability: correlationState === "not_correlated" ? "not_correlated" : "unknown",
+        status: null,
+        summary: null,
+      };
+    }
+    if (isUsageRowCorrupt(usage)) {
+      return {
+        availability: "corrupt",
+        status: textOrNull(usage.usage_status),
+        summary: null,
+      };
     }
     return {
       availability: "present",
       status: textOrNull(usage.usage_status),
       summary: {
-        inputTokens: intOrNull(usage.input_total_tokens),
-        outputTokens: intOrNull(usage.output_total_tokens),
-        reasoningTokens: intOrNull(usage.reasoning_tokens),
-        cacheReadTokens: intOrNull(usage.cache_read_tokens),
-        cacheWriteTokens: intOrNull(usage.cache_write_tokens),
-        totalTokens: intOrNull(usage.total_tokens),
-        costTotal: intOrNull(usage.cost_total),
+        inputTokens: finiteIntegerOrNull(usage.input_total_tokens),
+        outputTokens: finiteIntegerOrNull(usage.output_total_tokens),
+        reasoningTokens: finiteIntegerOrNull(usage.reasoning_tokens),
+        cacheReadTokens: finiteIntegerOrNull(usage.cache_read_tokens),
+        cacheWriteTokens: finiteIntegerOrNull(usage.cache_write_tokens),
+        totalTokens: finiteIntegerOrNull(usage.total_tokens),
+        costTotal: finiteNumberOrNull(usage.cost_total),
       },
     };
   }
@@ -491,6 +567,7 @@ export function createModelObservabilityQueryService({ lingxiHome }: { lingxiHom
   ): ModelObservabilityCallListItem {
     const startedAt = textOrNull(row.started_at);
     const endedAt = textOrNull(row.ended_at);
+    const categories = parseCategories(row.provenance_categories_json);
     return {
       callId: String(row.call_id ?? ""),
       traceId: textOrNull(row.trace_id),
@@ -527,13 +604,14 @@ export function createModelObservabilityQueryService({ lingxiHome }: { lingxiHom
       inputShape: textOrNull(row.input_shape),
       provenancePrecision: textOrNull(row.provenance_precision),
       provenance: {
-        sectionCount: intOrNull(row.provenance_section_count),
-        opaqueCount: intOrNull(row.provenance_opaque_count),
-        categories: parseCategories(row.provenance_categories_json),
+        sectionCount: finiteIntegerOrNull(row.provenance_section_count),
+        opaqueCount: finiteIntegerOrNull(row.provenance_opaque_count),
+        categories: categories.values,
+        categoriesState: categories.state,
       },
       payloadAvailability: payloadAvailabilityOf(row.payload_availability, extras.payloadRecordCount),
       payloadRecordCount: extras.payloadRecordCount,
-      usage: usageOf(reader, extras.usageRow),
+      usage: usageOf(reader, extras.usageRow, row.usage_correlation_state),
       attemptCount: extras.attemptCount,
       providerRequestCount: extras.providerRequestCount,
     };
@@ -591,8 +669,13 @@ export function createModelObservabilityQueryService({ lingxiHome }: { lingxiHom
 
   function queryTraces(query: NormalizedModelObservabilityTraceQuery): ModelObservabilityQueryResult<ModelObservabilityTracePage> {
     return runQuery((reader) => {
-      const filterSql = buildCallFilterSql(query.filter, "c");
-      const clauses = [filterSql.sql];
+      const filterSql = buildCallFilterSql(query.filter, "candidate");
+      const clauses = [
+        `EXISTS (
+          SELECT 1 FROM model_calls candidate
+          WHERE candidate.trace_id = t.trace_id AND ${filterSql.sql}
+        )`,
+      ];
       const params = [...filterSql.params];
       if (query.origin) {
         clauses.push("t.origin = ?");
@@ -661,9 +744,16 @@ export function createModelObservabilityQueryService({ lingxiHome }: { lingxiHom
    * 按 DST 段展开成有界 CASE（retention 有界 → 段数 ≤ 上限，超限诚实报错）。
    */
   const DATE_BUCKET_MAX_SEGMENTS = 16;
+  const DATE_BUCKET_TRANSITION_SCAN_MS = 6 * 60 * 60 * 1000;
+  const timeZoneFormatters = new Map<string, Intl.DateTimeFormat>();
 
   function timeZoneOffsetMinutesAt(timeZone: string, epochMs: number): number {
-    const formatted = new Intl.DateTimeFormat("en-US", { timeZone, timeZoneName: "longOffset" })
+    let formatter = timeZoneFormatters.get(timeZone);
+    if (!formatter) {
+      formatter = new Intl.DateTimeFormat("en-US", { timeZone, timeZoneName: "longOffset" });
+      timeZoneFormatters.set(timeZone, formatter);
+    }
+    const formatted = formatter
       .formatToParts(new Date(epochMs))
       .find((part) => part.type === "timeZoneName")?.value ?? "GMT+00:00";
     const match = /GMT([+-])(\d{2}):(\d{2})/.exec(formatted);
@@ -673,17 +763,26 @@ export function createModelObservabilityQueryService({ lingxiHome }: { lingxiHom
   }
 
   function nextTimeZoneTransition(timeZone: string, fromMs: number, untilMs: number): number | null {
-    const offsetFrom = timeZoneOffsetMinutesAt(timeZone, fromMs);
-    let hi = Math.min(untilMs, fromMs + 400 * 86_400_000);
-    if (timeZoneOffsetMinutesAt(timeZone, hi) === offsetFrom) return null;
-    let lo = fromMs;
-    // 二分到秒级：IEEE double 毫秒精度内安全（范围 ≤ 400 天）。
-    while (hi - lo > 1000) {
-      const mid = Math.floor((lo + hi) / 2);
-      if (timeZoneOffsetMinutesAt(timeZone, mid) === offsetFrom) lo = mid;
-      else hi = mid;
+    let scanStart = fromMs;
+    let scanOffset = timeZoneOffsetMinutesAt(timeZone, scanStart);
+    while (scanStart < untilMs) {
+      const scanEnd = Math.min(untilMs, scanStart + DATE_BUCKET_TRANSITION_SCAN_MS);
+      const endOffset = timeZoneOffsetMinutesAt(timeZone, scanEnd);
+      if (endOffset !== scanOffset) {
+        let lo = scanStart;
+        let hi = scanEnd;
+        // scanStart 保持旧 offset，scanEnd 已是新 offset；找第一毫秒边界。
+        while (hi - lo > 1) {
+          const mid = Math.floor((lo + hi) / 2);
+          if (timeZoneOffsetMinutesAt(timeZone, mid) === scanOffset) lo = mid;
+          else hi = mid;
+        }
+        return hi;
+      }
+      scanStart = scanEnd;
+      scanOffset = endOffset;
     }
-    return hi;
+    return null;
   }
 
   function dateBucketExpression(
@@ -722,13 +821,11 @@ export function createModelObservabilityQueryService({ lingxiHome }: { lingxiHom
     let cursor = startMs;
     segments.push({ boundaryIso: null, offset: timeZoneOffsetMinutesAt(timeZone, cursor) });
     while (cursor < endMs) {
-      if (segments.length >= DATE_BUCKET_MAX_SEGMENTS) {
-        // 有界保护（retention 默认 180d ≈ 最多 2 次 transition；16 段已远超正常）。
-        segments.push({ boundaryIso: null, offset: segments[segments.length - 1].offset });
-        break;
-      }
       const transition = nextTimeZoneTransition(timeZone, cursor, endMs);
       if (transition === null) break;
+      if (segments.length >= DATE_BUCKET_MAX_SEGMENTS) {
+        throw new DateBucketTooComplexError("date bucket range exceeds the supported transition limit");
+      }
       segments.push({
         boundaryIso: new Date(transition).toISOString(),
         offset: timeZoneOffsetMinutesAt(timeZone, transition),
@@ -782,31 +879,92 @@ export function createModelObservabilityQueryService({ lingxiHome }: { lingxiHom
         THEN CAST((julianday(mc.ended_at) - julianday(mc.started_at)) * 86400000.0 AS INTEGER) ELSE 0 END) AS duration_total_ms,
     SUM(CASE WHEN mc.started_at IS NOT NULL AND mc.ended_at IS NOT NULL THEN 1 ELSE 0 END) AS duration_observed_count`;
 
-  const USAGE_METRIC_SQL = `
-    SUM(CASE WHEN u.model_call_id IS NOT NULL THEN 1 ELSE 0 END) AS usage_covered,
-    SUM(CASE WHEN u.model_call_id IS NOT NULL AND u.usage_status = 'usage_missing' THEN 1 ELSE 0 END) AS usage_missing,
-    SUM(COALESCE(u.input_total_tokens, 0)) AS input_tokens,
-    SUM(COALESCE(u.output_total_tokens, 0)) AS output_tokens,
-    SUM(COALESCE(u.reasoning_tokens, 0)) AS reasoning_tokens,
-    SUM(COALESCE(u.cache_read_tokens, 0)) AS cache_read_tokens,
-    SUM(COALESCE(u.cache_write_tokens, 0)) AS cache_write_tokens,
-    SUM(COALESCE(u.total_tokens, 0)) AS total_tokens,
-    SUM(u.cost_total) AS cost_total,
-    SUM(CASE WHEN u.cache_hit = 1 THEN 1 ELSE 0 END) AS cache_hit_count,
-    SUM(CASE WHEN u.cache_hit IS NOT NULL THEN 1 ELSE 0 END) AS cache_observed_count`;
+  function usageMetricSql(reader: CachedReader): string {
+    if (!reader.hasAccounting) {
+      return `
+        0 AS usage_covered, 0 AS usage_corrupt, 0 AS usage_not_correlated, 0 AS usage_missing,
+        0 AS input_tokens_observed, NULL AS input_tokens,
+        0 AS output_tokens_observed, NULL AS output_tokens,
+        0 AS reasoning_tokens_observed, NULL AS reasoning_tokens,
+        0 AS cache_read_tokens_observed, NULL AS cache_read_tokens,
+        0 AS cache_write_tokens_observed, NULL AS cache_write_tokens,
+        0 AS total_tokens_observed, NULL AS total_tokens,
+        0 AS cost_total_observed, NULL AS cost_total,
+        NULL AS cache_hit_count, 0 AS cache_observed_count`;
+    }
+    const validInteger = (column: string) =>
+      `(typeof(u.${column}) = 'integer' AND u.${column} >= 0)`;
+    const validNumber = (column: string) =>
+      `(typeof(u.${column}) IN ('integer','real') AND u.${column} >= 0 AND abs(u.${column}) <= 1.7976931348623157e308)`;
+    const corruptPredicate = [
+      ...USAGE_INTEGER_FIELDS.map((column) =>
+        `(u.${column} IS NOT NULL AND NOT ${validInteger(column)})`),
+      `(u.cost_total IS NOT NULL AND NOT ${validNumber("cost_total")})`,
+      `(u.cache_hit_ratio IS NOT NULL AND NOT (${validNumber("cache_hit_ratio")} AND u.cache_hit_ratio <= 1))`,
+      ...USAGE_BOOLEAN_FIELDS.map((column) =>
+        `(u.${column} IS NOT NULL AND NOT (typeof(u.${column}) = 'integer' AND u.${column} IN (0,1)))`),
+    ].join(" OR ");
+    const notCorrelated = reader.schemaVersion >= 3
+      ? "SUM(CASE WHEN u.model_call_id IS NULL AND mc.usage_correlation_state = 'not_correlated' THEN 1 ELSE 0 END)"
+      : "0";
+    return `
+      SUM(CASE WHEN u.model_call_id IS NOT NULL AND NOT (${corruptPredicate}) THEN 1 ELSE 0 END) AS usage_covered,
+      SUM(CASE WHEN u.model_call_id IS NOT NULL AND (${corruptPredicate}) THEN 1 ELSE 0 END) AS usage_corrupt,
+      ${notCorrelated} AS usage_not_correlated,
+      SUM(CASE WHEN u.model_call_id IS NOT NULL AND u.usage_status = 'usage_missing' THEN 1 ELSE 0 END) AS usage_missing,
+      SUM(CASE WHEN ${validInteger("input_total_tokens")} THEN 1 ELSE 0 END) AS input_tokens_observed,
+      SUM(CASE WHEN ${validInteger("input_total_tokens")} THEN u.input_total_tokens ELSE NULL END) AS input_tokens,
+      SUM(CASE WHEN ${validInteger("output_total_tokens")} THEN 1 ELSE 0 END) AS output_tokens_observed,
+      SUM(CASE WHEN ${validInteger("output_total_tokens")} THEN u.output_total_tokens ELSE NULL END) AS output_tokens,
+      SUM(CASE WHEN ${validInteger("reasoning_tokens")} THEN 1 ELSE 0 END) AS reasoning_tokens_observed,
+      SUM(CASE WHEN ${validInteger("reasoning_tokens")} THEN u.reasoning_tokens ELSE NULL END) AS reasoning_tokens,
+      SUM(CASE WHEN ${validInteger("cache_read_tokens")} THEN 1 ELSE 0 END) AS cache_read_tokens_observed,
+      SUM(CASE WHEN ${validInteger("cache_read_tokens")} THEN u.cache_read_tokens ELSE NULL END) AS cache_read_tokens,
+      SUM(CASE WHEN ${validInteger("cache_write_tokens")} THEN 1 ELSE 0 END) AS cache_write_tokens_observed,
+      SUM(CASE WHEN ${validInteger("cache_write_tokens")} THEN u.cache_write_tokens ELSE NULL END) AS cache_write_tokens,
+      SUM(CASE WHEN ${validInteger("total_tokens")} THEN 1 ELSE 0 END) AS total_tokens_observed,
+      SUM(CASE WHEN ${validInteger("total_tokens")} THEN u.total_tokens ELSE NULL END) AS total_tokens,
+      SUM(CASE WHEN ${validNumber("cost_total")} THEN 1 ELSE 0 END) AS cost_total_observed,
+      SUM(CASE WHEN ${validNumber("cost_total")} THEN u.cost_total ELSE NULL END) AS cost_total,
+      SUM(CASE WHEN u.cache_hit = 1 THEN 1 ELSE 0 END) AS cache_hit_count,
+      SUM(CASE WHEN typeof(u.cache_hit) = 'integer' AND u.cache_hit IN (0,1) THEN 1 ELSE 0 END) AS cache_observed_count`;
+  }
 
-  /** v1（无 model_call_usage 表）：usage 指标全 0 / NULL，availability 由 queryHealth 表达。 */
-  const ZERO_USAGE_METRIC_SQL = `
-    0 AS usage_covered, 0 AS usage_missing,
-    0 AS input_tokens, 0 AS output_tokens, 0 AS reasoning_tokens,
-    0 AS cache_read_tokens, 0 AS cache_write_tokens, 0 AS total_tokens,
-    NULL AS cost_total, 0 AS cache_hit_count, 0 AS cache_observed_count`;
-
-  function metricsFromRow(row: Record<string, unknown>): ModelObservabilityGroupMetrics {
+  function metricsFromRow(
+    row: Record<string, unknown>,
+    { hasAccounting }: { hasAccounting: boolean },
+  ): ModelObservabilityGroupMetrics {
     const observed = Number(row.duration_observed_count ?? 0);
     const totalMs = Number(row.duration_total_ms ?? 0);
+    const callCount = Number(row.call_count ?? 0);
+    const usageCoveredCalls = Number(row.usage_covered ?? 0);
+    const usageCorruptCalls = Number(row.usage_corrupt ?? 0);
+    const usageNotCorrelatedCalls = Number(row.usage_not_correlated ?? 0);
+    const usageUnknownCalls = Math.max(
+      0,
+      callCount - usageCoveredCalls - usageCorruptCalls - usageNotCorrelatedCalls,
+    );
+    const usageAggregateAvailability = !hasAccounting
+      ? "projection_unavailable" as const
+      : usageCorruptCalls > 0
+        ? "corrupt" as const
+      : usageUnknownCalls === 0
+        ? "complete" as const
+        : usageCoveredCalls + usageNotCorrelatedCalls > 0
+          ? "partial" as const
+          : "unknown" as const;
+    const aggregateNumber = (value: unknown, observedKey: string): number | null => {
+      if (callCount === 0) return 0;
+      if (Number(row[observedKey] ?? 0) <= 0) return null;
+      return finiteNumberOrNull(value);
+    };
+    const aggregateInteger = (value: unknown, observedKey: string): number | null => {
+      const result = aggregateNumber(value, observedKey);
+      return result === null ? null : Math.trunc(result);
+    };
+    const cacheObservedCount = Number(row.cache_observed_count ?? 0);
     return {
-      callCount: Number(row.call_count ?? 0),
+      callCount,
       traceCount: Number(row.trace_count ?? 0),
       okCount: Number(row.ok_count ?? 0),
       errorCount: Number(row.error_count ?? 0),
@@ -816,17 +974,21 @@ export function createModelObservabilityQueryService({ lingxiHome }: { lingxiHom
       durationObservedCount: observed,
       durationTotalMs: totalMs,
       durationAverageMs: observed > 0 ? Math.round(totalMs / observed) : null,
-      usageCoveredCalls: Number(row.usage_covered ?? 0),
+      usageAggregateAvailability,
+      usageCoveredCalls,
+      usageCorruptCalls,
+      usageNotCorrelatedCalls,
+      usageUnknownCalls,
       usageMissingCalls: Number(row.usage_missing ?? 0),
-      inputTokens: Number(row.input_tokens ?? 0),
-      outputTokens: Number(row.output_tokens ?? 0),
-      reasoningTokens: Number(row.reasoning_tokens ?? 0),
-      cacheReadTokens: Number(row.cache_read_tokens ?? 0),
-      cacheWriteTokens: Number(row.cache_write_tokens ?? 0),
-      totalTokens: Number(row.total_tokens ?? 0),
-      costTotal: row.cost_total == null ? null : Number(row.cost_total),
-      cacheHitCount: Number(row.cache_hit_count ?? 0),
-      cacheObservedCount: Number(row.cache_observed_count ?? 0),
+      inputTokens: aggregateInteger(row.input_tokens, "input_tokens_observed"),
+      outputTokens: aggregateInteger(row.output_tokens, "output_tokens_observed"),
+      reasoningTokens: aggregateInteger(row.reasoning_tokens, "reasoning_tokens_observed"),
+      cacheReadTokens: aggregateInteger(row.cache_read_tokens, "cache_read_tokens_observed"),
+      cacheWriteTokens: aggregateInteger(row.cache_write_tokens, "cache_write_tokens_observed"),
+      totalTokens: aggregateInteger(row.total_tokens, "total_tokens_observed"),
+      costTotal: aggregateNumber(row.cost_total, "cost_total_observed"),
+      cacheHitCount: callCount === 0 ? 0 : cacheObservedCount > 0 ? Number(row.cache_hit_count ?? 0) : null,
+      cacheObservedCount,
     };
   }
 
@@ -836,7 +998,7 @@ export function createModelObservabilityQueryService({ lingxiHome }: { lingxiHom
       const fromSql = reader.hasAccounting
         ? "FROM model_calls mc LEFT JOIN model_call_usage u ON u.model_call_id = mc.call_id"
         : "FROM model_calls mc";
-      const usageMetrics = reader.hasAccounting ? USAGE_METRIC_SQL : ZERO_USAGE_METRIC_SQL;
+      const usageMetrics = usageMetricSql(reader);
 
       // 维度表达式 → g0..gN 别名（闭集映射；date 绑定 offset 参数，§四十三）。
       const groupExpressions: Array<{ dimension: ModelObservabilityGroupByDimension; column: string | null; expr: string; params: unknown[] }> = [];
@@ -857,7 +1019,7 @@ export function createModelObservabilityQueryService({ lingxiHome }: { lingxiHom
       ).get(...filterSql.params);
 
       if (query.groupBy.length === 0) {
-        return { groups: [], overall: metricsFromRow(overallRow) };
+        return { groups: [], overall: metricsFromRow(overallRow, reader) };
       }
 
       const selectDims = groupExpressions.map((g, i) => `${g.expr} AS g${i}`).join(", ");
@@ -886,9 +1048,9 @@ export function createModelObservabilityQueryService({ lingxiHome }: { lingxiHom
           }
           keyParts.push(value ?? "∅");
         });
-        return { key: keyParts.join("::"), values, metrics: metricsFromRow(row) };
+        return { key: keyParts.join("::"), values, metrics: metricsFromRow(row, reader) };
       });
-      return { groups, overall: metricsFromRow(overallRow) };
+      return { groups, overall: metricsFromRow(overallRow, reader) };
     });
   }
 
@@ -908,7 +1070,7 @@ export function createModelObservabilityQueryService({ lingxiHome }: { lingxiHom
         callId: String(row.call_id),
         kind: String(row.kind),
         attemptId: textOrNull(row.attempt_id),
-        providerRequestOrdinal: intOrNull(row.provider_request_ordinal),
+        providerRequestOrdinal: finiteIntegerOrNull(row.provider_request_ordinal),
         capturedAt: String(row.captured_at ?? ""),
         visibility: String(row.visibility ?? ""),
         fidelity: String(row.fidelity ?? ""),
@@ -916,7 +1078,7 @@ export function createModelObservabilityQueryService({ lingxiHome }: { lingxiHom
         redacted: boolFlag(row.redacted),
         truncated: boolFlag(row.truncated),
         degraded: boolFlag(row.degraded),
-        recordCharCount: intOrNull(row.record_char_count),
+        recordCharCount: finiteIntegerOrNull(row.record_char_count),
         hasBody: typeof row.payload_json === "string" && row.payload_json.length > 0,
         hasSemanticProvenance: typeof row.semantic_input_provenance_json === "string"
           && (row.semantic_input_provenance_json as string).length > 0,
@@ -986,7 +1148,7 @@ export function createModelObservabilityQueryService({ lingxiHome }: { lingxiHom
           responseReceivedAt: textOrNull(attempt.response_received_at),
           errorAt: textOrNull(attempt.error_at),
           providerRequestId: textOrNull(attempt.provider_request_id),
-          httpStatus: intOrNull(attempt.http_status),
+          httpStatus: finiteIntegerOrNull(attempt.http_status),
           attemptVisibility: textOrNull(attempt.attempt_visibility),
           providerWireVisibility: textOrNull(attempt.provider_wire_visibility),
           errorName: textOrNull(attempt.error_name),
@@ -1090,30 +1252,54 @@ export function createModelObservabilityQueryService({ lingxiHome }: { lingxiHom
 
       let usageAggregate: ModelObservabilityTraceDetail["usageAggregate"];
       if (!reader.hasAccounting) {
-        usageAggregate = { availability: "projection_unavailable", summary: null };
+        usageAggregate = {
+          availability: "projection_unavailable",
+          coveredCalls: 0,
+          corruptCalls: 0,
+          notCorrelatedCalls: 0,
+          unknownCalls: calls.length,
+          totalCalls: calls.length,
+          summary: null,
+        };
       } else {
-        const rows = [...usage.values()];
-        if (rows.length === 0) {
-          usageAggregate = { availability: "not_correlated", summary: null };
-        } else {
-          const sum = (key: string): number => rows.reduce((acc, row) => acc + (Number(row[key] ?? 0) || 0), 0);
-          const costValues = rows
-            .map((row) => row.cost_total)
-            .filter((v) => v != null)
-            .map(Number);
-          usageAggregate = {
-            availability: "present",
-            summary: {
-              inputTokens: sum("input_total_tokens"),
-              outputTokens: sum("output_total_tokens"),
-              reasoningTokens: sum("reasoning_tokens"),
-              cacheReadTokens: sum("cache_read_tokens"),
-              cacheWriteTokens: sum("cache_write_tokens"),
-              totalTokens: sum("total_tokens"),
-              costTotal: costValues.length > 0 ? costValues.reduce((a, b) => a + b, 0) : null,
-            },
-          };
-        }
+        const coveredCalls = calls.filter((call) => call.usage.availability === "present").length;
+        const corruptCalls = calls.filter((call) => call.usage.availability === "corrupt").length;
+        const notCorrelatedCalls = calls.filter((call) => call.usage.availability === "not_correlated").length;
+        const unknownCalls = Math.max(0, calls.length - coveredCalls - corruptCalls - notCorrelatedCalls);
+        const summaries = calls
+          .map((call) => call.usage.summary)
+          .filter((summary): summary is NonNullable<typeof summary> => summary !== null);
+        const sumKnown = (key: keyof (typeof summaries)[number]): number | null => {
+          const values = summaries
+            .map((summary) => summary[key])
+            .filter((value): value is number => typeof value === "number" && Number.isFinite(value));
+          return values.length > 0 ? values.reduce((total, value) => total + value, 0) : null;
+        };
+        usageAggregate = {
+          availability: corruptCalls > 0
+            ? "corrupt"
+            : unknownCalls === 0
+            ? "complete"
+            : coveredCalls + notCorrelatedCalls > 0
+              ? "partial"
+              : "unknown",
+          coveredCalls,
+          corruptCalls,
+          notCorrelatedCalls,
+          unknownCalls,
+          totalCalls: calls.length,
+          summary: summaries.length > 0
+            ? {
+              inputTokens: sumKnown("inputTokens"),
+              outputTokens: sumKnown("outputTokens"),
+              reasoningTokens: sumKnown("reasoningTokens"),
+              cacheReadTokens: sumKnown("cacheReadTokens"),
+              cacheWriteTokens: sumKnown("cacheWriteTokens"),
+              totalTokens: sumKnown("totalTokens"),
+              costTotal: sumKnown("costTotal"),
+            }
+            : null,
+        };
       }
 
       return {
@@ -1155,7 +1341,7 @@ export function createModelObservabilityQueryService({ lingxiHome }: { lingxiHom
         callId: String(row.call_id),
         kind: String(row.kind),
         attemptId: textOrNull(row.attempt_id),
-        providerRequestOrdinal: intOrNull(row.provider_request_ordinal),
+        providerRequestOrdinal: finiteIntegerOrNull(row.provider_request_ordinal),
         capturedAt: String(row.captured_at ?? ""),
         visibility: String(row.visibility ?? ""),
         fidelity: String(row.fidelity ?? ""),
@@ -1163,7 +1349,7 @@ export function createModelObservabilityQueryService({ lingxiHome }: { lingxiHom
         redacted: boolFlag(row.redacted),
         truncated: boolFlag(row.truncated),
         degraded: boolFlag(row.degraded),
-        recordCharCount: intOrNull(row.record_char_count),
+        recordCharCount: finiteIntegerOrNull(row.record_char_count),
         hasBody: typeof row.payload_json === "string" && (row.payload_json as string).length > 0,
         hasSemanticProvenance: typeof row.semantic_input_provenance_json === "string"
           && (row.semantic_input_provenance_json as string).length > 0,
@@ -1194,21 +1380,28 @@ export function createModelObservabilityQueryService({ lingxiHome }: { lingxiHom
           contentState = "corrupt";
         }
       }
-      const parseProvenance = (raw: unknown): unknown => {
-        if (typeof raw !== "string" || !raw) return null;
+      const parseProvenance = (raw: unknown): {
+        state: "present" | "absent" | "corrupt";
+        value: unknown;
+      } => {
+        if (typeof raw !== "string" || !raw) return { state: "absent", value: null };
         try {
-          return JSON.parse(raw);
+          return { state: "present", value: JSON.parse(raw) };
         } catch {
-          return null;
+          return { state: "corrupt", value: null };
         }
       };
+      const semanticInputProvenance = parseProvenance(row.semantic_input_provenance_json);
+      const providerRequestProvenance = parseProvenance(row.provider_request_provenance_json);
       return {
         ...metadata,
         contentAvailable,
         contentState,
         payload,
-        semanticInputProvenance: parseProvenance(row.semantic_input_provenance_json),
-        providerRequestProvenance: parseProvenance(row.provider_request_provenance_json),
+        semanticInputProvenanceState: semanticInputProvenance.state,
+        semanticInputProvenance: semanticInputProvenance.value,
+        providerRequestProvenanceState: providerRequestProvenance.state,
+        providerRequestProvenance: providerRequestProvenance.value,
       };
     });
   }
@@ -1231,12 +1424,7 @@ export function createModelObservabilityQueryService({ lingxiHome }: { lingxiHom
           traceCount: 0,
           payloadRecordCount: 0,
           usageProjectionCount: 0,
-          dataCompleteness: {
-            droppedTraceEvents: 0,
-            droppedPayloadRecords: 0,
-            droppedBlobs: 0,
-            interruptedByRestartCalls: 0,
-          },
+          dataCompleteness: unknownDataCompleteness(),
         },
       };
     }
@@ -1252,9 +1440,10 @@ export function createModelObservabilityQueryService({ lingxiHome }: { lingxiHom
       const usageCount = reader.hasAccounting
         ? Number(reader.db.prepare(`SELECT COUNT(*) AS n FROM model_call_usage`).get().n ?? 0)
         : 0;
+      const dataCompleteness = readDataCompleteness(reader.db);
       return {
-        queryStatus: "ready",
-        queryStatusReason: null,
+        queryStatus: dataCompleteness.status === "known" ? "ready" : "degraded",
+        queryStatusReason: dataCompleteness.status === "known" ? null : "data_completeness_unknown",
         schemaVersion: reader.schemaVersion,
         accountingProjectionAvailable: reader.hasAccounting,
         oldestCallAt: textOrNull(counts.oldest),
@@ -1263,7 +1452,7 @@ export function createModelObservabilityQueryService({ lingxiHome }: { lingxiHom
         traceCount: Number(counts.traces ?? 0),
         payloadRecordCount: Number(counts.payloads ?? 0),
         usageProjectionCount: usageCount,
-        dataCompleteness: readDataCompleteness(reader.db),
+        dataCompleteness,
       };
     });
   }
@@ -1280,7 +1469,7 @@ export function createModelObservabilityQueryService({ lingxiHome }: { lingxiHom
    *   - 绝不访问外部引用（local_file_reference / signed URL / external URL）。
    */
 
-  function getStoredBlob(blobId: string, { includeBytes = true }: { includeBytes?: boolean } = {}): ModelObservabilityQueryResult<ModelObservabilityStoredBlob> {
+  function getStoredBlob(blobId: string): ModelObservabilityQueryResult<ModelObservabilityStoredBlob> {
     if (typeof blobId !== "string" || !MODEL_OBSERVABILITY_BLOB_ID_PATTERN.test(blobId)) {
       return fail("invalid_blob_id", "blob id has an invalid format", "invalid_blob_id");
     }
@@ -1290,22 +1479,11 @@ export function createModelObservabilityQueryService({ lingxiHome }: { lingxiHom
       ).get(blobId);
       if (!row) throw new NotFoundError("blob not found", "blob_not_found");
       if (row.state === "missing") throw new BlobMissingError("blob file is marked missing");
-      const shard = blobId.slice(0, 2).replace(/[^a-z0-9]/gi, "0") || "00";
-      const root = modelObservabilityBlobsRoot(lingxiHome);
-      const abs = path.resolve(root, shard, `${blobId}.bin`);
-      if (!abs.startsWith(path.resolve(root) + path.sep)) {
-        // 理论上 blobId 闭集已杜绝；双保险，命中即数据异常，不当 500 抛出去。
-        throw new BlobMissingError("blob path escapes store root");
-      }
-      let bytes: Buffer | null = null;
-      let byteLength = Number(row.byte_length ?? 0) || 0;
+      const filePath = resolveExistingModelObservabilityBlobPath(lingxiHome, blobId);
+      if (!filePath) throw new BlobMissingError("blob file is missing on disk");
+      let byteLength: number;
       try {
-        if (includeBytes) {
-          bytes = fs.readFileSync(abs);
-          byteLength = bytes.byteLength;
-        } else {
-          byteLength = fs.statSync(abs).size;
-        }
+        byteLength = fs.statSync(filePath).size;
       } catch {
         throw new BlobMissingError("blob file is missing on disk");
       }
@@ -1313,7 +1491,7 @@ export function createModelObservabilityQueryService({ lingxiHome }: { lingxiHom
         blobId,
         mediaType: typeof row.media_type === "string" && row.media_type ? row.media_type : null,
         byteLength,
-        bytes,
+        filePath,
       };
     });
   }
@@ -1332,12 +1510,12 @@ export function createModelObservabilityQueryService({ lingxiHome }: { lingxiHom
   };
 }
 
-/** Stored blob 读取结果（server-only：bytes 是 Buffer，不进 browser 契约）。 */
+/** Stored blob 读取结果（server-only：本地路径不进入 browser wire contract）。 */
 export type ModelObservabilityStoredBlob = {
   blobId: string;
   mediaType: string | null;
   byteLength: number;
-  bytes: Buffer | null;
+  filePath: string;
 };
 
 export type ModelObservabilityQueryService = ReturnType<typeof createModelObservabilityQueryService>;

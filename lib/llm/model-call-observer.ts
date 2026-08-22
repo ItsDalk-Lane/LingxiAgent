@@ -48,6 +48,13 @@ export type ModelCallEventType = typeof MODEL_CALL_EVENT_TYPES[number];
 
 export type ModelCallTerminalStatus = "ok" | "error" | "aborted";
 
+/**
+ * Usage 无法精确关联的运行时事实。只有真实集成点明确知道
+ * exact modelCallId correlation 不存在时才能设置；普通缺失保持未知。
+ */
+export const MODEL_CALL_USAGE_CORRELATION_STATES = ["not_correlated"] as const;
+export type ModelCallUsageCorrelationState = typeof MODEL_CALL_USAGE_CORRELATION_STATES[number];
+
 export type ModelCallModelIdentity = {
   provider: string | null;
   modelId: string | null;
@@ -83,6 +90,8 @@ export type ModelCallEvent = {
   model?: ModelCallModelIdentity | null;
   source?: ModelCallSource | null;
   attribution?: ModelCallAttribution | null;
+  /** 运行时显式事实；不存在时 Query 不得猜测 not_correlated。 */
+  usageCorrelation?: ModelCallUsageCorrelationState | null;
   /** 终态事件（logical_call_end/error/aborted）携带最终状态。 */
   status?: ModelCallTerminalStatus | null;
   /**

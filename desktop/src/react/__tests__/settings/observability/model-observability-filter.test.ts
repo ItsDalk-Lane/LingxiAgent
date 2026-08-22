@@ -10,6 +10,7 @@ import {
   dateRangeForState,
   DEFAULT_OBSERVABILITY_FILTER,
   listActiveFilterChips,
+  localIanaTimeZone,
   localUtcOffsetMinutes,
   removeFilterChip,
   type ObservabilityFilterState,
@@ -58,6 +59,18 @@ describe('localUtcOffsetMinutes sign flip (§十六)', () => {
   it('is the negation of JS getTimezoneOffset for any environment TZ', () => {
     const probe = new Date('2026-08-22T12:00:00Z');
     expect(localUtcOffsetMinutes(probe)).toBe(-probe.getTimezoneOffset());
+  });
+});
+
+describe('localIanaTimeZone', () => {
+  it('returns a browser-resolved, valid IANA zone', () => {
+    expect(localIanaTimeZone(() => 'America/Los_Angeles')).toBe('America/Los_Angeles');
+  });
+
+  it('fails closed for missing or invalid zones', () => {
+    expect(localIanaTimeZone(() => '')).toBeNull();
+    expect(localIanaTimeZone(() => 'Definitely/Not_A_Zone')).toBeNull();
+    expect(localIanaTimeZone(() => { throw new Error('unavailable'); })).toBeNull();
   });
 });
 
@@ -118,10 +131,21 @@ describe('buildCallFilterInput (empty dimension = omitted, §十三)', () => {
 });
 
 describe('dateBucketForGroupBy', () => {
-  it('only present when groupBy contains date; offset via localUtcOffsetMinutes', () => {
+  it('only present when groupBy contains date; prefers the browser IANA zone', () => {
     expect(dateBucketForGroupBy(['provider'])).toBeUndefined();
-    const bucket = dateBucketForGroupBy(['date', 'provider']);
-    expect(bucket).toEqual({ bucket: 'day', utcOffsetMinutes: localUtcOffsetMinutes() });
+    const bucket = dateBucketForGroupBy(['date', 'provider'], {
+      resolveTimeZone: () => 'America/Los_Angeles',
+    });
+    expect(bucket).toEqual({ bucket: 'day', timeZone: 'America/Los_Angeles' });
+  });
+
+  it('falls back to the current offset only when no valid IANA zone is available', () => {
+    const probe = new Date('2026-08-22T12:00:00Z');
+    const bucket = dateBucketForGroupBy(['date'], {
+      now: probe,
+      resolveTimeZone: () => 'invalid/time-zone',
+    });
+    expect(bucket).toEqual({ bucket: 'day', utcOffsetMinutes: localUtcOffsetMinutes(probe) });
   });
 });
 

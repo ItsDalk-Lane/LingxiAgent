@@ -45,6 +45,7 @@ import {
   type ModelCallObserver,
   type ModelCallSource,
   type ModelCallTerminalStatus,
+  type ModelCallUsageCorrelationState,
 } from "./model-call-observer.ts";
 import {
   MODEL_CALL_SEMANTIC_PROVENANCE,
@@ -77,6 +78,8 @@ export type ModelCallRecorderContext = {
   model?: ModelCallModelIdentity | null;
   source?: ModelCallSource | null;
   attribution?: ModelCallAttribution | null;
+  /** 只由知道 exact usage correlation 不存在的真实运行时边界设置。 */
+  usageCorrelation?: ModelCallUsageCorrelationState | null;
   /**
    * Phase 6：Sensitive Payload Capture session handle（§一百二十一）。
    * 只允许 capture capability 引用（身份+计数器+sink 引用）——session 本身
@@ -87,7 +90,7 @@ export type ModelCallRecorderContext = {
 
 export type ModelCallRecorderOptions = {
   observer?: ModelCallObserver | null;
-  identity?: ModelCallIdentityFactory;
+  identity?: ModelCallIdentityFactory | null;
   context?: ModelCallRecorderContext;
   now?: () => number;
 };
@@ -109,6 +112,9 @@ export function createModelCallRecorder({
   const model = context.model ?? null;
   const source = context.source ?? null;
   const attribution = context.attribution ?? null;
+  const usageCorrelation = context.usageCorrelation === "not_correlated"
+    ? context.usageCorrelation
+    : null;
   /** Phase 6 capture session handle（duck-typed 校验，防错型注入；非对象一律 null）。 */
   let payloadCaptureHandle = isPayloadCaptureSession(context.payloadCapture)
     ? (context.payloadCapture as ModelCallPayloadCaptureSession)
@@ -138,6 +144,7 @@ export function createModelCallRecorder({
       source,
       attribution,
       ...extras,
+      ...(usageCorrelation ? { usageCorrelation } : {}),
       details: extras.details !== undefined ? sanitizeModelCallDetails(extras.details) : null,
       providerRequestId: extras.providerRequestId !== undefined
         ? sanitizeProviderRequestId(extras.providerRequestId)

@@ -65,11 +65,14 @@ describe("Model Observability Store Schema", () => {
     try { fs.rmSync(home, { recursive: true, force: true }); } catch { /* tmp */ }
   });
 
-  it("fresh DB：建全部表 + 索引，user_version=SCHEMA_VERSION（Phase 8 起 =2）", () => {
+  it("fresh DB：建全部表 + 索引，user_version=SCHEMA_VERSION（Phase 10.1 =3）", () => {
     const db = openModelObservabilityDatabase(modelObservabilityDbPath(home));
     try {
       expect(readModelObservabilitySchemaVersion(db)).toBe(MODEL_OBSERVABILITY_SCHEMA_VERSION);
-      expect(MODEL_OBSERVABILITY_SCHEMA_VERSION).toBe(2);
+      expect(MODEL_OBSERVABILITY_SCHEMA_VERSION).toBe(3);
+      const callColumns = db.prepare(`PRAGMA table_info(model_calls)`).all()
+        .map((row: any) => row.name);
+      expect(callColumns).toContain("usage_correlation_state");
       const tables = db.prepare(
         `SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' ORDER BY name`,
       ).all().map((row: any) => row.name);

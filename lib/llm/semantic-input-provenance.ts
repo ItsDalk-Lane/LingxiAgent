@@ -127,7 +127,7 @@ function sanitizeSource(source: unknown): SemanticInputSource | null {
 
 const SPAN_INVALID = Symbol("span-invalid");
 
-function sanitizeSpan(span: unknown): SemanticInputSpan | null | typeof SPAN_INVALID {
+function sanitizeSpan(span: unknown): SemanticInputSpan | null | undefined | typeof SPAN_INVALID {
   if (span === null) return null; // identity-only（structural/opaque 专用）
   if (span === undefined) return undefined; // 非文本根的 index/key 寻址
   if (!span || typeof span !== "object") return SPAN_INVALID;

@@ -10,13 +10,14 @@
  *     迁移；v1 历史库保持 v1 继续可读）；
  *   - busy_timeout=5000：与 active writer（WAL）短暂并发安全；
  *   - schema version 识别 + supportedReadVersions 闭集（§七）：v1 读 Phase 7
- *     字段，v2 才有 accounting projection；更高版本 → unavailable。
+ *     字段，v2 起有 accounting projection，v3 起有 explicit usage
+ *     correlation 事实；更高版本 → unavailable。
  */
 
 import fs from "fs";
 import { loadBetterSqliteDatabase } from "./model-observability-schema.ts";
 
-export const MODEL_OBSERVABILITY_READ_SUPPORTED_VERSIONS: readonly number[] = [1, 2];
+export const MODEL_OBSERVABILITY_READ_SUPPORTED_VERSIONS: readonly number[] = [1, 2, 3];
 
 export type ModelObservabilityReadDatabaseStatus =
   | "ready"

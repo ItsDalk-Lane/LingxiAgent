@@ -5877,6 +5877,15 @@
     },
     {
       "sourceFile": "lib/llm/model-observability-blob-store.ts",
+      "kind": "mkdir",
+      "excerpt": "fs.mkdirSync(root, { recursive: true })",
+      "reason": "Writes, renames, or removes observatory blob files under the private blob tree.",
+      "storeId": "model-observability-blobs",
+      "exemptionId": null,
+      "ordinal": 2
+    },
+    {
+      "sourceFile": "lib/llm/model-observability-blob-store.ts",
       "kind": "remove-path",
       "excerpt": "fs.rmSync(abs, { force: true })",
       "reason": "Writes, renames, or removes observatory blob files under the private blob tree.",
@@ -5887,7 +5896,7 @@
     {
       "sourceFile": "lib/llm/model-observability-blob-store.ts",
       "kind": "remove-path",
-      "excerpt": "fs.rmSync(absolutePathFor(row.relative_path), { force: true })",
+      "excerpt": "fs.rmSync(safeExisting, { force: true })",
       "reason": "Writes, renames, or removes observatory blob files under the private blob tree.",
       "storeId": "model-observability-blobs",
       "exemptionId": null,

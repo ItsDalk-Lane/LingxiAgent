@@ -14,7 +14,12 @@ import { installModelObservabilityPersistence } from "../lib/llm/model-observabi
 import { createModelCallRecorder } from "../lib/llm/model-call-recorder.ts";
 import { createTestModelCallObserver } from "../lib/llm/model-call-observer-testing.ts";
 import { setModelCallObserver, getModelCallObserver } from "../lib/llm/model-call-observer.ts";
-import { setModelCallPayloadSink, getModelCallPayloadSink } from "../lib/llm/model-call-payload-capture.ts";
+import {
+  getModelCallBlobExternalizer,
+  getModelCallPayloadSink,
+  setModelCallBlobExternalizer,
+  setModelCallPayloadSink,
+} from "../lib/llm/model-call-payload-capture.ts";
 import { createTestModelCallPayloadSink } from "../lib/llm/model-call-payload-testing.ts";
 import { loadBetterSqliteDatabase } from "../lib/llm/model-observability-schema.ts";
 
@@ -66,6 +71,7 @@ describe("Model Observability Persistence Coordinator", () => {
     harness.cleanup();
     setModelCallObserver(null);
     setModelCallPayloadSink(null);
+    setModelCallBlobExternalizer(null);
   });
 
   it("批量 flush：100 events + 100 payloads 无 duplicate、order 可恢复（§一百零七）", () => {
@@ -264,6 +270,29 @@ describe("Model Observability Persistence Coordinator", () => {
     // 恢复先前注册对象（不是 NOOP 覆盖）。
     expect(getModelCallObserver()).toBe(priorObserver);
     expect(getModelCallPayloadSink()).toBe(priorSink);
+  });
+
+  it("Blob externalizer 只恢复安装前对象，不覆盖后来接管者", async () => {
+    await harness.close();
+    const priorExternalizer = { stageBinary: () => null };
+    const successorExternalizer = { stageBinary: () => null };
+    setModelCallBlobExternalizer(priorExternalizer);
+
+    const first = installModelObservabilityPersistence({
+      lingxiHome: harness.lingxiHome,
+      policy: { enabled: true, persistPayloads: true, persistBlobs: true },
+    });
+    expect(getModelCallBlobExternalizer()).not.toBe(priorExternalizer);
+    await first.close();
+    expect(getModelCallBlobExternalizer()).toBe(priorExternalizer);
+
+    const second = installModelObservabilityPersistence({
+      lingxiHome: harness.lingxiHome,
+      policy: { enabled: true, persistPayloads: true, persistBlobs: true },
+    });
+    setModelCallBlobExternalizer(successorExternalizer);
+    await second.close();
+    expect(getModelCallBlobExternalizer()).toBe(successorExternalizer);
   });
 
   it("drop 计数跨 restart 恢复（§四十三）", async () => {

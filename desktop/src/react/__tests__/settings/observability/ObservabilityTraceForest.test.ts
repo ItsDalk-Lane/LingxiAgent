@@ -33,7 +33,7 @@ function makeCall(callId: string): ModelObservabilityCallListItem {
     callPurpose: 'chat',
     inputShape: 'chat_context',
     provenancePrecision: 'exact',
-    provenance: { sectionCount: 3, opaqueCount: 0, categories: ['persona'] },
+    provenance: { sectionCount: 3, opaqueCount: 0, categories: ['persona'], categoriesState: 'present' },
     payloadAvailability: 'present',
     payloadRecordCount: 1,
     usage: { availability: 'present', status: 'ok', summary: null },
@@ -61,14 +61,25 @@ function makeDetail(
     orphanEdges,
     graphIntegrity: 'ok',
     usageAggregate: {
-      availability: 'present',
+      availability: 'complete',
+      coveredCalls: calls.length,
+      corruptCalls: 0,
+      notCorrelatedCalls: 0,
+      unknownCalls: 0,
+      totalCalls: calls.length,
       summary: {
         inputTokens: 0, outputTokens: 0, reasoningTokens: 0, cacheReadTokens: 0,
         cacheWriteTokens: 0, totalTokens: 0, costTotal: null,
       },
     },
     payloadCompleteness: { present: 0, expired: 0, dropped: 0, notCaptured: 0, unknown: 0 },
-    dataCompleteness: { droppedTraceEvents: 0, droppedPayloadRecords: 0, droppedBlobs: 0, interruptedByRestartCalls: 0 },
+    dataCompleteness: {
+      status: 'known',
+      droppedTraceEvents: 0,
+      droppedPayloadRecords: 0,
+      droppedBlobs: 0,
+      interruptedByRestartCalls: 0,
+    },
   };
 }
 

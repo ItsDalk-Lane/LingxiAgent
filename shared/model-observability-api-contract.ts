@@ -167,12 +167,23 @@ export type ModelObservabilityPayloadAvailability =
 
 export const MODEL_OBSERVABILITY_USAGE_AVAILABILITIES = [
   "present",
+  "corrupt",
   "not_correlated",
   "projection_unavailable",
   "unknown",
 ] as const;
 export type ModelObservabilityUsageAvailability =
   typeof MODEL_OBSERVABILITY_USAGE_AVAILABILITIES[number];
+
+export const MODEL_OBSERVABILITY_USAGE_AGGREGATE_AVAILABILITIES = [
+  "complete",
+  "partial",
+  "corrupt",
+  "projection_unavailable",
+  "unknown",
+] as const;
+export type ModelObservabilityUsageAggregateAvailability =
+  typeof MODEL_OBSERVABILITY_USAGE_AGGREGATE_AVAILABILITIES[number];
 
 /* ════════════════════════════════════════════════════════════════════════
  * B. Query response DTO（列表永远是轻量 metadata，无正文）
@@ -214,7 +225,12 @@ export type ModelObservabilityCallListItem = {
   callPurpose: string | null;
   inputShape: string | null;
   provenancePrecision: string | null;
-  provenance: { sectionCount: number | null; opaqueCount: number | null; categories: string[] };
+  provenance: {
+    sectionCount: number | null;
+    opaqueCount: number | null;
+    categories: string[];
+    categoriesState: "present" | "absent" | "corrupt";
+  };
   payloadAvailability: ModelObservabilityPayloadAvailability;
   payloadRecordCount: number;
   usage: {
@@ -227,10 +243,11 @@ export type ModelObservabilityCallListItem = {
 };
 
 export type ModelObservabilityDataCompleteness = {
-  droppedTraceEvents: number;
-  droppedPayloadRecords: number;
-  droppedBlobs: number;
-  interruptedByRestartCalls: number;
+  status: "known" | "unknown";
+  droppedTraceEvents: number | null;
+  droppedPayloadRecords: number | null;
+  droppedBlobs: number | null;
+  interruptedByRestartCalls: number | null;
 };
 
 export type ModelObservabilityCallPage = {
@@ -267,16 +284,20 @@ export type ModelObservabilityGroupMetrics = {
   durationObservedCount: number;
   durationTotalMs: number;
   durationAverageMs: number | null;
+  usageAggregateAvailability: ModelObservabilityUsageAggregateAvailability;
   usageCoveredCalls: number;
+  usageCorruptCalls: number;
+  usageNotCorrelatedCalls: number;
+  usageUnknownCalls: number;
   usageMissingCalls: number;
-  inputTokens: number;
-  outputTokens: number;
-  reasoningTokens: number;
-  cacheReadTokens: number;
-  cacheWriteTokens: number;
-  totalTokens: number;
+  inputTokens: number | null;
+  outputTokens: number | null;
+  reasoningTokens: number | null;
+  cacheReadTokens: number | null;
+  cacheWriteTokens: number | null;
+  totalTokens: number | null;
   costTotal: number | null;
-  cacheHitCount: number;
+  cacheHitCount: number | null;
   cacheObservedCount: number;
 };
 
@@ -352,7 +373,9 @@ export type ModelObservabilityPayloadRecordDetail = ModelObservabilityPayloadRec
   contentAvailable: boolean;
   contentState: ModelObservabilityPayloadContentState;
   payload: unknown;
+  semanticInputProvenanceState: "present" | "absent" | "corrupt";
   semanticInputProvenance: unknown;
+  providerRequestProvenanceState: "present" | "absent" | "corrupt";
   providerRequestProvenance: unknown;
 };
 
@@ -394,16 +417,13 @@ export type ModelObservabilityTraceDetail = {
   orphanEdges: Array<{ childCallId: string; missingParentCallId: string }>;
   graphIntegrity: "ok" | "degraded";
   usageAggregate: {
-    availability: ModelObservabilityUsageAvailability;
-    summary: {
-      inputTokens: number;
-      outputTokens: number;
-      reasoningTokens: number;
-      cacheReadTokens: number;
-      cacheWriteTokens: number;
-      totalTokens: number;
-      costTotal: number | null;
-    } | null;
+    availability: ModelObservabilityUsageAggregateAvailability;
+    coveredCalls: number;
+    corruptCalls: number;
+    notCorrelatedCalls: number;
+    unknownCalls: number;
+    totalCalls: number;
+    summary: ModelObservabilityUsageSummary | null;
   };
   payloadCompleteness: {
     present: number;
@@ -741,7 +761,7 @@ export type ModelObservabilitySettingsUpdateRequest = {
 
 /** 运行时 effective 状态（desired ≠ effective：schema_newer 等显式原因）。 */
 export type ModelObservabilityEffectiveState = {
-  recordingStatus: "active" | "disabled" | "closed";
+  recordingStatus: "active" | "degraded" | "disabled" | "closed";
   storeDisabledReasonCode: string | null;
   persistTraceMetadata: boolean;
   persistPayloads: boolean;
@@ -764,7 +784,7 @@ export type ModelObservabilitySettingsUpdateResponse = ModelObservabilitySetting
 
 /** GET /health 响应（recording + query 合并；绝不包含正文）。 */
 export type ModelObservabilityHealthResponse = {
-  recordingStatus: "active" | "disabled" | "closed";
+  recordingStatus: "active" | "degraded" | "disabled" | "closed";
   storeDisabledReasonCode: string | null;
   persistTraceMetadata: boolean;
   persistPayloads: boolean;
@@ -773,14 +793,14 @@ export type ModelObservabilityHealthResponse = {
   queuedPayloadRecords: number;
   queuedBlobs: number;
   queuedUsageEntries: number;
-  droppedTraceEvents: number;
-  droppedPayloadRecords: number;
-  droppedBlobs: number;
+  droppedTraceEvents: number | null;
+  droppedPayloadRecords: number | null;
+  droppedBlobs: number | null;
   droppedUsageEntries: number;
   writeFailures: number;
   maintenanceErrors: number;
   lastSuccessfulFlushAt: string | null;
-  interruptedByRestartCalls: number;
+  interruptedByRestartCalls: number | null;
   atRestEncryption: boolean;
   query: ModelObservabilityQueryHealth;
 };
@@ -810,7 +830,7 @@ export type ModelObservabilityExportManifest = {
   storageSchemaVersion: number | null;
   totalCalls: number;
   backfillSource: string | null;
-  dataCompleteness: Record<string, number> | null;
+  dataCompleteness: ModelObservabilityDataCompleteness | null;
 };
 
 export type ModelObservabilityExportCallBundle = {

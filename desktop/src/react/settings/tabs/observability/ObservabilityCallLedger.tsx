@@ -117,6 +117,12 @@ export function ObservabilityCallLedger({ appliedFilter, selectedCallId, onSelec
   const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState<LedgerError | null>(null);
   const generationRef = useRef(0);
+  const completenessHasDrops = completeness?.status === 'known' && [
+    completeness.droppedTraceEvents,
+    completeness.droppedPayloadRecords,
+    completeness.droppedBlobs,
+    completeness.interruptedByRestartCalls,
+  ].some((value) => typeof value === 'number' && value > 0);
 
   const fetchPage = useCallback(async (cursor: string | null, generation: number, signal: AbortSignal) => {
     return queryObservabilityCalls(
@@ -201,13 +207,16 @@ export function ObservabilityCallLedger({ appliedFilter, selectedCallId, onSelec
   return (
     <div className={styles['observability-ledger']}>
       {/* §四十四：dataCompleteness 是全局累计事实，非阻塞 warning */}
-      {completeness && (completeness.droppedTraceEvents > 0 || completeness.droppedPayloadRecords > 0 || completeness.interruptedByRestartCalls > 0) && (
-        <div className={styles['observability-completeness-note']}>
-          {t('settings.observability.ledger.completenessNote', {
-            droppedEvents: formatNumber(completeness.droppedTraceEvents),
-            droppedPayloads: formatNumber(completeness.droppedPayloadRecords),
-            interrupted: formatNumber(completeness.interruptedByRestartCalls),
-          })}
+      {completeness && (completeness.status === 'unknown' || completenessHasDrops) && (
+        <div className={styles['observability-completeness-note']} data-completeness={completeness.status} role="status">
+          {completeness.status === 'unknown'
+            ? t('settings.observability.ledger.completenessUnknown')
+            : t('settings.observability.ledger.completenessNote', {
+              droppedEvents: formatNumber(completeness.droppedTraceEvents),
+              droppedPayloads: formatNumber(completeness.droppedPayloadRecords),
+              droppedBlobs: formatNumber(completeness.droppedBlobs),
+              interrupted: formatNumber(completeness.interruptedByRestartCalls),
+            })}
         </div>
       )}
       <div className={styles['observability-ledger-scroll']} data-loading={loading || undefined}>

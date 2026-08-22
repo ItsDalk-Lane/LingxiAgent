@@ -48,6 +48,7 @@ export {
   MODEL_OBSERVABILITY_TERMINAL_STATUSES,
   MODEL_OBSERVABILITY_PAYLOAD_AVAILABILITIES,
   MODEL_OBSERVABILITY_USAGE_AVAILABILITIES,
+  MODEL_OBSERVABILITY_USAGE_AGGREGATE_AVAILABILITIES,
 } from "../../shared/model-observability-api-contract.ts";
 export type {
   ModelObservabilityCallFilterInput,
@@ -58,6 +59,7 @@ export type {
   ModelObservabilityTerminalStatus,
   ModelObservabilityPayloadAvailability,
   ModelObservabilityUsageAvailability,
+  ModelObservabilityUsageAggregateAvailability,
   ModelObservabilityUsageSummary,
   ModelObservabilityCallListItem,
   ModelObservabilityDataCompleteness,

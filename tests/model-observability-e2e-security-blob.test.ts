@@ -12,6 +12,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { callText } from "../core/llm-client.ts";
 import { beginObservedModelCall } from "../lib/llm/model-call-integration.ts";
 import { installModelObservabilityPersistence } from "../lib/llm/model-observability-persistence.ts";
+import { modelObservabilityBlobPathCandidates } from "../lib/llm/model-observability-blob-store.ts";
 import { normalizeModelObservabilityAggregateQuery, normalizeModelObservabilityQuery } from "../lib/llm/model-observability-query-types.ts";
 import {
   createScenarioHarness,
@@ -67,6 +68,18 @@ describe("E2E truth — blob exact route 真相（S31 缺口补齐）", () => {
     const bytes = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==", "base64");
     expect(blobStore.writeBlobFile(blobId, bytes)).toBe(true);
     blobStore.insertBlobRow(blobId, bytes.byteLength, "image/png");
+    // maintenance 只承诺保留有活引用的文件；路由 fixture 也必须满足这条生产
+    // 不变量，不能依赖 GET 与后台 GC 谁先抢到事件循环。
+    const capturedAt = new Date().toISOString();
+    const payloadRecord = db.prepare(`
+      INSERT INTO payload_records (
+        call_id, kind, captured_at, visibility, fidelity, sanitization_status,
+        redacted, truncated, degraded, payload_json
+      ) VALUES (?, 'semantic_request', ?, 'metadata_only', 'metadata_only', 'none', 0, 0, 0, NULL)
+    `).run(`mc_blob_route_${blobId}`, capturedAt);
+    db.prepare(`
+      INSERT INTO payload_blob_refs (payload_record_id, blob_id, created_at) VALUES (?, ?, ?)
+    `).run(Number(payloadRecord.lastInsertRowid), blobId, capturedAt);
     db.close();
     return blobId;
   }
@@ -107,7 +120,7 @@ describe("E2E truth — blob exact route 真相（S31 缺口补齐）", () => {
 
     // HEAD：200 + 正确 length、无 body
     const headRes = await route.request(`/model-observability/blobs/${blobId}`, { method: "HEAD" });
-    expect(headRes.status).toBe(200);
+    expect(headRes.status, await headRes.clone().text()).toBe(200);
     expect(Number(headRes.headers.get("content-length"))).toBe(bytes.byteLength);
     expect(await headRes.text()).toBe("");
 
@@ -130,9 +143,7 @@ describe("E2E truth — blob exact route 真相（S31 缺口补齐）", () => {
     expect(missing.status).toBe(404);
 
     // 磁盘文件被删（测试专用破坏）：404 blob_missing，不 500（§一百二十九）
-    const blobsRoot = path.join(harness.lingxiHome, "model-observability", "blobs");
-    const shard = blobId.slice(0, 2);
-    const blobFile = path.join(blobsRoot, shard, `${blobId}.bin`);
+    const blobFile = modelObservabilityBlobPathCandidates(harness.lingxiHome, blobId)[0];
     expect(fs.existsSync(blobFile)).toBe(true);
     fs.rmSync(blobFile);
     const gone = await route.request(`/model-observability/blobs/${blobId}`);
@@ -140,7 +151,7 @@ describe("E2E truth — blob exact route 真相（S31 缺口补齐）", () => {
     expect(await gone.json()).toMatchObject({ code: "blob_missing" });
   });
 
-  it("HEAD 性能：64MB blob HEAD 只 stat 不加载字节（§一百零四）", async () => {
+  it("64MB Blob：HEAD 只 stat，GET 流式读取时 event loop 仍可继续运行", async () => {
     // 性能 fixture（直写 blob 文件 + DB 行——非正常 scenario 模拟，§一百三十五
     // 允许的专项直写类别）：验证 HEAD 分支 includeBytes=false 走 statSync。
     const blobId = "mb_perf0000test";
@@ -157,6 +168,8 @@ describe("E2E truth — blob exact route 真相（S31 缺口补齐）", () => {
     db.close();
 
     const route = harness.route();
+    const openSync = vi.spyOn(fs, "openSync");
+    const readFileSync = vi.spyOn(fs, "readFileSync");
     const t0 = Date.now();
     const head = await route.request(`/model-observability/blobs/${blobId}`, { method: "HEAD" });
     const headMs = Date.now() - t0;
@@ -164,10 +177,21 @@ describe("E2E truth — blob exact route 真相（S31 缺口补齐）", () => {
     expect(Number(head.headers.get("content-length"))).toBe(64 * 1024 * 1024);
     // stat only：64MB HEAD 显著快于读全量（阈值宽松，防 CI 抖动）
     expect(headMs).toBeLessThan(1000);
+    expect(openSync).not.toHaveBeenCalled();
+    expect(readFileSync).not.toHaveBeenCalled();
     // GET 可读全量（不在此断言耗时；stall 阈值见 TRUTH_AUDIT §10）
-    const get = await route.request(`/model-observability/blobs/${blobId}`);
-    expect(get.status).toBe(200);
-    expect((await get.arrayBuffer()).byteLength).toBe(64 * 1024 * 1024);
+    let timerTicks = 0;
+    const timer = setInterval(() => { timerTicks += 1; }, 0);
+    try {
+      const get = await route.request(`/model-observability/blobs/${blobId}`);
+      expect(get.status).toBe(200);
+      expect((await get.arrayBuffer()).byteLength).toBe(64 * 1024 * 1024);
+    } finally {
+      clearInterval(timer);
+    }
+    expect(timerTicks).toBeGreaterThan(0);
+    expect(openSync).toHaveBeenCalledTimes(1);
+    expect(readFileSync).not.toHaveBeenCalled();
   });
 });
 

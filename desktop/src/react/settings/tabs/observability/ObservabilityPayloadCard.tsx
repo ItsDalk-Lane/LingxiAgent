@@ -180,16 +180,22 @@ export function ObservabilityPayloadCard({
           )}
 
           {/* §七十二 输入来源视图（semantic_request；provenance 随 exact payload） */}
-          {loaded.kind === 'semantic_request' && loaded.hasSemanticProvenance && (
+          {loaded.kind === 'semantic_request' && loaded.semanticInputProvenanceState !== 'absent' && (
             <div className={styles['observability-payload-provenance']}>
               <div className={styles['observability-panel-subtitle']}>
                 {t('settings.observability.provenance.title')}
               </div>
-              <ObservabilitySemanticProvenance
-                provenanceInput={loaded.semanticInputProvenance}
-                semanticPayload={loaded.payload}
-                highlightOrdinal={highlightOrdinal}
-              />
+              {loaded.semanticInputProvenanceState === 'corrupt' ? (
+                <div className={styles['observability-provenance-note']} data-provenance-state="corrupt">
+                  {t('settings.observability.provenance.corrupt')}
+                </div>
+              ) : (
+                <ObservabilitySemanticProvenance
+                  provenanceInput={loaded.semanticInputProvenance}
+                  semanticPayload={loaded.payload}
+                  highlightOrdinal={highlightOrdinal}
+                />
+              )}
             </div>
           )}
 
@@ -199,7 +205,11 @@ export function ObservabilityPayloadCard({
               <div className={styles['observability-panel-subtitle']}>
                 {t('settings.observability.providerMapping.title')}
               </div>
-              {loaded.hasProviderProvenance ? (
+              {loaded.providerRequestProvenanceState === 'corrupt' ? (
+                <div className={styles['observability-provenance-note']} data-provenance-state="corrupt">
+                  {t('settings.observability.providerMapping.corrupt')}
+                </div>
+              ) : loaded.providerRequestProvenanceState === 'present' ? (
                 <ObservabilityProviderProvenance
                   provenanceInput={loaded.providerRequestProvenance}
                   providerPayload={loaded.payload}

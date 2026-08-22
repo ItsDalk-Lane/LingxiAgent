@@ -57,7 +57,7 @@ export function ObservabilityMetrics({ overall, loading }: {
   const errorRate = overall.callCount > 0
     ? (overall.errorCount + overall.abortedCount) / overall.callCount
     : null;
-  const cacheHitRate = overall.cacheObservedCount > 0
+  const cacheHitRate = overall.cacheObservedCount > 0 && overall.cacheHitCount !== null
     ? overall.cacheHitCount / overall.cacheObservedCount
     : null;
   const incompleteHint = overall.incompleteCount > 0
@@ -121,9 +121,27 @@ export function ObservabilityMetrics({ overall, loading }: {
           title={overall.costTotal !== null ? `$${overall.costTotal}` : undefined}
         />
       </div>
-      <div className={styles['observability-metrics-coverage']}>
-        {t('settings.observability.metrics.usageCoverage', {
+      <div
+        className={styles['observability-metrics-coverage']}
+        data-usage-availability={overall.usageAggregateAvailability}
+        role={overall.usageAggregateAvailability === 'complete' ? undefined : 'status'}
+      >
+        {t(`settings.observability.metrics.${
+          overall.usageAggregateAvailability === 'complete'
+            ? 'usageCoverageComplete'
+            : overall.usageAggregateAvailability === 'partial'
+              ? 'usageCoveragePartial'
+              : overall.usageAggregateAvailability === 'corrupt'
+                ? 'usageCoverageCorrupt'
+              : overall.usageAggregateAvailability === 'projection_unavailable'
+                ? 'usageCoverageProjectionUnavailable'
+                : 'usageCoverageUnknown'
+        }`, {
           covered: formatNumber(overall.usageCoveredCalls),
+          corrupt: formatNumber(overall.usageCorruptCalls),
+          notCorrelated: formatNumber(overall.usageNotCorrelatedCalls),
+          unknown: formatNumber(overall.usageUnknownCalls),
+          total: formatNumber(overall.callCount),
           missing: formatNumber(overall.usageMissingCalls),
         })}
       </div>
