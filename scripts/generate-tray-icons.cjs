@@ -97,47 +97,9 @@ function sampleArea(source, left, top, right, bottom) {
   ];
 }
 
-/**
- * Build a creature mask (1 = bird silhouette, 0 = background) from the source.
- *
- * Preferred path when the source ships a real alpha channel (transparent-background
- * artwork): the silhouette is simply the opaque pixels, so mask = alpha > threshold.
- * Falls back to the white-background flood-fill when the source has no usable alpha
- * (legacy opaque artwork).
- */
+/** Flood-fill background from the borders; return Float mask (1 = creature). */
 function buildCreatureMask(png) {
-  const { width, height, data, colorType } = png;
-  const hasAlpha = colorType === 6;
-  // Use the alpha channel whenever the source is RGBA. A transparent-background
-  // artwork has alpha=0 on the backdrop and alpha=255 inside the bird, so the
-  // opaque pixels form the silhouette directly. (Fully-opaque RGBA images — e.g.
-  // a legacy white-background logo — also have alpha=255 everywhere; in that case
-  // the flood-fill path below still applies because there are no transparent
-  // background pixels to separate the subject.)
-  let hasTransparent = false;
-  if (hasAlpha) {
-    for (let i = 3; i < data.length; i += 4) {
-      if (data[i] < 255) { hasTransparent = true; break; }
-    }
-  }
-  if (hasAlpha && hasTransparent) {
-    const mask = new Float32Array(width * height);
-    let creature = 0;
-    for (let i = 0; i < width * height; i++) {
-      const a = data[i * 4 + 3] / 255;
-      mask[i] = a > 0.4 ? 1 : 0;
-      if (mask[i]) creature++;
-    }
-    const coverage = creature / mask.length;
-    if (coverage < 0.05 || coverage > 0.95) {
-      throw new Error(
-        `Creature alpha-mask coverage looks wrong (${(coverage * 100).toFixed(1)}%); ` +
-          "the alpha channel may be absent or the threshold is off.",
-      );
-    }
-    return mask;
-  }
-
+  const { width, height, data } = png;
   const passable = (x, y) => {
     const i = (y * width + x) * 4;
     return (
