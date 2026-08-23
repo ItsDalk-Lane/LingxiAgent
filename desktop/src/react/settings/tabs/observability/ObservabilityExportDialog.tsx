@@ -16,7 +16,7 @@ import {
   MODEL_OBSERVABILITY_EXPORT_MAX_CALLS_LIMIT,
 } from '../../../../../../shared/model-observability-api-contract.ts';
 import { t } from '../../helpers';
-import { Button, Overlay } from '../../../ui';
+import { Button, Overlay, Toggle } from '../../../ui';
 import styles from '../../Settings.module.css';
 import {
   isObservabilityErrorKind,
@@ -158,29 +158,35 @@ export function ObservabilityExportDialog({ open, appliedFilter, onClose }: {
               {t('settings.observability.export.includePayloadsHint')}
             </span>
           </span>
-          <input
-            type="checkbox"
-            checked={includePayloads}
+          <Toggle
+            on={includePayloads}
             disabled={run.phase === 'running'}
-            onChange={(event) => setIncludePayloads(event.target.checked)}
+            onChange={setIncludePayloads}
+            ariaLabel={t('settings.observability.export.includePayloads')}
           />
         </label>
 
-        <div className={styles['observability-advanced-field']}>
-          <label className={styles['observability-advanced-label']}>
-            {t('settings.observability.export.maxCalls')}
-          </label>
-          <input
-            className={styles['settings-input']}
-            type="number"
-            min={1}
-            max={MODEL_OBSERVABILITY_EXPORT_MAX_CALLS_LIMIT}
-            placeholder={t('settings.observability.export.maxCallsPlaceholder')}
-            value={maxCallsRaw}
-            disabled={run.phase === 'running'}
-            data-invalid={!maxCallsValid || undefined}
-            onChange={(event) => setMaxCallsRaw(event.target.value)}
-          />
+        <div className={styles['observability-export-maxcalls']}>
+          <div className={styles['observability-settings-row']}>
+            <label
+              className={styles['observability-advanced-label']}
+              htmlFor="observability-export-maxcalls-input"
+            >
+              {t('settings.observability.export.maxCalls')}
+            </label>
+            <input
+              id="observability-export-maxcalls-input"
+              className={styles['settings-input']}
+              type="number"
+              min={1}
+              max={MODEL_OBSERVABILITY_EXPORT_MAX_CALLS_LIMIT}
+              placeholder={t('settings.observability.export.maxCallsPlaceholder')}
+              value={maxCallsRaw}
+              disabled={run.phase === 'running'}
+              data-invalid={!maxCallsValid || undefined}
+              onChange={(event) => setMaxCallsRaw(event.target.value)}
+            />
+          </div>
           {!maxCallsValid && (
             <span className={styles['observability-settings-invalid']} role="alert">
               {t('settings.observability.export.maxCallsInvalid', { max: formatNumber(MODEL_OBSERVABILITY_EXPORT_MAX_CALLS_LIMIT) })}

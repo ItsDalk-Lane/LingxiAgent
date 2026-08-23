@@ -2805,7 +2805,31 @@
         },
         "missingParent": "부모 호출 누락",
         "cycle": "순환을 감지하여 확장을 중단했습니다",
-        "degradedWarning": "이 트레이스에는 누락된 데이터가 있어 아래 트리가 불완전할 수 있습니다"
+        "degradedWarning": "이 트레이스에는 누락된 데이터가 있어 아래 트리가 불완전할 수 있습니다",
+        "header": {
+          "traceId": "트레이스",
+          "origin": "발생 위치",
+          "lastSeen": "최근 활동",
+          "calls": "호출",
+          "ok": "성공",
+          "error": "실패",
+          "aborted": "중단",
+          "incomplete": "불완전"
+        },
+        "groups": {
+          "trace": "트레이스",
+          "calls": "호출",
+          "usage": "사용량",
+          "payload": "페이로드"
+        },
+        "dialogAria": "트레이스 상세",
+        "chart": {
+          "aria": "호출 타임라인 차트",
+          "summary": "호출 {total}건 · 성공 {ok} · 실패 {error} · 최장 {peak}",
+          "hint": "각 점이 한 번의 호출입니다: 초록 = 성공, 빨강 = 실패, 회색 = 중단 / 불완전. 가로축은 시간, 세로축은 소요 시간이며 알 수 없는 호출은 기준선에 표시됩니다. 마우스를 올려 상세 보기, 클릭하여 호출 열기.",
+          "noTime": "시간 알 수 없음",
+          "parent": "부모 호출"
+        }
       },
       "recording": {
         "title": "기록 설정",

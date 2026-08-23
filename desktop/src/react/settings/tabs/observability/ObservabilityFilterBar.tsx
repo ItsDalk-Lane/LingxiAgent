@@ -29,6 +29,7 @@ import { ObservabilityAdvancedFilters } from './ObservabilityAdvancedFilters';
 import {
   groupByDimensionLabel,
   observabilityChipLabel,
+  subsystemLabel,
   terminalStatusLabel,
 } from './model-observability-labels';
 
@@ -228,7 +229,7 @@ export function ObservabilityFilterBar({
         />
         <ObservabilityMultiSelect
           label={t('settings.observability.filter.category')}
-          options={categoryFacet.options.map((value) => ({ value, label: value }))}
+          options={categoryFacet.options.map((value) => ({ value, label: subsystemLabel(value), title: value }))}
           values={appliedFilter.categories}
           onChange={(next) => patchFilter({ categories: next })}
           loading={categoryFacet.loading}

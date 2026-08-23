@@ -21,9 +21,12 @@ import { t } from '../../helpers';
 import styles from '../../Settings.module.css';
 import { formatCompactNumber, formatNumber, shortId } from './model-observability-format';
 import {
+  attributionKindLabel,
   groupByDimensionLabel,
   inputShapeLabel,
+  operationLabel,
   provenancePrecisionLabel,
+  subsystemLabel,
   terminalStatusLabel,
 } from './model-observability-labels';
 
@@ -39,6 +42,9 @@ function dimensionValueLabel(dimension: ModelObservabilityGroupByDimension, valu
   }
   if (raw === null || raw === undefined || raw === '') return t('settings.observability.groups.unknownValue');
   if (dimension === 'status') return terminalStatusLabel(raw);
+  if (dimension === 'category') return subsystemLabel(raw);
+  if (dimension === 'operation') return operationLabel(raw);
+  if (dimension === 'attributionKind') return attributionKindLabel(raw);
   if (dimension === 'inputShape') return inputShapeLabel(raw);
   if (dimension === 'provenancePrecision') return provenancePrecisionLabel(raw);
   if (dimension === 'session' || dimension === 'conversation' || dimension === 'task' || dimension === 'agent') {

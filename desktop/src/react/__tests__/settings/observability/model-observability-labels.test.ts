@@ -48,6 +48,15 @@ describe('observabilityChipLabel', () => {
       .toContain('T:settings.observability.values.payloadAvailability.expired');
   });
 
+  it('subsystem/operation/attributionKind chip values go through values.* (not raw wire words)', () => {
+    expect(observabilityChipLabel(multi('categories', 'session')))
+      .toBe('T:settings.observability.filter.category: T:settings.observability.values.subsystem.session');
+    expect(observabilityChipLabel(multi('operations', 'reply')))
+      .toContain('T:settings.observability.values.operation.reply');
+    expect(observabilityChipLabel(multi('attributionKinds', 'agent')))
+      .toContain('T:settings.observability.values.attributionKind.agent');
+  });
+
   it('exact and flag chips use their own label keys; flag appends tri-state', () => {
     const exact: ObservabilityFilterChip = { id: 'exact:sessionId', kind: 'exact', field: 'sessionId' as ObservabilityExactFilterKey };
     expect(observabilityChipLabel(exact)).toBe('T:settings.observability.filter.sessionId');

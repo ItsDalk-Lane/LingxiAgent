@@ -8355,20 +8355,15 @@ a.about-link:hover {
     font-size: var(--fs-caption);
 }
 
+/* SVG 时间柱（viewBox 0 0 100 36，preserveAspectRatio=none 拉伸），rect 只认 fill，不认 background */
 .observability-date-chart {
-    display: flex;
-    align-items: flex-end;
-    gap: var(--space-2);
+    display: block;
     height: 120px;
     padding: var(--space-8) 0;
 }
 
 .observability-date-bar {
-    flex: 1;
-    min-width: 4px;
-    min-height: 2px;
-    border-radius: 2px;
-    background: var(--accent);
+    fill: var(--accent);
 }
 
 .observability-group-rows {
@@ -9033,12 +9028,29 @@ a.about-link:hover {
     gap: var(--space-2);
 }
 
+.observability-trace-header,
 .observability-trace-row {
-    display: flex;
+    display: grid;
+    grid-template-columns: minmax(80px, auto) minmax(64px, auto) minmax(120px, 1fr) auto repeat(4, minmax(52px, auto));
     align-items: center;
     gap: var(--space-8);
-    width: 100%;
     padding: var(--space-6) var(--space-8);
+}
+
+.observability-trace-header {
+    font-size: var(--fs-micro);
+    color: var(--text-muted);
+}
+
+/* 表头与行的后四列（四态计数）右对齐 */
+.observability-trace-header > :nth-child(n+5),
+.observability-trace-row > :nth-child(n+5) {
+    justify-self: end;
+    text-align: right;
+}
+
+.observability-trace-row {
+    width: 100%;
     border: none;
     border-radius: var(--radius-sm);
     background: transparent;
@@ -9053,75 +9065,134 @@ a.about-link:hover {
     background: var(--accent-light);
 }
 
-.observability-trace-call {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--space-4);
-    min-width: 0;
+.observability-trace-row[data-selected] {
+    background: var(--accent-light);
 }
 
-.observability-trace-call-id {
-    font-family: var(--font-mono);
-    font-size: var(--fs-micro);
-    color: var(--text-muted);
+.observability-trace-origin {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
 
-.observability-trace-detail {
-    border: 1px solid var(--border);
-    border-radius: var(--radius-md);
-    padding: var(--space-12);
+.observability-trace-dialog {
     display: flex;
     flex-direction: column;
+    gap: var(--space-12);
+    width: 720px;
+    max-width: 100%;
+    padding: var(--space-24);
+    max-height: inherit;
+    overflow-y: auto;
+}
+
+.observability-trace-stat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: var(--space-8);
+}
+
+.observability-trace-stat-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: var(--space-8);
+    font-size: var(--fs-caption);
     min-width: 0;
 }
 
-.observability-trace-stats {
-    font-size: var(--fs-caption);
+.observability-trace-stat-title {
+    font-size: var(--fs-micro);
     color: var(--text-muted);
 }
 
-.observability-trace-tree {
+.observability-trace-terms {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4) var(--space-8);
+}
+
+.observability-trace-term[data-status="ok"] {
+    color: var(--green, #6b9);
+}
+
+.observability-trace-term[data-status="error"] {
+    color: var(--danger);
+}
+
+.observability-trace-term[data-zero] {
+    opacity: 0.55;
+}
+
+.observability-trace-row [data-status="ok"] {
+    color: var(--green, #6b9);
+}
+
+.observability-trace-row [data-status="error"] {
+    color: var(--danger);
+}
+
+.observability-trace-row [data-zero] {
+    opacity: 0.55;
+}
+
+/* 调用时间折线图（§八十七续：纯 SVG，无图表库；点色 = 终态） */
+.observability-trace-chart {
     display: flex;
     flex-direction: column;
-    gap: var(--space-2);
+    gap: var(--space-4);
+    min-width: 0;
 }
 
-.observability-trace-node {
-    display: flex;
-    align-items: center;
-    gap: var(--space-6);
-    padding: var(--space-2) var(--space-4);
-    border-radius: var(--radius-sm);
-    font-size: var(--fs-caption);
+.observability-trace-chart svg {
+    display: block;
+    width: 100%;
+    height: 180px;
 }
 
-.observability-trace-node[data-depth="1"] { margin-left: var(--space-16); }
-.observability-trace-node[data-depth="2"] { margin-left: calc(var(--space-16) * 2); }
-.observability-trace-node[data-depth="3"] { margin-left: calc(var(--space-16) * 3); }
-.observability-trace-node[data-depth="4"] { margin-left: calc(var(--space-16) * 4); }
-.observability-trace-node[data-depth="5"] { margin-left: calc(var(--space-16) * 5); }
-.observability-trace-node[data-depth="6"] { margin-left: calc(var(--space-16) * 6); }
-.observability-trace-node[data-depth="7"] { margin-left: calc(var(--space-16) * 7); }
-.observability-trace-node[data-depth="8"] { margin-left: calc(var(--space-16) * 8); }
-
-.observability-trace-children {
-    border-left: 1px dashed var(--border);
+.observability-trace-line {
+    fill: none;
+    stroke: var(--border);
+    stroke-width: 1.5;
 }
 
-.observability-trace-missing-parent {
-    border: 1px dashed var(--border);
-    border-radius: var(--radius-sm);
-    color: var(--text-muted);
+.observability-trace-baseline {
+    stroke: var(--border);
+    stroke-width: 1;
+    stroke-dasharray: 2 3;
 }
 
-.observability-trace-cycle {
-    font-size: var(--fs-hint);
-    color: var(--text-muted);
-    font-style: italic;
+.observability-trace-dot {
+    cursor: pointer;
+    transition: transform 0.1s ease;
+    transform-box: fill-box;
+    transform-origin: center;
+}
+
+.observability-trace-dot:hover {
+    transform: scale(1.5);
+}
+
+.observability-trace-dot:focus-visible {
+    outline: none;
+    stroke: var(--accent);
+    stroke-width: 2;
+}
+
+.observability-trace-dot[data-status="ok"] {
+    fill: var(--green, #6b9);
+}
+
+.observability-trace-dot[data-status="error"] {
+    fill: var(--danger);
+}
+
+.observability-trace-dot[data-status="aborted"],
+.observability-trace-dot[data-status="incomplete"],
+.observability-trace-dot[data-status="unknown"] {
+    fill: var(--text-muted);
 }
 
 /* ---------- Blob preview ---------- */
@@ -9173,6 +9244,9 @@ a.about-link:hover {
     gap: var(--space-12);
     width: 560px;
     max-width: 100%;
+    padding: var(--space-24);
+    max-height: inherit;
+    overflow-y: auto;
 }
 
 .observability-settings-form {
@@ -9189,19 +9263,36 @@ a.about-link:hover {
 }
 
 .observability-settings-hint {
+    display: block;
     font-size: var(--fs-hint);
     color: var(--text-muted);
 }
 
 .observability-settings-effective {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
     font-size: var(--fs-caption);
     color: var(--text-muted);
     font-variant-numeric: tabular-nums;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: var(--space-8) var(--space-12);
+}
+
+.observability-settings-effective[data-mismatch] {
+    border-color: var(--danger);
 }
 
 .observability-settings-retention {
     display: flex;
-    align-items: center;
+    flex-direction: column;
+    gap: var(--space-8);
+}
+
+.observability-settings-retention-fields {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: var(--space-8);
 }
 
@@ -9229,11 +9320,18 @@ a.about-link:hover {
     gap: var(--space-12);
     width: 520px;
     max-width: 100%;
+    padding: var(--space-24);
+    max-height: inherit;
+    overflow-y: auto;
 }
 
 .observability-export-filter {
     border: 1px solid var(--border);
     border-radius: var(--radius-md);
+}
+
+.observability-export-filter > .observability-advanced-title {
+    padding: var(--space-8) var(--space-8) 0;
 }
 
 .observability-export-filter-body {
@@ -9243,6 +9341,17 @@ a.about-link:hover {
     padding: var(--space-8);
     font-size: var(--fs-caption);
     color: var(--text-muted);
+}
+
+.observability-export-maxcalls {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+.observability-export-maxcalls .settings-input {
+    width: 180px;
+    flex: none;
 }
 
 .observability-export-progress {

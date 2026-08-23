@@ -25,7 +25,9 @@ import { useObservabilityFacetOptions, type ObservabilityFacetDimension } from '
 import { ObservabilityMultiSelect } from './ObservabilityMultiSelect';
 import { ObservabilityFilterPopover } from './ObservabilityFilterPopover';
 import {
+  attributionKindLabel,
   inputShapeLabel,
+  operationLabel,
   payloadAvailabilityLabel,
   provenancePrecisionLabel,
 } from './model-observability-labels';
@@ -50,6 +52,7 @@ function FacetMultiSelect({
   values,
   onChange,
   label,
+  optionLabel,
 }: {
   dimension: ObservabilityFacetDimension;
   active: boolean;
@@ -57,12 +60,14 @@ function FacetMultiSelect({
   values: string[];
   onChange: (next: string[]) => void;
   label: string;
+  /** 开放/闭集取值的中文标签函数（缺省直接显示原值）。 */
+  optionLabel?: (value: string) => string;
 }) {
   const facet = useObservabilityFacetOptions(dimension, active, filter);
   return (
     <ObservabilityMultiSelect
       label={label}
-      options={facet.options.map((value) => ({ value, label: value }))}
+      options={facet.options.map((value) => ({ value, label: optionLabel ? optionLabel(value) : value, title: value }))}
       values={values}
       onChange={onChange}
       loading={facet.loading}
@@ -117,6 +122,7 @@ export function ObservabilityAdvancedFilters({ state }: { state: ObservabilityQu
                 values={appliedFilter.operations}
                 onChange={(next) => patchFilter({ operations: next })}
                 label={t('settings.observability.filter.operation')}
+                optionLabel={operationLabel}
               />
               <FacetMultiSelect
                 dimension="callPurpose"
@@ -133,6 +139,7 @@ export function ObservabilityAdvancedFilters({ state }: { state: ObservabilityQu
                 values={appliedFilter.attributionKinds}
                 onChange={(next) => patchFilter({ attributionKinds: next })}
                 label={t('settings.observability.filter.attributionKind')}
+                optionLabel={attributionKindLabel}
               />
             </div>
           </div>

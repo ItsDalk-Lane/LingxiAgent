@@ -10,7 +10,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = cc697956e64507867bf8956e3c2999213e1320cb  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-08-23 品牌图标/logo 全量替换，去掉方形外框改透明主体)
+VERIFIED_SOURCE_SHA   = 440e9f575f095217085ef6aa9ebf742f5f8387a4  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-08-23 应用图标主体放大去框)
 工作分支              = feature/upstream-sync-0.447.4
 ```
 

@@ -183,7 +183,7 @@ describe('Model Observatory 详情纵向链', () => {
     expect(requestedPaths.some((value) => /\/api\/model-observability\/payloads\/\d+$/.test(value))).toBe(true);
   });
 
-  it('Trace Explorer 经真实 HTTP list/detail 构建同一调用链树', async () => {
+  it('Trace Explorer 经真实 HTTP list/detail 渲染同一调用链的折线图', async () => {
     render(
       <ObservabilityTraceExplorer
         appliedFilter={DEFAULT_OBSERVABILITY_FILTER}
@@ -195,9 +195,9 @@ describe('Model Observatory 详情纵向链', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText('phase10-detail-model')).toBeInTheDocument();
+      expect(document.querySelector(`[data-call-id="${callId}"]`)).not.toBeNull();
     });
-    expect(document.querySelector(`[title="${callId}"]`)).not.toBeNull();
+    expect(document.querySelector(`[data-call-id="${callId}"] title`)?.textContent).toContain('phase10-detail-model');
     expect(document.querySelector('[data-status="ok"]')).not.toBeNull();
     expect(requestedPaths).toContain('/api/model-observability/query/traces');
     expect(requestedPaths).toContain(`/api/model-observability/traces/${traceId}`);
