@@ -4,6 +4,10 @@
 本文档以当前最终代码为准；Phase 1/2 = 第一轮，Phase 2.5/3 = 第二轮，
 Phase 3.5 + Phase 4 = 本轮（trace 传播 + MC-10）。
 
+> 注：文中引用的跨会话断点文档（OBSERVABILITY_{STORAGE,QUERY,UI}_PROGRESS.md，
+> 以及更早删除的五个过程文档与 V1 验收）已于 2026-08-23 文档清场删除，
+> 内容见 git 历史。
+
 ## Residual Boundary Closure（Phase 3.5，本轮新增）
 
 修正旧「9 paths」结论：重新全仓出口反扫发现 diary temporary summary 是
@@ -1084,7 +1088,8 @@ closure 重生成，否则 census 测试全量互踩**。
 
 进度：OBSERVABILITY_VALIDATION_PROGRESS.md；审计设计：
 MODEL_OBSERVABILITY_E2E_TRUTH_AUDIT.md；最终验收：
-MODEL_OBSERVABILITY_RELEASE_ACCEPTANCE.md。本轮不加功能，只证明链：
+MODEL_OBSERVABILITY_RELEASE_ACCEPTANCE.md（进度/验收两文档已于 2026-08-23
+文档清场删除，内容见 git 历史）。本轮不加功能，只证明链：
 真实 Model Call = Observer 记录 = Durable Store = Query API = UI 展示 =
 Export，各层表达同一事实；缺失只能以真缺失态表达，不得伪装成
 0/{}/[]/null/"normal"。
