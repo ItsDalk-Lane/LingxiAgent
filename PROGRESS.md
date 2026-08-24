@@ -10,7 +10,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = 440e9f575f095217085ef6aa9ebf742f5f8387a4  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-08-23 应用图标主体放大去框)
+VERIFIED_SOURCE_SHA   = 30632983cbe3222785ee5058c3f9c82320dc01f6  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-08-24 观测台时间线折线图迭代+游标锚点修复)
 工作分支              = feature/upstream-sync-0.447.4
 ```
 
@@ -309,6 +309,24 @@ seal 不是一次性终点，而是"当前被验证树"的游标；每次审计�
   OBSERVATORY/OBSERVABILITY 拼写错位失效（含一处 cda8dbe5 起的死条目），
   b9933da8 逐字符修复。最终 seal commit 轮（PR HEAD）目标全绿。Release Acceptance V3 见
   MODEL_OBSERVATORY_RELEASE_ACCEPTANCE_V3.md；V2 保留历史。
+
+- **2026-08-23 图标/logo 全量 rebrand 链**（seal 8c94044b → 440e9f57，五次推进：
+  86a029a7 → cc697956 → 3b347a4f → aac8c605 → 440e9f57）：13 文件素材替换
+  （4.png 图标源 / 5.png logo 源 + tray + windows icon 重生成），各轮 chore(audit)
+  提交推进坐标；期间 3113d337 清理过时进度文档并同步审计清单。台账条目本轮补记。
+
+- **2026-08-24 观测台时间线折线图迭代 + v0.1.30 发布前收口**（功能树
+  30632983/seal 本提交；一并覆盖 440e9f57 之后的 0561c1ce 时间线图表与详情视图）：
+  date 分组柱状图升级为按真实日期比例定位的平滑折线（Catmull-Rom 贝塞尔 + 面积渐变
+  + non-scaling stroke + 贪心抽稀 X 轴标签 + hover tooltip，新增
+  ObservabilityDateLine 几何回归测试）；相对日期预设锚点 presetAnchorMs（since 冻结，
+  分页游标 filter 指纹不再随请求时刻漂移）；调用抽屉 scrim 自层接管外点击关闭 +
+  轨迹↔调用交叉跳转对称收起；DateLine hooks 顺序修复；style ratchet 收口
+  （trace-dot 裸时长 → var(--duration-instant)、tooltip 阴影 → 新 token
+  --chart-tooltip-shadow，含 0561c1ce 遗留 +1 bare-duration 一并修复）；i18n 五语言
+  datePointTooltip。验证：typecheck ×3（绿）+ eslint 改动文件 0 error + observability
+  定向 14 文件 100 用例 + style-discipline 8 用例 + full npm test 12142 passed
+  （唯一失败 = 推进前 seal guard 预期红）后推进。
 
 
 ## 最终状态：已合并（上游同步部分）
