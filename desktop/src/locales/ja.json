@@ -2593,6 +2593,7 @@
         "loading": "集計を読み込み中…",
         "empty": "現在のフィルターでは集計データがありません",
         "dateChartAria": "日付別の呼び出し量",
+        "datePointTooltip": "{date}：{count} 回の呼び出し",
         "dateSummary": "合計 {total} 回、ピークは {peakDate}（{peakCount} 回）",
         "filterByValue": "この値でフィルター：{value}",
         "unknownValue": "（不明）"
@@ -2805,7 +2806,31 @@
         },
         "missingParent": "親呼び出しが欠落",
         "cycle": "循環を検出したため展開を打ち切りました",
-        "degradedWarning": "このトレースには欠落データがあり、以下のツリーは不完全な可能性があります"
+        "degradedWarning": "このトレースには欠落データがあり、以下のツリーは不完全な可能性があります",
+        "header": {
+          "traceId": "トレース",
+          "origin": "発生源",
+          "lastSeen": "最終活動",
+          "calls": "呼び出し",
+          "ok": "成功",
+          "error": "失敗",
+          "aborted": "中止",
+          "incomplete": "不完全"
+        },
+        "groups": {
+          "trace": "トレース",
+          "calls": "呼び出し",
+          "usage": "使用量",
+          "payload": "ペイロード"
+        },
+        "dialogAria": "トレース詳細",
+        "chart": {
+          "aria": "呼び出しタイムライン",
+          "summary": "呼び出し {total} 件 · 成功 {ok} · 失敗 {error} · 最長 {peak}",
+          "hint": "各ドットが 1 回の呼び出し：緑 = 成功、赤 = 失敗、グレー = 中止 / 不完全。横軸は時間、縦軸は所要時間（不明はベースライン上）。ホバーで詳細、クリックで呼び出しを開く。",
+          "noTime": "時刻不明",
+          "parent": "親呼び出し"
+        }
       },
       "recording": {
         "title": "記録設定",

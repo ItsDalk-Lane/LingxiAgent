@@ -52,6 +52,13 @@ export const OBSERVABILITY_EXACT_FILTER_KEYS: readonly ObservabilityExactFilterK
 
 export type ObservabilityFilterState = {
   datePreset: ObservabilityDatePreset;
+  /**
+   * 相对预设（24h/7d/30d）的时间锚点（epoch ms）。选预设的瞬间冻结，
+   * 之后 since 一律 = anchor − 时长，绝不随请求时刻滚动——否则分页游标
+   * 的 filter 指纹（含 since）会随时间漂移，第二页起必判 invalid_cursor
+   * （§四十五）。null = 未锚定（回退请求时刻，仅测试/兼容路径）。
+   */
+  presetAnchorMs: number | null;
   /** datetime-local 输入的 applied 值（'' = 未设置）；custom preset 专用。 */
   customSince: string;
   customUntil: string;
@@ -75,9 +82,10 @@ export type ObservabilityFilterState = {
   hasPayload: boolean | null;
 };
 
-/** 默认：Last 7 Days（§十五）。 */
+/** 默认：Last 7 Days（§十五）。锚点 null，由 query-state hook 挂载时打点。 */
 export const DEFAULT_OBSERVABILITY_FILTER: ObservabilityFilterState = {
   datePreset: '7d',
+  presetAnchorMs: null,
   customSince: '',
   customUntil: '',
   providers: [],
@@ -117,12 +125,12 @@ function datetimeLocalToIso(value: string): string | null {
 }
 
 /**
- * 当前 filter 的日期范围。preset → since=now-时长、until=null（开口）；
+ * 当前 filter 的日期范围。preset → since=anchor−时长、until=null（开口）；
  * custom → datetime-local 输入转 ISO（until 保持 exclusive 语义，§四十四）；
- * all → 无边界。
+ * all → 无边界。anchor 缺失时回退 now（滚动窗口，兼容旧调用方/测试）。
  */
 export function dateRangeForState(
-  state: Pick<ObservabilityFilterState, 'datePreset' | 'customSince' | 'customUntil'>,
+  state: Pick<ObservabilityFilterState, 'datePreset' | 'customSince' | 'customUntil'> & { presetAnchorMs?: number | null },
   now: Date = new Date(),
 ): { since: string | null; until: string | null } {
   if (state.datePreset === 'all') return { since: null, until: null };
@@ -133,7 +141,29 @@ export function dateRangeForState(
     };
   }
   const duration = PRESET_DURATION_MS[state.datePreset];
-  return { since: new Date(now.getTime() - duration).toISOString(), until: null };
+  const anchor = typeof state.presetAnchorMs === 'number' && Number.isFinite(state.presetAnchorMs)
+    ? state.presetAnchorMs
+    : now.getTime();
+  return { since: new Date(anchor - duration).toISOString(), until: null };
+}
+
+/** 相对预设（24h/7d/30d）需要锚点；custom/all 的 since 与时刻无关。 */
+export function isRelativeDatePreset(preset: ObservabilityDatePreset): boolean {
+  return preset in PRESET_DURATION_MS;
+}
+
+/**
+ * 相对预设缺锚点时补上（挂载 / 重选预设 / 清空筛选后的统一打点）。
+ * 已有锚点原样保留——同一个预设选择期内 since 必须稳定（游标指纹契约）。
+ */
+export function stampDateAnchorIfMissing(
+  state: ObservabilityFilterState,
+  anchorMs: number = Date.now(),
+): ObservabilityFilterState {
+  if (isRelativeDatePreset(state.datePreset) && state.presetAnchorMs == null) {
+    return { ...state, presetAnchorMs: anchorMs };
+  }
+  return state;
 }
 
 /**
@@ -262,7 +292,8 @@ export function removeFilterChip(
 ): ObservabilityFilterState {
   switch (chip.kind) {
     case 'date':
-      return { ...state, datePreset: DEFAULT_OBSERVABILITY_FILTER.datePreset, customSince: '', customUntil: '' };
+      // 锚点置空：回到默认 7d 时由调用方重新打点（新窗口，不复用旧锚）。
+      return { ...state, datePreset: DEFAULT_OBSERVABILITY_FILTER.datePreset, presetAnchorMs: null, customSince: '', customUntil: '' };
     case 'multi':
       return { ...state, [chip.field]: state[chip.field].filter((value) => value !== chip.value) };
     case 'exact':

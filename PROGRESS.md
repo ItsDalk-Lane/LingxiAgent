@@ -1,4 +1,7 @@
-# PROGRESS — openhanako v0.444.1 → v0.447.4 上游同步
+# PROGRESS — Seal 推进台账（前身：openhanako v0.444.1 → v0.447.4 上游同步收口）
+
+上游同步已于 2026-08-20 经 PR #20 合入 main（merge 0f941e5b）并随 v0.1.29 发布；
+本文件自那以后作为 seal 推进台账延续，「Seal 推进记录」一节是现行工作流。
 
 ## 审计坐标（固定，执行期间从未移动）
 
@@ -7,7 +10,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = 8c94044bd921765c30df705ff95d4f8994bea4d0  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-08-22 第十~十一轮：Phase 10.1 修复树（dba9a6b1/4f95e17d）+ Phase 11 合并收口（81cdb2d8 scratchpad 清场）；坐标一律为 commit 对象——第八轮 tree sha 之误见 Phase 10 F-4)
+VERIFIED_SOURCE_SHA   = 7010fb06fed37596cb63ea14b41debfb1c45ac3e  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-08-24 v0.1.30 release 元数据提交)
 工作分支              = feature/upstream-sync-0.447.4
 ```
 
@@ -307,42 +310,64 @@ seal 不是一次性终点，而是"当前被验证树"的游标；每次审计�
   b9933da8 逐字符修复。最终 seal commit 轮（PR HEAD）目标全绿。Release Acceptance V3 见
   MODEL_OBSERVATORY_RELEASE_ACCEPTANCE_V3.md；V2 保留历史。
 
+- **2026-08-23 图标/logo 全量 rebrand 链**（seal 8c94044b → 440e9f57，五次推进：
+  86a029a7 → cc697956 → 3b347a4f → aac8c605 → 440e9f57）：13 文件素材替换
+  （4.png 图标源 / 5.png logo 源 + tray + windows icon 重生成），各轮 chore(audit)
+  提交推进坐标；期间 3113d337 清理过时进度文档并同步审计清单。台账条目本轮补记。
 
-## 最终状态：READY TO MERGE
+- **2026-08-24 观测台时间线折线图迭代 + v0.1.30 发布前收口**（功能树
+  30632983/seal 本提交；一并覆盖 440e9f57 之后的 0561c1ce 时间线图表与详情视图）：
+  date 分组柱状图升级为按真实日期比例定位的平滑折线（Catmull-Rom 贝塞尔 + 面积渐变
+  + non-scaling stroke + 贪心抽稀 X 轴标签 + hover tooltip，新增
+  ObservabilityDateLine 几何回归测试）；相对日期预设锚点 presetAnchorMs（since 冻结，
+  分页游标 filter 指纹不再随请求时刻漂移）；调用抽屉 scrim 自层接管外点击关闭 +
+  轨迹↔调用交叉跳转对称收起；DateLine hooks 顺序修复；style ratchet 收口
+  （trace-dot 裸时长 → var(--duration-instant)、tooltip 阴影 → 新 token
+  --chart-tooltip-shadow，含 0561c1ce 遗留 +1 bare-duration 一并修复）；i18n 五语言
+  datePointTooltip。验证：typecheck ×3（绿）+ eslint 改动文件 0 error + observability
+  定向 14 文件 100 用例 + style-discipline 8 用例 + full npm test 12142 passed
+  （唯一失败 = 推进前 seal guard 预期红）后推进。
 
+- **2026-08-24 v0.1.30 release**（7010fb06，各坐标以文首为准）：release 元数据提交
+  （package.json/package-lock 版本 0.1.30 + releaseGeneration 8，release-digest.v1
+  v0.1.30 手写条目 + v2 --append-history prepend（11 entries），release-preflight
+  活体断言随版本推进；5 files / +323-127，数据-only，零生产代码变化）。验证：
+  typecheck ×3（绿）+ validate-release-digest v1/v2 + release-preflight --tag v0.1.30
+  （PASS，historicalMaximum 0.1.29/7）+ test:artifact-release-smoke 8 文件 304 用例 +
+  digest/workflow/seal/matrix 目标套件 7 文件 59 用例全绿后推进。
+
+
+## 最终状态：已合并（上游同步部分）
+
+- 上游同步 PR #20 已于 2026-08-20 合入 main（merge 0f941e5b）并随 v0.1.29 发布；
+  此后各功能沿「Seal 推进记录」逐轮推进，当前 VERIFIED_SOURCE_SHA 以文首坐标为准
+  （历史验证链见各轮 seal 记录；本节旧快照曾停留在 Phase 8 树 61779cbd，已过期删除）。
 - Upstream ΔU：133 / 133 paths。
 - Disposition：ADOPTED 25 + ADAPTED 100 + REGENERATED 4 + INTENTIONAL_DIVERGENCE 4 = 133
   （脚本计算，`build-sync-matrix.mjs --check`：missing=0 / extra=0 / duplicate=0 / unknown=0）。
 - 4 个 `hanako.md → lingxi.md` 品牌映射统一分类为 ADAPTED。
-- `VERIFIED_SOURCE_SHA = 61779cbdda5b46082f32a554b99279149980c0b4`：被完整测试验证的代码树
-  （含收口树 d4cf92a8 的全部验证 + 文档清场树复跑验证 + 归档修复树 051f6117 复跑的
-  typecheck/lint/全量测试 + v0.1.29 release 树 fabd6dbf 复跑的 typecheck/目标套件 +
-  mac self-install 树 dcf3546a 的 PR CI typecheck/lint/build/全量测试 +
-  凭证边界修复树 b8688895 的本地 typecheck/定向测试 + PR CI typecheck/lint/build/全量测试 +
-  保留标签管道修复树 c83d238a 的本地 typecheck/定向测试 + 全量测试 +
-  保留标签指纹补钉树 be95b344 的 tripwire/guard 验证 +
-  模型调用可观测性七轮树 a9a5f3f4 / b9238533 / 53fa4575 / 3cf0e6ed / bfde47bc / cfab85564d6ad5b53de19862545535f084be223d / 61779cbdda5b46082f32a554b99279149980c0b4
-  的本地 typecheck/定向测试 + 全量测试，见「Seal 推进记录」）。当前 HEAD 只比 VERIFIED_SOURCE_SHA 多审计收口内容。
 
-### Post-verification diff 记录（`git diff --name-only VERIFIED_SOURCE_SHA..HEAD`）
+### Post-verification diff 记录（`git diff --name-only VERIFIED_SOURCE_SHA..HEAD`，2026-08-23 main @ 2e8077de）
 
 ```
-.sync-audit/verified-source-sha.txt
-.sync-audit/upstream-sync-matrix.json
 .sync-audit/build-sync-matrix.mjs
-UPSTREAM_SYNC_MATRIX.md
-UPSTREAM_SYNC_AUDIT.md
+.sync-audit/upstream-sync-matrix.json
+.sync-audit/verified-source-sha.txt
+MODEL_OBSERVATORY_RELEASE_ACCEPTANCE_V3.md
 PROGRESS.md
+UPSTREAM_SYNC_AUDIT.md
+UPSTREAM_SYNC_MATRIX.md
 ```
 
-以上全部为审计材料 / 审计测试 / 审计脚本；无任何生产代码、测试逻辑或 runtime
-generated artifacts 变化。
+以上全部为审计材料；无任何生产代码、测试逻辑或 runtime generated artifacts 变化。
 
-### 合并交接（重要）
+### Seal 工作流（合并后现行）
 
-post-verification diff guard 在 `npm test` 中运行。本分支合入 main 后，任何非 allowlist
-的正常开发提交都会挂该门禁——合并后第一件事是推进（复跑全量验证后更新 seal）或退役
-（删除 seal 文件与 guard 测试）`verified-source-sha.txt`。本文件「Seal 推进记录」即推进范例。
+post-verification diff guard 在 `npm test` 中运行（独立可执行形态为
+`.sync-audit/verify-post-verification-diff.mjs`，两处 allowlist 副本须同步维护）。
+上游同步分支已合并；此后任何非 allowlist 的正常开发提交都会挂该门禁——提交前
+要么推进（复跑全量验证后更新 seal），要么退役（删除 seal 文件与 guard 测试）
+`verified-source-sha.txt`。本文件「Seal 推进记录」即推进范例。
 
 ### Known limitation（保留）
 

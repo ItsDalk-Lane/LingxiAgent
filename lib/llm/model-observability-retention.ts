@@ -38,7 +38,7 @@ const DAY_MS = 24 * 60 * 60 * 1000;
 
 /**
  * Safe fallback（§五十五）：persistence 开启但未配置 retention 时使用。
- * 集中定义于此；改动需同步 OBSERVABILITY_STORAGE_PROGRESS.md 与审计文档。
+ * 集中定义于此；改动需同步持久化偏好契约与审计文档（进度类文档已清场进 git 历史）。
  */
 export const SAFE_FALLBACK_MODEL_OBSERVABILITY_RETENTION: ModelObservabilityRetentionPolicy = {
   traceMaxAgeMs: 180 * DAY_MS,

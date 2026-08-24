@@ -2592,6 +2592,7 @@
         "loading": "Loading aggregates…",
         "empty": "No aggregate data under current filters",
         "dateChartAria": "Call volume by date",
+        "datePointTooltip": "{date}: {count} calls",
         "dateSummary": "{total} calls total, peak on {peakDate} ({peakCount})",
         "filterByValue": "Filter by value: {value}",
         "unknownValue": "(unknown)"
@@ -2804,7 +2805,31 @@
         },
         "missingParent": "Missing parent call",
         "cycle": "Cycle detected; expansion truncated",
-        "degradedWarning": "This trace has missing data; the tree below may be incomplete"
+        "degradedWarning": "This trace has missing data; the tree below may be incomplete",
+        "header": {
+          "traceId": "Trace",
+          "origin": "Origin",
+          "lastSeen": "Last activity",
+          "calls": "Calls",
+          "ok": "OK",
+          "error": "Failed",
+          "aborted": "Aborted",
+          "incomplete": "Incomplete"
+        },
+        "groups": {
+          "trace": "Trace",
+          "calls": "Calls",
+          "usage": "Usage",
+          "payload": "Payloads"
+        },
+        "dialogAria": "Trace detail",
+        "chart": {
+          "aria": "Call timeline chart",
+          "summary": "{total} calls · {ok} ok · {error} failed · longest {peak}",
+          "hint": "Each dot is one call: green = ok, red = failed, gray = aborted / incomplete. X = time, Y = duration; calls with unknown duration sit on the baseline. Hover for details, click to open the call.",
+          "noTime": "time unknown",
+          "parent": "parent call"
+        }
       },
       "recording": {
         "title": "Recording settings",

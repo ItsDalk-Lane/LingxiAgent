@@ -45,9 +45,12 @@ import {
 import {
   attributionKindLabel,
   inputShapeLabel,
+  operationLabel,
+  originLabel,
   payloadAvailabilityLabel,
   persistenceCompletenessLabel,
   provenancePrecisionLabel,
+  subsystemLabel,
   terminalStatusLabel,
   usageAvailabilityLabel,
   usageStatusLabel,
@@ -236,10 +239,18 @@ export function ObservabilityCallInspector({ callId, isLocalOwner, onClose, onOp
       closeOnEsc
       closeOnBackdrop
       trapFocus
-      className={styles['observability-inspector-backdrop']}
+      className={styles['observability-inspector-layer']}
       backdrop="none"
       contentProps={{ role: 'dialog', 'aria-label': t('settings.observability.inspector.ariaLabel') }}
     >
+      {/* scrim 自成一层并接管抽屉外点击关闭：Overlay 的 closeOnBackdrop 只认其根节点，
+          而抽屉布局里抽屉外的点击全落在这层全覆盖 scrim 上，根节点永远收不到。 */}
+      <div
+        className={styles['observability-inspector-backdrop']}
+        onMouseDown={(event) => {
+          if (event.target === event.currentTarget) onClose();
+        }}
+      >
       <div className={styles['observability-inspector']}>
         <div className={styles['observability-inspector-head']}>
           <div className={styles['observability-inspector-title']}>
@@ -308,7 +319,9 @@ export function ObservabilityCallInspector({ callId, isLocalOwner, onClose, onOp
                 <span className={styles['observability-summary-label']}>
                   {t('settings.observability.ledger.col.category')}
                 </span>
-                <span>{detail.call.source.subsystem ?? '—'} / {detail.call.source.operation ?? '—'}</span>
+                <span title={[detail.call.source.subsystem, detail.call.source.operation].filter(Boolean).join(' / ') || undefined}>
+                  {subsystemLabel(detail.call.source.subsystem)} / {operationLabel(detail.call.source.operation)}
+                </span>
               </div>
               <div className={styles['observability-summary-row']}>
                 <span className={styles['observability-summary-label']}>
@@ -465,7 +478,7 @@ export function ObservabilityCallInspector({ callId, isLocalOwner, onClose, onOp
                 <div className={styles['observability-summary-row']}>
                   <code title={detail.trace.traceId}>{shortId(detail.trace.traceId)}</code>
                   <span className={styles['observability-ledger-muted']}>
-                    {detail.trace.origin ?? '—'} · {formatLocalFullDateTime(detail.trace.firstSeenAt)}
+                    {originLabel(detail.trace.origin)} · {formatLocalFullDateTime(detail.trace.firstSeenAt)}
                     {' → '}{formatLocalFullDateTime(detail.trace.lastSeenAt)}
                   </span>
                   <button
@@ -480,6 +493,7 @@ export function ObservabilityCallInspector({ callId, isLocalOwner, onClose, onOp
             )}
           </div>
         )}
+      </div>
       </div>
     </Overlay>
   );

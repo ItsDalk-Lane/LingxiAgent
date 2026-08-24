@@ -92,6 +92,19 @@ export function attributionKindLabel(value: string | null | undefined): string {
   return valueLabel('attributionKind', value);
 }
 
+/** subsystem/operation 是开放取值（非闭集）：已知值走 values.* 翻译，未知回退原文。 */
+export function subsystemLabel(value: string | null | undefined): string {
+  return valueLabel('subsystem', value);
+}
+
+export function operationLabel(value: string | null | undefined): string {
+  return valueLabel('operation', value);
+}
+
+export function originLabel(value: string | null | undefined): string {
+  return valueLabel('origin', value);
+}
+
 export function groupByDimensionLabel(value: string | null | undefined): string {
   return valueLabel('groupByDimension', value);
 }
@@ -131,6 +144,9 @@ export function observabilityChipLabel(chip: ObservabilityFilterChip): string {
       else if (chip.field === 'payloadAvailabilities') value = payloadAvailabilityLabel(chip.value);
       else if (chip.field === 'provenancePrecisions') value = provenancePrecisionLabel(chip.value);
       else if (chip.field === 'inputShapes') value = inputShapeLabel(chip.value);
+      else if (chip.field === 'categories') value = subsystemLabel(chip.value);
+      else if (chip.field === 'operations') value = operationLabel(chip.value);
+      else if (chip.field === 'attributionKinds') value = attributionKindLabel(chip.value);
       return `${field}: ${value}`;
     }
     case 'exact':

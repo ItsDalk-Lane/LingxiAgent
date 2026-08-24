@@ -8355,20 +8355,108 @@ a.about-link:hover {
     font-size: var(--fs-caption);
 }
 
-.observability-date-chart {
+/* SVG 时间折线（viewBox 0 0 100 36，preserveAspectRatio=none 拉伸）。
+   non-scaling-stroke 让线宽/圆点以屏幕像素为单位，不被非均匀拉伸拉宽。 */
+.observability-date-figure {
     display: flex;
-    align-items: flex-end;
-    gap: var(--space-2);
-    height: 120px;
-    padding: var(--space-8) 0;
+    flex-direction: column;
+    gap: var(--space-6);
+    margin: var(--space-8) 0;
 }
 
-.observability-date-bar {
-    flex: 1;
-    min-width: 4px;
-    min-height: 2px;
-    border-radius: 2px;
-    background: var(--accent);
+.observability-date-plot {
+    position: relative;
+}
+
+.observability-date-chart {
+    display: block;
+    /* width 不写 100% 时 Chromium 按 viewBox 宽高比给 svg 算 ~333px 固定宽度，
+       图表不铺满面板，与按容器百分比定位的 X 轴标签错位 */
+    width: 100%;
+    height: 120px;
+}
+
+.observability-date-gradient-top {
+    stop-color: var(--accent);
+    stop-opacity: 0.28;
+}
+
+.observability-date-gradient-bottom {
+    stop-color: var(--accent);
+    stop-opacity: 0.02;
+}
+
+.observability-date-area {
+    fill: url(#observability-date-area-gradient);
+}
+
+.observability-date-line {
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 2px;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    vector-effect: non-scaling-stroke;
+}
+
+.observability-date-point {
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 4px;
+    stroke-linecap: round;
+    vector-effect: non-scaling-stroke;
+}
+
+.observability-date-guide {
+    stroke: var(--text-muted);
+    stroke-opacity: 0.4;
+    stroke-width: 1px;
+    stroke-dasharray: 3 3;
+    vector-effect: non-scaling-stroke;
+}
+
+.observability-date-hit {
+    fill: transparent;
+}
+
+.observability-date-axis {
+    position: relative;
+    height: 1.6em;
+}
+
+.observability-date-tick {
+    position: absolute;
+    top: 0;
+    left: var(--observability-date-tick-x, 0%);
+    transform: translateX(-50%);
+    font-size: var(--fs-caption);
+    color: var(--text-muted);
+    white-space: nowrap;
+}
+
+.observability-date-tooltip {
+    position: absolute;
+    left: var(--observability-date-tooltip-x, 50%);
+    top: var(--observability-date-tooltip-y, 0%);
+    transform: translate(-50%, calc(-100% - var(--space-6)));
+    padding: var(--space-4) var(--space-6);
+    border: var(--border-width, 1px) solid color-mix(in srgb, var(--accent) 24%, var(--border));
+    border-radius: var(--radius-sm);
+    background: var(--bg-card);
+    color: var(--text);
+    font-size: var(--fs-caption);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    pointer-events: none;
+    box-shadow: var(--chart-tooltip-shadow);
+}
+
+.observability-date-tooltip[data-align='start'] {
+    transform: translate(0, calc(-100% - var(--space-6)));
+}
+
+.observability-date-tooltip[data-align='end'] {
+    transform: translate(-100%, calc(-100% - var(--space-6)));
 }
 
 .observability-group-rows {
@@ -8529,6 +8617,18 @@ a.about-link:hover {
 }
 
 /* ---------- Call inspector ---------- */
+/* Overlay 内容容器改做的全屏定位层（z 序锚点，自身透明不拦事件）；scrim 在内层接管点击关闭 */
+.observability-inspector-layer {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    max-width: none;
+    max-height: none;
+    z-index: 40;
+}
+
 .observability-inspector-backdrop {
     position: absolute;
     top: 0;
@@ -8536,7 +8636,6 @@ a.about-link:hover {
     bottom: 0;
     left: 0;
     background: var(--scrim-30);
-    z-index: 40;
 }
 
 .observability-inspector {
@@ -9033,12 +9132,29 @@ a.about-link:hover {
     gap: var(--space-2);
 }
 
+.observability-trace-header,
 .observability-trace-row {
-    display: flex;
+    display: grid;
+    grid-template-columns: minmax(80px, auto) minmax(64px, auto) minmax(120px, 1fr) auto repeat(4, minmax(52px, auto));
     align-items: center;
     gap: var(--space-8);
-    width: 100%;
     padding: var(--space-6) var(--space-8);
+}
+
+.observability-trace-header {
+    font-size: var(--fs-micro);
+    color: var(--text-muted);
+}
+
+/* 表头与行的后四列（四态计数）右对齐 */
+.observability-trace-header > :nth-child(n+5),
+.observability-trace-row > :nth-child(n+5) {
+    justify-self: end;
+    text-align: right;
+}
+
+.observability-trace-row {
+    width: 100%;
     border: none;
     border-radius: var(--radius-sm);
     background: transparent;
@@ -9053,75 +9169,134 @@ a.about-link:hover {
     background: var(--accent-light);
 }
 
-.observability-trace-call {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--space-4);
-    min-width: 0;
+.observability-trace-row[data-selected] {
+    background: var(--accent-light);
 }
 
-.observability-trace-call-id {
-    font-family: var(--font-mono);
-    font-size: var(--fs-micro);
-    color: var(--text-muted);
+.observability-trace-origin {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
 
-.observability-trace-detail {
-    border: 1px solid var(--border);
-    border-radius: var(--radius-md);
-    padding: var(--space-12);
+.observability-trace-dialog {
     display: flex;
     flex-direction: column;
+    gap: var(--space-12);
+    width: 720px;
+    max-width: 100%;
+    padding: var(--space-24);
+    max-height: inherit;
+    overflow-y: auto;
+}
+
+.observability-trace-stat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: var(--space-8);
+}
+
+.observability-trace-stat-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: var(--space-8);
+    font-size: var(--fs-caption);
     min-width: 0;
 }
 
-.observability-trace-stats {
-    font-size: var(--fs-caption);
+.observability-trace-stat-title {
+    font-size: var(--fs-micro);
     color: var(--text-muted);
 }
 
-.observability-trace-tree {
+.observability-trace-terms {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4) var(--space-8);
+}
+
+.observability-trace-term[data-status="ok"] {
+    color: var(--green, #6b9);
+}
+
+.observability-trace-term[data-status="error"] {
+    color: var(--danger);
+}
+
+.observability-trace-term[data-zero] {
+    opacity: 0.55;
+}
+
+.observability-trace-row [data-status="ok"] {
+    color: var(--green, #6b9);
+}
+
+.observability-trace-row [data-status="error"] {
+    color: var(--danger);
+}
+
+.observability-trace-row [data-zero] {
+    opacity: 0.55;
+}
+
+/* 调用时间折线图（§八十七续：纯 SVG，无图表库；点色 = 终态） */
+.observability-trace-chart {
     display: flex;
     flex-direction: column;
-    gap: var(--space-2);
+    gap: var(--space-4);
+    min-width: 0;
 }
 
-.observability-trace-node {
-    display: flex;
-    align-items: center;
-    gap: var(--space-6);
-    padding: var(--space-2) var(--space-4);
-    border-radius: var(--radius-sm);
-    font-size: var(--fs-caption);
+.observability-trace-chart svg {
+    display: block;
+    width: 100%;
+    height: 180px;
 }
 
-.observability-trace-node[data-depth="1"] { margin-left: var(--space-16); }
-.observability-trace-node[data-depth="2"] { margin-left: calc(var(--space-16) * 2); }
-.observability-trace-node[data-depth="3"] { margin-left: calc(var(--space-16) * 3); }
-.observability-trace-node[data-depth="4"] { margin-left: calc(var(--space-16) * 4); }
-.observability-trace-node[data-depth="5"] { margin-left: calc(var(--space-16) * 5); }
-.observability-trace-node[data-depth="6"] { margin-left: calc(var(--space-16) * 6); }
-.observability-trace-node[data-depth="7"] { margin-left: calc(var(--space-16) * 7); }
-.observability-trace-node[data-depth="8"] { margin-left: calc(var(--space-16) * 8); }
-
-.observability-trace-children {
-    border-left: 1px dashed var(--border);
+.observability-trace-line {
+    fill: none;
+    stroke: var(--border);
+    stroke-width: 1.5;
 }
 
-.observability-trace-missing-parent {
-    border: 1px dashed var(--border);
-    border-radius: var(--radius-sm);
-    color: var(--text-muted);
+.observability-trace-baseline {
+    stroke: var(--border);
+    stroke-width: 1;
+    stroke-dasharray: 2 3;
 }
 
-.observability-trace-cycle {
-    font-size: var(--fs-hint);
-    color: var(--text-muted);
-    font-style: italic;
+.observability-trace-dot {
+    cursor: pointer;
+    transition: transform var(--duration-instant) var(--ease-out);
+    transform-box: fill-box;
+    transform-origin: center;
+}
+
+.observability-trace-dot:hover {
+    transform: scale(1.5);
+}
+
+.observability-trace-dot:focus-visible {
+    outline: none;
+    stroke: var(--accent);
+    stroke-width: 2;
+}
+
+.observability-trace-dot[data-status="ok"] {
+    fill: var(--green, #6b9);
+}
+
+.observability-trace-dot[data-status="error"] {
+    fill: var(--danger);
+}
+
+.observability-trace-dot[data-status="aborted"],
+.observability-trace-dot[data-status="incomplete"],
+.observability-trace-dot[data-status="unknown"] {
+    fill: var(--text-muted);
 }
 
 /* ---------- Blob preview ---------- */
@@ -9173,6 +9348,9 @@ a.about-link:hover {
     gap: var(--space-12);
     width: 560px;
     max-width: 100%;
+    padding: var(--space-24);
+    max-height: inherit;
+    overflow-y: auto;
 }
 
 .observability-settings-form {
@@ -9189,19 +9367,36 @@ a.about-link:hover {
 }
 
 .observability-settings-hint {
+    display: block;
     font-size: var(--fs-hint);
     color: var(--text-muted);
 }
 
 .observability-settings-effective {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
     font-size: var(--fs-caption);
     color: var(--text-muted);
     font-variant-numeric: tabular-nums;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: var(--space-8) var(--space-12);
+}
+
+.observability-settings-effective[data-mismatch] {
+    border-color: var(--danger);
 }
 
 .observability-settings-retention {
     display: flex;
-    align-items: center;
+    flex-direction: column;
+    gap: var(--space-8);
+}
+
+.observability-settings-retention-fields {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: var(--space-8);
 }
 
@@ -9229,11 +9424,18 @@ a.about-link:hover {
     gap: var(--space-12);
     width: 520px;
     max-width: 100%;
+    padding: var(--space-24);
+    max-height: inherit;
+    overflow-y: auto;
 }
 
 .observability-export-filter {
     border: 1px solid var(--border);
     border-radius: var(--radius-md);
+}
+
+.observability-export-filter > .observability-advanced-title {
+    padding: var(--space-8) var(--space-8) 0;
 }
 
 .observability-export-filter-body {
@@ -9243,6 +9445,17 @@ a.about-link:hover {
     padding: var(--space-8);
     font-size: var(--fs-caption);
     color: var(--text-muted);
+}
+
+.observability-export-maxcalls {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+.observability-export-maxcalls .settings-input {
+    width: 180px;
+    flex: none;
 }
 
 .observability-export-progress {

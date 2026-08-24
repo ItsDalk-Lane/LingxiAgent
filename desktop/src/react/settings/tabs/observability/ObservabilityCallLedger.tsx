@@ -40,7 +40,12 @@ import {
   isoTooltip,
   shortId,
 } from './model-observability-format';
-import { payloadAvailabilityLabel, terminalStatusLabel } from './model-observability-labels';
+import {
+  operationLabel,
+  payloadAvailabilityLabel,
+  subsystemLabel,
+  terminalStatusLabel,
+} from './model-observability-labels';
 
 type LedgerError = {
   kind: 'invalid_cursor' | 'not_initialized' | 'query_failed' | 'forbidden' | 'network';
@@ -252,8 +257,8 @@ export function ObservabilityCallLedger({ appliedFilter, selectedCallId, onSelec
                 }}
               >
                 <td title={isoTooltip(call.startedAt)}>{formatLocalDateTime(call.startedAt)}</td>
-                <td>{call.source.subsystem ?? '—'}</td>
-                <td>{call.source.operation ?? '—'}</td>
+                <td title={call.source.subsystem ?? undefined}>{subsystemLabel(call.source.subsystem)}</td>
+                <td title={call.source.operation ?? undefined}>{operationLabel(call.source.operation)}</td>
                 <td title={call.model.modelId ?? undefined}>
                   {call.model.modelId ?? '—'}
                   {call.model.provider && <span className={styles['observability-ledger-muted']}> · {call.model.provider}</span>}

@@ -2592,7 +2592,8 @@
       "groups": {
         "loading": "載入分组统计…",
         "empty": "目前過濾下無分组資料",
-        "dateChartAria": "按日期的呼叫量柱狀圖",
+        "dateChartAria": "按日期的呼叫量折線圖",
+        "datePointTooltip": "{date}：{count} 次呼叫",
         "dateSummary": "共 {total} 次呼叫，峰值 {peakDate}（{peakCount} 次）",
         "filterByValue": "按此值篩選：{value}",
         "unknownValue": "（未知）"
@@ -2805,7 +2806,31 @@
         },
         "missingParent": "父呼叫缺失",
         "cycle": "检测到環，已截斷展開",
-        "degradedWarning": "該軌跡存在資料缺失，以下樹狀可能不完整"
+        "degradedWarning": "該軌跡存在資料缺失，以下樹狀可能不完整",
+        "header": {
+          "traceId": "軌跡",
+          "origin": "來源",
+          "lastSeen": "最後活動",
+          "calls": "呼叫數",
+          "ok": "成功",
+          "error": "失敗",
+          "aborted": "已中止",
+          "incomplete": "不完整"
+        },
+        "groups": {
+          "trace": "軌跡",
+          "calls": "呼叫",
+          "usage": "用量",
+          "payload": "內文"
+        },
+        "dialogAria": "軌跡詳情",
+        "chart": {
+          "aria": "呼叫時間折線圖",
+          "summary": "共 {total} 次呼叫 · 成功 {ok} · 失敗 {error} · 最長耗時 {peak}",
+          "hint": "每個點是一次呼叫：綠 = 成功，紅 = 失敗，灰 = 中止 / 不完整；橫軸為時間，縱軸為耗時，耗時未知的呼叫標在底線上。懸停查看詳情，點擊開啟呼叫詳情。",
+          "noTime": "時間未知",
+          "parent": "父呼叫"
+        }
       },
       "recording": {
         "title": "記錄設定",

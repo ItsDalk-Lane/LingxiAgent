@@ -85,6 +85,20 @@ const localFullDateTimeFormat = new Intl.DateTimeFormat(undefined, {
   second: '2-digit',
 });
 
+const localAxisDateFormat = new Intl.DateTimeFormat(undefined, {
+  month: 'short',
+  day: 'numeric',
+});
+
+/** 折线图 X 轴标签：本地「8月22日 / Aug 22」。纯日期串按本地零点解析，避免 UTC 偏移串日；不合法则原样返回。 */
+export function formatAxisDate(value: string | null | undefined): string {
+  if (!value) return '—';
+  const normalized = /^\d{4}-\d{2}-\d{2}$/.test(value) ? `${value}T00:00:00` : value;
+  const time = Date.parse(normalized);
+  if (!Number.isFinite(time)) return value;
+  return localAxisDateFormat.format(new Date(time));
+}
+
 /** 列表时间：本地 MM-DD HH:mm；完整 ISO 由调用方放 title/tooltip（§一百五十三）。 */
 export function formatLocalDateTime(value: string | null | undefined): string {
   if (!value) return '—';

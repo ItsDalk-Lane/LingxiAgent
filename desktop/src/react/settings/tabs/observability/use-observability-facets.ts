@@ -34,6 +34,31 @@ function facetValueOf(
   return typeof value === 'string' && value !== '' ? value : null;
 }
 
+/**
+ * signature 的时间精度：毫秒 → 分钟。
+ *
+ * 相对 preset（7d/24h/30d）的 since 由调用方每次渲染按当前时刻重算，毫秒级
+ * 漂移；若直接 stringify 进缓存键，同一逻辑筛选会在每次父组件渲染时 miss
+ * 缓存并 abort+refetch，下拉空态文字在「加载选项…/无可选值」间高频闪烁
+ * （§二十六 缓存键随 appliedFilter 失效的本意是筛选变了才失效）。facet
+ * 只枚举维度可选值，分钟级窗口差不改变选项集；查询本身仍用原始 filter。
+ */
+const SIGNATURE_TIME_PRECISION_MS = 60_000;
+
+function roundIsoToSignaturePrecision(value: string): string {
+  const time = new Date(value).getTime();
+  if (!Number.isFinite(time)) return value;
+  return new Date(Math.floor(time / SIGNATURE_TIME_PRECISION_MS) * SIGNATURE_TIME_PRECISION_MS).toISOString();
+}
+
+function facetSignature(filter: ModelObservabilityCallFilterInput): string {
+  if (filter.since === undefined && filter.until === undefined) return JSON.stringify(filter);
+  const stable = { ...filter };
+  if (typeof stable.since === 'string') stable.since = roundIsoToSignaturePrecision(stable.since);
+  if (typeof stable.until === 'string') stable.until = roundIsoToSignaturePrecision(stable.until);
+  return JSON.stringify(stable);
+}
+
 export function useObservabilityFacetOptions(
   dimension: ObservabilityFacetDimension,
   active: boolean,
@@ -43,7 +68,7 @@ export function useObservabilityFacetOptions(
   const [loading, setLoading] = useState(false);
   const cacheRef = useRef(new Map<string, string[]>());
   // filter 签名：请求内容与 filter 绑定，filter 变了缓存自然 miss。
-  const signature = JSON.stringify(filter);
+  const signature = facetSignature(filter);
 
   useEffect(() => {
     if (!active) return;
@@ -57,7 +82,7 @@ export function useObservabilityFacetOptions(
     const controller = new AbortController();
     setLoading(true);
     queryObservabilityAggregate(
-      { filter: JSON.parse(signature) as ModelObservabilityCallFilterInput, groupBy: [dimension] },
+      { filter, groupBy: [dimension] },
       { signal: controller.signal },
     ).then((result) => {
       const values: string[] = [];

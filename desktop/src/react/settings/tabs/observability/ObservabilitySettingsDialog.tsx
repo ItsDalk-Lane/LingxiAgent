@@ -278,33 +278,35 @@ export function ObservabilitySettingsDialog({ open, isLocalOwner, settings, heal
                 <div className={styles['observability-advanced-title']}>
                   {t('settings.observability.recording.retentionTitle')}
                 </div>
-                {([
-                  ['traceDays', 'settings.observability.recording.retentionTrace', traceDays],
-                  ['payloadDays', 'settings.observability.recording.retentionPayload', payloadDays],
-                  ['blobDays', 'settings.observability.recording.retentionBlob', blobDays],
-                ] as const).map(([field, labelKey, parsed]) => (
-                  <div className={styles['observability-advanced-field']} key={field}>
-                    <label className={styles['observability-advanced-label']}>{t(labelKey)}</label>
-                    <input
-                      className={styles['settings-input']}
-                      type="number"
-                      min={MIN_RETENTION_DAYS}
-                      max={MAX_RETENTION_DAYS}
-                      value={draft[field]}
-                      disabled={!isLocalOwner}
-                      data-invalid={parsed === null || undefined}
-                      onChange={(event) => patchDraft({ [field]: event.target.value })}
-                    />
-                    {parsed === null && (
-                      <span className={styles['observability-settings-invalid']} role="alert">
-                        {t('settings.observability.recording.retentionInvalid', {
-                          min: MIN_RETENTION_DAYS,
-                          max: MAX_RETENTION_DAYS,
-                        })}
-                      </span>
-                    )}
-                  </div>
-                ))}
+                <div className={styles['observability-settings-retention-fields']}>
+                  {([
+                    ['traceDays', 'settings.observability.recording.retentionTrace', traceDays],
+                    ['payloadDays', 'settings.observability.recording.retentionPayload', payloadDays],
+                    ['blobDays', 'settings.observability.recording.retentionBlob', blobDays],
+                  ] as const).map(([field, labelKey, parsed]) => (
+                    <div className={styles['observability-advanced-field']} key={field}>
+                      <label className={styles['observability-advanced-label']}>{t(labelKey)}</label>
+                      <input
+                        className={styles['settings-input']}
+                        type="number"
+                        min={MIN_RETENTION_DAYS}
+                        max={MAX_RETENTION_DAYS}
+                        value={draft[field]}
+                        disabled={!isLocalOwner}
+                        data-invalid={parsed === null || undefined}
+                        onChange={(event) => patchDraft({ [field]: event.target.value })}
+                      />
+                      {parsed === null && (
+                        <span className={styles['observability-settings-invalid']} role="alert">
+                          {t('settings.observability.recording.retentionInvalid', {
+                            min: MIN_RETENTION_DAYS,
+                            max: MAX_RETENTION_DAYS,
+                          })}
+                        </span>
+                      )}
+                    </div>
+                  ))}
+                </div>
               </div>
 
               {saveError && (
