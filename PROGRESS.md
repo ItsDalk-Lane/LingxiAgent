@@ -10,7 +10,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = 30632983cbe3222785ee5058c3f9c82320dc01f6  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-08-24 观测台时间线折线图迭代+游标锚点修复)
+VERIFIED_SOURCE_SHA   = 7010fb06fed37596cb63ea14b41debfb1c45ac3e  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-08-24 v0.1.30 release 元数据提交)
 工作分支              = feature/upstream-sync-0.447.4
 ```
 
@@ -327,6 +327,14 @@ seal 不是一次性终点，而是"当前被验证树"的游标；每次审计�
   datePointTooltip。验证：typecheck ×3（绿）+ eslint 改动文件 0 error + observability
   定向 14 文件 100 用例 + style-discipline 8 用例 + full npm test 12142 passed
   （唯一失败 = 推进前 seal guard 预期红）后推进。
+
+- **2026-08-24 v0.1.30 release**（7010fb06，各坐标以文首为准）：release 元数据提交
+  （package.json/package-lock 版本 0.1.30 + releaseGeneration 8，release-digest.v1
+  v0.1.30 手写条目 + v2 --append-history prepend（11 entries），release-preflight
+  活体断言随版本推进；5 files / +323-127，数据-only，零生产代码变化）。验证：
+  typecheck ×3（绿）+ validate-release-digest v1/v2 + release-preflight --tag v0.1.30
+  （PASS，historicalMaximum 0.1.29/7）+ test:artifact-release-smoke 8 文件 304 用例 +
+  digest/workflow/seal/matrix 目标套件 7 文件 59 用例全绿后推进。
 
 
 ## 最终状态：已合并（上游同步部分）
