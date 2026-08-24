@@ -520,8 +520,11 @@ function base64Descriptor(text: string): Record<string, unknown> {
 
 /* ── 本地绝对路径（§三十）────────────────────────────────────────────── */
 
-const FULL_LOCAL_PATH = /^([a-zA-Z]:[\\/][^\0]*|\/(?:Users|home|private|var\/folders)\/[^\0]+|\\\\[^\0]+)$/;
-const INLINE_LOCAL_PATH = /(?<![\w])((?:[a-zA-Z]:\\Users\\|\/(?:Users|home|private)\/)[A-Za-z0-9._\\/-]{2,240})/g;
+/* POSIX 临时目录（/tmp、/var/tmp）与家目录前缀都算本地路径：Linux 的 TMPDIR 在
+   /tmp（macOS 是 /private/var/folders、Windows 是盘符），漏掉它会让 blob 外置
+   路径原样泄漏进 payload 正文（2026-08-24 Linux quality-gate 实锤）。 */
+const FULL_LOCAL_PATH = /^([a-zA-Z]:[\\/][^\0]*|\/(?:Users|home|private|var\/(?:folders|tmp)|tmp)\/[^\0]+|\\\\[^\0]+)$/;
+const INLINE_LOCAL_PATH = /(?<![\w])((?:[a-zA-Z]:\\Users\\|\/(?:Users|home|private|var\/tmp|tmp)\/)[A-Za-z0-9._\\/-]{2,240})/g;
 
 export function looksLikeLocalPath(text: string): boolean {
   const trimmed = text.trim();
