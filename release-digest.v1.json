@@ -1,246 +1,220 @@
 {
   "schemaVersion": 1,
-  "tag": "v0.1.29",
-  "version": "0.1.29",
-  "previousTag": "v0.1.28",
-  "generatedAt": "2026-08-20T08:12:00.000Z",
+  "tag": "v0.1.30",
+  "version": "0.1.30",
+  "previousTag": "v0.1.29",
+  "generatedAt": "2026-08-24T11:45:00.000Z",
   "noUserFacingChanges": false,
   "summary": {
-    "zh": "新增「记忆梦境」：助手会在后台自动整理长期记忆，设置里可以查看每次整理的版本并对比变化；聊天渲染管线重构为单通道语义流，长会话更流畅、显示更准确；归档对话恢复显示真实标题，并支持手动勾选批量删除。",
-    "en": "Introducing Memory Dream: your assistant now consolidates long-term memory in the background, with revision history and diffs in settings; the chat rendering pipeline was rebuilt around a single semantic channel for smoother, more accurate long conversations; archived chats show their real titles again and can be bulk-deleted by manual selection."
+    "zh": "设置里的「用量」页升级为「模型观测」工作台：可按时间、模型、供应商、会话等维度筛选，查看每次模型调用的详情、请求与响应载荷、以及按真实时间排布的调用轨迹时间线，并支持导出（默认关闭，需在设置中显式开启）。修复了情绪与思考内容偶发回流聊天正文、模型凭证串用隐患、以及 mac 上自动更新安装失败的问题；应用图标与界面视觉全面焕新，设置供应商页加载大幅提速。",
+    "en": "The Usage page in settings is upgraded to a Model Observatory workbench: filter model calls by time, model, provider or session, inspect per-call details, request/response payloads, and a call-trace timeline laid out on a real time axis, with export support (disabled by default; opt in from settings). Fixes landed for mood/think segments occasionally leaking back into chat text, model credential boundary gaps, and macOS auto-update installation failures; the app icon and visual identity are refreshed, and the providers settings page loads much faster."
   },
   "counts": {
     "feature": 2,
-    "fix": 4,
+    "fix": 3,
     "improvement": 2,
     "migration": 0
   },
   "source": {
     "owner": "ItsDalk-Lane",
     "repo": "LingxiAgent",
-    "commitRange": "v0.1.28..HEAD",
-    "releaseUrl": "https://github.com/ItsDalk-Lane/LingxiAgent/releases/tag/v0.1.29",
+    "commitRange": "v0.1.29..HEAD",
+    "releaseUrl": "https://github.com/ItsDalk-Lane/LingxiAgent/releases/tag/v0.1.30",
     "releaseNotes": ""
   },
   "items": [
     {
-      "id": "feat-memory-dream",
+      "id": "feat-model-observatory",
       "kind": "feature",
       "importance": "high",
       "title": {
-        "zh": "记忆梦境：后台自动整理长期记忆",
-        "en": "Memory Dream: background long-term memory consolidation"
+        "zh": "模型观测工作台：看清每一次模型调用",
+        "en": "Model Observatory: see every model call"
       },
       "summary": {
-        "zh": "助手现在会在后台像做梦一样自动整理长期记忆，把零散的印象合并成清晰的要点；设置中新增记忆梦境控制项与版本浏览器，可查看每次整理的版本并对比与当前记忆的变化。",
-        "en": "Your assistant now consolidates long-term memory in the background, merging scattered impressions into clear facts. Settings gain Memory Dream controls and a revision browser where you can review each consolidation and diff it against current memory."
+        "zh": "设置中的「用量」页升级为完整的模型观测工作台。可按时间预设（24 小时/7 天/30 天/自定义/全部）、模型、供应商、状态等维度组合筛选，查看调用量、耗时、token 用量与成本等聚合指标；点击任意调用可展开检查器，查看各次尝试、请求与响应载荷（脱敏后）、以及归属的调用轨迹。",
+        "en": "The Usage page becomes a full Model Observatory workbench. Combine filters across time presets (24h/7d/30d/custom/all), model, provider and status; review aggregate metrics for call volume, latency, token usage and cost; open any call in the inspector to see its attempts, redacted request/response payloads, and the trace it belongs to."
       },
       "details": [
         {
-          "zh": "每个助手拥有独立的梦境整理核心，并与灵犀记忆槽位打通。",
-          "en": "Each agent gets its own Dream consolidation core, integrated with the Lingxi memory slot."
+          "zh": "隐私优先：观测默认关闭，需在设置中显式开启；载荷记录与二进制 blob 预览各自单独 opt-in。",
+          "en": "Privacy first: observability is off by default and must be enabled in settings; payload capture and blob preview each require a separate opt-in."
         },
         {
-          "zh": "版本浏览器支持查看当前记忆与任一历史版本的差异对比。",
-          "en": "The revision browser can diff current memory against any historical revision."
+          "zh": "相对时间预设的窗口在选中瞬间冻结，分页浏览时结果不再随时间漂移。",
+          "en": "Relative time presets freeze their window the moment they are selected, so paginated results no longer drift over time."
+        },
+        {
+          "zh": "支持按查询条件流式导出 JSONL，便于离线分析。",
+          "en": "Streaming JSONL export for the current query enables offline analysis."
         }
       ],
       "sources": [
         {
           "type": "commit",
-          "ref": "e715b8e4",
-          "title": "feat(memory): add per-agent Memory Dream core"
+          "ref": "496b4bb2",
+          "title": "feat(obs): 模型调用可观测性（Model Call Observer）"
         },
         {
           "type": "commit",
-          "ref": "8f249913",
-          "title": "feat(settings): add Memory Dream controls and revision browser"
+          "ref": "ec2a7e1b",
+          "title": "feat(obs): Phase 9 Model Observatory UI — Unified Workbench + Inspector + Provenance + Trace + Export Bridge + Legacy Retirement"
         },
         {
           "type": "commit",
-          "ref": "0271c4e9",
-          "title": "feat(memory): show current-vs-revision Dream diff"
+          "ref": "cfab8556",
+          "title": "feat(obs): Phase 8 Unified Observatory Query & Control Plane — Query Service + Accounting Projection + Settings + Export"
+        },
+        {
+          "type": "commit",
+          "ref": "3f20b58e",
+          "title": "feat(obs): Phase 10 Model Observatory E2E truth audit + adversarial validation + IANA timeZone date buckets"
         }
       ]
     },
     {
-      "id": "improve-chat-semantics-pipeline",
-      "kind": "improvement",
-      "importance": "high",
-      "title": {
-        "zh": "聊天渲染管线重构：长会话更流畅",
-        "en": "Chat rendering pipeline rebuild: smoother long conversations"
-      },
-      "summary": {
-        "zh": "聊天渲染链路重构为单通道语义流，解析前移、消息语义归一化，长会话渲染更流畅、内容显示更准确。",
-        "en": "The chat rendering pipeline was rebuilt around a single semantic channel with front-loaded parsing and normalized message semantics, making long conversations render smoother and more accurately."
-      },
-      "details": [
-        {
-          "zh": "流式更新按语义发布，Markdown 从增量源渲染，避免重复解析整段历史。",
-          "en": "Stream updates publish by semantics and markdown renders from an incremental source, avoiding re-parsing the whole history."
-        },
-        {
-          "zh": "重型历史渲染延后执行，滚动与加载大量消息时明显更顺滑。",
-          "en": "Heavy history rendering is deferred, noticeably smoothing scrolling and loading of large message lists."
-        }
-      ],
-      "sources": [
-        {
-          "type": "commit",
-          "ref": "2e2f406b",
-          "title": "feat(chat): consolidate semantics pipeline with canonical single channel"
-        },
-        {
-          "type": "commit",
-          "ref": "b78b320c",
-          "title": "perf(chat): defer heavy history rendering"
-        }
-      ]
-    },
-    {
-      "id": "fix-archived-chats-management",
-      "kind": "fix",
-      "importance": "high",
-      "title": {
-        "zh": "归档对话恢复真实标题，支持勾选批量删除",
-        "en": "Archived chats show real titles again, with selectable bulk delete"
-      },
-      "summary": {
-        "zh": "修复归档页面中对话标题全部显示为「新对话」的问题，现在会回退显示对话的首条消息作为标题；归档管理新增勾选框，可手动多选并批量删除，不再只有 30 天/90 天清理。",
-        "en": "Fixed archived chats all showing as “New chat” — titles now fall back to each conversation's first message. Archive management gains checkboxes for manual multi-select bulk deletion, beyond the 30/90-day cleanup options."
-      },
-      "details": [
-        {
-          "zh": "标题回退链路与主侧边栏一致：自定义标题优先，其次首条消息。",
-          "en": "The title fallback chain matches the main sidebar: custom title first, then first message."
-        }
-      ],
-      "sources": [
-        {
-          "type": "commit",
-          "ref": "051f6117",
-          "title": "fix(archive): restore archived chat titles and add manual bulk delete"
-        }
-      ]
-    },
-    {
-      "id": "feat-provider-capability-config",
+      "id": "feat-trace-timeline-chart",
       "kind": "feature",
       "importance": "medium",
       "title": {
-        "zh": "供应商能力模型与语音/媒体配置界面",
-        "en": "Provider capability metadata and speech/media config UI"
+        "zh": "轨迹时间线图表与日期折线",
+        "en": "Trace timeline chart and date line chart"
       },
       "summary": {
-        "zh": "统一了模型能力元数据，按用途匹配兼容性；设置中新增语音识别与媒体能力配置界面，媒体/模型配置围绕注册表能力绑定重建。",
-        "en": "Model capability metadata is unified with purpose-scoped compatibility; settings gain speech recognition and media capability configuration, rebuilt around registry capability bindings."
+        "zh": "轨迹详情新增时间线图表：按真实时间排布各模型调用，悬停查看明细；日期分组聚合从柱状图升级为按真实日期比例定位的平滑折线图，带悬停提示与自适应的坐标轴标签。",
+        "en": "Trace details gain a timeline chart that lays model calls on a real time axis with hover details; the date grouping upgrades from bars to a smooth line chart positioned by real date proportions, with hover tooltips and adaptive axis labels."
+      },
+      "details": [
+        {
+          "zh": "折线与时间线均为纯 SVG 实现，无新增图表库依赖。",
+          "en": "Both charts are pure SVG with no new charting dependency."
+        }
+      ],
+      "sources": [
+        {
+          "type": "commit",
+          "ref": "0561c1ce",
+          "title": "feat(observability): 新增轨迹时间线图表与详情视图"
+        },
+        {
+          "type": "commit",
+          "ref": "30632983",
+          "title": "feat(observability): 时间线折线图迭代 — 游标锚点 + 抽屉 scrim 收口"
+        }
+      ]
+    },
+    {
+      "id": "fix-reserved-tag-text-end-leak",
+      "kind": "fix",
+      "importance": "high",
+      "title": {
+        "zh": "修复情绪与思考内容回流聊天正文",
+        "en": "Fix mood/think segments leaking back into chat text"
+      },
+      "summary": {
+        "zh": "修复保留标签管道中 mood/think 段经 text_end 二次回流正文的问题：这类内部段不再混入最终回复，聊天记录净化也更严格。",
+        "en": "Fixes reserved-tag pipeline handling so mood/think segments no longer flow back into the visible reply via text_end; history sanitization is stricter as well."
+      },
+      "details": [
+        {
+          "zh": "历史消息净化后会删除因剥离内部段而产生的空文本段。",
+          "en": "Empty text segments left behind by stripping internal segments are now dropped during history sanitization."
+        }
+      ],
+      "sources": [
+        {
+          "type": "commit",
+          "ref": "c83d238a",
+          "title": "fix(chat): 保留标签管道 raw 单次消费与历史段净化边界"
+        }
+      ]
+    },
+    {
+      "id": "fix-credential-boundary",
+      "kind": "fix",
+      "importance": "high",
+      "title": {
+        "zh": "修复模型调用凭证边界",
+        "en": "Fix model-call credential boundaries"
+      },
+      "summary": {
+        "zh": "闭合全仓模型调用与凭证边界断点：临时凭证不再越过所属模型调用的边界，消除凭证串用隐患。",
+        "en": "Closes model-call and credential boundary gaps across the codebase: temporary credentials no longer leak across the model call they belong to, removing credential cross-use hazards."
       },
       "details": [],
       "sources": [
         {
           "type": "commit",
-          "ref": "5dc3811c",
-          "title": "feat(providers): unify model capability metadata & purpose-scoped compat"
-        },
-        {
-          "type": "commit",
-          "ref": "080948ae",
-          "title": "feat(media&providers): add speech recognition & media capabilities config UI"
+          "ref": "b8688895",
+          "title": "fix(credentials): 闭合全仓模型调用与凭证边界断点"
         }
       ]
     },
     {
-      "id": "improve-persona-agents-md",
+      "id": "fix-mac-adhoc-autoupdate",
+      "kind": "fix",
+      "importance": "high",
+      "title": {
+        "zh": "修复 mac 上自动更新安装失败",
+        "en": "Fix macOS auto-update installation failure"
+      },
+      "summary": {
+        "zh": "mac 上 ad-hoc 签名构建的自动更新此前因更新器校验机制结构性失败而静默跳过安装；现在改走自安装路径，更新下载完成后可靠完成换壳重启。待正式开发者签名配齐后该路径自动退役。",
+        "en": "On macOS, auto-updates of ad-hoc signed builds silently skipped installation because the updater's verification structurally fails; they now go through a self-install path that reliably swaps and relaunches after download. The path retires itself once proper Developer ID signing is configured."
+      },
+      "details": [],
+      "sources": [
+        {
+          "type": "commit",
+          "ref": "dcf3546a",
+          "title": "feat(updater): mac ad-hoc 构建走自安装路径"
+        }
+      ]
+    },
+    {
+      "id": "improve-brand-visuals",
       "kind": "improvement",
       "importance": "medium",
       "title": {
-        "zh": "人格配置迁移到 AGENTS.md 并兼容旧格式",
-        "en": "Persona contract migrated to AGENTS.md with legacy compatibility"
+        "zh": "应用图标与品牌视觉焕新",
+        "en": "Refreshed app icon and brand visuals"
       },
       "summary": {
-        "zh": "助手人格契约迁移到 AGENTS.md 格式，并在迁移失败时保留旧人格配置，避免人格丢失；同时修复了人格工作区重复注入的问题。",
-        "en": "The agent persona contract migrated to AGENTS.md, preserving legacy persona on failed migration so no persona is lost; also fixed duplicate persona workspace injection."
+        "zh": "应用图标、Logo 与人格立绘全面替换为新素材：新图标保留原画作主体并放大至满幅，去除内框线；托盘、Windows 图标等派生物同步重生成。",
+        "en": "App icon, logo and persona art are replaced with new assets: the new icon keeps the original artwork subject enlarged to full bleed without the inner frame; tray and Windows icon derivatives are regenerated in sync."
       },
       "details": [],
       "sources": [
         {
           "type": "commit",
-          "ref": "f781f10f",
-          "title": "feat(agent): migrate persona contract to AGENTS.md"
+          "ref": "86a029a7",
+          "title": "feat(brand): rebrand app icon, logo and persona art (new icon/logo sources)"
         },
         {
           "type": "commit",
-          "ref": "f3a1525a",
-          "title": "fix(persona): preserve legacy persona on failed AGENTS migration"
+          "ref": "440e9f57",
+          "title": "feat(brand): enlarge app icon subject to full bleed, drop inner frame line"
         }
       ]
     },
     {
-      "id": "fix-automation-resilience",
-      "kind": "fix",
+      "id": "improve-providers-page-speed",
+      "kind": "improvement",
       "importance": "medium",
       "title": {
-        "zh": "自动化任务存储更健壮",
-        "en": "More resilient automation storage"
+        "zh": "设置供应商页加载提速",
+        "en": "Faster providers settings page"
       },
       "summary": {
-        "zh": "自动化任务的本地存储损坏时现在可以安全恢复，持久化失败也会在界面中明确提示，不再静默丢失任务。",
-        "en": "Corrupt automation storage now recovers safely, and persistent store failures are surfaced in the UI instead of silently losing tasks."
+        "zh": "修复设置页供应商标签的空白延迟：概要接口由 O(N²) 聚合优化为单次遍历，多供应商场景下加载从秒级降至数十毫秒。",
+        "en": "Fixes the blank delay on the providers settings tab: the summary endpoint's O(N²) aggregation is now single-pass, cutting multi-provider load times from seconds to tens of milliseconds."
       },
       "details": [],
       "sources": [
         {
           "type": "commit",
-          "ref": "27d14477",
-          "title": "fix(automation): recover corrupt automation storage safely"
-        },
-        {
-          "type": "commit",
-          "ref": "ba9cb461",
-          "title": "fix(automation): surface persistent store failures in UI"
-        }
-      ]
-    },
-    {
-      "id": "fix-markdown-bare-url",
-      "kind": "fix",
-      "importance": "low",
-      "title": {
-        "zh": "修复编辑器中裸链接的 Markdown 渲染",
-        "en": "Fix bare markdown URLs in the editor"
-      },
-      "summary": {
-        "zh": "修复了编辑器中未包裹的裸 URL 在 Markdown 渲染时被破坏的问题。",
-        "en": "Fixed an issue where bare, unwrapped URLs were mangled by markdown rendering in the editor."
-      },
-      "details": [],
-      "sources": [
-        {
-          "type": "commit",
-          "ref": "fb032eea",
-          "title": "fix(editor): preserve bare markdown URLs"
-        }
-      ]
-    },
-    {
-      "id": "fix-windows-seed-cleanup",
-      "kind": "fix",
-      "importance": "low",
-      "title": {
-        "zh": "清理 Windows 上过期的内置种子数据",
-        "en": "Remove stale installed seed payloads on Windows"
-      },
-      "summary": {
-        "zh": "修复了 Windows 上旧版本残留的内置种子数据未被清理的问题，避免过期内容干扰新版本。",
-        "en": "Fixed stale built-in seed payloads from older versions lingering on Windows, preventing outdated content from interfering with new versions."
-      },
-      "details": [],
-      "sources": [
-        {
-          "type": "commit",
-          "ref": "18727d24",
-          "title": "fix(windows): remove stale installed seed payloads"
+          "ref": "c83d238a",
+          "title": "fix(chat): 保留标签管道 raw 单次消费与历史段净化边界"
         }
       ]
     }
