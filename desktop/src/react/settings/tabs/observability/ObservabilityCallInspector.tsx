@@ -239,10 +239,18 @@ export function ObservabilityCallInspector({ callId, isLocalOwner, onClose, onOp
       closeOnEsc
       closeOnBackdrop
       trapFocus
-      className={styles['observability-inspector-backdrop']}
+      className={styles['observability-inspector-layer']}
       backdrop="none"
       contentProps={{ role: 'dialog', 'aria-label': t('settings.observability.inspector.ariaLabel') }}
     >
+      {/* scrim 自成一层并接管抽屉外点击关闭：Overlay 的 closeOnBackdrop 只认其根节点，
+          而抽屉布局里抽屉外的点击全落在这层全覆盖 scrim 上，根节点永远收不到。 */}
+      <div
+        className={styles['observability-inspector-backdrop']}
+        onMouseDown={(event) => {
+          if (event.target === event.currentTarget) onClose();
+        }}
+      >
       <div className={styles['observability-inspector']}>
         <div className={styles['observability-inspector-head']}>
           <div className={styles['observability-inspector-title']}>
@@ -485,6 +493,7 @@ export function ObservabilityCallInspector({ callId, isLocalOwner, onClose, onOp
             )}
           </div>
         )}
+      </div>
       </div>
     </Overlay>
   );

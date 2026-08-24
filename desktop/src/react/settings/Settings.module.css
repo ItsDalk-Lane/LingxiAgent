@@ -8355,15 +8355,108 @@ a.about-link:hover {
     font-size: var(--fs-caption);
 }
 
-/* SVG 时间柱（viewBox 0 0 100 36，preserveAspectRatio=none 拉伸），rect 只认 fill，不认 background */
-.observability-date-chart {
-    display: block;
-    height: 120px;
-    padding: var(--space-8) 0;
+/* SVG 时间折线（viewBox 0 0 100 36，preserveAspectRatio=none 拉伸）。
+   non-scaling-stroke 让线宽/圆点以屏幕像素为单位，不被非均匀拉伸拉宽。 */
+.observability-date-figure {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+    margin: var(--space-8) 0;
 }
 
-.observability-date-bar {
-    fill: var(--accent);
+.observability-date-plot {
+    position: relative;
+}
+
+.observability-date-chart {
+    display: block;
+    /* width 不写 100% 时 Chromium 按 viewBox 宽高比给 svg 算 ~333px 固定宽度，
+       图表不铺满面板，与按容器百分比定位的 X 轴标签错位 */
+    width: 100%;
+    height: 120px;
+}
+
+.observability-date-gradient-top {
+    stop-color: var(--accent);
+    stop-opacity: 0.28;
+}
+
+.observability-date-gradient-bottom {
+    stop-color: var(--accent);
+    stop-opacity: 0.02;
+}
+
+.observability-date-area {
+    fill: url(#observability-date-area-gradient);
+}
+
+.observability-date-line {
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 2px;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    vector-effect: non-scaling-stroke;
+}
+
+.observability-date-point {
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 4px;
+    stroke-linecap: round;
+    vector-effect: non-scaling-stroke;
+}
+
+.observability-date-guide {
+    stroke: var(--text-muted);
+    stroke-opacity: 0.4;
+    stroke-width: 1px;
+    stroke-dasharray: 3 3;
+    vector-effect: non-scaling-stroke;
+}
+
+.observability-date-hit {
+    fill: transparent;
+}
+
+.observability-date-axis {
+    position: relative;
+    height: 1.6em;
+}
+
+.observability-date-tick {
+    position: absolute;
+    top: 0;
+    left: var(--observability-date-tick-x, 0%);
+    transform: translateX(-50%);
+    font-size: var(--fs-caption);
+    color: var(--text-muted);
+    white-space: nowrap;
+}
+
+.observability-date-tooltip {
+    position: absolute;
+    left: var(--observability-date-tooltip-x, 50%);
+    top: var(--observability-date-tooltip-y, 0%);
+    transform: translate(-50%, calc(-100% - var(--space-6)));
+    padding: var(--space-4) var(--space-6);
+    border: var(--border-width, 1px) solid color-mix(in srgb, var(--accent) 24%, var(--border));
+    border-radius: var(--radius-sm);
+    background: var(--bg-card);
+    color: var(--text);
+    font-size: var(--fs-caption);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    pointer-events: none;
+    box-shadow: var(--chart-tooltip-shadow);
+}
+
+.observability-date-tooltip[data-align='start'] {
+    transform: translate(0, calc(-100% - var(--space-6)));
+}
+
+.observability-date-tooltip[data-align='end'] {
+    transform: translate(-100%, calc(-100% - var(--space-6)));
 }
 
 .observability-group-rows {
@@ -8524,6 +8617,18 @@ a.about-link:hover {
 }
 
 /* ---------- Call inspector ---------- */
+/* Overlay 内容容器改做的全屏定位层（z 序锚点，自身透明不拦事件）；scrim 在内层接管点击关闭 */
+.observability-inspector-layer {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    max-width: none;
+    max-height: none;
+    z-index: 40;
+}
+
 .observability-inspector-backdrop {
     position: absolute;
     top: 0;
@@ -8531,7 +8636,6 @@ a.about-link:hover {
     bottom: 0;
     left: 0;
     background: var(--scrim-30);
-    z-index: 40;
 }
 
 .observability-inspector {
@@ -9166,7 +9270,7 @@ a.about-link:hover {
 
 .observability-trace-dot {
     cursor: pointer;
-    transition: transform 0.1s ease;
+    transition: transform var(--duration-instant) var(--ease-out);
     transform-box: fill-box;
     transform-origin: center;
 }

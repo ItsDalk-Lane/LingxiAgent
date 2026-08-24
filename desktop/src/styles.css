@@ -54,6 +54,8 @@
     --tooltip-text: var(--bg);
     --tooltip-border: transparent;
     --tooltip-shadow: rgba(0, 0, 0, 0.16);
+    /* 图表悬浮卡片的双层投影（bridge avatar 同款）；黑上加黑，暗主题继承亮值不翻白 */
+    --chart-tooltip-shadow: 0 3px 12px rgba(0, 0, 0, 0.12), 0 1px 4px rgba(0, 0, 0, 0.08);
 
     /* scrim 遮罩分档（样式立法⑤ 任务 B）：overlay/backdrop 压暗背景专用，
        禁止用于 box-shadow（overlay 语境在暗主题会翻白，见 --overlay-* 同类事故） */

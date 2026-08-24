@@ -20,7 +20,9 @@ import {
   clearAllFilterChips,
   DEFAULT_OBSERVABILITY_FILTER,
   DEFAULT_OBSERVABILITY_GROUP_BY,
+  isRelativeDatePreset,
   removeFilterChip,
+  stampDateAnchorIfMissing,
   type ObservabilityFilterChip,
   type ObservabilityFilterState,
 } from './model-observability-filter';
@@ -64,14 +66,24 @@ export type ObservabilityQueryStateApi = {
 };
 
 export function useObservabilityQueryState(): ObservabilityQueryStateApi {
-  const [appliedFilter, setAppliedFilter] = useState<ObservabilityFilterState>(DEFAULT_OBSERVABILITY_FILTER);
+  // 挂载即给默认 7d 打锚点：since 不随后续请求时刻滚动（游标指纹契约）。
+  const [appliedFilter, setAppliedFilter] = useState<ObservabilityFilterState>(
+    () => stampDateAnchorIfMissing({ ...DEFAULT_OBSERVABILITY_FILTER }),
+  );
   const [drafts, setDraftsState] = useState<ObservabilityTextDrafts>(EMPTY_DRAFTS);
   const [groupBy, setGroupByState] = useState<ModelObservabilityGroupByDimension[]>([...DEFAULT_OBSERVABILITY_GROUP_BY]);
   const [selectedCallId, setSelectedCallId] = useState<string | null>(null);
   const [selectedTraceId, setSelectedTraceId] = useState<string | null>(null);
 
   const patchFilter = useCallback((patch: Partial<ObservabilityFilterState>) => {
-    setAppliedFilter((prev) => ({ ...prev, ...patch }));
+    setAppliedFilter((prev) => {
+      const next = { ...prev, ...patch };
+      // 重选相对预设 → 换新锚（新窗口）；同一预设期内锚点保持不变。
+      if (patch.datePreset !== undefined && patch.datePreset !== prev.datePreset && isRelativeDatePreset(patch.datePreset)) {
+        return stampDateAnchorIfMissing({ ...next, presetAnchorMs: null });
+      }
+      return stampDateAnchorIfMissing(next);
+    });
   }, []);
 
   const setDrafts = useCallback((patch: Partial<ObservabilityTextDrafts>) => {
@@ -107,7 +119,8 @@ export function useObservabilityQueryState(): ObservabilityQueryStateApi {
   }, []);
 
   const removeChip = useCallback((chip: ObservabilityFilterChip) => {
-    setAppliedFilter((prev) => removeFilterChip(prev, chip));
+    // removeFilterChip 对 date chip 置空锚点 → 这里统一补新锚。
+    setAppliedFilter((prev) => stampDateAnchorIfMissing(removeFilterChip(prev, chip)));
     // exact/date chip 移除时同步清 draft，避免「删了 chip 文本还在」。
     if (chip.kind === 'exact') {
       setDraftsState((prev) => ({ ...prev, [chip.field]: '' }));
@@ -117,7 +130,7 @@ export function useObservabilityQueryState(): ObservabilityQueryStateApi {
   }, []);
 
   const clearAllFilters = useCallback(() => {
-    setAppliedFilter(clearAllFilterChips());
+    setAppliedFilter(stampDateAnchorIfMissing(clearAllFilterChips()));
     setDraftsState(EMPTY_DRAFTS);
   }, []);
 

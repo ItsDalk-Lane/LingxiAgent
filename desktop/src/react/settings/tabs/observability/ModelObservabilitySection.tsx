@@ -303,7 +303,12 @@ export function ModelObservabilitySection() {
         callId={queryState.selectedCallId}
         isLocalOwner={isLocalOwner}
         onClose={() => queryState.selectCall(null)}
-        onOpenTrace={handleSelectTrace}
+        onOpenTrace={(traceId) => {
+          // 交叉跳转对称处理：先收起调用抽屉再开轨迹弹层，避免轨迹被抽屉遮挡
+          //（与轨迹树→调用详情方向的「先收起轨迹弹窗」互逆）。
+          queryState.selectCall(null);
+          handleSelectTrace(traceId);
+        }}
       />
 
       <ObservabilitySettingsDialog

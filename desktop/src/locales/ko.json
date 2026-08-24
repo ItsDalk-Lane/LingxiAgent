@@ -2593,6 +2593,7 @@
         "loading": "집계 로드 중…",
         "empty": "현재 필터에서 집계 데이터가 없습니다",
         "dateChartAria": "날짜별 호출량",
+        "datePointTooltip": "{date}: {count}회 호출",
         "dateSummary": "총 {total}회 호출, 최다 {peakDate}({peakCount}회)",
         "filterByValue": "이 값으로 필터: {value}",
         "unknownValue": "(알 수 없음)"

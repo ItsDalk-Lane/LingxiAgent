@@ -2592,6 +2592,7 @@
         "loading": "Loading aggregates…",
         "empty": "No aggregate data under current filters",
         "dateChartAria": "Call volume by date",
+        "datePointTooltip": "{date}: {count} calls",
         "dateSummary": "{total} calls total, peak on {peakDate} ({peakCount})",
         "filterByValue": "Filter by value: {value}",
         "unknownValue": "(unknown)"

@@ -2591,7 +2591,8 @@
       "groups": {
         "loading": "加载分组统计…",
         "empty": "当前过滤下无分组数据",
-        "dateChartAria": "按日期的调用量柱状图",
+        "dateChartAria": "按日期的调用量折线图",
+        "datePointTooltip": "{date}：{count} 次调用",
         "dateSummary": "共 {total} 次调用，峰值 {peakDate}（{peakCount} 次）",
         "filterByValue": "按此值筛选：{value}",
         "unknownValue": "（未知）"

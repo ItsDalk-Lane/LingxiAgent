@@ -2592,7 +2592,8 @@
       "groups": {
         "loading": "載入分组统计…",
         "empty": "目前過濾下無分组資料",
-        "dateChartAria": "按日期的呼叫量柱狀圖",
+        "dateChartAria": "按日期的呼叫量折線圖",
+        "datePointTooltip": "{date}：{count} 次呼叫",
         "dateSummary": "共 {total} 次呼叫，峰值 {peakDate}（{peakCount} 次）",
         "filterByValue": "按此值篩選：{value}",
         "unknownValue": "（未知）"

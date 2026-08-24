@@ -2593,6 +2593,7 @@
         "loading": "集計を読み込み中…",
         "empty": "現在のフィルターでは集計データがありません",
         "dateChartAria": "日付別の呼び出し量",
+        "datePointTooltip": "{date}：{count} 回の呼び出し",
         "dateSummary": "合計 {total} 回、ピークは {peakDate}（{peakCount} 回）",
         "filterByValue": "この値でフィルター：{value}",
         "unknownValue": "（不明）"
