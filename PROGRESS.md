@@ -10,7 +10,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = 7010fb06fed37596cb63ea14b41debfb1c45ac3e  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-08-24 v0.1.30 release 元数据提交)
+VERIFIED_SOURCE_SHA   = e76918ef5fa1e2db606ca4efbde2209eefd2d2bf  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-08-24 Linux /tmp redaction 修复)
 工作分支              = feature/upstream-sync-0.447.4
 ```
 
@@ -335,6 +335,14 @@ seal 不是一次性终点，而是"当前被验证树"的游标；每次审计�
   typecheck ×3（绿）+ validate-release-digest v1/v2 + release-preflight --tag v0.1.30
   （PASS，historicalMaximum 0.1.29/7）+ test:artifact-release-smoke 8 文件 304 用例 +
   digest/workflow/seal/matrix 目标套件 7 文件 59 用例全绿后推进。
+
+- **2026-08-24 Linux /tmp redaction 修复**（e76918ef，v0.1.30 tag 重打前插入）：
+  v0.1.30 build run 32729830490 的 Linux quality-gate 首跑暴露 redaction 本地路径
+  正则盲区——FULL/INLINE_LOCAL_PATH 不认 /tmp、/var/tmp（macOS /private/var/folders
+  与 Windows 盘符恰好被覆盖），Linux TMPDIR 下 blob 外置路径泄漏进 payload 正文、
+  audio 整串不转 descriptor（payload-media/payload-speech/e2e-media-speech 三文件
+  七用例）。补 POSIX 临时目录分支 + 回归锁定用例。验证：定向 4 文件 77 用例绿 +
+  persistence guard OK（redaction.ts 非受护源）+ typecheck ×3 + eslint 0 error 后推进。
 
 
 ## 最终状态：已合并（上游同步部分）
