@@ -65,6 +65,8 @@ describe("redactTextWithMap 正例（高置信 inline secret 必须替换）", (
     [POISONS.userTextSecret, "kv secret"],
     [`access_token: "TOPSECRET_ACCESS_TOKEN_VALUE_0011223344"`, "kv secret quoted"],
     [`download from /Users/taro/secret/pic.png now`, "inline local path"],
+    [`blob at /tmp/hana-speech-payload-abc123/voice.wav ok`, "inline /tmp local path (Linux TMPDIR)"],
+    [`cache under /var/tmp/hana-media-payload-xyz9/ref.png`, "inline /var/tmp local path"],
   ];
 
   for (const [input, label] of positiveCases) {
@@ -225,6 +227,14 @@ describe("本地绝对路径（§三十）", () => {
 
   it("Windows 路径同样处理", () => {
     expect(looksLikeLocalPath("C:\\Users\\taro\\media\\ref.png")).toBe(true);
+  });
+
+  it("POSIX 临时目录路径同样处理（Linux TMPDIR 泄漏回归锁定）", () => {
+    expect(looksLikeLocalPath("/tmp/hana-speech-payload-abc123/voice.wav")).toBe(true);
+    const { value, sanitization } = sanitizeValueForCapture("/tmp/hana-speech-payload-abc123/voice.wav");
+    expect(value).toMatchObject({ kind: "local_file_reference", basename: "voice.wav" });
+    expect(sanitization.redacted).toBe(true);
+    expect(looksLikeLocalPath("/var/tmp/hana-media-payload-xyz9/ref.png")).toBe(true);
   });
 
   it("普通 URL 字符串不是本地路径", () => {
