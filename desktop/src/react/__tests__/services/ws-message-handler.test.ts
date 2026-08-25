@@ -1225,6 +1225,117 @@ describe('ws-message-handler compaction lifecycle', () => {
       percent: null,
     });
   });
+
+  it('stores the context_usage breakdown alongside the totals', () => {
+    const breakdown = {
+      system: 100, skills: 20, files: 0, tools: 40, mcp: 10,
+      conversation: 200, user: 15, toolResults: 30, other: 85,
+      total: 500, computedAt: 1,
+    };
+    handleServerMessage({
+      type: 'context_usage',
+      sessionPath: '/session/a.jsonl',
+      tokens: 500,
+      contextWindow: 200_000,
+      percent: 0.25,
+      breakdown,
+    });
+
+    expect(useStore.getState().contextBySession['/session/a.jsonl']).toEqual({
+      tokens: 500,
+      window: 200_000,
+      percent: 0.25,
+      breakdown,
+    });
+  });
+
+  it('keeps the existing breakdown when a context_usage message omits the field', () => {
+    const breakdown = {
+      system: 100, skills: 0, files: 0, tools: 40, mcp: 0,
+      conversation: 200, user: 15, toolResults: 30, other: 115,
+      total: 500, computedAt: 1,
+    };
+    useStore.setState({
+      contextBySession: {
+        '/session/a.jsonl': { tokens: 500, window: 200_000, percent: 0.25, breakdown },
+      },
+    } as never);
+
+    handleServerMessage({
+      type: 'context_usage',
+      sessionPath: '/session/a.jsonl',
+      tokens: 520,
+      contextWindow: 200_000,
+      percent: 0.26,
+    });
+
+    expect(useStore.getState().contextBySession['/session/a.jsonl']).toEqual({
+      tokens: 520,
+      window: 200_000,
+      percent: 0.26,
+      breakdown,
+    });
+  });
+
+  it('clears the breakdown when compaction_end explicitly reports null', () => {
+    const breakdown = {
+      system: 100, skills: 0, files: 0, tools: 40, mcp: 0,
+      conversation: 200, user: 15, toolResults: 30, other: 115,
+      total: 500, computedAt: 1,
+    };
+    useStore.setState({
+      compactingSessions: ['/session/a.jsonl'],
+      contextBySession: {
+        '/session/a.jsonl': { tokens: 500, window: 200_000, percent: 0.25, breakdown },
+      },
+    } as never);
+
+    handleServerMessage({
+      type: 'compaction_end',
+      sessionPath: '/session/a.jsonl',
+      tokens: null,
+      contextWindow: 200_000,
+      percent: null,
+      breakdown: null,
+    });
+
+    expect(useStore.getState().contextBySession['/session/a.jsonl']).toEqual({
+      tokens: null,
+      window: 200_000,
+      percent: null,
+      breakdown: null,
+    });
+  });
+
+  it('keeps the breakdown when compaction_end carries a fresh one', () => {
+    const breakdown = {
+      system: 90, skills: 0, files: 0, tools: 40, mcp: 0,
+      conversation: 50, user: 10, toolResults: 0, other: 10,
+      total: 200, computedAt: 2,
+    };
+    useStore.setState({
+      compactingSessions: ['/session/a.jsonl'],
+      contextBySession: {
+        '/session/a.jsonl': { tokens: 500, window: 200_000, percent: 0.25, breakdown: null },
+      },
+    } as never);
+
+    handleServerMessage({
+      type: 'compaction_end',
+      sessionPath: '/session/a.jsonl',
+      tokens: 200,
+      contextWindow: 200_000,
+      percent: 0.1,
+      breakdown,
+    });
+
+    expect(useStore.getState().contextBySession['/session/a.jsonl']).toEqual({
+      tokens: 200,
+      window: 200_000,
+      percent: 0.1,
+      breakdown,
+    });
+  });
 });
 
 describe('ws-message-handler app events', () => {

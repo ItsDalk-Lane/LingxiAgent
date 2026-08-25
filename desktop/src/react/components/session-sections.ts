@@ -1,38 +1,7 @@
 import type { Session } from '../types';
-import type {
-  SessionProject,
-  SessionProjectCatalog,
-  SessionProjectFolder,
-  SessionProjectFolderGroup,
-  SessionProjectGroup,
-} from '../types/session-projects';
-import {
-  UNCATEGORIZED_PROJECT_ID,
-  autoProjectIdForCwd as makeAutoProjectIdForCwd,
-  autoProjectNameForCwd,
-  isAutoProjectId,
-} from '../../../../shared/session-projects.ts';
+import { isSameWorkspacePath } from '../utils/agent-workspace';
 
-export type {
-  SessionProject,
-  SessionProjectCatalog,
-  SessionProjectFolder,
-  SessionProjectFolderGroup,
-  SessionProjectGroup,
-} from '../types/session-projects';
-
-export type SessionViewMode = 'time' | 'project';
 export type DateGroup = 'today' | 'thisWeek' | 'earlier';
-
-export interface SessionProjectView {
-  pinned: Session[];
-  rootProjects: SessionProjectGroup[];
-  folders: SessionProjectFolderGroup[];
-  // True while the project catalog has not finished loading. Consumers should show a
-  // loading affordance instead of trusting the (intentionally incomplete) grouping,
-  // because catalog-assigned sessions are held back rather than demoted to cwd.
-  pending: boolean;
-}
 
 export type SessionSection =
   | {
@@ -101,10 +70,6 @@ function comparePinned(a: Session, b: Session): number {
   return compareByModifiedDesc(a, b);
 }
 
-export function autoProjectIdForCwd(cwd: string | null | undefined): string {
-  return makeAutoProjectIdForCwd(cwd);
-}
-
 export function buildSessionSections(
   sessions: Session[],
   options: BuildSessionSectionsOptions = {},
@@ -152,140 +117,67 @@ export function buildSessionSections(
   return sections;
 }
 
-interface BuildSessionProjectViewOptions {
-  // Whether the catalog has finished loading. Defaults to true so existing callers
-  // and tests keep the "project missing -> fall back to cwd" semantics. When false,
-  // catalog-assigned sessions whose project has not arrived yet are held back.
-  catalogLoaded?: boolean;
+// ── Workspace 作用域（任务七/八：左栏聊天列表只显示当前工作台的会话） ──
+
+/** 当前工作台身份：mount 工作台用 mountId，本地目录工作台用规范化后的 basePath。 */
+export interface WorkspaceScope {
+  mountId: string | null;
+  basePath: string | null;
 }
 
-export function buildSessionProjectView(
+function normalizeScopeMountId(value: string | null | undefined): string | null {
+  return typeof value === 'string' && value.trim() ? value.trim() : null;
+}
+
+/**
+ * 解析当前左栏应使用的工作台身份。
+ *
+ * - 有当前会话时以 desk（已激活工作台）为准：mount 优先，否则 deskBasePath；
+ * - pending 新会话（无 currentSessionPath）时以 pending 目标（selectedWorkspaceMountId /
+ *   selectedFolder）为准；两者都未落地时退回 desk 身份（启动窗口期 desk 先恢复）。
+ */
+export function resolveWorkspaceScope(state: {
+  currentSessionPath: string | null;
+  deskWorkspaceMountId: string | null;
+  deskBasePath: string | null;
+  selectedWorkspaceMountId: string | null;
+  selectedFolder: string | null;
+}): WorkspaceScope {
+  if (!state.currentSessionPath) {
+    const pendingMountId = normalizeScopeMountId(state.selectedWorkspaceMountId);
+    if (pendingMountId) return { mountId: pendingMountId, basePath: null };
+    if (state.selectedFolder) return { mountId: null, basePath: state.selectedFolder };
+  }
+  const deskMountId = normalizeScopeMountId(state.deskWorkspaceMountId);
+  if (deskMountId) return { mountId: deskMountId, basePath: null };
+  return { mountId: null, basePath: state.deskBasePath || null };
+}
+
+/**
+ * Session 是否属于给定工作台作用域（数据层判定，非视觉过滤）：
+ *
+ * - mount 作用域：session.workspaceMountId 严格等值（不做显示名模糊匹配）；
+ * - 本地目录作用域：带 workspaceMountId 的 session 不混入；其余按项目现有
+ *   规范化路径规则（isSameWorkspacePath：反斜杠/尾斜杠归一、Windows/UNC 大小写不敏感）
+ *   比较 session.cwd 与作用域根；cwd 缺失视为无身份，不归属。
+ */
+export function sessionBelongsToWorkspaceScope(
+  session: Pick<Session, 'cwd' | 'workspaceMountId'>,
+  scope: WorkspaceScope,
+): boolean {
+  const scopeMountId = normalizeScopeMountId(scope.mountId);
+  const sessionMountId = normalizeScopeMountId(session.workspaceMountId);
+  if (scopeMountId) {
+    return sessionMountId === scopeMountId;
+  }
+  if (sessionMountId) return false;
+  if (!scope.basePath) return false;
+  return isSameWorkspacePath(session.cwd, scope.basePath);
+}
+
+export function filterSessionsForWorkspaceScope(
   sessions: Session[],
-  catalog: SessionProjectCatalog = { projects: [] },
-  options: BuildSessionProjectViewOptions = {},
-): SessionProjectView {
-  const catalogLoaded = options.catalogLoaded ?? true;
-  const pinned = sessions
-    .filter(isPinnedSession)
-    .sort(comparePinned);
-  const regular = sessions.filter(session => !isPinnedSession(session));
-
-  const catalogFolders = normalizeCatalogFolders(catalog.folders);
-  const folderIds = new Set(catalogFolders.map(folder => folder.id));
-  const catalogProjects = normalizeCatalogProjects(catalog.projects);
-  const projectById = new Map<string, SessionProjectGroup>();
-
-  for (const project of catalogProjects) {
-    projectById.set(project.id, {
-      id: project.id,
-      name: project.name,
-      folderId: project.folderId && folderIds.has(project.folderId) ? project.folderId : null,
-      order: project.order,
-      source: 'catalog',
-      items: [],
-    });
-  }
-
-  for (const session of regular) {
-    const explicitProjectId = typeof session.projectId === 'string' ? session.projectId.trim() : '';
-    const catalogAssigned = !!explicitProjectId && !isAutoProjectId(explicitProjectId);
-    // Catalog still loading: a session pointing at a custom project we have not
-    // received yet is held back, never demoted into a cwd-derived project. Demoting
-    // here is exactly what made custom projects vanish (their sessions dumped into the
-    // auto cwd group) until the user toggled the sort order and triggered a reload.
-    if (!catalogLoaded && catalogAssigned && !projectById.has(explicitProjectId)) {
-      continue;
-    }
-    const targetId = explicitProjectId && (projectById.has(explicitProjectId) || isAutoProjectId(explicitProjectId))
-      ? explicitProjectId
-      : autoProjectIdForCwd(session.cwd);
-    const project = ensureProjectGroup(projectById, targetId, session);
-    project.items.push(session);
-  }
-
-  for (const project of projectById.values()) {
-    project.items.sort(compareByModifiedDesc);
-  }
-
-  const allProjects = Array.from(projectById.values());
-  const rootProjects = allProjects
-    .filter(project => !project.folderId)
-    .sort(compareProjectGroups);
-  const folders = catalogFolders
-    .map(folder => ({
-      ...folder,
-      projects: allProjects
-        .filter(project => project.folderId === folder.id)
-        .sort(compareProjectGroups),
-    }))
-    .sort(compareFolders);
-
-  return { pinned, rootProjects, folders, pending: !catalogLoaded };
-}
-
-function ensureProjectGroup(
-  projectById: Map<string, SessionProjectGroup>,
-  projectId: string,
-  session: Session,
-): SessionProjectGroup {
-  const existing = projectById.get(projectId);
-  if (existing) return existing;
-  const project: SessionProjectGroup = {
-    id: projectId,
-    name: projectId === UNCATEGORIZED_PROJECT_ID
-      ? '未归类'
-      : autoProjectNameForCwd(session.cwd, '未指定项目'),
-    folderId: null,
-    order: Number.MAX_SAFE_INTEGER,
-    source: 'cwd',
-    items: [],
-  };
-  projectById.set(projectId, project);
-  return project;
-}
-
-function normalizeCatalogProjects(
-  projects: SessionProject[] | undefined,
-): SessionProject[] {
-  if (!Array.isArray(projects)) return [];
-  return projects
-    .filter(project => !!project && typeof project.id === 'string' && typeof project.name === 'string')
-    .map((project, index) => ({
-      id: project.id,
-      name: project.name,
-      folderId: typeof project.folderId === 'string' && project.folderId.trim() ? project.folderId.trim() : null,
-      order: Number.isFinite(project.order) ? project.order : index,
-    }));
-}
-
-function normalizeCatalogFolders(
-  folders: SessionProjectFolder[] | undefined,
-): SessionProjectFolder[] {
-  if (!Array.isArray(folders)) return [];
-  return folders
-    .filter(folder => !!folder && typeof folder.id === 'string' && typeof folder.name === 'string')
-    .map((folder, index) => ({
-      id: folder.id,
-      name: folder.name,
-      order: Number.isFinite(folder.order) ? folder.order : index,
-    }));
-}
-
-function compareProjectGroups(a: SessionProjectGroup, b: SessionProjectGroup): number {
-  if (a.source !== b.source) return a.source === 'catalog' ? -1 : 1;
-  const latestDelta = latestModifiedTime(b) - latestModifiedTime(a);
-  return a.order - b.order
-    || (a.source === 'cwd' ? latestDelta : 0)
-    || a.name.localeCompare(b.name)
-    || a.id.localeCompare(b.id);
-}
-
-function latestModifiedTime(project: SessionProjectGroup): number {
-  return project.items.reduce((latest, session) => Math.max(latest, modifiedTime(session)), 0);
-}
-
-function compareFolders(a: SessionProjectFolderGroup, b: SessionProjectFolderGroup): number {
-  return a.order - b.order
-    || a.name.localeCompare(b.name)
-    || a.id.localeCompare(b.id);
+  scope: WorkspaceScope,
+): Session[] {
+  return sessions.filter(session => sessionBelongsToWorkspaceScope(session, scope));
 }

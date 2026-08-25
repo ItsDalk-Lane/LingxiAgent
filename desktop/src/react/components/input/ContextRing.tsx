@@ -12,7 +12,10 @@ import {
   INSTANT_SIMPLE_COMPACTION_EXPERIMENT_ID,
   INSTANT_SIMPLE_COMPACTION_METHOD,
 } from '../../../../../shared/compaction-mode.ts';
+import { CONTEXT_USAGE_BREAKDOWN_CATEGORIES } from '../../../../../shared/context-usage-breakdown.ts';
 import styles from './InputArea.module.css';
+
+const formatDetailTokens = (value: number) => Math.round(value).toLocaleString();
 
 export function ContextRing() {
   const { t } = useI18n();
@@ -22,6 +25,7 @@ export function ContextRing() {
   const [percent, setPercent] = useState<number | null>(null);
   const [compacting, setCompacting] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [detailOpen, setDetailOpen] = useState(false);
   const [instantSimpleEnabled, setInstantSimpleEnabled] = useState(false);
   const anchorRef = useRef<HTMLElement | null>(null);
 
@@ -52,6 +56,7 @@ export function ContextRing() {
 
   useEffect(() => {
     setMenuOpen(false);
+    setDetailOpen(false);
   }, [currentSessionPath]);
 
   useEffect(() => {
@@ -91,8 +96,24 @@ export function ContextRing() {
 
   const handleClick = useCallback(() => {
     if (busy) return;
-    setMenuOpen(open => !open);
+    setMenuOpen(open => {
+      if (open) setDetailOpen(false);
+      return !open;
+    });
   }, [busy]);
+
+  const closeMenu = useCallback(() => {
+    setMenuOpen(false);
+    setDetailOpen(false);
+  }, []);
+
+  const handleShowDetail = useCallback(() => {
+    setDetailOpen(true);
+  }, []);
+
+  const handleHideDetail = useCallback(() => {
+    setDetailOpen(false);
+  }, []);
 
   const handleRefreshAndCompact = useCallback(() => {
     if (!currentSessionPath || busy) return;
@@ -144,6 +165,21 @@ export function ContextRing() {
   // token 数量格式化
   const tokensK = Math.round(displayTokens / 1000);
   const windowK = contextWindow != null ? Math.round(contextWindow / 1000) : 0;
+
+  // 详情视图数据:keyed store 按 session 隔离,切会话后 contextEntry 已指向新
+  // session,旧明细不会残留。breakdown 由服务端在最终请求边界统计并对账后下发;
+  // 旧服务端 / compaction 后为 null,详情只显示"暂无数据",不影响 Ring 本身。
+  const breakdown = contextEntry?.breakdown ?? null;
+  const detailTotal = typeof breakdown?.total === 'number' ? breakdown.total : null;
+  const detailUsed = tokens ?? detailTotal;
+  const detailRemaining = detailUsed != null && contextWindow != null
+    ? Math.max(0, contextWindow - detailUsed)
+    : null;
+  const detailRows = breakdown && detailTotal != null && detailTotal > 0
+    ? CONTEXT_USAGE_BREAKDOWN_CATEGORIES
+      .map(category => ({ category, categoryTokens: breakdown[category] ?? 0 }))
+      .filter(row => row.categoryTokens > 0)
+    : [];
 
   const tooltipContent = (
     <>
@@ -206,46 +242,100 @@ export function ContextRing() {
         role="menu"
         align="end"
         offset={6}
-        onClose={() => setMenuOpen(false)}
+        onClose={closeMenu}
       >
-        <button
-          type="button"
-          className={styles['context-ring-menu-item']}
-          role="menuitem"
-          onClick={handleCompact}
-          disabled={busy}
-        >
-          {t('input.compact')}
-        </button>
-        <Tooltip
-          content={t('input.refreshAndCompactTooltip')}
-          placement="left"
-          align="center"
-        >
-          {({ ref, ...tooltipProps }) => (
+        {detailOpen ? (
+          <div className={styles['context-ring-detail']}>
+            <div className={styles['context-ring-detail-head']}>
+              <button
+                type="button"
+                className={styles['context-ring-menu-item']}
+                role="menuitem"
+                onClick={handleHideDetail}
+              >
+                {t('input.contextDetailBack')}
+              </button>
+              <span className={styles['context-ring-detail-title']}>{t('input.contextDetail')}</span>
+            </div>
+            {breakdown && detailTotal != null ? (
+              <>
+                <div className={styles['context-ring-detail-row']}>
+                  <span>{t('input.contextDetailUsed')}</span>
+                  <span>{detailUsed != null ? formatDetailTokens(detailUsed) : '—'}</span>
+                </div>
+                <div className={styles['context-ring-detail-row']}>
+                  <span>{t('input.contextDetailWindowTotal')}</span>
+                  <span>{contextWindow != null ? formatDetailTokens(contextWindow) : '—'}</span>
+                </div>
+                <div className={styles['context-ring-detail-row']}>
+                  <span>{t('input.contextDetailRemaining')}</span>
+                  <span>{detailRemaining != null ? formatDetailTokens(detailRemaining) : '—'}</span>
+                </div>
+                {detailRows.map(row => (
+                  <div key={row.category} className={styles['context-ring-detail-row']}>
+                    <span>{t(`input.contextCategory.${row.category}`)}</span>
+                    <span>
+                      {formatDetailTokens(row.categoryTokens)}
+                      {' · '}
+                      {Math.round((row.categoryTokens / detailTotal) * 100)}%
+                    </span>
+                  </div>
+                ))}
+              </>
+            ) : (
+              <div className={styles['context-ring-detail-empty']}>{t('input.contextDetailEmpty')}</div>
+            )}
+          </div>
+        ) : (
+          <>
             <button
               type="button"
-              ref={ref}
               className={styles['context-ring-menu-item']}
               role="menuitem"
-              onClick={handleRefreshAndCompact}
+              onClick={handleCompact}
               disabled={busy}
-              {...tooltipProps}
             >
-              {t('input.refreshAndCompact')}
+              {t('input.compact')}
             </button>
-          )}
-        </Tooltip>
-        {instantSimpleEnabled && (
-          <button
-            type="button"
-            className={styles['context-ring-menu-item']}
-            role="menuitem"
-            onClick={handleInstantSimpleCompact}
-            disabled={busy}
-          >
-            {t('chat.instantSimpleCompaction')}
-          </button>
+            <Tooltip
+              content={t('input.refreshAndCompactTooltip')}
+              placement="left"
+              align="center"
+            >
+              {({ ref, ...tooltipProps }) => (
+                <button
+                  type="button"
+                  ref={ref}
+                  className={styles['context-ring-menu-item']}
+                  role="menuitem"
+                  onClick={handleRefreshAndCompact}
+                  disabled={busy}
+                  {...tooltipProps}
+                >
+                  {t('input.refreshAndCompact')}
+                </button>
+              )}
+            </Tooltip>
+            {instantSimpleEnabled && (
+              <button
+                type="button"
+                className={styles['context-ring-menu-item']}
+                role="menuitem"
+                onClick={handleInstantSimpleCompact}
+                disabled={busy}
+              >
+                {t('chat.instantSimpleCompaction')}
+              </button>
+            )}
+            <button
+              type="button"
+              className={styles['context-ring-menu-item']}
+              role="menuitem"
+              onClick={handleShowDetail}
+            >
+              {t('input.contextDetail')}
+            </button>
+          </>
         )}
       </AnchoredPortal>
     </>

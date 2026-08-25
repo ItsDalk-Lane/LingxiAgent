@@ -3,89 +3,47 @@
  *
  * Phase 6B: 替代 sidebar-shim.ts 中的 renderSessionList / createSessionItem。
  * 通过 portal 渲染到 #sessionList，从 Zustand sessions 状态驱动。
+ *
+ * 布局重构（任务七~十）：
+ * - 列表在数据层按当前工作台作用域过滤（mount 严格等值 / 本地目录规范化 cwd 比较），
+ *   不做视觉遮盖；无可靠身份的 session 不显示、不删除，仍可被全局搜索找到。
+ * - 项目/时间视图切换、项目目录式导航已从常驻左栏移除；时间分组（置顶/today/week/earlier）
+ *   保留为列表组织。项目数据动作（session-project-actions/store/API）保持现状。
+ * - 搜索已抽离到 Titlebar 放大镜 + 居中搜索界面（components/search/ChatSearchOverlay）。
  */
 
 import { Fragment, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { Collapse } from '@/ui';
 import { useStore } from '../stores';
 import { lingxiFetch } from '../hooks/use-hana-fetch';
 import { useI18n } from '../hooks/use-i18n';
 import { formatSessionDate } from '../utils/format';
-import { switchSession, archiveSession, renameSession, pinSession, createNewSession, reorderPinnedSessions } from '../stores/session-actions';
-import { locateSearchHit } from '../stores/chat-find-actions';
+import { switchSession, archiveSession, renameSession, pinSession, reorderPinnedSessions } from '../stores/session-actions';
 import { setBrowserStateForPath } from '../stores/browser-slice';
 import { sessionScopedListIncludes } from '../stores/session-slice';
 import type { Session, Agent } from '../types';
 import { AgentAvatar, resolveAgentDisplayInfo } from '../utils/agent-display';
-import {
-  autoProjectIdForCwd,
-  buildSessionProjectView,
-  buildSessionSections,
-  type SessionViewMode,
-} from './session-sections';
-import type { SessionProjectFolderGroup, SessionProjectGroup } from '../types/session-projects';
-import {
-  createSessionProjectInCatalog,
-  deleteSessionProjectFolderFromCatalog,
-  deleteSessionProjectFromCatalog,
-  loadSessionProjectCatalog,
-  patchSessionProjectFolderInCatalog,
-  patchSessionProjectInCatalog,
-  reorderSessionProjectFoldersInCatalog,
-  reorderSessionProjectsInCatalog,
-  setSessionProjectAssignmentForSession,
-} from '../stores/session-project-actions';
+import { buildSessionSections, filterSessionsForWorkspaceScope, resolveWorkspaceScope } from './session-sections';
+import type { SidebarSessionListRowMode } from '../../../../shared/sidebar-ui-state.ts';
 import { ContextMenu, type ContextMenuItem } from '../ui/ContextMenu';
 import { renderMarkdown } from '../utils/markdown';
-import { cwdFromAutoProjectId } from '../../../../shared/session-projects.ts';
-import type { SidebarSessionListRowMode } from '../../../../shared/sidebar-ui-state.ts';
-import { FolderIcon } from './shared/FolderIcon';
 import styles from './SessionList.module.css';
 
-const SESSION_VIEW_MODE_KEY = 'hana-session-sidebar-view-mode';
+// 置顶区行拖拽 MIME：pinned 重排提交完整有序 sessionId 列表。
 const SESSION_DRAG_MIME = 'application/x-lingxi-session-path';
-const PROJECT_DRAG_MIME = 'application/x-lingxi-project-id';
-const FOLDER_DRAG_MIME = 'application/x-lingxi-project-folder-id';
-const PROJECT_SESSION_PREVIEW_LIMIT = 5;
 
 type SidebarDragState =
-  | { kind: 'session'; sessionPath: string }
   | { kind: 'pinned-session'; sessionPath: string; sessionId: string | null }
-  | { kind: 'project'; projectId: string }
-  | { kind: 'folder'; folderId: string }
   | null;
 
 // 置顶区拖拽重排时的插入指示线位置：落在目标行的上边还是下边
 type PinnedDropTarget = { sessionPath: string; edge: 'before' | 'after' } | null;
-
-type ProjectNameDialogState =
-  | { kind: 'create-project'; value: string }
-  | { kind: 'rename-project'; projectId: string; value: string }
-  | { kind: 'rename-folder'; folderId: string; value: string }
-  | null;
-
-type ProjectActionMenuState = {
-  position: { x: number; y: number };
-  project: SessionProjectGroup;
-} | null;
-
-type FolderActionMenuState = {
-  position: { x: number; y: number };
-  folder: SessionProjectFolderGroup;
-} | null;
 
 interface BrowserSessionState {
   url: string | null;
   running: boolean;
   resumable: boolean;
   unavailableReason: string | null;
-}
-
-interface SessionSearchResult extends Session {
-  matchKind: 'title' | 'content';
-  snippet: string;
-  score?: number;
 }
 
 function normalizeBrowserSessionStates(data: unknown): Record<string, BrowserSessionState> {
@@ -113,64 +71,6 @@ function normalizeBrowserSessionStates(data: unknown): Record<string, BrowserSes
   return result;
 }
 
-function normalizeSessionSearchResults(data: unknown): SessionSearchResult[] {
-  if (!data || typeof data !== 'object' || Array.isArray(data)) return [];
-  const results = (data as { results?: unknown }).results;
-  if (!Array.isArray(results)) return [];
-
-  return results.flatMap((raw): SessionSearchResult[] => {
-    if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return [];
-    const item = raw as Partial<SessionSearchResult>;
-    if (typeof item.path !== 'string' || !item.path) return [];
-    return [{
-      path: item.path,
-      sessionId: typeof item.sessionId === 'string' ? item.sessionId : null,
-      title: typeof item.title === 'string' ? item.title : null,
-      firstMessage: typeof item.firstMessage === 'string' ? item.firstMessage : '',
-      modified: typeof item.modified === 'string' ? item.modified : '',
-      messageCount: typeof item.messageCount === 'number' ? item.messageCount : 0,
-      agentId: typeof item.agentId === 'string' ? item.agentId : null,
-      agentName: typeof item.agentName === 'string' ? item.agentName : null,
-      cwd: typeof item.cwd === 'string' ? item.cwd : null,
-      projectId: typeof item.projectId === 'string' ? item.projectId : null,
-      pinnedAt: typeof item.pinnedAt === 'string' ? item.pinnedAt : null,
-      pinOrder: typeof item.pinOrder === 'number' ? item.pinOrder : null,
-      hasSummary: item.hasSummary === true,
-      rcAttachment: null,
-      agentDeleted: item.agentDeleted === true,
-      readOnlyReason: typeof item.readOnlyReason === 'string' ? item.readOnlyReason : undefined,
-      continuationAvailable: item.continuationAvailable === true,
-      deletedAt: typeof item.deletedAt === 'string' ? item.deletedAt : undefined,
-      matchKind: item.matchKind === 'content' ? 'content' : 'title',
-      snippet: typeof item.snippet === 'string' ? item.snippet : '',
-      score: typeof item.score === 'number' ? item.score : undefined,
-    }];
-  });
-}
-
-function readInitialSessionViewMode(): SessionViewMode {
-  try {
-    return window.localStorage?.getItem(SESSION_VIEW_MODE_KEY) === 'project' ? 'project' : 'time';
-  } catch {
-    return 'time';
-  }
-}
-
-function dragSessionPath(event: React.DragEvent, state: SidebarDragState): string | null {
-  const fromState = state?.kind === 'session' ? state.sessionPath : null;
-  return event.dataTransfer.getData(SESSION_DRAG_MIME) || fromState;
-}
-
-function dragProjectId(event: React.DragEvent, state: SidebarDragState): string | null {
-  const fromState = state?.kind === 'project' ? state.projectId : null;
-  return event.dataTransfer.getData(PROJECT_DRAG_MIME) || fromState;
-}
-
-function dragFolderId(event: React.DragEvent, state: SidebarDragState): string | null {
-  const fromState = state?.kind === 'folder' ? state.folderId : null;
-  return event.dataTransfer.getData(FOLDER_DRAG_MIME) || fromState;
-}
-
 // ── 主组件 ──
 
 export function SessionList() {
@@ -189,46 +89,38 @@ function SessionListInner() {
   const streamingSessions = useStore(s => s.streamingSessions);
   const unreadOutputSessionPaths = useStore(s => s.unreadOutputSessionPaths);
   const browserBySession = useStore(s => s.browserBySession);
-  const projectCatalog = useStore(s => s.sessionProjectCatalog);
-  const projectCatalogLoaded = useStore(s => s.sessionProjectCatalogLoaded);
   const metaRecovery = useStore(s => s.metaRecovery);
   // 侧边栏 UI 偏好归 store：本组件有多个实例（主侧栏 / 悬浮侧栏），
   // 重挂载时直接读已加载的值，不再各自拉取、也就没有默认双行的首帧。
   const sidebarUiPrefs = useStore(s => s.sidebarUiPrefs);
-  const setSidebarProjectViewPrefs = useStore(s => s.setSidebarProjectViewPrefs);
   const sessionListRowMode: SidebarSessionListRowMode = sidebarUiPrefs.sessionList.rowMode;
-  const collapsedProjectIds = useMemo(
-    () => new Set(sidebarUiPrefs.projectView.collapsedProjectIds),
-    [sidebarUiPrefs],
+
+  // ── Workspace 作用域（任务七/八）──
+  // desk 状态变化（切换工作台/切会话恢复）→ 这里响应式重算，列表自动重过滤。
+  // pending 新会话（无 currentSessionPath）时作用域取 selected*（同一谓词）。
+  const deskWorkspaceMountId = useStore(s => s.deskWorkspaceMountId);
+  const deskBasePath = useStore(s => s.deskBasePath);
+  const selectedWorkspaceMountId = useStore(s => s.selectedWorkspaceMountId);
+  const selectedFolder = useStore(s => s.selectedFolder);
+  const workspaceScope = useMemo(
+    () => resolveWorkspaceScope({
+      currentSessionPath,
+      deskWorkspaceMountId,
+      deskBasePath,
+      selectedWorkspaceMountId,
+      selectedFolder,
+    }),
+    [currentSessionPath, deskBasePath, deskWorkspaceMountId, selectedFolder, selectedWorkspaceMountId],
   );
-  const collapsedFolderIds = useMemo(
-    () => new Set(sidebarUiPrefs.projectView.collapsedFolderIds),
-    [sidebarUiPrefs],
-  );
-  const showAllProjectIds = useMemo(
-    () => new Set(sidebarUiPrefs.projectView.showAllProjectIds),
-    [sidebarUiPrefs],
+  const scopedSessions = useMemo(
+    () => filterSessionsForWorkspaceScope(sessions, workspaceScope),
+    [sessions, workspaceScope],
   );
 
   const [browserSessions, setBrowserSessions] = useState<Record<string, BrowserSessionState>>({});
-  const [viewMode, setViewModeState] = useState<SessionViewMode>(readInitialSessionViewMode);
-  const [projectMenuPosition, setProjectMenuPosition] = useState<{ x: number; y: number } | null>(null);
-  const [projectActionMenu, setProjectActionMenu] = useState<ProjectActionMenuState>(null);
-  const [folderActionMenu, setFolderActionMenu] = useState<FolderActionMenuState>(null);
-  const [projectNameDialog, setProjectNameDialog] = useState<ProjectNameDialogState>(null);
   const [dragState, setDragState] = useState<SidebarDragState>(null);
-  const [dropTargetId, setDropTargetId] = useState<string | null>(null);
   const [pinnedDropTarget, setPinnedDropTarget] = useState<PinnedDropTarget>(null);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [titleResults, setTitleResults] = useState<SessionSearchResult[]>([]);
-  const [contentResults, setContentResults] = useState<SessionSearchResult[]>([]);
-  const [searchStatus, setSearchStatus] = useState<'idle' | 'title' | 'content' | 'done' | 'error'>('idle');
   const closingBrowserSessionsRef = useRef(new Set<string>());
-  const projectNameInputRef = useRef<HTMLInputElement>(null);
-  const searchQueryTrimmed = searchQuery.trim();
-  const sessionsSignature = useMemo(() => (
-    sessions.map(s => `${s.path}:${s.title || ''}:${s.modified || ''}:${s.messageCount}:${s.projectId || ''}`).join('\n')
-  ), [sessions]);
 
   const setVisibleBrowserSessions = useCallback((data: unknown) => {
     const states = normalizeBrowserSessionStates(data);
@@ -256,77 +148,6 @@ function SessionListInner() {
     };
   }, [sessions, browserBySession, setVisibleBrowserSessions]);
 
-  useEffect(() => {
-    if (!searchQueryTrimmed) {
-      setTitleResults([]);
-      setContentResults([]);
-      setSearchStatus('idle');
-      return;
-    }
-
-    let cancelled = false;
-    const controller = new AbortController();
-    setTitleResults([]);
-    setContentResults([]);
-    setSearchStatus('title');
-
-    const timer = window.setTimeout(async () => {
-      const encodedQuery = encodeURIComponent(searchQueryTrimmed);
-      try {
-        const titleRes = await lingxiFetch(`/api/sessions/search?q=${encodedQuery}&phase=title&limit=20`, {
-          signal: controller.signal,
-          timeout: 12_000,
-        });
-        const titleData = await titleRes.json();
-        if (cancelled) return;
-        setTitleResults(normalizeSessionSearchResults(titleData));
-        setSearchStatus('content');
-
-        const contentRes = await lingxiFetch(`/api/sessions/search?q=${encodedQuery}&phase=content&limit=20`, {
-          signal: controller.signal,
-          timeout: 12_000,
-        });
-        const contentData = await contentRes.json();
-        if (cancelled) return;
-        setContentResults(normalizeSessionSearchResults(contentData));
-        setSearchStatus('done');
-      } catch (err) {
-        if (controller.signal.aborted || cancelled) return;
-        console.warn('[sessions] search failed:', err);
-        setSearchStatus('error');
-      }
-    }, 180);
-
-    return () => {
-      cancelled = true;
-      window.clearTimeout(timer);
-      controller.abort();
-    };
-  }, [searchQueryTrimmed, sessionsSignature]);
-
-  const setViewMode = useCallback((mode: SessionViewMode) => {
-    setViewModeState(mode);
-    try {
-      window.localStorage?.setItem(SESSION_VIEW_MODE_KEY, mode);
-    } catch {
-      // localStorage can be unavailable in tests or privacy modes.
-    }
-  }, []);
-
-  useEffect(() => {
-    if (viewMode !== 'project') return;
-    loadSessionProjectCatalog()
-      .catch(err => console.warn('[sessions] fetch project catalog failed:', err));
-  }, [viewMode]);
-
-  useEffect(() => {
-    if (!projectNameDialog) return;
-    window.setTimeout(() => {
-      projectNameInputRef.current?.focus();
-      projectNameInputRef.current?.select();
-    }, 0);
-  }, [projectNameDialog]);
-
   const handleCloseBrowserSession = useCallback(async (sessionPath: string) => {
     closingBrowserSessionsRef.current.add(sessionPath);
     setBrowserSessions(prev => {
@@ -352,100 +173,8 @@ function SessionListInner() {
     }
   }, []);
 
-  const updateSessionProjectAssignment = useCallback(async (sessionPath: string, projectId: string | null) => {
-    await setSessionProjectAssignmentForSession(sessionPath, projectId);
-  }, []);
-
-  const patchProject = useCallback(async (projectId: string, patch: { folderId?: string | null; name?: string }) => {
-    return patchSessionProjectInCatalog(projectId, patch);
-  }, []);
-
-  const patchFolder = useCallback(async (folderId: string, patch: { name?: string }) => {
-    return patchSessionProjectFolderInCatalog(folderId, patch);
-  }, []);
-
-  const reorderProjects = useCallback(async (folderId: string | null, projectIds: string[]) => {
-    await reorderSessionProjectsInCatalog(folderId, projectIds);
-  }, []);
-
-  const reorderFolders = useCallback(async (folderIds: string[]) => {
-    await reorderSessionProjectFoldersInCatalog(folderIds);
-  }, []);
-
-  const createProject = useCallback(async (name: string) => {
-    await createSessionProjectInCatalog({ name, folderId: null });
-  }, []);
-
-  const deleteProject = useCallback(async (project: SessionProjectGroup) => {
-    const confirmed = window.confirm?.(t('sidebar.projects.deleteProjectConfirm', { name: project.name }));
-    if (!confirmed) return;
-    await deleteSessionProjectFromCatalog(project.id, project.items.map(item => item.path));
-    if (!collapsedProjectIds.has(project.id) && !showAllProjectIds.has(project.id)) return;
-    const nextCollapsed = new Set(collapsedProjectIds);
-    nextCollapsed.delete(project.id);
-    const nextShowAll = new Set(showAllProjectIds);
-    nextShowAll.delete(project.id);
-    setSidebarProjectViewPrefs({
-      collapsedProjectIds: [...nextCollapsed],
-      showAllProjectIds: [...nextShowAll],
-    });
-  }, [collapsedProjectIds, setSidebarProjectViewPrefs, showAllProjectIds, t]);
-
-  const deleteFolder = useCallback(async (folder: SessionProjectFolderGroup) => {
-    const confirmed = window.confirm?.(t('sidebar.projects.deleteFolderConfirm', { name: folder.name }));
-    if (!confirmed) return;
-    await deleteSessionProjectFolderFromCatalog(folder.id);
-    if (!collapsedFolderIds.has(folder.id)) return;
-    const next = new Set(collapsedFolderIds);
-    next.delete(folder.id);
-    setSidebarProjectViewPrefs({ collapsedFolderIds: [...next] });
-  }, [collapsedFolderIds, setSidebarProjectViewPrefs, t]);
-
-  const handleCreateProjectSession = useCallback((project: SessionProjectGroup) => {
-    if (project.source === 'cwd') {
-      const cwd = cwdFromAutoProjectId(project.id);
-      void createNewSession({ cwd });
-      return;
-    }
-    void createNewSession({ projectId: project.id, cwd: null });
-  }, []);
-
-  const handleProjectNameDialogSubmit = useCallback(async (event: React.FormEvent) => {
-    event.preventDefault();
-    if (!projectNameDialog) return;
-    const name = projectNameDialog.value.trim();
-    if (!name) return;
-    if (projectNameDialog.kind === 'create-project') {
-      await createProject(name);
-    } else if (projectNameDialog.kind === 'rename-project') {
-      await patchProject(projectNameDialog.projectId, { name });
-    } else {
-      await patchFolder(projectNameDialog.folderId, { name });
-    }
-    setProjectNameDialog(null);
-  }, [createProject, patchFolder, patchProject, projectNameDialog]);
-
-  const handleSessionDragStart = useCallback((event: React.DragEvent, session: Session) => {
-    event.dataTransfer.effectAllowed = 'move';
-    event.dataTransfer.setData(SESSION_DRAG_MIME, session.path);
-    setDragState({ kind: 'session', sessionPath: session.path });
-  }, []);
-
-  const handleProjectDragStart = useCallback((event: React.DragEvent, projectId: string) => {
-    event.dataTransfer.effectAllowed = 'move';
-    event.dataTransfer.setData(PROJECT_DRAG_MIME, projectId);
-    setDragState({ kind: 'project', projectId });
-  }, []);
-
-  const handleFolderDragStart = useCallback((event: React.DragEvent, folderId: string) => {
-    event.dataTransfer.effectAllowed = 'move';
-    event.dataTransfer.setData(FOLDER_DRAG_MIME, folderId);
-    setDragState({ kind: 'folder', folderId });
-  }, []);
-
   const clearDragState = useCallback(() => {
     setDragState(null);
-    setDropTargetId(null);
     setPinnedDropTarget(null);
   }, []);
 
@@ -503,107 +232,6 @@ function SessionListInner() {
     void reorderPinnedSessions(ordered.map(session => session.sessionId as string));
   }, [clearDragState, dragState, pinnedDropTarget]);
 
-  const ensureCatalogProject = useCallback(async (project: SessionProjectGroup, folderId: string | null = project.folderId) => {
-    const existing = projectCatalog.projects.find(item => item.id === project.id);
-    if (existing && existing.folderId === folderId) return;
-    await patchProject(project.id, { name: project.name, folderId });
-  }, [patchProject, projectCatalog.projects]);
-
-  const handleDropOnProject = useCallback(async (event: React.DragEvent, project: SessionProjectGroup) => {
-    event.preventDefault();
-    event.stopPropagation();
-    // 置顶区的行只在置顶区内重排，不接受落到项目/文件夹/根上
-    if (dragState?.kind === 'pinned-session') { clearDragState(); return; }
-    const sessionPath = dragSessionPath(event, dragState);
-    const projectId = dragProjectId(event, dragState);
-    clearDragState();
-    if (sessionPath) {
-      const session = sessions.find(item => item.path === sessionPath) || null;
-      const ownCwdProject = session ? autoProjectIdForCwd(session.cwd) : null;
-      const assignmentId = project.source === 'cwd' && ownCwdProject === project.id ? null : project.id;
-      await updateSessionProjectAssignment(sessionPath, assignmentId);
-      return;
-    }
-    if (projectId && projectId !== project.id) {
-      const visibleView = buildSessionProjectView(sessions, projectCatalog);
-      const visibleProjects = [
-        ...visibleView.rootProjects,
-        ...visibleView.folders.flatMap(folder => folder.projects),
-      ];
-      const draggedProject = visibleProjects.find(item => item.id === projectId) || null;
-      if (!draggedProject) return;
-      const targetFolderId = project.folderId || null;
-      const levelProjects = visibleProjects.filter(item => (item.folderId || null) === targetFolderId);
-      const nextProjectIds = levelProjects
-        .map(item => item.id)
-        .filter(id => id !== projectId);
-      const insertIndex = nextProjectIds.indexOf(project.id);
-      nextProjectIds.splice(insertIndex >= 0 ? insertIndex : nextProjectIds.length, 0, projectId);
-      for (const id of nextProjectIds) {
-        const visibleProject = visibleProjects.find(item => item.id === id);
-        if (visibleProject) await ensureCatalogProject(visibleProject, targetFolderId);
-      }
-      await reorderProjects(targetFolderId, nextProjectIds);
-    }
-  }, [clearDragState, dragState, ensureCatalogProject, projectCatalog, reorderProjects, sessions, updateSessionProjectAssignment]);
-
-  const handleDropOnProjectRoot = useCallback(async (event: React.DragEvent) => {
-    event.preventDefault();
-    event.stopPropagation();
-    // 置顶区的行只在置顶区内重排，不接受落到项目/文件夹/根上
-    if (dragState?.kind === 'pinned-session') { clearDragState(); return; }
-    const projectId = dragProjectId(event, dragState);
-    clearDragState();
-    if (!projectId) return;
-    const visibleView = buildSessionProjectView(sessions, projectCatalog);
-    const visibleProjects = [
-      ...visibleView.rootProjects,
-      ...visibleView.folders.flatMap(folder => folder.projects),
-    ];
-    const draggedProject = visibleProjects.find(item => item.id === projectId) || null;
-    if (!draggedProject) return;
-    const nextProjectIds = visibleView.rootProjects
-      .map(item => item.id)
-      .filter(id => id !== projectId);
-    nextProjectIds.push(projectId);
-    await ensureCatalogProject(draggedProject, null);
-    await reorderProjects(null, nextProjectIds);
-  }, [clearDragState, dragState, ensureCatalogProject, projectCatalog, reorderProjects, sessions]);
-
-  const handleDropOnFolder = useCallback(async (event: React.DragEvent, folder: SessionProjectFolderGroup) => {
-    event.preventDefault();
-    event.stopPropagation();
-    // 置顶区的行只在置顶区内重排，不接受落到项目/文件夹/根上
-    if (dragState?.kind === 'pinned-session') { clearDragState(); return; }
-    const projectId = dragProjectId(event, dragState);
-    const folderId = dragFolderId(event, dragState);
-    clearDragState();
-    const visibleView = buildSessionProjectView(sessions, projectCatalog);
-    if (projectId) {
-      const visibleProjects = [
-        ...visibleView.rootProjects,
-        ...visibleView.folders.flatMap(item => item.projects),
-      ];
-      const draggedProject = visibleProjects.find(item => item.id === projectId) || null;
-      if (!draggedProject) return;
-      const nextProjectIds = folder.projects
-        .map(item => item.id)
-        .filter(id => id !== projectId);
-      nextProjectIds.push(projectId);
-      await ensureCatalogProject(draggedProject, folder.id);
-      await reorderProjects(folder.id, nextProjectIds);
-      return;
-    }
-    if (folderId && folderId !== folder.id) {
-      const nextFolderIds = visibleView.folders
-        .map(item => item.id)
-        .filter(id => id !== folderId);
-      const insertIndex = nextFolderIds.indexOf(folder.id);
-      nextFolderIds.splice(insertIndex >= 0 ? insertIndex : nextFolderIds.length, 0, folderId);
-      await reorderFolders(nextFolderIds);
-    }
-  }, [clearDragState, dragState, ensureCatalogProject, projectCatalog, reorderFolders, reorderProjects, sessions]);
-
   const activeSessionPath = pendingSessionSwitchPath || currentSessionPath;
   const renderSessionItem = (
     s: Session,
@@ -615,14 +243,14 @@ function SessionListInner() {
       isActive={!pendingNewSession && s.path === activeSessionPath}
       isPending={!pendingNewSession && pendingSessionSwitchPath === s.path}
       isStreaming={sessionScopedListIncludes(useStore.getState(), streamingSessions, s.path)}
-      isPinned={!!s.pinnedAt}
       hasUnreadOutput={sessionScopedListIncludes(useStore.getState(), unreadOutputSessionPaths, s.path)}
+      isPinned={!!s.pinnedAt}
       agents={agents}
       browserState={browserSessions[s.path] || null}
       rowMode={sessionListRowMode}
       onCloseBrowser={handleCloseBrowserSession}
       draggable={options.draggable === true && s.agentDeleted !== true}
-      onDragStart={options.onDragStart || handleSessionDragStart}
+      onDragStart={options.onDragStart}
       onDragEnd={clearDragState}
     />
   );
@@ -650,44 +278,8 @@ function SessionListInner() {
     );
   };
 
-  const sections = buildSessionSections(sessions, { mode: 'time' });
-  const projectView = buildSessionProjectView(sessions, projectCatalog, { catalogLoaded: projectCatalogLoaded });
-  const titleResultPaths = new Set(titleResults.map(result => result.path));
-  const visibleContentResults = contentResults.filter(result => !titleResultPaths.has(result.path));
-  const hasSearchResults = titleResults.length > 0 || visibleContentResults.length > 0;
-  const isSearching = !!searchQueryTrimmed;
-  const showEmptyState = sessions.length === 0 && !isSearching;
-  const renderSortMenuButton = () => (
-    <button
-      type="button"
-      className={styles.sectionIconButton}
-      aria-label={t('sidebar.view.sort')}
-      title={t('sidebar.view.sort')}
-      onClick={(event) => setProjectMenuPosition({ x: event.clientX, y: event.clientY })}
-    >
-      <ListFilterIcon />
-    </button>
-  );
-  const handleToggleProjectCollapsed = useCallback((projectId: string) => {
-    const next = new Set(collapsedProjectIds);
-    if (next.has(projectId)) next.delete(projectId);
-    else next.add(projectId);
-    setSidebarProjectViewPrefs({ collapsedProjectIds: [...next] });
-  }, [collapsedProjectIds, setSidebarProjectViewPrefs]);
-  const handleToggleFolderCollapsed = useCallback((folderId: string) => {
-    const next = new Set(collapsedFolderIds);
-    if (next.has(folderId)) next.delete(folderId);
-    else next.add(folderId);
-    setSidebarProjectViewPrefs({ collapsedFolderIds: [...next] });
-  }, [collapsedFolderIds, setSidebarProjectViewPrefs]);
-  const handleShowAllProject = useCallback((projectId: string) => {
-    const next = new Set(showAllProjectIds);
-    next.add(projectId);
-    setSidebarProjectViewPrefs({ showAllProjectIds: [...next] });
-  }, [setSidebarProjectViewPrefs, showAllProjectIds]);
-  const handleProjectNameChange = useCallback((value: string) => {
-    setProjectNameDialog(dialog => dialog ? { ...dialog, value } : dialog);
-  }, []);
+  const sections = buildSessionSections(scopedSessions, { mode: 'time' });
+  const showEmptyState = scopedSessions.length === 0;
   const hasTodaySection = sections.some(section => section.kind === 'date' && section.group === 'today');
   const timeContent = sections.map(section => {
     const items = section.kind === 'pinned'
@@ -708,9 +300,7 @@ function SessionListInner() {
 
     return (
       <Fragment key={section.id}>
-        <SectionTitle
-          actions={section.group === 'today' ? renderSortMenuButton() : null}
-        >
+        <SectionTitle>
           <span>{t(section.titleKey)}</span>
         </SectionTitle>
         {items}
@@ -720,7 +310,7 @@ function SessionListInner() {
   if (!hasTodaySection && !showEmptyState) {
     const pinnedIndex = sections.findIndex(section => section.kind === 'pinned');
     timeContent.splice(Math.max(0, pinnedIndex + 1), 0, (
-      <SectionTitle key="date:today-empty" actions={renderSortMenuButton()}>
+      <SectionTitle key="date:today-empty">
         <span>{t('time.today')}</span>
       </SectionTitle>
     ));
@@ -729,568 +319,28 @@ function SessionListInner() {
     <div className={styles.sessionEmpty}>
       {metaRecovery?.degraded ? t('sidebar.metaRecoveryEmpty') : t('sidebar.empty')}
     </div>
-  ) : isSearching ? (
-    <SessionSearchResults
-      titleResults={titleResults}
-      contentResults={visibleContentResults}
-      status={searchStatus}
-      hasResults={hasSearchResults}
-      agents={agents}
-      activeSessionPath={activeSessionPath}
-      pendingNewSession={pendingNewSession}
-      query={searchQueryTrimmed}
-    />
-  ) : viewMode === 'project' ? (
-    <ProjectSessionView
-      view={projectView}
-      renderSessionItem={(session) => renderSessionItem(session, { draggable: true })}
-      renderPinnedSessionItem={renderPinnedSessionItem}
-      collapsedProjectIds={collapsedProjectIds}
-      collapsedFolderIds={collapsedFolderIds}
-      showAllProjectIds={showAllProjectIds}
-      dragState={dragState}
-      dropTargetId={dropTargetId}
-      setDropTargetId={setDropTargetId}
-      onToggleProject={handleToggleProjectCollapsed}
-      onToggleFolder={handleToggleFolderCollapsed}
-      onShowAllProject={handleShowAllProject}
-      onProjectDragStart={handleProjectDragStart}
-      onFolderDragStart={handleFolderDragStart}
-      onDragEnd={clearDragState}
-      onDropProject={handleDropOnProject}
-      onDropFolder={handleDropOnFolder}
-      onDropRoot={handleDropOnProjectRoot}
-      onOpenMenu={setProjectMenuPosition}
-      onCreateProject={() => setProjectNameDialog({ kind: 'create-project', value: '' })}
-      onCreateProjectSession={handleCreateProjectSession}
-      onOpenProjectMenu={(position, project) => setProjectActionMenu({ position, project })}
-      onOpenFolderMenu={(position, folder) => setFolderActionMenu({ position, folder })}
-    />
   ) : timeContent;
 
   return (
     <>
-      <SessionSearchBox
-        value={searchQuery}
-        onChange={setSearchQuery}
-        onClear={() => setSearchQuery('')}
-      />
       <div className={styles.sessionListScroller}>
         {content}
       </div>
-      {projectMenuPosition && (
-        <ContextMenu
-          position={projectMenuPosition}
-          onClose={() => setProjectMenuPosition(null)}
-          items={[
-            {
-              label: t('sidebar.view.time'),
-              checked: viewMode === 'time',
-              action: () => setViewMode('time'),
-            },
-            {
-              label: t('sidebar.view.project'),
-              checked: viewMode === 'project',
-              action: () => setViewMode('project'),
-            },
-          ]}
-        />
-      )}
-      {projectActionMenu && (
-        <ContextMenu
-          position={projectActionMenu.position}
-          onClose={() => setProjectActionMenu(null)}
-          items={[
-            {
-              label: t('sidebar.projects.renameProject'),
-              action: () => setProjectNameDialog({
-                kind: 'rename-project',
-                projectId: projectActionMenu.project.id,
-                value: projectActionMenu.project.name,
-              }),
-            },
-            {
-              label: t('sidebar.projects.deleteProject'),
-              action: () => { void deleteProject(projectActionMenu.project); },
-            },
-          ]}
-        />
-      )}
-      {folderActionMenu && (
-        <ContextMenu
-          position={folderActionMenu.position}
-          onClose={() => setFolderActionMenu(null)}
-          items={[
-            {
-              label: t('sidebar.projects.renameFolder'),
-              action: () => setProjectNameDialog({
-                kind: 'rename-folder',
-                folderId: folderActionMenu.folder.id,
-                value: folderActionMenu.folder.name,
-              }),
-            },
-            {
-              label: t('sidebar.projects.deleteFolder'),
-              action: () => { void deleteFolder(folderActionMenu.folder); },
-            },
-          ]}
-        />
-      )}
-      {projectNameDialog && (
-        <ProjectNameDialog
-          dialog={projectNameDialog}
-          inputRef={projectNameInputRef}
-          onChange={handleProjectNameChange}
-          onSubmit={handleProjectNameDialogSubmit}
-          onClose={() => setProjectNameDialog(null)}
-        />
-      )}
     </>
   );
 }
 
 function SectionTitle({
   children,
-  actions = null,
   className = '',
 }: {
   children: React.ReactNode;
-  actions?: React.ReactNode;
   className?: string;
 }) {
   return (
     <div className={`${styles.sessionSectionTitle}${className ? ` ${className}` : ''}`}>
       <div className={styles.sessionSectionTitleMain}>{children}</div>
-      {actions && <div className={styles.sectionTitleActions}>{actions}</div>}
     </div>
-  );
-}
-
-function ProjectNameDialog({
-  dialog,
-  inputRef,
-  onChange,
-  onSubmit,
-  onClose,
-}: {
-  dialog: NonNullable<ProjectNameDialogState>;
-  inputRef: React.RefObject<HTMLInputElement | null>;
-  onChange: (value: string) => void;
-  onSubmit: (event: React.FormEvent) => void;
-  onClose: () => void;
-}) {
-  const { t } = useI18n();
-  const titleKey = dialog.kind === 'create-project'
-    ? 'sidebar.projects.newProject'
-    : dialog.kind === 'rename-folder'
-      ? 'sidebar.projects.renameFolder'
-      : 'sidebar.projects.renameProject';
-  const placeholderKey = dialog.kind === 'rename-folder'
-    ? 'sidebar.projects.newFolderPrompt'
-    : 'sidebar.projects.newProjectPrompt';
-  const actionKey = dialog.kind === 'rename-project'
-    ? 'sidebar.projects.save'
-    : dialog.kind === 'rename-folder'
-      ? 'sidebar.projects.save'
-    : 'sidebar.projects.createAction';
-
-  return createPortal(
-    <div
-      className={styles.projectNameDialogBackdrop}
-      onMouseDown={(event) => {
-        if (event.target === event.currentTarget) onClose();
-      }}
-    >
-      <form className={styles.projectNameDialog} onSubmit={onSubmit}>
-        <div className={styles.projectNameDialogTitle}>{t(titleKey)}</div>
-        <input
-          ref={inputRef}
-          className={styles.projectNameInput}
-          value={dialog.value}
-          placeholder={t(placeholderKey)}
-          onChange={(event) => onChange(event.target.value)}
-          onKeyDown={(event) => {
-            if (event.key === 'Escape') onClose();
-          }}
-        />
-        <div className={styles.projectNameDialogActions}>
-          <button type="button" onClick={onClose}>{t('sidebar.projects.cancel')}</button>
-          <button type="submit" disabled={!dialog.value.trim()}>{t(actionKey)}</button>
-        </div>
-      </form>
-    </div>,
-    document.body,
-  );
-}
-
-function ProjectSessionView({
-  view,
-  renderSessionItem,
-  renderPinnedSessionItem,
-  collapsedProjectIds,
-  collapsedFolderIds,
-  showAllProjectIds,
-  dragState,
-  dropTargetId,
-  setDropTargetId,
-  onToggleProject,
-  onToggleFolder,
-  onShowAllProject,
-  onProjectDragStart,
-  onFolderDragStart,
-  onDragEnd,
-  onDropProject,
-  onDropFolder,
-  onDropRoot,
-  onOpenMenu,
-  onCreateProject,
-  onCreateProjectSession,
-  onOpenProjectMenu,
-  onOpenFolderMenu,
-}: {
-  view: ReturnType<typeof buildSessionProjectView>;
-  renderSessionItem: (session: Session) => React.ReactNode;
-  renderPinnedSessionItem: (session: Session, pinnedItems: Session[]) => React.ReactNode;
-  collapsedProjectIds: Set<string>;
-  collapsedFolderIds: Set<string>;
-  showAllProjectIds: Set<string>;
-  dragState: SidebarDragState;
-  dropTargetId: string | null;
-  setDropTargetId: (id: string | null) => void;
-  onToggleProject: (projectId: string) => void;
-  onToggleFolder: (folderId: string) => void;
-  onShowAllProject: (projectId: string) => void;
-  onProjectDragStart: (event: React.DragEvent, projectId: string) => void;
-  onFolderDragStart: (event: React.DragEvent, folderId: string) => void;
-  onDragEnd: () => void;
-  onDropProject: (event: React.DragEvent, project: SessionProjectGroup) => void;
-  onDropFolder: (event: React.DragEvent, folder: SessionProjectFolderGroup) => void;
-  onDropRoot: (event: React.DragEvent) => void;
-  onOpenMenu: (position: { x: number; y: number }) => void;
-  onCreateProject: () => void;
-  onCreateProjectSession: (project: SessionProjectGroup) => void;
-  onOpenProjectMenu: (position: { x: number; y: number }, project: SessionProjectGroup) => void;
-  onOpenFolderMenu: (position: { x: number; y: number }, folder: SessionProjectFolderGroup) => void;
-}) {
-  const { t } = useI18n();
-  return (
-    <>
-      <section className={styles.pinnedSection}>
-        <SectionTitle className={styles.pinnedSectionTitle}>
-          <span>{t('sidebar.pinned')}</span>
-          <PinIcon />
-        </SectionTitle>
-        {view.pinned.map(session => renderPinnedSessionItem(session, view.pinned))}
-      </section>
-      <SectionTitle
-        actions={(
-          <>
-            <button
-              type="button"
-              className={styles.sectionIconButton}
-              aria-label={t('sidebar.projects.create')}
-              title={t('sidebar.projects.create')}
-              onClick={onCreateProject}
-            >
-              <ProjectPlusIcon />
-            </button>
-            <button
-              type="button"
-              className={styles.sectionIconButton}
-              aria-label={t('sidebar.view.sort')}
-              title={t('sidebar.view.sort')}
-              onClick={(event) => onOpenMenu({ x: event.clientX, y: event.clientY })}
-            >
-              <ListFilterIcon />
-            </button>
-          </>
-        )}
-      >
-        <span>{t('sidebar.projects.title')}</span>
-      </SectionTitle>
-      <div
-        className={`${styles.projectRootDrop}${dropTargetId === 'root' ? ` ${styles.dropTarget}` : ''}`}
-        onDragOver={(event) => {
-          if (dragState?.kind !== 'project') return;
-          event.preventDefault();
-          event.dataTransfer.dropEffect = 'move';
-          setDropTargetId('root');
-        }}
-        onDragLeave={() => setDropTargetId(null)}
-        onDrop={onDropRoot}
-      >
-        {view.rootProjects.map(project => (
-          <ProjectBlock
-            key={project.id}
-            project={project}
-            collapsed={collapsedProjectIds.has(project.id)}
-            showAll={showAllProjectIds.has(project.id)}
-            onToggle={() => onToggleProject(project.id)}
-            onShowAll={() => onShowAllProject(project.id)}
-            renderSessionItem={renderSessionItem}
-            dropTargetId={dropTargetId}
-            setDropTargetId={setDropTargetId}
-            onProjectDragStart={onProjectDragStart}
-            onDragEnd={onDragEnd}
-            onDropProject={onDropProject}
-            onCreateProjectSession={onCreateProjectSession}
-            onOpenProjectMenu={onOpenProjectMenu}
-          />
-        ))}
-        {view.folders.map(folder => (
-          <FolderBlock
-            key={folder.id}
-            folder={folder}
-            collapsed={collapsedFolderIds.has(folder.id)}
-            collapsedProjectIds={collapsedProjectIds}
-            showAllProjectIds={showAllProjectIds}
-            onToggle={() => onToggleFolder(folder.id)}
-            onToggleProject={onToggleProject}
-            onShowAllProject={onShowAllProject}
-            renderSessionItem={renderSessionItem}
-            dragState={dragState}
-            dropTargetId={dropTargetId}
-            setDropTargetId={setDropTargetId}
-            onProjectDragStart={onProjectDragStart}
-            onFolderDragStart={onFolderDragStart}
-            onDragEnd={onDragEnd}
-            onDropProject={onDropProject}
-            onDropFolder={onDropFolder}
-            onCreateProjectSession={onCreateProjectSession}
-            onOpenProjectMenu={onOpenProjectMenu}
-            onOpenFolderMenu={onOpenFolderMenu}
-          />
-        ))}
-      </div>
-      {view.pending ? (
-        <div className={styles.sessionEmpty}>{t('sidebar.projects.loading')}</div>
-      ) : view.rootProjects.length === 0 && view.folders.length === 0 ? (
-        <div className={styles.sessionEmpty}>{t('sidebar.projects.empty')}</div>
-      ) : null}
-    </>
-  );
-}
-
-function ProjectBlock({
-  project,
-  collapsed,
-  showAll,
-  onToggle,
-  onShowAll,
-  renderSessionItem,
-  dropTargetId,
-  setDropTargetId,
-  onProjectDragStart,
-  onDragEnd,
-  onDropProject,
-  onCreateProjectSession,
-  onOpenProjectMenu,
-}: {
-  project: SessionProjectGroup;
-  collapsed: boolean;
-  showAll: boolean;
-  onToggle: () => void;
-  onShowAll: () => void;
-  renderSessionItem: (session: Session) => React.ReactNode;
-  dropTargetId: string | null;
-  setDropTargetId: (id: string | null) => void;
-  onProjectDragStart: (event: React.DragEvent, projectId: string) => void;
-  onDragEnd: () => void;
-  onDropProject: (event: React.DragEvent, project: SessionProjectGroup) => void;
-  onCreateProjectSession: (project: SessionProjectGroup) => void;
-  onOpenProjectMenu: (position: { x: number; y: number }, project: SessionProjectGroup) => void;
-}) {
-  const lastDragEndAtRef = useRef(0);
-  const { t } = useI18n();
-  return (
-    <div className={styles.projectBlock}>
-      <div
-        className={`${styles.projectRow}${dropTargetId === project.id ? ` ${styles.dropTarget}` : ''}`}
-        role="button"
-        tabIndex={0}
-        aria-expanded={!collapsed}
-        draggable
-        onClick={() => {
-          if (Date.now() - lastDragEndAtRef.current < 250) return;
-          onToggle();
-        }}
-        onKeyDown={(event) => {
-          if (event.key !== 'Enter' && event.key !== ' ') return;
-          event.preventDefault();
-          onToggle();
-        }}
-        onContextMenu={(event) => {
-          event.preventDefault();
-          event.stopPropagation();
-          onOpenProjectMenu({ x: event.clientX, y: event.clientY }, project);
-        }}
-        onDragStart={(event) => onProjectDragStart(event, project.id)}
-        onDragEnd={() => {
-          lastDragEndAtRef.current = Date.now();
-          onDragEnd();
-        }}
-        onDragOver={(event) => {
-          event.preventDefault();
-          event.dataTransfer.dropEffect = 'move';
-          setDropTargetId(project.id);
-        }}
-        onDragLeave={() => setDropTargetId(null)}
-        onDrop={(event) => onDropProject(event, project)}
-      >
-        <FolderIcon className={styles.projectIcon} size={16} open={!collapsed} />
-        <span className={styles.projectName}>{project.name}</span>
-        <button
-          type="button"
-          className={styles.projectNewSessionButton}
-          aria-label={t('sidebar.projects.newChatInProject', { name: project.name })}
-          title={t('sidebar.projects.newChatInProject', { name: project.name })}
-          onMouseDown={(event) => {
-            event.preventDefault();
-            event.stopPropagation();
-          }}
-          onClick={(event) => {
-            event.preventDefault();
-            event.stopPropagation();
-            onCreateProjectSession(project);
-          }}
-          onKeyDown={(event) => {
-            if (event.key !== 'Enter' && event.key !== ' ') return;
-            event.preventDefault();
-            event.stopPropagation();
-            onCreateProjectSession(project);
-          }}
-        >
-          <NewChatIcon />
-        </button>
-      </div>
-      <Collapse open={!collapsed}>
-        <div className={styles.projectSessionList}>
-          {(showAll ? project.items : project.items.slice(0, PROJECT_SESSION_PREVIEW_LIMIT)).map(session => renderSessionItem(session))}
-          {!showAll && project.items.length > PROJECT_SESSION_PREVIEW_LIMIT && (
-            <button type="button" className={styles.projectShowMoreButton} onClick={onShowAll}>
-              {t('sidebar.projects.showMore')}
-            </button>
-          )}
-        </div>
-      </Collapse>
-    </div>
-  );
-}
-
-function FolderBlock({
-  folder,
-  collapsed,
-  collapsedProjectIds,
-  showAllProjectIds,
-  onToggle,
-  onToggleProject,
-  onShowAllProject,
-  renderSessionItem,
-  dragState,
-  dropTargetId,
-  setDropTargetId,
-  onProjectDragStart,
-  onFolderDragStart,
-  onDragEnd,
-  onDropProject,
-  onDropFolder,
-  onCreateProjectSession,
-  onOpenProjectMenu,
-  onOpenFolderMenu,
-}: {
-  folder: SessionProjectFolderGroup;
-  collapsed: boolean;
-  collapsedProjectIds: Set<string>;
-  showAllProjectIds: Set<string>;
-  onToggle: () => void;
-  onToggleProject: (projectId: string) => void;
-  onShowAllProject: (projectId: string) => void;
-  renderSessionItem: (session: Session) => React.ReactNode;
-  dragState: SidebarDragState;
-  dropTargetId: string | null;
-  setDropTargetId: (id: string | null) => void;
-  onProjectDragStart: (event: React.DragEvent, projectId: string) => void;
-  onFolderDragStart: (event: React.DragEvent, folderId: string) => void;
-  onDragEnd: () => void;
-  onDropProject: (event: React.DragEvent, project: SessionProjectGroup) => void;
-  onDropFolder: (event: React.DragEvent, folder: SessionProjectFolderGroup) => void;
-  onCreateProjectSession: (project: SessionProjectGroup) => void;
-  onOpenProjectMenu: (position: { x: number; y: number }, project: SessionProjectGroup) => void;
-  onOpenFolderMenu: (position: { x: number; y: number }, folder: SessionProjectFolderGroup) => void;
-}) {
-  const lastDragEndAtRef = useRef(0);
-  return (
-    <div className={styles.folderBlock}>
-      <div
-        className={`${styles.projectRow}${dropTargetId === folder.id ? ` ${styles.dropTarget}` : ''}`}
-        role="button"
-        tabIndex={0}
-        aria-expanded={!collapsed}
-        draggable
-        onClick={() => {
-          if (Date.now() - lastDragEndAtRef.current < 250) return;
-          onToggle();
-        }}
-        onKeyDown={(event) => {
-          if (event.key !== 'Enter' && event.key !== ' ') return;
-          event.preventDefault();
-          onToggle();
-        }}
-        onContextMenu={(event) => {
-          event.preventDefault();
-          event.stopPropagation();
-          onOpenFolderMenu({ x: event.clientX, y: event.clientY }, folder);
-        }}
-        onDragStart={(event) => onFolderDragStart(event, folder.id)}
-        onDragEnd={() => {
-          lastDragEndAtRef.current = Date.now();
-          onDragEnd();
-        }}
-        onDragOver={(event) => {
-          if (dragState?.kind === 'session') return;
-          event.preventDefault();
-          event.dataTransfer.dropEffect = 'move';
-          setDropTargetId(folder.id);
-        }}
-        onDragLeave={() => setDropTargetId(null)}
-        onDrop={(event) => onDropFolder(event, folder)}
-      >
-        <FolderIcon className={styles.projectIcon} size={16} open={!collapsed} />
-        <span className={styles.projectName}>{folder.name}</span>
-      </div>
-      <Collapse open={!collapsed}>
-        <div className={styles.folderProjectList}>
-          {folder.projects.map(project => (
-            <ProjectBlock
-              key={project.id}
-              project={project}
-              collapsed={collapsedProjectIds.has(project.id)}
-              showAll={showAllProjectIds.has(project.id)}
-              onToggle={() => onToggleProject(project.id)}
-              onShowAll={() => onShowAllProject(project.id)}
-              renderSessionItem={renderSessionItem}
-              dropTargetId={dropTargetId}
-              setDropTargetId={setDropTargetId}
-              onProjectDragStart={onProjectDragStart}
-              onDragEnd={onDragEnd}
-              onDropProject={onDropProject}
-              onCreateProjectSession={onCreateProjectSession}
-              onOpenProjectMenu={onOpenProjectMenu}
-            />
-          ))}
-        </div>
-      </Collapse>
-    </div>
-  );
-}
-
-function ListFilterIcon() {
-  return (
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="M4 7h16" />
-      <path d="M7 12h10" />
-      <path d="M10 17h4" />
-    </svg>
   );
 }
 
@@ -1311,208 +361,6 @@ function BrowserStatusIcon() {
     </svg>
   );
 }
-
-function ProjectPlusIcon() {
-  return (
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <rect x="4.8" y="4.8" width="14.4" height="14.4" rx="4.2" />
-      <path d="M8.8 12h6.4" />
-      <path d="M12 8.8v6.4" />
-    </svg>
-  );
-}
-
-function NewChatIcon() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="M12 5v14" />
-      <path d="M5 12h14" />
-    </svg>
-  );
-}
-
-function SessionSearchBox({
-  value,
-  onChange,
-  onClear,
-}: {
-  value: string;
-  onChange: (value: string) => void;
-  onClear: () => void;
-}) {
-  const { t } = useI18n();
-  return (
-    <div className={styles.sessionSearchBox}>
-      <svg className={styles.sessionSearchIcon} width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-        <circle cx="11" cy="11" r="8" />
-        <path d="m21 21-4.3-4.3" />
-      </svg>
-      <input
-        className={styles.sessionSearchInput}
-        value={value}
-        placeholder={t('sidebar.searchPlaceholder')}
-        onChange={(e) => onChange(e.target.value)}
-      />
-      {value && (
-        <button
-          type="button"
-          className={styles.sessionSearchClear}
-          aria-label={t('sidebar.searchClear')}
-          onClick={onClear}
-        >
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-            <path d="M18 6 6 18" />
-            <path d="m6 6 12 12" />
-          </svg>
-        </button>
-      )}
-    </div>
-  );
-}
-
-function SessionSearchResults({
-  titleResults,
-  contentResults,
-  status,
-  hasResults,
-  agents,
-  activeSessionPath,
-  pendingNewSession,
-  query,
-}: {
-  titleResults: SessionSearchResult[];
-  contentResults: SessionSearchResult[];
-  status: 'idle' | 'title' | 'content' | 'done' | 'error';
-  hasResults: boolean;
-  agents: Agent[];
-  activeSessionPath: string | null;
-  pendingNewSession: boolean;
-  query: string;
-}) {
-  const { t } = useI18n();
-
-  if (status === 'error') {
-    return <div className={styles.sessionSearchEmpty}>{t('sidebar.searchFailed')}</div>;
-  }
-
-  return (
-    <>
-      {titleResults.length > 0 && (
-        <SessionSearchSection
-          title={t('sidebar.searchTitleMatches')}
-          results={titleResults}
-          agents={agents}
-          activeSessionPath={activeSessionPath}
-          pendingNewSession={pendingNewSession}
-          query={query}
-        />
-      )}
-      {status === 'title' && (
-        <div className={styles.sessionSearchStatus}>{t('sidebar.searchingTitles')}</div>
-      )}
-      {(contentResults.length > 0 || status === 'content') && (
-        <SessionSearchSection
-          title={t('sidebar.searchContentMatches')}
-          results={contentResults}
-          agents={agents}
-          activeSessionPath={activeSessionPath}
-          pendingNewSession={pendingNewSession}
-          placeholder={status === 'content' && contentResults.length === 0 ? t('sidebar.searchingContent') : null}
-          query={query}
-        />
-      )}
-      {status === 'done' && !hasResults && (
-        <div className={styles.sessionSearchEmpty}>{t('sidebar.searchNoResults')}</div>
-      )}
-    </>
-  );
-}
-
-function SessionSearchSection({
-  title,
-  results,
-  agents,
-  activeSessionPath,
-  pendingNewSession,
-  placeholder = null,
-  query,
-}: {
-  title: string;
-  results: SessionSearchResult[];
-  agents: Agent[];
-  activeSessionPath: string | null;
-  pendingNewSession: boolean;
-  placeholder?: string | null;
-  query: string;
-}) {
-  return (
-    <section className={styles.sessionSearchSection}>
-      <div className={styles.sessionSearchSectionTitle}>{title}</div>
-      {placeholder ? (
-        <div className={styles.sessionSearchStatus}>{placeholder}</div>
-      ) : results.map(result => (
-        <SessionSearchItem
-          key={`${result.matchKind}:${result.path}`}
-          result={result}
-          isActive={!pendingNewSession && result.path === activeSessionPath}
-          agents={agents}
-          query={query}
-        />
-      ))}
-    </section>
-  );
-}
-
-export const SessionSearchItem = memo(function SessionSearchItem({
-  result,
-  isActive,
-  agents,
-  query,
-}: {
-  result: SessionSearchResult;
-  isActive: boolean;
-  agents: Agent[];
-  query: string;
-}) {
-  const { t } = useI18n();
-  const parts: string[] = [];
-  if (result.agentDeleted === true) parts.push(t('session.deletedAgent.meta'));
-  if (result.agentName || result.agentId) parts.push(result.agentName || result.agentId!);
-  if (result.cwd) {
-    const dirName = result.cwd.split(/[/\\]/).filter(Boolean).pop();
-    if (dirName) parts.push(dirName);
-  }
-  if (result.modified) parts.push(formatSessionDate(result.modified));
-
-  const handleClick = useCallback(() => {
-    if (result.matchKind === 'content' && query.trim()) {
-      void locateSearchHit(result.path, query);
-      return;
-    }
-    switchSession(result.path);
-  }, [result.matchKind, result.path, query]);
-
-  return (
-    <button
-      className={`${styles.sessionSearchItem}${isActive ? ` ${styles.sessionSearchItemActive}` : ''}`}
-      data-session-path={result.path}
-      onClick={handleClick}
-    >
-      <div className={styles.sessionItemHeader}>
-        {result.agentId && (
-          <AgentBadge agentId={result.agentId} agentName={result.agentName} agents={agents} />
-        )}
-        <div className={styles.sessionItemTitle}>
-          {result.title || result.firstMessage || t('session.untitled')}
-        </div>
-      </div>
-      <div className={styles.sessionItemMeta}>{parts.join(' · ')}</div>
-      {result.snippet && (
-        <div className={styles.sessionSearchSnippet}>{result.snippet}</div>
-      )}
-    </button>
-  );
-});
 
 // ── Session Item ──
 

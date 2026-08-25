@@ -1,28 +1,14 @@
-import { useCallback, type CSSProperties } from 'react';
+import { useCallback } from 'react';
 import { useStore } from '../../stores';
-import type { RightWorkspaceTab } from '../../types';
-import { DeskSection } from '../DeskSection';
-import { DeskCwdSkillsButton, DeskCwdSkillsPanel } from '../desk/DeskCwdSkills';
 import { JianEditor } from '../desk/DeskEditor';
 import { PluginWidgetView } from '../plugin/PluginWidgetView';
-import { SessionRegistryFilesPanel } from './SessionRegistryFilesPanel';
+import { WorkspaceStableBody } from './WorkspaceStableBody';
 import { SessionTodoCard } from './SessionTodoCard';
 import { TerminalCard } from './TerminalCard';
 import { WorkflowCard } from './WorkflowCard';
 import { AgentActivityCard } from './AgentActivityCard';
 import { SessionStatusCard } from './SessionStatusCard';
 import styles from './RightWorkspacePanel.module.css';
-import { workspaceDisplayName } from '../../../../../shared/workspace-history.ts';
-
-interface RightWorkspaceTabDef {
-  id: RightWorkspaceTab;
-  labelKey: string;
-}
-
-const BASE_TABS: RightWorkspaceTabDef[] = [
-  { id: 'session-files', labelKey: 'rightWorkspace.tabs.sessionFiles' },
-  { id: 'workspace', labelKey: 'rightWorkspace.tabs.workspace' },
-];
 
 function Chevron({ open }: { open: boolean }) {
   return (
@@ -69,42 +55,9 @@ function JianFloatingToggle() {
   );
 }
 
-function TabContent({ activeTab }: { activeTab: RightWorkspaceTab }) {
-  if (activeTab === 'session-files') return <SessionRegistryFilesPanel />;
-  return <DeskSection framed={false} showHeader={false} rightWorkspaceLayout />;
-}
-
-function WorkspaceHeader() {
-  const deskBasePath = useStore(s => s.deskBasePath);
-  const deskWorkspaceMountId = useStore(s => s.deskWorkspaceMountId);
-  const deskWorkspaceLabel = useStore(s => s.deskWorkspaceLabel);
-  const selectedFolder = useStore(s => s.selectedFolder);
-  const homeFolder = useStore(s => s.homeFolder);
-  const t = window.t ?? ((p: string) => p);
-  const title = deskWorkspaceMountId
-    ? (deskWorkspaceLabel || deskWorkspaceMountId)
-    : workspaceDisplayName(deskBasePath || selectedFolder || homeFolder, t('desk.title'));
-  const titlePath = deskWorkspaceMountId ? title : (deskBasePath || selectedFolder || homeFolder || undefined);
-
-  return (
-    <>
-      <div className={styles.workspaceHeader}>
-        <div className={styles.workspaceTitle} title={titlePath}>
-          {title}
-        </div>
-        <DeskCwdSkillsButton />
-      </div>
-      <DeskCwdSkillsPanel />
-    </>
-  );
-}
-
 export function RightWorkspacePanel({ compact = false }: { compact?: boolean }) {
-  const rightWorkspaceTab = useStore(s => s.rightWorkspaceTab);
-  const setRightWorkspaceTab = useStore(s => s.setRightWorkspaceTab);
   const jianView = useStore(s => s.jianView);
   const jianDrawerOpen = useStore(s => s.jianDrawerOpen);
-  const t = window.t ?? ((p: string) => p);
 
   if (jianView.startsWith('widget:')) {
     return (
@@ -114,15 +67,6 @@ export function RightWorkspacePanel({ compact = false }: { compact?: boolean }) 
     );
   }
 
-  const activeTab = BASE_TABS.some(tab => tab.id === rightWorkspaceTab)
-    ? rightWorkspaceTab
-    : 'workspace';
-  const activeTabIndex = Math.max(0, BASE_TABS.findIndex(tab => tab.id === activeTab));
-  const tabsStyle = {
-    '--right-workspace-active-tab-index': `${activeTabIndex}`,
-    '--right-workspace-tab-slider-offset': activeTabIndex === 0 ? '0px' : 'calc(100% + 2px)',
-  } as CSSProperties;
-
   return (
     <div className={styles.shell}>
       {!compact && <SessionTodoCard />}
@@ -131,28 +75,7 @@ export function RightWorkspacePanel({ compact = false }: { compact?: boolean }) 
         data-right-workspace-card=""
         data-jian-open={jianDrawerOpen ? 'true' : 'false'}
       >
-        <WorkspaceHeader />
-        <div className={styles.tabs} role="tablist" aria-label={t('rightWorkspace.tabs.label')} style={tabsStyle}>
-          <div className={styles.tabSlider} data-right-workspace-tab-slider aria-hidden="true" />
-          {BASE_TABS.map(tab => {
-            const selected = activeTab === tab.id;
-            return (
-              <button
-                key={tab.id}
-                type="button"
-                className={`${styles.tab}${selected ? ` ${styles.tabActive}` : ''}`}
-                role="tab"
-                aria-selected={selected}
-                onClick={() => setRightWorkspaceTab(tab.id)}
-              >
-                {t(tab.labelKey)}
-              </button>
-            );
-          })}
-        </div>
-        <div className={styles.content} role="tabpanel">
-          <TabContent activeTab={activeTab} />
-        </div>
+        <WorkspaceStableBody />
         <JianDrawer />
         <JianFloatingToggle />
       </div>

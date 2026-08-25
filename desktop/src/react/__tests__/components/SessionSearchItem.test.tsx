@@ -20,7 +20,7 @@ vi.mock('../../hooks/use-i18n', () => ({
   useI18n: () => ({ t: (key: string) => key }),
 }));
 
-import { SessionSearchItem } from '../../components/SessionList';
+import { SessionSearchItem } from '../../components/search/ChatSearchOverlay';
 
 function makeResult(overrides: Record<string, unknown> = {}) {
   return {
@@ -38,49 +38,42 @@ function makeResult(overrides: Record<string, unknown> = {}) {
   };
 }
 
-describe('SessionSearchItem click routing', () => {
+describe('SessionSearchItem', () => {
+  const onSelect = vi.fn();
+
   beforeEach(() => {
     switchSessionMock.mockReset();
     locateSearchHitMock.mockReset();
+    onSelect.mockReset();
   });
 
   afterEach(() => {
     cleanup();
   });
 
-  it('routes content match hits through locateSearchHit with the query, not switchSession', () => {
+  it('forwards a content match result with its query on click', () => {
     const result = makeResult({ matchKind: 'content' });
     render(
-      <SessionSearchItem result={result as never} isActive={false} agents={[]} query="排查" />,
+      <SessionSearchItem result={result as never} isActive={false} agents={[]} query="排查" onSelect={onSelect} />,
     );
 
     fireEvent.click(screen.getByText('Result title').closest('button')!);
 
-    expect(locateSearchHitMock).toHaveBeenCalledWith(result.path, '排查');
+    expect(onSelect).toHaveBeenCalledWith(result);
+    // 点击路由（locateSearchHit/switchSession 分流）不在 item 内，由 ChatSearchOverlay 测试覆盖。
     expect(switchSessionMock).not.toHaveBeenCalled();
+    expect(locateSearchHitMock).not.toHaveBeenCalled();
   });
 
-  it('routes title match hits through switchSession, not locateSearchHit', () => {
+  it('forwards a title match result on click and shows the snippet', () => {
     const result = makeResult({ matchKind: 'title' });
     render(
-      <SessionSearchItem result={result as never} isActive={false} agents={[]} query="排查" />,
+      <SessionSearchItem result={result as never} isActive={false} agents={[]} query="排查" onSelect={onSelect} />,
     );
 
     fireEvent.click(screen.getByText('Result title').closest('button')!);
 
-    expect(switchSessionMock).toHaveBeenCalledWith(result.path);
-    expect(locateSearchHitMock).not.toHaveBeenCalled();
-  });
-
-  it('falls back to switchSession for a content match when the query is blank', () => {
-    const result = makeResult({ matchKind: 'content' });
-    render(
-      <SessionSearchItem result={result as never} isActive={false} agents={[]} query="   " />,
-    );
-
-    fireEvent.click(screen.getByText('Result title').closest('button')!);
-
-    expect(switchSessionMock).toHaveBeenCalledWith(result.path);
-    expect(locateSearchHitMock).not.toHaveBeenCalled();
+    expect(onSelect).toHaveBeenCalledWith(result);
+    expect(screen.getByText('a snippet')).toBeInTheDocument();
   });
 });

@@ -202,8 +202,11 @@ export function SettingsContent({
         serverToken,
         ...nextConnectionState,
       });
-      loadAgents().catch(() => {});
-      loadSettingsSnapshot().catch(() => {});
+      const agentsReload = loadAgents().catch(() => {});
+      // snapshot 依赖 agentId（getSettingsAgentId 读 loadAgents 的落库结果）：
+      // 必须等 agents 完成后再发，否则 agentId 为空时快照以「No settings agent
+      // selected」必败且无人重试，settingsConfig 恒 null。
+      agentsReload.then(() => { loadSettingsSnapshot().catch(() => {}); });
       loadSettingsModels().catch(() => {});
       loadProvidersSummary().catch(() => {});
     });
@@ -372,14 +375,19 @@ async function initSettings() {
       }
     })();
 
-    // 连接已就绪：全部数据加载并行。供应商摘要由 init 统一发起（原来 ProvidersTab
-    // 挂载时抢跑 fetch，连接未就绪必败且静默后无重试，供应商页数据残缺）。
-    // retainSameKeyData：重开设置时保留同 key 旧数据直到新数据到达，避免内容区闪空。
+    // 连接已就绪：互不依赖的数据加载并行。供应商摘要由 init 统一发起（原来
+    // ProvidersTab 挂载时抢跑 fetch，连接未就绪必败且静默无重试，供应商页数据残缺）。
+    // snapshot / avatars 依赖 agentId（getSettingsAgentId 读 loadAgents 的落库结果）：
+    // 必须串在 agents 之后。曾经与 agents 并行，冷启动时 agentId 必为 null，快照以
+    // 「No settings agent selected」必败且无重试，settingsConfig 恒 null——关于页
+    // 「自动检查更新 / 接收测试版更新」两个 Toggle 永久卡 loading 脉冲且点不动。
+    const agentsReady = loadAgents();
     await Promise.all([
       i18nReady,
-      loadAgents(),
-      loadAvatars(),
-      loadSettingsSnapshot({ retainSameKeyData: true }),
+      agentsReady,
+      // retainSameKeyData：重开设置时保留同 key 旧数据直到新数据到达，避免内容区闪空。
+      agentsReady.then(() => loadSettingsSnapshot({ retainSameKeyData: true })),
+      agentsReady.then(() => loadAvatars()),
       loadSettingsModels(),
     ]);
 

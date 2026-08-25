@@ -10,7 +10,6 @@ import { ChannelMessages, ChannelMembers, ChannelInput, ChannelReadonly, Channel
 import { ChannelHeader } from '../channels/ChannelHeader';
 import { MainContent } from '../../MainContent';
 import { ChatPage } from './ChatPage';
-import { WorkspaceCompanionRail } from './WorkspaceCompanionRail';
 
 const tr = (key: string, vars?: Record<string, string | number>) => window.t?.(key, vars) ?? key;
 
@@ -144,7 +143,6 @@ export function AppPages() {
       </MainContent>
 
       {currentTab === 'chat' && <PreviewPanel />}
-      <WorkspaceCompanionRail />
     </>
   );
 }

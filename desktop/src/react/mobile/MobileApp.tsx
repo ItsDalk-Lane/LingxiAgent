@@ -349,8 +349,7 @@ function MobileDesktopShell({
           includeChannels={false}
           showSettingsButton={false}
           showActivityBars={false}
-          onNewSession={() => void createNewSession()}
-          onCollapse={() => toggleSidebar(false)}
+          showWorkspaceSection={false}
           region="mobile-sidebar"
         />
         <MainContent>

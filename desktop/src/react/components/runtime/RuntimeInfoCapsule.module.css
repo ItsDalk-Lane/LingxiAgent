@@ -1,0 +1,164 @@
+/* ========================================
+   RuntimeInfoCapsule — 运行信息悬浮胶囊
+   桌面 chat 页右上角浮层：收起为小胶囊，展开时胶囊自身长成统一圆角容器
+   （单一界面：胶囊头留在容器顶部作标题行，内容在其下，不另起弹出面板）。
+   ======================================== */
+
+.root {
+    position: absolute;
+    top: var(--panel-edge-gap);
+    right: var(--panel-edge-gap);
+    z-index: 60; /* 高于 transcript / browser-floating-card(50)，低于全局浮层面板(1000) */
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    max-width: calc(100% - var(--panel-edge-gap) * 2);
+    pointer-events: none; /* 容器自身不拦截 transcript 交互，交互元素各自恢复 */
+    -webkit-app-region: no-drag;
+}
+
+/* ── 展开态：胶囊自身成为统一容器 ── */
+.root.expanded {
+    pointer-events: auto;
+    width: 320px;
+    max-height: min(60vh, 560px);
+    align-items: stretch;
+    background: var(--bg-card, var(--bg));
+    border: 1px solid var(--overlay-light);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 8px 32px var(--shadow), 0 2px 8px rgba(0, 0, 0, 0.04);
+    overflow: hidden;
+    animation: runtime-capsule-pop var(--duration-fast) var(--ease-out);
+}
+
+@keyframes runtime-capsule-pop {
+    from {
+        opacity: 0.6;
+        transform: translateY(-4px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.pill {
+    pointer-events: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 26px;
+    padding: 0 10px;
+    border: 1px solid var(--overlay-light);
+    border-radius: 999px;
+    background: var(--bg-card, var(--bg));
+    color: var(--text-muted);
+    font-family: inherit;
+    font-size: var(--fs-hint);
+    line-height: 1;
+    cursor: default;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    transition: color var(--duration-fast) var(--ease-out),
+                border-color var(--duration-fast) var(--ease-out);
+}
+
+.pill:hover {
+    color: var(--accent);
+    border-color: rgba(var(--accent-rgb), 0.35);
+}
+
+.pill svg {
+    display: block;
+    flex-shrink: 0;
+}
+
+.pillLabel {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* 展开后胶囊头保留为容器标题行 */
+.root.expanded .pill {
+    align-self: stretch;
+    height: 34px;
+    padding: 0 var(--space-16);
+    justify-content: flex-start;
+    border: none;
+    border-bottom: 1px solid var(--overlay-light);
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    color: var(--text-light);
+    font-size: var(--fs-ui);
+    font-weight: 500;
+}
+
+/* ── 展开容器的内容区：卡片皮肤在内部压平 ── */
+.panelBody {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    display: flex;
+    flex-direction: column;
+}
+
+.panelBody :global(.universal-card) {
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    overflow: visible;
+}
+
+/* 相邻运行卡之间用分隔线代替卡片间隔（返回 null 的卡不占位） */
+.panelBody :global(.universal-card + .universal-card) {
+    border-top: 1px solid var(--overlay-light);
+}
+
+/* ── 笺 Section（始终可用，无 session 时容器也不为空） ── */
+.jianSection {
+    display: flex;
+    flex-direction: column;
+    border-bottom: 1px solid var(--overlay-light);
+}
+
+.jianHeader {
+    display: flex;
+    align-items: center;
+    min-height: 34px;
+    padding: 0 var(--space-16);
+    flex-shrink: 0;
+}
+
+.jianTitle {
+    font-family: var(--font-ui);
+    font-size: 0.94rem;
+    font-weight: 600;
+    color: var(--text-light);
+}
+
+.jianBody {
+    height: 180px;
+    flex-shrink: 0;
+}
+
+.jianBody :global([data-desk-editor]) {
+    height: 100%;
+    margin: 0;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    background: transparent;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .pill {
+        transition: none;
+    }
+
+    .root.expanded {
+        animation: none;
+    }
+}

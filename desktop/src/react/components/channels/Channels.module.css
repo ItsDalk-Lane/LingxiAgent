@@ -3,7 +3,10 @@
    ======================================== */
 .tbTabs {
     position: absolute;
-    left: 50%;
+    /* 居中基准 = 聊天区（窗口去掉左栏）：侧栏打开时右移半个侧栏宽。
+       --sidebar-width 折叠时不归零（.sidebar.collapsed 只把 width 置 0），
+       折叠回退由下方 :has 规则处理。 */
+    left: calc(50% + var(--sidebar-width) / 2);
     transform: translateX(-50%);
     pointer-events: auto;
     -webkit-app-region: no-drag;
@@ -13,6 +16,11 @@
     background: var(--overlay-light);
     border-radius: var(--radius-md);
     padding: 2px;
+}
+
+/* 侧栏折叠（宽 0，含插件页强制折叠）时退回整窗居中 */
+:global(.app-shell):has(:global(.sidebar.collapsed)) .tbTabs {
+    left: 50%;
 }
 
 .tbTabsSlider {

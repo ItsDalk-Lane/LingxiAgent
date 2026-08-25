@@ -209,6 +209,7 @@ export function toCompactionLifecycleWsMessage(
   getSessionByPath: any,
   getSessionIdForPath: any,
   getCompactionMode?: any,
+  getSessionContextUsage?: any,
 ) {
   if (!sessionPath) return null;
   const sessionId = getSessionIdForPath?.(sessionPath) ?? null;
@@ -225,7 +226,11 @@ export function toCompactionLifecycleWsMessage(
   }
   if (event.type !== "compaction_end") return null;
 
-  const usage = getSessionByPath?.(sessionPath)?.getContextUsage?.();
+  // 优先走 coordinator 的 getSessionContextUsage：它会把 streamFn 边界缓存的
+  // breakdown 与总量对账后一并带回；compaction 后 tokens 未知时 breakdown 为
+  // null,前端据此清掉压缩前的旧明细,不残留。
+  const usage = getSessionContextUsage?.(sessionPath)
+    ?? getSessionByPath?.(sessionPath)?.getContextUsage?.();
   return {
     type: "compaction_end",
     sessionId,
@@ -237,6 +242,7 @@ export function toCompactionLifecycleWsMessage(
     tokens: usage?.tokens ?? null,
     contextWindow: usage?.contextWindow ?? null,
     percent: usage?.percent ?? null,
+    breakdown: usage?.breakdown ?? null,
   };
 }
 
@@ -1250,6 +1256,7 @@ export function createChatRoute(engine: any, hub: any, {
       (sp) => engine.getSessionByPath(sp),
       (sp) => sessionIdForPath(sp),
       () => getResolvedCompactionMode(engine.preferences),
+      (sp) => engine.getSessionContextUsage?.(sp),
     );
     if (compactionMessage) {
       broadcast(compactionMessage);
@@ -2237,9 +2244,13 @@ export function createChatRoute(engine: any, hub: any, {
               wsSend(ws, {
                 type: "context_usage",
                 sessionPath: usagePath,
+                ...(usageCtx.sessionId ? { sessionId: usageCtx.sessionId } : {}),
                 tokens: usage?.tokens ?? null,
                 contextWindow: usage?.contextWindow ?? null,
                 percent: usage?.percent ?? null,
+                // 任务二十:breakdown 为扩展可选字段,读取侧对账失败/无数据时为 null,
+                // handler 里不现算全量(统计在 streamFn 边界逐请求缓存)。
+                breakdown: usage?.breakdown ?? null,
               });
               return;
             }

@@ -1,22 +1,19 @@
 /**
- * FloatSidebar — 侧边栏折叠时 hover 滑入的全高面板
+ * FloatSidebar — 左侧栏折叠时 hover 滑入的全高面板
  *
- * 左侧：完整 ChatSidebarContent（搜索、分组、拖拽、右键菜单）
- * 右侧：完整 RightWorkspacePanel（文件树、笺编辑器）
+ * 内容 = 完整 ChatSidebarContent 新结构（顶部功能图标行、Session 区、工作台区）。
+ * 原右侧浮出（旧 RightWorkspacePanel 的 hover 展示路径）已随固定右栏移除而退役。
  */
 
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback } from 'react';
 import { useStore } from '../stores';
 import { useAnimatePresence } from '../hooks/use-animate-presence';
-import { createNewSession } from '../stores/session-actions';
 import { openSettingsModal } from '../stores/settings-modal-actions';
 import { ChatSidebarContent } from './app/ChatSidebar';
-import { RightWorkspacePanel } from './right-workspace/RightWorkspacePanel';
-import { RegionalErrorBoundary } from './RegionalErrorBoundary';
 
 import type { ActivePanel } from '../types';
 
-type FloatSidebarSide = 'left' | 'right';
+type FloatSidebarSide = 'left';
 
 let _enterTimer: ReturnType<typeof setTimeout> | null = null;
 let _leaveTimer: ReturnType<typeof setTimeout> | null = null;
@@ -24,15 +21,12 @@ let _leaveTimer: ReturnType<typeof setTimeout> | null = null;
 export function useFloatSidebar() {
   const [side, setSide] = useState<FloatSidebarSide | null>(null);
 
-  const show = useCallback((target: FloatSidebarSide) => {
+  const show = useCallback(() => {
     if (_leaveTimer) clearTimeout(_leaveTimer);
     if (_enterTimer) clearTimeout(_enterTimer);
     _enterTimer = setTimeout(() => {
-      const isCollapsed = target === 'left'
-        ? !useStore.getState().sidebarOpen
-        : !useStore.getState().jianOpen;
-      if (!isCollapsed) return;
-      setSide(target);
+      if (useStore.getState().sidebarOpen) return;
+      setSide('left');
     }, 200);
   }, []);
 
@@ -72,42 +66,28 @@ export function FloatSidebar({
   onMouseLeave: () => void;
   onAction: () => void;
 }) {
-  const lastSideRef = useRef<FloatSidebarSide>('left');
-  if (side) lastSideRef.current = side;
-
   const { mounted, stage } = useAnimatePresence(side !== null, {
     duration: FLOAT_SIDEBAR_ANIM_DURATION,
   });
 
   if (!mounted) return null;
 
-  const activeSide = lastSideRef.current;
-
   return (
     <div
       className="float-sidebar"
-      data-side={activeSide}
+      data-side="left"
       data-stage={stage}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
     >
-      <div className={`float-sidebar-panel float-sidebar-panel-${activeSide}`}>
-        {activeSide === 'left' ? (
-          <LeftPanel onAction={onAction} />
-        ) : (
-          <RightPanel />
-        )}
+      <div className="float-sidebar-panel float-sidebar-panel-left">
+        <LeftPanel onAction={onAction} />
       </div>
     </div>
   );
 }
 
 function LeftPanel({ onAction }: { onAction: () => void }) {
-  const handleNewSession = useCallback(() => {
-    onAction();
-    createNewSession();
-  }, [onAction]);
-
   const handleOpenSettings = useCallback(() => {
     onAction();
     openSettingsModal();
@@ -118,20 +98,10 @@ function LeftPanel({ onAction }: { onAction: () => void }) {
       <ChatSidebarContent
         showSettingsButton
         showActivityBars
-        onNewSession={handleNewSession}
-        onCollapse={onAction}
         onOpenSettings={handleOpenSettings}
         onTogglePanel={togglePanel}
         region="float-sidebar"
       />
     </div>
-  );
-}
-
-function RightPanel() {
-  return (
-    <RegionalErrorBoundary region="float-sidebar-right">
-      <RightWorkspacePanel compact />
-    </RegionalErrorBoundary>
   );
 }

@@ -107,27 +107,41 @@ vi.mock('../../components/input/InputContextRow', () => ({
   InputContextRow: () => null,
 }));
 
-vi.mock('../../components/input/InputControlBar', () => ({
-  InputControlBar: ({
-    canSend,
+vi.mock('../../components/input/ComposerToolbar', () => ({
+  ComposerToolbar: ({
+    showAudioInput,
+    onAudioToggle,
+    audioRecordingActive,
+  }: {
+    showAudioInput?: boolean;
+    onAudioToggle?: () => void;
+    audioRecordingActive?: boolean;
+  }) => (
+    showAudioInput
+      ? React.createElement(
+        'button',
+        { type: 'button', 'data-testid': 'record-audio', onClick: onAudioToggle },
+        audioRecordingActive ? 'stop' : 'record',
+      )
+      : null
+  ),
+}));
+
+vi.mock('../../components/input/SendButton', () => ({
+  SendButton: ({
+    disabled,
     onSend,
     isStreaming,
     hasInput,
     onSteer,
     onStop,
-    showAudioInput,
-    onAudioToggle,
-    audioRecordingActive,
   }: {
-    canSend: boolean;
+    disabled?: boolean;
     onSend: () => void;
     isStreaming?: boolean;
     hasInput?: boolean;
     onSteer?: () => void;
     onStop?: () => void;
-    showAudioInput?: boolean;
-    onAudioToggle?: () => void;
-    audioRecordingActive?: boolean;
   }) => React.createElement(
     React.Fragment,
     null,
@@ -136,18 +150,12 @@ vi.mock('../../components/input/InputControlBar', () => ({
       {
         type: 'button',
         'data-testid': 'send',
-        disabled: isStreaming ? !hasInput : !canSend,
+        // InputArea 传入 disabled = isStreaming ? false : !canSend，这里还原原 mock 的可用态逻辑。
+        disabled: isStreaming ? !hasInput : disabled,
         onClick: isStreaming ? onSteer : onSend,
       },
       'send',
     ),
-    showAudioInput
-      ? React.createElement(
-        'button',
-        { type: 'button', 'data-testid': 'record-audio', onClick: onAudioToggle },
-        audioRecordingActive ? 'stop' : 'record',
-      )
-      : null,
     isStreaming
       ? React.createElement('button', { type: 'button', 'data-testid': 'stop', onClick: onStop }, 'stop')
       : null,

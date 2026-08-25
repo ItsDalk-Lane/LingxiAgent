@@ -191,7 +191,8 @@
     }
   },
   "titlebar": {
-    "currentChatTitle": "目前對話標題"
+    "currentChatTitle": "目前對話標題",
+    "search": "搜尋聊天記錄"
   },
   "session": {
     "untitled": "新對話",
@@ -441,6 +442,23 @@
     "refreshAndCompactBusy": "正在壓縮並更新對話…",
     "refreshAndCompactFailed": "壓縮並更新失敗",
     "compact": "壓縮",
+    "contextDetail": "詳情",
+    "contextDetailBack": "返回",
+    "contextDetailEmpty": "暫無數據",
+    "contextDetailUsed": "已用",
+    "contextDetailWindowTotal": "上下文窗口",
+    "contextDetailRemaining": "剩餘容量",
+    "contextCategory": {
+      "system": "系統提示",
+      "conversation": "歷史對話",
+      "user": "當前輸入",
+      "tools": "工具定義",
+      "toolResults": "工具結果",
+      "mcp": "MCP",
+      "skills": "Skill",
+      "files": "檔案參考",
+      "other": "其他"
+    },
     "noAskThisConversation": "本对话不再询问",
     "confirmMoreOptions": "更多确认选项",
     "attachmentDirectory": "[目录] {label}",
@@ -3453,6 +3471,12 @@
       "collapse": "收起箋",
       "expand": "展開箋"
     }
+  },
+  "runtimeCapsule": {
+    "title": "執行資訊",
+    "expand": "展開執行資訊",
+    "collapse": "收起執行資訊",
+    "running": "{n} 項進行中"
   },
   "desk": {
     "title": "書桌",

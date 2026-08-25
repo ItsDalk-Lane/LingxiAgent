@@ -191,7 +191,8 @@
     }
   },
   "titlebar": {
-    "currentChatTitle": "当前对话标题"
+    "currentChatTitle": "当前对话标题",
+    "search": "搜索聊天记录"
   },
   "session": {
     "untitled": "新对话",
@@ -441,6 +442,23 @@
     "refreshAndCompactBusy": "正在压缩并更新对话…",
     "refreshAndCompactFailed": "压缩并更新失败",
     "compact": "压缩",
+    "contextDetail": "详情",
+    "contextDetailBack": "返回",
+    "contextDetailEmpty": "暂无数据",
+    "contextDetailUsed": "已用",
+    "contextDetailWindowTotal": "上下文窗口",
+    "contextDetailRemaining": "剩余容量",
+    "contextCategory": {
+      "system": "系统提示",
+      "conversation": "历史对话",
+      "user": "当前输入",
+      "tools": "工具定义",
+      "toolResults": "工具结果",
+      "mcp": "MCP",
+      "skills": "Skill",
+      "files": "文件引用",
+      "other": "其他"
+    },
     "noAskThisConversation": "本对话不再询问",
     "confirmMoreOptions": "更多确认选项",
     "attachmentDirectory": "[目录] {label}",
@@ -3527,6 +3545,12 @@
       "collapse": "收起笺",
       "expand": "展开笺"
     }
+  },
+  "runtimeCapsule": {
+    "title": "运行信息",
+    "expand": "展开运行信息",
+    "collapse": "收起运行信息",
+    "running": "{n} 项进行中"
   },
   "desk": {
     "title": "书桌",

@@ -191,7 +191,8 @@
     }
   },
   "titlebar": {
-    "currentChatTitle": "Current chat title"
+    "currentChatTitle": "Current chat title",
+    "search": "Search chats"
   },
   "session": {
     "untitled": "New Chat",
@@ -446,6 +447,23 @@
     "refreshAndCompactBusy": "Compacting and updating conversation…",
     "refreshAndCompactFailed": "Compact and update failed",
     "compact": "Compact",
+    "contextDetail": "Details",
+    "contextDetailBack": "Back",
+    "contextDetailEmpty": "No data yet",
+    "contextDetailUsed": "Used",
+    "contextDetailWindowTotal": "Context window",
+    "contextDetailRemaining": "Remaining",
+    "contextCategory": {
+      "system": "System prompt",
+      "conversation": "Conversation",
+      "user": "Current input",
+      "tools": "Tool definitions",
+      "toolResults": "Tool results",
+      "mcp": "MCP",
+      "skills": "Skills",
+      "files": "File references",
+      "other": "Other"
+    },
     "mention": {
       "title": "Mention",
       "tab": {
@@ -3452,6 +3470,12 @@
       "collapse": "Collapse Jian",
       "expand": "Expand Jian"
     }
+  },
+  "runtimeCapsule": {
+    "title": "Runtime info",
+    "expand": "Expand runtime info",
+    "collapse": "Collapse runtime info",
+    "running": "{n} running"
   },
   "desk": {
     "title": "Desk",

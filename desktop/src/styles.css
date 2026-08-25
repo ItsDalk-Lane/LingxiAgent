@@ -311,6 +311,17 @@ option,
     border-bottom: 1px solid var(--overlay-light);
 }
 
+/* 标题栏左侧按钮组（折叠 + 搜索）：横向一排、与主行水平居中。
+   折叠↔放大镜间距收至 2px（原 4px 偏大，用户反馈该处间距大于折叠↔交通灯一侧要改小）；
+   与交通灯内部紧凑间隙对齐，使五个按钮视觉节奏统一。 */
+.tb-left-group {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    pointer-events: auto;
+    -webkit-app-region: no-drag;
+}
+
 /* titlebar 里的 sidebar toggle 按钮 */
 .tb-toggle {
     pointer-events: auto;
@@ -340,9 +351,15 @@ option,
     color: var(--text, #333);
 }
 
-/* macOS 红绿灯避让：左按钮留出空间 */
+/* macOS 红绿灯避让：左按钮留出空间，与初始基准一致，避免折叠按钮被挤出版面 */
 .tb-toggle-left {
     margin-left: 68px;
+}
+
+/* 搜索按钮紧邻折叠按钮：间距由 .tb-left-group 的 gap(2px) 统一控制，
+   不再单独加 margin-left，否则叠加成 4px、与组内其它间距不一致 */
+.tb-toggle-search {
+    margin-left: 0;
 }
 
 .tb-toggle-right {
@@ -361,6 +378,10 @@ option,
 html[data-platform="win32"] .tb-toggle-left,
 html[data-platform="linux"] .tb-toggle-left {
     margin-left: 4px;
+}
+html[data-platform="win32"] .tb-toggle-search,
+html[data-platform="linux"] .tb-toggle-search {
+    margin-left: 0;
 }
 html[data-platform="win32"] .tb-toggle-right,
 html[data-platform="linux"] .tb-toggle-right {
@@ -421,13 +442,6 @@ html[data-platform="linux"] .tb-toggle-right {
     transform: translateX(-100%);
 }
 
-.float-sidebar[data-side="right"] {
-    right: 0;
-    bottom: 0;
-    padding: 0 var(--panel-edge-gap);
-    transform: translateX(100%);
-}
-
 .float-sidebar[data-stage="enter"],
 .float-sidebar[data-stage="exit"] {
     animation-duration: var(--duration-slow);
@@ -437,8 +451,6 @@ html[data-platform="linux"] .tb-toggle-right {
 
 .float-sidebar[data-side="left"][data-stage="enter"]  { animation-name: float-sidebar-in-left; }
 .float-sidebar[data-side="left"][data-stage="exit"]   { animation-name: float-sidebar-out-left; }
-.float-sidebar[data-side="right"][data-stage="enter"] { animation-name: float-sidebar-in-right; }
-.float-sidebar[data-side="right"][data-stage="exit"]  { animation-name: float-sidebar-out-right; }
 
 .float-sidebar[data-stage="idle"] {
     transform: translateX(0);
@@ -451,14 +463,6 @@ html[data-platform="linux"] .tb-toggle-right {
 @keyframes float-sidebar-out-left {
     from { transform: translateX(0); }
     to   { transform: translateX(-100%); }
-}
-@keyframes float-sidebar-in-right {
-    from { transform: translateX(100%); }
-    to   { transform: translateX(0); }
-}
-@keyframes float-sidebar-out-right {
-    from { transform: translateX(0); }
-    to   { transform: translateX(100%); }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -487,12 +491,6 @@ html[data-platform="linux"] .tb-toggle-right {
     border: 1px solid rgba(0, 0, 0, 0.08);
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04),
                 0 1px 4px rgba(0, 0, 0, 0.03);
-}
-
-.float-sidebar-panel-right {
-    width: var(--jian-sidebar-width, 260px);
-    background: var(--bg);
-    overflow: hidden;
 }
 
 /* ── 左侧面板内部：覆盖 sidebar 原有样式 ── */
@@ -625,54 +623,65 @@ html[data-platform="linux"] .tb-toggle-right {
     background: var(--accent-light);
 }
 
-/* 活动条（session 列表上方） */
-.sidebar-activity-bar {
+/* 顶部功能按钮行（Bridge / Activity / Automation / Skills / Settings 纯图标） */
+.sidebar-function-row {
     display: flex;
     align-items: center;
-    gap: 8px;
-    width: calc(100% - var(--space-8) * 2);
-    margin: 2px var(--space-8) 4px;
-    padding: var(--space-6) var(--space-12);
-    border-radius: var(--radius-sm);
-    font-family: inherit;
-    font-size: var(--fs-caption);
-    color: var(--text-muted);
+    gap: 2px;
+    padding: var(--space-8) var(--space-16) var(--space-4);
+    flex-shrink: 0;
+    -webkit-app-region: no-drag;
+}
+
+.sidebar-icon-btn {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
     background: none;
     border: none;
+    border-radius: var(--radius-sm);
+    color: var(--text-muted);
     cursor: default;
     transition: all var(--duration-fast) var(--ease-out);
-    flex-shrink: 0;
 }
 
-.sidebar-activity-bar:hover {
-    background: var(--accent-light);
+.sidebar-icon-btn:hover {
     color: var(--accent);
+    background: var(--accent-light);
 }
 
-.sidebar-activity-bar svg {
+.sidebar-icon-btn svg {
+    display: block;
     flex-shrink: 0;
-    opacity: 0.45;
 }
 
-.sidebar-activity-bar:hover svg {
-    opacity: 0.8;
+/* 设置按钮固定在功能行右端 */
+.sidebar-function-row-settings {
+    margin-left: auto;
 }
 
-/* 接入社交平台 — sidebar 卡片 */
-.sidebar-bridge-card {
-    background: rgba(255,255,255,0.5);
-    border: 1px solid rgba(0,0,0,0.05);
-    box-shadow: 0 1px 3px rgba(0,0,0,0.03);
-    color: var(--sidebar-bridge-card-text, var(--text-muted));
-    width: calc(100% - var(--space-16) * 2);
-    margin: 4px auto 6px;
-    padding: 7px var(--space-12);
-    justify-content: center;
+/* 图标按钮内的状态提示改为角标定位（原 activity-bar 内联布局已退役） */
+.sidebar-icon-btn .sidebar-bridge-dot {
+    position: absolute;
+    right: 2px;
+    bottom: 2px;
+    margin-left: 0;
 }
-.sidebar-bridge-card:hover {
-    background: rgba(255,255,255,0.7);
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+
+.sidebar-icon-btn .automation-count-badge {
+    position: absolute;
+    top: -3px;
+    right: -6px;
+    margin-left: 0;
 }
+
+.sidebar-icon-btn .automation-count-badge:empty {
+    display: none;
+}
+
 .sidebar-bridge-dot {
     width: 6px;
     height: 6px;
@@ -2204,7 +2213,8 @@ html[data-platform="linux"] .tb-toggle-right {
     bottom: 0;
     left: 0;
     right: 0;
-    padding: 0 var(--space-24) var(--space-24);
+    /* 底距与输入框→工具行的间距一致（--space-8），见 ComposerToolbar margin-top */
+    padding: 0 var(--space-24) var(--space-8);
     background: transparent;
     z-index: 5;
     pointer-events: none;

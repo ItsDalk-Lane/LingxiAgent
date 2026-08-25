@@ -358,6 +358,9 @@ function updateCompactionContext(msg: any): void {
       tokens: msg.tokens ?? null,
       window: msg.contextWindow ?? existing?.window ?? null,
       percent: msg.percent ?? null,
+      // 与 context_usage 同一语义:字段缺失保留旧值,显式 null 清除(compaction 后
+      // 服务端对账不出明细时主动置空,避免压缩前的旧明细残留在详情视图)。
+      breakdown: msg.breakdown !== undefined ? msg.breakdown : existing?.breakdown,
     };
     const contextBySession = { ...(state.contextBySession || {}), [key]: value };
     if (sessionId && sessionPath && sessionId !== sessionPath) delete contextBySession[sessionPath];
@@ -1079,11 +1082,14 @@ export function handleServerMessage(msg: any): void {
     case 'context_usage': {
       const sp = msg.sessionPath;
       if (!sp) { console.warn('[ws] event missing sessionPath:', msg.type); break; }
-      const existingWindow = sessionScopedValue(useStore.getState(), useStore.getState().contextBySession, sp)?.window ?? null;
-      const window = msg.contextWindow ?? existingWindow;
+      const existing = sessionScopedValue(useStore.getState(), useStore.getState().contextBySession, sp);
+      const window = msg.contextWindow ?? existing?.window ?? null;
       if (msg.tokens != null || window != null || msg.percent != null) {
+        // breakdown 为可选扩展字段:字段缺失(旧服务端)时保留旧值;显式 null
+        // (如 compaction 后)表示服务端确认无明细,清掉旧值,不残留。
+        const breakdown = msg.breakdown !== undefined ? msg.breakdown : existing?.breakdown;
         updateKeyed('contextBySession', sp,
-          { tokens: msg.tokens ?? null, window, percent: msg.percent ?? null },
+          { tokens: msg.tokens ?? null, window, percent: msg.percent ?? null, breakdown },
           (_s, d) => ({ contextTokens: d.tokens, contextWindow: d.window, contextPercent: d.percent }),
         );
       }

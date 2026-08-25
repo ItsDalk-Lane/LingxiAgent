@@ -660,7 +660,7 @@
     ],
     "version": 3
   },
-  "payloadFingerprint": "sha256:f4cfa1e85848f7b621a87f5cc638a3d0c9229d71acae9f662e34b438358a3d49",
+  "payloadFingerprint": "sha256:ab819c64862fffe49b9ae5b1fbce7bbff548390c9ac5301ddb44c135210be95c",
   "registry": [
     {
       "affectedByEpochMigration": true,
@@ -3090,8 +3090,8 @@
   ],
   "review": {
     "classification": "compatible",
-    "compatibilityReason": "Model Observatory schema v3 adds one nullable constrained usage-correlation column through a single-transaction v2 migration while retaining v1/v2 read compatibility; the new blob shard layout recomputes paths from blobId and preserves legacy blobs/mb reads, so existing data remains readable without a DATA_EPOCH change.",
-    "payloadFingerprint": "sha256:f4cfa1e85848f7b621a87f5cc638a3d0c9229d71acae9f662e34b438358a3d49"
+    "compatibilityReason": "session-coordinator: Context Ring 分类估值(contextUsageEstimate)随请求边界去抖落盘到 session-meta 并在 entry 重建时恢复、压缩时置空;仅新增可选 JSON 字段,不触及任何 SQLite store schema 或 DATA_EPOCH",
+    "payloadFingerprint": "sha256:ab819c64862fffe49b9ae5b1fbce7bbff548390c9ac5301ddb44c135210be95c"
   },
   "schemas": [
     {
@@ -3692,7 +3692,7 @@
         {
           "contract": "core/session-coordinator.ts Hana metadata extensions",
           "module": "core/session-coordinator.ts",
-          "sourceHash": "sha256:18396377b41487388a939f3062df252c7fe829290aadfba1f622be500acf346d"
+          "sourceHash": "sha256:79bea5413e65463f51675499e07281dc8dd33b9798c514d02ed57484fdf0272a"
         },
         {
           "contract": "core/session-jsonl-file.ts repair contract",

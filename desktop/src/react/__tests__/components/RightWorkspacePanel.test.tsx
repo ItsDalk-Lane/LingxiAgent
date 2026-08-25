@@ -231,7 +231,6 @@ describe('RightWorkspacePanel', () => {
     );
     const shellBlock = panelCss.match(/\.shell\s*\{[\s\S]*?\}/)?.[0] ?? '';
     const jianInnerBlock = globalCss.match(/\.jian-sidebar-inner\s*\{[\s\S]*?\}/)?.[0] ?? '';
-    const floatRightBlock = globalCss.match(/\.float-sidebar\[data-side="right"\]\s*\{[\s\S]*?\}/)?.[0] ?? '';
     const rootBlock = globalCss.match(/:root\s*\{[\s\S]*?\}/)?.[0] ?? '';
     const universalCardBlock = globalCss.match(/\.universal-card,\s*\.jian-card\s*\{[\s\S]*?\}/)?.[0] ?? '';
 
@@ -244,7 +243,6 @@ describe('RightWorkspacePanel', () => {
     expect(shellBlock).toMatch(/gap:\s*var\(--panel-edge-gap\);/);
     expect(panelCss).toMatch(/--right-workspace-jian-bottom:\s*var\(--panel-edge-gap\);/);
     expect(jianInnerBlock).toMatch(/padding:\s*0 var\(--panel-edge-gap\) 0 0;/);
-    expect(floatRightBlock).toMatch(/padding:\s*0 var\(--panel-edge-gap\);/);
     expect(universalCardBlock).toMatch(/background(?:-color)?:\s*var\(--panel-card-bg\);/);
     expect(universalCardBlock).toMatch(/border-radius:\s*var\(--panel-card-radius\);/);
     expect(universalCardBlock).toMatch(/border:\s*var\(--panel-card-border\);/);

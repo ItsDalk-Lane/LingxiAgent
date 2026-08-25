@@ -115,7 +115,7 @@ describe('ContextRing', () => {
     expect(queryByText('100k')).toBeNull();
   });
 
-  it('opens a two-action menu instead of compacting immediately', async () => {
+  it('opens an action menu instead of compacting immediately', async () => {
     useStore.setState({
       compactingSessions: [],
     } as never);
@@ -128,6 +128,7 @@ describe('ContextRing', () => {
     expect(screen.getAllByRole('menuitem').map(item => item.textContent)).toEqual([
       'input.compact',
       'input.refreshAndCompact',
+      'input.contextDetail',
     ]);
     expect(screen.queryByText('chat.instantSimpleCompaction')).not.toBeInTheDocument();
     expect(sendMock).not.toHaveBeenCalled();
@@ -147,6 +148,7 @@ describe('ContextRing', () => {
       'input.compact',
       'input.refreshAndCompact',
       'chat.instantSimpleCompaction',
+      'input.contextDetail',
     ]);
     fireEvent.click(actions[2]);
 
@@ -236,5 +238,78 @@ describe('ContextRing', () => {
 
     expect(sendMock).not.toHaveBeenCalled();
     expect(useStore.getState().toasts.at(-1)).toMatchObject({ type: 'error' });
+  });
+
+  it('shows the breakdown detail for the current session from the keyed store', () => {
+    const breakdown = {
+      system: 400, skills: 100, files: 0, tools: 200, mcp: 40,
+      conversation: 800, user: 60, toolResults: 100, other: 300,
+      total: 2000, computedAt: 1,
+    };
+    const otherSessionBreakdown = { ...breakdown, system: 9999, total: 9999 };
+    useStore.setState({
+      compactingSessions: [],
+      contextBySession: {
+        '/session/a.jsonl': { tokens: 2000, window: 200_000, percent: 1, breakdown },
+        '/session/b.jsonl': { tokens: 9999, window: 200_000, percent: 5, breakdown: otherSessionBreakdown },
+      },
+    } as never);
+
+    const { container } = render(<ContextRing />);
+    fireEvent.click(container.querySelector('button') as HTMLButtonElement);
+    fireEvent.click(screen.getByText('input.contextDetail'));
+
+    expect(screen.getByText('input.contextDetailUsed')).toBeInTheDocument();
+    expect(screen.getByText('input.contextDetailWindowTotal')).toBeInTheDocument();
+    expect(screen.getByText('input.contextDetailRemaining')).toBeInTheDocument();
+    expect(screen.getByText('input.contextCategory.system')).toBeInTheDocument();
+    expect(screen.getByText('input.contextCategory.conversation')).toBeInTheDocument();
+    expect(screen.getByText('input.contextCategory.user')).toBeInTheDocument();
+    expect(screen.getByText('input.contextCategory.tools')).toBeInTheDocument();
+    expect(screen.getByText('input.contextCategory.toolResults')).toBeInTheDocument();
+    expect(screen.getByText('input.contextCategory.mcp')).toBeInTheDocument();
+    expect(screen.getByText('input.contextCategory.skills')).toBeInTheDocument();
+    expect(screen.getByText('input.contextCategory.other')).toBeInTheDocument();
+    // 0 值分类不显示,不得制造不存在的上下文项。
+    expect(screen.queryByText('input.contextCategory.files')).not.toBeInTheDocument();
+    // 详情属于当前 session(session a),不串 session b 的明细。
+    expect(screen.getByText('2,000')).toBeInTheDocument();
+    expect(screen.queryByText('9,999')).not.toBeInTheDocument();
+    // 原菜单项被详情视图替代,Ring 本身不受影响。
+    expect(screen.queryByText('input.compact')).not.toBeInTheDocument();
+  });
+
+  it('returns from the detail view to the action menu', () => {
+    useStore.setState({
+      compactingSessions: [],
+      contextBySession: {
+        '/session/a.jsonl': { tokens: 100, window: 200_000, percent: 1, breakdown: null },
+      },
+    } as never);
+
+    const { container } = render(<ContextRing />);
+    fireEvent.click(container.querySelector('button') as HTMLButtonElement);
+    fireEvent.click(screen.getByText('input.contextDetail'));
+    fireEvent.click(screen.getByText('input.contextDetailBack'));
+
+    expect(screen.getByText('input.compact')).toBeInTheDocument();
+    expect(screen.getByText('input.refreshAndCompact')).toBeInTheDocument();
+    expect(screen.getByText('input.contextDetail')).toBeInTheDocument();
+  });
+
+  it('shows an empty state instead of fabricating detail when breakdown is missing', () => {
+    useStore.setState({
+      compactingSessions: [],
+      contextBySession: {
+        '/session/a.jsonl': { tokens: 100, window: 200_000, percent: 1 },
+      },
+    } as never);
+
+    const { container } = render(<ContextRing />);
+    fireEvent.click(container.querySelector('button') as HTMLButtonElement);
+    fireEvent.click(screen.getByText('input.contextDetail'));
+
+    expect(screen.getByText('input.contextDetailEmpty')).toBeInTheDocument();
+    expect(screen.queryByText('input.contextCategory.system')).not.toBeInTheDocument();
   });
 });

@@ -19,6 +19,7 @@ import { isAudioFileName } from '../utils/file-kind';
 import { useI18n } from '../hooks/use-i18n';
 import {
   continueDeletedAgentSession,
+  createNewSession,
   ensureSession,
   loadSessions,
   upsertOptimisticSessionFirstMessage,
@@ -33,7 +34,8 @@ import { SlashCommandMenu } from './input/SlashCommandMenu';
 import { MentionMenu, type MentionMenuItem } from './input/MentionMenu';
 import { InputStatusBars } from './input/InputStatusBars';
 import { InputContextRow } from './input/InputContextRow';
-import { InputControlBar } from './input/InputControlBar';
+import { ComposerToolbar } from './input/ComposerToolbar';
+import { SendButton } from './input/SendButton';
 import type { PermissionMode } from './input/PlanModeButton';
 import { SessionConfirmationPrompt } from './input/SessionConfirmationPrompt';
 import { serializeEditor } from '../utils/editor-serializer';
@@ -716,14 +718,17 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
       const cardHeight = cardRect.height || card.offsetHeight;
       const editorHeight = editorElement.getBoundingClientRect().height || editorElement.offsetHeight;
       const upperChromeHeight = Math.max(0, cardRect.top - surfaceRect.top);
+      // 输入卡片下方的 Composer 工具栏同样遮挡聊天滚动区，计入下方 chrome。
+      const lowerChromeHeight = Math.max(0, surfaceRect.bottom - cardRect.bottom);
       const bottomInset = calculateInputCardBottomInset({
         cardHeight,
         editorHeight,
         editorLineHeight,
         upperChromeHeight,
+        lowerChromeHeight,
       });
 
-      parent.style.setProperty('--input-card-h', `${cardHeight}px`);
+      parent.style.setProperty('--input-card-h', `${cardHeight + lowerChromeHeight}px`);
       parent.style.setProperty('--input-card-bottom-inset', `${bottomInset}px`);
     };
 
@@ -961,6 +966,11 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
     if (slashMenuOpen) dismissSlashMenu();
     else openSlashMenu();
   }, [slashMenuOpen, dismissSlashMenu, openSlashMenu]);
+
+  // Composer 工具栏的新建聊天入口：复用统一 Session 创建流程，不另起状态机。
+  const handleNewSession = useCallback(() => {
+    void createNewSession();
+  }, []);
 
   const handleBrowserFileInputChange = useCallback(async (event: ChangeEvent<HTMLInputElement>) => {
     if (inputLocked) {
@@ -2281,31 +2291,16 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
           >
             <EditorContent editor={editor} />
           </div>
-          <InputControlBar
-            t={t}
-            onAttach={handleAttach}
-            slashBtnRef={slashBtnRef}
-            onSlashToggle={handleSlashToggle}
-            permissionMode={permissionMode}
-            onPermissionModeChange={setPermissionMode}
-            planModeLocked={inputLocked}
-            showThinking={showThinkingControl}
-            thinkingLevel={thinkingLevel}
-            onThinkingChange={setThinkingLevel}
-            availableThinkingLevels={availableThinkingLevels}
-            models={models}
-            sessionModel={sessionModel}
-            isStreaming={isStreaming}
-            hasInput={hasContent}
-            canSend={canSend}
-            showAudioInput={showAudioInput}
-            audioRecordingActive={audioRecordingState === 'recording'}
-            audioRecordingBusy={audioRecordingState === 'starting' || audioRecordingState === 'stopping'}
-            onAudioToggle={handleAudioRecordToggle}
-            onSend={handleSend}
-            onSteer={handleSteer}
-            onStop={handleStop}
-          />
+          <div className={styles['input-card-footer']}>
+            <SendButton
+              isStreaming={isStreaming}
+              hasInput={hasContent}
+              disabled={isStreaming ? false : !canSend}
+              onSend={handleSend}
+              onSteer={handleSteer}
+              onStop={handleStop}
+            />
+          </div>
           {audioRecorderOpen && showAudioInput && (
             <div className={styles['audio-recording-card']} role="status" aria-live="polite">
               <div className={`${styles['audio-recording-dot']}${audioRecordingState === 'recording' ? ` ${styles['is-live']}` : ''}`} />
@@ -2361,6 +2356,27 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
             </div>
           )}
         </div>
+        <ComposerToolbar
+          t={t}
+          onNewSession={handleNewSession}
+          onAttach={handleAttach}
+          slashBtnRef={slashBtnRef}
+          onSlashToggle={handleSlashToggle}
+          permissionMode={permissionMode}
+          onPermissionModeChange={setPermissionMode}
+          planModeLocked={inputLocked}
+          showThinking={showThinkingControl}
+          thinkingLevel={thinkingLevel}
+          onThinkingChange={setThinkingLevel}
+          availableThinkingLevels={availableThinkingLevels}
+          models={models}
+          sessionModel={sessionModel}
+          isStreaming={isStreaming}
+          showAudioInput={showAudioInput}
+          audioRecordingActive={audioRecordingState === 'recording'}
+          audioRecordingBusy={audioRecordingState === 'starting' || audioRecordingState === 'stopping'}
+          onAudioToggle={handleAudioRecordToggle}
+        />
       </div>
     </div>
   );

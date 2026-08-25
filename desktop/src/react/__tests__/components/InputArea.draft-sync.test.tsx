@@ -131,10 +131,15 @@ vi.mock('../../components/input/InputContextRow', () => ({
   InputContextRow: () => null,
 }));
 
-vi.mock('../../components/input/InputControlBar', () => ({
-  InputControlBar: (props: { canSend: boolean; hasInput: boolean }) => React.createElement('div', {
-    'data-testid': 'input-control-bar',
-    'data-can-send': String(props.canSend),
+vi.mock('../../components/input/ComposerToolbar', () => ({
+  ComposerToolbar: () => null,
+}));
+
+vi.mock('../../components/input/SendButton', () => ({
+  // SendButton 只收 disabled（isStreaming=false 时 = !canSend），这里还原出 canSend 语义供断言。
+  SendButton: (props: { hasInput: boolean; disabled: boolean }) => React.createElement('div', {
+    'data-testid': 'send-button',
+    'data-can-send': String(props.disabled === false),
     'data-has-input': String(props.hasInput),
   }),
 }));
@@ -311,7 +316,7 @@ describe('InputArea draft sync', () => {
     });
 
     await waitFor(() => {
-      const bar = screen.getByTestId('input-control-bar');
+      const bar = screen.getByTestId('send-button');
       expect(bar.getAttribute('data-has-input')).toBe('true');
       expect(bar.getAttribute('data-can-send')).toBe('true');
     });
@@ -335,7 +340,7 @@ describe('InputArea draft sync', () => {
 
     await waitFor(() => {
       expect(setContentCallsWithText('等待更换模型')).toBe(true);
-      const bar = screen.getByTestId('input-control-bar');
+      const bar = screen.getByTestId('send-button');
       expect(bar.getAttribute('data-has-input')).toBe('true');
       expect(bar.getAttribute('data-can-send')).toBe('false');
     });

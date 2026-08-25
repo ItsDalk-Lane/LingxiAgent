@@ -107,6 +107,11 @@ import {
   diffCachePrefixContracts,
   summarizeCachePrefixContract,
 } from "../lib/llm/cache-prefix-contract.ts";
+import {
+  computeContextUsageEstimate,
+  reconcileContextUsageBreakdown,
+  sanitizeContextUsageEstimate,
+} from "../lib/llm/context-usage-breakdown.ts";
 import { buildSessionCacheSnapshot as buildSessionCacheSnapshotValue } from "./session-cache-snapshot.ts";
 import { repairRestoredToolSnapshotDetailed, sameToolNames } from "./tool-snapshot-repair.ts";
 import {
@@ -1032,6 +1037,7 @@ export class SessionCoordinator {
   declare _sessions: Map<string, any>;
   declare _hibernatedSessionMeta: Map<string, any>;
   declare _runtimePressureTimers: Map<string, any>;
+  declare _contextUsageEstimatePersistTimers: Map<string, any>;
   declare _memoryPressure: any;
   declare _headlessOps: Set<string>;
   declare _titlesCache: Map<string, any>;
@@ -1080,6 +1086,7 @@ export class SessionCoordinator {
     this._sessionStarted = false;
     this._sessions = new Map();
     this._hibernatedSessionMeta = new Map();
+    this._contextUsageEstimatePersistTimers = new Map();
     this._runtimePressureTimers = new Map();
     this._memoryPressure = normalizeMemoryPressureOptions(deps.memoryPressure);
     this._headlessOps = new Set();
@@ -1999,6 +2006,8 @@ export class SessionCoordinator {
       experiments: frozenExperimentFlags,
       visibleInSessionList: visibleInSessionList === true && !restore,
       sessionId: null as string | null,
+      // Context Ring 详情的分类估值缓存(streamFn 边界逐请求刷新;唤醒时从休眠快照交还)。
+      contextBreakdown: null as any,
       providerCacheAffinityKey: normalizeProviderCacheAffinityKey(
         restoredProviderCacheAffinityKey,
         sessionMgr.getSessionId?.(),
@@ -2558,6 +2567,17 @@ export class SessionCoordinator {
     if (old) old.unsub();
     this._sessions.set(mapKey, sessionEntry);
     if (sessionPath && mapKey !== sessionPath) this._sessions.delete(sessionPath);
+    // 唤醒路径：休眠时冻结的 context breakdown 快照交还给新 entry,恢复后
+    // 读取路径（getSessionContextUsage）立即有明细,不必等下一次模型调用。
+    if (sessionPath) {
+      const hibernatedBreakdown = this._getRuntimeValueForPath(this._hibernatedSessionMeta, sessionPath)?.contextBreakdown;
+      // 内存快照缺席时回落 session-meta 落盘副本:entry 被切换/淘汰后重建
+      // (LRU / reload 等)时,上一次请求的分类明细仍可交还,Context Ring 详情
+      // 不随会话切换消失;畸形落盘值由 sanitize 拦下,不进 reconcile。
+      const restoredBreakdown = hibernatedBreakdown
+        || sanitizeContextUsageEstimate(this._readSessionMetaEntrySync(sessionPath)?.contextUsageEstimate);
+      if (restoredBreakdown) sessionEntry.contextBreakdown = restoredBreakdown;
+    }
     this._deleteRuntimeValueForPath(this._hibernatedSessionMeta, sessionPath);
 
     // Apply tool snapshot (Case A / Case C). Permission mode is a runtime
@@ -5445,6 +5465,15 @@ export class SessionCoordinator {
       ? Math.max(0, Math.floor(entry.reminderCompactionRevision))
       : 0;
     entry.reminderCompactionRevision = revision + 1;
+    // 压缩后旧分类估值对新上下文不再成立:清内存与落盘副本,读取侧自然回落
+    // null,不把压缩前的明细伪造成压缩后的;去抖中的落盘任务一并取消。
+    entry.contextBreakdown = null;
+    const pending = this._getRuntimeValueForPath(this._contextUsageEstimatePersistTimers, sessionPath);
+    if (pending) {
+      clearTimeout(pending);
+      this._deleteRuntimeValueForPath(this._contextUsageEstimatePersistTimers, sessionPath);
+    }
+    void this.writeSessionMeta(sessionPath, { contextUsageEstimate: null });
     return true;
   }
 
@@ -5893,6 +5922,8 @@ export class SessionCoordinator {
         : [],
       toolCatalogManifest: entry.toolCatalogManifest || null,
       contextUsage: entry.session?.getContextUsage?.() || null,
+      // Context Ring 详情的分类估值随 usage 快照一起冻结,唤醒后原样交还新 entry。
+      contextBreakdown: entry.contextBreakdown || null,
       hibernatedAt: Date.now(),
     });
     await this._teardownSessionEntry(entry, sessionPath, reason);
@@ -6112,9 +6143,24 @@ export class SessionCoordinator {
 
   getSessionContextUsage(sessionPath: any) {
     if (!sessionPath) return null;
-    const live = this._getSessionEntryByPath(sessionPath)?.session?.getContextUsage?.();
-    if (live) return live;
-    return this._getRuntimeValueForPath(this._hibernatedSessionMeta, sessionPath)?.contextUsage || null;
+    const entry = this._getSessionEntryByPath(sessionPath);
+    const live = entry?.session?.getContextUsage?.();
+    if (live) return this._withContextUsageBreakdown(live, entry?.contextBreakdown);
+    const hibernated = this._getRuntimeValueForPath(this._hibernatedSessionMeta, sessionPath);
+    const usage = hibernated?.contextUsage || null;
+    if (!usage) return null;
+    return this._withContextUsageBreakdown(usage, hibernated?.contextBreakdown);
+  }
+
+  /**
+   * 把请求边界缓存的分类估值与 usage.tokens 对账（other 吸收差值）。
+   * breakdown 只在能闭合到真实总量时挂上：compaction 后 tokens 为 null,
+   * 或统计缺失/失败时,usage 保持原三字段形态,不伪造明细。
+   */
+  _withContextUsageBreakdown(usage: any, estimate: any) {
+    const breakdown = reconcileContextUsageBreakdown(estimate, usage?.tokens ?? null);
+    if (!breakdown) return usage;
+    return { ...usage, breakdown };
   }
 
   renderSessionReminderBlock(sessionPath: any) {
@@ -7206,6 +7252,11 @@ export class SessionCoordinator {
       // 仍由它们自己的严格会话快照契约把关。
       if (entry.session?.isCompacting !== true) {
         this._assertCachePrefixContract(sessionPath, entry, { model, context });
+        // Context Ring 详情（任务十八/十九）：这里是唯一能看到完整最终请求
+        // {systemPrompt, messages, tools} 的边界，逐请求做来源分类统计并缓存到
+        // entry，WS context_usage / compaction_end 读取时直接与总量对账。
+        // 压缩/分支摘要走的是摘要 prompt，不代表主聊天上下文，沿用 isCompacting 守卫跳过。
+        this._recordContextUsageBreakdown(sessionPath, entry, context);
       }
       return originalStreamFn.call(
         agent,
@@ -7214,6 +7265,43 @@ export class SessionCoordinator {
         withProviderCacheAffinity(options, model, entry.providerCacheAffinityKey),
       );
     };
+  }
+
+  /**
+   * 对一次最终请求做 context 来源分类统计，缓存到 session entry。
+   * 统计失败显式置 null 并记日志（红线：不静默降级），请求本身不受影响。
+   */
+  _recordContextUsageBreakdown(sessionPath: any, entry: any, context: any) {
+    try {
+      entry.contextBreakdown = computeContextUsageEstimate(context);
+      entry.contextBreakdownError = null;
+    } catch (err: any) {
+      entry.contextBreakdown = null;
+      entry.contextBreakdownError = String(err?.message || err);
+      log.warn(`context usage breakdown failed: ${err?.message || err}`);
+    }
+    this._scheduleContextUsageEstimatePersist(sessionPath, entry);
+  }
+
+  /**
+   * Context Ring 详情的分类估值随请求边界去抖落盘（session-meta）。
+   * entry 只在内存里：会话切换/淘汰后重建时 contextBreakdown 必丢，WS 读到
+   * 无明细会显式清掉前端缓存的旧明细（详情"暂无数据"）。落盘副本让 restore
+   * 路径能交还上一次请求的明细；压缩时置 null 失效（见 _markSessionCompacted）。
+   */
+  _scheduleContextUsageEstimatePersist(sessionPath: any, entry: any) {
+    if (!sessionPath) return;
+    const pending = this._getRuntimeValueForPath(this._contextUsageEstimatePersistTimers, sessionPath);
+    if (pending) clearTimeout(pending);
+    const estimate = entry?.contextBreakdown || null;
+    const timer = setTimeout(() => {
+      this._deleteRuntimeValueForPath(this._contextUsageEstimatePersistTimers, sessionPath);
+      // 统计失败（null）不落盘：不能把上次的好估值清成空。
+      if (!estimate) return;
+      void this.writeSessionMeta(sessionPath, { contextUsageEstimate: estimate });
+    }, 2000);
+    timer.unref?.();
+    this._setRuntimeValueForPath(this._contextUsageEstimatePersistTimers, sessionPath, timer);
   }
 
   _applyFinalPromptSnapshot(session: any, finalSystemPrompt: any) {
