@@ -43,6 +43,7 @@ const DEFAULT_CODEX_UTILITY_INSTRUCTIONS = [
 ].join("\n");
 const SUPPORTED_BUFFERED_APIS = new Set([
   "anthropic-messages",
+  "google-generative-ai",
   "openai-completions",
   "openai-responses",
   "openai-codex-responses",
@@ -309,6 +310,62 @@ function extractResponsesText(data) {
   return {
     text,
     removedThinking: outputContainsReasoning(output),
+  };
+}
+
+function googlePartsFromContent(content) {
+  if (typeof content === "string") return [{ text: content }];
+  if (!Array.isArray(content)) return [{ text: String(content ?? "") }];
+  return content.map((block) => {
+    if (block?.type === "text" || block?.type === "input_text") {
+      return { text: String(block.text || "") };
+    }
+    if ((block?.type === "image" || block?.type === "input_image") && block.data) {
+      return {
+        inlineData: {
+          mimeType: block.mimeType || block.media_type || "image/png",
+          data: block.data,
+        },
+      };
+    }
+    return { text: JSON.stringify(block) };
+  });
+}
+
+function extractGoogleText(data) {
+  const parts = data?.candidates?.[0]?.content?.parts;
+  if (!Array.isArray(parts)) {
+    return { text: "", reasoning: "", removedThinking: false, stopReason: null };
+  }
+  const reasoning = parts
+    .filter(part => part?.thought === true && typeof part.text === "string")
+    .map(part => part.text)
+    .join("\n")
+    .trim();
+  return {
+    text: parts
+      .filter(part => part?.thought !== true && typeof part?.text === "string")
+      .map(part => part.text)
+      .join("")
+      .trim(),
+    reasoning,
+    removedThinking: reasoning.length > 0,
+    stopReason: typeof data?.candidates?.[0]?.finishReason === "string"
+      ? data.candidates[0].finishReason
+      : null,
+  };
+}
+
+function googleUsage(data) {
+  const usage = data?.usageMetadata;
+  if (!usage || typeof usage !== "object") return null;
+  return {
+    input_tokens: usage.promptTokenCount,
+    output_tokens: usage.candidatesTokenCount,
+    total_tokens: usage.totalTokenCount,
+    ...(usage.thoughtsTokenCount !== undefined
+      ? { output_tokens_details: { reasoning_tokens: usage.thoughtsTokenCount } }
+      : {}),
   };
 }
 
@@ -642,6 +699,27 @@ export async function callText({
       ...(mergedSystem && { system: mergedSystem }),
       messages: anthropicMessages,
     };
+  } else if (api === "google-generative-ai") {
+    endpoint = appendProviderApiPath(
+      base,
+      `/models/${encodeURIComponent(modelId)}:generateContent`,
+    );
+    headers = { "Content-Type": "application/json" };
+    if (apiKey) headers["x-goog-api-key"] = apiKey;
+    const generationConfig = {
+      ...(explicitMaxTokens !== null && { maxOutputTokens: explicitMaxTokens }),
+      ...(temperature !== undefined && { temperature }),
+    };
+    body = {
+      ...(mergedSystem && {
+        systemInstruction: { parts: [{ text: mergedSystem }] },
+      }),
+      contents: normalizedMessages.map(message => ({
+        role: message.role === "assistant" ? "model" : "user",
+        parts: googlePartsFromContent(message.content),
+      })),
+      ...(Object.keys(generationConfig).length > 0 && { generationConfig }),
+    };
   } else if (api === "openai-codex-responses") {
     const accountId = resolveCodexAccountId(modelObj, apiKey);
     if (!accountId) {
@@ -826,7 +904,8 @@ export async function callText({
       parseFailed = true;
     }
   }
-  observedUsagePayload = data?.usage ?? null;
+  const responseUsage = api === "google-generative-ai" ? googleUsage(data) : data?.usage ?? null;
+  observedUsagePayload = responseUsage;
   // Phase 6 Provider Response Capture（§六十六/§六十八/§七十一）：业务已解析的
   // 对象复用（不重复 parse）；codex SSE 只保留 aggregate → stream_aggregate；
   // 非 2xx 的 error body 与 invalid JSON rawText 同样是有效观测事实（先捕获
@@ -879,6 +958,12 @@ export async function callText({
     removedStructuredThinking = extracted.removedThinking;
     reasoning = reasoningTextFromValue(data?.content);
     stopReason = typeof data?.stop_reason === "string" ? data.stop_reason : null;
+  } else if (api === "google-generative-ai") {
+    const extracted = extractGoogleText(data);
+    text = extracted.text;
+    reasoning = extracted.reasoning;
+    removedStructuredThinking = extracted.removedThinking;
+    stopReason = extracted.stopReason;
   } else if (api === "openai-responses" || api === "openai-codex-responses") {
     const extracted = extractResponsesText(data);
     text = extracted.text;
@@ -910,7 +995,7 @@ export async function callText({
         text,
         reasoning: reasoning || null,
         finishReason: stopReason ?? null,
-        usage: data?.usage ?? null,
+        usage: responseUsage,
         completeness: "complete",
       },
     });
@@ -939,13 +1024,13 @@ export async function callText({
     );
   }
 
-  const usage = normalizeLlmUsage(data?.usage, { costRates: modelObj?.cost });
+  const usage = normalizeLlmUsage(responseUsage, { costRates: modelObj?.cost });
   (logLlmUsage as (...args: any[]) => any)({
     source: "utility",
     api,
     provider,
     modelId,
-    usage: data?.usage,
+    usage: responseUsage,
     costRates: modelObj?.cost,
   });
   // 语义响应解析完成（parser 之后、业务裁剪之前）。只带结构/数值 metadata。
@@ -953,12 +1038,12 @@ export async function callText({
     details: {
       stopReason: stopReason ?? null,
       hasReasoning: reasoning.length > 0 || removedStructuredThinking,
-      usagePresent: Boolean(data?.usage),
+      usagePresent: Boolean(responseUsage),
       ...(usage ? { usage } : {}),
     },
   });
   usageLedger?.finish?.(usageRequest?.requestId, {
-    usage: data?.usage,
+    usage: responseUsage,
     model: { provider, modelId, api },
     costRates: modelObj?.cost,
   });

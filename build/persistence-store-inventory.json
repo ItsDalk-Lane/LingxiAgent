@@ -1028,6 +1028,164 @@
       "exemption": null
     },
     {
+      "id": "knowledge-database",
+      "ownerModule": "lib/knowledge/knowledge-store.ts",
+      "pathPattern": "knowledge/knowledge.db",
+      "pathPatterns": [
+        "knowledge/knowledge.db",
+        "knowledge/knowledge.db-wal",
+        "knowledge/knowledge.db-shm"
+      ],
+      "pathExclusions": [],
+      "pathKind": "file",
+      "format": "sqlite",
+      "schemaSource": {
+        "kind": "sqlite-runtime",
+        "module": "lib/knowledge/knowledge-store.ts",
+        "contract": "KnowledgeStore runtime DDL, transactional migration, and store-local PRAGMA user_version"
+      },
+      "schemaContract": {
+        "kind": "runtime-source",
+        "source": "lib/knowledge/knowledge-store.ts",
+        "compatibility": "The named runtime reader is canonical; this inventory does not imply stricter validation than runtime currently performs."
+      },
+      "openEntry": [
+        "new KnowledgeStore",
+        "new KnowledgeManager"
+      ],
+      "migrationEntry": [
+        "KnowledgeStore store-local migrations"
+      ],
+      "protocolModules": [],
+      "firstPossibleOpenPhase": "engine_construct",
+      "firstPossibleWritePhase": "runtime_ready",
+      "epochPolicy": "epoch-managed",
+      "checkpointPolicy": "Checkpoint with the managed source snapshots and citation-grade parse artifacts from the same Knowledge generation.",
+      "restorePolicy": "Restore through KnowledgeManager before queries resume; validate SQLite user_version and referenced managed bytes together.",
+      "affectedByEpochMigration": true,
+      "bootstrapSafety": null,
+      "preCoordinatorReadProjection": null,
+      "identityContract": "One Knowledge database belongs to one canonical LINGXI_HOME; Notebook, Source, Snapshot, and later run IDs are durable identities, while storage paths are relative locators.",
+      "exemption": null
+    },
+    {
+      "id": "knowledge-indexes",
+      "ownerModule": "lib/knowledge/knowledge-index-store.ts",
+      "pathPattern": "knowledge/indexes/**",
+      "pathPatterns": [
+        "knowledge/indexes/**"
+      ],
+      "pathExclusions": [],
+      "pathKind": "tree",
+      "format": "binary-cache",
+      "schemaSource": {
+        "kind": "directory-contract",
+        "module": "lib/knowledge/knowledge-index-store.ts",
+        "contract": "Regenerable lexical SQLite schema together with the vector cache schema in lib/knowledge/vector-index-adapter.ts; both derive only from durable Knowledge facts and artifacts"
+      },
+      "schemaContract": {
+        "kind": "protocol",
+        "source": "lib/knowledge/knowledge-index-store.ts",
+        "compatibility": "The named runtime reader is canonical; this inventory does not imply stricter validation than runtime currently performs."
+      },
+      "openEntry": [
+        "new KnowledgeManager",
+        "new KnowledgeIndexStore",
+        "new PortableVectorIndexAdapter"
+      ],
+      "migrationEntry": [
+        "KnowledgeIndexStore runtime DDL",
+        "PortableVectorIndexAdapter runtime DDL"
+      ],
+      "protocolModules": [
+        "lib/knowledge/vector-index-adapter.ts"
+      ],
+      "firstPossibleOpenPhase": "engine_construct",
+      "firstPossibleWritePhase": "runtime_ready",
+      "epochPolicy": "regenerable",
+      "checkpointPolicy": "Excluded; indexes are performance projections and must be completely rebuildable from knowledge.db plus validated parse artifacts.",
+      "restorePolicy": "Delete incompatible or corrupt index generations and rebuild them; never use an index as the source of Knowledge truth.",
+      "affectedByEpochMigration": false,
+      "bootstrapSafety": null,
+      "preCoordinatorReadProjection": null,
+      "identityContract": "Index generation IDs are disposable projection identities; Notebook, Source, Snapshot, Artifact, Evidence, and Claim facts never originate here.",
+      "exemption": null
+    },
+    {
+      "id": "knowledge-parse-artifacts",
+      "ownerModule": "lib/knowledge/knowledge-manager.ts",
+      "pathPattern": "knowledge/artifacts/**",
+      "pathPatterns": [
+        "knowledge/artifacts/**"
+      ],
+      "pathExclusions": [],
+      "pathKind": "tree",
+      "format": "mixed-directory",
+      "schemaSource": {
+        "kind": "directory-contract",
+        "module": "lib/knowledge/knowledge-manager.ts",
+        "contract": "ParseArtifact generation directories referenced by knowledge.db and never treated as source content versions"
+      },
+      "schemaContract": {
+        "kind": "protocol",
+        "source": "lib/knowledge/knowledge-manager.ts",
+        "compatibility": "The named runtime reader is canonical; this inventory does not imply stricter validation than runtime currently performs."
+      },
+      "openEntry": [
+        "new KnowledgeManager"
+      ],
+      "migrationEntry": [],
+      "protocolModules": [],
+      "firstPossibleOpenPhase": "engine_construct",
+      "firstPossibleWritePhase": "runtime_ready",
+      "epochPolicy": "epoch-managed",
+      "checkpointPolicy": "Checkpoint citation-grade parse artifacts that are referenced by knowledge.db together with their ContentSnapshot generations.",
+      "restorePolicy": "Restore only artifacts whose parser identity and source snapshot still validate; rebuild derived semantic views when compatibility requires it.",
+      "affectedByEpochMigration": true,
+      "bootstrapSafety": null,
+      "preCoordinatorReadProjection": null,
+      "identityContract": "parseArtifactId identifies one parser/config generation for one immutable ContentSnapshot; it never changes the ContentSnapshot identity.",
+      "exemption": null
+    },
+    {
+      "id": "knowledge-source-snapshots",
+      "ownerModule": "lib/knowledge/knowledge-manager.ts",
+      "pathPattern": "knowledge/sources/**",
+      "pathPatterns": [
+        "knowledge/sources/**"
+      ],
+      "pathExclusions": [],
+      "pathKind": "tree",
+      "format": "mixed-directory",
+      "schemaSource": {
+        "kind": "directory-contract",
+        "module": "lib/knowledge/knowledge-manager.ts",
+        "contract": "ContentSnapshot relative locator, immutable byte publication, SHA-256 verification, and rollback protocol"
+      },
+      "schemaContract": {
+        "kind": "protocol",
+        "source": "lib/knowledge/knowledge-manager.ts",
+        "compatibility": "The named runtime reader is canonical; this inventory does not imply stricter validation than runtime currently performs."
+      },
+      "openEntry": [
+        "new KnowledgeManager",
+        "KnowledgeManager.importFile",
+        "KnowledgeManager.readContentSnapshot"
+      ],
+      "migrationEntry": [],
+      "protocolModules": [],
+      "firstPossibleOpenPhase": "engine_construct",
+      "firstPossibleWritePhase": "runtime_ready",
+      "epochPolicy": "epoch-managed",
+      "checkpointPolicy": "Checkpoint every referenced immutable snapshot byte together with knowledge.db; unreferenced staging files are excluded.",
+      "restorePolicy": "Restore immutable bytes at their relative locators, then verify byte length and SHA-256 before serving citations or analysis.",
+      "affectedByEpochMigration": true,
+      "bootstrapSafety": null,
+      "preCoordinatorReadProjection": null,
+      "identityContract": "snapshotId and SHA-256 identify immutable captured bytes; the managed relative path is a locator and the external origin path is metadata only.",
+      "exemption": null
+    },
+    {
       "id": "legacy-upload-cache",
       "ownerModule": "server/routes/upload.ts",
       "pathPattern": "uploads/{uploadName}",
@@ -5849,6 +6007,321 @@
       "ordinal": 0
     },
     {
+      "sourceFile": "lib/knowledge/knowledge-index-store.ts",
+      "kind": "mkdir",
+      "excerpt": "fs.mkdirSync(path.dirname(this.dbPath), { recursive: true, mode: 0o700 })",
+      "reason": "Creates and removes only the regenerable lexical SQLite index files.",
+      "storeId": "knowledge-indexes",
+      "exemptionId": null,
+      "ordinal": 0
+    },
+    {
+      "sourceFile": "lib/knowledge/knowledge-index-store.ts",
+      "kind": "remove-path",
+      "excerpt": "fs.unlinkSync(`${this.dbPath}${suffix}`)",
+      "reason": "Creates and removes only the regenerable lexical SQLite index files.",
+      "storeId": "knowledge-indexes",
+      "exemptionId": null,
+      "ordinal": 0
+    },
+    {
+      "sourceFile": "lib/knowledge/knowledge-index-store.ts",
+      "kind": "remove-path",
+      "excerpt": "fs.unlinkSync(`${this.dbPath}${suffix}`)",
+      "reason": "Creates and removes only the regenerable lexical SQLite index files.",
+      "storeId": "knowledge-indexes",
+      "exemptionId": null,
+      "ordinal": 1
+    },
+    {
+      "sourceFile": "lib/knowledge/knowledge-manager.ts",
+      "kind": "mkdir",
+      "excerpt": "fs.mkdirSync(artifactDirectory, { recursive: true, mode: 0o700 })",
+      "reason": "Creates, atomically publishes, or rolls back citation-grade ParseArtifact generations.",
+      "storeId": "knowledge-parse-artifacts",
+      "exemptionId": null,
+      "ordinal": 0
+    },
+    {
+      "sourceFile": "lib/knowledge/knowledge-manager.ts",
+      "kind": "mkdir",
+      "excerpt": "fs.mkdirSync(sourceDirectory, { recursive: false, mode: 0o700 })",
+      "reason": "Publishes or rolls back only Knowledge-managed immutable source snapshot bytes.",
+      "storeId": "knowledge-source-snapshots",
+      "exemptionId": null,
+      "ordinal": 0
+    },
+    {
+      "sourceFile": "lib/knowledge/knowledge-manager.ts",
+      "kind": "mkdir",
+      "excerpt": "fs.mkdirSync(sourceDirectory, { recursive: false, mode: 0o700 })",
+      "reason": "Publishes or rolls back only Knowledge-managed immutable source snapshot bytes.",
+      "storeId": "knowledge-source-snapshots",
+      "exemptionId": null,
+      "ordinal": 1
+    },
+    {
+      "sourceFile": "lib/knowledge/knowledge-manager.ts",
+      "kind": "mkdir",
+      "excerpt": "fs.mkdirSync(this.artifactsRoot, { recursive: true, mode: 0o700 })",
+      "reason": "Creates, atomically publishes, or rolls back citation-grade ParseArtifact generations.",
+      "storeId": "knowledge-parse-artifacts",
+      "exemptionId": null,
+      "ordinal": 0
+    },
+    {
+      "sourceFile": "lib/knowledge/knowledge-manager.ts",
+      "kind": "mkdir",
+      "excerpt": "fs.mkdirSync(this.indexesRoot, { recursive: true, mode: 0o700 })",
+      "reason": "Creates the regenerable Knowledge index root.",
+      "storeId": "knowledge-indexes",
+      "exemptionId": null,
+      "ordinal": 0
+    },
+    {
+      "sourceFile": "lib/knowledge/knowledge-manager.ts",
+      "kind": "mkdir",
+      "excerpt": "fs.mkdirSync(this.sourcesRoot, { recursive: true, mode: 0o700 })",
+      "reason": "Publishes or rolls back only Knowledge-managed immutable source snapshot bytes.",
+      "storeId": "knowledge-source-snapshots",
+      "exemptionId": null,
+      "ordinal": 0
+    },
+    {
+      "sourceFile": "lib/knowledge/knowledge-manager.ts",
+      "kind": "remove-path",
+      "excerpt": "fs.promises.rm(artifactPath, { force: true })",
+      "reason": "Creates, atomically publishes, or rolls back citation-grade ParseArtifact generations.",
+      "storeId": "knowledge-parse-artifacts",
+      "exemptionId": null,
+      "ordinal": 0
+    },
+    {
+      "sourceFile": "lib/knowledge/knowledge-manager.ts",
+      "kind": "remove-path",
+      "excerpt": "fs.promises.rm(artifactPath, { force: true })",
+      "reason": "Creates, atomically publishes, or rolls back citation-grade ParseArtifact generations.",
+      "storeId": "knowledge-parse-artifacts",
+      "exemptionId": null,
+      "ordinal": 1
+    },
+    {
+      "sourceFile": "lib/knowledge/knowledge-manager.ts",
+      "kind": "remove-path",
+      "excerpt": "fs.promises.rm(artifactTemporaryPath, { force: true })",
+      "reason": "Creates, atomically publishes, or rolls back citation-grade ParseArtifact generations.",
+      "storeId": "knowledge-parse-artifacts",
+      "exemptionId": null,
+      "ordinal": 0
+    },
+    {
+      "sourceFile": "lib/knowledge/knowledge-manager.ts",
+      "kind": "remove-path",
+      "excerpt": "fs.promises.rm(snapshotPath, { force: true })",
+      "reason": "Publishes or rolls back only Knowledge-managed immutable source snapshot bytes.",
+      "storeId": "knowledge-source-snapshots",
+      "exemptionId": null,
+      "ordinal": 0
+    },
+    {
+      "sourceFile": "lib/knowledge/knowledge-manager.ts",
+      "kind": "remove-path",
+      "excerpt": "fs.promises.rm(snapshotPath, { force: true })",
+      "reason": "Publishes or rolls back only Knowledge-managed immutable source snapshot bytes.",
+      "storeId": "knowledge-source-snapshots",
+      "exemptionId": null,
+      "ordinal": 1
+    },
+    {
+      "sourceFile": "lib/knowledge/knowledge-manager.ts",
+      "kind": "remove-path",
+      "excerpt": "fs.promises.rm(snapshotPath, { force: true })",
+      "reason": "Publishes or rolls back only Knowledge-managed immutable source snapshot bytes.",
+      "storeId": "knowledge-source-snapshots",
+      "exemptionId": null,
+      "ordinal": 2
+    },
+    {
+      "sourceFile": "lib/knowledge/knowledge-manager.ts",
+      "kind": "remove-path",
+      "excerpt": "fs.promises.rm(temporaryPath, { force: true })",
+      "reason": "Publishes or rolls back only Knowledge-managed immutable source snapshot bytes.",
+      "storeId": "knowledge-source-snapshots",
+      "exemptionId": null,
+      "ordinal": 0
+    },
+    {
+      "sourceFile": "lib/knowledge/knowledge-manager.ts",
+      "kind": "remove-path",
+      "excerpt": "fs.promises.rm(temporaryPath, { force: true })",
+      "reason": "Publishes or rolls back only Knowledge-managed immutable source snapshot bytes.",
+      "storeId": "knowledge-source-snapshots",
+      "exemptionId": null,
+      "ordinal": 1
+    },
+    {
+      "sourceFile": "lib/knowledge/knowledge-manager.ts",
+      "kind": "remove-path",
+      "excerpt": "fs.promises.rm(temporaryPath, { force: true })",
+      "reason": "Publishes or rolls back only Knowledge-managed immutable source snapshot bytes.",
+      "storeId": "knowledge-source-snapshots",
+      "exemptionId": null,
+      "ordinal": 2
+    },
+    {
+      "sourceFile": "lib/knowledge/knowledge-manager.ts",
+      "kind": "remove-path",
+      "excerpt": "fs.promises.rmdir(sourceDirectory)",
+      "reason": "Publishes or rolls back only Knowledge-managed immutable source snapshot bytes.",
+      "storeId": "knowledge-source-snapshots",
+      "exemptionId": null,
+      "ordinal": 0
+    },
+    {
+      "sourceFile": "lib/knowledge/knowledge-manager.ts",
+      "kind": "remove-path",
+      "excerpt": "fs.promises.rmdir(sourceDirectory)",
+      "reason": "Publishes or rolls back only Knowledge-managed immutable source snapshot bytes.",
+      "storeId": "knowledge-source-snapshots",
+      "exemptionId": null,
+      "ordinal": 1
+    },
+    {
+      "sourceFile": "lib/knowledge/knowledge-manager.ts",
+      "kind": "rename",
+      "excerpt": "fs.promises.rename(artifactTemporaryPath, artifactPath)",
+      "reason": "Creates, atomically publishes, or rolls back citation-grade ParseArtifact generations.",
+      "storeId": "knowledge-parse-artifacts",
+      "exemptionId": null,
+      "ordinal": 0
+    },
+    {
+      "sourceFile": "lib/knowledge/knowledge-manager.ts",
+      "kind": "rename",
+      "excerpt": "fs.promises.rename(temporaryPath, snapshotPath)",
+      "reason": "Publishes or rolls back only Knowledge-managed immutable source snapshot bytes.",
+      "storeId": "knowledge-source-snapshots",
+      "exemptionId": null,
+      "ordinal": 0
+    },
+    {
+      "sourceFile": "lib/knowledge/knowledge-manager.ts",
+      "kind": "rename",
+      "excerpt": "fs.promises.rename(temporaryPath, snapshotPath)",
+      "reason": "Publishes or rolls back only Knowledge-managed immutable source snapshot bytes.",
+      "storeId": "knowledge-source-snapshots",
+      "exemptionId": null,
+      "ordinal": 1
+    },
+    {
+      "sourceFile": "lib/knowledge/knowledge-manager.ts",
+      "kind": "rename",
+      "excerpt": "fs.promises.rename(temporaryPath, snapshotPath)",
+      "reason": "Publishes or rolls back only Knowledge-managed immutable source snapshot bytes.",
+      "storeId": "knowledge-source-snapshots",
+      "exemptionId": null,
+      "ordinal": 2
+    },
+    {
+      "sourceFile": "lib/knowledge/knowledge-manager.ts",
+      "kind": "write-file",
+      "excerpt": "fs.promises.open(artifactTemporaryPath, \"wx\", 0o600)",
+      "reason": "Creates, atomically publishes, or rolls back citation-grade ParseArtifact generations.",
+      "storeId": "knowledge-parse-artifacts",
+      "exemptionId": null,
+      "ordinal": 0
+    },
+    {
+      "sourceFile": "lib/knowledge/knowledge-manager.ts",
+      "kind": "write-file",
+      "excerpt": "fs.promises.open(temporaryPath, \"wx\", 0o600)",
+      "reason": "Publishes or rolls back only Knowledge-managed immutable source snapshot bytes.",
+      "storeId": "knowledge-source-snapshots",
+      "exemptionId": null,
+      "ordinal": 0
+    },
+    {
+      "sourceFile": "lib/knowledge/knowledge-manager.ts",
+      "kind": "write-file",
+      "excerpt": "fs.promises.open(temporaryPath, \"wx\", 0o600)",
+      "reason": "Publishes or rolls back only Knowledge-managed immutable source snapshot bytes.",
+      "storeId": "knowledge-source-snapshots",
+      "exemptionId": null,
+      "ordinal": 1
+    },
+    {
+      "sourceFile": "lib/knowledge/knowledge-manager.ts",
+      "kind": "write-file",
+      "excerpt": "fs.promises.open(temporaryPath, \"wx\", 0o600)",
+      "reason": "Publishes or rolls back only Knowledge-managed immutable source snapshot bytes.",
+      "storeId": "knowledge-source-snapshots",
+      "exemptionId": null,
+      "ordinal": 2
+    },
+    {
+      "sourceFile": "lib/knowledge/knowledge-manager.ts",
+      "kind": "write-file",
+      "excerpt": "handle.writeFile(imported.bytes)",
+      "reason": "Publishes or rolls back only Knowledge-managed immutable source snapshot bytes.",
+      "storeId": "knowledge-source-snapshots",
+      "exemptionId": null,
+      "ordinal": 0
+    },
+    {
+      "sourceFile": "lib/knowledge/knowledge-manager.ts",
+      "kind": "write-file",
+      "excerpt": "handle.writeFile(imported.bytes)",
+      "reason": "Publishes or rolls back only Knowledge-managed immutable source snapshot bytes.",
+      "storeId": "knowledge-source-snapshots",
+      "exemptionId": null,
+      "ordinal": 1
+    },
+    {
+      "sourceFile": "lib/knowledge/knowledge-manager.ts",
+      "kind": "write-file",
+      "excerpt": "handle.writeFile(input.bytes)",
+      "reason": "Publishes or rolls back only Knowledge-managed immutable source snapshot bytes.",
+      "storeId": "knowledge-source-snapshots",
+      "exemptionId": null,
+      "ordinal": 0
+    },
+    {
+      "sourceFile": "lib/knowledge/knowledge-store.ts",
+      "kind": "database-open",
+      "excerpt": "new Database(options.dbPath)",
+      "reason": "Creates the private Knowledge directory and opens the store-local SQLite database.",
+      "storeId": "knowledge-database",
+      "exemptionId": null,
+      "ordinal": 0
+    },
+    {
+      "sourceFile": "lib/knowledge/knowledge-store.ts",
+      "kind": "mkdir",
+      "excerpt": "fs.mkdirSync(path.dirname(options.dbPath), { recursive: true, mode: 0o700 })",
+      "reason": "Creates the private Knowledge directory and opens the store-local SQLite database.",
+      "storeId": "knowledge-database",
+      "exemptionId": null,
+      "ordinal": 0
+    },
+    {
+      "sourceFile": "lib/knowledge/vector-index-adapter.ts",
+      "kind": "mkdir",
+      "excerpt": "fs.mkdirSync(path.dirname(this.dbPath), { recursive: true, mode: 0o700 })",
+      "reason": "Creates and removes only the regenerable vector SQLite cache files.",
+      "storeId": "knowledge-indexes",
+      "exemptionId": null,
+      "ordinal": 0
+    },
+    {
+      "sourceFile": "lib/knowledge/vector-index-adapter.ts",
+      "kind": "remove-path",
+      "excerpt": "fs.unlinkSync(`${this.dbPath}${suffix}`)",
+      "reason": "Creates and removes only the regenerable vector SQLite cache files.",
+      "storeId": "knowledge-indexes",
+      "exemptionId": null,
+      "ordinal": 0
+    },
+    {
       "sourceFile": "lib/llm/model-observability-blob-store.ts",
       "kind": "mkdir",
       "excerpt": "fs.mkdirSync(dir, { recursive: true })",
@@ -8209,7 +8682,7 @@
     {
       "sourceFile": "server/routes/upload.ts",
       "kind": "copy-file",
-      "excerpt": "fs.copyFile(srcPath, destPath)",
+      "excerpt": "fs.copyFile(realSrcPath, destPath)",
       "reason": "resolveUploadTarget sends the same syntactic write sites to registered session-files storage when sessionPath is present or to the registered legacy uploads cache otherwise; flow-sensitive site attribution is required to distinguish them.",
       "storeId": null,
       "exemptionId": "conditional-upload-target",

@@ -1,4 +1,5 @@
 import { normalizeModalityList } from "./modality.ts";
+import { isModelOperation } from "./model-operations.ts";
 
 const OFFICIAL_DEEPSEEK_PROVIDER_ID = "deepseek";
 const OFFICIAL_DEEPSEEK_HOST = "api.deepseek.com";
@@ -150,6 +151,34 @@ function validateModelMetadata(providerId, model) {
   }
   for (const field of ["inputs", "outputs"]) {
     validateModalityField(providerId, modelId, model, field);
+  }
+  if (Object.prototype.hasOwnProperty.call(model, "operations")) {
+    if (
+      !Array.isArray(model.operations)
+      || model.operations.length === 0
+      || model.operations.some((operation) => !isModelOperation(operation))
+    ) {
+      throw new ProviderModelMetadataValidationError(
+        providerId,
+        modelId,
+        "operations",
+        "expected a non-empty array containing only embedding or rerank",
+      );
+    }
+  }
+  if (
+    Object.prototype.hasOwnProperty.call(model, "operationProtocol")
+    && (typeof model.operationProtocol !== "string" || !model.operationProtocol.trim())
+  ) {
+    throw new ProviderModelMetadataValidationError(
+      providerId,
+      modelId,
+      "operationProtocol",
+      "expected a non-empty string",
+    );
+  }
+  if (Object.prototype.hasOwnProperty.call(model, "dimensions")) {
+    validatePositiveNumber(providerId, modelId, model, "dimensions");
   }
   if (!Object.prototype.hasOwnProperty.call(model, "thinkingLevelMap")) return;
   const map = model.thinkingLevelMap;

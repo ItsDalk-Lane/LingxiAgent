@@ -88,11 +88,12 @@ function makeResolver(config: HarnessConfig) {
 // ── Tests ─────────────────────────────────────────────────────────────
 
 describe("AuxiliarySlot descriptors", () => {
-  it("defines exactly 6 canonical slots", () => {
+  it("defines exactly 7 canonical slots", () => {
     expect(AUXILIARY_SLOT_IDS).toEqual([
       "title",
       "summarize",
       "memory",
+      "knowledge",
       "vision",
       "approval",
       "guard",
@@ -109,10 +110,11 @@ describe("AuxiliarySlot descriptors", () => {
     }
   });
 
-  it("title/summarize/memory fallback to chat", () => {
+  it("title/summarize/memory/knowledge fallback to chat", () => {
     expect(AUXILIARY_SLOTS.title.fallback).toBe("chat");
     expect(AUXILIARY_SLOTS.summarize.fallback).toBe("chat");
     expect(AUXILIARY_SLOTS.memory.fallback).toBe("chat");
+    expect(AUXILIARY_SLOTS.knowledge.fallback).toBe("chat");
   });
 
   it("vision fallback to image_capable_chat", () => {
@@ -358,6 +360,50 @@ describe("Case I: fresh credential resolves from provider", () => {
     await resolver.resolveAuxiliaryModelFresh("memory");
     expect(freshCallLog).toContain("provA");
     expect(freshCallLog).toContain("provB");
+  });
+});
+
+describe("Knowledge 请求边界刷新", () => {
+  it("每次请求都重新读取 Provider 凭证，不复用旧密钥", async () => {
+    const config: HarnessConfig = {
+      slotRefs: {
+        knowledge: { id: "knowledge-model", provider: "provA" },
+      },
+      chatModel: null,
+      models: [makeSentinel("knowledge-model", "provA")],
+      freshCredentials: {
+        provA: {
+          api: "openai",
+          apiKey: "first-key",
+          baseUrl: "https://provA.example.com/v1",
+        },
+      },
+    };
+    const { resolver, freshCallLog } = makeResolver(config);
+
+    expect((await resolver.resolveAuxiliaryModelFresh("knowledge"))?.apiKey).toBe("first-key");
+    config.freshCredentials!.provA.apiKey = "rotated-key";
+    expect((await resolver.resolveAuxiliaryModelFresh("knowledge"))?.apiKey).toBe("rotated-key");
+    expect(freshCallLog).toEqual(["provA", "provA"]);
+  });
+
+  it("下一次请求使用最新的 Knowledge 模型选择", async () => {
+    const config: HarnessConfig = {
+      slotRefs: {
+        knowledge: { id: "knowledge-a", provider: "provA" },
+      },
+      chatModel: null,
+      models: [
+        makeSentinel("knowledge-a", "provA"),
+        makeSentinel("knowledge-b", "provB"),
+      ],
+    };
+    const { resolver, freshCallLog } = makeResolver(config);
+
+    expect((await resolver.resolveAuxiliaryModelFresh("knowledge"))?.model?.id).toBe("knowledge-a");
+    config.slotRefs.knowledge = { id: "knowledge-b", provider: "provB" };
+    expect((await resolver.resolveAuxiliaryModelFresh("knowledge"))?.model?.id).toBe("knowledge-b");
+    expect(freshCallLog).toEqual(["provA", "provB"]);
   });
 });
 

@@ -18,7 +18,10 @@ import crypto from "crypto";
 import { Hono } from "hono";
 import { safeJson } from "../hono-helpers.ts";
 import { t } from "../../lib/i18n.ts";
-import { isSensitivePath } from "../utils/path-security.ts";
+import {
+  inspectLocalImportPath,
+  LocalImportPathError,
+} from "../../shared/file-import-security.ts";
 import {
   MAX_CHAT_IMAGE_BASE64_CHARS,
   extensionFromChatImageMime,
@@ -292,37 +295,29 @@ export function createUploadRoute(engine) {
       }
 
       try {
-        if (!path.isAbsolute(srcPath)) {
-          results.push({ src: srcPath, error: "Path must be absolute" });
-          continue;
-        }
-        let stat;
+        let inspected;
         try {
-          stat = await fs.lstat(srcPath);
-        } catch {
-          results.push({ src: srcPath, error: t("error.pathNotFound") });
+          inspected = await inspectLocalImportPath({
+            filePath: srcPath,
+            lingxiHome: engine.lingxiHome,
+            allowDirectories: true,
+          });
+        } catch (error) {
+          if (!(error instanceof LocalImportPathError)) throw error;
+          const message = error.code === "PATH_INVALID"
+            ? "Path must be absolute"
+            : error.code === "NOT_FOUND"
+              ? t("error.pathNotFound")
+              : error.code === "SYMLINK"
+                ? "symlink not allowed"
+                : error.code === "PATH_BLOCKED"
+                  ? "sensitive path blocked"
+                  : "regular file or directory required";
+          results.push({ src: srcPath, error: message });
           continue;
         }
-        if (stat.isSymbolicLink()) {
-          results.push({ src: srcPath, error: "symlink not allowed" });
-          continue;
-        }
-        if (isSensitivePath(srcPath, engine.lingxiHome)) {
-          results.push({ src: srcPath, error: "sensitive path blocked" });
-          continue;
-        }
-
-        // 必须用 JS 版 realpathSync，与 SessionFileRegistry 的路径规范化同源。
-        // fs/promises.realpath 只有 native 语义，会把路径改写成磁盘上的真实拼写
-        // （macOS 上是大小写，Windows 上是 8.3 短名），而 registry 用 fs.realpathSync
-        // 保留调用方的拼写。两边不一致时，同一个目录经不同入口会算出两个 realPath，
-        // 去重键、SessionFile id 和沙箱路径匹配会一起失准。
-        let realSrcPath;
-        try {
-          realSrcPath = fsSync.realpathSync(srcPath);
-        } catch {
-          realSrcPath = path.resolve(srcPath);
-        }
+        const stat = inspected.stat;
+        const realSrcPath = inspected.realPath;
 
         // 每个路径计 1 个附件额度；目录走引用、不复制，因此不再递归计数
         totalFiles += 1;
@@ -378,7 +373,7 @@ export function createUploadRoute(engine) {
         const base = path.basename(srcPath, ext);
         const destName = uniqueUploadName(base, ext);
         const destPath = path.join(uploadsDir, destName);
-        await fs.copyFile(srcPath, destPath);
+        await fs.copyFile(realSrcPath, destPath);
 
         const sessionFile = registerSessionFileFromRequest(engine, {
           sessionPath,

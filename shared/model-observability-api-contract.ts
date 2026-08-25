@@ -682,6 +682,7 @@ export const SEMANTIC_INPUT_SHAPES = [
   "external_cli_media",
   "speech_transcribe",
   "provider_probe",
+  "model_operation",
 ] as const;
 export type SemanticInputShape = typeof SEMANTIC_INPUT_SHAPES[number];
 

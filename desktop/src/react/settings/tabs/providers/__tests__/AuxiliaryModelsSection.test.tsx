@@ -4,7 +4,7 @@
 
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
 import { useSettingsStore } from '../../../store';
 
@@ -54,6 +54,9 @@ describe('AuxiliaryModelsSection', () => {
           title: null,
           summarize: null,
           memory: null,
+          knowledge: null,
+          embedding: null,
+          rerank: { id: 'rerank-model', provider: 'provider-b' },
           vision: { id: 'gpt-4o', provider: 'openai' },
           approval: null,
           guard: null,
@@ -61,6 +64,20 @@ describe('AuxiliaryModelsSection', () => {
         },
         search: { provider: '', api_key: '' },
         utility_api: {},
+        operation_models: [
+          {
+            id: 'embed-model',
+            provider: 'provider-a',
+            displayName: 'Embedding A',
+            operations: ['embedding'],
+          },
+          {
+            id: 'rerank-model',
+            provider: 'provider-b',
+            displayName: 'Rerank B',
+            operations: ['rerank'],
+          },
+        ],
       },
     });
   });
@@ -74,10 +91,12 @@ describe('AuxiliaryModelsSection', () => {
 
     const visionLabel = screen.getByText('settings.api.visionModel');
     const toggle = screen.getByRole('button', { name: 'settings.api.visionAuxiliaryToggle' });
-    const firstModelWidget = screen.getAllByTestId('model-widget')[3];
+    const visionRow = visionLabel.parentElement?.parentElement;
+    expect(visionRow).not.toBeNull();
+    const visionModelWidget = within(visionRow as HTMLElement).getByTestId('model-widget');
 
     expect(visionLabel.compareDocumentPosition(toggle) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    expect(toggle.compareDocumentPosition(firstModelWidget) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(toggle.compareDocumentPosition(visionModelWidget) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
 
     fireEvent.click(toggle);
 
@@ -89,8 +108,27 @@ describe('AuxiliaryModelsSection', () => {
   it('renders one model widget per auxiliary slot and does not render the search provider selector', () => {
     render(<AuxiliaryModelsSection providers={{ openai: { models: ['gpt-4o'] } }} />);
 
-    // 6 auxiliary slots (title/summarize/memory/vision/approval/guard)
-    expect(screen.getAllByTestId('model-widget')).toHaveLength(6);
+    // 7 auxiliary slots (title/summarize/memory/knowledge/vision/approval/guard)
+    expect(screen.getAllByTestId('model-widget')).toHaveLength(7);
     expect(screen.queryByText('settings.api.searchProviderField')).not.toBeInTheDocument();
+  });
+
+  it('renders optional operation pickers, filters their catalogs, and saves only composite model refs', () => {
+    render(<AuxiliaryModelsSection providers={{ openai: { models: ['gpt-4o'] } }} />);
+
+    const embedding = screen.getByRole('combobox', { name: 'settings.api.knowledgeEmbeddingModel' });
+    const rerank = screen.getByRole('combobox', { name: 'settings.api.knowledgeRerankModel' });
+    expect(within(embedding).getByRole('option', { name: 'Embedding A · provider-a' })).toBeInTheDocument();
+    expect(within(embedding).queryByRole('option', { name: 'Rerank B · provider-b' })).not.toBeInTheDocument();
+    expect(within(rerank).getByRole('option', { name: 'Rerank B · provider-b' })).toBeInTheDocument();
+    expect(screen.queryByRole('textbox', { name: /key/i })).not.toBeInTheDocument();
+
+    fireEvent.change(embedding, { target: { value: 'provider-a\u0000embed-model' } });
+    expect(mocks.autoSaveGlobalModels).toHaveBeenCalledWith({
+      models: { embedding: { id: 'embed-model', provider: 'provider-a' } },
+    });
+
+    fireEvent.change(rerank, { target: { value: '' } });
+    expect(mocks.autoSaveGlobalModels).toHaveBeenCalledWith({ models: { rerank: null } });
   });
 });

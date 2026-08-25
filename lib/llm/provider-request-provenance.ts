@@ -95,6 +95,10 @@ function mapSection(
         providerLocator = { path: ["instructions"], span: locator.span ?? null };
         transformation = section.category === "adapter_injected" ? "injected" : "renamed";
         break;
+      case "google-generative-ai":
+        providerLocator = { path: ["systemInstruction", "parts", 0, "text"], span: locator.span ?? null };
+        transformation = "moved";
+        break;
       default:
         return null;
     }
@@ -144,6 +148,13 @@ function mapSection(
           semanticSectionOrdinal: ordinal,
           providerLocator: { path: ["input", index] },
           transformation: "renamed",
+          mappingPrecision: section.precision === "exact" ? "exact" : "structural",
+        };
+      case "google-generative-ai":
+        return {
+          semanticSectionOrdinal: ordinal,
+          providerLocator: { path: ["contents", index] },
+          transformation: "moved",
           mappingPrecision: section.precision === "exact" ? "exact" : "structural",
         };
       default:

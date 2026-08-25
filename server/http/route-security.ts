@@ -115,6 +115,11 @@ export function classifyHttpRoute({ method = "GET", path = "" } = {}) {
   if (isDeskFileReadRoute(verb, routePath)) return scoped("files.read");
   if (isDeskFileWriteRoute(verb, routePath)) return scoped("files.write");
   if (routePath === "/api/usage/llm") return verb === "GET" ? STUDIO_OWNER : LOCAL_ONLY;
+  // Knowledge 保存长期私有文档与可复现研究状态；所有端点显式保持
+  // Studio Owner 边界，不依赖文件末尾的未知 /api 兜底。
+  if (routePath === "/api/knowledge" || routePath.startsWith("/api/knowledge/")) {
+    return STUDIO_OWNER;
+  }
   // ── Model Observatory（Phase 8；显式登记，不吃 /api/* STUDIO_OWNER fallback）──
   if (isModelObservatoryRoute(verb, routePath)) return modelObservabilityRoutePolicy(verb, routePath);
   if (routePath === "/api/session-projects" || routePath.startsWith("/api/session-projects/")) {

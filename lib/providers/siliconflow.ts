@@ -12,4 +12,19 @@ export const siliconflowPlugin = {
   authType: "api-key",
   defaultBaseUrl: "https://api.siliconflow.cn/v1",
   defaultApi: "openai-completions",
+  operationModels: [
+    {
+      id: "BAAI/bge-large-zh-v1.5",
+      displayName: "BGE Large Zh v1.5",
+      operations: ["embedding"],
+      operationProtocol: "openai-embeddings",
+      dimensions: 1024,
+    },
+    {
+      id: "BAAI/bge-reranker-v2-m3",
+      displayName: "BGE Reranker v2 M3",
+      operations: ["rerank"],
+      operationProtocol: "siliconflow-rerank",
+    },
+  ],
 };

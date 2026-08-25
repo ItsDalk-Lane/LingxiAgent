@@ -10,9 +10,25 @@ jobs:
   test:
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
-        os: [macos-latest, windows-latest]
-        node-version: ["24.15.0"]
+        include:
+          - os: macos-15
+            platform: darwin
+            arch: arm64
+            node-version: "24.15.0"
+          - os: macos-15-intel
+            platform: darwin
+            arch: x64
+            node-version: "24.15.0"
+          - os: windows-2025
+            platform: win32
+            arch: x64
+            node-version: "24.15.0"
+          - os: ubuntu-24.04
+            platform: linux
+            arch: x64
+            node-version: "24.15.0"
 
     steps:
       - uses: actions/checkout@v4
@@ -28,6 +44,9 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: npm
+
+      - name: Assert runner platform and architecture
+        run: node scripts/assert-runner-platform.mjs ${{ matrix.platform }} ${{ matrix.arch }}
 
       # npm ci 走网络下载依赖，偶发抖动（连接重置 / registry 5xx）会直接挂掉整个
       # 矩阵。这里用 nick-fields/retry 在步骤层面重试，不改 npm 本身、不改 lockfile。
@@ -63,6 +82,9 @@ jobs:
 
       - name: Build packages
         run: npm run build:packages
+
+      - name: Run Knowledge platform smoke
+        run: npm run test:knowledge-platform-smoke
 
       - name: Build renderer
         run: npm run build:renderer

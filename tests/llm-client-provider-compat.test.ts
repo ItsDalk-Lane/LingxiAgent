@@ -171,16 +171,51 @@ describe("callText provider-compat routing", () => {
     expect(body.thinking).toEqual({ type: "disabled" });
   });
 
-  it("fails closed for native APIs without a Hana buffered adapter", async () => {
-    const fetchMock = vi.spyOn(globalThis, "fetch");
+  it("uses the native Gemini buffered adapter at the shared call boundary", async () => {
+    const fetchMock = vi.spyOn(globalThis, "fetch").mockResolvedValue({
+      ok: true,
+      status: 200,
+      headers: new Headers({ "x-request-id": "gemini-request" }),
+      text: async () => JSON.stringify({
+        candidates: [{
+          finishReason: "STOP",
+          content: { parts: [{ thought: true, text: "private" }, { text: "gemini answer" }] },
+        }],
+        usageMetadata: {
+          promptTokenCount: 12,
+          candidatesTokenCount: 4,
+          totalTokenCount: 16,
+          thoughtsTokenCount: 2,
+        },
+      }),
+    } as any);
 
     await expect(callText({
       api: "google-generative-ai",
-      baseUrl: "https://generativelanguage.googleapis.com",
+      apiKey: "google-key",
+      baseUrl: "https://generativelanguage.googleapis.com/v1beta",
       model: { id: "gemini-native", provider: "google", api: "google-generative-ai" },
+      systemPrompt: "Only JSON",
       messages: [{ role: "user", content: "hi" }],
-    } as any)).rejects.toThrow(/buffered adapter.*google-generative-ai/i);
-    expect(fetchMock).not.toHaveBeenCalled();
+      maxTokens: 100,
+      outputPolicy: "bounded",
+      temperature: 0,
+      returnUsage: true,
+    } as any)).resolves.toMatchObject({
+      text: "gemini answer",
+      usage: {
+        input: { totalTokens: 12 },
+        output: { totalTokens: 4, reasoningTokens: 2 },
+      },
+    });
+    const [url, init] = fetchMock.mock.calls[0];
+    expect(url).toBe("https://generativelanguage.googleapis.com/v1beta/models/gemini-native:generateContent");
+    expect(init.headers).toMatchObject({ "x-goog-api-key": "google-key" });
+    expect(JSON.parse(init.body as string)).toMatchObject({
+      systemInstruction: { parts: [{ text: "Only JSON" }] },
+      contents: [{ role: "user", parts: [{ text: "hi" }] }],
+      generationConfig: { maxOutputTokens: 100, temperature: 0 },
+    });
   });
 
   it("omits temperature from utility requests unless the caller sets it explicitly", async () => {

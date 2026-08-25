@@ -660,7 +660,7 @@
     ],
     "version": 3
   },
-  "payloadFingerprint": "sha256:ab819c64862fffe49b9ae5b1fbce7bbff548390c9ac5301ddb44c135210be95c",
+  "payloadFingerprint": "sha256:34763e876cb11167ccc0388a9bbbfb4c1f177081d7c1fd415d1b245a1080997b",
   "registry": [
     {
       "affectedByEpochMigration": true,
@@ -1641,6 +1641,164 @@
         "contract": "installed manifest, install receipt, backup, and source-package directory protocols",
         "kind": "directory-contract",
         "module": "core/plugin-manager.ts"
+      }
+    },
+    {
+      "affectedByEpochMigration": true,
+      "bootstrapSafety": null,
+      "checkpointPolicy": "Checkpoint with the managed source snapshots and citation-grade parse artifacts from the same Knowledge generation.",
+      "epochPolicy": "epoch-managed",
+      "exemption": null,
+      "firstPossibleOpenPhase": "engine_construct",
+      "firstPossibleWritePhase": "runtime_ready",
+      "format": "sqlite",
+      "id": "knowledge-database",
+      "identityContract": "One Knowledge database belongs to one canonical LINGXI_HOME; Notebook, Source, Snapshot, and later run IDs are durable identities, while storage paths are relative locators.",
+      "migrationEntry": [
+        "KnowledgeStore store-local migrations"
+      ],
+      "openEntry": [
+        "new KnowledgeStore",
+        "new KnowledgeManager"
+      ],
+      "ownerModule": "lib/knowledge/knowledge-store.ts",
+      "pathExclusions": [],
+      "pathKind": "file",
+      "pathPattern": "knowledge/knowledge.db",
+      "pathPatterns": [
+        "knowledge/knowledge.db",
+        "knowledge/knowledge.db-wal",
+        "knowledge/knowledge.db-shm"
+      ],
+      "preCoordinatorReadProjection": null,
+      "protocolModules": [],
+      "restorePolicy": "Restore through KnowledgeManager before queries resume; validate SQLite user_version and referenced managed bytes together.",
+      "schemaContract": {
+        "compatibility": "The named runtime reader is canonical; this inventory does not imply stricter validation than runtime currently performs.",
+        "kind": "runtime-source",
+        "source": "lib/knowledge/knowledge-store.ts"
+      },
+      "schemaSource": {
+        "contract": "KnowledgeStore runtime DDL, transactional migration, and store-local PRAGMA user_version",
+        "kind": "sqlite-runtime",
+        "module": "lib/knowledge/knowledge-store.ts"
+      }
+    },
+    {
+      "affectedByEpochMigration": false,
+      "bootstrapSafety": null,
+      "checkpointPolicy": "Excluded; indexes are performance projections and must be completely rebuildable from knowledge.db plus validated parse artifacts.",
+      "epochPolicy": "regenerable",
+      "exemption": null,
+      "firstPossibleOpenPhase": "engine_construct",
+      "firstPossibleWritePhase": "runtime_ready",
+      "format": "binary-cache",
+      "id": "knowledge-indexes",
+      "identityContract": "Index generation IDs are disposable projection identities; Notebook, Source, Snapshot, Artifact, Evidence, and Claim facts never originate here.",
+      "migrationEntry": [
+        "KnowledgeIndexStore runtime DDL",
+        "PortableVectorIndexAdapter runtime DDL"
+      ],
+      "openEntry": [
+        "new KnowledgeManager",
+        "new KnowledgeIndexStore",
+        "new PortableVectorIndexAdapter"
+      ],
+      "ownerModule": "lib/knowledge/knowledge-index-store.ts",
+      "pathExclusions": [],
+      "pathKind": "tree",
+      "pathPattern": "knowledge/indexes/**",
+      "pathPatterns": [
+        "knowledge/indexes/**"
+      ],
+      "preCoordinatorReadProjection": null,
+      "protocolModules": [
+        "lib/knowledge/vector-index-adapter.ts"
+      ],
+      "restorePolicy": "Delete incompatible or corrupt index generations and rebuild them; never use an index as the source of Knowledge truth.",
+      "schemaContract": {
+        "compatibility": "The named runtime reader is canonical; this inventory does not imply stricter validation than runtime currently performs.",
+        "kind": "protocol",
+        "source": "lib/knowledge/knowledge-index-store.ts"
+      },
+      "schemaSource": {
+        "contract": "Regenerable lexical SQLite schema together with the vector cache schema in lib/knowledge/vector-index-adapter.ts; both derive only from durable Knowledge facts and artifacts",
+        "kind": "directory-contract",
+        "module": "lib/knowledge/knowledge-index-store.ts"
+      }
+    },
+    {
+      "affectedByEpochMigration": true,
+      "bootstrapSafety": null,
+      "checkpointPolicy": "Checkpoint citation-grade parse artifacts that are referenced by knowledge.db together with their ContentSnapshot generations.",
+      "epochPolicy": "epoch-managed",
+      "exemption": null,
+      "firstPossibleOpenPhase": "engine_construct",
+      "firstPossibleWritePhase": "runtime_ready",
+      "format": "mixed-directory",
+      "id": "knowledge-parse-artifacts",
+      "identityContract": "parseArtifactId identifies one parser/config generation for one immutable ContentSnapshot; it never changes the ContentSnapshot identity.",
+      "migrationEntry": [],
+      "openEntry": [
+        "new KnowledgeManager"
+      ],
+      "ownerModule": "lib/knowledge/knowledge-manager.ts",
+      "pathExclusions": [],
+      "pathKind": "tree",
+      "pathPattern": "knowledge/artifacts/**",
+      "pathPatterns": [
+        "knowledge/artifacts/**"
+      ],
+      "preCoordinatorReadProjection": null,
+      "protocolModules": [],
+      "restorePolicy": "Restore only artifacts whose parser identity and source snapshot still validate; rebuild derived semantic views when compatibility requires it.",
+      "schemaContract": {
+        "compatibility": "The named runtime reader is canonical; this inventory does not imply stricter validation than runtime currently performs.",
+        "kind": "protocol",
+        "source": "lib/knowledge/knowledge-manager.ts"
+      },
+      "schemaSource": {
+        "contract": "ParseArtifact generation directories referenced by knowledge.db and never treated as source content versions",
+        "kind": "directory-contract",
+        "module": "lib/knowledge/knowledge-manager.ts"
+      }
+    },
+    {
+      "affectedByEpochMigration": true,
+      "bootstrapSafety": null,
+      "checkpointPolicy": "Checkpoint every referenced immutable snapshot byte together with knowledge.db; unreferenced staging files are excluded.",
+      "epochPolicy": "epoch-managed",
+      "exemption": null,
+      "firstPossibleOpenPhase": "engine_construct",
+      "firstPossibleWritePhase": "runtime_ready",
+      "format": "mixed-directory",
+      "id": "knowledge-source-snapshots",
+      "identityContract": "snapshotId and SHA-256 identify immutable captured bytes; the managed relative path is a locator and the external origin path is metadata only.",
+      "migrationEntry": [],
+      "openEntry": [
+        "new KnowledgeManager",
+        "KnowledgeManager.importFile",
+        "KnowledgeManager.readContentSnapshot"
+      ],
+      "ownerModule": "lib/knowledge/knowledge-manager.ts",
+      "pathExclusions": [],
+      "pathKind": "tree",
+      "pathPattern": "knowledge/sources/**",
+      "pathPatterns": [
+        "knowledge/sources/**"
+      ],
+      "preCoordinatorReadProjection": null,
+      "protocolModules": [],
+      "restorePolicy": "Restore immutable bytes at their relative locators, then verify byte length and SHA-256 before serving citations or analysis.",
+      "schemaContract": {
+        "compatibility": "The named runtime reader is canonical; this inventory does not imply stricter validation than runtime currently performs.",
+        "kind": "protocol",
+        "source": "lib/knowledge/knowledge-manager.ts"
+      },
+      "schemaSource": {
+        "contract": "ContentSnapshot relative locator, immutable byte publication, SHA-256 verification, and rollback protocol",
+        "kind": "directory-contract",
+        "module": "lib/knowledge/knowledge-manager.ts"
       }
     },
     {
@@ -3090,8 +3248,8 @@
   ],
   "review": {
     "classification": "compatible",
-    "compatibilityReason": "session-coordinator: Context Ring 分类估值(contextUsageEstimate)随请求边界去抖落盘到 session-meta 并在 entry 重建时恢复、压缩时置空;仅新增可选 JSON 字段,不触及任何 SQLite store schema 或 DATA_EPOCH",
-    "payloadFingerprint": "sha256:ab819c64862fffe49b9ae5b1fbce7bbff548390c9ac5301ddb44c135210be95c"
+    "compatibilityReason": "Knowledge schema v5 仅新增可选的 Verification Step 事实账本表；v1-v4 历史行保持有效并原样迁移，现有数据含义不变，因此 DATA_EPOCH 保持不变。",
+    "payloadFingerprint": "sha256:34763e876cb11167ccc0388a9bbbfb4c1f177081d7c1fd415d1b245a1080997b"
   },
   "schemas": [
     {
@@ -3355,10 +3513,439 @@
       "storeId": "installed-plugins"
     },
     {
+      "contract": "KnowledgeStore runtime DDL, transactional migration, and store-local PRAGMA user_version",
+      "kind": "sqlite-runtime",
+      "module": "lib/knowledge/knowledge-store.ts",
+      "runtimeSchema": {
+        "objects": [
+          {
+            "name": "idx_analysis_unit_spans_block",
+            "sql": "CREATE INDEX idx_analysis_unit_spans_block ON analysis_unit_spans(block_id, kind, start_offset, end_offset)",
+            "tableName": "analysis_unit_spans",
+            "type": "index"
+          },
+          {
+            "name": "idx_analysis_units_run_status",
+            "sql": "CREATE INDEX idx_analysis_units_run_status ON analysis_units(run_id, status, priority, ordinal)",
+            "tableName": "analysis_units",
+            "type": "index"
+          },
+          {
+            "name": "idx_content_snapshots_source",
+            "sql": "CREATE INDEX idx_content_snapshots_source ON content_snapshots(source_id, captured_at DESC)",
+            "tableName": "content_snapshots",
+            "type": "index"
+          },
+          {
+            "name": "idx_contradiction_checks_run_status",
+            "sql": "CREATE INDEX idx_contradiction_checks_run_status ON contradiction_checks(run_id, status, unit_id)",
+            "tableName": "contradiction_checks",
+            "type": "index"
+          },
+          {
+            "name": "idx_evidence_validations_run",
+            "sql": "CREATE INDEX idx_evidence_validations_run ON evidence_validations(run_id, status, created_at)",
+            "tableName": "evidence_validations",
+            "type": "index"
+          },
+          {
+            "name": "idx_execution_batches_run_status",
+            "sql": "CREATE INDEX idx_execution_batches_run_status ON execution_batches(run_id, status, ordinal)",
+            "tableName": "execution_batches",
+            "type": "index"
+          },
+          {
+            "name": "idx_knowledge_blocks_artifact",
+            "sql": "CREATE INDEX idx_knowledge_blocks_artifact ON knowledge_blocks(parse_artifact_id, ordinal)",
+            "tableName": "knowledge_blocks",
+            "type": "index"
+          },
+          {
+            "name": "idx_knowledge_citations_artifact",
+            "sql": "CREATE INDEX idx_knowledge_citations_artifact ON knowledge_citations(parse_artifact_id, created_at)",
+            "tableName": "knowledge_citations",
+            "type": "index"
+          },
+          {
+            "name": "idx_knowledge_citations_block",
+            "sql": "CREATE INDEX idx_knowledge_citations_block ON knowledge_citations(block_id, start_offset, end_offset)",
+            "tableName": "knowledge_citations",
+            "type": "index"
+          },
+          {
+            "name": "idx_knowledge_run_citations_citation",
+            "sql": "CREATE INDEX idx_knowledge_run_citations_citation ON knowledge_run_citations(citation_id)",
+            "tableName": "knowledge_run_citations",
+            "type": "index"
+          },
+          {
+            "name": "idx_knowledge_runs_status",
+            "sql": "CREATE INDEX idx_knowledge_runs_status ON knowledge_runs(status, created_at)",
+            "tableName": "knowledge_runs",
+            "type": "index"
+          },
+          {
+            "name": "idx_knowledge_runs_studio",
+            "sql": "CREATE INDEX idx_knowledge_runs_studio ON knowledge_runs(studio_id, created_at DESC)",
+            "tableName": "knowledge_runs",
+            "type": "index"
+          },
+          {
+            "name": "idx_notebook_sources_active",
+            "sql": "CREATE INDEX idx_notebook_sources_active ON notebook_sources(notebook_id, removed_at, added_at)",
+            "tableName": "notebook_sources",
+            "type": "index"
+          },
+          {
+            "name": "idx_notebooks_studio_active",
+            "sql": "CREATE INDEX idx_notebooks_studio_active ON notebooks(studio_id, deleted_at, updated_at DESC)",
+            "tableName": "notebooks",
+            "type": "index"
+          },
+          {
+            "name": "idx_parse_artifacts_snapshot",
+            "sql": "CREATE INDEX idx_parse_artifacts_snapshot ON parse_artifacts(content_snapshot_id, created_at DESC)",
+            "tableName": "parse_artifacts",
+            "type": "index"
+          },
+          {
+            "name": "idx_parse_artifacts_status",
+            "sql": "CREATE INDEX idx_parse_artifacts_status ON parse_artifacts(status, created_at)",
+            "tableName": "parse_artifacts",
+            "type": "index"
+          },
+          {
+            "name": "idx_research_claims_run",
+            "sql": "CREATE INDEX idx_research_claims_run ON research_claims(run_id, ordinal)",
+            "tableName": "research_claims",
+            "type": "index"
+          },
+          {
+            "name": "idx_research_evidence_run",
+            "sql": "CREATE INDEX idx_research_evidence_run ON research_evidence(run_id, created_at)",
+            "tableName": "research_evidence",
+            "type": "index"
+          },
+          {
+            "name": "idx_research_runs_state",
+            "sql": "CREATE INDEX idx_research_runs_state ON research_runs(state, updated_at)",
+            "tableName": "research_runs",
+            "type": "index"
+          },
+          {
+            "name": "idx_research_verification_attempts_run",
+            "sql": "CREATE INDEX idx_research_verification_attempts_run ON research_verification_attempts(run_id, started_at)",
+            "tableName": "research_verification_attempts",
+            "type": "index"
+          },
+          {
+            "name": "idx_research_verification_cells_step",
+            "sql": "CREATE INDEX idx_research_verification_cells_step ON research_verification_cells(step_id, status, ordinal)",
+            "tableName": "research_verification_cells",
+            "type": "index"
+          },
+          {
+            "name": "idx_research_verification_relations_run",
+            "sql": "CREATE INDEX idx_research_verification_relations_run ON research_verification_relations(run_id, relation, created_at)",
+            "tableName": "research_verification_relations",
+            "type": "index"
+          },
+          {
+            "name": "idx_research_verification_steps_run",
+            "sql": "CREATE INDEX idx_research_verification_steps_run ON research_verification_steps(run_id, status, ordinal)",
+            "tableName": "research_verification_steps",
+            "type": "index"
+          },
+          {
+            "name": "idx_scope_snapshots_studio",
+            "sql": "CREATE INDEX idx_scope_snapshots_studio ON scope_snapshots(studio_id, created_at DESC)",
+            "tableName": "scope_snapshots",
+            "type": "index"
+          },
+          {
+            "name": "idx_scope_sources_artifact",
+            "sql": "CREATE INDEX idx_scope_sources_artifact ON scope_sources(scope_snapshot_id, parse_artifact_id)",
+            "tableName": "scope_sources",
+            "type": "index"
+          },
+          {
+            "name": "idx_scope_sources_snapshot",
+            "sql": "CREATE INDEX idx_scope_sources_snapshot ON scope_sources(content_snapshot_id)",
+            "tableName": "scope_sources",
+            "type": "index"
+          },
+          {
+            "name": "idx_source_notebooks_active",
+            "sql": "CREATE INDEX idx_source_notebooks_active ON notebook_sources(source_id, removed_at, added_at)",
+            "tableName": "notebook_sources",
+            "type": "index"
+          },
+          {
+            "name": "idx_sources_studio_active",
+            "sql": "CREATE INDEX idx_sources_studio_active ON sources(studio_id, deleted_at, created_at DESC)",
+            "tableName": "sources",
+            "type": "index"
+          },
+          {
+            "name": "idx_task_attempts_run",
+            "sql": "CREATE INDEX idx_task_attempts_run ON task_attempts(run_id, work_type, started_at)",
+            "tableName": "task_attempts",
+            "type": "index"
+          },
+          {
+            "name": "analysis_manifests",
+            "sql": "CREATE TABLE analysis_manifests ( run_id TEXT PRIMARY KEY, source_count INTEGER NOT NULL CHECK(source_count >= 0), parse_artifact_count INTEGER NOT NULL CHECK(parse_artifact_count >= 0), block_count INTEGER NOT NULL CHECK(block_count >= 0), unit_count INTEGER NOT NULL CHECK(unit_count > 0), primary_char_count INTEGER NOT NULL CHECK(primary_char_count > 0), created_at TEXT NOT NULL, FOREIGN KEY(run_id) REFERENCES research_runs(run_id) ON DELETE RESTRICT )",
+            "tableName": "analysis_manifests",
+            "type": "table"
+          },
+          {
+            "name": "analysis_unit_results",
+            "sql": "CREATE TABLE analysis_unit_results ( unit_id TEXT PRIMARY KEY, attempt_id TEXT NOT NULL, result_json TEXT NOT NULL, completed_at TEXT NOT NULL, FOREIGN KEY(unit_id) REFERENCES analysis_units(id) ON DELETE RESTRICT, FOREIGN KEY(attempt_id) REFERENCES task_attempts(id) ON DELETE RESTRICT )",
+            "tableName": "analysis_unit_results",
+            "type": "table"
+          },
+          {
+            "name": "analysis_unit_spans",
+            "sql": "CREATE TABLE analysis_unit_spans ( unit_id TEXT NOT NULL, kind TEXT NOT NULL CHECK(kind IN ('primary', 'context')), ordinal INTEGER NOT NULL CHECK(ordinal >= 0), block_id TEXT NOT NULL, block_ordinal INTEGER NOT NULL CHECK(block_ordinal >= 0), start_offset INTEGER NOT NULL CHECK(start_offset >= 0), end_offset INTEGER NOT NULL CHECK(end_offset > start_offset), PRIMARY KEY(unit_id, kind, ordinal), FOREIGN KEY(unit_id) REFERENCES analysis_units(id) ON DELETE RESTRICT, FOREIGN KEY(block_id) REFERENCES knowledge_blocks(id) ON DELETE RESTRICT )",
+            "tableName": "analysis_unit_spans",
+            "type": "table"
+          },
+          {
+            "name": "analysis_units",
+            "sql": "CREATE TABLE analysis_units ( id TEXT PRIMARY KEY, run_id TEXT NOT NULL, parse_artifact_id TEXT NOT NULL, ordinal INTEGER NOT NULL CHECK(ordinal >= 0), priority INTEGER NOT NULL CHECK(priority >= 0), status TEXT NOT NULL CHECK(status IN ('pending', 'running', 'completed', 'failed', 'canceled')), primary_char_count INTEGER NOT NULL CHECK(primary_char_count > 0), context_char_count INTEGER NOT NULL CHECK(context_char_count >= 0), completed_at TEXT, error_code TEXT, UNIQUE(run_id, parse_artifact_id, ordinal), FOREIGN KEY(run_id) REFERENCES research_runs(run_id) ON DELETE RESTRICT, FOREIGN KEY(parse_artifact_id) REFERENCES parse_artifacts(id) ON DELETE RESTRICT )",
+            "tableName": "analysis_units",
+            "type": "table"
+          },
+          {
+            "name": "claim_evidence",
+            "sql": "CREATE TABLE claim_evidence ( claim_id TEXT NOT NULL, evidence_id TEXT NOT NULL, relation TEXT NOT NULL CHECK(relation IN ('supports', 'contradicts', 'context')), PRIMARY KEY(claim_id, evidence_id, relation), FOREIGN KEY(claim_id) REFERENCES research_claims(id) ON DELETE RESTRICT, FOREIGN KEY(evidence_id) REFERENCES research_evidence(id) ON DELETE RESTRICT )",
+            "tableName": "claim_evidence",
+            "type": "table"
+          },
+          {
+            "name": "claim_packs",
+            "sql": "CREATE TABLE claim_packs ( id TEXT PRIMARY KEY, run_id TEXT NOT NULL, ordinal INTEGER NOT NULL CHECK(ordinal >= 0), claim_ids_json TEXT NOT NULL, created_at TEXT NOT NULL, UNIQUE(run_id, ordinal), FOREIGN KEY(run_id) REFERENCES research_runs(run_id) ON DELETE RESTRICT )",
+            "tableName": "claim_packs",
+            "type": "table"
+          },
+          {
+            "name": "content_snapshots",
+            "sql": "CREATE TABLE content_snapshots ( id TEXT PRIMARY KEY, source_id TEXT NOT NULL, sha256 TEXT NOT NULL CHECK(length(sha256) = 64), mime_type TEXT NOT NULL, byte_size INTEGER NOT NULL CHECK(byte_size >= 0), storage_path TEXT NOT NULL UNIQUE, captured_at TEXT NOT NULL, UNIQUE(source_id, sha256), FOREIGN KEY(source_id) REFERENCES sources(id) ON DELETE RESTRICT )",
+            "tableName": "content_snapshots",
+            "type": "table"
+          },
+          {
+            "name": "contradiction_checks",
+            "sql": "CREATE TABLE contradiction_checks ( id TEXT PRIMARY KEY, run_id TEXT NOT NULL, unit_id TEXT NOT NULL, claim_pack_id TEXT NOT NULL, status TEXT NOT NULL CHECK(status IN ('pending', 'running', 'completed', 'failed', 'canceled')), attempt_id TEXT, result_json TEXT, completed_at TEXT, error_code TEXT, UNIQUE(run_id, unit_id, claim_pack_id), FOREIGN KEY(run_id) REFERENCES research_runs(run_id) ON DELETE RESTRICT, FOREIGN KEY(unit_id) REFERENCES analysis_units(id) ON DELETE RESTRICT, FOREIGN KEY(claim_pack_id) REFERENCES claim_packs(id) ON DELETE RESTRICT, FOREIGN KEY(attempt_id) REFERENCES task_attempts(id) ON DELETE RESTRICT )",
+            "tableName": "contradiction_checks",
+            "type": "table"
+          },
+          {
+            "name": "contradiction_manifests",
+            "sql": "CREATE TABLE contradiction_manifests ( run_id TEXT PRIMARY KEY, unit_count INTEGER NOT NULL CHECK(unit_count >= 0), claim_pack_count INTEGER NOT NULL CHECK(claim_pack_count >= 0), total_check_count INTEGER NOT NULL CHECK(total_check_count >= 0), created_at TEXT NOT NULL, FOREIGN KEY(run_id) REFERENCES research_runs(run_id) ON DELETE RESTRICT )",
+            "tableName": "contradiction_manifests",
+            "type": "table"
+          },
+          {
+            "name": "evidence_validations",
+            "sql": "CREATE TABLE evidence_validations ( id TEXT PRIMARY KEY, run_id TEXT NOT NULL, unit_id TEXT NOT NULL, origin_type TEXT NOT NULL CHECK(origin_type IN ('analysis', 'contradiction')), origin_id TEXT NOT NULL, candidate_ordinal INTEGER NOT NULL CHECK(candidate_ordinal >= 0), status TEXT NOT NULL CHECK(status IN ('validated', 'invalid')), reason_code TEXT, citation_id TEXT, canonical_quote TEXT, quote_checksum TEXT, epistemic_basis TEXT NOT NULL CHECK(epistemic_basis IN ('explicit', 'inferred', 'mixed')), created_at TEXT NOT NULL, UNIQUE(origin_type, origin_id, candidate_ordinal), FOREIGN KEY(run_id) REFERENCES research_runs(run_id) ON DELETE RESTRICT, FOREIGN KEY(unit_id) REFERENCES analysis_units(id) ON DELETE RESTRICT, FOREIGN KEY(citation_id) REFERENCES knowledge_citations(id) ON DELETE RESTRICT )",
+            "tableName": "evidence_validations",
+            "type": "table"
+          },
+          {
+            "name": "execution_batch_units",
+            "sql": "CREATE TABLE execution_batch_units ( batch_id TEXT NOT NULL, unit_id TEXT NOT NULL UNIQUE, ordinal INTEGER NOT NULL CHECK(ordinal >= 0), PRIMARY KEY(batch_id, ordinal), FOREIGN KEY(batch_id) REFERENCES execution_batches(id) ON DELETE RESTRICT, FOREIGN KEY(unit_id) REFERENCES analysis_units(id) ON DELETE RESTRICT )",
+            "tableName": "execution_batch_units",
+            "type": "table"
+          },
+          {
+            "name": "execution_batches",
+            "sql": "CREATE TABLE execution_batches ( id TEXT PRIMARY KEY, run_id TEXT NOT NULL, ordinal INTEGER NOT NULL CHECK(ordinal >= 0), status TEXT NOT NULL CHECK(status IN ('pending', 'running', 'completed', 'failed', 'canceled')), estimated_chars INTEGER NOT NULL CHECK(estimated_chars > 0), created_at TEXT NOT NULL, started_at TEXT, completed_at TEXT, error_code TEXT, UNIQUE(run_id, ordinal), FOREIGN KEY(run_id) REFERENCES research_runs(run_id) ON DELETE RESTRICT )",
+            "tableName": "execution_batches",
+            "type": "table"
+          },
+          {
+            "name": "knowledge_blocks",
+            "sql": "CREATE TABLE knowledge_blocks ( id TEXT PRIMARY KEY, parse_artifact_id TEXT NOT NULL, ordinal INTEGER NOT NULL CHECK(ordinal >= 0), text TEXT NOT NULL, text_sha256 TEXT NOT NULL CHECK(length(text_sha256) = 64), locator_type TEXT NOT NULL CHECK(locator_type IN ('text', 'markdown', 'pdf', 'html')), locator_payload_json TEXT NOT NULL, UNIQUE(parse_artifact_id, ordinal), FOREIGN KEY(parse_artifact_id) REFERENCES parse_artifacts(id) ON DELETE RESTRICT )",
+            "tableName": "knowledge_blocks",
+            "type": "table"
+          },
+          {
+            "name": "knowledge_citations",
+            "sql": "CREATE TABLE knowledge_citations ( id TEXT PRIMARY KEY, parse_artifact_id TEXT NOT NULL, block_id TEXT NOT NULL, start_offset INTEGER NOT NULL CHECK(start_offset >= 0), end_offset INTEGER NOT NULL CHECK(end_offset > start_offset), canonical_text TEXT NOT NULL, canonical_text_sha256 TEXT NOT NULL CHECK(length(canonical_text_sha256) = 64), created_at TEXT NOT NULL, FOREIGN KEY(parse_artifact_id) REFERENCES parse_artifacts(id) ON DELETE RESTRICT, FOREIGN KEY(block_id) REFERENCES knowledge_blocks(id) ON DELETE RESTRICT )",
+            "tableName": "knowledge_citations",
+            "type": "table"
+          },
+          {
+            "name": "knowledge_run_citations",
+            "sql": "CREATE TABLE knowledge_run_citations ( run_id TEXT NOT NULL, ordinal INTEGER NOT NULL CHECK(ordinal >= 0), marker INTEGER NOT NULL CHECK(marker > 0), citation_id TEXT NOT NULL, candidate_ref TEXT NOT NULL, PRIMARY KEY(run_id, ordinal), UNIQUE(run_id, marker), FOREIGN KEY(run_id) REFERENCES knowledge_runs(id) ON DELETE RESTRICT, FOREIGN KEY(citation_id) REFERENCES knowledge_citations(id) ON DELETE RESTRICT )",
+            "tableName": "knowledge_run_citations",
+            "type": "table"
+          },
+          {
+            "name": "knowledge_run_retrievals",
+            "sql": "CREATE TABLE knowledge_run_retrievals ( run_id TEXT NOT NULL, rank INTEGER NOT NULL CHECK(rank > 0), chunk_id TEXT NOT NULL, parse_artifact_id TEXT NOT NULL, score REAL NOT NULL, PRIMARY KEY(run_id, rank), FOREIGN KEY(run_id) REFERENCES knowledge_runs(id) ON DELETE RESTRICT, FOREIGN KEY(parse_artifact_id) REFERENCES parse_artifacts(id) ON DELETE RESTRICT )",
+            "tableName": "knowledge_run_retrievals",
+            "type": "table"
+          },
+          {
+            "name": "knowledge_runs",
+            "sql": "CREATE TABLE knowledge_runs ( id TEXT PRIMARY KEY, studio_id TEXT NOT NULL, mode TEXT NOT NULL CHECK(mode IN ('quick', 'research')), question TEXT NOT NULL, scope_snapshot_id TEXT NOT NULL, status TEXT NOT NULL CHECK(status IN ('running', 'completed', 'failed', 'cancelled')), retrieval_mode TEXT NOT NULL CHECK(retrieval_mode IN ('fts', 'hybrid')), answer_text TEXT, error_code TEXT, created_at TEXT NOT NULL, completed_at TEXT, FOREIGN KEY(scope_snapshot_id) REFERENCES scope_snapshots(id) ON DELETE RESTRICT )",
+            "tableName": "knowledge_runs",
+            "type": "table"
+          },
+          {
+            "name": "notebook_sources",
+            "sql": "CREATE TABLE notebook_sources ( notebook_id TEXT NOT NULL, source_id TEXT NOT NULL, added_at TEXT NOT NULL, removed_at TEXT, PRIMARY KEY(notebook_id, source_id), FOREIGN KEY(notebook_id) REFERENCES notebooks(id) ON DELETE RESTRICT, FOREIGN KEY(source_id) REFERENCES sources(id) ON DELETE RESTRICT )",
+            "tableName": "notebook_sources",
+            "type": "table"
+          },
+          {
+            "name": "notebooks",
+            "sql": "CREATE TABLE notebooks ( id TEXT PRIMARY KEY, studio_id TEXT NOT NULL, name TEXT NOT NULL CHECK(length(trim(name)) > 0), created_at TEXT NOT NULL, updated_at TEXT NOT NULL, deleted_at TEXT )",
+            "tableName": "notebooks",
+            "type": "table"
+          },
+          {
+            "name": "parse_artifacts",
+            "sql": "CREATE TABLE parse_artifacts ( id TEXT PRIMARY KEY, content_snapshot_id TEXT NOT NULL, parser_id TEXT NOT NULL, parser_version TEXT NOT NULL, parser_config_hash TEXT NOT NULL, status TEXT NOT NULL CHECK(status IN ('parsing', 'ready', 'needs_ocr', 'failed')), warnings_json TEXT NOT NULL, semantic_artifact_path TEXT, created_at TEXT NOT NULL, completed_at TEXT, UNIQUE(content_snapshot_id, parser_id, parser_version, parser_config_hash), FOREIGN KEY(content_snapshot_id) REFERENCES content_snapshots(id) ON DELETE RESTRICT )",
+            "tableName": "parse_artifacts",
+            "type": "table"
+          },
+          {
+            "name": "research_claims",
+            "sql": "CREATE TABLE research_claims ( id TEXT PRIMARY KEY, run_id TEXT NOT NULL, origin_job_id TEXT NOT NULL, ordinal INTEGER NOT NULL CHECK(ordinal >= 0), text TEXT NOT NULL, support_status TEXT NOT NULL CHECK(support_status IN ('supported', 'partial', 'disputed', 'insufficient')), epistemic_basis TEXT NOT NULL CHECK(epistemic_basis IN ('explicit', 'inferred', 'mixed')), created_at TEXT NOT NULL, UNIQUE(origin_job_id, ordinal), FOREIGN KEY(run_id) REFERENCES research_runs(run_id) ON DELETE RESTRICT, FOREIGN KEY(origin_job_id) REFERENCES research_jobs(id) ON DELETE RESTRICT )",
+            "tableName": "research_claims",
+            "type": "table"
+          },
+          {
+            "name": "research_contradictions",
+            "sql": "CREATE TABLE research_contradictions ( id TEXT PRIMARY KEY, run_id TEXT NOT NULL, check_id TEXT NOT NULL, claim_id TEXT NOT NULL, evidence_id TEXT NOT NULL, relation TEXT NOT NULL CHECK(relation IN ('contradicts', 'context')), explanation TEXT NOT NULL, created_at TEXT NOT NULL, UNIQUE(check_id, claim_id, evidence_id), FOREIGN KEY(run_id) REFERENCES research_runs(run_id) ON DELETE RESTRICT, FOREIGN KEY(check_id) REFERENCES contradiction_checks(id) ON DELETE RESTRICT, FOREIGN KEY(claim_id) REFERENCES research_claims(id) ON DELETE RESTRICT, FOREIGN KEY(evidence_id) REFERENCES research_evidence(id) ON DELETE RESTRICT )",
+            "tableName": "research_contradictions",
+            "type": "table"
+          },
+          {
+            "name": "research_evidence",
+            "sql": "CREATE TABLE research_evidence ( id TEXT PRIMARY KEY, run_id TEXT NOT NULL, unit_id TEXT NOT NULL, validation_id TEXT NOT NULL UNIQUE, citation_id TEXT NOT NULL, content_snapshot_id TEXT NOT NULL, parse_artifact_id TEXT NOT NULL, block_id TEXT NOT NULL, start_offset INTEGER NOT NULL CHECK(start_offset >= 0), end_offset INTEGER NOT NULL CHECK(end_offset > start_offset), canonical_quote TEXT NOT NULL, quote_checksum TEXT NOT NULL CHECK(length(quote_checksum) = 64), epistemic_basis TEXT NOT NULL CHECK(epistemic_basis IN ('explicit', 'inferred', 'mixed')), created_at TEXT NOT NULL, FOREIGN KEY(run_id) REFERENCES research_runs(run_id) ON DELETE RESTRICT, FOREIGN KEY(unit_id) REFERENCES analysis_units(id) ON DELETE RESTRICT, FOREIGN KEY(validation_id) REFERENCES evidence_validations(id) ON DELETE RESTRICT, FOREIGN KEY(citation_id) REFERENCES knowledge_citations(id) ON DELETE RESTRICT, FOREIGN KEY(content_snapshot_id) REFERENCES content_snapshots(id) ON DELETE RESTRICT, FOREIGN KEY(parse_artifact_id) REFERENCES parse_artifacts(id) ON DELETE RESTRICT, FOREIGN KEY(block_id) REFERENCES knowledge_blocks(id) ON DELETE RESTRICT )",
+            "tableName": "research_evidence",
+            "type": "table"
+          },
+          {
+            "name": "research_jobs",
+            "sql": "CREATE TABLE research_jobs ( id TEXT PRIMARY KEY, run_id TEXT NOT NULL, phase TEXT NOT NULL CHECK(phase IN ('claim_build', 'final_synthesis')), ordinal INTEGER NOT NULL CHECK(ordinal >= 0), status TEXT NOT NULL CHECK(status IN ('pending', 'running', 'completed', 'failed', 'canceled')), input_refs_json TEXT NOT NULL, output_json TEXT, created_at TEXT NOT NULL, started_at TEXT, completed_at TEXT, error_code TEXT, UNIQUE(run_id, phase, ordinal), FOREIGN KEY(run_id) REFERENCES research_runs(run_id) ON DELETE RESTRICT )",
+            "tableName": "research_jobs",
+            "type": "table"
+          },
+          {
+            "name": "research_report_citations",
+            "sql": "CREATE TABLE research_report_citations ( run_id TEXT NOT NULL, ordinal INTEGER NOT NULL CHECK(ordinal >= 0), marker INTEGER NOT NULL CHECK(marker > 0), evidence_id TEXT NOT NULL, citation_id TEXT NOT NULL, PRIMARY KEY(run_id, ordinal), UNIQUE(run_id, marker), FOREIGN KEY(run_id) REFERENCES research_runs(run_id) ON DELETE RESTRICT, FOREIGN KEY(evidence_id) REFERENCES research_evidence(id) ON DELETE RESTRICT, FOREIGN KEY(citation_id) REFERENCES knowledge_citations(id) ON DELETE RESTRICT )",
+            "tableName": "research_report_citations",
+            "type": "table"
+          },
+          {
+            "name": "research_reports",
+            "sql": "CREATE TABLE research_reports ( run_id TEXT PRIMARY KEY, synthesis_job_id TEXT NOT NULL UNIQUE, report_json TEXT NOT NULL, created_at TEXT NOT NULL, FOREIGN KEY(run_id) REFERENCES research_runs(run_id) ON DELETE RESTRICT, FOREIGN KEY(synthesis_job_id) REFERENCES research_jobs(id) ON DELETE RESTRICT )",
+            "tableName": "research_reports",
+            "type": "table"
+          },
+          {
+            "name": "research_runs",
+            "sql": "CREATE TABLE research_runs ( run_id TEXT PRIMARY KEY, host_task_id TEXT NOT NULL UNIQUE, state TEXT NOT NULL CHECK(state IN ( 'queued', 'preparing_scope', 'building_manifest', 'scanning', 'building_claims', 'checking_contradictions', 'synthesizing', 'completed', 'recovering', 'partial', 'failed', 'canceled' )), spec_json TEXT NOT NULL, error_code TEXT, created_at TEXT NOT NULL, updated_at TEXT NOT NULL, completed_at TEXT, FOREIGN KEY(run_id) REFERENCES knowledge_runs(id) ON DELETE RESTRICT )",
+            "tableName": "research_runs",
+            "type": "table"
+          },
+          {
+            "name": "research_verification_attempts",
+            "sql": "CREATE TABLE research_verification_attempts ( id TEXT PRIMARY KEY, run_id TEXT NOT NULL, step_id TEXT NOT NULL, cell_id TEXT NOT NULL, attempt_number INTEGER NOT NULL CHECK(attempt_number > 0), status TEXT NOT NULL CHECK(status IN ('running', 'completed', 'failed', 'canceled')), error_code TEXT, output_json TEXT, started_at TEXT NOT NULL, completed_at TEXT, UNIQUE(cell_id, attempt_number), FOREIGN KEY(run_id) REFERENCES research_runs(run_id) ON DELETE RESTRICT, FOREIGN KEY(step_id) REFERENCES research_verification_steps(id) ON DELETE RESTRICT, FOREIGN KEY(cell_id) REFERENCES research_verification_cells(id) ON DELETE RESTRICT )",
+            "tableName": "research_verification_attempts",
+            "type": "table"
+          },
+          {
+            "name": "research_verification_cells",
+            "sql": "CREATE TABLE research_verification_cells ( id TEXT PRIMARY KEY, step_id TEXT NOT NULL, unit_id TEXT NOT NULL, ordinal INTEGER NOT NULL CHECK(ordinal >= 0), status TEXT NOT NULL CHECK(status IN ('pending', 'running', 'completed', 'failed', 'canceled')), result_json TEXT, created_at TEXT NOT NULL, started_at TEXT, completed_at TEXT, error_code TEXT, UNIQUE(step_id, unit_id), UNIQUE(step_id, ordinal), FOREIGN KEY(step_id) REFERENCES research_verification_steps(id) ON DELETE RESTRICT, FOREIGN KEY(unit_id) REFERENCES analysis_units(id) ON DELETE RESTRICT )",
+            "tableName": "research_verification_cells",
+            "type": "table"
+          },
+          {
+            "name": "research_verification_relations",
+            "sql": "CREATE TABLE research_verification_relations ( id TEXT PRIMARY KEY, run_id TEXT NOT NULL, step_id TEXT NOT NULL, cell_id TEXT NOT NULL, claim_id TEXT NOT NULL, evidence_id TEXT NOT NULL, relation TEXT NOT NULL CHECK(relation IN ('supports', 'contradicts', 'context')), explanation TEXT NOT NULL, created_at TEXT NOT NULL, UNIQUE(cell_id, claim_id, evidence_id, relation), FOREIGN KEY(run_id) REFERENCES research_runs(run_id) ON DELETE RESTRICT, FOREIGN KEY(step_id) REFERENCES research_verification_steps(id) ON DELETE RESTRICT, FOREIGN KEY(cell_id) REFERENCES research_verification_cells(id) ON DELETE RESTRICT, FOREIGN KEY(claim_id) REFERENCES research_claims(id) ON DELETE RESTRICT, FOREIGN KEY(evidence_id) REFERENCES research_evidence(id) ON DELETE RESTRICT )",
+            "tableName": "research_verification_relations",
+            "type": "table"
+          },
+          {
+            "name": "research_verification_steps",
+            "sql": "CREATE TABLE research_verification_steps ( id TEXT PRIMARY KEY, run_id TEXT NOT NULL, trigger_synthesis_job_id TEXT NOT NULL UNIQUE, ordinal INTEGER NOT NULL CHECK(ordinal >= 0), status TEXT NOT NULL CHECK(status IN ('pending', 'running', 'completed', 'failed', 'canceled')), requests_json TEXT NOT NULL, created_at TEXT NOT NULL, started_at TEXT, completed_at TEXT, error_code TEXT, UNIQUE(run_id, ordinal), FOREIGN KEY(run_id) REFERENCES research_runs(run_id) ON DELETE RESTRICT, FOREIGN KEY(trigger_synthesis_job_id) REFERENCES research_jobs(id) ON DELETE RESTRICT )",
+            "tableName": "research_verification_steps",
+            "type": "table"
+          },
+          {
+            "name": "scope_notebooks",
+            "sql": "CREATE TABLE scope_notebooks ( scope_snapshot_id TEXT NOT NULL, notebook_id TEXT NOT NULL, notebook_name TEXT NOT NULL, ordinal INTEGER NOT NULL CHECK(ordinal >= 0), PRIMARY KEY(scope_snapshot_id, notebook_id), UNIQUE(scope_snapshot_id, ordinal), FOREIGN KEY(scope_snapshot_id) REFERENCES scope_snapshots(id) ON DELETE RESTRICT, FOREIGN KEY(notebook_id) REFERENCES notebooks(id) ON DELETE RESTRICT )",
+            "tableName": "scope_notebooks",
+            "type": "table"
+          },
+          {
+            "name": "scope_snapshots",
+            "sql": "CREATE TABLE scope_snapshots ( id TEXT PRIMARY KEY, studio_id TEXT NOT NULL, mode TEXT NOT NULL CHECK(mode IN ('quick', 'research')), created_at TEXT NOT NULL )",
+            "tableName": "scope_snapshots",
+            "type": "table"
+          },
+          {
+            "name": "scope_sources",
+            "sql": "CREATE TABLE scope_sources ( scope_snapshot_id TEXT NOT NULL, notebook_id TEXT NOT NULL, source_id TEXT NOT NULL, source_display_name TEXT NOT NULL, content_snapshot_id TEXT NOT NULL, parse_artifact_id TEXT NOT NULL, ordinal INTEGER NOT NULL CHECK(ordinal >= 0), PRIMARY KEY(scope_snapshot_id, notebook_id, source_id), UNIQUE(scope_snapshot_id, ordinal), FOREIGN KEY(scope_snapshot_id) REFERENCES scope_snapshots(id) ON DELETE RESTRICT, FOREIGN KEY(notebook_id) REFERENCES notebooks(id) ON DELETE RESTRICT, FOREIGN KEY(source_id) REFERENCES sources(id) ON DELETE RESTRICT, FOREIGN KEY(content_snapshot_id) REFERENCES content_snapshots(id) ON DELETE RESTRICT, FOREIGN KEY(parse_artifact_id) REFERENCES parse_artifacts(id) ON DELETE RESTRICT )",
+            "tableName": "scope_sources",
+            "type": "table"
+          },
+          {
+            "name": "sources",
+            "sql": "CREATE TABLE sources ( id TEXT PRIMARY KEY, studio_id TEXT NOT NULL, source_type TEXT NOT NULL CHECK(source_type IN ('file', 'pasted_text', 'web_snapshot')), display_name TEXT NOT NULL CHECK(length(trim(display_name)) > 0), origin_metadata_json TEXT NOT NULL, created_at TEXT NOT NULL, deleted_at TEXT )",
+            "tableName": "sources",
+            "type": "table"
+          },
+          {
+            "name": "task_attempts",
+            "sql": "CREATE TABLE task_attempts ( id TEXT PRIMARY KEY, run_id TEXT NOT NULL, work_type TEXT NOT NULL CHECK(work_type IN ('scan_batch', 'claim_job', 'contradiction_check', 'synthesis_job')), work_id TEXT NOT NULL, attempt_number INTEGER NOT NULL CHECK(attempt_number > 0), status TEXT NOT NULL CHECK(status IN ('running', 'completed', 'failed', 'canceled')), error_code TEXT, output_json TEXT, started_at TEXT NOT NULL, completed_at TEXT, UNIQUE(work_type, work_id, attempt_number), FOREIGN KEY(run_id) REFERENCES research_runs(run_id) ON DELETE RESTRICT )",
+            "tableName": "task_attempts",
+            "type": "table"
+          }
+        ],
+        "userVersion": 5
+      },
+      "sourceHash": "sha256:045a31646d3c845438441b8a04ebf176b8c830517deb33b5799530d83ea41e60",
+      "storeId": "knowledge-database"
+    },
+    {
+      "contract": "Regenerable lexical SQLite schema together with the vector cache schema in lib/knowledge/vector-index-adapter.ts; both derive only from durable Knowledge facts and artifacts",
+      "kind": "directory-contract",
+      "module": "lib/knowledge/knowledge-index-store.ts",
+      "protocolModules": [
+        {
+          "module": "lib/knowledge/vector-index-adapter.ts",
+          "sourceHash": "sha256:b749d28d66671dc6f9c6e9e5ff084845ebe03c2540b3ee02813fbc302e2c2f8c"
+        }
+      ],
+      "sourceHash": "sha256:77fbc69106e60cdd08414164bf3010e405944877cfb7ffd7c8c7bbed5605ac80",
+      "storeId": "knowledge-indexes"
+    },
+    {
+      "contract": "ParseArtifact generation directories referenced by knowledge.db and never treated as source content versions",
+      "kind": "directory-contract",
+      "module": "lib/knowledge/knowledge-manager.ts",
+      "sourceHash": "sha256:378373bcdba723b31d72fb76ab8070d69ad73fabf9fa32082418d88d0adeaa6a",
+      "storeId": "knowledge-parse-artifacts"
+    },
+    {
+      "contract": "ContentSnapshot relative locator, immutable byte publication, SHA-256 verification, and rollback protocol",
+      "kind": "directory-contract",
+      "module": "lib/knowledge/knowledge-manager.ts",
+      "sourceHash": "sha256:378373bcdba723b31d72fb76ab8070d69ad73fabf9fa32082418d88d0adeaa6a",
+      "storeId": "knowledge-source-snapshots"
+    },
+    {
       "contract": "sessionless upload naming and age-based cleanup protocol",
       "kind": "directory-contract",
       "module": "server/routes/upload.ts",
-      "sourceHash": "sha256:8625c319a67bfe04f5f00db5857df78883a2a9ffc43e1765e003d6b87e06807e",
+      "sourceHash": "sha256:3d812be4b4846b223e6956e814e75128f04da26de0cbd127b070ba288e11336f",
       "storeId": "legacy-upload-cache"
     },
     {
@@ -6871,6 +7458,286 @@
       "reason": "Writes an explicit tool output path supplied by the caller; no LINGXI_HOME store is implied.",
       "sourceFile": "lib/file-ref/resource-io.ts",
       "storeId": null
+    },
+    {
+      "exemptionId": null,
+      "kind": "mkdir",
+      "ordinal": 0,
+      "reason": "Creates and removes only the regenerable lexical SQLite index files.",
+      "sourceFile": "lib/knowledge/knowledge-index-store.ts",
+      "storeId": "knowledge-indexes"
+    },
+    {
+      "exemptionId": null,
+      "kind": "remove-path",
+      "ordinal": 0,
+      "reason": "Creates and removes only the regenerable lexical SQLite index files.",
+      "sourceFile": "lib/knowledge/knowledge-index-store.ts",
+      "storeId": "knowledge-indexes"
+    },
+    {
+      "exemptionId": null,
+      "kind": "remove-path",
+      "ordinal": 1,
+      "reason": "Creates and removes only the regenerable lexical SQLite index files.",
+      "sourceFile": "lib/knowledge/knowledge-index-store.ts",
+      "storeId": "knowledge-indexes"
+    },
+    {
+      "exemptionId": null,
+      "kind": "mkdir",
+      "ordinal": 0,
+      "reason": "Creates, atomically publishes, or rolls back citation-grade ParseArtifact generations.",
+      "sourceFile": "lib/knowledge/knowledge-manager.ts",
+      "storeId": "knowledge-parse-artifacts"
+    },
+    {
+      "exemptionId": null,
+      "kind": "mkdir",
+      "ordinal": 0,
+      "reason": "Publishes or rolls back only Knowledge-managed immutable source snapshot bytes.",
+      "sourceFile": "lib/knowledge/knowledge-manager.ts",
+      "storeId": "knowledge-source-snapshots"
+    },
+    {
+      "exemptionId": null,
+      "kind": "mkdir",
+      "ordinal": 0,
+      "reason": "Creates, atomically publishes, or rolls back citation-grade ParseArtifact generations.",
+      "sourceFile": "lib/knowledge/knowledge-manager.ts",
+      "storeId": "knowledge-parse-artifacts"
+    },
+    {
+      "exemptionId": null,
+      "kind": "mkdir",
+      "ordinal": 0,
+      "reason": "Creates the regenerable Knowledge index root.",
+      "sourceFile": "lib/knowledge/knowledge-manager.ts",
+      "storeId": "knowledge-indexes"
+    },
+    {
+      "exemptionId": null,
+      "kind": "mkdir",
+      "ordinal": 0,
+      "reason": "Publishes or rolls back only Knowledge-managed immutable source snapshot bytes.",
+      "sourceFile": "lib/knowledge/knowledge-manager.ts",
+      "storeId": "knowledge-source-snapshots"
+    },
+    {
+      "exemptionId": null,
+      "kind": "mkdir",
+      "ordinal": 1,
+      "reason": "Publishes or rolls back only Knowledge-managed immutable source snapshot bytes.",
+      "sourceFile": "lib/knowledge/knowledge-manager.ts",
+      "storeId": "knowledge-source-snapshots"
+    },
+    {
+      "exemptionId": null,
+      "kind": "remove-path",
+      "ordinal": 0,
+      "reason": "Creates, atomically publishes, or rolls back citation-grade ParseArtifact generations.",
+      "sourceFile": "lib/knowledge/knowledge-manager.ts",
+      "storeId": "knowledge-parse-artifacts"
+    },
+    {
+      "exemptionId": null,
+      "kind": "remove-path",
+      "ordinal": 0,
+      "reason": "Creates, atomically publishes, or rolls back citation-grade ParseArtifact generations.",
+      "sourceFile": "lib/knowledge/knowledge-manager.ts",
+      "storeId": "knowledge-parse-artifacts"
+    },
+    {
+      "exemptionId": null,
+      "kind": "remove-path",
+      "ordinal": 0,
+      "reason": "Publishes or rolls back only Knowledge-managed immutable source snapshot bytes.",
+      "sourceFile": "lib/knowledge/knowledge-manager.ts",
+      "storeId": "knowledge-source-snapshots"
+    },
+    {
+      "exemptionId": null,
+      "kind": "remove-path",
+      "ordinal": 0,
+      "reason": "Publishes or rolls back only Knowledge-managed immutable source snapshot bytes.",
+      "sourceFile": "lib/knowledge/knowledge-manager.ts",
+      "storeId": "knowledge-source-snapshots"
+    },
+    {
+      "exemptionId": null,
+      "kind": "remove-path",
+      "ordinal": 0,
+      "reason": "Publishes or rolls back only Knowledge-managed immutable source snapshot bytes.",
+      "sourceFile": "lib/knowledge/knowledge-manager.ts",
+      "storeId": "knowledge-source-snapshots"
+    },
+    {
+      "exemptionId": null,
+      "kind": "remove-path",
+      "ordinal": 1,
+      "reason": "Creates, atomically publishes, or rolls back citation-grade ParseArtifact generations.",
+      "sourceFile": "lib/knowledge/knowledge-manager.ts",
+      "storeId": "knowledge-parse-artifacts"
+    },
+    {
+      "exemptionId": null,
+      "kind": "remove-path",
+      "ordinal": 1,
+      "reason": "Publishes or rolls back only Knowledge-managed immutable source snapshot bytes.",
+      "sourceFile": "lib/knowledge/knowledge-manager.ts",
+      "storeId": "knowledge-source-snapshots"
+    },
+    {
+      "exemptionId": null,
+      "kind": "remove-path",
+      "ordinal": 1,
+      "reason": "Publishes or rolls back only Knowledge-managed immutable source snapshot bytes.",
+      "sourceFile": "lib/knowledge/knowledge-manager.ts",
+      "storeId": "knowledge-source-snapshots"
+    },
+    {
+      "exemptionId": null,
+      "kind": "remove-path",
+      "ordinal": 1,
+      "reason": "Publishes or rolls back only Knowledge-managed immutable source snapshot bytes.",
+      "sourceFile": "lib/knowledge/knowledge-manager.ts",
+      "storeId": "knowledge-source-snapshots"
+    },
+    {
+      "exemptionId": null,
+      "kind": "remove-path",
+      "ordinal": 2,
+      "reason": "Publishes or rolls back only Knowledge-managed immutable source snapshot bytes.",
+      "sourceFile": "lib/knowledge/knowledge-manager.ts",
+      "storeId": "knowledge-source-snapshots"
+    },
+    {
+      "exemptionId": null,
+      "kind": "remove-path",
+      "ordinal": 2,
+      "reason": "Publishes or rolls back only Knowledge-managed immutable source snapshot bytes.",
+      "sourceFile": "lib/knowledge/knowledge-manager.ts",
+      "storeId": "knowledge-source-snapshots"
+    },
+    {
+      "exemptionId": null,
+      "kind": "rename",
+      "ordinal": 0,
+      "reason": "Creates, atomically publishes, or rolls back citation-grade ParseArtifact generations.",
+      "sourceFile": "lib/knowledge/knowledge-manager.ts",
+      "storeId": "knowledge-parse-artifacts"
+    },
+    {
+      "exemptionId": null,
+      "kind": "rename",
+      "ordinal": 0,
+      "reason": "Publishes or rolls back only Knowledge-managed immutable source snapshot bytes.",
+      "sourceFile": "lib/knowledge/knowledge-manager.ts",
+      "storeId": "knowledge-source-snapshots"
+    },
+    {
+      "exemptionId": null,
+      "kind": "rename",
+      "ordinal": 1,
+      "reason": "Publishes or rolls back only Knowledge-managed immutable source snapshot bytes.",
+      "sourceFile": "lib/knowledge/knowledge-manager.ts",
+      "storeId": "knowledge-source-snapshots"
+    },
+    {
+      "exemptionId": null,
+      "kind": "rename",
+      "ordinal": 2,
+      "reason": "Publishes or rolls back only Knowledge-managed immutable source snapshot bytes.",
+      "sourceFile": "lib/knowledge/knowledge-manager.ts",
+      "storeId": "knowledge-source-snapshots"
+    },
+    {
+      "exemptionId": null,
+      "kind": "write-file",
+      "ordinal": 0,
+      "reason": "Creates, atomically publishes, or rolls back citation-grade ParseArtifact generations.",
+      "sourceFile": "lib/knowledge/knowledge-manager.ts",
+      "storeId": "knowledge-parse-artifacts"
+    },
+    {
+      "exemptionId": null,
+      "kind": "write-file",
+      "ordinal": 0,
+      "reason": "Publishes or rolls back only Knowledge-managed immutable source snapshot bytes.",
+      "sourceFile": "lib/knowledge/knowledge-manager.ts",
+      "storeId": "knowledge-source-snapshots"
+    },
+    {
+      "exemptionId": null,
+      "kind": "write-file",
+      "ordinal": 0,
+      "reason": "Publishes or rolls back only Knowledge-managed immutable source snapshot bytes.",
+      "sourceFile": "lib/knowledge/knowledge-manager.ts",
+      "storeId": "knowledge-source-snapshots"
+    },
+    {
+      "exemptionId": null,
+      "kind": "write-file",
+      "ordinal": 0,
+      "reason": "Publishes or rolls back only Knowledge-managed immutable source snapshot bytes.",
+      "sourceFile": "lib/knowledge/knowledge-manager.ts",
+      "storeId": "knowledge-source-snapshots"
+    },
+    {
+      "exemptionId": null,
+      "kind": "write-file",
+      "ordinal": 1,
+      "reason": "Publishes or rolls back only Knowledge-managed immutable source snapshot bytes.",
+      "sourceFile": "lib/knowledge/knowledge-manager.ts",
+      "storeId": "knowledge-source-snapshots"
+    },
+    {
+      "exemptionId": null,
+      "kind": "write-file",
+      "ordinal": 1,
+      "reason": "Publishes or rolls back only Knowledge-managed immutable source snapshot bytes.",
+      "sourceFile": "lib/knowledge/knowledge-manager.ts",
+      "storeId": "knowledge-source-snapshots"
+    },
+    {
+      "exemptionId": null,
+      "kind": "write-file",
+      "ordinal": 2,
+      "reason": "Publishes or rolls back only Knowledge-managed immutable source snapshot bytes.",
+      "sourceFile": "lib/knowledge/knowledge-manager.ts",
+      "storeId": "knowledge-source-snapshots"
+    },
+    {
+      "exemptionId": null,
+      "kind": "database-open",
+      "ordinal": 0,
+      "reason": "Creates the private Knowledge directory and opens the store-local SQLite database.",
+      "sourceFile": "lib/knowledge/knowledge-store.ts",
+      "storeId": "knowledge-database"
+    },
+    {
+      "exemptionId": null,
+      "kind": "mkdir",
+      "ordinal": 0,
+      "reason": "Creates the private Knowledge directory and opens the store-local SQLite database.",
+      "sourceFile": "lib/knowledge/knowledge-store.ts",
+      "storeId": "knowledge-database"
+    },
+    {
+      "exemptionId": null,
+      "kind": "mkdir",
+      "ordinal": 0,
+      "reason": "Creates and removes only the regenerable vector SQLite cache files.",
+      "sourceFile": "lib/knowledge/vector-index-adapter.ts",
+      "storeId": "knowledge-indexes"
+    },
+    {
+      "exemptionId": null,
+      "kind": "remove-path",
+      "ordinal": 0,
+      "reason": "Creates and removes only the regenerable vector SQLite cache files.",
+      "sourceFile": "lib/knowledge/vector-index-adapter.ts",
+      "storeId": "knowledge-indexes"
     },
     {
       "exemptionId": null,

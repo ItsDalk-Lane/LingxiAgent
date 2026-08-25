@@ -91,7 +91,10 @@ describe("quality gates", () => {
     expect(serverConfig).toContain('target: "node24"');
     expect(mainConfig).toContain('target: "node24"');
     expect(preloadConfig).toContain('target: "node24"');
-    expect(ci.jobs.test.strategy.matrix["node-version"]).toEqual(["24.15.0"]);
+    expect(ci.jobs.test.strategy.matrix.include).toHaveLength(4);
+    expect(ci.jobs.test.strategy.matrix.include.every(
+      (entry: Record<string, unknown>) => entry["node-version"] === "24.15.0",
+    )).toBe(true);
     expect(build.jobs.build.steps).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
