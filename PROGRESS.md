@@ -10,7 +10,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = 69d69ca8869349f68682e3e3d9db7dae6ba10ab6  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-08-25 聊天界面布局重构 + 上下文用量分类详情)
+VERIFIED_SOURCE_SHA   = 87249ede84f52e7cbf4533f8b99178dcc87b0fe6  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-08-25 v0.1.31 release 元数据)
 工作分支              = feature/upstream-sync-0.447.4
 ```
 
@@ -358,6 +358,17 @@ seal 不是一次性终点，而是"当前被验证树"的游标；每次审计�
   验证（F 树，提交前工作区即该 tree）：typecheck×3（绿）+ eslint 0 error +
   full npm test 12180 passed / 0 failed（推进前 seal guard 旧坐标下工作区
   未提交态不触发 diff）后推进。
+
+- **2026-08-25 v0.1.31 release**（87249ede，各坐标以文首为准）：release 元数据
+  提交（package.json/package-lock 版本 0.1.31 + releaseGeneration 9，
+  release-digest.v1 v0.1.31 手写条目（布局重构/上下文分类明细/Toggle 卡
+  loading 修复）+ v2 --append-history prepend（12 entries），release-preflight
+  活体断言随版本推进；5 files / +150-164，数据-only，零生产代码变化）。
+  验证：typecheck×3（绿）+ validate-release-digest v1/v2 + release-preflight
+  --tag v0.1.31（PASS，historicalMaximum 0.1.30/8）+ 目标套件 8 文件 65
+  用例（release-preflight / release-digest-schema / validate-release-digest /
+  update-digest-history / generate-release-digest / release-workflow-gates /
+  post-verification-audit-seal / upstream-sync-matrix 全绿）后推进。
 
 
 ## 最终状态：已合并（上游同步部分）
