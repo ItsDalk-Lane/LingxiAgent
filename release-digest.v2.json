@@ -3,6 +3,110 @@
   "entries": [
     {
       "schemaVersion": 1,
+      "tag": "v0.1.31",
+      "version": "0.1.31",
+      "previousTag": "v0.1.30",
+      "generatedAt": "2026-08-25T04:46:40.000Z",
+      "noUserFacingChanges": false,
+      "summary": {
+        "zh": "桌面主界面布局重构：工作台主体移到左侧、聊天记录限定在当前工作台、运行期信息卡片整合为右上悬浮胶囊、聊天搜索改为顶部入口加居中搜索界面、输入区控制按钮重排为一条工具栏。上下文用量环新增真实分类明细，并跨会话持久保存。修复设置/关于页开关偶发卡在加载状态的问题。",
+        "en": "The desktop main chat UI is rearranged: the workspace panel moves to the left, chat history is scoped to the current workspace, runtime info cards collapse into a floating capsule at the top right, chat search becomes a top entry with a centered search overlay, and input-area controls are regrouped into a single toolbar. The context usage ring now shows a real category breakdown that persists across sessions. Also fixes settings/About toggles occasionally stuck in a loading state."
+      },
+      "counts": {
+        "feature": 2,
+        "fix": 1,
+        "improvement": 0,
+        "migration": 0
+      },
+      "source": {
+        "owner": "ItsDalk-Lane",
+        "repo": "LingxiAgent",
+        "commitRange": "v0.1.30..HEAD",
+        "releaseUrl": "https://github.com/ItsDalk-Lane/LingxiAgent/releases/tag/v0.1.31",
+        "releaseNotes": ""
+      },
+      "items": [
+        {
+          "id": "feat-chat-layout-refactor",
+          "kind": "feature",
+          "importance": "high",
+          "title": {
+            "zh": "主聊天界面布局重构",
+            "en": "Main chat layout refactor"
+          },
+          "summary": {
+            "zh": "重新编排桌面端主聊天界面：工作台主体从右侧移到左侧，聊天记录限定为当前工作台的会话；原本散落的运行期信息卡片整合为一个右上角悬浮信息胶囊，可按需展开；聊天搜索从侧栏入口改为标题栏顶部入口，打开后是居中的搜索界面；输入区控制按钮重新归组为一条工具栏，侧栏入口与标题栏同步重排。",
+            "en": "The desktop main chat surface is rearranged: the workspace panel moves from the right to the left, and chat history is scoped to the current workspace's sessions. Scattered runtime info cards collapse into one floating capsule at the top right that expands on demand. Chat search moves from the sidebar to a top-bar entry opening a centered search overlay. Input-area controls are regrouped into a single toolbar, with sidebar entries and the title bar rearranged to match."
+          },
+          "details": [
+            {
+              "zh": "只重排既有功能，不新增产品能力；移动端布局同步适配。",
+              "en": "Existing features are only rearranged, no new product capabilities added; the mobile layout adapts in sync."
+            },
+            {
+              "zh": "输入区原控制条（InputControlBar）由新工具栏组件（ComposerToolbar）取代。",
+              "en": "The old input control bar (InputControlBar) is replaced by the new ComposerToolbar component."
+            }
+          ],
+          "sources": [
+            {
+              "type": "commit",
+              "ref": "69d69ca8",
+              "title": "feat(desktop): 聊天界面布局重构 + 上下文用量分类详情"
+            }
+          ]
+        },
+        {
+          "id": "feat-context-usage-breakdown",
+          "kind": "feature",
+          "importance": "medium",
+          "title": {
+            "zh": "上下文用量分类明细",
+            "en": "Context usage category breakdown"
+          },
+          "summary": {
+            "zh": "输入区的上下文用量环现在展示真实的分类明细：各消息类别（如系统提示、对话、工具、记忆等）按统一契约估算占比，而非此前的单一总量。明细随会话持久保存，切换会话或重启应用后仍然保留，上下文压缩后相应清空。",
+            "en": "The context usage ring now shows a real category breakdown: message classes (system prompt, conversation, tools, memory, etc.) are estimated under a unified contract instead of a single total. The breakdown persists with the session — it survives switching sessions and app restarts, and is cleared when context is compacted."
+          },
+          "details": [
+            {
+              "zh": "分类估算契约以 lib/llm 与 shared 单一事实源落地，服务端与桌面端共用。",
+              "en": "The estimation contract lives as a single source of truth shared between lib/llm and shared/, used by both server and desktop."
+            }
+          ],
+          "sources": [
+            {
+              "type": "commit",
+              "ref": "69d69ca8",
+              "title": "feat(desktop): 聊天界面布局重构 + 上下文用量分类详情"
+            }
+          ]
+        },
+        {
+          "id": "fix-settings-toggles-loading",
+          "kind": "fix",
+          "importance": "medium",
+          "title": {
+            "zh": "修复设置/关于页开关卡在加载状态",
+            "en": "Fix settings/About toggles stuck loading"
+          },
+          "summary": {
+            "zh": "修复冷启动时设置页与关于页开关（Toggle）偶发一直显示加载中的问题：设置初始化并行化后，依赖当前助手身份的快照请求在助手数据就绪前发出，导致空身份快照固化。现在这类请求严格等待助手加载完成后再发起。",
+            "en": "Fixes toggles on the settings and About pages occasionally stuck loading on cold start: after settings initialization was parallelized, snapshot requests that depend on the current agent identity fired before agent data was ready, persisting an empty-identity snapshot. Such requests now strictly wait for agents to load first."
+          },
+          "details": [],
+          "sources": [
+            {
+              "type": "commit",
+              "ref": "69d69ca8",
+              "title": "feat(desktop): 聊天界面布局重构 + 上下文用量分类详情"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "schemaVersion": 1,
       "tag": "v0.1.30",
       "version": "0.1.30",
       "previousTag": "v0.1.29",
