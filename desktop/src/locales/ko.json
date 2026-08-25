@@ -191,7 +191,8 @@
     }
   },
   "titlebar": {
-    "currentChatTitle": "현재 대화 제목"
+    "currentChatTitle": "현재 대화 제목",
+    "search": "채팅 검색"
   },
   "session": {
     "untitled": "새 대화",
@@ -441,6 +442,23 @@
     "refreshAndCompactBusy": "대화를 압축하고 업데이트하는 중…",
     "refreshAndCompactFailed": "압축 및 업데이트 실패",
     "compact": "압축",
+    "contextDetail": "세부 정보",
+    "contextDetailBack": "뒤로",
+    "contextDetailEmpty": "데이터 없음",
+    "contextDetailUsed": "사용됨",
+    "contextDetailWindowTotal": "컨텍스트 창",
+    "contextDetailRemaining": "남은 용량",
+    "contextCategory": {
+      "system": "시스템 프롬프트",
+      "conversation": "대화 기록",
+      "user": "현재 입력",
+      "tools": "도구 정의",
+      "toolResults": "도구 결과",
+      "mcp": "MCP",
+      "skills": "스킬",
+      "files": "파일 참조",
+      "other": "기타"
+    },
     "noAskThisConversation": "이 대화에서는 다시 묻지 않기",
     "confirmMoreOptions": "추가 확인 옵션",
     "attachmentDirectory": "[디렉터리] {label}",
@@ -3453,6 +3471,12 @@
       "collapse": "Jian 접기",
       "expand": "Jian 펼치기"
     }
+  },
+  "runtimeCapsule": {
+    "title": "실행 정보",
+    "expand": "실행 정보 펼치기",
+    "collapse": "실행 정보 접기",
+    "running": "{n}개 진행 중"
   },
   "desk": {
     "title": "책상",

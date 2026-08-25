@@ -1,12 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import type { Session } from '../../types';
 import {
-  autoProjectIdForCwd,
-  buildSessionProjectView,
   buildSessionSections,
-  type SessionProjectCatalog,
+  filterSessionsForWorkspaceScope,
+  resolveWorkspaceScope,
+  sessionBelongsToWorkspaceScope,
 } from '../../components/session-sections';
-import { UNCATEGORIZED_PROJECT_ID } from '../../../../../shared/session-projects.ts';
 
 function makeSession(overrides: Partial<Session>): Session {
   return {
@@ -203,234 +202,105 @@ describe('buildSessionSections', () => {
   });
 });
 
-describe('buildSessionProjectView', () => {
-  it('orders the pinned strip by manual pin order too', () => {
-    const view = buildSessionProjectView([
-      {
-        path: '/sessions/b.jsonl',
-        title: null,
-        firstMessage: '',
-        modified: '2026-04-29T09:00:00.000Z',
-        messageCount: 1,
-        agentId: 'hana',
-        agentName: 'Hana',
-        cwd: null,
-        pinnedAt: '2026-04-28T07:00:00.000Z',
-        pinOrder: 2048,
-      },
-      {
-        path: '/sessions/a.jsonl',
-        title: null,
-        firstMessage: '',
-        modified: '2026-04-28T01:00:00.000Z',
-        messageCount: 1,
-        agentId: 'hana',
-        agentName: 'Hana',
-        cwd: null,
-        pinnedAt: '2026-04-28T07:00:00.000Z',
-        pinOrder: 1024,
-      },
-    ]);
+describe('workspace scope', () => {
+  it('matches sessions strictly by workspaceMountId for mount scopes', () => {
+    const scope = { mountId: 'mount-abc', basePath: null };
 
-    expect(view.pinned.map(session => session.path)).toEqual([
-      '/sessions/a.jsonl',
-      '/sessions/b.jsonl',
-    ]);
+    expect(sessionBelongsToWorkspaceScope({ cwd: null, workspaceMountId: 'mount-abc' }, scope)).toBe(true);
+    expect(sessionBelongsToWorkspaceScope({ cwd: '/anywhere', workspaceMountId: 'mount-abc' }, scope)).toBe(true);
+    expect(sessionBelongsToWorkspaceScope({ cwd: '/anywhere', workspaceMountId: 'mount-other' }, scope)).toBe(false);
+    expect(sessionBelongsToWorkspaceScope({ cwd: '/anywhere', workspaceMountId: null }, scope)).toBe(false);
+    expect(sessionBelongsToWorkspaceScope({ cwd: null, workspaceMountId: null }, scope)).toBe(false);
   });
 
-  it('excludes pinned sessions and groups unassigned sessions by derived cwd project', () => {
-    const cwd = '/Users/test/Desktop/project-hana';
-    const sections = buildSessionProjectView([
-      makeSession({
-        path: '/sessions/pinned.jsonl',
-        firstMessage: 'pinned',
-        cwd,
-        pinnedAt: '2026-05-28T08:00:00.000Z',
-      }),
-      makeSession({
-        path: '/sessions/a.jsonl',
-        firstMessage: 'a',
-        cwd,
-        modified: '2026-05-28T07:00:00.000Z',
-      }),
-      makeSession({
-        path: '/sessions/b.jsonl',
-        firstMessage: 'b',
-        cwd,
-        modified: '2026-05-28T09:00:00.000Z',
-      }),
-    ], { projects: [] });
+  it('matches local-directory scopes through normalized cwd comparison', () => {
+    const scope = { mountId: null, basePath: '/Users/test/Desktop/project-hana' };
 
-    expect(sections.pinned.map(item => item.path)).toEqual(['/sessions/pinned.jsonl']);
-    expect(sections.rootProjects).toHaveLength(1);
-    expect(sections.rootProjects[0]).toMatchObject({
-      id: autoProjectIdForCwd(cwd),
-      name: 'project-hana',
-      source: 'cwd',
-      folderId: null,
-    });
-    expect(sections.rootProjects[0].items.map(item => item.path)).toEqual([
-      '/sessions/b.jsonl',
-      '/sessions/a.jsonl',
-    ]);
+    expect(sessionBelongsToWorkspaceScope({ cwd: '/Users/test/Desktop/project-hana', workspaceMountId: null }, scope)).toBe(true);
+    // 尾斜杠归一
+    expect(sessionBelongsToWorkspaceScope({ cwd: '/Users/test/Desktop/project-hana/', workspaceMountId: null }, scope)).toBe(true);
+    // 反斜杠归一（Windows 风格）
+    expect(sessionBelongsToWorkspaceScope({ cwd: 'C:\\Work\\Project', workspaceMountId: null }, { mountId: null, basePath: 'C:/Work/Project' })).toBe(true);
+    // Windows 盘符大小写不敏感
+    expect(sessionBelongsToWorkspaceScope({ cwd: 'c:/work/project', workspaceMountId: null }, { mountId: null, basePath: 'C:/Work/Project' })).toBe(true);
+    // 大小写在 macOS/Linux 风格路径上敏感
+    expect(sessionBelongsToWorkspaceScope({ cwd: '/Users/Test/Desktop/project-hana', workspaceMountId: null }, scope)).toBe(false);
+    // 子目录不算同一工作台
+    expect(sessionBelongsToWorkspaceScope({ cwd: '/Users/test/Desktop/project-hana/sub', workspaceMountId: null }, scope)).toBe(false);
   });
 
-  it('sorts pinned project-view sessions by modified time instead of pin time', () => {
-    const cwd = '/Users/test/Desktop/project-hana';
-    const view = buildSessionProjectView([
-      makeSession({
-        path: '/sessions/recent-pin.jsonl',
-        firstMessage: 'recent pin',
-        cwd,
-        modified: '2026-05-28T09:00:00.000Z',
-        pinnedAt: '2026-05-27T08:00:00.000Z',
-      }),
-      makeSession({
-        path: '/sessions/freshly-pinned-old-chat.jsonl',
-        firstMessage: 'freshly pinned old chat',
-        cwd,
-        modified: '2026-05-28T07:00:00.000Z',
-        pinnedAt: '2026-05-28T10:00:00.000Z',
-      }),
-    ], { projects: [] });
+  it('keeps mount sessions out of local-directory scopes and vice versa', () => {
+    const localScope = { mountId: null, basePath: '/Users/test/Desktop/project-hana' };
+    const mountScope = { mountId: 'mount-abc', basePath: null };
 
-    expect(view.pinned.map(item => item.path)).toEqual([
-      '/sessions/recent-pin.jsonl',
-      '/sessions/freshly-pinned-old-chat.jsonl',
-    ]);
+    expect(sessionBelongsToWorkspaceScope({ cwd: '/Users/test/Desktop/project-hana', workspaceMountId: 'mount-abc' }, localScope)).toBe(false);
+    expect(sessionBelongsToWorkspaceScope({ cwd: null, workspaceMountId: null }, mountScope)).toBe(false);
   });
 
-  it('keeps catalog folders and places assigned projects under their folder', () => {
-    const catalog = {
-      folders: [
-        { id: 'folder-work', name: '作品集', order: 0 },
-      ],
-      projects: [
-        { id: 'project-resume', name: '简历和作品集', folderId: 'folder-work', order: 0 },
-        { id: 'project-root', name: '手帐本', folderId: null, order: 1 },
-      ],
-    } as unknown as SessionProjectCatalog;
-
-    const sections = buildSessionProjectView([
-      makeSession({
-        path: '/sessions/resume.jsonl',
-        title: '作品集整理',
-        cwd: '/Users/test/Desktop/project-hana',
-        projectId: 'project-resume',
-      }),
-      makeSession({
-        path: '/sessions/root.jsonl',
-        title: '手帐本',
-        cwd: '/Users/test/Desktop/notes',
-        projectId: 'project-root',
-      }),
-    ], catalog);
-
-    expect(sections.rootProjects).toEqual([
-      expect.objectContaining({
-        id: 'project-root',
-        folderId: null,
-        items: [expect.objectContaining({ path: '/sessions/root.jsonl' })],
-      }),
-    ]);
-    expect(sections.folders).toEqual([
-      expect.objectContaining({
-        id: 'folder-work',
-        name: '作品集',
-        projects: [
-          expect.objectContaining({
-            id: 'project-resume',
-            folderId: 'folder-work',
-            items: [expect.objectContaining({ path: '/sessions/resume.jsonl' })],
-          }),
-        ],
-      }),
-    ]);
+  it('never shows sessions without a reliable identity in any scope', () => {
+    const noIdentity = { cwd: null, workspaceMountId: null };
+    expect(sessionBelongsToWorkspaceScope(noIdentity, { mountId: 'mount-abc', basePath: null })).toBe(false);
+    expect(sessionBelongsToWorkspaceScope(noIdentity, { mountId: null, basePath: '/Users/test/Desktop/project-hana' })).toBe(false);
+    expect(sessionBelongsToWorkspaceScope(noIdentity, { mountId: null, basePath: null })).toBe(false);
   });
 
-  it('falls back to cwd project when a session references a missing custom project', () => {
-    const sections = buildSessionProjectView([
-      makeSession({
-        path: '/sessions/orphan.jsonl',
-        cwd: '/Users/test/Desktop/orphan-cwd',
-        projectId: 'missing-project',
-      }),
-    ], { projects: [] });
+  it('filters a full session list down to the scoped sessions', () => {
+    const sessions = [
+      makeSession({ path: '/sessions/local.jsonl', cwd: '/Users/test/Desktop/project-hana' }),
+      makeSession({ path: '/sessions/local-trailing.jsonl', cwd: '/Users/test/Desktop/project-hana/' }),
+      makeSession({ path: '/sessions/other-dir.jsonl', cwd: '/Users/test/Desktop/other' }),
+      makeSession({ path: '/sessions/mount.jsonl', cwd: null, workspaceMountId: 'mount-abc' }),
+      makeSession({ path: '/sessions/identity-less.jsonl', cwd: null }),
+    ];
 
-    expect(sections.rootProjects).toHaveLength(1);
-    expect(sections.rootProjects[0]).toMatchObject({
-      id: autoProjectIdForCwd('/Users/test/Desktop/orphan-cwd'),
-      name: 'orphan-cwd',
-    });
+    expect(filterSessionsForWorkspaceScope(sessions, { mountId: null, basePath: '/Users/test/Desktop/project-hana' }).map(s => s.path))
+      .toEqual(['/sessions/local.jsonl', '/sessions/local-trailing.jsonl']);
+    expect(filterSessionsForWorkspaceScope(sessions, { mountId: 'mount-abc', basePath: null }).map(s => s.path))
+      .toEqual(['/sessions/mount.jsonl']);
   });
 
-  it('keeps explicitly uncategorized sessions out of cwd-derived projects', () => {
-    const sections = buildSessionProjectView([
-      makeSession({
-        path: '/sessions/uncategorized.jsonl',
-        cwd: '/Users/test/Desktop/project-hana',
-        projectId: UNCATEGORIZED_PROJECT_ID,
-      }),
-    ], { projects: [] });
+  it('resolves the scope from the desk identity, or from the pending new-session target', () => {
+    // 有当前会话：以 desk 为准（mount 优先）
+    expect(resolveWorkspaceScope({
+      currentSessionPath: '/sessions/live.jsonl',
+      deskWorkspaceMountId: 'mount-abc',
+      deskBasePath: 'studio:mount-abc',
+      selectedWorkspaceMountId: null,
+      selectedFolder: '/elsewhere',
+    })).toEqual({ mountId: 'mount-abc', basePath: null });
 
-    expect(sections.rootProjects).toHaveLength(1);
-    expect(sections.rootProjects[0]).toMatchObject({
-      id: UNCATEGORIZED_PROJECT_ID,
-      name: '未归类',
-      source: 'cwd',
-    });
-  });
+    // 有当前会话：本地目录 desk
+    expect(resolveWorkspaceScope({
+      currentSessionPath: '/sessions/live.jsonl',
+      deskWorkspaceMountId: null,
+      deskBasePath: '/Users/test/Desktop/project-hana',
+      selectedWorkspaceMountId: null,
+      selectedFolder: '/elsewhere',
+    })).toEqual({ mountId: null, basePath: '/Users/test/Desktop/project-hana' });
 
-  it('surfaces empty catalog folders so users can drag projects into them', () => {
-    const sections = buildSessionProjectView([], {
-      folders: [{ id: 'folder-empty', name: '稍后整理', order: 0 }],
-      projects: [],
-    } as unknown as SessionProjectCatalog);
+    // pending 新会话：优先 selectedWorkspaceMountId / selectedFolder
+    expect(resolveWorkspaceScope({
+      currentSessionPath: null,
+      deskWorkspaceMountId: null,
+      deskBasePath: '/old',
+      selectedWorkspaceMountId: 'mount-pending',
+      selectedFolder: null,
+    })).toEqual({ mountId: 'mount-pending', basePath: null });
+    expect(resolveWorkspaceScope({
+      currentSessionPath: null,
+      deskWorkspaceMountId: null,
+      deskBasePath: '/old',
+      selectedWorkspaceMountId: null,
+      selectedFolder: '/Users/test/Desktop/pending',
+    })).toEqual({ mountId: null, basePath: '/Users/test/Desktop/pending' });
 
-    expect(sections.rootProjects).toEqual([]);
-    expect(sections.folders).toEqual([
-      expect.objectContaining({
-        id: 'folder-empty',
-        name: '稍后整理',
-        projects: [],
-      }),
-    ]);
-  });
-
-  it('does not demote catalog-assigned sessions to a cwd project while the catalog is still loading', () => {
-    // Regression: when the project catalog has not finished loading, a session that
-    // belongs to a real (custom) project must NOT be silently re-bucketed into a
-    // cwd-derived project. Doing so makes custom projects vanish and dumps their
-    // sessions into the auto "Hana"-style group until the user toggles sort order.
-    const view = buildSessionProjectView([
-      makeSession({
-        path: '/sessions/lili.jsonl',
-        cwd: '/Users/test/Hana',
-        projectId: 'project-e61c751e',
-      }),
-    ], { projects: [] }, { catalogLoaded: false });
-
-    const groupedPaths = [
-      ...view.rootProjects.flatMap(project => project.items),
-      ...view.folders.flatMap(folder => folder.projects.flatMap(project => project.items)),
-    ].map(session => session.path);
-
-    expect(view.pending).toBe(true);
-    expect(groupedPaths).not.toContain('/sessions/lili.jsonl');
-  });
-
-  it('still groups cwd-only sessions while the catalog is loading', () => {
-    // Holding back catalog-assigned sessions must not punish sessions that derive
-    // their group purely from cwd: those do not depend on the catalog at all.
-    const view = buildSessionProjectView([
-      makeSession({
-        path: '/sessions/plain.jsonl',
-        cwd: '/Users/test/Hana',
-      }),
-    ], { projects: [] }, { catalogLoaded: false });
-
-    const cwdGroup = view.rootProjects.find(project => project.source === 'cwd');
-    expect(cwdGroup?.items.map(session => session.path)).toEqual(['/sessions/plain.jsonl']);
-    expect(view.pending).toBe(true);
+    // pending 但 selected 未落地：退回 desk 身份
+    expect(resolveWorkspaceScope({
+      currentSessionPath: null,
+      deskWorkspaceMountId: null,
+      deskBasePath: '/Users/test/Desktop/project-hana',
+      selectedWorkspaceMountId: null,
+      selectedFolder: null,
+    })).toEqual({ mountId: null, basePath: '/Users/test/Desktop/project-hana' });
   });
 });

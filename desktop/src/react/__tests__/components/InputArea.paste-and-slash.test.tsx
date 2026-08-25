@@ -238,8 +238,8 @@ vi.mock('../../components/input/InputContextRow', () => ({
   InputContextRow: () => null,
 }));
 
-vi.mock('../../components/input/InputControlBar', () => ({
-  InputControlBar: ({
+vi.mock('../../components/input/ComposerToolbar', () => ({
+  ComposerToolbar: ({
     onAttach,
     onSlashToggle,
   }: {
@@ -259,6 +259,10 @@ vi.mock('../../components/input/InputControlBar', () => ({
       'slash',
     ),
   ),
+}));
+
+vi.mock('../../components/input/SendButton', () => ({
+  SendButton: () => null,
 }));
 
 vi.mock('../../components/input/SessionConfirmationPrompt', () => ({

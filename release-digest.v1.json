@@ -1,220 +1,102 @@
 {
   "schemaVersion": 1,
-  "tag": "v0.1.30",
-  "version": "0.1.30",
-  "previousTag": "v0.1.29",
-  "generatedAt": "2026-08-24T11:45:00.000Z",
+  "tag": "v0.1.31",
+  "version": "0.1.31",
+  "previousTag": "v0.1.30",
+  "generatedAt": "2026-08-25T04:46:40.000Z",
   "noUserFacingChanges": false,
   "summary": {
-    "zh": "设置里的「用量」页升级为「模型观测」工作台：可按时间、模型、供应商、会话等维度筛选，查看每次模型调用的详情、请求与响应载荷、以及按真实时间排布的调用轨迹时间线，并支持导出（默认关闭，需在设置中显式开启）。修复了情绪与思考内容偶发回流聊天正文、模型凭证串用隐患、以及 mac 上自动更新安装失败的问题；应用图标与界面视觉全面焕新，设置供应商页加载大幅提速。",
-    "en": "The Usage page in settings is upgraded to a Model Observatory workbench: filter model calls by time, model, provider or session, inspect per-call details, request/response payloads, and a call-trace timeline laid out on a real time axis, with export support (disabled by default; opt in from settings). Fixes landed for mood/think segments occasionally leaking back into chat text, model credential boundary gaps, and macOS auto-update installation failures; the app icon and visual identity are refreshed, and the providers settings page loads much faster."
+    "zh": "桌面主界面布局重构：工作台主体移到左侧、聊天记录限定在当前工作台、运行期信息卡片整合为右上悬浮胶囊、聊天搜索改为顶部入口加居中搜索界面、输入区控制按钮重排为一条工具栏。上下文用量环新增真实分类明细，并跨会话持久保存。修复设置/关于页开关偶发卡在加载状态的问题。",
+    "en": "The desktop main chat UI is rearranged: the workspace panel moves to the left, chat history is scoped to the current workspace, runtime info cards collapse into a floating capsule at the top right, chat search becomes a top entry with a centered search overlay, and input-area controls are regrouped into a single toolbar. The context usage ring now shows a real category breakdown that persists across sessions. Also fixes settings/About toggles occasionally stuck in a loading state."
   },
   "counts": {
     "feature": 2,
-    "fix": 3,
-    "improvement": 2,
+    "fix": 1,
+    "improvement": 0,
     "migration": 0
   },
   "source": {
     "owner": "ItsDalk-Lane",
     "repo": "LingxiAgent",
-    "commitRange": "v0.1.29..HEAD",
-    "releaseUrl": "https://github.com/ItsDalk-Lane/LingxiAgent/releases/tag/v0.1.30",
+    "commitRange": "v0.1.30..HEAD",
+    "releaseUrl": "https://github.com/ItsDalk-Lane/LingxiAgent/releases/tag/v0.1.31",
     "releaseNotes": ""
   },
   "items": [
     {
-      "id": "feat-model-observatory",
+      "id": "feat-chat-layout-refactor",
       "kind": "feature",
       "importance": "high",
       "title": {
-        "zh": "模型观测工作台：看清每一次模型调用",
-        "en": "Model Observatory: see every model call"
+        "zh": "主聊天界面布局重构",
+        "en": "Main chat layout refactor"
       },
       "summary": {
-        "zh": "设置中的「用量」页升级为完整的模型观测工作台。可按时间预设（24 小时/7 天/30 天/自定义/全部）、模型、供应商、状态等维度组合筛选，查看调用量、耗时、token 用量与成本等聚合指标；点击任意调用可展开检查器，查看各次尝试、请求与响应载荷（脱敏后）、以及归属的调用轨迹。",
-        "en": "The Usage page becomes a full Model Observatory workbench. Combine filters across time presets (24h/7d/30d/custom/all), model, provider and status; review aggregate metrics for call volume, latency, token usage and cost; open any call in the inspector to see its attempts, redacted request/response payloads, and the trace it belongs to."
+        "zh": "重新编排桌面端主聊天界面：工作台主体从右侧移到左侧，聊天记录限定为当前工作台的会话；原本散落的运行期信息卡片整合为一个右上角悬浮信息胶囊，可按需展开；聊天搜索从侧栏入口改为标题栏顶部入口，打开后是居中的搜索界面；输入区控制按钮重新归组为一条工具栏，侧栏入口与标题栏同步重排。",
+        "en": "The desktop main chat surface is rearranged: the workspace panel moves from the right to the left, and chat history is scoped to the current workspace's sessions. Scattered runtime info cards collapse into one floating capsule at the top right that expands on demand. Chat search moves from the sidebar to a top-bar entry opening a centered search overlay. Input-area controls are regrouped into a single toolbar, with sidebar entries and the title bar rearranged to match."
       },
       "details": [
         {
-          "zh": "隐私优先：观测默认关闭，需在设置中显式开启；载荷记录与二进制 blob 预览各自单独 opt-in。",
-          "en": "Privacy first: observability is off by default and must be enabled in settings; payload capture and blob preview each require a separate opt-in."
+          "zh": "只重排既有功能，不新增产品能力；移动端布局同步适配。",
+          "en": "Existing features are only rearranged, no new product capabilities added; the mobile layout adapts in sync."
         },
         {
-          "zh": "相对时间预设的窗口在选中瞬间冻结，分页浏览时结果不再随时间漂移。",
-          "en": "Relative time presets freeze their window the moment they are selected, so paginated results no longer drift over time."
-        },
-        {
-          "zh": "支持按查询条件流式导出 JSONL，便于离线分析。",
-          "en": "Streaming JSONL export for the current query enables offline analysis."
+          "zh": "输入区原控制条（InputControlBar）由新工具栏组件（ComposerToolbar）取代。",
+          "en": "The old input control bar (InputControlBar) is replaced by the new ComposerToolbar component."
         }
       ],
       "sources": [
         {
           "type": "commit",
-          "ref": "496b4bb2",
-          "title": "feat(obs): 模型调用可观测性（Model Call Observer）"
-        },
-        {
-          "type": "commit",
-          "ref": "ec2a7e1b",
-          "title": "feat(obs): Phase 9 Model Observatory UI — Unified Workbench + Inspector + Provenance + Trace + Export Bridge + Legacy Retirement"
-        },
-        {
-          "type": "commit",
-          "ref": "cfab8556",
-          "title": "feat(obs): Phase 8 Unified Observatory Query & Control Plane — Query Service + Accounting Projection + Settings + Export"
-        },
-        {
-          "type": "commit",
-          "ref": "3f20b58e",
-          "title": "feat(obs): Phase 10 Model Observatory E2E truth audit + adversarial validation + IANA timeZone date buckets"
+          "ref": "69d69ca8",
+          "title": "feat(desktop): 聊天界面布局重构 + 上下文用量分类详情"
         }
       ]
     },
     {
-      "id": "feat-trace-timeline-chart",
+      "id": "feat-context-usage-breakdown",
       "kind": "feature",
       "importance": "medium",
       "title": {
-        "zh": "轨迹时间线图表与日期折线",
-        "en": "Trace timeline chart and date line chart"
+        "zh": "上下文用量分类明细",
+        "en": "Context usage category breakdown"
       },
       "summary": {
-        "zh": "轨迹详情新增时间线图表：按真实时间排布各模型调用，悬停查看明细；日期分组聚合从柱状图升级为按真实日期比例定位的平滑折线图，带悬停提示与自适应的坐标轴标签。",
-        "en": "Trace details gain a timeline chart that lays model calls on a real time axis with hover details; the date grouping upgrades from bars to a smooth line chart positioned by real date proportions, with hover tooltips and adaptive axis labels."
+        "zh": "输入区的上下文用量环现在展示真实的分类明细：各消息类别（如系统提示、对话、工具、记忆等）按统一契约估算占比，而非此前的单一总量。明细随会话持久保存，切换会话或重启应用后仍然保留，上下文压缩后相应清空。",
+        "en": "The context usage ring now shows a real category breakdown: message classes (system prompt, conversation, tools, memory, etc.) are estimated under a unified contract instead of a single total. The breakdown persists with the session — it survives switching sessions and app restarts, and is cleared when context is compacted."
       },
       "details": [
         {
-          "zh": "折线与时间线均为纯 SVG 实现，无新增图表库依赖。",
-          "en": "Both charts are pure SVG with no new charting dependency."
+          "zh": "分类估算契约以 lib/llm 与 shared 单一事实源落地，服务端与桌面端共用。",
+          "en": "The estimation contract lives as a single source of truth shared between lib/llm and shared/, used by both server and desktop."
         }
       ],
       "sources": [
         {
           "type": "commit",
-          "ref": "0561c1ce",
-          "title": "feat(observability): 新增轨迹时间线图表与详情视图"
-        },
-        {
-          "type": "commit",
-          "ref": "30632983",
-          "title": "feat(observability): 时间线折线图迭代 — 游标锚点 + 抽屉 scrim 收口"
+          "ref": "69d69ca8",
+          "title": "feat(desktop): 聊天界面布局重构 + 上下文用量分类详情"
         }
       ]
     },
     {
-      "id": "fix-reserved-tag-text-end-leak",
+      "id": "fix-settings-toggles-loading",
       "kind": "fix",
-      "importance": "high",
-      "title": {
-        "zh": "修复情绪与思考内容回流聊天正文",
-        "en": "Fix mood/think segments leaking back into chat text"
-      },
-      "summary": {
-        "zh": "修复保留标签管道中 mood/think 段经 text_end 二次回流正文的问题：这类内部段不再混入最终回复，聊天记录净化也更严格。",
-        "en": "Fixes reserved-tag pipeline handling so mood/think segments no longer flow back into the visible reply via text_end; history sanitization is stricter as well."
-      },
-      "details": [
-        {
-          "zh": "历史消息净化后会删除因剥离内部段而产生的空文本段。",
-          "en": "Empty text segments left behind by stripping internal segments are now dropped during history sanitization."
-        }
-      ],
-      "sources": [
-        {
-          "type": "commit",
-          "ref": "c83d238a",
-          "title": "fix(chat): 保留标签管道 raw 单次消费与历史段净化边界"
-        }
-      ]
-    },
-    {
-      "id": "fix-credential-boundary",
-      "kind": "fix",
-      "importance": "high",
-      "title": {
-        "zh": "修复模型调用凭证边界",
-        "en": "Fix model-call credential boundaries"
-      },
-      "summary": {
-        "zh": "闭合全仓模型调用与凭证边界断点：临时凭证不再越过所属模型调用的边界，消除凭证串用隐患。",
-        "en": "Closes model-call and credential boundary gaps across the codebase: temporary credentials no longer leak across the model call they belong to, removing credential cross-use hazards."
-      },
-      "details": [],
-      "sources": [
-        {
-          "type": "commit",
-          "ref": "b8688895",
-          "title": "fix(credentials): 闭合全仓模型调用与凭证边界断点"
-        }
-      ]
-    },
-    {
-      "id": "fix-mac-adhoc-autoupdate",
-      "kind": "fix",
-      "importance": "high",
-      "title": {
-        "zh": "修复 mac 上自动更新安装失败",
-        "en": "Fix macOS auto-update installation failure"
-      },
-      "summary": {
-        "zh": "mac 上 ad-hoc 签名构建的自动更新此前因更新器校验机制结构性失败而静默跳过安装；现在改走自安装路径，更新下载完成后可靠完成换壳重启。待正式开发者签名配齐后该路径自动退役。",
-        "en": "On macOS, auto-updates of ad-hoc signed builds silently skipped installation because the updater's verification structurally fails; they now go through a self-install path that reliably swaps and relaunches after download. The path retires itself once proper Developer ID signing is configured."
-      },
-      "details": [],
-      "sources": [
-        {
-          "type": "commit",
-          "ref": "dcf3546a",
-          "title": "feat(updater): mac ad-hoc 构建走自安装路径"
-        }
-      ]
-    },
-    {
-      "id": "improve-brand-visuals",
-      "kind": "improvement",
       "importance": "medium",
       "title": {
-        "zh": "应用图标与品牌视觉焕新",
-        "en": "Refreshed app icon and brand visuals"
+        "zh": "修复设置/关于页开关卡在加载状态",
+        "en": "Fix settings/About toggles stuck loading"
       },
       "summary": {
-        "zh": "应用图标、Logo 与人格立绘全面替换为新素材：新图标保留原画作主体并放大至满幅，去除内框线；托盘、Windows 图标等派生物同步重生成。",
-        "en": "App icon, logo and persona art are replaced with new assets: the new icon keeps the original artwork subject enlarged to full bleed without the inner frame; tray and Windows icon derivatives are regenerated in sync."
+        "zh": "修复冷启动时设置页与关于页开关（Toggle）偶发一直显示加载中的问题：设置初始化并行化后，依赖当前助手身份的快照请求在助手数据就绪前发出，导致空身份快照固化。现在这类请求严格等待助手加载完成后再发起。",
+        "en": "Fixes toggles on the settings and About pages occasionally stuck loading on cold start: after settings initialization was parallelized, snapshot requests that depend on the current agent identity fired before agent data was ready, persisting an empty-identity snapshot. Such requests now strictly wait for agents to load first."
       },
       "details": [],
       "sources": [
         {
           "type": "commit",
-          "ref": "86a029a7",
-          "title": "feat(brand): rebrand app icon, logo and persona art (new icon/logo sources)"
-        },
-        {
-          "type": "commit",
-          "ref": "440e9f57",
-          "title": "feat(brand): enlarge app icon subject to full bleed, drop inner frame line"
-        }
-      ]
-    },
-    {
-      "id": "improve-providers-page-speed",
-      "kind": "improvement",
-      "importance": "medium",
-      "title": {
-        "zh": "设置供应商页加载提速",
-        "en": "Faster providers settings page"
-      },
-      "summary": {
-        "zh": "修复设置页供应商标签的空白延迟：概要接口由 O(N²) 聚合优化为单次遍历，多供应商场景下加载从秒级降至数十毫秒。",
-        "en": "Fixes the blank delay on the providers settings tab: the summary endpoint's O(N²) aggregation is now single-pass, cutting multi-provider load times from seconds to tens of milliseconds."
-      },
-      "details": [],
-      "sources": [
-        {
-          "type": "commit",
-          "ref": "c83d238a",
-          "title": "fix(chat): 保留标签管道 raw 单次消费与历史段净化边界"
+          "ref": "69d69ca8",
+          "title": "feat(desktop): 聊天界面布局重构 + 上下文用量分类详情"
         }
       ]
     }

@@ -293,5 +293,9 @@
     "bare-spacing": 109,
     "hardcoded-color": 50,
     "bare-duration": 2
+  },
+  "desktop/src/react/components/runtime/RuntimeInfoCapsule.module.css": {
+    "bare-spacing": 3,
+    "hardcoded-color": 3
   }
 }

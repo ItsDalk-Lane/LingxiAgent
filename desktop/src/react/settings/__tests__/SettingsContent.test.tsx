@@ -7,15 +7,18 @@ import { SettingsContent, normalizeSettingsTab } from '../SettingsContent';
 import { useSettingsStore } from '../store';
 
 const actionMocks = vi.hoisted(() => ({
+  loadAgents: vi.fn(async () => {}),
+  loadAvatars: vi.fn(async () => {}),
+  loadSettingsSnapshot: vi.fn(async () => {}),
   loadSettingsModels: vi.fn(async () => {}),
   loadProvidersSummary: vi.fn(async () => {}),
 }));
 
 vi.mock('../actions', () => ({
-  loadAgents: vi.fn(async () => {}),
-  loadAvatars: vi.fn(async () => {}),
+  loadAgents: actionMocks.loadAgents,
+  loadAvatars: actionMocks.loadAvatars,
   loadSettingsConfig: vi.fn(async () => {}),
-  loadSettingsSnapshot: vi.fn(async () => {}),
+  loadSettingsSnapshot: actionMocks.loadSettingsSnapshot,
   loadSettingsModels: actionMocks.loadSettingsModels,
   loadProvidersSummary: actionMocks.loadProvidersSummary,
   loadPluginSettings: vi.fn(async () => {}),
@@ -37,6 +40,11 @@ describe('SettingsContent tab heading', () => {
   beforeEach(() => {
     settingsChangedHandler = undefined;
     actionMocks.loadSettingsModels.mockClear();
+    // 个别用例会给这几个 mock 装定时实现（如延迟 resolve 的 loadAgents），
+    // clearAllMocks 不清实现，这里统一回到默认值防止泄漏到后续用例。
+    actionMocks.loadAgents.mockReset().mockResolvedValue(undefined);
+    actionMocks.loadAvatars.mockReset().mockResolvedValue(undefined);
+    actionMocks.loadSettingsSnapshot.mockReset().mockResolvedValue(undefined);
     actionMocks.loadProvidersSummary.mockReset();
     actionMocks.loadProvidersSummary.mockResolvedValue(undefined);
     window.t = ((key: string) => key) as typeof window.t;
@@ -209,6 +217,47 @@ describe('SettingsContent tab heading', () => {
     render(React.createElement(SettingsContent, { variant: 'window' }));
 
     await waitFor(() => expect(actionMocks.loadProvidersSummary).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(useSettingsStore.getState().ready).toBe(true));
+  });
+
+  it('loads the settings snapshot only after agents have resolved the agent id', async () => {
+    // 回归（v0.1.30）：initSettings 曾把 loadAgents 与 loadSettingsSnapshot 放进
+    // 同一个 Promise.all 并行。快照在被调用的瞬间同步读 getSettingsAgentId()，
+    // 此时 agents 的 fetch 尚未返回，agentId 必为 null → 快照以「No settings
+    // agent selected」必败且无任何重试，settingsConfig 恒为 null——关于页
+    // 「自动检查更新 / 接收测试版更新」两个 Toggle 永久卡 loading 脉冲且点不动。
+    let releaseAgents: (() => void) | undefined;
+    actionMocks.loadAgents.mockImplementation(async () => {
+      await new Promise<void>((resolve) => { releaseAgents = resolve; });
+      useSettingsStore.setState({ currentAgentId: 'lingxi' } as never);
+    });
+    const agentIdAtSnapshotCall: Array<string | null> = [];
+    actionMocks.loadSettingsSnapshot.mockImplementation(async () => {
+      agentIdAtSnapshotCall.push(useSettingsStore.getState().getSettingsAgentId());
+    });
+
+    useSettingsStore.setState({
+      activeTab: 'about',
+      currentAgentId: null,
+      settingsAgentId: null,
+      serverPort: null,
+      serverToken: null,
+      activeServerConnection: null,
+      activeServerConnectionId: null,
+      serverConnections: {},
+      ready: false,
+    } as never);
+
+    render(React.createElement(SettingsContent, { variant: 'window' }));
+
+    // init 已推进到等待 agents：快照绝不许抢跑，mask 也不许提前放行
+    await waitFor(() => expect(releaseAgents).toBeTypeOf('function'));
+    expect(actionMocks.loadSettingsSnapshot).not.toHaveBeenCalled();
+    expect(useSettingsStore.getState().ready).toBe(false);
+
+    releaseAgents?.();
+    await waitFor(() => expect(actionMocks.loadSettingsSnapshot).toHaveBeenCalledTimes(1));
+    expect(agentIdAtSnapshotCall[0]).toBe('lingxi');
     await waitFor(() => expect(useSettingsStore.getState().ready).toBe(true));
   });
 

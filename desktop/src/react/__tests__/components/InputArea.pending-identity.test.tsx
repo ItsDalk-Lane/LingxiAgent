@@ -8,7 +8,7 @@
  *
  * 编辑器 mock 沿用 InputArea.draft-sync.test.tsx 的可变 editorState.doc 结构（支持
  * setContent/getJSON 往返，能表达 skillBadge 节点）；发送按钮沿用
- * InputArea.media-send.test.tsx 的"真实可点击" InputControlBar mock 写法，只是不再用
+ * InputArea.media-send.test.tsx 的"真实可点击" SendButton mock 写法，只是不再用
  * canSend 控制 disabled —— 这两个用例要验证的是 submitEditorMessage 内部的守卫逻辑，
  * 不是按钮可用态（按钮可用态由 commit ③ 的 hasContent 谓词负责，那部分不在这两个用例范围内）。
  */
@@ -145,8 +145,12 @@ vi.mock('../../components/input/InputContextRow', () => ({
 
 // 不用 canSend 控制 disabled：这里只测 submitEditorMessage 内部的守卫，
 // 按钮可用态（hasContent/canSend）是 commit ③ 的职责，不在这两个用例断言范围内。
-vi.mock('../../components/input/InputControlBar', () => ({
-  InputControlBar: ({ onSend }: { onSend: () => void }) => React.createElement(
+vi.mock('../../components/input/ComposerToolbar', () => ({
+  ComposerToolbar: () => null,
+}));
+
+vi.mock('../../components/input/SendButton', () => ({
+  SendButton: ({ onSend }: { onSend: () => void }) => React.createElement(
     'button',
     { type: 'button', 'data-testid': 'send', onClick: onSend },
     'send',

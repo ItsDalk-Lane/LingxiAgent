@@ -96,8 +96,12 @@ vi.mock('../../components/input/InputContextRow', () => ({
   InputContextRow: () => null,
 }));
 
-vi.mock('../../components/input/InputControlBar', () => ({
-  InputControlBar: () => React.createElement('button', { type: 'button' }, 'send'),
+vi.mock('../../components/input/ComposerToolbar', () => ({
+  ComposerToolbar: () => null,
+}));
+
+vi.mock('../../components/input/SendButton', () => ({
+  SendButton: () => React.createElement('button', { type: 'button' }, 'send'),
 }));
 
 vi.mock('../../components/input/SessionConfirmationPrompt', () => ({

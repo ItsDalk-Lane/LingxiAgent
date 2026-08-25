@@ -102,12 +102,16 @@ vi.mock('../../components/input/InputContextRow', () => ({
   InputContextRow: () => null,
 }));
 
-vi.mock('../../components/input/InputControlBar', () => ({
-  InputControlBar: ({ planModeLocked }: { planModeLocked: boolean }) => React.createElement(
+vi.mock('../../components/input/ComposerToolbar', () => ({
+  ComposerToolbar: ({ planModeLocked }: { planModeLocked: boolean }) => React.createElement(
     'button',
     { type: 'button', 'data-testid': 'mode-button', disabled: planModeLocked },
     'mode',
   ),
+}));
+
+vi.mock('../../components/input/SendButton', () => ({
+  SendButton: () => null,
 }));
 
 vi.mock('../../hooks/use-slash-items', () => ({

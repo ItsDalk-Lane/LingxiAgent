@@ -1,4 +1,5 @@
 import path from "path";
+import fs from "node:fs";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
 const { createAgentSessionMock, sessionManagerCreateMock, sessionManagerOpenMock, emitSessionShutdownMock, refreshSessionModelFromRegistryMock } = vi.hoisted(() => ({
@@ -171,6 +172,76 @@ describe("SessionCoordinator runtime hibernation", () => {
     expect(session.dispose).toHaveBeenCalledOnce();
   });
 
+  it("freezes the context breakdown with the usage snapshot and reconciles it on read", async () => {
+    const sessionPath = "/tmp/hana-runtime-hibernation/agents/hana/sessions/current.jsonl";
+    const session = makeSession(sessionPath, {
+      getContextUsage: vi.fn(() => ({ tokens: 100, contextWindow: 1000, percent: 10 })),
+    });
+    const coordinator = makeCoordinator();
+    coordinator._session = session;
+    coordinator._sessionStarted = true;
+    const estimate = {
+      system: 40, skills: 0, files: 0, tools: 10, mcp: 0,
+      conversation: 30, user: 5, toolResults: 0, computedAt: 1,
+    };
+    coordinator._sessions.set(sessionPath, {
+      session,
+      unsub: vi.fn(),
+      agentId: "hana",
+      modelId: "test-model",
+      modelProvider: "test",
+      workspaceFolders: [],
+      permissionMode: "operate",
+      accessMode: "operate",
+      planMode: false,
+      thinkingLevel: "high",
+      lastTouchedAt: Date.now() - 60_000,
+      contextBreakdown: estimate,
+    });
+
+    // live 读取:breakdown 与 usage.tokens 对账,other 吸收差值,合计闭合。
+    const live = coordinator.getSessionContextUsage(sessionPath);
+    expect(live.breakdown).toMatchObject({
+      system: 40, tools: 10, conversation: 30, user: 5, other: 15, total: 100,
+    });
+
+    await expect(coordinator.hibernateSessionRuntime(sessionPath, "test")).resolves.toBe(true);
+
+    // 休眠后读取同一份冻结快照,明细不丢、口径不变。
+    const hibernatedMeta = coordinator._getRuntimeValueForPath(coordinator._hibernatedSessionMeta, sessionPath);
+    expect(hibernatedMeta?.contextBreakdown).toEqual(estimate);
+    const frozen = coordinator.getSessionContextUsage(sessionPath);
+    expect(frozen.breakdown).toMatchObject({
+      system: 40, tools: 10, conversation: 30, user: 5, other: 15, total: 100,
+    });
+  });
+
+  it("omits the breakdown when the total is unknown after compaction", async () => {
+    const sessionPath = "/tmp/hana-runtime-hibernation/agents/hana/sessions/current.jsonl";
+    const session = makeSession(sessionPath, {
+      getContextUsage: vi.fn(() => ({ tokens: null, contextWindow: 1000, percent: null })),
+    });
+    const coordinator = makeCoordinator();
+    coordinator._session = session;
+    coordinator._sessionStarted = true;
+    coordinator._sessions.set(sessionPath, {
+      session,
+      unsub: vi.fn(),
+      agentId: "hana",
+      contextBreakdown: {
+        system: 40, skills: 0, files: 0, tools: 10, mcp: 0,
+        conversation: 30, user: 5, toolResults: 0, computedAt: 1,
+      },
+    });
+
+    // compaction 后 tokens 未知:breakdown 显式缺席(WS 层回落 null),不伪造明细。
+    expect(coordinator.getSessionContextUsage(sessionPath)).toEqual({
+      tokens: null,
+      contextWindow: 1000,
+      percent: null,
+    });
+  });
+
   it("restores a hibernated focused runtime before prompting", async () => {
     const sessionPath = "/tmp/hana-runtime-hibernation/agents/hana/sessions/current.jsonl";
     const manager = { getCwd: () => "/tmp/workspace", getSessionFile: () => sessionPath };
@@ -188,6 +259,72 @@ describe("SessionCoordinator runtime hibernation", () => {
     expect(restored.prompt).toHaveBeenCalledWith("hello", undefined);
     expect(coordinator.session).toBe(restored);
     expect(coordinator.currentSessionPath).toBe(sessionPath);
+  });
+
+  it("restores the persisted context breakdown estimate from session-meta when the entry is rebuilt", async () => {
+    // 用户路径:聊天后切换会话再切回,entry 已被淘汰/重建,内存 contextBreakdown 丢失。
+    // 落盘的 contextUsageEstimate 在 restore 时交还新 entry,读取侧与 tokens 对账,
+    // Context Ring 详情不再只剩"暂无数据"。
+    const sessionPath = "/tmp/hana-runtime-hibernation/agents/hana/sessions/meta-restore.jsonl";
+    const sessionsDir = path.dirname(sessionPath);
+    fs.mkdirSync(sessionsDir, { recursive: true });
+    const metaPath = path.join(sessionsDir, "session-meta.json");
+    const estimate = {
+      system: 40, skills: 0, files: 10, tools: 10, mcp: 0,
+      conversation: 30, user: 5, toolResults: 0, computedAt: 42,
+    };
+    fs.writeFileSync(metaPath, JSON.stringify({ "meta-restore.jsonl": { contextUsageEstimate: estimate } }, null, 2));
+
+    const manager = { getCwd: () => "/tmp/workspace", getSessionFile: () => sessionPath };
+    const restored = makeSession(sessionPath, {
+      sessionManager: manager,
+      getContextUsage: vi.fn(() => ({ tokens: 100, contextWindow: 1000, percent: 10 })),
+    });
+    sessionManagerOpenMock.mockReturnValue(manager);
+    createAgentSessionMock.mockResolvedValue({ session: restored });
+
+    const coordinator = makeCoordinator();
+    coordinator._currentSessionPath = sessionPath;
+    coordinator._sessionStarted = true;
+
+    await (coordinator as any).promptSession(sessionPath, "hello");
+
+    const usage = coordinator.getSessionContextUsage(sessionPath);
+    // known = 40+10+10+30+5 = 95,total = 100 → other 吸收 5。
+    expect(usage.breakdown).toMatchObject({
+      system: 40, skills: 0, files: 10, tools: 10, mcp: 0,
+      conversation: 30, user: 5, toolResults: 0, other: 5, total: 100,
+    });
+  });
+
+  it("ignores a malformed persisted context estimate instead of restoring a broken split", async () => {
+    const sessionPath = "/tmp/hana-runtime-hibernation/agents/hana/sessions/meta-corrupt.jsonl";
+    const sessionsDir = path.dirname(sessionPath);
+    fs.mkdirSync(sessionsDir, { recursive: true });
+    const metaPath = path.join(sessionsDir, "session-meta.json");
+    let meta: Record<string, any> = {};
+    if (fs.existsSync(metaPath)) {
+      try { meta = JSON.parse(fs.readFileSync(metaPath, "utf-8")); } catch { meta = {}; }
+    }
+    meta["meta-corrupt.jsonl"] = { contextUsageEstimate: { system: "40", conversation: 30 } };
+    fs.writeFileSync(metaPath, JSON.stringify(meta, null, 2));
+
+    const manager = { getCwd: () => "/tmp/workspace", getSessionFile: () => sessionPath };
+    const restored = makeSession(sessionPath, {
+      sessionManager: manager,
+      getContextUsage: vi.fn(() => ({ tokens: 100, contextWindow: 1000, percent: 10 })),
+    });
+    sessionManagerOpenMock.mockReturnValue(manager);
+    createAgentSessionMock.mockResolvedValue({ session: restored });
+
+    const coordinator = makeCoordinator();
+    coordinator._currentSessionPath = sessionPath;
+    coordinator._sessionStarted = true;
+
+    await (coordinator as any).promptSession(sessionPath, "hello");
+
+    const usage = coordinator.getSessionContextUsage(sessionPath);
+    expect(usage.breakdown).toBeUndefined();
   });
 
   it("rejects the next live-session prompt before vision or Pi when its model was disabled", async () => {

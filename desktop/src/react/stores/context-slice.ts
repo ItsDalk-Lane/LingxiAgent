@@ -1,4 +1,13 @@
 import { sessionScopedKey, sessionScopedListIncludes, type SessionLocatorState } from './session-slice';
+import type { ContextUsageBreakdown } from '../../../../shared/context-usage-breakdown.ts';
+
+/** 按 session identity key 存储的 context usage 条目;breakdown 由服务端对账后下发,可为 null。 */
+export interface ContextUsageEntry {
+  tokens: number | null;
+  window: number | null;
+  percent: number | null;
+  breakdown?: ContextUsageBreakdown | null;
+}
 
 export interface ContextSlice {
   /** Context usage — token count for the current session */
@@ -6,7 +15,7 @@ export interface ContextSlice {
   contextWindow: number | null;
   contextPercent: number | null;
   /** 按 session identity key 存储的 context usage（读旧 path key 兼容） */
-  contextBySession: Record<string, { tokens: number | null; window: number | null; percent: number | null }>;
+  contextBySession: Record<string, ContextUsageEntry>;
   /** Session identity keys currently undergoing compaction */
   compactingSessions: string[];
   /** Compaction mode for each busy session, keyed by session identity. */

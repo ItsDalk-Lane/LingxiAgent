@@ -3,7 +3,6 @@ import { PlanModeButton, type PermissionMode } from './PlanModeButton';
 import { ContextRing } from './ContextRing';
 import { ThinkingLevelButton } from './ThinkingLevelButton';
 import { ModelSelector } from './ModelSelector';
-import { SendButton } from './SendButton';
 import type { ThinkingLevel } from '../../stores/model-slice';
 import type { Model } from '../../types';
 import type { SessionModel } from '../../stores/chat-types';
@@ -12,6 +11,7 @@ import styles from './InputArea.module.css';
 interface Props {
   t: (key: string) => string;
   // 左侧工具按钮
+  onNewSession: () => void;
   onAttach: () => void;
   slashBtnRef: RefObject<HTMLButtonElement | null>;
   onSlashToggle: () => void;
@@ -26,39 +26,43 @@ interface Props {
   models: Model[];
   sessionModel?: SessionModel;
   isStreaming: boolean;
-  hasInput: boolean;
-  canSend: boolean;
   showAudioInput: boolean;
   audioRecordingActive: boolean;
   audioRecordingBusy: boolean;
   onAudioToggle: () => void;
-  onSend: () => void;
-  onSteer: () => void;
-  onStop: () => void;
 }
 
-/** 编辑器下方的工具按钮行 + 发送控制 */
-export const InputControlBar = memo(function InputControlBar(props: Props) {
+/** 输入卡片下方的 Composer 工具栏：新建聊天 / 附件 / Slash / 权限模式 / Context / Thinking / 模型 / 语音 */
+export const ComposerToolbar = memo(function ComposerToolbar(props: Props) {
   const {
-    t, onAttach, slashBtnRef, onSlashToggle,
+    t, onNewSession, onAttach, slashBtnRef, onSlashToggle,
     permissionMode, onPermissionModeChange, planModeLocked,
     showThinking, thinkingLevel, onThinkingChange, availableThinkingLevels,
-    models, sessionModel, isStreaming, hasInput, canSend,
+    models, sessionModel, isStreaming,
     showAudioInput, audioRecordingActive, audioRecordingBusy, onAudioToggle,
-    onSend, onSteer, onStop,
   } = props;
 
   return (
-    <div className={styles['input-bottom-bar']}>
-      <div className={styles['input-actions']}>
+    <div className={styles['composer-toolbar']}>
+      <div className={styles['composer-toolbar-group']}>
+        <button
+          className={styles['attach-btn']}
+          title={t('sidebar.newChat')}
+          onClick={onNewSession}
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+            <path d="M9 10h6" />
+            <path d="M12 7v6" />
+          </svg>
+        </button>
         <button
           className={styles['attach-btn']}
           title={t('input.attachFiles')}
           onClick={onAttach}
         >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <line x1="12" y1="5" x2="12" y2="19" />
-            <line x1="5" y1="12" x2="19" y2="12" />
+            <path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48" />
           </svg>
         </button>
         <button
@@ -74,7 +78,7 @@ export const InputControlBar = memo(function InputControlBar(props: Props) {
         <PlanModeButton mode={permissionMode} onChange={onPermissionModeChange} locked={planModeLocked} />
         <ContextRing />
       </div>
-      <div className={styles['input-controls']}>
+      <div className={`${styles['composer-toolbar-group']} ${styles['composer-toolbar-right']}`}>
         {showThinking ? (
           <div className={styles['model-split-control']}>
             <ThinkingLevelButton level={thinkingLevel} onChange={onThinkingChange} availableLevels={availableThinkingLevels} />
@@ -106,8 +110,6 @@ export const InputControlBar = memo(function InputControlBar(props: Props) {
             )}
           </button>
         )}
-        <SendButton isStreaming={isStreaming} hasInput={hasInput}
-          disabled={isStreaming ? false : !canSend} onSend={onSend} onSteer={onSteer} onStop={onStop} />
       </div>
     </div>
   );

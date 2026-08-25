@@ -191,7 +191,8 @@
     }
   },
   "titlebar": {
-    "currentChatTitle": "現在のチャットタイトル"
+    "currentChatTitle": "現在のチャットタイトル",
+    "search": "チャットを検索"
   },
   "session": {
     "untitled": "新しいチャット",
@@ -441,6 +442,23 @@
     "refreshAndCompactBusy": "会話を圧縮して更新中…",
     "refreshAndCompactFailed": "圧縮と更新に失敗しました",
     "compact": "圧縮",
+    "contextDetail": "詳細",
+    "contextDetailBack": "戻る",
+    "contextDetailEmpty": "データなし",
+    "contextDetailUsed": "使用済み",
+    "contextDetailWindowTotal": "コンテキストウィンドウ",
+    "contextDetailRemaining": "残り容量",
+    "contextCategory": {
+      "system": "システムプロンプト",
+      "conversation": "会話履歴",
+      "user": "現在の入力",
+      "tools": "ツール定義",
+      "toolResults": "ツール結果",
+      "mcp": "MCP",
+      "skills": "スキル",
+      "files": "ファイル参照",
+      "other": "その他"
+    },
     "noAskThisConversation": "この会話では今後確認しない",
     "confirmMoreOptions": "その他の確認オプション",
     "attachmentDirectory": "[ディレクトリ] {label}",
@@ -3453,6 +3471,12 @@
       "collapse": "Jian をたたむ",
       "expand": "Jian を開く"
     }
+  },
+  "runtimeCapsule": {
+    "title": "実行情報",
+    "expand": "実行情報を開く",
+    "collapse": "実行情報を閉じる",
+    "running": "{n} 件実行中"
   },
   "desk": {
     "title": "デスク",

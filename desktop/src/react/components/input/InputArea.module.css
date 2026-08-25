@@ -28,21 +28,42 @@
     min-width: 0;
 }
 
-.input-surface-mobile .input-bottom-bar {
-    gap: var(--space-4);
+/* Composer 工具栏：输入卡片下方一行（新建聊天/附件/Slash/权限/Context | Thinking/模型/语音） */
+.composer-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-8);
+    flex-wrap: wrap;
+    margin-top: var(--space-8);
+}
+
+.composer-toolbar-group {
+    display: flex;
+    align-items: center;
+    gap: 0.2rem;
+    flex-wrap: wrap;
+    flex-shrink: 1;
     min-width: 0;
 }
 
-.input-surface-mobile .input-actions {
-    flex: 0 0 auto;
-    gap: 0.18rem;
-}
-
-.input-surface-mobile .input-controls {
-    flex: 1 1 auto;
+.composer-toolbar-right {
     justify-content: flex-end;
-    gap: 0.18rem;
+    gap: 0.35rem;
+}
+
+.input-surface-mobile .composer-toolbar {
+    gap: var(--space-4);
+    margin-top: var(--space-6);
     min-width: 0;
+}
+
+.input-surface-mobile .composer-toolbar-group {
+    gap: 0.18rem;
+}
+
+.input-surface-mobile .composer-toolbar-right {
+    flex: 1 1 auto;
 }
 
 .model-split-control {
@@ -332,6 +353,58 @@
 .context-ring-menu-item:disabled {
     opacity: 0.55;
     cursor: not-allowed;
+}
+
+/* Context Ring 详情视图（与菜单同一 AnchoredPortal 内切换） */
+.context-ring-detail {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    min-width: 220px;
+}
+
+.context-ring-detail-head {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+}
+
+.context-ring-detail-head .context-ring-menu-item {
+    width: auto;
+}
+
+.context-ring-detail-title {
+    flex: 1;
+    color: var(--text);
+    font-size: var(--fs-caption);
+    line-height: 1;
+    text-align: right;
+    white-space: nowrap;
+}
+
+.context-ring-detail-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-16);
+    height: 20px;
+    color: var(--text-muted);
+    font-size: var(--fs-caption);
+    line-height: 1;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+}
+
+.context-ring-detail-row span:last-child {
+    color: var(--text);
+}
+
+.context-ring-detail-empty {
+    padding: var(--space-4) 0;
+    color: var(--text-muted);
+    font-size: var(--fs-caption);
+    text-align: center;
+    white-space: nowrap;
 }
 
 /* 思考强度选择器 */
@@ -1408,6 +1481,13 @@
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
     transition: border-color 0.3s var(--ease-out),
                 box-shadow 0.3s var(--ease-out);
+}
+
+/* 输入卡片底部行：只保留发送主控制（Send/Steer/Stop） */
+.input-card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
 }
 
 .browser-file-input {

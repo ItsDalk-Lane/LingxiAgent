@@ -4,9 +4,14 @@ import { WindowControls } from '../WindowControls';
 
 interface AppTitlebarProps {
   sidebarOpen: boolean;
-  jianOpen: boolean;
+  /** 移动端右栏（工作台抽屉）开关状态；桌面端不再传，#tbToggleRight 不渲染 */
+  jianOpen?: boolean;
   onToggleSidebar: () => void;
-  onToggleJian: () => void;
+  /** 传入时才渲染右栏开关（移动端保留；桌面端固定右栏已移除） */
+  onToggleJian?: () => void;
+  /** 传入时才渲染聊天搜索按钮（桌面端；移动端不传不渲染） */
+  onOpenChatSearch?: () => void;
+  chatSearchOpen?: boolean;
   onNewSession?: () => void;
   previewOpen?: boolean;
   onTogglePreview?: () => void;
@@ -22,9 +27,11 @@ interface AppTitlebarProps {
 
 export function AppTitlebar({
   sidebarOpen,
-  jianOpen,
+  jianOpen = false,
   onToggleSidebar,
   onToggleJian,
+  onOpenChatSearch,
+  chatSearchOpen = false,
   onNewSession,
   previewOpen = false,
   onTogglePreview,
@@ -51,11 +58,28 @@ export function AppTitlebar({
           onMouseEnter={onLeftMouseEnter}
           onMouseLeave={onToggleMouseLeave}
         >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
             <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
             <line x1="9" y1="3" x2="9" y2="21"></line>
           </svg>
         </button>
+        {onOpenChatSearch && (
+          <button
+            className={`tb-toggle tb-toggle-search${chatSearchOpen ? ' active' : ''}`}
+            id="tbToggleSearch"
+            type="button"
+            title={t('titlebar.search')}
+            aria-label={t('titlebar.search')}
+            data-titlebar-chat-search=""
+            onMouseDown={(e) => e.preventDefault()}
+            onClick={onOpenChatSearch}
+          >
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <circle cx="11" cy="11" r="7.5" />
+              <path d="m21 21-4.3-4.3" />
+            </svg>
+          </button>
+        )}
         {showNewSessionButton && onNewSession && (
           <button
             className="tb-toggle tb-new-session"
@@ -97,20 +121,22 @@ export function AppTitlebar({
             </svg>
           </button>
         )}
-        <button
-          className={`tb-toggle tb-toggle-right${jianOpen ? ' active' : ''}`}
-          id="tbToggleRight"
-          title={t('sidebar.jian')}
-          onMouseDown={(e) => e.preventDefault()}
-          onClick={onToggleJian}
-          onMouseEnter={onRightMouseEnter}
-          onMouseLeave={onToggleMouseLeave}
-        >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-            <line x1="15" y1="3" x2="15" y2="21"></line>
-          </svg>
-        </button>
+        {onToggleJian && (
+          <button
+            className={`tb-toggle tb-toggle-right${jianOpen ? ' active' : ''}`}
+            id="tbToggleRight"
+            title={t('sidebar.jian')}
+            onMouseDown={(e) => e.preventDefault()}
+            onClick={onToggleJian}
+            onMouseEnter={onRightMouseEnter}
+            onMouseLeave={onToggleMouseLeave}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="15" y1="3" x2="15" y2="21"></line>
+            </svg>
+          </button>
+        )}
       </div>
       <WindowControls />
     </div>

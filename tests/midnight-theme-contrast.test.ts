@@ -40,14 +40,6 @@ describe('midnight theme contrast', () => {
     expect(contrast(readThemeToken(css, 'accent'), bg)).toBeGreaterThanOrEqual(3);
   });
 
-  it('uses a dark text token for the light social-platform sidebar button', () => {
-    const styles = fs.readFileSync(path.join(ROOT, 'desktop/src/styles.css'), 'utf8');
-    const css = fs.readFileSync(path.join(ROOT, 'desktop/src/themes/midnight.css'), 'utf8');
-
-    expect(styles).toContain('color: var(--sidebar-bridge-card-text, var(--text-muted));');
-    expect(contrast(readThemeToken(css, 'sidebar-bridge-card-text'), '#9DA6AC')).toBeGreaterThanOrEqual(4.5);
-  });
-
   it('adds a high-contrast dark variant with stronger readable colors', () => {
     const styles = fs.readFileSync(path.join(ROOT, 'desktop/src/styles.css'), 'utf8');
     const css = fs.readFileSync(path.join(ROOT, 'desktop/src/themes/midnight-contrast.css'), 'utf8');

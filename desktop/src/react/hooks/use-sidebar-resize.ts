@@ -19,20 +19,16 @@ export function useSidebarResize(): void {
   useEffect(() => {
     const root = document.documentElement;
     const sidebarEl = document.getElementById('sidebar');
-    const jianSidebarEl = document.getElementById('jianSidebar');
     const channelInspectorEl = document.getElementById('channelInspector');
     const leftHandle = document.getElementById('sidebarResizeHandle');
-    const rightHandle = document.getElementById('jianResizeHandle');
     const channelInspectorHandle = document.getElementById('channelInspectorResizeHandle');
     const previewPanel = document.getElementById('previewPanel');
 
     const LEFT_MIN = 180, LEFT_MAX = 400;
-    const RIGHT_MIN = 200, RIGHT_MAX = 600;
     const CHANNEL_INSPECTOR_MIN = 220, CHANNEL_INSPECTOR_MAX = 620;
     const PREVIEW_MIN = 320;
 
     const leftInner = sidebarEl?.querySelector('.sidebar-inner') as HTMLElement | null;
-    const rightInner = jianSidebarEl?.querySelector('.jian-sidebar-inner') as HTMLElement | null;
     const previewInner = previewPanel?.querySelector('[data-preview-panel-inner]') as HTMLElement | null;
 
     function cssWidth(name: string, fallback: number): number {
@@ -70,7 +66,6 @@ export function useSidebarResize(): void {
       const state = useStore.getState();
       const occupiedWidth =
         visiblePanelWidth(sidebarEl, '--sidebar-width', 240, state.sidebarOpen) +
-        visiblePanelWidth(jianSidebarEl, '--jian-sidebar-width', 260, state.jianOpen) +
         visiblePanelWidth(
           channelInspectorEl,
           '--channel-inspector-width',
@@ -85,18 +80,6 @@ export function useSidebarResize(): void {
       const px = w + 'px';
       root.style.setProperty('--sidebar-width', px);
       if (leftInner) { leftInner.style.width = px; leftInner.style.minWidth = px; }
-    }
-
-    function updateJianColumns(w: number): void {
-      const cols = w > 520 ? 3 : w > 350 ? 2 : 1;
-      root.style.setProperty('--jian-columns', String(cols));
-    }
-
-    function applyJianWidth(w: number): void {
-      const px = w + 'px';
-      root.style.setProperty('--jian-sidebar-width', px);
-      if (rightInner) { rightInner.style.width = px; rightInner.style.minWidth = px; }
-      updateJianColumns(w);
     }
 
     function applyChannelInspectorWidth(w: number): void {
@@ -116,11 +99,9 @@ export function useSidebarResize(): void {
 
     // 恢复保存的宽度
     const savedLeft = localStorage.getItem('hana-sidebar-width');
-    const savedRight = localStorage.getItem('hana-jian-width');
     const savedChannelInspector = localStorage.getItem('hana-channel-inspector-width');
     const savedPreview = localStorage.getItem('hana-preview-width');
     if (savedLeft) applySidebarWidth(Number(savedLeft));
-    if (savedRight) applyJianWidth(Number(savedRight));
     if (savedChannelInspector) applyChannelInspectorWidth(Number(savedChannelInspector));
     if (savedPreview) {
       const savedPreviewWidth = Number(savedPreview);
@@ -225,14 +206,6 @@ export function useSidebarResize(): void {
       () => sidebarEl?.offsetWidth || 240,
       (w) => applySidebarWidth(w),
       LEFT_MIN, LEFT_MAX, 'hana-sidebar-width', false,
-    );
-
-    setupHandle(
-      rightHandle,
-      () => jianSidebarEl,
-      () => jianSidebarEl?.offsetWidth || 260,
-      (w) => applyJianWidth(w),
-      RIGHT_MIN, RIGHT_MAX, 'hana-jian-width', true,
     );
 
     setupHandle(

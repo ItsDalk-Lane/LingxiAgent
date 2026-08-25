@@ -17,8 +17,6 @@ import { ChannelCreateOverlay } from './components/channels/ChannelCreateOverlay
 import { SidebarLayout, toggleSidebar } from './components/SidebarLayout';
 import { FloatSidebar, useFloatSidebar } from './components/FloatSidebar';
 import { useSidebarResize } from './hooks/use-sidebar-resize';
-import { createNewSession } from './stores/session-actions';
-import { toggleJianSidebar } from './stores/desk-actions';
 import { ToastContainer } from './components/ToastContainer';
 import { InputContextMenu } from './components/InputContextMenu';
 import { StatusBar } from './components/StatusBar';
@@ -33,6 +31,7 @@ import { openSettingsModal } from './stores/settings-modal-actions';
 import { AppTitlebar } from './components/app/AppTitlebar';
 import { ChatSidebar } from './components/app/ChatSidebar';
 import { AppPages } from './components/app/AppPages';
+import { ChatSearchOverlay } from './components/search/ChatSearchOverlay';
 
 declare function t(key: string, vars?: Record<string, string | number>): string;
 
@@ -66,7 +65,8 @@ function App() {
   // 订阅 locale 变化，驱动整棵树重渲染
   useStore(s => s.locale);
   const sidebarOpen = useStore(s => s.sidebarOpen);
-  const jianOpen = useStore(s => s.jianOpen);
+  const chatSearchOpen = useStore(s => s.chatSearchOpen);
+  const setChatSearchOpen = useStore(s => s.setChatSearchOpen);
   const currentTab = useStore(s => s.currentTab);
   const isPluginTab = typeof currentTab === 'string' && currentTab.startsWith('plugin:');
   const { side: floatSide, show: showFloat, scheduleHide: scheduleFloatHide, cancelHide: cancelFloatHide, hide: hideFloat } = useFloatSidebar();
@@ -97,20 +97,17 @@ function App() {
         {/* ── Titlebar ── */}
         <AppTitlebar
           sidebarOpen={sidebarOpen}
-          jianOpen={jianOpen}
           onToggleSidebar={() => { hideFloat(); toggleSidebar(); }}
-          onToggleJian={() => { hideFloat(); toggleJianSidebar(); }}
-          onLeftMouseEnter={() => showFloat('left')}
-          onRightMouseEnter={() => showFloat('right')}
+          onLeftMouseEnter={() => showFloat()}
           onToggleMouseLeave={scheduleFloatHide}
+          chatSearchOpen={chatSearchOpen}
+          onOpenChatSearch={() => setChatSearchOpen(!chatSearchOpen)}
         />
 
         {/* ── App body ── */}
         <div className="app">
           <ChatSidebar
             open={sidebarOpen && !isPluginTab}
-            onNewSession={createNewSession}
-            onCollapse={() => toggleSidebar()}
             onOpenSettings={() => openSettingsModal()}
             onTogglePanel={togglePanel}
           />
@@ -126,6 +123,9 @@ function App() {
 
       {/* Channel create overlay */}
       <ChannelCreateOverlay />
+
+      {/* Centered chat search overlay (desktop titlebar entry) */}
+      <ChatSearchOverlay />
 
       {/* Skill viewer overlay */}
       <Suspense fallback={null}><SkillViewerOverlay /></Suspense>

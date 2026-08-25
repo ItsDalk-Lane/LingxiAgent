@@ -177,8 +177,12 @@ vi.mock('../../components/input/InputContextRow', () => ({
   InputContextRow: () => null,
 }));
 
-vi.mock('../../components/input/InputControlBar', () => ({
-  InputControlBar: () => null,
+vi.mock('../../components/input/ComposerToolbar', () => ({
+  ComposerToolbar: () => null,
+}));
+
+vi.mock('../../components/input/SendButton', () => ({
+  SendButton: () => null,
 }));
 
 vi.mock('../../components/input/SessionConfirmationPrompt', () => ({

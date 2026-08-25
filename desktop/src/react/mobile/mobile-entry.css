@@ -342,87 +342,10 @@ html[data-platform="linux"] .tb-toggle-right {
     pointer-events: none;
 }
 
-.sidebar-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-shrink: 0;
-    padding: var(--space-8) var(--space-16);
-    -webkit-app-region: no-drag;
-}
-
-.sidebar-title {
-    font-size: var(--fs-ui);
-    font-weight: 600;
-    color: var(--text-muted);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-}
-
-.sidebar-header-actions,
 .sidebar-footer {
     display: flex;
     align-items: center;
     gap: 2px;
-}
-
-.sidebar-action-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 26px;
-    height: 26px;
-    border: none;
-    border-radius: var(--radius-sm);
-    background: none;
-    color: var(--text-muted);
-    cursor: default;
-    transition: all var(--duration-fast) var(--ease-out);
-    -webkit-app-region: no-drag;
-}
-
-.sidebar-action-btn:hover {
-    background: var(--accent-light);
-    color: var(--accent);
-}
-
-.sidebar-activity-bar {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    width: calc(100% - var(--space-8) * 2);
-    margin: 2px var(--space-8) 4px;
-    padding: var(--space-6) var(--space-12);
-    border: none;
-    border-radius: var(--radius-sm);
-    background: none;
-    color: var(--text-muted);
-    font: inherit;
-    font-size: var(--fs-caption);
-    cursor: default;
-    flex-shrink: 0;
-    transition: all var(--duration-fast) var(--ease-out);
-}
-
-.sidebar-activity-bar:hover {
-    background: var(--accent-light);
-    color: var(--accent);
-}
-
-.sidebar-activity-bar svg {
-    flex-shrink: 0;
-    opacity: 0.45;
-}
-
-.sidebar-bridge-card {
-    width: calc(100% - var(--space-16) * 2);
-    margin: 4px auto 6px;
-    padding: 7px var(--space-12);
-    justify-content: center;
-    background: rgba(255, 255, 255, 0.5);
-    border: 1px solid rgba(0, 0, 0, 0.05);
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
-    color: var(--sidebar-bridge-card-text, var(--text-muted));
 }
 
 .sidebar-bridge-dot {

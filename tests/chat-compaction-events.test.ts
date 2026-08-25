@@ -40,8 +40,43 @@ describe("chat route compaction lifecycle messages", () => {
       tokens: null,
       contextWindow: 200_000,
       percent: null,
+      breakdown: null,
     });
     expect(getSessionByPath).toHaveBeenCalledWith("/session/a.jsonl");
+  });
+
+  it("forwards the reconciled breakdown from the coordinator usage snapshot", () => {
+    const breakdown = {
+      system: 100, skills: 20, files: 0, tools: 40, mcp: 10,
+      conversation: 200, user: 15, toolResults: 30, other: 85,
+      total: 500, computedAt: 1,
+    };
+    const getSessionContextUsage = vi.fn(() => ({
+      tokens: 500, contextWindow: 200_000, percent: 0.25, breakdown,
+    }));
+    const getSessionByPath = vi.fn();
+
+    expect(toCompactionLifecycleWsMessage(
+      { type: "compaction_end", reason: "auto", aborted: false, willRetry: false },
+      "/session/a.jsonl",
+      getSessionByPath,
+      () => "sess_a",
+      undefined,
+      getSessionContextUsage,
+    )).toEqual({
+      type: "compaction_end",
+      sessionId: "sess_a",
+      sessionPath: "/session/a.jsonl",
+      reason: "auto",
+      aborted: false,
+      willRetry: false,
+      tokens: 500,
+      contextWindow: 200_000,
+      percent: 0.25,
+      breakdown,
+    });
+    // 协调器快照优先,不再回退到 session 裸 getContextUsage(它没有 breakdown)。
+    expect(getSessionByPath).not.toHaveBeenCalled();
   });
 
   it("includes the resolved compaction mode so the session ring can label local compaction", () => {

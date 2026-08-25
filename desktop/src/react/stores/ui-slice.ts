@@ -34,6 +34,8 @@ export interface UiSlice {
   skillCatalogVersion: number;
   /** 频道创建弹窗是否可见 */
   channelCreateOverlayVisible: boolean;
+  /** 居中聊天搜索界面是否打开（Titlebar 放大镜入口；桌面端专用） */
+  chatSearchOpen: boolean;
   setSidebarOpen: (open: boolean) => void;
   setSidebarAutoCollapsed: (collapsed: boolean) => void;
   setJianOpen: (open: boolean) => void;
@@ -45,6 +47,7 @@ export interface UiSlice {
   setRightWorkspaceTab: (tab: RightWorkspaceTab) => void;
   setJianDrawerOpen: (open: boolean) => void;
   setChannelCreateOverlayVisible: (visible: boolean) => void;
+  setChatSearchOpen: (open: boolean) => void;
   setMediaViewer: (state: MediaViewerState | null) => void;
   setSettingsModal: (state: SettingsModalState) => void;
   setMediaViewerCurrent: (id: string) => void;
@@ -74,6 +77,7 @@ export const createUiSlice = (
   settingsModal: { open: false, activeTab: 'agent' },
   skillCatalogVersion: 0,
   channelCreateOverlayVisible: false,
+  chatSearchOpen: false,
   setSidebarOpen: (open) => set({ sidebarOpen: open }),
   setSidebarAutoCollapsed: (collapsed) => set({ sidebarAutoCollapsed: collapsed }),
   setJianOpen: (open) => set({ jianOpen: open }),
@@ -85,6 +89,7 @@ export const createUiSlice = (
   setRightWorkspaceTab: (tab) => set({ rightWorkspaceTab: tab }),
   setJianDrawerOpen: (open) => set({ jianDrawerOpen: open }),
   setChannelCreateOverlayVisible: (visible) => set({ channelCreateOverlayVisible: visible }),
+  setChatSearchOpen: (open) => set({ chatSearchOpen: open }),
   setMediaViewer: (state) => set({ mediaViewer: state }),
   setSettingsModal: (state) => set({ settingsModal: state }),
   setMediaViewerCurrent: (id) => set((s) => ({

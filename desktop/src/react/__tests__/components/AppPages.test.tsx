@@ -13,10 +13,6 @@ vi.mock('../../MainContent', () => ({
   ),
 }));
 
-vi.mock('../../components/right-workspace/RightWorkspacePanel', () => ({
-  RightWorkspacePanel: () => <section data-testid="right-workspace-panel" />,
-}));
-
 vi.mock('../../components/plugin/PluginPageView', () => ({
   PluginPageView: ({ pluginId }: { pluginId: string }) => (
     <section data-testid="plugin-page">{pluginId}</section>
@@ -85,25 +81,26 @@ describe('AppPages page ownership', () => {
     cleanup();
   });
 
-  it('renders the file preview only on the chat page', () => {
+  it('renders the file preview only on the chat page, without the removed fixed right rail', () => {
     render(<AppPages />);
 
     expect(screen.getByTestId('chat-area')).toBeInTheDocument();
     expect(document.querySelector('#previewPanel')).toBeInTheDocument();
-    expect(screen.getByTestId('right-workspace-panel')).toBeInTheDocument();
+    // 旧固定右工作区 Rail 已从桌面端移除，不再占位渲染
+    expect(document.querySelector('#jianSidebar')).not.toBeInTheDocument();
   });
 
-  it('keeps the workspace companion on plugin pages without carrying the file preview', () => {
+  it('renders plugin pages without carrying the file preview', () => {
     useStore.setState({ currentTab: 'plugin:hanako-hyperframes' } as never);
 
     render(<AppPages />);
 
     expect(screen.getByTestId('plugin-page')).toHaveTextContent('hanako-hyperframes');
     expect(document.querySelector('#previewPanel')).not.toBeInTheDocument();
-    expect(screen.getByTestId('right-workspace-panel')).toBeInTheDocument();
+    expect(document.querySelector('#jianSidebar')).not.toBeInTheDocument();
   });
 
-  it('keeps channel inspector and workspace companion as separate right-side panels', () => {
+  it('keeps channel inspector panels stacked in order on the channel page', () => {
     useStore.setState({
       currentTab: 'channels',
       currentChannel: 'ch_crew',
@@ -127,6 +124,6 @@ describe('AppPages page ownership', () => {
         & Node.DOCUMENT_POSITION_FOLLOWING,
     ).toBeTruthy();
     expect(screen.queryByTestId('preview-panel')).not.toBeInTheDocument();
-    expect(screen.getByTestId('right-workspace-panel')).toBeInTheDocument();
+    expect(document.querySelector('#jianSidebar')).not.toBeInTheDocument();
   });
 });
