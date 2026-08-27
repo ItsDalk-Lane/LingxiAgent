@@ -457,6 +457,7 @@ export class KnowledgeResearchService {
           this.researchStore.failAttempt({
             attemptId: attempt.id,
             errorCode: safeErrorCode(error),
+            message: error instanceof Error ? error.message : String(error),
             retry,
           });
           if (!retry) throw error;
@@ -487,15 +488,23 @@ export class KnowledgeResearchService {
     if (!anchor || anchor.kind !== "primary") {
       throw new KnowledgeError("KNOWLEDGE_MODEL_OUTPUT_INVALID", "Evidence must reference a primary anchor");
     }
-    if (input.candidate.endOffset > anchor.text.length) {
-      throw new KnowledgeError("KNOWLEDGE_MODEL_OUTPUT_INVALID", "Evidence offsets exceed the supplied anchor");
+    let candidateStart = input.candidate.startOffset;
+    let candidateEnd = input.candidate.endOffset;
+    if (
+      input.candidate.endOffset > anchor.text.length
+      || anchor.text.slice(candidateStart, candidateEnd) !== input.candidate.quote
+    ) {
+      // LLM 数不准字符偏移。quote 逐字且在 anchor 内唯一出现时,由服务端定位。
+      const located = anchor.text.indexOf(input.candidate.quote);
+      if (located >= 0 && anchor.text.indexOf(input.candidate.quote, located + 1) === -1) {
+        candidateStart = located;
+        candidateEnd = located + input.candidate.quote.length;
+      } else {
+        throw new KnowledgeError("KNOWLEDGE_MODEL_OUTPUT_INVALID", "Evidence quote does not match the frozen text");
+      }
     }
-    const actual = anchor.text.slice(input.candidate.startOffset, input.candidate.endOffset);
-    if (actual !== input.candidate.quote) {
-      throw new KnowledgeError("KNOWLEDGE_MODEL_OUTPUT_INVALID", "Evidence quote does not match the frozen text");
-    }
-    const startOffset = anchor.blockStartOffset + input.candidate.startOffset;
-    const endOffset = anchor.blockStartOffset + input.candidate.endOffset;
+    const startOffset = anchor.blockStartOffset + candidateStart;
+    const endOffset = anchor.blockStartOffset + candidateEnd;
     const scopeSource = input.scope.sources.find(source => source.parseArtifactId === input.unit.parseArtifactId);
     if (!scopeSource || anchor.parseArtifactId !== scopeSource.parseArtifactId) {
       throw new KnowledgeError("KNOWLEDGE_MODEL_OUTPUT_INVALID", "Evidence escaped the frozen scope");
@@ -675,6 +684,7 @@ export class KnowledgeResearchService {
           this.researchStore.failAttempt({
             attemptId: attempt.id,
             errorCode: safeErrorCode(error),
+            message: error instanceof Error ? error.message : String(error),
             retry,
           });
           if (!retry) throw error;
@@ -767,16 +777,23 @@ export class KnowledgeResearchService {
             claimPackId: pack.id,
             claimRefs: new Set(claimRefMap.keys()),
           });
-          const validated = parsed.matches.map(match => ({
-            match,
-            evidence: this.validateCandidate({
-              studioId: input.studioId,
-              scope: input.scope,
-              unit,
-              payload,
-              candidate: match,
-            }),
-          }));
+          const validated = parsed.matches.flatMap(match => {
+            try {
+              return [{
+                match,
+                evidence: this.validateCandidate({
+                  studioId: input.studioId,
+                  scope: input.scope,
+                  unit,
+                  payload,
+                  candidate: match,
+                }),
+              }];
+            } catch {
+              // quote 定位失败的 match 丢弃,不让整单元重试
+              return [];
+            }
+          });
           this.researchStore.transaction(() => {
             const contradictions: Array<{
               claimId: string;
@@ -809,7 +826,9 @@ export class KnowledgeResearchService {
             this.researchStore.completeContradictionCheck({
               attemptId: attempt.id,
               checkId: check.id,
-              output: parsed,
+              // 只存通过验证的 matches:coverage.total 按 result_json.matches 统计,
+              // 必须与 evidence_validations 同源,否则 citationValidation 永不闭合。
+              output: { ...parsed, matches: validated.map(entry => entry.match) },
               contradictions,
             });
           });
@@ -820,6 +839,7 @@ export class KnowledgeResearchService {
           this.researchStore.failAttempt({
             attemptId: attempt.id,
             errorCode: safeErrorCode(error),
+            message: error instanceof Error ? error.message : String(error),
             retry,
           });
           if (!retry) throw error;
@@ -1067,6 +1087,7 @@ export class KnowledgeResearchService {
           this.researchStore.failAttempt({
             attemptId: attempt.id,
             errorCode: safeErrorCode(error),
+            message: error instanceof Error ? error.message : String(error),
             retry,
           });
           if (!retry) throw error;

@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import {
   extractMoodBlocksFromContent,
   parseUserAttachments,
+  extractLeadingSkillNotes,
   cleanMoodText,
   truncatePath,
   extractHostname,
@@ -361,5 +362,53 @@ describe('moodLabel', () => {
 
   it('未知 yuan 降级为 MOOD', () => {
     expect(moodLabel('unknown')).toContain('MOOD');
+  });
+});
+
+// 服务端落盘格式见 server/routes/chat.ts：`${[Use skill: x]\n}${原文}`
+describe('extractLeadingSkillNotes', () => {
+  it('解析开头单个技能标记并剥离', () => {
+    const result = extractLeadingSkillNotes('[Use skill: character-creator]\n帮我建一个角色');
+    expect(result.skills).toEqual(['character-creator']);
+    expect(result.text).toBe('帮我建一个角色');
+  });
+
+  it('解析连续多个技能标记', () => {
+    const result = extractLeadingSkillNotes('[Use skill: leader]\n[Use skill: writer]\n正文');
+    expect(result.skills).toEqual(['leader', 'writer']);
+    expect(result.text).toBe('正文');
+  });
+
+  it('纯技能消息剥完为空字符串', () => {
+    const result = extractLeadingSkillNotes('[Use skill: character-creator]\n');
+    expect(result.skills).toEqual(['character-creator']);
+    expect(result.text).toBe('');
+  });
+
+  it('无标记原样返回', () => {
+    const result = extractLeadingSkillNotes('普通输入');
+    expect(result.skills).toEqual([]);
+    expect(result.text).toBe('普通输入');
+  });
+
+  it('正文中间的同形文本不剥离（只认前缀）', () => {
+    const content = '第一行\n[Use skill: not-a-note]\n第三行';
+    const result = extractLeadingSkillNotes(content);
+    expect(result.skills).toEqual([]);
+    expect(result.text).toBe(content);
+  });
+});
+
+describe('parseUserAttachments skills 回填', () => {
+  it('从 [Use skill: x] 前缀还原 skills 并清洗正文', () => {
+    const result = parseUserAttachments('[Use skill: character-creator]\n你好，帮我做个角色');
+    expect(result.skills).toEqual(['character-creator']);
+    expect(result.text).toBe('你好，帮我做个角色');
+  });
+
+  it('无技能标记时 skills 为空数组', () => {
+    const result = parseUserAttachments('你好');
+    expect(result.skills).toEqual([]);
+    expect(result.text).toBe('你好');
   });
 });

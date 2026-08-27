@@ -42,7 +42,7 @@ const KNOWN_MODELS = {
   },
   deepseek: {
     "deepseek-chat": { name: "DeepSeek Chat", context: 128000, maxOutput: 8192 },
-    "deepseek-v4-pro": { name: "DeepSeek V4 Pro", context: 1000000, maxOutput: 384000, reasoning: true, xhigh: true },
+    "deepseek-v4-pro": { name: "DeepSeek V4 Pro", context: 1000000, maxOutput: 384000, reasoning: true, xhigh: true, outputIncludesThinking: false },
   },
   zhipu: {
     "glm-4.7-flash": { name: "GLM-4.7 Flash", context: 200000, maxOutput: 128000, reasoning: true },
@@ -609,6 +609,32 @@ describe("syncModels", () => {
     expect(model.reasoning).toBe(true);
     expect(model.quirks).toEqual(["enable_thinking"]);
     expect(model.compat.thinkingFormat).toBe("qwen");
+  });
+
+  it("projects outputIncludesThinking from known dictionary and user entries", async () => {
+    const syncModels = await loadSync();
+
+    const providers = {
+      deepseek: {
+        base_url: "https://api.deepseek.com",
+        api: "openai-completions",
+        api_key: "sk-test",
+        // 字符串条目：outputIncludesThinking 来自 known 词典（separate 语义）
+        models: [
+          "deepseek-v4-pro",
+          // 对象条目：用户显式声明 included，覆盖词典缺省推导
+          { id: "custom-thinking-model", reasoning: true, maxOutput: 131072, outputIncludesThinking: true },
+        ],
+      },
+    };
+
+    syncModels(providers, { modelsJsonPath });
+
+    const result = JSON.parse(fs.readFileSync(modelsJsonPath, "utf-8"));
+    const [fromKnown, fromUser] = result.providers.deepseek.models;
+    expect(fromKnown.id).toBe("deepseek-v4-pro");
+    expect(fromKnown.outputIncludesThinking).toBe(false);
+    expect(fromUser.outputIncludesThinking).toBe(true);
   });
 
   it("preserves user-declared max thinking capability for local model objects", async () => {

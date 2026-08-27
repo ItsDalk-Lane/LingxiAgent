@@ -2197,11 +2197,11 @@ export class LingxiEngine {
       systemPrompt: request.systemPrompt,
       messages: [{ role: "user", content: request.userPrompt }],
       temperature: 0,
-      maxTokens: request.operation === "quick_answer" ? 2048 : 4096,
+      maxTokens: request.operation === "quick_answer" ? 2048 : 32_768,
       outputPolicy: "bounded",
       outputBudgetSource: "system",
       callPurpose: callPurposeByOperation[request.operation] || "knowledge_research_analysis",
-      timeoutMs: request.operation === "quick_answer" ? 90_000 : 120_000,
+      timeoutMs: request.operation === "quick_answer" ? 240_000 : 240_000,
       signal: request.signal,
       usageLedger: resolved.usageLedger,
       usageContext: {
@@ -2252,6 +2252,9 @@ export class LingxiEngine {
     return this._embeddingClient.embed({
       texts: request.texts,
       signal: request.signal,
+      // 知识向量化按块批量编码,本地模型(如 ollama 8B)跑完一个来源的全部块
+      // 可能远超操作客户端 30s 默认超时,超时会以 retrieval unavailable 失败整个 run。
+      timeoutMs: 300_000,
       usageContext: this._knowledgeOperationUsageContext("embedding", request.runId),
     });
   }
@@ -2262,6 +2265,7 @@ export class LingxiEngine {
       documents: request.documents,
       topN: request.topN,
       signal: request.signal,
+      timeoutMs: 120_000,
       usageContext: this._knowledgeOperationUsageContext("rerank", request.runId),
     });
   }

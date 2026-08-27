@@ -1855,7 +1855,7 @@ export class ProviderRegistry {
    * 裸字符串条目会被升级为对象
    * @param {string} providerId
    * @param {string} modelId
-   * @param {{ name?: string, api?: string, context?: number, contextWindow?: number, maxOutput?: number, maxTokens?: number, maxOutputTokens?: number, image?: boolean, video?: boolean, audio?: boolean, reasoning?: boolean, xhigh?: boolean, thinkingLevels?: string[], thinkingLevelMap?: object, defaultThinkingLevel?: string, compat?: object, toolUse?: object, visionCapabilities?: object }} meta
+   * @param {{ name?: string, api?: string, context?: number, contextWindow?: number, maxOutput?: number, maxTokens?: number, maxOutputTokens?: number, outputIncludesThinking?: boolean, image?: boolean, video?: boolean, audio?: boolean, reasoning?: boolean, xhigh?: boolean, thinkingLevels?: string[], thinkingLevelMap?: object, defaultThinkingLevel?: string, compat?: object, toolUse?: object, visionCapabilities?: object }} meta
    */
   updateModelEntry(providerId, modelId, meta) {
     const { ownerProviderId, rawProvider, models } = this._providerConfigForModelMutation(providerId);
@@ -1880,11 +1880,14 @@ export class ProviderRegistry {
     }
 
     // 白名单：只允许模型能力字段（image 是标准名，vision 为旧名不写入）
-    const ALLOWED = ["name", "api", "context", "maxOutput", "image", "video", "audio", "reasoning", "xhigh", "thinkingLevels", "thinkingLevelMap", "type", "defaultThinkingLevel", "web", "structuredOutput", "operations", "operationProtocol", "dimensions"];
+    const ALLOWED = ["name", "api", "context", "maxOutput", "outputIncludesThinking", "image", "video", "audio", "reasoning", "xhigh", "thinkingLevels", "thinkingLevelMap", "type", "defaultThinkingLevel", "web", "structuredOutput", "operations", "operationProtocol", "dimensions"];
+    // null = 显式清除 outputIncludesThinking 覆盖、回到按线协议家族的自动推导。
+    const clearOutputIncludesThinking = meta?.outputIncludesThinking === null;
     const safe: any = {};
     for (const key of ALLOWED) {
       if (meta[key] !== undefined) safe[key] = meta[key];
     }
+    if (clearOutputIncludesThinking) delete safe.outputIncludesThinking;
     // 模态字段：保存时按 canonical 顺序去重排序；非法值显式 400
     for (const modalityField of ["inputs", "outputs"]) {
       const normalizedModality = normalizeValidatedModalityField(ownerProviderId, modelId, modalityField, meta?.[modalityField]);
@@ -1916,8 +1919,12 @@ export class ProviderRegistry {
       // 删除旧字段 vision，避免残留；显式 inputs 保存时同时剥离
       // image/video/audio legacy 布尔，避免两份互相冲突的输入模态真理。
       let cleaned: any = base;
-      if (base.vision !== undefined || stripLegacyInputFlags) {
-        const legacy = ["vision", ...(stripLegacyInputFlags ? ["image", "video", "audio"] : [])];
+      if (base.vision !== undefined || stripLegacyInputFlags || clearOutputIncludesThinking) {
+        const legacy = [
+          "vision",
+          ...(stripLegacyInputFlags ? ["image", "video", "audio"] : []),
+          ...(clearOutputIncludesThinking ? ["outputIncludesThinking"] : []),
+        ];
         cleaned = Object.fromEntries(Object.entries(base).filter(([key]) => !legacy.includes(key)));
       }
       return mergeModelMetadata(cleaned, safe);

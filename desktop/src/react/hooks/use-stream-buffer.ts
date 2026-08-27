@@ -88,6 +88,12 @@ interface Buffer {
   /** 过程区到达序号计数器：思考段/工具组/卡片首次物化时各取一个单调递增的戳，
    *  投影层据此把两条"车道"交错回真实时间线。 */
   nextProcessOrder: number;
+  /** 防重放叠加：每个 canonical 段已应用的最大事件 seq；≤ 它的 delta 直接丢弃。
+   *  resume 增量重放在流元数据失配时会把已应用事件原样重发，没有这层防御
+   *  会把同一段正文拼接两遍（尾重叠）或让同一工具调用生成第二张卡。 */
+  canonicalAppliedSeqBySegment: Map<string, number>;
+  /** 防重放叠加：本 Run 内已应用的 tool_start 事件 seq 集合。 */
+  appliedToolStartSeqs: Set<number>;
 }
 
 function createBuffer(sessionPath: string): Buffer {
@@ -120,6 +126,8 @@ function createBuffer(sessionPath: string): Buffer {
     lastFinalizedRunKey: null,
     canonicalLocked: false,
     nextProcessOrder: 0,
+    canonicalAppliedSeqBySegment: new Map(),
+    appliedToolStartSeqs: new Set(),
   };
 }
 
@@ -293,6 +301,8 @@ class StreamBufferManager {
     buf.textAcc = '';
     buf.blocks = [];
     buf.segmentsById.clear();
+    buf.canonicalAppliedSeqBySegment.clear();
+    buf.appliedToolStartSeqs.clear();
     buf.segmentOrder = [];
     buf.textSegmentAcc = '';
     buf.textSegmentOrdinal = null;
@@ -432,6 +442,14 @@ class StreamBufferManager {
       if (!existing) buf.segmentOrder.push(msg.segmentId);
       buf.segmentsById.set(msg.segmentId, segment);
     } else if (msg.type === 'assistant_segment_delta') {
+      // 幂等防御：resume 增量重放会原样重发 delta，≤ 已应用 seq 的重复禁止再拼接，
+      // 否则同一段正文出现尾部重叠重复。无 seq 的旧协议保持原行为。
+      const incomingSeq = Number.isFinite(msg.seq) ? Math.max(0, Math.floor(Number(msg.seq))) : null;
+      if (incomingSeq !== null) {
+        const appliedSeq = buf.canonicalAppliedSeqBySegment.get(msg.segmentId);
+        if (appliedSeq !== undefined && incomingSeq <= appliedSeq) return;
+        buf.canonicalAppliedSeqBySegment.set(msg.segmentId, incomingSeq);
+      }
       const semanticPhase = normalizeLiveSegmentPhase(msg.semanticPhase || existing?.semanticPhase);
       const segment: LiveAssistantSegment = existing || {
         id: msg.segmentId,
@@ -752,10 +770,25 @@ class StreamBufferManager {
         break;
       }
 
-      case 'tool_start':
+      case 'tool_start': {
+        // 幂等防御（第一层，按事件 seq）：resume 增量重放会原样重发 tool_start，
+        // 同一 seq 只允许成卡一次；无 seq 的旧协议保持原行为。
+        const startSeq = Number.isFinite(msg.seq) ? Math.max(0, Math.floor(Number(msg.seq))) : null;
+        if (startSeq !== null) {
+          if (buf.appliedToolStartSeqs.has(startSeq)) break;
+          buf.appliedToolStartSeqs.add(startSeq);
+        }
         this.ensureMessage(buf);
         this.publishBoundary(buf, (m) => {
           const blocks = [...(m.blocks || [])];
+          // 幂等防御（第二层，按工具身份）：即使 seq 缺失，同一 toolCallId 也
+          // 绝不生成第二张卡。tool_end 侧的 findOpenToolIndex 已天然幂等。
+          const callId = typeof msg.id === 'string' ? msg.id : '';
+          if (callId && blocks.some((block) => (
+            block.type === 'tool_group' && block.tools.some((tool) => tool.id === callId)
+          ))) {
+            return m;
+          }
           // 找最后一个 tool_group 或创建新的
           let lastTg = blocks.length - 1;
           while (lastTg >= 0 && blocks[lastTg].type !== 'tool_group') lastTg--;
@@ -783,6 +816,7 @@ class StreamBufferManager {
         buf.textSegmentAcc = '';
         buf.textSegmentOrdinal = null;
         break;
+      }
 
       case 'tool_end':
         this.publishBoundary(buf, (m) => {

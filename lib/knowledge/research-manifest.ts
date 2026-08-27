@@ -7,7 +7,7 @@ import type { KnowledgeBlock, KnowledgeScopeSnapshot } from "./types.ts";
 export const DEFAULT_ANALYSIS_UNIT_PRIMARY_CHARS = 6_000;
 export const DEFAULT_EXECUTION_BATCH_CHARS = 18_000;
 const CONTEXT_CHARS = 240;
-const MAX_UNITS_PER_BATCH = 4;
+const MAX_UNITS_PER_BATCH = 2;
 
 function stableId(prefix: string, ...parts: Array<string | number>): string {
   const digest = crypto.createHash("sha256").update(parts.join("\u0000"), "utf8").digest("hex");

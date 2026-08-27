@@ -32,6 +32,17 @@ export type ModelCallScope = {
   traceId?: string | null;
   parentCallId?: string | null;
   model?: ModelCallModelIdentity | null;
+  /**
+   * Output Budget Fact 解析用的最小模型能力切片（streamFn wrapper 在模型对象
+   * 还在手上时摘取）：{ maxTokens?, outputIncludesThinking?, reasoning?,
+   * compat.outputIncludesThinking? }。仅结构标量，不含内容与重引用。
+   */
+  modelBudgetMeta?: {
+    maxTokens?: number | null;
+    outputIncludesThinking?: boolean;
+    reasoning?: boolean;
+    compat?: { outputIncludesThinking?: boolean } | null;
+  } | null;
   source?: ModelCallSource | null;
   attribution?: ModelCallAttribution | null;
   /** 上游（如 MC-02 runner）附带的小型安全 metadata，merge 进 logical_call_start details。 */

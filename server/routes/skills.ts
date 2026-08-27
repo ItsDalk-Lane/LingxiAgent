@@ -18,6 +18,8 @@ import {
   installSkillPackageFromPath,
   sanitizeSkillName,
 } from "../../lib/skills/skill-package-installer.ts";
+import { withSkillMutationLock } from "../../lib/skills/install-lock.ts";
+import { removeUserSkills } from "../../lib/skills/skill-removal.ts";
 import { t } from "../../lib/i18n.ts";
 import { validateId, agentExists } from "../utils/validation.ts";
 import { registerSessionFileFromRequest } from "../../lib/session-files/session-file-response.ts";
@@ -25,7 +27,6 @@ import {
   createSkillBundle,
   deleteSkillBundle,
   loadSkillBundleStore,
-  removeSkillsFromBundles,
   reorderSkillBundles,
   updateSkillBundle,
 } from "../../lib/skill-bundles/store.ts";
@@ -34,11 +35,6 @@ import { createModuleLogger } from "../../lib/debug-log.ts";
 import { materializeUploadedSkillPackage } from "../utils/uploaded-skill-package.ts";
 
 const log = createModuleLogger("skills");
-
-/** 递归删除目录 */
-function rmDirSync(dir) {
-  fs.rmSync(dir, { recursive: true, force: true });
-}
 
 function installErrorMessage(err, sourcePath) {
   switch (err?.code) {
@@ -64,14 +60,9 @@ function installErrorMessage(err, sourcePath) {
 export function createSkillsRoute(engine) {
   const route = new Hono();
 
-  // 安装/删除/reload 共享互斥锁，防止 reloadSkills() 并发导致 500
-  let _installLock = Promise.resolve();
-  function withInstallLock(fn) {
-    const prev = _installLock;
-    let resolve;
-    _installLock = new Promise(r => { resolve = r; });
-    return prev.then(fn).finally(resolve);
-  }
+  // 安装/删除/reload 共享互斥锁（模块级单例，与 agents 路由的连带删技能共用），
+  // 防止 reloadSkills() 并发导致 500
+  const withInstallLock = withSkillMutationLock;
 
   const agentSkillWriteLocks = new Map();
 
@@ -510,31 +501,12 @@ export function createSkillsRoute(engine) {
         return c.json({ error: t("error.skillNotExists") }, 404);
       }
 
-      // 删除目录
-      rmDirSync(userSkillPath);
-
-      // 从所有 agent 的 enabled 列表中移除
-      const agentsDir = engine.agentsDir;
-      for (const agentName of fs.readdirSync(agentsDir)) {
-        const configPath = path.join(agentsDir, agentName, "config.yaml");
-        if (!fs.existsSync(configPath)) continue;
-        try {
-          const { loadConfig } = await import("../../lib/memory/config-loader.ts");
-          const cfg = loadConfig(configPath);
-          const enabled = cfg?.skills?.enabled;
-          if (Array.isArray(enabled) && enabled.includes(name)) {
-            const filtered = enabled.filter(n => n !== name);
-            saveConfig(configPath, { skills: { enabled: filtered } });
-          }
-        } catch (e) {
-          log.error(`清理 agent ${agentName} 的 skill 引用失败: ${e.message}`);
-        }
-      }
-
-      // 重新加载 skills
-      await engine.reloadSkills();
-      if (engine.lingxiHome) {
-        removeSkillsFromBundles(engine, [name]);
+      // 删除目录 + 清理所有 agent 的 enabled 引用 + bundle 引用 + reload
+      // （共享逻辑，与「删除助手时连带删技能」走同一条路径）
+      const { removed, skipped } = await removeUserSkills(engine, [name]);
+      if (!removed.includes(name)) {
+        const reason = skipped.find(s => s.name === name)?.reason || "remove_failed";
+        return c.json({ error: `failed to delete skill: ${reason}` }, 500);
       }
 
       emitAppEvent(engine, "skills-changed", { agentId: targetAgentId || null });

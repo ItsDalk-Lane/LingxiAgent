@@ -562,6 +562,59 @@ function sameReasoningReplayContract(left: any, right: any) {
     && left.clearable === right.clearable;
 }
 
+/**
+ * Resolve whether the model's max-output budget already contains its
+ * chain-of-thought tokens.
+ *
+ * Provider semantics differ and MUST NOT be treated uniformly:
+ *
+ *   - "included"：思维链消耗计入 max output 上限（Anthropic Messages 的
+ *     budget_tokens、Gemini 的 maxOutputTokens、OpenAI Responses 的 reasoning
+ *     items、豆包 Seed / Kimi K2-Thinking 等把 reasoning 计入 completion 的
+ *     OpenAI 兼容通道）。此时输出预算要给思考留余量，否则思考会挤压最终回答。
+ *   - "separate"：声明的 max output 只约束最终回答，思维链由服务端在这个上限
+ *     之外单独计费/预算（DeepSeek 官方 reasoner 家族等）。此时按纯答案长度
+ *     处理，不再为思考预留或扣除任何空间。
+ *
+ * Precedence:
+ *   1. model.compat.outputIncludesThinking（目录/用户显式契约）
+ *   2. model.outputIncludesThinking（model-sync 投影到运行时模型对象）
+ *   3. DeepSeek 官方 endpoint 基线 —— 无论走哪条线协议通道（ChatCompletions、
+ *      Responses 还是 Anthropic 兼容），官方语义都是思维链独立预算，不随
+ *      wire family 翻转。显式声明仍可覆盖这条基线。
+ *   4. 线协议家族兜底 —— 只对语义由协议保证的家族下结论；其余 openai-completions
+ *      推理家族按 "separate" 兜底（与 DeepSeek 语义一致，也是历史行为），
+ *      计入型厂商必须在目录条目上显式声明 true。
+ */
+export type OutputThinkingComposition = "included" | "separate";
+
+export function getOutputThinkingComposition(model: any, context: any = {}): OutputThinkingComposition {
+  const explicitCompat = isPlainObject(model?.compat)
+    ? model.compat.outputIncludesThinking
+    : undefined;
+  if (explicitCompat === true) return "included";
+  if (explicitCompat === false) return "separate";
+  if (model?.outputIncludesThinking === true) return "included";
+  if (model?.outputIncludesThinking === false) return "separate";
+
+  // DeepSeek 官方 endpoint：CoT 与最终回答始终是两本账（max_tokens/max_output_tokens
+  // 只约束答案），线协议换成 Responses / Anthropic 兼容也不改变这个语义。
+  if (isOfficialDeepSeekEndpoint(model, context)) return "separate";
+
+  const api = getApi(model, context);
+  if (
+    api === "anthropic-messages"
+    || api === "google-generative-ai"
+    || api === "google-vertex"
+    || api === "openai-responses"
+    || api === "openai-codex-responses"
+    || api === "azure-openai-responses"
+  ) {
+    return "included";
+  }
+  return "separate";
+}
+
 export function withThinkingFormatCompat(model: any, context: any = {}) {
   if (!isPlainObject(model)) return model;
 

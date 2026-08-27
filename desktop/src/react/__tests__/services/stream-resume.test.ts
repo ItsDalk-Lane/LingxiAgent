@@ -97,6 +97,8 @@ describe('stream-resume', () => {
     injectHandlers((msg) => handled.push(msg), (isStreaming, sessionPath) => {
       statuses.push({ isStreaming, sessionPath });
     });
+    // 断点连续性凭证：本地此前已真实消费 seq 1（信任门槛要求）。
+    updateSessionStreamMeta({ sessionPath: '/background.jsonl', streamId: 'stream_2', seq: 1 });
 
     replayStreamResume({
       type: 'stream_resume',
@@ -129,18 +131,21 @@ describe('stream-resume', () => {
     const handled: unknown[] = [];
     injectHandlers((msg) => handled.push(msg), vi.fn());
 
+    // 本地已消费到 seq1；重放只补发其后的增量（信任门槛前提）。
+    updateSessionStreamMeta({ sessionPath: '/background.jsonl', streamId: 'stream_dedupe', seq: 1 });
+
     const resume = {
       type: 'stream_resume',
       sessionPath: '/background.jsonl',
       streamId: 'stream_dedupe',
-      sinceSeq: 0,
-      nextSeq: 3,
+      sinceSeq: 1,
+      nextSeq: 4,
       isStreaming: true,
       reset: false,
       truncated: false,
       events: [
-        { seq: 1, event: { type: 'tool_start', name: 'echo', args: { value: 'one' } } },
-        { seq: 2, event: { type: 'tool_end', name: 'echo', success: true } },
+        { seq: 2, event: { type: 'tool_start', name: 'echo', args: { value: 'one' } } },
+        { seq: 3, event: { type: 'tool_end', name: 'echo', success: true } },
       ],
     };
 
@@ -149,8 +154,8 @@ describe('stream-resume', () => {
 
     expect(handled).toHaveLength(2);
     expect(handled).toEqual([
-      expect.objectContaining({ type: 'tool_start', seq: 1 }),
-      expect.objectContaining({ type: 'tool_end', seq: 2 }),
+      expect.objectContaining({ type: 'tool_start', seq: 2 }),
+      expect.objectContaining({ type: 'tool_end', seq: 3 }),
     ]);
   });
 

@@ -67,6 +67,8 @@ export function extractMoodBlocksFromContent(content: string): { moods: Array<{ 
 
 export interface ParsedAttachments {
   text: string;
+  /** 手动技能调用的胶囊名，来自落盘时的 [Use skill: x] 前缀标记。 */
+  skills: string[];
   files: Array<{ path: string; name: string; isDirectory: boolean }>;
   attachedImages: Array<{ path: string; name: string }>;
   attachedVideos: Array<{ path: string; name: string }>;
@@ -79,6 +81,30 @@ export interface ParsedAttachments {
 function baseName(p: string): string {
   const normalized = p.replace(/\\/g, '/');
   return normalized.split('/').pop() || p;
+}
+
+const USE_SKILL_LINE_RE = /^\[Use skill:\s*([^\]]+?)\]\s*$/;
+
+/**
+ * 服务端落盘用户 prompt 时会把手动调用的技能拼成前缀标记
+ * （server/routes/chat.ts：`${[Use skill: x]\n}${原文}`）。这里只认
+ * 连续出现在开头的前缀标记，与写入侧对称；正文中间的同形文本不动。
+ */
+export function extractLeadingSkillNotes(content: string): { skills: string[]; text: string } {
+  const lines = content.split('\n');
+  let index = 0;
+  const skills: string[] = [];
+  while (index < lines.length) {
+    const match = lines[index].match(USE_SKILL_LINE_RE);
+    if (!match) break;
+    const name = match[1].trim();
+    if (!name) break;
+    skills.push(name);
+    index += 1;
+  }
+  if (skills.length === 0) return { skills: [], text: content };
+  // 原文为空时残余一个尾随换行，交给调用方的尾部 trim 收口。
+  return { skills, text: lines.slice(index).join('\n').replace(/^\n/, '') };
 }
 
 function parseSessionFileMarker(line: string): { fileId: string; sessionPath?: string; label: string; kind: string } | null {
@@ -112,8 +138,10 @@ function parseSessionFileMarker(line: string): { fileId: string; sessionPath?: s
 }
 
 export function parseUserAttachments(content: string): ParsedAttachments {
-  if (!content) return { text: '', files: [], attachedImages: [], attachedVideos: [], attachedAudios: [], sessionFileRefs: [], deskContext: null, quotedText: null };
+  if (!content) return { text: '', skills: [], files: [], attachedImages: [], attachedVideos: [], attachedAudios: [], sessionFileRefs: [], deskContext: null, quotedText: null };
   content = stripLeadingSessionReminder(content);
+  const skillNotes = extractLeadingSkillNotes(content);
+  content = skillNotes.text;
   const lines = content.split('\n');
   const textLines: string[] = [];
   const files: Array<{ path: string; name: string; isDirectory: boolean }> = [];
@@ -219,7 +247,7 @@ export function parseUserAttachments(content: string): ParsedAttachments {
     }
   }
   const text = textLines.join('\n').replace(/\n+$/, '').trim();
-  return { text, files, attachedImages, attachedVideos, attachedAudios, sessionFileRefs, deskContext, quotedText };
+  return { text, skills: skillNotes.skills, files, attachedImages, attachedVideos, attachedAudios, sessionFileRefs, deskContext, quotedText };
 }
 
 // ── 工具详情提取 ──

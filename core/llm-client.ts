@@ -1,6 +1,7 @@
 import { AppError } from '../shared/errors.ts';
 import { errorBus } from '../shared/error-bus.ts';
 import { normalizeProviderPayload } from './provider-compat.ts';
+import { resolveOutputBudgetFact } from './provider-compat/output-budget.ts';
 import { buildProviderCompatOptions } from './llm-request-policy.ts';
 import { logLlmUsage, normalizeLlmUsage } from '../lib/llm/usage-observer.ts';
 import { appendProviderApiPath, withDefaultProviderHeaders } from '../lib/llm/provider-client.ts';
@@ -472,7 +473,7 @@ function convertContentForApi(content, api) {
 // ── ModelCallObserver 安全 metadata ──
 // 只提取不可逆结构信息：消息/工具计数、system 存在性、媒体存在性、字节估算。
 // 绝不读取或携带正文内容（§八）。
-function summarizeCallTextRequest(body, api, serializedByteLength) {
+function summarizeCallTextRequest(body, api, serializedByteLength, outputBudgetFact = null) {
   const summary = summarizeProviderRequestPayload(body);
   return {
     protocol: api,
@@ -483,6 +484,7 @@ function summarizeCallTextRequest(body, api, serializedByteLength) {
     // callText 历史字段名保持 hasImages；共享 helper 统一输出 hasMedia
     hasImages: summary.hasMedia,
     inputByteEstimate: Number.isFinite(serializedByteLength) ? serializedByteLength : null,
+    ...(outputBudgetFact ? { outputBudget: outputBudgetFact } : {}),
   };
 }
 
@@ -795,12 +797,17 @@ export async function callText({
         ? { id: modelId, provider, api, baseUrl, quirks }
         : null
     );
-  body = normalizeProviderPayload(body, modelForCompat, buildProviderCompatOptions({
+  const providerCompatOptions = buildProviderCompatOptions({
     mode: "utility",
     callPurpose,
     explicitMaxTokens,
     outputBudgetSource,
-  }));
+  });
+  body = normalizeProviderPayload(body, modelForCompat, providerCompatOptions);
+  // Output Budget Fact：与 chat 路径同款，最终 body + 调用方 source 物化成
+  // attempt 持久事实（safe_details_json），utility 的 system/user 显式预算
+  // 从此可与 SDK/默认派生值区分。
+  const outputBudgetFact = resolveOutputBudgetFact(body, modelForCompat, providerCompatOptions);
 
   // ── 3.5 Provider Request Provenance（Phase 6，§五十九/§一三八）──
   // mapping 在 body 构造分支产生（构造事实），normalizeProviderPayload 之后做
@@ -831,7 +838,7 @@ export async function callText({
   const serializedBody = JSON.stringify(body);
   // provider_request_prepared 只带结构 metadata，绝不携带 body（§八）。
   modelCallRecorder.providerRequestPrepared({
-    details: summarizeCallTextRequest(body, api, serializedBody.length),
+    details: summarizeCallTextRequest(body, api, serializedBody.length, outputBudgetFact),
   });
   // Phase 6 Provider Request Capture（§六十四）：normalize 完成、stringify/fetch
   // 之前的最终 body + 真实 headers/endpoint；凭证（x-api-key/Authorization）在

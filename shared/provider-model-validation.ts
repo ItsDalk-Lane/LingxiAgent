@@ -149,6 +149,16 @@ function validateModelMetadata(providerId, model) {
   for (const field of ["web", "structuredOutput"]) {
     validateBooleanField(providerId, modelId, model, field);
   }
+  // 「最大输出是否包含思维链」的按模型契约：true=思维链计入 maxOutput（豆包
+  // Seed / Kimi K2-Thinking 等），false=思维链独立预算、maxOutput 仅约束最终
+  // 回答（DeepSeek reasoner 等）。缺省时按线协议家族推导；null 显式清除用户
+  // 覆盖、回到自动推导。
+  if (Object.prototype.hasOwnProperty.call(model, "outputIncludesThinking")) {
+    const value = model.outputIncludesThinking;
+    if (value !== true && value !== false && value !== null) {
+      throw new ProviderModelMetadataValidationError(providerId, modelId, "outputIncludesThinking", "expected a boolean or null");
+    }
+  }
   for (const field of ["inputs", "outputs"]) {
     validateModalityField(providerId, modelId, model, field);
   }

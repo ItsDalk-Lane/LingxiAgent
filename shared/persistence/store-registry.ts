@@ -1132,7 +1132,7 @@ export const PERSISTENT_STORES: readonly StoreDescriptor[] = Object.freeze([
       ...rules(["lib/skill-bundles/package-service.ts", "lib/skill-bundles/store.ts", "lib/skills/skill-package-installer.ts", "server/utils/uploaded-skill-package.ts"], "Installs, exports, uploads, or records skill packages."),
       ...rules(["core/engine.ts"], "Creates the user skill root.", ["mkdir"], "skillsDir"),
       ...rules(["lib/character-cards/service.ts"], "Installs, rolls back, or renames a skill imported from a character card.", ["mkdir", "write-file", "remove-path"], "(?:engine[.]userSkillsDir|skillMdPath|item[.]dir)"),
-      ...rules(["server/routes/skills.ts"], "Removes an installed user skill through the skill owner route.", ["remove-path"], "rmSync\\(dir"),
+      ...rules(["lib/skills/skill-removal.ts"], "Removes installed user skills (single delete route and agent-delete cleanup share this module).", ["remove-path"], "rmSync\\(dir"),
     ],
   }),
   defineStore({

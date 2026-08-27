@@ -4,7 +4,8 @@
  * GET    /api/agents              — 列出所有助手
  * POST   /api/agents              — 创建新助手
  * POST   /api/agents/switch       — 切换到指定助手
- * DELETE /api/agents/:id          — 删除助手
+ * DELETE /api/agents/:id          — 删除助手（可选 body { deleteSkills: string[] }，连带删除其独占技能）
+ * GET    /api/agents/:id/skills/cleanup-preview — 预览可随该助手一并删除的孤儿技能
  * PUT    /api/agents/primary      — 设置主助手
  * GET    /api/agents/:id/avatar   — 获取指定助手的头像
  * POST   /api/agents/:id/avatar   — 上传指定助手的头像
@@ -42,6 +43,11 @@ import {
 } from "../../lib/memory/pinned-memory-store.ts";
 import { splitByScope, injectGlobalFields } from '../../shared/config-scope.ts';
 import { validateId, agentExists } from "../utils/validation.ts";
+import {
+  computeAgentOrphanSkills,
+  removeUserSkills,
+} from "../../lib/skills/skill-removal.ts";
+import { withSkillMutationLock } from "../../lib/skills/install-lock.ts";
 import {
   OPTIONAL_TOOL_NAMES,
   computeSettingsAvailableToolNames,
@@ -337,10 +343,37 @@ export function createAgentsRoute(engine) {
     }
   });
 
+  // 可随该助手一并删除的「孤儿」技能预览：
+  // 仅该助手启用、其他存活助手都未启用、可删除的用户技能（不含内置种子/外部/插件）
+  route.get("/agents/:id/skills/cleanup-preview", async (c) => {
+    try {
+      const id = c.req.param("id");
+      if (!validateId(id)) return c.json({ error: "invalid id" }, 400);
+      if (!agentExists(engine, id)) return c.json({ error: "agent not found" }, 404);
+      const { skills } = computeAgentOrphanSkills(engine, id);
+      return c.json({ skills });
+    } catch (err) {
+      return c.json({ error: err.message }, 500);
+    }
+  });
+
   route.delete("/agents/:id", async (c) => {
     try {
       const id = c.req.param("id");
       if (!validateId(id)) return c.json({ error: "invalid id" }, 400);
+      // 可选 body: { deleteSkills: string[] } —— 不带 body 时行为与旧版完全一致
+      const body = await safeJson(c);
+      const requestedSkills = Array.isArray(body.deleteSkills)
+        ? [...new Set(body.deleteSkills.filter(n => typeof n === "string" && n.trim()))]
+        : [];
+
+      // 名单先与「当前仍独占」的候选集求交：预览之后如果技能又被其他助手启用
+      // 或已不可删，则跳过该项而不是误删（跳过项随响应返回，前端可见）。
+      let allowedNames = null;
+      if (requestedSkills.length > 0) {
+        allowedNames = new Set(computeAgentOrphanSkills(engine, id).skills.map(s => s.name));
+      }
+
       const result = await engine.deleteAgent(id);
       const replacementAgentId = result?.replacementAgentId || null;
       if (replacementAgentId) {
@@ -352,7 +385,32 @@ export function createAgentsRoute(engine) {
         });
       }
       emitAppEvent(engine, "agent-deleted", { agentId: id });
-      return c.json({ ok: true, replacementAgentId });
+
+      // 助手删除成功后才动技能。助手删除不可逆，技能清理失败不让整个请求 500：
+      // 计入 skillsSkipped（显式降级并标注），错误只落日志。
+      let skillsDeleted = [];
+      let skillsSkipped = allowedNames
+        ? requestedSkills
+            .filter(name => !allowedNames.has(name))
+            .map(name => ({ name, reason: "not_orphan" }))
+        : [];
+      if (allowedNames) {
+        const names = requestedSkills.filter(name => allowedNames.has(name));
+        if (names.length > 0) {
+          try {
+            const removal = await withSkillMutationLock(() => removeUserSkills(engine, names));
+            skillsDeleted = removal.removed;
+            skillsSkipped.push(...removal.skipped);
+          } catch (err) {
+            log.error(`删除助手 (${id}) 连带清理技能失败: ${err.message}`);
+            skillsSkipped.push(...names.map(name => ({ name, reason: "removal_failed" })));
+          }
+        }
+        if (skillsDeleted.length > 0) {
+          emitAppEvent(engine, "skills-changed", { agentId: null });
+        }
+      }
+      return c.json({ ok: true, replacementAgentId, skillsDeleted, skillsSkipped });
     } catch (err) {
       const code = err.message.includes("cannot delete the last agent") ? 400
         : err.message.includes("不能删除当前") ? 400

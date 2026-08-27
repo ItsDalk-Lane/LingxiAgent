@@ -356,9 +356,7 @@ describe("model-call-observer-ext — provider hooks 经 ALS scope 关联", () =
       callId: "mc_hook",
       attemptId: "ma_hook",
       model: { provider: "anthropic", modelId: "claude", api: "anthropic-messages" },
-    }, () => pi.handlers.before_provider_request({ type: "before_provider_request", payload }, {}));
-
-    expect(result).toBeUndefined();
+    }, () => pi.handlers.before_provider_request({ type: "before_provider_request", payload }, {}));    expect(result).toBeUndefined();
     expect(payload.system).toBe("TOPSECRET_SYSTEM"); // payload 未被改动
 
     const prepared = observer.eventsOfType("provider_request_prepared")[0];
@@ -369,10 +367,48 @@ describe("model-call-observer-ext — provider hooks 经 ALS scope 关联", () =
       hasSystemPrompt: true,
       hasMedia: false,
       streaming: true,
+      // Output Budget Fact：payload 无 cap 字段 → absent（included 家族信息仍保留）
+      outputBudget: {
+        field: null,
+        value: null,
+        ownership: "absent",
+        composition: "included",
+      },
     });
     const serialized = JSON.stringify(prepared);
     expect(serialized).not.toContain("TOPSECRET_SYSTEM");
     expect(serialized).not.toContain("TOPSECRET_USER");
+  });
+
+  it("before_provider_request：cap 字段物化为 hana-chat-default（included 家族）", async () => {
+    const observer = createTestModelCallObserver();
+    setModelCallObserver(observer);
+    const pi = piMock();
+    createModelCallObserverExtension()(pi);
+
+    const payload = {
+      stream: true,
+      system: "TOPSECRET_SYSTEM",
+      messages: [{ role: "user", content: [{ type: "text", text: "hi" }] }],
+      max_tokens: 81920,
+    };
+    runWithModelCallScope({
+      callId: "mc_hook_budget",
+      attemptId: "ma_hook_budget",
+      model: { provider: "anthropic", modelId: "claude", api: "anthropic-messages" },
+      modelBudgetMeta: { maxTokens: 128000 },
+    }, () => pi.handlers.before_provider_request({ type: "before_provider_request", payload }, {}));
+
+    const prepared = observer.eventsOfType("provider_request_prepared")[0];
+    expect(prepared.callId).toBe("mc_hook_budget");
+    expect(prepared.details.outputBudget).toMatchObject({
+      field: "max_tokens",
+      value: 81920,
+      composition: "included",
+      ownership: "hana-chat-default",
+      chatDefault: 81920,
+      declaredMaxOutput: 128000,
+    });
   });
 
   it("after_provider_response：httpStatus + providerRequestId（allowlist 头）", async () => {

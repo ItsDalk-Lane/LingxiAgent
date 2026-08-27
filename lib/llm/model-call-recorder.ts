@@ -249,7 +249,8 @@ export function createModelCallRecorder({
     /**
      * Provider 请求已完成构造并被观测到。details 只允许结构 metadata
      * （messageCount/toolCount/hasSystemPrompt/hasImages/streaming/protocol/
-     * inputByteEstimate）；绝不放 body/headers 全量。
+     * inputByteEstimate，以及结构化 outputBudget 预算来源事实）；绝不放
+     * body/headers 全量。
      */
     providerRequestPrepared({ details = null }: { details?: Record<string, unknown> | null } = {}) {
       emit("provider_request_prepared", { details });

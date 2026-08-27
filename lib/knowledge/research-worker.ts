@@ -168,7 +168,15 @@ function parseRawObject(raw: unknown, label: string): Record<string, unknown> {
   }
   let parsed: unknown;
   try {
-    parsed = JSON.parse(raw.trim());
+    let candidate = raw.trim();
+    const fenced = candidate.match(/^```(?:json)?\s*([\s\S]*?)\s*```$/u);
+    if (fenced) candidate = fenced[1].trim();
+    const firstBrace = candidate.indexOf("{");
+    const lastBrace = candidate.lastIndexOf("}");
+    if (firstBrace > 0 && lastBrace > firstBrace) {
+      candidate = candidate.slice(firstBrace, lastBrace + 1);
+    }
+    parsed = JSON.parse(candidate);
   } catch {
     throw new KnowledgeError("KNOWLEDGE_MODEL_OUTPUT_INVALID", `${label} is not valid JSON`);
   }
@@ -224,6 +232,21 @@ function indexes(value: unknown, label: string, upperBound: number): number[] {
   return result;
 }
 
+/**
+ * 宽容版索引清洗:剔除越界/重复/非整数的引用而不是整批拒绝。
+ * 剩余有效引用为空时返回 null,由调用方丢弃该条 claim。
+ * LLM 在长列表里偶发引用越界是常态,不值得以整个批次为代价。
+ */
+function tolerantIndexes(value: unknown, upperBound: number): number[] | null {
+  if (!Array.isArray(value) || value.length === 0) return null;
+  const seen = new Set<number>();
+  for (const entry of value) {
+    const num = Number(entry);
+    if (Number.isSafeInteger(num) && num >= 0 && num < upperBound) seen.add(num);
+  }
+  return seen.size > 0 ? [...seen] : null;
+}
+
 function parseEvidenceCandidate(value: unknown, label: string): AnalysisEvidenceCandidate {
   const record = exactObject(value, label, [
     "anchorRef",
@@ -232,11 +255,12 @@ function parseEvidenceCandidate(value: unknown, label: string): AnalysisEvidence
     "quote",
     "epistemicBasis",
   ]);
-  const startOffset = Number(record.startOffset);
-  const endOffset = Number(record.endOffset);
-  if (!Number.isSafeInteger(startOffset) || startOffset < 0 || !Number.isSafeInteger(endOffset) || endOffset <= startOffset) {
-    throw new KnowledgeError("KNOWLEDGE_MODEL_OUTPUT_INVALID", `${label} offsets are invalid`);
-  }
+  // LLM 数不准偏移:offsets 仅作定位提示,合法区间最终由 validateCandidate
+  // 按 quote 唯一出现定位;非法数值降级为 (0,0) 而不是整批拒绝。
+  const rawStart = Number(record.startOffset);
+  const rawEnd = Number(record.endOffset);
+  const startOffset = Number.isSafeInteger(rawStart) && rawStart >= 0 ? rawStart : 0;
+  const endOffset = Number.isSafeInteger(rawEnd) && rawEnd > startOffset ? rawEnd : startOffset;
   return {
     anchorRef: stringValue(record.anchorRef, `${label}.anchorRef`, 32),
     startOffset,
@@ -312,31 +336,39 @@ export function parseAnalysisOutput(raw: unknown, expectedUnits: ResearchUnitPay
     if (!Array.isArray(record.candidateClaims) || record.candidateClaims.length > 100) {
       throw new KnowledgeError("KNOWLEDGE_MODEL_OUTPUT_INVALID", "Analysis candidate claims are invalid");
     }
-    const candidateClaims = record.candidateClaims.map((candidate, claimIndex) => {
-      const claim = exactObject(candidate, `candidateClaims[${claimIndex}]`, [
-        "text",
-        "supportStatus",
-        "epistemicBasis",
-        "evidenceCandidateIndexes",
-      ]);
-      return {
-        text: stringValue(claim.text, `candidateClaims[${claimIndex}].text`),
-        supportStatus: enumValue(
-          claim.supportStatus,
-          `candidateClaims[${claimIndex}].supportStatus`,
-          ["supported", "partial", "disputed", "insufficient"] as const,
-        ),
-        epistemicBasis: enumValue(
-          claim.epistemicBasis,
-          `candidateClaims[${claimIndex}].epistemicBasis`,
-          ["explicit", "inferred", "mixed"] as const,
-        ),
-        evidenceCandidateIndexes: indexes(
-          claim.evidenceCandidateIndexes,
-          `candidateClaims[${claimIndex}].evidenceCandidateIndexes`,
-          evidenceCandidates.length,
-        ),
-      };
+    const candidateClaims: Array<{
+      text: string;
+      supportStatus: "supported" | "partial" | "disputed" | "insufficient";
+      epistemicBasis: "explicit" | "inferred" | "mixed";
+      evidenceCandidateIndexes: number[];
+    }> = [];
+    record.candidateClaims.forEach((candidate, claimIndex) => {
+      try {
+        const claim = exactObject(candidate, `candidateClaims[${claimIndex}]`, [
+          "text",
+          "supportStatus",
+          "epistemicBasis",
+          "evidenceCandidateIndexes",
+        ]);
+        const refs = tolerantIndexes(claim.evidenceCandidateIndexes, evidenceCandidates.length);
+        if (!refs) return;
+        candidateClaims.push({
+          text: stringValue(claim.text, `candidateClaims[${claimIndex}].text`),
+          supportStatus: enumValue(
+            claim.supportStatus,
+            `candidateClaims[${claimIndex}].supportStatus`,
+            ["supported", "partial", "disputed", "insufficient"] as const,
+          ),
+          epistemicBasis: enumValue(
+            claim.epistemicBasis,
+            `candidateClaims[${claimIndex}].epistemicBasis`,
+            ["explicit", "inferred", "mixed"] as const,
+          ),
+          evidenceCandidateIndexes: refs,
+        });
+      } catch {
+        // 单条 claim 无效只丢弃该条,不拒绝整批
+      }
     });
     return {
       unitId,
@@ -464,34 +496,39 @@ export function parseContradictionOutput(raw: unknown, input: {
   if (root.matches.length > input.claimRefs.size * 20) {
     throw new KnowledgeError("KNOWLEDGE_MODEL_OUTPUT_INVALID", "Contradiction output is too large");
   }
-  const matches = root.matches.map((value, index) => {
-    const match = exactObject(value, `matches[${index}]`, [
-      "claimRef",
-      "anchorRef",
-      "startOffset",
-      "endOffset",
-      "quote",
-      "relation",
-      "epistemicBasis",
-      "explanation",
-    ]);
-    const claimRef = stringValue(match.claimRef, `matches[${index}].claimRef`, 32);
-    if (!input.claimRefs.has(claimRef)) {
-      throw new KnowledgeError("KNOWLEDGE_MODEL_OUTPUT_INVALID", "Contradiction references an unknown claim");
+  const matches: Array<ContradictionOutput["matches"][number]> = [];
+  root.matches.forEach((value, index) => {
+    // 矛盾发现是增益信息:单条 match 无效(未知引用/非法枚举/坏证据)只丢弃,
+    // 不以整个检查单元重试为代价。
+    try {
+      const match = exactObject(value, `matches[${index}]`, [
+        "claimRef",
+        "anchorRef",
+        "startOffset",
+        "endOffset",
+        "quote",
+        "relation",
+        "epistemicBasis",
+        "explanation",
+      ]);
+      const claimRef = stringValue(match.claimRef, `matches[${index}].claimRef`, 32);
+      if (!input.claimRefs.has(claimRef)) return;
+      const evidence = parseEvidenceCandidate({
+        anchorRef: match.anchorRef,
+        startOffset: match.startOffset,
+        endOffset: match.endOffset,
+        quote: match.quote,
+        epistemicBasis: match.epistemicBasis,
+      }, `matches[${index}]`);
+      matches.push({
+        claimRef,
+        ...evidence,
+        relation: enumValue(match.relation, `matches[${index}].relation`, ["contradicts", "context"] as const),
+        explanation: stringValue(match.explanation, `matches[${index}].explanation`),
+      });
+    } catch {
+      // 丢弃该条 match
     }
-    const evidence = parseEvidenceCandidate({
-      anchorRef: match.anchorRef,
-      startOffset: match.startOffset,
-      endOffset: match.endOffset,
-      quote: match.quote,
-      epistemicBasis: match.epistemicBasis,
-    }, `matches[${index}]`);
-    return {
-      claimRef,
-      ...evidence,
-      relation: enumValue(match.relation, `matches[${index}].relation`, ["contradicts", "context"] as const),
-      explanation: stringValue(match.explanation, `matches[${index}].explanation`),
-    };
   });
   return { unitId: input.unit.unitId, claimPackId: input.claimPackId, matches };
 }
@@ -500,14 +537,19 @@ function parseReportItems(value: unknown, label: string, claimRefs: Set<string>)
   if (!Array.isArray(value) || value.length > 100) {
     throw new KnowledgeError("KNOWLEDGE_MODEL_OUTPUT_INVALID", `${label} is invalid`);
   }
-  return value.map((entry, index) => {
-    const item = exactObject(entry, `${label}[${index}]`, ["text", "claimRefs"]);
-    const refs = stringArray(item.claimRefs, `${label}[${index}].claimRefs`, claimRefs.size);
-    if (refs.length === 0 || new Set(refs).size !== refs.length || refs.some(ref => !claimRefs.has(ref))) {
-      throw new KnowledgeError("KNOWLEDGE_MODEL_OUTPUT_INVALID", `${label} references unknown claims`);
+  const result: Array<{ text: string; claimRefs: string[] }> = [];
+  value.forEach((entry, index) => {
+    try {
+      const item = exactObject(entry, `${label}[${index}]`, ["text", "claimRefs"]);
+      const refs = stringArray(item.claimRefs, `${label}[${index}].claimRefs`, claimRefs.size);
+      const unique = [...new Set(refs)].filter(ref => claimRefs.has(ref));
+      if (unique.length === 0) return;
+      result.push({ text: stringValue(item.text, `${label}[${index}].text`), claimRefs: unique });
+    } catch {
+      // 报告条目无效只丢弃该条
     }
-    return { text: stringValue(item.text, `${label}[${index}].text`), claimRefs: refs };
   });
+  return result;
 }
 
 export function parseSynthesisOutput(raw: unknown, claimRefs: Set<string>): SynthesisOutput {

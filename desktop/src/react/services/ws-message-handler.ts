@@ -37,6 +37,7 @@ import {
 } from './stream-resume';
 import { TODO_TOOL_NAMES, type TodoToolName } from '../utils/todo-constants';
 import { applyTodoLifecycle, migrateLegacyTodos } from '../utils/todo-compat';
+import { extractLeadingSkillNotes } from '../utils/message-parser';
 import { renderMarkdown } from '../utils/markdown';
 import { bumpMessageLiveVersion } from '../stores/message-live-version';
 import { terminalOutputStream } from './terminal-output-stream';
@@ -865,10 +866,22 @@ export function handleServerMessage(msg: any): void {
       if (!sessionScopedValue(current, current.chatSessions, sp)) {
         useStore.getState().initSession(sp, [], false);
       }
-      if (msg.__fromReplay === true && replayUserMessageAlreadyHydrated(sp, msg.message)) {
+      if (msg.__fromReplay === true && replayUserMessageAlreadyHydrated(sp, { ...msg.message, text: extractLeadingSkillNotes(typeof msg.message.text === 'string' ? msg.message.text : '').text })) {
         break;
       }
-      const text = typeof msg.message.text === 'string' ? msg.message.text : '';
+      const rawText = typeof msg.message.text === 'string' ? msg.message.text : '';
+      // 服务端把手动技能调用落盘成 [Use skill: x] 前缀；回放事件可能只有这段
+      // 前缀而没有结构化 skills。这里与 history-builder 同步剥前缀、回填胶囊，
+      // 水合守卫的比较文本也用剥离后的值，两边形状一致才不会重复插入。
+      const notes = extractLeadingSkillNotes(rawText);
+      const echoedSkills = Array.isArray(msg.message.skills)
+        ? msg.message.skills.filter((name: unknown): name is string => typeof name === 'string' && !!name.trim())
+        : [];
+      const text = notes.text;
+      const textHtml = text ? renderMarkdown(text) : undefined;
+      const skills = echoedSkills.length > 0
+        ? echoedSkills
+        : (notes.skills.length > 0 ? notes.skills : undefined);
       const clientMessageId = typeof msg.clientMessageId === 'string' && msg.clientMessageId
         ? msg.clientMessageId
         : typeof msg.message.clientMessageId === 'string' && msg.message.clientMessageId
@@ -884,11 +897,11 @@ export function handleServerMessage(msg: any): void {
         sourceEntryId: serverMessageId,
         role: 'user' as const,
         text,
-        textHtml: text ? renderMarkdown(text) : undefined,
+        textHtml,
         timestamp: normalizeMessageTimestamp(msg.message.timestamp),
         attachments: msg.message.attachments,
         quotedText: msg.message.quotedText,
-        skills: msg.message.skills,
+        skills,
         sessionRefs: msg.message.sessionRefs ?? undefined,
         agentMentions: msg.message.agentMentions ?? undefined,
         agentReview: msg.message.agentReview ?? undefined,

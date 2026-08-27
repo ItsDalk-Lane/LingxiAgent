@@ -40,6 +40,53 @@ Lingxi 的 provider 出站链路有两层兼容逻辑，排查时必须同时看
 4. 查 provider 子模块：`matches()` 范围、`apply()` 字段翻译、utility/off 行为、历史 replay 规则。
 5. 加最终出站契约测试：优先用 `normalizeProviderPayload()` 和 model-sync 测试固定最终 payload，而不是只测试 Pi SDK 中间形态。
 
+## 输出预算口径（outputIncludesThinking）
+
+**思维链与最大输出的关系必须按模型区分，禁止统一计算。** 契约解析在
+[`shared/model-capabilities.ts`](../../shared/model-capabilities.ts) 的
+`getOutputThinkingComposition(model)`，消费方为
+[`output-budget.ts`](output-budget.ts) 与 [`anthropic.ts`](anthropic.ts)：
+
+| composition | 语义 | 典型模型 | 输出预算处理 |
+|---|---|---|---|
+| `included` | 思维链消耗计入 max output 上限 | Anthropic Messages、Gemini、OpenAI Responses，以及显式声明的豆包 Seed / Kimi 系通道 | 聊天默认值 = 64K 答案目标 + 16K 思考余量；封顶时给思考留空间 |
+| `separate` | 声明的 max output 只约束最终回答，思维链由服务端独立预算 | DeepSeek 官方 reasoner 家族及未声明的 OpenAI ChatCompletions 推理通道 | 维持历史 64K 纯答案封顶，不为思考预留或扣除 |
+
+解析优先级：`compat.outputIncludesThinking` > `model.outputIncludesThinking`
+（model-sync 投影位）> 线协议家族兜底。未声明的 OpenAI-compatible 推理模型按
+`separate` 兜底——计入型厂商必须在词典条目（`lib/known-models.json`）或用户
+模型配置上显式写 `"outputIncludesThinking": true`。
+
+用户覆盖链路：设置页「编辑模型 → 输出长度口径」三态选择器写入 provider 模型
+条目（`null` 显式清除覆盖、回到自动推导），经 `provider-registry.updateModelEntry`
+白名单落盘、`model-sync` 投影进 models.json、`ModelManager` 在 refreshAvailable
+时挂回运行时模型对象。
+
+## 输出预算事实（Output Budget Fact，持久化 request header）
+
+借鉴 deepseek-harness 的 adapter-owned materialized defaults：在最终序列化 body
+上解析「这个输出预算是谁定的」，并把结果物化成**持久 request fact**——
+chat 路径（`lib/extensions/model-call-observer-ext.ts` 的 before_provider_request）
+与 utility 路径（`core/llm-client.ts` callText）都把 fact 附在
+`provider_request_prepared` details 上，由 trace-store 写进
+`model_attempts.safe_details_json`，观测详情 API 以 `attempt.outputBudget` 读回。
+
+- 解析器：[`output-budget.ts`](output-budget.ts) 的
+  `resolveOutputBudgetFact(payload, model, options)`。
+- ownership 枚举：`absent` / `user-explicit` / `system-explicit` /
+  `hana-chat-default` / `sdk-derived`；另含 `field/value/composition/chatDefault/
+  declaredMaxOutput`。chat 来源恒为未指定，故只会出现 absent / hana-chat-default
+  / sdk-derived——恰是与用户显式值的分界。
+- chat 的模型能力切片（composition/声明上限）由 streamFn wrapper 在模型对象在手
+  时摘取（scope.modelBudgetMeta），provider hooks 只消费结构标量，不拿完整引用。
+- 隐私纪律不变：fact 只含数值/枚举/字段名，绝不放 body/正文；details 安全线
+  （sanitizeModelCallDetails）继续全程把关。
+
+排查「为什么这次回答被截断」时：先看 attempt.outputBudget——如果 value 命中
+hana-chat-default 且 composition=included，说明预算是默认策略给的思考余量；
+如果是 sdk-derived，说明 SDK 按剩余窗口收紧过；如果是 user/system-explicit，
+则是显式设置本身如此。
+
 ## 新增 provider 补丁的步骤
 
 1. 在 `core/provider-compat/` 下新建 `<provider>.ts`

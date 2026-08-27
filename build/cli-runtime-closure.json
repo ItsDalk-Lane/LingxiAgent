@@ -2190,9 +2190,19 @@
           "root": "server-bootstrap",
           "from": "core/session-compactor.ts",
           "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "core/llm-client.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/extensions/model-call-observer-ext.ts",
+          "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by core/provider-compat.ts (import-statement); core/session-compactor.ts (import-statement)."
+      "reason": "Reached via esbuild source module graph, imported by core/provider-compat.ts (import-statement); core/session-compactor.ts (import-statement); core/llm-client.ts (import-statement); +1 more importer(s)."
     },
     {
       "path": "core/provider-compat/purpose-scope.ts",
@@ -5062,6 +5072,11 @@
         },
         {
           "root": "server-bootstrap",
+          "from": "lib/skills/skill-removal.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
           "from": "server/routes/agents.ts",
           "kind": "import-statement"
         },
@@ -5241,7 +5256,7 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by core/migrations.ts (import-statement); core/plugin-config.ts (import-statement); lib/desk/cron-store.ts (import-statement); +83 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by core/migrations.ts (import-statement); core/plugin-config.ts (import-statement); lib/desk/cron-store.ts (import-statement); +84 more importer(s)."
     },
     {
       "path": "lib/default-models.json",
@@ -7722,6 +7737,11 @@
         },
         {
           "root": "server-bootstrap",
+          "from": "lib/skills/skill-removal.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
           "from": "server/routes/agents.ts",
           "kind": "import-statement"
         },
@@ -7729,11 +7749,6 @@
           "root": "server-bootstrap",
           "from": "server/routes/skills.ts",
           "kind": "import-statement"
-        },
-        {
-          "root": "server-bootstrap",
-          "from": "server/routes/skills.ts",
-          "kind": "dynamic-import"
         },
         {
           "root": "server-bootstrap",
@@ -10249,6 +10264,11 @@
         },
         {
           "root": "server-bootstrap",
+          "from": "lib/skills/skill-removal.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
           "from": "lib/skill-bundles/package-service.ts",
           "kind": "import-statement"
         },
@@ -10258,7 +10278,24 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by core/agent-manager.ts (import-statement); lib/skill-bundles/package-service.ts (import-statement); server/routes/skills.ts (import-statement)."
+      "reason": "Reached via esbuild source module graph, imported by core/agent-manager.ts (import-statement); lib/skills/skill-removal.ts (import-statement); lib/skill-bundles/package-service.ts (import-statement); +1 more importer(s)."
+    },
+    {
+      "path": "lib/skills/install-lock.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "server/routes/agents.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "server/routes/skills.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by server/routes/agents.ts (import-statement); server/routes/skills.ts (import-statement)."
     },
     {
       "path": "lib/skills/session-skill-snapshot.ts",
@@ -10339,11 +10376,33 @@
         },
         {
           "root": "server-bootstrap",
+          "from": "lib/skills/skill-removal.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
           "from": "server/routes/skills.ts",
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by lib/tools/install-skill.ts (import-statement); server/routes/skills.ts (import-statement)."
+      "reason": "Reached via esbuild source module graph, imported by lib/tools/install-skill.ts (import-statement); lib/skills/skill-removal.ts (import-statement); server/routes/skills.ts (import-statement)."
+    },
+    {
+      "path": "lib/skills/skill-removal.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "server/routes/agents.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "server/routes/skills.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by server/routes/agents.ts (import-statement); server/routes/skills.ts (import-statement)."
     },
     {
       "path": "lib/subagent-executor-metadata.ts",
@@ -122729,6 +122788,11 @@
         },
         {
           "root": "server-bootstrap",
+          "from": "lib/skills/skill-removal.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
           "from": "server/composition/open-root.ts",
           "kind": "import-statement"
         },
@@ -122738,7 +122802,7 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by core/data-epoch-restore.ts (import-statement); shared/known-models.ts (import-statement); lib/i18n.ts (import-statement); +4 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by core/data-epoch-restore.ts (import-statement); shared/known-models.ts (import-statement); lib/i18n.ts (import-statement); +5 more importer(s)."
     },
     {
       "path": "shared/hana-runtime-paths.cjs",
@@ -123056,6 +123120,11 @@
         },
         {
           "root": "server-bootstrap",
+          "from": "core/provider-compat/output-budget.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
           "from": "core/provider-compat.ts",
           "kind": "import-statement"
         },
@@ -123160,7 +123229,7 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by core/message-sanitizer.ts (import-statement); core/provider-compat/reasoning-content-replay.ts (import-statement); core/provider-compat/deepseek.ts (import-statement); +28 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by core/message-sanitizer.ts (import-statement); core/provider-compat/reasoning-content-replay.ts (import-statement); core/provider-compat/deepseek.ts (import-statement); +29 more importer(s)."
     },
     {
       "path": "shared/model-observability-api-contract.ts",
@@ -124434,9 +124503,9 @@
     }
   ],
   "stats": {
-    "totalFiles": 10634,
+    "totalFiles": 10636,
     "byInputType": {
-      "source-graph": 734,
+      "source-graph": 736,
       "runtime-asset": 11,
       "nft-runtime-trace": 9889
     }

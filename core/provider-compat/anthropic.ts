@@ -7,7 +7,7 @@
  */
 
 import { modelSupportsAnthropicMaxEffort } from "../session-thinking-level.ts";
-import { getReasoningProfile, getThinkingFormat } from "../../shared/model-capabilities.ts";
+import { getOutputThinkingComposition, getReasoningProfile, getThinkingFormat } from "../../shared/model-capabilities.ts";
 
 const CACHE_CONTROL = { type: "ephemeral" };
 const MAX_EFFORT_MIN_OUTPUT_TOKENS = 64000;
@@ -211,6 +211,9 @@ function withMaxEffortOutputBudget(payload, model, options) {
   if (!isImplicitAnthropicOutputCap(current, model)) return payload;
   const source = lower(options?.outputBudgetSource || options?.maxTokensSource);
   if (source === "user" || source === "system") return payload;
+  // 「最大输出包含思维链」才需要抬升回答预算给思考让位；separate 模型
+  // （如走 Anthropic 兼容线的 DeepSeek）的 max_tokens 本来就只算最终回答。
+  if (getOutputThinkingComposition(model) !== "included") return payload;
 
   const target = Math.min(modelLimit, MAX_EFFORT_MIN_OUTPUT_TOKENS);
   if (current >= target) return payload;

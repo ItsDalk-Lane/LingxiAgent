@@ -50,6 +50,32 @@ import {
   extendChatContextProvenance,
   type SessionPromptProvenancePayload,
 } from "../llm/semantic-input-provenance.ts";
+import type { ModelCallScope as ModelCallScopeContract } from "../llm/model-call-scope.ts";
+
+/**
+ * Output Budget Fact 的最小模型能力切片：streamFn 边界上模型对象还完整在手，
+ * 摘取预算解析需要的结构标量（§八），provider hooks 只经 ALS 消费这份切片。
+ */
+function buildModelBudgetMeta(model: any): ModelCallScopeContract["modelBudgetMeta"] {
+  if (!model || typeof model !== "object") return null;
+  const compat = model.compat && typeof model.compat === "object" && !Array.isArray(model.compat)
+    ? {
+      ...(model.compat.outputIncludesThinking === true || model.compat.outputIncludesThinking === false
+        ? { outputIncludesThinking: model.compat.outputIncludesThinking as boolean }
+        : {}),
+    }
+    : null;
+  const meta: NonNullable<ModelCallScopeContract["modelBudgetMeta"]> = {};
+  if (Number.isFinite(Number(model.maxTokens)) && Number(model.maxTokens) > 0) {
+    meta.maxTokens = Math.floor(Number(model.maxTokens));
+  }
+  if (model.outputIncludesThinking === true || model.outputIncludesThinking === false) {
+    meta.outputIncludesThinking = model.outputIncludesThinking as boolean;
+  }
+  if (model.reasoning === true) meta.reasoning = true;
+  if (compat && Object.keys(compat).length > 0) meta.compat = compat;
+  return Object.keys(meta).length > 0 ? meta : null;
+}
 import {
   createModelCallPayloadCaptureSession,
   type ModelCallPayloadCaptureSession,
@@ -303,6 +329,9 @@ export function installModelCallStreamObserver(
       traceId,
       parentCallId,
       model: modelIdentity,
+      // Output Budget Fact 的能力切片：模型对象此刻在手，摘取后 provider hooks
+      // 无需也不该拿到完整 model 引用（结构标量，不含内容）。
+      modelBudgetMeta: buildModelBudgetMeta(model),
       source: effectiveSource,
       attribution: effectiveAttribution,
       // Phase 6：provider hooks 经 ALS 读到的 capture 能力引用（无正文）。

@@ -1,3 +1,4 @@
+import { appendFileSync } from "node:fs";
 import crypto from "node:crypto";
 
 import {
@@ -131,7 +132,16 @@ function parseModelAnswer(raw: unknown): ParsedModelAnswer {
   }
   let parsed: unknown;
   try {
-    parsed = JSON.parse(raw.trim());
+    // 模型偶发用 markdown 围栏或前后缀文字包裹 JSON——先剥掉再解析。
+    let candidate = raw.trim();
+    const fenced = candidate.match(/^```(?:json)?\s*([\s\S]*?)\s*```$/u);
+    if (fenced) candidate = fenced[1].trim();
+    const firstBrace = candidate.indexOf("{");
+    const lastBrace = candidate.lastIndexOf("}");
+    if (firstBrace > 0 && lastBrace > firstBrace) {
+      candidate = candidate.slice(firstBrace, lastBrace + 1);
+    }
+    parsed = JSON.parse(candidate);
   } catch {
     throw new KnowledgeError("KNOWLEDGE_MODEL_OUTPUT_INVALID", "Knowledge model did not return valid JSON");
   }
@@ -187,19 +197,30 @@ function markerSet(answer: string): Set<number> {
 function spanForQuote(
   chunk: IndexedKnowledgeChunk,
   citation: ParsedModelCitation,
-): KnowledgeChunkSpanDraft {
-  const actual = chunk.text.slice(citation.startOffset, citation.endOffset);
-  if (actual !== citation.quote) {
-    throw new KnowledgeError("KNOWLEDGE_MODEL_OUTPUT_INVALID", "Knowledge citation quote does not match evidence");
+): { span: KnowledgeChunkSpanDraft; startOffset: number; endOffset: number } {
+  let startOffset = citation.startOffset;
+  let endOffset = citation.endOffset;
+  if (chunk.text.slice(startOffset, endOffset) !== citation.quote) {
+    // LLM 无法可靠数出字符偏移。quote 逐字匹配且在候选内唯一出现时,
+    // 由服务端定位真实偏移;模型给的 offset 仅是尽力而为的提示。
+    const located = chunk.text.indexOf(citation.quote);
+    if (located >= 0 && chunk.text.indexOf(citation.quote, located + 1) === -1) {
+      startOffset = located;
+      endOffset = located + citation.quote.length;
+    } else {
+      throw new KnowledgeError("KNOWLEDGE_MODEL_OUTPUT_INVALID", "Knowledge citation quote does not match evidence");
+    }
   }
+  // 引用锚定到覆盖起始位置的 span;模型摘录跨块(如跨段落)时不再整条拒绝,
+  // 完整 offset 仍指回原文,展示层按起始块定位。
   const span = chunk.spans.find(candidate => (
-    citation.startOffset >= candidate.chunkStartOffset
-    && citation.endOffset <= candidate.chunkEndOffset
+    startOffset >= candidate.chunkStartOffset
+    && startOffset < candidate.chunkEndOffset
   ));
   if (!span) {
     throw new KnowledgeError("KNOWLEDGE_MODEL_OUTPUT_INVALID", "Knowledge citation crosses an evidence boundary");
   }
-  return span;
+  return { span, startOffset, endOffset };
 }
 
 function validateModelAnswer(
@@ -218,14 +239,14 @@ function validateModelAnswer(
     if (!chunk) {
       throw new KnowledgeError("KNOWLEDGE_MODEL_OUTPUT_INVALID", "Knowledge citation references an unknown candidate");
     }
-    const span = spanForQuote(chunk, citation);
+    const { span, startOffset, endOffset } = spanForQuote(chunk, citation);
     return {
       marker: citation.marker,
       candidateRef: citation.candidateRef,
       parseArtifactId: chunk.parseArtifactId,
       blockId: span.blockId,
-      startOffset: span.blockStartOffset + (citation.startOffset - span.chunkStartOffset),
-      endOffset: span.blockStartOffset + (citation.endOffset - span.chunkStartOffset),
+      startOffset: span.blockStartOffset + (startOffset - span.chunkStartOffset),
+      endOffset: span.blockStartOffset + (endOffset - span.chunkStartOffset),
     };
   });
   if (
@@ -418,6 +439,8 @@ export class KnowledgeQueryService {
     } catch (error) {
       if (isAbortLike(error)) throw error;
       if (isKnowledgeError(error)) throw error;
+      try { appendFileSync("/tmp/lingxi-embed-diag.log",
+        `embed-fail code=${(error as any)?.code} name=${error?.name} msg=${error?.message}\nstack=${(error as any)?.stack?.split("\n").slice(0, 5).join("\n")}\n`); } catch {}
       throw new KnowledgeError("KNOWLEDGE_RETRIEVAL_UNAVAILABLE", "Knowledge embedding request failed");
     }
   }
@@ -656,6 +679,8 @@ export class KnowledgeQueryService {
       }));
       return { run, scope, citations, retrievalBasis: "related_content" };
     } catch (error) {
+      try { appendFileSync("/tmp/lingxi-embed-diag.log",
+        `quick-catch code=${(error as any)?.code} name=${error?.name} msg=${error?.message}\nstack=${(error as any)?.stack?.split("\n").slice(0, 6).join("\n")}\n`); } catch {}
       const errorCode = isKnowledgeError(error) ? error.code : "KNOWLEDGE_MODEL_UNAVAILABLE";
       this.deps.store.failKnowledgeRun({ studioId: scope.studioId, runId: run.id, errorCode });
       if (isKnowledgeError(error)) throw error;

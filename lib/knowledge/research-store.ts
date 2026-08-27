@@ -541,14 +541,16 @@ export class KnowledgeResearchStore {
     attemptId: string;
     errorCode: string;
     retry: boolean;
+    message?: string;
   }) {
     const attempt = this.getAttempt(input.attemptId);
     const now = this.now();
     this.transaction(() => {
       this.db.prepare(`
-        UPDATE task_attempts SET status = 'failed', error_code = ?, completed_at = ?
+        UPDATE task_attempts SET status = 'failed', error_code = ?, completed_at = ?,
+          output_json = COALESCE(?, output_json)
         WHERE id = ? AND status = 'running'
-      `).run(input.errorCode, now, input.attemptId);
+      `).run(input.errorCode, now, input.message ? JSON.stringify({ message: input.message }) : null, input.attemptId);
       if (attempt.workType === "scan_batch") {
         if (!input.retry) {
           this.db.prepare(`
