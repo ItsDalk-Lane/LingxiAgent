@@ -23,7 +23,10 @@ export default defineConfig({
       "desktop/native/**/.build/**",
       "dist-computer-use/**",
     ],
-    testTimeout: 10_000,
+    // CI 矩阵含 macos-15-intel 等慢 I/O runner：满载下单测可逼近旧 10s 默认
+    // （64MB 缓冲分配/全仓扫描类），统一放宽到 60s；更慢的场景由各测试显式加预算。
+    testTimeout: 60_000,
+    hookTimeout: 60_000,
     setupFiles: ["./tests/setup-auto-updater.ts"],
     server: {
       deps: {
