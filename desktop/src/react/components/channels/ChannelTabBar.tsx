@@ -1,5 +1,5 @@
 /**
- * ChannelTabBar — dynamic tab bar (chat / channels / plugin tabs)
+ * ChannelTabBar — dynamic tab bar (chat / knowledge / channels / plugin tabs)
  *
  * Renders tabs dynamically from store state, supports drag-to-reorder
  * for non-chat tabs, and overflows into a dropdown when >5 draggable tabs.
@@ -61,11 +61,12 @@ function buildTabList(pluginPages: PluginPageInfo[], tabOrder: string[]): TabTyp
     if (!ordered.includes(tab)) ordered.push(tab);
   }
 
-  return ['chat' as TabType, ...ordered];
+  return ['chat' as TabType, 'knowledge' as TabType, ...ordered];
 }
 
 function getTabLabel(tab: TabType, pluginPages: PluginPageInfo[], locale: string): string {
   if (tab === 'chat') return t('channel.chatTab');
+  if (tab === 'knowledge') return t('knowledge.tab');
   if (tab === 'channels') return t('channel.tab');
   if (typeof tab === 'string' && tab.startsWith('plugin:')) {
     const pluginId = tab.slice(7);
@@ -94,11 +95,11 @@ export function ChannelTabBar() {
   const hiddenPages = pluginPages.filter(p => hiddenPluginTabs.includes(p.pluginId));
 
   const allTabs = buildTabList(visiblePages, tabOrder);
-  // chat is always first and not draggable; split into visible and overflow
-  const draggableTabs = allTabs.slice(1);
+  // chat 与 knowledge 是固定一级入口，其余页签可排序、溢出。
+  const draggableTabs = allTabs.slice(2);
   const visibleDraggable = draggableTabs.slice(0, MAX_VISIBLE_DRAGGABLE);
   const overflowDraggable = draggableTabs.slice(MAX_VISIBLE_DRAGGABLE);
-  const visibleTabs: TabType[] = ['chat' as TabType, ...visibleDraggable];
+  const visibleTabs: TabType[] = ['chat' as TabType, 'knowledge' as TabType, ...visibleDraggable];
 
   const tabsRef = useRef<HTMLDivElement>(null);
   const sliderRef = useRef<HTMLDivElement>(null);
@@ -165,14 +166,14 @@ export function ChannelTabBar() {
   // ── Drag handlers ──
 
   const onDragStart = useCallback((e: React.DragEvent, tab: TabType) => {
-    if (tab === 'chat') { e.preventDefault(); return; }
+    if (tab === 'chat' || tab === 'knowledge') { e.preventDefault(); return; }
     e.dataTransfer.effectAllowed = 'move';
     e.dataTransfer.setData('text/plain', tab);
     setDragTab(tab);
   }, []);
 
   const onDragOver = useCallback((e: React.DragEvent, tab: TabType) => {
-    if (tab === 'chat') return;
+    if (tab === 'chat' || tab === 'knowledge') return;
     e.preventDefault();
     e.dataTransfer.dropEffect = 'move';
     setDragOverTab(tab);
@@ -187,7 +188,7 @@ export function ChannelTabBar() {
     setDragTab(null);
     setDragOverTab(null);
     const sourceTab = e.dataTransfer.getData('text/plain') as TabType;
-    if (!sourceTab || sourceTab === targetTab || targetTab === 'chat') return;
+    if (!sourceTab || sourceTab === targetTab || targetTab === 'chat' || targetTab === 'knowledge') return;
 
     // Compute new order from current draggable list
     const currentDraggable = [...draggableTabs];
@@ -242,7 +243,7 @@ export function ChannelTabBar() {
             ref={(el) => setBtnRef(tab, el)}
             className={cls}
             data-tab={tab}
-            draggable={tab !== 'chat'}
+            draggable={tab !== 'chat' && tab !== 'knowledge'}
             onClick={() => handleTabClick(tab)}
             onContextMenu={(e) => handleTabContextMenu(e, tab)}
             onDragStart={(e) => onDragStart(e, tab)}

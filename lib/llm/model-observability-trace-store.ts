@@ -199,7 +199,10 @@ export function createModelObservabilityTraceStore({ db, now = () => new Date().
         provider_wire_visibility = COALESCE(model_attempts.provider_wire_visibility, excluded.provider_wire_visibility)
     `),
     updateAttemptRequestPrepared: db.prepare(
-      `UPDATE model_attempts SET request_prepared_at = COALESCE(request_prepared_at, @ts) WHERE attempt_id = @attempt_id`,
+      `UPDATE model_attempts SET
+        request_prepared_at = COALESCE(request_prepared_at, @ts),
+        safe_details_json = COALESCE(safe_details_json, @safe_details_json)
+      WHERE attempt_id = @attempt_id`,
     ),
     updateAttemptResponse: db.prepare(`
       UPDATE model_attempts SET
@@ -324,7 +327,13 @@ export function createModelObservabilityTraceStore({ db, now = () => new Date().
           attempt_visibility: null,
           provider_wire_visibility: null,
         });
-        stmts.updateAttemptRequestPrepared.run({ attempt_id: attemptId, ts });
+        // Output Budget Fact 等 prepared 结构 metadata 持久化进
+        // safe_details_json（借鉴 deepseek-harness materialized request header）。
+        stmts.updateAttemptRequestPrepared.run({
+          attempt_id: attemptId,
+          ts,
+          safe_details_json: jsonOrNull(details),
+        });
         return;
       }
       case "provider_response_received": {

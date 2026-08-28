@@ -1,6 +1,7 @@
 import { AppError } from '../shared/errors.ts';
 import { errorBus } from '../shared/error-bus.ts';
 import { normalizeProviderPayload } from './provider-compat.ts';
+import { resolveOutputBudgetFact } from './provider-compat/output-budget.ts';
 import { buildProviderCompatOptions } from './llm-request-policy.ts';
 import { logLlmUsage, normalizeLlmUsage } from '../lib/llm/usage-observer.ts';
 import { appendProviderApiPath, withDefaultProviderHeaders } from '../lib/llm/provider-client.ts';
@@ -43,6 +44,7 @@ const DEFAULT_CODEX_UTILITY_INSTRUCTIONS = [
 ].join("\n");
 const SUPPORTED_BUFFERED_APIS = new Set([
   "anthropic-messages",
+  "google-generative-ai",
   "openai-completions",
   "openai-responses",
   "openai-codex-responses",
@@ -312,6 +314,62 @@ function extractResponsesText(data) {
   };
 }
 
+function googlePartsFromContent(content) {
+  if (typeof content === "string") return [{ text: content }];
+  if (!Array.isArray(content)) return [{ text: String(content ?? "") }];
+  return content.map((block) => {
+    if (block?.type === "text" || block?.type === "input_text") {
+      return { text: String(block.text || "") };
+    }
+    if ((block?.type === "image" || block?.type === "input_image") && block.data) {
+      return {
+        inlineData: {
+          mimeType: block.mimeType || block.media_type || "image/png",
+          data: block.data,
+        },
+      };
+    }
+    return { text: JSON.stringify(block) };
+  });
+}
+
+function extractGoogleText(data) {
+  const parts = data?.candidates?.[0]?.content?.parts;
+  if (!Array.isArray(parts)) {
+    return { text: "", reasoning: "", removedThinking: false, stopReason: null };
+  }
+  const reasoning = parts
+    .filter(part => part?.thought === true && typeof part.text === "string")
+    .map(part => part.text)
+    .join("\n")
+    .trim();
+  return {
+    text: parts
+      .filter(part => part?.thought !== true && typeof part?.text === "string")
+      .map(part => part.text)
+      .join("")
+      .trim(),
+    reasoning,
+    removedThinking: reasoning.length > 0,
+    stopReason: typeof data?.candidates?.[0]?.finishReason === "string"
+      ? data.candidates[0].finishReason
+      : null,
+  };
+}
+
+function googleUsage(data) {
+  const usage = data?.usageMetadata;
+  if (!usage || typeof usage !== "object") return null;
+  return {
+    input_tokens: usage.promptTokenCount,
+    output_tokens: usage.candidatesTokenCount,
+    total_tokens: usage.totalTokenCount,
+    ...(usage.thoughtsTokenCount !== undefined
+      ? { output_tokens_details: { reasoning_tokens: usage.thoughtsTokenCount } }
+      : {}),
+  };
+}
+
 async function readCodexResponsesStream(body) {
   const reader = body.getReader();
   const decoder = new TextDecoder();
@@ -415,7 +473,7 @@ function convertContentForApi(content, api) {
 // ── ModelCallObserver 安全 metadata ──
 // 只提取不可逆结构信息：消息/工具计数、system 存在性、媒体存在性、字节估算。
 // 绝不读取或携带正文内容（§八）。
-function summarizeCallTextRequest(body, api, serializedByteLength) {
+function summarizeCallTextRequest(body, api, serializedByteLength, outputBudgetFact = null) {
   const summary = summarizeProviderRequestPayload(body);
   return {
     protocol: api,
@@ -426,6 +484,7 @@ function summarizeCallTextRequest(body, api, serializedByteLength) {
     // callText 历史字段名保持 hasImages；共享 helper 统一输出 hasMedia
     hasImages: summary.hasMedia,
     inputByteEstimate: Number.isFinite(serializedByteLength) ? serializedByteLength : null,
+    ...(outputBudgetFact ? { outputBudget: outputBudgetFact } : {}),
   };
 }
 
@@ -642,6 +701,27 @@ export async function callText({
       ...(mergedSystem && { system: mergedSystem }),
       messages: anthropicMessages,
     };
+  } else if (api === "google-generative-ai") {
+    endpoint = appendProviderApiPath(
+      base,
+      `/models/${encodeURIComponent(modelId)}:generateContent`,
+    );
+    headers = { "Content-Type": "application/json" };
+    if (apiKey) headers["x-goog-api-key"] = apiKey;
+    const generationConfig = {
+      ...(explicitMaxTokens !== null && { maxOutputTokens: explicitMaxTokens }),
+      ...(temperature !== undefined && { temperature }),
+    };
+    body = {
+      ...(mergedSystem && {
+        systemInstruction: { parts: [{ text: mergedSystem }] },
+      }),
+      contents: normalizedMessages.map(message => ({
+        role: message.role === "assistant" ? "model" : "user",
+        parts: googlePartsFromContent(message.content),
+      })),
+      ...(Object.keys(generationConfig).length > 0 && { generationConfig }),
+    };
   } else if (api === "openai-codex-responses") {
     const accountId = resolveCodexAccountId(modelObj, apiKey);
     if (!accountId) {
@@ -717,12 +797,17 @@ export async function callText({
         ? { id: modelId, provider, api, baseUrl, quirks }
         : null
     );
-  body = normalizeProviderPayload(body, modelForCompat, buildProviderCompatOptions({
+  const providerCompatOptions = buildProviderCompatOptions({
     mode: "utility",
     callPurpose,
     explicitMaxTokens,
     outputBudgetSource,
-  }));
+  });
+  body = normalizeProviderPayload(body, modelForCompat, providerCompatOptions);
+  // Output Budget Fact：与 chat 路径同款，最终 body + 调用方 source 物化成
+  // attempt 持久事实（safe_details_json），utility 的 system/user 显式预算
+  // 从此可与 SDK/默认派生值区分。
+  const outputBudgetFact = resolveOutputBudgetFact(body, modelForCompat, providerCompatOptions);
 
   // ── 3.5 Provider Request Provenance（Phase 6，§五十九/§一三八）──
   // mapping 在 body 构造分支产生（构造事实），normalizeProviderPayload 之后做
@@ -753,7 +838,7 @@ export async function callText({
   const serializedBody = JSON.stringify(body);
   // provider_request_prepared 只带结构 metadata，绝不携带 body（§八）。
   modelCallRecorder.providerRequestPrepared({
-    details: summarizeCallTextRequest(body, api, serializedBody.length),
+    details: summarizeCallTextRequest(body, api, serializedBody.length, outputBudgetFact),
   });
   // Phase 6 Provider Request Capture（§六十四）：normalize 完成、stringify/fetch
   // 之前的最终 body + 真实 headers/endpoint；凭证（x-api-key/Authorization）在
@@ -826,7 +911,8 @@ export async function callText({
       parseFailed = true;
     }
   }
-  observedUsagePayload = data?.usage ?? null;
+  const responseUsage = api === "google-generative-ai" ? googleUsage(data) : data?.usage ?? null;
+  observedUsagePayload = responseUsage;
   // Phase 6 Provider Response Capture（§六十六/§六十八/§七十一）：业务已解析的
   // 对象复用（不重复 parse）；codex SSE 只保留 aggregate → stream_aggregate；
   // 非 2xx 的 error body 与 invalid JSON rawText 同样是有效观测事实（先捕获
@@ -879,6 +965,12 @@ export async function callText({
     removedStructuredThinking = extracted.removedThinking;
     reasoning = reasoningTextFromValue(data?.content);
     stopReason = typeof data?.stop_reason === "string" ? data.stop_reason : null;
+  } else if (api === "google-generative-ai") {
+    const extracted = extractGoogleText(data);
+    text = extracted.text;
+    reasoning = extracted.reasoning;
+    removedStructuredThinking = extracted.removedThinking;
+    stopReason = extracted.stopReason;
   } else if (api === "openai-responses" || api === "openai-codex-responses") {
     const extracted = extractResponsesText(data);
     text = extracted.text;
@@ -910,7 +1002,7 @@ export async function callText({
         text,
         reasoning: reasoning || null,
         finishReason: stopReason ?? null,
-        usage: data?.usage ?? null,
+        usage: responseUsage,
         completeness: "complete",
       },
     });
@@ -939,13 +1031,13 @@ export async function callText({
     );
   }
 
-  const usage = normalizeLlmUsage(data?.usage, { costRates: modelObj?.cost });
+  const usage = normalizeLlmUsage(responseUsage, { costRates: modelObj?.cost });
   (logLlmUsage as (...args: any[]) => any)({
     source: "utility",
     api,
     provider,
     modelId,
-    usage: data?.usage,
+    usage: responseUsage,
     costRates: modelObj?.cost,
   });
   // 语义响应解析完成（parser 之后、业务裁剪之前）。只带结构/数值 metadata。
@@ -953,12 +1045,12 @@ export async function callText({
     details: {
       stopReason: stopReason ?? null,
       hasReasoning: reasoning.length > 0 || removedStructuredThinking,
-      usagePresent: Boolean(data?.usage),
+      usagePresent: Boolean(responseUsage),
       ...(usage ? { usage } : {}),
     },
   });
   usageLedger?.finish?.(usageRequest?.requestId, {
-    usage: data?.usage,
+    usage: responseUsage,
     model: { provider, modelId, api },
     costRates: modelObj?.cost,
   });

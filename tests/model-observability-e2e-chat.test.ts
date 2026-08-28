@@ -139,6 +139,21 @@ describe("E2E truth — MC-01 真实 Pi chat", () => {
     const kinds = detail.value.payloadRecords.map((r: any) => r.kind).sort();
     expect(kinds).toEqual(["provider_request", "provider_response", "semantic_request", "semantic_response"]);
 
+    /* Output Budget Fact 持久化往返：prepared details → safe_details_json → 详情 API */
+    expect(detail.value.attempts.length).toBeGreaterThan(0);
+    for (const attempt of detail.value.attempts) {
+      // 本 harness 未注册 engine 的 output-cap 兼容钩子，最终 body 无 cap 字段 →
+      // ownership=absent；但 wrapper 切片仍如实物化了 composition 与声明上限。
+      expect(attempt.outputBudget).toMatchObject({
+        field: null,
+        value: null,
+        composition: "separate",
+        ownership: "absent",
+        chatDefault: 1024,
+        declaredMaxOutput: 1024,
+      });
+    }
+
     const providerRequestMeta = detail.value.payloadRecords.find((r: any) => r.kind === "provider_request")!;
     const providerRequest = query.getPayloadRecord(providerRequestMeta.id);
     expect(providerRequest.ok).toBe(true);

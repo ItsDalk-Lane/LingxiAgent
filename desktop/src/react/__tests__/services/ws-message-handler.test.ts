@@ -201,6 +201,24 @@ describe('ws-message-handler session-scoped desktop events', () => {
     expect(first.data.attachments).toEqual([{ path: '/tmp/a.png', name: 'a.png', isDir: false }]);
   });
 
+  it('session_user_message 把 [Use skill: x] 前缀还原成 skills 胶囊并清洗正文', () => {
+    handleServerMessage({
+      type: 'session_user_message',
+      sessionPath: '/session/a.jsonl',
+      __fromReplay: true,
+      message: {
+        text: '[Use skill: character-creator]\n我想创建一个全新的 Lingxi 角色',
+      },
+    });
+
+    const items = useStore.getState().chatSessions['/session/a.jsonl']?.items || [];
+    expect(items).toHaveLength(1);
+    const first = items[0];
+    if (!first || first.type !== 'message') throw new Error('expected message item');
+    expect(first.data.skills).toEqual(['character-creator']);
+    expect(first.data.text).toBe('我想创建一个全新的 Lingxi 角色');
+  });
+
   it('drops a websocket event whose sessionId is already bound to a different known path (#2078)', () => {
     useStore.setState({
       currentSessionId: 'sess_a',

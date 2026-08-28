@@ -540,7 +540,7 @@ export function buildItemsFromHistory(data: HistoryApiResponse): ChatListItem[] 
         continue;
       }
 
-      const { text, files, attachedImages, attachedVideos, attachedAudios, sessionFileRefs, deskContext, quotedText } = parseUserAttachments(rawContent);
+      const { text, skills, files, attachedImages, attachedVideos, attachedAudios, sessionFileRefs, deskContext, quotedText } = parseUserAttachments(rawContent);
       const hasMarkerMedia = attachedImages.length > 0 || attachedVideos.length > 0 || attachedAudios.length > 0;
       const visibleText = normalizeUserVisibleText(text, hasMarkerMedia);
       const consumedSessionFileMarkers = new Set<number>();
@@ -584,6 +584,9 @@ export function buildItemsFromHistory(data: HistoryApiResponse): ChatListItem[] 
         deskContext: deskContext || undefined,
         quotedText: quotedText || undefined,
         timestamp,
+        // 手动技能调用落盘是 [Use skill: x] 前缀，这里解析回胶囊字段，
+        // 与 live 提交路径的 message.skills 形状一致（否则重进会话退化为纯文本）。
+        ...(skills.length ? { skills } : {}),
         ...(origin ? { origin } : {}),
         ...(m.agentReview ? { agentReview: m.agentReview } : {}),
         ...(m.agentReviewRequest ? { agentReviewRequest: m.agentReviewRequest } : {}),

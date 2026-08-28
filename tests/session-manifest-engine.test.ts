@@ -29,7 +29,7 @@ describe("LingxiEngine session manifest facade", () => {
 
   afterEach(() => {
     store?.close();
-    fs.rmSync(tmpDir, { recursive: true, force: true });
+    fs.rmSync(tmpDir, { recursive: true, force: true, maxRetries: 20, retryDelay: 250 });
   });
 
   it("resolves session refs without exposing the store implementation", () => {
@@ -168,9 +168,12 @@ describe("LingxiEngine session manifest store recovery", () => {
   let tmpDir;
   let engine;
 
-  afterEach(() => {
-    engine?._sessionManifestStore?.close?.();
-    fs.rmSync(tmpDir, { recursive: true, force: true });
+  afterEach(async () => {
+    // LingxiEngine 构造即打开 knowledge 三库句柄；只关 manifest store 会让
+    // Windows rmSync EPERM（macOS 可删已打开文件故本地不可见）。dispose()
+    // 统一关闭 knowledge 与 manifest store（engine-lifecycle 同款收口）。
+    await engine?.dispose?.();
+    fs.rmSync(tmpDir, { recursive: true, force: true, maxRetries: 20, retryDelay: 250 });
   });
 
   it("quarantines a corrupt manifest database and still starts", () => {
@@ -227,7 +230,7 @@ describe("LingxiEngine getSessionMetadataRecoveryStatus", () => {
 
   afterEach(() => {
     store?.close();
-    fs.rmSync(tmpDir, { recursive: true, force: true });
+    fs.rmSync(tmpDir, { recursive: true, force: true, maxRetries: 20, retryDelay: 250 });
   });
 
   it("both sources empty → not degraded", () => {

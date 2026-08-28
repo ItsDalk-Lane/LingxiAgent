@@ -97,6 +97,53 @@ function projectSegment(
   };
 }
 
+/** 继续推进 agent 循环的内容类型：它们出现在某段正文之后，即证明那段正文
+ *  不是回合的最终答案，而是过程叙事。mood 是装饰性输出，不在此列。 */
+function isGenerationAnchor(block: ContentBlock): boolean {
+  return block.type === 'tool_group'
+    || block.type === 'thinking'
+    || block.type === 'subagent'
+    || block.type === 'workflow'
+    || block.type === 'media_generation'
+    || block.type === 'plugin_card'
+    || block.type === 'file';
+}
+
+/**
+ * 结构性定相：供应商协议不会直接报告一段文字是叙事还是最终答案（textSignature
+ * 无人写入），这个身份只能从回合结构反推——时间线上其后仍有生成锚点的正文是
+ * 叙事（commentary/process），只有尾巴上的文字才可能是最终答案。
+ * 只对两侧都带到达戳（processOrder）的可靠偏序做推断；无序号的旧数据保持原分类。
+ */
+function demotePreAnchorNarration(blocks: ContentBlock[]): ContentBlock[] {
+  const stamped = blocks
+    .map((block, index) => ({ block, index }))
+    .filter(({ block }) => block.processOrder !== undefined)
+    .sort((a, b) => (
+      (a.block.processOrder ?? 0) - (b.block.processOrder ?? 0) || a.index - b.index
+    ));
+  let lastAnchorOrder: number | null = null;
+  for (const { block } of stamped) {
+    if (isGenerationAnchor(block)) lastAnchorOrder = block.processOrder ?? null;
+  }
+  if (lastAnchorOrder === null) return blocks;
+  let changed = false;
+  const next = [...blocks];
+  for (let index = 0; index < next.length; index += 1) {
+    const block = next[index];
+    if (block.type !== 'text' || block.processOrder === undefined) continue;
+    if (block.processOrder >= lastAnchorOrder) continue;
+    if (block.surfaceRole !== 'answer' && block.surfaceRole !== 'provisional') continue;
+    next[index] = {
+      ...block,
+      semanticPhase: 'commentary',
+      surfaceRole: 'process',
+    };
+    changed = true;
+  }
+  return changed ? next : blocks;
+}
+
 function turnStatusBlock(
   input: ProjectAssistantTurnInput,
   hasToolCalls: boolean,
@@ -150,7 +197,7 @@ export function projectAssistantTurn(input: ProjectAssistantTurnInput): ProjectA
       turnLifecycle: input.status === 'streaming' ? 'streaming' : 'sealed',
     },
   );
-  const allBlocks = [...segmentBlocks, ...legacyBlocks];
+  const allBlocks = demotePreAnchorNarration([...segmentBlocks, ...legacyBlocks]);
   // 过程区按"到达序号"交错回真实时间线（思考段与工具块在入口分别盖戳）；
   // 没有序号的旧数据（+Infinity）稳定地排在带序号块之后，行为与旧版一致。
   const processBlocks = allBlocks

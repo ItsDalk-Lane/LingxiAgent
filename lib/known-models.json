@@ -609,13 +609,15 @@
       "context": 128000,
       "maxOutput": 64000,
       "image": false,
-      "reasoning": true
+      "reasoning": true,
+      "outputIncludesThinking": false
     },
     "deepseek-v3.2": {
       "name": "DeepSeek V3.2",
       "context": 163840,
       "maxOutput": 65536,
-      "image": false
+      "image": false,
+      "outputIncludesThinking": false
     },
     "deepseek-v4-pro": {
       "name": "DeepSeek V4 Pro",
@@ -623,7 +625,8 @@
       "maxOutput": 384000,
       "image": false,
       "reasoning": true,
-      "xhigh": true
+      "xhigh": true,
+      "outputIncludesThinking": false
     },
     "deepseek-v4-flash": {
       "name": "DeepSeek V4 Flash",
@@ -631,7 +634,8 @@
       "maxOutput": 384000,
       "image": false,
       "reasoning": true,
-      "xhigh": true
+      "xhigh": true,
+      "outputIncludesThinking": false
     },
     "deepseek-coder": {
       "name": "Deepseek Coder",
@@ -644,7 +648,8 @@
       "context": 65536,
       "maxOutput": 8192,
       "image": false,
-      "reasoning": true
+      "reasoning": true,
+      "outputIncludesThinking": false
     },
     "deepseek-v3": {
       "name": "Deepseek V3",
@@ -6411,7 +6416,8 @@
       "context": 128000,
       "maxOutput": 64000,
       "reasoning": true,
-      "image": false
+      "image": false,
+      "outputIncludesThinking": false
     },
     "deepseek-v3.2": {
       "name": "DeepSeek V3.2",
@@ -6616,7 +6622,8 @@
       "context": 128000,
       "maxOutput": 64000,
       "reasoning": true,
-      "image": false
+      "image": false,
+      "outputIncludesThinking": false
     }
   },
   "baidu-cloud": {
@@ -6737,7 +6744,8 @@
       "context": 128000,
       "maxOutput": 64000,
       "reasoning": true,
-      "image": false
+      "image": false,
+      "outputIncludesThinking": false
     },
     "deepseek-v3.2": {
       "name": "DeepSeek V3.2",

@@ -11,13 +11,14 @@
  */
 
 /**
- * 6 个语义 Slot 的 id。新增 Slot 时在此追加，core descriptor 与 UI metadata
+ * 7 个语义 Slot 的 id。新增 Slot 时在此追加，core descriptor 与 UI metadata
  * 会被 TypeScript 的 exhaustive Record 检查强迫补齐。
  */
 export const AUXILIARY_SLOT_IDS = [
   "title",
   "summarize",
   "memory",
+  "knowledge",
   "vision",
   "approval",
   "guard",

@@ -229,6 +229,72 @@ describe("model sync related routes", () => {
     expectAppEvent(engine.emitEvent, "models-changed", { agentId: null });
   });
 
+  it("operation model preferences use the provider catalog without entering chat model sync", async () => {
+    const { createPreferencesRoute } = await import("../server/routes/preferences.ts");
+    const app = new Hono();
+    const operationModels = [{
+      id: "embed-model",
+      provider: "provider-a",
+      operations: ["embedding"],
+      operationProtocol: "openai-embeddings",
+    }];
+    const engine = {
+      getSharedModels: vi.fn(() => ({ embedding: null, rerank: null })),
+      getSearchConfig: vi.fn(() => ({ provider: null, api_key: null })),
+      listModelOperationModels: vi.fn(() => operationModels),
+      setSharedModels: vi.fn(),
+      setSearchConfig: vi.fn(),
+      syncModelsAndRefresh: vi.fn().mockResolvedValue(true),
+      emitEvent: vi.fn(),
+    };
+    app.route("/api", createPreferencesRoute(engine));
+
+    const read = await app.request("/api/preferences/models");
+    expect(await read.json()).toMatchObject({ operation_models: operationModels });
+
+    const write = await app.request("/api/preferences/models", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        models: { embedding: { id: "embed-model", provider: "provider-a" } },
+      }),
+    });
+    expect(write.status).toBe(200);
+    expect(engine.listModelOperationModels).toHaveBeenCalledWith("embedding");
+    expect(engine.setSharedModels).toHaveBeenCalledWith({
+      embedding: { id: "embed-model", provider: "provider-a" },
+    });
+    expect(engine.syncModelsAndRefresh).not.toHaveBeenCalled();
+    expectAppEvent(engine.emitEvent, "models-changed", { agentId: null });
+  });
+
+  it("rejects an unavailable configured operation model instead of saving a fallback", async () => {
+    const { createPreferencesRoute } = await import("../server/routes/preferences.ts");
+    const app = new Hono();
+    const engine = {
+      getSharedModels: vi.fn(() => ({ embedding: null })),
+      getSearchConfig: vi.fn(() => ({ provider: null, api_key: null })),
+      listModelOperationModels: vi.fn(() => []),
+      setSharedModels: vi.fn(),
+      setSearchConfig: vi.fn(),
+      syncModelsAndRefresh: vi.fn(),
+      emitEvent: vi.fn(),
+    };
+    app.route("/api", createPreferencesRoute(engine));
+
+    const response = await app.request("/api/preferences/models", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        models: { embedding: { id: "missing", provider: "provider-a" } },
+      }),
+    });
+    expect(response.status).toBe(400);
+    expect(await response.json()).toMatchObject({ error: "embedding model is unavailable" });
+    expect(engine.setSharedModels).not.toHaveBeenCalled();
+    expect(engine.emitEvent).not.toHaveBeenCalled();
+  });
+
   it("shared model preference updates return an error and emit no event when model refresh fails", async () => {
     const { createPreferencesRoute } = await import("../server/routes/preferences.ts");
     const app = new Hono();

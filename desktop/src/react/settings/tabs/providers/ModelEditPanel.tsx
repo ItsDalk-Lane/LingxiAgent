@@ -156,6 +156,12 @@ export function ModelEditPanel({
   );
   const [ctxVal, setCtxVal] = useState(String(initialContext ?? ''));
   const [outVal, setOutVal] = useState(String(initialMaxOutput ?? ''));
+  // 「最大输出」口径：''=自动（按线协议家族推导）、'true'=输出长度包含思维链、
+  // 'false'=输出长度仅指最终回答。只反映用户覆盖，known 目录声明不回填。
+  const [outputComp, setOutputComp] = useState<string>(
+    userMeta.outputIncludesThinking === true ? 'true'
+      : userMeta.outputIncludesThinking === false ? 'false' : '',
+  );
   const [inputs, setInputs] = useState<Modality[]>(initialInputs);
   const [outputs, setOutputs] = useState<Modality[]>(initialOutputs);
   const [reasoning, setReasoning] = useState<boolean>(meta.reasoning === true);
@@ -202,6 +208,8 @@ export function ModelEditPanel({
       const maxOut = outVal.trim();
       if (ctx) entry.context = parseInt(ctx);
       if (maxOut) entry.maxOutput = parseInt(maxOut);
+      // null（''=自动）显式清除覆盖，回到按线协议家族的自动推导。
+      if (dirty.outputComp) entry.outputIncludesThinking = outputComp === '' ? null : outputComp === 'true';
       if (dirty.inputs) entry.inputs = MODALITY_ORDER.filter(m => inputs.includes(m));
       if (dirty.outputs) entry.outputs = MODALITY_ORDER.filter(m => outputs.includes(m));
       if (dirty.reasoning) entry.reasoning = reasoning;
@@ -294,6 +302,19 @@ export function ModelEditPanel({
               <label className={styles['pv-model-edit-label']}>{t('settings.api.maxOutput')}</label>
               <ComboInput presets={OUTPUT_PRESETS} value={outVal} onChange={setOutVal} placeholder="65536" />
             </div>
+          </div>
+          <div className={styles['pv-model-edit-field']}>
+            <label className={styles['pv-model-edit-label']}>{t('settings.api.outputComposition')}</label>
+            <select
+              className={styles['settings-input']}
+              value={outputComp}
+              onChange={(e) => { setOutputComp(e.target.value); markDirty('outputComp'); }}
+            >
+              <option value="">{t('settings.api.outputCompositionAuto')}</option>
+              <option value="false">{t('settings.api.outputCompositionSeparate')}</option>
+              <option value="true">{t('settings.api.outputCompositionIncluded')}</option>
+            </select>
+            <span className={styles['pv-model-edit-hint']}>{t('settings.api.outputCompositionHint')}</span>
           </div>
         </>
       )}

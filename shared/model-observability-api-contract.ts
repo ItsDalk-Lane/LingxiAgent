@@ -386,6 +386,15 @@ export type ModelObservabilityCallRef = {
   modelId: string | null;
 };
 
+export type ModelObservabilityOutputBudgetFact = {
+  field: string | null;
+  value: number | null;
+  composition: "included" | "separate";
+  ownership: "absent" | "user-explicit" | "system-explicit" | "hana-chat-default" | "sdk-derived";
+  chatDefault: number | null;
+  declaredMaxOutput: number | null;
+};
+
 export type ModelObservabilityAttemptSummary = {
   attemptId: string;
   startedAt: string | null;
@@ -398,6 +407,11 @@ export type ModelObservabilityAttemptSummary = {
   providerWireVisibility: string | null;
   errorName: string | null;
   errorCode: string | null;
+  /**
+   * Output Budget Fact（provider_request_prepared 物化的输出预算来源事实）。
+   * 缺失时为 null（旧数据或未产生预算决策的 attempt）——显式无数据，不伪造。
+   */
+  outputBudget: ModelObservabilityOutputBudgetFact | null;
 };
 
 export type ModelObservabilityCallDetail = {
@@ -682,6 +696,7 @@ export const SEMANTIC_INPUT_SHAPES = [
   "external_cli_media",
   "speech_transcribe",
   "provider_probe",
+  "model_operation",
 ] as const;
 export type SemanticInputShape = typeof SEMANTIC_INPUT_SHAPES[number];
 

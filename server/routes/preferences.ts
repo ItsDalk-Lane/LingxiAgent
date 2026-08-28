@@ -169,6 +169,7 @@ export function createPreferencesRoute(engine: any, options: Record<string, any>
 
       return c.json({
         models,
+        operation_models: engine.listModelOperationModels?.() || [],
         thinking_level: engine.getThinkingLevel?.() || "medium",
         search: {
           provider: search.provider || "",
@@ -213,6 +214,17 @@ export function createPreferencesRoute(engine: any, options: Record<string, any>
           }
           if (!modelSupportsImage(resolved)) {
             return c.json({ error: "vision model must support image input" }, 400);
+          }
+        }
+        for (const operation of ["embedding", "rerank"] as const) {
+          const ref = modelsPatch[operation];
+          if (!ref) continue;
+          const available = engine.listModelOperationModels?.(operation) || [];
+          const matches = available.some((model) => (
+            model?.id === ref.id && model?.provider === ref.provider
+          ));
+          if (!matches) {
+            return c.json({ error: `${operation} model is unavailable` }, 400);
           }
         }
         engine.setSharedModels(modelsPatch);

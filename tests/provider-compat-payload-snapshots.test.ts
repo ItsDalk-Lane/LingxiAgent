@@ -112,7 +112,7 @@ describe("provider payload snapshots", () => {
     expect(payloads).toMatchInlineSnapshot(`
       {
         "anthropicCompatibleReasoning": {
-          "max_tokens": 65536,
+          "max_tokens": 81920,
           "messages": [
             {
               "content": "hi",
@@ -126,7 +126,7 @@ describe("provider payload snapshots", () => {
           },
         },
         "anthropicMessagesNative": {
-          "max_tokens": 65536,
+          "max_tokens": 81920,
           "messages": [
             {
               "content": [

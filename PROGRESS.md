@@ -10,7 +10,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = 87249ede84f52e7cbf4533f8b99178dcc87b0fe6  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-08-25 v0.1.31 release 元数据)
+VERIFIED_SOURCE_SHA   = 7de8ed8e0e47b39282f0c8e7d8140fa1cc6bfcb3  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-08-28 PR #29 knowledge-notebook + provider-compat 输出预算 + 四平台 CI 修复四轮)
 工作分支              = feature/upstream-sync-0.447.4
 ```
 
@@ -370,6 +370,51 @@ seal 不是一次性终点，而是"当前被验证树"的游标；每次审计�
   update-digest-history / generate-release-digest / release-workflow-gates /
   post-verification-audit-seal / upstream-sync-matrix 全绿）后推进。
 
+- **2026-08-28 knowledge-notebook + provider-compat + 四平台 CI 修复**（功能链
+  1f3e1ea1（knowledge-notebook：知识存储/导入/检索/研究/引用、KnowledgePage UI、
+  server 路由与测试，97 files +21k，Store Registry knowledge-database 等登记）
+  → da7fa01a（provider-compat：输出预算控制与模型解析，output-budget 扩展 +
+  anthropic 兼容层适配 + CI 矩阵钉住 macos-15/macos-15-intel/windows-2025/
+  ubuntu-24.04 精确 runner + knowledge/build 平台 smoke）
+  → 2e7798ae（CI 修复，seal 本轮坐标））：PR #29 首轮 CI 四平台 test job 全红
+  （各 5–7 失败），三因收口——① knowledge-query-service 两处
+  /tmp/lingxi-embed-diag.log appendFileSync 调试残留为未登记持久化点
+  （persistence 三测试全平台红），删除后 store-inventory 重生成（skill 删除点
+  已随 da7fa01a 迁至 lib/skills/skill-removal.ts，committed inventory 仍指
+  server/routes/skills.ts 旧路径，此前被未登记点先抛遮蔽）+ fingerprint
+  compatible repin（sha256:6a120a12…）；② macos-15-intel 新 runner 上三个
+  real esbuild+nft 慢测试超时（单轮 60–110s），预算 120s/180s→420s/600s；
+  ③ session-manifest corrupt-manifest 清理仅关 manifest store，而本 PR 起
+  LingxiEngine 构造即打开 knowledge 三库句柄（knowledge/knowledge-fts/
+  knowledge-vector），Windows rmSync EPERM（macOS 可删已打开文件故本地不可见，
+  与 Phase 10.1 vertical 泄漏同型），改 engine.dispose() 统一收口 + rmSync
+  maxRetries 兜底。验证（2e7798ae 树）：typecheck×3（绿）+ 目标回归
+  （persistence-store-registry / persistence-startup-receipt /
+  persistence-schema-tripwire / session-manifest-engine / cli-closure-census /
+  knowledge-query 全绿）+ full npm test 12324 passed / 0 failed（推进前 seal guard
+  旧坐标预期红；另 artifact-core-ustar afterEach 本地并行清理 ENOTEMPTY 一次，
+  单跑 10/10 绿且四平台 CI 从未红，判本地环境 flake）后推进。
+  第二轮（52d29b3c，seal 终坐标）：上轮 CI arm64/ubuntu/windows 全绿，唯
+  macos-15-intel 满载下 persistence-store-registry 双扫描测试（generates
+  deterministic / anchors by ordinal）打穿 vitest 默认 10s（单扫描测试擦线过：
+  单次全仓扫描在该 runner 逼近 10s，两次必超，算术非抖动，重试不可解）。
+  修法与 cli-closure 同款：全仓扫描测试显式超时预算（单扫描 60s ×4 处、
+  双扫描 120s ×2 处，断言零变化）。验证：两文件 17 用例绿 + typecheck×3
+  绿后二次推进。
+  第三轮（236109df，seal 终坐标）：上轮 CI arm64/ubuntu/windows 全绿，
+  macos-15-intel 换 model-observability-blob size cap（64MB+1 Uint8Array
+  分配）打穿 10s——边缘型重负载单测逐个冒头是打地鼠，系统性收口：
+  vitest.config 全局 testTimeout/hookTimeout 10s→60s（6 倍余量；更慢
+  场景仍由显式预算覆盖）。验证：blob 套件绿 + typecheck×3 绿后三次推进。
+  第四轮（7de8ed8e，seal 终坐标）：上轮 CI 唯一失败 macos-15-intel
+  markdown-blocks「collects complete direct syntax-tree children」断言只收
+  到首块——根因是 CodeMirror 增量解析按时间预算推进，syntaxTree() 可能
+  返回只含首块的部分树（快机器预算内解析完故不可见，生产环境真实潜在
+  bug 非纯测试问题）。修复：collectMarkdownBlocks 与 block-selection
+  缓存键改 ensureSyntaxTree(doc.length, 1s) 同步补齐完整树；装饰/hover
+  增量路径保持部分树语义不变。验证：editor 套件 80 用例绿 + typecheck×3
+  绿后四次推进。
+
 
 ## 最终状态：已合并（上游同步部分）
 
@@ -407,3 +452,72 @@ post-verification diff guard 在 `npm test` 中运行（独立可执行形态为
 
 Windows NSIS 已在 windows-latest 构建成功；尚未在真实 Windows 桌面环境执行安装/升级
 交互 smoke（宿主平台 macOS 无法运行 NSIS 安装包）。不伪造真机安装通过。
+
+## 2026-08-25 Notebook-first Knowledge 目标
+
+### 当前阶段：本机闭环完成，外部证据待执行
+
+- 已完整读取用户附件 3911 行，确认目标是 Notebook-first、可信引用和可审计全文研究的完整产品能力。
+- 已发现主工作区存在 11 个无关文档删除，因此从 `e1bac7be` 创建隔离分支 `codex/knowledge-notebook` 与独立工作区。
+- 已建立 `task_plan.md` 和 `findings.md` 作为本目标的断点续跑记录。
+- Phase 0–10 的本机实现、逐条规格审计、缺口修复和可执行验证均已完成；四平台正式流水线已接好但尚未远端执行，真实付费模型 live smoke 与提交后 audit seal 保持 `NOT_EXECUTED`。
+
+### Phase 1–3：Knowledge 持久化、可信引用与原生页面（工作区实现）
+
+- 已建立独立 Knowledge 数据库和托管快照，完成 Notebook、来源成员关系、解析产物、引用与重启恢复；未使用偏好文件承载业务数据。
+- 已完成 TXT、Markdown、HTML、PDF 的首批引用级解析；扫描 PDF 明确标记需要 OCR，外部原件删除后历史快照和引用仍可读取。
+- 已挂载仅限 Studio Owner 的 `/api/knowledge/*`，本机绝对路径导入额外要求 Local Owner，返回值不泄露内部或用户路径。
+- 已接入原生一级“知识”页面：Notebook 管理、来源导入/状态/查看器、Notebook-only 查询范围均已完成。
+- 当前定向验证：后端 7 文件/55 项、页面与页签 5 文件/16 项、类型检查、持久化扫描均通过；完整回归与 seal 留待所有阶段结束后执行。
+
+### Phase 4：FTS Quick Answer（工作区实现）
+
+- 已完成发送时不可变范围冻结、中文全文索引、稳定分块、标准回答、后端引用校验和失败状态持久化。
+- 标准回答只从选中 Notebook 的冻结范围检索；范围为空或任一来源未就绪会明确失败，不会偷偷排除来源。
+- 原生页面已能发送标准回答，明确显示“基于相关内容检索”；历史引用可打开冻结快照并高亮原句。
+- 当前 Phase 1–4 与模型角色定向验证 10 文件/50 项全部通过，三套类型检查通过；下一阶段进入可选混合检索。
+
+### Phase 5：Provider Operation + Hybrid Retrieval（工作区实现）
+
+- 已把 Google 原生文本调用补进共享非流式边界；Embedding/Rerank 作为独立 Provider 操作能力，不进入辅助模型角色或聊天目录。
+- 已建立统一操作解析、供应商凭证刷新、用量/观测调用客户端，以及独立可重建向量缓存；未新增 Knowledge 专属密钥。
+- FTS-only、FTS+Vector、FTS+Vector+Rerank 三种状态均有端到端契约测试；设置页相邻呈现知识分析、可选嵌入、可选重排。
+- 当前相关验证累计覆盖 43、78、12、20、70 项分组测试，三套类型检查通过；真实供应商付费网络 smoke 因本机无密钥保持 `NOT_EXECUTED`。
+
+### Phase 6–8：全文研究、证据链与研究界面（工作区实现）
+
+- 已完成冻结范围、覆盖清单、分析单位、批次/尝试账本与重启恢复；检索只改变执行顺序，不能减少全文覆盖。
+- 已完成服务端引文复验、证据/结论/矛盾事实与受约束综合；覆盖或完整矛盾检查不足 100% 时只能形成部分完成报告。
+- 已完成活动研究重连、取消/恢复、覆盖进度、冲突、限制和历史引用跳转界面；研究事实保存在独立数据库，宿主任务中心只负责展示和控制。
+- 已完成本地文件刷新、粘贴来源和带每跳 SSRF 防护的冻结网页快照；历史内容版本不受外部来源变化或删除影响。
+
+### Phase 9：本地验证收口（工作区实现）
+
+- 持久化治理为 65 个 Store / 756 个访问点；Knowledge 真实 schema v5 进入指纹与 tripwire，兼容性指纹为 `sha256:34763e876cb11167ccc0388a9bbbfb4c1f177081d7c1fd415d1b245a1080997b`。
+- 正式运行闭包为 10634 个文件（734 source graph / 11 runtime assets / 9889 nft）；开放边界保持 1 条既有基线边。
+- 生产服务签名构建和原生依赖启动冒烟通过，临时签名材料已销毁；前端生产构建通过。
+- 真实浏览器使用隔离数据完成 Notebook 创建、粘贴来源、READY 状态、逐字正文和行号锚点查看；控制台与页面错误均为 0。
+- 最终完整回归（仅排除需要提交坐标的 seal 测试）为 1221 文件通过、1 跳过；12270 项通过、7 跳过；类型检查、零错误代码检查、边界和补丁格式均通过。
+- 生产依赖审计保留既有 7 个中等级别问题、退出码 1；未执行破坏性自动修复。
+- `WORKFLOW_READY / NOT_EXECUTED`：macOS arm64、macOS Intel x64、Windows x64、Linux x64 已使用明确宿主并接入源级恢复、种子验签和真实归档两次启动烟测，但未提交、未远端执行。
+- `NOT_EXECUTED`：真实供应商 Embedding/Rerank live smoke、获准提交后的 audit seal。当前未提交、未推送。
+
+### Phase 10：逐条规格审计与缺口修复（本机完成）
+
+- 已把附件 75 个主题章节、A–M 核心场景和全部明确禁项映射到源码、测试与运行时证据；未定义协议的“高影响歧义确认”未用主观启发式伪造实现。
+- 已补齐最终综合发现证据不足时的 Verification Step：只复查冻结范围内全部分析单元，新证据经逐字校验进入账本，再执行第二次受约束综合；步骤、单元、尝试和关系均可恢复、可取消、可审计。
+- 已补齐 Notebook 软删除后的历史报告/引用可读、Knowledge 连续请求热读取凭证与模型、多格式多 Notebook 范围计数、失败解析整单拒绝、无范围禁发和检索免责声明等验收证据。
+- 已补齐四平台交付链：矩阵先硬校验真实宿主，再运行新建/重启/Full Research/Verification 崩溃恢复；服务器种子验签后从真实归档解包、启动两次并读回冻结正文。当前 macOS arm64 真包链已通过，另三宿主待远端运行。
+- 定向集中回归 27 文件 284 项、生成物/边界回归 11 文件 138 项、持久化门禁 5 文件 54 项均通过；四平台补强后全仓为 1221 文件、12270 项通过。Renderer 与带一次性签名的完整服务器构建通过，临时密钥已精确销毁。
+## 2026-08-25 Knowledge 最终本机复验补充
+
+- 四平台工作流契约：4 files / 28 tests 全部通过。
+- Knowledge 平台稳定性集合：9 files / 85 tests 全部通过。
+- 最终低并发全量测试：1222 files passed、1 skipped；12274 tests passed、7 skipped；130.80s。
+- 三套 TypeScript 检查、代码规范检查（0 error，仓库既有 warnings）、开放边界 ratchet、补丁空白检查均通过。
+- 四种真实托管主机的工作流执行仍为 `NOT_EXECUTED`：当前改动未提交，且本任务没有 commit、push 或远程工作流触发授权。
+## 2026-08-26 Knowledge 外部阻塞收口
+
+- 重新按 3911 行任务书审计当前状态；本机可闭合项没有发现新缺口。
+- 当前复跑：四平台统一稳定性 85/85、工作流契约 28/28、本机真实服务器归档新装/重启/快照读回，退出码均为 0。
+- 远端不存在 `codex/knowledge-notebook` 分支或该分支工作流运行。Phase 9 四种真实宿主仍为 `NOT_EXECUTED`；需要明确 commit、push 和远程触发授权后才能继续。

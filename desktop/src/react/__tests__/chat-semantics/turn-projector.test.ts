@@ -255,4 +255,112 @@ describe('turn projector', () => {
 
     expect(reloaded).toEqual(liveFinalized);
   });
+
+  it('被后续工具证明是叙事的正文段降级为 commentary，并按到达序穿插回时间线', () => {
+    // 真实 agentic 流的形状：供应商从不显式报告相位（textSignature 无人写入），
+    // 全部正文段出生时都是 final_answer；只有回合结构能反推真实身份。
+    const result = projectAssistantTurn({
+      idPrefix: 'entry-assistant-1',
+      inputMessageId: 'entry-user-1',
+      assistantMessageIds: ['entry-assistant-1'],
+      segments: [
+        { ...segment('a:text:0', 'final_answer', '我去看一下提交历史。'), processOrder: 0 },
+        { ...segment('a:text:1', 'final_answer', '让我把内容展开来看。'), processOrder: 2 },
+        { ...segment('a:text:2', 'final_answer', '# 提交历史梳理\n……'), processOrder: 6 },
+        { ...segment('a:reasoning:0', 'reasoning', '先想', 'reasoning'), processOrder: 3 },
+      ],
+      legacyBlocks: [
+        {
+          type: 'tool_group',
+          tools: [{ id: 'call-1', name: 'exec_command', done: true, success: true }],
+          collapsed: false,
+          processOrder: 1,
+        },
+        {
+          type: 'tool_group',
+          tools: [{ id: 'call-2', name: 'read', done: true, success: true }],
+          collapsed: false,
+          processOrder: 5,
+        },
+      ],
+      status: 'completed',
+    });
+
+    const timelineTypes = result.blocks.map((block) => block.type);
+    // 叙事段落插入它们真实的到达位置，答案仍留在全部过程块之后。
+    expect(timelineTypes).toEqual([
+      'text', 'tool_group', 'text', 'thinking', 'tool_group', 'text',
+    ]);
+    expect(result.blocks[0]).toMatchObject({
+      semanticPhase: 'commentary',
+      surfaceRole: 'process',
+      source: '我去看一下提交历史。',
+    });
+    expect(result.blocks[2]).toMatchObject({
+      semanticPhase: 'commentary',
+      surfaceRole: 'process',
+    });
+    expect(result.blocks[5]).toMatchObject({
+      semanticPhase: 'final_answer',
+      surfaceRole: 'answer',
+    });
+    expect(result.projection.answerBlockIds).toHaveLength(1);
+    expect(result.projection.processBlockIds).toHaveLength(5);
+    // 降级只改身份不改标识：segment 块 id 稳定。
+    expect(result.projection.processBlockIds[0]).toBe('entry-assistant-1:segment:a:text:0');
+  });
+
+  it('流式期 provisional 正文落在生成锚点之前时同样降级，不冒充临时区', () => {
+    const result = projectAssistantTurn({
+      idPrefix: 'entry-assistant-1',
+      inputMessageId: 'entry-user-1',
+      assistantMessageIds: ['entry-assistant-1'],
+      segments: [
+        { ...segment('a:text:0', 'unresolved', '还没判明的开头'), lifecycle: 'streaming', processOrder: 0 },
+        { ...segment('a:text:1', 'unresolved', '正在输出的结尾'), lifecycle: 'streaming', processOrder: 2 },
+      ],
+      legacyBlocks: [{
+        type: 'tool_group',
+        tools: [{ id: 'call-1', name: 'exec_command', done: false, success: false }],
+        collapsed: false,
+        processOrder: 1,
+      }],
+      status: 'streaming',
+    });
+
+    expect(result.blocks.map((block) => block.surfaceRole)).toEqual([
+      'process', 'process', 'provisional',
+    ]);
+  });
+
+  it('只有尾部文字（其后没有任何锚点）时保持 answer 分类不变', () => {
+    const result = projectAssistantTurn({
+      idPrefix: 'entry-assistant-1',
+      inputMessageId: 'entry-user-1',
+      assistantMessageIds: ['entry-assistant-1'],
+      segments: [{ ...segment('a:text:0', 'final_answer', '纯文本答复'), processOrder: 0 }],
+      legacyBlocks: [],
+      status: 'completed',
+    });
+
+    expect(result.blocks[0]).toMatchObject({ surfaceRole: 'answer' });
+    expect(result.projection.processBlockIds).toEqual([]);
+  });
+
+  it('无到达戳的旧数据不做结构推断（保守不降级）', () => {
+    const result = projectAssistantTurn({
+      idPrefix: 'entry-assistant-1',
+      inputMessageId: 'entry-user-1',
+      assistantMessageIds: ['entry-assistant-1'],
+      segments: [segment('a:text:0', 'final_answer', '写在最前的答复')],
+      legacyBlocks: [{
+        type: 'tool_group',
+        tools: [{ id: 'call-1', name: 'read', done: true, success: true }],
+        collapsed: false,
+      }],
+      status: 'completed',
+    });
+
+    expect(result.blocks.filter((block) => block.surfaceRole === 'answer')).toHaveLength(1);
+  });
 });

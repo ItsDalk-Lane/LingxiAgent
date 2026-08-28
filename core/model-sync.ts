@@ -183,6 +183,10 @@ function buildModelOverride(modelEntry, modelDefaults = {}, executionHeaders = {
     ?? modelEntry.maxTokens
     ?? modelEntry.maxOutputTokens;
   if (configuredMaxOutput !== undefined) override.maxTokens = configuredMaxOutput;
+  // 「最大输出是否包含思维链」的按模型契约，与 maxOutput 同级投影。
+  if (modelEntry.outputIncludesThinking !== undefined) {
+    override.outputIncludesThinking = modelEntry.outputIncludesThinking === true;
+  }
   const defaultThinkingLevel = modelEntry.defaultThinkingLevel ?? modelDefaultThinkingLevel;
   if (defaultThinkingLevel !== undefined) {
     override.defaultThinkingLevel = defaultThinkingLevel;
@@ -342,6 +346,15 @@ function buildModelEntry(
     ? (modelEntry.maxOutput ?? modelEntry.maxTokens ?? modelEntry.maxOutputTokens)
     : undefined) ?? piProtocolBaseline?.maxTokens ?? known?.maxOutput;
   if (maxOutput) entry.maxTokens = maxOutput;
+  // 「最大输出是否包含思维链」契约：用户显式声明 > known-models 词条。
+  // true=思维链计入 maxOutput；false=思维链独立预算，maxOutput 仅约束最终回答。
+  // 未声明的模型不落字段，消费端按线协议家族推导（shared/model-capabilities.ts）。
+  const resolvedOutputIncludesThinking = (isObj && modelEntry.outputIncludesThinking !== undefined)
+    ? modelEntry.outputIncludesThinking === true
+    : known?.outputIncludesThinking;
+  if (resolvedOutputIncludesThinking === true || resolvedOutputIncludesThinking === false) {
+    entry.outputIncludesThinking = resolvedOutputIncludesThinking;
+  }
   const configuredDefaultThinkingLevel = getProviderModelDefaultThinkingLevel(modelDefaults, id);
   const defaultThinkingLevel = isObj
     ? (modelEntry.defaultThinkingLevel ?? configuredDefaultThinkingLevel ?? providerKnown?.defaultThinkingLevel)

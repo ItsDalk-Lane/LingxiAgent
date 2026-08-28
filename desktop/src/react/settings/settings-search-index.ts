@@ -169,7 +169,7 @@ const BUILT_IN_SETTINGS_SEARCH_ENTRIES: SettingsSearchEntry[] = [
     tabId: 'models',
     titleKey: 'settings.models.auxiliary',
     pathKeys: ['settings.tabs.models'],
-    aliases: ['auxiliary model', 'title', 'summarize', 'memory', 'vision', 'approval', 'guard', '辅助模型', '标题', '摘要', '记忆', '视觉', '审批', '守卫'],
+    aliases: ['auxiliary model', 'title', 'summarize', 'memory', 'knowledge', 'vision', 'approval', 'guard', '辅助模型', '标题', '摘要', '记忆', '知识', '视觉', '审批', '守卫'],
   },
   {
     id: 'models-global-defaults',

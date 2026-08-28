@@ -104,6 +104,10 @@ function serializeModelInfo(model, { current = null, overrides = null } = {}) {
     defaultThinkingLevel: resolveModelDefaultThinkingLevel(model),
     contextWindow: model.contextWindow,
     maxTokens: model.maxTokens,
+    // 「最大输出是否包含思维链」契约（未声明时省略，客户端按线协议家族推导）。
+    ...(model.outputIncludesThinking === true || model.outputIncludesThinking === false
+      ? { outputIncludesThinking: model.outputIncludesThinking }
+      : {}),
     ...(modelSupportsXhigh(model) ? { xhigh: true } : {}),
     ...(toolUse ? { toolUse } : {}),
   };

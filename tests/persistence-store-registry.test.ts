@@ -60,7 +60,8 @@ describe("persistent store registry", () => {
       expect(Number(Boolean(site.storeId)) + Number(Boolean(site.exemptionId))).toBe(1);
       expect(site.reason).toBeTruthy();
     }
-  });
+    // 全仓扫描：慢 I/O runner（macos-15-intel）单次扫描可逼近 10s 默认超时。
+  }, 60_000);
 
   it("keeps required store contracts explicit and session identity path-independent", () => {
     const ids = new Set(PERSISTENT_STORES.map((store) => store.id));
@@ -241,7 +242,7 @@ describe("persistent store registry", () => {
       exemptions: [...PERSISTENCE_EXEMPTIONS, dangling],
       today: TODAY,
     })).toThrow(/dangling persistence exemption/);
-  });
+  }, 60_000);
 
   it("fails closed when a declared production root is missing", () => {
     const root = tempRepository();
@@ -368,7 +369,7 @@ describe("persistent store registry", () => {
     const serialized = JSON.stringify(committed);
     expect(serialized).not.toMatch(/(?:\/Users\/|\/home\/|[A-Za-z]:\\)/);
     expect(committed.discoveredSites.every((site: { sourceFile: string }) => !site.sourceFile.includes("\\"))).toBe(true);
-  });
+  }, 120_000);
 
   it("anchors sites by ordinal so the receipt survives line shifts", () => {
     // The absolute line number never took part in classification: ruleMatches
@@ -394,7 +395,7 @@ describe("persistent store registry", () => {
       sourceOverrides: new Map([[target, `// line shift mutation\n${original}`]]),
     });
     expect(shifted.inventory.discoveredSites).toEqual(inventory.discoveredSites);
-  });
+  }, 120_000);
 
   it("still reports a genuinely new write site after the ordinal change", () => {
     // Desensitizing line numbers must not blunt the guard: adding a real write
@@ -406,5 +407,5 @@ describe("persistent store registry", () => {
       today: TODAY,
       sourceOverrides: new Map([[target, `${original}\nfs.writeFileSync("/tmp/persistence-drift-probe.json", "{}");\n`]]),
     })).toThrow(/unregistered persistence site/);
-  });
+  }, 60_000);
 });

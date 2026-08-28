@@ -165,12 +165,15 @@ describe('DreamRevisionBrowser', () => {
     fireEvent.click(await screen.findByText('settings.memory.dream.revisions.confirmRestore'));
 
     expect(await screen.findByText('settings.memory.dream.revisions.restored')).toBeInTheDocument();
-    // 列表被重新拉取（初始一次 + 恢复后一次）
-    expect(loadDreamRevisions).toHaveBeenCalledTimes(2);
-    // 恢复后重新读取 revision detail（刷新 current 对比），且发生在 restore 之后
+    await waitFor(() => {
+      // 列表被重新拉取（初始一次 + 恢复后一次）
+      expect(loadDreamRevisions).toHaveBeenCalledTimes(2);
+      // 恢复后重新读取 revision detail（刷新 current 对比）
+      expect(vi.mocked(loadDreamRevision).mock.calls.length).toBeGreaterThanOrEqual(3);
+    });
+    // 最后一次 detail 读取必须发生在 restore 之后
     const restoreOrder = vi.mocked(restoreDream).mock.invocationCallOrder[0];
     const revisionCalls = vi.mocked(loadDreamRevision).mock.invocationCallOrder;
-    expect(revisionCalls.length).toBeGreaterThanOrEqual(3);
     expect(revisionCalls[revisionCalls.length - 1]).toBeGreaterThan(restoreOrder);
   });
 

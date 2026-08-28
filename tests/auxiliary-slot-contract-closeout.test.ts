@@ -132,9 +132,9 @@ describe("Task C7 / Task 4: canonical slot single source of truth", () => {
     }
   });
 
-  it("canonical Slot 数量恰好为 6（title/summarize/memory/vision/approval/guard）", () => {
+  it("canonical Slot 数量恰好为 7（title/summarize/memory/vision/approval/guard/knowledge）", () => {
     expect([...AUXILIARY_SLOT_IDS].sort()).toEqual(
-      ["approval", "guard", "memory", "summarize", "title", "vision"],
+      ["approval", "guard", "knowledge", "memory", "summarize", "title", "vision"],
     );
   });
 

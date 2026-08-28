@@ -228,6 +228,52 @@ function boolFlag(value: unknown): boolean {
   return value === 1 || value === true;
 }
 
+const OUTPUT_BUDGET_OWNERSHIPS = new Set([
+  "absent",
+  "user-explicit",
+  "system-explicit",
+  "hana-chat-default",
+  "sdk-derived",
+]);
+
+/**
+ * 从 attempt.safe_details_json（provider_request_prepared 的持久 details）中
+ * 提取 Output Budget Fact。数据是落盘后的旧版本或手改文件：形状不符时显式
+ * 返回 null，不按快照伪造（与 sanitize 系列同款纪律）。
+ */
+function extractOutputBudgetFact(safeDetailsJson: unknown): ModelObservabilityOutputBudgetFact | null {
+  if (typeof safeDetailsJson !== "string" || !safeDetailsJson) return null;
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(safeDetailsJson);
+  } catch {
+    return null;
+  }
+  const fact = parsed && typeof parsed === "object" && !Array.isArray(parsed)
+    ? (parsed as Record<string, unknown>).outputBudget
+    : undefined;
+  if (!fact || typeof fact !== "object" || Array.isArray(fact)) return null;
+  const source = fact as Record<string, unknown>;
+  if (
+    (source.field !== null && typeof source.field !== "string")
+    || !OUTPUT_BUDGET_OWNERSHIPS.has(String(source.ownership))
+    || (source.composition !== "included" && source.composition !== "separate")
+  ) {
+    return null;
+  }
+  for (const key of ["value", "chatDefault", "declaredMaxOutput"] as const) {
+    if (source[key] !== null && !Number.isFinite(Number(source[key]))) return null;
+  }
+  return {
+    field: typeof source.field === "string" ? source.field : null,
+    value: source.value === null ? null : Number(source.value),
+    composition: source.composition,
+    ownership: source.ownership as ModelObservabilityOutputBudgetFact["ownership"],
+    chatDefault: source.chatDefault === null ? null : Number(source.chatDefault),
+    declaredMaxOutput: source.declaredMaxOutput === null ? null : Number(source.declaredMaxOutput),
+  };
+}
+
 function durationMs(startedAt: string | null, endedAt: string | null): number | null {
   if (!startedAt || !endedAt) return null;
   const start = new Date(startedAt).getTime();
@@ -279,6 +325,7 @@ import type {
   ModelObservabilityPayloadRecordDetail,
   ModelObservabilityCallRef,
   ModelObservabilityAttemptSummary,
+  ModelObservabilityOutputBudgetFact,
   ModelObservabilityCallDetail,
   ModelObservabilityTraceDetail,
 } from "../../shared/model-observability-api-contract.ts";
@@ -1153,6 +1200,7 @@ export function createModelObservabilityQueryService({ lingxiHome }: { lingxiHom
           providerWireVisibility: textOrNull(attempt.provider_wire_visibility),
           errorName: textOrNull(attempt.error_name),
           errorCode: textOrNull(attempt.error_code),
+          outputBudget: extractOutputBudgetFact(attempt.safe_details_json),
         })),
         payloadRecords: payloadMeta,
       };

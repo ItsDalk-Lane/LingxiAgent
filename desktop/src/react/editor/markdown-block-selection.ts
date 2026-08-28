@@ -10,8 +10,9 @@ import {
   ViewPlugin,
   type ViewUpdate,
 } from '@codemirror/view';
-import { syntaxTree } from '@codemirror/language';
+import { ensureSyntaxTree, syntaxTree } from '@codemirror/language';
 import {
+  BLOCK_TREE_ENSURE_TIMEOUT_MS,
   collectMarkdownBlocks,
   type MarkdownBlock,
 } from './markdown-blocks';
@@ -29,7 +30,10 @@ const markdownBlockCache = new WeakMap<object, {
 }>();
 
 function blocksForState(state: EditorState): MarkdownBlock[] {
-  const tree = syntaxTree(state);
+  // Key the cache by the ensured-complete tree so a partial first parse never
+  // pins a stale key (blocks themselves come back complete either way).
+  const tree = ensureSyntaxTree(state, state.doc.length, BLOCK_TREE_ENSURE_TIMEOUT_MS)
+    ?? syntaxTree(state);
   const cached = markdownBlockCache.get(state.doc);
   if (cached?.tree === tree) return cached.blocks;
   const blocks = collectMarkdownBlocks(state);

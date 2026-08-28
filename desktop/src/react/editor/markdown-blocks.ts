@@ -1,6 +1,14 @@
-import { syntaxTree } from '@codemirror/language';
+import { ensureSyntaxTree, syntaxTree } from '@codemirror/language';
 import type { EditorState } from '@codemirror/state';
 import { findMarkdownFrontMatterRange } from '../utils/markdown-document';
+
+/**
+ * Budget for parsing the document synchronously before reading blocks.
+ * `syntaxTree` alone may return a partial tree: the incremental parser advances
+ * under a time budget, and on a slow loaded machine it can stop right after the
+ * first block, which would silently drop every block after it.
+ */
+export const BLOCK_TREE_ENSURE_TIMEOUT_MS = 1_000;
 
 export interface MarkdownBlock {
   readonly from: number;
@@ -32,7 +40,9 @@ export interface MarkdownBlockMove {
 export function collectMarkdownBlocks(state: EditorState): MarkdownBlock[] {
   const blocks: MarkdownBlock[] = [];
   const protectedFrontMatter = findMarkdownFrontMatterRange(state.doc.toString());
-  let node = syntaxTree(state).topNode.firstChild;
+  const tree = ensureSyntaxTree(state, state.doc.length, BLOCK_TREE_ENSURE_TIMEOUT_MS)
+    ?? syntaxTree(state);
+  let node = tree.topNode.firstChild;
 
   while (node) {
     const overlapsFrontMatter = protectedFrontMatter

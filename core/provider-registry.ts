@@ -22,6 +22,11 @@ import {
 } from "../shared/provider-auth.ts";
 import { validateProviderModels, normalizeValidatedModalityField } from "../shared/provider-model-validation.ts";
 import {
+  isModelOperation,
+  modelSupportsOperation,
+  normalizeModelOperations,
+} from "../shared/model-operations.ts";
+import {
   normalizeModelProtocolCompat,
   normalizeToolUseContract,
   normalizeVisionCapabilities,
@@ -504,6 +509,7 @@ const BUILTIN_PLUGINS = [
  * @property {string} defaultApi
  * @property {string} [authJsonKey] - OAuth provider 在 auth.json 中的 key（不同于 id 时）
  * @property {Array<string|object>} [models] - 固定 chat 模型列表（本地 Provider Plugin 可直接声明）
+ * @property {Array<object>} [operationModels] - embedding/rerank 操作模型目录；不进入 chat 投影
  * @property {Record<string, Record<string, string>>|((modelId: string) => Record<string, string>)} [modelExecutionHeaders]
  *   Provider-owned per-model protocol/routing headers. Credential-bearing names are filtered from this lane.
  * @property {object} [capabilities]
@@ -1050,6 +1056,60 @@ export class ProviderRegistry {
       .filter((model) => getModelType(providerId, model) === "chat")
       .map(getModelId)
       .filter(Boolean);
+  }
+
+  /**
+   * 返回独立于聊天投影的操作模型目录。内置声明提供候选项，用户模型条目可
+   * 按复合键覆盖同名元数据；凭证仍只来自所属 Provider。
+   */
+  getOperationModelCatalog(operation = null) {
+    if (operation !== null && !isModelOperation(operation)) {
+      throw new Error(`unknown model operation "${operation}"`);
+    }
+    if (this._entries.size === 0) this.reload();
+    const raw = this.getAllProvidersRaw();
+    const catalog = [];
+    for (const [providerId, entry] of this._entries) {
+      const pluginModels = Array.isArray(this._plugins.get(providerId)?.operationModels)
+        ? this._plugins.get(providerId).operationModels
+        : [];
+      const userModels = Array.isArray(raw[providerId]?.models)
+        ? raw[providerId].models.filter((model) => normalizeModelOperations(model).length > 0)
+        : [];
+      const models = mergeProviderModelEntries(pluginModels, userModels);
+      for (const rawModel of models) {
+        if (!rawModel || typeof rawModel !== "object") continue;
+        const operations = normalizeModelOperations(rawModel);
+        if (operations.length === 0 || (operation && !operations.includes(operation))) continue;
+        const modelId = getModelId(rawModel);
+        if (!modelId) continue;
+        const operationProtocol = rawModel.operationProtocol || rawModel.operation_protocol || "";
+        catalog.push({
+          ...cloneData(rawModel),
+          id: modelId,
+          provider: providerId,
+          name: rawModel.name || rawModel.displayName || modelId,
+          displayName: rawModel.displayName || rawModel.name || modelId,
+          operations,
+          operationProtocol,
+          api: operationProtocol,
+          baseUrl: rawModel.baseUrl || rawModel.base_url || entry.baseUrl,
+        });
+      }
+    }
+    return catalog;
+  }
+
+  getOperationModel(operation, ref) {
+    if (!isModelOperation(operation)) throw new Error(`unknown model operation "${operation}"`);
+    const parsed = typeof ref === "object" && ref !== null
+      ? { id: ref.id, provider: ref.provider }
+      : null;
+    if (typeof parsed?.id !== "string" || typeof parsed?.provider !== "string") return null;
+    return this.getOperationModelCatalog(operation).find(
+      (model) => model.id === parsed.id && model.provider === parsed.provider
+        && modelSupportsOperation(model, operation),
+    ) || null;
   }
 
   /**
@@ -1795,7 +1855,7 @@ export class ProviderRegistry {
    * 裸字符串条目会被升级为对象
    * @param {string} providerId
    * @param {string} modelId
-   * @param {{ name?: string, api?: string, context?: number, contextWindow?: number, maxOutput?: number, maxTokens?: number, maxOutputTokens?: number, image?: boolean, video?: boolean, audio?: boolean, reasoning?: boolean, xhigh?: boolean, thinkingLevels?: string[], thinkingLevelMap?: object, defaultThinkingLevel?: string, compat?: object, toolUse?: object, visionCapabilities?: object }} meta
+   * @param {{ name?: string, api?: string, context?: number, contextWindow?: number, maxOutput?: number, maxTokens?: number, maxOutputTokens?: number, outputIncludesThinking?: boolean, image?: boolean, video?: boolean, audio?: boolean, reasoning?: boolean, xhigh?: boolean, thinkingLevels?: string[], thinkingLevelMap?: object, defaultThinkingLevel?: string, compat?: object, toolUse?: object, visionCapabilities?: object }} meta
    */
   updateModelEntry(providerId, modelId, meta) {
     const { ownerProviderId, rawProvider, models } = this._providerConfigForModelMutation(providerId);
@@ -1820,11 +1880,14 @@ export class ProviderRegistry {
     }
 
     // 白名单：只允许模型能力字段（image 是标准名，vision 为旧名不写入）
-    const ALLOWED = ["name", "api", "context", "maxOutput", "image", "video", "audio", "reasoning", "xhigh", "thinkingLevels", "thinkingLevelMap", "type", "defaultThinkingLevel", "web", "structuredOutput"];
+    const ALLOWED = ["name", "api", "context", "maxOutput", "outputIncludesThinking", "image", "video", "audio", "reasoning", "xhigh", "thinkingLevels", "thinkingLevelMap", "type", "defaultThinkingLevel", "web", "structuredOutput", "operations", "operationProtocol", "dimensions"];
+    // null = 显式清除 outputIncludesThinking 覆盖、回到按线协议家族的自动推导。
+    const clearOutputIncludesThinking = meta?.outputIncludesThinking === null;
     const safe: any = {};
     for (const key of ALLOWED) {
       if (meta[key] !== undefined) safe[key] = meta[key];
     }
+    if (clearOutputIncludesThinking) delete safe.outputIncludesThinking;
     // 模态字段：保存时按 canonical 顺序去重排序；非法值显式 400
     for (const modalityField of ["inputs", "outputs"]) {
       const normalizedModality = normalizeValidatedModalityField(ownerProviderId, modelId, modalityField, meta?.[modalityField]);
@@ -1856,8 +1919,12 @@ export class ProviderRegistry {
       // 删除旧字段 vision，避免残留；显式 inputs 保存时同时剥离
       // image/video/audio legacy 布尔，避免两份互相冲突的输入模态真理。
       let cleaned: any = base;
-      if (base.vision !== undefined || stripLegacyInputFlags) {
-        const legacy = ["vision", ...(stripLegacyInputFlags ? ["image", "video", "audio"] : [])];
+      if (base.vision !== undefined || stripLegacyInputFlags || clearOutputIncludesThinking) {
+        const legacy = [
+          "vision",
+          ...(stripLegacyInputFlags ? ["image", "video", "audio"] : []),
+          ...(clearOutputIncludesThinking ? ["outputIncludesThinking"] : []),
+        ];
         cleaned = Object.fromEntries(Object.entries(base).filter(([key]) => !legacy.includes(key)));
       }
       return mergeModelMetadata(cleaned, safe);

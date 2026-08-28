@@ -16,7 +16,7 @@ import type { TabType } from '../types';
 const HANDSHAKE_TIMEOUT_MS = 5000;
 
 function isAllowedPluginNavigationTab(tab: string): tab is TabType {
-  return tab === 'chat' || tab === 'channels' || tab.startsWith('plugin:');
+  return tab === 'chat' || tab === 'knowledge' || tab === 'channels' || tab.startsWith('plugin:');
 }
 
 interface UsePluginIframeOptions {

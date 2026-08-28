@@ -19,6 +19,10 @@ vi.mock('../../components/plugin/PluginPageView', () => ({
   ),
 }));
 
+vi.mock('../../components/knowledge/KnowledgePage', () => ({
+  KnowledgePage: () => <section data-testid="knowledge-page" />,
+}));
+
 vi.mock('../../components/chat/ChatArea', () => ({
   ChatArea: () => <section data-testid="chat-area" />,
 }));
@@ -98,6 +102,15 @@ describe('AppPages page ownership', () => {
     expect(screen.getByTestId('plugin-page')).toHaveTextContent('hanako-hyperframes');
     expect(document.querySelector('#previewPanel')).not.toBeInTheDocument();
     expect(document.querySelector('#jianSidebar')).not.toBeInTheDocument();
+  });
+
+  it('renders Knowledge as a native top-level page without the chat file preview', () => {
+    useStore.setState({ currentTab: 'knowledge' } as never);
+
+    render(<AppPages />);
+
+    expect(screen.getByTestId('knowledge-page')).toBeInTheDocument();
+    expect(document.querySelector('#previewPanel')).not.toBeInTheDocument();
   });
 
   it('keeps channel inspector panels stacked in order on the channel page', () => {

@@ -50,6 +50,12 @@ export const AUXILIARY_MODEL_PREF_KEYS: ReadonlyArray<readonly [string, string]>
  */
 export const SHARED_MODEL_KEYS = AUXILIARY_MODEL_PREF_KEYS;
 
+/** 操作模型不是语义 Slot；这里只共享同一种 ModelRef 持久化形状。 */
+export const MODEL_OPERATION_PREF_KEYS: ReadonlyArray<readonly [string, string]> = [
+  ["embedding", "knowledge_embedding_model"],
+  ["rerank", "knowledge_rerank_model"],
+];
+
 export const VISION_AUXILIARY_ENABLED_PREF_KEY = "vision_auxiliary_enabled";
 
 function hasOwn(obj, key) {
@@ -64,7 +70,10 @@ export function sharedModelsPatchRequiresModelSync(patch) {
 /**
  * 允许的非 Slot model settings 字段（feature toggle 等，与 Slot 模型引用是不同概念）。
  */
-const ALLOWED_NON_SLOT_FIELDS = new Set(["vision_enabled"]);
+const ALLOWED_NON_SLOT_FIELDS = new Set([
+  "vision_enabled",
+  ...MODEL_OPERATION_PREF_KEYS.map(([field]) => field),
+]);
 
 export function normalizeSharedModelsPatch(partial) {
   if (!partial || typeof partial !== "object" || Array.isArray(partial)) {
@@ -94,6 +103,20 @@ export function normalizeSharedModelsPatch(partial) {
       result[field] = requireModelRef(raw);
     } catch (err) {
       throw new Error(`shared model ${field}: ${err.message}`);
+    }
+  }
+  for (const [field] of MODEL_OPERATION_PREF_KEYS) {
+    if (!hasOwn(partial, field)) continue;
+    const raw = partial[field];
+    if (raw === undefined) continue;
+    if (raw === null || raw === "") {
+      result[field] = null;
+      continue;
+    }
+    try {
+      result[field] = requireModelRef(raw);
+    } catch (err) {
+      throw new Error(`model operation ${field}: ${err.message}`);
     }
   }
   if (hasOwn(partial, "vision_enabled")) {
@@ -218,6 +241,10 @@ export class ConfigCoordinator {
         result[field] = null;
       }
     }
+    for (const [field, prefKey] of MODEL_OPERATION_PREF_KEYS) {
+      const raw = prefs[prefKey];
+      result[field] = raw || null;
+    }
     result.vision_enabled = prefs[VISION_AUXILIARY_ENABLED_PREF_KEY] === true;
     return result;
   }
@@ -240,6 +267,15 @@ export class ConfigCoordinator {
           shouldSyncAgentRuntimeModels = true;
         }
       }
+    }
+    for (const [field, prefKey] of MODEL_OPERATION_PREF_KEYS) {
+      if (!hasOwn(normalized, field)) continue;
+      if (normalized[field]) prefs[prefKey] = normalized[field];
+      else delete prefs[prefKey];
+      const value = normalized[field];
+      changed.push(
+        `${field}=${value ? `${value.provider || "?"}/${value.id || "?"}` : "(cleared)"}`,
+      );
     }
     if (hasOwn(normalized, "vision_enabled")) {
       if (normalized.vision_enabled) prefs[VISION_AUXILIARY_ENABLED_PREF_KEY] = true;

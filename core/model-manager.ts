@@ -87,6 +87,10 @@ function buildProviderModelMetadataMap(projectionPlans: unknown) {
         if (explicitOutputs) meta.outputs = explicitOutputs;
         if (modelEntry.web !== undefined) meta.web = modelEntry.web === true;
         if (modelEntry.structuredOutput !== undefined) meta.structuredOutput = modelEntry.structuredOutput === true;
+        // 「最大输出是否包含思维链」契约随模型元数据挂回（Pi modelFromJson 会丢弃）。
+        if (modelEntry.outputIncludesThinking !== undefined) {
+          meta.outputIncludesThinking = modelEntry.outputIncludesThinking === true;
+        }
       }
       if (meta.inputs === undefined) {
         const knownInputs = readModalityListLoose(known?.inputs);
@@ -98,6 +102,10 @@ function buildProviderModelMetadataMap(projectionPlans: unknown) {
       }
       if (meta.web === undefined && known?.web === true) meta.web = true;
       if (meta.structuredOutput === undefined && known?.structuredOutput === true) meta.structuredOutput = true;
+      if (meta.outputIncludesThinking === undefined
+        && (known?.outputIncludesThinking === true || known?.outputIncludesThinking === false)) {
+        meta.outputIncludesThinking = known.outputIncludesThinking === true;
+      }
       const executionHeaders = normalizeProviderHeaders(plan?.modelExecutionHeaders?.[modelId]);
       if (Object.keys(executionHeaders).length > 0) meta.headers = executionHeaders;
       if (meta.defaultThinkingLevel === undefined && typeof known?.defaultThinkingLevel === "string") {

@@ -23,6 +23,7 @@ import {
 } from "../llm/model-call-observer.ts";
 import { createModelCallRecorder } from "../llm/model-call-recorder.ts";
 import { currentModelCallScope } from "../llm/model-call-scope.ts";
+import { resolveOutputBudgetFact } from "../../core/provider-compat/output-budget.ts";
 
 export function createModelCallObserverExtension() {
   return function (pi: any) {
@@ -30,11 +31,23 @@ export function createModelCallObserverExtension() {
       try {
         const scope = currentModelCallScope();
         if (!scope?.callId) return undefined;
+        // Output Budget Fact（借鉴 deepseek-harness materialized defaults）：
+        // 在最终 body 上解析「输出预算是谁定的」，物化进 attempt 的持久
+        // safe_details_json。模型侧由 wrapper 摘取的 modelBudgetMeta 提供
+        // 能力切片（composition/声明上限），身份切片提供线协议。
+        const budgetModel = {
+          ...(scope.model ?? {}),
+          ...(scope.modelBudgetMeta ?? {}),
+        };
+        const outputBudgetFact = resolveOutputBudgetFact(event?.payload, budgetModel);
+        const preparedDetails = summarizeProviderRequestPayload(event?.payload);
         createModelCallRecorder({
           observer: getModelCallObserver(),
           context: scope,
         }).providerRequestPrepared({
-          details: summarizeProviderRequestPayload(event?.payload),
+          details: outputBudgetFact
+            ? { ...preparedDetails, outputBudget: outputBudgetFact }
+            : preparedDetails,
         });
         // Phase 6（§七十四/§七十五）：event.payload 是 compat 转换后、序列化前的
         // 最终 provider body 活引用（pi-ai 0.84.1 实证，audit §1.1）→

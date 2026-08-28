@@ -56,6 +56,10 @@ import {
 import { loadLocale } from "../lib/i18n.ts";
 import { createApprovalGateway, createModelApprovalReviewer } from "../lib/approval-gateway.ts";
 import { runWithNewModelTrace } from "../lib/llm/model-trace-scope.ts";
+import {
+  createSemanticInputProvenance,
+  provenanceSection,
+} from "../lib/llm/semantic-input-provenance.ts";
 import { callText } from "./llm-client.ts";
 import { SESSION_APPROVAL_POLICIES } from "./session-permission-mode.ts";
 import { readCompiledResetAt } from "../lib/memory/compiled-memory-state.ts";
@@ -99,6 +103,9 @@ import { PreferencesManager } from "./preferences-manager.ts";
 import { InputDraftsStore } from "./input-drafts-store.ts";
 import { ModelManager } from "./model-manager.ts";
 import { AuxiliaryModelResolver } from "./auxiliary-model-resolver.ts";
+import { ModelOperationResolver } from "./model-operation-resolver.ts";
+import { EmbeddingClient, RerankClient } from "./model-operation-client.ts";
+import type { ModelOperation } from "../shared/model-operations.ts";
 import { isAuxiliaryConfigError } from "./auxiliary-slots.ts";
 import { SessionProjectCatalogStore } from "./session-project-catalog-store.ts";
 import { SkillManager } from "./skill-manager.ts";
@@ -183,6 +190,7 @@ function buildToolCatalogManifestSnapshot(catalog, modelContextWindowTokens) {
 }
 import { filterToolObjectsByAvailability } from "./tool-availability.ts";
 import { TaskRegistry } from "../lib/task-registry.ts";
+import { KnowledgeManager } from "../lib/knowledge/knowledge-manager.ts";
 import { BrowserManager } from "../lib/browser/browser-manager.ts";
 import { TerminalSessionManager } from "../lib/terminal/terminal-session-manager.ts";
 import {
@@ -281,6 +289,9 @@ export class LingxiEngine {
   declare _computerProviders: any;
   declare _configCoord: any;
   declare _auxResolver: AuxiliaryModelResolver;
+  declare _modelOperationResolver: ModelOperationResolver;
+  declare _embeddingClient: EmbeddingClient;
+  declare _rerankClient: RerankClient;
   declare _confirmStore: any;
   declare _coreExtensionFactories: any;
   declare _currentTurnNativeMedia: any;
@@ -300,6 +311,7 @@ export class LingxiEngine {
   declare _loopAlarm: any;
   declare _loopController: any;
   declare _loopBridgeHooks: any;
+  declare _knowledge: KnowledgeManager;
   declare _media: any;
   declare _mcp: any;
   declare _models: any;
@@ -440,6 +452,12 @@ export class LingxiEngine {
 
     // ── Core managers ──
     this._prefs = new PreferencesManager({ userDir: this.userDir, agentsDir: this.agentsDir });
+    this._knowledge = new KnowledgeManager({
+      lingxiHome: this.lingxiHome,
+      generateText: (request) => this._generateKnowledgeText(request),
+      embedTexts: (request) => this._embedKnowledgeTexts(request),
+      rerank: (request) => this._rerankKnowledgeTexts(request),
+    });
     this._installModelObservability(modelObservability);
     this._inputDrafts = new InputDraftsStore({ lingxiHome: this.lingxiHome });
     this._models = new ModelManager({ lingxiHome });
@@ -650,7 +668,7 @@ export class LingxiEngine {
 
     // ── Auxiliary Model Resolver ──
     // 统一的语义 Slot 解析器：业务层只认识 title/summarize/memory/vision/
-    // approval/guard，不再关心 utility/utility_large。Slot 不拥有 credential；
+    // knowledge/approval/guard，不再关心 utility/utility_large。Slot 不拥有 credential；
     // Provider credential 基础设施是唯一执行凭证来源。
     this._auxResolver = new AuxiliaryModelResolver({
       resolveModel: (ref) => this._models._resolveFromAvailable(ref),
@@ -666,6 +684,18 @@ export class LingxiEngine {
       allowsMissingApiKey: (provider, baseUrl) =>
         this._models.providerRegistry?.allowsMissingApiKey?.(provider, baseUrl) ??
         isLocalBaseUrl(baseUrl),
+    });
+    this._modelOperationResolver = new ModelOperationResolver({
+      getOperationModelRef: (operation) => this._configCoord.getSharedModels()?.[operation] || null,
+      resolveOperationModel: (operation, ref) =>
+        this._models.providerRegistry.getOperationModel(operation, ref),
+      resolveProviderCredentialsFresh: (provider) =>
+        this._models.resolveProviderCredentialsFresh(provider),
+      getProviderCredentials: (provider) =>
+        this._models.providerRegistry.getCredentials(provider),
+      allowsMissingApiKey: (provider, baseUrl) =>
+        this._models.providerRegistry?.allowsMissingApiKey?.(provider, baseUrl)
+        ?? isLocalBaseUrl(baseUrl),
     });
 
     this._visionBridge = new VisionBridge({
@@ -729,6 +759,7 @@ export class LingxiEngine {
       persistencePath: path.join(this.lingxiHome, ".ephemeral", "plugin-tasks.json"),
       getSessionIdForPath: (sessionPath) => this.getSessionIdForPath(sessionPath),
     });
+    this._knowledge.attachTaskRegistry(this._taskRegistry);
 
     // subagent AbortController 存储（engine 级别，跨 agent 共享）
     this._subagentControllers = new Map();
@@ -784,6 +815,14 @@ export class LingxiEngine {
         emit: (event, sessionPath) => this._emitEvent(event, sessionPath),
       },
       logger: moduleLog,
+    });
+    this._embeddingClient = new EmbeddingClient({
+      resolveOperationFresh: (operation) => this.resolveModelOperationFresh(operation),
+      getUsageLedger: () => this._usageLedger,
+    });
+    this._rerankClient = new RerankClient({
+      resolveOperationFresh: (operation) => this.resolveModelOperationFresh(operation),
+      getUsageLedger: () => this._usageLedger,
     });
     // Phase 8：ledger 就绪后接线 accounting projection（构造期 install 时
     // ledger 尚未创建，_wireModelObservabilityAccounting 会提前返回）。
@@ -1218,6 +1257,10 @@ export class LingxiEngine {
 
   get taskRegistry() {
     return this._taskRegistry;
+  }
+
+  get knowledge() {
+    return this._knowledge;
   }
 
   get runtimeContext() {
@@ -2122,9 +2165,114 @@ export class LingxiEngine {
   setSearchConfig(p) { return this._configCoord.setSearchConfig(p); }
   _callApprovalReviewerText(options) { return callText(options); }
 
+  async _generateKnowledgeText(request) {
+    const resolved = await this.resolveAuxiliaryModelFresh("knowledge", {
+      agentId: this.currentAgentId,
+    });
+    if (!resolved?.model || !resolved?.api || !resolved?.baseUrl) {
+      throw new Error("knowledge_model_unavailable");
+    }
+    const callPurposeByOperation = {
+      quick_answer: "knowledge_quick_answer",
+      research_analysis: "knowledge_research_analysis",
+      research_verification: "knowledge_research_verification",
+      claim_build: "knowledge_claim_build",
+      contradiction_check: "knowledge_contradiction_check",
+      final_synthesis: "knowledge_final_synthesis",
+    };
+    const templateByOperation = {
+      quick_answer: "knowledge.quick-answer.system",
+      research_analysis: "knowledge.research-analysis.system",
+      research_verification: "knowledge.research-verification.system",
+      claim_build: "knowledge.claim-build.system",
+      contradiction_check: "knowledge.contradiction-check.system",
+      final_synthesis: "knowledge.final-synthesis.system",
+    };
+    return callText({
+      api: resolved.api,
+      apiKey: resolved.apiKey,
+      baseUrl: resolved.baseUrl,
+      headers: resolved.headers,
+      model: resolved.model,
+      systemPrompt: request.systemPrompt,
+      messages: [{ role: "user", content: request.userPrompt }],
+      temperature: 0,
+      maxTokens: request.operation === "quick_answer" ? 2048 : 32_768,
+      outputPolicy: "bounded",
+      outputBudgetSource: "system",
+      callPurpose: callPurposeByOperation[request.operation] || "knowledge_research_analysis",
+      timeoutMs: request.operation === "quick_answer" ? 240_000 : 240_000,
+      signal: request.signal,
+      usageLedger: resolved.usageLedger,
+      usageContext: {
+        source: {
+          subsystem: "knowledge",
+          operation: request.operation,
+          surface: "knowledge",
+          trigger: "user",
+        },
+        attribution: {
+          kind: "knowledge",
+          agentId: resolved.usageAgentId || this.currentAgentId || null,
+          taskId: request.runId,
+        },
+      },
+      semanticInputProvenance: createSemanticInputProvenance("calltext", [
+        provenanceSection(
+          { root: "systemPrompt", span: { start: 0, end: request.systemPrompt.length } },
+          "task_instruction",
+          { role: "system", source: { type: "template", id: templateByOperation[request.operation] || "knowledge.research.system" } },
+        ),
+        provenanceSection(
+          { root: "messages", path: [0], span: { start: 0, end: request.userPrompt.length } },
+          "task_input",
+          { role: "user", source: { type: "snapshot", id: request.runId } },
+        ),
+      ]),
+    }) as Promise<string>;
+  }
+
+  _knowledgeOperationUsageContext(operation, runId) {
+    return {
+      source: {
+        subsystem: "knowledge",
+        operation,
+        surface: "knowledge",
+        trigger: "user",
+      },
+      attribution: {
+        kind: "knowledge",
+        taskId: runId,
+        agentId: this.currentAgentId || null,
+      },
+    };
+  }
+
+  async _embedKnowledgeTexts(request) {
+    return this._embeddingClient.embed({
+      texts: request.texts,
+      signal: request.signal,
+      // 知识向量化按块批量编码,本地模型(如 ollama 8B)跑完一个来源的全部块
+      // 可能远超操作客户端 30s 默认超时,超时会以 retrieval unavailable 失败整个 run。
+      timeoutMs: 300_000,
+      usageContext: this._knowledgeOperationUsageContext("embedding", request.runId),
+    });
+  }
+
+  async _rerankKnowledgeTexts(request) {
+    return this._rerankClient.rerank({
+      query: request.query,
+      documents: request.documents,
+      topN: request.topN,
+      signal: request.signal,
+      timeoutMs: 120_000,
+      usageContext: this._knowledgeOperationUsageContext("rerank", request.runId),
+    });
+  }
+
   // ── Auxiliary Model Resolver (semantic slots) ──
   // 统一的语义 Slot 解析入口。业务层只认识 title/summarize/memory/vision/
-  // approval/guard，不再关心 utility/utility_large。
+  // knowledge/approval/guard，不再关心 utility/utility_large。
   resolveAuxiliaryModel(slot, options: any = {}) {
     const ctx = this._auxResolveContext(options);
     const config = this._auxResolver.resolveAuxiliaryModel(slot, ctx);
@@ -2139,6 +2287,15 @@ export class LingxiEngine {
     const ctx = this._auxResolveContext(options);
     const execution = await this._auxResolver.resolveAuxiliaryExecution(slot, ctx);
     return this._withAuxiliaryUsageAttribution(execution, ctx);
+  }
+  listModelOperationModels(operation?: ModelOperation) {
+    return this._models.providerRegistry.getOperationModelCatalog(operation || null);
+  }
+  resolveModelOperation(operation: ModelOperation) {
+    return this._modelOperationResolver.resolveSync(operation);
+  }
+  resolveModelOperationFresh(operation: ModelOperation) {
+    return this._modelOperationResolver.resolveFresh(operation);
   }
   _auxResolveContext(options: any = {}) {
     const ctx = { ...(options || {}) };
@@ -2666,6 +2823,8 @@ export class LingxiEngine {
     // 预填充 _availableModels，agent init 时需要解析 utility model
     await this._models.refreshAvailable();
     log(`[init] 1/5 AuthStorage + ModelRegistry + ${this._models.availableModels.length} 个模型就绪`);
+    // 先等模型与凭证就绪，再恢复全文研究；恢复方法只登记后台续跑，不阻塞应用启动。
+    await this._knowledge.resumeResearchRuns();
 
     // 2. 初始化所有 agent
     log(`[init] 2/5 初始化所有 agent...`);
@@ -2921,7 +3080,11 @@ export class LingxiEngine {
             // query facade 关闭失败不阻塞退出
           }
         } finally {
-          this._sessionManifestStore?.close?.();
+          try {
+            this._knowledge?.close?.();
+          } finally {
+            this._sessionManifestStore?.close?.();
+          }
         }
       }
     }

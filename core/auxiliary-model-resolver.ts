@@ -249,12 +249,17 @@ export class AuxiliaryModelResolver {
         slot,
       );
     }
+    // resolveProviderCredentialsFresh(ModelManager)返回 snake_case(base_url/api_key),
+    // registry.getCredentials 返回 camelCase——检查必须同时兼容两种形状,
+    // 否则 fresh 路径会误报 provider_missing_creds(model-operation-resolver 同款兼容)。
+    const credBaseUrl = cred?.baseUrl ?? cred?.base_url ?? "";
+    const credApiKey = cred?.apiKey ?? cred?.api_key ?? null;
     const allowsMissingApiKey =
-      this._deps.allowsMissingApiKey?.(model.provider, cred?.baseUrl || "") ??
-      isLocalBaseUrl(cred?.baseUrl || "");
+      this._deps.allowsMissingApiKey?.(model.provider, credBaseUrl) ??
+      isLocalBaseUrl(credBaseUrl);
     if (
-      !cred?.baseUrl ||
-      (!cred.apiKey && !hasCredentialHeaders(cred) && !allowsMissingApiKey)
+      !credBaseUrl ||
+      (!credApiKey && !hasCredentialHeaders(cred) && !allowsMissingApiKey)
     ) {
       throw new AuxiliaryConfigurationError(
         t("error.providerMissingCreds", { provider: model.provider }),

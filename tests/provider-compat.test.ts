@@ -384,11 +384,14 @@ describe("resolveOutputBudgetPolicy", () => {
       maxTokens: 128000,
     }, { mode: "chat", outputBudgetSource: "sdk-default" });
 
+    // anthropic-messages 属「输出上限包含思维链」协议家族：聊天默认值 =
+    // 答案目标(64K) + 一档思考余量(16K)，不能按纯答案封顶。
     expect(policy).toMatchObject({
       source: "sdk-default",
       preserveForSource: false,
       applyChatDefault: true,
-      defaultMaxTokens: 65536,
+      thinkingSharesOutput: true,
+      defaultMaxTokens: 81920,
       capability: {
         id: "anthropic-messages",
         required: true,
@@ -555,7 +558,8 @@ describe("normalizeProviderPayload — 通用层", () => {
       maxTokens: 262144,
     }, { mode: "chat" });
 
-    expect(result.max_output_tokens).toBe(65536);
+    // openai-responses 属「输出包含思维链」家族：64K 答案目标 + 16K 思考余量。
+    expect(result.max_output_tokens).toBe(81920);
   });
 
   it("保留 SDK 按剩余上下文收紧后的更小输出预算，不反向抬高", () => {
@@ -636,7 +640,7 @@ describe("normalizeProviderPayload — 通用层", () => {
     expect(result.max_completion_tokens).toBe(65536);
   });
 
-  it("协议必填 provider 也使用 64K chat 默认值", () => {
+  it("协议必填 provider 也使用包含思考余量的 chat 默认值", () => {
     const payload = {
       model: "claude-opus-4-7",
       messages: [{ role: "user", content: "hi" }],
@@ -648,11 +652,12 @@ describe("normalizeProviderPayload — 通用层", () => {
       api: "anthropic-messages",
       maxTokens: 128000,
     }, { mode: "chat" });
-    expect(result.max_tokens).toBe(65536);
+    // anthropic-messages 家族：64K 答案目标 + 16K 思考余量 = 81920。
+    expect(result.max_tokens).toBe(81920);
     expect(payload.max_tokens).toBe(128000);
   });
 
-  it("自定义 Anthropic-compatible provider 也使用 64K chat 默认值", () => {
+  it("自定义 Anthropic-compatible provider 也使用包含思考余量的 chat 默认值", () => {
     const payload = {
       model: "claude-compatible",
       messages: [{ role: "user", content: "hi" }],
@@ -665,7 +670,7 @@ describe("normalizeProviderPayload — 通用层", () => {
       maxTokens: 128000,
       compat: { thinkingFormat: "anthropic" },
     }, { mode: "chat" });
-    expect(result.max_tokens).toBe(65536);
+    expect(result.max_tokens).toBe(81920);
     expect(payload.max_tokens).toBe(128000);
   });
 
@@ -1165,7 +1170,8 @@ describe("normalizeProviderPayload — DeepSeek Anthropic 模式", () => {
       compat: { thinkingFormat: "anthropic" },
     }, { mode: "chat", reasoningLevel: "xhigh" });
     expect(result).not.toBe(payload);
-    expect(result.max_tokens).toBe(65536);
+    // Kimi（Anthropic 兼容线）无声明上限：默认值含思考余量 81920。
+    expect(result.max_tokens).toBe(81920);
     expect(result).not.toHaveProperty("output_config");
   });
 });

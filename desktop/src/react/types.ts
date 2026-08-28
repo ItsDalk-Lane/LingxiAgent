@@ -436,7 +436,7 @@ export interface TodoItem {
 
 // ── 浮动面板类型 ──
 export type ActivePanel = 'activity' | 'automation' | 'bridge' | 'skills' | null;
-export type TabType = 'chat' | 'channels' | `plugin:${string}`;
+export type TabType = 'chat' | 'knowledge' | 'channels' | `plugin:${string}`;
 export type RightWorkspaceTab = 'session-files' | 'workspace' | `plugin-widget:${string}`;
 
 export interface FileVersion {

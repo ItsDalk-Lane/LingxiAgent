@@ -126,16 +126,20 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: macos-latest
+          - os: macos-15
+            platform: darwin
             target: dmg
             arch: arm64
-          - os: macos-latest
+          - os: macos-15-intel
+            platform: darwin
             target: dmg
             arch: x64
-          - os: windows-latest
+          - os: windows-2025
+            platform: win32
             target: nsis
             arch: x64
-          - os: ubuntu-latest
+          - os: ubuntu-24.04
+            platform: linux
             target: AppImage
             arch: x64
 
@@ -150,8 +154,17 @@ jobs:
           node-version: "24.15.0"
           cache: npm
 
+      - name: Assert runner platform and architecture
+        run: node scripts/assert-runner-platform.mjs ${{ matrix.platform }} ${{ matrix.arch }}
+
       - name: Install dependencies
         run: npm ci
+
+      - name: Build packages for Knowledge platform smoke
+        run: npm run build:packages
+
+      - name: Run Knowledge platform smoke
+        run: npm run test:knowledge-platform-smoke
 
       # Windows: 下载官方 MinGit（git + sh-compatible shell + coreutils，非交互运行时），打包进安装包
       - name: Download MinGit
@@ -297,6 +310,12 @@ jobs:
           else
             node scripts/build-server.mjs win32 ${{ matrix.arch }}
           fi
+
+      - name: Verify seed kit before packaged Knowledge smoke
+        run: node scripts/verify-seed-kit.mjs ${{ matrix.platform }} ${{ matrix.arch }}
+
+      - name: Smoke-test packaged Knowledge persistence
+        run: node scripts/smoke-packaged-knowledge.mjs ${{ matrix.platform }} ${{ matrix.arch }}
 
       - name: Build Computer Use helper
         if: runner.os == 'macOS'

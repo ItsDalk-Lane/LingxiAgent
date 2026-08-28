@@ -344,13 +344,50 @@ async function rebuildSessionFromResume(msg: any, opts: { finishTurnBeforeHydrat
   }
 }
 
+/**
+ * 增量重放信任门槛：只有当响应 streamId 与本地元数据一致、且断点 sinceSeq 是
+ * 本地真实消费过的 seq 时，才允许把重放事件叠加到现有渲染状态上。
+ * 例外：sinceSeq===0 的全量补发只要求本地处于空白状态（lastSeq===0），因为它
+ * 覆盖流从头到尾的完整窗口。元数据一旦被 invalidate / 劈叉（半路刷新、LRU
+ * 淘汰、分支重置、streamId 变更），consumedSeqs 与已渲染 buffer 不再互证——
+ * 此时任何增量叠加都可能重复工具卡或把正文拼接两遍，必须整段重建。
+ */
+export function canApplyIncrementalResume(msg: any, target: StreamSessionInput): boolean {
+  const meta = getSessionStreamMeta(target);
+  if (!meta) return false;
+  const sinceSeq = Number.isFinite(msg?.sinceSeq)
+    ? Math.max(0, Math.floor(Number(msg.sinceSeq)))
+    : null;
+  if (sinceSeq === null) return false;
+  if (sinceSeq === 0) return meta.lastSeq === 0;
+  const requestedStreamId = normalizeStreamString(msg?.streamId);
+  if (!requestedStreamId || meta.streamId !== requestedStreamId) return false;
+  return meta.consumedSeqs.has(sinceSeq);
+}
+
 export function replayStreamResume(msg: any): void {
   const target = resolveStreamSession(msg);
   const sessionPath = target.sessionPath;
   if (!sessionPath) return;
 
   const completedEmptyResume = shouldHydrateCompletedEmptyResume(msg);
-  if (msg.reset || msg.truncated || completedEmptyResume) {
+  const replayEvents = Array.isArray(msg.events) ? msg.events : [];
+
+  if (!msg.reset && !msg.truncated && !completedEmptyResume && replayEvents.length === 0) {
+    // 空增量：没有可叠加内容，重建只会白付一次 hydrate；只需同步运行态
+    // （含 runtimeIsStreaming=false 时的强制清流清理）。
+    const streamId = msg.streamId || null;
+    const meta = prepareStreamMeta(target, streamId);
+    if (meta && Number.isFinite(msg.nextSeq)) {
+      meta.lastSeq = Math.max(meta.lastSeq || 0, Math.max(0, msg.nextSeq - 1));
+    }
+    _applyStreamingStatus?.(resolveRuntimeStreaming(msg), sessionPath, {
+      streamId,
+    }, { force: shouldForceApplyRuntimeStreamingStatus(msg) });
+    return;
+  }
+
+  if (msg.reset || msg.truncated || completedEmptyResume || !canApplyIncrementalResume(msg, target)) {
     rebuildSessionFromResume(msg, { finishTurnBeforeHydrate: completedEmptyResume }).catch((err) => {
       console.error('[stream] rebuild failed:', err);
       _streamResumeRebuildingFor = null;

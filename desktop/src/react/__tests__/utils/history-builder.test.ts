@@ -1017,4 +1017,21 @@ describe('buildItemsFromHistory user image restoration', () => {
       text: 'Independent findings',
     });
   });
+
+  it('把落盘的 [Use skill: x] 前缀还原成胶囊字段，正文不再带标记', () => {
+    const items = buildItemsFromHistory({
+      messages: [{
+        id: 'u-skill',
+        role: 'user',
+        content: '[Use skill: character-creator]\n我想创建一个全新的 Lingxi 角色',
+      }],
+    });
+
+    expect(items).toHaveLength(1);
+    expect(items[0]?.type).toBe('message');
+    if (items[0]?.type !== 'message') throw new Error('expected message');
+    expect(items[0].data.skills).toEqual(['character-creator']);
+    expect(items[0].data.text).toBe('我想创建一个全新的 Lingxi 角色');
+    expect(items[0].data.textHtml).not.toContain('[Use skill:');
+  });
 });

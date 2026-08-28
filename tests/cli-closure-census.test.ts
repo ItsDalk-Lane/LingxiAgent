@@ -302,7 +302,8 @@ describe("compute-cli-closure: full generation (real esbuild + nft, slow)", () =
     expect(generatedClosure.stats.byInputType["source-graph"]).toBeGreaterThan(500);
     expect(generatedClosure.stats.byInputType["nft-runtime-trace"]).toBeGreaterThan(5000);
     expect(generatedBaseline.stats.totalEdges).toBeGreaterThan(0);
-  }, 120_000);
+    // intel CI runners take 2-3× arm64 for the real esbuild+nft pass.
+  }, 420_000);
 
   it("is idempotent: two independent full runs produce identical output", async () => {
     const first = await computeCliRuntimeClosure({ rootDir: REPOSITORY_ROOT, includeNftTrace: true });
@@ -312,7 +313,7 @@ describe("compute-cli-closure: full generation (real esbuild + nft, slow)", () =
     const baselineFirst = computeOpenBoundaryBaseline({ closure: first });
     const baselineSecond = computeOpenBoundaryBaseline({ closure: second });
     expect(baselineSecond).toEqual(baselineFirst);
-  }, 180_000);
+  }, 600_000);
 
   it("writeCliRuntimeClosure/writeOpenBoundaryBaseline regenerate the exact committed files in place", async () => {
     const before = fs.readFileSync(CLOSURE_PATH, "utf-8");
@@ -328,5 +329,5 @@ describe("compute-cli-closure: full generation (real esbuild + nft, slow)", () =
     const afterBaseline = fs.readFileSync(BASELINE_PATH, "utf-8");
     expect(after).toBe(before);
     expect(afterBaseline).toBe(beforeBaseline);
-  }, 120_000);
+  }, 420_000);
 });

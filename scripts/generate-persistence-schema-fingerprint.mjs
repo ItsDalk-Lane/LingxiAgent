@@ -326,11 +326,22 @@ async function modelObservabilitySchema(rootDir) {
   );
 }
 
+async function knowledgeSchema(rootDir) {
+  const modulePath = "lib/knowledge/knowledge-store.ts";
+  const runtime = await import(pathToFileURL(path.join(rootDir, ...modulePath.split("/"))).href);
+  return withTemporaryDatabase(
+    "lingxi-knowledge-schema-",
+    (tempDir) => new runtime.KnowledgeStore({ dbPath: path.join(tempDir, "knowledge.db") }),
+    (store) => readSqliteRuntimeSchema(store.db),
+  );
+}
+
 async function introspectSqliteStore(rootDir, storeId) {
   if (storeId === "session-manifest-sqlite") return sessionManifestSchema(rootDir);
   if (storeId === "agent-facts-sqlite") return factStoreSchema(rootDir);
   if (storeId === "file-history-sqlite") return fileHistorySchema(rootDir);
   if (storeId === "model-observability-db") return modelObservabilitySchema(rootDir);
+  if (storeId === "knowledge-database") return knowledgeSchema(rootDir);
   throw new Error(
     `SQLite store ${storeId} has no runtime introspector. Add one that opens the real store; do not copy DDL into the fingerprint generator.`,
   );

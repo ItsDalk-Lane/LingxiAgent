@@ -29,6 +29,11 @@ interface WorkflowStep {
 
 interface WorkflowJob {
   steps?: WorkflowStep[];
+  strategy?: {
+    matrix?: {
+      include?: Array<Record<string, unknown>>;
+    };
+  };
   [key: string]: unknown;
 }
 
@@ -49,6 +54,92 @@ function loadWorkflow(filePath: string): WorkflowDoc {
 function stepRun(step: WorkflowStep): string {
   return typeof step.run === "string" ? step.run : "";
 }
+
+const REQUIRED_PLATFORM_MATRIX = [
+  { os: "macos-15", platform: "darwin", arch: "arm64" },
+  { os: "macos-15-intel", platform: "darwin", arch: "x64" },
+  { os: "windows-2025", platform: "win32", arch: "x64" },
+  { os: "ubuntu-24.04", platform: "linux", arch: "x64" },
+] as const;
+const REQUIRED_KNOWLEDGE_PLATFORM_TESTS = [
+  "tests/knowledge-store.test.ts",
+  "tests/knowledge-manager-import.test.ts",
+  "tests/knowledge-engine-persistence.test.ts",
+  "tests/knowledge-research.test.ts",
+  "tests/knowledge-vector-index.test.ts",
+  "tests/auxiliary-slot-resolver.test.ts",
+  "tests/fresh-credential-routing.test.ts",
+  "tests/oauth-force-refresh.test.ts",
+  "tests/model-manager-auth-storage.test.ts",
+] as const;
+
+function matrixEntries(job: WorkflowJob | undefined): Array<Record<string, unknown>> {
+  return job?.strategy?.matrix?.include ?? [];
+}
+
+function expectRequiredPlatformMatrix(job: WorkflowJob | undefined) {
+  const entries = matrixEntries(job);
+  expect(entries).toHaveLength(REQUIRED_PLATFORM_MATRIX.length);
+  for (const required of REQUIRED_PLATFORM_MATRIX) {
+    expect(entries).toContainEqual(expect.objectContaining(required));
+  }
+}
+
+describe("Knowledge 四平台运行与打包烟测已接入正式流水线", () => {
+  const ci = loadWorkflow(CI_YAML_PATH);
+  const build = loadWorkflow(BUILD_YAML_PATH);
+
+  it("普通 CI 与发布构建都使用明确的 macOS arm64/x64、Windows x64、Linux x64 宿主", () => {
+    expectRequiredPlatformMatrix(ci.jobs.test);
+    expectRequiredPlatformMatrix(build.jobs.build);
+  });
+
+  it("两个矩阵都在执行前硬校验真实宿主平台与架构", () => {
+    for (const job of [ci.jobs.test, build.jobs.build]) {
+      const step = job?.steps?.find(entry => stepRun(entry).includes("scripts/assert-runner-platform.mjs"));
+      expect(step).toBeDefined();
+      expect(stepRun(step ?? {})).toContain("${{ matrix.platform }}");
+      expect(stepRun(step ?? {})).toContain("${{ matrix.arch }}");
+    }
+  });
+
+  it("普通 CI 在全量测试前运行 Knowledge 新建、重启和崩溃恢复烟测", () => {
+    const steps = ci.jobs.test?.steps ?? [];
+    const packageIndex = steps.findIndex(step => stepRun(step).includes("build:packages"));
+    const smokeIndex = steps.findIndex(step => stepRun(step).includes("test:knowledge-platform-smoke"));
+    const fullIndex = steps.findIndex(step => stepRun(step).includes("npm test"));
+    expect(packageIndex).toBeGreaterThanOrEqual(0);
+    expect(smokeIndex).toBeGreaterThan(packageIndex);
+    expect(fullIndex).toBeGreaterThan(smokeIndex);
+  });
+
+  it("平台烟测命令覆盖附件要求的迁移、索引、删除、凭证、OAuth 与模型切换专项", () => {
+    const packageJson = JSON.parse(fs.readFileSync(path.join(ROOT, "package.json"), "utf8"));
+    const command = packageJson?.scripts?.["test:knowledge-platform-smoke"];
+    expect(typeof command).toBe("string");
+    for (const testFile of REQUIRED_KNOWLEDGE_PLATFORM_TESTS) {
+      expect(command).toContain(testFile);
+    }
+    expect(command).toContain("--maxWorkers=1");
+  });
+
+  it("发布矩阵在构建服务器前跑源级烟测，并在构建后启动包内 Knowledge 两次", () => {
+    const steps = build.jobs.build?.steps ?? [];
+    const packageIndex = steps.findIndex(step => stepRun(step).includes("build:packages"));
+    const sourceSmokeIndex = steps.findIndex(step => stepRun(step).includes("test:knowledge-platform-smoke"));
+    const serverIndex = steps.findIndex(step => stepRun(step).includes("scripts/build-server.mjs"));
+    const verifyArchiveIndex = steps.findIndex(step => step.name === "Verify seed kit before packaged Knowledge smoke");
+    const packagedSmokeIndex = steps.findIndex(step => stepRun(step).includes("scripts/smoke-packaged-knowledge.mjs"));
+    expect(packageIndex).toBeGreaterThanOrEqual(0);
+    expect(sourceSmokeIndex).toBeGreaterThan(packageIndex);
+    expect(serverIndex).toBeGreaterThan(sourceSmokeIndex);
+    expect(verifyArchiveIndex).toBeGreaterThan(serverIndex);
+    expect(stepRun(steps[verifyArchiveIndex])).toContain("scripts/verify-seed-kit.mjs");
+    expect(packagedSmokeIndex).toBeGreaterThan(verifyArchiveIndex);
+    expect(stepRun(steps[packagedSmokeIndex])).toContain("${{ matrix.platform }}");
+    expect(stepRun(steps[packagedSmokeIndex])).toContain("${{ matrix.arch }}");
+  });
+});
 
 describe("ci.yml: open composition build+smoke guard is wired", () => {
   const doc = loadWorkflow(CI_YAML_PATH);
