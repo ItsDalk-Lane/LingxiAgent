@@ -10,7 +10,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = 236109df16df255be39f4d8c3a16a5d374998b6b  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-08-28 PR #29 knowledge-notebook + provider-compat 输出预算 + 四平台 CI 修复三轮)
+VERIFIED_SOURCE_SHA   = 7de8ed8e0e47b39282f0c8e7d8140fa1cc6bfcb3  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-08-28 PR #29 knowledge-notebook + provider-compat 输出预算 + 四平台 CI 修复四轮)
 工作分支              = feature/upstream-sync-0.447.4
 ```
 
@@ -406,6 +406,14 @@ seal 不是一次性终点，而是"当前被验证树"的游标；每次审计�
   分配）打穿 10s——边缘型重负载单测逐个冒头是打地鼠，系统性收口：
   vitest.config 全局 testTimeout/hookTimeout 10s→60s（6 倍余量；更慢
   场景仍由显式预算覆盖）。验证：blob 套件绿 + typecheck×3 绿后三次推进。
+  第四轮（7de8ed8e，seal 终坐标）：上轮 CI 唯一失败 macos-15-intel
+  markdown-blocks「collects complete direct syntax-tree children」断言只收
+  到首块——根因是 CodeMirror 增量解析按时间预算推进，syntaxTree() 可能
+  返回只含首块的部分树（快机器预算内解析完故不可见，生产环境真实潜在
+  bug 非纯测试问题）。修复：collectMarkdownBlocks 与 block-selection
+  缓存键改 ensureSyntaxTree(doc.length, 1s) 同步补齐完整树；装饰/hover
+  增量路径保持部分树语义不变。验证：editor 套件 80 用例绿 + typecheck×3
+  绿后四次推进。
 
 
 ## 最终状态：已合并（上游同步部分）
