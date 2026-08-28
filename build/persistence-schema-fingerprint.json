@@ -660,7 +660,7 @@
     ],
     "version": 3
   },
-  "payloadFingerprint": "sha256:34763e876cb11167ccc0388a9bbbfb4c1f177081d7c1fd415d1b245a1080997b",
+  "payloadFingerprint": "sha256:6a120a1251bc85dc4d6d686be4d2629292a7fffd05f2b7d8b424c5f5b201c7d3",
   "registry": [
     {
       "affectedByEpochMigration": true,
@@ -3248,8 +3248,8 @@
   ],
   "review": {
     "classification": "compatible",
-    "compatibilityReason": "Knowledge schema v5 仅新增可选的 Verification Step 事实账本表；v1-v4 历史行保持有效并原样迁移，现有数据含义不变，因此 DATA_EPOCH 保持不变。",
-    "payloadFingerprint": "sha256:34763e876cb11167ccc0388a9bbbfb4c1f177081d7c1fd415d1b245a1080997b"
+    "compatibilityReason": "移除 knowledge-query-service 中的 /tmp 诊断日志残留（两处 appendFileSync 与 node:fs import），零 schema/DDL/存储行为变化",
+    "payloadFingerprint": "sha256:6a120a1251bc85dc4d6d686be4d2629292a7fffd05f2b7d8b424c5f5b201c7d3"
   },
   "schemas": [
     {
@@ -9061,6 +9061,14 @@
     },
     {
       "exemptionId": null,
+      "kind": "remove-path",
+      "ordinal": 0,
+      "reason": "Removes installed user skills (single delete route and agent-delete cleanup share this module).",
+      "sourceFile": "lib/skills/skill-removal.ts",
+      "storeId": "skill-state"
+    },
+    {
+      "exemptionId": null,
       "kind": "mkdir",
       "ordinal": 0,
       "reason": "Writes subagent run, thread, or executor metadata.",
@@ -9826,14 +9834,6 @@
       "reason": "Archives, restores, or deletes a session JSONL locator.",
       "sourceFile": "server/routes/sessions.ts",
       "storeId": "session-jsonl"
-    },
-    {
-      "exemptionId": null,
-      "kind": "remove-path",
-      "ordinal": 0,
-      "reason": "Removes an installed user skill through the skill owner route.",
-      "sourceFile": "server/routes/skills.ts",
-      "storeId": "skill-state"
     },
     {
       "exemptionId": "conditional-upload-target",

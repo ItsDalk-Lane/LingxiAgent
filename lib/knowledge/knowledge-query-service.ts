@@ -1,4 +1,3 @@
-import { appendFileSync } from "node:fs";
 import crypto from "node:crypto";
 
 import {
@@ -439,8 +438,6 @@ export class KnowledgeQueryService {
     } catch (error) {
       if (isAbortLike(error)) throw error;
       if (isKnowledgeError(error)) throw error;
-      try { appendFileSync("/tmp/lingxi-embed-diag.log",
-        `embed-fail code=${(error as any)?.code} name=${error?.name} msg=${error?.message}\nstack=${(error as any)?.stack?.split("\n").slice(0, 5).join("\n")}\n`); } catch {}
       throw new KnowledgeError("KNOWLEDGE_RETRIEVAL_UNAVAILABLE", "Knowledge embedding request failed");
     }
   }
@@ -679,8 +676,6 @@ export class KnowledgeQueryService {
       }));
       return { run, scope, citations, retrievalBasis: "related_content" };
     } catch (error) {
-      try { appendFileSync("/tmp/lingxi-embed-diag.log",
-        `quick-catch code=${(error as any)?.code} name=${error?.name} msg=${error?.message}\nstack=${(error as any)?.stack?.split("\n").slice(0, 6).join("\n")}\n`); } catch {}
       const errorCode = isKnowledgeError(error) ? error.code : "KNOWLEDGE_MODEL_UNAVAILABLE";
       this.deps.store.failKnowledgeRun({ studioId: scope.studioId, runId: run.id, errorCode });
       if (isKnowledgeError(error)) throw error;

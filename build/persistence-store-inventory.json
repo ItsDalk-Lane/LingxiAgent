@@ -7807,6 +7807,15 @@
       "ordinal": 0
     },
     {
+      "sourceFile": "lib/skills/skill-removal.ts",
+      "kind": "remove-path",
+      "excerpt": "fs.rmSync(dir, { recursive: true, force: true })",
+      "reason": "Removes installed user skills (single delete route and agent-delete cleanup share this module).",
+      "storeId": "skill-state",
+      "exemptionId": null,
+      "ordinal": 0
+    },
+    {
       "sourceFile": "lib/subagent-executor-metadata.ts",
       "kind": "mkdir",
       "excerpt": "fsp.mkdir(path.dirname(metaPath), { recursive: true })",
@@ -8669,15 +8678,6 @@
       "storeId": "session-jsonl",
       "exemptionId": null,
       "ordinal": 2
-    },
-    {
-      "sourceFile": "server/routes/skills.ts",
-      "kind": "remove-path",
-      "excerpt": "fs.rmSync(dir, { recursive: true, force: true })",
-      "reason": "Removes an installed user skill through the skill owner route.",
-      "storeId": "skill-state",
-      "exemptionId": null,
-      "ordinal": 0
     },
     {
       "sourceFile": "server/routes/upload.ts",
