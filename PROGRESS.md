@@ -10,7 +10,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = 87249ede84f52e7cbf4533f8b99178dcc87b0fe6  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-08-25 v0.1.31 release 元数据)
+VERIFIED_SOURCE_SHA   = 2e7798aebb2b1bbfdaf7c15cf75477e083f2baef  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-08-28 PR #29 knowledge-notebook + provider-compat 输出预算 + 四平台 CI 修复)
 工作分支              = feature/upstream-sync-0.447.4
 ```
 
@@ -369,6 +369,31 @@ seal 不是一次性终点，而是"当前被验证树"的游标；每次审计�
   用例（release-preflight / release-digest-schema / validate-release-digest /
   update-digest-history / generate-release-digest / release-workflow-gates /
   post-verification-audit-seal / upstream-sync-matrix 全绿）后推进。
+
+- **2026-08-28 knowledge-notebook + provider-compat + 四平台 CI 修复**（功能链
+  1f3e1ea1（knowledge-notebook：知识存储/导入/检索/研究/引用、KnowledgePage UI、
+  server 路由与测试，97 files +21k，Store Registry knowledge-database 等登记）
+  → da7fa01a（provider-compat：输出预算控制与模型解析，output-budget 扩展 +
+  anthropic 兼容层适配 + CI 矩阵钉住 macos-15/macos-15-intel/windows-2025/
+  ubuntu-24.04 精确 runner + knowledge/build 平台 smoke）
+  → 2e7798ae（CI 修复，seal 本轮坐标））：PR #29 首轮 CI 四平台 test job 全红
+  （各 5–7 失败），三因收口——① knowledge-query-service 两处
+  /tmp/lingxi-embed-diag.log appendFileSync 调试残留为未登记持久化点
+  （persistence 三测试全平台红），删除后 store-inventory 重生成（skill 删除点
+  已随 da7fa01a 迁至 lib/skills/skill-removal.ts，committed inventory 仍指
+  server/routes/skills.ts 旧路径，此前被未登记点先抛遮蔽）+ fingerprint
+  compatible repin（sha256:6a120a12…）；② macos-15-intel 新 runner 上三个
+  real esbuild+nft 慢测试超时（单轮 60–110s），预算 120s/180s→420s/600s；
+  ③ session-manifest corrupt-manifest 清理仅关 manifest store，而本 PR 起
+  LingxiEngine 构造即打开 knowledge 三库句柄（knowledge/knowledge-fts/
+  knowledge-vector），Windows rmSync EPERM（macOS 可删已打开文件故本地不可见，
+  与 Phase 10.1 vertical 泄漏同型），改 engine.dispose() 统一收口 + rmSync
+  maxRetries 兜底。验证（2e7798ae 树）：typecheck×3（绿）+ 目标回归
+  （persistence-store-registry / persistence-startup-receipt /
+  persistence-schema-tripwire / session-manifest-engine / cli-closure-census /
+  knowledge-query 全绿）+ full npm test 12324 passed / 0 failed（唯一失败 =
+  seal guard 旧坐标预期红；另 artifact-core-ustar afterEach 本地并行清理
+  ENOTEMPTY 一次，单跑 10/10 绿且四平台 CI 从未红，判本地环境 flake）后推进。
 
 
 ## 最终状态：已合并（上游同步部分）
