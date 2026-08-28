@@ -10,7 +10,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = 52d29b3c43585b4ea91457b1c86ec6b1d7b955a1  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-08-28 PR #29 knowledge-notebook + provider-compat 输出预算 + 四平台 CI 修复两轮)
+VERIFIED_SOURCE_SHA   = 236109df16df255be39f4d8c3a16a5d374998b6b  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-08-28 PR #29 knowledge-notebook + provider-compat 输出预算 + 四平台 CI 修复三轮)
 工作分支              = feature/upstream-sync-0.447.4
 ```
 
@@ -401,6 +401,11 @@ seal 不是一次性终点，而是"当前被验证树"的游标；每次审计�
   修法与 cli-closure 同款：全仓扫描测试显式超时预算（单扫描 60s ×4 处、
   双扫描 120s ×2 处，断言零变化）。验证：两文件 17 用例绿 + typecheck×3
   绿后二次推进。
+  第三轮（236109df，seal 终坐标）：上轮 CI arm64/ubuntu/windows 全绿，
+  macos-15-intel 换 model-observability-blob size cap（64MB+1 Uint8Array
+  分配）打穿 10s——边缘型重负载单测逐个冒头是打地鼠，系统性收口：
+  vitest.config 全局 testTimeout/hookTimeout 10s→60s（6 倍余量；更慢
+  场景仍由显式预算覆盖）。验证：blob 套件绿 + typecheck×3 绿后三次推进。
 
 
 ## 最终状态：已合并（上游同步部分）
