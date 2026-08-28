@@ -85,5 +85,6 @@ describe("persistence startup receipt", () => {
 
     expect(committed).toEqual(generated);
     expect(JSON.stringify(committed)).not.toMatch(/(?:\/Users\/|\/home\/|[A-Za-z]:\\)/);
-  });
+    // 全仓扫描：慢 I/O runner（macos-15-intel）单次扫描可逼近 10s 默认超时。
+  }, 60_000);
 });
