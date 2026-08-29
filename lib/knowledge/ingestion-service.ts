@@ -1,12 +1,16 @@
 import {
-  computeAutoChunkTargetChars,
   knowledgeChunkerConfigId,
   resolveKnowledgeChunkerConfig,
 } from "./chunker.ts";
 import { isKnowledgeError, KnowledgeError } from "./errors.ts";
 import type { KnowledgeEmbeddingResult, KnowledgeEmbedder } from "./knowledge-query-service.ts";
 import { KnowledgeQueryService } from "./knowledge-query-service.ts";
-import { KnowledgeStore, resolveNotebookConfig, type ResolvedNotebookConfig } from "./knowledge-store.ts";
+import {
+  KnowledgeStore,
+  resolveEffectiveChunkTargetChars,
+  resolveNotebookConfig,
+  type ResolvedNotebookConfig,
+} from "./knowledge-store.ts";
 import type { IngestionJob, KnowledgeModelRef, KnowledgeParseArtifact } from "./types.ts";
 
 /**
@@ -249,12 +253,10 @@ export class KnowledgeIngestionService {
   ): Omit<ResolvedNotebookConfig, "chunkTargetChars"> & { chunkTargetChars: number } {
     const config = this.deps.store.getNotebookConfig({ studioId, notebookId });
     const resolved = resolveNotebookConfig(config);
-    const chunkTargetChars = resolved.chunkTargetChars
-      ?? computeAutoChunkTargetChars(
-        resolved.embeddingModelRef
-          ? this.deps.getEmbeddingModelContextWindow?.(resolved.embeddingModelRef) ?? null
-          : null,
-      );
+    const chunkTargetChars = resolveEffectiveChunkTargetChars(
+      resolved,
+      this.deps.getEmbeddingModelContextWindow,
+    );
     return { ...resolved, chunkTargetChars };
   }
 

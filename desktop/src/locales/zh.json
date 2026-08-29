@@ -444,10 +444,6 @@
     "knowledgeMetaLabel": "知识库",
     "knowledgeMetaModeQa": "问答模式",
     "knowledgeMetaModeAssist": "辅助模式",
-    "knowledgeMetaRetrieved": "检索 {count} 块",
-    "knowledgeMetaInjected": "注入 {count} 块",
-    "knowledgeMetaTokens": "~{count} tokens",
-    "knowledgeMetaTruncated": "超预算分片",
     "knowledgeMetaUnavailable": "知识检索不可用",
     "knowledgeMetaDegradedTitle": "检索已降级：{reason}",
     "knowledgeRetrieving": "知识库检索中",
@@ -455,7 +451,8 @@
     "knowledgeRetrievalTruncated": "超预算分片",
     "knowledgeRetrievalUnavailable": "知识检索不可用",
     "knowledgeRetrievalRowTitle": "{source} · 块 {chunk}",
-    "knowledgeRetrievalDistilled": "已提炼 {n} 批"
+    "knowledgeRetrievalDistilled": "已提炼 {n} 批",
+    "knowledgeDistilling": "知识蒸馏中 · 已完成 {done} 批 · {model}"
   },
   "time": {
     "justNow": "刚刚",

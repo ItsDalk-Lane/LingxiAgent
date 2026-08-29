@@ -444,10 +444,6 @@
     "knowledgeMetaLabel": "Knowledge",
     "knowledgeMetaModeQa": "Q&A mode",
     "knowledgeMetaModeAssist": "Assist mode",
-    "knowledgeMetaRetrieved": "retrieved {count} chunks",
-    "knowledgeMetaInjected": "injected {count}",
-    "knowledgeMetaTokens": "~{count} tokens",
-    "knowledgeMetaTruncated": "over-budget shards",
     "knowledgeMetaUnavailable": "knowledge retrieval unavailable",
     "knowledgeMetaDegradedTitle": "Retrieval degraded: {reason}",
     "knowledgeRetrieving": "Searching knowledge base",
@@ -455,7 +451,8 @@
     "knowledgeRetrievalTruncated": "over-budget shards",
     "knowledgeRetrievalUnavailable": "knowledge retrieval unavailable",
     "knowledgeRetrievalRowTitle": "{source} · chunk {chunk}",
-    "knowledgeRetrievalDistilled": "distilled in {n} batches"
+    "knowledgeRetrievalDistilled": "distilled in {n} batches",
+    "knowledgeDistilling": "Distilling knowledge · {done} batches done · {model}"
   },
   "time": {
     "justNow": "Just now",

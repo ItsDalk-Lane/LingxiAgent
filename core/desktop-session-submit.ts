@@ -121,12 +121,18 @@ async function resolveKnowledgeInjectionBlock(
   refs: KnowledgeRefs,
   question: string,
   budgetTokens: number,
+  sessionPath: string,
 ): Promise<{ block: string; stats: KnowledgeRetrievalStats }> {
   if (typeof engine?.buildKnowledgeContextInjection !== "function") {
     throw new Error("desktop-session-submit: knowledge injection unavailable (engine lacks buildKnowledgeContextInjection)");
   }
   try {
-    return await engine.buildKnowledgeContextInjection({ question, knowledgeRefs: refs, budgetTokens });
+    return await engine.buildKnowledgeContextInjection({
+      question,
+      knowledgeRefs: refs,
+      budgetTokens,
+      ...(sessionPath ? { sessionPath } : {}),
+    });
   } catch (err) {
     const reason = err instanceof Error ? err.message : String(err);
     return {
@@ -425,6 +431,7 @@ export async function submitDesktopSessionMessage(engine: any, opts: {
           promptKnowledgeRefs,
           text || "",
           resolveKnowledgeInjectionBudgetTokens((session as any)?.model ?? null),
+          sessionPath,
         );
         knowledgeInjectionBlock = injection.block;
         knowledgeRetrievalStats = injection.stats;
@@ -773,6 +780,7 @@ export async function submitDesktopSessionInterjection(engine: any, opts: {
       promptKnowledgeRefs,
       text || "",
       resolveKnowledgeInjectionBudgetTokens((session as any)?.model ?? null),
+      sessionPath,
     );
     knowledgeInjectionBlock = injection.block;
     knowledgeRetrievalStats = injection.stats;

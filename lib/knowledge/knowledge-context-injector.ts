@@ -12,7 +12,12 @@
 import { estimateTextTokens } from "../llm/estimate-text-tokens.ts";
 import type { KnowledgeReferenceMode, KnowledgeRetrievalStats } from "../../shared/knowledge-refs.ts";
 import { KnowledgeError } from "./errors.ts";
-import { distillKnowledgeEvidence, type DistillModel, type DistillSection } from "./knowledge-distiller.ts";
+import {
+  distillKnowledgeEvidence,
+  type DistillBatchBudgetSource,
+  type DistillModel,
+  type DistillSection,
+} from "./knowledge-distiller.ts";
 import type {
   NotebookRetrievalChunk,
   NotebookRetrievalSource,
@@ -223,6 +228,15 @@ export interface KnowledgeInjectorDeps {
    * "部分块 + 分片清单 + 子 Agent 指引"降级路径并留痕）。
    */
   distillModel: DistillModel | null;
+  /**
+   * 蒸馏单批输入预算（token）：固定值或取批时求值的函数（engine 按实测吞吐
+   * 动态推算"每路 ≤10s"目标），与注入预算分离——复用注入预算曾切出
+   * 49.5 万 token/批的多 MB 请求体，供应商预填充 32–90+ 秒撞破客户端超时
+   * （2026-08-29 事故）。null = 退回注入预算（兼容）。
+   */
+  distillBatchBudgetTokens?: DistillBatchBudgetSource | null;
+  /** 每批蒸馏完成后的进度回调（已完成批数）；engine 侧转 knowledge_distill_progress 事件。 */
+  onDistillProgress?: (done: number) => void;
   /** 检索门面（retrieveForNotebooks 绑定 studioId + notebookIds）。 */
   retrieve: (input: { query: string }) => Promise<RetrieveForNotebooksResult>;
 }
@@ -569,6 +583,11 @@ export async function buildKnowledgeContextInjection(input: {
       chunks: fusedForCost,
       headerOf: (chunk, index) => chunkHeader(chunk, index),
       budgetTokens,
+      // 批预算与注入预算分离：按蒸馏模型目标延迟动态推算（缺省兼容旧行为=注入预算）。
+      ...(input.deps.distillBatchBudgetTokens != null
+        ? { batchBudgetTokens: input.deps.distillBatchBudgetTokens }
+        : {}),
+      ...(input.deps.onDistillProgress ? { onProgress: input.deps.onDistillProgress } : {}),
       distillModel: input.deps.distillModel,
     });
     if (distilled.ok === true) {

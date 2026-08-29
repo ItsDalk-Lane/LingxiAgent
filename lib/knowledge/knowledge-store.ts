@@ -8,6 +8,7 @@ import {
   KNOWLEDGE_CHUNK_TARGET_CHARS,
   MAX_KNOWLEDGE_CHUNK_TARGET_CHARS,
   MIN_KNOWLEDGE_CHUNK_TARGET_CHARS,
+  computeAutoChunkTargetChars,
 } from "./chunker.ts";
 import type {
   ContentSnapshot,
@@ -346,6 +347,23 @@ export function resolveNotebookConfig(config: NotebookConfig): ResolvedNotebookC
     chunkTargetChars: config.chunkTargetChars ?? null,
     retrievalTopK: config.retrievalTopK ?? null,
   };
+}
+
+/**
+ * 生效分块尺寸：显式列 > 嵌入模型上下文 ×80% 自动值（computeAutoChunkTargetChars）。
+ * 摄入侧与查询侧懒构建必须经同一函数解析——两侧各自解析曾是查询侧按默认 1200
+ * 重建索引、与摄入侧指纹互相打架的根因（configId 进 chunk id，尺寸不同即全量重建+重嵌）。
+ */
+export function resolveEffectiveChunkTargetChars(
+  resolved: Pick<ResolvedNotebookConfig, "chunkTargetChars" | "embeddingModelRef">,
+  getEmbeddingModelContextWindow?: ((modelRef: KnowledgeModelRef) => number | null) | null,
+): number {
+  return resolved.chunkTargetChars
+    ?? computeAutoChunkTargetChars(
+      resolved.embeddingModelRef
+        ? getEmbeddingModelContextWindow?.(resolved.embeddingModelRef) ?? null
+        : null,
+    );
 }
 
 export interface KnowledgeStoreOptions {

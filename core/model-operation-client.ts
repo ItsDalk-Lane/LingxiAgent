@@ -7,11 +7,11 @@ import {
 } from "../lib/llm/model-call-integration.ts";
 import { extractProviderRequestId } from "../lib/llm/model-call-observer.ts";
 import { withModelRequestAccounting } from "../lib/llm/model-request-accounting.ts";
-import type { ModelOperation } from "../shared/model-operations.ts";
+import { MODEL_OPERATION_RERANK_MAX_DOCS, type ModelOperation } from "../shared/model-operations.ts";
 
 const DEFAULT_TIMEOUT_MS = 30_000;
 const MAX_EMBED_INPUTS = 128;
-const MAX_RERANK_DOCUMENTS = 100;
+const MAX_RERANK_DOCUMENTS = MODEL_OPERATION_RERANK_MAX_DOCS;
 const MAX_TEXT_CHARS = 32_000;
 const MAX_TOTAL_TEXT_CHARS = 500_000;
 

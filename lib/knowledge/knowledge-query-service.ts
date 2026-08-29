@@ -9,8 +9,12 @@ import {
 import { KnowledgeError, isKnowledgeError } from "./errors.ts";
 import { KnowledgeIndexStore, type IndexedKnowledgeChunk } from "./knowledge-index-store.ts";
 import { KnowledgeStore } from "./knowledge-store.ts";
-import { resolveNotebookConfig } from "./knowledge-store.ts";
+import {
+  resolveEffectiveChunkTargetChars,
+  resolveNotebookConfig,
+} from "./knowledge-store.ts";
 import type { KnowledgeBlock, KnowledgeModelRef, KnowledgeSource } from "./types.ts";
+import { MODEL_OPERATION_RERANK_MAX_DOCS } from "../../shared/model-operations.ts";
 import {
   type VectorIndexAdapter,
   type VectorIndexModelIdentity,
@@ -193,9 +197,10 @@ export function buildKnowledgeBlockLocatorIndex(blocks: KnowledgeBlock[]): Map<s
 export const KNOWLEDGE_UNCAPPED_RETRIEVAL_LIMIT = 1000;
 /**
  * rerank 输入文档数防护：无上限召回后候选可达千级，但 rerank 精度在远小于
- * 200 时已饱和且多数 rerank API 有文档数上限；超出部分保持 RRF 名次不再重排。
+ * 100 时已饱和且多数 rerank API 有文档数上限；超出部分保持 RRF 名次不再重排。
+ * 与 RerankClient 校验共用 shared/model-operations 的同一上限，杜绝两侧各自常量打架。
  */
-export const KNOWLEDGE_RERANK_MAX_DOCS = 200;
+export const KNOWLEDGE_RERANK_MAX_DOCS = MODEL_OPERATION_RERANK_MAX_DOCS;
 
 export class KnowledgeQueryService {
   private readonly deps: {
@@ -214,6 +219,20 @@ export class KnowledgeQueryService {
       signal?: AbortSignal;
     }) => Promise<KnowledgeEmbeddingResult | null>) | null;
     rerank?: KnowledgeReranker | null;
+    /**
+     * 按笔记本显式引用路由的 rerank 执行回调（v8：全局 rerank 槽已退役）。
+     * 配置类不可解析由回调侧记日志并返回 null → 检索显式降级 RRF 名次。
+     */
+    rerankForModel?: ((request: {
+      runId: string;
+      query: string;
+      documents: string[];
+      topN: number;
+      signal?: AbortSignal;
+      modelRef: KnowledgeModelRef;
+    }) => Promise<{ results: Array<{ index: number; score: number }> } | null>) | null;
+    /** 查嵌入模型上下文窗口（token 数）：与摄入侧同源，用于自动分块尺寸解析。 */
+    getEmbeddingModelContextWindow?: ((modelRef: KnowledgeModelRef) => number | null) | null;
   };
 
   constructor(deps: KnowledgeQueryService["deps"]) {
@@ -223,8 +242,8 @@ export class KnowledgeQueryService {
   /**
    * 摄入管线的 chunk+fts_index 相位：分块与 FTS 索引在同一次幂等替换中原子完成。
    * 指纹（blocks 内容 + chunkerConfigId）匹配即整体跳过；不匹配才重建。
-   * 笔记本级 targetChars 由摄入侧传入；查询侧懒构建（ensureArtifactIndexed）仍用默认配置，
-   * 是摄入未跑时的兜底，不删。
+   * targetChars 由调用方传入：摄入侧与查询侧懒构建都必须按笔记本生效值解析
+   * （resolveEffectiveChunkTargetChars 同源），缺省才落 chunker 内置默认。
    */
   indexArtifactForIngestion(
     studioId: string,
@@ -261,13 +280,16 @@ export class KnowledgeQueryService {
     }
   }
 
-  private ensureArtifactIndexed(studioId: string, parseArtifactId: string) {
-    // 查询侧懒构建兜底保留：摄入管线未覆盖的 artifact 在查询时按默认分块配置补齐。
-    this.indexArtifactForIngestion(studioId, parseArtifactId);
+  private ensureArtifactIndexed(studioId: string, parseArtifactId: string, chunkTargetChars?: number | null) {
+    // 查询侧懒构建兜底保留：摄入管线未覆盖的 artifact 在查询时按同源解析的
+    // 笔记本生效分块配置补齐（曾按内置默认 1200 重建，与摄入侧指纹互相打架）。
+    this.indexArtifactForIngestion(studioId, parseArtifactId, {
+      ...(chunkTargetChars != null ? { targetChars: chunkTargetChars } : {}),
+    });
   }
 
-  private ensureScopeIndexed(studioId: string, artifactIds: string[]) {
-    const ensureAll = () => artifactIds.forEach(id => this.ensureArtifactIndexed(studioId, id));
+  private ensureScopeIndexed(studioId: string, artifactIds: string[], chunkTargetChars?: number | null) {
+    const ensureAll = () => artifactIds.forEach(id => this.ensureArtifactIndexed(studioId, id, chunkTargetChars));
     try {
       ensureAll();
     } catch (error) {
@@ -277,8 +299,14 @@ export class KnowledgeQueryService {
     }
   }
 
-  private retrieveFts(studioId: string, artifactIds: string[], question: string, limit: number): IndexedKnowledgeChunk[] {
-    this.ensureScopeIndexed(studioId, artifactIds);
+  private retrieveFts(
+    studioId: string,
+    artifactIds: string[],
+    question: string,
+    limit: number,
+    chunkTargetChars?: number | null,
+  ): IndexedKnowledgeChunk[] {
+    this.ensureScopeIndexed(studioId, artifactIds, chunkTargetChars);
     // 底层 FTS/向量 search 的 sanity 上限 1000：无上限召回（retrieval_top_k NULL）
     // 的物理边界即此值，防病态全表膨胀。
     const searchLimit = Math.max(1, Math.min(limit, KNOWLEDGE_UNCAPPED_RETRIEVAL_LIMIT));
@@ -289,7 +317,7 @@ export class KnowledgeQueryService {
       if (isKnowledgeError(error) && error.code === "KNOWLEDGE_INVALID_ARGUMENT") return [];
       if (!isKnowledgeError(error) || error.code !== "KNOWLEDGE_INDEX_INVALID") throw error;
       this.deps.indexStore.reset();
-      this.ensureScopeIndexed(studioId, artifactIds);
+      this.ensureScopeIndexed(studioId, artifactIds, chunkTargetChars);
       return search();
     }
   }
@@ -380,6 +408,55 @@ export class KnowledgeQueryService {
     }
   }
 
+  /**
+   * 查询侧懒构建的在途去重：同一 (model, artifact) 的并行检索（拆解/直检/多子查询
+   * 同时触发 ensure）共享一次向量构建，避免同批块被并发嵌入多遍（曾把单槽本地
+   * 嵌入排队时间放大 N 倍并连锁触发客户端超时）。加入方 abort 只取消自己的等待；
+   * 全部加入方离开（完成或取消）时中止后台构建，不让无人等待的嵌入空跑。
+   */
+  private readonly vectorBuildInFlight = new Map<string, {
+    promise: Promise<void>;
+    controller: AbortController;
+    refCount: number;
+  }>();
+
+  private joinArtifactVectorBuild(input: {
+    parseArtifactId: string;
+    model: VectorIndexModelIdentity;
+    signal?: AbortSignal;
+    build: (signal: AbortSignal) => Promise<void>;
+  }): Promise<void> {
+    const key = `${input.model.key}\0${input.parseArtifactId}`;
+    const detach = (entry: { controller: AbortController; refCount: number }) => {
+      entry.refCount -= 1;
+      if (entry.refCount <= 0) entry.controller.abort();
+    };
+    const abortWait = (signal: AbortSignal): Promise<never> => new Promise((_, reject) => {
+      const abortError = new Error("Knowledge vector build wait aborted");
+      abortError.name = "AbortError";
+      signal.addEventListener("abort", () => reject(abortError), { once: true });
+    });
+
+    const existing = this.vectorBuildInFlight.get(key);
+    if (existing) {
+      existing.refCount += 1;
+      const waiters = [existing.promise];
+      if (input.signal) waiters.push(abortWait(input.signal));
+      return Promise.race(waiters).finally(() => detach(existing));
+    }
+    const controller = new AbortController();
+    const entry = { controller, refCount: 1, promise: null as unknown as Promise<void> };
+    entry.promise = input.build(controller.signal).finally(() => {
+      if (this.vectorBuildInFlight.get(key) === entry) this.vectorBuildInFlight.delete(key);
+    });
+    // 等待方可能全部先于构建完成而离开：此处兜底标记已处理，防止 unhandled rejection。
+    entry.promise.catch(() => {});
+    this.vectorBuildInFlight.set(key, entry);
+    const waiters: Array<Promise<void>> = [entry.promise];
+    if (input.signal) waiters.push(abortWait(input.signal));
+    return Promise.race(waiters).finally(() => detach(entry));
+  }
+
   private async ensureVectorArtifacts(input: {
     runId: string;
     artifactIds: string[];
@@ -396,30 +473,40 @@ export class KnowledgeQueryService {
       const chunks = input.chunksByArtifact.get(parseArtifactId) || [];
       const fingerprint = chunkFingerprint(chunks);
       if (vectorIndex.hasArtifact({ parseArtifactId, chunkFingerprint: fingerprint, model: input.model })) continue;
-      const vectors: number[][] = [];
-      for (let start = 0; start < chunks.length; start += 64) {
-        const batch = chunks.slice(start, start + 64);
-        const embedded = assertEmbeddingBatch(
-          await this.invokeEmbedding({
-            runId: input.runId,
-            texts: batch.map(chunk => chunk.text),
-            signal: input.signal,
-          }, input.embedTexts),
-          batch.length,
-          input.model,
-        );
-        vectors.push(...embedded.result.vectors);
-      }
-      vectorIndex.buildOrReplaceArtifact({
+      await this.joinArtifactVectorBuild({
         parseArtifactId,
-        chunkFingerprint: fingerprint,
         model: input.model,
-        entries: chunks.map((chunk, index) => ({
-          chunkId: chunk.id,
-          parseArtifactId,
-          ordinal: chunk.ordinal,
-          vector: vectors[index],
-        })),
+        signal: input.signal,
+        build: async (signal) => {
+          // 加入时可能已被并行调用方构建完成：进入构建前再查一次指纹。
+          if (vectorIndex.hasArtifact({ parseArtifactId, chunkFingerprint: fingerprint, model: input.model })) return;
+          const vectors: number[][] = [];
+          for (let start = 0; start < chunks.length; start += 64) {
+            const batch = chunks.slice(start, start + 64);
+            const embedded = assertEmbeddingBatch(
+              await this.invokeEmbedding({
+                runId: input.runId,
+                texts: batch.map(chunk => chunk.text),
+                signal,
+              }, input.embedTexts),
+              batch.length,
+              input.model,
+            );
+            vectors.push(...embedded.result.vectors);
+          }
+          if (signal.aborted) return; // 全部等待方已离开：丢弃结果，不留半写状态
+          vectorIndex.buildOrReplaceArtifact({
+            parseArtifactId,
+            chunkFingerprint: fingerprint,
+            model: input.model,
+            entries: chunks.map((chunk, index) => ({
+              chunkId: chunk.id,
+              parseArtifactId,
+              ordinal: chunk.ordinal,
+              vector: vectors[index],
+            })),
+          });
+        },
       });
     }
   }
@@ -440,16 +527,26 @@ export class KnowledgeQueryService {
     /** 是否执行 rerank（默认 true）；false 时跳过即使 reranker 已接线。 */
     rerank?: boolean;
     /**
+     * 本轮使用的 reranker（按笔记本引用构造的闭包）。undefined = 回落 deps.rerank
+     * （全局路径，v8 后恒为不可解析 → null 跳过）；null = 显式不用。
+     */
+    reranker?: KnowledgeReranker | null;
+    /**
      * 查询嵌入回调（v8 起由调用方按笔记本解析出的嵌入模型构造闭包传入）。
      * 缺省 → 纯 FTS（retrievalMode 如实 "fts"，禁静默换模型）。
      */
     embedTexts?: KnowledgeEmbedder | null;
+    /**
+     * 笔记本生效分块尺寸：ensure 链懒构建按同一 configId 判定指纹，避免查询侧
+     * 以不同尺寸重建索引与摄入侧互相打架。缺省 = 无笔记本上下文（chunker 内置默认）。
+     */
+    chunkTargetChars?: number | null;
   }): Promise<{ candidates: IndexedKnowledgeChunk[]; retrievalMode: "fts" | "hybrid" }> {
     const { studioId, artifactIds, question, runId, signal } = input;
     const topK = input.topK == null || input.topK <= 0
       ? KNOWLEDGE_UNCAPPED_RETRIEVAL_LIMIT
       : Math.min(input.topK, KNOWLEDGE_UNCAPPED_RETRIEVAL_LIMIT);
-    const fts = this.retrieveFts(studioId, artifactIds, question, topK);
+    const fts = this.retrieveFts(studioId, artifactIds, question, topK, input.chunkTargetChars);
     if (!input.embedTexts) return { candidates: fts, retrievalMode: "fts" };
 
     const questionEmbedding = await this.invokeEmbedding({ runId, texts: [question], signal }, input.embedTexts);
@@ -502,10 +599,11 @@ export class KnowledgeQueryService {
     const rerankTail = candidates.length > KNOWLEDGE_RERANK_MAX_DOCS
       ? candidates.slice(KNOWLEDGE_RERANK_MAX_DOCS)
       : [];
-    if (input.rerank !== false && rerankCandidates.length > 0 && this.deps.rerank) {
+    const reranker = input.reranker !== undefined ? input.reranker : this.deps.rerank;
+    if (input.rerank !== false && rerankCandidates.length > 0 && reranker) {
       let reranked;
       try {
-        reranked = await this.deps.rerank({
+        reranked = await reranker({
           runId,
           query: question,
           documents: rerankCandidates.map(candidate => candidate.text),
@@ -515,7 +613,8 @@ export class KnowledgeQueryService {
       } catch (error) {
         if (isAbortLike(error)) throw error;
         if (isKnowledgeError(error)) throw error;
-        throw new KnowledgeError("KNOWLEDGE_RETRIEVAL_UNAVAILABLE", "Knowledge rerank request failed");
+        const cause = error instanceof Error ? `${error.name}: ${error.message}` : String(error);
+        throw new KnowledgeError("KNOWLEDGE_RETRIEVAL_UNAVAILABLE", "Knowledge rerank request failed", { cause });
       }
       if (reranked) {
         if (
@@ -554,6 +653,10 @@ export class KnowledgeQueryService {
     signal?: AbortSignal;
     /** owning notebook 的嵌入引用：按同一模型路由查询向量；null → 纯 FTS。 */
     embeddingModelRef?: KnowledgeModelRef | null;
+    /** owning notebook 的生效分块尺寸：ensure 链与摄入侧同 configId（缺省 = chunker 默认）。 */
+    chunkTargetChars?: number | null;
+    /** owning notebook 的重排引用：按引用路由执行；null/缺省 → 不重排。 */
+    rerankModelRef?: KnowledgeModelRef | null;
   }): Promise<{ candidates: IndexedKnowledgeChunk[]; retrievalMode: "fts" | "hybrid" }> {
     if (!Array.isArray(input.artifactIds) || input.artifactIds.length === 0) {
       throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "Knowledge retrieval scope must not be empty");
@@ -567,6 +670,17 @@ export class KnowledgeQueryService {
           modelRef: input.embeddingModelRef!,
         })) as KnowledgeEmbedder
       : null;
+    const reranker = input.rerankModelRef && this.deps.rerankForModel
+      ? ((request: { runId: string; query: string; documents: string[]; topN: number; signal?: AbortSignal }) =>
+        this.deps.rerankForModel!({
+          runId: request.runId,
+          query: request.query,
+          documents: request.documents,
+          topN: request.topN,
+          signal: request.signal,
+          modelRef: input.rerankModelRef!,
+        })) as KnowledgeReranker
+      : null;
     return this.retrieve({
       studioId: input.studioId,
       artifactIds: input.artifactIds,
@@ -575,6 +689,8 @@ export class KnowledgeQueryService {
       signal: input.signal,
       ...(input.topK != null ? { topK: input.topK } : {}),
       ...(input.rerank != null ? { rerank: input.rerank } : {}),
+      ...(input.chunkTargetChars != null ? { chunkTargetChars: input.chunkTargetChars } : {}),
+      reranker,
       embedTexts,
     });
   }
@@ -612,9 +728,26 @@ export class KnowledgeQueryService {
         this.deps.store.getNotebookConfig({ studioId, notebookId }),
       );
       const topK = input.topK ?? resolved.retrievalTopK;
-      // rerank 解析（v8 起）：显式入参 > 笔记本 rerank 列。引用本身只作开关；
-      // 执行仍走 manager 级 reranker（本阶段无按引用路由的 rerank 执行面）。
-      const rerank = input.rerank ?? resolved.rerankModelRef != null;
+      // rerank 路由（v8）：笔记本显式引用 → 按引用执行（配置不可解析由回调侧
+      // 记日志并返回 null，检索显式降级 RRF 名次）；引用未配置或执行面未接线 → 不重排。
+      const reranker = resolved.rerankModelRef && this.deps.rerankForModel
+        ? ((request: { runId: string; query: string; documents: string[]; topN: number; signal?: AbortSignal }) =>
+          this.deps.rerankForModel!({
+            runId: request.runId,
+            query: request.query,
+            documents: request.documents,
+            topN: request.topN,
+            signal: request.signal,
+            modelRef: resolved.rerankModelRef!,
+          })) as KnowledgeReranker
+        : null;
+      const rerank = input.rerank ?? reranker != null;
+      // 生效分块尺寸与摄入侧同源解析（显式列 > 嵌入模型上下文 ×80%）：查询侧
+      // ensure 链按同一 configId 判定指纹，不再以默认 1200 重建摄入侧的索引。
+      const chunkTargetChars = resolveEffectiveChunkTargetChars(
+        resolved,
+        this.deps.getEmbeddingModelContextWindow,
+      );
       // 查询嵌入按笔记本配置路由（与摄入侧同一模型 → 向量命中同一 model_key 分区）；
       // 笔记本未配置嵌入模型 → 该笔记本纯 FTS（禁静默换模型）。
       const embedTexts = resolved.embeddingModelRef && this.deps.embedTextsForModel
@@ -641,7 +774,9 @@ export class KnowledgeQueryService {
           signal: input.signal,
           topK,
           rerank,
+          reranker,
           embedTexts,
+          chunkTargetChars,
         });
         if (result.retrievalMode === "hybrid") retrievalMode = "hybrid";
         ranked = result.candidates;
@@ -652,6 +787,7 @@ export class KnowledgeQueryService {
         notebookName: notebook.name,
         source: entry.source,
         artifactId,
+        chunkTargetChars,
       }));
       return { notebookId, notebookName: notebook.name, ranked, retrievalMode, sources };
     }));
@@ -684,8 +820,9 @@ export class KnowledgeQueryService {
     notebookName: string;
     source: KnowledgeSource;
     artifactId: string;
+    chunkTargetChars?: number | null;
   }): NotebookRetrievalSource {
-    this.ensureArtifactIndexed(input.studioId, input.artifactId);
+    this.ensureArtifactIndexed(input.studioId, input.artifactId, input.chunkTargetChars);
     const chunks = this.deps.indexStore.listArtifactChunks(input.artifactId);
     let firstHeadingPath: string[] | null = null;
     if (chunks.length > 0) {

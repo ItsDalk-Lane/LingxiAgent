@@ -660,7 +660,7 @@
     ],
     "version": 3
   },
-  "payloadFingerprint": "sha256:74094f1c33c3b1eb747fe29a0ac353737fc4c2a361e947b2439c017bcf594cfd",
+  "payloadFingerprint": "sha256:738e444baf13db917e353ab3194b022a178b9ae9183723eb0551ebdb686cc233",
   "registry": [
     {
       "affectedByEpochMigration": true,
@@ -3248,8 +3248,8 @@
   ],
   "review": {
     "classification": "compatible",
-    "compatibilityReason": "knowledge FTS/vector search sanity limit raised 50 to 1000 for uncapped notebook retrieval; no schema shape change",
-    "payloadFingerprint": "sha256:74094f1c33c3b1eb747fe29a0ac353737fc4c2a361e947b2439c017bcf594cfd"
+    "compatibilityReason": "knowledge-manager.ts 新增 rerankForModel 回调选项并接线到查询服务（rerank 按笔记本引用路由）；knowledge-query-service/knowledge-read-tool 同步穿透引用。无 DDL/迁移/store 注册变更，持久化 schema 不变",
+    "payloadFingerprint": "sha256:738e444baf13db917e353ab3194b022a178b9ae9183723eb0551ebdb686cc233"
   },
   "schemas": [
     {
@@ -3647,7 +3647,7 @@
         ],
         "userVersion": 8
       },
-      "sourceHash": "sha256:f1d61a2a004afa64439521bafe4ed61ea39f62f9fcddebf1be785a79c5e7482e",
+      "sourceHash": "sha256:c4016c5096ca85d292d78ef1d260d580e62ea4fd7a34df412d9576fcf62cb391",
       "storeId": "knowledge-database"
     },
     {
@@ -3667,14 +3667,14 @@
       "contract": "ParseArtifact generation directories referenced by knowledge.db and never treated as source content versions",
       "kind": "directory-contract",
       "module": "lib/knowledge/knowledge-manager.ts",
-      "sourceHash": "sha256:a91945d4420f43716f090f733e393c4fde6d9541ec97b7a5177950008b17edba",
+      "sourceHash": "sha256:1d664cc8827f7e968a8395c613d8e9c9629856d29dbc424a8e315e2d974c7d00",
       "storeId": "knowledge-parse-artifacts"
     },
     {
       "contract": "ContentSnapshot relative locator, immutable byte publication, SHA-256 verification, and rollback protocol",
       "kind": "directory-contract",
       "module": "lib/knowledge/knowledge-manager.ts",
-      "sourceHash": "sha256:a91945d4420f43716f090f733e393c4fde6d9541ec97b7a5177950008b17edba",
+      "sourceHash": "sha256:1d664cc8827f7e968a8395c613d8e9c9629856d29dbc424a8e315e2d974c7d00",
       "storeId": "knowledge-source-snapshots"
     },
     {

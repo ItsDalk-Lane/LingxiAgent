@@ -1874,6 +1874,8 @@ describe("knowledge context injection (Phase 8)", () => {
       knowledgeRefs: { notebookIds: ["nb-1"], mode: "qa" },
       // mock 会话无 model.contextWindow → 动态预算回退固定兜底值。
       budgetTokens: 6000,
+      // 会话路径随行：蒸馏进度事件按 session 广播（knowledge_distill_progress）。
+      sessionPath: "/tmp/desk.jsonl",
     });
     expect(engine.promptSession).toHaveBeenCalledWith(
       "/tmp/desk.jsonl",

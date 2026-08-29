@@ -444,10 +444,6 @@
     "knowledgeMetaLabel": "ナレッジベース",
     "knowledgeMetaModeQa": "Q&A モード",
     "knowledgeMetaModeAssist": "補助モード",
-    "knowledgeMetaRetrieved": "{count} チャンクを検索",
-    "knowledgeMetaInjected": "{count} チャンクを注入",
-    "knowledgeMetaTokens": "~{count} tokens",
-    "knowledgeMetaTruncated": "予算超過シャード",
     "knowledgeMetaUnavailable": "ナレッジ検索は利用不可",
     "knowledgeMetaDegradedTitle": "検索が劣化しました：{reason}",
     "knowledgeRetrieving": "ナレッジベースを検索中",
@@ -455,7 +451,8 @@
     "knowledgeRetrievalTruncated": "予算超過シャード",
     "knowledgeRetrievalUnavailable": "ナレッジ検索は利用不可",
     "knowledgeRetrievalRowTitle": "{source} · チャンク {chunk}",
-    "knowledgeRetrievalDistilled": "{n} バッチに抽出済み"
+    "knowledgeRetrievalDistilled": "{n} バッチに抽出済み",
+    "knowledgeDistilling": "知識蒸留中 · {done} バッチ完了 · {model}"
   },
   "time": {
     "justNow": "たった今",

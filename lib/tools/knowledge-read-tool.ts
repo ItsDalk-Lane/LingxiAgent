@@ -48,7 +48,14 @@ function resolveReadyArtifact(
   studioId: string,
   sourceId: string,
   notebookId: string | null,
-): { artifactId: string; notebookId: string; sourceName: string; embeddingModelRef: KnowledgeModelRef | null } {
+): {
+  artifactId: string;
+  notebookId: string;
+  sourceName: string;
+  embeddingModelRef: KnowledgeModelRef | null;
+  chunkTargetChars: number;
+  rerankModelRef: KnowledgeModelRef | null;
+} {
   const source = knowledge.getSource({ studioId, sourceId });
   if (notebookId) {
     knowledge.getNotebook({ studioId, notebookId });
@@ -72,6 +79,11 @@ function resolveReadyArtifact(
       // owning notebook 的嵌入引用：源内检索按同一模型路由（与索引侧一致）。
       embeddingModelRef: knowledge.getNotebookConfig?.({ studioId, notebookId: notebook.id })
         .embeddingModelRef ?? null,
+      // owning notebook 的生效分块尺寸：ensure 链与摄入侧同 configId 判定指纹。
+      chunkTargetChars: knowledge.getNotebookEffectiveChunkTargetChars({ studioId, notebookId: notebook.id }),
+      // owning notebook 的重排引用：按引用路由（不可解析 → 回调侧 null → RRF 降级）。
+      rerankModelRef: knowledge.getNotebookConfig?.({ studioId, notebookId: notebook.id })
+        .rerankModelRef ?? null,
     };
   }
   throw new KnowledgeError("KNOWLEDGE_PARSE_NOT_READY", "Knowledge source has no ready parse artifact");
@@ -133,6 +145,8 @@ export function createKnowledgeReadTool(deps: KnowledgeReadToolDeps) {
             question: query,
             topK: 12,
             embeddingModelRef: resolved.embeddingModelRef,
+            chunkTargetChars: resolved.chunkTargetChars,
+            rerankModelRef: resolved.rerankModelRef,
           });
           const chunks = result.candidates.map(chunk => ({
             ordinal: chunk.ordinal + 1,

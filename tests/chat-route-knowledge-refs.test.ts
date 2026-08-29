@@ -128,4 +128,18 @@ describe("chat route knowledgeRefs handling", () => {
       sessionPath: "/sessions/test.jsonl",
     });
   });
+
+  it("knowledge_distill_progress 引擎事件广播为同名 WS 消息（带批数与模型）", async () => {
+    const { hub, ws } = setup();
+    const listener = hub.subscribe.mock.calls[0][0];
+    listener({ type: "knowledge_distill_progress", done: 7, model: "opencode-go/deepseek-v4-flash" }, "/sessions/test.jsonl");
+
+    const sent = ws.send.mock.calls.map((call) => JSON.parse(call[0] as string));
+    expect(sent).toContainEqual({
+      type: "knowledge_distill_progress",
+      sessionPath: "/sessions/test.jsonl",
+      done: 7,
+      model: "opencode-go/deepseek-v4-flash",
+    });
+  });
 });

@@ -45,6 +45,7 @@
  *   { type: "content_block", block: { type: "file"|"media_generation"|"artifact"|"screenshot"|"skill"|"plugin_card"|"suggestion_card"|"cron_confirm"|"settings_confirm"|"settings_update", ... } }  (工具结果统一内容块，含 stage_files/media_generation 占位与完成替换/旧 create_artifact 兼容输出/browser screenshot/install_skill/plugin card/建议卡片/cron 兼容确认/settings 确认/设置结果)
  *   { type: "session_user_message", sessionPath: "...", message: { text, attachments?, quotedText?, skills?, deskContext?, knowledgeRefs?, knowledgeRetrieval? } }  (桌面/RC 统一用户消息，参与 stream_resume；knowledgeRetrieval 为知识库注入的检索统计，仅带引用的消息出现)
  *   { type: "knowledge_retrieval_started", sessionPath: "..." }  (知识库注入链路开始检索的即时反馈；在阻塞式注入前发出、早于 session_status isStreaming，不进 stream_resume)
+ *   { type: "knowledge_distill_progress", sessionPath: "...", done: number, model: string|null }  (蒸馏每批完成的进度：超预算证据分段压缩期间逐批广播，驱动「蒸馏中 · N 批」胶囊；不进 stream_resume，由该 session 任意后续事件保守清除)
  *   { type: "loop_status", sessionPath: "...", sessionId?: string|null, status: "running"|"paused"|"stopped"|"completed", turnCount: number, maxTurns: number|null, pausedReason?: string|null, prompt?: string|null }  (循环任务状态机变更广播；不进 stream_resume，驱动会话列表循环徽章与 interlude 控制按钮态)
  *   { type: "confirmation_resolved", confirmId: "...", action: "confirmed"|"rejected", value?: any }  (用户操作确认卡片后广播，前端更新卡片状态)
  *   { type: "block_update", taskId: "...", patch: { streamStatus: "done"|"failed", summary?: "..." } }  (活跃 block 状态更新)

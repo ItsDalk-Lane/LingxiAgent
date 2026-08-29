@@ -6673,9 +6673,14 @@
           "root": "server-bootstrap",
           "from": "lib/llm/context-usage-breakdown.ts",
           "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "core/engine.ts",
+          "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by core/session-compactor.ts (import-statement); lib/knowledge/knowledge-distiller.ts (import-statement); lib/knowledge/knowledge-context-injector.ts (import-statement); +3 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by core/session-compactor.ts (import-statement); lib/knowledge/knowledge-distiller.ts (import-statement); lib/knowledge/knowledge-context-injector.ts (import-statement); +4 more importer(s)."
     },
     {
       "path": "lib/llm/model-call-correlation.ts",
@@ -123412,9 +123417,19 @@
           "root": "server-bootstrap",
           "from": "core/model-operation-resolver.ts",
           "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "core/model-operation-client.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/knowledge/knowledge-query-service.ts",
+          "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by shared/provider-model-validation.ts (import-statement); core/provider-registry.ts (import-statement); core/model-operation-resolver.ts (import-statement)."
+      "reason": "Reached via esbuild source module graph, imported by shared/provider-model-validation.ts (import-statement); core/provider-registry.ts (import-statement); core/model-operation-resolver.ts (import-statement); +2 more importer(s)."
     },
     {
       "path": "shared/model-ref.ts",

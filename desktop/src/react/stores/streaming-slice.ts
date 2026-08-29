@@ -45,6 +45,13 @@ export interface StreamingSlice {
   beginKnowledgeRetrieval: (path: string) => void;
   endKnowledgeRetrieval: (path: string) => void;
   /**
+   * 知识蒸馏进行中的 session（ws knowledge_distill_progress 逐批更新 →
+   * 该 session 任意后续事件清除）。纯瞬态：驱动「蒸馏中 · N 批」胶囊。
+   */
+  knowledgeDistillBySession: Record<string, { model: string | null; done: number }>;
+  updateKnowledgeDistill: (path: string, progress: { model: string | null; done: number }) => void;
+  endKnowledgeDistill: (path: string) => void;
+  /**
    * 发送后本地进入「等待助手」态的 session（ws.send 成功 → 该 session 首个
    * 后续事件清除）。服务器在知识检索/排队期间不置 isStreaming，靠它保证
    * 发送瞬间就有 typing 指示器，不依赖任何服务器信号（旧 server 也生效）。
@@ -191,6 +198,37 @@ export const createStreamingSlice = (
     set((s) => ({
       knowledgeRetrievingSessions: filterLegacyAndIdentity(s.knowledgeRetrievingSessions, path, key),
     }));
+  },
+  knowledgeDistillBySession: {},
+  updateKnowledgeDistill: (path, progress) => {
+    const key = identityKeyForPath(get, path);
+    const current = get?.();
+    const existing = current?.knowledgeDistillBySession?.[key];
+    if (existing && existing.done === progress.done && existing.model === progress.model) return;
+    const base = filterLegacyAndIdentity(
+      Object.keys(current?.knowledgeDistillBySession ?? {}),
+      path,
+      key,
+    ).reduce<Record<string, { model: string | null; done: number }>>((acc, k) => {
+      acc[k] = current!.knowledgeDistillBySession[k];
+      return acc;
+    }, {});
+    base[key] = progress;
+    set({ knowledgeDistillBySession: base });
+  },
+  endKnowledgeDistill: (path) => {
+    const key = identityKeyForPath(get, path);
+    const current = get?.();
+    if (!current?.knowledgeDistillBySession?.[key] && !current?.knowledgeDistillBySession?.[path]) return;
+    const kept = filterLegacyAndIdentity(
+      Object.keys(current?.knowledgeDistillBySession ?? {}),
+      path,
+      key,
+    ).reduce<Record<string, { model: string | null; done: number }>>((acc, k) => {
+      acc[k] = current!.knowledgeDistillBySession[k];
+      return acc;
+    }, {});
+    set({ knowledgeDistillBySession: kept });
   },
   turnPendingSessions: [],
   beginTurnPending: (path) => set((s) => {

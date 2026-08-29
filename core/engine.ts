@@ -193,7 +193,14 @@ import {
   buildKnowledgeContextInjection,
   KNOWLEDGE_DECOMPOSE_SYSTEM_PROMPT,
 } from "../lib/knowledge/knowledge-context-injector.ts";
-import { KNOWLEDGE_DISTILL_SYSTEM_PROMPT } from "../lib/knowledge/knowledge-distiller.ts";
+import {
+  KNOWLEDGE_DISTILL_FALLBACK_BATCH_TOKENS,
+  KNOWLEDGE_DISTILL_MAX_BATCH_TOKENS,
+  KNOWLEDGE_DISTILL_MIN_BATCH_TOKENS,
+  KNOWLEDGE_DISTILL_SYSTEM_PROMPT,
+  KNOWLEDGE_DISTILL_TARGET_BATCH_MS,
+} from "../lib/knowledge/knowledge-distiller.ts";
+import { estimateTextTokens } from "../lib/llm/estimate-text-tokens.ts";
 import { BrowserManager } from "../lib/browser/browser-manager.ts";
 import { TerminalSessionManager } from "../lib/terminal/terminal-session-manager.ts";
 import {
@@ -289,6 +296,8 @@ export class LingxiEngine {
   declare _checkpointStore: any;
   declare _fileHistory: any;
   declare _computerHost: any;
+  /** 蒸馏模型实测吞吐（ms/token EMA），按 provider/model 分键；驱动批预算动态推算。 */
+  declare _knowledgeDistillThroughput: Map<string, number>;
   declare _computerProviders: any;
   declare _configCoord: any;
   declare _auxResolver: AuxiliaryModelResolver;
@@ -454,9 +463,13 @@ export class LingxiEngine {
 
     // ── Core managers ──
     this._prefs = new PreferencesManager({ userDir: this.userDir, agentsDir: this.agentsDir });
+    this._knowledgeDistillThroughput = new Map();
     this._knowledge = new KnowledgeManager({
       lingxiHome: this.lingxiHome,
       rerank: (request) => this._rerankKnowledgeTexts(request),
+      // 查询侧 rerank 按笔记本解析链的显式引用路由（v8：全局 rerank 槽已退役，
+      // 引用不可解析 → null → 检索显式降级 RRF 名次，见 _rerankKnowledgeTextsForModel）。
+      rerankForModel: (request) => this._rerankKnowledgeTextsForModel(request),
       // 摄入管线按笔记本解析链拿到的显式引用执行嵌入；
       // 与查询侧懒构建共用同一套 ModelOperationResolver/EmbeddingClient 基础设施。
       embedTextsForModel: (request) => this._embedKnowledgeTextsForModel(request),
@@ -2262,6 +2275,43 @@ export class LingxiEngine {
   }
 
   /**
+   * 知识查询侧 rerank（v8）：按笔记本解析链给出的显式引用路由执行。
+   * 配置类错误（模型被移出清单/缺凭证/无操作协议）→ 记日志后返回 null，
+   * 检索显式降级为 RRF 名次（与嵌入侧 unresolvable → 纯 FTS 同一语义，
+   * 禁静默降级红线：日志留痕 + 调用方按 null 跳过）；请求级错误照常抛出。
+   */
+  async _rerankKnowledgeTextsForModel(request) {
+    const resolver = new ModelOperationResolver(
+      this._modelOperationResolverDeps(() => request?.modelRef || null),
+    );
+    let execution = null;
+    try {
+      execution = await resolver.resolveFresh("rerank");
+    } catch (error) {
+      if (error instanceof ModelOperationConfigurationError) {
+        moduleLog.log(
+          `knowledge rerank skipped (explicit degradation): ${request?.modelRef?.provider ?? "?"}/${request?.modelRef?.id ?? "?"} — ${error.message}`,
+        );
+        return null;
+      }
+      throw error;
+    }
+    if (!execution) return null;
+    const client = new RerankClient({
+      resolveOperationFresh: async () => execution,
+      getUsageLedger: () => this._usageLedger,
+    });
+    return client.rerank({
+      query: request.query,
+      documents: request.documents,
+      topN: request.topN,
+      signal: request.signal,
+      timeoutMs: 120_000,
+      usageContext: this._knowledgeOperationUsageContext("rerank", request.runId),
+    });
+  }
+
+  /**
    * Phase 8 知识库引用注入门面：拆解（knowledge 槽位，首次 15s / 纠错重试 8s 超时，
    * temperature 0）+ retrieveForNotebooks 检索 + 预算裁剪，产出拼进 prompt 的
    * [KnowledgeContext] 系统侧注入块与本次检索统计（KnowledgeRetrievalStats，
@@ -2274,6 +2324,8 @@ export class LingxiEngine {
     knowledgeRefs: { notebookIds: string[]; mode: "qa" | "assist" };
     /** 动态注入预算（desktop-session-submit 按会话模型解析）；缺省走 injector 兜底。 */
     budgetTokens?: number;
+    /** 会话路径：携带时蒸馏每批完成广播 knowledge_distill_progress 进度事件。 */
+    sessionPath?: string;
   }): Promise<{ block: string; stats: KnowledgeRetrievalStats }> {
     const annotateUnavailable = (reason: string) => ({
       block: `[KnowledgeContext]\n[knowledge injection unavailable: ${reason}]\n`
@@ -2305,11 +2357,48 @@ export class LingxiEngine {
       // 未配置 → injector 退回"截断 + 分片清单 + knowledge_read 指引"并留痕。
       const distillSlotConfigured = !!this.getSharedModels()?.knowledgeDistill;
       let distillModel = null;
+      // 批预算 = min(目标延迟 10s ÷ 该模型实测吞吐, 窗口/4, 64k)，夹 ≥4k。
+      // 吞吐为每次蒸馏调用实测的 ms/token EMA（按 provider/model 分键）——
+      // 不绑定任何单一模型标定：换模型后首批按 12k 回退起步，完成即自我校准，
+      // 惰性建批让同一场内的后续批次立即用上新估值。与注入预算彻底分离
+      // （复用注入预算曾切出 49.5 万 token/批的多 MB 请求体，2026-08-29 事故）。
+      let distillBatchBudgetTokens: (() => number) | null = null;
+      let distillModelLabel: string | null = null;
       if (distillSlotConfigured) {
+        let distillWindowBudget = KNOWLEDGE_DISTILL_FALLBACK_BATCH_TOKENS;
+        try {
+          const distillConfig = await this.resolveAuxiliaryModelFresh("knowledgeDistill");
+          const window = Number(distillConfig?.model?.contextWindow);
+          distillModelLabel = `${distillConfig?.model?.provider ?? "?"}/${distillConfig?.model?.id ?? "?"}`;
+          distillWindowBudget = Number.isFinite(window) && window > 0
+            ? Math.min(
+              KNOWLEDGE_DISTILL_MAX_BATCH_TOKENS,
+              Math.max(KNOWLEDGE_DISTILL_MIN_BATCH_TOKENS, Math.floor(window / 4)),
+            )
+            : KNOWLEDGE_DISTILL_FALLBACK_BATCH_TOKENS;
+        } catch {
+          distillWindowBudget = KNOWLEDGE_DISTILL_FALLBACK_BATCH_TOKENS;
+        }
+        const throughputKey = distillModelLabel ?? "knowledgeDistill";
+        distillBatchBudgetTokens = () => {
+          const emaMsPerToken = this._knowledgeDistillThroughput.get(throughputKey);
+          const throughputBudget = emaMsPerToken && emaMsPerToken > 0
+            ? Math.floor(KNOWLEDGE_DISTILL_TARGET_BATCH_MS / emaMsPerToken)
+            : KNOWLEDGE_DISTILL_FALLBACK_BATCH_TOKENS;
+          return Math.max(
+            KNOWLEDGE_DISTILL_MIN_BATCH_TOKENS,
+            Math.min(throughputBudget, distillWindowBudget),
+          );
+        };
         distillModel = async ({ question, batch, maxOutputChars, correction }) => {
           const config = await this.resolveAuxiliaryModelFresh("knowledgeDistill");
           if (!config) throw new Error("knowledgeDistill model slot unavailable");
-          return callText({
+          // 超时随批大小线性化：30s 基线 + 1ms/token（预填充实测 ≈0.07ms/token，
+          // 留 ~14 倍余量覆盖生成与排队），上限 180s。
+          const batchTokens = estimateTextTokens(batch);
+          const batchTimeoutMs = Math.min(180_000, 30_000 + batchTokens);
+          const callStartedAt = Date.now();
+          const distilled = await callText({
             api: config.api,
             apiKey: config.apiKey,
             baseUrl: config.baseUrl,
@@ -2326,9 +2415,16 @@ export class LingxiEngine {
                   + `Extract only the question-relevant content. Plain text, no fences, at most ${maxOutputChars} characters.`,
             }],
             temperature: 0,
-            // 分批输入可能很大；提炼是纯文本压缩任务，给足超时但留纠错余量。
-            timeoutMs: correction ? 60_000 : 90_000,
+            timeoutMs: batchTimeoutMs,
           });
+          // 实测吞吐回馈（ms/token EMA，α=0.3）：过短的调用噪声大不采样。
+          const elapsedMs = Date.now() - callStartedAt;
+          if (batchTokens > 0 && elapsedMs >= 200) {
+            const sample = elapsedMs / batchTokens;
+            const previous = this._knowledgeDistillThroughput.get(throughputKey) ?? sample;
+            this._knowledgeDistillThroughput.set(throughputKey, previous * 0.7 + sample * 0.3);
+          }
+          return distilled;
         };
       }
       let decomposeModel = null;
@@ -2367,6 +2463,20 @@ export class LingxiEngine {
         deps: {
           decomposeModel,
           distillModel,
+          ...(distillBatchBudgetTokens != null ? { distillBatchBudgetTokens } : {}),
+          // 每批蒸馏完成 → ws 广播进度（聊天界面"蒸馏中 · N 批"胶囊）。
+          ...(input.sessionPath && distillModelLabel
+            ? {
+              onDistillProgress: (done: number) => {
+                this.emitEvent({
+                  type: "knowledge_distill_progress",
+                  sessionPath: input.sessionPath!,
+                  done,
+                  model: distillModelLabel!,
+                }, input.sessionPath!);
+              },
+            }
+            : {}),
           retrieve: ({ query }) => knowledge.queryService.retrieveForNotebooks({
             studioId,
             notebookIds: input.knowledgeRefs.notebookIds,

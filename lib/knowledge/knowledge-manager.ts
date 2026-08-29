@@ -110,6 +110,18 @@ export interface KnowledgeManagerOptions {
    */
   embedTextsForModel?: ((request: KnowledgeIngestionEmbedRequest) => Promise<KnowledgeEmbeddingResult | null>) | null;
   canEmbedWithModel?: ((modelRef: KnowledgeModelRef) => boolean) | null;
+  /**
+   * 查询侧 rerank 执行回调（v8：按笔记本显式引用路由）。配置类不可解析由
+   * engine 侧记日志并返回 null，检索显式降级 RRF 名次；请求级错误照常抛出。
+   */
+  rerankForModel?: ((request: {
+    runId: string;
+    query: string;
+    documents: string[];
+    topN: number;
+    signal?: AbortSignal;
+    modelRef: KnowledgeModelRef;
+  }) => Promise<{ results: Array<{ index: number; score: number }> } | null>) | null;
   /** 查嵌入模型上下文窗口（token 数）：自动分块与生效值展示共用。 */
   getEmbeddingModelContextWindow?: ((modelRef: KnowledgeModelRef) => number | null) | null;
   ingestionLog?: (message: string) => void;
@@ -184,6 +196,8 @@ export class KnowledgeManager {
       vectorIndex: this.vectorIndex,
       embedTextsForModel: options.embedTextsForModel ?? null,
       rerank: options.rerank,
+      rerankForModel: options.rerankForModel ?? null,
+      getEmbeddingModelContextWindow: options.getEmbeddingModelContextWindow ?? null,
     });
     this.ingestion = new KnowledgeIngestionService({
       store: this.store,
@@ -693,9 +707,23 @@ export class KnowledgeManager {
     if (artifact.status !== "ready") {
       throw new KnowledgeError("KNOWLEDGE_PARSE_NOT_READY", "Parse artifact is not ready for chunk cards");
     }
+    // owning notebook 的生效分块尺寸（与摄入侧同源）：卡片视图的幂等兜底也必须
+    // 按同一 configId 判定，否则打开卡片即以默认 1200 重建索引、连坐查询侧。
+    let chunkTargetChars: number | null = null;
+    for (const notebook of this.store.listNotebooks({ studioId: input?.studioId })) {
+      const inNotebook = this.store.listNotebookSources({ studioId: input?.studioId, notebookId: notebook.id })
+        .some(entry => entry.parseArtifact?.id === artifact.id);
+      if (!inNotebook) continue;
+      chunkTargetChars = this.getNotebookEffectiveChunkTargetChars({
+        studioId: input?.studioId,
+        notebookId: notebook.id,
+      });
+      break;
+    }
     const { chunkerConfigId } = this.queryService.indexArtifactForIngestion(
       String(input?.studioId),
       artifact.id,
+      chunkTargetChars != null ? { targetChars: chunkTargetChars } : undefined,
     );
     const chunks = this.indexStore.listArtifactChunks(artifact.id);
     const locatorIndex = buildKnowledgeBlockLocatorIndex(

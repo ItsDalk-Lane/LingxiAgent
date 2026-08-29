@@ -1784,6 +1784,15 @@ export function createChatRoute(engine: any, hub: any, {
       // 知识注入链路开始检索的即时反馈（desktop-session-submit 在阻塞式注入前发出）：
       // 早于 session_status isStreaming，前端用它显示「正在检索知识库」占位。
       broadcast({ type: "knowledge_retrieval_started", sessionPath });
+    } else if (event.type === "knowledge_distill_progress") {
+      // 蒸馏每批完成的进度（超预算证据分段压缩）：驱动前端「蒸馏中 · N 批」胶囊，
+      // 结束由该 session 任意后续事件（session_user_message 等）保守清除。
+      broadcast({
+        type: "knowledge_distill_progress",
+        sessionPath,
+        done: Number(event.done) || 0,
+        model: typeof event.model === "string" ? event.model : null,
+      });
     } else if (event.type === "session_status") {
       // session_status 只回答「Session 忙不忙」（任务书 §九/§十：status 与 Run 正交）。
       // 不再 reset Run 级 parser，也不 finalize Run；Run 只由 agent_start / agent_settled 开关。

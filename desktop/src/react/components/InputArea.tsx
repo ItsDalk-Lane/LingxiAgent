@@ -2111,6 +2111,13 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
         // interject 发生在流式态中，指示器已由 isStreaming 覆盖。
         if (type === 'prompt') {
           useStore.getState().beginTurnPending?.(sessionPathForSend);
+          // 携带知识库引用的提问：发送瞬间本地点亮「知识库检索中」——服务器在
+          // 检索/蒸馏期间不发任何流事件，此前这段时间只剩裸三点指示器（用户
+          // 完全看不到动作）。本地置位与服务器 knowledge_retrieval_started 幂等
+          // 合流，清除沿用顶部保守清除。
+          if (wsMsg.knowledgeRefs) {
+            useStore.getState().beginKnowledgeRetrieval?.(sessionPathForSend);
+          }
         }
         upsertOptimisticSessionFirstMessage(sessionPathForSend, text, new Date().toISOString());
       } catch (err) {

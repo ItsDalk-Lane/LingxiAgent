@@ -108,15 +108,18 @@ describe('UserMessage knowledge meta line', () => {
     expect(screen.getByText('知识库 · nb-x · 辅助模式')).toBeInTheDocument();
   });
 
-  it('appends retrieval stats on the same line once they arrive', () => {
+  it('never appends retrieval stats to the line（统计只进折叠卡与蒸馏胶囊）', () => {
     renderUserMessage({ knowledgeRetrieval: makeStats({}) });
-    expect(screen.getByText('知识库 · 笔记本A、笔记本B · 问答模式 · 检索 86 块 · 注入 12 块 · ~920 tokens'))
-      .toBeInTheDocument();
+    const line = screen.getByText('知识库 · 笔记本A、笔记本B · 问答模式');
+    expect(line.textContent).not.toContain('检索');
+    expect(line.textContent).not.toContain('注入');
+    expect(line.textContent).not.toContain('tokens');
+    expect(line.textContent).not.toContain('超预算分片');
   });
 
-  it('marks over-budget truncation on the line', () => {
+  it('never marks over-budget truncation on the line', () => {
     renderUserMessage({ knowledgeRetrieval: makeStats({ truncated: true }) });
-    expect(screen.getByText(/超预算分片/)).toBeInTheDocument();
+    expect(screen.queryByText(/超预算分片/)).not.toBeInTheDocument();
   });
 
   it('shows unavailable instead of numeric stats when retrieval is unavailable', () => {
@@ -131,7 +134,7 @@ describe('UserMessage knowledge meta line', () => {
     renderUserMessage({
       knowledgeRetrieval: makeStats({ degraded: true, degradeReason: '拆解失败，退回单查询' }),
     });
-    const line = screen.getByText(/检索 86 块/);
+    const line = screen.getByText('知识库 · 笔记本A、笔记本B · 问答模式');
     expect(line).toHaveAttribute('title', expect.stringContaining('检索已降级：拆解失败，退回单查询'));
     expect(line.textContent).not.toContain('拆解失败');
   });

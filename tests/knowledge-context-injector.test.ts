@@ -346,7 +346,8 @@ describe("注入块生成（纯函数部分）", () => {
       },
     });
     expect(block).toContain("Shard manifest");
-    expect(stats.distillDegradedReason).toContain("rate limited");
+    // 限流形态错误走"减半重试梯"（8→4→2→1 + 单批重试上限），耗尽后整体失败留痕。
+    expect(stats.distillDegradedReason).toContain("rate-limited");
     expect(stats.truncated).toBe(true);
   });
 
@@ -652,7 +653,7 @@ describe("retrieveForNotebooks 边界与配置（真实 KnowledgeManager）", ()
   });
 
   it("rerank 仅在解析链给出引用时执行（hybrid 路径）", async () => {
-    const rerank = vi.fn(async () => null);
+    const rerank = vi.fn(async (_request: unknown) => null);
     // rerank 只作用于 hybrid 候选（融合核心既有语义）：接伪嵌入让检索走 hybrid。
     const fakeEmbedder = async ({ texts }: { texts: string[] }) => ({
       vectors: texts.map((text) => {
@@ -663,7 +664,12 @@ describe("retrieveForNotebooks 边界与配置（真实 KnowledgeManager）", ()
       dimensions: 8,
       model: { provider: "fake", id: "emb-1", api: "openai", dimensions: 8 },
     });
-    const manager = new KnowledgeManager({ lingxiHome: tempHome(), embedTextsForModel: fakeEmbedder, rerank });
+    // v8 查询侧 rerank 按笔记本显式引用路由（rerankForModel）；全局 rerank 选项已退役。
+    const manager = new KnowledgeManager({
+      lingxiHome: tempHome(),
+      embedTextsForModel: fakeEmbedder,
+      rerankForModel: async (request) => rerank(request),
+    });
     managers.push(manager);
     const studioId = "studio-a";
     const notebook = manager.createNotebook({ studioId, name: "资料" });

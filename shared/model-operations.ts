@@ -2,6 +2,13 @@ export const MODEL_OPERATION_IDS = ["embedding", "rerank"] as const;
 
 export type ModelOperation = (typeof MODEL_OPERATION_IDS)[number];
 
+/**
+ * rerank 单次请求的文档数硬上限（调用方裁剪与客户端校验共用）。
+ * 查询侧与 RerankClient 曾分别写 200/100：候选落在 101–200 区间时重排输入被
+ * 客户端断言拒绝，一次问答的检索整体失败（2026-08-29 事故）——单一真理源消除该类打架。
+ */
+export const MODEL_OPERATION_RERANK_MAX_DOCS = 100;
+
 const MODEL_OPERATION_SET = new Set<string>(MODEL_OPERATION_IDS);
 
 export function isModelOperation(value: unknown): value is ModelOperation {

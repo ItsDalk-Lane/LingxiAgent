@@ -444,10 +444,6 @@
     "knowledgeMetaLabel": "지식 베이스",
     "knowledgeMetaModeQa": "Q&A 모드",
     "knowledgeMetaModeAssist": "보조 모드",
-    "knowledgeMetaRetrieved": "{count}개 청크 검색",
-    "knowledgeMetaInjected": "{count}개 청크 주입",
-    "knowledgeMetaTokens": "~{count} tokens",
-    "knowledgeMetaTruncated": "예산 초과 샤드",
     "knowledgeMetaUnavailable": "지식 검색 사용 불가",
     "knowledgeMetaDegradedTitle": "검색이 저하됨: {reason}",
     "knowledgeRetrieving": "지식 베이스 검색 중",
@@ -455,7 +451,8 @@
     "knowledgeRetrievalTruncated": "예산 초과 샤드",
     "knowledgeRetrievalUnavailable": "지식 검색 사용 불가",
     "knowledgeRetrievalRowTitle": "{source} · 청크 {chunk}",
-    "knowledgeRetrievalDistilled": "{n}배치로 추출됨"
+    "knowledgeRetrievalDistilled": "{n}배치로 추출됨",
+    "knowledgeDistilling": "지식 증류 중 · {done}배 완료 · {model}"
   },
   "time": {
     "justNow": "방금",

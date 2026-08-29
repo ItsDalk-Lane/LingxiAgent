@@ -282,9 +282,11 @@ export const UserMessage = memo(function UserMessage({
 // ── 知识库元信息行 ──
 
 /**
- * 用户消息上方的知识库引用元信息：一行 muted 小字（笔记本 + 模式），
- * 检索统计到达后同行追加（块数 / 注入数 / tokens）；整体不可用时只报
- * 「知识检索不可用」。模式 hint 与拆解降级原因收进 title tooltip，不占行宽。
+ * 用户消息上方的知识库引用元信息：一行 muted 小字，只显示来源与模式
+ * （知识库 · 笔记本 · 问答/辅助模式）；整体不可用时追加「知识检索不可用」。
+ * 检索统计（块数/注入数/tokens/超预算分片）不再上屏——面向用户的成败信号
+ * 由蒸馏进度胶囊与知识检索折叠卡承载。模式 hint 与拆解降级原因收进
+ * title tooltip，不占行宽。
  */
 const UserKnowledgeMeta = memo(function UserKnowledgeMeta({
   knowledgeRefs,
@@ -305,12 +307,7 @@ const UserKnowledgeMeta = memo(function UserKnowledgeMeta({
     nameList,
     t(knowledgeRefs.mode === 'qa' ? 'chat.knowledgeMetaModeQa' : 'chat.knowledgeMetaModeAssist'),
   ];
-  if (retrieval && !retrieval.unavailableReason) {
-    parts.push(t('chat.knowledgeMetaRetrieved', { count: retrieval.fusedChunks }));
-    parts.push(t('chat.knowledgeMetaInjected', { count: retrieval.injectedChunks }));
-    parts.push(t('chat.knowledgeMetaTokens', { count: retrieval.usedTokens }));
-    if (retrieval.truncated) parts.push(t('chat.knowledgeMetaTruncated'));
-  } else if (retrieval?.unavailableReason) {
+  if (retrieval?.unavailableReason) {
     parts.push(t('chat.knowledgeMetaUnavailable'));
   }
   const modeHint = t(knowledgeRefs.mode === 'qa' ? 'input.knowledgeModeQaHint' : 'input.knowledgeModeAssistHint');
