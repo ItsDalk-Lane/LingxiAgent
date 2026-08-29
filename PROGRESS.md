@@ -10,7 +10,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = 7de8ed8e0e47b39282f0c8e7d8140fa1cc6bfcb3  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-08-28 PR #29 knowledge-notebook + provider-compat 输出预算 + 四平台 CI 修复四轮)
+VERIFIED_SOURCE_SHA   = 93f05a3c996481cf6bd4fb441a3784e313939a73  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-08-29 knowledge 引用链路 Phase 7/8 + 管线重构 + 多项会话修复)
 工作分支              = feature/upstream-sync-0.447.4
 ```
 
@@ -414,6 +414,23 @@ seal 不是一次性终点，而是"当前被验证树"的游标；每次审计�
   缓存键改 ensureSyntaxTree(doc.length, 1s) 同步补齐完整树；装饰/hover
   增量路径保持部分树语义不变。验证：editor 套件 80 用例绿 + typecheck×3
   绿后四次推进。
+
+- **2026-08-29 knowledge 引用链路 Phase 7/8 + 管线重构 + 多项会话修复**
+  （功能树 93f05a3c/seal 本提交；113 files / +12996-9097）：消息级笔记本
+  引用主链路——shared/knowledge-refs 契约（notebookIds + qa/assist，会话内
+  持续生效、服务端无状态透传）+ knowledge-context-injector（拆解+检索+注入
+  块生成，失败显式留痕禁静默降级）+ knowledge_read 工具（超预算时子 Agent
+  并行读分片，只读 + studio 隔离）+ knowledge-distiller（证据超注入预算分批
+  提炼，两次失败整体判失败退回分片清单并留痕）；前端 KnowledgeReferenceBar/
+  Button、KnowledgeRetrievalFold、knowledge-reference-slice。管线重构：research
+  管线退役（4 模块+2 测试删除），导入改走 ingestion-service，新增
+  source-file-watcher / knowledge-history-compressor / chunker 自动策略。
+  会话修复：知识问答空白时延（turnPending 本地即亮+拆解/直检并行）、技能
+  胶囊重载退化（[Use skill:] 三处对称解析）、正文段结构性降级（textSignature
+  全默认 final_answer，turn-projector 三路径统一）、辅助槽 fresh 凭证形状
+  （snake/camel 错配）。生成产物重 pin：closure/fingerprint（compatible）/
+  inventory/export-manifest。验证：typecheck×3（绿）+ eslint 0 error +
+  full npm test 12504 passed / 0 failed（推进前 seal guard 旧坐标预期红）后推进。
 
 
 ## 最终状态：已合并（上游同步部分）
