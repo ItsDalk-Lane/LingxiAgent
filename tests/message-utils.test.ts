@@ -395,6 +395,27 @@ describe("loadSessionHistoryMessages", () => {
     expect(result[0].content).toEqual([{ type: "text", text: "hello" }]);
   });
 
+  it("历史投影剥离 [KnowledgeContext] 注入块（后端兜底，前端门槛漏分支时不泄漏）", async () => {
+    const sessionPath = path.join(tmpDir, "knowledge-injection.jsonl");
+    fs.writeFileSync(sessionPath, [
+      JSON.stringify({
+        type: "message",
+        message: {
+          role: "user",
+          content: [{
+            type: "text",
+            text: "[KnowledgeContext]\n[K1] notebook \"研究\" / source \"论文\" / chunk ordinal 3\n证据文本\n[/KnowledgeContext]\n\n苹果什么时候交付",
+          }],
+        },
+      }),
+      "",
+    ].join("\n"), "utf-8");
+
+    const result = await loadSessionHistoryMessages({}, sessionPath);
+
+    expect(result[0].content).toEqual([{ type: "text", text: "苹果什么时候交付" }]);
+  });
+
   it("只恢复当前 leaf 所在分支上的消息", async () => {
     const sessionDir = path.join(tmpDir, "sessions");
     const manager = SessionManager.create(tmpDir, sessionDir);

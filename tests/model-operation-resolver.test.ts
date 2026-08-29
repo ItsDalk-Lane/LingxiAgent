@@ -113,16 +113,16 @@ describe("ModelOperationResolver", () => {
 });
 
 describe("operation preference normalization", () => {
-  it("accepts composite refs, supports clear, and rejects bare ids", () => {
-    expect(normalizeSharedModelsPatch({
+  it("v8 起知识库嵌入/重排全局字段被显式拒绝（迁移至笔记本级配置）", () => {
+    // 旧客户端 PUT embedding/rerank → unknown field 400（显式拒绝，禁静默降级）。
+    expect(() => normalizeSharedModelsPatch({
       embedding: { id: "embed", provider: "provider-a" },
-      rerank: null,
-    })).toEqual({
-      embedding: { id: "embed", provider: "provider-a" },
-      rerank: null,
-    });
+    })).toThrow(/unknown shared model field "embedding"/);
+    expect(() => normalizeSharedModelsPatch({ rerank: null })).toThrow(
+      /unknown shared model field "rerank"/,
+    );
     expect(() => normalizeSharedModelsPatch({ embedding: "embed" })).toThrow(
-      /model operation embedding/i,
+      /unknown shared model field "embedding"/,
     );
   });
 });

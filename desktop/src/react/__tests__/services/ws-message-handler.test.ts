@@ -2003,3 +2003,122 @@ describe('ws-message-handler loop_status', () => {
     expect(useStore.getState().loopStatusBySession).toEqual({});
   });
 });
+
+describe('ws-message-handler knowledge_retrieval_started（知识检索中状态）', () => {
+  beforeEach(() => {
+    useStore.setState({
+      currentSessionPath: '/focused.jsonl',
+      currentSessionId: null,
+      pendingNewSession: false,
+      sessions: [],
+      sessionLocatorsById: {},
+      streamingSessions: [],
+      activeSessionStreams: {},
+      knowledgeRetrievingSessions: [],
+      unreadOutputSessionPaths: [],
+      inlineErrors: {},
+      chatSessions: {},
+    } as never);
+  });
+
+  it('knowledge_retrieval_started 记录该 session 的检索中状态', () => {
+    handleServerMessage({ type: 'knowledge_retrieval_started', sessionPath: '/focused.jsonl' });
+    expect(useStore.getState().knowledgeRetrievingSessions).toEqual(['/focused.jsonl']);
+  });
+
+  it('后续 status 事件（流式开始）清除检索中状态', () => {
+    handleServerMessage({ type: 'knowledge_retrieval_started', sessionPath: '/focused.jsonl' });
+    handleServerMessage({ type: 'status', sessionPath: '/focused.jsonl', isStreaming: true });
+    expect(useStore.getState().knowledgeRetrievingSessions).toEqual([]);
+    expect(useStore.getState().streamingSessions).toEqual(['/focused.jsonl']);
+  });
+
+  it('后续 session_user_message 事件（检索统计随行）清除检索中状态', () => {
+    handleServerMessage({ type: 'knowledge_retrieval_started', sessionPath: '/focused.jsonl' });
+    handleServerMessage({
+      type: 'session_user_message',
+      sessionPath: '/focused.jsonl',
+      message: {
+        id: 'm1',
+        text: '帮我总结路线图',
+        knowledgeRefs: { notebookIds: ['nb-1'], mode: 'qa' },
+        knowledgeRetrieval: {
+          mode: 'qa',
+          retrievalMode: 'hybrid',
+          subQueries: ['q'],
+          subQueryHits: [3],
+          degraded: false,
+          fusedChunks: 3,
+          injectedChunks: 2,
+          truncated: false,
+          usedTokens: 512,
+          budgetTokens: 4000,
+        },
+      },
+    });
+    expect(useStore.getState().knowledgeRetrievingSessions).toEqual([]);
+  });
+
+  it('其他 session 的事件不清除本 session 的检索中状态', () => {
+    handleServerMessage({ type: 'knowledge_retrieval_started', sessionPath: '/focused.jsonl' });
+    handleServerMessage({ type: 'status', sessionPath: '/other.jsonl', isStreaming: true });
+    expect(useStore.getState().knowledgeRetrievingSessions).toEqual(['/focused.jsonl']);
+  });
+
+  it('缺少 sessionPath 的 knowledge_retrieval_started 不写 store', () => {
+    handleServerMessage({ type: 'knowledge_retrieval_started' });
+    expect(useStore.getState().knowledgeRetrievingSessions).toEqual([]);
+  });
+});
+
+describe('ws-message-handler turnPending（发送后等待助手状态）', () => {
+  beforeEach(() => {
+    useStore.setState({
+      currentSessionPath: '/focused.jsonl',
+      currentSessionId: null,
+      pendingNewSession: false,
+      sessions: [],
+      sessionLocatorsById: {},
+      streamingSessions: [],
+      activeSessionStreams: {},
+      knowledgeRetrievingSessions: [],
+      turnPendingSessions: [],
+      unreadOutputSessionPaths: [],
+      inlineErrors: {},
+      chatSessions: {},
+    } as never);
+  });
+
+  it('knowledge_retrieval_started 不清除 pending（发送 → 检索是同一段等待）', () => {
+    useStore.getState().beginTurnPending('/focused.jsonl');
+    handleServerMessage({ type: 'knowledge_retrieval_started', sessionPath: '/focused.jsonl' });
+    expect(useStore.getState().turnPendingSessions).toEqual(['/focused.jsonl']);
+    expect(useStore.getState().knowledgeRetrievingSessions).toEqual(['/focused.jsonl']);
+  });
+
+  it('首个后续事件（status isStreaming=true）清除 pending', () => {
+    useStore.getState().beginTurnPending('/focused.jsonl');
+    handleServerMessage({ type: 'status', sessionPath: '/focused.jsonl', isStreaming: true });
+    expect(useStore.getState().turnPendingSessions).toEqual([]);
+    expect(useStore.getState().streamingSessions).toEqual(['/focused.jsonl']);
+  });
+
+  it('error 回包（session_busy 等）清除 pending', () => {
+    useStore.getState().beginTurnPending('/focused.jsonl');
+    handleServerMessage({ type: 'error', message: 'busy', sessionPath: '/focused.jsonl' });
+    expect(useStore.getState().turnPendingSessions).toEqual([]);
+  });
+
+  it('其他 session 的事件不清除本 session 的 pending', () => {
+    useStore.getState().beginTurnPending('/focused.jsonl');
+    handleServerMessage({ type: 'status', sessionPath: '/other.jsonl', isStreaming: true });
+    expect(useStore.getState().turnPendingSessions).toEqual(['/focused.jsonl']);
+  });
+
+  it('clearAllTurnPending 清空全部 pending（ws 断连路径）', () => {
+    useStore.getState().beginTurnPending('/a.jsonl');
+    useStore.getState().beginTurnPending('/b.jsonl');
+    useStore.getState().clearAllTurnPending();
+    expect(useStore.getState().turnPendingSessions).toEqual([]);
+  });
+});

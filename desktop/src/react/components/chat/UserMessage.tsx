@@ -11,6 +11,7 @@ import { AudioAttachmentChip } from '../shared/AudioAttachmentChip';
 import { FileKindIcon } from '../shared/FileKindIcon';
 import { FolderIcon } from '../shared/FolderIcon';
 import type { ChatMessage, UserAttachment, DeskContext } from '../../stores/chat-types';
+import type { KnowledgeRetrievalStats } from '../../../../../shared/knowledge-refs.ts';
 import { useStore } from '../../stores';
 import { selectSelectedIdsBySession } from '../../stores/session-selectors';
 import { extractSelectedTexts } from '../../utils/message-text';
@@ -216,6 +217,9 @@ export const UserMessage = memo(function UserMessage({
           />
         </div>
       )}
+      {message.knowledgeRefs && message.knowledgeRefs.notebookIds.length > 0 && (
+        <UserKnowledgeMeta knowledgeRefs={message.knowledgeRefs} retrieval={message.knowledgeRetrieval} />
+      )}
       {message.attachments && message.attachments.length > 0 && (
         <UserAttachmentsView
           attachments={message.attachments}
@@ -271,6 +275,51 @@ export const UserMessage = memo(function UserMessage({
           testId="user-message-footer-actions"
         />
       )}
+    </div>
+  );
+});
+
+// ── 知识库元信息行 ──
+
+/**
+ * 用户消息上方的知识库引用元信息：一行 muted 小字（笔记本 + 模式），
+ * 检索统计到达后同行追加（块数 / 注入数 / tokens）；整体不可用时只报
+ * 「知识检索不可用」。模式 hint 与拆解降级原因收进 title tooltip，不占行宽。
+ */
+const UserKnowledgeMeta = memo(function UserKnowledgeMeta({
+  knowledgeRefs,
+  retrieval,
+}: {
+  knowledgeRefs: NonNullable<ChatMessage['knowledgeRefs']>;
+  retrieval?: KnowledgeRetrievalStats;
+}) {
+  const t = window.t ?? ((p: string) => p);
+  const locale = useStore(s => s.locale);
+  const names = knowledgeRefs.notebookIds.map(notebookId =>
+    knowledgeRefs.notebooks?.find(nb => nb.id === notebookId)?.name || notebookId);
+  // 名称缺失回退 id；CJK 语言用顿号枚举，其余用逗号（保持单行紧凑，不走 ListFormat 的「和」连接）。
+  const separator = /^(zh|ja)([-_]|$)/.test(locale || '') ? '、' : ', ';
+  const nameList = names.join(separator);
+  const parts = [
+    t('chat.knowledgeMetaLabel'),
+    nameList,
+    t(knowledgeRefs.mode === 'qa' ? 'chat.knowledgeMetaModeQa' : 'chat.knowledgeMetaModeAssist'),
+  ];
+  if (retrieval && !retrieval.unavailableReason) {
+    parts.push(t('chat.knowledgeMetaRetrieved', { count: retrieval.fusedChunks }));
+    parts.push(t('chat.knowledgeMetaInjected', { count: retrieval.injectedChunks }));
+    parts.push(t('chat.knowledgeMetaTokens', { count: retrieval.usedTokens }));
+    if (retrieval.truncated) parts.push(t('chat.knowledgeMetaTruncated'));
+  } else if (retrieval?.unavailableReason) {
+    parts.push(t('chat.knowledgeMetaUnavailable'));
+  }
+  const modeHint = t(knowledgeRefs.mode === 'qa' ? 'input.knowledgeModeQaHint' : 'input.knowledgeModeAssistHint');
+  const degradeTitle = retrieval?.degraded
+    ? t('chat.knowledgeMetaDegradedTitle', { reason: retrieval.degradeReason || '' })
+    : '';
+  return (
+    <div className={styles.userKnowledgeMeta} title={degradeTitle ? `${modeHint}\n${degradeTitle}` : modeHint}>
+      {parts.join(' · ')}
     </div>
   );
 });

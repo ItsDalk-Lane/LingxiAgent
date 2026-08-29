@@ -176,6 +176,19 @@
     font-variant-numeric: tabular-nums;
 }
 
+/* 用户消息的知识库引用元信息：一行 muted 小字（笔记本 · 模式 · 检索统计），无底无边框 */
+.userKnowledgeMeta {
+    max-width: 92%;
+    margin-bottom: var(--space-4);
+    overflow: hidden;
+    font-size: 0.64rem;
+    line-height: 1.5;
+    color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 .messageFooterBtn {
     display: inline-flex;
     align-items: center;
@@ -1419,6 +1432,26 @@
     padding: 0;
 }
 
+/* ── 知识检索步骤（复用工具条 class，仅补图标/徽标/编号行内样式） ── */
+
+.knowledgeRetrievalIcon {
+    flex-shrink: 0;
+    font-size: var(--fs-ui);
+    line-height: 1.5;
+}
+
+.knowledgeRetrievalBadge {
+    flex-shrink: 0;
+    font-size: var(--fs-caption);
+    color: var(--text-muted);
+}
+
+.knowledgeRetrievalOrdinal {
+    flex: 0 0 auto;
+    color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
+}
+
 /* 单条工具时隐藏标题行 */
 .toolGroupSingle .toolGroupSummary {
     display: none;
@@ -2172,6 +2205,16 @@
 .typingIndicator::after {
     content: '';
     animation: hana-typewriter-dots 1.4s steps(1, end) infinite;
+}
+
+/* 「知识库检索中」胶囊：复用 typingIndicator 的入场 + 打字点动画，
+   只把字号/颜色收敛成 muted 小字（检索结束后由后续事件清除，流式开始切换为 typingIndicator）。 */
+.knowledgeRetrievingIndicator {
+    font-family: inherit;
+    font-size: var(--fs-ui);
+    font-weight: 400;
+    letter-spacing: normal;
+    color: var(--text-muted);
 }
 
 /* ── Scroll to bottom FAB ── */

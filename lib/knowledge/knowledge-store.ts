@@ -4,31 +4,47 @@ import crypto from "node:crypto";
 import { createRequire } from "node:module";
 
 import { KnowledgeError } from "./errors.ts";
+import {
+  KNOWLEDGE_CHUNK_TARGET_CHARS,
+  MAX_KNOWLEDGE_CHUNK_TARGET_CHARS,
+  MIN_KNOWLEDGE_CHUNK_TARGET_CHARS,
+} from "./chunker.ts";
 import type {
   ContentSnapshot,
   ImportedKnowledgeSource,
+  IngestionJob,
+  IngestionJobStatus,
+  IngestionPhase,
   KnowledgeBlock,
   KnowledgeCitation,
+  KnowledgeModelRef,
   KnowledgeNotebook,
   KnowledgeParseArtifact,
   KnowledgeParseStatus,
-  KnowledgeQueryMode,
-  KnowledgeRun,
-  KnowledgeRunCitationRef,
-  KnowledgeRunRetrieval,
-  KnowledgeScopeSnapshot,
   KnowledgeSource,
   KnowledgeSourceType,
+  NotebookConfig,
   NotebookSourceMembership,
   ResolvedKnowledgeCitation,
 } from "./types.ts";
 import type { KnowledgeBlockDraft } from "./source-adapters.ts";
 
-export const KNOWLEDGE_SCHEMA_VERSION = 5;
+export const KNOWLEDGE_SCHEMA_VERSION = 8;
 
 const SOURCE_TYPES = new Set<KnowledgeSourceType>(["file", "pasted_text", "web_snapshot"]);
 const PARSE_STATUSES = new Set<KnowledgeParseStatus>(["parsing", "ready", "needs_ocr", "failed"]);
-const QUERY_MODES = new Set<KnowledgeQueryMode>(["quick", "research"]);
+const INGESTION_PHASES = new Set<IngestionPhase>(["parse", "chunk", "fts_index", "embed", "done"]);
+const INGESTION_STATUSES = new Set<IngestionJobStatus>(["queued", "running", "pending_embedding", "failed", "done"]);
+
+/**
+ * retrieval_top_k 的 sanity 边界。v8 起笔记本列 NULL = 无上限（返回全部
+ * 匹配块）；"无上限"在检索核心的物理边界就是 MAX（防病态全表膨胀）。
+ * KNOWLEDGE_DEFAULT_RETRIEVAL_TOP_K 已随 v8 语义反转退役，保留导出仅供
+ * 旧测试/文档理解 v7 及以前的行为（NULL 当时回退 12）。
+ */
+export const KNOWLEDGE_DEFAULT_RETRIEVAL_TOP_K = 12;
+const MIN_RETRIEVAL_TOP_K = 1;
+export const MAX_RETRIEVAL_TOP_K = 1000;
 const require = createRequire(import.meta.url);
 let BetterSqliteDatabase: any = null;
 
@@ -222,6 +238,116 @@ function toCitation(row: any): KnowledgeCitation | null {
   };
 }
 
+/** 与 shared/model-ref.ts 的持久化纪律一致：完整 {id, provider}，不做按 id 降级。 */
+function serializeModelRef(value: unknown, field: string): string {
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", `${field} must be an object`);
+  }
+  const ref = value as Record<string, unknown>;
+  const id = requiredString(ref.id, `${field}.id`, 256);
+  const provider = requiredString(ref.provider, `${field}.provider`, 256);
+  return JSON.stringify({ id, provider });
+}
+
+function parseModelRefJson(value: unknown, field: string): KnowledgeModelRef | null {
+  if (value == null) return null;
+  const parsed = parseObjectJson(value, field);
+  if (
+    typeof parsed.id !== "string" || !parsed.id
+    || typeof parsed.provider !== "string" || !parsed.provider
+  ) {
+    throw new KnowledgeError("KNOWLEDGE_STORAGE_INVALID", `${field} is corrupt`);
+  }
+  return { id: parsed.id, provider: parsed.provider };
+}
+
+function optionalIntegerInRange(
+  value: unknown,
+  field: string,
+  min: number,
+  max: number,
+): number | null {
+  if (value == null) return null;
+  if (!Number.isSafeInteger(value) || Number(value) < min || Number(value) > max) {
+    throw new KnowledgeError(
+      "KNOWLEDGE_INVALID_ARGUMENT",
+      `${field} must be an integer between ${min} and ${max}`,
+      { field, min, max },
+    );
+  }
+  return Number(value);
+}
+
+function chunkerConfigId(value: unknown): string {
+  if (typeof value !== "string" || !/^[0-9a-f]{16}$/u.test(value)) {
+    throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "chunkerConfigId must be 16 lowercase hex characters");
+  }
+  return value;
+}
+
+function isoTimestampOrNull(value: unknown, field: string): string | null {
+  if (value == null) return null;
+  if (typeof value !== "string" || Number.isNaN(Date.parse(value))) {
+    throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", `${field} must be an ISO timestamp`);
+  }
+  return value;
+}
+
+function toNotebookConfig(row: any): NotebookConfig {
+  return {
+    embeddingModelRef: parseModelRefJson(row?.embedding_model_ref, "embedding model ref"),
+    rerankModelRef: parseModelRefJson(row?.rerank_model_ref, "rerank model ref"),
+    chunkTargetChars: row?.chunk_target_chars == null ? null : Number(row.chunk_target_chars),
+    retrievalTopK: row?.retrieval_top_k == null ? null : Number(row.retrieval_top_k),
+  };
+}
+
+function toIngestionJob(row: any): IngestionJob | null {
+  if (!row) return null;
+  if (!INGESTION_PHASES.has(row.phase) || !INGESTION_STATUSES.has(row.status)) {
+    throw new KnowledgeError("KNOWLEDGE_STORAGE_INVALID", "Ingestion job state is invalid");
+  }
+  return {
+    id: row.id,
+    notebookId: row.notebook_id,
+    sourceId: row.source_id,
+    artifactId: row.artifact_id || null,
+    phase: row.phase,
+    status: row.status,
+    attempt: Number(row.attempt),
+    retryAfter: row.retry_after || null,
+    error: row.error || null,
+    chunkerConfigId: row.chunker_config_id,
+    progressDone: Number(row.progress_done ?? 0),
+    progressTotal: row.progress_total == null ? null : Number(row.progress_total),
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+  };
+}
+
+export interface ResolvedNotebookConfig {
+  embeddingModelRef: KnowledgeModelRef | null;
+  rerankModelRef: KnowledgeModelRef | null;
+  /** null = 自动（按嵌入模型上下文 ×80% 派生，摄入时计算）；遗留显式值仍生效。 */
+  chunkTargetChars: number | null;
+  /** null = 无上限（返回全部匹配块）；正整数 = 最大召回数。 */
+  retrievalTopK: number | null;
+}
+
+/**
+ * 笔记本配置解析（v8 起）：仅笔记本列，无全局偏好级。模型引用未配置返回
+ * null：摄入落 pending_embedding，查询走纯 FTS 并显式标注 retrievalMode="fts"
+ * （禁静默降级，不偷换其他模型）。数值项 NULL = 自动/无上限语义。
+ */
+export function resolveNotebookConfig(config: NotebookConfig): ResolvedNotebookConfig {
+  return {
+    embeddingModelRef: config.embeddingModelRef ?? null,
+    rerankModelRef: config.rerankModelRef ?? null,
+    chunkTargetChars: config.chunkTargetChars ?? null,
+    retrievalTopK: config.retrievalTopK ?? null,
+  };
+}
+
 export interface KnowledgeStoreOptions {
   dbPath: string;
   Database?: any;
@@ -284,6 +410,9 @@ export class KnowledgeStore {
         if (version === 2) this.createSchemaV3();
         if (version === 3) this.createSchemaV4();
         if (version === 4) this.createSchemaV5();
+        if (version === 5) this.createSchemaV6();
+        if (version === 6) this.createSchemaV7();
+        if (version === 7) this.createSchemaV8();
         version += 1;
       }
       this.db.pragma(`user_version = ${KNOWLEDGE_SCHEMA_VERSION}`);
@@ -874,6 +1003,99 @@ export class KnowledgeStore {
     `);
   }
 
+  private createSchemaV6() {
+    // 笔记本级配置：模型引用存 {id, provider} JSON，NULL = 继承全局偏好；
+    // 数值列带默认值（旧行回填 1200/12），显式置 NULL = 回退内置默认。
+    this.db.exec(`
+      ALTER TABLE notebooks ADD COLUMN embedding_model_ref TEXT;
+      ALTER TABLE notebooks ADD COLUMN rerank_model_ref TEXT;
+      ALTER TABLE notebooks ADD COLUMN chunk_target_chars INTEGER DEFAULT 1200
+        CHECK(chunk_target_chars IS NULL OR (chunk_target_chars >= 100 AND chunk_target_chars <= 100000));
+      ALTER TABLE notebooks ADD COLUMN retrieval_top_k INTEGER DEFAULT 12
+        CHECK(retrieval_top_k IS NULL OR (retrieval_top_k >= 1 AND retrieval_top_k <= 1000));
+
+      CREATE TABLE ingestion_jobs (
+        id TEXT PRIMARY KEY,
+        notebook_id TEXT NOT NULL,
+        source_id TEXT NOT NULL,
+        artifact_id TEXT,
+        phase TEXT NOT NULL CHECK(phase IN ('parse', 'chunk', 'fts_index', 'embed', 'done')),
+        status TEXT NOT NULL CHECK(status IN ('queued', 'running', 'pending_embedding', 'failed', 'done')),
+        attempt INTEGER NOT NULL DEFAULT 0 CHECK(attempt >= 0),
+        retry_after TEXT,
+        error TEXT,
+        chunker_config_id TEXT NOT NULL CHECK(length(chunker_config_id) = 16),
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL,
+        FOREIGN KEY(notebook_id) REFERENCES notebooks(id) ON DELETE RESTRICT,
+        FOREIGN KEY(source_id) REFERENCES sources(id) ON DELETE RESTRICT,
+        FOREIGN KEY(artifact_id) REFERENCES parse_artifacts(id) ON DELETE RESTRICT
+      );
+
+      CREATE INDEX idx_ingestion_jobs_status
+        ON ingestion_jobs(status, retry_after, created_at);
+      CREATE INDEX idx_ingestion_jobs_source
+        ON ingestion_jobs(source_id, created_at DESC);
+      CREATE INDEX idx_ingestion_jobs_notebook
+        ON ingestion_jobs(notebook_id, created_at DESC);
+    `);
+
+    // 提问功能已删（Phase 1），V3-V5 研究表零读路径，全部是从 V1-V2 核心表
+    // 派生的产物，与 v6 新列同事务 DROP。按 子表 → 父表 顺序，避免 foreign_keys
+    // 开启时 DROP 父表的隐式 DELETE 触发子行 FK 检查；IF EXISTS 容忍残缺的旧库。
+    this.db.exec(`
+      DROP TABLE IF EXISTS research_verification_relations;
+      DROP TABLE IF EXISTS research_verification_attempts;
+      DROP TABLE IF EXISTS research_verification_cells;
+      DROP TABLE IF EXISTS research_verification_steps;
+      DROP TABLE IF EXISTS research_report_citations;
+      DROP TABLE IF EXISTS research_reports;
+      DROP TABLE IF EXISTS research_contradictions;
+      DROP TABLE IF EXISTS contradiction_checks;
+      DROP TABLE IF EXISTS contradiction_manifests;
+      DROP TABLE IF EXISTS claim_packs;
+      DROP TABLE IF EXISTS claim_evidence;
+      DROP TABLE IF EXISTS research_claims;
+      DROP TABLE IF EXISTS research_evidence;
+      DROP TABLE IF EXISTS evidence_validations;
+      DROP TABLE IF EXISTS analysis_unit_results;
+      DROP TABLE IF EXISTS task_attempts;
+      DROP TABLE IF EXISTS research_jobs;
+      DROP TABLE IF EXISTS execution_batch_units;
+      DROP TABLE IF EXISTS execution_batches;
+      DROP TABLE IF EXISTS analysis_unit_spans;
+      DROP TABLE IF EXISTS analysis_units;
+      DROP TABLE IF EXISTS analysis_manifests;
+      DROP TABLE IF EXISTS research_runs;
+      DROP TABLE IF EXISTS knowledge_run_citations;
+      DROP TABLE IF EXISTS knowledge_run_retrievals;
+      DROP TABLE IF EXISTS knowledge_runs;
+      DROP TABLE IF EXISTS scope_sources;
+      DROP TABLE IF EXISTS scope_notebooks;
+      DROP TABLE IF EXISTS scope_snapshots;
+    `);
+  }
+
+  private createSchemaV7() {
+    // 嵌入进度列：done 从 0 递增（每批嵌入后由摄入 worker 落库）；
+    // total NULL = 尚未进入 embed 相位（parse/chunk/fts_index 阶段无进度语义）。
+    this.db.exec(`
+      ALTER TABLE ingestion_jobs ADD COLUMN progress_done INTEGER NOT NULL DEFAULT 0;
+      ALTER TABLE ingestion_jobs ADD COLUMN progress_total INTEGER;
+    `);
+  }
+
+  private createSchemaV8() {
+    // retrieval_top_k 语义反转：NULL = 无上限（新默认，返回全部匹配块）。
+    // v6 的 ADD COLUMN … DEFAULT 12 把存量行回填成显式 12，与用户手填的 12
+    // 不可区分——统一清 NULL，让所有笔记本从新的"无上限"默认起步；此前显式
+    // 设置过召回数的笔记本同样回到无上限（符合"默认无上限"的需求方向，用户
+    // 可在设置里重新指定最大召回数）。纯数据迁移，无 DDL 结构变更。
+    this.db.exec(`
+      UPDATE notebooks SET retrieval_top_k = NULL WHERE deleted_at IS NULL;
+    `);
+  }
+
   private newId(prefix: string): string {
     return requiredString(this.idGenerator(prefix), `${prefix} id`, 128);
   }
@@ -903,9 +1125,11 @@ export class KnowledgeStore {
     const name = requiredString(input?.name, "name", 120);
     const id = this.newId("nb");
     const now = this.now();
+    // v8 起显式写 NULL：retrieval_top_k/chunk_target_chars 列的 DDL DEFAULT
+    // （12/1200）是 v6 遗留，新笔记本必须以"无上限/自动"起步而非撞上旧默认。
     this.db.prepare(`
-      INSERT INTO notebooks (id, studio_id, name, created_at, updated_at, deleted_at)
-      VALUES (?, ?, ?, ?, ?, NULL)
+      INSERT INTO notebooks (id, studio_id, name, created_at, updated_at, deleted_at, retrieval_top_k, chunk_target_chars)
+      VALUES (?, ?, ?, ?, ?, NULL, NULL, NULL)
     `).run(id, studioId, name, now, now);
     return this.getNotebook({ studioId, notebookId: id });
   }
@@ -953,6 +1177,103 @@ export class KnowledgeStore {
       `).run(deletedAt, notebookId);
     })();
     return { ...notebook, updatedAt: deletedAt, deletedAt };
+  }
+
+  getNotebookConfig(input: { studioId: unknown; notebookId: unknown }): NotebookConfig {
+    const studioId = requiredString(input?.studioId, "studioId", 256);
+    const notebookId = requiredString(input?.notebookId, "notebookId", 128);
+    this.activeNotebook(studioId, notebookId);
+    return toNotebookConfig(this.db.prepare(`
+      SELECT embedding_model_ref, rerank_model_ref, chunk_target_chars, retrieval_top_k
+      FROM notebooks
+      WHERE id = ? AND studio_id = ?
+    `).get(notebookId, studioId));
+  }
+
+  /**
+   * 笔记本配置部分更新：字段 omitted → 不变；null → 清除为 NULL
+   * （模型引用回 NULL = 未配置，数值回 NULL = 自动分块/无上限召回）；
+   * 否则校验后写入。至少给一个字段，避免空调用被静默接受。
+   */
+  updateNotebookConfig(input: {
+    studioId: unknown;
+    notebookId: unknown;
+    embeddingModelRef?: unknown;
+    rerankModelRef?: unknown;
+    chunkTargetChars?: unknown;
+    retrievalTopK?: unknown;
+  }): NotebookConfig {
+    const studioId = requiredString(input?.studioId, "studioId", 256);
+    const notebookId = requiredString(input?.notebookId, "notebookId", 128);
+    this.activeNotebook(studioId, notebookId);
+    const assignments: string[] = [];
+    const params: unknown[] = [];
+    const hasField = (field: string) => Object.prototype.hasOwnProperty.call(input ?? {}, field);
+    if (hasField("embeddingModelRef")) {
+      assignments.push("embedding_model_ref = ?");
+      params.push(input.embeddingModelRef == null
+        ? null
+        : serializeModelRef(input.embeddingModelRef, "embeddingModelRef"));
+    }
+    if (hasField("rerankModelRef")) {
+      assignments.push("rerank_model_ref = ?");
+      params.push(input.rerankModelRef == null
+        ? null
+        : serializeModelRef(input.rerankModelRef, "rerankModelRef"));
+    }
+    if (hasField("chunkTargetChars")) {
+      assignments.push("chunk_target_chars = ?");
+      params.push(optionalIntegerInRange(
+        input.chunkTargetChars,
+        "chunkTargetChars",
+        MIN_KNOWLEDGE_CHUNK_TARGET_CHARS,
+        MAX_KNOWLEDGE_CHUNK_TARGET_CHARS,
+      ));
+    }
+    if (hasField("retrievalTopK")) {
+      assignments.push("retrieval_top_k = ?");
+      params.push(optionalIntegerInRange(
+        input.retrievalTopK,
+        "retrievalTopK",
+        MIN_RETRIEVAL_TOP_K,
+        MAX_RETRIEVAL_TOP_K,
+      ));
+    }
+    if (assignments.length === 0) {
+      throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "Notebook config update requires at least one field");
+    }
+    this.db.prepare(`
+      UPDATE notebooks SET ${assignments.join(", ")}, updated_at = ?
+      WHERE id = ? AND studio_id = ? AND deleted_at IS NULL
+    `).run(...params, this.now(), notebookId, studioId);
+    return this.getNotebookConfig({ studioId, notebookId });
+  }
+
+  /**
+   * 一次性迁移（v8 配套）：把已退役的全局嵌入/重排引用写入所有未单独配置
+   * 的活跃笔记本（WHERE … IS NULL 保证不覆盖显式配置）。迁移值与旧解析链
+   * 会解析出的同一引用，语义零变化，不触发重建。幂等：列已写/无全局值时 0 行。
+   */
+  migrateLegacyGlobalModelRefs(input: {
+    embeddingModelRef: KnowledgeModelRef | null;
+    rerankModelRef: KnowledgeModelRef | null;
+  }): { notebooksUpdated: number } {
+    let notebooksUpdated = 0;
+    this.db.transaction(() => {
+      if (input.embeddingModelRef) {
+        notebooksUpdated += this.db.prepare(`
+          UPDATE notebooks SET embedding_model_ref = ?, updated_at = ?
+          WHERE embedding_model_ref IS NULL AND deleted_at IS NULL
+        `).run(JSON.stringify(input.embeddingModelRef), this.now()).changes;
+      }
+      if (input.rerankModelRef) {
+        notebooksUpdated += this.db.prepare(`
+          UPDATE notebooks SET rerank_model_ref = ?, updated_at = ?
+          WHERE rerank_model_ref IS NULL AND deleted_at IS NULL
+        `).run(JSON.stringify(input.rerankModelRef), this.now()).changes;
+      }
+    })();
+    return { notebooksUpdated };
   }
 
   createSourceWithSnapshot(input: {
@@ -1150,6 +1471,46 @@ export class KnowledgeStore {
         completedAt: row.parse_completed_at || null,
       } : null,
     }));
+  }
+
+  /**
+   * source-file-watcher 的启动扫描：全部活跃 file 源 × 活跃 membership
+   * （一行一条 membership，watcher 按 sourceId 聚合成多笔记本 watch 项）。
+   * originMetadata.originalPath 缺失/非绝对路径的行跳过——这类源无法 refresh
+   * （refreshFileSource 会抛 KNOWLEDGE_STORAGE_INVALID），watch 无意义。
+   */
+  listWatchableFileSources(): Array<{
+    studioId: string;
+    notebookId: string;
+    sourceId: string;
+    originalPath: string;
+  }> {
+    const rows = this.db.prepare(`
+      SELECT s.id AS source_id, s.studio_id, s.origin_metadata_json, ns.notebook_id
+      FROM sources s
+      JOIN notebook_sources ns ON ns.source_id = s.id AND ns.removed_at IS NULL
+      JOIN notebooks n ON n.id = ns.notebook_id AND n.deleted_at IS NULL
+      WHERE s.source_type = 'file' AND s.deleted_at IS NULL
+      ORDER BY s.id ASC, ns.notebook_id ASC
+    `).all();
+    const result: Array<{
+      studioId: string;
+      notebookId: string;
+      sourceId: string;
+      originalPath: string;
+    }> = [];
+    for (const row of rows as any[]) {
+      const metadata = parseObjectJson(row.origin_metadata_json, "origin metadata");
+      const originalPath = metadata.originalPath;
+      if (typeof originalPath !== "string" || !path.isAbsolute(originalPath)) continue;
+      result.push({
+        studioId: row.studio_id,
+        notebookId: row.notebook_id,
+        sourceId: row.source_id,
+        originalPath,
+      });
+    }
+    return result;
   }
 
   getContentSnapshot(input: { studioId: unknown; snapshotId: unknown }): ContentSnapshot {
@@ -1574,363 +1935,6 @@ export class KnowledgeStore {
     };
   }
 
-  createScopeSnapshot(input: {
-    studioId: unknown;
-    notebookIds: unknown;
-    mode: unknown;
-  }): KnowledgeScopeSnapshot {
-    const studioId = requiredString(input?.studioId, "studioId", 256);
-    if (!Array.isArray(input?.notebookIds) || input.notebookIds.length === 0) {
-      throw new KnowledgeError("KNOWLEDGE_SCOPE_EMPTY", "At least one Notebook is required");
-    }
-    if (input.notebookIds.length > 16) {
-      throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "Knowledge query selects too many Notebooks");
-    }
-    const notebookIds = input.notebookIds.map(id => requiredString(id, "notebookId", 128));
-    if (new Set(notebookIds).size !== notebookIds.length) {
-      throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "Knowledge query contains duplicate Notebooks");
-    }
-    if (typeof input.mode !== "string" || !QUERY_MODES.has(input.mode as KnowledgeQueryMode)) {
-      throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "Knowledge query mode is invalid");
-    }
-    const mode = input.mode as KnowledgeQueryMode;
-    const scopeSnapshotId = this.newId("scope");
-    const createdAt = this.now();
-
-    this.db.transaction(() => {
-      this.db.prepare(`
-        INSERT INTO scope_snapshots (id, studio_id, mode, created_at)
-        VALUES (?, ?, ?, ?)
-      `).run(scopeSnapshotId, studioId, mode, createdAt);
-
-      const insertNotebook = this.db.prepare(`
-        INSERT INTO scope_notebooks (
-          scope_snapshot_id, notebook_id, notebook_name, ordinal
-        ) VALUES (?, ?, ?, ?)
-      `);
-      const insertSource = this.db.prepare(`
-        INSERT INTO scope_sources (
-          scope_snapshot_id, notebook_id, source_id, source_display_name,
-          content_snapshot_id, parse_artifact_id, ordinal
-        ) VALUES (?, ?, ?, ?, ?, ?, ?)
-      `);
-      const notReady: Array<{ sourceId: string; displayName: string; status: string }> = [];
-      let sourceOrdinal = 0;
-
-      notebookIds.forEach((notebookId, notebookOrdinal) => {
-        const notebook = this.activeNotebook(studioId, notebookId);
-        insertNotebook.run(scopeSnapshotId, notebook.id, notebook.name, notebookOrdinal);
-        const entries = this.listNotebookSources({ studioId, notebookId });
-        for (const entry of entries) {
-          const status = entry.parseArtifact?.status || "not_parsed";
-          if (status !== "ready") {
-            notReady.push({
-              sourceId: entry.source.id,
-              displayName: entry.source.displayName,
-              status,
-            });
-            continue;
-          }
-          insertSource.run(
-            scopeSnapshotId,
-            notebook.id,
-            entry.source.id,
-            entry.source.displayName,
-            entry.snapshot.id,
-            entry.parseArtifact!.id,
-            sourceOrdinal,
-          );
-          sourceOrdinal += 1;
-        }
-      });
-
-      if (notReady.length > 0) {
-        throw new KnowledgeError(
-          "KNOWLEDGE_SCOPE_NOT_READY",
-          "Selected Notebooks contain sources that are not ready",
-          { unreadyCount: notReady.length, sources: notReady.slice(0, 50) },
-        );
-      }
-      if (sourceOrdinal === 0) {
-        throw new KnowledgeError("KNOWLEDGE_SCOPE_EMPTY", "Selected Notebooks contain no ready sources");
-      }
-    })();
-
-    return this.getScopeSnapshot({ studioId, scopeSnapshotId });
-  }
-
-  getScopeSnapshot(input: { studioId: unknown; scopeSnapshotId: unknown }): KnowledgeScopeSnapshot {
-    const studioId = requiredString(input?.studioId, "studioId", 256);
-    const scopeSnapshotId = requiredString(input?.scopeSnapshotId, "scopeSnapshotId", 128);
-    const row = this.db.prepare(`
-      SELECT * FROM scope_snapshots WHERE id = ? AND studio_id = ?
-    `).get(scopeSnapshotId, studioId);
-    if (!row) throw new KnowledgeError("KNOWLEDGE_NOT_FOUND", "Knowledge scope snapshot not found");
-    const notebooks = this.db.prepare(`
-      SELECT * FROM scope_notebooks
-      WHERE scope_snapshot_id = ?
-      ORDER BY ordinal ASC
-    `).all(scopeSnapshotId).map((entry: any) => ({
-      scopeSnapshotId: entry.scope_snapshot_id,
-      notebookId: entry.notebook_id,
-      notebookName: entry.notebook_name,
-      ordinal: Number(entry.ordinal),
-    }));
-    const sources = this.db.prepare(`
-      SELECT * FROM scope_sources
-      WHERE scope_snapshot_id = ?
-      ORDER BY ordinal ASC
-    `).all(scopeSnapshotId).map((entry: any) => ({
-      scopeSnapshotId: entry.scope_snapshot_id,
-      notebookId: entry.notebook_id,
-      sourceId: entry.source_id,
-      sourceDisplayName: entry.source_display_name,
-      contentSnapshotId: entry.content_snapshot_id,
-      parseArtifactId: entry.parse_artifact_id,
-      ordinal: Number(entry.ordinal),
-    }));
-    return {
-      id: row.id,
-      studioId: row.studio_id,
-      mode: row.mode,
-      createdAt: row.created_at,
-      notebooks,
-      sources,
-    };
-  }
-
-  createKnowledgeRun(input: {
-    studioId: unknown;
-    mode: unknown;
-    question: unknown;
-    scopeSnapshotId: unknown;
-    retrievalMode?: unknown;
-  }): KnowledgeRun {
-    const studioId = requiredString(input?.studioId, "studioId", 256);
-    if (typeof input.mode !== "string" || !QUERY_MODES.has(input.mode as KnowledgeQueryMode)) {
-      throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "Knowledge query mode is invalid");
-    }
-    const mode = input.mode as KnowledgeQueryMode;
-    const question = requiredString(input.question, "question", 4000);
-    const scopeSnapshotId = requiredString(input.scopeSnapshotId, "scopeSnapshotId", 128);
-    const scope = this.getScopeSnapshot({ studioId, scopeSnapshotId });
-    if (scope.mode !== mode) {
-      throw new KnowledgeError("KNOWLEDGE_CONFLICT", "Knowledge scope mode does not match the run mode");
-    }
-    const retrievalMode = input.retrievalMode == null ? "fts" : input.retrievalMode;
-    if (retrievalMode !== "fts" && retrievalMode !== "hybrid") {
-      throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "Knowledge retrieval mode is invalid");
-    }
-    const id = this.newId("krun");
-    const createdAt = this.now();
-    this.db.prepare(`
-      INSERT INTO knowledge_runs (
-        id, studio_id, mode, question, scope_snapshot_id, status,
-        retrieval_mode, answer_text, error_code, created_at, completed_at
-      ) VALUES (?, ?, ?, ?, ?, 'running', ?, NULL, NULL, ?, NULL)
-    `).run(id, studioId, mode, question, scopeSnapshotId, retrievalMode, createdAt);
-    return this.getKnowledgeRun({ studioId, runId: id });
-  }
-
-  setKnowledgeRunRetrievalMode(input: {
-    studioId: unknown;
-    runId: unknown;
-    retrievalMode: unknown;
-  }): KnowledgeRun {
-    const studioId = requiredString(input?.studioId, "studioId", 256);
-    const runId = requiredString(input?.runId, "runId", 128);
-    if (input.retrievalMode !== "fts" && input.retrievalMode !== "hybrid") {
-      throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "Knowledge retrieval mode is invalid");
-    }
-    const run = this.getKnowledgeRun({ studioId, runId });
-    if (run.status !== "running") {
-      throw new KnowledgeError("KNOWLEDGE_CONFLICT", "Knowledge run is not active");
-    }
-    this.db.prepare(`
-      UPDATE knowledge_runs SET retrieval_mode = ?
-      WHERE id = ? AND studio_id = ? AND status = 'running'
-    `).run(input.retrievalMode, runId, studioId);
-    return this.getKnowledgeRun({ studioId, runId });
-  }
-
-  recordRunRetrievals(input: {
-    studioId: unknown;
-    runId: unknown;
-    retrievals: Array<{ chunkId: unknown; parseArtifactId: unknown; score: unknown }>;
-  }): KnowledgeRunRetrieval[] {
-    const studioId = requiredString(input?.studioId, "studioId", 256);
-    const runId = requiredString(input?.runId, "runId", 128);
-    const run = this.getKnowledgeRun({ studioId, runId });
-    if (run.status !== "running") {
-      throw new KnowledgeError("KNOWLEDGE_CONFLICT", "Knowledge run is not active");
-    }
-    if (!Array.isArray(input.retrievals) || input.retrievals.length === 0 || input.retrievals.length > 50) {
-      throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "Knowledge retrieval result is invalid");
-    }
-    const allowedArtifacts = new Set(
-      this.getScopeSnapshot({ studioId, scopeSnapshotId: run.scopeSnapshotId })
-        .sources.map(source => source.parseArtifactId),
-    );
-    const normalized = input.retrievals.map((entry, index) => {
-      const chunkId = requiredString(entry.chunkId, "chunkId", 128);
-      const parseArtifactId = requiredString(entry.parseArtifactId, "parseArtifactId", 128);
-      const score = Number(entry.score);
-      if (!allowedArtifacts.has(parseArtifactId) || !Number.isFinite(score)) {
-        throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "Knowledge retrieval escaped its frozen scope");
-      }
-      return { runId, rank: index + 1, chunkId, parseArtifactId, score };
-    });
-    this.db.transaction(() => {
-      this.db.prepare(`DELETE FROM knowledge_run_retrievals WHERE run_id = ?`).run(runId);
-      const insert = this.db.prepare(`
-        INSERT INTO knowledge_run_retrievals (
-          run_id, rank, chunk_id, parse_artifact_id, score
-        ) VALUES (?, ?, ?, ?, ?)
-      `);
-      for (const entry of normalized) {
-        insert.run(entry.runId, entry.rank, entry.chunkId, entry.parseArtifactId, entry.score);
-      }
-    })();
-    return normalized;
-  }
-
-  commitQuickRun(input: {
-    studioId: unknown;
-    runId: unknown;
-    answerText: unknown;
-    citations: Array<{
-      marker: unknown;
-      candidateRef: unknown;
-      parseArtifactId: unknown;
-      blockId: unknown;
-      startOffset: unknown;
-      endOffset: unknown;
-    }>;
-  }): KnowledgeRun {
-    const studioId = requiredString(input?.studioId, "studioId", 256);
-    const runId = requiredString(input?.runId, "runId", 128);
-    const answerText = requiredString(input?.answerText, "answerText", 200_000);
-    const run = this.getKnowledgeRun({ studioId, runId });
-    if (run.mode !== "quick" || run.status !== "running") {
-      throw new KnowledgeError("KNOWLEDGE_CONFLICT", "Quick Answer run is not active");
-    }
-    if (!Array.isArray(input.citations) || input.citations.length === 0 || input.citations.length > 100) {
-      throw new KnowledgeError("KNOWLEDGE_MODEL_OUTPUT_INVALID", "Quick Answer requires validated citations");
-    }
-    const allowedArtifacts = new Set(
-      this.getScopeSnapshot({ studioId, scopeSnapshotId: run.scopeSnapshotId })
-        .sources.map(source => source.parseArtifactId),
-    );
-    const seenMarkers = new Set<number>();
-    const normalized = input.citations.map(entry => {
-      const marker = Number(entry.marker);
-      const parseArtifactId = requiredString(entry.parseArtifactId, "parseArtifactId", 128);
-      if (
-        !Number.isSafeInteger(marker)
-        || marker <= 0
-        || seenMarkers.has(marker)
-        || !answerText.includes(`[${marker}]`)
-        || !allowedArtifacts.has(parseArtifactId)
-      ) {
-        throw new KnowledgeError("KNOWLEDGE_MODEL_OUTPUT_INVALID", "Quick Answer citation is invalid");
-      }
-      seenMarkers.add(marker);
-      return {
-        marker,
-        candidateRef: requiredString(entry.candidateRef, "candidateRef", 64),
-        parseArtifactId,
-        blockId: requiredString(entry.blockId, "blockId", 128),
-        startOffset: entry.startOffset,
-        endOffset: entry.endOffset,
-      };
-    });
-    const completedAt = this.now();
-
-    this.db.transaction(() => {
-      const insertRef = this.db.prepare(`
-        INSERT INTO knowledge_run_citations (
-          run_id, ordinal, marker, citation_id, candidate_ref
-        ) VALUES (?, ?, ?, ?, ?)
-      `);
-      normalized.forEach((entry, ordinal) => {
-        const citation = this.createCitation({
-          studioId,
-          parseArtifactId: entry.parseArtifactId,
-          blockId: entry.blockId,
-          startOffset: entry.startOffset,
-          endOffset: entry.endOffset,
-        });
-        insertRef.run(runId, ordinal, entry.marker, citation.id, entry.candidateRef);
-      });
-      this.db.prepare(`
-        UPDATE knowledge_runs
-        SET status = 'completed', answer_text = ?, error_code = NULL, completed_at = ?
-        WHERE id = ? AND status = 'running'
-      `).run(answerText, completedAt, runId);
-    })();
-    return this.getKnowledgeRun({ studioId, runId });
-  }
-
-  failKnowledgeRun(input: { studioId: unknown; runId: unknown; errorCode: unknown }): KnowledgeRun {
-    const studioId = requiredString(input?.studioId, "studioId", 256);
-    const runId = requiredString(input?.runId, "runId", 128);
-    const errorCode = requiredString(input?.errorCode, "errorCode", 128);
-    const run = this.getKnowledgeRun({ studioId, runId });
-    if (run.status !== "running") return run;
-    this.db.prepare(`
-      UPDATE knowledge_runs
-      SET status = 'failed', error_code = ?, completed_at = ?
-      WHERE id = ? AND studio_id = ? AND status = 'running'
-    `).run(errorCode, this.now(), runId, studioId);
-    return this.getKnowledgeRun({ studioId, runId });
-  }
-
-  getKnowledgeRun(input: { studioId: unknown; runId: unknown }): KnowledgeRun {
-    const studioId = requiredString(input?.studioId, "studioId", 256);
-    const runId = requiredString(input?.runId, "runId", 128);
-    const row = this.db.prepare(`
-      SELECT * FROM knowledge_runs WHERE id = ? AND studio_id = ?
-    `).get(runId, studioId);
-    if (!row) throw new KnowledgeError("KNOWLEDGE_NOT_FOUND", "Knowledge run not found");
-    const citations: KnowledgeRunCitationRef[] = this.db.prepare(`
-      SELECT * FROM knowledge_run_citations
-      WHERE run_id = ?
-      ORDER BY ordinal ASC
-    `).all(runId).map((entry: any) => ({
-      runId: entry.run_id,
-      ordinal: Number(entry.ordinal),
-      marker: Number(entry.marker),
-      citationId: entry.citation_id,
-      candidateRef: entry.candidate_ref,
-    }));
-    const retrievals: KnowledgeRunRetrieval[] = this.db.prepare(`
-      SELECT * FROM knowledge_run_retrievals
-      WHERE run_id = ?
-      ORDER BY rank ASC
-    `).all(runId).map((entry: any) => ({
-      runId: entry.run_id,
-      rank: Number(entry.rank),
-      chunkId: entry.chunk_id,
-      parseArtifactId: entry.parse_artifact_id,
-      score: Number(entry.score),
-    }));
-    return {
-      id: row.id,
-      studioId: row.studio_id,
-      mode: row.mode,
-      question: row.question,
-      scopeSnapshotId: row.scope_snapshot_id,
-      status: row.status,
-      retrievalMode: row.retrieval_mode,
-      answerText: row.answer_text || null,
-      errorCode: row.error_code || null,
-      createdAt: row.created_at,
-      completedAt: row.completed_at || null,
-      citations,
-      retrievals,
-    };
-  }
-
   countContentSnapshots(input: { studioId: unknown; sourceId: unknown }): number {
     const source = this.getSource(input);
     return Number(this.db.prepare(`
@@ -1946,6 +1950,370 @@ export class KnowledgeStore {
       JOIN content_snapshots cs ON cs.id = pa.content_snapshot_id
       WHERE cs.source_id = ?
     `).get(source.id).count);
+  }
+
+  /**
+   * 入队一个摄入 job（phase 链 parse → chunk → fts_index → embed → done）。
+   * 同一 notebook+source 已有活跃 job（queued/running/pending_embedding）时直接去重返回，
+   * 不重复排队；done/failed 的历史 job 不挡新的摄入（配置变更重建语义）。
+   * chunkerConfigId 记录触发摄入的笔记本分块配置——一源多笔记本配置冲突时以触发方为准。
+   */
+  enqueueIngestionJob(input: {
+    studioId: unknown;
+    notebookId: unknown;
+    sourceId: unknown;
+    chunkerConfigId: unknown;
+    artifactId?: unknown;
+  }): IngestionJob {
+    const studioId = requiredString(input?.studioId, "studioId", 256);
+    const notebookId = requiredString(input?.notebookId, "notebookId", 128);
+    const sourceId = requiredString(input?.sourceId, "sourceId", 128);
+    this.activeNotebook(studioId, notebookId);
+    this.activeSource(studioId, sourceId);
+    const membership = toMembership(this.db.prepare(`
+      SELECT * FROM notebook_sources
+      WHERE notebook_id = ? AND source_id = ? AND removed_at IS NULL
+    `).get(notebookId, sourceId));
+    if (!membership) {
+      throw new KnowledgeError("KNOWLEDGE_NOT_FOUND", "Knowledge source is not in this Notebook");
+    }
+    const configId = chunkerConfigId(input.chunkerConfigId);
+    const artifactId = input.artifactId == null
+      ? null
+      : this.getParseArtifact({ studioId, parseArtifactId: input.artifactId }).id;
+
+    const existing = toIngestionJob(this.db.prepare(`
+      SELECT * FROM ingestion_jobs
+      WHERE notebook_id = ? AND source_id = ?
+        AND status IN ('queued', 'running', 'pending_embedding')
+      ORDER BY created_at DESC, id DESC
+      LIMIT 1
+    `).get(notebookId, sourceId));
+    if (existing) return existing;
+
+    const id = this.newId("ingjob");
+    const now = this.now();
+    this.db.prepare(`
+      INSERT INTO ingestion_jobs (
+        id, notebook_id, source_id, artifact_id, phase, status,
+        attempt, retry_after, error, chunker_config_id, created_at, updated_at
+      ) VALUES (?, ?, ?, ?, 'parse', 'queued', 0, NULL, NULL, ?, ?, ?)
+    `).run(id, notebookId, sourceId, artifactId, configId, now, now);
+    return this.getIngestionJob({ studioId, jobId: id });
+  }
+
+  getIngestionJob(input: { studioId: unknown; jobId: unknown }): IngestionJob {
+    const studioId = requiredString(input?.studioId, "studioId", 256);
+    const jobId = requiredString(input?.jobId, "jobId", 128);
+    const job = toIngestionJob(this.db.prepare(`
+      SELECT j.*
+      FROM ingestion_jobs j
+      JOIN notebooks nb ON nb.id = j.notebook_id
+      WHERE j.id = ? AND nb.studio_id = ?
+    `).get(jobId, studioId));
+    if (!job) throw new KnowledgeError("KNOWLEDGE_NOT_FOUND", "Ingestion job not found");
+    return job;
+  }
+
+  /**
+   * 原子认领下一个到期 queued job（retry_after 未到的跳过），置 running。
+   * 队列由本进程内串行 worker 消费（engine 级，跨 studio）；同步驱动下单事务即原子。
+   */
+  claimNextIngestionJob(): IngestionJob | null {
+    const now = this.now();
+    return this.db.transaction(() => {
+      const row = this.db.prepare(`
+        SELECT * FROM ingestion_jobs
+        WHERE status = 'queued' AND (retry_after IS NULL OR retry_after <= ?)
+        ORDER BY created_at ASC, id ASC
+        LIMIT 1
+      `).get(now);
+      if (!row) return null;
+      this.db.prepare(`
+        UPDATE ingestion_jobs SET status = 'running', updated_at = ?
+        WHERE id = ?
+      `).run(now, row.id);
+      return toIngestionJob(this.db.prepare(`SELECT * FROM ingestion_jobs WHERE id = ?`).get(row.id));
+    })();
+  }
+
+  private runningIngestionJob(studioId: unknown, jobId: unknown): IngestionJob {
+    const job = this.getIngestionJob({ studioId, jobId });
+    if (job.status !== "running") {
+      throw new KnowledgeError("KNOWLEDGE_CONFLICT", "Ingestion job is not running");
+    }
+    return job;
+  }
+
+  /** 推进到下一个待执行 phase；parse 完成时顺带绑定产生的 parse artifact。 */
+  updateIngestionJobPhase(input: {
+    studioId: unknown;
+    jobId: unknown;
+    phase: unknown;
+    artifactId?: unknown;
+  }): IngestionJob {
+    const studioId = requiredString(input?.studioId, "studioId", 256);
+    const job = this.runningIngestionJob(studioId, input?.jobId);
+    const phase = input.phase;
+    if (typeof phase !== "string" || !INGESTION_PHASES.has(phase as IngestionPhase) || phase === "done") {
+      throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "Ingestion phase is invalid");
+    }
+    const artifactId = input.artifactId == null
+      ? job.artifactId
+      : this.getParseArtifact({ studioId, parseArtifactId: input.artifactId }).id;
+    this.db.prepare(`
+      UPDATE ingestion_jobs SET phase = ?, artifact_id = ?, updated_at = ?
+      WHERE id = ?
+    `).run(phase, artifactId, this.now(), job.id);
+    return this.getIngestionJob({ studioId, jobId: job.id });
+  }
+
+  /** 摄入 worker 的嵌入进度落库：仅 running 可写；total 首次给出时初始化（NULL → 已知值）。 */
+  updateIngestionJobProgress(input: {
+    studioId: unknown;
+    jobId: unknown;
+    done: unknown;
+    total?: unknown;
+  }): IngestionJob {
+    const studioId = requiredString(input?.studioId, "studioId", 256);
+    const job = this.runningIngestionJob(studioId, input?.jobId);
+    const done = input?.done;
+    if (!Number.isSafeInteger(done) || Number(done) < 0) {
+      throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "Ingestion progress done must be a non-negative integer");
+    }
+    if (input?.total != null && (!Number.isSafeInteger(input.total) || Number(input.total) < 0)) {
+      throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "Ingestion progress total must be a non-negative integer");
+    }
+    const total = input?.total == null ? job.progressTotal : Number(input.total);
+    if (total != null && Number(done) > total) {
+      throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "Ingestion progress done must not exceed total");
+    }
+    this.db.prepare(`
+      UPDATE ingestion_jobs
+      SET progress_done = ?, progress_total = ?, updated_at = ?
+      WHERE id = ?
+    `).run(Number(done), total, this.now(), job.id);
+    return this.getIngestionJob({ studioId, jobId: job.id });
+  }
+
+  completeIngestionJob(input: { studioId: unknown; jobId: unknown }): IngestionJob {
+    const studioId = requiredString(input?.studioId, "studioId", 256);
+    const job = this.runningIngestionJob(studioId, input?.jobId);
+    this.db.prepare(`
+      UPDATE ingestion_jobs
+      SET phase = 'done', status = 'done', error = NULL, retry_after = NULL,
+        progress_done = COALESCE(progress_total, progress_done), updated_at = ?
+      WHERE id = ?
+    `).run(this.now(), job.id);
+    return this.getIngestionJob({ studioId, jobId: job.id });
+  }
+
+  /** 显式终态（非失败）：FTS 已可查、嵌入模型未配置，等模型就绪信号补跑。 */
+  markIngestionJobPendingEmbedding(input: { studioId: unknown; jobId: unknown }): IngestionJob {
+    const studioId = requiredString(input?.studioId, "studioId", 256);
+    const job = this.runningIngestionJob(studioId, input?.jobId);
+    this.db.prepare(`
+      UPDATE ingestion_jobs SET phase = 'embed', status = 'pending_embedding', updated_at = ?
+      WHERE id = ?
+    `).run(this.now(), job.id);
+    return this.getIngestionJob({ studioId, jobId: job.id });
+  }
+
+  /**
+   * 记录一次失败：attempt + 1，进度重置（重跑从 0 计，防 UI 显示旧进度回退）。
+   * 带 retryAfter → 回到 queued 等退避到期；不带 → 标 failed
+   * （attempt 上限判定在服务层，store 只做状态机）。
+   */
+  failIngestionJob(input: {
+    studioId: unknown;
+    jobId: unknown;
+    error: unknown;
+    retryAfter?: unknown;
+  }): IngestionJob {
+    const studioId = requiredString(input?.studioId, "studioId", 256);
+    const job = this.runningIngestionJob(studioId, input?.jobId);
+    const error = requiredString(input.error, "error", 512);
+    const retryAfter = isoTimestampOrNull(input.retryAfter, "retryAfter");
+    this.db.prepare(`
+      UPDATE ingestion_jobs
+      SET status = ?, attempt = attempt + 1, error = ?, retry_after = ?,
+        progress_done = 0, progress_total = NULL, updated_at = ?
+      WHERE id = ?
+    `).run(retryAfter ? "queued" : "failed", error, retryAfter, this.now(), job.id);
+    return this.getIngestionJob({ studioId, jobId: job.id });
+  }
+
+  /** UI 手动重试：failed → queued，attempt 归零、进度重置；phase 保留，从失败的 phase 续跑（各步幂等）。 */
+  requeueIngestionJob(input: { studioId: unknown; jobId: unknown }): IngestionJob {
+    const studioId = requiredString(input?.studioId, "studioId", 256);
+    const job = this.getIngestionJob({ studioId, jobId: input?.jobId });
+    if (job.status !== "failed") {
+      throw new KnowledgeError("KNOWLEDGE_CONFLICT", "Only failed ingestion jobs can be retried");
+    }
+    this.db.prepare(`
+      UPDATE ingestion_jobs
+      SET status = 'queued', attempt = 0, error = NULL, retry_after = NULL,
+        progress_done = 0, progress_total = NULL, updated_at = ?
+      WHERE id = ?
+    `).run(this.now(), job.id);
+    return this.getIngestionJob({ studioId, jobId: job.id });
+  }
+
+  /** 模型就绪信号：全部 pending_embedding 一次性置回 queued 补跑嵌入。返回置回数量。 */
+  requeuePendingEmbeddingIngestionJobs(): number {
+    const result = this.db.prepare(`
+      UPDATE ingestion_jobs SET status = 'queued', updated_at = ?
+      WHERE status = 'pending_embedding'
+    `).run(this.now());
+    return Number(result.changes);
+  }
+
+  /**
+   * 启动恢复：running 残留（进程崩溃/强杀中断）重置回 queued 续跑。
+   * 各 phase 幂等（fingerprint/hasArtifact 判断），从 phase 断点续跑无副作用。返回重置数量。
+   */
+  requeueRunningIngestionJobs(): number {
+    const result = this.db.prepare(`
+      UPDATE ingestion_jobs SET status = 'queued', updated_at = ?
+      WHERE status = 'running'
+    `).run(this.now());
+    return Number(result.changes);
+  }
+
+  /** 摄入 worker 跨 studio 认领 job 后回查归属（job 行不冗余存 studio_id，经 notebook join 推导）。 */
+  getIngestionJobOwner(input: { jobId: unknown }): {
+    studioId: string;
+    notebookId: string;
+    sourceId: string;
+  } | null {
+    const jobId = requiredString(input?.jobId, "jobId", 128);
+    const row = this.db.prepare(`
+      SELECT nb.studio_id AS studio_id, j.notebook_id AS notebook_id, j.source_id AS source_id
+      FROM ingestion_jobs j
+      JOIN notebooks nb ON nb.id = j.notebook_id
+      WHERE j.id = ?
+    `).get(jobId);
+    if (!row) return null;
+    return {
+      studioId: row.studio_id,
+      notebookId: row.notebook_id,
+      sourceId: row.source_id,
+    };
+  }
+
+  /** 跨 studio 列出 pending_embedding job（模型就绪补跑判定用），每行附归属 studioId。 */
+  listPendingEmbeddingIngestionJobs(): Array<IngestionJob & { studioId: string }> {
+    return this.db.prepare(`
+      SELECT j.*, nb.studio_id AS studio_id
+      FROM ingestion_jobs j
+      JOIN notebooks nb ON nb.id = j.notebook_id
+      WHERE j.status = 'pending_embedding'
+      ORDER BY j.created_at ASC, j.id ASC
+    `).all().map((row: any) => ({ ...(toIngestionJob(row) as IngestionJob), studioId: row.studio_id }));
+  }
+
+  /**
+   * 源的最新摄入 job。可选 notebookId 过滤：一源多笔记本时各笔记本的
+   * 摄入状态彼此独立（job 按 notebook+source 去重入队），不传则跨笔记本
+   * 取最新一条（源级视图用）。
+   */
+  getLatestIngestionJobForSource(input: {
+    studioId: unknown;
+    sourceId: unknown;
+    notebookId?: unknown;
+  }): IngestionJob | null {
+    const studioId = requiredString(input?.studioId, "studioId", 256);
+    const sourceId = requiredString(input?.sourceId, "sourceId", 128);
+    this.activeSource(studioId, sourceId);
+    const notebookId = input?.notebookId == null
+      ? null
+      : requiredString(input.notebookId, "notebookId", 128);
+    return toIngestionJob(notebookId == null
+      ? this.db.prepare(`
+          SELECT * FROM ingestion_jobs
+          WHERE source_id = ?
+          ORDER BY created_at DESC, id DESC
+          LIMIT 1
+        `).get(sourceId)
+      : this.db.prepare(`
+          SELECT * FROM ingestion_jobs
+          WHERE source_id = ? AND notebook_id = ?
+          ORDER BY created_at DESC, id DESC
+          LIMIT 1
+        `).get(sourceId, notebookId));
+  }
+
+  listIngestionJobs(input: {
+    studioId: unknown;
+    notebookId?: unknown;
+    sourceId?: unknown;
+    statuses?: unknown;
+    limit?: unknown;
+  }): IngestionJob[] {
+    const studioId = requiredString(input?.studioId, "studioId", 256);
+    const clauses = ["nb.studio_id = ?"];
+    const params: unknown[] = [studioId];
+    if (input?.notebookId != null) {
+      clauses.push("j.notebook_id = ?");
+      params.push(requiredString(input.notebookId, "notebookId", 128));
+    }
+    if (input?.sourceId != null) {
+      clauses.push("j.source_id = ?");
+      params.push(requiredString(input.sourceId, "sourceId", 128));
+    }
+    if (input?.statuses != null) {
+      if (
+        !Array.isArray(input.statuses) || input.statuses.length === 0
+        || input.statuses.some((status) => !INGESTION_STATUSES.has(status))
+      ) {
+        throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "statuses must be a non-empty ingestion status array");
+      }
+      clauses.push(`j.status IN (${input.statuses.map(() => "?").join(", ")})`);
+      params.push(...input.statuses);
+    }
+    const limit = optionalIntegerInRange(input?.limit, "limit", 1, 500) ?? 100;
+    params.push(limit);
+    return this.db.prepare(`
+      SELECT j.*
+      FROM ingestion_jobs j
+      JOIN notebooks nb ON nb.id = j.notebook_id
+      WHERE ${clauses.join(" AND ")}
+      ORDER BY j.created_at DESC, j.id DESC
+      LIMIT ?
+    `).all(...params).map(toIngestionJob);
+  }
+
+  countIngestionJobsByStatus(input: {
+    studioId: unknown;
+    notebookId?: unknown;
+  }): Record<IngestionJobStatus, number> {
+    const studioId = requiredString(input?.studioId, "studioId", 256);
+    const clauses = ["nb.studio_id = ?"];
+    const params: unknown[] = [studioId];
+    if (input?.notebookId != null) {
+      clauses.push("j.notebook_id = ?");
+      params.push(requiredString(input.notebookId, "notebookId", 128));
+    }
+    const counts: Record<IngestionJobStatus, number> = {
+      queued: 0,
+      running: 0,
+      pending_embedding: 0,
+      failed: 0,
+      done: 0,
+    };
+    const rows = this.db.prepare(`
+      SELECT j.status AS status, COUNT(*) AS count
+      FROM ingestion_jobs j
+      JOIN notebooks nb ON nb.id = j.notebook_id
+      WHERE ${clauses.join(" AND ")}
+      GROUP BY j.status
+    `).all(...params);
+    for (const row of rows) {
+      if (INGESTION_STATUSES.has(row.status)) {
+        counts[row.status as IngestionJobStatus] = Number(row.count);
+      }
+    }
+    return counts;
   }
 
   close() {

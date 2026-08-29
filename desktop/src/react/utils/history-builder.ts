@@ -85,6 +85,12 @@ export interface HistoryApiResponse {
     agentReviewRequest?: import('../stores/chat-types').AgentReviewRequestContext;
     sessionRefs?: Array<{ sessionId: string; label: string }>;
     agentMentions?: Array<{ agentId: string; label: string }>;
+    knowledgeRefs?: {
+      notebookIds: string[];
+      mode: 'qa' | 'assist';
+      notebooks?: Array<{ id: string; name?: string }>;
+    };
+    knowledgeRetrieval?: import('../../../../shared/knowledge-refs.ts').KnowledgeRetrievalStats;
     displayText?: string;
   }>;
   sessionFiles?: SessionRegistryFile[];
@@ -525,9 +531,12 @@ export function buildItemsFromHistory(data: HistoryApiResponse): ChatListItem[] 
 
     if (m.role === 'user') {
       // 跨 session 协作：非用户本人发出的消息带 origin，此时以 displayText（干净正文，
-      // 不含模型侧身份前缀）为准；老消息没有这两个字段，走既有 content 管道，行为不变。
+      // 不含模型侧身份前缀）为准；带知识库引用 / 检索统计的消息同理（content 含
+      // [KnowledgeContext] 注入块，displayText 才是用户敲的原文）；老消息没有这些
+      // 字段，走既有 content 管道，行为不变。
       const origin = (m as any).origin;
-      const originDisplayText = (origin || m.agentReview || m.agentReviewRequest || m.sessionRefs?.length)
+      const originDisplayText = (origin || m.agentReview || m.agentReviewRequest || m.sessionRefs?.length
+        || m.knowledgeRefs?.notebookIds?.length || m.knowledgeRetrieval)
         && typeof m.displayText === 'string' ? m.displayText : null;
 
       // strip steer 前缀（内部标记，不应展示给用户）
@@ -592,6 +601,8 @@ export function buildItemsFromHistory(data: HistoryApiResponse): ChatListItem[] 
         ...(m.agentReviewRequest ? { agentReviewRequest: m.agentReviewRequest } : {}),
         ...(m.sessionRefs?.length ? { sessionRefs: m.sessionRefs } : {}),
         ...(m.agentMentions?.length ? { agentMentions: m.agentMentions } : {}),
+        ...(m.knowledgeRefs?.notebookIds?.length ? { knowledgeRefs: m.knowledgeRefs } : {}),
+        ...(m.knowledgeRetrieval ? { knowledgeRetrieval: m.knowledgeRetrieval } : {}),
       };
       items.push({ type: 'message', data: msg });
     } else if (m.role === 'assistant') {

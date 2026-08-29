@@ -660,7 +660,7 @@
     ],
     "version": 3
   },
-  "payloadFingerprint": "sha256:6a120a1251bc85dc4d6d686be4d2629292a7fffd05f2b7d8b424c5f5b201c7d3",
+  "payloadFingerprint": "sha256:74094f1c33c3b1eb747fe29a0ac353737fc4c2a361e947b2439c017bcf594cfd",
   "registry": [
     {
       "affectedByEpochMigration": true,
@@ -1674,7 +1674,7 @@
       "protocolModules": [],
       "restorePolicy": "Restore through KnowledgeManager before queries resume; validate SQLite user_version and referenced managed bytes together.",
       "schemaContract": {
-        "compatibility": "The named runtime reader is canonical; this inventory does not imply stricter validation than runtime currently performs.",
+        "compatibility": "schema v6 adds notebook config columns (embedding_model_ref/rerank_model_ref inherit the global preference when NULL; chunk_target_chars/retrieval_top_k fall back to built-in defaults 1200/12) and the ingestion_jobs queue table, and drops the V3-V5 research tables in the same transaction; research rows were derived artifacts, so the V1-V2 source-of-truth tables migrate untouched. schema v7 adds ingestion_jobs.progress_done (NOT NULL DEFAULT 0) and progress_total (NULL = embed phase not reached) for embedding progress; existing rows backfill 0/NULL and no other persisted shape changes.",
         "kind": "runtime-source",
         "source": "lib/knowledge/knowledge-store.ts"
       },
@@ -3248,8 +3248,8 @@
   ],
   "review": {
     "classification": "compatible",
-    "compatibilityReason": "移除 knowledge-query-service 中的 /tmp 诊断日志残留（两处 appendFileSync 与 node:fs import），零 schema/DDL/存储行为变化",
-    "payloadFingerprint": "sha256:6a120a1251bc85dc4d6d686be4d2629292a7fffd05f2b7d8b424c5f5b201c7d3"
+    "compatibilityReason": "knowledge FTS/vector search sanity limit raised 50 to 1000 for uncapped notebook retrieval; no schema shape change",
+    "payloadFingerprint": "sha256:74094f1c33c3b1eb747fe29a0ac353737fc4c2a361e947b2439c017bcf594cfd"
   },
   "schemas": [
     {
@@ -3519,39 +3519,27 @@
       "runtimeSchema": {
         "objects": [
           {
-            "name": "idx_analysis_unit_spans_block",
-            "sql": "CREATE INDEX idx_analysis_unit_spans_block ON analysis_unit_spans(block_id, kind, start_offset, end_offset)",
-            "tableName": "analysis_unit_spans",
-            "type": "index"
-          },
-          {
-            "name": "idx_analysis_units_run_status",
-            "sql": "CREATE INDEX idx_analysis_units_run_status ON analysis_units(run_id, status, priority, ordinal)",
-            "tableName": "analysis_units",
-            "type": "index"
-          },
-          {
             "name": "idx_content_snapshots_source",
             "sql": "CREATE INDEX idx_content_snapshots_source ON content_snapshots(source_id, captured_at DESC)",
             "tableName": "content_snapshots",
             "type": "index"
           },
           {
-            "name": "idx_contradiction_checks_run_status",
-            "sql": "CREATE INDEX idx_contradiction_checks_run_status ON contradiction_checks(run_id, status, unit_id)",
-            "tableName": "contradiction_checks",
+            "name": "idx_ingestion_jobs_notebook",
+            "sql": "CREATE INDEX idx_ingestion_jobs_notebook ON ingestion_jobs(notebook_id, created_at DESC)",
+            "tableName": "ingestion_jobs",
             "type": "index"
           },
           {
-            "name": "idx_evidence_validations_run",
-            "sql": "CREATE INDEX idx_evidence_validations_run ON evidence_validations(run_id, status, created_at)",
-            "tableName": "evidence_validations",
+            "name": "idx_ingestion_jobs_source",
+            "sql": "CREATE INDEX idx_ingestion_jobs_source ON ingestion_jobs(source_id, created_at DESC)",
+            "tableName": "ingestion_jobs",
             "type": "index"
           },
           {
-            "name": "idx_execution_batches_run_status",
-            "sql": "CREATE INDEX idx_execution_batches_run_status ON execution_batches(run_id, status, ordinal)",
-            "tableName": "execution_batches",
+            "name": "idx_ingestion_jobs_status",
+            "sql": "CREATE INDEX idx_ingestion_jobs_status ON ingestion_jobs(status, retry_after, created_at)",
+            "tableName": "ingestion_jobs",
             "type": "index"
           },
           {
@@ -3570,24 +3558,6 @@
             "name": "idx_knowledge_citations_block",
             "sql": "CREATE INDEX idx_knowledge_citations_block ON knowledge_citations(block_id, start_offset, end_offset)",
             "tableName": "knowledge_citations",
-            "type": "index"
-          },
-          {
-            "name": "idx_knowledge_run_citations_citation",
-            "sql": "CREATE INDEX idx_knowledge_run_citations_citation ON knowledge_run_citations(citation_id)",
-            "tableName": "knowledge_run_citations",
-            "type": "index"
-          },
-          {
-            "name": "idx_knowledge_runs_status",
-            "sql": "CREATE INDEX idx_knowledge_runs_status ON knowledge_runs(status, created_at)",
-            "tableName": "knowledge_runs",
-            "type": "index"
-          },
-          {
-            "name": "idx_knowledge_runs_studio",
-            "sql": "CREATE INDEX idx_knowledge_runs_studio ON knowledge_runs(studio_id, created_at DESC)",
-            "tableName": "knowledge_runs",
             "type": "index"
           },
           {
@@ -3615,66 +3585,6 @@
             "type": "index"
           },
           {
-            "name": "idx_research_claims_run",
-            "sql": "CREATE INDEX idx_research_claims_run ON research_claims(run_id, ordinal)",
-            "tableName": "research_claims",
-            "type": "index"
-          },
-          {
-            "name": "idx_research_evidence_run",
-            "sql": "CREATE INDEX idx_research_evidence_run ON research_evidence(run_id, created_at)",
-            "tableName": "research_evidence",
-            "type": "index"
-          },
-          {
-            "name": "idx_research_runs_state",
-            "sql": "CREATE INDEX idx_research_runs_state ON research_runs(state, updated_at)",
-            "tableName": "research_runs",
-            "type": "index"
-          },
-          {
-            "name": "idx_research_verification_attempts_run",
-            "sql": "CREATE INDEX idx_research_verification_attempts_run ON research_verification_attempts(run_id, started_at)",
-            "tableName": "research_verification_attempts",
-            "type": "index"
-          },
-          {
-            "name": "idx_research_verification_cells_step",
-            "sql": "CREATE INDEX idx_research_verification_cells_step ON research_verification_cells(step_id, status, ordinal)",
-            "tableName": "research_verification_cells",
-            "type": "index"
-          },
-          {
-            "name": "idx_research_verification_relations_run",
-            "sql": "CREATE INDEX idx_research_verification_relations_run ON research_verification_relations(run_id, relation, created_at)",
-            "tableName": "research_verification_relations",
-            "type": "index"
-          },
-          {
-            "name": "idx_research_verification_steps_run",
-            "sql": "CREATE INDEX idx_research_verification_steps_run ON research_verification_steps(run_id, status, ordinal)",
-            "tableName": "research_verification_steps",
-            "type": "index"
-          },
-          {
-            "name": "idx_scope_snapshots_studio",
-            "sql": "CREATE INDEX idx_scope_snapshots_studio ON scope_snapshots(studio_id, created_at DESC)",
-            "tableName": "scope_snapshots",
-            "type": "index"
-          },
-          {
-            "name": "idx_scope_sources_artifact",
-            "sql": "CREATE INDEX idx_scope_sources_artifact ON scope_sources(scope_snapshot_id, parse_artifact_id)",
-            "tableName": "scope_sources",
-            "type": "index"
-          },
-          {
-            "name": "idx_scope_sources_snapshot",
-            "sql": "CREATE INDEX idx_scope_sources_snapshot ON scope_sources(content_snapshot_id)",
-            "tableName": "scope_sources",
-            "type": "index"
-          },
-          {
             "name": "idx_source_notebooks_active",
             "sql": "CREATE INDEX idx_source_notebooks_active ON notebook_sources(source_id, removed_at, added_at)",
             "tableName": "notebook_sources",
@@ -3687,81 +3597,15 @@
             "type": "index"
           },
           {
-            "name": "idx_task_attempts_run",
-            "sql": "CREATE INDEX idx_task_attempts_run ON task_attempts(run_id, work_type, started_at)",
-            "tableName": "task_attempts",
-            "type": "index"
-          },
-          {
-            "name": "analysis_manifests",
-            "sql": "CREATE TABLE analysis_manifests ( run_id TEXT PRIMARY KEY, source_count INTEGER NOT NULL CHECK(source_count >= 0), parse_artifact_count INTEGER NOT NULL CHECK(parse_artifact_count >= 0), block_count INTEGER NOT NULL CHECK(block_count >= 0), unit_count INTEGER NOT NULL CHECK(unit_count > 0), primary_char_count INTEGER NOT NULL CHECK(primary_char_count > 0), created_at TEXT NOT NULL, FOREIGN KEY(run_id) REFERENCES research_runs(run_id) ON DELETE RESTRICT )",
-            "tableName": "analysis_manifests",
-            "type": "table"
-          },
-          {
-            "name": "analysis_unit_results",
-            "sql": "CREATE TABLE analysis_unit_results ( unit_id TEXT PRIMARY KEY, attempt_id TEXT NOT NULL, result_json TEXT NOT NULL, completed_at TEXT NOT NULL, FOREIGN KEY(unit_id) REFERENCES analysis_units(id) ON DELETE RESTRICT, FOREIGN KEY(attempt_id) REFERENCES task_attempts(id) ON DELETE RESTRICT )",
-            "tableName": "analysis_unit_results",
-            "type": "table"
-          },
-          {
-            "name": "analysis_unit_spans",
-            "sql": "CREATE TABLE analysis_unit_spans ( unit_id TEXT NOT NULL, kind TEXT NOT NULL CHECK(kind IN ('primary', 'context')), ordinal INTEGER NOT NULL CHECK(ordinal >= 0), block_id TEXT NOT NULL, block_ordinal INTEGER NOT NULL CHECK(block_ordinal >= 0), start_offset INTEGER NOT NULL CHECK(start_offset >= 0), end_offset INTEGER NOT NULL CHECK(end_offset > start_offset), PRIMARY KEY(unit_id, kind, ordinal), FOREIGN KEY(unit_id) REFERENCES analysis_units(id) ON DELETE RESTRICT, FOREIGN KEY(block_id) REFERENCES knowledge_blocks(id) ON DELETE RESTRICT )",
-            "tableName": "analysis_unit_spans",
-            "type": "table"
-          },
-          {
-            "name": "analysis_units",
-            "sql": "CREATE TABLE analysis_units ( id TEXT PRIMARY KEY, run_id TEXT NOT NULL, parse_artifact_id TEXT NOT NULL, ordinal INTEGER NOT NULL CHECK(ordinal >= 0), priority INTEGER NOT NULL CHECK(priority >= 0), status TEXT NOT NULL CHECK(status IN ('pending', 'running', 'completed', 'failed', 'canceled')), primary_char_count INTEGER NOT NULL CHECK(primary_char_count > 0), context_char_count INTEGER NOT NULL CHECK(context_char_count >= 0), completed_at TEXT, error_code TEXT, UNIQUE(run_id, parse_artifact_id, ordinal), FOREIGN KEY(run_id) REFERENCES research_runs(run_id) ON DELETE RESTRICT, FOREIGN KEY(parse_artifact_id) REFERENCES parse_artifacts(id) ON DELETE RESTRICT )",
-            "tableName": "analysis_units",
-            "type": "table"
-          },
-          {
-            "name": "claim_evidence",
-            "sql": "CREATE TABLE claim_evidence ( claim_id TEXT NOT NULL, evidence_id TEXT NOT NULL, relation TEXT NOT NULL CHECK(relation IN ('supports', 'contradicts', 'context')), PRIMARY KEY(claim_id, evidence_id, relation), FOREIGN KEY(claim_id) REFERENCES research_claims(id) ON DELETE RESTRICT, FOREIGN KEY(evidence_id) REFERENCES research_evidence(id) ON DELETE RESTRICT )",
-            "tableName": "claim_evidence",
-            "type": "table"
-          },
-          {
-            "name": "claim_packs",
-            "sql": "CREATE TABLE claim_packs ( id TEXT PRIMARY KEY, run_id TEXT NOT NULL, ordinal INTEGER NOT NULL CHECK(ordinal >= 0), claim_ids_json TEXT NOT NULL, created_at TEXT NOT NULL, UNIQUE(run_id, ordinal), FOREIGN KEY(run_id) REFERENCES research_runs(run_id) ON DELETE RESTRICT )",
-            "tableName": "claim_packs",
-            "type": "table"
-          },
-          {
             "name": "content_snapshots",
             "sql": "CREATE TABLE content_snapshots ( id TEXT PRIMARY KEY, source_id TEXT NOT NULL, sha256 TEXT NOT NULL CHECK(length(sha256) = 64), mime_type TEXT NOT NULL, byte_size INTEGER NOT NULL CHECK(byte_size >= 0), storage_path TEXT NOT NULL UNIQUE, captured_at TEXT NOT NULL, UNIQUE(source_id, sha256), FOREIGN KEY(source_id) REFERENCES sources(id) ON DELETE RESTRICT )",
             "tableName": "content_snapshots",
             "type": "table"
           },
           {
-            "name": "contradiction_checks",
-            "sql": "CREATE TABLE contradiction_checks ( id TEXT PRIMARY KEY, run_id TEXT NOT NULL, unit_id TEXT NOT NULL, claim_pack_id TEXT NOT NULL, status TEXT NOT NULL CHECK(status IN ('pending', 'running', 'completed', 'failed', 'canceled')), attempt_id TEXT, result_json TEXT, completed_at TEXT, error_code TEXT, UNIQUE(run_id, unit_id, claim_pack_id), FOREIGN KEY(run_id) REFERENCES research_runs(run_id) ON DELETE RESTRICT, FOREIGN KEY(unit_id) REFERENCES analysis_units(id) ON DELETE RESTRICT, FOREIGN KEY(claim_pack_id) REFERENCES claim_packs(id) ON DELETE RESTRICT, FOREIGN KEY(attempt_id) REFERENCES task_attempts(id) ON DELETE RESTRICT )",
-            "tableName": "contradiction_checks",
-            "type": "table"
-          },
-          {
-            "name": "contradiction_manifests",
-            "sql": "CREATE TABLE contradiction_manifests ( run_id TEXT PRIMARY KEY, unit_count INTEGER NOT NULL CHECK(unit_count >= 0), claim_pack_count INTEGER NOT NULL CHECK(claim_pack_count >= 0), total_check_count INTEGER NOT NULL CHECK(total_check_count >= 0), created_at TEXT NOT NULL, FOREIGN KEY(run_id) REFERENCES research_runs(run_id) ON DELETE RESTRICT )",
-            "tableName": "contradiction_manifests",
-            "type": "table"
-          },
-          {
-            "name": "evidence_validations",
-            "sql": "CREATE TABLE evidence_validations ( id TEXT PRIMARY KEY, run_id TEXT NOT NULL, unit_id TEXT NOT NULL, origin_type TEXT NOT NULL CHECK(origin_type IN ('analysis', 'contradiction')), origin_id TEXT NOT NULL, candidate_ordinal INTEGER NOT NULL CHECK(candidate_ordinal >= 0), status TEXT NOT NULL CHECK(status IN ('validated', 'invalid')), reason_code TEXT, citation_id TEXT, canonical_quote TEXT, quote_checksum TEXT, epistemic_basis TEXT NOT NULL CHECK(epistemic_basis IN ('explicit', 'inferred', 'mixed')), created_at TEXT NOT NULL, UNIQUE(origin_type, origin_id, candidate_ordinal), FOREIGN KEY(run_id) REFERENCES research_runs(run_id) ON DELETE RESTRICT, FOREIGN KEY(unit_id) REFERENCES analysis_units(id) ON DELETE RESTRICT, FOREIGN KEY(citation_id) REFERENCES knowledge_citations(id) ON DELETE RESTRICT )",
-            "tableName": "evidence_validations",
-            "type": "table"
-          },
-          {
-            "name": "execution_batch_units",
-            "sql": "CREATE TABLE execution_batch_units ( batch_id TEXT NOT NULL, unit_id TEXT NOT NULL UNIQUE, ordinal INTEGER NOT NULL CHECK(ordinal >= 0), PRIMARY KEY(batch_id, ordinal), FOREIGN KEY(batch_id) REFERENCES execution_batches(id) ON DELETE RESTRICT, FOREIGN KEY(unit_id) REFERENCES analysis_units(id) ON DELETE RESTRICT )",
-            "tableName": "execution_batch_units",
-            "type": "table"
-          },
-          {
-            "name": "execution_batches",
-            "sql": "CREATE TABLE execution_batches ( id TEXT PRIMARY KEY, run_id TEXT NOT NULL, ordinal INTEGER NOT NULL CHECK(ordinal >= 0), status TEXT NOT NULL CHECK(status IN ('pending', 'running', 'completed', 'failed', 'canceled')), estimated_chars INTEGER NOT NULL CHECK(estimated_chars > 0), created_at TEXT NOT NULL, started_at TEXT, completed_at TEXT, error_code TEXT, UNIQUE(run_id, ordinal), FOREIGN KEY(run_id) REFERENCES research_runs(run_id) ON DELETE RESTRICT )",
-            "tableName": "execution_batches",
+            "name": "ingestion_jobs",
+            "sql": "CREATE TABLE ingestion_jobs ( id TEXT PRIMARY KEY, notebook_id TEXT NOT NULL, source_id TEXT NOT NULL, artifact_id TEXT, phase TEXT NOT NULL CHECK(phase IN ('parse', 'chunk', 'fts_index', 'embed', 'done')), status TEXT NOT NULL CHECK(status IN ('queued', 'running', 'pending_embedding', 'failed', 'done')), attempt INTEGER NOT NULL DEFAULT 0 CHECK(attempt >= 0), retry_after TEXT, error TEXT, chunker_config_id TEXT NOT NULL CHECK(length(chunker_config_id) = 16), created_at TEXT NOT NULL, updated_at TEXT NOT NULL, progress_done INTEGER NOT NULL DEFAULT 0, progress_total INTEGER, FOREIGN KEY(notebook_id) REFERENCES notebooks(id) ON DELETE RESTRICT, FOREIGN KEY(source_id) REFERENCES sources(id) ON DELETE RESTRICT, FOREIGN KEY(artifact_id) REFERENCES parse_artifacts(id) ON DELETE RESTRICT )",
+            "tableName": "ingestion_jobs",
             "type": "table"
           },
           {
@@ -3777,24 +3621,6 @@
             "type": "table"
           },
           {
-            "name": "knowledge_run_citations",
-            "sql": "CREATE TABLE knowledge_run_citations ( run_id TEXT NOT NULL, ordinal INTEGER NOT NULL CHECK(ordinal >= 0), marker INTEGER NOT NULL CHECK(marker > 0), citation_id TEXT NOT NULL, candidate_ref TEXT NOT NULL, PRIMARY KEY(run_id, ordinal), UNIQUE(run_id, marker), FOREIGN KEY(run_id) REFERENCES knowledge_runs(id) ON DELETE RESTRICT, FOREIGN KEY(citation_id) REFERENCES knowledge_citations(id) ON DELETE RESTRICT )",
-            "tableName": "knowledge_run_citations",
-            "type": "table"
-          },
-          {
-            "name": "knowledge_run_retrievals",
-            "sql": "CREATE TABLE knowledge_run_retrievals ( run_id TEXT NOT NULL, rank INTEGER NOT NULL CHECK(rank > 0), chunk_id TEXT NOT NULL, parse_artifact_id TEXT NOT NULL, score REAL NOT NULL, PRIMARY KEY(run_id, rank), FOREIGN KEY(run_id) REFERENCES knowledge_runs(id) ON DELETE RESTRICT, FOREIGN KEY(parse_artifact_id) REFERENCES parse_artifacts(id) ON DELETE RESTRICT )",
-            "tableName": "knowledge_run_retrievals",
-            "type": "table"
-          },
-          {
-            "name": "knowledge_runs",
-            "sql": "CREATE TABLE knowledge_runs ( id TEXT PRIMARY KEY, studio_id TEXT NOT NULL, mode TEXT NOT NULL CHECK(mode IN ('quick', 'research')), question TEXT NOT NULL, scope_snapshot_id TEXT NOT NULL, status TEXT NOT NULL CHECK(status IN ('running', 'completed', 'failed', 'cancelled')), retrieval_mode TEXT NOT NULL CHECK(retrieval_mode IN ('fts', 'hybrid')), answer_text TEXT, error_code TEXT, created_at TEXT NOT NULL, completed_at TEXT, FOREIGN KEY(scope_snapshot_id) REFERENCES scope_snapshots(id) ON DELETE RESTRICT )",
-            "tableName": "knowledge_runs",
-            "type": "table"
-          },
-          {
             "name": "notebook_sources",
             "sql": "CREATE TABLE notebook_sources ( notebook_id TEXT NOT NULL, source_id TEXT NOT NULL, added_at TEXT NOT NULL, removed_at TEXT, PRIMARY KEY(notebook_id, source_id), FOREIGN KEY(notebook_id) REFERENCES notebooks(id) ON DELETE RESTRICT, FOREIGN KEY(source_id) REFERENCES sources(id) ON DELETE RESTRICT )",
             "tableName": "notebook_sources",
@@ -3802,7 +3628,7 @@
           },
           {
             "name": "notebooks",
-            "sql": "CREATE TABLE notebooks ( id TEXT PRIMARY KEY, studio_id TEXT NOT NULL, name TEXT NOT NULL CHECK(length(trim(name)) > 0), created_at TEXT NOT NULL, updated_at TEXT NOT NULL, deleted_at TEXT )",
+            "sql": "CREATE TABLE notebooks ( id TEXT PRIMARY KEY, studio_id TEXT NOT NULL, name TEXT NOT NULL CHECK(length(trim(name)) > 0), created_at TEXT NOT NULL, updated_at TEXT NOT NULL, deleted_at TEXT , embedding_model_ref TEXT, rerank_model_ref TEXT, chunk_target_chars INTEGER DEFAULT 1200 CHECK(chunk_target_chars IS NULL OR (chunk_target_chars >= 100 AND chunk_target_chars <= 100000)), retrieval_top_k INTEGER DEFAULT 12 CHECK(retrieval_top_k IS NULL OR (retrieval_top_k >= 1 AND retrieval_top_k <= 1000)))",
             "tableName": "notebooks",
             "type": "table"
           },
@@ -3813,105 +3639,15 @@
             "type": "table"
           },
           {
-            "name": "research_claims",
-            "sql": "CREATE TABLE research_claims ( id TEXT PRIMARY KEY, run_id TEXT NOT NULL, origin_job_id TEXT NOT NULL, ordinal INTEGER NOT NULL CHECK(ordinal >= 0), text TEXT NOT NULL, support_status TEXT NOT NULL CHECK(support_status IN ('supported', 'partial', 'disputed', 'insufficient')), epistemic_basis TEXT NOT NULL CHECK(epistemic_basis IN ('explicit', 'inferred', 'mixed')), created_at TEXT NOT NULL, UNIQUE(origin_job_id, ordinal), FOREIGN KEY(run_id) REFERENCES research_runs(run_id) ON DELETE RESTRICT, FOREIGN KEY(origin_job_id) REFERENCES research_jobs(id) ON DELETE RESTRICT )",
-            "tableName": "research_claims",
-            "type": "table"
-          },
-          {
-            "name": "research_contradictions",
-            "sql": "CREATE TABLE research_contradictions ( id TEXT PRIMARY KEY, run_id TEXT NOT NULL, check_id TEXT NOT NULL, claim_id TEXT NOT NULL, evidence_id TEXT NOT NULL, relation TEXT NOT NULL CHECK(relation IN ('contradicts', 'context')), explanation TEXT NOT NULL, created_at TEXT NOT NULL, UNIQUE(check_id, claim_id, evidence_id), FOREIGN KEY(run_id) REFERENCES research_runs(run_id) ON DELETE RESTRICT, FOREIGN KEY(check_id) REFERENCES contradiction_checks(id) ON DELETE RESTRICT, FOREIGN KEY(claim_id) REFERENCES research_claims(id) ON DELETE RESTRICT, FOREIGN KEY(evidence_id) REFERENCES research_evidence(id) ON DELETE RESTRICT )",
-            "tableName": "research_contradictions",
-            "type": "table"
-          },
-          {
-            "name": "research_evidence",
-            "sql": "CREATE TABLE research_evidence ( id TEXT PRIMARY KEY, run_id TEXT NOT NULL, unit_id TEXT NOT NULL, validation_id TEXT NOT NULL UNIQUE, citation_id TEXT NOT NULL, content_snapshot_id TEXT NOT NULL, parse_artifact_id TEXT NOT NULL, block_id TEXT NOT NULL, start_offset INTEGER NOT NULL CHECK(start_offset >= 0), end_offset INTEGER NOT NULL CHECK(end_offset > start_offset), canonical_quote TEXT NOT NULL, quote_checksum TEXT NOT NULL CHECK(length(quote_checksum) = 64), epistemic_basis TEXT NOT NULL CHECK(epistemic_basis IN ('explicit', 'inferred', 'mixed')), created_at TEXT NOT NULL, FOREIGN KEY(run_id) REFERENCES research_runs(run_id) ON DELETE RESTRICT, FOREIGN KEY(unit_id) REFERENCES analysis_units(id) ON DELETE RESTRICT, FOREIGN KEY(validation_id) REFERENCES evidence_validations(id) ON DELETE RESTRICT, FOREIGN KEY(citation_id) REFERENCES knowledge_citations(id) ON DELETE RESTRICT, FOREIGN KEY(content_snapshot_id) REFERENCES content_snapshots(id) ON DELETE RESTRICT, FOREIGN KEY(parse_artifact_id) REFERENCES parse_artifacts(id) ON DELETE RESTRICT, FOREIGN KEY(block_id) REFERENCES knowledge_blocks(id) ON DELETE RESTRICT )",
-            "tableName": "research_evidence",
-            "type": "table"
-          },
-          {
-            "name": "research_jobs",
-            "sql": "CREATE TABLE research_jobs ( id TEXT PRIMARY KEY, run_id TEXT NOT NULL, phase TEXT NOT NULL CHECK(phase IN ('claim_build', 'final_synthesis')), ordinal INTEGER NOT NULL CHECK(ordinal >= 0), status TEXT NOT NULL CHECK(status IN ('pending', 'running', 'completed', 'failed', 'canceled')), input_refs_json TEXT NOT NULL, output_json TEXT, created_at TEXT NOT NULL, started_at TEXT, completed_at TEXT, error_code TEXT, UNIQUE(run_id, phase, ordinal), FOREIGN KEY(run_id) REFERENCES research_runs(run_id) ON DELETE RESTRICT )",
-            "tableName": "research_jobs",
-            "type": "table"
-          },
-          {
-            "name": "research_report_citations",
-            "sql": "CREATE TABLE research_report_citations ( run_id TEXT NOT NULL, ordinal INTEGER NOT NULL CHECK(ordinal >= 0), marker INTEGER NOT NULL CHECK(marker > 0), evidence_id TEXT NOT NULL, citation_id TEXT NOT NULL, PRIMARY KEY(run_id, ordinal), UNIQUE(run_id, marker), FOREIGN KEY(run_id) REFERENCES research_runs(run_id) ON DELETE RESTRICT, FOREIGN KEY(evidence_id) REFERENCES research_evidence(id) ON DELETE RESTRICT, FOREIGN KEY(citation_id) REFERENCES knowledge_citations(id) ON DELETE RESTRICT )",
-            "tableName": "research_report_citations",
-            "type": "table"
-          },
-          {
-            "name": "research_reports",
-            "sql": "CREATE TABLE research_reports ( run_id TEXT PRIMARY KEY, synthesis_job_id TEXT NOT NULL UNIQUE, report_json TEXT NOT NULL, created_at TEXT NOT NULL, FOREIGN KEY(run_id) REFERENCES research_runs(run_id) ON DELETE RESTRICT, FOREIGN KEY(synthesis_job_id) REFERENCES research_jobs(id) ON DELETE RESTRICT )",
-            "tableName": "research_reports",
-            "type": "table"
-          },
-          {
-            "name": "research_runs",
-            "sql": "CREATE TABLE research_runs ( run_id TEXT PRIMARY KEY, host_task_id TEXT NOT NULL UNIQUE, state TEXT NOT NULL CHECK(state IN ( 'queued', 'preparing_scope', 'building_manifest', 'scanning', 'building_claims', 'checking_contradictions', 'synthesizing', 'completed', 'recovering', 'partial', 'failed', 'canceled' )), spec_json TEXT NOT NULL, error_code TEXT, created_at TEXT NOT NULL, updated_at TEXT NOT NULL, completed_at TEXT, FOREIGN KEY(run_id) REFERENCES knowledge_runs(id) ON DELETE RESTRICT )",
-            "tableName": "research_runs",
-            "type": "table"
-          },
-          {
-            "name": "research_verification_attempts",
-            "sql": "CREATE TABLE research_verification_attempts ( id TEXT PRIMARY KEY, run_id TEXT NOT NULL, step_id TEXT NOT NULL, cell_id TEXT NOT NULL, attempt_number INTEGER NOT NULL CHECK(attempt_number > 0), status TEXT NOT NULL CHECK(status IN ('running', 'completed', 'failed', 'canceled')), error_code TEXT, output_json TEXT, started_at TEXT NOT NULL, completed_at TEXT, UNIQUE(cell_id, attempt_number), FOREIGN KEY(run_id) REFERENCES research_runs(run_id) ON DELETE RESTRICT, FOREIGN KEY(step_id) REFERENCES research_verification_steps(id) ON DELETE RESTRICT, FOREIGN KEY(cell_id) REFERENCES research_verification_cells(id) ON DELETE RESTRICT )",
-            "tableName": "research_verification_attempts",
-            "type": "table"
-          },
-          {
-            "name": "research_verification_cells",
-            "sql": "CREATE TABLE research_verification_cells ( id TEXT PRIMARY KEY, step_id TEXT NOT NULL, unit_id TEXT NOT NULL, ordinal INTEGER NOT NULL CHECK(ordinal >= 0), status TEXT NOT NULL CHECK(status IN ('pending', 'running', 'completed', 'failed', 'canceled')), result_json TEXT, created_at TEXT NOT NULL, started_at TEXT, completed_at TEXT, error_code TEXT, UNIQUE(step_id, unit_id), UNIQUE(step_id, ordinal), FOREIGN KEY(step_id) REFERENCES research_verification_steps(id) ON DELETE RESTRICT, FOREIGN KEY(unit_id) REFERENCES analysis_units(id) ON DELETE RESTRICT )",
-            "tableName": "research_verification_cells",
-            "type": "table"
-          },
-          {
-            "name": "research_verification_relations",
-            "sql": "CREATE TABLE research_verification_relations ( id TEXT PRIMARY KEY, run_id TEXT NOT NULL, step_id TEXT NOT NULL, cell_id TEXT NOT NULL, claim_id TEXT NOT NULL, evidence_id TEXT NOT NULL, relation TEXT NOT NULL CHECK(relation IN ('supports', 'contradicts', 'context')), explanation TEXT NOT NULL, created_at TEXT NOT NULL, UNIQUE(cell_id, claim_id, evidence_id, relation), FOREIGN KEY(run_id) REFERENCES research_runs(run_id) ON DELETE RESTRICT, FOREIGN KEY(step_id) REFERENCES research_verification_steps(id) ON DELETE RESTRICT, FOREIGN KEY(cell_id) REFERENCES research_verification_cells(id) ON DELETE RESTRICT, FOREIGN KEY(claim_id) REFERENCES research_claims(id) ON DELETE RESTRICT, FOREIGN KEY(evidence_id) REFERENCES research_evidence(id) ON DELETE RESTRICT )",
-            "tableName": "research_verification_relations",
-            "type": "table"
-          },
-          {
-            "name": "research_verification_steps",
-            "sql": "CREATE TABLE research_verification_steps ( id TEXT PRIMARY KEY, run_id TEXT NOT NULL, trigger_synthesis_job_id TEXT NOT NULL UNIQUE, ordinal INTEGER NOT NULL CHECK(ordinal >= 0), status TEXT NOT NULL CHECK(status IN ('pending', 'running', 'completed', 'failed', 'canceled')), requests_json TEXT NOT NULL, created_at TEXT NOT NULL, started_at TEXT, completed_at TEXT, error_code TEXT, UNIQUE(run_id, ordinal), FOREIGN KEY(run_id) REFERENCES research_runs(run_id) ON DELETE RESTRICT, FOREIGN KEY(trigger_synthesis_job_id) REFERENCES research_jobs(id) ON DELETE RESTRICT )",
-            "tableName": "research_verification_steps",
-            "type": "table"
-          },
-          {
-            "name": "scope_notebooks",
-            "sql": "CREATE TABLE scope_notebooks ( scope_snapshot_id TEXT NOT NULL, notebook_id TEXT NOT NULL, notebook_name TEXT NOT NULL, ordinal INTEGER NOT NULL CHECK(ordinal >= 0), PRIMARY KEY(scope_snapshot_id, notebook_id), UNIQUE(scope_snapshot_id, ordinal), FOREIGN KEY(scope_snapshot_id) REFERENCES scope_snapshots(id) ON DELETE RESTRICT, FOREIGN KEY(notebook_id) REFERENCES notebooks(id) ON DELETE RESTRICT )",
-            "tableName": "scope_notebooks",
-            "type": "table"
-          },
-          {
-            "name": "scope_snapshots",
-            "sql": "CREATE TABLE scope_snapshots ( id TEXT PRIMARY KEY, studio_id TEXT NOT NULL, mode TEXT NOT NULL CHECK(mode IN ('quick', 'research')), created_at TEXT NOT NULL )",
-            "tableName": "scope_snapshots",
-            "type": "table"
-          },
-          {
-            "name": "scope_sources",
-            "sql": "CREATE TABLE scope_sources ( scope_snapshot_id TEXT NOT NULL, notebook_id TEXT NOT NULL, source_id TEXT NOT NULL, source_display_name TEXT NOT NULL, content_snapshot_id TEXT NOT NULL, parse_artifact_id TEXT NOT NULL, ordinal INTEGER NOT NULL CHECK(ordinal >= 0), PRIMARY KEY(scope_snapshot_id, notebook_id, source_id), UNIQUE(scope_snapshot_id, ordinal), FOREIGN KEY(scope_snapshot_id) REFERENCES scope_snapshots(id) ON DELETE RESTRICT, FOREIGN KEY(notebook_id) REFERENCES notebooks(id) ON DELETE RESTRICT, FOREIGN KEY(source_id) REFERENCES sources(id) ON DELETE RESTRICT, FOREIGN KEY(content_snapshot_id) REFERENCES content_snapshots(id) ON DELETE RESTRICT, FOREIGN KEY(parse_artifact_id) REFERENCES parse_artifacts(id) ON DELETE RESTRICT )",
-            "tableName": "scope_sources",
-            "type": "table"
-          },
-          {
             "name": "sources",
             "sql": "CREATE TABLE sources ( id TEXT PRIMARY KEY, studio_id TEXT NOT NULL, source_type TEXT NOT NULL CHECK(source_type IN ('file', 'pasted_text', 'web_snapshot')), display_name TEXT NOT NULL CHECK(length(trim(display_name)) > 0), origin_metadata_json TEXT NOT NULL, created_at TEXT NOT NULL, deleted_at TEXT )",
             "tableName": "sources",
             "type": "table"
-          },
-          {
-            "name": "task_attempts",
-            "sql": "CREATE TABLE task_attempts ( id TEXT PRIMARY KEY, run_id TEXT NOT NULL, work_type TEXT NOT NULL CHECK(work_type IN ('scan_batch', 'claim_job', 'contradiction_check', 'synthesis_job')), work_id TEXT NOT NULL, attempt_number INTEGER NOT NULL CHECK(attempt_number > 0), status TEXT NOT NULL CHECK(status IN ('running', 'completed', 'failed', 'canceled')), error_code TEXT, output_json TEXT, started_at TEXT NOT NULL, completed_at TEXT, UNIQUE(work_type, work_id, attempt_number), FOREIGN KEY(run_id) REFERENCES research_runs(run_id) ON DELETE RESTRICT )",
-            "tableName": "task_attempts",
-            "type": "table"
           }
         ],
-        "userVersion": 5
+        "userVersion": 8
       },
-      "sourceHash": "sha256:045a31646d3c845438441b8a04ebf176b8c830517deb33b5799530d83ea41e60",
+      "sourceHash": "sha256:f1d61a2a004afa64439521bafe4ed61ea39f62f9fcddebf1be785a79c5e7482e",
       "storeId": "knowledge-database"
     },
     {
@@ -3921,24 +3657,24 @@
       "protocolModules": [
         {
           "module": "lib/knowledge/vector-index-adapter.ts",
-          "sourceHash": "sha256:b749d28d66671dc6f9c6e9e5ff084845ebe03c2540b3ee02813fbc302e2c2f8c"
+          "sourceHash": "sha256:434c064d02c6b6b974acf7a4cde473cf48bd123628e80dbde8ce2303d4e2a052"
         }
       ],
-      "sourceHash": "sha256:77fbc69106e60cdd08414164bf3010e405944877cfb7ffd7c8c7bbed5605ac80",
+      "sourceHash": "sha256:b769c309b22c0e25c8f98beefbded5d58c13b85688c8a226820098955293ce22",
       "storeId": "knowledge-indexes"
     },
     {
       "contract": "ParseArtifact generation directories referenced by knowledge.db and never treated as source content versions",
       "kind": "directory-contract",
       "module": "lib/knowledge/knowledge-manager.ts",
-      "sourceHash": "sha256:378373bcdba723b31d72fb76ab8070d69ad73fabf9fa32082418d88d0adeaa6a",
+      "sourceHash": "sha256:a91945d4420f43716f090f733e393c4fde6d9541ec97b7a5177950008b17edba",
       "storeId": "knowledge-parse-artifacts"
     },
     {
       "contract": "ContentSnapshot relative locator, immutable byte publication, SHA-256 verification, and rollback protocol",
       "kind": "directory-contract",
       "module": "lib/knowledge/knowledge-manager.ts",
-      "sourceHash": "sha256:378373bcdba723b31d72fb76ab8070d69ad73fabf9fa32082418d88d0adeaa6a",
+      "sourceHash": "sha256:a91945d4420f43716f090f733e393c4fde6d9541ec97b7a5177950008b17edba",
       "storeId": "knowledge-source-snapshots"
     },
     {

@@ -217,8 +217,9 @@ export class Hub {
       uiContext,
       displayMessage,
       sessionFileRefs,
+      knowledgeRefs,
     } = opts;
-    const o = { sessionKey, role, ephemeral, meta, isGroup, cwd, model, persist, permissionMode, from, to, onDelta, images, imageAttachmentPaths, videos, videoAttachmentPaths, audios, audioAttachmentPaths, inboundFiles, clientMessageId, sessionId, sessionPath, agentId, uiContext, displayMessage, sessionFileRefs };
+    const o = { sessionKey, role, ephemeral, meta, isGroup, cwd, model, persist, permissionMode, from, to, onDelta, images, imageAttachmentPaths, videos, videoAttachmentPaths, audios, audioAttachmentPaths, inboundFiles, clientMessageId, sessionId, sessionPath, agentId, uiContext, displayMessage, sessionFileRefs, knowledgeRefs };
 
     // ── 图片预处理：持久化到磁盘 + 插入 [attached_image] 标记 ──
     // 在路由之前统一处理，所有消息路径（WS / Bridge DM / Bridge Group）共享
@@ -293,6 +294,7 @@ export class Hub {
             uiContext: o.uiContext,
             displayMessage: o.displayMessage,
             sessionFileRefs: o.sessionFileRefs,
+            knowledgeRefs: o.knowledgeRefs,
           })
           : this._engine.prompt(text, { images: o.images, videos: o.videos, audios: o.audios }),
       },

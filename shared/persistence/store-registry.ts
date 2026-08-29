@@ -874,6 +874,7 @@ export const PERSISTENT_STORES: readonly StoreDescriptor[] = Object.freeze([
     migrationEntry: ["KnowledgeStore store-local migrations"],
     checkpointPolicy: "Checkpoint with the managed source snapshots and citation-grade parse artifacts from the same Knowledge generation.",
     restorePolicy: "Restore through KnowledgeManager before queries resume; validate SQLite user_version and referenced managed bytes together.",
+    compatibility: "schema v6 adds notebook config columns (embedding_model_ref/rerank_model_ref inherit the global preference when NULL; chunk_target_chars/retrieval_top_k fall back to built-in defaults 1200/12) and the ingestion_jobs queue table, and drops the V3-V5 research tables in the same transaction; research rows were derived artifacts, so the V1-V2 source-of-truth tables migrate untouched. schema v7 adds ingestion_jobs.progress_done (NOT NULL DEFAULT 0) and progress_total (NULL = embed phase not reached) for embedding progress; existing rows backfill 0/NULL and no other persisted shape changes.",
     identityContract: "One Knowledge database belongs to one canonical LINGXI_HOME; Notebook, Source, Snapshot, and later run IDs are durable identities, while storage paths are relative locators.",
     siteRules: rules(
       ["lib/knowledge/knowledge-store.ts"],

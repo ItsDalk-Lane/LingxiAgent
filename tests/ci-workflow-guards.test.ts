@@ -65,7 +65,6 @@ const REQUIRED_KNOWLEDGE_PLATFORM_TESTS = [
   "tests/knowledge-store.test.ts",
   "tests/knowledge-manager-import.test.ts",
   "tests/knowledge-engine-persistence.test.ts",
-  "tests/knowledge-research.test.ts",
   "tests/knowledge-vector-index.test.ts",
   "tests/auxiliary-slot-resolver.test.ts",
   "tests/fresh-credential-routing.test.ts",

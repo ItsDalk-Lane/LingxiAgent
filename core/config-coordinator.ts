@@ -50,11 +50,15 @@ export const AUXILIARY_MODEL_PREF_KEYS: ReadonlyArray<readonly [string, string]>
  */
 export const SHARED_MODEL_KEYS = AUXILIARY_MODEL_PREF_KEYS;
 
-/** 操作模型不是语义 Slot；这里只共享同一种 ModelRef 持久化形状。 */
-export const MODEL_OPERATION_PREF_KEYS: ReadonlyArray<readonly [string, string]> = [
-  ["embedding", "knowledge_embedding_model"],
-  ["rerank", "knowledge_rerank_model"],
-];
+/**
+ * 已退役的知识库全局嵌入/重排偏好键（笔记本级配置的唯一来源）。
+ * 启动迁移 consumeLegacyKnowledgeModelPrefs 读取后删除，此后 PUT 这些字段
+ * 会被 normalizeSharedModelsPatch 以 unknown field 显式拒绝。
+ */
+export const LEGACY_KNOWLEDGE_MODEL_PREF_KEYS = {
+  embedding: "knowledge_embedding_model",
+  rerank: "knowledge_rerank_model",
+} as const;
 
 export const VISION_AUXILIARY_ENABLED_PREF_KEY = "vision_auxiliary_enabled";
 
@@ -70,10 +74,7 @@ export function sharedModelsPatchRequiresModelSync(patch) {
 /**
  * 允许的非 Slot model settings 字段（feature toggle 等，与 Slot 模型引用是不同概念）。
  */
-const ALLOWED_NON_SLOT_FIELDS = new Set([
-  "vision_enabled",
-  ...MODEL_OPERATION_PREF_KEYS.map(([field]) => field),
-]);
+const ALLOWED_NON_SLOT_FIELDS = new Set(["vision_enabled"]);
 
 export function normalizeSharedModelsPatch(partial) {
   if (!partial || typeof partial !== "object" || Array.isArray(partial)) {
@@ -103,20 +104,6 @@ export function normalizeSharedModelsPatch(partial) {
       result[field] = requireModelRef(raw);
     } catch (err) {
       throw new Error(`shared model ${field}: ${err.message}`);
-    }
-  }
-  for (const [field] of MODEL_OPERATION_PREF_KEYS) {
-    if (!hasOwn(partial, field)) continue;
-    const raw = partial[field];
-    if (raw === undefined) continue;
-    if (raw === null || raw === "") {
-      result[field] = null;
-      continue;
-    }
-    try {
-      result[field] = requireModelRef(raw);
-    } catch (err) {
-      throw new Error(`model operation ${field}: ${err.message}`);
     }
   }
   if (hasOwn(partial, "vision_enabled")) {
@@ -241,10 +228,6 @@ export class ConfigCoordinator {
         result[field] = null;
       }
     }
-    for (const [field, prefKey] of MODEL_OPERATION_PREF_KEYS) {
-      const raw = prefs[prefKey];
-      result[field] = raw || null;
-    }
     result.vision_enabled = prefs[VISION_AUXILIARY_ENABLED_PREF_KEY] === true;
     return result;
   }
@@ -267,15 +250,6 @@ export class ConfigCoordinator {
           shouldSyncAgentRuntimeModels = true;
         }
       }
-    }
-    for (const [field, prefKey] of MODEL_OPERATION_PREF_KEYS) {
-      if (!hasOwn(normalized, field)) continue;
-      if (normalized[field]) prefs[prefKey] = normalized[field];
-      else delete prefs[prefKey];
-      const value = normalized[field];
-      changed.push(
-        `${field}=${value ? `${value.provider || "?"}/${value.id || "?"}` : "(cleared)"}`,
-      );
     }
     if (hasOwn(normalized, "vision_enabled")) {
       if (normalized.vision_enabled) prefs[VISION_AUXILIARY_ENABLED_PREF_KEY] = true;
@@ -308,6 +282,48 @@ export class ConfigCoordinator {
     // MemoryTicker 等消费方在调用边界通过 engine.resolveAuxiliaryExecution("memory")
     // 现场解析，用户修改 memory_model 后下一次 tick 自动生效，无需同步。
     if (!agent) return;
+  }
+
+  /**
+   * 一次性迁移（读侧）：读出已退役的知识库全局嵌入/重排偏好。
+   * 直接读 raw prefs（不经过 getSharedModels——操作模型键体系已随迁移删除）。
+   * 只读不删；删除必须等调用方把引用成功写进笔记本列之后（clearLegacy...），
+   * 否则写库失败会永久丢配置。返回 { embedding, rerank }（无配置时为 null）。
+   */
+  peekLegacyKnowledgeModelPrefs() {
+    const prefs = this._prefs();
+    return {
+      embedding: this._readLegacyKnowledgeModelPref(prefs, LEGACY_KNOWLEDGE_MODEL_PREF_KEYS.embedding),
+      rerank: this._readLegacyKnowledgeModelPref(prefs, LEGACY_KNOWLEDGE_MODEL_PREF_KEYS.rerank),
+    };
+  }
+
+  /** 一次性迁移（删侧）：笔记本列写入成功后调用；幂等（键不存在时 no-op）。 */
+  clearLegacyKnowledgeModelPrefs() {
+    const prefs = this._prefs();
+    let changed = false;
+    for (const prefKey of Object.values(LEGACY_KNOWLEDGE_MODEL_PREF_KEYS)) {
+      if (prefs[prefKey] !== undefined) {
+        delete prefs[prefKey];
+        changed = true;
+      }
+    }
+    if (changed) this._savePrefs(prefs);
+  }
+
+  _readLegacyKnowledgeModelPref(prefs, prefKey) {
+    const raw = prefs[prefKey];
+    if (!raw) return null;
+    if (typeof raw === "object" && raw.id) {
+      return { id: String(raw.id), provider: String(raw.provider || "") };
+    }
+    const text = String(raw).trim();
+    if (!text) return null;
+    const slashIndex = text.indexOf("/");
+    if (slashIndex > 0 && slashIndex < text.length - 1) {
+      return { provider: text.slice(0, slashIndex), id: text.slice(slashIndex + 1) };
+    }
+    return { id: text, provider: "" };
   }
 
   // ── Search Config ──

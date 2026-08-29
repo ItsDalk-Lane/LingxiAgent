@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import type { KnowledgeRetrievalStats } from '../../../../../shared/knowledge-refs.ts';
 import type { ChatListItem, ChatMessage, ContentBlock, ToolCall } from '../../stores/chat-types';
 import {
   buildProcessFoldSummary,
@@ -560,7 +561,7 @@ describe('process fold grouping', () => {
 
   it('formats unsuccessful attempts as light process copy', () => {
     const text = buildProcessFoldSummary(
-      { toolCount: 13, thinkingCount: 5, unsuccessfulCount: 1 },
+      { toolCount: 13, thinkingCount: 5, unsuccessfulCount: 1, knowledgeCount: 0 },
       '小花',
       (key, vars) => {
         const table: Record<string, string> = {
@@ -574,5 +575,131 @@ describe('process fold grouping', () => {
     );
 
     expect(text).toBe('✨ 小花忙活了一阵子 · 13 个工具 · 5 次思考 · 1 次尝试未成功');
+  });
+});
+
+describe('knowledge-only process fold（纯检索轮折叠）', () => {
+  function retrievalStats(injectedChunks = 18): KnowledgeRetrievalStats {
+    return {
+      mode: 'qa',
+      retrievalMode: 'hybrid',
+      subQueries: ['q1'],
+      subQueryHits: [18],
+      degraded: false,
+      fusedChunks: 197,
+      injectedChunks,
+      truncated: true,
+      usedTokens: 5694,
+      budgetTokens: 6000,
+    };
+  }
+
+  function answerTurn(id: string, status: 'completed' | 'streaming' = 'completed'): ChatListItem {
+    const answer: ContentBlock = {
+      id: `${id}:answer`,
+      type: 'text',
+      html: '<p>末日真相是虚构的。</p>',
+      source: '末日真相是虚构的。',
+      semanticPhase: 'final_answer',
+      surfaceRole: 'answer',
+      lifecycle: 'sealed',
+    };
+    const turn = assistant(id, [answer]);
+    if (turn.type !== 'message') throw new Error('expected assistant');
+    turn.data.turnProjection = {
+      id: `${id}:turn`,
+      inputMessageId: 'u1',
+      assistantMessageIds: [id],
+      processBlockIds: [],
+      answerBlockIds: [`${id}:answer`],
+      resultBlockIds: [],
+      controlBlockIds: [],
+      status,
+    };
+    return turn;
+  }
+
+  it('无工具/思考的知识问答轮也生成 fold：检索步骤入卡、正文外显、源消息卡片被抑制', () => {
+    const turn = answerTurn('a1');
+    const rendered = buildTranscriptRenderItems(
+      [user('u1', '世界末日'), turn],
+      { isStreaming: false, knowledgeRetrievalByIndex: new Map([[1, retrievalStats()]]) },
+    );
+
+    expect(rendered.map((item) => item.type)).toEqual(['source', 'process_fold', 'source']);
+    const fold = rendered[1];
+    expect(fold).toMatchObject({
+      type: 'process_fold',
+      id: 'a1:process',
+      turnId: 'a1:turn',
+      blockIds: [],
+      refs: [],
+      originalIndex: 1,
+      stats: { toolCount: 0, thinkingCount: 0, unsuccessfulCount: 0, knowledgeCount: 1 },
+      status: 'completed',
+      defaultCollapsed: true,
+      ownsTurnCompletion: false,
+      mode: 'settled',
+    });
+    // 正文仍在 fold 后原位渲染；「延续本轮」让头像不重复、检索卡由 fold 承载。
+    expect(rendered[2]).toMatchObject({
+      type: 'source',
+      item: { data: { blocks: [expect.objectContaining({ id: 'a1:answer' })] } },
+      continuesAssistantTurn: true,
+    });
+  });
+
+  it('无检索统计的纯文本轮维持原样：不生成 fold', () => {
+    const turn = answerTurn('a1');
+    const rendered = buildTranscriptRenderItems([user('u1'), turn], { isStreaming: false });
+
+    expect(rendered.map((item) => item.type)).toEqual(['source', 'source']);
+    expect(rendered[1]).not.toHaveProperty('continuesAssistantTurn');
+  });
+
+  it('live 模式的纯检索 fold 不默认折叠（流式期间检索卡保持可见）', () => {
+    const turn = answerTurn('a1', 'streaming');
+    const rendered = buildTranscriptRenderItems(
+      [user('u1'), turn],
+      { isStreaming: true, liveTurnStatus: 'streaming', knowledgeRetrievalByIndex: new Map([[1, retrievalStats()]]) },
+    );
+
+    const fold = rendered.find((item) => item.type === 'process_fold');
+    expect(fold).toMatchObject({ mode: 'live', defaultCollapsed: false, status: 'completed' });
+  });
+
+  it('多轮纯检索各自成 fold：id 以各自轮首消息稳定，不冲突', () => {
+    const t1 = answerTurn('a1');
+    const t2 = answerTurn('a2');
+    const rendered = buildTranscriptRenderItems(
+      [user('u1'), t1, user('u2'), t2],
+      { isStreaming: false, knowledgeRetrievalByIndex: new Map([[1, retrievalStats()], [3, retrievalStats()]]) },
+    );
+
+    const folds = rendered.filter((item) => item.type === 'process_fold');
+    expect(folds.map((fold) => (fold as { id: string }).id)).toEqual(['a1:process', 'a2:process']);
+  });
+
+  it('纯检索摘要用「N 次检索」；混合轮维持工具步数合并语义', () => {
+    const translate = (key: string, vars?: Record<string, string | number>) => {
+      const table: Record<string, string> = {
+        'processFold.summary': '✨ {name}忙活了一阵子',
+        'processFold.tools': '{n} 个工具',
+        'processFold.knowledge': '{n} 次检索',
+        'processFold.thinking': '{n} 次思考',
+        'processFold.unsuccessful': '{n} 次尝试未成功',
+      };
+      return (table[key] || key).replace(/\{(\w+)\}/g, (_, name) => String(vars?.[name] ?? ''));
+    };
+    expect(buildProcessFoldSummary(
+      { toolCount: 0, thinkingCount: 0, unsuccessfulCount: 0, knowledgeCount: 1 },
+      '小文',
+      translate,
+    )).toBe('✨ 小文忙活了一阵子 · 1 次检索');
+    expect(buildProcessFoldSummary(
+      { toolCount: 2, thinkingCount: 1, unsuccessfulCount: 0, knowledgeCount: 1 },
+      '小文',
+      translate,
+    )).toBe('✨ 小文忙活了一阵子 · 3 个工具 · 1 次思考');
   });
 });

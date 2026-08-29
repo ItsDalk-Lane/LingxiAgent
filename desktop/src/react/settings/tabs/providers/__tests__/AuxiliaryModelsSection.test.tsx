@@ -55,8 +55,7 @@ describe('AuxiliaryModelsSection', () => {
           summarize: null,
           memory: null,
           knowledge: null,
-          embedding: null,
-          rerank: { id: 'rerank-model', provider: 'provider-b' },
+          knowledgeDistill: null,
           vision: { id: 'gpt-4o', provider: 'openai' },
           approval: null,
           guard: null,
@@ -105,30 +104,16 @@ describe('AuxiliaryModelsSection', () => {
     });
   });
 
-  it('renders one model widget per auxiliary slot and does not render the search provider selector', () => {
+  it('renders one model widget per auxiliary slot (8 slots incl. knowledgeDistill) and no operation pickers', () => {
     render(<AuxiliaryModelsSection providers={{ openai: { models: ['gpt-4o'] } }} />);
 
-    // 7 auxiliary slots (title/summarize/memory/knowledge/vision/approval/guard)
-    expect(screen.getAllByTestId('model-widget')).toHaveLength(7);
+    // 8 auxiliary slots (title/summarize/memory/knowledge/knowledgeDistill/vision/approval/guard)
+    expect(screen.getAllByTestId('model-widget')).toHaveLength(8);
+    expect(screen.getByText('settings.api.auxKnowledgeDistillModel')).toBeInTheDocument();
     expect(screen.queryByText('settings.api.searchProviderField')).not.toBeInTheDocument();
-  });
-
-  it('renders optional operation pickers, filters their catalogs, and saves only composite model refs', () => {
-    render(<AuxiliaryModelsSection providers={{ openai: { models: ['gpt-4o'] } }} />);
-
-    const embedding = screen.getByRole('combobox', { name: 'settings.api.knowledgeEmbeddingModel' });
-    const rerank = screen.getByRole('combobox', { name: 'settings.api.knowledgeRerankModel' });
-    expect(within(embedding).getByRole('option', { name: 'Embedding A · provider-a' })).toBeInTheDocument();
-    expect(within(embedding).queryByRole('option', { name: 'Rerank B · provider-b' })).not.toBeInTheDocument();
-    expect(within(rerank).getByRole('option', { name: 'Rerank B · provider-b' })).toBeInTheDocument();
+    // 知识库嵌入/重排全局配置已退役（迁移至笔记本级）：不出现对应下拉。
+    expect(screen.queryByRole('combobox', { name: 'settings.api.knowledgeEmbeddingModel' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('combobox', { name: 'settings.api.knowledgeRerankModel' })).not.toBeInTheDocument();
     expect(screen.queryByRole('textbox', { name: /key/i })).not.toBeInTheDocument();
-
-    fireEvent.change(embedding, { target: { value: 'provider-a\u0000embed-model' } });
-    expect(mocks.autoSaveGlobalModels).toHaveBeenCalledWith({
-      models: { embedding: { id: 'embed-model', provider: 'provider-a' } },
-    });
-
-    fireEvent.change(rerank, { target: { value: '' } });
-    expect(mocks.autoSaveGlobalModels).toHaveBeenCalledWith({ models: { rerank: null } });
   });
 });

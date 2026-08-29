@@ -26,8 +26,10 @@ import {
   type BlockRendererProps,
 } from './block-renderers';
 import { FileOutputActions } from './FileOutputActions';
+import { KnowledgeRetrievalFold } from './KnowledgeRetrievalFold';
 const lazyScreenshot = () => import('../../utils/screenshot').then(m => m.takeScreenshot);
 import type { ChatMessage, ContentBlock } from '../../stores/chat-types';
+import type { KnowledgeRetrievalStats } from '../../../../../shared/knowledge-refs.ts';
 import { useStore } from '../../stores';
 import { selectSessionFiles } from '../../stores/selectors/file-refs';
 import { sessionIdForPathFromLocatorState } from '../../stores/session-slice';
@@ -82,6 +84,7 @@ interface Props {
   turnTarget?: SessionNodeTarget | null;
   retrySourceMessage?: ChatMessage | null;
   skillPrompt?: string | null;
+  knowledgeRetrieval?: KnowledgeRetrievalStats | null;
   onForkCreated?: ForkedSessionHandler;
   messageRef?: (element: HTMLDivElement | null) => void;
 }
@@ -107,6 +110,7 @@ export const AssistantMessage = memo(function AssistantMessage({
   turnTarget = null,
   retrySourceMessage = null,
   skillPrompt = null,
+  knowledgeRetrieval = null,
   onForkCreated,
   messageRef,
 }: Props) {
@@ -200,6 +204,7 @@ export const AssistantMessage = memo(function AssistantMessage({
         </div>
       )}
       <div className={`${styles.message} ${styles.messageAssistant}${hasWideBlock ? ` ${styles.messageHasWideBlock}` : ''}${isInterludeOnly ? ` ${styles.messageAssistantInterludeOnly}` : ''}`}>
+        {knowledgeRetrieval && <KnowledgeRetrievalFold retrieval={knowledgeRetrieval} />}
         {blocks.map((block, i) => (
           <ContentBlockErrorBoundary
             key={block.id || `block-${i}`}

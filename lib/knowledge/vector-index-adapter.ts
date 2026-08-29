@@ -319,7 +319,7 @@ export class PortableVectorIndexAdapter implements VectorIndexAdapter {
     const model = this.normalizeModel(input.model);
     const query = readVector(vectorBuffer(input.queryVector, model.dimensions), model.dimensions);
     const limit = input.limit == null ? 12 : Number(input.limit);
-    if (!Number.isSafeInteger(limit) || limit < 1 || limit > 50) {
+    if (!Number.isSafeInteger(limit) || limit < 1 || limit > 1000) {
       throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "Vector search limit is invalid");
     }
     const placeholders = artifactIds.map(() => "?").join(", ");

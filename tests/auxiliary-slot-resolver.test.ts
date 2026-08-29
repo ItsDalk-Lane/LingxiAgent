@@ -88,12 +88,13 @@ function makeResolver(config: HarnessConfig) {
 // ── Tests ─────────────────────────────────────────────────────────────
 
 describe("AuxiliarySlot descriptors", () => {
-  it("defines exactly 7 canonical slots", () => {
+  it("defines exactly 8 canonical slots", () => {
     expect(AUXILIARY_SLOT_IDS).toEqual([
       "title",
       "summarize",
       "memory",
       "knowledge",
+      "knowledgeDistill",
       "vision",
       "approval",
       "guard",

@@ -87,180 +87,59 @@ export interface ResolvedKnowledgeCitation {
   source: KnowledgeSource;
 }
 
-export type KnowledgeQueryMode = "quick" | "research";
-
-export interface KnowledgeScopeNotebook {
-  scopeSnapshotId: string;
-  notebookId: string;
-  notebookName: string;
-  ordinal: number;
+/**
+ * 模型引用，与 shared/model-ref.ts 的持久化形状一致：完整 {id, provider}，
+ * 任一缺失即非法，不做按 id 降级。
+ */
+export interface KnowledgeModelRef {
+  id: string;
+  provider: string;
 }
 
-export interface KnowledgeScopeSource {
-  scopeSnapshotId: string;
+/**
+ * 笔记本级摄入/检索配置（schema v6 notebooks 新列的读取形状）。
+ * 任一项为 null 表示未设置：模型引用沿解析链 笔记本列 → 全局偏好 → null；
+ * 数值项无全局偏好，回退内置默认。见 knowledge-store.ts 的 resolveNotebookConfig。
+ */
+export interface NotebookConfig {
+  embeddingModelRef: KnowledgeModelRef | null;
+  rerankModelRef: KnowledgeModelRef | null;
+  chunkTargetChars: number | null;
+  retrievalTopK: number | null;
+}
+
+/** 摄入管线的 phase 链：parse → chunk → fts_index → embed → done。 */
+export type IngestionPhase = "parse" | "chunk" | "fts_index" | "embed" | "done";
+
+/**
+ * pending_embedding 是显式终态（非失败）：FTS 已可查、嵌入模型未配置，
+ * 等模型就绪信号置回 queued 补跑（禁静默降级红线）。
+ */
+export type IngestionJobStatus = "queued" | "running" | "pending_embedding" | "failed" | "done";
+
+export interface IngestionJob {
+  id: string;
   notebookId: string;
   sourceId: string;
-  sourceDisplayName: string;
-  contentSnapshotId: string;
-  parseArtifactId: string;
-  ordinal: number;
-}
-
-export interface KnowledgeScopeSnapshot {
-  id: string;
-  studioId: string;
-  mode: KnowledgeQueryMode;
-  createdAt: string;
-  notebooks: KnowledgeScopeNotebook[];
-  sources: KnowledgeScopeSource[];
-}
-
-export type KnowledgeRunStatus = "running" | "completed" | "failed" | "cancelled";
-
-export interface KnowledgeRunCitationRef {
-  runId: string;
-  ordinal: number;
-  marker: number;
-  citationId: string;
-  candidateRef: string;
-}
-
-export interface KnowledgeRunRetrieval {
-  runId: string;
-  rank: number;
-  chunkId: string;
-  parseArtifactId: string;
-  score: number;
-}
-
-export interface KnowledgeRun {
-  id: string;
-  studioId: string;
-  mode: KnowledgeQueryMode;
-  question: string;
-  scopeSnapshotId: string;
-  status: KnowledgeRunStatus;
-  retrievalMode: "fts" | "hybrid";
-  answerText: string | null;
-  errorCode: string | null;
-  createdAt: string;
-  completedAt: string | null;
-  citations: KnowledgeRunCitationRef[];
-  retrievals: KnowledgeRunRetrieval[];
-}
-
-export type KnowledgeResearchState =
-  | "queued"
-  | "preparing_scope"
-  | "building_manifest"
-  | "scanning"
-  | "building_claims"
-  | "checking_contradictions"
-  | "synthesizing"
-  | "completed"
-  | "recovering"
-  | "partial"
-  | "failed"
-  | "canceled";
-
-export type KnowledgeResearchWorkStatus = "pending" | "running" | "completed" | "failed" | "canceled";
-export type KnowledgeSupportStatus = "supported" | "partial" | "disputed" | "insufficient";
-export type KnowledgeEpistemicBasis = "explicit" | "inferred" | "mixed";
-export type KnowledgeClaimEvidenceRelation = "supports" | "contradicts" | "context";
-
-export interface KnowledgeResearchSpec {
-  originalQuestion: string;
-  scopeSnapshotId: string;
-  notebookIds: string[];
-  goal: string;
-  dimensions: string[];
-  outputRequirements: string[];
-  definitions: string[];
-  assumptions: string[];
-}
-
-export interface KnowledgeAnalysisUnitSpan {
-  kind: "primary" | "context";
-  ordinal: number;
-  blockId: string;
-  blockOrdinal: number;
-  startOffset: number;
-  endOffset: number;
-}
-
-export interface KnowledgeAnalysisUnit {
-  id: string;
-  runId: string;
-  parseArtifactId: string;
-  ordinal: number;
-  priority: number;
-  status: KnowledgeResearchWorkStatus;
-  primaryCharCount: number;
-  contextCharCount: number;
-  completedAt: string | null;
-  errorCode: string | null;
-  spans: KnowledgeAnalysisUnitSpan[];
-}
-
-export interface KnowledgeAnalysisManifest {
-  runId: string;
-  sourceCount: number;
-  parseArtifactCount: number;
-  blockCount: number;
-  unitCount: number;
-  primaryCharCount: number;
-  createdAt: string;
-}
-
-export interface KnowledgeResearchCoverageMetric {
-  completed: number;
-  total: number;
-}
-
-export interface KnowledgeResearchCoverage {
-  sourceReadiness: KnowledgeResearchCoverageMetric;
-  extraction: KnowledgeResearchCoverageMetric;
-  primaryScan: KnowledgeResearchCoverageMetric;
-  contradiction: KnowledgeResearchCoverageMetric;
-  citationValidation: KnowledgeResearchCoverageMetric & { valid: number; invalid: number };
-}
-
-export interface KnowledgeResearchRun {
-  runId: string;
-  hostTaskId: string;
-  state: KnowledgeResearchState;
-  spec: KnowledgeResearchSpec;
-  manifest: KnowledgeAnalysisManifest | null;
-  coverage: KnowledgeResearchCoverage;
-  reportAvailable: boolean;
-  errorCode: string | null;
+  /** parse 完成前未知，随 phase 推进绑定。 */
+  artifactId: string | null;
+  /** 下一个待执行的 phase；done 表示全部完成。 */
+  phase: IngestionPhase;
+  status: IngestionJobStatus;
+  attempt: number;
+  /** 下次可重试时间（ISO）；NULL = 立即可取。 */
+  retryAfter: string | null;
+  error: string | null;
+  /**
+   * 触发本次摄入的笔记本分块配置指纹（knowledgeChunkerConfigId）。
+   * 权衡（显式记录）：同一源被多个笔记本以不同配置引用时，
+   * 分块以触发摄入的笔记本配置为准。
+   */
+  chunkerConfigId: string;
+  /** 嵌入进度：已完成块数（每批嵌入后递增；失败/重试重置为 0）。 */
+  progressDone: number;
+  /** 嵌入总块数；NULL = 尚未进入 embed 相位（无进度语义）。 */
+  progressTotal: number | null;
   createdAt: string;
   updatedAt: string;
-  completedAt: string | null;
-}
-
-export interface KnowledgeResearchReportCitation {
-  marker: number;
-  evidenceId: string;
-  citationId: string;
-}
-
-export interface KnowledgeResearchReportItem {
-  text: string;
-  claimIds: string[];
-  citationMarkers: number[];
-}
-
-export interface KnowledgeResearchReport {
-  runId: string;
-  title: string;
-  summary: string;
-  conclusions: KnowledgeResearchReportItem[];
-  majorFindings: KnowledgeResearchReportItem[];
-  conflicts: KnowledgeResearchReportItem[];
-  uncertainties: string[];
-  limitations: string[];
-  coverage: KnowledgeResearchCoverage;
-  citations: KnowledgeResearchReportCitation[];
-  createdAt: string;
 }

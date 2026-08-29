@@ -37,7 +37,7 @@ const LABELED_TOOL_NAMES = [
   'web_search', 'web_fetch', 'todo_write', 'automation', 'stage_files', 'file', 'channel',
   'browser', 'computer', 'install_skill', 'notify', 'stop_task', 'update_settings',
   'session_folders', 'subagent', 'subagent_reply', 'subagent_close', 'workflow',
-  'check_pending_tasks', 'loop_control', 'current_status', 'session',
+  'check_pending_tasks', 'loop_control', 'current_status', 'session', 'knowledge_read',
   'hana_card_guide', 'show_card',
   // Hub 频道
   'channel_read_context', 'channel_reply', 'channel_pass',

@@ -31,7 +31,8 @@ import {
   INSTANT_SIMPLE_COMPACTION_RUNTIME_MODE,
   normalizeCompactionLifecycleMode,
 } from "../../shared/compaction-mode.ts";
-import { submitDesktopSessionInterjection, submitDesktopSessionMessage } from "../../core/desktop-session-submit.ts";
+import { abortPendingDesktopSubmission, submitDesktopSessionInterjection, submitDesktopSessionMessage } from "../../core/desktop-session-submit.ts";
+import { normalizeKnowledgeRefs } from "../../shared/knowledge-refs.ts";
 import {
   AgentReviewTurnCoordinator,
   buildSessionReferenceBlock,
@@ -1779,6 +1780,10 @@ export function createChatRoute(engine: any, hub: any, {
         sessionPath,
         session: event.session || null,
       });
+    } else if (event.type === "knowledge_retrieval_started") {
+      // 知识注入链路开始检索的即时反馈（desktop-session-submit 在阻塞式注入前发出）：
+      // 早于 session_status isStreaming，前端用它显示「正在检索知识库」占位。
+      broadcast({ type: "knowledge_retrieval_started", sessionPath });
     } else if (event.type === "session_status") {
       // session_status 只回答「Session 忙不忙」（任务书 §九/§十：status 与 Run 正交）。
       // 不再 reset Run 级 parser，也不 finalize Run；Run 只由 agent_start / agent_settled 开关。
@@ -2149,10 +2154,28 @@ export function createChatRoute(engine: any, hub: any, {
                 : "user_abort";
               if (abortSs) abortSs.isAborted = true;
               let abortAccepted = false;
+              let pendingSubmissionAborted = false;
               try {
                 abortAccepted = !!(await agentReviewTurns.cancelByParent(abortTarget.sessionId, abortReason));
                 if (!abortAccepted) abortAccepted = !!(await hub.abort(abortPath, { reason: abortReason }));
+                // 未进入流式的提交（知识检索/排队中）在此取消：submit 在检索完成后
+                // 消费该标记，跳过 promptSession。检索 LLM 调用本身不可中断，UI 侧
+                // 立即广播空闲态让指示器/停止按钮即时复位，不等检索自然结束。
+                if (!abortAccepted) {
+                  pendingSubmissionAborted = abortPendingDesktopSubmission(engine, { sessionId: abortTarget.sessionId, sessionPath: abortPath });
+                  abortAccepted = pendingSubmissionAborted;
+                }
               } catch {}
+              if (pendingSubmissionAborted) {
+                broadcast({
+                  type: "status",
+                  isStreaming: false,
+                  sessionPath: abortPath,
+                  streamId: abortSs?.streamId || null,
+                  aborted: true,
+                  reason: abortReason,
+                });
+              }
               if (!abortAccepted) {
                 const abortStreamId = abortSs?.streamId || null;
                 finishStreamingState(abortSs, abortPath);
@@ -2491,6 +2514,19 @@ export function createChatRoute(engine: any, hub: any, {
                   request && typeof request.agentId === "string" && request.agentId.trim()
                 ))
                 : [];
+              // 知识库引用：严格校验，非法值显式拒绝（禁静默降级吞掉用户引用）。
+              let knowledgeRefs = null;
+              try {
+                knowledgeRefs = normalizeKnowledgeRefs(msg.knowledgeRefs);
+              } catch (err: any) {
+                wsSend(ws, {
+                  type: "error",
+                  code: "invalid_knowledge_refs",
+                  message: err?.message || "invalid knowledgeRefs",
+                  sessionPath: promptSessionPath,
+                });
+                return;
+              }
               if (interject && reviewRequests.length > 0) {
                 wsSend(ws, {
                   type: "error",
@@ -2513,6 +2549,7 @@ export function createChatRoute(engine: any, hub: any, {
                     uiContext: msg.uiContext ?? null,
                     displayMessage: msg.displayMessage,
                     sessionFileRefs: msg.sessionFileRefs,
+                    knowledgeRefs,
                   });
                   wsSend(ws, { type: "steered", sessionPath: promptSessionPath });
                 } catch (err) {
@@ -2593,6 +2630,7 @@ export function createChatRoute(engine: any, hub: any, {
                   uiContext: msg.uiContext ?? null,
                   displayMessage: msg.displayMessage,
                   sessionFileRefs: msg.sessionFileRefs,
+                  knowledgeRefs,
                 });
               } catch (err) {
                 const isUserAbort = err.name === 'AbortError'

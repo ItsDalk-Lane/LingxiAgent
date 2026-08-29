@@ -3,6 +3,7 @@ import { PlanModeButton, type PermissionMode } from './PlanModeButton';
 import { ContextRing } from './ContextRing';
 import { ThinkingLevelButton } from './ThinkingLevelButton';
 import { ModelSelector } from './ModelSelector';
+import { KnowledgeReferenceButton } from './KnowledgeReferenceButton';
 import type { ThinkingLevel } from '../../stores/model-slice';
 import type { Model } from '../../types';
 import type { SessionModel } from '../../stores/chat-types';
@@ -15,6 +16,8 @@ interface Props {
   onAttach: () => void;
   slashBtnRef: RefObject<HTMLButtonElement | null>;
   onSlashToggle: () => void;
+  /** 知识库引用按钮的会话键（sessionPath；pending 新会话为 HOME_DRAFT_KEY；null/缺省禁用） */
+  knowledgeRefSessionKey?: string | null;
   permissionMode: PermissionMode;
   onPermissionModeChange: (v: PermissionMode) => void;
   planModeLocked: boolean;
@@ -36,6 +39,7 @@ interface Props {
 export const ComposerToolbar = memo(function ComposerToolbar(props: Props) {
   const {
     t, onNewSession, onAttach, slashBtnRef, onSlashToggle,
+    knowledgeRefSessionKey,
     permissionMode, onPermissionModeChange, planModeLocked,
     showThinking, thinkingLevel, onThinkingChange, availableThinkingLevels,
     models, sessionModel, isStreaming,
@@ -75,6 +79,7 @@ export const ComposerToolbar = memo(function ComposerToolbar(props: Props) {
             <path d="M12 2L14 10L22 12L14 14L12 22L10 14L2 12L10 10Z" />
           </svg>
         </button>
+        <KnowledgeReferenceButton sessionKey={knowledgeRefSessionKey ?? null} />
         <PlanModeButton mode={permissionMode} onChange={onPermissionModeChange} locked={planModeLocked} />
         <ContextRing />
       </div>

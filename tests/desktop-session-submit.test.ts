@@ -4,6 +4,7 @@ import {
   AGENT_REVIEW_RECORD_TYPE,
   MESSAGE_ORIGIN_RECORD_TYPE,
   MESSAGE_PRESENTATION_RECORD_TYPE,
+  abortPendingDesktopSubmission,
   submitDesktopSessionInterjection,
   submitDesktopSessionMessage,
   submitDesktopSessionMessageWithReceipt,
@@ -174,8 +175,14 @@ describe("submitDesktopSessionMessage", () => {
       expect.objectContaining({ type: "session_status", isStreaming: true }),
       "/tmp/desk.jsonl",
     );
+    // 发送即置忙（第 1 次）之后，afterCachePreflight 幂等再置忙并投影用户消息。
     expect(engine.emitEvent).toHaveBeenNthCalledWith(
       2,
+      expect.objectContaining({ type: "session_status", isStreaming: true }),
+      "/tmp/desk.jsonl",
+    );
+    expect(engine.emitEvent).toHaveBeenNthCalledWith(
+      3,
       expect.objectContaining({
         type: "session_user_message",
         message: expect.objectContaining({ text: "hello from bridge" }),
@@ -1414,7 +1421,13 @@ describe("session reminder block injection", () => {
       promptSession: vi.fn(async (_sessionPath, text, opts, submitOptions) => {
         order.push("cache-preflight");
         expect((session as any).sessionManager.appendCustomEntry).not.toHaveBeenCalled();
-        expect(engine.emitEvent).not.toHaveBeenCalled();
+        // 发送即置忙：进 preflight 时只允许已发过一次提前的 session_status(true)。
+        expect(engine.emitEvent).toHaveBeenCalledTimes(1);
+        expect(engine.emitEvent).toHaveBeenNthCalledWith(
+          1,
+          expect.objectContaining({ type: "session_status", isStreaming: true }),
+          "/tmp/desk.jsonl",
+        );
         const hookResult = submitOptions.afterCachePreflight();
         expect(hookResult).toBeUndefined();
         order.push("pi-prompt");
@@ -1431,7 +1444,8 @@ describe("session reminder block injection", () => {
       beforeInputSideEffects: () => { order.push("retry-branch-commit"); },
     });
 
-    expect(order.slice(0, 5)).toEqual([
+    expect(order.slice(0, 6)).toEqual([
+      "session_status",
       "cache-preflight",
       "retry-branch-commit",
       "session_status",
@@ -1463,7 +1477,18 @@ describe("session reminder block injection", () => {
       beforeInputSideEffects,
     })).rejects.toThrow("Cache prefix contract violated");
 
-    expect(engine.emitEvent).not.toHaveBeenCalled();
+    // 发送即置忙 + 失败回收：preflight 拒绝只留下这对 status（无用户投影等其它事件）。
+    expect(engine.emitEvent).toHaveBeenCalledTimes(2);
+    expect(engine.emitEvent).toHaveBeenNthCalledWith(
+      1,
+      expect.objectContaining({ type: "session_status", isStreaming: true }),
+      "/tmp/desk.jsonl",
+    );
+    expect(engine.emitEvent).toHaveBeenNthCalledWith(
+      2,
+      expect.objectContaining({ type: "session_status", isStreaming: false }),
+      "/tmp/desk.jsonl",
+    );
     expect(appendCustomEntry).not.toHaveBeenCalled();
     expect(engine.consumeRenderedSessionReminderBlock).not.toHaveBeenCalled();
     expect(beforeInputSideEffects).not.toHaveBeenCalled();
@@ -1485,7 +1510,18 @@ describe("session reminder block injection", () => {
     });
     await expect(submission.accepted).rejects.toThrow("prompt preflight rejected");
     await expect(submission.completion).rejects.toThrow("prompt preflight rejected");
-    expect(engine.emitEvent).not.toHaveBeenCalled();
+    // 发送即置忙 + 失败回收：只有这对 status，无用户投影。
+    expect(engine.emitEvent).toHaveBeenCalledTimes(2);
+    expect(engine.emitEvent).toHaveBeenNthCalledWith(
+      1,
+      expect.objectContaining({ type: "session_status", isStreaming: true }),
+      "/tmp/receipt-fast-reject.jsonl",
+    );
+    expect(engine.emitEvent).toHaveBeenNthCalledWith(
+      2,
+      expect.objectContaining({ type: "session_status", isStreaming: false }),
+      "/tmp/receipt-fast-reject.jsonl",
+    );
   });
 
   it("acceptance receipt stays pending through delayed preflight and rejects when it finally fails", async () => {
@@ -1514,7 +1550,18 @@ describe("session reminder block injection", () => {
     finishPreflight();
     await expect(submission.accepted).rejects.toThrow("delayed prompt preflight rejected");
     await expect(submission.completion).rejects.toThrow("delayed prompt preflight rejected");
-    expect(engine.emitEvent).not.toHaveBeenCalled();
+    // 发送即置忙 + 失败回收：只有这对 status，无用户投影。
+    expect(engine.emitEvent).toHaveBeenCalledTimes(2);
+    expect(engine.emitEvent).toHaveBeenNthCalledWith(
+      1,
+      expect.objectContaining({ type: "session_status", isStreaming: true }),
+      "/tmp/receipt-delayed-reject.jsonl",
+    );
+    expect(engine.emitEvent).toHaveBeenNthCalledWith(
+      2,
+      expect.objectContaining({ type: "session_status", isStreaming: false }),
+      "/tmp/receipt-delayed-reject.jsonl",
+    );
   });
 
   it("receipt resolves after accepted side effects without waiting for the model turn", async () => {
@@ -1574,7 +1621,7 @@ describe("session reminder block injection", () => {
 
     expect(engine.emitEvent.mock.calls
       .filter(([event]) => event.type === "session_status")
-      .map(([event]) => event.isStreaming)).toEqual([true, false]);
+      .map(([event]) => event.isStreaming)).toEqual([true, true, false]);
     expect(engine.consumeRenderedSessionReminderBlock).not.toHaveBeenCalled();
   });
 
@@ -1634,5 +1681,466 @@ describe("session reminder block injection", () => {
     expect(engine.emitEvent).not.toHaveBeenCalled();
     expect(appendCustomEntry).not.toHaveBeenCalled();
     expect(engine.consumeRenderedSessionReminderBlock).not.toHaveBeenCalled();
+  });
+});
+
+
+describe("knowledgeRefs passthrough (Phase 7)", () => {
+  it("projects displayMessage.knowledgeRefs into the user message event and presentation record", async () => {
+    const session = makeFakeSession();
+    const appendCustomEntry = vi.fn();
+    Object.assign(session, { sessionManager: { appendCustomEntry } });
+    const retrievalStats = {
+      mode: "qa",
+      retrievalMode: "fts",
+      subQueries: ["总结一下"],
+      subQueryHits: [2],
+      degraded: true,
+      degradeReason: "knowledge model slot not configured",
+      fusedChunks: 2,
+      injectedChunks: 2,
+      truncated: false,
+      usedTokens: 64,
+      budgetTokens: 6000,
+    };
+    const engine = {
+      ensureSessionLoaded: vi.fn(async () => session),
+      promptSession: vi.fn(async (sessionPath, text, opts) => session.prompt(text, opts)),
+      emitEvent: vi.fn(),
+      setUiContext: vi.fn(),
+      buildKnowledgeContextInjection: vi.fn(async () => ({
+        block: "[KnowledgeContext]\nevidence\n[/KnowledgeContext]",
+        stats: retrievalStats,
+      })),
+    };
+    const knowledgeRefs = {
+      notebookIds: ["nb-1", "nb-2"],
+      mode: "qa",
+      notebooks: [{ id: "nb-1", name: "产品笔记" }, { id: "nb-2", name: "小说资料" }],
+    };
+
+    await submitDesktopSessionMessage(engine, {
+      sessionPath: "/tmp/desk.jsonl",
+      text: "总结一下",
+      // 功能字段（服务端校验后透传）
+      knowledgeRefs: { notebookIds: ["nb-1", "nb-2"], mode: "qa" },
+      // 展示投影（含名称缓存）
+      displayMessage: { text: "总结一下", knowledgeRefs },
+    });
+
+    expect(engine.emitEvent).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: "session_user_message",
+        message: expect.objectContaining({ knowledgeRefs, knowledgeRetrieval: retrievalStats }),
+      }),
+      "/tmp/desk.jsonl",
+    );
+    expect(appendCustomEntry).toHaveBeenCalledWith(
+      MESSAGE_PRESENTATION_RECORD_TYPE,
+      expect.objectContaining({ displayText: "总结一下", knowledgeRefs, knowledgeRetrieval: retrievalStats }),
+    );
+    // Phase 8：注入块进入模型 prompt（见下方 Phase 8 专测），投影保持原文。
+    const promptText = engine.promptSession.mock.calls[0][1];
+    expect(promptText).toContain("总结一下");
+  });
+
+  it("does not write a presentation record when knowledgeRefs is absent", async () => {
+    const session = makeFakeSession();
+    const appendCustomEntry = vi.fn();
+    Object.assign(session, { sessionManager: { appendCustomEntry } });
+    const engine = {
+      ensureSessionLoaded: vi.fn(async () => session),
+      promptSession: vi.fn(async (sessionPath, text, opts) => session.prompt(text, opts)),
+      emitEvent: vi.fn(),
+      setUiContext: vi.fn(),
+    };
+
+    await submitDesktopSessionMessage(engine, {
+      sessionPath: "/tmp/desk.jsonl",
+      text: "普通消息",
+    });
+
+    expect(appendCustomEntry).not.toHaveBeenCalled();
+    const userMessageEvent = engine.emitEvent.mock.calls.find(
+      ([event]) => event?.type === "session_user_message",
+    );
+    expect(userMessageEvent?.[0]?.message?.knowledgeRefs ?? null).toBeNull();
+  });
+
+  it("rejects malformed knowledgeRefs explicitly instead of dropping them silently", async () => {
+    const session = makeFakeSession();
+    const engine = {
+      ensureSessionLoaded: vi.fn(async () => session),
+      promptSession: vi.fn(async (sessionPath, text, opts) => session.prompt(text, opts)),
+      emitEvent: vi.fn(),
+      setUiContext: vi.fn(),
+    };
+
+    await expect(submitDesktopSessionMessage(engine, {
+      sessionPath: "/tmp/desk.jsonl",
+      text: "你好",
+      knowledgeRefs: { notebookIds: ["nb-1"], mode: "strict" } as any,
+    })).rejects.toThrow('knowledgeRefs.mode must be "qa" or "assist"');
+
+    await expect(submitDesktopSessionMessage(engine, {
+      sessionPath: "/tmp/desk.jsonl",
+      text: "你好",
+      knowledgeRefs: { notebookIds: [""], mode: "qa" } as any,
+    })).rejects.toThrow("knowledgeRefs.notebookIds must be an array of non-empty strings");
+
+    expect(engine.promptSession).not.toHaveBeenCalled();
+  });
+
+  it("rejects malformed knowledgeRefs on the interjection path too", async () => {
+    const session = makeFakeSession();
+    const engine = {
+      ensureSessionLoaded: vi.fn(async () => session),
+      isSessionStreaming: vi.fn(() => true),
+      steerSession: vi.fn(() => true),
+      emitEvent: vi.fn(),
+      setUiContext: vi.fn(),
+    };
+
+    await expect(submitDesktopSessionInterjection(engine, {
+      sessionPath: "/tmp/desk.jsonl",
+      text: "插话",
+      knowledgeRefs: { notebookIds: "nb-1", mode: "qa" } as any,
+    })).rejects.toThrow("knowledgeRefs.notebookIds must be an array of non-empty strings");
+
+    expect(engine.steerSession).not.toHaveBeenCalled();
+  });
+
+  it("normalizes duplicate/whitespace notebookIds and treats empty refs as absent", async () => {
+    const session = makeFakeSession();
+    const engine = {
+      ensureSessionLoaded: vi.fn(async () => session),
+      promptSession: vi.fn(async (sessionPath, text, opts) => session.prompt(text, opts)),
+      emitEvent: vi.fn(),
+      setUiContext: vi.fn(),
+    };
+
+    await submitDesktopSessionMessage(engine, {
+      sessionPath: "/tmp/desk.jsonl",
+      text: "你好",
+      knowledgeRefs: { notebookIds: [], mode: "qa" },
+    });
+    // 空数组归一为无引用，正常提交
+    expect(engine.promptSession).toHaveBeenCalledWith("/tmp/desk.jsonl", "你好", undefined);
+  });
+});
+
+describe("knowledge context injection (Phase 8)", () => {
+  const INJECTION_BLOCK = "[KnowledgeContext]\n[K1] evidence\n[/KnowledgeContext]";
+  const RETRIEVAL_STATS = {
+    mode: "qa",
+    retrievalMode: "hybrid",
+    subQueries: ["苹果 交付"],
+    subQueryHits: [2],
+    degraded: false,
+    fusedChunks: 2,
+    injectedChunks: 1,
+    truncated: true,
+    usedTokens: 5980,
+    budgetTokens: 6000,
+  };
+
+  function injectionEngine(overrides: Record<string, any> = {}) {
+    const session = makeFakeSession();
+    const appendCustomEntry = vi.fn();
+    Object.assign(session, { sessionManager: { appendCustomEntry } });
+    const engine = {
+      ensureSessionLoaded: vi.fn(async () => session),
+      promptSession: vi.fn(async (sessionPath, text, opts) => session.prompt(text, opts)),
+      emitEvent: vi.fn(),
+      setUiContext: vi.fn(),
+      buildKnowledgeContextInjection: vi.fn(async () => ({ block: INJECTION_BLOCK, stats: RETRIEVAL_STATS })),
+      ...overrides,
+    };
+    return { engine, session, appendCustomEntry };
+  }
+
+  it("prepends the injection block to the model prompt but keeps it out of the visible projection", async () => {
+    const { engine, appendCustomEntry } = injectionEngine();
+
+    await submitDesktopSessionMessage(engine, {
+      sessionPath: "/tmp/desk.jsonl",
+      text: "苹果什么时候交付",
+      displayMessage: { text: "苹果什么时候交付" },
+      knowledgeRefs: { notebookIds: ["nb-1"], mode: "qa" },
+    });
+
+    expect(engine.buildKnowledgeContextInjection).toHaveBeenCalledWith({
+      question: "苹果什么时候交付",
+      knowledgeRefs: { notebookIds: ["nb-1"], mode: "qa" },
+      // mock 会话无 model.contextWindow → 动态预算回退固定兜底值。
+      budgetTokens: 6000,
+    });
+    expect(engine.promptSession).toHaveBeenCalledWith(
+      "/tmp/desk.jsonl",
+      `${INJECTION_BLOCK}\n\n苹果什么时候交付`,
+      undefined,
+    );
+    // 用户可见投影（事件与展示条目）不包含注入块，但携带检索统计。
+    const userMessage = engine.emitEvent.mock.calls
+      .find(([event]) => event?.type === "session_user_message")?.[0].message;
+    expect(userMessage.text).toBe("苹果什么时候交付");
+    expect(userMessage.text).not.toContain("[KnowledgeContext]");
+    expect(userMessage.knowledgeRetrieval).toBe(RETRIEVAL_STATS);
+    expect(appendCustomEntry).toHaveBeenCalledWith(
+      MESSAGE_PRESENTATION_RECORD_TYPE,
+      expect.objectContaining({ displayText: "苹果什么时候交付", knowledgeRetrieval: RETRIEVAL_STATS }),
+    );
+    const presentationArg = appendCustomEntry.mock.calls
+      .find(([type]) => type === MESSAGE_PRESENTATION_RECORD_TYPE)?.[1];
+    expect(JSON.stringify(presentationArg)).not.toContain("[KnowledgeContext]");
+  });
+
+  it("forces a displayText presentation entry even without structured displayMessage", async () => {
+    const { engine, appendCustomEntry } = injectionEngine();
+
+    await submitDesktopSessionMessage(engine, {
+      sessionPath: "/tmp/desk.jsonl",
+      text: "只问一句",
+      knowledgeRefs: { notebookIds: ["nb-1"], mode: "assist" },
+    });
+
+    // displayMessage 缺省时也必须持久化展示正文，否则历史投影会显示注入后的 prompt。
+    expect(appendCustomEntry).toHaveBeenCalledWith(
+      MESSAGE_PRESENTATION_RECORD_TYPE,
+      expect.objectContaining({ displayText: "只问一句" }),
+    );
+    expect(engine.promptSession.mock.calls[0][1]).toContain("[KnowledgeContext]");
+  });
+
+  it("keeps the chat flowing with an explicit unavailable annotation when the injector throws", async () => {
+    const { engine } = injectionEngine({
+      buildKnowledgeContextInjection: vi.fn(async () => {
+        throw new Error("embedding provider down");
+      }),
+    });
+
+    await submitDesktopSessionMessage(engine, {
+      sessionPath: "/tmp/desk.jsonl",
+      text: "继续问",
+      displayMessage: { text: "继续问" },
+      knowledgeRefs: { notebookIds: ["nb-1"], mode: "qa" },
+    });
+
+    const promptText = engine.promptSession.mock.calls[0][1];
+    expect(promptText).toContain("[knowledge injection unavailable: embedding provider down]");
+    expect(promptText).toContain("继续问");
+    const userMessage = engine.emitEvent.mock.calls
+      .find(([event]) => event?.type === "session_user_message")?.[0].message;
+    expect(userMessage.text).toBe("继续问");
+    // 降级路径的 stats 带 unavailableReason，其余字段置零/none（禁静默降级）。
+    expect(userMessage.knowledgeRetrieval).toMatchObject({
+      mode: "qa",
+      retrievalMode: "none",
+      subQueries: [],
+      subQueryHits: [],
+      degraded: false,
+      fusedChunks: 0,
+      injectedChunks: 0,
+      truncated: false,
+      usedTokens: 0,
+      budgetTokens: 6000,
+      unavailableReason: "embedding provider down",
+    });
+  });
+
+  it("rejects explicitly when the engine lacks the injection facade while refs are present", async () => {
+    const { engine } = injectionEngine();
+    delete (engine as any).buildKnowledgeContextInjection;
+
+    await expect(submitDesktopSessionMessage(engine, {
+      sessionPath: "/tmp/desk.jsonl",
+      text: "你好",
+      knowledgeRefs: { notebookIds: ["nb-1"], mode: "qa" },
+    })).rejects.toThrow("knowledge injection unavailable");
+    expect(engine.promptSession).not.toHaveBeenCalled();
+  });
+
+  it("does not call the injector when knowledgeRefs is absent or normalized away", async () => {
+    const { engine } = injectionEngine();
+
+    await submitDesktopSessionMessage(engine, {
+      sessionPath: "/tmp/desk.jsonl",
+      text: "普通消息",
+      displayMessage: { text: "普通消息" },
+    });
+    await submitDesktopSessionMessage(engine, {
+      sessionPath: "/tmp/desk.jsonl",
+      text: "空引用",
+      displayMessage: { text: "空引用" },
+      knowledgeRefs: { notebookIds: [], mode: "qa" },
+    });
+
+    expect(engine.buildKnowledgeContextInjection).not.toHaveBeenCalled();
+    expect(engine.promptSession).toHaveBeenLastCalledWith("/tmp/desk.jsonl", "空引用", undefined);
+  });
+
+  it("skips injection when replaying a preserved prompt envelope", async () => {
+    const { engine } = injectionEngine();
+
+    await submitDesktopSessionMessage(engine, {
+      sessionPath: "/tmp/desk.jsonl",
+      text: `${INJECTION_BLOCK}\n\nenvelope text`,
+      knowledgeRefs: { notebookIds: ["nb-1"], mode: "qa" },
+      preservePromptEnvelope: true,
+    } as any);
+
+    expect(engine.buildKnowledgeContextInjection).not.toHaveBeenCalled();
+    expect(engine.promptSession).toHaveBeenCalledWith(
+      "/tmp/desk.jsonl",
+      `${INJECTION_BLOCK}\n\nenvelope text`,
+      undefined,
+    );
+    // 重放不重新检索：新消息不携带检索统计（retry/fork 路径不复制旧 stats）。
+    const userMessage = engine.emitEvent.mock.calls
+      .find(([event]) => event?.type === "session_user_message")?.[0].message;
+    expect(userMessage.knowledgeRetrieval).toBeNull();
+  });
+
+  it("emits knowledge_retrieval_started before the blocking injection resolves", async () => {
+    const { engine } = injectionEngine();
+    let resolveInjection!: (value: { block: string; stats: typeof RETRIEVAL_STATS }) => void;
+    engine.buildKnowledgeContextInjection = vi.fn(() => new Promise((resolve) => {
+      resolveInjection = resolve;
+    }));
+    const submitted = submitDesktopSessionMessage(engine, {
+      sessionPath: "/tmp/desk.jsonl",
+      text: "苹果什么时候交付",
+      displayMessage: { text: "苹果什么时候交付" },
+      knowledgeRefs: { notebookIds: ["nb-1"], mode: "qa" },
+    });
+
+    await vi.waitFor(() => {
+      expect(engine.emitEvent).toHaveBeenCalledWith(
+        { type: "knowledge_retrieval_started", sessionPath: "/tmp/desk.jsonl" },
+        "/tmp/desk.jsonl",
+      );
+    });
+    // 注入未完成：promptSession 尚未被调用，事件先于用户投影（发送即置忙的
+    // 提前 session_status 是唯一允许更早的事件）。
+    expect(engine.promptSession).not.toHaveBeenCalled();
+
+    resolveInjection({ block: INJECTION_BLOCK, stats: RETRIEVAL_STATS });
+    await submitted;
+    const finalTypes = engine.emitEvent.mock.calls.map(([event]) => event.type);
+    expect(finalTypes.indexOf("knowledge_retrieval_started")).toBeLessThan(finalTypes.indexOf("session_user_message"));
+  });
+
+  it("检索期间 abort：跳过 promptSession 与用户投影，补发 isStreaming:false 收回提前忙态", async () => {
+    const { engine, appendCustomEntry } = injectionEngine();
+    let resolveInjection!: (value: { block: string; stats: typeof RETRIEVAL_STATS }) => void;
+    engine.buildKnowledgeContextInjection = vi.fn(() => new Promise((resolve) => {
+      resolveInjection = resolve;
+    }));
+    const submitted = submitDesktopSessionMessage(engine, {
+      sessionPath: "/tmp/desk.jsonl",
+      text: "检索中被停止",
+      displayMessage: { text: "检索中被停止" },
+      knowledgeRefs: { notebookIds: ["nb-1"], mode: "qa" },
+    });
+
+    await vi.waitFor(() => {
+      expect(engine.emitEvent).toHaveBeenCalledWith(
+        { type: "knowledge_retrieval_started", sessionPath: "/tmp/desk.jsonl" },
+        "/tmp/desk.jsonl",
+      );
+    });
+    // 用户点停止：abort 路由标记 pending 提交（sessionId 与 path 两种键都命中）。
+    expect(abortPendingDesktopSubmission(engine, { sessionPath: "/tmp/desk.jsonl" })).toBe(true);
+
+    resolveInjection({ block: INJECTION_BLOCK, stats: RETRIEVAL_STATS });
+    const result = await submitted;
+    expect(result).toEqual({ text: null, toolMedia: [] });
+    expect(engine.promptSession).not.toHaveBeenCalled();
+    expect(appendCustomEntry).not.toHaveBeenCalled();
+    const types = engine.emitEvent.mock.calls.map(([event]) => event.type);
+    expect(types).not.toContain("session_user_message");
+    // 提前置忙 + abort 收回：最后一次 session_status 是 isStreaming:false 且带 aborted。
+    const statusCalls = engine.emitEvent.mock.calls.filter(([event]) => event.type === "session_status");
+    expect(statusCalls[statusCalls.length - 1][0]).toMatchObject({ isStreaming: false, aborted: true, reason: "user_abort" });
+    // abort 消费后不留残留：同一 session 立即可再次提交。
+    await submitDesktopSessionMessage(engine, {
+      sessionPath: "/tmp/desk.jsonl",
+      text: "下一条",
+      displayMessage: { text: "下一条" },
+    });
+    expect(engine.promptSession).toHaveBeenCalledTimes(1);
+  });
+
+  it("does not emit knowledge_retrieval_started when knowledgeRefs is absent", async () => {
+    const { engine } = injectionEngine();
+
+    await submitDesktopSessionMessage(engine, {
+      sessionPath: "/tmp/desk.jsonl",
+      text: "普通消息",
+      displayMessage: { text: "普通消息" },
+    });
+
+    const emittedTypes = engine.emitEvent.mock.calls.map(([event]) => event.type);
+    expect(emittedTypes).not.toContain("knowledge_retrieval_started");
+  });
+
+  it("emits knowledge_retrieval_started on the interjection path before steering", async () => {
+    const { engine } = injectionEngine();
+    let resolveInjection!: (value: { block: string; stats: typeof RETRIEVAL_STATS }) => void;
+    engine.buildKnowledgeContextInjection = vi.fn(() => new Promise((resolve) => {
+      resolveInjection = resolve;
+    }));
+    const steerSession = vi.fn(() => true);
+    Object.assign(engine, {
+      isSessionStreaming: vi.fn(() => true),
+      steerSession,
+    });
+    const submitted = submitDesktopSessionInterjection(engine, {
+      sessionPath: "/tmp/desk.jsonl",
+      text: "插一句",
+      displayMessage: { text: "插一句" },
+      knowledgeRefs: { notebookIds: ["nb-1"], mode: "qa" },
+    });
+
+    await vi.waitFor(() => {
+      expect(engine.emitEvent).toHaveBeenCalledWith(
+        { type: "knowledge_retrieval_started", sessionPath: "/tmp/desk.jsonl" },
+        "/tmp/desk.jsonl",
+      );
+    });
+    expect(steerSession).not.toHaveBeenCalled();
+
+    resolveInjection({ block: INJECTION_BLOCK, stats: RETRIEVAL_STATS });
+    await submitted;
+    expect(steerSession).toHaveBeenCalledWith("/tmp/desk.jsonl", `${INJECTION_BLOCK}\n\n插一句`);
+  });
+
+  it("injects into the interjection (steer) prompt as well without polluting the projection", async () => {
+    const { engine, appendCustomEntry } = injectionEngine();
+    const steerSession = vi.fn(() => true);
+    Object.assign(engine, {
+      isSessionStreaming: vi.fn(() => true),
+      steerSession,
+    });
+
+    await submitDesktopSessionInterjection(engine, {
+      sessionPath: "/tmp/desk.jsonl",
+      text: "插一句",
+      displayMessage: { text: "插一句" },
+      knowledgeRefs: { notebookIds: ["nb-1"], mode: "qa" },
+    });
+
+    expect(steerSession).toHaveBeenCalledWith(
+      "/tmp/desk.jsonl",
+      `${INJECTION_BLOCK}\n\n插一句`,
+    );
+    const userMessage = engine.emitEvent.mock.calls
+      .find(([event]) => event?.type === "session_user_message")?.[0].message;
+    expect(userMessage.text).toBe("插一句");
+    expect(userMessage.knowledgeRetrieval).toBe(RETRIEVAL_STATS);
+    expect(appendCustomEntry).toHaveBeenCalledWith(
+      MESSAGE_PRESENTATION_RECORD_TYPE,
+      expect.objectContaining({ displayText: "插一句", knowledgeRetrieval: RETRIEVAL_STATS }),
+    );
   });
 });

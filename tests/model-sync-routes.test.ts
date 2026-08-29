@@ -252,6 +252,7 @@ describe("model sync related routes", () => {
     const read = await app.request("/api/preferences/models");
     expect(await read.json()).toMatchObject({ operation_models: operationModels });
 
+    // v8 起嵌入/重排只在笔记本级配置：全局 PUT 显式 400（不进 chat model sync）。
     const write = await app.request("/api/preferences/models", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
@@ -259,16 +260,14 @@ describe("model sync related routes", () => {
         models: { embedding: { id: "embed-model", provider: "provider-a" } },
       }),
     });
-    expect(write.status).toBe(200);
-    expect(engine.listModelOperationModels).toHaveBeenCalledWith("embedding");
-    expect(engine.setSharedModels).toHaveBeenCalledWith({
-      embedding: { id: "embed-model", provider: "provider-a" },
-    });
+    expect(write.status).toBe(400);
+    expect(await write.json()).toMatchObject({ error: 'unknown shared model field "embedding"' });
+    expect(engine.setSharedModels).not.toHaveBeenCalled();
     expect(engine.syncModelsAndRefresh).not.toHaveBeenCalled();
-    expectAppEvent(engine.emitEvent, "models-changed", { agentId: null });
+    expect(engine.emitEvent).not.toHaveBeenCalled();
   });
 
-  it("rejects an unavailable configured operation model instead of saving a fallback", async () => {
+  it("rejects retired knowledge operation fields instead of saving a fallback (v8)", async () => {
     const { createPreferencesRoute } = await import("../server/routes/preferences.ts");
     const app = new Hono();
     const engine = {
@@ -290,7 +289,8 @@ describe("model sync related routes", () => {
       }),
     });
     expect(response.status).toBe(400);
-    expect(await response.json()).toMatchObject({ error: "embedding model is unavailable" });
+    // v8：字段本身已被拒绝（先于目录校验）。
+    expect(await response.json()).toMatchObject({ error: 'unknown shared model field "embedding"' });
     expect(engine.setSharedModels).not.toHaveBeenCalled();
     expect(engine.emitEvent).not.toHaveBeenCalled();
   });

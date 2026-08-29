@@ -1,5 +1,31 @@
 import { lingxiFetch, lingxiUrl } from '../../hooks/use-hana-fetch';
 
+export interface KnowledgeModelRefDto {
+  id: string;
+  provider: string;
+}
+
+/**
+ * 笔记本级配置（v8 语义）：模型引用 null = 未配置（检索降级纯全文）；
+ * chunkTargetChars null = 自动分块（遗留显式值仍生效）；retrievalTopK
+ * null = 无上限召回。
+ */
+export interface KnowledgeNotebookConfigDto {
+  embeddingModelRef: KnowledgeModelRefDto | null;
+  rerankModelRef: KnowledgeModelRefDto | null;
+  chunkTargetChars: number | null;
+  retrievalTopK: number | null;
+}
+
+/** 按每个源的最新摄入 job 归类的就绪汇总。 */
+export interface KnowledgeNotebookIngestionDto {
+  done: number;
+  pendingEmbedding: number;
+  processing: number;
+  failed: number;
+  untracked: number;
+}
+
 export interface KnowledgeNotebookDto {
   id: string;
   studioId: string;
@@ -7,6 +33,47 @@ export interface KnowledgeNotebookDto {
   createdAt: string;
   updatedAt: string;
   deletedAt: string | null;
+  config: KnowledgeNotebookConfigDto;
+  /** 生效分块尺寸（遗留显式列 > 嵌入模型上下文 ×80% 自动值），设置弹窗只读展示。 */
+  chunkTargetCharsEffective?: number | null;
+  sourceCount: number;
+  ingestion: KnowledgeNotebookIngestionDto;
+}
+
+export type KnowledgeIngestionStatusDto = 'queued' | 'running' | 'pending_embedding' | 'failed' | 'done';
+export type KnowledgeIngestionPhaseDto = 'parse' | 'chunk' | 'fts_index' | 'embed' | 'done';
+
+export interface KnowledgeIngestionJobDto {
+  id: string;
+  notebookId: string;
+  sourceId: string;
+  artifactId: string | null;
+  phase: KnowledgeIngestionPhaseDto;
+  status: KnowledgeIngestionStatusDto;
+  attempt: number;
+  retryAfter: string | null;
+  error: string | null;
+  chunkerConfigId: string;
+  createdAt: string;
+  updatedAt: string;
+  /** embed 阶段进度：progressDone 从 0 递增；progressTotal null = 未进入 embed 阶段。 */
+  progressDone?: number;
+  progressTotal?: number | null;
+}
+
+export interface KnowledgeIngestionStateDto {
+  jobs: KnowledgeIngestionJobDto[];
+  counts: Record<KnowledgeIngestionStatusDto, number>;
+  /** 文件 watch 检出"源文件不可达"的源（仅不可达项；老服务端可能不返回该字段） */
+  unreachableSources?: Array<{
+    sourceId: string;
+    studioId: string;
+    notebooks: string[];
+    watching: boolean;
+    unreachable: boolean;
+    unreachableReason: string | null;
+    unreachableSince: string | null;
+  }>;
 }
 
 export type KnowledgeParseStatusDto = 'parsing' | 'ready' | 'needs_ocr' | 'failed';
@@ -60,56 +127,6 @@ export interface KnowledgeBlockDto {
   locator: Record<string, unknown>;
 }
 
-export interface KnowledgeScopeSnapshotDto {
-  id: string;
-  studioId: string;
-  mode: 'quick' | 'research';
-  createdAt: string;
-  notebooks: Array<{
-    scopeSnapshotId: string;
-    notebookId: string;
-    notebookName: string;
-    ordinal: number;
-  }>;
-  sources: Array<{
-    scopeSnapshotId: string;
-    notebookId: string;
-    sourceId: string;
-    sourceDisplayName: string;
-    contentSnapshotId: string;
-    parseArtifactId: string;
-    ordinal: number;
-  }>;
-}
-
-export interface KnowledgeRunDto {
-  id: string;
-  studioId: string;
-  mode: 'quick' | 'research';
-  question: string;
-  scopeSnapshotId: string;
-  status: 'running' | 'completed' | 'failed' | 'cancelled';
-  retrievalMode: 'fts' | 'hybrid';
-  answerText: string | null;
-  errorCode: string | null;
-  createdAt: string;
-  completedAt: string | null;
-  citations: Array<{
-    runId: string;
-    ordinal: number;
-    marker: number;
-    citationId: string;
-    candidateRef: string;
-  }>;
-  retrievals: Array<{
-    runId: string;
-    rank: number;
-    chunkId: string;
-    parseArtifactId: string;
-    score: number;
-  }>;
-}
-
 export interface KnowledgeCitationDto {
   id: string;
   parseArtifactId: string;
@@ -131,108 +148,6 @@ export interface KnowledgeResolvedCitationDto {
     contentUrl: string;
     locator: Record<string, unknown>;
   };
-}
-
-export interface KnowledgeQueryResultDto {
-  run: KnowledgeRunDto;
-  scope: KnowledgeScopeSnapshotDto;
-  retrievalBasis: 'related_content';
-  citations: Array<Omit<KnowledgeResolvedCitationDto, 'block'> & {
-    marker: number;
-    locator: Record<string, unknown>;
-  }>;
-}
-
-export interface KnowledgeCoverageMetricDto {
-  completed: number;
-  total: number;
-}
-
-export interface KnowledgeResearchCoverageDto {
-  sourceReadiness: KnowledgeCoverageMetricDto;
-  extraction: KnowledgeCoverageMetricDto;
-  primaryScan: KnowledgeCoverageMetricDto;
-  contradiction: KnowledgeCoverageMetricDto;
-  citationValidation: KnowledgeCoverageMetricDto & { valid: number; invalid: number };
-}
-
-export interface KnowledgeResearchRunDto {
-  runId: string;
-  hostTaskId: string;
-  state:
-    | 'queued'
-    | 'preparing_scope'
-    | 'building_manifest'
-    | 'scanning'
-    | 'building_claims'
-    | 'checking_contradictions'
-    | 'synthesizing'
-    | 'completed'
-    | 'recovering'
-    | 'partial'
-    | 'failed'
-    | 'canceled';
-  spec: {
-    originalQuestion: string;
-    scopeSnapshotId: string;
-    notebookIds: string[];
-    goal: string;
-    dimensions: string[];
-    outputRequirements: string[];
-    definitions: string[];
-    assumptions: string[];
-  };
-  manifest: {
-    runId: string;
-    sourceCount: number;
-    parseArtifactCount: number;
-    blockCount: number;
-    unitCount: number;
-    primaryCharCount: number;
-    createdAt: string;
-  } | null;
-  coverage: KnowledgeResearchCoverageDto;
-  reportAvailable: boolean;
-  errorCode: string | null;
-  createdAt: string;
-  updatedAt: string;
-  completedAt: string | null;
-}
-
-export interface KnowledgeResearchRunResultDto {
-  run: KnowledgeRunDto;
-  scope: KnowledgeScopeSnapshotDto;
-  research: KnowledgeResearchRunDto;
-  citations: [];
-}
-
-export interface KnowledgeResearchReportItemDto {
-  text: string;
-  claimIds: string[];
-  citationMarkers: number[];
-}
-
-export interface KnowledgeResearchReportDto {
-  runId: string;
-  title: string;
-  summary: string;
-  conclusions: KnowledgeResearchReportItemDto[];
-  majorFindings: KnowledgeResearchReportItemDto[];
-  conflicts: KnowledgeResearchReportItemDto[];
-  uncertainties: string[];
-  limitations: string[];
-  coverage: KnowledgeResearchCoverageDto;
-  citations: Array<{ marker: number; evidenceId: string; citationId: string }>;
-  createdAt: string;
-}
-
-export interface KnowledgeResearchReportResultDto {
-  report: KnowledgeResearchReportDto;
-  citations: Array<Omit<KnowledgeResolvedCitationDto, 'block'> & {
-    marker: number;
-    evidenceId: string;
-    locator: Record<string, unknown>;
-  }>;
 }
 
 interface KnowledgeApiErrorBody {
@@ -283,6 +198,50 @@ export async function renameKnowledgeNotebook(id: string, name: string): Promise
 
 export async function deleteKnowledgeNotebook(id: string): Promise<void> {
   await knowledgeRequest(`/api/knowledge/notebooks/${encodeURIComponent(id)}`, { method: 'DELETE' });
+}
+
+/** 笔记本设置部分更新：字段 omitted=不变、null=清除（未配置/无上限召回）。 */
+export async function updateKnowledgeNotebookSettings(
+  id: string,
+  settings: {
+    embeddingModelRef?: KnowledgeModelRefDto | null;
+    rerankModelRef?: KnowledgeModelRefDto | null;
+    retrievalTopK?: number | null;
+  },
+): Promise<KnowledgeNotebookConfigDto> {
+  const data = await knowledgeRequest<{ config: KnowledgeNotebookConfigDto }>(
+    `/api/knowledge/notebooks/${encodeURIComponent(id)}/settings`,
+    {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(settings),
+    },
+  );
+  return data.config;
+}
+
+export async function listKnowledgeIngestion(input: {
+  notebookId?: string;
+  sourceId?: string;
+}): Promise<KnowledgeIngestionStateDto> {
+  const params = new URLSearchParams();
+  if (input.notebookId) params.set('notebookId', input.notebookId);
+  if (input.sourceId) params.set('sourceId', input.sourceId);
+  const query = params.toString();
+  return knowledgeRequest<KnowledgeIngestionStateDto>(
+    `/api/knowledge/ingestion${query ? `?${query}` : ''}`,
+  );
+}
+
+/** failed 摄入 job 手动重试；无 job 时服务端兜底入队。 */
+export async function reingestKnowledgeSource(
+  notebookId: string,
+  sourceId: string,
+): Promise<{ job: KnowledgeIngestionJobDto; retried: boolean }> {
+  return knowledgeRequest<{ job: KnowledgeIngestionJobDto; retried: boolean }>(
+    `/api/knowledge/notebooks/${encodeURIComponent(notebookId)}/sources/${encodeURIComponent(sourceId)}/reingest`,
+    { method: 'POST' },
+  );
 }
 
 export async function listKnowledgeSources(notebookId: string): Promise<KnowledgeSourceEntryDto[]> {
@@ -358,60 +317,26 @@ export async function listKnowledgeBlocks(parseArtifactId: string): Promise<Know
   return data.blocks;
 }
 
-export async function runKnowledgeQuickAnswer(input: {
-  question: string;
-  notebookIds: string[];
-}): Promise<KnowledgeQueryResultDto> {
-  return knowledgeRequest<KnowledgeQueryResultDto>('/api/knowledge/query', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      mode: 'quick',
-      question: input.question,
-      notebookIds: input.notebookIds,
-    }),
-  });
+/** 摄入分块卡片（GET .../chunks；ordinal 为 1-based，定位信息来自 block locator 组装）。 */
+export interface KnowledgeChunkDto {
+  id: string;
+  ordinal: number;
+  text: string;
+  tokenCount: number;
+  charCount: number;
+  headingPath?: string[];
+  pageNumber?: number;
 }
 
-export async function runKnowledgeResearch(input: {
-  question: string;
-  notebookIds: string[];
-}): Promise<KnowledgeResearchRunResultDto> {
-  return knowledgeRequest<KnowledgeResearchRunResultDto>('/api/knowledge/query', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      mode: 'research',
-      question: input.question,
-      notebookIds: input.notebookIds,
-    }),
-  });
+export interface KnowledgeChunksDto {
+  chunkerConfigId: string;
+  chunks: KnowledgeChunkDto[];
 }
 
-export async function listActiveKnowledgeResearchRuns(): Promise<KnowledgeResearchRunResultDto[]> {
-  const data = await knowledgeRequest<{ runs: KnowledgeResearchRunResultDto[] }>('/api/knowledge/runs');
-  return data.runs;
-}
-
-export async function getKnowledgeResearchRun(runId: string): Promise<KnowledgeResearchRunResultDto> {
-  return knowledgeRequest<KnowledgeResearchRunResultDto>(
-    `/api/knowledge/runs/${encodeURIComponent(runId)}`,
-  );
-}
-
-export async function cancelKnowledgeResearch(runId: string): Promise<{
-  run: KnowledgeRunDto;
-  research: KnowledgeResearchRunDto;
-}> {
-  return knowledgeRequest(
-    `/api/knowledge/runs/${encodeURIComponent(runId)}/cancel`,
-    { method: 'POST' },
-  );
-}
-
-export async function getKnowledgeResearchReport(runId: string): Promise<KnowledgeResearchReportResultDto> {
-  return knowledgeRequest<KnowledgeResearchReportResultDto>(
-    `/api/knowledge/runs/${encodeURIComponent(runId)}/report`,
+/** 分块内容视图数据；artifact 未 ready 时服务端返回 422。 */
+export async function listKnowledgeChunks(parseArtifactId: string): Promise<KnowledgeChunksDto> {
+  return knowledgeRequest<KnowledgeChunksDto>(
+    `/api/knowledge/parse-artifacts/${encodeURIComponent(parseArtifactId)}/chunks`,
   );
 }
 

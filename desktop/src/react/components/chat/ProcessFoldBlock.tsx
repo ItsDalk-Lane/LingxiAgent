@@ -2,6 +2,7 @@ import { memo, useCallback, useEffect, useId, useMemo, useState } from 'react';
 import { Collapse } from '@/ui';
 import { AgentAvatar, type AgentDisplayInfo } from '../../utils/agent-display';
 import { AssistantBlockList } from './AssistantBlockList';
+import { KnowledgeRetrievalFold } from './KnowledgeRetrievalFold';
 import { MessageFooterActions, formatMessageTime } from './MessageFooterActions';
 import { buildProcessFoldSummary, type ProcessFoldRenderItem } from './process-fold';
 import { useSessionNodeActions } from './SessionNodeActions';
@@ -10,6 +11,7 @@ import type {
   SessionNodeTarget,
 } from '../../stores/message-turn-actions';
 import type { ChatMessage } from '../../stores/chat-types';
+import type { KnowledgeRetrievalStats } from '../../../../../shared/knowledge-refs.ts';
 import styles from './Chat.module.css';
 import { subscribeChatCardNavigation } from '../../services/chat-card-navigation';
 
@@ -24,6 +26,7 @@ interface Props {
   assistantTurnTargetsByCompletionIndex?: ReadonlyMap<number, SessionNodeTarget>;
   assistantTurnRetryMessagesByCompletionIndex?: ReadonlyMap<number, ChatMessage>;
   assistantSkillPromptsByIndex?: ReadonlyMap<number, string>;
+  assistantKnowledgeRetrievalByIndex?: ReadonlyMap<number, KnowledgeRetrievalStats>;
   completionTimePersistent?: boolean;
   agentDisplay: AgentDisplayInfo & { yuan: string };
   isStreaming: boolean;
@@ -43,6 +46,7 @@ export const ProcessFoldBlock = memo(function ProcessFoldBlock({
   assistantTurnTargetsByCompletionIndex,
   assistantTurnRetryMessagesByCompletionIndex,
   assistantSkillPromptsByIndex,
+  assistantKnowledgeRetrievalByIndex,
   completionTimePersistent = false,
   agentDisplay,
   isStreaming,
@@ -84,6 +88,10 @@ export const ProcessFoldBlock = memo(function ProcessFoldBlock({
   const registerRefElement = useCallback((messageId: string) => (
     (element: HTMLDivElement | null) => registerMessageElement?.(messageId, element)
   ), [registerMessageElement]);
+  // 纯检索轮的 fold 无 refs（没有工具/思考块）：检索卡直接在面板渲染。
+  const knowledgeOnlyRetrieval = group.refs.length === 0
+    ? assistantKnowledgeRetrievalByIndex?.get(group.originalIndex) ?? null
+    : null;
   // 完成状态/操作取该轮最后一个源消息（与 turnCompletion 索引对齐）。
   const lastRef = group.refs[group.refs.length - 1];
   const turnCompletionEntry = group.ownsTurnCompletion && turnCompletionAssistantIndexes && lastRef
@@ -140,6 +148,9 @@ export const ProcessFoldBlock = memo(function ProcessFoldBlock({
         )}
         <Collapse open={open} className={styles.processFoldCollapse}>
           <div id={panelId} className={`${styles.message} ${styles.messageAssistant} ${styles.processFoldPanel}`}>
+            {knowledgeOnlyRetrieval && (
+              <KnowledgeRetrievalFold retrieval={knowledgeOnlyRetrieval} />
+            )}
             {group.refs.map((ref) => (
               <div
                 key={ref.sourceMessageId}
@@ -155,6 +166,7 @@ export const ProcessFoldBlock = memo(function ProcessFoldBlock({
                   isStreaming={isStreaming}
                   readOnly={readOnly}
                   skillPrompt={assistantSkillPromptsByIndex?.get(ref.originalIndex) ?? null}
+                  knowledgeRetrieval={assistantKnowledgeRetrievalByIndex?.get(ref.originalIndex) ?? null}
                 />
               </div>
             ))}

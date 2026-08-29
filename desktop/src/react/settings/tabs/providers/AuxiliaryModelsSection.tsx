@@ -13,67 +13,8 @@ import {
 } from '../../../../../../shared/auxiliary-slot-ids.ts';
 
 type ModelRef = { id: string; provider: string };
-type OperationModel = ModelRef & {
-  displayName?: string;
-  name?: string;
-  operations?: string[];
-};
 
-function operationValue(ref: ModelRef | null): string {
-  return ref?.provider && ref.id ? `${ref.provider}\u0000${ref.id}` : '';
-}
 
-function KnowledgeOperationRow({
-  operation,
-  titleKey,
-  hintKey,
-  models,
-  value,
-}: {
-  operation: 'embedding' | 'rerank';
-  titleKey: string;
-  hintKey: string;
-  models: OperationModel[];
-  value: ModelRef | null;
-}) {
-  const available = models.filter(model => model.operations?.includes(operation));
-  const selectedValue = operationValue(value);
-  const selectedAvailable = available.some(model => operationValue(model) === selectedValue);
-  return (
-    <div className={styles['pv-model-config-row']} data-operation={operation}>
-      <div className={styles['pv-model-config-label']}>
-        <span className={styles['pv-model-config-title']}>{t(titleKey)}</span>
-        <span className={styles['settings-form-hint']}>{t(hintKey)}</span>
-        <span className={styles['settings-form-hint']}>{t('settings.api.knowledgeOperationUsesProviderCredential')}</span>
-      </div>
-      <div className={styles['pv-model-config-control']}>
-        <select
-          className={styles['pv-model-config-select']}
-          aria-label={t(titleKey)}
-          value={selectedValue}
-          onChange={(event) => {
-            const selected = available.find(model => operationValue(model) === event.target.value);
-            autoSaveGlobalModels({
-              models: { [operation]: selected ? { id: selected.id, provider: selected.provider } : null },
-            });
-          }}
-        >
-          <option value="">{t('settings.api.knowledgeOperationOptional')}</option>
-          {value && !selectedAvailable && (
-            <option value={selectedValue} disabled>
-              {t('settings.api.knowledgeOperationUnavailable')}: {value.provider}/{value.id}
-            </option>
-          )}
-          {available.map(model => (
-            <option key={operationValue(model)} value={operationValue(model)}>
-              {model.displayName || model.name || model.id} · {model.provider}
-            </option>
-          ))}
-        </select>
-      </div>
-    </div>
-  );
-}
 
 function ToolModelTestBtn({ modelRef }: { modelRef: unknown }) {
   const [status, setStatus] = useState<'idle' | 'testing' | 'ok' | 'fail'>('idle');
@@ -154,7 +95,7 @@ export function AuxiliaryModelsSection({ providers }: { providers: Record<string
   );
 
   // UI-only metadata keyed by canonical Slot id。Slot 身份来自 shared 单一真理源
-  // （shared/auxiliary-slot-ids.ts），不再手写 field 字符串数组；新增第 7 个 Slot 时，
+  // （shared/auxiliary-slot-ids.ts），不再手写 field 字符串数组；新增 Slot 时，
   // 这里的 Record<AuxiliarySlot, ...> 会因缺 key 直接编译失败，强迫 UI 补齐。
   const UI_METADATA: Record<AuxiliarySlot, {
     titleKey: string;
@@ -167,6 +108,7 @@ export function AuxiliaryModelsSection({ providers }: { providers: Record<string
     summarize: { titleKey: 'settings.api.auxSummarizeModel', hintKey: 'settings.api.auxSummarizeModelHint', fallbackKey: 'settings.api.auxFallbackChat', followKey: 'settings.api.auxFollowMain' },
     memory: { titleKey: 'settings.api.auxMemoryModel', hintKey: 'settings.api.auxMemoryModelHint', fallbackKey: 'settings.api.auxFallbackChat', followKey: 'settings.api.auxFollowMain' },
     knowledge: { titleKey: 'settings.api.auxKnowledgeModel', hintKey: 'settings.api.auxKnowledgeModelHint', fallbackKey: 'settings.api.auxFallbackChat', followKey: 'settings.api.auxFollowMain' },
+    knowledgeDistill: { titleKey: 'settings.api.auxKnowledgeDistillModel', hintKey: 'settings.api.auxKnowledgeDistillModelHint', fallbackKey: 'settings.api.auxFallbackChat', followKey: 'settings.api.auxFollowMain' },
     vision: { titleKey: 'settings.api.visionModel', hintKey: 'settings.api.visionModelHint', fallbackKey: 'settings.api.auxFallbackVision', followKey: 'settings.api.auxFollowMain', imageOnly: true },
     approval: { titleKey: 'settings.api.auxApprovalModel', hintKey: 'settings.api.auxApprovalModelHint', fallbackKey: 'settings.api.auxFallbackApproval', followKey: 'settings.api.auxFollowDisabled' },
     guard: { titleKey: 'settings.api.auxGuardModel', hintKey: 'settings.api.auxGuardModelHint', fallbackKey: 'settings.api.auxFallbackGuard', followKey: 'settings.api.auxFollowDisabled' },
@@ -174,9 +116,6 @@ export function AuxiliaryModelsSection({ providers }: { providers: Record<string
   const slots = AUXILIARY_SLOT_IDS.map((id) => ({ field: id, ...UI_METADATA[id] }));
 
   const visionAuxiliaryEnabled = globalModelsConfig ? globalModelsConfig.models?.vision_enabled === true : undefined;
-  const operationModels = Array.isArray(globalModelsConfig?.operation_models)
-    ? globalModelsConfig.operation_models as OperationModel[]
-    : [];
 
   return (
     <div className={styles['pv-model-config']}>
@@ -220,24 +159,6 @@ export function AuxiliaryModelsSection({ providers }: { providers: Record<string
                 </div>
               </div>
             </div>
-            {slot.field === 'knowledge' && (
-              <>
-                <KnowledgeOperationRow
-                  operation="embedding"
-                  titleKey="settings.api.knowledgeEmbeddingModel"
-                  hintKey="settings.api.knowledgeEmbeddingModelHint"
-                  models={operationModels}
-                  value={toModelRef(globalModelsConfig?.models?.embedding)}
-                />
-                <KnowledgeOperationRow
-                  operation="rerank"
-                  titleKey="settings.api.knowledgeRerankModel"
-                  hintKey="settings.api.knowledgeRerankModelHint"
-                  models={operationModels}
-                  value={toModelRef(globalModelsConfig?.models?.rerank)}
-                />
-              </>
-            )}
           </React.Fragment>
         );
       })}

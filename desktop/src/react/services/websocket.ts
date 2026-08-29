@@ -178,6 +178,9 @@ async function openConnectionWebSocket(connection: ServerConnection): Promise<vo
 
   _ws.onclose = () => {
     setStatus('status.disconnected', false);
+    // 断连后再不会有后续事件来清「等待助手」pending；streamingSessions 保留
+    // （重连 resume 靠它圈目标），pending 必须就地全清，否则挂出永久指示器。
+    useStore.getState().clearAllTurnPending?.();
     scheduleReconnect();
   };
 

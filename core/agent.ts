@@ -43,6 +43,7 @@ import { createCheckDeferredTool } from "../lib/tools/check-deferred-tool.ts";
 import { createLoopControlTool } from "../lib/tools/loop-control-tool.ts";
 import { createStopTaskTool } from "../lib/tools/stop-task-tool.ts";
 import { createCurrentStatusTool } from "../lib/tools/current-status-tool.ts";
+import { createKnowledgeReadTool } from "../lib/tools/knowledge-read-tool.ts";
 import { createWorkflowTool } from "../lib/tools/workflow-tool.ts";
 import { createCardGuideTool } from "../lib/tools/card-guide-tool.ts";
 import { createSessionTool } from "../lib/tools/session-tool.ts";
@@ -108,6 +109,7 @@ export class Agent {
   declare _config: any;
   declare _cronStore: any;
   declare _currentStatusTool: any;
+  declare _knowledgeReadTool: any;
   declare _descriptionRefreshHandler: any;
   declare _deskManager: any;
   declare _disposing: any;
@@ -242,6 +244,7 @@ export class Agent {
     this._sessionTool = null;
     this._workflowTool = null;
     this._currentStatusTool = null;
+    this._knowledgeReadTool = null;
     this._loopControlTool = null;
 
     /**
@@ -602,6 +605,12 @@ export class Agent {
       getSessionFolderScope: (sessionPath) => this._cb?.getEngine?.()?.getSessionFolderScope?.(sessionPath) || null,
       getBridgeContext: (sessionPath) => this._cb?.getEngine?.()?.getBridgeContextForSessionPath?.(sessionPath, { agentId: this.id }) || null,
       listOpenSubagentThreads: (sessionPath) => this._cb?.getSubagentThreadStore?.()?.listOpenDirectBySession?.(sessionPath) || [],
+    });
+    // knowledge_read：读知识库源分片。直连 engine 级 KnowledgeManager（跨会话），
+    // 供 [KnowledgeContext] 超预算时模型派出的子 Agent 并行读片；只读 + studio 隔离。
+    this._knowledgeReadTool = createKnowledgeReadTool({
+      getKnowledge: () => this._cb?.getEngine?.()?.knowledge || null,
+      getStudioId: () => this._cb?.getEngine?.()?.runtimeContext?.studioId || null,
     });
     // 10. 设置修改工具
     this._updateSettingsTool = createUpdateSettingsTool({
@@ -969,6 +978,7 @@ export class Agent {
       this._checkDeferredTool,
       this._loopControlTool,
       this._currentStatusTool,
+      this._knowledgeReadTool,
       ...(surface === "desktop" ? [this._sessionTool] : []),
       this._cardGuideTool,
       this._showCardTool,

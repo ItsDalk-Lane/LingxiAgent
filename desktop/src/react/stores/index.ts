@@ -9,6 +9,7 @@ import { createChannelSlice, type ChannelSlice } from './channel-slice';
 import { createDeskSlice, type DeskSlice } from './desk-slice';
 import { createModelSlice, type ModelSlice } from './model-slice';
 import { createInputSlice, type InputSlice } from './input-slice';
+import { createKnowledgeReferenceSlice, type KnowledgeReferenceSlice } from './knowledge-reference-slice';
 import { createChatSlice, type ChatSlice } from './chat-slice';
 import { createChatFindSlice, type ChatFindSlice } from './chat-find-slice';
 import { createToastSlice, type ToastSlice } from './toast-slice';
@@ -40,6 +41,7 @@ export type StoreState = ConnectionSlice &
   DeskSlice &
   ModelSlice &
   InputSlice &
+  KnowledgeReferenceSlice &
   ChatSlice &
   ChatFindSlice &
   ToastSlice &
@@ -70,6 +72,7 @@ export const useStore = create<StoreState>()((set, _get, _api) => ({
   ...createDeskSlice(set),
   ...createModelSlice(set),
   ...createInputSlice(set),
+  ...createKnowledgeReferenceSlice(set),
   ...createChatSlice(set, _get),
   ...createChatFindSlice(set, _get),
   ...createToastSlice(set, _get),
@@ -109,6 +112,7 @@ export type {
   DeskSlice,
   ModelSlice,
   InputSlice,
+  KnowledgeReferenceSlice,
   ChatSlice,
   ChatFindSlice,
   ToastSlice,
