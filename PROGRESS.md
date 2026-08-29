@@ -10,7 +10,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = 93f05a3c996481cf6bd4fb441a3784e313939a73  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-08-29 knowledge 引用链路 Phase 7/8 + 管线重构 + 多项会话修复)
+VERIFIED_SOURCE_SHA   = 26906c8324366ba0481080b0caf7b20c374ee4d7  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-08-29 知识问答链路四连修 + 蒸馏并行化与进度可视化)
 工作分支              = feature/upstream-sync-0.447.4
 ```
 
@@ -414,6 +414,21 @@ seal 不是一次性终点，而是"当前被验证树"的游标；每次审计�
   缓存键改 ensureSyntaxTree(doc.length, 1s) 同步补齐完整树；装饰/hover
   增量路径保持部分树语义不变。验证：editor 套件 80 用例绿 + typecheck×3
   绿后四次推进。
+
+- **2026-08-29 知识问答链路四连修 + 蒸馏并行化与进度可视化**
+  （功能树 26906c83/seal 本提交；32 files / +1340-172）：分块配置同源
+  （resolveEffectiveChunkTargetChars 贯穿查询 ensure 链/卡片视图/
+  knowledge_read，消除查询侧 1200 重建与摄入指纹互打架的全量重嵌事故；
+  ensureVectorArtifacts 在途去重）；rerank 按笔记本引用路由（v8 全局槽退役
+  断链补齐，配置不可解析显式降级 RRF 留痕，报错包装带 cause，重排上限提为
+  shared MODEL_OPERATION_RERANK_MAX_DOCS=100 单一真理源）；蒸馏并行化
+  （批预算按实测吞吐 EMA 动态推算 10s 目标、惰性建批，32 路自适应并发池
+  限流/超时逐层减半，超时线性化，sections 按批序整合）；蒸馏逐批进度事件
+  knowledge_distill_progress → 聊天「蒸馏中 · N 批」胶囊（独立于流式态）+
+  发送即本地「知识库检索中」；用户消息知识库元信息行精简为来源与模式。
+  生成产物：cli-runtime-closure 重生成、持久化指纹 compatible repin。
+  验证：typecheck×3（绿）+ eslint 0 error + full npm test 12523 passed /
+  0 failed 后推进。
 
 - **2026-08-29 knowledge 引用链路 Phase 7/8 + 管线重构 + 多项会话修复**
   （功能树 93f05a3c/seal 本提交；113 files / +12996-9097）：消息级笔记本

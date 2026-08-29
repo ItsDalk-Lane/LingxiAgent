@@ -14,7 +14,7 @@
 | U1：上游目标 | `c6d0405294be67cb134c2758f6472748ee73e2be` | openhanako `v0.447.4` |
 | L0：Lingxi 同步基线 | `97595264ead8735a04559507ddaade25db8a4e15` | chore: sync upstream 0.444.1 and pi SDK 0.84.1 (PR #2) |
 | L1：同步开始 Lingxi | `ca0b417e36a6a1f80947458aaed328a25718e41b` | 2026-08-20 main HEAD |
-| VERIFIED_SOURCE_SHA | `93f05a3c996481cf6bd4fb441a3784e313939a73` | 最终验证（typecheck/lint/测试/构建/打包）所针对的 feature commit（其 tree 即被验证源码树）；2026-08-29 knowledge 引用链路 Phase 7/8 + 管线重构 + 多项会话修复 |
+| VERIFIED_SOURCE_SHA | `26906c8324366ba0481080b0caf7b20c374ee4d7` | 最终验证（typecheck/lint/测试/构建/打包）所针对的 feature commit（其 tree 即被验证源码树）；2026-08-29 知识问答链路四连修 + 蒸馏并行化与进度可视化 |
 
 ## Audit seal model
 
