@@ -37,6 +37,7 @@
 import { estimateTextTokens } from "../llm/estimate-text-tokens.ts";
 import {
   KNOWLEDGE_COVERAGE_CANCELLED,
+  KNOWLEDGE_COVERAGE_CIRCUIT_BREAK,
   KNOWLEDGE_COVERAGE_PARTIAL,
   KNOWLEDGE_COVERAGE_TIMEOUT,
 } from "../../shared/knowledge-reason-codes.ts";
@@ -1232,6 +1233,15 @@ async function runExhaustiveCoverage(input: {
       + `${ledger.failedPrimaryUnits > 0 ? `, ${ledger.failedPrimaryUnits} failed` : ""}.`,
     );
     statusLines.push(guardLine);
+  } else if (reasonCode === KNOWLEDGE_COVERAGE_CIRCUIT_BREAK) {
+    statusLines.push(
+      `Coverage status: partial — every shard attempt so far failed with zero successes, so `
+      + `remaining shards were cancelled early [${KNOWLEDGE_COVERAGE_CIRCUIT_BREAK}]; processed `
+      + `${ledger.processedPrimaryUnits} / expected ${ledger.expectedPrimaryUnits} units, `
+      + `${ledger.failedPrimaryUnits} failed. The shard worker model is likely too slow or `
+      + `unavailable for this corpus; consider switching the knowledge model slot.`,
+    );
+    statusLines.push(guardLine);
   } else {
     statusLines.push(
       `Coverage status: partial — processed ${ledger.processedPrimaryUnits} / expected `
@@ -1464,6 +1474,9 @@ export function renderKnowledgeContextBlock(input: {
     : fuseSubQueryResults(input.retrievalResults);
   const allSources = mergeSources(input.retrievalResults);
   const degraded = mergeDegradedScopes(input.retrievalResults);
+  // rerank 期限/传输降级留痕（候选保持 RRF 名次，禁静默）：注入块与 stats 同源。
+  const rerankDegradeReasons = input.retrievalResults
+    .flatMap(result => result.rerankDegradeReasons ?? []);
   // ── 证据身份链（任务书 §六十七 EvidenceManifest 数据源）──
   // artifact → 分块配置指纹（NotebookRetrievalSource 随检索结果携带）；
   // 向量变体身份从各检索结果汇总去重（fts-only 轮为空数组）。
@@ -1673,6 +1686,10 @@ export function renderKnowledgeContextBlock(input: {
     lines.push(...degraded.notes);
     lines.push(...noEvidenceLines);
     lines.push(...sectionNoEvidenceLines);
+    // rerank 期限/传输降级留痕（候选保持 RRF 名次，禁静默）：模型不得声称做过精排。
+    for (const reason of rerankDegradeReasons) {
+      lines.push(`[rerank degraded: ${reason}]`);
+    }
     lines.push(`Evidence blocks (total budget ${input.budgetTokens} tokens, retrieval mode: ${describeRetrievalMode(input.retrievalResults)}):`);
     lines.push(injected.join("\n\n"));
     if (truncated > 0) {
@@ -1717,6 +1734,9 @@ export function renderKnowledgeContextBlock(input: {
         ? { distilled: true, distillBatches: input.distilled.batches }
         : {}),
       ...(input.degradedDistillReason ? { distillDegradedReason: input.degradedDistillReason } : {}),
+      ...(rerankDegradeReasons.length > 0
+        ? { rerankDegradeReason: rerankDegradeReasons.join("; ") }
+        : {}),
       ...(input.coveragePlan
         ? {
           coverageMode: input.coveragePlan.coverageMode,

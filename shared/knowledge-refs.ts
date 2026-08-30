@@ -131,6 +131,12 @@ export interface KnowledgeRetrievalStats {
   /** 压缩不可用/失败后退回"分片清单"降级的原因（显式留痕）。 */
   distillDegradedReason?: string;
   /**
+   * rerank 降级留痕（2026-08-30 延迟加固）：任一被引笔记本的重排超期/传输失败
+   * 时携带（多笔记本以 "; " 连接，保留笔记本归属），候选保持 RRF 名次，
+   * 注入块内同文案留痕。缺省 = 全部正常重排或未配置重排。
+   */
+  rerankDegradeReason?: string;
+  /**
    * Coverage 维度摘要（任务书 §二十八/§二十九，Phase 7）：本轮 KnowledgeCoveragePlan
    * 的结构化结论。只携带 plan 的判定结果，不携带任何 CoT/原始模型输出；缺省 =
    * 调用方（旧调用路径/降级块）未接入 coverage planner。

@@ -19,6 +19,7 @@
  */
 import crypto from "node:crypto";
 
+import { estimateTextTokens } from "../llm/estimate-text-tokens.ts";
 import { KnowledgeError } from "./errors.ts";
 import {
   COVERAGE_UNIT_TOKEN_BUDGET,
@@ -32,6 +33,28 @@ export const COVERAGE_SHARD_TOKEN_BUDGET = 16384;
 
 /** 相邻 shard 的 context 窗口：首/尾各取的 unit 数上限（§四十九）。 */
 export const COVERAGE_SHARD_CONTEXT_UNITS = 2;
+
+/**
+ * sharding 预算的渲染开销口径：每个 unit 进 worker prompt 时除正文外还有
+ * provenance 头（label/unitId/sourceId/snapshotId/parseArtifactId/blockId/
+ * offsets/text 标记）。行级小单元源（XLSX/CSV，§五十九）正文仅几十 token，
+ * 头开销可达正文的 2–3 倍——只按正文装填会让渲染后 prompt 达预算的 3 倍+
+ * （实测 54k token/片 vs 16k 预算，线性化超时全灭）。planCoverageShards 按
+ * 正文 + 本开销装填，保证渲染后 prompt 仍在 shardTokenBudget 口径内。
+ * snapshotId 在 sharding 期不可得（scope 冻结后才知道），按真实格式长度
+ * （"snap_" + 36 位 uuid = 41 chars）取代表值，误差 <1 token。
+ */
+const COVERAGE_SNAPSHOT_ID_PLACEHOLDER = `snap_${"0".repeat(36)}`;
+
+/** 单个 unit 渲染进 worker prompt 的 provenance 头 token 开销（不含正文）。 */
+export function coverageUnitPromptOverheadTokens(unit: CoverageUnit): number {
+  return estimateTextTokens([
+    `[U] unitId=${unit.id}`,
+    `sourceId=${unit.sourceId} snapshotId=${COVERAGE_SNAPSHOT_ID_PLACEHOLDER} parseArtifactId=${unit.parseArtifactId}`,
+    `blockId=${unit.blockId} startOffset=${unit.startOffset} endOffset=${unit.endOffset}`,
+    "text:",
+  ].join("\n"));
+}
 
 const COVERAGE_SHARD_ID_PREFIX = "cshard_";
 
@@ -270,11 +293,13 @@ function coverageShardId(manifestHash: string, ordinal: number): string {
 }
 
 /**
- * 确定性分片：按全局 unit 序列贪心装填 primary units 到 shardTokenBudget，
- * 单 unit 超预算独占一个 shard（照送不丢）。shardId 由 manifestHash + 序号
- * 派生——同 manifest 重启后边界一致（§四十八）。contextBefore/After 取相邻
- * shard 首尾各 ≤contextUnits 个 unit（§四十九），只作连续性上下文，不进
- * ledger 分母（executor/ledger 只统计 primaryUnitIds）。
+ * 确定性分片：按全局 unit 序列贪心装填 primary units，装填成本 = 正文 token +
+ * 渲染开销（coverageUnitPromptOverheadTokens，见其 docstring——行级小单元源
+ * 头开销占大头，只按正文装填会 3 倍+ 超预算），单 unit 超预算独占一个 shard
+ * （照送不丢）。shardId 由 manifestHash + 序号派生——同 manifest 重启后边界
+ * 一致（§四十八）。contextBefore/After 取相邻 shard 首尾各 ≤contextUnits 个
+ * unit（§四十九），只作连续性上下文，不进 ledger 分母（executor/ledger 只统计
+ * primaryUnitIds）。
  */
 export function planCoverageShards(input: {
   manifest: CoverageManifest;
@@ -294,13 +319,14 @@ export function planCoverageShards(input: {
   let current: CoverageUnit[] = [];
   let used = 0;
   for (const unit of sequence) {
-    if (current.length > 0 && used + unit.tokenEstimate > budgetTokens) {
+    const cost = unit.tokenEstimate + coverageUnitPromptOverheadTokens(unit);
+    if (current.length > 0 && used + cost > budgetTokens) {
       groups.push(current);
       current = [];
       used = 0;
     }
     current.push(unit);
-    used += unit.tokenEstimate;
+    used += cost;
   }
   if (current.length > 0) groups.push(current);
   return groups.map((group, ordinal) => {

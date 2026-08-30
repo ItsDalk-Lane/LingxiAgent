@@ -216,10 +216,14 @@ function okWorker(callLog: string[] = [], statement?: string, delayMs = 0): Work
 /** ~200 CJK 字 ≈ 222 tokens：单 block 单 unit，多块即可跨 shard（16k 预算）。 */
 const BIG_BLOCK = (index: number) => `${index}号段落。` + "覆盖测试文本。".repeat(40);
 
-/** 2 源 × 50 大块：~100 units ≈ 22k tokens → 稳定切成 2 个 shard。 */
+/**
+ * 2 源 × 30 大块：~60 units，正文 ≈271 token/块 + 渲染头开销 ≈60 token/块
+ * （2026-08-30 开销感知装填后分片按正文+头计）≈ 19.9k 成本 → 稳定切成 2 个
+ * shard（49 + 11），保证「一完成一取消/一成功一失败」类用例的结构稳定。
+ */
 function seedTwoShardSources(store: KnowledgeStore, nb: string) {
-  seedSource(store, [nb], { blockCount: 50, blockText: BIG_BLOCK });
-  seedSource(store, [nb], { blockCount: 50, blockText: BIG_BLOCK });
+  seedSource(store, [nb], { blockCount: 30, blockText: BIG_BLOCK });
+  seedSource(store, [nb], { blockCount: 30, blockText: BIG_BLOCK });
 }
 
 function retrievalFacade(input: {

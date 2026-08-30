@@ -107,6 +107,11 @@ export interface RetrieveForNotebooksResult {
   degraded: KnowledgeDegradedRetrievalScope[];
   /** 各笔记本本轮实际搜索过的向量变体身份（去重）；缺省/空 = 纯 FTS 轮。 */
   searchedVectorVariants?: SearchedVectorVariantIdentity[];
+  /**
+   * rerank 降级留痕（每笔记本一条，含笔记本名；空/缺省 = 全部正常重排或未尝试）。
+   * 见 KNOWLEDGE_RERANK_DEADLINE_MS。
+   */
+  rerankDegradeReasons?: string[];
 }
 
 /** retrieve() 产出的逐 scope 降级条目（尚未附带 notebook/source 归属，由调用方映射）。 */
@@ -315,6 +320,16 @@ export const KNOWLEDGE_UNCAPPED_RETRIEVAL_LIMIT = 1000;
  * 与 RerankClient 校验共用 shared/model-operations 的同一上限，杜绝两侧各自常量打架。
  */
 export const KNOWLEDGE_RERANK_MAX_DOCS = MODEL_OPERATION_RERANK_MAX_DOCS;
+
+/**
+ * rerank 执行期限（2026-08-30 延迟加固）：单次 rerank 调用超过该时长即放弃，
+ * 候选保持 RRF 名次继续检索（与「超出 MAX_DOCS 的尾部保持 RRF 名次」同一降级
+ * 语义），rerankDegradeReason 显式留痕。动机：远程 rerank 供应商排队方差大
+ * （实测单次 11–56s），无期限时一次知识提问的重排尾巴可达一分钟以上；重排是
+ * 精排增强层，不该拖死整条检索。传输类失败（网络/HTTP/供应商 5xx）同路径
+ * 降级；KnowledgeError 与用户 abort 仍然上抛（禁静默吞真实错误）。
+ */
+export const KNOWLEDGE_RERANK_DEADLINE_MS = 15_000;
 
 /**
  * Retrieval Candidate Budgets（任务书 §二十六，Phase 8）：候选生成预算与
@@ -842,6 +857,11 @@ export class KnowledgeQueryService {
     degraded: KnowledgeDegradedRetrievalScope[];
     /** 实际参与向量检索的变体身份（§六十七 EvidenceManifest；fts-only 为空）。 */
     searchedVectorVariants: SearchedVectorVariantIdentity[];
+    /**
+     * rerank 降级留痕（2026-08-30 延迟加固）：期限超时/传输类失败时携带，
+     * 候选保持 RRF 名次；未尝试或成功重排时缺省。
+     */
+    rerankDegradeReason?: string;
   }> {
     const { scopes, question, runId, signal } = input;
     const retrievalModeRequested: "fts" | "hybrid" = input.embedTexts ? "hybrid" : "fts";
@@ -1011,21 +1031,24 @@ export class KnowledgeQueryService {
       ? candidates.slice(KNOWLEDGE_RERANK_MAX_DOCS)
       : [];
     const reranker = input.reranker !== undefined ? input.reranker : this.deps.rerank;
+    let rerankDegradeReason: string | undefined;
     if (input.rerank !== false && rerankCandidates.length > 0 && reranker) {
       let reranked;
       try {
-        reranked = await reranker({
+        reranked = await this.invokeRerankerWithDeadline({
+          reranker,
           runId,
-          query: question,
+          question,
           documents: rerankCandidates.map(candidate => candidate.text),
-          topN: rerankCandidates.length,
           signal,
         });
       } catch (error) {
         if (isAbortLike(error)) throw error;
         if (isKnowledgeError(error)) throw error;
+        // 期限超时/传输类失败：重排是精排增强层，降级保 RRF 名次并显式留痕
+        // （见 KNOWLEDGE_RERANK_DEADLINE_MS docstring），不炸整个检索。
         const cause = error instanceof Error ? `${error.name}: ${error.message}` : String(error);
-        throw new KnowledgeError("KNOWLEDGE_RETRIEVAL_UNAVAILABLE", "Knowledge rerank request failed", { cause });
+        rerankDegradeReason = `rerank degraded (${cause}); kept RRF ranking`;
       }
       if (reranked) {
         if (
@@ -1054,7 +1077,50 @@ export class KnowledgeQueryService {
       retrievalModeRequested,
       degraded: allDegraded,
       searchedVectorVariants,
+      ...(rerankDegradeReason ? { rerankDegradeReason } : {}),
     };
+  }
+
+  /**
+   * rerank 执行 + 期限竞速（KNOWLEDGE_RERANK_DEADLINE_MS）：超时即 abort 底层
+   * 请求并抛 KnowledgeRerankDeadlineError（调用方降级处理）；外部 signal 的
+   * abort 原样穿透（用户取消语义）。竞速落败方的 rejection 就地吞掉，不允许
+   * 变成 unhandled rejection。
+   */
+  private async invokeRerankerWithDeadline(input: {
+    reranker: KnowledgeReranker;
+    runId: string;
+    question: string;
+    documents: string[];
+    signal?: AbortSignal;
+  }): Promise<{ results: Array<{ index: number; score: number }> } | null> {
+    const controller = new AbortController();
+    const onExternalAbort = () => controller.abort();
+    input.signal?.addEventListener("abort", onExternalAbort, { once: true });
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const deadline = new Promise<never>((_, reject) => {
+      timer = setTimeout(() => {
+        controller.abort();
+        const error = new Error(`rerank deadline exceeded after ${KNOWLEDGE_RERANK_DEADLINE_MS}ms`);
+        error.name = "KnowledgeRerankDeadlineError";
+        reject(error);
+      }, KNOWLEDGE_RERANK_DEADLINE_MS);
+    });
+    const attempt = Promise.resolve().then(() => input.reranker({
+      runId: input.runId,
+      query: input.question,
+      documents: input.documents,
+      topN: input.documents.length,
+      signal: controller.signal,
+    }));
+    deadline.catch(() => {});
+    attempt.catch(() => {});
+    try {
+      return await Promise.race([attempt, deadline]);
+    } finally {
+      if (timer !== undefined) clearTimeout(timer);
+      input.signal?.removeEventListener("abort", onExternalAbort);
+    }
   }
 
   /**
@@ -1289,6 +1355,7 @@ export class KnowledgeQueryService {
       let retrievalMode: "fts" | "hybrid" = "fts";
       let retrievalModeRequested: "fts" | "hybrid" = embedTexts ? "hybrid" : "fts";
       let searchedVectorVariants: SearchedVectorVariantIdentity[] = [];
+      let rerankDegradeReason: string | null = null;
       if (scopes.length > 0) {
         const result = await this.retrieve({
           studioId,
@@ -1306,6 +1373,9 @@ export class KnowledgeQueryService {
         retrievalModeRequested = result.retrievalModeRequested;
         ranked = result.candidates;
         searchedVectorVariants = result.searchedVectorVariants;
+        if (result.rerankDegradeReason) {
+          rerankDegradeReason = `${notebook.name}: ${result.rerankDegradeReason}`;
+        }
         // 逐 scope 降级：附上 notebook/source 归属，并幂等入队后台构建（§十二）。
         // KNOWLEDGE_INDEX_FAILED 是显式终态：不自动重试（UI 手动 reingest），只留痕。
         for (const item of result.degraded) {
@@ -1344,6 +1414,7 @@ export class KnowledgeQueryService {
         sources,
         degraded,
         searchedVectorVariants,
+        ...(rerankDegradeReason ? { rerankDegradeReason } : {}),
       };
     }));
 
@@ -1357,6 +1428,10 @@ export class KnowledgeQueryService {
       ? "hybrid"
       : "fts";
     const degraded = notebookResults.flatMap(item => item.degraded);
+    // rerank 降级留痕跨笔记本汇总（保持笔记本归属，供注入块/stats 显式呈现）。
+    const rerankDegradeReasons = notebookResults
+      .map(item => item.rerankDegradeReason)
+      .filter((reason): reason is string => typeof reason === "string");
     // 向量变体身份跨笔记本汇总去重（同源被多笔记本共享时各结果重复携带）。
     const searchedVectorVariants: SearchedVectorVariantIdentity[] = [];
     const seenVectorVariantIds = new Set<string>();
@@ -1381,7 +1456,15 @@ export class KnowledgeQueryService {
       locatorCache,
     ));
 
-    return { candidates, sources, retrievalMode, retrievalModeRequested, degraded, searchedVectorVariants };
+    return {
+      candidates,
+      sources,
+      retrievalMode,
+      retrievalModeRequested,
+      degraded,
+      searchedVectorVariants,
+      ...(rerankDegradeReasons.length > 0 ? { rerankDegradeReasons } : {}),
+    };
   }
 
   /**

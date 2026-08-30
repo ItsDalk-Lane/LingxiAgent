@@ -16,7 +16,11 @@
  * 不复活 Research 领域模型（§六十六）。
  */
 import { KnowledgeError } from "./errors.ts";
-import { KNOWLEDGE_COVERAGE_PARTIAL, KNOWLEDGE_COVERAGE_SHARD_FAILED } from "../../shared/knowledge-reason-codes.ts";
+import {
+  KNOWLEDGE_COVERAGE_CIRCUIT_BREAK,
+  KNOWLEDGE_COVERAGE_PARTIAL,
+  KNOWLEDGE_COVERAGE_SHARD_FAILED,
+} from "../../shared/knowledge-reason-codes.ts";
 import {
   aggregateShardEvidence,
   buildShardWorkerPrompt,
@@ -38,6 +42,16 @@ export const COVERAGE_EXECUTOR_DEFAULT_CONCURRENCY = 4;
 
 /** shard 级 bounded retry 上限：1 次首跑 + 2 次自动重试后终态 failed。 */
 export const COVERAGE_SHARD_MAX_ATTEMPTS = 3;
+
+/**
+ * 熔断阈值（2026-08-30 延迟加固）：run 内零成功且终态 failed 的 shard 数达到
+ * 该值（默认 = 默认并发波次 4，即第一个整波全部烧完 bounded retry 仍零成功）
+ * → 提前取消剩余 shard，reasonCode 记 KNOWLEDGE_COVERAGE_CIRCUIT_BREAK。
+ * 按终态失败计数（而非 attempt 级）：单个 shard 的 bounded retry 语义不变，
+ * 小 run（shard 数 < 阈值）永不触发。任一 shard 成功即豁免——有产出说明
+ * worker 可用，后续失败留给 shard 级 bounded retry 与 PARTIAL 留痕处理。
+ */
+export const COVERAGE_CIRCUIT_BREAK_FAILURES = COVERAGE_EXECUTOR_DEFAULT_CONCURRENCY;
 
 /** 每次 attempt 内的输出纠错重试次数（JSON 非法/契约不符时重发一次）。 */
 const SHARD_ATTEMPT_CORRECTION_RETRIES = 1;
@@ -447,6 +461,18 @@ export async function executeCoverageRun(input: CoverageExecutorInput): Promise<
   const total = persisted.length;
   let done = persisted.filter(shard => shard.status === "completed").length;
   let cancelled = false;
+  // 熔断状态（2026-08-30 延迟加固）：零成功 + 终态 failed shard 数达阈值。
+  // 见 COVERAGE_CIRCUIT_BREAK_FAILURES docstring。resume 场景下既有成功 shard
+  // 已计入 succeededShards，因此续跑 run 永不熔断。
+  let succeededShards = persisted.filter(shard => shard.status === "completed").length;
+  let circuitOpen = false;
+  const tripCircuit = () => {
+    circuitOpen = true;
+    cancelled = true;
+    input.store.cancelCoverageShards({ runId });
+  };
+  const shouldTripCircuit = () => succeededShards === 0
+    && failedShards.length >= COVERAGE_CIRCUIT_BREAK_FAILURES;
 
   const abortPromise: Promise<never> | null = input.signal
     ? new Promise<never>((_, reject) => {
@@ -511,6 +537,7 @@ export async function executeCoverageRun(input: CoverageExecutorInput): Promise<
           });
           completedResults.set(shard.id, result);
           done += 1;
+          succeededShards += 1;
           try {
             input.onProgress?.(done, total, runId);
           } catch {
@@ -536,6 +563,10 @@ export async function executeCoverageRun(input: CoverageExecutorInput): Promise<
             } catch {
               // 同上。
             }
+            // 熔断检查在终态 failed 落定后：零成功 + 终态失败达阈值 → 提前
+            // 取消剩余 pending shard，剩余预算不再烧在注定失败的调用上。
+            // reasonCode 见 run 返回处。
+            if (shouldTripCircuit()) tripCircuit();
             return;
           }
           // bounded retry：回 pending，本 shard 的下一轮 attempt 续跑。
@@ -588,7 +619,13 @@ export async function executeCoverageRun(input: CoverageExecutorInput): Promise<
     evidence: aggregateShardEvidence(shardResults),
     cancelled,
     failedShards,
-    reasonCode: runStatus === "complete" ? null : KNOWLEDGE_COVERAGE_PARTIAL,
+    // 熔断优先于通用 PARTIAL 留痕（取消语义 ≠ 用户取消，stats 侧由 injector
+    // 按该 code 渲染专属措辞行）。
+    reasonCode: runStatus === "complete"
+      ? null
+      : circuitOpen
+        ? KNOWLEDGE_COVERAGE_CIRCUIT_BREAK
+        : KNOWLEDGE_COVERAGE_PARTIAL,
   };
 }
 

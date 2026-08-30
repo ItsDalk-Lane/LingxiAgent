@@ -1,10 +1,10 @@
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { KnowledgeManager } from "../lib/knowledge/knowledge-manager.ts";
-import { KNOWLEDGE_RRF_K } from "../lib/knowledge/knowledge-query-service.ts";
+import { KNOWLEDGE_RERANK_DEADLINE_MS, KNOWLEDGE_RRF_K } from "../lib/knowledge/knowledge-query-service.ts";
 
 /**
  * 任务书 §二十四/§二十五/§九十二：rerank 按笔记本引用真正路由 + 跨笔记本
@@ -251,5 +251,90 @@ describe("Knowledge 跨笔记本 rerank 路由与 rank-based RRF 融合", () => 
       1 / (KNOWLEDGE_RRF_K + 1) + 1 / (KNOWLEDGE_RRF_K + 2),
       8,
     );
+  });
+});
+
+// ─────────────── rerank 期限降级（2026-08-30 延迟加固） ───────────────
+
+describe("rerank 期限与传输失败降级", () => {
+  it("rerank 永不返回：KNOWLEDGE_RERANK_DEADLINE_MS 后降级 RRF 名次并留痕，检索不失败", async () => {
+    const hangManager = new KnowledgeManager({
+      lingxiHome: tempHome(),
+      embedTextsForModel: async (request) => ({
+        vectors: fakeEmbedVectors(request.texts),
+        dimensions: 8,
+        model: { provider: "fake", id: EMB_REF.id, api: "openai", dimensions: 8 },
+      }),
+      canEmbedWithModel: () => true,
+      rerankForModel: () => new Promise(() => {}),
+    });
+    managers.push(hangManager);
+    const studioId = "studio-hang";
+    const nb = hangManager.createNotebook({ studioId, name: "甲本" });
+    hangManager.updateNotebookSettings({
+      studioId,
+      notebookId: nb.id,
+      embeddingModelRef: EMB_REF,
+      rerankModelRef: RERANK_X,
+    });
+    await ingestPasted(hangManager, studioId, nb.id, TEXT_A1, "甲一.txt");
+    await ingestPasted(hangManager, studioId, nb.id, TEXT_A2, "甲二.txt");
+
+    vi.useFakeTimers();
+    try {
+      const pending = hangManager.queryService.retrieveForNotebooks({
+        studioId,
+        notebookIds: [nb.id],
+        question: QUESTION_B,
+      });
+      await vi.advanceTimersByTimeAsync(KNOWLEDGE_RERANK_DEADLINE_MS + 10);
+      const result = await pending;
+
+      // 检索本体成功：hybrid 通道照常出候选（RRF 名次），不因重排挂死而失败。
+      expect(result.retrievalMode).toBe("hybrid");
+      expect(result.candidates.length).toBeGreaterThan(0);
+      // 显式留痕（禁静默降级）：带笔记本归属。
+      expect(result.rerankDegradeReasons).toBeDefined();
+      expect(result.rerankDegradeReasons!.join("; ")).toContain("甲本");
+      expect(result.rerankDegradeReasons!.join("; ")).toContain("deadline");
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("rerank 传输类失败（非 KnowledgeError）：同样降级 RRF 名次并留痕，不再炸整个检索", async () => {
+    const failManager = new KnowledgeManager({
+      lingxiHome: tempHome(),
+      embedTextsForModel: async (request) => ({
+        vectors: fakeEmbedVectors(request.texts),
+        dimensions: 8,
+        model: { provider: "fake", id: EMB_REF.id, api: "openai", dimensions: 8 },
+      }),
+      canEmbedWithModel: () => true,
+      rerankForModel: async () => {
+        throw new Error("connection reset by peer");
+      },
+    });
+    managers.push(failManager);
+    const studioId = "studio-fail";
+    const nb = failManager.createNotebook({ studioId, name: "乙本" });
+    failManager.updateNotebookSettings({
+      studioId,
+      notebookId: nb.id,
+      embeddingModelRef: EMB_REF,
+      rerankModelRef: RERANK_Y,
+    });
+    await ingestPasted(failManager, studioId, nb.id, TEXT_B1, "乙一.txt");
+    await ingestPasted(failManager, studioId, nb.id, TEXT_B2, "乙二.txt");
+
+    const result = await failManager.queryService.retrieveForNotebooks({
+      studioId,
+      notebookIds: [nb.id],
+      question: QUESTION_B,
+    });
+
+    expect(result.retrievalMode).toBe("hybrid");
+    expect(result.candidates.length).toBeGreaterThan(0);
+    expect(result.rerankDegradeReasons?.join("; ")).toContain("connection reset");
   });
 });

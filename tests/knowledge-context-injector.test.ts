@@ -802,3 +802,43 @@ describe("retrieveForNotebooks 边界与配置（真实 KnowledgeManager）", ()
     expect(block).toContain(`ordinals 1-`);
   });
 });
+
+// ─────────────── rerank 期限降级留痕（2026-08-30 延迟加固） ───────────────
+
+describe("rerank 降级留痕透传", () => {
+  it("retrieve 携带 rerankDegradeReasons：注入块与 stats 同文案显式留痕", async () => {
+    const { block, stats } = await buildKnowledgeContextInjection({
+      question: "问题",
+      mode: "qa",
+      budgetTokens: 1000,
+      deps: {
+        decomposeModel: null,
+        distillModel: null,
+        retrieve: async () => ({
+          ...fakeRetrieval([fakeChunk({ text: "证据文本" })]),
+          rerankDegradeReasons: ["研究: rerank degraded (KnowledgeRerankDeadlineError: rerank deadline exceeded after 15000ms); kept RRF ranking"],
+        }),
+      },
+    });
+    expect(block).toContain(
+      "[rerank degraded: 研究: rerank degraded (KnowledgeRerankDeadlineError: rerank deadline exceeded after 15000ms); kept RRF ranking]",
+    );
+    expect(stats.rerankDegradeReason).toContain("研究");
+    expect(stats.rerankDegradeReason).toContain("kept RRF ranking");
+  });
+
+  it("无降级时不产出 rerank 留痕行/字段（缺省语义）", async () => {
+    const { block, stats } = await buildKnowledgeContextInjection({
+      question: "问题",
+      mode: "qa",
+      budgetTokens: 1000,
+      deps: {
+        decomposeModel: null,
+        distillModel: null,
+        retrieve: async () => fakeRetrieval([fakeChunk({ text: "证据文本" })]),
+      },
+    });
+    expect(block).not.toContain("[rerank degraded:");
+    expect(stats.rerankDegradeReason).toBeUndefined();
+  });
+});

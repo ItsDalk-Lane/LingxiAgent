@@ -63,3 +63,13 @@ export const KNOWLEDGE_COVERAGE_CANCELLED = "KNOWLEDGE_COVERAGE_CANCELLED";
  * 剩余 pending shard，run 以 partial 语义收尾（显式 timeout 留痕），不无限挂死会话。
  */
 export const KNOWLEDGE_COVERAGE_TIMEOUT = "KNOWLEDGE_COVERAGE_TIMEOUT";
+
+/**
+ * Coverage run 熔断（2026-08-30 延迟加固）：run 内零成功且终态 failed 的 shard
+ * 数达到 COVERAGE_CIRCUIT_BREAK_FAILURES（默认 = 一个并发波次 4）即提前取消
+ * 剩余 shard，run 以 partial 语义收尾并显式留痕。动机：worker 模型对当前 shard
+ * 规模结构性必败时（如线性化超时全灭），按 bounded retry + 30 分钟 run 上限会把
+ * 整段预算白烧在注定失败的调用上，用户体感为「卡死」；熔断把最坏等待压到一个
+ * 波次的完整 retry 周期。已完成 shard 的结果保留；绝不生成 complete claim。
+ */
+export const KNOWLEDGE_COVERAGE_CIRCUIT_BREAK = "KNOWLEDGE_COVERAGE_CIRCUIT_BREAK";

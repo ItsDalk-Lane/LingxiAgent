@@ -18,6 +18,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { KnowledgeStore } from "../lib/knowledge/knowledge-store.ts";
 import {
+  COVERAGE_CIRCUIT_BREAK_FAILURES,
   COVERAGE_EXECUTOR_DEFAULT_CONCURRENCY,
   COVERAGE_SHARD_MAX_ATTEMPTS,
   computeCoverageLedger,
@@ -46,8 +47,13 @@ import {
   buildCoverageUnits,
   verifyCoverageUnits,
 } from "../lib/knowledge/knowledge-coverage-unit.ts";
-import { KNOWLEDGE_COVERAGE_PARTIAL, KNOWLEDGE_COVERAGE_SHARD_FAILED } from "../shared/knowledge-reason-codes.ts";
+import {
+  KNOWLEDGE_COVERAGE_CIRCUIT_BREAK,
+  KNOWLEDGE_COVERAGE_PARTIAL,
+  KNOWLEDGE_COVERAGE_SHARD_FAILED,
+} from "../shared/knowledge-reason-codes.ts";
 import type { KnowledgeBlockDraft } from "../lib/knowledge/source-adapters.ts";
+import { estimateTextTokens } from "../lib/llm/estimate-text-tokens.ts";
 
 const tempDirs: string[] = [];
 const stores: KnowledgeStore[] = [];
@@ -860,5 +866,115 @@ describe("Ledger / Gate / Evidence", () => {
     });
     expect(prompt).toContain("Context before (continuity only");
     expect(validResultForPrompt(prompt)).toContain(second.shardId);
+  });
+});
+
+// ─────────────── 开销感知装填 / 熔断（2026-08-30 延迟加固） ───────────────
+
+describe("分片预算含渲染开销（行级小单元源）", () => {
+  it("300 个行级小 block：每片渲染后 prompt 仍在预算口径内（正文+头 ≤ shardTokenBudget）", () => {
+    const store = createStore();
+    const nb = notebook(store, "A");
+    // 行级源（XLSX/CSV 一行一 block 的形状，§五十九）：正文 ~11 token/行，
+    // provenance 头（unitId sha256/snapshot/parseArtifact/blockId/offsets）反而
+    // 是大头——只按正文装填时 300 行会挤进同一片，渲染后 prompt 3 倍+ 超预算
+    // （实测 54k token/片 → 线性化超时全灭）。
+    const seeded = seedSource(store, [nb], {
+      blockCount: 300,
+      blockText: (index) => `行${index}:单价${index}数量${index}备注行数据。`,
+    });
+    const manifest = buildCoverageManifest({
+      source: store,
+      studioId: STUDIO,
+      scopeId: scopeOf(store, [nb]),
+    });
+    const unitsById = new Map(manifest.sources.flatMap(source =>
+      source.coverageUnits.map(unit => [unit.id, unit] as const)));
+    const snapshotIdsBySource = new Map(manifest.sources.map(source =>
+      [source.sourceId, source.contentSnapshotId]));
+    const plans = planCoverageShards({ manifest });
+    // 装填确实在切：小单元源不应一片装完。
+    expect(plans.length).toBeGreaterThan(1);
+    // 渲染后不变式：每片 prompt 估算 ≤ 预算 + context 窗口（±2 单元）+ 头部
+    // 固定行（question/plan/schema 指令）。旧口径下这里会到 ~54k。
+    for (const plan of plans) {
+      const prompt = buildShardWorkerPrompt({
+        question: "请完整梳理全部资料要点，不要遗漏",
+        planSummary: PLAN_SUMMARY,
+        shard: plan,
+        unitsById,
+        snapshotIdsBySource,
+      });
+      expect(estimateTextTokens(prompt)).toBeLessThanOrEqual(
+        COVERAGE_SHARD_TOKEN_BUDGET + 2 * COVERAGE_UNIT_TOKEN_BUDGET + 500,
+      );
+    }
+    // 全量 unit 仍然恰好各属一片 primary（exhaustive 语义不受装填口径影响）。
+    const primaryCount = new Map<string, number>();
+    for (const plan of plans) {
+      for (const unitId of plan.primaryUnitIds) primaryCount.set(unitId, (primaryCount.get(unitId) ?? 0) + 1);
+    }
+    expect(primaryCount.size).toBe(300);
+    for (const unit of manifestUnitSequence(manifest)) {
+      expect(primaryCount.get(unit.id)).toBe(1);
+    }
+    expect(seeded.sourceId).toBeTruthy();
+  });
+});
+
+describe("Coverage 熔断（零成功 + 终态失败达阈值）", () => {
+  it("worker 持续失败：第 4 个终态 failed shard 后提前取消剩余，reasonCode=CIRCUIT_BREAK", async () => {
+    const store = createStore();
+    // 400 个 BIG_BLOCK units ≈ 9 shards（开销感知口径）：> 阈值 4。
+    const manifest = manifestWithUnits(store, 400);
+    const plans = planCoverageShards({ manifest });
+    expect(plans.length).toBeGreaterThan(COVERAGE_CIRCUIT_BREAK_FAILURES);
+    let calls = 0;
+    const worker: CoverageWorkerModel = async () => {
+      calls += 1;
+      return "{invalid";
+    };
+    const result = await runCoverage({ store, manifest, workerModel: worker });
+
+    expect(result.reasonCode).toBe(KNOWLEDGE_COVERAGE_CIRCUIT_BREAK);
+    expect(result.cancelled).toBe(true);
+    // 提前终止：只有第一个波次（4 shards）烧完 bounded retry，未开跑的直接取消。
+    const state = store.getCoverageRun({ runId: result.runId })!;
+    const failed = state.shards.filter(shard => shard.status === "failed");
+    const cancelledShards = state.shards.filter(shard => shard.status === "cancelled");
+    expect(failed).toHaveLength(COVERAGE_CIRCUIT_BREAK_FAILURES);
+    expect(cancelledShards.length).toBe(plans.length - COVERAGE_CIRCUIT_BREAK_FAILURES);
+    expect(calls).toBe(COVERAGE_CIRCUIT_BREAK_FAILURES * COVERAGE_SHARD_MAX_ATTEMPTS * 2);
+    // ledger 如实：零成功、失败单元计入、绝不 complete。
+    expect(result.ledger.processedPrimaryUnits).toBe(0);
+    expect(result.ledger.failedPrimaryUnits).toBe(
+      failed.reduce((sum, shard) => sum + shard.unitIds.length, 0),
+    );
+    expect(result.gate.coverageStatus).not.toBe("complete");
+  });
+
+  it("任一 shard 成功即豁免熔断：全灭之外的失败仍走 PARTIAL 留痕", async () => {
+    const store = createStore();
+    const manifest = manifestWithUnits(store, 400);
+    const plans = planCoverageShards({ manifest });
+    let succeeded = 0;
+    const worker: CoverageWorkerModel = async ({ prompt }) => {
+      // 只有第一片成功，其余全部失败——终态失败数远超阈值但有成功 → 不熔断。
+      if (/ordinal 0\)/.test(prompt)) {
+        succeeded += 1;
+        return validResultForPrompt(prompt);
+      }
+      return "{invalid";
+    };
+    const result = await runCoverage({ store, manifest, workerModel: worker });
+
+    expect(succeeded).toBe(1);
+    expect(result.reasonCode).toBe(KNOWLEDGE_COVERAGE_PARTIAL);
+    expect(result.cancelled).toBe(false);
+    const state = store.getCoverageRun({ runId: result.runId })!;
+    // 没有任何 shard 被 circuit 取消：失败片全部走满 bounded retry 终态 failed。
+    expect(state.shards.filter(shard => shard.status === "cancelled")).toHaveLength(0);
+    expect(state.shards.filter(shard => shard.status === "failed")).toHaveLength(plans.length - 1);
+    expect(state.shards.filter(shard => shard.status === "completed")).toHaveLength(1);
   });
 });
