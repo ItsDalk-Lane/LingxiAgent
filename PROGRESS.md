@@ -10,7 +10,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = 4e6bfe87b1e065c7418b7e64cf6c51c982a7079f  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-08-30 同上 + 嵌入/重排供应商协议兼容修复 + 融合池上限随预算倒推（阀 A 70%）+ 检索列表二次展开)
+VERIFIED_SOURCE_SHA   = d6be53aec5bfbfca404e3f8fc09d2c3ed6ca68fe  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-08-30 同上 + 融合池随预算倒推 + 检索列表二次展开 + 查询嵌入失败/期限降级（退 FTS 不炸检索）)
 工作分支              = feature/upstream-sync-0.447.4
 ```
 
@@ -625,6 +625,16 @@ seal 不是一次性终点，而是"当前被验证树"的游标；每次审计�
   knowledgeRetrievalShowMore。验证：typecheck×3 绿 + eslint 0 error + 新增
   5 用例（倒推公式三态含 1M 口径示例/端到端池 180/UI 双路）+ knowledge 簇
   182 用例 + full npm test 12805 passed / 0 failed 后推进。
+
+- **2026-08-30 查询嵌入失败/期限降级（退 FTS 不炸检索不空等）**
+  （功能树 d6be53ae/seal 本提交；3 files / +248-9）：与 rerank 期限降级对称
+  补齐嵌入侧——旧口径查询嵌入网络失败抛 KNOWLEDGE_RETRIEVAL_UNAVAILABLE 丢
+  掉已算好的 FTS 候选（注入块变检索不可用）、且无期限（闭包 HTTP 超时 300s
+  全额放行，挂着的供应商卡五分钟）。新 reason 码 KNOWLEDGE_EMBEDDING_FAILED +
+  invokeEmbeddingWithDeadline 15s 竞速（与 rerank 同构）+ vectorIndex.search
+  意外错误同纪律降级；无配置纯 FTS 路径不动（调查确认三层本就支持无嵌入/
+  无重排运行）。验证：typecheck×3 绿 + eslint 0 error + 新增 5 用例 +
+  knowledge 簇 200 用例 + full npm test 12810 passed / 0 failed 后推进。
 
 
 ## 最终状态：已合并（上游同步部分）
