@@ -10,7 +10,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = e7b14874481afa416b30b343a564a1cccc4692dd  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-08-30 同上 + 拆解优化 P0-P2（96k 上限已按用户要求 revert，恢复按上下文伸缩原设计）)
+VERIFIED_SOURCE_SHA   = 7de81782955ef62cc73d391eb26a73fe3d19b7bd  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-08-31 知识问答重构：覆盖两档化 + 主模型滚动多轮注入（exhaustive/蒸馏链路移除，检索侧不动）)
 工作分支              = feature/upstream-sync-0.447.4
 ```
 
@@ -681,6 +681,21 @@ seal 不是一次性终点，而是"当前被验证树"的游标；每次审计�
   恢复原设计；「512k 证据装满预算 → 主模型预填充 77s」的权衡数据已呈报
   用户，是否加上限及数值由用户后续拍板。验证：typecheck×3 绿 + injector/
   execution 套件 98 用例绿后推进。
+- **2026-08-31 知识问答重构：覆盖两档化 + 主模型滚动多轮注入**（功能树
+  7de81782/seal 本提交）：用户批准的方案（检索侧机器完全不动，改动集中在
+  证据交给主模型与作答段）。①覆盖判定三档→两档（exhaustive 执行链路/蒸馏
+  压缩/broad→exhaustive 升级整体移除；executor/reduction/distiller 三模块删
+  除；manifest 裁成 fidelity 面；store coverage run 写 API 删除；表与 DDL 保留
+  存量兼容零迁移）；②超预算改 knowledge-rollup 滚动注入（会话主模型经
+  session streamFn 侧线缓冲调用逐部分消化，中间笔记逐部分标注传递，循环内
+  模型可 need-more-evidence 自主补充检索，轮/查询数硬上限，孤立超限单条也送
+  消化轮）；③knowledgeDistill 槽位移除、ws 事件换
+  knowledge_rollup_progress/knowledge_supplement_search、stats 新增 rollup
+  契约、前端胶囊/折叠卡/五语言。已知代价（已呈报用户确认）：超预算 turn 从
+  廉价蒸馏模型多批并行变主模型 N 轮串行，延迟与 token 花费上升。验证：
+  typecheck×3 绿 + 全量 npm test 12766 用例通过（0 失败；persistence 指纹
+  compatible repin sha256:4172d591…、开放边界清单重生成后 tripwire/lint 绿）
+  后推进。
 
 
 ## 最终状态：已合并（上游同步部分）
