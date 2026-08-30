@@ -10,7 +10,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = 6bb5878f3a6f5b43be565218e117d4e9b0a4066e  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-08-30 同上 + 拆解系统优化 P0+P1+P2 全量（职责收缩/扩展并行/Query Family/候选总预算/Adaptive Specialist/Gap Analyzer/否定 exclusion）)
+VERIFIED_SOURCE_SHA   = 0cf94f450de105d121e4fa8b6795dee7978ce9cc  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-08-30 同上 + 拆解优化 P0-P2 + 注入预算实践上限 96k（修证据装满预算致预填充 77s）)
 工作分支              = feature/upstream-sync-0.447.4
 ```
 
@@ -666,6 +666,14 @@ seal 不是一次性终点，而是"当前被验证树"的游标；每次审计�
   §十八明确不做（解码收益被宽容解析边际化/需别名基建/覆盖由 coverage run
   承担）。验证：typecheck×3 绿 + eslint 0 error + 新增 12 用例 + knowledge
   簇 283 用例 + full npm test 12834 passed / 0 failed 后推进。
+
+- **2026-08-30 注入预算实践上限 96k（实测回归修复）**（功能树 0cf94f45/seal
+  本提交；2 files / +40-1）：P2 实测发现锚点/融合池随预算伸缩把 512k 动态
+  预算装到满格（usedTokens 493,757/495,616、136 块），主模型预填充 49.4 万
+  token 使 session/reply 77.3s——检索提速被预填充吃回。注入预算 =
+  min(动态预算, KNOWLEDGE_INJECTION_BUDGET_MAX_TOKENS=96k)；「能装≠该装」，
+  注入同时受模型上下文与预填充时间预算约束（§十三 思想）。验证：新增 1
+  用例 + full npm test 12835 passed / 0 failed 后推进。
 
 
 ## 最终状态：已合并（上游同步部分）
