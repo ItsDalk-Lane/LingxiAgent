@@ -99,6 +99,22 @@ export interface KnowledgeRetrievalStats {
   /** 拆解降级（单查询 + 注入块内留痕）。 */
   degraded: boolean;
   degradeReason?: string;
+  /**
+   * 拆解遥测（2026-08-30 拆解优化 §二十五）：latencyMs 含纠错重试；retryCount
+   * = 纠错次数（0=首跑采纳）。缺省 = 旧调用方未接入。
+   */
+  decompositionLatencyMs?: number;
+  decompositionRetryCount?: number;
+  /**
+   * 检索遥测（§二十五，家族级）：originalQueryHits = 直检命中数；
+   * expansionUniqueHits = 扩展查询独立召回的新块数（subQueryMarginalGain 的
+   * 扩展侧）；queryOverlapRatio = 1 − 去重后唯一块 / 总候选引用（0=无重叠）；
+   * evidenceNeedGains = 每证据需求（家族）边际新增块数（家族序：原问题族在前）。
+   */
+  originalQueryHits?: number;
+  expansionUniqueHits?: number;
+  queryOverlapRatio?: number;
+  evidenceNeedGains?: number[];
   /** 融合去重后的候选块数。 */
   fusedChunks: number;
   /** 预算内实际注入块数。 */

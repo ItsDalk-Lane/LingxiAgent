@@ -3285,7 +3285,7 @@
   ],
   "review": {
     "classification": "compatible",
-    "compatibilityReason": "engine.ts _embedKnowledgeTextsForModel 闭包仅透传可选 inputType 参数给 EmbeddingClient（MiniMax db/query 与 Voyage input_type 算法分离），不触及任何持久化形状/SQLite schema/store I/O",
+    "compatibilityReason": "core/engine.ts retrieve closure adds optional topK passthrough to retrieveForNotebooks (candidate total budget per-query share); no persisted store shape or site mapping change",
     "payloadFingerprint": "sha256:7316ccbf83072b075a76e861c110365bda399554823ae3db0278674b086d6f69"
   },
   "schemas": [

@@ -15,6 +15,8 @@ import {
   fuseSubQueryResults,
   knowledgeModeGuidance,
   KNOWLEDGE_DECOMPOSE_SYSTEM_PROMPT,
+  fuseQueryFamilies,
+  groupFamiliesById,
   parseQuestionDecomposition,
   type DecomposeModel,
 } from "../lib/knowledge/knowledge-context-injector.ts";
@@ -92,12 +94,28 @@ describe("拆解输出严格校验", () => {
     expect(parsed.subQueries).toEqual(["q1", "q2"]);
   });
 
-  it("拒绝非 JSON / 非对象 / 字段不符", () => {
+  it("拒绝非 JSON / 非对象 / 必需字段缺失或内容非法", () => {
     for (const raw of ["not json", "[]", '{"intent":"factual"}', '{"intent":"factual","subQueries":[],"extra":1}']) {
       expect(() => parseQuestionDecomposition(raw)).toThrowError(
         expect.objectContaining({ code: "KNOWLEDGE_MODEL_OUTPUT_INVALID" }),
       );
     }
+    // 必需字段整体缺失仍拒绝（宽容输入 ≠ 放过缺字段）。
+    expect(() => parseQuestionDecomposition('{"intent":"factual","reason":"x"}')).toThrow();
+  });
+
+  it("宽容输入 + 严格消费：未知字段忽略，白名单只取 intent/subQueries（2026-08-30）", () => {
+    const parsed = parseQuestionDecomposition('{"intent":"reasoning","subQueries":["甲证据","乙证据"],"reason":"因为"}');
+    expect(parsed.intent).toBe("reasoning");
+    expect(parsed.subQueries).toEqual(["甲证据", "乙证据"]);
+  });
+
+  it("Markdown 围栏与首尾空白被程序剥离，不构成失败（§14 格式错误不走 LLM 纠错）", () => {
+    const parsed = parseQuestionDecomposition('```json\n{"intent":"list","subQueries":["q"]}\n```');
+    expect(parsed.subQueries).toEqual(["q"]);
+    expect(parseQuestionDecomposition('  {"intent":"list","subQueries":["q"]}  ').subQueries).toEqual(["q"]);
+    // 围栏只剥「整段包裹」的形状；JSON 内部内容不动。
+    expect(() => parseQuestionDecomposition('```\nnot json\n```')).toThrow();
   });
 
   it("拒绝非法 intent 枚举与超出 1-4 条的子查询", () => {
@@ -961,5 +979,160 @@ describe("resolveFusionPoolBudget（阀 A：池 70% 折算块数）", () => {
     // 3 路 × 60 全部入池（旧行为会在 60 截断），锚点随之全选。
     expect(stats.fusedChunks).toBe(180);
     expect(stats.injectedChunks).toBe(180);
+  });
+});
+
+// ─────────────── 拆解系统优化（2026-08-30 P0+P1+stats） ───────────────
+
+describe("拆解提示词职责收缩", () => {
+  it("证据需求定义 + 禁同义改写（变体归扩展器，不再职责重复）", () => {
+    expect(KNOWLEDGE_DECOMPOSE_SYSTEM_PROMPT).toContain("independent evidence need");
+    expect(KNOWLEDGE_DECOMPOSE_SYSTEM_PROMPT).toContain("Do NOT add synonym rewrites");
+    // 旧规则 4（同义改写/英文变体）已移除。
+    expect(KNOWLEDGE_DECOMPOSE_SYSTEM_PROMPT).not.toContain("Add synonym rewrites");
+    // 需要相同证据的查询必须合并（SubQuery = 独立证据需求）。
+    expect(KNOWLEDGE_DECOMPOSE_SYSTEM_PROMPT).toContain("merge them into one");
+  });
+});
+
+describe("Query Family 两级融合（§八/§二十）", () => {
+  it("变体多的家族不得多倍投票：三变体原问题族与单查询证据需求等权", () => {
+    const chunk = (id: string) => fakeChunk({ id });
+    const mk = (ids: string[]): RetrieveForNotebooksResult => fakeRetrieval(ids.map(id => chunk(id)));
+    // 原问题族：直检 + 两条扩展转述，三个名次序列同序 [x1, x2]；
+    // 证据需求族：单条子查询 [z1]。
+    const families = [
+      [mk(["x1", "x2"]), mk(["x1", "x2"]), mk(["x1", "x2"])],
+      [mk(["z1"])],
+    ];
+    const fused = fuseQueryFamilies(families, 60);
+    // 两级融合：族内归一后两族第一名同分（各 1/61）→ z1 并列前排，不被
+    // 变体数量淹没；x2 族内第二（1/62）殿后。
+    expect(fused.map(entry => entry.id)).toEqual(["x1", "z1", "x2"]);
+    // 对照（旧行为）：平铺 RRF 下 x1 吃三票压倒 z1。
+    const flat = fuseSubQueryResults([...families[0], ...families[1]]);
+    expect(flat.map(entry => entry.id)).toEqual(["x1", "x2", "z1"]);
+  });
+
+  it("groupFamiliesById：flat 结果按家族 id 升序归组，缺省 id 归 0 族", () => {
+    const chunk = (id: string) => fakeChunk({ id });
+    const r1 = fakeRetrieval([chunk("a")]);
+    const r2 = fakeRetrieval([chunk("b")]);
+    const r3 = fakeRetrieval([chunk("c")]);
+    const grouped = groupFamiliesById([r2, r1, r3], [2, 0, 2]);
+    expect(grouped).toEqual([[r1], [r2, r3]]);
+  });
+});
+
+describe("decomposeQuestion 遥测（§二十五）", () => {
+  it("首跑采纳：attempts=1、retryCount=0、latencyMs 如实", async () => {
+    const result = await decomposeQuestion({
+      question: "问题",
+      callModel: async () => validOutput(["子查询一"]),
+      now: (() => 1000) as () => number,
+    });
+    expect(result.attempts).toBe(1);
+    expect(result.degraded).toBe(false);
+    // now 固定时钟：latencyMs = 0（数值存在即契约，不假设真实耗时）。
+    expect(result.latencyMs).toBe(0);
+  });
+
+  it("经一次纠错：attempts=2（stats 侧 retryCount=1）", async () => {
+    const result = await decomposeQuestion({
+      question: "问题",
+      callModel: async (input) => (input.correction ? validOutput(["修正"]) : "{invalid"),
+      now: (() => 1000) as () => number,
+    });
+    expect(result.attempts).toBe(2);
+    expect(result.subQueries).toEqual(["修正"]);
+  });
+});
+
+describe("候选总预算分摊（§二十一）与扩展并行（§二十三 重排）", () => {
+  it("每查询 topK = ceil(240/(非等值子查询+1)) 夹 [24,60]；直检不追溯", async () => {
+    const seen: Array<{ query: string; topK?: number }> = [];
+    const decomposeModel: DecomposeModel = async () => validOutput(["甲查询", "乙查询", "丙查询", "丁查询"]);
+    const { stats } = await buildKnowledgeContextInjection({
+      question: "主问题",
+      mode: "qa",
+      deps: {
+        decomposeModel,
+        distillModel: null,
+        retrieve: async ({ query, topK }) => {
+          seen.push({ query, topK });
+          return fakeRetrieval([fakeChunk({ id: query })]);
+        },
+      },
+    });
+    // 4 条非等值子查询 → 每查询分摊 ceil(240/5) = 48。
+    const subCalls = seen.filter(call => call.query !== "主问题");
+    expect(subCalls).toHaveLength(4);
+    expect(subCalls.every(call => call.topK === 48)).toBe(true);
+    // 直检在 t0 已启动，不带分摊（检索侧默认水位）。
+    expect(seen.find(call => call.query === "主问题")?.topK).toBeUndefined();
+    expect(stats.subQueryHits).toEqual([1, 1, 1, 1]);
+  });
+
+  it("扩展与子查询批并行：子查询检索先于扩展 LLM 返回；扩展到货补检索", async () => {
+    const events: string[] = [];
+    let releaseExpansion: (() => void) | null = null;
+    const expansionGate = new Promise<void>(resolve => {
+      releaseExpansion = () => resolve();
+    });
+    const decomposeModel: DecomposeModel = async () => validOutput(["子查询一"]);
+    const expandModel: DecomposeModel = async () => {
+      events.push("expand-llm-start");
+      await expansionGate;
+      return JSON.stringify({ expansions: ["扩展查询甲"] });
+    };
+    const injectionPromise = buildKnowledgeContextInjection({
+      question: "主问题",
+      mode: "qa",
+      deps: {
+        decomposeModel,
+        expandModel,
+        distillModel: null,
+        retrieve: async ({ query }) => {
+          events.push(`retrieve:${query}`);
+          return fakeRetrieval([fakeChunk({ id: query })]);
+        },
+      },
+    });
+    // 让微任务队列跑完（拆解/子查询批/扩展 LLM 启动），再放行扩展。
+    await new Promise(resolve => setTimeout(resolve, 20));
+    expect(events).toContain("retrieve:子查询一"); // 子查询检索没等扩展 LLM
+    events.push("release");
+    releaseExpansion!();
+    const { stats } = await injectionPromise;
+    expect(events.indexOf("retrieve:子查询一")).toBeLessThan(events.indexOf("release"));
+    expect(events).toContain("retrieve:扩展查询甲"); // 扩展到货补检索
+    expect(stats.expandedQueries).toEqual(["扩展查询甲"]);
+    expect(stats.expandedQueryHits).toEqual([1]);
+  });
+
+  it("检索遥测（§二十五）：直检命中/扩展独立贡献/重叠率/家族边际收益", async () => {
+    const decomposeModel: DecomposeModel = async () => validOutput(["子查询一"]);
+    const expandModel: DecomposeModel = async () => JSON.stringify({ expansions: ["扩展查询甲"] });
+    const { stats } = await buildKnowledgeContextInjection({
+      question: "主问题",
+      mode: "qa",
+      deps: {
+        decomposeModel,
+        expandModel,
+        distillModel: null,
+        retrieve: async ({ query }) => {
+          if (query === "主问题") return fakeRetrieval([fakeChunk({ id: "d1" })]);
+          if (query === "子查询一") return fakeRetrieval([fakeChunk({ id: "s1" })]);
+          return fakeRetrieval([fakeChunk({ id: "e1" })]);
+        },
+      },
+    });
+    expect(stats.originalQueryHits).toBe(1);
+    expect(stats.expansionUniqueHits).toBe(1); // e1 仅扩展召回
+    expect(stats.queryOverlapRatio).toBe(0); // 三查询三块无重叠
+    // 家族序：0=原问题族（d1+e1 两块）→ 1=子查询族（s1）。
+    expect(stats.evidenceNeedGains).toEqual([2, 1]);
+    expect(stats.decompositionLatencyMs).toBeDefined();
+    expect(stats.decompositionRetryCount).toBe(0);
   });
 });

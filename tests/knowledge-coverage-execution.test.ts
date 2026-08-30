@@ -124,7 +124,13 @@ describe("受控查询扩展（§三十五）", () => {
     );
     expect(() => parseQueryExpansion("not json", [])).toThrow();
     expect(() => parseQueryExpansion('{"expansions":["  "]}', [])).toThrow();
-    expect(() => parseQueryExpansion('{"expansions":["x"],"extra":1}', [])).toThrow();
+    // 宽容输入 + 严格消费（2026-08-30 拆解优化）：未知字段忽略不整体拒绝，
+    // 白名单只消费 expansions——无害格式偏差不再浪费一次 8s 纠错。
+    expect(parseQueryExpansion('{"expansions":["x"],"extra":1}', [])).toEqual(["x"]);
+    // 必需字段缺失仍拒绝。
+    expect(() => parseQueryExpansion('{"extra":1}', [])).toThrow();
+    // Markdown 围栏包裹被程序剥离，不算失败（§14 格式错误不走 LLM 纠错）。
+    expect(parseQueryExpansion('```json\n{"expansions":["x"]}\n```', [])).toEqual(["x"]);
   });
 
   it("扩展成功：扩展查询与子查询同样并行检索、进 RRF；块内列出采纳的扩展", async () => {

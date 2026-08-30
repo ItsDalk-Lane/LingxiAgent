@@ -2721,14 +2721,16 @@ export class LingxiEngine {
               : {}),
           },
           // Phase 8：sourceIds/sectionsBySourceId 是 broad 结构缺口的约束参数
-          // （§三十八/§三十九）；§四十三 冻结对二次检索同样生效。
-          retrieve: ({ query, sourceIds, sectionsBySourceId }) => knowledge.queryService.retrieveForNotebooks({
+          // （§三十八/§三十九）；§四十三 冻结对二次检索同样生效。topK 是候选
+          // 总预算（§二十一）的每查询分摊，同时约束该查询的 rerank 输入。
+          retrieve: ({ query, sourceIds, sectionsBySourceId, topK }) => knowledge.queryService.retrieveForNotebooks({
             studioId,
             notebookIds: input.knowledgeRefs.notebookIds,
             question: query,
             ...(frozenArtifacts ? { frozenArtifacts } : {}),
             ...(sourceIds ? { sourceIds } : {}),
             ...(sectionsBySourceId ? { sectionsBySourceId } : {}),
+            ...(topK != null ? { topK } : {}),
           }),
           // §三十六 邻接扩展：同 variant 内按锚点 ordinal ± 窗口定点回读。
           readNeighborChunks: ({ anchor, ordinals }) => knowledge.queryService.readAdjacentChunks({

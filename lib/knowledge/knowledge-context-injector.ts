@@ -79,6 +79,7 @@ import type {
   RetrieveForNotebooksResult,
 } from "./knowledge-query-service.ts";
 import {
+  KNOWLEDGE_CANDIDATE_GENERATION_BUDGET,
   KNOWLEDGE_EVIDENCE_BUDGET,
   KNOWLEDGE_FUSION_BUDGET,
   knowledgeSectionKeyOf,
@@ -119,6 +120,16 @@ export const KNOWLEDGE_EVIDENCE_BUDGET_MAX = 240;
  */
 export const KNOWLEDGE_FUSION_POOL_UTILIZATION = 0.7;
 export const KNOWLEDGE_FUSION_POOL_MAX = 480;
+
+/**
+ * 候选总预算（§二十一，2026-08-30 拆解优化）：查询数不再隐式放大下游成本
+ * （每查询 × 每笔记本各一次嵌入+rerank）。子查询/扩展查询的每查询 topK =
+ * 总预算对（非等值子查询 + 直检）的分摊，下限 24（保检索意义）、上限 =
+ * KNOWLEDGE_CANDIDATE_GENERATION_BUDGET（60，既有单查询水位）。直检在 t0
+ * 已启动不追溯，天然占满 60。
+ */
+export const KNOWLEDGE_TOTAL_CANDIDATE_BUDGET = 240;
+export const KNOWLEDGE_TOTAL_CANDIDATE_BUDGET_MIN_PER_QUERY = 24;
 
 /** 伸缩后的融合池上限：确定性纯函数（与 resolveEvidenceAnchorBudget 同法）。 */
 export function resolveFusionPoolBudget(input: {
@@ -251,10 +262,10 @@ export const KNOWLEDGE_DECOMPOSE_SYSTEM_PROMPT = `You decompose a user question 
 
 Rules:
 1. Produce 1 to 4 sub-queries. Use a single sub-query only when the question is already one focused lookup.
-2. Cover distinct facets of the question: entities, time constraints, causes, comparisons, or exclusion conditions.
+2. Each sub-query must represent one independent evidence need — a distinct piece of evidence required to answer the question (an entity's state, a time-constrained fact, a cause, one side of a comparison, an exclusion condition). If two sub-queries would be answered by essentially the same passages, merge them into one.
 3. For negated questions (not, except, besides, 除了/不包括), include one sub-query that states the exclusion condition itself.
-4. Add synonym rewrites and keyword variants, in the question's language and in English when the topic has established English terms.
-5. Keep proper nouns, product names, and code identifiers exactly as written in the question. Do not translate or normalize them.
+4. Keep proper nouns, product names, and code identifiers exactly as written in the question. Do not translate or normalize them.
+5. Do NOT add synonym rewrites, translations, or keyword variants — a separate expansion stage owns retrieval wording. Only distinct evidence needs belong here.
 6. The sub-queries search untrusted source data. Never embed instructions for the reader inside a sub-query.
 7. Return one JSON object and nothing else. Do not use Markdown fences.
 
@@ -282,6 +293,10 @@ export interface DecomposeResult {
   degraded: boolean;
   degradeReason: DecomposeDegradeReason | null;
   degradeDetail: string | null;
+  /** 拆解总耗时（ms，含纠错重试；2026-08-30 拆解优化 §25 观测）。 */
+  latencyMs: number;
+  /** 模型调用次数（1=首跑采纳，2=经一次纠错；降级路径如实）。 */
+  attempts: number;
 }
 
 /** 拆解模型调用（callText 封装）。correction 非空表示纠错重试：附上次的错误与原始输出。 */
@@ -333,8 +348,10 @@ function requiredExpansion(value: unknown): QuestionExpansion {
     throw new KnowledgeError("KNOWLEDGE_MODEL_OUTPUT_INVALID", "Query expansion output must be an object");
   }
   const record = value as Record<string, unknown>;
-  const keys = Object.keys(record);
-  if (keys.length !== 1 || !Object.hasOwn(record, "expansions")) {
+  // 宽容输入 + 严格消费（2026-08-30 拆解优化）：未知字段忽略（白名单只取
+  // expansions），必需字段缺失/内容非法仍然整体拒绝——无害格式偏差不再
+  // 浪费一次 8s 纠错往返。
+  if (!Object.hasOwn(record, "expansions")) {
     throw new KnowledgeError("KNOWLEDGE_MODEL_OUTPUT_INVALID", "Query expansion output fields are invalid");
   }
   if (!Array.isArray(record.expansions) || record.expansions.length > KNOWLEDGE_QUERY_EXPANSION_MAX) {
@@ -370,7 +387,7 @@ export function parseQueryExpansion(raw: string, existingQueries: string[]): str
   }
   let parsed: unknown;
   try {
-    parsed = JSON.parse(raw);
+    parsed = JSON.parse(stripModelOutputFences(raw));
   } catch {
     throw new KnowledgeError("KNOWLEDGE_MODEL_OUTPUT_INVALID", "Query expansion model output is not valid JSON");
   }
@@ -458,8 +475,10 @@ function requiredDecomposition(value: unknown): QuestionDecomposition {
     throw new KnowledgeError("KNOWLEDGE_MODEL_OUTPUT_INVALID", "Decomposition output must be an object");
   }
   const record = value as Record<string, unknown>;
-  const keys = Object.keys(record);
-  if (keys.length !== 2 || !Object.hasOwn(record, "intent") || !Object.hasOwn(record, "subQueries")) {
+  // 宽容输入 + 严格消费（2026-08-30 拆解优化）：未知字段（reason/foo/…）忽略，
+  // 只白名单消费 intent + subQueries；必需字段缺失或内容非法仍整体拒绝。
+  // 提示词仍严格要求恰好两字段——解析侧不再因无害偏差丢弃整个结果。
+  if (!Object.hasOwn(record, "intent") || !Object.hasOwn(record, "subQueries")) {
     throw new KnowledgeError("KNOWLEDGE_MODEL_OUTPUT_INVALID", "Decomposition output fields are invalid");
   }
   if (typeof record.intent !== "string" || !QUESTION_INTENTS.has(record.intent as QuestionIntent)) {
@@ -495,6 +514,18 @@ function requiredDecomposition(value: unknown): QuestionDecomposition {
 }
 
 /**
+ * 程序化格式修复（2026-08-30 拆解优化 §14）：剥离 ```json 围栏与首尾空白后再
+ * JSON.parse——纯格式偏差（fence/空白）不烧 8s 纠错往返，直接程序修复；语义
+ * 层非法（字段/枚举/条数）仍走纠错。仅剥离「整段被围栏包裹」的形状，不动
+ * JSON 内部内容。
+ */
+export function stripModelOutputFences(raw: string): string {
+  const trimmed = raw.trim();
+  const fenced = /^```[a-zA-Z0-9_-]*\s*([\s\S]*?)\s*```$/.exec(trimmed);
+  return fenced ? fenced[1].trim() : trimmed;
+}
+
+/**
  * 解析并严格校验拆解输出（requiredObject 风格）：纯 JSON、精确字段、
  * intent 枚举、子查询 1-4 条非空且不超长。任何不符抛 KNOWLEDGE_MODEL_OUTPUT_INVALID。
  */
@@ -504,20 +535,26 @@ export function parseQuestionDecomposition(raw: string): QuestionDecomposition {
   }
   let parsed: unknown;
   try {
-    parsed = JSON.parse(raw);
+    parsed = JSON.parse(stripModelOutputFences(raw));
   } catch {
     throw new KnowledgeError("KNOWLEDGE_MODEL_OUTPUT_INVALID", "Decomposition model output is not valid JSON");
   }
   return requiredDecomposition(parsed);
 }
 
-function degrade(question: string, reason: DecomposeDegradeReason, detail: string | null): DecomposeResult {
+function degrade(
+  question: string,
+  reason: DecomposeDegradeReason,
+  detail: string | null,
+  telemetry: { latencyMs: number; attempts: number },
+): DecomposeResult {
   return {
     subQueries: [question],
     intent: null,
     degraded: true,
     degradeReason: reason,
     degradeDetail: detail,
+    ...telemetry,
   };
 }
 
@@ -535,10 +572,13 @@ function describeError(error: unknown): string {
 export async function decomposeQuestion(input: {
   question: string;
   callModel: DecomposeModel | null;
+  now?: () => number;
 }): Promise<DecomposeResult> {
   const question = input.question.trim();
+  const now = input.now ?? (() => Date.now());
+  const startedAt = now();
   if (!input.callModel) {
-    return degrade(question, "knowledge model slot not configured", null);
+    return degrade(question, "knowledge model slot not configured", null, { latencyMs: 0, attempts: 0 });
   }
   let firstError = "";
   let firstOutput = "";
@@ -549,7 +589,10 @@ export async function decomposeQuestion(input: {
         ? { question }
         : { question, correction: { error: firstError, previousOutput: firstOutput } });
     } catch (error) {
-      return degrade(question, "model call failed", describeError(error));
+      return degrade(question, "model call failed", describeError(error), {
+        latencyMs: now() - startedAt,
+        attempts: attempt + 1,
+      });
     }
     try {
       const parsed = parseQuestionDecomposition(raw);
@@ -559,6 +602,8 @@ export async function decomposeQuestion(input: {
         degraded: false,
         degradeReason: null,
         degradeDetail: null,
+        latencyMs: now() - startedAt,
+        attempts: attempt + 1,
       };
     } catch (error) {
       if (attempt === 0) {
@@ -566,11 +611,17 @@ export async function decomposeQuestion(input: {
         firstOutput = raw.slice(0, 2000);
         continue;
       }
-      return degrade(question, "model output invalid after one correction retry", firstError);
+      return degrade(question, "model output invalid after one correction retry", firstError, {
+        latencyMs: now() - startedAt,
+        attempts: 2,
+      });
     }
   }
   // 循环必然 return；此处仅为类型完备。
-  return degrade(question, "model output invalid after one correction retry", null);
+  return degrade(question, "model output invalid after one correction retry", null, {
+    latencyMs: now() - startedAt,
+    attempts: 2,
+  });
 }
 
 export interface KnowledgeInjectorDeps {
@@ -604,6 +655,11 @@ export interface KnowledgeInjectorDeps {
     query: string;
     sourceIds?: string[];
     sectionsBySourceId?: ReadonlyMap<string, string[]>;
+    /**
+     * 该查询的候选上限（候选总预算 §二十一 的每查询分摊；同时约束该查询
+     * 的 rerank 输入）。缺省 = 检索侧默认水位（60）。
+     */
+    topK?: number;
   }) => Promise<RetrieveForNotebooksResult>;
   /**
    * 邻接块读取门面（§三十六，Phase 8）：按锚点 (variant, ordinal ±窗口) 定点
@@ -648,18 +704,17 @@ interface FusedChunk {
 }
 
 /**
- * 跨子查询融合：每个子查询的候选各自是一个名次序列，按名次做 RRF
- * （score = Σ 1/(60+rank+1)，与检索核心 fuseCandidates 同一公式），
- * 让多条子查询同时命中的 chunk 排到前面。并列时按 notebook/源/ordinal 稳定排序。
- * §二十六 fusionBudget：融合池输出封顶（预算链独立生效，候选不无限增长）。
+ * RRF 融合核心（k=60，与检索核心 fuseCandidates 同一公式）：多条名次序列
+ * 等权融合，score = Σ 1/(60+rank+1)；并列按 notebook/源/ordinal 稳定排序。
+ * fuseSubQueryResults（查询级平铺）与 fuseQueryFamilies（家族两级）共用。
  */
-export function fuseSubQueryResults(
-  results: RetrieveForNotebooksResult[],
-  cap: number = KNOWLEDGE_FUSION_BUDGET,
+function rrfFuseRankings(
+  rankings: ReadonlyArray<readonly NotebookRetrievalChunk[]>,
+  cap: number,
 ): NotebookRetrievalChunk[] {
   const fused = new Map<string, FusedChunk>();
-  for (const result of results) {
-    result.candidates.forEach((chunk, rank) => {
+  for (const ranking of rankings) {
+    ranking.forEach((chunk, rank) => {
       const current = fused.get(chunk.id) || { chunk, score: 0 };
       current.score += 1 / (60 + rank + 1);
       fused.set(chunk.id, current);
@@ -674,6 +729,53 @@ export function fuseSubQueryResults(
     ))
     .slice(0, Math.max(1, cap))
     .map(entry => entry.chunk);
+}
+
+/**
+ * 跨子查询融合：每个子查询的候选各自是一个名次序列，按名次做 RRF
+ * （score = Σ 1/(60+rank+1)，与检索核心 fuseCandidates 同一公式），
+ * 让多条子查询同时命中的 chunk 排到前面。并列时按 notebook/源/ordinal 稳定排序。
+ * §二十六 fusionBudget：融合池输出封顶（预算链独立生效，候选不无限增长）。
+ */
+export function fuseSubQueryResults(
+  results: RetrieveForNotebooksResult[],
+  cap: number = KNOWLEDGE_FUSION_BUDGET,
+): NotebookRetrievalChunk[] {
+  return rrfFuseRankings(results.map(result => result.candidates), cap);
+}
+
+/**
+ * Query Family 两级融合（§八/§二十，2026-08-30 拆解优化）：先在家族内把该
+ * 证据需求的全部查询变体（直检 + 扩展转述 / 单条子查询 / 单次结构探测）归一
+ * 成一条名次序列，再在证据需求（家族）之间等权 RRF——每个家族恰好一票，
+ * 与变体数量无关（否则同一证据需求靠多写法获得多倍投票权，淹没只有一条
+ * 查询的证据方向）。池上限语义与 fuseSubQueryResults 相同。
+ */
+export function fuseQueryFamilies(
+  families: ReadonlyArray<RetrieveForNotebooksResult[]>,
+  cap: number,
+): NotebookRetrievalChunk[] {
+  const familyRankings = families.map(family =>
+    (family.length === 0
+      ? []
+      : rrfFuseRankings(family.map(result => result.candidates), Number.MAX_SAFE_INTEGER)));
+  return rrfFuseRankings(familyRankings, cap);
+}
+
+/** flat 检索结果按家族 id 归组（家族序 = id 升序；缺省 id 归 0 族）。 */
+export function groupFamiliesById(
+  results: ReadonlyArray<RetrieveForNotebooksResult>,
+  familyIds: ReadonlyArray<number>,
+): RetrieveForNotebooksResult[][] {
+  const byFamily = new Map<number, RetrieveForNotebooksResult[]>();
+  results.forEach((result, index) => {
+    const familyId = familyIds[index] ?? 0;
+    const bucket = byFamily.get(familyId) ?? [];
+    bucket.push(result);
+    byFamily.set(familyId, bucket);
+  });
+  return [...byFamily.keys()].sort((left, right) => left - right)
+    .map(familyId => byFamily.get(familyId)!);
 }
 
 /** 证据装填条目（§三十六）：锚点 = 检索命中；邻接扩展块 contextOnly=true。 */
@@ -1538,6 +1640,20 @@ export function renderKnowledgeContextBlock(input: {
    * openQuestions/warnings，替换普通检索证据区。
    */
   coverageEvidence?: CoverageEvidencePayload;
+  /**
+   * Query Family 归属（§八，2026-08-30 拆解优化）：与 retrievalResults 下标对齐
+   * 的家族 id（0=原问题族，1..N=各子查询，探测各自领号）。给定时 stats 的
+   * 融合口径与编排层两级融合同源；缺省回退平铺融合（兼容直接调用方/测试）。
+   */
+  retrievalFamilyIds?: number[];
+  /** 检索遥测（§二十五，编排层按家族计算；缺省不产出对应 stats 字段）。 */
+  retrievalTelemetry?: {
+    originalQueryHits: number;
+    expansionUniqueHits: number;
+    queryOverlapRatio: number;
+    /** 每家族边际新增块数（家族序：0=原问题族在前）。 */
+    evidenceNeedGains: number[];
+  };
 }): { block: string; stats: KnowledgeRetrievalStats; evidence: KnowledgeInjectionEvidence } {
   const lines: string[] = ["[KnowledgeContext]"];
   lines.push("Knowledge notebook evidence retrieved for the user's question (not part of the user's message).");
@@ -1562,7 +1678,12 @@ export function renderKnowledgeContextBlock(input: {
   });
   const fused = input.evidence && !input.distilled
     ? input.evidence.filter(entry => !entry.contextOnly).map(entry => entry.chunk)
-    : fuseSubQueryResults(input.retrievalResults, renderFusionPoolBudget);
+    : (input.retrievalFamilyIds
+      ? fuseQueryFamilies(
+        groupFamiliesById(input.retrievalResults, input.retrievalFamilyIds),
+        renderFusionPoolBudget,
+      )
+      : fuseSubQueryResults(input.retrievalResults, renderFusionPoolBudget));
   const allSources = mergeSources(input.retrievalResults);
   const degraded = mergeDegradedScopes(input.retrievalResults);
   // rerank 期限/传输降级留痕（候选保持 RRF 名次，禁静默）：注入块与 stats 同源。
@@ -1702,7 +1823,12 @@ export function renderKnowledgeContextBlock(input: {
     // 装填序列 = 锚点 + contextOnly 邻接块（§三十六）；邻接块放不下只跳过自身
     // （上下文连续性让位于锚点证据），锚点放不下才触发截断 + 分片清单。
     const entries: KnowledgeEvidenceEntry[] = input.evidence
-      ?? fuseSubQueryResults(input.retrievalResults, renderFusionPoolBudget)
+      ?? (input.retrievalFamilyIds
+        ? fuseQueryFamilies(
+          groupFamiliesById(input.retrievalResults, input.retrievalFamilyIds),
+          renderFusionPoolBudget,
+        )
+        : fuseSubQueryResults(input.retrievalResults, renderFusionPoolBudget))
         .map(chunk => ({ chunk, contextOnly: false }));
     let lastAnchorOrdinal: number | null = null;
     for (let index = 0; index < entries.length; index += 1) {
@@ -1815,6 +1941,21 @@ export function renderKnowledgeContextBlock(input: {
       subQueryHits: input.subQueryHits,
       degraded: input.decomposition.degraded,
       ...(input.decomposition.degradeReason ? { degradeReason: input.decomposition.degradeReason } : {}),
+      // 拆解/检索遥测（§二十五，2026-08-30）：全可选 additive，缺省不产出。
+      ...(input.decomposition.latencyMs != null
+        ? { decompositionLatencyMs: input.decomposition.latencyMs }
+        : {}),
+      ...(input.decomposition.attempts != null
+        ? { decompositionRetryCount: Math.max(0, input.decomposition.attempts - 1) }
+        : {}),
+      ...(input.retrievalTelemetry
+        ? {
+          originalQueryHits: input.retrievalTelemetry.originalQueryHits,
+          expansionUniqueHits: input.retrievalTelemetry.expansionUniqueHits,
+          queryOverlapRatio: input.retrievalTelemetry.queryOverlapRatio,
+          evidenceNeedGains: input.retrievalTelemetry.evidenceNeedGains,
+        }
+        : {}),
       fusedChunks: fused.length,
       injectedChunks: injected.length,
       truncated: truncated > 0,
@@ -1932,27 +2073,53 @@ export async function buildKnowledgeContextInjection(input: {
     question: input.question,
     callModel: input.deps.decomposeModel,
   });
-  // §三十五 受控扩展：拆解成功才尝试（降级单查询路径本身已复用直检，不再扩展）；
-  // 无模型/失败 → 不扩展并留痕。扩展查询与子查询同样并行检索、同走 RRF。
-  const expansion = decomposition.degraded
-    ? null
-    : await expandQueries({
+  // 与原问题字面相同的子查询复用直检结果；其余子查询立即并行检索。
+  // parseQuestionDecomposition 已按 trimmed 去重，等值子查询至多一条。
+  const isDirect = decomposition.subQueries.map(query => query.trim() === questionTrimmed);
+  // ── 候选总预算（§二十一）：查询数不再隐式放大下游成本。每查询 topK =
+  // 总预算对（非等值子查询 + 直检）的分摊，夹在 [24,60]；扩展查询沿用同一
+  // 分摊（直检在 t0 已按自然上限 60 启动，不追溯）。
+  const nonDirectSubQueryCount = isDirect.filter(equal => !equal).length;
+  const perQueryTopK = Math.max(
+    KNOWLEDGE_TOTAL_CANDIDATE_BUDGET_MIN_PER_QUERY,
+    Math.min(
+      KNOWLEDGE_CANDIDATE_GENERATION_BUDGET,
+      Math.ceil(KNOWLEDGE_TOTAL_CANDIDATE_BUDGET / Math.max(1, nonDirectSubQueryCount + 1)),
+    ),
+  );
+  const subQuerySettledPromise: Promise<PromiseSettledResult<RetrieveForNotebooksResult>[]> = Promise.allSettled(
+    decomposition.subQueries
+      .filter((_, index) => !isDirect[index])
+      .map(subQuery => input.deps.retrieve({ query: subQuery, topK: perQueryTopK })),
+  );
+  // ── 扩展与子查询批并行（§十一/§二十三 链路重排，2026-08-30）：拆解一返回
+  // 就同时发 (a) 子查询检索批 (b) 扩展 LLM 调用；扩展返回后其查询立即补一批
+  // 检索。消除「拆解 → 扩展 → 检索」中扩展那次串行 LLM 往返（典型 1-2s、
+  // 最坏 15s）。拆解降级（单查询路径已复用直检）不扩展并留痕。
+  const expansionOutcomePromise: Promise<{
+    expansion: Awaited<ReturnType<typeof expandQueries>> | null;
+    settled: PromiseSettledResult<RetrieveForNotebooksResult>[];
+  }> = (async () => {
+    if (decomposition.degraded) {
+      return { expansion: null, settled: [] };
+    }
+    const expansion = await expandQueries({
       question: input.question,
       existingQueries: decomposition.subQueries,
       callModel: input.deps.expandModel ?? null,
     });
-  const expansionQueries = expansion ? expansion.expansions : [];
-
-  // 与原问题字面相同的子查询复用直检结果；其余子查询与扩展查询并行补检索。
-  // parseQuestionDecomposition 已按 trimmed 去重，等值子查询至多一条；
-  // parseQueryExpansion 已对 [原问题, ...子查询] 去重。
-  const isDirect = decomposition.subQueries.map(query => query.trim() === questionTrimmed);
-  const settled = await Promise.allSettled([
-    ...decomposition.subQueries
-      .filter((_, index) => !isDirect[index])
-      .map(subQuery => input.deps.retrieve({ query: subQuery })),
-    ...expansionQueries.map(query => input.deps.retrieve({ query })),
+    const queries = expansion ? expansion.expansions : [];
+    const settled = await Promise.allSettled(
+      queries.map(query => input.deps.retrieve({ query, topK: perQueryTopK })),
+    );
+    return { expansion, settled };
+  })();
+  const [subQuerySettled, expansionOutcome] = await Promise.all([
+    subQuerySettledPromise,
+    expansionOutcomePromise,
   ]);
+  const expansion = expansionOutcome.expansion;
+  const expansionQueries = expansion ? expansion.expansions : [];
   let directValue: RetrieveForNotebooksResult | null = null;
   let directFailure: string | null = null;
   try {
@@ -1965,13 +2132,27 @@ export async function buildKnowledgeContextInjection(input: {
   const retrievalFailures: string[] = [];
   const subQueryHits: number[] = [];
   const expandedQueryHits: number[] = [];
-  let settledIndex = 0;
+  // Query Family 归属（§八，2026-08-30 拆解优化）：family 0 = 原问题族（直检 +
+  // 全部扩展转述，扩展无归属字段、是查询集的变体）；family 1..N = 各非等值
+  // 子查询（独立证据需求）；结构探测结果在并入时各自领新家族号。
+  const resultFamilyIds: number[] = [];
+  // fulfilled 结果按来源分桶收集（遥测用：扩展的独立贡献只看扩展结果，
+  // 不按 flat 下标区间——直检尾插在扩展之后，区间口径会误计）。
+  const nonExpansionFulfilled: RetrieveForNotebooksResult[] = [];
+  const expansionFulfilled: RetrieveForNotebooksResult[] = [];
+  const FAMILY_ORIGINAL = 0;
+  // 结构探测结果并入时各自领新家族号（每次探测 = 一个定向补证需求）。
+  let nextFamilyId = 1;
+  let subQuerySettledIndex = 0;
+  let nonDirectFamilySeq = 0;
   let directUsedAsSubQuery = false;
   decomposition.subQueries.forEach((subQuery, index) => {
     if (isDirect[index]) {
       directUsedAsSubQuery = true;
       if (directValue) {
         retrievalResults.push(directValue);
+        resultFamilyIds.push(FAMILY_ORIGINAL);
+        nonExpansionFulfilled.push(directValue);
         subQueryHits.push(directValue.candidates.length);
       } else {
         retrievalFailures.push(directFailure || "direct retrieval failed");
@@ -1979,32 +2160,37 @@ export async function buildKnowledgeContextInjection(input: {
       }
       return;
     }
-    const outcome = settled[settledIndex];
-    settledIndex += 1;
+    const outcome = subQuerySettled[subQuerySettledIndex];
+    subQuerySettledIndex += 1;
     if (outcome.status === "fulfilled") {
       retrievalResults.push(outcome.value);
+      resultFamilyIds.push(1 + nonDirectFamilySeq);
+      nonExpansionFulfilled.push(outcome.value);
       subQueryHits.push(outcome.value.candidates.length);
     } else {
       retrievalFailures.push(describeError(outcome.reason));
       subQueryHits.push(0);
     }
+    nonDirectFamilySeq += 1;
   });
-  // 扩展查询的名次序列（hits 对齐 expandedQueries）。
-  expansionQueries.forEach(() => {
-    const outcome = settled[settledIndex];
-    settledIndex += 1;
+  // 扩展查询的名次序列（hits 对齐 expandedQueries）——变体并入原问题族。
+  expansionOutcome.settled.forEach((outcome) => {
     if (outcome.status === "fulfilled") {
       retrievalResults.push(outcome.value);
+      resultFamilyIds.push(FAMILY_ORIGINAL);
+      expansionFulfilled.push(outcome.value);
       expandedQueryHits.push(outcome.value.candidates.length);
     } else {
       retrievalFailures.push(describeError(outcome.reason));
       expandedQueryHits.push(0);
     }
   });
-  // 无等值子查询时，直检作为第 N+1 条名次序列并入 RRF 融合。
+  // 无等值子查询时，直检作为第 N+1 条名次序列并入 RRF 融合（原问题族）。
   if (!directUsedAsSubQuery) {
     if (directValue) {
       retrievalResults.push(directValue);
+      resultFamilyIds.push(FAMILY_ORIGINAL);
+      nonExpansionFulfilled.push(directValue);
     } else {
       retrievalFailures.push(directFailure || "direct retrieval failed");
     }
@@ -2038,6 +2224,7 @@ export async function buildKnowledgeContextInjection(input: {
         : [];
 
   let finalResults = retrievalResults;
+  let finalFamilyIds = resultFamilyIds;
   const mergedFailures = [...retrievalFailures];
   let noEvidenceSources: NotebookRetrievalSource[] = [];
   let sectionNoEvidence: Array<{ source: NotebookRetrievalSource; sections: string[] }> = [];
@@ -2046,6 +2233,8 @@ export async function buildKnowledgeContextInjection(input: {
   let upgradedTo: "broad" | "exhaustive" | undefined;
   let coverageDegradeReason: string | undefined;
   const allSources = mergeSources(retrievalResults);
+  // 家族分组（§八）：两级融合与边际收益统计共用 groupFamiliesById；探测并入后
+  // 以 finalResults/finalFamilyIds 重算。
   // 融合池上限随预算倒推（70% 折算块数；按初轮候选预估，探测后以 finalResults
   // 重算并用于正式融合）。
   const fusionPoolBudgetPreview = resolveFusionPoolBudget({
@@ -2067,7 +2256,19 @@ export async function buildKnowledgeContextInjection(input: {
       scopeLevel: coveragePlan?.scopeLevel ?? null,
       retrieve: input.deps.retrieve,
     });
-    if (probes.results.length > 0) finalResults = [...finalResults, ...probes.results];
+    if (probes.results.length > 0) {
+      // 每次探测结果 = 一个定向补证需求，各自领新家族号（§八 两级融合下
+      // 与既有证据需求等权一票）。
+      finalResults = [...finalResults, ...probes.results];
+      finalFamilyIds = [
+        ...finalFamilyIds,
+        ...probes.results.map(() => {
+          const familyId = nextFamilyId;
+          nextFamilyId += 1;
+          return familyId;
+        }),
+      ];
+    }
     mergedFailures.push(...probes.failures);
     noEvidenceSources = probes.noEvidenceSources;
     sectionNoEvidence = probes.sectionNoEvidence;
@@ -2085,7 +2286,7 @@ export async function buildKnowledgeContextInjection(input: {
     // §四十一 执行侧自动升级：主轮 footprint 不足且多源 scope → 复用已检索
     // 结果，只补 broad 的缺失探测（不重跑已命中的部分）。
     const previewFootprint = computeCoverageFootprint({
-      fused: fuseSubQueryResults(retrievalResults, fusionPoolBudgetPreview),
+      fused: fuseQueryFamilies(groupFamiliesById(retrievalResults, resultFamilyIds), fusionPoolBudgetPreview),
       sources: allSources,
       candidateChunkCount: retrievalResults.reduce((sum, result) => sum + result.candidates.length, 0),
     });
@@ -2113,7 +2314,7 @@ export async function buildKnowledgeContextInjection(input: {
     budgetTokens,
     candidates: finalResults.flatMap(result => result.candidates),
   });
-  let fused = fuseSubQueryResults(finalResults, fusionPoolBudget);
+  let fused = fuseQueryFamilies(groupFamiliesById(finalResults, finalFamilyIds), fusionPoolBudget);
   // 锚点上限随注入预算伸缩（大上下文模型多带证据，小模型维持既有 40 兜底）。
   let anchorBudget = resolveEvidenceAnchorBudget({ budgetTokens, fused });
   let anchors = fused.slice(0, anchorBudget);
@@ -2159,7 +2360,7 @@ export async function buildKnowledgeContextInjection(input: {
       await runProbes();
       // 降格补跑的结构探测改变了融合池：footprint 按探测后结果重算
       // （与正常 broad 路径同口径，§四十一 升级判断也用重算后的值）。
-      fused = fuseSubQueryResults(finalResults, fusionPoolBudget);
+      fused = fuseQueryFamilies(groupFamiliesById(finalResults, finalFamilyIds), fusionPoolBudget);
       anchorBudget = resolveEvidenceAnchorBudget({ budgetTokens, fused });
       anchors = fused.slice(0, anchorBudget);
       candidateChunkCount = finalResults.reduce((sum, result) => sum + result.candidates.length, 0);
@@ -2245,6 +2446,45 @@ export async function buildKnowledgeContextInjection(input: {
   };
   const notes = [...coverageNotes, ...expansionAnnotation];
 
+  // ── 检索遥测（§二十五，2026-08-30 拆解优化）：家族级边际收益与重叠率 ──
+  // 按 finalResults/finalFamilyIds 的最终态计算（探测并入后）。
+  const totalCandidateRefs = finalResults.reduce((sum, result) => sum + result.candidates.length, 0);
+  const uniqueCandidateIds = new Set(
+    finalResults.flatMap(result => result.candidates.map(chunk => chunk.id)),
+  ).size;
+  const telemetryFamilySequence = groupFamiliesById(finalResults, finalFamilyIds);
+  const telemetrySeenIds = new Set<string>();
+  const evidenceNeedGains = telemetryFamilySequence.map(family => {
+    const ranking = rrfFuseRankings(family.map(result => result.candidates), Number.MAX_SAFE_INTEGER);
+    let gain = 0;
+    for (const chunk of ranking) {
+      if (!telemetrySeenIds.has(chunk.id)) {
+        telemetrySeenIds.add(chunk.id);
+        gain += 1;
+      }
+    }
+    return gain;
+  });
+  const nonExpansionIds = new Set(
+    nonExpansionFulfilled.flatMap(result => result.candidates.map(chunk => chunk.id)),
+  );
+  const expansionNewIds = new Set<string>();
+  for (const result of expansionFulfilled) {
+    for (const chunk of result.candidates) {
+      if (!nonExpansionIds.has(chunk.id) && !expansionNewIds.has(chunk.id)) {
+        expansionNewIds.add(chunk.id);
+      }
+    }
+  }
+  const retrievalTelemetry = {
+    originalQueryHits: directValue ? directValue.candidates.length : 0,
+    expansionUniqueHits: expansionNewIds.size,
+    queryOverlapRatio: totalCandidateRefs > 0
+      ? Math.round((1 - uniqueCandidateIds / totalCandidateRefs) * 1000) / 1000
+      : 0,
+    evidenceNeedGains,
+  };
+
   // exhaustive 成功：注入 coverage 证据区（状态行措辞闸 + findings），跳过普通
   // 检索证据的三岔口（findings 的预算处理已在 runExhaustiveCoverage 内完成）。
   if (coveragePayload) {
@@ -2254,6 +2494,8 @@ export async function buildKnowledgeContextInjection(input: {
       retrievalResults: finalResults,
       retrievalFailures: mergedFailures,
       subQueryHits,
+      retrievalFamilyIds: finalFamilyIds,
+      retrievalTelemetry,
       budgetTokens,
       ...(input.scopeId ? { scopeId: input.scopeId } : {}),
       ...(coveragePlan ? { coveragePlan } : {}),
@@ -2292,6 +2534,8 @@ export async function buildKnowledgeContextInjection(input: {
         retrievalResults: finalResults,
         retrievalFailures: mergedFailures,
         subQueryHits,
+        retrievalFamilyIds: finalFamilyIds,
+        retrievalTelemetry,
         budgetTokens,
         ...(input.scopeId ? { scopeId: input.scopeId } : {}),
         ...(coveragePlan ? { coveragePlan } : {}),
@@ -2313,6 +2557,8 @@ export async function buildKnowledgeContextInjection(input: {
       retrievalResults: finalResults,
       retrievalFailures: mergedFailures,
       subQueryHits,
+      retrievalFamilyIds: finalFamilyIds,
+      retrievalTelemetry,
       budgetTokens,
       ...(input.scopeId ? { scopeId: input.scopeId } : {}),
       ...(coveragePlan ? { coveragePlan } : {}),
@@ -2329,6 +2575,8 @@ export async function buildKnowledgeContextInjection(input: {
     retrievalResults: finalResults,
     retrievalFailures: mergedFailures,
     subQueryHits,
+    retrievalFamilyIds: finalFamilyIds,
+    retrievalTelemetry,
     budgetTokens,
     ...(input.scopeId ? { scopeId: input.scopeId } : {}),
     ...(coveragePlan ? { coveragePlan } : {}),
