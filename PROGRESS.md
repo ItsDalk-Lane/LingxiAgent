@@ -10,7 +10,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = 2ffef293d199edda0c8836d9855f2a4780f6862c  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-08-30 同上 + build 钉依赖 + Windows 关库 + watch 测试时间泵三连修)
+VERIFIED_SOURCE_SHA   = dd508491d3f7094138fdd45024228b12581fd2f1  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-08-30 knowledge Phase 9-12 分支合并 main（PR #30）后的合并树)
 工作分支              = feature/upstream-sync-0.447.4
 ```
 
@@ -533,6 +533,18 @@ seal 不是一次性终点，而是"当前被验证树"的游标；每次审计�
   （run 1 同代码通过、本地 5/5 绿，负载抖动非回归）。waitFor 增加
   fakeTimers 泵参数，防抖相关 7 处等待统一传 DEBOUNCE_MS。验证：该文件
   5/5 绿 + typecheck×3 + full npm test 12746 passed / 0 failed 后推进。
+
+- **2026-08-30 分支合并 main（PR #30）+ 合并树 seal 推进**
+  （合并树 dd508491/seal 本提交）：PR #30（模型操作原生协议 + 用户打标签 +
+  knowledge v9 向量保留 + CI 稳定性修复）在 PR #31 CI 期间合入 main，产生
+  13 文件冲突。合并语义：knowledge schema 两条线合一（本分支 v9-v16 保留，
+  向量保留重编号 v17 additive + 跨线护栏，schema v17）；向量索引库以 variant
+  架构为基座吸收 last_used_at（v3，v2 老库按表形分流迁移）；manager 孤儿
+  处理并集（状态重算 + 即时索引回收 + TurnScope/manifest 保护闸）；
+  index-store removeArtifact 去掉对已 DROP 的 artifact_indexes 的 DELETE
+  （原样保留会事务回滚吞掉 FTS 清理）。指纹按合并树 compatible repin。
+  验证：typecheck×3（绿）+ full npm test 12778 passed / 0 failed +
+  build:server:open / smoke:server:open 正反冒烟全过后推进。
 
 
 ## 最终状态：已合并（上游同步部分）
