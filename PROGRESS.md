@@ -10,7 +10,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = 11474e8274aa6d1f9bbc75e94e0722ac69ad0b6b  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-08-30 同上 + 知识提问延迟三连修复 + exhaustive 交互式规模闸（>24 片降格 broad）+ engine 构造顺序修复)
+VERIFIED_SOURCE_SHA   = 47fed9ef6f799e04004c47b3fc0dc1b892165039  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-08-30 同上 + 知识提问延迟修复 + exhaustive 规模闸 + 证据锚点随预算伸缩 + engine 构造顺序修复)
 工作分支              = feature/upstream-sync-0.447.4
 ```
 
@@ -586,6 +586,17 @@ seal 不是一次性终点，而是"当前被验证树"的游标；每次审计�
   自动升级），指引 knowledge_grep/outline + subagent 分治；阈值内语义不变。
   验证：typecheck×3 绿 + eslint 0 error + 新增 2 用例 + coverage 簇 110
   用例 + full npm test 12787 passed / 0 failed 后推进。
+
+- **2026-08-30 证据锚点随注入预算伸缩 + 移除「检索数量」设置**
+  （功能树 47fed9ef/seal 本提交；11 files / +134-106，含 cli-runtime-closure
+  随 manifest→estimate-text-tokens 依赖边重生成）：Phase 8 固定 40 锚点在
+  大上下文模型下只占预算一成（512k 窗口 → ~50 万 token 预算 vs 40 块 ≈ 5 万
+  token）。resolveEvidenceAnchorBudget 按融合候选平均 token 伸缩（≤50% 预算、
+  下限 40 兜底、上限 240 防碎屑）；同轮移除笔记本设置「检索数量」控件——
+  候选预算链每层独立封顶后 retrievalTopK ≥60 无实际影响，保存原样回传存量
+  值，五语言 locale 键同步移除。验证：typecheck×3 绿 + eslint 0 error +
+  新增 7 用例 + knowledge 簇 195 用例 + full npm test 12791 passed / 0
+  failed 后推进。
 
 
 ## 最终状态：已合并（上游同步部分）
