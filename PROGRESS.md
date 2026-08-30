@@ -10,7 +10,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = 0cf94f450de105d121e4fa8b6795dee7978ce9cc  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-08-30 同上 + 拆解优化 P0-P2 + 注入预算实践上限 96k（修证据装满预算致预填充 77s）)
+VERIFIED_SOURCE_SHA   = e7b14874481afa416b30b343a564a1cccc4692dd  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-08-30 同上 + 拆解优化 P0-P2（96k 上限已按用户要求 revert，恢复按上下文伸缩原设计）)
 工作分支              = feature/upstream-sync-0.447.4
 ```
 
@@ -674,6 +674,13 @@ seal 不是一次性终点，而是"当前被验证树"的游标；每次审计�
   min(动态预算, KNOWLEDGE_INJECTION_BUDGET_MAX_TOKENS=96k)；「能装≠该装」，
   注入同时受模型上下文与预填充时间预算约束（§十三 思想）。验证：新增 1
   用例 + full npm test 12835 passed / 0 failed 后推进。
+
+- **2026-08-30 revert 注入预算实践上限 96k**（功能树 e7b14874/seal 本提交）：
+  用户指出该修复未经批准且与其亲自指定的「锚点 50%\/融合池 70% 按上下文
+  倒推」设计相抵——诊断请求（「查看一下」）不应自行变成修复提交。revert
+  恢复原设计；「512k 证据装满预算 → 主模型预填充 77s」的权衡数据已呈报
+  用户，是否加上限及数值由用户后续拍板。验证：typecheck×3 绿 + injector/
+  execution 套件 98 用例绿后推进。
 
 
 ## 最终状态：已合并（上游同步部分）
