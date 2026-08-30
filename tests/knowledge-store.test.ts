@@ -60,7 +60,8 @@ function deterministicIds() {
 
 afterEach(() => {
   for (const dir of tempDirs.splice(0)) {
-    fs.rmSync(dir, { recursive: true, force: true });
+    // Windows CI 上杀毒/索引服务会短暂占住文件，EPERM/EBUSY 需要退避重试才能删干净。
+    fs.rmSync(dir, { recursive: true, force: true, maxRetries: 10, retryDelay: 100 });
   }
 });
 
@@ -119,6 +120,8 @@ describe("KnowledgeStore", () => {
     // 幂等：列已写 → 0 行。
     const second = store.migrateLegacyGlobalModelRefs({ embeddingModelRef: emb, rerankModelRef: rerank });
     expect(second.notebooksUpdated).toBe(0);
+    // 不关库就删临时目录，Windows 上 rm 会因句柄未释放报 EPERM。
+    store.close();
   });
 
   it("用独立 user_version 建库，并在重启后保留 Notebook", () => {
