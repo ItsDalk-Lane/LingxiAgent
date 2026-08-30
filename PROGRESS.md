@@ -10,7 +10,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = 29de5ee2f4f67e92856a68f20a8ae9279bf0004a  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-08-29 模型操作原生协议 + 用户打标签方案 + knowledge v9 向量保留)
+VERIFIED_SOURCE_SHA   = 91d66f9399a5f356e6750540cbe436ef2f539edd  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-08-30 模型操作原生协议 + 用户打标签 + knowledge v9 向量保留 + Windows CI 稳定性两连修)
 工作分支              = feature/upstream-sync-0.447.4
 ```
 
@@ -414,6 +414,19 @@ seal 不是一次性终点，而是"当前被验证树"的游标；每次审计�
   缓存键改 ensureSyntaxTree(doc.length, 1s) 同步补齐完整树；装饰/hover
   增量路径保持部分树语义不变。验证：editor 套件 80 用例绿 + typecheck×3
   绿后四次推进。
+
+- **2026-08-30 Windows CI 稳定性两连修（PR #30 监控修复）**
+  （功能树 91d66f93/seal 本提交；2 files / +10-1）：①knowledge-store 测试
+  migrateLegacyGlobalModelRefs 泄漏 SQLite 句柄未 close 就删临时目录，
+  Windows rmSync 报 EPERM（macOS/Linux 删打开文件合法故本机全绿）——补
+  store.close() + afterEach rmSync 退避重试；②model-manager-auth-storage
+  同代码结果漂移（main 8/28 挂 2 例/PR 一轮全过/三轮挂 1 例，SDK getAuth
+  无解析走兼容分支 ok:true+apiKey undefined），抢救/投影/凭证链路逐层排查
+  均为同步确定性逻辑，结合 main 近 8 轮 Windows 矩阵挂 4 轮且失败文件各异，
+  定性 runner 环境抖动——vitest test.retry 仅 win32=1（与 ci.yml npm ci
+  的 nick-fields/retry 同一处置逻辑），macOS/Linux 保持 0。两修各验：
+  typecheck×3 绿 + eslint 改动文件 0 error + full npm test 12556 passed /
+  0 failed（封印推进后复跑）后推进。
 
 - **2026-08-30 模型操作原生协议 + 用户打标签方案 + knowledge v9 向量保留（PR #30）**
   （功能树 29de5ee2/seal 本提交；37 files / +1817-96）：ModelOperationClient 按
