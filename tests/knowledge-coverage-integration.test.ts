@@ -22,6 +22,7 @@ import { afterEach, describe, expect, it } from "vitest";
 
 import { KnowledgeStore } from "../lib/knowledge/knowledge-store.ts";
 import {
+  KNOWLEDGE_EXHAUSTIVE_MAX_SHARDS,
   buildKnowledgeContextInjection,
   planCoveragePriorityOrder,
 } from "../lib/knowledge/knowledge-context-injector.ts";
@@ -957,5 +958,63 @@ describe("EXHAUSTIVE 证据超预算", () => {
     for (const id of blockIds) {
       expect(inputIds.has(id)).toBe(true);
     }
+  });
+});
+
+// ─────────────── exhaustive 交互式规模闸（2026-08-30 延迟加固第二轮） ───────────────
+
+describe("exhaustive 规模闸", () => {
+  it("分片计划超 KNOWLEDGE_EXHAUSTIVE_MAX_SHARDS：降格 broad + 留痕，worker 零调用", async () => {
+    const store = createStore();
+    const nb = notebook(store, "A");
+    // 1200 个 BIG_BLOCK unit × ~331 成本 ≈ 397k token → 25 shards（49/片），
+    // 超 24 片阈值（实测用户 680 万 token 语料 = 1073 片的同型场景）。
+    const seeded = seedSource(store, [nb], { blockCount: 1200, blockText: BIG_BLOCK });
+    const scope = scopeOf(store, [nb]);
+    expect(planCoverageShards({ manifest: buildCoverageManifest({ source: store, studioId: STUDIO, scopeId: scope.id }) }).length)
+      .toBeGreaterThan(KNOWLEDGE_EXHAUSTIVE_MAX_SHARDS);
+    const callLog: string[] = [];
+    const { workerModel } = okWorker(callLog);
+
+    const { block, stats } = await injectWithCoverage(store, {
+      workerModel,
+      retrieve: retrievalFacade({
+        hits: [{ seeded, notebookId: nb, ordinal: 0 }],
+        sourcesMeta: [{ seeded, notebookId: nb, chunkCount: 1200 }],
+      }),
+      scopeId: scope.id,
+    });
+
+    // 降格 broad 执行：无 coverage run、无完整性声称、gate 原因透出到 stats。
+    expect(stats.executedCoverageMode).toBe("broad");
+    expect(stats.coverageStatus).toBeUndefined();
+    expect(stats.coverageRunId).toBeUndefined();
+    expect(stats.coverageDegradeReason).toContain("exhaustive scope too large");
+    expect(stats.coverageDegradeReason).toContain("30 shards (> 24)");
+    expect(block).toContain("[coverage execution degraded to broad: exhaustive scope too large");
+    expect(block).toContain("knowledge_grep");
+    expect(block).not.toContain("all parseable text in scope has been processed");
+    // worker 一次都没被调（分片执行被闸在计划期）。
+    expect(callLog.filter(entry => entry === "worker")).toHaveLength(0);
+  });
+
+  it("分片计划在阈值内（≤24 片）：闸不拦，exhaustive 照常真执行", async () => {
+    const store = createStore();
+    const nb = notebook(store, "A");
+    // 60 units ≈ 2 shards：现有 exhaustive 语义不变。
+    const seeded = seedSource(store, [nb], { blockCount: 60 });
+    const scope = scopeOf(store, [nb]);
+    const { workerModel } = okWorker();
+    const { stats } = await injectWithCoverage(store, {
+      workerModel,
+      retrieve: retrievalFacade({
+        hits: [{ seeded, notebookId: nb, ordinal: 0 }],
+        sourcesMeta: [{ seeded, notebookId: nb, chunkCount: 60 }],
+      }),
+      scopeId: scope.id,
+    });
+    expect(stats.executedCoverageMode).toBe("exhaustive");
+    expect(stats.coverageStatus).toBe("complete");
+    expect(stats.coverageDegradeReason).toBeUndefined();
   });
 });

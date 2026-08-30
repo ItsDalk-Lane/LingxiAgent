@@ -164,6 +164,16 @@ export const KNOWLEDGE_SECTION_COVERAGE_MIN_HIT_RATIO = 0.5;
 export const KNOWLEDGE_BROAD_TO_EXHAUSTIVE_SECTION_FOOTPRINT_MIN = 0.5;
 /** broad→exhaustive 自动升级总开关（保守默认开；置 false 回到 Phase 8 行为）。 */
 export const KNOWLEDGE_BROAD_TO_EXHAUSTIVE_ENABLED = true;
+/**
+ * exhaustive 交互式规模闸（2026-08-30 延迟加固第二轮）：冻结 scope 的分片计划
+ * 超过该值即显式降格 broad（留痕 + 无完整性声称），计划 exhaustive 与自动升级
+ * 两条入口同闸。口径：4 并发 × ~30s/片 × 24 片 ≈ 3 分钟交互上限（快模型
+ * ~1 分钟）；~16k token/片 → 24 片 ≈ 40 万 token（约一本书）。更大的语料
+ * exhaustive 本质不可能在交互窗口完成（实测 680 万 token 语料 = 1073 片 ≈
+ * 2–3 小时，UI 无进度渲染时体感即「卡死」）；此类 scope 应由模型以
+ * knowledge_grep / knowledge_outline + subagent 分治应对。
+ */
+export const KNOWLEDGE_EXHAUSTIVE_MAX_SHARDS = 24;
 /** 允许触发 broad→exhaustive 升级的整体性 scope 层级（§四十一）。 */
 const BROAD_TO_EXHAUSTIVE_SCOPE_LEVELS = new Set(["notebook", "multi_notebook", "whole_scope"]);
 
@@ -1141,6 +1151,20 @@ async function runExhaustiveCoverage(input: {
     return { ok: false, reason: `coverage manifest build failed: ${describeError(error)}` };
   }
   const priorityOrder = planCoveragePriorityOrder({ manifest, fused: input.fused });
+
+  // 交互式规模闸（见 KNOWLEDGE_EXHAUSTIVE_MAX_SHARDS docstring）：分片计划超阈值
+  // → 显式降格 broad + 留痕。两个入口（计划 exhaustive / §四十一 自动升级）都
+  // 经本函数，单点收口；大语料的确定性覆盖交给 knowledge_grep/outline 工具与
+  // subagent 分治，不在会话轮内烧小时级 LLM 预算。
+  const shardCount = planCoverageShards({ manifest }).length;
+  if (shardCount > KNOWLEDGE_EXHAUSTIVE_MAX_SHARDS) {
+    return {
+      ok: false,
+      reason: `exhaustive scope too large for the interactive window: ${shardCount} shards `
+        + `(> ${KNOWLEDGE_EXHAUSTIVE_MAX_SHARDS}); use knowledge_grep / knowledge_outline `
+        + "or subagents for deterministic coverage of large corpora",
+    };
+  }
 
   // 总时长上限（超长运行保护）：到点 abort 剩余 pending shard → partial + timeout
   // 留痕；外部（用户）取消同样并入同一 abort 通道，两者用 timedOut/external 区分。
