@@ -10,7 +10,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = 26906c8324366ba0481080b0caf7b20c374ee4d7  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-08-29 知识问答链路四连修 + 蒸馏并行化与进度可视化)
+VERIFIED_SOURCE_SHA   = 29de5ee2f4f67e92856a68f20a8ae9279bf0004a  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-08-29 模型操作原生协议 + 用户打标签方案 + knowledge v9 向量保留)
 工作分支              = feature/upstream-sync-0.447.4
 ```
 
@@ -414,6 +414,19 @@ seal 不是一次性终点，而是"当前被验证树"的游标；每次审计�
   缓存键改 ensureSyntaxTree(doc.length, 1s) 同步补齐完整树；装饰/hover
   增量路径保持部分树语义不变。验证：editor 套件 80 用例绿 + typecheck×3
   绿后四次推进。
+
+- **2026-08-30 模型操作原生协议 + 用户打标签方案 + knowledge v9 向量保留（PR #30）**
+  （功能树 29de5ee2/seal 本提交；37 files / +1817-96）：ModelOperationClient 按
+  operationProtocol 分发五协议方言（ollama-embed/gemini-embed/voyage-embeddings/
+  voyage-rerank/cohere-rerank），inferOperationProtocol 按供应商推断默认方言、显式
+  声明优先；模型设置页「模型类型」（嵌入/重排）标签 + 向量维度（五语言），用户打标
+  模型进笔记本设置下拉、用户配置为真理源，内置操作卡彻底清零；knowledge v8→v9
+  notebooks.vector_retention_days（幂等迁移，指纹 compatible repin，并行会话工作一并
+  入库）。CI 监控修复：Windows runner EPERM——migrateLegacyGlobalModelRefs 用例
+  泄漏 SQLite 句柄未 close 就删临时目录，补 store.close() + afterEach rmSync 退避
+  重试；审计 seal 因功能提交越过 VERIFIED_SOURCE_SHA 翻红，按惯例本提交推进封印。
+  验证：typecheck×3（绿）+ eslint 改动文件 0 error + full npm test 12556 passed /
+  0 failed（封印推进后复跑）后推进。
 
 - **2026-08-29 知识问答链路四连修 + 蒸馏并行化与进度可视化**
   （功能树 26906c83/seal 本提交；32 files / +1340-172）：分块配置同源
