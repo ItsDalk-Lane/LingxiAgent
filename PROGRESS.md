@@ -10,7 +10,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = 08ead330e7a6f3bf46d7b67d54c40c54b0fae2e6  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-08-30 同上 + 嵌入/重排供应商协议兼容修复（千问双端点方言/MiniMax 方言/rerank 上限 50）)
+VERIFIED_SOURCE_SHA   = 4e6bfe87b1e065c7418b7e64cf6c51c982a7079f  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-08-30 同上 + 嵌入/重排供应商协议兼容修复 + 融合池上限随预算倒推（阀 A 70%）+ 检索列表二次展开)
 工作分支              = feature/upstream-sync-0.447.4
 ```
 
@@ -613,6 +613,18 @@ seal 不是一次性终点，而是"当前被验证树"的游标；每次审计�
   小于该值已饱和），查询侧裁剪与客户端断言共用单一真理源。验证：typecheck×3
   绿 + full npm test 12799 passed / 0 failed + 指纹 compatible repin（engine.ts
   闭包透传不触及持久化形状）+ tripwire/census 门禁单跑绿后推进。
+
+- **2026-08-30 融合池上限随预算倒推（阀 A）+ 检索列表二次展开**
+  （功能树 4e6bfe87/seal 本提交；10 files / +177-17）：接续锚点伸缩（阀 B
+  50%）补齐候选侧——resolveFusionPoolBudget = 预算 × 70% ÷ 候选平均 token
+  （池是候选水位，略高于锚点配额留选择余量），下限 60（小预算既有召回水位）、
+  上限 480（防碎片块碎屑化）；fuseSubQueryResults 可选 cap 参数（缺省 60
+  向后兼容），编排/降格重算/render 统计三处同源接线；多子查询大预算端到端
+  实测融合池 180 块全保留（旧行为 60 截断）。聊天检索列表二次展开：首屏
+  10 条 +「显示更多（还有 N 条）」二级一次性放出（≤10 条无按钮），五语言
+  knowledgeRetrievalShowMore。验证：typecheck×3 绿 + eslint 0 error + 新增
+  5 用例（倒推公式三态含 1M 口径示例/端到端池 180/UI 双路）+ knowledge 簇
+  182 用例 + full npm test 12805 passed / 0 failed 后推进。
 
 
 ## 最终状态：已合并（上游同步部分）
