@@ -14,7 +14,7 @@
 | U1：上游目标 | `c6d0405294be67cb134c2758f6472748ee73e2be` | openhanako `v0.447.4` |
 | L0：Lingxi 同步基线 | `97595264ead8735a04559507ddaade25db8a4e15` | chore: sync upstream 0.444.1 and pi SDK 0.84.1 (PR #2) |
 | L1：同步开始 Lingxi | `ca0b417e36a6a1f80947458aaed328a25718e41b` | 2026-08-20 main HEAD |
-| VERIFIED_SOURCE_SHA | `7de81782955ef62cc73d391eb26a73fe3d19b7bd` | 最终验证（typecheck/lint/测试/构建/打包）所针对的 feature commit（其 tree 即被验证源码树）；2026-08-31 知识问答重构：覆盖两档化 + 主模型滚动多轮注入（exhaustive/蒸馏链路移除，检索侧不动） |
+| VERIFIED_SOURCE_SHA | `a4048480622da11b009608f83520f6ab78f0bae3` | 最终验证（typecheck/lint/测试/构建/打包）所针对的 feature commit（其 tree 即被验证源码树）；2026-08-31 知识问答重构 + 过程可见二轮（knowledge_trace 逐行广播拆解/检索阶段） |
 
 ## Audit seal model
 

@@ -10,7 +10,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = 7de81782955ef62cc73d391eb26a73fe3d19b7bd  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-08-31 知识问答重构：覆盖两档化 + 主模型滚动多轮注入（exhaustive/蒸馏链路移除，检索侧不动）)
+VERIFIED_SOURCE_SHA   = a4048480622da11b009608f83520f6ab78f0bae3  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-08-31 知识问答重构 + 过程可见二轮（knowledge_trace 逐行广播拆解/检索阶段）)
 工作分支              = feature/upstream-sync-0.447.4
 ```
 
@@ -696,6 +696,13 @@ seal 不是一次性终点，而是"当前被验证树"的游标；每次审计�
   typecheck×3 绿 + 全量 npm test 12766 用例通过（0 失败；persistence 指纹
   compatible repin sha256:4172d591…、开放边界清单重生成后 tripwire/lint 绿）
   后推进。
+- **2026-08-31 过程可见二轮：knowledge_trace 逐行广播**（功能树 a4048480/seal
+  本提交）：用户反馈检索期界面只有三点干等，要求对齐编程 Agent 的工具调用
+  过程卡全程可见。engine 拆解/扩展/补证闭包与 retrieve 门面统一插桩
+  knowledge_trace 事件（只发元数据禁发模型输出），前端过程行堆按 id 原位
+  更新（检索行 start=查询词 → done=「N 个搜索结果」），rollup/supplement
+  事件同步映射为 read/note 行；首个非知识事件保守清除整堆。验证：typecheck×3
+  绿 + 全量 npm test 12771 用例通过（0 失败）后推进。
 
 
 ## 最终状态：已合并（上游同步部分）
