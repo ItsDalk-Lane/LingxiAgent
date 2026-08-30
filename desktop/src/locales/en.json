@@ -60,6 +60,7 @@
     "sourceCount": "{count} sources",
     "addSource": "Add source",
     "addLocalFile": "Choose local files",
+    "addLocalFolder": "Choose a local folder",
     "addPastedText": "Paste text",
     "addWebSnapshot": "Web snapshot",
     "sourceDisplayNameOptional": "Source name (optional)",
@@ -100,6 +101,8 @@
     "importUnavailable": "A local file picker is unavailable in this environment",
     "importSuccess": "Imported {count} sources",
     "importPartialFailure": "Import finished: {success}/{total} sources succeeded",
+    "importDirectorySuccess": "Folder import finished: {imported} imported, {skipped} skipped",
+    "importDirectoryPartialFailure": "Folder import finished: {imported} imported, {skipped} skipped, {failed} failed",
     "loadFailed": "Could not load the knowledge library",
     "saveFailed": "Knowledge operation failed",
     "notebookSettings": "Notebook settings",
@@ -1153,6 +1156,21 @@
       "running": "📚 Reading knowledge shards",
       "done": "📚 Read knowledge shards",
       "failed": "📚 Failed to read knowledge shards"
+    },
+    "knowledge_outline": {
+      "running": "🗂️ Outlining knowledge scope",
+      "done": "🗂️ Outlined knowledge scope",
+      "failed": "🗂️ Failed to outline knowledge scope"
+    },
+    "knowledge_grep": {
+      "running": "🔍 Searching knowledge text",
+      "done": "🔍 Searched knowledge text",
+      "failed": "🔍 Failed to search knowledge text"
+    },
+    "knowledge_manage": {
+      "running": "🗃️ Updating knowledge notebooks",
+      "done": "🗃️ Updated knowledge notebooks",
+      "failed": "🗃️ Failed to update knowledge notebooks"
     }
   },
   "file_output": {

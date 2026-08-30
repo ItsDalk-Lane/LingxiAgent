@@ -4,6 +4,7 @@ import {
   createKnowledgeNotebook,
   deleteKnowledgeNotebook,
   importKnowledgeFileSource,
+  importKnowledgeDirectory,
   importKnowledgePastedText,
   importKnowledgeWebSnapshot,
   knowledgeSnapshotContentUrl,
@@ -567,6 +568,38 @@ export function KnowledgePage() {
     }
   };
 
+  const handleImportDirectory = async () => {
+    if (!selectedNotebookId || !window.platform?.selectFolder) {
+      addToast(tr('knowledge.importUnavailable'), 'error');
+      return;
+    }
+    setShowImportMenu(false);
+    const dirPath = await window.platform.selectFolder();
+    if (!dirPath) return;
+    setImporting(true);
+    try {
+      const result = await importKnowledgeDirectory(selectedNotebookId, dirPath);
+      // 先触发摄入轮询再刷源列表：导入返回时 job 已入队，避免新源短暂显示「待摄入」。
+      setIngestionRefreshKey(key => key + 1);
+      await refreshSources();
+      const counts = {
+        imported: result.imported.length,
+        skipped: result.skipped.length,
+        failed: result.failed.length,
+      };
+      // 只汇报计数，避免泄露本机路径。
+      if (counts.failed === 0) {
+        addToast(tr('knowledge.importDirectorySuccess', counts), 'success');
+      } else {
+        addToast(tr('knowledge.importDirectoryPartialFailure', counts), 'error');
+      }
+    } catch {
+      addToast(tr('knowledge.importUnavailable'), 'error');
+    } finally {
+      setImporting(false);
+    }
+  };
+
   const resetSourceDraft = () => {
     setSourceDraftKind(null);
     setSourceDraftName('');
@@ -768,6 +801,7 @@ export function KnowledgePage() {
         {showImportMenu && selectedNotebookId && (
           <div className={styles.sourceImportMenu} role="menu" aria-label={tr('knowledge.addSource')}>
             <button role="menuitem" onClick={() => void handleImportFiles()}>{tr('knowledge.addLocalFile')}</button>
+            <button role="menuitem" onClick={() => void handleImportDirectory()}>{tr('knowledge.addLocalFolder')}</button>
             <button role="menuitem" onClick={() => openSourceDraft('pasted_text')}>{tr('knowledge.addPastedText')}</button>
             <button role="menuitem" onClick={() => openSourceDraft('web_snapshot')}>{tr('knowledge.addWebSnapshot')}</button>
           </div>

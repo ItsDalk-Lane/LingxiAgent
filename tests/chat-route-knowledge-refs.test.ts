@@ -142,4 +142,37 @@ describe("chat route knowledgeRefs handling", () => {
       model: "opencode-go/deepseek-v4-flash",
     });
   });
+
+  it("knowledge_coverage_progress 引擎事件广播为同名 WS 消息（带 runId/进度，可选 coverageStatus）", async () => {
+    const { hub, ws } = setup();
+    const listener = hub.subscribe.mock.calls[0][0];
+    listener({
+      type: "knowledge_coverage_progress",
+      runId: "covrun_1",
+      done: 3,
+      total: 8,
+      coverageStatus: "partial",
+    }, "/sessions/test.jsonl");
+
+    const sent = ws.send.mock.calls.map((call) => JSON.parse(call[0] as string));
+    expect(sent).toContainEqual({
+      type: "knowledge_coverage_progress",
+      sessionPath: "/sessions/test.jsonl",
+      runId: "covrun_1",
+      done: 3,
+      total: 8,
+      coverageStatus: "partial",
+    });
+    // 缺省 coverageStatus 不强加字段（对齐 distill 进度的可选字段纪律）。
+    ws.send.mockClear();
+    listener({ type: "knowledge_coverage_progress", runId: "covrun_2", done: 8, total: 8 }, "/sessions/test.jsonl");
+    const followup = ws.send.mock.calls.map((call) => JSON.parse(call[0] as string));
+    expect(followup).toContainEqual({
+      type: "knowledge_coverage_progress",
+      sessionPath: "/sessions/test.jsonl",
+      runId: "covrun_2",
+      done: 8,
+      total: 8,
+    });
+  });
 });

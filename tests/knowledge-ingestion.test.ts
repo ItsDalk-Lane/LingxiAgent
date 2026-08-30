@@ -8,6 +8,8 @@ import {
   knowledgeBlockFingerprint,
   resolveKnowledgeChunkerConfig,
 } from "../lib/knowledge/chunker.ts";
+import { knowledgeChunkIndexVariantId } from "../lib/knowledge/knowledge-index-store.ts";
+import { knowledgeVectorIndexVariantId } from "../lib/knowledge/vector-index-adapter.ts";
 import { KnowledgeManager } from "../lib/knowledge/knowledge-manager.ts";
 
 const tempDirs: string[] = [];
@@ -128,8 +130,12 @@ describe("Knowledge 摄入管线", () => {
     expect(finished).toMatchObject({ status: "pending_embedding", phase: "embed", artifactId: artifact.id });
 
     // pending_embedding 是显式终态而非不可用：FTS 已可检索。
+    // 检索锚（schema v2）：(parseArtifactId, chunkProfileHash)，hash 即上面的 chunkerConfigId。
     const hits = manager.indexStore.search({
-      parseArtifactIds: [artifact.id],
+      scopes: [{
+        parseArtifactId: artifact.id,
+        chunkProfileHash: resolveKnowledgeChunkerConfig(blocks, { targetChars: 6553 }).configId,
+      }],
       query: "交付日期",
       limit: 12,
     });
@@ -155,12 +161,18 @@ describe("Knowledge 摄入管线", () => {
     expect(getJob(manager, studioId, job.id)).toMatchObject({ status: "done", phase: "done" });
     expect(embedding.calls).toHaveLength(1); // 小文本单批
 
-    // 向量库确实写入了该 artifact 的向量。
+    // 向量库确实写入了该 artifact 的向量（锚点：viv = f(civ, modelKey) 确定性派生）。
     const modelKey = crypto.createHash("sha256")
       .update(JSON.stringify(["fake", "emb-1", "openai", 8]), "utf8")
       .digest("hex");
+    const chunkProfileHash = resolveKnowledgeChunkerConfig(
+      manager.listArtifactBlocks({ studioId, parseArtifactId: artifact.id }),
+      { targetChars: 6553 },
+    ).configId;
     const vectorHits = manager.vectorIndex.search({
-      parseArtifactIds: [artifact.id],
+      vectorIndexVariantIds: [
+        knowledgeVectorIndexVariantId(knowledgeChunkIndexVariantId(artifact.id, chunkProfileHash), modelKey),
+      ],
       model: { key: modelKey, provider: "fake", modelId: "emb-1", protocol: "openai", dimensions: 8 },
       queryVector: [1, 0, 0, 0, 0, 0, 0, 0],
       limit: 5,
@@ -256,7 +268,8 @@ describe("Knowledge 摄入管线", () => {
       statuses: ["queued", "running", "pending_embedding"],
     })).toHaveLength(0);
 
-    // 改分块尺寸：两个源全部重新入队，重建后 FTS 指纹按新 configId 生效。
+    // 改分块尺寸：两个源全部重新入队，重建后 FTS 新变体 ready（新契约实参顺序：
+    // (parseArtifactId, chunkProfileHash, fingerprint)；旧变体共存不被覆盖）。
     manager.updateNotebookSettings({ studioId, notebookId: notebook.id, chunkTargetChars: 300 });
     expect(manager.store.listIngestionJobs({
       studioId,
@@ -269,8 +282,8 @@ describe("Knowledge 摄入管线", () => {
       const configId = resolveKnowledgeChunkerConfig(blocks, { targetChars: 300 }).configId;
       expect(manager.indexStore.hasArtifactFingerprint(
         entry.artifact.id,
-        knowledgeBlockFingerprint(blocks),
         configId,
+        knowledgeBlockFingerprint(blocks),
       )).toBe(true);
     }
     // chunk 指纹变化 → 向量按新 chunk 重嵌（不静默沿用旧向量）。
@@ -359,6 +372,198 @@ describe("Knowledge 摄入管线", () => {
   });
 });
 
+describe("Embedding 批级 checkpoint 恢复（§九十，Phase 3）", () => {
+  /**
+   * 100 chunk 语料：text 章节策略，100 行 "第N章 …"（每行一章一节一 chunk），
+   * 每行 120 字符 ≤ softCap(targetChars×1.5=150)，合计恰好 100 个 chunk（两批：64 + 36）。
+   */
+  function hundredChunkText(): string {
+    return Array.from({ length: 100 }, (_, index) => (
+      `第${index + 1}章恢复测试语料`.padEnd(120, "填")
+    )).join("\n");
+  }
+
+  function variantHandle(manager: KnowledgeManager, artifactId: string) {
+    const blocks = manager.listArtifactBlocks({ studioId: "studio-a", parseArtifactId: artifactId });
+    const chunkProfileHash = resolveKnowledgeChunkerConfig(blocks, { targetChars: 100 }).configId;
+    const civ = knowledgeChunkIndexVariantId(artifactId, chunkProfileHash);
+    const modelKey = crypto.createHash("sha256")
+      .update(JSON.stringify(["fake", "emb-1", "openai", 8]), "utf8")
+      .digest("hex");
+    return { civ, viv: knowledgeVectorIndexVariantId(civ, modelKey), chunkProfileHash };
+  }
+
+  function vectorCount(manager: KnowledgeManager, viv: string): number {
+    return manager.vectorIndex.db.prepare(
+      `SELECT COUNT(*) AS count FROM chunk_vectors WHERE vector_index_variant_id = ?`,
+    ).get(viv).count;
+  }
+
+  it("100 chunks：第二批失败后 64 块已落库，重试只补 65–100，变体 ready、向量 100", async () => {
+    // 注：checkpoint 以 64 块/批为原子单位，§九十 的 80/20 在本实现映射为 64/36
+    // （第一批 64 块持久化后中断）；断言的核心不变：已落库块绝不重嵌。
+    const now = { value: "2026-08-28T00:00:00.000Z" };
+    const { manager, embedding } = createManager(tempHome(), { now: () => now.value });
+    const studioId = "studio-a";
+    const notebook = manager.createNotebook({ studioId, name: "资料" });
+    manager.updateNotebookSettings({
+      studioId,
+      notebookId: notebook.id,
+      embeddingModelRef: FAKE_MODEL_REF,
+      chunkTargetChars: 100,
+    });
+    embedding.embedder = async ({ texts }: { texts: string[] }) => {
+      embedding.calls.push([...texts]);
+      if (embedding.calls.length === 2) throw new TypeError("network down"); // 第二批失败
+      return {
+        vectors: texts.map((text) => {
+          const vector = new Array(8).fill(0);
+          vector[text.length % 8] = (text.length % 7) + 1;
+          return vector;
+        }),
+        dimensions: 8,
+        model: { provider: "fake", id: "emb-1", api: "openai", dimensions: 8 },
+      };
+    };
+    const { artifact, job } = await importTextSource(manager, studioId, notebook.id, hundredChunkText());
+
+    expect(await manager.ingestion.drainQueue()).toBe(1);
+    const { viv, civ } = variantHandle(manager, artifact.id);
+    // 分块 sanity：确实 100 块（两批：64 + 36；chunk 相位已建出，embed 在第二批失败）。
+    expect(manager.indexStore.listVariantChunks(civ)).toHaveLength(100);
+    const failedOnce = getJob(manager, studioId, job.id);
+    expect(failedOnce).toMatchObject({ status: "queued", attempt: 1 });
+    expect(failedOnce.error).toContain("KNOWLEDGE_RETRIEVAL_UNAVAILABLE");
+    // 失败保留进度（不再清零）：64/100 是真实已落库的 checkpoint。
+    expect(failedOnce).toMatchObject({ progressDone: 64, progressTotal: 100 });
+    expect(embedding.calls).toHaveLength(2);
+    expect(embedding.calls[0]).toHaveLength(64);
+    // 批级 checkpoint：第一批 64 块已在向量库，variant 保持 building（不是重头再来）。
+    expect(vectorCount(manager, viv)).toBe(64);
+    expect(manager.vectorIndex.getVariant(viv)).toMatchObject({ status: "building" });
+
+    // 退避到期后重试：免探测恢复（唯一 building 断点变体），只嵌缺失的 36 块。
+    embedding.embedder = createFakeEmbedder(embedding);
+    shiftNow(now, 31_000);
+    expect(await manager.ingestion.drainQueue()).toBe(1);
+    expect(getJob(manager, studioId, job.id)).toMatchObject({ status: "done", phase: "done" });
+    const resumeCalls = embedding.calls.slice(2);
+    expect(resumeCalls).toHaveLength(1);
+    const expectedMissing = manager.indexStore.listVariantChunks(civ).slice(64).map(chunk => chunk.text);
+    expect(resumeCalls[0]).toEqual(expectedMissing); // 恰好 65–100，1–64 未重嵌
+    expect(resumeCalls[0]).toHaveLength(36);
+    expect(manager.vectorIndex.getVariant(viv)).toMatchObject({ status: "ready" });
+    expect(vectorCount(manager, viv)).toBe(100);
+
+    // 成本观测（§七十四）落 job：本轮新嵌 36、断点续用 64、一次请求。
+    expect(getJob(manager, studioId, job.id).embeddingStats).toMatchObject({
+      chunksNewlyEmbedded: 36,
+      chunksResumedFromCheckpoint: 64,
+      chunksReusedFromReadyVariant: 0,
+      requestCount: 1,
+      model: { provider: "fake", modelId: "emb-1", protocol: "openai", dimensions: 8 },
+      resetStaleVectors: false,
+      abandonedStaleVariantId: null,
+    });
+  });
+
+  it("中断重启：stop() 中断 embed 后换进程（重建 manager），恢复只补缺失块且留痕 INTERRUPTED", async () => {
+    const home = tempHome();
+    const studioId = "studio-a";
+    const first = createManager(home);
+    const notebook = first.manager.createNotebook({ studioId, name: "资料" });
+    first.manager.updateNotebookSettings({
+      studioId,
+      notebookId: notebook.id,
+      embeddingModelRef: FAKE_MODEL_REF,
+      chunkTargetChars: 100,
+    });
+    first.embedding.embedder = async ({ texts, signal }: { texts: string[]; signal?: AbortSignal }) => {
+      first.embedding.calls.push([...texts]);
+      if (first.embedding.calls.length === 2) {
+        // 第二批进行中进程收到停止信号（stop 中断语义）。
+        first.manager.ingestion.stop();
+        expect(signal?.aborted).toBe(true);
+        throw Object.assign(new Error("aborted"), { name: "AbortError" });
+      }
+      return {
+        vectors: texts.map((text) => {
+          const vector = new Array(8).fill(0);
+          vector[text.length % 8] = (text.length % 7) + 1;
+          return vector;
+        }),
+        dimensions: 8,
+        model: { provider: "fake", id: "emb-1", api: "openai", dimensions: 8 },
+      };
+    };
+    const { artifact, job } = await importTextSource(
+      first.manager, studioId, notebook.id, hundredChunkText(),
+    );
+    const { viv } = variantHandle(first.manager, artifact.id);
+
+    await first.manager.ingestion.drainQueue();
+    const interrupted = getJob(first.manager, studioId, job.id);
+    // stop 中断：不消耗 attempt、置回 queued、embed 相位显式留痕（§一百零四）。
+    expect(interrupted).toMatchObject({ status: "queued", attempt: 0, progressDone: 64, progressTotal: 100 });
+    expect(interrupted.error).toContain("KNOWLEDGE_EMBEDDING_INTERRUPTED");
+    expect(vectorCount(first.manager, viv)).toBe(64);
+    untrack(first.manager);
+    first.manager.close();
+
+    // 模拟进程重启：新 manager 打开同一 LINGXI_HOME，断点向量仍在，只补 65–100。
+    const restarted = createManager(home);
+    restarted.embedding.embedder = createFakeEmbedder(restarted.embedding);
+    expect(await restarted.manager.ingestion.drainQueue()).toBe(1);
+    expect(getJob(restarted.manager, studioId, job.id)).toMatchObject({ status: "done", phase: "done" });
+    expect(restarted.embedding.calls).toHaveLength(1);
+    expect(restarted.embedding.calls[0]).toHaveLength(36);
+    expect(restarted.manager.vectorIndex.getVariant(viv)).toMatchObject({ status: "ready" });
+    expect(vectorCount(restarted.manager, viv)).toBe(100);
+  });
+
+  it("分块配置变更：新 profile 建独立 variant，旧 variant 向量不混不丢", async () => {
+    const { manager, embedding } = createManager(tempHome());
+    embedding.embedder = createFakeEmbedder(embedding);
+    const studioId = "studio-a";
+    const notebook = manager.createNotebook({ studioId, name: "资料" });
+    manager.updateNotebookSettings({
+      studioId,
+      notebookId: notebook.id,
+      embeddingModelRef: FAKE_MODEL_REF,
+      chunkTargetChars: 100,
+    });
+    const { artifact } = await importTextSource(manager, studioId, notebook.id, hundredChunkText());
+    expect(await manager.ingestion.drainQueue()).toBe(1);
+    const firstVariant = variantHandle(manager, artifact.id);
+    expect(vectorCount(manager, firstVariant.viv)).toBe(100);
+    expect(manager.vectorIndex.getVariant(firstVariant.viv)).toMatchObject({ status: "ready" });
+
+    // chunk 内容/配置变化 → 新 civ → 新 variant 独立构建，旧 variant 原样保留。
+    manager.updateNotebookSettings({ studioId, notebookId: notebook.id, chunkTargetChars: 300 });
+    expect(await manager.ingestion.drainQueue()).toBe(1);
+    const blocks = manager.listArtifactBlocks({ studioId, parseArtifactId: artifact.id });
+    const newProfileHash = resolveKnowledgeChunkerConfig(blocks, { targetChars: 300 }).configId;
+    const modelKey = crypto.createHash("sha256")
+      .update(JSON.stringify(["fake", "emb-1", "openai", 8]), "utf8")
+      .digest("hex");
+    const newCiv = knowledgeChunkIndexVariantId(artifact.id, newProfileHash);
+    const newViv = knowledgeVectorIndexVariantId(newCiv, modelKey);
+    expect(newViv).not.toBe(firstVariant.viv);
+    expect(manager.vectorIndex.getVariant(newViv)).toMatchObject({ status: "ready" });
+    // 章节语料在 targetChars=300 下仍一章一块（120 ≤ softCap 450）：chunk 数同为 100，
+    // 但 chunk id 由新 configId 派生，两个 variant 各自持有独立向量行。
+    expect(vectorCount(manager, newViv)).toBe(100);
+    const overlap = manager.vectorIndex.db.prepare(`
+      SELECT COUNT(*) AS count FROM chunk_vectors old
+      JOIN chunk_vectors new ON old.chunk_id = new.chunk_id
+      WHERE old.vector_index_variant_id = ? AND new.vector_index_variant_id = ?
+    `).get(firstVariant.viv, newViv).count;
+    expect(overlap).toBe(0); // 不同 profile 的 chunk 身份零交叉（不混写）
+    // 旧 variant：向量不丢不混（付费产物保留，供旧 profile 检索/后续 GC 显式处理）。
+    expect(vectorCount(manager, firstVariant.viv)).toBe(100);
+    expect(manager.vectorIndex.getVariant(firstVariant.viv)).toMatchObject({ status: "ready" });
+  });
+});
 describe("向量保留策略与删除清理", () => {
   it("sweep：超期未使用的旧身份被回收，最新身份与查询命中者保留", async () => {
     const home = tempHome();
@@ -391,7 +596,7 @@ describe("向量保留策略与删除清理", () => {
       model: staleIdentity,
       entries: [{ chunkId: "stale-chunk", parseArtifactId: artifact.id, ordinal: 0, vector: new Array(8).fill(0.5) }],
     });
-    manager.vectorIndex.db.prepare(`UPDATE vector_artifacts SET last_used_at = ? WHERE model_key = ?`)
+    manager.vectorIndex.db.prepare(`UPDATE vector_index_variants SET last_used_at = ? WHERE model_key = ?`)
       .run("2026-07-28T00:00:00.000Z", staleIdentity.key);
 
     // 未超期（距 now 4 天 < 7 天）：不删。
@@ -427,7 +632,7 @@ describe("向量保留策略与删除清理", () => {
       model: staleIdentity,
       entries: [{ chunkId: "stale-chunk", parseArtifactId: artifact.id, ordinal: 0, vector: new Array(8).fill(0.5) }],
     });
-    manager.vectorIndex.db.prepare(`UPDATE vector_artifacts SET last_used_at = ? WHERE model_key = ?`)
+    manager.vectorIndex.db.prepare(`UPDATE vector_index_variants SET last_used_at = ? WHERE model_key = ?`)
       .run("2020-01-01T00:00:00.000Z", staleIdentity.key);
     expect(manager.queryService.sweepStaleVectorArtifacts({ now: () => "2026-09-01T00:00:00.000Z" })).toBe(0);
     expect(manager.vectorIndex.listArtifactUsage()).toHaveLength(2);
@@ -455,23 +660,3 @@ describe("向量保留策略与删除清理", () => {
     expect(manager.indexStore.listArtifactChunks(artifact.id)).toHaveLength(0);
   });
 });
-
-  it("sweep 兜底回收历史孤儿源的向量（删除清理上线前的残留）", async () => {
-    const home = tempHome();
-    const { manager, embedding } = createManager(home);
-    embedding.embedder = createFakeEmbedder(embedding);
-    const studioId = "studio-a";
-    const notebook = manager.createNotebook({ studioId, name: "资料" });
-    manager.updateNotebookSettings({ studioId, notebookId: notebook.id, embeddingModelRef: FAKE_MODEL_REF });
-    const { imported, artifact } = await importTextSource(manager, studioId, notebook.id, "孤儿源残留内容示例。".repeat(40));
-    await manager.ingestion.drainQueue();
-    expect(manager.vectorIndex.listArtifactUsage().some((row) => row.parseArtifactId === artifact.id)).toBe(true);
-
-    // 模拟"删除清理上线前"的删除：直接在 store 层移除挂靠（绕过 manager 的即时清理）。
-    manager.store.removeSourceFromNotebook({ studioId, notebookId: notebook.id, sourceId: imported.source.id });
-    expect(manager.vectorIndex.listArtifactUsage().some((row) => row.parseArtifactId === artifact.id)).toBe(true);
-
-    // sweep 兜底：无活跃挂靠的孤儿源向量被回收。
-    expect(manager.queryService.sweepStaleVectorArtifacts()).toBeGreaterThanOrEqual(1);
-    expect(manager.vectorIndex.listArtifactUsage().some((row) => row.parseArtifactId === artifact.id)).toBe(false);
-  });

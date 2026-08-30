@@ -10,7 +10,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = 33473a8fa7e27a8bcf2da7b50240bfc2dafb9040  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-08-30 模型操作原生协议 + 用户打标签 + knowledge v9 向量保留 + Windows CI 稳定性四连修)
+VERIFIED_SOURCE_SHA   = 57d716e5c3fc49573a8fba7765c78c6d49e86055  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-08-30 同上 + Windows 轮询测试真实时间预算修复)
 工作分支              = feature/upstream-sync-0.447.4
 ```
 
@@ -415,6 +415,65 @@ seal 不是一次性终点，而是"当前被验证树"的游标；每次审计�
   增量路径保持部分树语义不变。验证：editor 套件 80 用例绿 + typecheck×3
   绿后四次推进。
 
+- **2026-08-29 知识问答链路四连修 + 蒸馏并行化与进度可视化**
+  （功能树 26906c83/seal 本提交；32 files / +1340-172）：分块配置同源
+  （resolveEffectiveChunkTargetChars 贯穿查询 ensure 链/卡片视图/
+  knowledge_read，消除查询侧 1200 重建与摄入指纹互打架的全量重嵌事故；
+  ensureVectorArtifacts 在途去重）；rerank 按笔记本引用路由（v8 全局槽退役
+  断链补齐，配置不可解析显式降级 RRF 留痕，报错包装带 cause，重排上限提为
+  shared MODEL_OPERATION_RERANK_MAX_DOCS=100 单一真理源）；蒸馏并行化
+  （批预算按实测吞吐 EMA 动态推算 10s 目标、惰性建批，32 路自适应并发池
+  限流/超时逐层减半，超时线性化，sections 按批序整合）；蒸馏逐批进度事件
+  knowledge_distill_progress → 聊天「蒸馏中 · N 批」胶囊（独立于流式态）+
+  发送即本地「知识库检索中」；用户消息知识库元信息行精简为来源与模式。
+  生成产物：cli-runtime-closure 重生成、持久化指纹 compatible repin。
+  验证：typecheck×3（绿）+ eslint 0 error + full npm test 12523 passed /
+  0 failed 后推进。
+
+- **2026-08-29 knowledge 引用链路 Phase 7/8 + 管线重构 + 多项会话修复**
+  （功能树 93f05a3c/seal 本提交；113 files / +12996-9097）：消息级笔记本
+  引用主链路——shared/knowledge-refs 契约（notebookIds + qa/assist，会话内
+  持续生效、服务端无状态透传）+ knowledge-context-injector（拆解+检索+注入
+  块生成，失败显式留痕禁静默降级）+ knowledge_read 工具（超预算时子 Agent
+  并行读分片，只读 + studio 隔离）+ knowledge-distiller（证据超注入预算分批
+  提炼，两次失败整体判失败退回分片清单并留痕）；前端 KnowledgeReferenceBar/
+  Button、KnowledgeRetrievalFold、knowledge-reference-slice。管线重构：research
+  管线退役（4 模块+2 测试删除），导入改走 ingestion-service，新增
+  source-file-watcher / knowledge-history-compressor / chunker 自动策略。
+  会话修复：知识问答空白时延（turnPending 本地即亮+拆解/直检并行）、技能
+  胶囊重载退化（[Use skill:] 三处对称解析）、正文段结构性降级（textSignature
+  全默认 final_answer，turn-projector 三路径统一）、辅助槽 fresh 凭证形状
+  （snake/camel 错配）。生成产物重 pin：closure/fingerprint（compatible）/
+  inventory/export-manifest。验证：typecheck×3（绿）+ eslint 0 error +
+  full npm test 12504 passed / 0 failed（推进前 seal guard 旧坐标预期红）后推进。
+
+- **2026-08-30 knowledge coverage 证据链 Phase 9/10 + Agent 三工具 Phase 11
+  + ProcessingArtifact 管线 Phase 12 + EvidenceManifest 持久化**
+  （功能树 7b240ce1/seal 本提交；80 files / +23534-844）：Phase 9 coverage
+  真执行两波——落库层 knowledge-coverage-{unit,manifest,planner,executor}.ts
+  （契约/Planner/Executor/Ledger/Gate/Evidence 聚合，schema v13→v14
+  coverage_runs/coverage_shards + loadResumableCoverageRun 恢复语义）+ 会话
+  接线（injector exhaustive Planner→manifest→execute→aggregate 证据注入 +
+  降格留痕、engine coverage worker 闭包、submit 检索期 abort、WS
+  knowledge_coverage_progress、broad→exhaustive 自动升级、run 总时长上限）；
+  Phase 10 层级归约 knowledge-coverage-reduction.ts（ev_ 稳定 id→Source→
+  Notebook→Cross-Notebook，级预算内零 LLM 调用，结构化 JSON I/O + DP 分解
+  校验，纠错一次后仍失败降级保序截断；injector 三岔口替换删伪 chunk distill
+  过渡路径，stats coverageReduction）；Phase 11 三工具 knowledge_outline/
+  knowledge_grep/knowledge_manage（scope 校验链抽 lib/tools/knowledge-scope.ts
+  共享，STANDARD 分类 + 审批 review 档 + 五语言文案）；§六十七
+  EvidenceManifest 轻量持久化（schema v14→v15 身份链表、injector evidence
+  第三字段、engine 按 TurnScope 冻结集合复核、GC/deleteSource 引用保护）；
+  Phase 12 ProcessingArtifact 管线 + 目录导入（source-processors.ts DOCX/
+  XLSX/CSV 块级行级 + 防护上限、schema v15→v16、importDirectory sha 去重
+  三组明细、import-directory 路由 local-owner 限定、桌面端入口 + 5 语言
+  locale、不支持格式显式拒绝）；查询链路配套（TurnScope 冻结语义、rerank
+  按引用路由 + 跨笔记本 RRF 融合只消名次、chunk profile/index variant 分离、
+  生命周期与 GC 保护）。生成产物：export-manifest 收录新模块、
+  cli-runtime-closure 重生成、persistence 指纹/inventory/receipt compatible
+  repin、store-registry 登记。验证：typecheck×3（绿）+ eslint 0 error +
+  full npm test 12746 passed / 0 failed 后推进。
+
 - **2026-08-30 knowledge-watch 条件驱动假时钟 + win32 retry=2（四连修之四）**
   （功能树 33473a8f/seal 本提交；2 files / +20-17）：上轮 5 轮循环仍有
   洞——防抖计时器在轮询 stat 完成那一刻才建出（假时钟停在当时值），stat
@@ -447,50 +506,54 @@ seal 不是一次性终点，而是"当前被验证树"的游标；每次审计�
   typecheck×3 绿 + eslint 改动文件 0 error + full npm test 12556 passed /
   0 failed（封印推进后复跑）后推进。
 
-- **2026-08-30 模型操作原生协议 + 用户打标签方案 + knowledge v9 向量保留（PR #30）**
-  （功能树 29de5ee2/seal 本提交；37 files / +1817-96）：ModelOperationClient 按
-  operationProtocol 分发五协议方言（ollama-embed/gemini-embed/voyage-embeddings/
-  voyage-rerank/cohere-rerank），inferOperationProtocol 按供应商推断默认方言、显式
-  声明优先；模型设置页「模型类型」（嵌入/重排）标签 + 向量维度（五语言），用户打标
-  模型进笔记本设置下拉、用户配置为真理源，内置操作卡彻底清零；knowledge v8→v9
-  notebooks.vector_retention_days（幂等迁移，指纹 compatible repin，并行会话工作一并
-  入库）。CI 监控修复：Windows runner EPERM——migrateLegacyGlobalModelRefs 用例
-  泄漏 SQLite 句柄未 close 就删临时目录，补 store.close() + afterEach rmSync 退避
-  重试；审计 seal 因功能提交越过 VERIFIED_SOURCE_SHA 翻红，按惯例本提交推进封印。
-  验证：typecheck×3（绿）+ eslint 改动文件 0 error + full npm test 12556 passed /
-  0 failed（封印推进后复跑）后推进。
 
-- **2026-08-29 知识问答链路四连修 + 蒸馏并行化与进度可视化**
-  （功能树 26906c83/seal 本提交；32 files / +1340-172）：分块配置同源
-  （resolveEffectiveChunkTargetChars 贯穿查询 ensure 链/卡片视图/
-  knowledge_read，消除查询侧 1200 重建与摄入指纹互打架的全量重嵌事故；
-  ensureVectorArtifacts 在途去重）；rerank 按笔记本引用路由（v8 全局槽退役
-  断链补齐，配置不可解析显式降级 RRF 留痕，报错包装带 cause，重排上限提为
-  shared MODEL_OPERATION_RERANK_MAX_DOCS=100 单一真理源）；蒸馏并行化
-  （批预算按实测吞吐 EMA 动态推算 10s 目标、惰性建批，32 路自适应并发池
-  限流/超时逐层减半，超时线性化，sections 按批序整合）；蒸馏逐批进度事件
-  knowledge_distill_progress → 聊天「蒸馏中 · N 批」胶囊（独立于流式态）+
-  发送即本地「知识库检索中」；用户消息知识库元信息行精简为来源与模式。
-  生成产物：cli-runtime-closure 重生成、持久化指纹 compatible repin。
-  验证：typecheck×3（绿）+ eslint 0 error + full npm test 12523 passed /
+- **2026-08-30 build 修复 underscore 钉入 server 外置传递依赖**
+  （功能树 0a45563a/seal 本提交；1 file / +6-1）：PR #31 CI open-build-smoke
+  红——外置包 mammoth 的传递依赖 underscore 被 nft 按 ["node","import"]
+  条件追踪，运行时 CJS require 走其 exports require.node 分支
+  （underscore-node.cjs），分支文件集不同致剪枝后产物缺文件，服务器入口
+  import 即崩。沿用 lru-cache 先例把 underscore 钉进 pinnedTransitiveDeps
+  默认清单（完整安装 + 豁免剪枝），open/closed 两套构建共用一处生效。
+  验证：本地 build:server:open + smoke:server:open 正反冒烟全过（protecting
+  20→21）；build:server 钉依赖阶段确认入保护名单（签名步骤因本地无
+  LINGXI_SIGN_KEY 停止为预期）；eslint 0 error + full npm test 12746
+  passed / 0 failed 后推进。
+
+- **2026-08-30 Windows CI 测试修复：knowledge-store 新测试补关库**
+  （功能树 563478a0/seal 本提交；1 file / +2）：migrateLegacyGlobalModelRefs
+  测试漏 store.close()，better-sqlite3 句柄悬空，Windows 上 afterEach
+  fs.rmSync 删临时目录 EPERM（posix 允许删打开中文件故本地全绿）。对齐
+  同文件关库纪律。验证：该文件 13/13 绿 + full npm test 12746 passed /
   0 failed 后推进。
 
-- **2026-08-29 knowledge 引用链路 Phase 7/8 + 管线重构 + 多项会话修复**
-  （功能树 93f05a3c/seal 本提交；113 files / +12996-9097）：消息级笔记本
-  引用主链路——shared/knowledge-refs 契约（notebookIds + qa/assist，会话内
-  持续生效、服务端无状态透传）+ knowledge-context-injector（拆解+检索+注入
-  块生成，失败显式留痕禁静默降级）+ knowledge_read 工具（超预算时子 Agent
-  并行读分片，只读 + studio 隔离）+ knowledge-distiller（证据超注入预算分批
-  提炼，两次失败整体判失败退回分片清单并留痕）；前端 KnowledgeReferenceBar/
-  Button、KnowledgeRetrievalFold、knowledge-reference-slice。管线重构：research
-  管线退役（4 模块+2 测试删除），导入改走 ingestion-service，新增
-  source-file-watcher / knowledge-history-compressor / chunker 自动策略。
-  会话修复：知识问答空白时延（turnPending 本地即亮+拆解/直检并行）、技能
-  胶囊重载退化（[Use skill:] 三处对称解析）、正文段结构性降级（textSignature
-  全默认 final_answer，turn-projector 三路径统一）、辅助槽 fresh 凭证形状
-  （snake/camel 错配）。生成产物重 pin：closure/fingerprint（compatible）/
-  inventory/export-manifest。验证：typecheck×3（绿）+ eslint 0 error +
-  full npm test 12504 passed / 0 failed（推进前 seal guard 旧坐标预期红）后推进。
+- **2026-08-30 knowledge-watch 测试抖动修复：等待补 fake 时间泵**
+  （功能树 2ffef293/seal 本提交；1 file / +23-2）：该文件 fake 计时器 +
+  refresh 链真实 fs I/O，轮询 stat 晚于固定 settleIo 完成时防抖计时器迟建，
+  原 waitFor 只泵真实事件循环致迟到计时器永不触发，CI ubuntu 实测超时
+  （run 1 同代码通过、本地 5/5 绿，负载抖动非回归）。waitFor 增加
+  fakeTimers 泵参数，防抖相关 7 处等待统一传 DEBOUNCE_MS。验证：该文件
+  5/5 绿 + typecheck×3 + full npm test 12746 passed / 0 failed 后推进。
+
+- **2026-08-30 分支合并 main（PR #30）+ 合并树 seal 推进**
+  （合并树 dd508491/seal 本提交）：PR #30（模型操作原生协议 + 用户打标签 +
+  knowledge v9 向量保留 + CI 稳定性修复）在 PR #31 CI 期间合入 main，产生
+  13 文件冲突。合并语义：knowledge schema 两条线合一（本分支 v9-v16 保留，
+  向量保留重编号 v17 additive + 跨线护栏，schema v17）；向量索引库以 variant
+  架构为基座吸收 last_used_at（v3，v2 老库按表形分流迁移）；manager 孤儿
+  处理并集（状态重算 + 即时索引回收 + TurnScope/manifest 保护闸）；
+  index-store removeArtifact 去掉对已 DROP 的 artifact_indexes 的 DELETE
+  （原样保留会事务回滚吞掉 FTS 清理）。指纹按合并树 compatible repin。
+  验证：typecheck×3（绿）+ full npm test 12778 passed / 0 failed +
+  build:server:open / smoke:server:open 正反冒烟全过后推进。
+
+- **2026-08-30 Windows 轮询测试超时修复：waitForWithClock 补真实时间维度**
+  （功能树 57d716e5/seal 本提交；1 file / +29-8）：轮询检出的 stat/refresh 链
+  进度由 libuv 线程池队列决定（默认 4 线程全 worker 共享），Windows CI 实测
+  一轮 refresh 需真实秒级；原 waitForWithClock 按迭代计数预算在几毫秒真实
+  时间即耗尽。改双维度预算：Atomics.wait 真实阻塞 15ms/轮 + settle + 推进
+  假时钟，600 轮 = 真实 ≥9s + 假时钟 150s 仍留轮询窗内；两处调用点挂调试
+  转储。验证：该文件 6/6 绿 + typecheck×3 + full npm test 12778 passed /
+  0 failed 后推进。
 
 
 ## 最终状态：已合并（上游同步部分）
@@ -598,99 +661,3 @@ Windows NSIS 已在 windows-latest 构建成功；尚未在真实 Windows 桌面
 - 重新按 3911 行任务书审计当前状态；本机可闭合项没有发现新缺口。
 - 当前复跑：四平台统一稳定性 85/85、工作流契约 28/28、本机真实服务器归档新装/重启/快照读回，退出码均为 0。
 - 远端不存在 `codex/knowledge-notebook` 分支或该分支工作流运行。Phase 9 四种真实宿主仍为 `NOT_EXECUTED`；需要明确 commit、push 和远程触发授权后才能继续。
-
-## 2026-08-29 Model Operation 原生协议(本任务)开工基线
-
-- 任务:为 ModelOperationClient 补 Ollama/Gemini/Voyage/DashScope 原生协议,按 operationProtocol 分发。
-- 分支 feat/model-operation-protocols,HEAD d968b0caf8e94f63bd7cff8b55d0c30852483298。
-- 基线复测(2026-08-29,本工作树):
-  - npm run typecheck → 0 错(退出码 0)。
-  - npx vitest run tests/model-operation-client.test.ts tests/model-operation-resolver.test.ts → 2 文件 12 用例全过。
-  - npm test(同款 exclude)→ 1245 文件过/1 跳;12523 过/0 败/7 跳;退出码 0。
-- git status 快照(开工前,与任务书一致,为空):
-  ```
-  (空——工作区干净,无未提交改动)
-  ```
-- 并行编排:阶段 1 三路并行 A(协议核心)/B(现有厂商声明)/V(Voyage 新厂商);阶段 2 C(provider-registry 注册 + resolver 测试);阶段 3 主会话收口。
-- 协议名合同(冻结):ollama-embed / gemini-embed / voyage-embeddings / voyage-rerank / cohere-rerank;siliconflow-rerank 保留兼容统一归 cohere-rerank 实现。
-- 主会话追加决策:EmbeddingClient.embed 增加可选 inputType("document"|"query",缺省 "document")供 voyage-embeddings 映射 input_type;调用方不改。ollama-embed 的 URL 拼接 = base 去尾斜杠后,以 /api 结尾则 +"/embed",否则 +"/api/embed"(勿双写 /api)。
-
-### 阶段 1 完成记录(2026-08-29)
-
-- A(协议核心)交付:core/model-operation-client.ts 按 execution.api 分发协议方言(operationDialect:URL/请求体/认证头/响应归一化);shared/model-operations.ts 加 MODEL_OPERATION_PROTOCOLS 冻结清单;tests/model-operation-protocols.test.ts 新建 17 用例(ollama×3、gemini×4、voyage-embed×3、voyage-rerank×2、cohere×2、回退×3)。主会话已逐条核对协议形状与任务书规格一致(含真连 Ollama /api/embed 验证响应形状)。
-- B(厂商声明)交付:ollama.ts(qwen3-embedding:8b dims 4096 + mxbai-embed-large dims 1024,均带 baseUrl http://localhost:11434/api)、gemini.ts(gemini-embedding-001 dims 3072 + text-embedding-004 dims 768)、dashscope.ts(text-embedding-v4 openai-embeddings dims 1024 + gte-rerank-v2 cohere-rerank)。主会话读文件核实协议名与冻结清单一致。
-- V(Voyage 新厂商)交付:lib/providers/voyageai.ts(voyage-3-large 2048 / voyage-3.5 1024 / rerank-2.5,defaultBaseUrl https://api.voyageai.com)。已核实。
-- 主会话合并验证(A→B→V):npx vitest run 三文件 → 29 用例全绿(17 新 + 12 既有);npm run typecheck → 0 错。
-- 本机 Ollama 真连:GET /api/tags 见 qwen3-embedding:8b;POST /api/embed {"model":"qwen3-embedding:8b","input":["hello world"]} → {model, embeddings:[[…]]} 与规格一致。
-- 阶段 2 已派 C:provider-registry 注册 voyageai + resolver 测试加 resolveFresh 用例。待 C 交付后主会话验证,再做任务 3 收口。
-
-### 阶段 2/3 完成与收口(2026-08-29)
-
-- C(注册接线)交付并经主会话验证:core/provider-registry.ts 注册 voyageaiPlugin(+2 行);tests/model-operation-resolver.test.ts 追加 registry 集成 describe(5 用例断言 ollama/gemini/dashscope/voyageai 各协议模型的 execution.api/baseUrl;ollama 无 key 靠本地 base 兜底)。定向三文件 34 用例全绿(17+12+5)。
-- 收口过程中全量首跑出现 4 败(tests/open-boundary-lint.test.ts 两条 smoke):根因是 export-manifest.json 开放集未含新建 lib/providers/voyageai.ts,注册 import 构成新 open→closed 边。已向 manifest 按字母序补一行,boundary lint 恢复 ok(1 条既有基线债务不变),build/cli-runtime-closure.json 由构建链自动重算 voyageai 入图(10639→10640)。两文件均在白名单外,已在 BLOCKED.md 记录待裁决。
-- 最终验证(主会话复跑,输出均贴主对话):
-  - npx vitest run 三文件 → 34 用例全绿(protocols 17 / client 7+5 / resolver 5+5);
-  - npm run typecheck → 0 错(退出码 0);
-  - npm test → 1246 文件过/1 跳;12545 过/0 败/7 跳(基线 12523 + 新增 22 用例,skip 数与基线一致);
-  - 反向验证:临时把 voyage-rerank 断言改为期待 top_n → 1 败(diff 精确显示 top_n≠top_k)→ 还原 → 17 全绿;
-  - git status 终态:白名单内 10 个文件(PROGRESS/BLOCKED 之外含 core×2、shared×1、lib/providers×4、tests×2)+ 白名单外 2 个(export-manifest.json、build/cli-runtime-closure.json,见 BLOCKED.md 第 1 项)。
-- 本机 Ollama 真连:模型卡 qwen3-embedding:8b + POST /api/embed 形状已验证;真连用例未入套件的理由见 BLOCKED.md 第 2 项。
-- 未做 commit/push(审计门禁,改动留工作区由领导验收)。
-
-### 终态复核(2026-08-29,stop 轮补充)
-
-- 应收口复核要求做了回退实验:仅回退 build/cli-runtime-closure.json 时,单独跑 open-boundary 测试绿,但全量出现竞态 2 败且 closure 被写回;恢复后连续两轮全量稳定 12545 过/0 败/7 跳、typecheck 0 错、定向 34 用例全绿。
-- 终态 git status:白名单内 10 文件 + 白名单外 2 文件(export-manifest.json、build/cli-runtime-closure.json)。两者与「全量 0 失败」互为因果,不可回退,完整实证见 BLOCKED.md「补充实证」节,待领导裁决。
-- 任务在此终态下交付:改动留工作区,未 commit/push。
-
-### 终局(第三轮复核后定稿)
-
-- 已定位并实证闭包治理闭环:tests/cli-closure-census.test.ts L289/L318 强制磁盘 closure==源码真实闭包
-  (L318 原位重写后断言逐字节一致),L295-297 连 gitignored baseline 也要求重算==磁盘——「藏边」旁路封死。
-- 结论:完成条件②「白名单外零差异」与 C 任务(注册 voyageai)+「测试只增不减」构成规格级矛盾,
-  两方向必破一条;按让步顺序维持当前工作区终态(定向 34 绿、typecheck 0 错、全量 12545/0 败/7 跳、
-  反向验证红→绿)。穷尽论证与二选一裁决单见 BLOCKED.md。任务至此交付定稿,等待领导裁决与验收。
-
-## 2026-08-29 需求变更(用户推翻内置方案,改为用户打标签方案)
-
-用户要求:
-1. 移除新供应商 Voyage(注册、模型卡、配套清单)。
-2. 移除 Ollama/Gemini/DashScope 六张内置操作模型卡;保留 client 协议分发核心。
-3. 新功能:模型设置页新增「模型类型」设置项(嵌入/重排标签);打「嵌入」标签后追加「向量维度」配置项
-   (供应商支持则生效,不支持仅作记录)。
-4. 用户打标签的模型进入笔记本设置页嵌入/重排下拉;下拉内容以用户配置为真理源,不再内置预置。
-用户拍板三点:①协议方言按供应商自动推断(用户不操心);②内置卡一并撤、协议核心保留;
-③维度不匹配维持报错拦截。
-
-### 2026-08-29 用户打标签方案落地完成
-
-- 撤销:Voyage 供应商(注册/文件/manifest 行/closure)与 Ollama/Gemini/DashScope 六张内置操作模型卡全部移除;export-manifest.json 与 build/cli-runtime-closure.json 已随撤销恢复原状(上一任务的"白名单外接线待裁决"问题随之消解,BLOCKED.md 对应条目已标记失效)。协议分发核心(core/model-operation-client.ts)与 18 条协议测试保留。
-- 新增:shared/model-operations.ts 增 inferOperationProtocol(供应商→默认方言:ollama→ollama-embed、gemini→gemini-embed、其余→嵌入 openai-embeddings/重排 cohere-rerank);core/provider-registry.ts 的 getOperationModelCatalog 对无显式协议的用户条目按此推断(显式声明永远优先)。
-- client 增强:ollama-embed URL 拼接先剥结尾 /v1(自添加模型继承供应商默认 base),新增 1 条测试锁定。
-- 前端:ModelEditPanel 新增「模型类型」设置项(无/嵌入/重排 单选)+ 嵌入时条件显示「向量维度」输入框(五语言文案);保存走既有 PUT 链路写 operations/dimensions(后端 ALLOWED 已含,零后端路由改动)。
-- resolver 测试:registry 集成用例改写为用户条目风格(saveProvider 注入,无协议声明),覆盖 ollama/gemini/dashscope 推断、openai 兼容默认回退、显式协议优先,共 5 用例。
-- 验证:定向 35 用例全绿;typecheck 0 错;全量 12546 过/0 败/7 跳;git status 无白名单外文件。
-- 界面实操(dev:web):模型编辑弹层出现「模型类型」+ 维度联动;给 ollama/qwen3-embedding:8b 打嵌入标签并填维度 4096 后,/api/preferences/models 的 operation_models 出现该条目(协议自动推断 ollama-embed、dims=4096)。
-- 真实端到端:临时笔记本贴文本→摄入 5 秒完成,向量库新增 1 条 4096 维向量(完整链路 UI 标签→目录→resolver→client 剥 /v1→本机 Ollama /api/embed);验证后临时笔记本已删除。
-- 已知边界(如实记录):贴来源时若嵌入模型尚未配置,job 落显式 pending_embedding 终态,需模型配置变更信号才补跑——正常顺序(先配模型再贴来源)不受影响,属既有行为非本次引入。
-
-### 2026-08-29 晚 追加:内置操作卡彻底清零(用户要求)
-
-- 移除 lib/providers/openai.ts 与 lib/providers/siliconflow.ts 的 operationModels 声明(任务开始前就存在的最后 4 张内置卡)。
-- resolver 测试首个 describe 改写:①锁"内置目录为空、纯用户驱动";②用户打标签条目进目录并按供应商推断协议(原"内置卡不进聊天目录"断言对用户条目不成立——用户自添加条目本就会进聊天目录,属既有设计,断言已按新语义改写)。
-- 验证:定向 39 用例全绿;typecheck 0 错;dev server 实测 /api/preferences/models 的 operation_models 仅剩 3 条且全部为用户打标签条目(qwen3-embedding:8b/0.6b-fp16 嵌入、Qwen/Qwen3-VL-Reranker-8B 重排),内置卡清零。
-- 全量 12552 过/4 败/7 跳:4 败全部为 tests/persistence-schema-tripwire.test.ts,经 stash 对照实验证实与本轮改动无关——工作区在 20:23-20:39(上一轮全量结束后)被另一并行会话写入 schema 变更(lib/knowledge/knowledge-store.ts 含 ALTER TABLE notebooks ADD COLUMN vector_retention_days 等),与 committed 指纹不匹配所致。该改动非本任务产物,不越界 repin 指纹,详见 BLOCKED.md。
-
-### 2026-08-29 深夜补遗:反向验证完成 + tripwire 处置交底
-
-- 反向验证(原任务书要求)已补做并贴主会话输出:临时把 voyage-rerank 用例断言改为期待 top_n → 红("top_n": 2 Expected vs "top_k": 2 Received,Tests 1 failed)→ 还原 → 绿(21 passed)。
-- tripwire 4 败处置:并行会话的向量保留天数改动经核验是完整自洽的兼容性新增(knowledge v8→v9、幂等加列、配套 27 用例全绿),按门禁只差 repin。本会话尝试代行 repin 被权限系统拦截;结合此前"不越界合法化他人在途工作"的判断,最终处置=不改,交由变更作者/用户执行:
-  node scripts/generate-persistence-schema-fingerprint.mjs --classification compatible --compatibility-reason "<按实填写>"
-  (还原方式:git checkout build/persistence-schema-fingerprint.json)
-- git 差异归因(与会话开头快照对照):白名单内撤卡后 ollama/gemini/dashscope/voyageai 已归零;快照内既有 M(engine/knowledge/server/desktop knowledge/dev-web/vite/locales)属并行会话与前会话工作区基线,非本任务新增差异;本任务新增改动=ModelEditPanel(用户指令的功能)、locales 五语言(配套文案)、openai/siliconflow(用户指令撤卡)、shared/model-operations+provider-registry(协议推断)、model-operation 测试。
-
-### 2026-08-29 终局:全量归绿
-
-- 用户于 23:12:15 亲自执行 repin(build/persistence-schema-fingerprint.json → sha256:e541de…,review=compatible,"knowledge v8->v9 加可空列 vector_retention_days,幂等迁移,向后兼容")。
-- tripwire 剩余 1 败为断言版本号未跟上(并行会话升 schema 至 v9 未同步该断言),已同步 userVersion 8→9(与用户 repin 认可的事实一致,非放宽断言)。
-- 终验输出:typecheck 0 错;定向 model-operation 三文件 39 用例全绿;全量 `Tests 12556 passed | 7 skipped (12563)` 0 失败;反向验证红→绿已贴(前节)。BLOCKED.md 所列事项均已闭环或注明待裁决项。

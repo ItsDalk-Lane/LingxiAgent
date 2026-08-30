@@ -422,7 +422,7 @@ describe("KnowledgeStore", () => {
     migrated.close();
   });
 
-  it("嵌入进度列：仅 running 可写、total 初始化、完成写满与失败/重试重置", () => {
+  it("嵌入进度列：仅 running 可写、total 初始化、完成写满、失败保留与手动重试重置", () => {
     const root = tempDir();
     let now = "2026-08-25T01:00:00.000Z";
     const store = new KnowledgeStore({
@@ -475,7 +475,8 @@ describe("KnowledgeStore", () => {
     expect(store.completeIngestionJob({ studioId, jobId: job.id }))
       .toMatchObject({ status: "done", progressDone: 4, progressTotal: 4 });
 
-    // 失败（带退避回 queued）与手动重试都重置进度：幂等重跑防 UI 显示旧进度回退。
+    // 失败（带退避回 queued）：进度保留——Phase 3 起 embed 有批级 checkpoint，
+    // progress 反映真实已落库向量数，清零会丢掉诊断信息（§十四/§七十四）。
     const rebuild = store.enqueueIngestionJob({
       studioId,
       notebookId: notebook.id,
@@ -489,13 +490,118 @@ describe("KnowledgeStore", () => {
       jobId: rebuild.id,
       error: "embed_timeout",
       retryAfter: "2026-08-25T01:00:30.000Z",
-    })).toMatchObject({ status: "queued", progressDone: 0, progressTotal: null });
+    })).toMatchObject({ status: "queued", progressDone: 2, progressTotal: 6 });
     now = "2026-08-25T01:01:00.000Z";
     store.claimNextIngestionJob();
     store.updateIngestionJobProgress({ studioId, jobId: rebuild.id, done: 2, total: 6 });
     store.failIngestionJob({ studioId, jobId: rebuild.id, error: "embed_timeout" });
+    // 手动重试（用户显式要求重来）仍重置进度。
     expect(store.requeueIngestionJob({ studioId, jobId: rebuild.id }))
       .toMatchObject({ status: "queued", progressDone: 0, progressTotal: null });
+    store.close();
+  });
+
+  it("embedding_stats（v10）：仅 running 可写、JSON 往返解析、坏数据显式抛错", () => {
+    const root = tempDir();
+    const store = new KnowledgeStore({
+      dbPath: path.join(root, "knowledge.db"),
+      now: () => "2026-08-25T01:00:00.000Z",
+      idGenerator: deterministicIds(),
+    });
+    const studioId = "studio-a";
+    const notebook = store.createNotebook({ studioId, name: "统计" });
+    const imported = store.createSourceWithSnapshot({
+      studioId,
+      notebookId: notebook.id,
+      sourceType: "file",
+      displayName: "统计.txt",
+      originMetadata: { fileName: "统计.txt" },
+      snapshot: {
+        sha256: "e".repeat(64),
+        mimeType: "text/plain",
+        byteSize: 12,
+        storagePath: "sources/src_0002/snap_0004",
+      },
+    });
+    const job = store.enqueueIngestionJob({
+      studioId,
+      notebookId: notebook.id,
+      sourceId: imported.source.id,
+      chunkerConfigId: "a".repeat(16),
+    });
+    // 新库直建 v10：stats 列默认 NULL → null。
+    expect(job.embeddingStats).toBeNull();
+    const stats = {
+      chunksNewlyEmbedded: 20,
+      chunksResumedFromCheckpoint: 80,
+      chunksReusedFromReadyVariant: 0,
+      requestCount: 1,
+      model: { key: "k", provider: "fake", modelId: "emb-1", protocol: "openai", dimensions: 8 },
+      resetStaleVectors: false,
+      abandonedStaleVariantId: null,
+    };
+    // 仅 running 可写。
+    expect(() => store.recordIngestionJobEmbeddingStats({ studioId, jobId: job.id, stats }))
+      .toThrow(/not running/i);
+    store.claimNextIngestionJob();
+    expect(store.recordIngestionJobEmbeddingStats({ studioId, jobId: job.id, stats })
+      .embeddingStats).toEqual(stats);
+    // 形状校验：负计数拒绝。
+    expect(() => store.recordIngestionJobEmbeddingStats({
+      studioId,
+      jobId: job.id,
+      stats: { ...stats, chunksNewlyEmbedded: -1 },
+    })).toThrow(/stats are invalid/i);
+    // 坏 JSON / 坏形状：读取侧显式抛错（禁静默丢诊断）。
+    store.db.prepare(`UPDATE ingestion_jobs SET embedding_stats = ? WHERE id = ?`).run("{oops", job.id);
+    expect(() => store.getIngestionJob({ studioId, jobId: job.id })).toThrow(/stats are invalid/i);
+    store.db.prepare(`UPDATE ingestion_jobs SET embedding_stats = ? WHERE id = ?`)
+      .run(JSON.stringify({ chunksNewlyEmbedded: 1 }), job.id);
+    expect(() => store.getIngestionJob({ studioId, jobId: job.id })).toThrow(/stats are invalid/i);
+    store.close();
+  });
+
+  it("启动恢复：embed 相位 running 残留置回 queued 并留痕 KNOWLEDGE_EMBEDDING_INTERRUPTED", () => {
+    const root = tempDir();
+    const store = new KnowledgeStore({
+      dbPath: path.join(root, "knowledge.db"),
+      now: () => "2026-08-25T01:00:00.000Z",
+      idGenerator: deterministicIds(),
+    });
+    const studioId = "studio-a";
+    const notebook = store.createNotebook({ studioId, name: "恢复" });
+    const imported = store.createSourceWithSnapshot({
+      studioId,
+      notebookId: notebook.id,
+      sourceType: "file",
+      displayName: "恢复.txt",
+      originMetadata: { fileName: "恢复.txt" },
+      snapshot: {
+        sha256: "d".repeat(64),
+        mimeType: "text/plain",
+        byteSize: 12,
+        storagePath: "sources/src_0002/snap_0005",
+      },
+    });
+    const job = store.enqueueIngestionJob({
+      studioId,
+      notebookId: notebook.id,
+      sourceId: imported.source.id,
+      chunkerConfigId: "a".repeat(16),
+    });
+    store.claimNextIngestionJob();
+    store.updateIngestionJobPhase({ studioId, jobId: job.id, phase: "chunk" });
+    store.updateIngestionJobPhase({ studioId, jobId: job.id, phase: "embed" });
+    store.updateIngestionJobProgress({ studioId, jobId: job.id, done: 64, total: 100 });
+    // 进程中断（running 残留）→ 启动恢复：queued + 中断留痕 + 进度保留。
+    expect(store.requeueRunningIngestionJobs()).toBe(1);
+    expect(store.getIngestionJob({ studioId, jobId: job.id })).toMatchObject({
+      status: "queued",
+      progressDone: 64,
+      progressTotal: 100,
+    });
+    expect(store.getIngestionJob({ studioId, jobId: job.id }).error)
+      .toContain("KNOWLEDGE_EMBEDDING_INTERRUPTED");
     store.close();
   });
 

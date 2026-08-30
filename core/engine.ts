@@ -190,9 +190,21 @@ import { TaskRegistry } from "../lib/task-registry.ts";
 import { KnowledgeManager } from "../lib/knowledge/knowledge-manager.ts";
 import type { KnowledgeRetrievalStats } from "../shared/knowledge-refs.ts";
 import {
+  assembleKnowledgeEvidenceManifestEntries,
   buildKnowledgeContextInjection,
   KNOWLEDGE_DECOMPOSE_SYSTEM_PROMPT,
+  KNOWLEDGE_EXPANSION_SYSTEM_PROMPT,
+  type KnowledgeInjectionEvidence,
 } from "../lib/knowledge/knowledge-context-injector.ts";
+import {
+  KNOWLEDGE_COVERAGE_CLASSIFY_SYSTEM_PROMPT,
+  planKnowledgeCoverage,
+} from "../lib/knowledge/knowledge-coverage-planner.ts";
+import { KNOWLEDGE_COVERAGE_SHARD_SYSTEM_PROMPT } from "../lib/knowledge/knowledge-coverage-manifest.ts";
+import {
+  KNOWLEDGE_COVERAGE_REDUCTION_SYSTEM_PROMPT,
+  type CoverageReduceModel,
+} from "../lib/knowledge/knowledge-coverage-reduction.ts";
 import {
   KNOWLEDGE_DISTILL_FALLBACK_BATCH_TOKENS,
   KNOWLEDGE_DISTILL_MAX_BATCH_TOKENS,
@@ -2318,12 +2330,19 @@ export class LingxiEngine {
   }
 
   /**
-   * Phase 8 知识库引用注入门面：拆解（knowledge 槽位，首次 15s / 纠错重试 8s 超时，
-   * temperature 0）+ retrieveForNotebooks 检索 + 预算裁剪，产出拼进 prompt 的
-   * [KnowledgeContext] 系统侧注入块与本次检索统计（KnowledgeRetrievalStats，
-   * 随投影链透出）。desktop-session-submit 在用户可见投影确定之后消费（注入块
-   * 不进投影）。内部失败（槽位未配/模型超时/检索错误）在块内显式留痕，不抛错、
-   * 不阻断聊天（禁静默降级：降级必须可见）；该路径的 stats 带 unavailableReason。
+   * Phase 8/9 知识库引用注入门面：覆盖规划（Phase 7 CoveragePlanner，规则层 +
+   * knowledge 槽位语义分类，exhaustive 触发直接定档）+ 拆解（knowledge 槽位，
+   * 首次 15s / 纠错重试 8s 超时，temperature 0）+ 受控查询扩展（§三十五，同一
+   * 槽位独立提示词）+ retrieveForNotebooks 检索（Phase 8 执行档位：broad 的
+   * source/section constrained 二次探测与 §三十六 邻接扩展都在 injector 内编排；
+   * Phase 9 第二波：exhaustive 真执行——manifest/executor 接入 + coverage worker
+   * 闭包 + knowledge_coverage_progress 进度事件 + abort signal 透传；Phase 10：
+   * 层级证据归约接入 + reduceModel 闭包（knowledgeDistill 槽位））+
+   * 预算裁剪，产出拼进 prompt 的 [KnowledgeContext] 系统侧注入块与本次检索统计
+   * （KnowledgeRetrievalStats，随投影链透出）。desktop-session-submit 在用户可见
+   * 投影确定之后消费（注入块不进投影）。内部失败（槽位未配/模型超时/检索错误）
+   * 在块内显式留痕，不抛错、不阻断聊天（禁静默降级：降级必须可见）；该路径的
+   * stats 带 unavailableReason。
    */
   async buildKnowledgeContextInjection(input: {
     question: string;
@@ -2332,7 +2351,19 @@ export class LingxiEngine {
     budgetTokens?: number;
     /** 会话路径：携带时蒸馏每批完成广播 knowledge_distill_progress 进度事件。 */
     sessionPath?: string;
-  }): Promise<{ block: string; stats: KnowledgeRetrievalStats }> {
+    /** 会话轮标识（提交方传 clientMessageId）；缺省时 store 生成。 */
+    turnId?: string;
+    /**
+     * 用户取消信号（Phase 9 第二波）：desktop-session-submit 检索期 abort 通道
+     * 传入，exhaustive coverage run 据此中止（pending shard → cancelled）。
+     */
+    signal?: AbortSignal;
+  }): Promise<{
+    block: string;
+    stats: KnowledgeRetrievalStats;
+    /** 证据身份链（§六十七 EvidenceManifest 数据源）：不进 UI stats，供 manifest 持久化。 */
+    evidence: KnowledgeInjectionEvidence;
+  }> {
     const annotateUnavailable = (reason: string) => ({
       block: `[KnowledgeContext]\n[knowledge injection unavailable: ${reason}]\n`
         + `Guidance: Knowledge notebook evidence could not be retrieved for this question.\n[/KnowledgeContext]`,
@@ -2349,6 +2380,8 @@ export class LingxiEngine {
         budgetTokens: input.budgetTokens ?? 0,
         unavailableReason: reason,
       },
+      // 降级路径无任何证据进入模型上下文：身份链为空（不伪造）。
+      evidence: { entries: [], searchedVectorVariants: [] } satisfies KnowledgeInjectionEvidence,
     });
     const knowledge = this._knowledge;
     const studioId = this._runtimeContext?.studioId;
@@ -2356,6 +2389,25 @@ export class LingxiEngine {
       return annotateUnavailable("Knowledge is not accessible in this runtime");
     }
     try {
+      // KnowledgeTurnScope（任务书 §二十/§四十三，Phase 4）：本轮知识权限天花板。
+      // 选中 notebooks 的活跃 membership × 各源当前最新 snapshot/artifact 同事务
+      // 冻结落库；检索锚定冻结集合，注入块头带出 scopeId 供 knowledge_read 回传。
+      // 无 sessionPath 的旧调用方（非会话 surface）不建 scope、不冻结（兼容路径，
+      // 注入块不带 scopeId，knowledge_read 侧无 scope 上下文会显式拒绝）。
+      const turnScope = input.sessionPath
+        ? knowledge.createTurnScope({
+          studioId,
+          sessionPath: input.sessionPath,
+          turnId: input.turnId ?? null,
+          notebookIds: input.knowledgeRefs.notebookIds,
+        })
+        : null;
+      const frozenArtifacts = turnScope
+        ? new Map(turnScope.sources.map(source => [source.sourceId, {
+          contentSnapshotId: source.contentSnapshotId,
+          parseArtifactId: source.parseArtifactId,
+        }]))
+        : null;
       // 槽位未配置（knowledge 偏好未设）→ 拆解模型为 null，injector 直接单查询并显式标注。
       // 模型解析放在闭包内：槽位配置错误只降级拆解（单查询 + 留痕），检索照常进行。
       const slotConfigured = !!this.getSharedModels()?.knowledge;
@@ -2434,6 +2486,7 @@ export class LingxiEngine {
         };
       }
       let decomposeModel = null;
+      let expandModel = null;
       if (slotConfigured) {
         decomposeModel = async ({ question, correction }) => {
           const config = await this.resolveAuxiliaryModelFresh("knowledge");
@@ -2461,13 +2514,165 @@ export class LingxiEngine {
             timeoutMs: correction ? 8_000 : 15_000,
           });
         };
+        // §三十五 受控查询扩展（Phase 8）：与拆解同一 knowledge 槽位、独立系统
+        // 提示词；输出非法纠错重试一次，失败不扩展（injector 留痕）。
+        expandModel = async ({ question, existingQueries, correction }) => {
+          const config = await this.resolveAuxiliaryModelFresh("knowledge");
+          if (!config) throw new Error("knowledge model slot unavailable");
+          const queriesList = existingQueries.map(query => `- ${query}`).join("\n");
+          return callText({
+            api: config.api,
+            apiKey: config.apiKey,
+            baseUrl: config.baseUrl,
+            headers: config.headers,
+            model: config.model,
+            systemPrompt: KNOWLEDGE_EXPANSION_SYSTEM_PROMPT,
+            messages: [{
+              role: "user",
+              content: correction
+                ? `Your previous output was invalid and must be corrected.\nError: ${correction.error}\n`
+                  + `Previous output: ${correction.previousOutput}\n\nQuestion: ${question}\n`
+                  + `Existing queries:\n${queriesList}\n`
+                  + "Return the corrected JSON object following the schema. Plain JSON only, no Markdown fences."
+                : `Question: ${question}\n\nExisting queries:\n${queriesList}`,
+            }],
+            temperature: 0,
+            timeoutMs: correction ? 8_000 : 15_000,
+          });
+        };
       }
-      const { block, stats } = await buildKnowledgeContextInjection({
+      // Phase 9 第二波：exhaustive shard worker 闭包（§五十二）。复用 knowledge
+      // 辅助槽位；超时纪律对齐 distiller 的线性化超时（30s 基线 + 1ms/token，
+      // 上限 180s——shard 预算 16k tokens 时约 46s）。槽位未配置 → 闭包为 null，
+      // injector 把 exhaustive 显式降格 broad 并留痕（不静默不阻断）。
+      let coverageWorkerModel = null;
+      if (slotConfigured) {
+        coverageWorkerModel = async ({ prompt, correction }) => {
+          const config = await this.resolveAuxiliaryModelFresh("knowledge");
+          if (!config) throw new Error("knowledge model slot unavailable");
+          const promptTokens = estimateTextTokens(prompt);
+          const timeoutMs = Math.min(180_000, 30_000 + promptTokens);
+          return callText({
+            api: config.api,
+            apiKey: config.apiKey,
+            baseUrl: config.baseUrl,
+            headers: config.headers,
+            model: config.model,
+            systemPrompt: KNOWLEDGE_COVERAGE_SHARD_SYSTEM_PROMPT,
+            messages: [{
+              role: "user",
+              content: correction
+                ? `Your previous output was invalid and must be corrected.\nError: ${correction.error}\n`
+                  + `Previous output: ${correction.previousOutput}\n\n${prompt}\n`
+                  + "Return the corrected JSON object for the same shardId following the schema. Plain JSON only, no Markdown fences."
+                : prompt,
+            }],
+            temperature: 0,
+            timeoutMs,
+          });
+        };
+      }
+      // Phase 10：层级归约闭包（reduceModel，§六十一/§六十二）。复用 knowledgeDistill
+      // 槽位（与分段压缩同一模型配置），闭包形态对齐 coverage worker（{prompt,
+      // correction}）；超时纪律同 distiller 线性化（30s 基线 + 1ms/token，上限
+      // 180s）。未配 → null → 归约层显式降级结构化截断 + 留痕
+      // （coverageReduction.degradedReason，禁静默）。
+      let coverageReduceModel: CoverageReduceModel | null = null;
+      if (distillSlotConfigured) {
+        coverageReduceModel = async ({ prompt, correction }) => {
+          const config = await this.resolveAuxiliaryModelFresh("knowledgeDistill");
+          if (!config) throw new Error("knowledgeDistill model slot unavailable");
+          const timeoutMs = Math.min(180_000, 30_000 + estimateTextTokens(prompt));
+          // callText 静态返回 string | {text, usage}（默认仅文本）；显式归一保闭包契约。
+          const text = await callText({
+            api: config.api,
+            apiKey: config.apiKey,
+            baseUrl: config.baseUrl,
+            headers: config.headers,
+            model: config.model,
+            systemPrompt: KNOWLEDGE_COVERAGE_REDUCTION_SYSTEM_PROMPT,
+            messages: [{
+              role: "user",
+              content: correction
+                ? `Your previous output was invalid and must be corrected.\nError: ${correction.error}\n`
+                  + `Previous output: ${correction.previousOutput}\n\n${prompt}\n`
+                  + "Return the corrected JSON object following the schema. Plain JSON only, no Markdown fences."
+                : prompt,
+            }],
+            temperature: 0,
+            timeoutMs,
+          });
+          return typeof text === "string" ? text : text.text;
+        };
+      }
+      // CoveragePlanner（任务书 §二十七–§三十二/§四十一，Phase 7）：decompose 前
+      // 先定覆盖档位。exhaustive/global-negative 规则直接定档（不浪费一次普通
+      // 检索）；分类闭包复用 knowledge 辅助槽位（与 decompose 同源同超时阶梯）。
+      // Phase 8 起 injector 消费 plan：coverageMode 决定执行档位（broad 结构探测 /
+      // 自动升级 / exhaustive 真执行——执行面不可用显式降格 broad +
+      // coverageDegradeReason）；planner 失败/未配模型在 plan 内显式留痕降级
+      // high_recall，不阻断注入。
+      let classifyModel = null;
+      if (slotConfigured) {
+        classifyModel = async ({ question, scopeNote, correction }) => {
+          const config = await this.resolveAuxiliaryModelFresh("knowledge");
+          if (!config) throw new Error("knowledge model slot unavailable");
+          return callText({
+            api: config.api,
+            apiKey: config.apiKey,
+            baseUrl: config.baseUrl,
+            headers: config.headers,
+            model: config.model,
+            systemPrompt: KNOWLEDGE_COVERAGE_CLASSIFY_SYSTEM_PROMPT,
+            messages: [{
+              role: "user",
+              content: correction
+                ? `Your previous output was invalid and must be corrected.\nError: ${correction.error}\n`
+                  + `Previous output: ${correction.previousOutput}\n\nQuestion: ${question}\n`
+                  + "Return the corrected JSON object following the schema. Plain JSON only, no Markdown fences."
+                : `Question: ${question}${scopeNote ? `\n${scopeNote}` : ""}`,
+            }],
+            temperature: 0,
+            timeoutMs: correction ? 8_000 : 15_000,
+          });
+        };
+      }
+      // planner 与 injector 并行启动：injector 内直检先行（§三十四 安全网），
+      // 在拆解前 await 本 promise（planner 先于 decompose）。planKnowledgeCoverage
+      // 是总函数（模型失败在 plan 内降级留痕），promise 不会 reject。
+      const coveragePlanPromise = (async () => {
+        const plan = await planKnowledgeCoverage({
+          question: input.question,
+          turnScopeInfo: {
+            notebookCount: input.knowledgeRefs.notebookIds.length,
+            sourceCount: turnScope ? turnScope.sources.length : null,
+          },
+          ...(classifyModel ? { classifyModel } : {}),
+        });
+        // 计划持久化（§二十九 只存结构化结果，禁 CoT）：失败只留日志痕，
+        // 不阻断注入（plan 本身已在 stats/块头透出）。
+        try {
+          knowledge.insertCoveragePlan({
+            turnScopeId: turnScope?.id ?? null,
+            question: input.question,
+            plan,
+          });
+        } catch (error) {
+          moduleLog.log(
+            `knowledge coverage plan persistence failed: ${error instanceof Error ? error.message : String(error)}`,
+          );
+        }
+        return plan;
+      })();
+      const { block, stats, evidence } = await buildKnowledgeContextInjection({
         question: input.question,
         mode: input.knowledgeRefs.mode,
         ...(input.budgetTokens != null ? { budgetTokens: input.budgetTokens } : {}),
+        ...(turnScope ? { scopeId: turnScope.id } : {}),
+        coveragePlan: coveragePlanPromise,
         deps: {
           decomposeModel,
+          expandModel,
           distillModel,
           ...(distillBatchBudgetTokens != null ? { distillBatchBudgetTokens } : {}),
           // 每批蒸馏完成 → ws 广播进度（聊天界面"蒸馏中 · N 批"胶囊）。
@@ -2483,17 +2688,102 @@ export class LingxiEngine {
               },
             }
             : {}),
-          retrieve: ({ query }) => knowledge.queryService.retrieveForNotebooks({
+          // Phase 9 第二波：exhaustive 覆盖执行面。KnowledgeStore 同时满足
+          // manifest 数据源与 coverage run 持久化面（v14）；worker 闭包槽位未配
+          // → null → injector 显式降格 broad（coverageDegradeReason 留痕）。
+          // abort signal 从 submit 链传入；shard 终态进度转事件广播。
+          // Phase 10：reduceModel 闭包（knowledgeDistill 槽位）供层级证据归约。
+          coverage: {
+            source: knowledge.store,
+            store: knowledge.store,
+            studioId,
+            workerModel: coverageWorkerModel,
+            reduceModel: coverageReduceModel,
+            ...(input.signal ? { signal: input.signal } : {}),
+            ...(input.sessionPath
+              ? {
+                onProgress: (event: { runId: string; done: number; total: number }) => {
+                  this.emitEvent({
+                    type: "knowledge_coverage_progress",
+                    sessionPath: input.sessionPath!,
+                    runId: event.runId,
+                    done: event.done,
+                    total: event.total,
+                  }, input.sessionPath!);
+                },
+              }
+              : {}),
+          },
+          // Phase 8：sourceIds/sectionsBySourceId 是 broad 结构缺口的约束参数
+          // （§三十八/§三十九）；§四十三 冻结对二次检索同样生效。
+          retrieve: ({ query, sourceIds, sectionsBySourceId }) => knowledge.queryService.retrieveForNotebooks({
             studioId,
             notebookIds: input.knowledgeRefs.notebookIds,
             question: query,
+            ...(frozenArtifacts ? { frozenArtifacts } : {}),
+            ...(sourceIds ? { sourceIds } : {}),
+            ...(sectionsBySourceId ? { sectionsBySourceId } : {}),
+          }),
+          // §三十六 邻接扩展：同 variant 内按锚点 ordinal ± 窗口定点回读。
+          readNeighborChunks: ({ anchor, ordinals }) => knowledge.queryService.readAdjacentChunks({
+            studioId,
+            anchor: {
+              notebookId: anchor.notebookId,
+              notebookName: anchor.notebookName,
+              sourceId: anchor.sourceId,
+              sourceName: anchor.sourceName,
+              parseArtifactId: anchor.parseArtifactId,
+              chunkIndexVariantId: anchor.chunkIndexVariantId,
+            },
+            ordinals,
           }),
         },
       });
-      return { block, stats };
+      return { block, stats, evidence };
     } catch (err) {
       return annotateUnavailable(err instanceof Error ? err.message : String(err));
     }
+  }
+
+  /**
+   * EvidenceManifest 持久化门面（任务书 §六十七，schema v15）：desktop-session-submit
+   * 在持久化检索 stats 的同一位置调用。服务端复核（不信任模型/调用方传入 id）：
+   * 一切轮身份从 stats.scopeId 反查 TurnScope 行复读；条目经
+   * assembleKnowledgeEvidenceManifestEntries 与冻结集合核对后落库。写入失败
+   * 抛错，由调用方留痕 warn（与 stats 持久化同纪律，不阻断会话提交）。
+   * 只持久化身份链与标签，绝不存 chunk 正文或任何模型输出。
+   */
+  recordKnowledgeEvidenceManifest(input: {
+    sessionPath: string;
+    stats: KnowledgeRetrievalStats;
+    evidence: KnowledgeInjectionEvidence;
+  }): void {
+    const knowledge = this._knowledge;
+    const studioId = this._runtimeContext?.studioId;
+    if (!knowledge || !studioId) {
+      throw new Error("Knowledge is not accessible in this runtime");
+    }
+    if (typeof input?.stats?.scopeId !== "string" || !input.stats.scopeId) {
+      throw new Error("knowledge evidence manifest requires a turn scope (stats.scopeId)");
+    }
+    if (!input?.evidence || !Array.isArray(input.evidence.entries)) {
+      throw new Error("knowledge evidence manifest requires the injection evidence payload");
+    }
+    const scope = knowledge.getTurnScope({ scopeId: input.stats.scopeId });
+    if (!scope) {
+      throw new Error(`knowledge turn scope not found: ${input.stats.scopeId}`);
+    }
+    knowledge.insertEvidenceManifest({
+      turnScopeId: scope.id,
+      coverageMode: input.stats.coverageMode ?? null,
+      executedCoverageMode: input.stats.executedCoverageMode ?? null,
+      coverageRunId: input.stats.coverageRunId ?? null,
+      coverageManifestHash: input.stats.coverageManifestHash ?? null,
+      entries: assembleKnowledgeEvidenceManifestEntries({
+        turnScope: scope,
+        evidence: input.evidence,
+      }),
+    });
   }
 
   // ── Auxiliary Model Resolver (semantic slots) ──
@@ -3259,10 +3549,12 @@ export class LingxiEngine {
     // 模型/provider/嵌入偏好的运行期变更经 onProviderChanged / setSharedModels
     // 两个收敛点通知（见各自注释）。同点位启动 file 源 watcher：扫描全部活跃
     // file 源建目录级 watch（变化 → 防抖 → refreshFileSource → 自动入队摄入），
-    // 关闭走 engine close → knowledge.close()（先停 watcher 再停摄入）。
+    // 以及生命周期维护（Phase 5：orphan Source 定时 GC + 零引用变体诊断）。
+    // 关闭走 engine close → knowledge.close()（先停维护再停 watcher 再停摄入）。
     try {
       this._knowledge.ingestion.start();
       this._knowledge.startSourceFileWatcher();
+      this._knowledge.startLifecycleMaintenance();
       this._knowledge.onModelConfigMayHaveChanged();
     } catch (err) {
       moduleLog.warn(`[init] knowledge ingestion start failed: ${err?.message}`);

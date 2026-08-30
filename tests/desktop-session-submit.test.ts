@@ -1876,6 +1876,8 @@ describe("knowledge context injection (Phase 8)", () => {
       budgetTokens: 6000,
       // 会话路径随行：蒸馏进度事件按 session 广播（knowledge_distill_progress）。
       sessionPath: "/tmp/desk.jsonl",
+      // Phase 9 第二波：检索期取消信号（exhaustive coverage run 中止通道）。
+      signal: expect.any(AbortSignal),
     });
     expect(engine.promptSession).toHaveBeenCalledWith(
       "/tmp/desk.jsonl",
@@ -2071,6 +2073,49 @@ describe("knowledge context injection (Phase 8)", () => {
       displayMessage: { text: "下一条" },
     });
     expect(engine.promptSession).toHaveBeenCalledTimes(1);
+  });
+
+  it("检索期间 abort 同步中止传给注入链的 AbortSignal（exhaustive coverage run 取消通道）", async () => {
+    const { engine } = injectionEngine();
+    let capturedSignal: AbortSignal | undefined;
+    let rejectInjection!: (reason: Error) => void;
+    (engine as any).buildKnowledgeContextInjection = vi.fn((input: any) => {
+      capturedSignal = input?.signal;
+      return new Promise((_resolve, reject) => {
+        rejectInjection = reject;
+      });
+    });
+    const submitted = submitDesktopSessionMessage(engine, {
+      sessionPath: "/tmp/desk.jsonl",
+      text: "全文梳理",
+      displayMessage: { text: "全文梳理" },
+      knowledgeRefs: { notebookIds: ["nb-1"], mode: "qa" },
+    });
+
+    await vi.waitFor(() => {
+      expect(capturedSignal).toBeInstanceOf(AbortSignal);
+    });
+    expect(capturedSignal!.aborted).toBe(false);
+    // 用户点停止：controller 立即 abort（不再等注入完成后才被丢弃）。
+    expect(abortPendingDesktopSubmission(engine, { sessionPath: "/tmp/desk.jsonl" })).toBe(true);
+    expect(capturedSignal!.aborted).toBe(true);
+
+    // 注入链随后以取消收场（此处模拟 engine 内部对 signal 的响应后返回）。
+    rejectInjection(new Error("coverage run aborted"));
+    const result = await submitted;
+    expect(result).toEqual({ text: null, toolMedia: [] });
+    expect(engine.promptSession).not.toHaveBeenCalled();
+    // controller 注册表已清理：同 session 再提交拿到的是新的未中止 signal。
+    (engine as any).buildKnowledgeContextInjection = vi.fn(async () => ({ block: null, stats: RETRIEVAL_STATS }));
+    await submitDesktopSessionMessage(engine, {
+      sessionPath: "/tmp/desk.jsonl",
+      text: "下一条",
+      displayMessage: { text: "下一条" },
+      knowledgeRefs: { notebookIds: ["nb-1"], mode: "qa" },
+    });
+    const secondCall = (engine.buildKnowledgeContextInjection as unknown as ReturnType<typeof vi.fn>).mock.calls[0][0];
+    expect(secondCall.signal.aborted).toBe(false);
+    expect(secondCall.signal).not.toBe(capturedSignal);
   });
 
   it("does not emit knowledge_retrieval_started when knowledgeRefs is absent", async () => {

@@ -4,6 +4,12 @@ import path from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 
 import { KnowledgeManager } from "../lib/knowledge/knowledge-manager.ts";
+import { resolveKnowledgeChunkerConfig } from "../lib/knowledge/chunker.ts";
+import {
+  KNOWLEDGE_FUSION_BUDGET,
+  KNOWLEDGE_RERANK_MAX_DOCS,
+} from "../lib/knowledge/knowledge-query-service.ts";
+import type { KnowledgeParseArtifact } from "../lib/knowledge/types.ts";
 
 /**
  * 回归：查询侧懒构建与摄入侧的分块配置同源。
@@ -94,6 +100,25 @@ async function ingestSource(manager: KnowledgeManager, studioId: string, noteboo
   return artifact;
 }
 
+/**
+ * 按 owning notebook 的 RetrievalProfile 锚定列出该 artifact 的索引 chunk
+ * （schema v2：chunk 挂在 ChunkIndexVariant 上，不再有跨配置的 listArtifactChunks）。
+ */
+function listNotebookProfileChunks(
+  manager: KnowledgeManager,
+  studioId: string,
+  notebookId: string,
+  artifact: KnowledgeParseArtifact,
+) {
+  const blocks = manager.store.listArtifactBlocks({ studioId, parseArtifactId: artifact.id });
+  const strategy = resolveKnowledgeChunkerConfig(blocks, {
+    targetChars: manager.getNotebookEffectiveChunkTargetChars({ studioId, notebookId }),
+  }).strategy;
+  const { chunkProfile } = manager.store.resolveNotebookRetrievalProfile({ studioId, notebookId, strategy });
+  const variant = manager.indexStore.resolveChunkIndexVariant(artifact.id, chunkProfile.profileHash);
+  return variant ? manager.indexStore.listVariantChunks(variant.id) : [];
+}
+
 describe("查询侧分块配置与摄入侧同源", () => {
   it("显式 chunkTargetChars：摄入后检索不重建索引、不重嵌（只多 1 次查询嵌入）", async () => {
     const { manager, embedCalls } = createManager(tempHome());
@@ -107,7 +132,7 @@ describe("查询侧分块配置与摄入侧同源", () => {
     });
     const artifact = await ingestSource(manager, studioId, notebook.id);
 
-    const chunksAfterIngestion = manager.indexStore.listArtifactChunks(artifact.id);
+    const chunksAfterIngestion = listNotebookProfileChunks(manager, studioId, notebook.id, artifact);
     expect(chunksAfterIngestion.length).toBe(6); // 5000：整章一块
     expect(embedCalls.length).toBe(1); // 摄入批量嵌入 6 块
     expect(embedCalls[0].length).toBe(6);
@@ -120,7 +145,7 @@ describe("查询侧分块配置与摄入侧同源", () => {
 
     // 修复前：查询侧按默认 1200 重建（12 块）并对全部块重嵌；
     // 修复后：索引原样命中，只多出 1 次查询嵌入。
-    expect(manager.indexStore.listArtifactChunks(artifact.id).length).toBe(6);
+    expect(listNotebookProfileChunks(manager, studioId, notebook.id, artifact).length).toBe(6);
     expect(embedCalls.length).toBe(2);
     expect(embedCalls[1].length).toBe(1);
   });
@@ -136,7 +161,7 @@ describe("查询侧分块配置与摄入侧同源", () => {
       embeddingModelRef: FAKE_MODEL_REF,
     });
     const artifact = await ingestSource(manager, studioId, notebook.id);
-    expect(manager.indexStore.listArtifactChunks(artifact.id).length).toBe(6);
+    expect(listNotebookProfileChunks(manager, studioId, notebook.id, artifact).length).toBe(6);
 
     await manager.queryService.retrieveForNotebooks({
       studioId,
@@ -144,12 +169,12 @@ describe("查询侧分块配置与摄入侧同源", () => {
       question: "长夜",
     });
 
-    expect(manager.indexStore.listArtifactChunks(artifact.id).length).toBe(6);
+    expect(listNotebookProfileChunks(manager, studioId, notebook.id, artifact).length).toBe(6);
     expect(embedCalls.length).toBe(2);
     expect(embedCalls[1].length).toBe(1);
   });
 
-  it("并行检索共享同一次懒构建：向量缺失时批量嵌入只发生一遍", async () => {
+  it("向量未就绪：并行查询降级 FTS + 幂等入队后台构建，绝不现场批量嵌入（§十一/§十二）", async () => {
     const { manager, embedCalls } = createManager(tempHome());
     const studioId = "studio-a";
     const notebook = manager.createNotebook({ studioId, name: "小说" });
@@ -159,22 +184,42 @@ describe("查询侧分块配置与摄入侧同源", () => {
       embeddingModelRef: FAKE_MODEL_REF,
       chunkTargetChars: 5000,
     });
-    const artifact = await ingestSource(manager, studioId, notebook.id);
+    await ingestSource(manager, studioId, notebook.id);
     expect(embedCalls.length).toBe(1);
 
-    // 模拟向量缺失（FTS 完好）：拆解/直检并行触发 ensure 时只重嵌一遍。
+    // 模拟向量缺失（FTS 完好）：查询不得现场批量嵌入（Phase 2 前的懒构建已拆除）。
     manager.vectorIndex.rebuild();
     const callsBeforeRetrieve = embedCalls.length;
-    const callsAfterRetrieve = () => embedCalls.slice(callsBeforeRetrieve);
 
-    await Promise.all([
+    const [first, second] = await Promise.all([
       manager.queryService.retrieveForNotebooks({ studioId, notebookIds: [notebook.id], question: "废墟" }),
       manager.queryService.retrieveForNotebooks({ studioId, notebookIds: [notebook.id], question: "幸存者" }),
     ]);
 
-    const batchCalls = callsAfterRetrieve().filter(call => call.length > 1);
-    expect(batchCalls.length).toBe(1); // 去重：6 块的批量只发生一次
-    expect(batchCalls[0].length).toBe(6);
+    // 查询线程只嵌入问题文本（各 1 条），零批量 chunk 嵌入。
+    const batchCalls = embedCalls.slice(callsBeforeRetrieve).filter(call => call.length > 1);
+    expect(batchCalls.length).toBe(0);
+    for (const result of [first, second]) {
+      expect(result.retrievalMode).toBe("fts");
+      expect(result.retrievalModeRequested).toBe("hybrid");
+      expect(result.degraded.some(entry => entry.reason === "KNOWLEDGE_VECTOR_NOT_READY")).toBe(true);
+    }
+    // 幂等入队：并行两次查询共享同一个活跃后台构建 job（活跃 job 去重）。
+    expect(manager.store.listIngestionJobs({
+      studioId,
+      notebookId: notebook.id,
+      statuses: ["queued", "running", "pending_embedding"],
+    })).toHaveLength(1);
+
+    // 后台构建完成后再次查询恢复 hybrid，降级清单清空。
+    await manager.ingestion.drainQueue();
+    const rebuilt = await manager.queryService.retrieveForNotebooks({
+      studioId,
+      notebookIds: [notebook.id],
+      question: "废墟",
+    });
+    expect(rebuilt.retrievalMode).toBe("hybrid");
+    expect(rebuilt.degraded).toEqual([]);
     expect(manager.vectorIndex.health().status).toBe("ready");
   });
 
@@ -201,7 +246,7 @@ describe("查询侧分块配置与摄入侧同源", () => {
     expect(okResult.retrievalMode).toBe("hybrid");
     expect(ok.rerankCalls.length).toBe(1);
     expect(ok.rerankCalls[0].modelRef).toEqual(FAKE_RERANK_REF);
-    expect(ok.rerankCalls[0].docCount).toBe(ok.manager.indexStore.listArtifactChunks(okArtifact.id).length > 0 ? okResult.candidates.length : 0);
+    expect(ok.rerankCalls[0].docCount).toBe(listNotebookProfileChunks(ok.manager, studioId, okNotebook.id, okArtifact).length > 0 ? okResult.candidates.length : 0);
 
     // 引用不可解析（如模型被移出清单）：回调返回 null → 检索降级 RRF 名次而非失败。
     const degraded = createManager(tempHome(), { rerankResult: "unresolvable" });
@@ -224,9 +269,10 @@ describe("查询侧分块配置与摄入侧同源", () => {
     expect(degraded.rerankCalls.length).toBe(1); // 尝试过、显式降级（调用侧记日志）
   });
 
-  it("无上限召回候选超过重排上限：重排输入裁剪到共享上限 100，检索不失败", async () => {
-    // 事故（2026-08-29 第二连）：查询侧裁剪上限 200 与 RerankClient 校验上限 100
-    // 打架，候选落在 101–200 区间时重排输入被断言拒绝 → 整个检索失败。
+  it("无上限召回（retrieval_top_k NULL）：预算链独立生效截断候选，重排输入不超共享上限 100，检索不失败", async () => {
+    // 事故（2026-08-29 第二连）回归锚 + §二十六（Phase 8）：topK=NULL→1000 不再
+    // 作为覆盖机制——候选生成（每通道）与融合池按 candidate budgets 独立截断；
+    // rerank 输入仍受共享上限保护（docCount ≤ 100），两侧常量不再打架。
     const { manager, rerankCalls } = createManager(tempHome());
     const studioId = "studio-a";
     const notebook = manager.createNotebook({ studioId, name: "长文" });
@@ -255,16 +301,18 @@ describe("查询侧分块配置与摄入侧同源", () => {
       artifactId: artifact.id,
     });
     await manager.ingestion.drainQueue();
-    expect(manager.indexStore.listArtifactChunks(artifact.id).length).toBe(150);
+    expect(listNotebookProfileChunks(manager, studioId, notebook.id, artifact).length).toBe(150);
 
-    // retrieval_top_k 未配置 = 无上限召回：候选 > 重排上限。
+    // retrieval_top_k 未配置 = 无上限召回：150 个可匹配 chunk 在融合池处被
+    // fusionBudget 截断（预算链独立于 topK 生效），绝不再冲到物理边界 1000。
     const result = await manager.queryService.retrieveForNotebooks({
       studioId,
       notebookIds: [notebook.id],
       question: "长夜",
     });
-    expect(result.candidates.length).toBeGreaterThan(100);
+    expect(result.candidates.length).toBe(KNOWLEDGE_FUSION_BUDGET);
+    expect(result.candidates.length).toBeLessThanOrEqual(KNOWLEDGE_RERANK_MAX_DOCS);
     expect(rerankCalls.length).toBe(1);
-    expect(rerankCalls[0].docCount).toBeLessThanOrEqual(100); // 裁剪到共享上限
+    expect(rerankCalls[0].docCount).toBeLessThanOrEqual(KNOWLEDGE_RERANK_MAX_DOCS); // 裁剪到共享上限
   });
 });

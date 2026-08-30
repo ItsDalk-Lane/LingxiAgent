@@ -46,6 +46,7 @@
  *   { type: "session_user_message", sessionPath: "...", message: { text, attachments?, quotedText?, skills?, deskContext?, knowledgeRefs?, knowledgeRetrieval? } }  (桌面/RC 统一用户消息，参与 stream_resume；knowledgeRetrieval 为知识库注入的检索统计，仅带引用的消息出现)
  *   { type: "knowledge_retrieval_started", sessionPath: "..." }  (知识库注入链路开始检索的即时反馈；在阻塞式注入前发出、早于 session_status isStreaming，不进 stream_resume)
  *   { type: "knowledge_distill_progress", sessionPath: "...", done: number, model: string|null }  (蒸馏每批完成的进度：超预算证据分段压缩期间逐批广播，驱动「蒸馏中 · N 批」胶囊；不进 stream_resume，由该 session 任意后续事件保守清除)
+ *   { type: "knowledge_coverage_progress", sessionPath: "...", runId: string, done: number, total: number, coverageStatus?: "complete"|"partial"|"cancelled" }  (EXHAUSTIVE 覆盖执行的 shard 终态进度：Phase 9 第二波广播，对齐 knowledge_distill_progress 模式；不进 stream_resume，渲染留给后续版本，未知该事件的旧前端直接忽略不崩)
  *   { type: "loop_status", sessionPath: "...", sessionId?: string|null, status: "running"|"paused"|"stopped"|"completed", turnCount: number, maxTurns: number|null, pausedReason?: string|null, prompt?: string|null }  (循环任务状态机变更广播；不进 stream_resume，驱动会话列表循环徽章与 interlude 控制按钮态)
  *   { type: "confirmation_resolved", confirmId: "...", action: "confirmed"|"rejected", value?: any }  (用户操作确认卡片后广播，前端更新卡片状态)
  *   { type: "block_update", taskId: "...", patch: { streamStatus: "done"|"failed", summary?: "..." } }  (活跃 block 状态更新)

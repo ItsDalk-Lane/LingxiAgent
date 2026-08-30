@@ -215,6 +215,14 @@ export class KnowledgeSourceFileWatcher {
     }
   }
 
+  /** 整源摘除（manager.deleteSource 挂钩）：源被显式删除后不再 watch 其外部文件。 */
+  untrackSource(sourceId: string) {
+    const entry = this.entries.get(sourceId);
+    if (!entry) return;
+    this.detach(entry);
+    this.entries.delete(sourceId);
+  }
+
   /** 启动：挂载全部已跟踪源 + 启动兜底轮询。幂等。 */
   start() {
     if (this.started) return;

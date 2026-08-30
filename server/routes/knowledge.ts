@@ -432,6 +432,59 @@ export function createKnowledgeRoute(engine: any) {
     }
   });
 
+  // §六十九 目录导入：local-owner 限定（与 file 导入同级），服务端递归展开目录、
+  // sha 去重、Membership 写目录组织路径；逐源 parse + 入队摄入，部分失败显式留痕。
+  route.post("/knowledge/notebooks/:id/import-directory", knowledgeSourceBodyLimit, async (c) => {
+    const scope = bindKnowledgeScope(c, engine);
+    if (scope.error) return scope.error;
+    try {
+      if (!isLocalOwnerPrincipal(scope.requestContext.authPrincipal)) {
+        return c.json({
+          error: "KNOWLEDGE_LOCAL_IMPORT_REQUIRED",
+          message: "Importing a server directory requires the local Studio owner",
+        }, 403);
+      }
+      const body = await safeJson(c);
+      const allowed = new Set(["dirPath"]);
+      if (!body || typeof body !== "object" || Array.isArray(body)
+        || Object.keys(body).some(key => !allowed.has(key))) {
+        throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "Directory import body is invalid");
+      }
+      const result = await scope.knowledge.importDirectory({
+        studioId: scope.studioId,
+        notebookId: c.req.param("id"),
+        dirPath: body.dirPath,
+      });
+      const imported = [];
+      for (const entry of result.imported) {
+        try {
+          const parseArtifact = await scope.knowledge.parseSource({
+            studioId: scope.studioId,
+            sourceId: entry.sourceId,
+          });
+          scope.knowledge.enqueueSourceIngestion({
+            studioId: scope.studioId,
+            notebookId: c.req.param("id"),
+            sourceId: entry.sourceId,
+            artifactId: parseArtifact.id,
+          });
+          imported.push({ ...entry, ingestion: "enqueued" });
+        } catch {
+          // 解析失败也保证有摄入 job：worker 从 parse 相位重试（显式终态，不静默）。
+          scope.knowledge.enqueueSourceIngestion({
+            studioId: scope.studioId,
+            notebookId: c.req.param("id"),
+            sourceId: entry.sourceId,
+          });
+          imported.push({ ...entry, ingestion: "parse_failed_enqueued_for_retry" });
+        }
+      }
+      return c.json({ imported, skipped: result.skipped, failed: result.failed }, 201);
+    } catch (error) {
+      return routeError(c, error);
+    }
+  });
+
   route.delete("/knowledge/notebooks/:id/sources/:sourceId", (c) => {
     const scope = bindKnowledgeScope(c, engine);
     if (scope.error) return scope.error;
@@ -442,6 +495,27 @@ export function createKnowledgeRoute(engine: any) {
         sourceId: c.req.param("sourceId"),
       });
       return c.json({ membership });
+    } catch (error) {
+      return routeError(c, error);
+    }
+  });
+
+  // Phase 5（§十九 delete wins）：显式删除源——取消该源全部活跃摄入 job（running
+  // 经 abort 收尾）、清理派生索引变体与全部物理痕迹；并发 reingest 在删除标记后
+  // 显式失败，被取消 job 不可重试。活跃 turn scope 冻结引用时 409 拒绝。
+  route.delete("/knowledge/sources/:id", async (c) => {
+    const scope = bindKnowledgeScope(c, engine);
+    if (scope.error) return scope.error;
+    try {
+      const result = await scope.knowledge.deleteSource({
+        studioId: scope.studioId,
+        sourceId: c.req.param("id"),
+      });
+      return c.json({
+        source: serializeSource(result.source),
+        cancelledJobs: result.cancelledJobs,
+        purge: result.purge,
+      });
     } catch (error) {
       return routeError(c, error);
     }

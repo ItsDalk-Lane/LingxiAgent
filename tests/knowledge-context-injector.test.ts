@@ -55,7 +55,7 @@ function fakeChunk(overrides: Partial<RetrieveForNotebooksResult["candidates"][n
 }
 
 function fakeRetrieval(candidates: RetrieveForNotebooksResult["candidates"]): RetrieveForNotebooksResult {
-  return { candidates, sources: [], retrievalMode: "fts" };
+  return { candidates, sources: [], retrievalMode: "fts", retrievalModeRequested: "fts", degraded: [] };
 }
 
 describe("动态注入预算 resolveKnowledgeInjectionBudgetTokens", () => {
@@ -257,6 +257,8 @@ describe("注入块生成（纯函数部分）", () => {
             firstHeadingPath: ["Intro"],
           }],
           retrievalMode: "fts",
+          retrievalModeRequested: "fts",
+          degraded: [],
         }),
       },
     });
@@ -528,7 +530,7 @@ describe("注入块生成（纯函数部分）", () => {
       deps: {
         decomposeModel: null,
         distillModel: null,
-        retrieve: async () => ({ candidates: [], sources: [], retrievalMode: "fts" }),
+        retrieve: async () => ({ candidates: [], sources: [], retrievalMode: "fts", retrievalModeRequested: "fts", degraded: [] }),
       },
     });
     expect(block).toContain("[knowledge retrieval unavailable: no ready sources in the referenced notebooks]");
@@ -555,7 +557,31 @@ describe("retrieveForNotebooks 边界与配置（真实 KnowledgeManager）", ()
   ) {
     const imported = await manager.importPastedText({ studioId, notebookId, text, displayName });
     const artifact = await manager.parseSource({ studioId, sourceId: imported.source.id });
-    manager.queryService.indexArtifactForIngestion(studioId, artifact.id);
+    // Phase 2 查询侧只读：索引必须按摄入管线同一身份锚显式建好（笔记本生效
+    // 分块尺寸），不再有查询时懒构建兜底。
+    manager.queryService.indexArtifactForIngestion(studioId, artifact.id, {
+      targetChars: manager.getNotebookEffectiveChunkTargetChars({ studioId, notebookId }),
+    });
+    return { imported, artifact };
+  }
+
+  /** 完整摄入（chunk+FTS+向量）：hybrid 检索断言用，与路由调用序列一致。 */
+  async function addIngestedSource(
+    manager: KnowledgeManager,
+    studioId: string,
+    notebookId: string,
+    text: string,
+    displayName: string,
+  ) {
+    const imported = await manager.importPastedText({ studioId, notebookId, text, displayName });
+    const artifact = await manager.parseSource({ studioId, sourceId: imported.source.id });
+    manager.enqueueSourceIngestion({
+      studioId,
+      notebookId,
+      sourceId: imported.source.id,
+      artifactId: artifact.id,
+    });
+    await manager.ingestion.drainQueue();
     return { imported, artifact };
   }
 
@@ -598,8 +624,8 @@ describe("retrieveForNotebooks 边界与配置（真实 KnowledgeManager）", ()
     const notebookB = manager.createNotebook({ studioId, name: "乙" });
     manager.updateNotebookSettings({ studioId, notebookId: notebookA.id, embeddingModelRef: { id: "embA", provider: "fake" } });
     manager.updateNotebookSettings({ studioId, notebookId: notebookB.id, embeddingModelRef: { id: "embB", provider: "fake" } });
-    await addReadySource(manager, studioId, notebookA.id, "苹果项目的交付日期是九月十五日。", "苹果.txt");
-    await addReadySource(manager, studioId, notebookB.id, "火星项目的预算是八百万元。", "火星.txt");
+    await addIngestedSource(manager, studioId, notebookA.id, "苹果项目的交付日期是九月十五日。", "苹果.txt");
+    await addIngestedSource(manager, studioId, notebookB.id, "火星项目的预算是八百万元。", "火星.txt");
 
     const result = await manager.queryService.retrieveForNotebooks({
       studioId,
@@ -608,7 +634,7 @@ describe("retrieveForNotebooks 边界与配置（真实 KnowledgeManager）", ()
     });
     // 两个笔记本的查询向量分别用各自配置的嵌入模型（与索引侧同一模型，
     // 向量命中同一 model_key 分区——修复"查询侧全局模型与索引侧不一致"）。
-    // 每模型 ≥1 次（查询嵌入 + 可能的懒构建向量，均路由到该笔记本的模型）；
+    // 每模型 ≥1 次（摄入批量嵌入 + 查询嵌入，均路由到该笔记本的模型）；
     // 关键断言：任何调用都不带另一个笔记本的模型（不串模型）。
     expect(embedCalls.filter(id => id === "embA").length).toBeGreaterThanOrEqual(1);
     expect(embedCalls.filter(id => id === "embB").length).toBeGreaterThanOrEqual(1);
@@ -689,6 +715,8 @@ describe("retrieveForNotebooks 边界与配置（真实 KnowledgeManager）", ()
       embeddingModelRef: { id: "emb-1", provider: "fake" },
       rerankModelRef: { id: "rr-1", provider: "fake" },
     });
+    // Phase 2：配置变更触发后台重建（唯一建库入口），向量就绪后检索才走 hybrid。
+    await manager.ingestion.drainQueue();
     await manager.queryService.retrieveForNotebooks({
       studioId,
       notebookIds: [notebook.id],
@@ -697,7 +725,7 @@ describe("retrieveForNotebooks 边界与配置（真实 KnowledgeManager）", ()
     expect(rerank).toHaveBeenCalled();
   });
 
-  it("多笔记本检索并行执行，合并按 notebookIds 顺序轮转交错", async () => {
+  it("多笔记本检索并行执行，合并按 notebookIds 顺序做 rank-based RRF 融合", async () => {
     const manager = await setupManager();
     const studioId = "studio-a";
     const notebookA = manager.createNotebook({ studioId, name: "甲笔记本" });
@@ -727,7 +755,8 @@ describe("retrieveForNotebooks 边界与配置（真实 KnowledgeManager）", ()
         question: "项目",
       });
       expect(maxInFlight).toBe(2);
-      // 确定性合并：rank 0 层按 notebookIds 顺序轮转（两个笔记本各有命中）。
+      // 确定性合并：两个笔记本各只有名次 0 命中 → RRF 贡献并列（1/61），
+      // 按 notebookIds 顺序稳定排序（rank-based 融合不读跨笔记本分数）。
       expect(result.candidates.map(chunk => chunk.notebookId)).toEqual([notebookA.id, notebookB.id]);
       expect(result.sources.map(source => source.sourceName)).toEqual(["苹果.txt", "火星.txt"]);
     } finally {
@@ -747,7 +776,10 @@ describe("retrieveForNotebooks 边界与配置（真实 KnowledgeManager）", ()
     fs.writeFileSync(filePath, "# 交付计划\n\n苹果项目的交付日期是九月十五日。\n\n## 风险\n\n火星项目预算八百万。\n");
     const imported = await manager.importFile({ studioId, notebookId: notebook.id, filePath });
     const artifact = await manager.parseSource({ studioId, sourceId: imported.source.id });
-    manager.queryService.indexArtifactForIngestion(studioId, artifact.id);
+    // 与摄入管线同一身份锚（Phase 2 查询侧只读，不再懒构建兜底）。
+    manager.queryService.indexArtifactForIngestion(studioId, artifact.id, {
+      targetChars: manager.getNotebookEffectiveChunkTargetChars({ studioId, notebookId: notebook.id }),
+    });
 
     const { block } = await buildKnowledgeContextInjection({
       question: "苹果 交付",

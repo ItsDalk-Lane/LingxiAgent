@@ -44,6 +44,10 @@ import { createLoopControlTool } from "../lib/tools/loop-control-tool.ts";
 import { createStopTaskTool } from "../lib/tools/stop-task-tool.ts";
 import { createCurrentStatusTool } from "../lib/tools/current-status-tool.ts";
 import { createKnowledgeReadTool } from "../lib/tools/knowledge-read-tool.ts";
+import { createKnowledgeOutlineTool } from "../lib/tools/knowledge-outline-tool.ts";
+import { createKnowledgeGrepTool } from "../lib/tools/knowledge-grep-tool.ts";
+import { createKnowledgeManageTool } from "../lib/tools/knowledge-manage-tool.ts";
+import { getToolSessionPath } from "../lib/tools/tool-session.ts";
 import { createWorkflowTool } from "../lib/tools/workflow-tool.ts";
 import { createCardGuideTool } from "../lib/tools/card-guide-tool.ts";
 import { createSessionTool } from "../lib/tools/session-tool.ts";
@@ -110,6 +114,9 @@ export class Agent {
   declare _cronStore: any;
   declare _currentStatusTool: any;
   declare _knowledgeReadTool: any;
+  declare _knowledgeOutlineTool: any;
+  declare _knowledgeGrepTool: any;
+  declare _knowledgeManageTool: any;
   declare _descriptionRefreshHandler: any;
   declare _deskManager: any;
   declare _disposing: any;
@@ -245,6 +252,9 @@ export class Agent {
     this._workflowTool = null;
     this._currentStatusTool = null;
     this._knowledgeReadTool = null;
+    this._knowledgeOutlineTool = null;
+    this._knowledgeGrepTool = null;
+    this._knowledgeManageTool = null;
     this._loopControlTool = null;
 
     /**
@@ -606,9 +616,58 @@ export class Agent {
       getBridgeContext: (sessionPath) => this._cb?.getEngine?.()?.getBridgeContextForSessionPath?.(sessionPath, { agentId: this.id }) || null,
       listOpenSubagentThreads: (sessionPath) => this._cb?.getSubagentThreadStore?.()?.listOpenDirectBySession?.(sessionPath) || [],
     });
+    // knowledge_read / knowledge_outline / knowledge_grep 共用的 scope 归属解析：
+    // scope 归属按工具执行会话判定——主会话直接匹配 scope.session_path；subagent
+    // 子会话经 manifest provenance.parentSessionId 继承父会话 scope（scope 只能
+    // 缩小，子会话不得访问父 scope 之外的源）。manifest 解析失败按无父会话处理
+    // （fail-closed：子会话匹配不上即 KNOWLEDGE_SCOPE_VIOLATION，不放行）。
+    const resolveKnowledgeSessionContext = (ctx: any) => {
+      const engine = this._cb?.getEngine?.();
+      const sessionPath = getToolSessionPath(ctx);
+      if (!engine || !sessionPath) return { sessionPath: sessionPath ?? null, parentSessionPath: null };
+      let parentSessionPath: string | null = null;
+      try {
+        const sessionId = engine.getSessionIdForPath?.(sessionPath) || null;
+        const manifest = sessionId ? engine.getSessionManifest?.(sessionId) : null;
+        if (manifest && (manifest.kind === "subagent_child" || manifest.domain === "subagent")) {
+          const parentId = typeof manifest.provenance?.parentSessionId === "string"
+            ? manifest.provenance.parentSessionId
+            : null;
+          const parentManifest = parentId ? engine.getSessionManifest?.(parentId) : null;
+          parentSessionPath = typeof parentManifest?.currentLocator?.path === "string"
+            ? parentManifest.currentLocator.path
+            : null;
+        }
+      } catch {
+        parentSessionPath = null;
+      }
+      return { sessionPath, parentSessionPath };
+    };
     // knowledge_read：读知识库源分片。直连 engine 级 KnowledgeManager（跨会话），
     // 供 [KnowledgeContext] 超预算时模型派出的子 Agent 并行读片；只读 + studio 隔离。
+    // Phase 4（KnowledgeTurnScope，任务书 §二十~§二十二）。
     this._knowledgeReadTool = createKnowledgeReadTool({
+      getKnowledge: () => this._cb?.getEngine?.()?.knowledge || null,
+      getStudioId: () => this._cb?.getEngine?.()?.runtimeContext?.studioId || null,
+      resolveSessionContext: resolveKnowledgeSessionContext,
+    });
+    // knowledge_outline / knowledge_grep（Phase 11，任务书 §二十三）：本轮 scope
+    // 冻结集合的结构枚举与确定性原文扫描；只读 + 与 knowledge_read 同一校验链。
+    this._knowledgeOutlineTool = createKnowledgeOutlineTool({
+      getKnowledge: () => this._cb?.getEngine?.()?.knowledge || null,
+      getStudioId: () => this._cb?.getEngine?.()?.runtimeContext?.studioId || null,
+      resolveSessionContext: resolveKnowledgeSessionContext,
+    });
+    this._knowledgeGrepTool = createKnowledgeGrepTool({
+      getKnowledge: () => this._cb?.getEngine?.()?.knowledge || null,
+      getStudioId: () => this._cb?.getEngine?.()?.runtimeContext?.studioId || null,
+      resolveSessionContext: resolveKnowledgeSessionContext,
+    });
+    // knowledge_manage（Phase 11，任务书 §二十三）：知识库修改性操作，全部委托
+    // KnowledgeManager 既有方法。审批档 kind "review"（read_only 拒绝）+ 子 Agent
+    // 拦截（SUBAGENT_BLOCKED_TOOLS）；现有暴露面机制无按 surface 过滤能力，
+    // 依赖审批关卡约束普通会话（见工具描述与任务报告）。
+    this._knowledgeManageTool = createKnowledgeManageTool({
       getKnowledge: () => this._cb?.getEngine?.()?.knowledge || null,
       getStudioId: () => this._cb?.getEngine?.()?.runtimeContext?.studioId || null,
     });
@@ -979,6 +1038,9 @@ export class Agent {
       this._loopControlTool,
       this._currentStatusTool,
       this._knowledgeReadTool,
+      this._knowledgeOutlineTool,
+      this._knowledgeGrepTool,
+      this._knowledgeManageTool,
       ...(surface === "desktop" ? [this._sessionTool] : []),
       this._cardGuideTool,
       this._showCardTool,

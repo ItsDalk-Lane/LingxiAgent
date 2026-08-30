@@ -6278,12 +6278,12 @@
       "provenance": [
         {
           "root": "server-bootstrap",
-          "from": "lib/knowledge/knowledge-store.ts",
+          "from": "lib/tools/knowledge-read-tool.ts",
           "kind": "import-statement"
         },
         {
           "root": "server-bootstrap",
-          "from": "lib/knowledge/ingestion-service.ts",
+          "from": "lib/knowledge/knowledge-store.ts",
           "kind": "import-statement"
         },
         {
@@ -6293,11 +6293,16 @@
         },
         {
           "root": "server-bootstrap",
+          "from": "lib/knowledge/ingestion-service.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
           "from": "lib/knowledge/knowledge-manager.ts",
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by lib/knowledge/knowledge-store.ts (import-statement); lib/knowledge/ingestion-service.ts (import-statement); lib/knowledge/knowledge-query-service.ts (import-statement); +1 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by lib/tools/knowledge-read-tool.ts (import-statement); lib/knowledge/knowledge-store.ts (import-statement); lib/knowledge/knowledge-query-service.ts (import-statement); +2 more importer(s)."
     },
     {
       "path": "lib/knowledge/errors.ts",
@@ -6305,7 +6310,72 @@
       "provenance": [
         {
           "root": "server-bootstrap",
+          "from": "lib/tools/knowledge-scope.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
           "from": "lib/tools/knowledge-read-tool.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/knowledge/knowledge-coverage-unit.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/knowledge/knowledge-coverage-manifest.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/tools/knowledge-outline-tool.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/tools/knowledge-grep-tool.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/tools/knowledge-manage-tool.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/knowledge/knowledge-coverage-executor.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/knowledge/knowledge-coverage-reduction.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/knowledge/knowledge-index-store.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/knowledge/knowledge-coverage-planner.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/knowledge/knowledge-store.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/knowledge/vector-index-adapter.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/knowledge/knowledge-query-service.ts",
           "kind": "import-statement"
         },
         {
@@ -6320,27 +6390,7 @@
         },
         {
           "root": "server-bootstrap",
-          "from": "lib/knowledge/knowledge-store.ts",
-          "kind": "import-statement"
-        },
-        {
-          "root": "server-bootstrap",
-          "from": "lib/knowledge/knowledge-index-store.ts",
-          "kind": "import-statement"
-        },
-        {
-          "root": "server-bootstrap",
           "from": "lib/knowledge/ingestion-service.ts",
-          "kind": "import-statement"
-        },
-        {
-          "root": "server-bootstrap",
-          "from": "lib/knowledge/knowledge-query-service.ts",
-          "kind": "import-statement"
-        },
-        {
-          "root": "server-bootstrap",
-          "from": "lib/knowledge/vector-index-adapter.ts",
           "kind": "import-statement"
         },
         {
@@ -6355,6 +6405,11 @@
         },
         {
           "root": "server-bootstrap",
+          "from": "lib/knowledge/source-processors.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
           "from": "lib/knowledge/knowledge-manager.ts",
           "kind": "import-statement"
         },
@@ -6364,7 +6419,7 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by lib/tools/knowledge-read-tool.ts (import-statement); lib/knowledge/knowledge-context-injector.ts (import-statement); lib/knowledge/file-import-security.ts (import-statement); +9 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by lib/tools/knowledge-scope.ts (import-statement); lib/tools/knowledge-read-tool.ts (import-statement); lib/knowledge/knowledge-coverage-unit.ts (import-statement); +19 more importer(s)."
     },
     {
       "path": "lib/knowledge/file-import-security.ts",
@@ -6408,6 +6463,106 @@
       "reason": "Reached via esbuild source module graph, imported by core/desktop-session-submit.ts (import-statement); core/engine.ts (import-statement)."
     },
     {
+      "path": "lib/knowledge/knowledge-coverage-executor.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "lib/knowledge/knowledge-coverage-reduction.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/knowledge/knowledge-context-injector.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by lib/knowledge/knowledge-coverage-reduction.ts (import-statement); lib/knowledge/knowledge-context-injector.ts (import-statement)."
+    },
+    {
+      "path": "lib/knowledge/knowledge-coverage-manifest.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "lib/tools/knowledge-outline-tool.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/knowledge/knowledge-coverage-executor.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/knowledge/knowledge-coverage-reduction.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/knowledge/knowledge-context-injector.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "core/engine.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by lib/tools/knowledge-outline-tool.ts (import-statement); lib/knowledge/knowledge-coverage-executor.ts (import-statement); lib/knowledge/knowledge-coverage-reduction.ts (import-statement); +2 more importer(s)."
+    },
+    {
+      "path": "lib/knowledge/knowledge-coverage-planner.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "lib/knowledge/knowledge-store.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "core/engine.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by lib/knowledge/knowledge-store.ts (import-statement); core/engine.ts (import-statement)."
+    },
+    {
+      "path": "lib/knowledge/knowledge-coverage-reduction.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "lib/knowledge/knowledge-context-injector.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "core/engine.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by lib/knowledge/knowledge-context-injector.ts (import-statement); core/engine.ts (import-statement)."
+    },
+    {
+      "path": "lib/knowledge/knowledge-coverage-unit.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "lib/knowledge/knowledge-coverage-manifest.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/tools/knowledge-outline-tool.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by lib/knowledge/knowledge-coverage-manifest.ts (import-statement); lib/tools/knowledge-outline-tool.ts (import-statement)."
+    },
+    {
       "path": "lib/knowledge/knowledge-distiller.ts",
       "inputType": "source-graph",
       "provenance": [
@@ -6430,11 +6585,21 @@
       "provenance": [
         {
           "root": "server-bootstrap",
+          "from": "lib/knowledge/knowledge-query-service.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/knowledge/ingestion-service.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
           "from": "lib/knowledge/knowledge-manager.ts",
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by lib/knowledge/knowledge-manager.ts (import-statement)."
+      "reason": "Reached via esbuild source module graph, imported by lib/knowledge/knowledge-query-service.ts (import-statement); lib/knowledge/ingestion-service.ts (import-statement); lib/knowledge/knowledge-manager.ts (import-statement)."
     },
     {
       "path": "lib/knowledge/knowledge-manager.ts",
@@ -6454,11 +6619,16 @@
       "provenance": [
         {
           "root": "server-bootstrap",
+          "from": "lib/knowledge/knowledge-context-injector.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
           "from": "lib/knowledge/knowledge-manager.ts",
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by lib/knowledge/knowledge-manager.ts (import-statement)."
+      "reason": "Reached via esbuild source module graph, imported by lib/knowledge/knowledge-context-injector.ts (import-statement); lib/knowledge/knowledge-manager.ts (import-statement)."
     },
     {
       "path": "lib/knowledge/knowledge-store.ts",
@@ -6466,12 +6636,12 @@
       "provenance": [
         {
           "root": "server-bootstrap",
-          "from": "lib/knowledge/ingestion-service.ts",
+          "from": "lib/knowledge/knowledge-query-service.ts",
           "kind": "import-statement"
         },
         {
           "root": "server-bootstrap",
-          "from": "lib/knowledge/knowledge-query-service.ts",
+          "from": "lib/knowledge/ingestion-service.ts",
           "kind": "import-statement"
         },
         {
@@ -6480,7 +6650,7 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by lib/knowledge/ingestion-service.ts (import-statement); lib/knowledge/knowledge-query-service.ts (import-statement); lib/knowledge/knowledge-manager.ts (import-statement)."
+      "reason": "Reached via esbuild source module graph, imported by lib/knowledge/knowledge-query-service.ts (import-statement); lib/knowledge/ingestion-service.ts (import-statement); lib/knowledge/knowledge-manager.ts (import-statement)."
     },
     {
       "path": "lib/knowledge/source-adapters.ts",
@@ -6507,7 +6677,7 @@
       "reason": "Reached via esbuild source module graph, imported by lib/knowledge/knowledge-manager.ts (import-statement)."
     },
     {
-      "path": "lib/knowledge/vector-index-adapter.ts",
+      "path": "lib/knowledge/source-processors.ts",
       "inputType": "source-graph",
       "provenance": [
         {
@@ -6517,6 +6687,23 @@
         }
       ],
       "reason": "Reached via esbuild source module graph, imported by lib/knowledge/knowledge-manager.ts (import-statement)."
+    },
+    {
+      "path": "lib/knowledge/vector-index-adapter.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "lib/knowledge/knowledge-query-service.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/knowledge/knowledge-manager.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by lib/knowledge/knowledge-query-service.ts (import-statement); lib/knowledge/knowledge-manager.ts (import-statement)."
     },
     {
       "path": "lib/knowledge/web-snapshot-security.ts",
@@ -6651,6 +6838,16 @@
         },
         {
           "root": "server-bootstrap",
+          "from": "lib/knowledge/knowledge-coverage-unit.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/knowledge/knowledge-coverage-reduction.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
           "from": "lib/knowledge/knowledge-distiller.ts",
           "kind": "import-statement"
         },
@@ -6680,7 +6877,7 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by core/session-compactor.ts (import-statement); lib/knowledge/knowledge-distiller.ts (import-statement); lib/knowledge/knowledge-context-injector.ts (import-statement); +4 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by core/session-compactor.ts (import-statement); lib/knowledge/knowledge-coverage-unit.ts (import-statement); lib/knowledge/knowledge-coverage-reduction.ts (import-statement); +6 more importer(s)."
     },
     {
       "path": "lib/llm/model-call-correlation.ts",
@@ -8436,6 +8633,21 @@
         },
         {
           "root": "server-bootstrap",
+          "from": "lib/tools/knowledge-outline-tool.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/tools/knowledge-grep-tool.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/tools/knowledge-manage-tool.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
           "from": "lib/tools/workflow-tool.ts",
           "kind": "import-statement"
         },
@@ -8540,7 +8752,7 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by core/compaction-utils.ts (import-statement); lib/llm/cache-preserving-compaction-agent-run.ts (import-statement); core/session-compactor.ts (import-statement); +52 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by core/compaction-utils.ts (import-statement); lib/llm/cache-preserving-compaction-agent-run.ts (import-statement); core/session-compactor.ts (import-statement); +55 more importer(s)."
     },
     {
       "path": "lib/pi-sdk/model-call-stream-observer.ts",
@@ -10857,6 +11069,42 @@
       "reason": "Reached via esbuild source module graph, imported by core/agent.ts (import-statement); lib/skill-bundles/package-service.ts (import-statement)."
     },
     {
+      "path": "lib/tools/knowledge-grep-tool.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "core/agent.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by core/agent.ts (import-statement)."
+    },
+    {
+      "path": "lib/tools/knowledge-manage-tool.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "core/agent.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by core/agent.ts (import-statement)."
+    },
+    {
+      "path": "lib/tools/knowledge-outline-tool.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "core/agent.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by core/agent.ts (import-statement)."
+    },
+    {
       "path": "lib/tools/knowledge-read-tool.ts",
       "inputType": "source-graph",
       "provenance": [
@@ -10867,6 +11115,28 @@
         }
       ],
       "reason": "Reached via esbuild source module graph, imported by core/agent.ts (import-statement)."
+    },
+    {
+      "path": "lib/tools/knowledge-scope.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "lib/tools/knowledge-read-tool.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/tools/knowledge-outline-tool.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/tools/knowledge-grep-tool.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by lib/tools/knowledge-read-tool.ts (import-statement); lib/tools/knowledge-outline-tool.ts (import-statement); lib/tools/knowledge-grep-tool.ts (import-statement)."
     },
     {
       "path": "lib/tools/loop-control-tool.ts",
@@ -11158,6 +11428,21 @@
         },
         {
           "root": "server-bootstrap",
+          "from": "lib/tools/knowledge-outline-tool.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/tools/knowledge-grep-tool.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/tools/knowledge-manage-tool.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
           "from": "lib/tools/workflow-tool.ts",
           "kind": "import-statement"
         },
@@ -11182,7 +11467,7 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by lib/tools/browser-tool.ts (import-statement); lib/tools/computer-use-tool.ts (import-statement); lib/tools/session-folders-tool.ts (import-statement); +7 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by lib/tools/browser-tool.ts (import-statement); lib/tools/computer-use-tool.ts (import-statement); lib/tools/session-folders-tool.ts (import-statement); +10 more importer(s)."
     },
     {
       "path": "lib/tools/tool-session.ts",
@@ -11265,6 +11550,11 @@
         },
         {
           "root": "server-bootstrap",
+          "from": "core/agent.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
           "from": "lib/sandbox/read-image-vision.ts",
           "kind": "import-statement"
         },
@@ -11304,7 +11594,7 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by core/plugin-manager.ts (import-statement); lib/tools/automation-tool.ts (import-statement); lib/tools/output-file-tool.ts (import-statement); +20 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by core/plugin-manager.ts (import-statement); lib/tools/automation-tool.ts (import-statement); lib/tools/output-file-tool.ts (import-statement); +21 more importer(s)."
     },
     {
       "path": "lib/tools/update-settings-tool.ts",
@@ -122974,6 +123264,28 @@
       "reason": "Reached via esbuild source module graph, imported by core/events.ts (import-statement)."
     },
     {
+      "path": "shared/knowledge-reason-codes.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "lib/knowledge/knowledge-coverage-executor.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/knowledge/knowledge-store.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/knowledge/knowledge-context-injector.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by lib/knowledge/knowledge-coverage-executor.ts (import-statement); lib/knowledge/knowledge-store.ts (import-statement); lib/knowledge/knowledge-context-injector.ts (import-statement)."
+    },
+    {
       "path": "shared/knowledge-refs.ts",
       "inputType": "source-graph",
       "provenance": [
@@ -124624,9 +124936,9 @@
     }
   ],
   "stats": {
-    "totalFiles": 10639,
+    "totalFiles": 10650,
     "byInputType": {
-      "source-graph": 739,
+      "source-graph": 750,
       "runtime-asset": 11,
       "nft-runtime-trace": 9889
     }

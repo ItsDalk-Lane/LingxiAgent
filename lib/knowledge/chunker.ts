@@ -10,7 +10,8 @@ export type KnowledgeChunkerStrategy = "fixed" | "markdown" | "text" | "pdf" | "
 export interface KnowledgeChunkerOptions {
   /**
    * 目标 chunk 字符数。摄入侧由 ingestion-service 按笔记本配置（schema v6 列，
-   * 解析链见 knowledge-store.resolveNotebookConfig）传入；查询侧懒构建兜底仍用默认值。
+   * 解析链见 knowledge-store.resolveNotebookConfig）传入；无笔记本上下文的
+   * 调用（显式 artifact 直检锚点解析等只读路径）落内置默认值。
    */
   targetChars?: number;
 }
@@ -20,11 +21,13 @@ export interface KnowledgeChunkerConfig {
   targetChars: number;
   /**
    * 分块配置指纹：sha256(`${KNOWLEDGE_CHUNKER_VERSION}${strategy}${targetChars}`) 的前 16 个 hex 字符。
-   * 编入 chunk id，并作为 artifact_indexes.chunker_version 列的新语义值
-   * （该列从常量版本号改存 configId；索引库是可重建缓存，不匹配即整体重建，无需迁移）。
+   * 即 ChunkProfile 的 profileHash（knowledge.db chunk_profiles.profile_hash），也是
+   * ChunkIndexVariant 的跨库身份键（knowledge-fts.db chunk_index_variants.chunk_profile_hash），
+   * 并编入 chunk id 与 ingestion_jobs.chunker_config_id。
    *
-   * 权衡（显式记录）：同一源被多个笔记本以不同分块配置引用时，分块以
-   * "触发本次摄入的笔记本"的配置为准；configId 由 ingestion-service 记入 ingestion job 行。
+   * 身份语义（v9 起）：同一源被多个笔记本以不同分块配置引用时，每个配置产生一个
+   * 独立的 ChunkIndexVariant 并存，互不覆盖；不再有"以触发方笔记本配置为准"的
+   * 单一份 chunk 集。
    */
   configId: string;
 }

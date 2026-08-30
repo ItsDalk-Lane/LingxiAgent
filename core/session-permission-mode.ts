@@ -92,6 +92,7 @@ const SUBAGENT_BLOCKED_TOOLS = new Set([
   "update_settings",
   "session_folders",
   "loop_control",      // 循环归主会话管，子代理不得约闹钟/收束循环
+  "knowledge_manage",  // 知识库修改面：导入/移除/刷新/重建只归主会话（读侧 knowledge_read/outline/grep 不拦）
 ]);
 
 // session 工具（跨 session 协作）：读侧零副作用；send/create 的 execute 只产草稿卡，

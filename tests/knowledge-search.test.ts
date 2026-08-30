@@ -48,9 +48,16 @@ function indexBlocks(store: KnowledgeIndexStore, parseArtifactId: string, blocks
   store.replaceArtifactChunks({
     parseArtifactId,
     blockFingerprint: knowledgeBlockFingerprint(blocks),
-    chunkerVersion: resolveKnowledgeChunkerConfig(blocks).configId,
+    chunkProfileHash: resolveKnowledgeChunkerConfig(blocks).configId,
     chunks: buildKnowledgeChunks(parseArtifactId, blocks),
   });
+}
+
+function scopeOf(parseArtifactId: string, blocks: KnowledgeBlock[]) {
+  return {
+    parseArtifactId,
+    chunkProfileHash: resolveKnowledgeChunkerConfig(blocks).configId,
+  };
 }
 
 afterEach(() => {
@@ -93,24 +100,27 @@ describe("Knowledge search primitives", () => {
     indexBlocks(store, "parse-a", blocksA);
     indexBlocks(store, "parse-b", blocksB);
 
-    const onlyA = store.search({ parseArtifactIds: ["parse-a"], query: "项目", limit: 12 });
+    const onlyA = store.search({ scopes: [scopeOf("parse-a", blocksA)], query: "项目", limit: 12 });
     expect(onlyA.map(result => result.parseArtifactId)).toEqual(["parse-a"]);
     expect(onlyA[0].text).toContain("苹果项目");
 
-    const both = store.search({ parseArtifactIds: ["parse-a", "parse-b"], query: "项目", limit: 12 });
+    const both = store.search({ scopes: [scopeOf("parse-a", blocksA), scopeOf("parse-b", blocksB)], query: "项目", limit: 12 });
     expect(new Set(both.map(result => result.parseArtifactId))).toEqual(new Set(["parse-a", "parse-b"]));
   });
 
   it("索引文件损坏时只丢弃缓存并建立空白健康索引", () => {
     const dbPath = path.join(tempDir(), "knowledge-fts.db");
     const store = openIndex(dbPath);
-    indexBlocks(store, "parse-a", [block("parse-a", "block-a", 0, "可恢复的搜索内容")]);
-    expect(store.listArtifactChunks("parse-a")).toHaveLength(1);
+    const blocks = [block("parse-a", "block-a", 0, "可恢复的搜索内容")];
+    indexBlocks(store, "parse-a", blocks);
+    const variantId = store.resolveChunkIndexVariant("parse-a", scopeOf("parse-a", blocks).chunkProfileHash)!.id;
+    expect(store.listVariantChunks(variantId)).toHaveLength(1);
     store.close();
 
     fs.writeFileSync(dbPath, "not-a-sqlite-database", "utf8");
     const recovered = openIndex(dbPath);
     expect(recovered.health()).toEqual({ status: "ready" });
-    expect(recovered.listArtifactChunks("parse-a")).toEqual([]);
+    expect(recovered.resolveChunkIndexVariant("parse-a", scopeOf("parse-a", blocks).chunkProfileHash)).toBeNull();
+    expect(recovered.listVariantChunks(variantId)).toEqual([]);
   });
 });

@@ -60,6 +60,7 @@
     "sourceCount": "{count} 个来源",
     "addSource": "添加来源",
     "addLocalFile": "选择本地文件",
+    "addLocalFolder": "选择本地文件夹",
     "addPastedText": "粘贴文本",
     "addWebSnapshot": "网页快照",
     "sourceDisplayNameOptional": "来源名称（可选）",
@@ -100,6 +101,8 @@
     "importUnavailable": "当前环境不能打开本机文件选择器",
     "importSuccess": "已导入 {count} 个来源",
     "importPartialFailure": "导入完成：{success}/{total} 个来源成功",
+    "importDirectorySuccess": "目录导入完成：导入 {imported} 个来源，跳过 {skipped} 个",
+    "importDirectoryPartialFailure": "目录导入完成：导入 {imported} 个，跳过 {skipped} 个，失败 {failed} 个",
     "loadFailed": "知识库读取失败",
     "saveFailed": "知识库操作失败",
     "notebookSettings": "笔记本设置",
@@ -1154,6 +1157,21 @@
       "running": "📚 正在读知识库分片",
       "done": "📚 读了知识库分片",
       "failed": "📚 知识库分片没读出来"
+    },
+    "knowledge_outline": {
+      "running": "🗂️ 正在梳理知识库结构",
+      "done": "🗂️ 梳理了知识库结构",
+      "failed": "🗂️ 知识库结构没梳理出来"
+    },
+    "knowledge_grep": {
+      "running": "🔍 正在检索知识库原文",
+      "done": "🔍 检索了知识库原文",
+      "failed": "🔍 知识库原文没检索出来"
+    },
+    "knowledge_manage": {
+      "running": "🗃️ 正在整理知识库笔记本",
+      "done": "🗃️ 整理了知识库笔记本",
+      "failed": "🗃️ 知识库笔记本没整理成"
     }
   },
   "file_output": {

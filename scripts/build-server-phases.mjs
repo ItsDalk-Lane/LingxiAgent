@@ -358,7 +358,12 @@ export async function resolveAndInstallExternalServerDeps({
   runWithTargetNode,
   cachedNpmCli,
   extraPackageNames = [],
-  pinnedTransitiveDeps = ["lru-cache"],
+  // pinnedTransitiveDeps：外置包的传递依赖，nft 按 ["node","import"] 条件追踪，
+  // 而运行时 CJS require 走 exports 的 require 分支，两类分支文件集不同的包会被
+  // 裁到缺文件（先例：lru-cache；underscore 1.13 的 require.node 指向
+  // underscore-node.cjs、import.node 指向 underscore-node.mjs，mammoth 外置后
+  // require 它）。钉住 = 完整安装且豁免剪枝。
+  pinnedTransitiveDeps = ["lru-cache", "underscore"],
   log = (msg) => console.log(msg),
 }) {
   const rootPkg = JSON.parse(fs.readFileSync(path.join(rootDir, "package.json"), "utf-8"));

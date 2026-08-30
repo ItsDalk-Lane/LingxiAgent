@@ -1,17 +1,32 @@
 /**
- * knowledge_read 工具 —— 读知识库笔记本源的分片（Phase 8 分片子 Agent 链路）。
+ * knowledge_read 工具 —— 读知识库笔记本源的分片（Phase 8 分片子 Agent 链路，
+ * Phase 4 KnowledgeTurnScope 权限天花板）。
  *
  * 消费方是子 Agent：[KnowledgeContext] 注入块超预算时只带分片清单，主模型用
  * `subagent` 工具并行派子 Agent，各用本工具按 ordinal 范围读一片（或按 query
  * 检索该源）再汇总。工具直连 engine 级 KnowledgeManager，跨会话可用。
  *
- * 权限边界：只读；studio 隔离（所有 store 查询都带 studioId，越界/不存在显式
- * 报错，不静默返回空）。
+ * 权限边界（任务书 §二十~§二十二）：
+ * - 只读；studio 隔离（所有 store 查询都带 studioId）；
+ * - scopeId 必填且服务端逐次复核：scope 存在、active、属于当前会话（subagent
+ *   子会话经 manifest provenance 继承父会话 scope——scope 只能缩小）；
+ * - sourceId/notebookId 必须在 scope 冻结集合内，不信任模型传入的任何 id；
+ * - 读取锚定 scope 冻结的 snapshot/artifact（§四十三：watcher 轮内产生的新
+ *   版本下一轮才生效）。任何一项失败 → KNOWLEDGE_SCOPE_VIOLATION / 显式错误，
+ *   不回落到旧的全 studio 扫描行为。
  */
 import { Type } from "../pi-sdk/index.ts";
+import { resolveKnowledgeChunkerConfig } from "../knowledge/chunker.ts";
 import { isKnowledgeError, KnowledgeError } from "../knowledge/errors.ts";
 import type { KnowledgeManager } from "../knowledge/knowledge-manager.ts";
 import type { KnowledgeModelRef } from "../knowledge/types.ts";
+import {
+  knowledgeScopeViolation,
+  requireKnowledgeScopeSource,
+  requireKnowledgeSessionContext,
+  resolveKnowledgeOwningNotebookId,
+  resolveKnowledgeTurnScope,
+} from "./knowledge-scope.ts";
 import { toolError, toolOk } from "./tool-result.ts";
 
 /** 单次读片的防护上限：防止一次调用把整个大源灌进子 Agent 上下文。 */
@@ -22,6 +37,16 @@ export interface KnowledgeReadToolDeps {
   getKnowledge: () => KnowledgeManager | null;
   /** 当前 runtime studioId；null = 运行时上下文不可用。 */
   getStudioId: () => string | null;
+  /**
+   * 工具执行会话的 scope 归属上下文（Pi SDK execute 第 5 参 ctx 解析）：
+   * sessionPath = 当前执行会话的 JSONL 路径；parentSessionPath = subagent
+   * 子会话的父会话路径（主会话为 null）。缺失 → 无 scope 上下文的 surface
+   * （显式 KNOWLEDGE_MODEL_UNAVAILABLE，不静默放行）。
+   */
+  resolveSessionContext?: (ctx: unknown) => {
+    sessionPath: string | null;
+    parentSessionPath: string | null;
+  };
 }
 
 function requireNonEmptyString(value: unknown, label: string): string {
@@ -40,53 +65,57 @@ function optionalOrdinal(value: unknown, label: string): number | null {
 }
 
 /**
- * 解析源的最新 ready parse artifact。notebookId 给出时校验 membership
- * （源不在该笔记本 → 显式报错）；artifact 非 ready → KNOWLEDGE_PARSE_NOT_READY。
+ * scope 校验 + 冻结 artifact 解析（§二十二，服务端复核，不信任模型传入的 id；
+ * 校验链本体在 lib/tools/knowledge-scope.ts，Phase 11 起多工具共享）：
+ * 1. scopeId 存在、active、属于当前 studio 与当前会话（或其 subagent 父会话）；
+ * 2. sourceId 在 scope 冻结集合内；notebookId 给出时必须同时属于 scope 选中
+ *    集合与该源的冻结引用集合；缺失时 owning notebook 取冻结集合内第一个
+ *    引用笔记本（限选中集合，不再扫全 studio）；
+ * 3. 读取锚定冻结的 parseArtifactId（非 ready → KNOWLEDGE_PARSE_NOT_READY）。
  */
-function resolveReadyArtifact(
+function resolveScopedArtifact(
   knowledge: KnowledgeManager,
   studioId: string,
+  scopeId: string,
   sourceId: string,
   notebookId: string | null,
+  sessionContext: { sessionPath: string | null; parentSessionPath: string | null },
 ): {
   artifactId: string;
+  contentSnapshotId: string;
   notebookId: string;
   sourceName: string;
   embeddingModelRef: KnowledgeModelRef | null;
   chunkTargetChars: number;
   rerankModelRef: KnowledgeModelRef | null;
 } {
+  // 无会话上下文的 surface（如独立 CLI 调用）：显式不可用，不静默放行。
+  requireKnowledgeSessionContext(sessionContext);
+  const scope = resolveKnowledgeTurnScope({ knowledge, studioId, scopeId, sessionContext });
+  const frozen = requireKnowledgeScopeSource(scope, sourceId);
+  const owningNotebookId = resolveKnowledgeOwningNotebookId(scope, frozen, notebookId);
+  if (!frozen.parseArtifactId) {
+    throw new KnowledgeError("KNOWLEDGE_PARSE_NOT_READY", "Knowledge source has no frozen parse artifact");
+  }
+  const artifact = knowledge.store.getParseArtifact({ studioId, parseArtifactId: frozen.parseArtifactId });
+  if (artifact.status !== "ready") {
+    throw new KnowledgeError("KNOWLEDGE_PARSE_NOT_READY", "Knowledge source has no ready parse artifact");
+  }
   const source = knowledge.getSource({ studioId, sourceId });
-  if (notebookId) {
-    knowledge.getNotebook({ studioId, notebookId });
-    const inNotebook = knowledge.listNotebookSources({ studioId, notebookId })
-      .some(entry => entry.source.id === sourceId);
-    if (!inNotebook) {
-      throw new KnowledgeError("KNOWLEDGE_NOT_FOUND", "Knowledge source is not in this Notebook");
-    }
-  }
-  // 源可能属于多个笔记本：找到含该源且最新 artifact ready 的 membership。
-  const notebooks = knowledge.listNotebooks({ studioId });
-  for (const notebook of notebooks) {
-    const entry = knowledge.listNotebookSources({ studioId, notebookId: notebook.id })
-      .find(item => item.source.id === sourceId);
-    if (!entry) continue;
-    if (entry.parseArtifact?.status !== "ready") continue;
-    return {
-      artifactId: entry.parseArtifact.id,
-      notebookId: notebook.id,
-      sourceName: entry.source.displayName,
-      // owning notebook 的嵌入引用：源内检索按同一模型路由（与索引侧一致）。
-      embeddingModelRef: knowledge.getNotebookConfig?.({ studioId, notebookId: notebook.id })
-        .embeddingModelRef ?? null,
-      // owning notebook 的生效分块尺寸：ensure 链与摄入侧同 configId 判定指纹。
-      chunkTargetChars: knowledge.getNotebookEffectiveChunkTargetChars({ studioId, notebookId: notebook.id }),
-      // owning notebook 的重排引用：按引用路由（不可解析 → 回调侧 null → RRF 降级）。
-      rerankModelRef: knowledge.getNotebookConfig?.({ studioId, notebookId: notebook.id })
-        .rerankModelRef ?? null,
-    };
-  }
-  throw new KnowledgeError("KNOWLEDGE_PARSE_NOT_READY", "Knowledge source has no ready parse artifact");
+  return {
+    artifactId: artifact.id,
+    contentSnapshotId: frozen.contentSnapshotId,
+    notebookId: owningNotebookId,
+    sourceName: source.displayName,
+    // owning notebook 的嵌入引用：源内检索按同一模型路由（与索引侧一致）。
+    embeddingModelRef: knowledge.getNotebookConfig?.({ studioId, notebookId: owningNotebookId })
+      .embeddingModelRef ?? null,
+    // owning notebook 的生效分块尺寸：ensure 链与摄入侧同 configId 判定指纹。
+    chunkTargetChars: knowledge.getNotebookEffectiveChunkTargetChars({ studioId, notebookId: owningNotebookId }),
+    // owning notebook 的重排引用：按引用路由（不可解析 → 回调侧 null → RRF 降级）。
+    rerankModelRef: knowledge.getNotebookConfig?.({ studioId, notebookId: owningNotebookId })
+      .rerankModelRef ?? null,
+  };
 }
 
 export function createKnowledgeReadTool(deps: KnowledgeReadToolDeps) {
@@ -95,14 +124,18 @@ export function createKnowledgeReadTool(deps: KnowledgeReadToolDeps) {
     label: "Knowledge Read",
     description: "Read chunks of a Knowledge notebook source by ordinal range, or search within one source by query. "
       + "Use when a [KnowledgeContext] shard manifest lists more content than was injected: read shards with "
-      + "sourceId plus fromOrdinal/toOrdinal (1-based, both inclusive), or narrow with query. Read-only.",
+      + "the scopeId from the block's Scope line, plus sourceId and fromOrdinal/toOrdinal (1-based, both inclusive), "
+      + "or narrow with query. The scopeId is this turn's knowledge permission ceiling: reads outside it are rejected. Read-only.",
     parameters: Type.Object({
-      notebookId: Type.Optional(Type.String({
-        description: "Optional notebook scope. When given, the source must belong to this notebook.",
-      })),
-      sourceId: Type.String({
-        description: "Source to read, a sourceId from the [KnowledgeContext] shard manifest.",
+      scopeId: Type.String({
+        description: "Knowledge turn scope id from the [KnowledgeContext] block header (the Scope line). Required.",
       }),
+      sourceId: Type.String({
+        description: "Source to read, a sourceId from the [KnowledgeContext] shard manifest. Must be inside the scope.",
+      }),
+      notebookId: Type.Optional(Type.String({
+        description: "Optional notebook scope. When given, it must be one of the scope's selected notebooks referencing this source.",
+      })),
       fromOrdinal: Type.Optional(Type.Number({
         description: "First chunk ordinal to read (1-based). Defaults to 1; ignored when query is given.",
       })),
@@ -122,7 +155,7 @@ export function createKnowledgeReadTool(deps: KnowledgeReadToolDeps) {
         capability: "knowledge_read.read",
       }),
     },
-    execute: async (_toolCallId: any, params: Record<string, any> = {}) => {
+    execute: async (_toolCallId: any, params: Record<string, any> = {}, _signal?: any, _onUpdate?: any, ctx?: any) => {
       const knowledge = deps.getKnowledge();
       const studioId = deps.getStudioId();
       if (!knowledge || !studioId) {
@@ -131,12 +164,25 @@ export function createKnowledgeReadTool(deps: KnowledgeReadToolDeps) {
         });
       }
       try {
+        // scopeId 缺失 = 契约违例：显式拒绝，不得回落到旧的全 studio 行为（§二十二）。
+        const scopeId = typeof params.scopeId === "string" && params.scopeId.trim()
+          ? params.scopeId.trim()
+          : null;
+        if (!scopeId) {
+          throw knowledgeScopeViolation(
+            "scopeId is required: pass the scope id from the [KnowledgeContext] block header (Scope line)",
+          );
+        }
         const sourceId = requireNonEmptyString(params.sourceId, "sourceId");
         const notebookId = typeof params.notebookId === "string" && params.notebookId.trim()
           ? params.notebookId.trim()
           : null;
         const query = typeof params.query === "string" && params.query.trim() ? params.query.trim() : null;
-        const resolved = resolveReadyArtifact(knowledge, studioId, sourceId, notebookId);
+        const sessionContext = deps.resolveSessionContext?.(ctx) ?? {
+          sessionPath: null,
+          parentSessionPath: null,
+        };
+        const resolved = resolveScopedArtifact(knowledge, studioId, scopeId, sourceId, notebookId, sessionContext);
 
         if (query) {
           const result = await knowledge.queryService.retrieveForArtifacts({
@@ -144,10 +190,22 @@ export function createKnowledgeReadTool(deps: KnowledgeReadToolDeps) {
             artifactIds: [resolved.artifactId],
             question: query,
             topK: 12,
+            notebookId: resolved.notebookId,
             embeddingModelRef: resolved.embeddingModelRef,
             chunkTargetChars: resolved.chunkTargetChars,
             rerankModelRef: resolved.rerankModelRef,
           });
+          // 降级显式标注（§十二）：向量变体未就绪/索引缺失时结果仍是合法 FTS
+          // 答案，但 payload 携带 reason code；同时幂等入队后台补齐（去重由
+          // 摄入层保证，重复检索不重复排队）。
+          if (result.degraded.length > 0) {
+            knowledge.requestVariantBuild({
+              studioId,
+              notebookId: resolved.notebookId,
+              sourceId,
+              artifactId: resolved.artifactId,
+            });
+          }
           const chunks = result.candidates.map(chunk => ({
             ordinal: chunk.ordinal + 1,
             text: chunk.text,
@@ -156,13 +214,46 @@ export function createKnowledgeReadTool(deps: KnowledgeReadToolDeps) {
             source: resolved.sourceName,
             sourceId,
             notebookId: resolved.notebookId,
+            scopeId,
+            parseArtifactId: resolved.artifactId,
+            contentSnapshotId: resolved.contentSnapshotId,
             mode: "search",
             retrievalMode: result.retrievalMode,
+            retrievalModeRequested: result.retrievalModeRequested,
+            ...(result.degraded.length > 0
+              ? { degraded: result.degraded.map(({ reason, detail }) => ({ reason, ...(detail ? { detail } : {}) })) }
+              : {}),
             matches: chunks,
           }, null, 2), { sourceId, mode: "search" });
         }
 
-        const total = knowledge.indexStore.listArtifactChunks(resolved.artifactId).length;
+        // 索引身份锚（Phase 2 起纯解析、只读）：chunkProfileHash = 生效分块配置的
+        // chunkerConfigId（与摄入侧同一解析链，查询不再惰性建绑/建索引）。
+        // 变体缺失/未 ready → 幂等入队后台构建 + 显式报 KNOWLEDGE_PARSE_NOT_READY
+        // （提示等摄入完成重试），不得静默当空。
+        const blocks = knowledge.listArtifactBlocks({ studioId, parseArtifactId: resolved.artifactId });
+        const chunkProfileHash = resolveKnowledgeChunkerConfig(blocks, {
+          targetChars: resolved.chunkTargetChars,
+        }).configId;
+        const variant = knowledge.indexStore.resolveChunkIndexVariant(
+          resolved.artifactId,
+          chunkProfileHash,
+        );
+        if (!variant || variant.status !== "ready") {
+          knowledge.requestVariantBuild({
+            studioId,
+            notebookId: resolved.notebookId,
+            sourceId,
+            artifactId: resolved.artifactId,
+          });
+          return toolError(
+            `Knowledge source index is not ready yet (sourceId: ${sourceId}, variant status: ${variant?.status ?? "missing"}); `
+            + "background build enqueued, retry after ingestion completes.",
+            { errorCode: "KNOWLEDGE_PARSE_NOT_READY", sourceId },
+          );
+        }
+        const indexedChunks = knowledge.indexStore.listVariantChunks(variant.id);
+        const total = indexedChunks.length;
         if (total === 0) {
           return toolError(`Knowledge source has no indexed chunks (sourceId: ${sourceId}).`, {
             errorCode: "KNOWLEDGE_INDEX_INVALID",
@@ -184,7 +275,7 @@ export function createKnowledgeReadTool(deps: KnowledgeReadToolDeps) {
             { errorCode: "KNOWLEDGE_INVALID_ARGUMENT", sourceId, totalChunks: total },
           );
         }
-        const chunks = knowledge.indexStore.listArtifactChunks(resolved.artifactId)
+        const chunks = indexedChunks
           .filter(chunk => chunk.ordinal >= from && chunk.ordinal < toExclusive)
           .sort((left, right) => left.ordinal - right.ordinal)
           .map(chunk => ({ ordinal: chunk.ordinal + 1, text: chunk.text }));
@@ -192,6 +283,9 @@ export function createKnowledgeReadTool(deps: KnowledgeReadToolDeps) {
           source: resolved.sourceName,
           sourceId,
           notebookId: resolved.notebookId,
+          scopeId,
+          parseArtifactId: resolved.artifactId,
+          contentSnapshotId: resolved.contentSnapshotId,
           mode: "ordinal-range",
           requestedRange: [from + 1, Math.min(toExclusive, total)],
           totalChunks: total,

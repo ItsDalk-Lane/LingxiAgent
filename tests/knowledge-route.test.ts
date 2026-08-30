@@ -558,6 +558,42 @@ describe("Knowledge route", () => {
     expect(await wrongNotebook.json()).toMatchObject({ error: "KNOWLEDGE_NOT_FOUND" });
   });
 
+  it("DELETE /knowledge/sources/:id：显式删除取消 job 并清理；重复删除 404", async () => {
+    const { app, knowledge } = appHarness();
+    const notebook = knowledge.createNotebook({ studioId: "studio-a", name: "删除" });
+    const imported = await knowledge.importPastedText({
+      studioId: "studio-a", notebookId: notebook.id, text: "待删除内容。\n", displayName: "删除.txt",
+    });
+    const artifact = await knowledge.parseSource({ studioId: "studio-a", sourceId: imported.source.id });
+    knowledge.enqueueSourceIngestion({
+      studioId: "studio-a", notebookId: notebook.id, sourceId: imported.source.id, artifactId: artifact.id,
+    });
+
+    const deleted = await app.request(`/api/knowledge/sources/${imported.source.id}`, { method: "DELETE" });
+    expect(deleted.status).toBe(200);
+    const body = await deleted.json() as any;
+    expect(body.source.id).toBe(imported.source.id);
+    expect(body.cancelledJobs).toHaveLength(1);
+    expect(body.purge).toMatchObject({ snapshots: 1, parseArtifacts: 1 });
+    // 源行、job 行、派生索引全部物理清理。
+    expect(() => knowledge.getSource({ studioId: "studio-a", sourceId: imported.source.id })).toThrow();
+    expect(knowledge.listIngestionJobs({ studioId: "studio-a" })).toEqual([]);
+    expect(knowledge.indexStore.listChunkIndexVariantsByArtifact(artifact.id)).toEqual([]);
+
+    // 重复删除：显式 404。
+    const again = await app.request(`/api/knowledge/sources/${imported.source.id}`, { method: "DELETE" });
+    expect(again.status).toBe(404);
+    expect(await again.json()).toMatchObject({ error: "KNOWLEDGE_NOT_FOUND" });
+
+    // 删除后 reingest 不复活（delete wins）。
+    const revive = await app.request(
+      `/api/knowledge/notebooks/${notebook.id}/sources/${imported.source.id}/reingest`,
+      { method: "POST" },
+    );
+    expect(revive.status).toBe(404);
+    expect(await revive.json()).toMatchObject({ error: "KNOWLEDGE_NOT_FOUND" });
+  });
+
   it("路由策略显式保持 Studio Owner，不依赖未知 API 兜底", () => {
     const paths = [
       ["GET", "/api/knowledge/notebooks"],
@@ -567,6 +603,7 @@ describe("Knowledge route", () => {
       ["POST", "/api/knowledge/notebooks/nb-1/sources/src-1/reingest"],
       ["GET", "/api/knowledge/citations/cite-1"],
       ["GET", "/api/knowledge/snapshots/snap-1/content"],
+      ["DELETE", "/api/knowledge/sources/src-1"],
     ];
     for (const [method, requestPath] of paths) {
       expect(classifyHttpRoute({ method, path: requestPath })).toMatchObject({ kind: "studio_owner" });

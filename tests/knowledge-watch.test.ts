@@ -102,6 +102,10 @@ function createManager(lingxiHome: string, watch: WatchHarness): ManagerHarness 
     ingestionLog: (message) => logs.push(message),
     embedTextsForModel: (request) => createFakeEmbedder(embeddingCalls)(request),
     canEmbedWithModel: () => true,
+    // 本文件 fake 了 setTimeout/clearTimeout（watcher 防抖/退避确定性驱动），
+    // provider gate 的限流计时器会被冻结：这里显式放宽（间隔 0、上限抬高），
+    // 限流行为由 tests/knowledge-lifecycle.test.ts 在真实计时器下覆盖。
+    embeddingGate: { maxConcurrent: 8, minRequestIntervalMs: 0 },
     fileWatcher: {
       debounceMs: DEBOUNCE_MS,
       pollIntervalMs: POLL_INTERVAL_MS,
@@ -152,24 +156,40 @@ async function settleIo(rounds = 20) {
   }
 }
 
-async function waitFor(condition: () => boolean, label: string, debug?: () => unknown) {
+async function waitFor(
+  condition: () => boolean,
+  label: string,
+  debug?: () => unknown,
+  fakeTimers?: { advanceMs: number },
+) {
   // refresh 链（stat→读源→写快照→fsync→rename→解析→写产物）全是真实 fs I/O，
   // 每个操作都要若干事件循环轮次；轮次给足避免慢机器/CI 上抖动。
+  // fakeTimers：等待对象依赖 fake 计时器（防抖/轮询）触发的场景。高负载下
+  // 真实 stat 可能晚于前一步的固定 settleIo 才完成、防抖计时器迟建，若只在
+  // 真实事件循环里等就会死锁超时（CI ubuntu 实测）——两个时间域必须一起泵。
   for (let i = 0; i < 3000; i++) {
     if (condition()) return;
+    if (fakeTimers) await vi.advanceTimersByTimeAsync(fakeTimers.advanceMs);
     await new Promise((resolve) => setImmediate(resolve));
   }
   const detail = debug ? `\n${JSON.stringify(debug(), null, 2)}` : "";
   throw new Error(`waitFor timeout: ${label}${detail}`);
 }
 
-/** 轮询检出路径专用：stat 与 refresh 链全是真实 I/O，所需事件循环轮次随机器
- * 负载浮动——慢 runner 上 stat 晚于任何固定 settle 轮数完成时，其建出的防抖
- * 计时器停在「未来的假时钟」，不推进就永不触发。把「settle → 推进防抖窗 →
- * 查条件」合成循环直到条件满足；总推进上限 120×1.5s=180s，留在 300s 轮询
- * 窗之内，不会引入第二次轮询检出。 */
+/** 轮询检出路径专用：stat 与 refresh 链全是真实 I/O，其进度由 libuv 线程池
+ * （默认 4 线程、全 worker 共享）队列决定——Windows CI 实测一轮 refresh 需要
+ * 真实秒级，纯按迭代计数会在几毫秒真实时间内耗尽预算。预算必须双维度：
+ * 真实时间（fake 计时器下 setTimeout 是假的，用 Atomics.wait 阻塞本线程
+ * 15ms/轮——线程池是独立线程，正好趁阻塞消化 fs 队列）+ 假时钟（每轮推进
+ * DEBOUNCE_MS 触发迟建的防抖计时器）；600 轮 = 真实 ≥9s + 假时钟 150s，
+ * 仍留在 300s 轮询窗之内，不会引入第二次轮询检出。 */
+const realDelaySAB = new SharedArrayBuffer(4);
+function realDelay(ms: number) {
+  Atomics.wait(new Int32Array(realDelaySAB), 0, 0, ms);
+}
 async function waitForWithClock(condition: () => boolean, label: string, debug?: () => unknown) {
-  for (let i = 0; i < 120; i++) {
+  for (let i = 0; i < 600; i++) {
+    realDelay(15);
     await settleIo();
     await vi.advanceTimersByTimeAsync(DEBOUNCE_MS);
     if (condition()) return;
@@ -264,7 +284,7 @@ describe("Knowledge 源文件 watch", () => {
     fs.writeFileSync(filePath, "恒定内容第一行。\n恒定内容第二行。\n");
     watch.registrations[0].onEvent("change", "不变.txt");
     await vi.advanceTimersByTimeAsync(DEBOUNCE_MS);
-    await waitFor(() => statCalls.length > statsBefore, "watcher stat ran for the event");
+    await waitFor(() => statCalls.length > statsBefore, "watcher stat ran for the event", undefined, { advanceMs: DEBOUNCE_MS });
     await settleIo();
 
     expect(snapshotCount(manager, studioId, imported.source.id)).toBe(1);
@@ -292,6 +312,8 @@ describe("Knowledge 源文件 watch", () => {
     await waitFor(
       () => sourceJobs(manager, studioId, notebook.id, imported.source.id).length === 2,
       "watch refresh enqueues a new ingestion job",
+      undefined,
+      { advanceMs: DEBOUNCE_MS },
     );
     expect(snapshotCount(manager, studioId, imported.source.id)).toBe(2);
 
@@ -360,6 +382,8 @@ describe("Knowledge 源文件 watch", () => {
     await waitFor(
       () => sourceJobs(manager, studioId, notebook.id, imported.source.id).length === 2,
       "refresh after re-attach",
+      undefined,
+      { advanceMs: DEBOUNCE_MS },
     );
     expect(snapshotCount(manager, studioId, imported.source.id)).toBe(2);
   });
@@ -368,7 +392,7 @@ describe("Knowledge 源文件 watch", () => {
     const home = tempDir("lingxi-watch-home-");
     const filesDir = tempDir("lingxi-watch-files-");
     const watch = createWatchHarness();
-    const { manager } = createManager(home, watch);
+    const { manager, logs, statCalls } = createManager(home, watch);
     const studioId = "studio-a";
     const notebook = manager.createNotebook({ studioId, name: "资料" });
     manager.updateNotebookSettings({ studioId, notebookId: notebook.id, embeddingModelRef: FAKE_MODEL_REF });
@@ -390,6 +414,13 @@ describe("Knowledge 源文件 watch", () => {
     await waitForWithClock(
       () => sourceJobs(manager, studioId, notebook.id, imported.source.id).length === 2,
       "fallback poll detects the change",
+      () => ({
+        jobs: sourceJobs(manager, studioId, notebook.id, imported.source.id).length,
+        snapshots: snapshotCount(manager, studioId, imported.source.id),
+        watchState: watchState(manager, imported.source.id) ?? null,
+        statCalls: statCalls.length,
+        logs: logs.slice(-6),
+      }),
     );
     expect(snapshotCount(manager, studioId, imported.source.id)).toBe(2);
   });
@@ -398,7 +429,7 @@ describe("Knowledge 源文件 watch", () => {
     const home = tempDir("lingxi-watch-home-");
     const filesDir = tempDir("lingxi-watch-files-");
     const watch = createWatchHarness();
-    const { manager, logs } = createManager(home, watch);
+    const { manager, logs, statCalls } = createManager(home, watch);
     const studioId = "studio-a";
     const notebook = manager.createNotebook({ studioId, name: "资料" });
     manager.updateNotebookSettings({ studioId, notebookId: notebook.id, embeddingModelRef: FAKE_MODEL_REF });
@@ -415,6 +446,8 @@ describe("Knowledge 源文件 watch", () => {
     await waitFor(
       () => watchState(manager, imported.source.id)?.unreachable === true,
       "source marked unreachable",
+      undefined,
+      { advanceMs: DEBOUNCE_MS },
     );
     const gone = watchState(manager, imported.source.id)!;
     expect(gone.unreachableReason).toContain("ENOENT");
@@ -428,6 +461,13 @@ describe("Knowledge 源文件 watch", () => {
     await waitForWithClock(
       () => sourceJobs(manager, studioId, notebook.id, imported.source.id).length === 2,
       "refresh after file restored",
+      () => ({
+        jobs: sourceJobs(manager, studioId, notebook.id, imported.source.id).length,
+        snapshots: snapshotCount(manager, studioId, imported.source.id),
+        watchState: watchState(manager, imported.source.id) ?? null,
+        statCalls: statCalls.length,
+        logs: logs.slice(-6),
+      }),
     );
     expect(snapshotCount(manager, studioId, imported.source.id)).toBe(2);
     expect(watchState(manager, imported.source.id)?.unreachable).toBe(false);
@@ -466,6 +506,8 @@ describe("Knowledge 源文件 watch", () => {
       () => sourceJobs(manager, studioId, notebookA.id, imported.source.id).length === 2
         && sourceJobs(manager, studioId, notebookB.id, imported.source.id).length === 1,
       "shared source refreshed for both notebooks",
+      undefined,
+      { advanceMs: DEBOUNCE_MS },
     );
     expect(snapshotCount(manager, studioId, imported.source.id)).toBe(2);
 

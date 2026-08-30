@@ -37,7 +37,10 @@ import { materializeBridgeInboundFiles } from "../lib/session-files/bridge-inbou
 import { serializeSessionFile } from "../lib/session-files/session-file-response.ts";
 import { BrowserManager } from "../lib/browser/browser-manager.ts";
 import { normalizeKnowledgeRefs, type KnowledgeRefs, type KnowledgeRetrievalStats } from "../shared/knowledge-refs.ts";
-import { resolveKnowledgeInjectionBudgetTokens } from "../lib/knowledge/knowledge-context-injector.ts";
+import {
+  resolveKnowledgeInjectionBudgetTokens,
+  type KnowledgeInjectionEvidence,
+} from "../lib/knowledge/knowledge-context-injector.ts";
 import { compressHistoricalKnowledgeContextMessages } from "./knowledge-history-compressor.ts";
 
 /**
@@ -68,6 +71,15 @@ const pendingDesktopSessionSubmissions = new Set();
 const abortedDesktopSessionSubmissions = new Set();
 
 /**
+ * 检索/排队期间可中止在途知识注入的 AbortController（Phase 9 第二波）：键与
+ * abortedDesktopSessionSubmissions 同源（sessionId 与 sessionPath 两种形式）。
+ * abortPendingDesktopSubmission 标记 abort 时同步 abort 对应 controller——
+ * exhaustive coverage run 据此中止（pending shard → cancelled，stats 如实），
+ * 不再等检索完成后才被丢弃。提交结束 finally 兜底清理，防泄漏。
+ */
+const pendingKnowledgeInjectionAborters = new Map();
+
+/**
  * 取消尚未进入 promptSession 的桌面提交（知识检索/排队期间点停止）。
  * 返回是否标记成功——false 表示该 session 没有可解析身份（视为无可取消）。
  * 已进入流式的 turn 不走这里（engine.abortSession 路径负责）。
@@ -80,7 +92,12 @@ export function abortPendingDesktopSubmission(engine: any, target: { sessionId?:
     // 只对真实在途的提交标记；没有 pending 提交时返回 false（abort 路由维持
     // already_stopped 语义，不误报 accepted）。
     if (!keys.some((key) => pendingDesktopSessionSubmissions.has(key))) return false;
-    for (const key of keys) abortedDesktopSessionSubmissions.add(key);
+    for (const key of keys) {
+      abortedDesktopSessionSubmissions.add(key);
+      // 在途知识注入（含 exhaustive coverage run）立即中止；无 controller 的
+      // 提交（未携带知识引用）只走既有的标记-检查通道。
+      pendingKnowledgeInjectionAborters.get(key)?.abort();
+    }
     return true;
   } catch {
     return false;
@@ -122,7 +139,9 @@ async function resolveKnowledgeInjectionBlock(
   question: string,
   budgetTokens: number,
   sessionPath: string,
-): Promise<{ block: string; stats: KnowledgeRetrievalStats }> {
+  turnId?: string | null,
+  signal?: AbortSignal | null,
+): Promise<{ block: string; stats: KnowledgeRetrievalStats; evidence: KnowledgeInjectionEvidence }> {
   if (typeof engine?.buildKnowledgeContextInjection !== "function") {
     throw new Error("desktop-session-submit: knowledge injection unavailable (engine lacks buildKnowledgeContextInjection)");
   }
@@ -132,6 +151,10 @@ async function resolveKnowledgeInjectionBlock(
       knowledgeRefs: refs,
       budgetTokens,
       ...(sessionPath ? { sessionPath } : {}),
+      // 轮标识随行（clientMessageId）：TurnScope 的 turn_id 列；缺省由 store 生成。
+      ...(turnId ? { turnId } : {}),
+      // 检索期取消信号（Phase 9 第二波）：exhaustive coverage run 中止通道。
+      ...(signal ? { signal } : {}),
     });
   } catch (err) {
     const reason = err instanceof Error ? err.message : String(err);
@@ -151,7 +174,34 @@ async function resolveKnowledgeInjectionBlock(
         budgetTokens,
         unavailableReason: reason,
       },
+      // 降级路径无证据进入模型上下文：身份链为空（不伪造）。
+      evidence: { entries: [], searchedVectorVariants: [] },
     };
+  }
+}
+
+/**
+ * EvidenceManifest 持久化（任务书 §六十七）：与 stats 持久化同一位置、同一
+ * 纪律——写入失败只显式 warn 不阻断会话提交（manifest 是追溯性元数据，不能
+ * 因为它写不进去就丢掉用户消息本身）。无 scopeId（旧调用方/降级路径/非会话
+ * surface）无 manifest 可写，直接返回；engine 门面缺失按布线缺陷显式 warn
+ * （与 recordMessageOriginEntry 的 appendCustomEntry 缺失同纪律）。
+ */
+export function recordKnowledgeEvidenceManifest(
+  engine: any,
+  sessionPath: string,
+  stats: KnowledgeRetrievalStats | null,
+  evidence: KnowledgeInjectionEvidence | null,
+): void {
+  if (!stats?.scopeId || !evidence) return;
+  if (typeof engine?.recordKnowledgeEvidenceManifest !== "function") {
+    console.warn(`[desktop-session-submit] knowledge evidence manifest not persisted (engine lacks recordKnowledgeEvidenceManifest): ${sessionPath}`);
+    return;
+  }
+  try {
+    engine.recordKnowledgeEvidenceManifest({ sessionPath, stats, evidence });
+  } catch (err) {
+    console.warn(`[desktop-session-submit] knowledge evidence manifest write failed for ${sessionPath}: ${(err as any)?.message || err}`);
   }
 }
 
@@ -351,6 +401,7 @@ export async function submitDesktopSessionMessage(engine: any, opts: {
     const displayComparisonPromptText = promptText;
     let knowledgeInjectionBlock: string | null = null;
     let knowledgeRetrievalStats: KnowledgeRetrievalStats | null = null;
+    let knowledgeInjectionEvidence: KnowledgeInjectionEvidence | null = null;
     let promptSessionFileRefs = normalizeSessionFileRefs(sessionFileRefs, sessionPath, sessionId);
     // 知识库引用：形状非法直接抛错（显式拒绝，禁静默降级）；下方 marker 注入点
     // 调 knowledge-context-injector 做拆解 + 检索注入。
@@ -426,15 +477,34 @@ export async function submitDesktopSessionMessage(engine: any, opts: {
         // 内部才会发出。先发 knowledge_retrieval_started 让 UI 进入「检索中」态，
         // 再开始阻塞式注入（chat.ts 广播到订阅客户端）。
         engine.emitEvent?.({ type: "knowledge_retrieval_started", sessionPath }, sessionPath);
-        const injection = await resolveKnowledgeInjectionBlock(
-          engine,
-          promptKnowledgeRefs,
-          text || "",
-          resolveKnowledgeInjectionBudgetTokens((session as any)?.model ?? null),
-          sessionPath,
-        );
+        // 检索期取消信号（Phase 9 第二波）：abortPendingDesktopSubmission 标记
+        // abort 时同步触发——exhaustive coverage run 中止（pending shard →
+        // cancelled），不再等注入完成后才被丢弃。两种键形式都注册（与标记集合同源）。
+        const knowledgeAbort = new AbortController();
+        const aborterKeys = [sessionId, sessionPath]
+          .filter((key): key is string => typeof key === "string" && !!key.trim());
+        for (const key of aborterKeys) pendingKnowledgeInjectionAborters.set(key, knowledgeAbort);
+        let injection: { block: string; stats: KnowledgeRetrievalStats; evidence: KnowledgeInjectionEvidence };
+        try {
+          injection = await resolveKnowledgeInjectionBlock(
+            engine,
+            promptKnowledgeRefs,
+            text || "",
+            resolveKnowledgeInjectionBudgetTokens((session as any)?.model ?? null),
+            sessionPath,
+            clientMessageId || null,
+            knowledgeAbort.signal,
+          );
+        } finally {
+          for (const key of aborterKeys) {
+            if (pendingKnowledgeInjectionAborters.get(key) === knowledgeAbort) {
+              pendingKnowledgeInjectionAborters.delete(key);
+            }
+          }
+        }
         knowledgeInjectionBlock = injection.block;
         knowledgeRetrievalStats = injection.stats;
+        knowledgeInjectionEvidence = injection.evidence;
         if (knowledgeInjectionBlock) {
           promptText = `${knowledgeInjectionBlock}\n\n${promptText}`;
         }
@@ -496,6 +566,14 @@ export async function submitDesktopSessionMessage(engine: any, opts: {
             forceDisplayText: !!reminderBlock?.block || !!knowledgeInjectionBlock,
             knowledgeRetrieval: knowledgeRetrievalStats,
           },
+        );
+        // EvidenceManifest（§六十七）：与 stats 持久化同一位置/同一纪律
+        // （失败 warn 不阻断）——该轮回答基于哪个 snapshot/variant/chunks。
+        recordKnowledgeEvidenceManifest(
+          engine,
+          sessionPath,
+          knowledgeRetrievalStats,
+          knowledgeInjectionEvidence,
         );
         recordMessageOriginEntry(session, sessionPath, displayMessage);
         recordAgentReviewEntry(session, sessionPath, displayMessage);
@@ -713,6 +791,7 @@ export async function submitDesktopSessionInterjection(engine: any, opts: {
   const displayComparisonPromptText = promptText;
   let knowledgeInjectionBlock: string | null = null;
   let knowledgeRetrievalStats: KnowledgeRetrievalStats | null = null;
+  let knowledgeInjectionEvidence: KnowledgeInjectionEvidence | null = null;
   let promptSessionFileRefs = normalizeSessionFileRefs(sessionFileRefs, sessionPath, sessionId);
   // 与 prompt 路径同一契约：形状非法显式抛错；下方 marker 注入点调 injector 注入。
   const promptKnowledgeRefs = normalizeKnowledgeRefs(knowledgeRefs);
@@ -781,9 +860,11 @@ export async function submitDesktopSessionInterjection(engine: any, opts: {
       text || "",
       resolveKnowledgeInjectionBudgetTokens((session as any)?.model ?? null),
       sessionPath,
+      clientMessageId || null,
     );
     knowledgeInjectionBlock = injection.block;
     knowledgeRetrievalStats = injection.stats;
+    knowledgeInjectionEvidence = injection.evidence;
     if (knowledgeInjectionBlock) {
       promptText = `${knowledgeInjectionBlock}\n\n${promptText}`;
     }
@@ -836,6 +917,13 @@ export async function submitDesktopSessionInterjection(engine: any, opts: {
     },
   );
   recordMessageOriginEntry(session, sessionPath, displayMessage);
+  // EvidenceManifest（§六十七）：与 stats 持久化同一位置/同一纪律（失败 warn 不阻断）。
+  recordKnowledgeEvidenceManifest(
+    engine,
+    sessionPath,
+    knowledgeRetrievalStats,
+    knowledgeInjectionEvidence,
+  );
   return { text: null, toolMedia: [], steered: true };
 }
 
