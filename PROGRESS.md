@@ -10,7 +10,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = 91d66f9399a5f356e6750540cbe436ef2f539edd  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-08-30 模型操作原生协议 + 用户打标签 + knowledge v9 向量保留 + Windows CI 稳定性两连修)
+VERIFIED_SOURCE_SHA   = 7cddd56376199c7687401011ddac1ed80b21cc1f  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-08-30 模型操作原生协议 + 用户打标签 + knowledge v9 向量保留 + Windows CI 稳定性三连修)
 工作分支              = feature/upstream-sync-0.447.4
 ```
 
@@ -414,6 +414,15 @@ seal 不是一次性终点，而是"当前被验证树"的游标；每次审计�
   缓存键改 ensureSyntaxTree(doc.length, 1s) 同步补齐完整树；装饰/hover
   增量路径保持部分树语义不变。验证：editor 套件 80 用例绿 + typecheck×3
   绿后四次推进。
+
+- **2026-08-30 knowledge-watch 轮询测试慢 runner 修复（Windows CI 三连修之三）**
+  （功能树 7cddd563/seal 本提交；1 file / +12-4）：兜底轮询检出为假时钟
+  推进 + 真实 fs stat，原固定 settleIo(20) 轮后单次推进 DEBOUNCE_MS——
+  满载 Windows runner（全程 774s，本机 10 倍）stat 晚完成则防抖计时器
+  在推进后才建出，waitFor 的 setImmediate 循环不推假时钟，永不触发。
+  改「settle → 推进防抖窗」循环 5 轮（5×1500ms 远不到下一个 300s 轮询
+  点，无二次检出），恢复后检出同款脆弱点一并修。验证：typecheck×3 绿 +
+  full npm test 12556 passed / 0 failed（封印推进后复跑）后推进。
 
 - **2026-08-30 Windows CI 稳定性两连修（PR #30 监控修复）**
   （功能树 91d66f93/seal 本提交；2 files / +10-1）：①knowledge-store 测试
