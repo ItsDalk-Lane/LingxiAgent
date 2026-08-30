@@ -13,6 +13,12 @@ export const KNOWLEDGE_DEGRADE_REASONS = [
   "KNOWLEDGE_INDEX_FAILED",
   /** VectorIndexVariant 未就绪或查询嵌入不可用：本轮向量通道跳过，降级纯 FTS。 */
   "KNOWLEDGE_VECTOR_NOT_READY",
+  /**
+   * 查询嵌入请求失败（2026-08-30 延迟加固）：网络/HTTP/期限超时/响应非法——
+   * 向量通道是检索增强层，失败降级纯 FTS 并显式留痕（不炸检索、不丢已算好的
+   * FTS 候选），后台重建按既有 requestVariantBuild 幂等语义补跑。
+   */
+  "KNOWLEDGE_EMBEDDING_FAILED",
   /** 源解析产物 needs_ocr：无可检索文本，该源本轮不参与检索。 */
   "KNOWLEDGE_SOURCE_NEEDS_OCR",
 ] as const;

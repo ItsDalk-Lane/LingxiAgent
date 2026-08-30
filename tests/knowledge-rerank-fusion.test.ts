@@ -4,7 +4,11 @@ import path from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { KnowledgeManager } from "../lib/knowledge/knowledge-manager.ts";
-import { KNOWLEDGE_RERANK_DEADLINE_MS, KNOWLEDGE_RRF_K } from "../lib/knowledge/knowledge-query-service.ts";
+import {
+  KNOWLEDGE_EMBEDDING_DEADLINE_MS,
+  KNOWLEDGE_RERANK_DEADLINE_MS,
+  KNOWLEDGE_RRF_K,
+} from "../lib/knowledge/knowledge-query-service.ts";
 
 /**
  * 任务书 §二十四/§二十五/§九十二：rerank 按笔记本引用真正路由 + 跨笔记本
@@ -336,5 +340,127 @@ describe("rerank 期限与传输失败降级", () => {
     expect(result.retrievalMode).toBe("hybrid");
     expect(result.candidates.length).toBeGreaterThan(0);
     expect(result.rerankDegradeReasons?.join("; ")).toContain("connection reset");
+  });
+});
+
+// ─────────────── 查询嵌入失败/期限降级（2026-08-30 延迟加固） ───────────────
+
+describe("查询嵌入失败与期限降级", () => {
+  type EmbedMode = "ok" | "fail" | "hang" | "invalid" | "abort";
+  async function setupEmbedFailNotebook() {
+    let embedMode: EmbedMode = "ok";
+    const manager = new KnowledgeManager({
+      lingxiHome: tempHome(),
+      embedTextsForModel: async (request) => {
+        if (embedMode === "fail") throw new Error("connection reset by peer");
+        if (embedMode === "hang") return new Promise(() => {});
+        if (embedMode === "invalid") {
+          return { vectors: [], dimensions: 8, model: { provider: "fake", id: EMB_REF.id, api: "openai", dimensions: 8 } };
+        }
+        if (embedMode === "abort") {
+          const error = new Error("The operation was aborted");
+          error.name = "AbortError";
+          throw error;
+        }
+        return {
+          vectors: fakeEmbedVectors(request.texts),
+          dimensions: 8,
+          model: { provider: "fake", id: EMB_REF.id, api: "openai", dimensions: 8 },
+        };
+      },
+      canEmbedWithModel: () => true,
+    });
+    managers.push(manager);
+    const studioId = "studio-embed-fail";
+    const nb = manager.createNotebook({ studioId, name: "嵌入降级本" });
+    manager.updateNotebookSettings({ studioId, notebookId: nb.id, embeddingModelRef: EMB_REF });
+    // 摄入期用 "ok" 模式：chunk+FTS+向量全就绪（失败只发生在查询期）。
+    await ingestPasted(manager, studioId, nb.id, TEXT_A1, "甲一.txt");
+    return { manager, studioId, nb, setMode: (mode: EmbedMode) => { embedMode = mode; } };
+  }
+
+  it("embedder 网络错：降级纯 FTS + KNOWLEDGE_EMBEDDING_FAILED 留痕，FTS 候选不丢", async () => {
+    const { manager, studioId, nb, setMode } = await setupEmbedFailNotebook();
+    setMode("fail");
+    const result = await manager.queryService.retrieveForNotebooks({
+      studioId,
+      notebookIds: [nb.id],
+      question: QUESTION_B,
+    });
+    expect(result.retrievalMode).toBe("fts");
+    expect(result.retrievalModeRequested).toBe("hybrid");
+    expect(result.candidates.length).toBeGreaterThan(0);
+    expect(result.degraded.some(item => item.reason === "KNOWLEDGE_EMBEDDING_FAILED")).toBe(true);
+    expect(result.degraded.find(item => item.reason === "KNOWLEDGE_EMBEDDING_FAILED")?.detail)
+      .toContain("connection reset");
+  });
+
+  it("embedder 挂起：KNOWLEDGE_EMBEDDING_DEADLINE_MS 后降级 FTS（不再挂满 300s）", async () => {
+    const { manager, studioId, nb, setMode } = await setupEmbedFailNotebook();
+    setMode("hang");
+    vi.useFakeTimers();
+    try {
+      const pending = manager.queryService.retrieveForNotebooks({
+        studioId,
+        notebookIds: [nb.id],
+        question: QUESTION_B,
+      });
+      await vi.advanceTimersByTimeAsync(KNOWLEDGE_EMBEDDING_DEADLINE_MS + 10);
+      const result = await pending;
+      expect(result.retrievalMode).toBe("fts");
+      expect(result.candidates.length).toBeGreaterThan(0);
+      expect(result.degraded.some(item => item.reason === "KNOWLEDGE_EMBEDDING_FAILED")).toBe(true);
+      expect(result.degraded.find(item => item.reason === "KNOWLEDGE_EMBEDDING_FAILED")?.detail)
+        .toContain("deadline");
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("外部 signal 取消：abort 原样上抛（用户取消不降级）", async () => {
+    const { manager, studioId, nb, setMode } = await setupEmbedFailNotebook();
+    setMode("abort");
+    const controller = new AbortController();
+    controller.abort();
+    await expect(manager.queryService.retrieveForNotebooks({
+      studioId,
+      notebookIds: [nb.id],
+      question: QUESTION_B,
+      signal: controller.signal,
+    })).rejects.toMatchObject({ name: "AbortError" });
+  });
+
+  it("嵌入响应非法（vectors 数量不符）：降级不抛，留痕 EMBEDDING_FAILED", async () => {
+    const { manager, studioId, nb, setMode } = await setupEmbedFailNotebook();
+    setMode("invalid");
+    const result = await manager.queryService.retrieveForNotebooks({
+      studioId,
+      notebookIds: [nb.id],
+      question: QUESTION_B,
+    });
+    expect(result.retrievalMode).toBe("fts");
+    expect(result.candidates.length).toBeGreaterThan(0);
+    expect(result.degraded.some(item => item.reason === "KNOWLEDGE_EMBEDDING_FAILED")).toBe(true);
+  });
+
+  it("向量库 search 意外错误：降级 FTS + VECTOR_NOT_READY 留痕", async () => {
+    const { manager, studioId, nb } = await setupEmbedFailNotebook();
+    vi.spyOn(manager.vectorIndex, "search").mockImplementation(() => {
+      throw new Error("sqlite bus error");
+    });
+    try {
+      const result = await manager.queryService.retrieveForNotebooks({
+        studioId,
+        notebookIds: [nb.id],
+        question: QUESTION_B,
+      });
+      expect(result.retrievalMode).toBe("fts");
+      expect(result.candidates.length).toBeGreaterThan(0);
+      expect(result.degraded.some(item => item.reason === "KNOWLEDGE_VECTOR_NOT_READY")).toBe(true);
+      expect(result.degraded.find(item => item.reason === "KNOWLEDGE_VECTOR_NOT_READY")?.detail)
+        .toContain("vector search failed");
+    } finally {
+      vi.restoreAllMocks();
+    }
   });
 });

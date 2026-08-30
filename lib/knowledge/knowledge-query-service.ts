@@ -332,6 +332,16 @@ export const KNOWLEDGE_RERANK_MAX_DOCS = MODEL_OPERATION_RERANK_MAX_DOCS;
 export const KNOWLEDGE_RERANK_DEADLINE_MS = 15_000;
 
 /**
+ * 查询嵌入执行期限（2026-08-30 延迟加固）：单次查询侧嵌入调用超过该时长即
+ * 放弃，候选保持 FTS 名次继续检索并显式留痕（KNOWLEDGE_EMBEDDING_FAILED）。
+ * 与 rerank 期限对称（见 KNOWLEDGE_RERANK_DEADLINE_MS）；动机：engine 嵌入
+ * 闭包的 HTTP 超时 300s 全额放行，挂着的嵌入供应商 = 一次提问卡 5 分钟。
+ * 摄入侧批量嵌入不受影响（不经过本竞速，走闭包自身超时）。本地 Ollama 实测
+ * 0.1–2s、远程 API 数秒，15s 充裕。
+ */
+export const KNOWLEDGE_EMBEDDING_DEADLINE_MS = 15_000;
+
+/**
  * Retrieval Candidate Budgets（任务书 §二十六，Phase 8）：候选生成预算与
  * Context Injection Budget（budgetTokens，注入层）分离。topK（含 NULL→1000 的
  * "无上限"列语义）不再作为覆盖机制——预算链对每一步独立封顶，topK 只在预算
@@ -601,7 +611,50 @@ export class KnowledgeQueryService {
     } catch (error) {
       if (isAbortLike(error)) throw error;
       if (isKnowledgeError(error)) throw error;
-      throw new KnowledgeError("KNOWLEDGE_RETRIEVAL_UNAVAILABLE", "Knowledge embedding request failed");
+      const cause = error instanceof Error ? `${error.name}: ${error.message}` : String(error);
+      throw new KnowledgeError(
+        "KNOWLEDGE_RETRIEVAL_UNAVAILABLE",
+        `Knowledge embedding request failed (${cause})`,
+      );
+    }
+  }
+
+  /**
+   * 查询嵌入执行 + 期限竞速（KNOWLEDGE_EMBEDDING_DEADLINE_MS）：超时即 abort
+   * 底层请求并抛 KnowledgeEmbeddingDeadlineError（调用方降级处理）；外部
+   * signal 的 abort 原样穿透（用户取消语义）。竞速落败方的 rejection 就地
+   * 吞掉，不允许变成 unhandled rejection。与 invokeRerankerWithDeadline 同构。
+   */
+  private async invokeEmbeddingWithDeadline(input: {
+    runId: string;
+    question: string;
+    signal?: AbortSignal;
+    embedder: KnowledgeEmbedder;
+  }): Promise<KnowledgeEmbeddingResult | null> {
+    const controller = new AbortController();
+    const onExternalAbort = () => controller.abort();
+    input.signal?.addEventListener("abort", onExternalAbort, { once: true });
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const deadline = new Promise<never>((_, reject) => {
+      timer = setTimeout(() => {
+        controller.abort();
+        const error = new Error(`query embedding deadline exceeded after ${KNOWLEDGE_EMBEDDING_DEADLINE_MS}ms`);
+        error.name = "KnowledgeEmbeddingDeadlineError";
+        reject(error);
+      }, KNOWLEDGE_EMBEDDING_DEADLINE_MS);
+    });
+    const attempt = Promise.resolve().then(() => this.invokeEmbedding({
+      runId: input.runId,
+      texts: [input.question],
+      signal: controller.signal,
+    }, input.embedder));
+    deadline.catch(() => {});
+    attempt.catch(() => {});
+    try {
+      return await Promise.race([attempt, deadline]);
+    } finally {
+      if (timer !== undefined) clearTimeout(timer);
+      input.signal?.removeEventListener("abort", onExternalAbort);
     }
   }
 
@@ -880,9 +933,43 @@ export class KnowledgeQueryService {
       return { candidates: fts, retrievalMode: "fts", retrievalModeRequested, degraded, searchedVectorVariants: [] };
     }
 
-    const questionEmbedding = await this.invokeEmbedding({ runId, texts: [question], signal }, input.embedTexts);
-    if (!questionEmbedding) {
-      // 查询嵌入在检查与执行之间变得不可用：显式降级纯 FTS 并留痕（禁静默）。
+    // 查询嵌入带期限竞速（KNOWLEDGE_EMBEDDING_DEADLINE_MS）：超时/传输类失败/
+    // 响应非法一律显式降级纯 FTS + KNOWLEDGE_EMBEDDING_FAILED 留痕（FTS 候选
+    // 已算好、不再随异常丢弃——向量是检索增强层，失效不该炸掉整条检索，也
+    // 不该挂满 engine 闭包 300s）；外部 signal abort 原样上抛（用户取消）。
+    let embeddedQuestion: { result: KnowledgeEmbeddingResult; model: VectorIndexModelIdentity };
+    try {
+      const questionEmbedding = await this.invokeEmbeddingWithDeadline({
+        runId,
+        question,
+        signal,
+        embedder: input.embedTexts,
+      });
+      if (!questionEmbedding) {
+        // 查询嵌入在检查与执行之间变得不可用：显式降级纯 FTS 并留痕（禁静默）。
+        return {
+          candidates: fts,
+          retrievalMode: "fts",
+          retrievalModeRequested,
+          degraded: [
+            ...degraded,
+            ...readyScopes.map(scope => ({
+              parseArtifactId: scope.parseArtifactId,
+              chunkProfileHash: scope.chunkProfileHash,
+              reason: "KNOWLEDGE_VECTOR_NOT_READY" as const,
+              detail: "query embedding unavailable",
+            })),
+          ],
+          searchedVectorVariants: [],
+        };
+      }
+      embeddedQuestion = assertEmbeddingBatch(questionEmbedding, 1);
+    } catch (error) {
+      // 外部 signal 的 abort = 用户取消，原样上抛；其余（期限超时/网络/HTTP/
+      // 响应非法，含 deadline 竞速自身 abort 底层请求后逸出的 AbortError）一律
+      // 降级纯 FTS + 留痕——向量是增强层，不炸检索。
+      if (isAbortLike(error) && signal?.aborted) throw error;
+      const cause = error instanceof Error ? `${error.name}: ${error.message}` : String(error);
       return {
         candidates: fts,
         retrievalMode: "fts",
@@ -892,14 +979,13 @@ export class KnowledgeQueryService {
           ...readyScopes.map(scope => ({
             parseArtifactId: scope.parseArtifactId,
             chunkProfileHash: scope.chunkProfileHash,
-            reason: "KNOWLEDGE_VECTOR_NOT_READY" as const,
-            detail: "query embedding unavailable",
+            reason: "KNOWLEDGE_EMBEDDING_FAILED" as const,
+            detail: `query embedding request failed (${cause}); kept FTS candidates`,
           })),
         ],
         searchedVectorVariants: [],
       };
     }
-    const embeddedQuestion = assertEmbeddingBatch(questionEmbedding, 1);
 
     // 向量通道只读判定：逐就绪 scope 校验 VectorIndexVariant（viv = f(civ, modelKey)
     // 确定性派生，与写入侧同一算法）；指纹+维度命中才参与检索，否则降级留痕。
@@ -984,7 +1070,28 @@ export class KnowledgeQueryService {
         limit: Math.max(1, Math.min(generationLimit, KNOWLEDGE_UNCAPPED_RETRIEVAL_LIMIT)),
       });
     } catch (error) {
-      if (!isKnowledgeError(error) || error.code !== "KNOWLEDGE_INDEX_INVALID") throw error;
+      if (!isKnowledgeError(error) || error.code !== "KNOWLEDGE_INDEX_INVALID") {
+        // 向量库检索的意外错误（非损坏自愈路径）：向量通道本轮不可用——降级
+        // 纯 FTS + VECTOR_NOT_READY 留痕，不炸检索（与查询嵌入失败降级同纪律）。
+        const cause = error instanceof Error ? `${error.name}: ${error.message}` : String(error);
+        return {
+          candidates: fts,
+          retrievalMode: "fts",
+          retrievalModeRequested,
+          degraded: [
+            ...allDegraded,
+            ...readyScopes
+              .filter(scope => !vectorDegraded.some(item => item.parseArtifactId === scope.parseArtifactId))
+              .map(scope => ({
+                parseArtifactId: scope.parseArtifactId,
+                chunkProfileHash: scope.chunkProfileHash,
+                reason: "KNOWLEDGE_VECTOR_NOT_READY" as const,
+                detail: `vector search failed (${cause}); kept FTS candidates`,
+              })),
+          ],
+          searchedVectorVariants: [],
+        };
+      }
       // 向量库损坏自愈（§十三）：rebuild 后变体必然全失（缓存级重建），本轮降级
       // 纯 FTS 并把原就绪 scope 记为 VECTOR_NOT_READY，由后台摄入重建向量。
       vectorIndex!.rebuild();
