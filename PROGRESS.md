@@ -10,7 +10,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = dd508491d3f7094138fdd45024228b12581fd2f1  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-08-30 knowledge Phase 9-12 分支合并 main（PR #30）后的合并树)
+VERIFIED_SOURCE_SHA   = 57d716e5c3fc49573a8fba7765c78c6d49e86055  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-08-30 同上 + Windows 轮询测试真实时间预算修复)
 工作分支              = feature/upstream-sync-0.447.4
 ```
 
@@ -545,6 +545,15 @@ seal 不是一次性终点，而是"当前被验证树"的游标；每次审计�
   （原样保留会事务回滚吞掉 FTS 清理）。指纹按合并树 compatible repin。
   验证：typecheck×3（绿）+ full npm test 12778 passed / 0 failed +
   build:server:open / smoke:server:open 正反冒烟全过后推进。
+
+- **2026-08-30 Windows 轮询测试超时修复：waitForWithClock 补真实时间维度**
+  （功能树 57d716e5/seal 本提交；1 file / +29-8）：轮询检出的 stat/refresh 链
+  进度由 libuv 线程池队列决定（默认 4 线程全 worker 共享），Windows CI 实测
+  一轮 refresh 需真实秒级；原 waitForWithClock 按迭代计数预算在几毫秒真实
+  时间即耗尽。改双维度预算：Atomics.wait 真实阻塞 15ms/轮 + settle + 推进
+  假时钟，600 轮 = 真实 ≥9s + 假时钟 150s 仍留轮询窗内；两处调用点挂调试
+  转储。验证：该文件 6/6 绿 + typecheck×3 + full npm test 12778 passed /
+  0 failed 后推进。
 
 
 ## 最终状态：已合并（上游同步部分）
