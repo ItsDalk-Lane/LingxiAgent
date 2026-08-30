@@ -10,7 +10,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = 656cbaf0fb081abdac49719395452e6698268b04  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-08-30 同上 + 融合池随预算倒推 + 检索列表二次展开 + 查询嵌入退 FTS + 拆解系统优化（职责收缩/扩展并行/Query Family 两级融合/候选总预算）)
+VERIFIED_SOURCE_SHA   = 6bb5878f3a6f5b43be565218e117d4e9b0a4066e  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-08-30 同上 + 拆解系统优化 P0+P1+P2 全量（职责收缩/扩展并行/Query Family/候选总预算/Adaptive Specialist/Gap Analyzer/否定 exclusion）)
 工作分支              = feature/upstream-sync-0.447.4
 ```
 
@@ -650,6 +650,22 @@ seal 不是一次性终点，而是"当前被验证树"的游标；每次审计�
   P2（多专家拆解/Gap Analyzer/结构化解码/否定 constraint）明确不做。验证：
   typecheck×3 绿 + eslint 0 error + 新增 10 用例 + knowledge 簇 254 用例 +
   full npm test 12820 passed / 0 failed 后推进。
+
+- **2026-08-30 拆解系统优化 P2 收官（Adaptive Specialist/扩展门控/Gap
+  Analyzer/否定 exclusion）**（功能树 6bb5878f/seal 本提交；5 files /
+  +868-23，含指纹 compatible repin）：§三~§五——廉价复杂度闸（纯规则词标，
+  无 LLM Router）：simple→0 方向（完全跳过拆解 LLM）/focused→1/compound→2/
+  complex→3-4；四个专业拆解器（fact/cause/relation/validation）认知职责
+  分离、方向间并行（墙钟≈单次调用）、合并去重封顶 4；部分方向失败不降级
+  留痕。词标 pattern 禁 g 标志（/g 的 .test() lastIndex 状态致评估非纯函数，
+  实测踩坑）。§十一——扩展条件门控：simple 与 broad+focused 跳过改写扩展
+  （省一次 LLM，expansionSkipReason 留痕）。§二十二——Gap Analyzer 二轮
+  补证：高覆盖模式/零命中条件触发，≤3 条补证查询各自领家族，最多一轮，
+  secondPass*/gapQueries 留痕。§九——exclusions 词法约束（embedding 对否定
+  不可靠）：融合后词面剔除 + 过度匹配保护（>半数放弃过滤留痕）。§十六/§十二/
+  §十八明确不做（解码收益被宽容解析边际化/需别名基建/覆盖由 coverage run
+  承担）。验证：typecheck×3 绿 + eslint 0 error + 新增 12 用例 + knowledge
+  簇 283 用例 + full npm test 12834 passed / 0 failed 后推进。
 
 
 ## 最终状态：已合并（上游同步部分）
