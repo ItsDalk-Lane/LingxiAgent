@@ -372,8 +372,13 @@ describe("Knowledge 源文件 watch", () => {
 
     // 轮询检出 mtime/size 变化 → 走同一防抖窗口 → refresh。
     await vi.advanceTimersByTimeAsync(1);
-    await settleIo(); // 轮询 stat 是真实 I/O：先让它完成并建防抖计时器
-    await vi.advanceTimersByTimeAsync(DEBOUNCE_MS);
+    // 轮询 stat 是真实 I/O：慢 runner 上固定 20 轮未必够它完成并建出防抖
+    // 计时器；「settle → 推进防抖窗」多给几轮，晚建的计时器也有机会触发。
+    // 5×DEBOUNCE_MS 假时钟远不到下一个 300s 轮询点，不会引入第二次检出。
+    for (let i = 0; i < 5; i++) {
+      await settleIo();
+      await vi.advanceTimersByTimeAsync(DEBOUNCE_MS);
+    }
     await waitFor(
       () => sourceJobs(manager, studioId, notebook.id, imported.source.id).length === 2,
       "fallback poll detects the change",
@@ -412,8 +417,11 @@ describe("Knowledge 源文件 watch", () => {
     // 文件恢复（新内容）：兜底轮询检出 → 清除 unreachable → 自动刷新入队。
     fs.writeFileSync(filePath, "恢复后的内容，比之前更长一些。\n");
     await vi.advanceTimersByTimeAsync(POLL_INTERVAL_MS);
-    await settleIo(); // 轮询 stat 是真实 I/O：先让它完成并建防抖计时器
-    await vi.advanceTimersByTimeAsync(DEBOUNCE_MS);
+    // 同上：慢 runner 上 stat 可能晚于固定 20 轮完成，多给几轮防抖窗口。
+    for (let i = 0; i < 5; i++) {
+      await settleIo();
+      await vi.advanceTimersByTimeAsync(DEBOUNCE_MS);
+    }
     await waitFor(
       () => sourceJobs(manager, studioId, notebook.id, imported.source.id).length === 2,
       "refresh after file restored",
