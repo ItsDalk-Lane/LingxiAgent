@@ -10,7 +10,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = 563478a0269dd8cdd9f5661273432447842f85c1  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-08-30 同上 + build underscore 钉依赖修复 + Windows 测试关库修复)
+VERIFIED_SOURCE_SHA   = 2ffef293d199edda0c8836d9855f2a4780f6862c  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-08-30 同上 + build 钉依赖 + Windows 关库 + watch 测试时间泵三连修)
 工作分支              = feature/upstream-sync-0.447.4
 ```
 
@@ -492,6 +492,14 @@ seal 不是一次性终点，而是"当前被验证树"的游标；每次审计�
   fs.rmSync 删临时目录 EPERM（posix 允许删打开中文件故本地全绿）。对齐
   同文件关库纪律。验证：该文件 13/13 绿 + full npm test 12746 passed /
   0 failed 后推进。
+
+- **2026-08-30 knowledge-watch 测试抖动修复：等待补 fake 时间泵**
+  （功能树 2ffef293/seal 本提交；1 file / +23-2）：该文件 fake 计时器 +
+  refresh 链真实 fs I/O，轮询 stat 晚于固定 settleIo 完成时防抖计时器迟建，
+  原 waitFor 只泵真实事件循环致迟到计时器永不触发，CI ubuntu 实测超时
+  （run 1 同代码通过、本地 5/5 绿，负载抖动非回归）。waitFor 增加
+  fakeTimers 泵参数，防抖相关 7 处等待统一传 DEBOUNCE_MS。验证：该文件
+  5/5 绿 + typecheck×3 + full npm test 12746 passed / 0 failed 后推进。
 
 
 ## 最终状态：已合并（上游同步部分）
