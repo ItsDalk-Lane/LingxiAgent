@@ -10,7 +10,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = 57d716e5c3fc49573a8fba7765c78c6d49e86055  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-08-30 同上 + Windows 轮询测试真实时间预算修复)
+VERIFIED_SOURCE_SHA   = 01dfb168e94148af0aafc0bf965890c17543597f  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-08-30 同上 + 知识提问延迟三连修复（分片渲染开销计费/coverage 熔断/rerank 期限降级）+ engine 构造顺序修复)
 工作分支              = feature/upstream-sync-0.447.4
 ```
 
@@ -554,6 +554,26 @@ seal 不是一次性终点，而是"当前被验证树"的游标；每次审计�
   假时钟，600 轮 = 真实 ≥9s + 假时钟 150s 仍留轮询窗内；两处调用点挂调试
   转储。验证：该文件 6/6 绿 + typecheck×3 + full npm test 12778 passed /
   0 failed 后推进。
+
+- **2026-08-30 知识提问延迟三连修复 + engine 构造顺序修复**
+  （功能树 2d447aa4+01dfb168/seal 本提交；12 files / +452-22，含 persistence
+  指纹 compatible repin）：桌面 dev 实测一次知识提问 1 分钟以上，observability
+  逐调用记录定位三处结构性瓶颈——①分片装填只数正文不数渲染开销：行级小单元源
+  （XLSX/CSV 一行一 block）provenance 头（unitId sha256/snapshot/parseArtifact/
+  blockId/offsets）是正文 2–3 倍，300 单元挤一片渲染后 54k token（vs 16k 预算）
+  → MiniMax-M3 分片 19 调用 0 成功全灭于线性化超时；②必败场景无熔断：按
+  bounded retry + 30min run 上限最坏白烧半小时；③rerank 无期限：siliconflow
+  VL-Reranker 单次 11–56s 排队方差，检索尾巴固定 ~66s，且传输类失败直接
+  KNOWLEDGE_RETRIEVAL_UNAVAILABLE 炸掉整个检索。修复：planCoverageShards 成本
+  = 正文 + coverageUnitPromptOverheadTokens；executor 熔断（零成功 + 终态
+  failed ≥ COVERAGE_CIRCUIT_BREAK_FAILURES=4 提前取消剩余，新 reason code
+  KNOWLEDGE_COVERAGE_CIRCUIT_BREAK，任一成功即豁免）；rerank 15s 期限竞速
+  （KNOWLEDGE_RERANK_DEADLINE_MS）超时/传输失败降级保 RRF 名次 +
+  rerankDegradeReason 留痕（注入块行 + stats）。附带 engine _models 先于
+  _knowledge 构造（存量库迁移期闭包读 providerRegistry 崩溃循环，CI 新库
+  测不到）。验证：typecheck×3 绿 + eslint 0 error + 新增 8 用例 + knowledge
+  簇 282 用例 + full npm test 12785 passed / 0 failed（首轮 census 2 用例
+  并行负载抖动、复跑与隔离复跑均全绿）后推进。
 
 
 ## 最终状态：已合并（上游同步部分）
