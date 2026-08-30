@@ -364,5 +364,11 @@ export default defineConfig({
   },
   test: {
     root: path.resolve(__dirname),
+    // Windows runner 的文件句柄/时序抖动会让个别用例间歇翻红（2026-08-30：
+    // model-manager-auth-storage 在同代码下 main 挂 2 例、PR 矩阵挂 1 例、又全绿；
+    // knowledge-store EPERM 同族）。只对 win32 重试一次兜环境抖动，真实回归
+    // 重试后依然红；macOS/Linux 保持 0 不掩信号。与 ci.yml npm ci 步骤的
+    // nick-fields/retry 同一处置逻辑。
+    retry: process.platform === 'win32' ? 1 : 0,
   },
 });
