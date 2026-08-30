@@ -163,6 +163,21 @@ async function waitFor(condition: () => boolean, label: string, debug?: () => un
   throw new Error(`waitFor timeout: ${label}${detail}`);
 }
 
+/** 轮询检出路径专用：stat 与 refresh 链全是真实 I/O，所需事件循环轮次随机器
+ * 负载浮动——慢 runner 上 stat 晚于任何固定 settle 轮数完成时，其建出的防抖
+ * 计时器停在「未来的假时钟」，不推进就永不触发。把「settle → 推进防抖窗 →
+ * 查条件」合成循环直到条件满足；总推进上限 120×1.5s=180s，留在 300s 轮询
+ * 窗之内，不会引入第二次轮询检出。 */
+async function waitForWithClock(condition: () => boolean, label: string, debug?: () => unknown) {
+  for (let i = 0; i < 120; i++) {
+    await settleIo();
+    await vi.advanceTimersByTimeAsync(DEBOUNCE_MS);
+    if (condition()) return;
+  }
+  const detail = debug ? `\n${JSON.stringify(debug(), null, 2)}` : "";
+  throw new Error(`waitFor timeout: ${label}${detail}`);
+}
+
 describe("Knowledge 源文件 watch", () => {
   it("目录事件按文件名过滤并 1500ms 防抖：连续多次保存只刷新一次", async () => {
     const home = tempDir("lingxi-watch-home-");
@@ -372,14 +387,7 @@ describe("Knowledge 源文件 watch", () => {
 
     // 轮询检出 mtime/size 变化 → 走同一防抖窗口 → refresh。
     await vi.advanceTimersByTimeAsync(1);
-    // 轮询 stat 是真实 I/O：慢 runner 上固定 20 轮未必够它完成并建出防抖
-    // 计时器；「settle → 推进防抖窗」多给几轮，晚建的计时器也有机会触发。
-    // 5×DEBOUNCE_MS 假时钟远不到下一个 300s 轮询点，不会引入第二次检出。
-    for (let i = 0; i < 5; i++) {
-      await settleIo();
-      await vi.advanceTimersByTimeAsync(DEBOUNCE_MS);
-    }
-    await waitFor(
+    await waitForWithClock(
       () => sourceJobs(manager, studioId, notebook.id, imported.source.id).length === 2,
       "fallback poll detects the change",
     );
@@ -417,12 +425,7 @@ describe("Knowledge 源文件 watch", () => {
     // 文件恢复（新内容）：兜底轮询检出 → 清除 unreachable → 自动刷新入队。
     fs.writeFileSync(filePath, "恢复后的内容，比之前更长一些。\n");
     await vi.advanceTimersByTimeAsync(POLL_INTERVAL_MS);
-    // 同上：慢 runner 上 stat 可能晚于固定 20 轮完成，多给几轮防抖窗口。
-    for (let i = 0; i < 5; i++) {
-      await settleIo();
-      await vi.advanceTimersByTimeAsync(DEBOUNCE_MS);
-    }
-    await waitFor(
+    await waitForWithClock(
       () => sourceJobs(manager, studioId, notebook.id, imported.source.id).length === 2,
       "refresh after file restored",
     );
