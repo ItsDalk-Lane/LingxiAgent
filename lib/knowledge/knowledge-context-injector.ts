@@ -276,9 +276,219 @@ export type QuestionIntent = "factual" | "summarize" | "compare" | "list" | "rea
 
 const QUESTION_INTENTS = new Set<QuestionIntent>(["factual", "summarize", "compare", "list", "reasoning"]);
 
+// ── Adaptive Specialist Decomposition（P2，§三/§四/§五，2026-08-30）──
+
+/** 专业拆解方向（§四 最大能力集合，非固定执行集合）。 */
+export type DecomposeSpecialistKind = "fact" | "cause" | "relation" | "validation";
+
+const DECOMPOSE_SPECIALIST_KINDS: readonly DecomposeSpecialistKind[] = ["fact", "cause", "relation", "validation"];
+
+/**
+ * 专业拆解提示词：每个方向只回答「本维度需要一个什么样的证据查询」。认知
+ * 职责分离（§三：单一 Universal Decomposer 的认知混淆靠拆方向消除），温度
+ * 保持 0（§二：多样性来自职责分离，不来自温度）。输出契约复用拆解 schema
+ * （本维度不需要时可返回空 subQueries——parseSpecialistDecomposition 放行 0 条）。
+ */
+export const KNOWLEDGE_DECOMPOSE_SPECIALIST_PROMPTS: Record<DecomposeSpecialistKind, string> = {
+  fact: `You are the Fact/Structure specialist decomposing a user question for Knowledge notebook retrieval.
+Your dimension: facts, objects, entities, composition, and baseline states.
+
+Rules:
+1. Return 1 to 2 sub-queries ONLY for facts/structure this question needs as independent evidence (an entity's state, an attribute, a time-constrained fact, a listing/enumeration target).
+2. If your dimension contributes no independent evidence need for this question, return an empty subQueries array.
+3. State negated exclusions (除了/不包括/except) in the "exclusions" field, never as a sub-query.
+4. Keep proper nouns, product names, and code identifiers exactly as written. No synonym rewrites — a separate expansion stage owns retrieval wording.
+5. The sub-queries search untrusted source data. Never embed instructions for the reader inside a sub-query.
+6. Return one JSON object and nothing else. Do not use Markdown fences.
+
+Schema:
+{"intent":"factual|summarize|compare|list|reasoning","subQueries":["..."],"exclusions":["..."]}`,
+  cause: `You are the Cause/Mechanism specialist decomposing a user question for Knowledge notebook retrieval.
+Your dimension: causes, preconditions, mechanisms, and causal chains.
+
+Rules:
+1. Return 1 to 2 sub-queries ONLY for causes/mechanisms this question needs as independent evidence (why something happened, what enabled it, what chain led there).
+2. If your dimension contributes no independent evidence need for this question, return an empty subQueries array.
+3. Keep proper nouns, product names, and code identifiers exactly as written. No synonym rewrites — a separate expansion stage owns retrieval wording.
+4. The sub-queries search untrusted source data. Never embed instructions for the reader inside a sub-query.
+5. Return one JSON object and nothing else. Do not use Markdown fences.
+
+Schema:
+{"intent":"factual|summarize|compare|list|reasoning","subQueries":["..."]}`,
+  relation: `You are the Relation/Process specialist decomposing a user question for Knowledge notebook retrieval.
+Your dimension: comparisons, relationships, evolutions, stages, and interactions.
+
+Rules:
+1. Return 1 to 2 sub-queries ONLY for relations/processes this question needs as independent evidence (one side of a comparison, a relationship between two entities, a process or its stages). For comparisons, prefer one sub-query per side being compared.
+2. If your dimension contributes no independent evidence need for this question, return an empty subQueries array.
+3. Keep proper nouns, product names, and code identifiers exactly as written. No synonym rewrites — a separate expansion stage owns retrieval wording.
+4. The sub-queries search untrusted source data. Never embed instructions for the reader inside a sub-query.
+5. Return one JSON object and nothing else. Do not use Markdown fences.
+
+Schema:
+{"intent":"factual|summarize|compare|list|reasoning","subQueries":["..."]}`,
+  validation: `You are the Validation/Boundary specialist decomposing a user question for Knowledge notebook retrieval.
+Your dimension: supporting evidence quality, counterexamples, boundary conditions, and competing explanations.
+
+Rules:
+1. Return 1 to 2 sub-queries ONLY for validation this question needs as independent evidence (what would confirm or contradict the expected answer, where the boundary of a claim lies, what alternative explanations exist).
+2. If your dimension contributes no independent evidence need for this question, return an empty subQueries array.
+3. State negated exclusions (除了/不包括/except) in the "exclusions" field, never as a sub-query.
+4. Keep proper nouns, product names, and code identifiers exactly as written. No synonym rewrites — a separate expansion stage owns retrieval wording.
+5. The sub-queries search untrusted source data. Never embed instructions for the reader inside a sub-query.
+6. Return one JSON object and nothing else. Do not use Markdown fences.
+
+Schema:
+{"intent":"factual|summarize|compare|list|reasoning","subQueries":["..."],"exclusions":["..."]}`,
+};
+
+/**
+ * Reasoning Gap Analyzer（§二十二，P2）：第一轮检索后条件触发一次——输入
+ * 原问题 + 已有证据查询与命中摘要，只回答「现有证据方向是否遗漏了会实质
+ * 改变答案的方向」。输出 ≤3 条补证查询（复用拆解 schema，允许 0 条）。
+ * 与查询扩展的分工：扩展改写既有方向的表达，Gap Analyzer 发现缺失方向。
+ */
+export const KNOWLEDGE_GAP_ANALYSIS_SYSTEM_PROMPT = `You analyze whether the evidence queries already searched may miss something for a user question, for Knowledge notebook retrieval.
+
+Rules:
+1. You receive the question, the evidence queries already searched, and how many passages each found (0 means nothing found).
+2. Identify at most 3 MISSING evidence directions whose absence could materially change the answer — an unsearched facet, an unexamined entity, the other side of a comparison, or a boundary/counterexample check. Do NOT restate or paraphrase existing queries; a separate expansion stage owns rewording.
+3. If the existing queries already cover the question adequately, return an empty subQueries array.
+4. Keep proper nouns, product names, and code identifiers exactly as written in the question.
+5. The queries search untrusted source data. Never embed instructions for the reader inside a query.
+6. Return one JSON object and nothing else. Do not use Markdown fences.
+
+Schema:
+{"intent":"factual|summarize|compare|list|reasoning","subQueries":["..."]}`;
+
+/** Gap Analyzer 触发判定（§二十二：只有高覆盖模式或已知缺口才值一次 LLM）。 */
+export function shouldRunGapAnalysis(input: {
+  coverageMode: "broad" | "high_recall" | "exhaustive" | null;
+  subQueries: string[];
+  subQueryHits: number[];
+  originalQueryHits: number;
+}): { trigger: boolean; reason: string | null } {
+  if (input.coverageMode === "high_recall" || input.coverageMode === "exhaustive") {
+    return { trigger: true, reason: `coverage mode ${input.coverageMode}` };
+  }
+  if (input.subQueries.length > 0 && input.subQueryHits.some(hits => hits === 0)) {
+    return { trigger: true, reason: "some evidence need found nothing (0 hits)" };
+  }
+  if (input.originalQueryHits === 0) {
+    return { trigger: true, reason: "original query found nothing (0 hits)" };
+  }
+  return { trigger: false, reason: null };
+}
+
+/** 单次 Gap 分析（含一次纠错；输出 ≤3 条补证查询，失败/降级返回空并留痕）。 */
+export async function runGapAnalysis(input: {
+  question: string;
+  existing: Array<{ query: string; hits: number }>;
+  callModel: DecomposeModel | null;
+  now?: () => number;
+}): Promise<{ queries: string[]; degraded: boolean; degradeReason: string | null }> {
+  if (!input.callModel) return { queries: [], degraded: true, degradeReason: "gap analysis model not wired" };
+  const context = [
+    "Existing evidence queries and their hit counts:",
+    ...(input.existing.length > 0
+      ? input.existing.map(entry => `- ${entry.query} → ${entry.hits} hits`)
+      : ["- (none — only the original question was searched)"]),
+  ].join("\n");
+  let firstError = "";
+  let firstOutput = "";
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    let raw: string;
+    try {
+      raw = await input.callModel(attempt === 0
+        ? { question: input.question, specialist: "gap", context }
+        : {
+          question: input.question,
+          specialist: "gap",
+          context,
+          correction: { error: firstError, previousOutput: firstOutput },
+        });
+    } catch (error) {
+      return { queries: [], degraded: true, degradeReason: `gap analysis call failed: ${describeError(error)}` };
+    }
+    try {
+      const parsed = parseQuestionDecomposition(raw, { allowEmptySubQueries: true });
+      // 与既有查询（原问题 + 子查询 + 扩展）等值的补证直接丢弃；总量 ≤3。
+      const seen = new Set(input.existing.map(entry => entry.query.trim()));
+      const queries: string[] = [];
+      for (const subQuery of parsed.subQueries) {
+        if (seen.has(subQuery)) continue;
+        seen.add(subQuery);
+        queries.push(subQuery);
+      }
+      return { queries: queries.slice(0, 3), degraded: false, degradeReason: null };
+    } catch (error) {
+      if (attempt === 0) {
+        firstError = describeError(error);
+        firstOutput = raw.slice(0, 2000);
+        continue;
+      }
+      return { queries: [], degraded: true, degradeReason: `gap analysis output invalid: ${firstError}` };
+    }
+  }
+  return { queries: [], degraded: true, degradeReason: "gap analysis output invalid" };
+}
+
+/** 问题复杂度档位（§四：Simple→0 / Focused→1 / Compound→2 / Complex→3~4 个证据需求）。 */
+export type QuestionComplexity = "simple" | "focused" | "compound" | "complex";
+
+// 注意：词标 pattern 一律不带 g 标志——/g 的 .test() 有 lastIndex 状态，
+// 同一 pattern 对象跨调用会漂移结果（评估必须纯函数）。
+const COMPLEXITY_MARKER_DIMENSIONS: ReadonlyArray<{ pattern: RegExp; dimension: DecomposeSpecialistKind }> = [
+  { pattern: /为什么|为何|缘故|原因|导致|机制|怎么会|因果|why\b|cause/i, dimension: "cause" },
+  { pattern: /比较|区别|相比|差异|对比|哪个更|哪一个更|vs\.?|和.{1,12}(一样|相同|不同)|compare|difference/i, dimension: "relation" },
+  { pattern: /关系|演变|过程|阶段|流程|之间|相互作用|先后|relationship|process|stages/i, dimension: "relation" },
+  { pattern: /列出|全部|所有|分别|哪些|各有哪些|各自|list all|every\b/i, dimension: "fact" },
+  { pattern: /除了|不包括|排除|不含|except|besides|excluding/i, dimension: "validation" },
+];
+const COMPLEXITY_LOOKUP_PATTERN = /谁|什么|何时|哪年|哪一年|多少|几岁|在哪里|是谁|what\b|who\b|when\b|how many|how much|where\b/i;
+const COMPLEXITY_CONNECTIVE_PATTERN = /、|和|与|及|并且|同时|以及|还是|还是说|以及是否|\band\b|\bor\b/gi;
+
+/**
+ * 廉价复杂度闸（§五：不加 LLM Router——规则 + 词标判定）。simple 判定刻意
+ * 保守：必须同时满足「查表式问句 + 无任何维度词标 + 短文本 + 无并列连接」，
+ * 疑难归 focused（宁可多一次拆解，不误跳过）。dimensions 按词标命中去重，
+ * 不足档位数时按 fact → cause → relation → validation 顺序补齐。
+ */
+export function assessQuestionComplexity(question: string): {
+  level: QuestionComplexity;
+  dimensions: DecomposeSpecialistKind[];
+} {
+  const text = question.trim();
+  const dimensions: DecomposeSpecialistKind[] = [];
+  for (const { pattern, dimension } of COMPLEXITY_MARKER_DIMENSIONS) {
+    if (pattern.test(text) && !dimensions.includes(dimension)) dimensions.push(dimension);
+  }
+  const connectives = (text.match(COMPLEXITY_CONNECTIVE_PATTERN) ?? []).length;
+  const multiClause = /[；;。]|.{8,}？.{8,}[？?]/.test(text);
+  const lookupShaped = COMPLEXITY_LOOKUP_PATTERN.test(text);
+  if (dimensions.length === 0 && connectives === 0 && !multiClause && lookupShaped
+    && text.length <= 40 && text.split(/\s+/).length <= 12) {
+    return { level: "simple", dimensions: [] };
+  }
+  const level: QuestionComplexity = dimensions.length >= 3 || (dimensions.length >= 2 && (connectives >= 2 || multiClause))
+    ? "complex"
+    : dimensions.length === 2
+      ? "compound"
+      : "focused";
+  const targetCount = level === "complex" ? Math.min(4, Math.max(3, dimensions.length)) : dimensions.length || 1;
+  const selected = [...dimensions];
+  for (const kind of DECOMPOSE_SPECIALIST_KINDS) {
+    if (selected.length >= targetCount) break;
+    if (!selected.includes(kind)) selected.push(kind);
+  }
+  return { level, dimensions: selected.slice(0, 4) };
+}
+
 export interface QuestionDecomposition {
   intent: QuestionIntent;
   subQueries: string[];
+  /** 否定排除条件（§九，P2）：词法约束而非检索查询；缺省空。 */
+  exclusions: string[];
 }
 
 export type DecomposeDegradeReason =
@@ -287,7 +497,7 @@ export type DecomposeDegradeReason =
   | "model call failed";
 
 export interface DecomposeResult {
-  /** 降级时为 [原问题] 单查询。 */
+  /** 降级时为 [原问题] 单查询；simple 档为 []（零拆解，直检即全部）。 */
   subQueries: string[];
   intent: QuestionIntent | null;
   degraded: boolean;
@@ -297,12 +507,25 @@ export interface DecomposeResult {
   latencyMs: number;
   /** 模型调用次数（1=首跑采纳，2=经一次纠错；降级路径如实）。 */
   attempts: number;
+  /** 否定排除条件（§九，P2）：词法约束（融合后过滤），缺省空。 */
+  exclusions: string[];
+  /** 复杂度档位与实际执行的专业方向（P2 §四/§五；adaptive 入口填充）。 */
+  complexity: QuestionComplexity | null;
+  specialists: DecomposeSpecialistKind[];
+  /** 部分专业方向失败的留痕（有成功方向时不构成降级；禁静默）。 */
+  specialistFailures: string[];
 }
 
-/** 拆解模型调用（callText 封装）。correction 非空表示纠错重试：附上次的错误与原始输出。 */
+/**
+ * 拆解模型调用（callText 封装）。correction 非空表示纠错重试：附上次的错误与
+ * 原始输出。specialist 非 null 表示专业拆解方向（P2：engine 据此选择对应
+ * 系统提示词）；context 是 Gap Analyzer 的补充上下文（已有查询 + 命中摘要）。
+ */
 export type DecomposeModel = (input: {
   question: string;
   correction?: { error: string; previousOutput: string };
+  specialist?: DecomposeSpecialistKind | "gap" | null;
+  context?: string | null;
 }) => Promise<string>;
 
 /** 受控查询扩展模型调用（§三十五）：与拆解模型同一槽位、独立系统提示词。 */
@@ -470,7 +693,10 @@ export async function expandQueries(input: {
   };
 }
 
-function requiredDecomposition(value: unknown): QuestionDecomposition {
+function requiredDecomposition(
+  value: unknown,
+  options?: { allowEmptySubQueries?: boolean },
+): QuestionDecomposition {
   if (!value || typeof value !== "object" || Array.isArray(value)) {
     throw new KnowledgeError("KNOWLEDGE_MODEL_OUTPUT_INVALID", "Decomposition output must be an object");
   }
@@ -484,10 +710,12 @@ function requiredDecomposition(value: unknown): QuestionDecomposition {
   if (typeof record.intent !== "string" || !QUESTION_INTENTS.has(record.intent as QuestionIntent)) {
     throw new KnowledgeError("KNOWLEDGE_MODEL_OUTPUT_INVALID", "Decomposition intent is invalid");
   }
-  if (!Array.isArray(record.subQueries) || record.subQueries.length < 1 || record.subQueries.length > DECOMPOSE_SUBQUERY_MAX) {
+  const allowEmpty = options?.allowEmptySubQueries ?? false;
+  if (!Array.isArray(record.subQueries) || record.subQueries.length > DECOMPOSE_SUBQUERY_MAX
+    || (!allowEmpty && record.subQueries.length < 1)) {
     throw new KnowledgeError(
       "KNOWLEDGE_MODEL_OUTPUT_INVALID",
-      `Decomposition must contain 1 to ${DECOMPOSE_SUBQUERY_MAX} sub-queries`,
+      `Decomposition must contain ${allowEmpty ? "0 to" : "1 to"} ${DECOMPOSE_SUBQUERY_MAX} sub-queries`,
     );
   }
   const seen = new Set<string>();
@@ -507,10 +735,31 @@ function requiredDecomposition(value: unknown): QuestionDecomposition {
     seen.add(trimmed);
     subQueries.push(trimmed);
   }
-  if (subQueries.length === 0) {
+  if (subQueries.length === 0 && !allowEmpty) {
     throw new KnowledgeError("KNOWLEDGE_MODEL_OUTPUT_INVALID", "Decomposition produced no usable sub-queries");
   }
-  return { intent: record.intent as QuestionIntent, subQueries };
+  // 否定排除条件（§九，P2）：可选白名单字段——词法约束，≤4 条、每条 ≤100
+  // 字符、trimmed 去重；非法形状整体拒绝（宁可少一条约束也不静默吞错）。
+  const exclusions: string[] = [];
+  if (record.exclusions != null) {
+    if (!Array.isArray(record.exclusions) || record.exclusions.length > 4) {
+      throw new KnowledgeError("KNOWLEDGE_MODEL_OUTPUT_INVALID", "Decomposition exclusions must be an array of at most 4 strings");
+    }
+    const seenExclusions = new Set<string>();
+    for (const raw of record.exclusions) {
+      if (typeof raw !== "string") {
+        throw new KnowledgeError("KNOWLEDGE_MODEL_OUTPUT_INVALID", "Decomposition exclusion must be a string");
+      }
+      const trimmed = raw.trim();
+      if (!trimmed || trimmed.length > 100) {
+        throw new KnowledgeError("KNOWLEDGE_MODEL_OUTPUT_INVALID", "Decomposition exclusion must be non-empty and at most 100 characters");
+      }
+      if (seenExclusions.has(trimmed)) continue;
+      seenExclusions.add(trimmed);
+      exclusions.push(trimmed);
+    }
+  }
+  return { intent: record.intent as QuestionIntent, subQueries, exclusions };
 }
 
 /**
@@ -529,7 +778,10 @@ export function stripModelOutputFences(raw: string): string {
  * 解析并严格校验拆解输出（requiredObject 风格）：纯 JSON、精确字段、
  * intent 枚举、子查询 1-4 条非空且不超长。任何不符抛 KNOWLEDGE_MODEL_OUTPUT_INVALID。
  */
-export function parseQuestionDecomposition(raw: string): QuestionDecomposition {
+export function parseQuestionDecomposition(
+  raw: string,
+  options?: { allowEmptySubQueries?: boolean },
+): QuestionDecomposition {
   if (typeof raw !== "string" || !raw.trim() || raw.length > DECOMPOSE_OUTPUT_MAX_CHARS) {
     throw new KnowledgeError("KNOWLEDGE_MODEL_OUTPUT_INVALID", "Decomposition model output is empty or too large");
   }
@@ -539,7 +791,7 @@ export function parseQuestionDecomposition(raw: string): QuestionDecomposition {
   } catch {
     throw new KnowledgeError("KNOWLEDGE_MODEL_OUTPUT_INVALID", "Decomposition model output is not valid JSON");
   }
-  return requiredDecomposition(parsed);
+  return requiredDecomposition(parsed, options);
 }
 
 function degrade(
@@ -547,6 +799,7 @@ function degrade(
   reason: DecomposeDegradeReason,
   detail: string | null,
   telemetry: { latencyMs: number; attempts: number },
+  extras?: Partial<Pick<DecomposeResult, "complexity" | "specialists" | "specialistFailures">>,
 ): DecomposeResult {
   return {
     subQueries: [question],
@@ -554,7 +807,12 @@ function degrade(
     degraded: true,
     degradeReason: reason,
     degradeDetail: detail,
+    exclusions: [],
+    complexity: null,
+    specialists: [],
+    specialistFailures: [],
     ...telemetry,
+    ...extras,
   };
 }
 
@@ -573,10 +831,13 @@ export async function decomposeQuestion(input: {
   question: string;
   callModel: DecomposeModel | null;
   now?: () => number;
+  /** 专业方向（P2）：透传给闭包选提示词；specialist 模式允许 0 条子查询。 */
+  specialist?: DecomposeSpecialistKind | null;
 }): Promise<DecomposeResult> {
   const question = input.question.trim();
   const now = input.now ?? (() => Date.now());
   const startedAt = now();
+  const allowEmpty = input.specialist != null;
   if (!input.callModel) {
     return degrade(question, "knowledge model slot not configured", null, { latencyMs: 0, attempts: 0 });
   }
@@ -586,8 +847,12 @@ export async function decomposeQuestion(input: {
     let raw: string;
     try {
       raw = await input.callModel(attempt === 0
-        ? { question }
-        : { question, correction: { error: firstError, previousOutput: firstOutput } });
+        ? { question, ...(input.specialist ? { specialist: input.specialist } : {}) }
+        : {
+          question,
+          correction: { error: firstError, previousOutput: firstOutput },
+          ...(input.specialist ? { specialist: input.specialist } : {}),
+        });
     } catch (error) {
       return degrade(question, "model call failed", describeError(error), {
         latencyMs: now() - startedAt,
@@ -595,7 +860,7 @@ export async function decomposeQuestion(input: {
       });
     }
     try {
-      const parsed = parseQuestionDecomposition(raw);
+      const parsed = parseQuestionDecomposition(raw, { allowEmptySubQueries: allowEmpty });
       return {
         subQueries: parsed.subQueries,
         intent: parsed.intent,
@@ -604,6 +869,10 @@ export async function decomposeQuestion(input: {
         degradeDetail: null,
         latencyMs: now() - startedAt,
         attempts: attempt + 1,
+        exclusions: parsed.exclusions,
+        complexity: null,
+        specialists: input.specialist ? [input.specialist] : [],
+        specialistFailures: [],
       };
     } catch (error) {
       if (attempt === 0) {
@@ -624,6 +893,97 @@ export async function decomposeQuestion(input: {
   });
 }
 
+/**
+ * Adaptive Specialist Decomposition（P2，§三/§四/§五）：规则复杂度闸（零 LLM）
+ * 决定 0/1/2/3-4 个专业方向，方向间并行（墙钟 ≈ 单次调用），各自只回答本维度
+ * 的证据需求；按 fact → cause → relation → validation 序合并去重、总量 ≤4。
+ * simple 档完全跳过拆解 LLM（直检即全部，§四 Simple→0）。任一方向成功即不
+ * 降级（部分失败留痕）；全部失败/未配槽位才降级为原问题单查询。
+ */
+export async function decomposeQuestionAdaptive(input: {
+  question: string;
+  callModel: DecomposeModel | null;
+  now?: () => number;
+}): Promise<DecomposeResult> {
+  const question = input.question.trim();
+  const now = input.now ?? (() => Date.now());
+  const startedAt = now();
+  if (!input.callModel) {
+    return degrade(question, "knowledge model slot not configured", null, { latencyMs: 0, attempts: 0 });
+  }
+  const { level, dimensions } = assessQuestionComplexity(question);
+  if (level === "simple") {
+    return {
+      subQueries: [],
+      intent: null,
+      degraded: false,
+      degradeReason: null,
+      degradeDetail: null,
+      latencyMs: 0,
+      attempts: 0,
+      exclusions: [],
+      complexity: level,
+      specialists: [],
+      specialistFailures: [],
+    };
+  }
+  const settled = await Promise.allSettled(
+    dimensions.map(dimension => decomposeQuestion({
+      question: input.question,
+      callModel: input.callModel,
+      ...(input.now ? { now: input.now } : {}),
+      specialist: dimension,
+    })),
+  );
+  const mergedSubQueries: string[] = [];
+  const mergedExclusions: string[] = [];
+  const specialistFailures: string[] = [];
+  const succeededKinds: DecomposeSpecialistKind[] = [];
+  let attemptsTotal = 0;
+  settled.forEach((outcome, index) => {
+    const dimension = dimensions[index];
+    if (outcome.status === "fulfilled" && !outcome.value.degraded) {
+      succeededKinds.push(dimension);
+      attemptsTotal += outcome.value.attempts;
+      for (const subQuery of outcome.value.subQueries) {
+        if (!mergedSubQueries.includes(subQuery)) mergedSubQueries.push(subQuery);
+      }
+      for (const exclusion of outcome.value.exclusions) {
+        if (!mergedExclusions.includes(exclusion)) mergedExclusions.push(exclusion);
+      }
+    } else {
+      const reason = outcome.status === "rejected"
+        ? describeError(outcome.reason)
+        : (outcome.value.degradeReason ?? "unknown");
+      specialistFailures.push(`${dimension}: ${reason}`);
+    }
+  });
+  if (succeededKinds.length === 0) {
+    // 全部方向失败：与单路拆解同语义降级（原问题单查询 + 留痕）。
+    return degrade(
+      question,
+      "model call failed",
+      specialistFailures.join("; ") || null,
+      { latencyMs: now() - startedAt, attempts: attemptsTotal },
+      { complexity: level, specialists: dimensions, specialistFailures },
+    );
+  }
+  // 总量封顶 4（§四 复杂档 3~4 个证据需求）：按方向序截断。
+  return {
+    subQueries: mergedSubQueries.slice(0, DECOMPOSE_SUBQUERY_MAX),
+    intent: null,
+    degraded: false,
+    degradeReason: null,
+    degradeDetail: null,
+    latencyMs: now() - startedAt,
+    attempts: attemptsTotal,
+    exclusions: mergedExclusions,
+    complexity: level,
+    specialists: succeededKinds,
+    specialistFailures,
+  };
+}
+
 export interface KnowledgeInjectorDeps {
   /** 拆解模型调用；null = knowledge 槽位未配置（单查询 + 显式标注）。 */
   decomposeModel: DecomposeModel | null;
@@ -632,6 +992,11 @@ export interface KnowledgeInjectorDeps {
    * （不扩展，stats 留 expansionDegradedReason）。
    */
   expandModel?: QueryExpansionModel | null;
+  /**
+   * Gap Analyzer 模型调用（§二十二，P2；与拆解同一 knowledge 槽位、独立系统
+   * 提示词）。null/缺省 = 二轮补证面未接线（不触发，无留痕负担）。
+   */
+  gapAnalysisModel?: DecomposeModel | null;
   /**
    * 分段提炼模型调用；null = knowledgeDistill 槽位未配置（超预算退回
    * "部分块 + 分片清单 + 子 Agent 指引"降级路径并留痕）。
@@ -760,6 +1125,38 @@ export function fuseQueryFamilies(
       ? []
       : rrfFuseRankings(family.map(result => result.candidates), Number.MAX_SAFE_INTEGER)));
   return rrfFuseRankings(familyRankings, cap);
+}
+
+/**
+ * 否定排除过滤（§九，P2）：排除条件是词法约束而非检索查询——embedding 对
+ * 否定的表达不可靠，「除了 X」写成查询只会召回 X 本身。融合后按词面剔除
+ * 含排除词的块。过度匹配保护：剔除超过半数（且池子 >4）时疑似词面撞车
+ * （排除词恰好是高频词），放弃过滤保序返回并留痕，宁可多给证据不误删。
+ */
+export function applyNegationExclusions(input: {
+  chunks: ReadonlyArray<NotebookRetrievalChunk>;
+  exclusions: ReadonlyArray<string>;
+}): { kept: NotebookRetrievalChunk[]; droppedCount: number; skipped: boolean } {
+  const terms = input.exclusions
+    .map(term => term.trim().toLowerCase())
+    .filter(term => term.length >= 2);
+  if (terms.length === 0 || input.chunks.length === 0) {
+    return { kept: [...input.chunks], droppedCount: 0, skipped: false };
+  }
+  const kept: NotebookRetrievalChunk[] = [];
+  let droppedCount = 0;
+  for (const chunk of input.chunks) {
+    const text = chunk.text.toLowerCase();
+    if (terms.some(term => text.includes(term))) {
+      droppedCount += 1;
+      continue;
+    }
+    kept.push(chunk);
+  }
+  if (input.chunks.length > 4 && droppedCount > input.chunks.length / 2) {
+    return { kept: [...input.chunks], droppedCount: 0, skipped: true };
+  }
+  return { kept, droppedCount, skipped: false };
 }
 
 /** flat 检索结果按家族 id 归组（家族序 = id 升序；缺省 id 归 0 族）。 */
@@ -967,6 +1364,18 @@ export interface KnowledgeExecutionStats {
   coverageReasonCode?: string;
   /** Phase 10 层级归约统计（契约见 KnowledgeRetrievalStats.coverageReduction）。 */
   coverageReduction?: KnowledgeRetrievalStats["coverageReduction"];
+  /** ── P2 拆解优化统计（2026-08-30，§四/§十一/§九/§二十二；契约见 KnowledgeRetrievalStats）── */
+  decompositionComplexity?: "simple" | "focused" | "compound" | "complex";
+  decompositionSpecialists?: string[];
+  decompositionSpecialistFailures?: string[];
+  expansionSkipReason?: string;
+  negationExclusions?: string[];
+  negationDroppedChunks?: number;
+  negationFilterSkipped?: boolean;
+  secondPassTriggered?: boolean;
+  secondPassReason?: string;
+  gapQueries?: string[];
+  gapQueryHits?: number[];
 }
 
 /** broad 档结构缺口探测产物（§三十八/§三十九）。 */
@@ -2069,7 +2478,9 @@ export async function buildKnowledgeContextInjection(input: {
   const directPromise = (async () => input.deps.retrieve({ query: questionTrimmed }))();
   // 覆盖计划先行落定（planner 与直检并行；先于拆解——档位决定执行分派）。
   const coveragePlan = input.coveragePlan != null ? await input.coveragePlan : null;
-  const decomposition = await decomposeQuestion({
+  // Adaptive Specialist（P2 §四/§五）：规则复杂度闸 → 0/1/2/3-4 个专业方向
+  // 并行拆解（墙钟 ≈ 单次调用）；simple 档零 LLM 直检即全部。
+  const decomposition = await decomposeQuestionAdaptive({
     question: input.question,
     callModel: input.deps.decomposeModel,
   });
@@ -2096,11 +2507,22 @@ export async function buildKnowledgeContextInjection(input: {
   // 就同时发 (a) 子查询检索批 (b) 扩展 LLM 调用；扩展返回后其查询立即补一批
   // 检索。消除「拆解 → 扩展 → 检索」中扩展那次串行 LLM 往返（典型 1-2s、
   // 最坏 15s）。拆解降级（单查询路径已复用直检）不扩展并留痕。
+  // 扩展条件门控（§十一 Conditional LLM，P2）：simple 档（单查表问题）与
+  // broad+focused（单方向浅问题）不做改写扩展——直检 + BM25/向量双通道已覆盖
+  // 表达差异，跳过省一次 LLM 调用并显式留痕；compound/complex 或
+  // high_recall/exhaustive 档照常（多方向/高覆盖值得转述召回）。
+  const expansionSkipReason = decomposition.degraded
+    ? null
+    : decomposition.complexity === "simple"
+      ? "simple lookup question — direct retrieval only"
+      : coveragePlan?.coverageMode === "broad" && decomposition.complexity === "focused"
+        ? "broad shallow question — single evidence direction"
+        : null;
   const expansionOutcomePromise: Promise<{
     expansion: Awaited<ReturnType<typeof expandQueries>> | null;
     settled: PromiseSettledResult<RetrieveForNotebooksResult>[];
   }> = (async () => {
-    if (decomposition.degraded) {
+    if (decomposition.degraded || expansionSkipReason != null) {
       return { expansion: null, settled: [] };
     }
     const expansion = await expandQueries({
@@ -2211,6 +2633,61 @@ export async function buildKnowledgeContextInjection(input: {
     executionMode = "high_recall";
   }
   const coverageNotes: string[] = [];
+  // ── Gap Analyzer 二轮补证（§二十二，P2）：条件触发一次（高覆盖模式或已知
+  // 缺口），≤3 条补证查询补一波检索，各自领新家族号；最多一轮，禁静默留痕。 ──
+  let gapQueries: string[] = [];
+  let gapQueryHits: number[] = [];
+  let secondPassTriggered = false;
+  let secondPassReason: string | null = null;
+  const gapAnalysisModel = input.deps.gapAnalysisModel ?? null;
+  if (gapAnalysisModel != null) {
+    const gapGate = shouldRunGapAnalysis({
+      coverageMode: coveragePlan?.coverageMode ?? "high_recall",
+      subQueries: decomposition.subQueries,
+      subQueryHits,
+      originalQueryHits: directValue ? directValue.candidates.length : 0,
+    });
+    if (gapGate.trigger) {
+      const gapOutcome = await runGapAnalysis({
+        question: input.question,
+        existing: [
+          ...(directValue
+            ? [{ query: questionTrimmed, hits: directValue.candidates.length }]
+            : []),
+          ...decomposition.subQueries.map((query, index) => ({ query, hits: subQueryHits[index] ?? 0 })),
+          ...expansionQueries.map((query, index) => ({ query, hits: expandedQueryHits[index] ?? 0 })),
+        ],
+        callModel: gapAnalysisModel,
+      });
+      if (gapOutcome.degraded && gapOutcome.degradeReason) {
+        coverageNotes.push(`[gap analysis unavailable: ${gapOutcome.degradeReason}]`);
+      }
+      if (gapOutcome.queries.length > 0) {
+        secondPassTriggered = true;
+        secondPassReason = gapGate.reason;
+        gapQueries = gapOutcome.queries;
+        const gapSettled = await Promise.allSettled(
+          gapQueries.map(query => input.deps.retrieve({ query, topK: perQueryTopK })),
+        );
+        gapSettled.forEach((outcome) => {
+          const familyId = nextFamilyId;
+          nextFamilyId += 1;
+          if (outcome.status === "fulfilled") {
+            retrievalResults.push(outcome.value);
+            resultFamilyIds.push(familyId);
+            gapQueryHits.push(outcome.value.candidates.length);
+          } else {
+            retrievalFailures.push(describeError(outcome.reason));
+            gapQueryHits.push(0);
+          }
+        });
+        coverageNotes.push(
+          `[gap analysis second pass: ${gapQueries.length} supplemental evidence quer${gapQueries.length === 1 ? "y" : "ies"} (${gapGate.reason})]`,
+        );
+      }
+    }
+  }
+
   // 扩展留痕：成功列出采纳的扩展查询；不可用/失败显式标注（禁静默降级）。
   const expansionAnnotation = expansion == null
     ? []
@@ -2315,6 +2792,24 @@ export async function buildKnowledgeContextInjection(input: {
     candidates: finalResults.flatMap(result => result.candidates),
   });
   let fused = fuseQueryFamilies(groupFamiliesById(finalResults, finalFamilyIds), fusionPoolBudget);
+  // 否定排除（§九，P2）：词法约束在融合后生效（锚点之前），过度匹配保护。
+  let negationDroppedChunks = 0;
+  let negationFilterSkipped = false;
+  if (decomposition.exclusions.length > 0) {
+    const filtered = applyNegationExclusions({ chunks: fused, exclusions: decomposition.exclusions });
+    fused = filtered.kept;
+    negationDroppedChunks = filtered.droppedCount;
+    negationFilterSkipped = filtered.skipped;
+    if (filtered.droppedCount > 0) {
+      coverageNotes.push(
+        `[negation exclusion: dropped ${filtered.droppedCount} chunks matching excluded terms]`,
+      );
+    } else if (filtered.skipped) {
+      coverageNotes.push(
+        "[negation exclusion skipped: excluded terms match more than half the pool — suspected lexical collision]",
+      );
+    }
+  }
   // 锚点上限随注入预算伸缩（大上下文模型多带证据，小模型维持既有 40 兜底）。
   let anchorBudget = resolveEvidenceAnchorBudget({ budgetTokens, fused });
   let anchors = fused.slice(0, anchorBudget);
@@ -2361,6 +2856,12 @@ export async function buildKnowledgeContextInjection(input: {
       // 降格补跑的结构探测改变了融合池：footprint 按探测后结果重算
       // （与正常 broad 路径同口径，§四十一 升级判断也用重算后的值）。
       fused = fuseQueryFamilies(groupFamiliesById(finalResults, finalFamilyIds), fusionPoolBudget);
+      if (decomposition.exclusions.length > 0) {
+        const refiltered = applyNegationExclusions({ chunks: fused, exclusions: decomposition.exclusions });
+        fused = refiltered.kept;
+        negationDroppedChunks = refiltered.droppedCount;
+        negationFilterSkipped = refiltered.skipped;
+      }
       anchorBudget = resolveEvidenceAnchorBudget({ budgetTokens, fused });
       anchors = fused.slice(0, anchorBudget);
       candidateChunkCount = finalResults.reduce((sum, result) => sum + result.candidates.length, 0);
@@ -2443,6 +2944,30 @@ export async function buildKnowledgeContextInjection(input: {
       ? { chunkRecallFootprint: roundFootprint(footprint.chunkRecallFootprint) }
       : {}),
     ...coverageStatsExtra,
+    // ── P2 拆解优化统计（§四/§十一/§九/§二十二）──
+    ...(decomposition.complexity != null
+      ? { decompositionComplexity: decomposition.complexity }
+      : {}),
+    ...(decomposition.specialists.length > 0
+      ? { decompositionSpecialists: [...decomposition.specialists] }
+      : {}),
+    ...(decomposition.specialistFailures.length > 0
+      ? { decompositionSpecialistFailures: [...decomposition.specialistFailures] }
+      : {}),
+    ...(expansionSkipReason != null ? { expansionSkipReason } : {}),
+    ...(decomposition.exclusions.length > 0
+      ? { negationExclusions: [...decomposition.exclusions] }
+      : {}),
+    ...(negationDroppedChunks > 0 ? { negationDroppedChunks } : {}),
+    ...(negationFilterSkipped ? { negationFilterSkipped: true } : {}),
+    ...(secondPassTriggered
+      ? {
+        secondPassTriggered: true,
+        ...(secondPassReason != null ? { secondPassReason } : {}),
+        gapQueries: [...gapQueries],
+        gapQueryHits: [...gapQueryHits],
+      }
+      : {}),
   };
   const notes = [...coverageNotes, ...expansionAnnotation];
 

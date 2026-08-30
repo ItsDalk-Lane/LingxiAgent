@@ -15,6 +15,10 @@ import {
   fuseSubQueryResults,
   knowledgeModeGuidance,
   KNOWLEDGE_DECOMPOSE_SYSTEM_PROMPT,
+  assessQuestionComplexity,
+  decomposeQuestionAdaptive,
+  shouldRunGapAnalysis,
+  applyNegationExclusions,
   fuseQueryFamilies,
   groupFamiliesById,
   parseQuestionDecomposition,
@@ -1134,5 +1138,291 @@ describe("候选总预算分摊（§二十一）与扩展并行（§二十三 �
     expect(stats.evidenceNeedGains).toEqual([2, 1]);
     expect(stats.decompositionLatencyMs).toBeDefined();
     expect(stats.decompositionRetryCount).toBe(0);
+  });
+});
+
+// ─────────────── P2：Adaptive Specialist / 扩展门控 / Gap Analyzer / 否定排除 ───────────────
+
+describe("assessQuestionComplexity（廉价复杂度闸，§五）", () => {
+  it("simple：查表式短问 + 零维度词标 → 0 个专业方向（零拆解 LLM）", () => {
+    expect(assessQuestionComplexity("这本书的作者是谁？")).toEqual({ level: "simple", dimensions: [] });
+    expect(assessQuestionComplexity("项目哪一年启动的")).toEqual({ level: "simple", dimensions: [] });
+  });
+  it("focused：单一维度词标 → 1 个对应方向", () => {
+    const focused = assessQuestionComplexity("秦统一六国的原因是什么");
+    expect(focused.level).toBe("focused");
+    expect(focused.dimensions).toEqual(["cause"]);
+    // 无词标但非查表形状 → focused + fact 兜底（宁可多拆不误跳）。
+    const fallback = assessQuestionComplexity("整理一下这套系统的运转情况");
+    expect(fallback.level).toBe("focused");
+    expect(fallback.dimensions).toEqual(["fact"]);
+  });
+  it("compound：两个维度 → 2 个方向；complex：≥3 维度或维度+并列 → 3-4 个方向", () => {
+    const compound = assessQuestionComplexity("秦统一六国的原因和六国各自的弱点是什么");
+    expect(compound.level).toBe("compound");
+    expect(new Set(compound.dimensions)).toEqual(new Set(["cause", "fact"]));
+    const complex = assessQuestionComplexity("为什么秦能统一六国，相比六国有什么差异，除了军事还有哪些因素");
+    expect(complex.level).toBe("complex");
+    expect(complex.dimensions.length).toBeGreaterThanOrEqual(3);
+    expect(complex.dimensions.length).toBeLessThanOrEqual(4);
+  });
+});
+
+describe("decomposeQuestionAdaptive（§四：0/1/2/3-4 专业方向并行）", () => {
+  it("simple：完全跳过拆解 LLM（callModel 零调用），subQueries 为空", async () => {
+    const calls: string[] = [];
+    const callModel: DecomposeModel = async ({ question }) => {
+      calls.push(question);
+      return validOutput(["不该出现"]);
+    };
+    const result = await decomposeQuestionAdaptive({ question: "作者是谁？", callModel });
+    expect(calls).toHaveLength(0);
+    expect(result.subQueries).toEqual([]);
+    expect(result.degraded).toBe(false);
+    expect(result.complexity).toBe("simple");
+    expect(result.attempts).toBe(0);
+  });
+
+  it("compound：两个专业方向并行（收到各自 specialist 入参），合并去重", async () => {
+    const specialists: Array<string | null | undefined> = [];
+    const callModel: DecomposeModel = async ({ specialist }) => {
+      specialists.push(specialist ?? null);
+      return validOutput([specialist === "cause" ? "因果证据查询" : "事实证据查询"]);
+    };
+    const result = await decomposeQuestionAdaptive({
+      question: "秦统一六国的原因和六国各自的弱点是什么",
+      callModel,
+    });
+    expect(specialists.sort()).toEqual(["cause", "fact"]);
+    expect(result.subQueries.sort()).toEqual(["事实证据查询", "因果证据查询"]); // Unicode 序：事 < 因
+    expect(result.complexity).toBe("compound");
+    expect(result.degraded).toBe(false);
+    expect(result.specialists.sort()).toEqual(["cause", "fact"]);
+  });
+
+  it("部分方向失败不降级（留痕）；全部失败降级为原问题单查询", async () => {
+    // cause 方向总输出非法，fact 方向成功。
+    const partial: DecomposeModel = async ({ specialist }) =>
+      (specialist === "cause" ? "{invalid" : validOutput(["事实查询"]));
+    const partialResult = await decomposeQuestionAdaptive({
+      question: "秦统一六国的原因和六国各自的弱点是什么",
+      callModel: partial,
+    });
+    expect(partialResult.degraded).toBe(false);
+    expect(partialResult.subQueries).toEqual(["事实查询"]);
+    expect(partialResult.specialistFailures.length).toBe(1);
+    expect(partialResult.specialistFailures[0]).toContain("cause");
+
+    const allFail: DecomposeModel = async () => "{invalid";
+    const degraded = await decomposeQuestionAdaptive({
+      question: "秦统一六国的原因和六国各自的弱点是什么",
+      callModel: allFail,
+    });
+    expect(degraded.degraded).toBe(true);
+    expect(degraded.subQueries).toEqual(["秦统一六国的原因和六国各自的弱点是什么"]);
+    expect(degraded.specialistFailures.length).toBe(2);
+  });
+
+  it("否定 exclusion 经专业方向透传（fact/validation 维度的 exclusions 字段）", async () => {
+    const callModel: DecomposeModel = async () => JSON.stringify({
+      intent: "list",
+      subQueries: ["全部方法清单"],
+      exclusions: ["方法X"],
+    });
+    const result = await decomposeQuestionAdaptive({
+      question: "除了方法X还有哪些方法",
+      callModel,
+    });
+    expect(result.exclusions).toEqual(["方法X"]);
+    expect(result.subQueries).toEqual(["全部方法清单"]);
+  });
+});
+
+describe("扩展条件门控（§十一 Conditional LLM）", () => {
+  it("simple 问题跳过扩展（留痕），不再发起扩展 LLM 与其检索", async () => {
+    const events: string[] = [];
+    const decomposeModel: DecomposeModel = async () => { events.push("decompose"); return "unused"; };
+    const expandModel: DecomposeModel = async () => { events.push("expand"); return "{}"; };
+    const { stats, block } = await buildKnowledgeContextInjection({
+      question: "作者是谁？",
+      mode: "qa",
+      deps: {
+        decomposeModel,
+        expandModel,
+        distillModel: null,
+        retrieve: async ({ query }) => {
+          events.push(`retrieve:${query}`);
+          return fakeRetrieval([fakeChunk({ id: `c-${query}` })]);
+        },
+      },
+    });
+    // simple：拆解 LLM 与扩展 LLM 都不跑，只有直检。
+    expect(events).toEqual(["retrieve:作者是谁？"]);
+    expect(stats.subQueries).toEqual([]);
+    expect(stats.subQueryHits).toEqual([]);
+    expect(stats.decompositionComplexity).toBe("simple");
+    expect(stats.expansionSkipReason).toContain("simple");
+    void block;
+  });
+
+  it("broad + focused 跳过；compound 照常扩展", async () => {
+    const expandCalls: string[] = [];
+    const decomposeModel: DecomposeModel = async () => validOutput(["因果查询"]);
+    const expandModel: DecomposeModel = async () => {
+      expandCalls.push("expand");
+      return JSON.stringify({ expansions: ["因果转述"] });
+    };
+    const broadPlan = {
+      coverageMode: "broad" as const,
+      scopeLevel: "notebook" as const,
+      requiresCompleteness: false,
+      confidence: 0.9,
+      matchedRuleIds: [],
+      intent: "fact_lookup" as const,
+      classifierUsed: "rules" as const,
+    };
+    const broad = await buildKnowledgeContextInjection({
+      question: "秦统一六国的原因是什么",
+      mode: "qa",
+      coveragePlan: broadPlan,
+      deps: {
+        decomposeModel,
+        expandModel,
+        distillModel: null,
+        retrieve: async ({ query }) => fakeRetrieval([fakeChunk({ id: `c-${query}` })]),
+      },
+    });
+    expect(broad.stats.expansionSkipReason).toContain("broad");
+    expect(expandCalls).toHaveLength(0);
+
+    const compound = await buildKnowledgeContextInjection({
+      question: "秦统一六国的原因和六国各自的弱点是什么",
+      mode: "qa",
+      coveragePlan: broadPlan,
+      deps: {
+        decomposeModel,
+        expandModel,
+        distillModel: null,
+        retrieve: async ({ query }) => fakeRetrieval([fakeChunk({ id: `c-${query}` })]),
+      },
+    });
+    expect(compound.stats.expansionSkipReason).toBeUndefined();
+    expect(expandCalls).toHaveLength(1);
+    expect(compound.stats.expandedQueries).toEqual(["因果转述"]);
+  });
+});
+
+describe("Gap Analyzer 二轮补证（§二十二）", () => {
+  it("shouldRunGapAnalysis：高覆盖模式或零命中触发；全强命中不触发", () => {
+    expect(shouldRunGapAnalysis({ coverageMode: "high_recall", subQueries: ["q"], subQueryHits: [10], originalQueryHits: 10 }).trigger).toBe(true);
+    expect(shouldRunGapAnalysis({ coverageMode: "exhaustive", subQueries: [], subQueryHits: [], originalQueryHits: 5 }).trigger).toBe(true);
+    const weak = shouldRunGapAnalysis({ coverageMode: "broad", subQueries: ["a", "b"], subQueryHits: [5, 0], originalQueryHits: 3 });
+    expect(weak.trigger).toBe(true);
+    expect(weak.reason).toContain("0 hits");
+    expect(shouldRunGapAnalysis({ coverageMode: "broad", subQueries: ["a"], subQueryHits: [5], originalQueryHits: 3 }).trigger).toBe(false);
+  });
+
+  it("端到端：零命中触发二轮，补证查询各自领家族检索并留痕（单轮上限）", async () => {
+    const gapModelCalls: Array<{ context?: string | null; specialist?: string | null }> = [];
+    const decomposeModel: DecomposeModel = async () => validOutput(["零命中方向"]);
+    const gapModel: DecomposeModel = async ({ context, specialist }) => {
+      gapModelCalls.push({ context, specialist });
+      return validOutput(["遗漏的反例方向", "另一侧对比"]);
+    };
+    const retrieved: string[] = [];
+    const { stats, block } = await buildKnowledgeContextInjection({
+      question: "为什么甲方案导致失败和乙方案的关系是什么",
+      mode: "qa",
+      deps: {
+        decomposeModel,
+        expandModel: null,
+        gapAnalysisModel: gapModel,
+        distillModel: null,
+        retrieve: async ({ query }) => {
+          retrieved.push(query);
+          // 「零命中方向」0 命中触发 gap；其余 1 命中。
+          const hit = query === "零命中方向" ? [] : [fakeChunk({ id: `c-${query}` })];
+          return fakeRetrieval(hit);
+        },
+      },
+    });
+    expect(retrieved).toContain("遗漏的反例方向");
+    expect(retrieved).toContain("另一侧对比");
+    expect(stats.secondPassTriggered).toBe(true);
+    expect(stats.gapQueries).toEqual(["遗漏的反例方向", "另一侧对比"]);
+    expect(stats.gapQueryHits).toEqual([1, 1]);
+    expect(block).toContain("gap analysis second pass");
+    // gap 模型收到 specialist= gap 与含命中摘要的 context。
+    expect(gapModelCalls[0].specialist).toBe("gap");
+    expect(gapModelCalls[0].context).toContain("0 hits");
+  });
+
+  it("全强命中且 broad：不触发二轮（gap 模型零调用）", async () => {
+    let gapCalls = 0;
+    const decomposeModel: DecomposeModel = async () => validOutput(["强方向"]);
+    const gapModel: DecomposeModel = async () => { gapCalls += 1; return validOutput(["不该出现"]); };
+    const broadPlan = {
+      coverageMode: "broad" as const,
+      scopeLevel: "notebook" as const,
+      requiresCompleteness: false,
+      confidence: 0.9,
+      matchedRuleIds: [],
+      intent: "fact_lookup" as const,
+      classifierUsed: "rules" as const,
+    };
+    const { stats } = await buildKnowledgeContextInjection({
+      question: "甲方案和乙方案的关系是什么",
+      mode: "qa",
+      coveragePlan: broadPlan,
+      deps: {
+        decomposeModel,
+        expandModel: null,
+        gapAnalysisModel: gapModel,
+        distillModel: null,
+        retrieve: async ({ query }) => fakeRetrieval([fakeChunk({ id: `c-${query}` })]),
+      },
+    });
+    expect(gapCalls).toBe(0);
+    expect(stats.secondPassTriggered).toBeUndefined();
+  });
+});
+
+describe("否定排除（§九：词法约束而非检索查询）", () => {
+  it("applyNegationExclusions：剔除含排除词的块；过度匹配保护（>半数放弃过滤）", () => {
+    const chunks = ["a", "b", "c", "d", "e"].map(id => fakeChunk({ id, text: `内容-${id}-${id === "c" ? "方法X" : "其他"}` }));
+    const filtered = applyNegationExclusions({ chunks, exclusions: ["方法X"] });
+    expect(filtered.kept.map(chunk => chunk.id)).toEqual(["a", "b", "d", "e"]);
+    expect(filtered.droppedCount).toBe(1);
+    expect(filtered.skipped).toBe(false);
+
+    const allMatch = Array.from({ length: 6 }, (_, index) => fakeChunk({ id: `m${index}`, text: `都含方法X-${index}` }));
+    const guard = applyNegationExclusions({ chunks: allMatch, exclusions: ["方法X"] });
+    expect(guard.skipped).toBe(true);
+    expect(guard.kept).toHaveLength(6);
+  });
+
+  it("端到端：exclusions 过滤生效并留痕 stats", async () => {
+    const decomposeModel: DecomposeModel = async () => JSON.stringify({
+      intent: "list",
+      subQueries: ["方法清单"],
+      exclusions: ["乙方法"],
+    });
+    const { stats, block } = await buildKnowledgeContextInjection({
+      question: "除了乙方法还有哪些方法",
+      mode: "qa",
+      deps: {
+        decomposeModel,
+        expandModel: null,
+        distillModel: null,
+        retrieve: async ({ query }) => fakeRetrieval([
+          fakeChunk({ id: "keep", text: "甲方法的说明" }),
+          fakeChunk({ id: "drop", text: "乙方法的相关段落" }),
+        ]),
+      },
+    });
+    expect(stats.negationExclusions).toEqual(["乙方法"]);
+    expect(stats.negationDroppedChunks).toBeGreaterThan(0);
+    expect(block).toContain("negation exclusion");
+    expect(block).not.toContain("乙方法的相关段落");
   });
 });

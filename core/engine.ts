@@ -193,7 +193,9 @@ import {
   assembleKnowledgeEvidenceManifestEntries,
   buildKnowledgeContextInjection,
   KNOWLEDGE_DECOMPOSE_SYSTEM_PROMPT,
+  KNOWLEDGE_DECOMPOSE_SPECIALIST_PROMPTS,
   KNOWLEDGE_EXPANSION_SYSTEM_PROMPT,
+  KNOWLEDGE_GAP_ANALYSIS_SYSTEM_PROMPT,
   type KnowledgeInjectionEvidence,
 } from "../lib/knowledge/knowledge-context-injector.ts";
 import {
@@ -2493,33 +2495,41 @@ export class LingxiEngine {
       }
       let decomposeModel = null;
       let expandModel = null;
+      // Gap Analyzer（§二十二，P2）：与拆解同一 knowledge 槽位、独立系统提示词
+      // （specialist="gap" 时选择）；context 携带已有查询与命中摘要进 user 消息。
+      let gapAnalysisModel = null;
       if (slotConfigured) {
-        decomposeModel = async ({ question, correction }) => {
+        decomposeModel = async ({ question, correction, specialist, context }) => {
           const config = await this.resolveAuxiliaryModelFresh("knowledge");
           if (!config) throw new Error("knowledge model slot unavailable");
-          // 显式取 callText 需要的字段（与 approval reviewer 同一模式），
-          // 不整包 spread 归一化附带的 usage 元数据。
-          // 超时阶梯：首次 15s；纠错重试 8s——首次失败已经吃掉一部分预算，
-          // 重试再等 15s 会把最坏阻塞推到 30s，8s 足够返回一个小 JSON 对象。
+          // 专业方向（P2 §四）：fact/cause/relation/validation 各自的聚焦提示词；
+          // gap 用 Gap Analyzer 提示词；缺省回落通用拆解提示词（兼容直接调用方）。
+          const systemPrompt = specialist == null
+            ? KNOWLEDGE_DECOMPOSE_SYSTEM_PROMPT
+            : specialist === "gap"
+              ? KNOWLEDGE_GAP_ANALYSIS_SYSTEM_PROMPT
+              : KNOWLEDGE_DECOMPOSE_SPECIALIST_PROMPTS[specialist];
+          const contextBlock = context ? `${context}\n\n` : "";
           return callText({
             api: config.api,
             apiKey: config.apiKey,
             baseUrl: config.baseUrl,
             headers: config.headers,
             model: config.model,
-            systemPrompt: KNOWLEDGE_DECOMPOSE_SYSTEM_PROMPT,
+            systemPrompt,
             messages: [{
               role: "user",
               content: correction
                 ? `Your previous output was invalid and must be corrected.\nError: ${correction.error}\n`
-                  + `Previous output: ${correction.previousOutput}\n\nQuestion: ${question}\n`
+                  + `Previous output: ${correction.previousOutput}\n\n${contextBlock}Question: ${question}\n`
                   + "Return the corrected JSON object following the schema. Plain JSON only, no Markdown fences."
-                : `Question: ${question}`,
+                : `${contextBlock}Question: ${question}`,
             }],
             temperature: 0,
             timeoutMs: correction ? 8_000 : 15_000,
           });
         };
+        gapAnalysisModel = decomposeModel;
         // §三十五 受控查询扩展（Phase 8）：与拆解同一 knowledge 槽位、独立系统
         // 提示词；输出非法纠错重试一次，失败不扩展（injector 留痕）。
         expandModel = async ({ question, existingQueries, correction }) => {
@@ -2679,6 +2689,9 @@ export class LingxiEngine {
         deps: {
           decomposeModel,
           expandModel,
+          // Gap Analyzer（§二十二，P2）：二轮补证面与拆解同一闭包（specialist
+          // 路由提示词）；未配 knowledge 槽位时为 null（不触发）。
+          gapAnalysisModel,
           distillModel,
           ...(distillBatchBudgetTokens != null ? { distillBatchBudgetTokens } : {}),
           // 每批蒸馏完成 → ws 广播进度（聊天界面"蒸馏中 · N 批"胶囊）。

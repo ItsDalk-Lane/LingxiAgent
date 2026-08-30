@@ -115,6 +115,23 @@ export interface KnowledgeRetrievalStats {
   expansionUniqueHits?: number;
   queryOverlapRatio?: number;
   evidenceNeedGains?: number[];
+  /**
+   * P2 拆解优化统计（2026-08-30）：复杂度档位（simple=零拆解 LLM 直检即全部）/
+   * 实际执行的专业方向 / 部分方向失败留痕；扩展跳过原因（条件门控）；
+   * 否定排除条件与词法过滤计数（filterSkipped=过度匹配保护触发）；
+   * Gap Analyzer 二轮补证（触发原因 + 补证查询与命中）。
+   */
+  decompositionComplexity?: "simple" | "focused" | "compound" | "complex";
+  decompositionSpecialists?: string[];
+  decompositionSpecialistFailures?: string[];
+  expansionSkipReason?: string;
+  negationExclusions?: string[];
+  negationDroppedChunks?: number;
+  negationFilterSkipped?: boolean;
+  secondPassTriggered?: boolean;
+  secondPassReason?: string;
+  gapQueries?: string[];
+  gapQueryHits?: number[];
   /** 融合去重后的候选块数。 */
   fusedChunks: number;
   /** 预算内实际注入块数。 */

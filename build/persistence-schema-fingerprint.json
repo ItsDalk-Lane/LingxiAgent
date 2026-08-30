@@ -3285,7 +3285,7 @@
   ],
   "review": {
     "classification": "compatible",
-    "compatibilityReason": "core/engine.ts retrieve closure adds optional topK passthrough to retrieveForNotebooks (candidate total budget per-query share); no persisted store shape or site mapping change",
+    "compatibilityReason": "core/engine.ts decompose closure adds specialist/gap prompt routing and context passthrough; no persisted store shape or site mapping change",
     "payloadFingerprint": "sha256:7316ccbf83072b075a76e861c110365bda399554823ae3db0278674b086d6f69"
   },
   "schemas": [
