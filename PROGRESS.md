@@ -10,7 +10,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = 01dfb168e94148af0aafc0bf965890c17543597f  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-08-30 同上 + 知识提问延迟三连修复（分片渲染开销计费/coverage 熔断/rerank 期限降级）+ engine 构造顺序修复)
+VERIFIED_SOURCE_SHA   = 11474e8274aa6d1f9bbc75e94e0722ac69ad0b6b  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-08-30 同上 + 知识提问延迟三连修复 + exhaustive 交互式规模闸（>24 片降格 broad）+ engine 构造顺序修复)
 工作分支              = feature/upstream-sync-0.447.4
 ```
 
@@ -574,6 +574,18 @@ seal 不是一次性终点，而是"当前被验证树"的游标；每次审计�
   测不到）。验证：typecheck×3 绿 + eslint 0 error + 新增 8 用例 + knowledge
   簇 282 用例 + full npm test 12785 passed / 0 failed（首轮 census 2 用例
   并行负载抖动、复跑与隔离复跑均全绿）后推进。
+
+- **2026-08-30 exhaustive 交互式规模闸（延迟加固第二轮）**
+  （功能树 11474e82/seal 本提交；2 files / +83-0）：第一轮修复实测后暴露
+  更深一层问题——680 万 token 语料按开销计费正确分出 1073 片 exhaustive，
+  交互式窗口本质装不下（2–3 小时）；MiniMax-M3 压 46s 超时线成败各半 →
+  熔断被「任一成功即豁免」正确豁免 → 继续磨（用户按停时 4 分钟完成 5/1073
+  片），coverage 期前端无进度渲染体感即卡死。修复：KNOWLEDGE_EXHAUSTIVE_
+  MAX_SHARDS=24（≈40 万 token ≈ 一本书），runExhaustiveCoverage 计划期计数
+  超阈即显式降格 broad + 留痕（两条入口统一收口：计划 exhaustive / §四十一
+  自动升级），指引 knowledge_grep/outline + subagent 分治；阈值内语义不变。
+  验证：typecheck×3 绿 + eslint 0 error + 新增 2 用例 + coverage 簇 110
+  用例 + full npm test 12787 passed / 0 failed 后推进。
 
 
 ## 最终状态：已合并（上游同步部分）
