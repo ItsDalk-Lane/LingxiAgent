@@ -10,7 +10,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = 26906c8324366ba0481080b0caf7b20c374ee4d7  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-08-29 知识问答链路四连修 + 蒸馏并行化与进度可视化)
+VERIFIED_SOURCE_SHA   = 7b240ce15715c54bd0f248cc202ff2582aecdfa6  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-08-30 knowledge coverage 证据链 Phase 9/10 + Agent 三工具 Phase 11 + ProcessingArtifact 管线 Phase 12 + EvidenceManifest 持久化)
 工作分支              = feature/upstream-sync-0.447.4
 ```
 
@@ -446,6 +446,33 @@ seal 不是一次性终点，而是"当前被验证树"的游标；每次审计�
   （snake/camel 错配）。生成产物重 pin：closure/fingerprint（compatible）/
   inventory/export-manifest。验证：typecheck×3（绿）+ eslint 0 error +
   full npm test 12504 passed / 0 failed（推进前 seal guard 旧坐标预期红）后推进。
+
+- **2026-08-30 knowledge coverage 证据链 Phase 9/10 + Agent 三工具 Phase 11
+  + ProcessingArtifact 管线 Phase 12 + EvidenceManifest 持久化**
+  （功能树 7b240ce1/seal 本提交；80 files / +23534-844）：Phase 9 coverage
+  真执行两波——落库层 knowledge-coverage-{unit,manifest,planner,executor}.ts
+  （契约/Planner/Executor/Ledger/Gate/Evidence 聚合，schema v13→v14
+  coverage_runs/coverage_shards + loadResumableCoverageRun 恢复语义）+ 会话
+  接线（injector exhaustive Planner→manifest→execute→aggregate 证据注入 +
+  降格留痕、engine coverage worker 闭包、submit 检索期 abort、WS
+  knowledge_coverage_progress、broad→exhaustive 自动升级、run 总时长上限）；
+  Phase 10 层级归约 knowledge-coverage-reduction.ts（ev_ 稳定 id→Source→
+  Notebook→Cross-Notebook，级预算内零 LLM 调用，结构化 JSON I/O + DP 分解
+  校验，纠错一次后仍失败降级保序截断；injector 三岔口替换删伪 chunk distill
+  过渡路径，stats coverageReduction）；Phase 11 三工具 knowledge_outline/
+  knowledge_grep/knowledge_manage（scope 校验链抽 lib/tools/knowledge-scope.ts
+  共享，STANDARD 分类 + 审批 review 档 + 五语言文案）；§六十七
+  EvidenceManifest 轻量持久化（schema v14→v15 身份链表、injector evidence
+  第三字段、engine 按 TurnScope 冻结集合复核、GC/deleteSource 引用保护）；
+  Phase 12 ProcessingArtifact 管线 + 目录导入（source-processors.ts DOCX/
+  XLSX/CSV 块级行级 + 防护上限、schema v15→v16、importDirectory sha 去重
+  三组明细、import-directory 路由 local-owner 限定、桌面端入口 + 5 语言
+  locale、不支持格式显式拒绝）；查询链路配套（TurnScope 冻结语义、rerank
+  按引用路由 + 跨笔记本 RRF 融合只消名次、chunk profile/index variant 分离、
+  生命周期与 GC 保护）。生成产物：export-manifest 收录新模块、
+  cli-runtime-closure 重生成、persistence 指纹/inventory/receipt compatible
+  repin、store-registry 登记。验证：typecheck×3（绿）+ eslint 0 error +
+  full npm test 12746 passed / 0 failed 后推进。
 
 
 ## 最终状态：已合并（上游同步部分）
