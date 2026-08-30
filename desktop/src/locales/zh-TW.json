@@ -456,7 +456,11 @@
     "knowledgeRetrievalUnavailable": "知識檢索不可用",
     "knowledgeRetrievalRowTitle": "{source} · 塊 {chunk}",
     "knowledgeRetrievalDistilled": "已提煉 {n} 批",
-    "knowledgeDistilling": "知識蒸餾中 · 已完成 {done} 批 · {model}"
+    "knowledgeRollupReading": "正在閱讀第 {current}/{total} 部分證據",
+    "knowledgeSupplementing": "模型發起了補充檢索（{count} 條查詢）",
+    "knowledgeRetrievalRolled": "分 {parts} 部分閱讀",
+    "knowledgeRetrievalSupplement": "補充檢索 {n} 條查詢",
+    "knowledgeRetrievalSupplementTitle": "滾動注入循環中模型自主發起的補充檢索"
   },
   "time": {
     "justNow": "剛剛",
@@ -1887,8 +1891,6 @@
       "auxMemoryModelHint": "用於長期記憶提煉、工作階段記憶壓縮、日記記憶材料生成",
       "auxKnowledgeModel": "知識分析模型",
       "auxKnowledgeModelHint": "用於知識問題拆解",
-      "auxKnowledgeDistillModel": "知識提煉模型",
-      "auxKnowledgeDistillModelHint": "知識證據超出注入預算時，分批提煉與問題相關的內容（未設定時退回分片清單模式）",
       "knowledgeOperationUsesProviderCredential": "沿用所選供應商的憑證，不另外儲存金鑰",
       "knowledgeOperationOptional": "未設定（選用）",
       "knowledgeOperationUnavailable": "目前無法使用",

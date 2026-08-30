@@ -456,7 +456,11 @@
     "knowledgeRetrievalUnavailable": "知识检索不可用",
     "knowledgeRetrievalRowTitle": "{source} · 块 {chunk}",
     "knowledgeRetrievalDistilled": "已提炼 {n} 批",
-    "knowledgeDistilling": "知识蒸馏中 · 已完成 {done} 批 · {model}"
+    "knowledgeRollupReading": "正在阅读第 {current}/{total} 部分证据",
+    "knowledgeSupplementing": "模型发起了补充检索（{count} 条查询）",
+    "knowledgeRetrievalRolled": "分 {parts} 部分阅读",
+    "knowledgeRetrievalSupplement": "补充检索 {n} 条查询",
+    "knowledgeRetrievalSupplementTitle": "滚动注入循环中模型自主发起的补充检索"
   },
   "time": {
     "justNow": "刚刚",
@@ -1957,8 +1961,6 @@
       "auxMemoryModelHint": "用于长期记忆提炼、会话记忆压缩、日记记忆材料生成",
       "auxKnowledgeModel": "知识分析模型",
       "auxKnowledgeModelHint": "用于知识问题拆解",
-      "auxKnowledgeDistillModel": "知识提炼模型",
-      "auxKnowledgeDistillModelHint": "知识证据超出注入预算时，分批提炼与问题相关的内容（未配置时退回分片清单模式）",
       "knowledgeOperationUsesProviderCredential": "复用所选供应商的凭证，不单独保存密钥",
       "knowledgeOperationOptional": "未配置（可选）",
       "knowledgeOperationUnavailable": "当前不可用",

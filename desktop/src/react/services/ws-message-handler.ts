@@ -547,20 +547,20 @@ export function handleServerMessage(msg: any): void {
 
   // 「知识库检索中」胶囊与「等待助手」pending 都是纯瞬态信号：该 session 的
   // 任何后续事件（status / session_user_message / 聊天流事件 / error…）到达都
-  // 代表前一阶段已结束，保守清除（两个 end 内部对未命中 session 都是零成本
+  // 代表前一阶段已结束，保守清除（各 end 内部对未命中 session 都是零成本
   // no-op）。knowledge_retrieval_started 自身不清 pending（发送 → 检索是同一段
-  // 等待），也不被自己清除；knowledge_distill_progress / knowledge_coverage_progress
-  // 是检索期内的分段进度（Phase 9 第二波新增 coverage 进度，渲染留给后续版本，
-  // 本波只保证不清检索态、未知事件不崩），同样排除。
+  // 等待），也不被自己清除；knowledge_rollup_progress / knowledge_supplement_search
+  // 是检索期内的滚动注入分段进度（自身不清检索态），同样排除。
   if (msg?.type !== 'knowledge_retrieval_started'
-    && msg?.type !== 'knowledge_distill_progress'
-    && msg?.type !== 'knowledge_coverage_progress') {
+    && msg?.type !== 'knowledge_rollup_progress'
+    && msg?.type !== 'knowledge_supplement_search') {
     const { sessionPath: retrievalDonePath } = sessionIdentityFromMessage(msg);
     // 与 markSessionOutputUnread? 同策略：部分测试 store / 旧 slice 组合缺 action 时不炸。
     if (retrievalDonePath) {
       useStore.getState().endKnowledgeRetrieval?.(retrievalDonePath);
       useStore.getState().endTurnPending?.(retrievalDonePath);
-      useStore.getState().endKnowledgeDistill?.(retrievalDonePath);
+      useStore.getState().endKnowledgeRollup?.(retrievalDonePath);
+      useStore.getState().endKnowledgeSupplement?.(retrievalDonePath);
     }
   }
 
@@ -1250,15 +1250,32 @@ export function handleServerMessage(msg: any): void {
       break;
     }
 
-    case 'knowledge_distill_progress': {
-      // 蒸馏每批完成的进度（超预算证据分段压缩）：逐批更新「蒸馏中 · N 批」胶囊；
-      // 不进 stream_resume，结束同样由顶部保守清除（该 session 任意后续事件）。
+    case 'knowledge_rollup_progress': {
+      // 滚动注入中间轮进度（超预算证据分部分喂给主模型消化）：逐轮更新
+      // 「正在阅读第 X/N 部分」胶囊；不进 stream_resume，结束由顶部保守清除。
       const sp = nonEmptyString(msg.sessionPath) || nonEmptyString(msg.path);
-      if (!sp) { console.warn('[ws] knowledge_distill_progress missing sessionPath, skipping'); break; }
-      const done = Number(msg.done);
-      useStore.getState().updateKnowledgeDistill?.(sp, {
-        done: Number.isSafeInteger(done) && done > 0 ? done : 0,
-        model: typeof msg.model === 'string' && msg.model ? msg.model : null,
+      if (!sp) { console.warn('[ws] knowledge_rollup_progress missing sessionPath, skipping'); break; }
+      const current = Number(msg.current);
+      const total = Number(msg.total);
+      useStore.getState().updateKnowledgeRollup?.(sp, {
+        current: Number.isSafeInteger(current) && current > 0 ? current : 1,
+        total: Number.isSafeInteger(total) && total > 0 ? total : 1,
+      });
+      break;
+    }
+
+    case 'knowledge_supplement_search': {
+      // 滚动循环内模型自主发起的补充检索（过程可见，不显中间内容）：展示查询行；
+      // 不进 stream_resume，结束由顶部保守清除。
+      const sp = nonEmptyString(msg.sessionPath) || nonEmptyString(msg.path);
+      if (!sp) { console.warn('[ws] knowledge_supplement_search missing sessionPath, skipping'); break; }
+      const queries = Array.isArray(msg.queries)
+        ? msg.queries.filter((q: unknown): q is string => typeof q === 'string' && !!q.trim())
+        : [];
+      const round = Number(msg.round);
+      useStore.getState().updateKnowledgeSupplement?.(sp, {
+        queries,
+        round: Number.isSafeInteger(round) && round > 0 ? round : 1,
       });
       break;
     }

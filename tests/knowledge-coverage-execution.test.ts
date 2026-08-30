@@ -96,7 +96,6 @@ function planOf(overrides: Partial<KnowledgeCoveragePlan> = {}): KnowledgeCovera
   return {
     intent: "fact_lookup",
     coverageMode: "high_recall",
-    requiresCompleteness: false,
     scopeLevel: "source",
     confidence: 0.75,
     matchedRuleIds: [],
@@ -143,7 +142,6 @@ describe("受控查询扩展（§三十五）", () => {
       deps: {
         decomposeModel: DECOMPOSE_MODEL,
         expandModel,
-        distillModel: null,
         retrieve: async ({ query }) => {
           queries.push(query);
           return fakeRetrieval([fakeChunk({ id: `c-${query}`, text: `证据-${query}` })]);
@@ -171,7 +169,6 @@ describe("受控查询扩展（§三十五）", () => {
       deps: {
         decomposeModel: DECOMPOSE_MODEL,
         expandModel,
-        distillModel: null,
         retrieve: async ({ query }) => {
           queries.push(query);
           return fakeRetrieval([fakeChunk({ id: `c-${query}` })]);
@@ -197,7 +194,6 @@ describe("受控查询扩展（§三十五）", () => {
       deps: {
         decomposeModel: DECOMPOSE_MODEL,
         expandModel,
-        distillModel: null,
         retrieve: async ({ query }) => {
           queries.push(query);
           return fakeRetrieval([]);
@@ -214,7 +210,6 @@ describe("受控查询扩展（§三十五）", () => {
       deps: {
         decomposeModel: DECOMPOSE_MODEL,
         expandModel: failing,
-        distillModel: null,
         retrieve: async ({ query }) => {
           queries.push(query);
           return fakeRetrieval([]);
@@ -230,7 +225,6 @@ describe("受控查询扩展（§三十五）", () => {
     const queries: string[] = [];
     const base = {
       decomposeModel: DECOMPOSE_MODEL,
-      distillModel: null as null,
       retrieve: async ({ query }: { query: string }) => {
         queries.push(query);
         return fakeRetrieval([]);
@@ -267,7 +261,6 @@ describe("受控查询扩展（§三十五）", () => {
       mode: "qa",
       deps: {
         decomposeModel: null,
-        distillModel: null,
         retrieve: async () => fakeRetrieval([fakeChunk()]),
       },
     });
@@ -314,7 +307,6 @@ describe("HIGH_RECALL：预算链与邻接扩展（§二十六/§三十六/§九
       mode: "qa",
       deps: {
         decomposeModel: null,
-        distillModel: null,
         retrieve: async () => fakeRetrieval(candidates),
       },
     });
@@ -338,7 +330,6 @@ describe("HIGH_RECALL：预算链与邻接扩展（§二十六/§三十六/§九
       mode: "qa",
       deps: {
         decomposeModel: null,
-        distillModel: null,
         retrieve: async () => fakeRetrieval([anchorA, anchorB]),
         readNeighborChunks: ({ anchor, ordinals }) => {
           readCalls.push({ anchorOrdinal: anchor.ordinal, ordinals: [...ordinals] });
@@ -377,7 +368,6 @@ describe("HIGH_RECALL：预算链与邻接扩展（§二十六/§三十六/§九
       mode: "qa",
       deps: {
         decomposeModel: async () => validDecomposeOutput(["子查询一", "子查询二"]),
-        distillModel: null,
         retrieve: async ({ query }) => fakeRetrieval(
           query === "子查询一" ? [shared, adjacent] : [shared, adjacent, far],
         ),
@@ -401,7 +391,6 @@ describe("HIGH_RECALL：预算链与邻接扩展（§二十六/§三十六/§九
       mode: "qa",
       deps: {
         decomposeModel: null,
-        distillModel: null,
         retrieve: async () => fakeRetrieval([fakeChunk({ id: "a1", ordinal: 1 })]),
       },
     });
@@ -426,7 +415,6 @@ describe("HIGH_RECALL：预算链与邻接扩展（§二十六/§三十六/§九
       budgetTokens: 900,
       deps: {
         decomposeModel: null,
-        distillModel: null,
         retrieve: async () => fakeRetrieval(anchors),
         readNeighborChunks: ({ anchor }) => {
           const index = anchors.findIndex(candidate => candidate.id === anchor.id);
@@ -482,7 +470,7 @@ describe("BROAD：Source Coverage Floor 与 Section Coverage（§九十五）", 
     const { stats } = await buildKnowledgeContextInjection({
       question: "这些文件分别如何看待 X？",
       mode: "qa",
-      deps: { decomposeModel: null, distillModel: null, retrieve },
+      deps: { decomposeModel: null, retrieve },
       coveragePlan: planOf({ coverageMode: "broad", intent: "cross_source_synthesis", scopeLevel: "multi_source" }),
     });
     const probedSources = new Set(constrainedCalls.flatMap(call => call.sourceIds ?? []));
@@ -497,7 +485,7 @@ describe("BROAD：Source Coverage Floor 与 Section Coverage（§九十五）", 
     const { block, stats } = await buildKnowledgeContextInjection({
       question: "这些文件分别如何看待 X？",
       mode: "qa",
-      deps: { decomposeModel: null, distillModel: null, retrieve },
+      deps: { decomposeModel: null, retrieve },
       coveragePlan: planOf({ coverageMode: "broad", intent: "cross_source_synthesis", scopeLevel: "multi_source" }),
     });
     expect(block).toContain('[no relevant evidence found in source "B.pdf" (sourceId: src-b)]');
@@ -533,7 +521,6 @@ describe("BROAD：Source Coverage Floor 与 Section Coverage（§九十五）", 
       mode: "qa",
       deps: {
         decomposeModel: null,
-        distillModel: null,
         retrieve: async ({ sourceIds, sectionsBySourceId }) => {
           if (sourceIds) {
             constrainedCalls.push({ sourceIds: [...sourceIds], sectionsBySourceId: sectionsBySourceId ? new Map(sectionsBySourceId) : undefined });
@@ -565,7 +552,6 @@ describe("BROAD：Source Coverage Floor 与 Section Coverage（§九十五）", 
       mode: "qa",
       deps: {
         decomposeModel: null,
-        distillModel: null,
         retrieve: async ({ sourceIds }) => {
           if (sourceIds) {
             constrainedCalls.push({ sourceIds: [...sourceIds] });
@@ -586,7 +572,7 @@ describe("BROAD：Source Coverage Floor 与 Section Coverage（§九十五）", 
     const { stats, block } = await buildKnowledgeContextInjection({
       question: "X 的相关记录都在哪？",
       mode: "qa",
-      deps: { decomposeModel: null, distillModel: null, retrieve },
+      deps: { decomposeModel: null, retrieve },
       coveragePlan: planOf({ coverageMode: "high_recall", scopeLevel: "multi_source" }),
     });
     expect(stats.upgradedTo).toBe("broad");
@@ -607,7 +593,7 @@ describe("BROAD：Source Coverage Floor 与 Section Coverage（§九十五）", 
     const full = await buildKnowledgeContextInjection({
       question: "问题",
       mode: "qa",
-      deps: { decomposeModel: null, distillModel: null, retrieve: allHit },
+      deps: { decomposeModel: null, retrieve: allHit },
       coveragePlan: planOf({ coverageMode: "high_recall", scopeLevel: "multi_source" }),
     });
     expect(full.stats.upgradedTo).toBeUndefined();
@@ -621,7 +607,6 @@ describe("BROAD：Source Coverage Floor 与 Section Coverage（§九十五）", 
       mode: "qa",
       deps: {
         decomposeModel: null,
-        distillModel: null,
         retrieve: async () => fakeRetrieval([lone], [singleSource]),
       },
       coveragePlan: planOf({ coverageMode: "high_recall", scopeLevel: "source" }),
@@ -630,29 +615,24 @@ describe("BROAD：Source Coverage Floor 与 Section Coverage（§九十五）", 
     expect(single.stats.secondaryRetrievalCount).toBe(0);
   });
 
-  it("exhaustive 计划但执行面未接线：显式降格 broad + coverageDegradeReason 留痕，块内不声称完整性", async () => {
+  it("存量旧值 exhaustive 计划：直接按 broad 执行（结构探测照常），无降格留痕负担", async () => {
     const { retrieve, constrainedCalls } = createFourSourceFacade();
     const { block, stats } = await buildKnowledgeContextInjection({
       question: "全文提到的风险都列出来",
       mode: "qa",
-      deps: { decomposeModel: null, distillModel: null, retrieve },
+      deps: { decomposeModel: null, retrieve },
       coveragePlan: planOf({
         coverageMode: "exhaustive",
-        requiresCompleteness: true,
         intent: "whole_scope_analysis",
         scopeLevel: "multi_source",
       }),
     });
+    // 块头如实透出存量计划档位；执行侧按 broad（exhaustive 档已移除）。
     expect(stats.coverageMode).toBe("exhaustive");
-    expect(stats.requiresCompleteness).toBe(true);
-    // 无 coverage 执行面（deps.coverage 缺省）：显式降格 broad，不再有 phase-9 占位标记。
     expect(stats.executedCoverageMode).toBe("broad");
-    expect(stats.coverageDegradeReason).toBe("coverage execution is not wired");
-    expect(stats).not.toHaveProperty("exhaustivePending");
+    expect(stats).not.toHaveProperty("coverageDegradeReason");
     expect(block).toContain("[coverage: exhaustive · multi_source]");
-    expect(block).toContain("[coverage execution degraded to broad: coverage execution is not wired");
-    expect(block).toContain("no completeness claim is made for this turn");
-    // 降格后 broad 档结构探测照常执行。
+    // broad 档结构探测照常执行。
     expect(constrainedCalls.length).toBeGreaterThan(0);
   });
 
@@ -661,7 +641,7 @@ describe("BROAD：Source Coverage Floor 与 Section Coverage（§九十五）", 
     const { stats } = await buildKnowledgeContextInjection({
       question: "问题",
       mode: "qa",
-      deps: { decomposeModel: null, distillModel: null, retrieve },
+      deps: { decomposeModel: null, retrieve },
     });
     expect(constrainedCalls).toHaveLength(0);
     expect(stats.secondaryRetrievalCount).toBe(0);
@@ -682,7 +662,6 @@ describe("BROAD：Source Coverage Floor 与 Section Coverage（§九十五）", 
       mode: "qa",
       deps: {
         decomposeModel: null,
-        distillModel: null,
         retrieve: async ({ sourceIds }) => {
           if (sourceIds) {
             return {
@@ -870,7 +849,6 @@ describe("retrieveForNotebooks 约束检索与 readAdjacentChunks（真实索引
       mode: "qa",
       deps: {
         decomposeModel: null,
-        distillModel: null,
         retrieve: ({ query, sourceIds, sectionsBySourceId }) => manager.queryService.retrieveForNotebooks({
           studioId,
           notebookIds: [notebook.id],

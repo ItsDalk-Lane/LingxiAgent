@@ -16,12 +16,14 @@
 
 import { AsyncLocalStorage } from "node:async_hooks";
 
-export type ProviderCompatPurpose = "chat" | "utility" | "compaction";
+export type ProviderCompatPurpose = "chat" | "utility" | "compaction" | "knowledge_rollup";
 
 const PURPOSE_STORAGE = new AsyncLocalStorage<{ purpose: ProviderCompatPurpose }>();
 
 export function normalizeProviderCompatPurpose(value): ProviderCompatPurpose {
-  return value === "utility" || value === "compaction" ? value : "chat";
+  return value === "utility" || value === "compaction" || value === "knowledge_rollup"
+    ? value
+    : "chat";
 }
 
 export function runWithProviderCompatPurpose<T>(purpose: ProviderCompatPurpose, fn: () => T): T {

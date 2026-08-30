@@ -222,7 +222,6 @@ describe("注入块生成（纯函数部分）", () => {
       mode: "qa",
       deps: {
         decomposeModel: null,
-        distillModel: null,
         retrieve: async () => fakeRetrieval([
           fakeChunk({ text: "证据 A", notebookName: "研究", sourceName: "论文", ordinal: 3, headingPath: ["Intro", "Scope"] }),
           fakeChunk({ text: "证据 B", sourceName: "报告", pageNumber: 12 }),
@@ -271,7 +270,6 @@ describe("注入块生成（纯函数部分）", () => {
       budgetTokens: 1000,
       deps: {
         decomposeModel: null,
-        distillModel: null,
         retrieve: async () => ({
           candidates,
           sources: [{
@@ -312,32 +310,37 @@ describe("注入块生成（纯函数部分）", () => {
       Array.from({ length: injectedCount }, (_, index) => index + 1),
     );
   });
-  it("超预算 + 提炼模型可用：分段压缩注入，stats 标注 distilled/batches", async () => {
+  it("超预算 + 滚动面可用：中间笔记逐部分标注 + 最后一部分证据块；stats 标注 rollup", async () => {
     const candidates = Array.from({ length: 10 }, (_, index) => (
       fakeChunk({ id: `c${index}`, ordinal: index, text: `${"证据".repeat(200)}-${index}` })
     ));
-    const distillModel = vi.fn(async ({ batch }: { batch: string }) => `提炼(${batch.length}字)`);
+    const rollupModel = vi.fn(async ({ userPrompt, round }: { userPrompt: string; round: number }) =>
+      `第${round}部分笔记：覆盖 ${userPrompt.length} 字符的证据`);
     const { block, stats } = await buildKnowledgeContextInjection({
       question: "问题",
       mode: "qa",
       budgetTokens: 1000,
       deps: {
         decomposeModel: null,
-        distillModel,
+        rollupModel,
         retrieve: async () => fakeRetrieval(candidates),
       },
     });
-    expect(distillModel).toHaveBeenCalled();
-    expect(block).toContain("distilled from evidence blocks");
+    expect(rollupModel.mock.calls.length).toBeGreaterThanOrEqual(1);
+    // 分批说明行 + 逐部分标注的中间笔记 + 最后一部分证据块（全局编号延续）。
+    expect(block).toContain("evidence delivered in");
+    expect(block).toContain("Intermediate notes after part 1");
+    expect(block).toMatch(/Final part evidence blocks/);
     expect(block).not.toContain("Shard manifest");
-    expect(stats.distilled).toBe(true);
-    expect(typeof stats.distillBatches).toBe("number");
-    expect((stats.distillBatches ?? 0)).toBeGreaterThan(0);
+    // qa 模式滚动指引：跨部分引用规则。
+    expect(block).toContain("(part 2)");
+    expect(stats.rollup).toBeDefined();
+    expect((stats.rollup?.parts ?? 0)).toBeGreaterThanOrEqual(2);
+    expect(stats.rollup?.rounds).toBe(rollupModel.mock.calls.length);
     expect(stats.truncated).toBe(false);
-    expect(stats.usedTokens).toBeLessThanOrEqual(1000);
   });
 
-  it("超预算 + 未配置提炼模型：退回分片清单并在 stats 留痕", async () => {
+  it("超预算 + 滚动面未接线：退回预算截断 + 分片清单并在 stats 留痕", async () => {
     const candidates = Array.from({ length: 10 }, (_, index) => (
       fakeChunk({ id: `c${index}`, ordinal: index, text: `${"证据".repeat(200)}-${index}` })
     ));
@@ -347,22 +350,21 @@ describe("注入块生成（纯函数部分）", () => {
       budgetTokens: 1000,
       deps: {
         decomposeModel: null,
-        distillModel: null,
         retrieve: async () => fakeRetrieval(candidates),
       },
     });
     expect(block).toContain("Shard manifest");
-    expect(stats.distilled).toBeUndefined();
-    expect(stats.distillDegradedReason).toBe("distill model not configured");
+    expect(block).toContain("[evidence rollup unavailable: rollup model not configured; budget truncation applied]");
+    expect(stats.rollup?.degradedReason).toBe("rollup model not configured");
     expect(stats.truncated).toBe(true);
   });
 
-  it("超预算 + 提炼失败：退回分片清单并携带失败原因", async () => {
+  it("超预算 + 滚动轮失败：重试一次后整体降级预算截断并携带失败原因", async () => {
     const candidates = Array.from({ length: 10 }, (_, index) => (
       fakeChunk({ id: `c${index}`, ordinal: index, text: `${"证据".repeat(200)}-${index}` })
     ));
-    const distillModel = vi.fn(async () => {
-      throw new Error("rate limited");
+    const rollupModel = vi.fn(async () => {
+      throw new Error("boom");
     });
     const { block, stats } = await buildKnowledgeContextInjection({
       question: "问题",
@@ -370,16 +372,16 @@ describe("注入块生成（纯函数部分）", () => {
       budgetTokens: 1000,
       deps: {
         decomposeModel: null,
-        distillModel,
+        rollupModel,
         retrieve: async () => fakeRetrieval(candidates),
       },
     });
     expect(block).toContain("Shard manifest");
-    // 限流形态错误走"减半重试梯"（8→4→2→1 + 单批重试上限），耗尽后整体失败留痕。
-    expect(stats.distillDegradedReason).toContain("rate-limited");
+    // 单轮一次重试后仍失败：整体降级留痕（禁静默）。
+    expect(rollupModel.mock.calls.length).toBe(2);
+    expect(stats.rollup?.degradedReason).toContain("boom");
     expect(stats.truncated).toBe(true);
   });
-
 
   it("results.firstLine 取块正文首行并截断到 ~120 字符", async () => {
     const longLine = "长".repeat(200);
@@ -388,7 +390,6 @@ describe("注入块生成（纯函数部分）", () => {
       mode: "qa",
       deps: {
         decomposeModel: null,
-        distillModel: null,
         retrieve: async () => fakeRetrieval([
           fakeChunk({ text: `${longLine}\n第二行不进 firstLine` }),
         ]),
@@ -410,7 +411,6 @@ describe("注入块生成（纯函数部分）", () => {
       mode: "qa",
       deps: {
         decomposeModel: callModel,
-        distillModel: null,
         retrieve: async ({ query }) => {
           call += 1;
           if (query === "失败子查询") throw new Error("boom");
@@ -437,7 +437,6 @@ describe("注入块生成（纯函数部分）", () => {
       mode: "qa",
       deps: {
         decomposeModel: callModel,
-        distillModel: null,
         retrieve: async ({ query }) => {
           inFlight += 1;
           maxInFlight = Math.max(maxInFlight, inFlight);
@@ -469,7 +468,6 @@ describe("注入块生成（纯函数部分）", () => {
       mode: "qa",
       deps: {
         decomposeModel: callModel,
-        distillModel: null,
         retrieve: async ({ query }) => {
           events.push(`retrieve:${query}`);
           return fakeRetrieval([fakeChunk({ id: `c-${query}`, text: `证据-${query}` })]);
@@ -490,7 +488,6 @@ describe("注入块生成（纯函数部分）", () => {
       mode: "qa",
       deps: {
         decomposeModel: null,
-        distillModel: null,
         retrieve: async ({ query }) => {
           queries.push(query);
           return fakeRetrieval([fakeChunk({ text: "证据" })]);
@@ -507,7 +504,6 @@ describe("注入块生成（纯函数部分）", () => {
       mode: "qa",
       deps: {
         decomposeModel: callModel,
-        distillModel: null,
         retrieve: async ({ query }) => {
           if (query === "问题") throw new Error("direct boom");
           return fakeRetrieval([fakeChunk({ id: "c-1", text: "证据" })]);
@@ -527,7 +523,6 @@ describe("注入块生成（纯函数部分）", () => {
       mode: "qa",
       deps: {
         decomposeModel: null,
-        distillModel: null,
         retrieve: async () => {
           throw new Error("boom");
         },
@@ -556,7 +551,6 @@ describe("注入块生成（纯函数部分）", () => {
       mode: "qa",
       deps: {
         decomposeModel: null,
-        distillModel: null,
         retrieve: async () => ({ candidates: [], sources: [], retrievalMode: "fts", retrievalModeRequested: "fts", degraded: [] }),
       },
     });
@@ -814,7 +808,6 @@ describe("retrieveForNotebooks 边界与配置（真实 KnowledgeManager）", ()
       budgetTokens: 5,
       deps: {
         decomposeModel: null,
-        distillModel: null,
         retrieve: ({ query }) => manager.queryService.retrieveForNotebooks({
           studioId,
           notebookIds: [notebook.id],
@@ -840,7 +833,6 @@ describe("rerank 降级留痕透传", () => {
       budgetTokens: 1000,
       deps: {
         decomposeModel: null,
-        distillModel: null,
         retrieve: async () => ({
           ...fakeRetrieval([fakeChunk({ text: "证据文本" })]),
           rerankDegradeReasons: ["研究: rerank degraded (KnowledgeRerankDeadlineError: rerank deadline exceeded after 15000ms); kept RRF ranking"],
@@ -861,7 +853,6 @@ describe("rerank 降级留痕透传", () => {
       budgetTokens: 1000,
       deps: {
         decomposeModel: null,
-        distillModel: null,
         retrieve: async () => fakeRetrieval([fakeChunk({ text: "证据文本" })]),
       },
     });
@@ -907,7 +898,6 @@ describe("注入链路锚点伸缩", () => {
       budgetTokens: 300_000,
       deps: {
         decomposeModel: null,
-        distillModel: null,
         retrieve: async () => fakeRetrieval(candidates),
       },
     });
@@ -926,7 +916,6 @@ describe("注入链路锚点伸缩", () => {
       budgetTokens: 2_000,
       deps: {
         decomposeModel: null,
-        distillModel: null,
         retrieve: async () => fakeRetrieval(candidates),
       },
     });
@@ -972,7 +961,6 @@ describe("resolveFusionPoolBudget（阀 A：池 70% 折算块数）", () => {
       budgetTokens: 500_000,
       deps: {
         decomposeModel,
-        distillModel: null,
         retrieve: async ({ query }) => {
           if (query === "问题") return fakeRetrieval(perQuery("direct"));
           if (query.includes("甲")) return fakeRetrieval(perQuery("subA"));
@@ -1061,7 +1049,6 @@ describe("候选总预算分摊（§二十一）与扩展并行（§二十三 �
       mode: "qa",
       deps: {
         decomposeModel,
-        distillModel: null,
         retrieve: async ({ query, topK }) => {
           seen.push({ query, topK });
           return fakeRetrieval([fakeChunk({ id: query })]);
@@ -1095,7 +1082,6 @@ describe("候选总预算分摊（§二十一）与扩展并行（§二十三 �
       deps: {
         decomposeModel,
         expandModel,
-        distillModel: null,
         retrieve: async ({ query }) => {
           events.push(`retrieve:${query}`);
           return fakeRetrieval([fakeChunk({ id: query })]);
@@ -1123,7 +1109,6 @@ describe("候选总预算分摊（§二十一）与扩展并行（§二十三 �
       deps: {
         decomposeModel,
         expandModel,
-        distillModel: null,
         retrieve: async ({ query }) => {
           if (query === "主问题") return fakeRetrieval([fakeChunk({ id: "d1" })]);
           if (query === "子查询一") return fakeRetrieval([fakeChunk({ id: "s1" })]);
@@ -1249,7 +1234,6 @@ describe("扩展条件门控（§十一 Conditional LLM）", () => {
       deps: {
         decomposeModel,
         expandModel,
-        distillModel: null,
         retrieve: async ({ query }) => {
           events.push(`retrieve:${query}`);
           return fakeRetrieval([fakeChunk({ id: `c-${query}` })]);
@@ -1288,7 +1272,6 @@ describe("扩展条件门控（§十一 Conditional LLM）", () => {
       deps: {
         decomposeModel,
         expandModel,
-        distillModel: null,
         retrieve: async ({ query }) => fakeRetrieval([fakeChunk({ id: `c-${query}` })]),
       },
     });
@@ -1302,7 +1285,6 @@ describe("扩展条件门控（§十一 Conditional LLM）", () => {
       deps: {
         decomposeModel,
         expandModel,
-        distillModel: null,
         retrieve: async ({ query }) => fakeRetrieval([fakeChunk({ id: `c-${query}` })]),
       },
     });
@@ -1313,9 +1295,11 @@ describe("扩展条件门控（§十一 Conditional LLM）", () => {
 });
 
 describe("Gap Analyzer 二轮补证（§二十二）", () => {
-  it("shouldRunGapAnalysis：高覆盖模式或零命中触发；全强命中不触发", () => {
+  it("shouldRunGapAnalysis：高召回模式或零命中触发；全强命中不触发（旧值 exhaustive 按 broad 待遇）", () => {
     expect(shouldRunGapAnalysis({ coverageMode: "high_recall", subQueries: ["q"], subQueryHits: [10], originalQueryHits: 10 }).trigger).toBe(true);
-    expect(shouldRunGapAnalysis({ coverageMode: "exhaustive", subQueries: [], subQueryHits: [], originalQueryHits: 5 }).trigger).toBe(true);
+    // 存量旧值 exhaustive（两档化后执行侧按 broad）：结构探测已跑过，模式本身不再触发。
+    expect(shouldRunGapAnalysis({ coverageMode: "exhaustive", subQueries: [], subQueryHits: [], originalQueryHits: 0 }).trigger).toBe(true);
+    expect(shouldRunGapAnalysis({ coverageMode: "exhaustive", subQueries: ["q"], subQueryHits: [10], originalQueryHits: 5 }).trigger).toBe(false);
     const weak = shouldRunGapAnalysis({ coverageMode: "broad", subQueries: ["a", "b"], subQueryHits: [5, 0], originalQueryHits: 3 });
     expect(weak.trigger).toBe(true);
     expect(weak.reason).toContain("0 hits");
@@ -1337,7 +1321,6 @@ describe("Gap Analyzer 二轮补证（§二十二）", () => {
         decomposeModel,
         expandModel: null,
         gapAnalysisModel: gapModel,
-        distillModel: null,
         retrieve: async ({ query }) => {
           retrieved.push(query);
           // 「零命中方向」0 命中触发 gap；其余 1 命中。
@@ -1378,7 +1361,6 @@ describe("Gap Analyzer 二轮补证（§二十二）", () => {
         decomposeModel,
         expandModel: null,
         gapAnalysisModel: gapModel,
-        distillModel: null,
         retrieve: async ({ query }) => fakeRetrieval([fakeChunk({ id: `c-${query}` })]),
       },
     });
@@ -1413,7 +1395,6 @@ describe("否定排除（§九：词法约束而非检索查询）", () => {
       deps: {
         decomposeModel,
         expandModel: null,
-        distillModel: null,
         retrieve: async ({ query }) => fakeRetrieval([
           fakeChunk({ id: "keep", text: "甲方法的说明" }),
           fakeChunk({ id: "drop", text: "乙方法的相关段落" }),

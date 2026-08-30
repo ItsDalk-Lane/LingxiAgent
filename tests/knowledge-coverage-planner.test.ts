@@ -1,12 +1,13 @@
 /**
- * KnowledgeCoveragePlanner（任务书 §二十七–§三十二/§四十一/§九十六，Phase 7）：
- * - 第一层确定性规则：exhaustive 关键词 / global-negative 句式 → exhaustive
- *   （纯规则命中，无 LLM 也定档）；多源指代 → broad+multi_source；单点事实 →
- *   high_recall；
- * - 第二层语义判断：隐式整体总结经 classifyModel 进 exhaustive/broad（低置信
- *   broad）；输出非法/调用失败降级 high_recall 并留痕；
+ * KnowledgeCoveragePlanner（任务书 §二十七–§三十二/§九十六，Phase 7；
+ * 2026-08-31 两档化改写）：
+ * - 第一层确定性规则：全库/完整性关键词与 global-negative 句式 → broad（历史
+ *   exhaustive 定档改道）；多源指代 → broad+multi_source；单点事实 → high_recall；
+ * - 第二层语义判断：whole_scope_analysis/global_negative 意图与模型旧值 exhaustive
+ *   输出一律归并 broad；输出非法/调用失败降级 high_recall 并留痕；
  * - 三维度正交：plan 不携带 answerMode/retrievalMode；
- * - 持久化 round-trip（schema v13 knowledge_coverage_plans）；
+ * - 持久化 round-trip（schema v13 knowledge_coverage_plans；requires_completeness
+ *   遗留列新行恒 false）；
  * - injector 集成回归：块头 coverage 标注 + stats 透出，检索行为与无 planner 一致。
  */
 import fs from "node:fs";
@@ -17,7 +18,6 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import {
   KNOWLEDGE_COVERAGE_CLASSIFY_SYSTEM_PROMPT,
-  KNOWLEDGE_COVERAGE_EXHAUSTIVE_MIN_CONFIDENCE,
   RULE_EXHAUSTIVE_KEYWORD,
   RULE_FACT_LOOKUP,
   RULE_GLOBAL_NEGATIVE,
@@ -54,35 +54,35 @@ function tempHome(prefix: string) {
 function classificationJson(overrides: Record<string, unknown> = {}) {
   return JSON.stringify({
     intent: "whole_scope_analysis",
-    coverageMode: "exhaustive",
-    requiresCompleteness: true,
+    coverageMode: "broad",
     scopeLevel: "notebook",
     confidence: 0.9,
     ...overrides,
   });
 }
 
-/** plan 不得携带 answerMode/retrievalMode（三维度正交，§二十八）。 */
+/** plan 不得携带 answerMode/retrievalMode/requiresCompleteness（三维度正交 + 两档化）。 */
 function expectOrthogonal(plan: KnowledgeCoveragePlan) {
   for (const key of Object.keys(plan)) {
     expect(key).not.toBe("answerMode");
     expect(key).not.toBe("retrievalMode");
+    expect(key).not.toBe("requiresCompleteness");
   }
 }
 
-describe("第一层确定性规则（§三十一）", () => {
+describe("第一层确定性规则（§三十一，两档化）", () => {
   it.each([
     "请把这本书全文梳理一遍，不要遗漏任何论点",
     "列出所有提到交付日期的段落",
     "从头到尾全面分析这份报告",
     "第三章之后的全部内容都检查一遍",
-  ])("exhaustive 关键词 → exhaustive（无 LLM 也命中）：%s", async (question) => {
+  ])("全库/完整性关键词 → broad（无 LLM 也命中）：%s", async (question) => {
     const plan = await planKnowledgeCoverage({ question });
-    expect(plan.coverageMode).toBe("exhaustive");
-    expect(plan.requiresCompleteness).toBe(true);
+    expect(plan.coverageMode).toBe("broad");
     expect(plan.matchedRuleIds).toContain(RULE_EXHAUSTIVE_KEYWORD);
+    expect(plan.intent).toBe("whole_scope_analysis");
     expect(plan.classifierUsed).toBe("rules");
-    expect(plan.confidence).toBeGreaterThanOrEqual(0.9);
+    expect(plan.confidence).toBeGreaterThanOrEqual(0.8);
     expectOrthogonal(plan);
   });
 
@@ -90,31 +90,29 @@ describe("第一层确定性规则（§三十一）", () => {
     "全文有没有任何地方提到风险准备金？",
     "是否存在任何反例推翻这个结论？",
     "所有提到的交付节点是否都有出处？",
-  ])("global-negative 句式 → exhaustive + global_negative 意图：%s", async (question) => {
+  ])("global-negative 句式 → broad + global_negative 意图：%s", async (question) => {
     const plan = await planKnowledgeCoverage({ question });
-    expect(plan.coverageMode).toBe("exhaustive");
-    expect(plan.requiresCompleteness).toBe(true);
+    expect(plan.coverageMode).toBe("broad");
     expect(plan.matchedRuleIds).toContain(RULE_GLOBAL_NEGATIVE);
     expect(plan.intent).toBe("global_negative");
     expect(plan.classifierUsed).toBe("rules");
     expectOrthogonal(plan);
   });
 
-  it("exhaustive 规则直接定档：classifyModel 存在也不被调用（§四十一）", async () => {
+  it("关键词命中后 classifyModel 仍被复核（definitive 短路已移除）", async () => {
     const classifyModel = vi.fn(async () => classificationJson());
     const plan = await planKnowledgeCoverage({
       question: "全书所有出现的术语都列出来",
       classifyModel: classifyModel as unknown as CoverageClassifyModel,
     });
-    expect(plan.coverageMode).toBe("exhaustive");
-    expect(plan.classifierUsed).toBe("rules");
-    expect(classifyModel).not.toHaveBeenCalled();
+    expect(plan.coverageMode).toBe("broad");
+    expect(plan.classifierUsed).toBe("rules+llm");
+    expect(classifyModel).toHaveBeenCalledTimes(1);
   });
 
   it("多源指代 → broad + multi_source（无 LLM 即终稿）", async () => {
     const plan = await planKnowledgeCoverage({ question: "这几份文件分别如何看待利率风险？" });
     expect(plan.coverageMode).toBe("broad");
-    expect(plan.requiresCompleteness).toBe(false);
     expect(plan.scopeLevel).toBe("multi_source");
     expect(plan.matchedRuleIds).toContain(RULE_MULTI_SOURCE);
     expect(plan.intent).toBe("cross_source_synthesis");
@@ -125,7 +123,6 @@ describe("第一层确定性规则（§三十一）", () => {
   it("普通事实问题 → high_recall + local", async () => {
     const plan = await planKnowledgeCoverage({ question: "项目是何时启动的？" });
     expect(plan.coverageMode).toBe("high_recall");
-    expect(plan.requiresCompleteness).toBe(false);
     expect(plan.scopeLevel).toBe("local");
     expect(plan.matchedRuleIds).toContain(RULE_FACT_LOOKUP);
     expect(plan.classifierUsed).toBe("rules");
@@ -143,7 +140,7 @@ describe("第一层确定性规则（§三十一）", () => {
   it("matchCoverageRules 的规则 id 稳定（可直接断言）", () => {
     expect(matchCoverageRules("全文怎么说的").matchedRuleIds).toEqual([RULE_EXHAUSTIVE_KEYWORD]);
     expect(matchCoverageRules("有没有任何遗漏").matchedRuleIds).toEqual([RULE_GLOBAL_NEGATIVE]);
-    // exhaustive 关键词与 global-negative 可叠加命中（两个 id 都在）。
+    // 全库关键词与 global-negative 可叠加命中（两个 id 都在）。
     expect(matchCoverageRules("全文是否提到任何风险").matchedRuleIds)
       .toEqual([RULE_EXHAUSTIVE_KEYWORD, RULE_GLOBAL_NEGATIVE]);
   });
@@ -161,17 +158,16 @@ describe("scopeLevel 元数据推导（§三十）", () => {
       question: "全文提到的风险条款都列出来",
       turnScopeInfo: info,
     });
-    expect(plan.coverageMode).toBe("exhaustive");
+    expect(plan.coverageMode).toBe("broad");
     expect(plan.scopeLevel).toBe(expected);
   });
 });
 
-describe("第二层语义判断（§三十二）", () => {
-  it("隐式整体总结（无关键词）经 classifyModel 进 exhaustive", async () => {
+describe("第二层语义判断（§三十二，两档化）", () => {
+  it("隐式整体总结（无关键词）经 classifyModel 定 broad", async () => {
     const classifyModel = vi.fn(async () => classificationJson({
       intent: "whole_scope_analysis",
-      coverageMode: "exhaustive",
-      requiresCompleteness: true,
+      coverageMode: "broad",
       scopeLevel: "notebook",
       confidence: 0.85,
       subQueries: ["核心思想", "理论体系脉络"],
@@ -181,9 +177,8 @@ describe("第二层语义判断（§三十二）", () => {
       turnScopeInfo: { notebookCount: 1, sourceCount: 2 },
       classifyModel: classifyModel as unknown as CoverageClassifyModel,
     });
-    expect(plan.coverageMode).toBe("exhaustive");
-    expect(plan.requiresCompleteness).toBe(true);
-    expect(plan.classifierUsed).toBe("rules+llm"); // "是什么" 命中 fact 规则，语义层复核升级
+    expect(plan.coverageMode).toBe("broad");
+    expect(plan.classifierUsed).toBe("rules+llm"); // "是什么" 命中 fact 规则，语义层复核
     expect(plan.matchedRuleIds).toContain(RULE_FACT_LOOKUP);
     expect(plan.scopeLevel).toBe("notebook");
     expect(plan.subQueries).toEqual(["核心思想", "理论体系脉络"]);
@@ -191,52 +186,58 @@ describe("第二层语义判断（§三十二）", () => {
     expectOrthogonal(plan);
   });
 
-  it("低置信 exhaustive 判定保守降为 broad（§三十二：置信度较低时进入 broad）", async () => {
+  it("模型输出旧值 exhaustive → 归并 broad（存量/旧提示词习惯兼容）", async () => {
     const classifyModel = vi.fn(async () => classificationJson({
       coverageMode: "exhaustive",
-      requiresCompleteness: false,
-      confidence: KNOWLEDGE_COVERAGE_EXHAUSTIVE_MIN_CONFIDENCE - 0.01,
       scopeLevel: "whole_scope",
+      confidence: 0.95,
     }));
     const plan = await planKnowledgeCoverage({
       question: "这份报告整体有哪些重要风险？",
       classifyModel: classifyModel as unknown as CoverageClassifyModel,
     });
     expect(plan.coverageMode).toBe("broad");
-    expect(plan.requiresCompleteness).toBe(false);
     expectOrthogonal(plan);
   });
 
-  it("requiresCompleteness=true 或 global_negative 意图 → 强制 exhaustive（不变量）", async () => {
-    const requiresCompletenessPlan = await planKnowledgeCoverage({
+  it("whole_scope_analysis / global_negative 意图不允许低于 broad", async () => {
+    const wholeScopePlan = await planKnowledgeCoverage({
       question: "这份报告的要点分布",
       classifyModel: (async () => classificationJson({
-        intent: "open_summary",
+        intent: "whole_scope_analysis",
         coverageMode: "high_recall",
-        requiresCompleteness: true,
         confidence: 0.8,
       })) as unknown as CoverageClassifyModel,
     });
-    expect(requiresCompletenessPlan.coverageMode).toBe("exhaustive");
-    expect(requiresCompletenessPlan.requiresCompleteness).toBe(true);
+    expect(wholeScopePlan.coverageMode).toBe("broad");
 
     const globalNegativePlan = await planKnowledgeCoverage({
       question: "这份报告的要点分布",
       classifyModel: (async () => classificationJson({
         intent: "global_negative",
         coverageMode: "high_recall",
-        requiresCompleteness: false,
         confidence: 0.8,
       })) as unknown as CoverageClassifyModel,
     });
-    expect(globalNegativePlan.coverageMode).toBe("exhaustive");
-    expect(globalNegativePlan.requiresCompleteness).toBe(true);
+    expect(globalNegativePlan.coverageMode).toBe("broad");
+  });
+
+  it("open_summary + high_recall 维持 high_recall（不强升 broad）", async () => {
+    const plan = await planKnowledgeCoverage({
+      question: "帮我归纳这份材料",
+      classifyModel: (async () => classificationJson({
+        intent: "open_summary",
+        coverageMode: "high_recall",
+        confidence: 0.7,
+      })) as unknown as CoverageClassifyModel,
+    });
+    expect(plan.coverageMode).toBe("high_recall");
   });
 
   it("首次输出非法 → 纠错重试一次；第二次合法则采用", async () => {
     const classifyModel = vi.fn()
       .mockResolvedValueOnce("这不是 JSON")
-      .mockResolvedValueOnce(classificationJson({ intent: "open_summary", coverageMode: "broad", requiresCompleteness: false, confidence: 0.7 }));
+      .mockResolvedValueOnce(classificationJson({ intent: "open_summary", coverageMode: "broad", confidence: 0.7 }));
     const plan = await planKnowledgeCoverage({
       question: "帮我归纳这份材料",
       classifyModel: classifyModel as unknown as CoverageClassifyModel,
@@ -258,7 +259,6 @@ describe("第二层语义判断（§三十二）", () => {
       classifyModel: classifyModel as unknown as CoverageClassifyModel,
     });
     expect(plan.coverageMode).toBe("high_recall");
-    expect(plan.requiresCompleteness).toBe(false);
     expect(plan.classifierUsed).toBe("rules");
     expect(plan.degradeReason).toBe("model output invalid after one correction retry");
     expect(classifyModel).toHaveBeenCalledTimes(2);
@@ -282,7 +282,7 @@ describe("第二层语义判断（§三十二）", () => {
   });
 
   it("classifyModel 收到 scope 元数据摘要", async () => {
-    const classifyModel = vi.fn(async () => classificationJson({ coverageMode: "broad", requiresCompleteness: false }));
+    const classifyModel = vi.fn(async () => classificationJson({ coverageMode: "broad" }));
     await planKnowledgeCoverage({
       question: "归纳一下",
       turnScopeInfo: { notebookCount: 2, sourceCount: 5 },
@@ -301,15 +301,19 @@ describe("分类输出严格校验 parseCoverageClassification", () => {
     expect(() => parseCoverageClassification(classificationJson({ coverageMode: "medium" }))).toThrow();
     expect(() => parseCoverageClassification(classificationJson({ scopeLevel: "everywhere" }))).toThrow();
     expect(() => parseCoverageClassification(classificationJson({ confidence: 1.5 }))).toThrow();
+    // 两档化后 requiresCompleteness 是多余字段（schema 已移除）。
     expect(() => parseCoverageClassification(classificationJson({ requiresCompleteness: "yes" }))).toThrow();
     expect(() => parseCoverageClassification(classificationJson({ subQueries: ["a", "b", "c", "d", "e"] }))).toThrow();
     expect(() => parseCoverageClassification(classificationJson({ unknownField: 1 }))).toThrow();
     expect(parseCoverageClassification(classificationJson())).toMatchObject({ intent: "whole_scope_analysis" });
   });
 
-  it("系统提示词携带枚举 schema、围栏禁令与禁 CoT 要求", () => {
+  it("系统提示词为两档 schema、围栏禁令与禁 CoT 要求", () => {
     expect(KNOWLEDGE_COVERAGE_CLASSIFY_SYSTEM_PROMPT).toContain("high_recall");
-    expect(KNOWLEDGE_COVERAGE_CLASSIFY_SYSTEM_PROMPT).toContain("exhaustive");
+    expect(KNOWLEDGE_COVERAGE_CLASSIFY_SYSTEM_PROMPT).toContain("broad");
+    expect(KNOWLEDGE_COVERAGE_CLASSIFY_SYSTEM_PROMPT).toContain('\"coverageMode\":\"high_recall|broad\"');
+    expect(KNOWLEDGE_COVERAGE_CLASSIFY_SYSTEM_PROMPT).toContain("There is no exhaustive mode");
+    expect(KNOWLEDGE_COVERAGE_CLASSIFY_SYSTEM_PROMPT).not.toContain("requiresCompleteness");
     expect(KNOWLEDGE_COVERAGE_CLASSIFY_SYSTEM_PROMPT).toContain("Do not use Markdown fences");
     expect(KNOWLEDGE_COVERAGE_CLASSIFY_SYSTEM_PROMPT).toContain("Do not include reasoning");
   });
@@ -331,7 +335,6 @@ describe("持久化 round-trip（schema v13）", () => {
     return {
       intent: "cross_source_synthesis",
       coverageMode: "broad",
-      requiresCompleteness: false,
       scopeLevel: "multi_source",
       subQueries: ["利率风险", "信用风险"],
       confidence: 0.8,
@@ -340,10 +343,9 @@ describe("持久化 round-trip（schema v13）", () => {
     };
   }
 
-  it("新库直接是 v14，表存在", () => {
+  it("新库直接是最新 schema，表存在", () => {
     const store = createStore();
     expect(store.db.pragma("user_version", { simple: true })).toBe(KNOWLEDGE_SCHEMA_VERSION);
-    expect(KNOWLEDGE_SCHEMA_VERSION).toBe(17);
     expect(store.db.prepare(
       "SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'knowledge_coverage_plans'",
     ).get()).toBeTruthy();
@@ -381,6 +383,7 @@ describe("持久化 round-trip（schema v13）", () => {
     expect(record.id).toBeTruthy();
     expect(record.turnScopeId).toBe(scope.id);
     expect(record.coverageMode).toBe("broad");
+    // 遗留列恒 false（exhaustive 档移除）。
     expect(record.requiresCompleteness).toBe(false);
     expect(record.subQueries).toEqual(["利率风险", "信用风险"]);
     expect(record.matchedRuleIds).toEqual([RULE_MULTI_SOURCE]);
@@ -402,7 +405,6 @@ describe("持久化 round-trip（schema v13）", () => {
       plan: {
         intent: "fact_lookup",
         coverageMode: "high_recall",
-        requiresCompleteness: false,
         scopeLevel: "source",
         confidence: 0.3,
         matchedRuleIds: [],
@@ -422,10 +424,6 @@ describe("持久化 round-trip（schema v13）", () => {
     expect(() => store.insertCoveragePlan({
       question: "q",
       plan: { ...samplePlan(), coverageMode: "medium" },
-    })).toThrow();
-    expect(() => store.insertCoveragePlan({
-      question: "q",
-      plan: { ...samplePlan(), requiresCompleteness: "yes" },
     })).toThrow();
     expect(() => store.insertCoveragePlan({
       question: "q",
@@ -452,7 +450,7 @@ describe("持久化 round-trip（schema v13）", () => {
       question: "全文提到的风险都列出来",
       plan,
     });
-    expect(record.coverageMode).toBe("exhaustive");
+    expect(record.coverageMode).toBe("broad");
     expect(manager.getLatestCoveragePlan({ turnScopeId: scope.id })).toEqual(record);
   });
 });
@@ -484,7 +482,7 @@ describe("injector 集成回归（Phase 7：只标注，不改变检索行为）
     const chunks = [fakeChunk("chunk_a", 0), fakeChunk("chunk_b", 1)];
     return {
       decomposeModel: null,
-      distillModel: null,
+      rollupModel: null,
       retrieve: ({ query }: { query: string }) => {
         retrieveQueries.push(query);
         return Promise.resolve(fakeRetrieval(chunks));
@@ -495,7 +493,6 @@ describe("injector 集成回归（Phase 7：只标注，不改变检索行为）
   const broadPlan: KnowledgeCoveragePlan = {
     intent: "cross_source_synthesis",
     coverageMode: "broad",
-    requiresCompleteness: false,
     scopeLevel: "multi_source",
     confidence: 0.8,
     matchedRuleIds: [RULE_MULTI_SOURCE],
@@ -514,7 +511,6 @@ describe("injector 集成回归（Phase 7：只标注，不改变检索行为）
     expect(block).toContain("[coverage: broad · multi_source]");
     expect(stats.coverageMode).toBe("broad");
     expect(stats.scopeLevel).toBe("multi_source");
-    expect(stats.requiresCompleteness).toBe(false);
     expect(stats.matchedRuleIds).toEqual([RULE_MULTI_SOURCE]);
   });
 

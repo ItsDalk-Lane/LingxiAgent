@@ -456,7 +456,11 @@
     "knowledgeRetrievalUnavailable": "ナレッジ検索は利用不可",
     "knowledgeRetrievalRowTitle": "{source} · チャンク {chunk}",
     "knowledgeRetrievalDistilled": "{n} バッチに抽出済み",
-    "knowledgeDistilling": "知識蒸留中 · {done} バッチ完了 · {model}"
+    "knowledgeRollupReading": "エビデンスの第 {current}/{total} 部を読み込み中",
+    "knowledgeSupplementing": "モデルが補足検索を実行しました（{count} 件）",
+    "knowledgeRetrievalRolled": "{parts} 部に分けて読解",
+    "knowledgeRetrievalSupplement": "補足検索 {n} 件",
+    "knowledgeRetrievalSupplementTitle": "ローリング読解中にモデルが自主的に発行した補足検索"
   },
   "time": {
     "justNow": "たった今",
@@ -1887,8 +1891,6 @@
       "auxMemoryModelHint": "長期記憶抽出、セッション記憶圧縮、日記素材生成に使用",
       "auxKnowledgeModel": "ナレッジ分析モデル",
       "auxKnowledgeModelHint": "知識の質問分解に使用",
-      "auxKnowledgeDistillModel": "知識抽出モデル",
-      "auxKnowledgeDistillModelHint": "根拠が注入予算を超える場合、質問に関連する内容をバッチごとに抽出（未設定時はシャード一覧モードへフォールバック）",
       "knowledgeOperationUsesProviderCredential": "選択したプロバイダーの認証情報を再利用し、別のキーは保存しません",
       "knowledgeOperationOptional": "未設定（任意）",
       "knowledgeOperationUnavailable": "現在利用できません",

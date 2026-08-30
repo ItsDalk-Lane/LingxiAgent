@@ -660,7 +660,7 @@
     ],
     "version": 3
   },
-  "payloadFingerprint": "sha256:7316ccbf83072b075a76e861c110365bda399554823ae3db0278674b086d6f69",
+  "payloadFingerprint": "sha256:4172d591d3ff1b087ea2fa6efd552816992dbc8ef8352bb4f30f9caf89a5c36c",
   "registry": [
     {
       "affectedByEpochMigration": true,
@@ -3285,8 +3285,8 @@
   ],
   "review": {
     "classification": "compatible",
-    "compatibilityReason": "core/engine.ts decompose closure adds specialist/gap prompt routing and context passthrough; no persisted store shape or site mapping change",
-    "payloadFingerprint": "sha256:7316ccbf83072b075a76e861c110365bda399554823ae3db0278674b086d6f69"
+    "compatibilityReason": "knowledge-store.ts: exhaustive coverage run write APIs removed (runtime code only; coverage_runs/coverage_shards/evidence_manifests DDL unchanged, schema stays v17); knowledge-manager.ts untouched store shapes; coverage plan insert drops legacy requiresCompleteness input field (column still written as 0)",
+    "payloadFingerprint": "sha256:4172d591d3ff1b087ea2fa6efd552816992dbc8ef8352bb4f30f9caf89a5c36c"
   },
   "schemas": [
     {
@@ -3822,7 +3822,7 @@
         ],
         "userVersion": 17
       },
-      "sourceHash": "sha256:d69e3accf5d936297ae492459c67a723109e9c85564d84db164a5f6f5f002b08",
+      "sourceHash": "sha256:750e1194eac7e48f2e596d845954d90d8a8cc594a9dc5fd0a82f9d55af2a44e3",
       "storeId": "knowledge-database"
     },
     {

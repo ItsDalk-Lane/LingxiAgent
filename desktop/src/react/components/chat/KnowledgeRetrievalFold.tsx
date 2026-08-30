@@ -9,6 +9,8 @@
  *   一次性全展开会让列表失去可读性（用户明确要求的二级结构）。
  *   每条一行 `#ordinal firstLine`（编号 + 首行，不是全文），
  *   行 title 悬浮 `{sourceName} · 块 {chunkOrdinal}`。
+ * - 滚动注入（2026-08-31）：rollup 携带分批阅读统计与模型自主补充检索的
+ *   查询行（过程留痕，历史可见）；distilled 徽标仅为旧会话存量 stats 渲染。
  * 视觉复用 ToolGroupBlock 的工具条 class，不另起卡片形态。
  */
 
@@ -43,7 +45,9 @@ export const KnowledgeRetrievalFold = memo(function KnowledgeRetrievalFold({ ret
   const results = Array.isArray(retrieval.results)
     ? retrieval.results.filter(isRetrievalResult)
     : [];
-  const expandable = !unavailable && results.length > 0;
+  const rollup = retrieval.rollup ?? null;
+  const supplementalQueries = rollup?.supplementalQueries ?? [];
+  const expandable = !unavailable && (results.length > 0 || supplementalQueries.length > 0);
   const summary = unavailable
     ? t('chat.knowledgeRetrievalUnavailable')
     : t('chat.knowledgeRetrievalSearched', { n: retrieval.injectedChunks });
@@ -58,6 +62,11 @@ export const KnowledgeRetrievalFold = memo(function KnowledgeRetrievalFold({ ret
       >
         <span className={styles.knowledgeRetrievalIcon} aria-hidden="true">📚</span>
         <span className={styles.toolGroupTitle}>{summary}</span>
+        {rollup && !unavailable && (
+          <span className={styles.knowledgeRetrievalBadge}>
+            {t('chat.knowledgeRetrievalRolled', { parts: rollup.parts, rounds: rollup.rounds })}
+          </span>
+        )}
         {retrieval.distilled && !unavailable && (
           <span className={styles.knowledgeRetrievalBadge}>
             {t('chat.knowledgeRetrievalDistilled', { n: retrieval.distillBatches ?? 0 })}
@@ -75,6 +84,24 @@ export const KnowledgeRetrievalFold = memo(function KnowledgeRetrievalFold({ ret
       {expandable && (
         <Collapse open={expanded}>
           <div className={styles.toolGroupContent}>
+            {supplementalQueries.length > 0 && (
+              <div className={styles.toolIndicator} data-testid="knowledge-retrieval-supplement">
+                <span className={styles.knowledgeRetrievalOrdinal}>🔍</span>
+                <span className={styles.toolDesc}>
+                  {t('chat.knowledgeRetrievalSupplement', { n: supplementalQueries.length })}
+                </span>
+              </div>
+            )}
+            {supplementalQueries.map((query) => (
+              <div
+                key={`supplement-${query}`}
+                className={styles.toolIndicator}
+                title={t('chat.knowledgeRetrievalSupplementTitle')}
+              >
+                <span className={styles.knowledgeRetrievalOrdinal}>↻</span>
+                <span className={styles.toolDesc}>{query}</span>
+              </div>
+            ))}
             {preview.map((result) => (
               <div
                 key={`${result.ordinal}-${result.sourceName}-${result.chunkOrdinal}`}

@@ -1784,27 +1784,26 @@ export function createChatRoute(engine: any, hub: any, {
       // 知识注入链路开始检索的即时反馈（desktop-session-submit 在阻塞式注入前发出）：
       // 早于 session_status isStreaming，前端用它显示「正在检索知识库」占位。
       broadcast({ type: "knowledge_retrieval_started", sessionPath });
-    } else if (event.type === "knowledge_distill_progress") {
-      // 蒸馏每批完成的进度（超预算证据分段压缩）：驱动前端「蒸馏中 · N 批」胶囊，
-      // 结束由该 session 任意后续事件（session_user_message 等）保守清除。
+    } else if (event.type === "knowledge_rollup_progress") {
+      // 滚动注入中间轮进度（超预算证据分部分喂给主模型消化）：驱动前端
+      // 「正在阅读第 X/N 部分」胶囊，结束由该 session 任意后续事件
+      // （session_user_message 等）保守清除。
       broadcast({
-        type: "knowledge_distill_progress",
+        type: "knowledge_rollup_progress",
         sessionPath,
-        done: Number(event.done) || 0,
-        model: typeof event.model === "string" ? event.model : null,
-      });
-    } else if (event.type === "knowledge_coverage_progress") {
-      // EXHAUSTIVE 覆盖执行的 shard 终态进度（Phase 9 第二波）：对齐
-      // knowledge_distill_progress 的广播模式，不进 stream_resume；结束同样由
-      // 该 session 任意后续事件保守清除。前端本波次只保证不破坏（未知事件
-      // 直接忽略），进度胶囊渲染留给后续版本。
-      broadcast({
-        type: "knowledge_coverage_progress",
-        sessionPath,
-        runId: typeof event.runId === "string" ? event.runId : "",
-        done: Number(event.done) || 0,
+        current: Number(event.current) || 0,
         total: Number(event.total) || 0,
-        ...(event.coverageStatus != null ? { coverageStatus: event.coverageStatus } : {}),
+      });
+    } else if (event.type === "knowledge_supplement_search") {
+      // 滚动循环内模型自主发起的补充检索（过程可见，不显中间内容）：前端
+      // 折叠卡/胶囊展示查询行；清除语义同上（保守清除）。
+      broadcast({
+        type: "knowledge_supplement_search",
+        sessionPath,
+        queries: Array.isArray(event.queries)
+          ? event.queries.filter((query: unknown): query is string => typeof query === "string")
+          : [],
+        round: Number(event.round) || 0,
       });
     } else if (event.type === "session_status") {
       // session_status 只回答「Session 忙不忙」（任务书 §九/§十：status 与 Run 正交）。

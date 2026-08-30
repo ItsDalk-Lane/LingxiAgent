@@ -108,7 +108,6 @@ export function AuxiliaryModelsSection({ providers }: { providers: Record<string
     summarize: { titleKey: 'settings.api.auxSummarizeModel', hintKey: 'settings.api.auxSummarizeModelHint', fallbackKey: 'settings.api.auxFallbackChat', followKey: 'settings.api.auxFollowMain' },
     memory: { titleKey: 'settings.api.auxMemoryModel', hintKey: 'settings.api.auxMemoryModelHint', fallbackKey: 'settings.api.auxFallbackChat', followKey: 'settings.api.auxFollowMain' },
     knowledge: { titleKey: 'settings.api.auxKnowledgeModel', hintKey: 'settings.api.auxKnowledgeModelHint', fallbackKey: 'settings.api.auxFallbackChat', followKey: 'settings.api.auxFollowMain' },
-    knowledgeDistill: { titleKey: 'settings.api.auxKnowledgeDistillModel', hintKey: 'settings.api.auxKnowledgeDistillModelHint', fallbackKey: 'settings.api.auxFallbackChat', followKey: 'settings.api.auxFollowMain' },
     vision: { titleKey: 'settings.api.visionModel', hintKey: 'settings.api.visionModelHint', fallbackKey: 'settings.api.auxFallbackVision', followKey: 'settings.api.auxFollowMain', imageOnly: true },
     approval: { titleKey: 'settings.api.auxApprovalModel', hintKey: 'settings.api.auxApprovalModelHint', fallbackKey: 'settings.api.auxFallbackApproval', followKey: 'settings.api.auxFollowDisabled' },
     guard: { titleKey: 'settings.api.auxGuardModel', hintKey: 'settings.api.auxGuardModelHint', fallbackKey: 'settings.api.auxFallbackGuard', followKey: 'settings.api.auxFollowDisabled' },

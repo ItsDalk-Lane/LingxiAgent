@@ -1,22 +1,22 @@
 /**
- * knowledge-coverage-planner —— 覆盖策略规划（任务书 §二十七–§三十二/§四十一，Phase 7）。
+ * knowledge-coverage-planner —— 覆盖策略规划（任务书 §二十七–§三十二/§四十一，Phase 7；
+ * 2026-08-31 两档化：exhaustive 档移除，全库完整性改由 injector 的滚动多轮注入承担）。
  *
- * 三维度正交（§二十八）：coverageMode（high_recall/broad/exhaustive）与 answerMode
+ * 三维度正交（§二十八）：coverageMode（high_recall/broad）与 answerMode
  * （qa/assist）、retrievalMode（fts/hybrid）互不携带、互不影响——plan 不包含也
  * 不读这两个维度；执行侧自 Phase 8 起在 injector 消费（按档位切换检索行为），
  * 本模块只负责把判定做对。
  *
  * 两层判定：
- * 1. 确定性规则层（§三十一）：exhaustive 关键词与 global-negative 句式直接定档
- *    exhaustive（§四十一：明确触发不浪费一次普通检索，不依赖 LLM）；多源指代 →
- *    broad；单点事实 → high_recall。规则未定档的部分交给第二层。
+ * 1. 确定性规则层（§三十一）：全库/完整性关键词与 global-negative 句式 → broad
+ *    （历史上的 exhaustive 定档改道；规则 id 字符串保留兼容存量持久化行）；
+ *    多源指代 → broad；单点事实 → high_recall。
  * 2. 语义判断层（§三十二）：classifyModel 可用时用一次严格 JSON 输出的 LLM 分类
  *    （复用 injector 的纠错重试模式：输出 schema 校验失败重试一次，再失败降级
  *    high_recall 并留 degradeReason）；无 classifyModel → 规则结果即终稿。
  *
- * 不变量：requiresCompleteness ⟺ coverageMode === "exhaustive"（exhaustive 的
- * 定义就是"确定性扫描全部可处理内容"，完整性义务与档位一体两面；§三十一明确
- * 这类问题不能靠 TopK Search 证明）。
+ * 类型层保留 'exhaustive' 枚举值仅为存量持久化行/旧会话 stats 的读取兼容，
+ * 本模块与全部生产写入侧不再产出该值；旧值在执行侧按 broad 处理。
  *
  * 禁 CoT（§二十九）：模型输出只取结构化分类结果，reasoning 一律不落库不透传。
  * 纯函数化可测：模型调用依赖注入，本模块不做 IO。
@@ -50,7 +50,6 @@ export type CoverageDegradeReason =
 export interface KnowledgeCoveragePlan {
   intent: KnowledgeCoverageIntent;
   coverageMode: KnowledgeCoverageMode;
-  requiresCompleteness: boolean;
   scopeLevel: KnowledgeCoverageScopeLevel;
   /** 可选的覆盖面检索子查询（语义层产出，0-4 条；执行侧按需消费）。 */
   subQueries?: string[];
@@ -71,6 +70,7 @@ export interface KnowledgeCoveragePlanRecord {
   createdAt: string;
   intent: KnowledgeCoverageIntent;
   coverageMode: KnowledgeCoverageMode;
+  /** 遗留列：两档化后新行恒 false；存量 exhaustive 行为 true（仅读取兼容）。 */
   requiresCompleteness: boolean;
   scopeLevel: KnowledgeCoverageScopeLevel;
   subQueries: string[];
@@ -81,15 +81,21 @@ export interface KnowledgeCoveragePlanRecord {
   degradeReason: string | null;
 }
 
-/** 规则 id（§三十一；稳定枚举，持久化进 matched_rule_ids_json）。 */
+/**
+ * 规则 id（§三十一；稳定枚举，持久化进 matched_rule_ids_json）。前两个是
+ * exhaustive 时代的定档规则，两档化后命中改定 broad——id 字符串不动，存量行
+ * 留痕可读。
+ */
 export const RULE_EXHAUSTIVE_KEYWORD = "RULE_EXHAUSTIVE_KEYWORD";
 export const RULE_GLOBAL_NEGATIVE = "RULE_GLOBAL_NEGATIVE";
 export const RULE_MULTI_SOURCE = "RULE_MULTI_SOURCE";
 export const RULE_FACT_LOOKUP = "RULE_FACT_LOOKUP";
 
 /**
- * §三十一 全词表：以下词义强烈触发 exhaustive。中文按子串匹配（这些词在
- * 正常问句中不构成歧义子串）；"等"类扩展只在任务书词表内取词，不做自由发挥。
+ * §三十一 全词表：以下词义强烈指示全库/完整性诉求（历史上的 exhaustive 触发
+ * 词）。两档化后命中定 broad——整库阅读需求由 injector 的滚动多轮注入在执行侧
+ * 承担。中文按子串匹配（这些词在正常问句中不构成歧义子串）；"等"类扩展只在
+ * 任务书词表内取词，不做自由发挥。
  */
 const EXHAUSTIVE_KEYWORDS: readonly string[] = [
   "全文", "全书", "整本", "整篇", "全部", "所有",
@@ -124,6 +130,7 @@ const COVERAGE_INTENTS = new Set<KnowledgeCoverageIntent>([
   "global_negative",
   "open_summary",
 ]);
+/** 校验集含 'exhaustive'：LLM 输出与存量持久化行的旧值读取兼容（执行侧映射 broad）。 */
 const COVERAGE_MODES = new Set<KnowledgeCoverageMode>(["high_recall", "broad", "exhaustive"]);
 const COVERAGE_SCOPE_LEVELS = new Set<KnowledgeCoverageScopeLevel>([
   "local",
@@ -175,7 +182,6 @@ export interface KnowledgeCoverageTurnScopeInfo {
 export interface CoverageClassification {
   intent: KnowledgeCoverageIntent;
   coverageMode: KnowledgeCoverageMode;
-  requiresCompleteness: boolean;
   scopeLevel: KnowledgeCoverageScopeLevel;
   confidence: number;
   subQueries?: string[];
@@ -193,15 +199,13 @@ export const KNOWLEDGE_COVERAGE_CLASSIFY_SYSTEM_PROMPT = `You classify a user qu
 
 Rules:
 1. intent: fact_lookup (one focused fact), cross_source_synthesis (compare or combine several sources), whole_scope_analysis (the whole selected scope such as a book or report as a unit), global_negative (proving absence or checking every occurrence), or open_summary (open-ended summary of the content).
-2. coverageMode: high_recall (find as much relevant content as possible), broad (emphasize source/section structure coverage), exhaustive (deterministic scan of all processable content).
-3. requiresCompleteness is true only when a correct answer depends on covering every matching passage (completeness obligation). Such questions cannot be proven by top-K search.
-4. Whole-scope questions without explicit keywords ("core idea of this book", "overall theory", "key stages", "overall risks") are exhaustive when you are confident, broad when less confident; set confidence honestly between 0 and 1.
-5. scopeLevel: local (inside one section), source (one document), multi_source (several documents), notebook (one notebook as a unit), multi_notebook (several notebooks), whole_scope (everything selected this turn). Use the scope metadata in the user message when present.
-6. subQueries (optional, 0 to 4): narrow retrieval queries for the facets that need coverage. Keep proper nouns exactly as written. Never embed instructions for the reader inside a sub-query.
-7. Return one JSON object and nothing else. Do not use Markdown fences. Do not include reasoning.
+2. coverageMode: high_recall (focused retrieval for a specific point) or broad (deep retrieval emphasizing source/section structure coverage). Whole-scope questions and completeness-heavy questions take broad; focused lookups take high_recall. There is no exhaustive mode.
+3. scopeLevel: local (inside one section), source (one document), multi_source (several documents), notebook (one notebook as a unit), multi_notebook (several notebooks), whole_scope (everything selected this turn). Use the scope metadata in the user message when present.
+4. subQueries (optional, 0 to 4): narrow retrieval queries for the facets that need coverage. Keep proper nouns exactly as written. Never embed instructions for the reader inside a sub-query.
+5. Return one JSON object and nothing else. Do not use Markdown fences. Do not include reasoning.
 
 Schema:
-{"intent":"fact_lookup|cross_source_synthesis|whole_scope_analysis|global_negative|open_summary","coverageMode":"high_recall|broad|exhaustive","requiresCompleteness":false,"scopeLevel":"local|source|multi_source|notebook|multi_notebook|whole_scope","subQueries":["..."],"confidence":0.0}`;
+{"intent":"fact_lookup|cross_source_synthesis|whole_scope_analysis|global_negative|open_summary","coverageMode":"high_recall|broad","scopeLevel":"local|source|multi_source|notebook|multi_notebook|whole_scope","subQueries":["..."],"confidence":0.0}`;
 
 /**
  * 解析并严格校验语义分类输出（requiredObject 风格）：纯 JSON、5 个必备字段
@@ -222,13 +226,13 @@ export function parseCoverageClassification(raw: string): CoverageClassification
     throw new KnowledgeError("KNOWLEDGE_MODEL_OUTPUT_INVALID", "Coverage classification output must be an object");
   }
   const record = parsed as Record<string, unknown>;
-  for (const key of ["intent", "coverageMode", "requiresCompleteness", "scopeLevel", "confidence"]) {
+  for (const key of ["intent", "coverageMode", "scopeLevel", "confidence"]) {
     if (!Object.hasOwn(record, key)) {
       throw new KnowledgeError("KNOWLEDGE_MODEL_OUTPUT_INVALID", `Coverage classification field '${key}' is missing`);
     }
   }
   const extraKeys = Object.keys(record).filter(key => key !== "subQueries"
-    && !["intent", "coverageMode", "requiresCompleteness", "scopeLevel", "confidence"].includes(key));
+    && !["intent", "coverageMode", "scopeLevel", "confidence"].includes(key));
   if (extraKeys.length > 0) {
     throw new KnowledgeError("KNOWLEDGE_MODEL_OUTPUT_INVALID", "Coverage classification output fields are invalid");
   }
@@ -237,9 +241,6 @@ export function parseCoverageClassification(raw: string): CoverageClassification
   }
   if (!isKnowledgeCoverageMode(record.coverageMode)) {
     throw new KnowledgeError("KNOWLEDGE_MODEL_OUTPUT_INVALID", "Coverage classification coverageMode is invalid");
-  }
-  if (typeof record.requiresCompleteness !== "boolean") {
-    throw new KnowledgeError("KNOWLEDGE_MODEL_OUTPUT_INVALID", "Coverage classification requiresCompleteness must be a boolean");
   }
   if (!isKnowledgeCoverageScopeLevel(record.scopeLevel)) {
     throw new KnowledgeError("KNOWLEDGE_MODEL_OUTPUT_INVALID", "Coverage classification scopeLevel is invalid");
@@ -251,7 +252,6 @@ export function parseCoverageClassification(raw: string): CoverageClassification
   const classification: CoverageClassification = {
     intent: record.intent,
     coverageMode: record.coverageMode,
-    requiresCompleteness: record.requiresCompleteness,
     scopeLevel: record.scopeLevel,
     confidence,
   };
@@ -287,40 +287,33 @@ export function parseCoverageClassification(raw: string): CoverageClassification
   return classification;
 }
 
-/** 规则层评估结果：matchedRuleIds 按判定顺序；definitive = 直接定档（跳过 LLM）。 */
+/** 规则层评估结果：matchedRuleIds 按判定顺序。 */
 export interface CoverageRuleMatch {
   matchedRuleIds: string[];
   /** 规则层给出的档位；null = 未定档（交给语义层或规则默认）。 */
   coverageMode: KnowledgeCoverageMode | null;
   intent: KnowledgeCoverageIntent | null;
-  /** §四十一：exhaustive 规则命中即终稿，不再询问 LLM。 */
-  definitive: boolean;
 }
 
 /**
- * 第一层确定性规则（§三十一 全词表）。判定顺序：exhaustive 关键词 →
- * global-negative 句式（两者可叠加命中）→ 多源指代 → 单点事实。只有
- * exhaustive/global-negative 是定档规则；broad/high_recall 是规则默认档，
- * classifyModel 可用时仍交语义层复核升级。
+ * 第一层确定性规则（§三十一 全词表，两档化改写）。判定顺序：全库/完整性
+ * 关键词 → global-negative 句式（两者可叠加命中，均定 broad）→ 多源指代 →
+ * 单点事实。规则只给默认档，classifyModel 可用时仍交语义层复核。
  */
 export function matchCoverageRules(question: string): CoverageRuleMatch {
   const matchedRuleIds: string[] = [];
   let coverageMode: KnowledgeCoverageMode | null = null;
   let intent: KnowledgeCoverageIntent | null = null;
-  let definitive = false;
   if (EXHAUSTIVE_KEYWORDS.some(keyword => question.includes(keyword))) {
     matchedRuleIds.push(RULE_EXHAUSTIVE_KEYWORD);
-    coverageMode = "exhaustive";
+    coverageMode = "broad";
     intent = "whole_scope_analysis";
-    definitive = true;
   }
   if (GLOBAL_NEGATIVE_PATTERNS.some(pattern => pattern.test(question))) {
     matchedRuleIds.push(RULE_GLOBAL_NEGATIVE);
-    coverageMode = "exhaustive";
+    coverageMode = "broad";
     intent = "global_negative";
-    definitive = true;
   }
-  if (definitive) return { matchedRuleIds, coverageMode, intent, definitive };
   if (MULTI_SOURCE_KEYWORDS.some(keyword => question.includes(keyword))) {
     matchedRuleIds.push(RULE_MULTI_SOURCE);
     coverageMode = "broad";
@@ -330,7 +323,7 @@ export function matchCoverageRules(question: string): CoverageRuleMatch {
     coverageMode = "high_recall";
     intent = "fact_lookup";
   }
-  return { matchedRuleIds, coverageMode: matchedRuleIds.length > 0 ? coverageMode : null, intent, definitive };
+  return { matchedRuleIds, coverageMode: matchedRuleIds.length > 0 ? coverageMode : null, intent };
 }
 
 /**
@@ -350,13 +343,6 @@ export function coverageScopeLevelFromMetadata(
   }
   return "whole_scope";
 }
-
-/**
- * LLM 判 exhaustive 的置信度门槛（§三十二"置信度较低时进入 broad"）：
- * 低于该值的 exhaustive 判定保守降为 broad（完整性义务随档位一并撤销，
- * 维持 requiresCompleteness ⟺ exhaustive 不变量）。
- */
-export const KNOWLEDGE_COVERAGE_EXHAUSTIVE_MIN_CONFIDENCE = 0.6;
 
 function describeError(error: unknown): string {
   if (error instanceof KnowledgeError) return `${error.code}: ${error.message}`;
@@ -378,18 +364,37 @@ function scopeNoteOf(info: KnowledgeCoverageTurnScopeInfo | null | undefined): s
  * 规则层终稿（无模型路径共用）。规则未命中时按保守默认 high_recall
  * （镜像当前检索姿态），留痕场合由调用方补 degradeReason。
  */
+/**
+ * scopeLevel 推导（规则层共用）：元数据为准；多源指代规则（"这几份"类）是
+ * 确定性事实，元数据低于 multi_source（含未知元数据的 whole_scope 缺省）时按
+ * multi_source 记（与语义层归并同纪律）。
+ */
+function ruleScopeLevel(
+  rules: CoverageRuleMatch,
+  info: KnowledgeCoverageTurnScopeInfo | null | undefined,
+): KnowledgeCoverageScopeLevel {
+  const metadataScope = coverageScopeLevelFromMetadata(info);
+  if (rules.matchedRuleIds.includes(RULE_MULTI_SOURCE)
+    && metadataScope !== "multi_source"
+    && metadataScope !== "multi_notebook") {
+    return "multi_source";
+  }
+  return metadataScope;
+}
+
 function rulesOnlyPlan(input: {
   rules: CoverageRuleMatch;
   info: KnowledgeCoverageTurnScopeInfo | null | undefined;
   degradeReason?: CoverageDegradeReason;
 }): KnowledgeCoveragePlan {
-  const metadataScope = coverageScopeLevelFromMetadata(input.info);
   if (input.rules.coverageMode === "broad") {
+    // 两档化：broad 吸收全库/完整性问题后不再一律下限 multi_source——scopeLevel
+    // 如实按元数据推导（单源整书 = source，单笔记本 = notebook），多源指代
+    // 规则命中时保留 multi_source 下限。
     return {
       intent: input.rules.intent ?? "cross_source_synthesis",
       coverageMode: "broad",
-      requiresCompleteness: false,
-      scopeLevel: metadataScope === "multi_notebook" ? "multi_notebook" : "multi_source",
+      scopeLevel: ruleScopeLevel(input.rules, input.info),
       confidence: 0.8,
       matchedRuleIds: [...input.rules.matchedRuleIds],
       classifierUsed: "rules",
@@ -399,7 +404,6 @@ function rulesOnlyPlan(input: {
     return {
       intent: input.rules.intent ?? "fact_lookup",
       coverageMode: "high_recall",
-      requiresCompleteness: false,
       scopeLevel: "local",
       confidence: 0.75,
       matchedRuleIds: [...input.rules.matchedRuleIds],
@@ -410,8 +414,7 @@ function rulesOnlyPlan(input: {
   return {
     intent: "fact_lookup",
     coverageMode: "high_recall",
-    requiresCompleteness: false,
-    scopeLevel: metadataScope,
+    scopeLevel: ruleScopeLevel(input.rules, input.info),
     confidence: 0.5,
     matchedRuleIds: [...input.rules.matchedRuleIds],
     classifierUsed: "rules",
@@ -429,16 +432,11 @@ function degradedAfterClassifierFailure(input: {
   info: KnowledgeCoverageTurnScopeInfo | null | undefined;
   reason: CoverageDegradeReason;
 }): KnowledgeCoveragePlan {
-  const metadataScope = coverageScopeLevelFromMetadata(input.info);
-  const scopeLevel = input.rules.coverageMode === "broad"
-    ? (metadataScope === "multi_notebook" ? "multi_notebook" : "multi_source")
-    : input.rules.coverageMode === "high_recall"
-      ? "local"
-      : metadataScope;
+  // 范围提示与档位正交：降级留痕时不随降档失真（多源指代命中保留 multi_source）。
+  const scopeLevel = ruleScopeLevel(input.rules, input.info);
   return {
     intent: "fact_lookup",
     coverageMode: "high_recall",
-    requiresCompleteness: false,
     scopeLevel,
     confidence: 0.3,
     matchedRuleIds: [...input.rules.matchedRuleIds],
@@ -448,8 +446,8 @@ function degradedAfterClassifierFailure(input: {
 }
 
 /**
- * 语义层判定归并：执行 requiresCompleteness ⟺ exhaustive 不变量与低置信
- * exhaustive → broad 的保守降档；global_negative 意图蕴含完整性义务。
+ * 语义层判定归并（两档化）：模型/存量旧值输出 'exhaustive' 一律映射 broad；
+ * whole_scope_analysis / global_negative 意图蕴含强覆盖诉求，不允许低于 broad。
  */
 function mergeClassification(input: {
   rules: CoverageRuleMatch;
@@ -457,16 +455,12 @@ function mergeClassification(input: {
   classification: CoverageClassification;
 }): KnowledgeCoveragePlan {
   const { classification } = input;
-  const requiresCompleteness = classification.requiresCompleteness || classification.intent === "global_negative";
-  let coverageMode: KnowledgeCoverageMode;
-  if (requiresCompleteness) {
-    coverageMode = "exhaustive";
-  } else if (classification.coverageMode === "exhaustive") {
-    coverageMode = classification.confidence >= KNOWLEDGE_COVERAGE_EXHAUSTIVE_MIN_CONFIDENCE
-      ? "exhaustive"
-      : "broad";
-  } else {
-    coverageMode = classification.coverageMode;
+  let coverageMode: KnowledgeCoverageMode = classification.coverageMode === "exhaustive"
+    ? "broad"
+    : classification.coverageMode;
+  if ((classification.intent === "whole_scope_analysis" || classification.intent === "global_negative")
+    && coverageMode === "high_recall") {
+    coverageMode = "broad";
   }
   // 多源指代规则是确定性事实：语义层的范围判定不能低于 multi_source。
   let scopeLevel = classification.scopeLevel;
@@ -477,7 +471,6 @@ function mergeClassification(input: {
   return {
     intent: classification.intent,
     coverageMode,
-    requiresCompleteness: coverageMode === "exhaustive",
     scopeLevel,
     ...(classification.subQueries && classification.subQueries.length > 0
       ? { subQueries: [...classification.subQueries] }
@@ -493,9 +486,8 @@ function mergeClassification(input: {
  * 不要求完整 scope 对象）。总函数：任何模型失败/输出非法都在 plan 内显式
  * 降级留痕，不抛错、不阻断注入（对齐拆解层降级纪律）。
  *
- * - exhaustive/global-negative 规则命中 → 直接定档（§四十一），不调 LLM；
- * - 其余档位：classifyModel 可用 → 一次严格 JSON 分类（纠错重试一次），
- *   连续无效/调用失败 → 降级 high_recall 并留 degradeReason；
+ * - classifyModel 可用 → 一次严格 JSON 分类（纠错重试一次），连续无效/调用
+ *   失败 → 降级 high_recall 并留 degradeReason；
  * - 无 classifyModel → 规则结果即终稿；规则也未定档时按保守默认 high_recall
  *   并留 "knowledge model slot not configured" 痕。
  */
@@ -506,17 +498,6 @@ export async function planKnowledgeCoverage(input: {
 }): Promise<KnowledgeCoveragePlan> {
   const question = input.question.trim();
   const rules = matchCoverageRules(question);
-  if (rules.definitive) {
-    return {
-      intent: rules.intent ?? "whole_scope_analysis",
-      coverageMode: "exhaustive",
-      requiresCompleteness: true,
-      scopeLevel: coverageScopeLevelFromMetadata(input.turnScopeInfo),
-      confidence: 0.95,
-      matchedRuleIds: [...rules.matchedRuleIds],
-      classifierUsed: "rules",
-    };
-  }
   if (!input.classifyModel) {
     // 无模型：规则结果即终稿；规则也未定档 → 保守默认 + 显式留痕。
     return rulesOnlyPlan({

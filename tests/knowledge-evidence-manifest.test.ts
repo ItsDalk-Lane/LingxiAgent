@@ -3,7 +3,6 @@
  * - 普通轮写入：injector 真跑（真实 KnowledgeManager 检索链路）→ 身份链
  *   round-trip——由 manifest 能还原该轮读的是哪个 snapshot/variant/chunks
  *   （含 block spans 与 [KN] 引用标签；hybrid 轮带向量变体身份）；
- * - exhaustive 轮：manifest 头记录 coverageRunId + coverageManifestHash；
  * - 服务端复核：scope 外 source / 冻结 snapshot 不一致 → 显式拒绝；
  * - GC/deleteSource：被 manifest 引用的源跳过/拒绝（manifest 无 TTL 前全部保留）；
  * - 写入失败不阻断会话提交（desktop-session-submit 显式 warn）。
@@ -25,7 +24,6 @@ import {
   buildKnowledgeContextInjection,
   type KnowledgeInjectionEvidence,
 } from "../lib/knowledge/knowledge-context-injector.ts";
-import type { CoverageWorkerModel } from "../lib/knowledge/knowledge-coverage-manifest.ts";
 import type { KnowledgeCoveragePlan } from "../lib/knowledge/knowledge-coverage-planner.ts";
 import type { RetrieveForNotebooksResult } from "../lib/knowledge/knowledge-query-service.ts";
 import type { KnowledgeBlockDraft } from "../lib/knowledge/source-adapters.ts";
@@ -100,7 +98,6 @@ async function injectWithManager(manager: KnowledgeManager, input: {
     scopeId: input.scopeId,
     deps: {
       decomposeModel: null,
-      distillModel: null,
       retrieve: ({ query }) => manager.queryService.retrieveForNotebooks({
         studioId: input.studioId,
         notebookIds: input.notebookIds,
@@ -289,12 +286,12 @@ describe("EvidenceManifest：普通轮写入（round-trip）", () => {
     }
   });
 
-  it("蒸馏轮：manifest 记蒸馏输入锚点（回答实际基于的证据；节首块带 [KN] 节标签）", async () => {
+  it("滚动注入轮：manifest 记全部部分条目（模型读过即入身份链；标签为全局 [KN]）", async () => {
     const manager = createManager();
     const studioId = "studio-a";
     const notebook = manager.createNotebook({ studioId, name: "资料" });
     manager.updateNotebookSettings({ studioId, notebookId: notebook.id, embeddingModelRef: FAKE_MODEL_REF });
-    const text = Array.from({ length: 6 }, (_, index) => `第${index}条长事实：${"蒸馏证据正文。".repeat(60)}`).join("\n");
+    const text = Array.from({ length: 8 }, (_, index) => `第${index}条长事实：${"滚动证据正文。".repeat(90)}`).join("\n");
     const { imported, artifact } = await importTextSource(manager, studioId, notebook.id, text);
     const scope = manager.createTurnScope({
       studioId,
@@ -311,10 +308,10 @@ describe("EvidenceManifest：普通轮写入（round-trip）", () => {
       question: "全部长事实的要点是什么？",
       mode: "qa",
       scopeId: scope.id,
-      budgetTokens: 400,
+      budgetTokens: 2_000,
       deps: {
         decomposeModel: null,
-        distillModel: async () => "提炼后的要点文本。",
+        rollupModel: async ({ round }) => `第${round}部分中间笔记。`,
         retrieve: ({ query }) => manager.queryService.retrieveForNotebooks({
           studioId,
           notebookIds: [notebook.id],
@@ -323,7 +320,9 @@ describe("EvidenceManifest：普通轮写入（round-trip）", () => {
         }),
       },
     });
-    expect(stats.distilled).toBe(true);
+    // 超预算触发滚动注入（蒸馏路径已移除）。
+    expect(stats.rollup).toBeDefined();
+    expect((stats.rollup?.parts ?? 0)).toBeGreaterThanOrEqual(2);
     expect(evidence.entries.length).toBeGreaterThan(0);
 
     engineRecordManifest(manager, studioId, {
@@ -333,11 +332,11 @@ describe("EvidenceManifest：普通轮写入（round-trip）", () => {
     });
     const manifest = manager.getEvidenceManifestByScope({ scopeId: scope.id })!;
     const entry = manifest.entries.find(item => item.sourceId === imported.source.id)!;
-    // 蒸馏输入锚点全部入身份链（回答基于的完整证据集）。
+    // 全部部分条目都进身份链（中间轮 + 最终轮模型都读过）。
     expect(entry.chunkIds.length).toBeGreaterThan(0);
     expect(entry.neighborChunkIds).toEqual([]);
     expect(entry.parseArtifactId).toBe(artifact.id);
-    // 蒸馏节首块带节编号标签；其余锚点为蒸馏中间输入（无直接渲染标签）。
+    // 标签为跨部分全局编号（K1 起、连续）。
     expect(entry.citationLabels).toContain("K1");
     // manifest 可还原：chunk ids 全部在该变体内。
     const variantChunks = new Set(manager.indexStore.listVariantChunks(entry.chunkIndexVariantId!).map(chunk => chunk.id));
@@ -401,202 +400,6 @@ describe("EvidenceManifest：普通轮写入（round-trip）", () => {
   });
 });
 
-// ── exhaustive 轮：coverage run 关联 ─────────────────────────────────
-
-function exhaustivePlan(): KnowledgeCoveragePlan {
-  return {
-    intent: "whole_scope_analysis",
-    coverageMode: "exhaustive",
-    requiresCompleteness: true,
-    scopeLevel: "notebook",
-    confidence: 0.9,
-    matchedRuleIds: ["RULE_EXHAUSTIVE_KEYWORD"],
-    classifierUsed: "rules",
-  };
-}
-
-function integrationStore() {
-  const dir = tempHome("lingxi-evidence-exhaustive-");
-  const store = new KnowledgeStore({ dbPath: path.join(dir, "knowledge", "knowledge.db") });
-  stores.push(store);
-  return store;
-}
-
-function seedReadySource(store: KnowledgeStore, studioId: string, notebookId: string, blockCount: number) {
-  const imported = store.createSourceWithSnapshot({
-    studioId,
-    notebookId,
-    sourceType: "pasted_text",
-    displayName: "覆盖源.txt",
-    originMetadata: { kind: "test" },
-    snapshot: {
-      sha256: crypto.randomBytes(32).toString("hex"),
-      mimeType: "text/plain",
-      byteSize: 1024,
-      storagePath: "sources/evman/snap.bin",
-    },
-  });
-  const blocks: KnowledgeBlockDraft[] = Array.from({ length: blockCount }, (_, index) => ({
-    ordinal: index,
-    text: `第${index}段：exhaustive 覆盖测试文本。`,
-    locatorType: "text" as const,
-    locator: { charStart: 0, charEnd: 16 },
-  }));
-  const artifact = store.beginParseArtifact({
-    studioId,
-    contentSnapshotId: imported.snapshot.id,
-    parserId: "test-parser",
-    parserVersion: "1",
-    parserConfigHash: crypto.randomBytes(32).toString("hex"),
-  });
-  store.completeParseArtifact({
-    studioId,
-    parseArtifactId: artifact.id,
-    status: "ready",
-    warnings: [],
-    semanticArtifactPath: "semantic/evman.json",
-    blocks,
-  });
-  return imported;
-}
-
-/** executor 契约的确定性 worker：全部 unit processed + 单条带 provenance 的 finding。 */
-function okWorker(): CoverageWorkerModel {
-  return async ({ prompt }) => {
-    const primaryBlock = /Primary units \(scan EVERY one of them\):\n\n([\s\S]*?)(?:\n\nContext after|\n\nReturn exactly)/.exec(prompt)![1];
-    const header = /sourceId=(\S+) snapshotId=(\S+) parseArtifactId=(\S+)\nblockId=(\S+) startOffset=(\d+) endOffset=(\d+)/.exec(primaryBlock);
-    const shardId = /Shard: (cshard_\S+)/.exec(prompt)![1];
-    const unitIds = [...primaryBlock.matchAll(/unitId=(cu_[0-9a-f]{64})/gu)].map(entry => entry[1]);
-    return JSON.stringify({
-      shardId,
-      processedUnitIds: unitIds,
-      findings: header ? [{
-        statement: "exhaustive 测试发现：该源覆盖文本要点。",
-        support: [{
-          sourceId: header[1],
-          snapshotId: header[2],
-          parseArtifactId: header[3],
-          blockId: header[4],
-          startOffset: Number(header[5]),
-          endOffset: Number(header[6]),
-        }],
-      }] : [],
-      contradictions: [],
-      openQuestions: [],
-      warnings: [],
-    });
-  };
-}
-
-function fakeRetrieval(seeded: { sourceId: string; artifactId: string }[], notebookId: string) {
-  return async (): Promise<RetrieveForNotebooksResult> => ({
-    candidates: seeded.map((item, index) => ({
-      id: `chunk-${item.sourceId}-${index}`,
-      parseArtifactId: item.artifactId,
-      chunkIndexVariantId: "civ-evman-test",
-      ordinal: index,
-      text: "检索锚点文本。",
-      tokenCount: 8,
-      spans: [],
-      score: 1,
-      notebookId,
-      notebookName: "资料",
-      sourceId: item.sourceId,
-      sourceName: "覆盖源.txt",
-      headingPath: null,
-      pageNumber: null,
-    })),
-    sources: seeded.map(item => ({
-      notebookId,
-      notebookName: "资料",
-      sourceId: item.sourceId,
-      sourceName: "覆盖源.txt",
-      parseArtifactId: item.artifactId,
-      chunkCount: 2,
-      firstHeadingPath: null,
-    })),
-    retrievalMode: "fts",
-    retrievalModeRequested: "fts",
-    degraded: [],
-  });
-}
-
-describe("EvidenceManifest：exhaustive 轮 coverage 关联", () => {
-  it("exhaustive 注入 → stats 带 coverageRunId/manifestHash；manifest 头记录 run 关联", async () => {
-    const store = integrationStore();
-    const studioId = "studio-exh";
-    const notebookId = store.createNotebook({ studioId, name: "资料" }).id;
-    const seeded = seedReadySource(store, studioId, notebookId, 2);
-    const scope = store.createTurnScope({
-      studioId,
-      sessionPath: "/sessions/evman-exh.jsonl",
-      turnId: "turn-evman-exh",
-      notebookIds: [notebookId],
-    });
-    const { block, stats, evidence } = await buildKnowledgeContextInjection({
-      question: "请完整梳理全部资料要点，不要遗漏",
-      mode: "qa",
-      scopeId: scope.id,
-      coveragePlan: exhaustivePlan(),
-      deps: {
-        decomposeModel: null,
-        distillModel: null,
-        retrieve: fakeRetrieval(
-          [{ sourceId: seeded.source.id, artifactId: seedReadySourceArtifact(store, seeded) }],
-          notebookId,
-        ),
-        coverage: {
-          source: store,
-          store,
-          studioId,
-          workerModel: okWorker(),
-          reduceModel: null,
-        },
-      },
-    });
-    expect(block).toContain("Coverage status");
-    expect(stats.coverageRunId).toMatch(/^covrun_/);
-    expect(stats.coverageManifestHash).toMatch(/^[0-9a-f]{64}$/);
-    // exhaustive 轮块级身份不进 entries（findings 身份在 coverage run 冻结 manifest 内）。
-    expect(evidence.entries).toEqual([]);
-
-    // 落库（store 直写——引擎门面路径已在普通轮覆盖）。
-    store.insertEvidenceManifest({
-      turnScopeId: scope.id,
-      coverageMode: stats.coverageMode ?? null,
-      executedCoverageMode: stats.executedCoverageMode ?? null,
-      coverageRunId: stats.coverageRunId,
-      coverageManifestHash: stats.coverageManifestHash,
-      entries: [],
-    });
-    const manifest = store.getEvidenceManifestByScope({ scopeId: scope.id })!;
-    expect(manifest.coverageMode).toBe("exhaustive");
-    expect(manifest.executedCoverageMode).toBe("exhaustive");
-    expect(manifest.coverageRunId).toBe(stats.coverageRunId);
-    expect(manifest.coverageManifestHash).toBe(stats.coverageManifestHash);
-    // run 关联真实存在（复核可回查 coverage_runs 行）。
-    expect(store.getCoverageRun({ runId: manifest.coverageRunId! })).not.toBeNull();
-
-    // 不存在的 run id 显式拒绝。
-    expect(() => store.insertEvidenceManifest({
-      turnScopeId: scope.id,
-      coverageRunId: "covrun_missing",
-      entries: [],
-    })).toThrow(/does not reference an existing coverage run/);
-  });
-});
-
-/** seedReadySource 返回 imported（含 snapshot），此处补 artifact id 查找。 */
-function seedReadySourceArtifact(store: KnowledgeStore, seeded: { source: { id: string } }): string {
-  const row = store.db.prepare(`
-    SELECT pa.id AS id
-    FROM parse_artifacts pa
-    JOIN content_snapshots cs ON cs.id = pa.content_snapshot_id
-    WHERE cs.source_id = ?
-    ORDER BY pa.created_at DESC LIMIT 1
-  `).get(seeded.source.id) as any;
-  return row.id;
-}
 
 // ── GC / deleteSource：manifest 引用保护 ─────────────────────────────
 

@@ -456,7 +456,11 @@
     "knowledgeRetrievalUnavailable": "knowledge retrieval unavailable",
     "knowledgeRetrievalRowTitle": "{source} · chunk {chunk}",
     "knowledgeRetrievalDistilled": "distilled in {n} batches",
-    "knowledgeDistilling": "Distilling knowledge · {done} batches done · {model}"
+    "knowledgeRollupReading": "Reading evidence part {current}/{total}",
+    "knowledgeSupplementing": "Model issued supplemental searches ({count} queries)",
+    "knowledgeRetrievalRolled": "Read in {parts} parts",
+    "knowledgeRetrievalSupplement": "Supplemental searches: {n} queries",
+    "knowledgeRetrievalSupplementTitle": "Supplemental searches issued by the model during the rolling read"
   },
   "time": {
     "justNow": "Just now",
@@ -1956,8 +1960,6 @@
       "auxMemoryModelHint": "Used for long-term memory extraction, session memory compression, diary materials",
       "auxKnowledgeModel": "Knowledge Analysis Model",
       "auxKnowledgeModelHint": "Used to decompose knowledge questions",
-      "auxKnowledgeDistillModel": "Knowledge distill model",
-      "auxKnowledgeDistillModelHint": "When evidence exceeds the injection budget, distills question-relevant content in batches (falls back to the shard-manifest mode when unset)",
       "knowledgeOperationUsesProviderCredential": "Reuses the selected provider credential; no separate key is stored",
       "knowledgeOperationOptional": "Not configured (optional)",
       "knowledgeOperationUnavailable": "Currently unavailable",
