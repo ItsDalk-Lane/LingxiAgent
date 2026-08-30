@@ -10,7 +10,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = d6be53aec5bfbfca404e3f8fc09d2c3ed6ca68fe  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-08-30 同上 + 融合池随预算倒推 + 检索列表二次展开 + 查询嵌入失败/期限降级（退 FTS 不炸检索）)
+VERIFIED_SOURCE_SHA   = 656cbaf0fb081abdac49719395452e6698268b04  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-08-30 同上 + 融合池随预算倒推 + 检索列表二次展开 + 查询嵌入退 FTS + 拆解系统优化（职责收缩/扩展并行/Query Family 两级融合/候选总预算）)
 工作分支              = feature/upstream-sync-0.447.4
 ```
 
@@ -635,6 +635,21 @@ seal 不是一次性终点，而是"当前被验证树"的游标；每次审计�
   意外错误同纪律降级；无配置纯 FTS 路径不动（调查确认三层本就支持无嵌入/
   无重排运行）。验证：typecheck×3 绿 + eslint 0 error + 新增 5 用例 +
   knowledge 簇 200 用例 + full npm test 12810 passed / 0 failed 后推进。
+
+- **2026-08-30 拆解系统优化（P0+P1+stats，评审文档分档落地）**
+  （功能树 656cbaf0/seal 本提交；6 files / +503-58，含指纹 compatible repin）：
+  P0——拆解提示词删同义改写规则（与扩展器职责重复且致 RRF 多倍投票）、规则 2
+  改 Evidence Need 定义（需要相同证据的查询必须合并）；解析器宽容输入+严格
+  消费（未知字段忽略，必需字段/内容非法仍拒）；围栏/空白程序剥离不走 LLM
+  纠错。链路重排——扩展 LLM 与子查询检索批并行（消除拆解→扩展→检索的串行
+  LLM 跳，最坏 15s）。P1——Query Family 两级融合（family 0=直检+扩展变体、
+  子查询各自成族、探测各自领号；族内归一→族间等权 RRF，变体数量不再等于
+  投票权）+ 候选总预算 240（每查询 topK 分摊夹 [24,60]，engine 透传，同时
+  约束 rerank 输入）。Stats——decompositionLatencyMs/RetryCount/
+  originalQueryHits/expansionUniqueHits/queryOverlapRatio/evidenceNeedGains。
+  P2（多专家拆解/Gap Analyzer/结构化解码/否定 constraint）明确不做。验证：
+  typecheck×3 绿 + eslint 0 error + 新增 10 用例 + knowledge 簇 254 用例 +
+  full npm test 12820 passed / 0 failed 后推进。
 
 
 ## 最终状态：已合并（上游同步部分）
