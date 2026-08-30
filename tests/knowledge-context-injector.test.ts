@@ -6,6 +6,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   buildKnowledgeContextInjection,
   KNOWLEDGE_INJECTION_FALLBACK_BUDGET_TOKENS,
+  KNOWLEDGE_INJECTION_BUDGET_MAX_TOKENS,
   KNOWLEDGE_EVIDENCE_BUDGET_MAX,
   KNOWLEDGE_FUSION_POOL_MAX,
   resolveEvidenceAnchorBudget,
@@ -1424,5 +1425,28 @@ describe("否定排除（§九：词法约束而非检索查询）", () => {
     expect(stats.negationDroppedChunks).toBeGreaterThan(0);
     expect(block).toContain("negation exclusion");
     expect(block).not.toContain("乙方法的相关段落");
+  });
+});
+
+describe("注入预算实践上限（实测回归修复）", () => {
+  it("超大动态预算被压到 96k：stats.budgetTokens 如实反映生效值", async () => {
+    const candidates = Array.from({ length: 90 }, (_, index) => (
+      fakeChunk({ id: `c${index}`, ordinal: index, text: `块${index}：${"证".repeat(500)}` })
+    ));
+    const { stats } = await buildKnowledgeContextInjection({
+      question: "为什么甲方案失败和乙方案的关系是什么",
+      mode: "qa",
+      budgetTokens: 500_000,
+      deps: {
+        decomposeModel: null,
+        distillModel: null,
+        retrieve: async () => fakeRetrieval(candidates),
+      },
+    });
+    // 512k 模型的动态预算 ~50 万被压到实践上限 96k（预填充时间预算）。
+    expect(stats.budgetTokens).toBe(KNOWLEDGE_INJECTION_BUDGET_MAX_TOKENS);
+    expect(stats.usedTokens).toBeLessThanOrEqual(KNOWLEDGE_INJECTION_BUDGET_MAX_TOKENS);
+    // 锚点随「生效预算」伸缩：96000×0.5/约550 ≈ 87 → 90 倗选 87。
+    expect(stats.injectedChunks).toBeLessThanOrEqual(90);
   });
 });

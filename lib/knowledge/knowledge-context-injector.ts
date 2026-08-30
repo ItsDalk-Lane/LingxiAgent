@@ -95,6 +95,16 @@ import type {
  * "分段压缩（配了提炼模型）"或"部分块 + 分片清单 + 子 Agent 指引"（未配）。
  */
 export const KNOWLEDGE_INJECTION_FALLBACK_BUDGET_TOKENS = 6000;
+/**
+ * 注入预算实践上限（2026-08-30 实测回归修复）：动态预算 = 模型上下文 − 回答
+ * 预留（512k 模型 → ~50 万 token），锚点/融合池随预算伸缩后证据会装到预算
+ * 满格——实测 49.4 万 token 注入使主模型预填充 77s，检索提速被「证据太多
+ * 读太慢」全额吃回（预填充时间 ∝ 输入长度，证据边际收益远早于此递减）。
+ * 注入预算取 min(动态预算, 本上限)：96k ≈ 75 个千三 token 块，大上下文
+ * 模型的多证据优势保留，预填充压回交互窗口。可与注入预算同源观测
+ * （stats.budgetTokens 如实反映生效值）。
+ */
+export const KNOWLEDGE_INJECTION_BUDGET_MAX_TOKENS = 96_000;
 /** 预算下限：过小的窗口算出来的预算失去检索意义。 */
 const KNOWLEDGE_INJECTION_MIN_BUDGET_TOKENS = 1000;
 
@@ -2617,7 +2627,12 @@ export async function buildKnowledgeContextInjection(input: {
       retrievalFailures.push(directFailure || "direct retrieval failed");
     }
   }
-  const budgetTokens = input.budgetTokens ?? KNOWLEDGE_INJECTION_FALLBACK_BUDGET_TOKENS;
+  // 实践上限（见 KNOWLEDGE_INJECTION_BUDGET_MAX_TOKENS docstring）：动态预算
+  // 只描述「模型能装多少」，注入还要过「预填充时间预算」这一关。
+  const budgetTokens = Math.min(
+    input.budgetTokens ?? KNOWLEDGE_INJECTION_FALLBACK_BUDGET_TOKENS,
+    KNOWLEDGE_INJECTION_BUDGET_MAX_TOKENS,
+  );
 
   // ── 执行档位分派（Phase 8 消费 plan；Phase 9 第二波 exhaustive 真执行）──
   // exhaustive：manifest 冻结 turnScope → 全 shard 必达扫描（§五十一 system
