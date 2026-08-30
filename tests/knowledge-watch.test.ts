@@ -156,11 +156,20 @@ async function settleIo(rounds = 20) {
   }
 }
 
-async function waitFor(condition: () => boolean, label: string, debug?: () => unknown) {
+async function waitFor(
+  condition: () => boolean,
+  label: string,
+  debug?: () => unknown,
+  fakeTimers?: { advanceMs: number },
+) {
   // refresh 链（stat→读源→写快照→fsync→rename→解析→写产物）全是真实 fs I/O，
   // 每个操作都要若干事件循环轮次；轮次给足避免慢机器/CI 上抖动。
+  // fakeTimers：等待对象依赖 fake 计时器（防抖/轮询）触发的场景。高负载下
+  // 真实 stat 可能晚于前一步的固定 settleIo 才完成、防抖计时器迟建，若只在
+  // 真实事件循环里等就会死锁超时（CI ubuntu 实测）——两个时间域必须一起泵。
   for (let i = 0; i < 3000; i++) {
     if (condition()) return;
+    if (fakeTimers) await vi.advanceTimersByTimeAsync(fakeTimers.advanceMs);
     await new Promise((resolve) => setImmediate(resolve));
   }
   const detail = debug ? `\n${JSON.stringify(debug(), null, 2)}` : "";
@@ -253,7 +262,7 @@ describe("Knowledge 源文件 watch", () => {
     fs.writeFileSync(filePath, "恒定内容第一行。\n恒定内容第二行。\n");
     watch.registrations[0].onEvent("change", "不变.txt");
     await vi.advanceTimersByTimeAsync(DEBOUNCE_MS);
-    await waitFor(() => statCalls.length > statsBefore, "watcher stat ran for the event");
+    await waitFor(() => statCalls.length > statsBefore, "watcher stat ran for the event", undefined, { advanceMs: DEBOUNCE_MS });
     await settleIo();
 
     expect(snapshotCount(manager, studioId, imported.source.id)).toBe(1);
@@ -281,6 +290,8 @@ describe("Knowledge 源文件 watch", () => {
     await waitFor(
       () => sourceJobs(manager, studioId, notebook.id, imported.source.id).length === 2,
       "watch refresh enqueues a new ingestion job",
+      undefined,
+      { advanceMs: DEBOUNCE_MS },
     );
     expect(snapshotCount(manager, studioId, imported.source.id)).toBe(2);
 
@@ -349,6 +360,8 @@ describe("Knowledge 源文件 watch", () => {
     await waitFor(
       () => sourceJobs(manager, studioId, notebook.id, imported.source.id).length === 2,
       "refresh after re-attach",
+      undefined,
+      { advanceMs: DEBOUNCE_MS },
     );
     expect(snapshotCount(manager, studioId, imported.source.id)).toBe(2);
   });
@@ -381,6 +394,8 @@ describe("Knowledge 源文件 watch", () => {
     await waitFor(
       () => sourceJobs(manager, studioId, notebook.id, imported.source.id).length === 2,
       "fallback poll detects the change",
+      undefined,
+      { advanceMs: DEBOUNCE_MS },
     );
     expect(snapshotCount(manager, studioId, imported.source.id)).toBe(2);
   });
@@ -406,6 +421,8 @@ describe("Knowledge 源文件 watch", () => {
     await waitFor(
       () => watchState(manager, imported.source.id)?.unreachable === true,
       "source marked unreachable",
+      undefined,
+      { advanceMs: DEBOUNCE_MS },
     );
     const gone = watchState(manager, imported.source.id)!;
     expect(gone.unreachableReason).toContain("ENOENT");
@@ -421,6 +438,8 @@ describe("Knowledge 源文件 watch", () => {
     await waitFor(
       () => sourceJobs(manager, studioId, notebook.id, imported.source.id).length === 2,
       "refresh after file restored",
+      undefined,
+      { advanceMs: DEBOUNCE_MS },
     );
     expect(snapshotCount(manager, studioId, imported.source.id)).toBe(2);
     expect(watchState(manager, imported.source.id)?.unreachable).toBe(false);
@@ -459,6 +478,8 @@ describe("Knowledge 源文件 watch", () => {
       () => sourceJobs(manager, studioId, notebookA.id, imported.source.id).length === 2
         && sourceJobs(manager, studioId, notebookB.id, imported.source.id).length === 1,
       "shared source refreshed for both notebooks",
+      undefined,
+      { advanceMs: DEBOUNCE_MS },
     );
     expect(snapshotCount(manager, studioId, imported.source.id)).toBe(2);
 
