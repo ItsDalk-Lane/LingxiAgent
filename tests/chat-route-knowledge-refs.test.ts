@@ -143,6 +143,50 @@ describe("chat route knowledgeRefs handling", () => {
     });
   });
 
+  it("knowledge_trace 引擎事件广播为同名 WS 消息（阶段元数据归一）", async () => {
+    const { hub, ws } = setup();
+    const listener = hub.subscribe.mock.calls[0][0];
+    listener({ type: "knowledge_trace", id: "search-1", kind: "search", phase: "start", query: "风险准备金" }, "/sessions/test.jsonl");
+    listener({ type: "knowledge_trace", id: "search-1", kind: "search", phase: "done", query: "风险准备金", hits: 50 }, "/sessions/test.jsonl");
+    listener({ type: "knowledge_trace", id: "think-1", kind: "think", phase: "start", detail: "fact" }, "/sessions/test.jsonl");
+    // 非法 kind/phase 归一为 search/start；缺省可选字段不强加。
+    listener({ type: "knowledge_trace", id: "search-2", kind: "weird", phase: "weird" }, "/sessions/test.jsonl");
+
+    const sent = ws.send.mock.calls.map((call) => JSON.parse(call[0] as string));
+    expect(sent).toContainEqual({
+      type: "knowledge_trace",
+      sessionPath: "/sessions/test.jsonl",
+      id: "search-1",
+      kind: "search",
+      phase: "start",
+      query: "风险准备金",
+    });
+    expect(sent).toContainEqual({
+      type: "knowledge_trace",
+      sessionPath: "/sessions/test.jsonl",
+      id: "search-1",
+      kind: "search",
+      phase: "done",
+      query: "风险准备金",
+      hits: 50,
+    });
+    expect(sent).toContainEqual({
+      type: "knowledge_trace",
+      sessionPath: "/sessions/test.jsonl",
+      id: "think-1",
+      kind: "think",
+      phase: "start",
+      detail: "fact",
+    });
+    expect(sent).toContainEqual({
+      type: "knowledge_trace",
+      sessionPath: "/sessions/test.jsonl",
+      id: "search-2",
+      kind: "search",
+      phase: "start",
+    });
+  });
+
   it("knowledge_supplement_search 引擎事件广播为同名 WS 消息（查询行 + 轮序）", async () => {
     const { hub, ws } = setup();
     const listener = hub.subscribe.mock.calls[0][0];

@@ -460,7 +460,11 @@
     "knowledgeSupplementing": "Model issued supplemental searches ({count} queries)",
     "knowledgeRetrievalRolled": "Read in {parts} parts",
     "knowledgeRetrievalSupplement": "Supplemental searches: {n} queries",
-    "knowledgeRetrievalSupplementTitle": "Supplemental searches issued by the model during the rolling read"
+    "knowledgeRetrievalSupplementTitle": "Supplemental searches issued by the model during the rolling read",
+    "knowledgeTraceThinking": "Deep thinking",
+    "knowledgeTraceSearching": "Searching the knowledge base",
+    "knowledgeTraceResults": "{n} search results",
+    "knowledgeTraceFailed": "Search failed"
   },
   "time": {
     "justNow": "Just now",

@@ -1805,6 +1805,19 @@ export function createChatRoute(engine: any, hub: any, {
           : [],
         round: Number(event.round) || 0,
       });
+    } else if (event.type === "knowledge_trace") {
+      // 知识注入过程行（拆解/检索逐阶段）：前端过程卡实时渲染。只含阶段元
+      // 数据（查询词/命中数/方向名），无模型中间输出；清除语义同下（保守清除）。
+      broadcast({
+        type: "knowledge_trace",
+        sessionPath,
+        id: typeof event.id === "string" && event.id ? event.id : "",
+        kind: event.kind === "think" ? "think" : "search",
+        phase: event.phase === "done" || event.phase === "failed" ? event.phase : "start",
+        ...(typeof event.query === "string" && event.query ? { query: event.query } : {}),
+        ...(Number.isFinite(Number(event.hits)) ? { hits: Number(event.hits) } : {}),
+        ...(typeof event.detail === "string" && event.detail ? { detail: event.detail } : {}),
+      });
     } else if (event.type === "session_status") {
       // session_status 只回答「Session 忙不忙」（任务书 §九/§十：status 与 Run 正交）。
       // 不再 reset Run 级 parser，也不 finalize Run；Run 只由 agent_start / agent_settled 开关。

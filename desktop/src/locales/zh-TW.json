@@ -460,7 +460,11 @@
     "knowledgeSupplementing": "模型發起了補充檢索（{count} 條查詢）",
     "knowledgeRetrievalRolled": "分 {parts} 部分閱讀",
     "knowledgeRetrievalSupplement": "補充檢索 {n} 條查詢",
-    "knowledgeRetrievalSupplementTitle": "滾動注入循環中模型自主發起的補充檢索"
+    "knowledgeRetrievalSupplementTitle": "滾動注入循環中模型自主發起的補充檢索",
+    "knowledgeTraceThinking": "已深度思考",
+    "knowledgeTraceSearching": "正在檢索知識庫",
+    "knowledgeTraceResults": "{n} 個搜尋結果",
+    "knowledgeTraceFailed": "檢索失敗"
   },
   "time": {
     "justNow": "剛剛",

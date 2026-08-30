@@ -460,7 +460,11 @@
     "knowledgeSupplementing": "모델이 보충 검색을 실행했습니다({count}건)",
     "knowledgeRetrievalRolled": "{parts}부분으로 나눠 읽기",
     "knowledgeRetrievalSupplement": "보충 검색 {n}건",
-    "knowledgeRetrievalSupplementTitle": "롤링 읽기 중 모델이 자발적으로 실행한 보충 검색"
+    "knowledgeRetrievalSupplementTitle": "롤링 읽기 중 모델이 자발적으로 실행한 보충 검색",
+    "knowledgeTraceThinking": "깊이 생각하는 중",
+    "knowledgeTraceSearching": "지식 베이스 검색 중",
+    "knowledgeTraceResults": "검색 결과 {n}건",
+    "knowledgeTraceFailed": "검색 실패"
   },
   "time": {
     "justNow": "방금",

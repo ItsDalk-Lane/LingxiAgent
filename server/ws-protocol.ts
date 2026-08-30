@@ -47,6 +47,7 @@
  *   { type: "knowledge_retrieval_started", sessionPath: "..." }  (知识库注入链路开始检索的即时反馈；在阻塞式注入前发出、早于 session_status isStreaming，不进 stream_resume)
  *   { type: "knowledge_rollup_progress", sessionPath: "...", current: number, total: number }  (滚动注入中间轮进度：超预算证据分部分喂给主模型消化期间逐轮广播，驱动「正在阅读第 X/N 部分」胶囊；不进 stream_resume，由该 session 任意后续事件保守清除)
  *   { type: "knowledge_supplement_search", sessionPath: "...", queries: string[], round: number }  (滚动循环内模型自主发起的补充检索：过程可见不显中间内容；清除语义同上)
+ *   { type: "knowledge_trace", sessionPath: "...", id: string, kind: "think"|"search", phase: "start"|"done"|"failed", query?: string, hits?: number, detail?: string }  (知识注入过程行：拆解/检索逐阶段实时广播——start 带查询词/方向名，done 带命中数；只含元数据无模型输出；前端按 id 原位更新成过程行堆，清除语义同上)
  *   { type: "loop_status", sessionPath: "...", sessionId?: string|null, status: "running"|"paused"|"stopped"|"completed", turnCount: number, maxTurns: number|null, pausedReason?: string|null, prompt?: string|null }  (循环任务状态机变更广播；不进 stream_resume，驱动会话列表循环徽章与 interlude 控制按钮态)
  *   { type: "confirmation_resolved", confirmId: "...", action: "confirmed"|"rejected", value?: any }  (用户操作确认卡片后广播，前端更新卡片状态)
  *   { type: "block_update", taskId: "...", patch: { streamStatus: "done"|"failed", summary?: "..." } }  (活跃 block 状态更新)

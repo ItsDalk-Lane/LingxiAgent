@@ -44,6 +44,7 @@ describe('knowledge_rollup_progress / knowledge_supplement_search 前端消费�
       knowledgeRetrievingSessions: [],
       knowledgeRollupBySession: {},
       knowledgeSupplementBySession: {},
+      knowledgeTraceBySession: {},
     } as never);
   });
 
@@ -92,3 +93,67 @@ describe('knowledge_rollup_progress / knowledge_supplement_search 前端消费�
     expect(useStore.getState().knowledgeSupplementBySession[PATH]).toBeUndefined();
   });
 });
+
+describe('knowledge_trace 过程行堆（2026-08-31 二轮）', () => {
+  beforeEach(() => {
+    useStore.setState({
+      currentSessionPath: PATH,
+      pendingNewSession: false,
+      sessions: [{
+        path: PATH,
+        title: null,
+        firstMessage: '',
+        modified: '2026-05-08T00:00:00.000Z',
+        messageCount: 0,
+        agentId: 'hana',
+        agentName: 'Hana',
+        cwd: null,
+      }],
+      streamingSessions: [],
+      activeSessionStreams: {},
+      inlineErrors: {},
+      chatSessions: {},
+      knowledgeRetrievingSessions: [],
+      knowledgeRollupBySession: {},
+      knowledgeSupplementBySession: {},
+      knowledgeTraceBySession: {},
+    } as never);
+  });
+
+  it('trace 事件按 id 追加与原位更新（start 查询词 → done 命中数）', () => {
+    handleServerMessage({ type: 'knowledge_trace', sessionPath: PATH, id: 'think-1', kind: 'think', phase: 'start' });
+    handleServerMessage({ type: 'knowledge_trace', sessionPath: PATH, id: 'search-1', kind: 'search', phase: 'start', query: '风险准备金' });
+    handleServerMessage({ type: 'knowledge_trace', sessionPath: PATH, id: 'search-1', kind: 'search', phase: 'done', query: '风险准备金', hits: 50 });
+    handleServerMessage({ type: 'knowledge_trace', sessionPath: PATH, id: 'think-1', kind: 'think', phase: 'done' });
+
+    const trace = useStore.getState().knowledgeTraceBySession[PATH]!;
+    expect(trace.map(entry => entry.id)).toEqual(['think-1', 'search-1']);
+    expect(trace[0]).toMatchObject({ kind: 'think', phase: 'done' });
+    expect(trace[1]).toMatchObject({ kind: 'search', phase: 'done', hits: 50 });
+  });
+
+  it('rollup/supplement 事件同步映射为 read/note 过程行', () => {
+    handleServerMessage({ type: 'knowledge_rollup_progress', sessionPath: PATH, current: 2, total: 5 });
+    handleServerMessage({ type: 'knowledge_supplement_search', sessionPath: PATH, queries: ['交付节点'], round: 2 });
+
+    const trace = useStore.getState().knowledgeTraceBySession[PATH]!;
+    expect(trace).toHaveLength(2);
+    expect(trace[0]).toMatchObject({ id: 'read', kind: 'read', current: 2, total: 5 });
+    expect(trace[1]).toMatchObject({ id: 'supplement-2', kind: 'note', queries: ['交付节点'] });
+  });
+
+  it('非法载荷（缺 id / 缺 sessionPath）跳过且不炸', () => {
+    expect(() => handleServerMessage({ type: 'knowledge_trace', sessionPath: PATH, kind: 'think', phase: 'start' })).not.toThrow();
+    expect(() => handleServerMessage({ type: 'knowledge_trace', id: 'x', kind: 'think', phase: 'start' })).not.toThrow();
+    expect(useStore.getState().knowledgeTraceBySession[PATH]).toBeUndefined();
+  });
+
+  it('该 session 的真实轮事件到达即整堆收起', () => {
+    handleServerMessage({ type: 'knowledge_trace', sessionPath: PATH, id: 'think-1', kind: 'think', phase: 'start' });
+    expect(useStore.getState().knowledgeTraceBySession[PATH]).toHaveLength(1);
+
+    handleServerMessage({ type: 'session_title', path: PATH, title: '新标题' });
+    expect(useStore.getState().knowledgeTraceBySession[PATH]).toBeUndefined();
+  });
+});
+

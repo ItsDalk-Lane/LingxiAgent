@@ -460,7 +460,11 @@
     "knowledgeSupplementing": "モデルが補足検索を実行しました（{count} 件）",
     "knowledgeRetrievalRolled": "{parts} 部に分けて読解",
     "knowledgeRetrievalSupplement": "補足検索 {n} 件",
-    "knowledgeRetrievalSupplementTitle": "ローリング読解中にモデルが自主的に発行した補足検索"
+    "knowledgeRetrievalSupplementTitle": "ローリング読解中にモデルが自主的に発行した補足検索",
+    "knowledgeTraceThinking": "深い思考",
+    "knowledgeTraceSearching": "ナレッジベースを検索中",
+    "knowledgeTraceResults": "{n} 件の検索結果",
+    "knowledgeTraceFailed": "検索に失敗しました"
   },
   "time": {
     "justNow": "たった今",

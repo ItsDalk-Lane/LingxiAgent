@@ -2591,6 +2591,41 @@ export class LingxiEngine {
           });
         };
       }
+      // 过程留痕（2026-08-31 二轮）：把拆解/检索阶段逐条以 knowledge_trace 事件
+      // 广播，前端在聊天流里实时渲染成过程行（类似编程 Agent 的工具调用卡片：
+      // 「已深度思考」「N 个搜索结果」）。只发阶段元数据（查询词/命中数/方向
+      // 名），绝不发模型中间输出或 CoT。
+      let knowledgeTraceSeq = 0;
+      const emitKnowledgeTrace = (entry: {
+        id: string;
+        kind: "think" | "search";
+        phase: "start" | "done" | "failed";
+        query?: string;
+        hits?: number;
+        detail?: string | null;
+      }) => {
+        if (!input.sessionPath) return;
+        this.emitEvent({
+          type: "knowledge_trace",
+          sessionPath: input.sessionPath,
+          ...entry,
+        }, input.sessionPath);
+      };
+      const withThinkTrace = (detail: string | null, call: any) => {
+        if (!call) return call;
+        return async (args: any) => {
+          const id = `think-${++knowledgeTraceSeq}`;
+          emitKnowledgeTrace({ id, kind: "think", phase: "start", detail });
+          try {
+            return await call(args);
+          } finally {
+            emitKnowledgeTrace({ id, kind: "think", phase: "done", detail });
+          }
+        };
+      };
+      decomposeModel = withThinkTrace(null, decomposeModel);
+      gapAnalysisModel = decomposeModel;
+      expandModel = withThinkTrace("expand", expandModel);
       // CoveragePlanner（任务书 §二十七–§三十二，Phase 7；2026-08-31 两档化）：
       // decompose 前先定覆盖档位；分类闭包复用 knowledge 辅助槽位（与 decompose
       // 同源同超时阶梯）。Phase 8 起 injector 消费 plan：coverageMode 决定执行档位
@@ -2690,15 +2725,34 @@ export class LingxiEngine {
           // Phase 8：sourceIds/sectionsBySourceId 是 broad 结构缺口的约束参数
           // （§三十八/§三十九）；§四十三 冻结对二次检索同样生效。topK 是候选
           // 总预算（§二十一）的每查询分摊，同时约束该查询的 rerank 输入。
-          retrieve: ({ query, sourceIds, sectionsBySourceId, topK }) => knowledge.queryService.retrieveForNotebooks({
-            studioId,
-            notebookIds: input.knowledgeRefs.notebookIds,
-            question: query,
-            ...(frozenArtifacts ? { frozenArtifacts } : {}),
-            ...(sourceIds ? { sourceIds } : {}),
-            ...(sectionsBySourceId ? { sectionsBySourceId } : {}),
-            ...(topK != null ? { topK } : {}),
-          }),
+          // 每次检索（直检/子查询/扩展/补证/结构探测/滚动补充检索都走这里）
+          // 逐行发 knowledge_trace：start 带查询词，done 带命中数。
+          retrieve: async ({ query, sourceIds, sectionsBySourceId, topK }) => {
+            const traceId = `search-${++knowledgeTraceSeq}`;
+            emitKnowledgeTrace({ id: traceId, kind: "search", phase: "start", query });
+            try {
+              const result = await knowledge.queryService.retrieveForNotebooks({
+                studioId,
+                notebookIds: input.knowledgeRefs.notebookIds,
+                question: query,
+                ...(frozenArtifacts ? { frozenArtifacts } : {}),
+                ...(sourceIds ? { sourceIds } : {}),
+                ...(sectionsBySourceId ? { sectionsBySourceId } : {}),
+                ...(topK != null ? { topK } : {}),
+              });
+              emitKnowledgeTrace({
+                id: traceId,
+                kind: "search",
+                phase: "done",
+                query,
+                hits: result.candidates.length,
+              });
+              return result;
+            } catch (error) {
+              emitKnowledgeTrace({ id: traceId, kind: "search", phase: "failed", query, hits: 0 });
+              throw error;
+            }
+          },
           // §三十六 邻接扩展：同 variant 内按锚点 ordinal ± 窗口定点回读。
           readNeighborChunks: ({ anchor, ordinals }) => knowledge.queryService.readAdjacentChunks({
             studioId,

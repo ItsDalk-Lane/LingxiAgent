@@ -552,6 +552,7 @@ export function handleServerMessage(msg: any): void {
   // 等待），也不被自己清除；knowledge_rollup_progress / knowledge_supplement_search
   // 是检索期内的滚动注入分段进度（自身不清检索态），同样排除。
   if (msg?.type !== 'knowledge_retrieval_started'
+    && msg?.type !== 'knowledge_trace'
     && msg?.type !== 'knowledge_rollup_progress'
     && msg?.type !== 'knowledge_supplement_search') {
     const { sessionPath: retrievalDonePath } = sessionIdentityFromMessage(msg);
@@ -561,6 +562,7 @@ export function handleServerMessage(msg: any): void {
       useStore.getState().endTurnPending?.(retrievalDonePath);
       useStore.getState().endKnowledgeRollup?.(retrievalDonePath);
       useStore.getState().endKnowledgeSupplement?.(retrievalDonePath);
+      useStore.getState().resetKnowledgeTrace?.(retrievalDonePath);
     }
   }
 
@@ -1261,6 +1263,14 @@ export function handleServerMessage(msg: any): void {
         current: Number.isSafeInteger(current) && current > 0 ? current : 1,
         total: Number.isSafeInteger(total) && total > 0 ? total : 1,
       });
+      // 过程行堆同步更新（阅读第 X/N 部分）。
+      useStore.getState().upsertKnowledgeTrace?.(sp, {
+        id: 'read',
+        kind: 'read',
+        phase: 'start',
+        current: Number.isSafeInteger(current) && current > 0 ? current : 1,
+        total: Number.isSafeInteger(total) && total > 0 ? total : 1,
+      });
       break;
     }
 
@@ -1276,6 +1286,33 @@ export function handleServerMessage(msg: any): void {
       useStore.getState().updateKnowledgeSupplement?.(sp, {
         queries,
         round: Number.isSafeInteger(round) && round > 0 ? round : 1,
+      });
+      // 过程行堆同步更新（补充检索行；其后的实际检索经 knowledge_trace 逐行跟进）。
+      useStore.getState().upsertKnowledgeTrace?.(sp, {
+        id: `supplement-${Number.isSafeInteger(round) && round > 0 ? round : 1}`,
+        kind: 'note',
+        phase: 'start',
+        queries,
+      });
+      break;
+    }
+
+    case 'knowledge_trace': {
+      // 知识注入过程行（拆解/检索逐阶段）：按 id 原位更新过程行堆——start
+      // 显示查询词/思考态，done 原位变成「N 个搜索结果」。不进 stream_resume，
+      // 结束由顶部保守清除（真实轮消息到达整堆收起）。
+      const sp = nonEmptyString(msg.sessionPath) || nonEmptyString(msg.path);
+      if (!sp) { console.warn('[ws] knowledge_trace missing sessionPath, skipping'); break; }
+      const id = nonEmptyString(msg.id);
+      if (!id) { console.warn('[ws] knowledge_trace missing id, skipping'); break; }
+      const phaseRaw = msg.phase;
+      useStore.getState().upsertKnowledgeTrace?.(sp, {
+        id,
+        kind: msg.kind === 'think' ? 'think' : 'search',
+        phase: phaseRaw === 'done' || phaseRaw === 'failed' ? phaseRaw : 'start',
+        ...(typeof msg.query === 'string' && msg.query ? { query: msg.query } : {}),
+        ...(Number.isFinite(Number(msg.hits)) ? { hits: Number(msg.hits) } : {}),
+        ...(typeof msg.detail === 'string' && msg.detail ? { detail: msg.detail } : {}),
       });
       break;
     }

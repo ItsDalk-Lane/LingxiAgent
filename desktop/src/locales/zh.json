@@ -460,7 +460,11 @@
     "knowledgeSupplementing": "模型发起了补充检索（{count} 条查询）",
     "knowledgeRetrievalRolled": "分 {parts} 部分阅读",
     "knowledgeRetrievalSupplement": "补充检索 {n} 条查询",
-    "knowledgeRetrievalSupplementTitle": "滚动注入循环中模型自主发起的补充检索"
+    "knowledgeRetrievalSupplementTitle": "滚动注入循环中模型自主发起的补充检索",
+    "knowledgeTraceThinking": "已深度思考",
+    "knowledgeTraceSearching": "正在检索知识库",
+    "knowledgeTraceResults": "{n} 个搜索结果",
+    "knowledgeTraceFailed": "检索失败"
   },
   "time": {
     "justNow": "刚刚",
