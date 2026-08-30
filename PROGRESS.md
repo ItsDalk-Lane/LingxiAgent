@@ -10,7 +10,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = 7b240ce15715c54bd0f248cc202ff2582aecdfa6  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-08-30 knowledge coverage 证据链 Phase 9/10 + Agent 三工具 Phase 11 + ProcessingArtifact 管线 Phase 12 + EvidenceManifest 持久化)
+VERIFIED_SOURCE_SHA   = 0a45563a2c8f440f54cc93e4daf6c659701ae9e1  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-08-30 同上 + build 修复 underscore 钉入外置传递依赖)
 工作分支              = feature/upstream-sync-0.447.4
 ```
 
@@ -473,6 +473,18 @@ seal 不是一次性终点，而是"当前被验证树"的游标；每次审计�
   cli-runtime-closure 重生成、persistence 指纹/inventory/receipt compatible
   repin、store-registry 登记。验证：typecheck×3（绿）+ eslint 0 error +
   full npm test 12746 passed / 0 failed 后推进。
+
+- **2026-08-30 build 修复 underscore 钉入 server 外置传递依赖**
+  （功能树 0a45563a/seal 本提交；1 file / +6-1）：PR #31 CI open-build-smoke
+  红——外置包 mammoth 的传递依赖 underscore 被 nft 按 ["node","import"]
+  条件追踪，运行时 CJS require 走其 exports require.node 分支
+  （underscore-node.cjs），分支文件集不同致剪枝后产物缺文件，服务器入口
+  import 即崩。沿用 lru-cache 先例把 underscore 钉进 pinnedTransitiveDeps
+  默认清单（完整安装 + 豁免剪枝），open/closed 两套构建共用一处生效。
+  验证：本地 build:server:open + smoke:server:open 正反冒烟全过（protecting
+  20→21）；build:server 钉依赖阶段确认入保护名单（签名步骤因本地无
+  LINGXI_SIGN_KEY 停止为预期）；eslint 0 error + full npm test 12746
+  passed / 0 failed 后推进。
 
 
 ## 最终状态：已合并（上游同步部分）
