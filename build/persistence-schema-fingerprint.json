@@ -3285,7 +3285,7 @@
   ],
   "review": {
     "classification": "compatible",
-    "compatibilityReason": "合并 main（PR #30 向量保留）：knowledge schema v16→v17 additive（notebooks.vector_retention_days，PR #30 原 v9 重编号，幂等 ALTER）；向量索引库 schema v2→v3 additive（vector_index_variants + last_used_at，v2 老库按表形分流迁移，不重算向量）",
+    "compatibilityReason": "core/engine.ts constructor reorder only: _models (ModelManager) now constructed before _knowledge (KnowledgeManager) so migration-time chunk-profile backfill can read providerRegistry; no persisted store shape or site mapping change",
     "payloadFingerprint": "sha256:7316ccbf83072b075a76e861c110365bda399554823ae3db0278674b086d6f69"
   },
   "schemas": [

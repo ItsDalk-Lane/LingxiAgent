@@ -475,6 +475,10 @@ export class LingxiEngine {
 
     // ── Core managers ──
     this._prefs = new PreferencesManager({ userDir: this.userDir, agentsDir: this.agentsDir });
+    // _models 必须先于 _knowledge 构造：KnowledgeManager 构造期会同步跑 knowledge.db
+    // 迁移（chunk profile 回填），经 getEmbeddingModelContextWindow 闭包读
+    // providerRegistry；晚赋值会在存量库迁移时读到 undefined 直接崩。
+    this._models = new ModelManager({ lingxiHome });
     this._knowledgeDistillThroughput = new Map();
     this._knowledge = new KnowledgeManager({
       lingxiHome: this.lingxiHome,
@@ -499,7 +503,6 @@ export class LingxiEngine {
     });
     this._installModelObservability(modelObservability);
     this._inputDrafts = new InputDraftsStore({ lingxiHome: this.lingxiHome });
-    this._models = new ModelManager({ lingxiHome });
     this._speechRecognition = new SpeechRecognitionService({
       providerRegistry: this._models.providerRegistry,
       resolveProviderCredentialsFresh: (providerId) => this._models.resolveProviderCredentialsFresh(providerId),
