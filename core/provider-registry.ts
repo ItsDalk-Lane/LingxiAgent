@@ -1882,8 +1882,9 @@ export class ProviderRegistry {
       meta = { ...meta, maxOutput: meta.maxOutputTokens };
     }
 
-    // 白名单：只允许模型能力字段（image 是标准名，vision 为旧名不写入）
-    const ALLOWED = ["name", "api", "context", "maxOutput", "outputIncludesThinking", "image", "video", "audio", "reasoning", "xhigh", "thinkingLevels", "thinkingLevelMap", "type", "defaultThinkingLevel", "web", "structuredOutput", "operations", "operationProtocol", "dimensions"];
+    // 白名单：只允许模型能力字段（image 是标准名，vision 为旧名不写入；
+    // groupId 是 MiniMax embeddings 的必填 GroupId URL query 参数，随模型条目携带）
+    const ALLOWED = ["name", "api", "context", "maxOutput", "outputIncludesThinking", "image", "video", "audio", "reasoning", "xhigh", "thinkingLevels", "thinkingLevelMap", "type", "defaultThinkingLevel", "web", "structuredOutput", "operations", "operationProtocol", "dimensions", "groupId"];
     // null = 显式清除 outputIncludesThinking 覆盖、回到按线协议家族的自动推导。
     const clearOutputIncludesThinking = meta?.outputIncludesThinking === null;
     const safe: any = {};

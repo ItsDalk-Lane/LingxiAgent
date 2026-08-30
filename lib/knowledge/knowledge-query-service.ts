@@ -358,6 +358,8 @@ export class KnowledgeQueryService {
       texts: string[];
       modelRef: KnowledgeModelRef;
       signal?: AbortSignal;
+      /** 查询侧固定 "query"（MiniMax db/query、Voyage input_type 算法分离），摄入侧缺省 document。 */
+      inputType?: "document" | "query";
     }) => Promise<KnowledgeEmbeddingResult | null>) | null;
     rerank?: KnowledgeReranker | null;
     /**
@@ -1159,6 +1161,8 @@ export class KnowledgeQueryService {
           texts: request.texts,
           signal: request.signal,
           modelRef: input.embeddingModelRef!,
+          // 查询侧嵌入（MiniMax db/query、Voyage input_type 的算法分离）
+          inputType: "query",
         })) as KnowledgeEmbedder
       : null;
     const reranker = input.rerankModelRef && this.deps.rerankForModel
@@ -1298,6 +1302,8 @@ export class KnowledgeQueryService {
             texts: request.texts,
             signal: request.signal,
             modelRef: resolved.embeddingModelRef!,
+            // 查询侧嵌入（MiniMax db/query、Voyage input_type 的算法分离）
+            inputType: "query",
           })) as KnowledgeEmbedder
         : null;
       const readyArtifacts = entries

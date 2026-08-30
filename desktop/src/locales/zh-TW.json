@@ -1998,7 +1998,9 @@
       "modelOperationRerank": "重排",
       "modelOperationHint": "打上嵌入或重排標籤的模型會出現在知識庫筆記本設定的對應下拉中。標籤只是標記，模型是否真的支援由實際呼叫檢驗。",
       "embeddingDimensions": "向量維度",
-      "embeddingDimensionsHint": "供應商支援自訂維度時按此值請求；不支援時僅作記錄，按供應商預設維度回傳。"
+      "embeddingDimensionsHint": "供應商支援自訂維度時按此值請求；不支援時僅作記錄，按供應商預設維度回傳。",
+      "modelGroupId": "GroupId",
+      "modelGroupIdHint": "MiniMax 向量化模型必填（平台「帳戶管理」中的 Group Id），缺失時呼叫會報錯。"
     },
     "memory": {
       "sectionTitle": "記憶",

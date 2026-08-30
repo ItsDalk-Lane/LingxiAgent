@@ -72,6 +72,11 @@ export interface KnowledgeIngestionEmbedRequest {
   runId: string;
   texts: string[];
   signal?: AbortSignal;
+  /**
+   * 嵌入用途（2026-08-30 供应商兼容修复）：document=入库向量（缺省）、query=检索
+   * 向量。MiniMax（db/query）与 Voyage（input_type）的官方算法按此分离，其余协议忽略。
+   */
+  inputType?: "document" | "query";
 }
 
 /** embedding provider 限流配置（§十六）：per (provider, model) 并发上限 + 最小请求间隔。 */

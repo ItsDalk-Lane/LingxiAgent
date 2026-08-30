@@ -181,6 +181,8 @@ export function ModelEditPanel({
     : userOperations.includes('rerank') ? 'rerank' : '';
   const [operationType, setOperationType] = useState(initialOperationType);
   const [dimensionsVal, setDimensionsVal] = useState(String(finiteNumber(userMeta.dimensions) ?? ''));
+  // MiniMax embeddings 的必填 GroupId（官方 URL query 参数，随模型条目持久化）
+  const [groupIdVal, setGroupIdVal] = useState(typeof userMeta.groupId === 'string' ? userMeta.groupId : '');
   const [dirty, setDirty] = useState<Record<string, boolean>>({});
   const markDirty = (field: string) => setDirty(prev => ({ ...prev, [field]: true }));
   const panelRef = useRef<HTMLDivElement>(null);
@@ -245,6 +247,8 @@ export function ModelEditPanel({
         // null 显式清除维度记录；非法输入原样拒绝由数字输入框约束
         entry.dimensions = dimensionsVal.trim() && Number.isSafeInteger(parsed) && parsed > 0 ? parsed : null;
       }
+      // 空串 → null 显式清除 GroupId（MiniMax 缺 GroupId 时调用会显式报错，不静默）
+      if (dirty.groupId) entry.groupId = groupIdVal.trim() ? groupIdVal.trim() : null;
       try {
         await lingxiFetchJson(`/api/providers/${encodeURIComponent(providerId)}/models/${encodeURIComponent(modelId)}`, {
           method: 'PUT',
@@ -390,6 +394,19 @@ export function ModelEditPanel({
                 placeholder="1024"
               />
               <span className={styles['pv-model-edit-hint']}>{t('settings.api.embeddingDimensionsHint')}</span>
+            </div>
+          )}
+          {operationType === 'embedding' && providerId === 'minimax' && (
+            <div className={styles['pv-model-edit-field']}>
+              <label className={styles['pv-model-edit-label']}>{t('settings.api.modelGroupId')}</label>
+              <input
+                className={styles['settings-input']}
+                type="text"
+                value={groupIdVal}
+                onChange={(e) => { setGroupIdVal(e.target.value); markDirty('groupId'); }}
+                placeholder="17xxxxxxxxxxxxxxxxxx"
+              />
+              <span className={styles['pv-model-edit-hint']}>{t('settings.api.modelGroupIdHint')}</span>
             </div>
           )}
         </>

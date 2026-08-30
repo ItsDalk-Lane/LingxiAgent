@@ -2280,6 +2280,9 @@ export class LingxiEngine {
       timeoutMs: 300_000,
       dimensions: execution.model?.dimensions ?? undefined,
       contextWindow: Number.isSafeInteger(declaredWindow) && declaredWindow > 0 ? declaredWindow : undefined,
+      // 嵌入用途穿透（查询侧 "query"、摄入缺省 "document"）：MiniMax db/query 与
+      // Voyage input_type 的官方算法按此分离，其余协议忽略。
+      inputType: request.inputType,
       usageContext: this._knowledgeOperationUsageContext("embedding", request.runId),
     });
   }

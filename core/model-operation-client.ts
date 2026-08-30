@@ -19,7 +19,8 @@ const MAX_RERANK_DOCUMENTS = MODEL_OPERATION_RERANK_MAX_DOCS;
 const MAX_TEXT_CHARS = 32_000;
 const MAX_TOTAL_TEXT_CHARS = 500_000;
 
-// 已识别的操作协议名，按下标解构出可读常量用于 switch 分发
+// 已识别的操作协议名，按下标解构出可读常量用于 switch 分发。
+// 注意：MODEL_OPERATION_PROTOCOLS 的既有顺序是解构契约，新协议只允许末尾追加。
 const [
   PROTOCOL_OPENAI_EMBEDDINGS,
   PROTOCOL_OLLAMA_EMBED,
@@ -28,6 +29,8 @@ const [
   PROTOCOL_COHERE_RERANK,
   PROTOCOL_SILICONFLOW_RERANK,
   PROTOCOL_VOYAGE_RERANK,
+  PROTOCOL_DASHSCOPE_RERANK,
+  PROTOCOL_MINIMAX_EMBEDDINGS,
 ] = MODEL_OPERATION_PROTOCOLS;
 
 /** embed() 的输入用途：voyage 协议映射为 input_type，其余协议忽略。 */
@@ -89,7 +92,7 @@ function trimBaseUrl(baseUrl: string): string {
   return trimmed;
 }
 
-function operationUrl(baseUrl: string, suffix: "embeddings" | "rerank"): string {
+function operationUrl(baseUrl: string, suffix: "embeddings" | "rerank" | "reranks"): string {
   const trimmed = trimBaseUrl(baseUrl);
   return trimmed.endsWith(`/${suffix}`) ? trimmed : `${trimmed}/${suffix}`;
 }
@@ -102,12 +105,42 @@ function ollamaEmbedUrl(baseUrl: string): string {
   return trimmed.endsWith("/api") ? `${trimmed}/embed` : `${trimmed}/api/embed`;
 }
 
-// DashScope 的 compatible-mode 网关不承载 /rerank：cohere 系协议命中时改写到 compatible-api 再拼接
+// DashScope 的 compatible-mode 网关不承载 rerank：base 命中 compatible-mode 时改写为
+// compatible-api 并拼官方复数端点 /reranks；未命中（其余供应商）保持单数 /rerank。
 function cohereRerankUrl(baseUrl: string): string {
+  if (!baseUrl.includes("/compatible-mode/v1")) return operationUrl(baseUrl, "rerank");
+  return operationUrl(baseUrl.replace("/compatible-mode/v1", "/compatible-api/v1"), "reranks");
+}
+
+// DashScope 原生重排端点（gte-rerank 系与 qwen3-vl-rerank 系专用，嵌套请求协议）：路径与
+// base 无关，只取域名（国际站 dashscope-intl 同样成立）。
+function dashscopeNativeRerankUrl(baseUrl: string): string {
+  try {
+    return `${new URL(trimBaseUrl(baseUrl)).origin}/api/v1/services/rerank/text-rerank/text-rerank`;
+  } catch {
+    throw new ModelOperationRequestError("invalid_input", "Provider base URL is invalid");
+  }
+}
+
+// DashScope 兼容重排端点（qwen3-rerank* 专用，扁平 cohere 形状）：官方路径为
+// compatible-api/v1/reranks（复数）；用户自定义 base 未含 compatible-mode 时按原样拼接。
+function dashscopeCompatibleRerankUrl(baseUrl: string): string {
   const rewritten = baseUrl.includes("/compatible-mode/v1")
     ? baseUrl.replace("/compatible-mode/v1", "/compatible-api/v1")
     : baseUrl;
-  return operationUrl(rewritten, "rerank");
+  return operationUrl(rewritten, "reranks");
+}
+
+// MiniMax 官方 embeddings 是自有协议：GroupId 为必填 URL query 参数（模型条目
+// groupId 字段携带），端点固定在域名根的 /v1/embeddings（供应商 base 指向
+// /anthropic chat 网关，不能直接拼接）。
+function minimaxEmbeddingUrl(baseUrl: string, groupId: string): string {
+  try {
+    const origin = new URL(trimBaseUrl(baseUrl)).origin;
+    return `${origin}/v1/embeddings?GroupId=${encodeURIComponent(groupId)}`;
+  } catch {
+    throw new ModelOperationRequestError("invalid_input", "Provider base URL is invalid");
+  }
 }
 
 function hasHeader(headers: Record<string, string>, name: string): boolean {
@@ -176,6 +209,36 @@ function normalizeVoyageEmbeddings(body: any) {
   };
 }
 
+// DashScope 原生重排响应的 results 嵌在 output 下：折成顶层 results 让 RerankClient
+// 的校验/排序路径与 cohere 形状完全复用（其余字段原样保留供 usage/留痕）。
+function normalizeDashscopeNativeRerank(body: any) {
+  return {
+    results: Array.isArray(body?.output?.results) ? body.output.results : null,
+    usage: body?.usage,
+    request_id: body?.request_id,
+  };
+}
+
+// MiniMax embeddings 响应为自有形状：顶层 vectors（顺序对应输入，无 index 字段）+
+// total_tokens；错误以 HTTP 200 内嵌 base_resp.status_code 表达，非 0 必须显式抛错
+// （禁静默降级），否则错误响应会被当作向量数据进入下游校验。
+function normalizeMinimaxEmbeddings(body: any) {
+  const status = body?.base_resp?.status_code;
+  if (typeof status === "number" && status !== 0) {
+    throw new ModelOperationRequestError(
+      "invalid_provider_response",
+      `MiniMax embeddings failed: ${body?.base_resp?.status_msg || status}`,
+    );
+  }
+  const totalTokens = Number(body?.total_tokens);
+  return {
+    data: Array.isArray(body?.vectors)
+      ? body.vectors.map((vector: unknown, index: number) => ({ index, embedding: vector }))
+      : null,
+    usage: Number.isFinite(totalTokens) ? { total_tokens: totalTokens } : null,
+  };
+}
+
 // 协议方言：按 execution.api 把通用（openai/cohere 形状）请求体翻译成厂商原生协议的
 // URL/请求体/认证头，并给出响应归一化函数；缺省与未识别协议名回退现状路径。
 interface OperationDialect {
@@ -231,7 +294,7 @@ function operationDialect(execution: any, options: {
       case PROTOCOL_VOYAGE_EMBEDDINGS:
         return {
           url: `${trimBaseUrl(execution.baseUrl)}/v1/embeddings`,
-          headers: protocolHeaders(execution, "bearer"),
+          headers: requestHeaders(execution),
           body: {
             model: modelId,
             input,
@@ -241,6 +304,29 @@ function operationDialect(execution: any, options: {
           itemCount: input.length,
           normalizeResponse: normalizeVoyageEmbeddings,
         };
+      case PROTOCOL_MINIMAX_EMBEDDINGS: {
+        // GroupId 必填（官方 URL query 参数）：缺失显式报错，不静默降级。
+        const groupId = execution.model?.groupId;
+        if (!groupId || typeof groupId !== "string") {
+          throw new ModelOperationRequestError(
+            "invalid_input",
+            "MiniMax embeddings require a GroupId configured on the model entry (settings > providers > model > GroupId)",
+          );
+        }
+        return {
+          url: minimaxEmbeddingUrl(execution.baseUrl, groupId),
+          headers: requestHeaders(execution),
+          // 官方自有请求体：texts 数组 + type（db=入库向量 / query=检索向量，算法分离）；
+          // dimensions 不透传（embo-01 固定 1536 维，多余字段官方未定义）。
+          body: {
+            model: modelId,
+            texts: input,
+            type: options.inputType === "query" ? "query" : "db",
+          },
+          itemCount: input.length,
+          normalizeResponse: normalizeMinimaxEmbeddings,
+        };
+      }
       case PROTOCOL_OPENAI_EMBEDDINGS:
       default:
         // openai-embeddings 协议名、缺省与未识别协议名：维持现状路径
@@ -264,6 +350,34 @@ function operationDialect(execution: any, options: {
         itemCount: documents.length,
         normalizeResponse: passthroughResponse,
       };
+    case PROTOCOL_DASHSCOPE_RERANK: {
+      // 官方双端点按模型分流：兼容端点 compatible-api/v1/reranks（扁平 cohere 形状）
+      // 仅支持 qwen3-rerank 系；gte-rerank 系与 qwen3-vl-rerank 系必须走原生嵌套协议端点
+      // （input.query/input.documents/parameters，响应 output.results）。未知新模型
+      // 归入兼容端点（gte 系已公告下线迁移，qwen 系新模型在兼容端点演进）。
+      if (/^(gte-rerank|qwen3-vl-rerank)/.test(modelId)) {
+        return {
+          url: dashscopeNativeRerankUrl(execution.baseUrl),
+          headers: requestHeaders(execution),
+          body: {
+            model: modelId,
+            input: { query, documents },
+            parameters: { top_n: top_n, return_documents: false },
+          },
+          itemCount: documents.length,
+          normalizeResponse: normalizeDashscopeNativeRerank,
+        };
+      }
+      return {
+        url: dashscopeCompatibleRerankUrl(execution.baseUrl),
+        headers: requestHeaders(execution),
+        // 兼容端点官方字段集为 model/query/documents/top_n(/instruct)，
+        // 不透传 return_documents（旧版原生端点参数，官方兼容文档未定义）。
+        body: { model: modelId, query, documents, top_n },
+        itemCount: documents.length,
+        normalizeResponse: passthroughResponse,
+      };
+    }
     case PROTOCOL_COHERE_RERANK:
     case PROTOCOL_SILICONFLOW_RERANK:
       return {
@@ -343,16 +457,20 @@ function normalizeEmbeddingUsage(body: any) {
 
 function normalizeRerankUsage(body: any) {
   const tokens = body?.meta?.tokens;
-  if (!tokens || typeof tokens !== "object") return null;
-  const input = Number(tokens.input_tokens);
-  const output = Number(tokens.output_tokens);
-  return {
-    ...(Number.isFinite(input) ? { input_tokens: input } : {}),
-    ...(Number.isFinite(output) ? { output_tokens: output } : {}),
-    ...(Number.isFinite(input) || Number.isFinite(output)
-      ? { total_tokens: (Number.isFinite(input) ? input : 0) + (Number.isFinite(output) ? output : 0) }
-      : {}),
-  };
+  if (tokens && typeof tokens === "object") {
+    const input = Number(tokens.input_tokens);
+    const output = Number(tokens.output_tokens);
+    return {
+      ...(Number.isFinite(input) ? { input_tokens: input } : {}),
+      ...(Number.isFinite(output) ? { output_tokens: output } : {}),
+      ...(Number.isFinite(input) || Number.isFinite(output)
+        ? { total_tokens: (Number.isFinite(input) ? input : 0) + (Number.isFinite(output) ? output : 0) }
+        : {}),
+    };
+  }
+  // DashScope 原生/兼容端点的 usage 只带 total_tokens
+  const total = Number(body?.usage?.total_tokens);
+  return Number.isFinite(total) ? { total_tokens: total } : null;
 }
 
 function modelIdentity(execution: any) {

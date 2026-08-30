@@ -1998,7 +1998,9 @@
       "modelOperationRerank": "リランク",
       "modelOperationHint": "埋め込みまたはリランクのタグを付けたモデルは、知識ノート設定の対応するドロップダウンに表示されます。タグは印のみで、実際の対応は呼び出し時に検証されます。",
       "embeddingDimensions": "埋め込み次元数",
-      "embeddingDimensionsHint": "プロバイダーがカスタム次元に対応する場合に使用。非対応の場合は記録のみで、プロバイダーの既定次元で返されます。"
+      "embeddingDimensionsHint": "プロバイダーがカスタム次元に対応する場合に使用。非対応の場合は記録のみで、プロバイダーの既定次元で返されます。",
+      "modelGroupId": "GroupId",
+      "modelGroupIdHint": "MiniMax の埋め込みモデルには必須（プラットフォームのアカウント管理にある Group Id）。未設定の場合は呼び出しが失敗します。"
     },
     "memory": {
       "sectionTitle": "記憶",

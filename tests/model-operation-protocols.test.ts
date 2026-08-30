@@ -398,7 +398,7 @@ describe("voyage-rerank 协议", () => {
 });
 
 describe("cohere-rerank 协议", () => {
-  it("DashScope compatible-mode base 改写为 compatible-api 再拼 /rerank", async () => {
+  it("DashScope compatible-mode base 改写为 compatible-api 再拼官方复数端点 /reranks", async () => {
     const fetchMock = vi.fn(async () => response({
       results: [{ index: 0, relevance_score: 0.9 }],
     }));
@@ -420,7 +420,7 @@ describe("cohere-rerank 协议", () => {
 
     const [url, init] = fetchMock.mock.calls[0] as unknown as [string, RequestInit];
     expect(init.method).toBe("POST");
-    expect(url).toBe("https://dashscope.aliyuncs.com/compatible-api/v1/rerank");
+    expect(url).toBe("https://dashscope.aliyuncs.com/compatible-api/v1/reranks");
     const headers = init.headers as Record<string, string>;
     expect(headers.Authorization).toBe("Bearer secret-key");
     expect(JSON.parse(String(init.body))).toEqual({
@@ -536,5 +536,189 @@ describe("协议回退（缺省与未识别协议名）", () => {
       top_n: 1,
       return_documents: false,
     });
+  });
+});
+
+describe("dashscope-rerank 协议（官方双端点按模型分流）", () => {
+  it("gte-rerank-v2 走原生嵌套端点：input/parameters 请求体 + output.results 归一化", async () => {
+    const fetchMock = vi.fn(async () => response({
+      output: {
+        results: [
+          { index: 1, relevance_score: 0.5 },
+          { index: 0, relevance_score: 0.9 },
+        ],
+      },
+      usage: { total_tokens: 42 },
+      request_id: "req-1",
+    }));
+    const client = new RerankClient({
+      resolveOperationFresh: vi.fn(async () => execution("rerank", {
+        api: "dashscope-rerank",
+        baseUrl: "https://dashscope.aliyuncs.com/compatible-mode/v1",
+        model: { id: "gte-rerank-v2", provider: "dashscope" },
+      })),
+      fetch: fetchMock as any,
+    });
+
+    await expect(client.rerank({ query: "question", documents: ["one", "two"], topN: 2 }))
+      .resolves.toMatchObject({
+        results: [{ index: 0, score: 0.9 }, { index: 1, score: 0.5 }],
+        usage: { total_tokens: 42 },
+      });
+
+    const [url, init] = fetchMock.mock.calls[0] as unknown as [string, RequestInit];
+    expect(init.method).toBe("POST");
+    expect(url).toBe("https://dashscope.aliyuncs.com/api/v1/services/rerank/text-rerank/text-rerank");
+    const headers = init.headers as Record<string, string>;
+    expect(headers.Authorization).toBe("Bearer secret-key");
+    expect(JSON.parse(String(init.body))).toEqual({
+      model: "gte-rerank-v2",
+      input: { query: "question", documents: ["one", "two"] },
+      parameters: { top_n: 2, return_documents: false },
+    });
+  });
+
+  it("qwen3-vl-rerank 同样路由到原生端点", async () => {
+    const fetchMock = vi.fn(async () => response({
+      output: { results: [{ index: 0, relevance_score: 0.9 }] },
+    }));
+    const client = new RerankClient({
+      resolveOperationFresh: vi.fn(async () => execution("rerank", {
+        api: "dashscope-rerank",
+        baseUrl: "https://dashscope.aliyuncs.com/compatible-mode/v1",
+        model: { id: "qwen3-vl-rerank", provider: "dashscope" },
+      })),
+      fetch: fetchMock as any,
+    });
+
+    await expect(client.rerank({ query: "q", documents: ["one"], topN: 1 }))
+      .resolves.toMatchObject({ results: [{ index: 0, score: 0.9 }] });
+
+    const [url] = fetchMock.mock.calls[0] as unknown as [string, RequestInit];
+    expect(url).toBe("https://dashscope.aliyuncs.com/api/v1/services/rerank/text-rerank/text-rerank");
+  });
+
+  it("qwen3-rerank 走兼容端点 /compatible-api/v1/reranks：扁平请求体（无 return_documents）", async () => {
+    const fetchMock = vi.fn(async () => response({
+      results: [{ index: 0, relevance_score: 0.9 }],
+      usage: { total_tokens: 7 },
+    }));
+    const client = new RerankClient({
+      resolveOperationFresh: vi.fn(async () => execution("rerank", {
+        api: "dashscope-rerank",
+        baseUrl: "https://dashscope.aliyuncs.com/compatible-mode/v1",
+        model: { id: "qwen3-rerank", provider: "dashscope" },
+      })),
+      fetch: fetchMock as any,
+    });
+
+    await expect(client.rerank({ query: "question", documents: ["one"], topN: 1 }))
+      .resolves.toMatchObject({
+        results: [{ index: 0, score: 0.9 }],
+        usage: { total_tokens: 7 },
+      });
+
+    const [url, init] = fetchMock.mock.calls[0] as unknown as [string, RequestInit];
+    expect(init.method).toBe("POST");
+    expect(url).toBe("https://dashscope.aliyuncs.com/compatible-api/v1/reranks");
+    const headers = init.headers as Record<string, string>;
+    expect(headers.Authorization).toBe("Bearer secret-key");
+    expect(JSON.parse(String(init.body))).toEqual({
+      model: "qwen3-rerank",
+      query: "question",
+      documents: ["one"],
+      top_n: 1,
+    });
+  });
+});
+
+describe("minimax-embeddings 协议（texts/type + GroupId query 参数）", () => {
+  const minimaxExecution = (modelOverrides: Record<string, any> = {}) => execution("embedding", {
+    api: "minimax-embeddings",
+    baseUrl: "https://api.minimaxi.com/anthropic",
+    model: { id: "embo-01", provider: "minimax", groupId: "g-123", ...modelOverrides },
+  });
+
+  it("GroupId 拼进 URL query、请求体为 texts/type(db)、vectors 归一化 openai 形状", async () => {
+    const fetchMock = vi.fn(async () => response({
+      vectors: [[0.1, 0.2], [0.3, 0.4]],
+      total_tokens: 10,
+      base_resp: { status_code: 0, status_msg: "" },
+    }));
+    const client = new EmbeddingClient({
+      resolveOperationFresh: vi.fn(async () => minimaxExecution()),
+      fetch: fetchMock as any,
+    });
+
+    await expect(client.embed({ texts: ["first", "second"] })).resolves.toMatchObject({
+      vectors: [[0.1, 0.2], [0.3, 0.4]],
+      dimensions: 2,
+      usage: { total_tokens: 10 },
+    });
+
+    const [url, init] = fetchMock.mock.calls[0] as unknown as [string, RequestInit];
+    expect(init.method).toBe("POST");
+    expect(url).toBe("https://api.minimaxi.com/v1/embeddings?GroupId=g-123");
+    const headers = init.headers as Record<string, string>;
+    expect(headers.Authorization).toBe("Bearer secret-key");
+    expect(JSON.parse(String(init.body))).toEqual({
+      model: "embo-01",
+      texts: ["first", "second"],
+      type: "db",
+    });
+  });
+
+  it("inputType=query 时 type 映射为 query（官方 db/query 算法分离）", async () => {
+    const fetchMock = vi.fn(async () => response({
+      vectors: [[0.1, 0.2]],
+      total_tokens: 5,
+      base_resp: { status_code: 0, status_msg: "" },
+    }));
+    const client = new EmbeddingClient({
+      resolveOperationFresh: vi.fn(async () => minimaxExecution()),
+      fetch: fetchMock as any,
+    });
+
+    await expect(client.embed({ texts: ["q"], inputType: "query" })).resolves.toMatchObject({
+      vectors: [[0.1, 0.2]],
+    });
+
+    const [, init] = fetchMock.mock.calls[0] as unknown as [string, RequestInit];
+    expect(JSON.parse(String(init.body))).toEqual({
+      model: "embo-01",
+      texts: ["q"],
+      type: "query",
+    });
+  });
+
+  it("HTTP 200 内嵌 base_resp 错误码时显式抛错（不静默当作向量数据）", async () => {
+    const fetchMock = vi.fn(async () => response({
+      base_resp: { status_code: 1004, status_msg: "invalid api key" },
+    }));
+    const client = new EmbeddingClient({
+      resolveOperationFresh: vi.fn(async () => minimaxExecution()),
+      fetch: fetchMock as any,
+    });
+
+    await expect(client.embed({ texts: ["first"] })).rejects.toMatchObject({
+      name: "ModelOperationRequestError",
+      code: "invalid_provider_response",
+      message: expect.stringContaining("invalid api key"),
+    });
+  });
+
+  it("模型条目缺 GroupId 时显式报错", async () => {
+    const fetchMock = vi.fn(async () => response({ vectors: [[0.1]] }));
+    const client = new EmbeddingClient({
+      resolveOperationFresh: vi.fn(async () => minimaxExecution({ groupId: undefined })),
+      fetch: fetchMock as any,
+    });
+
+    await expect(client.embed({ texts: ["first"] })).rejects.toMatchObject({
+      name: "ModelOperationRequestError",
+      code: "invalid_input",
+      message: expect.stringContaining("GroupId"),
+    });
+    expect(fetchMock).not.toHaveBeenCalled();
   });
 });

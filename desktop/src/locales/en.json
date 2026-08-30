@@ -2067,7 +2067,9 @@
       "modelOperationRerank": "Rerank",
       "modelOperationHint": "Models tagged embedding or rerank appear in the matching dropdowns of the knowledge notebook settings. The tag is only a label; actual support is verified at call time.",
       "embeddingDimensions": "Embedding dimensions",
-      "embeddingDimensionsHint": "Used when the provider supports custom dimensions; otherwise recorded only and the provider default applies."
+      "embeddingDimensionsHint": "Used when the provider supports custom dimensions; otherwise recorded only and the provider default applies.",
+      "modelGroupId": "GroupId",
+      "modelGroupIdHint": "Required for MiniMax embedding models (the Group Id from the platform account page); calls fail without it."
     },
     "memory": {
       "sectionTitle": "Memory",

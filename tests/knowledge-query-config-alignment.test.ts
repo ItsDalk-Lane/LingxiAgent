@@ -269,10 +269,10 @@ describe("查询侧分块配置与摄入侧同源", () => {
     expect(degraded.rerankCalls.length).toBe(1); // 尝试过、显式降级（调用侧记日志）
   });
 
-  it("无上限召回（retrieval_top_k NULL）：预算链独立生效截断候选，重排输入不超共享上限 100，检索不失败", async () => {
+  it("无上限召回（retrieval_top_k NULL）：预算链独立生效截断候选，重排输入不超共享上限 50，检索不失败", async () => {
     // 事故（2026-08-29 第二连）回归锚 + §二十六（Phase 8）：topK=NULL→1000 不再
     // 作为覆盖机制——候选生成（每通道）与融合池按 candidate budgets 独立截断；
-    // rerank 输入仍受共享上限保护（docCount ≤ 100），两侧常量不再打架。
+    // rerank 输入仍受共享上限保护（docCount ≤ 50，2026-08-30 收紧防御方舟 50 上限），两侧常量不再打架。
     const { manager, rerankCalls } = createManager(tempHome());
     const studioId = "studio-a";
     const notebook = manager.createNotebook({ studioId, name: "长文" });
@@ -311,8 +311,9 @@ describe("查询侧分块配置与摄入侧同源", () => {
       question: "长夜",
     });
     expect(result.candidates.length).toBe(KNOWLEDGE_FUSION_BUDGET);
-    expect(result.candidates.length).toBeLessThanOrEqual(KNOWLEDGE_RERANK_MAX_DOCS);
     expect(rerankCalls.length).toBe(1);
-    expect(rerankCalls[0].docCount).toBeLessThanOrEqual(KNOWLEDGE_RERANK_MAX_DOCS); // 裁剪到共享上限
+    // 总候选（60）> 共享上限（50，2026-08-30 收紧）时：rerank 输入裁剪到上限、
+    // 尾部保 RRF 名次拼回，总候选数不变——上限只约束重排输入不约束返回总数。
+    expect(rerankCalls[0].docCount).toBe(KNOWLEDGE_RERANK_MAX_DOCS); // 裁剪到共享上限
   });
 });
