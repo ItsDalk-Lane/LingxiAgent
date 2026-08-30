@@ -549,8 +549,12 @@ export function handleServerMessage(msg: any): void {
   // 任何后续事件（status / session_user_message / 聊天流事件 / error…）到达都
   // 代表前一阶段已结束，保守清除（两个 end 内部对未命中 session 都是零成本
   // no-op）。knowledge_retrieval_started 自身不清 pending（发送 → 检索是同一段
-  // 等待），也不被自己清除。
-  if (msg?.type !== 'knowledge_retrieval_started' && msg?.type !== 'knowledge_distill_progress') {
+  // 等待），也不被自己清除；knowledge_distill_progress / knowledge_coverage_progress
+  // 是检索期内的分段进度（Phase 9 第二波新增 coverage 进度，渲染留给后续版本，
+  // 本波只保证不清检索态、未知事件不崩），同样排除。
+  if (msg?.type !== 'knowledge_retrieval_started'
+    && msg?.type !== 'knowledge_distill_progress'
+    && msg?.type !== 'knowledge_coverage_progress') {
     const { sessionPath: retrievalDonePath } = sessionIdentityFromMessage(msg);
     // 与 markSessionOutputUnread? 同策略：部分测试 store / 旧 slice 组合缺 action 时不炸。
     if (retrievalDonePath) {

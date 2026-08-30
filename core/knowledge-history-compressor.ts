@@ -56,7 +56,7 @@ function compressMessageText(text: string): string | null {
       "Knowledge evidence retrieved in an earlier turn of this conversation; full content omitted to save context.",
       `Evidence blocks retrieved in that turn: ${headerLines.length}.`,
       ...headerLines,
-      "The blocks above are addressable: use the `knowledge_read` tool with a sourceId and fromOrdinal/toOrdinal to re-read any of them if the answer needs the original text.",
+      "The blocks above are addressable: use the `knowledge_read` tool with the current turn's scopeId (from the latest [KnowledgeContext] block's Scope line), a sourceId and fromOrdinal/toOrdinal to re-read any of them if the answer needs the original text.",
       KNOWLEDGE_CONTEXT_BLOCK_END,
     );
   };

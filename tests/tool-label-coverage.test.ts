@@ -38,6 +38,7 @@ const LABELED_TOOL_NAMES = [
   'browser', 'computer', 'install_skill', 'notify', 'stop_task', 'update_settings',
   'session_folders', 'subagent', 'subagent_reply', 'subagent_close', 'workflow',
   'check_pending_tasks', 'loop_control', 'current_status', 'session', 'knowledge_read',
+  'knowledge_outline', 'knowledge_grep', 'knowledge_manage',
   'hana_card_guide', 'show_card',
   // Hub 频道
   'channel_read_context', 'channel_reply', 'channel_pass',

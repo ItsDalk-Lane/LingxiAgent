@@ -60,6 +60,7 @@
     "sourceCount": "소스 {count}개",
     "addSource": "소스 추가",
     "addLocalFile": "로컬 파일 선택",
+    "addLocalFolder": "로컬 폴더 선택",
     "addPastedText": "텍스트 붙여넣기",
     "addWebSnapshot": "웹 스냅샷",
     "sourceDisplayNameOptional": "소스 이름(선택 사항)",
@@ -100,6 +101,8 @@
     "importUnavailable": "이 환경에서는 로컬 파일 선택기를 사용할 수 없습니다",
     "importSuccess": "소스 {count}개를 가져왔습니다",
     "importPartialFailure": "가져오기 완료: {success}/{total}개 성공",
+    "importDirectorySuccess": "폴더 가져오기 완료: {imported}개 가져옴, {skipped}개 건너뜀",
+    "importDirectoryPartialFailure": "폴더 가져오기 완료: {imported}개 성공, {skipped}개 건너뜀, {failed}개 실패",
     "loadFailed": "지식 라이브러리를 불러오지 못했습니다",
     "saveFailed": "지식 작업에 실패했습니다",
     "notebookSettings": "노트북 설정",
@@ -1150,6 +1153,21 @@
       "running": "📚 지식 조각을 읽는 중",
       "done": "📚 지식 조각을 읽었습니다",
       "failed": "📚 지식 조각을 읽지 못했습니다"
+    },
+    "knowledge_outline": {
+      "running": "🗂️ 지식 구조를 정리하는 중",
+      "done": "🗂️ 지식 구조를 정리했어요",
+      "failed": "🗂️ 지식 구조를 정리하지 못했어요"
+    },
+    "knowledge_grep": {
+      "running": "🔍 지식 원문을 검색하는 중",
+      "done": "🔍 지식 원문을 검색했어요",
+      "failed": "🔍 지식 원문을 검색하지 못했어요"
+    },
+    "knowledge_manage": {
+      "running": "🗃️ 지식 노트를 정리하는 중",
+      "done": "🗃️ 지식 노트를 정리했어요",
+      "failed": "🗃️ 지식 노트를 정리하지 못했어요"
     }
   },
   "file_output": {

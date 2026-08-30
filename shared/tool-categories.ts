@@ -48,6 +48,9 @@ export const STANDARD_TOOL_NAMES = [
   "show_card",
   "loop_control",
   "knowledge_read",
+  "knowledge_outline",
+  "knowledge_grep",
+  "knowledge_manage",
 ];
 
 export const GLOBAL_TOOL_NAMES = [

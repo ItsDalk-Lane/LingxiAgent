@@ -1793,6 +1793,19 @@ export function createChatRoute(engine: any, hub: any, {
         done: Number(event.done) || 0,
         model: typeof event.model === "string" ? event.model : null,
       });
+    } else if (event.type === "knowledge_coverage_progress") {
+      // EXHAUSTIVE 覆盖执行的 shard 终态进度（Phase 9 第二波）：对齐
+      // knowledge_distill_progress 的广播模式，不进 stream_resume；结束同样由
+      // 该 session 任意后续事件保守清除。前端本波次只保证不破坏（未知事件
+      // 直接忽略），进度胶囊渲染留给后续版本。
+      broadcast({
+        type: "knowledge_coverage_progress",
+        sessionPath,
+        runId: typeof event.runId === "string" ? event.runId : "",
+        done: Number(event.done) || 0,
+        total: Number(event.total) || 0,
+        ...(event.coverageStatus != null ? { coverageStatus: event.coverageStatus } : {}),
+      });
     } else if (event.type === "session_status") {
       // session_status 只回答「Session 忙不忙」（任务书 §九/§十：status 与 Run 正交）。
       // 不再 reset Run 级 parser，也不 finalize Run；Run 只由 agent_start / agent_settled 开关。

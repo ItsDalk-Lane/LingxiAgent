@@ -70,4 +70,19 @@ describe('knowledge_distill_progress 前端消费', () => {
     expect(() => handleServerMessage({ type: 'knowledge_distill_progress', done: 1 })).not.toThrow();
     expect(useStore.getState().knowledgeDistillBySession[PATH]).toBeUndefined();
   });
+
+  it('knowledge_coverage_progress（Phase 9 第二波）：不清检索态、不炸（渲染留给后续版本）', () => {
+    handleServerMessage({ type: 'knowledge_retrieval_started', sessionPath: PATH });
+    expect(useStore.getState().knowledgeRetrievingSessions).toContain(PATH);
+
+    // 覆盖进度是检索期内的分段进度：不提前清除「检索中」胶囊，也不产生渲染状态。
+    expect(() => handleServerMessage({
+      type: 'knowledge_coverage_progress',
+      sessionPath: PATH,
+      runId: 'covrun_1',
+      done: 3,
+      total: 8,
+    })).not.toThrow();
+    expect(useStore.getState().knowledgeRetrievingSessions).toContain(PATH);
+  });
 });

@@ -874,7 +874,7 @@ export const PERSISTENT_STORES: readonly StoreDescriptor[] = Object.freeze([
     migrationEntry: ["KnowledgeStore store-local migrations"],
     checkpointPolicy: "Checkpoint with the managed source snapshots and citation-grade parse artifacts from the same Knowledge generation.",
     restorePolicy: "Restore through KnowledgeManager before queries resume; validate SQLite user_version and referenced managed bytes together.",
-    compatibility: "schema v6 adds notebook config columns (embedding_model_ref/rerank_model_ref inherit the global preference when NULL; chunk_target_chars/retrieval_top_k fall back to built-in defaults 1200/12) and the ingestion_jobs queue table, and drops the V3-V5 research tables in the same transaction; research rows were derived artifacts, so the V1-V2 source-of-truth tables migrate untouched. schema v7 adds ingestion_jobs.progress_done (NOT NULL DEFAULT 0) and progress_total (NULL = embed phase not reached) for embedding progress; existing rows backfill 0/NULL and no other persisted shape changes.",
+    compatibility: "schema v6 adds notebook config columns (embedding_model_ref/rerank_model_ref inherit the global preference when NULL; chunk_target_chars/retrieval_top_k fall back to built-in defaults 1200/12) and the ingestion_jobs queue table, and drops the V3-V5 research tables in the same transaction; research rows were derived artifacts, so the V1-V2 source-of-truth tables migrate untouched. schema v7 adds ingestion_jobs.progress_done (NOT NULL DEFAULT 0) and progress_total (NULL = embed phase not reached) for embedding progress; existing rows backfill 0/NULL and no other persisted shape changes. schema v8 is a pure data migration: retrieval_top_k is reset to NULL for all active notebooks (NULL = uncapped retrieval; the DDL DEFAULT 12 from v6 is a legacy artifact new notebooks no longer receive). schema v9 (P0 index identity) is purely additive: it creates the chunk_profiles and retrieval_profiles identity registries plus the notebooks.retrieval_profile_id binding column, and backfills chunk_profiles from ingestion_jobs.chunker_config_id history (unresolvable hashes become profile_type='legacy' rows with NULL config, never fabricated); no existing column or index/vector data is touched and no re-embedding is triggered. schema v10 adds ingestion_jobs.embedding_stats (JSON, NULL = embed phase never ran); schema v11 adds the KnowledgeTurnScope tables knowledge_turn_scopes and knowledge_turn_scope_sources. schema v12 (lifecycle governance) is additive: sources.orphaned_at marks zero-membership orphans for retention-based GC, ingestion_jobs.cancelled_at marks jobs cancelled by explicit source deletion (the status CHECK cannot gain a 'cancelled' value, so cancellation reuses the failed terminal state plus this explicit column, and requeue rejects cancelled rows), and a partial unique index enforces one active job per (notebook_id, source_id) after collapsing pre-existing duplicate active rows to failed with an explicit error. schema v13 (Phase 7 coverage planner) is purely additive: the knowledge_coverage_plans table persists structured KnowledgeCoveragePlan results only (intent/coverage_mode/requires_completeness/scope_level/sub_queries_json/confidence/matched_rule_ids_json/classifier_used/degrade_reason plus a nullable turn_scope_id reference); no chain-of-thought or raw model output is ever stored, and no existing table or row changes. schema v14 (Phase 9 exhaustive coverage execution) is purely additive: the coverage_runs and coverage_shards tables persist the frozen coverage manifest identity (manifest_hash plus manifest_json with unit texts for resume), deterministic shard rows with attempt counts, and worker ShardResult JSON only (structured findings with provenance; no chain-of-thought); recovery reuses completed shard results and resets running shards to pending, and no existing table or row changes. schema v15 (EvidenceManifest, task spec 67) is purely additive: the evidence_manifests and evidence_manifest_entries tables persist per-answer evidence identity chains only (turn scope/session/turn/coverage mode references plus per-source snapshot/artifact/chunk-profile/chunk-and-vector-variant ids, neighbor ids, block offsets, and citation labels); no chunk text, chain-of-thought, or model output is ever stored, entries are re-verified server-side against the frozen turn-scope source set on insert, and orphan GC plus deleteSource now skip sources referenced by any manifest; no existing table or row changes. schema v16 (Phase 12 ProcessingArtifact pipeline, task spec 58/59/69) is purely additive: the processing_artifacts table persists binary-format conversion generations keyed by the processor identity quadruple (content_snapshot_id, processor_id, processor_version, processor_config_hash) with fidelity, output locator, locatorMap JSON and warnings; parse_artifacts gains fidelity (legacy rows default to 'citation_grade') and processing_artifact_id; notebook_sources gains directory organization path columns (relative_path/folder_node/display_order, NULL = no directory context); no existing table, row, or index/vector data is touched and no re-processing is triggered.",
     identityContract: "One Knowledge database belongs to one canonical LINGXI_HOME; Notebook, Source, Snapshot, and later run IDs are durable identities, while storage paths are relative locators.",
     siteRules: rules(
       ["lib/knowledge/knowledge-store.ts"],
@@ -925,6 +925,28 @@ export const PERSISTENT_STORES: readonly StoreDescriptor[] = Object.freeze([
     ),
   }),
   defineStore({
+    id: "knowledge-processing-artifacts",
+    ownerModule: "lib/knowledge/knowledge-manager.ts",
+    pathPatterns: ["knowledge/processed/**"],
+    pathKind: "tree",
+    format: "mixed-directory",
+    schemaSource: directorySource(
+      "lib/knowledge/knowledge-manager.ts",
+      "ProcessingArtifact output files (binary office formats converted to structured text) referenced by knowledge.db processing_artifacts rows, with locatorMap held in the database",
+    ),
+    openEntry: ["new KnowledgeManager", "KnowledgeManager.parseSource"],
+    checkpointPolicy: "Checkpoint ready ProcessingArtifact outputs that are referenced by knowledge.db together with their ContentSnapshot generations; unreferenced staging files are excluded.",
+    restorePolicy: "Restore only outputs whose processor identity and content snapshot still validate; re-run the processor when compatibility requires it.",
+    compatibility: "schema v16 introduces the processing_artifacts table (processor identity quadruple, fidelity, output locator, locatorMap JSON) and these managed output files; parse_artifacts gains fidelity plus processing_artifact_id back-references, and notebook_sources gains directory organization paths (relative_path/folder_node/display_order).",
+    identityContract: "(contentSnapshotId, processorId, processorVersion, processorConfigHash) identifies one conversion generation; outputs are deterministic projections of immutable snapshot bytes and never change ContentSnapshot identity.",
+    siteRules: rules(
+      ["lib/knowledge/knowledge-manager.ts"],
+      "Creates, atomically publishes, reads back, or rolls back ProcessingArtifact output files.",
+      ["mkdir", "write-file", "rename", "remove-path"],
+      "processedRoot|processedDirectory|processedTemporaryPath|processedOutputPath|processedOutputFile",
+    ),
+  }),
+  defineStore({
     id: "knowledge-indexes",
     ownerModule: "lib/knowledge/knowledge-index-store.ts",
     pathPatterns: ["knowledge/indexes/**"],
@@ -941,7 +963,8 @@ export const PERSISTENT_STORES: readonly StoreDescriptor[] = Object.freeze([
     checkpointPolicy: "Excluded; indexes are performance projections and must be completely rebuildable from knowledge.db plus validated parse artifacts.",
     restorePolicy: "Delete incompatible or corrupt index generations and rebuild them; never use an index as the source of Knowledge truth.",
     affectedByEpochMigration: false,
-    identityContract: "Index generation IDs are disposable projection identities; Notebook, Source, Snapshot, Artifact, Evidence, and Claim facts never originate here.",
+    compatibility: "knowledge-fts.db schema v2 and knowledge-vector.db schema v2 (P0 index identity) migrate v1 in a single transaction each: chunk identity moves from (parse_artifact_id, ordinal) to ChunkIndexVariant (parse_artifact_id, chunk_profile_hash) + ordinal via chunk_index_variants backfill (artifact_indexes is retired after backfill), and vector identity moves from (parse_artifact_id, model_key) to VectorIndexVariant (chunk_index_variant_id, model_key) via vector_index_variants backfill (vector_artifacts is retired after backfill). Rows whose chunk profile cannot be resolved are filed under the explicit legacy_unknown identity instead of being dropped; migrations only establish identities and remap existing rows, never re-chunk or re-embed.",
+    identityContract: "Index generation IDs are disposable projection identities; ChunkIndexVariant (parseArtifactId, chunkProfileHash) and VectorIndexVariant (chunkIndexVariantId, modelKey) are deterministic derived identities, while Notebook, Source, Snapshot, Artifact, Evidence, and Claim facts never originate here.",
     siteRules: [
       ...rules(
         ["lib/knowledge/knowledge-manager.ts"],

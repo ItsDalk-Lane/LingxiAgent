@@ -87,12 +87,31 @@ describe("persistence schema tripwire", () => {
     expect(knowledge).toMatchObject({
       kind: "sqlite-runtime",
       module: "lib/knowledge/knowledge-store.ts",
-      runtimeSchema: { userVersion: 8 },
+      runtimeSchema: { userVersion: 16 },
     });
     expect(knowledge.runtimeSchema.objects.some((entry) => entry.name === "notebooks")).toBe(true);
     expect(knowledge.runtimeSchema.objects.some((entry) => entry.name === "ingestion_jobs")).toBe(true);
+    expect(knowledge.runtimeSchema.objects.some((entry) => entry.name === "chunk_profiles")).toBe(true);
+    expect(knowledge.runtimeSchema.objects.some((entry) => entry.name === "retrieval_profiles")).toBe(true);
+    expect(knowledge.runtimeSchema.objects.some((entry) => entry.name === "knowledge_turn_scopes")).toBe(true);
+    expect(knowledge.runtimeSchema.objects.some((entry) => entry.name === "knowledge_turn_scope_sources")).toBe(true);
     expect(knowledge.runtimeSchema.objects.some((entry) => entry.name === "research_reports")).toBe(false);
     expect(knowledge.runtimeSchema.objects.some((entry) => entry.name === "knowledge_runs")).toBe(false);
+    // v13（Phase 7 覆盖规划）：只存结构化分类结果的覆盖计划表。
+    expect(knowledge.runtimeSchema.objects.some((entry) => entry.name === "knowledge_coverage_plans")).toBe(true);
+    // v14（Phase 9 EXHAUSTIVE 覆盖执行）：run/shard 执行事实表（只存 ShardResult，禁 CoT）。
+    expect(knowledge.runtimeSchema.objects.some((entry) => entry.name === "coverage_runs")).toBe(true);
+    expect(knowledge.runtimeSchema.objects.some((entry) => entry.name === "coverage_shards")).toBe(true);
+    expect(knowledge.runtimeSchema.objects.some((entry) => entry.name === "idx_coverage_runs_manifest")).toBe(true);
+    // v15（任务书 §六十七 EvidenceManifest）：身份链表（只存 id/序号/偏移/标签，禁正文/CoT）。
+    expect(knowledge.runtimeSchema.objects.some((entry) => entry.name === "evidence_manifests")).toBe(true);
+    expect(knowledge.runtimeSchema.objects.some((entry) => entry.name === "evidence_manifest_entries")).toBe(true);
+    expect(knowledge.runtimeSchema.objects.some((entry) => entry.name === "idx_evidence_manifests_scope")).toBe(true);
+    // v16（任务书 §五十八 ProcessingArtifact 管线）：processor 身份四元组转换产物表。
+    expect(knowledge.runtimeSchema.objects.some((entry) => entry.name === "processing_artifacts")).toBe(true);
+    // v12（Phase 5 生命周期治理）：orphan 标记部分索引 + 活跃 job 部分唯一索引。
+    expect(knowledge.runtimeSchema.objects.some((entry) => entry.name === "idx_sources_orphaned")).toBe(true);
+    expect(knowledge.runtimeSchema.objects.some((entry) => entry.name === "idx_ingestion_jobs_active")).toBe(true);
 
     const sessions = first.schemas.find((entry) => entry.storeId === "session-jsonl");
     expect(sessions).toMatchObject({

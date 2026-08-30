@@ -338,7 +338,7 @@ describe("chunkerConfigId 缓存键", () => {
     expect(small.every(chunk => chunk.text.length <= 400)).toBe(true);
   });
 
-  it("KnowledgeIndexStore 以 configId 判断缓存：配置变化即失效并整体重建", () => {
+  it("KnowledgeIndexStore 以 configId 判断缓存：配置身份不同即各自独立判定、变体共存", () => {
     const store = openIndex(path.join(tempDir(), "knowledge-fts.db"));
     const blocks = [mdBlock(0, "标题", ["标题"], 1), mdBlock(1, "需要检索的正文内容", ["标题"], 2)];
     const fingerprint = knowledgeBlockFingerprint(blocks);
@@ -348,20 +348,29 @@ describe("chunkerConfigId 缓存键", () => {
     store.replaceArtifactChunks({
       parseArtifactId: "parse-md",
       blockFingerprint: fingerprint,
-      chunkerVersion: config1200,
+      chunkProfileHash: config1200,
       chunks: buildKnowledgeChunks("parse-md", blocks),
     });
-    expect(store.hasArtifactFingerprint("parse-md", fingerprint, config1200)).toBe(true);
-    // 仅 targetChars 变化即判定缓存失效。
-    expect(store.hasArtifactFingerprint("parse-md", fingerprint, config800)).toBe(false);
+    // 新契约实参顺序：(parseArtifactId, chunkProfileHash, fingerprint)。
+    expect(store.hasArtifactFingerprint("parse-md", config1200, fingerprint)).toBe(true);
+    // 另一配置的变体未建立 → 不命中。
+    expect(store.hasArtifactFingerprint("parse-md", config800, fingerprint)).toBe(false);
+    // 同变体指纹不匹配 → 判失效（重建触发条件保留）。
+    expect(store.hasArtifactFingerprint("parse-md", config1200, "fp-stale")).toBe(false);
 
     store.replaceArtifactChunks({
       parseArtifactId: "parse-md",
       blockFingerprint: fingerprint,
-      chunkerVersion: config800,
+      chunkProfileHash: config800,
       chunks: buildKnowledgeChunks("parse-md", blocks, { targetChars: 800 }),
     });
-    expect(store.hasArtifactFingerprint("parse-md", fingerprint, config800)).toBe(true);
-    expect(store.hasArtifactFingerprint("parse-md", fingerprint, config1200)).toBe(false);
+    expect(store.hasArtifactFingerprint("parse-md", config800, fingerprint)).toBe(true);
+    // schema v2 变体共存：800 变体的建立不覆盖 1200 变体（不再是单一份 chunk 集互相替换）。
+    expect(store.hasArtifactFingerprint("parse-md", config1200, fingerprint)).toBe(true);
+    const variant1200 = store.resolveChunkIndexVariant("parse-md", config1200)!;
+    const variant800 = store.resolveChunkIndexVariant("parse-md", config800)!;
+    expect(variant1200.id).not.toBe(variant800.id);
+    expect(store.listVariantChunks(variant1200.id).map(chunk => chunk.id))
+      .not.toEqual(store.listVariantChunks(variant800.id).map(chunk => chunk.id));
   });
 });

@@ -60,6 +60,7 @@
     "sourceCount": "{count} 個來源",
     "addSource": "加入來源",
     "addLocalFile": "選取本機檔案",
+    "addLocalFolder": "選取本機資料夾",
     "addPastedText": "貼上文字",
     "addWebSnapshot": "網頁快照",
     "sourceDisplayNameOptional": "來源名稱（選填）",
@@ -100,6 +101,8 @@
     "importUnavailable": "目前環境無法開啟本機檔案選擇器",
     "importSuccess": "已匯入 {count} 個來源",
     "importPartialFailure": "匯入完成：{success}/{total} 個來源成功",
+    "importDirectorySuccess": "資料夾匯入完成：匯入 {imported} 個來源，略過 {skipped} 個",
+    "importDirectoryPartialFailure": "資料夾匯入完成：匯入 {imported} 個，略過 {skipped} 個，失敗 {failed} 個",
     "loadFailed": "知識庫讀取失敗",
     "saveFailed": "知識庫操作失敗",
     "notebookSettings": "筆記本設定",
@@ -1150,6 +1153,21 @@
       "running": "📚 正在讀知識庫分片",
       "done": "📚 讀了知識庫分片",
       "failed": "📚 知識庫分片沒讀出來"
+    },
+    "knowledge_outline": {
+      "running": "🗂️ 正在梳理知識庫結構",
+      "done": "🗂️ 梳理了知識庫結構",
+      "failed": "🗂️ 知識庫結構沒梳理出來"
+    },
+    "knowledge_grep": {
+      "running": "🔍 正在檢索知識庫原文",
+      "done": "🔍 檢索了知識庫原文",
+      "failed": "🔍 知識庫原文沒檢索出來"
+    },
+    "knowledge_manage": {
+      "running": "🗃️ 正在整理知識庫筆記本",
+      "done": "🗃️ 整理了知識庫筆記本",
+      "failed": "🗃️ 知識庫筆記本沒整理成"
     }
   },
   "file_output": {

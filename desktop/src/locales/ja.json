@@ -60,6 +60,7 @@
     "sourceCount": "{count} 件のソース",
     "addSource": "ソースを追加",
     "addLocalFile": "ローカルファイルを選択",
+    "addLocalFolder": "ローカルフォルダを選択",
     "addPastedText": "テキストを貼り付け",
     "addWebSnapshot": "ウェブスナップショット",
     "sourceDisplayNameOptional": "ソース名（任意）",
@@ -100,6 +101,8 @@
     "importUnavailable": "この環境ではローカルファイル選択を利用できません",
     "importSuccess": "{count} 件のソースを読み込みました",
     "importPartialFailure": "読み込み完了：{success}/{total} 件が成功しました",
+    "importDirectorySuccess": "フォルダ読み込み完了：{imported} 件を読み込み、{skipped} 件をスキップしました",
+    "importDirectoryPartialFailure": "フォルダ読み込み完了：{imported} 件成功、{skipped} 件スキップ、{failed} 件失敗",
     "loadFailed": "ナレッジライブラリを読み込めませんでした",
     "saveFailed": "ナレッジ操作に失敗しました",
     "notebookSettings": "ノートブック設定",
@@ -1150,6 +1153,21 @@
       "running": "📚 ナレッジ断片を読み取り中",
       "done": "📚 ナレッジ断片を読み取りました",
       "failed": "📚 ナレッジ断片を読み取れませんでした"
+    },
+    "knowledge_outline": {
+      "running": "🗂️ ナレッジの構成を整理中",
+      "done": "🗂️ ナレッジの構成を整理しました",
+      "failed": "🗂️ ナレッジの構成を整理できませんでした"
+    },
+    "knowledge_grep": {
+      "running": "🔍 ナレッジ本文を検索中",
+      "done": "🔍 ナレッジ本文を検索しました",
+      "failed": "🔍 ナレッジ本文を検索できませんでした"
+    },
+    "knowledge_manage": {
+      "running": "🗃️ ナレッジノートを更新中",
+      "done": "🗃️ ナレッジノートを更新しました",
+      "failed": "🗃️ ナレッジノートを更新できませんでした"
     }
   },
   "file_output": {

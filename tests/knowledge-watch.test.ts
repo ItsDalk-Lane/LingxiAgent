@@ -102,6 +102,10 @@ function createManager(lingxiHome: string, watch: WatchHarness): ManagerHarness 
     ingestionLog: (message) => logs.push(message),
     embedTextsForModel: (request) => createFakeEmbedder(embeddingCalls)(request),
     canEmbedWithModel: () => true,
+    // 本文件 fake 了 setTimeout/clearTimeout（watcher 防抖/退避确定性驱动），
+    // provider gate 的限流计时器会被冻结：这里显式放宽（间隔 0、上限抬高），
+    // 限流行为由 tests/knowledge-lifecycle.test.ts 在真实计时器下覆盖。
+    embeddingGate: { maxConcurrent: 8, minRequestIntervalMs: 0 },
     fileWatcher: {
       debounceMs: DEBOUNCE_MS,
       pollIntervalMs: POLL_INTERVAL_MS,

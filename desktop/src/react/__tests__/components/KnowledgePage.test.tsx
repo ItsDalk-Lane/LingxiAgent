@@ -15,6 +15,7 @@ vi.mock('../../components/knowledge/knowledge-api', () => ({
   updateKnowledgeNotebookSettings: vi.fn(),
   listKnowledgeSources: vi.fn(),
   importKnowledgeFileSource: vi.fn(),
+  importKnowledgeDirectory: vi.fn(),
   importKnowledgePastedText: vi.fn(),
   importKnowledgeWebSnapshot: vi.fn(),
   removeKnowledgeSource: vi.fn(),
@@ -130,6 +131,9 @@ describe('KnowledgePage', () => {
         'knowledge.create': '创建',
         'knowledge.addSource': '添加来源',
         'knowledge.addLocalFile': '选择本地文件',
+        'knowledge.addLocalFolder': '选择本地文件夹',
+        'knowledge.importDirectorySuccess': '目录导入完成：导入 {imported} 个来源，跳过 {skipped} 个',
+        'knowledge.importDirectoryPartialFailure': '目录导入完成：导入 {imported} 个，跳过 {skipped} 个，失败 {failed} 个',
         'knowledge.addPastedText': '粘贴文本',
         'knowledge.addWebSnapshot': '网页快照',
         'knowledge.sourceDisplayNameOptional': '来源名称（可选）',
@@ -171,7 +175,7 @@ describe('KnowledgePage', () => {
     }) as typeof window.t;
     Object.defineProperty(window, 'platform', {
       configurable: true,
-      value: { selectFiles: vi.fn(async () => []) },
+      value: { selectFiles: vi.fn(async () => []), selectFolder: vi.fn(async () => null) },
     });
     useStore.setState({ addToast: vi.fn() } as never);
     vi.mocked(knowledgeApi.listKnowledgeNotebooks).mockResolvedValue([notebookA, notebookB]);
@@ -345,6 +349,30 @@ describe('KnowledgePage', () => {
     await waitFor(() => expect(knowledgeApi.importKnowledgeFileSource).toHaveBeenCalledTimes(2));
     expect(knowledgeApi.importKnowledgeFileSource).toHaveBeenNthCalledWith(1, 'notebook-c', '/tmp/a.md');
     expect(knowledgeApi.importKnowledgeFileSource).toHaveBeenNthCalledWith(2, 'notebook-c', '/tmp/b.pdf');
+  });
+
+  it('imports a local folder through the native directory picker', async () => {
+    vi.mocked(knowledgeApi.importKnowledgeDirectory).mockResolvedValue({
+      imported: [
+        { sourceId: 'source-x', path: 'readme.txt', reused: false, ingestion: 'enqueued' },
+        { sourceId: 'source-y', path: 'docs/guide.md', reused: true, ingestion: 'enqueued' },
+      ],
+      skipped: [{ path: 'deck.pptx', reason: 'KNOWLEDGE_IMPORT_PROCESSOR_UNAVAILABLE' }],
+      failed: [],
+    });
+    vi.mocked(window.platform.selectFolder).mockResolvedValue('/tmp/docs');
+
+    render(<KnowledgePage />);
+    await screen.findByText('roadmap.md');
+
+    fireEvent.click(screen.getByRole('button', { name: /添加来源/ }));
+    fireEvent.click(screen.getByRole('menuitem', { name: '选择本地文件夹' }));
+    await waitFor(() => expect(knowledgeApi.importKnowledgeDirectory)
+      .toHaveBeenCalledWith('notebook-a', '/tmp/docs'));
+    await waitFor(() => expect(useStore.getState().addToast).toHaveBeenCalledWith(
+      '目录导入完成：导入 2 个来源，跳过 1 个',
+      'success',
+    ));
   });
 
   it('imports pasted text and a frozen web snapshot without a local path picker', async () => {

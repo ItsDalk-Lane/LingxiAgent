@@ -293,6 +293,31 @@ export async function importKnowledgeWebSnapshot(
   );
 }
 
+export interface KnowledgeDirectoryImportResultDto {
+  imported: Array<{
+    sourceId: string;
+    path: string;
+    reused: boolean;
+    ingestion: 'enqueued' | 'parse_failed_enqueued_for_retry';
+  }>;
+  skipped: Array<{ path: string; reason: string }>;
+  failed: Array<{ path: string; reason: string }>;
+}
+
+export async function importKnowledgeDirectory(
+  notebookId: string,
+  dirPath: string,
+): Promise<KnowledgeDirectoryImportResultDto> {
+  return knowledgeRequest<KnowledgeDirectoryImportResultDto>(
+    `/api/knowledge/notebooks/${encodeURIComponent(notebookId)}/import-directory`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ dirPath }),
+    },
+  );
+}
+
 export async function removeKnowledgeSource(notebookId: string, sourceId: string): Promise<void> {
   await knowledgeRequest(
     `/api/knowledge/notebooks/${encodeURIComponent(notebookId)}/sources/${encodeURIComponent(sourceId)}`,
