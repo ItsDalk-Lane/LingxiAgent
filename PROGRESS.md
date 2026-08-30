@@ -10,7 +10,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = 0a45563a2c8f440f54cc93e4daf6c659701ae9e1  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-08-30 同上 + build 修复 underscore 钉入外置传递依赖)
+VERIFIED_SOURCE_SHA   = 563478a0269dd8cdd9f5661273432447842f85c1  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-08-30 同上 + build underscore 钉依赖修复 + Windows 测试关库修复)
 工作分支              = feature/upstream-sync-0.447.4
 ```
 
@@ -485,6 +485,13 @@ seal 不是一次性终点，而是"当前被验证树"的游标；每次审计�
   20→21）；build:server 钉依赖阶段确认入保护名单（签名步骤因本地无
   LINGXI_SIGN_KEY 停止为预期）；eslint 0 error + full npm test 12746
   passed / 0 failed 后推进。
+
+- **2026-08-30 Windows CI 测试修复：knowledge-store 新测试补关库**
+  （功能树 563478a0/seal 本提交；1 file / +2）：migrateLegacyGlobalModelRefs
+  测试漏 store.close()，better-sqlite3 句柄悬空，Windows 上 afterEach
+  fs.rmSync 删临时目录 EPERM（posix 允许删打开中文件故本地全绿）。对齐
+  同文件关库纪律。验证：该文件 13/13 绿 + full npm test 12746 passed /
+  0 failed 后推进。
 
 
 ## 最终状态：已合并（上游同步部分）
