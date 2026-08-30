@@ -1,5 +1,6 @@
 import { memo, useCallback, useMemo, useSyncExternalStore } from 'react';
 import type { AssistantTurnStatus, ChatListItem, ChatMessage } from '../../stores/chat-types';
+import type { KnowledgeRetrievalStats } from '../../../../../shared/knowledge-refs.ts';
 import { UserMessage } from './UserMessage';
 import { AgentOriginMessage } from './AgentOriginMessage';
 import { AssistantMessage } from './AssistantMessage';
@@ -91,13 +92,17 @@ export const ChatTranscript = memo(function ChatTranscript({
     () => null,
   );
 
+  const turnState = useMemo(() => buildTurnState(items), [items]);
   const renderItems = useMemo(
     () => enableProcessFold
-      ? buildTranscriptRenderItems(items, { isStreaming, liveTurnStatus })
+      ? buildTranscriptRenderItems(items, {
+        isStreaming,
+        liveTurnStatus,
+        knowledgeRetrievalByIndex: turnState.assistantKnowledgeRetrievalByIndex,
+      })
       : items.map((item, originalIndex) => ({ type: 'source' as const, item, originalIndex })),
-    [enableProcessFold, isStreaming, liveTurnStatus, items],
+    [enableProcessFold, isStreaming, liveTurnStatus, items, turnState.assistantKnowledgeRetrievalByIndex],
   );
-  const turnState = useMemo(() => buildTurnState(items), [items]);
 
   return (
     <>
@@ -118,6 +123,7 @@ export const ChatTranscript = memo(function ChatTranscript({
           assistantTurnTargetsByCompletionIndex={turnState.assistantTurnTargetsByCompletionIndex}
           assistantTurnRetryMessagesByCompletionIndex={turnState.assistantTurnRetryMessagesByCompletionIndex}
           assistantSkillPromptsByIndex={turnState.assistantSkillPromptsByIndex}
+          assistantKnowledgeRetrievalByIndex={turnState.assistantKnowledgeRetrievalByIndex}
           isStreamingSession={isStreaming}
           agentDisplay={agentDisplay}
           viewerIdentity={viewerIdentity}
@@ -146,6 +152,7 @@ function buildTurnState(items: ChatListItem[]): {
   assistantTurnTargetsByCompletionIndex: ReadonlyMap<number, SessionNodeTarget>;
   assistantTurnRetryMessagesByCompletionIndex: ReadonlyMap<number, ChatMessage>;
   assistantSkillPromptsByIndex: ReadonlyMap<number, string>;
+  assistantKnowledgeRetrievalByIndex: ReadonlyMap<number, KnowledgeRetrievalStats>;
 } {
   recordChatPerformance('turn_state_projection', { itemCount: items.length });
   let latestUserIndex = -1;
@@ -162,6 +169,7 @@ function buildTurnState(items: ChatListItem[]): {
   const assistantTurnTargetsByCompletionIndex = new Map<number, SessionNodeTarget>();
   const assistantTurnRetryMessagesByCompletionIndex = new Map<number, ChatMessage>();
   const assistantSkillPromptsByIndex = new Map<number, string>();
+  const assistantKnowledgeRetrievalByIndex = new Map<number, KnowledgeRetrievalStats>();
   const visibleUsersByEntryId = new Map<string, ChatMessage>();
 
   const completePendingAssistantTurn = () => {
@@ -213,6 +221,13 @@ function buildTurnState(items: ChatListItem[]): {
       }
       if (pendingAssistantIndex < 0) {
         pendingAssistantTurnInputEntryId = turnInputEntryId;
+        // 知识检索卡只挂轮首 assistant（一轮渲染一次）；配对逻辑与 skillPrompt
+        // 同源（显式 turnInputEntryId 优先，回退 precedingUserMessage）。
+        const knowledgeSource = explicitTurnInputEntryId
+          ? visibleUsersByEntryId.get(explicitTurnInputEntryId) || null
+          : precedingUserMessage;
+        const knowledgeRetrieval = knowledgeSource?.knowledgeRetrieval;
+        if (knowledgeRetrieval) assistantKnowledgeRetrievalByIndex.set(i, knowledgeRetrieval);
       }
       pendingAssistantIndex = i;
       pendingAssistantTurnIds = [...pendingAssistantTurnIds, item.data.id];
@@ -238,6 +253,7 @@ function buildTurnState(items: ChatListItem[]): {
     assistantTurnTargetsByCompletionIndex,
     assistantTurnRetryMessagesByCompletionIndex,
     assistantSkillPromptsByIndex,
+    assistantKnowledgeRetrievalByIndex,
   };
 }
 
@@ -256,6 +272,7 @@ const TranscriptRenderItemView = memo(function TranscriptRenderItemView({
   assistantTurnTargetsByCompletionIndex,
   assistantTurnRetryMessagesByCompletionIndex,
   assistantSkillPromptsByIndex,
+  assistantKnowledgeRetrievalByIndex,
   isStreamingSession,
   agentDisplay,
   viewerIdentity,
@@ -277,6 +294,7 @@ const TranscriptRenderItemView = memo(function TranscriptRenderItemView({
   assistantTurnTargetsByCompletionIndex: ReadonlyMap<number, SessionNodeTarget>;
   assistantTurnRetryMessagesByCompletionIndex: ReadonlyMap<number, ChatMessage>;
   assistantSkillPromptsByIndex: ReadonlyMap<number, string>;
+  assistantKnowledgeRetrievalByIndex: ReadonlyMap<number, KnowledgeRetrievalStats>;
   isStreamingSession: boolean;
   agentDisplay: AgentDisplayInfo & { yuan: string };
   viewerIdentity: { name: string; avatarUrl: string | null };
@@ -303,6 +321,7 @@ const TranscriptRenderItemView = memo(function TranscriptRenderItemView({
         assistantTurnTargetsByCompletionIndex={assistantTurnTargetsByCompletionIndex}
         assistantTurnRetryMessagesByCompletionIndex={assistantTurnRetryMessagesByCompletionIndex}
         assistantSkillPromptsByIndex={assistantSkillPromptsByIndex}
+        assistantKnowledgeRetrievalByIndex={assistantKnowledgeRetrievalByIndex}
         completionTimePersistent={renderItem.ownsTurnCompletion &&
           turnCompletionAssistantIndexes.has(groupLastOriginalIndex(renderItem))
           && groupLastOriginalIndex(renderItem) === latestAssistantIndex
@@ -350,6 +369,9 @@ const TranscriptRenderItemView = memo(function TranscriptRenderItemView({
         ? assistantTurnRetryMessagesByCompletionIndex.get(originalIndex) ?? null
         : null}
       skillPrompt={assistantSkillPromptsByIndex.get(originalIndex) ?? null}
+      knowledgeRetrieval={renderItem.type === 'source' && !renderItem.continuesAssistantTurn
+        ? assistantKnowledgeRetrievalByIndex.get(originalIndex) ?? null
+        : null}
       agentDisplay={agentDisplay}
       viewerIdentity={viewerIdentity}
       isStreaming={isStreamingSession}
@@ -387,6 +409,7 @@ const TranscriptItemView = memo(function TranscriptItemView({
   assistantTurnTarget,
   assistantTurnRetryMessage,
   skillPrompt,
+  knowledgeRetrieval,
   agentDisplay,
   viewerIdentity,
   isStreaming,
@@ -408,6 +431,7 @@ const TranscriptItemView = memo(function TranscriptItemView({
   assistantTurnTarget?: SessionNodeTarget | null;
   assistantTurnRetryMessage?: ChatMessage | null;
   skillPrompt?: string | null;
+  knowledgeRetrieval?: KnowledgeRetrievalStats | null;
   agentDisplay: AgentDisplayInfo & { yuan: string };
   viewerIdentity: { name: string; avatarUrl: string | null };
   isStreaming: boolean;
@@ -470,6 +494,7 @@ const TranscriptItemView = memo(function TranscriptItemView({
       turnTarget={assistantTurnTarget}
       retrySourceMessage={assistantTurnRetryMessage}
       skillPrompt={skillPrompt}
+      knowledgeRetrieval={knowledgeRetrieval}
       onForkCreated={onForkCreated}
       messageRef={messageRef}
     />

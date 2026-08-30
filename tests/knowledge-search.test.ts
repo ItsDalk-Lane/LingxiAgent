@@ -5,9 +5,9 @@ import path from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 
 import {
-  KNOWLEDGE_CHUNKER_VERSION,
   buildKnowledgeChunks,
   knowledgeBlockFingerprint,
+  resolveKnowledgeChunkerConfig,
 } from "../lib/knowledge/chunker.ts";
 import { KnowledgeIndexStore } from "../lib/knowledge/knowledge-index-store.ts";
 import type { KnowledgeBlock } from "../lib/knowledge/types.ts";
@@ -48,7 +48,7 @@ function indexBlocks(store: KnowledgeIndexStore, parseArtifactId: string, blocks
   store.replaceArtifactChunks({
     parseArtifactId,
     blockFingerprint: knowledgeBlockFingerprint(blocks),
-    chunkerVersion: KNOWLEDGE_CHUNKER_VERSION,
+    chunkerVersion: resolveKnowledgeChunkerConfig(blocks).configId,
     chunks: buildKnowledgeChunks(parseArtifactId, blocks),
   });
 }

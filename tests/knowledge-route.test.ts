@@ -8,8 +8,6 @@ import {
   KnowledgeManager,
   type KnowledgeManagerOptions,
 } from "../lib/knowledge/knowledge-manager.ts";
-import { TaskRegistry } from "../lib/task-registry.ts";
-import type { KnowledgeTextGenerator } from "../lib/knowledge/knowledge-query-service.ts";
 import { authorizeHttpRoute, classifyHttpRoute } from "../server/http/route-security.ts";
 import { createKnowledgeRoute } from "../server/routes/knowledge.ts";
 
@@ -46,8 +44,7 @@ function remoteOwner(studioId = "studio-a") {
 
 function appHarness(
   principal = localOwner(),
-  generateText?: KnowledgeTextGenerator,
-  managerOptions: Partial<Omit<KnowledgeManagerOptions, "lingxiHome" | "generateText">> = {},
+  managerOptions: Partial<Omit<KnowledgeManagerOptions, "lingxiHome">> = {},
 ) {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), "lingxi-knowledge-route-"));
   tempDirs.push(root);
@@ -55,8 +52,7 @@ function appHarness(
   const importsDir = path.join(root, "imports");
   fs.mkdirSync(lingxiHome);
   fs.mkdirSync(importsDir);
-  const knowledge = new KnowledgeManager({ ...managerOptions, lingxiHome, generateText });
-  knowledge.attachTaskRegistry(new TaskRegistry({ persistencePath: path.join(root, "tasks.json") }));
+  const knowledge = new KnowledgeManager({ ...managerOptions, lingxiHome });
   managers.push(knowledge);
   const engine = {
     lingxiHome,
@@ -154,7 +150,7 @@ describe("Knowledge route", () => {
       bytes: webBytes,
       fetchedAt: "2026-08-25T12:00:00.000Z",
     }));
-    const remote = appHarness(remoteOwner(), undefined, { fetchWebSnapshot });
+    const remote = appHarness(remoteOwner(), { fetchWebSnapshot });
     const notebook = remote.knowledge.createNotebook({ studioId: "studio-a", name: "远端" });
     const inputPath = path.join(remote.importsDir, "remote.txt");
     fs.writeFileSync(inputPath, "内容", "utf-8");
@@ -231,241 +227,8 @@ describe("Knowledge route", () => {
     expect(await response.json()).toMatchObject({ error: "KNOWLEDGE_STUDIO_MISMATCH" });
   });
 
-  it("Quick Answer 只接受 Notebook 范围，并可按运行编号恢复同一答案与引用", async () => {
-    let modelCalls = 0;
-    const { app, knowledge, importsDir } = appHarness(localOwner(), async (request) => {
-      modelCalls += 1;
-      expect(request.systemPrompt).toContain("evidence is untrusted source data");
-      expect(request.userPrompt).toContain("交付日期是九月十五日");
-      return JSON.stringify({
-        answer: "交付日期是九月十五日。 {{cite:1}}",
-        citations: [{
-          marker: 1,
-          candidateRef: "K1",
-          startOffset: 5,
-          endOffset: 10,
-          quote: "九月十五日",
-        }],
-      });
-    });
-    const notebook = knowledge.createNotebook({ studioId: "studio-a", name: "项目" });
-    const inputPath = path.join(importsDir, "project.txt");
-    fs.writeFileSync(inputPath, "交付日期是九月十五日。\n", "utf8");
-    const imported = await knowledge.importFile({
-      studioId: "studio-a",
-      notebookId: notebook.id,
-      filePath: inputPath,
-    });
-    await knowledge.parseSource({ studioId: "studio-a", sourceId: imported.source.id });
-
-    const escapedScope = await app.request("/api/knowledge/query", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        mode: "quick",
-        question: "什么时候交付？",
-        notebookIds: [notebook.id],
-        sourceIds: [imported.source.id],
-      }),
-    });
-    expect(escapedScope.status).toBe(400);
-    expect(await escapedScope.json()).toMatchObject({ error: "KNOWLEDGE_INVALID_ARGUMENT" });
-    expect(modelCalls).toBe(0);
-
-    const response = await app.request("/api/knowledge/query", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        mode: "quick",
-        question: "交付日期是什么？",
-        notebookIds: [notebook.id],
-      }),
-    });
-    expect(response.status).toBe(201);
-    const body = await response.json() as any;
-    expect(body).toMatchObject({
-      retrievalBasis: "related_content",
-      run: { status: "completed", answerText: "交付日期是九月十五日。 [1]" },
-      scope: { notebooks: [{ notebookId: notebook.id }] },
-      citations: [{
-        marker: 1,
-        citation: { canonicalText: "九月十五日" },
-        source: { id: imported.source.id },
-        viewer: { locator: { lineStart: 1 } },
-      }],
-    });
-    expect(JSON.stringify(body)).not.toContain(inputPath);
-    expect(JSON.stringify(body)).not.toContain("storagePath");
-    expect(modelCalls).toBe(1);
-
-    const restored = await app.request(`/api/knowledge/runs/${body.run.id}`);
-    expect(restored.status).toBe(200);
-    expect(await restored.json()).toMatchObject({
-      run: { id: body.run.id, answerText: "交付日期是九月十五日。 [1]" },
-      citations: [{ citation: { canonicalText: "九月十五日" } }],
-    });
-    expect(modelCalls).toBe(1);
-  });
-
-  it("Full Research 通过后台运行返回可审计覆盖与可跳转报告引用", async () => {
-    const { app, knowledge, importsDir } = appHarness(localOwner(), async request => {
-      const prompt = JSON.parse(request.userPrompt);
-      if (request.operation === "research_analysis") {
-        return JSON.stringify({
-          units: prompt.units.map((unit: any) => {
-            const anchor = unit.anchors.find((entry: any) => entry.kind === "primary");
-            const quote = anchor.text.slice(0, 6);
-            return {
-              unitId: unit.unitId,
-              findings: [quote],
-              evidenceCandidates: [{
-                anchorRef: anchor.anchorRef,
-                startOffset: 0,
-                endOffset: quote.length,
-                quote,
-                epistemicBasis: "explicit",
-              }],
-              candidateClaims: [{
-                text: quote,
-                supportStatus: "supported",
-                epistemicBasis: "explicit",
-                evidenceCandidateIndexes: [0],
-              }],
-              uncertainties: [],
-            };
-          }),
-        });
-      }
-      if (request.operation === "claim_build") {
-        const first = prompt.validatedEvidence[0];
-        return JSON.stringify({
-          claims: [{
-            text: first.quote,
-            supportStatus: "supported",
-            epistemicBasis: "explicit",
-            evidence: [{ evidenceRef: first.evidenceRef, relation: "supports" }],
-          }],
-        });
-      }
-      if (request.operation === "contradiction_check") {
-        return JSON.stringify({
-          unitId: prompt.unit.unitId,
-          claimPackId: prompt.claimPack.claimPackId,
-          matches: [],
-        });
-      }
-      if (request.operation === "final_synthesis") {
-        return JSON.stringify({
-          title: "研究报告",
-          summary: "冻结来源完成扫描。",
-          conclusions: [{ text: prompt.claims[0].text, claimRefs: [prompt.claims[0].claimRef] }],
-          majorFindings: [],
-          conflicts: [],
-          uncertainties: [],
-          limitations: [],
-          verificationRequests: [],
-        });
-      }
-      throw new Error("unexpected operation");
-    });
-    const notebook = knowledge.createNotebook({ studioId: "studio-a", name: "全文" });
-    const inputPath = path.join(importsDir, "full.txt");
-    fs.writeFileSync(inputPath, "完整扫描必须可验证。\n", "utf8");
-    const imported = await knowledge.importFile({
-      studioId: "studio-a",
-      notebookId: notebook.id,
-      filePath: inputPath,
-    });
-    await knowledge.parseSource({ studioId: "studio-a", sourceId: imported.source.id });
-
-    const response = await app.request("/api/knowledge/query", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ mode: "research", question: "是否完整？", notebookIds: [notebook.id] }),
-    });
-    expect(response.status).toBe(202);
-    const started = await response.json() as any;
-    expect(started).toMatchObject({
-      run: { mode: "research", status: "running" },
-      research: { state: "scanning", manifest: { unitCount: 1 } },
-    });
-    await knowledge.waitForResearch(started.run.id);
-
-    const restored = await app.request(`/api/knowledge/runs/${started.run.id}`);
-    expect(restored.status).toBe(200);
-    expect(await restored.json()).toMatchObject({
-      run: { status: "completed" },
-      research: {
-        state: "completed",
-        coverage: {
-          primaryScan: { completed: 1, total: 1 },
-          contradiction: { completed: 1, total: 1 },
-        },
-      },
-    });
-
-    const reportResponse = await app.request(`/api/knowledge/runs/${started.run.id}/report`);
-    expect(reportResponse.status).toBe(200);
-    const report = await reportResponse.json() as any;
-    expect(report).toMatchObject({
-      report: { title: "研究报告", citations: [{ marker: 1 }] },
-      citations: [{ marker: 1, source: { id: imported.source.id } }],
-    });
-    expect(JSON.stringify(report)).not.toContain(inputPath);
-    expect(JSON.stringify(report)).not.toContain("storagePath");
-    expect(await (await app.request("/api/knowledge/runs")).json()).toEqual({ runs: [] });
-  });
-
-  it("Full Research 可取消，领域运行与宿主任务一起进入终态", async () => {
-    const { app, knowledge, importsDir } = appHarness(localOwner(), async request => {
-      if (request.operation === "research_analysis") return new Promise<string>(() => {});
-      throw new Error("unexpected operation");
-    });
-    const notebook = knowledge.createNotebook({ studioId: "studio-a", name: "取消" });
-    const inputPath = path.join(importsDir, "cancel.txt");
-    fs.writeFileSync(inputPath, "等待取消。\n", "utf8");
-    const imported = await knowledge.importFile({
-      studioId: "studio-a",
-      notebookId: notebook.id,
-      filePath: inputPath,
-    });
-    await knowledge.parseSource({ studioId: "studio-a", sourceId: imported.source.id });
-    const startResponse = await app.request("/api/knowledge/query", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ mode: "research", question: "等待", notebookIds: [notebook.id] }),
-    });
-    const started = await startResponse.json() as any;
-    await Promise.resolve();
-    const activeResponse = await app.request("/api/knowledge/runs");
-    expect(activeResponse.status).toBe(200);
-    expect(await activeResponse.json()).toMatchObject({
-      runs: [{ run: { id: started.run.id }, research: { runId: started.run.id } }],
-    });
-    const cancelResponse = await app.request(`/api/knowledge/runs/${started.run.id}/cancel`, { method: "POST" });
-    expect(cancelResponse.status).toBe(200);
-    expect(await cancelResponse.json()).toMatchObject({
-      run: { status: "cancelled" },
-      research: { state: "canceled" },
-    });
-  });
-
-  it("本机刷新只在内容变化时创建新快照；历史引用留在旧快照，新 Query 使用新版本", async () => {
-    const { app, knowledge, importsDir } = appHarness(localOwner(), async request => {
-      expect(request.operation).toBe("quick_answer");
-      expect(request.userPrompt).toContain("新版本内容");
-      expect(request.userPrompt).not.toContain("旧版本内容");
-      return JSON.stringify({
-        answer: "当前是新版本。 {{cite:1}}",
-        citations: [{
-          marker: 1,
-          candidateRef: "K1",
-          startOffset: 0,
-          endOffset: 3,
-          quote: "新版本",
-        }],
-      });
-    });
+  it("本机刷新只在内容变化时创建新快照；历史引用留在旧快照", async () => {
+    const { app, knowledge, importsDir } = appHarness();
     const notebook = knowledge.createNotebook({ studioId: "studio-a", name: "版本" });
     const inputPath = path.join(importsDir, "version.txt");
     fs.writeFileSync(inputPath, "旧版本内容。\n", "utf8");
@@ -515,19 +278,6 @@ describe("Knowledge route", () => {
       sourceId: imported.source.id,
     })).toBe(2);
 
-    const answerResponse = await app.request("/api/knowledge/query", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ mode: "quick", question: "当前版本是什么？", notebookIds: [notebook.id] }),
-    });
-    expect(answerResponse.status).toBe(201);
-    const answer = await answerResponse.json() as any;
-    expect(answer.scope.sources[0]).toMatchObject({
-      contentSnapshotId: refreshed.snapshot.id,
-      parseArtifactId: refreshed.parseArtifact.id,
-    });
-    expect(answer.citations[0].citation.canonicalText).toBe("新版本");
-
     const historical = await app.request(`/api/knowledge/citations/${historicalCitation.id}`);
     expect(await historical.json()).toMatchObject({
       citation: { canonicalText: "旧版本" },
@@ -535,12 +285,286 @@ describe("Knowledge route", () => {
     });
   });
 
+  it("笔记本设置端点：部分更新、范围与模型引用校验、配置变更触发全量重建", async () => {
+    const { app, knowledge, importsDir } = appHarness();
+    const notebook = knowledge.createNotebook({ studioId: "studio-a", name: "设定" });
+    const inputPath = path.join(importsDir, "notes.txt");
+    fs.writeFileSync(inputPath, "第一段。\n\n第二段。\n", "utf8");
+    const imported = await knowledge.importFile({
+      studioId: "studio-a",
+      notebookId: notebook.id,
+      filePath: inputPath,
+    });
+    await knowledge.parseSource({ studioId: "studio-a", sourceId: imported.source.id });
+
+    const settingsUrl = `/api/knowledge/notebooks/${notebook.id}/settings`;
+    const put = (body: unknown) => app.request(settingsUrl, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+
+    expect((await put({})).status).toBe(400);
+    expect((await put({ unknownKey: 1 })).status).toBe(400);
+    const tooSmall = await put({ chunkTargetChars: 50 });
+    expect(tooSmall.status).toBe(400);
+    expect(await tooSmall.json()).toMatchObject({ error: "KNOWLEDGE_INVALID_ARGUMENT" });
+    const incompleteRef = await put({ embeddingModelRef: { id: "embed-1" } });
+    expect(incompleteRef.status).toBe(400);
+    expect(await incompleteRef.json()).toMatchObject({ error: "KNOWLEDGE_INVALID_ARGUMENT" });
+    expect((await put({ retrievalTopK: 0 })).status).toBe(400);
+
+    // 只影响查询时行为的字段：更新成功但不触发重建（无任何摄入 job）
+    // （schema 默认：新笔记本 chunkTargetChars=1200 / retrievalTopK=12）
+    const queryOnly = await put({ retrievalTopK: 8 });
+    expect(queryOnly.status).toBe(200);
+    expect(await queryOnly.json()).toMatchObject({
+      config: { retrievalTopK: 8, chunkTargetChars: null, embeddingModelRef: null },
+    });
+    expect(knowledge.listIngestionJobs({ studioId: "studio-a", notebookId: notebook.id })).toHaveLength(0);
+
+    // chunkTargetChars 已随自动分块退役：PUT 显式拒绝（遗留显式列值仍生效但不再接受写入）
+    const chunkUpdate = await put({ chunkTargetChars: 800 });
+    expect(chunkUpdate.status).toBe(400);
+    expect(await chunkUpdate.json()).toMatchObject({ error: "KNOWLEDGE_INVALID_ARGUMENT" });
+    expect(knowledge.listIngestionJobs({ studioId: "studio-a", notebookId: notebook.id })).toHaveLength(0);
+
+    // null 清除回 NULL（未配置/无上限召回）
+    const cleared = await put({ retrievalTopK: null });
+    expect(await cleared.json()).toMatchObject({
+      config: { chunkTargetChars: null, retrievalTopK: null },
+    });
+
+    const missing = await app.request("/api/knowledge/notebooks/nb-missing/settings", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ retrievalTopK: 8 }),
+    });
+    expect(missing.status).toBe(404);
+  });
+
+  it("GET notebooks 带配置与摄入就绪汇总；GET ingestion 支持按笔记本/源过滤", async () => {
+    const { app, knowledge, importsDir } = appHarness();
+    const notebook = knowledge.createNotebook({ studioId: "studio-a", name: "状态" });
+    const inputPath = path.join(importsDir, "state.txt");
+    fs.writeFileSync(inputPath, "状态内容。\n", "utf8");
+    const imported = await knowledge.importFile({
+      studioId: "studio-a",
+      notebookId: notebook.id,
+      filePath: inputPath,
+    });
+    const artifact = await knowledge.parseSource({ studioId: "studio-a", sourceId: imported.source.id });
+    knowledge.enqueueSourceIngestion({
+      studioId: "studio-a",
+      notebookId: notebook.id,
+      sourceId: imported.source.id,
+      artifactId: artifact.id,
+    });
+
+    const listResponse = await app.request("/api/knowledge/notebooks");
+    expect(listResponse.status).toBe(200);
+    const { notebooks } = await listResponse.json() as any;
+    expect(notebooks).toHaveLength(1);
+    expect(notebooks[0]).toMatchObject({
+      id: notebook.id,
+      config: {
+        embeddingModelRef: null,
+        rerankModelRef: null,
+        chunkTargetChars: null,
+        retrievalTopK: null,
+      },
+      chunkTargetCharsEffective: 6553,
+      sourceCount: 1,
+      ingestion: { done: 0, pendingEmbedding: 0, processing: 1, failed: 0, untracked: 0 },
+    });
+
+    const ingestionResponse = await app.request(
+      `/api/knowledge/ingestion?notebookId=${notebook.id}`,
+    );
+    expect(ingestionResponse.status).toBe(200);
+    const ingestion = await ingestionResponse.json() as any;
+    expect(ingestion.jobs).toHaveLength(1);
+    expect(ingestion.jobs[0]).toMatchObject({
+      notebookId: notebook.id,
+      sourceId: imported.source.id,
+      status: "queued",
+      phase: "parse",
+    });
+    expect(ingestion.counts).toMatchObject({ queued: 1, running: 0, failed: 0, done: 0 });
+
+    const bySource = await app.request(
+      `/api/knowledge/ingestion?notebookId=${notebook.id}&sourceId=${imported.source.id}`,
+    );
+    expect((await bySource.json() as any).jobs).toHaveLength(1);
+    const emptyNotebook = await app.request("/api/knowledge/ingestion?notebookId=nb-none");
+    expect(emptyNotebook.status).toBe(200);
+    expect(await emptyNotebook.json()).toMatchObject({
+      jobs: [],
+      counts: { queued: 0, running: 0, pending_embedding: 0, failed: 0, done: 0 },
+    });
+
+    // 最新 job 转 failed 后，就绪汇总归类到 failed
+    const claimed = knowledge.store.claimNextIngestionJob();
+    knowledge.store.failIngestionJob({
+      studioId: "studio-a",
+      jobId: claimed.id,
+      error: "KNOWLEDGE_RETRIEVAL_UNAVAILABLE: boom",
+    });
+    const afterFail = await app.request("/api/knowledge/notebooks");
+    expect((await afterFail.json() as any).notebooks[0].ingestion).toMatchObject({
+      processing: 0,
+      failed: 1,
+    });
+  });
+
+  it("chunks 端点：ready artifact 返回分块卡片；跨 studio 404；未 ready 422", async () => {
+    const { app, knowledge, importsDir } = appHarness();
+    const notebook = knowledge.createNotebook({ studioId: "studio-a", name: "分块" });
+    const inputPath = path.join(importsDir, "chunks.md");
+    fs.writeFileSync(inputPath, "# 第一章\n\n苹果交付日期是九月。\n\n## 数据\n\n预算八百万。\n", "utf-8");
+    const imported = await knowledge.importFile({
+      studioId: "studio-a",
+      notebookId: notebook.id,
+      filePath: inputPath,
+    });
+    const artifact = await knowledge.parseSource({ studioId: "studio-a", sourceId: imported.source.id });
+
+    const chunksResponse = await app.request(`/api/knowledge/parse-artifacts/${artifact.id}/chunks`);
+    expect(chunksResponse.status).toBe(200);
+    const body = await chunksResponse.json() as any;
+    expect(typeof body.chunkerConfigId).toBe("string");
+    expect(body.chunkerConfigId).toMatch(/^[0-9a-f]{16}$/);
+    expect(body.chunks.length).toBeGreaterThan(0);
+    // 冻结契约：ordinal 为 1-based 连续展示序号，charCount 与文本长度一致。
+    body.chunks.forEach((chunk: any, index: number) => {
+      expect(chunk.ordinal).toBe(index + 1);
+      expect(chunk.charCount).toBe(chunk.text.length);
+      expect(chunk.tokenCount).toBeGreaterThan(0);
+      expect(typeof chunk.id).toBe("string");
+    });
+    // markdown 源的首 chunk 带 headingPath 定位（来自 block locator 索引）。
+    expect(body.chunks[0].headingPath).toEqual(["第一章"]);
+
+    // 幂等：重复请求返回同一份 chunk 数据（fingerprint 命中不重建）。
+    const again = await app.request(`/api/knowledge/parse-artifacts/${artifact.id}/chunks`);
+    expect(await again.json()).toEqual(body);
+
+    // 跨 studio：studio-b 的 artifact 用 studio-a 身份访问 → 404（不泄漏存在性）。
+    const otherNotebook = knowledge.createNotebook({ studioId: "studio-b", name: "外域" });
+    const other = await knowledge.importPastedText({
+      studioId: "studio-b",
+      notebookId: otherNotebook.id,
+      text: "别处内容",
+      displayName: "外域.txt",
+    });
+    const otherArtifact = await knowledge.parseSource({ studioId: "studio-b", sourceId: other.source.id });
+    const cross = await app.request(`/api/knowledge/parse-artifacts/${otherArtifact.id}/chunks`);
+    expect(cross.status).toBe(404);
+    expect(await cross.json()).toMatchObject({ error: "KNOWLEDGE_NOT_FOUND" });
+
+    // 未 ready（parsing 态）artifact：显式 422，不返回半成品分块。
+    const parsing = knowledge.store.beginParseArtifact({
+      studioId: "studio-a",
+      contentSnapshotId: imported.snapshot.id,
+      parserId: "other-parser",
+      parserVersion: "1",
+      parserConfigHash: "d".repeat(64),
+    });
+    const notReady = await app.request(`/api/knowledge/parse-artifacts/${parsing.id}/chunks`);
+    expect(notReady.status).toBe(422);
+    expect(await notReady.json()).toMatchObject({ error: "KNOWLEDGE_PARSE_NOT_READY" });
+  });
+
+  it("GET notebooks 就绪汇总按笔记本归类：一源多笔记本不串记", async () => {
+    const { app, knowledge, importsDir } = appHarness();
+    const nbA = knowledge.createNotebook({ studioId: "studio-a", name: "甲" });
+    const nbB = knowledge.createNotebook({ studioId: "studio-a", name: "乙" });
+    const inputPath = path.join(importsDir, "shared.txt");
+    fs.writeFileSync(inputPath, "共享内容。\n", "utf-8");
+    const imported = await knowledge.importFile({
+      studioId: "studio-a",
+      notebookId: nbA.id,
+      filePath: inputPath,
+    });
+    knowledge.addSourceToNotebook({ studioId: "studio-a", notebookId: nbB.id, sourceId: imported.source.id });
+    const artifact = await knowledge.parseSource({ studioId: "studio-a", sourceId: imported.source.id });
+    // 仅在乙笔记本入队摄入：甲笔记本的汇总应保持 untracked，不串到乙的 job。
+    knowledge.enqueueSourceIngestion({
+      studioId: "studio-a",
+      notebookId: nbB.id,
+      sourceId: imported.source.id,
+      artifactId: artifact.id,
+    });
+
+    const listResponse = await app.request("/api/knowledge/notebooks");
+    expect(listResponse.status).toBe(200);
+    const { notebooks } = await listResponse.json() as any;
+    const byName = new Map<string, any>(notebooks.map((nb: any) => [nb.name, nb] as [string, any]));
+    expect(byName.get("甲").ingestion).toEqual({
+      done: 0, pendingEmbedding: 0, processing: 0, failed: 0, untracked: 1,
+    });
+    expect(byName.get("乙").ingestion).toEqual({
+      done: 0, pendingEmbedding: 0, processing: 1, failed: 0, untracked: 0,
+    });
+    expect(byName.get("甲").sourceCount).toBe(1);
+    expect(byName.get("乙").sourceCount).toBe(1);
+  });
+
+  it("reingest 端点：failed 手动重试、非 failed 冲突、无 job 兜底入队、跨笔记本拒绝", async () => {
+    const { app, knowledge, importsDir } = appHarness();
+    const notebook = knowledge.createNotebook({ studioId: "studio-a", name: "重试" });
+    const otherNotebook = knowledge.createNotebook({ studioId: "studio-a", name: "其他" });
+    const inputPath = path.join(importsDir, "retry.txt");
+    fs.writeFileSync(inputPath, "待重试内容。\n", "utf8");
+    const imported = await knowledge.importFile({
+      studioId: "studio-a",
+      notebookId: notebook.id,
+      filePath: inputPath,
+    });
+    await knowledge.parseSource({ studioId: "studio-a", sourceId: imported.source.id });
+    const reingestUrl = `/api/knowledge/notebooks/${notebook.id}/sources/${imported.source.id}/reingest`;
+
+    // 从未入队的源：兜底 enqueue
+    const fallback = await app.request(reingestUrl, { method: "POST" });
+    expect(fallback.status).toBe(200);
+    const fallbackBody = await fallback.json() as any;
+    expect(fallbackBody.retried).toBe(false);
+    expect(fallbackBody.job).toMatchObject({
+      notebookId: notebook.id,
+      sourceId: imported.source.id,
+      status: "queued",
+    });
+
+    // 最新 job 非 failed：409 冲突
+    const conflict = await app.request(reingestUrl, { method: "POST" });
+    expect(conflict.status).toBe(409);
+    expect(await conflict.json()).toMatchObject({ error: "KNOWLEDGE_CONFLICT" });
+
+    // 失败后手动重试：attempt 归零、回到 queued
+    const claimed = knowledge.store.claimNextIngestionJob();
+    knowledge.store.failIngestionJob({ studioId: "studio-a", jobId: claimed.id, error: "boom" });
+    const retried = await app.request(reingestUrl, { method: "POST" });
+    expect(retried.status).toBe(200);
+    const retriedBody = await retried.json() as any;
+    expect(retriedBody.retried).toBe(true);
+    expect(retriedBody.job).toMatchObject({ id: claimed.id, status: "queued", attempt: 0 });
+
+    // 源不在该笔记本：兜底入队经 membership 校验抛 NOT_FOUND
+    const wrongNotebook = await app.request(
+      `/api/knowledge/notebooks/${otherNotebook.id}/sources/${imported.source.id}/reingest`,
+      { method: "POST" },
+    );
+    expect(wrongNotebook.status).toBe(404);
+    expect(await wrongNotebook.json()).toMatchObject({ error: "KNOWLEDGE_NOT_FOUND" });
+  });
+
   it("路由策略显式保持 Studio Owner，不依赖未知 API 兜底", () => {
     const paths = [
       ["GET", "/api/knowledge/notebooks"],
       ["POST", "/api/knowledge/notebooks"],
-      ["POST", "/api/knowledge/query"],
-      ["GET", "/api/knowledge/runs/run-1"],
+      ["PUT", "/api/knowledge/notebooks/nb-1/settings"],
+      ["GET", "/api/knowledge/ingestion"],
+      ["POST", "/api/knowledge/notebooks/nb-1/sources/src-1/reingest"],
       ["GET", "/api/knowledge/citations/cite-1"],
       ["GET", "/api/knowledge/snapshots/snap-1/content"],
     ];

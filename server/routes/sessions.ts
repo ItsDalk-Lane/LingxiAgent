@@ -1683,6 +1683,8 @@ export function createSessionsRoute(engine, hub = null) {
               ...(Array.isArray(presentation?.skills) ? { skills: presentation.skills } : {}),
               ...(Array.isArray(presentation?.sessionRefs) ? { sessionRefs: presentation.sessionRefs } : {}),
               ...(Array.isArray(presentation?.agentMentions) ? { agentMentions: presentation.agentMentions } : {}),
+              ...(presentation?.knowledgeRefs ? { knowledgeRefs: presentation.knowledgeRefs } : {}),
+              ...(presentation?.knowledgeRetrieval ? { knowledgeRetrieval: presentation.knowledgeRetrieval } : {}),
               ...(presentation?.agentReviewRequest ? { agentReviewRequest: presentation.agentReviewRequest } : {}),
             });
           }

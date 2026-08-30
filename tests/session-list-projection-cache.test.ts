@@ -117,6 +117,25 @@ describe("session-list-projection-cache revision", () => {
     expect(projection.allMessagesText).toBe("hello");
   });
 
+  it("does not expose [KnowledgeContext] injection blocks in list previews", async () => {
+    writeSessionFile(tmpDir, "knowledge.jsonl", [
+      HEADER,
+      {
+        ...USER_MESSAGE,
+        message: {
+          role: "user",
+          content: "[KnowledgeContext]\n[K1] evidence body\n[/KnowledgeContext]\n\n苹果什么时候交付",
+        },
+      },
+    ]);
+
+    const cache = new SessionListProjectionCache();
+    const [projection] = await cache.list(tmpDir);
+
+    expect(projection.firstMessage).toBe("苹果什么时候交付");
+    expect(projection.allMessagesText).toBe("苹果什么时候交付");
+  });
+
   it("includes jsonl files that are reached through a filesystem link", async () => {
     const realDir = path.join(tmpDir, "real");
     fs.mkdirSync(realDir, { recursive: true });

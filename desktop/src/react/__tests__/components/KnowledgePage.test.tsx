@@ -12,22 +12,29 @@ vi.mock('../../components/knowledge/knowledge-api', () => ({
   createKnowledgeNotebook: vi.fn(),
   renameKnowledgeNotebook: vi.fn(),
   deleteKnowledgeNotebook: vi.fn(),
+  updateKnowledgeNotebookSettings: vi.fn(),
   listKnowledgeSources: vi.fn(),
   importKnowledgeFileSource: vi.fn(),
   importKnowledgePastedText: vi.fn(),
   importKnowledgeWebSnapshot: vi.fn(),
   removeKnowledgeSource: vi.fn(),
   refreshKnowledgeSource: vi.fn(),
+  reingestKnowledgeSource: vi.fn(),
+  listKnowledgeIngestion: vi.fn(),
   listKnowledgeBlocks: vi.fn(),
-  runKnowledgeQuickAnswer: vi.fn(),
-  runKnowledgeResearch: vi.fn(),
-  listActiveKnowledgeResearchRuns: vi.fn(),
-  getKnowledgeResearchRun: vi.fn(),
-  getKnowledgeResearchReport: vi.fn(),
-  cancelKnowledgeResearch: vi.fn(),
+  listKnowledgeChunks: vi.fn(),
   resolveKnowledgeCitation: vi.fn(),
   knowledgeSnapshotContentUrl: vi.fn((id: string) => `http://127.0.0.1/content/${id}`),
 }));
+
+vi.mock('../../hooks/use-hana-fetch', () => ({
+  lingxiFetch: vi.fn(async () => ({
+    json: async () => ({ models: {}, operation_models: [] }),
+  })),
+  lingxiUrl: (path: string) => path,
+}));
+
+const emptyIngestionCounts = { queued: 0, running: 0, pending_embedding: 0, failed: 0, done: 0 };
 
 const notebookA = {
   id: 'notebook-a',
@@ -36,6 +43,15 @@ const notebookA = {
   createdAt: '2026-08-25T00:00:00.000Z',
   updatedAt: '2026-08-25T00:00:00.000Z',
   deletedAt: null,
+  config: {
+    embeddingModelRef: null,
+    rerankModelRef: null,
+    chunkTargetChars: 1200,
+    retrievalTopK: 12,
+    vectorRetentionDays: null,
+  },
+  sourceCount: 1,
+  ingestion: { done: 1, pendingEmbedding: 0, processing: 0, failed: 0, untracked: 0 },
 };
 
 const notebookB = {
@@ -91,6 +107,17 @@ const block = {
   locator: { lineStart: 3, lineEnd: 3, headingPath: ['路线图'] },
 };
 
+const chunkText = '这是分块的完整正文，用于验证详情层全文展示。'.repeat(11);
+
+const chunk = {
+  id: 'chunk-a',
+  ordinal: 1,
+  text: chunkText,
+  tokenCount: 420,
+  charCount: chunkText.length,
+  headingPath: ['路线图', '里程碑'],
+};
+
 describe('KnowledgePage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -110,43 +137,32 @@ describe('KnowledgePage', () => {
         'knowledge.pastedTextPlaceholder': '粘贴需要保存和引用的文字…',
         'knowledge.webUrlPlaceholder': 'https://example.com/page',
         'knowledge.importSource': '导入',
-        'knowledge.analysis': '分析',
-        'knowledge.askYourKnowledge': '向你的知识库提问',
-        'knowledge.scope': '本次来源',
-        'knowledge.addNotebook': '添加笔记本',
         'knowledge.sourceViewer': '来源查看器',
+        'knowledge.chunkViewer': '分块内容查看器',
         'knowledge.closeViewer': '返回分析区',
-        'knowledge.statusReady': '准备完成',
+        'knowledge.statusReady': '已就绪',
+        'knowledge.statusPendingIngestion': '待摄入',
+        'knowledge.sourceActions': '来源操作',
+        'knowledge.sourceMenuPreview': '预览原文',
+        'knowledge.sourceMenuChunks': '查看分块内容',
+        'knowledge.sourceMenuNotReadyHint': '解析完成后可用',
+        'knowledge.chunkCount': '{count} 个分块',
+        'knowledge.chunkDetailTitle': '分块 #{ordinal}',
+        'knowledge.chunkTokenCount': '{count} tokens',
+        'knowledge.chunkCharCount': '{count} 字符',
+        'knowledge.noChunks': '分块尚未生成，等待摄入完成。',
+        'common.close': '关闭',
         'knowledge.lineNumber': '第 {number} 行',
         'knowledge.removeSource': '从笔记本移除 {name}',
-        'knowledge.quickAnswer': '标准回答',
-        'knowledge.fullResearch': '全文研究',
-        'knowledge.questionPlaceholder': '输入想了解的问题…',
-        'knowledge.send': '发送',
-        'knowledge.quickRetrievalHint': '基于相关内容检索，不代表已阅读全部来源',
-        'knowledge.researching': '正在研究…',
-        'knowledge.researchResult': '全文研究结果',
-        'knowledge.cancelResearch': '取消研究',
-        'knowledge.coverage': '研究覆盖',
-        'knowledge.coverageSourceReadiness': '来源准备',
-        'knowledge.coverageExtraction': '内容提取',
-        'knowledge.coveragePrimaryScan': '全文扫描',
-        'knowledge.coverageContradiction': '矛盾检查',
-        'knowledge.coverageCitationValidation': '证据验证',
-        'knowledge.researchConclusions': '研究结论',
-        'knowledge.researchMajorFindings': '主要发现',
-        'knowledge.researchConflicts': '冲突与反例',
-        'knowledge.researchUncertainties': '不确定点',
-        'knowledge.researchLimitations': '研究限制',
-        'knowledge.researchStateScanning': '全文扫描',
-        'knowledge.researchStateRecovering': '正在恢复',
-        'knowledge.researchStateCompleted': '研究完成',
-        'knowledge.answerResult': '回答结果',
-        'knowledge.relatedContentBasis': '基于相关内容检索',
-        'knowledge.citations': '引用',
-        'knowledge.openCitation': '打开引用 {number}',
-        'knowledge.sourceSnapshots': '来源快照',
-        'knowledge.snapshotShortId': '快照 {id}',
+        'knowledge.notebookSettings': '笔记本设置',
+        'knowledge.save': '保存',
+        'knowledge.cancel': '取消',
+        'knowledge.selectSource': '选择一个来源查看解析内容',
+        'knowledge.ingestionQueued': '排队中',
+        'knowledge.ingestionEmbedProgress': '嵌入中 {done}/{total}',
+        'knowledge.ingestionPendingEmbedding': '待嵌入',
+        'knowledge.ingestionFailed': '摄入失败',
+        'knowledge.retryIngestion': '重试摄入 {name}',
       };
       let text = labels[key] || key;
       for (const [name, value] of Object.entries(vars || {})) {
@@ -162,49 +178,145 @@ describe('KnowledgePage', () => {
     vi.mocked(knowledgeApi.listKnowledgeNotebooks).mockResolvedValue([notebookA, notebookB]);
     vi.mocked(knowledgeApi.listKnowledgeSources).mockResolvedValue([sourceEntry]);
     vi.mocked(knowledgeApi.listKnowledgeBlocks).mockResolvedValue([block]);
-    vi.mocked(knowledgeApi.listActiveKnowledgeResearchRuns).mockResolvedValue([]);
+    vi.mocked(knowledgeApi.listKnowledgeChunks).mockResolvedValue({ chunkerConfigId: 'cfg-a', chunks: [chunk] });
+    vi.mocked(knowledgeApi.listKnowledgeIngestion).mockResolvedValue({
+      jobs: [],
+      counts: { ...emptyIngestionCounts },
+    });
   });
 
   afterEach(() => {
     cleanup();
   });
 
-  it('shows the three native areas and opens citation-grade source blocks', async () => {
+  it('opens a source action menu and previews original blocks from it', async () => {
     render(<KnowledgePage />);
 
     expect(await screen.findByRole('heading', { name: '知识库' })).toBeInTheDocument();
     expect(await screen.findByText('roadmap.md')).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: '向你的知识库提问' })).toBeInTheDocument();
+
+    // 摄入数据加载完成后，无 job 的源显示「待摄入」而非 parse 状态徽章
+    expect(await screen.findByText('待摄入')).toBeInTheDocument();
+    expect(screen.queryByText('准备完成')).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByText('roadmap.md'));
+    const menu = await screen.findByRole('menu', { name: '来源操作' });
+    expect(within(menu).getByRole('menuitem', { name: '预览原文' })).toBeEnabled();
+    expect(within(menu).getByRole('menuitem', { name: '查看分块内容' })).toBeEnabled();
+
+    fireEvent.click(within(menu).getByRole('menuitem', { name: '预览原文' }));
 
     expect(await screen.findByText('引用级原文内容')).toBeInTheDocument();
     expect(screen.getByText('第 3 行')).toBeInTheDocument();
     expect(knowledgeApi.listKnowledgeBlocks).toHaveBeenCalledWith('artifact-a');
   });
 
-  it('keeps source viewing separate from notebook-only query scope', async () => {
+  it('opens the chunk cards view from the menu and a detail dialog per card', async () => {
     render(<KnowledgePage />);
     await screen.findByText('roadmap.md');
 
-    const scopeArea = screen.getByText('本次来源').parentElement;
-    expect(scopeArea).not.toBeNull();
-    expect(within(scopeArea as HTMLElement).getByRole('button', { name: '产品资料' })).toBeInTheDocument();
-    const sourcePane = screen.getByText('来源').closest('section');
-    expect(sourcePane).not.toBeNull();
-    expect(within(sourcePane as HTMLElement).queryByRole('checkbox')).not.toBeInTheDocument();
+    fireEvent.click(screen.getByText('roadmap.md'));
+    fireEvent.click(await screen.findByRole('menuitem', { name: '查看分块内容' }));
 
-    fireEvent.click(screen.getByRole('button', { name: /添加笔记本/ }));
-    const marketCheckbox = screen.getByRole('checkbox', { name: '市场资料' });
-    fireEvent.click(marketCheckbox);
-    expect(within(scopeArea as HTMLElement).getByRole('button', { name: '市场资料 ×' })).toBeInTheDocument();
+    expect(await waitFor(() => expect(knowledgeApi.listKnowledgeChunks).toHaveBeenCalledWith('artifact-a')));
+    expect(await screen.findByText('1 个分块')).toBeInTheDocument();
+    const card = screen.getByRole('button', { name: /#1/ });
+    expect(card).toHaveTextContent('路线图 / 里程碑');
+    // 卡片只显示前 200 字符预览，不携带全文
+    expect(card).toHaveTextContent(`${chunkText.slice(0, 200)}…`);
+    expect(card).not.toHaveTextContent(chunkText);
+
+    fireEvent.click(card);
+    const dialog = await screen.findByRole('dialog');
+    expect(dialog).toHaveTextContent('分块 #1');
+    expect(dialog).toHaveTextContent('420 tokens');
+    expect(dialog).toHaveTextContent(`${chunkText.length} 字符`);
+    expect(dialog).toHaveTextContent(chunkText);
+
+    fireEvent.click(within(dialog).getByRole('button', { name: '关闭' }));
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+  });
+
+  it('disables source menu entries until the parse artifact is ready', async () => {
+    const parsingEntry = {
+      ...sourceEntry,
+      parseArtifact: { ...sourceEntry.parseArtifact, status: 'parsing' as const, completedAt: null },
+    };
+    vi.mocked(knowledgeApi.listKnowledgeSources).mockResolvedValue([parsingEntry]);
+
+    render(<KnowledgePage />);
+    await screen.findByText('roadmap.md');
 
     fireEvent.click(screen.getByText('roadmap.md'));
-    await screen.findByText('引用级原文内容');
-    fireEvent.click(screen.getByRole('button', { name: '返回分析区' }));
+    const menu = await screen.findByRole('menu', { name: '来源操作' });
+    expect(within(menu).getByRole('menuitem', { name: '预览原文' })).toBeDisabled();
+    expect(within(menu).getByRole('menuitem', { name: '查看分块内容' })).toBeDisabled();
+    expect(knowledgeApi.listKnowledgeBlocks).not.toHaveBeenCalled();
+    expect(knowledgeApi.listKnowledgeChunks).not.toHaveBeenCalled();
+  });
 
-    expect(screen.getByRole('button', { name: '产品资料 ×' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: '市场资料 ×' })).toBeInTheDocument();
+  it('shows a single job-driven badge per source: done = ready, no job = pending ingestion', async () => {
+    const doneJob = {
+      id: 'job-done',
+      notebookId: 'notebook-a',
+      sourceId: 'source-a',
+      artifactId: 'artifact-a',
+      phase: 'done',
+      status: 'done',
+      attempt: 1,
+      retryAfter: null,
+      error: null,
+      chunkerConfigId: 'cfg',
+      createdAt: '2026-08-25T00:00:00.000Z',
+      updatedAt: '2026-08-25T00:00:00.000Z',
+    } as const;
+    const untrackedEntry = {
+      ...sourceEntry,
+      source: { ...sourceEntry.source, id: 'source-c', displayName: 'draft.md' },
+      snapshot: { ...sourceEntry.snapshot, id: 'snapshot-c', sourceId: 'source-c' },
+      membership: { ...sourceEntry.membership, sourceId: 'source-c' },
+    };
+    vi.mocked(knowledgeApi.listKnowledgeSources).mockResolvedValue([sourceEntry, untrackedEntry]);
+    vi.mocked(knowledgeApi.listKnowledgeIngestion).mockResolvedValue({
+      jobs: [doneJob],
+      counts: { ...emptyIngestionCounts, done: 1 },
+    });
+
+    render(<KnowledgePage />);
+    expect(await screen.findByText('已就绪')).toBeInTheDocument();
+    expect(await screen.findByText('待摄入')).toBeInTheDocument();
+  });
+
+  it('shows embed progress counts and a thin progress bar while embedding', async () => {
+    const embedJob = {
+      id: 'job-embed',
+      notebookId: 'notebook-a',
+      sourceId: 'source-a',
+      artifactId: 'artifact-a',
+      phase: 'embed',
+      status: 'running',
+      attempt: 1,
+      retryAfter: null,
+      error: null,
+      chunkerConfigId: 'cfg',
+      createdAt: '2026-08-25T00:00:00.000Z',
+      updatedAt: '2026-08-25T00:00:00.000Z',
+      progressDone: 320,
+      progressTotal: 708,
+    } as const;
+    vi.mocked(knowledgeApi.listKnowledgeIngestion).mockResolvedValue({
+      jobs: [embedJob],
+      counts: { ...emptyIngestionCounts, running: 1 },
+    });
+
+    render(<KnowledgePage />);
+    expect(await screen.findByText('嵌入中 320/708')).toBeInTheDocument();
+
+    const bar = screen.getByRole('progressbar');
+    expect(bar).toHaveAttribute('aria-valuenow', '320');
+    expect(bar).toHaveAttribute('aria-valuemax', '708');
+    const fill = bar.firstElementChild as HTMLElement;
+    expect(fill.style.width).toBe('45%');
   });
 
   it('creates a notebook and imports selected local files through the native picker', async () => {
@@ -278,416 +390,63 @@ describe('KnowledgePage', () => {
     expect(window.platform.selectFiles).not.toHaveBeenCalled();
   });
 
-  it('sends only notebook scope, labels the retrieval basis, and opens a historical citation', async () => {
-    const citation = {
-      id: 'citation-a',
-      parseArtifactId: 'artifact-a',
-      blockId: 'block-a',
-      startOffset: 5,
-      endOffset: 10,
-      canonicalText: '九月十五日',
-      canonicalTextSha256: 'c'.repeat(64),
+  it('shows ingestion badges for pending and failed sources and retries a failed job', async () => {
+    const failedJob = {
+      id: 'job-1',
+      notebookId: 'notebook-a',
+      sourceId: 'source-a',
+      artifactId: 'artifact-a',
+      phase: 'embed',
+      status: 'failed',
+      attempt: 3,
+      retryAfter: null,
+      error: 'KNOWLEDGE_RETRIEVAL_UNAVAILABLE: boom',
+      chunkerConfigId: 'cfg',
       createdAt: '2026-08-25T00:00:00.000Z',
+      updatedAt: '2026-08-25T00:00:00.000Z',
+    } as const;
+    const pendingJob = {
+      ...failedJob,
+      id: 'job-2',
+      sourceId: 'source-b',
+      status: 'pending_embedding',
+      attempt: 0,
+      error: null,
+    } as const;
+    const pendingEntry = {
+      ...sourceEntry,
+      source: { ...sourceEntry.source, id: 'source-b', displayName: 'notes.txt' },
+      snapshot: { ...sourceEntry.snapshot, id: 'snapshot-b', sourceId: 'source-b' },
+      membership: { ...sourceEntry.membership, sourceId: 'source-b' },
     };
-    const citationBlock = {
-      ...block,
-      text: '交付日期是九月十五日。',
-      locator: { lineStart: 8, lineEnd: 8 },
-    };
-    vi.mocked(knowledgeApi.runKnowledgeQuickAnswer).mockResolvedValue({
-      retrievalBasis: 'related_content',
-      run: {
-        id: 'run-a',
-        studioId: 'studio-a',
-        mode: 'quick',
-        question: '什么时候交付？',
-        scopeSnapshotId: 'scope-a',
-        status: 'completed',
-        retrievalMode: 'fts',
-        answerText: '交付日期是九月十五日。 [1]',
-        errorCode: null,
-        createdAt: '2026-08-25T00:00:00.000Z',
-        completedAt: '2026-08-25T00:00:01.000Z',
-        citations: [{
-          runId: 'run-a',
-          ordinal: 0,
-          marker: 1,
-          citationId: 'citation-a',
-          candidateRef: 'K1',
-        }],
-        retrievals: [],
-      },
-      scope: {
-        id: 'scope-a',
-        studioId: 'studio-a',
-        mode: 'quick',
-        createdAt: '2026-08-25T00:00:00.000Z',
-        notebooks: [{
-          scopeSnapshotId: 'scope-a',
-          notebookId: 'notebook-a',
-          notebookName: '产品资料',
-          ordinal: 0,
-        }],
-        sources: [],
-      },
-      citations: [{
-        marker: 1,
-        citation,
-        source: { ...sourceEntry.source, displayName: '历史版本.md' },
-        snapshot: sourceEntry.snapshot,
-        parseArtifact: sourceEntry.parseArtifact,
-        locator: citationBlock.locator,
-        viewer: { contentUrl: '/content/snapshot-a', locator: citationBlock.locator },
-      }],
+    vi.mocked(knowledgeApi.listKnowledgeSources).mockResolvedValue([sourceEntry, pendingEntry]);
+    vi.mocked(knowledgeApi.listKnowledgeIngestion).mockResolvedValue({
+      jobs: [failedJob, pendingJob],
+      counts: { ...emptyIngestionCounts, failed: 1, pending_embedding: 1 },
     });
-    vi.mocked(knowledgeApi.resolveKnowledgeCitation).mockResolvedValue({
-      citation,
-      block: citationBlock,
-      source: { ...sourceEntry.source, displayName: '历史版本.md' },
-      snapshot: sourceEntry.snapshot,
-      parseArtifact: sourceEntry.parseArtifact,
-      viewer: { contentUrl: '/content/snapshot-a', locator: citationBlock.locator },
+    vi.mocked(knowledgeApi.reingestKnowledgeSource).mockResolvedValue({
+      job: { ...failedJob, status: 'queued', attempt: 0 },
+      retried: true,
     });
 
+    render(<KnowledgePage />);
+    expect(await screen.findByText('摄入失败')).toBeInTheDocument();
+    expect(await screen.findByText('待嵌入')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: '重试摄入 roadmap.md' }));
+    await waitFor(() => expect(knowledgeApi.reingestKnowledgeSource)
+      .toHaveBeenCalledWith('notebook-a', 'source-a'));
+  });
+
+  it('opens the notebook settings dialog from the source pane header', async () => {
     render(<KnowledgePage />);
     await screen.findByText('roadmap.md');
-    const question = screen.getByPlaceholderText('输入想了解的问题…');
-    const send = screen.getByRole('button', { name: '发送' });
-    expect(screen.getByText('基于相关内容检索，不代表已阅读全部来源')).toBeInTheDocument();
-    expect(send).toBeDisabled();
 
-    fireEvent.change(question, { target: { value: '什么时候交付？' } });
-    expect(send).toBeEnabled();
-    fireEvent.click(send);
+    fireEvent.click(screen.getByRole('button', { name: '笔记本设置' }));
+    const dialog = await screen.findByRole('dialog');
+    expect(dialog).toHaveTextContent('笔记本设置 · 产品资料');
 
-    await waitFor(() => expect(knowledgeApi.runKnowledgeQuickAnswer).toHaveBeenCalledWith({
-      question: '什么时候交付？',
-      notebookIds: ['notebook-a'],
-    }));
-    expect(await screen.findByText('基于相关内容检索')).toBeInTheDocument();
-    expect(screen.getByText('历史版本.md')).toBeInTheDocument();
-
-    fireEvent.click(screen.getByRole('button', { name: '打开引用 1' }));
-    await waitFor(() => expect(knowledgeApi.resolveKnowledgeCitation).toHaveBeenCalledWith('citation-a'));
-    expect(await screen.findByRole('heading', { name: '历史版本.md' })).toBeInTheDocument();
-    expect(screen.getByText('九月十五日', { selector: 'mark' })).toBeInTheDocument();
-    expect(screen.getByText('第 8 行')).toBeInTheDocument();
-  });
-
-  it('keeps Send disabled when no Notebook exists even after a question is entered', async () => {
-    vi.mocked(knowledgeApi.listKnowledgeNotebooks).mockResolvedValue([]);
-    vi.mocked(knowledgeApi.listKnowledgeSources).mockResolvedValue([]);
-
-    render(<KnowledgePage />);
-    await screen.findByRole('heading', { name: '知识库' });
-    fireEvent.change(screen.getByPlaceholderText('输入想了解的问题…'), {
-      target: { value: '没有范围时能发送吗？' },
-    });
-
-    expect(screen.getByRole('button', { name: '发送' })).toBeDisabled();
-    expect(knowledgeApi.runKnowledgeQuickAnswer).not.toHaveBeenCalled();
-    expect(knowledgeApi.runKnowledgeResearch).not.toHaveBeenCalled();
-  });
-
-  it('runs Full Research, shows separate coverage ledgers, and opens report citations', async () => {
-    const coverage = {
-      sourceReadiness: { completed: 1, total: 1 },
-      extraction: { completed: 1, total: 1 },
-      primaryScan: { completed: 1, total: 1 },
-      contradiction: { completed: 1, total: 1 },
-      citationValidation: { completed: 1, total: 1, valid: 1, invalid: 0 },
-    };
-    const run = {
-      id: 'research-a',
-      studioId: 'studio-a',
-      mode: 'research' as const,
-      question: '完整结论是什么？',
-      scopeSnapshotId: 'scope-r',
-      status: 'running' as const,
-      retrievalMode: 'fts' as const,
-      answerText: null,
-      errorCode: null,
-      createdAt: '2026-08-25T00:00:00.000Z',
-      completedAt: null,
-      citations: [],
-      retrievals: [],
-    };
-    const scope = {
-      id: 'scope-r',
-      studioId: 'studio-a',
-      mode: 'research' as const,
-      createdAt: '2026-08-25T00:00:00.000Z',
-      notebooks: [{
-        scopeSnapshotId: 'scope-r',
-        notebookId: 'notebook-a',
-        notebookName: '产品资料',
-        ordinal: 0,
-      }],
-      sources: [{
-        scopeSnapshotId: 'scope-r',
-        notebookId: 'notebook-a',
-        sourceId: 'source-a',
-        sourceDisplayName: 'roadmap.md',
-        contentSnapshotId: 'snapshot-a',
-        parseArtifactId: 'artifact-a',
-        ordinal: 0,
-      }],
-    };
-    const research = {
-      runId: run.id,
-      hostTaskId: `knowledge-research:${run.id}`,
-      state: 'scanning' as const,
-      spec: {
-        originalQuestion: run.question,
-        scopeSnapshotId: scope.id,
-        notebookIds: ['notebook-a'],
-        goal: run.question,
-        dimensions: [],
-        outputRequirements: [],
-        definitions: [],
-        assumptions: [],
-      },
-      manifest: {
-        runId: run.id,
-        sourceCount: 1,
-        parseArtifactCount: 1,
-        blockCount: 1,
-        unitCount: 1,
-        primaryCharCount: 10,
-        createdAt: run.createdAt,
-      },
-      coverage: { ...coverage, primaryScan: { completed: 0, total: 1 }, contradiction: { completed: 0, total: 1 } },
-      reportAvailable: false,
-      errorCode: null,
-      createdAt: run.createdAt,
-      updatedAt: run.createdAt,
-      completedAt: null,
-    };
-    vi.mocked(knowledgeApi.runKnowledgeResearch).mockResolvedValue({ run, scope, research, citations: [] });
-    vi.mocked(knowledgeApi.getKnowledgeResearchRun).mockResolvedValue({
-      run: { ...run, status: 'completed', answerText: '完整报告', completedAt: '2026-08-25T00:00:01.000Z' },
-      scope,
-      research: {
-        ...research,
-        state: 'completed',
-        coverage,
-        reportAvailable: true,
-        completedAt: '2026-08-25T00:00:01.000Z',
-      },
-      citations: [],
-    });
-    const citation = {
-      id: 'research-citation',
-      parseArtifactId: 'artifact-a',
-      blockId: 'block-a',
-      startOffset: 0,
-      endOffset: 6,
-      canonicalText: '引用级原文',
-      canonicalTextSha256: 'd'.repeat(64),
-      createdAt: run.createdAt,
-    };
-    vi.mocked(knowledgeApi.getKnowledgeResearchReport).mockResolvedValue({
-      report: {
-        runId: run.id,
-        title: '完整研究报告',
-        summary: '所有冻结来源均已扫描。',
-        conclusions: [{ text: '结论有证据。', claimIds: ['claim-a'], citationMarkers: [1] }],
-        majorFindings: [],
-        conflicts: [],
-        uncertainties: ['仍需长期观察。'],
-        limitations: ['仅限所选笔记本。'],
-        coverage,
-        citations: [{ marker: 1, evidenceId: 'evidence-a', citationId: citation.id }],
-        createdAt: '2026-08-25T00:00:01.000Z',
-      },
-      citations: [{
-        marker: 1,
-        evidenceId: 'evidence-a',
-        citation,
-        source: sourceEntry.source,
-        snapshot: sourceEntry.snapshot,
-        parseArtifact: sourceEntry.parseArtifact,
-        locator: block.locator,
-        viewer: { contentUrl: '/content/snapshot-a', locator: block.locator },
-      }],
-    });
-    vi.mocked(knowledgeApi.resolveKnowledgeCitation).mockResolvedValue({
-      citation,
-      block,
-      source: sourceEntry.source,
-      snapshot: sourceEntry.snapshot,
-      parseArtifact: sourceEntry.parseArtifact,
-      viewer: { contentUrl: '/content/snapshot-a', locator: block.locator },
-    });
-
-    render(<KnowledgePage />);
-    await screen.findByText('roadmap.md');
-    fireEvent.click(screen.getByRole('button', { name: '全文研究' }));
-    const question = screen.getByPlaceholderText('输入想了解的问题…');
-    expect(question).toBeEnabled();
-    fireEvent.change(question, { target: { value: run.question } });
-    fireEvent.click(screen.getByRole('button', { name: '发送' }));
-
-    await waitFor(() => expect(knowledgeApi.runKnowledgeResearch).toHaveBeenCalledWith({
-      question: run.question,
-      notebookIds: ['notebook-a'],
-    }));
-    expect(await screen.findByRole('heading', { name: '完整研究报告' })).toBeInTheDocument();
-    expect(screen.getByText('所有冻结来源均已扫描。')).toBeInTheDocument();
-    expect(screen.getByText('来源准备')).toBeInTheDocument();
-    expect(screen.getByText('矛盾检查')).toBeInTheDocument();
-    expect(screen.getByText('证据验证')).toBeInTheDocument();
-    expect(screen.getByText('快照 snapshot-a')).toBeInTheDocument();
-    expect(screen.getByText('仍需长期观察。')).toBeInTheDocument();
-    expect(screen.getByText('仅限所选笔记本。')).toBeInTheDocument();
-
-    fireEvent.click(screen.getByRole('button', { name: '打开引用 1' }));
-    await waitFor(() => expect(knowledgeApi.resolveKnowledgeCitation).toHaveBeenCalledWith(citation.id));
-    expect(await screen.findByRole('heading', { name: 'roadmap.md' })).toBeInTheDocument();
-  });
-
-  it('offers Cancel while Full Research is active', async () => {
-    const run = {
-      id: 'research-cancel',
-      studioId: 'studio-a',
-      mode: 'research' as const,
-      question: '取消',
-      scopeSnapshotId: 'scope-cancel',
-      status: 'running' as const,
-      retrievalMode: 'fts' as const,
-      answerText: null,
-      errorCode: null,
-      createdAt: '2026-08-25T00:00:00.000Z',
-      completedAt: null,
-      citations: [],
-      retrievals: [],
-    };
-    const coverage = {
-      sourceReadiness: { completed: 1, total: 1 },
-      extraction: { completed: 1, total: 1 },
-      primaryScan: { completed: 0, total: 1 },
-      contradiction: { completed: 0, total: 0 },
-      citationValidation: { completed: 0, total: 0, valid: 0, invalid: 0 },
-    };
-    const scope = {
-      id: run.scopeSnapshotId,
-      studioId: 'studio-a',
-      mode: 'research' as const,
-      createdAt: run.createdAt,
-      notebooks: [],
-      sources: [],
-    };
-    const research = {
-      runId: run.id,
-      hostTaskId: `knowledge-research:${run.id}`,
-      state: 'scanning' as const,
-      spec: {
-        originalQuestion: run.question,
-        scopeSnapshotId: scope.id,
-        notebookIds: ['notebook-a'],
-        goal: run.question,
-        dimensions: [],
-        outputRequirements: [],
-        definitions: [],
-        assumptions: [],
-      },
-      manifest: null,
-      coverage,
-      reportAvailable: false,
-      errorCode: null,
-      createdAt: run.createdAt,
-      updatedAt: run.createdAt,
-      completedAt: null,
-    };
-    vi.mocked(knowledgeApi.runKnowledgeResearch).mockResolvedValue({ run, scope, research, citations: [] });
-    vi.mocked(knowledgeApi.getKnowledgeResearchRun).mockImplementation(() => new Promise(() => {}));
-    vi.mocked(knowledgeApi.cancelKnowledgeResearch).mockResolvedValue({
-      run: { ...run, status: 'cancelled', completedAt: '2026-08-25T00:00:01.000Z' },
-      research: { ...research, state: 'canceled', completedAt: '2026-08-25T00:00:01.000Z' },
-    });
-
-    render(<KnowledgePage />);
-    await screen.findByText('roadmap.md');
-    fireEvent.click(screen.getByRole('button', { name: '全文研究' }));
-    fireEvent.change(screen.getByPlaceholderText('输入想了解的问题…'), { target: { value: '取消' } });
-    fireEvent.click(screen.getByRole('button', { name: '发送' }));
-    fireEvent.click(await screen.findByRole('button', { name: '取消研究' }));
-
-    await waitFor(() => expect(knowledgeApi.cancelKnowledgeResearch).toHaveBeenCalledWith(run.id));
-    expect(screen.queryByRole('button', { name: '取消研究' })).not.toBeInTheDocument();
-  });
-
-  it('reconnects the page to a recovering research run after reload', async () => {
-    const run = {
-      id: 'research-recovering',
-      studioId: 'studio-a',
-      mode: 'research' as const,
-      question: '继续上次研究',
-      scopeSnapshotId: 'scope-recovering',
-      status: 'running' as const,
-      retrievalMode: 'fts' as const,
-      answerText: null,
-      errorCode: null,
-      createdAt: '2026-08-25T00:00:00.000Z',
-      completedAt: null,
-      citations: [],
-      retrievals: [],
-    };
-    const scope = {
-      id: 'scope-recovering',
-      studioId: 'studio-a',
-      mode: 'research' as const,
-      createdAt: run.createdAt,
-      notebooks: [{
-        scopeSnapshotId: 'scope-recovering',
-        notebookId: 'notebook-a',
-        notebookName: '产品资料',
-        ordinal: 0,
-      }],
-      sources: [],
-    };
-    const coverage = {
-      sourceReadiness: { completed: 1, total: 1 },
-      extraction: { completed: 1, total: 1 },
-      primaryScan: { completed: 2, total: 4 },
-      contradiction: { completed: 0, total: 0 },
-      citationValidation: { completed: 1, total: 1, valid: 1, invalid: 0 },
-    };
-    const recovered = {
-      run,
-      scope,
-      research: {
-        runId: run.id,
-        hostTaskId: `knowledge-research:${run.id}`,
-        state: 'recovering' as const,
-        spec: {
-          originalQuestion: run.question,
-          scopeSnapshotId: scope.id,
-          notebookIds: ['notebook-a'],
-          goal: run.question,
-          dimensions: [],
-          outputRequirements: [],
-          definitions: [],
-          assumptions: [],
-        },
-        manifest: null,
-        coverage,
-        reportAvailable: false,
-        errorCode: null,
-        createdAt: run.createdAt,
-        updatedAt: run.createdAt,
-        completedAt: null,
-      },
-      citations: [] as [],
-    };
-    vi.mocked(knowledgeApi.listActiveKnowledgeResearchRuns).mockResolvedValue([recovered]);
-    vi.mocked(knowledgeApi.getKnowledgeResearchRun).mockImplementation(() => new Promise(() => {}));
-
-    render(<KnowledgePage />);
-
-    expect(await screen.findByDisplayValue('继续上次研究')).toBeDisabled();
-    expect(await screen.findByText('正在恢复')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: '取消研究' })).toBeInTheDocument();
-    expect(knowledgeApi.runKnowledgeResearch).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole('button', { name: '取消' }));
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
   });
 });

@@ -125,4 +125,56 @@ describe("PortableVectorIndexAdapter", () => {
     })).toEqual([]);
     adapter.close();
   });
+
+  it("查询命中刷新 last_used_at，removeArtifactModel 细粒度删除保留同产物其他身份", () => {
+    const adapter = createAdapter();
+    const modelB: VectorIndexModelIdentity = { ...model, key: "provider-b/embed-b/openai-embeddings/3", modelId: "embed-b" };
+    adapter.buildOrReplaceArtifact({
+      parseArtifactId: "artifact-a",
+      chunkFingerprint: "fingerprint-a",
+      model,
+      entries: [{ chunkId: "chunk-a", parseArtifactId: "artifact-a", ordinal: 0, vector: [1, 0, 0] }],
+    });
+    adapter.buildOrReplaceArtifact({
+      parseArtifactId: "artifact-a",
+      chunkFingerprint: "fingerprint-a",
+      model: modelB,
+      entries: [{ chunkId: "chunk-b", parseArtifactId: "artifact-a", ordinal: 0, vector: [0, 1, 0] }],
+    });
+
+    // 查询只命中 modelB 的向量，但使用时间按 artifact 维度刷新。
+    const before = adapter.listArtifactUsage().find((row) => row.modelKey === model.key)!.lastUsedAt;
+    adapter.search({ parseArtifactIds: ["artifact-a"], model: modelB, queryVector: [0, 1, 0] });
+    const usage = adapter.listArtifactUsage();
+    expect(usage).toHaveLength(2);
+    for (const row of usage) {
+      expect(Date.parse(row.lastUsedAt)).toBeGreaterThanOrEqual(Date.parse(before));
+    }
+
+    // 细粒度删除：只删 model 身份，modelB 保留。
+    adapter.removeArtifactModel({ parseArtifactId: "artifact-a", modelKey: model.key });
+    expect(adapter.listArtifactUsage().map((row) => row.modelKey)).toEqual([modelB.key]);
+    expect(adapter.search({ parseArtifactIds: ["artifact-a"], model, queryVector: [1, 0, 0] })).toEqual([]);
+    expect(adapter.search({ parseArtifactIds: ["artifact-a"], model: modelB, queryVector: [0, 1, 0] })).toHaveLength(1);
+    adapter.close();
+  });
+
+  it("v1 库升级到 v2 时 last_used_at 回填 indexed_at", () => {
+    const adapter = createAdapter();
+    adapter.buildOrReplaceArtifact({
+      parseArtifactId: "artifact-a",
+      chunkFingerprint: "fingerprint-a",
+      model,
+      entries: [{ chunkId: "chunk-a", parseArtifactId: "artifact-a", ordinal: 0, vector: [1, 0, 0] }],
+    });
+    const indexedAt = adapter.listArtifactUsage()[0].indexedAt;
+    // 压回 v1：抹掉 last_used_at 模拟旧库，重开触发 v1→v2 迁移。
+    adapter.db.pragma("user_version = 1");
+    adapter.db.prepare(`UPDATE vector_artifacts SET last_used_at = ''`).run();
+    adapter.close();
+    const reopened = new PortableVectorIndexAdapter({ dbPath: adapter.dbPath });
+    expect(Number(reopened.db.pragma("user_version", { simple: true }))).toBe(2);
+    expect(reopened.listArtifactUsage()[0].lastUsedAt).toBe(indexedAt);
+    reopened.close();
+  });
 });

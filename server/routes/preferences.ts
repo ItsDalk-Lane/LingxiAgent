@@ -216,17 +216,8 @@ export function createPreferencesRoute(engine: any, options: Record<string, any>
             return c.json({ error: "vision model must support image input" }, 400);
           }
         }
-        for (const operation of ["embedding", "rerank"] as const) {
-          const ref = modelsPatch[operation];
-          if (!ref) continue;
-          const available = engine.listModelOperationModels?.(operation) || [];
-          const matches = available.some((model) => (
-            model?.id === ref.id && model?.provider === ref.provider
-          ));
-          if (!matches) {
-            return c.json({ error: `${operation} model is unavailable` }, 400);
-          }
-        }
+        // 知识库嵌入/重排全局配置已退役（v8 迁移至笔记本列）：
+        // normalizeSharedModelsPatch 对 embedding/rerank 字段显式拒绝（unknown field 400）。
         engine.setSharedModels(modelsPatch);
         sections.push("models");
         needsModelSync = sharedModelsPatchRequiresModelSync(modelsPatch);

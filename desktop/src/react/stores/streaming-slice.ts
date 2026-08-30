@@ -37,6 +37,31 @@ export interface StreamingSlice {
   addStreamingSession: (path: string, identity?: StreamingStatusIdentity) => void;
   removeStreamingSession: (path: string, identity?: StreamingStatusIdentity) => boolean;
   forceRemoveStreamingSession: (path: string) => boolean;
+  /**
+   * 知识库检索进行中的 session（ws knowledge_retrieval_started → 后续任意事件清除）。
+   * 纯瞬态：不落盘、不进 stream_resume，只驱动「知识库检索中」胶囊。
+   */
+  knowledgeRetrievingSessions: string[];
+  beginKnowledgeRetrieval: (path: string) => void;
+  endKnowledgeRetrieval: (path: string) => void;
+  /**
+   * 知识蒸馏进行中的 session（ws knowledge_distill_progress 逐批更新 →
+   * 该 session 任意后续事件清除）。纯瞬态：驱动「蒸馏中 · N 批」胶囊。
+   */
+  knowledgeDistillBySession: Record<string, { model: string | null; done: number }>;
+  updateKnowledgeDistill: (path: string, progress: { model: string | null; done: number }) => void;
+  endKnowledgeDistill: (path: string) => void;
+  /**
+   * 发送后本地进入「等待助手」态的 session（ws.send 成功 → 该 session 首个
+   * 后续事件清除）。服务器在知识检索/排队期间不置 isStreaming，靠它保证
+   * 发送瞬间就有 typing 指示器，不依赖任何服务器信号（旧 server 也生效）。
+   * 纯瞬态：不落盘、不进 stream_resume、不做发送互斥（互斥仍归 streamingSessions）。
+   */
+  turnPendingSessions: string[];
+  beginTurnPending: (path: string) => void;
+  endTurnPending: (path: string) => void;
+  /** ws 断连时全清 pending：没有后续事件会来清它，不清会挂出永久指示器。 */
+  clearAllTurnPending: () => void;
   /** 后台 session 已完成新输出，但用户尚未切回查看。 */
   unreadOutputSessionPaths: string[];
   markSessionOutputUnread: (path: string) => void;
@@ -151,6 +176,86 @@ export const createStreamingSlice = (
 ): StreamingSlice => ({
   streamingSessions: [],
   activeSessionStreams: {},
+  knowledgeRetrievingSessions: [],
+  beginKnowledgeRetrieval: (path) => set((s) => {
+    const key = identityKeyForPath(get, path);
+    if (s.knowledgeRetrievingSessions.includes(key)
+      || (key !== path && s.knowledgeRetrievingSessions.includes(path))) {
+      return {};
+    }
+    return {
+      knowledgeRetrievingSessions: [
+        ...filterLegacyAndIdentity(s.knowledgeRetrievingSessions, path, key),
+        key,
+      ],
+    };
+  }),
+  endKnowledgeRetrieval: (path) => {
+    // 高频事件路径也调用这里：列表不含该 session 时直接返回，不产生 setState。
+    const key = identityKeyForPath(get, path);
+    const current = get?.().knowledgeRetrievingSessions ?? [];
+    if (!current.includes(key) && !(key !== path && current.includes(path))) return;
+    set((s) => ({
+      knowledgeRetrievingSessions: filterLegacyAndIdentity(s.knowledgeRetrievingSessions, path, key),
+    }));
+  },
+  knowledgeDistillBySession: {},
+  updateKnowledgeDistill: (path, progress) => {
+    const key = identityKeyForPath(get, path);
+    const current = get?.();
+    const existing = current?.knowledgeDistillBySession?.[key];
+    if (existing && existing.done === progress.done && existing.model === progress.model) return;
+    const base = filterLegacyAndIdentity(
+      Object.keys(current?.knowledgeDistillBySession ?? {}),
+      path,
+      key,
+    ).reduce<Record<string, { model: string | null; done: number }>>((acc, k) => {
+      acc[k] = current!.knowledgeDistillBySession[k];
+      return acc;
+    }, {});
+    base[key] = progress;
+    set({ knowledgeDistillBySession: base });
+  },
+  endKnowledgeDistill: (path) => {
+    const key = identityKeyForPath(get, path);
+    const current = get?.();
+    if (!current?.knowledgeDistillBySession?.[key] && !current?.knowledgeDistillBySession?.[path]) return;
+    const kept = filterLegacyAndIdentity(
+      Object.keys(current?.knowledgeDistillBySession ?? {}),
+      path,
+      key,
+    ).reduce<Record<string, { model: string | null; done: number }>>((acc, k) => {
+      acc[k] = current!.knowledgeDistillBySession[k];
+      return acc;
+    }, {});
+    set({ knowledgeDistillBySession: kept });
+  },
+  turnPendingSessions: [],
+  beginTurnPending: (path) => set((s) => {
+    const key = identityKeyForPath(get, path);
+    if (s.turnPendingSessions.includes(key)
+      || (key !== path && s.turnPendingSessions.includes(path))) {
+      return {};
+    }
+    return {
+      turnPendingSessions: [
+        ...filterLegacyAndIdentity(s.turnPendingSessions, path, key),
+        key,
+      ],
+    };
+  }),
+  endTurnPending: (path) => {
+    // 与 endKnowledgeRetrieval 同一高频清除点调用：未命中直接返回，零 setState。
+    const key = identityKeyForPath(get, path);
+    const current = get?.().turnPendingSessions ?? [];
+    if (!current.includes(key) && !(key !== path && current.includes(path))) return;
+    set((s) => ({
+      turnPendingSessions: filterLegacyAndIdentity(s.turnPendingSessions, path, key),
+    }));
+  },
+  clearAllTurnPending: () => set((s) => (
+    s.turnPendingSessions.length === 0 ? {} : { turnPendingSessions: [] }
+  )),
   addStreamingSession: (path, identity) => set((s) => {
     const key = identityKeyForPath(get, path);
     const active = s.activeSessionStreams || {};

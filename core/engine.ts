@@ -27,6 +27,7 @@ import { ResourceAccessService } from "./resource-access-service.ts";
 import { ResourceService } from "./resource-service.ts";
 import { appendSecurityAuditEvent } from "./security-audit-log.ts";
 import { findModel } from "../shared/model-ref.ts";
+import { lookupKnown } from "../shared/known-models.ts";
 import { isLocalBaseUrl } from "../shared/net-utils.ts";
 import {
   resolveWorkspaceSkillCatalogPaths,
@@ -56,10 +57,6 @@ import {
 import { loadLocale } from "../lib/i18n.ts";
 import { createApprovalGateway, createModelApprovalReviewer } from "../lib/approval-gateway.ts";
 import { runWithNewModelTrace } from "../lib/llm/model-trace-scope.ts";
-import {
-  createSemanticInputProvenance,
-  provenanceSection,
-} from "../lib/llm/semantic-input-provenance.ts";
 import { callText } from "./llm-client.ts";
 import { SESSION_APPROVAL_POLICIES } from "./session-permission-mode.ts";
 import { readCompiledResetAt } from "../lib/memory/compiled-memory-state.ts";
@@ -103,7 +100,7 @@ import { PreferencesManager } from "./preferences-manager.ts";
 import { InputDraftsStore } from "./input-drafts-store.ts";
 import { ModelManager } from "./model-manager.ts";
 import { AuxiliaryModelResolver } from "./auxiliary-model-resolver.ts";
-import { ModelOperationResolver } from "./model-operation-resolver.ts";
+import { ModelOperationConfigurationError, ModelOperationResolver } from "./model-operation-resolver.ts";
 import { EmbeddingClient, RerankClient } from "./model-operation-client.ts";
 import type { ModelOperation } from "../shared/model-operations.ts";
 import { isAuxiliaryConfigError } from "./auxiliary-slots.ts";
@@ -191,6 +188,19 @@ function buildToolCatalogManifestSnapshot(catalog, modelContextWindowTokens) {
 import { filterToolObjectsByAvailability } from "./tool-availability.ts";
 import { TaskRegistry } from "../lib/task-registry.ts";
 import { KnowledgeManager } from "../lib/knowledge/knowledge-manager.ts";
+import type { KnowledgeRetrievalStats } from "../shared/knowledge-refs.ts";
+import {
+  buildKnowledgeContextInjection,
+  KNOWLEDGE_DECOMPOSE_SYSTEM_PROMPT,
+} from "../lib/knowledge/knowledge-context-injector.ts";
+import {
+  KNOWLEDGE_DISTILL_FALLBACK_BATCH_TOKENS,
+  KNOWLEDGE_DISTILL_MAX_BATCH_TOKENS,
+  KNOWLEDGE_DISTILL_MIN_BATCH_TOKENS,
+  KNOWLEDGE_DISTILL_SYSTEM_PROMPT,
+  KNOWLEDGE_DISTILL_TARGET_BATCH_MS,
+} from "../lib/knowledge/knowledge-distiller.ts";
+import { estimateTextTokens } from "../lib/llm/estimate-text-tokens.ts";
 import { BrowserManager } from "../lib/browser/browser-manager.ts";
 import { TerminalSessionManager } from "../lib/terminal/terminal-session-manager.ts";
 import {
@@ -286,11 +296,12 @@ export class LingxiEngine {
   declare _checkpointStore: any;
   declare _fileHistory: any;
   declare _computerHost: any;
+  /** 蒸馏模型实测吞吐（ms/token EMA），按 provider/model 分键；驱动批预算动态推算。 */
+  declare _knowledgeDistillThroughput: Map<string, number>;
   declare _computerProviders: any;
   declare _configCoord: any;
   declare _auxResolver: AuxiliaryModelResolver;
   declare _modelOperationResolver: ModelOperationResolver;
-  declare _embeddingClient: EmbeddingClient;
   declare _rerankClient: RerankClient;
   declare _confirmStore: any;
   declare _coreExtensionFactories: any;
@@ -452,11 +463,27 @@ export class LingxiEngine {
 
     // ── Core managers ──
     this._prefs = new PreferencesManager({ userDir: this.userDir, agentsDir: this.agentsDir });
+    this._knowledgeDistillThroughput = new Map();
     this._knowledge = new KnowledgeManager({
       lingxiHome: this.lingxiHome,
-      generateText: (request) => this._generateKnowledgeText(request),
-      embedTexts: (request) => this._embedKnowledgeTexts(request),
       rerank: (request) => this._rerankKnowledgeTexts(request),
+      // 查询侧 rerank 按笔记本解析链的显式引用路由（v8：全局 rerank 槽已退役，
+      // 引用不可解析 → null → 检索显式降级 RRF 名次，见 _rerankKnowledgeTextsForModel）。
+      rerankForModel: (request) => this._rerankKnowledgeTextsForModel(request),
+      // 摄入管线按笔记本解析链拿到的显式引用执行嵌入；
+      // 与查询侧懒构建共用同一套 ModelOperationResolver/EmbeddingClient 基础设施。
+      embedTextsForModel: (request) => this._embedKnowledgeTextsForModel(request),
+      canEmbedWithModel: (ref) => this._canResolveKnowledgeEmbeddingRef(ref),
+      // 嵌入模型上下文窗口（自动分块 ×80% 口径）：目录条目归一化的
+      // contextWindow/context 优先，known-models 静态目录兜底。
+      getEmbeddingModelContextWindow: (ref) => {
+        const entry = this._models.providerRegistry.getOperationModel("embedding", ref);
+        for (const candidate of [entry?.contextWindow, entry?.context]) {
+          if (typeof candidate === "number" && Number.isFinite(candidate) && candidate > 0) return candidate;
+        }
+        return lookupKnown(ref?.provider, ref?.id)?.context ?? null;
+      },
+      ingestionLog: (message) => moduleLog.log(message),
     });
     this._installModelObservability(modelObservability);
     this._inputDrafts = new InputDraftsStore({ lingxiHome: this.lingxiHome });
@@ -685,18 +712,10 @@ export class LingxiEngine {
         this._models.providerRegistry?.allowsMissingApiKey?.(provider, baseUrl) ??
         isLocalBaseUrl(baseUrl),
     });
-    this._modelOperationResolver = new ModelOperationResolver({
-      getOperationModelRef: (operation) => this._configCoord.getSharedModels()?.[operation] || null,
-      resolveOperationModel: (operation, ref) =>
-        this._models.providerRegistry.getOperationModel(operation, ref),
-      resolveProviderCredentialsFresh: (provider) =>
-        this._models.resolveProviderCredentialsFresh(provider),
-      getProviderCredentials: (provider) =>
-        this._models.providerRegistry.getCredentials(provider),
-      allowsMissingApiKey: (provider, baseUrl) =>
-        this._models.providerRegistry?.allowsMissingApiKey?.(provider, baseUrl)
-        ?? isLocalBaseUrl(baseUrl),
-    });
+    this._modelOperationResolver = new ModelOperationResolver(
+      this._modelOperationResolverDeps((operation) =>
+        this._configCoord.getSharedModels()?.[operation] || null),
+    );
 
     this._visionBridge = new VisionBridge({
       resolveVisionConfig: () => this.resolveVisionConfigFresh(),
@@ -759,7 +778,6 @@ export class LingxiEngine {
       persistencePath: path.join(this.lingxiHome, ".ephemeral", "plugin-tasks.json"),
       getSessionIdForPath: (sessionPath) => this.getSessionIdForPath(sessionPath),
     });
-    this._knowledge.attachTaskRegistry(this._taskRegistry);
 
     // subagent AbortController 存储（engine 级别，跨 agent 共享）
     this._subagentControllers = new Map();
@@ -815,10 +833,6 @@ export class LingxiEngine {
         emit: (event, sessionPath) => this._emitEvent(event, sessionPath),
       },
       logger: moduleLog,
-    });
-    this._embeddingClient = new EmbeddingClient({
-      resolveOperationFresh: (operation) => this.resolveModelOperationFresh(operation),
-      getUsageLedger: () => this._usageLedger,
     });
     this._rerankClient = new RerankClient({
       resolveOperationFresh: (operation) => this.resolveModelOperationFresh(operation),
@@ -2098,7 +2112,13 @@ export class LingxiEngine {
   getBridgeMediaPublicBaseUrl() { return this._prefs.getBridgeMediaPublicBaseUrl(); }
   setBridgeMediaPublicBaseUrl(v) { return this._prefs.setBridgeMediaPublicBaseUrl(v); }
   getSharedModels() { return this._configCoord.getSharedModels(); }
-  setSharedModels(p) { return this._configCoord.setSharedModels(p); }
+  setSharedModels(p) {
+    const result = this._configCoord.setSharedModels(p);
+    // 嵌入/重排模型偏好变更的收敛点（preferences 路由唯一入口）：
+    // knowledge_embedding_model 就绪或变化 → 通知知识摄入管线补跑待嵌入 job。
+    this._knowledge?.onModelConfigMayHaveChanged?.();
+    return result;
+  }
   isVisionAuxiliaryEnabled() { return this.getSharedModels()?.vision_enabled === true; }
   getVisionBridge() { return this._visionBridge; }
   _ensureComputerRuntime() {
@@ -2165,73 +2185,6 @@ export class LingxiEngine {
   setSearchConfig(p) { return this._configCoord.setSearchConfig(p); }
   _callApprovalReviewerText(options) { return callText(options); }
 
-  async _generateKnowledgeText(request) {
-    const resolved = await this.resolveAuxiliaryModelFresh("knowledge", {
-      agentId: this.currentAgentId,
-    });
-    if (!resolved?.model || !resolved?.api || !resolved?.baseUrl) {
-      throw new Error("knowledge_model_unavailable");
-    }
-    const callPurposeByOperation = {
-      quick_answer: "knowledge_quick_answer",
-      research_analysis: "knowledge_research_analysis",
-      research_verification: "knowledge_research_verification",
-      claim_build: "knowledge_claim_build",
-      contradiction_check: "knowledge_contradiction_check",
-      final_synthesis: "knowledge_final_synthesis",
-    };
-    const templateByOperation = {
-      quick_answer: "knowledge.quick-answer.system",
-      research_analysis: "knowledge.research-analysis.system",
-      research_verification: "knowledge.research-verification.system",
-      claim_build: "knowledge.claim-build.system",
-      contradiction_check: "knowledge.contradiction-check.system",
-      final_synthesis: "knowledge.final-synthesis.system",
-    };
-    return callText({
-      api: resolved.api,
-      apiKey: resolved.apiKey,
-      baseUrl: resolved.baseUrl,
-      headers: resolved.headers,
-      model: resolved.model,
-      systemPrompt: request.systemPrompt,
-      messages: [{ role: "user", content: request.userPrompt }],
-      temperature: 0,
-      maxTokens: request.operation === "quick_answer" ? 2048 : 32_768,
-      outputPolicy: "bounded",
-      outputBudgetSource: "system",
-      callPurpose: callPurposeByOperation[request.operation] || "knowledge_research_analysis",
-      timeoutMs: request.operation === "quick_answer" ? 240_000 : 240_000,
-      signal: request.signal,
-      usageLedger: resolved.usageLedger,
-      usageContext: {
-        source: {
-          subsystem: "knowledge",
-          operation: request.operation,
-          surface: "knowledge",
-          trigger: "user",
-        },
-        attribution: {
-          kind: "knowledge",
-          agentId: resolved.usageAgentId || this.currentAgentId || null,
-          taskId: request.runId,
-        },
-      },
-      semanticInputProvenance: createSemanticInputProvenance("calltext", [
-        provenanceSection(
-          { root: "systemPrompt", span: { start: 0, end: request.systemPrompt.length } },
-          "task_instruction",
-          { role: "system", source: { type: "template", id: templateByOperation[request.operation] || "knowledge.research.system" } },
-        ),
-        provenanceSection(
-          { root: "messages", path: [0], span: { start: 0, end: request.userPrompt.length } },
-          "task_input",
-          { role: "user", source: { type: "snapshot", id: request.runId } },
-        ),
-      ]),
-    }) as Promise<string>;
-  }
-
   _knowledgeOperationUsageContext(operation, runId) {
     return {
       source: {
@@ -2248,13 +2201,70 @@ export class LingxiEngine {
     };
   }
 
-  async _embedKnowledgeTexts(request) {
-    return this._embeddingClient.embed({
+  /**
+   * ModelOperationResolver 的依赖集（全局偏好路径与按显式引用路径共用）。
+   * getOperationModelRef 是唯一差异：全局路径从 shared models 偏好读，
+   * 知识摄入路径用笔记本解析链给出的显式引用。
+   */
+  _modelOperationResolverDeps(getOperationModelRef) {
+    return {
+      getOperationModelRef,
+      resolveOperationModel: (operation, ref) =>
+        this._models.providerRegistry.getOperationModel(operation, ref),
+      resolveProviderCredentialsFresh: (provider) =>
+        this._models.resolveProviderCredentialsFresh(provider),
+      getProviderCredentials: (provider) =>
+        this._models.providerRegistry.getCredentials(provider),
+      allowsMissingApiKey: (provider, baseUrl) =>
+        this._models.providerRegistry?.allowsMissingApiKey?.(provider, baseUrl)
+        ?? isLocalBaseUrl(baseUrl),
+    };
+  }
+
+  /** 摄入管线用：同步判定显式嵌入模型引用当前是否可解析（模型存在/支持嵌入/凭证就绪）。 */
+  _canResolveKnowledgeEmbeddingRef(ref) {
+    if (!ref?.id || !ref?.provider) return false;
+    try {
+      const resolver = new ModelOperationResolver(this._modelOperationResolverDeps(() => ref));
+      return !!resolver.resolveSync("embedding");
+    } catch {
+      // ModelOperationConfigurationError（模型不存在/不支持/缺凭证）→ 不可解析。
+      return false;
+    }
+  }
+
+  /**
+   * 摄入管线用：按显式模型引用执行嵌入。引用不可解析（未配置/模型缺失/缺凭证）
+   * 返回 null，由 ingestion-service 落显式 pending_embedding；请求级错误
+   * （HTTP 4xx/5xx、超时）照常抛出，走 job 退避重试。
+   */
+  async _embedKnowledgeTextsForModel(request) {
+    const resolver = new ModelOperationResolver(
+      this._modelOperationResolverDeps(() => request?.modelRef || null),
+    );
+    let execution = null;
+    try {
+      execution = await resolver.resolveFresh("embedding");
+    } catch (error) {
+      if (error instanceof ModelOperationConfigurationError) return null;
+      throw error;
+    }
+    if (!execution) return null;
+    const client = new EmbeddingClient({
+      resolveOperationFresh: async () => execution,
+      getUsageLedger: () => this._usageLedger,
+    });
+    // 模型条目声明的维度（如 qwen3-embedding 的 MRL 截断值）与上下文窗口随请求
+    // 下发：维度缺失会拿 provider 原生维度（4096），窗口缺失会让 ollama 按模型
+    // 声明最大值（40960）预分配 KV cache——8B 模型上多占数 GB 内存。
+    const declaredWindow = execution.model?.contextWindow ?? execution.model?.context ?? null;
+    return client.embed({
       texts: request.texts,
       signal: request.signal,
-      // 知识向量化按块批量编码,本地模型(如 ollama 8B)跑完一个来源的全部块
-      // 可能远超操作客户端 30s 默认超时,超时会以 retrieval unavailable 失败整个 run。
+      // 与 _embedKnowledgeTexts 同理：整源批量编码可能远超默认 30s 操作超时。
       timeoutMs: 300_000,
+      dimensions: execution.model?.dimensions ?? undefined,
+      contextWindow: Number.isSafeInteger(declaredWindow) && declaredWindow > 0 ? declaredWindow : undefined,
       usageContext: this._knowledgeOperationUsageContext("embedding", request.runId),
     });
   }
@@ -2268,6 +2278,222 @@ export class LingxiEngine {
       timeoutMs: 120_000,
       usageContext: this._knowledgeOperationUsageContext("rerank", request.runId),
     });
+  }
+
+  /**
+   * 知识查询侧 rerank（v8）：按笔记本解析链给出的显式引用路由执行。
+   * 配置类错误（模型被移出清单/缺凭证/无操作协议）→ 记日志后返回 null，
+   * 检索显式降级为 RRF 名次（与嵌入侧 unresolvable → 纯 FTS 同一语义，
+   * 禁静默降级红线：日志留痕 + 调用方按 null 跳过）；请求级错误照常抛出。
+   */
+  async _rerankKnowledgeTextsForModel(request) {
+    const resolver = new ModelOperationResolver(
+      this._modelOperationResolverDeps(() => request?.modelRef || null),
+    );
+    let execution = null;
+    try {
+      execution = await resolver.resolveFresh("rerank");
+    } catch (error) {
+      if (error instanceof ModelOperationConfigurationError) {
+        moduleLog.log(
+          `knowledge rerank skipped (explicit degradation): ${request?.modelRef?.provider ?? "?"}/${request?.modelRef?.id ?? "?"} — ${error.message}`,
+        );
+        return null;
+      }
+      throw error;
+    }
+    if (!execution) return null;
+    const client = new RerankClient({
+      resolveOperationFresh: async () => execution,
+      getUsageLedger: () => this._usageLedger,
+    });
+    return client.rerank({
+      query: request.query,
+      documents: request.documents,
+      topN: request.topN,
+      signal: request.signal,
+      timeoutMs: 120_000,
+      usageContext: this._knowledgeOperationUsageContext("rerank", request.runId),
+    });
+  }
+
+  /**
+   * Phase 8 知识库引用注入门面：拆解（knowledge 槽位，首次 15s / 纠错重试 8s 超时，
+   * temperature 0）+ retrieveForNotebooks 检索 + 预算裁剪，产出拼进 prompt 的
+   * [KnowledgeContext] 系统侧注入块与本次检索统计（KnowledgeRetrievalStats，
+   * 随投影链透出）。desktop-session-submit 在用户可见投影确定之后消费（注入块
+   * 不进投影）。内部失败（槽位未配/模型超时/检索错误）在块内显式留痕，不抛错、
+   * 不阻断聊天（禁静默降级：降级必须可见）；该路径的 stats 带 unavailableReason。
+   */
+  async buildKnowledgeContextInjection(input: {
+    question: string;
+    knowledgeRefs: { notebookIds: string[]; mode: "qa" | "assist" };
+    /** 动态注入预算（desktop-session-submit 按会话模型解析）；缺省走 injector 兜底。 */
+    budgetTokens?: number;
+    /** 会话路径：携带时蒸馏每批完成广播 knowledge_distill_progress 进度事件。 */
+    sessionPath?: string;
+  }): Promise<{ block: string; stats: KnowledgeRetrievalStats }> {
+    const annotateUnavailable = (reason: string) => ({
+      block: `[KnowledgeContext]\n[knowledge injection unavailable: ${reason}]\n`
+        + `Guidance: Knowledge notebook evidence could not be retrieved for this question.\n[/KnowledgeContext]`,
+      stats: {
+        mode: input.knowledgeRefs.mode,
+        retrievalMode: "none" as const,
+        subQueries: [],
+        subQueryHits: [],
+        degraded: false,
+        fusedChunks: 0,
+        injectedChunks: 0,
+        truncated: false,
+        usedTokens: 0,
+        budgetTokens: input.budgetTokens ?? 0,
+        unavailableReason: reason,
+      },
+    });
+    const knowledge = this._knowledge;
+    const studioId = this._runtimeContext?.studioId;
+    if (!knowledge || !studioId) {
+      return annotateUnavailable("Knowledge is not accessible in this runtime");
+    }
+    try {
+      // 槽位未配置（knowledge 偏好未设）→ 拆解模型为 null，injector 直接单查询并显式标注。
+      // 模型解析放在闭包内：槽位配置错误只降级拆解（单查询 + 留痕），检索照常进行。
+      const slotConfigured = !!this.getSharedModels()?.knowledge;
+      // 分段提炼槽位（knowledgeDistill）：证据总量超注入预算时启用分段压缩；
+      // 未配置 → injector 退回"截断 + 分片清单 + knowledge_read 指引"并留痕。
+      const distillSlotConfigured = !!this.getSharedModels()?.knowledgeDistill;
+      let distillModel = null;
+      // 批预算 = min(目标延迟 10s ÷ 该模型实测吞吐, 窗口/4, 64k)，夹 ≥4k。
+      // 吞吐为每次蒸馏调用实测的 ms/token EMA（按 provider/model 分键）——
+      // 不绑定任何单一模型标定：换模型后首批按 12k 回退起步，完成即自我校准，
+      // 惰性建批让同一场内的后续批次立即用上新估值。与注入预算彻底分离
+      // （复用注入预算曾切出 49.5 万 token/批的多 MB 请求体，2026-08-29 事故）。
+      let distillBatchBudgetTokens: (() => number) | null = null;
+      let distillModelLabel: string | null = null;
+      if (distillSlotConfigured) {
+        let distillWindowBudget = KNOWLEDGE_DISTILL_FALLBACK_BATCH_TOKENS;
+        try {
+          const distillConfig = await this.resolveAuxiliaryModelFresh("knowledgeDistill");
+          const window = Number(distillConfig?.model?.contextWindow);
+          distillModelLabel = `${distillConfig?.model?.provider ?? "?"}/${distillConfig?.model?.id ?? "?"}`;
+          distillWindowBudget = Number.isFinite(window) && window > 0
+            ? Math.min(
+              KNOWLEDGE_DISTILL_MAX_BATCH_TOKENS,
+              Math.max(KNOWLEDGE_DISTILL_MIN_BATCH_TOKENS, Math.floor(window / 4)),
+            )
+            : KNOWLEDGE_DISTILL_FALLBACK_BATCH_TOKENS;
+        } catch {
+          distillWindowBudget = KNOWLEDGE_DISTILL_FALLBACK_BATCH_TOKENS;
+        }
+        const throughputKey = distillModelLabel ?? "knowledgeDistill";
+        distillBatchBudgetTokens = () => {
+          const emaMsPerToken = this._knowledgeDistillThroughput.get(throughputKey);
+          const throughputBudget = emaMsPerToken && emaMsPerToken > 0
+            ? Math.floor(KNOWLEDGE_DISTILL_TARGET_BATCH_MS / emaMsPerToken)
+            : KNOWLEDGE_DISTILL_FALLBACK_BATCH_TOKENS;
+          return Math.max(
+            KNOWLEDGE_DISTILL_MIN_BATCH_TOKENS,
+            Math.min(throughputBudget, distillWindowBudget),
+          );
+        };
+        distillModel = async ({ question, batch, maxOutputChars, correction }) => {
+          const config = await this.resolveAuxiliaryModelFresh("knowledgeDistill");
+          if (!config) throw new Error("knowledgeDistill model slot unavailable");
+          // 超时随批大小线性化：30s 基线 + 1ms/token（预填充实测 ≈0.07ms/token，
+          // 留 ~14 倍余量覆盖生成与排队），上限 180s。
+          const batchTokens = estimateTextTokens(batch);
+          const batchTimeoutMs = Math.min(180_000, 30_000 + batchTokens);
+          const callStartedAt = Date.now();
+          const distilled = await callText({
+            api: config.api,
+            apiKey: config.apiKey,
+            baseUrl: config.baseUrl,
+            headers: config.headers,
+            model: config.model,
+            systemPrompt: KNOWLEDGE_DISTILL_SYSTEM_PROMPT,
+            messages: [{
+              role: "user",
+              content: correction
+                ? `Your previous output was empty and must be corrected.\nError: ${correction.error}\n`
+                  + `Previous output: ${correction.previousOutput}\n\nQuestion: ${question}\n\nEvidence batch:\n${batch}\n\n`
+                  + `Extract only the question-relevant content. Plain text, no fences, at most ${maxOutputChars} characters.`
+                : `Question: ${question}\n\nEvidence batch:\n${batch}\n`
+                  + `Extract only the question-relevant content. Plain text, no fences, at most ${maxOutputChars} characters.`,
+            }],
+            temperature: 0,
+            timeoutMs: batchTimeoutMs,
+          });
+          // 实测吞吐回馈（ms/token EMA，α=0.3）：过短的调用噪声大不采样。
+          const elapsedMs = Date.now() - callStartedAt;
+          if (batchTokens > 0 && elapsedMs >= 200) {
+            const sample = elapsedMs / batchTokens;
+            const previous = this._knowledgeDistillThroughput.get(throughputKey) ?? sample;
+            this._knowledgeDistillThroughput.set(throughputKey, previous * 0.7 + sample * 0.3);
+          }
+          return distilled;
+        };
+      }
+      let decomposeModel = null;
+      if (slotConfigured) {
+        decomposeModel = async ({ question, correction }) => {
+          const config = await this.resolveAuxiliaryModelFresh("knowledge");
+          if (!config) throw new Error("knowledge model slot unavailable");
+          // 显式取 callText 需要的字段（与 approval reviewer 同一模式），
+          // 不整包 spread 归一化附带的 usage 元数据。
+          // 超时阶梯：首次 15s；纠错重试 8s——首次失败已经吃掉一部分预算，
+          // 重试再等 15s 会把最坏阻塞推到 30s，8s 足够返回一个小 JSON 对象。
+          return callText({
+            api: config.api,
+            apiKey: config.apiKey,
+            baseUrl: config.baseUrl,
+            headers: config.headers,
+            model: config.model,
+            systemPrompt: KNOWLEDGE_DECOMPOSE_SYSTEM_PROMPT,
+            messages: [{
+              role: "user",
+              content: correction
+                ? `Your previous output was invalid and must be corrected.\nError: ${correction.error}\n`
+                  + `Previous output: ${correction.previousOutput}\n\nQuestion: ${question}\n`
+                  + "Return the corrected JSON object following the schema. Plain JSON only, no Markdown fences."
+                : `Question: ${question}`,
+            }],
+            temperature: 0,
+            timeoutMs: correction ? 8_000 : 15_000,
+          });
+        };
+      }
+      const { block, stats } = await buildKnowledgeContextInjection({
+        question: input.question,
+        mode: input.knowledgeRefs.mode,
+        ...(input.budgetTokens != null ? { budgetTokens: input.budgetTokens } : {}),
+        deps: {
+          decomposeModel,
+          distillModel,
+          ...(distillBatchBudgetTokens != null ? { distillBatchBudgetTokens } : {}),
+          // 每批蒸馏完成 → ws 广播进度（聊天界面"蒸馏中 · N 批"胶囊）。
+          ...(input.sessionPath && distillModelLabel
+            ? {
+              onDistillProgress: (done: number) => {
+                this.emitEvent({
+                  type: "knowledge_distill_progress",
+                  sessionPath: input.sessionPath!,
+                  done,
+                  model: distillModelLabel!,
+                }, input.sessionPath!);
+              },
+            }
+            : {}),
+          retrieve: ({ query }) => knowledge.queryService.retrieveForNotebooks({
+            studioId,
+            notebookIds: input.knowledgeRefs.notebookIds,
+            question: query,
+          }),
+        },
+      });
+      return { block, stats };
+    } catch (err) {
+      return annotateUnavailable(err instanceof Error ? err.message : String(err));
+    }
   }
 
   // ── Auxiliary Model Resolver (semantic slots) ──
@@ -2743,6 +2969,9 @@ export class LingxiEngine {
   async onProviderChanged() {
     await this._models.reloadAndSync();
     this._sessionCoord.refreshAllSessionsModels();
+    // provider 变更的收敛点（providers 路由/hub/媒体管理都汇到此处）：
+    // 凭证与模型目录变化可能改变嵌入模型可解析性 → 通知知识摄入管线补跑待嵌入 job。
+    this._knowledge?.onModelConfigMayHaveChanged?.();
   }
   getRegistryModelsForProvider(name) { return this._models.getRegistryModelsForProvider(name); }
 
@@ -2823,8 +3052,6 @@ export class LingxiEngine {
     // 预填充 _availableModels，agent init 时需要解析 utility model
     await this._models.refreshAvailable();
     log(`[init] 1/5 AuthStorage + ModelRegistry + ${this._models.availableModels.length} 个模型就绪`);
-    // 先等模型与凭证就绪，再恢复全文研究；恢复方法只登记后台续跑，不阻塞应用启动。
-    await this._knowledge.resumeResearchRuns();
 
     // 2. 初始化所有 agent
     log(`[init] 2/5 初始化所有 agent...`);
@@ -2836,6 +3063,24 @@ export class LingxiEngine {
     // 的 agent 把缺失的 last-read cursor 补进 channels.md，是按成员真相源
     // 重建投影的单一入口，覆盖缺 channels.md 的老 agent。
     await this._channels.repairChannelCursorProjection();
+
+    // 2c. 知识库全局模型偏好迁移（一次性，幂等）。
+    // 全局嵌入/重排配置已退役：读出旧偏好 → 写入所有未单独配置的笔记本列 →
+    // 迁移成功后删除偏好键（先删后写会丢配置，顺序不可颠倒）。
+    // 迁移值与旧解析链会解析出的引用一致，语义零变化，不触发重建。
+    try {
+      const legacyRefs = this._configCoord.peekLegacyKnowledgeModelPrefs();
+      if (legacyRefs.embedding || legacyRefs.rerank) {
+        const result = this._knowledge.migrateLegacyGlobalModelRefs({
+          embeddingModelRef: legacyRefs.embedding,
+          rerankModelRef: legacyRefs.rerank,
+        });
+        this._configCoord.clearLegacyKnowledgeModelPrefs();
+        log(`[init] 2c 知识库全局模型偏好已迁移至 ${result.notebooksUpdated} 个笔记本`);
+      }
+    } catch (err) {
+      log(`[init] 2c 知识库全局模型偏好迁移失败（下次启动重试）: ${err instanceof Error ? err.message : String(err)}`);
+    }
 
     // 3. ResourceLoader + Skills
     log(`[init] 3/5 ResourceLoader 初始化...`);
@@ -3008,6 +3253,20 @@ export class LingxiEngine {
 
     // 10. 文件历史：按各 agent 的工作区根目录建立/同步快照 watcher
     this.refreshFileHistoryWorkspaces();
+
+    // 11. 知识摄入管线（替代 Phase 1 删除的 resumeResearchRuns 点位）：启动恢复
+    // running 残留、接管 queued 存量；模型已于步骤 4 就绪，立即补跑待嵌入 job。
+    // 模型/provider/嵌入偏好的运行期变更经 onProviderChanged / setSharedModels
+    // 两个收敛点通知（见各自注释）。同点位启动 file 源 watcher：扫描全部活跃
+    // file 源建目录级 watch（变化 → 防抖 → refreshFileSource → 自动入队摄入），
+    // 关闭走 engine close → knowledge.close()（先停 watcher 再停摄入）。
+    try {
+      this._knowledge.ingestion.start();
+      this._knowledge.startSourceFileWatcher();
+      this._knowledge.onModelConfigMayHaveChanged();
+    } catch (err) {
+      moduleLog.warn(`[init] knowledge ingestion start failed: ${err?.message}`);
+    }
 
     const totalTime = ((Date.now() - startupTimer) / 1000).toFixed(1);
     log(`✿ 初始化完成（${totalTime}s）`);

@@ -8,6 +8,7 @@ import {
 } from "./desktop-session-submit.ts";
 import { extractLatestTodos } from "../lib/tools/todo-compat.ts";
 import { acquireSessionOperation } from "./session-operation-lock.ts";
+import { compressHistoricalKnowledgeContextMessages } from "./knowledge-history-compressor.ts";
 import { invalidateSessionDerivedStateSync } from "../lib/memory/session-derived-state.ts";
 import {
   isHiddenTurnInputMessage,
@@ -687,6 +688,9 @@ function displayMessageFromUserEnvelope(branch, userEntryId) {
       if (Array.isArray(data.skills)) displayMessage.skills = data.skills;
       if (Array.isArray(data.sessionRefs)) displayMessage.sessionRefs = data.sessionRefs;
       if (Array.isArray(data.agentMentions)) displayMessage.agentMentions = data.agentMentions;
+      if (data.knowledgeRefs) displayMessage.knowledgeRefs = data.knowledgeRefs;
+      // knowledgeRetrieval（检索统计）刻意不复制：retry 重放携带 preservePromptEnvelope，
+      // 不会重新检索，新消息的 stats 只能来自新的注入；旧统计属于被回滚的分支。
       if (data.agentReviewRequest) displayMessage.agentReviewRequest = data.agentReviewRequest;
     } else if (entry.customType === MESSAGE_ORIGIN_RECORD_TYPE) {
       if (data.source) displayMessage.source = data.source;
@@ -856,9 +860,12 @@ function restoreBranchLeaf(session, leafId) {
 
 function replaceAgentMessagesFromBranch(session) {
   const context = session.sessionManager.buildSessionContext();
+  // 分支重建出的全部消息都属于历史轮：知识注入块压缩为编号清单，
+  // 模型需要原文时用 knowledge_read 按 sourceId+ordinal 回查。
+  const { messages } = compressHistoricalKnowledgeContextMessages(context.messages);
   if (session.agent?.replaceMessages) {
-    session.agent.replaceMessages(context.messages);
+    session.agent.replaceMessages(messages);
   } else if (session.agent?.state) {
-    session.agent.state.messages = context.messages;
+    session.agent.state.messages = messages;
   }
 }

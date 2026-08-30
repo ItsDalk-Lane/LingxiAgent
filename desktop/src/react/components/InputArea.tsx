@@ -12,6 +12,7 @@ import { useStore } from '../stores';
 import { HOME_DRAFT_KEY } from '../../../../shared/input-drafts.ts';
 import { selectPreviewItems, selectActiveTabId } from '../stores/preview-slice';
 import { sessionScopedListIncludes, sessionScopedValue } from '../stores/session-slice';
+import { selectKnowledgeRefsForSession } from '../stores/knowledge-reference-slice';
 import { getSessionCompactionMode, isSessionCompacting } from '../stores/context-slice';
 import { selectSessionFiles } from '../stores/selectors/file-refs';
 import { isImageFile, isVideoFile } from '../utils/format';
@@ -433,6 +434,11 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
 
   // Zustand state
   const isStreaming = useStore(s => sessionScopedListIncludes(s, s.streamingSessions, s.currentSessionPath));
+  // 发送即置位的本地「等待助手」态：知识检索/排队期间服务器尚未置 isStreaming，
+  // 用它补齐发送瞬间的运行反馈（停止按钮 / 打字指示器），首个后续事件清除。
+  const isTurnPending = useStore(s => sessionScopedListIncludes(s, s.turnPendingSessions, s.currentSessionPath));
+  // 对输入区而言「会话忙」= 服务器流式或本地等待：按钮/发送门禁按同一语义。
+  const effectiveStreaming = isStreaming || isTurnPending;
   const connected = useStore(s => s.connected);
   const pendingNewSession = useStore(s => s.pendingNewSession);
   const pendingSessionSwitchPath = useStore(s => s.pendingSessionSwitchPath);
@@ -611,6 +617,8 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
   const clearDraft = useStore(s => s.clearDraft);
   // 草稿 key：session 内用 sessionPath（store 内解析为 sessionId）；首页 pending 态用保留键
   const draftKey = currentSessionPath ?? (pendingNewSession ? HOME_DRAFT_KEY : null);
+  // 知识库引用 key 与草稿同规则（会话级隔离；pending 新会话先记在 HOME_DRAFT_KEY 下）
+  const knowledgeRefSessionKey = draftKey;
 
   const prevWelcomeVisibleRef = useRef(welcomeVisible);
   const prevLocaleRef = useRef(locale);
@@ -1475,7 +1483,7 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
   });
   // capabilityRefreshing / compacting：压缩到 reload 完成之间 session 没有可用
   // runtime，此窗口内发 prompt 会冷建第二个 runtime 与 reload 竞争（#1624 I2）。
-  const canSend = hasContent && connected && !isStreaming && !modelSwitching && !pendingSessionSwitchPath && !inputLocked
+  const canSend = hasContent && connected && !effectiveStreaming && !modelSwitching && !pendingSessionSwitchPath && !inputLocked
     && !modelSelectionRequired
     && !capabilityRefreshing && !compacting;
 
@@ -1718,6 +1726,11 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
       : null;
     const clickedAttachedFiles = attachedFiles.map(file => ({ ...file }));
     const clickedQuotes = clickState.quotedSelections.map(quote => ({ ...quote }));
+    // 知识库引用在点击发送时快照（引用持续生效，每条消息显式携带；服务端无状态）
+    const clickedKnowledgeRefKey = clickedSessionPath ?? (clickedPendingDraftId ? HOME_DRAFT_KEY : null);
+    const clickedKnowledgeRefs = clickedKnowledgeRefKey
+      ? selectKnowledgeRefsForSession(clickState, clickedKnowledgeRefKey)
+      : null;
     const clickedDocContextAttached = docContextAttached;
     const clickedDoc = currentDoc ? { ...currentDoc } : null;
     const clickedUiContext = collectUiContext(clickState);
@@ -1756,8 +1769,8 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
       hasDocContext: clickedDocContextAttached,
       hasQuotes: clickedQuotes.length > 0,
     }) || !connected) return;
-    if (type === 'prompt' && isStreaming) return;
-    if (type === 'interject' && !isStreaming) return;
+    if (type === 'prompt' && effectiveStreaming) return;
+    if (type === 'interject' && !effectiveStreaming) return;
     if (sending) return;
     if (modelSwitching) return;
     if (useStore.getState().pendingSessionSwitchPath) return;
@@ -1799,6 +1812,16 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
           return;
         }
         loadSessions();
+        // pending 首页占位落成真实会话：知识库引用从 HOME_DRAFT_KEY 迁移到新会话，
+        // 保持「引用持续生效直到手动取消」语义。
+        if (clickedKnowledgeRefs && clickedKnowledgeRefs.notebookIds.length > 0) {
+          const refsState = useStore.getState();
+          refsState.clearKnowledgeReferences(HOME_DRAFT_KEY);
+          for (const notebookId of clickedKnowledgeRefs.notebookIds) {
+            refsState.toggleKnowledgeNotebook(sessionRef.sessionPath, notebookId, clickedKnowledgeRefs.notebookNames[notebookId]);
+          }
+          refsState.setKnowledgeReferenceMode(sessionRef.sessionPath, clickedKnowledgeRefs.mode);
+        }
       }
       if (!sessionRef) {
         // 走到这里说明既不是 pending 新会话、也没有已激活会话身份——同样是无法发送，显式报错而非静默 return。
@@ -2003,6 +2026,17 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
         quotedText: quotes.length > 0 ? quotes.map(q => q.text).join('\n\n') : undefined,
         sessionRefs: sessionRefs.length > 0 ? sessionRefs : undefined,
         agentMentions: agentMentions.length > 0 ? agentMentions : undefined,
+        // 消息投影用的知识库引用（含名称缓存，仅展示；功能字段走 wsMsg.knowledgeRefs）
+        knowledgeRefs: clickedKnowledgeRefs && clickedKnowledgeRefs.notebookIds.length > 0
+          ? {
+            notebookIds: clickedKnowledgeRefs.notebookIds,
+            mode: clickedKnowledgeRefs.mode,
+            notebooks: clickedKnowledgeRefs.notebookIds.map(id => ({
+              id,
+              name: clickedKnowledgeRefs.notebookNames[id],
+            })),
+          }
+          : undefined,
         attachments: allFiles.length > 0 ? allFiles.map(f => {
           const cached = imageBase64Map.get(f.path);
           const cachedVideo = videoBase64Map.get(f.path);
@@ -2029,6 +2063,7 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
         attachments: displayMessage.attachments,
         quotedText: displayMessage.quotedText,
         skills: displayMessage.skills,
+        knowledgeRefs: displayMessage.knowledgeRefs,
         sendStatus: 'pending',
         agentReview: agentMentions.length === 1 ? {
           status: 'running',
@@ -2054,6 +2089,12 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
       if (skills.length > 0) wsMsg.skills = skills;
       if (sessionRefs.length > 0) wsMsg.sessionRefs = sessionRefs;
       if (agentMentions.length > 0) wsMsg.agentReviewRequests = agentMentions;
+      if (clickedKnowledgeRefs && clickedKnowledgeRefs.notebookIds.length > 0) {
+        wsMsg.knowledgeRefs = {
+          notebookIds: clickedKnowledgeRefs.notebookIds,
+          mode: clickedKnowledgeRefs.mode,
+        };
+      }
       if (!ws) {
         useStore.getState().markOptimisticUserMessageFailed(
           sessionPathForSend,
@@ -2064,6 +2105,20 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
       }
       try {
         ws.send(JSON.stringify(wsMsg));
+        // 发送即进入「等待助手」态：服务器在知识检索/排队期间不置 isStreaming，
+        // 本地先亮 typing 指示器，首个该 session 的后续事件（status / 流事件 /
+        // error）到达即清（见 ws-message-handler 顶部保守清除）。仅限 prompt——
+        // interject 发生在流式态中，指示器已由 isStreaming 覆盖。
+        if (type === 'prompt') {
+          useStore.getState().beginTurnPending?.(sessionPathForSend);
+          // 携带知识库引用的提问：发送瞬间本地点亮「知识库检索中」——服务器在
+          // 检索/蒸馏期间不发任何流事件，此前这段时间只剩裸三点指示器（用户
+          // 完全看不到动作）。本地置位与服务器 knowledge_retrieval_started 幂等
+          // 合流，清除沿用顶部保守清除。
+          if (wsMsg.knowledgeRefs) {
+            useStore.getState().beginKnowledgeRetrieval?.(sessionPathForSend);
+          }
+        }
         upsertOptimisticSessionFirstMessage(sessionPathForSend, text, new Date().toISOString());
       } catch (err) {
         const message = err instanceof Error ? err.message : String(err);
@@ -2073,7 +2128,7 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
     } finally {
       setSending(false);
     }
-  }, [addToast, editor, inputLocked, attachedFiles, docContextAttached, connected, isStreaming, sending, currentDoc, clearAttachedFiles, clearAttachedFilesForSession, clearDraft, setDocContextAttached, slashCommands, slashSelected, handleSlashSelect, supportsVision, currentModelInfo, loadVisionAuxiliaryConfig, modelSwitching, t]);
+  }, [addToast, editor, inputLocked, attachedFiles, docContextAttached, connected, effectiveStreaming, sending, currentDoc, clearAttachedFiles, clearAttachedFilesForSession, clearDraft, setDocContextAttached, slashCommands, slashSelected, handleSlashSelect, supportsVision, currentModelInfo, loadVisionAuxiliaryConfig, modelSwitching, t]);
 
   const handleSend = useCallback(async () => {
     await submitEditorMessage('prompt');
@@ -2087,7 +2142,7 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
   // ── Stop ──
   const handleStop = useCallback(() => {
     const ws = getWebSocket();
-    if (!isStreaming || !ws) return;
+    if (!effectiveStreaming || !ws) return;
     const state = useStore.getState();
     const path = state.currentSessionPath;
     const sessionId = state.currentSessionId;
@@ -2095,7 +2150,7 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
     const request = createStopRequest({ sessionId, sessionPath: path, streamId: active?.streamId });
     if (!request) return;
     ws.send(JSON.stringify(request));
-  }, [isStreaming]);
+  }, [effectiveStreaming]);
 
   // ── Key handler ──
   const handleEditorKeyDown = useCallback((e: InputKeyEvent): boolean => {
@@ -2153,7 +2208,7 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
     }
     if (e.key === 'Enter' && !e.shiftKey && !isComposing.current && !e.isComposing) {
       e.preventDefault();
-      if (isStreaming && hasContent) handleSteer(); else handleSend();
+      if (effectiveStreaming && hasContent) handleSteer(); else handleSend();
       return true;
     }
     return false;
@@ -2170,7 +2225,7 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
     handleSend,
     handleSteer,
     handleSlashSelect,
-    isStreaming,
+    effectiveStreaming,
     hasContent,
     inputLocked,
     slashMenuOpen,
@@ -2225,6 +2280,7 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
         attachedFiles={attachedFiles}
         removeAttachedFile={removeAttachedFile}
         hasQuotedSelection={quotedSelections.length > 0}
+        knowledgeRefSessionKey={knowledgeRefSessionKey}
       />
       <InputStatusBars
         slashBusy={slashBusy}
@@ -2293,9 +2349,9 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
           </div>
           <div className={styles['input-card-footer']}>
             <SendButton
-              isStreaming={isStreaming}
+              isStreaming={effectiveStreaming}
               hasInput={hasContent}
-              disabled={isStreaming ? false : !canSend}
+              disabled={effectiveStreaming ? false : !canSend}
               onSend={handleSend}
               onSteer={handleSteer}
               onStop={handleStop}
@@ -2362,6 +2418,7 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
           onAttach={handleAttach}
           slashBtnRef={slashBtnRef}
           onSlashToggle={handleSlashToggle}
+          knowledgeRefSessionKey={knowledgeRefSessionKey}
           permissionMode={permissionMode}
           onPermissionModeChange={setPermissionMode}
           planModeLocked={inputLocked}

@@ -2,55 +2,93 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useStore } from '../../stores';
 import {
   createKnowledgeNotebook,
-  cancelKnowledgeResearch,
   deleteKnowledgeNotebook,
-  getKnowledgeResearchReport,
-  getKnowledgeResearchRun,
   importKnowledgeFileSource,
   importKnowledgePastedText,
   importKnowledgeWebSnapshot,
   knowledgeSnapshotContentUrl,
-  listActiveKnowledgeResearchRuns,
   listKnowledgeBlocks,
+  listKnowledgeChunks,
+  listKnowledgeIngestion,
   listKnowledgeNotebooks,
   listKnowledgeSources,
+  reingestKnowledgeSource,
   removeKnowledgeSource,
   refreshKnowledgeSource,
   renameKnowledgeNotebook,
-  resolveKnowledgeCitation,
-  runKnowledgeQuickAnswer,
-  runKnowledgeResearch,
+  type KnowledgeChunkDto,
   type KnowledgeBlockDto,
+  type KnowledgeIngestionJobDto,
   type KnowledgeNotebookDto,
-  type KnowledgeParseStatusDto,
-  type KnowledgeQueryResultDto,
-  type KnowledgeResearchReportResultDto,
-  type KnowledgeResearchRunDto,
-  type KnowledgeResearchRunResultDto,
-  type KnowledgeResolvedCitationDto,
   type KnowledgeSourceEntryDto,
 } from './knowledge-api';
+import { NotebookSettingsDialog } from './NotebookSettingsDialog';
+import { Overlay } from '../../ui';
 import styles from './KnowledgePage.module.css';
 
 const tr = (key: string, vars?: Record<string, string | number>) => window.t?.(key, vars) ?? key;
 
-function parseStatusLabel(status: KnowledgeParseStatusDto | undefined): string {
-  switch (status) {
-    case 'parsing': return tr('knowledge.statusParsing');
-    case 'ready': return tr('knowledge.statusReady');
-    case 'needs_ocr': return tr('knowledge.statusNeedsOcr');
-    case 'failed': return tr('knowledge.statusFailed');
-    default: return tr('knowledge.statusParsing');
+/** 源行唯一徽章的展示信息：label + 配色（复用解析状态配色语义）。 */
+interface SourceBadgeInfo {
+  label: string;
+  className: string;
+  title?: string;
+}
+
+/**
+ * 摄入徽章文案：由最新 ingestion job 驱动 —— done=已就绪；running 按 phase 细分
+ * （embed 带进度 done/total）；queued/pending_embedding/failed 是显式状态；
+ * 无 job 且该笔记本摄入数据已加载 = untracked 源 → 「待摄入」（muted）。
+ */
+function sourceBadgeInfo(job: KnowledgeIngestionJobDto | null, ingestionLoaded: boolean): SourceBadgeInfo | null {
+  if (!job) {
+    return ingestionLoaded ? { label: tr('knowledge.statusPendingIngestion'), className: '' } : null;
   }
+  if (job.status === 'done') return { label: tr('knowledge.statusReady'), className: 'ready' };
+  if (job.status === 'pending_embedding') {
+    return { label: tr('knowledge.ingestionPendingEmbedding'), className: '', title: tr('knowledge.pendingEmbeddingHint') };
+  }
+  if (job.status === 'failed') {
+    return { label: tr('knowledge.ingestionFailed'), className: 'failed', title: job.error || undefined };
+  }
+  if (job.status === 'queued') return { label: tr('knowledge.ingestionQueued'), className: 'parsing' };
+  if (job.status === 'running') {
+    if (job.phase === 'embed') {
+      const label = typeof job.progressTotal === 'number' && job.progressTotal > 0
+        ? tr('knowledge.ingestionEmbedProgress', { done: job.progressDone ?? 0, total: job.progressTotal })
+        : tr('knowledge.ingestionEmbed');
+      return { label, className: 'parsing' };
+    }
+    switch (job.phase) {
+      case 'parse': return { label: tr('knowledge.ingestionProcessingParse'), className: 'parsing' };
+      case 'chunk': return { label: tr('knowledge.ingestionProcessingChunk'), className: 'parsing' };
+      case 'fts_index': return { label: tr('knowledge.ingestionProcessingIndex'), className: 'parsing' };
+      default: return { label: tr('knowledge.ingestionQueued'), className: 'parsing' };
+    }
+  }
+  return null;
 }
 
-function researchStateLabel(state: KnowledgeResearchRunDto['state']): string {
-  const suffix = state.split('_').map(part => part.charAt(0).toUpperCase() + part.slice(1)).join('');
-  return tr(`knowledge.researchState${suffix}`);
+/** embed 阶段细进度条的比例（0–1）；非 embed 运行态或无 total 时为 null。 */
+function embedProgressRatio(job: KnowledgeIngestionJobDto | null): number | null {
+  if (!job || job.status !== 'running' || job.phase !== 'embed') return null;
+  if (typeof job.progressTotal !== 'number' || job.progressTotal <= 0) return null;
+  return Math.min(1, Math.max(0, (job.progressDone ?? 0) / job.progressTotal));
 }
 
-function researchIsTerminal(state: KnowledgeResearchRunDto['state']): boolean {
-  return ['completed', 'partial', 'failed', 'canceled'].includes(state);
+/** 笔记本就绪汇总后缀：只列非零的异常/进行中项（徽章级摘要）。 */
+function readinessSuffix(notebook: KnowledgeNotebookDto): string {
+  const parts: string[] = [];
+  if (notebook.ingestion.processing > 0) {
+    parts.push(tr('knowledge.readinessProcessing', { count: notebook.ingestion.processing }));
+  }
+  if (notebook.ingestion.pendingEmbedding > 0) {
+    parts.push(tr('knowledge.readinessPendingEmbedding', { count: notebook.ingestion.pendingEmbedding }));
+  }
+  if (notebook.ingestion.failed > 0) {
+    parts.push(tr('knowledge.readinessFailed', { count: notebook.ingestion.failed }));
+  }
+  return parts.length > 0 ? ` · ${parts.join(' · ')}` : '';
 }
 
 function formatBytes(bytes: number): string {
@@ -76,10 +114,11 @@ function locatorLabel(block: KnowledgeBlockDto): string {
   return tr('knowledge.paragraphNumber', { number: block.ordinal + 1 });
 }
 
-interface CitationHighlight {
-  blockId: string;
-  startOffset: number;
-  endOffset: number;
+/** 分块卡片定位：heading 面包屑优先，其次页码；都没有时返回 null。 */
+function chunkLocatorLabel(chunk: KnowledgeChunkDto): string | null {
+  if (chunk.headingPath && chunk.headingPath.length > 0) return chunk.headingPath.join(' / ');
+  if (typeof chunk.pageNumber === 'number') return tr('knowledge.pageNumber', { number: chunk.pageNumber });
+  return null;
 }
 
 interface SourceViewerProps {
@@ -87,30 +126,10 @@ interface SourceViewerProps {
   blocks: KnowledgeBlockDto[];
   loading: boolean;
   error: string | null;
-  highlight?: CitationHighlight | null;
   onClose: () => void;
 }
 
-function BlockText({ block, highlight }: { block: KnowledgeBlockDto; highlight?: CitationHighlight | null }) {
-  if (
-    !highlight
-    || highlight.blockId !== block.id
-    || highlight.startOffset < 0
-    || highlight.endOffset <= highlight.startOffset
-    || highlight.endOffset > block.text.length
-  ) {
-    return <>{block.text}</>;
-  }
-  return (
-    <>
-      {block.text.slice(0, highlight.startOffset)}
-      <mark className={styles.citationHighlight}>{block.text.slice(highlight.startOffset, highlight.endOffset)}</mark>
-      {block.text.slice(highlight.endOffset)}
-    </>
-  );
-}
-
-function SourceViewer({ entry, blocks, loading, error, highlight, onClose }: SourceViewerProps) {
+function SourceViewer({ entry, blocks, loading, error, onClose }: SourceViewerProps) {
   const [selectedPdfPage, setSelectedPdfPage] = useState(1);
   const isPdf = entry.snapshot.mimeType === 'application/pdf';
   const pdfUrl = useMemo(() => {
@@ -141,9 +160,6 @@ function SourceViewer({ entry, blocks, loading, error, highlight, onClose }: Sou
             )}
           </div>
         </div>
-        <span className={`${styles.status} ${styles[entry.parseArtifact?.status || 'parsing']}`}>
-          {parseStatusLabel(entry.parseArtifact?.status)}
-        </span>
       </header>
 
       {entry.parseArtifact?.status === 'needs_ocr' && (
@@ -178,7 +194,7 @@ function SourceViewer({ entry, blocks, loading, error, highlight, onClose }: Sou
               }}
             >
               <span className={styles.blockLocator}>{locatorLabel(block)}</span>
-              <span className={styles.blockText}><BlockText block={block} highlight={highlight} /></span>
+              <span className={styles.blockText}>{block.text}</span>
             </button>
           ))}
         </div>
@@ -187,36 +203,82 @@ function SourceViewer({ entry, blocks, loading, error, highlight, onClose }: Sou
   );
 }
 
-function AnswerText({
-  text,
-  result,
-  onOpenCitation,
-}: {
-  text: string;
-  result: KnowledgeQueryResultDto;
-  onOpenCitation: (citationId: string) => void;
-}) {
-  const citationByMarker = new Map(
-    result.run.citations.map(citation => [citation.marker, citation.citationId]),
-  );
+interface ChunkViewerProps {
+  entry: Pick<KnowledgeSourceEntryDto, 'source'>;
+  chunks: KnowledgeChunkDto[];
+  loading: boolean;
+  error: string | null;
+  onClose: () => void;
+  onOpenChunk: (chunk: KnowledgeChunkDto) => void;
+}
+
+/** 分块内容视图：卡片网格（#ordinal + 定位 + 预览），点击卡片弹出全文详情层。 */
+function ChunkViewer({ entry, chunks, loading, error, onClose, onOpenChunk }: ChunkViewerProps) {
   return (
-    <div className={styles.answerText}>
-      {text.split(/(\[[1-9][0-9]*\])/gu).map((part, index) => {
-        const match = /^\[([1-9][0-9]*)\]$/u.exec(part);
-        const citationId = match ? citationByMarker.get(Number(match[1])) : null;
-        if (!match || !citationId) return <span key={`${index}-${part}`}>{part}</span>;
-        return (
-          <button
-            key={`${index}-${part}`}
-            className={styles.inlineCitation}
-            onClick={() => onOpenCitation(citationId)}
-            aria-label={tr('knowledge.openCitation', { number: Number(match[1]) })}
-          >
-            {part}
+    <section className={styles.viewer} aria-label={tr('knowledge.chunkViewer')}>
+      <header className={styles.viewerHeader}>
+        <div className={styles.viewerTitleWrap}>
+          <button className={styles.backButton} onClick={onClose} aria-label={tr('knowledge.closeViewer')}>←</button>
+          <div>
+            <h2>{entry.source.displayName}</h2>
+            <p>{tr('knowledge.chunkCount', { count: chunks.length })}</p>
+          </div>
+        </div>
+      </header>
+
+      {error && <div className={styles.errorNotice}>{error}</div>}
+
+      <div className={styles.chunkGrid} aria-busy={loading}>
+        {loading && <div className={styles.centerMessage}>{tr('knowledge.loading')}</div>}
+        {!loading && !error && chunks.length === 0 && (
+          <div className={styles.centerMessage}>{tr('knowledge.noChunks')}</div>
+        )}
+        {chunks.map(chunk => (
+          <button key={chunk.id} className={styles.chunkCard} onClick={() => onOpenChunk(chunk)}>
+            <span className={styles.chunkCardMeta}>
+              <span className={styles.chunkOrdinal}>#{chunk.ordinal}</span>
+              {chunkLocatorLabel(chunk) && (
+                <span className={styles.chunkLocator} title={chunkLocatorLabel(chunk) ?? undefined}>
+                  {chunkLocatorLabel(chunk)}
+                </span>
+              )}
+            </span>
+            <span className={styles.chunkPreview}>
+              {chunk.text.length > 200 ? `${chunk.text.slice(0, 200)}…` : chunk.text}
+            </span>
           </button>
-        );
-      })}
-    </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+/** 分块详情弹层：全文 + 定位信息 + token/字符数（仿 NotebookSettingsDialog 的 Overlay 模式）。 */
+function ChunkDetailDialog({ chunk, onClose }: { chunk: KnowledgeChunkDto; onClose: () => void }) {
+  const closeRef = useRef<HTMLButtonElement>(null);
+  const locator = chunkLocatorLabel(chunk);
+  return (
+    <Overlay
+      open
+      scope="window"
+      onClose={onClose}
+      className={styles.chunkDialog}
+      initialFocusRef={closeRef}
+      contentProps={{ role: 'dialog', 'aria-modal': true }}
+    >
+      <header className={styles.chunkDialogHeader}>
+        <h2 className={styles.chunkDialogTitle}>{tr('knowledge.chunkDetailTitle', { ordinal: chunk.ordinal })}</h2>
+        <button ref={closeRef} className={styles.iconButton} onClick={onClose} aria-label={tr('common.close')}>×</button>
+      </header>
+      <div className={styles.chunkDialogMeta}>
+        {locator && <span>{locator}</span>}
+        <span>{tr('knowledge.chunkTokenCount', { count: chunk.tokenCount })}</span>
+        <span>{tr('knowledge.chunkCharCount', { count: chunk.charCount })}</span>
+      </div>
+      <div className={styles.chunkDialogBody}>
+        <pre className={styles.chunkDialogText}>{chunk.text}</pre>
+      </div>
+    </Overlay>
   );
 }
 
@@ -224,7 +286,6 @@ export function KnowledgePage() {
   const addToast = useStore(state => state.addToast);
   const [notebooks, setNotebooks] = useState<KnowledgeNotebookDto[]>([]);
   const [selectedNotebookId, setSelectedNotebookId] = useState<string | null>(null);
-  const [scopeIds, setScopeIds] = useState<string[]>([]);
   const [sources, setSources] = useState<KnowledgeSourceEntryDto[]>([]);
   const [selectedSourceId, setSelectedSourceId] = useState<string | null>(null);
   const [blocks, setBlocks] = useState<KnowledgeBlockDto[]>([]);
@@ -243,25 +304,31 @@ export function KnowledgePage() {
   const [sourceDraftName, setSourceDraftName] = useState('');
   const [sourceDraftValue, setSourceDraftValue] = useState('');
   const [refreshingSourceId, setRefreshingSourceId] = useState<string | null>(null);
-  const [showScopePicker, setShowScopePicker] = useState(false);
-  const [mode, setMode] = useState<'quick' | 'research'>('quick');
-  const [question, setQuestion] = useState('');
-  const [asking, setAsking] = useState(false);
-  const [queryResult, setQueryResult] = useState<KnowledgeQueryResultDto | null>(null);
-  const [researchResult, setResearchResult] = useState<KnowledgeResearchRunResultDto | null>(null);
-  const [researchReport, setResearchReport] = useState<KnowledgeResearchReportResultDto | null>(null);
-  const [resolvedCitation, setResolvedCitation] = useState<KnowledgeResolvedCitationDto | null>(null);
-  const userStartedQuery = useRef(false);
+  const [ingestionJobs, setIngestionJobs] = useState<KnowledgeIngestionJobDto[]>([]);
+  const [ingestionRefreshKey, setIngestionRefreshKey] = useState(0);
+  /** 摄入 job 列表已成功拉取的笔记本：只有该笔记本的「无 job」才判为 untracked（待摄入）。 */
+  const [ingestionLoadedNotebookId, setIngestionLoadedNotebookId] = useState<string | null>(null);
+  const [settingsNotebookId, setSettingsNotebookId] = useState<string | null>(null);
+  const [sourceMenuFor, setSourceMenuFor] = useState<string | null>(null);
+  const [sourceViewMode, setSourceViewMode] = useState<'preview' | 'chunks'>('preview');
+  const [chunks, setChunks] = useState<KnowledgeChunkDto[]>([]);
+  const [loadingChunks, setLoadingChunks] = useState(false);
+  const [chunksError, setChunksError] = useState<string | null>(null);
+  const [chunkDetail, setChunkDetail] = useState<KnowledgeChunkDto | null>(null);
+  const sourceMenuRowRef = useRef<HTMLDivElement | null>(null);
 
   const selectedNotebook = notebooks.find(item => item.id === selectedNotebookId) ?? null;
   const selectedSource = sources.find(item => item.source.id === selectedSourceId) ?? null;
-  const viewerEntry = resolvedCitation || selectedSource;
-  const viewerBlocks = resolvedCitation ? [resolvedCitation.block] : blocks;
-  const citationHighlight = resolvedCitation ? {
-    blockId: resolvedCitation.citation.blockId,
-    startOffset: resolvedCitation.citation.startOffset,
-    endOffset: resolvedCitation.citation.endOffset,
-  } : null;
+  const settingsNotebook = notebooks.find(item => item.id === settingsNotebookId) ?? null;
+
+  // API 按 created_at 倒序返回：每个源的第一条即最新 job。
+  const latestJobBySource = useMemo(() => {
+    const map = new Map<string, KnowledgeIngestionJobDto>();
+    for (const job of ingestionJobs) {
+      if (!map.has(job.sourceId)) map.set(job.sourceId, job);
+    }
+    return map;
+  }, [ingestionJobs]);
 
   const refreshNotebooks = useCallback(async (preferredId?: string | null) => {
     const loaded = await listKnowledgeNotebooks();
@@ -293,30 +360,11 @@ export function KnowledgePage() {
   }, []);
 
   useEffect(() => {
-    let active = true;
-    listActiveKnowledgeResearchRuns()
-      .then(runs => {
-        if (!active || userStartedQuery.current || runs.length === 0) return;
-        const recovered = runs[0];
-        setMode('research');
-        setQuestion(recovered.run.question);
-        setScopeIds(recovered.scope.notebooks.map(notebook => notebook.notebookId));
-        setResearchResult(recovered);
-        setAsking(true);
-      })
-      .catch(error => {
-        if (active) setPageError(error instanceof Error ? error.message : tr('knowledge.resumeLoadFailed'));
-      });
-    return () => { active = false; };
-  }, []);
-
-  useEffect(() => {
     if (!selectedNotebookId) {
       setSources([]);
       setSelectedSourceId(null);
       return;
     }
-    setScopeIds(current => current.includes(selectedNotebookId) ? current : [...current, selectedNotebookId]);
     let active = true;
     setLoadingSources(true);
     setSelectedSourceId(null);
@@ -336,7 +384,7 @@ export function KnowledgePage() {
 
   useEffect(() => {
     const artifact = selectedSource?.parseArtifact;
-    if (!artifact || artifact.status !== 'ready') {
+    if (!artifact || artifact.status !== 'ready' || sourceViewMode !== 'preview') {
       setBlocks([]);
       return;
     }
@@ -354,55 +402,53 @@ export function KnowledgePage() {
         if (active) setLoadingBlocks(false);
       });
     return () => { active = false; };
-  }, [selectedSource?.parseArtifact, selectedSource?.source.id]);
+  }, [selectedSource?.parseArtifact, selectedSource?.source.id, sourceViewMode]);
 
-  const activeResearchRunId = researchResult && !researchIsTerminal(researchResult.research.state)
-    ? researchResult.run.id
-    : null;
-
+  // 分块内容视图：仅 chunks 模式且 parse ready 时拉取（未 ready 由菜单入口禁用兜底）。
   useEffect(() => {
-    if (!activeResearchRunId) return;
+    const artifact = selectedSource?.parseArtifact;
+    if (sourceViewMode !== 'chunks' || !artifact || artifact.status !== 'ready') {
+      setChunks([]);
+      return;
+    }
     let active = true;
-    let timer: ReturnType<typeof setTimeout> | null = null;
-    const poll = async () => {
-      try {
-        const result = await getKnowledgeResearchRun(activeResearchRunId);
-        if (!active) return;
-        if (result.research.state === 'completed') {
-          try {
-            const report = await getKnowledgeResearchReport(activeResearchRunId);
-            if (!active) return;
-            setResearchResult(result);
-            setResearchReport(report);
-            setAsking(false);
-          } catch (error) {
-            if (!active) return;
-            setResearchResult(result);
-            setAsking(false);
-            setPageError(error instanceof Error ? error.message : tr('knowledge.queryFailed'));
-          }
-          return;
-        }
-        setResearchResult(result);
-        if (researchIsTerminal(result.research.state)) {
-          setAsking(false);
-          if (result.research.state === 'partial') setPageError(tr('knowledge.researchPartialHint'));
-          if (result.research.state === 'failed') setPageError(tr('knowledge.researchFailedHint'));
-          return;
-        }
-        timer = setTimeout(() => void poll(), 750);
-      } catch (error) {
-        if (!active) return;
-        setAsking(false);
-        setPageError(error instanceof Error ? error.message : tr('knowledge.queryFailed'));
-      }
+    setLoadingChunks(true);
+    setChunksError(null);
+    listKnowledgeChunks(artifact.id)
+      .then(loaded => {
+        if (active) setChunks(loaded.chunks);
+      })
+      .catch(error => {
+        if (active) setChunksError(error instanceof Error ? error.message : tr('knowledge.loadFailed'));
+      })
+      .finally(() => {
+        if (active) setLoadingChunks(false);
+      });
+    return () => { active = false; };
+  }, [selectedSource?.parseArtifact, selectedSource?.source.id, sourceViewMode]);
+
+  // 源行操作菜单：外点关闭 + Escape（仿 KnowledgeReferenceButton 的 rootRef 模式）。
+  useEffect(() => {
+    if (!sourceMenuFor) return;
+    const onMouseDown = (e: MouseEvent) => {
+      if (sourceMenuRowRef.current && !sourceMenuRowRef.current.contains(e.target as Node)) setSourceMenuFor(null);
     };
-    timer = setTimeout(() => void poll(), 100);
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setSourceMenuFor(null);
+    };
+    document.addEventListener('mousedown', onMouseDown);
+    document.addEventListener('keydown', onKeyDown);
     return () => {
-      active = false;
-      if (timer) clearTimeout(timer);
+      document.removeEventListener('mousedown', onMouseDown);
+      document.removeEventListener('keydown', onKeyDown);
     };
-  }, [activeResearchRunId]);
+  }, [sourceMenuFor]);
+
+  const openSourceView = useCallback((entry: KnowledgeSourceEntryDto, mode: 'preview' | 'chunks') => {
+    setSourceMenuFor(null);
+    setSourceViewMode(mode);
+    setSelectedSourceId(entry.source.id);
+  }, []);
 
   const handleCreate = async () => {
     const name = newName.trim();
@@ -434,7 +480,6 @@ export function KnowledgePage() {
     if (!window.confirm(tr('knowledge.deleteNotebookConfirm', { name: notebook.name }))) return;
     try {
       await deleteKnowledgeNotebook(notebook.id);
-      setScopeIds(current => current.filter(id => id !== notebook.id));
       await refreshNotebooks(null);
     } catch (error) {
       addToast(error instanceof Error ? error.message : tr('knowledge.saveFailed'), 'error');
@@ -446,6 +491,49 @@ export function KnowledgePage() {
     const loaded = await listKnowledgeSources(selectedNotebookId);
     setSources(loaded);
   }, [selectedNotebookId]);
+
+  // 摄入状态：进入笔记本/导入/刷新/重试/设置保存后拉一次；有活跃 job（queued/running）
+  // 时才持续轮询，全部落终态后刷新来源与就绪汇总并停止轮询。
+  useEffect(() => {
+    if (!selectedNotebookId) {
+      setIngestionJobs([]);
+      return;
+    }
+    let active = true;
+    let timer: ReturnType<typeof setInterval> | null = null;
+    let hadActive = false;
+    const tick = async () => {
+      try {
+        const state = await listKnowledgeIngestion({ notebookId: selectedNotebookId });
+        if (!active) return;
+        setIngestionJobs(state.jobs);
+        setIngestionLoadedNotebookId(selectedNotebookId);
+        const hasActive = state.jobs.some(job => job.status === 'queued' || job.status === 'running');
+        if (hasActive && !timer) {
+          timer = setInterval(() => { void tick(); }, 2000);
+        } else if (!hasActive && timer) {
+          clearInterval(timer);
+          timer = null;
+        }
+        // 活跃 job 期间同步刷就绪汇总，页头/引用菜单的 ingestion 摘要不再陈旧。
+        if (hasActive) {
+          void refreshNotebooks(selectedNotebookId);
+        }
+        if (hadActive && !hasActive) {
+          void refreshSources();
+          void refreshNotebooks(selectedNotebookId);
+        }
+        hadActive = hasActive;
+      } catch {
+        // 轮询失败不打断页面；若仍有活跃 job，下个周期自动重试。
+      }
+    };
+    void tick();
+    return () => {
+      active = false;
+      if (timer) clearInterval(timer);
+    };
+  }, [selectedNotebookId, ingestionRefreshKey, refreshSources, refreshNotebooks]);
 
   const handleImportFiles = async () => {
     if (!selectedNotebookId || !window.platform?.selectFiles) {
@@ -466,6 +554,8 @@ export function KnowledgePage() {
           // 单个来源失败不阻断其余来源，最终只汇报数量，避免泄露本机路径。
         }
       }
+      // 先触发摄入轮询再刷源列表：导入返回时 job 已入队，避免新源短暂显示「待摄入」。
+      setIngestionRefreshKey(key => key + 1);
       await refreshSources();
       if (successCount === filePaths.length) {
         addToast(tr('knowledge.importSuccess', { count: successCount }), 'success');
@@ -507,6 +597,7 @@ export function KnowledgePage() {
         });
       }
       resetSourceDraft();
+      setIngestionRefreshKey(key => key + 1);
       await refreshSources();
       addToast(tr('knowledge.importSuccess', { count: 1 }), 'success');
     } catch (error) {
@@ -533,6 +624,7 @@ export function KnowledgePage() {
     setRefreshingSourceId(entry.source.id);
     try {
       const refreshed = await refreshKnowledgeSource(selectedNotebookId, entry.source.id);
+      setIngestionRefreshKey(key => key + 1);
       await refreshSources();
       addToast(
         refreshed.changed ? tr('knowledge.refreshSourceChanged') : tr('knowledge.refreshSourceUnchanged'),
@@ -545,75 +637,24 @@ export function KnowledgePage() {
     }
   };
 
-  const handleAsk = async () => {
-    const normalizedQuestion = question.trim();
-    if (!normalizedQuestion || scopeIds.length === 0 || asking) return;
-    userStartedQuery.current = true;
-    setAsking(true);
-    setPageError(null);
-    setSelectedSourceId(null);
-    setResolvedCitation(null);
-    setResearchReport(null);
+  const handleReingest = async (entry: KnowledgeSourceEntryDto) => {
+    if (!selectedNotebookId) return;
     try {
-      if (mode === 'quick') {
-        const result = await runKnowledgeQuickAnswer({
-          question: normalizedQuestion,
-          notebookIds: scopeIds,
-        });
-        setResearchResult(null);
-        setQueryResult(result);
-        setAsking(false);
-      } else {
-        const result = await runKnowledgeResearch({
-          question: normalizedQuestion,
-          notebookIds: scopeIds,
-        });
-        setQueryResult(null);
-        setResearchResult(result);
-      }
+      await reingestKnowledgeSource(selectedNotebookId, entry.source.id);
+      setIngestionRefreshKey(key => key + 1);
     } catch (error) {
-      setPageError(error instanceof Error ? error.message : tr('knowledge.queryFailed'));
-      setAsking(false);
+      addToast(error instanceof Error ? error.message : tr('knowledge.saveFailed'), 'error');
     }
   };
 
-  const handleCancelResearch = async () => {
-    if (!activeResearchRunId) return;
-    try {
-      const result = await cancelKnowledgeResearch(activeResearchRunId);
-      setResearchResult(current => current ? {
-        ...current,
-        run: result.run,
-        research: result.research,
-      } : current);
-      setAsking(false);
-    } catch (error) {
-      setPageError(error instanceof Error ? error.message : tr('knowledge.queryFailed'));
-    }
+  const handleSettingsSaved = async () => {
+    const notebookId = settingsNotebookId;
+    setSettingsNotebookId(null);
+    await refreshNotebooks(notebookId);
+    // 分块尺寸/嵌入模型变更已触发服务端全量重建：立即拉取新的摄入状态开始轮询。
+    setIngestionRefreshKey(key => key + 1);
+    addToast(tr('knowledge.settingsSaved'), 'success');
   };
-
-  const handleOpenCitation = async (citationId: string) => {
-    setViewerError(null);
-    try {
-      const resolved = await resolveKnowledgeCitation(citationId);
-      setSelectedSourceId(null);
-      setResolvedCitation(resolved);
-    } catch (error) {
-      setPageError(error instanceof Error ? error.message : tr('knowledge.citationLoadFailed'));
-    }
-  };
-
-  const canSend = question.trim().length > 0 && scopeIds.length > 0 && !asking;
-  const researchCoverageItems = researchResult ? [
-    [tr('knowledge.coverageSourceReadiness'), researchResult.research.coverage.sourceReadiness],
-    [tr('knowledge.coverageExtraction'), researchResult.research.coverage.extraction],
-    [tr('knowledge.coveragePrimaryScan'), researchResult.research.coverage.primaryScan],
-    [tr('knowledge.coverageContradiction'), researchResult.research.coverage.contradiction],
-    [tr('knowledge.coverageCitationValidation'), researchResult.research.coverage.citationValidation],
-  ] as const : [];
-  const reportCitationByMarker = new Map(
-    (researchReport?.citations || []).map(citation => [citation.marker, citation]),
-  );
 
   return (
     <div className={styles.page} data-testid="knowledge-page">
@@ -697,16 +738,31 @@ export function KnowledgePage() {
           <div>
             <span className={styles.eyebrow}>{tr('knowledge.sources')}</span>
             <h2>{selectedNotebook?.name || tr('knowledge.noNotebookSelected')}</h2>
-            {selectedNotebook && <p>{tr('knowledge.sourceCount', { count: sources.length })}</p>}
+            {selectedNotebook && (
+              <p>
+                {tr('knowledge.sourceCount', { count: sources.length })}
+                {readinessSuffix(selectedNotebook)}
+              </p>
+            )}
           </div>
-          <button
-            className={styles.importButton}
-            onClick={() => setShowImportMenu(value => !value)}
-            disabled={!selectedNotebookId || importing}
-            aria-expanded={showImportMenu}
-          >
-            {importing ? tr('knowledge.importing') : `＋ ${tr('knowledge.addSource')}`}
-          </button>
+          <div className={styles.headerActions}>
+            {selectedNotebook && (
+              <button
+                className={styles.iconButton}
+                onClick={() => setSettingsNotebookId(selectedNotebook.id)}
+                aria-label={tr('knowledge.notebookSettings')}
+                title={tr('knowledge.notebookSettings')}
+              >⚙</button>
+            )}
+            <button
+              className={styles.importButton}
+              onClick={() => setShowImportMenu(value => !value)}
+              disabled={!selectedNotebookId || importing}
+              aria-expanded={showImportMenu}
+            >
+              {importing ? tr('knowledge.importing') : `＋ ${tr('knowledge.addSource')}`}
+            </button>
+          </div>
         </header>
 
         {showImportMenu && selectedNotebookId && (
@@ -764,15 +820,24 @@ export function KnowledgePage() {
             <div className={styles.emptyState}>{tr('knowledge.noSources')}</div>
           )}
           {!selectedNotebookId && <div className={styles.emptyState}>{tr('knowledge.selectNotebook')}</div>}
-          {sources.map(entry => (
+          {sources.map(entry => {
+            const latestJob = latestJobBySource.get(entry.source.id) ?? null;
+            const badge = sourceBadgeInfo(latestJob, ingestionLoadedNotebookId === selectedNotebookId);
+            const embedRatio = embedProgressRatio(latestJob);
+            const menuOpen = sourceMenuFor === entry.source.id;
+            const parseReady = entry.parseArtifact?.status === 'ready';
+            return (
             <div
               key={entry.source.id}
+              ref={menuOpen ? sourceMenuRowRef : undefined}
               className={`${styles.sourceRow} ${selectedSourceId === entry.source.id ? styles.selected : ''}`}
             >
-              <button className={styles.sourceSelect} onClick={() => {
-                setResolvedCitation(null);
-                setSelectedSourceId(entry.source.id);
-              }}>
+              <button
+                className={`${styles.sourceSelect} ${latestJob?.status === 'failed' ? styles.hasRetry : ''}`}
+                aria-haspopup="menu"
+                aria-expanded={menuOpen}
+                onClick={() => setSourceMenuFor(menuOpen ? null : entry.source.id)}
+              >
                 <span className={styles.fileGlyph}>
                   {entry.source.sourceType === 'web_snapshot' ? '◎' : entry.source.sourceType === 'pasted_text' ? '≡' : '▤'}
                 </span>
@@ -780,10 +845,52 @@ export function KnowledgePage() {
                   <strong>{entry.source.displayName}</strong>
                   <span>{formatBytes(entry.snapshot.byteSize)}</span>
                 </span>
-                <span className={`${styles.status} ${styles[entry.parseArtifact?.status || 'parsing']}`}>
-                  {parseStatusLabel(entry.parseArtifact?.status)}
+                <span className={styles.sourceBadges}>
+                  {badge && (
+                    <span
+                      className={`${styles.status} ${badge.className ? styles[badge.className] : ''}`}
+                      title={badge.title}
+                    >
+                      {badge.label}
+                    </span>
+                  )}
                 </span>
               </button>
+              {embedRatio !== null && (
+                <div
+                  className={styles.embedProgress}
+                  role="progressbar"
+                  aria-valuemin={0}
+                  aria-valuemax={latestJob?.progressTotal ?? 0}
+                  aria-valuenow={latestJob?.progressDone ?? 0}
+                >
+                  <div className={styles.embedProgressFill} style={{ width: `${Math.round(embedRatio * 100)}%` }} />
+                </div>
+              )}
+              {menuOpen && (
+                <div className={styles.sourceActionMenu} role="menu" aria-label={tr('knowledge.sourceActions')}>
+                  <button
+                    role="menuitem"
+                    disabled={!parseReady}
+                    title={!parseReady ? tr('knowledge.sourceMenuNotReadyHint') : undefined}
+                    onClick={() => openSourceView(entry, 'preview')}
+                  >{tr('knowledge.sourceMenuPreview')}</button>
+                  <button
+                    role="menuitem"
+                    disabled={!parseReady}
+                    title={!parseReady ? tr('knowledge.sourceMenuNotReadyHint') : undefined}
+                    onClick={() => openSourceView(entry, 'chunks')}
+                  >{tr('knowledge.sourceMenuChunks')}</button>
+                </div>
+              )}
+              {latestJob?.status === 'failed' && (
+                <button
+                  className={styles.retryIngestion}
+                  onClick={() => void handleReingest(entry)}
+                  aria-label={tr('knowledge.retryIngestion', { name: entry.source.displayName })}
+                  title={tr('knowledge.retryIngestion', { name: entry.source.displayName })}
+                >⟳</button>
+              )}
               {entry.source.sourceType === 'file' && (
                 <button
                   className={styles.refreshSource}
@@ -798,297 +905,53 @@ export function KnowledgePage() {
                 aria-label={tr('knowledge.removeSource', { name: entry.source.displayName })}
               >×</button>
             </div>
-          ))}
+            );
+          })}
         </div>
       </section>
 
       <main className={styles.analysisPane}>
-        {viewerEntry ? (
-          <SourceViewer
-            entry={viewerEntry}
-            blocks={viewerBlocks}
-            loading={resolvedCitation ? false : loadingBlocks}
-            error={viewerError}
-            highlight={citationHighlight}
-            onClose={() => {
-              setSelectedSourceId(null);
-              setResolvedCitation(null);
-            }}
-          />
+        {selectedSource ? (
+          sourceViewMode === 'chunks' ? (
+            <ChunkViewer
+              entry={selectedSource}
+              chunks={chunks}
+              loading={loadingChunks}
+              error={chunksError}
+              onClose={() => {
+                setSelectedSourceId(null);
+              }}
+              onOpenChunk={setChunkDetail}
+            />
+          ) : (
+            <SourceViewer
+              entry={selectedSource}
+              blocks={blocks}
+              loading={loadingBlocks}
+              error={viewerError}
+              onClose={() => {
+                setSelectedSourceId(null);
+              }}
+            />
+          )
         ) : (
-          <section className={styles.composer}>
-            <header>
-              <span className={styles.eyebrow}>{tr('knowledge.analysis')}</span>
-              <h2>{tr('knowledge.askYourKnowledge')}</h2>
-              <p>{tr('knowledge.scopeHint')}</p>
-            </header>
-
-            <div className={styles.fieldGroup}>
-              <span className={styles.fieldLabel}>{tr('knowledge.scope')}</span>
-              <div className={styles.scopeRow}>
-                {scopeIds.map(id => {
-                  const notebook = notebooks.find(item => item.id === id);
-                  if (!notebook) return null;
-                  return (
-                    <button
-                      key={id}
-                      className={styles.scopeChip}
-                      onClick={() => {
-                        if (scopeIds.length > 1) setScopeIds(current => current.filter(scopeId => scopeId !== id));
-                      }}
-                      title={scopeIds.length > 1 ? tr('knowledge.removeFromScope') : tr('knowledge.scopeCannotBeEmpty')}
-                    >
-                      {notebook.name} {scopeIds.length > 1 && '×'}
-                    </button>
-                  );
-                })}
-                <button className={styles.addScopeButton} onClick={() => setShowScopePicker(value => !value)}>
-                  ＋ {tr('knowledge.addNotebook')}
-                </button>
-              </div>
-              {showScopePicker && (
-                <div className={styles.scopePicker}>
-                  {notebooks.map(notebook => (
-                    <label key={notebook.id}>
-                      <input
-                        type="checkbox"
-                        checked={scopeIds.includes(notebook.id)}
-                        onChange={event => {
-                          setScopeIds(current => event.target.checked
-                            ? [...new Set([...current, notebook.id])]
-                            : current.length > 1
-                              ? current.filter(id => id !== notebook.id)
-                              : current);
-                        }}
-                      />
-                      <span>{notebook.name}</span>
-                    </label>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            <div className={styles.fieldGroup}>
-              <span className={styles.fieldLabel}>{tr('knowledge.mode')}</span>
-              <div className={styles.modeSwitch}>
-                <button className={mode === 'quick' ? styles.activeMode : ''} onClick={() => setMode('quick')}>
-                  {tr('knowledge.quickAnswer')}
-                </button>
-                <button className={mode === 'research' ? styles.activeMode : ''} onClick={() => setMode('research')}>
-                  {tr('knowledge.fullResearch')}
-                </button>
-              </div>
-            </div>
-
-            <div className={styles.questionCard}>
-              <textarea
-                value={question}
-                placeholder={tr('knowledge.questionPlaceholder')}
-                disabled={asking}
-                maxLength={4000}
-                onChange={event => setQuestion(event.target.value)}
-                onKeyDown={event => {
-                  if (event.key === 'Enter' && (event.metaKey || event.ctrlKey)) {
-                    event.preventDefault();
-                    void handleAsk();
-                  }
-                }}
-              />
-              <div className={styles.questionFooter}>
-                <span>{mode === 'quick'
-                  ? tr('knowledge.quickRetrievalHint')
-                  : tr('knowledge.researchFullScanHint')}</span>
-                <button disabled={!canSend} onClick={() => void handleAsk()}>
-                  {asking
-                    ? mode === 'research' ? tr('knowledge.researching') : tr('knowledge.answering')
-                    : tr('knowledge.send')}
-                </button>
-              </div>
-            </div>
-
-            {queryResult?.run.answerText && (
-              <section className={styles.answerCard} aria-label={tr('knowledge.answerResult')}>
-                <header className={styles.answerHeader}>
-                  <div>
-                    <span className={styles.fieldLabel}>{tr('knowledge.quickAnswer')}</span>
-                    <h3>{tr('knowledge.answerResult')}</h3>
-                  </div>
-                  <span className={styles.retrievalBadge}>{tr('knowledge.relatedContentBasis')}</span>
-                </header>
-
-                <AnswerText
-                  text={queryResult.run.answerText}
-                  result={queryResult}
-                  onOpenCitation={citationId => void handleOpenCitation(citationId)}
-                />
-
-                <div className={styles.answerSection}>
-                  <h4>{tr('knowledge.citations')}</h4>
-                  <div className={styles.citationList}>
-                    {queryResult.citations.map(item => {
-                      const ref = queryResult.run.citations.find(entry => entry.marker === item.marker);
-                      return (
-                        <button
-                          key={item.citation.id}
-                          onClick={() => {
-                            if (ref) void handleOpenCitation(ref.citationId);
-                          }}
-                        >
-                          <strong>[{item.marker}] {item.citation.canonicalText}</strong>
-                          <span>{item.source.displayName}</span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                <div className={styles.answerSection}>
-                  <h4>{tr('knowledge.scopeSnapshot')}</h4>
-                  <div className={styles.scopeSnapshotList}>
-                    {queryResult.scope.notebooks.map(notebook => (
-                      <span key={notebook.notebookId}>{notebook.notebookName}</span>
-                    ))}
-                  </div>
-                </div>
-              </section>
-            )}
-
-            {researchResult && (
-              <section className={`${styles.answerCard} ${styles.researchCard}`} aria-label={tr('knowledge.researchResult')}>
-                <header className={styles.answerHeader}>
-                  <div>
-                    <span className={styles.fieldLabel}>{tr('knowledge.fullResearch')}</span>
-                    <h3>{researchReport?.report.title || tr('knowledge.researchResult')}</h3>
-                  </div>
-                  <div className={styles.researchHeaderActions}>
-                    <span className={styles.retrievalBadge}>
-                      {researchStateLabel(researchResult.research.state)}
-                    </span>
-                    {activeResearchRunId && (
-                      <button className={styles.cancelResearchButton} onClick={() => void handleCancelResearch()}>
-                        {tr('knowledge.cancelResearch')}
-                      </button>
-                    )}
-                  </div>
-                </header>
-
-                <div className={styles.coverageGrid} aria-label={tr('knowledge.coverage')}>
-                  {researchCoverageItems.map(([label, metric]) => (
-                    <div className={styles.coverageItem} key={label}>
-                      <span>{label}</span>
-                      <strong>{metric.completed} / {metric.total}</strong>
-                      <progress max={Math.max(1, metric.total)} value={metric.completed} />
-                    </div>
-                  ))}
-                </div>
-
-                {!researchIsTerminal(researchResult.research.state) && (
-                  <p className={styles.researchProgressHint}>{tr('knowledge.researchProgressHint')}</p>
-                )}
-                {(researchResult.research.state === 'partial' || researchResult.research.state === 'failed') && (
-                  <div className={styles.errorNotice}>
-                    {researchResult.research.state === 'partial'
-                      ? tr('knowledge.researchPartialHint')
-                      : tr('knowledge.researchFailedHint')}
-                    {researchResult.research.errorCode && ` (${researchResult.research.errorCode})`}
-                  </div>
-                )}
-
-                {researchReport && (
-                  <>
-                    <div className={styles.answerText}>{researchReport.report.summary}</div>
-                    {([
-                      [tr('knowledge.researchConclusions'), researchReport.report.conclusions],
-                      [tr('knowledge.researchMajorFindings'), researchReport.report.majorFindings],
-                      [tr('knowledge.researchConflicts'), researchReport.report.conflicts],
-                    ] as const).map(([heading, items]) => items.length > 0 && (
-                      <div className={styles.answerSection} key={heading}>
-                        <h4>{heading}</h4>
-                        <div className={styles.researchItemList}>
-                          {items.map((item, itemIndex) => (
-                            <div key={`${heading}-${itemIndex}`} className={styles.researchItem}>
-                              <span>{item.text}</span>
-                              <span className={styles.reportMarkers}>
-                                {item.citationMarkers.map(marker => {
-                                  const citation = reportCitationByMarker.get(marker);
-                                  return citation ? (
-                                    <button
-                                      key={marker}
-                                      className={styles.inlineCitation}
-                                      onClick={() => void handleOpenCitation(citation.citation.id)}
-                                      aria-label={tr('knowledge.openCitation', { number: marker })}
-                                    >
-                                      [{marker}]
-                                    </button>
-                                  ) : null;
-                                })}
-                              </span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    ))}
-
-                    {researchReport.report.uncertainties.length > 0 && (
-                      <div className={styles.answerSection}>
-                        <h4>{tr('knowledge.researchUncertainties')}</h4>
-                        <ul className={styles.researchNotes}>
-                          {researchReport.report.uncertainties.map(item => <li key={item}>{item}</li>)}
-                        </ul>
-                      </div>
-                    )}
-                    {researchReport.report.limitations.length > 0 && (
-                      <div className={styles.answerSection}>
-                        <h4>{tr('knowledge.researchLimitations')}</h4>
-                        <ul className={styles.researchNotes}>
-                          {researchReport.report.limitations.map(item => <li key={item}>{item}</li>)}
-                        </ul>
-                      </div>
-                    )}
-
-                    <div className={styles.answerSection}>
-                      <h4>{tr('knowledge.citations')}</h4>
-                      <div className={styles.citationList}>
-                        {researchReport.citations.map(item => (
-                          <button
-                            key={item.citation.id}
-                            onClick={() => void handleOpenCitation(item.citation.id)}
-                          >
-                            <strong>[{item.marker}] {item.citation.canonicalText}</strong>
-                            <span>{item.source.displayName}</span>
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  </>
-                )}
-
-                <div className={styles.answerSection}>
-                  <h4>{tr('knowledge.scopeSnapshot')}</h4>
-                  <div className={styles.scopeSnapshotList}>
-                    {researchResult.scope.notebooks.map(notebook => (
-                      <span key={notebook.notebookId}>{notebook.notebookName}</span>
-                    ))}
-                  </div>
-                </div>
-                <div className={styles.answerSection}>
-                  <h4>{tr('knowledge.sourceSnapshots')}</h4>
-                  <div className={styles.sourceSnapshotList}>
-                    {researchResult.scope.sources.map(source => (
-                      <div key={`${source.notebookId}:${source.sourceId}`}>
-                        <span>{source.sourceDisplayName}</span>
-                        <code>{tr('knowledge.snapshotShortId', {
-                          id: source.contentSnapshotId.slice(0, 12),
-                        })}</code>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </section>
-            )}
-          </section>
+          <div className={`${styles.emptyState} ${styles.analysisEmpty}`}>
+            {tr('knowledge.selectSource')}
+          </div>
         )}
       </main>
+
+      {chunkDetail && (
+        <ChunkDetailDialog chunk={chunkDetail} onClose={() => setChunkDetail(null)} />
+      )}
+
+      {settingsNotebook && (
+        <NotebookSettingsDialog
+          notebook={settingsNotebook}
+          onClose={() => setSettingsNotebookId(null)}
+          onSaved={() => void handleSettingsSaved()}
+        />
+      )}
 
       {pageError && (
         <div className={styles.pageError} role="alert">

@@ -4,6 +4,7 @@ import { bodyLimit } from "hono/body-limit";
 import { KnowledgeError, isKnowledgeError } from "../../lib/knowledge/errors.ts";
 import type {
   ContentSnapshot,
+  KnowledgeNotebook,
   KnowledgeParseArtifact,
   KnowledgeSource,
 } from "../../lib/knowledge/types.ts";
@@ -43,7 +44,6 @@ function errorStatus(error: KnowledgeError): number {
     case "KNOWLEDGE_IMPORT_TYPE_UNSUPPORTED":
     case "KNOWLEDGE_SCOPE_NOT_READY":
     case "KNOWLEDGE_RETRIEVAL_EMPTY":
-    case "KNOWLEDGE_RESEARCH_INCOMPLETE":
     case "KNOWLEDGE_WEB_TYPE_UNSUPPORTED":
       return 422;
     case "KNOWLEDGE_MODEL_OUTPUT_INVALID":
@@ -157,43 +157,6 @@ function serializeArtifact(artifact: KnowledgeParseArtifact | null) {
   return safe;
 }
 
-function serializeRunResult(knowledge: any, studioId: string, run: any) {
-  const scope = knowledge.getScopeSnapshot({ studioId, scopeSnapshotId: run.scopeSnapshotId });
-  const citations = run.citations.map((ref: any) => {
-    const resolved = knowledge.resolveCitation({ studioId, citationId: ref.citationId });
-    return {
-      marker: ref.marker,
-      citation: resolved.citation,
-      source: serializeSource(resolved.source),
-      snapshot: serializeSnapshot(resolved.snapshot),
-      parseArtifact: serializeArtifact(resolved.artifact),
-      locator: resolved.block.locator,
-      viewer: {
-        contentUrl: `/api/knowledge/snapshots/${encodeURIComponent(resolved.snapshot.id)}/content`,
-        locator: resolved.block.locator,
-      },
-    };
-  });
-  return { run, scope, citations };
-}
-
-function validateQueryBody(body: any) {
-  if (!body || typeof body !== "object" || Array.isArray(body)) {
-    throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "Knowledge query body must be an object");
-  }
-  const allowed = new Set(["question", "notebookIds", "mode"]);
-  if (Object.keys(body).some(key => !allowed.has(key))) {
-    throw new KnowledgeError(
-      "KNOWLEDGE_INVALID_ARGUMENT",
-      "Knowledge query accepts only question, notebookIds, and mode",
-    );
-  }
-  if (body.mode !== "quick" && body.mode !== "research") {
-    throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "Knowledge query mode is invalid");
-  }
-  return body;
-}
-
 function validateExactBody(body: unknown, allowedKeys: string[], label: string): Record<string, any> {
   if (!body || typeof body !== "object" || Array.isArray(body)) {
     throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", `${label} body must be an object`);
@@ -208,6 +171,54 @@ function validateExactBody(body: unknown, allowedKeys: string[], label: string):
   return record;
 }
 
+/**
+ * 笔记本设置 PUT 的键校验：omitted=不变，至少给一个键。chunkTargetChars 已
+ * 随"按嵌入模型上下文自动分块"退役（遗留显式列值仍生效，只是不再接受写入）。
+ */
+const NOTEBOOK_SETTINGS_KEYS = ["embeddingModelRef", "rerankModelRef", "retrievalTopK", "vectorRetentionDays"];
+
+function validateSettingsBody(body: unknown): Record<string, any> {
+  if (!body || typeof body !== "object" || Array.isArray(body)) {
+    throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "Notebook settings body must be an object");
+  }
+  const record = body as Record<string, any>;
+  const keys = Object.keys(record);
+  if (keys.length === 0 || keys.some(key => !NOTEBOOK_SETTINGS_KEYS.includes(key))) {
+    throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "Notebook settings body fields are invalid");
+  }
+  return record;
+}
+
+/**
+ * 笔记本就绪汇总：按每个源的最新摄入 job 归类（done / pending_embedding /
+ * 处理中 / failed / 无 job），供引用菜单与知识页徽章使用。
+ */
+function summarizeNotebookIngestion(knowledge: any, studioId: string, notebookId: string) {
+  const entries = knowledge.listNotebookSources({ studioId, notebookId });
+  const ingestion = { done: 0, pendingEmbedding: 0, processing: 0, failed: 0, untracked: 0 };
+  for (const entry of entries) {
+    // notebookId 过滤：一源多笔记本时按本笔记本的 job 归类，避免错记到
+    // 其他笔记本的摄入状态上。
+    const latest = knowledge.getLatestIngestionJobForSource({
+      studioId,
+      sourceId: entry.source.id,
+      notebookId,
+    });
+    if (!latest) {
+      ingestion.untracked += 1;
+    } else if (latest.status === "done") {
+      ingestion.done += 1;
+    } else if (latest.status === "pending_embedding") {
+      ingestion.pendingEmbedding += 1;
+    } else if (latest.status === "failed") {
+      ingestion.failed += 1;
+    } else {
+      ingestion.processing += 1;
+    }
+  }
+  return { sourceCount: entries.length, ingestion };
+}
+
 export function createKnowledgeRoute(engine: any) {
   const route = new Hono();
 
@@ -215,7 +226,18 @@ export function createKnowledgeRoute(engine: any) {
     const scope = bindKnowledgeScope(c, engine);
     if (scope.error) return scope.error;
     try {
-      return c.json({ notebooks: scope.knowledge.listNotebooks({ studioId: scope.studioId }) });
+      const notebooks = scope.knowledge.listNotebooks({ studioId: scope.studioId })
+        .map((notebook: KnowledgeNotebook) => ({
+          ...notebook,
+          config: scope.knowledge.getNotebookConfig({ studioId: scope.studioId, notebookId: notebook.id }),
+          // 生效分块尺寸（遗留显式列 > 嵌入模型上下文 ×80% 自动值），设置弹窗只读展示。
+          chunkTargetCharsEffective: scope.knowledge.getNotebookEffectiveChunkTargetChars({
+            studioId: scope.studioId,
+            notebookId: notebook.id,
+          }),
+          ...summarizeNotebookIngestion(scope.knowledge, scope.studioId, notebook.id),
+        }));
+      return c.json({ notebooks });
     } catch (error) {
       return routeError(c, error);
     }
@@ -272,6 +294,41 @@ export function createKnowledgeRoute(engine: any) {
         notebookId: c.req.param("id"),
       });
       return c.json({ notebook });
+    } catch (error) {
+      return routeError(c, error);
+    }
+  });
+
+  route.put("/knowledge/notebooks/:id/settings", knowledgeMetadataBodyLimit, async (c) => {
+    const scope = bindKnowledgeScope(c, engine);
+    if (scope.error) return scope.error;
+    try {
+      const body = validateSettingsBody(await safeJson(c));
+      // 数值范围与模型引用完整性由 store 层 updateNotebookConfig 统一校验；
+      // 分块尺寸/嵌入模型引用变化触发的全量重建在 manager 内完成。
+      const config = scope.knowledge.updateNotebookSettings({
+        studioId: scope.studioId,
+        notebookId: c.req.param("id"),
+        ...body,
+      });
+      return c.json({ config });
+    } catch (error) {
+      return routeError(c, error);
+    }
+  });
+
+  route.get("/knowledge/ingestion", (c) => {
+    const scope = bindKnowledgeScope(c, engine);
+    if (scope.error) return scope.error;
+    try {
+      const notebookId = c.req.query("notebookId") || undefined;
+      const sourceId = c.req.query("sourceId") || undefined;
+      const jobs = scope.knowledge.listIngestionJobs({ studioId: scope.studioId, notebookId, sourceId });
+      const counts = scope.knowledge.countIngestionJobsByStatus({ studioId: scope.studioId, notebookId });
+      // Phase 6 文件 watch 的"源文件不可达"显式状态顺带暴露（只列不可达项，不含可达噪音）。
+      const unreachableSources = scope.knowledge.listSourceFileWatchStates()
+        .filter((state: any) => state.unreachable && state.studioId === scope.studioId);
+      return c.json({ jobs, counts, unreachableSources });
     } catch (error) {
       return routeError(c, error);
     }
@@ -341,9 +398,28 @@ export function createKnowledgeRoute(engine: any) {
           displayName: body.displayName,
         });
       }
-      const parseArtifact = await scope.knowledge.parseSource({
+      let parseArtifact: any;
+      try {
+        parseArtifact = await scope.knowledge.parseSource({
+          studioId: scope.studioId,
+          sourceId: imported.source.id,
+        });
+      } catch (error) {
+        // 解析失败也保证有摄入 job：worker 从 parse 相位重试、超限标 failed
+        // （显式终态，可手动重试），不允许源静默无摄入状态。
+        scope.knowledge.enqueueSourceIngestion({
+          studioId: scope.studioId,
+          notebookId: c.req.param("id"),
+          sourceId: imported.source.id,
+        });
+        throw error;
+      }
+      // 导入+解析完成即入队摄入（chunk→fts_index→embed 异步执行），HTTP 立即返回。
+      scope.knowledge.enqueueSourceIngestion({
         studioId: scope.studioId,
+        notebookId: c.req.param("id"),
         sourceId: imported.source.id,
+        artifactId: parseArtifact.id,
       });
       return c.json({
         source: serializeSource(imported.source),
@@ -398,127 +474,18 @@ export function createKnowledgeRoute(engine: any) {
     }
   });
 
-  route.post("/knowledge/query", knowledgeMetadataBodyLimit, async (c) => {
+  route.post("/knowledge/notebooks/:id/sources/:sourceId/reingest", async (c) => {
     const scope = bindKnowledgeScope(c, engine);
     if (scope.error) return scope.error;
     try {
-      const body = validateQueryBody(await safeJson(c));
-      if (body.mode === "research") {
-        const result = await scope.knowledge.startResearch({
-          studioId: scope.studioId,
-          notebookIds: body.notebookIds,
-          question: body.question,
-        });
-        return c.json({
-          run: result.run,
-          scope: result.scope,
-          research: result.research,
-          citations: [],
-        }, 202);
-      }
-      const result = await scope.knowledge.runQuickAnswer({
+      // failed 手动重试（requeue + 唤醒队列）；无 job 时兜底入队；
+      // 最新 job 非 failed 时抛 KNOWLEDGE_CONFLICT（409）。
+      const result = scope.knowledge.requeueSourceIngestion({
         studioId: scope.studioId,
-        notebookIds: body.notebookIds,
-        question: body.question,
+        notebookId: c.req.param("id"),
+        sourceId: c.req.param("sourceId"),
       });
-      return c.json({
-        ...serializeRunResult(scope.knowledge, scope.studioId, result.run),
-        retrievalBasis: result.retrievalBasis,
-      }, 201);
-    } catch (error) {
-      return routeError(c, error);
-    }
-  });
-
-  route.get("/knowledge/runs", (c) => {
-    const scope = bindKnowledgeScope(c, engine);
-    if (scope.error) return scope.error;
-    try {
-      const runs = scope.knowledge.listActiveResearchRuns({ studioId: scope.studioId })
-        .map((research: any) => {
-          const run = scope.knowledge.getKnowledgeRun({
-            studioId: scope.studioId,
-            runId: research.runId,
-          });
-          return {
-            ...serializeRunResult(scope.knowledge, scope.studioId, run),
-            research,
-          };
-        });
-      return c.json({ runs });
-    } catch (error) {
-      return routeError(c, error);
-    }
-  });
-
-  route.get("/knowledge/runs/:runId", (c) => {
-    const scope = bindKnowledgeScope(c, engine);
-    if (scope.error) return scope.error;
-    try {
-      const run = scope.knowledge.getKnowledgeRun({
-        studioId: scope.studioId,
-        runId: c.req.param("runId"),
-      });
-      const serialized = serializeRunResult(scope.knowledge, scope.studioId, run);
-      if (run.mode !== "research") return c.json(serialized);
-      return c.json({
-        ...serialized,
-        research: scope.knowledge.getResearchRun({
-          studioId: scope.studioId,
-          runId: run.id,
-        }),
-      });
-    } catch (error) {
-      return routeError(c, error);
-    }
-  });
-
-  route.post("/knowledge/runs/:runId/cancel", (c) => {
-    const scope = bindKnowledgeScope(c, engine);
-    if (scope.error) return scope.error;
-    try {
-      const research = scope.knowledge.cancelResearch({
-        studioId: scope.studioId,
-        runId: c.req.param("runId"),
-      });
-      const run = scope.knowledge.getKnowledgeRun({
-        studioId: scope.studioId,
-        runId: research.runId,
-      });
-      return c.json({ run, research });
-    } catch (error) {
-      return routeError(c, error);
-    }
-  });
-
-  route.get("/knowledge/runs/:runId/report", (c) => {
-    const scope = bindKnowledgeScope(c, engine);
-    if (scope.error) return scope.error;
-    try {
-      const report = scope.knowledge.getResearchReport({
-        studioId: scope.studioId,
-        runId: c.req.param("runId"),
-      });
-      const citations = report.citations.map((ref: any) => {
-        const resolved = scope.knowledge.resolveCitation({
-          studioId: scope.studioId,
-          citationId: ref.citationId,
-        });
-        return {
-          marker: ref.marker,
-          evidenceId: ref.evidenceId,
-          citation: resolved.citation,
-          source: serializeSource(resolved.source),
-          snapshot: serializeSnapshot(resolved.snapshot),
-          parseArtifact: serializeArtifact(resolved.artifact),
-          locator: resolved.block.locator,
-          viewer: {
-            contentUrl: `/api/knowledge/snapshots/${encodeURIComponent(resolved.snapshot.id)}/content`,
-            locator: resolved.block.locator,
-          },
-        };
-      });
-      return c.json({ report, citations });
+      return c.json(result);
     } catch (error) {
       return routeError(c, error);
     }
@@ -533,6 +500,22 @@ export function createKnowledgeRoute(engine: any) {
         parseArtifactId: c.req.param("id"),
       });
       return c.json({ blocks });
+    } catch (error) {
+      return routeError(c, error);
+    }
+  });
+
+  // 冻结契约：{ chunkerConfigId, chunks: [{ id, ordinal(1-based), text,
+  // tokenCount, charCount, headingPath?, pageNumber? }] }。
+  route.get("/knowledge/parse-artifacts/:id/chunks", (c) => {
+    const scope = bindKnowledgeScope(c, engine);
+    if (scope.error) return scope.error;
+    try {
+      const result = scope.knowledge.listArtifactChunkCards({
+        studioId: scope.studioId,
+        parseArtifactId: c.req.param("id"),
+      });
+      return c.json(result);
     } catch (error) {
       return routeError(c, error);
     }

@@ -14,7 +14,7 @@ import type {
   MemoryFactsPayload,
 } from "./env-change-ledger.ts";
 
-import { estimateTextTokens } from "../lib/llm/estimate-text-tokens.ts";
+import { estimateTextTokens, trimTextToTokenBudget } from "../lib/llm/estimate-text-tokens.ts";
 
 export const REMINDER_BLOCK_PREFIX = "[hana_reminder";
 export const REMINDER_BLOCK_END = "[/hana_reminder]";
@@ -31,6 +31,14 @@ export const REMINDER_BLOCK_END = "[/hana_reminder]";
  */
 export const REFERENCE_BLOCK_PREFIX = "[hana_reference]";
 export const REFERENCE_BLOCK_END = "[/hana_reference]";
+
+/**
+ * 知识库注入块包裹符（lib/knowledge/knowledge-context-injector.ts 的
+ * renderKnowledgeContextBlock 产出）。与 reminder/reference 同属模型侧信封：
+ * 必须读给模型、绝不能进用户可见投影，由下方同一剥离函数移除。
+ */
+export const KNOWLEDGE_CONTEXT_BLOCK_PREFIX = "[KnowledgeContext]";
+export const KNOWLEDGE_CONTEXT_BLOCK_END = "[/KnowledgeContext]";
 
 const REFERENCE_BUDGET_CONTEXT_FRACTION = 0.05;
 const REFERENCE_BUDGET_MAX_TOKENS = 20000;
@@ -72,8 +80,7 @@ export function renderReferenceBlock({
     : REFERENCE_BUDGET_FALLBACK_TOKENS;
   let rendered = body;
   if (estimateTextTokens(body) > budget) {
-    // estimateTextTokens is chars/4, so the budget converts back directly.
-    rendered = `${body.slice(0, Math.max(1, budget * 4 - 1))}…`;
+    rendered = `${trimTextToTokenBudget(body, budget)}…`;
   }
   return `${REFERENCE_BLOCK_PREFIX}\n${rendered}\n${REFERENCE_BLOCK_END}`;
 }
@@ -93,12 +100,20 @@ export const SESSION_FILE_MARKER_RE = /^\[SessionFile\]\s+\{.*\}\s*$/;
 const BLOCK_BODY_CHAR_LIMIT = 300;
 
 /**
- * Removes model-only reminder blocks from user-visible session text.
+ * Removes model-only reminder/reference/knowledge blocks from user-visible
+ * session text.
  *
  * Historical JSONL stores reminder input inside the user message because the
  * model must observe it. Display/export consumers must use this projection
  * rather than exposing that internal input. An exact header without a closing
  * line is removed through end-of-text so a truncated JSONL entry fails closed.
+ *
+ * `[KnowledgeContext] ... [/KnowledgeContext]` injection blocks are stripped by
+ * the same projection (they are the same shape of model-only envelope). Audit
+ * boundary — this strip never rebuilds a model prompt: prompt replay reads the
+ * stored raw prompt (preservePromptEnvelope resubmits it verbatim), and the
+ * edit-retry suffix swap keeps everything ahead of the user's visible tail, so
+ * stripping only affects what humans read, never what the model re-receives.
  */
 export function stripSessionReminderBlocks(value: unknown): string {
   if (typeof value !== "string" || !value) return typeof value === "string" ? value : "";
@@ -106,6 +121,7 @@ export function stripSessionReminderBlocks(value: unknown): string {
   const visibleLines: string[] = [];
   let insideReminder = false;
   let insideReference = false;
+  let insideKnowledge = false;
   let dropSeparatorAfterReminder = false;
 
   for (const line of value.split(/\r?\n/)) {
@@ -123,10 +139,21 @@ export function stripSessionReminderBlocks(value: unknown): string {
       }
       continue;
     }
-    // Like the reminder envelope, an unterminated reference block is dropped
-    // through end of text so a truncated JSONL entry fails closed.
+    if (insideKnowledge) {
+      if (line === KNOWLEDGE_CONTEXT_BLOCK_END) {
+        insideKnowledge = false;
+        dropSeparatorAfterReminder = true;
+      }
+      continue;
+    }
+    // Like the reminder envelope, an unterminated reference or knowledge block
+    // is dropped through end of text so a truncated JSONL entry fails closed.
     if (line === REFERENCE_BLOCK_PREFIX) {
       insideReference = true;
+      continue;
+    }
+    if (line === KNOWLEDGE_CONTEXT_BLOCK_PREFIX) {
+      insideKnowledge = true;
       continue;
     }
     if (REMINDER_HEADER_LINE_RE.test(line)) {

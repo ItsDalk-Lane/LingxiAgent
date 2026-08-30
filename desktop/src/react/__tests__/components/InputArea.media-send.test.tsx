@@ -193,6 +193,10 @@ function seedSession() {
     connected: true,
     pendingNewSession: false,
     streamingSessions: [],
+    // 发送即置位的瞬态列表也归零：上一条用例的真实发送会写入，未清除会让
+    // 后续用例的 InputArea 误判「等待助手」态。
+    turnPendingSessions: [],
+    knowledgeRetrievingSessions: [],
     inlineErrors: {},
     attachedFiles: [{
       fileId: 'sf_pasted',

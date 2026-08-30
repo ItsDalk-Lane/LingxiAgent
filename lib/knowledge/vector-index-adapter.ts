@@ -5,7 +5,9 @@ import { createRequire } from "node:module";
 import { KnowledgeError } from "./errors.ts";
 
 const require = createRequire(import.meta.url);
-const VECTOR_INDEX_SCHEMA_VERSION = 1;
+// v2：vector_artifacts 加 last_used_at（查询命中即刷新），支撑笔记本级
+// 向量保留策略——超期未使用的旧版本向量由 sweep 回收。
+const VECTOR_INDEX_SCHEMA_VERSION = 2;
 let BetterSqliteDatabase: any = null;
 
 function loadDatabase() {
@@ -111,6 +113,15 @@ export interface VectorIndexAdapter {
     entries: VectorIndexEntry[];
   }): void;
   removeArtifact(parseArtifactId: unknown): void;
+  /** 细粒度删除：只删某 artifact 下某模型身份的向量（保留同 artifact 其他身份）。 */
+  removeArtifactModel(input: { parseArtifactId: unknown; modelKey: unknown }): void;
+  /** 全部向量工件的使用记录（sweep 判定超期用）。 */
+  listArtifactUsage(): Array<{
+    parseArtifactId: string;
+    modelKey: string;
+    indexedAt: string;
+    lastUsedAt: string;
+  }>;
   search(input: {
     parseArtifactIds: unknown;
     model: VectorIndexModelIdentity;
@@ -182,6 +193,7 @@ export class PortableVectorIndexAdapter implements VectorIndexAdapter {
             chunk_fingerprint TEXT NOT NULL,
             dimensions INTEGER NOT NULL CHECK(dimensions > 0),
             indexed_at TEXT NOT NULL,
+            last_used_at TEXT NOT NULL DEFAULT '',
             PRIMARY KEY(parse_artifact_id, model_key)
           );
 
@@ -199,6 +211,17 @@ export class PortableVectorIndexAdapter implements VectorIndexAdapter {
           CREATE INDEX idx_chunk_vectors_scope
             ON chunk_vectors(model_key, parse_artifact_id, ordinal);
         `);
+        this.db.pragma(`user_version = ${VECTOR_INDEX_SCHEMA_VERSION}`);
+      })();
+    }
+    if (version === 1) {
+      this.db.transaction(() => {
+        // 列存在检查：压版本重开的迁移需幂等（ALTER 对已存在列报 duplicate）。
+        const columns = this.db.prepare(`PRAGMA table_info(vector_artifacts)`).all() as any[];
+        if (!columns.some((col) => col.name === "last_used_at")) {
+          this.db.exec(`ALTER TABLE vector_artifacts ADD COLUMN last_used_at TEXT NOT NULL DEFAULT '';`);
+        }
+        this.db.exec(`UPDATE vector_artifacts SET last_used_at = indexed_at WHERE last_used_at = '';`);
         this.db.pragma(`user_version = ${VECTOR_INDEX_SCHEMA_VERSION}`);
       })();
     }
@@ -288,13 +311,14 @@ export class PortableVectorIndexAdapter implements VectorIndexAdapter {
       });
       this.db.prepare(`
         INSERT INTO vector_artifacts (
-          parse_artifact_id, model_key, chunk_fingerprint, dimensions, indexed_at
-        ) VALUES (?, ?, ?, ?, ?)
+          parse_artifact_id, model_key, chunk_fingerprint, dimensions, indexed_at, last_used_at
+        ) VALUES (?, ?, ?, ?, ?, ?)
         ON CONFLICT(parse_artifact_id, model_key) DO UPDATE SET
           chunk_fingerprint = excluded.chunk_fingerprint,
           dimensions = excluded.dimensions,
-          indexed_at = excluded.indexed_at
-      `).run(parseArtifactId, model.key, fingerprint, model.dimensions, this.now());
+          indexed_at = excluded.indexed_at,
+          last_used_at = excluded.last_used_at
+      `).run(parseArtifactId, model.key, fingerprint, model.dimensions, this.now(), this.now());
     })();
   }
 
@@ -319,7 +343,7 @@ export class PortableVectorIndexAdapter implements VectorIndexAdapter {
     const model = this.normalizeModel(input.model);
     const query = readVector(vectorBuffer(input.queryVector, model.dimensions), model.dimensions);
     const limit = input.limit == null ? 12 : Number(input.limit);
-    if (!Number.isSafeInteger(limit) || limit < 1 || limit > 50) {
+    if (!Number.isSafeInteger(limit) || limit < 1 || limit > 1000) {
       throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "Vector search limit is invalid");
     }
     const placeholders = artifactIds.map(() => "?").join(", ");
@@ -329,7 +353,7 @@ export class PortableVectorIndexAdapter implements VectorIndexAdapter {
         FROM chunk_vectors
         WHERE model_key = ? AND parse_artifact_id IN (${placeholders})
       `).all(model.key, ...artifactIds);
-      return rows.map((row: any) => {
+      const results = rows.map((row: any) => {
         if (Number(row.dimensions) !== model.dimensions) {
           throw new KnowledgeError("KNOWLEDGE_INDEX_INVALID", "Knowledge vector dimensions are corrupt");
         }
@@ -344,10 +368,50 @@ export class PortableVectorIndexAdapter implements VectorIndexAdapter {
         || left.parseArtifactId.localeCompare(right.parseArtifactId)
         || left.ordinal - right.ordinal
       )).slice(0, limit);
+      // 查询涉及即为使用：scope 内全部 artifact 刷新 last_used_at，
+      // 供笔记本级向量保留策略判定"超期未使用"。刷新失败不阻断查询。
+      try {
+        this.db.prepare(`
+          UPDATE vector_artifacts SET last_used_at = ? WHERE parse_artifact_id IN (${placeholders})
+        `).run(this.now(), ...artifactIds);
+      } catch { /* 使用时间刷新失败不影响检索结果 */ }
+      return results;
     } catch (error) {
       if (error instanceof KnowledgeError) throw error;
       throw new KnowledgeError("KNOWLEDGE_INDEX_INVALID", "Knowledge vector index query failed");
     }
+  }
+
+  /** 全部向量工件的使用记录（sweep 判定超期用）。 */
+  listArtifactUsage(): Array<{
+    parseArtifactId: string;
+    modelKey: string;
+    indexedAt: string;
+    lastUsedAt: string;
+  }> {
+    return this.db.prepare(`
+      SELECT parse_artifact_id, model_key, indexed_at, last_used_at
+      FROM vector_artifacts
+    `).all().map((row: any) => ({
+      parseArtifactId: row.parse_artifact_id,
+      modelKey: row.model_key,
+      indexedAt: row.indexed_at,
+      lastUsedAt: row.last_used_at || row.indexed_at,
+    }));
+  }
+
+  /** 细粒度删除：只删某 artifact 下某模型身份的向量（保留同 artifact 其他身份）。 */
+  removeArtifactModel(input: { parseArtifactId: unknown; modelKey: unknown }): void {
+    const artifactId = requiredId(input?.parseArtifactId, "parseArtifactId");
+    const modelKey = requiredId(input?.modelKey, "modelKey");
+    this.db.transaction(() => {
+      this.db.prepare(
+        `DELETE FROM chunk_vectors WHERE parse_artifact_id = ? AND model_key = ?`,
+      ).run(artifactId, modelKey);
+      this.db.prepare(
+        `DELETE FROM vector_artifacts WHERE parse_artifact_id = ? AND model_key = ?`,
+      ).run(artifactId, modelKey);
+    })();
   }
 
   health() {

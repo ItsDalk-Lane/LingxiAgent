@@ -8,6 +8,7 @@
 
 import type { FileVersion } from '../types';
 import type { ThinkingLevel } from './model-slice';
+import type { KnowledgeRetrievalStats } from '../../../../shared/knowledge-refs.ts';
 
 // ── 工具调用 ──
 
@@ -387,6 +388,14 @@ export interface ChatMessage {
   skills?: string[];
   sessionRefs?: Array<{ sessionId: string; label: string }>;
   agentMentions?: Array<{ agentId: string; label: string }>;
+  /** 本条消息引用的知识库笔记本（展示投影；notebooks 为名称缓存，可能滞后于重命名） */
+  knowledgeRefs?: {
+    notebookIds: string[];
+    mode: 'qa' | 'assist';
+    notebooks?: Array<{ id: string; name?: string }>;
+  };
+  /** 本次知识库注入的检索统计（session_user_message 回显 / 历史透出；乐观消息无此字段）。 */
+  knowledgeRetrieval?: KnowledgeRetrievalStats;
   agentReview?: AgentReviewContext;
   agentReviewRequest?: AgentReviewRequestContext;
   sendStatus?: 'pending' | 'failed';

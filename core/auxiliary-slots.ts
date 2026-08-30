@@ -1,8 +1,8 @@
 /**
  * Auxiliary Model Slots — canonical single source of truth.
  *
- * 业务层只认识语义 Slot（title/summarize/memory/knowledge/vision/approval/guard），
- * 不再关心 utility/utility_large 或模型大小。
+ * 业务层只认识语义 Slot（title/summarize/memory/knowledge/knowledgeDistill/
+ * vision/approval/guard），不再关心 utility/utility_large 或模型大小。
  *
  * Slot 不拥有 credential；Provider credential 基础设施是唯一执行凭证来源。
  * 一次 resolve 只解析一个 Slot。
@@ -68,7 +68,7 @@ export interface AuxiliarySlotDescriptor {
 }
 
 /**
- * 7 个语义 Slot 的 canonical 定义。
+ * 8 个语义 Slot 的 canonical 定义。
  *
  * 所有层（config / server / UI / tests）都从这里派生 Slot 名单，
  * 禁止在多处手写硬编码数组。
@@ -95,6 +95,12 @@ export const AUXILIARY_SLOTS: Record<AuxiliarySlot, AuxiliarySlotDescriptor> = {
   knowledge: {
     id: "knowledge",
     preferenceKey: "knowledge_model",
+    fallback: "chat",
+    capability: "text",
+  },
+  knowledgeDistill: {
+    id: "knowledgeDistill",
+    preferenceKey: "knowledge_distill_model",
     fallback: "chat",
     capability: "text",
   },

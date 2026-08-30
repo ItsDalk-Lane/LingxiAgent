@@ -7,17 +7,24 @@ import {
   DEFAULT_KNOWLEDGE_IMPORT_MAX_BYTES,
   readSecureKnowledgeImportFile,
 } from "./file-import-security.ts";
-import { KnowledgeStore } from "./knowledge-store.ts";
+import { KnowledgeStore, resolveNotebookConfig } from "./knowledge-store.ts";
+import { computeAutoChunkTargetChars } from "./chunker.ts";
 import { KnowledgeIndexStore } from "./knowledge-index-store.ts";
 import {
+  KnowledgeIngestionService,
+  type KnowledgeIngestionEmbedRequest,
+} from "./ingestion-service.ts";
+import {
   KnowledgeQueryService,
-  type KnowledgeEmbedder,
+  buildKnowledgeBlockLocatorIndex,
+  type KnowledgeEmbeddingResult,
   type KnowledgeReranker,
-  type KnowledgeTextGenerator,
 } from "./knowledge-query-service.ts";
 import { PortableVectorIndexAdapter } from "./vector-index-adapter.ts";
-import { KnowledgeResearchStore } from "./research-store.ts";
-import { KnowledgeResearchService } from "./research-service.ts";
+import {
+  KnowledgeSourceFileWatcher,
+  type KnowledgeSourceFileWatcherTuning,
+} from "./source-file-watcher.ts";
 import {
   DEFAULT_WEB_SNAPSHOT_MAX_BYTES,
   fetchCitationGradeWebSnapshot,
@@ -28,6 +35,7 @@ import { parseCitationGradeSnapshot } from "./source-adapters.ts";
 import type {
   ContentSnapshot,
   ImportedKnowledgeSource,
+  KnowledgeModelRef,
   KnowledgeParseArtifact,
 } from "./types.ts";
 
@@ -95,9 +103,31 @@ export interface KnowledgeManagerOptions {
   now?: () => string;
   idGenerator?: (prefix: string) => string;
   Database?: any;
-  generateText?: KnowledgeTextGenerator | null;
-  embedTexts?: KnowledgeEmbedder | null;
+  log?: (message: string) => void;
   rerank?: KnowledgeReranker | null;
+  /**
+   * 摄入管线嵌入回调（engine 用 ModelOperationResolver/EmbeddingClient 按显式
+   * 模型引用接线）；缺省时摄入在 embed 相位落显式 pending_embedding。
+   */
+  embedTextsForModel?: ((request: KnowledgeIngestionEmbedRequest) => Promise<KnowledgeEmbeddingResult | null>) | null;
+  canEmbedWithModel?: ((modelRef: KnowledgeModelRef) => boolean) | null;
+  /**
+   * 查询侧 rerank 执行回调（v8：按笔记本显式引用路由）。配置类不可解析由
+   * engine 侧记日志并返回 null，检索显式降级 RRF 名次；请求级错误照常抛出。
+   */
+  rerankForModel?: ((request: {
+    runId: string;
+    query: string;
+    documents: string[];
+    topN: number;
+    signal?: AbortSignal;
+    modelRef: KnowledgeModelRef;
+  }) => Promise<{ results: Array<{ index: number; score: number }> } | null>) | null;
+  /** 查嵌入模型上下文窗口（token 数）：自动分块与生效值展示共用。 */
+  getEmbeddingModelContextWindow?: ((modelRef: KnowledgeModelRef) => number | null) | null;
+  ingestionLog?: (message: string) => void;
+  /** 测试注入：file 源 watcher 的计时器/IO 参数（防抖/退避/轮询时长、watch/stat 工厂）。 */
+  fileWatcher?: KnowledgeSourceFileWatcherTuning;
   fetchWebSnapshot?: (
     url: unknown,
     options?: WebSnapshotFetchOptions,
@@ -117,14 +147,16 @@ export class KnowledgeManager {
   readonly indexStore: KnowledgeIndexStore;
   readonly vectorIndex: PortableVectorIndexAdapter;
   readonly queryService: KnowledgeQueryService;
-  readonly researchStore: KnowledgeResearchStore;
-  readonly researchService: KnowledgeResearchService;
+  readonly ingestion: KnowledgeIngestionService;
+  readonly watcher: KnowledgeSourceFileWatcher;
   private readonly lingxiHome: string;
   private readonly maxImportBytes: number;
+  private readonly options: KnowledgeManagerOptions;
   private readonly idGenerator: (prefix: string) => string;
   private readonly fetchWebSnapshot: NonNullable<KnowledgeManagerOptions["fetchWebSnapshot"]>;
 
   constructor(options: KnowledgeManagerOptions) {
+    this.options = options;
     if (!options?.lingxiHome || !path.isAbsolute(options.lingxiHome)) {
       throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "KnowledgeManager requires an absolute lingxiHome");
     }
@@ -135,7 +167,6 @@ export class KnowledgeManager {
     }
     this.idGenerator = options.idGenerator || createId;
     this.fetchWebSnapshot = options.fetchWebSnapshot || fetchCitationGradeWebSnapshot;
-    const researchNow = options.now || (() => new Date().toISOString());
     this.knowledgeRoot = path.join(this.lingxiHome, "knowledge");
     this.sourcesRoot = path.join(this.knowledgeRoot, "sources");
     this.artifactsRoot = path.join(this.knowledgeRoot, "artifacts");
@@ -164,21 +195,27 @@ export class KnowledgeManager {
       store: this.store,
       indexStore: this.indexStore,
       vectorIndex: this.vectorIndex,
-      embedTexts: options.embedTexts,
+      embedTextsForModel: options.embedTextsForModel ?? null,
       rerank: options.rerank,
-      generateText: options.generateText,
+      rerankForModel: options.rerankForModel ?? null,
+      getEmbeddingModelContextWindow: options.getEmbeddingModelContextWindow ?? null,
     });
-    this.researchStore = new KnowledgeResearchStore({
-      db: this.store.db,
-      now: researchNow,
-      idGenerator: this.idGenerator,
-    });
-    this.researchService = new KnowledgeResearchService({
+    this.ingestion = new KnowledgeIngestionService({
       store: this.store,
-      researchStore: this.researchStore,
-      generateText: options.generateText,
-      prioritizeScope: (input) => this.queryService.prioritizeResearchScope(input),
-      idGenerator: this.idGenerator,
+      queryService: this.queryService,
+      parseSource: (input) => this.parseSource(input),
+      embedTextsForModel: options.embedTextsForModel ?? null,
+      canEmbedWithModel: options.canEmbedWithModel ?? null,
+      getEmbeddingModelContextWindow: options.getEmbeddingModelContextWindow ?? null,
+      now: options.now,
+      log: options.ingestionLog,
+    });
+    this.watcher = new KnowledgeSourceFileWatcher({
+      refresh: (input) => this.refreshFileSource(input),
+      enqueueForNotebook: (input) => this.ingestion.enqueueSourceIngestion(input),
+      log: options.ingestionLog,
+      now: options.now,
+      ...options.fileWatcher,
     });
   }
 
@@ -199,7 +236,18 @@ export class KnowledgeManager {
   }
 
   deleteNotebook(input: Parameters<KnowledgeStore["deleteNotebook"]>[0]) {
-    return this.store.deleteNotebook(input);
+    // 删除前记下挂靠源，删除后对因此变成孤儿的源清理派生索引。
+    const members = this.store.listNotebookSources({
+      studioId: input?.studioId,
+      notebookId: input?.notebookId,
+    }).map((entry: any) => entry.source.id);
+    const notebook = this.store.deleteNotebook(input);
+    // 笔记本删除后摘掉其全部 watch membership（最后一个 membership 消失即摘 watcher）。
+    this.watcher.untrackNotebook(notebook.id);
+    for (const sourceId of members) {
+      this.pruneOrphanSourceIndexes(sourceId);
+    }
+    return notebook;
   }
 
   listNotebookSources(input: Parameters<KnowledgeStore["listNotebookSources"]>[0]) {
@@ -207,11 +255,49 @@ export class KnowledgeManager {
   }
 
   addSourceToNotebook(input: Parameters<KnowledgeStore["addSourceToNotebook"]>[0]) {
-    return this.store.addSourceToNotebook(input);
+    const membership = this.store.addSourceToNotebook(input);
+    // 既有 file 源被加进新笔记本：并入该源的 watch 项（多 membership 共用一个 watcher）。
+    const source = this.store.getSource({ studioId: input?.studioId, sourceId: input?.sourceId });
+    if (source.sourceType === "file") {
+      const originalPath = source.originMetadata.originalPath;
+      if (typeof originalPath === "string" && path.isAbsolute(originalPath)) {
+        this.watcher.trackSource({
+          studioId: source.studioId,
+          notebookId: membership.notebookId,
+          sourceId: source.id,
+          filePath: originalPath,
+        });
+      }
+    }
+    return membership;
   }
 
   removeSourceFromNotebook(input: Parameters<KnowledgeStore["removeSourceFromNotebook"]>[0]) {
-    return this.store.removeSourceFromNotebook(input);
+    const membership = this.store.removeSourceFromNotebook(input);
+    this.watcher.untrackSourceMembership({
+      sourceId: membership.sourceId,
+      notebookId: membership.notebookId,
+    });
+    this.pruneOrphanSourceIndexes(membership.sourceId);
+    return membership;
+  }
+
+  /**
+   * 孤儿源派生索引清理：源不再挂靠任何活跃笔记本时，删除其全部解析产物的
+   * 向量与 FTS 行。事实数据（快照/解析产物记录）保留软删除语义可追溯；
+   * 派生索引可由重摄入完全重建，清掉不损失信息。清理失败只记日志不阻断删除
+   * （残留索引由 sweep 兜底回收）。
+   */
+  private pruneOrphanSourceIndexes(sourceId: string) {
+    try {
+      if (this.store.listActiveNotebookIdsForSource({ sourceId }).length > 0) return;
+      for (const artifactId of this.store.listSourceArtifactIds({ sourceId })) {
+        this.vectorIndex.removeArtifact(artifactId);
+        this.indexStore.removeArtifact(artifactId);
+      }
+    } catch (error) {
+      this.options?.log?.(`knowledge: orphan index prune failed for ${sourceId}: ${error instanceof Error ? error.message : String(error)}`);
+    }
   }
 
   getSource(input: Parameters<KnowledgeStore["getSource"]>[0]) {
@@ -252,7 +338,7 @@ export class KnowledgeManager {
       await fs.promises.rename(temporaryPath, snapshotPath);
       published = true;
 
-      return this.store.createSourceWithSnapshot({
+      const created = this.store.createSourceWithSnapshot({
         studioId: input.studioId,
         notebookId: input.notebookId,
         sourceId,
@@ -271,6 +357,14 @@ export class KnowledgeManager {
           storagePath: relativeStoragePath,
         },
       });
+      // file 源导入成功即挂 watch（外部原文件后续变化 → 自动 refresh + 摄入）。
+      this.watcher.trackSource({
+        studioId: created.source.studioId,
+        notebookId: created.membership.notebookId,
+        sourceId: created.source.id,
+        filePath: imported.realPath,
+      });
+      return created;
     } catch (error) {
       // 数据库事务失败时移除尚未被领域事实引用的字节；不触碰任何已有快照。
       await fs.promises.rm(temporaryPath, { force: true }).catch(() => {});
@@ -443,9 +537,28 @@ export class KnowledgeManager {
         storagePath: relativeStoragePath,
       });
       committed = true;
-      const parseArtifact = await this.parseSource({
+      let parseArtifact: KnowledgeParseArtifact;
+      try {
+        parseArtifact = await this.parseSource({
+          studioId: input.studioId,
+          sourceId: input.sourceId,
+        });
+      } catch (error) {
+        // 新快照解析失败也保证有摄入 job：worker 从 parse 相位重试，
+        // 超限后标 failed（显式终态，UI 可手动重试），不允许静默无状态。
+        this.ingestion.enqueueSourceIngestion({
+          studioId: input.studioId,
+          notebookId: input.notebookId,
+          sourceId: input.sourceId,
+        });
+        throw error;
+      }
+      // 刷新完成即入队摄入（HTTP 调用方立即返回，不等摄入完成）。
+      this.ingestion.enqueueSourceIngestion({
         studioId: input.studioId,
+        notebookId: input.notebookId,
         sourceId: input.sourceId,
+        artifactId: parseArtifact.id,
       });
       return {
         source: current.source,
@@ -596,6 +709,71 @@ export class KnowledgeManager {
     return this.store.listArtifactBlocks(input);
   }
 
+  /**
+   * 分块卡片（GET /api/knowledge/parse-artifacts/:id/chunks 的数据面）：
+   * 校验 artifact 归属（studio 隔离经 getParseArtifact 的 JOIN 链）后，
+   * 走 indexArtifactForIngestion 幂等兜底（纯 chunk+FTS，不依赖嵌入模型），
+   * 再组装每 chunk 的 headingPath / pageNumber 定位信息。
+   * ordinal 为 1-based 展示序号（与注入块的 [KN] 编号语义一致）。
+   */
+  listArtifactChunkCards(input: { studioId: unknown; parseArtifactId: unknown }): {
+    chunkerConfigId: string;
+    chunks: Array<{
+      id: string;
+      ordinal: number;
+      text: string;
+      tokenCount: number;
+      charCount: number;
+      headingPath?: string[];
+      pageNumber?: number;
+    }>;
+  } {
+    const artifact = this.store.getParseArtifact({
+      studioId: input?.studioId,
+      parseArtifactId: input?.parseArtifactId,
+    });
+    if (artifact.status !== "ready") {
+      throw new KnowledgeError("KNOWLEDGE_PARSE_NOT_READY", "Parse artifact is not ready for chunk cards");
+    }
+    // owning notebook 的生效分块尺寸（与摄入侧同源）：卡片视图的幂等兜底也必须
+    // 按同一 configId 判定，否则打开卡片即以默认 1200 重建索引、连坐查询侧。
+    let chunkTargetChars: number | null = null;
+    for (const notebook of this.store.listNotebooks({ studioId: input?.studioId })) {
+      const inNotebook = this.store.listNotebookSources({ studioId: input?.studioId, notebookId: notebook.id })
+        .some(entry => entry.parseArtifact?.id === artifact.id);
+      if (!inNotebook) continue;
+      chunkTargetChars = this.getNotebookEffectiveChunkTargetChars({
+        studioId: input?.studioId,
+        notebookId: notebook.id,
+      });
+      break;
+    }
+    const { chunkerConfigId } = this.queryService.indexArtifactForIngestion(
+      String(input?.studioId),
+      artifact.id,
+      chunkTargetChars != null ? { targetChars: chunkTargetChars } : undefined,
+    );
+    const chunks = this.indexStore.listArtifactChunks(artifact.id);
+    const locatorIndex = buildKnowledgeBlockLocatorIndex(
+      this.store.listArtifactBlocks({ studioId: input?.studioId, parseArtifactId: artifact.id }),
+    );
+    return {
+      chunkerConfigId,
+      chunks: chunks.map(chunk => {
+        const locator = locatorIndex.get(chunk.spans?.[0]?.blockId ?? "");
+        return {
+          id: chunk.id,
+          ordinal: chunk.ordinal + 1,
+          text: chunk.text,
+          tokenCount: chunk.tokenCount,
+          charCount: chunk.text.length,
+          ...(locator?.headingPath ? { headingPath: locator.headingPath } : {}),
+          ...(locator?.pageNumber != null ? { pageNumber: locator.pageNumber } : {}),
+        };
+      }),
+    };
+  }
+
   createCitation(input: Parameters<KnowledgeStore["createCitation"]>[0]) {
     return this.store.createCitation(input);
   }
@@ -619,59 +797,150 @@ export class KnowledgeManager {
     return resolved;
   }
 
-  async runQuickAnswer(input: Parameters<KnowledgeQueryService["runQuickAnswer"]>[0]) {
-    const result = await this.queryService.runQuickAnswer(input);
-    return {
-      ...result,
-      citations: result.run.citations.map(ref => this.resolveCitation({
-        studioId: result.scope.studioId,
-        citationId: ref.citationId,
-      })),
-    };
+  /** 摄入入队门面：路由/watcher 在源导入或刷新完成后调用；HTTP 立即返回。 */
+  enqueueSourceIngestion(input: {
+    studioId: unknown;
+    notebookId: unknown;
+    sourceId: unknown;
+    artifactId?: unknown;
+  }) {
+    return this.ingestion.enqueueSourceIngestion(input);
   }
 
-  attachTaskRegistry(taskRegistry: any) {
-    this.researchService.attachTaskRegistry(taskRegistry);
+  /**
+   * 启动 file 源 watcher（engine init 调用一次）：从 store 扫描全部活跃 file 源的
+   * 活跃 membership 建立 watch 项，然后启动目录 watch + 兜底轮询。幂等。
+   * 运行期新增/删除源由 importFile/addSourceToNotebook/removeSourceFromNotebook/
+   * deleteNotebook 内的挂钩动态增删，无需再走这里。
+   */
+  startSourceFileWatcher() {
+    for (const row of this.store.listWatchableFileSources()) {
+      this.watcher.trackSource({
+        studioId: row.studioId,
+        notebookId: row.notebookId,
+        sourceId: row.sourceId,
+        filePath: row.originalPath,
+      });
+    }
+    this.watcher.start();
   }
 
-  resumeResearchRuns() {
-    return this.researchService.resumeRecoveringRuns();
+  /** watch 状态门面（含 unreachable="源文件不可达"标记），供状态端点/测试使用。 */
+  listSourceFileWatchStates() {
+    return this.watcher.getWatchStates();
   }
 
-  startResearch(input: Parameters<KnowledgeResearchService["startResearch"]>[0]) {
-    return this.researchService.startResearch(input);
+  /** 笔记本配置变更后的全量重建门面。 */
+  enqueueNotebookRebuild(input: { studioId: unknown; notebookId: unknown }) {
+    return this.ingestion.enqueueNotebookRebuild(input);
   }
 
-  getResearchRun(input: Parameters<KnowledgeResearchService["getResearchRun"]>[0]) {
-    return this.researchService.getResearchRun(input);
+  /**
+   * 模型配置可能变更的信号（模型 init/refresh、provider 变更、嵌入偏好变更后由 engine 调用）：
+   * 嵌入可解析时把 pending_embedding 批量置回 queued 补跑。
+   */
+  onModelConfigMayHaveChanged() {
+    return this.ingestion.onModelConfigMayHaveChanged();
   }
 
-  getResearchReport(input: Parameters<KnowledgeResearchService["getReport"]>[0]) {
-    return this.researchService.getReport(input);
+    /**
+   * 生效分块尺寸（只读展示用）：笔记本遗留显式列 > 嵌入模型上下文 ×80%
+   * 自动值（窗口查不到回退 8192）。与摄入侧 resolveConfig 同一派生口径。
+   */
+  getNotebookEffectiveChunkTargetChars(input: { studioId: unknown; notebookId: unknown }): number {
+    const resolved = resolveNotebookConfig(
+      this.store.getNotebookConfig({ studioId: input?.studioId, notebookId: input?.notebookId }),
+    );
+    if (resolved.chunkTargetChars != null) return resolved.chunkTargetChars;
+    return computeAutoChunkTargetChars(
+      resolved.embeddingModelRef
+        ? this.options.getEmbeddingModelContextWindow?.(resolved.embeddingModelRef) ?? null
+        : null,
+    );
   }
 
-  listActiveResearchRuns(input: Parameters<KnowledgeResearchService["listActiveResearchRuns"]>[0]) {
-    return this.researchService.listActiveResearchRuns(input);
+  /**
+   * 一次性迁移门面（v8 配套）：把已退役的全局嵌入/重排引用写入所有未单独
+   * 配置的活跃笔记本。幂等；不触发重建（迁移值与旧解析链结果一致）。
+   */
+  migrateLegacyGlobalModelRefs(input: {
+    embeddingModelRef: import("./types.ts").KnowledgeModelRef | null;
+    rerankModelRef: import("./types.ts").KnowledgeModelRef | null;
+  }): { notebooksUpdated: number } {
+    return this.store.migrateLegacyGlobalModelRefs(input);
   }
 
-  cancelResearch(input: Parameters<KnowledgeResearchService["cancel"]>[0]) {
-    return this.researchService.cancel(input);
+/**
+   * 笔记本设置更新门面：更新配置后，分块尺寸或嵌入模型引用变化（影响派生产物）
+   * → 全量重建该笔记本全部源；rerank/topK 只影响查询时行为，不触发重建。
+   */
+  updateNotebookSettings(input: {
+    studioId: unknown;
+    notebookId: unknown;
+    embeddingModelRef?: unknown;
+    rerankModelRef?: unknown;
+    chunkTargetChars?: unknown;
+    retrievalTopK?: unknown;
+    vectorRetentionDays?: unknown;
+  }) {
+    const before = this.store.getNotebookConfig({
+      studioId: input?.studioId,
+      notebookId: input?.notebookId,
+    });
+    const after = this.store.updateNotebookConfig(input);
+    const embeddingChanged = JSON.stringify(before.embeddingModelRef ?? null)
+      !== JSON.stringify(after.embeddingModelRef ?? null);
+    const chunkChanged = (before.chunkTargetChars ?? null) !== (after.chunkTargetChars ?? null);
+    if (embeddingChanged || chunkChanged) {
+      this.ingestion.enqueueNotebookRebuild({
+        studioId: input?.studioId,
+        notebookId: input?.notebookId,
+      });
+    }
+    return after;
   }
 
-  waitForResearch(runId: string) {
-    return this.researchService.waitForRun(runId);
+  getNotebookConfig(input: Parameters<KnowledgeStore["getNotebookConfig"]>[0]) {
+    return this.store.getNotebookConfig(input);
   }
 
-  getKnowledgeRun(input: Parameters<KnowledgeStore["getKnowledgeRun"]>[0]) {
-    return this.store.getKnowledgeRun(input);
+  listIngestionJobs(input: Parameters<KnowledgeStore["listIngestionJobs"]>[0]) {
+    return this.store.listIngestionJobs(input);
   }
 
-  getScopeSnapshot(input: Parameters<KnowledgeStore["getScopeSnapshot"]>[0]) {
-    return this.store.getScopeSnapshot(input);
+  countIngestionJobsByStatus(input: Parameters<KnowledgeStore["countIngestionJobsByStatus"]>[0]) {
+    return this.store.countIngestionJobsByStatus(input);
+  }
+
+  getLatestIngestionJobForSource(input: Parameters<KnowledgeStore["getLatestIngestionJobForSource"]>[0]) {
+    return this.store.getLatestIngestionJobForSource(input);
+  }
+
+  /**
+   * 摄入手动重试门面（reingest 端点）：该 notebook+source 最新 job 为 failed 时
+   * requeue（attempt 归零、从失败 phase 续跑）并唤醒队列；从未有过 job 时兜底入队。
+   * 最新 job 非 failed 时由 store 抛 KNOWLEDGE_CONFLICT（409）。
+   */
+  requeueSourceIngestion(input: { studioId: unknown; notebookId: unknown; sourceId: unknown }) {
+    const latest = this.store.listIngestionJobs({
+      studioId: input?.studioId,
+      notebookId: input?.notebookId,
+      sourceId: input?.sourceId,
+      limit: 1,
+    })[0] ?? null;
+    if (!latest) {
+      return { job: this.enqueueSourceIngestion(input), retried: false };
+    }
+    const job = this.store.requeueIngestionJob({ studioId: input?.studioId, jobId: latest.id });
+    this.ingestion.wake();
+    return { job, retried: true };
   }
 
   close() {
-    this.researchService.suspendForShutdown();
+    // 先停 watcher（不再产生 refresh/enqueue），再停摄入队列（abort 进行中的嵌入、
+    // 被中断 job 留给启动恢复），最后关库。
+    this.watcher.stop();
+    this.ingestion.stop();
     this.vectorIndex.close();
     this.indexStore.close();
     this.store.close();

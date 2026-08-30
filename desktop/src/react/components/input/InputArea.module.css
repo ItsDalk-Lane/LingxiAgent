@@ -1924,6 +1924,148 @@
     opacity: 1;
 }
 
+/* 知识库引用：工具栏按钮 + 笔记本弹出菜单 + 输入框上方引用条 */
+.knowledge-ref-btn-active {
+    color: var(--accent);
+    border-color: color-mix(in srgb, var(--accent) 25%, var(--overlay-light));
+}
+
+.knowledge-ref-menu {
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+    margin-bottom: var(--space-4);
+    min-width: 240px;
+    max-width: 320px;
+    max-height: 260px;
+    overflow-y: auto;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    box-shadow: 0 4px 16px var(--shadow);
+    z-index: 50;
+    transform-origin: bottom left;
+    animation: hana-popout var(--duration-fast) var(--ease-out);
+}
+
+.knowledge-ref-menu-status {
+    padding: var(--space-8) 0.65rem;
+    color: var(--text-muted);
+    font-size: var(--fs-caption);
+}
+
+.knowledge-ref-item {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    width: 100%;
+    padding: 0.4rem 0.65rem;
+    font-family: inherit;
+    font-size: var(--fs-caption);
+    color: var(--text);
+    background: none;
+    border: none;
+    cursor: default;
+    text-align: left;
+    transition: background var(--duration-fast);
+}
+
+.knowledge-ref-item:hover {
+    background: var(--accent-light);
+}
+
+.knowledge-ref-item.checked .knowledge-ref-name {
+    color: var(--accent);
+    font-weight: 600;
+}
+
+.knowledge-ref-check {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    width: 12px;
+    color: var(--accent);
+}
+
+.knowledge-ref-name {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.knowledge-ref-meta {
+    flex: 0 0 auto;
+    color: var(--text-muted);
+    font-size: var(--fs-hint);
+}
+
+.knowledge-ref-badge {
+    flex: 0 0 auto;
+    padding: 0.05rem 0.35rem;
+    border-radius: var(--radius-sm);
+    font-size: var(--fs-hint);
+    color: var(--text-muted);
+    background: var(--overlay-light);
+}
+
+.knowledge-ref-badge-ready,
+.knowledge-ref-badge-processing {
+    color: var(--accent);
+    background: var(--accent-light);
+}
+
+.knowledge-ref-badge-failed {
+    color: var(--danger, var(--coral));
+    background: color-mix(in srgb, var(--danger, var(--coral)) 8%, transparent);
+}
+
+.knowledge-ref-bar {
+    display: contents;
+}
+
+.knowledge-ref-chip-icon {
+    display: inline-flex;
+    flex: 0 0 auto;
+    color: var(--accent);
+}
+
+.knowledge-ref-mode {
+    display: inline-flex;
+    align-items: center;
+    background: var(--bg-card);
+    border: 1px solid var(--overlay-light);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+}
+
+.knowledge-ref-mode-btn {
+    padding: 0.18rem 0.5rem;
+    font-family: inherit;
+    font-size: var(--fs-hint);
+    color: var(--text-muted);
+    background: none;
+    border: none;
+    cursor: default;
+    transition: all var(--duration-fast);
+}
+
+.knowledge-ref-mode-btn + .knowledge-ref-mode-btn {
+    border-left: 1px solid var(--overlay-light);
+}
+
+.knowledge-ref-mode-btn:hover {
+    color: var(--text);
+}
+
+.knowledge-ref-mode-btn.active {
+    color: var(--accent);
+    background: var(--accent-light);
+    font-weight: 600;
+}
+
 .input-box p:global(.is-editor-empty):first-child::before {
     content: attr(data-placeholder);
     color: var(--text-muted);

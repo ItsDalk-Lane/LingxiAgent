@@ -19,6 +19,7 @@
  * @param {(delta: string, accumulated: string) => void} [opts.onDelta]
  * @param {object} [opts.displayMessage]
  * @param {Array<{fileId?:string, sessionId?:string, sessionPath?:string, label?:string, kind?:string}>} [opts.sessionFileRefs]
+ * @param {{notebookIds:string[], mode:'qa'|'assist'}} [opts.knowledgeRefs] - 知识库笔记本引用（拆解 + 检索后注入 [KnowledgeContext] 块，不进用户可见投影）
  * @param {object|null|undefined} [opts.uiContext]
  * @param {object|null|undefined} [opts.context]
  * @param {boolean} [opts.preservePromptEnvelope] - prompt text already contains its persisted media/SessionFile/reminder envelope
@@ -35,6 +36,9 @@ import { createVisibleTextAccumulator } from "../lib/bridge/visible-text-accumul
 import { materializeBridgeInboundFiles } from "../lib/session-files/bridge-inbound-files.ts";
 import { serializeSessionFile } from "../lib/session-files/session-file-response.ts";
 import { BrowserManager } from "../lib/browser/browser-manager.ts";
+import { normalizeKnowledgeRefs, type KnowledgeRefs, type KnowledgeRetrievalStats } from "../shared/knowledge-refs.ts";
+import { resolveKnowledgeInjectionBudgetTokens } from "../lib/knowledge/knowledge-context-injector.ts";
+import { compressHistoricalKnowledgeContextMessages } from "./knowledge-history-compressor.ts";
 
 /**
  * 非桌面来源（bridge /rc 等）用户消息的来源元信息持久化条目类型。
@@ -56,6 +60,33 @@ export const AGENT_REVIEW_RECORD_TYPE = "hana-agent-review-result";
 
 const pendingDesktopSessionSubmissions = new Set();
 
+/**
+ * 检索/排队期间被用户 abort 的提交键（sessionId 与 sessionPath 两种形式都记，
+ * 与 submitDesktopSessionMessage 的 submissionKey 计算兼容）。submit 在知识检索
+ * 完成后消费并清除；提交结束的 finally 也兜底清理，防泄漏。
+ */
+const abortedDesktopSessionSubmissions = new Set();
+
+/**
+ * 取消尚未进入 promptSession 的桌面提交（知识检索/排队期间点停止）。
+ * 返回是否标记成功——false 表示该 session 没有可解析身份（视为无可取消）。
+ * 已进入流式的 turn 不走这里（engine.abortSession 路径负责）。
+ */
+export function abortPendingDesktopSubmission(engine: any, target: { sessionId?: any; sessionPath?: any }): boolean {
+  try {
+    const resolved = resolveDesktopSessionTarget(engine, target?.sessionId, target?.sessionPath);
+    const keys = [resolved.sessionId, resolved.sessionPath]
+      .filter((key): key is string => typeof key === "string" && !!key.trim());
+    // 只对真实在途的提交标记；没有 pending 提交时返回 false（abort 路由维持
+    // already_stopped 语义，不误报 accepted）。
+    if (!keys.some((key) => pendingDesktopSessionSubmissions.has(key))) return false;
+    for (const key of keys) abortedDesktopSessionSubmissions.add(key);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 function renderPendingReminderBlock(engine: any, sessionPath: string) {
   if (typeof engine.renderSessionReminderBlock === "function") {
     const rendered = engine.renderSessionReminderBlock(sessionPath);
@@ -75,6 +106,53 @@ function renderPendingReminderBlock(engine: any, sessionPath: string) {
 function consumeRenderedReminderBlock(engine: any, sessionPath: string, rendered: any): void {
   if (!rendered || rendered.alreadyConsumed || rendered.receipt == null) return;
   engine.consumeRenderedSessionReminderBlock?.(sessionPath, rendered.receipt);
+}
+
+/**
+ * Phase 8 知识注入块解析：engine 门面缺失 = 布线缺陷（显式抛错，不静默跳过
+ * 用户显式携带的知识库引用）；门面自身运行期失败已在其内部转为带
+ * [knowledge injection unavailable: ...] 标注的降级块——此处再兜一层，
+ * 保证聊天不因注入链路中断而阻断（降级留痕，禁静默）。
+ * 返回注入块与检索统计：降级路径的 stats 带 unavailableReason（其余字段
+ * 置零/none），正常路径原样透传 injector 的统计。
+ */
+async function resolveKnowledgeInjectionBlock(
+  engine: any,
+  refs: KnowledgeRefs,
+  question: string,
+  budgetTokens: number,
+  sessionPath: string,
+): Promise<{ block: string; stats: KnowledgeRetrievalStats }> {
+  if (typeof engine?.buildKnowledgeContextInjection !== "function") {
+    throw new Error("desktop-session-submit: knowledge injection unavailable (engine lacks buildKnowledgeContextInjection)");
+  }
+  try {
+    return await engine.buildKnowledgeContextInjection({
+      question,
+      knowledgeRefs: refs,
+      budgetTokens,
+      ...(sessionPath ? { sessionPath } : {}),
+    });
+  } catch (err) {
+    const reason = err instanceof Error ? err.message : String(err);
+    return {
+      block: `[KnowledgeContext]\n[knowledge injection unavailable: ${reason}]\n`
+        + "Guidance: Knowledge notebook evidence could not be retrieved for this question.\n[/KnowledgeContext]",
+      stats: {
+        mode: refs.mode,
+        retrievalMode: "none",
+        subQueries: [],
+        subQueryHits: [],
+        degraded: false,
+        fusedChunks: 0,
+        injectedChunks: 0,
+        truncated: false,
+        usedTokens: 0,
+        budgetTokens,
+        unavailableReason: reason,
+      },
+    };
+  }
 }
 
 /**
@@ -148,13 +226,21 @@ export function recordMessagePresentationEntry(
   sessionPath: string,
   promptText: string,
   displayMessage: any,
-  { forceDisplayText = false }: { forceDisplayText?: boolean } = {},
+  { forceDisplayText = false, knowledgeRetrieval = null }: {
+    forceDisplayText?: boolean;
+    knowledgeRetrieval?: KnowledgeRetrievalStats | null;
+  } = {},
 ): void {
   if (!displayMessage || typeof displayMessage !== "object") return;
   const displayText = typeof displayMessage.text === "string" ? displayMessage.text : null;
+  const knowledgeRefs = displayMessage.knowledgeRefs && typeof displayMessage.knowledgeRefs === "object"
+    ? displayMessage.knowledgeRefs
+    : null;
   const hasStructuredPresentation = Array.isArray(displayMessage.skills)
     || Array.isArray(displayMessage.sessionRefs)
     || Array.isArray(displayMessage.agentMentions)
+    || !!knowledgeRefs
+    || !!knowledgeRetrieval
     || !!displayMessage.agentReview
     || !!displayMessage.agentReviewRequest;
   if (!forceDisplayText && !hasStructuredPresentation && (displayText === null || displayText === promptText)) return;
@@ -167,6 +253,10 @@ export function recordMessagePresentationEntry(
       skills: Array.isArray(displayMessage.skills) ? displayMessage.skills : null,
       sessionRefs: Array.isArray(displayMessage.sessionRefs) ? displayMessage.sessionRefs : null,
       agentMentions: Array.isArray(displayMessage.agentMentions) ? displayMessage.agentMentions : null,
+      knowledgeRefs,
+      // 本次注入的检索统计（引擎门面产出）；retry/fork 重放不产生新检索，
+      // 新条目不携带旧消息的 stats。
+      knowledgeRetrieval,
       agentReviewRequest: displayMessage.agentReviewRequest || null,
     });
   } catch (err) {
@@ -189,6 +279,7 @@ export async function submitDesktopSessionMessage(engine: any, opts: {
   onDelta?: (delta: string, accumulated: string) => void;
   displayMessage?: any;
   sessionFileRefs?: Array<{ fileId?: string; sessionId?: string; sessionPath?: string; label?: string; kind?: string }>;
+  knowledgeRefs?: KnowledgeRefs;
   uiContext?: any;
   context?: any;
   preservePromptEnvelope?: boolean;
@@ -211,6 +302,7 @@ export async function submitDesktopSessionMessage(engine: any, opts: {
     onDelta,
     displayMessage,
     sessionFileRefs,
+    knowledgeRefs,
     uiContext,
     context,
     preservePromptEnvelope = false,
@@ -235,6 +327,14 @@ export async function submitDesktopSessionMessage(engine: any, opts: {
   liftBrowserAuthorizationRevocation(sessionPath);
 
   pendingDesktopSessionSubmissions.add(submissionKey);
+  // 发送即置忙：知识检索/排队期间该 session 事实上不可再收新输入（上方 busy 门禁），
+  // 提前广播 isStreaming:true 让 UI（打字指示器 / 停止按钮 / 发送门禁）从发送瞬间
+  // 就进入运行态，不再等检索完成后 promptSession 内部才置位（其后的 isStreaming:true
+  // 广播幂等）。提交链路异常或检索中被 abort 时，catch / abort 分支补发
+  // isStreaming:false，不留悬挂忙态。
+  engine.emitEvent?.({ type: "session_status", isStreaming: true }, sessionPath);
+  let earlyBusyEmitted = true;
+  let inputSideEffectsStarted = false;
   try {
     const session = await engine.ensureSessionLoaded(sessionPath);
     if (!session) throw new Error(`desktop-session-submit: failed to load session ${sessionPath}`);
@@ -249,7 +349,12 @@ export async function submitDesktopSessionMessage(engine: any, opts: {
     let displayAttachments = displayMessage?.attachments;
     let promptText = text || "";
     const displayComparisonPromptText = promptText;
+    let knowledgeInjectionBlock: string | null = null;
+    let knowledgeRetrievalStats: KnowledgeRetrievalStats | null = null;
     let promptSessionFileRefs = normalizeSessionFileRefs(sessionFileRefs, sessionPath, sessionId);
+    // 知识库引用：形状非法直接抛错（显式拒绝，禁静默降级）；下方 marker 注入点
+    // 调 knowledge-context-injector 做拆解 + 检索注入。
+    const promptKnowledgeRefs = normalizeKnowledgeRefs(knowledgeRefs);
 
     if (preservePromptEnvelope && inboundFiles?.length) {
       throw new Error("desktop-session-submit: preservePromptEnvelope cannot materialize inboundFiles");
@@ -311,13 +416,66 @@ export async function submitDesktopSessionMessage(engine: any, opts: {
       promptText = addAttachedVideoMarkers(promptText, promptVideoAttachmentPaths);
       promptText = addAttachedAudioMarkers(promptText, promptAudioAttachmentPaths);
       promptText = addSessionFileRefMarkers(promptText, promptSessionFileRefs);
+      // Phase 8：knowledge-context-injector 基于 promptKnowledgeRefs 做拆解 + 检索，
+      // 把 [KnowledgeContext] 系统侧注入块拼进发给模型的 prompt。displayComparisonPromptText
+      // 在此之前已捕获（复用 reminderBlock 剥离模式），用户可见投影不被污染；
+      // 注入块存在时 forceDisplayText 强制持久化展示正文（见下方投影条目）。
+      if (promptKnowledgeRefs) {
+        // 立即反馈：注入链路（拆解 + 检索）可能阻塞数秒到数十秒，而
+        // session_status isStreaming / session_user_message 都要等 promptSession
+        // 内部才会发出。先发 knowledge_retrieval_started 让 UI 进入「检索中」态，
+        // 再开始阻塞式注入（chat.ts 广播到订阅客户端）。
+        engine.emitEvent?.({ type: "knowledge_retrieval_started", sessionPath }, sessionPath);
+        const injection = await resolveKnowledgeInjectionBlock(
+          engine,
+          promptKnowledgeRefs,
+          text || "",
+          resolveKnowledgeInjectionBudgetTokens((session as any)?.model ?? null),
+          sessionPath,
+        );
+        knowledgeInjectionBlock = injection.block;
+        knowledgeRetrievalStats = injection.stats;
+        if (knowledgeInjectionBlock) {
+          promptText = `${knowledgeInjectionBlock}\n\n${promptText}`;
+        }
+      }
     }
+    if (abortedDesktopSessionSubmissions.delete(submissionKey)) {
+      // 检索期间用户点了停止：不进 promptSession、不做用户消息投影（消息视作从未
+      // 被接受；前端 optimistic 气泡随会话刷新消失），补发终止态收回提前置的忙。
+      engine.emitEvent?.({ type: "session_status", isStreaming: false, aborted: true, reason: "user_abort" }, sessionPath);
+      earlyBusyEmitted = false;
+      return { text: null, toolMedia: [] };
+    }
+
     const reminderBlock = preservePromptEnvelope ? null : renderPendingReminderBlock(engine, sessionPath);
     if (reminderBlock?.block) {
       promptText = `${reminderBlock.block}\n\n${promptText}`;
     }
 
-    let inputSideEffectsStarted = false;
+    // 历史轮知识注入块压缩（模型侧重发前）：JSONL 存储态的全部 [KnowledgeContext]
+    // 块都属于历史轮（本轮消息由 promptSession 落盘），替换为编号清单省上下文；
+    // preservePromptEnvelope 的逐字重放路径不压缩。压缩只改发给模型的内存消息
+    // 列表，JSONL 真相不动。
+    if (!preservePromptEnvelope) {
+      try {
+        const historicalContext = session?.sessionManager?.buildSessionContext?.();
+        if (historicalContext?.messages) {
+          const compressed = compressHistoricalKnowledgeContextMessages(historicalContext.messages);
+          if (compressed.changed) {
+            if (session.agent?.replaceMessages) {
+              session.agent.replaceMessages(compressed.messages);
+            } else if (session.agent?.state) {
+              session.agent.state.messages = compressed.messages;
+            }
+          }
+        }
+      } catch (compressError) {
+        // 压缩失败不阻断聊天：回退为旧的全量重发行为（自然降级，正文仍在）。
+        console.warn(`[desktop-session-submit] historical knowledge compression skipped: ${(compressError as Error)?.message || compressError}`);
+      }
+    }
+
     const afterCachePreflight = () => {
       const commitResult = beforeInputSideEffects?.();
       if (commitResult && typeof (commitResult as any).then === "function") {
@@ -327,13 +485,17 @@ export async function submitDesktopSessionMessage(engine: any, opts: {
       engine.emitEvent?.({ type: "session_status", isStreaming: true }, sessionPath);
       if (projectUserMessage) {
         // 展示投影与来源元信息先于 prompt 持久化，让 custom 条目注释其后的 user message。
-        // forceDisplayText 表示模型输入另含内部 Reminder；displayMessage 只保存用户可见正文。
+        // forceDisplayText 表示模型输入另含内部 Reminder/知识注入块；displayMessage
+        // 只保存用户可见正文，历史投影不显示这些系统侧注入。
         recordMessagePresentationEntry(
           session,
           sessionPath,
           displayComparisonPromptText,
           displayMessage ?? { text: text ?? "" },
-          { forceDisplayText: !!reminderBlock?.block },
+          {
+            forceDisplayText: !!reminderBlock?.block || !!knowledgeInjectionBlock,
+            knowledgeRetrieval: knowledgeRetrievalStats,
+          },
         );
         recordMessageOriginEntry(session, sessionPath, displayMessage);
         recordAgentReviewEntry(session, sessionPath, displayMessage);
@@ -352,6 +514,8 @@ export async function submitDesktopSessionMessage(engine: any, opts: {
             origin: displayMessage?.origin || null,
             sessionRefs: displayMessage?.sessionRefs || null,
             agentMentions: displayMessage?.agentMentions || null,
+            knowledgeRefs: displayMessage?.knowledgeRefs || null,
+            knowledgeRetrieval: knowledgeRetrievalStats,
             agentReview: displayMessage?.agentReview || null,
             agentReviewRequest: displayMessage?.agentReviewRequest || null,
           },
@@ -424,7 +588,17 @@ export async function submitDesktopSessionMessage(engine: any, opts: {
       text: visibleText.getText().trim() || null,
       toolMedia,
     };
+  } catch (err) {
+    // 提交链路在 promptSession 启动前抛错：提前广播的忙态必须收回（其内部不会再发
+    // isStreaming:false），否则客户端永久停在运行态。inputSideEffectsStarted 之后
+    // 的失败由内层 finally 收尾。
+    if (earlyBusyEmitted && !inputSideEffectsStarted) {
+      engine.emitEvent?.({ type: "session_status", isStreaming: false }, sessionPath);
+      earlyBusyEmitted = false;
+    }
+    throw err;
   } finally {
+    abortedDesktopSessionSubmissions.delete(submissionKey);
     pendingDesktopSessionSubmissions.delete(submissionKey);
   }
 }
@@ -487,6 +661,7 @@ export async function submitDesktopSessionInterjection(engine: any, opts: {
   clientMessageId?: string;
   displayMessage?: any;
   sessionFileRefs?: Array<{ fileId?: string; sessionId?: string; sessionPath?: string; label?: string; kind?: string }>;
+  knowledgeRefs?: KnowledgeRefs;
   uiContext?: any;
   context?: any;
 } = {}) {
@@ -504,6 +679,7 @@ export async function submitDesktopSessionInterjection(engine: any, opts: {
     clientMessageId,
     displayMessage,
     sessionFileRefs,
+    knowledgeRefs,
     uiContext,
     context,
   } = opts;
@@ -535,7 +711,11 @@ export async function submitDesktopSessionInterjection(engine: any, opts: {
   let displayAttachments = displayMessage?.attachments;
   let promptText = text || "";
   const displayComparisonPromptText = promptText;
+  let knowledgeInjectionBlock: string | null = null;
+  let knowledgeRetrievalStats: KnowledgeRetrievalStats | null = null;
   let promptSessionFileRefs = normalizeSessionFileRefs(sessionFileRefs, sessionPath, sessionId);
+  // 与 prompt 路径同一契约：形状非法显式抛错；下方 marker 注入点调 injector 注入。
+  const promptKnowledgeRefs = normalizeKnowledgeRefs(knowledgeRefs);
 
   if (displayAttachments?.length) {
     const registeredDisplay = registerDisplayAttachments({
@@ -591,6 +771,23 @@ export async function submitDesktopSessionInterjection(engine: any, opts: {
   promptText = addAttachedVideoMarkers(promptText, promptVideoAttachmentPaths);
   promptText = addAttachedAudioMarkers(promptText, promptAudioAttachmentPaths);
   promptText = addSessionFileRefMarkers(promptText, promptSessionFileRefs);
+  // Phase 8：interject 同样按 knowledgeRefs 注入（与 prompt 路径同一 injector）。
+  if (promptKnowledgeRefs) {
+    // 与 prompt 路径同一即时反馈：steer 前先广播检索开始（见 prompt 路径注释）。
+    engine.emitEvent?.({ type: "knowledge_retrieval_started", sessionPath }, sessionPath);
+    const injection = await resolveKnowledgeInjectionBlock(
+      engine,
+      promptKnowledgeRefs,
+      text || "",
+      resolveKnowledgeInjectionBudgetTokens((session as any)?.model ?? null),
+      sessionPath,
+    );
+    knowledgeInjectionBlock = injection.block;
+    knowledgeRetrievalStats = injection.stats;
+    if (knowledgeInjectionBlock) {
+      promptText = `${knowledgeInjectionBlock}\n\n${promptText}`;
+    }
+  }
   if (context?.beforeUser) {
     promptText = `${context.beforeUser}\n\n${promptText}`;
   }
@@ -615,6 +812,8 @@ export async function submitDesktopSessionInterjection(engine: any, opts: {
       source: displayMessage?.source || "desktop",
       bridgeSessionKey: displayMessage?.bridgeSessionKey || null,
       origin: displayMessage?.origin || null,
+      knowledgeRefs: displayMessage?.knowledgeRefs || null,
+      knowledgeRetrieval: knowledgeRetrievalStats,
     },
   }, sessionPath);
   queueVoiceInputTranscriptions({
@@ -625,12 +824,16 @@ export async function submitDesktopSessionInterjection(engine: any, opts: {
   // 展示投影与来源元信息在 steer 成功后持久化，避免 steer 被拒绝时产生孤儿条目。
   // steerSession 同步返回，与 appendCustomEntry 之间无 await，紧邻性不受影响。
   // 契约：origin 条目注释其后第一条 user message（中间可能隔着在途 assistant 输出）。
+  // forceDisplayText 同 prompt 路径：模型输入含 Reminder/知识注入块时强制持久化用户可见正文。
   recordMessagePresentationEntry(
     session,
     sessionPath,
     displayComparisonPromptText,
     displayMessage ?? { text: text ?? "" },
-    { forceDisplayText: !!reminderBlock?.block },
+    {
+      forceDisplayText: !!reminderBlock?.block || !!knowledgeInjectionBlock,
+      knowledgeRetrieval: knowledgeRetrievalStats,
+    },
   );
   recordMessageOriginEntry(session, sessionPath, displayMessage);
   return { text: null, toolMedia: [], steered: true };

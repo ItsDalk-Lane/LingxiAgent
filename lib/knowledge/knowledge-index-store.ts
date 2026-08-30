@@ -132,6 +132,8 @@ export class KnowledgeIndexStore {
     if (check !== "ok") throw new Error("index_quick_check_failed");
   }
 
+  // chunker_version 列语义为 chunkerConfigId（见 chunker.ts）：分块策略/尺寸不匹配即
+  // 整体重建；本库是可重建缓存，列定义无需迁移，DDL 保持不变（schema 指纹守门）。
   private createSchema() {
     this.db.exec(`
       CREATE TABLE artifact_indexes (
@@ -181,6 +183,7 @@ export class KnowledgeIndexStore {
     `);
   }
 
+  /** chunkerVersion 形参传入 chunkerConfigId；fingerprint 或 configId 任一不匹配即视为缓存失效。 */
   hasArtifactFingerprint(parseArtifactId: unknown, fingerprint: unknown, chunkerVersion: unknown): boolean {
     const artifactId = requiredId(parseArtifactId, "parseArtifactId");
     const row = this.db.prepare(`
@@ -236,6 +239,15 @@ export class KnowledgeIndexStore {
     })();
   }
 
+  /** 删除某解析产物的全部 FTS 行与索引登记（源被移除/孤儿清理时调用）。 */
+  removeArtifact(parseArtifactId: unknown) {
+    const artifactId = requiredId(parseArtifactId, "parseArtifactId");
+    this.db.transaction(() => {
+      this.db.prepare(`DELETE FROM knowledge_chunks WHERE parse_artifact_id = ?`).run(artifactId);
+      this.db.prepare(`DELETE FROM artifact_indexes WHERE parse_artifact_id = ?`).run(artifactId);
+    })();
+  }
+
   listArtifactChunks(parseArtifactId: unknown): KnowledgeChunkDraft[] {
     const artifactId = requiredId(parseArtifactId, "parseArtifactId");
     return this.db.prepare(`
@@ -272,7 +284,7 @@ export class KnowledgeIndexStore {
       throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "Knowledge search query has no searchable terms");
     }
     const limit = input.limit == null ? 12 : Number(input.limit);
-    if (!Number.isSafeInteger(limit) || limit < 1 || limit > 50) {
+    if (!Number.isSafeInteger(limit) || limit < 1 || limit > 1000) {
       throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "Knowledge search limit is invalid");
     }
     const placeholders = artifactIds.map(() => "?").join(", ");

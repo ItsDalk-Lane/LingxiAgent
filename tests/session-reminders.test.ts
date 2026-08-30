@@ -287,6 +287,50 @@ describe("stripSessionReminderBlocks", () => {
       "visible\n[hana_reminder at 2026-07-05 14:05]\n- internal only",
     )).toBe("visible");
   });
+
+  it("removes [KnowledgeContext] injection blocks while preserving user text", () => {
+    const visible = stripSessionReminderBlocks(
+      "[KnowledgeContext]\n"
+      + "Knowledge notebook evidence retrieved for the user's question.\n"
+      + "[K1] notebook \"研究\" / source \"论文\" / chunk ordinal 3\n"
+      + "证据文本\n"
+      + "[/KnowledgeContext]\n\n"
+      + "苹果什么时候交付",
+    );
+
+    expect(visible).toBe("苹果什么时候交付");
+    expect(visible).not.toContain("[KnowledgeContext]");
+    expect(visible).not.toContain("证据文本");
+  });
+
+  it("removes multiple knowledge blocks mixed with reminder blocks across lines", () => {
+    const visible = stripSessionReminderBlocks(
+      "[hana_reminder]\n- 插件已加载\n[/hana_reminder]\n\n"
+      + "[KnowledgeContext]\n块一正文\n[/KnowledgeContext]\n"
+      + "第一句\n\n"
+      + "[KnowledgeContext]\n块二正文\n多行\n[/KnowledgeContext]\n\n"
+      + "[hana_reminder]\n- 工具不可用\n[/hana_reminder]\n"
+      + "第二句",
+    );
+
+    expect(visible).toBe("第一句\n\n第二句");
+    expect(visible).not.toContain("KnowledgeContext");
+    expect(visible).not.toContain("块一正文");
+    expect(visible).not.toContain("块二正文");
+    expect(visible).not.toContain("hana_reminder");
+  });
+
+  it("fails closed for an unterminated knowledge block", () => {
+    expect(stripSessionReminderBlocks(
+      "visible\n[KnowledgeContext]\n[K1] evidence",
+    )).toBe("visible");
+  });
+
+  it("keeps a knowledge-shaped line that is not an exact whole-line header", () => {
+    expect(stripSessionReminderBlocks(
+      "see [KnowledgeContext] inline mention",
+    )).toBe("see [KnowledgeContext] inline mention");
+  });
 });
 
 describe("reminder receipt consumption", () => {
