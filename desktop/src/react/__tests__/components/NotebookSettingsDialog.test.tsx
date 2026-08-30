@@ -94,14 +94,15 @@ describe('NotebookSettingsDialog', () => {
     expect(screen.queryByRole('spinbutton', { name: '分块大小（字符）' })).not.toBeInTheDocument();
   });
 
-  it('默认无上限：保存 retrievalTopK=null', async () => {
+  it('检索数量控件已移除：界面无该行，保存原样回传库内 retrievalTopK', async () => {
     const onSaved = vi.fn();
     render(<NotebookSettingsDialog notebook={notebook} onClose={() => {}} onSaved={onSaved} />);
 
     await screen.findAllByRole('option', { name: '未配置' });
-    // 默认选中"无上限"，无数字输入框
-    expect(screen.getByLabelText('无上限（默认）')).toBeChecked();
-    expect(screen.queryByRole('spinbutton', { name: '最大召回数' })).not.toBeInTheDocument();
+    // 控件整体移除：标签/单选/数字输入都不存在（mock t 仍映射旧键，防回归）。
+    expect(screen.queryByText('检索数量')).not.toBeInTheDocument();
+    expect(screen.queryByLabelText('无上限（默认）')).not.toBeInTheDocument();
+    expect(screen.queryByLabelText('最大召回数')).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: '保存' }));
     await waitFor(() => expect(knowledgeApi.updateKnowledgeNotebookSettings).toHaveBeenCalledWith(
@@ -116,27 +117,7 @@ describe('NotebookSettingsDialog', () => {
     expect(onSaved).toHaveBeenCalledTimes(1);
   });
 
-  it('切换"最大召回数"后输入数字保存；非法数字本地拦截', async () => {
-    render(<NotebookSettingsDialog notebook={notebook} onClose={() => {}} onSaved={() => {}} />);
-    await screen.findAllByRole('option', { name: '未配置' });
-
-    fireEvent.click(screen.getByLabelText('最大召回数'));
-    const input = screen.getByRole('spinbutton', { name: '最大召回数' });
-    fireEvent.change(input, { target: { value: '5000' } });
-    fireEvent.click(screen.getByRole('button', { name: '保存' }));
-
-    expect(await screen.findByRole('alert')).toHaveTextContent('请输入 1–1000 之间的整数');
-    expect(knowledgeApi.updateKnowledgeNotebookSettings).not.toHaveBeenCalled();
-
-    fireEvent.change(input, { target: { value: '200' } });
-    fireEvent.click(screen.getByRole('button', { name: '保存' }));
-    await waitFor(() => expect(knowledgeApi.updateKnowledgeNotebookSettings).toHaveBeenCalledWith(
-      'notebook-a',
-      expect.objectContaining({ retrievalTopK: 200 }),
-    ));
-  });
-
-  it('已配置召回上限的笔记本初始为"最大召回数"模式', async () => {
+  it('存量配置了召回上限的笔记本：控件移除后保存按原值回传（不清不改）', async () => {
     const limited = {
       ...notebook,
       config: { ...notebook.config, retrievalTopK: 20 },
@@ -144,8 +125,12 @@ describe('NotebookSettingsDialog', () => {
     render(<NotebookSettingsDialog notebook={limited} onClose={() => {}} onSaved={() => {}} />);
     await screen.findAllByRole('option', { name: '未配置' });
 
-    expect(screen.getByRole('radio', { name: '最大召回数' })).toBeChecked();
-    expect(screen.getByRole('spinbutton', { name: '最大召回数' })).toHaveValue(20);
+    expect(screen.queryByText('检索数量')).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: '保存' }));
+    await waitFor(() => expect(knowledgeApi.updateKnowledgeNotebookSettings).toHaveBeenCalledWith(
+      'notebook-a',
+      expect.objectContaining({ retrievalTopK: 20 }),
+    ));
   });
 
   it('保存失败内联展示并保持弹窗打开', async () => {

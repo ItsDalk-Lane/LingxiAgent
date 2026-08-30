@@ -10,8 +10,6 @@ import styles from './KnowledgePage.module.css';
 
 const tr = (key: string, vars?: Record<string, string | number>) => window.t?.(key, vars) ?? key;
 
-const RETRIEVAL_TOP_K_MIN = 1;
-const RETRIEVAL_TOP_K_MAX = 1000;
 const VECTOR_RETENTION_DAYS_MIN = 1;
 const VECTOR_RETENTION_DAYS_MAX = 3650;
 
@@ -97,11 +95,9 @@ export function NotebookSettingsDialog({ notebook, onClose, onSaved }: NotebookS
   const [prefsFailed, setPrefsFailed] = useState(false);
   const [embeddingValue, setEmbeddingValue] = useState(() => refValue(notebook.config.embeddingModelRef));
   const [rerankValue, setRerankValue] = useState(() => refValue(notebook.config.rerankModelRef));
-  // 检索模式：null（无上限，默认）→ unlimited；正整数 → max。
-  const [topKUnlimited, setTopKUnlimited] = useState(notebook.config.retrievalTopK == null);
-  const [topK, setTopK] = useState(
-    notebook.config.retrievalTopK == null ? '' : String(notebook.config.retrievalTopK),
-  );
+  // 检索数量（retrievalTopK）控件已移除（2026-08-30）：候选预算链对每层独立封顶
+  // （生成 60 / 融合 60 / 证据锚点随注入预算伸缩），该设置 ≥60 后无实际影响，
+  // 保留只会误导；保存时原样回传库内现值，存量配置不受影响。
   // 向量保留：null（永久保留，默认）→ keep；正整数 → N 天未使用自动清理。
   const [retentionKeepForever, setRetentionKeepForever] = useState(notebook.config.vectorRetentionDays == null);
   const [retentionDays, setRetentionDays] = useState(
@@ -137,10 +133,6 @@ export function NotebookSettingsDialog({ notebook, onClose, onSaved }: NotebookS
   };
 
   const handleSave = async () => {
-    if (!topKUnlimited && !validateNumber(topK, RETRIEVAL_TOP_K_MIN, RETRIEVAL_TOP_K_MAX)) {
-      setFormError(tr('knowledge.settingsInvalidNumber', { min: RETRIEVAL_TOP_K_MIN, max: RETRIEVAL_TOP_K_MAX }));
-      return;
-    }
     if (!retentionKeepForever && !validateNumber(retentionDays, VECTOR_RETENTION_DAYS_MIN, VECTOR_RETENTION_DAYS_MAX)) {
       setFormError(tr('knowledge.settingsInvalidNumber', { min: VECTOR_RETENTION_DAYS_MIN, max: VECTOR_RETENTION_DAYS_MAX }));
       return;
@@ -151,7 +143,7 @@ export function NotebookSettingsDialog({ notebook, onClose, onSaved }: NotebookS
       await updateKnowledgeNotebookSettings(notebook.id, {
         embeddingModelRef: resolveRef(embeddingValue, notebook.config.embeddingModelRef),
         rerankModelRef: resolveRef(rerankValue, notebook.config.rerankModelRef),
-        retrievalTopK: topKUnlimited || topK.trim() === '' ? null : Number(topK),
+        retrievalTopK: notebook.config.retrievalTopK,
         vectorRetentionDays: retentionKeepForever || retentionDays.trim() === '' ? null : Number(retentionDays),
       });
       onSaved();
@@ -204,43 +196,6 @@ export function NotebookSettingsDialog({ notebook, onClose, onSaved }: NotebookS
           </output>
           <span className={styles.settingsHint}>{tr('knowledge.settingsChunkHint')}</span>
         </label>
-        <div className={styles.settingsRow}>
-          <span className={styles.settingsLabel}>{tr('knowledge.settingsRetrievalTopK')}</span>
-          <div className={styles.settingsTopKControls}>
-            <label className={styles.settingsRadio}>
-              <input
-                type="radio"
-                name={`topk-mode-${notebook.id}`}
-                checked={topKUnlimited}
-                onChange={() => setTopKUnlimited(true)}
-              />
-              <span>{tr('knowledge.settingsTopKUnlimited')}</span>
-            </label>
-            <label className={styles.settingsRadio}>
-              <input
-                type="radio"
-                name={`topk-mode-${notebook.id}`}
-                checked={!topKUnlimited}
-                onChange={() => setTopKUnlimited(false)}
-              />
-              <span>{tr('knowledge.settingsTopKMaxRecall')}</span>
-            </label>
-            {!topKUnlimited && (
-              <input
-                className={styles.settingsInput}
-                type="number"
-                min={RETRIEVAL_TOP_K_MIN}
-                max={RETRIEVAL_TOP_K_MAX}
-                step={1}
-                value={topK}
-                placeholder="12"
-                aria-label={tr('knowledge.settingsTopKMaxRecall')}
-                onChange={event => setTopK(event.target.value)}
-              />
-            )}
-          </div>
-          <span className={styles.settingsHint}>{tr('knowledge.settingsTopKHint')}</span>
-        </div>
         <div className={styles.settingsRow}>
           <span className={styles.settingsLabel}>{tr('knowledge.settingsVectorRetention')}</span>
           <div className={styles.settingsTopKControls}>

@@ -6843,6 +6843,11 @@
         },
         {
           "root": "server-bootstrap",
+          "from": "lib/knowledge/knowledge-coverage-manifest.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
           "from": "lib/knowledge/knowledge-coverage-reduction.ts",
           "kind": "import-statement"
         },
@@ -6877,7 +6882,7 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by core/session-compactor.ts (import-statement); lib/knowledge/knowledge-coverage-unit.ts (import-statement); lib/knowledge/knowledge-coverage-reduction.ts (import-statement); +6 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by core/session-compactor.ts (import-statement); lib/knowledge/knowledge-coverage-unit.ts (import-statement); lib/knowledge/knowledge-coverage-manifest.ts (import-statement); +7 more importer(s)."
     },
     {
       "path": "lib/llm/model-call-correlation.ts",

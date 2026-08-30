@@ -6,6 +6,8 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   buildKnowledgeContextInjection,
   KNOWLEDGE_INJECTION_FALLBACK_BUDGET_TOKENS,
+  KNOWLEDGE_EVIDENCE_BUDGET_MAX,
+  resolveEvidenceAnchorBudget,
   resolveKnowledgeInjectionBudgetTokens,
   decomposeQuestion,
   fuseSubQueryResults,
@@ -14,6 +16,7 @@ import {
   parseQuestionDecomposition,
   type DecomposeModel,
 } from "../lib/knowledge/knowledge-context-injector.ts";
+import { KNOWLEDGE_EVIDENCE_BUDGET } from "../lib/knowledge/knowledge-query-service.ts";
 import { KnowledgeManager } from "../lib/knowledge/knowledge-manager.ts";
 import type { RetrieveForNotebooksResult } from "../lib/knowledge/knowledge-query-service.ts";
 
@@ -840,5 +843,70 @@ describe("rerank 降级留痕透传", () => {
     });
     expect(block).not.toContain("[rerank degraded:");
     expect(stats.rerankDegradeReason).toBeUndefined();
+  });
+});
+
+// ─────────────── 证据锚点随注入预算伸缩（2026-08-30） ───────────────
+
+describe("resolveEvidenceAnchorBudget", () => {
+  it("大预算 × 中等块：锚点随预算上探（512k 窗口模型不再被 40 掐死）", () => {
+    // 60 块 × ~550 token：scaled = 500000×0.5/550 ≈ 454 → 封顶 240。
+    const fused = Array.from({ length: 60 }, () => ({ text: "证".repeat(500) }));
+    expect(resolveEvidenceAnchorBudget({ budgetTokens: 500_000, fused })).toBe(KNOWLEDGE_EVIDENCE_BUDGET_MAX);
+    // 预算 200k：scaled ≈ 181 → 介于 40 与 240 之间。
+    expect(resolveEvidenceAnchorBudget({ budgetTokens: 200_000, fused })).toBe(181);
+  });
+
+  it("小预算/兜底预算：下限 40 兜底（既有行为不变，装填循环按预算硬裁）", () => {
+    const fused = Array.from({ length: 60 }, () => ({ text: "证".repeat(500) }));
+    expect(resolveEvidenceAnchorBudget({ budgetTokens: 6_000, fused })).toBe(KNOWLEDGE_EVIDENCE_BUDGET);
+    expect(resolveEvidenceAnchorBudget({ budgetTokens: 0, fused })).toBe(KNOWLEDGE_EVIDENCE_BUDGET);
+  });
+
+  it("碎片块语料：scaled 再大也封顶 240；fused 为空 → 下限", () => {
+    const tiny = Array.from({ length: 500 }, () => ({ text: "短" }));
+    expect(resolveEvidenceAnchorBudget({ budgetTokens: 500_000, fused: tiny })).toBe(KNOWLEDGE_EVIDENCE_BUDGET_MAX);
+    expect(resolveEvidenceAnchorBudget({ budgetTokens: 500_000, fused: [] })).toBe(KNOWLEDGE_EVIDENCE_BUDGET);
+  });
+});
+
+describe("注入链路锚点伸缩", () => {
+  it("大预算下注入锚点超过 40（预算自动匹配证据量）", async () => {
+    // 55 个候选块 × ~550 token：融合池 ≤60，预算 300k → 锚点上限 ~109，
+    // 全部 55 块都能成为锚点（旧行为会被 40 截掉 15 块）。
+    const candidates = Array.from({ length: 55 }, (_, index) => (
+      fakeChunk({ id: `c${index}`, ordinal: index, text: `块${index}：` + "证".repeat(500) })
+    ));
+    const { block, stats } = await buildKnowledgeContextInjection({
+      question: "问题",
+      mode: "qa",
+      budgetTokens: 300_000,
+      deps: {
+        decomposeModel: null,
+        distillModel: null,
+        retrieve: async () => fakeRetrieval(candidates),
+      },
+    });
+    expect(stats.fusedChunks).toBe(55);
+    expect(stats.injectedChunks).toBeGreaterThanOrEqual(55);
+    expect(block).not.toContain("beyond the evidence budget");
+  });
+
+  it("小预算维持既有收紧：超预算走分片清单，锚点不越预算", async () => {
+    const candidates = Array.from({ length: 55 }, (_, index) => (
+      fakeChunk({ id: `c${index}`, ordinal: index, text: `块${index}：` + "证".repeat(500) })
+    ));
+    const { stats } = await buildKnowledgeContextInjection({
+      question: "问题",
+      mode: "qa",
+      budgetTokens: 2_000,
+      deps: {
+        decomposeModel: null,
+        distillModel: null,
+        retrieve: async () => fakeRetrieval(candidates),
+      },
+    });
+    expect(stats.truncated).toBe(true);
+    expect(stats.usedTokens).toBeLessThanOrEqual(2_000);
   });
 });

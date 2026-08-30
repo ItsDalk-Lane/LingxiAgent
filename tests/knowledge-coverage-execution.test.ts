@@ -297,8 +297,10 @@ describe("HIGH_RECALL：预算链与邻接扩展（§二十六/§三十六/§九
     expect(fused[0].id).toBe("c0"); // 截断保序：RRF 名次前列保留
   });
 
-  it("candidate budget 链逐级截断并留痕计数：150 候选 → unique 60 → evidence 40", async () => {
+  it("candidate budget 链逐级截断并留痕计数：150 候选 → unique 60 → 锚点随预算伸缩", async () => {
     const candidates = Array.from({ length: 150 }, (_, index) => fakeChunk({ id: `c${index}`, ordinal: index }));
+    // 兜底预算（6000）× 假块 ~5 token：锚点上限 = min(240, 6000×0.5/5) = 240
+    // → 全部 60 个融合候选都成为锚点（2026-08-30 伸缩后语义；旧行为固定 40）。
     const { block, stats } = await buildKnowledgeContextInjection({
       question: "问题",
       mode: "qa",
@@ -310,11 +312,11 @@ describe("HIGH_RECALL：预算链与邻接扩展（§二十六/§三十六/§九
     });
     expect(stats.candidateChunkCount).toBe(150);
     expect(stats.uniqueChunkCount).toBe(KNOWLEDGE_FUSION_BUDGET);
-    expect(stats.fusedChunks).toBe(KNOWLEDGE_EVIDENCE_BUDGET);
-    expect(stats.injectedChunks).toBe(KNOWLEDGE_EVIDENCE_BUDGET);
-    // 超出 evidenceBudget 的融合候选显式留痕（禁静默丢弃）。
-    expect(block).toContain("fused candidates beyond the evidence budget");
-    expect((block.match(/\[K\d+\] notebook/g) || []).length).toBe(KNOWLEDGE_EVIDENCE_BUDGET);
+    expect(stats.fusedChunks).toBe(KNOWLEDGE_FUSION_BUDGET);
+    expect(stats.injectedChunks).toBe(KNOWLEDGE_FUSION_BUDGET);
+    // 融合候选全部成为锚点：无 "beyond the evidence budget" 截断留痕。
+    expect(block).not.toContain("fused candidates beyond the evidence budget");
+    expect((block.match(/\[K\d+\] notebook/g) || []).length).toBe(KNOWLEDGE_FUSION_BUDGET);
   });
 
   it("邻接扩展 ±1：contextOnly 标记、计入 neighborExpansionCount、不计检索命中/footprint 分子", async () => {

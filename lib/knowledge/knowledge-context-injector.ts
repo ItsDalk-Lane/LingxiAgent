@@ -98,6 +98,36 @@ export const KNOWLEDGE_INJECTION_FALLBACK_BUDGET_TOKENS = 6000;
 const KNOWLEDGE_INJECTION_MIN_BUDGET_TOKENS = 1000;
 
 /**
+ * 证据锚点数随注入预算伸缩（2026-08-30）：Phase 8 的固定 40 锚点在大会话模型
+ * 下只占预算一成（实测 512k 窗口 → ~50 万 token 预算 vs 40 块 ≈ 5 万 token），
+ * 余量闲置。公式：按融合候选的平均 token 估算为粒度，锚点最多吃掉预算的
+ * KNOWLEDGE_EVIDENCE_BUDGET_UTILIZATION（另一半留给邻接扩展与块头开销）；
+ * 下限 = KNOWLEDGE_EVIDENCE_BUDGET（40，小预算模型既有行为兜底，装填循环
+ * 仍按预算硬裁不会超），上限 = KNOWLEDGE_EVIDENCE_BUDGET_MAX（240，防碎片
+ * 块语料把 prompt 切成碎屑）。fused 为空/预算非法 → 下限。
+ */
+export const KNOWLEDGE_EVIDENCE_BUDGET_UTILIZATION = 0.5;
+export const KNOWLEDGE_EVIDENCE_BUDGET_MAX = 240;
+
+/** 伸缩后的证据锚点上限：确定性纯函数（同输入同输出，便于测试与留痕）。 */
+export function resolveEvidenceAnchorBudget(input: {
+  budgetTokens: number;
+  fused: ReadonlyArray<{ text: string }>;
+}): number {
+  if (input.fused.length === 0) return KNOWLEDGE_EVIDENCE_BUDGET;
+  if (!Number.isFinite(input.budgetTokens) || input.budgetTokens <= 0) {
+    return KNOWLEDGE_EVIDENCE_BUDGET;
+  }
+  const totalTokens = input.fused.reduce((sum, chunk) => sum + estimateTextTokens(chunk.text), 0);
+  const avgTokens = Math.max(1, totalTokens / input.fused.length);
+  const scaled = Math.floor((input.budgetTokens * KNOWLEDGE_EVIDENCE_BUDGET_UTILIZATION) / avgTokens);
+  return Math.max(
+    KNOWLEDGE_EVIDENCE_BUDGET,
+    Math.min(KNOWLEDGE_EVIDENCE_BUDGET_MAX, scaled),
+  );
+}
+
+/**
  * 动态注入预算 = 会话模型上下文窗口 − 回答预留。回答预留取模型最大输出
  * 长度（maxOutput/maxTokens）；缺失时按窗口 25%。窗口未知回退固定兜底值。
  * 由 desktop-session-submit 按当前会话模型解析后经 engine 门面传入。
@@ -2034,7 +2064,9 @@ export async function buildKnowledgeContextInjection(input: {
 
   // ── 融合 → 证据组装（§二十六 预算链 + §三十六 邻接扩展）──
   let fused = fuseSubQueryResults(finalResults);
-  let anchors = fused.slice(0, KNOWLEDGE_EVIDENCE_BUDGET);
+  // 锚点上限随注入预算伸缩（大上下文模型多带证据，小模型维持既有 40 兜底）。
+  let anchorBudget = resolveEvidenceAnchorBudget({ budgetTokens, fused });
+  let anchors = fused.slice(0, anchorBudget);
   let candidateChunkCount = finalResults.reduce((sum, result) => sum + result.candidates.length, 0);
   let footprint = computeCoverageFootprint({ fused, sources: allSources, candidateChunkCount });
 
@@ -2078,7 +2110,8 @@ export async function buildKnowledgeContextInjection(input: {
       // 降格补跑的结构探测改变了融合池：footprint 按探测后结果重算
       // （与正常 broad 路径同口径，§四十一 升级判断也用重算后的值）。
       fused = fuseSubQueryResults(finalResults);
-      anchors = fused.slice(0, KNOWLEDGE_EVIDENCE_BUDGET);
+      anchorBudget = resolveEvidenceAnchorBudget({ budgetTokens, fused });
+      anchors = fused.slice(0, anchorBudget);
       candidateChunkCount = finalResults.reduce((sum, result) => sum + result.candidates.length, 0);
       footprint = computeCoverageFootprint({ fused, sources: allSources, candidateChunkCount });
     }
@@ -2119,7 +2152,7 @@ export async function buildKnowledgeContextInjection(input: {
     if (fused.length > anchors.length) {
       coverageNotes.push(
         `(${fused.length - anchors.length} fused candidates beyond the evidence budget `
-        + `(${KNOWLEDGE_EVIDENCE_BUDGET}) were not assembled into evidence)`,
+        + `(${anchorBudget}) were not assembled into evidence)`,
       );
     }
   }
