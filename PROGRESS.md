@@ -10,7 +10,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = 47fed9ef6f799e04004c47b3fc0dc1b892165039  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-08-30 同上 + 知识提问延迟修复 + exhaustive 规模闸 + 证据锚点随预算伸缩 + engine 构造顺序修复)
+VERIFIED_SOURCE_SHA   = 08ead330e7a6f3bf46d7b67d54c40c54b0fae2e6  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-08-30 同上 + 嵌入/重排供应商协议兼容修复（千问双端点方言/MiniMax 方言/rerank 上限 50）)
 工作分支              = feature/upstream-sync-0.447.4
 ```
 
@@ -597,6 +597,22 @@ seal 不是一次性终点，而是"当前被验证树"的游标；每次审计�
   值，五语言 locale 键同步移除。验证：typecheck×3 绿 + eslint 0 error +
   新增 7 用例 + knowledge 簇 195 用例 + full npm test 12791 passed / 0
   failed 后推进。
+
+- **2026-08-30 嵌入/重排供应商协议兼容修复**（功能树 08ead330/seal 本提交；
+  17 files / +428-40，含 persistence fingerprint compatible repin）：全部供应商
+  插件的嵌入/重排调用链对各家官方文档逐家核验后的实锤三连修——①千问 rerank
+  新增 dashscope-rerank 双端点方言（gte-rerank 系/qwen3-vl-rerank 系走原生
+  嵌套端点 + output.results 归一化，qwen3-rerank 系走 compatible-api/v1/
+  reranks 官方复数端点；旧实现改写后拼单数 /rerank 必 404），cohere-rerank
+  协议在 compatible-mode base 上的改写后缀同步修正为复数；②MiniMax 嵌入新增
+  minimax-embeddings 方言（/v1/embeddings?GroupId= + texts/type(db|query)
+  请求体 + vectors 归一化 + HTTP 200 内嵌 base_resp 错误码显式抛错），groupId
+  进 registry ALLOWED 白名单 + 模型编辑面板输入位 + 五语言文案，inputType
+  穿透查询侧固定 query（官方 db/query 算法分离）、缺 GroupId 显式报错；
+  ③rerank 文档上限 100→50（防御火山方舟 doubao-rerank 单次 50 上限，精度远
+  小于该值已饱和），查询侧裁剪与客户端断言共用单一真理源。验证：typecheck×3
+  绿 + full npm test 12799 passed / 0 failed + 指纹 compatible repin（engine.ts
+  闭包透传不触及持久化形状）+ tripwire/census 门禁单跑绿后推进。
 
 
 ## 最终状态：已合并（上游同步部分）
