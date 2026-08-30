@@ -134,7 +134,11 @@
     "readinessFailed": "{count} 件失敗",
     "settingsChunkAutoFallback": "自動（約 6553）",
     "settingsTopKUnlimited": "無制限（デフォルト）",
-    "settingsTopKMaxRecall": "最大召回数"
+    "settingsTopKMaxRecall": "最大召回数",
+    "settingsVectorRetention": "ベクトル保持ポリシー",
+    "settingsRetentionKeepForever": "永久保持（デフォルト）",
+    "settingsRetentionDaysMode": "日数経過後に削除",
+    "settingsVectorRetentionHint": "モデル切替や再取り込みで不要になった旧ベクトルは、設定日数（1–3650）クエリ未使用で自動削除されます。使用中の最新版には影響しません"
   },
   "channel": {
     "tab": "チャンネル",
@@ -1991,7 +1995,14 @@
         "image": "画像",
         "video": "動画",
         "speech": "音声認識"
-      }
+      },
+      "modelOperationType": "モデルタイプ",
+      "modelOperationNone": "なし",
+      "modelOperationEmbedding": "埋め込み",
+      "modelOperationRerank": "リランク",
+      "modelOperationHint": "埋め込みまたはリランクのタグを付けたモデルは、知識ノート設定の対応するドロップダウンに表示されます。タグは印のみで、実際の対応は呼び出し時に検証されます。",
+      "embeddingDimensions": "埋め込み次元数",
+      "embeddingDimensionsHint": "プロバイダーがカスタム次元に対応する場合に使用。非対応の場合は記録のみで、プロバイダーの既定次元で返されます。"
     },
     "memory": {
       "sectionTitle": "記憶",

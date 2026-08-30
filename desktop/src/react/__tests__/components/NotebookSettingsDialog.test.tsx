@@ -28,6 +28,7 @@ const notebook = {
     rerankModelRef: null,
     chunkTargetChars: null,
     retrievalTopK: null,
+    vectorRetentionDays: null,
   },
   chunkTargetCharsEffective: 6553,
   sourceCount: 2,
@@ -56,6 +57,10 @@ describe('NotebookSettingsDialog', () => {
         'knowledge.settingsRetrievalTopK': '检索数量',
         'knowledge.settingsTopKUnlimited': '无上限（默认）',
         'knowledge.settingsTopKMaxRecall': '最大召回数',
+        'knowledge.settingsVectorRetention': '向量保留策略',
+        'knowledge.settingsRetentionKeepForever': '永久保留（默认）',
+        'knowledge.settingsRetentionDaysMode': '天数后清理',
+        'knowledge.settingsVectorRetentionHint': '旧版向量超期未使用自动清理',
         'knowledge.settingsGlobalNotConfigured': '未配置',
         'knowledge.settingsInvalidNumber': '请输入 {min}–{max} 之间的整数',
       };
@@ -105,6 +110,7 @@ describe('NotebookSettingsDialog', () => {
         embeddingModelRef: null,
         rerankModelRef: null,
         retrievalTopK: null,
+        vectorRetentionDays: null,
       },
     ));
     expect(onSaved).toHaveBeenCalledTimes(1);

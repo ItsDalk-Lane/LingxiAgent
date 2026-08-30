@@ -49,6 +49,7 @@ const notebookA = {
     rerankModelRef: null,
     chunkTargetChars: 1200,
     retrievalTopK: 12,
+    vectorRetentionDays: null,
   },
   sourceCount: 1,
   ingestion: { done: 1, pendingEmbedding: 0, processing: 0, failed: 0, untracked: 0 },

@@ -441,6 +441,32 @@ export class KnowledgeIndexStore {
     })();
   }
 
+  /** 删除某解析产物的全部 FTS chunk 行（源被移除/孤儿清理时调用）。
+   * 注：v2 起索引登记并入 chunk_index_variants、artifact_indexes 表已 DROP，
+   * 这里只清 knowledge_chunks。 */
+  removeArtifact(parseArtifactId: unknown) {
+    const artifactId = requiredId(parseArtifactId, "parseArtifactId");
+    this.db.transaction(() => {
+      this.db.prepare(`DELETE FROM knowledge_chunks WHERE parse_artifact_id = ?`).run(artifactId);
+    })();
+  }
+
+  listArtifactChunks(parseArtifactId: unknown): KnowledgeChunkDraft[] {
+    const artifactId = requiredId(parseArtifactId, "parseArtifactId");
+    return this.db.prepare(`
+      SELECT * FROM knowledge_chunks
+      WHERE parse_artifact_id = ?
+      ORDER BY ordinal ASC
+    `).all(artifactId).map((row: any) => ({
+      id: row.id,
+      parseArtifactId: row.parse_artifact_id,
+      ordinal: Number(row.ordinal),
+      text: row.text,
+      tokenCount: Number(row.token_count),
+      spans: parseSpans(row.spans_json),
+    }));
+  }
+
   listVariantChunks(chunkIndexVariantId: unknown): StoredKnowledgeChunk[] {
     const variantId = requiredId(chunkIndexVariantId, "chunkIndexVariantId");
     return this.db.prepare(`

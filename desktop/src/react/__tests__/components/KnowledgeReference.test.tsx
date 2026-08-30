@@ -20,7 +20,7 @@ function notebookDto(partial: Partial<KnowledgeNotebookDto> & Pick<KnowledgeNote
     createdAt: '2026-08-01T00:00:00Z',
     updatedAt: '2026-08-01T00:00:00Z',
     deletedAt: null,
-    config: { embeddingModelRef: null, rerankModelRef: null, chunkTargetChars: null, retrievalTopK: null },
+    config: { embeddingModelRef: null, rerankModelRef: null, chunkTargetChars: null, retrievalTopK: null, vectorRetentionDays: null },
     sourceCount: 2,
     ingestion: { done: 2, pendingEmbedding: 0, processing: 0, failed: 0, untracked: 0 },
     ...partial,

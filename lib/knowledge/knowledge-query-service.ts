@@ -378,6 +378,53 @@ export class KnowledgeQueryService {
   }
 
   /**
+   * 向量保留策略 sweep：回收"旧版本"向量——(a) 非该源最新解析产物的全部向量；
+   * (b) 最新产物下非最新嵌入身份的向量（换模型/改维度后的作废副本）。候选超过
+   * 挂靠笔记本配置的保留天数（以向量库 last_used_at 计，查询命中即刷新）未
+   * 被使用即删除；任一挂靠笔记本未配置保留策略 = 该源永久保留。由摄入循环
+   * 周期调用（每小时量级）。返回删除的（artifact, modelKey）数。
+   */
+  sweepStaleVectorArtifacts(input?: { now?: () => string }): number {
+    const vectorIndex = this.deps.vectorIndex;
+    if (!vectorIndex || typeof vectorIndex.listArtifactUsage !== "function") return 0;
+    const nowMs = Date.parse((input?.now ?? (() => new Date().toISOString()))());
+    let removed = 0;
+    // 历史孤儿源（无活跃挂靠笔记本，UI 不可达）：向量无人引用，直接回收。
+    // 新删除已由 manager 即时清理，这里只兜底清理逻辑上线前的残留。
+    for (const artifactId of this.deps.store.listOrphanArtifactIds()) {
+      vectorIndex.removeArtifact(artifactId);
+      removed += 1;
+    }
+    const ownership = new Map(
+      this.deps.store.listArtifactVectorSweepRows().map((row) => [row.artifactId, row]),
+    );
+    // 最新产物按"最新身份保留"豁免：同 artifact 下 indexedAt 最新的 modelKey 不删。
+    const usage = vectorIndex.listArtifactUsage();
+    const latestKeyByArtifact = new Map<string, { modelKey: string; indexedAt: string }>();
+    for (const entry of usage) {
+      const current = latestKeyByArtifact.get(entry.parseArtifactId);
+      if (!current || entry.indexedAt > current.indexedAt) {
+        latestKeyByArtifact.set(entry.parseArtifactId, { modelKey: entry.modelKey, indexedAt: entry.indexedAt });
+      }
+    }
+    for (const entry of usage) {
+      const owner = ownership.get(entry.parseArtifactId);
+      if (!owner || owner.retentionDays == null) continue;
+      if (owner.isLatestForSource && latestKeyByArtifact.get(entry.parseArtifactId)?.modelKey === entry.modelKey) {
+        continue;
+      }
+      const lastUsedMs = Date.parse(entry.lastUsedAt || entry.indexedAt);
+      if (Number.isFinite(lastUsedMs) && nowMs - lastUsedMs < owner.retentionDays * 86_400_000) continue;
+      vectorIndex.removeArtifactModel({
+        parseArtifactId: entry.parseArtifactId,
+        modelKey: entry.modelKey,
+      });
+      removed += 1;
+    }
+    return removed;
+  }
+
+  /**
    * 摄入管线的 chunk+fts_index 相位：分块与 FTS 索引在同一次幂等替换中原子完成。
    * 身份锚是 ChunkIndexVariant (parseArtifactId, chunkProfileHash)（chunkProfileHash
    * 即 chunkerConfigId）：指纹（blocks 内容）匹配且变体 ready 即整体跳过；不匹配只

@@ -474,6 +474,39 @@ seal 不是一次性终点，而是"当前被验证树"的游标；每次审计�
   repin、store-registry 登记。验证：typecheck×3（绿）+ eslint 0 error +
   full npm test 12746 passed / 0 failed 后推进。
 
+- **2026-08-30 knowledge-watch 条件驱动假时钟 + win32 retry=2（四连修之四）**
+  （功能树 33473a8f/seal 本提交；2 files / +20-17）：上轮 5 轮循环仍有
+  洞——防抖计时器在轮询 stat 完成那一刻才建出（假时钟停在当时值），stat
+  晚于全部固定 settle 轮数完成时（Linux 满载轮次即此）计时器停在「未来
+  的假时钟」永不触发；改 waitForWithClock「settle → 推进防抖窗 → 查条件」
+  循环直至条件满足（上限 180s 留在 300s 轮询窗内），两处轮询检出点改用。
+  auth-storage recovers 在 retry=1 下仍复发（第 2 个红周期），win32 retry
+  提至 2；若再挂达连续 3 周期约束即停改上报。验证：typecheck×3 绿 +
+  full npm test 12556 passed / 0 failed（封印推进后复跑）后推进。
+
+- **2026-08-30 knowledge-watch 轮询测试慢 runner 修复（Windows CI 三连修之三）**
+  （功能树 7cddd563/seal 本提交；1 file / +12-4）：兜底轮询检出为假时钟
+  推进 + 真实 fs stat，原固定 settleIo(20) 轮后单次推进 DEBOUNCE_MS——
+  满载 Windows runner（全程 774s，本机 10 倍）stat 晚完成则防抖计时器
+  在推进后才建出，waitFor 的 setImmediate 循环不推假时钟，永不触发。
+  改「settle → 推进防抖窗」循环 5 轮（5×1500ms 远不到下一个 300s 轮询
+  点，无二次检出），恢复后检出同款脆弱点一并修。验证：typecheck×3 绿 +
+  full npm test 12556 passed / 0 failed（封印推进后复跑）后推进。
+
+- **2026-08-30 Windows CI 稳定性两连修（PR #30 监控修复）**
+  （功能树 91d66f93/seal 本提交；2 files / +10-1）：①knowledge-store 测试
+  migrateLegacyGlobalModelRefs 泄漏 SQLite 句柄未 close 就删临时目录，
+  Windows rmSync 报 EPERM（macOS/Linux 删打开文件合法故本机全绿）——补
+  store.close() + afterEach rmSync 退避重试；②model-manager-auth-storage
+  同代码结果漂移（main 8/28 挂 2 例/PR 一轮全过/三轮挂 1 例，SDK getAuth
+  无解析走兼容分支 ok:true+apiKey undefined），抢救/投影/凭证链路逐层排查
+  均为同步确定性逻辑，结合 main 近 8 轮 Windows 矩阵挂 4 轮且失败文件各异，
+  定性 runner 环境抖动——vitest test.retry 仅 win32=1（与 ci.yml npm ci
+  的 nick-fields/retry 同一处置逻辑），macOS/Linux 保持 0。两修各验：
+  typecheck×3 绿 + eslint 改动文件 0 error + full npm test 12556 passed /
+  0 failed（封印推进后复跑）后推进。
+
+
 - **2026-08-30 build 修复 underscore 钉入 server 外置传递依赖**
   （功能树 0a45563a/seal 本提交；1 file / +6-1）：PR #31 CI open-build-smoke
   红——外置包 mammoth 的传递依赖 underscore 被 nft 按 ["node","import"]

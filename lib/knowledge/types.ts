@@ -153,6 +153,8 @@ export interface NotebookConfig {
   rerankModelRef: KnowledgeModelRef | null;
   chunkTargetChars: number | null;
   retrievalTopK: number | null;
+  /** null = 永久保留（默认）；正整数 = 旧版本向量 N 天未被查询命中即回收（schema v9）。 */
+  vectorRetentionDays: number | null;
 }
 
 /**

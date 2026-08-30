@@ -78,7 +78,7 @@ describe("KnowledgeStore v9：ChunkProfile / RetrievalProfile", () => {
   it("v9 schema：两张身份表与 notebooks.retrieval_profile_id 列就位", () => {
     const store = openStore(path.join(tempDir(), "knowledge.db"));
     expect(store.db.pragma("user_version", { simple: true })).toBe(KNOWLEDGE_SCHEMA_VERSION);
-    expect(KNOWLEDGE_SCHEMA_VERSION).toBe(16);
+    expect(KNOWLEDGE_SCHEMA_VERSION).toBe(17);
 
     // v12（Phase 5 生命周期治理）：orphan 标记列、取消留痕列与活跃 job 部分唯一索引。
     const sourceColumns = new Set<string>(

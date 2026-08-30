@@ -2266,11 +2266,17 @@ export class LingxiEngine {
       resolveOperationFresh: async () => execution,
       getUsageLedger: () => this._usageLedger,
     });
+    // 模型条目声明的维度（如 qwen3-embedding 的 MRL 截断值）与上下文窗口随请求
+    // 下发：维度缺失会拿 provider 原生维度（4096），窗口缺失会让 ollama 按模型
+    // 声明最大值（40960）预分配 KV cache——8B 模型上多占数 GB 内存。
+    const declaredWindow = execution.model?.contextWindow ?? execution.model?.context ?? null;
     return client.embed({
       texts: request.texts,
       signal: request.signal,
       // 与 _embedKnowledgeTexts 同理：整源批量编码可能远超默认 30s 操作超时。
       timeoutMs: 300_000,
+      dimensions: execution.model?.dimensions ?? undefined,
+      contextWindow: Number.isSafeInteger(declaredWindow) && declaredWindow > 0 ? declaredWindow : undefined,
       usageContext: this._knowledgeOperationUsageContext("embedding", request.runId),
     });
   }

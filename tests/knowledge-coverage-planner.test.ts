@@ -343,7 +343,7 @@ describe("持久化 round-trip（schema v13）", () => {
   it("新库直接是 v14，表存在", () => {
     const store = createStore();
     expect(store.db.pragma("user_version", { simple: true })).toBe(KNOWLEDGE_SCHEMA_VERSION);
-    expect(KNOWLEDGE_SCHEMA_VERSION).toBe(16);
+    expect(KNOWLEDGE_SCHEMA_VERSION).toBe(17);
     expect(store.db.prepare(
       "SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'knowledge_coverage_plans'",
     ).get()).toBeTruthy();

@@ -207,6 +207,61 @@ describe("PortableVectorIndexAdapter（legacy 过渡锚：裸 parseArtifactId）
     })).toEqual([]);
     adapter.close();
   });
+
+  it("查询命中刷新 last_used_at，removeArtifactModel 细粒度删除保留同产物其他身份", () => {
+    const { adapter } = createAdapter();
+    const modelB: VectorIndexModelIdentity = { ...model, key: "provider-b/embed-b/openai-embeddings/3", modelId: "embed-b" };
+    adapter.buildOrReplaceArtifact({
+      parseArtifactId: "artifact-a",
+      chunkFingerprint: "fingerprint-a",
+      model,
+      entries: [{ chunkId: "chunk-a", parseArtifactId: "artifact-a", ordinal: 0, vector: [1, 0, 0] }],
+    });
+    adapter.buildOrReplaceArtifact({
+      parseArtifactId: "artifact-a",
+      chunkFingerprint: "fingerprint-a",
+      model: modelB,
+      entries: [{ chunkId: "chunk-b", parseArtifactId: "artifact-a", ordinal: 0, vector: [0, 1, 0] }],
+    });
+
+    // 查询只命中 modelB 的向量，但使用时间按 artifact 维度刷新。
+    const before = adapter.listArtifactUsage().find((row) => row.modelKey === model.key)!.lastUsedAt;
+    adapter.search({ parseArtifactIds: ["artifact-a"], model: modelB, queryVector: [0, 1, 0] });
+    const usage = adapter.listArtifactUsage();
+    expect(usage).toHaveLength(2);
+    for (const row of usage) {
+      expect(Date.parse(row.lastUsedAt)).toBeGreaterThanOrEqual(Date.parse(before));
+    }
+
+    // 细粒度删除：只删 model 身份，modelB 保留。
+    adapter.removeArtifactModel({ parseArtifactId: "artifact-a", modelKey: model.key });
+    expect(adapter.listArtifactUsage().map((row) => row.modelKey)).toEqual([modelB.key]);
+    expect(adapter.search({ parseArtifactIds: ["artifact-a"], model, queryVector: [1, 0, 0] })).toEqual([]);
+    expect(adapter.search({ parseArtifactIds: ["artifact-a"], model: modelB, queryVector: [0, 1, 0] })).toHaveLength(1);
+    adapter.close();
+  });
+
+  it("v2 库升级到 v3 时 last_used_at 回填 created_at（=indexed_at 语义）", () => {
+    const { dbPath, adapter } = createAdapter();
+    adapter.buildOrReplaceArtifact({
+      parseArtifactId: "artifact-a",
+      chunkFingerprint: "fingerprint-a",
+      model,
+      entries: [{ chunkId: "chunk-a", parseArtifactId: "artifact-a", ordinal: 0, vector: [1, 0, 0] }],
+    });
+    const indexedAt = adapter.listArtifactUsage()[0].indexedAt;
+    // 压回 v2 并抹掉 last_used_at 列，模拟本分支线 v2 老库，重开触发 v2→v3 补列迁移。
+    adapter.db.pragma("user_version = 2");
+    adapter.db.exec(`ALTER TABLE vector_index_variants DROP COLUMN last_used_at`);
+    adapter.close();
+    const reopened = new PortableVectorIndexAdapter({ dbPath });
+    expect(Number(reopened.db.pragma("user_version", { simple: true }))).toBe(3);
+    const usage = reopened.listArtifactUsage();
+    expect(usage).toHaveLength(1);
+    expect(usage[0].indexedAt).toBe(indexedAt);
+    expect(usage[0].lastUsedAt).toBe(indexedAt);
+    reopened.close();
+  });
 });
 
 describe("variant 确定性身份", () => {
@@ -262,7 +317,7 @@ describe("schema v1→v2 迁移", () => {
       ),
     });
 
-    expect(adapter.db.pragma("user_version", { simple: true })).toBe(2);
+    expect(adapter.db.pragma("user_version", { simple: true })).toBe(3);
     const tables = adapter.db.prepare(
       `SELECT name FROM sqlite_master WHERE type = 'table' ORDER BY name`,
     ).all().map((row: any) => row.name);

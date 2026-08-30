@@ -12,6 +12,8 @@ const tr = (key: string, vars?: Record<string, string | number>) => window.t?.(k
 
 const RETRIEVAL_TOP_K_MIN = 1;
 const RETRIEVAL_TOP_K_MAX = 1000;
+const VECTOR_RETENTION_DAYS_MIN = 1;
+const VECTOR_RETENTION_DAYS_MAX = 3650;
 
 interface OperationModel extends KnowledgeModelRefDto {
   displayName?: string;
@@ -100,6 +102,11 @@ export function NotebookSettingsDialog({ notebook, onClose, onSaved }: NotebookS
   const [topK, setTopK] = useState(
     notebook.config.retrievalTopK == null ? '' : String(notebook.config.retrievalTopK),
   );
+  // 向量保留：null（永久保留，默认）→ keep；正整数 → N 天未使用自动清理。
+  const [retentionKeepForever, setRetentionKeepForever] = useState(notebook.config.vectorRetentionDays == null);
+  const [retentionDays, setRetentionDays] = useState(
+    notebook.config.vectorRetentionDays == null ? '' : String(notebook.config.vectorRetentionDays),
+  );
   const [saving, setSaving] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
 
@@ -134,6 +141,10 @@ export function NotebookSettingsDialog({ notebook, onClose, onSaved }: NotebookS
       setFormError(tr('knowledge.settingsInvalidNumber', { min: RETRIEVAL_TOP_K_MIN, max: RETRIEVAL_TOP_K_MAX }));
       return;
     }
+    if (!retentionKeepForever && !validateNumber(retentionDays, VECTOR_RETENTION_DAYS_MIN, VECTOR_RETENTION_DAYS_MAX)) {
+      setFormError(tr('knowledge.settingsInvalidNumber', { min: VECTOR_RETENTION_DAYS_MIN, max: VECTOR_RETENTION_DAYS_MAX }));
+      return;
+    }
     setSaving(true);
     setFormError(null);
     try {
@@ -141,6 +152,7 @@ export function NotebookSettingsDialog({ notebook, onClose, onSaved }: NotebookS
         embeddingModelRef: resolveRef(embeddingValue, notebook.config.embeddingModelRef),
         rerankModelRef: resolveRef(rerankValue, notebook.config.rerankModelRef),
         retrievalTopK: topKUnlimited || topK.trim() === '' ? null : Number(topK),
+        vectorRetentionDays: retentionKeepForever || retentionDays.trim() === '' ? null : Number(retentionDays),
       });
       onSaved();
     } catch (error) {
@@ -228,6 +240,43 @@ export function NotebookSettingsDialog({ notebook, onClose, onSaved }: NotebookS
             )}
           </div>
           <span className={styles.settingsHint}>{tr('knowledge.settingsTopKHint')}</span>
+        </div>
+        <div className={styles.settingsRow}>
+          <span className={styles.settingsLabel}>{tr('knowledge.settingsVectorRetention')}</span>
+          <div className={styles.settingsTopKControls}>
+            <label className={styles.settingsRadio}>
+              <input
+                type="radio"
+                name={`vector-retention-mode-${notebook.id}`}
+                checked={retentionKeepForever}
+                onChange={() => setRetentionKeepForever(true)}
+              />
+              <span>{tr('knowledge.settingsRetentionKeepForever')}</span>
+            </label>
+            <label className={styles.settingsRadio}>
+              <input
+                type="radio"
+                name={`vector-retention-mode-${notebook.id}`}
+                checked={!retentionKeepForever}
+                onChange={() => setRetentionKeepForever(false)}
+              />
+              <span>{tr('knowledge.settingsRetentionDaysMode')}</span>
+            </label>
+            {!retentionKeepForever && (
+              <input
+                className={styles.settingsInput}
+                type="number"
+                min={VECTOR_RETENTION_DAYS_MIN}
+                max={VECTOR_RETENTION_DAYS_MAX}
+                step={1}
+                value={retentionDays}
+                placeholder="30"
+                aria-label={tr('knowledge.settingsRetentionDaysMode')}
+                onChange={event => setRetentionDays(event.target.value)}
+              />
+            )}
+          </div>
+          <span className={styles.settingsHint}>{tr('knowledge.settingsVectorRetentionHint')}</span>
         </div>
         {formError && <p className={styles.settingsError} role="alert">{formError}</p>}
       </div>

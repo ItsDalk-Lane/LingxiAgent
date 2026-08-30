@@ -356,11 +356,19 @@ export default defineConfig({
     },
   },
   server: {
-    port: 5173,
+    // 端口可被外部指定（preview harness 经 PORT 分配；dev-web 脚本经
+    // LINGXI_DEV_WEB_CLIENT_PORT 传递同一值），无指定时保持 5173 默认。
+    port: Number(process.env.LINGXI_DEV_WEB_CLIENT_PORT || process.env.PORT || 5173),
     strictPort: true,
     proxy: createDevWebProxy(),
   },
   test: {
     root: path.resolve(__dirname),
+    // Windows runner 的文件句柄/时序抖动会让个别用例间歇翻红（2026-08-30：
+    // model-manager-auth-storage 在同代码下 main 挂 2 例、PR 矩阵挂 1 例、又全绿；
+    // knowledge-store EPERM 同族）。只对 win32 重试两次兜环境抖动，真实回归
+    // 重试后依然红；macOS/Linux 保持 0 不掩信号。与 ci.yml npm ci 步骤的
+    // nick-fields/retry（max_attempts 3）同一处置逻辑。
+    retry: process.platform === 'win32' ? 2 : 0,
   },
 });

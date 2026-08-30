@@ -75,7 +75,13 @@ import { createRequire } from "node:module";
 import { KnowledgeError } from "./errors.ts";
 
 const require = createRequire(import.meta.url);
-const VECTOR_INDEX_SCHEMA_VERSION = 2;
+// v2：vector_artifacts 加 last_used_at（查询命中即刷新），支撑笔记本级
+// 向量保留策略——超期未使用的旧版本向量由 sweep 回收。
+// v3（合并 PR #30 保留语义到 variant 架构）：vector_index_variants 加
+// last_used_at（created_at 兼作 indexed_at 语义）；v2 老库按表形分流迁移
+// （有 vector_index_variants = 本分支线，只补列；只有 vector_artifacts =
+// main 线，先走 v1→v2 身份迁移再补列）。
+const VECTOR_INDEX_SCHEMA_VERSION = 3;
 let BetterSqliteDatabase: any = null;
 
 /** 迁移回填兜底：无法解析 chunkProfileHash 的历史数据统一挂到这个身份下。 */
@@ -235,6 +241,15 @@ export interface VectorIndexAdapter {
     entries: VectorIndexEntry[];
   }): { vectorIndexVariantId: string };
   removeArtifact(parseArtifactId: unknown): void;
+  /** 细粒度删除：只删某 artifact 下某模型身份的向量（保留同 artifact 其他身份）。 */
+  removeArtifactModel(input: { parseArtifactId: unknown; modelKey: unknown }): void;
+  /** 全部向量工件的使用记录（sweep 判定超期用）。 */
+  listArtifactUsage(): Array<{
+    parseArtifactId: string;
+    modelKey: string;
+    indexedAt: string;
+    lastUsedAt: string;
+  }>;
   removeVariant(vectorIndexVariantId: unknown): void;
   getVariant(vectorIndexVariantId: unknown): VectorIndexVariantRecord | null;
   setVariantStatus(vectorIndexVariantId: unknown, status: VectorIndexVariantStatus): void;
@@ -349,9 +364,9 @@ export class PortableVectorIndexAdapter implements VectorIndexAdapter {
             status TEXT NOT NULL CHECK(status IN ('building', 'ready', 'failed', 'retiring')),
             created_at TEXT NOT NULL,
             updated_at TEXT NOT NULL,
+            last_used_at TEXT NOT NULL DEFAULT '',
             UNIQUE(chunk_index_variant_id, model_key)
           );
-
           CREATE TABLE chunk_vectors (
             vector_index_variant_id TEXT NOT NULL,
             parse_artifact_id TEXT NOT NULL,
@@ -374,11 +389,33 @@ export class PortableVectorIndexAdapter implements VectorIndexAdapter {
         this.db.pragma(`user_version = ${VECTOR_INDEX_SCHEMA_VERSION}`);
       })();
     } else if (version === 1) {
+      // 祖先线 v1（vector_artifacts 无 last_used_at）：身份迁移 + 补列。
       this.migrateV1ToV2();
+      this.addVariantLastUsedAt();
+    } else if (version === 2) {
+      // v2 有两条历史线（本分支 variant 表 vs main 线 vector_artifacts+last_used_at），
+      // 按表形分流：本分支线只补列；main 线先做身份迁移再补列。
+      const columns = this.db.prepare(`PRAGMA table_info(vector_index_variants)`).all() as any[];
+      if (columns.length === 0) {
+        this.migrateV1ToV2();
+      }
+      this.addVariantLastUsedAt();
     }
     if (this.db.pragma("quick_check", { simple: true }) !== "ok") {
       throw new Error("vector_index_quick_check_failed");
     }
+  }
+
+  /** v3 补列（幂等）：variant 表加 last_used_at，存量行回填 created_at（=indexed_at 语义）。 */
+  private addVariantLastUsedAt() {
+    this.db.transaction(() => {
+      const columns = this.db.prepare(`PRAGMA table_info(vector_index_variants)`).all() as any[];
+      if (!columns.some((col: any) => col.name === "last_used_at")) {
+        this.db.exec(`ALTER TABLE vector_index_variants ADD COLUMN last_used_at TEXT NOT NULL DEFAULT '';`);
+      }
+      this.db.exec(`UPDATE vector_index_variants SET last_used_at = created_at WHERE last_used_at = '';`);
+      this.db.pragma(`user_version = ${VECTOR_INDEX_SCHEMA_VERSION}`);
+    })();
   }
 
   /**
@@ -670,13 +707,14 @@ export class PortableVectorIndexAdapter implements VectorIndexAdapter {
       this.db.prepare(`
         INSERT INTO vector_index_variants (
           id, chunk_index_variant_id, parse_artifact_id, model_key,
-          chunk_fingerprint, dimensions, status, created_at, updated_at
-        ) VALUES (?, ?, ?, ?, ?, ?, 'ready', ?, ?)
+          chunk_fingerprint, dimensions, status, created_at, updated_at, last_used_at
+        ) VALUES (?, ?, ?, ?, ?, ?, 'ready', ?, ?, ?)
         ON CONFLICT(id) DO UPDATE SET
           chunk_fingerprint = excluded.chunk_fingerprint,
           dimensions = excluded.dimensions,
           status = 'ready',
-          updated_at = excluded.updated_at
+          updated_at = excluded.updated_at,
+          last_used_at = excluded.last_used_at
       `).run(
         anchor.vectorIndexVariantId,
         anchor.chunkIndexVariantId,
@@ -684,6 +722,7 @@ export class PortableVectorIndexAdapter implements VectorIndexAdapter {
         model.key,
         fingerprint,
         model.dimensions,
+        this.now(),
         this.now(),
         this.now(),
       );
@@ -944,7 +983,7 @@ export class PortableVectorIndexAdapter implements VectorIndexAdapter {
         FROM chunk_vectors
         WHERE ${conditions.join(" AND ")}
       `).all(...params);
-      return rows.map((row: any) => {
+      const results = rows.map((row: any) => {
         if (Number(row.dimensions) !== model.dimensions) {
           throw new KnowledgeError("KNOWLEDGE_INDEX_INVALID", "Knowledge vector dimensions are corrupt");
         }
@@ -960,10 +999,60 @@ export class PortableVectorIndexAdapter implements VectorIndexAdapter {
         || left.parseArtifactId.localeCompare(right.parseArtifactId)
         || left.ordinal - right.ordinal
       )).slice(0, limit);
+      // 查询涉及即为使用：scope 内全部 variant 刷新 last_used_at（按 artifact 维度
+      // 判定保留期），供笔记本级向量保留策略判定"超期未使用"。刷新失败不阻断查询。
+      try {
+        const usageConditions: string[] = [];
+        const usageParams: unknown[] = [this.now()];
+        if (artifactIds) {
+          usageConditions.push(`parse_artifact_id IN (${artifactIds.map(() => "?").join(", ")})`);
+          usageParams.push(...artifactIds);
+        }
+        if (variantIds) {
+          usageConditions.push(`id IN (${variantIds.map(() => "?").join(", ")})`);
+          usageParams.push(...variantIds);
+        }
+        this.db.prepare(`
+          UPDATE vector_index_variants SET last_used_at = ? WHERE ${usageConditions.join(" OR ")}
+        `).run(...usageParams);
+      } catch { /* 使用时间刷新失败不影响检索结果 */ }
+      return results;
     } catch (error) {
       if (error instanceof KnowledgeError) throw error;
       throw new KnowledgeError("KNOWLEDGE_INDEX_INVALID", "Knowledge vector index query failed");
     }
+  }
+
+  /** 全部向量工件的使用记录（sweep 判定超期用）。created_at 兼作 indexed_at 语义。 */
+  listArtifactUsage(): Array<{
+    parseArtifactId: string;
+    modelKey: string;
+    indexedAt: string;
+    lastUsedAt: string;
+  }> {
+    return this.db.prepare(`
+      SELECT parse_artifact_id, model_key, created_at, last_used_at
+      FROM vector_index_variants
+    `).all().map((row: any) => ({
+      parseArtifactId: row.parse_artifact_id,
+      modelKey: row.model_key,
+      indexedAt: row.created_at,
+      lastUsedAt: row.last_used_at || row.created_at,
+    }));
+  }
+
+  /** 细粒度删除：只删某 artifact 下某模型身份的向量（保留同 artifact 其他身份）。 */
+  removeArtifactModel(input: { parseArtifactId: unknown; modelKey: unknown }): void {
+    const artifactId = requiredId(input?.parseArtifactId, "parseArtifactId");
+    const modelKey = requiredId(input?.modelKey, "modelKey");
+    this.db.transaction(() => {
+      this.db.prepare(
+        `DELETE FROM chunk_vectors WHERE parse_artifact_id = ? AND model_key = ?`,
+      ).run(artifactId, modelKey);
+      this.db.prepare(
+        `DELETE FROM vector_index_variants WHERE parse_artifact_id = ? AND model_key = ?`,
+      ).run(artifactId, modelKey);
+    })();
   }
 
   health() {

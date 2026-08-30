@@ -134,7 +134,11 @@
     "readinessFailed": "{count} 失败",
     "settingsChunkAutoFallback": "自动（约 6553）",
     "settingsTopKUnlimited": "无上限（默认）",
-    "settingsTopKMaxRecall": "最大召回数"
+    "settingsTopKMaxRecall": "最大召回数",
+    "settingsVectorRetention": "向量保留策略",
+    "settingsRetentionKeepForever": "永久保留（默认）",
+    "settingsRetentionDaysMode": "天数后清理",
+    "settingsVectorRetentionHint": "换模型或重新嵌入产生的旧版向量，超过设定天数未被查询使用即自动清理（1–3650）；正在使用的最新版本不受影响"
   },
   "channel": {
     "tab": "频道",
@@ -2061,7 +2065,14 @@
         "image": "图片",
         "video": "视频",
         "speech": "语音识别"
-      }
+      },
+      "modelOperationType": "模型类型",
+      "modelOperationNone": "无",
+      "modelOperationEmbedding": "嵌入",
+      "modelOperationRerank": "重排",
+      "modelOperationHint": "打上嵌入或重排标签的模型会出现在知识库笔记本设置的对应下拉中。标签只是标记，模型是否真的支持由实际调用检验。",
+      "embeddingDimensions": "向量维度",
+      "embeddingDimensionsHint": "供应商支持自定义维度时按此值请求；不支持时仅作记录，按供应商默认维度返回。"
     },
     "memory": {
       "sectionTitle": "记忆",

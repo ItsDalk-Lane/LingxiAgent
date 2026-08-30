@@ -144,6 +144,7 @@ export interface KnowledgeManagerOptions {
   now?: () => string;
   idGenerator?: (prefix: string) => string;
   Database?: any;
+  log?: (message: string) => void;
   rerank?: KnowledgeReranker | null;
   /**
    * 摄入管线嵌入回调（engine 用 ModelOperationResolver/EmbeddingClient 按显式
@@ -381,9 +382,12 @@ export class KnowledgeManager {
     const notebook = this.store.deleteNotebook(input);
     // 笔记本删除后摘掉其全部 watch membership（最后一个 membership 消失即摘 watcher）。
     this.watcher.untrackNotebook(notebook.id);
-    // 各源重算 orphan 状态（§十八：最后 membership 消失 → orphan 标记，保留期后 GC）。
     for (const sourceId of affectedSourceIds) {
+      // 各源重算 orphan 状态（§十八：最后 membership 消失 → orphan 标记，保留期后 GC）。
       this.recomputeSourceOrphanState(String(input?.studioId), sourceId);
+      // 孤儿源派生索引即时回收（PR #30 语义）：有活跃 TurnScope/EvidenceManifest
+      // 引用的源不即时清（见 pruneOrphanSourceIndexes 内保护闸），留到保留期 GC。
+      this.pruneOrphanSourceIndexes(sourceId);
     }
     return notebook;
   }
@@ -425,6 +429,9 @@ export class KnowledgeManager {
     // §十八三层生命周期：移除 membership ≠ 删 Source——重算该源活跃引用，
     // 仍有引用一切保留；零引用才标 orphan（保留期后 GC，物理清理绝不即时发生）。
     this.recomputeSourceOrphanState(String(input?.studioId), membership.sourceId);
+    // 孤儿源派生索引即时回收（PR #30 语义）：受保护源（TurnScope/manifest 引用）
+    // 不即时清，见 pruneOrphanSourceIndexes 内保护闸。
+    this.pruneOrphanSourceIndexes(membership.sourceId);
     return membership;
   }
 
@@ -654,6 +661,29 @@ export class KnowledgeManager {
     runMaintenance();
     this.lifecycleGcTimer = setInterval(runMaintenance, this.lifecycleGcIntervalMs);
     this.lifecycleGcTimer.unref?.();
+  }
+
+  /**
+   * 孤儿源派生索引清理：源不再挂靠任何活跃笔记本时，删除其全部解析产物的
+   * 向量与 FTS 行。事实数据（快照/解析产物记录）保留软删除语义可追溯；
+   * 派生索引可由重摄入完全重建，清掉不损失信息。清理失败只记日志不阻断删除
+   * （残留索引由 sweep 兜底回收）。
+   * 保护闸（§十八/§六十七）：仍有活跃 TurnScope 或 EvidenceManifest 引用的源
+   * 不即时清派生索引——这份数据是受保护证据链的一部分，统一留给过保留期的
+   * orphan GC（同一套安全检查）物理处理。
+   */
+  private pruneOrphanSourceIndexes(sourceId: string) {
+    try {
+      if (this.store.listActiveNotebookIdsForSource({ sourceId }).length > 0) return;
+      if (this.store.countActiveTurnScopesForSource({ sourceId }) > 0) return;
+      if (this.store.countEvidenceManifestsForSource({ sourceId }) > 0) return;
+      for (const artifactId of this.store.listSourceArtifactIds({ sourceId })) {
+        this.vectorIndex.removeArtifact(artifactId);
+        this.indexStore.removeArtifact(artifactId);
+      }
+    } catch (error) {
+      this.options?.log?.(`knowledge: orphan index prune failed for ${sourceId}: ${error instanceof Error ? error.message : String(error)}`);
+    }
   }
 
   getSource(input: Parameters<KnowledgeStore["getSource"]>[0]) {
@@ -1640,6 +1670,7 @@ export class KnowledgeManager {
     rerankModelRef?: unknown;
     chunkTargetChars?: unknown;
     retrievalTopK?: unknown;
+    vectorRetentionDays?: unknown;
   }) {
     const before = this.store.getNotebookConfig({
       studioId: input?.studioId,

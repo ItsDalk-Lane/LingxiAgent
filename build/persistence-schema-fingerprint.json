@@ -660,7 +660,7 @@
     ],
     "version": 3
   },
-  "payloadFingerprint": "sha256:830d379a6bb4492a60f6c2c67ff0e0a723e2eca0662eddbdaa7c4f7fe7ae5bcd",
+  "payloadFingerprint": "sha256:7316ccbf83072b075a76e861c110365bda399554823ae3db0278674b086d6f69",
   "registry": [
     {
       "affectedByEpochMigration": true,
@@ -3285,8 +3285,8 @@
   ],
   "review": {
     "classification": "compatible",
-    "compatibilityReason": "schema v16 is purely additive: new processing_artifacts table (processor identity quadruple + fidelity + locatorMap), parse_artifacts gains fidelity/processing_artifact_id, notebook_sources gains relative_path/folder_node/display_order, plus the knowledge/processed/** managed output tree; no existing tables, rows, or index/vector data are touched and no re-processing is triggered",
-    "payloadFingerprint": "sha256:830d379a6bb4492a60f6c2c67ff0e0a723e2eca0662eddbdaa7c4f7fe7ae5bcd"
+    "compatibilityReason": "合并 main（PR #30 向量保留）：knowledge schema v16→v17 additive（notebooks.vector_retention_days，PR #30 原 v9 重编号，幂等 ALTER）；向量索引库 schema v2→v3 additive（vector_index_variants + last_used_at，v2 老库按表形分流迁移，不重算向量）",
+    "payloadFingerprint": "sha256:7316ccbf83072b075a76e861c110365bda399554823ae3db0278674b086d6f69"
   },
   "schemas": [
     {
@@ -3791,7 +3791,7 @@
           },
           {
             "name": "notebooks",
-            "sql": "CREATE TABLE notebooks ( id TEXT PRIMARY KEY, studio_id TEXT NOT NULL, name TEXT NOT NULL CHECK(length(trim(name)) > 0), created_at TEXT NOT NULL, updated_at TEXT NOT NULL, deleted_at TEXT , embedding_model_ref TEXT, rerank_model_ref TEXT, chunk_target_chars INTEGER DEFAULT 1200 CHECK(chunk_target_chars IS NULL OR (chunk_target_chars >= 100 AND chunk_target_chars <= 100000)), retrieval_top_k INTEGER DEFAULT 12 CHECK(retrieval_top_k IS NULL OR (retrieval_top_k >= 1 AND retrieval_top_k <= 1000)), retrieval_profile_id TEXT)",
+            "sql": "CREATE TABLE notebooks ( id TEXT PRIMARY KEY, studio_id TEXT NOT NULL, name TEXT NOT NULL CHECK(length(trim(name)) > 0), created_at TEXT NOT NULL, updated_at TEXT NOT NULL, deleted_at TEXT , embedding_model_ref TEXT, rerank_model_ref TEXT, chunk_target_chars INTEGER DEFAULT 1200 CHECK(chunk_target_chars IS NULL OR (chunk_target_chars >= 100 AND chunk_target_chars <= 100000)), retrieval_top_k INTEGER DEFAULT 12 CHECK(retrieval_top_k IS NULL OR (retrieval_top_k >= 1 AND retrieval_top_k <= 1000)), retrieval_profile_id TEXT, vector_retention_days INTEGER)",
             "tableName": "notebooks",
             "type": "table"
           },
@@ -3820,9 +3820,9 @@
             "type": "table"
           }
         ],
-        "userVersion": 16
+        "userVersion": 17
       },
-      "sourceHash": "sha256:36c1a80ebe1672355634089554d3888e65fd2151fefb7842b869e07b71f9d605",
+      "sourceHash": "sha256:d69e3accf5d936297ae492459c67a723109e9c85564d84db164a5f6f5f002b08",
       "storeId": "knowledge-database"
     },
     {
@@ -3832,31 +3832,31 @@
       "protocolModules": [
         {
           "module": "lib/knowledge/vector-index-adapter.ts",
-          "sourceHash": "sha256:7735ce1c2268ae4c5a09f1309707a888089991655c28760c65faf10cdb70bc34"
+          "sourceHash": "sha256:485d5e8070cc05b2db6821e02b179b08607c0cf15885c30aa45ea2bcfdaf70a6"
         }
       ],
-      "sourceHash": "sha256:c9f8183fa8f40e0beb87b2a3352b80142ac30bcf0cc1715e8888b18dfae3d9a6",
+      "sourceHash": "sha256:495b0c5ab2f907ad1d242f8fc23cddf64ab4701b8a7fef94c5c16ee4ec921cff",
       "storeId": "knowledge-indexes"
     },
     {
       "contract": "ParseArtifact generation directories referenced by knowledge.db and never treated as source content versions",
       "kind": "directory-contract",
       "module": "lib/knowledge/knowledge-manager.ts",
-      "sourceHash": "sha256:dd0bacdc2fa2bf15dc45f8ba1bdedbde2770b29529ffd46a4fbc6c37c5a59ef7",
+      "sourceHash": "sha256:fec50cc6e4517f4dcc40eea0222d28d73d7bc88a8252c3de1b6d820820461257",
       "storeId": "knowledge-parse-artifacts"
     },
     {
       "contract": "ProcessingArtifact output files (binary office formats converted to structured text) referenced by knowledge.db processing_artifacts rows, with locatorMap held in the database",
       "kind": "directory-contract",
       "module": "lib/knowledge/knowledge-manager.ts",
-      "sourceHash": "sha256:dd0bacdc2fa2bf15dc45f8ba1bdedbde2770b29529ffd46a4fbc6c37c5a59ef7",
+      "sourceHash": "sha256:fec50cc6e4517f4dcc40eea0222d28d73d7bc88a8252c3de1b6d820820461257",
       "storeId": "knowledge-processing-artifacts"
     },
     {
       "contract": "ContentSnapshot relative locator, immutable byte publication, SHA-256 verification, and rollback protocol",
       "kind": "directory-contract",
       "module": "lib/knowledge/knowledge-manager.ts",
-      "sourceHash": "sha256:dd0bacdc2fa2bf15dc45f8ba1bdedbde2770b29529ffd46a4fbc6c37c5a59ef7",
+      "sourceHash": "sha256:fec50cc6e4517f4dcc40eea0222d28d73d7bc88a8252c3de1b6d820820461257",
       "storeId": "knowledge-source-snapshots"
     },
     {
