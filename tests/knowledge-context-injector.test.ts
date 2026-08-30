@@ -7,7 +7,9 @@ import {
   buildKnowledgeContextInjection,
   KNOWLEDGE_INJECTION_FALLBACK_BUDGET_TOKENS,
   KNOWLEDGE_EVIDENCE_BUDGET_MAX,
+  KNOWLEDGE_FUSION_POOL_MAX,
   resolveEvidenceAnchorBudget,
+  resolveFusionPoolBudget,
   resolveKnowledgeInjectionBudgetTokens,
   decomposeQuestion,
   fuseSubQueryResults,
@@ -16,7 +18,7 @@ import {
   parseQuestionDecomposition,
   type DecomposeModel,
 } from "../lib/knowledge/knowledge-context-injector.ts";
-import { KNOWLEDGE_EVIDENCE_BUDGET } from "../lib/knowledge/knowledge-query-service.ts";
+import { KNOWLEDGE_EVIDENCE_BUDGET, KNOWLEDGE_FUSION_BUDGET } from "../lib/knowledge/knowledge-query-service.ts";
 import { KnowledgeManager } from "../lib/knowledge/knowledge-manager.ts";
 import type { RetrieveForNotebooksResult } from "../lib/knowledge/knowledge-query-service.ts";
 
@@ -908,5 +910,56 @@ describe("注入链路锚点伸缩", () => {
     });
     expect(stats.truncated).toBe(true);
     expect(stats.usedTokens).toBeLessThanOrEqual(2_000);
+  });
+});
+
+// ─────────────── 融合池上限随预算倒推（2026-08-30 二轮） ───────────────
+
+describe("resolveFusionPoolBudget（阀 A：池 70% 折算块数）", () => {
+  it("用户口径示例：1M 上下文 → 预算 ~99 万 × 0.7 ÷ 10k token/块 ≈ 69 块封顶", () => {
+    const blocks = Array.from({ length: 200 }, () => ({ text: "x".repeat(40_000) })); // ~10k token/块
+    // 990_000 × 0.7 / 10_000 = 69.3 → 69。
+    expect(resolveFusionPoolBudget({ budgetTokens: 990_000, candidates: blocks })).toBe(69);
+  });
+
+  it("真实块（~1300 token）+ agnes 512k 预算：池上限 ≈ 268；碎片块封顶 480", () => {
+    const novel = Array.from({ length: 400 }, () => ({ text: "证".repeat(1180) })); // ~1298 token
+    expect(resolveFusionPoolBudget({ budgetTokens: 500_000, candidates: novel })).toBe(269);
+    const tiny = Array.from({ length: 800 }, () => ({ text: "短" }));
+    expect(resolveFusionPoolBudget({ budgetTokens: 500_000, candidates: tiny })).toBe(KNOWLEDGE_FUSION_POOL_MAX);
+  });
+
+  it("小预算/兜底预算：下限 60 水位地板（既有召回水位不变）；候选空 → 地板", () => {
+    const novel = Array.from({ length: 400 }, () => ({ text: "证".repeat(1180) }));
+    expect(resolveFusionPoolBudget({ budgetTokens: 6_000, candidates: novel })).toBe(KNOWLEDGE_FUSION_BUDGET);
+    expect(resolveFusionPoolBudget({ budgetTokens: 500_000, candidates: [] })).toBe(KNOWLEDGE_FUSION_BUDGET);
+  });
+
+  it("端到端：拆解出 3 条子查询 × 大预算 → 融合池突破 60，锚点随之放大", async () => {
+    // 拆解模型出 2 条子查询 + 原问题直检 = 3 路检索 × 每路 60 候选（查询侧
+    // 生成预算封顶），id 全异 → 去重后 ~120+ 块；预算 500k、块 ~210 token →
+    // 池上限 = min(480, 500k×0.7/210≈1666→480) = 480 → 池吃下全部去重候选
+    // （> 旧行为的 60 截断）；锚点 = min(240, …) = 120 全选。
+    const perQuery = (tag: string) => Array.from({ length: 60 }, (_, index) => (
+      fakeChunk({ id: `${tag}-${index}`, ordinal: index, text: `块：${"证".repeat(180)}-${tag}-${index}` })
+    ));
+    const decomposeModel: DecomposeModel = async () => validOutput(["子查询甲", "子查询乙"]);
+    const { stats } = await buildKnowledgeContextInjection({
+      question: "问题",
+      mode: "qa",
+      budgetTokens: 500_000,
+      deps: {
+        decomposeModel,
+        distillModel: null,
+        retrieve: async ({ query }) => {
+          if (query === "问题") return fakeRetrieval(perQuery("direct"));
+          if (query.includes("甲")) return fakeRetrieval(perQuery("subA"));
+          return fakeRetrieval(perQuery("subB"));
+        },
+      },
+    });
+    // 3 路 × 60 全部入池（旧行为会在 60 截断），锚点随之全选。
+    expect(stats.fusedChunks).toBe(180);
+    expect(stats.injectedChunks).toBe(180);
   });
 });

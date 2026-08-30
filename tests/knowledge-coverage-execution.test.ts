@@ -297,10 +297,12 @@ describe("HIGH_RECALL：预算链与邻接扩展（§二十六/§三十六/§九
     expect(fused[0].id).toBe("c0"); // 截断保序：RRF 名次前列保留
   });
 
-  it("candidate budget 链逐级截断并留痕计数：150 候选 → unique 60 → 锚点随预算伸缩", async () => {
+  it("candidate budget 链逐级截断并留痕计数：150 候选 → 融合池/锚点随预算伸缩", async () => {
     const candidates = Array.from({ length: 150 }, (_, index) => fakeChunk({ id: `c${index}`, ordinal: index }));
-    // 兜底预算（6000）× 假块 ~5 token：锚点上限 = min(240, 6000×0.5/5) = 240
-    // → 全部 60 个融合候选都成为锚点（2026-08-30 伸缩后语义；旧行为固定 40）。
+    // 兜底预算（6000）× 假块 ~5 token：融合池上限 = min(480, 6000×0.7/5) = 480
+    // → 150 候选全部入池；锚点上限 = min(240, 6000×0.5/5) = 240 → 全部成为锚点
+    // （2026-08-30 阀 A/阀 B 均随预算倒推后的语义；真实块 ~1300 token 时池子
+    // 仍在 60 水位地板，见 resolveFusionPoolBudget 单测）。
     const { block, stats } = await buildKnowledgeContextInjection({
       question: "问题",
       mode: "qa",
@@ -311,12 +313,12 @@ describe("HIGH_RECALL：预算链与邻接扩展（§二十六/§三十六/§九
       },
     });
     expect(stats.candidateChunkCount).toBe(150);
-    expect(stats.uniqueChunkCount).toBe(KNOWLEDGE_FUSION_BUDGET);
-    expect(stats.fusedChunks).toBe(KNOWLEDGE_FUSION_BUDGET);
-    expect(stats.injectedChunks).toBe(KNOWLEDGE_FUSION_BUDGET);
+    expect(stats.uniqueChunkCount).toBe(150);
+    expect(stats.fusedChunks).toBe(150);
+    expect(stats.injectedChunks).toBe(150);
     // 融合候选全部成为锚点：无 "beyond the evidence budget" 截断留痕。
     expect(block).not.toContain("fused candidates beyond the evidence budget");
-    expect((block.match(/\[K\d+\] notebook/g) || []).length).toBe(KNOWLEDGE_FUSION_BUDGET);
+    expect((block.match(/\[K\d+\] notebook/g) || []).length).toBe(150);
   });
 
   it("邻接扩展 ±1：contextOnly 标记、计入 neighborExpansionCount、不计检索命中/footprint 分子", async () => {

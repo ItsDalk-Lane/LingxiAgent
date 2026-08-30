@@ -109,6 +109,35 @@ const KNOWLEDGE_INJECTION_MIN_BUDGET_TOKENS = 1000;
 export const KNOWLEDGE_EVIDENCE_BUDGET_UTILIZATION = 0.5;
 export const KNOWLEDGE_EVIDENCE_BUDGET_MAX = 240;
 
+/**
+ * 融合池上限随注入预算倒推（2026-08-30 二轮）：池子最多容纳预算的
+ * KNOWLEDGE_FUSION_POOL_UTILIZATION（70%）折算成的块数——池是候选水位，
+ * 略高于锚点配额（50%）留选择余量。下限 = KNOWLEDGE_FUSION_BUDGET（60，
+ * 小预算模型既有召回水位），上限 = KNOWLEDGE_FUSION_POOL_MAX（480，防碎片
+ * 块语料把候选列表撑成碎屑）。倒推示例：1M 上下文 → 预算 ~99 万 × 0.7
+ * ÷ 10k token/块 ≈ 69 块封顶。候选为空/预算非法 → 下限。
+ */
+export const KNOWLEDGE_FUSION_POOL_UTILIZATION = 0.7;
+export const KNOWLEDGE_FUSION_POOL_MAX = 480;
+
+/** 伸缩后的融合池上限：确定性纯函数（与 resolveEvidenceAnchorBudget 同法）。 */
+export function resolveFusionPoolBudget(input: {
+  budgetTokens: number;
+  candidates: ReadonlyArray<{ text: string }>;
+}): number {
+  if (input.candidates.length === 0) return KNOWLEDGE_FUSION_BUDGET;
+  if (!Number.isFinite(input.budgetTokens) || input.budgetTokens <= 0) {
+    return KNOWLEDGE_FUSION_BUDGET;
+  }
+  const totalTokens = input.candidates.reduce((sum, chunk) => sum + estimateTextTokens(chunk.text), 0);
+  const avgTokens = Math.max(1, totalTokens / input.candidates.length);
+  const scaled = Math.floor((input.budgetTokens * KNOWLEDGE_FUSION_POOL_UTILIZATION) / avgTokens);
+  return Math.max(
+    KNOWLEDGE_FUSION_BUDGET,
+    Math.min(KNOWLEDGE_FUSION_POOL_MAX, scaled),
+  );
+}
+
 /** 伸缩后的证据锚点上限：确定性纯函数（同输入同输出，便于测试与留痕）。 */
 export function resolveEvidenceAnchorBudget(input: {
   budgetTokens: number;
@@ -624,7 +653,10 @@ interface FusedChunk {
  * 让多条子查询同时命中的 chunk 排到前面。并列时按 notebook/源/ordinal 稳定排序。
  * §二十六 fusionBudget：融合池输出封顶（预算链独立生效，候选不无限增长）。
  */
-export function fuseSubQueryResults(results: RetrieveForNotebooksResult[]): NotebookRetrievalChunk[] {
+export function fuseSubQueryResults(
+  results: RetrieveForNotebooksResult[],
+  cap: number = KNOWLEDGE_FUSION_BUDGET,
+): NotebookRetrievalChunk[] {
   const fused = new Map<string, FusedChunk>();
   for (const result of results) {
     result.candidates.forEach((chunk, rank) => {
@@ -640,7 +672,7 @@ export function fuseSubQueryResults(results: RetrieveForNotebooksResult[]): Note
       || left.chunk.parseArtifactId.localeCompare(right.chunk.parseArtifactId)
       || left.chunk.ordinal - right.chunk.ordinal
     ))
-    .slice(0, KNOWLEDGE_FUSION_BUDGET)
+    .slice(0, Math.max(1, cap))
     .map(entry => entry.chunk);
 }
 
@@ -1523,9 +1555,14 @@ export function renderKnowledgeContextBlock(input: {
 
   // 蒸馏路径的 evidence 只供身份链记录（蒸馏输入锚点）；stats.fusedChunks 等
   // 口径仍按全量融合计算，不因传入 evidence 收窄（与蒸馏前的行为一致）。
+  // 融合池上限与编排层同源（预算倒推），stats 口径不漂移。
+  const renderFusionPoolBudget = resolveFusionPoolBudget({
+    budgetTokens: input.budgetTokens,
+    candidates: input.retrievalResults.flatMap(result => result.candidates),
+  });
   const fused = input.evidence && !input.distilled
     ? input.evidence.filter(entry => !entry.contextOnly).map(entry => entry.chunk)
-    : fuseSubQueryResults(input.retrievalResults);
+    : fuseSubQueryResults(input.retrievalResults, renderFusionPoolBudget);
   const allSources = mergeSources(input.retrievalResults);
   const degraded = mergeDegradedScopes(input.retrievalResults);
   // rerank 期限/传输降级留痕（候选保持 RRF 名次，禁静默）：注入块与 stats 同源。
@@ -1665,7 +1702,8 @@ export function renderKnowledgeContextBlock(input: {
     // 装填序列 = 锚点 + contextOnly 邻接块（§三十六）；邻接块放不下只跳过自身
     // （上下文连续性让位于锚点证据），锚点放不下才触发截断 + 分片清单。
     const entries: KnowledgeEvidenceEntry[] = input.evidence
-      ?? fuseSubQueryResults(input.retrievalResults).map(chunk => ({ chunk, contextOnly: false }));
+      ?? fuseSubQueryResults(input.retrievalResults, renderFusionPoolBudget)
+        .map(chunk => ({ chunk, contextOnly: false }));
     let lastAnchorOrdinal: number | null = null;
     for (let index = 0; index < entries.length; index += 1) {
       const entry = entries[index];
@@ -2008,6 +2046,12 @@ export async function buildKnowledgeContextInjection(input: {
   let upgradedTo: "broad" | "exhaustive" | undefined;
   let coverageDegradeReason: string | undefined;
   const allSources = mergeSources(retrievalResults);
+  // 融合池上限随预算倒推（70% 折算块数；按初轮候选预估，探测后以 finalResults
+  // 重算并用于正式融合）。
+  const fusionPoolBudgetPreview = resolveFusionPoolBudget({
+    budgetTokens,
+    candidates: retrievalResults.flatMap(result => result.candidates),
+  });
   // broad 结构探测用的查询集：直检 + 子查询 + 扩展（去重、保序）。
   const probeQueries = [...new Set([
     questionTrimmed,
@@ -2041,7 +2085,7 @@ export async function buildKnowledgeContextInjection(input: {
     // §四十一 执行侧自动升级：主轮 footprint 不足且多源 scope → 复用已检索
     // 结果，只补 broad 的缺失探测（不重跑已命中的部分）。
     const previewFootprint = computeCoverageFootprint({
-      fused: fuseSubQueryResults(retrievalResults),
+      fused: fuseSubQueryResults(retrievalResults, fusionPoolBudgetPreview),
       sources: allSources,
       candidateChunkCount: retrievalResults.reduce((sum, result) => sum + result.candidates.length, 0),
     });
@@ -2063,7 +2107,13 @@ export async function buildKnowledgeContextInjection(input: {
   }
 
   // ── 融合 → 证据组装（§二十六 预算链 + §三十六 邻接扩展）──
-  let fused = fuseSubQueryResults(finalResults);
+  // 融合池上限（阀 A）与锚点配额（阀 B）同源随预算倒推：池 70% 候选水位、
+  // 锚 50% 装填配额（池略高留选择余量）。
+  const fusionPoolBudget = resolveFusionPoolBudget({
+    budgetTokens,
+    candidates: finalResults.flatMap(result => result.candidates),
+  });
+  let fused = fuseSubQueryResults(finalResults, fusionPoolBudget);
   // 锚点上限随注入预算伸缩（大上下文模型多带证据，小模型维持既有 40 兜底）。
   let anchorBudget = resolveEvidenceAnchorBudget({ budgetTokens, fused });
   let anchors = fused.slice(0, anchorBudget);
@@ -2109,7 +2159,7 @@ export async function buildKnowledgeContextInjection(input: {
       await runProbes();
       // 降格补跑的结构探测改变了融合池：footprint 按探测后结果重算
       // （与正常 broad 路径同口径，§四十一 升级判断也用重算后的值）。
-      fused = fuseSubQueryResults(finalResults);
+      fused = fuseSubQueryResults(finalResults, fusionPoolBudget);
       anchorBudget = resolveEvidenceAnchorBudget({ budgetTokens, fused });
       anchors = fused.slice(0, anchorBudget);
       candidateChunkCount = finalResults.reduce((sum, result) => sum + result.candidates.length, 0);

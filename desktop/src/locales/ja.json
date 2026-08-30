@@ -451,6 +451,7 @@
     "knowledgeMetaDegradedTitle": "検索が劣化しました：{reason}",
     "knowledgeRetrieving": "ナレッジベースを検索中",
     "knowledgeRetrievalSearched": "{n} 件の結果を検索済み",
+    "knowledgeRetrievalShowMore": "さらに表示（あと {n} 件）",
     "knowledgeRetrievalTruncated": "予算超過シャード",
     "knowledgeRetrievalUnavailable": "ナレッジ検索は利用不可",
     "knowledgeRetrievalRowTitle": "{source} · チャンク {chunk}",
