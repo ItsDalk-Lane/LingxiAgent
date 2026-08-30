@@ -118,6 +118,8 @@ describe("KnowledgeStore", () => {
     // 幂等：列已写 → 0 行。
     const second = store.migrateLegacyGlobalModelRefs({ embeddingModelRef: emb, rerankModelRef: rerank });
     expect(second.notebooksUpdated).toBe(0);
+    // 关库释放句柄，Windows 上 afterEach 删临时目录才不会 EPERM。
+    store.close();
   });
 
   it("用独立 user_version 建库，并在重启后保留 Notebook", () => {
