@@ -15,6 +15,8 @@ export interface KnowledgeNotebookConfigDto {
   rerankModelRef: KnowledgeModelRefDto | null;
   chunkTargetChars: number | null;
   retrievalTopK: number | null;
+  /** null = 永久保留（默认）；正整数 = 旧版本向量 N 天未被查询命中即回收。 */
+  vectorRetentionDays: number | null;
 }
 
 /** 按每个源的最新摄入 job 归类的就绪汇总。 */
@@ -207,6 +209,7 @@ export async function updateKnowledgeNotebookSettings(
     embeddingModelRef?: KnowledgeModelRefDto | null;
     rerankModelRef?: KnowledgeModelRefDto | null;
     retrievalTopK?: number | null;
+    vectorRetentionDays?: number | null;
   },
 ): Promise<KnowledgeNotebookConfigDto> {
   const data = await knowledgeRequest<{ config: KnowledgeNotebookConfigDto }>(

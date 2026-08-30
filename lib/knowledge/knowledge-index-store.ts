@@ -239,6 +239,15 @@ export class KnowledgeIndexStore {
     })();
   }
 
+  /** 删除某解析产物的全部 FTS 行与索引登记（源被移除/孤儿清理时调用）。 */
+  removeArtifact(parseArtifactId: unknown) {
+    const artifactId = requiredId(parseArtifactId, "parseArtifactId");
+    this.db.transaction(() => {
+      this.db.prepare(`DELETE FROM knowledge_chunks WHERE parse_artifact_id = ?`).run(artifactId);
+      this.db.prepare(`DELETE FROM artifact_indexes WHERE parse_artifact_id = ?`).run(artifactId);
+    })();
+  }
+
   listArtifactChunks(parseArtifactId: unknown): KnowledgeChunkDraft[] {
     const artifactId = requiredId(parseArtifactId, "parseArtifactId");
     return this.db.prepare(`

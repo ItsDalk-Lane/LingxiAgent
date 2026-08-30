@@ -22,6 +22,7 @@ import {
 } from "../shared/provider-auth.ts";
 import { validateProviderModels, normalizeValidatedModalityField } from "../shared/provider-model-validation.ts";
 import {
+  inferOperationProtocol,
   isModelOperation,
   modelSupportsOperation,
   normalizeModelOperations,
@@ -1083,7 +1084,9 @@ export class ProviderRegistry {
         if (operations.length === 0 || (operation && !operations.includes(operation))) continue;
         const modelId = getModelId(rawModel);
         if (!modelId) continue;
-        const operationProtocol = rawModel.operationProtocol || rawModel.operation_protocol || "";
+        // 用户条目只打操作标签时按供应商推断默认方言；显式声明的协议永远优先
+        const operationProtocol = rawModel.operationProtocol || rawModel.operation_protocol
+          || (operations.length > 0 ? inferOperationProtocol(providerId, operations[0]) : "");
         catalog.push({
           ...cloneData(rawModel),
           id: modelId,

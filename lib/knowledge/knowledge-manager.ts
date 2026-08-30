@@ -103,6 +103,7 @@ export interface KnowledgeManagerOptions {
   now?: () => string;
   idGenerator?: (prefix: string) => string;
   Database?: any;
+  log?: (message: string) => void;
   rerank?: KnowledgeReranker | null;
   /**
    * 摄入管线嵌入回调（engine 用 ModelOperationResolver/EmbeddingClient 按显式
@@ -235,9 +236,17 @@ export class KnowledgeManager {
   }
 
   deleteNotebook(input: Parameters<KnowledgeStore["deleteNotebook"]>[0]) {
+    // 删除前记下挂靠源，删除后对因此变成孤儿的源清理派生索引。
+    const members = this.store.listNotebookSources({
+      studioId: input?.studioId,
+      notebookId: input?.notebookId,
+    }).map((entry: any) => entry.source.id);
     const notebook = this.store.deleteNotebook(input);
     // 笔记本删除后摘掉其全部 watch membership（最后一个 membership 消失即摘 watcher）。
     this.watcher.untrackNotebook(notebook.id);
+    for (const sourceId of members) {
+      this.pruneOrphanSourceIndexes(sourceId);
+    }
     return notebook;
   }
 
@@ -269,7 +278,26 @@ export class KnowledgeManager {
       sourceId: membership.sourceId,
       notebookId: membership.notebookId,
     });
+    this.pruneOrphanSourceIndexes(membership.sourceId);
     return membership;
+  }
+
+  /**
+   * 孤儿源派生索引清理：源不再挂靠任何活跃笔记本时，删除其全部解析产物的
+   * 向量与 FTS 行。事实数据（快照/解析产物记录）保留软删除语义可追溯；
+   * 派生索引可由重摄入完全重建，清掉不损失信息。清理失败只记日志不阻断删除
+   * （残留索引由 sweep 兜底回收）。
+   */
+  private pruneOrphanSourceIndexes(sourceId: string) {
+    try {
+      if (this.store.listActiveNotebookIdsForSource({ sourceId }).length > 0) return;
+      for (const artifactId of this.store.listSourceArtifactIds({ sourceId })) {
+        this.vectorIndex.removeArtifact(artifactId);
+        this.indexStore.removeArtifact(artifactId);
+      }
+    } catch (error) {
+      this.options?.log?.(`knowledge: orphan index prune failed for ${sourceId}: ${error instanceof Error ? error.message : String(error)}`);
+    }
   }
 
   getSource(input: Parameters<KnowledgeStore["getSource"]>[0]) {
@@ -853,6 +881,7 @@ export class KnowledgeManager {
     rerankModelRef?: unknown;
     chunkTargetChars?: unknown;
     retrievalTopK?: unknown;
+    vectorRetentionDays?: unknown;
   }) {
     const before = this.store.getNotebookConfig({
       studioId: input?.studioId,

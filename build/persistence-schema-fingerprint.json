@@ -660,7 +660,7 @@
     ],
     "version": 3
   },
-  "payloadFingerprint": "sha256:738e444baf13db917e353ab3194b022a178b9ae9183723eb0551ebdb686cc233",
+  "payloadFingerprint": "sha256:e541dec517000467651e9fe1289763af4bf8d62f915397b14b3f6534eb17bd6d",
   "registry": [
     {
       "affectedByEpochMigration": true,
@@ -3248,8 +3248,8 @@
   ],
   "review": {
     "classification": "compatible",
-    "compatibilityReason": "knowledge-manager.ts 新增 rerankForModel 回调选项并接线到查询服务（rerank 按笔记本引用路由）；knowledge-query-service/knowledge-read-tool 同步穿透引用。无 DDL/迁移/store 注册变更，持久化 schema 不变",
-    "payloadFingerprint": "sha256:738e444baf13db917e353ab3194b022a178b9ae9183723eb0551ebdb686cc233"
+    "compatibilityReason": "knowledge v8->v9 加可空列 vector_retention_days,幂等迁移,向后兼容",
+    "payloadFingerprint": "sha256:e541dec517000467651e9fe1289763af4bf8d62f915397b14b3f6534eb17bd6d"
   },
   "schemas": [
     {
@@ -3628,7 +3628,7 @@
           },
           {
             "name": "notebooks",
-            "sql": "CREATE TABLE notebooks ( id TEXT PRIMARY KEY, studio_id TEXT NOT NULL, name TEXT NOT NULL CHECK(length(trim(name)) > 0), created_at TEXT NOT NULL, updated_at TEXT NOT NULL, deleted_at TEXT , embedding_model_ref TEXT, rerank_model_ref TEXT, chunk_target_chars INTEGER DEFAULT 1200 CHECK(chunk_target_chars IS NULL OR (chunk_target_chars >= 100 AND chunk_target_chars <= 100000)), retrieval_top_k INTEGER DEFAULT 12 CHECK(retrieval_top_k IS NULL OR (retrieval_top_k >= 1 AND retrieval_top_k <= 1000)))",
+            "sql": "CREATE TABLE notebooks ( id TEXT PRIMARY KEY, studio_id TEXT NOT NULL, name TEXT NOT NULL CHECK(length(trim(name)) > 0), created_at TEXT NOT NULL, updated_at TEXT NOT NULL, deleted_at TEXT , embedding_model_ref TEXT, rerank_model_ref TEXT, chunk_target_chars INTEGER DEFAULT 1200 CHECK(chunk_target_chars IS NULL OR (chunk_target_chars >= 100 AND chunk_target_chars <= 100000)), retrieval_top_k INTEGER DEFAULT 12 CHECK(retrieval_top_k IS NULL OR (retrieval_top_k >= 1 AND retrieval_top_k <= 1000)), vector_retention_days INTEGER)",
             "tableName": "notebooks",
             "type": "table"
           },
@@ -3645,9 +3645,9 @@
             "type": "table"
           }
         ],
-        "userVersion": 8
+        "userVersion": 9
       },
-      "sourceHash": "sha256:c4016c5096ca85d292d78ef1d260d580e62ea4fd7a34df412d9576fcf62cb391",
+      "sourceHash": "sha256:fb35892fb3e7a73ae038d2cede80d05ccb0562dae8902dac26d5b60fe48459b0",
       "storeId": "knowledge-database"
     },
     {
@@ -3657,24 +3657,24 @@
       "protocolModules": [
         {
           "module": "lib/knowledge/vector-index-adapter.ts",
-          "sourceHash": "sha256:434c064d02c6b6b974acf7a4cde473cf48bd123628e80dbde8ce2303d4e2a052"
+          "sourceHash": "sha256:e8aeb0ee03c974f53c45f6c41e219423d27de46a28a2825ceac8bf711e3f1bbb"
         }
       ],
-      "sourceHash": "sha256:b769c309b22c0e25c8f98beefbded5d58c13b85688c8a226820098955293ce22",
+      "sourceHash": "sha256:f798774e08a34138f35470f8d21a8dbf8d0aa6c23c07c63f8a565ef3aabc04a2",
       "storeId": "knowledge-indexes"
     },
     {
       "contract": "ParseArtifact generation directories referenced by knowledge.db and never treated as source content versions",
       "kind": "directory-contract",
       "module": "lib/knowledge/knowledge-manager.ts",
-      "sourceHash": "sha256:1d664cc8827f7e968a8395c613d8e9c9629856d29dbc424a8e315e2d974c7d00",
+      "sourceHash": "sha256:6e92286f1263bf638575fa8804de838c77f0f33f4540f83de9faa64da4c6d25c",
       "storeId": "knowledge-parse-artifacts"
     },
     {
       "contract": "ContentSnapshot relative locator, immutable byte publication, SHA-256 verification, and rollback protocol",
       "kind": "directory-contract",
       "module": "lib/knowledge/knowledge-manager.ts",
-      "sourceHash": "sha256:1d664cc8827f7e968a8395c613d8e9c9629856d29dbc424a8e315e2d974c7d00",
+      "sourceHash": "sha256:6e92286f1263bf638575fa8804de838c77f0f33f4540f83de9faa64da4c6d25c",
       "storeId": "knowledge-source-snapshots"
     },
     {

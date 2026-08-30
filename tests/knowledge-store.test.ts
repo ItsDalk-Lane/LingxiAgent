@@ -106,6 +106,7 @@ describe("KnowledgeStore", () => {
       rerankModelRef: rerank,
       chunkTargetChars: null,
       retrievalTopK: null,
+      vectorRetentionDays: null,
     });
     // 乙的显式嵌入保留，rerank 被补。
     expect(store.getNotebookConfig({ studioId, notebookId: nbB.id })).toMatchObject({
@@ -353,6 +354,7 @@ describe("KnowledgeStore", () => {
       rerankModelRef: null,
       chunkTargetChars: 1200,
       retrievalTopK: null,
+      vectorRetentionDays: null,
     });
     // 研究表（含数据）全部消失，ingestion_jobs 就绪。
     const remaining = new Set<string>(migrated.db.prepare(
@@ -511,6 +513,7 @@ describe("KnowledgeStore", () => {
       rerankModelRef: null,
       chunkTargetChars: null,
       retrievalTopK: null,
+      vectorRetentionDays: null,
     });
     // 解析（v8 起仅笔记本列，无全局偏好级）：NULL 原样透出，语义在消费侧解释。
     expect(resolveNotebookConfig(defaults)).toEqual({
@@ -518,6 +521,7 @@ describe("KnowledgeStore", () => {
       rerankModelRef: null,
       chunkTargetChars: null,
       retrievalTopK: null,
+      vectorRetentionDays: null,
     });
 
     // 部分更新：只动给定字段。
@@ -533,6 +537,7 @@ describe("KnowledgeStore", () => {
       rerankModelRef: null,
       chunkTargetChars: 800,
       retrievalTopK: 20,
+      vectorRetentionDays: null,
     });
     // v8：解析仅读笔记本列。
     expect(resolveNotebookConfig(updated)).toEqual({
@@ -540,6 +545,7 @@ describe("KnowledgeStore", () => {
       rerankModelRef: null,
       chunkTargetChars: 800,
       retrievalTopK: 20,
+      vectorRetentionDays: null,
     });
 
     // null 清除 → 回到继承/内置默认；omitted 字段不变。
@@ -554,12 +560,14 @@ describe("KnowledgeStore", () => {
       rerankModelRef: null,
       chunkTargetChars: null,
       retrievalTopK: 20,
+      vectorRetentionDays: null,
     });
     expect(resolveNotebookConfig(cleared)).toEqual({
       embeddingModelRef: null,
       rerankModelRef: null,
       chunkTargetChars: null,
       retrievalTopK: 20,
+      vectorRetentionDays: null,
     });
 
     // 校验与边界。

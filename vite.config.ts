@@ -356,7 +356,9 @@ export default defineConfig({
     },
   },
   server: {
-    port: 5173,
+    // 端口可被外部指定（preview harness 经 PORT 分配；dev-web 脚本经
+    // LINGXI_DEV_WEB_CLIENT_PORT 传递同一值），无指定时保持 5173 默认。
+    port: Number(process.env.LINGXI_DEV_WEB_CLIENT_PORT || process.env.PORT || 5173),
     strictPort: true,
     proxy: createDevWebProxy(),
   },

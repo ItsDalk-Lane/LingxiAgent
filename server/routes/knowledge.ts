@@ -175,7 +175,7 @@ function validateExactBody(body: unknown, allowedKeys: string[], label: string):
  * 笔记本设置 PUT 的键校验：omitted=不变，至少给一个键。chunkTargetChars 已
  * 随"按嵌入模型上下文自动分块"退役（遗留显式列值仍生效，只是不再接受写入）。
  */
-const NOTEBOOK_SETTINGS_KEYS = ["embeddingModelRef", "rerankModelRef", "retrievalTopK"];
+const NOTEBOOK_SETTINGS_KEYS = ["embeddingModelRef", "rerankModelRef", "retrievalTopK", "vectorRetentionDays"];
 
 function validateSettingsBody(body: unknown): Record<string, any> {
   if (!body || typeof body !== "object" || Array.isArray(body)) {

@@ -131,7 +131,11 @@
     "readinessFailed": "{count} failed",
     "settingsChunkAutoFallback": "Auto (~6553)",
     "settingsTopKUnlimited": "Unlimited (default)",
-    "settingsTopKMaxRecall": "Max recall count"
+    "settingsTopKMaxRecall": "Max recall count",
+    "settingsVectorRetention": "Vector retention",
+    "settingsRetentionKeepForever": "Keep forever (default)",
+    "settingsRetentionDaysMode": "Clean up after days",
+    "settingsVectorRetentionHint": "Stale vectors from model switches or re-ingestion are removed automatically after the configured days without query use (1–3650); the latest in-use version is never affected"
   },
   "channel": {
     "tab": "Channels",
@@ -2042,7 +2046,14 @@
         "image": "Image",
         "video": "Video",
         "speech": "Speech recognition"
-      }
+      },
+      "modelOperationType": "Model type",
+      "modelOperationNone": "None",
+      "modelOperationEmbedding": "Embedding",
+      "modelOperationRerank": "Rerank",
+      "modelOperationHint": "Models tagged embedding or rerank appear in the matching dropdowns of the knowledge notebook settings. The tag is only a label; actual support is verified at call time.",
+      "embeddingDimensions": "Embedding dimensions",
+      "embeddingDimensionsHint": "Used when the provider supports custom dimensions; otherwise recorded only and the provider default applies."
     },
     "memory": {
       "sectionTitle": "Memory",

@@ -358,3 +358,120 @@ describe("Knowledge 摄入管线", () => {
     expect(embedding.calls).toHaveLength(0);
   });
 });
+
+describe("向量保留策略与删除清理", () => {
+  it("sweep：超期未使用的旧身份被回收，最新身份与查询命中者保留", async () => {
+    const home = tempHome();
+    const now = { value: "2026-08-01T00:00:00.000Z" };
+    const { manager, embedding } = createManager(home, { now: () => now.value });
+    embedding.embedder = createFakeEmbedder(embedding);
+    const studioId = "studio-a";
+    const notebook = manager.createNotebook({ studioId, name: "资料" });
+    manager.updateNotebookSettings({
+      studioId,
+      notebookId: notebook.id,
+      embeddingModelRef: FAKE_MODEL_REF,
+      vectorRetentionDays: 7,
+    });
+    const { artifact, job } = await importTextSource(manager, studioId, notebook.id, "雪花写作法第一章内容示例。".repeat(40));
+    expect(await manager.ingestion.drainQueue()).toBe(1);
+    expect(getJob(manager, studioId, job.id).status).toBe("done");
+
+    // 手工塞入一份"历史模型身份"向量（模拟换模型后的作废副本），并拨老其使用时间。
+    const staleIdentity = {
+      key: "fake/emb-old/openai/8",
+      provider: "fake",
+      modelId: "emb-old",
+      protocol: "openai",
+      dimensions: 8,
+    };
+    manager.vectorIndex.buildOrReplaceArtifact({
+      parseArtifactId: artifact.id,
+      chunkFingerprint: "legacy-fingerprint",
+      model: staleIdentity,
+      entries: [{ chunkId: "stale-chunk", parseArtifactId: artifact.id, ordinal: 0, vector: new Array(8).fill(0.5) }],
+    });
+    manager.vectorIndex.db.prepare(`UPDATE vector_artifacts SET last_used_at = ? WHERE model_key = ?`)
+      .run("2026-07-28T00:00:00.000Z", staleIdentity.key);
+
+    // 未超期（距 now 4 天 < 7 天）：不删。
+    expect(manager.queryService.sweepStaleVectorArtifacts({ now: () => now.value })).toBe(0);
+    // 30 天后：旧身份超期回收，当前身份保留。
+    const later = { value: "2026-09-01T00:00:00.000Z" };
+    expect(manager.queryService.sweepStaleVectorArtifacts({ now: () => later.value })).toBe(1);
+    const remaining = manager.vectorIndex.listArtifactUsage();
+    expect(remaining.map((row) => row.modelKey)).toHaveLength(1);
+    expect(remaining[0].modelKey).not.toBe(staleIdentity.key);
+  });
+
+  it("未配置保留策略（默认）时 sweep 不删任何向量", async () => {
+    const home = tempHome();
+    const { manager, embedding } = createManager(home);
+    embedding.embedder = createFakeEmbedder(embedding);
+    const studioId = "studio-a";
+    const notebook = manager.createNotebook({ studioId, name: "资料" });
+    manager.updateNotebookSettings({ studioId, notebookId: notebook.id, embeddingModelRef: FAKE_MODEL_REF });
+    const { artifact } = await importTextSource(manager, studioId, notebook.id, "默认永久保留策略下的内容示例。".repeat(40));
+    await manager.ingestion.drainQueue();
+
+    const staleIdentity = {
+      key: "fake/emb-old/openai/8",
+      provider: "fake",
+      modelId: "emb-old",
+      protocol: "openai",
+      dimensions: 8,
+    };
+    manager.vectorIndex.buildOrReplaceArtifact({
+      parseArtifactId: artifact.id,
+      chunkFingerprint: "legacy-fingerprint",
+      model: staleIdentity,
+      entries: [{ chunkId: "stale-chunk", parseArtifactId: artifact.id, ordinal: 0, vector: new Array(8).fill(0.5) }],
+    });
+    manager.vectorIndex.db.prepare(`UPDATE vector_artifacts SET last_used_at = ? WHERE model_key = ?`)
+      .run("2020-01-01T00:00:00.000Z", staleIdentity.key);
+    expect(manager.queryService.sweepStaleVectorArtifacts({ now: () => "2026-09-01T00:00:00.000Z" })).toBe(0);
+    expect(manager.vectorIndex.listArtifactUsage()).toHaveLength(2);
+  });
+
+  it("删除唯一笔记本挂靠的源时清理其派生索引；仍挂靠其他笔记本时不清理", async () => {
+    const home = tempHome();
+    const { manager, embedding } = createManager(home);
+    embedding.embedder = createFakeEmbedder(embedding);
+    const studioId = "studio-a";
+    const notebookA = manager.createNotebook({ studioId, name: "甲" });
+    const notebookB = manager.createNotebook({ studioId, name: "乙" });
+    manager.updateNotebookSettings({ studioId, notebookId: notebookA.id, embeddingModelRef: FAKE_MODEL_REF });
+    const { imported, artifact } = await importTextSource(manager, studioId, notebookA.id, "待删除源的内容示例。".repeat(40));
+    await manager.ingestion.drainQueue();
+    manager.addSourceToNotebook({ studioId, notebookId: notebookB.id, sourceId: imported.source.id });
+
+    // 从甲移除但乙仍挂靠：不清理。
+    manager.removeSourceFromNotebook({ studioId, notebookId: notebookA.id, sourceId: imported.source.id });
+    expect(manager.vectorIndex.listArtifactUsage().some((row) => row.parseArtifactId === artifact.id)).toBe(true);
+
+    // 从乙也移除（孤儿）：向量与 FTS 行全部清理。
+    manager.removeSourceFromNotebook({ studioId, notebookId: notebookB.id, sourceId: imported.source.id });
+    expect(manager.vectorIndex.listArtifactUsage().some((row) => row.parseArtifactId === artifact.id)).toBe(false);
+    expect(manager.indexStore.listArtifactChunks(artifact.id)).toHaveLength(0);
+  });
+});
+
+  it("sweep 兜底回收历史孤儿源的向量（删除清理上线前的残留）", async () => {
+    const home = tempHome();
+    const { manager, embedding } = createManager(home);
+    embedding.embedder = createFakeEmbedder(embedding);
+    const studioId = "studio-a";
+    const notebook = manager.createNotebook({ studioId, name: "资料" });
+    manager.updateNotebookSettings({ studioId, notebookId: notebook.id, embeddingModelRef: FAKE_MODEL_REF });
+    const { imported, artifact } = await importTextSource(manager, studioId, notebook.id, "孤儿源残留内容示例。".repeat(40));
+    await manager.ingestion.drainQueue();
+    expect(manager.vectorIndex.listArtifactUsage().some((row) => row.parseArtifactId === artifact.id)).toBe(true);
+
+    // 模拟"删除清理上线前"的删除：直接在 store 层移除挂靠（绕过 manager 的即时清理）。
+    manager.store.removeSourceFromNotebook({ studioId, notebookId: notebook.id, sourceId: imported.source.id });
+    expect(manager.vectorIndex.listArtifactUsage().some((row) => row.parseArtifactId === artifact.id)).toBe(true);
+
+    // sweep 兜底：无活跃挂靠的孤儿源向量被回收。
+    expect(manager.queryService.sweepStaleVectorArtifacts()).toBeGreaterThanOrEqual(1);
+    expect(manager.vectorIndex.listArtifactUsage().some((row) => row.parseArtifactId === artifact.id)).toBe(false);
+  });

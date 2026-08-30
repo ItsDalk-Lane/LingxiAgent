@@ -59,22 +59,6 @@ export const openaiPlugin = {
   authType: "api-key",
   defaultBaseUrl: "https://api.openai.com/v1",
   defaultApi: "openai-completions",
-  operationModels: [
-    {
-      id: "text-embedding-3-small",
-      displayName: "Text Embedding 3 Small",
-      operations: ["embedding"],
-      operationProtocol: "openai-embeddings",
-      dimensions: 1536,
-    },
-    {
-      id: "text-embedding-3-large",
-      displayName: "Text Embedding 3 Large",
-      operations: ["embedding"],
-      operationProtocol: "openai-embeddings",
-      dimensions: 3072,
-    },
-  ],
   capabilities: {
     media: {
       imageGeneration: {

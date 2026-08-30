@@ -30,7 +30,7 @@ import type {
 } from "./types.ts";
 import type { KnowledgeBlockDraft } from "./source-adapters.ts";
 
-export const KNOWLEDGE_SCHEMA_VERSION = 8;
+export const KNOWLEDGE_SCHEMA_VERSION = 9;
 
 const SOURCE_TYPES = new Set<KnowledgeSourceType>(["file", "pasted_text", "web_snapshot"]);
 const PARSE_STATUSES = new Set<KnowledgeParseStatus>(["parsing", "ready", "needs_ocr", "failed"]);
@@ -46,6 +46,9 @@ const INGESTION_STATUSES = new Set<IngestionJobStatus>(["queued", "running", "pe
 export const KNOWLEDGE_DEFAULT_RETRIEVAL_TOP_K = 12;
 const MIN_RETRIEVAL_TOP_K = 1;
 export const MAX_RETRIEVAL_TOP_K = 1000;
+/** 向量保留天数边界：1 天 ~ 10 年。 */
+export const MIN_VECTOR_RETENTION_DAYS = 1;
+export const MAX_VECTOR_RETENTION_DAYS = 3650;
 const require = createRequire(import.meta.url);
 let BetterSqliteDatabase: any = null;
 
@@ -300,6 +303,7 @@ function toNotebookConfig(row: any): NotebookConfig {
     rerankModelRef: parseModelRefJson(row?.rerank_model_ref, "rerank model ref"),
     chunkTargetChars: row?.chunk_target_chars == null ? null : Number(row.chunk_target_chars),
     retrievalTopK: row?.retrieval_top_k == null ? null : Number(row.retrieval_top_k),
+    vectorRetentionDays: row?.vector_retention_days == null ? null : Number(row.vector_retention_days),
   };
 }
 
@@ -333,6 +337,8 @@ export interface ResolvedNotebookConfig {
   chunkTargetChars: number | null;
   /** null = 无上限（返回全部匹配块）；正整数 = 最大召回数。 */
   retrievalTopK: number | null;
+  /** null = 永久保留（默认）；正整数 = 旧版本向量 N 天未被查询命中即回收。 */
+  vectorRetentionDays: number | null;
 }
 
 /**
@@ -346,6 +352,7 @@ export function resolveNotebookConfig(config: NotebookConfig): ResolvedNotebookC
     rerankModelRef: config.rerankModelRef ?? null,
     chunkTargetChars: config.chunkTargetChars ?? null,
     retrievalTopK: config.retrievalTopK ?? null,
+    vectorRetentionDays: config.vectorRetentionDays ?? null,
   };
 }
 
@@ -431,6 +438,7 @@ export class KnowledgeStore {
         if (version === 5) this.createSchemaV6();
         if (version === 6) this.createSchemaV7();
         if (version === 7) this.createSchemaV8();
+        if (version === 8) this.createSchemaV9();
         version += 1;
       }
       this.db.pragma(`user_version = ${KNOWLEDGE_SCHEMA_VERSION}`);
@@ -1114,6 +1122,17 @@ export class KnowledgeStore {
     `);
   }
 
+  private createSchemaV9() {
+    // 向量保留策略：NULL = 永久保留（默认）；正整数 = 旧版本向量超过 N 天
+    // 未被查询命中即由 sweep 回收（换模型/重嵌产生的作废向量不再无限叠加）。
+    // 列存在检查：测试压版本重开时 ALTER 会对已存在列报 duplicate，需幂等。
+    const columns = this.db.prepare(`PRAGMA table_info(notebooks)`).all() as any[];
+    if (columns.some((col) => col.name === "vector_retention_days")) return;
+    this.db.exec(`
+      ALTER TABLE notebooks ADD COLUMN vector_retention_days INTEGER;
+    `);
+  }
+
   private newId(prefix: string): string {
     return requiredString(this.idGenerator(prefix), `${prefix} id`, 128);
   }
@@ -1202,10 +1221,105 @@ export class KnowledgeStore {
     const notebookId = requiredString(input?.notebookId, "notebookId", 128);
     this.activeNotebook(studioId, notebookId);
     return toNotebookConfig(this.db.prepare(`
-      SELECT embedding_model_ref, rerank_model_ref, chunk_target_chars, retrieval_top_k
+      SELECT embedding_model_ref, rerank_model_ref, chunk_target_chars, retrieval_top_k, vector_retention_days
       FROM notebooks
       WHERE id = ? AND studio_id = ?
     `).get(notebookId, studioId));
+  }
+
+  /**
+   * 源的全部解析产物 id（含历史版本）：派生索引清理用。
+   * 软删除源同样返回——索引清理正是删除语义的一部分。
+   */
+  listSourceArtifactIds(input: { sourceId: unknown }): string[] {
+    const sourceId = requiredString(input?.sourceId, "sourceId", 128);
+    return this.db.prepare(`
+      SELECT pa.id FROM parse_artifacts pa
+      JOIN content_snapshots cs ON cs.id = pa.content_snapshot_id
+      WHERE cs.source_id = ?
+      ORDER BY pa.created_at
+    `).all(sourceId).map((row: any) => row.id);
+  }
+
+  /**
+   * 仍活跃挂靠该源的笔记本 id（membership 未移除且笔记本未删除）。
+   * 空数组 = 孤儿源：没有任何笔记本可达，派生索引可清理。
+   */
+  listActiveNotebookIdsForSource(input: { sourceId: unknown }): string[] {
+    const sourceId = requiredString(input?.sourceId, "sourceId", 128);
+    return this.db.prepare(`
+      SELECT ns.notebook_id FROM notebook_sources ns
+      JOIN notebooks n ON n.id = ns.notebook_id
+      WHERE ns.source_id = ? AND ns.removed_at IS NULL AND n.deleted_at IS NULL
+    `).all(sourceId).map((row: any) => row.notebook_id);
+  }
+
+  /**
+   * 孤儿源的全部解析产物 id：源本身未删（快照/产物仍活跃）但已无任何
+   * 活跃挂靠笔记本（UI 不可达）。历史删除动作发生在删除清理逻辑上线前的
+   * 残留由 sweep 兜底回收；新删除已由 manager 即时清理，通常为空。
+   */
+  listOrphanArtifactIds(): string[] {
+    return this.db.prepare(`
+      SELECT pa.id FROM parse_artifacts pa
+      JOIN content_snapshots cs ON cs.id = pa.content_snapshot_id
+      JOIN sources s ON s.id = cs.source_id AND s.deleted_at IS NULL
+      WHERE NOT EXISTS (
+        SELECT 1 FROM notebook_sources ns
+        JOIN notebooks n ON n.id = ns.notebook_id AND n.deleted_at IS NULL
+        WHERE ns.source_id = s.id AND ns.removed_at IS NULL
+      )
+    `).all().map((row: any) => row.id);
+  }
+
+  /**
+   * 向量 sweep 的归属视图：全部活跃源的解析产物 × 是否该源最新产物 ×
+   * 活跃挂靠笔记本的保留策略（取最宽松的最大值；任一笔记本未配置 = 该源
+   * 永久保留，不误删仍被引用的向量）。历史产物（isLatestForSource=false）
+   * 与同产物非当前模型身份的向量是"旧版本"回收候选。
+   */
+  listArtifactVectorSweepRows(): Array<{
+    artifactId: string;
+    sourceId: string;
+    isLatestForSource: boolean;
+    retentionDays: number | null;
+  }> {
+    const retentionBySource = new Map<string, number | null>();
+    for (const row of this.db.prepare(`
+      SELECT ns.source_id,
+             MAX(n.vector_retention_days) AS max_days,
+             COUNT(n.vector_retention_days) AS configured_count,
+             COUNT(*) AS total_count
+      FROM notebook_sources ns
+      JOIN notebooks n ON n.id = ns.notebook_id
+      WHERE ns.removed_at IS NULL AND n.deleted_at IS NULL
+      GROUP BY ns.source_id
+    `).all() as any[]) {
+      // 任一挂靠笔记本未配置保留策略 = 该源永久保留。
+      retentionBySource.set(
+        row.source_id,
+        Number(row.configured_count) < Number(row.total_count)
+          ? null
+          : row.max_days == null ? null : Number(row.max_days),
+      );
+    }
+    const latestBySource = new Map<string, string>();
+    const artifacts: Array<{ sourceId: string; artifactId: string }> = this.db.prepare(`
+      SELECT cs.source_id, pa.id AS artifact_id
+      FROM parse_artifacts pa
+      JOIN content_snapshots cs ON cs.id = pa.content_snapshot_id
+      JOIN sources s ON s.id = cs.source_id AND s.deleted_at IS NULL
+      ORDER BY pa.created_at
+    `).all().map((row: any) => ({ sourceId: row.source_id, artifactId: row.artifact_id }));
+    for (const { sourceId, artifactId } of artifacts) {
+      latestBySource.set(sourceId, artifactId);
+    }
+    return artifacts.map(({ sourceId, artifactId }) => ({
+      artifactId,
+      sourceId,
+      isLatestForSource: latestBySource.get(sourceId) === artifactId,
+      retentionDays: retentionBySource.get(sourceId) ?? null,
+    }));
   }
 
   /**
@@ -1220,6 +1334,7 @@ export class KnowledgeStore {
     rerankModelRef?: unknown;
     chunkTargetChars?: unknown;
     retrievalTopK?: unknown;
+    vectorRetentionDays?: unknown;
   }): NotebookConfig {
     const studioId = requiredString(input?.studioId, "studioId", 256);
     const notebookId = requiredString(input?.notebookId, "notebookId", 128);
@@ -1255,6 +1370,15 @@ export class KnowledgeStore {
         "retrievalTopK",
         MIN_RETRIEVAL_TOP_K,
         MAX_RETRIEVAL_TOP_K,
+      ));
+    }
+    if (hasField("vectorRetentionDays")) {
+      assignments.push("vector_retention_days = ?");
+      params.push(optionalIntegerInRange(
+        input.vectorRetentionDays,
+        "vectorRetentionDays",
+        MIN_VECTOR_RETENTION_DAYS,
+        MAX_VECTOR_RETENTION_DAYS,
       ));
     }
     if (assignments.length === 0) {

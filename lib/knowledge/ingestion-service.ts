@@ -80,6 +80,9 @@ export interface KnowledgeIngestionServiceDeps {
  * - embed 复用 vectorIndex.hasArtifact（chunkFingerprint + 模型身份命中即跳过）。
  * 查询侧懒构建（KnowledgeQueryService.retrieve 的 ensure 链）保留为摄入未跑时的兜底。
  */
+/** 向量保留策略 sweep 间隔：与摄入退避节奏解耦，小时级足够。 */
+const VECTOR_SWEEP_INTERVAL_MS = 3_600_000;
+
 export class KnowledgeIngestionService {
   private readonly deps: KnowledgeIngestionServiceDeps;
   private readonly now: () => string;
@@ -91,6 +94,7 @@ export class KnowledgeIngestionService {
   private waiter: (() => void) | null = null;
   private waiterTimer: ReturnType<typeof setTimeout> | null = null;
   private wakeRequested = false;
+  private lastVectorSweepAt = 0;
 
   constructor(deps: KnowledgeIngestionServiceDeps) {
     if (!deps?.store || !deps?.queryService || typeof deps?.parseSource !== "function") {
@@ -276,8 +280,25 @@ export class KnowledgeIngestionService {
         // 显式记录后继续循环（不吞错、不退出）。
         this.log(`knowledge ingestion: drain failed: ${describeIngestionError(error)}`);
       }
+      this.sweepStaleVectorsIfDue();
       if (this.stopped || processed > 0) continue;
       await this.waitForWake(this.pollIntervalMs);
+    }
+  }
+
+  /** 向量保留策略 sweep：到期才跑，失败记日志不阻断摄入循环。 */
+  private sweepStaleVectorsIfDue() {
+    if (this.stopped) return;
+    const nowMs = Date.now();
+    if (nowMs - this.lastVectorSweepAt < VECTOR_SWEEP_INTERVAL_MS) return;
+    this.lastVectorSweepAt = nowMs;
+    try {
+      const removed = this.deps.queryService.sweepStaleVectorArtifacts();
+      if (removed > 0) {
+        this.log(`knowledge ingestion: vector retention sweep removed ${removed} stale artifact vector(s)`);
+      }
+    } catch (error) {
+      this.log(`knowledge ingestion: vector retention sweep failed: ${describeIngestionError(error)}`);
     }
   }
 

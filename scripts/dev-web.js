@@ -124,9 +124,14 @@ if (process.platform === "win32") {
 try {
   spawnServer();
   const serverInfo = await waitForServerInfo();
-  const clientConfig = buildDevWebClientConfig(serverInfo);
+  // preview harness 经 PORT 分配端口（autoPort）；无 PORT 时保持 5173 默认。
+  const clientPort = process.env.PORT ? Number(process.env.PORT) : undefined;
+  const clientConfig = buildDevWebClientConfig(
+    serverInfo,
+    clientPort !== undefined ? { clientPort } : {},
+  );
   spawnVite(clientConfig, serverInfo);
-  log(`open ${buildDevWebPreviewUrl()}`);
+  log(`open ${buildDevWebPreviewUrl(clientPort !== undefined ? { port: clientPort } : {})}`);
 } catch (err) {
   shutdown();
   console.error(`[dev-web] ${err?.stack || err?.message || String(err)}`);

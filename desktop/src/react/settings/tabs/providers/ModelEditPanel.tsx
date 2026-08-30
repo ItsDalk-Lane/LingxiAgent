@@ -173,6 +173,14 @@ export function ModelEditPanel({
     ? meta.toolUse.supportsTools === true
     : false;
   const [toolUse, setToolUse] = useState<boolean>(initialToolUse);
+  // 模型类型标签：嵌入/重排只是用户打的标记，不代表模型真的支持；
+  // 打了标签的模型进入知识库笔记本设置的对应下拉，协议方言由供应商自动推断
+  const userOperations: string[] = Array.isArray(userMeta.operations) ? (userMeta.operations as string[]) : [];
+  const initialOperationType = userOperations.includes('embedding')
+    ? 'embedding'
+    : userOperations.includes('rerank') ? 'rerank' : '';
+  const [operationType, setOperationType] = useState(initialOperationType);
+  const [dimensionsVal, setDimensionsVal] = useState(String(finiteNumber(userMeta.dimensions) ?? ''));
   const [dirty, setDirty] = useState<Record<string, boolean>>({});
   const markDirty = (field: string) => setDirty(prev => ({ ...prev, [field]: true }));
   const panelRef = useRef<HTMLDivElement>(null);
@@ -230,6 +238,12 @@ export function ModelEditPanel({
           };
         // 开启但既无既有 contract 也无法从 api 推导：不要写入一个错误的工具契约
         if (toolUse && !existing && !derived) delete entry.toolUse;
+      }
+      if (dirty.operationType) entry.operations = operationType ? [operationType] : [];
+      if (dirty.dimensions) {
+        const parsed = parseInt(dimensionsVal.trim());
+        // null 显式清除维度记录；非法输入原样拒绝由数字输入框约束
+        entry.dimensions = dimensionsVal.trim() && Number.isSafeInteger(parsed) && parsed > 0 ? parsed : null;
       }
       try {
         await lingxiFetchJson(`/api/providers/${encodeURIComponent(providerId)}/models/${encodeURIComponent(modelId)}`, {
@@ -351,6 +365,33 @@ export function ModelEditPanel({
               onChange={(value) => { setStructuredOutput(value); markDirty('structuredOutput'); }}
             />
           </div>
+          <div className={styles['pv-model-edit-section-title']}>{t('settings.api.modelOperationType')}</div>
+          <div className={styles['pv-model-edit-field']}>
+            <select
+              className={styles['settings-input']}
+              value={operationType}
+              onChange={(e) => { setOperationType(e.target.value); markDirty('operationType'); }}
+            >
+              <option value="">{t('settings.api.modelOperationNone')}</option>
+              <option value="embedding">{t('settings.api.modelOperationEmbedding')}</option>
+              <option value="rerank">{t('settings.api.modelOperationRerank')}</option>
+            </select>
+            <span className={styles['pv-model-edit-hint']}>{t('settings.api.modelOperationHint')}</span>
+          </div>
+          {operationType === 'embedding' && (
+            <div className={styles['pv-model-edit-field']}>
+              <label className={styles['pv-model-edit-label']}>{t('settings.api.embeddingDimensions')}</label>
+              <input
+                className={styles['settings-input']}
+                type="number"
+                min="1"
+                value={dimensionsVal}
+                onChange={(e) => { setDimensionsVal(e.target.value); markDirty('dimensions'); }}
+                placeholder="1024"
+              />
+              <span className={styles['pv-model-edit-hint']}>{t('settings.api.embeddingDimensionsHint')}</span>
+            </div>
+          )}
         </>
       )}
       <div className={styles['pv-model-edit-actions']}>

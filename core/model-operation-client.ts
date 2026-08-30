@@ -7,13 +7,31 @@ import {
 } from "../lib/llm/model-call-integration.ts";
 import { extractProviderRequestId } from "../lib/llm/model-call-observer.ts";
 import { withModelRequestAccounting } from "../lib/llm/model-request-accounting.ts";
-import { MODEL_OPERATION_RERANK_MAX_DOCS, type ModelOperation } from "../shared/model-operations.ts";
+import {
+  MODEL_OPERATION_PROTOCOLS,
+  MODEL_OPERATION_RERANK_MAX_DOCS,
+  type ModelOperation,
+} from "../shared/model-operations.ts";
 
 const DEFAULT_TIMEOUT_MS = 30_000;
 const MAX_EMBED_INPUTS = 128;
 const MAX_RERANK_DOCUMENTS = MODEL_OPERATION_RERANK_MAX_DOCS;
 const MAX_TEXT_CHARS = 32_000;
 const MAX_TOTAL_TEXT_CHARS = 500_000;
+
+// 已识别的操作协议名，按下标解构出可读常量用于 switch 分发
+const [
+  PROTOCOL_OPENAI_EMBEDDINGS,
+  PROTOCOL_OLLAMA_EMBED,
+  PROTOCOL_GEMINI_EMBED,
+  PROTOCOL_VOYAGE_EMBEDDINGS,
+  PROTOCOL_COHERE_RERANK,
+  PROTOCOL_SILICONFLOW_RERANK,
+  PROTOCOL_VOYAGE_RERANK,
+] = MODEL_OPERATION_PROTOCOLS;
+
+/** embed() 的输入用途：voyage 协议映射为 input_type，其余协议忽略。 */
+type EmbeddingInputType = "document" | "query";
 
 type OperationResolver = (operation: ModelOperation) => Promise<any | null>;
 
@@ -65,10 +83,31 @@ function assertTextList(value: unknown, label: string, maxItems: number): string
   return texts;
 }
 
-function operationUrl(baseUrl: string, suffix: "embeddings" | "rerank"): string {
+function trimBaseUrl(baseUrl: string): string {
   const trimmed = String(baseUrl || "").replace(/\/+$/, "");
   if (!trimmed) throw new ModelOperationRequestError("base_url_missing", "Provider base URL is unavailable");
+  return trimmed;
+}
+
+function operationUrl(baseUrl: string, suffix: "embeddings" | "rerank"): string {
+  const trimmed = trimBaseUrl(baseUrl);
   return trimmed.endsWith(`/${suffix}`) ? trimmed : `${trimmed}/${suffix}`;
+}
+
+// ollama 嵌入端点随 base 形状而变：OpenAI 兼容前缀 /v1 先剥掉（自添加模型继承的供应商默认
+// base 带 /v1，原生端点不在其下）；base 已以 /api 结尾只补 /embed，否则补 /api/embed
+function ollamaEmbedUrl(baseUrl: string): string {
+  let trimmed = trimBaseUrl(baseUrl);
+  if (trimmed.endsWith("/v1")) trimmed = trimmed.slice(0, -"/v1".length);
+  return trimmed.endsWith("/api") ? `${trimmed}/embed` : `${trimmed}/api/embed`;
+}
+
+// DashScope 的 compatible-mode 网关不承载 /rerank：cohere 系协议命中时改写到 compatible-api 再拼接
+function cohereRerankUrl(baseUrl: string): string {
+  const rewritten = baseUrl.includes("/compatible-mode/v1")
+    ? baseUrl.replace("/compatible-mode/v1", "/compatible-api/v1")
+    : baseUrl;
+  return operationUrl(rewritten, "rerank");
 }
 
 function hasHeader(headers: Record<string, string>, name: string): boolean {
@@ -84,6 +123,166 @@ function requestHeaders(execution: any): Record<string, string> {
     headers.Authorization = `Bearer ${execution.apiKey}`;
   }
   return headers;
+}
+
+// ollama/gemini 等原生协议认证方言：先剥掉 Authorization，保证最终请求不携带 Bearer
+function headersWithoutAuthorization(source: Record<string, string>): Record<string, string> {
+  return Object.fromEntries(
+    Object.entries(source).filter(([key]) => key.toLowerCase() !== "authorization"),
+  );
+}
+
+function protocolHeaders(execution: any, auth: "bearer" | "none" | "google"): Record<string, string> {
+  if (auth === "bearer") return requestHeaders(execution);
+  const headers = headersWithoutAuthorization(execution?.headers || {});
+  headers["Content-Type"] = "application/json";
+  if (auth === "google" && execution?.apiKey && !hasHeader(headers, "x-goog-api-key")) {
+    headers["x-goog-api-key"] = String(execution.apiKey);
+  }
+  return headers;
+}
+
+function passthroughResponse(body: any) {
+  return body;
+}
+
+// 以下归一化函数把各厂商原生嵌入响应折成 openai 的 data[{index, embedding}] 形状，
+// 让 validate/usage 逻辑与 openai 路径复用完全相同的校验强度（数量/index 归位/向量合法性/维度匹配）。
+function normalizeOllamaEmbeddings(body: any) {
+  return {
+    data: Array.isArray(body?.embeddings)
+      ? body.embeddings.map((vector: unknown, index: number) => ({ index, embedding: vector }))
+      : null,
+  };
+}
+
+function normalizeGeminiEmbeddings(body: any) {
+  return {
+    data: Array.isArray(body?.embeddings)
+      ? body.embeddings.map((row: any, index: number) => ({ index, embedding: row?.values }))
+      : null,
+  };
+}
+
+function normalizeVoyageEmbeddings(body: any) {
+  return {
+    data: Array.isArray(body?.data)
+      ? body.data.map((row: any, index: number) => ({
+          index: Number.isSafeInteger(row?.index) ? row.index : index,
+          embedding: row?.embedding,
+        }))
+      : null,
+    usage: body?.usage,
+  };
+}
+
+// 协议方言：按 execution.api 把通用（openai/cohere 形状）请求体翻译成厂商原生协议的
+// URL/请求体/认证头，并给出响应归一化函数；缺省与未识别协议名回退现状路径。
+interface OperationDialect {
+  url: string;
+  headers: Record<string, string>;
+  body: any;
+  itemCount: number;
+  normalizeResponse: (body: any) => any;
+}
+
+function operationDialect(execution: any, options: {
+  operation: ModelOperation;
+  requestBody: any;
+  inputType?: EmbeddingInputType;
+  contextWindow?: number;
+}): OperationDialect {
+  const api = typeof execution?.api === "string" ? execution.api : "";
+  const modelId = execution?.model?.id;
+
+  if (options.operation === "embedding") {
+    const { input, dimensions } = options.requestBody;
+    const contextWindow = options.contextWindow;
+    switch (api) {
+      case PROTOCOL_OLLAMA_EMBED:
+        return {
+          url: ollamaEmbedUrl(execution.baseUrl),
+          headers: protocolHeaders(execution, "none"),
+          // 原生 /api/embed 同样接受 dimensions（MRL 截断）与 options.num_ctx
+          // （KV cache 预分配）；实测 qwen3-embedding:8b 两参数均生效。
+          body: {
+            model: modelId,
+            input,
+            ...(dimensions ? { dimensions } : {}),
+            ...(contextWindow ? { options: { num_ctx: contextWindow } } : {}),
+          },
+          itemCount: input.length,
+          normalizeResponse: normalizeOllamaEmbeddings,
+        };
+      case PROTOCOL_GEMINI_EMBED:
+        return {
+          url: `${trimBaseUrl(execution.baseUrl)}/models/${modelId}:batchEmbedContents`,
+          headers: protocolHeaders(execution, "google"),
+          body: {
+            requests: input.map((text: string) => ({
+              model: `models/${modelId}`,
+              content: { parts: [{ text }] },
+              ...(dimensions ? { outputDimensionality: dimensions } : {}),
+            })),
+          },
+          itemCount: input.length,
+          normalizeResponse: normalizeGeminiEmbeddings,
+        };
+      case PROTOCOL_VOYAGE_EMBEDDINGS:
+        return {
+          url: `${trimBaseUrl(execution.baseUrl)}/v1/embeddings`,
+          headers: protocolHeaders(execution, "bearer"),
+          body: {
+            model: modelId,
+            input,
+            input_type: options.inputType ?? "document",
+            ...(dimensions ? { dimensions } : {}),
+          },
+          itemCount: input.length,
+          normalizeResponse: normalizeVoyageEmbeddings,
+        };
+      case PROTOCOL_OPENAI_EMBEDDINGS:
+      default:
+        // openai-embeddings 协议名、缺省与未识别协议名：维持现状路径
+        return {
+          url: operationUrl(execution.baseUrl, "embeddings"),
+          headers: requestHeaders(execution),
+          body: options.requestBody,
+          itemCount: input.length,
+          normalizeResponse: passthroughResponse,
+        };
+    }
+  }
+
+  const { query, documents, top_n } = options.requestBody;
+  switch (api) {
+    case PROTOCOL_VOYAGE_RERANK:
+      return {
+        url: `${trimBaseUrl(execution.baseUrl)}/v1/rerank`,
+        headers: requestHeaders(execution),
+        body: { model: modelId, query, documents, top_k: top_n },
+        itemCount: documents.length,
+        normalizeResponse: passthroughResponse,
+      };
+    case PROTOCOL_COHERE_RERANK:
+    case PROTOCOL_SILICONFLOW_RERANK:
+      return {
+        url: cohereRerankUrl(execution.baseUrl),
+        headers: requestHeaders(execution),
+        body: options.requestBody,
+        itemCount: documents.length,
+        normalizeResponse: passthroughResponse,
+      };
+    default:
+      // 缺省与未识别协议名：维持现状路径（不做 compatible-mode 改写）
+      return {
+        url: operationUrl(execution.baseUrl, "rerank"),
+        headers: requestHeaders(execution),
+        body: options.requestBody,
+        itemCount: documents.length,
+        normalizeResponse: passthroughResponse,
+      };
+  }
 }
 
 function combinedSignal(signal: AbortSignal | undefined, timeoutMs: number): AbortSignal {
@@ -191,16 +390,23 @@ abstract class BaseModelOperationClient {
   protected async execute({
     operation,
     requestBody,
-    endpoint,
     signal,
     timeoutMs,
     usageContext,
     semanticRequest,
+    inputType,
+    contextWindow,
     validate,
   }: any) {
     const execution = await this.resolveOperationFresh(operation);
     if (!execution) return null;
-    const providerRequestBody = { ...requestBody, model: execution.model.id };
+    // 协议方言分发：按 execution.api 决定 URL/请求体/认证头/响应归一化；缺省与未识别协议名回退现状路径
+    const dialect = operationDialect(execution, {
+      operation,
+      requestBody: { ...requestBody, model: execution.model.id },
+      inputType,
+      contextWindow,
+    });
     const identity = modelIdentity(execution);
     const recorder = beginObservedModelCall({
       model: identity,
@@ -215,8 +421,8 @@ abstract class BaseModelOperationClient {
       inputShape: "model_operation",
       parameters: semanticRequest,
     });
-    const url = operationUrl(execution.baseUrl, endpoint);
-    const headers = requestHeaders(execution);
+    const url = dialect.url;
+    const headers = dialect.headers;
     const carrier = { modelCall: recorder };
     try {
       const result = await withModelRequestAccounting({
@@ -228,17 +434,17 @@ abstract class BaseModelOperationClient {
         const response = await observedProviderFetch(carrier, () => this.fetchImpl(url, {
           method: "POST",
           headers,
-          body: JSON.stringify(providerRequestBody),
+          body: JSON.stringify(dialect.body),
           signal: combinedSignal(signal, assertTimeout(timeoutMs, this.timeoutMs)),
         }), {
           requestDetails: {
             protocol: execution.api,
             operation,
-            itemCount: operation === "embedding" ? providerRequestBody.input.length : providerRequestBody.documents.length,
+            itemCount: dialect.itemCount,
           },
-          capture: { method: "POST", url, headers, body: providerRequestBody, protocol: execution.api },
+          capture: { method: "POST", url, headers, body: dialect.body, protocol: execution.api },
         });
-        const body = await responseJson(response, carrier);
+        const body = dialect.normalizeResponse(await responseJson(response, carrier));
         return {
           ...validate(body, execution),
           providerRequestId: extractProviderRequestId(response.headers),
@@ -267,6 +473,12 @@ export class EmbeddingClient extends BaseModelOperationClient {
   async embed(input: {
     texts: string[];
     dimensions?: number;
+    /**
+     * 嵌入模型上下文窗口（token 数）：仅 ollama 原生协议透传为 options.num_ctx，
+     * 控制推理端的 KV cache 预分配（否则按模型声明最大值预留，8B 模型可达数 GB）。
+     */
+    contextWindow?: number;
+    inputType?: EmbeddingInputType;
     signal?: AbortSignal;
     timeoutMs?: number;
     usageContext?: any;
@@ -276,6 +488,25 @@ export class EmbeddingClient extends BaseModelOperationClient {
     if (dimensions !== undefined && (!Number.isSafeInteger(dimensions) || dimensions <= 0 || dimensions > 65_536)) {
       throw new ModelOperationRequestError("invalid_input", "dimensions must be a positive integer");
     }
+    const contextWindow = input?.contextWindow;
+    if (contextWindow !== undefined && (!Number.isSafeInteger(contextWindow) || contextWindow <= 0 || contextWindow > 1_048_576)) {
+      throw new ModelOperationRequestError("invalid_input", "contextWindow must be a positive integer");
+    }
+    // ollama 的 num_ctx 必须覆盖实际输入：分块文本可能超过模型条目声明的
+    // contextWindow（遗留显式分块值不受窗口 ×80% 约束），"小 num_ctx + 超长
+    // 输入"组合会让推理端反复扩容重载甚至挂死。按最长文本字符 ×1.6 估算
+    // token，向上取整到 1024 倍数，与声明窗口取大者，夹在 [2048, 32768]。
+    const maxTextChars = texts.reduce((max, text) => Math.max(max, text.length), 0);
+    const effectiveContextWindow = Math.max(
+      2048,
+      Math.min(
+        32_768,
+        Math.max(
+          contextWindow ?? 0,
+          Math.ceil((maxTextChars * 1.6 + 512) / 1024) * 1024,
+        ),
+      ),
+    );
     return this.execute({
       operation: "embedding",
       requestBody: {
@@ -284,7 +515,8 @@ export class EmbeddingClient extends BaseModelOperationClient {
         encoding_format: "float",
         ...(dimensions ? { dimensions } : {}),
       },
-      endpoint: "embeddings",
+      contextWindow: effectiveContextWindow,
+      inputType: input?.inputType,
       signal: input?.signal,
       timeoutMs: input?.timeoutMs,
       usageContext: input?.usageContext,
@@ -354,7 +586,6 @@ export class RerankClient extends BaseModelOperationClient {
         top_n: topN,
         return_documents: false,
       },
-      endpoint: "rerank",
       signal: input?.signal,
       timeoutMs: input?.timeoutMs,
       usageContext: input?.usageContext,
