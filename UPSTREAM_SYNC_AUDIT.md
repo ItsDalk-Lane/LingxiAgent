@@ -14,7 +14,7 @@
 | U1：上游目标 | `c6d0405294be67cb134c2758f6472748ee73e2be` | openhanako `v0.447.4` |
 | L0：Lingxi 同步基线 | `97595264ead8735a04559507ddaade25db8a4e15` | chore: sync upstream 0.444.1 and pi SDK 0.84.1 (PR #2) |
 | L1：同步开始 Lingxi | `ca0b417e36a6a1f80947458aaed328a25718e41b` | 2026-08-20 main HEAD |
-| VERIFIED_SOURCE_SHA | `ec1850c234f170d0e11266e1218d5f9c26b4c0e6` | 最终验证（typecheck/lint/测试/构建/打包）所针对的 feature commit（其 tree 即被验证源码树）；2026-08-31 fix(ci) renderer 归档上传 glob 修复（v0.1.32 发布链 retag 重打） |
+| VERIFIED_SOURCE_SHA | `37580730e8da02cf10912e6e7333739f0d6ca397` | 最终验证（typecheck/lint/测试/构建/打包）所针对的 feature commit（其 tree 即被验证源码树）；2026-09-01 fix(test) spawn 等待预算放宽（劣化 intel runner 假红） |
 
 ## Audit seal model
 
