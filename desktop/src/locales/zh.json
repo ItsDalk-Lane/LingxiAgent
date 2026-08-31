@@ -458,6 +458,7 @@
     "knowledgeRetrievalDistilled": "已提炼 {n} 批",
     "knowledgeRollupReading": "正在阅读第 {current}/{total} 部分证据",
     "knowledgeSupplementing": "模型发起了补充检索（{count} 条查询）",
+    "knowledgeSupplementQueryCount": "共 {count} 条查询",
     "knowledgeRetrievalRolled": "分 {parts} 部分阅读",
     "knowledgeRetrievalSupplement": "补充检索 {n} 条查询",
     "knowledgeRetrievalSupplementTitle": "滚动注入循环中模型自主发起的补充检索",

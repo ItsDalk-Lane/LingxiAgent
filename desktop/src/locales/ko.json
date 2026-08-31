@@ -458,6 +458,7 @@
     "knowledgeRetrievalDistilled": "{n}배치로 추출됨",
     "knowledgeRollupReading": "증거 {current}/{total}번째 부분 읽는 중",
     "knowledgeSupplementing": "모델이 보충 검색을 실행했습니다({count}건)",
+    "knowledgeSupplementQueryCount": "총 {count}건 쿼리",
     "knowledgeRetrievalRolled": "{parts}부분으로 나눠 읽기",
     "knowledgeRetrievalSupplement": "보충 검색 {n}건",
     "knowledgeRetrievalSupplementTitle": "롤링 읽기 중 모델이 자발적으로 실행한 보충 검색",

@@ -1373,7 +1373,7 @@ export function handleServerMessage(msg: any): void {
         type: 'tool_end',
         id: supplementId,
         success: true,
-        resultNote: t('chat.knowledgeSupplementing', { count: String(queries.length) }),
+        resultNote: t('chat.knowledgeSupplementQueryCount', { count: String(queries.length) }),
       });
       break;
     }

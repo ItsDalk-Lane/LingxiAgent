@@ -458,6 +458,7 @@
     "knowledgeRetrievalDistilled": "distilled in {n} batches",
     "knowledgeRollupReading": "Reading evidence part {current}/{total}",
     "knowledgeSupplementing": "Model issued supplemental searches ({count} queries)",
+    "knowledgeSupplementQueryCount": "{count} queries total",
     "knowledgeRetrievalRolled": "Read in {parts} parts",
     "knowledgeRetrievalSupplement": "Supplemental searches: {n} queries",
     "knowledgeRetrievalSupplementTitle": "Supplemental searches issued by the model during the rolling read",

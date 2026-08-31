@@ -458,6 +458,7 @@
     "knowledgeRetrievalDistilled": "已提煉 {n} 批",
     "knowledgeRollupReading": "正在閱讀第 {current}/{total} 部分證據",
     "knowledgeSupplementing": "模型發起了補充檢索（{count} 條查詢）",
+    "knowledgeSupplementQueryCount": "共 {count} 條查詢",
     "knowledgeRetrievalRolled": "分 {parts} 部分閱讀",
     "knowledgeRetrievalSupplement": "補充檢索 {n} 條查詢",
     "knowledgeRetrievalSupplementTitle": "滾動注入循環中模型自主發起的補充檢索",

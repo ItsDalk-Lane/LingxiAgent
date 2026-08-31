@@ -458,6 +458,7 @@
     "knowledgeRetrievalDistilled": "{n} バッチに抽出済み",
     "knowledgeRollupReading": "エビデンスの第 {current}/{total} 部を読み込み中",
     "knowledgeSupplementing": "モデルが補足検索を実行しました（{count} 件）",
+    "knowledgeSupplementQueryCount": "クエリ計 {count} 件",
     "knowledgeRetrievalRolled": "{parts} 部に分けて読解",
     "knowledgeRetrievalSupplement": "補足検索 {n} 件",
     "knowledgeRetrievalSupplementTitle": "ローリング読解中にモデルが自主的に発行した補足検索",
