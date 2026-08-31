@@ -31,7 +31,9 @@ function spawnServerBootstrap(lingxiHome: string, extraEnv: Record<string, strin
   });
 }
 
-async function waitForExit(child: ReturnType<typeof spawn>, timeoutMs = 15000) {
+// spawn 等待预算 60s：断言的是先于引擎初始化的顺序契约，不是墙钟 SLA——劣化
+// CI runner（2026-08-31 intel）上 Node 24 冷启动 TS 转换可超旧预算 15s 出假红。
+async function waitForExit(child: ReturnType<typeof spawn>, timeoutMs = 60000) {
   let stdout = "";
   let stderr = "";
   child.stdout?.on("data", (chunk) => { stdout += chunk; });
@@ -51,7 +53,7 @@ async function waitForExit(child: ReturnType<typeof spawn>, timeoutMs = 15000) {
   return { ...result, stdout, stderr };
 }
 
-async function waitForStartupProgress(child: ReturnType<typeof spawn>, marker = "ensureFirstRun", timeoutMs = 25000) {
+async function waitForStartupProgress(child: ReturnType<typeof spawn>, marker = "ensureFirstRun", timeoutMs = 60000) {
   const childClosed = new Promise<void>((resolve) => child.once("close", () => resolve()));
   let stdout = "";
   let stderr = "";
@@ -167,7 +169,7 @@ describe("server home guards — real spawn behavior (fast failure paths, before
       await new Promise<void>((resolve) => fakeServer.close(() => resolve()));
       fs.rmSync(lingxiHome, { recursive: true, force: true });
     }
-  }, 20000);
+  }, 90000);
 
   it("self-cleans a dead server-info.json (nothing listening on the recorded port) and proceeds past the mutex gate", async () => {
     const lingxiHome = fs.mkdtempSync(path.join(os.tmpdir(), "hana-mutex-guard-dead-test-"));
@@ -202,7 +204,7 @@ describe("server home guards — real spawn behavior (fast failure paths, before
     } finally {
       fs.rmSync(lingxiHome, { recursive: true, force: true });
     }
-  }, 20000);
+  }, 90000);
 
   it("exits 1 with a bilingual message when the data-epoch stamp is higher than this build's DATA_EPOCH and no override is set", async () => {
     const lingxiHome = fs.mkdtempSync(path.join(os.tmpdir(), "hana-epoch-guard-test-"));
@@ -225,7 +227,7 @@ describe("server home guards — real spawn behavior (fast failure paths, before
     } finally {
       fs.rmSync(lingxiHome, { recursive: true, force: true });
     }
-  }, 20000);
+  }, 90000);
 
   it("prints a LINGXI_DATA_EPOCH_BLOCKED machine-readable marker ahead of the human-readable text when a higher stamp blocks startup", async () => {
     const lingxiHome = fs.mkdtempSync(path.join(os.tmpdir(), "hana-epoch-blocked-marker-test-"));
@@ -252,7 +254,7 @@ describe("server home guards — real spawn behavior (fast failure paths, before
     } finally {
       fs.rmSync(lingxiHome, { recursive: true, force: true });
     }
-  }, 20000);
+  }, 90000);
 
   it("continues ordinary startup when the epoch-1 stamp is corrupt but no higher epoch is evidenced", async () => {
     const lingxiHome = fs.mkdtempSync(path.join(os.tmpdir(), "hana-epoch-corrupt-test-"));
@@ -267,7 +269,7 @@ describe("server home guards — real spawn behavior (fast failure paths, before
     } finally {
       fs.rmSync(lingxiHome, { recursive: true, force: true });
     }
-  }, 20000);
+  }, 90000);
 
   it("continues a stable-era upgrade when LINGXI_HOME is a linked directory without an epoch stamp", async () => {
     const container = fs.mkdtempSync(path.join(os.tmpdir(), "hana-linked-stable-upgrade-test-"));
@@ -302,7 +304,7 @@ describe("server home guards — real spawn behavior (fast failure paths, before
     } finally {
       fs.rmSync(container, { recursive: true, force: true });
     }
-  }, 30000);
+  }, 90000);
 
   it("continues ordinary startup for an orphaned corrupt epoch-1 journal without higher-epoch evidence", async () => {
     const lingxiHome = fs.mkdtempSync(path.join(os.tmpdir(), "hana-epoch-journal-corrupt-test-"));
@@ -317,7 +319,7 @@ describe("server home guards — real spawn behavior (fast failure paths, before
     } finally {
       fs.rmSync(lingxiHome, { recursive: true, force: true });
     }
-  }, 20000);
+  }, 90000);
 
   it("still blocks a corrupt journal when a readable stamp proves the data is from a higher epoch", async () => {
     const lingxiHome = fs.mkdtempSync(path.join(os.tmpdir(), "hana-epoch-journal-higher-stamp-test-"));
@@ -342,7 +344,7 @@ describe("server home guards — real spawn behavior (fast failure paths, before
     } finally {
       fs.rmSync(lingxiHome, { recursive: true, force: true });
     }
-  }, 20000);
+  }, 90000);
 
   it("does not let LINGXI_ALLOW_DATA_DOWNGRADE bypass an incomplete transition", async () => {
     const lingxiHome = fs.mkdtempSync(path.join(os.tmpdir(), "hana-epoch-journal-incomplete-test-"));
@@ -383,7 +385,7 @@ describe("server home guards — real spawn behavior (fast failure paths, before
     } finally {
       fs.rmSync(lingxiHome, { recursive: true, force: true });
     }
-  }, 20000);
+  }, 90000);
 
   it("prints a LINGXI_DATA_EPOCH_TRANSITION_INCOMPLETE machine-readable marker ahead of the human-readable text for an incomplete transition", async () => {
     const lingxiHome = fs.mkdtempSync(path.join(os.tmpdir(), "hana-epoch-incomplete-marker-test-"));
@@ -424,7 +426,7 @@ describe("server home guards — real spawn behavior (fast failure paths, before
     } finally {
       fs.rmSync(lingxiHome, { recursive: true, force: true });
     }
-  }, 20000);
+  }, 90000);
 
   it("reports a non-blocking baseline warning rather than a migration-incomplete marker for a corrupt epoch-1 stamp", async () => {
     const lingxiHome = fs.mkdtempSync(path.join(os.tmpdir(), "hana-epoch-corrupt-marker-test-"));
@@ -440,7 +442,7 @@ describe("server home guards — real spawn behavior (fast failure paths, before
     } finally {
       fs.rmSync(lingxiHome, { recursive: true, force: true });
     }
-  }, 20000);
+  }, 90000);
 
   it("proceeds past a higher epoch stamp when LINGXI_ALLOW_DATA_DOWNGRADE=1 is set (does not fail on the epoch gate)", async () => {
     const lingxiHome = fs.mkdtempSync(path.join(os.tmpdir(), "hana-epoch-override-test-"));
@@ -501,5 +503,5 @@ describe("server home guards — real spawn behavior (fast failure paths, before
     } finally {
       fs.rmSync(lingxiHome, { recursive: true, force: true });
     }
-  }, 35000);
+  }, 90000);
 });

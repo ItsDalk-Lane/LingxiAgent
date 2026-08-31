@@ -100,7 +100,10 @@ describe("server transport ownership", () => {
     try {
       const result = await Promise.race([
         new Promise(resolve => child.once("exit", (code, signal) => resolve({ code, signal }))),
-        new Promise(resolve => setTimeout(() => resolve({ timeout: true }), 10_000)),
+        // 60s：断言的是「端口冲突先于首跑/引擎初始化退出」的顺序契约，不是墙钟
+        // SLA——劣化 CI runner（实测 2026-08-31 intel：套件 24m→45m）上 Node 24
+        // 冷启动 TS 转换 server 模块图可超 10s，预算过紧只会出假红。
+        new Promise(resolve => setTimeout(() => resolve({ timeout: true }), 60_000)),
       ]);
       if ((result as any).timeout) {
         child.kill("SIGKILL");
@@ -115,5 +118,5 @@ describe("server transport ownership", () => {
       blocker.close();
       fs.rmSync(lingxiHome, { recursive: true, force: true });
     }
-  });
+  }, 90000);
 });
