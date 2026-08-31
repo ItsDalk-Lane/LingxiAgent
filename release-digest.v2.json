@@ -3,6 +3,155 @@
   "entries": [
     {
       "schemaVersion": 1,
+      "tag": "v0.1.32",
+      "version": "0.1.32",
+      "previousTag": "v0.1.31",
+      "generatedAt": "2026-08-31T15:11:15.000Z",
+      "noUserFacingChanges": false,
+      "summary": {
+        "zh": "知识库问答新增「快速/详细」两档并默认快速：快速档不做问题拆解、只注入最相关的高命中证据、检索结果清晰时自动跳过重排，秒级作答；详细档保留全量召回与分批阅读。知识检索过程改为逐动作工具卡（检索/阅读/补充检索/生成回答）。修复知识提问延迟（重排无期限、覆盖执行必败无熔断、单批证据过大、侧线调用污染缓存契约）与千问重排、MiniMax 嵌入等供应商协议兼容问题。",
+        "en": "Knowledge base Q&A gains Fast/Detailed modes with Fast as the new default: Fast skips question decomposition, injects only the top high-confidence evidence, and skips rerank when results are unambiguous, answering in seconds; Detailed keeps full recall with batched reading. The retrieval process is now shown as per-action tool cards (search / read / supplement / answering). Fixes knowledge question latency (unbounded rerank waits, doomed coverage runs without a circuit breaker, oversized evidence batches, sideline calls polluting the cache contract) and provider protocol compatibility for Qwen rerank and MiniMax embeddings."
+      },
+      "counts": {
+        "feature": 2,
+        "fix": 2,
+        "improvement": 0,
+        "migration": 0
+      },
+      "source": {
+        "owner": "ItsDalk-Lane",
+        "repo": "LingxiAgent",
+        "commitRange": "v0.1.31..HEAD",
+        "releaseUrl": "https://github.com/ItsDalk-Lane/LingxiAgent/releases/tag/v0.1.32",
+        "releaseNotes": ""
+      },
+      "items": [
+        {
+          "id": "feat-knowledge-fast-detailed-modes",
+          "kind": "feature",
+          "importance": "high",
+          "title": {
+            "zh": "知识问答「快速/详细」两档",
+            "en": "Fast/Detailed modes for knowledge Q&A"
+          },
+          "summary": {
+            "zh": "挂载知识库引用时可一键切换两档回答模式，新引用默认快速档：快速档不做问题拆解与多路扩展，只注入最相关的高命中头部证据（封顶 12 条），检索结果头部清晰时自动跳过重排、结果模糊时重排最多等 5 秒，以最快速度作答；详细档保留原有的自适应拆解、全量召回与超长证据分批阅读综合回答。旧会话的问答/辅助模式自动按详细档继续，显示不变。",
+            "en": "Knowledge references now offer two answer modes, defaulting to Fast: Fast skips decomposition and multi-query expansion, injects only the top high-confidence evidence (capped at 12 blocks), skips rerank when the ranking is unambiguous and waits at most 5 seconds otherwise, answering as fast as possible; Detailed keeps the existing adaptive decomposition, full recall, and batched reading of oversized evidence. Legacy Q&A/Assist references continue as Detailed with unchanged display."
+          },
+          "details": [
+            {
+              "zh": "两档切换在输入框上方的知识库引用条上，逐会话生效；检索统计新增各阶段耗时记录。",
+              "en": "The toggle lives on the knowledge reference bar above the input, per session; retrieval stats now record per-stage timings."
+            },
+            {
+              "zh": "新增固定问题集的检索质量回归门禁，防止后续优化悄悄降低召回。",
+              "en": "A fixed golden-set recall gate now guards retrieval quality against future regressions."
+            }
+          ],
+          "sources": [
+            {
+              "type": "commit",
+              "ref": "55834549",
+              "title": "feat(knowledge): 知识问答两档化——快速/详细 answer mode + rerank 动态门控 + 分段计时 + golden set"
+            }
+          ]
+        },
+        {
+          "id": "feat-knowledge-process-cards",
+          "kind": "feature",
+          "importance": "medium",
+          "title": {
+            "zh": "知识检索过程工具卡",
+            "en": "Knowledge retrieval process tool cards"
+          },
+          "summary": {
+            "zh": "知识问答期间的过程以工具调用卡的形式逐动作呈现在助手消息流：检索卡显示查询词与命中数，分批阅读卡逐部分展示进度，模型自主发起的补充检索与最终生成回答各有专属卡片，替代此前只能看着三个点等待的体验。",
+            "en": "During knowledge Q&A the process is shown as per-action tool cards in the assistant message stream: a search card with the query and hit count, one reading card per evidence part, and dedicated cards for model-initiated supplemental searches and the final answer — replacing the old blank wait behind three dots."
+          },
+          "details": [
+            {
+              "zh": "卡片为纯前端合成，不改变会话协议与历史记录；历史轮仍由知识检索折叠卡承载。",
+              "en": "Cards are synthesized purely on the frontend without changing the session protocol or history; older turns keep the knowledge retrieval fold."
+            }
+          ],
+          "sources": [
+            {
+              "type": "commit",
+              "ref": "287d9333",
+              "title": "feat(knowledge): 过程可见四轮——知识过程改合成工具卡，一动作一卡依次长在助手消息流里"
+            }
+          ]
+        },
+        {
+          "id": "fix-knowledge-latency",
+          "kind": "fix",
+          "importance": "high",
+          "title": {
+            "zh": "知识提问延迟治理",
+            "en": "Knowledge question latency fixes"
+          },
+          "summary": {
+            "zh": "修复挂载知识库后一次提问动辄一分钟以上甚至六分半的问题：重排调用设置 15 秒期限、超时降级保留原排序不再无限等待；覆盖执行连续失败触发熔断提前止损；分片装填把检索开销计入成本防止巨片超时；滚动阅读单批证据封顶 64k token 防止预填充超时；修复侧线消化调用污染缓存契约导致真实回答轮缓存被误判作废全量重填的问题。",
+            "en": "Fixes knowledge questions taking over a minute (up to 6.5 minutes) per turn: rerank calls now have a 15-second deadline that degrades gracefully instead of waiting indefinitely; doomed coverage runs trip a circuit breaker; shard packing accounts for retrieval overhead; rolling reads cap each evidence part at 64k tokens to avoid prefill timeouts; and sideline digestion calls no longer pollute the cache contract that previously voided and refilled the real answer turn's cache."
+          },
+          "details": [
+            {
+              "zh": "查询嵌入失败或超时同样降级为纯关键词检索，不再阻塞或报错。",
+              "en": "Query embedding failures or timeouts likewise degrade to pure keyword retrieval instead of blocking or failing."
+            },
+            {
+              "zh": "观测侧补齐检索各阶段耗时记录，便于后续定位。",
+              "en": "Per-stage retrieval timings are now recorded for future diagnosis."
+            }
+          ],
+          "sources": [
+            {
+              "type": "commit",
+              "ref": "01dfb168",
+              "title": "fix(knowledge): 知识提问延迟三连修复——分片渲染开销计费/coverage 熔断/rerank 期限降级"
+            },
+            {
+              "type": "commit",
+              "ref": "22492163",
+              "title": "fix(knowledge): 滚动注入实测回归双修复——单份封顶 64k + 侧线调用用途标记"
+            },
+            {
+              "type": "commit",
+              "ref": "d6be53ae",
+              "title": "fix(knowledge): 查询嵌入失败/期限降级——任何嵌入失效退回纯 FTS"
+            }
+          ]
+        },
+        {
+          "id": "fix-provider-protocols",
+          "kind": "fix",
+          "importance": "medium",
+          "title": {
+            "zh": "嵌入与重排供应商协议修复",
+            "en": "Embedding and rerank provider protocol fixes"
+          },
+          "summary": {
+            "zh": "修复千问（Qwen）重排接口调用必 404 的问题（按模型系适配双端点方言）；修复 MiniMax 嵌入接口三层不匹配（端点拼接、请求形状、必填 GroupId）；重排单次文档数上限收紧到 50 以匹配供应商限制。",
+            "en": "Fixes Qwen rerank calls always failing with 404 (dual-endpoint dialects matched per model family) and the MiniMax embedding triple mismatch (endpoint join, request shape, required GroupId); the per-request rerank document cap is tightened to 50 to match provider limits."
+          },
+          "details": [
+            {
+              "zh": "供应商编辑面板新增 GroupId 输入位，五语言界面齐备。",
+              "en": "The provider editing panel gains a GroupId field with all five UI languages covered."
+            }
+          ],
+          "sources": [
+            {
+              "type": "commit",
+              "ref": "08ead330",
+              "title": "fix(knowledge): 嵌入/重排供应商协议兼容修复（千问 rerank 双端点方言 + MiniMax 方言/GroupId）"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "schemaVersion": 1,
       "tag": "v0.1.31",
       "version": "0.1.31",
       "previousTag": "v0.1.30",
