@@ -10,7 +10,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = 5d7a81a19b7dad4ab7fbe1b38103b18a0844407a  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-08-31 v0.1.32 release metadata)
+VERIFIED_SOURCE_SHA   = ec1850c234f170d0e11266e1218d5f9c26b4c0e6  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-08-31 fix(ci) renderer 上传 glob 修复)
 工作分支              = feature/upstream-sync-0.447.4
 ```
 
@@ -747,6 +747,16 @@ seal 不是一次性终点，而是"当前被验证树"的游标；每次审计�
   --append-history 进 v2 滚动史，共 13 条）+ release-preflight 测试坐标推进。
   验证：validate-release-digest v1/v2 均过 + release-preflight --tag v0.1.32
   PASS（gen 10 > 9）+ test:artifact-release-smoke 8 文件 304 用例绿后推进。
+
+- **2026-08-31 fix(ci) renderer 上传 glob 修复**（功能树 ec1850c/seal 本提交）：
+  v0.1.32 首次构建的 release 作业在 renderer-<ver>.tar.gz 上传处硬失败——矩阵
+  os 自 macos-latest 改 macos-15 后 installer 工件名漂移，旧 glob
+  '*installer-macos-latest-arm64*' 永不匹配；归档四平台字节同一，find 改为
+  匹配任意 installer 副本（runner 标签漂移免疫）。workflow 单行修复；验证：
+  yaml 解析合法 + workflow 契约套件（quality-gates-contract/package-build-
+  order/publish-train）67 用例绿 + seal diff guard 复验后推进。v0.1.32 tag
+  按 v0.1.30 先例删旧 draft 后重打（旧 run 33410110948 的 13 个已上传产物
+  随 draft 一并废弃重出）。
 
 ## 最终状态：已合并（上游同步部分）
 
