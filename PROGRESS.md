@@ -10,7 +10,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = 70b210a7765540bdfb95fda179335459be214cca  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-08-31 知识问答重构 + 过程可见二轮（knowledge_trace 逐行广播拆解/检索阶段）)
+VERIFIED_SOURCE_SHA   = 55834549d77739c81c2870f518ace9bdba8f8334  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-08-31 知识问答两档化（快速/详细 + rerank 门控 + golden set）)
 工作分支              = feature/upstream-sync-0.447.4
 ```
 
@@ -730,7 +730,16 @@ seal 不是一次性终点，而是"当前被验证树"的游标；每次审计�
   与 resultNote 文案重复（换 count-only 新键 chat.knowledgeSupplementQueryCount，
   五语言）。验证：typecheck×3 绿 + 定向套件 30 用例绿（纯文案与前端单点改动，
   未触发指纹/闭包面）后推进。
-
+- **2026-08-31 知识问答两档化**（功能树 55834549/seal 本提交）：answerMode
+  qa/assist → fast/detailed（存量值读取侧按详细、显示层保留旧标签、默认快速）；
+  快速档零辅助 LLM 轮（engine 跳 planner + injector 跳拆解/扩展/gap/探测）+
+  rerank 动态门控（RRF 融合分领先 ≥0.008 跳过、扎堆 5s 期限、rerankSkippedReason
+  留痕）+ 证据封顶（锚点 ≤12/渲染预算 ≤8192）+ 禁滚动；详细档原行为（回归锚）；
+  rerankPolicy 三层穿线；stats.stageTimings 九段计时；golden set 质量门禁
+  （tests/knowledge-retrieval-golden.test.ts 双档 recall）；五语言 8 新键。
+  验证：typecheck×3 绿 + eslint 0 error + lint:boundary 绿 + 全量 npm test
+  12782 用例通过（lifecycle delete-wins 一例为预存 flaky：干净树 6 次重跑亦
+  1 次红，与本改动无关）；fingerprint 未动（sha256:5f525a1d 不变）后推进。
 
 ## 最终状态：已合并（上游同步部分）
 
