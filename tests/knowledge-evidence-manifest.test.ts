@@ -94,7 +94,7 @@ async function injectWithManager(manager: KnowledgeManager, input: {
   }]));
   return await buildKnowledgeContextInjection({
     question: input.question,
-    mode: "qa",
+    mode: "detailed",
     scopeId: input.scopeId,
     deps: {
       decomposeModel: null,
@@ -306,7 +306,7 @@ describe("EvidenceManifest：普通轮写入（round-trip）", () => {
     }]));
     const { stats, evidence } = await buildKnowledgeContextInjection({
       question: "全部长事实的要点是什么？",
-      mode: "qa",
+      mode: "detailed",
       scopeId: scope.id,
       budgetTokens: 2_000,
       deps: {
@@ -512,7 +512,7 @@ describe("EvidenceManifest：写入失败不阻断会话提交", () => {
         sessionManager: { appendCustomEntry: vi.fn() },
       };
       const stats = {
-        mode: "qa" as const,
+        mode: "detailed" as const,
         scopeId: "kts_scope-1",
         retrievalMode: "hybrid" as const,
         subQueries: [],
@@ -545,7 +545,7 @@ describe("EvidenceManifest：写入失败不阻断会话提交", () => {
         sessionPath: "/tmp/evman-desk.jsonl",
         text: "苹果什么时候交付",
         displayMessage: { text: "苹果什么时候交付" },
-        knowledgeRefs: { notebookIds: ["nb-1"], mode: "qa" },
+        knowledgeRefs: { notebookIds: ["nb-1"], mode: "detailed" },
       });
 
       // 提交完成（不因 manifest 写入失败阻断）。
@@ -577,7 +577,7 @@ describe("EvidenceManifest：写入失败不阻断会话提交", () => {
         sessionPath: "/tmp/evman-desk2.jsonl",
         text: "无 scope 追问",
         displayMessage: { text: "无 scope 追问" },
-        knowledgeRefs: { notebookIds: ["nb-1"], mode: "qa" },
+        knowledgeRefs: { notebookIds: ["nb-1"], mode: "detailed" },
       });
       expect(recordNoScope).not.toHaveBeenCalled();
       expect(warn).not.toHaveBeenCalledWith(expect.stringContaining("evidence manifest"));

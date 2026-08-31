@@ -8,7 +8,13 @@
 
 import type { FileVersion } from '../types';
 import type { ThinkingLevel } from './model-slice';
-import type { KnowledgeRetrievalStats } from '../../../../shared/knowledge-refs.ts';
+import type { KnowledgeReferenceMode, KnowledgeRetrievalStats, LegacyKnowledgeReferenceMode } from '../../../../shared/knowledge-refs.ts';
+
+/**
+ * 消息投影上的知识引用模式：新值 fast/detailed + 存量 qa/assist（旧消息
+ * 显示层保留原标签；存量值只在展示语境出现，提交链路已被 normalize 拒绝）。
+ */
+export type KnowledgeReferenceModeDisplay = KnowledgeReferenceMode | LegacyKnowledgeReferenceMode;
 
 // ── 工具调用 ──
 
@@ -394,7 +400,7 @@ export interface ChatMessage {
   /** 本条消息引用的知识库笔记本（展示投影；notebooks 为名称缓存，可能滞后于重命名） */
   knowledgeRefs?: {
     notebookIds: string[];
-    mode: 'qa' | 'assist';
+    mode: KnowledgeReferenceModeDisplay;
     notebooks?: Array<{ id: string; name?: string }>;
   };
   /** 本次知识库注入的检索统计（session_user_message 回显 / 历史透出；乐观消息无此字段）。 */

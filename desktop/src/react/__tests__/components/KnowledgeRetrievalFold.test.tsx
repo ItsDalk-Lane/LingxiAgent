@@ -29,7 +29,7 @@ function t(key: string, vars?: Record<string, string | number>): string {
 
 function makeStats(partial: Partial<KnowledgeRetrievalStats> = {}): KnowledgeRetrievalStats {
   return {
-    mode: 'qa',
+    mode: 'detailed',
     retrievalMode: 'hybrid',
     subQueries: ['q1'],
     subQueryHits: [8],

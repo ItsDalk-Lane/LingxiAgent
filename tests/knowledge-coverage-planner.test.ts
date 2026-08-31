@@ -503,7 +503,7 @@ describe("injector 集成回归（Phase 7：只标注，不改变检索行为）
     const queries: string[] = [];
     const { block, stats } = await buildKnowledgeContextInjection({
       question: "这几份文件分别如何看待 X？",
-      mode: "qa",
+      mode: "detailed",
       deps: buildDeps(queries),
       budgetTokens: 10_000,
       coveragePlan: broadPlan,
@@ -518,7 +518,7 @@ describe("injector 集成回归（Phase 7：只标注，不改变检索行为）
     const queries: string[] = [];
     const { block, stats } = await buildKnowledgeContextInjection({
       question: "归纳一下",
-      mode: "assist",
+      mode: "detailed",
       deps: buildDeps(queries),
       budgetTokens: 10_000,
       coveragePlan: { ...broadPlan, coverageMode: "high_recall", scopeLevel: "source", degradeReason: "model call failed" },
@@ -538,7 +538,7 @@ describe("injector 集成回归（Phase 7：只标注，不改变检索行为）
     // 直检在 injector 内同步启动：promise 微任务 resolve 前 retrieve 已发起。
     const injectionPromise = buildKnowledgeContextInjection({
       question: "这几份文件分别如何看待 X？",
-      mode: "qa",
+      mode: "detailed",
       deps,
       budgetTokens: 10_000,
       coveragePlan: planPromise,
@@ -554,7 +554,7 @@ describe("injector 集成回归（Phase 7：只标注，不改变检索行为）
       const queries: string[] = [];
       const { block, stats } = await buildKnowledgeContextInjection({
         question: "这几份文件分别如何看待 X？",
-        mode: "qa",
+        mode: "detailed",
         deps: buildDeps(queries),
         budgetTokens: 10_000,
         ...(coveragePlan ? { coveragePlan } : {}),
@@ -582,7 +582,7 @@ describe("injector 集成回归（Phase 7：只标注，不改变检索行为）
     const queries: string[] = [];
     const { block, stats } = await buildKnowledgeContextInjection({
       question: "这几份文件分别如何看待 X？",
-      mode: "qa",
+      mode: "detailed",
       deps: buildDeps(queries),
       budgetTokens: 10_000,
     });

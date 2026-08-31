@@ -463,7 +463,9 @@
     "knowledgeRetrievalSupplement": "補足検索 {n} 件",
     "knowledgeRetrievalSupplementTitle": "ローリング読解中にモデルが自主的に発行した補足検索",
     "knowledgeTraceResults": "{n} 件の検索結果",
-    "knowledgeTraceFailed": "検索に失敗しました"
+    "knowledgeTraceFailed": "検索に失敗しました",
+    "knowledgeMetaModeFast": "高速モード",
+    "knowledgeMetaModeDetailed": "詳細モード"
   },
   "time": {
     "justNow": "たった今",
@@ -593,7 +595,11 @@
       },
       "empty": "一致する項目はありません",
       "singleAgent": "1 回のターンで招待できる Agent レビュアーは 1 人です"
-    }
+    },
+    "knowledgeModeFast": "高速",
+    "knowledgeModeDetailed": "詳細",
+    "knowledgeModeFastHint": "最速で回答：関連度の高い証拠のみを使用し、分解や多段階読解は行いません",
+    "knowledgeModeDetailedHint": "できる限り詳細に回答：質問を分解して多方向から取得し、証拠が多い場合は分割して読解します"
   },
   "agentReview": {
     "running": "この Session をレビュー中",

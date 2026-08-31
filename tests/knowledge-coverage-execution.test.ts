@@ -138,7 +138,7 @@ describe("受控查询扩展（§三十五）", () => {
     const queries: string[] = [];
     const { block, stats } = await buildKnowledgeContextInjection({
       question: "问题",
-      mode: "qa",
+      mode: "detailed",
       deps: {
         decomposeModel: DECOMPOSE_MODEL,
         expandModel,
@@ -165,7 +165,7 @@ describe("受控查询扩展（§三十五）", () => {
     const queries: string[] = [];
     const { stats } = await buildKnowledgeContextInjection({
       question: "问题",
-      mode: "qa",
+      mode: "detailed",
       deps: {
         decomposeModel: DECOMPOSE_MODEL,
         expandModel,
@@ -190,7 +190,7 @@ describe("受控查询扩展（§三十五）", () => {
     const queries: string[] = [];
     const { stats } = await buildKnowledgeContextInjection({
       question: "问题",
-      mode: "qa",
+      mode: "detailed",
       deps: {
         decomposeModel: DECOMPOSE_MODEL,
         expandModel,
@@ -206,7 +206,7 @@ describe("受控查询扩展（§三十五）", () => {
     const failing: QueryExpansionModel = async () => "still not json";
     const second = await buildKnowledgeContextInjection({
       question: "问题",
-      mode: "qa",
+      mode: "detailed",
       deps: {
         decomposeModel: DECOMPOSE_MODEL,
         expandModel: failing,
@@ -232,7 +232,7 @@ describe("受控查询扩展（§三十五）", () => {
     };
     const noModel = await buildKnowledgeContextInjection({
       question: "问题",
-      mode: "qa",
+      mode: "detailed",
       deps: { ...base, expandModel: null },
     });
     expect(noModel.stats.expansionDegradeReason).toBe("knowledge model slot not configured");
@@ -243,7 +243,7 @@ describe("受控查询扩展（§三十五）", () => {
     queries.length = 0;
     const failing = await buildKnowledgeContextInjection({
       question: "问题",
-      mode: "qa",
+      mode: "detailed",
       deps: {
         ...base,
         expandModel: async () => {
@@ -258,7 +258,7 @@ describe("受控查询扩展（§三十五）", () => {
   it("拆解降级（无模型）时不尝试扩展：无扩展留痕（拆解留痕已覆盖原因）", async () => {
     const { stats, block } = await buildKnowledgeContextInjection({
       question: "问题",
-      mode: "qa",
+      mode: "detailed",
       deps: {
         decomposeModel: null,
         retrieve: async () => fakeRetrieval([fakeChunk()]),
@@ -304,7 +304,7 @@ describe("HIGH_RECALL：预算链与邻接扩展（§二十六/§三十六/§九
     // 仍在 60 水位地板，见 resolveFusionPoolBudget 单测）。
     const { block, stats } = await buildKnowledgeContextInjection({
       question: "问题",
-      mode: "qa",
+      mode: "detailed",
       deps: {
         decomposeModel: null,
         retrieve: async () => fakeRetrieval(candidates),
@@ -327,7 +327,7 @@ describe("HIGH_RECALL：预算链与邻接扩展（§二十六/§三十六/§九
     const readCalls: Array<{ anchorOrdinal: number; ordinals: number[] }> = [];
     const { block, stats } = await buildKnowledgeContextInjection({
       question: "问题",
-      mode: "qa",
+      mode: "detailed",
       deps: {
         decomposeModel: null,
         retrieve: async () => fakeRetrieval([anchorA, anchorB]),
@@ -365,7 +365,7 @@ describe("HIGH_RECALL：预算链与邻接扩展（§二十六/§三十六/§九
     const far = fakeChunk({ id: "far", ordinal: 40, text: "远处块" });
     const { stats, block } = await buildKnowledgeContextInjection({
       question: "问题",
-      mode: "qa",
+      mode: "detailed",
       deps: {
         decomposeModel: async () => validDecomposeOutput(["子查询一", "子查询二"]),
         retrieve: async ({ query }) => fakeRetrieval(
@@ -388,7 +388,7 @@ describe("HIGH_RECALL：预算链与邻接扩展（§二十六/§三十六/§九
   it("readNeighborChunks 未接线：不扩展、stats.neighborExpansionCount = 0（调用方未启用）", async () => {
     const { stats, block } = await buildKnowledgeContextInjection({
       question: "问题",
-      mode: "qa",
+      mode: "detailed",
       deps: {
         decomposeModel: null,
         retrieve: async () => fakeRetrieval([fakeChunk({ id: "a1", ordinal: 1 })]),
@@ -411,7 +411,7 @@ describe("HIGH_RECALL：预算链与邻接扩展（§二十六/§三十六/§九
     }));
     const { stats } = await buildKnowledgeContextInjection({
       question: "问题",
-      mode: "qa",
+      mode: "detailed",
       budgetTokens: 900,
       deps: {
         decomposeModel: null,
@@ -469,7 +469,7 @@ describe("BROAD：Source Coverage Floor 与 Section Coverage（§九十五）", 
     const { retrieve, constrainedCalls } = createFourSourceFacade();
     const { stats } = await buildKnowledgeContextInjection({
       question: "这些文件分别如何看待 X？",
-      mode: "qa",
+      mode: "detailed",
       deps: { decomposeModel: null, retrieve },
       coveragePlan: planOf({ coverageMode: "broad", intent: "cross_source_synthesis", scopeLevel: "multi_source" }),
     });
@@ -484,7 +484,7 @@ describe("BROAD：Source Coverage Floor 与 Section Coverage（§九十五）", 
     const { retrieve } = createFourSourceFacade();
     const { block, stats } = await buildKnowledgeContextInjection({
       question: "这些文件分别如何看待 X？",
-      mode: "qa",
+      mode: "detailed",
       deps: { decomposeModel: null, retrieve },
       coveragePlan: planOf({ coverageMode: "broad", intent: "cross_source_synthesis", scopeLevel: "multi_source" }),
     });
@@ -518,7 +518,7 @@ describe("BROAD：Source Coverage Floor 与 Section Coverage（§九十五）", 
     const constrainedCalls: Array<{ sourceIds?: string[]; sectionsBySourceId?: Map<string, string[]> }> = [];
     const { stats, block } = await buildKnowledgeContextInjection({
       question: "这本书整体如何演进？",
-      mode: "qa",
+      mode: "detailed",
       deps: {
         decomposeModel: null,
         retrieve: async ({ sourceIds, sectionsBySourceId }) => {
@@ -549,7 +549,7 @@ describe("BROAD：Source Coverage Floor 与 Section Coverage（§九十五）", 
     const constrainedCalls: Array<{ sourceIds?: string[] }> = [];
     const { stats } = await buildKnowledgeContextInjection({
       question: "第二章里的那个日期是什么？",
-      mode: "qa",
+      mode: "detailed",
       deps: {
         decomposeModel: null,
         retrieve: async ({ sourceIds }) => {
@@ -571,7 +571,7 @@ describe("BROAD：Source Coverage Floor 与 Section Coverage（§九十五）", 
     const { retrieve, constrainedCalls } = createFourSourceFacade();
     const { stats, block } = await buildKnowledgeContextInjection({
       question: "X 的相关记录都在哪？",
-      mode: "qa",
+      mode: "detailed",
       deps: { decomposeModel: null, retrieve },
       coveragePlan: planOf({ coverageMode: "high_recall", scopeLevel: "multi_source" }),
     });
@@ -592,7 +592,7 @@ describe("BROAD：Source Coverage Floor 与 Section Coverage（§九十五）", 
     ], ALL_SOURCES);
     const full = await buildKnowledgeContextInjection({
       question: "问题",
-      mode: "qa",
+      mode: "detailed",
       deps: { decomposeModel: null, retrieve: allHit },
       coveragePlan: planOf({ coverageMode: "high_recall", scopeLevel: "multi_source" }),
     });
@@ -604,7 +604,7 @@ describe("BROAD：Source Coverage Floor 与 Section Coverage（§九十五）", 
     const lone = fakeChunk({ sourceId: "src-only" });
     const single = await buildKnowledgeContextInjection({
       question: "问题",
-      mode: "qa",
+      mode: "detailed",
       deps: {
         decomposeModel: null,
         retrieve: async () => fakeRetrieval([lone], [singleSource]),
@@ -619,7 +619,7 @@ describe("BROAD：Source Coverage Floor 与 Section Coverage（§九十五）", 
     const { retrieve, constrainedCalls } = createFourSourceFacade();
     const { block, stats } = await buildKnowledgeContextInjection({
       question: "全文提到的风险都列出来",
-      mode: "qa",
+      mode: "detailed",
       deps: { decomposeModel: null, retrieve },
       coveragePlan: planOf({
         coverageMode: "exhaustive",
@@ -640,7 +640,7 @@ describe("BROAD：Source Coverage Floor 与 Section Coverage（§九十五）", 
     const { retrieve, constrainedCalls } = createFourSourceFacade();
     const { stats } = await buildKnowledgeContextInjection({
       question: "问题",
-      mode: "qa",
+      mode: "detailed",
       deps: { decomposeModel: null, retrieve },
     });
     expect(constrainedCalls).toHaveLength(0);
@@ -659,7 +659,7 @@ describe("BROAD：Source Coverage Floor 与 Section Coverage（§九十五）", 
     const hit = fakeChunk({ sourceId: "src-ok", sourceName: "OK.pdf" });
     const { block, stats } = await buildKnowledgeContextInjection({
       question: "问题",
-      mode: "qa",
+      mode: "detailed",
       deps: {
         decomposeModel: null,
         retrieve: async ({ sourceIds }) => {
@@ -846,7 +846,7 @@ describe("retrieveForNotebooks 约束检索与 readAdjacentChunks（真实索引
     const spy = vi.spyOn(manager.queryService, "retrieveForNotebooks");
     const { block, stats } = await buildKnowledgeContextInjection({
       question: "信标",
-      mode: "qa",
+      mode: "detailed",
       deps: {
         decomposeModel: null,
         retrieve: ({ query, sourceIds, sectionsBySourceId }) => manager.queryService.retrieveForNotebooks({

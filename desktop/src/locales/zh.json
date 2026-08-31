@@ -463,7 +463,9 @@
     "knowledgeRetrievalSupplement": "补充检索 {n} 条查询",
     "knowledgeRetrievalSupplementTitle": "滚动注入循环中模型自主发起的补充检索",
     "knowledgeTraceResults": "{n} 个搜索结果",
-    "knowledgeTraceFailed": "检索失败"
+    "knowledgeTraceFailed": "检索失败",
+    "knowledgeMetaModeFast": "快速模式",
+    "knowledgeMetaModeDetailed": "详细模式"
   },
   "time": {
     "justNow": "刚刚",
@@ -593,7 +595,11 @@
       },
       "empty": "没有匹配项",
       "singleAgent": "每个回合暂时只能邀请一位助手审阅"
-    }
+    },
+    "knowledgeModeFast": "快速",
+    "knowledgeModeDetailed": "详细",
+    "knowledgeModeFastHint": "以最快速度回答：只取最相关的高命中证据，不做全量拆解与滚动阅读",
+    "knowledgeModeDetailedHint": "尽量详尽：拆解问题、多路召回，证据过多时分批阅读后综合回答"
   },
   "agentReview": {
     "running": "正在审阅当前对话",

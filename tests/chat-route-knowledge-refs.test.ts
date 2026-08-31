@@ -48,14 +48,14 @@ describe("chat route knowledgeRefs handling", () => {
         text: "总结一下这个笔记本",
         sessionPath: "/sessions/test.jsonl",
         agentId: "agent-test",
-        knowledgeRefs: { notebookIds: ["nb-1", "nb-2"], mode: "qa" },
+        knowledgeRefs: { notebookIds: ["nb-1", "nb-2"], mode: "fast" },
       }),
     }, ws);
     await new Promise((resolve) => setTimeout(resolve, 0));
 
     expect(hub.send).toHaveBeenCalledTimes(1);
     expect(hub.send.mock.calls[0][1]).toEqual(expect.objectContaining({
-      knowledgeRefs: { notebookIds: ["nb-1", "nb-2"], mode: "qa" },
+      knowledgeRefs: { notebookIds: ["nb-1", "nb-2"], mode: "fast" },
     }));
     expect(sentErrors(ws)).toEqual([]);
   });
@@ -105,7 +105,7 @@ describe("chat route knowledgeRefs handling", () => {
         text: "插话",
         sessionPath: "/sessions/test.jsonl",
         agentId: "agent-test",
-        knowledgeRefs: { notebookIds: ["nb-1", 42], mode: "assist" },
+        knowledgeRefs: { notebookIds: ["nb-1", 42], mode: "detailed" },
       }),
     }, ws);
     await new Promise((resolve) => setTimeout(resolve, 0));

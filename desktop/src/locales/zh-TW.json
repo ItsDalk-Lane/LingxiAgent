@@ -463,7 +463,9 @@
     "knowledgeRetrievalSupplement": "補充檢索 {n} 條查詢",
     "knowledgeRetrievalSupplementTitle": "滾動注入循環中模型自主發起的補充檢索",
     "knowledgeTraceResults": "{n} 個搜尋結果",
-    "knowledgeTraceFailed": "檢索失敗"
+    "knowledgeTraceFailed": "檢索失敗",
+    "knowledgeMetaModeFast": "快速模式",
+    "knowledgeMetaModeDetailed": "詳細模式"
   },
   "time": {
     "justNow": "剛剛",
@@ -593,7 +595,11 @@
       },
       "empty": "沒有符合項目",
       "singleAgent": "每個回合暫時只能邀請一位助手審閱"
-    }
+    },
+    "knowledgeModeFast": "快速",
+    "knowledgeModeDetailed": "詳細",
+    "knowledgeModeFastHint": "以最快速度回答：只取最相關的高命中證據，不做全量拆解與滾動閱讀",
+    "knowledgeModeDetailedHint": "盡量詳盡：拆解問題、多路召回，證據過多時分批閱讀後綜合回答"
   },
   "agentReview": {
     "running": "正在審閱目前對話",

@@ -3,7 +3,7 @@
  *
  * 引用在会话内持续生效直到手动取消；前端每条消息显式携带（服务端无状态，
  * 与 sessionFileRefs 同模式）：
- *   wsMsg.knowledgeRefs = { notebookIds: string[], mode: "qa" | "assist" }
+ *   wsMsg.knowledgeRefs = { notebookIds: string[], mode: "fast" | "detailed" }
  *
  * Phase 7 只做透传 + 严格校验；Phase 8 的 knowledge-context-injector 在
  * core/desktop-session-submit.ts 的 prompt 组装区消费它做拆解与检索注入。
@@ -11,13 +11,38 @@
 
 import type { KnowledgeDegradeReason } from "./knowledge-reason-codes.ts";
 
-export type KnowledgeReferenceMode = "qa" | "assist";
+/**
+ * 答案模式两档（2026-08-31 两档化，取代旧 qa/assist）：
+ * - fast：零辅助 LLM 轮（不拆解）、rerank 动态门控、证据注入硬封顶、不触发
+ *   滚动消化——以最快速度给出高命中回答；
+ * - detailed：自适应拆解 + coverage 两档 + 超预算滚动消化的全量召回路径
+ *   （两档化前的既有行为，作为回归锚）。
+ */
+export type KnowledgeReferenceMode = "fast" | "detailed";
+
+/**
+ * 存量答案模式（两档化前的 qa/assist）：生产写入侧不再产出。读取侧（历史
+ * 还原 / retry-fork 重放）经 normalizeLegacyKnowledgeReferenceMode 一律映射
+ * detailed（行为保持，沿用 coverage exhaustive→broad 的存量兼容先例）；显示层
+ * 保留原值渲染旧标签。
+ */
+export type LegacyKnowledgeReferenceMode = "qa" | "assist";
+
+/**
+ * 存量值读取侧归一：fast/detailed 原样返回；qa/assist → detailed；非法值 →
+ * null（调用方显式处理，禁静默）。
+ */
+export function normalizeLegacyKnowledgeReferenceMode(mode: string): KnowledgeReferenceMode | null {
+  if (mode === "fast" || mode === "detailed") return mode;
+  if (mode === "qa" || mode === "assist") return "detailed";
+  return null;
+}
 
 /**
  * Coverage 维度的档位枚举（任务书 §二十八 三维度正交，Phase 7；2026-08-31
- * 两档化）：与 answerMode（qa/assist）、retrievalMode（fts/hybrid）互不携带、
- * 互不影响。定义在 shared 层供 stats 契约与 lib/knowledge 的 planner 共用
- * （lib → shared 单向）。
+ * 两档化）：与 answerMode（fast/detailed）、retrievalMode（fts/hybrid）互不
+ * 携带、互不影响。定义在 shared 层供 stats 契约与 lib/knowledge 的 planner
+ * 共用（lib → shared 单向）。
  *
  * 'exhaustive' 值仅作存量兼容：旧持久化 plan 行 / 旧会话 stats 可能携带，
  * 生产写入侧不再产出；执行侧读到旧值一律按 broad 处理。
@@ -165,6 +190,29 @@ export interface KnowledgeRetrievalStats {
    */
   rerankDegradeReason?: string;
   /**
+   * rerank 动态门控跳过留痕（2026-08-31 快速档）：快速档检索结果头部清晰
+   * （top-1 RRF 融合分领先 ≥ 阈值）时主动跳过重排、保持 RRF 名次。多笔记本以
+   * "; " 连接保留笔记本归属。与 rerankDegradeReason 的区别：这是主动跳过
+   * 而非失败降级，只进 stats 不进注入块。缺省 = 未跳过（正常重排/未配置/
+   * 非快速档）。
+   */
+  rerankSkippedReason?: string;
+  /**
+   * 检索分段计时（2026-08-31）：各阶段墙钟毫秒（单笔记本取该段合计，多笔记本
+   * 取最大值——反映对关键路径的贡献）。纯增量可选字段，旧调用方/旧会话不携带。
+   */
+  stageTimings?: {
+    ftsMs?: number;
+    embedMs?: number;
+    vectorMs?: number;
+    fuseMs?: number;
+    rerankMs?: number;
+    plannerMs?: number;
+    assembleMs?: number;
+    rollupMs?: number;
+    totalMs?: number;
+  };
+  /**
    * Coverage 维度摘要（任务书 §二十八/§二十九，Phase 7）：本轮 KnowledgeCoveragePlan
    * 的结构化结论。只携带 plan 的判定结果，不携带任何 CoT/原始模型输出；缺省 =
    * 调用方（旧调用路径/降级块）未接入 coverage planner。
@@ -246,8 +294,8 @@ export function normalizeKnowledgeRefs(value: unknown): KnowledgeRefs | null {
   if (!Array.isArray(ids) || ids.some((id) => typeof id !== "string" || !id.trim())) {
     throw new TypeError("knowledgeRefs.notebookIds must be an array of non-empty strings");
   }
-  if (raw.mode !== "qa" && raw.mode !== "assist") {
-    throw new TypeError('knowledgeRefs.mode must be "qa" or "assist"');
+  if (raw.mode !== "fast" && raw.mode !== "detailed") {
+    throw new TypeError('knowledgeRefs.mode must be "fast" or "detailed"');
   }
   const notebookIds = [...new Set((ids as string[]).map((id) => id.trim()))];
   if (notebookIds.length === 0) return null;

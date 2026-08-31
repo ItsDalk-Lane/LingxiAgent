@@ -5,6 +5,9 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import {
   buildKnowledgeContextInjection,
+  KNOWLEDGE_FAST_MAX_EVIDENCE_ENTRIES,
+  KNOWLEDGE_FAST_RENDER_BUDGET_TOKENS,
+  KNOWLEDGE_FAST_RERANK_DEADLINE_MS,
   KNOWLEDGE_INJECTION_FALLBACK_BUDGET_TOKENS,
   KNOWLEDGE_EVIDENCE_BUDGET_MAX,
   KNOWLEDGE_FUSION_POOL_MAX,
@@ -209,17 +212,19 @@ describe("跨子查询融合", () => {
 });
 
 describe("注入块生成（纯函数部分）", () => {
-  it("问答模式指引带 {{cite:N}} 证据规则，辅助模式不带", () => {
-    expect(knowledgeModeGuidance("qa")).toContain("{{cite:N}}");
-    expect(knowledgeModeGuidance("qa")).toContain("say so plainly");
-    expect(knowledgeModeGuidance("assist")).not.toContain("{{cite:N}}");
-    expect(knowledgeModeGuidance("assist")).toContain("general knowledge");
+  it("快速档指引直答头部证据+关键事实引用；详细档沿用全量引用纪律", () => {
+    expect(knowledgeModeGuidance("fast")).toContain("{{cite:N}}");
+    expect(knowledgeModeGuidance("fast")).toContain("top matches");
+    expect(knowledgeModeGuidance("fast")).toContain("say so plainly");
+    expect(knowledgeModeGuidance("detailed")).toContain("{{cite:N}}");
+    expect(knowledgeModeGuidance("detailed")).toContain("Answer only from the evidence blocks");
+    expect(knowledgeModeGuidance("detailed")).toContain("say so plainly");
   });
 
   it("未超预算：全部证据块注入并带定位头；stats 完整记录检索量", async () => {
     const { block, stats } = await buildKnowledgeContextInjection({
       question: "问题",
-      mode: "qa",
+      mode: "detailed",
       deps: {
         decomposeModel: null,
         retrieve: async () => fakeRetrieval([
@@ -237,7 +242,7 @@ describe("注入块生成（纯函数部分）", () => {
     expect(block.endsWith("[/KnowledgeContext]")).toBe(true);
     // stats：拆解降级单查询 + 两条候选全部注入，fts 模式，未超预算。
     expect(stats).toMatchObject({
-      mode: "qa",
+      mode: "detailed",
       retrievalMode: "fts",
       subQueries: ["问题"],
       subQueryHits: [2],
@@ -266,7 +271,7 @@ describe("注入块生成（纯函数部分）", () => {
     // 会低估到 100）；预算 1000 装得下前两块、装不下全部十块。
     const { block, stats } = await buildKnowledgeContextInjection({
       question: "问题",
-      mode: "assist",
+      mode: "detailed",
       budgetTokens: 1000,
       deps: {
         decomposeModel: null,
@@ -297,7 +302,7 @@ describe("注入块生成（纯函数部分）", () => {
     expect(injectedCount).toBeGreaterThan(0);
     expect(injectedCount).toBeLessThan(10);
     expect(stats).toMatchObject({
-      mode: "assist",
+      mode: "detailed",
       budgetTokens: 1000,
       fusedChunks: 10,
       truncated: true,
@@ -318,7 +323,7 @@ describe("注入块生成（纯函数部分）", () => {
       `第${round}部分笔记：覆盖 ${userPrompt.length} 字符的证据`);
     const { block, stats } = await buildKnowledgeContextInjection({
       question: "问题",
-      mode: "qa",
+      mode: "detailed",
       budgetTokens: 1000,
       deps: {
         decomposeModel: null,
@@ -346,7 +351,7 @@ describe("注入块生成（纯函数部分）", () => {
     ));
     const { block, stats } = await buildKnowledgeContextInjection({
       question: "问题",
-      mode: "assist",
+      mode: "detailed",
       budgetTokens: 1000,
       deps: {
         decomposeModel: null,
@@ -368,7 +373,7 @@ describe("注入块生成（纯函数部分）", () => {
     });
     const { block, stats } = await buildKnowledgeContextInjection({
       question: "问题",
-      mode: "qa",
+      mode: "detailed",
       budgetTokens: 1000,
       deps: {
         decomposeModel: null,
@@ -387,7 +392,7 @@ describe("注入块生成（纯函数部分）", () => {
     const longLine = "长".repeat(200);
     const { stats } = await buildKnowledgeContextInjection({
       question: "问题",
-      mode: "qa",
+      mode: "detailed",
       deps: {
         decomposeModel: null,
         retrieve: async () => fakeRetrieval([
@@ -408,7 +413,7 @@ describe("注入块生成（纯函数部分）", () => {
     let call = 0;
     const { block, stats } = await buildKnowledgeContextInjection({
       question: "问题",
-      mode: "qa",
+      mode: "detailed",
       deps: {
         decomposeModel: callModel,
         retrieve: async ({ query }) => {
@@ -434,7 +439,7 @@ describe("注入块生成（纯函数部分）", () => {
     let maxInFlight = 0;
     const { stats } = await buildKnowledgeContextInjection({
       question: "问题",
-      mode: "qa",
+      mode: "detailed",
       deps: {
         decomposeModel: callModel,
         retrieve: async ({ query }) => {
@@ -465,7 +470,7 @@ describe("注入块生成（纯函数部分）", () => {
     };
     const { block } = await buildKnowledgeContextInjection({
       question: "问题",
-      mode: "qa",
+      mode: "detailed",
       deps: {
         decomposeModel: callModel,
         retrieve: async ({ query }) => {
@@ -485,7 +490,7 @@ describe("注入块生成（纯函数部分）", () => {
     const queries: string[] = [];
     await buildKnowledgeContextInjection({
       question: "问题",
-      mode: "qa",
+      mode: "detailed",
       deps: {
         decomposeModel: null,
         retrieve: async ({ query }) => {
@@ -501,7 +506,7 @@ describe("注入块生成（纯函数部分）", () => {
     const callModel: DecomposeModel = async () => validOutput(["子查询甲"]);
     const { block, stats } = await buildKnowledgeContextInjection({
       question: "问题",
-      mode: "qa",
+      mode: "detailed",
       deps: {
         decomposeModel: callModel,
         retrieve: async ({ query }) => {
@@ -520,7 +525,7 @@ describe("注入块生成（纯函数部分）", () => {
   it("检索全失败：显式标注不可用而不是静默跳过；stats 带 unavailableReason", async () => {
     const { block, stats } = await buildKnowledgeContextInjection({
       question: "问题",
-      mode: "qa",
+      mode: "detailed",
       deps: {
         decomposeModel: null,
         retrieve: async () => {
@@ -531,7 +536,7 @@ describe("注入块生成（纯函数部分）", () => {
     expect(block).toContain("[knowledge retrieval unavailable: boom]");
     expect(block).toContain("{{cite:N}}");
     expect(stats).toMatchObject({
-      mode: "qa",
+      mode: "detailed",
       retrievalMode: "none",
       subQueries: ["问题"],
       subQueryHits: [0],
@@ -548,7 +553,7 @@ describe("注入块生成（纯函数部分）", () => {
   it("被引笔记本无 ready 源：显式标注并在 stats 记录原因", async () => {
     const { block, stats } = await buildKnowledgeContextInjection({
       question: "问题",
-      mode: "qa",
+      mode: "detailed",
       deps: {
         decomposeModel: null,
         retrieve: async () => ({ candidates: [], sources: [], retrievalMode: "fts", retrievalModeRequested: "fts", degraded: [] }),
@@ -804,7 +809,7 @@ describe("retrieveForNotebooks 边界与配置（真实 KnowledgeManager）", ()
 
     const { block } = await buildKnowledgeContextInjection({
       question: "苹果 交付",
-      mode: "qa",
+      mode: "detailed",
       budgetTokens: 5,
       deps: {
         decomposeModel: null,
@@ -829,7 +834,7 @@ describe("rerank 降级留痕透传", () => {
   it("retrieve 携带 rerankDegradeReasons：注入块与 stats 同文案显式留痕", async () => {
     const { block, stats } = await buildKnowledgeContextInjection({
       question: "问题",
-      mode: "qa",
+      mode: "detailed",
       budgetTokens: 1000,
       deps: {
         decomposeModel: null,
@@ -849,7 +854,7 @@ describe("rerank 降级留痕透传", () => {
   it("无降级时不产出 rerank 留痕行/字段（缺省语义）", async () => {
     const { block, stats } = await buildKnowledgeContextInjection({
       question: "问题",
-      mode: "qa",
+      mode: "detailed",
       budgetTokens: 1000,
       deps: {
         decomposeModel: null,
@@ -894,7 +899,7 @@ describe("注入链路锚点伸缩", () => {
     ));
     const { block, stats } = await buildKnowledgeContextInjection({
       question: "问题",
-      mode: "qa",
+      mode: "detailed",
       budgetTokens: 300_000,
       deps: {
         decomposeModel: null,
@@ -912,7 +917,7 @@ describe("注入链路锚点伸缩", () => {
     ));
     const { stats } = await buildKnowledgeContextInjection({
       question: "问题",
-      mode: "qa",
+      mode: "detailed",
       budgetTokens: 2_000,
       deps: {
         decomposeModel: null,
@@ -957,7 +962,7 @@ describe("resolveFusionPoolBudget（阀 A：池 70% 折算块数）", () => {
     const decomposeModel: DecomposeModel = async () => validOutput(["子查询甲", "子查询乙"]);
     const { stats } = await buildKnowledgeContextInjection({
       question: "问题",
-      mode: "qa",
+      mode: "detailed",
       budgetTokens: 500_000,
       deps: {
         decomposeModel,
@@ -1046,7 +1051,7 @@ describe("候选总预算分摊（§二十一）与扩展并行（§二十三 �
     const decomposeModel: DecomposeModel = async () => validOutput(["甲查询", "乙查询", "丙查询", "丁查询"]);
     const { stats } = await buildKnowledgeContextInjection({
       question: "主问题",
-      mode: "qa",
+      mode: "detailed",
       deps: {
         decomposeModel,
         retrieve: async ({ query, topK }) => {
@@ -1078,7 +1083,7 @@ describe("候选总预算分摊（§二十一）与扩展并行（§二十三 �
     };
     const injectionPromise = buildKnowledgeContextInjection({
       question: "主问题",
-      mode: "qa",
+      mode: "detailed",
       deps: {
         decomposeModel,
         expandModel,
@@ -1105,7 +1110,7 @@ describe("候选总预算分摊（§二十一）与扩展并行（§二十三 �
     const expandModel: DecomposeModel = async () => JSON.stringify({ expansions: ["扩展查询甲"] });
     const { stats } = await buildKnowledgeContextInjection({
       question: "主问题",
-      mode: "qa",
+      mode: "detailed",
       deps: {
         decomposeModel,
         expandModel,
@@ -1230,7 +1235,7 @@ describe("扩展条件门控（§十一 Conditional LLM）", () => {
     const expandModel: DecomposeModel = async () => { events.push("expand"); return "{}"; };
     const { stats, block } = await buildKnowledgeContextInjection({
       question: "作者是谁？",
-      mode: "qa",
+      mode: "detailed",
       deps: {
         decomposeModel,
         expandModel,
@@ -1267,7 +1272,7 @@ describe("扩展条件门控（§十一 Conditional LLM）", () => {
     };
     const broad = await buildKnowledgeContextInjection({
       question: "秦统一六国的原因是什么",
-      mode: "qa",
+      mode: "detailed",
       coveragePlan: broadPlan,
       deps: {
         decomposeModel,
@@ -1280,7 +1285,7 @@ describe("扩展条件门控（§十一 Conditional LLM）", () => {
 
     const compound = await buildKnowledgeContextInjection({
       question: "秦统一六国的原因和六国各自的弱点是什么",
-      mode: "qa",
+      mode: "detailed",
       coveragePlan: broadPlan,
       deps: {
         decomposeModel,
@@ -1316,7 +1321,7 @@ describe("Gap Analyzer 二轮补证（§二十二）", () => {
     const retrieved: string[] = [];
     const { stats, block } = await buildKnowledgeContextInjection({
       question: "为什么甲方案导致失败和乙方案的关系是什么",
-      mode: "qa",
+      mode: "detailed",
       deps: {
         decomposeModel,
         expandModel: null,
@@ -1355,7 +1360,7 @@ describe("Gap Analyzer 二轮补证（§二十二）", () => {
     };
     const { stats } = await buildKnowledgeContextInjection({
       question: "甲方案和乙方案的关系是什么",
-      mode: "qa",
+      mode: "detailed",
       coveragePlan: broadPlan,
       deps: {
         decomposeModel,
@@ -1391,7 +1396,7 @@ describe("否定排除（§九：词法约束而非检索查询）", () => {
     });
     const { stats, block } = await buildKnowledgeContextInjection({
       question: "除了乙方法还有哪些方法",
-      mode: "qa",
+      mode: "detailed",
       deps: {
         decomposeModel,
         expandModel: null,
@@ -1405,5 +1410,116 @@ describe("否定排除（§九：词法约束而非检索查询）", () => {
     expect(stats.negationDroppedChunks).toBeGreaterThan(0);
     expect(block).toContain("negation exclusion");
     expect(block).not.toContain("乙方法的相关段落");
+  });
+});
+
+// ─────────────── 快速/详细两档（2026-08-31 两档化） ───────────────
+
+describe("快速档（fast mode）：零辅助 LLM + 证据封顶 + 禁滚动", () => {
+  it("零辅助 LLM 轮：拆解模型可用也不调用；直检独走且携带 rerank 门控策略；stats 口径完整", async () => {
+    const decomposeModel = vi.fn(async () => validOutput(["子查询一", "子查询二"]));
+    const retrieveCalls: Array<Record<string, unknown>> = [];
+    const candidates = Array.from({ length: 30 }, (_, index) => (
+      fakeChunk({ id: `c${index}`, ordinal: index, text: `证据片段-${index}：${"内容".repeat(30)}` })
+    ));
+    const { block, stats } = await buildKnowledgeContextInjection({
+      question: "问题",
+      mode: "fast",
+      budgetTokens: 100_000,
+      deps: {
+        decomposeModel,
+        retrieve: async (input) => {
+          retrieveCalls.push({ ...input });
+          return fakeRetrieval(candidates);
+        },
+      },
+    });
+    // 拆解/扩展 LLM 零调用（零辅助 LLM 轮的核心断言）。
+    expect(decomposeModel).not.toHaveBeenCalled();
+    // 直检只跑一次，且带快速档 rerank 策略（门控 + 5s 期限）。
+    expect(retrieveCalls).toHaveLength(1);
+    expect(retrieveCalls[0].rerankPolicy).toEqual({
+      marginGate: true,
+      deadlineMs: KNOWLEDGE_FAST_RERANK_DEADLINE_MS,
+    });
+    // 块内显式声明快速档（禁静默），不再有拆解行。
+    expect(block).toContain("[fast mode: direct retrieval of top evidence");
+    expect(block).not.toContain("Question decomposition:");
+    expect(block).toContain("Guidance (fast mode):");
+    // 锚点硬封顶 12；渲染预算收紧 8192（stats.budgetTokens 如实反映收紧值）。
+    expect(stats.injectedChunks).toBeLessThanOrEqual(KNOWLEDGE_FAST_MAX_EVIDENCE_ENTRIES);
+    expect(stats.usedTokens).toBeLessThanOrEqual(KNOWLEDGE_FAST_RENDER_BUDGET_TOKENS);
+    expect(stats.budgetTokens).toBe(KNOWLEDGE_FAST_RENDER_BUDGET_TOKENS);
+    // 零子查询；复杂度未评估（不冒充 simple 结论）。
+    expect(stats.subQueries).toEqual([]);
+    expect(stats.decompositionComplexity).toBeUndefined();
+    expect(stats.mode).toBe("fast");
+  });
+
+  it("证据超封顶：滚动消化禁用（rollupModel 可用也不调用），截断路径显式留痕", async () => {
+    const rollupModel = vi.fn(async () => "不该被调用的中间笔记");
+    const candidates = Array.from({ length: 10 }, (_, index) => (
+      fakeChunk({ id: `c${index}`, ordinal: index, text: `${"证据".repeat(200)}-${index}` })
+    ));
+    const { block, stats } = await buildKnowledgeContextInjection({
+      question: "问题",
+      mode: "fast",
+      budgetTokens: 3000,
+      deps: {
+        decomposeModel: null,
+        rollupModel,
+        retrieve: async () => fakeRetrieval(candidates),
+      },
+    });
+    expect(rollupModel).not.toHaveBeenCalled();
+    expect(block).toContain("omitted to fit the context budget");
+    expect(block).toContain(
+      "[evidence rollup unavailable: fast mode: rolling digest disabled; budget truncation applied]",
+    );
+    expect(stats.truncated).toBe(true);
+    expect(stats.rollup?.degradedReason).toBe("fast mode: rolling digest disabled");
+  });
+
+  it("详细档：直检不携带 rerank 策略（既有行为），拆解照常执行", async () => {
+    const decomposeModel = vi.fn(async () => validOutput(["子查询甲"]));
+    const retrieveCalls: Array<Record<string, unknown>> = [];
+    await buildKnowledgeContextInjection({
+      question: "问题",
+      mode: "detailed",
+      deps: {
+        decomposeModel,
+        retrieve: async (input) => {
+          retrieveCalls.push({ ...input });
+          return fakeRetrieval([fakeChunk({ text: "证据" })]);
+        },
+      },
+    });
+    expect(decomposeModel).toHaveBeenCalledTimes(1);
+    for (const call of retrieveCalls) {
+      expect(call.rerankPolicy).toBeUndefined();
+    }
+    expect(retrieveCalls.length).toBeGreaterThanOrEqual(2); // 直检 + 等值/子查询
+  });
+
+  it("存量 legacy mode（qa/assist 运行时值）按详细路径处理：有拆解降级行、无 fast-mode 行、无门控策略", async () => {
+    for (const legacyMode of ["qa", "assist"]) {
+      const retrieveCalls: Array<Record<string, unknown>> = [];
+      const { block } = await buildKnowledgeContextInjection({
+        question: "问题",
+        mode: legacyMode as "fast" | "detailed",
+        deps: {
+          decomposeModel: null,
+          retrieve: async (input) => {
+            retrieveCalls.push({ ...input });
+            return fakeRetrieval([fakeChunk({ text: "证据" })]);
+          },
+        },
+      });
+      expect(block).toContain("[question decomposition unavailable: knowledge model slot not configured]");
+      expect(block).not.toContain("[fast mode:");
+      for (const call of retrieveCalls) {
+        expect(call.rerankPolicy).toBeUndefined();
+      }
+    }
   });
 });

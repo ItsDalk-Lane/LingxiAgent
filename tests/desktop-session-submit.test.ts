@@ -1691,7 +1691,7 @@ describe("knowledgeRefs passthrough (Phase 7)", () => {
     const appendCustomEntry = vi.fn();
     Object.assign(session, { sessionManager: { appendCustomEntry } });
     const retrievalStats = {
-      mode: "qa",
+      mode: "fast",
       retrievalMode: "fts",
       subQueries: ["总结一下"],
       subQueryHits: [2],
@@ -1715,7 +1715,7 @@ describe("knowledgeRefs passthrough (Phase 7)", () => {
     };
     const knowledgeRefs = {
       notebookIds: ["nb-1", "nb-2"],
-      mode: "qa",
+      mode: "fast",
       notebooks: [{ id: "nb-1", name: "产品笔记" }, { id: "nb-2", name: "小说资料" }],
     };
 
@@ -1723,7 +1723,7 @@ describe("knowledgeRefs passthrough (Phase 7)", () => {
       sessionPath: "/tmp/desk.jsonl",
       text: "总结一下",
       // 功能字段（服务端校验后透传）
-      knowledgeRefs: { notebookIds: ["nb-1", "nb-2"], mode: "qa" },
+      knowledgeRefs: { notebookIds: ["nb-1", "nb-2"], mode: "fast" },
       // 展示投影（含名称缓存）
       displayMessage: { text: "总结一下", knowledgeRefs },
     });
@@ -1780,12 +1780,12 @@ describe("knowledgeRefs passthrough (Phase 7)", () => {
       sessionPath: "/tmp/desk.jsonl",
       text: "你好",
       knowledgeRefs: { notebookIds: ["nb-1"], mode: "strict" } as any,
-    })).rejects.toThrow('knowledgeRefs.mode must be "qa" or "assist"');
+    })).rejects.toThrow('knowledgeRefs.mode must be "fast" or "detailed"');
 
     await expect(submitDesktopSessionMessage(engine, {
       sessionPath: "/tmp/desk.jsonl",
       text: "你好",
-      knowledgeRefs: { notebookIds: [""], mode: "qa" } as any,
+      knowledgeRefs: { notebookIds: [""], mode: "fast" } as any,
     })).rejects.toThrow("knowledgeRefs.notebookIds must be an array of non-empty strings");
 
     expect(engine.promptSession).not.toHaveBeenCalled();
@@ -1804,7 +1804,7 @@ describe("knowledgeRefs passthrough (Phase 7)", () => {
     await expect(submitDesktopSessionInterjection(engine, {
       sessionPath: "/tmp/desk.jsonl",
       text: "插话",
-      knowledgeRefs: { notebookIds: "nb-1", mode: "qa" } as any,
+      knowledgeRefs: { notebookIds: "nb-1", mode: "fast" } as any,
     })).rejects.toThrow("knowledgeRefs.notebookIds must be an array of non-empty strings");
 
     expect(engine.steerSession).not.toHaveBeenCalled();
@@ -1822,7 +1822,7 @@ describe("knowledgeRefs passthrough (Phase 7)", () => {
     await submitDesktopSessionMessage(engine, {
       sessionPath: "/tmp/desk.jsonl",
       text: "你好",
-      knowledgeRefs: { notebookIds: [], mode: "qa" },
+      knowledgeRefs: { notebookIds: [], mode: "fast" },
     });
     // 空数组归一为无引用，正常提交
     expect(engine.promptSession).toHaveBeenCalledWith("/tmp/desk.jsonl", "你好", undefined);
@@ -1832,7 +1832,7 @@ describe("knowledgeRefs passthrough (Phase 7)", () => {
 describe("knowledge context injection (Phase 8)", () => {
   const INJECTION_BLOCK = "[KnowledgeContext]\n[K1] evidence\n[/KnowledgeContext]";
   const RETRIEVAL_STATS = {
-    mode: "qa",
+    mode: "fast",
     retrievalMode: "hybrid",
     subQueries: ["苹果 交付"],
     subQueryHits: [2],
@@ -1866,12 +1866,12 @@ describe("knowledge context injection (Phase 8)", () => {
       sessionPath: "/tmp/desk.jsonl",
       text: "苹果什么时候交付",
       displayMessage: { text: "苹果什么时候交付" },
-      knowledgeRefs: { notebookIds: ["nb-1"], mode: "qa" },
+      knowledgeRefs: { notebookIds: ["nb-1"], mode: "fast" },
     });
 
     expect(engine.buildKnowledgeContextInjection).toHaveBeenCalledWith({
       question: "苹果什么时候交付",
-      knowledgeRefs: { notebookIds: ["nb-1"], mode: "qa" },
+      knowledgeRefs: { notebookIds: ["nb-1"], mode: "fast" },
       // mock 会话无 model.contextWindow → 动态预算回退固定兜底值。
       budgetTokens: 6000,
       // 会话路径随行：蒸馏进度事件按 session 广播（knowledge_distill_progress）。
@@ -1905,7 +1905,7 @@ describe("knowledge context injection (Phase 8)", () => {
     await submitDesktopSessionMessage(engine, {
       sessionPath: "/tmp/desk.jsonl",
       text: "只问一句",
-      knowledgeRefs: { notebookIds: ["nb-1"], mode: "assist" },
+      knowledgeRefs: { notebookIds: ["nb-1"], mode: "detailed" },
     });
 
     // displayMessage 缺省时也必须持久化展示正文，否则历史投影会显示注入后的 prompt。
@@ -1927,7 +1927,7 @@ describe("knowledge context injection (Phase 8)", () => {
       sessionPath: "/tmp/desk.jsonl",
       text: "继续问",
       displayMessage: { text: "继续问" },
-      knowledgeRefs: { notebookIds: ["nb-1"], mode: "qa" },
+      knowledgeRefs: { notebookIds: ["nb-1"], mode: "fast" },
     });
 
     const promptText = engine.promptSession.mock.calls[0][1];
@@ -1938,7 +1938,7 @@ describe("knowledge context injection (Phase 8)", () => {
     expect(userMessage.text).toBe("继续问");
     // 降级路径的 stats 带 unavailableReason，其余字段置零/none（禁静默降级）。
     expect(userMessage.knowledgeRetrieval).toMatchObject({
-      mode: "qa",
+      mode: "fast",
       retrievalMode: "none",
       subQueries: [],
       subQueryHits: [],
@@ -1959,7 +1959,7 @@ describe("knowledge context injection (Phase 8)", () => {
     await expect(submitDesktopSessionMessage(engine, {
       sessionPath: "/tmp/desk.jsonl",
       text: "你好",
-      knowledgeRefs: { notebookIds: ["nb-1"], mode: "qa" },
+      knowledgeRefs: { notebookIds: ["nb-1"], mode: "fast" },
     })).rejects.toThrow("knowledge injection unavailable");
     expect(engine.promptSession).not.toHaveBeenCalled();
   });
@@ -1976,7 +1976,7 @@ describe("knowledge context injection (Phase 8)", () => {
       sessionPath: "/tmp/desk.jsonl",
       text: "空引用",
       displayMessage: { text: "空引用" },
-      knowledgeRefs: { notebookIds: [], mode: "qa" },
+      knowledgeRefs: { notebookIds: [], mode: "fast" },
     });
 
     expect(engine.buildKnowledgeContextInjection).not.toHaveBeenCalled();
@@ -1989,7 +1989,7 @@ describe("knowledge context injection (Phase 8)", () => {
     await submitDesktopSessionMessage(engine, {
       sessionPath: "/tmp/desk.jsonl",
       text: `${INJECTION_BLOCK}\n\nenvelope text`,
-      knowledgeRefs: { notebookIds: ["nb-1"], mode: "qa" },
+      knowledgeRefs: { notebookIds: ["nb-1"], mode: "fast" },
       preservePromptEnvelope: true,
     } as any);
 
@@ -2015,7 +2015,7 @@ describe("knowledge context injection (Phase 8)", () => {
       sessionPath: "/tmp/desk.jsonl",
       text: "苹果什么时候交付",
       displayMessage: { text: "苹果什么时候交付" },
-      knowledgeRefs: { notebookIds: ["nb-1"], mode: "qa" },
+      knowledgeRefs: { notebookIds: ["nb-1"], mode: "fast" },
     });
 
     await vi.waitFor(() => {
@@ -2044,7 +2044,7 @@ describe("knowledge context injection (Phase 8)", () => {
       sessionPath: "/tmp/desk.jsonl",
       text: "检索中被停止",
       displayMessage: { text: "检索中被停止" },
-      knowledgeRefs: { notebookIds: ["nb-1"], mode: "qa" },
+      knowledgeRefs: { notebookIds: ["nb-1"], mode: "fast" },
     });
 
     await vi.waitFor(() => {
@@ -2089,7 +2089,7 @@ describe("knowledge context injection (Phase 8)", () => {
       sessionPath: "/tmp/desk.jsonl",
       text: "全文梳理",
       displayMessage: { text: "全文梳理" },
-      knowledgeRefs: { notebookIds: ["nb-1"], mode: "qa" },
+      knowledgeRefs: { notebookIds: ["nb-1"], mode: "fast" },
     });
 
     await vi.waitFor(() => {
@@ -2111,7 +2111,7 @@ describe("knowledge context injection (Phase 8)", () => {
       sessionPath: "/tmp/desk.jsonl",
       text: "下一条",
       displayMessage: { text: "下一条" },
-      knowledgeRefs: { notebookIds: ["nb-1"], mode: "qa" },
+      knowledgeRefs: { notebookIds: ["nb-1"], mode: "fast" },
     });
     const secondCall = (engine.buildKnowledgeContextInjection as unknown as ReturnType<typeof vi.fn>).mock.calls[0][0];
     expect(secondCall.signal.aborted).toBe(false);
@@ -2146,7 +2146,7 @@ describe("knowledge context injection (Phase 8)", () => {
       sessionPath: "/tmp/desk.jsonl",
       text: "插一句",
       displayMessage: { text: "插一句" },
-      knowledgeRefs: { notebookIds: ["nb-1"], mode: "qa" },
+      knowledgeRefs: { notebookIds: ["nb-1"], mode: "fast" },
     });
 
     await vi.waitFor(() => {
@@ -2174,7 +2174,7 @@ describe("knowledge context injection (Phase 8)", () => {
       sessionPath: "/tmp/desk.jsonl",
       text: "插一句",
       displayMessage: { text: "插一句" },
-      knowledgeRefs: { notebookIds: ["nb-1"], mode: "qa" },
+      knowledgeRefs: { notebookIds: ["nb-1"], mode: "fast" },
     });
 
     expect(steerSession).toHaveBeenCalledWith(

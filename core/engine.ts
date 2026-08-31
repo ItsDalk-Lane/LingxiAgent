@@ -2376,7 +2376,7 @@ export class LingxiEngine {
    */
   async buildKnowledgeContextInjection(input: {
     question: string;
-    knowledgeRefs: { notebookIds: string[]; mode: "qa" | "assist" };
+    knowledgeRefs: { notebookIds: string[]; mode: "fast" | "detailed" };
     /** 动态注入预算（desktop-session-submit 按会话模型解析）；缺省走 injector 兜底。 */
     budgetTokens?: number;
     /** 会话路径：携带时滚动轮/补充检索广播进度事件。 */
@@ -2661,30 +2661,34 @@ export class LingxiEngine {
       // planner 与 injector 并行启动：injector 内直检先行（§三十四 安全网），
       // 在拆解前 await 本 promise（planner 先于 decompose）。planKnowledgeCoverage
       // 是总函数（模型失败在 plan 内降级留痕），promise 不会 reject。
-      const coveragePlanPromise = (async () => {
-        const plan = await planKnowledgeCoverage({
-          question: input.question,
-          turnScopeInfo: {
-            notebookCount: input.knowledgeRefs.notebookIds.length,
-            sourceCount: turnScope ? turnScope.sources.length : null,
-          },
-          ...(classifyModel ? { classifyModel } : {}),
-        });
-        // 计划持久化（§二十九 只存结构化结果，禁 CoT）：失败只留日志痕，
-        // 不阻断注入（plan 本身已在 stats/块头透出）。
-        try {
-          knowledge.insertCoveragePlan({
-            turnScopeId: turnScope?.id ?? null,
+      // 快速档（2026-08-31 两档化）整体跳过 planner——零辅助 LLM 轮的一部分，
+      // injector 收 coveragePlan: null（无 plan 可消费，stats 不带 coverage 字段）。
+      const coveragePlanPromise = input.knowledgeRefs.mode === "fast"
+        ? null
+        : (async () => {
+          const plan = await planKnowledgeCoverage({
             question: input.question,
-            plan,
+            turnScopeInfo: {
+              notebookCount: input.knowledgeRefs.notebookIds.length,
+              sourceCount: turnScope ? turnScope.sources.length : null,
+            },
+            ...(classifyModel ? { classifyModel } : {}),
           });
-        } catch (error) {
-          moduleLog.log(
-            `knowledge coverage plan persistence failed: ${error instanceof Error ? error.message : String(error)}`,
-          );
-        }
-        return plan;
-      })();
+          // 计划持久化（§二十九 只存结构化结果，禁 CoT）：失败只留日志痕，
+          // 不阻断注入（plan 本身已在 stats/块头透出）。
+          try {
+            knowledge.insertCoveragePlan({
+              turnScopeId: turnScope?.id ?? null,
+              question: input.question,
+              plan,
+            });
+          } catch (error) {
+            moduleLog.log(
+              `knowledge coverage plan persistence failed: ${error instanceof Error ? error.message : String(error)}`,
+            );
+          }
+          return plan;
+        })();
       const { block, stats, evidence } = await buildKnowledgeContextInjection({
         question: input.question,
         mode: input.knowledgeRefs.mode,
@@ -2729,7 +2733,7 @@ export class LingxiEngine {
           // 总预算（§二十一）的每查询分摊，同时约束该查询的 rerank 输入。
           // 每次检索（直检/子查询/扩展/补证/结构探测/滚动补充检索都走这里）
           // 逐行发 knowledge_trace：start 带查询词，done 带命中数。
-          retrieve: async ({ query, sourceIds, sectionsBySourceId, topK }) => {
+          retrieve: async ({ query, sourceIds, sectionsBySourceId, topK, rerankPolicy }) => {
             const traceId = `search-${++knowledgeTraceSeq}`;
             emitKnowledgeTrace({ id: traceId, kind: "search", phase: "start", query });
             try {
@@ -2741,6 +2745,7 @@ export class LingxiEngine {
                 ...(sourceIds ? { sourceIds } : {}),
                 ...(sectionsBySourceId ? { sectionsBySourceId } : {}),
                 ...(topK != null ? { topK } : {}),
+                ...(rerankPolicy ? { rerankPolicy } : {}),
               });
               emitKnowledgeTrace({
                 id: traceId,

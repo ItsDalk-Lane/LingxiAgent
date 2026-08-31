@@ -463,7 +463,9 @@
     "knowledgeRetrievalSupplement": "Supplemental searches: {n} queries",
     "knowledgeRetrievalSupplementTitle": "Supplemental searches issued by the model during the rolling read",
     "knowledgeTraceResults": "{n} search results",
-    "knowledgeTraceFailed": "Search failed"
+    "knowledgeTraceFailed": "Search failed",
+    "knowledgeMetaModeFast": "Fast mode",
+    "knowledgeMetaModeDetailed": "Detailed mode"
   },
   "time": {
     "justNow": "Just now",
@@ -592,7 +594,11 @@
       },
       "empty": "No matches",
       "singleAgent": "Only one Agent reviewer can be invited per turn"
-    }
+    },
+    "knowledgeModeFast": "Fast",
+    "knowledgeModeDetailed": "Detailed",
+    "knowledgeModeFastHint": "Answer as fast as possible: top high-confidence evidence only, no decomposition or rolling read",
+    "knowledgeModeDetailedHint": "Answer as thoroughly as possible: question decomposition and multi-way recall, with batched reading when evidence overflows"
   },
   "agentReview": {
     "running": "Reviewing this Session",
