@@ -14,7 +14,7 @@
 | U1：上游目标 | `c6d0405294be67cb134c2758f6472748ee73e2be` | openhanako `v0.447.4` |
 | L0：Lingxi 同步基线 | `97595264ead8735a04559507ddaade25db8a4e15` | chore: sync upstream 0.444.1 and pi SDK 0.84.1 (PR #2) |
 | L1：同步开始 Lingxi | `ca0b417e36a6a1f80947458aaed328a25718e41b` | 2026-08-20 main HEAD |
-| VERIFIED_SOURCE_SHA | `55834549d77739c81c2870f518ace9bdba8f8334` | 最终验证（typecheck/lint/测试/构建/打包）所针对的 feature commit（其 tree 即被验证源码树）；2026-08-31 知识问答两档化（快速/详细 answer mode + rerank 动态门控 + 分段计时 + golden set） |
+| VERIFIED_SOURCE_SHA | `5d7a81a19b7dad4ab7fbe1b38103b18a0844407a` | 最终验证（typecheck/lint/测试/构建/打包）所针对的 feature commit（其 tree 即被验证源码树）；2026-08-31 v0.1.32 release metadata（version 0.1.32 + releaseGeneration 10 + digest v0.1.32） |
 
 ## Audit seal model
 

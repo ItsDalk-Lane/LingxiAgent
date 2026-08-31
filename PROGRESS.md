@@ -10,7 +10,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = 55834549d77739c81c2870f518ace9bdba8f8334  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-08-31 知识问答两档化（快速/详细 + rerank 门控 + golden set）)
+VERIFIED_SOURCE_SHA   = 5d7a81a19b7dad4ab7fbe1b38103b18a0844407a  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-08-31 v0.1.32 release metadata)
 工作分支              = feature/upstream-sync-0.447.4
 ```
 
@@ -740,6 +740,13 @@ seal 不是一次性终点，而是"当前被验证树"的游标；每次审计�
   验证：typecheck×3 绿 + eslint 0 error + lint:boundary 绿 + 全量 npm test
   12782 用例通过（lifecycle delete-wins 一例为预存 flaky：干净树 6 次重跑亦
   1 次红，与本改动无关）；fingerprint 未动（sha256:5f525a1d 不变）后推进。
+
+- **2026-08-31 v0.1.32 release metadata**（功能树 5d7a81a1/seal 本提交）：version
+  0.1.31→0.1.32 + releaseGeneration 9→10（双 bump 防同代静默跳过激活）+ digest
+  v0.1.32（手写 v1：两档化/过程工具卡/延迟治理/供应商协议四条目；经
+  --append-history 进 v2 滚动史，共 13 条）+ release-preflight 测试坐标推进。
+  验证：validate-release-digest v1/v2 均过 + release-preflight --tag v0.1.32
+  PASS（gen 10 > 9）+ test:artifact-release-smoke 8 文件 304 用例绿后推进。
 
 ## 最终状态：已合并（上游同步部分）
 
