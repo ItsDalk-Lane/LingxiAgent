@@ -10,7 +10,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = c031078864c50bb5ecf7e6b07b2827c469740938  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-08-31 知识问答重构 + 过程可见二轮（knowledge_trace 逐行广播拆解/检索阶段）)
+VERIFIED_SOURCE_SHA   = 287d9333e830e1a688e9783ffe3edab7ac5dc6ad  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-08-31 知识问答重构 + 过程可见二轮（knowledge_trace 逐行广播拆解/检索阶段）)
 工作分支              = feature/upstream-sync-0.447.4
 ```
 
@@ -710,6 +710,13 @@ seal 不是一次性终点，而是"当前被验证树"的游标；每次审计�
   assistant_run_end（中止/空回包兜底）时收起；submit 两路径检索完成即发
   note+detail=answer 的「正在生成回答」行盖住预填充期。验证：typecheck×3 绿 +
   全量 npm test 12772 用例通过（0 失败）后推进。
+- **2026-08-31 过程可见四轮：合成工具卡**（功能树 287d9333/seal 本提交）：用户
+  三轮反馈后定稿形态——对齐编程 Agent，一个动作一张卡依次长在助手消息流里。
+  ws 层把 knowledge 事件翻译成合成 tool_start/tool_end 喂 streamBufferManager
+  （复用既有工具卡管线：无消息时自动建助手消息，正文同条复用）；ToolCall 增
+  可选 resultNote（检索卡 done 显「N 个结果」）；回答卡以在途集合守卫防空
+  tool_end 凭空造消息（chat-turn-lifecycle 抓到的回归）。旧过程行堆整体移除。
+  验证：typecheck×3 绿 + 全量 npm test 12772 用例通过（0 失败）后推进。
 
 
 ## 最终状态：已合并（上游同步部分）
