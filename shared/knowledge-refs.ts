@@ -3,7 +3,7 @@
  *
  * 引用在会话内持续生效直到手动取消；前端每条消息显式携带（服务端无状态，
  * 与 sessionFileRefs 同模式）：
- *   wsMsg.knowledgeRefs = { notebookIds: string[], mode: "qa" | "assist" }
+ *   wsMsg.knowledgeRefs = { notebookIds: string[], mode: "fast" | "detailed" }
  *
  * Phase 7 只做透传 + 严格校验；Phase 8 的 knowledge-context-injector 在
  * core/desktop-session-submit.ts 的 prompt 组装区消费它做拆解与检索注入。
@@ -11,12 +11,41 @@
 
 import type { KnowledgeDegradeReason } from "./knowledge-reason-codes.ts";
 
-export type KnowledgeReferenceMode = "qa" | "assist";
+/**
+ * 答案模式两档（2026-08-31 两档化，取代旧 qa/assist）：
+ * - fast：零辅助 LLM 轮（不拆解）、rerank 动态门控、证据注入硬封顶、不触发
+ *   滚动消化——以最快速度给出高命中回答；
+ * - detailed：自适应拆解 + coverage 两档 + 超预算滚动消化的全量召回路径
+ *   （两档化前的既有行为，作为回归锚）。
+ */
+export type KnowledgeReferenceMode = "fast" | "detailed";
 
 /**
- * Coverage 维度的两档枚举（任务书 §二十八 三维度正交，Phase 7）：
- * 与 answerMode（qa/assist）、retrievalMode（fts/hybrid）互不携带、互不影响。
- * 定义在 shared 层供 stats 契约与 lib/knowledge 的 planner 共用（lib → shared 单向）。
+ * 存量答案模式（两档化前的 qa/assist）：生产写入侧不再产出。读取侧（历史
+ * 还原 / retry-fork 重放）经 normalizeLegacyKnowledgeReferenceMode 一律映射
+ * detailed（行为保持，沿用 coverage exhaustive→broad 的存量兼容先例）；显示层
+ * 保留原值渲染旧标签。
+ */
+export type LegacyKnowledgeReferenceMode = "qa" | "assist";
+
+/**
+ * 存量值读取侧归一：fast/detailed 原样返回；qa/assist → detailed；非法值 →
+ * null（调用方显式处理，禁静默）。
+ */
+export function normalizeLegacyKnowledgeReferenceMode(mode: string): KnowledgeReferenceMode | null {
+  if (mode === "fast" || mode === "detailed") return mode;
+  if (mode === "qa" || mode === "assist") return "detailed";
+  return null;
+}
+
+/**
+ * Coverage 维度的档位枚举（任务书 §二十八 三维度正交，Phase 7；2026-08-31
+ * 两档化）：与 answerMode（fast/detailed）、retrievalMode（fts/hybrid）互不
+ * 携带、互不影响。定义在 shared 层供 stats 契约与 lib/knowledge 的 planner
+ * 共用（lib → shared 单向）。
+ *
+ * 'exhaustive' 值仅作存量兼容：旧持久化 plan 行 / 旧会话 stats 可能携带，
+ * 生产写入侧不再产出；执行侧读到旧值一律按 broad 处理。
  */
 export type KnowledgeCoverageMode = "high_recall" | "broad" | "exhaustive";
 
@@ -33,30 +62,6 @@ export interface KnowledgeRefs {
   notebookIds: string[];
   mode: KnowledgeReferenceMode;
 }
-
-/**
- * Source Fidelity 维度的等级枚举（任务书 §五十七/§五十九，Phase 9）：text
- * coverage 之外的第二个维度——「可解析文本全覆盖」绝不等于「原始资料全覆盖」。
- * 与 lib/knowledge/knowledge-coverage-manifest.ts 的 CoverageSourceFidelity 同构
- * （lib → shared 单向，这里只做 stats 摘要计数，不引 lib 类型）。
- */
-export type KnowledgeCoverageFidelity =
-  | "citation_grade"
-  | "structural"
-  | "semantic_only"
-  | "needs_ocr"
-  | "unavailable";
-
-/** 各 fidelity 等级的源计数摘要（零计条目可省略）。 */
-export type KnowledgeSourceFidelitySummary = Partial<Record<KnowledgeCoverageFidelity, number>>;
-
-/**
- * EXHAUSTIVE 覆盖执行的终态（Phase 9 第二波）：
- * - complete：全部 primary units processed 且零 failed/skipped（gate 判定）；
- * - partial：存在 failed/未处理/超时截断（含 expected=0 的无可处理源）；
- * - cancelled：执行中被用户 abort。
- */
-export type KnowledgeCoverageRunStatus = "complete" | "partial" | "cancelled";
 
 /**
  * 一次降级留痕的 per-scope 明细（Phase 2 Query/Index 分离）：被引笔记本内某个
@@ -99,6 +104,39 @@ export interface KnowledgeRetrievalStats {
   /** 拆解降级（单查询 + 注入块内留痕）。 */
   degraded: boolean;
   degradeReason?: string;
+  /**
+   * 拆解遥测（2026-08-30 拆解优化 §二十五）：latencyMs 含纠错重试；retryCount
+   * = 纠错次数（0=首跑采纳）。缺省 = 旧调用方未接入。
+   */
+  decompositionLatencyMs?: number;
+  decompositionRetryCount?: number;
+  /**
+   * 检索遥测（§二十五，家族级）：originalQueryHits = 直检命中数；
+   * expansionUniqueHits = 扩展查询独立召回的新块数（subQueryMarginalGain 的
+   * 扩展侧）；queryOverlapRatio = 1 − 去重后唯一块 / 总候选引用（0=无重叠）；
+   * evidenceNeedGains = 每证据需求（家族）边际新增块数（家族序：原问题族在前）。
+   */
+  originalQueryHits?: number;
+  expansionUniqueHits?: number;
+  queryOverlapRatio?: number;
+  evidenceNeedGains?: number[];
+  /**
+   * P2 拆解优化统计（2026-08-30）：复杂度档位（simple=零拆解 LLM 直检即全部）/
+   * 实际执行的专业方向 / 部分方向失败留痕；扩展跳过原因（条件门控）；
+   * 否定排除条件与词法过滤计数（filterSkipped=过度匹配保护触发）；
+   * Gap Analyzer 二轮补证（触发原因 + 补证查询与命中）。
+   */
+  decompositionComplexity?: "simple" | "focused" | "compound" | "complex";
+  decompositionSpecialists?: string[];
+  decompositionSpecialistFailures?: string[];
+  expansionSkipReason?: string;
+  negationExclusions?: string[];
+  negationDroppedChunks?: number;
+  negationFilterSkipped?: boolean;
+  secondPassTriggered?: boolean;
+  secondPassReason?: string;
+  gapQueries?: string[];
+  gapQueryHits?: number[];
   /** 融合去重后的候选块数。 */
   fusedChunks: number;
   /** 预算内实际注入块数。 */
@@ -124,12 +162,56 @@ export interface KnowledgeRetrievalStats {
     /** 邻接扩展的上下文块（§三十六，Phase 8）：进入注入块但不计任何检索命中。 */
     contextOnly?: boolean;
   }>;
-  /** 证据总量超预算时走了分段压缩（知识提炼模型分批提炼后整合注入）。 */
+  /**
+   * @deprecated 蒸馏压缩路径已移除（2026-08-31）；字段仅为旧会话存量 stats 的
+   * 读取兼容保留，生产写入侧不再产出。
+   */
   distilled?: boolean;
-  /** 分段压缩的批数（成功路径）。 */
+  /** @deprecated 同上（蒸馏批数）。 */
   distillBatches?: number;
-  /** 压缩不可用/失败后退回"分片清单"降级的原因（显式留痕）。 */
+  /** @deprecated 同上（蒸馏降级原因）。 */
   distillDegradedReason?: string;
+  /**
+   * 滚动注入统计（2026-08-31 取代蒸馏）：证据总量超预算时证据被拆成 N 份、
+   * 由会话主模型逐部分消化。parts = 拆分总数（最后一部分直接进注入块）；
+   * rounds = 实际执行的中间轮数；supplementalQueries = 循环内模型自主发起的
+   * 补充检索查询全集；degradedReason = 留痕（笔记截断/轮上限触顶等，禁静默）。
+   */
+  rollup?: {
+    parts: number;
+    rounds: number;
+    supplementalQueries?: string[];
+    degradedReason?: string;
+  };
+  /**
+   * rerank 降级留痕（2026-08-30 延迟加固）：任一被引笔记本的重排超期/传输失败
+   * 时携带（多笔记本以 "; " 连接，保留笔记本归属），候选保持 RRF 名次，
+   * 注入块内同文案留痕。缺省 = 全部正常重排或未配置重排。
+   */
+  rerankDegradeReason?: string;
+  /**
+   * rerank 动态门控跳过留痕（2026-08-31 快速档）：快速档检索结果头部清晰
+   * （top-1 RRF 融合分领先 ≥ 阈值）时主动跳过重排、保持 RRF 名次。多笔记本以
+   * "; " 连接保留笔记本归属。与 rerankDegradeReason 的区别：这是主动跳过
+   * 而非失败降级，只进 stats 不进注入块。缺省 = 未跳过（正常重排/未配置/
+   * 非快速档）。
+   */
+  rerankSkippedReason?: string;
+  /**
+   * 检索分段计时（2026-08-31）：各阶段墙钟毫秒（单笔记本取该段合计，多笔记本
+   * 取最大值——反映对关键路径的贡献）。纯增量可选字段，旧调用方/旧会话不携带。
+   */
+  stageTimings?: {
+    ftsMs?: number;
+    embedMs?: number;
+    vectorMs?: number;
+    fuseMs?: number;
+    rerankMs?: number;
+    plannerMs?: number;
+    assembleMs?: number;
+    rollupMs?: number;
+    totalMs?: number;
+  };
   /**
    * Coverage 维度摘要（任务书 §二十八/§二十九，Phase 7）：本轮 KnowledgeCoveragePlan
    * 的结构化结论。只携带 plan 的判定结果，不携带任何 CoT/原始模型输出；缺省 =
@@ -137,31 +219,20 @@ export interface KnowledgeRetrievalStats {
    */
   coverageMode?: KnowledgeCoverageMode;
   scopeLevel?: KnowledgeCoverageScopeLevel;
-  /** exhaustive 档位才有完整性义务（coverageMode === "exhaustive" 时为 true）。 */
-  requiresCompleteness?: boolean;
   /** 规则层命中的确定性规则 id（如 RULE_EXHAUSTIVE_KEYWORD / RULE_GLOBAL_NEGATIVE）。 */
   matchedRuleIds?: string[];
   /**
-   * Phase 8/9 执行档位（§三十三~§三十七/§五十一）：本轮实际执行的覆盖档位。
-   * plan 消费后与计划档位可能不同——high_recall 可被自动升级（见 upgradedTo）、
-   * exhaustive 计划在 coverage 执行面不可用（worker 模型未配/无冻结 scope）时
-   * 显式降级 broad 执行（见 coverageDegradeReason）。仅在接入 coverage planner
-   * 时携带。
+   * Phase 8 执行档位（§三十三~§三十七；2026-08-31 两档化）：本轮实际执行的
+   * 覆盖档位。plan 消费后与计划档位可能不同——high_recall 可被自动升级（见
+   * upgradedTo）。存量旧值 'exhaustive' 的 plan 执行侧按 broad 处理。仅在接入
+   * coverage planner 时携带。
    */
-  executedCoverageMode?: "high_recall" | "broad" | "exhaustive";
+  executedCoverageMode?: "high_recall" | "broad";
   /**
    * §四十一（执行侧）：high_recall 执行后 sourceCoverageFootprint 低于阈值且多源
-   * scope，自动补一轮 broad 流程（复用已检索结果，只补缺失探测）时标注；
-   * Phase 9 第二波起 broad 后 sectionCoverageFootprint 仍不足且整体性 scope 时
-   * 也可自动升级 exhaustive（确定性全量扫描）。
+   * scope，自动补一轮 broad 流程（复用已检索结果，只补缺失探测）时标注。
    */
-  upgradedTo?: "broad" | "exhaustive";
-  /**
-   * exhaustive 执行面不可用时的显式降格留痕（Phase 9 第二波；禁静默降级）：
-   * 计划 exhaustive 但 worker 模型未配/冻结 scope 缺失/manifest 构建失败 →
-   * 本轮按 broad 执行，原因记录在此并同步进注入块标注行。
-   */
-  coverageDegradeReason?: string;
+  upgradedTo?: "broad";
   /**
    * 受控查询扩展（§三十五，Phase 8）：实际采纳的扩展查询（去重后 ≤
    * KNOWLEDGE_QUERY_EXPANSION_MAX，与拆解子查询共用总查询预算）。仅在尝试扩展
@@ -204,49 +275,6 @@ export interface KnowledgeRetrievalStats {
   chunkRecallFootprint?: number;
   /** 二次探测达到预算上限仍未探完（显式留痕；缺省 = 探测未受限或无缺口）。 */
   secondaryRetrievalCapped?: boolean;
-  /**
-   * ── EXHAUSTIVE 覆盖执行统计（任务书 §五十五~§五十七/§八十四~§八十六，
-   * Phase 9 第二波；全部可选、向后兼容，仅 exhaustive 真执行时携带）──
-   */
-  /** coverage_runs.id（v14 持久化行；同 manifestHash 重开可续跑）。 */
-  coverageRunId?: string;
-  /**
-   * 冻结覆盖清单指纹（coverage_runs.manifest_hash；任务书 §六十七 EvidenceManifest
-   * 关联 exhaustive 轮用）。仅 exhaustive 真执行时携带。
-   */
-  coverageManifestHash?: string;
-  /** 覆盖终态：complete 仅当 processed==expected>0 且 failed==skipped==0。 */
-  coverageStatus?: KnowledgeCoverageRunStatus;
-  coverageExpectedUnits?: number;
-  coverageProcessedUnits?: number;
-  coverageFailedUnits?: number;
-  /** shard 终态计数（completed/failed；cancelled/pending 不进这两个分子）。 */
-  coverageShardTotal?: number;
-  coverageShardCompleted?: number;
-  coverageShardFailed?: number;
-  /** processed / expected（4 位小数；expected=0 时为 0，绝不虚标 100%）。 */
-  textCoverageRatio?: number;
-  /** 各 fidelity 等级的源计数（needs_ocr/unavailable 源在注入块 fidelity 行点名）。 */
-  sourceFidelitySummary?: KnowledgeSourceFidelitySummary;
-  /** aggregateShardEvidence 去重后的 findings 数（实际注入数见 injectedChunks）。 */
-  coverageFindingsCount?: number;
-  /** 终态留痕 code：KNOWLEDGE_COVERAGE_PARTIAL / _CANCELLED / _TIMEOUT。 */
-  coverageReasonCode?: string;
-  /**
-   * Phase 10 层级归约统计（§六十一/§六十二；全部可选、向后兼容，仅 exhaustive
-   * 真执行时携带）。levels 按层级聚合（source/notebook/cross_notebook）；
-   * degradedReason 在归约降级（reduceModel 未配/两次输出非法/调用失败）时留痕，
-   * 此时证据走结构化截断 + shard 清单（禁静默降级）。
-   */
-  coverageReduction?: {
-    levels: Array<{
-      level: "source" | "notebook" | "cross_notebook";
-      inputCount: number;
-      outputCount: number;
-      reduced: boolean;
-    }>;
-    degradedReason?: string;
-  };
 }
 
 /**
@@ -266,8 +294,8 @@ export function normalizeKnowledgeRefs(value: unknown): KnowledgeRefs | null {
   if (!Array.isArray(ids) || ids.some((id) => typeof id !== "string" || !id.trim())) {
     throw new TypeError("knowledgeRefs.notebookIds must be an array of non-empty strings");
   }
-  if (raw.mode !== "qa" && raw.mode !== "assist") {
-    throw new TypeError('knowledgeRefs.mode must be "qa" or "assist"');
+  if (raw.mode !== "fast" && raw.mode !== "detailed") {
+    throw new TypeError('knowledgeRefs.mode must be "fast" or "detailed"');
   }
   const notebookIds = [...new Set((ids as string[]).map((id) => id.trim()))];
   if (notebookIds.length === 0) return null;

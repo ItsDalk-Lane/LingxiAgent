@@ -87,7 +87,7 @@ export interface HistoryApiResponse {
     agentMentions?: Array<{ agentId: string; label: string }>;
     knowledgeRefs?: {
       notebookIds: string[];
-      mode: 'qa' | 'assist';
+      mode: import('../stores/chat-types').KnowledgeReferenceModeDisplay;
       notebooks?: Array<{ id: string; name?: string }>;
     };
     knowledgeRetrieval?: import('../../../../shared/knowledge-refs.ts').KnowledgeRetrievalStats;

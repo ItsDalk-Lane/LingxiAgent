@@ -48,8 +48,8 @@ export const ChatMessageSurface = memo(function ChatMessageSurface({
   const loadingMore = useStore(s => sessionScopedValue(s, s.chatSessions, sessionPath)?.loadingMore ?? false);
   const isSessionStreaming = useStore(s => sessionScopedListIncludes(s, s.streamingSessions, sessionPath));
   const isKnowledgeRetrieving = useStore(s => sessionScopedListIncludes(s, s.knowledgeRetrievingSessions, sessionPath));
-  // 蒸馏逐批进度（超预算证据分段压缩期间服务器逐批广播）：驱动「蒸馏中 · N 批」胶囊。
-  const knowledgeDistill = useStore(s => sessionScopedValue(s, s.knowledgeDistillBySession, sessionPath));
+  // 滚动注入进度（超预算证据分部分喂给主模型消化期间服务器逐轮广播）：
+  // 驱动「正在阅读第 X/N 部分」胶囊；补充检索（模型自主再查询）另有一行。
   // 发送即置位的本地「等待助手」态：知识检索/排队期间服务器不置 isStreaming，
   // 靠它让 typing 指示器在发送瞬间出现，而不是等检索结束才亮（首个后续事件清除）。
   const isTurnPending = useStore(s => sessionScopedListIncludes(s, s.turnPendingSessions, sessionPath));
@@ -475,14 +475,8 @@ export const ChatMessageSurface = memo(function ChatMessageSurface({
             registerMessageElement={registerMessageElement}
             enableProcessFold
           />
-          {knowledgeDistill && (
-            // 蒸馏进度独立成行：interject（流式中追问）期间也必须可见——
-            // 该场景下主指示区被 isStreaming 裸三点占据，曾把进度胶囊整个遮没。
-            <div className={`${styles.typingIndicator} ${styles.knowledgeRetrievingIndicator}`}>
-              {t('chat.knowledgeDistilling', { done: knowledgeDistill.done, model: knowledgeDistill.model ?? '' })}
-            </div>
-          )}
           {(isKnowledgeRetrieving || isTurnPending) && !isSessionStreaming && (
+
             <div className={`${styles.typingIndicator} ${styles.knowledgeRetrievingIndicator}`}>
               {isKnowledgeRetrieving ? t('chat.knowledgeRetrieving') : ''}
             </div>

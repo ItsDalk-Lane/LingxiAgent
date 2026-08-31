@@ -581,7 +581,7 @@ describe('process fold grouping', () => {
 describe('knowledge-only process fold（纯检索轮折叠）', () => {
   function retrievalStats(injectedChunks = 18): KnowledgeRetrievalStats {
     return {
-      mode: 'qa',
+      mode: 'detailed',
       retrievalMode: 'hybrid',
       subQueries: ['q1'],
       subQueryHits: [18],

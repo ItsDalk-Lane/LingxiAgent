@@ -115,8 +115,6 @@
     "settingsGlobalNotConfigured": "未配置",
     "settingsChunkTargetChars": "分块大小（字符）",
     "settingsChunkHint": "按嵌入模型上下文窗口 ×80% 自动计算（1 token = 1 字符口径）；换嵌入模型后自动重建",
-    "settingsRetrievalTopK": "检索数量",
-    "settingsTopKHint": "无上限返回全部匹配块；可改为限制最大召回数（1–1000）",
     "settingsInvalidNumber": "请输入 {min}–{max} 之间的整数",
     "selectSource": "选择一个来源查看解析内容",
     "ingestionQueued": "排队中",
@@ -133,8 +131,6 @@
     "readinessPendingEmbedding": "{count} 待嵌入",
     "readinessFailed": "{count} 失败",
     "settingsChunkAutoFallback": "自动（约 6553）",
-    "settingsTopKUnlimited": "无上限（默认）",
-    "settingsTopKMaxRecall": "最大召回数",
     "settingsVectorRetention": "向量保留策略",
     "settingsRetentionKeepForever": "永久保留（默认）",
     "settingsRetentionDaysMode": "天数后清理",
@@ -455,11 +451,21 @@
     "knowledgeMetaDegradedTitle": "检索已降级：{reason}",
     "knowledgeRetrieving": "知识库检索中",
     "knowledgeRetrievalSearched": "已搜索 {n} 个结果",
+    "knowledgeRetrievalShowMore": "显示更多（还有 {n} 条）",
     "knowledgeRetrievalTruncated": "超预算分片",
     "knowledgeRetrievalUnavailable": "知识检索不可用",
     "knowledgeRetrievalRowTitle": "{source} · 块 {chunk}",
     "knowledgeRetrievalDistilled": "已提炼 {n} 批",
-    "knowledgeDistilling": "知识蒸馏中 · 已完成 {done} 批 · {model}"
+    "knowledgeRollupReading": "正在阅读第 {current}/{total} 部分证据",
+    "knowledgeSupplementing": "模型发起了补充检索（{count} 条查询）",
+    "knowledgeSupplementQueryCount": "共 {count} 条查询",
+    "knowledgeRetrievalRolled": "分 {parts} 部分阅读",
+    "knowledgeRetrievalSupplement": "补充检索 {n} 条查询",
+    "knowledgeRetrievalSupplementTitle": "滚动注入循环中模型自主发起的补充检索",
+    "knowledgeTraceResults": "{n} 个搜索结果",
+    "knowledgeTraceFailed": "检索失败",
+    "knowledgeMetaModeFast": "快速模式",
+    "knowledgeMetaModeDetailed": "详细模式"
   },
   "time": {
     "justNow": "刚刚",
@@ -589,7 +595,11 @@
       },
       "empty": "没有匹配项",
       "singleAgent": "每个回合暂时只能邀请一位助手审阅"
-    }
+    },
+    "knowledgeModeFast": "快速",
+    "knowledgeModeDetailed": "详细",
+    "knowledgeModeFastHint": "以最快速度回答：只取最相关的高命中证据，不做全量拆解与滚动阅读",
+    "knowledgeModeDetailedHint": "尽量详尽：拆解问题、多路召回，证据过多时分批阅读后综合回答"
   },
   "agentReview": {
     "running": "正在审阅当前对话",
@@ -1172,6 +1182,31 @@
       "running": "🗃️ 正在整理知识库笔记本",
       "done": "🗃️ 整理了知识库笔记本",
       "failed": "🗃️ 知识库笔记本没整理成"
+    },
+    "knowledge_think": {
+      "running": "🧠 正在拆解问题",
+      "done": "🧠 拆解了问题",
+      "failed": "🧠 问题没拆解出来"
+    },
+    "knowledge_search": {
+      "running": "🔍 正在检索知识库",
+      "done": "🔍 检索了知识库",
+      "failed": "🔍 检索失败"
+    },
+    "knowledge_read_part": {
+      "running": "📖 正在阅读证据",
+      "done": "📖 读了证据",
+      "failed": "📖 阅读失败"
+    },
+    "knowledge_supplement": {
+      "running": "↻ 模型发起补充检索",
+      "done": "↻ 模型发起了补充检索",
+      "failed": "↻ 补充检索失败"
+    },
+    "knowledge_answer": {
+      "running": "✻ 正在生成回答",
+      "done": "✻ 生成了回答",
+      "failed": "✻ 回答没生成出来"
     }
   },
   "file_output": {
@@ -1960,8 +1995,6 @@
       "auxMemoryModelHint": "用于长期记忆提炼、会话记忆压缩、日记记忆材料生成",
       "auxKnowledgeModel": "知识分析模型",
       "auxKnowledgeModelHint": "用于知识问题拆解",
-      "auxKnowledgeDistillModel": "知识提炼模型",
-      "auxKnowledgeDistillModelHint": "知识证据超出注入预算时，分批提炼与问题相关的内容（未配置时退回分片清单模式）",
       "knowledgeOperationUsesProviderCredential": "复用所选供应商的凭证，不单独保存密钥",
       "knowledgeOperationOptional": "未配置（可选）",
       "knowledgeOperationUnavailable": "当前不可用",
@@ -2072,7 +2105,9 @@
       "modelOperationRerank": "重排",
       "modelOperationHint": "打上嵌入或重排标签的模型会出现在知识库笔记本设置的对应下拉中。标签只是标记，模型是否真的支持由实际调用检验。",
       "embeddingDimensions": "向量维度",
-      "embeddingDimensionsHint": "供应商支持自定义维度时按此值请求；不支持时仅作记录，按供应商默认维度返回。"
+      "embeddingDimensionsHint": "供应商支持自定义维度时按此值请求；不支持时仅作记录，按供应商默认维度返回。",
+      "modelGroupId": "GroupId",
+      "modelGroupIdHint": "MiniMax 向量化模型必填（平台「账户管理」中的 Group Id），缺失时调用会报错。"
     },
     "memory": {
       "sectionTitle": "记忆",

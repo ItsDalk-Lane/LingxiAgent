@@ -115,8 +115,6 @@
     "settingsGlobalNotConfigured": "Not configured",
     "settingsChunkTargetChars": "Chunk size (chars)",
     "settingsChunkHint": "Computed automatically as the embedding model's context window ×80% (1 token = 1 char); switching the embedding model rebuilds chunks",
-    "settingsRetrievalTopK": "Retrieval count",
-    "settingsTopKHint": "Unlimited returns every matching chunk; optionally cap the recall count (1–1000)",
     "settingsInvalidNumber": "Enter an integer between {min} and {max}",
     "selectSource": "Select a source to view its parsed content",
     "ingestionQueued": "Queued",
@@ -133,8 +131,6 @@
     "readinessPendingEmbedding": "{count} pending embedding",
     "readinessFailed": "{count} failed",
     "settingsChunkAutoFallback": "Auto (~6553)",
-    "settingsTopKUnlimited": "Unlimited (default)",
-    "settingsTopKMaxRecall": "Max recall count",
     "settingsVectorRetention": "Vector retention",
     "settingsRetentionKeepForever": "Keep forever (default)",
     "settingsRetentionDaysMode": "Clean up after days",
@@ -455,11 +451,21 @@
     "knowledgeMetaDegradedTitle": "Retrieval degraded: {reason}",
     "knowledgeRetrieving": "Searching knowledge base",
     "knowledgeRetrievalSearched": "Searched {n} results",
+    "knowledgeRetrievalShowMore": "Show more ({n} more)",
     "knowledgeRetrievalTruncated": "over-budget shards",
     "knowledgeRetrievalUnavailable": "knowledge retrieval unavailable",
     "knowledgeRetrievalRowTitle": "{source} · chunk {chunk}",
     "knowledgeRetrievalDistilled": "distilled in {n} batches",
-    "knowledgeDistilling": "Distilling knowledge · {done} batches done · {model}"
+    "knowledgeRollupReading": "Reading evidence part {current}/{total}",
+    "knowledgeSupplementing": "Model issued supplemental searches ({count} queries)",
+    "knowledgeSupplementQueryCount": "{count} queries total",
+    "knowledgeRetrievalRolled": "Read in {parts} parts",
+    "knowledgeRetrievalSupplement": "Supplemental searches: {n} queries",
+    "knowledgeRetrievalSupplementTitle": "Supplemental searches issued by the model during the rolling read",
+    "knowledgeTraceResults": "{n} search results",
+    "knowledgeTraceFailed": "Search failed",
+    "knowledgeMetaModeFast": "Fast mode",
+    "knowledgeMetaModeDetailed": "Detailed mode"
   },
   "time": {
     "justNow": "Just now",
@@ -588,7 +594,11 @@
       },
       "empty": "No matches",
       "singleAgent": "Only one Agent reviewer can be invited per turn"
-    }
+    },
+    "knowledgeModeFast": "Fast",
+    "knowledgeModeDetailed": "Detailed",
+    "knowledgeModeFastHint": "Answer as fast as possible: top high-confidence evidence only, no decomposition or rolling read",
+    "knowledgeModeDetailedHint": "Answer as thoroughly as possible: question decomposition and multi-way recall, with batched reading when evidence overflows"
   },
   "agentReview": {
     "running": "Reviewing this Session",
@@ -1171,6 +1181,31 @@
       "running": "🗃️ Updating knowledge notebooks",
       "done": "🗃️ Updated knowledge notebooks",
       "failed": "🗃️ Failed to update knowledge notebooks"
+    },
+    "knowledge_think": {
+      "running": "🧠 Decomposing the question",
+      "done": "🧠 Decomposed the question",
+      "failed": "🧠 Failed to decompose"
+    },
+    "knowledge_search": {
+      "running": "🔍 Searching the knowledge base",
+      "done": "🔍 Searched the knowledge base",
+      "failed": "🔍 Search failed"
+    },
+    "knowledge_read_part": {
+      "running": "📖 Reading evidence",
+      "done": "📖 Read evidence",
+      "failed": "📖 Read failed"
+    },
+    "knowledge_supplement": {
+      "running": "↻ Model requests more searches",
+      "done": "↻ Model requested more searches",
+      "failed": "↻ Supplement failed"
+    },
+    "knowledge_answer": {
+      "running": "✻ Composing the answer",
+      "done": "✻ Composed the answer",
+      "failed": "✻ Answer failed"
     }
   },
   "file_output": {
@@ -1959,8 +1994,6 @@
       "auxMemoryModelHint": "Used for long-term memory extraction, session memory compression, diary materials",
       "auxKnowledgeModel": "Knowledge Analysis Model",
       "auxKnowledgeModelHint": "Used to decompose knowledge questions",
-      "auxKnowledgeDistillModel": "Knowledge distill model",
-      "auxKnowledgeDistillModelHint": "When evidence exceeds the injection budget, distills question-relevant content in batches (falls back to the shard-manifest mode when unset)",
       "knowledgeOperationUsesProviderCredential": "Reuses the selected provider credential; no separate key is stored",
       "knowledgeOperationOptional": "Not configured (optional)",
       "knowledgeOperationUnavailable": "Currently unavailable",
@@ -2071,7 +2104,9 @@
       "modelOperationRerank": "Rerank",
       "modelOperationHint": "Models tagged embedding or rerank appear in the matching dropdowns of the knowledge notebook settings. The tag is only a label; actual support is verified at call time.",
       "embeddingDimensions": "Embedding dimensions",
-      "embeddingDimensionsHint": "Used when the provider supports custom dimensions; otherwise recorded only and the provider default applies."
+      "embeddingDimensionsHint": "Used when the provider supports custom dimensions; otherwise recorded only and the provider default applies.",
+      "modelGroupId": "GroupId",
+      "modelGroupIdHint": "Required for MiniMax embedding models (the Group Id from the platform account page); calls fail without it."
     },
     "memory": {
       "sectionTitle": "Memory",

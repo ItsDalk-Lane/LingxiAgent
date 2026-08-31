@@ -7,7 +7,7 @@ import styles from './InputArea.module.css';
 
 /**
  * 输入框上方的知识库引用条（类似附件条）：已引用笔记本 chip（× 可移除）
- * + 问答/辅助模式切换。无引用时整体不渲染。
+ * + 快速/详细回答模式切换。无引用时整体不渲染。
  *
  * 笔记本名称解析顺序：最新列表 → slice 名称缓存 → 原始 id（脏 id 兜底可见、可移除）。
  */
@@ -64,16 +64,16 @@ export const KnowledgeReferenceBar = memo(function KnowledgeReferenceBar({ sessi
         );
       })}
       <span className={styles['knowledge-ref-mode']} role="group" aria-label={t('input.knowledgeModeLabel')}>
-        {(['qa', 'assist'] as KnowledgeReferenceMode[]).map((mode) => (
+        {(['fast', 'detailed'] as KnowledgeReferenceMode[]).map((mode) => (
           <button
             key={mode}
             type="button"
             className={`${styles['knowledge-ref-mode-btn']}${refs.mode === mode ? ` ${styles.active}` : ''}`}
-            title={t(mode === 'qa' ? 'input.knowledgeModeQaHint' : 'input.knowledgeModeAssistHint')}
+            title={t(mode === 'fast' ? 'input.knowledgeModeFastHint' : 'input.knowledgeModeDetailedHint')}
             aria-pressed={refs.mode === mode}
             onClick={() => setKnowledgeReferenceMode(sessionKey, mode)}
           >
-            {t(mode === 'qa' ? 'input.knowledgeModeQa' : 'input.knowledgeModeAssist')}
+            {t(mode === 'fast' ? 'input.knowledgeModeFast' : 'input.knowledgeModeDetailed')}
           </button>
         ))}
       </span>

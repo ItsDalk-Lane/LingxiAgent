@@ -13,6 +13,12 @@ export const KNOWLEDGE_DEGRADE_REASONS = [
   "KNOWLEDGE_INDEX_FAILED",
   /** VectorIndexVariant 未就绪或查询嵌入不可用：本轮向量通道跳过，降级纯 FTS。 */
   "KNOWLEDGE_VECTOR_NOT_READY",
+  /**
+   * 查询嵌入请求失败（2026-08-30 延迟加固）：网络/HTTP/期限超时/响应非法——
+   * 向量通道是检索增强层，失败降级纯 FTS 并显式留痕（不炸检索、不丢已算好的
+   * FTS 候选），后台重建按既有 requestVariantBuild 幂等语义补跑。
+   */
+  "KNOWLEDGE_EMBEDDING_FAILED",
   /** 源解析产物 needs_ocr：无可检索文本，该源本轮不参与检索。 */
   "KNOWLEDGE_SOURCE_NEEDS_OCR",
 ] as const;
@@ -38,28 +44,12 @@ export const KNOWLEDGE_EMBEDDING_INTERRUPTED = "KNOWLEDGE_EMBEDDING_INTERRUPTED"
 export const KNOWLEDGE_SCOPE_VIOLATION = "KNOWLEDGE_SCOPE_VIOLATION";
 
 /**
- * Coverage run 未达 complete（任务书 §一百零四/§五十六，Phase 9）：expected 与
- * processed 不等、存在 failed/skipped primary units、或无可处理源（全
- * needs_ocr/unavailable）。终态留痕用，prompt 侧据此禁止"全文全部检查完成"措辞。
+ * @deprecated 以下五个 exhaustive 覆盖执行 reason code 随 exhaustive 档移除
+ * （2026-08-31）退役：生产写入侧已无产出，定义保留一版仅供存量 stats/日志
+ * 的读取兼容，不做语义变更。
  */
 export const KNOWLEDGE_COVERAGE_PARTIAL = "KNOWLEDGE_COVERAGE_PARTIAL";
-
-/**
- * 单个 coverage shard 终态 failed（任务书 §一百零四/§五十二，Phase 9）：纠错
- * 重试一次 + shard 级 bounded retry（≤2 次自动重试）后仍无法产出合法 ShardResult。
- * 该 shard 的 primary units 计入 failed 分母，run 不得声称 complete。
- */
 export const KNOWLEDGE_COVERAGE_SHARD_FAILED = "KNOWLEDGE_COVERAGE_SHARD_FAILED";
-
-/**
- * Coverage run 被用户中止（任务书 §八十六/§一百零四，Phase 9 第二波）：执行中
- * abort signal 触发，pending/running shard 置 cancelled，completed 结果保留诊断。
- * 该轮 stats 覆盖状态记 cancelled，绝不生成 complete claim。
- */
 export const KNOWLEDGE_COVERAGE_CANCELLED = "KNOWLEDGE_COVERAGE_CANCELLED";
-
-/**
- * Coverage run 触发总时长上限（任务书 §一百零四，Phase 9 第二波）：到点后取消
- * 剩余 pending shard，run 以 partial 语义收尾（显式 timeout 留痕），不无限挂死会话。
- */
 export const KNOWLEDGE_COVERAGE_TIMEOUT = "KNOWLEDGE_COVERAGE_TIMEOUT";
+export const KNOWLEDGE_COVERAGE_CIRCUIT_BREAK = "KNOWLEDGE_COVERAGE_CIRCUIT_BREAK";

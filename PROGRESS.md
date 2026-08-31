@@ -10,7 +10,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = 57d716e5c3fc49573a8fba7765c78c6d49e86055  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-08-30 同上 + Windows 轮询测试真实时间预算修复)
+VERIFIED_SOURCE_SHA   = 55834549d77739c81c2870f518ace9bdba8f8334  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-08-31 知识问答两档化（快速/详细 + rerank 门控 + golden set）)
 工作分支              = feature/upstream-sync-0.447.4
 ```
 
@@ -555,6 +555,191 @@ seal 不是一次性终点，而是"当前被验证树"的游标；每次审计�
   转储。验证：该文件 6/6 绿 + typecheck×3 + full npm test 12778 passed /
   0 failed 后推进。
 
+- **2026-08-30 知识提问延迟三连修复 + engine 构造顺序修复**
+  （功能树 2d447aa4+01dfb168/seal 本提交；12 files / +452-22，含 persistence
+  指纹 compatible repin）：桌面 dev 实测一次知识提问 1 分钟以上，observability
+  逐调用记录定位三处结构性瓶颈——①分片装填只数正文不数渲染开销：行级小单元源
+  （XLSX/CSV 一行一 block）provenance 头（unitId sha256/snapshot/parseArtifact/
+  blockId/offsets）是正文 2–3 倍，300 单元挤一片渲染后 54k token（vs 16k 预算）
+  → MiniMax-M3 分片 19 调用 0 成功全灭于线性化超时；②必败场景无熔断：按
+  bounded retry + 30min run 上限最坏白烧半小时；③rerank 无期限：siliconflow
+  VL-Reranker 单次 11–56s 排队方差，检索尾巴固定 ~66s，且传输类失败直接
+  KNOWLEDGE_RETRIEVAL_UNAVAILABLE 炸掉整个检索。修复：planCoverageShards 成本
+  = 正文 + coverageUnitPromptOverheadTokens；executor 熔断（零成功 + 终态
+  failed ≥ COVERAGE_CIRCUIT_BREAK_FAILURES=4 提前取消剩余，新 reason code
+  KNOWLEDGE_COVERAGE_CIRCUIT_BREAK，任一成功即豁免）；rerank 15s 期限竞速
+  （KNOWLEDGE_RERANK_DEADLINE_MS）超时/传输失败降级保 RRF 名次 +
+  rerankDegradeReason 留痕（注入块行 + stats）。附带 engine _models 先于
+  _knowledge 构造（存量库迁移期闭包读 providerRegistry 崩溃循环，CI 新库
+  测不到）。验证：typecheck×3 绿 + eslint 0 error + 新增 8 用例 + knowledge
+  簇 282 用例 + full npm test 12785 passed / 0 failed（首轮 census 2 用例
+  并行负载抖动、复跑与隔离复跑均全绿）后推进。
+
+- **2026-08-30 exhaustive 交互式规模闸（延迟加固第二轮）**
+  （功能树 11474e82/seal 本提交；2 files / +83-0）：第一轮修复实测后暴露
+  更深一层问题——680 万 token 语料按开销计费正确分出 1073 片 exhaustive，
+  交互式窗口本质装不下（2–3 小时）；MiniMax-M3 压 46s 超时线成败各半 →
+  熔断被「任一成功即豁免」正确豁免 → 继续磨（用户按停时 4 分钟完成 5/1073
+  片），coverage 期前端无进度渲染体感即卡死。修复：KNOWLEDGE_EXHAUSTIVE_
+  MAX_SHARDS=24（≈40 万 token ≈ 一本书），runExhaustiveCoverage 计划期计数
+  超阈即显式降格 broad + 留痕（两条入口统一收口：计划 exhaustive / §四十一
+  自动升级），指引 knowledge_grep/outline + subagent 分治；阈值内语义不变。
+  验证：typecheck×3 绿 + eslint 0 error + 新增 2 用例 + coverage 簇 110
+  用例 + full npm test 12787 passed / 0 failed 后推进。
+
+- **2026-08-30 证据锚点随注入预算伸缩 + 移除「检索数量」设置**
+  （功能树 47fed9ef/seal 本提交；11 files / +134-106，含 cli-runtime-closure
+  随 manifest→estimate-text-tokens 依赖边重生成）：Phase 8 固定 40 锚点在
+  大上下文模型下只占预算一成（512k 窗口 → ~50 万 token 预算 vs 40 块 ≈ 5 万
+  token）。resolveEvidenceAnchorBudget 按融合候选平均 token 伸缩（≤50% 预算、
+  下限 40 兜底、上限 240 防碎屑）；同轮移除笔记本设置「检索数量」控件——
+  候选预算链每层独立封顶后 retrievalTopK ≥60 无实际影响，保存原样回传存量
+  值，五语言 locale 键同步移除。验证：typecheck×3 绿 + eslint 0 error +
+  新增 7 用例 + knowledge 簇 195 用例 + full npm test 12791 passed / 0
+  failed 后推进。
+
+- **2026-08-30 嵌入/重排供应商协议兼容修复**（功能树 08ead330/seal 本提交；
+  17 files / +428-40，含 persistence fingerprint compatible repin）：全部供应商
+  插件的嵌入/重排调用链对各家官方文档逐家核验后的实锤三连修——①千问 rerank
+  新增 dashscope-rerank 双端点方言（gte-rerank 系/qwen3-vl-rerank 系走原生
+  嵌套端点 + output.results 归一化，qwen3-rerank 系走 compatible-api/v1/
+  reranks 官方复数端点；旧实现改写后拼单数 /rerank 必 404），cohere-rerank
+  协议在 compatible-mode base 上的改写后缀同步修正为复数；②MiniMax 嵌入新增
+  minimax-embeddings 方言（/v1/embeddings?GroupId= + texts/type(db|query)
+  请求体 + vectors 归一化 + HTTP 200 内嵌 base_resp 错误码显式抛错），groupId
+  进 registry ALLOWED 白名单 + 模型编辑面板输入位 + 五语言文案，inputType
+  穿透查询侧固定 query（官方 db/query 算法分离）、缺 GroupId 显式报错；
+  ③rerank 文档上限 100→50（防御火山方舟 doubao-rerank 单次 50 上限，精度远
+  小于该值已饱和），查询侧裁剪与客户端断言共用单一真理源。验证：typecheck×3
+  绿 + full npm test 12799 passed / 0 failed + 指纹 compatible repin（engine.ts
+  闭包透传不触及持久化形状）+ tripwire/census 门禁单跑绿后推进。
+
+- **2026-08-30 融合池上限随预算倒推（阀 A）+ 检索列表二次展开**
+  （功能树 4e6bfe87/seal 本提交；10 files / +177-17）：接续锚点伸缩（阀 B
+  50%）补齐候选侧——resolveFusionPoolBudget = 预算 × 70% ÷ 候选平均 token
+  （池是候选水位，略高于锚点配额留选择余量），下限 60（小预算既有召回水位）、
+  上限 480（防碎片块碎屑化）；fuseSubQueryResults 可选 cap 参数（缺省 60
+  向后兼容），编排/降格重算/render 统计三处同源接线；多子查询大预算端到端
+  实测融合池 180 块全保留（旧行为 60 截断）。聊天检索列表二次展开：首屏
+  10 条 +「显示更多（还有 N 条）」二级一次性放出（≤10 条无按钮），五语言
+  knowledgeRetrievalShowMore。验证：typecheck×3 绿 + eslint 0 error + 新增
+  5 用例（倒推公式三态含 1M 口径示例/端到端池 180/UI 双路）+ knowledge 簇
+  182 用例 + full npm test 12805 passed / 0 failed 后推进。
+
+- **2026-08-30 查询嵌入失败/期限降级（退 FTS 不炸检索不空等）**
+  （功能树 d6be53ae/seal 本提交；3 files / +248-9）：与 rerank 期限降级对称
+  补齐嵌入侧——旧口径查询嵌入网络失败抛 KNOWLEDGE_RETRIEVAL_UNAVAILABLE 丢
+  掉已算好的 FTS 候选（注入块变检索不可用）、且无期限（闭包 HTTP 超时 300s
+  全额放行，挂着的供应商卡五分钟）。新 reason 码 KNOWLEDGE_EMBEDDING_FAILED +
+  invokeEmbeddingWithDeadline 15s 竞速（与 rerank 同构）+ vectorIndex.search
+  意外错误同纪律降级；无配置纯 FTS 路径不动（调查确认三层本就支持无嵌入/
+  无重排运行）。验证：typecheck×3 绿 + eslint 0 error + 新增 5 用例 +
+  knowledge 簇 200 用例 + full npm test 12810 passed / 0 failed 后推进。
+
+- **2026-08-30 拆解系统优化（P0+P1+stats，评审文档分档落地）**
+  （功能树 656cbaf0/seal 本提交；6 files / +503-58，含指纹 compatible repin）：
+  P0——拆解提示词删同义改写规则（与扩展器职责重复且致 RRF 多倍投票）、规则 2
+  改 Evidence Need 定义（需要相同证据的查询必须合并）；解析器宽容输入+严格
+  消费（未知字段忽略，必需字段/内容非法仍拒）；围栏/空白程序剥离不走 LLM
+  纠错。链路重排——扩展 LLM 与子查询检索批并行（消除拆解→扩展→检索的串行
+  LLM 跳，最坏 15s）。P1——Query Family 两级融合（family 0=直检+扩展变体、
+  子查询各自成族、探测各自领号；族内归一→族间等权 RRF，变体数量不再等于
+  投票权）+ 候选总预算 240（每查询 topK 分摊夹 [24,60]，engine 透传，同时
+  约束 rerank 输入）。Stats——decompositionLatencyMs/RetryCount/
+  originalQueryHits/expansionUniqueHits/queryOverlapRatio/evidenceNeedGains。
+  P2（多专家拆解/Gap Analyzer/结构化解码/否定 constraint）明确不做。验证：
+  typecheck×3 绿 + eslint 0 error + 新增 10 用例 + knowledge 簇 254 用例 +
+  full npm test 12820 passed / 0 failed 后推进。
+
+- **2026-08-30 拆解系统优化 P2 收官（Adaptive Specialist/扩展门控/Gap
+  Analyzer/否定 exclusion）**（功能树 6bb5878f/seal 本提交；5 files /
+  +868-23，含指纹 compatible repin）：§三~§五——廉价复杂度闸（纯规则词标，
+  无 LLM Router）：simple→0 方向（完全跳过拆解 LLM）/focused→1/compound→2/
+  complex→3-4；四个专业拆解器（fact/cause/relation/validation）认知职责
+  分离、方向间并行（墙钟≈单次调用）、合并去重封顶 4；部分方向失败不降级
+  留痕。词标 pattern 禁 g 标志（/g 的 .test() lastIndex 状态致评估非纯函数，
+  实测踩坑）。§十一——扩展条件门控：simple 与 broad+focused 跳过改写扩展
+  （省一次 LLM，expansionSkipReason 留痕）。§二十二——Gap Analyzer 二轮
+  补证：高覆盖模式/零命中条件触发，≤3 条补证查询各自领家族，最多一轮，
+  secondPass*/gapQueries 留痕。§九——exclusions 词法约束（embedding 对否定
+  不可靠）：融合后词面剔除 + 过度匹配保护（>半数放弃过滤留痕）。§十六/§十二/
+  §十八明确不做（解码收益被宽容解析边际化/需别名基建/覆盖由 coverage run
+  承担）。验证：typecheck×3 绿 + eslint 0 error + 新增 12 用例 + knowledge
+  簇 283 用例 + full npm test 12834 passed / 0 failed 后推进。
+
+- **2026-08-30 注入预算实践上限 96k（实测回归修复）**（功能树 0cf94f45/seal
+  本提交；2 files / +40-1）：P2 实测发现锚点/融合池随预算伸缩把 512k 动态
+  预算装到满格（usedTokens 493,757/495,616、136 块），主模型预填充 49.4 万
+  token 使 session/reply 77.3s——检索提速被预填充吃回。注入预算 =
+  min(动态预算, KNOWLEDGE_INJECTION_BUDGET_MAX_TOKENS=96k)；「能装≠该装」，
+  注入同时受模型上下文与预填充时间预算约束（§十三 思想）。验证：新增 1
+  用例 + full npm test 12835 passed / 0 failed 后推进。
+
+- **2026-08-30 revert 注入预算实践上限 96k**（功能树 e7b14874/seal 本提交）：
+  用户指出该修复未经批准且与其亲自指定的「锚点 50%\/融合池 70% 按上下文
+  倒推」设计相抵——诊断请求（「查看一下」）不应自行变成修复提交。revert
+  恢复原设计；「512k 证据装满预算 → 主模型预填充 77s」的权衡数据已呈报
+  用户，是否加上限及数值由用户后续拍板。验证：typecheck×3 绿 + injector/
+  execution 套件 98 用例绿后推进。
+- **2026-08-31 知识问答重构：覆盖两档化 + 主模型滚动多轮注入**（功能树
+  7de81782/seal 本提交）：用户批准的方案（检索侧机器完全不动，改动集中在
+  证据交给主模型与作答段）。①覆盖判定三档→两档（exhaustive 执行链路/蒸馏
+  压缩/broad→exhaustive 升级整体移除；executor/reduction/distiller 三模块删
+  除；manifest 裁成 fidelity 面；store coverage run 写 API 删除；表与 DDL 保留
+  存量兼容零迁移）；②超预算改 knowledge-rollup 滚动注入（会话主模型经
+  session streamFn 侧线缓冲调用逐部分消化，中间笔记逐部分标注传递，循环内
+  模型可 need-more-evidence 自主补充检索，轮/查询数硬上限，孤立超限单条也送
+  消化轮）；③knowledgeDistill 槽位移除、ws 事件换
+  knowledge_rollup_progress/knowledge_supplement_search、stats 新增 rollup
+  契约、前端胶囊/折叠卡/五语言。已知代价（已呈报用户确认）：超预算 turn 从
+  廉价蒸馏模型多批并行变主模型 N 轮串行，延迟与 token 花费上升。验证：
+  typecheck×3 绿 + 全量 npm test 12766 用例通过（0 失败；persistence 指纹
+  compatible repin sha256:4172d591…、开放边界清单重生成后 tripwire/lint 绿）
+  后推进。
+- **2026-08-31 过程可见二轮：knowledge_trace 逐行广播**（功能树 a4048480/seal
+  本提交）：用户反馈检索期界面只有三点干等，要求对齐编程 Agent 的工具调用
+  过程卡全程可见。engine 拆解/扩展/补证闭包与 retrieve 门面统一插桩
+  knowledge_trace 事件（只发元数据禁发模型输出），前端过程行堆按 id 原位
+  更新（检索行 start=查询词 → done=「N 个搜索结果」），rollup/supplement
+  事件同步映射为 read/note 行；首个非知识事件保守清除整堆。验证：typecheck×3
+  绿 + 全量 npm test 12771 用例通过（0 失败）后推进。
+- **2026-08-31 过程可见三轮：过程行堆=等待态本体**（功能树 c0310788/seal 本
+  提交）：用户实测反馈「检索提示先消失、退回三个点干等很久才有输出」——根因
+  是过程行堆被 session_user_message 等普通事件保守清除，把主模型预填充+生成
+  的漫长等待裸露成三个点。改为：过程行只在答案正文首个 text_delta 或
+  assistant_run_end（中止/空回包兜底）时收起；submit 两路径检索完成即发
+  note+detail=answer 的「正在生成回答」行盖住预填充期。验证：typecheck×3 绿 +
+  全量 npm test 12772 用例通过（0 失败）后推进。
+- **2026-08-31 过程可见四轮：合成工具卡**（功能树 287d9333/seal 本提交）：用户
+  三轮反馈后定稿形态——对齐编程 Agent，一个动作一张卡依次长在助手消息流里。
+  ws 层把 knowledge 事件翻译成合成 tool_start/tool_end 喂 streamBufferManager
+  （复用既有工具卡管线：无消息时自动建助手消息，正文同条复用）；ToolCall 增
+  可选 resultNote（检索卡 done 显「N 个结果」）；回答卡以在途集合守卫防空
+  tool_end 凭空造消息（chat-turn-lifecycle 抓到的回归）。旧过程行堆整体移除。
+  验证：typecheck×3 绿 + 全量 npm test 12772 用例通过（0 失败）后推进。
+- **2026-08-31 实测回归双修复**（功能树 22492163/seal 本提交）：用户实测一轮
+  6.5 分钟无输出，observability 取证（reply 调用 240s aborted + 163s 重试 +
+  cache_contract_violation ×2）实锤：滚动单份只按剩余预算装填 → 49 万 token 巨
+  份；侧线调用无用途标记污染缓存契约致真实轮全量重填。修复：单份封顶 64k +
+  runWithProviderCompatPurpose(knowledge_rollup) + 守卫跳过非 chat 用途。
+  隔离实例端到端因克隆环境模型解析怪癖未能跑通（与修复无关），以单元/集成
+  测试 + 全量回归覆盖。验证：typecheck×3 绿 + 全量 npm test 12773 用例通过
+  （0 失败；closure/boundary/指纹三生成物重钉）后推进。
+- **2026-08-31 用户截图验收 + 文案修补**（功能树 70b210a7/seal 本提交）：用户
+  实机截图确认合成工具卡形态达标（一动作一卡长在消息流）；修补充检索卡标签
+  与 resultNote 文案重复（换 count-only 新键 chat.knowledgeSupplementQueryCount，
+  五语言）。验证：typecheck×3 绿 + 定向套件 30 用例绿（纯文案与前端单点改动，
+  未触发指纹/闭包面）后推进。
+- **2026-08-31 知识问答两档化**（功能树 55834549/seal 本提交）：answerMode
+  qa/assist → fast/detailed（存量值读取侧按详细、显示层保留旧标签、默认快速）；
+  快速档零辅助 LLM 轮（engine 跳 planner + injector 跳拆解/扩展/gap/探测）+
+  rerank 动态门控（RRF 融合分领先 ≥0.008 跳过、扎堆 5s 期限、rerankSkippedReason
+  留痕）+ 证据封顶（锚点 ≤12/渲染预算 ≤8192）+ 禁滚动；详细档原行为（回归锚）；
+  rerankPolicy 三层穿线；stats.stageTimings 九段计时；golden set 质量门禁
+  （tests/knowledge-retrieval-golden.test.ts 双档 recall）；五语言 8 新键。
+  验证：typecheck×3 绿 + eslint 0 error + lint:boundary 绿 + 全量 npm test
+  12782 用例通过（lifecycle delete-wins 一例为预存 flaky：干净树 6 次重跑亦
+  1 次红，与本改动无关）；fingerprint 未动（sha256:5f525a1d 不变）后推进。
 
 ## 最终状态：已合并（上游同步部分）
 

@@ -32,12 +32,12 @@ describe('knowledge-reference-slice', () => {
     expect(selectKnowledgeRefsForSession(slice as never, null)).toBeNull();
   });
 
-  it('toggle 添加引用，默认问答模式，并缓存名称', () => {
+  it('toggle 添加引用，默认快速模式，并缓存名称', () => {
     slice.toggleKnowledgeNotebook('/session/a', 'nb-1', '笔记本一');
     expect(slice.knowledgeRefsBySession['/session/a']).toEqual({
       notebookIds: ['nb-1'],
       notebookNames: { 'nb-1': '笔记本一' },
-      mode: 'qa',
+      mode: 'fast',
     });
   });
 
@@ -63,23 +63,23 @@ describe('knowledge-reference-slice', () => {
     expect(slice.knowledgeRefsBySession['/session/a']).toEqual({
       notebookIds: ['nb-2'],
       notebookNames: { 'nb-2': '二' },
-      mode: 'qa',
+      mode: 'fast',
     });
     slice.removeKnowledgeNotebook('/session/a', 'nb-2');
     expect(slice.knowledgeRefsBySession['/session/a']).toBeUndefined();
   });
 
-  it('setKnowledgeReferenceMode 在问答/辅助之间切换，且保留引用', () => {
+  it('setKnowledgeReferenceMode 在快速/详细之间切换，且保留引用', () => {
     slice.toggleKnowledgeNotebook('/session/a', 'nb-1');
-    slice.setKnowledgeReferenceMode('/session/a', 'assist');
-    expect(slice.knowledgeRefsBySession['/session/a'].mode).toBe('assist');
+    slice.setKnowledgeReferenceMode('/session/a', 'detailed');
+    expect(slice.knowledgeRefsBySession['/session/a'].mode).toBe('detailed');
     expect(slice.knowledgeRefsBySession['/session/a'].notebookIds).toEqual(['nb-1']);
-    slice.setKnowledgeReferenceMode('/session/a', 'qa');
-    expect(slice.knowledgeRefsBySession['/session/a'].mode).toBe('qa');
+    slice.setKnowledgeReferenceMode('/session/a', 'fast');
+    expect(slice.knowledgeRefsBySession['/session/a'].mode).toBe('fast');
   });
 
   it('无引用时 setMode / remove 是空操作，不创建记录', () => {
-    slice.setKnowledgeReferenceMode('/session/a', 'assist');
+    slice.setKnowledgeReferenceMode('/session/a', 'detailed');
     slice.removeKnowledgeNotebook('/session/a', 'nb-x');
     expect(slice.knowledgeRefsBySession).toEqual({});
   });
@@ -94,16 +94,16 @@ describe('knowledge-reference-slice', () => {
   it('按 session 隔离：不同会话的引用互不影响', () => {
     slice.toggleKnowledgeNotebook('/session/a', 'nb-1', '一');
     slice.toggleKnowledgeNotebook('/session/b', 'nb-2', '二');
-    slice.setKnowledgeReferenceMode('/session/b', 'assist');
+    slice.setKnowledgeReferenceMode('/session/b', 'detailed');
     expect(selectKnowledgeRefsForSession(slice as never, '/session/a')).toEqual({
       notebookIds: ['nb-1'],
       notebookNames: { 'nb-1': '一' },
-      mode: 'qa',
+      mode: 'fast',
     });
     expect(selectKnowledgeRefsForSession(slice as never, '/session/b')).toEqual({
       notebookIds: ['nb-2'],
       notebookNames: { 'nb-2': '二' },
-      mode: 'assist',
+      mode: 'detailed',
     });
     slice.clearKnowledgeReferences('/session/a');
     expect(selectKnowledgeRefsForSession(slice as never, '/session/a')).toBeNull();

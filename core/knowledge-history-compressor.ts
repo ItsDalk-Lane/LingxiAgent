@@ -11,7 +11,9 @@
  * - 未闭合信封 fail-closed 替换到文本尾（残缺 JSONL 防泄漏正文）；
  * - 已压缩块（无证据块头行）再跑一次是 no-op（幂等）；
  * - JSONL 存储永不改写——压缩只发生在发给模型的内存消息列表上，
- *   preservePromptEnvelope 的逐字重放路径不经过本模块。
+ *   preservePromptEnvelope 的逐字重放路径不经过本模块；
+ * - 滚动注入块（2026-08-31）：中间笔记行无 [KN] 头，压缩时随之省略；最后一
+ *   部分的 [KN] 头照常进编号清单（模型可用 knowledge_read 回查原文）。
  */
 import { KNOWLEDGE_CONTEXT_BLOCK_END, KNOWLEDGE_CONTEXT_BLOCK_PREFIX } from "./session-reminders.ts";
 

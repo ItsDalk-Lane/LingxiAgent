@@ -115,8 +115,6 @@
     "settingsGlobalNotConfigured": "未設定",
     "settingsChunkTargetChars": "チャンクサイズ（文字）",
     "settingsChunkHint": "埋め込みモデルのコンテキストウィンドウ ×80% で自動計算（1 token = 1 文字）；埋め込みモデル変更時に自動再構築",
-    "settingsRetrievalTopK": "検索数",
-    "settingsTopKHint": "無制限は一致したチャンクをすべて返します。最大召回数（1–1000）で制限することも可能",
     "settingsInvalidNumber": "{min}〜{max} の整数を入力してください",
     "selectSource": "ソースを選択して解析内容を表示",
     "ingestionQueued": "待機中",
@@ -133,8 +131,6 @@
     "readinessPendingEmbedding": "{count} 件埋め込み待ち",
     "readinessFailed": "{count} 件失敗",
     "settingsChunkAutoFallback": "自動（約 6553）",
-    "settingsTopKUnlimited": "無制限（デフォルト）",
-    "settingsTopKMaxRecall": "最大召回数",
     "settingsVectorRetention": "ベクトル保持ポリシー",
     "settingsRetentionKeepForever": "永久保持（デフォルト）",
     "settingsRetentionDaysMode": "日数経過後に削除",
@@ -455,11 +451,21 @@
     "knowledgeMetaDegradedTitle": "検索が劣化しました：{reason}",
     "knowledgeRetrieving": "ナレッジベースを検索中",
     "knowledgeRetrievalSearched": "{n} 件の結果を検索済み",
+    "knowledgeRetrievalShowMore": "さらに表示（あと {n} 件）",
     "knowledgeRetrievalTruncated": "予算超過シャード",
     "knowledgeRetrievalUnavailable": "ナレッジ検索は利用不可",
     "knowledgeRetrievalRowTitle": "{source} · チャンク {chunk}",
     "knowledgeRetrievalDistilled": "{n} バッチに抽出済み",
-    "knowledgeDistilling": "知識蒸留中 · {done} バッチ完了 · {model}"
+    "knowledgeRollupReading": "エビデンスの第 {current}/{total} 部を読み込み中",
+    "knowledgeSupplementing": "モデルが補足検索を実行しました（{count} 件）",
+    "knowledgeSupplementQueryCount": "クエリ計 {count} 件",
+    "knowledgeRetrievalRolled": "{parts} 部に分けて読解",
+    "knowledgeRetrievalSupplement": "補足検索 {n} 件",
+    "knowledgeRetrievalSupplementTitle": "ローリング読解中にモデルが自主的に発行した補足検索",
+    "knowledgeTraceResults": "{n} 件の検索結果",
+    "knowledgeTraceFailed": "検索に失敗しました",
+    "knowledgeMetaModeFast": "高速モード",
+    "knowledgeMetaModeDetailed": "詳細モード"
   },
   "time": {
     "justNow": "たった今",
@@ -589,7 +595,11 @@
       },
       "empty": "一致する項目はありません",
       "singleAgent": "1 回のターンで招待できる Agent レビュアーは 1 人です"
-    }
+    },
+    "knowledgeModeFast": "高速",
+    "knowledgeModeDetailed": "詳細",
+    "knowledgeModeFastHint": "最速で回答：関連度の高い証拠のみを使用し、分解や多段階読解は行いません",
+    "knowledgeModeDetailedHint": "できる限り詳細に回答：質問を分解して多方向から取得し、証拠が多い場合は分割して読解します"
   },
   "agentReview": {
     "running": "この Session をレビュー中",
@@ -1172,6 +1182,31 @@
       "running": "🗃️ ナレッジノートを更新中",
       "done": "🗃️ ナレッジノートを更新しました",
       "failed": "🗃️ ナレッジノートを更新できませんでした"
+    },
+    "knowledge_think": {
+      "running": "🧠 質問を分解中",
+      "done": "🧠 質問を分解しました",
+      "failed": "🧠 分解に失敗"
+    },
+    "knowledge_search": {
+      "running": "🔍 ナレッジベースを検索中",
+      "done": "🔍 ナレッジベースを検索しました",
+      "failed": "🔍 検索に失敗"
+    },
+    "knowledge_read_part": {
+      "running": "📖 エビデンスを読み込み中",
+      "done": "📖 エビデンスを読みました",
+      "failed": "📖 読み込みに失敗"
+    },
+    "knowledge_supplement": {
+      "running": "↻ モデルが補足検索を要求",
+      "done": "↻ モデルが補足検索を要求しました",
+      "failed": "↻ 補足検索に失敗"
+    },
+    "knowledge_answer": {
+      "running": "✻ 回答を生成中",
+      "done": "✻ 回答を生成しました",
+      "failed": "✻ 回答に失敗"
     }
   },
   "file_output": {
@@ -1890,8 +1925,6 @@
       "auxMemoryModelHint": "長期記憶抽出、セッション記憶圧縮、日記素材生成に使用",
       "auxKnowledgeModel": "ナレッジ分析モデル",
       "auxKnowledgeModelHint": "知識の質問分解に使用",
-      "auxKnowledgeDistillModel": "知識抽出モデル",
-      "auxKnowledgeDistillModelHint": "根拠が注入予算を超える場合、質問に関連する内容をバッチごとに抽出（未設定時はシャード一覧モードへフォールバック）",
       "knowledgeOperationUsesProviderCredential": "選択したプロバイダーの認証情報を再利用し、別のキーは保存しません",
       "knowledgeOperationOptional": "未設定（任意）",
       "knowledgeOperationUnavailable": "現在利用できません",
@@ -2002,7 +2035,9 @@
       "modelOperationRerank": "リランク",
       "modelOperationHint": "埋め込みまたはリランクのタグを付けたモデルは、知識ノート設定の対応するドロップダウンに表示されます。タグは印のみで、実際の対応は呼び出し時に検証されます。",
       "embeddingDimensions": "埋め込み次元数",
-      "embeddingDimensionsHint": "プロバイダーがカスタム次元に対応する場合に使用。非対応の場合は記録のみで、プロバイダーの既定次元で返されます。"
+      "embeddingDimensionsHint": "プロバイダーがカスタム次元に対応する場合に使用。非対応の場合は記録のみで、プロバイダーの既定次元で返されます。",
+      "modelGroupId": "GroupId",
+      "modelGroupIdHint": "MiniMax の埋め込みモデルには必須（プラットフォームのアカウント管理にある Group Id）。未設定の場合は呼び出しが失敗します。"
     },
     "memory": {
       "sectionTitle": "記憶",

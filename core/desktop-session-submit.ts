@@ -517,6 +517,19 @@ export async function submitDesktopSessionMessage(engine: any, opts: {
       earlyBusyEmitted = false;
       return { text: null, toolMedia: [] };
     }
+    if (promptKnowledgeRefs) {
+      // 检索阶段收口（2026-08-31 三轮）：过程行堆补一条「正在生成回答」，盖住
+      // 主模型预填充+生成这段无流式输出的等待（此前该阶段裸露为三个点）。
+      // 前端在答案正文首个 text_delta 到达时整堆收起。
+      engine.emitEvent?.({
+        type: "knowledge_trace",
+        sessionPath,
+        id: "answer",
+        kind: "note",
+        phase: "start",
+        detail: "answer",
+      }, sessionPath);
+    }
 
     const reminderBlock = preservePromptEnvelope ? null : renderPendingReminderBlock(engine, sessionPath);
     if (reminderBlock?.block) {
@@ -868,6 +881,15 @@ export async function submitDesktopSessionInterjection(engine: any, opts: {
     if (knowledgeInjectionBlock) {
       promptText = `${knowledgeInjectionBlock}\n\n${promptText}`;
     }
+    // 与 prompt 路径同一收口：主模型等待期的「正在生成回答」过程行。
+    engine.emitEvent?.({
+      type: "knowledge_trace",
+      sessionPath,
+      id: "answer",
+      kind: "note",
+      phase: "start",
+      detail: "answer",
+    }, sessionPath);
   }
   if (context?.beforeUser) {
     promptText = `${context.beforeUser}\n\n${promptText}`;

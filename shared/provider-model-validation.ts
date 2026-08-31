@@ -190,6 +190,14 @@ function validateModelMetadata(providerId, model) {
   if (Object.prototype.hasOwnProperty.call(model, "dimensions")) {
     validatePositiveNumber(providerId, modelId, model, "dimensions");
   }
+  // groupId：MiniMax embeddings 的必填 GroupId URL query 参数（null = 显式清除）
+  if (
+    Object.prototype.hasOwnProperty.call(model, "groupId")
+    && model.groupId !== null
+    && (typeof model.groupId !== "string" || !model.groupId.trim())
+  ) {
+    throw new ProviderModelMetadataValidationError(providerId, modelId, "groupId", "expected a non-empty string or null");
+  }
   if (!Object.prototype.hasOwnProperty.call(model, "thinkingLevelMap")) return;
   const map = model.thinkingLevelMap;
   if (!map || typeof map !== "object" || Array.isArray(map)) {

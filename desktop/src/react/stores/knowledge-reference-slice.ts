@@ -29,7 +29,8 @@ export interface KnowledgeReferenceSlice {
   clearKnowledgeReferences: (sessionKey: string) => void;
 }
 
-const DEFAULT_MODE: KnowledgeReferenceMode = 'qa';
+/** 新引用默认快速档（2026-08-31 两档化）：最快速度 + 高命中头部证据；深读切详细。 */
+const DEFAULT_MODE: KnowledgeReferenceMode = 'fast';
 
 function resolveSessionKey(state: unknown, sessionKey: string): string {
   return sessionScopedKey(state as Parameters<typeof sessionScopedKey>[0], sessionKey) || sessionKey;

@@ -170,21 +170,45 @@ describe("ModelOperationResolver registry integration", () => {
     });
   });
 
-  it("dashscope 自添加重排条目按供应商推断 cohere-rerank 协议的兼容模式端点", async () => {
+  it("dashscope 自添加重排条目推断 dashscope-rerank 双端点方言", async () => {
     const registry = new ProviderRegistry(tempRoot());
     registry.saveProvider("dashscope", {
-      models: [{ id: "gte-rerank-v2", operations: ["rerank"] }],
+      models: [
+        { id: "gte-rerank-v2", operations: ["rerank"] },
+        { id: "qwen3-rerank", operations: ["rerank"] },
+      ],
+    });
+
+    // 双端点方言内部按模型 id 分流（原生嵌套 vs 兼容扁平），目录层统一标记同一协议
+    for (const modelId of ["gte-rerank-v2", "qwen3-rerank"]) {
+      const resolver = makeRegistryResolver(
+        registry,
+        { id: modelId, provider: "dashscope" },
+        providerCatalogCredential,
+      );
+      await expect(resolver.resolveFresh("rerank")).resolves.toMatchObject({
+        operation: "rerank",
+        api: "dashscope-rerank",
+        baseUrl: "https://dashscope.aliyuncs.com/compatible-mode/v1",
+      });
+    }
+  });
+
+  it("minimax 自添加嵌入条目按供应商推断 minimax-embeddings 协议", async () => {
+    const registry = new ProviderRegistry(tempRoot());
+    registry.saveProvider("minimax", {
+      models: [{ id: "embo-01", operations: ["embedding"] }],
     });
     const resolver = makeRegistryResolver(
       registry,
-      { id: "gte-rerank-v2", provider: "dashscope" },
+      { id: "embo-01", provider: "minimax" },
       providerCatalogCredential,
     );
 
-    await expect(resolver.resolveFresh("rerank")).resolves.toMatchObject({
-      operation: "rerank",
-      api: "cohere-rerank",
-      baseUrl: "https://dashscope.aliyuncs.com/compatible-mode/v1",
+    await expect(resolver.resolveFresh("embedding")).resolves.toMatchObject({
+      operation: "embedding",
+      api: "minimax-embeddings",
+      baseUrl: "https://api.minimaxi.com/anthropic",
     });
   });
 

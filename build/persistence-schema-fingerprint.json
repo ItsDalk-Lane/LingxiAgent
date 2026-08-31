@@ -660,7 +660,7 @@
     ],
     "version": 3
   },
-  "payloadFingerprint": "sha256:7316ccbf83072b075a76e861c110365bda399554823ae3db0278674b086d6f69",
+  "payloadFingerprint": "sha256:5f525a1dca055ac97938d71d729f457b6bd2a11650ccecfe18da2903f3eb381a",
   "registry": [
     {
       "affectedByEpochMigration": true,
@@ -3285,8 +3285,8 @@
   ],
   "review": {
     "classification": "compatible",
-    "compatibilityReason": "合并 main（PR #30 向量保留）：knowledge schema v16→v17 additive（notebooks.vector_retention_days，PR #30 原 v9 重编号，幂等 ALTER）；向量索引库 schema v2→v3 additive（vector_index_variants + last_used_at，v2 老库按表形分流迁移，不重算向量）",
-    "payloadFingerprint": "sha256:7316ccbf83072b075a76e861c110365bda399554823ae3db0278674b086d6f69"
+    "compatibilityReason": "session-coordinator.ts: cache-prefix guard now skips non-chat purpose side lanes (knowledge rollup rounds); engine.ts: rollup side-lane call wrapped in purpose scope; knowledge-rollup.ts: part size cap. No persisted store shape or site mapping change",
+    "payloadFingerprint": "sha256:5f525a1dca055ac97938d71d729f457b6bd2a11650ccecfe18da2903f3eb381a"
   },
   "schemas": [
     {
@@ -3822,7 +3822,7 @@
         ],
         "userVersion": 17
       },
-      "sourceHash": "sha256:d69e3accf5d936297ae492459c67a723109e9c85564d84db164a5f6f5f002b08",
+      "sourceHash": "sha256:750e1194eac7e48f2e596d845954d90d8a8cc594a9dc5fd0a82f9d55af2a44e3",
       "storeId": "knowledge-database"
     },
     {
@@ -4197,7 +4197,7 @@
         {
           "contract": "core/session-coordinator.ts Hana metadata extensions",
           "module": "core/session-coordinator.ts",
-          "sourceHash": "sha256:79bea5413e65463f51675499e07281dc8dd33b9798c514d02ed57484fdf0272a"
+          "sourceHash": "sha256:bd949abdcbb3a9bf75c540c9ed2ac07ec43624abc2fa6eada720f5aa62c9337d"
         },
         {
           "contract": "core/session-jsonl-file.ts repair contract",

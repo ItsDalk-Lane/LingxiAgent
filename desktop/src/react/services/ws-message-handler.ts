@@ -537,6 +537,70 @@ function applyInputSessionConfirmationBlock(msg: any): void {
   );
 }
 
+
+// ── 知识过程 → 合成工具卡（2026-08-31 四轮）──
+// 把 knowledge_trace / knowledge_rollup_progress / knowledge_supplement_search
+// 翻译成 tool_start / tool_end 喂给既有工具卡管线：每个动作一张卡，从上往下
+// 长在助手消息流里（与编程 Agent 调工具/执行命令同一形态；tool_start 在无
+// 消息时会自动创建助手消息，后续 assistant_run_start/答案正文复用同一条）。
+// 卡片是纯前端合成（不出现在会话流协议里）；toolCallId 以 kt- 前缀幂等防重。
+const knowledgeReadCardBySession = new Map<string, string>();
+/** 「正在生成回答」卡在途的 session（无该卡的会话绝不喂合成 tool_end——空卡
+ * 的 tool_end 也会经 ensureMessage 凭空创建第二条助手消息）。 */
+const knowledgeAnswerCardSessions = new Set<string>();
+
+function feedKnowledgeToolCard(sp: string, event: Record<string, unknown>): void {
+  streamBufferManager.handle({ ...event, sessionPath: sp });
+}
+
+function feedKnowledgeThinkCard(sp: string, id: string, phase: string): void {
+  feedKnowledgeToolCard(sp, phase === 'start'
+    ? { type: 'tool_start', id, name: 'knowledge_think' }
+    : { type: 'tool_end', id, success: phase !== 'failed' });
+}
+
+function translatorT(): (key: string, vars?: Record<string, string>) => string {
+  const t = typeof window !== 'undefined' ? window.t : null;
+  return t ?? ((key: string) => key);
+}
+
+function feedKnowledgeSearchCard(sp: string, id: string, phase: string, query?: string, hits?: number): void {
+  const t = translatorT();
+  feedKnowledgeToolCard(sp, phase === 'start'
+    ? { type: 'tool_start', id, name: 'knowledge_search', args: { query: query ?? '' } }
+    : {
+      type: 'tool_end',
+      id,
+      success: phase !== 'failed',
+      resultNote: phase === 'failed'
+        ? t('chat.knowledgeTraceFailed')
+        : t('chat.knowledgeTraceResults', { n: String(hits ?? 0) }),
+    });
+}
+
+function feedKnowledgeReadCard(sp: string, current: number, total: number): void {
+  const previous = knowledgeReadCardBySession.get(sp);
+  if (previous) {
+    feedKnowledgeToolCard(sp, { type: 'tool_end', id: previous, success: true });
+  }
+  const id = `kt-read-${current}`;
+  feedKnowledgeToolCard(sp, {
+    type: 'tool_start',
+    id,
+    name: 'knowledge_read_part',
+    args: { current: String(current), total: String(total) },
+  });
+  knowledgeReadCardBySession.set(sp, id);
+}
+
+function settleKnowledgeReadCard(sp: string): void {
+  const open = knowledgeReadCardBySession.get(sp);
+  if (open) {
+    feedKnowledgeToolCard(sp, { type: 'tool_end', id: open, success: true });
+    knowledgeReadCardBySession.delete(sp);
+  }
+}
+
 // ── 消息分发（大 switch） ──
 
 export function handleServerMessage(msg: any): void {
@@ -547,20 +611,21 @@ export function handleServerMessage(msg: any): void {
 
   // 「知识库检索中」胶囊与「等待助手」pending 都是纯瞬态信号：该 session 的
   // 任何后续事件（status / session_user_message / 聊天流事件 / error…）到达都
-  // 代表前一阶段已结束，保守清除（两个 end 内部对未命中 session 都是零成本
+  // 代表前一阶段已结束，保守清除（各 end 内部对未命中 session 都是零成本
   // no-op）。knowledge_retrieval_started 自身不清 pending（发送 → 检索是同一段
-  // 等待），也不被自己清除；knowledge_distill_progress / knowledge_coverage_progress
-  // 是检索期内的分段进度（Phase 9 第二波新增 coverage 进度，渲染留给后续版本，
-  // 本波只保证不清检索态、未知事件不崩），同样排除。
+  // 等待），也不被自己清除；knowledge_rollup_progress / knowledge_supplement_search
+  // 是检索期内的滚动注入分段进度（自身不清检索态），同样排除。
   if (msg?.type !== 'knowledge_retrieval_started'
-    && msg?.type !== 'knowledge_distill_progress'
-    && msg?.type !== 'knowledge_coverage_progress') {
+    && msg?.type !== 'knowledge_trace'
+    && msg?.type !== 'knowledge_rollup_progress'
+    && msg?.type !== 'knowledge_supplement_search') {
     const { sessionPath: retrievalDonePath } = sessionIdentityFromMessage(msg);
     // 与 markSessionOutputUnread? 同策略：部分测试 store / 旧 slice 组合缺 action 时不炸。
     if (retrievalDonePath) {
       useStore.getState().endKnowledgeRetrieval?.(retrievalDonePath);
       useStore.getState().endTurnPending?.(retrievalDonePath);
-      useStore.getState().endKnowledgeDistill?.(retrievalDonePath);
+      useStore.getState().endKnowledgeRollup?.(retrievalDonePath);
+      useStore.getState().endKnowledgeSupplement?.(retrievalDonePath);
     }
   }
 
@@ -595,6 +660,21 @@ export function handleServerMessage(msg: any): void {
   }
 
   applyInputSessionConfirmationBlock(msg);
+
+  // 知识过程卡的收口（2026-08-31 四轮）：答案正文开始流式输出时收尾阅读卡与
+  // 「正在生成回答」卡（正文与卡片同在一条助手消息里）；run 结束兜底（中止/
+  // 空回包）。卡片由流缓冲随消息渲染，无需额外清除。
+  if (msg.type === 'text_delta' || msg.type === 'assistant_run_end') {
+    const { sessionPath: traceDonePath } = sessionIdentityFromMessage(msg);
+    if (traceDonePath && knowledgeAnswerCardSessions.has(traceDonePath)) {
+      settleKnowledgeReadCard(traceDonePath);
+      feedKnowledgeToolCard(traceDonePath, { type: 'tool_end', id: 'kt-answer', success: true });
+      knowledgeAnswerCardSessions.delete(traceDonePath);
+    } else if (traceDonePath) {
+      // 无回答卡的会话仍要收尾可能的阅读卡（map 空时为 no-op）。
+      settleKnowledgeReadCard(traceDonePath);
+    }
+  }
 
   // 活跃 block 事件路由：非当前 session 的聊天事件也要写入正常聊天缓存。
   // stream-key-dispatcher 只负责卡片/预览订阅，不能吞掉主 transcript 的后台流。
@@ -1247,19 +1327,82 @@ export function handleServerMessage(msg: any): void {
       const sp = nonEmptyString(msg.sessionPath) || nonEmptyString(msg.path);
       if (!sp) { console.warn('[ws] knowledge_retrieval_started missing sessionPath, skipping'); break; }
       useStore.getState().beginKnowledgeRetrieval?.(sp);
+      // 新一轮检索：收尾上一轮可能残留的阅读卡（跨轮 Map 泄漏防护）。
+      settleKnowledgeReadCard(sp);
       break;
     }
 
-    case 'knowledge_distill_progress': {
-      // 蒸馏每批完成的进度（超预算证据分段压缩）：逐批更新「蒸馏中 · N 批」胶囊；
-      // 不进 stream_resume，结束同样由顶部保守清除（该 session 任意后续事件）。
+    case 'knowledge_rollup_progress': {
+      // 滚动注入中间轮进度（超预算证据分部分喂给主模型消化）：逐轮更新
+      // 「正在阅读第 X/N 部分」胶囊；不进 stream_resume，结束由顶部保守清除。
       const sp = nonEmptyString(msg.sessionPath) || nonEmptyString(msg.path);
-      if (!sp) { console.warn('[ws] knowledge_distill_progress missing sessionPath, skipping'); break; }
-      const done = Number(msg.done);
-      useStore.getState().updateKnowledgeDistill?.(sp, {
-        done: Number.isSafeInteger(done) && done > 0 ? done : 0,
-        model: typeof msg.model === 'string' && msg.model ? msg.model : null,
+      if (!sp) { console.warn('[ws] knowledge_rollup_progress missing sessionPath, skipping'); break; }
+      const current = Number(msg.current);
+      const total = Number(msg.total);
+      useStore.getState().updateKnowledgeRollup?.(sp, {
+        current: Number.isSafeInteger(current) && current > 0 ? current : 1,
+        total: Number.isSafeInteger(total) && total > 0 ? total : 1,
       });
+      // 阅读卡：每部分一张卡（第 k 部分开始时收尾第 k-1 张）。
+      feedKnowledgeReadCard(
+        sp,
+        Number.isSafeInteger(current) && current > 0 ? current : 1,
+        Number.isSafeInteger(total) && total > 0 ? total : 1,
+      );
+      break;
+    }
+
+    case 'knowledge_supplement_search': {
+      // 滚动循环内模型自主发起的补充检索（过程可见，不显中间内容）：展示查询行；
+      // 不进 stream_resume，结束由顶部保守清除。
+      const sp = nonEmptyString(msg.sessionPath) || nonEmptyString(msg.path);
+      if (!sp) { console.warn('[ws] knowledge_supplement_search missing sessionPath, skipping'); break; }
+      const queries = Array.isArray(msg.queries)
+        ? msg.queries.filter((q: unknown): q is string => typeof q === 'string' && !!q.trim())
+        : [];
+      const round = Number(msg.round);
+      useStore.getState().updateKnowledgeSupplement?.(sp, {
+        queries,
+        round: Number.isSafeInteger(round) && round > 0 ? round : 1,
+      });
+      // 补充检索决策卡（瞬时完成；随后每条真实检索经 knowledge_trace 各自成卡）。
+      const t = translatorT();
+      const supplementId = `kt-supplement-${Number.isSafeInteger(round) && round > 0 ? round : 1}`;
+      feedKnowledgeToolCard(sp, { type: 'tool_start', id: supplementId, name: 'knowledge_supplement' });
+      feedKnowledgeToolCard(sp, {
+        type: 'tool_end',
+        id: supplementId,
+        success: true,
+        resultNote: t('chat.knowledgeSupplementQueryCount', { count: String(queries.length) }),
+      });
+      break;
+    }
+
+    case 'knowledge_trace': {
+      // 知识注入过程行（拆解/检索逐阶段）：按 id 原位更新过程行堆——start
+      // 显示查询词/思考态，done 原位变成「N 个搜索结果」。不进 stream_resume，
+      // 结束由顶部保守清除（真实轮消息到达整堆收起）。
+      const sp = nonEmptyString(msg.sessionPath) || nonEmptyString(msg.path);
+      if (!sp) { console.warn('[ws] knowledge_trace missing sessionPath, skipping'); break; }
+      const id = nonEmptyString(msg.id);
+      if (!id) { console.warn('[ws] knowledge_trace missing id, skipping'); break; }
+      const phaseRaw = msg.phase === 'done' || msg.phase === 'failed' ? msg.phase : 'start';
+      if (msg.kind === 'think') {
+        feedKnowledgeThinkCard(sp, `kt-${id}`, phaseRaw);
+      } else if (msg.detail === 'answer') {
+        // 检索收口：阅读卡收尾 + 「正在生成回答」卡盖住主模型预填充等待。
+        settleKnowledgeReadCard(sp);
+        feedKnowledgeToolCard(sp, { type: 'tool_start', id: 'kt-answer', name: 'knowledge_answer' });
+        knowledgeAnswerCardSessions.add(sp);
+      } else {
+        feedKnowledgeSearchCard(
+          sp,
+          `kt-${id}`,
+          phaseRaw,
+          typeof msg.query === 'string' ? msg.query : undefined,
+          Number.isFinite(Number(msg.hits)) ? Number(msg.hits) : undefined,
+        );
+      }
       break;
     }
 

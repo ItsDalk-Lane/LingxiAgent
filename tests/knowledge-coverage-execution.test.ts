@@ -96,7 +96,6 @@ function planOf(overrides: Partial<KnowledgeCoveragePlan> = {}): KnowledgeCovera
   return {
     intent: "fact_lookup",
     coverageMode: "high_recall",
-    requiresCompleteness: false,
     scopeLevel: "source",
     confidence: 0.75,
     matchedRuleIds: [],
@@ -124,7 +123,13 @@ describe("受控查询扩展（§三十五）", () => {
     );
     expect(() => parseQueryExpansion("not json", [])).toThrow();
     expect(() => parseQueryExpansion('{"expansions":["  "]}', [])).toThrow();
-    expect(() => parseQueryExpansion('{"expansions":["x"],"extra":1}', [])).toThrow();
+    // 宽容输入 + 严格消费（2026-08-30 拆解优化）：未知字段忽略不整体拒绝，
+    // 白名单只消费 expansions——无害格式偏差不再浪费一次 8s 纠错。
+    expect(parseQueryExpansion('{"expansions":["x"],"extra":1}', [])).toEqual(["x"]);
+    // 必需字段缺失仍拒绝。
+    expect(() => parseQueryExpansion('{"extra":1}', [])).toThrow();
+    // Markdown 围栏包裹被程序剥离，不算失败（§14 格式错误不走 LLM 纠错）。
+    expect(parseQueryExpansion('```json\n{"expansions":["x"]}\n```', [])).toEqual(["x"]);
   });
 
   it("扩展成功：扩展查询与子查询同样并行检索、进 RRF；块内列出采纳的扩展", async () => {
@@ -133,11 +138,10 @@ describe("受控查询扩展（§三十五）", () => {
     const queries: string[] = [];
     const { block, stats } = await buildKnowledgeContextInjection({
       question: "问题",
-      mode: "qa",
+      mode: "detailed",
       deps: {
         decomposeModel: DECOMPOSE_MODEL,
         expandModel,
-        distillModel: null,
         retrieve: async ({ query }) => {
           queries.push(query);
           return fakeRetrieval([fakeChunk({ id: `c-${query}`, text: `证据-${query}` })]);
@@ -161,11 +165,10 @@ describe("受控查询扩展（§三十五）", () => {
     const queries: string[] = [];
     const { stats } = await buildKnowledgeContextInjection({
       question: "问题",
-      mode: "qa",
+      mode: "detailed",
       deps: {
         decomposeModel: DECOMPOSE_MODEL,
         expandModel,
-        distillModel: null,
         retrieve: async ({ query }) => {
           queries.push(query);
           return fakeRetrieval([fakeChunk({ id: `c-${query}` })]);
@@ -187,11 +190,10 @@ describe("受控查询扩展（§三十五）", () => {
     const queries: string[] = [];
     const { stats } = await buildKnowledgeContextInjection({
       question: "问题",
-      mode: "qa",
+      mode: "detailed",
       deps: {
         decomposeModel: DECOMPOSE_MODEL,
         expandModel,
-        distillModel: null,
         retrieve: async ({ query }) => {
           queries.push(query);
           return fakeRetrieval([]);
@@ -204,11 +206,10 @@ describe("受控查询扩展（§三十五）", () => {
     const failing: QueryExpansionModel = async () => "still not json";
     const second = await buildKnowledgeContextInjection({
       question: "问题",
-      mode: "qa",
+      mode: "detailed",
       deps: {
         decomposeModel: DECOMPOSE_MODEL,
         expandModel: failing,
-        distillModel: null,
         retrieve: async ({ query }) => {
           queries.push(query);
           return fakeRetrieval([]);
@@ -224,7 +225,6 @@ describe("受控查询扩展（§三十五）", () => {
     const queries: string[] = [];
     const base = {
       decomposeModel: DECOMPOSE_MODEL,
-      distillModel: null as null,
       retrieve: async ({ query }: { query: string }) => {
         queries.push(query);
         return fakeRetrieval([]);
@@ -232,7 +232,7 @@ describe("受控查询扩展（§三十五）", () => {
     };
     const noModel = await buildKnowledgeContextInjection({
       question: "问题",
-      mode: "qa",
+      mode: "detailed",
       deps: { ...base, expandModel: null },
     });
     expect(noModel.stats.expansionDegradeReason).toBe("knowledge model slot not configured");
@@ -243,7 +243,7 @@ describe("受控查询扩展（§三十五）", () => {
     queries.length = 0;
     const failing = await buildKnowledgeContextInjection({
       question: "问题",
-      mode: "qa",
+      mode: "detailed",
       deps: {
         ...base,
         expandModel: async () => {
@@ -258,10 +258,9 @@ describe("受控查询扩展（§三十五）", () => {
   it("拆解降级（无模型）时不尝试扩展：无扩展留痕（拆解留痕已覆盖原因）", async () => {
     const { stats, block } = await buildKnowledgeContextInjection({
       question: "问题",
-      mode: "qa",
+      mode: "detailed",
       deps: {
         decomposeModel: null,
-        distillModel: null,
         retrieve: async () => fakeRetrieval([fakeChunk()]),
       },
     });
@@ -297,24 +296,27 @@ describe("HIGH_RECALL：预算链与邻接扩展（§二十六/§三十六/§九
     expect(fused[0].id).toBe("c0"); // 截断保序：RRF 名次前列保留
   });
 
-  it("candidate budget 链逐级截断并留痕计数：150 候选 → unique 60 → evidence 40", async () => {
+  it("candidate budget 链逐级截断并留痕计数：150 候选 → 融合池/锚点随预算伸缩", async () => {
     const candidates = Array.from({ length: 150 }, (_, index) => fakeChunk({ id: `c${index}`, ordinal: index }));
+    // 兜底预算（6000）× 假块 ~5 token：融合池上限 = min(480, 6000×0.7/5) = 480
+    // → 150 候选全部入池；锚点上限 = min(240, 6000×0.5/5) = 240 → 全部成为锚点
+    // （2026-08-30 阀 A/阀 B 均随预算倒推后的语义；真实块 ~1300 token 时池子
+    // 仍在 60 水位地板，见 resolveFusionPoolBudget 单测）。
     const { block, stats } = await buildKnowledgeContextInjection({
       question: "问题",
-      mode: "qa",
+      mode: "detailed",
       deps: {
         decomposeModel: null,
-        distillModel: null,
         retrieve: async () => fakeRetrieval(candidates),
       },
     });
     expect(stats.candidateChunkCount).toBe(150);
-    expect(stats.uniqueChunkCount).toBe(KNOWLEDGE_FUSION_BUDGET);
-    expect(stats.fusedChunks).toBe(KNOWLEDGE_EVIDENCE_BUDGET);
-    expect(stats.injectedChunks).toBe(KNOWLEDGE_EVIDENCE_BUDGET);
-    // 超出 evidenceBudget 的融合候选显式留痕（禁静默丢弃）。
-    expect(block).toContain("fused candidates beyond the evidence budget");
-    expect((block.match(/\[K\d+\] notebook/g) || []).length).toBe(KNOWLEDGE_EVIDENCE_BUDGET);
+    expect(stats.uniqueChunkCount).toBe(150);
+    expect(stats.fusedChunks).toBe(150);
+    expect(stats.injectedChunks).toBe(150);
+    // 融合候选全部成为锚点：无 "beyond the evidence budget" 截断留痕。
+    expect(block).not.toContain("fused candidates beyond the evidence budget");
+    expect((block.match(/\[K\d+\] notebook/g) || []).length).toBe(150);
   });
 
   it("邻接扩展 ±1：contextOnly 标记、计入 neighborExpansionCount、不计检索命中/footprint 分子", async () => {
@@ -325,10 +327,9 @@ describe("HIGH_RECALL：预算链与邻接扩展（§二十六/§三十六/§九
     const readCalls: Array<{ anchorOrdinal: number; ordinals: number[] }> = [];
     const { block, stats } = await buildKnowledgeContextInjection({
       question: "问题",
-      mode: "qa",
+      mode: "detailed",
       deps: {
         decomposeModel: null,
-        distillModel: null,
         retrieve: async () => fakeRetrieval([anchorA, anchorB]),
         readNeighborChunks: ({ anchor, ordinals }) => {
           readCalls.push({ anchorOrdinal: anchor.ordinal, ordinals: [...ordinals] });
@@ -364,10 +365,9 @@ describe("HIGH_RECALL：预算链与邻接扩展（§二十六/§三十六/§九
     const far = fakeChunk({ id: "far", ordinal: 40, text: "远处块" });
     const { stats, block } = await buildKnowledgeContextInjection({
       question: "问题",
-      mode: "qa",
+      mode: "detailed",
       deps: {
         decomposeModel: async () => validDecomposeOutput(["子查询一", "子查询二"]),
-        distillModel: null,
         retrieve: async ({ query }) => fakeRetrieval(
           query === "子查询一" ? [shared, adjacent] : [shared, adjacent, far],
         ),
@@ -388,10 +388,9 @@ describe("HIGH_RECALL：预算链与邻接扩展（§二十六/§三十六/§九
   it("readNeighborChunks 未接线：不扩展、stats.neighborExpansionCount = 0（调用方未启用）", async () => {
     const { stats, block } = await buildKnowledgeContextInjection({
       question: "问题",
-      mode: "qa",
+      mode: "detailed",
       deps: {
         decomposeModel: null,
-        distillModel: null,
         retrieve: async () => fakeRetrieval([fakeChunk({ id: "a1", ordinal: 1 })]),
       },
     });
@@ -412,11 +411,10 @@ describe("HIGH_RECALL：预算链与邻接扩展（§二十六/§三十六/§九
     }));
     const { stats } = await buildKnowledgeContextInjection({
       question: "问题",
-      mode: "qa",
+      mode: "detailed",
       budgetTokens: 900,
       deps: {
         decomposeModel: null,
-        distillModel: null,
         retrieve: async () => fakeRetrieval(anchors),
         readNeighborChunks: ({ anchor }) => {
           const index = anchors.findIndex(candidate => candidate.id === anchor.id);
@@ -471,8 +469,8 @@ describe("BROAD：Source Coverage Floor 与 Section Coverage（§九十五）", 
     const { retrieve, constrainedCalls } = createFourSourceFacade();
     const { stats } = await buildKnowledgeContextInjection({
       question: "这些文件分别如何看待 X？",
-      mode: "qa",
-      deps: { decomposeModel: null, distillModel: null, retrieve },
+      mode: "detailed",
+      deps: { decomposeModel: null, retrieve },
       coveragePlan: planOf({ coverageMode: "broad", intent: "cross_source_synthesis", scopeLevel: "multi_source" }),
     });
     const probedSources = new Set(constrainedCalls.flatMap(call => call.sourceIds ?? []));
@@ -486,8 +484,8 @@ describe("BROAD：Source Coverage Floor 与 Section Coverage（§九十五）", 
     const { retrieve } = createFourSourceFacade();
     const { block, stats } = await buildKnowledgeContextInjection({
       question: "这些文件分别如何看待 X？",
-      mode: "qa",
-      deps: { decomposeModel: null, distillModel: null, retrieve },
+      mode: "detailed",
+      deps: { decomposeModel: null, retrieve },
       coveragePlan: planOf({ coverageMode: "broad", intent: "cross_source_synthesis", scopeLevel: "multi_source" }),
     });
     expect(block).toContain('[no relevant evidence found in source "B.pdf" (sourceId: src-b)]');
@@ -520,10 +518,9 @@ describe("BROAD：Source Coverage Floor 与 Section Coverage（§九十五）", 
     const constrainedCalls: Array<{ sourceIds?: string[]; sectionsBySourceId?: Map<string, string[]> }> = [];
     const { stats, block } = await buildKnowledgeContextInjection({
       question: "这本书整体如何演进？",
-      mode: "qa",
+      mode: "detailed",
       deps: {
         decomposeModel: null,
-        distillModel: null,
         retrieve: async ({ sourceIds, sectionsBySourceId }) => {
           if (sourceIds) {
             constrainedCalls.push({ sourceIds: [...sourceIds], sectionsBySourceId: sectionsBySourceId ? new Map(sectionsBySourceId) : undefined });
@@ -552,10 +549,9 @@ describe("BROAD：Source Coverage Floor 与 Section Coverage（§九十五）", 
     const constrainedCalls: Array<{ sourceIds?: string[] }> = [];
     const { stats } = await buildKnowledgeContextInjection({
       question: "第二章里的那个日期是什么？",
-      mode: "qa",
+      mode: "detailed",
       deps: {
         decomposeModel: null,
-        distillModel: null,
         retrieve: async ({ sourceIds }) => {
           if (sourceIds) {
             constrainedCalls.push({ sourceIds: [...sourceIds] });
@@ -575,8 +571,8 @@ describe("BROAD：Source Coverage Floor 与 Section Coverage（§九十五）", 
     const { retrieve, constrainedCalls } = createFourSourceFacade();
     const { stats, block } = await buildKnowledgeContextInjection({
       question: "X 的相关记录都在哪？",
-      mode: "qa",
-      deps: { decomposeModel: null, distillModel: null, retrieve },
+      mode: "detailed",
+      deps: { decomposeModel: null, retrieve },
       coveragePlan: planOf({ coverageMode: "high_recall", scopeLevel: "multi_source" }),
     });
     expect(stats.upgradedTo).toBe("broad");
@@ -596,8 +592,8 @@ describe("BROAD：Source Coverage Floor 与 Section Coverage（§九十五）", 
     ], ALL_SOURCES);
     const full = await buildKnowledgeContextInjection({
       question: "问题",
-      mode: "qa",
-      deps: { decomposeModel: null, distillModel: null, retrieve: allHit },
+      mode: "detailed",
+      deps: { decomposeModel: null, retrieve: allHit },
       coveragePlan: planOf({ coverageMode: "high_recall", scopeLevel: "multi_source" }),
     });
     expect(full.stats.upgradedTo).toBeUndefined();
@@ -608,10 +604,9 @@ describe("BROAD：Source Coverage Floor 与 Section Coverage（§九十五）", 
     const lone = fakeChunk({ sourceId: "src-only" });
     const single = await buildKnowledgeContextInjection({
       question: "问题",
-      mode: "qa",
+      mode: "detailed",
       deps: {
         decomposeModel: null,
-        distillModel: null,
         retrieve: async () => fakeRetrieval([lone], [singleSource]),
       },
       coveragePlan: planOf({ coverageMode: "high_recall", scopeLevel: "source" }),
@@ -620,29 +615,24 @@ describe("BROAD：Source Coverage Floor 与 Section Coverage（§九十五）", 
     expect(single.stats.secondaryRetrievalCount).toBe(0);
   });
 
-  it("exhaustive 计划但执行面未接线：显式降格 broad + coverageDegradeReason 留痕，块内不声称完整性", async () => {
+  it("存量旧值 exhaustive 计划：直接按 broad 执行（结构探测照常），无降格留痕负担", async () => {
     const { retrieve, constrainedCalls } = createFourSourceFacade();
     const { block, stats } = await buildKnowledgeContextInjection({
       question: "全文提到的风险都列出来",
-      mode: "qa",
-      deps: { decomposeModel: null, distillModel: null, retrieve },
+      mode: "detailed",
+      deps: { decomposeModel: null, retrieve },
       coveragePlan: planOf({
         coverageMode: "exhaustive",
-        requiresCompleteness: true,
         intent: "whole_scope_analysis",
         scopeLevel: "multi_source",
       }),
     });
+    // 块头如实透出存量计划档位；执行侧按 broad（exhaustive 档已移除）。
     expect(stats.coverageMode).toBe("exhaustive");
-    expect(stats.requiresCompleteness).toBe(true);
-    // 无 coverage 执行面（deps.coverage 缺省）：显式降格 broad，不再有 phase-9 占位标记。
     expect(stats.executedCoverageMode).toBe("broad");
-    expect(stats.coverageDegradeReason).toBe("coverage execution is not wired");
-    expect(stats).not.toHaveProperty("exhaustivePending");
+    expect(stats).not.toHaveProperty("coverageDegradeReason");
     expect(block).toContain("[coverage: exhaustive · multi_source]");
-    expect(block).toContain("[coverage execution degraded to broad: coverage execution is not wired");
-    expect(block).toContain("no completeness claim is made for this turn");
-    // 降格后 broad 档结构探测照常执行。
+    // broad 档结构探测照常执行。
     expect(constrainedCalls.length).toBeGreaterThan(0);
   });
 
@@ -650,8 +640,8 @@ describe("BROAD：Source Coverage Floor 与 Section Coverage（§九十五）", 
     const { retrieve, constrainedCalls } = createFourSourceFacade();
     const { stats } = await buildKnowledgeContextInjection({
       question: "问题",
-      mode: "qa",
-      deps: { decomposeModel: null, distillModel: null, retrieve },
+      mode: "detailed",
+      deps: { decomposeModel: null, retrieve },
     });
     expect(constrainedCalls).toHaveLength(0);
     expect(stats.secondaryRetrievalCount).toBe(0);
@@ -669,10 +659,9 @@ describe("BROAD：Source Coverage Floor 与 Section Coverage（§九十五）", 
     const hit = fakeChunk({ sourceId: "src-ok", sourceName: "OK.pdf" });
     const { block, stats } = await buildKnowledgeContextInjection({
       question: "问题",
-      mode: "qa",
+      mode: "detailed",
       deps: {
         decomposeModel: null,
-        distillModel: null,
         retrieve: async ({ sourceIds }) => {
           if (sourceIds) {
             return {
@@ -857,10 +846,9 @@ describe("retrieveForNotebooks 约束检索与 readAdjacentChunks（真实索引
     const spy = vi.spyOn(manager.queryService, "retrieveForNotebooks");
     const { block, stats } = await buildKnowledgeContextInjection({
       question: "信标",
-      mode: "qa",
+      mode: "detailed",
       deps: {
         decomposeModel: null,
-        distillModel: null,
         retrieve: ({ query, sourceIds, sectionsBySourceId }) => manager.queryService.retrieveForNotebooks({
           studioId,
           notebookIds: [notebook.id],

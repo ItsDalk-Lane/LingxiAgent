@@ -34,6 +34,7 @@ import {
   resolveReferenceBudgetTokens,
 } from "./session-reminders.ts";
 import { diffCatalogNames, formatCatalogChangeLines } from "./tool-catalog.ts";
+import { currentProviderCompatPurpose } from "./provider-compat/purpose-scope.ts";
 import { createModuleLogger } from "../lib/debug-log.ts";
 import { BrowserManager } from "../lib/browser/browser-manager.ts";
 import { t, getLocale } from "../lib/i18n.ts";
@@ -7251,6 +7252,17 @@ export class SessionCoordinator {
       // 契约只覆盖普通轮次，原生压缩与分支摘要用的是各自的 prompt；保缓存的旁路任务
       // 仍由它们自己的严格会话快照契约把关。
       if (entry.session?.isCompacting !== true) {
+        // 非普通聊天用途（压缩/知识滚动注入等侧线）不参与主聊天前缀契约，也不
+        // 进 Context Ring 分类——它们用各自的 prompt，混入会把契约判成漂移、把
+        // 上下文分类刷成侧线请求（2026-08-31：滚动注入轮曾把主轮系统提示词顶掉）。
+        if (currentProviderCompatPurpose() !== "chat") {
+          return originalStreamFn.call(
+            agent,
+            model,
+            context,
+            withProviderCacheAffinity(options, model, entry.providerCacheAffinityKey),
+          );
+        }
         this._assertCachePrefixContract(sessionPath, entry, { model, context });
         // Context Ring 详情（任务十八/十九）：这里是唯一能看到完整最终请求
         // {systemPrompt, messages, tools} 的边界，逐请求做来源分类统计并缓存到

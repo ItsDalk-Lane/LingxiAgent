@@ -51,12 +51,6 @@ import {
   type KnowledgeCoveragePlan,
   type KnowledgeCoveragePlanRecord,
 } from "./knowledge-coverage-planner.ts";
-import type {
-  CoverageRunRecord,
-  CoverageRunStatus,
-  CoverageShardRecord,
-  CoverageShardStatus,
-} from "./knowledge-coverage-executor.ts";
 
 export const KNOWLEDGE_SCHEMA_VERSION = 17;
 
@@ -64,12 +58,6 @@ const SOURCE_TYPES = new Set<KnowledgeSourceType>(["file", "pasted_text", "web_s
 const PARSE_STATUSES = new Set<KnowledgeParseStatus>(["parsing", "ready", "needs_ocr", "failed"]);
 const INGESTION_PHASES = new Set<IngestionPhase>(["parse", "chunk", "fts_index", "embed", "done"]);
 const INGESTION_STATUSES = new Set<IngestionJobStatus>(["queued", "running", "pending_embedding", "failed", "done"]);
-const COVERAGE_RUN_STATUSES = new Set<CoverageRunStatus>([
-  "pending", "running", "complete", "partial", "cancelled", "failed",
-]);
-const COVERAGE_SHARD_STATUSES = new Set<CoverageShardStatus>([
-  "pending", "running", "completed", "failed", "cancelled",
-]);
 const PROCESSING_STATUSES = new Set<KnowledgeProcessingArtifact["status"]>([
   "processing", "ready", "failed",
 ]);
@@ -413,44 +401,6 @@ function toCoveragePlanRecord(row: any): KnowledgeCoveragePlanRecord | null {
     classifierUsed: row.classifier_used,
     degradeReason: row.degrade_reason || null,
     createdAt: row.created_at,
-  };
-}
-
-function toCoverageRunRecord(row: any): CoverageRunRecord | null {
-  if (!row) return null;
-  if (!COVERAGE_RUN_STATUSES.has(row.status)) {
-    throw new KnowledgeError("KNOWLEDGE_STORAGE_INVALID", "Coverage run state is invalid");
-  }
-  return {
-    id: row.id,
-    turnScopeId: row.turn_scope_id,
-    manifestHash: row.manifest_hash,
-    manifestJson: row.manifest_json,
-    status: row.status,
-    expectedUnits: Number(row.expected_units),
-    processedUnits: Number(row.processed_units),
-    failedUnits: Number(row.failed_units),
-    createdAt: row.created_at,
-    updatedAt: row.updated_at,
-  };
-}
-
-function toCoverageShardRecord(row: any): CoverageShardRecord | null {
-  if (!row) return null;
-  if (!COVERAGE_SHARD_STATUSES.has(row.status)) {
-    throw new KnowledgeError("KNOWLEDGE_STORAGE_INVALID", "Coverage shard state is invalid");
-  }
-  return {
-    id: row.id,
-    runId: row.run_id,
-    ordinal: Number(row.ordinal),
-    unitIds: parseStringArrayJson(row.unit_ids_json, "coverage shard units"),
-    contextBeforeUnitIds: parseStringArrayJson(row.context_before_ids_json, "coverage shard context before"),
-    contextAfterUnitIds: parseStringArrayJson(row.context_after_ids_json, "coverage shard context after"),
-    status: row.status,
-    attemptCount: Number(row.attempt_count),
-    resultJson: row.result_json || null,
-    updatedAt: row.updated_at,
   };
 }
 
@@ -3104,7 +3054,6 @@ export class KnowledgeStore {
     plan: {
       intent: unknown;
       coverageMode: unknown;
-      requiresCompleteness: unknown;
       scopeLevel: unknown;
       subQueries?: unknown;
       confidence: unknown;
@@ -3123,9 +3072,6 @@ export class KnowledgeStore {
     }
     if (!isKnowledgeCoverageMode(plan.coverageMode)) {
       throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "plan.coverageMode is invalid");
-    }
-    if (typeof plan.requiresCompleteness !== "boolean") {
-      throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "plan.requiresCompleteness must be a boolean");
     }
     if (!isKnowledgeCoverageScopeLevel(plan.scopeLevel)) {
       throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "plan.scopeLevel is invalid");
@@ -3175,7 +3121,7 @@ export class KnowledgeStore {
       question,
       plan.intent,
       plan.coverageMode,
-      plan.requiresCompleteness ? 1 : 0,
+      0, // requires_completeness：exhaustive 档移除后新行恒 0（遗留列，存量行保留原值）
       plan.scopeLevel,
       JSON.stringify(subQueries),
       confidence,
@@ -3205,235 +3151,6 @@ export class KnowledgeStore {
       SELECT * FROM knowledge_coverage_plans
       ORDER BY created_at DESC, rowid DESC LIMIT 1
     `).get());
-  }
-
-  /**
-   * 创建 CoverageRun（schema v14，任务书 §六十五）：run 行（pending）+ 全部
-   * shard 行（pending）同事务落库。manifestJson 是冻结 manifest 的完整序列化
-   * （含 unit 文本，恢复时 worker 输入的唯一来源），上限 64MB 防失控。shard 的
-   * id/ordinal/unit 序列由 executor 的确定性分片给定，store 只做形状校验。
-   */
-  createCoverageRun(input: {
-    turnScopeId: unknown;
-    manifestHash: unknown;
-    manifestJson: unknown;
-    expectedUnits: unknown;
-    shards: unknown;
-  }): { run: CoverageRunRecord; shards: CoverageShardRecord[] } {
-    const turnScopeId = requiredString(input?.turnScopeId, "turnScopeId", 128);
-    if (!this.db.prepare(`SELECT 1 FROM knowledge_turn_scopes WHERE id = ?`).get(turnScopeId)) {
-      throw new KnowledgeError("KNOWLEDGE_NOT_FOUND", "turnScopeId does not reference an existing turn scope");
-    }
-    const manifestHash = sha256(input?.manifestHash);
-    if (typeof input?.manifestJson !== "string" || !input.manifestJson.trim()) {
-      throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "manifestJson must be a non-empty string");
-    }
-    if (Buffer.byteLength(input.manifestJson, "utf8") > 64 * 1024 * 1024) {
-      throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "manifestJson exceeds the 64MB limit");
-    }
-    const expectedUnits = input?.expectedUnits;
-    if (!Number.isSafeInteger(expectedUnits) || Number(expectedUnits) < 0) {
-      throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "expectedUnits must be a non-negative integer");
-    }
-    if (!Array.isArray(input?.shards)) {
-      throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "shards must be an array");
-    }
-    const normalizedShards = input.shards.map((shard: any, index: number) => {
-      if (!shard || typeof shard !== "object") {
-        throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "shard entries must be objects");
-      }
-      const ordinal = Number(shard.ordinal);
-      if (!Number.isSafeInteger(ordinal) || ordinal !== index || ordinal < 0) {
-        throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "shard ordinals must be contiguous");
-      }
-      return {
-        id: requiredString(shard.id, "shard id", 128),
-        ordinal,
-        unitIds: serializeStringArray(shard.unitIds, "shard unitIds"),
-        contextBeforeIds: serializeStringArray(shard.contextBeforeUnitIds, "shard contextBeforeUnitIds"),
-        contextAfterIds: serializeStringArray(shard.contextAfterUnitIds, "shard contextAfterUnitIds"),
-      };
-    });
-    const id = this.newId("covrun");
-    const now = this.now();
-    return this.db.transaction(() => {
-      this.db.prepare(`
-        INSERT INTO coverage_runs (
-          id, turn_scope_id, manifest_hash, manifest_json, status,
-          expected_units, processed_units, failed_units, created_at, updated_at
-        ) VALUES (?, ?, ?, ?, 'pending', ?, 0, 0, ?, ?)
-      `).run(id, turnScopeId, manifestHash, input.manifestJson, Number(expectedUnits), now, now);
-      const insertShard = this.db.prepare(`
-        INSERT INTO coverage_shards (
-          id, run_id, ordinal, unit_ids_json, context_before_ids_json,
-          context_after_ids_json, status, attempt_count, result_json, updated_at
-        ) VALUES (?, ?, ?, ?, ?, ?, 'pending', 0, NULL, ?)
-      `);
-      for (const shard of normalizedShards) {
-        insertShard.run(
-          shard.id, id, shard.ordinal, shard.unitIds,
-          shard.contextBeforeIds, shard.contextAfterIds, now,
-        );
-      }
-      return this.getCoverageRun({ runId: id })!;
-    })();
-  }
-
-  /**
-   * 恢复入口（§六十五）：取同 manifestHash 最新一条非终态（≠complete/cancelled）
-   * run，同事务执行 recovery policy——running shard 置回 pending（进程中断残留），
-   * completed 原样保留（executor 直接复用 result_json，不重跑），failed/cancelled
-   * 是该 run 内的终态（重试语义属于新 run）。无可恢复 run 返回 null。
-   */
-  loadResumableCoverageRun(input: { manifestHash: unknown }): {
-    run: CoverageRunRecord;
-    shards: CoverageShardRecord[];
-  } | null {
-    const manifestHash = sha256(input?.manifestHash);
-    return this.db.transaction(() => {
-      const row = this.db.prepare(`
-        SELECT * FROM coverage_runs
-        WHERE manifest_hash = ? AND status NOT IN ('complete', 'cancelled')
-        ORDER BY created_at DESC, rowid DESC
-        LIMIT 1
-      `).get(manifestHash);
-      if (!row) return null;
-      this.db.prepare(`
-        UPDATE coverage_shards SET status = 'pending', updated_at = ?
-        WHERE run_id = ? AND status = 'running'
-      `).run(this.now(), row.id);
-      return this.getCoverageRun({ runId: row.id });
-    })();
-  }
-
-  getCoverageRun(input: { runId: unknown }): { run: CoverageRunRecord; shards: CoverageShardRecord[] } | null {
-    const runId = requiredString(input?.runId, "runId", 128);
-    const run = toCoverageRunRecord(this.db.prepare(`
-      SELECT * FROM coverage_runs WHERE id = ?
-    `).get(runId));
-    if (!run) return null;
-    const shards = this.db.prepare(`
-      SELECT * FROM coverage_shards WHERE run_id = ? ORDER BY ordinal ASC
-    `).all(runId).map(toCoverageShardRecord);
-    return { run, shards };
-  }
-
-  /** 起跑/续跑（pending|running|partial|failed → running；complete/cancelled 拒绝）。 */
-  markCoverageRunRunning(input: { runId: unknown }): CoverageRunRecord {
-    const runId = requiredString(input?.runId, "runId", 128);
-    const result = this.db.prepare(`
-      UPDATE coverage_runs SET status = 'running', updated_at = ?
-      WHERE id = ? AND status IN ('pending', 'running', 'partial', 'failed')
-    `).run(this.now(), runId);
-    if (Number(result.changes) !== 1) {
-      throw new KnowledgeError("KNOWLEDGE_CONFLICT", "Coverage run is not resumable");
-    }
-    return this.getCoverageRun({ runId })!.run;
-  }
-
-  /** shard 认领（pending → running，attempt_count +1；并发认领后到者得 null 语义由调用方保证单线程池）。 */
-  markCoverageShardRunning(input: { shardId: unknown }): CoverageShardRecord {
-    const shardId = requiredString(input?.shardId, "shardId", 128);
-    const result = this.db.prepare(`
-      UPDATE coverage_shards SET status = 'running', attempt_count = attempt_count + 1, updated_at = ?
-      WHERE id = ? AND status = 'pending'
-    `).run(this.now(), shardId);
-    if (Number(result.changes) !== 1) {
-      throw new KnowledgeError("KNOWLEDGE_CONFLICT", "Coverage shard is not pending");
-    }
-    return this.coverageShardById(shardId);
-  }
-
-  completeCoverageShard(input: { shardId: unknown; resultJson: unknown }): CoverageShardRecord {
-    const shardId = requiredString(input?.shardId, "shardId", 128);
-    if (typeof input?.resultJson !== "string" || !input.resultJson.trim()) {
-      throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "resultJson must be a non-empty string");
-    }
-    if (Buffer.byteLength(input.resultJson, "utf8") > 8 * 1024 * 1024) {
-      throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "resultJson exceeds the 8MB limit");
-    }
-    const result = this.db.prepare(`
-      UPDATE coverage_shards SET status = 'completed', result_json = ?, updated_at = ?
-      WHERE id = ? AND status = 'running'
-    `).run(input.resultJson, this.now(), shardId);
-    if (Number(result.changes) !== 1) {
-      throw new KnowledgeError("KNOWLEDGE_CONFLICT", "Coverage shard is not running");
-    }
-    return this.coverageShardById(shardId);
-  }
-
-  /** 可重试失败（running → pending）：attempt_count 保留，executor 的 bounded retry 循环续跑。 */
-  retryCoverageShard(input: { shardId: unknown }): CoverageShardRecord {
-    const shardId = requiredString(input?.shardId, "shardId", 128);
-    const result = this.db.prepare(`
-      UPDATE coverage_shards SET status = 'pending', result_json = NULL, updated_at = ?
-      WHERE id = ? AND status = 'running'
-    `).run(this.now(), shardId);
-    if (Number(result.changes) !== 1) {
-      throw new KnowledgeError("KNOWLEDGE_CONFLICT", "Coverage shard is not running");
-    }
-    return this.coverageShardById(shardId);
-  }
-
-  /** 终态失败（running → failed）：重试预算耗尽，由 executor 判定后调用。 */
-  failCoverageShard(input: { shardId: unknown }): CoverageShardRecord {
-    const shardId = requiredString(input?.shardId, "shardId", 128);
-    const result = this.db.prepare(`
-      UPDATE coverage_shards SET status = 'failed', result_json = NULL, updated_at = ?
-      WHERE id = ? AND status = 'running'
-    `).run(this.now(), shardId);
-    if (Number(result.changes) !== 1) {
-      throw new KnowledgeError("KNOWLEDGE_CONFLICT", "Coverage shard is not running");
-    }
-    return this.coverageShardById(shardId);
-  }
-
-  /**
-   * 用户取消（§八十六）：该 run 全部 pending/running shard → cancelled，返回
-   * 翻转行数；completed 行不动（结果保留做诊断）。幂等。
-   */
-  cancelCoverageShards(input: { runId: unknown }): number {
-    const runId = requiredString(input?.runId, "runId", 128);
-    return Number(this.db.prepare(`
-      UPDATE coverage_shards SET status = 'cancelled', updated_at = ?
-      WHERE run_id = ? AND status IN ('pending', 'running')
-    `).run(this.now(), runId).changes);
-  }
-
-  /** run 终态回写（running → 终态；计数由 executor 从 ledger 计算）。 */
-  finalizeCoverageRun(input: {
-    runId: unknown;
-    status: unknown;
-    processedUnits: unknown;
-    failedUnits: unknown;
-  }): CoverageRunRecord {
-    const runId = requiredString(input?.runId, "runId", 128);
-    const status = input?.status as CoverageRunStatus;
-    if (!COVERAGE_RUN_STATUSES.has(status) || status === "pending" || status === "running") {
-      throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "Coverage run final status is invalid");
-    }
-    for (const [field, value] of [["processedUnits", input.processedUnits], ["failedUnits", input.failedUnits]] as const) {
-      if (!Number.isSafeInteger(value) || Number(value) < 0) {
-        throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", `Coverage run ${field} must be a non-negative integer`);
-      }
-    }
-    const result = this.db.prepare(`
-      UPDATE coverage_runs
-      SET status = ?, processed_units = ?, failed_units = ?, updated_at = ?
-      WHERE id = ? AND status = 'running'
-    `).run(status, Number(input.processedUnits), Number(input.failedUnits), this.now(), runId);
-    if (Number(result.changes) !== 1) {
-      throw new KnowledgeError("KNOWLEDGE_CONFLICT", "Coverage run is not running");
-    }
-    return this.getCoverageRun({ runId })!.run;
-  }
-
-  private coverageShardById(shardId: string): CoverageShardRecord {
-    const shard = toCoverageShardRecord(this.db.prepare(`
-      SELECT * FROM coverage_shards WHERE id = ?
-    `).get(shardId));
-    if (!shard) throw new KnowledgeError("KNOWLEDGE_NOT_FOUND", "Coverage shard not found");
-    return shard;
   }
 
   /**

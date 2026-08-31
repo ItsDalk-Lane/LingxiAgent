@@ -17,6 +17,7 @@ function t(key: string, vars?: Record<string, string | number>): string {
     'chat.knowledgeRetrievalTruncated': '超预算分片',
     'chat.knowledgeRetrievalUnavailable': '知识检索不可用',
     'chat.knowledgeRetrievalRowTitle': '{source} · 块 {chunk}',
+    'chat.knowledgeRetrievalShowMore': '显示更多（还有 {n} 条）',
     'processFold.summary': '✨ {name}忙活了一阵子',
     'processFold.tools': '{n} 个工具',
     'processFold.thinking': '{n} 次思考',
@@ -28,7 +29,7 @@ function t(key: string, vars?: Record<string, string | number>): string {
 
 function makeStats(partial: Partial<KnowledgeRetrievalStats> = {}): KnowledgeRetrievalStats {
   return {
-    mode: 'qa',
+    mode: 'detailed',
     retrievalMode: 'hybrid',
     subQueries: ['q1'],
     subQueryHits: [8],
@@ -123,6 +124,34 @@ describe('KnowledgeRetrievalFold（工具条样式检索步骤）', () => {
     // 编号与首行同行（同一 toolIndicator 行内）
     const ordinalRow = screen.getByText('#1').closest('div');
     expect(within(ordinalRow as HTMLElement).getByText('第一段内容')).toBeInTheDocument();
+  });
+
+  it('二次展开：首屏只渲染 10 条，「显示更多」一次性放出剩余', async () => {
+    const results = Array.from({ length: 35 }, (_, index) => ({
+      ordinal: index + 1,
+      sourceName: '笔记本A',
+      chunkOrdinal: index + 1,
+      firstLine: `证据行${index + 1}`,
+    }));
+    render(<KnowledgeRetrievalFold retrieval={makeStats({ results, injectedChunks: 35 })} />);
+    fireEvent.click(screen.getByText('已搜索 35 个结果'));
+    await waitFor(() => expect(screen.getByText('#1')).toBeInTheDocument());
+    // 首屏 = 前 10 条（证据行1~10），第 11 条不可见。
+    expect(screen.getAllByText(/^证据行\d+$/).length).toBe(10);
+    expect(screen.queryByText('证据行11')).not.toBeInTheDocument();
+    // 「显示更多（还有 25 条）」二级展开：点击后剩余全部放出。
+    fireEvent.click(screen.getByTestId('knowledge-retrieval-show-more'));
+    await waitFor(() => expect(screen.getByText('证据行35')).toBeInTheDocument());
+    expect(screen.getAllByText(/^证据行\d+$/).length).toBe(35);
+    expect(screen.queryByTestId('knowledge-retrieval-show-more')).not.toBeInTheDocument();
+  });
+
+  it('结果 ≤ 10 条时无「显示更多」按钮（一次性全展开）', async () => {
+    render(<KnowledgeRetrievalFold retrieval={makeStats()} />);
+    fireEvent.click(screen.getByText('已搜索 2 个结果'));
+    await waitFor(() => expect(screen.getByText('#1')).toBeInTheDocument());
+    expect(screen.queryByTestId('knowledge-retrieval-show-more')).not.toBeInTheDocument();
+    expect(screen.getByText('第二段内容')).toBeInTheDocument();
   });
 
   it('truncated 时摘要行追加「超预算分片」小标', () => {

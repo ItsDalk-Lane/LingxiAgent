@@ -55,7 +55,6 @@ describe('AuxiliaryModelsSection', () => {
           summarize: null,
           memory: null,
           knowledge: null,
-          knowledgeDistill: null,
           vision: { id: 'gpt-4o', provider: 'openai' },
           approval: null,
           guard: null,
@@ -104,12 +103,12 @@ describe('AuxiliaryModelsSection', () => {
     });
   });
 
-  it('renders one model widget per auxiliary slot (8 slots incl. knowledgeDistill) and no operation pickers', () => {
+  it('renders one model widget per auxiliary slot (7 slots; knowledgeDistill removed with the distill path) and no operation pickers', () => {
     render(<AuxiliaryModelsSection providers={{ openai: { models: ['gpt-4o'] } }} />);
 
-    // 8 auxiliary slots (title/summarize/memory/knowledge/knowledgeDistill/vision/approval/guard)
-    expect(screen.getAllByTestId('model-widget')).toHaveLength(8);
-    expect(screen.getByText('settings.api.auxKnowledgeDistillModel')).toBeInTheDocument();
+    // 7 auxiliary slots (title/summarize/memory/knowledge/vision/approval/guard)
+    expect(screen.getAllByTestId('model-widget')).toHaveLength(7);
+    expect(screen.queryByText('settings.api.auxKnowledgeDistillModel')).not.toBeInTheDocument();
     expect(screen.queryByText('settings.api.searchProviderField')).not.toBeInTheDocument();
     // 知识库嵌入/重排全局配置已退役（迁移至笔记本级）：不出现对应下拉。
     expect(screen.queryByRole('combobox', { name: 'settings.api.knowledgeEmbeddingModel' })).not.toBeInTheDocument();

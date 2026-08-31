@@ -4,6 +4,9 @@ const VALID_CALL_PURPOSES = new Set([
   "health_check",
   "summary",
   "chat",
+  // 知识滚动注入中间轮（2026-08-31）：会话主模型侧线消化超预算证据；非聊天
+  // 主轮，模型级联网/结构化输出开关不应作用于该用途。
+  "knowledge_rollup",
 ]);
 
 function normalizeCallPurpose(value: unknown): string | null {

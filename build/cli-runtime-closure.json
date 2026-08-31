@@ -2232,6 +2232,11 @@
         },
         {
           "root": "server-bootstrap",
+          "from": "core/session-coordinator.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
           "from": "core/engine.ts",
           "kind": "import-statement"
         },
@@ -2241,7 +2246,7 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by core/session-compactor.ts (import-statement); core/engine.ts (import-statement); lib/extensions/compaction-guard-ext.ts (import-statement)."
+      "reason": "Reached via esbuild source module graph, imported by core/session-compactor.ts (import-statement); core/session-coordinator.ts (import-statement); core/engine.ts (import-statement); +1 more importer(s)."
     },
     {
       "path": "core/provider-compat/qwen.ts",
@@ -6325,11 +6330,6 @@
         },
         {
           "root": "server-bootstrap",
-          "from": "lib/knowledge/knowledge-coverage-manifest.ts",
-          "kind": "import-statement"
-        },
-        {
-          "root": "server-bootstrap",
           "from": "lib/tools/knowledge-outline-tool.ts",
           "kind": "import-statement"
         },
@@ -6341,16 +6341,6 @@
         {
           "root": "server-bootstrap",
           "from": "lib/tools/knowledge-manage-tool.ts",
-          "kind": "import-statement"
-        },
-        {
-          "root": "server-bootstrap",
-          "from": "lib/knowledge/knowledge-coverage-executor.ts",
-          "kind": "import-statement"
-        },
-        {
-          "root": "server-bootstrap",
-          "from": "lib/knowledge/knowledge-coverage-reduction.ts",
           "kind": "import-statement"
         },
         {
@@ -6419,7 +6409,7 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by lib/tools/knowledge-scope.ts (import-statement); lib/tools/knowledge-read-tool.ts (import-statement); lib/knowledge/knowledge-coverage-unit.ts (import-statement); +19 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by lib/tools/knowledge-scope.ts (import-statement); lib/tools/knowledge-read-tool.ts (import-statement); lib/knowledge/knowledge-coverage-unit.ts (import-statement); +16 more importer(s)."
     },
     {
       "path": "lib/knowledge/file-import-security.ts",
@@ -6463,23 +6453,6 @@
       "reason": "Reached via esbuild source module graph, imported by core/desktop-session-submit.ts (import-statement); core/engine.ts (import-statement)."
     },
     {
-      "path": "lib/knowledge/knowledge-coverage-executor.ts",
-      "inputType": "source-graph",
-      "provenance": [
-        {
-          "root": "server-bootstrap",
-          "from": "lib/knowledge/knowledge-coverage-reduction.ts",
-          "kind": "import-statement"
-        },
-        {
-          "root": "server-bootstrap",
-          "from": "lib/knowledge/knowledge-context-injector.ts",
-          "kind": "import-statement"
-        }
-      ],
-      "reason": "Reached via esbuild source module graph, imported by lib/knowledge/knowledge-coverage-reduction.ts (import-statement); lib/knowledge/knowledge-context-injector.ts (import-statement)."
-    },
-    {
       "path": "lib/knowledge/knowledge-coverage-manifest.ts",
       "inputType": "source-graph",
       "provenance": [
@@ -6487,29 +6460,9 @@
           "root": "server-bootstrap",
           "from": "lib/tools/knowledge-outline-tool.ts",
           "kind": "import-statement"
-        },
-        {
-          "root": "server-bootstrap",
-          "from": "lib/knowledge/knowledge-coverage-executor.ts",
-          "kind": "import-statement"
-        },
-        {
-          "root": "server-bootstrap",
-          "from": "lib/knowledge/knowledge-coverage-reduction.ts",
-          "kind": "import-statement"
-        },
-        {
-          "root": "server-bootstrap",
-          "from": "lib/knowledge/knowledge-context-injector.ts",
-          "kind": "import-statement"
-        },
-        {
-          "root": "server-bootstrap",
-          "from": "core/engine.ts",
-          "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by lib/tools/knowledge-outline-tool.ts (import-statement); lib/knowledge/knowledge-coverage-executor.ts (import-statement); lib/knowledge/knowledge-coverage-reduction.ts (import-statement); +2 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by lib/tools/knowledge-outline-tool.ts (import-statement)."
     },
     {
       "path": "lib/knowledge/knowledge-coverage-planner.ts",
@@ -6529,55 +6482,16 @@
       "reason": "Reached via esbuild source module graph, imported by lib/knowledge/knowledge-store.ts (import-statement); core/engine.ts (import-statement)."
     },
     {
-      "path": "lib/knowledge/knowledge-coverage-reduction.ts",
-      "inputType": "source-graph",
-      "provenance": [
-        {
-          "root": "server-bootstrap",
-          "from": "lib/knowledge/knowledge-context-injector.ts",
-          "kind": "import-statement"
-        },
-        {
-          "root": "server-bootstrap",
-          "from": "core/engine.ts",
-          "kind": "import-statement"
-        }
-      ],
-      "reason": "Reached via esbuild source module graph, imported by lib/knowledge/knowledge-context-injector.ts (import-statement); core/engine.ts (import-statement)."
-    },
-    {
       "path": "lib/knowledge/knowledge-coverage-unit.ts",
       "inputType": "source-graph",
       "provenance": [
-        {
-          "root": "server-bootstrap",
-          "from": "lib/knowledge/knowledge-coverage-manifest.ts",
-          "kind": "import-statement"
-        },
         {
           "root": "server-bootstrap",
           "from": "lib/tools/knowledge-outline-tool.ts",
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by lib/knowledge/knowledge-coverage-manifest.ts (import-statement); lib/tools/knowledge-outline-tool.ts (import-statement)."
-    },
-    {
-      "path": "lib/knowledge/knowledge-distiller.ts",
-      "inputType": "source-graph",
-      "provenance": [
-        {
-          "root": "server-bootstrap",
-          "from": "lib/knowledge/knowledge-context-injector.ts",
-          "kind": "import-statement"
-        },
-        {
-          "root": "server-bootstrap",
-          "from": "core/engine.ts",
-          "kind": "import-statement"
-        }
-      ],
-      "reason": "Reached via esbuild source module graph, imported by lib/knowledge/knowledge-context-injector.ts (import-statement); core/engine.ts (import-statement)."
+      "reason": "Reached via esbuild source module graph, imported by lib/tools/knowledge-outline-tool.ts (import-statement)."
     },
     {
       "path": "lib/knowledge/knowledge-index-store.ts",
@@ -6629,6 +6543,18 @@
         }
       ],
       "reason": "Reached via esbuild source module graph, imported by lib/knowledge/knowledge-context-injector.ts (import-statement); lib/knowledge/knowledge-manager.ts (import-statement)."
+    },
+    {
+      "path": "lib/knowledge/knowledge-rollup.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "lib/knowledge/knowledge-context-injector.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by lib/knowledge/knowledge-context-injector.ts (import-statement)."
     },
     {
       "path": "lib/knowledge/knowledge-store.ts",
@@ -6843,12 +6769,7 @@
         },
         {
           "root": "server-bootstrap",
-          "from": "lib/knowledge/knowledge-coverage-reduction.ts",
-          "kind": "import-statement"
-        },
-        {
-          "root": "server-bootstrap",
-          "from": "lib/knowledge/knowledge-distiller.ts",
+          "from": "lib/knowledge/knowledge-rollup.ts",
           "kind": "import-statement"
         },
         {
@@ -6870,14 +6791,9 @@
           "root": "server-bootstrap",
           "from": "lib/llm/context-usage-breakdown.ts",
           "kind": "import-statement"
-        },
-        {
-          "root": "server-bootstrap",
-          "from": "core/engine.ts",
-          "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by core/session-compactor.ts (import-statement); lib/knowledge/knowledge-coverage-unit.ts (import-statement); lib/knowledge/knowledge-coverage-reduction.ts (import-statement); +6 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by core/session-compactor.ts (import-statement); lib/knowledge/knowledge-coverage-unit.ts (import-statement); lib/knowledge/knowledge-rollup.ts (import-statement); +4 more importer(s)."
     },
     {
       "path": "lib/llm/model-call-correlation.ts",
@@ -123269,21 +123185,11 @@
       "provenance": [
         {
           "root": "server-bootstrap",
-          "from": "lib/knowledge/knowledge-coverage-executor.ts",
-          "kind": "import-statement"
-        },
-        {
-          "root": "server-bootstrap",
           "from": "lib/knowledge/knowledge-store.ts",
-          "kind": "import-statement"
-        },
-        {
-          "root": "server-bootstrap",
-          "from": "lib/knowledge/knowledge-context-injector.ts",
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by lib/knowledge/knowledge-coverage-executor.ts (import-statement); lib/knowledge/knowledge-store.ts (import-statement); lib/knowledge/knowledge-context-injector.ts (import-statement)."
+      "reason": "Reached via esbuild source module graph, imported by lib/knowledge/knowledge-store.ts (import-statement)."
     },
     {
       "path": "shared/knowledge-refs.ts",
@@ -124936,9 +124842,9 @@
     }
   ],
   "stats": {
-    "totalFiles": 10650,
+    "totalFiles": 10648,
     "byInputType": {
-      "source-graph": 750,
+      "source-graph": 748,
       "runtime-asset": 11,
       "nft-runtime-trace": 9889
     }

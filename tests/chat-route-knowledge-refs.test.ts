@@ -48,14 +48,14 @@ describe("chat route knowledgeRefs handling", () => {
         text: "总结一下这个笔记本",
         sessionPath: "/sessions/test.jsonl",
         agentId: "agent-test",
-        knowledgeRefs: { notebookIds: ["nb-1", "nb-2"], mode: "qa" },
+        knowledgeRefs: { notebookIds: ["nb-1", "nb-2"], mode: "fast" },
       }),
     }, ws);
     await new Promise((resolve) => setTimeout(resolve, 0));
 
     expect(hub.send).toHaveBeenCalledTimes(1);
     expect(hub.send.mock.calls[0][1]).toEqual(expect.objectContaining({
-      knowledgeRefs: { notebookIds: ["nb-1", "nb-2"], mode: "qa" },
+      knowledgeRefs: { notebookIds: ["nb-1", "nb-2"], mode: "fast" },
     }));
     expect(sentErrors(ws)).toEqual([]);
   });
@@ -105,7 +105,7 @@ describe("chat route knowledgeRefs handling", () => {
         text: "插话",
         sessionPath: "/sessions/test.jsonl",
         agentId: "agent-test",
-        knowledgeRefs: { notebookIds: ["nb-1", 42], mode: "assist" },
+        knowledgeRefs: { notebookIds: ["nb-1", 42], mode: "detailed" },
       }),
     }, ws);
     await new Promise((resolve) => setTimeout(resolve, 0));
@@ -129,50 +129,89 @@ describe("chat route knowledgeRefs handling", () => {
     });
   });
 
-  it("knowledge_distill_progress 引擎事件广播为同名 WS 消息（带批数与模型）", async () => {
+  it("knowledge_rollup_progress 引擎事件广播为同名 WS 消息（带轮序进度）", async () => {
     const { hub, ws } = setup();
     const listener = hub.subscribe.mock.calls[0][0];
-    listener({ type: "knowledge_distill_progress", done: 7, model: "opencode-go/deepseek-v4-flash" }, "/sessions/test.jsonl");
+    listener({ type: "knowledge_rollup_progress", current: 2, total: 5 }, "/sessions/test.jsonl");
 
     const sent = ws.send.mock.calls.map((call) => JSON.parse(call[0] as string));
     expect(sent).toContainEqual({
-      type: "knowledge_distill_progress",
+      type: "knowledge_rollup_progress",
       sessionPath: "/sessions/test.jsonl",
-      done: 7,
-      model: "opencode-go/deepseek-v4-flash",
+      current: 2,
+      total: 5,
     });
   });
 
-  it("knowledge_coverage_progress 引擎事件广播为同名 WS 消息（带 runId/进度，可选 coverageStatus）", async () => {
+  it("knowledge_trace 引擎事件广播为同名 WS 消息（阶段元数据归一）", async () => {
+    const { hub, ws } = setup();
+    const listener = hub.subscribe.mock.calls[0][0];
+    listener({ type: "knowledge_trace", id: "search-1", kind: "search", phase: "start", query: "风险准备金" }, "/sessions/test.jsonl");
+    listener({ type: "knowledge_trace", id: "search-1", kind: "search", phase: "done", query: "风险准备金", hits: 50 }, "/sessions/test.jsonl");
+    listener({ type: "knowledge_trace", id: "think-1", kind: "think", phase: "start", detail: "fact" }, "/sessions/test.jsonl");
+    // 非法 kind/phase 归一为 search/start；缺省可选字段不强加。
+    listener({ type: "knowledge_trace", id: "search-2", kind: "weird", phase: "weird" }, "/sessions/test.jsonl");
+
+    const sent = ws.send.mock.calls.map((call) => JSON.parse(call[0] as string));
+    expect(sent).toContainEqual({
+      type: "knowledge_trace",
+      sessionPath: "/sessions/test.jsonl",
+      id: "search-1",
+      kind: "search",
+      phase: "start",
+      query: "风险准备金",
+    });
+    expect(sent).toContainEqual({
+      type: "knowledge_trace",
+      sessionPath: "/sessions/test.jsonl",
+      id: "search-1",
+      kind: "search",
+      phase: "done",
+      query: "风险准备金",
+      hits: 50,
+    });
+    expect(sent).toContainEqual({
+      type: "knowledge_trace",
+      sessionPath: "/sessions/test.jsonl",
+      id: "think-1",
+      kind: "think",
+      phase: "start",
+      detail: "fact",
+    });
+    expect(sent).toContainEqual({
+      type: "knowledge_trace",
+      sessionPath: "/sessions/test.jsonl",
+      id: "search-2",
+      kind: "search",
+      phase: "start",
+    });
+  });
+
+  it("knowledge_supplement_search 引擎事件广播为同名 WS 消息（查询行 + 轮序）", async () => {
     const { hub, ws } = setup();
     const listener = hub.subscribe.mock.calls[0][0];
     listener({
-      type: "knowledge_coverage_progress",
-      runId: "covrun_1",
-      done: 3,
-      total: 8,
-      coverageStatus: "partial",
+      type: "knowledge_supplement_search",
+      queries: ["风险准备金", "交付节点"],
+      round: 2,
     }, "/sessions/test.jsonl");
 
     const sent = ws.send.mock.calls.map((call) => JSON.parse(call[0] as string));
     expect(sent).toContainEqual({
-      type: "knowledge_coverage_progress",
+      type: "knowledge_supplement_search",
       sessionPath: "/sessions/test.jsonl",
-      runId: "covrun_1",
-      done: 3,
-      total: 8,
-      coverageStatus: "partial",
+      queries: ["风险准备金", "交付节点"],
+      round: 2,
     });
-    // 缺省 coverageStatus 不强加字段（对齐 distill 进度的可选字段纪律）。
+    // 非字符串查询条目被过滤（防御性归一，不炸不漏）。
     ws.send.mockClear();
-    listener({ type: "knowledge_coverage_progress", runId: "covrun_2", done: 8, total: 8 }, "/sessions/test.jsonl");
+    listener({ type: "knowledge_supplement_search", queries: ["ok", 42, null], round: 3 }, "/sessions/test.jsonl");
     const followup = ws.send.mock.calls.map((call) => JSON.parse(call[0] as string));
     expect(followup).toContainEqual({
-      type: "knowledge_coverage_progress",
+      type: "knowledge_supplement_search",
       sessionPath: "/sessions/test.jsonl",
-      runId: "covrun_2",
-      done: 8,
-      total: 8,
+      queries: ["ok"],
+      round: 3,
     });
   });
 });

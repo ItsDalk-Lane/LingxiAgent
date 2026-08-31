@@ -48,9 +48,14 @@ export interface StreamingSlice {
    * 知识蒸馏进行中的 session（ws knowledge_distill_progress 逐批更新 →
    * 该 session 任意后续事件清除）。纯瞬态：驱动「蒸馏中 · N 批」胶囊。
    */
-  knowledgeDistillBySession: Record<string, { model: string | null; done: number }>;
-  updateKnowledgeDistill: (path: string, progress: { model: string | null; done: number }) => void;
-  endKnowledgeDistill: (path: string) => void;
+  /** 滚动注入进度（2026-08-31 取代蒸馏胶囊）：current/total 为「正在阅读第 X/N 部分」。 */
+  knowledgeRollupBySession: Record<string, { current: number; total: number }>;
+  updateKnowledgeRollup: (path: string, progress: { current: number; total: number }) => void;
+  endKnowledgeRollup: (path: string) => void;
+  /** 补充检索过程（滚动循环内模型自主发起）：queries 逐轮覆盖展示。 */
+  knowledgeSupplementBySession: Record<string, { queries: string[]; round: number }>;
+  updateKnowledgeSupplement: (path: string, progress: { queries: string[]; round: number }) => void;
+  endKnowledgeSupplement: (path: string) => void;
   /**
    * 发送后本地进入「等待助手」态的 session（ws.send 成功 → 该 session 首个
    * 后续事件清除）。服务器在知识检索/排队期间不置 isStreaming，靠它保证
@@ -199,36 +204,68 @@ export const createStreamingSlice = (
       knowledgeRetrievingSessions: filterLegacyAndIdentity(s.knowledgeRetrievingSessions, path, key),
     }));
   },
-  knowledgeDistillBySession: {},
-  updateKnowledgeDistill: (path, progress) => {
+  knowledgeRollupBySession: {},
+  updateKnowledgeRollup: (path, progress) => {
     const key = identityKeyForPath(get, path);
     const current = get?.();
-    const existing = current?.knowledgeDistillBySession?.[key];
-    if (existing && existing.done === progress.done && existing.model === progress.model) return;
+    const existing = current?.knowledgeRollupBySession?.[key];
+    if (existing && existing.current === progress.current && existing.total === progress.total) return;
     const base = filterLegacyAndIdentity(
-      Object.keys(current?.knowledgeDistillBySession ?? {}),
+      Object.keys(current?.knowledgeRollupBySession ?? {}),
       path,
       key,
-    ).reduce<Record<string, { model: string | null; done: number }>>((acc, k) => {
-      acc[k] = current!.knowledgeDistillBySession[k];
+    ).reduce<Record<string, { current: number; total: number }>>((acc, k) => {
+      acc[k] = current!.knowledgeRollupBySession[k];
       return acc;
     }, {});
     base[key] = progress;
-    set({ knowledgeDistillBySession: base });
+    set({ knowledgeRollupBySession: base });
   },
-  endKnowledgeDistill: (path) => {
+  endKnowledgeRollup: (path) => {
     const key = identityKeyForPath(get, path);
     const current = get?.();
-    if (!current?.knowledgeDistillBySession?.[key] && !current?.knowledgeDistillBySession?.[path]) return;
+    if (!current?.knowledgeRollupBySession?.[key] && !current?.knowledgeRollupBySession?.[path]) return;
     const kept = filterLegacyAndIdentity(
-      Object.keys(current?.knowledgeDistillBySession ?? {}),
+      Object.keys(current?.knowledgeRollupBySession ?? {}),
       path,
       key,
-    ).reduce<Record<string, { model: string | null; done: number }>>((acc, k) => {
-      acc[k] = current!.knowledgeDistillBySession[k];
+    ).reduce<Record<string, { current: number; total: number }>>((acc, k) => {
+      acc[k] = current!.knowledgeRollupBySession[k];
       return acc;
     }, {});
-    set({ knowledgeDistillBySession: kept });
+    set({ knowledgeRollupBySession: kept });
+  },
+  knowledgeSupplementBySession: {},
+  updateKnowledgeSupplement: (path, progress) => {
+    const key = identityKeyForPath(get, path);
+    const current = get?.();
+    const existing = current?.knowledgeSupplementBySession?.[key];
+    if (existing && existing.round === progress.round
+      && existing.queries.join('\n') === progress.queries.join('\n')) return;
+    const base = filterLegacyAndIdentity(
+      Object.keys(current?.knowledgeSupplementBySession ?? {}),
+      path,
+      key,
+    ).reduce<Record<string, { queries: string[]; round: number }>>((acc, k) => {
+      acc[k] = current!.knowledgeSupplementBySession[k];
+      return acc;
+    }, {});
+    base[key] = progress;
+    set({ knowledgeSupplementBySession: base });
+  },
+  endKnowledgeSupplement: (path) => {
+    const key = identityKeyForPath(get, path);
+    const current = get?.();
+    if (!current?.knowledgeSupplementBySession?.[key] && !current?.knowledgeSupplementBySession?.[path]) return;
+    const kept = filterLegacyAndIdentity(
+      Object.keys(current?.knowledgeSupplementBySession ?? {}),
+      path,
+      key,
+    ).reduce<Record<string, { queries: string[]; round: number }>>((acc, k) => {
+      acc[k] = current!.knowledgeSupplementBySession[k];
+      return acc;
+    }, {});
+    set({ knowledgeSupplementBySession: kept });
   },
   turnPendingSessions: [],
   beginTurnPending: (path) => set((s) => {

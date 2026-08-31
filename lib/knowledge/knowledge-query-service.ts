@@ -101,12 +101,38 @@ export interface RetrieveForNotebooksResult {
   candidates: NotebookRetrievalChunk[];
   sources: NotebookRetrievalSource[];
   retrievalMode: "fts" | "hybrid";
-  /** 本轮请求的检索模式（任一笔记本配置了可路由嵌入模型即 "hybrid"；§十二留痕）。 */
+  /** 本轮请求的检索模式（任一笔记本配置了可路由的嵌入模型即 "hybrid"；§十二留痕）。 */
   retrievalModeRequested: "fts" | "hybrid";
   /** 逐 scope 降级明细（缺失/未就绪的索引变体已幂等入队后台构建）；无降级为空数组。 */
   degraded: KnowledgeDegradedRetrievalScope[];
   /** 各笔记本本轮实际搜索过的向量变体身份（去重）；缺省/空 = 纯 FTS 轮。 */
   searchedVectorVariants?: SearchedVectorVariantIdentity[];
+  /**
+   * rerank 降级留痕（每笔记本一条，含笔记本名；空/缺省 = 全部正常重排或未尝试）。
+   * 见 KNOWLEDGE_RERANK_DEADLINE_MS。
+   */
+  rerankDegradeReasons?: string[];
+  /**
+   * rerank 门控主动跳过留痕（2026-08-31 快速档；每笔记本一条，含笔记本名）：
+   * 快速档检索结果头部清晰（top-1 RRF 融合分领先 ≥ KNOWLEDGE_RERANK_CLEAR_MARGIN）
+   * 时不发起重排、保持 RRF 名次。与 rerankDegradeReasons 的区别：这是主动
+   * 跳过而非失败降级，只进 stats 不进注入块。空/缺省 = 未跳过。
+   */
+  rerankSkippedReasons?: string[];
+  /**
+   * 检索分段计时（2026-08-31 观测补齐）：多笔记本为各段跨笔记本最大值
+   * （反映对关键路径的贡献）；纯增量可选，旧调用方不携带。
+   */
+  stageTimings?: KnowledgeRetrievalStageTimings;
+}
+
+/** 检索侧各段墙钟（毫秒）；未执行的段不携带。 */
+export interface KnowledgeRetrievalStageTimings {
+  ftsMs?: number;
+  embedMs?: number;
+  vectorMs?: number;
+  fuseMs?: number;
+  rerankMs?: number;
 }
 
 /** retrieve() 产出的逐 scope 降级条目（尚未附带 notebook/source 归属，由调用方映射）。 */
@@ -317,6 +343,35 @@ export const KNOWLEDGE_UNCAPPED_RETRIEVAL_LIMIT = 1000;
 export const KNOWLEDGE_RERANK_MAX_DOCS = MODEL_OPERATION_RERANK_MAX_DOCS;
 
 /**
+ * rerank 执行期限（2026-08-30 延迟加固）：单次 rerank 调用超过该时长即放弃，
+ * 候选保持 RRF 名次继续检索（与「超出 MAX_DOCS 的尾部保持 RRF 名次」同一降级
+ * 语义），rerankDegradeReason 显式留痕。动机：远程 rerank 供应商排队方差大
+ * （实测单次 11–56s），无期限时一次知识提问的重排尾巴可达一分钟以上；重排是
+ * 精排增强层，不该拖死整条检索。传输类失败（网络/HTTP/供应商 5xx）同路径
+ * 降级；KnowledgeError 与用户 abort 仍然上抛（禁静默吞真实错误）。
+ */
+export const KNOWLEDGE_RERANK_DEADLINE_MS = 15_000;
+
+/**
+ * rerank 动态门控阈值（2026-08-31 快速档）：RRF 融合分 top-1 对 top-2 的
+ * 领先幅度 ≥ 该值 = 检索结果头部清晰，重排是纯开销——主动跳过、保持 RRF
+ * 名次（stats 留 rerankSkippedReason，与降级留痕不同路径）。量纲参考：单通道
+ * rank-0 贡献 1/61 ≈ 0.0164，双通道命中 ≈ 2/61 ≈ 0.0328——0.008 ≈ 半个通道
+ * 顶分，即「top-1 明显是双通道共识命中、top-2 远未及」才跳过。
+ */
+export const KNOWLEDGE_RERANK_CLEAR_MARGIN = 0.008;
+
+/**
+ * 查询嵌入执行期限（2026-08-30 延迟加固）：单次查询侧嵌入调用超过该时长即
+ * 放弃，候选保持 FTS 名次继续检索并显式留痕（KNOWLEDGE_EMBEDDING_FAILED）。
+ * 与 rerank 期限对称（见 KNOWLEDGE_RERANK_DEADLINE_MS）；动机：engine 嵌入
+ * 闭包的 HTTP 超时 300s 全额放行，挂着的嵌入供应商 = 一次提问卡 5 分钟。
+ * 摄入侧批量嵌入不受影响（不经过本竞速，走闭包自身超时）。本地 Ollama 实测
+ * 0.1–2s、远程 API 数秒，15s 充裕。
+ */
+export const KNOWLEDGE_EMBEDDING_DEADLINE_MS = 15_000;
+
+/**
  * Retrieval Candidate Budgets（任务书 §二十六，Phase 8）：候选生成预算与
  * Context Injection Budget（budgetTokens，注入层）分离。topK（含 NULL→1000 的
  * "无上限"列语义）不再作为覆盖机制——预算链对每一步独立封顶，topK 只在预算
@@ -343,6 +398,8 @@ export class KnowledgeQueryService {
       texts: string[];
       modelRef: KnowledgeModelRef;
       signal?: AbortSignal;
+      /** 查询侧固定 "query"（MiniMax db/query、Voyage input_type 算法分离），摄入侧缺省 document。 */
+      inputType?: "document" | "query";
     }) => Promise<KnowledgeEmbeddingResult | null>) | null;
     rerank?: KnowledgeReranker | null;
     /**
@@ -584,7 +641,50 @@ export class KnowledgeQueryService {
     } catch (error) {
       if (isAbortLike(error)) throw error;
       if (isKnowledgeError(error)) throw error;
-      throw new KnowledgeError("KNOWLEDGE_RETRIEVAL_UNAVAILABLE", "Knowledge embedding request failed");
+      const cause = error instanceof Error ? `${error.name}: ${error.message}` : String(error);
+      throw new KnowledgeError(
+        "KNOWLEDGE_RETRIEVAL_UNAVAILABLE",
+        `Knowledge embedding request failed (${cause})`,
+      );
+    }
+  }
+
+  /**
+   * 查询嵌入执行 + 期限竞速（KNOWLEDGE_EMBEDDING_DEADLINE_MS）：超时即 abort
+   * 底层请求并抛 KnowledgeEmbeddingDeadlineError（调用方降级处理）；外部
+   * signal 的 abort 原样穿透（用户取消语义）。竞速落败方的 rejection 就地
+   * 吞掉，不允许变成 unhandled rejection。与 invokeRerankerWithDeadline 同构。
+   */
+  private async invokeEmbeddingWithDeadline(input: {
+    runId: string;
+    question: string;
+    signal?: AbortSignal;
+    embedder: KnowledgeEmbedder;
+  }): Promise<KnowledgeEmbeddingResult | null> {
+    const controller = new AbortController();
+    const onExternalAbort = () => controller.abort();
+    input.signal?.addEventListener("abort", onExternalAbort, { once: true });
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const deadline = new Promise<never>((_, reject) => {
+      timer = setTimeout(() => {
+        controller.abort();
+        const error = new Error(`query embedding deadline exceeded after ${KNOWLEDGE_EMBEDDING_DEADLINE_MS}ms`);
+        error.name = "KnowledgeEmbeddingDeadlineError";
+        reject(error);
+      }, KNOWLEDGE_EMBEDDING_DEADLINE_MS);
+    });
+    const attempt = Promise.resolve().then(() => this.invokeEmbedding({
+      runId: input.runId,
+      texts: [input.question],
+      signal: controller.signal,
+    }, input.embedder));
+    deadline.catch(() => {});
+    attempt.catch(() => {});
+    try {
+      return await Promise.race([attempt, deadline]);
+    } finally {
+      if (timer !== undefined) clearTimeout(timer);
+      input.signal?.removeEventListener("abort", onExternalAbort);
     }
   }
 
@@ -820,6 +920,12 @@ export class KnowledgeQueryService {
     /** 是否执行 rerank（默认 true）；false 时跳过即使 reranker 已接线。 */
     rerank?: boolean;
     /**
+     * rerank 策略（2026-08-31 快速档）：marginGate = 融合分头部清晰时主动跳过
+     * 重排保持 RRF 名次（留 rerankSkippedReason）；deadlineMs 收紧期限（缺省 =
+     * KNOWLEDGE_RERANK_DEADLINE_MS）。
+     */
+    rerankPolicy?: { marginGate: boolean; deadlineMs?: number };
+    /**
      * 本轮使用的 reranker（按笔记本引用构造的闭包）。undefined = 回落 deps.rerank
      * （全局路径，v8 后恒为不可解析 → null 跳过）；null = 显式不用。
      */
@@ -842,6 +948,15 @@ export class KnowledgeQueryService {
     degraded: KnowledgeDegradedRetrievalScope[];
     /** 实际参与向量检索的变体身份（§六十七 EvidenceManifest；fts-only 为空）。 */
     searchedVectorVariants: SearchedVectorVariantIdentity[];
+    /**
+     * rerank 降级留痕（2026-08-30 延迟加固）：期限超时/传输类失败时携带，
+     * 候选保持 RRF 名次；未尝试或成功重排时缺省。
+     */
+    rerankDegradeReason?: string;
+    /** rerank 门控主动跳过留痕（2026-08-31 快速档）：头部清晰时跳过重排。 */
+    rerankSkippedReason?: string;
+    /** 检索分段计时（2026-08-31 观测补齐）；未执行的段不携带。 */
+    stageTimings?: KnowledgeRetrievalStageTimings;
   }> {
     const { scopes, question, runId, signal } = input;
     const retrievalModeRequested: "fts" | "hybrid" = input.embedTexts ? "hybrid" : "fts";
@@ -852,15 +967,67 @@ export class KnowledgeQueryService {
     // 独立于 topK 生效（topK=NULL→1000 不再作为覆盖机制，只在预算内进一步收紧）。
     const generationLimit = Math.min(topK, KNOWLEDGE_CANDIDATE_GENERATION_BUDGET);
     const ordinalRanges = input.ordinalRangesByChunkIndexVariantId ?? null;
+    // 分段计时（2026-08-31 观测补齐）：各段墙钟随结果携带，纯增量可选。
+    const ftsStart = Date.now();
     const ftsResult = this.retrieveFts(scopes, question, generationLimit, ordinalRanges ?? undefined);
+    const ftsMs = Date.now() - ftsStart;
+    let embedMs: number | undefined;
+    let vectorMs: number | undefined;
+    let fuseMs: number | undefined;
+    let rerankMs: number | undefined;
     const { fts, readyScopes, degraded } = ftsResult;
     if (!input.embedTexts || readyScopes.length === 0) {
-      return { candidates: fts, retrievalMode: "fts", retrievalModeRequested, degraded, searchedVectorVariants: [] };
+      return {
+        candidates: fts,
+        retrievalMode: "fts",
+        retrievalModeRequested,
+        degraded,
+        searchedVectorVariants: [],
+        stageTimings: { ftsMs },
+      };
     }
 
-    const questionEmbedding = await this.invokeEmbedding({ runId, texts: [question], signal }, input.embedTexts);
-    if (!questionEmbedding) {
-      // 查询嵌入在检查与执行之间变得不可用：显式降级纯 FTS 并留痕（禁静默）。
+    // 查询嵌入带期限竞速（KNOWLEDGE_EMBEDDING_DEADLINE_MS）：超时/传输类失败/
+    // 响应非法一律显式降级纯 FTS + KNOWLEDGE_EMBEDDING_FAILED 留痕（FTS 候选
+    // 已算好、不再随异常丢弃——向量是检索增强层，失效不该炸掉整条检索，也
+    // 不该挂满 engine 闭包 300s）；外部 signal abort 原样上抛（用户取消）。
+    let embeddedQuestion: { result: KnowledgeEmbeddingResult; model: VectorIndexModelIdentity };
+    const embedStart = Date.now();
+    try {
+      const questionEmbedding = await this.invokeEmbeddingWithDeadline({
+        runId,
+        question,
+        signal,
+        embedder: input.embedTexts,
+      });
+      embedMs = Date.now() - embedStart;
+      if (!questionEmbedding) {
+        // 查询嵌入在检查与执行之间变得不可用：显式降级纯 FTS 并留痕（禁静默）。
+        return {
+          candidates: fts,
+          retrievalMode: "fts",
+          retrievalModeRequested,
+          degraded: [
+            ...degraded,
+            ...readyScopes.map(scope => ({
+              parseArtifactId: scope.parseArtifactId,
+              chunkProfileHash: scope.chunkProfileHash,
+              reason: "KNOWLEDGE_VECTOR_NOT_READY" as const,
+              detail: "query embedding unavailable",
+            })),
+          ],
+          searchedVectorVariants: [],
+          stageTimings: { ftsMs, embedMs },
+        };
+      }
+      embeddedQuestion = assertEmbeddingBatch(questionEmbedding, 1);
+    } catch (error) {
+      embedMs = Date.now() - embedStart;
+      // 外部 signal 的 abort = 用户取消，原样上抛；其余（期限超时/网络/HTTP/
+      // 响应非法，含 deadline 竞速自身 abort 底层请求后逸出的 AbortError）一律
+      // 降级纯 FTS + 留痕——向量是增强层，不炸检索。
+      if (isAbortLike(error) && signal?.aborted) throw error;
+      const cause = error instanceof Error ? `${error.name}: ${error.message}` : String(error);
       return {
         candidates: fts,
         retrievalMode: "fts",
@@ -870,17 +1037,18 @@ export class KnowledgeQueryService {
           ...readyScopes.map(scope => ({
             parseArtifactId: scope.parseArtifactId,
             chunkProfileHash: scope.chunkProfileHash,
-            reason: "KNOWLEDGE_VECTOR_NOT_READY" as const,
-            detail: "query embedding unavailable",
+            reason: "KNOWLEDGE_EMBEDDING_FAILED" as const,
+            detail: `query embedding request failed (${cause}); kept FTS candidates`,
           })),
         ],
         searchedVectorVariants: [],
+        stageTimings: { ftsMs, embedMs },
       };
     }
-    const embeddedQuestion = assertEmbeddingBatch(questionEmbedding, 1);
 
     // 向量通道只读判定：逐就绪 scope 校验 VectorIndexVariant（viv = f(civ, modelKey)
     // 确定性派生，与写入侧同一算法）；指纹+维度命中才参与检索，否则降级留痕。
+    const vectorStart = Date.now();
     const vectorIndex = this.deps.vectorIndex;
     const chunksById = new Map<string, StoredKnowledgeChunk>();
     const vectorVariantIds: string[] = [];
@@ -962,7 +1130,28 @@ export class KnowledgeQueryService {
         limit: Math.max(1, Math.min(generationLimit, KNOWLEDGE_UNCAPPED_RETRIEVAL_LIMIT)),
       });
     } catch (error) {
-      if (!isKnowledgeError(error) || error.code !== "KNOWLEDGE_INDEX_INVALID") throw error;
+      if (!isKnowledgeError(error) || error.code !== "KNOWLEDGE_INDEX_INVALID") {
+        // 向量库检索的意外错误（非损坏自愈路径）：向量通道本轮不可用——降级
+        // 纯 FTS + VECTOR_NOT_READY 留痕，不炸检索（与查询嵌入失败降级同纪律）。
+        const cause = error instanceof Error ? `${error.name}: ${error.message}` : String(error);
+        return {
+          candidates: fts,
+          retrievalMode: "fts",
+          retrievalModeRequested,
+          degraded: [
+            ...allDegraded,
+            ...readyScopes
+              .filter(scope => !vectorDegraded.some(item => item.parseArtifactId === scope.parseArtifactId))
+              .map(scope => ({
+                parseArtifactId: scope.parseArtifactId,
+                chunkProfileHash: scope.chunkProfileHash,
+                reason: "KNOWLEDGE_VECTOR_NOT_READY" as const,
+                detail: `vector search failed (${cause}); kept FTS candidates`,
+              })),
+          ],
+          searchedVectorVariants: [],
+        };
+      }
       // 向量库损坏自愈（§十三）：rebuild 后变体必然全失（缓存级重建），本轮降级
       // 纯 FTS 并把原就绪 scope 记为 VECTOR_NOT_READY，由后台摄入重建向量。
       vectorIndex!.rebuild();
@@ -1002,7 +1191,13 @@ export class KnowledgeQueryService {
         }
         return { ...chunk, score: row.score };
       });
-    let candidates = fuseCandidates(fts, vector, topK);
+    let candidates;
+    {
+      vectorMs = Date.now() - vectorStart;
+      const fuseStart = Date.now();
+      candidates = fuseCandidates(fts, vector, topK);
+      fuseMs = Date.now() - fuseStart;
+    }
     // rerank 输入防护：超出 KNOWLEDGE_RERANK_MAX_DOCS 的尾部保持 RRF 名次。
     const rerankCandidates = candidates.length > KNOWLEDGE_RERANK_MAX_DOCS
       ? candidates.slice(0, KNOWLEDGE_RERANK_MAX_DOCS)
@@ -1011,21 +1206,39 @@ export class KnowledgeQueryService {
       ? candidates.slice(KNOWLEDGE_RERANK_MAX_DOCS)
       : [];
     const reranker = input.reranker !== undefined ? input.reranker : this.deps.rerank;
-    if (input.rerank !== false && rerankCandidates.length > 0 && reranker) {
+    let rerankDegradeReason: string | undefined;
+    let rerankSkippedReason: string | undefined;
+    const rerankStart = Date.now();
+    // ── rerank 动态门控（2026-08-31 快速档）──
+    // 融合分 top-1 领先 ≥ 阈值 = 头部清晰，重排对头部次序几乎不可能改进——
+    // 主动跳过（省一次 0–15s 的网络往返），保持 RRF 名次。跳过≠降级：
+    // 留痕走独立字段（rerankSkippedReason），只进 stats 不进注入块。
+    const marginGateActive = input.rerankPolicy?.marginGate === true
+      && rerankCandidates.length >= 2
+      && candidates[0].score - candidates[1].score >= KNOWLEDGE_RERANK_CLEAR_MARGIN;
+    if (marginGateActive) {
+      rerankSkippedReason = `rerank skipped (margin gate: top-1 RRF score ${candidates[0].score.toFixed(4)} `
+        + `leads top-2 ${candidates[1].score.toFixed(4)} ≥ ${KNOWLEDGE_RERANK_CLEAR_MARGIN}); kept RRF ranking`;
+    } else if (input.rerank !== false && rerankCandidates.length > 0 && reranker) {
       let reranked;
       try {
-        reranked = await reranker({
+        reranked = await this.invokeRerankerWithDeadline({
+          reranker,
           runId,
-          query: question,
+          question,
           documents: rerankCandidates.map(candidate => candidate.text),
-          topN: rerankCandidates.length,
           signal,
+          ...(input.rerankPolicy?.deadlineMs != null
+            ? { deadlineMs: input.rerankPolicy.deadlineMs }
+            : {}),
         });
       } catch (error) {
         if (isAbortLike(error)) throw error;
         if (isKnowledgeError(error)) throw error;
+        // 期限超时/传输类失败：重排是精排增强层，降级保 RRF 名次并显式留痕
+        // （见 KNOWLEDGE_RERANK_DEADLINE_MS docstring），不炸整个检索。
         const cause = error instanceof Error ? `${error.name}: ${error.message}` : String(error);
-        throw new KnowledgeError("KNOWLEDGE_RETRIEVAL_UNAVAILABLE", "Knowledge rerank request failed", { cause });
+        rerankDegradeReason = `rerank degraded (${cause}); kept RRF ranking`;
       }
       if (reranked) {
         if (
@@ -1048,13 +1261,68 @@ export class KnowledgeQueryService {
         ];
       }
     }
+    rerankMs = Date.now() - rerankStart;
     return {
       candidates,
       retrievalMode: "hybrid",
       retrievalModeRequested,
       degraded: allDegraded,
       searchedVectorVariants,
+      ...(rerankDegradeReason ? { rerankDegradeReason } : {}),
+      ...(rerankSkippedReason ? { rerankSkippedReason } : {}),
+      stageTimings: {
+        ftsMs,
+        ...(embedMs != null ? { embedMs } : {}),
+        ...(vectorMs != null ? { vectorMs } : {}),
+        ...(fuseMs != null ? { fuseMs } : {}),
+        ...(rerankMs != null ? { rerankMs } : {}),
+      },
     };
+  }
+
+  /**
+   * rerank 执行 + 期限竞速（KNOWLEDGE_RERANK_DEADLINE_MS）：超时即 abort 底层
+   * 请求并抛 KnowledgeRerankDeadlineError（调用方降级处理）；外部 signal 的
+   * abort 原样穿透（用户取消语义）。竞速落败方的 rejection 就地吞掉，不允许
+   * 变成 unhandled rejection。
+   */
+  private async invokeRerankerWithDeadline(input: {
+    reranker: KnowledgeReranker;
+    runId: string;
+    question: string;
+    documents: string[];
+    signal?: AbortSignal;
+    /** 期限覆写（2026-08-31 快速档的收紧版）；缺省 = KNOWLEDGE_RERANK_DEADLINE_MS。 */
+    deadlineMs?: number;
+  }): Promise<{ results: Array<{ index: number; score: number }> } | null> {
+    const deadlineMs = input.deadlineMs ?? KNOWLEDGE_RERANK_DEADLINE_MS;
+    const controller = new AbortController();
+    const onExternalAbort = () => controller.abort();
+    input.signal?.addEventListener("abort", onExternalAbort, { once: true });
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const deadline = new Promise<never>((_, reject) => {
+      timer = setTimeout(() => {
+        controller.abort();
+        const error = new Error(`rerank deadline exceeded after ${deadlineMs}ms`);
+        error.name = "KnowledgeRerankDeadlineError";
+        reject(error);
+      }, deadlineMs);
+    });
+    const attempt = Promise.resolve().then(() => input.reranker({
+      runId: input.runId,
+      query: input.question,
+      documents: input.documents,
+      topN: input.documents.length,
+      signal: controller.signal,
+    }));
+    deadline.catch(() => {});
+    attempt.catch(() => {});
+    try {
+      return await Promise.race([attempt, deadline]);
+    } finally {
+      if (timer !== undefined) clearTimeout(timer);
+      input.signal?.removeEventListener("abort", onExternalAbort);
+    }
   }
 
   /**
@@ -1093,6 +1361,8 @@ export class KnowledgeQueryService {
           texts: request.texts,
           signal: request.signal,
           modelRef: input.embeddingModelRef!,
+          // 查询侧嵌入（MiniMax db/query、Voyage input_type 的算法分离）
+          inputType: "query",
         })) as KnowledgeEmbedder
       : null;
     const reranker = input.rerankModelRef && this.deps.rerankForModel
@@ -1153,6 +1423,11 @@ export class KnowledgeQueryService {
     question: string;
     topK?: number;
     rerank?: boolean;
+    /**
+     * rerank 策略（2026-08-31 快速档；门控跳过 + 期限收紧）。逐笔记本透传到
+     * retrieve()；缺省 = 既有行为（总是重排 + 默认期限）。
+     */
+    rerankPolicy?: { marginGate: boolean; deadlineMs?: number };
     signal?: AbortSignal;
     /**
      * KnowledgeTurnScope 冻结集合（§四十三，Phase 4）：sourceId → 冻结的
@@ -1232,6 +1507,8 @@ export class KnowledgeQueryService {
             texts: request.texts,
             signal: request.signal,
             modelRef: resolved.embeddingModelRef!,
+            // 查询侧嵌入（MiniMax db/query、Voyage input_type 的算法分离）
+            inputType: "query",
           })) as KnowledgeEmbedder
         : null;
       const readyArtifacts = entries
@@ -1289,6 +1566,9 @@ export class KnowledgeQueryService {
       let retrievalMode: "fts" | "hybrid" = "fts";
       let retrievalModeRequested: "fts" | "hybrid" = embedTexts ? "hybrid" : "fts";
       let searchedVectorVariants: SearchedVectorVariantIdentity[] = [];
+      let rerankDegradeReason: string | null = null;
+      let rerankSkippedReason: string | null = null;
+      let stageTimings: KnowledgeRetrievalStageTimings | undefined;
       if (scopes.length > 0) {
         const result = await this.retrieve({
           studioId,
@@ -1300,12 +1580,22 @@ export class KnowledgeQueryService {
           rerank,
           reranker,
           embedTexts,
+          ...(input.rerankPolicy ? { rerankPolicy: input.rerankPolicy } : {}),
           ...(ordinalRanges.size > 0 ? { ordinalRangesByChunkIndexVariantId: ordinalRanges } : {}),
         });
         if (result.retrievalMode === "hybrid") retrievalMode = "hybrid";
         retrievalModeRequested = result.retrievalModeRequested;
         ranked = result.candidates;
         searchedVectorVariants = result.searchedVectorVariants;
+        if (result.rerankDegradeReason) {
+          rerankDegradeReason = `${notebook.name}: ${result.rerankDegradeReason}`;
+        }
+        if (result.rerankSkippedReason) {
+          rerankSkippedReason = `${notebook.name}: ${result.rerankSkippedReason}`;
+        }
+        if (result.stageTimings) {
+          stageTimings = result.stageTimings;
+        }
         // 逐 scope 降级：附上 notebook/source 归属，并幂等入队后台构建（§十二）。
         // KNOWLEDGE_INDEX_FAILED 是显式终态：不自动重试（UI 手动 reingest），只留痕。
         for (const item of result.degraded) {
@@ -1344,6 +1634,9 @@ export class KnowledgeQueryService {
         sources,
         degraded,
         searchedVectorVariants,
+        ...(rerankDegradeReason ? { rerankDegradeReason } : {}),
+        ...(rerankSkippedReason ? { rerankSkippedReason } : {}),
+        ...(stageTimings ? { stageTimings } : {}),
       };
     }));
 
@@ -1357,6 +1650,25 @@ export class KnowledgeQueryService {
       ? "hybrid"
       : "fts";
     const degraded = notebookResults.flatMap(item => item.degraded);
+    // rerank 降级留痕跨笔记本汇总（保持笔记本归属，供注入块/stats 显式呈现）。
+    const rerankDegradeReasons = notebookResults
+      .map(item => item.rerankDegradeReason)
+      .filter((reason): reason is string => typeof reason === "string");
+    // 门控跳过留痕同构汇总（主动跳过≠降级；只进 stats）。
+    const rerankSkippedReasons = notebookResults
+      .map(item => item.rerankSkippedReason)
+      .filter((reason): reason is string => typeof reason === "string");
+    // 分段计时跨笔记本取各段最大值（并行执行的笔记本里最慢的那个才是关键路径）。
+    const stageTimings: KnowledgeRetrievalStageTimings = {};
+    for (const item of notebookResults) {
+      if (!item.stageTimings) continue;
+      for (const [key, value] of Object.entries(item.stageTimings)) {
+        if (typeof value !== "number") continue;
+        if (value > ((stageTimings as Record<string, number | undefined>)[key] ?? 0)) {
+          (stageTimings as Record<string, number | undefined>)[key] = value;
+        }
+      }
+    }
     // 向量变体身份跨笔记本汇总去重（同源被多笔记本共享时各结果重复携带）。
     const searchedVectorVariants: SearchedVectorVariantIdentity[] = [];
     const seenVectorVariantIds = new Set<string>();
@@ -1381,7 +1693,17 @@ export class KnowledgeQueryService {
       locatorCache,
     ));
 
-    return { candidates, sources, retrievalMode, retrievalModeRequested, degraded, searchedVectorVariants };
+    return {
+      candidates,
+      sources,
+      retrievalMode,
+      retrievalModeRequested,
+      degraded,
+      searchedVectorVariants,
+      ...(rerankDegradeReasons.length > 0 ? { rerankDegradeReasons } : {}),
+      ...(rerankSkippedReasons.length > 0 ? { rerankSkippedReasons } : {}),
+      ...(Object.keys(stageTimings).length > 0 ? { stageTimings } : {}),
+    };
   }
 
   /**
