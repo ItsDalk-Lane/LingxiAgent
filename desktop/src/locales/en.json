@@ -461,11 +461,8 @@
     "knowledgeRetrievalRolled": "Read in {parts} parts",
     "knowledgeRetrievalSupplement": "Supplemental searches: {n} queries",
     "knowledgeRetrievalSupplementTitle": "Supplemental searches issued by the model during the rolling read",
-    "knowledgeTraceThinking": "Deep thinking",
-    "knowledgeTraceSearching": "Searching the knowledge base",
     "knowledgeTraceResults": "{n} search results",
-    "knowledgeTraceFailed": "Search failed",
-    "knowledgeTraceAnswering": "Generating answer"
+    "knowledgeTraceFailed": "Search failed"
   },
   "time": {
     "justNow": "Just now",
@@ -1177,6 +1174,31 @@
       "running": "🗃️ Updating knowledge notebooks",
       "done": "🗃️ Updated knowledge notebooks",
       "failed": "🗃️ Failed to update knowledge notebooks"
+    },
+    "knowledge_think": {
+      "running": "🧠 Decomposing the question",
+      "done": "🧠 Decomposed the question",
+      "failed": "🧠 Failed to decompose"
+    },
+    "knowledge_search": {
+      "running": "🔍 Searching the knowledge base",
+      "done": "🔍 Searched the knowledge base",
+      "failed": "🔍 Search failed"
+    },
+    "knowledge_read_part": {
+      "running": "📖 Reading evidence",
+      "done": "📖 Read evidence",
+      "failed": "📖 Read failed"
+    },
+    "knowledge_supplement": {
+      "running": "↻ Model requests more searches",
+      "done": "↻ Model requested more searches",
+      "failed": "↻ Supplement failed"
+    },
+    "knowledge_answer": {
+      "running": "✻ Composing the answer",
+      "done": "✻ Composed the answer",
+      "failed": "✻ Answer failed"
     }
   },
   "file_output": {

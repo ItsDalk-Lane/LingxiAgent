@@ -461,11 +461,8 @@
     "knowledgeRetrievalRolled": "{parts}부분으로 나눠 읽기",
     "knowledgeRetrievalSupplement": "보충 검색 {n}건",
     "knowledgeRetrievalSupplementTitle": "롤링 읽기 중 모델이 자발적으로 실행한 보충 검색",
-    "knowledgeTraceThinking": "깊이 생각하는 중",
-    "knowledgeTraceSearching": "지식 베이스 검색 중",
     "knowledgeTraceResults": "검색 결과 {n}건",
-    "knowledgeTraceFailed": "검색 실패",
-    "knowledgeTraceAnswering": "답변 생성 중"
+    "knowledgeTraceFailed": "검색 실패"
   },
   "time": {
     "justNow": "방금",
@@ -1178,6 +1175,31 @@
       "running": "🗃️ 지식 노트를 정리하는 중",
       "done": "🗃️ 지식 노트를 정리했어요",
       "failed": "🗃️ 지식 노트를 정리하지 못했어요"
+    },
+    "knowledge_think": {
+      "running": "🧠 질문 분해 중",
+      "done": "🧠 질문을 분해했습니다",
+      "failed": "🧠 분해 실패"
+    },
+    "knowledge_search": {
+      "running": "🔍 지식 베이스 검색 중",
+      "done": "🔍 지식 베이스를 검색했습니다",
+      "failed": "🔍 검색 실패"
+    },
+    "knowledge_read_part": {
+      "running": "📖 증거 읽는 중",
+      "done": "📖 증거를 읽었습니다",
+      "failed": "📖 읽기 실패"
+    },
+    "knowledge_supplement": {
+      "running": "↻ 모델이 보충 검색 요청",
+      "done": "↻ 모델이 보충 검색을 요청했습니다",
+      "failed": "↻ 보충 검색 실패"
+    },
+    "knowledge_answer": {
+      "running": "✻ 답변 생성 중",
+      "done": "✻ 답변을 생성했습니다",
+      "failed": "✻ 답변 실패"
     }
   },
   "file_output": {

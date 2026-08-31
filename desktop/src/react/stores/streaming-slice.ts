@@ -29,19 +29,6 @@ export type LoopStatus = {
   prompt: string | null;
 };
 
-/** 知识注入过程行（服务器只发元数据：查询词/命中数/方向名，无模型输出）。 */
-export interface KnowledgeTraceEntry {
-  id: string;
-  kind: 'think' | 'search' | 'read' | 'note';
-  phase: 'start' | 'done' | 'failed';
-  query?: string;
-  hits?: number;
-  current?: number;
-  total?: number;
-  queries?: string[];
-  detail?: string | null;
-}
-
 export interface StreamingSlice {
   /** 所有正在 streaming 的 session identity key 集合（legacy path 只做兼容 locator） */
   streamingSessions: string[];
@@ -69,16 +56,6 @@ export interface StreamingSlice {
   knowledgeSupplementBySession: Record<string, { queries: string[]; round: number }>;
   updateKnowledgeSupplement: (path: string, progress: { queries: string[]; round: number }) => void;
   endKnowledgeSupplement: (path: string) => void;
-  /**
-   * 知识注入过程行堆（2026-08-31 二轮，对齐编程 Agent 的工具调用过程卡）：
-   * knowledge_trace / knowledge_rollup_progress / knowledge_supplement_search
-   * 事件按 id 原位更新成有序行（思考/检索/阅读/补充检索）。纯瞬态：不落盘、
-   * 不进 stream_resume；该 session 首个非知识过程事件（session_user_message 等）
-   * 保守清除——真实轮消息到达即整堆收起。
-   */
-  knowledgeTraceBySession: Record<string, KnowledgeTraceEntry[]>;
-  upsertKnowledgeTrace: (path: string, entry: KnowledgeTraceEntry) => void;
-  resetKnowledgeTrace: (path: string) => void;
   /**
    * 发送后本地进入「等待助手」态的 session（ws.send 成功 → 该 session 首个
    * 后续事件清除）。服务器在知识检索/排队期间不置 isStreaming，靠它保证
@@ -289,25 +266,6 @@ export const createStreamingSlice = (
       return acc;
     }, {});
     set({ knowledgeSupplementBySession: kept });
-  },
-  knowledgeTraceBySession: {},
-  upsertKnowledgeTrace: (path, entry) => {
-    const key = identityKeyForPath(get, path);
-    const current = get?.().knowledgeTraceBySession ?? {};
-    const list = current[key] ?? [];
-    const index = list.findIndex(item => item.id === entry.id);
-    const next = index >= 0
-      ? list.map((item, i) => (i === index ? { ...item, ...entry } : item))
-      : [...list, entry];
-    set({ knowledgeTraceBySession: { ...current, [key]: next } });
-  },
-  resetKnowledgeTrace: (path) => {
-    const key = identityKeyForPath(get, path);
-    const current = get?.().knowledgeTraceBySession ?? {};
-    if (!current[key] || current[key].length === 0) return;
-    const kept = { ...current };
-    delete kept[key];
-    set({ knowledgeTraceBySession: kept });
   },
   turnPendingSessions: [],
   beginTurnPending: (path) => set((s) => {

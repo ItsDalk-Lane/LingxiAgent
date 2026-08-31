@@ -461,11 +461,8 @@
     "knowledgeRetrievalRolled": "分 {parts} 部分阅读",
     "knowledgeRetrievalSupplement": "补充检索 {n} 条查询",
     "knowledgeRetrievalSupplementTitle": "滚动注入循环中模型自主发起的补充检索",
-    "knowledgeTraceThinking": "已深度思考",
-    "knowledgeTraceSearching": "正在检索知识库",
     "knowledgeTraceResults": "{n} 个搜索结果",
-    "knowledgeTraceFailed": "检索失败",
-    "knowledgeTraceAnswering": "正在生成回答"
+    "knowledgeTraceFailed": "检索失败"
   },
   "time": {
     "justNow": "刚刚",
@@ -1178,6 +1175,31 @@
       "running": "🗃️ 正在整理知识库笔记本",
       "done": "🗃️ 整理了知识库笔记本",
       "failed": "🗃️ 知识库笔记本没整理成"
+    },
+    "knowledge_think": {
+      "running": "🧠 正在拆解问题",
+      "done": "🧠 拆解了问题",
+      "failed": "🧠 问题没拆解出来"
+    },
+    "knowledge_search": {
+      "running": "🔍 正在检索知识库",
+      "done": "🔍 检索了知识库",
+      "failed": "🔍 检索失败"
+    },
+    "knowledge_read_part": {
+      "running": "📖 正在阅读证据",
+      "done": "📖 读了证据",
+      "failed": "📖 阅读失败"
+    },
+    "knowledge_supplement": {
+      "running": "↻ 模型发起补充检索",
+      "done": "↻ 模型发起了补充检索",
+      "failed": "↻ 补充检索失败"
+    },
+    "knowledge_answer": {
+      "running": "✻ 正在生成回答",
+      "done": "✻ 生成了回答",
+      "failed": "✻ 回答没生成出来"
     }
   },
   "file_output": {

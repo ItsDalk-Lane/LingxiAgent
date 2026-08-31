@@ -50,9 +50,6 @@ export const ChatMessageSurface = memo(function ChatMessageSurface({
   const isKnowledgeRetrieving = useStore(s => sessionScopedListIncludes(s, s.knowledgeRetrievingSessions, sessionPath));
   // 滚动注入进度（超预算证据分部分喂给主模型消化期间服务器逐轮广播）：
   // 驱动「正在阅读第 X/N 部分」胶囊；补充检索（模型自主再查询）另有一行。
-  // 知识注入过程行堆（2026-08-31 二轮）：拆解/检索/阅读/补充检索逐行实时渲染
-  // （对齐编程 Agent 的工具调用过程卡）；服务器只发元数据（查询词/命中数）。
-  const knowledgeTrace = useStore(s => sessionScopedValue(s, s.knowledgeTraceBySession, sessionPath));
   // 发送即置位的本地「等待助手」态：知识检索/排队期间服务器不置 isStreaming，
   // 靠它让 typing 指示器在发送瞬间出现，而不是等检索结束才亮（首个后续事件清除）。
   const isTurnPending = useStore(s => sessionScopedListIncludes(s, s.turnPendingSessions, sessionPath));
@@ -478,48 +475,8 @@ export const ChatMessageSurface = memo(function ChatMessageSurface({
             registerMessageElement={registerMessageElement}
             enableProcessFold
           />
-          {!!knowledgeTrace?.length && (
-            // 知识注入过程行堆：interject（流式中追问）期间也必须可见——该场景下
-            // 主指示区被 isStreaming 裸三点占据，曾把进度胶囊整个遮没。行按发生
-            // 顺序排列、按 id 原位更新（检索行 start=查询词 → done=N 个搜索结果）。
-            <div className={styles.toolGroup} data-testid="knowledge-process-trace">
-              <div className={styles.toolGroupContent}>
-                {knowledgeTrace.map(entry => {
-                  const running = entry.phase === 'start';
-                  let icon = '🔍';
-                  let text = '';
-                  if (entry.kind === 'think') {
-                    icon = '✻';
-                    text = t('chat.knowledgeTraceThinking');
-                  } else if (entry.kind === 'search') {
-                    if (entry.phase === 'failed') text = t('chat.knowledgeTraceFailed');
-                    else if (running) text = entry.query || t('chat.knowledgeTraceSearching');
-                    else text = t('chat.knowledgeTraceResults', { n: entry.hits ?? 0 });
-                  } else if (entry.kind === 'read') {
-                    icon = '📖';
-                    text = t('chat.knowledgeRollupReading', { current: entry.current ?? 1, total: entry.total ?? 1 });
-                  } else if (entry.detail === 'answer') {
-                    icon = '✻';
-                    text = t('chat.knowledgeTraceAnswering');
-                  } else {
-                    icon = '↻';
-                    text = t('chat.knowledgeSupplementing', { count: entry.queries?.length ?? 0 });
-                  }
-                  return (
-                    <div
-                      key={entry.id}
-                      className={styles.toolIndicator}
-                      title={entry.kind === 'search' && entry.query ? entry.query : undefined}
-                    >
-                      <span className={styles.knowledgeRetrievalOrdinal} aria-hidden="true">{icon}</span>
-                      <span className={styles.toolDesc}>{text}{running ? ' …' : ''}</span>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-          {(isKnowledgeRetrieving || isTurnPending) && !isSessionStreaming && !knowledgeTrace?.length && (
+          {(isKnowledgeRetrieving || isTurnPending) && !isSessionStreaming && (
+
             <div className={`${styles.typingIndicator} ${styles.knowledgeRetrievingIndicator}`}>
               {isKnowledgeRetrieving ? t('chat.knowledgeRetrieving') : ''}
             </div>

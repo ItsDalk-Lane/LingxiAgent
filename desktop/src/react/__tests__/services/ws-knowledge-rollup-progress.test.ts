@@ -16,9 +16,13 @@ vi.mock('../../services/stream-resume', () => ({
   updateSessionStreamMeta: vi.fn(),
 }));
 vi.mock('../../services/stream-key-dispatcher', () => ({ dispatchStreamKey: vi.fn() }));
+vi.mock('../../hooks/use-stream-buffer', () => ({
+  streamBufferManager: { handle: vi.fn(), finishRun: vi.fn() },
+}));
 
 import { handleServerMessage } from '../../services/ws-message-handler';
 import { useStore } from '../../stores';
+import { streamBufferManager } from '../../hooks/use-stream-buffer';
 
 const PATH = '/session/knowledge-rollup.jsonl';
 
@@ -94,8 +98,11 @@ describe('knowledge_rollup_progress / knowledge_supplement_search 前端消费�
   });
 });
 
-describe('knowledge_trace 过程行堆（2026-08-31 二轮）', () => {
+describe('知识过程 → 合成工具卡（2026-08-31 四轮）', () => {
   beforeEach(() => {
+    // 归零跨用例的阅读卡状态（上一用例可能残留 kt-read-* 开卡），再清 mock。
+    handleServerMessage({ type: 'knowledge_retrieval_started', sessionPath: PATH });
+    vi.mocked(streamBufferManager.handle).mockClear();
     useStore.setState({
       currentSessionPath: PATH,
       pendingNewSession: false,
@@ -116,60 +123,67 @@ describe('knowledge_trace 过程行堆（2026-08-31 二轮）', () => {
       knowledgeRetrievingSessions: [],
       knowledgeRollupBySession: {},
       knowledgeSupplementBySession: {},
-      knowledgeTraceBySession: {},
     } as never);
   });
 
-  it('trace 事件按 id 追加与原位更新（start 查询词 → done 命中数）', () => {
+  it('think/search 事件各翻译成一张工具卡：start 成卡、done 收尾带结果注记', () => {
     handleServerMessage({ type: 'knowledge_trace', sessionPath: PATH, id: 'think-1', kind: 'think', phase: 'start' });
     handleServerMessage({ type: 'knowledge_trace', sessionPath: PATH, id: 'search-1', kind: 'search', phase: 'start', query: '风险准备金' });
     handleServerMessage({ type: 'knowledge_trace', sessionPath: PATH, id: 'search-1', kind: 'search', phase: 'done', query: '风险准备金', hits: 50 });
     handleServerMessage({ type: 'knowledge_trace', sessionPath: PATH, id: 'think-1', kind: 'think', phase: 'done' });
 
-    const trace = useStore.getState().knowledgeTraceBySession[PATH]!;
-    expect(trace.map(entry => entry.id)).toEqual(['think-1', 'search-1']);
-    expect(trace[0]).toMatchObject({ kind: 'think', phase: 'done' });
-    expect(trace[1]).toMatchObject({ kind: 'search', phase: 'done', hits: 50 });
+    const calls = vi.mocked(streamBufferManager.handle).mock.calls.map(call => call[0]);
+    console.log('RECEIVED_CALLS', JSON.stringify(calls, null, 1));
+    expect(calls).toEqual([
+      { type: 'tool_start', sessionPath: PATH, id: 'kt-think-1', name: 'knowledge_think' },
+      { type: 'tool_start', sessionPath: PATH, id: 'kt-search-1', name: 'knowledge_search', args: { query: '风险准备金' } },
+      // resultNote 在生产经 window.t 解析为「N 个搜索结果」；测试环境无 t 回落裸 key。
+      expect.objectContaining({ type: 'tool_end', id: 'kt-search-1', success: true, resultNote: expect.any(String) }),
+      { type: 'tool_end', sessionPath: PATH, id: 'kt-think-1', success: true },
+    ]);
   });
 
-  it('rollup/supplement 事件同步映射为 read/note 过程行', () => {
-    handleServerMessage({ type: 'knowledge_rollup_progress', sessionPath: PATH, current: 2, total: 5 });
+  it('滚动阅读：每部分一张卡，第 k 部分开始时收尾第 k-1 张', () => {
+    handleServerMessage({ type: 'knowledge_rollup_progress', sessionPath: PATH, current: 1, total: 3 });
+    handleServerMessage({ type: 'knowledge_rollup_progress', sessionPath: PATH, current: 2, total: 3 });
+
+    const calls = vi.mocked(streamBufferManager.handle).mock.calls.map(call => call[0]);
+    expect(calls).toEqual([
+      { type: 'tool_start', sessionPath: PATH, id: 'kt-read-1', name: 'knowledge_read_part', args: { current: '1', total: '3' } },
+      { type: 'tool_end', sessionPath: PATH, id: 'kt-read-1', success: true },
+      { type: 'tool_start', sessionPath: PATH, id: 'kt-read-2', name: 'knowledge_read_part', args: { current: '2', total: '3' } },
+    ]);
+  });
+
+  it('answer 收口：阅读卡收尾 + 「正在生成回答」卡；正文首字到达时收尾', () => {
+    handleServerMessage({ type: 'knowledge_rollup_progress', sessionPath: PATH, current: 1, total: 2 });
+    handleServerMessage({ type: 'knowledge_trace', sessionPath: PATH, id: 'answer', kind: 'note', phase: 'start', detail: 'answer' });
+    handleServerMessage({ type: 'text_delta', sessionPath: PATH, streamId: 's1', delta: '答' });
+
+    // 只断言合成卡：text_delta 本身也会正常喂缓冲（真实流事件），不属于翻译层。
+    const calls = vi.mocked(streamBufferManager.handle).mock.calls
+      .map(call => call[0])
+      .filter(event => event.type === 'tool_start' || event.type === 'tool_end');
+    expect(calls).toEqual([
+      { type: 'tool_start', sessionPath: PATH, id: 'kt-read-1', name: 'knowledge_read_part', args: { current: '1', total: '2' } },
+      { type: 'tool_end', sessionPath: PATH, id: 'kt-read-1', success: true },
+      { type: 'tool_start', sessionPath: PATH, id: 'kt-answer', name: 'knowledge_answer' },
+      { type: 'tool_end', sessionPath: PATH, id: 'kt-answer', success: true },
+    ]);
+  });
+
+  it('补充检索：决策卡瞬时完成（随后真实检索各自成卡）', () => {
     handleServerMessage({ type: 'knowledge_supplement_search', sessionPath: PATH, queries: ['交付节点'], round: 2 });
-
-    const trace = useStore.getState().knowledgeTraceBySession[PATH]!;
-    expect(trace).toHaveLength(2);
-    expect(trace[0]).toMatchObject({ id: 'read', kind: 'read', current: 2, total: 5 });
-    expect(trace[1]).toMatchObject({ id: 'supplement-2', kind: 'note', queries: ['交付节点'] });
+    const calls = vi.mocked(streamBufferManager.handle).mock.calls.map(call => call[0]);
+    expect(calls).toEqual([
+      { type: 'tool_start', sessionPath: PATH, id: 'kt-supplement-2', name: 'knowledge_supplement' },
+      expect.objectContaining({ type: 'tool_end', id: 'kt-supplement-2', success: true, resultNote: expect.any(String) }),
+    ]);
   });
 
-  it('非法载荷（缺 id / 缺 sessionPath）跳过且不炸', () => {
+  it('非法载荷（缺 id / 缺 sessionPath）不喂卡且不炸', () => {
     expect(() => handleServerMessage({ type: 'knowledge_trace', sessionPath: PATH, kind: 'think', phase: 'start' })).not.toThrow();
     expect(() => handleServerMessage({ type: 'knowledge_trace', id: 'x', kind: 'think', phase: 'start' })).not.toThrow();
-    expect(useStore.getState().knowledgeTraceBySession[PATH]).toBeUndefined();
-  });
-
-  it('过程行堆跨真实轮事件存活，只在答案正文流式开始时收起', () => {
-    handleServerMessage({ type: 'knowledge_trace', sessionPath: PATH, id: 'think-1', kind: 'think', phase: 'start' });
-    handleServerMessage({ type: 'knowledge_trace', sessionPath: PATH, id: 'answer', kind: 'note', phase: 'start', detail: 'answer' });
-    expect(useStore.getState().knowledgeTraceBySession[PATH]).toHaveLength(2);
-
-    // 用户消息投影等普通事件不清过程行（等待态本身要持续到答案出现）。
-    handleServerMessage({ type: 'session_title', path: PATH, title: '新标题' });
-    expect(useStore.getState().knowledgeTraceBySession[PATH]).toHaveLength(2);
-
-    // 答案正文首个 text_delta 到达 → 整堆收起。
-    handleServerMessage({ type: 'text_delta', sessionPath: PATH, streamId: 's1', delta: '答' });
-    expect(useStore.getState().knowledgeTraceBySession[PATH]).toBeUndefined();
-  });
-
-  it('run 结束（assistant_run_end）兜底收起；新一轮检索重开空堆', () => {
-    handleServerMessage({ type: 'knowledge_trace', sessionPath: PATH, id: 'think-1', kind: 'think', phase: 'start' });
-    handleServerMessage({ type: 'assistant_run_end', sessionPath: PATH });
-    expect(useStore.getState().knowledgeTraceBySession[PATH]).toBeUndefined();
-
-    handleServerMessage({ type: 'knowledge_trace', sessionPath: PATH, id: 'search-1', kind: 'search', phase: 'start', query: 'q' });
-    handleServerMessage({ type: 'knowledge_retrieval_started', sessionPath: PATH });
-    expect(useStore.getState().knowledgeTraceBySession[PATH]).toBeUndefined();
+    expect(streamBufferManager.handle).not.toHaveBeenCalled();
   });
 });
-

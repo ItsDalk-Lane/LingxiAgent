@@ -21,6 +21,9 @@ export interface ToolCall {
   status?: 'running' | 'succeeded' | 'failed' | 'unknown';
   error?: string;
   details?: { card?: import('../types').PluginCardDetails; [key: string]: unknown };
+  /** 完成态行内结果注记（如「50 个结果」）：合成过程卡（knowledge_*）经 tool_end
+   * resultNote 透出；真实工具不携带。 */
+  resultNote?: string;
 }
 
 export interface DeferredHistoryContent {

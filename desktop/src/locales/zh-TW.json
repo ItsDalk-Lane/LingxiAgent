@@ -461,11 +461,8 @@
     "knowledgeRetrievalRolled": "分 {parts} 部分閱讀",
     "knowledgeRetrievalSupplement": "補充檢索 {n} 條查詢",
     "knowledgeRetrievalSupplementTitle": "滾動注入循環中模型自主發起的補充檢索",
-    "knowledgeTraceThinking": "已深度思考",
-    "knowledgeTraceSearching": "正在檢索知識庫",
     "knowledgeTraceResults": "{n} 個搜尋結果",
-    "knowledgeTraceFailed": "檢索失敗",
-    "knowledgeTraceAnswering": "正在產生回答"
+    "knowledgeTraceFailed": "檢索失敗"
   },
   "time": {
     "justNow": "剛剛",
@@ -1178,6 +1175,31 @@
       "running": "🗃️ 正在整理知識庫筆記本",
       "done": "🗃️ 整理了知識庫筆記本",
       "failed": "🗃️ 知識庫筆記本沒整理成"
+    },
+    "knowledge_think": {
+      "running": "🧠 正在拆解問題",
+      "done": "🧠 拆解了問題",
+      "failed": "🧠 問題沒拆解出來"
+    },
+    "knowledge_search": {
+      "running": "🔍 正在檢索知識庫",
+      "done": "🔍 檢索了知識庫",
+      "failed": "🔍 檢索失敗"
+    },
+    "knowledge_read_part": {
+      "running": "📖 正在閱讀證據",
+      "done": "📖 讀了證據",
+      "failed": "📖 閱讀失敗"
+    },
+    "knowledge_supplement": {
+      "running": "↻ 模型發起補充檢索",
+      "done": "↻ 模型發起了補充檢索",
+      "failed": "↻ 補充檢索失敗"
+    },
+    "knowledge_answer": {
+      "running": "✻ 正在產生回答",
+      "done": "✻ 產生了回答",
+      "failed": "✻ 回答沒產生出來"
     }
   },
   "file_output": {

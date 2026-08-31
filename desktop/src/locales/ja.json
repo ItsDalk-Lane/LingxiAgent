@@ -461,11 +461,8 @@
     "knowledgeRetrievalRolled": "{parts} 部に分けて読解",
     "knowledgeRetrievalSupplement": "補足検索 {n} 件",
     "knowledgeRetrievalSupplementTitle": "ローリング読解中にモデルが自主的に発行した補足検索",
-    "knowledgeTraceThinking": "深い思考",
-    "knowledgeTraceSearching": "ナレッジベースを検索中",
     "knowledgeTraceResults": "{n} 件の検索結果",
-    "knowledgeTraceFailed": "検索に失敗しました",
-    "knowledgeTraceAnswering": "回答を生成中"
+    "knowledgeTraceFailed": "検索に失敗しました"
   },
   "time": {
     "justNow": "たった今",
@@ -1178,6 +1175,31 @@
       "running": "🗃️ ナレッジノートを更新中",
       "done": "🗃️ ナレッジノートを更新しました",
       "failed": "🗃️ ナレッジノートを更新できませんでした"
+    },
+    "knowledge_think": {
+      "running": "🧠 質問を分解中",
+      "done": "🧠 質問を分解しました",
+      "failed": "🧠 分解に失敗"
+    },
+    "knowledge_search": {
+      "running": "🔍 ナレッジベースを検索中",
+      "done": "🔍 ナレッジベースを検索しました",
+      "failed": "🔍 検索に失敗"
+    },
+    "knowledge_read_part": {
+      "running": "📖 エビデンスを読み込み中",
+      "done": "📖 エビデンスを読みました",
+      "failed": "📖 読み込みに失敗"
+    },
+    "knowledge_supplement": {
+      "running": "↻ モデルが補足検索を要求",
+      "done": "↻ モデルが補足検索を要求しました",
+      "failed": "↻ 補足検索に失敗"
+    },
+    "knowledge_answer": {
+      "running": "✻ 回答を生成中",
+      "done": "✻ 回答を生成しました",
+      "failed": "✻ 回答に失敗"
     }
   },
   "file_output": {

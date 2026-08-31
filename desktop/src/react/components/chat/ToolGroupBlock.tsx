@@ -212,6 +212,9 @@ const StandardToolIndicator = memo(function StandardToolIndicator({ tool, agentN
             <span className={styles.toolDetail} title={detailTitle}>{detail.text}</span>
           )
         )}
+        {tool.resultNote && (
+          <span className={styles.toolDetail}>{tool.resultNote}</span>
+        )}
         {tool.error && (
           <span className={styles.toolDetail} title={tool.error}>{tool.error}</span>
         )}

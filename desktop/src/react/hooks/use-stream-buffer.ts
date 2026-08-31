@@ -837,6 +837,7 @@ class StreamBufferManager {
                 status: msg.status || (msg.success ? 'succeeded' : 'failed'),
                 ...(typeof msg.error === 'string' && msg.error ? { error: msg.error } : {}),
                 ...(msg.details !== undefined ? { details: msg.details } : {}),
+                ...(typeof msg.resultNote === 'string' && msg.resultNote ? { resultNote: msg.resultNote } : {}),
               };
               const allDone = tools.every(t => t.done);
               blocks[i] = { ...tg, tools, collapsed: allDone && tools.length > 1 };
