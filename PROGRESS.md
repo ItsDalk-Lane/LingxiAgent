@@ -10,7 +10,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = 22492163a8f107204d219b0da5ea1bbeaf243b1e  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-08-31 知识问答重构 + 过程可见二轮（knowledge_trace 逐行广播拆解/检索阶段）)
+VERIFIED_SOURCE_SHA   = 70b210a7765540bdfb95fda179335459be214cca  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-08-31 知识问答重构 + 过程可见二轮（knowledge_trace 逐行广播拆解/检索阶段）)
 工作分支              = feature/upstream-sync-0.447.4
 ```
 
@@ -725,6 +725,11 @@ seal 不是一次性终点，而是"当前被验证树"的游标；每次审计�
   隔离实例端到端因克隆环境模型解析怪癖未能跑通（与修复无关），以单元/集成
   测试 + 全量回归覆盖。验证：typecheck×3 绿 + 全量 npm test 12773 用例通过
   （0 失败；closure/boundary/指纹三生成物重钉）后推进。
+- **2026-08-31 用户截图验收 + 文案修补**（功能树 70b210a7/seal 本提交）：用户
+  实机截图确认合成工具卡形态达标（一动作一卡长在消息流）；修补充检索卡标签
+  与 resultNote 文案重复（换 count-only 新键 chat.knowledgeSupplementQueryCount，
+  五语言）。验证：typecheck×3 绿 + 定向套件 30 用例绿（纯文案与前端单点改动，
+  未触发指纹/闭包面）后推进。
 
 
 ## 最终状态：已合并（上游同步部分）
