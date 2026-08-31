@@ -148,11 +148,27 @@ describe('knowledge_trace 过程行堆（2026-08-31 二轮）', () => {
     expect(useStore.getState().knowledgeTraceBySession[PATH]).toBeUndefined();
   });
 
-  it('该 session 的真实轮事件到达即整堆收起', () => {
+  it('过程行堆跨真实轮事件存活，只在答案正文流式开始时收起', () => {
     handleServerMessage({ type: 'knowledge_trace', sessionPath: PATH, id: 'think-1', kind: 'think', phase: 'start' });
-    expect(useStore.getState().knowledgeTraceBySession[PATH]).toHaveLength(1);
+    handleServerMessage({ type: 'knowledge_trace', sessionPath: PATH, id: 'answer', kind: 'note', phase: 'start', detail: 'answer' });
+    expect(useStore.getState().knowledgeTraceBySession[PATH]).toHaveLength(2);
 
+    // 用户消息投影等普通事件不清过程行（等待态本身要持续到答案出现）。
     handleServerMessage({ type: 'session_title', path: PATH, title: '新标题' });
+    expect(useStore.getState().knowledgeTraceBySession[PATH]).toHaveLength(2);
+
+    // 答案正文首个 text_delta 到达 → 整堆收起。
+    handleServerMessage({ type: 'text_delta', sessionPath: PATH, streamId: 's1', delta: '答' });
+    expect(useStore.getState().knowledgeTraceBySession[PATH]).toBeUndefined();
+  });
+
+  it('run 结束（assistant_run_end）兜底收起；新一轮检索重开空堆', () => {
+    handleServerMessage({ type: 'knowledge_trace', sessionPath: PATH, id: 'think-1', kind: 'think', phase: 'start' });
+    handleServerMessage({ type: 'assistant_run_end', sessionPath: PATH });
+    expect(useStore.getState().knowledgeTraceBySession[PATH]).toBeUndefined();
+
+    handleServerMessage({ type: 'knowledge_trace', sessionPath: PATH, id: 'search-1', kind: 'search', phase: 'start', query: 'q' });
+    handleServerMessage({ type: 'knowledge_retrieval_started', sessionPath: PATH });
     expect(useStore.getState().knowledgeTraceBySession[PATH]).toBeUndefined();
   });
 });

@@ -562,7 +562,6 @@ export function handleServerMessage(msg: any): void {
       useStore.getState().endTurnPending?.(retrievalDonePath);
       useStore.getState().endKnowledgeRollup?.(retrievalDonePath);
       useStore.getState().endKnowledgeSupplement?.(retrievalDonePath);
-      useStore.getState().resetKnowledgeTrace?.(retrievalDonePath);
     }
   }
 
@@ -597,6 +596,16 @@ export function handleServerMessage(msg: any): void {
   }
 
   applyInputSessionConfirmationBlock(msg);
+
+  // 知识过程行堆的收口（2026-08-31 三轮）：过程行是「正在工作的助手消息」的
+  // 等待态本身——不被普通事件清除，只在答案正文开始流式输出（text_delta）或
+  // 本轮 run 结束（assistant_run_end，覆盖中止/空回包）时整堆收起。
+  if (msg.type === 'text_delta' || msg.type === 'assistant_run_end') {
+    const { sessionPath: traceDonePath } = sessionIdentityFromMessage(msg);
+    if (traceDonePath) {
+      useStore.getState().resetKnowledgeTrace?.(traceDonePath);
+    }
+  }
 
   // 活跃 block 事件路由：非当前 session 的聊天事件也要写入正常聊天缓存。
   // stream-key-dispatcher 只负责卡片/预览订阅，不能吞掉主 transcript 的后台流。
@@ -1249,6 +1258,8 @@ export function handleServerMessage(msg: any): void {
       const sp = nonEmptyString(msg.sessionPath) || nonEmptyString(msg.path);
       if (!sp) { console.warn('[ws] knowledge_retrieval_started missing sessionPath, skipping'); break; }
       useStore.getState().beginKnowledgeRetrieval?.(sp);
+      // 新一轮检索：清掉上一轮残留的过程行堆（新一轮从空堆开始）。
+      useStore.getState().resetKnowledgeTrace?.(sp);
       break;
     }
 

@@ -498,6 +498,9 @@ export const ChatMessageSurface = memo(function ChatMessageSurface({
                   } else if (entry.kind === 'read') {
                     icon = '📖';
                     text = t('chat.knowledgeRollupReading', { current: entry.current ?? 1, total: entry.total ?? 1 });
+                  } else if (entry.detail === 'answer') {
+                    icon = '✻';
+                    text = t('chat.knowledgeTraceAnswering');
                   } else {
                     icon = '↻';
                     text = t('chat.knowledgeSupplementing', { count: entry.queries?.length ?? 0 });
