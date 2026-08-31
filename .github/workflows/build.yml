@@ -564,15 +564,16 @@ jobs:
           # matrix jobs: it is built once by the renderer-box job and downloaded/reused by
           # every platform (see scripts/pack-renderer-box.mjs and packDualKindSeed's
           # prebuiltRendererArchive / LINGXI_PREBUILT_RENDERER_BOX). Which platform's copy we
-          # publish here no longer matters for correctness — macOS arm64 is kept only to
-          # avoid widening this step's diff.
-          echo "=== Uploading renderer hot-update archive (macOS arm64 build only) ==="
-          RENDERER_TGZ=$(find artifacts -path '*installer-macos-latest-arm64*/dist-renderer-artifact/renderer-*.tar.gz' | head -1)
+          # publish here does not matter for correctness — the find deliberately matches ANY
+          # installer copy so runner-label drift (macos-latest → macos-15, artifact names
+          # embed matrix.os) can never break the release upload again.
+          echo "=== Uploading renderer hot-update archive ==="
+          RENDERER_TGZ=$(find artifacts -path '*/dist-renderer-artifact/renderer-*.tar.gz' | head -1)
           if [ -n "$RENDERER_TGZ" ]; then
             echo "  $RENDERER_TGZ"
             gh release upload "${{ github.ref_name }}" "$RENDERER_TGZ" --clobber
           else
-            echo "::error::renderer hot-update archive not found from the macOS arm64 build"
+            echo "::error::renderer hot-update archive not found in any installer artifact"
             exit 1
           fi
 
