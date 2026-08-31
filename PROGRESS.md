@@ -10,7 +10,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = a4048480622da11b009608f83520f6ab78f0bae3  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-08-31 知识问答重构 + 过程可见二轮（knowledge_trace 逐行广播拆解/检索阶段）)
+VERIFIED_SOURCE_SHA   = c031078864c50bb5ecf7e6b07b2827c469740938  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-08-31 知识问答重构 + 过程可见二轮（knowledge_trace 逐行广播拆解/检索阶段）)
 工作分支              = feature/upstream-sync-0.447.4
 ```
 
@@ -703,6 +703,13 @@ seal 不是一次性终点，而是"当前被验证树"的游标；每次审计�
   更新（检索行 start=查询词 → done=「N 个搜索结果」），rollup/supplement
   事件同步映射为 read/note 行；首个非知识事件保守清除整堆。验证：typecheck×3
   绿 + 全量 npm test 12771 用例通过（0 失败）后推进。
+- **2026-08-31 过程可见三轮：过程行堆=等待态本体**（功能树 c0310788/seal 本
+  提交）：用户实测反馈「检索提示先消失、退回三个点干等很久才有输出」——根因
+  是过程行堆被 session_user_message 等普通事件保守清除，把主模型预填充+生成
+  的漫长等待裸露成三个点。改为：过程行只在答案正文首个 text_delta 或
+  assistant_run_end（中止/空回包兜底）时收起；submit 两路径检索完成即发
+  note+detail=answer 的「正在生成回答」行盖住预填充期。验证：typecheck×3 绿 +
+  全量 npm test 12772 用例通过（0 失败）后推进。
 
 
 ## 最终状态：已合并（上游同步部分）
