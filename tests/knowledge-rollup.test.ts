@@ -227,6 +227,26 @@ describe("runKnowledgeRollup", () => {
     expect(empty).toMatchObject({ ok: false, reason: "no evidence entries to roll up" });
   });
 
+  it("单份证据封顶 KNOWLEDGE_ROLLUP_PART_MAX_TOKENS（大预算不再装出 49 万 token 的巨份）", async () => {
+    // 4 条 × ~3.3 万 token：总 ~13 万 < 预算 50 万（availableForPart 巨大），
+    // 但每份必须 ≤ 64k → 每份 1-2 条、共 ≥ 3 份（而非一整份）。
+    const entries = [entry(0, 40_000), entry(1, 40_000), entry(2, 40_000), entry(3, 40_000)];
+    const rollupModel: KnowledgeRollupModel = vi.fn(async ({ round }) => `r${round}`);
+    const outcome = await runKnowledgeRollup({
+      question: "问题",
+      entries,
+      budgetTokens: 500_000,
+      deps: { rollupModel, retrieve: async () => fakeRetrieval([]) },
+    });
+    expect(outcome.ok).toBe(true);
+    if (!outcome.ok) return;
+    expect(outcome.result.stats.parts).toBeGreaterThanOrEqual(3);
+    expect(outcome.result.stats.rounds).toBeGreaterThanOrEqual(2);
+    for (const digest of outcome.result.digests) {
+      expect(digest.notes).toMatch(/^r\d+$/);
+    }
+  });
+
   it("中间笔记超限硬截断并留痕 degradedReason", async () => {
     const rollupModel: KnowledgeRollupModel = vi.fn(async () => "笔".repeat(20_000));
     const outcome = await runKnowledgeRollup({

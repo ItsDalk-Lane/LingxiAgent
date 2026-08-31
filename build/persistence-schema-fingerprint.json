@@ -660,7 +660,7 @@
     ],
     "version": 3
   },
-  "payloadFingerprint": "sha256:4172d591d3ff1b087ea2fa6efd552816992dbc8ef8352bb4f30f9caf89a5c36c",
+  "payloadFingerprint": "sha256:5f525a1dca055ac97938d71d729f457b6bd2a11650ccecfe18da2903f3eb381a",
   "registry": [
     {
       "affectedByEpochMigration": true,
@@ -3285,8 +3285,8 @@
   ],
   "review": {
     "classification": "compatible",
-    "compatibilityReason": "knowledge-store.ts: exhaustive coverage run write APIs removed (runtime code only; coverage_runs/coverage_shards/evidence_manifests DDL unchanged, schema stays v17); knowledge-manager.ts untouched store shapes; coverage plan insert drops legacy requiresCompleteness input field (column still written as 0)",
-    "payloadFingerprint": "sha256:4172d591d3ff1b087ea2fa6efd552816992dbc8ef8352bb4f30f9caf89a5c36c"
+    "compatibilityReason": "session-coordinator.ts: cache-prefix guard now skips non-chat purpose side lanes (knowledge rollup rounds); engine.ts: rollup side-lane call wrapped in purpose scope; knowledge-rollup.ts: part size cap. No persisted store shape or site mapping change",
+    "payloadFingerprint": "sha256:5f525a1dca055ac97938d71d729f457b6bd2a11650ccecfe18da2903f3eb381a"
   },
   "schemas": [
     {
@@ -4197,7 +4197,7 @@
         {
           "contract": "core/session-coordinator.ts Hana metadata extensions",
           "module": "core/session-coordinator.ts",
-          "sourceHash": "sha256:79bea5413e65463f51675499e07281dc8dd33b9798c514d02ed57484fdf0272a"
+          "sourceHash": "sha256:bd949abdcbb3a9bf75c540c9ed2ac07ec43624abc2fa6eada720f5aa62c9337d"
         },
         {
           "contract": "core/session-jsonl-file.ts repair contract",

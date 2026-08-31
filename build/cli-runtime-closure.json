@@ -2232,6 +2232,11 @@
         },
         {
           "root": "server-bootstrap",
+          "from": "core/session-coordinator.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
           "from": "core/engine.ts",
           "kind": "import-statement"
         },
@@ -2241,7 +2246,7 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by core/session-compactor.ts (import-statement); core/engine.ts (import-statement); lib/extensions/compaction-guard-ext.ts (import-statement)."
+      "reason": "Reached via esbuild source module graph, imported by core/session-compactor.ts (import-statement); core/session-coordinator.ts (import-statement); core/engine.ts (import-statement); +1 more importer(s)."
     },
     {
       "path": "core/provider-compat/qwen.ts",

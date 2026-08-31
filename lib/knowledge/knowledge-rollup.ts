@@ -26,6 +26,13 @@ import type { NotebookRetrievalChunk, RetrieveForNotebooksResult } from "./knowl
 
 /** 滚动轮上限（防护）：超限后剩余证据并入最后一轮（预算截断在渲染层兜底）。 */
 export const KNOWLEDGE_ROLLUP_MAX_ROUNDS = 8;
+/**
+ * 单份证据的 token 上限（2026-08-31 实测回归修复）：只按剩余预算装填会把
+ * 「一份」装到 ≈ 整个上下文（实测 49 万 token/份 → 主模型预填充 240s 超时被
+ * 掐 + 重试 163s，单轮烧 6.5 分钟）。每份封顶 64k（对齐蒸馏时代批上限）——
+ * 大窗口模型下每份约 20-30s 预填充，轮数换时延。
+ */
+export const KNOWLEDGE_ROLLUP_PART_MAX_TOKENS = 64_000;
 /** 每部分中间笔记的 token 上限（紧凑笔记纪律；超限硬截断并留痕）。 */
 export const KNOWLEDGE_ROLLUP_NOTES_MAX_TOKENS = 3000;
 /** 补充检索轮数上限（模型自主再查询的硬上限，一切有界）。 */
@@ -233,7 +240,7 @@ export async function runKnowledgeRollup(input: {
 
   /** 从队列头部装填一份（贪心；单条超预算时独占一份，不静默丢弃）。 */
   const packPart = (): { part: KnowledgeRollupEntry[]; overflowSingle: boolean } => {
-    const budget = availableForPart();
+    const budget = Math.min(availableForPart(), KNOWLEDGE_ROLLUP_PART_MAX_TOKENS);
     const part: KnowledgeRollupEntry[] = [];
     let used = 0;
     let overflowSingle = false;

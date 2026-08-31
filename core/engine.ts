@@ -2480,7 +2480,9 @@ export class LingxiEngine {
               }
               const timer = setTimeout(() => controller.abort(), KNOWLEDGE_ROLLUP_ROUND_TIMEOUT_MS);
               try {
-                const eventStream = await Promise.resolve(streamFn(sessionModel, {
+                // 整个调用包进 knowledge_rollup 用途作用域：缓存前缀守卫/Context
+                // Ring 分类等请求边界逻辑据此识别侧线轮（不参与主聊天契约）。
+                const eventStream = await runWithProviderCompatPurpose("knowledge_rollup", () => Promise.resolve(streamFn(sessionModel, {
                   systemPrompt,
                   messages: [{
                     role: "user",
@@ -2490,7 +2492,7 @@ export class LingxiEngine {
                   ...streamOptions,
                   temperature: 0,
                   signal: controller.signal,
-                }));
+                })));
                 const finalMessage: any = await eventStream.result();
                 if (finalMessage?.stopReason === "aborted" && (signal?.aborted || controller.signal.aborted)) {
                   const abortError = new Error("knowledge rollup round aborted");
