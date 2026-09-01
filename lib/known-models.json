@@ -113,6 +113,7 @@
       "context": 131072,
       "maxOutput": 8192,
       "image": true,
+      "video": true,
       "reasoning": true,
       "quirks": [
         "enable_thinking"
@@ -530,6 +531,7 @@
       "context": 131072,
       "maxOutput": 8192,
       "image": true,
+      "video": true,
       "reasoning": true,
       "quirks": ["enable_thinking"]
     },
@@ -574,6 +576,42 @@
         "outputFormat": "qwen",
         "groundingMode": "native"
       }
+    },
+    "qwen3.7-plus": {
+      "name": "Qwen 3.7 Plus",
+      "context": 1000000,
+      "maxOutput": 131072,
+      "image": true,
+      "video": true,
+      "reasoning": true,
+      "quirks": ["enable_thinking"]
+    },
+    "qwen3.7-flash": {
+      "name": "Qwen 3.7 Flash",
+      "context": 1000000,
+      "maxOutput": 131072,
+      "image": true,
+      "video": true,
+      "reasoning": true,
+      "quirks": ["enable_thinking"]
+    },
+    "qwen3.8-max": {
+      "name": "Qwen 3.8 Max",
+      "context": 1000000,
+      "maxOutput": 131072,
+      "image": true,
+      "video": true,
+      "reasoning": true,
+      "quirks": ["enable_thinking"]
+    },
+    "qwen3.8-flash": {
+      "name": "Qwen 3.8 Flash",
+      "context": 1000000,
+      "maxOutput": 131072,
+      "image": true,
+      "video": true,
+      "reasoning": true,
+      "quirks": ["enable_thinking"]
     }
   },
   "dashscope-coding": {
@@ -7080,5 +7118,50 @@
       "image": true,
       "reasoning": true
     }
+  },
+  "qwen-token-plan": {
+    "qwen3.6-flash": { "name": "Qwen 3.6 Flash", "context": 131072, "maxOutput": 8192, "image": true, "video": true, "reasoning": true, "quirks": ["enable_thinking"] },
+    "qwen3.7-plus": { "name": "Qwen 3.7 Plus", "context": 1000000, "maxOutput": 131072, "image": true, "video": true, "reasoning": true, "quirks": ["enable_thinking"] },
+    "qwen3.7-flash": { "name": "Qwen 3.7 Flash", "context": 1000000, "maxOutput": 131072, "image": true, "video": true, "reasoning": true, "quirks": ["enable_thinking"] },
+    "qwen3.8-max": { "name": "Qwen 3.8 Max", "context": 1000000, "maxOutput": 131072, "image": true, "video": true, "reasoning": true, "quirks": ["enable_thinking"] },
+    "qwen3.8-flash": { "name": "Qwen 3.8 Flash", "context": 1000000, "maxOutput": 131072, "image": true, "video": true, "reasoning": true, "quirks": ["enable_thinking"] },
+    "qwen3-vl-plus": { "name": "Qwen3 VL Plus", "context": 260096, "image": true, "video": true, "reasoning": true },
+    "qwen3-vl-235b-a22b-instruct": { "name": "Qwen3 VL 235B A22B Instruct", "context": 131072, "image": true, "video": true },
+    "qwen3-vl-235b-a22b-thinking": { "name": "Qwen3 VL 235B A22B Thinking", "context": 131072, "image": true, "video": true, "reasoning": true },
+    "qwen3-vl-32b-instruct": { "name": "Qwen3 VL 32B Instruct", "context": 131072, "image": true, "video": true },
+    "qwen3-vl-32b-thinking": { "name": "Qwen3 VL 32B Thinking", "context": 131072, "image": true, "video": true, "reasoning": true },
+    "qwen3.5-omni-plus": { "name": "Qwen 3.5 Omni Plus", "context": 262144, "image": true, "video": true, "reasoning": true },
+    "qwen3.5-omni-flash": { "name": "Qwen 3.5 Omni Flash", "context": 262144, "image": true, "video": true, "reasoning": true },
+    "qwen3.5-omni-light": { "name": "Qwen 3.5 Omni Light", "context": 131072, "image": true, "video": true, "reasoning": true }
+  },
+  "qwen-token-plan-cn": {
+    "qwen3.6-flash": { "name": "Qwen 3.6 Flash", "context": 131072, "maxOutput": 8192, "image": true, "video": true, "reasoning": true, "quirks": ["enable_thinking"] },
+    "qwen3.7-plus": { "name": "Qwen 3.7 Plus", "context": 1000000, "maxOutput": 131072, "image": true, "video": true, "reasoning": true, "quirks": ["enable_thinking"] },
+    "qwen3.7-flash": { "name": "Qwen 3.7 Flash", "context": 1000000, "maxOutput": 131072, "image": true, "video": true, "reasoning": true, "quirks": ["enable_thinking"] },
+    "qwen3.8-max": { "name": "Qwen 3.8 Max", "context": 1000000, "maxOutput": 131072, "image": true, "video": true, "reasoning": true, "quirks": ["enable_thinking"] },
+    "qwen3.8-flash": { "name": "Qwen 3.8 Flash", "context": 1000000, "maxOutput": 131072, "image": true, "video": true, "reasoning": true, "quirks": ["enable_thinking"] },
+    "qwen3-vl-plus": { "name": "Qwen3 VL Plus", "context": 260096, "image": true, "video": true, "reasoning": true },
+    "qwen3-vl-235b-a22b-instruct": { "name": "Qwen3 VL 235B A22B Instruct", "context": 131072, "image": true, "video": true },
+    "qwen3-vl-235b-a22b-thinking": { "name": "Qwen3 VL 235B A22B Thinking", "context": 131072, "image": true, "video": true, "reasoning": true },
+    "qwen3-vl-32b-instruct": { "name": "Qwen3 VL 32B Instruct", "context": 131072, "image": true, "video": true },
+    "qwen3-vl-32b-thinking": { "name": "Qwen3 VL 32B Thinking", "context": 131072, "image": true, "video": true, "reasoning": true },
+    "qwen3.5-omni-plus": { "name": "Qwen 3.5 Omni Plus", "context": 262144, "image": true, "video": true, "reasoning": true },
+    "qwen3.5-omni-flash": { "name": "Qwen 3.5 Omni Flash", "context": 262144, "image": true, "video": true, "reasoning": true },
+    "qwen3.5-omni-light": { "name": "Qwen 3.5 Omni Light", "context": 131072, "image": true, "video": true, "reasoning": true }
+  },
+  "qwen-token-plan-individual": {
+    "qwen3.6-flash": { "name": "Qwen 3.6 Flash", "context": 131072, "maxOutput": 8192, "image": true, "video": true, "reasoning": true, "quirks": ["enable_thinking"] },
+    "qwen3.7-plus": { "name": "Qwen 3.7 Plus", "context": 1000000, "maxOutput": 131072, "image": true, "video": true, "reasoning": true, "quirks": ["enable_thinking"] },
+    "qwen3.7-flash": { "name": "Qwen 3.7 Flash", "context": 1000000, "maxOutput": 131072, "image": true, "video": true, "reasoning": true, "quirks": ["enable_thinking"] },
+    "qwen3.8-max": { "name": "Qwen 3.8 Max", "context": 1000000, "maxOutput": 131072, "image": true, "video": true, "reasoning": true, "quirks": ["enable_thinking"] },
+    "qwen3.8-flash": { "name": "Qwen 3.8 Flash", "context": 1000000, "maxOutput": 131072, "image": true, "video": true, "reasoning": true, "quirks": ["enable_thinking"] },
+    "qwen3-vl-plus": { "name": "Qwen3 VL Plus", "context": 260096, "image": true, "video": true, "reasoning": true },
+    "qwen3-vl-235b-a22b-instruct": { "name": "Qwen3 VL 235B A22B Instruct", "context": 131072, "image": true, "video": true },
+    "qwen3-vl-235b-a22b-thinking": { "name": "Qwen3 VL 235B A22B Thinking", "context": 131072, "image": true, "video": true, "reasoning": true },
+    "qwen3-vl-32b-instruct": { "name": "Qwen3 VL 32B Instruct", "context": 131072, "image": true, "video": true },
+    "qwen3-vl-32b-thinking": { "name": "Qwen3 VL 32B Thinking", "context": 131072, "image": true, "video": true, "reasoning": true },
+    "qwen3.5-omni-plus": { "name": "Qwen 3.5 Omni Plus", "context": 262144, "image": true, "video": true, "reasoning": true },
+    "qwen3.5-omni-flash": { "name": "Qwen 3.5 Omni Flash", "context": 262144, "image": true, "video": true, "reasoning": true },
+    "qwen3.5-omni-light": { "name": "Qwen 3.5 Omni Light", "context": 131072, "image": true, "video": true, "reasoning": true }
   }
 }

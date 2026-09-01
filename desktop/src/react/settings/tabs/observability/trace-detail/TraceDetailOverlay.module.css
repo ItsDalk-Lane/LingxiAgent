@@ -1,0 +1,164 @@
+/*
+ * TraceDetailOverlay.module.css — 轨迹详情全屏层 + dsw 设计 token 桥。
+ *
+ * 布局模式复用 Settings.module.css 的 observability-inspector-layer 全幅层
+ * 先例；被移植的 dsh ui-trajectory CSS 模块引用 --dsw-* / --dsh-scrollbar-*
+ * token，这里统一桥接到灵犀主题变量（--bg/--bg-card/--text/--border/--accent/
+ * --danger/--font-mono），保证四个 dsh CSS 模块零改动可用。
+ */
+
+.layer {
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: var(--radius-card, 8px);
+
+  /* ── dsw → 灵犀 token 桥 ─────────────────────────────────────────── */
+
+  /* 文本 */
+  --dsw-alias-label-primary: var(--text, #22272e);
+  --dsw-alias-label-secondary: var(--text, #22272e);
+  --dsw-alias-label-tertiary: var(--text-muted, #6b7280);
+  --dsw-alias-label-caption: var(--text-muted, #6b7280);
+  --dsw-alias-label-dimmed: var(--text-muted, #6b7280);
+
+  /* 背景 */
+  --dsw-alias-bg-base: var(--bg, #f7f7f5);
+  --dsw-alias-bg-layer-1: var(--bg, #f7f7f5);
+  --dsw-alias-bg-layer-2: var(--bg-card, #ffffff);
+  --dsw-alias-bg-layer-3: var(--bg-card, #ffffff);
+  --dsw-alias-bg-module-platform: var(--bg-card, #ffffff);
+  --dsw-specific-sidebar-fill: var(--bg-card, #ffffff);
+
+  /* 边框 / 交互 */
+  --dsw-alias-border-l1: var(--border, #d9d9d4);
+  --dsw-alias-border-l2: var(--border, #d9d9d4);
+  --dsw-alias-border-l3: var(--border, #d9d9d4);
+  --dsw-alias-interactive-bg-hover: var(--accent-light, rgba(83, 125, 150, 0.1));
+  --dsw-alias-interactive-bg-active: var(--accent-light, rgba(83, 125, 150, 0.16));
+  --dsw-alias-button-ghost-active-fill: var(--accent-light, rgba(83, 125, 150, 0.16));
+
+  /* 状态色 */
+  --dsw-alias-state-business-primary: var(--accent, #537d96);
+  --dsw-alias-state-business-tertiary: var(--text-muted, #6b7280);
+  --dsw-alias-state-warn-label: #967431;
+  --dsw-alias-state-warn-tertiary: rgba(150, 116, 49, 0.4);
+  --dsw-alias-state-error-primary: var(--danger, #b56b66);
+  --dsw-alias-state-error-secondary: color-mix(in srgb, var(--danger, #b56b66) 55%, transparent);
+  --dsw-alias-state-success-primary: #5f8f6b;
+  --dsw-alias-state-success-tertiary: rgba(95, 143, 107, 0.4);
+  --dsw-alias-brand-primary-new-colorprimary-new-color: var(--accent, #537d96);
+  --dsw-static-blue-500: var(--accent, #537d96);
+
+  /* 滚动条（dsh 协议变量） */
+  --dsh-scrollbar-thumb: rgba(128, 128, 128, 0.35);
+  --dsh-scrollbar-thumb-hover: rgba(128, 128, 128, 0.55);
+  --dsw-alias-scrollbar-bg-l2: transparent;
+  --dsw-alias-scrollbar-hover-l2: rgba(128, 128, 128, 0.35);
+
+  /* 字体（dsw font token 是完整 font 简写） */
+  --dsw-font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC',
+    'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+  --ds-font-family-code: var(--font-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+  --dsw-font-xxs-12: 400 12px/18px var(--dsw-font-family);
+  --dsw-font-xs-13: 400 13px/20px var(--dsw-font-family);
+  --dsw-font-xs-strong-13: 600 13px/20px var(--dsw-font-family);
+  --dsw-font-xxxs-11: 400 11px/16px var(--dsw-font-family);
+  --ds-ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --dsw-shadow-lv2: 0 8px 24px rgba(0, 0, 0, 0.16);
+
+  /* markdown */
+  --dsw-alias-markdown-code-block: color-mix(in srgb, var(--border, #d9d9d4) 45%, transparent);
+  --dsw-alias-markdown-citation: var(--accent, #537d96);
+
+  color: var(--text, #22272e);
+  background: var(--bg, #f7f7f5);
+}
+
+.scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 39;
+  background: rgba(0, 0, 0, 0.32);
+}
+
+/* ── 头部摘要行（灵犀独有：trace 级统计合并）────────────────────────── */
+
+.header {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border, #d9d9d4);
+  background: var(--bg-card, #ffffff);
+  font-size: var(--fs-caption, 12px);
+  flex: none;
+}
+
+.headerTitle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  font-size: var(--fs-body, 13px);
+}
+
+.headerClose {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-muted, #6b7280);
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.headerClose:hover {
+  background: var(--accent-light, rgba(83, 125, 150, 0.1));
+  color: var(--text, #22272e);
+}
+
+.headerStat {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+  color: var(--text-muted, #6b7280);
+  white-space: nowrap;
+}
+
+.headerStatValue {
+  color: var(--text, #22272e);
+  font-variant-numeric: tabular-nums;
+}
+
+.headerStatValue[data-status='error'] {
+  color: var(--danger, #b56b66);
+  font-weight: 600;
+}
+
+.headerStatValue[data-status='aborted'] {
+  color: var(--text-muted, #6b7280);
+  font-weight: 600;
+}
+
+.headerId {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: var(--fs-micro, 11px);
+  color: var(--text-muted, #6b7280);
+}
+
+.headerBody {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}

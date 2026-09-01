@@ -931,12 +931,7 @@ export class PreferencesManager {
     return normalizeModelObservabilityPreferences(this._cache.model_observability);
   }
 
-  /**
-   * 合并写入 Model Observatory preference。落盘的是**原始意图**（raw merge，
-   * 只保留已知字段；未表达的字段不落盘），语义归一只发生在 getModelObservability
-   * 读取侧——否则 disabled 态归一出的派生 false 会被固化成用户显式选择，
-   * 「关掉再打开」会丢失 §六十一 的开启默认（trace=true / payload=false）。
-   */
+  /** 合并写入保留期，并把历史关闭开关迁移为当前固定全开策略。 */
   setModelObservability(partial) {
     const current = this._cache.model_observability
       && typeof this._cache.model_observability === "object"
@@ -945,9 +940,10 @@ export class PreferencesManager {
       : {};
     const input = partial && typeof partial === "object" && !Array.isArray(partial) ? partial : {};
     const merged: Record<string, unknown> = { ...current };
-    for (const key of ["enabled", "persistTraceMetadata", "persistPayloads", "persistBlobs"]) {
-      if (input[key] !== undefined) merged[key] = input[key] === true;
-    }
+    merged.enabled = true;
+    merged.persistTraceMetadata = true;
+    merged.persistPayloads = true;
+    merged.persistBlobs = true;
     if (input.retention !== undefined) {
       const retention = input.retention as Record<string, unknown>;
       const next: Record<string, number> = {

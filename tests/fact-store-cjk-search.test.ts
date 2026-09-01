@@ -157,7 +157,7 @@ describe("FactStore CJK full-text search", () => {
 
     store = new FactStore(dbPath);
 
-    expect(store.db.pragma("user_version", { simple: true })).toBe(2);
+    expect(store.db.pragma("user_version", { simple: true })).toBe(3);
     expect(store.searchFullText("茉莉花茶", 10).map((r) => r.fact)).toEqual([
       "用户喜欢在晚上喝茉莉花茶",
     ]);

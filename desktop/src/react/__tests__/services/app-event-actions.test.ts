@@ -101,6 +101,8 @@ describe('handleAppEvent', () => {
 
   it('agent-switched applies agent identity, reloads dependent data, and resets agent-scoped UI state', async () => {
     mockLingxiFetch
+      // tenets 初拉（agent-switched 现在会先刷新用户原则待审列表）
+      .mockResolvedValueOnce(jsonResponse({ tenets: [] }))
       .mockResolvedValueOnce(jsonResponse({ jobs: [{ id: 'job-1' }] }));
     Object.assign(mockState, {
       currentChannel: { id: 'old' },
@@ -255,6 +257,8 @@ describe('handleAppEvent', () => {
 
   it('agent-switched reads the next agent memory gate from config', async () => {
     mockLingxiFetch
+      // tenets 初拉（agent-switched 现在会先刷新用户原则待审列表）
+      .mockResolvedValueOnce(jsonResponse({ tenets: [] }))
       .mockResolvedValueOnce(jsonResponse({ jobs: [] }));
     Object.assign(mockState, { currentAgentId: 'agent-a', memoryMasterEnabled: true });
     const { handleAppEvent } = await import('../../services/app-event-actions');

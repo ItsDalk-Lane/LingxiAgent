@@ -15,9 +15,12 @@
  */
 
 import fs from "fs";
-import { loadBetterSqliteDatabase } from "./model-observability-schema.ts";
+import {
+  loadBetterSqliteDatabase,
+  MODEL_OBSERVABILITY_SUPPORTED_READ_VERSIONS,
+} from "./model-observability-schema.ts";
 
-export const MODEL_OBSERVABILITY_READ_SUPPORTED_VERSIONS: readonly number[] = [1, 2, 3];
+export const MODEL_OBSERVABILITY_READ_SUPPORTED_VERSIONS = MODEL_OBSERVABILITY_SUPPORTED_READ_VERSIONS;
 
 export type ModelObservabilityReadDatabaseStatus =
   | "ready"

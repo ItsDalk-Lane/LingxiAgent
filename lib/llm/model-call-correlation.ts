@@ -22,6 +22,9 @@ export type ModelCallIdentityTriple = {
   parentCallId: string | null;
 };
 
+/** 写入 Pi session 的隐藏关联条目；custom entry 不进入模型上下文。 */
+export const MODEL_CALL_REFERENCE_RECORD_TYPE = "hana-model-call-reference-v1";
+
 const MESSAGE_IDENTITY = new WeakMap<object, ModelCallIdentityTriple>();
 
 /** stream observer 在 result() resolve 时登记（同对象幂等覆盖无害）。 */
@@ -57,4 +60,24 @@ export function modelCallLedgerMetadataForMessage(message: unknown): {
   parentCallId: string | null;
 } | null {
   return modelCallIdentityForMessage(message);
+}
+
+/**
+ * 必须在 SDK 落盘助手消息之前调用，使关联条目紧邻并位于助手消息之前。
+ * 查不到运行时身份时不猜，也不写空记录。
+ */
+export function persistModelCallReferenceForMessage(
+  sessionManager: unknown,
+  message: unknown,
+): ModelCallIdentityTriple | null {
+  const identity = modelCallIdentityForMessage(message);
+  const append = (sessionManager as any)?.appendCustomEntry;
+  if (!identity || typeof append !== "function") return null;
+  append.call(sessionManager, MODEL_CALL_REFERENCE_RECORD_TYPE, {
+    schemaVersion: 1,
+    modelCallId: identity.modelCallId,
+    traceId: identity.traceId,
+    parentCallId: identity.parentCallId,
+  });
+  return identity;
 }

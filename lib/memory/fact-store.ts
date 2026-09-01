@@ -11,6 +11,7 @@
 import { createRequire } from "module";
 import { scrubPII } from "../pii-guard.ts";
 import { createModuleLogger } from "../debug-log.ts";
+import { cosineSimilarity, parseVector } from "./fact-embeddings.ts";
 
 const log = createModuleLogger("fact-store");
 
@@ -29,7 +30,7 @@ export function loadBetterSqliteDatabase() {
  * 当前 schema 版本。每次改表结构时递增，
  * 并在 _migrate() 里添加对应的迁移逻辑。
  */
-const SCHEMA_VERSION = 2;
+const SCHEMA_VERSION = 3;
 
 const CJK_RUN_RE = /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Hangul}]+/gu;
 
@@ -108,6 +109,7 @@ export class FactStore {
     this.db = new Database(dbPath);
     this.db.pragma("journal_mode = WAL");
     this.db.pragma("synchronous = NORMAL");
+    this.db.pragma("foreign_keys = ON");   // fact_embeddings ON DELETE CASCADE 依赖
     this.db.pragma("cache_size = -16000");     // 16MB（默认 ~2MB）
     this.db.pragma("temp_store = MEMORY");
     this.db.pragma("mmap_size = 30000000");    // 30MB mmap I/O
@@ -194,6 +196,21 @@ export class FactStore {
           case 1:
             // v1 → v2：补充 CJK 友好的搜索文本，并重建 FTS 表到双列 schema。
             this._migrateToSearchText();
+            break;
+          case 2:
+            // v2 → v3：语义检索向量表（float32 BLOB，按 model_key 分区）。
+            // 幂等 CREATE，无数据迁移；旧库向量自然为空，回填后可用。
+            this.db.exec(`
+              CREATE TABLE IF NOT EXISTS fact_embeddings (
+                fact_id    INTEGER NOT NULL REFERENCES facts(id) ON DELETE CASCADE,
+                model_key  TEXT NOT NULL,
+                dimensions INTEGER NOT NULL,
+                vector     BLOB NOT NULL,
+                updated_at TEXT NOT NULL,
+                PRIMARY KEY (fact_id)
+              );
+              CREATE INDEX IF NOT EXISTS idx_fact_embeddings_model ON fact_embeddings(model_key);
+            `);
             break;
         }
         v++;
@@ -406,9 +423,158 @@ export class FactStore {
     return rows.map((row) => this._rowToFact(row));
   }
 
+  /**
+   * 单词条全文匹配计数（search_memory 零结果诊断用）。
+   * 与 searchFullText 走同一转义与降级路径：FTS 失败、或零命中且含 CJK 时走 LIKE 兜底，
+   * 保证诊断口径与实际检索一致。
+   */
+  countFullTextMatches(term) {
+    const normalized = normalizeSearchText(term);
+    if (!normalized) return 0;
+    try {
+      const ftsQuery = buildFtsQuery(normalized);
+      if (!ftsQuery) return 0;
+      const row = this.db
+        .prepare(`SELECT COUNT(*) as cnt FROM facts_fts WHERE facts_fts MATCH ?`)
+        .get(ftsQuery);
+      const cnt = Number(row?.cnt || 0);
+      if (cnt === 0 && hasCjk(normalized)) return this._likeCount(normalized);
+      return cnt;
+    } catch {
+      return this._likeCount(normalized);
+    }
+  }
+
+  _likeCount(term) {
+    const row = this.db
+      .prepare(`SELECT COUNT(*) as cnt FROM facts WHERE fact LIKE '%' || ? || '%'`)
+      .get(term);
+    return Number(row?.cnt || 0);
+  }
+
   /** 获取所有元事实（按时间降序） */
   getAll() {
     return this._stmts.getAll.all().map((row) => this._rowToFact(row));
+  }
+
+  /**
+   * 全部标签的条数统计（记忆导航节用）。
+   * 与 searchByTags 同走 json_each 精确匹配口径。
+   * @returns {Array<{ tag: string, count: number }>} 按条数降序、同数按标签字典序
+   */
+  tagCounts() {
+    const rows = this.db
+      .prepare(`
+        SELECT je.value as tag, COUNT(*) as cnt
+        FROM facts f, json_each(f.tags) je
+        GROUP BY je.value
+        ORDER BY cnt DESC, tag ASC
+      `)
+      .all();
+    return rows.map((row) => ({ tag: String(row.tag), count: Number(row.cnt) }));
+  }
+
+  // ── 语义检索（v3：fact_embeddings，按 model_key 分区 + JS 暴力余弦） ──
+
+  /**
+   * 批量写入/覆盖向量（单事务）。fact_id 不存在由外键约束拒绝。
+   * @param {Array<{ factId: number, modelKey: string, dimensions: number, vector: Buffer }>} entries
+   */
+  upsertFactEmbeddings(entries) {
+    if (!Array.isArray(entries) || entries.length === 0) return 0;
+    const stmt = this.db.prepare(`
+      INSERT INTO fact_embeddings (fact_id, model_key, dimensions, vector, updated_at)
+      VALUES (@factId, @modelKey, @dimensions, @vector, @updatedAt)
+      ON CONFLICT(fact_id) DO UPDATE SET
+        model_key = excluded.model_key,
+        dimensions = excluded.dimensions,
+        vector = excluded.vector,
+        updated_at = excluded.updated_at
+    `);
+    const now = new Date().toISOString();
+    const run = this.db.transaction(() => {
+      for (const entry of entries) {
+        stmt.run({
+          factId: entry.factId,
+          modelKey: entry.modelKey,
+          dimensions: entry.dimensions,
+          vector: entry.vector,
+          updatedAt: now,
+        });
+      }
+    });
+    run();
+    return entries.length;
+  }
+
+  /** 当前 model_key 分区下还没有向量的 facts（回填队列，按插入序取） */
+  factsNeedingEmbedding(modelKey, limit = 64) {
+    const rows = this.db
+      .prepare(`
+        SELECT f.* FROM facts f
+        LEFT JOIN fact_embeddings e ON e.fact_id = f.id AND e.model_key = ?
+        WHERE e.fact_id IS NULL
+        ORDER BY f.id
+        LIMIT ?
+      `)
+      .all(modelKey, limit);
+    return rows.map((row) => this._rowToFact(row));
+  }
+
+  /** 覆盖率：embedded/total（total=facts 总数；未配置向量时 embedded=0） */
+  embeddingCoverage(modelKey) {
+    const total = this.size;
+    const row = this.db
+      .prepare(`SELECT COUNT(*) as cnt FROM fact_embeddings WHERE model_key = ?`)
+      .get(modelKey);
+    const embedded = Math.min(Number(row?.cnt || 0), total);
+    return { embedded, total };
+  }
+
+  /** 清掉非当前 model_key 的旧向量（换模型后的显式清理出口；检索侧本身会忽略异键） */
+  purgeFactEmbeddingsOtherThan(modelKey) {
+    return this.db
+      .prepare(`DELETE FROM fact_embeddings WHERE model_key <> ?`)
+      .run(modelKey).changes;
+  }
+
+  /**
+   * 语义检索：当前 model_key 分区内暴力余弦 top-N。
+   * 维度不匹配的行显式跳过（MRL 截断变化不静默混算）。
+   * @returns {Array<{ id, fact, tags, time, session_id, created_at, similarity }>}
+   */
+  semanticSearch(modelKey, queryVector, limit = 15) {
+    if (!Array.isArray(queryVector) || queryVector.length === 0) return [];
+    const rows = this.db
+      .prepare(`
+        SELECT e.fact_id, e.dimensions, e.vector
+        FROM fact_embeddings e
+        WHERE e.model_key = ?
+      `)
+      .all(modelKey);
+    const scored: Array<{ factId: number; similarity: number }> = [];
+    for (const row of rows) {
+      if (Number(row.dimensions) !== queryVector.length) continue;
+      const similarity = cosineSimilarity(queryVector, parseVector(row.vector));
+      if (!Number.isFinite(similarity)) continue;
+      scored.push({ factId: Number(row.fact_id), similarity });
+    }
+    scored.sort((a, b) => b.similarity - a.similarity);
+    const top = scored.slice(0, limit);
+    if (top.length === 0) return [];
+    const factsById = new Map<number, any>(
+      (this.db
+        .prepare(`SELECT * FROM facts WHERE id IN (${top.map(() => "?").join(",")})`)
+        .all(...top.map((t) => t.factId))
+        .map((row) => [Number(row.id), this._rowToFact(row)]) as Array<[number, any]>),
+    );
+    const results: any[] = [];
+    for (const { factId, similarity } of top) {
+      const fact = factsById.get(factId);
+      if (!fact) continue;
+      results.push({ ...fact, similarity });
+    }
+    return results;
   }
 
   /** 按 session_id 查询 */

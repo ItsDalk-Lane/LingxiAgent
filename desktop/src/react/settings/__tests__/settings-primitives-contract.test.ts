@@ -13,7 +13,13 @@ function read(pathFromRoot: string) {
 function walkTsx(dir: string): string[] {
   return readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
     const path = join(dir, entry.name);
-    if (entry.isDirectory()) return entry.name === '__tests__' ? [] : walkTsx(path);
+    if (entry.isDirectory()) {
+      // trace-detail/ 是 dsh ui-trajectory 的 vendored 移植（MIT）：其内联
+      // style 全部是 CSS 变量承载（动态百分比定位），沿用上游机制不参与
+      // 一方代码的内联样式棘轮。
+      if (entry.name === '__tests__' || entry.name === 'trace-detail') return [];
+      return walkTsx(path);
+    }
     return entry.name.endsWith('.tsx') ? [path] : [];
   });
 }

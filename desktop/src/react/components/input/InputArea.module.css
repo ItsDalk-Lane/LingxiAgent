@@ -188,7 +188,7 @@
 }
 
 .plan-mode-operate {
-    color: var(--danger, #c55);
+    color: var(--danger);
     border-color: color-mix(in srgb, var(--danger, #c55) 34%, transparent);
     background: color-mix(in srgb, var(--danger, #c55) 7%, var(--bg-card));
 }
@@ -527,7 +527,7 @@
 }
 
 .plan-mode-option-operate {
-    color: var(--danger, #c55);
+    color: var(--danger);
 }
 
 .plan-mode-option-ask {
@@ -545,7 +545,7 @@
 
 .plan-mode-option-operate:hover,
 .plan-mode-option-operate.active {
-    color: var(--danger, #c55);
+    color: var(--danger);
 }
 
 .plan-mode-option-ask:hover,
@@ -2089,4 +2089,92 @@
 .input-box li {
     margin: 0;
     padding-left: var(--space-4);
+}
+
+/* ── 用户原则（tenets）审批横幅 ── */
+
+.tenet-banner {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 100%;
+    margin: 0 0 -2rem;
+    padding: 0.85rem 1rem 2.1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+    background: var(--bg-card);
+    border: 1px solid color-mix(in srgb, var(--accent) 16%, transparent);
+    border-radius: var(--radius-chat-card);
+    box-shadow: var(--panel-card-shadow);
+}
+
+.tenet-banner-header {
+    font-size: 0.86rem;
+    font-weight: 600;
+    color: var(--accent);
+}
+
+.tenet-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.tenet-content {
+    min-width: 0;
+    display: flex;
+    align-items: baseline;
+    gap: 0.45rem;
+    font-size: 0.86rem;
+    color: var(--text);
+    word-break: break-word;
+}
+
+.tenet-priority-tag {
+    flex-shrink: 0;
+    font-size: 0.7rem;
+    padding: 0.05rem 0.4rem;
+    border-radius: 999px;
+    background: var(--accent-light);
+    color: var(--accent);
+}
+
+.tenet-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    flex-shrink: 0;
+}
+
+.tenet-action-button {
+    font-size: 0.8rem;
+    padding: 0.24rem 0.7rem;
+    border-radius: var(--radius-sm);
+    border: 1px solid color-mix(in srgb, var(--accent) 28%, transparent);
+    background: transparent;
+    color: var(--text);
+    cursor: pointer;
+}
+
+.tenet-action-button:disabled {
+    opacity: 0.5;
+    cursor: default;
+}
+
+.tenet-approve-button {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--bg-card);
+}
+
+.tenet-reject-button:hover:not(:disabled) {
+    border-color: color-mix(in srgb, var(--danger) 45%, transparent);
+    color: var(--danger);
+}
+
+.tenet-error-text {
+    font-size: 0.74rem;
+    color: var(--danger);
 }

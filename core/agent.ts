@@ -30,6 +30,8 @@ import { createBrowserTool } from "../lib/tools/browser-tool.ts";
 import { createComputerUseTool } from "../lib/tools/computer-use-tool.ts";
 import { createPinnedMemoryTools } from "../lib/tools/pinned-memory.ts";
 import { createExperienceTools } from "../lib/tools/experience.ts";
+import { createTenetProposeTool } from "../lib/tools/tenet-propose-tool.ts";
+import { buildTenetsPromptSection } from "../lib/memory/tenets.ts";
 import { createInstallSkillTool } from "../lib/tools/install-skill.ts";
 import { createNotifyTool } from "../lib/tools/notify-tool.ts";
 import { createUpdateSettingsTool } from "../lib/tools/update-settings-tool.ts";
@@ -136,6 +138,7 @@ export class Agent {
   declare _notifyTool: any;
   declare _onInstallCallback: any;
   declare _pinnedMemoryTools: any;
+  declare _tenetProposeTool: any;
   declare _repairState: any;
   declare _runtimeInitialized: any;
   declare _searchConfigResolver: any;
@@ -222,6 +225,7 @@ export class Agent {
     this._webFetchTool = null;
     this._todoTool = null;
     this._pinnedMemoryTools = [];
+    this._tenetProposeTool = null;
     this._experienceTools = [];
     this._memoryMasterEnabled = true;   // agent 级别总开关（config.yaml memory.enabled）
     this._memorySessionEnabled = true;  // per-session 开关（WelcomeScreen toggle）
@@ -497,6 +501,24 @@ export class Agent {
           this._cb?.getEngine?.()?.getSessionBranchProjection?.(sessionPath, options)
         ),
         envChangeLedger: this._cb?.getEngine?.()?.getEnvChangeLedger?.() || null,
+        // 记忆导航节：最近会话标题+ID 与标签概览的数据源（agent 过滤在 navigation.ts 内做）。
+        listSessions: async () => {
+          const engine = this._cb?.getEngine?.();
+          if (!engine?.listSessions) return [];
+          return engine.listSessions();
+        },
+        // 语义检索回填：滚动摘要落库（新事实已进 facts.db）后补嵌入向量，
+        // fire-and-forget；engine 侧限流 + 单飞 + 失败留待下轮。
+        backfillFactEmbeddings: () => {
+          try {
+            const engine = this._cb?.getEngine?.();
+            if (typeof engine?.backfillMemoryFactEmbeddings === "function") {
+              void engine.backfillMemoryFactEmbeddings(this.id);
+            }
+          } catch {
+            // 回填是增益路径，失败不阻断记忆编译
+          }
+        },
         onCompiled: () => {
           // _systemPrompt 是非 session 路径（巡检/cron/频道/DM/bridge owner 新建）
           // 共享的 cache，必须按 master 构建，不被 per-session 开关污染。
@@ -522,7 +544,11 @@ export class Agent {
 
     // 7. 创建工具（记忆 + 通用）
     log(`  [agent] 7. 创建工具...`);
-    this._memorySearchTool = createMemorySearchTool(this._factStore);
+    this._memorySearchTool = createMemorySearchTool(this._factStore, {
+      // 语义检索闭包：engine 解析 memory.embedding_model 并嵌入查询文本；
+      // 未配置时闭包返回 unavailable，工具侧显式走 FTS 单路并留痕。
+      embedQuery: (query: string) => this._embedMemoryQuery(query),
+    });
     this._webSearchTool = createWebSearchTool({
       configPath: this.configPath,
       searchConfigResolver: this._searchConfigResolver,
@@ -530,6 +556,18 @@ export class Agent {
     this._webFetchTool = createWebFetchTool();
     this._todoTool = createTodoTool();
     this._pinnedMemoryTools = createPinnedMemoryTools(this.agentDir);
+    // tenet_propose：模型只能提议，生效需用户批准（聊天审批卡/设置页）；
+    // 新提案落地后广播 tenets-changed 让双端刷新待审列表。
+    this._tenetProposeTool = createTenetProposeTool(this.agentDir, {
+      isEnabled: () => this._memoryMasterEnabled,
+      onProposed: () => {
+        try {
+          this._cb?.getEngine?.()?._emitAppEvent?.("tenets-changed", { agentId: this.id });
+        } catch {
+          // 通知失败不影响提案本身（pending 已持久化，设置页可见）
+        }
+      },
+    });
     this._experienceTools = createExperienceTools(this.agentDir, {
       isEnabled: () => this._experienceEnabled === true,
     });
@@ -879,7 +917,19 @@ export class Agent {
    */
   createConversationScopedMemorySearchTool(conversationScope) {
     if (!this._factStore) return null;
-    return createMemorySearchTool(this._factStore, { conversationScope });
+    return createMemorySearchTool(this._factStore, {
+      conversationScope,
+      embedQuery: (query: string) => this._embedMemoryQuery(query),
+    });
+  }
+
+  /** search_memory 语义闭包：engine 侧解析 memory.embedding_model → 查询向量 + model_key */
+  async _embedMemoryQuery(query: string) {
+    const engine = this._cb?.getEngine?.();
+    if (typeof engine?.embedMemoryQuery !== "function") {
+      return { status: "unavailable", reason: "no_model" };
+    }
+    return engine.embedMemoryQuery(this.id, query);
   }
 
   // ════════════════════════════
@@ -984,6 +1034,14 @@ export class Agent {
   }
   get summaryManager() { return this._summaryManager; }
   get memoryTicker() { return this._memoryTicker; }
+  /** 记忆语义检索的嵌入模型引用（config.yaml memory.embedding_model，形如 {provider, id}） */
+  get memoryEmbeddingModelRef(): { provider: string; id: string } | null {
+    const ref = this._config?.memory?.embedding_model;
+    if (!ref || typeof ref !== "object") return null;
+    const provider = typeof ref.provider === "string" ? ref.provider.trim() : "";
+    const id = typeof ref.id === "string" ? ref.id.trim() : "";
+    return provider && id ? { provider, id } : null;
+  }
   getToolsSnapshot( options: any = {}) {
     const surface = options.surface === "bridge" ? "bridge" : "desktop";
     const forceMemoryEnabled = Object.prototype.hasOwnProperty.call(options, "forceMemoryEnabled")
@@ -1001,7 +1059,8 @@ export class Agent {
     const memTools = memoryEnabled ? [
       this._memorySearchTool,
       ...this._pinnedMemoryTools,
-    ] : [];
+      this._tenetProposeTool,
+    ].filter(Boolean) : [];
     const experienceTools = experienceEnabled ? this._experienceTools : [];
     const computerUseTools = this._isComputerUseCandidateForThisAgent()
       ? [this._getComputerUseTool()]
@@ -1482,8 +1541,11 @@ export class Agent {
       const hasPinned = pinnedMd.trim();
       const trimmedMemory = memory.trim();
       const hasMemory = trimmedMemory && trimmedMemory !== "（暂无记忆）" && trimmedMemory !== "(No memory yet)";
+      // 用户原则（tenets）：经用户确认的行为原则，active 才注入；按会话冻结，
+      // 与 memory.md 同语义（新批准的原则对新会话生效）
+      const tenetsSection = buildTenetsPromptSection(this.agentDir, isZh);
 
-      if (hasPinned || hasMemory) {
+      if (hasPinned || hasMemory || tenetsSection) {
         const memChunks: Array<{ parts: string[]; category: string; source: Record<string, unknown> }> = [];
         memChunks.push({
           parts: [memoryRule],
@@ -1500,6 +1562,13 @@ export class Agent {
             ),
             category: "memory_context",
             source: { type: "memory", id: "memory.pinned" },
+          });
+        }
+        if (tenetsSection) {
+          memChunks.push({
+            parts: [tenetsSection],
+            category: "memory_context",
+            source: { type: "memory", id: "memory.tenets" },
           });
         }
         if (hasMemory) {

@@ -71,6 +71,12 @@ function safeBlobContentType(mediaType: string | null): string {
   return `${major}/${match[2].toLowerCase()}`;
 }
 
+async function enrichSources(engine: any, value: any) {
+  return typeof engine?.enrichModelObservabilitySources === "function"
+    ? engine.enrichModelObservabilitySources(value)
+    : value;
+}
+
 export function createModelObservabilityRoute(engine: any) {
   const route = new Hono();
 
@@ -101,11 +107,22 @@ export function createModelObservabilityRoute(engine: any) {
         return badRequest(c, { code: "unknown_field", message: `unknown settings field "${key}"`, field: key });
       }
     }
+    for (const key of ["enabled", "persistTraceMetadata", "persistPayloads", "persistBlobs"] as const) {
+      if (source[key] === false) {
+        return c.json({ error: "immutable_setting", code: "immutable_setting", field: key,
+          message: `${key} is always enabled and cannot be turned off` }, 409);
+      }
+      if (source[key] !== undefined && source[key] !== true) {
+        return badRequest(c, { code: "invalid_filter", message: `${key} must be true when provided`, field: key });
+      }
+    }
     if (source.retention !== undefined
       && (source.retention === null || typeof source.retention !== "object" || Array.isArray(source.retention))) {
       return badRequest(c, { code: "invalid_filter", message: "retention must be an object", field: "retention" });
     }
-    const result = await engine.setModelObservabilitySettings(source);
+    const result = await engine.setModelObservabilitySettings(
+      source.retention === undefined ? {} : { retention: source.retention },
+    );
     return c.json(result);
   });
 
@@ -122,7 +139,7 @@ export function createModelObservabilityRoute(engine: any) {
     if (normalized.ok === false) return badRequest(c, normalized.error);
     const result = engine.getModelObservabilityQueryService().queryCalls(normalized.value);
     if (result.ok === false) return serviceError(c, result.error);
-    return c.json(result.value);
+    return c.json(await enrichSources(engine, result.value));
   });
 
   route.post("/model-observability/query/traces", async (c) => {
@@ -136,7 +153,7 @@ export function createModelObservabilityRoute(engine: any) {
     if (normalized.ok === false) return badRequest(c, normalized.error);
     const result = engine.getModelObservabilityQueryService().queryTraces(normalized.value);
     if (result.ok === false) return serviceError(c, result.error);
-    return c.json(result.value);
+    return c.json(await enrichSources(engine, result.value));
   });
 
   route.post("/model-observability/query/aggregate", async (c) => {
@@ -155,16 +172,16 @@ export function createModelObservabilityRoute(engine: any) {
 
   /* ── drill-down detail（§三十二/三十）────────────────────────────── */
 
-  route.get("/model-observability/calls/:callId", (c) => {
+  route.get("/model-observability/calls/:callId", async (c) => {
     const result = engine.getModelObservabilityQueryService().queryCallDetail(c.req.param("callId"));
     if (result.ok === false) return serviceError(c, result.error);
-    return c.json(result.value);
+    return c.json(await enrichSources(engine, result.value));
   });
 
-  route.get("/model-observability/traces/:traceId", (c) => {
+  route.get("/model-observability/traces/:traceId", async (c) => {
     const result = engine.getModelObservabilityQueryService().queryTraceDetail(c.req.param("traceId"));
     if (result.ok === false) return serviceError(c, result.error);
-    return c.json(result.value);
+    return c.json(await enrichSources(engine, result.value));
   });
 
   /** payload metadata（正文不默认 inline，§三十四）。 */

@@ -1,10 +1,8 @@
 /**
  * @vitest-environment jsdom
  *
- * Phase 9 Recording Settings 对话框测试 — desired/effective 拆分展示
- * （§一百：mismatch 绝不伪装 Active）、persistBlobs ⊆ persistPayloads
- * （§一百零五）、payload opt-in 确认（§一百零三：无加密事实文案）、
- * retention 校验（§一百零六）。
+ * 模型观测设置对话框测试：采集能力固定全开，界面只保留真实运行状态、
+ * 静态加密事实和三类保留天数。
  */
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -43,7 +41,7 @@ const SETTINGS_ACTIVE: ModelObservabilitySettingsResponse = {
     persistTraceMetadata: true,
     persistPayloads: true,
     persistBlobs: true,
-    schemaVersion: 2,
+    schemaVersion: 4,
   },
   cryptographicallyEncryptedAtRest: false,
 };
@@ -81,7 +79,7 @@ function makeHealth(): ModelObservabilityHealthResponse {
     query: {
       queryStatus: 'ready',
       queryStatusReason: null,
-      schemaVersion: 2,
+      schemaVersion: 4,
       accountingProjectionAvailable: true,
       oldestCallAt: null,
       newestCallAt: null,
@@ -95,10 +93,6 @@ function makeHealth(): ModelObservabilityHealthResponse {
       },
     },
   };
-}
-
-function switchByLabel(label: string): HTMLElement {
-  return screen.getByRole('switch', { name: label });
 }
 
 describe('ObservabilitySettingsDialog', () => {
@@ -165,33 +159,26 @@ describe('ObservabilitySettingsDialog', () => {
         onClose={() => {}} onApplied={() => {}}
       />,
     );
-    await screen.findByRole('switch', { name: 'settings.observability.recording.enabled' });
+    await screen.findByRole('dialog', { name: 'settings.observability.recording.dialogAria' });
     const effective = document.querySelector('[class*="observability-settings-effective"]');
     expect(effective!.textContent).toContain('settings.observability.recording.atRestEncryptionNo');
     expect(effective!.textContent).not.toMatch(/加密存储|encrypted storage/i);
   });
 
-  it('turning payloads off also turns blobs off (§一百零五 persistBlobs ⊆ persistPayloads)', async () => {
+  it('removes all recording switches and only exposes three retention fields', async () => {
     render(
       <ObservabilitySettingsDialog
         open isLocalOwner settings={SETTINGS_ACTIVE} health={makeHealth()}
         onClose={() => {}} onApplied={() => {}}
       />,
     );
-    const payloads = await screen.findByRole('switch', { name: 'settings.observability.recording.persistPayloads' });
-    const blobs = screen.getByRole('switch', { name: 'settings.observability.recording.persistBlobs' });
-    expect(payloads).toHaveAttribute('aria-checked', 'true');
-    expect(blobs).toHaveAttribute('aria-checked', 'true');
-
-    fireEvent.click(payloads);
-
-    expect(switchByLabel('settings.observability.recording.persistPayloads'))
-      .toHaveAttribute('aria-checked', 'false');
-    expect(switchByLabel('settings.observability.recording.persistBlobs'))
-      .toHaveAttribute('aria-checked', 'false');
+    await screen.findByRole('dialog', { name: 'settings.observability.recording.dialogAria' });
+    expect(screen.queryByRole('switch')).toBeNull();
+    expect(screen.getAllByRole('spinbutton')).toHaveLength(3);
+    expect(document.body.textContent).toContain('settings.observability.recording.persistPayloadsHint');
   });
 
-  it('payload opt-in requires an explicit confirmation listing persisted content kinds (§一百零三)', async () => {
+  it('does not restore legacy opt-in controls when an old response contains false switches', async () => {
     const off: ModelObservabilitySettingsResponse = {
       ...SETTINGS_ACTIVE,
       desired: { ...SETTINGS_ACTIVE.desired, persistPayloads: false, persistBlobs: false },
@@ -203,19 +190,9 @@ describe('ObservabilitySettingsDialog', () => {
         onClose={() => {}} onApplied={() => {}}
       />,
     );
-    const payloads = await screen.findByRole('switch', { name: 'settings.observability.recording.persistPayloads' });
-    fireEvent.click(payloads);
-
-    // 确认对话框列出 5 类内容 + 无加密事实，confirm 后 draft 才翻 true。
-    expect(screen.getByText('settings.observability.recording.confirmPayloadsTitle')).toBeInTheDocument();
-    expect(screen.getByText('settings.observability.recording.confirmPayloadsItemReasoning')).toBeInTheDocument();
-    expect(screen.getByText('settings.observability.recording.confirmPayloadsEncryptionFact')).toBeInTheDocument();
-    expect(switchByLabel('settings.observability.recording.persistPayloads'))
-      .toHaveAttribute('aria-checked', 'false');
-
-    fireEvent.click(screen.getByRole('button', { name: 'settings.observability.recording.confirmPayloadsConfirm' }));
-    expect(switchByLabel('settings.observability.recording.persistPayloads'))
-      .toHaveAttribute('aria-checked', 'true');
+    await screen.findByRole('dialog', { name: 'settings.observability.recording.dialogAria' });
+    expect(screen.queryByRole('switch')).toBeNull();
+    expect(screen.queryByText('settings.observability.recording.confirmPayloadsTitle')).toBeNull();
   });
 
   it('invalid retention blocks save and announces the allowed range (§一百零六)', async () => {
@@ -225,7 +202,7 @@ describe('ObservabilitySettingsDialog', () => {
         onClose={() => {}} onApplied={() => {}}
       />,
     );
-    await screen.findByRole('switch', { name: 'settings.observability.recording.enabled' });
+    await screen.findByRole('dialog', { name: 'settings.observability.recording.dialogAria' });
 
     const traceInput = document.querySelector('input[class*="settings-input"]') as HTMLInputElement;
     fireEvent.change(traceInput, { target: { value: '0' } });
@@ -236,7 +213,7 @@ describe('ObservabilitySettingsDialog', () => {
     expect(saveButton).toBeDisabled();
   });
 
-  it('save submits the full desired shape via PUT payload', async () => {
+  it('save submits retention only', async () => {
     mocks.updateObservabilitySettings.mockResolvedValue({});
     render(
       <ObservabilitySettingsDialog
@@ -244,16 +221,12 @@ describe('ObservabilitySettingsDialog', () => {
         onClose={() => {}} onApplied={() => {}}
       />,
     );
-    await screen.findByRole('switch', { name: 'settings.observability.recording.enabled' });
+    await screen.findByRole('dialog', { name: 'settings.observability.recording.dialogAria' });
 
     fireEvent.click(screen.getByRole('button', { name: 'settings.observability.actions.save' }));
 
     await waitFor(() => {
       expect(mocks.updateObservabilitySettings).toHaveBeenCalledWith({
-        enabled: true,
-        persistTraceMetadata: true,
-        persistPayloads: true,
-        persistBlobs: true,
         retention: { traceDays: 180, payloadDays: 30, blobDays: 30 },
       });
     });

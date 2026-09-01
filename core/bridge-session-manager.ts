@@ -9,7 +9,10 @@ import path from "path";
 import { createAgentSession, SessionManager } from "../lib/pi-sdk/index.ts";
 import { registerSessionModelCallContext } from "../lib/pi-sdk/model-call-stream-observer.ts";
 import { runWithModelTraceRoot } from "../lib/llm/model-trace-scope.ts";
-import { modelCallLedgerMetadataForMessage } from "../lib/llm/model-call-correlation.ts";
+import {
+  modelCallLedgerMetadataForMessage,
+  persistModelCallReferenceForMessage,
+} from "../lib/llm/model-call-correlation.ts";
 import { createDefaultSettings } from "./session-defaults.ts";
 import { compactSessionWithCachePreservation } from "./session-compactor.ts";
 import {
@@ -1372,6 +1375,9 @@ export class BridgeSessionManager {
 
       // 捕获文本输出（visibleText / providerErrorMessage 声明见方法顶部）
       const unsub = session.subscribe((event) => {
+        if (event?.type === "message_end" && event.message?.role === "assistant") {
+          persistModelCallReferenceForMessage(session.sessionManager, event.message);
+        }
         recordBridgeAssistantUsage({
           ledger: this._deps.getUsageLedger?.(),
           event,

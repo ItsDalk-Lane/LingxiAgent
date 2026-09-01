@@ -27,6 +27,8 @@ vi.mock('../../hooks/use-i18n', () => ({
       'common.screenshot': '截图',
       'common.selectMessage': '选择消息',
       'common.selectAllMessages': '全选消息',
+      'chat.feedbackUp': '有帮助',
+      'chat.feedbackDown': '没帮助',
     }[key] || key),
   }),
 }));
@@ -129,6 +131,8 @@ describe('AssistantMessage completion actions', () => {
       '分支为新会话',
       '复制文本',
       '截图',
+      '有帮助',
+      '没帮助',
       '全选消息',
       '选择消息',
     ]);

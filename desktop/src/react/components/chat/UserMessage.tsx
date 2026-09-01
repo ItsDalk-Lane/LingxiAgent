@@ -17,7 +17,7 @@ import { selectSelectedIdsBySession } from '../../stores/session-selectors';
 import { extractSelectedTexts } from '../../utils/message-text';
 import { openFilePreview } from '../../utils/file-preview';
 import { buildFileRefId, isImageOrSvgExt, extOfName, kindOfFileName } from '../../utils/file-kind';
-import { getUserAttachmentImageSrc } from '../../utils/user-attachment-media';
+import { getUserAttachmentImageSrc, getUserAttachmentVideoPosterSrc } from '../../utils/user-attachment-media';
 import { AgentAvatar, resolveAgentDisplayInfo } from '../../utils/agent-display';
 import { openMediaViewerForRef } from '../../utils/open-media-viewer';
 import { useDeferredHistoryContent } from '../../hooks/use-deferred-history-content';
@@ -408,6 +408,18 @@ const UserAttachmentsView = memo(function UserAttachmentsView({ attachments, des
             />
           );
         }
+        // 视频附件：首帧海报 + 播放角标，点击进 MediaViewer 全屏播放
+        //（此前走兜底文件胶囊，无任何点击入口——视频「看得见却点不开」）。
+        if (!expired && kind === 'video') {
+          return (
+            <UserVideoAttachmentCard
+              key={att.fileId || att.path || att.name || `att-${i}`}
+              attachment={att}
+              sessionPath={sessionPath}
+              messageId={messageId}
+            />
+          );
+        }
         if (imageSrc) {
           return (
             <div key={att.name || `att-${i}`} className={styles.attachImageWrap}>
@@ -450,6 +462,61 @@ const UserAttachmentsView = memo(function UserAttachmentsView({ attachments, des
           name={`${t('sidebar.jian')} (${deskContext.fileCount})`}
         />
       )}
+    </div>
+  );
+});
+
+/** 视频附件卡：首帧海报 + 播放角标；海报解码失败（HEVC 等编码）回退文件图标，
+ * 卡片本身仍可点击进 MediaViewer（那里有「用系统播放器打开」逃生门）。 */
+const UserVideoAttachmentCard = memo(function UserVideoAttachmentCard({
+  attachment: att,
+  sessionPath,
+  messageId,
+}: {
+  attachment: UserAttachment;
+  sessionPath: string;
+  messageId: string;
+}) {
+  const [posterFailed, setPosterFailed] = useState(false);
+  const posterSrc = getUserAttachmentVideoPosterSrc(att);
+  return (
+    <div
+      className={styles.attachVideoWrap}
+      role="button"
+      aria-label={att.name}
+      onClick={(e) => {
+        e.stopPropagation();
+        const ext = att.name.split('.').pop()?.toLowerCase() || '';
+        openFilePreview(att.path, att.name, ext, {
+          origin: 'session',
+          sessionPath,
+          messageId,
+        });
+      }}
+    >
+      <div className={styles.attachVideoPosterBox}>
+        {posterSrc && !posterFailed ? (
+          <video
+            className={styles.attachVideoPoster}
+            src={posterSrc}
+            preload="metadata"
+            muted
+            playsInline
+            aria-hidden
+            onError={() => setPosterFailed(true)}
+          />
+        ) : (
+          <div className={styles.attachVideoPosterFallback}>
+            <FileKindIcon kind="video" size={22} />
+          </div>
+        )}
+        <span className={styles.attachVideoPlayBadge} aria-hidden>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="#fff" aria-hidden="true">
+            <path d="M8 5v14l11-7z" />
+          </svg>
+        </span>
+      </div>
+      <span className={styles.attachVideoName} title={att.name}>{att.name}</span>
     </div>
   );
 });

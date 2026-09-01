@@ -21,6 +21,7 @@
  * PUT    /api/agents/:id/pinned   — 写入 pinned.md
  * GET    /api/agents/:id/experience — 读取经验（合并）
  * PUT    /api/agents/:id/experience — 写入经验（拆分）
+ * POST   /api/agents/:id/experience/feedback — 消息级用户反馈沉淀（赞/踩，不受 experience.enabled 门控）
  */
 import fs from "fs/promises";
 import fsSync from "fs";
@@ -36,11 +37,19 @@ import {
   listExperienceDocuments,
   normalizeExperienceCategory,
   syncExperienceCategories,
+  recordEntry,
 } from "../../lib/tools/experience.ts";
 import {
   readPinnedMemoryItems,
   replacePinnedMemoryItems,
 } from "../../lib/memory/pinned-memory-store.ts";
+import {
+  listTenets,
+  addTenetDirect,
+  decideTenet,
+  removeTenet,
+  TENET_ERRORS,
+} from "../../lib/memory/tenets.ts";
 import { splitByScope, injectGlobalFields } from '../../shared/config-scope.ts';
 import { validateId, agentExists } from "../utils/validation.ts";
 import {
@@ -1014,6 +1023,126 @@ export function createAgentsRoute(engine) {
       if (err.message === "invalid experience category") {
         return c.json({ error: err.message }, 400);
       }
+      return c.json({ error: err.message }, 500);
+    }
+  });
+
+  // POST /api/agents/:id/experience/feedback — 消息级用户反馈沉淀（赞/踩）。
+  // 用户显式动作：不受 experience.enabled 门控（不静默丢弃）；分类固定，
+  // 内容一行带日期/标记/摘录/会话短 id。experienceEnabled 原样带回供 toast 分支。
+  route.post("/agents/:id/experience/feedback", async (c) => {
+    const id = c.req.param("id");
+    if (!validateId(id) || !agentExists(engine, id)) {
+      return c.json({ error: "agent not found" }, 404);
+    }
+    try {
+      const body = await safeJson(c);
+      const rating = body.rating === "down" ? "down" : body.rating === "up" ? "up" : null;
+      if (!rating) {
+        return c.json({ error: "rating must be 'up' or 'down'" }, 400);
+      }
+      const excerpt = String(body.excerpt || "").trim().slice(0, 200);
+      if (!excerpt) {
+        return c.json({ error: "excerpt is required" }, 400);
+      }
+      const sessionId = String(body.sessionId || "").trim().slice(0, 128);
+
+      const dir = agentDir(engine, id);
+      const expDir = path.join(dir, "experience");
+      const indexPath = path.join(dir, "experience.md");
+      const date = new Date().toISOString().slice(0, 10);
+      const category = rating === "up" ? "用户认可的做法" : "用户不认可的做法";
+      const mark = rating === "up" ? "✓" : "✗";
+      const sessionNote = sessionId ? `（会话 ${sessionId.slice(0, 8)}）` : "";
+      const content = `[${date}] ${mark} ${excerpt}${sessionNote}`;
+
+      const result = recordEntry(expDir, indexPath, category, content);
+      return c.json({
+        ok: true,
+        added: result.added === true,
+        duplicate: result.added === false,
+        category,
+        experienceEnabled: isExperienceEnabled(engine, id),
+      });
+    } catch (err) {
+      return c.json({ error: err.message }, 500);
+    }
+  });
+
+  // ════════════════════════════
+  //  Tenets（用户原则：提案→审批→注入 system prompt）
+  // ════════════════════════════
+
+  const tenetsDirOf = (id: string) => agentDir(engine, id);
+  const tenetsErrorStatus = (err: any) => {
+    if (err?.code === TENET_ERRORS.NOT_FOUND) return 404;
+    if (err?.code === TENET_ERRORS.LIMIT_REACHED
+      || err?.code === TENET_ERRORS.PENDING_FULL
+      || err?.code === TENET_ERRORS.INVALID) return 409;
+    return 500;
+  };
+
+  route.get("/agents/:id/tenets", async (c) => {
+    const id = c.req.param("id");
+    if (!validateId(id) || !agentExists(engine, id)) {
+      return c.json({ error: "agent not found" }, 404);
+    }
+    try {
+      return c.json({ tenets: listTenets(tenetsDirOf(id)) });
+    } catch (err) {
+      return c.json({ error: err.message }, 500);
+    }
+  });
+
+  // 用户直接添加（立即 active）
+  route.post("/agents/:id/tenets", async (c) => {
+    const id = c.req.param("id");
+    if (!validateId(id) || !agentExists(engine, id)) {
+      return c.json({ error: "agent not found" }, 404);
+    }
+    try {
+      const body = await safeJson(c);
+      if (typeof body.content !== "string" || !body.content.trim()) {
+        return c.json({ error: "content must be a non-empty string" }, 400);
+      }
+      const result = addTenetDirect(tenetsDirOf(id), {
+        content: body.content,
+        priority: typeof body.priority === "string" ? body.priority : undefined,
+      });
+      emitAppEvent(engine, "tenets-changed", { agentId: id });
+      return c.json({ ok: true, tenet: result.tenet, duplicate: result.duplicate });
+    } catch (err) {
+      return c.json({ error: err.message, code: err?.code }, tenetsErrorStatus(err));
+    }
+  });
+
+  // 审批提案（approve=false 拒绝）
+  route.post("/agents/:id/tenets/:tenetId/decide", async (c) => {
+    const id = c.req.param("id");
+    if (!validateId(id) || !agentExists(engine, id)) {
+      return c.json({ error: "agent not found" }, 404);
+    }
+    try {
+      const body = await safeJson(c);
+      const tenet = decideTenet(tenetsDirOf(id), c.req.param("tenetId"), body.approve !== false);
+      emitAppEvent(engine, "tenets-changed", { agentId: id });
+      return c.json({ ok: true, tenet });
+    } catch (err) {
+      return c.json({ error: err.message, code: err?.code }, tenetsErrorStatus(err));
+    }
+  });
+
+  route.delete("/agents/:id/tenets/:tenetId", async (c) => {
+    const id = c.req.param("id");
+    if (!validateId(id) || !agentExists(engine, id)) {
+      return c.json({ error: "agent not found" }, 404);
+    }
+    try {
+      const removed = removeTenet(tenetsDirOf(id), c.req.param("tenetId"));
+      if (!removed) return c.json({ error: "tenet not found" }, 404);
+      emitAppEvent(engine, "tenets-changed", { agentId: id });
+      return c.json({ ok: true });
+    } catch (err) {
       return c.json({ error: err.message }, 500);
     }
   });

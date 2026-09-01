@@ -39,6 +39,7 @@ import { ComposerToolbar } from './input/ComposerToolbar';
 import { SendButton } from './input/SendButton';
 import type { PermissionMode } from './input/PlanModeButton';
 import { SessionConfirmationPrompt } from './input/SessionConfirmationPrompt';
+import { TenetApprovalBanner } from './input/TenetApprovalBanner';
 import { serializeEditor } from '../utils/editor-serializer';
 import {
   buildFileMentionItems,
@@ -59,9 +60,10 @@ import {
   evaluateChatAudioSendPreflight,
   evaluateChatVideoSendPreflight,
   getModelAudioInputMode,
+  notifyChatVideoFormatUnsupported,
   notifyTextModelImageFileOnly,
   notifyTextModelAudioBlocked,
-  notifyTextModelVideoFileOnly,
+  notifyVideoSendBlockedByModel,
 } from '../utils/chat-image-send-preflight';
 import { openProviderModelSettings } from '../utils/model-settings-navigation';
 import { shouldShowThinkingControl } from '../utils/model-thinking';
@@ -80,6 +82,12 @@ import { lingxiFetch } from '../hooks/use-hana-fetch';
 import type { DeskSearchResult } from '../types';
 import styles from './input/InputArea.module.css';
 import type { AudioWaveform, ChatListItem, SessionConfirmationBlock, SessionModel } from '../stores/chat-types';
+import {
+  MAX_CHAT_VIDEO_SOURCE_BYTES,
+  isAllowedChatVideoMime,
+  isChatVideoBase64ContentCompatible,
+  isChatVideoBase64WithinLimit,
+} from '../../../../shared/video-mime.ts';
 
 const EMPTY_FILE_REFS: readonly import('../types/file-ref').FileRef[] = Object.freeze([]);
 
@@ -990,12 +998,29 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
     try {
       if (files.length === 0) return;
       if (useStore.getState().attachedFiles.length >= 9) return;
+      const existingVideoCount = useStore.getState().attachedFiles.filter(file => isVideoFile(file.name)).length;
+      const selectedVideoCount = files.filter(file => isVideoFile(file.name)).length;
+      if (existingVideoCount + selectedVideoCount > 3) {
+        useStore.getState().addToast(t('error.maxVideos', { max: 3 }), 'error', 6000);
+        return;
+      }
 
       for (const file of files) {
         if (useStore.getState().attachedFiles.length >= 9) break;
-        const mimeType = file.type || (isAudioFileName(file.name) ? chatAudioMimeTypeForName(file.name) : chatImageMimeTypeForName(file.name));
+        const mimeType = file.type || (
+          isVideoFile(file.name)
+            ? chatVideoMimeTypeForName(file.name)
+            : isAudioFileName(file.name) ? chatAudioMimeTypeForName(file.name) : chatImageMimeTypeForName(file.name)
+        );
         try {
+          if (mimeType.startsWith('video/')) {
+            if (!isAllowedChatVideoMime(mimeType)) throw new Error(`unsupported video format: ${mimeType}`);
+            if (file.size > MAX_CHAT_VIDEO_SOURCE_BYTES) throw new Error('video exceeds the 20 MiB Base64 limit');
+          }
           const base64Data = await readFileAsBase64(file);
+          if (mimeType.startsWith('video/') && !isChatVideoBase64WithinLimit(base64Data)) {
+            throw new Error('video exceeds the 20 MiB Base64 limit');
+          }
           const uploadPayload = mimeType.startsWith('image/')
             ? await prepareChatImageUpload({
               file,
@@ -1856,14 +1881,27 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
         attachments: inputFiles,
         model: currentModelInfo,
       });
+      if (videoFiles.length > 3) {
+        useStore.getState().addToast(t('error.maxVideos', { max: 3 }), 'error', 6000);
+        return;
+      }
       const sendVideosNatively = videoPreflight.ok && videoPreflight.reason === 'native-video';
-      const videosAsFileOnly = !videoPreflight.ok;
-      if (videosAsFileOnly) {
-        notifyTextModelVideoFileOnly({
-          t,
-          addToast: useStore.getState().addToast,
-          openSettings: () => openProviderModelSettings(currentModelInfo?.provider),
-        });
+      if (!videoPreflight.ok) {
+        // 两种拦截分流：模型无视频能力 vs 格式不在该端点契约交集内，提示语不同。
+        if (videoPreflight.reason === 'video-format-unsupported') {
+          notifyChatVideoFormatUnsupported({
+            t,
+            addToast: useStore.getState().addToast,
+            mimeType: videoPreflight.mimeType,
+          });
+        } else {
+          notifyVideoSendBlockedByModel({
+            t,
+            addToast: useStore.getState().addToast,
+            openSettings: () => openProviderModelSettings(currentModelInfo?.provider),
+          });
+        }
+        return;
       }
       const audioPreflight = await evaluateChatAudioSendPreflight({
         attachments: inputFiles,
@@ -1960,11 +1998,21 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
         try {
           if (video.base64Data && video.mimeType) {
             const mimeType = chatVideoMimeTypeForName(video.name, video.mimeType);
+            if (!isAllowedChatVideoMime(mimeType)
+              || !isChatVideoBase64WithinLimit(video.base64Data)
+              || !isChatVideoBase64ContentCompatible(video.base64Data, mimeType)) {
+              throw new Error(`unsupported or oversized video: ${video.name}`);
+            }
             videos.push({ type: 'video', data: video.base64Data, mimeType });
           } else {
             const base64 = await platform?.readFileBase64?.(video.path);
             if (base64) {
               const mimeType = chatVideoMimeTypeForName(video.name, video.mimeType);
+              if (!isAllowedChatVideoMime(mimeType)
+                || !isChatVideoBase64WithinLimit(base64)
+                || !isChatVideoBase64ContentCompatible(base64, mimeType)) {
+                throw new Error(`unsupported or oversized video: ${video.name}`);
+              }
               videoBase64Map.set(video.path, { base64Data: base64, mimeType });
               videos.push({ type: 'video', data: base64, mimeType });
             } else {
@@ -2328,13 +2376,14 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
             exiting={sessionConfirmationExiting}
           />
         )}
+        <TenetApprovalBanner />
         <div className={styles['input-wrapper']} ref={inputCardRef}>
           <input
             ref={browserFileInputRef}
             className={styles['browser-file-input']}
             type="file"
             multiple
-            accept="image/png,image/jpeg,image/gif,image/webp,audio/mpeg,audio/wav,audio/x-wav,audio/mp4,audio/ogg,audio/flac,audio/webm"
+            accept="image/png,image/jpeg,image/gif,image/webp,audio/mpeg,audio/wav,audio/x-wav,audio/mp4,audio/ogg,audio/flac,audio/webm,video/mp4,video/quicktime,video/webm"
             disabled={inputLocked}
             onChange={handleBrowserFileInputChange}
           />

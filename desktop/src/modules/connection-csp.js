@@ -4,6 +4,10 @@
     "default-src": ["'self'"],
     "connect-src": ["'self'", "ws://127.0.0.1:*", "http://127.0.0.1:*"],
     "img-src": ["'self'", "data:", "file:", "http://127.0.0.1:*"],
+    // 视频附件海报帧与 MediaViewer 播放都经 <video src> 加载：没有 media-src 时
+    // 回落 default-src 'self'，file:// 源会被拦（黑屏有控件但不播）。与 img-src
+    // 同源白名单，另加 blob:（object URL 播放源）。
+    "media-src": ["'self'", "data:", "blob:", "file:", "http://127.0.0.1:*"],
     "style-src": ["'self'", "'unsafe-inline'"],
     "script-src": ["'self'"],
     "font-src": ["'self'", "data:"],

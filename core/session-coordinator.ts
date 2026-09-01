@@ -11,7 +11,10 @@ import path from "path";
 import { createAgentSession, SessionManager, estimateTokens, refreshSessionModelFromRegistry } from "../lib/pi-sdk/index.ts";
 import { registerSessionModelCallContext } from "../lib/pi-sdk/model-call-stream-observer.ts";
 import { runWithModelTraceRoot } from "../lib/llm/model-trace-scope.ts";
-import { modelCallLedgerMetadataForMessage } from "../lib/llm/model-call-correlation.ts";
+import {
+  modelCallLedgerMetadataForMessage,
+  persistModelCallReferenceForMessage,
+} from "../lib/llm/model-call-correlation.ts";
 import { isSessionJsonlFilename } from "../lib/session-jsonl.ts";
 import { createDefaultSettings } from "./session-defaults.ts";
 import { isDefaultWorkspacePath, restoreDefaultWorkspaceIfMissing } from "../shared/default-workspace.ts";
@@ -89,7 +92,9 @@ import {
   modelSupportsAudioInput,
   modelSupportsDirectVideoInput,
   modelSupportsVideoInput,
+  modelSupportsVideoMimeType,
 } from "../shared/model-capabilities.ts";
+import { isChatVideoBase64ContentCompatible } from "../shared/video-mime.ts";
 import {
   normalizeSessionThinkingLevel,
   normalizeThinkingLevelForModel,
@@ -379,6 +384,14 @@ function assertVideoInputSupported(model: any, videos: any) {
   }
   if (!modelSupportsDirectVideoInput(model)) {
     throw new Error("current provider does not support direct video input");
+  }
+  for (const video of videos) {
+    if (!modelSupportsVideoMimeType(model, video?.mimeType)) {
+      throw new Error(`current provider does not support video format ${video?.mimeType || "unknown"}`);
+    }
+    if (!isChatVideoBase64ContentCompatible(video?.data, video?.mimeType)) {
+      throw new Error("video content does not match its declared format");
+    }
   }
 }
 
@@ -2283,6 +2296,9 @@ export class SessionCoordinator {
         && event.message?.role !== "assistant"
       ) {
         schedulePreAssistantSessionManagerFlush(session.sessionManager);
+      }
+      if (event?.type === "message_end" && event.message?.role === "assistant") {
+        persistModelCallReferenceForMessage(session.sessionManager, event.message);
       }
       recordAssistantUsage({
         ledger: this._d.getUsageLedger?.(),
@@ -7137,6 +7153,28 @@ export class SessionCoordinator {
     }
   }
 
+  /**
+   * 按会话文件路径读取该会话冻结的提示词快照与工具名列表（session-meta.json
+   * sidecar；含载荷外置水合）。供「模型观测轨迹详情 → SYSTEM 首记录」等
+   * 只读展示面使用——会话文件与 session-meta 同目录，直接从路径推导。
+   */
+  async readSessionPromptContextByPath(sessionPath: any) {
+    try {
+      const metaPath = path.join(path.dirname(sessionPath), "session-meta.json");
+      const meta = await this._readMetaCached(metaPath);
+      const entry = meta[path.basename(sessionPath)] ?? null;
+      const toolNames = Array.isArray(entry?.toolNames)
+        ? entry.toolNames.filter((name: unknown) => typeof name === "string")
+        : null;
+      return {
+        promptSnapshot: normalizeSessionPromptSnapshot(entry?.promptSnapshot),
+        toolNames,
+      };
+    } catch {
+      return { promptSnapshot: null, toolNames: null };
+    }
+  }
+
   _getFinalSystemPrompt(session: any) {
     if (typeof session?._baseSystemPrompt === "string") {
       return session._baseSystemPrompt;
@@ -8311,6 +8349,9 @@ export class SessionCoordinator {
           ? opts.parentSessionId.trim()
           : (parentSessionPath ? this._sessionIdForPath(parentSessionPath) : null);
         const childSessionId = childSessionPath ? this._sessionIdForPath(childSessionPath) : null;
+        if (event?.type === "message_end" && event.message?.role === "assistant") {
+          persistModelCallReferenceForMessage(session.sessionManager, event.message);
+        }
         recordAssistantUsage({
           ledger: this._d.getUsageLedger?.(),
           event,

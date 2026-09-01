@@ -64,7 +64,11 @@ import {
 } from "../../lib/turn-input-presentation.ts";
 import { buildAutomationSuggestionBlock } from "../suggestion-blocks.ts";
 import { isAllowedChatImageMime, isChatImageBase64WithinLimit } from "../../shared/image-mime.ts";
-import { isAllowedChatVideoMime, isChatVideoBase64WithinLimit } from "../../shared/video-mime.ts";
+import {
+  isAllowedChatVideoMime,
+  isChatVideoBase64ContentCompatible,
+  isChatVideoBase64WithinLimit,
+} from "../../shared/video-mime.ts";
 import { isAllowedChatAudioMime, isChatAudioBase64WithinLimit } from "../../shared/audio-mime.ts";
 import { summarizeToolArgs } from "../../shared/tool-arg-summary.ts";
 import { projectLiveToolResultOutcome } from "../../shared/tool-outcome.ts";
@@ -2496,6 +2500,10 @@ export function createChatRoute(engine: any, hub: any, {
                   }
                   if (video.data && !isChatVideoBase64WithinLimit(video.data)) {
                     wsSend(ws, { type: "error", message: t("error.videoTooLarge"), sessionPath: promptSessionPath });
+                    return;
+                  }
+                  if (!isChatVideoBase64ContentCompatible(video.data, video.mimeType)) {
+                    wsSend(ws, { type: "error", message: t("error.invalidVideoContent"), sessionPath: promptSessionPath });
                     return;
                   }
                 }

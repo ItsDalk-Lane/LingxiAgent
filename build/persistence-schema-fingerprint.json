@@ -660,7 +660,7 @@
     ],
     "version": 3
   },
-  "payloadFingerprint": "sha256:5f525a1dca055ac97938d71d729f457b6bd2a11650ccecfe18da2903f3eb381a",
+  "payloadFingerprint": "sha256:6c61458af2032f36a28a1688c1c2b7920f156914d8a696ff0e4c25787303ea28",
   "registry": [
     {
       "affectedByEpochMigration": true,
@@ -765,6 +765,8 @@
       "pathPattern": "agents/{agentId}/memory/memory.md",
       "pathPatterns": [
         "agents/{agentId}/memory/memory.md",
+        "agents/{agentId}/memory/navigation.md",
+        "agents/{agentId}/memory/tenets.json",
         "agents/{agentId}/memory/facts.md",
         "agents/{agentId}/memory/today.md",
         "agents/{agentId}/memory/week.md",
@@ -3285,8 +3287,8 @@
   ],
   "review": {
     "classification": "compatible",
-    "compatibilityReason": "session-coordinator.ts: cache-prefix guard now skips non-chat purpose side lanes (knowledge rollup rounds); engine.ts: rollup side-lane call wrapped in purpose scope; knowledge-rollup.ts: part size cap. No persisted store shape or site mapping change",
-    "payloadFingerprint": "sha256:5f525a1dca055ac97938d71d729f457b6bd2a11650ccecfe18da2903f3eb381a"
+    "compatibilityReason": "Model Observatory schema v4 adds a source identity snapshot table without rewriting existing call rows; existing retention and read compatibility remain intact.",
+    "payloadFingerprint": "sha256:6c61458af2032f36a28a1688c1c2b7920f156914d8a696ff0e4c25787303ea28"
   },
   "schemas": [
     {
@@ -3303,6 +3305,12 @@
       "runtimeSchema": {
         "objects": [
           {
+            "name": "idx_fact_embeddings_model",
+            "sql": "CREATE INDEX idx_fact_embeddings_model ON fact_embeddings(model_key)",
+            "tableName": "fact_embeddings",
+            "type": "index"
+          },
+          {
             "name": "idx_facts_session",
             "sql": "CREATE INDEX idx_facts_session ON facts(session_id)",
             "tableName": "facts",
@@ -3313,6 +3321,12 @@
             "sql": "CREATE INDEX idx_facts_time ON facts(time)",
             "tableName": "facts",
             "type": "index"
+          },
+          {
+            "name": "fact_embeddings",
+            "sql": "CREATE TABLE fact_embeddings ( fact_id INTEGER NOT NULL REFERENCES facts(id) ON DELETE CASCADE, model_key TEXT NOT NULL, dimensions INTEGER NOT NULL, vector BLOB NOT NULL, updated_at TEXT NOT NULL, PRIMARY KEY (fact_id) )",
+            "tableName": "fact_embeddings",
+            "type": "table"
           },
           {
             "name": "facts",
@@ -3345,9 +3359,9 @@
             "type": "trigger"
           }
         ],
-        "userVersion": 2
+        "userVersion": 3
       },
-      "sourceHash": "sha256:c10e82386c2099edde0193af8669681a9b9b79b6657b1087dd9f5e386e8ff889",
+      "sourceHash": "sha256:85b95cdb425b47951a581a1ca3ab5302e2a6e7a9b7bfd3bc64fef8c7d667ecd0",
       "storeId": "agent-facts-sqlite"
     },
     {
@@ -3863,7 +3877,7 @@
       "contract": "sessionless upload naming and age-based cleanup protocol",
       "kind": "directory-contract",
       "module": "server/routes/upload.ts",
-      "sourceHash": "sha256:3d812be4b4846b223e6956e814e75128f04da26de0cbd127b070ba288e11336f",
+      "sourceHash": "sha256:32af9515aad9964d922b9a7226a74b1db8e726d86948e9e5e273d018df5fc635",
       "storeId": "legacy-upload-cache"
     },
     {
@@ -4022,6 +4036,12 @@
             "type": "index"
           },
           {
+            "name": "idx_source_identity_snapshots_updated",
+            "sql": "CREATE INDEX idx_source_identity_snapshots_updated ON source_identity_snapshots(updated_at)",
+            "tableName": "source_identity_snapshots",
+            "type": "index"
+          },
+          {
             "name": "idx_traces_last_seen",
             "sql": "CREATE INDEX idx_traces_last_seen ON traces(last_seen_at)",
             "tableName": "traces",
@@ -4070,15 +4090,21 @@
             "type": "table"
           },
           {
+            "name": "source_identity_snapshots",
+            "sql": "CREATE TABLE source_identity_snapshots ( kind TEXT NOT NULL, entity_id TEXT NOT NULL, title TEXT, updated_at TEXT NOT NULL, PRIMARY KEY (kind, entity_id) )",
+            "tableName": "source_identity_snapshots",
+            "type": "table"
+          },
+          {
             "name": "traces",
             "sql": "CREATE TABLE traces ( trace_id TEXT PRIMARY KEY, origin TEXT, first_seen_at TEXT NOT NULL, last_seen_at TEXT NOT NULL, call_count INTEGER NOT NULL DEFAULT 0, created_at TEXT NOT NULL, updated_at TEXT NOT NULL )",
             "tableName": "traces",
             "type": "table"
           }
         ],
-        "userVersion": 3
+        "userVersion": 4
       },
-      "sourceHash": "sha256:fd88815a4f0cc6176aaff3100f6aa68e106abc2472467fc435031cd7f4b2b788",
+      "sourceHash": "sha256:ec7b0dc5ab0c1c27f90df3f33be238fda398196e967e3a35f3269162c3962d2a",
       "storeId": "model-observability-db"
     },
     {
@@ -4197,7 +4223,7 @@
         {
           "contract": "core/session-coordinator.ts Hana metadata extensions",
           "module": "core/session-coordinator.ts",
-          "sourceHash": "sha256:bd949abdcbb3a9bf75c540c9ed2ac07ec43624abc2fa6eada720f5aa62c9337d"
+          "sourceHash": "sha256:ba0e917497712b45c04c392161595e9a40f152a8dcb2c150113359ed5e8440ac"
         },
         {
           "contract": "core/session-jsonl-file.ts repair contract",
@@ -4295,7 +4321,7 @@
       "contract": "bridge index, legacy session metadata, title, and vision sidecar readers",
       "kind": "runtime-contract",
       "module": "core/bridge-session-manager.ts",
-      "sourceHash": "sha256:3da441d6a8ec19fa7b2d0aaa4789969f7d0fa42cce44c5def7a868eea3d90de2",
+      "sourceHash": "sha256:845eeb30490e7f6caa06c80218311ef5cbd99df2359bd76387a1423f4066cbb4",
       "storeId": "session-sidecars"
     },
     {
@@ -4351,7 +4377,7 @@
       "contract": "PreferencesManager defaults, coercion, and _dataVersion migration driver",
       "kind": "runtime-contract",
       "module": "core/preferences-manager.ts",
-      "sourceHash": "sha256:24f6a1238c655e9d12914ef020e7eca515dfa937985969ae396798319a700321",
+      "sourceHash": "sha256:39e890768ba7df9fa210a987675ec6d55b072915007e4c9a1043954da4cb4723",
       "storeId": "user-preferences"
     },
     {
@@ -8270,6 +8296,22 @@
       "kind": "atomic-write",
       "ordinal": 0,
       "reason": "Writes a named per-agent memory or Dream revision protocol file.",
+      "sourceFile": "lib/memory/navigation.ts",
+      "storeId": "agent-memory"
+    },
+    {
+      "exemptionId": null,
+      "kind": "mkdir",
+      "ordinal": 0,
+      "reason": "Writes a named per-agent memory or Dream revision protocol file.",
+      "sourceFile": "lib/memory/navigation.ts",
+      "storeId": "agent-memory"
+    },
+    {
+      "exemptionId": null,
+      "kind": "atomic-write",
+      "ordinal": 0,
+      "reason": "Writes a named per-agent memory or Dream revision protocol file.",
       "sourceFile": "lib/memory/pinned-memory-store.ts",
       "storeId": "agent-memory"
     },
@@ -8335,6 +8377,22 @@
       "ordinal": 0,
       "reason": "Writes a named per-agent memory or Dream revision protocol file.",
       "sourceFile": "lib/memory/session-summary.ts",
+      "storeId": "agent-memory"
+    },
+    {
+      "exemptionId": null,
+      "kind": "atomic-write",
+      "ordinal": 0,
+      "reason": "Writes a named per-agent memory or Dream revision protocol file.",
+      "sourceFile": "lib/memory/tenets.ts",
+      "storeId": "agent-memory"
+    },
+    {
+      "exemptionId": null,
+      "kind": "mkdir",
+      "ordinal": 0,
+      "reason": "Writes a named per-agent memory or Dream revision protocol file.",
+      "sourceFile": "lib/memory/tenets.ts",
       "storeId": "agent-memory"
     },
     {

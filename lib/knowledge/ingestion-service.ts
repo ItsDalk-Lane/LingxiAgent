@@ -207,12 +207,18 @@ export class KnowledgeEmbeddingProviderGate {
     const wait = Math.max(0, slot.lastDispatchAt + this.intervalFor(key) - Date.now());
     slot.dispatchTimer = setTimeout(() => {
       slot.dispatchTimer = null;
-      this.dispatch(slot);
+      this.dispatch(slot, key);
     }, wait);
   }
 
-  private dispatch(slot: EmbeddingGateSlot) {
+  private dispatch(slot: EmbeddingGateSlot, key: string) {
     if (this.disposed || slot.active >= this.maxConcurrent || slot.queue.length === 0) return;
+    // Windows 计时器粒度（~15.6ms）会让 setTimeout 提前醒：派发前复验节流窗口，
+    // 没过节流就续等剩余时间，保证「至少间隔 minRequestIntervalMs」在所有平台成立。
+    if (!this.intervalElapsed(slot, key)) {
+      this.scheduleDispatch(slot, key);
+      return;
+    }
     const next = slot.queue.shift();
     slot.active += 1;
     slot.lastDispatchAt = Date.now();

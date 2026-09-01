@@ -759,6 +759,9 @@ export const MODEL_VIDEO_TRANSPORTS = Object.freeze({
   NONE: "none",
   GEMINI_INLINE_DATA: "gemini-inline-data",
   OPENAI_VIDEO_URL: "openai-video-url",
+  /** 用户/词典声明了视频输入、但端点不在已验证名单：按 OpenAI 兼容生态的
+   *  video_url 事实标准发送，供应商不支持时由其 4xx 显式报错（不静默降级）。 */
+  GENERIC_OPENAI_VIDEO_URL: "generic-openai-video-url",
   UNSUPPORTED: "unsupported",
 });
 
@@ -770,8 +773,14 @@ export function resolveModelVideoInputTransport(model: any, context: any = {}) {
     return MODEL_VIDEO_TRANSPORTS.GEMINI_INLINE_DATA;
   }
 
-  if (api === "openai-completions" && usesOpenAiVideoUrlTransport(model, context)) {
+  if ((api === "openai-completions" || api === "") && usesOpenAiVideoUrlTransport(model, context)) {
     return MODEL_VIDEO_TRANSPORTS.OPENAI_VIDEO_URL;
+  }
+
+  // 通用档：模型条目声明了视频输入（勾选/词典）即视为授权，不再按供应商白名单拦。
+  // 仅限 OpenAI 兼容线协议——anthropic/responses 等协议没有视频内容位，仍判 UNSUPPORTED。
+  if (api === "openai-completions" || api === "") {
+    return MODEL_VIDEO_TRANSPORTS.GENERIC_OPENAI_VIDEO_URL;
   }
 
   return MODEL_VIDEO_TRANSPORTS.UNSUPPORTED;
@@ -780,7 +789,29 @@ export function resolveModelVideoInputTransport(model: any, context: any = {}) {
 export function modelSupportsDirectVideoInput(model: any, context: any = {}) {
   const transport = resolveModelVideoInputTransport(model, context);
   return transport === MODEL_VIDEO_TRANSPORTS.GEMINI_INLINE_DATA
-    || transport === MODEL_VIDEO_TRANSPORTS.OPENAI_VIDEO_URL;
+    || transport === MODEL_VIDEO_TRANSPORTS.OPENAI_VIDEO_URL
+    || transport === MODEL_VIDEO_TRANSPORTS.GENERIC_OPENAI_VIDEO_URL;
+}
+
+/**
+ * 视频格式门分两档：已验证端点按官方契约交集收紧（千问 mp4/mov、Kimi mp4 等）；
+ * 通用档端点未验证，格式交由供应商裁决——不支持的组合会得到显式 4xx 而非静默吞掉，
+ * 全局仍受 mp4/mov/webm 白名单与魔数校验约束。
+ */
+export function modelSupportsVideoMimeType(model: any, mimeType: unknown, context: any = {}) {
+  if (!modelSupportsDirectVideoInput(model, context)) return false;
+  const mime = lower(mimeType);
+  if (getApi(model, context) === "google-generative-ai") {
+    return mime === "video/mp4" || mime === "video/quicktime" || mime === "video/webm";
+  }
+  if (isDashScopeEndpoint(model, context)) {
+    return mime === "video/mp4" || mime === "video/quicktime";
+  }
+  if (isMoonshotEndpoint(model, context)) return mime === "video/mp4";
+  if (isOfficialMimoEndpoint(model, context)) {
+    return mime === "video/mp4" || mime === "video/quicktime";
+  }
+  return mime === "video/mp4" || mime === "video/quicktime" || mime === "video/webm";
 }
 
 function usesOpenAiVideoUrlTransport(model: any, context: any = {}) {
@@ -789,21 +820,41 @@ function usesOpenAiVideoUrlTransport(model: any, context: any = {}) {
     || isOfficialMimoEndpoint(model, context);
 }
 
+/** DashScope 系端点：官方按量付费（dashscope/dashscope-coding）+ TokenPlan 订阅通道
+ *  （qwen-token-plan 三变体，域名 token-plan.<region>.maas.aliyuncs.com 不含 "dashscope"
+ *  字样，须按 provider id 与 MaaS 域名后缀双轨识别）。 */
+const DASHSCOPE_ENDPOINT_PROVIDERS = new Set([
+  "dashscope",
+  "dashscope-coding",
+  "qwen-token-plan",
+  "qwen-token-plan-cn",
+  "qwen-token-plan-individual",
+]);
+
 function isDashScopeEndpoint(model: any, context: any = {}) {
   const provider = getProvider(model, context);
-  const baseUrl = getBaseUrl(model, context);
-  return provider === "dashscope"
-    || provider === "dashscope-coding"
-    || baseUrl.includes("dashscope");
+  if (DASHSCOPE_ENDPOINT_PROVIDERS.has(provider)) return true;
+  if (getBaseUrl(model, context).includes("dashscope")) return true;
+  const host = getBaseHost(model, context);
+  return host === "maas.aliyuncs.com" || host.endsWith(".maas.aliyuncs.com");
 }
+
+/** Kimi 系端点：Moonshot 旧域名 + Kimi 品牌域名（api.kimi.com，含 coding 订阅通道）。 */
+const MOONSHOT_ENDPOINT_PROVIDERS = new Set([
+  "moonshot",
+  "kimi",
+  "kimi-coding",
+  "moonshotai",
+  "moonshotai-cn",
+]);
 
 function isMoonshotEndpoint(model: any, context: any = {}) {
   const provider = getProvider(model, context);
+  if (MOONSHOT_ENDPOINT_PROVIDERS.has(provider)) return true;
   const baseUrl = getBaseUrl(model, context);
-  return provider === "moonshot"
-    || provider === "kimi"
-    || baseUrl.includes("moonshot.cn")
-    || baseUrl.includes("moonshot.ai");
+  if (baseUrl.includes("moonshot.cn") || baseUrl.includes("moonshot.ai")) return true;
+  const host = getBaseHost(model, context);
+  return host === "kimi.com" || host.endsWith(".kimi.com");
 }
 
 export function withLingxiVideoInputCompat(model: any, enabled: unknown): any {

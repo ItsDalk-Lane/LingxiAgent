@@ -394,6 +394,8 @@ export function normalizeModelObservabilityAggregateQuery(input: unknown): Norma
 export type NormalizedModelObservabilityTraceQuery = {
   filter: ModelObservabilityNormalizedFilter;
   origin: string | null;
+  /** 轨迹列表只保留 call 总数 ≥ 该值的 trace（null = 不过滤；单次调用 trace 由调用台账覆盖）。 */
+  minCallCount: number | null;
   limit: number;
   cursor: string | null;
 };
@@ -404,7 +406,7 @@ export function normalizeModelObservabilityTraceQuery(input: unknown): Normalize
     return { ok: false, error: { code: "invalid_filter", message: "trace query body must be an object" } };
   }
   const source = input as Record<string, unknown>;
-  const allowed = new Set(["filter", "origin", "limit", "cursor"]);
+  const allowed = new Set(["filter", "origin", "minCallCount", "limit", "cursor"]);
   for (const key of Object.keys(source)) {
     if (!allowed.has(key)) {
       return { ok: false, error: { code: "unknown_field", message: `unknown trace query field "${key}"`, field: key } };
@@ -419,6 +421,15 @@ export function normalizeModelObservabilityTraceQuery(input: unknown): Normalize
       return { ok: false, error: { code: "invalid_filter", message: "origin must be a bounded string", field: "origin" } };
     }
     origin = source.origin.trim();
+  }
+
+  let minCallCount: number | null = null;
+  if (source.minCallCount !== undefined && source.minCallCount !== null) {
+    const n = Number(source.minCallCount);
+    if (!Number.isInteger(n) || n < 1 || n > 1000) {
+      return { ok: false, error: { code: "invalid_filter", message: "minCallCount must be an integer in 1..1000", field: "minCallCount" } };
+    }
+    minCallCount = n;
   }
 
   let limit = MODEL_OBSERVABILITY_PAGE_DEFAULT_LIMIT;
@@ -437,7 +448,7 @@ export function normalizeModelObservabilityTraceQuery(input: unknown): Normalize
     }
     cursor = source.cursor;
   }
-  return { ok: true, value: { filter: filter.value, origin, limit, cursor } };
+  return { ok: true, value: { filter: filter.value, origin, minCallCount, limit, cursor } };
 }
 
 /* ── Cursor codec（§二十五/二十六：opaque、bounded、与 filter 绑定）──── */
@@ -558,11 +569,12 @@ export function encodeModelObservabilityTraceCursor(
   position: ModelObservabilityTraceKeysetCursor,
   filter: ModelObservabilityNormalizedFilter,
   origin: string | null = null,
+  minCallCount: number | null = null,
 ): string {
   const payload = {
     v: CURSOR_VERSION,
     kind: "traces" as const,
-    fp: modelObservabilityQueryFingerprint(filter, "started_at_desc", { origin }),
+    fp: modelObservabilityQueryFingerprint(filter, "started_at_desc", { origin, minCallCount }),
     s: position.lastSeenAt,
     t: position.lastTraceId,
   };
@@ -573,6 +585,7 @@ export function decodeModelObservabilityTraceCursor(
   raw: string,
   filter: ModelObservabilityNormalizedFilter,
   origin: string | null = null,
+  minCallCount: number | null = null,
 ): NormalizedQueryResult<ModelObservabilityTraceKeysetCursor> {
   const invalid = (message: string): NormalizedQueryResult<ModelObservabilityTraceKeysetCursor> => ({
     ok: false,
@@ -596,7 +609,7 @@ export function decodeModelObservabilityTraceCursor(
   if (payload.v !== CURSOR_VERSION || payload.kind !== "traces") {
     return invalid("cursor version/kind mismatch");
   }
-  if (payload.fp !== modelObservabilityQueryFingerprint(filter, "started_at_desc", { origin })) {
+  if (payload.fp !== modelObservabilityQueryFingerprint(filter, "started_at_desc", { origin, minCallCount })) {
     return invalid("cursor was issued for a different query");
   }
   const lastTraceId = typeof payload.t === "string" && payload.t ? payload.t : "";

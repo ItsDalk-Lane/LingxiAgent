@@ -319,6 +319,67 @@
     gap: 4px;
 }
 
+.attachVideoWrap {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-4);
+    cursor: pointer;
+}
+
+.attachVideoPosterBox {
+    position: relative;
+    display: inline-block;
+    line-height: 0;
+}
+
+.attachVideoPoster {
+    --attach-video-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+    max-width: 200px;
+    max-height: 150px;
+    background: var(--overlay-medium);
+    border-radius: var(--radius-chat-card);
+    box-shadow: var(--attach-video-shadow);
+    object-fit: contain;
+    display: block;
+}
+
+.attachVideoPosterFallback {
+    width: 160px;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--overlay-light);
+    border-radius: var(--radius-chat-card);
+    color: var(--text-muted);
+}
+
+.attachVideoPlayBadge {
+    --attach-video-badge-bg: rgba(0, 0, 0, 0.55);
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--attach-video-badge-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+}
+
+.attachVideoName {
+    font-size: 12px;
+    opacity: 0.75;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 .deferredAttachmentButton {
     display: inline-flex;
     align-items: center;

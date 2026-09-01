@@ -10,7 +10,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = 37580730e8da02cf10912e6e7333739f0d6ca397  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-09-01 fix(test) spawn 等待预算放宽)
+VERIFIED_SOURCE_SHA   = cc6315e0faae2102443f1576de15a9aa0fe831a2  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-09-02 embedding gate Windows 粒度派发修复)
 工作分支              = feature/upstream-sync-0.447.4
 ```
 
@@ -758,7 +758,7 @@ seal 不是一次性终点，而是"当前被验证树"的游标；每次审计�
   按 v0.1.30 先例删旧 draft 后重打（旧 run 33410110948 的 13 个已上传产物
   随 draft 一并废弃重出）。
 - **2026-09-01 迁移 #54：清理 utility_model/utility_large_model 死键**
-  （fix/knowledge-latency-hardening，未提交）：辅助槽排障时实锤——283d9581
+  （fix/knowledge-latency-hardening，已随 20a9e944 批量提交）：辅助槽排障时实锤——283d9581
   语义 Slot 重构删了两个旧键的全部读写路径，但存量 preferences.json 里的值
   一直没清，用户配置里躺着的 gemma4 死键造成「已配置取标题模型」的错觉
   （title 槽实际读 title_model，未配置回退 chat）。core/migrations.ts 加
@@ -777,6 +777,50 @@ seal 不是一次性终点，而是"当前被验证树"的游标；每次审计�
   冷启动 TS 转换击穿（同窗口套件时长 24m→45m）。测试断言的是顺序契约非
   墙钟 SLA：spawn 等待统一 60s、用例超时 90s。验证：typecheck×3 绿 +
   三文件 30/30 绿后推进。
+
+- **2026-09-01 记忆系统升级 + 观测轨迹详情页 + 迁移#54 批量提交**（功能树
+  20a9e944/seal 本提交，feat/pending-sep01）：三线合集 80 files / +14435-420。
+  ①借鉴 nuphus 记忆五项落地：tenets 用户原则层（tenet_propose 工具 + 聊天
+  审批卡 + 设置页 + agents 路由 CRUD，active 注入新会话 system prompt）、
+  记忆导航节（navigation.md 经 assemble 第 5 段注入 cache 分界线后）、facts
+  语义检索（float32 BLOB + JS 余弦，FTS×向量 RRF 融合 + memory.embedding_model
+  配置 + engine 侧回填）、检索零结果诊断、经验反馈路由（👍/👎 记经验库）。
+  ②迁移 #54 utility_model/utility_large_model 死键清理（见上条）。
+  ③模型观测轨迹：列表 minCallCount≥2 过滤（cursor 指纹绑定）+ dsh
+  ui-trajectory 详情页移植（trace-detail/ 11 文件，会话 join 双通道 +
+  prompt-snapshot sidecar 路由 + 载荷 TXT 直出 + @tanstack/react-virtual
+  3.14.10）+ 主链分类修复（subsystem/purpose 不只 parentCallId）。
+  指纹（compatible）/closure/inventory/export-manifest 已更新，五语言齐。
+  验证：typecheck×3 绿 + eslint 0 error + 全量 npm test 12862 用例通过
+  （唯一失败为 post-verification-audit-seal 预期红，旧坐标 37580730 下）后推进。
+
+- **2026-09-02 模型调用统一 + 视频上传闭环 + 工作台继承**（功能树
+  ea03c627/seal 本提交，feat/pending-sep01）：79 files / +2738-1181。
+  ①模型调用统一：来源身份公共契约与解析服务
+  （lib/llm/model-observability-source-identity.ts）、观测 schema v3→v4
+  additive（来源快照不含正文、当前名称增强、轨迹根来源投影）、助手消息与
+  模型调用持久关联（隐藏 custom entry + 历史加载归并 + 编号优先）、调用
+  详情全屏化（载荷自动并行纯文本、技术信息默认收起）、观测持久化全开
+  （旧客户端 false 拒绝、设置页只保留保留天数）。②新建聊天继承当前主
+  工作台。③视频上传闭环：浏览器上传（魔数/大小/数量三段式门禁）+
+  shared/video-mime 重构 + 四类供应商格式交集 + known-models 目录声明。
+  ④样式纪律收口：新增 UI 全部走 token（space/overlay/text/border +
+  类内局部定义行），style-discipline 棘轮零新增（首跑红 4 项 → token 化
+  归零）。指纹/closure/export-manifest 已更新，五语言齐。验证：typecheck×3
+  绿 + 全量 npm test 12895 用例通过（CSS 收口后复跑全绿；首跑仅
+  style-discipline 4 项违例红）后推进。
+
+- **2026-09-02 embedding gate Windows 粒度派发修复**（功能树 cc6315e0/seal
+  本提交，feat/pending-sep01，1 file / +8-2）：windows-2025 CI 连续三轮假红
+  实锤根因——scheduleDispatch 的 setTimeout(wait) 在 Windows 计时器粒度
+  （~15.6ms）下提前一个粒度醒，两次派发实测间隔 66ms < 配置 80ms，破坏
+  「至少间隔 minRequestIntervalMs」语义（tests/knowledge-lifecycle.test.ts
+  间隔断言假红）。修复：dispatch 回调先 intervalElapsed 复验，未过节流窗口
+  则 scheduleDispatch 续等剩余时间；语义在所有平台成立，断言不放宽。同日
+  另两轮失败（auth-storage legacy key 恢复、vitest worker 意外退出）与代码
+  无关（本地 31/31 绿、同 job attempt 1 全绿），属 runner 抖动。验证：
+  typecheck×3 绿 + knowledge-lifecycle 16/16 + persistence tripwire 15/15 +
+  closure/boundary 39/39 后推进。
 
 ## 最终状态：已合并（上游同步部分）
 

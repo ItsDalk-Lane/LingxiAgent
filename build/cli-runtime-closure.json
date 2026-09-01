@@ -2166,21 +2166,11 @@
       "provenance": [
         {
           "root": "server-bootstrap",
-          "from": "core/provider-compat/mimo.ts",
-          "kind": "import-statement"
-        },
-        {
-          "root": "server-bootstrap",
-          "from": "core/provider-compat/qwen.ts",
-          "kind": "import-statement"
-        },
-        {
-          "root": "server-bootstrap",
           "from": "core/provider-compat.ts",
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by core/provider-compat/mimo.ts (import-statement); core/provider-compat/qwen.ts (import-statement); core/provider-compat.ts (import-statement)."
+      "reason": "Reached via esbuild source module graph, imported by core/provider-compat.ts (import-statement)."
     },
     {
       "path": "core/provider-compat/openrouter.ts",
@@ -4949,6 +4939,11 @@
         },
         {
           "root": "server-bootstrap",
+          "from": "lib/memory/navigation.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
           "from": "lib/memory/deep-memory.ts",
           "kind": "import-statement"
         },
@@ -4975,6 +4970,11 @@
         {
           "root": "server-bootstrap",
           "from": "lib/tools/pinned-memory.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/memory/tenets.ts",
           "kind": "import-statement"
         },
         {
@@ -5283,7 +5283,7 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by core/migrations.ts (import-statement); core/plugin-config.ts (import-statement); lib/desk/cron-store.ts (import-statement); +84 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by core/migrations.ts (import-statement); core/plugin-config.ts (import-statement); lib/desk/cron-store.ts (import-statement); +86 more importer(s)."
     },
     {
       "path": "lib/default-models.json",
@@ -5934,6 +5934,11 @@
         },
         {
           "root": "server-bootstrap",
+          "from": "lib/memory/navigation.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
           "from": "lib/memory/deep-memory.ts",
           "kind": "import-statement"
         },
@@ -6000,6 +6005,11 @@
         {
           "root": "server-bootstrap",
           "from": "lib/tools/experience.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/tools/tenet-propose-tool.ts",
           "kind": "import-statement"
         },
         {
@@ -6253,7 +6263,7 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by lib/llm/provider-client.ts (import-statement); core/model-manager.ts (import-statement); core/auxiliary-slots.ts (import-statement); +71 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by lib/llm/provider-client.ts (import-statement); core/model-manager.ts (import-statement); core/auxiliary-slots.ts (import-statement); +73 more importer(s)."
     },
     {
       "path": "lib/identity-templates",
@@ -6431,9 +6441,14 @@
           "root": "server-bootstrap",
           "from": "lib/knowledge/knowledge-manager.ts",
           "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "core/engine.ts",
+          "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by lib/knowledge/knowledge-manager.ts (import-statement)."
+      "reason": "Reached via esbuild source module graph, imported by lib/knowledge/knowledge-manager.ts (import-statement); core/engine.ts (import-statement)."
     },
     {
       "path": "lib/knowledge/knowledge-context-injector.ts",
@@ -6811,6 +6826,11 @@
         },
         {
           "root": "server-bootstrap",
+          "from": "core/message-utils.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
           "from": "core/session-coordinator.ts",
           "kind": "import-statement"
         },
@@ -6820,7 +6840,7 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by lib/pi-sdk/model-call-stream-observer.ts (import-statement); core/bridge-session-manager.ts (import-statement); core/session-coordinator.ts (import-statement); +1 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by lib/pi-sdk/model-call-stream-observer.ts (import-statement); core/bridge-session-manager.ts (import-statement); core/message-utils.ts (import-statement); +2 more importer(s)."
     },
     {
       "path": "lib/llm/model-call-identity.ts",
@@ -7256,6 +7276,18 @@
         }
       ],
       "reason": "Reached via esbuild source module graph, imported by lib/llm/model-observability-blob-store.ts (import-statement); lib/llm/model-observability-retention.ts (import-statement); lib/llm/model-observability-persistence.ts (import-statement); +2 more importer(s)."
+    },
+    {
+      "path": "lib/llm/model-observability-source-identity.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "lib/llm/model-observability-query.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by lib/llm/model-observability-query.ts (import-statement)."
     },
     {
       "path": "lib/llm/model-observability-trace-store.ts",
@@ -8041,6 +8073,28 @@
       "reason": "Reached via esbuild source module graph, imported by lib/memory/dream/revision-store.ts (import-statement); lib/memory/dream/runner.ts (import-statement); server/routes/memory-dream.ts (import-statement)."
     },
     {
+      "path": "lib/memory/fact-embeddings.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "lib/memory/fact-store.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/memory/memory-search.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "core/engine.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by lib/memory/fact-store.ts (import-statement); lib/memory/memory-search.ts (import-statement); core/engine.ts (import-statement)."
+    },
+    {
       "path": "lib/memory/fact-store.ts",
       "inputType": "source-graph",
       "provenance": [
@@ -8107,6 +8161,18 @@
         }
       ],
       "reason": "Reached via esbuild source module graph, imported by core/agent.ts (import-statement)."
+    },
+    {
+      "path": "lib/memory/navigation.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "lib/memory/memory-ticker.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by lib/memory/memory-ticker.ts (import-statement)."
     },
     {
       "path": "lib/memory/pinned-memory-store.ts",
@@ -8216,6 +8282,28 @@
         }
       ],
       "reason": "Reached via esbuild source module graph, imported by lib/memory/deep-memory.ts (import-statement); core/agent.ts (import-statement)."
+    },
+    {
+      "path": "lib/memory/tenets.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "lib/tools/tenet-propose-tool.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "core/agent.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "server/routes/agents.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by lib/tools/tenet-propose-tool.ts (import-statement); core/agent.ts (import-statement); server/routes/agents.ts (import-statement)."
     },
     {
       "path": "lib/memory/time-context.ts",
@@ -8499,6 +8587,11 @@
         },
         {
           "root": "server-bootstrap",
+          "from": "lib/tools/tenet-propose-tool.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
           "from": "lib/tools/install-skill.ts",
           "kind": "import-statement"
         },
@@ -8668,7 +8761,7 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by core/compaction-utils.ts (import-statement); lib/llm/cache-preserving-compaction-agent-run.ts (import-statement); core/session-compactor.ts (import-statement); +55 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by core/compaction-utils.ts (import-statement); lib/llm/cache-preserving-compaction-agent-run.ts (import-statement); core/session-compactor.ts (import-statement); +56 more importer(s)."
     },
     {
       "path": "lib/pi-sdk/model-call-stream-observer.ts",
@@ -11252,6 +11345,18 @@
     },
     {
       "path": "lib/tools/subagent-tool.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "core/agent.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by core/agent.ts (import-statement)."
+    },
+    {
+      "path": "lib/tools/tenet-propose-tool.ts",
       "inputType": "source-graph",
       "provenance": [
         {
@@ -123419,11 +123524,6 @@
         },
         {
           "root": "server-bootstrap",
-          "from": "core/provider-compat/openai-video-url.ts",
-          "kind": "import-statement"
-        },
-        {
-          "root": "server-bootstrap",
           "from": "core/provider-compat/mimo.ts",
           "kind": "import-statement"
         },
@@ -123435,6 +123535,11 @@
         {
           "root": "server-bootstrap",
           "from": "core/provider-compat/openai-input-audio.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "core/provider-compat/openai-video-url.ts",
           "kind": "import-statement"
         },
         {
@@ -124137,6 +124242,11 @@
         },
         {
           "root": "server-bootstrap",
+          "from": "lib/memory/navigation.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
           "from": "lib/memory/dream/state-store.ts",
           "kind": "import-statement"
         },
@@ -124158,6 +124268,11 @@
         {
           "root": "server-bootstrap",
           "from": "lib/memory/pinned-memory-store.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/memory/tenets.ts",
           "kind": "import-statement"
         },
         {
@@ -124276,7 +124391,7 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by core/execution-lease-registry.ts (import-statement); core/grant-registry.ts (import-statement); core/server-network-config.ts (import-statement); +43 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by core/execution-lease-registry.ts (import-statement); core/grant-registry.ts (import-statement); core/server-network-config.ts (import-statement); +45 more importer(s)."
     },
     {
       "path": "shared/safe-parse.ts",
@@ -124653,11 +124768,21 @@
       "provenance": [
         {
           "root": "server-bootstrap",
+          "from": "core/session-coordinator.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
           "from": "server/routes/chat.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "server/routes/upload.ts",
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by server/routes/chat.ts (import-statement)."
+      "reason": "Reached via esbuild source module graph, imported by core/session-coordinator.ts (import-statement); server/routes/chat.ts (import-statement); server/routes/upload.ts (import-statement)."
     },
     {
       "path": "shared/workspace-history.ts",
@@ -124842,9 +124967,9 @@
     }
   ],
   "stats": {
-    "totalFiles": 10648,
+    "totalFiles": 10653,
     "byInputType": {
-      "source-graph": 748,
+      "source-graph": 753,
       "runtime-asset": 11,
       "nft-runtime-trace": 9889
     }

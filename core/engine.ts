@@ -188,6 +188,11 @@ function buildToolCatalogManifestSnapshot(catalog, modelContextWindowTokens) {
 import { filterToolObjectsByAvailability } from "./tool-availability.ts";
 import { TaskRegistry } from "../lib/task-registry.ts";
 import { KnowledgeManager } from "../lib/knowledge/knowledge-manager.ts";
+import { KnowledgeEmbeddingProviderGate } from "../lib/knowledge/ingestion-service.ts";
+import {
+  factEmbeddingModelKey,
+  serializeVector,
+} from "../lib/memory/fact-embeddings.ts";
 import type { KnowledgeRetrievalStats } from "../shared/knowledge-refs.ts";
 import {
   assembleKnowledgeEvidenceManifestEntries,
@@ -340,6 +345,9 @@ export class LingxiEngine {
   declare _auxResolver: AuxiliaryModelResolver;
   declare _modelOperationResolver: ModelOperationResolver;
   declare _rerankClient: RerankClient;
+  /** 记忆事实向量回填：每 agent 单飞标记 + 共享供应商限流闸 */
+  declare _memoryBackfillInFlight: Set<string>;
+  declare _memoryEmbeddingGate: KnowledgeEmbeddingProviderGate;
   declare _confirmStore: any;
   declare _coreExtensionFactories: any;
   declare _currentTurnNativeMedia: any;
@@ -817,6 +825,12 @@ export class LingxiEngine {
       persistencePath: path.join(this.lingxiHome, ".ephemeral", "plugin-tasks.json"),
       getSessionIdForPath: (sessionPath) => this.getSessionIdForPath(sessionPath),
     });
+    // v4 来源名称有界回填：延后到构造完成后执行，不阻塞启动，也不读取消息正文。
+    setImmediate(() => {
+      void this.refreshModelObservabilitySourceSnapshots().catch((error) => {
+        moduleLog.warn(`model observability source snapshot backfill failed: ${error?.message ?? error}`);
+      });
+    }).unref?.();
 
     // subagent AbortController 存储（engine 级别，跨 agent 共享）
     this._subagentControllers = new Map();
@@ -968,7 +982,7 @@ export class LingxiEngine {
    * Phase 8 §五十四：安装 observability persistence。优先级：CompositionRoot
    * 显式 option（enabled=true，测试/dev wiring）> 已保存用户 preference
    * （preferences.json model_observability，canonical normalizer 单一来源）。
-   * 默认 disabled；打开失败 → disabled handle，主程序不受影响。
+   * 产品偏好固定全开；打开失败 → disabled handle，主程序不受影响并诚实暴露原因。
    */
   _installModelObservability(explicitOption) {
     this._modelObservability = null;
@@ -977,6 +991,12 @@ export class LingxiEngine {
       policy = explicitOption;
     } else if (this._prefs?.getModelObservability) {
       const preference = this._prefs.getModelObservability();
+      // 启动即把旧版关闭值写回为全开；只改开关，用户已有保留天数由 normalizer 原样带回。
+      try {
+        this._prefs.setModelObservability?.(preference);
+      } catch (error) {
+        moduleLog.warn(`model observability preference migration failed: ${error?.message ?? error}`);
+      }
       if (preference.enabled) policy = modelObservabilityPreferenceToPolicy(preference);
     }
     if (!policy) {
@@ -1029,6 +1049,164 @@ export class LingxiEngine {
     return this._modelObservabilityQuery;
   }
 
+  _recordModelObservabilitySourceSnapshot(kind, entityId, title) {
+    if (!kind || !entityId) return false;
+    return this._modelObservability?.upsertSourceIdentitySnapshot?.({
+      kind,
+      entityId,
+      title: typeof title === "string" && title.trim() ? title.trim() : null,
+    }) === true;
+  }
+
+  /**
+   * 把仍存在的会话和任务名称同步进 v4 快照。只读取列表摘要，数量有界，
+   * 不读取完整消息正文；实体后来删除时，查询层仍能使用最后快照。
+   */
+  async refreshModelObservabilitySourceSnapshots() {
+    if (!this._modelObservability?.upsertSourceIdentitySnapshot) return { sessions: 0, tasks: 0 };
+    const sessions = (await this.listSessions({ includePluginPrivate: true })).slice(0, 5000);
+    const sessionIdByPath = new Map();
+    let sessionCount = 0;
+    for (const session of sessions) {
+      const title = typeof session?.title === "string" && session.title.trim()
+        ? session.title.trim()
+        : typeof session?.firstMessage === "string" && session.firstMessage.trim()
+          ? session.firstMessage.trim().replace(/\s+/g, " ").slice(0, 80)
+          : null;
+      const ids = new Set([session?.sessionId, session?.path].filter(Boolean));
+      if (session?.path && session?.sessionId) sessionIdByPath.set(session.path, session.sessionId);
+      for (const entityId of ids) {
+        if (this._recordModelObservabilitySourceSnapshot("chat", entityId, title)) sessionCount += 1;
+      }
+    }
+    // 自动化调用历史上常只带隔离会话路径；桌面活动账本保存了这条路径与业务摘要。
+    let activityCount = 0;
+    let taskCount = 0;
+    for (const [agentId] of this._agentMgr.agents) {
+      if (activityCount >= 5000) break;
+      const activities = this.getActivityStore(agentId)?.list?.() ?? [];
+      for (const activity of activities) {
+        if (activityCount >= 5000) break;
+        const rawTitle = [activity?.label, activity?.summary, activity?.type]
+          .find((value) => typeof value === "string" && value.trim());
+        const title = typeof rawTitle === "string"
+          ? rawTitle.trim().replace(/\s+/g, " ").slice(0, 160)
+          : null;
+        const sessionPath = activity?.sessionFile
+          ? path.join(this.agentsDir, agentId, "activity", activity.sessionFile)
+          : null;
+        const ids = new Set([
+          activity?.id,
+          sessionPath,
+          sessionPath ? sessionIdByPath.get(sessionPath) : null,
+        ].filter(Boolean));
+        for (const entityId of ids) {
+          if (this._recordModelObservabilitySourceSnapshot("automation", entityId, title)) taskCount += 1;
+        }
+        activityCount += 1;
+      }
+    }
+    const tasks = this._taskRegistry?.listAll?.({})?.slice?.(0, 5000) ?? [];
+    for (const task of tasks) {
+      const meta = task?.meta && typeof task.meta === "object" ? task.meta : {};
+      const title = [meta.label, meta.name, meta.title, meta.summary]
+        .find((value) => typeof value === "string" && value.trim());
+      const kind = task?.type === "subagent"
+        ? "subagent"
+        : /automation|cron|schedule|heartbeat/.test(String(task?.type || ""))
+          ? "automation"
+          : "background_task";
+      if (task?.taskId && this._recordModelObservabilitySourceSnapshot(
+        kind,
+        task.taskId,
+        typeof title === "string" ? title.trim().replace(/\s+/g, " ").slice(0, 160) : task.type,
+      )) taskCount += 1;
+    }
+    for (const schedule of this._taskRegistry?.listSchedules?.({})?.slice?.(0, 5000) ?? []) {
+      const meta = schedule?.meta && typeof schedule.meta === "object" ? schedule.meta : {};
+      const rawTitle = [meta.label, meta.name, meta.title, meta.summary, schedule?.type]
+        .find((value) => typeof value === "string" && value.trim());
+      if (schedule?.scheduleId && this._recordModelObservabilitySourceSnapshot(
+        "automation",
+        schedule.scheduleId,
+        typeof rawTitle === "string" ? rawTitle.trim().replace(/\s+/g, " ").slice(0, 160) : null,
+      )) taskCount += 1;
+    }
+    this._modelObservabilityQuery?.invalidate?.();
+    return { sessions: sessionCount, tasks: taskCount };
+  }
+
+  /** 当前实体名称优先于快照；返回值只改显示投影，不碰原始来源字段。 */
+  async enrichModelObservabilitySources(value) {
+    const sessions = (await this.listSessions({ includePluginPrivate: true })).slice(0, 5000);
+    const current = new Map();
+    const sessionIdByPath = new Map();
+    for (const session of sessions) {
+      const title = typeof session?.title === "string" && session.title.trim()
+        ? session.title.trim()
+        : typeof session?.firstMessage === "string" && session.firstMessage.trim()
+          ? session.firstMessage.trim().replace(/\s+/g, " ").slice(0, 80)
+          : null;
+      for (const id of [session?.sessionId, session?.path]) {
+        if (id && title) current.set(`chat\0${id}`, title);
+      }
+      if (session?.path && session?.sessionId) sessionIdByPath.set(session.path, session.sessionId);
+    }
+    let activityCount = 0;
+    for (const [agentId] of this._agentMgr.agents) {
+      if (activityCount >= 5000) break;
+      for (const activity of this.getActivityStore(agentId)?.list?.() ?? []) {
+        if (activityCount >= 5000) break;
+        const rawTitle = [activity?.label, activity?.summary, activity?.type]
+          .find((candidate) => typeof candidate === "string" && candidate.trim());
+        const title = typeof rawTitle === "string"
+          ? rawTitle.trim().replace(/\s+/g, " ").slice(0, 160)
+          : null;
+        const sessionPath = activity?.sessionFile
+          ? path.join(this.agentsDir, agentId, "activity", activity.sessionFile)
+          : null;
+        for (const id of [activity?.id, sessionPath, sessionPath ? sessionIdByPath.get(sessionPath) : null]) {
+          if (id && title) current.set(`automation\0${id}`, title);
+        }
+        activityCount += 1;
+      }
+    }
+    for (const task of this._taskRegistry?.listAll?.({})?.slice?.(0, 5000) ?? []) {
+      const meta = task?.meta && typeof task.meta === "object" ? task.meta : {};
+      const rawTitle = [meta.label, meta.name, meta.title, meta.summary]
+        .find((candidate) => typeof candidate === "string" && candidate.trim());
+      const title = typeof rawTitle === "string"
+        ? rawTitle.trim().replace(/\s+/g, " ").slice(0, 160)
+        : task?.type || null;
+      for (const kind of ["background_task", "automation", "subagent"]) {
+        if (task?.taskId && title) current.set(`${kind}\0${task.taskId}`, title);
+      }
+    }
+    for (const schedule of this._taskRegistry?.listSchedules?.({})?.slice?.(0, 5000) ?? []) {
+      const meta = schedule?.meta && typeof schedule.meta === "object" ? schedule.meta : {};
+      const rawTitle = [meta.label, meta.name, meta.title, meta.summary, schedule?.type]
+        .find((candidate) => typeof candidate === "string" && candidate.trim());
+      if (schedule?.scheduleId && typeof rawTitle === "string") {
+        current.set(`automation\0${schedule.scheduleId}`, rawTitle.trim().replace(/\s+/g, " ").slice(0, 160));
+      }
+    }
+    const visit = (node) => {
+      if (!node || typeof node !== "object") return;
+      const identity = node.sourceIdentity;
+      if (identity?.entityId && identity?.kind) {
+        const title = current.get(`${identity.kind}\0${identity.entityId}`);
+        if (title) {
+          identity.title = title;
+          identity.resolution = "current";
+          this._recordModelObservabilitySourceSnapshot(identity.kind, identity.entityId, title);
+        }
+      }
+      for (const child of Array.isArray(node) ? node : Object.values(node)) visit(child);
+    };
+    visit(value);
+    return value;
+  }
+
   /**
    * Phase 8 §五十八/五十九：settings 读取。desired（用户偏好）与 effective
    * （运行态，含 schema_newer 等 disable 原因）是两个概念，分开返回。
@@ -1054,7 +1232,7 @@ export class LingxiEngine {
   }
 
   /**
-   * Phase 8 §五十七/五十九：运行中 enable/disable/reconfigure。
+   * 运行中只允许调整保留期并重配 persistence generation。
    * 顺序：normalize → persist desired preference → 旧 generation 退出全局入口并
    * 排水 → install 新 generation（不删除历史数据，§六十）→ invalidate query
    * reader → 返回 desired + effective。设置变化只影响新开始的调用。
@@ -2050,7 +2228,12 @@ export class LingxiEngine {
     return { sessionPath, projectId: normalizedProjectId };
   }
   async listArchivedSessions() { return this._sessionCoord.listArchivedSessions(); }
-  async saveSessionTitle(p, t) { return this._sessionCoord.saveSessionTitle(p, t); }
+  async saveSessionTitle(p, t) {
+    const result = await this._sessionCoord.saveSessionTitle(p, t);
+    this._recordModelObservabilitySourceSnapshot("chat", this.getSessionIdForPath(p) || p, t);
+    if (this.getSessionIdForPath(p)) this._recordModelObservabilitySourceSnapshot("chat", p, t);
+    return result;
+  }
   async clearSessionTitle(p) { return this._sessionCoord.clearSessionTitle(p); }
   async setSessionPinned(p, pinned) { return this._sessionCoord.setSessionPinned(p, pinned); }
   async setSessionPinOrder(orderedRefs) { return this._sessionCoord.setSessionPinOrder(orderedRefs); }
@@ -2320,6 +2503,160 @@ export class LingxiEngine {
       timeoutMs: 120_000,
       usageContext: this._knowledgeOperationUsageContext("rerank", request.runId),
     });
+  }
+
+  // ── 记忆语义检索（facts.db 向量；模型身份经 memory.embedding_model 显式配置） ──
+
+  _memoryEmbeddingAgent(agentId) {
+    return this._agentMgr?.getAgent?.(agentId) || null;
+  }
+
+  _memoryOperationUsageContext(operation, agentId) {
+    return {
+      source: {
+        subsystem: "memory",
+        operation,
+        surface: "desktop",
+        trigger: "user",
+      },
+      attribution: {
+        kind: "agent",
+        agentId: agentId || this.currentAgentId || null,
+      },
+    };
+  }
+
+  /**
+   * 解析记忆嵌入执行（模型引用来自 agent config memory.embedding_model）。
+   * 未配置 → { status:"unavailable", reason:"no_model" }；
+   * 配置了但模型缺失/缺凭证 → reason:"unresolvable"。
+   */
+  async _resolveMemoryEmbeddingExecution(agentId) {
+    const agent = this._memoryEmbeddingAgent(agentId);
+    const ref = agent?.memoryEmbeddingModelRef || null;
+    if (!ref) return { status: "unavailable", reason: "no_model" };
+    const resolver = new ModelOperationResolver(this._modelOperationResolverDeps(() => ref));
+    let execution = null;
+    try {
+      execution = await resolver.resolveFresh("embedding");
+    } catch (error) {
+      if (error instanceof ModelOperationConfigurationError) {
+        return { status: "unavailable", reason: "unresolvable" };
+      }
+      throw error;
+    }
+    if (!execution) return { status: "unavailable", reason: "unresolvable" };
+    return {
+      status: "ok",
+      ref,
+      execution,
+      modelKey: factEmbeddingModelKey(ref, execution.model?.operationProtocol || ""),
+    };
+  }
+
+  /**
+   * search_memory 查询侧闭包：查询文本 → 向量 + model_key。
+   * 15s 期限（对齐知识库查询侧 KNOWLEDGE_EMBEDDING_DEADLINE_MS 范式）；
+   * 超时/不可用显式返回状态，绝不静默假装没配。
+   */
+  async embedMemoryQuery(agentId, query) {
+    const resolved = await this._resolveMemoryEmbeddingExecution(agentId);
+    if (resolved.status !== "ok") {
+      return { status: "unavailable", reason: resolved.reason };
+    }
+    let response;
+    try {
+      const client = new EmbeddingClient({
+        resolveOperationFresh: async () => resolved.execution,
+        getUsageLedger: () => this._usageLedger,
+      });
+      response = await client.embed({
+        texts: [String(query || "")],
+        timeoutMs: 15_000,
+        dimensions: resolved.execution.model?.dimensions ?? undefined,
+        inputType: "query",
+        usageContext: this._memoryOperationUsageContext("search_memory", agentId),
+      });
+    } catch (error) {
+      if (error?.name === "TimeoutError" || error?.name === "AbortError" || /timeout/i.test(String(error?.message || ""))) {
+        return { status: "timeout" };
+      }
+      throw error;
+    }
+    const vector = Array.isArray(response?.embeddings?.[0])
+      ? response.embeddings[0]
+      : Array.isArray(response?.[0]) ? response[0] : null;
+    if (!vector) return { status: "timeout" };
+    return { status: "ok", vector, modelKey: resolved.modelKey };
+  }
+
+  /**
+   * 记忆事实向量回填：每 agent 单飞，单次批量 ≤64 条、32 条/请求，
+   * KnowledgeEmbeddingProviderGate 限流。失败不抛——留待下轮 ticker 重试
+   * （缺向量期间检索侧自动走 FTS 单路并留痕）。
+   */
+  async backfillMemoryFactEmbeddings(agentId, limit = 64) {
+    const agent = this._memoryEmbeddingAgent(agentId);
+    const factStore = agent?.factStore;
+    if (!agent || !factStore) return { skipped: true, reason: "no_agent_or_store" };
+    if (!this._memoryBackfillInFlight) this._memoryBackfillInFlight = new Set();
+    if (this._memoryBackfillInFlight.has(agentId)) return { skipped: true, reason: "in_flight" };
+    this._memoryBackfillInFlight.add(agentId);
+    try {
+      const resolved = await this._resolveMemoryEmbeddingExecution(agentId);
+      if (resolved.status !== "ok") return { skipped: true, reason: resolved.reason };
+      const { modelKey, execution, ref } = resolved;
+      const pendingFacts = factStore.factsNeedingEmbedding(modelKey, limit);
+      if (pendingFacts.length === 0) {
+        const coverage0 = factStore.embeddingCoverage(modelKey);
+        return { done: true, embedded: 0, remaining: coverage0.total - coverage0.embedded };
+      }
+
+      const client = new EmbeddingClient({
+        resolveOperationFresh: async () => execution,
+        getUsageLedger: () => this._usageLedger,
+      });
+      const gateKey = `${ref.provider}/${ref.id}`;
+      const gate = this._memoryEmbeddingGate
+        || (this._memoryEmbeddingGate = new KnowledgeEmbeddingProviderGate());
+      let embedded = 0;
+      for (let i = 0; i < pendingFacts.length; i += 32) {
+        const batch = pendingFacts.slice(i, i + 32);
+        const vectors = await gate.run(gateKey, async () => {
+          const response = await client.embed({
+            texts: batch.map((f) => (
+              `${f.fact}${f.tags && f.tags.length ? ` ${f.tags.join(" ")}` : ""}`
+            )),
+            timeoutMs: 300_000,
+            dimensions: execution.model?.dimensions ?? undefined,
+            inputType: "document",
+            usageContext: this._memoryOperationUsageContext("fact_backfill", agentId),
+          });
+          return Array.isArray(response?.embeddings) ? response.embeddings : response;
+        });
+        const entries = batch
+          .map((f, idx) => ({ f, vector: vectors?.[idx] }))
+          .filter(({ vector }) => Array.isArray(vector) && vector.length > 0)
+          .map(({ f, vector }) => ({
+            factId: f.id,
+            modelKey,
+            dimensions: vector.length,
+            vector: serializeVector(vector),
+          }));
+        embedded += factStore.upsertFactEmbeddings(entries);
+      }
+      const coverage = factStore.embeddingCoverage(modelKey);
+      return {
+        done: coverage.embedded >= coverage.total,
+        embedded,
+        remaining: coverage.total - coverage.embedded,
+      };
+    } catch (error) {
+      moduleLog.warn(`memory fact embedding backfill failed (agent=${agentId}): ${error?.message || error}`);
+      return { skipped: true, reason: "error", error: String(error?.message || error) };
+    } finally {
+      this._memoryBackfillInFlight.delete(agentId);
+    }
   }
 
   /**

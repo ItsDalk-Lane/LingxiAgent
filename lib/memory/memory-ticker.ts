@@ -41,6 +41,7 @@ import {
   migrateLegacyEditableFacts,
   migrateLegacyWeekToLongterm,
 } from "./compile.ts";
+import { refreshNavigationFile } from "./navigation.ts";
 import { processDirtySessions } from "./deep-memory.ts";
 import { getLogicalDay, shiftLogicalDate } from "../time-utils.ts";
 import { readCompiledResetAt } from "./compiled-memory-state.ts";
@@ -128,6 +129,9 @@ export function createMemoryTicker(opts) {
     readSessionBranchForPath,
     envChangeLedger,
     memoryDir = path.dirname(memoryMdPath),
+    listSessions,
+    navigationPath = path.join(memoryDir, "navigation.md"),
+    backfillFactEmbeddings,
   } = opts;
   let _aggregateCompileInFlight = 0;
   const _dreamRunner = createMemoryDreamRunner({
@@ -532,6 +536,22 @@ export function createMemoryTicker(opts) {
 
   // ── 内部：今天编译 + 组装 ──
 
+  /** 导航节刷新：assemble 之后 fire-and-forget，失败只留日志。 */
+  function _refreshNavigation() {
+    if (!listSessions) return;
+    void refreshNavigationFile({ listSessions, agentId, factStore, navigationPath });
+  }
+
+  /** 事实向量回填：deep-memory 之后 fire-and-forget（engine 侧单飞+限流+容错）。 */
+  function _backfillFactEmbeddings() {
+    if (typeof backfillFactEmbeddings !== "function") return;
+    try {
+      backfillFactEmbeddings();
+    } catch {
+      // 增益路径，不阻断
+    }
+  }
+
   async function _doCompileTodayAndAssemble() {
     if (_dreamRunner.isRunning()) return;
     // 后台记忆任务 = 独立新 Trace（§四十四）：checkpoint 可能从某个 turn 的
@@ -543,6 +563,7 @@ export function createMemoryTicker(opts) {
       await compileToday(summaryManager, todayMdPath, await getResolvedMemoryModel(), { since: resetAt });
       assemble(_factsSourcePath(), todayMdPath, weekMdPath, longtermMdPath, memoryMdPath);
       onCompiled?.();
+      _refreshNavigation();
       debugLog()?.log("memory", "today compiled + assembled");
       _markSuccess("compileToday");
       _markStepRecovered("compileToday");
@@ -659,6 +680,7 @@ export function createMemoryTicker(opts) {
         assembleWeekFromDaily(_dailyDir(), weekMdPath);
         assemble(_factsSourcePath(), todayMdPath, weekMdPath, longtermMdPath, memoryMdPath);
         onCompiled?.();
+        _refreshNavigation();
       } catch (err) {
         hasFailed = true;
         log.error(`assemble 失败: ${err.message}`);
@@ -688,6 +710,8 @@ export function createMemoryTicker(opts) {
           }
           _markSuccess("deepMemory");
           _markStepRecovered("deep-memory");
+          // 新事实已入库，补嵌入向量（配置了 memory.embedding_model 才有实际动作）
+          _backfillFactEmbeddings();
         } catch (err) {
           hasFailed = true;
           _markFailure("deepMemory", err);

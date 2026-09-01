@@ -26,6 +26,7 @@ const EXPECTED_TABLES = [
   "blob_objects",
   "payload_blob_refs",
   "model_call_usage", // Phase 8 v2
+  "source_identity_snapshots", // schema v4
 ];
 
 const EXPECTED_INDEXES = [
@@ -49,6 +50,7 @@ const EXPECTED_INDEXES = [
   "idx_blob_objects_created",
   "idx_model_call_usage_status", // Phase 8 v2
   "idx_model_calls_conversation", // Phase 8 v2
+  "idx_source_identity_snapshots_updated", // schema v4
 ];
 
 function makeTempHome(): string {
@@ -65,11 +67,12 @@ describe("Model Observability Store Schema", () => {
     try { fs.rmSync(home, { recursive: true, force: true }); } catch { /* tmp */ }
   });
 
-  it("fresh DB：建全部表 + 索引，user_version=SCHEMA_VERSION（Phase 10.1 =3）", () => {
+  it("fresh DB：建全部表 + 索引，user_version=SCHEMA_VERSION（来源快照 v4）", () => {
     const db = openModelObservabilityDatabase(modelObservabilityDbPath(home));
     try {
       expect(readModelObservabilitySchemaVersion(db)).toBe(MODEL_OBSERVABILITY_SCHEMA_VERSION);
-      expect(MODEL_OBSERVABILITY_SCHEMA_VERSION).toBe(3);
+      expect(MODEL_OBSERVABILITY_SCHEMA_VERSION).toBe(4);
+      expect(db.prepare(`SELECT name FROM sqlite_master WHERE type='table' AND name='source_identity_snapshots'`).get()).toBeTruthy();
       const callColumns = db.prepare(`PRAGMA table_info(model_calls)`).all()
         .map((row: any) => row.name);
       expect(callColumns).toContain("usage_correlation_state");

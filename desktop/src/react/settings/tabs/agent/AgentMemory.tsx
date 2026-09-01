@@ -6,6 +6,8 @@ import { PinItem } from './AgentPins';
 import { SettingsSection } from '../../components/SettingsSection';
 import { Toggle } from '@/ui';
 import { AgentMemoryDream } from './AgentMemoryDream';
+import { AgentTenets } from './AgentTenets';
+import { AgentMemoryEmbedding } from './AgentMemoryEmbedding';
 import styles from '../../Settings.module.css';
 
 type MemoryHealthStatus = 'healthy' | 'degraded' | 'unhealthy' | 'disabled' | 'unavailable';
@@ -228,6 +230,14 @@ export function MemorySection({ agentId, hasUtilityModel, memoryEnabled, autoDre
               {t('settings.memory.compiledView')}
             </button>
           </div>
+
+          {agentId && (
+            <AgentMemoryEmbedding agentId={agentId} />
+          )}
+
+          {agentId && (
+            <AgentTenets agentId={agentId} />
+          )}
 
           {agentId && (
             <AgentMemoryDream agentId={agentId} autoEnabled={autoDreamEnabled} />

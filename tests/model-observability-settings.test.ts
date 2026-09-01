@@ -58,26 +58,24 @@ describe("Model Observability Settings / Control Plane", () => {
     try { fs.rmSync(home, { recursive: true, force: true }); } catch { /* tmp */ }
   });
 
-  it("preference 默认：enabled=false + payload/blob opt-in 默认 false（§五十一/六十一）", () => {
+  it("preference 默认及旧关闭配置迁移：元数据、正文和合格媒体恒为开启", () => {
     expect(DEFAULT_MODEL_OBSERVABILITY_PREFERENCE).toMatchObject({
-      enabled: false,
+      enabled: true,
       persistTraceMetadata: true,
-      persistPayloads: false,
-      persistBlobs: false,
+      persistPayloads: true,
+      persistBlobs: true,
     });
-    // 损坏输入 → canonical normalize 安全回退（disabled 下 trace flag 归 false，
-    // 与 Phase 7 policy 语义一致；DEFAULT 表达的是「开启时」的用户可见默认）。
+    // 损坏输入和旧关闭值都迁移为全开；保留天数仍按安全默认修复。
     expect(normalizeModelObservabilityPreferences(null))
       .toEqual(normalizeModelObservabilityPreferences(DEFAULT_MODEL_OBSERVABILITY_PREFERENCE));
     expect(normalizeModelObservabilityPreferences({ enabled: "yes", persistPayloads: 1, retention: { traceDays: -5 } }))
-      .toMatchObject({ enabled: false, persistPayloads: false, retention: { traceDays: 180 } });
-    // enabled=true 时 payload 仍需显式 opt-in。
+      .toMatchObject({ enabled: true, persistPayloads: true, persistBlobs: true, retention: { traceDays: 180 } });
     expect(normalizeModelObservabilityPreferences({ enabled: true })).toMatchObject({
-      enabled: true, persistTraceMetadata: true, persistPayloads: false, persistBlobs: false,
+      enabled: true, persistTraceMetadata: true, persistPayloads: true, persistBlobs: true,
     });
-    // persistBlobs ⊆ persistPayloads（§八十三 Phase 7 契约保持）。
+    // 旧客户端保存的关闭值不再生效。
     expect(normalizeModelObservabilityPreferences({ enabled: true, persistPayloads: false, persistBlobs: true }))
-      .toMatchObject({ persistBlobs: false });
+      .toMatchObject({ enabled: true, persistTraceMetadata: true, persistPayloads: true, persistBlobs: true });
     // days → ms。
     const policy = modelObservabilityPreferenceToPolicy(
       normalizeModelObservabilityPreferences({ enabled: true, retention: { traceDays: 10, payloadDays: 5, blobDays: 1 } }),
@@ -99,10 +97,40 @@ describe("Model Observability Settings / Control Plane", () => {
     // 新实例（模拟重启）从磁盘读回同一 policy。
     const restarted = new PreferencesManager({ userDir, agentsDir: path.join(home, "agents") });
     expect(restarted.getModelObservability()).toMatchObject({
-      enabled: true, persistTraceMetadata: true, persistPayloads: false, persistBlobs: false,
+      enabled: true, persistTraceMetadata: true, persistPayloads: true, persistBlobs: true,
     });
     const raw = JSON.parse(fs.readFileSync(path.join(userDir, "preferences.json"), "utf-8"));
-    expect(raw.model_observability).toMatchObject({ enabled: true });
+    expect(raw.model_observability).toMatchObject({
+      enabled: true,
+      persistTraceMetadata: true,
+      persistPayloads: true,
+      persistBlobs: true,
+    });
+  });
+
+  it("PreferencesManager 写入保留期时会把旧关闭配置持久迁移为全开", () => {
+    const userDir = path.join(home, "user-migrate");
+    fs.mkdirSync(userDir, { recursive: true });
+    fs.writeFileSync(path.join(userDir, "preferences.json"), JSON.stringify({
+      model_observability: {
+        enabled: false,
+        persistTraceMetadata: false,
+        persistPayloads: false,
+        persistBlobs: false,
+        retention: { traceDays: 90, payloadDays: 20, blobDays: 10 },
+      },
+    }));
+    const manager = new PreferencesManager({ userDir, agentsDir: path.join(home, "agents-migrate") });
+    manager.setModelObservability({ retention: { traceDays: 91 } });
+
+    const raw = JSON.parse(fs.readFileSync(path.join(userDir, "preferences.json"), "utf-8"));
+    expect(raw.model_observability).toEqual({
+      enabled: true,
+      persistTraceMetadata: true,
+      persistPayloads: true,
+      persistBlobs: true,
+      retention: { traceDays: 91, payloadDays: 20, blobDays: 10 },
+    });
   });
 
   it("dynamic enable：初始 disabled 无 DB 文件；enable 后 call 落库可查（§一百一十二）", async () => {
@@ -144,7 +172,7 @@ describe("Model Observability Settings / Control Plane", () => {
       expect(calls.ok === true && calls.value.calls.map((c) => c.callId)).toEqual(["mc_keep"]);
       const health = service.getHealth();
       expect(health.ok === true && health.value.queryStatus).toBe("ready");
-      expect(health.ok === true && health.value.schemaVersion).toBe(3);
+      expect(health.ok === true && health.value.schemaVersion).toBe(4);
     } finally {
       service.close();
     }

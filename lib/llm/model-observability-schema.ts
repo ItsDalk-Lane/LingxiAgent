@@ -27,14 +27,14 @@ import fs from "fs";
 import path from "path";
 import { createRequire } from "module";
 
-export const MODEL_OBSERVABILITY_SCHEMA_VERSION = 3;
+export const MODEL_OBSERVABILITY_SCHEMA_VERSION = 4;
 
 /**
  * read side 支持的 schema 版本闭集（Phase 8 §七）：v1 历史库不迁移也可读
  * （accounting projection 标 unavailable）；v2 起有 model_call_usage；
- * v3 起有运行时显式 usage correlation 事实。
+ * v3 起有运行时显式 usage correlation 事实；v4 增加不含正文的来源名称快照。
  */
-export const MODEL_OBSERVABILITY_SUPPORTED_READ_VERSIONS: readonly number[] = [1, 2, 3];
+export const MODEL_OBSERVABILITY_SUPPORTED_READ_VERSIONS: readonly number[] = [1, 2, 3, 4];
 
 /** store 目录约定（audit Q1 决策）。 */
 export const MODEL_OBSERVABILITY_DIR_NAME = "model-observability";
@@ -266,6 +266,19 @@ ALTER TABLE model_calls ADD COLUMN usage_correlation_state TEXT
   CHECK (usage_correlation_state IS NULL OR usage_correlation_state = 'not_correlated');
 `;
 
+/* ── v4 DDL：业务来源名称快照（不保存消息正文）──────────────────────── */
+const V4_DDL = `
+CREATE TABLE source_identity_snapshots (
+  kind TEXT NOT NULL,
+  entity_id TEXT NOT NULL,
+  title TEXT,
+  updated_at TEXT NOT NULL,
+  PRIMARY KEY (kind, entity_id)
+);
+CREATE INDEX idx_source_identity_snapshots_updated
+  ON source_identity_snapshots(updated_at);
+`;
+
 /**
  * 打开（必要时创建）observability 数据库并应用到受支持 schema。
  *
@@ -349,6 +362,10 @@ export function migrateModelObservabilitySchema(db: any, currentVersion: number)
           case 2:
             // v2 → v3：只新增闭集事实列；既有 call/usage 行原样保留。
             db.exec(V3_DDL);
+            break;
+          case 3:
+            // v3 → v4：新增不含正文的名称快照；既有调用与载荷原样保留。
+            db.exec(V4_DDL);
             break;
           default:
             throw new Error(`no migration step from observability schema ${version}`);

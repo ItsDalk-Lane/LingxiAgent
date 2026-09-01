@@ -33,7 +33,7 @@ const LABELED_TOOL_NAMES = [
   // Pi SDK 沙盒工具
   'read', 'write', 'edit', 'grep', 'find', 'ls', 'bash', 'terminal', 'materialize',
   // Agent 自带
-  'search_memory', 'pin_memory', 'unpin_memory', 'recall_experience', 'record_experience',
+  'search_memory', 'pin_memory', 'unpin_memory', 'recall_experience', 'record_experience', 'tenet_propose',
   'web_search', 'web_fetch', 'todo_write', 'automation', 'stage_files', 'file', 'channel',
   'browser', 'computer', 'install_skill', 'notify', 'stop_task', 'update_settings',
   'session_folders', 'subagent', 'subagent_reply', 'subagent_close', 'workflow',

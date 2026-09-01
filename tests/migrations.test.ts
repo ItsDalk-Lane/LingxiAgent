@@ -1,10 +1,10 @@
 /**
  * core/migrations.ts 单元测试
  *
- * 旧版本存量数据迁移（#1–#53）随"全新安装、无遗留数据"前提整体退役，
- * 迁移注册表当前为空。这里只保留管线基础设施（runMigrations /
- * getMigrationStatus / 收据状态机）的行为测试；未来新增迁移时，
- * 把该迁移的行为测试加回本文件，并以真实迁移作为 runner 机制的夹具。
+ * #1–#53 旧版本存量数据迁移随"全新安装、无遗留数据"前提整体退役；
+ * #54（清理 utility_model / utility_large_model 死键）起以真实迁移作为
+ * runner 机制的夹具。新增迁移时，把该迁移的行为测试加在本文件，并同步
+ * registryLatestId 断言。
  */
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import fs from "fs";
@@ -31,6 +31,10 @@ function makePrefs(userDir) {
   };
 }
 
+function readPrefs(userDir) {
+  return JSON.parse(fs.readFileSync(path.join(userDir, "preferences.json"), "utf-8"));
+}
+
 // ── runner 行为 ──────────────────────────────────────────────────────────────
 
 describe("runMigrations runner", () => {
@@ -45,8 +49,9 @@ describe("runMigrations runner", () => {
 
   afterEach(() => { fs.rmSync(tmpDir, { recursive: true, force: true }); });
 
-  it("空注册表 + 全新偏好：不执行任何迁移，也不写盘", () => {
+  it("高水位已达 registryLatest：不执行任何迁移，也不写盘", () => {
     const prefs = makePrefs(userDir);
+    prefs.savePreferences({ _dataVersion: 54, keep: "unchanged" });
     const before = fs.readFileSync(path.join(userDir, "preferences.json"), "utf-8");
 
     const status = runMigrations({
@@ -58,7 +63,7 @@ describe("runMigrations runner", () => {
     });
 
     expect(status).toEqual({
-      registryLatestId: 0,
+      registryLatestId: 54,
       pendingIds: [],
       lastFailedIds: [],
     });
@@ -72,8 +77,8 @@ describe("runMigrations runner", () => {
     const before = fs.readFileSync(path.join(userDir, "preferences.json"), "utf-8");
 
     expect(getMigrationStatus(prefs)).toEqual({
-      registryLatestId: 0,
-      pendingIds: [],
+      registryLatestId: 54,
+      pendingIds: [54],
       lastFailedIds: [],
     });
     expect(fs.readFileSync(path.join(userDir, "preferences.json"), "utf-8")).toBe(before);
@@ -82,27 +87,95 @@ describe("runMigrations runner", () => {
   it("收据里引用已退役编号的 completedIds / lastFailedIds 会被过滤", () => {
     const prefs = makePrefs(userDir);
     prefs.savePreferences({
+      _dataVersion: 53,
       _migrationState: { completedIds: [51, 52], lastFailedIds: [49] },
     });
 
-    // 已退役编号不在注册表内，不能当作有效收据重放。
+    // 已退役编号不在注册表内，不能当作有效收据重放；#54 高于高水位 53，待执行。
     expect(getMigrationStatus(prefs)).toEqual({
-      registryLatestId: 0,
-      pendingIds: [],
+      registryLatestId: 54,
+      pendingIds: [54],
       lastFailedIds: [],
     });
   });
 
   it("getMigrationStatus 接受裸 preferences 对象", () => {
-    expect(getMigrationStatus({ _dataVersion: 53 })).toEqual({
-      registryLatestId: 0,
+    expect(getMigrationStatus({ _dataVersion: 54 })).toEqual({
+      registryLatestId: 54,
       pendingIds: [],
       lastFailedIds: [],
     });
     expect(getMigrationStatus(null)).toEqual({
-      registryLatestId: 0,
-      pendingIds: [],
+      registryLatestId: 54,
+      pendingIds: [54],
       lastFailedIds: [],
     });
+  });
+});
+
+// ── #54 清理 utility_model / utility_large_model 死键 ────────────────────────
+
+describe("#54 migrateRemoveLegacyUtilityModelKeys", () => {
+  let tmpDir, agentsDir, userDir;
+
+  beforeEach(() => {
+    tmpDir = makeTmpDir();
+    agentsDir = path.join(tmpDir, "agents");
+    userDir = path.join(tmpDir, "user");
+    fs.mkdirSync(agentsDir, { recursive: true });
+  });
+
+  afterEach(() => { fs.rmSync(tmpDir, { recursive: true, force: true }); });
+
+  it("删除两个死键，其余偏好原样保留", () => {
+    const prefs = makePrefs(userDir);
+    prefs.savePreferences({
+      _dataVersion: 53,
+      utility_model: { id: "gemma4:12b-nvfp4", provider: "ollama" },
+      utility_large_model: { id: "gemma4:31b-nvfp4", provider: "ollama" },
+      memory_model: { id: "keep-me", provider: "ollama" },
+      locale: "zh",
+    });
+
+    const status = runMigrations({ lingxiHome: tmpDir, agentsDir, prefs, providerRegistry: null, log: () => {} });
+
+    const after = readPrefs(userDir);
+    expect(after.utility_model).toBeUndefined();
+    expect(after.utility_large_model).toBeUndefined();
+    // 活跃 Slot 键与其余偏好不受影响。
+    expect(after.memory_model).toEqual({ id: "keep-me", provider: "ollama" });
+    expect(after.locale).toBe("zh");
+    // 收据推进到 54。
+    expect(after._dataVersion).toBe(54);
+    expect(status).toEqual({ registryLatestId: 54, pendingIds: [], lastFailedIds: [] });
+  });
+
+  it("幂等：对已迁移状态重跑断言零数据变更", () => {
+    const prefs = makePrefs(userDir);
+    prefs.savePreferences({
+      _dataVersion: 54,
+      memory_model: { id: "keep-me", provider: "ollama" },
+    });
+
+    const status = runMigrations({ lingxiHome: tmpDir, agentsDir, prefs, providerRegistry: null, log: () => {} });
+    const after = readPrefs(userDir);
+
+    expect(status.pendingIds).toEqual([]);
+    expect(after).toEqual({
+      _dataVersion: 54,
+      memory_model: { id: "keep-me", provider: "ollama" },
+    });
+  });
+
+  it("全新安装（无死键）：#54 空跑后只落收据，不写入任何业务键", () => {
+    const prefs = makePrefs(userDir);
+
+    const status = runMigrations({ lingxiHome: tmpDir, agentsDir, prefs, providerRegistry: null, log: () => {} });
+    const after = readPrefs(userDir);
+
+    expect(status.pendingIds).toEqual([]);
+    expect(after.utility_model).toBeUndefined();
+    expect(after.utility_large_model).toBeUndefined();
+    expect(Object.keys(after).filter((k) => !k.startsWith("_"))).toEqual([]);
   });
 });

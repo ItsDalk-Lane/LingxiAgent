@@ -199,6 +199,27 @@ export type ModelObservabilityUsageSummary = {
   costTotal: number | null;
 };
 
+/** 面向用户的业务来源投影；不覆盖 model_calls 中保存的原始来源事实。 */
+export type ModelObservabilitySourceIdentity = {
+  kind:
+    | "chat"
+    | "background_task"
+    | "automation"
+    | "subagent"
+    | "phone"
+    | "media"
+    | "speech"
+    | "plugin"
+    | "provider_probe"
+    | "health_check"
+    | "memory"
+    | "diary"
+    | "unknown";
+  entityId: string | null;
+  title: string | null;
+  resolution: "current" | "snapshot" | "derived" | "unknown";
+};
+
 export type ModelObservabilityCallListItem = {
   callId: string;
   traceId: string | null;
@@ -210,6 +231,7 @@ export type ModelObservabilityCallListItem = {
   persistenceCompleteness: string;
   interruptedByRestart: boolean;
   model: { provider: string | null; modelId: string | null; api: string | null };
+  sourceIdentity?: ModelObservabilitySourceIdentity;
   source: { subsystem: string | null; operation: string | null; surface: string | null; trigger: string | null };
   attribution: {
     kind: string | null;
@@ -259,6 +281,7 @@ export type ModelObservabilityCallPage = {
 export type ModelObservabilityTraceListItem = {
   traceId: string;
   origin: string | null;
+  sourceIdentity?: ModelObservabilitySourceIdentity;
   firstSeenAt: string;
   lastSeenAt: string;
   callCount: number;

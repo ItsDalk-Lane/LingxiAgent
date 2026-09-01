@@ -43,6 +43,7 @@ import { resolveFileRefUrl } from '../../services/resource-url';
 import type { FileRef } from '../../types/file-ref';
 import { openPreview } from '../../stores/preview-actions';
 import type { ForkedSessionHandler, SessionNodeTarget } from '../../stores/message-turn-actions';
+import { submitMessageFeedback } from '../../stores/message-turn-actions';
 import { selectSelectedIdsBySession } from '../../stores/session-selectors';
 import { normalizeSessionRouteError } from '../../../../../shared/error-user-messages.ts';
 import { extractSelectedTexts, extractTextBlockPlainText } from '../../utils/message-text';
@@ -167,6 +168,35 @@ export const AssistantMessage = memo(function AssistantMessage({
     fn(message.id, sessionPath);
   }, [message.id, sessionPath]);
 
+  // ── 消息级反馈（赞/踩 → experience 沉淀）──
+  // 一条消息只记一票（防连点重复写库）；成功后按服务端返回分 toast 文案。
+  const t = window.t ?? ((key: string) => key);
+  const addToast = useStore(s => s.addToast);
+  const [feedbackState, setFeedbackState] = useState<'up' | 'down' | null>(null);
+  const handleFeedback = useCallback((rating: 'up' | 'down') => {
+    if (feedbackState) return;
+    const textBlocks = blocks.filter(
+      (b): b is ContentBlock & { type: 'text' } => b.type === 'text'
+    );
+    const excerpt = extractTextBlockPlainText(textBlocks).slice(0, 200).trim();
+    if (!excerpt) return;
+    setFeedbackState(rating);
+    void submitMessageFeedback(sessionPath, agentId, { rating, excerpt }).then((res) => {
+      if (!res.ok) {
+        setFeedbackState(null);
+        addToast(t('chat.feedbackFailed'), 'error');
+        return;
+      }
+      if (res.experienceEnabled === false) {
+        addToast(t('chat.feedbackRecordedExperienceOff'), 'info');
+      } else if (res.duplicate) {
+        addToast(t('chat.feedbackDuplicate'), 'info');
+      } else {
+        addToast(t('chat.feedbackRecorded'), 'success');
+      }
+    });
+  }, [addToast, agentId, blocks, feedbackState, sessionPath, t]);
+
   const { actions: nodeActions, busy: nodeActionBusy } = useSessionNodeActions({
     sessionPath,
     target: readOnly || !showTurnCompletionTime ? null : turnTarget,
@@ -185,6 +215,8 @@ export const AssistantMessage = memo(function AssistantMessage({
     onScreenshot: () => { void handleScreenshot(); },
     copied,
     isStreaming: isStreaming || nodeActionBusy,
+    onFeedback: handleFeedback,
+    feedbackState,
   });
   const messageActions = readOnly || !showTurnCompletionTime || isStreaming ? [] : standardMessageActions;
   const footerActions = canShowNodeActions ? nodeActions : [];

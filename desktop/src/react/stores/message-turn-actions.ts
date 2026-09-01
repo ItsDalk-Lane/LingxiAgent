@@ -146,8 +146,59 @@ export async function forkSessionTurn(
   }
 }
 
-export async function activateForkedSession(forked: ForkedSessionRef): Promise<void> {
-  useStore.setState((state) => {
+export type MessageFeedbackRating = 'up' | 'down';
+
+export interface MessageFeedbackResult {
+  ok: boolean;
+  experienceEnabled?: boolean;
+  duplicate?: boolean;
+}
+
+/**
+ * 消息级用户反馈 → experience 沉淀（赞/踩）。
+ * 服务端不受 experience.enabled 门控（用户显式动作不丢弃），
+ * experienceEnabled 原样带回供调用方选择 toast 文案。
+ */
+export async function submitMessageFeedback(
+  sessionPath: string,
+  agentId: string | null | undefined,
+  input: { rating: MessageFeedbackRating; excerpt: string },
+): Promise<MessageFeedbackResult> {
+  if (!sessionPath || !agentId) return { ok: false };
+  try {
+    let sessionId = '';
+    try {
+      sessionId = resolveSessionIdentity(sessionPath).sessionId;
+    } catch {
+      // 会话 id 未知时省略（服务端按可选处理）
+    }
+    const response = await lingxiFetch(
+      `/api/agents/${encodeURIComponent(agentId)}/experience/feedback`,
+      {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        timeout: 30_000,
+        throwOnHttpError: false,
+        body: JSON.stringify({
+          rating: input.rating,
+          excerpt: (input.excerpt || '').trim().slice(0, 200),
+          sessionId,
+        }),
+      },
+    );
+    const data = await readSessionActionResponse(response, 'Feedback failed');
+    return {
+      ok: true,
+      experienceEnabled: data?.experienceEnabled === true,
+      duplicate: data?.duplicate === true,
+    };
+  } catch {
+    // 失败由调用方 toast（这里的错误对用户是「反馈没送出去」而不是会话内错误）
+    return { ok: false };
+  }
+}
+
+export async function activateForkedSession(forked: ForkedSessionRef): Promise<void> {  useStore.setState((state) => {
     const sessions = state.sessions || [];
     const existingIndex = sessions.findIndex((session) => (
       session?.sessionId === forked.sessionId || session?.path === forked.sessionPath

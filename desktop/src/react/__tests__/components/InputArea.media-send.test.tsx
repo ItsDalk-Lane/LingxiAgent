@@ -198,6 +198,7 @@ function seedSession() {
     turnPendingSessions: [],
     knowledgeRetrievingSessions: [],
     inlineErrors: {},
+    toasts: [],
     attachedFiles: [{
       fileId: 'sf_pasted',
       path: '/tmp/hana/session-files/pasted.png',
@@ -771,7 +772,7 @@ describe('InputArea media send', () => {
     expect(window.platform.readFileBase64).not.toHaveBeenCalled();
   });
 
-  it('keeps video attachments on the file-only path for unsupported models', async () => {
+  it('rejects video before send when the selected model does not support video', async () => {
     useStore.setState({
       attachedFiles: [{
         fileId: 'sf_clip',
@@ -796,25 +797,73 @@ describe('InputArea media send', () => {
     fireEvent.click(screen.getByTestId('send'));
 
     await waitFor(() => {
-      expect(mocks.wsSend).toHaveBeenCalledTimes(1);
+      expect(useStore.getState().toasts.some(toast => toast.type === 'warning')).toBe(true);
     });
-    const payload = JSON.parse(String(mocks.wsSend.mock.calls[0][0]));
-    expect(payload.videos).toBeUndefined();
-    expect(payload.text).toBe('[附件] clip.mp4');
-    expect(payload.sessionFileRefs).toEqual([{
-      fileId: 'sf_clip',
-      sessionId: 'sess_media',
-      sessionPath: '/session/media.jsonl',
-      label: 'clip.mp4',
-      kind: 'attachment',
-    }]);
-    expect(payload.displayMessage.attachments[0]).toMatchObject({
-      fileId: 'sf_clip',
-      path: '/tmp/hana/session-files/clip.mp4',
-      name: 'clip.mp4',
-      mimeType: 'video/mp4',
-    });
+    expect(mocks.wsSend).not.toHaveBeenCalled();
     expect(window.platform.readFileBase64).not.toHaveBeenCalled();
+  });
+
+  it('sends a valid video as an independent native media type for a supported provider', async () => {
+    const mp4Base64 = Buffer.from([0x00, 0x00, 0x00, 0x18, 0x66, 0x74, 0x79, 0x70, 0x69, 0x73, 0x6f, 0x6d]).toString('base64');
+    useStore.setState({
+      models: [{
+        id: 'gemini-video',
+        provider: 'gemini',
+        api: 'google-generative-ai',
+        input: ['text', 'image'],
+        compat: { hanaVideoInput: true },
+        isCurrent: true,
+      }],
+      attachedFiles: [{
+        fileId: 'sf_clip',
+        path: '/tmp/hana/session-files/clip.mp4',
+        name: 'clip.mp4',
+        mimeType: 'video/mp4',
+        isDirectory: false,
+      }],
+      attachedFilesBySession: {
+        '/session/media.jsonl': [{
+          fileId: 'sf_clip',
+          path: '/tmp/hana/session-files/clip.mp4',
+          name: 'clip.mp4',
+          mimeType: 'video/mp4',
+          isDirectory: false,
+        }],
+      },
+    } as never);
+    vi.mocked(window.platform.readFileBase64).mockResolvedValueOnce(mp4Base64);
+
+    render(React.createElement(InputArea));
+    fireEvent.click(screen.getByTestId('send'));
+
+    await waitFor(() => expect(mocks.wsSend).toHaveBeenCalledTimes(1));
+    const payload = JSON.parse(String(mocks.wsSend.mock.calls[0][0]));
+    expect(payload.videos).toEqual([{ type: 'video', data: mp4Base64, mimeType: 'video/mp4' }]);
+    expect(payload.images).toBeUndefined();
+  });
+
+  it('rejects spoofed video content before WebSocket send', async () => {
+    useStore.setState({
+      models: [{
+        id: 'gemini-video', provider: 'gemini', api: 'google-generative-ai',
+        input: ['text', 'image'], compat: { hanaVideoInput: true }, isCurrent: true,
+      }],
+      attachedFiles: [{
+        fileId: 'sf_clip', path: '/tmp/hana/session-files/clip.mp4', name: 'clip.mp4', mimeType: 'video/mp4', isDirectory: false,
+      }],
+      attachedFilesBySession: {
+        '/session/media.jsonl': [{
+          fileId: 'sf_clip', path: '/tmp/hana/session-files/clip.mp4', name: 'clip.mp4', mimeType: 'video/mp4', isDirectory: false,
+        }],
+      },
+    } as never);
+    vi.mocked(window.platform.readFileBase64).mockResolvedValueOnce(Buffer.from('plain text').toString('base64'));
+
+    render(React.createElement(InputArea));
+    fireEvent.click(screen.getByTestId('send'));
+
+    await waitFor(() => expect(useStore.getState().toasts.some(toast => toast.type === 'error')).toBe(true));
+    expect(mocks.wsSend).not.toHaveBeenCalled();
   });
 
   it('sends ordinary attachments by fileId instead of using visible path text as the machine contract', async () => {

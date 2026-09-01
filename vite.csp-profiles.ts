@@ -14,15 +14,15 @@ import type { Plugin } from 'vite';
  * 构建配置共享，不能只活在主配置文件里。
  */
 export const CSP_PROFILES: Record<string, string> = {
-  // 主窗口：需要 API 连接、图片、字体（KaTeX）、iframe（artifacts）
+  // 主窗口：需要 API 连接、图片/视频（附件海报与 MediaViewer）、字体（KaTeX）、iframe（artifacts）
   'index.html':
-    "default-src 'self'; connect-src 'self' ws://127.0.0.1:* http://127.0.0.1:*; img-src 'self' data: file: http://127.0.0.1:*; style-src 'self' 'unsafe-inline'; script-src 'self'; font-src 'self' data:; frame-src blob: data: file: http://127.0.0.1:* http://localhost:*",
-  // 设置窗口：需要 API 连接、图片、字体
+    "default-src 'self'; connect-src 'self' ws://127.0.0.1:* http://127.0.0.1:*; img-src 'self' data: file: http://127.0.0.1:*; media-src 'self' data: blob: file: http://127.0.0.1:*; style-src 'self' 'unsafe-inline'; script-src 'self'; font-src 'self' data:; frame-src blob: data: file: http://127.0.0.1:* http://localhost:*",
+  // 设置窗口：需要 API 连接、图片/视频（观测 blob 预览）、字体
   'settings.html':
-    "default-src 'self'; connect-src 'self' ws://127.0.0.1:* http://127.0.0.1:*; img-src 'self' data: file: http://127.0.0.1:*; style-src 'self' 'unsafe-inline'; script-src 'self'; font-src 'self' data:",
-  // Quick Chat：独立小窗，需要 API/WS、附件预览图片
+    "default-src 'self'; connect-src 'self' ws://127.0.0.1:* http://127.0.0.1:*; img-src 'self' data: file: http://127.0.0.1:*; media-src 'self' data: blob: file: http://127.0.0.1:*; style-src 'self' 'unsafe-inline'; script-src 'self'; font-src 'self' data:",
+  // Quick Chat：独立小窗，需要 API/WS、附件预览图片/视频
   'quick-chat.html':
-    "default-src 'self'; connect-src 'self' ws://127.0.0.1:* http://127.0.0.1:*; img-src 'self' data: blob: file: http://127.0.0.1:*; style-src 'self' 'unsafe-inline'; script-src 'self'; font-src 'self' data:",
+    "default-src 'self'; connect-src 'self' ws://127.0.0.1:* http://127.0.0.1:*; img-src 'self' data: blob: file: http://127.0.0.1:*; media-src 'self' data: blob: file: http://127.0.0.1:*; style-src 'self' 'unsafe-inline'; script-src 'self'; font-src 'self' data:",
   // Onboarding：需要 API 连接、图片、字体
   'onboarding.html':
     "default-src 'self'; connect-src 'self' http: https: ws: wss:; img-src 'self' data: file: http://127.0.0.1:*; style-src 'self' 'unsafe-inline'; script-src 'self'; font-src 'self' data:",
@@ -32,7 +32,7 @@ export const CSP_PROFILES: Record<string, string> = {
   'browser-viewer.html':
     "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'; img-src 'self' file:",
   'viewer-window.html':
-    "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'; img-src 'self' data: file:",
+    "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'; img-src 'self' data: file:; media-src 'self' data: blob: file:",
   'mobile.html':
     "default-src 'self'; connect-src 'self' ws: wss:; img-src 'self' data: blob:; media-src 'self' blob:; style-src 'self' 'unsafe-inline'; script-src 'self'; font-src 'self' data:; frame-src 'self' blob:",
 };

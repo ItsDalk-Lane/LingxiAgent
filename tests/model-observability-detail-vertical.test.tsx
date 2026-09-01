@@ -8,7 +8,7 @@ import React from 'react';
 import '../desktop/src/assets.d.ts';
 import { createAssistantMessageEventStream } from '@earendil-works/pi-ai';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
+import { cleanup, render, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
 import { callText } from '../core/llm-client.ts';
 import {
@@ -156,7 +156,7 @@ afterEach(async () => {
 });
 
 describe('Model Observatory 详情纵向链', () => {
-  it('Call Inspector 经真实 HTTP detail 展示调用，并按需加载真实 Payload 正文', async () => {
+  it('Call Inspector 经真实 HTTP detail 展示调用，并自动加载纯文本 Payload 正文', async () => {
     render(
       <ObservabilityCallInspector
         callId={callId}
@@ -167,23 +167,18 @@ describe('Model Observatory 详情纵向链', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText(/phase10-detail-model/)).toBeInTheDocument();
+      expect(screen.getAllByText(/phase10-detail-model/).length).toBeGreaterThan(0);
     });
     expect(requestedPaths).toContain(`/api/model-observability/calls/${callId}`);
 
-    const semanticRequestCard = document.querySelector<HTMLElement>(
-      '[data-kind="semantic_request"].observability-payload-card, [data-kind="semantic_request"]',
-    );
-    expect(semanticRequestCard).not.toBeNull();
-    fireEvent.click(within(semanticRequestCard!).getByText('settings.observability.payload.loadBody'));
-
     await waitFor(() => {
-      expect(semanticRequestCard!.textContent).toContain(USER_INPUT);
+      expect(screen.getAllByText(new RegExp(USER_INPUT)).length).toBeGreaterThan(0);
     });
+    expect(screen.queryByText('settings.observability.payload.loadBody')).toBeNull();
     expect(requestedPaths.some((value) => /\/api\/model-observability\/payloads\/\d+$/.test(value))).toBe(true);
   });
 
-  it('Trace Explorer 经真实 HTTP list/detail 渲染同一调用链的折线图', async () => {
+  it('Trace Explorer 经真实 HTTP list/detail：单次调用 trace 不进列表，详情层渲染调用记录', async () => {
     render(
       <ObservabilityTraceExplorer
         appliedFilter={DEFAULT_OBSERVABILITY_FILTER}
@@ -194,12 +189,16 @@ describe('Model Observatory 详情纵向链', () => {
       />,
     );
 
+    // 轨迹列表默认只保留 ≥2 次调用的 trace（minCallCount=2）：
+    // 本 fixture 只发了一次调用 → 空态（调用台账仍可见该调用）。
     await waitFor(() => {
-      expect(document.querySelector(`[data-call-id="${callId}"]`)).not.toBeNull();
+      expect(document.querySelector('[data-state="no-results"]')).not.toBeNull();
     });
-    expect(document.querySelector(`[data-call-id="${callId}"] title`)?.textContent).toContain('phase10-detail-model');
-    expect(document.querySelector('[data-status="ok"]')).not.toBeNull();
     expect(requestedPaths).toContain('/api/model-observability/query/traces');
+    // 详情层（dsh ui-trajectory 布局）经真实 HTTP 拉取 trace 并渲染记录行。
+    await waitFor(() => {
+      expect(document.querySelector('tr[data-record-index]')).not.toBeNull();
+    });
     expect(requestedPaths).toContain(`/api/model-observability/traces/${traceId}`);
   });
 

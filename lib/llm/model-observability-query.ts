@@ -21,6 +21,7 @@ import fs from "fs";
 import { modelObservabilityDbPath } from "./model-observability-schema.ts";
 import { resolveExistingModelObservabilityBlobPath } from "./model-observability-blob-store.ts";
 import { openModelObservabilityReadDatabase } from "./model-observability-read-database.ts";
+import { resolveModelObservabilitySourceIdentity } from "./model-observability-source-identity.ts";
 import { MODEL_OBSERVABILITY_BLOB_ID_PATTERN } from "../../shared/model-observability-api-contract.ts";
 import {
   decodeModelObservabilityCallCursor,
@@ -630,6 +631,7 @@ export function createModelObservabilityQueryService({ lingxiHome }: { lingxiHom
         modelId: textOrNull(row.model_id),
         api: textOrNull(row.api),
       },
+      sourceIdentity: resolveModelObservabilitySourceIdentity(reader.db, row),
       source: {
         subsystem: textOrNull(row.subsystem),
         operation: textOrNull(row.operation),
@@ -729,7 +731,7 @@ export function createModelObservabilityQueryService({ lingxiHome }: { lingxiHom
         params.push(query.origin);
       }
       if (query.cursor) {
-        const decoded = decodeModelObservabilityTraceCursor(query.cursor, query.filter, query.origin);
+        const decoded = decodeModelObservabilityTraceCursor(query.cursor, query.filter, query.origin, query.minCallCount);
         if (decoded.ok === false) throw new CursorError(decoded.error.message);
         const { lastSeenAt, lastTraceId } = decoded.value;
         if (lastSeenAt === null) {
@@ -754,15 +756,37 @@ export function createModelObservabilityQueryService({ lingxiHome }: { lingxiHom
          JOIN model_calls c ON c.trace_id = t.trace_id
          WHERE ${clauses.join(" AND ")}
          GROUP BY t.trace_id, t.origin, t.first_seen_at, t.last_seen_at
+         ${query.minCallCount !== null ? "HAVING COUNT(c.call_id) >= ?" : ""}
          ORDER BY (t.last_seen_at IS NULL) ASC, t.last_seen_at DESC, t.trace_id DESC
          LIMIT ?`,
-      ).all(...params, query.limit + 1);
+      ).all(...params, ...(query.minCallCount !== null ? [query.minCallCount] : []), query.limit + 1);
 
       const hasMore = rows.length > query.limit;
       const page = hasMore ? rows.slice(0, query.limit) : rows;
+      const traceIds = page.map((row) => String(row.trace_id));
+      const rootByTrace = new Map<string, Record<string, unknown>>();
+      if (traceIds.length > 0) {
+        const rootRows: Array<Record<string, unknown>> = reader.db.prepare(
+          `SELECT * FROM model_calls
+           WHERE trace_id IN (${traceIds.map(() => "?").join(",")})
+           ORDER BY trace_id,
+             CASE WHEN parent_call_id IS NULL OR parent_call_id = '' THEN 0 ELSE 1 END,
+             CASE WHEN started_at IS NULL OR started_at = '' THEN 1 ELSE 0 END,
+             started_at,
+             call_id`,
+        ).all(...traceIds);
+        for (const rootRow of rootRows) {
+          const traceId = String(rootRow.trace_id ?? "");
+          if (!rootByTrace.has(traceId)) rootByTrace.set(traceId, rootRow);
+        }
+      }
       const traces: ModelObservabilityTraceListItem[] = page.map((row) => ({
         traceId: String(row.trace_id),
         origin: textOrNull(row.origin),
+        sourceIdentity: resolveModelObservabilitySourceIdentity(
+          reader.db,
+          rootByTrace.get(String(row.trace_id)) ?? row,
+        ),
         firstSeenAt: String(row.first_seen_at ?? ""),
         lastSeenAt: String(row.last_seen_at ?? ""),
         callCount: Number(row.call_count ?? 0),
@@ -775,9 +799,10 @@ export function createModelObservabilityQueryService({ lingxiHome }: { lingxiHom
       if (hasMore && page.length > 0) {
         const last = page[page.length - 1];
         nextCursor = encodeModelObservabilityTraceCursor(
-          { lastSeenAt: textOrNull(last.last_seen_at), lastTraceId: String(last.trace_id) },
+          { lastSeenAt: textOrNull(last.lastSeenAt), lastTraceId: String(last.trace_id) },
           query.filter,
           query.origin,
+          query.minCallCount,
         );
       }
       return { traces, nextCursor };
@@ -1361,6 +1386,10 @@ export function createModelObservabilityQueryService({ lingxiHome }: { lingxiHom
           terminalError: counts.error,
           terminalAborted: counts.aborted,
           incomplete: counts.incomplete,
+          sourceIdentity: resolveModelObservabilitySourceIdentity(
+            reader.db,
+            callRows.find((row) => !textOrNull(row.parent_call_id)) ?? callRows[0] ?? traceRow ?? {},
+          ),
         },
         calls,
         roots,

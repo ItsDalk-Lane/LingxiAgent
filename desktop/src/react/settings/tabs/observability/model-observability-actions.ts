@@ -224,6 +224,11 @@ export type ObservabilityCallsQuery = {
   cursor?: string | null;
 };
 
+export type ObservabilityTracesQuery = ObservabilityCallsQuery & {
+  /** 轨迹列表默认只保留 ≥2 次调用的 trace（单次调用 trace 由调用台账覆盖）；传 1 = 不过滤。 */
+  minCallCount?: number | null;
+};
+
 export function queryObservabilityCalls(
   query: ObservabilityCallsQuery,
   opts: SignalOptions = {},
@@ -232,10 +237,14 @@ export function queryObservabilityCalls(
 }
 
 export function queryObservabilityTraces(
-  query: ObservabilityCallsQuery,
+  query: ObservabilityTracesQuery,
   opts: SignalOptions = {},
 ): Promise<ModelObservabilityTracePage> {
-  return observabilityJson(`${API_BASE}/query/traces`, { ...opts, method: 'POST', body: query });
+  return observabilityJson(`${API_BASE}/query/traces`, {
+    ...opts,
+    method: 'POST',
+    body: { ...query, minCallCount: query.minCallCount ?? 2 },
+  });
 }
 
 export type ObservabilityAggregateQuery = {
