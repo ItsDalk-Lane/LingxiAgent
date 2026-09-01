@@ -10,7 +10,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = 37580730e8da02cf10912e6e7333739f0d6ca397  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-09-01 fix(test) spawn 等待预算放宽)
+VERIFIED_SOURCE_SHA   = 20a9e9444adb821458848c923c3f4be4a5862dac  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-09-01 记忆系统升级 + 观测轨迹详情页 + 迁移#54 批量提交)
 工作分支              = feature/upstream-sync-0.447.4
 ```
 
@@ -758,7 +758,7 @@ seal 不是一次性终点，而是"当前被验证树"的游标；每次审计�
   按 v0.1.30 先例删旧 draft 后重打（旧 run 33410110948 的 13 个已上传产物
   随 draft 一并废弃重出）。
 - **2026-09-01 迁移 #54：清理 utility_model/utility_large_model 死键**
-  （fix/knowledge-latency-hardening，未提交）：辅助槽排障时实锤——283d9581
+  （fix/knowledge-latency-hardening，已随 20a9e944 批量提交）：辅助槽排障时实锤——283d9581
   语义 Slot 重构删了两个旧键的全部读写路径，但存量 preferences.json 里的值
   一直没清，用户配置里躺着的 gemma4 死键造成「已配置取标题模型」的错觉
   （title 槽实际读 title_model，未配置回退 chat）。core/migrations.ts 加
@@ -777,6 +777,22 @@ seal 不是一次性终点，而是"当前被验证树"的游标；每次审计�
   冷启动 TS 转换击穿（同窗口套件时长 24m→45m）。测试断言的是顺序契约非
   墙钟 SLA：spawn 等待统一 60s、用例超时 90s。验证：typecheck×3 绿 +
   三文件 30/30 绿后推进。
+
+- **2026-09-01 记忆系统升级 + 观测轨迹详情页 + 迁移#54 批量提交**（功能树
+  20a9e944/seal 本提交，feat/pending-sep01）：三线合集 80 files / +14435-420。
+  ①借鉴 nuphus 记忆五项落地：tenets 用户原则层（tenet_propose 工具 + 聊天
+  审批卡 + 设置页 + agents 路由 CRUD，active 注入新会话 system prompt）、
+  记忆导航节（navigation.md 经 assemble 第 5 段注入 cache 分界线后）、facts
+  语义检索（float32 BLOB + JS 余弦，FTS×向量 RRF 融合 + memory.embedding_model
+  配置 + engine 侧回填）、检索零结果诊断、经验反馈路由（👍/👎 记经验库）。
+  ②迁移 #54 utility_model/utility_large_model 死键清理（见上条）。
+  ③模型观测轨迹：列表 minCallCount≥2 过滤（cursor 指纹绑定）+ dsh
+  ui-trajectory 详情页移植（trace-detail/ 11 文件，会话 join 双通道 +
+  prompt-snapshot sidecar 路由 + 载荷 TXT 直出 + @tanstack/react-virtual
+  3.14.10）+ 主链分类修复（subsystem/purpose 不只 parentCallId）。
+  指纹（compatible）/closure/inventory/export-manifest 已更新，五语言齐。
+  验证：typecheck×3 绿 + eslint 0 error + 全量 npm test 12862 用例通过
+  （唯一失败为 post-verification-audit-seal 预期红，旧坐标 37580730 下）后推进。
 
 ## 最终状态：已合并（上游同步部分）
 
