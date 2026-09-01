@@ -1047,20 +1047,27 @@ export async function compileEditableFacts(summaryManager, outputPath, resolvedM
  * @param {string} weekPath
  * @param {string} longtermPath
  * @param {string} memoryMdPath
+ * @param {string|null} [navigationPath] - 导航节文件。缺省时读 memory.md 同目录的
+ *   navigation.md（REST 编辑/dream/import 重拼均走此默认，导航节不丢）；
+ *   显式传空串可跳过（测试隔离用）。
  */
-export function assemble(factsPath, todayPath, weekPath, longtermPath, memoryMdPath) {
+export function assemble(factsPath, todayPath, weekPath, longtermPath, memoryMdPath, navigationPath?: string | null) {
   const read = (p) => { try { return fs.readFileSync(p, "utf-8").trim(); } catch { return ""; } };
 
   const facts    = normalizeCompiledSectionBody(read(factsPath));
   const today    = normalizeCompiledSectionBody(read(todayPath));
   const week     = normalizeCompiledWeekSectionBody(read(weekPath));
   const longterm = normalizeCompiledSectionBody(read(longtermPath));
+  const navPath = navigationPath === undefined
+    ? path.join(path.dirname(memoryMdPath), "navigation.md")
+    : navigationPath;
+  const navigation = navPath ? read(navPath) : "";
 
-  atomicWrite(memoryMdPath, buildCompiledMemoryMarkdown({ facts, today, week, longterm }));
+  atomicWrite(memoryMdPath, buildCompiledMemoryMarkdown({ facts, today, week, longterm, navigation }));
 }
 
-export function buildCompiledMemoryMarkdown({ facts = "", today = "", week = "", longterm = "" } = {}) {
-  // 四个标题始终保留，空栏写占位符，避免格式漂移
+export function buildCompiledMemoryMarkdown({ facts = "", today = "", week = "", longterm = "", navigation = "" } = {}) {
+  // 四个标题始终保留，空栏写占位符，避免格式漂移；导航节仅在内容非空时追加。
   const isZh = _isZh();
   const empty = isZh ? "（暂无）" : "(none)";
   const section = (title, content) =>
@@ -1068,12 +1075,18 @@ export function buildCompiledMemoryMarkdown({ facts = "", today = "", week = "",
   const weekSection = (title, content) =>
     `## ${title}\n\n${normalizeCompiledWeekSectionBody(content) || empty}`;
 
-  return [
+  const sections = [
     section(isZh ? "重要事实" : "Key facts", facts),
     section(isZh ? "今天" : "Today", today),
     weekSection(isZh ? "本周早些时候" : "Earlier this week", week),
     section(isZh ? "长期情况" : "Long-term context", longterm),
-  ].join("\n\n") + "\n";
+  ];
+  const navBody = normalizeCompiledSectionBody(navigation);
+  if (navBody) {
+    sections.push(`## ${isZh ? "记忆检索导航" : "Memory retrieval navigation"}\n\n${navBody}`);
+  }
+
+  return sections.join("\n\n") + "\n";
 }
 
 /**

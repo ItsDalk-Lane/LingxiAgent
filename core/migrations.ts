@@ -21,11 +21,37 @@ const moduleLog = createModuleLogger("migrations");
 
 // ── 迁移表 ──────────────────────────────────────────────────────────────────
 
-// 已发布的最高迁移编号是 53（#1–#53 全部为旧版本存量数据的格式升级/修复/回填，
-// 产品转为全新安装后整体退役）。管线基础设施保留给未来的 schema 升级：
-// 新迁移编号必须从 54 开始，禁止复用 ≤ 53 的槽位——任何拿到旧安装包的用户
-// preferences.json 里 _dataVersion 可能已经 ≥ 53，"编号 ≤ 高水位即跳过"。
-const migrations = {};
+// 已发布的最高迁移编号是 54（#1–#53 为旧版本存量数据迁移，随"全新安装、无遗留
+// 数据"前提整体退役；#54 起为退役后的新迁移）。新迁移编号必须严格递增，禁止复用
+// 已发布编号——任何拿到旧安装包的用户 preferences.json 里 _dataVersion 可能已经
+// 达到该编号，"编号 ≤ 高水位即跳过"。
+
+/**
+ * #54 — 清理语义 Slot 重构后残留的 utility_model / utility_large_model 死键。
+ *
+ * 283d9581（辅助模型语义 Slot 重构）删除了两个旧键的全部读写路径，但存量
+ * preferences.json 里的值一直没清。死键会让用户误以为「取标题/记忆模型已配置」
+ * （实际读取侧走 title_model/memory_model 等 Slot 键，未配置回退 chat）。
+ * 纯删除、不做值迁移：Slot 体系默认回退 chat 已是一个月来的实际行为，
+ * 静默把旧值映射到某个 Slot 反而会凭空切换用户正在用的模型。
+ */
+function migrateRemoveLegacyUtilityModelKeys(ctx) {
+  const { prefs, log } = ctx;
+  const preferences = prefs.getPreferences();
+
+  let changed = false;
+  for (const key of ["utility_model", "utility_large_model"]) {
+    if (!Object.prototype.hasOwnProperty.call(preferences, key)) continue;
+    delete preferences[key];
+    changed = true;
+    log(`[migrations] #54 preferences.${key} 已删除（语义 Slot 重构后无读取方的死键）`);
+  }
+  if (changed) prefs.savePreferences(preferences);
+}
+
+const migrations = {
+  54: migrateRemoveLegacyUtilityModelKeys,
+};
 
 // Migration ids are a single monotonic ladder shared across release channels;
 // a new id must exceed the highest id ever shipped on ANY channel, because the

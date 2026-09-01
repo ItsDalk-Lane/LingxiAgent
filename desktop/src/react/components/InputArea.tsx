@@ -39,6 +39,7 @@ import { ComposerToolbar } from './input/ComposerToolbar';
 import { SendButton } from './input/SendButton';
 import type { PermissionMode } from './input/PlanModeButton';
 import { SessionConfirmationPrompt } from './input/SessionConfirmationPrompt';
+import { TenetApprovalBanner } from './input/TenetApprovalBanner';
 import { serializeEditor } from '../utils/editor-serializer';
 import {
   buildFileMentionItems,
@@ -2328,6 +2329,7 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
             exiting={sessionConfirmationExiting}
           />
         )}
+        <TenetApprovalBanner />
         <div className={styles['input-wrapper']} ref={inputCardRef}>
           <input
             ref={browserFileInputRef}

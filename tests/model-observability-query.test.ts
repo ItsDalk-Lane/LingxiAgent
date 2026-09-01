@@ -479,6 +479,44 @@ describe("Model Observability Unified Query", () => {
     expect(s2Traces.value.traces.map((t) => t.traceId).sort()).toEqual(["mt_i", "mt_m", "mt_v"].sort());
   });
 
+  it("trace list minCallCount：≥2 过滤单调用 trace；缺省不过滤；cursor 与 minCallCount 绑定", () => {
+    seedFixture();
+    service = createModelObservabilityQueryService({ lingxiHome: home });
+    // 缺省：全部 5 条 trace（mt_a×3 + mt_m/mt_v/mt_b/mt_i 单调用）。
+    const all = tracesQuery({ filter: {}, limit: 50 });
+    if (all.ok !== true) throw new Error("trace query failed");
+    expect(all.value.traces.map((t) => t.traceId).sort()).toEqual(["mt_a", "mt_b", "mt_i", "mt_m", "mt_v"].sort());
+    // minCallCount=2：只剩 mt_a。
+    const filtered = tracesQuery({ filter: {}, minCallCount: 2, limit: 50 });
+    if (filtered.ok !== true) throw new Error("trace query failed");
+    expect(filtered.value.traces.map((t) => t.traceId)).toEqual(["mt_a"]);
+    expect(filtered.value.traces[0].callCount).toBe(3);
+    // minCallCount=1：等价不过滤。
+    const unfiltered = tracesQuery({ filter: {}, minCallCount: 1, limit: 50 });
+    if (unfiltered.ok !== true) throw new Error("trace query failed");
+    expect(unfiltered.value.traces.length).toBe(5);
+    // 非法值 → normalize 400。
+    const invalid = normalizeModelObservabilityTraceQuery({ filter: {}, minCallCount: 0 });
+    expect(invalid.ok).toBe(false);
+    if (invalid.ok === false) expect(invalid.error.code).toBe("invalid_filter");
+    const nonInteger = normalizeModelObservabilityTraceQuery({ filter: {}, minCallCount: 1.5 });
+    expect(nonInteger.ok).toBe(false);
+    // 未知顶层字段仍被闭集拒绝（minCallCount 本身在白名单内）。
+    const unknownField = normalizeModelObservabilityTraceQuery({ filter: {}, minCallCounts: 2 });
+    expect(unknownField.ok).toBe(false);
+    // cursor 与 minCallCount 绑定：缺省查询发的 cursor 在 minCallCount=2 查询下失效。
+    const pagedDefault = tracesQuery({ filter: {}, limit: 2 });
+    if (pagedDefault.ok !== true) throw new Error("trace query failed");
+    expect(pagedDefault.value.nextCursor).toBeTruthy();
+    const tampered = tracesQuery({ filter: {}, minCallCount: 2, limit: 50, cursor: pagedDefault.value.nextCursor });
+    expect(tampered.ok).toBe(false);
+    if (tampered.ok === false) expect(tampered.error.message).toContain("different query");
+    // 自身 cursor 正常续页。
+    const pagedFiltered = tracesQuery({ filter: {}, minCallCount: 2, limit: 1 });
+    if (pagedFiltered.ok !== true) throw new Error("trace query failed");
+    expect(pagedFiltered.value.nextCursor).toBeNull();
+  });
+
   it("trace detail：roots/edges/orphan 诚实 + cycle → degraded 不 crash（§三十/三十一）", () => {
     seedFixture();
     // orphan parent：C4 的 parent 指向不存在的 call。

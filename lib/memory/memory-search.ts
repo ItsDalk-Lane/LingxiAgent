@@ -11,10 +11,48 @@
 import { Type } from "../pi-sdk/index.ts";
 import { t } from "../i18n.ts";
 import { createModuleLogger } from "../debug-log.ts";
+import { rrfFuse } from "./fact-embeddings.ts";
 
 const log = createModuleLogger("memory-search");
 
 const CHANNEL_SESSION_PREFIX = "channel-";
+
+/**
+ * 语义检索状态（details.semantic + 零结果诊断用）。
+ * 禁静默降级：任何跳过语义路径的情形都显式带状态出结果。
+ */
+export type MemorySemanticStatus =
+  | "used"
+  | "unavailable_no_model"
+  | "unavailable_unresolvable"
+  | "skipped_timeout"
+  | "skipped_no_coverage"
+  | "not_configured";
+
+export interface MemoryEmbedQueryResult {
+  status: "ok";
+  vector: number[];
+  modelKey: string;
+}
+
+export type MemoryEmbedQuery =
+  | MemoryEmbedQueryResult
+  | { status: "unavailable"; reason: "no_model" | "unresolvable" }
+  | { status: "timeout" };
+
+function semanticStatusKey(status: MemorySemanticStatus): string {
+  switch (status) {
+    case "unavailable_no_model":
+    case "unavailable_unresolvable":
+      return "error.memorySearchSemanticUnavailable";
+    case "skipped_timeout":
+      return "error.memorySearchSemanticTimeout";
+    case "skipped_no_coverage":
+      return "error.memorySearchSemanticNoCoverage";
+    default:
+      return "";
+  }
+}
 
 /**
  * 会话作用域过滤：频道 phone 会话默认看不到「其它频道」的事实。
@@ -29,6 +67,32 @@ function factVisibleInConversationScope(row, scope, crossChannel) {
   return crossChannel === true;
 }
 
+const ZERO_RESULT_DIAGNOSTIC_MAX_TERMS = 6;
+
+/**
+ * 零结果诊断：把 query 拆词后逐词独立计数，让模型能自己定位
+ * 「哪个词断了」并改写查询重试（借鉴 nuphus 的逐词命中数反馈）。
+ * 只做诊断输出，不影响检索路径本身。
+ */
+function buildZeroResultDiagnostics(factStore, query) {
+  const terms = Array.from(
+    new Set(
+      String(query || "")
+        .split(/\s+/)
+        .map((s) => s.trim())
+        .filter(Boolean),
+    ),
+  ).slice(0, ZERO_RESULT_DIAGNOSTIC_MAX_TERMS);
+  if (terms.length === 0) return null;
+
+  const counts = terms.map((term) => ({
+    term,
+    count: factStore.countFullTextMatches(term),
+  }));
+  const countsText = counts.map(({ term, count }) => `『${term}』${count} 条`).join("、");
+  return { counts, countsText, hasZeroTerm: counts.some((c) => c.count === 0) };
+}
+
 /**
  * 创建 search_memory 工具定义
  * @param {import('./fact-store.ts').FactStore} factStore
@@ -37,6 +101,8 @@ function factVisibleInConversationScope(row, scope, crossChannel) {
  * @param {{kind:"channel", channelId:string}} [opts.conversationScope]
  *   - 会话作用域。频道 phone 会话注入后，默认排除其它频道的事实；
  *     scoped 实例的 schema 额外暴露 cross_channel 参数供显式跨频道检索
+ * @param {(query: string) => Promise<import('./memory-search.ts').MemoryEmbedQuery>} [opts.embedQuery]
+ *   - 语义检索闭包（engine 注入；未传 = 语义路径未接线，行为同旧版）
  * @returns {import('../pi-sdk/index.ts').ToolDefinition}
  */
 export function createMemorySearchTool(factStore, opts: any = {}) {
@@ -101,14 +167,67 @@ export function createMemorySearchTool(factStore, opts: any = {}) {
           }
         }
 
-        // 策略 2：全文搜索补充（标签结果不足 3 条时）
+        // 策略 2：全文 + 语义混合（标签结果不足 3 条时）
+        // 语义路径由 engine 注入的 embedQuery 闭包驱动；未接线/未配置/超时/
+        // 零覆盖时按旧版 FTS 单路走，状态显式进 details（禁静默降级）。
+        let semanticStatus: MemorySemanticStatus = "not_configured";
         if (results.length < 3 && params.query) {
           const ftsResults = factStore.searchFullText(params.query, 10);
-          for (const r of ftsResults) {
-            if (seenIds.has(r.id)) continue;
-            if (!visibleInScope(r)) continue;
-            seenIds.add(r.id);
-            results.push({ ...r, source: "fts" });
+
+          let semanticRows: any[] = [];
+          if (typeof opts.embedQuery === "function") {
+            let embedResult: MemoryEmbedQuery | null = null;
+            try {
+              embedResult = await opts.embedQuery(params.query);
+            } catch {
+              embedResult = { status: "timeout" };
+            }
+            if (embedResult?.status === "ok") {
+              const coverage = factStore.embeddingCoverage(embedResult.modelKey);
+              if (coverage.embedded === 0) {
+                semanticStatus = "skipped_no_coverage";
+              } else {
+                semanticStatus = "used";
+                semanticRows = factStore
+                  .semanticSearch(embedResult.modelKey, embedResult.vector, 15)
+                  .filter((r) => visibleInScope(r));
+              }
+            } else if (embedResult?.status === "unavailable") {
+              semanticStatus = embedResult.reason === "unresolvable"
+                ? "unavailable_unresolvable"
+                : "unavailable_no_model";
+            } else {
+              semanticStatus = "skipped_timeout";
+            }
+          }
+
+          if (semanticRows.length > 0) {
+            // RRF 融合：FTS 与语义两路排名 → 统一顺序；命中两路的标 semantic+fts
+            const ftsById = new Map(ftsResults.filter(visibleInScope).map((r) => [r.id, r]));
+            const semById = new Map(semanticRows.map((r) => [r.id, r]));
+            const fused = rrfFuse([
+              [...ftsById.keys()],
+              [...semById.keys()],
+            ]);
+            for (const [id] of fused) {
+              if (seenIds.has(id)) continue;
+              const fromFts = ftsById.has(id);
+              const fromSem = semById.has(id);
+              const row = fromSem ? semById.get(id) : ftsById.get(id);
+              if (!row) continue;
+              seenIds.add(id);
+              results.push({
+                ...row,
+                source: fromFts && fromSem ? "semantic+fts" : fromSem ? "semantic" : "fts",
+              });
+            }
+          } else {
+            for (const r of ftsResults) {
+              if (seenIds.has(r.id)) continue;
+              if (!visibleInScope(r)) continue;
+              seenIds.add(r.id);
+              results.push({ ...r, source: "fts" });
+            }
           }
         }
 
@@ -126,13 +245,32 @@ export function createMemorySearchTool(factStore, opts: any = {}) {
         log.log(
           `${elapsed.toFixed(0)}ms | ` +
           `hits: ${results.length} (tag: ${results.filter((r) => r.source === "tag").length}, ` +
-          `fts: ${results.filter((r) => r.source === "fts").length})`,
+          `fts: ${results.filter((r) => r.source === "fts").length}, ` +
+          `semantic: ${results.filter((r) => String(r.source).startsWith("semantic")).length}, ` +
+          `path: ${semanticStatus})`,
         );
 
         if (results.length === 0) {
+          const diagnostics = params.query
+            ? buildZeroResultDiagnostics(factStore, params.query)
+            : null;
+          const textParts = [t("error.memorySearchEmpty")];
+          if (diagnostics) {
+            textParts.push(t("error.memorySearchTermCounts", { counts: diagnostics.countsText }));
+            if (diagnostics.hasZeroTerm) {
+              textParts.push(t("error.memorySearchRetryHint"));
+            }
+          }
+          if (semanticStatus !== "used" && semanticStatus !== "not_configured") {
+            // 显式降级标注：语义路径被跳过的原因要让模型知道
+            textParts.push(t(semanticStatusKey(semanticStatus)));
+          }
           return {
-            content: [{ type: "text", text: t("error.memorySearchEmpty") }],
-            details: {},
+            content: [{ type: "text", text: textParts.join("\n") }],
+            details: {
+              ...(diagnostics ? { diagnostics: { terms: diagnostics.counts } } : {}),
+              ...(semanticStatus !== "not_configured" ? { semantic: semanticStatus } : {}),
+            },
           };
         }
 
@@ -145,7 +283,10 @@ export function createMemorySearchTool(factStore, opts: any = {}) {
 
         return {
           content: [{ type: "text", text: lines.join("\n") }],
-          details: { resultCount: results.length },
+          details: {
+            resultCount: results.length,
+            ...(semanticStatus !== "not_configured" ? { semantic: semanticStatus } : {}),
+          },
         };
       } catch (err) {
         return {

@@ -49,7 +49,7 @@ function labelKeyFor(name: string, args?: Record<string, unknown>): string {
 export const BUILTIN_TOOL_NAMES: ReadonlySet<string> = new Set([
   'read', 'write', 'edit', 'grep', 'find', 'ls', 'bash', 'terminal', 'materialize',
   'exec_command', 'write_stdin',
-  'search_memory', 'pin_memory', 'unpin_memory', 'recall_experience', 'record_experience',
+  'search_memory', 'pin_memory', 'unpin_memory', 'recall_experience', 'record_experience', 'tenet_propose',
   'web_search', 'web_fetch', 'todo_write', 'automation', 'stage_files', 'file', 'channel',
   'browser', 'computer', 'install_skill', 'notify', 'stop_task', 'update_settings',
   'session_folders', 'subagent', 'subagent_reply', 'subagent_close', 'workflow',

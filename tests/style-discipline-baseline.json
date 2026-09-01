@@ -30,8 +30,8 @@
     "bare-duration": 0
   },
   "desktop/src/react/components/SessionList.module.css": {
-    "bare-spacing": 31,
-    "hardcoded-color": 9,
+    "bare-spacing": 16,
+    "hardcoded-color": 6,
     "bare-duration": 1
   },
   "desktop/src/react/components/SettingsModalShell.module.css": {
@@ -174,6 +174,11 @@
     "hardcoded-color": 12,
     "bare-duration": 2
   },
+  "desktop/src/react/components/runtime/RuntimeInfoCapsule.module.css": {
+    "bare-spacing": 2,
+    "hardcoded-color": 3,
+    "bare-duration": 0
+  },
   "desktop/src/react/components/selection/SelectionQuoteActionSurface.module.css": {
     "bare-spacing": 2,
     "hardcoded-color": 1,
@@ -210,8 +215,8 @@
     "bare-duration": 0
   },
   "desktop/src/react/mobile/mobile-entry.css": {
-    "bare-spacing": 30,
-    "hardcoded-color": 21,
+    "bare-spacing": 26,
+    "hardcoded-color": 18,
     "bare-duration": 1
   },
   "desktop/src/react/quick-chat/QuickChatApp.module.css": {
@@ -238,6 +243,26 @@
     "bare-spacing": 0,
     "hardcoded-color": 4,
     "bare-duration": 0
+  },
+  "desktop/src/react/settings/tabs/observability/trace-detail/TraceDetailOverlay.module.css": {
+    "bare-spacing": 4,
+    "hardcoded-color": 1,
+    "bare-duration": 0
+  },
+  "desktop/src/react/settings/tabs/observability/trace-detail/TrajectoryTable.module.css": {
+    "bare-spacing": 100,
+    "hardcoded-color": 2,
+    "bare-duration": 11
+  },
+  "desktop/src/react/settings/tabs/observability/trace-detail/TrajectoryTimeline.module.css": {
+    "bare-spacing": 1,
+    "hardcoded-color": 0,
+    "bare-duration": 1
+  },
+  "desktop/src/react/settings/tabs/observability/trace-detail/TrajectoryToolbar.module.css": {
+    "bare-spacing": 11,
+    "hardcoded-color": 0,
+    "bare-duration": 2
   },
   "desktop/src/react/ui/Button.module.css": {
     "bare-spacing": 0,
@@ -290,12 +315,8 @@
     "bare-duration": 0
   },
   "desktop/src/styles.css": {
-    "bare-spacing": 109,
-    "hardcoded-color": 50,
+    "bare-spacing": 107,
+    "hardcoded-color": 45,
     "bare-duration": 2
-  },
-  "desktop/src/react/components/runtime/RuntimeInfoCapsule.module.css": {
-    "bare-spacing": 3,
-    "hardcoded-color": 3
   }
 }

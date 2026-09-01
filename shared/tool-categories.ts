@@ -40,6 +40,7 @@ export const STANDARD_TOOL_NAMES = [
   "channel",
   "record_experience",
   "recall_experience",
+  "tenet_propose",
   "check_pending_tasks",
   "current_status",
   "session_folders",

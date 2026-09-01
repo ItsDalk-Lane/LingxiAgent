@@ -729,7 +729,7 @@ export function createModelObservabilityQueryService({ lingxiHome }: { lingxiHom
         params.push(query.origin);
       }
       if (query.cursor) {
-        const decoded = decodeModelObservabilityTraceCursor(query.cursor, query.filter, query.origin);
+        const decoded = decodeModelObservabilityTraceCursor(query.cursor, query.filter, query.origin, query.minCallCount);
         if (decoded.ok === false) throw new CursorError(decoded.error.message);
         const { lastSeenAt, lastTraceId } = decoded.value;
         if (lastSeenAt === null) {
@@ -754,9 +754,10 @@ export function createModelObservabilityQueryService({ lingxiHome }: { lingxiHom
          JOIN model_calls c ON c.trace_id = t.trace_id
          WHERE ${clauses.join(" AND ")}
          GROUP BY t.trace_id, t.origin, t.first_seen_at, t.last_seen_at
+         ${query.minCallCount !== null ? "HAVING COUNT(c.call_id) >= ?" : ""}
          ORDER BY (t.last_seen_at IS NULL) ASC, t.last_seen_at DESC, t.trace_id DESC
          LIMIT ?`,
-      ).all(...params, query.limit + 1);
+      ).all(...params, ...(query.minCallCount !== null ? [query.minCallCount] : []), query.limit + 1);
 
       const hasMore = rows.length > query.limit;
       const page = hasMore ? rows.slice(0, query.limit) : rows;
@@ -775,9 +776,10 @@ export function createModelObservabilityQueryService({ lingxiHome }: { lingxiHom
       if (hasMore && page.length > 0) {
         const last = page[page.length - 1];
         nextCursor = encodeModelObservabilityTraceCursor(
-          { lastSeenAt: textOrNull(last.last_seen_at), lastTraceId: String(last.trace_id) },
+          { lastSeenAt: textOrNull(last.lastSeenAt), lastTraceId: String(last.trace_id) },
           query.filter,
           query.origin,
+          query.minCallCount,
         );
       }
       return { traces, nextCursor };

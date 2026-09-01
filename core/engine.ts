@@ -188,6 +188,11 @@ function buildToolCatalogManifestSnapshot(catalog, modelContextWindowTokens) {
 import { filterToolObjectsByAvailability } from "./tool-availability.ts";
 import { TaskRegistry } from "../lib/task-registry.ts";
 import { KnowledgeManager } from "../lib/knowledge/knowledge-manager.ts";
+import { KnowledgeEmbeddingProviderGate } from "../lib/knowledge/ingestion-service.ts";
+import {
+  factEmbeddingModelKey,
+  serializeVector,
+} from "../lib/memory/fact-embeddings.ts";
 import type { KnowledgeRetrievalStats } from "../shared/knowledge-refs.ts";
 import {
   assembleKnowledgeEvidenceManifestEntries,
@@ -340,6 +345,9 @@ export class LingxiEngine {
   declare _auxResolver: AuxiliaryModelResolver;
   declare _modelOperationResolver: ModelOperationResolver;
   declare _rerankClient: RerankClient;
+  /** 记忆事实向量回填：每 agent 单飞标记 + 共享供应商限流闸 */
+  declare _memoryBackfillInFlight: Set<string>;
+  declare _memoryEmbeddingGate: KnowledgeEmbeddingProviderGate;
   declare _confirmStore: any;
   declare _coreExtensionFactories: any;
   declare _currentTurnNativeMedia: any;
@@ -2320,6 +2328,160 @@ export class LingxiEngine {
       timeoutMs: 120_000,
       usageContext: this._knowledgeOperationUsageContext("rerank", request.runId),
     });
+  }
+
+  // ── 记忆语义检索（facts.db 向量；模型身份经 memory.embedding_model 显式配置） ──
+
+  _memoryEmbeddingAgent(agentId) {
+    return this._agentMgr?.getAgent?.(agentId) || null;
+  }
+
+  _memoryOperationUsageContext(operation, agentId) {
+    return {
+      source: {
+        subsystem: "memory",
+        operation,
+        surface: "desktop",
+        trigger: "user",
+      },
+      attribution: {
+        kind: "agent",
+        agentId: agentId || this.currentAgentId || null,
+      },
+    };
+  }
+
+  /**
+   * 解析记忆嵌入执行（模型引用来自 agent config memory.embedding_model）。
+   * 未配置 → { status:"unavailable", reason:"no_model" }；
+   * 配置了但模型缺失/缺凭证 → reason:"unresolvable"。
+   */
+  async _resolveMemoryEmbeddingExecution(agentId) {
+    const agent = this._memoryEmbeddingAgent(agentId);
+    const ref = agent?.memoryEmbeddingModelRef || null;
+    if (!ref) return { status: "unavailable", reason: "no_model" };
+    const resolver = new ModelOperationResolver(this._modelOperationResolverDeps(() => ref));
+    let execution = null;
+    try {
+      execution = await resolver.resolveFresh("embedding");
+    } catch (error) {
+      if (error instanceof ModelOperationConfigurationError) {
+        return { status: "unavailable", reason: "unresolvable" };
+      }
+      throw error;
+    }
+    if (!execution) return { status: "unavailable", reason: "unresolvable" };
+    return {
+      status: "ok",
+      ref,
+      execution,
+      modelKey: factEmbeddingModelKey(ref, execution.model?.operationProtocol || ""),
+    };
+  }
+
+  /**
+   * search_memory 查询侧闭包：查询文本 → 向量 + model_key。
+   * 15s 期限（对齐知识库查询侧 KNOWLEDGE_EMBEDDING_DEADLINE_MS 范式）；
+   * 超时/不可用显式返回状态，绝不静默假装没配。
+   */
+  async embedMemoryQuery(agentId, query) {
+    const resolved = await this._resolveMemoryEmbeddingExecution(agentId);
+    if (resolved.status !== "ok") {
+      return { status: "unavailable", reason: resolved.reason };
+    }
+    let response;
+    try {
+      const client = new EmbeddingClient({
+        resolveOperationFresh: async () => resolved.execution,
+        getUsageLedger: () => this._usageLedger,
+      });
+      response = await client.embed({
+        texts: [String(query || "")],
+        timeoutMs: 15_000,
+        dimensions: resolved.execution.model?.dimensions ?? undefined,
+        inputType: "query",
+        usageContext: this._memoryOperationUsageContext("search_memory", agentId),
+      });
+    } catch (error) {
+      if (error?.name === "TimeoutError" || error?.name === "AbortError" || /timeout/i.test(String(error?.message || ""))) {
+        return { status: "timeout" };
+      }
+      throw error;
+    }
+    const vector = Array.isArray(response?.embeddings?.[0])
+      ? response.embeddings[0]
+      : Array.isArray(response?.[0]) ? response[0] : null;
+    if (!vector) return { status: "timeout" };
+    return { status: "ok", vector, modelKey: resolved.modelKey };
+  }
+
+  /**
+   * 记忆事实向量回填：每 agent 单飞，单次批量 ≤64 条、32 条/请求，
+   * KnowledgeEmbeddingProviderGate 限流。失败不抛——留待下轮 ticker 重试
+   * （缺向量期间检索侧自动走 FTS 单路并留痕）。
+   */
+  async backfillMemoryFactEmbeddings(agentId, limit = 64) {
+    const agent = this._memoryEmbeddingAgent(agentId);
+    const factStore = agent?.factStore;
+    if (!agent || !factStore) return { skipped: true, reason: "no_agent_or_store" };
+    if (!this._memoryBackfillInFlight) this._memoryBackfillInFlight = new Set();
+    if (this._memoryBackfillInFlight.has(agentId)) return { skipped: true, reason: "in_flight" };
+    this._memoryBackfillInFlight.add(agentId);
+    try {
+      const resolved = await this._resolveMemoryEmbeddingExecution(agentId);
+      if (resolved.status !== "ok") return { skipped: true, reason: resolved.reason };
+      const { modelKey, execution, ref } = resolved;
+      const pendingFacts = factStore.factsNeedingEmbedding(modelKey, limit);
+      if (pendingFacts.length === 0) {
+        const coverage0 = factStore.embeddingCoverage(modelKey);
+        return { done: true, embedded: 0, remaining: coverage0.total - coverage0.embedded };
+      }
+
+      const client = new EmbeddingClient({
+        resolveOperationFresh: async () => execution,
+        getUsageLedger: () => this._usageLedger,
+      });
+      const gateKey = `${ref.provider}/${ref.id}`;
+      const gate = this._memoryEmbeddingGate
+        || (this._memoryEmbeddingGate = new KnowledgeEmbeddingProviderGate());
+      let embedded = 0;
+      for (let i = 0; i < pendingFacts.length; i += 32) {
+        const batch = pendingFacts.slice(i, i + 32);
+        const vectors = await gate.run(gateKey, async () => {
+          const response = await client.embed({
+            texts: batch.map((f) => (
+              `${f.fact}${f.tags && f.tags.length ? ` ${f.tags.join(" ")}` : ""}`
+            )),
+            timeoutMs: 300_000,
+            dimensions: execution.model?.dimensions ?? undefined,
+            inputType: "document",
+            usageContext: this._memoryOperationUsageContext("fact_backfill", agentId),
+          });
+          return Array.isArray(response?.embeddings) ? response.embeddings : response;
+        });
+        const entries = batch
+          .map((f, idx) => ({ f, vector: vectors?.[idx] }))
+          .filter(({ vector }) => Array.isArray(vector) && vector.length > 0)
+          .map(({ f, vector }) => ({
+            factId: f.id,
+            modelKey,
+            dimensions: vector.length,
+            vector: serializeVector(vector),
+          }));
+        embedded += factStore.upsertFactEmbeddings(entries);
+      }
+      const coverage = factStore.embeddingCoverage(modelKey);
+      return {
+        done: coverage.embedded >= coverage.total,
+        embedded,
+        remaining: coverage.total - coverage.embedded,
+      };
+    } catch (error) {
+      moduleLog.warn(`memory fact embedding backfill failed (agent=${agentId}): ${error?.message || error}`);
+      return { skipped: true, reason: "error", error: String(error?.message || error) };
+    } finally {
+      this._memoryBackfillInFlight.delete(agentId);
+    }
   }
 
   /**

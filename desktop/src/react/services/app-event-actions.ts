@@ -1,4 +1,5 @@
 import { useStore } from '../stores';
+import { useTenetStore } from '../stores/tenet-store';
 import { lingxiFetch } from '../hooks/use-hana-fetch';
 import { applyAgentIdentity, loadAgents } from '../stores/agent-actions';
 import { loadSessions, switchSession } from '../stores/session-actions';
@@ -91,6 +92,11 @@ export function handleAppEvent(type: string, data: any = {}, options: AppEventOp
   switch (type) {
     case 'agent-switched': {
       const myVersion = ++_agentSwitchVersion;
+
+      // 用户原则（tenets）：切换/启动时拉一次待审列表，聊天审批横幅据此出现
+      if (typeof data.agentId === 'string' && data.agentId) {
+        void useTenetStore.getState().refresh(data.agentId);
+      }
 
       applyAgentIdentity({
         agentName: data.agentName,
@@ -252,6 +258,14 @@ export function handleAppEvent(type: string, data: any = {}, options: AppEventOp
     case 'chat-layout-changed':
       applyChatLayout(data.chat ?? data);
       break;
+    case 'tenets-changed': {
+      // 用户原则变更（新提案/审批/增删）：刷新 tenet store，聊天审批横幅与设置页随之更新
+      const tenetAgentId = typeof data.agentId === 'string' && data.agentId ? data.agentId : null;
+      if (tenetAgentId) {
+        void useTenetStore.getState().refresh(tenetAgentId);
+      }
+      break;
+    }
     case 'experiment-changed':
       window.dispatchEvent(new CustomEvent('hana-settings', {
         detail: { type: 'experiment-changed', id: data.id, value: data.value },

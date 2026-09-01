@@ -7137,6 +7137,28 @@ export class SessionCoordinator {
     }
   }
 
+  /**
+   * 按会话文件路径读取该会话冻结的提示词快照与工具名列表（session-meta.json
+   * sidecar；含载荷外置水合）。供「模型观测轨迹详情 → SYSTEM 首记录」等
+   * 只读展示面使用——会话文件与 session-meta 同目录，直接从路径推导。
+   */
+  async readSessionPromptContextByPath(sessionPath: any) {
+    try {
+      const metaPath = path.join(path.dirname(sessionPath), "session-meta.json");
+      const meta = await this._readMetaCached(metaPath);
+      const entry = meta[path.basename(sessionPath)] ?? null;
+      const toolNames = Array.isArray(entry?.toolNames)
+        ? entry.toolNames.filter((name: unknown) => typeof name === "string")
+        : null;
+      return {
+        promptSnapshot: normalizeSessionPromptSnapshot(entry?.promptSnapshot),
+        toolNames,
+      };
+    } catch {
+      return { promptSnapshot: null, toolNames: null };
+    }
+  }
+
   _getFinalSystemPrompt(session: any) {
     if (typeof session?._baseSystemPrompt === "string") {
       return session._baseSystemPrompt;

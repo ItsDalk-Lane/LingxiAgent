@@ -82,6 +82,7 @@ const SUBAGENT_BLOCKED_TOOLS = new Set([
   "pin_memory",
   "unpin_memory",
   "record_experience",
+  "tenet_propose",
   // ③ agent 生命周期 / 对外副作用
   "automation",
   "cron",

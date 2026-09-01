@@ -5064,7 +5064,7 @@ a.about-link:hover {
 
 .pv-cred-conn-icon:hover { color: var(--accent); border-color: var(--accent); }
 .pv-cred-conn-icon.ok { color: var(--success, #5a9); border-color: var(--success, #5a9); }
-.pv-cred-conn-icon.fail { color: var(--danger, #c55); border-color: var(--danger, #c55); }
+.pv-cred-conn-icon.fail { color: var(--danger); border-color: var(--danger); }
 .pv-cred-conn-icon.testing { opacity: 0.5; }
 .pv-cred-conn-icon.spinning svg { animation: hana-spin 0.8s linear infinite; }
 
@@ -5242,7 +5242,7 @@ a.about-link:hover {
 }
 
 .pv-fav-item-edit:hover { color: var(--accent); }
-.pv-fav-item-remove:hover { color: var(--danger, #c55); }
+.pv-fav-item-remove:hover { color: var(--danger); }
 
 /* ── 模型编辑弹出卡片 ── */
 .pv-model-edit-overlay {
@@ -5861,7 +5861,7 @@ a.about-link:hover {
 .pv-delete-btn {
     font-family: inherit;
     font-size: var(--fs-hint);
-    color: var(--danger, #c55);
+    color: var(--danger);
     background: transparent;
     border: 1px solid var(--danger, #c55);
     border-radius: var(--radius-input, 6px);
@@ -9574,4 +9574,46 @@ a.about-link:hover {
     .observability-export-dialog {
         width: 100%;
     }
+}
+
+/* ── 用户原则（tenets）/ 记忆嵌入模型 ── */
+
+.tenets-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-8);
+    flex-wrap: wrap;
+}
+
+.tenets-tag {
+    flex-shrink: 0;
+    font-size: 0.72rem;
+    padding: 0.05rem 0.4rem;
+    border-radius: 999px;
+    background: var(--accent-light);
+    color: var(--accent);
+}
+
+.tenets-content {
+    min-width: 0;
+    flex: 1;
+    word-break: break-word;
+}
+
+.tenets-actions {
+    display: flex;
+    gap: var(--space-4);
+    flex-shrink: 0;
+}
+
+.tenets-error {
+    color: var(--danger);
+}
+
+.tenets-note {
+    opacity: 0.65;
+}
+
+.tenets-input-full {
+    max-width: 100%;
 }

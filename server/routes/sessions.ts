@@ -1360,6 +1360,42 @@ export function createSessionsRoute(engine, hub = null) {
     }
   });
 
+  // 会话冻结的提示词快照 + 工具名列表（session-meta.json sidecar；只读展示面用，
+  // 模型观测轨迹详情的 SYSTEM 首记录在未开启载荷捕获时从这里取系统提示词）。
+  route.get("/sessions/prompt-snapshot", async (c) => {
+    try {
+      const requestContext = createRequestContext(c, engine);
+      const querySessionId = (c.req.query("sessionId") || "").trim();
+      const queryPath = c.req.query("path") || null;
+      let sessionPath: string | null = queryPath;
+      if (querySessionId) {
+        const manifest = engine.getSessionManifest?.(querySessionId) || null;
+        if (!manifest?.currentLocator?.path) {
+          return c.json({ error: "Session manifest not found", code: "session_manifest_not_found" }, 404);
+        }
+        sessionPath = manifest.currentLocator.path;
+      }
+      if (sessionPath && !isValidSessionPath(sessionPath, engine.agentsDir)) {
+        return c.json({ error: "Invalid session path" }, 403);
+      }
+      const auth = authorizeSessionRoute(requestContext, "sessions.read", {
+        kind: "session",
+        studioId: requestContext.studioId,
+        sessionPath: sessionPath || engine.currentSessionPath || null,
+      });
+      if (!auth.allowed) return c.json({ error: "insufficient_scope", reason: auth.reason }, 403);
+      const resolvedSessionPath = sessionPath || engine.currentSessionPath || null;
+      if (!resolvedSessionPath) return c.json({ error: "Session path not resolved" }, 404);
+      const context = await engine.sessionCoordinator.readSessionPromptContextByPath(resolvedSessionPath);
+      return c.json({
+        promptSnapshot: context.promptSnapshot,
+        toolNames: context.toolNames,
+      });
+    } catch (err) {
+      return c.json({ error: err.message }, 500);
+    }
+  });
+
   // 获取 session 的消息（支持 ?path= 指定 session，否则读焦点 session）
   route.get("/sessions/messages", async (c) => {
     try {
@@ -1758,8 +1794,17 @@ export function createSessionsRoute(engine, hub = null) {
                 }
                 projectedOutcome = { ...outcome, details };
               }
+              // 工具计时（dsh 轨迹视图同款「Session timestamps」口径）：
+              // startedAt = 携带 tool_use 的 assistant 条目时间（工具执行前落盘），
+              // endedAt = 对应 toolResult 条目时间（执行后落盘）。
+              const toolResultTimestamp = outcome !== null
+                && Number.isInteger(outcomeSourceIndex)
+                ? sourceMessages[outcomeSourceIndex]?.timestamp
+                : undefined;
               return {
                 ...toolUse,
+                ...(m.timestamp ? { startedAt: m.timestamp } : {}),
+                ...(toolResultTimestamp ? { endedAt: toolResultTimestamp } : {}),
                 ...(projectedOutcome || { status: "unknown", success: false }),
               };
             });
