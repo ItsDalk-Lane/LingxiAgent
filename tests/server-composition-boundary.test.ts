@@ -192,7 +192,9 @@ describe("composition boundary behavior lock: bootstrap contract (no silent non-
       child.stdout.on("data", (chunk) => { stdout += chunk; });
       child.stderr.on("data", (chunk) => { stderr += chunk; });
       const result: any = await new Promise((resolve) => {
-        const timeout = setTimeout(() => { child.kill("SIGKILL"); resolve({ timeout: true }); }, 15000);
+        // 60s：顺序契约（导入不启动）非墙钟 SLA；劣化 CI runner 上 TS 冷转换可超 15s
+        // （2026-08-31 intel 实测假红，套件时长 24m→45m）。
+        const timeout = setTimeout(() => { child.kill("SIGKILL"); resolve({ timeout: true }); }, 60000);
         child.once("close", (code, signal) => { clearTimeout(timeout); resolve({ code, signal }); });
       });
 
@@ -211,7 +213,7 @@ describe("composition boundary behavior lock: bootstrap contract (no silent non-
       // so this rm needs the same Windows handle-latency tolerance as Part 3.
       fs.rmSync(lingxiHome, TEMP_HOME_RM_OPTIONS);
     }
-  }, 20000);
+  }, 90000);
 });
 
 // ---------------------------------------------------------------------------

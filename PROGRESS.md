@@ -10,7 +10,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = ec1850c234f170d0e11266e1218d5f9c26b4c0e6  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-08-31 fix(ci) renderer 上传 glob 修复)
+VERIFIED_SOURCE_SHA   = 37580730e8da02cf10912e6e7333739f0d6ca397  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-09-01 fix(test) spawn 等待预算放宽)
 工作分支              = feature/upstream-sync-0.447.4
 ```
 
@@ -757,6 +757,26 @@ seal 不是一次性终点，而是"当前被验证树"的游标；每次审计�
   order/publish-train）67 用例绿 + seal diff guard 复验后推进。v0.1.32 tag
   按 v0.1.30 先例删旧 draft 后重打（旧 run 33410110948 的 13 个已上传产物
   随 draft 一并废弃重出）。
+- **2026-09-01 迁移 #54：清理 utility_model/utility_large_model 死键**
+  （fix/knowledge-latency-hardening，未提交）：辅助槽排障时实锤——283d9581
+  语义 Slot 重构删了两个旧键的全部读写路径，但存量 preferences.json 里的值
+  一直没清，用户配置里躺着的 gemma4 死键造成「已配置取标题模型」的错觉
+  （title 槽实际读 title_model，未配置回退 chat）。core/migrations.ts 加
+  #54 纯删除迁移（不做值迁移：Slot 回退 chat 已是实际行为，静默映射反而
+  凭空换模型）；migrations.test.ts 以 #54 为 runner 夹具重写（空注册表
+  断言全部更新 + 删除/幂等/全新安装三组行为测试，7 用例）。验证：typecheck
+  ×3 绿、tripwire/cli-closure-census 原样绿（指纹 sourceDigest 不含
+  migrations.ts、closure 只记模块图，均无需重钉）；dev 实例重启实跑
+  _dataVersion 53→54、两键删除、memory_model 等活跃键原样保留。打包版
+  （~/.lingxi）同款死键待携带 #54 的版本升级时自动清理。
+
+- **2026-09-01 fix(test) spawn 等待预算放宽**（功能树 37580730/seal 本提交）：
+  v0.1.32 合入后 main push run 在 macos-intel 连续两轮假红（同树 PR run 绿、
+  本地三文件 30/30 绿、git diff 证实 PR 头与 merge 提交树一致）——三个真实
+  spawn server 测试文件的等待预算（10s/15s/25s）被劣化 runner 上 Node 24
+  冷启动 TS 转换击穿（同窗口套件时长 24m→45m）。测试断言的是顺序契约非
+  墙钟 SLA：spawn 等待统一 60s、用例超时 90s。验证：typecheck×3 绿 +
+  三文件 30/30 绿后推进。
 
 ## 最终状态：已合并（上游同步部分）
 
