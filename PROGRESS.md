@@ -10,7 +10,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = 20a9e9444adb821458848c923c3f4be4a5862dac  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-09-01 记忆系统升级 + 观测轨迹详情页 + 迁移#54 批量提交)
+VERIFIED_SOURCE_SHA   = ea03c6276347391388dbda886d25137e80bfb7de  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-09-02 模型调用统一 + 视频上传闭环 + 工作台继承)
 工作分支              = feature/upstream-sync-0.447.4
 ```
 
@@ -793,6 +793,22 @@ seal 不是一次性终点，而是"当前被验证树"的游标；每次审计�
   指纹（compatible）/closure/inventory/export-manifest 已更新，五语言齐。
   验证：typecheck×3 绿 + eslint 0 error + 全量 npm test 12862 用例通过
   （唯一失败为 post-verification-audit-seal 预期红，旧坐标 37580730 下）后推进。
+
+- **2026-09-02 模型调用统一 + 视频上传闭环 + 工作台继承**（功能树
+  ea03c627/seal 本提交，feat/pending-sep01）：79 files / +2738-1181。
+  ①模型调用统一：来源身份公共契约与解析服务
+  （lib/llm/model-observability-source-identity.ts）、观测 schema v3→v4
+  additive（来源快照不含正文、当前名称增强、轨迹根来源投影）、助手消息与
+  模型调用持久关联（隐藏 custom entry + 历史加载归并 + 编号优先）、调用
+  详情全屏化（载荷自动并行纯文本、技术信息默认收起）、观测持久化全开
+  （旧客户端 false 拒绝、设置页只保留保留天数）。②新建聊天继承当前主
+  工作台。③视频上传闭环：浏览器上传（魔数/大小/数量三段式门禁）+
+  shared/video-mime 重构 + 四类供应商格式交集 + known-models 目录声明。
+  ④样式纪律收口：新增 UI 全部走 token（space/overlay/text/border +
+  类内局部定义行），style-discipline 棘轮零新增（首跑红 4 项 → token 化
+  归零）。指纹/closure/export-manifest 已更新，五语言齐。验证：typecheck×3
+  绿 + 全量 npm test 12895 用例通过（CSS 收口后复跑全绿；首跑仅
+  style-discipline 4 项违例红）后推进。
 
 ## 最终状态：已合并（上游同步部分）
 
