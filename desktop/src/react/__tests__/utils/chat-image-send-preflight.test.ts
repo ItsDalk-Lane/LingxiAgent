@@ -10,7 +10,8 @@ import {
   hasChatVideoAttachments,
   notifyTextModelAudioBlocked,
   notifyTextModelImageFileOnly,
-  notifyTextModelVideoFileOnly,
+  notifyVideoSendBlockedByModel,
+  notifyChatVideoFormatUnsupported,
   evaluateChatVideoSendPreflight,
 } from '../../utils/chat-image-send-preflight';
 
@@ -195,12 +196,12 @@ describe('chat image send preflight', () => {
     });
   });
 
-  it('builds one actionable file-only notice toast for unsupported video sends', () => {
+  it('builds one actionable blocked-send notice toast for unsupported video sends', () => {
     const addToast = vi.fn();
     const openSettings = vi.fn();
     const t = (key: string) => `i18n:${key}`;
 
-    notifyTextModelVideoFileOnly({
+    notifyVideoSendBlockedByModel({
       t,
       addToast,
       openSettings,
@@ -211,7 +212,7 @@ describe('chat image send preflight', () => {
       'warning',
       9000,
       {
-        dedupeKey: 'text-model-video-file-only',
+        dedupeKey: 'video-send-blocked-by-model',
         action: {
           label: 'i18n:input.openModelSettings',
           onClick: expect.any(Function),
@@ -221,6 +222,37 @@ describe('chat image send preflight', () => {
 
     addToast.mock.calls[0][3].action.onClick();
     expect(openSettings).toHaveBeenCalledOnce();
+  });
+
+  it('routes format-unsupported video to the dedicated format toast', async () => {
+    const addToast = vi.fn();
+    const t = (key: string, params?: Record<string, unknown>) =>
+      `i18n:${key}:${String(params?.mime ?? '')}`;
+
+    // 模型支持视频，但 webm 不在该端点（DashScope）格式交集内。
+    await expect(evaluateChatVideoSendPreflight({
+      attachments: [{ path: '/tmp/clip.webm', name: 'clip.webm' }],
+      model: {
+        id: 'qwen3.6-flash',
+        provider: 'qwen-token-plan-cn',
+        api: 'openai-completions',
+        input: ['text', 'image'],
+        compat: { hanaVideoInput: true },
+      },
+    })).resolves.toEqual({
+      ok: false,
+      reason: 'video-format-unsupported',
+      videoInputMode: 'no-native-video',
+      mimeType: 'video/webm',
+    });
+
+    notifyChatVideoFormatUnsupported({ t, addToast, mimeType: 'video/webm' });
+    expect(addToast).toHaveBeenCalledWith(
+      'i18n:error.unsupportedVideoFormat:video/webm',
+      'error',
+      9000,
+      { dedupeKey: 'video-format-unsupported' },
+    );
   });
 
   it('detects only non-directory audio attachments as chat audios', () => {

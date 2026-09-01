@@ -8,7 +8,7 @@ import React from 'react';
 import '../desktop/src/assets.d.ts';
 import { createAssistantMessageEventStream } from '@earendil-works/pi-ai';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
+import { cleanup, render, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
 import { callText } from '../core/llm-client.ts';
 import {
@@ -156,7 +156,7 @@ afterEach(async () => {
 });
 
 describe('Model Observatory 详情纵向链', () => {
-  it('Call Inspector 经真实 HTTP detail 展示调用，并按需加载真实 Payload 正文', async () => {
+  it('Call Inspector 经真实 HTTP detail 展示调用，并自动加载纯文本 Payload 正文', async () => {
     render(
       <ObservabilityCallInspector
         callId={callId}
@@ -167,19 +167,14 @@ describe('Model Observatory 详情纵向链', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText(/phase10-detail-model/)).toBeInTheDocument();
+      expect(screen.getAllByText(/phase10-detail-model/).length).toBeGreaterThan(0);
     });
     expect(requestedPaths).toContain(`/api/model-observability/calls/${callId}`);
 
-    const semanticRequestCard = document.querySelector<HTMLElement>(
-      '[data-kind="semantic_request"].observability-payload-card, [data-kind="semantic_request"]',
-    );
-    expect(semanticRequestCard).not.toBeNull();
-    fireEvent.click(within(semanticRequestCard!).getByText('settings.observability.payload.loadBody'));
-
     await waitFor(() => {
-      expect(semanticRequestCard!.textContent).toContain(USER_INPUT);
+      expect(screen.getAllByText(new RegExp(USER_INPUT)).length).toBeGreaterThan(0);
     });
+    expect(screen.queryByText('settings.observability.payload.loadBody')).toBeNull();
     expect(requestedPaths.some((value) => /\/api\/model-observability\/payloads\/\d+$/.test(value))).toBe(true);
   });
 

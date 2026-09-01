@@ -520,7 +520,7 @@
     "deskContext": "책상 컨텍스트 포함",
     "pastedImage": "붙여넣은 이미지",
     "textModelImageFileOnly": "현재 모델은 이미지를 볼 수 없고 보조 비전도 활성화되어 있지 않습니다. 이미지는 파일로 전송되며 모델은 파일 경로만 볼 수 있고 이미지 내용은 볼 수 없습니다.",
-    "textModelVideoFileOnly": "현재 모델은 비디오를 직접 볼 수 없습니다. 비디오는 파일로 전송되며 모델은 파일 경로만 볼 수 있고 비디오 내용은 볼 수 없습니다.",
+    "textModelVideoFileOnly": "전송이 취소되었어요: 현재 모델은 비디오 입력을 지원하지 않습니다. 비디오를 제거하거나 모델을 변경해 주세요.",
     "textModelAudioBlocked": "현재 모델은 오디오 입력을 지원하지 않아요. 오디오 지원 모델로 전환해 주세요.",
     "imageReadFailedSentAsFile": "이미지 데이터를 읽지 못해 이 이미지는 파일 경로로 전송되었습니다. 모델은 그 내용을 볼 수 없습니다.",
     "videoReadFailed": "비디오를 읽지 못해 메시지를 보내지 않았어요. 다시 첨부해 주세요.",
@@ -2876,7 +2876,7 @@
       "empty": {
         "noResults": "현재 필터 조건에 맞는 호출이 없습니다",
         "noTraces": "현재 필터 조건에 맞는 트레이스가 없습니다",
-        "storeAbsent": "관측 스토리지가 아직 초기화되지 않았습니다. 기록을 활성화하면 새 모델 호출이 여기에 표시됩니다"
+        "storeAbsent": "관측 스토리지가 초기화되지 않았습니다. 실행 상태와 오류 원인을 확인해 주세요"
       },
       "error": {
         "invalid_query": "쿼리 조건이 유효하지 않습니다",
@@ -2996,17 +2996,27 @@
       },
       "inspector": {
         "title": "호출 상세",
-        "ariaLabel": "모델 호출 상세 드로어",
+        "ariaLabel": "모델 호출 상세 페이지",
         "closeAria": "상세 닫기",
         "overview": "개요",
         "attempts": "시도 기록",
-        "pipeline": "페이로드 파이프라인",
+        "pipeline": "모델 입력 및 출력",
+        "technical": "기술 정보",
+        "origin": "원본 소스",
         "traceSection": "소속 트레이스",
         "openTrace": "트레이스 보기에서 열기",
         "parentCall": "부모 호출: {id}",
         "childCalls": "자식 호출({count})",
         "model": "모델",
         "start": "시작 시각",
+        "usage": {
+          "input": "입력",
+          "output": "출력",
+          "cacheRead": "캐시 읽기",
+          "cacheWrite": "캐시 쓰기",
+          "reasoning": "추론",
+          "cost": "비용"
+        },
         "field": {
           "attempts": "시도 횟수",
           "attribution": "귀속",
@@ -3089,7 +3099,7 @@
         "disabledBrowsing": "기록이 꺼져 있지만 기존 데이터는 볼 수 있습니다",
         "persistTraceMetadata": "트레이스 메타데이터 영속화",
         "persistPayloads": "페이로드 본문 영속화",
-        "persistPayloadsHint": "요청/응답 본문의 마스킹된 복사본을 저장해 나중에 감사할 수 있습니다",
+        "persistPayloadsHint": "메타데이터, 모델 본문, 허용된 미디어는 항상 활성화되며 마스킹, 잘라내기, 용량 보호가 적용됩니다",
         "persistBlobs": "미디어 Blob 영속화",
         "persistBlobsHint": "이미지/오디오/비디오 등 바이너리를 저장합니다",
         "persistBlobsRequiresPayloads": "먼저 페이로드 본문 영속화를 활성화하세요",
@@ -3154,8 +3164,8 @@
       },
       "onboarding": {
         "title": "모델 관측",
-        "body": "모든 모델 호출의 트레이스, 사용량, 비용을 기록하여 이 머신에서 언제든 감사할 수 있습니다. 활성화 후에는 메타데이터만 저장되며, 페이로드 본문과 미디어 Blob은 기본적으로 저장되지 않고 기록 설정에서 별도로 켤 수 있습니다. 모든 데이터는 이 머신에만 저장되며 디스크 저장에는 암호학적 암호화가 없고 로컬 파일 권한에 의존합니다.",
-        "enable": "관측 기록 활성화"
+        "body": "모델 호출 메타데이터, 본문 및 대상 미디어는 항상 기록되며 비식별화, 잘림, 용량 보호 및 보존 기간 정리가 적용됩니다. 모든 데이터는 이 머신에만 저장되며 디스크 저장소는 암호학적으로 암호화되지 않고 로컬 파일 권한에 의존합니다.",
+        "enable": "관측 기록은 항상 켜져 있습니다"
       },
       "jsonViewer": {
         "wrap": "자동 줄바꿈",
@@ -3340,6 +3350,21 @@
           "task": "작업",
           "utility": "유틸리티",
           "workflow": "워크플로",
+          "unknown": "알 수 없음"
+        },
+        "sourceKind": {
+          "chat": "채팅",
+          "background_task": "백그라운드 작업",
+          "automation": "자동화",
+          "subagent": "하위 에이전트",
+          "phone": "전화 대화",
+          "media": "미디어 작업",
+          "speech": "음성 작업",
+          "plugin": "플러그인 호출",
+          "provider_probe": "공급자 점검",
+          "health_check": "상태 점검",
+          "memory": "메모리 유지 관리",
+          "diary": "일기",
           "unknown": "알 수 없음"
         },
         "groupByDimension": {
@@ -3540,6 +3565,7 @@
         },
         "systemPromptInitial": "초기 시스템 프롬프트",
         "payloadView": {
+          "copy": "전체 텍스트 복사",
           "more": "더 보기",
           "less": "접기"
         }
@@ -4020,9 +4046,10 @@
     "maxAudios": "오디오는 최대 {max}개까지 가능해요",
     "unsupportedImageFormat": "지원하지 않는 이미지 형식: {mime}",
     "unsupportedVideoFormat": "지원하지 않는 비디오 형식: {mime}",
+    "invalidVideoContent": "비디오 내용이 선언된 형식과 일치하지 않아요. 올바른 MP4, MOV 또는 WebM 파일을 선택해 주세요",
     "unsupportedAudioFormat": "지원하지 않는 오디오 형식: {mime}",
     "imageTooLarge": "이미지 한 장당 20MB를 초과할 수 없어요",
-    "videoTooLarge": "비디오 하나는 20MB를 초과할 수 없어요",
+    "videoTooLarge": "인코딩된 비디오는 20 MiB(원본 약 15 MiB)를 초과할 수 없어요",
     "audioTooLarge": "오디오 하나는 50MB를 초과할 수 없어요",
     "viewImage": "(이미지 보기)",
     "viewVideo": "(비디오 보기)",
@@ -4728,7 +4755,9 @@
     "ariaLabel": "미디어 미리보기",
     "close": "닫기",
     "prev": "이전",
-    "next": "다음"
+    "next": "다음",
+    "videoDecodeError": "이 비디오는 앱에서 재생할 수 없어요: Chromium이 지원하지 않는 코덱일 수 있어요(예: HEVC/H.265).",
+    "openWithSystemPlayer": "시스템 플레이어로 열기"
   },
   "mobile": {
     "startupFailed": "Lingxi 시작에 실패했어요",

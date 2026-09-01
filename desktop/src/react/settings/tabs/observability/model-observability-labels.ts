@@ -8,6 +8,7 @@
  */
 import { t } from '../../helpers';
 import type { ObservabilityFilterChip, ObservabilityMultiFilterKey } from './model-observability-filter';
+import type { ModelObservabilitySourceIdentity } from '../../../../../../shared/model-observability-api-contract.ts';
 
 function valueLabel(group: string, value: string | null | undefined): string {
   if (!value) return '—';
@@ -103,6 +104,23 @@ export function operationLabel(value: string | null | undefined): string {
 
 export function originLabel(value: string | null | undefined): string {
   return valueLabel('origin', value);
+}
+
+export function sourceIdentityKindLabel(value: ModelObservabilitySourceIdentity['kind'] | null | undefined): string {
+  return valueLabel('sourceKind', value);
+}
+
+export function sourceIdentityTitle(identity: ModelObservabilitySourceIdentity | null | undefined): string {
+  if (identity?.title) {
+    if (identity.resolution === 'derived') {
+      const localized = operationLabel(identity.title);
+      return localized === identity.title
+        ? identity.title.replace(/[_-]+/g, ' ').replace(/\s+/g, ' ').trim()
+        : localized;
+    }
+    return identity.title;
+  }
+  return sourceIdentityKindLabel(identity?.kind ?? 'unknown');
 }
 
 export function groupByDimensionLabel(value: string | null | undefined): string {

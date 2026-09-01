@@ -168,6 +168,13 @@ export type ModelObservabilityPersistenceHandle = {
   /** 立即 flush 队列（测试/显式触发；模型热路径永远不调用它等待）。 */
   flushSync(): void;
   runMaintenance(): ModelObservabilityMaintenanceStats | null;
+  /** 保存不含正文的业务来源名称快照。 */
+  upsertSourceIdentitySnapshot(input: {
+    kind: string;
+    entityId: string;
+    title: string | null;
+    updatedAt?: string;
+  }): boolean;
   /**
    * Phase 8（§十四）：接入 Usage Ledger → llm_usage 事件流。幂等（重复调用
    * 先退订旧 consumer）。包含 bounded ledger best-effort backfill（§十五，
@@ -241,6 +248,7 @@ function createDisabledHandle(
     },
     flushSync() { /* disabled：快路径 no-op */ },
     runMaintenance() { return null; },
+    upsertSourceIdentitySnapshot() { return false; },
     initializeAccounting() { return null; },
     async close() { /* disabled：无资源 */ },
     uninstall() { /* 无安装 */ },
@@ -854,6 +862,27 @@ export function installModelObservabilityPersistence({
     },
     runMaintenance() {
       return runMaintenanceInternal();
+    },
+    upsertSourceIdentitySnapshot(input) {
+      if (closed) return false;
+      const kind = typeof input?.kind === "string" ? input.kind.trim().slice(0, 64) : "";
+      const entityId = typeof input?.entityId === "string" ? input.entityId.trim().slice(0, 1024) : "";
+      const title = typeof input?.title === "string" && input.title.trim()
+        ? input.title.trim().slice(0, 512)
+        : null;
+      if (!kind || !entityId) return false;
+      try {
+        db.prepare(
+          `INSERT INTO source_identity_snapshots (kind, entity_id, title, updated_at)
+           VALUES (?, ?, ?, ?)
+           ON CONFLICT(kind, entity_id) DO UPDATE SET
+             title = excluded.title,
+             updated_at = excluded.updated_at`,
+        ).run(kind, entityId, title, input.updatedAt || now());
+        return true;
+      } catch {
+        return false;
+      }
     },
     initializeAccounting,
     async close() {

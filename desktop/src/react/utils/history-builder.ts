@@ -92,6 +92,7 @@ export interface HistoryApiResponse {
     };
     knowledgeRetrieval?: import('../../../../shared/knowledge-refs.ts').KnowledgeRetrievalStats;
     displayText?: string;
+    modelCallRef?: { modelCallId: string; traceId: string | null; parentCallId: string | null };
   }>;
   sessionFiles?: SessionRegistryFile[];
   blocks?: Array<any>;

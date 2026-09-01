@@ -78,7 +78,6 @@ const PROVIDER_MODULES: ProviderModule[] = [
   longcat,
   agnes,
   openaiInputAudio,
-  openaiVideoUrl,
   openrouter,
   anthropic,
   codexResponses,
@@ -272,6 +271,11 @@ function normalizeAudioTransportPayload(payload, model) {
   return payload;
 }
 
+function normalizeVideoTransportPayload(payload, model) {
+  if (!openaiVideoUrl.matches(model)) return payload;
+  return openaiVideoUrl.apply(payload);
+}
+
 function isToolResultMessage(message) {
   return message?.role === "toolResult";
 }
@@ -367,6 +371,11 @@ export function normalizeProviderPayload(payload, model, options = {}) {
   result = normalizeImplicitOutputBudget(result, model, normalizedOptions);
   result = stripNativeMediaAttachmentMarkers(result);
   result = normalizeAudioTransportPayload(result, model);
+  // 视频 transport 改写与音频同理必须中心化：它曾排在 PROVIDER_MODULES 里，
+  // 被自有模块的 first-match-wins 遮蔽（zhipu/kimi 等命中后 video_url 改写
+  // 永远轮不到 → GLM 5.3-Flash 视频以 image_url 发出被 400）。传输层能力
+  // 归传输层，供应商模块只管各自的协议方言。
+  result = normalizeVideoTransportPayload(result, model);
   // 先把 SDK 尚未序列化的 signed thinking block 投影成 wire carrier。
   // 部分 provider 模块随后会把 assistant.content 归一化为字符串。
   result = normalizeReasoningReplayPayload(result, model, normalizedOptions);

@@ -367,6 +367,7 @@
     "lib/llm/model-observability-read-database.ts",
     "lib/llm/model-observability-retention.ts",
     "lib/llm/model-observability-schema.ts",
+    "lib/llm/model-observability-source-identity.ts",
     "lib/llm/model-observability-testing.ts",
     "lib/llm/model-observability-trace-store.ts",
     "lib/llm/model-request-accounting.ts",

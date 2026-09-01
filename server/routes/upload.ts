@@ -35,6 +35,13 @@ import {
   isAllowedUploadAudioMime,
   isChatAudioBase64WithinLimit,
 } from "../../shared/audio-mime.ts";
+import {
+  MAX_CHAT_VIDEO_BASE64_CHARS,
+  extensionFromChatVideoMime,
+  isAllowedChatVideoMime,
+  isChatVideoBytesCompatible,
+  isChatVideoBase64WithinLimit,
+} from "../../shared/video-mime.ts";
 import { registerSessionFileFromRequest, serializeSessionFile } from "../../lib/session-files/session-file-response.ts";
 import { buildSessionFileSourceKey, sessionFilesCacheDir } from "../../lib/session-files/session-file-registry.ts";
 
@@ -68,21 +75,23 @@ const WINDOWS_RESERVED_DEVICE_NAMES = new Set([
 const SESSION_FILE_PRESENTATIONS = new Set(["attachment", "voice-input"]);
 
 function extFromMime(mimeType) {
-  return extensionFromChatImageMime(mimeType) || extensionFromChatAudioMime(mimeType);
+  return extensionFromChatImageMime(mimeType) || extensionFromChatAudioMime(mimeType) || extensionFromChatVideoMime(mimeType);
 }
 
 function isAllowedUploadBlobMime(mimeType) {
-  return isAllowedChatImageMime(mimeType) || isAllowedUploadAudioMime(mimeType);
+  return isAllowedChatImageMime(mimeType) || isAllowedUploadAudioMime(mimeType) || isAllowedChatVideoMime(mimeType);
 }
 
 function isUploadBlobBase64WithinLimit(base64Data, mimeType) {
   if (isAllowedChatImageMime(mimeType)) return isChatImageBase64WithinLimit(base64Data);
   if (isAllowedUploadAudioMime(mimeType)) return isChatAudioBase64WithinLimit(base64Data);
+  if (isAllowedChatVideoMime(mimeType)) return isChatVideoBase64WithinLimit(base64Data);
   return false;
 }
 
 function uploadBlobMaxBase64Chars(mimeType) {
   if (isAllowedUploadAudioMime(mimeType)) return MAX_CHAT_AUDIO_BASE64_CHARS;
+  if (isAllowedChatVideoMime(mimeType)) return MAX_CHAT_VIDEO_BASE64_CHARS;
   return MAX_CHAT_IMAGE_BASE64_CHARS;
 }
 
@@ -156,7 +165,9 @@ function sanitizeFileNameCandidate(value) {
 }
 
 function sanitizeBlobName(name, mimeType) {
-  const fallbackBase = isAllowedChatAudioMime(mimeType) ? "recording" : "pasted";
+  const fallbackBase = isAllowedChatAudioMime(mimeType)
+    ? "recording"
+    : isAllowedChatVideoMime(mimeType) ? "video" : "pasted";
   const fallback = `${fallbackBase}${extFromMime(mimeType) || ".bin"}`;
   if (!name || typeof name !== "string") return fallback;
   // 用户传入的 name 不可信：只保留跨平台 basename，再清理文件系统保留字符。
@@ -463,6 +474,10 @@ export function createUploadRoute(engine) {
         const buf = Buffer.from(base64Data, "base64");
         if (buf.length === 0) {
           results.push({ error: "empty blob" });
+          continue;
+        }
+        if (isAllowedChatVideoMime(mimeType) && !isChatVideoBytesCompatible(buf, mimeType)) {
+          results.push({ error: "video content does not match mimeType" });
           continue;
         }
 

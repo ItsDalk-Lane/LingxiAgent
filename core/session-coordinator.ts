@@ -11,7 +11,10 @@ import path from "path";
 import { createAgentSession, SessionManager, estimateTokens, refreshSessionModelFromRegistry } from "../lib/pi-sdk/index.ts";
 import { registerSessionModelCallContext } from "../lib/pi-sdk/model-call-stream-observer.ts";
 import { runWithModelTraceRoot } from "../lib/llm/model-trace-scope.ts";
-import { modelCallLedgerMetadataForMessage } from "../lib/llm/model-call-correlation.ts";
+import {
+  modelCallLedgerMetadataForMessage,
+  persistModelCallReferenceForMessage,
+} from "../lib/llm/model-call-correlation.ts";
 import { isSessionJsonlFilename } from "../lib/session-jsonl.ts";
 import { createDefaultSettings } from "./session-defaults.ts";
 import { isDefaultWorkspacePath, restoreDefaultWorkspaceIfMissing } from "../shared/default-workspace.ts";
@@ -89,7 +92,9 @@ import {
   modelSupportsAudioInput,
   modelSupportsDirectVideoInput,
   modelSupportsVideoInput,
+  modelSupportsVideoMimeType,
 } from "../shared/model-capabilities.ts";
+import { isChatVideoBase64ContentCompatible } from "../shared/video-mime.ts";
 import {
   normalizeSessionThinkingLevel,
   normalizeThinkingLevelForModel,
@@ -379,6 +384,14 @@ function assertVideoInputSupported(model: any, videos: any) {
   }
   if (!modelSupportsDirectVideoInput(model)) {
     throw new Error("current provider does not support direct video input");
+  }
+  for (const video of videos) {
+    if (!modelSupportsVideoMimeType(model, video?.mimeType)) {
+      throw new Error(`current provider does not support video format ${video?.mimeType || "unknown"}`);
+    }
+    if (!isChatVideoBase64ContentCompatible(video?.data, video?.mimeType)) {
+      throw new Error("video content does not match its declared format");
+    }
   }
 }
 
@@ -2283,6 +2296,9 @@ export class SessionCoordinator {
         && event.message?.role !== "assistant"
       ) {
         schedulePreAssistantSessionManagerFlush(session.sessionManager);
+      }
+      if (event?.type === "message_end" && event.message?.role === "assistant") {
+        persistModelCallReferenceForMessage(session.sessionManager, event.message);
       }
       recordAssistantUsage({
         ledger: this._d.getUsageLedger?.(),
@@ -8333,6 +8349,9 @@ export class SessionCoordinator {
           ? opts.parentSessionId.trim()
           : (parentSessionPath ? this._sessionIdForPath(parentSessionPath) : null);
         const childSessionId = childSessionPath ? this._sessionIdForPath(childSessionPath) : null;
+        if (event?.type === "message_end" && event.message?.role === "assistant") {
+          persistModelCallReferenceForMessage(session.sessionManager, event.message);
+        }
         recordAssistantUsage({
           ledger: this._d.getUsageLedger?.(),
           event,

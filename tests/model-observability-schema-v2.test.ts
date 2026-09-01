@@ -1,6 +1,6 @@
 /**
- * Phase 10.1 Schema v3 测试：
- * fresh v3 / v1→v3 / v2→v3 single-transaction migration + data
+ * Model Observatory Schema v4 测试：
+ * fresh v4 / v1→v4 / v2→v4 single-transaction migration + data
  * preservation / explicit usage correlation column / unknown higher schema /
  * rollback on migration failure / read-only v1+v2 compatibility。
  *
@@ -28,11 +28,15 @@ const MODEL = { provider: "anthropic", modelId: "claude-x", api: "anthropic-mess
 const SOURCE = { subsystem: "llm", operation: "callText", surface: "server", trigger: "user_turn" };
 
 function makeTempHome(): string {
-  return fs.mkdtempSync(path.join(os.tmpdir(), "hana-obs-v3-"));
+  return fs.mkdtempSync(path.join(os.tmpdir(), "hana-obs-v4-"));
 }
 
-/** 把 v3 库还原成 v2 形状（只移除 v3 新列）。 */
+/** 把 v4 库还原成 v2 形状（移除 v3 列和 v4 来源快照表）。 */
 function downgradeToV2(db: any): void {
+  db.exec(`
+    DROP INDEX IF EXISTS idx_source_identity_snapshots_updated;
+    DROP TABLE IF EXISTS source_identity_snapshots;
+  `);
   const columns = db.prepare(`PRAGMA table_info(model_calls)`).all()
     .map((row: any) => row.name);
   if (columns.includes("usage_correlation_state")) {
@@ -41,7 +45,7 @@ function downgradeToV2(db: any): void {
   db.pragma("user_version = 2");
 }
 
-/** 把 v3 库还原成 v1 形状（drop v2/v3 新增对象）。 */
+/** 把 v4 库还原成 v1 形状（drop v2-v4 新增对象）。 */
 function downgradeToV1(db: any): void {
   downgradeToV2(db);
   db.exec(`
@@ -52,7 +56,7 @@ function downgradeToV1(db: any): void {
   db.pragma("user_version = 1");
 }
 
-describe("Model Observability Schema v3", () => {
+describe("Model Observability Schema v4", () => {
   let home: string;
 
   beforeEach(() => {
@@ -62,11 +66,11 @@ describe("Model Observability Schema v3", () => {
     try { fs.rmSync(home, { recursive: true, force: true }); } catch { /* tmp */ }
   });
 
-  it("fresh v3：user_version=3，usage projection 与 explicit correlation 列存在", () => {
+  it("fresh v4：usage projection、explicit correlation 与来源快照表存在", () => {
     const db = openModelObservabilityDatabase(modelObservabilityDbPath(home));
     try {
-      expect(readModelObservabilitySchemaVersion(db)).toBe(3);
-      expect(MODEL_OBSERVABILITY_SCHEMA_VERSION).toBe(3);
+      expect(readModelObservabilitySchemaVersion(db)).toBe(4);
+      expect(MODEL_OBSERVABILITY_SCHEMA_VERSION).toBe(4);
       const table = db.prepare(
         `SELECT 1 FROM sqlite_master WHERE type='table' AND name='model_call_usage'`,
       ).get();
@@ -74,6 +78,9 @@ describe("Model Observability Schema v3", () => {
       const columns = db.prepare(`PRAGMA table_info(model_calls)`).all()
         .map((row: any) => row.name);
       expect(columns).toContain("usage_correlation_state");
+      expect(db.prepare(
+        `SELECT 1 FROM sqlite_master WHERE type='table' AND name='source_identity_snapshots'`,
+      ).get()).not.toBeNull();
       expect(() => db.prepare(
         `INSERT INTO model_calls (call_id, usage_correlation_state) VALUES ('mc_invalid', 'guessed')`,
       ).run()).toThrow();
@@ -82,7 +89,7 @@ describe("Model Observability Schema v3", () => {
     }
   });
 
-  it("v1 → v3 migration：v1 行原样保留，v2 表与 v3 列一次完成", () => {
+  it("v1 → v4 migration：v1 行原样保留，后续表与列一次完成", () => {
     // ① 造真实 v1 数据（Phase 7 生产投影）。
     const seed = openModelObservabilityDatabase(modelObservabilityDbPath(home));
     seed.prepare(
@@ -106,10 +113,10 @@ describe("Model Observability Schema v3", () => {
     expect(v1Table).toBeUndefined();
     readOnly.db.close();
 
-    // ③ write 侧打开 → 同一个 migration transaction 推进到 v3。
+    // ③ write 侧打开 → 同一个 migration transaction 推进到 v4。
     const db = openModelObservabilityDatabase(modelObservabilityDbPath(home));
     try {
-      expect(readModelObservabilitySchemaVersion(db)).toBe(3);
+      expect(readModelObservabilitySchemaVersion(db)).toBe(4);
       const trace = db.prepare(`SELECT * FROM traces WHERE trace_id = 'mt_v1'`).get();
       expect(trace).toMatchObject({ trace_id: "mt_v1", origin: "user_turn" });
       const call = db.prepare(`SELECT * FROM model_calls WHERE call_id = 'mc_v1'`).get();
@@ -127,7 +134,7 @@ describe("Model Observability Schema v3", () => {
     }
   });
 
-  it("v2 只读兼容：可读 accounting，不添加 v3 列，不改 user_version", () => {
+  it("v2 只读兼容：可读 accounting，不添加后续对象，不改 user_version", () => {
     const db = openModelObservabilityDatabase(modelObservabilityDbPath(home));
     db.prepare(
       `INSERT INTO model_calls (call_id, trace_id, terminal_status, persistence_completeness)
@@ -163,7 +170,7 @@ describe("Model Observability Schema v3", () => {
     }
   });
 
-  it("v2 → v3 migration：既有 call/usage 行保留，新列默认 NULL", () => {
+  it("v2 → v4 migration：既有 call/usage 行保留，新列默认 NULL", () => {
     const seed = openModelObservabilityDatabase(modelObservabilityDbPath(home));
     seed.prepare(
       `INSERT INTO model_calls (call_id, trace_id, terminal_status, persistence_completeness)
@@ -178,7 +185,7 @@ describe("Model Observability Schema v3", () => {
 
     const migrated = openModelObservabilityDatabase(modelObservabilityDbPath(home));
     try {
-      expect(readModelObservabilitySchemaVersion(migrated)).toBe(3);
+      expect(readModelObservabilitySchemaVersion(migrated)).toBe(4);
       expect(migrated.prepare(`SELECT * FROM model_calls WHERE call_id = 'mc_v2_preserved'`).get())
         .toMatchObject({ call_id: "mc_v2_preserved", usage_correlation_state: null });
       expect(migrated.prepare(`SELECT total_tokens FROM model_call_usage WHERE model_call_id = 'mc_v2_preserved'`).get())
@@ -188,7 +195,7 @@ describe("Model Observability Schema v3", () => {
     }
   });
 
-  it("v2 → v3 migration failure：单事务 rollback，user_version 和既有数据保持 v2", () => {
+  it("v2 → v4 migration failure：单事务 rollback，user_version 和既有数据保持 v2", () => {
     const db = openModelObservabilityDatabase(modelObservabilityDbPath(home));
     db.prepare(
       `INSERT INTO model_calls (call_id, trace_id, terminal_status, persistence_completeness)
@@ -222,20 +229,20 @@ describe("Model Observability Schema v3", () => {
 
     // 失败没有留下脏状态；后续用真实 adapter 可正常完成迁移。
     const recovered = openModelObservabilityDatabase(modelObservabilityDbPath(home));
-    expect(readModelObservabilitySchemaVersion(recovered)).toBe(3);
+    expect(readModelObservabilitySchemaVersion(recovered)).toBe(4);
     recovered.close();
     expect(fs.existsSync(modelObservabilityDbPath(home))).toBe(true);
   });
 
-  it("unknown higher schema（v4）：write 打开抛 schema_newer，read 侧 unavailable", () => {
+  it("unknown higher schema（v5）：write 打开抛 schema_newer，read 侧 unavailable", () => {
     const db = openModelObservabilityDatabase(modelObservabilityDbPath(home));
-    db.pragma("user_version = 4");
+    db.pragma("user_version = 5");
     db.close();
     expect(() => openModelObservabilityDatabase(modelObservabilityDbPath(home)))
       .toThrowError(ModelObservabilitySchemaError);
     const readOnly = openModelObservabilityReadDatabase(modelObservabilityDbPath(home));
     expect(readOnly.status).toBe("schema_newer");
-    expect(readOnly.schemaVersion).toBe(4);
+    expect(readOnly.schemaVersion).toBe(5);
     expect(readOnly.db).toBeNull();
   });
 

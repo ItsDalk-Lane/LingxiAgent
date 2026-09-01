@@ -2166,21 +2166,11 @@
       "provenance": [
         {
           "root": "server-bootstrap",
-          "from": "core/provider-compat/mimo.ts",
-          "kind": "import-statement"
-        },
-        {
-          "root": "server-bootstrap",
-          "from": "core/provider-compat/qwen.ts",
-          "kind": "import-statement"
-        },
-        {
-          "root": "server-bootstrap",
           "from": "core/provider-compat.ts",
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by core/provider-compat/mimo.ts (import-statement); core/provider-compat/qwen.ts (import-statement); core/provider-compat.ts (import-statement)."
+      "reason": "Reached via esbuild source module graph, imported by core/provider-compat.ts (import-statement)."
     },
     {
       "path": "core/provider-compat/openrouter.ts",
@@ -6836,6 +6826,11 @@
         },
         {
           "root": "server-bootstrap",
+          "from": "core/message-utils.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
           "from": "core/session-coordinator.ts",
           "kind": "import-statement"
         },
@@ -6845,7 +6840,7 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by lib/pi-sdk/model-call-stream-observer.ts (import-statement); core/bridge-session-manager.ts (import-statement); core/session-coordinator.ts (import-statement); +1 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by lib/pi-sdk/model-call-stream-observer.ts (import-statement); core/bridge-session-manager.ts (import-statement); core/message-utils.ts (import-statement); +2 more importer(s)."
     },
     {
       "path": "lib/llm/model-call-identity.ts",
@@ -7281,6 +7276,18 @@
         }
       ],
       "reason": "Reached via esbuild source module graph, imported by lib/llm/model-observability-blob-store.ts (import-statement); lib/llm/model-observability-retention.ts (import-statement); lib/llm/model-observability-persistence.ts (import-statement); +2 more importer(s)."
+    },
+    {
+      "path": "lib/llm/model-observability-source-identity.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "lib/llm/model-observability-query.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by lib/llm/model-observability-query.ts (import-statement)."
     },
     {
       "path": "lib/llm/model-observability-trace-store.ts",
@@ -123517,11 +123524,6 @@
         },
         {
           "root": "server-bootstrap",
-          "from": "core/provider-compat/openai-video-url.ts",
-          "kind": "import-statement"
-        },
-        {
-          "root": "server-bootstrap",
           "from": "core/provider-compat/mimo.ts",
           "kind": "import-statement"
         },
@@ -123533,6 +123535,11 @@
         {
           "root": "server-bootstrap",
           "from": "core/provider-compat/openai-input-audio.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "core/provider-compat/openai-video-url.ts",
           "kind": "import-statement"
         },
         {
@@ -124761,11 +124768,21 @@
       "provenance": [
         {
           "root": "server-bootstrap",
+          "from": "core/session-coordinator.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
           "from": "server/routes/chat.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "server/routes/upload.ts",
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by server/routes/chat.ts (import-statement)."
+      "reason": "Reached via esbuild source module graph, imported by core/session-coordinator.ts (import-statement); server/routes/chat.ts (import-statement); server/routes/upload.ts (import-statement)."
     },
     {
       "path": "shared/workspace-history.ts",
@@ -124950,9 +124967,9 @@
     }
   ],
   "stats": {
-    "totalFiles": 10652,
+    "totalFiles": 10653,
     "byInputType": {
-      "source-graph": 752,
+      "source-graph": 753,
       "runtime-asset": 11,
       "nft-runtime-trace": 9889
     }

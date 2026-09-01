@@ -660,7 +660,7 @@
     ],
     "version": 3
   },
-  "payloadFingerprint": "sha256:335a8763d170a66b4ef7a7ac3ead83d2ccfcec4d045362a88e4938340e968f55",
+  "payloadFingerprint": "sha256:6c61458af2032f36a28a1688c1c2b7920f156914d8a696ff0e4c25787303ea28",
   "registry": [
     {
       "affectedByEpochMigration": true,
@@ -3287,8 +3287,8 @@
   ],
   "review": {
     "classification": "compatible",
-    "compatibilityReason": "session-coordinator 新增只读门面 readSessionPromptContextByPath（读取既有 session-meta.json 提示词快照，无 schema/写入语义变化）+ 新只读路由 GET /api/sessions/prompt-snapshot",
-    "payloadFingerprint": "sha256:335a8763d170a66b4ef7a7ac3ead83d2ccfcec4d045362a88e4938340e968f55"
+    "compatibilityReason": "Model Observatory schema v4 adds a source identity snapshot table without rewriting existing call rows; existing retention and read compatibility remain intact.",
+    "payloadFingerprint": "sha256:6c61458af2032f36a28a1688c1c2b7920f156914d8a696ff0e4c25787303ea28"
   },
   "schemas": [
     {
@@ -3877,7 +3877,7 @@
       "contract": "sessionless upload naming and age-based cleanup protocol",
       "kind": "directory-contract",
       "module": "server/routes/upload.ts",
-      "sourceHash": "sha256:3d812be4b4846b223e6956e814e75128f04da26de0cbd127b070ba288e11336f",
+      "sourceHash": "sha256:32af9515aad9964d922b9a7226a74b1db8e726d86948e9e5e273d018df5fc635",
       "storeId": "legacy-upload-cache"
     },
     {
@@ -4036,6 +4036,12 @@
             "type": "index"
           },
           {
+            "name": "idx_source_identity_snapshots_updated",
+            "sql": "CREATE INDEX idx_source_identity_snapshots_updated ON source_identity_snapshots(updated_at)",
+            "tableName": "source_identity_snapshots",
+            "type": "index"
+          },
+          {
             "name": "idx_traces_last_seen",
             "sql": "CREATE INDEX idx_traces_last_seen ON traces(last_seen_at)",
             "tableName": "traces",
@@ -4084,15 +4090,21 @@
             "type": "table"
           },
           {
+            "name": "source_identity_snapshots",
+            "sql": "CREATE TABLE source_identity_snapshots ( kind TEXT NOT NULL, entity_id TEXT NOT NULL, title TEXT, updated_at TEXT NOT NULL, PRIMARY KEY (kind, entity_id) )",
+            "tableName": "source_identity_snapshots",
+            "type": "table"
+          },
+          {
             "name": "traces",
             "sql": "CREATE TABLE traces ( trace_id TEXT PRIMARY KEY, origin TEXT, first_seen_at TEXT NOT NULL, last_seen_at TEXT NOT NULL, call_count INTEGER NOT NULL DEFAULT 0, created_at TEXT NOT NULL, updated_at TEXT NOT NULL )",
             "tableName": "traces",
             "type": "table"
           }
         ],
-        "userVersion": 3
+        "userVersion": 4
       },
-      "sourceHash": "sha256:fd88815a4f0cc6176aaff3100f6aa68e106abc2472467fc435031cd7f4b2b788",
+      "sourceHash": "sha256:ec7b0dc5ab0c1c27f90df3f33be238fda398196e967e3a35f3269162c3962d2a",
       "storeId": "model-observability-db"
     },
     {
@@ -4211,7 +4223,7 @@
         {
           "contract": "core/session-coordinator.ts Hana metadata extensions",
           "module": "core/session-coordinator.ts",
-          "sourceHash": "sha256:a2e06c2c93b540c522af2810ebdcd1188fc378cb448a7508f066aed5608e5eb0"
+          "sourceHash": "sha256:ba0e917497712b45c04c392161595e9a40f152a8dcb2c150113359ed5e8440ac"
         },
         {
           "contract": "core/session-jsonl-file.ts repair contract",
@@ -4309,7 +4321,7 @@
       "contract": "bridge index, legacy session metadata, title, and vision sidecar readers",
       "kind": "runtime-contract",
       "module": "core/bridge-session-manager.ts",
-      "sourceHash": "sha256:3da441d6a8ec19fa7b2d0aaa4789969f7d0fa42cce44c5def7a868eea3d90de2",
+      "sourceHash": "sha256:845eeb30490e7f6caa06c80218311ef5cbd99df2359bd76387a1423f4066cbb4",
       "storeId": "session-sidecars"
     },
     {
@@ -4365,7 +4377,7 @@
       "contract": "PreferencesManager defaults, coercion, and _dataVersion migration driver",
       "kind": "runtime-contract",
       "module": "core/preferences-manager.ts",
-      "sourceHash": "sha256:24f6a1238c655e9d12914ef020e7eca515dfa937985969ae396798319a700321",
+      "sourceHash": "sha256:39e890768ba7df9fa210a987675ec6d55b072915007e4c9a1043954da4cb4723",
       "storeId": "user-preferences"
     },
     {

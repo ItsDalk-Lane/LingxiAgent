@@ -25,6 +25,7 @@ import { isAssistantCommentaryTextBlock } from "../shared/text-signature.ts";
 import { TOOL_ARG_SUMMARY_KEYS, summarizeToolArgs } from "../shared/tool-arg-summary.ts";
 import { projectSessionMessageForDisplay } from "./session-reminders.ts";
 import { isKnownLegacyLingxiToolFailure } from "../shared/tool-outcome.ts";
+import { MODEL_CALL_REFERENCE_RECORD_TYPE } from "../lib/llm/model-call-correlation.ts";
 export { TOOL_ARG_SUMMARY_KEYS };
 
 const SESSION_TAIL_READ_THRESHOLD = 256 * 1024;
@@ -198,6 +199,7 @@ function historyMessageFromEntry(entry) {
       || entry.customType === AGENT_REVIEW_RECORD_TYPE
       || entry.customType === MESSAGE_PRESENTATION_RECORD_TYPE
       || entry.customType === SESSION_COLLAB_DECISION_RECORD_TYPE
+      || entry.customType === MODEL_CALL_REFERENCE_RECORD_TYPE
     )
   ) {
     const message: Record<string, any> = {
@@ -211,6 +213,33 @@ function historyMessageFromEntry(entry) {
     return message;
   }
   return null;
+}
+
+/** 隐藏关联条目只注释其后第一条助手消息，且自身永不进入展示或模型上下文。 */
+export function collectModelCallReferencesBySourceIndex(messages) {
+  const result = new Map();
+  let pending = null;
+  for (let index = 0; index < (messages || []).length; index += 1) {
+    const message = messages[index];
+    if (message?.role === "custom" && message.customType === MODEL_CALL_REFERENCE_RECORD_TYPE) {
+      const data = message.data;
+      pending = data?.schemaVersion === 1 && typeof data?.modelCallId === "string" && data.modelCallId
+        ? {
+            modelCallId: data.modelCallId,
+            traceId: typeof data.traceId === "string" ? data.traceId : null,
+            parentCallId: typeof data.parentCallId === "string" ? data.parentCallId : null,
+          }
+        : null;
+      continue;
+    }
+    if (message?.role === "assistant") {
+      if (pending) result.set(index, pending);
+      pending = null;
+      continue;
+    }
+    if (message?.role === "user") pending = null;
+  }
+  return result;
 }
 
 /** origin custom 条目注释其后第一条 user 消息（契约见 desktop-session-submit recordMessageOriginEntry）。返回过滤掉 origin 条目的新数组。 */

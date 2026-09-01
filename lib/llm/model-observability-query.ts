@@ -21,6 +21,7 @@ import fs from "fs";
 import { modelObservabilityDbPath } from "./model-observability-schema.ts";
 import { resolveExistingModelObservabilityBlobPath } from "./model-observability-blob-store.ts";
 import { openModelObservabilityReadDatabase } from "./model-observability-read-database.ts";
+import { resolveModelObservabilitySourceIdentity } from "./model-observability-source-identity.ts";
 import { MODEL_OBSERVABILITY_BLOB_ID_PATTERN } from "../../shared/model-observability-api-contract.ts";
 import {
   decodeModelObservabilityCallCursor,
@@ -630,6 +631,7 @@ export function createModelObservabilityQueryService({ lingxiHome }: { lingxiHom
         modelId: textOrNull(row.model_id),
         api: textOrNull(row.api),
       },
+      sourceIdentity: resolveModelObservabilitySourceIdentity(reader.db, row),
       source: {
         subsystem: textOrNull(row.subsystem),
         operation: textOrNull(row.operation),
@@ -761,9 +763,30 @@ export function createModelObservabilityQueryService({ lingxiHome }: { lingxiHom
 
       const hasMore = rows.length > query.limit;
       const page = hasMore ? rows.slice(0, query.limit) : rows;
+      const traceIds = page.map((row) => String(row.trace_id));
+      const rootByTrace = new Map<string, Record<string, unknown>>();
+      if (traceIds.length > 0) {
+        const rootRows: Array<Record<string, unknown>> = reader.db.prepare(
+          `SELECT * FROM model_calls
+           WHERE trace_id IN (${traceIds.map(() => "?").join(",")})
+           ORDER BY trace_id,
+             CASE WHEN parent_call_id IS NULL OR parent_call_id = '' THEN 0 ELSE 1 END,
+             CASE WHEN started_at IS NULL OR started_at = '' THEN 1 ELSE 0 END,
+             started_at,
+             call_id`,
+        ).all(...traceIds);
+        for (const rootRow of rootRows) {
+          const traceId = String(rootRow.trace_id ?? "");
+          if (!rootByTrace.has(traceId)) rootByTrace.set(traceId, rootRow);
+        }
+      }
       const traces: ModelObservabilityTraceListItem[] = page.map((row) => ({
         traceId: String(row.trace_id),
         origin: textOrNull(row.origin),
+        sourceIdentity: resolveModelObservabilitySourceIdentity(
+          reader.db,
+          rootByTrace.get(String(row.trace_id)) ?? row,
+        ),
         firstSeenAt: String(row.first_seen_at ?? ""),
         lastSeenAt: String(row.last_seen_at ?? ""),
         callCount: Number(row.call_count ?? 0),
@@ -1363,6 +1386,10 @@ export function createModelObservabilityQueryService({ lingxiHome }: { lingxiHom
           terminalError: counts.error,
           terminalAborted: counts.aborted,
           incomplete: counts.incomplete,
+          sourceIdentity: resolveModelObservabilitySourceIdentity(
+            reader.db,
+            callRows.find((row) => !textOrNull(row.parent_call_id)) ?? callRows[0] ?? traceRow ?? {},
+          ),
         },
         calls,
         roots,

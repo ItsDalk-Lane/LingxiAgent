@@ -825,6 +825,12 @@ export class LingxiEngine {
       persistencePath: path.join(this.lingxiHome, ".ephemeral", "plugin-tasks.json"),
       getSessionIdForPath: (sessionPath) => this.getSessionIdForPath(sessionPath),
     });
+    // v4 来源名称有界回填：延后到构造完成后执行，不阻塞启动，也不读取消息正文。
+    setImmediate(() => {
+      void this.refreshModelObservabilitySourceSnapshots().catch((error) => {
+        moduleLog.warn(`model observability source snapshot backfill failed: ${error?.message ?? error}`);
+      });
+    }).unref?.();
 
     // subagent AbortController 存储（engine 级别，跨 agent 共享）
     this._subagentControllers = new Map();
@@ -976,7 +982,7 @@ export class LingxiEngine {
    * Phase 8 §五十四：安装 observability persistence。优先级：CompositionRoot
    * 显式 option（enabled=true，测试/dev wiring）> 已保存用户 preference
    * （preferences.json model_observability，canonical normalizer 单一来源）。
-   * 默认 disabled；打开失败 → disabled handle，主程序不受影响。
+   * 产品偏好固定全开；打开失败 → disabled handle，主程序不受影响并诚实暴露原因。
    */
   _installModelObservability(explicitOption) {
     this._modelObservability = null;
@@ -985,6 +991,12 @@ export class LingxiEngine {
       policy = explicitOption;
     } else if (this._prefs?.getModelObservability) {
       const preference = this._prefs.getModelObservability();
+      // 启动即把旧版关闭值写回为全开；只改开关，用户已有保留天数由 normalizer 原样带回。
+      try {
+        this._prefs.setModelObservability?.(preference);
+      } catch (error) {
+        moduleLog.warn(`model observability preference migration failed: ${error?.message ?? error}`);
+      }
       if (preference.enabled) policy = modelObservabilityPreferenceToPolicy(preference);
     }
     if (!policy) {
@@ -1037,6 +1049,164 @@ export class LingxiEngine {
     return this._modelObservabilityQuery;
   }
 
+  _recordModelObservabilitySourceSnapshot(kind, entityId, title) {
+    if (!kind || !entityId) return false;
+    return this._modelObservability?.upsertSourceIdentitySnapshot?.({
+      kind,
+      entityId,
+      title: typeof title === "string" && title.trim() ? title.trim() : null,
+    }) === true;
+  }
+
+  /**
+   * 把仍存在的会话和任务名称同步进 v4 快照。只读取列表摘要，数量有界，
+   * 不读取完整消息正文；实体后来删除时，查询层仍能使用最后快照。
+   */
+  async refreshModelObservabilitySourceSnapshots() {
+    if (!this._modelObservability?.upsertSourceIdentitySnapshot) return { sessions: 0, tasks: 0 };
+    const sessions = (await this.listSessions({ includePluginPrivate: true })).slice(0, 5000);
+    const sessionIdByPath = new Map();
+    let sessionCount = 0;
+    for (const session of sessions) {
+      const title = typeof session?.title === "string" && session.title.trim()
+        ? session.title.trim()
+        : typeof session?.firstMessage === "string" && session.firstMessage.trim()
+          ? session.firstMessage.trim().replace(/\s+/g, " ").slice(0, 80)
+          : null;
+      const ids = new Set([session?.sessionId, session?.path].filter(Boolean));
+      if (session?.path && session?.sessionId) sessionIdByPath.set(session.path, session.sessionId);
+      for (const entityId of ids) {
+        if (this._recordModelObservabilitySourceSnapshot("chat", entityId, title)) sessionCount += 1;
+      }
+    }
+    // 自动化调用历史上常只带隔离会话路径；桌面活动账本保存了这条路径与业务摘要。
+    let activityCount = 0;
+    let taskCount = 0;
+    for (const [agentId] of this._agentMgr.agents) {
+      if (activityCount >= 5000) break;
+      const activities = this.getActivityStore(agentId)?.list?.() ?? [];
+      for (const activity of activities) {
+        if (activityCount >= 5000) break;
+        const rawTitle = [activity?.label, activity?.summary, activity?.type]
+          .find((value) => typeof value === "string" && value.trim());
+        const title = typeof rawTitle === "string"
+          ? rawTitle.trim().replace(/\s+/g, " ").slice(0, 160)
+          : null;
+        const sessionPath = activity?.sessionFile
+          ? path.join(this.agentsDir, agentId, "activity", activity.sessionFile)
+          : null;
+        const ids = new Set([
+          activity?.id,
+          sessionPath,
+          sessionPath ? sessionIdByPath.get(sessionPath) : null,
+        ].filter(Boolean));
+        for (const entityId of ids) {
+          if (this._recordModelObservabilitySourceSnapshot("automation", entityId, title)) taskCount += 1;
+        }
+        activityCount += 1;
+      }
+    }
+    const tasks = this._taskRegistry?.listAll?.({})?.slice?.(0, 5000) ?? [];
+    for (const task of tasks) {
+      const meta = task?.meta && typeof task.meta === "object" ? task.meta : {};
+      const title = [meta.label, meta.name, meta.title, meta.summary]
+        .find((value) => typeof value === "string" && value.trim());
+      const kind = task?.type === "subagent"
+        ? "subagent"
+        : /automation|cron|schedule|heartbeat/.test(String(task?.type || ""))
+          ? "automation"
+          : "background_task";
+      if (task?.taskId && this._recordModelObservabilitySourceSnapshot(
+        kind,
+        task.taskId,
+        typeof title === "string" ? title.trim().replace(/\s+/g, " ").slice(0, 160) : task.type,
+      )) taskCount += 1;
+    }
+    for (const schedule of this._taskRegistry?.listSchedules?.({})?.slice?.(0, 5000) ?? []) {
+      const meta = schedule?.meta && typeof schedule.meta === "object" ? schedule.meta : {};
+      const rawTitle = [meta.label, meta.name, meta.title, meta.summary, schedule?.type]
+        .find((value) => typeof value === "string" && value.trim());
+      if (schedule?.scheduleId && this._recordModelObservabilitySourceSnapshot(
+        "automation",
+        schedule.scheduleId,
+        typeof rawTitle === "string" ? rawTitle.trim().replace(/\s+/g, " ").slice(0, 160) : null,
+      )) taskCount += 1;
+    }
+    this._modelObservabilityQuery?.invalidate?.();
+    return { sessions: sessionCount, tasks: taskCount };
+  }
+
+  /** 当前实体名称优先于快照；返回值只改显示投影，不碰原始来源字段。 */
+  async enrichModelObservabilitySources(value) {
+    const sessions = (await this.listSessions({ includePluginPrivate: true })).slice(0, 5000);
+    const current = new Map();
+    const sessionIdByPath = new Map();
+    for (const session of sessions) {
+      const title = typeof session?.title === "string" && session.title.trim()
+        ? session.title.trim()
+        : typeof session?.firstMessage === "string" && session.firstMessage.trim()
+          ? session.firstMessage.trim().replace(/\s+/g, " ").slice(0, 80)
+          : null;
+      for (const id of [session?.sessionId, session?.path]) {
+        if (id && title) current.set(`chat\0${id}`, title);
+      }
+      if (session?.path && session?.sessionId) sessionIdByPath.set(session.path, session.sessionId);
+    }
+    let activityCount = 0;
+    for (const [agentId] of this._agentMgr.agents) {
+      if (activityCount >= 5000) break;
+      for (const activity of this.getActivityStore(agentId)?.list?.() ?? []) {
+        if (activityCount >= 5000) break;
+        const rawTitle = [activity?.label, activity?.summary, activity?.type]
+          .find((candidate) => typeof candidate === "string" && candidate.trim());
+        const title = typeof rawTitle === "string"
+          ? rawTitle.trim().replace(/\s+/g, " ").slice(0, 160)
+          : null;
+        const sessionPath = activity?.sessionFile
+          ? path.join(this.agentsDir, agentId, "activity", activity.sessionFile)
+          : null;
+        for (const id of [activity?.id, sessionPath, sessionPath ? sessionIdByPath.get(sessionPath) : null]) {
+          if (id && title) current.set(`automation\0${id}`, title);
+        }
+        activityCount += 1;
+      }
+    }
+    for (const task of this._taskRegistry?.listAll?.({})?.slice?.(0, 5000) ?? []) {
+      const meta = task?.meta && typeof task.meta === "object" ? task.meta : {};
+      const rawTitle = [meta.label, meta.name, meta.title, meta.summary]
+        .find((candidate) => typeof candidate === "string" && candidate.trim());
+      const title = typeof rawTitle === "string"
+        ? rawTitle.trim().replace(/\s+/g, " ").slice(0, 160)
+        : task?.type || null;
+      for (const kind of ["background_task", "automation", "subagent"]) {
+        if (task?.taskId && title) current.set(`${kind}\0${task.taskId}`, title);
+      }
+    }
+    for (const schedule of this._taskRegistry?.listSchedules?.({})?.slice?.(0, 5000) ?? []) {
+      const meta = schedule?.meta && typeof schedule.meta === "object" ? schedule.meta : {};
+      const rawTitle = [meta.label, meta.name, meta.title, meta.summary, schedule?.type]
+        .find((candidate) => typeof candidate === "string" && candidate.trim());
+      if (schedule?.scheduleId && typeof rawTitle === "string") {
+        current.set(`automation\0${schedule.scheduleId}`, rawTitle.trim().replace(/\s+/g, " ").slice(0, 160));
+      }
+    }
+    const visit = (node) => {
+      if (!node || typeof node !== "object") return;
+      const identity = node.sourceIdentity;
+      if (identity?.entityId && identity?.kind) {
+        const title = current.get(`${identity.kind}\0${identity.entityId}`);
+        if (title) {
+          identity.title = title;
+          identity.resolution = "current";
+          this._recordModelObservabilitySourceSnapshot(identity.kind, identity.entityId, title);
+        }
+      }
+      for (const child of Array.isArray(node) ? node : Object.values(node)) visit(child);
+    };
+    visit(value);
+    return value;
+  }
+
   /**
    * Phase 8 §五十八/五十九：settings 读取。desired（用户偏好）与 effective
    * （运行态，含 schema_newer 等 disable 原因）是两个概念，分开返回。
@@ -1062,7 +1232,7 @@ export class LingxiEngine {
   }
 
   /**
-   * Phase 8 §五十七/五十九：运行中 enable/disable/reconfigure。
+   * 运行中只允许调整保留期并重配 persistence generation。
    * 顺序：normalize → persist desired preference → 旧 generation 退出全局入口并
    * 排水 → install 新 generation（不删除历史数据，§六十）→ invalidate query
    * reader → 返回 desired + effective。设置变化只影响新开始的调用。
@@ -2058,7 +2228,12 @@ export class LingxiEngine {
     return { sessionPath, projectId: normalizedProjectId };
   }
   async listArchivedSessions() { return this._sessionCoord.listArchivedSessions(); }
-  async saveSessionTitle(p, t) { return this._sessionCoord.saveSessionTitle(p, t); }
+  async saveSessionTitle(p, t) {
+    const result = await this._sessionCoord.saveSessionTitle(p, t);
+    this._recordModelObservabilitySourceSnapshot("chat", this.getSessionIdForPath(p) || p, t);
+    if (this.getSessionIdForPath(p)) this._recordModelObservabilitySourceSnapshot("chat", p, t);
+    return result;
+  }
   async clearSessionTitle(p) { return this._sessionCoord.clearSessionTitle(p); }
   async setSessionPinned(p, pinned) { return this._sessionCoord.setSessionPinned(p, pinned); }
   async setSessionPinOrder(orderedRefs) { return this._sessionCoord.setSessionPinOrder(orderedRefs); }

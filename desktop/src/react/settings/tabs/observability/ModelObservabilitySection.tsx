@@ -2,7 +2,7 @@
  * ModelObservabilitySection.tsx — Model Observatory 页面编排（Phase 9）。
  *
  * 职责：health/settings bootstrap、录制状态条（低噪声，§九十六）、
- * onboarding 空态（§九十八）、aggregate 唯一查询点（Metrics/Groups 共享，
+ * honest absent/degraded 状态、aggregate 唯一查询点（Metrics/Groups 共享，
  * §十四）、Inspector/TraceExplorer/Settings/Export 的挂载与导航联动。
  *
  * 纪律：
@@ -28,7 +28,6 @@ import {
   loadObservabilitySettings,
   ModelObservabilityRequestError,
   queryObservabilityAggregate,
-  updateObservabilitySettings,
 } from './model-observability-actions';
 import {
   buildCallFilterInput,
@@ -131,29 +130,6 @@ export function ModelObservabilitySection() {
       .finally(() => setRefreshing(false));
   }, [reloadControlPlane]);
 
-  /* ── onboarding：store absent + disabled（§九十八）───────────────────── */
-  const [enabling, setEnabling] = useState(false);
-  const [enableError, setEnableError] = useState<string | null>(null);
-  const enableObservability = useCallback(() => {
-    setEnabling(true);
-    setEnableError(null);
-    // §九十九 安全默认：只开 trace metadata；payload/blob 必须另行显式 opt-in。
-    updateObservabilitySettings({
-      enabled: true,
-      persistTraceMetadata: true,
-      persistPayloads: false,
-      persistBlobs: false,
-    }).then(() => reloadControlPlane())
-      .then(() => setRefreshToken((token) => token + 1))
-      .catch((error: unknown) => {
-        setEnableError(error instanceof Error ? error.message : String(error));
-      })
-      .finally(() => setEnabling(false));
-  }, [reloadControlPlane]);
-
-  const storeAbsent = health?.query.queryStatus === 'absent' || aggregateError === 'not_initialized';
-  const recordingEnabled = settings?.desired.enabled === true;
-
   /* ── 导航联动：Inspector ↔ TraceExplorer ─────────────────────────────── */
   const handleSelectCall = useCallback((callId: string) => {
     queryState.selectCall(callId);
@@ -193,32 +169,6 @@ export function ModelObservabilitySection() {
     );
   }
 
-  if (health && !recordingEnabled && storeAbsent) {
-    // §九十八：从未启用 + 无 store → onboarding（不是报错）。
-    return (
-      <div className={styles['observability-onboarding']}>
-        <div className={styles['observability-onboarding-title']}>
-          {t('settings.observability.onboarding.title')}
-        </div>
-        <div className={styles['observability-onboarding-body']}>
-          {t('settings.observability.onboarding.body')}
-        </div>
-        {enableError && (
-          <div className={styles['observability-error-detail']} role="alert">{enableError}</div>
-        )}
-        <button
-          type="button"
-          className={styles['observability-onboarding-enable']}
-          disabled={enabling || !isLocalOwner}
-          title={!isLocalOwner ? t('settings.observability.recording.localOnlyHint') : undefined}
-          onClick={enableObservability}
-        >
-          {t('settings.observability.onboarding.enable')}
-        </button>
-      </div>
-    );
-  }
-
   return (
     <div className={styles['observability-root']}>
       {/* 录制状态条（低噪声，§九十六；desired vs effective 分开，§一百） */}
@@ -234,11 +184,6 @@ export function ModelObservabilitySection() {
             && (health.recordingStatus === 'disabled' || health.recordingStatus === 'closed') && (
             <span className={styles['observability-recording-reason']}>
               {t('settings.observability.recording.configuredButInactive')}
-            </span>
-          )}
-          {!recordingEnabled && (
-            <span className={styles['observability-recording-reason']}>
-              {t('settings.observability.recording.disabledBrowsing')}
             </span>
           )}
         </div>

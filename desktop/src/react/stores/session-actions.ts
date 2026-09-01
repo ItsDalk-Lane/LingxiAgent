@@ -1183,9 +1183,29 @@ export async function createNewSession(options: CreateNewSessionOptions = {}): P
   const primaryAgent = findPrimaryAgent(s.agents);
   const primaryWorkspace = resolveAgentWorkspace(primaryAgent);
   const requestedFolder = typeof options.cwd === 'string' && options.cwd.trim() ? options.cwd.trim() : null;
-  const defaultWorkspaceMountId = null;
-  const defaultWorkspaceLabel = null;
-  const defaultFolder = requestedFolder || primaryWorkspace || (!primaryAgent ? s.homeFolder : null) || null;
+  // 清空会话身份前先冻结当前会话的主工作台。显式 cwd 仍拥有最高优先级；
+  // 只继承主工作台，不带额外授权目录、附件或桌面子目录位置。
+  const currentProjection = sessionByIdentityOrPath(
+    s as Record<string, any>,
+    normalizeSessionId(s.currentSessionId),
+    typeof s.currentSessionPath === 'string' ? s.currentSessionPath : null,
+  );
+  const inheritedMountId = requestedFolder ? null : normalizeSessionId(currentProjection?.workspaceMountId);
+  const defaultWorkspaceMountId = inheritedMountId;
+  const defaultWorkspaceLabel = inheritedMountId
+    ? (typeof currentProjection?.workspaceLabel === 'string' ? currentProjection.workspaceLabel : null)
+    : null;
+  const inheritedLocalFolder = !requestedFolder && !inheritedMountId
+    && typeof currentProjection?.cwd === 'string' && currentProjection.cwd.trim()
+    ? currentProjection.cwd.trim()
+    : null;
+  const defaultFolder = requestedFolder
+    || inheritedLocalFolder
+    || (!currentProjection ? primaryWorkspace || (!primaryAgent ? s.homeFolder : null) : null)
+    || null;
+  const deskFolder = inheritedMountId && typeof currentProjection?.cwd === 'string'
+    ? currentProjection.cwd
+    : defaultFolder;
   const selectedPrimaryAgentId = primaryAgent && primaryAgent.id !== s.currentAgentId
     ? primaryAgent.id
     : null;
@@ -1198,8 +1218,8 @@ export async function createNewSession(options: CreateNewSessionOptions = {}): P
     currentSessionPath: null,
     currentSessionId: null,
     pendingSessionSwitchPath: null,
-    // 全局新建始终回到 Primary Agent。显式项目 cwd 只覆盖本次工作目录；
-    // 普通新建使用 Primary Agent 的有效工作区（显式 home 或服务端默认工作区）。
+    // 全局新建仍回到 Primary Agent；工作台则优先使用显式目录，其次继承当前会话的主工作台，
+    // 只有没有当前会话时才使用 Primary Agent 默认工作台。
     selectedFolder: defaultFolder,
     selectedWorkspaceMountId: defaultWorkspaceMountId,
     selectedWorkspaceLabel: defaultWorkspaceLabel,
@@ -1212,9 +1232,12 @@ export async function createNewSession(options: CreateNewSessionOptions = {}): P
     attachedFiles: [],
     deskContextAttached: false,
     docContextAttached: false,
+    deskCurrentPath: '',
+    deskFiles: [],
+    deskJianContent: null,
   });
 
-  await activateWorkspaceDesk(defaultFolder, {
+  await activateWorkspaceDesk(deskFolder, {
     mountId: defaultWorkspaceMountId,
     label: defaultWorkspaceLabel,
   });

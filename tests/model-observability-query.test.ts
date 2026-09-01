@@ -553,6 +553,47 @@ describe("Model Observability Unified Query", () => {
     expect(cyclic.value.calls).toHaveLength(3);
   });
 
+  it("轨迹列表使用因果根来源，子调用详情保留自己的来源", () => {
+    seedCall({
+      id: "mc_source_root",
+      trace: "mt_source",
+      at: T(4, 2),
+      attributionKind: "session",
+      session: "session-source",
+      task: undefined,
+      operation: "unknown",
+    });
+    seedCall({
+      id: "mc_source_child",
+      trace: "mt_source",
+      parent: "mc_source_root",
+      at: T(4, 3),
+      attributionKind: "subagent_child",
+      session: "child-session",
+      task: "task-child",
+      subsystem: "subagent",
+      operation: "background_research",
+    });
+    harness.handle.upsertSourceIdentitySnapshot({ kind: "chat", entityId: "session-source", title: "项目架构讨论" });
+    harness.handle.upsertSourceIdentitySnapshot({ kind: "subagent", entityId: "task-child", title: "资料检索" });
+    harness.flush();
+    service = createModelObservabilityQueryService({ lingxiHome: home });
+
+    const traces = tracesQuery({ filter: { traceId: "mt_source" }, minCallCount: 1, limit: 10 });
+    if (traces.ok !== true) throw new Error("trace query failed");
+    expect(traces.value.traces[0].sourceIdentity).toMatchObject({
+      kind: "chat",
+      entityId: "session-source",
+      title: "项目架构讨论",
+    });
+
+    const detail = service.queryTraceDetail("mt_source");
+    if (detail.ok !== true) throw new Error("trace detail failed");
+    expect(detail.value.trace.sourceIdentity).toMatchObject({ kind: "chat", title: "项目架构讨论" });
+    expect(detail.value.calls.find(call => call.callId === "mc_source_child")?.sourceIdentity)
+      .toMatchObject({ kind: "subagent", title: "资料检索" });
+  });
+
   /* ── Call detail（§一百零六 MC-06 codex 401）──────────────────────── */
 
   it("call detail：MC-06 形状 = 1 call + 2 attempts + 2 provider_request ordinals + 2 provider_response（§三十三/一百零六）", () => {

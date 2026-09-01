@@ -1723,14 +1723,16 @@ function parseJsonContainer(value: string): object | undefined {
   }
 }
 
-/* ── 灵犀独有：观测载荷面板（正文通道之二，懒加载）────────────────────── */
+/* ── 灵犀独有：观测载荷面板（正文通道之二，打开即加载）──────────────── */
 
 const PAYLOAD_PLAIN_COLLAPSED_CHARS = 1_200;
 
 /** 单条载荷的 TXT 阅读式正文块：超长截断 + 「更多」展开。 */
-function PayloadPlainView({ record, text }: {
+export function PayloadPlainView({ record, text, hideKindLabel = false }: {
   record: ModelObservabilityPayloadRecordMetadata;
   text: string;
+  /** 外层折叠区已带 kind 标题时置 true，避免卡内标题重复。 */
+  hideKindLabel?: boolean;
 }) {
   const [expanded, setExpanded] = useState(false);
   const clamped = !expanded && text.length > PAYLOAD_PLAIN_COLLAPSED_CHARS;
@@ -1738,14 +1740,11 @@ function PayloadPlainView({ record, text }: {
   return (
     <section className={css.payloadView}>
       <header className={css.payloadViewHead}>
-        <span className={css.payloadViewKind}>{payloadKindLabel(record.kind)}</span>
-        {record.attemptId !== null && (
-          <span className={css.payloadViewMeta}>{shortId(record.attemptId)}</span>
-        )}
-        {record.providerRequestOrdinal !== null && (
-          <span className={css.payloadViewMeta}>req #{record.providerRequestOrdinal}</span>
-        )}
-        <span className={css.payloadViewMeta}>{record.recordCharCount ?? text.length} ch</span>
+        {!hideKindLabel && <span className={css.payloadViewKind}>{payloadKindLabel(record.kind)}</span>}
+        <button type="button" className={`${css.payloadViewMore} ${css.payloadViewCopy}`}
+          onClick={() => { void navigator.clipboard?.writeText(text) }}>
+          {tr('payloadView.copy')}
+        </button>
       </header>
       <pre className={css.payloadViewText}>{shown}{clamped ? '…' : ''}</pre>
       {text.length > PAYLOAD_PLAIN_COLLAPSED_CHARS && (

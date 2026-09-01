@@ -648,7 +648,7 @@ function mockPermissionDefault(mode = 'ask') {
   });
 
   describe('createNewSession cwd draft', () => {
-    it('resets a global new-session draft to the primary agent and its effective workspace', async () => {
+    it('without a current session, resets the draft to the primary agent and its effective workspace', async () => {
       (mockState as Record<string, unknown>).agents = [
         {
           id: 'hana',
@@ -685,7 +685,7 @@ function mockPermissionDefault(mode = 'ask') {
       expect(mockLoadDeskFiles).toHaveBeenCalledWith('', '/workspace/Primary', null);
     });
 
-    it('uses the primary agent effective default workspace instead of the active session cwd', async () => {
+    it('inherits the active session local workspace but not its extra authorized folders or subdirectory', async () => {
       (mockState as Record<string, unknown>).agents = [
         {
           id: 'hana',
@@ -703,6 +703,15 @@ function mockPermissionDefault(mode = 'ask') {
         },
       ];
       (mockState as Record<string, unknown>).currentAgentId = 'mio';
+      (mockState as Record<string, unknown>).currentSessionId = 'sess-current';
+      (mockState as Record<string, unknown>).currentSessionPath = '/session/current.jsonl';
+      (mockState as Record<string, unknown>).sessions = [{
+        sessionId: 'sess-current',
+        path: '/session/current.jsonl',
+        cwd: '/workspace/current-session',
+        workspaceFolders: ['/workspace/extra-reference'],
+      }];
+      (mockState as Record<string, unknown>).workspaceFolders = ['/workspace/extra-reference'];
       (mockState as Record<string, unknown>).homeFolder = null;
       (mockState as Record<string, unknown>).deskBasePath = '/workspace/current-session';
       (mockState as Record<string, unknown>).deskCurrentPath = 'notes';
@@ -712,10 +721,38 @@ function mockPermissionDefault(mode = 'ask') {
       await createNewSession();
 
       expect(mockState.selectedAgentId).toBe('hana');
-      expect(mockState.selectedFolder).toBe('/home/test/Desktop/OH-WorkSpace');
-      expect(mockState.deskBasePath).toBe('/home/test/Desktop/OH-WorkSpace');
+      expect(mockState.selectedFolder).toBe('/workspace/current-session');
+      expect(mockState.deskBasePath).toBe('/workspace/current-session');
+      expect(mockState.workspaceFolders).toEqual([]);
       expect(mockState.deskCurrentPath).toBe('');
-      expect(mockLoadDeskFiles).toHaveBeenCalledWith('', '/home/test/Desktop/OH-WorkSpace', null);
+      expect(mockLoadDeskFiles).toHaveBeenCalledWith('', '/workspace/current-session', null);
+    });
+
+    it('inherits the active session managed workspace id and label', async () => {
+      (mockState as Record<string, unknown>).agents = [{
+        id: 'hana', name: 'Hana', isPrimary: true, effectiveHomeFolder: '/workspace/Primary',
+      }];
+      (mockState as Record<string, unknown>).currentAgentId = 'hana';
+      (mockState as Record<string, unknown>).currentSessionId = 'sess-managed';
+      (mockState as Record<string, unknown>).currentSessionPath = '/session/managed.jsonl';
+      (mockState as Record<string, unknown>).sessions = [{
+        sessionId: 'sess-managed',
+        path: '/session/managed.jsonl',
+        cwd: '/resolved/studio/docs',
+        workspaceMountId: 'mount_docs',
+        workspaceLabel: 'Docs',
+      }];
+      mockPermissionDefault();
+
+      await createNewSession();
+
+      expect(mockState.selectedFolder).toBeNull();
+      expect(mockState.selectedWorkspaceMountId).toBe('mount_docs');
+      expect(mockState.selectedWorkspaceLabel).toBe('Docs');
+      expect(deskActionMocks.activateWorkspaceDesk).toHaveBeenCalledWith('/resolved/studio/docs', {
+        mountId: 'mount_docs',
+        label: 'Docs',
+      });
     });
 
     it('invalidates an in-flight session switch so the new-session desk stays on the agent home folder', async () => {

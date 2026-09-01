@@ -520,7 +520,7 @@
     "deskContext": "看著書桌說",
     "pastedImage": "貼上圖片",
     "textModelImageFileOnly": "當前模型不能查看圖片，也未啟用輔助視覺：圖片將作為檔案發送，模型只能看到檔案路徑，看不到圖片內容。",
-    "textModelVideoFileOnly": "目前模型不支援直接查看影片：影片將作為檔案發送，模型只能看到檔案路徑，看不到影片內容。",
+    "textModelVideoFileOnly": "已取消傳送：目前模型不支援影片輸入。請移除影片或更換模型。",
     "textModelAudioBlocked": "目前模型不支援音訊輸入。請切換到支援音訊的模型。",
     "imageReadFailedSentAsFile": "圖片內容讀取失敗，這張圖已改為按檔案路徑發送，模型不會看到它的內容。",
     "videoReadFailed": "影片讀取失敗，訊息沒有傳送。請重新加入影片。",
@@ -2876,7 +2876,7 @@
       "empty": {
         "noResults": "目前過濾條件下沒有呼叫記錄",
         "noTraces": "目前過濾條件下沒有軌跡",
-        "storeAbsent": "觀測儲存尚未初始化——開啟記錄後，新的模型呼叫會出現在這裡"
+        "storeAbsent": "觀測儲存尚未初始化；請查看執行狀態和故障原因"
       },
       "error": {
         "invalid_query": "查询條件無效",
@@ -2996,17 +2996,27 @@
       },
       "inspector": {
         "title": "呼叫詳情",
-        "ariaLabel": "模型呼叫詳情抽屜",
+        "ariaLabel": "模型呼叫詳情頁面",
         "closeAria": "關閉詳情",
         "overview": "概覽",
         "attempts": "嘗試記錄",
-        "pipeline": "Payload 管線",
+        "pipeline": "模型輸入與輸出",
+        "technical": "技術資訊",
+        "origin": "原始來源",
         "traceSection": "所屬軌跡",
         "openTrace": "在軌跡視圖中打開",
         "parentCall": "父呼叫：{id}",
         "childCalls": "子呼叫（{count}）",
         "model": "模型",
         "start": "開始時間",
+        "usage": {
+          "input": "輸入",
+          "output": "輸出",
+          "cacheRead": "快取讀取",
+          "cacheWrite": "快取寫入",
+          "reasoning": "推理",
+          "cost": "費用"
+        },
         "field": {
           "attempts": "嘗試次数",
           "attribution": "歸因",
@@ -3089,7 +3099,7 @@
         "disabledBrowsing": "記錄未啟用，僅可瀏覽已有資料",
         "persistTraceMetadata": "持久化軌跡元資料",
         "persistPayloads": "持久化 payload 內文",
-        "persistPayloadsHint": "儲存請求/回應內文的脫敏副本，用于事後稽核",
+        "persistPayloadsHint": "中繼資料、模型正文和合格媒體始終開啟，並繼續執行脫敏、截斷和容量保護",
         "persistBlobs": "持久化媒體 blob",
         "persistBlobsHint": "儲存圖片/音訊/影片等二進制內容",
         "persistBlobsRequiresPayloads": "需先開啟 payload 內文持久化",
@@ -3154,8 +3164,8 @@
       },
       "onboarding": {
         "title": "模型觀測",
-        "body": "記錄每一次模型呼叫的軌跡、用量與成本，在本機隨時稽核。開啟後僅儲存元資料；payload 內文與媒體 blob 預設不儲存，可在記錄設定中另行開啟。所有資料只存本機，磁碟儲存沒有密碼學加密，依賴本機檔案權限保護。",
-        "enable": "開啟觀測記錄"
+        "body": "模型呼叫元資料、內文和合格媒體始終記錄，並繼續執行脫敏、截斷、容量保護和保留期清理。所有資料只存本機，磁碟儲存沒有密碼學靜態加密，依賴本機檔案權限保護。",
+        "enable": "觀測記錄始終開啟"
       },
       "jsonViewer": {
         "wrap": "自動換行",
@@ -3340,6 +3350,21 @@
           "task": "任務",
           "utility": "工具任務",
           "workflow": "工作流程",
+          "unknown": "未知"
+        },
+        "sourceKind": {
+          "chat": "聊天對話",
+          "background_task": "背景任務",
+          "automation": "自動化",
+          "subagent": "子代理",
+          "phone": "電話會話",
+          "media": "媒體任務",
+          "speech": "語音任務",
+          "plugin": "外掛呼叫",
+          "provider_probe": "供應商探測",
+          "health_check": "健康檢查",
+          "memory": "記憶維護",
+          "diary": "日記",
           "unknown": "未知"
         },
         "groupByDimension": {
@@ -3540,6 +3565,7 @@
         },
         "systemPromptInitial": "初始系統提示詞",
         "payloadView": {
+          "copy": "複製全文",
           "more": "顯示更多",
           "less": "收起"
         }
@@ -4020,9 +4046,10 @@
     "maxAudios": "最多支援 {max} 個音訊",
     "unsupportedImageFormat": "不支援的圖片格式: {mime}",
     "unsupportedVideoFormat": "不支援的影片格式: {mime}",
+    "invalidVideoContent": "影片內容與宣告的格式不一致，請選擇有效的 MP4、MOV 或 WebM 檔案",
     "unsupportedAudioFormat": "不支援的音訊格式: {mime}",
     "imageTooLarge": "單張圖片不得超過 20MB",
-    "videoTooLarge": "單個影片不得超過 20MB",
+    "videoTooLarge": "單個影片編碼後不得超過 20 MiB（原始檔約 15 MiB）",
     "audioTooLarge": "單個音訊不得超過 50MB",
     "viewImage": "（看圖）",
     "viewVideo": "（看影片）",
@@ -4728,7 +4755,9 @@
     "ariaLabel": "媒体预览",
     "close": "关闭",
     "prev": "上一张",
-    "next": "下一张"
+    "next": "下一张",
+    "videoDecodeError": "影片無法在應用程式內播放：可能是 Chromium 不支援的編碼（如 HEVC/H.265）。",
+    "openWithSystemPlayer": "用系統播放器開啟"
   },
   "mobile": {
     "startupFailed": "靈犀 启动失败",

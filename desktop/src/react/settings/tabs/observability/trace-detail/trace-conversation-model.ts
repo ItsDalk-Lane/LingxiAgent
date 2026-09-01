@@ -59,6 +59,7 @@ export interface ParsedSessionMessage {
   turnStatus?: string;
   /** epoch ms；缺失为 null（老 entry 可能没有 timestamp，按相邻归属）。 */
   timestampMs: number | null;
+  modelCallRef?: { modelCallId: string; traceId: string | null; parentCallId: string | null };
 }
 
 /** 会话冻结提示词快照（/api/sessions/prompt-snapshot 的 promptSnapshot 字段子集）。 */
@@ -110,6 +111,14 @@ function isMainChainReply(call: ModelObservabilityCallListItem): boolean {
     && (call.source?.operation === 'reply' || call.callPurpose === 'reply');
 }
 
+/** 老版本把普通回复记成 llm/chat；仅在用途为空或 reply 时允许参与历史猜测。 */
+function isHistoricalAssistantCandidate(call: ModelObservabilityCallListItem): boolean {
+  if (isMainChainReply(call)) return true;
+  const operation = call.source?.operation;
+  return (operation === 'chat' || operation === 'reply')
+    && (call.callPurpose === null || call.callPurpose === undefined || call.callPurpose === 'reply');
+}
+
 function callStatus(call: ModelObservabilityCallListItem): 'complete' | 'running' | 'error' {
   if (call.terminalStatus === 'ok') return 'complete';
   if (call.terminalStatus === 'error' || call.terminalStatus === 'aborted') return 'error';
@@ -145,6 +154,16 @@ export function parseSessionMessages(raw: unknown): ParsedSessionMessage[] | nul
       content: typeof message.content === 'string' ? message.content : '',
       timestampMs: epochMs(message.timestamp),
     };
+    if (role === 'assistant' && typeof message.modelCallRef === 'object' && message.modelCallRef !== null) {
+      const reference = message.modelCallRef as Record<string, unknown>;
+      if (typeof reference.modelCallId === 'string' && reference.modelCallId !== '') {
+        parsed.modelCallRef = {
+          modelCallId: reference.modelCallId,
+          traceId: typeof reference.traceId === 'string' ? reference.traceId : null,
+          parentCallId: typeof reference.parentCallId === 'string' ? reference.parentCallId : null,
+        };
+      }
+    }
     if (role === 'user') {
       if (typeof message.displayText === 'string' && message.displayText !== '') {
         parsed.displayText = message.displayText;
@@ -534,38 +553,60 @@ function pairAssistantCalls(
 ): Map<ParsedSessionMessage, ModelObservabilityCallListItem> {
   const pairings = new Map<ParsedSessionMessage, ModelObservabilityCallListItem>();
   const used = new Set<string>();
-  const assistantsWithTime = assistants.filter(message => message.timestampMs !== null);
-  for (const message of assistantsWithTime) {
+  const callIndexes = new Map(calls.map((call, index) => [call.callId, index] as const));
+  // 新记录先按持久编号一对一精确归并；历史记录才进入时间兼容路径。
+  for (const message of assistants) {
+    const callId = message.modelCallRef?.modelCallId;
+    if (!callId || used.has(callId)) continue;
+    const call = calls.find(candidate => candidate.callId === callId);
+    if (!call) continue;
+    pairings.set(message, call);
+    used.add(call.callId);
+  }
+  // 老记录按助手消息顺序单调向前匹配。只允许 reply 主链参与猜测，避免把标题
+  // 生成、压缩、知识滚动等真实辅助调用误吞成助手正文。
+  let minimumCallIndex = 0;
+  for (const message of assistants) {
+    const exact = pairings.get(message);
+    if (exact !== undefined) {
+      minimumCallIndex = Math.max(minimumCallIndex, (callIndexes.get(exact.callId) ?? -1) + 1);
+      continue;
+    }
     const ts = message.timestampMs;
     if (ts === null) continue;
     let best: ModelObservabilityCallListItem | null = null;
+    let bestIndex = -1;
     let bestScore = Number.POSITIVE_INFINITY;
-    for (const call of calls) {
-      if (used.has(call.callId)) continue;
+    for (let callIndex = minimumCallIndex; callIndex < calls.length; callIndex++) {
+      const call = calls[callIndex];
+      if (call === undefined || used.has(call.callId) || !isHistoricalAssistantCandidate(call)) continue;
       const start = callStartMs(call);
       const end = callEndMs(call) ?? start;
       if (start === null || end === null) continue;
       const score = end <= ts ? ts - end : end - ts + 60_000;
       if (score < bestScore) {
         best = call;
+        bestIndex = callIndex;
         bestScore = score;
       }
     }
     if (best !== null && bestScore <= 90_000) {
       pairings.set(message, best);
       used.add(best.callId);
+      minimumCallIndex = bestIndex + 1;
     }
   }
-  // 无时间戳的助手消息按剩余顺序配对（数量兜底）。
-  const remaining = calls.filter(call => !used.has(call.callId));
-  let remainingIndex = 0;
+  // 无时间戳的助手消息也只在剩余 reply 主链中单调配对（数量兜底）。
   for (const message of assistants) {
     if (message.timestampMs !== null || pairings.has(message)) continue;
-    const call = remaining[remainingIndex];
-    remainingIndex += 1;
-    if (call === undefined) break;
+    const callIndex = calls.findIndex((call, index) => (
+      index >= minimumCallIndex && !used.has(call.callId) && isHistoricalAssistantCandidate(call)
+    ));
+    if (callIndex < 0) break;
+    const call = calls[callIndex]!;
     pairings.set(message, call);
     used.add(call.callId);
+    minimumCallIndex = callIndex + 1;
   }
   return pairings;
 }

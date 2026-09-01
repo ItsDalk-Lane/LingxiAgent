@@ -38,6 +38,7 @@ import {
   contentHasThinkingBlock,
   filterUnreferencedInlineImages,
   loadSessionHistoryMessages,
+  collectModelCallReferencesBySourceIndex,
   loadLatestAssistantSummaryFromSessionFile,
   isValidSessionPath,
   isActiveDesktopSessionPath,
@@ -1517,6 +1518,7 @@ export function createSessionsRoute(engine, hub = null) {
       // suggestion_card block 的 status，让重开 session 不再回弹 pending。
       const sessionCollabDecisions = collectSessionCollabDecisions(sourceMessages);
       const toolOutcomesByCallId = collectToolOutcomesByCallId(sourceMessages);
+      const modelCallReferenceBySourceIndex = collectModelCallReferencesBySourceIndex(sourceMessages);
       const toolResultSourceIndexByCallId = new Map<string, number>();
       for (let sourceIndex = 0; sourceIndex < sourceMessages.length; sourceIndex += 1) {
         const message = sourceMessages[sourceIndex];
@@ -1815,6 +1817,9 @@ export function createSessionsRoute(engine, hub = null) {
               ...(m.id ? { entryId: m.id } : {}),
               role: "assistant",
               content,
+              ...(modelCallReferenceBySourceIndex.has(sourceIndex)
+                ? { modelCallRef: modelCallReferenceBySourceIndex.get(sourceIndex) }
+                : {}),
               assistantSegments,
               ...(turnStatus !== "completed" ? { turnStatus } : {}),
               ...(turnInputEntryId

@@ -531,7 +531,7 @@
     "knowledgeRemoveNotebook": "Remove knowledge reference {name}",
     "pastedImage": "Pasted image",
     "textModelImageFileOnly": "The current model cannot view images and auxiliary vision is not enabled: images are sent as files, so the model only sees the file path, not the image content.",
-    "textModelVideoFileOnly": "The current model cannot view videos directly: videos are sent as files, so the model only sees the file path, not the video content.",
+    "textModelVideoFileOnly": "Send cancelled: the current model does not support video input. Remove the video or switch models.",
     "textModelAudioBlocked": "The current model does not support audio input. Switch to an audio-capable model.",
     "imageReadFailedSentAsFile": "Failed to read the image bytes; this image was sent as a file path instead, so the model will not see its content.",
     "videoReadFailed": "Could not read the video, so the message was not sent. Attach it again.",
@@ -2874,7 +2874,7 @@
       "empty": {
         "noResults": "No calls match the current filters",
         "noTraces": "No traces match the current filters",
-        "storeAbsent": "Observability storage is not initialized yet — enable recording and new model calls will appear here"
+        "storeAbsent": "Observability storage is not initialized; check the runtime status and failure reason"
       },
       "error": {
         "invalid_query": "Invalid query",
@@ -2994,17 +2994,27 @@
       },
       "inspector": {
         "title": "Call detail",
-        "ariaLabel": "Model call detail drawer",
+        "ariaLabel": "Model call detail page",
         "closeAria": "Close detail",
         "overview": "Overview",
         "attempts": "Attempts",
-        "pipeline": "Payload pipeline",
+        "pipeline": "Model input and output",
+        "technical": "Technical information",
+        "origin": "Raw source",
         "traceSection": "Trace",
         "openTrace": "Open in trace view",
         "parentCall": "Parent call: {id}",
         "childCalls": "Child calls ({count})",
         "model": "Model",
         "start": "Started",
+        "usage": {
+          "input": "Input",
+          "output": "Output",
+          "cacheRead": "Cache read",
+          "cacheWrite": "Cache write",
+          "reasoning": "Reasoning",
+          "cost": "Cost"
+        },
         "field": {
           "attempts": "Attempts",
           "attribution": "Attribution",
@@ -3087,7 +3097,7 @@
         "disabledBrowsing": "Recording is off; you can still browse existing data",
         "persistTraceMetadata": "Persist trace metadata",
         "persistPayloads": "Persist payload bodies",
-        "persistPayloadsHint": "Store redacted copies of request/response bodies for later auditing",
+        "persistPayloadsHint": "Metadata, model bodies, and eligible media are always enabled with redaction, truncation, and capacity protection",
         "persistBlobs": "Persist media blobs",
         "persistBlobsHint": "Store binary content such as images, audio and video",
         "persistBlobsRequiresPayloads": "Requires payload body persistence first",
@@ -3152,8 +3162,8 @@
       },
       "onboarding": {
         "title": "Model Observatory",
-        "body": "Record the trace, usage and cost of every model call, auditable on this machine at any time. Once enabled, only metadata is stored; payload bodies and media blobs are off by default and can be enabled separately in recording settings. All data stays on this machine; on-disk storage is not cryptographically encrypted and relies on local file permissions.",
-        "enable": "Enable observability recording"
+        "body": "Model-call metadata, payload bodies, and eligible media are always recorded with redaction, truncation, capacity protection, and retention cleanup. All data stays on this machine; on-disk storage is not cryptographically encrypted and relies on local file permissions.",
+        "enable": "Observability recording is always on"
       },
       "jsonViewer": {
         "wrap": "Wrap lines",
@@ -3338,6 +3348,21 @@
           "task": "Task",
           "utility": "Utility",
           "workflow": "Workflow",
+          "unknown": "Unknown"
+        },
+        "sourceKind": {
+          "chat": "Chat",
+          "background_task": "Background task",
+          "automation": "Automation",
+          "subagent": "Subagent",
+          "phone": "Phone conversation",
+          "media": "Media task",
+          "speech": "Speech task",
+          "plugin": "Plugin call",
+          "provider_probe": "Provider probe",
+          "health_check": "Health check",
+          "memory": "Memory maintenance",
+          "diary": "Diary",
           "unknown": "Unknown"
         },
         "groupByDimension": {
@@ -3538,6 +3563,7 @@
         },
         "systemPromptInitial": "Initial System Prompt",
         "payloadView": {
+          "copy": "Copy full text",
           "more": "Show more",
           "less": "Show less"
         }
@@ -4023,9 +4049,10 @@
     "maxAudios": "Maximum {max} audio files allowed",
     "unsupportedImageFormat": "Unsupported image format: {mime}",
     "unsupportedVideoFormat": "Unsupported video format: {mime}",
+    "invalidVideoContent": "The video content does not match its declared format. Choose a valid MP4, MOV, or WebM file.",
     "unsupportedAudioFormat": "Unsupported audio format: {mime}",
     "imageTooLarge": "Single image must not exceed 20MB",
-    "videoTooLarge": "Single video must not exceed 20MB",
+    "videoTooLarge": "Encoded video must not exceed 20 MiB (about 15 MiB before encoding)",
     "audioTooLarge": "Single audio file must not exceed 50MB",
     "viewImage": "(view image)",
     "viewVideo": "(view video)",
@@ -4725,7 +4752,9 @@
     "ariaLabel": "Media preview",
     "close": "Close",
     "prev": "Previous",
-    "next": "Next"
+    "next": "Next",
+    "videoDecodeError": "This video cannot play in-app: the codec may be unsupported by Chromium (e.g. HEVC/H.265).",
+    "openWithSystemPlayer": "Open with system player"
   },
   "action": {
     "retry": "Retry"

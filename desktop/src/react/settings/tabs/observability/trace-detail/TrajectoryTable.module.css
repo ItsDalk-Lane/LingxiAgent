@@ -1859,3 +1859,11 @@
 .payloadViewMore:hover {
   background: var(--dsw-alias-interactive-bg-hover);
 }
+
+.payloadViewCopy {
+  width: auto;
+  margin-left: auto;
+  padding: 0;
+  border-top: none;
+  flex: 0 0 auto;
+}

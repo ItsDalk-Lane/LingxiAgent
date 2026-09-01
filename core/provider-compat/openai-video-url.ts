@@ -5,6 +5,9 @@
  * 与 Moonshot Kimi 的 OpenAI-compatible 视频接口要求本地视频使用
  * video_url，因此这里把 data:video 的 image_url 块转换为 video_url。
  *
+ * 覆盖两档 transport：已验证端点（openai-video-url）与用户声明即放行的
+ * 通用档（generic-openai-video-url）——两者线上形状相同，只是格式门宽窄不同。
+ *
  * 删除条件：
  *   - Pi SDK 原生按 mimeType=video/* 输出 video_url；
  *   - 或对应 provider 接受 data:video 的 image_url。
@@ -15,7 +18,9 @@ import {
 } from "../../shared/model-capabilities.ts";
 
 export function matches(model) {
-  return resolveModelVideoInputTransport(model) === MODEL_VIDEO_TRANSPORTS.OPENAI_VIDEO_URL;
+  const transport = resolveModelVideoInputTransport(model);
+  return transport === MODEL_VIDEO_TRANSPORTS.OPENAI_VIDEO_URL
+    || transport === MODEL_VIDEO_TRANSPORTS.GENERIC_OPENAI_VIDEO_URL;
 }
 
 export function apply(payload) {

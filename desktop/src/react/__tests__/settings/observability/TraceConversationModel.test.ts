@@ -281,6 +281,46 @@ describe('buildTraceConversationModel — 会话 join', () => {
     expect(messageCell?.observabilityCallId).toBe('main');
   });
 
+  it('新记录优先按持久调用编号精确归并，不再被九十秒时间猜测改配', () => {
+    const exact = makeCall({
+      callId: 'exact',
+      startedAt: new Date(T0 - 2_000).toISOString(),
+      endedAt: new Date(T0 - 1_000).toISOString(),
+    });
+    const temporallyCloser = makeCall({
+      callId: 'closer',
+      startedAt: new Date(T0 + 1_000).toISOString(),
+      endedAt: new Date(T0 + 2_500).toISOString(),
+    });
+    const messages = [userMsg, assistantMsg(3_000, {
+      modelCallRef: { modelCallId: 'exact', traceId: 'mt_x', parentCallId: null },
+    })];
+    const model = buildTraceConversationModel(makeDetail([exact, temporallyCloser]), messages);
+    const assistantCells = cellsOf(model.turns).filter(cell => cell.kind === 'message');
+
+    expect(assistantCells.find(cell => cell.outputDetail === '答案正文')?.observabilityCallId).toBe('exact');
+    expect(assistantCells.some(cell => cell.observabilityCallId === 'closer')).toBe(true);
+  });
+
+  it('历史兼容归并不会把更近的辅助调用吞成助手正文', () => {
+    const reply = makeCall({
+      callId: 'reply',
+      endedAt: new Date(T0 + 1_500).toISOString(),
+    });
+    const title = makeCall({
+      callId: 'title',
+      callPurpose: 'title',
+      source: { subsystem: 'auxiliary', operation: 'title', surface: 'server', trigger: 'user_turn' },
+      startedAt: new Date(T0 + 2_700).toISOString(),
+      endedAt: new Date(T0 + 2_900).toISOString(),
+    });
+    const model = buildTraceConversationModel(makeDetail([reply, title]), [userMsg, assistantMsg(3_000)]);
+    const assistantCells = cellsOf(model.turns).filter(cell => cell.kind === 'message');
+
+    expect(assistantCells.find(cell => cell.outputDetail === '答案正文')?.observabilityCallId).toBe('reply');
+    expect(assistantCells.some(cell => cell.observabilityCallId === 'title')).toBe(true);
+  });
+
   it('时间窗锚定：窗口前的最近用户消息被拉入，窗口后的用户消息截断', () => {
     const earlierUser = {
       role: 'user', entryId: 'eu0', content: '旧问题',
@@ -330,6 +370,15 @@ describe('parseSessionMessages', () => {
     expect(parsed?.length).toBe(2);
     expect(parsed?.[0]?.timestampMs).toBe(T0);
     expect(parsed?.[1]?.toolCalls?.length).toBe(1);
+  });
+
+  it('解析助手消息的持久调用关联，但忽略空壳关联', () => {
+    const parsed = parseSessionMessages([
+      { role: 'assistant', content: 'a', modelCallRef: { modelCallId: 'mc_1', traceId: 'mt_1', parentCallId: null } },
+      { role: 'assistant', content: 'b', modelCallRef: { modelCallId: '' } },
+    ]);
+    expect(parsed?.[0]?.modelCallRef).toEqual({ modelCallId: 'mc_1', traceId: 'mt_1', parentCallId: null });
+    expect(parsed?.[1]?.modelCallRef).toBeUndefined();
   });
 });
 

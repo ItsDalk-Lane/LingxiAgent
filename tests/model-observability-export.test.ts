@@ -151,7 +151,7 @@ describe("Model Observability Export", () => {
       exportSchemaVersion: MODEL_OBSERVABILITY_EXPORT_SCHEMA_VERSION,
       includePayloads: false,
       totalCalls: 2,
-      storageSchemaVersion: 3,
+      storageSchemaVersion: 4,
       backfillSource: "bounded_usage_ledger",
     });
     const bundle1 = JSON.parse(lines[1]);

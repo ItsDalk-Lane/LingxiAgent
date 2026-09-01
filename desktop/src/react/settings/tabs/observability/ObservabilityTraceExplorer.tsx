@@ -33,7 +33,7 @@ import {
   isoTooltip,
   shortId,
 } from './model-observability-format';
-import { originLabel } from './model-observability-labels';
+import { sourceIdentityKindLabel, sourceIdentityTitle } from './model-observability-labels';
 
 /* ── 树构建（纯函数，§八十九/§九十二；测试直接锁定）────────────────────── */
 
@@ -211,7 +211,10 @@ export function ObservabilityTraceExplorer({ appliedFilter, selectedTraceId, onS
             onClick={() => onSelectTrace(trace.traceId === selectedTraceId ? null : trace.traceId)}
           >
             <code title={trace.traceId}>{shortId(trace.traceId)}</code>
-            <span className={styles['observability-trace-origin']} title={trace.origin ?? undefined}>{originLabel(trace.origin)}</span>
+            <span className={styles['observability-trace-origin']} title={trace.sourceIdentity?.entityId ?? trace.origin ?? undefined}>
+              {sourceIdentityTitle(trace.sourceIdentity)}
+              <small> · {sourceIdentityKindLabel(trace.sourceIdentity?.kind ?? 'unknown')}</small>
+            </span>
             <span className={styles['observability-ledger-muted']} title={isoTooltip(trace.lastSeenAt)}>
               {formatLocalDateTime(trace.lastSeenAt)}
             </span>

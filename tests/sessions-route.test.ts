@@ -49,6 +49,7 @@ vi.mock("../core/message-utils.js", () => ({
   contentHasThinkingBlock: vi.fn(() => false),
   filterUnreferencedInlineImages: vi.fn((_text, images) => images || []),
   loadSessionHistoryMessages: vi.fn(async () => []),
+  collectModelCallReferencesBySourceIndex: vi.fn(() => new Map()),
   loadLatestAssistantSummaryFromSessionFile: vi.fn(async () => null),
   isValidSessionPath: vi.fn(() => true),
   isActiveSessionPath: vi.fn(() => true),

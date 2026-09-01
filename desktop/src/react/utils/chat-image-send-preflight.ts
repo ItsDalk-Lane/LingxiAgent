@@ -1,6 +1,7 @@
 import { isImageFile, isVideoFile } from './format';
 import { isAudioFileName } from './file-kind';
-import { modelSupportsDirectAudioInput } from '../../../../shared/model-capabilities.ts';
+import { modelSupportsDirectAudioInput, modelSupportsVideoMimeType } from '../../../../shared/model-capabilities.ts';
+import { isAllowedChatVideoMime } from '../../../../shared/video-mime.ts';
 
 export interface ChatImageAttachment {
   path: string;
@@ -53,11 +54,11 @@ export type ChatImageSendPreflightResult =
 
 export type ChatImageBlockedToast = (
   text: string,
-  type: 'warning',
+  type: 'warning' | 'error',
   duration: number,
   opts: {
     dedupeKey: string;
-    action: {
+    action?: {
       label: string;
       onClick: () => void;
     };
@@ -72,8 +73,9 @@ export type ChatVideoSendPreflightResult =
   }
   | {
     ok: false;
-    reason: 'model-video-unsupported';
+    reason: 'model-video-unsupported' | 'video-format-unsupported';
     videoInputMode: 'no-native-video' | 'unknown';
+    mimeType?: string;
   };
 
 export type ChatAudioSendPreflightResult =
@@ -113,7 +115,12 @@ export function getModelVideoInputMode(model: ChatImageModel | null | undefined)
     if (model.videoTransportSupported === false || transport === 'unsupported' || transport === 'none') {
       return 'no-native-video';
     }
-    if (model.videoTransportSupported === true || transport === 'gemini-inline-data' || transport === 'openai-video-url') {
+    // 通用档（generic-openai-video-url）= 用户声明即放行：server 端 videoTransportSupported
+    // 会置 true 走第一分支，这里保留 transport 字符串兜底（快照缺 supported 字段时）。
+    if (model.videoTransportSupported === true
+      || transport === 'gemini-inline-data'
+      || transport === 'openai-video-url'
+      || transport === 'generic-openai-video-url') {
       return 'native-video';
     }
     return 'native-video';
@@ -191,6 +198,13 @@ export async function evaluateChatVideoSendPreflight({
     return { ok: true, reason: 'no-videos', videoInputMode };
   }
   if (videoInputMode === 'native-video') {
+    for (const attachment of attachments) {
+      if (attachment.isDirectory || !isVideoFile(attachment.name)) continue;
+      const mimeType = videoMimeTypeForAttachment(attachment);
+      if (!isAllowedChatVideoMime(mimeType) || !modelSupportsVideoMimeType(model, mimeType)) {
+        return { ok: false, reason: 'video-format-unsupported', videoInputMode: 'no-native-video', mimeType };
+      }
+    }
     return { ok: true, reason: 'native-video', videoInputMode };
   }
   return {
@@ -198,6 +212,15 @@ export async function evaluateChatVideoSendPreflight({
     reason: 'model-video-unsupported',
     videoInputMode,
   };
+}
+
+function videoMimeTypeForAttachment(attachment: ChatImageAttachment): string {
+  if (attachment.mimeType?.startsWith('video/')) return attachment.mimeType.toLowerCase();
+  const extension = attachment.name.toLowerCase().split('.').pop();
+  if (extension === 'mov') return 'video/quicktime';
+  if (extension === 'webm') return 'video/webm';
+  if (extension === 'mp4' || extension === 'm4v') return 'video/mp4';
+  return attachment.mimeType || 'application/octet-stream';
 }
 
 export async function evaluateChatAudioSendPreflight({
@@ -248,7 +271,11 @@ export function notifyTextModelImageFileOnly({
   );
 }
 
-export function notifyTextModelVideoFileOnly({
+/**
+ * 模型不支持视频输入：整条发送被取消（视频仅按文件身份发送对模型没有意义，
+ * 与图片的 #1647 显式降级不同）。文案必须说明「已取消」，不能再说「将作为文件发送」。
+ */
+export function notifyVideoSendBlockedByModel({
   t,
   addToast,
   openSettings,
@@ -262,11 +289,31 @@ export function notifyTextModelVideoFileOnly({
     'warning',
     9000,
     {
-      dedupeKey: 'text-model-video-file-only',
+      dedupeKey: 'video-send-blocked-by-model',
       action: {
         label: t('input.openModelSettings'),
         onClick: openSettings,
       },
+    },
+  );
+}
+
+/** 模型支持视频输入，但该格式不在端点的官方契约交集内（如千问通道的 webm）。 */
+export function notifyChatVideoFormatUnsupported({
+  t,
+  addToast,
+  mimeType,
+}: {
+  t: (key: string, params?: Record<string, string | number>) => string;
+  addToast: ChatImageBlockedToast;
+  mimeType?: string;
+}): void {
+  addToast(
+    t('error.unsupportedVideoFormat', { mime: mimeType || 'unknown' }),
+    'error',
+    9000,
+    {
+      dedupeKey: 'video-format-unsupported',
     },
   );
 }

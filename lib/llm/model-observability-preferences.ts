@@ -6,10 +6,8 @@
  * coordinator 全部经 normalizeModelObservabilityPreferences()——禁止
  * PreferencesManager 一套 default、server startup 又一套、coordinator 第三套。
  *
- * 安全默认（§六十一）：enabled=false；用户开启 Observatory 后
- * persistTraceMetadata=true、persistPayloads=false、persistBlobs=false——
- * Payload/Blob 必须额外显式 opt-in，打开 Usage Observatory ≠ 自动永久保存
- * 所有 Prompt/Response。
+ * 当前产品策略：元数据、正文与合格媒体始终开启。旧配置中的关闭值在读取时
+ * 自动迁移为全开；历史上未采集的内容不会被伪造或回填。
  *
  * 持久化单位是 days（用户语义，§五十二）；转换为 persistence policy 时才
  * ×DAY_MS（内部毫秒不进 preferences.json）。
@@ -33,10 +31,10 @@ export type ModelObservabilityUserPreference = {
 
 /** 用户可见默认（§六十一；与 Phase 7 safe fallback retention 对齐）。 */
 export const DEFAULT_MODEL_OBSERVABILITY_PREFERENCE: ModelObservabilityUserPreference = {
-  enabled: false,
+  enabled: true,
   persistTraceMetadata: true,
-  persistPayloads: false,
-  persistBlobs: false,
+  persistPayloads: true,
+  persistBlobs: true,
   retention: { traceDays: 180, payloadDays: 30, blobDays: 30 },
 };
 
@@ -59,18 +57,15 @@ export function normalizeModelObservabilityPreferences(input: unknown): ModelObs
   const source = input && typeof input === "object" && !Array.isArray(input)
     ? input as Record<string, unknown>
     : {};
-  const enabled = source.enabled === true;
   const defaults = DEFAULT_MODEL_OBSERVABILITY_PREFERENCE;
-  const persistPayloads = enabled && source.persistPayloads === true;
-  const persistTraceMetadata = enabled ? source.persistTraceMetadata !== false : false;
   const retentionSource = source.retention && typeof source.retention === "object" && !Array.isArray(source.retention)
     ? source.retention as Record<string, unknown>
     : {};
   return {
-    enabled,
-    persistTraceMetadata,
-    persistPayloads,
-    persistBlobs: enabled && persistPayloads && source.persistBlobs === true,
+    enabled: true,
+    persistTraceMetadata: true,
+    persistPayloads: true,
+    persistBlobs: true,
     retention: {
       traceDays: daysOrFallback(retentionSource.traceDays, defaults.retention.traceDays),
       payloadDays: daysOrFallback(retentionSource.payloadDays, defaults.retention.payloadDays),

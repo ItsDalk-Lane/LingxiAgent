@@ -231,6 +231,47 @@ describe("upload route", () => {
     expect(fs.readFileSync(up.dest).equals(png)).toBe(true);
   });
 
+  it("upload-blob accepts a valid MP4 and keeps it as an independent video attachment", async () => {
+    tmpDir = mktemp();
+    const lingxiHome = path.join(tmpDir, "hana-home");
+    const app = new Hono();
+    app.route("/api", createUploadRoute({ lingxiHome }));
+    const mp4 = Buffer.from([0x00, 0x00, 0x00, 0x18, 0x66, 0x74, 0x79, 0x70, 0x69, 0x73, 0x6f, 0x6d]);
+
+    const res = await app.request("/api/upload-blob", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name: "clip.exe", base64Data: mp4.toString("base64"), mimeType: "video/mp4" }),
+    });
+    const data = await res.json();
+
+    expect(res.status).toBe(200);
+    expect(data.uploads[0].error).toBeUndefined();
+    expect(data.uploads[0].name).toBe("clip.mp4");
+    expect(fs.readFileSync(data.uploads[0].dest).equals(mp4)).toBe(true);
+  });
+
+  it("upload-blob rejects a renamed non-video file before writing it", async () => {
+    tmpDir = mktemp();
+    const lingxiHome = path.join(tmpDir, "hana-home");
+    const app = new Hono();
+    app.route("/api", createUploadRoute({ lingxiHome }));
+
+    const res = await app.request("/api/upload-blob", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: "renamed.mp4",
+        base64Data: Buffer.from("this is plain text").toString("base64"),
+        mimeType: "video/mp4",
+      }),
+    });
+    const data = await res.json();
+
+    expect(data.uploads[0]).toEqual({ error: "video content does not match mimeType" });
+    expect(fs.readdirSync(path.join(lingxiHome, "uploads"))).toHaveLength(0);
+  });
+
   it("registers copied uploads as session files when sessionPath is provided", async () => {
     tmpDir = mktemp();
     const source = path.join(tmpDir, "note.txt");

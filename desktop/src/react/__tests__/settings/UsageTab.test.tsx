@@ -89,17 +89,17 @@ const ABSENT_HEALTH = {
   },
 };
 
-const DISABLED_SETTINGS = {
+const ALWAYS_ON_SETTINGS = {
   desired: {
-    enabled: false,
+    enabled: true,
     persistTraceMetadata: true,
-    persistPayloads: false,
-    persistBlobs: false,
+    persistPayloads: true,
+    persistBlobs: true,
     retention: { traceDays: 180, payloadDays: 30, blobDays: 30 },
   },
   effective: {
     recordingStatus: 'disabled',
-    storeDisabledReasonCode: 'disabled_by_policy',
+    storeDisabledReasonCode: 'not_installed',
     persistTraceMetadata: false,
     persistPayloads: false,
     persistBlobs: false,
@@ -112,7 +112,7 @@ describe('UsageTab settings page registration (Phase 9: Model Observatory)', () 
   beforeEach(() => {
     vi.clearAllMocks();
     mocks.loadObservabilityHealth.mockResolvedValue(ABSENT_HEALTH);
-    mocks.loadObservabilitySettings.mockResolvedValue(DISABLED_SETTINGS);
+    mocks.loadObservabilitySettings.mockResolvedValue(ALWAYS_ON_SETTINGS);
     mocks.queryObservabilityAggregate.mockRejectedValue(new Error('not initialized'));
     mocks.queryObservabilityCalls.mockRejectedValue(new Error('not initialized'));
     mocks.queryObservabilityTraces.mockRejectedValue(new Error('not initialized'));
@@ -182,12 +182,12 @@ describe('UsageTab settings page registration (Phase 9: Model Observatory)', () 
     expect(tabIds).not.toContain('media');
   });
 
-  it('shows the onboarding empty state when recording is disabled and the store is absent', async () => {
+  it('shows the honest inactive state without offering a recording enable switch', async () => {
     render(<UsageTab />);
-    // §九十八：disabled + store absent → onboarding（「启用模型观测」按钮），
-    // 不是报错页。
     await waitFor(() => {
-      expect(screen.getByText('settings.observability.onboarding.enable')).toBeInTheDocument();
+      expect(screen.getByText('settings.observability.recording.configuredButInactive')).toBeInTheDocument();
     });
+    expect(screen.queryByText('settings.observability.onboarding.enable')).toBeNull();
+    expect(mocks.updateObservabilitySettings).not.toHaveBeenCalled();
   });
 });

@@ -21,7 +21,7 @@ import {
   observabilityRequest,
 } from '../model-observability-actions';
 import { formatCompactNumber } from '../model-observability-format';
-import { originLabel } from '../model-observability-labels';
+import { sourceIdentityKindLabel, sourceIdentityTitle } from '../model-observability-labels';
 import type {
   ModelObservabilityTraceDetail,
   ModelObservabilityUsageSummary,
@@ -326,7 +326,8 @@ export function TraceDetailOverlay({
     >
       <div className={css.header}>
           <span className={css.headerTitle}>
-            {detail ? originLabel(detail.trace.origin) : '…'}
+            {detail ? sourceIdentityTitle(detail.trace.sourceIdentity) : '…'}
+            {detail ? ` · ${sourceIdentityKindLabel(detail.trace.sourceIdentity?.kind ?? 'unknown')}` : ''}
             <code className={css.headerId} title={detail?.trace.traceId ?? ''}>
               {detail?.trace.traceId ?? tr('header.loading')}
             </code>
