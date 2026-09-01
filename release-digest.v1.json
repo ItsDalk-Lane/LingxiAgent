@@ -1,147 +1,170 @@
 {
   "schemaVersion": 1,
-  "tag": "v0.1.32",
-  "version": "0.1.32",
-  "previousTag": "v0.1.31",
-  "generatedAt": "2026-08-31T15:11:15.000Z",
+  "tag": "v0.1.33",
+  "version": "0.1.33",
+  "previousTag": "v0.1.32",
+  "generatedAt": "2026-09-01T18:14:43.000Z",
   "noUserFacingChanges": false,
   "summary": {
-    "zh": "知识库问答新增「快速/详细」两档并默认快速：快速档不做问题拆解、只注入最相关的高命中证据、检索结果清晰时自动跳过重排，秒级作答；详细档保留全量召回与分批阅读。知识检索过程改为逐动作工具卡（检索/阅读/补充检索/生成回答）。修复知识提问延迟（重排无期限、覆盖执行必败无熔断、单批证据过大、侧线调用污染缓存契约）与千问重排、MiniMax 嵌入等供应商协议兼容问题。",
-    "en": "Knowledge base Q&A gains Fast/Detailed modes with Fast as the new default: Fast skips question decomposition, injects only the top high-confidence evidence, and skips rerank when results are unambiguous, answering in seconds; Detailed keeps full recall with batched reading. The retrieval process is now shown as per-action tool cards (search / read / supplement / answering). Fixes knowledge question latency (unbounded rerank waits, doomed coverage runs without a circuit breaker, oversized evidence batches, sideline calls polluting the cache contract) and provider protocol compatibility for Qwen rerank and MiniMax embeddings."
+    "zh": "模型调用全面统一：每条调用有稳定的业务来源身份，助手消息与调用持久关联，调用详情全屏化且长载荷自动并行展示；观测持久化默认全开，设置页只保留保留天数。聊天支持直接上传视频（魔数/大小/数量校验，按供应商自动适配传输格式）。记忆系统升级：用户原则（tenets）审批沉淀、导航索引注入、事实语义检索与经验反馈。新增观测轨迹详情页与轨迹列表会话过滤；新建聊天继承当前工作台。",
+    "en": "Model calls are now unified: every call carries a stable business source identity, assistant messages are persistently linked to their calls, and the call inspector goes full-screen with automatic parallel plain-text rendering of large payloads. Observability persistence is on by default, and its settings page keeps only the retention window. Chat now accepts direct video uploads (magic-number/size/count validation, transport format adapted per provider). The memory system gains tenets (approved user principles), a navigation index, semantic fact retrieval, and experience feedback. Adds the observability trace detail page with session-level list filtering; new chats inherit the current workspace."
   },
   "counts": {
-    "feature": 2,
-    "fix": 2,
-    "improvement": 0,
-    "migration": 0
+    "feature": 4,
+    "fix": 0,
+    "improvement": 1,
+    "migration": 1
   },
   "source": {
     "owner": "ItsDalk-Lane",
     "repo": "LingxiAgent",
-    "commitRange": "v0.1.31..HEAD",
-    "releaseUrl": "https://github.com/ItsDalk-Lane/LingxiAgent/releases/tag/v0.1.32",
+    "commitRange": "v0.1.32..HEAD",
+    "releaseUrl": "https://github.com/ItsDalk-Lane/LingxiAgent/releases/tag/v0.1.33",
     "releaseNotes": ""
   },
   "items": [
     {
-      "id": "feat-knowledge-fast-detailed-modes",
+      "id": "feat-model-call-unification",
       "kind": "feature",
       "importance": "high",
       "title": {
-        "zh": "知识问答「快速/详细」两档",
-        "en": "Fast/Detailed modes for knowledge Q&A"
+        "zh": "模型调用统一：来源身份与全屏调用详情",
+        "en": "Unified model calls: source identity and full-screen call inspector"
       },
       "summary": {
-        "zh": "挂载知识库引用时可一键切换两档回答模式，新引用默认快速档：快速档不做问题拆解与多路扩展，只注入最相关的高命中头部证据（封顶 12 条），检索结果头部清晰时自动跳过重排、结果模糊时重排最多等 5 秒，以最快速度作答；详细档保留原有的自适应拆解、全量召回与超长证据分批阅读综合回答。旧会话的问答/辅助模式自动按详细档继续，显示不变。",
-        "en": "Knowledge references now offer two answer modes, defaulting to Fast: Fast skips decomposition and multi-query expansion, injects only the top high-confidence evidence (capped at 12 blocks), skips rerank when the ranking is unambiguous and waits at most 5 seconds otherwise, answering as fast as possible; Detailed keeps the existing adaptive decomposition, full recall, and batched reading of oversized evidence. Legacy Q&A/Assist references continue as Detailed with unchanged display."
+        "zh": "每条模型调用现在有稳定的来源身份，界面按「业务标题 + 类型标签」显示它来自哪次会话提问或后台任务；助手消息与调用的关联持久化并在历史加载时按编号归并，不再依赖进程内存。调用详情改为全屏视图：长载荷自动并行展示为纯文本，技术信息默认收起。",
+        "en": "Every model call now carries a stable source identity, shown as a business title plus a type badge telling which conversation turn or background task it came from; assistant-message links are persisted and merged by call number on history load instead of living only in process memory. The call inspector is now full-screen: large payloads render automatically as parallel plain text and technical details stay collapsed by default."
       },
       "details": [
         {
-          "zh": "两档切换在输入框上方的知识库引用条上，逐会话生效；检索统计新增各阶段耗时记录。",
-          "en": "The toggle lives on the knowledge reference bar above the input, per session; retrieval stats now record per-stage timings."
+          "zh": "观测持久化默认全开，产品偏好不再提供关闭开关；设置页只保留保留天数，旧客户端的关闭值会被拒绝。",
+          "en": "Observability persistence is on by default with no product-facing off switch; the settings page keeps only the retention window, and false values from old clients are rejected."
         },
         {
-          "zh": "新增固定问题集的检索质量回归门禁，防止后续优化悄悄降低召回。",
-          "en": "A fixed golden-set recall gate now guards retrieval quality against future regressions."
+          "zh": "观测数据库升级到 schema v4（增量迁移，旧调用不改写；来源快照不含正文）。",
+          "en": "The observability database upgrades to schema v4 (additive migration; existing calls untouched, source snapshots store no content)."
         }
       ],
       "sources": [
         {
           "type": "commit",
-          "ref": "55834549",
-          "title": "feat(knowledge): 知识问答两档化——快速/详细 answer mode + rerank 动态门控 + 分段计时 + golden set"
+          "ref": "ea03c627",
+          "title": "feat(observability): 模型调用统一（来源身份+调用引用+详情全屏+观测全开）+ 视频上传闭环 + 工作台继承"
         }
       ]
     },
     {
-      "id": "feat-knowledge-process-cards",
+      "id": "feat-chat-video-upload",
+      "kind": "feature",
+      "importance": "high",
+      "title": {
+        "zh": "聊天视频上传",
+        "en": "Video uploads in chat"
+      },
+      "summary": {
+        "zh": "发送框现在可以直接选择并上传视频文件，与图片、音频一致；上传前做魔数、大小与数量三段式校验，并按当前供应商自动适配传输格式（inline data 与多家 video_url 兼容路径）。",
+        "en": "The composer now accepts video files alongside images and audio; uploads pass magic-number, size, and count validation before leaving the browser, and the transport format is adapted per provider (inline data and several video_url compat paths)."
+      },
+      "details": [
+        {
+          "zh": "消息流内视频以海报缩略图加播放角标展示，点开进入媒体查看器播放；播放失败时给出可重试的错误卡片。",
+          "en": "Videos in the message stream render as a poster thumbnail with a play badge and open in the media viewer; playback failures show a retryable error card."
+        }
+      ],
+      "sources": [
+        {
+          "type": "commit",
+          "ref": "ea03c627",
+          "title": "feat(observability): 模型调用统一（来源身份+调用引用+详情全屏+观测全开）+ 视频上传闭环 + 工作台继承"
+        }
+      ]
+    },
+    {
+      "id": "feat-memory-system-upgrade",
+      "kind": "feature",
+      "importance": "high",
+      "title": {
+        "zh": "记忆系统升级：原则层、导航与语义检索",
+        "en": "Memory upgrade: tenets, navigation, and semantic retrieval"
+      },
+      "summary": {
+        "zh": "新增用户原则层（tenets）：助手可在对话中提出原则，经你审批后长期注入新会话；记忆库新增导航索引并在编译时注入上下文，事实检索升级为关键词与语义向量融合召回，检索不到时给出零结果诊断；👍/👎 评分会沉淀为经验反馈供后续参考。",
+        "en": "Adds a tenets layer: the assistant can propose principles mid-conversation which, once you approve them, are injected into new sessions; the memory store gains a navigation index injected at compile time, fact retrieval now fuses keyword and semantic-vector recall, empty results get a diagnosis, and 👍/👎 ratings feed an experience store for future turns."
+      },
+      "details": [
+        {
+          "zh": "tenets 管理入口在设置页，可随时停用或删除；停用后不再注入。",
+          "en": "Tenets are managed in settings and can be deactivated or deleted at any time; deactivated tenets stop being injected."
+        }
+      ],
+      "sources": [
+        {
+          "type": "commit",
+          "ref": "20a9e944",
+          "title": "feat(memory): 记忆系统升级（tenets/导航节/语义检索/经验反馈）+ 观测轨迹详情页 + 迁移#54"
+        }
+      ]
+    },
+    {
+      "id": "feat-observability-trace-detail",
       "kind": "feature",
       "importance": "medium",
       "title": {
-        "zh": "知识检索过程工具卡",
-        "en": "Knowledge retrieval process tool cards"
+        "zh": "观测轨迹详情页",
+        "en": "Observability trace detail page"
       },
       "summary": {
-        "zh": "知识问答期间的过程以工具调用卡的形式逐动作呈现在助手消息流：检索卡显示查询词与命中数，分批阅读卡逐部分展示进度，模型自主发起的补充检索与最终生成回答各有专属卡片，替代此前只能看着三个点等待的体验。",
-        "en": "During knowledge Q&A the process is shown as per-action tool cards in the assistant message stream: a search card with the query and hit count, one reading card per evidence part, and dedicated cards for model-initiated supplemental searches and the final answer — replacing the old blank wait behind three dots."
+        "zh": "轨迹列表新增按会话聚合的过滤（只看发生过多次调用的会话），并新增轨迹详情页：时间线、调用瀑布与载荷快照一屏可读，宽窄屏均已适配。",
+        "en": "The trace list gains a session-aggregated filter (only sessions with repeated calls), plus a new trace detail page: timeline, call waterfall, and payload snapshots readable in one view, adapted to both wide and narrow layouts."
       },
-      "details": [
-        {
-          "zh": "卡片为纯前端合成，不改变会话协议与历史记录；历史轮仍由知识检索折叠卡承载。",
-          "en": "Cards are synthesized purely on the frontend without changing the session protocol or history; older turns keep the knowledge retrieval fold."
-        }
-      ],
+      "details": [],
       "sources": [
         {
           "type": "commit",
-          "ref": "287d9333",
-          "title": "feat(knowledge): 过程可见四轮——知识过程改合成工具卡，一动作一卡依次长在助手消息流里"
+          "ref": "20a9e944",
+          "title": "feat(memory): 记忆系统升级（tenets/导航节/语义检索/经验反馈）+ 观测轨迹详情页 + 迁移#54"
         }
       ]
     },
     {
-      "id": "fix-knowledge-latency",
-      "kind": "fix",
-      "importance": "high",
-      "title": {
-        "zh": "知识提问延迟治理",
-        "en": "Knowledge question latency fixes"
-      },
-      "summary": {
-        "zh": "修复挂载知识库后一次提问动辄一分钟以上甚至六分半的问题：重排调用设置 15 秒期限、超时降级保留原排序不再无限等待；覆盖执行连续失败触发熔断提前止损；分片装填把检索开销计入成本防止巨片超时；滚动阅读单批证据封顶 64k token 防止预填充超时；修复侧线消化调用污染缓存契约导致真实回答轮缓存被误判作废全量重填的问题。",
-        "en": "Fixes knowledge questions taking over a minute (up to 6.5 minutes) per turn: rerank calls now have a 15-second deadline that degrades gracefully instead of waiting indefinitely; doomed coverage runs trip a circuit breaker; shard packing accounts for retrieval overhead; rolling reads cap each evidence part at 64k tokens to avoid prefill timeouts; and sideline digestion calls no longer pollute the cache contract that previously voided and refilled the real answer turn's cache."
-      },
-      "details": [
-        {
-          "zh": "查询嵌入失败或超时同样降级为纯关键词检索，不再阻塞或报错。",
-          "en": "Query embedding failures or timeouts likewise degrade to pure keyword retrieval instead of blocking or failing."
-        },
-        {
-          "zh": "观测侧补齐检索各阶段耗时记录，便于后续定位。",
-          "en": "Per-stage retrieval timings are now recorded for future diagnosis."
-        }
-      ],
-      "sources": [
-        {
-          "type": "commit",
-          "ref": "01dfb168",
-          "title": "fix(knowledge): 知识提问延迟三连修复——分片渲染开销计费/coverage 熔断/rerank 期限降级"
-        },
-        {
-          "type": "commit",
-          "ref": "22492163",
-          "title": "fix(knowledge): 滚动注入实测回归双修复——单份封顶 64k + 侧线调用用途标记"
-        },
-        {
-          "type": "commit",
-          "ref": "d6be53ae",
-          "title": "fix(knowledge): 查询嵌入失败/期限降级——任何嵌入失效退回纯 FTS"
-        }
-      ]
-    },
-    {
-      "id": "fix-provider-protocols",
-      "kind": "fix",
+      "id": "improvement-workspace-inheritance",
+      "kind": "improvement",
       "importance": "medium",
       "title": {
-        "zh": "嵌入与重排供应商协议修复",
-        "en": "Embedding and rerank provider protocol fixes"
+        "zh": "新建聊天继承当前工作台",
+        "en": "New chats inherit the current workspace"
       },
       "summary": {
-        "zh": "修复千问（Qwen）重排接口调用必 404 的问题（按模型系适配双端点方言）；修复 MiniMax 嵌入接口三层不匹配（端点拼接、请求形状、必填 GroupId）；重排单次文档数上限收紧到 50 以匹配供应商限制。",
-        "en": "Fixes Qwen rerank calls always failing with 404 (dual-endpoint dialects matched per model family) and the MiniMax embedding triple mismatch (endpoint join, request shape, required GroupId); the per-request rerank document cap is tightened to 50 to match provider limits."
+        "zh": "在某个工作台下新建聊天时，新聊天归属该工作台，不再总是回到默认工作台。",
+        "en": "Creating a chat while inside a workspace now files the new chat under that workspace instead of always falling back to the default one."
       },
-      "details": [
-        {
-          "zh": "供应商编辑面板新增 GroupId 输入位，五语言界面齐备。",
-          "en": "The provider editing panel gains a GroupId field with all five UI languages covered."
-        }
-      ],
+      "details": [],
       "sources": [
         {
           "type": "commit",
-          "ref": "08ead330",
-          "title": "fix(knowledge): 嵌入/重排供应商协议兼容修复（千问 rerank 双端点方言 + MiniMax 方言/GroupId）"
+          "ref": "ea03c627",
+          "title": "feat(observability): 模型调用统一（来源身份+调用引用+详情全屏+观测全开）+ 视频上传闭环 + 工作台继承"
+        }
+      ]
+    },
+    {
+      "id": "migration-54-utility-dead-keys",
+      "kind": "migration",
+      "importance": "low",
+      "title": {
+        "zh": "清理历史配置死键",
+        "en": "Clean up legacy config dead keys"
+      },
+      "summary": {
+        "zh": "自动清理早期版本残留在本地配置中的 utility_model / utility_large_model 死键，避免「已配置辅助模型」的错觉（该槽位实际读取新键名）。",
+        "en": "Automatically removes the utility_model / utility_large_model dead keys left in local config by early builds, eliminating the illusion of a configured helper model (the slot actually reads its new key names)."
+      },
+      "details": [],
+      "sources": [
+        {
+          "type": "commit",
+          "ref": "20a9e944",
+          "title": "feat(memory): 记忆系统升级（tenets/导航节/语义检索/经验反馈）+ 观测轨迹详情页 + 迁移#54"
         }
       ]
     }
