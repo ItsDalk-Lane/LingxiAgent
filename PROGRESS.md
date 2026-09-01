@@ -10,7 +10,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = ea03c6276347391388dbda886d25137e80bfb7de  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-09-02 模型调用统一 + 视频上传闭环 + 工作台继承)
+VERIFIED_SOURCE_SHA   = cc6315e0faae2102443f1576de15a9aa0fe831a2  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-09-02 embedding gate Windows 粒度派发修复)
 工作分支              = feature/upstream-sync-0.447.4
 ```
 
@@ -809,6 +809,18 @@ seal 不是一次性终点，而是"当前被验证树"的游标；每次审计�
   归零）。指纹/closure/export-manifest 已更新，五语言齐。验证：typecheck×3
   绿 + 全量 npm test 12895 用例通过（CSS 收口后复跑全绿；首跑仅
   style-discipline 4 项违例红）后推进。
+
+- **2026-09-02 embedding gate Windows 粒度派发修复**（功能树 cc6315e0/seal
+  本提交，feat/pending-sep01，1 file / +8-2）：windows-2025 CI 连续三轮假红
+  实锤根因——scheduleDispatch 的 setTimeout(wait) 在 Windows 计时器粒度
+  （~15.6ms）下提前一个粒度醒，两次派发实测间隔 66ms < 配置 80ms，破坏
+  「至少间隔 minRequestIntervalMs」语义（tests/knowledge-lifecycle.test.ts
+  间隔断言假红）。修复：dispatch 回调先 intervalElapsed 复验，未过节流窗口
+  则 scheduleDispatch 续等剩余时间；语义在所有平台成立，断言不放宽。同日
+  另两轮失败（auth-storage legacy key 恢复、vitest worker 意外退出）与代码
+  无关（本地 31/31 绿、同 job attempt 1 全绿），属 runner 抖动。验证：
+  typecheck×3 绿 + knowledge-lifecycle 16/16 + persistence tripwire 15/15 +
+  closure/boundary 39/39 后推进。
 
 ## 最终状态：已合并（上游同步部分）
 
