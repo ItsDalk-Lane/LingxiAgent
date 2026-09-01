@@ -3,6 +3,178 @@
   "entries": [
     {
       "schemaVersion": 1,
+      "tag": "v0.1.33",
+      "version": "0.1.33",
+      "previousTag": "v0.1.32",
+      "generatedAt": "2026-09-01T18:14:43.000Z",
+      "noUserFacingChanges": false,
+      "summary": {
+        "zh": "模型调用全面统一：每条调用有稳定的业务来源身份，助手消息与调用持久关联，调用详情全屏化且长载荷自动并行展示；观测持久化默认全开，设置页只保留保留天数。聊天支持直接上传视频（魔数/大小/数量校验，按供应商自动适配传输格式）。记忆系统升级：用户原则（tenets）审批沉淀、导航索引注入、事实语义检索与经验反馈。新增观测轨迹详情页与轨迹列表会话过滤；新建聊天继承当前工作台。",
+        "en": "Model calls are now unified: every call carries a stable business source identity, assistant messages are persistently linked to their calls, and the call inspector goes full-screen with automatic parallel plain-text rendering of large payloads. Observability persistence is on by default, and its settings page keeps only the retention window. Chat now accepts direct video uploads (magic-number/size/count validation, transport format adapted per provider). The memory system gains tenets (approved user principles), a navigation index, semantic fact retrieval, and experience feedback. Adds the observability trace detail page with session-level list filtering; new chats inherit the current workspace."
+      },
+      "counts": {
+        "feature": 4,
+        "fix": 0,
+        "improvement": 1,
+        "migration": 1
+      },
+      "source": {
+        "owner": "ItsDalk-Lane",
+        "repo": "LingxiAgent",
+        "commitRange": "v0.1.32..HEAD",
+        "releaseUrl": "https://github.com/ItsDalk-Lane/LingxiAgent/releases/tag/v0.1.33",
+        "releaseNotes": ""
+      },
+      "items": [
+        {
+          "id": "feat-model-call-unification",
+          "kind": "feature",
+          "importance": "high",
+          "title": {
+            "zh": "模型调用统一：来源身份与全屏调用详情",
+            "en": "Unified model calls: source identity and full-screen call inspector"
+          },
+          "summary": {
+            "zh": "每条模型调用现在有稳定的来源身份，界面按「业务标题 + 类型标签」显示它来自哪次会话提问或后台任务；助手消息与调用的关联持久化并在历史加载时按编号归并，不再依赖进程内存。调用详情改为全屏视图：长载荷自动并行展示为纯文本，技术信息默认收起。",
+            "en": "Every model call now carries a stable source identity, shown as a business title plus a type badge telling which conversation turn or background task it came from; assistant-message links are persisted and merged by call number on history load instead of living only in process memory. The call inspector is now full-screen: large payloads render automatically as parallel plain text and technical details stay collapsed by default."
+          },
+          "details": [
+            {
+              "zh": "观测持久化默认全开，产品偏好不再提供关闭开关；设置页只保留保留天数，旧客户端的关闭值会被拒绝。",
+              "en": "Observability persistence is on by default with no product-facing off switch; the settings page keeps only the retention window, and false values from old clients are rejected."
+            },
+            {
+              "zh": "观测数据库升级到 schema v4（增量迁移，旧调用不改写；来源快照不含正文）。",
+              "en": "The observability database upgrades to schema v4 (additive migration; existing calls untouched, source snapshots store no content)."
+            }
+          ],
+          "sources": [
+            {
+              "type": "commit",
+              "ref": "ea03c627",
+              "title": "feat(observability): 模型调用统一（来源身份+调用引用+详情全屏+观测全开）+ 视频上传闭环 + 工作台继承"
+            }
+          ]
+        },
+        {
+          "id": "feat-chat-video-upload",
+          "kind": "feature",
+          "importance": "high",
+          "title": {
+            "zh": "聊天视频上传",
+            "en": "Video uploads in chat"
+          },
+          "summary": {
+            "zh": "发送框现在可以直接选择并上传视频文件，与图片、音频一致；上传前做魔数、大小与数量三段式校验，并按当前供应商自动适配传输格式（inline data 与多家 video_url 兼容路径）。",
+            "en": "The composer now accepts video files alongside images and audio; uploads pass magic-number, size, and count validation before leaving the browser, and the transport format is adapted per provider (inline data and several video_url compat paths)."
+          },
+          "details": [
+            {
+              "zh": "消息流内视频以海报缩略图加播放角标展示，点开进入媒体查看器播放；播放失败时给出可重试的错误卡片。",
+              "en": "Videos in the message stream render as a poster thumbnail with a play badge and open in the media viewer; playback failures show a retryable error card."
+            }
+          ],
+          "sources": [
+            {
+              "type": "commit",
+              "ref": "ea03c627",
+              "title": "feat(observability): 模型调用统一（来源身份+调用引用+详情全屏+观测全开）+ 视频上传闭环 + 工作台继承"
+            }
+          ]
+        },
+        {
+          "id": "feat-memory-system-upgrade",
+          "kind": "feature",
+          "importance": "high",
+          "title": {
+            "zh": "记忆系统升级：原则层、导航与语义检索",
+            "en": "Memory upgrade: tenets, navigation, and semantic retrieval"
+          },
+          "summary": {
+            "zh": "新增用户原则层（tenets）：助手可在对话中提出原则，经你审批后长期注入新会话；记忆库新增导航索引并在编译时注入上下文，事实检索升级为关键词与语义向量融合召回，检索不到时给出零结果诊断；👍/👎 评分会沉淀为经验反馈供后续参考。",
+            "en": "Adds a tenets layer: the assistant can propose principles mid-conversation which, once you approve them, are injected into new sessions; the memory store gains a navigation index injected at compile time, fact retrieval now fuses keyword and semantic-vector recall, empty results get a diagnosis, and 👍/👎 ratings feed an experience store for future turns."
+          },
+          "details": [
+            {
+              "zh": "tenets 管理入口在设置页，可随时停用或删除；停用后不再注入。",
+              "en": "Tenets are managed in settings and can be deactivated or deleted at any time; deactivated tenets stop being injected."
+            }
+          ],
+          "sources": [
+            {
+              "type": "commit",
+              "ref": "20a9e944",
+              "title": "feat(memory): 记忆系统升级（tenets/导航节/语义检索/经验反馈）+ 观测轨迹详情页 + 迁移#54"
+            }
+          ]
+        },
+        {
+          "id": "feat-observability-trace-detail",
+          "kind": "feature",
+          "importance": "medium",
+          "title": {
+            "zh": "观测轨迹详情页",
+            "en": "Observability trace detail page"
+          },
+          "summary": {
+            "zh": "轨迹列表新增按会话聚合的过滤（只看发生过多次调用的会话），并新增轨迹详情页：时间线、调用瀑布与载荷快照一屏可读，宽窄屏均已适配。",
+            "en": "The trace list gains a session-aggregated filter (only sessions with repeated calls), plus a new trace detail page: timeline, call waterfall, and payload snapshots readable in one view, adapted to both wide and narrow layouts."
+          },
+          "details": [],
+          "sources": [
+            {
+              "type": "commit",
+              "ref": "20a9e944",
+              "title": "feat(memory): 记忆系统升级（tenets/导航节/语义检索/经验反馈）+ 观测轨迹详情页 + 迁移#54"
+            }
+          ]
+        },
+        {
+          "id": "improvement-workspace-inheritance",
+          "kind": "improvement",
+          "importance": "medium",
+          "title": {
+            "zh": "新建聊天继承当前工作台",
+            "en": "New chats inherit the current workspace"
+          },
+          "summary": {
+            "zh": "在某个工作台下新建聊天时，新聊天归属该工作台，不再总是回到默认工作台。",
+            "en": "Creating a chat while inside a workspace now files the new chat under that workspace instead of always falling back to the default one."
+          },
+          "details": [],
+          "sources": [
+            {
+              "type": "commit",
+              "ref": "ea03c627",
+              "title": "feat(observability): 模型调用统一（来源身份+调用引用+详情全屏+观测全开）+ 视频上传闭环 + 工作台继承"
+            }
+          ]
+        },
+        {
+          "id": "migration-54-utility-dead-keys",
+          "kind": "migration",
+          "importance": "low",
+          "title": {
+            "zh": "清理历史配置死键",
+            "en": "Clean up legacy config dead keys"
+          },
+          "summary": {
+            "zh": "自动清理早期版本残留在本地配置中的 utility_model / utility_large_model 死键，避免「已配置辅助模型」的错觉（该槽位实际读取新键名）。",
+            "en": "Automatically removes the utility_model / utility_large_model dead keys left in local config by early builds, eliminating the illusion of a configured helper model (the slot actually reads its new key names)."
+          },
+          "details": [],
+          "sources": [
+            {
+              "type": "commit",
+              "ref": "20a9e944",
+              "title": "feat(memory): 记忆系统升级（tenets/导航节/语义检索/经验反馈）+ 观测轨迹详情页 + 迁移#54"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "schemaVersion": 1,
       "tag": "v0.1.32",
       "version": "0.1.32",
       "previousTag": "v0.1.31",

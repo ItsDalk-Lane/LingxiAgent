@@ -10,7 +10,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = cc6315e0faae2102443f1576de15a9aa0fe831a2  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-09-02 embedding gate Windows 粒度派发修复)
+VERIFIED_SOURCE_SHA   = 850bf49e578612f16544806982931f80d083b0ee  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-09-02 v0.1.33 release metadata)
 工作分支              = feature/upstream-sync-0.447.4
 ```
 
@@ -821,6 +821,16 @@ seal 不是一次性终点，而是"当前被验证树"的游标；每次审计�
   无关（本地 31/31 绿、同 job attempt 1 全绿），属 runner 抖动。验证：
   typecheck×3 绿 + knowledge-lifecycle 16/16 + persistence tripwire 15/15 +
   closure/boundary 39/39 后推进。
+
+- **2026-09-02 v0.1.33 release metadata**（功能树 850bf49e/seal 本提交，
+  release/v0.1.33，5 files / +271-76，数据-only，零生产代码变化）：package.json
+  版本 0.1.33 + releaseGeneration 11（双 bump，防同代静默跳过激活）；release
+  digest v1（手写 digest 工作流：6 items——模型调用统一/视频上传/记忆系统
+  升级/观测轨迹详情页 high·feature、工作台继承 medium·improvement、迁移#54
+  low·migration）+ v2 追加至 14 条（generate-release-digest --append-history）；
+  release-preflight 活体测试随版本推进。验证：validate-release-digest v1/v2
+  过 + release-preflight --tag v0.1.33 PASS（gen 11 > 10）+ release 目标
+  套件 6 文件 55 用例全绿后推进。
 
 ## 最终状态：已合并（上游同步部分）
 
