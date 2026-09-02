@@ -10,7 +10,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = 61099bcdfdb110b9210e3b4381f00af539c5f57f  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-09-02 AtomGit 镜像旧 release 清理降级 best-effort)
+VERIFIED_SOURCE_SHA   = 275d82c7e420c343f0d79243c80c3f43536149f5  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-09-02 安全双件套+沙盒拒绝分因文案)
 工作分支              = feature/upstream-sync-0.447.4
 ```
 
@@ -844,6 +844,25 @@ seal 不是一次性终点，而是"当前被验证树"的游标；每次审计�
   删除改经 deleteOldReleaseTolerant，失败 WARN 继续不判红；真实环境端到端
   exit 0（14 删除 → 14 WARN）。验证：typecheck×3 绿 + 全量 npm test
   12896 通过（含新增 425 降级用例）后推进。
+
+- **2026-09-02 安全双件套 + 沙盒拒绝分因文案**（功能树 275d82c7/seal 本提交，
+  feat/pending-sep02，628d2f90+275d82c7 两提交 32 files / +1053-58）：
+  ①安全双件套——lib/security/injection-scan.ts 固定规则注入扫描（去零宽/HTML
+  注释防绕过，high→block、medium→warn，只加警告不改原文），knowledge 普通/
+  滚动注入链路打 UNTRUSTED 边界；lib/extensions/agent-loop-guard-ext.ts 同
+  签名第 7 次/同工具连败 5 次阻断（第 3/5 次前置警告），注册先于 compaction
+  guard；持久化指纹 compatible 重钉（server/index.ts 属守卫源）。
+  ②沙盒拒绝分因——Windows 实测会话全程 operate（完整权限）档下 stage_files
+  投递工作区外文件被拒，旧文案「权限级别: read_only」致模型误判为会话只读
+  模式，反复请求用户切权限并原样重试；PathGuard.check 拒绝结构化（level +
+  cause: outside_write_scope|blocked|unresolvable），分因文案明示「与会话权限
+  模式无关」+ 两条出路（session_folders 授权目录/复制进工作区），safety-policy
+  兜底改拼接不覆盖，系统提示词补反误诊指引（中英+golden 快照同步），五语言
+  sandbox.denied 拆三键（deniedOutsideWriteScope/deniedBlocked/
+  deniedUnresolvable）。③tenets locale 键迁移 settings.tenets* →
+  settings.memory.tenets*（跟随设置页结构）。验证：typecheck×3 绿 + 定向
+  176 用例绿 + 全量 npm test 12929 passed / 7 skipped（exit 0，275d82c7 树
+  复跑）+ 持久化 tripwire 15/15 + locale parity 绿后推进。
 
 ## 最终状态：已合并（上游同步部分）
 
