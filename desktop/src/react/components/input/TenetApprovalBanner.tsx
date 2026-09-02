@@ -15,10 +15,10 @@ import { useI18n } from '../../hooks/use-i18n';
 import styles from './InputArea.module.css';
 
 const PRIORITY_LABEL_KEYS: Record<string, string> = {
-  critical: 'settings.tenetsPriorityCritical',
-  high: 'settings.tenetsPriorityHigh',
-  medium: 'settings.tenetsPriorityMedium',
-  low: 'settings.tenetsPriorityLow',
+  critical: 'settings.memory.tenetsPriorityCritical',
+  high: 'settings.memory.tenetsPriorityHigh',
+  medium: 'settings.memory.tenetsPriorityMedium',
+  low: 'settings.memory.tenetsPriorityLow',
 };
 
 async function decideTenet(agentId: string, tenetId: string, approve: boolean): Promise<boolean> {
@@ -55,7 +55,7 @@ function TenetRow({ agentId, tenet, onDecided }: { agentId: string; tenet: Tenet
     }
   };
 
-  const priorityLabel = t(PRIORITY_LABEL_KEYS[tenet.priority] || 'settings.tenetsPriorityMedium');
+  const priorityLabel = t(PRIORITY_LABEL_KEYS[tenet.priority] || 'settings.memory.tenetsPriorityMedium');
 
   return (
     <div className={styles['tenet-row']}>
@@ -64,14 +64,14 @@ function TenetRow({ agentId, tenet, onDecided }: { agentId: string; tenet: Tenet
         <span>{tenet.content}</span>
       </div>
       <div className={styles['tenet-actions']}>
-        {error && <span className={styles['tenet-error-text']}>{t('settings.tenetsDecideFailed')}</span>}
+        {error && <span className={styles['tenet-error-text']}>{t('settings.memory.tenetsDecideFailed')}</span>}
         <button
           type="button"
           className={`${styles['tenet-action-button']} ${styles['tenet-approve-button']}`}
           disabled={busy}
           onClick={() => { void handle(true); }}
         >
-          {t('settings.tenetsApprove')}
+          {t('settings.memory.tenetsApprove')}
         </button>
         <button
           type="button"
@@ -79,7 +79,7 @@ function TenetRow({ agentId, tenet, onDecided }: { agentId: string; tenet: Tenet
           disabled={busy}
           onClick={() => { void handle(false); }}
         >
-          {t('settings.tenetsReject')}
+          {t('settings.memory.tenetsReject')}
         </button>
       </div>
     </div>
@@ -103,7 +103,7 @@ export function TenetApprovalBanner() {
 
   return (
     <div className={styles['tenet-banner']} data-testid="tenet-approval-banner">
-      <div className={styles['tenet-banner-header']}>{t('settings.tenetsBannerTitle', { count: pending.length })}</div>
+      <div className={styles['tenet-banner-header']}>{t('settings.memory.tenetsBannerTitle', { count: pending.length })}</div>
       {pending.map((tenet) => (
         <TenetRow
           key={tenet.id}

@@ -2143,6 +2143,14 @@
         }
       },
       "allMemories": "모든 기억",
+      "embeddingTitle": "기억 의미 검색",
+      "embeddingHint": "기억 의미 검색에 사용할 임베딩 모델을 선택하세요. 설정하지 않으면 기억 검색은 태그와 키워드만 사용해요.",
+      "embeddingNone": "사용 안 함",
+      "embeddingLoading": "임베딩 모델을 불러오는 중…",
+      "embeddingNoModels": "사용 가능한 임베딩 모델이 없어요. 먼저 '모델' 탭에서 임베딩 지원 모델을 추가해 주세요.",
+      "embeddingActiveNote": "의미 검색 사용 중: 기억 검색이 벡터 검색과 키워드 검색을 함께 수행해요.",
+      "embeddingOffNote": "의미 검색이 꺼져 있어요: 기억 검색은 태그와 키워드 검색만 사용해요.",
+      "embeddingSaved": "기억 임베딩 모델이 저장되었어요",
       "tenetsTitle": "사용자 원칙",
       "tenetsHint": "사용자가 확인한 행동 원칙으로, 새 대화마다 주입돼요. 어시스턴트 제안은 승인 후에 효력이 있어요.",
       "tenetsLoading": "사용자 원칙을 불러오는 중…",
@@ -4486,7 +4494,9 @@
     "opRead": "읽기",
     "opWrite": "쓰기",
     "opDelete": "삭제",
-    "denied": "{op} 거부됨: {path} (접근 레벨: {level})"
+    "deniedOutsideWriteScope": "{op} 거부됨: {path} 경로가 샌드박스 쓰기 허용 범위 밖에 있어요(외부 경로는 읽기 전용). 쓰기와 파일 전달은 워크스페이스 및 승인된 폴더로 제한되며, 이 제한은 세션 권한 모드와 무관해서 모드를 바꿔도 결과가 달라지지 않아요. 사용자에게 폴더 승인(세션 폴더)을 요청하거나 파일을 워크스페이스로 복사한 후 진행하세요.",
+    "deniedBlocked": "{op} 거부됨: {path} 경로는 샌드박스가 접근을 금지한 보호 대상 위치(자격 증명, 브라우저 데이터 등)로, 세션 권한 모드와 관계없이 접근할 수 없어요.",
+    "deniedUnresolvable": "{op} 거부됨: {path} 경로를 실제 경로로 해석할 수 없어요(존재하지 않거나 접근 불가능할 수 있어요)."
   },
   "error.llmTimeout": "Model request timed out",
   "error.llmRateLimited": "Model rate limited, please wait",

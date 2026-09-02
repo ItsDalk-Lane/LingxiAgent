@@ -2143,6 +2143,14 @@
         }
       },
       "allMemories": "すべての記憶",
+      "embeddingTitle": "記憶意味検索",
+      "embeddingHint": "記憶意味検索に使う埋め込みモデルを選択します。未設定の場合、記憶検索はタグとキーワードのみを使用します。",
+      "embeddingNone": "無効",
+      "embeddingLoading": "埋め込みモデルを読み込み中…",
+      "embeddingNoModels": "利用できる埋め込みモデルがありません。先に「モデル」タブで埋め込み対応モデルを追加してください。",
+      "embeddingActiveNote": "意味検索が有効：記憶検索はベクトル検索とキーワード検索を併用します。",
+      "embeddingOffNote": "意味検索が無効：記憶検索はタグとキーワード検索のみを使用します。",
+      "embeddingSaved": "記憶用埋め込みモデルを保存しました",
       "tenetsTitle": "ユーザー原則",
       "tenetsHint": "あなたが確認した行動原則で、新しい会話ごとに注入されます。アシスタントの提案は承認後に有効になります。",
       "tenetsLoading": "ユーザー原則を読み込み中…",
@@ -4486,7 +4494,9 @@
     "opRead": "読み取り",
     "opWrite": "書き込み",
     "opDelete": "削除",
-    "denied": "{op}が拒否されました：{path}（アクセスレベル: {level}）"
+    "deniedOutsideWriteScope": "{op}が拒否されました：{path} はサンドボックスの書き込み可能範囲の外にあります（外部パスは読み取り専用）。書き込みとファイルの受け渡しはワークスペースと承認済みフォルダに限られ、この制限はセッション権限モードとは無関係のため、モードを切り替えても結果は変わりません。ユーザーにフォルダの承認（セッションフォルダ）を依頼するか、ファイルをワークスペースにコピーしてから操作してください。",
+    "deniedBlocked": "{op}が拒否されました：{path} はサンドボックスがアクセスを禁止する保護対象の場所（認証情報やブラウザデータなど）で、セッション権限モードに関係なくアクセスできません。",
+    "deniedUnresolvable": "{op}が拒否されました：{path} を実パスとして解決できません（存在しないかアクセスできない可能性があります）。"
   },
   "error.llmTimeout": "Model request timed out",
   "error.llmRateLimited": "Model rate limited, please wait",

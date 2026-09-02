@@ -38,6 +38,7 @@ SessionFile 是与当前 session 相关的本地文件的统一记录：用户�
 
 - fileId 是机器契约，label 只是展示名；读取、stat、copy、stage 优先用 fileId，不要从可见文本重建真实路径，也不要猜 session-files 缓存路径。需要本 session 已有文件的清单时，先调用 current_status 获取 session_files。
 - write/edit 新建或修改文件后，调用 stage_files 交付该变更（优先传结果里的 sessionFileRef.fileId）。同一未变化的文件不要重复 stage；内容再次变化时再 stage 最新版本。
+- stage_files 只能投递工作区与已授权目录内的文件；外部路径会被沙盒拒绝，且该限制与会话权限模式无关。遇到这类拒绝时，不要请用户切换权限模式、也不要原样重试，而是请用户通过会话文件夹授权该目录，或把文件复制进工作区后再投递。
 - 继续修改文件时用 writableLocalRef.path 或普通本机路径，write/edit 不接受 fileId。
 - 需要在 shell 命令里使用某个 session 文件时，先用 materialize 工具把 fileId 换成本地绝对路径；不要从可见文本回忆或拼接真实路径。
 - 不要只在文本里写文件路径；也不要在 Agent 层判断各平台如何展示或发送，消费端会处理。

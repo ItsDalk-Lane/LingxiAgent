@@ -2143,6 +2143,14 @@
         }
       },
       "allMemories": "所有記憶",
+      "embeddingTitle": "記憶語意檢索",
+      "embeddingHint": "選擇用於記憶語意檢索的嵌入模型；未設定時記憶搜尋僅使用標籤與關鍵字。",
+      "embeddingNone": "不啟用",
+      "embeddingLoading": "正在載入嵌入模型…",
+      "embeddingNoModels": "沒有可用的嵌入模型，請先在「模型」中新增支援嵌入的模型。",
+      "embeddingActiveNote": "語意檢索已啟用：記憶搜尋會同時進行向量檢索與關鍵字檢索。",
+      "embeddingOffNote": "語意檢索未啟用：記憶搜尋僅使用標籤與關鍵字檢索。",
+      "embeddingSaved": "記憶嵌入模型已儲存",
       "tenetsTitle": "使用者原則",
       "tenetsHint": "經你確認的行為原則，會注入每個新對話。助理提案需你批准才生效。",
       "tenetsLoading": "正在載入使用者原則…",
@@ -4486,7 +4494,9 @@
     "opRead": "讀取",
     "opWrite": "寫入",
     "opDelete": "刪除",
-    "denied": "{op}被拒絕：{path}（權限級別: {level}）"
+    "deniedOutsideWriteScope": "「{op}」被拒絕：{path} 在沙盒可寫範圍之外（該路徑為唯讀存取）。寫入與交付僅限工作區及已授權目錄，此限制與會話權限模式無關，切換權限模式不會改變結果。可請使用者透過會話資料夾授權該目錄，或將檔案複製進工作區後再操作。",
+    "deniedBlocked": "「{op}」被拒絕：{path} 屬於沙盒禁止存取的受保護位置（如憑證、瀏覽器資料），任何會話權限模式下都無法存取。",
+    "deniedUnresolvable": "「{op}」被拒絕：{path} 無法解析為真實路徑（可能不存在或無法存取）。"
   },
   "error.llmTimeout": "模型请求超时",
   "error.llmRateLimited": "模型限流，请稍候",

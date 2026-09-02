@@ -190,18 +190,22 @@ export class PathGuard {
    * 检查操作是否被允许
    * @param {string} absolutePath
    * @param {"read"|"write"|"delete"|"stage"} operation
-   * @returns {{ allowed: boolean, canonicalPath?: string, reason?: string }}
+   * @returns {{ allowed: boolean, canonicalPath?: string, reason?: string, level?: string, cause?: "outside_write_scope"|"blocked"|"unresolvable" }}
    */
   check(absolutePath, operation) {
+    const opLabel = {
+      read: t("sandbox.opRead"),
+      write: t("sandbox.opWrite"),
+      delete: t("sandbox.opDelete"),
+      stage: "stage",
+    }[operation] || operation;
     const canonicalPath = this._resolveReal(absolutePath);
     if (!canonicalPath) {
       return {
         allowed: false,
-        reason: t("sandbox.denied", {
-          op: operation === "stage" ? "stage" : operation,
-          path: path.resolve(absolutePath),
-          level: AccessLevel.BLOCKED,
-        }),
+        level: AccessLevel.BLOCKED,
+        cause: "unresolvable",
+        reason: t("sandbox.deniedUnresolvable", { op: opLabel, path: path.resolve(absolutePath) }),
       };
     }
     if (this._fullAccess) return { allowed: true, canonicalPath };
@@ -210,15 +214,23 @@ export class PathGuard {
 
     if (allowed) return { allowed: true, canonicalPath };
 
-    const opLabel = {
-      read: t("sandbox.opRead"),
-      write: t("sandbox.opWrite"),
-      delete: t("sandbox.opDelete"),
-      stage: "stage",
-    }[operation] || operation;
+    // 拒绝文案必须把「路径 ACL 只读/封禁」与「会话权限模式」区分开并给出出路；
+    // 否则模型会把拒绝误判成会话模式问题，反复让用户切模式后原样重试。
+    if (level === AccessLevel.READ_ONLY) {
+      return {
+        allowed: false,
+        level,
+        cause: "outside_write_scope",
+        canonicalPath,
+        reason: t("sandbox.deniedOutsideWriteScope", { op: opLabel, path: canonicalPath }),
+      };
+    }
     return {
       allowed: false,
-      reason: t("sandbox.denied", { op: opLabel, path: canonicalPath, level }),
+      level,
+      cause: "blocked",
+      canonicalPath,
+      reason: t("sandbox.deniedBlocked", { op: opLabel, path: canonicalPath }),
     };
   }
 

@@ -2212,6 +2212,14 @@
         }
       },
       "allMemories": "所有记忆",
+      "embeddingTitle": "记忆语义检索",
+      "embeddingHint": "选择用于记忆语义检索的嵌入模型；未配置时记忆搜索仅使用标签与关键词。",
+      "embeddingNone": "不启用",
+      "embeddingLoading": "正在加载嵌入模型…",
+      "embeddingNoModels": "没有可用的嵌入模型，请先在「模型」中添加支持嵌入的模型。",
+      "embeddingActiveNote": "语义检索已启用：记忆搜索会同时进行向量检索与关键词检索。",
+      "embeddingOffNote": "语义检索未启用：记忆搜索仅使用标签与关键词检索。",
+      "embeddingSaved": "记忆嵌入模型已保存",
       "tenetsTitle": "用户原则",
       "tenetsHint": "经你确认的行为原则，会注入每个新对话。助手提案需你批准才生效。",
       "tenetsLoading": "正在加载用户原则…",
@@ -4586,7 +4594,9 @@
     "opRead": "读取",
     "opWrite": "写入",
     "opDelete": "删除",
-    "denied": "{op}被拒绝：{path}（权限级别: {level}）"
+    "deniedOutsideWriteScope": "「{op}」被拒绝：{path} 在沙盒可写范围之外（该路径为只读访问）。写入与投递仅限工作区及已授权目录，此限制与会话权限模式无关，切换权限模式不会改变结果。可请用户通过会话文件夹授权该目录，或把文件复制进工作区后再操作。",
+    "deniedBlocked": "「{op}」被拒绝：{path} 属于沙盒禁止访问的受保护位置（如凭证、浏览器数据），任何会话权限模式下都不可访问。",
+    "deniedUnresolvable": "「{op}」被拒绝：{path} 无法解析为真实路径（可能不存在或无法访问）。"
   },
   "error.llmTimeout": "模型请求超时",
   "error.llmRateLimited": "模型限流，请稍候",
