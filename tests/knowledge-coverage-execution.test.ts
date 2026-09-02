@@ -298,13 +298,15 @@ describe("HIGH_RECALL：预算链与邻接扩展（§二十六/§三十六/§九
 
   it("candidate budget 链逐级截断并留痕计数：150 候选 → 融合池/锚点随预算伸缩", async () => {
     const candidates = Array.from({ length: 150 }, (_, index) => fakeChunk({ id: `c${index}`, ordinal: index }));
-    // 兜底预算（6000）× 假块 ~5 token：融合池上限 = min(480, 6000×0.7/5) = 480
-    // → 150 候选全部入池；锚点上限 = min(240, 6000×0.5/5) = 240 → 全部成为锚点
+    // 显式预算（8000）覆盖每条证据新增的外部内容边界开销：融合池上限
+    // = min(480, 8000×0.7/5) = 480 → 150 候选全部入池；锚点上限
+    // = min(240, 8000×0.5/5) = 240 → 全部成为锚点
     // （2026-08-30 阀 A/阀 B 均随预算倒推后的语义；真实块 ~1300 token 时池子
     // 仍在 60 水位地板，见 resolveFusionPoolBudget 单测）。
     const { block, stats } = await buildKnowledgeContextInjection({
       question: "问题",
       mode: "detailed",
+      budgetTokens: 8000,
       deps: {
         decomposeModel: null,
         retrieve: async () => fakeRetrieval(candidates),

@@ -660,7 +660,7 @@
     ],
     "version": 3
   },
-  "payloadFingerprint": "sha256:6c61458af2032f36a28a1688c1c2b7920f156914d8a696ff0e4c25787303ea28",
+  "payloadFingerprint": "sha256:d7239a0f7b0ca2323bb7b57da212a09e98674ac724f863155dfd96f07900e50c",
   "registry": [
     {
       "affectedByEpochMigration": true,
@@ -3287,8 +3287,8 @@
   ],
   "review": {
     "classification": "compatible",
-    "compatibilityReason": "Model Observatory schema v4 adds a source identity snapshot table without rewriting existing call rows; existing retention and read compatibility remain intact.",
-    "payloadFingerprint": "sha256:6c61458af2032f36a28a1688c1c2b7920f156914d8a696ff0e4c25787303ea28"
+    "compatibilityReason": "registers a stateless Pi tool loop guard extension; no persisted store schema, data epoch, or restore contract changes",
+    "payloadFingerprint": "sha256:d7239a0f7b0ca2323bb7b57da212a09e98674ac724f863155dfd96f07900e50c"
   },
   "schemas": [
     {
@@ -4201,7 +4201,7 @@
       "contract": "server-info writer and desktop bootstrap reader",
       "kind": "runtime-contract",
       "module": "server/index.ts",
-      "sourceHash": "sha256:cd511f1d4c6aa4258841cceb78e2029cb7c416f3c1e728796b68a1bf8c6ff83e",
+      "sourceHash": "sha256:f641d0ccaac284d241c2d999178c1cb78bc2d4f1c0e7dcbb6daeb3983d5f97b6",
       "storeId": "server-runtime-info"
     },
     {

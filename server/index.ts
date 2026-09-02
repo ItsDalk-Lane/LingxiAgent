@@ -84,6 +84,7 @@ import { SubagentThreadStore } from "../lib/subagent-thread-store.ts";
 import { ActivityHub } from "../lib/activity-hub.ts";
 import { WorkflowActivityStore } from "../lib/workflow-activity-store.ts";
 import { createDeferredResultExtension } from "../lib/extensions/deferred-result-ext.ts";
+import { createAgentLoopGuardExtension } from "../lib/extensions/agent-loop-guard-ext.ts";
 import { createCompactionGuardExtension } from "../lib/extensions/compaction-guard-ext.ts";
 import { createModelCallObserverExtension } from "../lib/extensions/model-call-observer-ext.ts";
 import { getResolvedCompactionMode } from "../shared/compaction-mode.ts";
@@ -493,6 +494,8 @@ export async function startServer(root: CompositionRoot = {}): Promise<void> {
   );
 
   await engine.registerExtensionFactory(createDeferredResultExtension(deferredResultStore));
+  // 跑飞守卫必须先看到完整 tool_result；后续 compaction guard 才可截断大结果。
+  await engine.registerExtensionFactory(createAgentLoopGuardExtension());
   await engine.registerExtensionFactory(createCompactionGuardExtension({
     usageLedger: engine.usageLedger,
     getCompactionMode: () => getResolvedCompactionMode(engine.preferences),

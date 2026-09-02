@@ -28,7 +28,14 @@
  * （[question decomposition unavailable: ...] / [knowledge retrieval unavailable: ...]），
  * 不悄悄退回无注入的普通聊天。
  */
+import { createModuleLogger } from "../debug-log.ts";
 import { estimateTextTokens } from "../llm/estimate-text-tokens.ts";
+import {
+  buildWarningLine,
+  markUntrusted,
+  scan as scanInjection,
+  type InjectionDecision,
+} from "../security/injection-scan.ts";
 import type {
   KnowledgeDegradedScope,
   KnowledgeReferenceMode,
@@ -57,6 +64,25 @@ import type {
   KnowledgeEvidenceManifestEntry,
   KnowledgeTurnScope,
 } from "./types.ts";
+
+const injectionScanLog = createModuleLogger("knowledge-injection-scan");
+
+type InjectionScanCounts = Record<InjectionDecision, number>;
+
+function createInjectionScanCounts(): InjectionScanCounts {
+  return { clean: 0, warn: 0, block: 0 };
+}
+
+function markScannedEvidence(text: string, counts?: InjectionScanCounts): string {
+  const result = scanInjection(text);
+  if (counts) counts[result.decision] += 1;
+  const warning = buildWarningLine(result.decision);
+  return markUntrusted(warning ? `${warning}\n${text}` : text);
+}
+
+function logInjectionScanCounts(stage: string, counts: InjectionScanCounts): void {
+  injectionScanLog.log(`${stage}: clean=${counts.clean} warn=${counts.warn} block=${counts.block}`);
+}
 
 /**
  * 注入预算兜底（tokens）：会话模型上下文未知时的回退值。超预算走
@@ -1759,6 +1785,7 @@ export function renderKnowledgeContextBlock(input: {
   let used = 0;
   let truncated = 0;
   let neighborExpansionCount = 0;
+  const injectionScanCounts = createInjectionScanCounts();
   if (input.rollup) {
     // 滚动注入路径（2026-08-31）：证据总量超预算，已由会话主模型分部分消化。
     // 渲染结构 = 分批说明行 + 各部分中间笔记（逐部分标注：工作笔记，非对话
@@ -1800,7 +1827,7 @@ export function renderKnowledgeContextBlock(input: {
         ordinal: entry.labelIndex,
         sourceName: entry.chunk.sourceName,
         chunkOrdinal: entry.chunk.ordinal + 1,
-        firstLine: resultFirstLine(entry.text),
+        firstLine: resultFirstLine(quoteText(entry.chunk.text)),
       });
     }
   } else {
@@ -1823,14 +1850,15 @@ export function renderKnowledgeContextBlock(input: {
         entry.contextOnly && lastAnchorOrdinal != null ? lastAnchorOrdinal : undefined,
       );
       const body = quoteText(entry.chunk.text);
-      const cost = estimateTextTokens(header) + estimateTextTokens(body);
+      const rendered = markScannedEvidence(`${header}\n${body}`, injectionScanCounts);
+      const cost = estimateTextTokens(rendered);
       if (used + cost > input.budgetTokens) {
         if (entry.contextOnly) continue;
         truncated = entries.slice(index).filter(candidate => !candidate.contextOnly).length;
         break;
       }
       used += cost;
-      injected.push(`${header}\n${body}`);
+      injected.push(rendered);
       if (entry.contextOnly) {
         neighborExpansionCount += 1;
       } else {
@@ -1913,6 +1941,9 @@ export function renderKnowledgeContextBlock(input: {
     + (input.rollup ? knowledgeRollupGuidance() : knowledgeModeGuidance(input.mode)),
   );
   lines.push("[/KnowledgeContext]");
+  if (!input.rollup && injected.length > 0) {
+    logInjectionScanCounts("render", injectionScanCounts);
+  }
   return {
     block: lines.join("\n"),
     stats: {
@@ -2566,7 +2597,10 @@ export async function buildKnowledgeContextInjection(input: {
       if (!entry.contextOnly) lastAnchorLabel = labelCursor;
     }
   }
-  const totalCost = renderedEntries.reduce((sum, entry) => sum + estimateTextTokens(entry.text), 0);
+  const totalCost = renderedEntries.reduce(
+    (sum, entry) => sum + estimateTextTokens(markScannedEvidence(entry.text)),
+    0,
+  );
   const assembleMs = Date.now() - assembleStart;
   // 快速档渲染预算收紧（只影响装填循环与 stats 口径；外层 budgetTokens 不动，
   // 避免把快速档推进滚动判定）。

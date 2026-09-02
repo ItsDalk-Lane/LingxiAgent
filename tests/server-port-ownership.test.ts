@@ -44,6 +44,18 @@ describe("server transport ownership", () => {
     expect(compactionIndex).toBeLessThan(pluginInitIndex);
   });
 
+  it("registers the agent loop guard before result truncation and plugin startup", () => {
+    const source = fs.readFileSync(path.join(root, "server", "index.ts"), "utf-8");
+
+    const loopGuardIndex = source.indexOf("await engine.registerExtensionFactory(createAgentLoopGuardExtension");
+    const compactionIndex = source.indexOf("await engine.registerExtensionFactory(createCompactionGuardExtension");
+    const pluginInitIndex = source.indexOf("await engine.initPlugins(");
+
+    expect(loopGuardIndex).toBeGreaterThan(-1);
+    expect(loopGuardIndex).toBeLessThan(compactionIndex);
+    expect(loopGuardIndex).toBeLessThan(pluginInitIndex);
+  });
+
   it("reports PORT_IN_USE with host, port, network mode, and recovery suggestions", () => {
     const source = fs.readFileSync(path.join(root, "server", "index.ts"), "utf-8");
 

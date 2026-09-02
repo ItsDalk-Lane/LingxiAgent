@@ -4984,6 +4984,16 @@
         },
         {
           "root": "server-bootstrap",
+          "from": "lib/knowledge/knowledge-rollup.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/knowledge/knowledge-context-injector.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
           "from": "lib/compat/checks/facts-db.ts",
           "kind": "import-statement"
         },
@@ -5149,6 +5159,11 @@
         },
         {
           "root": "server-bootstrap",
+          "from": "lib/extensions/agent-loop-guard-ext.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
           "from": "lib/extensions/compaction-guard-ext.ts",
           "kind": "import-statement"
         },
@@ -5283,7 +5298,7 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by core/migrations.ts (import-statement); core/plugin-config.ts (import-statement); lib/desk/cron-store.ts (import-statement); +86 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by core/migrations.ts (import-statement); core/plugin-config.ts (import-statement); lib/desk/cron-store.ts (import-statement); +89 more importer(s)."
     },
     {
       "path": "lib/default-models.json",
@@ -5673,6 +5688,18 @@
         }
       ],
       "reason": "Reached via esbuild source module graph, imported by core/agent.ts (import-statement); core/session-coordinator.ts (import-statement); server/routes/settings-snapshot.ts (import-statement); +1 more importer(s)."
+    },
+    {
+      "path": "lib/extensions/agent-loop-guard-ext.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "server/index.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by server/index.ts (import-statement)."
     },
     {
       "path": "lib/extensions/compaction-guard-ext.ts",
@@ -10170,6 +10197,28 @@
         }
       ],
       "reason": "Reached via esbuild source module graph, imported by lib/bridge/dingtalk-api.ts (import-statement); server/routes/bridge.ts (import-statement); lib/bridge/dingtalk-adapter.ts (import-statement)."
+    },
+    {
+      "path": "lib/security/injection-scan.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "lib/knowledge/knowledge-rollup.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/knowledge/knowledge-context-injector.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/extensions/agent-loop-guard-ext.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by lib/knowledge/knowledge-rollup.ts (import-statement); lib/knowledge/knowledge-context-injector.ts (import-statement); lib/extensions/agent-loop-guard-ext.ts (import-statement)."
     },
     {
       "path": "lib/session-collab/decision-record.ts",
@@ -124967,9 +125016,9 @@
     }
   ],
   "stats": {
-    "totalFiles": 10653,
+    "totalFiles": 10655,
     "byInputType": {
-      "source-graph": 753,
+      "source-graph": 755,
       "runtime-asset": 11,
       "nft-runtime-trace": 9889
     }
