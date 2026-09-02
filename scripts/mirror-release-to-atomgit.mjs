@@ -284,7 +284,7 @@ async function makePrereleaseQuotaRoom(options, projectId, githubRelease, releas
   const toDelete = releases.filter(release => release.tag_name !== fallback?.tag_name);
   for (const release of toDelete) {
     console.log(`Deleting old AtomGit release ${release.tag_name} to make prerelease quota room`);
-    await deleteAtomGitRelease(projectId, release.tag_name, dependencies);
+    await deleteOldReleaseTolerant(projectId, release.tag_name, dependencies);
   }
   return fallback ? [fallback] : [];
 }
@@ -297,7 +297,24 @@ async function retainOnlyTargetRelease(options, projectId, targetTag, dependenci
   for (const release of releases) {
     if (release.tag_name === targetTag) continue;
     console.log(`Deleting superseded AtomGit release ${release.tag_name}`);
-    await deleteAtomGitRelease(projectId, release.tag_name, dependencies);
+    await deleteOldReleaseTolerant(projectId, release.tag_name, dependencies);
+  }
+}
+
+// release-only DELETE 只存在于 v2 web 端点（v5 官方 API 没有该操作），而 v2 端点
+// 不认 PAT——2026-09-02 实测：Owner 满权限令牌经 Bearer / access_token 查询参数 /
+// PRIVATE-TOKEN / Cookie / X-GitCode-Token 五种传法全部被拒（425 TOKEN_INVALID_ERROR
+// 或 401），镜像上堆积的 15 个 release 也证明该清理从未成功过。删除只是上传完成后的
+// 整理性收尾，失败不应把已经成功的发布镜像判红：留警告继续，必要时人工在 GitCode
+// Web UI 清理旧版本。
+async function deleteOldReleaseTolerant(projectId, tag, dependencies) {
+  try {
+    await deleteAtomGitRelease(projectId, tag, dependencies);
+  } catch (error) {
+    console.warn(
+      `WARN: AtomGit release delete ${tag} failed (${error.message}); `
+      + `kept on the mirror — remove ${tag} manually from the GitCode web UI if desired`,
+    );
   }
 }
 

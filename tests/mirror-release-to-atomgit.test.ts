@@ -362,6 +362,83 @@ describe("mirror-release-to-atomgit", () => {
     );
   });
 
+  it("keeps the mirror green when GitCode rejects superseded-release deletes (v2 web API does not accept PATs)", async () => {
+    const target = {
+      ...githubRelease("v0.425.4", false),
+      assets: [githubRelease("v0.425.4", false).assets[0]],
+    };
+    const old = {
+      tag_name: "v0.424.1",
+      prerelease: false,
+      release_status: "stable",
+      created_at: "2026-07-01T00:00:00Z",
+      assets: [],
+    };
+    const operations: string[] = [];
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const log = vi.spyOn(console, "log").mockImplementation(() => {});
+    const fetchImpl = vi.fn(async (input, init = {}) => {
+      const url = String(input);
+      const method = init.method || "GET";
+      if (url.endsWith("/repos/ItsDalk-Lane/LingxiAgent/releases/latest")) {
+        return new Response(JSON.stringify(target), { status: 200 });
+      }
+      const projectLookup = atomgitProjectLookupResponse(url, init);
+      if (projectLookup) return projectLookup;
+      if (url.includes("/repos/ItsDalk-Lane/LingxiAgent-Releases/branches/main") && method === "GET") {
+        return new Response(JSON.stringify({ name: "main" }), { status: 200 });
+      }
+      if (url.includes("/repos/ItsDalk-Lane/LingxiAgent-Releases/releases?") && method === "GET") {
+        operations.push("list");
+        return new Response(JSON.stringify([
+          old,
+          { tag_name: target.tag_name, prerelease: false, created_at: "2026-09-01T00:00:00Z", assets: [] },
+        ]), { status: 200 });
+      }
+      if (url.includes("/api/v2/projects/10296556/releases/") && method === "DELETE") {
+        operations.push(`delete:${decodeURIComponent(new URL(url).pathname.split("/").pop() || "")}`);
+        return new Response(
+          JSON.stringify({ error_code: 425, error_code_name: "TOKEN_INVALID_ERROR", error_message: "token无效" }),
+          { status: 400 },
+        );
+      }
+      if (url.endsWith("/repos/ItsDalk-Lane/LingxiAgent-Releases/releases?access_token=atomgit-token") && method === "POST") {
+        operations.push("create:target");
+        return new Response(JSON.stringify({ tag_name: target.tag_name, assets: [] }), { status: 201 });
+      }
+      if (url.includes(`/releases/${target.tag_name}?`) && method === "PATCH") {
+        operations.push("patch:target");
+        return new Response(JSON.stringify({ tag_name: target.tag_name }), { status: 200 });
+      }
+      if (url.includes(`/releases/${target.tag_name}/upload_url`)) {
+        return new Response(JSON.stringify({ url: "https://upload.example.com/latest.yml" }), { status: 200 });
+      }
+      if (url === "https://example.com/latest.yml") {
+        return new Response("asset", { status: 200 });
+      }
+      if (url === "https://upload.example.com/latest.yml" && method === "PUT") {
+        operations.push("upload:target");
+        return new Response(null, { status: 200 });
+      }
+      if (url.includes("/attach_files/latest.yml/download") && method === "HEAD") {
+        operations.push("verify:target");
+        return new Response(null, { status: 200, headers: { "content-length": "120" } });
+      }
+      throw new Error(`unexpected fetch: ${method} ${url}`);
+    });
+
+    await expect(mirrorRelease(mirrorOptions, target, {
+      env: { ATOMGIT_TOKEN: "atomgit-token" },
+      fetchImpl,
+    })).resolves.toMatchObject({ dryRun: false });
+
+    expect(operations).toContain("delete:v0.424.1");
+    expect(operations.filter(op => op.startsWith("delete:")).length).toBe(1);
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining("v0.424.1"));
+    warn.mockRestore();
+    log.mockRestore();
+  });
+
   it("does not delete the fallback when target asset verification fails", async () => {
     const fallback = {
       tag_name: "v0.425.3",

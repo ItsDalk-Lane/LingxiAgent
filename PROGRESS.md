@@ -10,7 +10,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = 850bf49e578612f16544806982931f80d083b0ee  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-09-02 v0.1.33 release metadata)
+VERIFIED_SOURCE_SHA   = 61099bcdfdb110b9210e3b4381f00af539c5f57f  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-09-02 AtomGit 镜像旧 release 清理降级 best-effort)
 工作分支              = feature/upstream-sync-0.447.4
 ```
 
@@ -831,6 +831,19 @@ seal 不是一次性终点，而是"当前被验证树"的游标；每次审计�
   release-preflight 活体测试随版本推进。验证：validate-release-digest v1/v2
   过 + release-preflight --tag v0.1.33 PASS（gen 11 > 10）+ release 目标
   套件 6 文件 55 用例全绿后推进。
+
+- **2026-09-02 AtomGit 镜像旧 release 清理降级 best-effort**（功能树
+  61099bcd/seal 本提交，fix/atomgit-mirror-delete-tolerant，2 files /
+  +96-2）：v0.1.33 发布 mirror-atomgit 实锤——18 产物全部上传成功后，
+  收尾删除被取代旧 release 被 GitCode v2 web 端点拒（425
+  TOKEN_INVALID_ERROR）。排查证据链：token 在 v5 完全有效且 self-permission
+  Owner 满权限；v5 无 release-only DELETE（路由 405）；v2 五种鉴权传法
+  （Bearer/access_token 查询参数/PRIVATE-TOKEN/Cookie/X-GitCode-Token）
+  全拒；镜像堆积 15 release 证明清理从未成功过。结论：v2 只认浏览器会话，
+  PAT 结构性无解。修复：retainOnlyTargetRelease/makePrereleaseQuotaRoom
+  删除改经 deleteOldReleaseTolerant，失败 WARN 继续不判红；真实环境端到端
+  exit 0（14 删除 → 14 WARN）。验证：typecheck×3 绿 + 全量 npm test
+  12896 通过（含新增 425 降级用例）后推进。
 
 ## 最终状态：已合并（上游同步部分）
 
