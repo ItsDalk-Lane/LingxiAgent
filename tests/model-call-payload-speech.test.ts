@@ -92,7 +92,8 @@ describe("MC-09 speech × payload capture", () => {
     for (const root of roots.splice(0)) fs.rmSync(root, { recursive: true, force: true });
   });
 
-  for (const adapter of builtinSpeechRecognitionAdapters) {
+  // 离线本地适配器没有 provider HTTP 请求，单独由本地模型合同测试覆盖。
+  for (const adapter of builtinSpeechRecognitionAdapters.filter((entry) => entry.id !== "local")) {
     it(`coverage: ${adapter.id} 四层 capture：audio externalize + language 保留 + credential 替换 + transcription 捕获`, async () => {
       const file = makeVoiceFile();
       const ledger = createUsageLedger({});

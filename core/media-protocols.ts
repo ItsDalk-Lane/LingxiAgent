@@ -13,6 +13,8 @@ export const MEDIA_CAPABILITY_KEYS = {
   video_generation: "videoGeneration",
   video: "videoGeneration",
   speech_generation: "speechGeneration",
+  speech_synthesis: "speechGeneration",
+  tts: "speechGeneration",
   speech_recognition: "speechRecognition",
   speechRecognition: "speechRecognition",
   transcription: "speechRecognition",

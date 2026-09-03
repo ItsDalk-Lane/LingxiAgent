@@ -14,9 +14,10 @@ const forkMock = vi.fn(async (_sessionPath: string, _target: unknown) => ({
   agentId: 'hana',
 }));
 const activateForkMock = vi.fn(async (..._args: unknown[]) => undefined);
+const hanaFetchMock = vi.hoisted(() => vi.fn(async (_path: string, _options?: unknown) => new Response('{}', { status: 200 })));
 
 vi.mock('../../hooks/use-hana-fetch', () => ({
-  lingxiFetch: vi.fn(async () => new Response('{}', { status: 200 })),
+  lingxiFetch: hanaFetchMock,
   lingxiUrl: (path: string) => `http://127.0.0.1:3210${path}`,
 }));
 
@@ -68,10 +69,17 @@ describe('AssistantMessage completion actions', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    hanaFetchMock.mockResolvedValue(new Response('{}', { status: 200 }));
     Object.assign(window, {
       t: (key: string) => ({
         'common.regenerate': '重新生成',
         'common.forkSession': '分支为新会话',
+        'chat.readAloud': '朗读',
+        'chat.readAloudPreparing': '正在准备朗读',
+        'chat.pauseReadAloud': '暂停朗读',
+        'chat.resumeReadAloud': '继续朗读',
+        'chat.stopReadAloud': '停止朗读',
+        'chat.readAloudFailed': '朗读失败',
       }[key] || key),
     });
     Object.assign(navigator, {
@@ -131,6 +139,7 @@ describe('AssistantMessage completion actions', () => {
       '分支为新会话',
       '复制文本',
       '截图',
+      '朗读',
       '有帮助',
       '没帮助',
       '全选消息',
@@ -144,6 +153,58 @@ describe('AssistantMessage completion actions', () => {
       { role: 'assistant', entryId: 'entry-a1' },
       { message: userMessage },
     );
+  });
+
+  it('按句请求本地语音，并支持暂停、继续和停止', async () => {
+    const audioInstances: Array<{
+      play: ReturnType<typeof vi.fn>;
+      pause: ReturnType<typeof vi.fn>;
+    }> = [];
+    class FakeAudio {
+      onended: (() => void) | null = null;
+      onerror: (() => void) | null = null;
+      play = vi.fn(async () => undefined);
+      pause = vi.fn();
+      removeAttribute = vi.fn();
+      load = vi.fn();
+      constructor(readonly src: string) { audioInstances.push(this); }
+    }
+    Object.defineProperty(globalThis, 'Audio', { configurable: true, value: FakeAudio });
+    Object.defineProperty(URL, 'createObjectURL', { configurable: true, value: vi.fn(() => 'blob:local-tts') });
+    Object.defineProperty(URL, 'revokeObjectURL', { configurable: true, value: vi.fn() });
+    hanaFetchMock.mockResolvedValue(new Response(JSON.stringify({
+      audio: 'UklGRg==', encoding: 'base64', format: 'wav', sampleRate: 24000,
+    }), { status: 200, headers: { 'Content-Type': 'application/json' } }));
+
+    render(
+      <AssistantMessage
+        agentDisplay={{ id: 'hana', displayName: 'Hana', avatarUrl: null, fallbackAvatar: null, yuan: 'hana', isUser: false }}
+        isStreaming={false}
+        isSelected={false}
+        message={assistantMessage}
+        showAvatar={false}
+        sessionPath={sessionPath}
+        showTurnCompletionTime
+      />,
+    );
+
+    fireEvent.click(screen.getByTitle('朗读'));
+    await waitFor(() => expect(hanaFetchMock).toHaveBeenCalledWith('/api/media/tts/synthesize', expect.objectContaining({
+      method: 'POST',
+      body: JSON.stringify({ text: '月亮很好。', sessionPath, surface: 'desktop-chat' }),
+    })));
+    await waitFor(() => expect(screen.getByTitle('暂停朗读')).toBeInTheDocument());
+    expect(audioInstances).toHaveLength(1);
+
+    fireEvent.click(screen.getByTitle('暂停朗读'));
+    expect(screen.getByTitle('继续朗读')).toBeInTheDocument();
+    expect(audioInstances[0].pause).toHaveBeenCalled();
+
+    fireEvent.click(screen.getByTitle('继续朗读'));
+    await waitFor(() => expect(screen.getByTitle('暂停朗读')).toBeInTheDocument());
+    fireEvent.click(screen.getByTitle('停止朗读'));
+    expect(screen.getByTitle('朗读')).toBeInTheDocument();
+    expect(URL.revokeObjectURL).toHaveBeenCalledWith('blob:local-tts');
   });
 
   it('does not render a footer unless the caller marks the assistant message as turn completion', () => {

@@ -39,6 +39,10 @@ export default defineConfig({
         // (this list is the source of truth for that install set).
         "@firecrawl/anydoc",
 
+        // @napi-rs/canvas 也通过平台子包加载 .node 原生绑定；扫描 PDF
+        // 的 OCR 会在服务端动态使用它，必须由独立 server 依赖安装链分发。
+        "@napi-rs/canvas",
+
         // ws: CJS package, Rollup's CJS→ESM interop loses WebSocketServer
         // named export. Keep external — available as PI SDK transitive dep.
         "ws",

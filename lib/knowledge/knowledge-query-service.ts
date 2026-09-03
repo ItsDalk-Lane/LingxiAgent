@@ -31,6 +31,8 @@ import {
 export interface KnowledgeEmbeddingResult {
   vectors: number[][];
   dimensions: number;
+  /** 本地运行时可提供精确稳定身份；远端模型缺省时仍沿用下方字段推导。 */
+  modelKey?: string;
   model: {
     provider: string;
     id: string;
@@ -190,9 +192,12 @@ function vectorModelIdentity(result: KnowledgeEmbeddingResult): VectorIndexModel
   ) {
     throw new KnowledgeError("KNOWLEDGE_RETRIEVAL_UNAVAILABLE", "Embedding model identity is invalid");
   }
+  const explicitModelKey = typeof result.modelKey === "string" && result.modelKey.trim()
+    ? result.modelKey.trim()
+    : null;
   const descriptor = JSON.stringify([provider, modelId, protocol, dimensions]);
   return {
-    key: crypto.createHash("sha256").update(descriptor, "utf8").digest("hex"),
+    key: explicitModelKey ?? crypto.createHash("sha256").update(descriptor, "utf8").digest("hex"),
     provider,
     modelId,
     protocol,

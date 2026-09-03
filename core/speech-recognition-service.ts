@@ -100,6 +100,7 @@ export class SpeechRecognitionService {
   declare _fetch: any;
   declare _logger: any;
   declare _getUsageLedger: any;
+  declare _getLocalModels: any;
   declare _prefs: any;
   declare _providers: any;
   declare _resolveProviderCredentialsFresh: any;
@@ -116,6 +117,7 @@ export class SpeechRecognitionService {
     adapters = builtinSpeechRecognitionAdapters,
     usageLedger = null,
     getUsageLedger = null,
+    getLocalModels = null,
   }: any = {}) {
     if (!providerRegistry) throw new Error("SpeechRecognitionService requires providerRegistry");
     if (typeof resolveProviderCredentialsFresh !== "function") {
@@ -131,6 +133,7 @@ export class SpeechRecognitionService {
     this._fetch = fetch;
     this._logger = logger;
     this._getUsageLedger = typeof getUsageLedger === "function" ? getUsageLedger : () => usageLedger;
+    this._getLocalModels = typeof getLocalModels === "function" ? getLocalModels : () => null;
     this._registry = new MediaAdapterRegistry();
     for (const adapter of adapters || []) this.registerAdapter(adapter);
   }
@@ -177,6 +180,25 @@ export class SpeechRecognitionService {
           name: model.displayName || model.name || model.id,
         })),
         catalogModels,
+      };
+    }
+    const localModels = this._getLocalModels()?.registry?.snapshot?.().models
+      ?.filter((entry) => entry.category === "stt")
+      ?.map((entry) => ({
+        id: `local:${entry.id}@${entry.quant}@${entry.version}`,
+        name: `${entry.id} (${entry.quant})`,
+        protocolId: "local-offline-asr",
+        inputs: ["audio"],
+        outputs: ["text"],
+      })) || [];
+    if (localModels.length > 0) {
+      next.local = {
+        providerId: "local",
+        name: "Local Models",
+        credentialStatus: "not-required",
+        models: localModels,
+        availableModels: localModels.map((model) => ({ id: model.id, name: model.name })),
+        catalogModels: [],
       };
     }
     return {
@@ -277,7 +299,7 @@ export class SpeechRecognitionService {
       throw new Error("speech recognition model is not configured");
     }
 
-    const target = this._providers.resolveMediaModel({
+    const target = this._resolveTarget({
       providerId: targetProvider,
       modelId: targetModel,
       capability: CAPABILITY,
@@ -305,6 +327,7 @@ export class SpeechRecognitionService {
         sessionId,
         sessionPath,
         fileId,
+        signal: payload.signal,
       });
       const ready = this._updateTranscription({ sessionId, sessionPath }, fileId, {
         status: "ready",
@@ -354,7 +377,7 @@ export class SpeechRecognitionService {
     if (!file) throw new Error(`session file not found: ${fileId}`);
     if (file.presentation !== "voice-input") return { status: "skipped", reason: "not_voice_input" };
 
-    const target = this._providers.resolveMediaModel({
+    const target = this._resolveTarget({
       providerId: config.defaultModel.provider,
       modelId: config.defaultModel.id,
       capability: CAPABILITY,
@@ -382,6 +405,7 @@ export class SpeechRecognitionService {
         sessionId,
         sessionPath,
         fileId,
+        signal: payload.signal,
       });
       const ready = this._updateTranscription({ sessionId, sessionPath }, fileId, {
         status: "ready",
@@ -413,8 +437,23 @@ export class SpeechRecognitionService {
   }
 
   async _resolveCredentialsFresh(target) {
+    if (target.providerId === "local") return {};
     const credentialProviderId = target.credentialLane?.providerId || target.providerId;
     return this._resolveProviderCredentialsFresh(credentialProviderId);
+  }
+
+  _resolveTarget({ providerId, modelId, capability }) {
+    if (providerId !== "local" || typeof modelId !== "string" || !modelId.startsWith("local:")) {
+      return this._providers.resolveMediaModel({ providerId, modelId, capability });
+    }
+    const model = this.listProviders().providers.local?.models?.find((entry) => entry.id === modelId);
+    if (!model) throw new Error("local speech recognition model is unavailable");
+    return {
+      providerId: "local",
+      provider: { id: "local", providerId: "local", name: "Local Models" },
+      model,
+      credentialLane: null,
+    };
   }
 
   async _transcribeWithAccounting({
@@ -426,6 +465,7 @@ export class SpeechRecognitionService {
     sessionId,
     sessionPath,
     fileId = null,
+    signal = undefined,
   }) {
     // MC-09（§三十七/§三十八）：在 file/provider/model/protocol/language/session
     // 都确定之后、真正 Adapter HTTP 请求之前铸 callId。fileId 是业务引用
@@ -500,6 +540,8 @@ export class SpeechRecognitionService {
         language,
         fetch: this._fetch,
         modelCall: recorder,
+        localModels: this._getLocalModels(),
+        signal,
       }));
       // 语义响应（§四十二）：Observer 只记录结构事实；transcription text 是
       // 模型输出正文——Phase 6 经统一 Redactor 进 payload capture（§一百零一）。

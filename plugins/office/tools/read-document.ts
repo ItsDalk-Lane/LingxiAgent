@@ -7,7 +7,7 @@ export const name = "read-document";
 export const description = [
   "Read supported Office/text documents into structured text for the Agent.",
   "Use for .docx, .xlsx, .xlsm, .pdf, .txt, .md, .csv, .tsv, and .html files.",
-  "PDF output is Markdown text with 1-based pageRange continuation metadata; OCR for scanned/image-only PDFs is not supported.",
+  "PDF output is Markdown text with 1-based pageRange continuation metadata; scanned PDFs and images can use an installed local OCR model.",
   "Use resource for user workspace or mount files. filePath remains accepted for legacy local-only callers.",
   "Does not modify files. Unsupported legacy formats such as .doc, .xls, .ppt, and .pptx fail explicitly.",
 ].join(" ");
@@ -42,6 +42,22 @@ export const parameters = {
       type: "number",
       description: "pdf only. Maximum selected pages to inspect in one call. Default 25.",
     },
+    ocr: {
+      type: "boolean",
+      description: "Use local OCR for scanned PDFs and image files. Defaults to true when a local OCR model is configured.",
+    },
+    ocrModelId: {
+      type: "string",
+      description: "Optional stable local model identity override, such as local:model@quant@manifestVersion.",
+    },
+    ocrLanguage: {
+      type: "string",
+      description: "Optional OCR language hint.",
+    },
+    ocrMaxPixelsPerPage: {
+      type: "number",
+      description: "Maximum rendered pixels per scanned PDF page.",
+    },
     sheetLimit: {
       type: "number",
       description: "xlsx only. Maximum sheets to read. Default 8.",
@@ -61,6 +77,8 @@ export async function execute(input, ctx: any = {}) {
   try {
     const result = await readOfficeDocument(input, {
       resources: ctx?.resources,
+      documentExtract: ctx?.documentExtract,
+      signal: ctx?.signal,
     });
     const text = result.format === "json"
       ? JSON.stringify(result.workbook, null, 2)

@@ -660,7 +660,7 @@
     ],
     "version": 3
   },
-  "payloadFingerprint": "sha256:d7239a0f7b0ca2323bb7b57da212a09e98674ac724f863155dfd96f07900e50c",
+  "payloadFingerprint": "sha256:b5bc82a64e930ddf5e6ca30bd48e0eff0e25a4d99e37f7c6e3d671868121ed58",
   "registry": [
     {
       "affectedByEpochMigration": true,
@@ -1874,6 +1874,163 @@
         "contract": "sessionless upload naming and age-based cleanup protocol",
         "kind": "directory-contract",
         "module": "server/routes/upload.ts"
+      }
+    },
+    {
+      "affectedByEpochMigration": false,
+      "bootstrapSafety": null,
+      "checkpointPolicy": "Excluded from automatic data-epoch checkpoints because model/runtime assets can be many gigabytes and are independently integrity-addressed.",
+      "epochPolicy": "compatible",
+      "exemption": null,
+      "firstPossibleOpenPhase": "runtime_ready",
+      "firstPossibleWritePhase": "runtime_ready",
+      "format": "mixed-directory",
+      "id": "local-model-artifacts",
+      "identityContract": "category/id@quant identifies one model variant generation via model.json version; runtimeId/version/platform identifies one verified runtime generation; .staging-* and .install-work are unpublished transaction state.",
+      "migrationEntry": [],
+      "openEntry": [
+        "LocalModelsSubsystem.initialize",
+        "LocalModelInstaller.install",
+        "LocalModelRegistry.importDirectory"
+      ],
+      "ownerModule": "lib/local-models/subsystem.ts",
+      "pathExclusions": [],
+      "pathKind": "tree",
+      "pathPattern": "models/embedding/{idAtQuant}/**",
+      "pathPatterns": [
+        "models/embedding/{idAtQuant}/**",
+        "models/ocr/{idAtQuant}/**",
+        "models/stt/{idAtQuant}/**",
+        "models/tts/{idAtQuant}/**",
+        "models/.install-work/**",
+        "runtime/local-inference/{runtimeId}/{version}/{platform}/**"
+      ],
+      "preCoordinatorReadProjection": null,
+      "protocolModules": [
+        "lib/local-models/registry.ts",
+        "lib/local-models/installer.ts",
+        "lib/local-models/secure-archive.ts"
+      ],
+      "restorePolicy": "Remote assets are redownloaded and reverified from a valid manifest; manual assets are restored only by explicit user re-import or external backup.",
+      "schemaContract": {
+        "compatibility": "The named runtime reader is canonical; this inventory does not imply stricter validation than runtime currently performs.",
+        "kind": "protocol",
+        "source": "lib/local-models/registry.ts"
+      },
+      "schemaSource": {
+        "contract": "strict model.json plus per-file size/SHA-256 contract; installer.ts owns runtime.json and atomic staging",
+        "kind": "directory-contract",
+        "module": "lib/local-models/registry.ts"
+      }
+    },
+    {
+      "affectedByEpochMigration": false,
+      "bootstrapSafety": null,
+      "checkpointPolicy": "Excluded; incomplete parts can resume from the source asset and completed artifacts are deleted after publication.",
+      "epochPolicy": "regenerable",
+      "exemption": null,
+      "firstPossibleOpenPhase": "runtime_ready",
+      "firstPossibleWritePhase": "runtime_ready",
+      "format": "mixed-directory",
+      "id": "local-model-downloads",
+      "identityContract": "taskId is SHA-256(uri, bytes, expected SHA-256) and owns exactly one state file, part set, and optional verified artifact.",
+      "migrationEntry": [],
+      "openEntry": [
+        "ResumableDownloader.download",
+        "ResumableDownloader.listTasks"
+      ],
+      "ownerModule": "lib/local-models/downloader.ts",
+      "pathExclusions": [],
+      "pathKind": "tree",
+      "pathPattern": "models/.downloads/{taskId}/**",
+      "pathPatterns": [
+        "models/.downloads/{taskId}/**"
+      ],
+      "preCoordinatorReadProjection": null,
+      "protocolModules": [],
+      "restorePolicy": "Resume only when URI, byte count, SHA-256, and deterministic taskId still match; otherwise cancel and redownload.",
+      "schemaContract": {
+        "compatibility": "The named runtime reader is canonical; this inventory does not imply stricter validation than runtime currently performs.",
+        "kind": "runtime-source",
+        "source": "lib/local-models/downloader.ts"
+      },
+      "schemaSource": {
+        "contract": "schemaVersion 1 state.json, deterministic part layout, and verified artifact.bin lifecycle",
+        "kind": "runtime-contract",
+        "module": "lib/local-models/downloader.ts"
+      }
+    },
+    {
+      "affectedByEpochMigration": false,
+      "bootstrapSafety": null,
+      "checkpointPolicy": "Excluded; it is an HTTPS/ETag cache and never the authority for installed bytes.",
+      "epochPolicy": "regenerable",
+      "exemption": null,
+      "firstPossibleOpenPhase": "runtime_ready",
+      "firstPossibleWritePhase": "runtime_ready",
+      "format": "json",
+      "id": "local-model-manifest-cache",
+      "identityContract": "One cache record belongs to one configured manifest URL for one LINGXI_HOME.",
+      "migrationEntry": [],
+      "openEntry": [
+        "LocalModelsManifestClient.loadCached",
+        "LocalModelsManifestClient.refresh"
+      ],
+      "ownerModule": "lib/local-models/manifest-client.ts",
+      "pathExclusions": [],
+      "pathKind": "file",
+      "pathPattern": "models/.manifest-cache/manifest-cache.json",
+      "pathPatterns": [
+        "models/.manifest-cache/manifest-cache.json"
+      ],
+      "preCoordinatorReadProjection": null,
+      "protocolModules": [],
+      "restorePolicy": "Re-parse before use; discard invalid cache and refresh, falling back to the built-in catalog while offline.",
+      "schemaContract": {
+        "compatibility": "The named runtime reader is canonical; this inventory does not imply stricter validation than runtime currently performs.",
+        "kind": "runtime-source",
+        "source": "lib/local-models/manifest-client.ts"
+      },
+      "schemaSource": {
+        "contract": "schemaVersion 1 URL/ETag/fetchedAt/raw-body parser with strict manifest revalidation",
+        "kind": "runtime-contract",
+        "module": "lib/local-models/manifest-client.ts"
+      }
+    },
+    {
+      "affectedByEpochMigration": false,
+      "bootstrapSafety": null,
+      "checkpointPolicy": "Excluded; logs are bounded diagnostics and contain no model output payload by host design.",
+      "epochPolicy": "regenerable",
+      "exemption": null,
+      "firstPossibleOpenPhase": "runtime_ready",
+      "firstPossibleWritePhase": "runtime_ready",
+      "format": "append-only-log",
+      "id": "local-model-sidecar-logs",
+      "identityContract": "id@quant owns one active redacted log and at most maxLogFiles rotated generations.",
+      "migrationEntry": [],
+      "openEntry": [
+        "SidecarManager.start"
+      ],
+      "ownerModule": "lib/local-models/sidecar-manager.ts",
+      "pathExclusions": [],
+      "pathKind": "tree",
+      "pathPattern": "logs/local-models/{idAtQuant}/sidecar.log*",
+      "pathPatterns": [
+        "logs/local-models/{idAtQuant}/sidecar.log*"
+      ],
+      "preCoordinatorReadProjection": null,
+      "protocolModules": [],
+      "restorePolicy": "Never restore; create a new bounded log generation after restart.",
+      "schemaContract": {
+        "compatibility": "The named runtime reader is canonical; this inventory does not imply stricter validation than runtime currently performs.",
+        "kind": "protocol",
+        "source": "lib/local-models/sidecar-manager.ts"
+      },
+      "schemaSource": {
+        "contract": "redacted bounded rotating stderr log family",
+        "kind": "directory-contract",
+        "module": "lib/local-models/sidecar-manager.ts"
       }
     },
     {
@@ -3287,8 +3444,8 @@
   ],
   "review": {
     "classification": "compatible",
-    "compatibilityReason": "registers a stateless Pi tool loop guard extension; no persisted store schema, data epoch, or restore contract changes",
-    "payloadFingerprint": "sha256:d7239a0f7b0ca2323bb7b57da212a09e98674ac724f863155dfd96f07900e50c"
+    "compatibilityReason": "Additive only: server/index.ts now passes a default local-models manifestUrl (env-overridable) into LocalModelsSubsystem; shared/persistence/store-registry.ts adds site rules for the local-models backend probe cache (probe-cache.json) under the existing local-model-artifacts store. No schema, DATA_EPOCH, or restore contract changes.",
+    "payloadFingerprint": "sha256:b5bc82a64e930ddf5e6ca30bd48e0eff0e25a4d99e37f7c6e3d671868121ed58"
   },
   "schemas": [
     {
@@ -3497,7 +3654,7 @@
       "contract": "desktop window bounds, release announcement bookmark, and update cache version marker readers",
       "kind": "directory-contract",
       "module": "desktop/main.cjs",
-      "sourceHash": "sha256:b9d44f3f2940b563371ab0a7d92edf9b4b9a94fe3abf347019f0826dc0e66fca",
+      "sourceHash": "sha256:c04840f37579a0112714a2cb2f93721425a33394c4a722d18442c96da9da6ae4",
       "storeId": "desktop-window-version-state"
     },
     {
@@ -3560,7 +3717,7 @@
       "contract": "installed manifest, install receipt, backup, and source-package directory protocols",
       "kind": "directory-contract",
       "module": "core/plugin-manager.ts",
-      "sourceHash": "sha256:78098ac67519299dd169da7eab6abef5f960141551fb63a5266c3d36210d9497",
+      "sourceHash": "sha256:891a2e271bdff8b17b0568e6fefed762b19175a15978fbaf1ac12ae237713dfc",
       "storeId": "installed-plugins"
     },
     {
@@ -3879,6 +4036,48 @@
       "module": "server/routes/upload.ts",
       "sourceHash": "sha256:32af9515aad9964d922b9a7226a74b1db8e726d86948e9e5e273d018df5fc635",
       "storeId": "legacy-upload-cache"
+    },
+    {
+      "contract": "strict model.json plus per-file size/SHA-256 contract; installer.ts owns runtime.json and atomic staging",
+      "kind": "directory-contract",
+      "module": "lib/local-models/registry.ts",
+      "protocolModules": [
+        {
+          "module": "lib/local-models/installer.ts",
+          "sourceHash": "sha256:7aaf97bb493579b18fc9e719b14871ff8ba6e1f6680182231397bca13dd63ac7"
+        },
+        {
+          "module": "lib/local-models/registry.ts",
+          "sourceHash": "sha256:4084f39705e78135876d74943856a1cb5ea716cdf66c0d21b1a6393c0521a2f6"
+        },
+        {
+          "module": "lib/local-models/secure-archive.ts",
+          "sourceHash": "sha256:2895976231a4c9dc7f3898ed18460e6a188a452dfc674dcf63d1f7e7b83fc122"
+        }
+      ],
+      "sourceHash": "sha256:4084f39705e78135876d74943856a1cb5ea716cdf66c0d21b1a6393c0521a2f6",
+      "storeId": "local-model-artifacts"
+    },
+    {
+      "contract": "schemaVersion 1 state.json, deterministic part layout, and verified artifact.bin lifecycle",
+      "kind": "runtime-contract",
+      "module": "lib/local-models/downloader.ts",
+      "sourceHash": "sha256:0c1185b28c2fee25348c93ab2be37bb8e212a798441d6756a388206e08133c2b",
+      "storeId": "local-model-downloads"
+    },
+    {
+      "contract": "schemaVersion 1 URL/ETag/fetchedAt/raw-body parser with strict manifest revalidation",
+      "kind": "runtime-contract",
+      "module": "lib/local-models/manifest-client.ts",
+      "sourceHash": "sha256:9cc197b67483317a9809efea23f597f4af0495fbc6697ea3f1dd53f8c1030903",
+      "storeId": "local-model-manifest-cache"
+    },
+    {
+      "contract": "redacted bounded rotating stderr log family",
+      "kind": "directory-contract",
+      "module": "lib/local-models/sidecar-manager.ts",
+      "sourceHash": "sha256:230a9561f39961d087c55c47ff32665c3b17268a124339d68328fec6b01662e7",
+      "storeId": "local-model-sidecar-logs"
     },
     {
       "contract": "local authentication secret reader and atomic serializer",
@@ -4201,7 +4400,7 @@
       "contract": "server-info writer and desktop bootstrap reader",
       "kind": "runtime-contract",
       "module": "server/index.ts",
-      "sourceHash": "sha256:f641d0ccaac284d241c2d999178c1cb78bc2d4f1c0e7dcbb6daeb3983d5f97b6",
+      "sourceHash": "sha256:9a7dad30d355bbccfa5eb19a6cfa04c2081da198012ed7363ffa3566538805f7",
       "storeId": "server-runtime-info"
     },
     {
@@ -4321,7 +4520,7 @@
       "contract": "bridge index, legacy session metadata, title, and vision sidecar readers",
       "kind": "runtime-contract",
       "module": "core/bridge-session-manager.ts",
-      "sourceHash": "sha256:845eeb30490e7f6caa06c80218311ef5cbd99df2359bd76387a1423f4066cbb4",
+      "sourceHash": "sha256:ef309eb6b169e95fbe69c984ecbeb8f38ece73929d848453fcd1abf45cebf5c9",
       "storeId": "session-sidecars"
     },
     {
@@ -6284,6 +6483,14 @@
       "storeId": "desktop-diagnostics"
     },
     {
+      "exemptionId": null,
+      "kind": "mkdir",
+      "ordinal": 0,
+      "reason": "Creates the fixed local-model root before opening it in the system file manager.",
+      "sourceFile": "desktop/main.cjs",
+      "storeId": "local-model-artifacts"
+    },
+    {
       "exemptionId": "desktop-caller-selected-output",
       "kind": "mkdir",
       "ordinal": 0,
@@ -7898,6 +8105,326 @@
       "reason": "Writes the usage ledger.",
       "sourceFile": "lib/llm/usage-ledger.ts",
       "storeId": "usage-ledger"
+    },
+    {
+      "exemptionId": null,
+      "kind": "mkdir",
+      "ordinal": 0,
+      "reason": "Writes the backend probe cache (probe-cache.json) under LINGXI_HOME runtime root; a per-runtime startup捷径 cache that is rebuilt from live probing on any mismatch.",
+      "sourceFile": "lib/local-models/backend-probe.ts",
+      "storeId": "local-model-artifacts"
+    },
+    {
+      "exemptionId": null,
+      "kind": "write-file",
+      "ordinal": 0,
+      "reason": "Writes the backend probe cache (probe-cache.json) under LINGXI_HOME runtime root; a per-runtime startup捷径 cache that is rebuilt from live probing on any mismatch.",
+      "sourceFile": "lib/local-models/backend-probe.ts",
+      "storeId": "local-model-artifacts"
+    },
+    {
+      "exemptionId": null,
+      "kind": "mkdir",
+      "ordinal": 0,
+      "reason": "Persists resumable download state, bounded parts, assembly output, and exact-task cleanup.",
+      "sourceFile": "lib/local-models/downloader.ts",
+      "storeId": "local-model-downloads"
+    },
+    {
+      "exemptionId": null,
+      "kind": "mkdir",
+      "ordinal": 0,
+      "reason": "Persists resumable download state, bounded parts, assembly output, and exact-task cleanup.",
+      "sourceFile": "lib/local-models/downloader.ts",
+      "storeId": "local-model-downloads"
+    },
+    {
+      "exemptionId": null,
+      "kind": "remove-path",
+      "ordinal": 0,
+      "reason": "Persists resumable download state, bounded parts, assembly output, and exact-task cleanup.",
+      "sourceFile": "lib/local-models/downloader.ts",
+      "storeId": "local-model-downloads"
+    },
+    {
+      "exemptionId": null,
+      "kind": "remove-path",
+      "ordinal": 0,
+      "reason": "Persists resumable download state, bounded parts, assembly output, and exact-task cleanup.",
+      "sourceFile": "lib/local-models/downloader.ts",
+      "storeId": "local-model-downloads"
+    },
+    {
+      "exemptionId": null,
+      "kind": "remove-path",
+      "ordinal": 0,
+      "reason": "Persists resumable download state, bounded parts, assembly output, and exact-task cleanup.",
+      "sourceFile": "lib/local-models/downloader.ts",
+      "storeId": "local-model-downloads"
+    },
+    {
+      "exemptionId": null,
+      "kind": "remove-path",
+      "ordinal": 0,
+      "reason": "Persists resumable download state, bounded parts, assembly output, and exact-task cleanup.",
+      "sourceFile": "lib/local-models/downloader.ts",
+      "storeId": "local-model-downloads"
+    },
+    {
+      "exemptionId": null,
+      "kind": "remove-path",
+      "ordinal": 0,
+      "reason": "Persists resumable download state, bounded parts, assembly output, and exact-task cleanup.",
+      "sourceFile": "lib/local-models/downloader.ts",
+      "storeId": "local-model-downloads"
+    },
+    {
+      "exemptionId": null,
+      "kind": "remove-path",
+      "ordinal": 1,
+      "reason": "Persists resumable download state, bounded parts, assembly output, and exact-task cleanup.",
+      "sourceFile": "lib/local-models/downloader.ts",
+      "storeId": "local-model-downloads"
+    },
+    {
+      "exemptionId": null,
+      "kind": "remove-path",
+      "ordinal": 1,
+      "reason": "Persists resumable download state, bounded parts, assembly output, and exact-task cleanup.",
+      "sourceFile": "lib/local-models/downloader.ts",
+      "storeId": "local-model-downloads"
+    },
+    {
+      "exemptionId": null,
+      "kind": "rename",
+      "ordinal": 0,
+      "reason": "Persists resumable download state, bounded parts, assembly output, and exact-task cleanup.",
+      "sourceFile": "lib/local-models/downloader.ts",
+      "storeId": "local-model-downloads"
+    },
+    {
+      "exemptionId": null,
+      "kind": "rename",
+      "ordinal": 0,
+      "reason": "Persists resumable download state, bounded parts, assembly output, and exact-task cleanup.",
+      "sourceFile": "lib/local-models/downloader.ts",
+      "storeId": "local-model-downloads"
+    },
+    {
+      "exemptionId": null,
+      "kind": "write-file",
+      "ordinal": 0,
+      "reason": "Persists resumable download state, bounded parts, assembly output, and exact-task cleanup.",
+      "sourceFile": "lib/local-models/downloader.ts",
+      "storeId": "local-model-downloads"
+    },
+    {
+      "exemptionId": null,
+      "kind": "write-file",
+      "ordinal": 0,
+      "reason": "Persists resumable download state, bounded parts, assembly output, and exact-task cleanup.",
+      "sourceFile": "lib/local-models/downloader.ts",
+      "storeId": "local-model-downloads"
+    },
+    {
+      "exemptionId": null,
+      "kind": "mkdir",
+      "ordinal": 0,
+      "reason": "Stages and atomically publishes manifest-verified model and platform runtime assets.",
+      "sourceFile": "lib/local-models/installer.ts",
+      "storeId": "local-model-artifacts"
+    },
+    {
+      "exemptionId": null,
+      "kind": "remove-path",
+      "ordinal": 0,
+      "reason": "Stages and atomically publishes manifest-verified model and platform runtime assets.",
+      "sourceFile": "lib/local-models/installer.ts",
+      "storeId": "local-model-artifacts"
+    },
+    {
+      "exemptionId": null,
+      "kind": "remove-path",
+      "ordinal": 1,
+      "reason": "Stages and atomically publishes manifest-verified model and platform runtime assets.",
+      "sourceFile": "lib/local-models/installer.ts",
+      "storeId": "local-model-artifacts"
+    },
+    {
+      "exemptionId": null,
+      "kind": "rename",
+      "ordinal": 0,
+      "reason": "Stages and atomically publishes manifest-verified model and platform runtime assets.",
+      "sourceFile": "lib/local-models/installer.ts",
+      "storeId": "local-model-artifacts"
+    },
+    {
+      "exemptionId": null,
+      "kind": "write-file",
+      "ordinal": 0,
+      "reason": "Stages and atomically publishes manifest-verified model and platform runtime assets.",
+      "sourceFile": "lib/local-models/installer.ts",
+      "storeId": "local-model-artifacts"
+    },
+    {
+      "exemptionId": null,
+      "kind": "mkdir",
+      "ordinal": 0,
+      "reason": "Creates the cache directory and atomically replaces the last strictly parsed manifest response.",
+      "sourceFile": "lib/local-models/manifest-client.ts",
+      "storeId": "local-model-manifest-cache"
+    },
+    {
+      "exemptionId": null,
+      "kind": "rename",
+      "ordinal": 0,
+      "reason": "Creates the cache directory and atomically replaces the last strictly parsed manifest response.",
+      "sourceFile": "lib/local-models/manifest-client.ts",
+      "storeId": "local-model-manifest-cache"
+    },
+    {
+      "exemptionId": null,
+      "kind": "write-file",
+      "ordinal": 0,
+      "reason": "Creates the cache directory and atomically replaces the last strictly parsed manifest response.",
+      "sourceFile": "lib/local-models/manifest-client.ts",
+      "storeId": "local-model-manifest-cache"
+    },
+    {
+      "exemptionId": null,
+      "kind": "mkdir",
+      "ordinal": 0,
+      "reason": "Scans, atomically imports, verifies, or removes one exact local model variant directory.",
+      "sourceFile": "lib/local-models/registry.ts",
+      "storeId": "local-model-artifacts"
+    },
+    {
+      "exemptionId": null,
+      "kind": "mkdir",
+      "ordinal": 0,
+      "reason": "Scans, atomically imports, verifies, or removes one exact local model variant directory.",
+      "sourceFile": "lib/local-models/registry.ts",
+      "storeId": "local-model-artifacts"
+    },
+    {
+      "exemptionId": null,
+      "kind": "mkdir",
+      "ordinal": 0,
+      "reason": "Scans, atomically imports, verifies, or removes one exact local model variant directory.",
+      "sourceFile": "lib/local-models/registry.ts",
+      "storeId": "local-model-artifacts"
+    },
+    {
+      "exemptionId": null,
+      "kind": "remove-path",
+      "ordinal": 0,
+      "reason": "Scans, atomically imports, verifies, or removes one exact local model variant directory.",
+      "sourceFile": "lib/local-models/registry.ts",
+      "storeId": "local-model-artifacts"
+    },
+    {
+      "exemptionId": null,
+      "kind": "remove-path",
+      "ordinal": 0,
+      "reason": "Scans, atomically imports, verifies, or removes one exact local model variant directory.",
+      "sourceFile": "lib/local-models/registry.ts",
+      "storeId": "local-model-artifacts"
+    },
+    {
+      "exemptionId": null,
+      "kind": "rename",
+      "ordinal": 0,
+      "reason": "Scans, atomically imports, verifies, or removes one exact local model variant directory.",
+      "sourceFile": "lib/local-models/registry.ts",
+      "storeId": "local-model-artifacts"
+    },
+    {
+      "exemptionId": null,
+      "kind": "rename",
+      "ordinal": 0,
+      "reason": "Scans, atomically imports, verifies, or removes one exact local model variant directory.",
+      "sourceFile": "lib/local-models/registry.ts",
+      "storeId": "local-model-artifacts"
+    },
+    {
+      "exemptionId": null,
+      "kind": "write-file",
+      "ordinal": 0,
+      "reason": "Scans, atomically imports, verifies, or removes one exact local model variant directory.",
+      "sourceFile": "lib/local-models/registry.ts",
+      "storeId": "local-model-artifacts"
+    },
+    {
+      "exemptionId": null,
+      "kind": "write-file",
+      "ordinal": 0,
+      "reason": "Scans, atomically imports, verifies, or removes one exact local model variant directory.",
+      "sourceFile": "lib/local-models/registry.ts",
+      "storeId": "local-model-artifacts"
+    },
+    {
+      "exemptionId": null,
+      "kind": "mkdir",
+      "ordinal": 0,
+      "reason": "Streams declared archive entries only into an installer-owned staging directory and removes it on failure.",
+      "sourceFile": "lib/local-models/secure-archive.ts",
+      "storeId": "local-model-artifacts"
+    },
+    {
+      "exemptionId": null,
+      "kind": "mkdir",
+      "ordinal": 0,
+      "reason": "Streams declared archive entries only into an installer-owned staging directory and removes it on failure.",
+      "sourceFile": "lib/local-models/secure-archive.ts",
+      "storeId": "local-model-artifacts"
+    },
+    {
+      "exemptionId": null,
+      "kind": "remove-path",
+      "ordinal": 0,
+      "reason": "Streams declared archive entries only into an installer-owned staging directory and removes it on failure.",
+      "sourceFile": "lib/local-models/secure-archive.ts",
+      "storeId": "local-model-artifacts"
+    },
+    {
+      "exemptionId": null,
+      "kind": "write-file",
+      "ordinal": 0,
+      "reason": "Streams declared archive entries only into an installer-owned staging directory and removes it on failure.",
+      "sourceFile": "lib/local-models/secure-archive.ts",
+      "storeId": "local-model-artifacts"
+    },
+    {
+      "exemptionId": null,
+      "kind": "append-file",
+      "ordinal": 0,
+      "reason": "Creates sidecar log directories and appends/rotates token-redacted stderr diagnostics.",
+      "sourceFile": "lib/local-models/sidecar-manager.ts",
+      "storeId": "local-model-sidecar-logs"
+    },
+    {
+      "exemptionId": null,
+      "kind": "mkdir",
+      "ordinal": 0,
+      "reason": "Creates sidecar log directories and appends/rotates token-redacted stderr diagnostics.",
+      "sourceFile": "lib/local-models/sidecar-manager.ts",
+      "storeId": "local-model-sidecar-logs"
+    },
+    {
+      "exemptionId": null,
+      "kind": "remove-path",
+      "ordinal": 0,
+      "reason": "Creates sidecar log directories and appends/rotates token-redacted stderr diagnostics.",
+      "sourceFile": "lib/local-models/sidecar-manager.ts",
+      "storeId": "local-model-sidecar-logs"
+    },
+    {
+      "exemptionId": null,
+      "kind": "rename",
+      "ordinal": 0,
+      "reason": "Creates sidecar log directories and appends/rotates token-redacted stderr diagnostics.",
+      "sourceFile": "lib/local-models/sidecar-manager.ts",
+      "storeId": "local-model-sidecar-logs"
     },
     {
       "exemptionId": null,

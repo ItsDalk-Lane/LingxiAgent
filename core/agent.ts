@@ -25,6 +25,7 @@ import { createAutomationTool } from "../lib/tools/automation-tool.ts";
 import { createWebFetchTool } from "../lib/tools/web-fetch.ts";
 import { createStageFilesTool } from "../lib/tools/output-file-tool.ts";
 import { createFileTool } from "../lib/tools/file-tool.ts";
+import { extractDocument as extractDocumentBase } from "../lib/document-extract/index.ts";
 import { createChannelTool } from "../lib/tools/channel-tool.ts";
 import { createBrowserTool } from "../lib/tools/browser-tool.ts";
 import { createComputerUseTool } from "../lib/tools/computer-use-tool.ts";
@@ -615,6 +616,12 @@ export class Agent {
       },
       resolveSessionFile: resolveActiveSessionFile,
       registerSessionFile: (entry) => this._cb?.registerSessionFile?.(entry),
+      extractDocument: (input) => {
+        const engine = this._cb?.getEngine?.();
+        return typeof engine?.extractDocument === "function"
+          ? engine.extractDocument(input)
+          : extractDocumentBase(input);
+      },
     });
     this._browserTool = createBrowserTool(() => this._cb?.getCurrentSessionPath?.(), {
       getSessionModel: (sessionPath) => {

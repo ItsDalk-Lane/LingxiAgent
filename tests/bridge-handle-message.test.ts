@@ -2085,4 +2085,72 @@ describe("BridgeManager._handleMessage", () => {
       expect(hub.send).toHaveBeenLastCalledWith(tagged("msg2"), expect.any(Object));
     });
   });
+
+  describe("local speech replies", () => {
+    it("sends a WAV buffer only when the user enabled local Bridge speech", async () => {
+      const { bm, engine } = createMocks();
+      const sendMediaBuffer = vi.fn(async (_chatId: string, _buffer: Buffer, _metadata: Record<string, unknown>) => {});
+      const adapter = {
+        mediaCapabilities: {
+          supportedKinds: ["audio"],
+          inputModes: ["buffer"],
+          maxBytes: { buffer: { audio: 1024 * 1024 } },
+        },
+        sendMediaBuffer,
+      };
+      engine.localModels = {
+        getConfig: () => ({
+          tts: { bridgeReply: true, defaultModel: "local:kokoro-82m@fp32@2026.09.02" },
+        }),
+      };
+      engine.textToSpeech = {
+        synthesize: vi.fn(async () => ({
+          audio: Uint8Array.from([0, 1, 2, 3]),
+          format: "pcm_s16le",
+          sampleRate: 24000,
+        })),
+      };
+
+      await expect(bm._sendLocalSpeechReply({
+        adapter,
+        chatId: "owner123",
+        text: "语音回复",
+        platform: "telegram",
+        isGroup: false,
+        sessionKey: "tg_dm_owner123@hana",
+        replyContext: null,
+      })).resolves.toBe(true);
+
+      expect(engine.textToSpeech.synthesize).toHaveBeenCalledWith({
+        text: "语音回复",
+        surface: "bridge",
+        bridgeSessionKey: "tg_dm_owner123@hana",
+      });
+      expect(sendMediaBuffer).toHaveBeenCalledWith(
+        "owner123",
+        expect.any(Buffer),
+        expect.objectContaining({ mime: "audio/wav", filename: "lingxi-reply.wav" }),
+      );
+      expect(sendMediaBuffer.mock.calls[0][1].subarray(0, 4).toString("ascii")).toBe("RIFF");
+    });
+
+    it("keeps text-only delivery when the platform cannot accept audio buffers", async () => {
+      const { bm, engine } = createMocks();
+      engine.localModels = {
+        getConfig: () => ({ tts: { bridgeReply: true, defaultModel: "local:kokoro-82m@fp32@2026.09.02" } }),
+      };
+      engine.textToSpeech = { synthesize: vi.fn() };
+
+      await expect(bm._sendLocalSpeechReply({
+        adapter: { mediaCapabilities: { supportedKinds: ["audio"], inputModes: ["local_file"] } },
+        chatId: "owner123",
+        text: "文本仍然发送",
+        platform: "qq",
+        isGroup: false,
+        sessionKey: "qq_dm_owner123@hana",
+        replyContext: null,
+      })).resolves.toBe(false);
+      expect(engine.textToSpeech.synthesize).not.toHaveBeenCalled();
+    });
+  });
 });

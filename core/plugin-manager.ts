@@ -236,6 +236,7 @@ export class PluginManager {
   declare _providerPlugins: any;
   declare _registerSessionFile: any;
   declare _emitResourceChanged: any;
+  declare _documentExtract: any;
   declare _resourceIO: any;
   declare _resourceWatch: any;
   declare _routeApps: any;
@@ -269,6 +270,7 @@ export class PluginManager {
     lifecycleTimeoutMs,
     logSink,
     runtimeContext,
+    documentExtract,
   }) {
     this._pluginsDirs = pluginsDirs || (pluginsDir ? [pluginsDir] : []);
     this._dataDir = dataDir;
@@ -282,6 +284,7 @@ export class PluginManager {
     this._resourceWatch = resourceWatch || null;
     this._logSink = typeof logSink === "function" ? logSink : null;
     this._runtimeContext = runtimeContext || null;
+    this._documentExtract = typeof documentExtract === "function" ? documentExtract : null;
     this._plugins = new Map();
     this._scanned = [];
     this._opQueue = Promise.resolve();
@@ -704,6 +707,7 @@ export class PluginManager {
       configSchema: entry.configSchema,
       logSink: this._logSink,
       runtimeContext: this._runtimeContext,
+      documentExtract: entry.source === "builtin" ? this._documentExtract : null,
       permissions: entry.manifest?.permissions,
       capabilities: entry.capabilities,
       sensitiveCapabilities: entry.sensitiveCapabilities,

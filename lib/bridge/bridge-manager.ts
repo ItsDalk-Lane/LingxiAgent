@@ -1421,6 +1421,40 @@ export class BridgeManager {
     return adapter.sendBlockReply(chatId, text);
   }
 
+  async _sendLocalSpeechReply({ adapter, chatId, text, platform, isGroup, sessionKey, replyContext }) {
+    const config = this.engine?.localModels?.getConfig?.();
+    if (config?.tts?.bridgeReply !== true || !config.tts.defaultModel) return false;
+    const capabilities = adapter?.mediaCapabilities;
+    if (!capabilities?.supportedKinds?.includes("audio")
+      || !capabilities?.inputModes?.includes("buffer")
+      || typeof adapter.sendMediaBuffer !== "function") return false;
+    try {
+      const result = await this.engine?.textToSpeech?.synthesize?.({
+        text,
+        surface: "bridge",
+        bridgeSessionKey: sessionKey,
+      });
+      if (!(result?.audio instanceof Uint8Array)) throw new Error("local speech synthesis returned no audio");
+      const audio = result.format === "pcm_s16le"
+        ? pcm16BufferToWav(result.audio, result.sampleRate)
+        : Buffer.from(result.audio);
+      const maxBytes = capabilities.maxBytes?.buffer?.audio;
+      if (Number.isFinite(maxBytes) && audio.length > maxBytes) {
+        throw new Error("local speech reply exceeds platform audio size limit");
+      }
+      await adapter.sendMediaBuffer(chatId, audio, {
+        mime: "audio/wav",
+        filename: "lingxi-reply.wav",
+        isGroup: isGroup === true,
+        ...(this._normalizeReplyContext(replyContext) || {}),
+      });
+      return true;
+    } catch (error) {
+      debugLog()?.warn("bridge", `local speech reply fell back to text (${platform || "platform"}): ${error?.message || error}`);
+      return false;
+    }
+  }
+
   _createStreamDelivery({ adapter, chatId, isGroup, platform, messageThreadId, replyContext }) {
     const capability = this._resolveStreamingCapability(adapter, isGroup);
     const mode = capability?.mode || "batch";
@@ -2027,6 +2061,15 @@ export class BridgeManager {
       if (reply && adapter) {
         const cleaned = this._cleanReplyForPlatform(reply);
         let allMediaUrls = await delivery.finish(cleaned);
+        await this._sendLocalSpeechReply({
+          adapter,
+          chatId,
+          text: cleaned,
+          platform,
+          isGroup,
+          sessionKey,
+          replyContext,
+        });
 
         // 正文因错误中断：附加简短截断说明（人话，不携带低层错误字符串）
         if (replyTruncated) {
@@ -3068,6 +3111,27 @@ export class BridgeManager {
     all.sort((a, b) => (a.ts || 0) - (b.ts || 0));
     return all.slice(-limit);
   }
+}
+
+function pcm16BufferToWav(pcm, sampleRate) {
+  const source = Buffer.from(pcm);
+  const rate = sampleRate === 16000 || sampleRate === 24000 ? sampleRate : 24000;
+  const output = Buffer.allocUnsafe(44 + source.length);
+  output.write("RIFF", 0, "ascii");
+  output.writeUInt32LE(36 + source.length, 4);
+  output.write("WAVE", 8, "ascii");
+  output.write("fmt ", 12, "ascii");
+  output.writeUInt32LE(16, 16);
+  output.writeUInt16LE(1, 20);
+  output.writeUInt16LE(1, 22);
+  output.writeUInt32LE(rate, 24);
+  output.writeUInt32LE(rate * 2, 28);
+  output.writeUInt16LE(2, 32);
+  output.writeUInt16LE(16, 34);
+  output.write("data", 36, "ascii");
+  output.writeUInt32LE(source.length, 40);
+  source.copy(output, 44);
+  return output;
 }
 
 // ── 测试导出 ──────────────────────────────────────────────

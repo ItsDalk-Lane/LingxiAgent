@@ -197,6 +197,25 @@ export function buildAnydocRuntimeSmokeScript() {
   ].join("\n");
 }
 
+export function buildCanvasRuntimeSmokeScript() {
+  return [
+    "const mod = await import('@napi-rs/canvas');",
+    "if (typeof mod?.createCanvas !== 'function') {",
+    "  throw new Error('@napi-rs/canvas runtime smoke failed: createCanvas is not callable');",
+    "}",
+    "const canvas = mod.createCanvas(2, 2);",
+    "const context = canvas.getContext('2d');",
+    "context.fillStyle = '#000';",
+    "context.fillRect(0, 0, 2, 2);",
+    "const png = canvas.toBuffer('image/png');",
+    "if (!(png instanceof Uint8Array) || png.byteLength < 8) {",
+    "  throw new Error('@napi-rs/canvas runtime smoke failed: PNG output is invalid');",
+    "}",
+    "console.log('[build-server] @napi-rs/canvas runtime smoke passed');",
+    "",
+  ].join("\n");
+}
+
 function collectRuntimeExportTargets(exportValue, targets = []) {
   if (typeof exportValue === "string") {
     targets.push(exportValue);

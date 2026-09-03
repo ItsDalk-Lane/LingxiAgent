@@ -985,6 +985,68 @@ describe("BridgeSessionManager teardown", () => {
     );
   });
 
+  it("transcribes registered bridge audio before prompting when speech recognition is enabled", async () => {
+    const agent = makeAgent(rootDir);
+    const mgrPath = path.join(agent.sessionDir, "bridge", "owner", "s-audio.jsonl");
+    const transcribeAudio = vi.fn(async () => ({ status: "ready", text: "测试语音" }));
+    const deps = {
+      ...makeDeps(agent),
+      getSpeechRecognitionConfig: () => ({
+        enabled: true,
+        defaultModel: { provider: "local", id: "local:sensevoice-small@int8@2026.09.02" },
+      }),
+      transcribeAudio,
+      registerSessionFile: vi.fn(({ sessionPath, filePath, label, origin, storageKind }) => ({
+        id: "sf_bridge_audio",
+        fileId: "sf_bridge_audio",
+        sessionPath,
+        filePath,
+        realPath: filePath,
+        displayName: label,
+        filename: path.basename(filePath),
+        label,
+        ext: "ogg",
+        mime: "audio/ogg",
+        size: 4,
+        kind: "audio",
+        origin,
+        storageKind,
+        createdAt: 1,
+      })),
+    };
+    const manager = new BridgeSessionManager(deps);
+    sessionManagerCreateMock.mockReturnValue({ getSessionFile: () => mgrPath });
+    const session = {
+      model: { input: ["text"] },
+      prompt: vi.fn(async () => {}),
+      subscribe: vi.fn(() => () => {}),
+      dispose: vi.fn(),
+      sessionManager: { getSessionFile: () => mgrPath },
+    };
+    createAgentSessionMock.mockResolvedValue({ session });
+
+    await manager.executeExternalMessage("hello", "bridge-audio", null, {
+      agentId: "agent-a",
+      inboundFiles: [{
+        type: "audio",
+        filename: "voice.ogg",
+        mimeType: "audio/ogg",
+        buffer: Buffer.from([0x4f, 0x67, 0x67, 0x53]),
+      }],
+      displayMessage: { text: "[收到语音]" },
+    });
+
+    expect(transcribeAudio).toHaveBeenCalledWith({
+      sessionId: "sess_s-audio",
+      sessionPath: mgrPath,
+      fileId: "sf_bridge_audio",
+    });
+    expect(session.prompt).toHaveBeenCalledWith(
+      "hello\n[语音转写]\n测试语音",
+      expect.objectContaining({}),
+    );
+  });
+
   it("abortSession releases a bridge session immediately when provider abort never settles", async () => {
     const agent = makeAgent(rootDir);
     const manager = new BridgeSessionManager(makeDeps(agent));

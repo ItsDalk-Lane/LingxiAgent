@@ -16,5 +16,11 @@ describe("electron-builder native rebuild contract", () => {
     expect(pkg.build.files).toContain("!**/node_modules/**");
     expect(pkg.build.files).toContain("node_modules/ws/**");
     expect(pkg.build.files).not.toContain("node_modules/better-sqlite3/**");
+    expect(pkg.build.files.some((entry: string) => /(^|\/)models(\/|\*|$)/.test(entry))).toBe(false);
+    expect(pkg.build.extraResources.some((entry: { from?: string }) => /models|local-inference/.test(entry.from || ""))).toBe(false);
+    for (const platform of ["mac", "win", "linux"]) {
+      const resources = pkg.build[platform]?.extraResources || [];
+      expect(resources.some((entry: { from?: string }) => /models|local-inference/.test(entry.from || ""))).toBe(false);
+    }
   });
 });

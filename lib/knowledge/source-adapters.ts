@@ -211,7 +211,7 @@ async function parsePdf(bytes: Buffer): Promise<ParsedKnowledgeSnapshot> {
       if (lineParts.length > 0) finishLine(items.length);
     }
   } finally {
-    await pdf.destroy?.();
+    await (pdf as unknown as { destroy?: () => Promise<void> | void }).destroy?.();
   }
 
   if (itemCount === 0 || blocks.length === 0) {

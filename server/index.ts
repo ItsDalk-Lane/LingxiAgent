@@ -92,6 +92,7 @@ import { Hub } from "../hub/index.ts";
 import { startCLI } from "./cli.ts";
 import { fromRoot } from "../shared/hana-root.ts";
 import { callText } from "../core/llm-client.ts";
+import { LocalModelsSubsystem } from "../lib/local-models/index.ts";
 
 const productDir = fromRoot("lib");
 
@@ -455,6 +456,18 @@ export async function startServer(root: CompositionRoot = {}): Promise<void> {
   } as any);
   engine.setOutboundProxyRuntime(outboundProxyRuntime);
   outboundProxyRuntime.apply(engine.getNetworkProxy());
+
+  const localModels = new LocalModelsSubsystem({
+    lingxiHome,
+    // 清单源：默认 HF 分发仓（revision 固定，各资产自带 sha256 锚定）；env 可覆盖。
+    manifestUrl: process.env.LINGXI_LOCAL_MODELS_MANIFEST_URL
+      || "https://huggingface.co/Stonedmoon/lingxi-local-models/resolve/main/local-models-manifest.json",
+    getPreferences: () => engine.getPreferences?.() || {},
+    savePreferences: (preferences) => engine.savePreferences(preferences),
+    emitEvent: (event) => engine._emitEvent?.(event, null),
+  });
+  await localModels.initialize({ signal: new AbortController().signal });
+  engine.attachLocalModels(localModels);
 
   // 注入依赖给 BrowserManager（避免循环依赖）
   BrowserManager.setLingxiHome(engine.lingxiHome);
@@ -1349,6 +1362,9 @@ export async function startServer(root: CompositionRoot = {}): Promise<void> {
 
       // 4. flush deferred result store（debounce 可能有未写盘的脏数据）
       engine.deferredResults?.dispose?.();
+
+      // 本地模型先于 Engine/Hub 退出，确保原生会话与 sidecar 不留孤儿进程。
+      await localModels.dispose();
 
       // 5. 清理 Hub + 引擎（停 ticker → 等 tick 完成 → 关 DB → 清理 session）
       await hub.dispose();

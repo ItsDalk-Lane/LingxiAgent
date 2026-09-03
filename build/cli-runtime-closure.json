@@ -65,6 +65,18 @@
   ],
   "dynamicCallSites": [
     {
+      "file": "lib/local-models/sidecar-manager.ts",
+      "callee": "spawn",
+      "argText": "executable",
+      "reason": "The local-model sidecar executable is a platform runtime asset selected from a strict HTTPS manifest, downloaded with SHA-256 verification, extracted from a declared-file archive, and revalidated from runtime.json immediately before launch. It is external runtime content under LINGXI_HOME/runtime/local-inference, not a hidden reference to repository source, so it adds no static source edge."
+    },
+    {
+      "file": "lib/local-models/in-process-factory.ts",
+      "callee": "import",
+      "argText": "pathToFileURL(entrypoint).href",
+      "reason": "The in-process local-model module is the entrypoint of the same manifest-declared, SHA-256-verified platform runtime asset. Its runtime.json identity and every declared file hash are checked again before import. The module lives under LINGXI_HOME/runtime/local-inference rather than this repository, so it cannot be represented as another static source-closure path."
+    },
+    {
       "file": "server/bootstrap.ts",
       "callee": "import",
       "argText": "pathToFileURL(serverEntry).href",
@@ -1257,11 +1269,16 @@
         },
         {
           "root": "server-bootstrap",
+          "from": "core/text-to-speech-service.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
           "from": "core/media/universal-media-manager.ts",
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by core/speech-recognition-service.ts (import-statement); core/media/universal-media-manager.ts (import-statement)."
+      "reason": "Reached via esbuild source module graph, imported by core/speech-recognition-service.ts (import-statement); core/text-to-speech-service.ts (import-statement); core/media/universal-media-manager.ts (import-statement)."
     },
     {
       "path": "core/media-protocols.ts",
@@ -3495,6 +3512,30 @@
       "reason": "Reached via esbuild source module graph, imported by server/routes/providers.ts (import-statement)."
     },
     {
+      "path": "core/text-to-speech-service.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "core/engine.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by core/engine.ts (import-statement)."
+    },
+    {
+      "path": "core/text-to-speech/adapters.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "core/text-to-speech-service.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by core/text-to-speech-service.ts (import-statement)."
+    },
+    {
       "path": "core/tool-availability.ts",
       "inputType": "source-graph",
       "provenance": [
@@ -5576,9 +5617,31 @@
           "root": "server-bootstrap",
           "from": "lib/tools/file-tool.ts",
           "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "core/agent.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "core/engine.ts",
+          "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by lib/tools/file-tool.ts (import-statement)."
+      "reason": "Reached via esbuild source module graph, imported by lib/tools/file-tool.ts (import-statement); core/agent.ts (import-statement); core/engine.ts (import-statement)."
+    },
+    {
+      "path": "lib/document-extract/trim-page.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "lib/document-extract/index.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by lib/document-extract/index.ts (import-statement)."
     },
     {
       "path": "lib/exec-command/guidance.ts",
@@ -6922,6 +6985,11 @@
         },
         {
           "root": "server-bootstrap",
+          "from": "core/text-to-speech-service.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
           "from": "core/media/image-task-runner.ts",
           "kind": "import-statement"
         },
@@ -6931,7 +6999,7 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by lib/llm/provider-client.ts (import-statement); core/model-operation-client.ts (import-statement); core/speech-recognition/adapters.ts (import-statement); +3 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by lib/llm/provider-client.ts (import-statement); core/model-operation-client.ts (import-statement); core/speech-recognition/adapters.ts (import-statement); +4 more importer(s)."
     },
     {
       "path": "lib/llm/model-call-observer.ts",
@@ -7748,6 +7816,505 @@
       "reason": "Reached via esbuild source module graph, imported by core/llm-client.ts (import-statement); lib/llm/usage-ledger.ts (import-statement); server/routes/chat.ts (import-statement)."
     },
     {
+      "path": "lib/local-models/backend-probe.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "lib/local-models/sidecar-factory.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/local-models/in-process-factory.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/local-models/subsystem.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/local-models/index.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by lib/local-models/sidecar-factory.ts (import-statement); lib/local-models/in-process-factory.ts (import-statement); lib/local-models/subsystem.ts (import-statement); +1 more importer(s)."
+    },
+    {
+      "path": "lib/local-models/catalog.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "lib/local-models/manifest-client.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/local-models/subsystem.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/local-models/index.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by lib/local-models/manifest-client.ts (import-statement); lib/local-models/subsystem.ts (import-statement); lib/local-models/index.ts (import-statement)."
+    },
+    {
+      "path": "lib/local-models/composite-factory.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "lib/local-models/subsystem.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/local-models/index.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by lib/local-models/subsystem.ts (import-statement); lib/local-models/index.ts (import-statement)."
+    },
+    {
+      "path": "lib/local-models/config.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "lib/local-models/subsystem.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/local-models/index.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by lib/local-models/subsystem.ts (import-statement); lib/local-models/index.ts (import-statement)."
+    },
+    {
+      "path": "lib/local-models/contracts.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "core/speech-recognition/adapters.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "core/text-to-speech/adapters.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "core/engine.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "server/routes/preferences.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/local-models/instance-manager.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/local-models/runtime-service.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/local-models/subsystem.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/local-models/index.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by core/speech-recognition/adapters.ts (import-statement); core/text-to-speech/adapters.ts (import-statement); core/engine.ts (import-statement); +5 more importer(s)."
+    },
+    {
+      "path": "lib/local-models/downloader.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "lib/local-models/subsystem.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/local-models/index.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by lib/local-models/subsystem.ts (import-statement); lib/local-models/index.ts (import-statement)."
+    },
+    {
+      "path": "lib/local-models/errors.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "lib/local-models/backend-probe.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/local-models/composite-factory.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/local-models/large-slot.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/local-models/manifest.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/local-models/manifest-client.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/local-models/registry.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/local-models/instance-manager.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/local-models/memory-governor.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/local-models/runtime-service.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/local-models/secure-archive.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/local-models/installer.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/local-models/sidecar-manager.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/local-models/sidecar-factory.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/local-models/in-process-factory.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/local-models/downloader.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/local-models/subsystem.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/local-models/index.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by lib/local-models/backend-probe.ts (import-statement); lib/local-models/composite-factory.ts (import-statement); lib/local-models/large-slot.ts (import-statement); +14 more importer(s)."
+    },
+    {
+      "path": "lib/local-models/gpu-detect.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "lib/local-models/subsystem.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/local-models/index.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by lib/local-models/subsystem.ts (import-statement); lib/local-models/index.ts (import-statement)."
+    },
+    {
+      "path": "lib/local-models/in-process-factory.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "lib/local-models/subsystem.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/local-models/index.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by lib/local-models/subsystem.ts (import-statement); lib/local-models/index.ts (import-statement)."
+    },
+    {
+      "path": "lib/local-models/index.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "server/routes/local-models.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "server/index.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by server/routes/local-models.ts (import-statement); server/index.ts (import-statement)."
+    },
+    {
+      "path": "lib/local-models/installer.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "lib/local-models/subsystem.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/local-models/index.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by lib/local-models/subsystem.ts (import-statement); lib/local-models/index.ts (import-statement)."
+    },
+    {
+      "path": "lib/local-models/instance-manager.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "lib/local-models/runtime-service.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/local-models/index.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by lib/local-models/runtime-service.ts (import-statement); lib/local-models/index.ts (import-statement)."
+    },
+    {
+      "path": "lib/local-models/large-slot.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "lib/local-models/runtime-service.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/local-models/subsystem.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/local-models/index.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by lib/local-models/runtime-service.ts (import-statement); lib/local-models/subsystem.ts (import-statement); lib/local-models/index.ts (import-statement)."
+    },
+    {
+      "path": "lib/local-models/manifest-client.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "lib/local-models/subsystem.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/local-models/index.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by lib/local-models/subsystem.ts (import-statement); lib/local-models/index.ts (import-statement)."
+    },
+    {
+      "path": "lib/local-models/manifest.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "lib/local-models/manifest-client.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/local-models/index.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by lib/local-models/manifest-client.ts (import-statement); lib/local-models/index.ts (import-statement)."
+    },
+    {
+      "path": "lib/local-models/memory-governor.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "lib/local-models/runtime-service.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/local-models/index.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by lib/local-models/runtime-service.ts (import-statement); lib/local-models/index.ts (import-statement)."
+    },
+    {
+      "path": "lib/local-models/registry.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "lib/local-models/subsystem.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/local-models/index.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by lib/local-models/subsystem.ts (import-statement); lib/local-models/index.ts (import-statement)."
+    },
+    {
+      "path": "lib/local-models/runtime-service.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "lib/local-models/subsystem.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/local-models/index.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by lib/local-models/subsystem.ts (import-statement); lib/local-models/index.ts (import-statement)."
+    },
+    {
+      "path": "lib/local-models/secure-archive.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "lib/local-models/installer.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/local-models/index.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by lib/local-models/installer.ts (import-statement); lib/local-models/index.ts (import-statement)."
+    },
+    {
+      "path": "lib/local-models/sidecar-factory.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "lib/local-models/in-process-factory.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/local-models/subsystem.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/local-models/index.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by lib/local-models/in-process-factory.ts (import-statement); lib/local-models/subsystem.ts (import-statement); lib/local-models/index.ts (import-statement)."
+    },
+    {
+      "path": "lib/local-models/sidecar-manager.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "lib/local-models/sidecar-factory.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/local-models/index.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by lib/local-models/sidecar-factory.ts (import-statement); lib/local-models/index.ts (import-statement)."
+    },
+    {
+      "path": "lib/local-models/subsystem.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "lib/local-models/index.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by lib/local-models/index.ts (import-statement)."
+    },
+    {
       "path": "lib/log-redactor.ts",
       "inputType": "source-graph",
       "provenance": [
@@ -8380,6 +8947,16 @@
         },
         {
           "root": "server-bootstrap",
+          "from": "lib/local-models/manifest-client.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/local-models/downloader.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
           "from": "lib/bridge/telegram-adapter.ts",
           "kind": "import-statement"
         },
@@ -8399,7 +8976,7 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by core/mcp/clients/http-client.ts (import-statement); lib/bridge/outbound-http.ts (import-statement); server/routes/bridge.ts (import-statement); +4 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by core/mcp/clients/http-client.ts (import-statement); lib/bridge/outbound-http.ts (import-statement); server/routes/bridge.ts (import-statement); +6 more importer(s)."
     },
     {
       "path": "lib/notifications/notification-service.ts",
@@ -78478,6 +79055,72 @@
       "reason": "nft-runtime-trace via nft-server-bundle (see roots[] for the full explanation)"
     },
     {
+      "path": "node_modules/@napi-rs/canvas-<platform>/package.json",
+      "inputType": "nft-runtime-trace",
+      "provenance": [
+        {
+          "root": "nft-server-bundle",
+          "kind": "nft-trace"
+        }
+      ],
+      "reason": "nft-runtime-trace via nft-server-bundle (see roots[] for the full explanation)"
+    },
+    {
+      "path": "node_modules/@napi-rs/canvas/geometry.js",
+      "inputType": "nft-runtime-trace",
+      "provenance": [
+        {
+          "root": "nft-server-bundle",
+          "kind": "nft-trace"
+        }
+      ],
+      "reason": "nft-runtime-trace via nft-server-bundle (see roots[] for the full explanation)"
+    },
+    {
+      "path": "node_modules/@napi-rs/canvas/index.js",
+      "inputType": "nft-runtime-trace",
+      "provenance": [
+        {
+          "root": "nft-server-bundle",
+          "kind": "nft-trace"
+        }
+      ],
+      "reason": "nft-runtime-trace via nft-server-bundle (see roots[] for the full explanation)"
+    },
+    {
+      "path": "node_modules/@napi-rs/canvas/js-binding.js",
+      "inputType": "nft-runtime-trace",
+      "provenance": [
+        {
+          "root": "nft-server-bundle",
+          "kind": "nft-trace"
+        }
+      ],
+      "reason": "nft-runtime-trace via nft-server-bundle (see roots[] for the full explanation)"
+    },
+    {
+      "path": "node_modules/@napi-rs/canvas/load-image.js",
+      "inputType": "nft-runtime-trace",
+      "provenance": [
+        {
+          "root": "nft-server-bundle",
+          "kind": "nft-trace"
+        }
+      ],
+      "reason": "nft-runtime-trace via nft-server-bundle (see roots[] for the full explanation)"
+    },
+    {
+      "path": "node_modules/@napi-rs/canvas/package.json",
+      "inputType": "nft-runtime-trace",
+      "provenance": [
+        {
+          "root": "nft-server-bundle",
+          "kind": "nft-trace"
+        }
+      ],
+      "reason": "nft-runtime-trace via nft-server-bundle (see roots[] for the full explanation)"
+    },
+    {
       "path": "node_modules/@opentelemetry/api/build/src/api/context.js",
       "inputType": "nft-runtime-trace",
       "provenance": [
@@ -107183,6 +107826,17 @@
       "reason": "nft-runtime-trace via nft-server-bundle (see roots[] for the full explanation)"
     },
     {
+      "path": "node_modules/pdfjs-dist/legacy/build/pdf.mjs",
+      "inputType": "nft-runtime-trace",
+      "provenance": [
+        {
+          "root": "nft-server-bundle",
+          "kind": "nft-trace"
+        }
+      ],
+      "reason": "nft-runtime-trace via nft-server-bundle (see roots[] for the full explanation)"
+    },
+    {
       "path": "node_modules/pend/index.js",
       "inputType": "nft-runtime-trace",
       "provenance": [
@@ -121364,11 +122018,16 @@
         },
         {
           "root": "server-bootstrap",
+          "from": "server/routes/local-models.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
           "from": "server/index.ts",
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by server/routes/mobile-workbench.ts (import-statement); server/routes/sessions.ts (import-statement); server/routes/models.ts (import-statement); +22 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by server/routes/mobile-workbench.ts (import-statement); server/routes/sessions.ts (import-statement); server/routes/models.ts (import-statement); +23 more importer(s)."
     },
     {
       "path": "server/http/boundary.ts",
@@ -121495,9 +122154,14 @@
           "root": "server-bootstrap",
           "from": "server/routes/memory-dream.ts",
           "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "server/routes/local-models.ts",
+          "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by server/http/security-audit.ts (import-statement); server/routes/config.ts (import-statement); server/routes/providers.ts (import-statement); +12 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by server/http/security-audit.ts (import-statement); server/routes/config.ts (import-statement); server/routes/providers.ts (import-statement); +13 more importer(s)."
     },
     {
       "path": "server/http/cors-policy.ts",
@@ -121674,11 +122338,16 @@
         },
         {
           "root": "server-bootstrap",
+          "from": "server/routes/local-models.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
           "from": "server/index.ts",
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by server/routes/plugins.ts (import-statement); server/http/request-principal.ts (import-statement); server/http/capability-guard.ts (import-statement); +7 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by server/routes/plugins.ts (import-statement); server/http/request-principal.ts (import-statement); server/http/capability-guard.ts (import-statement); +8 more importer(s)."
     },
     {
       "path": "server/http/security-audit.ts",
@@ -121733,9 +122402,14 @@
           "root": "server-bootstrap",
           "from": "server/routes/speech-recognition.ts",
           "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "server/routes/local-models.ts",
+          "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by server/routes/mobile-workbench.ts (import-statement); server/routes/config.ts (import-statement); server/routes/agents.ts (import-statement); +7 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by server/routes/mobile-workbench.ts (import-statement); server/routes/config.ts (import-statement); server/routes/agents.ts (import-statement); +8 more importer(s)."
     },
     {
       "path": "server/http/transport-context.ts",
@@ -122018,6 +122692,18 @@
     },
     {
       "path": "server/routes/knowledge.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "server/composition/open-root.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by server/composition/open-root.ts (import-statement)."
+    },
+    {
+      "path": "server/routes/local-models.ts",
       "inputType": "source-graph",
       "provenance": [
         {
@@ -125016,11 +125702,11 @@
     }
   ],
   "stats": {
-    "totalFiles": 10655,
+    "totalFiles": 10688,
     "byInputType": {
-      "source-graph": 755,
+      "source-graph": 781,
       "runtime-asset": 11,
-      "nft-runtime-trace": 9889
+      "nft-runtime-trace": 9896
     }
   }
 }

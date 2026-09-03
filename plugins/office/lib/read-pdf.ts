@@ -194,6 +194,6 @@ export async function readPdfDocument(filePath: string, input: PdfReadInput = {}
       warnings: sawMathLikeText ? ["math_may_be_degraded"] : [],
     };
   } finally {
-    await pdf.destroy?.();
+    await (pdf as unknown as { destroy?: () => Promise<void> | void }).destroy?.();
   }
 }

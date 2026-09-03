@@ -2,6 +2,7 @@ import fs from "fs";
 import path from "path";
 import { randomUUID } from "crypto";
 import { captureProviderHttpResponse, observedProviderFetch } from "../../lib/llm/model-call-integration.ts";
+import { parseLocalModelKey } from "../../lib/local-models/contracts.ts";
 
 const DEFAULT_MIME = "audio/wav";
 
@@ -217,7 +218,32 @@ export const volcengineSpeechRecognitionAdapter = {
   },
 };
 
+export const localSpeechRecognitionAdapter = {
+  id: "local",
+  name: "Local Offline Speech Recognition",
+  protocolId: "local-offline-asr",
+  types: ["speechRecognition"],
+  async transcribe(input) {
+    const runtime = input.localModels?.runtime;
+    if (!runtime?.transcribe) throw new Error("local speech recognition runtime is unavailable");
+    const model = parseLocalModelKey(input.model?.id);
+    if (!model) throw new Error("local speech recognition model identity is invalid");
+    const filePath = input.file?.realPath || input.file?.filePath;
+    if (!filePath) throw new Error("audio file path is required");
+    const result = await runtime.transcribe({
+      model,
+      filePath,
+      mime: input.file?.mime || DEFAULT_MIME,
+      language: input.language,
+      signal: input.signal ?? new AbortController().signal,
+      priority: "interactive",
+    });
+    return result.output;
+  },
+};
+
 export const builtinSpeechRecognitionAdapters = [
+  localSpeechRecognitionAdapter,
   openaiSpeechRecognitionAdapter,
   mimoSpeechRecognitionAdapter,
   dashscopeSpeechRecognitionAdapter,

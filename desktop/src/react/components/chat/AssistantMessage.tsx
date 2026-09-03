@@ -17,7 +17,8 @@ import { SettingsUpdateCard } from './SettingsUpdateCard';
 import { InteractiveCard } from './InteractiveCard';
 import { SessionCollabDraftCard } from './SessionCollabDraftCard';
 import { useMessageFooterActions } from './MessageActions';
-import { MessageFooterActions, formatMessageTime } from './MessageFooterActions';
+import { MessageFooterActions, formatMessageTime, type MessageFooterAction } from './MessageFooterActions';
+import { useLocalReadAloud } from './use-local-read-aloud';
 import { ChatResourceCard } from './ChatResourceCard';
 import { FileResourceIcon, SkillResourceIcon } from './ChatResourceIcons';
 import {
@@ -172,6 +173,17 @@ export const AssistantMessage = memo(function AssistantMessage({
   // 一条消息只记一票（防连点重复写库）；成功后按服务端返回分 toast 文案。
   const t = window.t ?? ((key: string) => key);
   const addToast = useStore(s => s.addToast);
+  const readAloudText = useMemo(() => extractTextBlockPlainText(blocks.filter(
+    (block): block is ContentBlock & { type: 'text' } => block.type === 'text',
+  )).trim(), [blocks]);
+  const handleReadAloudError = useCallback((message: string) => {
+    addToast(`${t('chat.readAloudFailed')}: ${message}`, 'error');
+  }, [addToast, t]);
+  const readAloud = useLocalReadAloud({
+    text: readAloudText,
+    sessionPath,
+    onError: handleReadAloudError,
+  });
   const [feedbackState, setFeedbackState] = useState<'up' | 'down' | null>(null);
   const handleFeedback = useCallback((rating: 'up' | 'down') => {
     if (feedbackState) return;
@@ -218,7 +230,33 @@ export const AssistantMessage = memo(function AssistantMessage({
     onFeedback: handleFeedback,
     feedbackState,
   });
-  const messageActions = readOnly || !showTurnCompletionTime || isStreaming ? [] : standardMessageActions;
+  const readAloudActions = useMemo<MessageFooterAction[]>(() => {
+    if (!readAloudText) return [];
+    const title = readAloud.state === 'playing'
+      ? t('chat.pauseReadAloud')
+      : readAloud.state === 'paused'
+        ? t('chat.resumeReadAloud')
+        : readAloud.state === 'loading'
+          ? t('chat.readAloudPreparing')
+          : t('chat.readAloud');
+    return [{
+      id: 'read-aloud',
+      title,
+      icon: <ReadAloudIcon state={readAloud.state} />,
+      onClick: readAloud.toggle,
+      disabled: readAloud.state === 'loading',
+      active: readAloud.state !== 'idle',
+      pressed: readAloud.state === 'playing',
+    }, ...(readAloud.state !== 'idle' ? [{
+      id: 'stop-read-aloud',
+      title: t('chat.stopReadAloud'),
+      icon: <StopReadAloudIcon />,
+      onClick: readAloud.stop,
+    }] : [])];
+  }, [readAloud.state, readAloud.stop, readAloud.toggle, readAloudText, t]);
+  const messageActions = readOnly || !showTurnCompletionTime || isStreaming
+    ? []
+    : [...standardMessageActions.slice(0, 2), ...readAloudActions, ...standardMessageActions.slice(2)];
   const footerActions = canShowNodeActions ? nodeActions : [];
 
   return (
@@ -272,6 +310,23 @@ export const AssistantMessage = memo(function AssistantMessage({
     </div>
   );
 });
+
+function ReadAloudIcon({ state }: { state: 'idle' | 'loading' | 'playing' | 'paused' }) {
+  if (state === 'playing') {
+    return <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"><path d="M8 5v14M16 5v14" /></svg>;
+  }
+  return (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M11 5 6 9H2v6h4l5 4V5Z" />
+      <path d="M15.5 8.5a5 5 0 0 1 0 7" />
+      <path d="M18.5 5.5a9 9 0 0 1 0 13" />
+    </svg>
+  );
+}
+
+function StopReadAloudIcon() {
+  return <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="1" /></svg>;
+}
 
 class ContentBlockErrorBoundary extends Component<{
   messageId: string;

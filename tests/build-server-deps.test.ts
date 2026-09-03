@@ -5,6 +5,7 @@ import { execFileSync } from "child_process";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   buildAnydocRuntimeSmokeScript,
+  buildCanvasRuntimeSmokeScript,
   buildBetterSqliteRuntimeSmokeScript,
   buildExternalPackage,
   buildJiebaRuntimeSmokeScript,
@@ -224,6 +225,26 @@ describe("build-server external dependency packaging", () => {
 
     expect(() => execFileSync(process.execPath, [scriptPath], { cwd: outDir, stdio: "pipe" }))
       .toThrow();
+  });
+
+  it("generates a canvas smoke script that creates and encodes pixels", () => {
+    const outDir = makeTempDir();
+    const packageDir = path.join(outDir, "node_modules", "@napi-rs", "canvas");
+    fs.mkdirSync(packageDir, { recursive: true });
+    fs.writeFileSync(path.join(outDir, "package.json"), JSON.stringify({ type: "module" }));
+    fs.writeFileSync(path.join(packageDir, "index.js"), [
+      "exports.createCanvas = () => ({",
+      "  getContext: () => ({ fillStyle: '', fillRect() {} }),",
+      "  toBuffer: () => Buffer.from('fake-png'),",
+      "});",
+    ].join("\n"));
+    fs.writeFileSync(path.join(packageDir, "package.json"), JSON.stringify({
+      name: "@napi-rs/canvas",
+      main: "index.js",
+    }));
+    const scriptPath = path.join(outDir, ".canvas-smoke.mjs");
+    fs.writeFileSync(scriptPath, buildCanvasRuntimeSmokeScript());
+    expect(() => execFileSync(process.execPath, [scriptPath], { cwd: outDir })).not.toThrow();
   });
 
   it("fails fast when an installed external package export resolves to a missing file", () => {

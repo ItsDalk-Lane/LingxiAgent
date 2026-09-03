@@ -295,6 +295,52 @@ describe("model sync related routes", () => {
     expect(engine.emitEvent).not.toHaveBeenCalled();
   });
 
+  it("lists installed local embedding variants without inventing remote credentials", async () => {
+    const { createPreferencesRoute } = await import("../server/routes/preferences.ts");
+    const app = new Hono();
+    const engine = {
+      getSharedModels: vi.fn(() => ({})),
+      getSearchConfig: vi.fn(() => ({})),
+      listModelOperationModels: vi.fn(() => [{
+        id: "remote-embed", provider: "remote", operations: ["embedding"], operationProtocol: "openai-embeddings",
+      }]),
+      localModels: {
+        registry: {
+          snapshot: () => ({
+            models: [{
+              id: "qwen3-embedding-0.6b",
+              category: "embedding",
+              quant: "fp8",
+              version: "2026.09.02",
+              estimatedPeakRssMb: 1024,
+            }, {
+              id: "kokoro-82m",
+              category: "tts",
+              quant: "fp32",
+              version: "2026.09.02",
+              estimatedPeakRssMb: 600,
+            }],
+          }),
+        },
+      },
+    };
+    app.route("/api", createPreferencesRoute(engine));
+
+    const response = await app.request("/api/preferences/models");
+    expect(response.status).toBe(200);
+    expect((await response.json()).operation_models).toEqual([
+      expect.objectContaining({ id: "remote-embed", provider: "remote" }),
+      expect.objectContaining({
+        id: "local:qwen3-embedding-0.6b@fp8@2026.09.02",
+        provider: "local",
+        operations: ["embedding"],
+        operationProtocol: "local-offline-embedding",
+        offline: true,
+        estimatedPeakRssMb: 1024,
+      }),
+    ]);
+  });
+
   it("shared model preference updates return an error and emit no event when model refresh fails", async () => {
     const { createPreferencesRoute } = await import("../server/routes/preferences.ts");
     const app = new Hono();
