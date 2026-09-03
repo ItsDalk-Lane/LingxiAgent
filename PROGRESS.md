@@ -10,7 +10,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = 275d82c7e420c343f0d79243c80c3f43536149f5  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-09-02 安全双件套+沙盒拒绝分因文案)
+VERIFIED_SOURCE_SHA   = 33543b8c159d4d9f53d40a6f7cdb74692f4c3c36  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-09-03 本地推理全链路批量收口)
 工作分支              = feature/upstream-sync-0.447.4
 ```
 
@@ -168,6 +168,15 @@ AboutTab），因此最终源码树重新执行了 renderer build / package smok
 ## Seal 推进记录
 
 seal 不是一次性终点，而是"当前被验证树"的游标；每次审计期后的结构性收尾都需复跑验证并推进：
+
+- **2026-09-03 本地推理链路批量收口**（seal 275d82c7 → 33543b8c）：本地模型分发/
+  三平台运行时基建/治理增强批量提交（90 files，含 lib/local-models 子系统、HF 分发
+  对接、build-runtimes/smoke/CI 工作流、语音链路前序累积）。复跑 typecheck x3（绿）+
+  全量 npm test（exit 0，13073 passed / 7 skipped，82.75s）+ compute-cli-closure
+  （exit 0）+ lint:boundary（exit 0；gpu-detect.ts 登记 export-manifest）+ 持久化
+  指纹 compatible 重钉（server/index.ts manifestUrl 接线 + store-registry 探测缓存
+  位点；check exit 0）后推进。CSS 治理两处同步修复（local-models 设置页
+  --space-20→--space-24、裸 1px→--space-2）。
 
 - **2026-08-20 收口**（d4cf92a8）：全部最终验证（typecheck/lint/测试/构建/打包/CI）针对的树。
 - **2026-08-20 文档清场**（6e28d74e4717ee36631bd9e3384c57cc1ced4487）：删除三份已完成的历史
