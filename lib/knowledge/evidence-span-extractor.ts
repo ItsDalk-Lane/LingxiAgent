@@ -112,7 +112,9 @@ function selectWindow(text: string, start: number, end: number, terms: string[])
 
 /** 搜索正文只作线索；引用必须回到同一冻结解析块，再按原文切片。 */
 export class EvidenceSpanExtractor {
-  constructor(private readonly store: Pick<KnowledgeStore, "getArtifactBlocksByIds">) {}
+  private readonly store: Pick<KnowledgeStore, "getArtifactBlocksByIds">;
+
+  constructor(store: Pick<KnowledgeStore, "getArtifactBlocksByIds">) { this.store = store; }
 
   extract(input: Parameters<FastKnowledgeEvidenceStages["extractSpans"]>[0]): KnowledgeEvidenceSpan[] {
     input.signal?.throwIfAborted();

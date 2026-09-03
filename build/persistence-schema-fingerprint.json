@@ -660,7 +660,7 @@
     ],
     "version": 3
   },
-  "payloadFingerprint": "sha256:d7239a0f7b0ca2323bb7b57da212a09e98674ac724f863155dfd96f07900e50c",
+  "payloadFingerprint": "sha256:9d2a2751a11ad11c01fa759f8ca4ff65527f71166f64d849d13534cc3ed0a7ee",
   "registry": [
     {
       "affectedByEpochMigration": true,
@@ -3287,8 +3287,8 @@
   ],
   "review": {
     "classification": "compatible",
-    "compatibilityReason": "registers a stateless Pi tool loop guard extension; no persisted store schema, data epoch, or restore contract changes",
-    "payloadFingerprint": "sha256:d7239a0f7b0ca2323bb7b57da212a09e98674ac724f863155dfd96f07900e50c"
+    "compatibilityReason": "Only additive optional knowledge retrieval statistics, local read orchestration and Node-compatible class field syntax changed; persisted schemas and DATA_EPOCH remain unchanged.",
+    "payloadFingerprint": "sha256:9d2a2751a11ad11c01fa759f8ca4ff65527f71166f64d849d13534cc3ed0a7ee"
   },
   "schemas": [
     {
@@ -3836,7 +3836,7 @@
         ],
         "userVersion": 17
       },
-      "sourceHash": "sha256:750e1194eac7e48f2e596d845954d90d8a8cc594a9dc5fd0a82f9d55af2a44e3",
+      "sourceHash": "sha256:0e13adef3b6388af0372a0579b2b64f8a8c8f6522166d32dd073cfd998efbcf1",
       "storeId": "knowledge-database"
     },
     {
@@ -3849,28 +3849,28 @@
           "sourceHash": "sha256:485d5e8070cc05b2db6821e02b179b08607c0cf15885c30aa45ea2bcfdaf70a6"
         }
       ],
-      "sourceHash": "sha256:495b0c5ab2f907ad1d242f8fc23cddf64ab4701b8a7fef94c5c16ee4ec921cff",
+      "sourceHash": "sha256:a94d26db6bcae59b3df82f6055550a97986daeb4953e92d38d6cfddcf400d4aa",
       "storeId": "knowledge-indexes"
     },
     {
       "contract": "ParseArtifact generation directories referenced by knowledge.db and never treated as source content versions",
       "kind": "directory-contract",
       "module": "lib/knowledge/knowledge-manager.ts",
-      "sourceHash": "sha256:fec50cc6e4517f4dcc40eea0222d28d73d7bc88a8252c3de1b6d820820461257",
+      "sourceHash": "sha256:95b3875c66f378bcd537075ace19c5eb2b7518dba01b4b1cd4be5fb0b7855ce4",
       "storeId": "knowledge-parse-artifacts"
     },
     {
       "contract": "ProcessingArtifact output files (binary office formats converted to structured text) referenced by knowledge.db processing_artifacts rows, with locatorMap held in the database",
       "kind": "directory-contract",
       "module": "lib/knowledge/knowledge-manager.ts",
-      "sourceHash": "sha256:fec50cc6e4517f4dcc40eea0222d28d73d7bc88a8252c3de1b6d820820461257",
+      "sourceHash": "sha256:95b3875c66f378bcd537075ace19c5eb2b7518dba01b4b1cd4be5fb0b7855ce4",
       "storeId": "knowledge-processing-artifacts"
     },
     {
       "contract": "ContentSnapshot relative locator, immutable byte publication, SHA-256 verification, and rollback protocol",
       "kind": "directory-contract",
       "module": "lib/knowledge/knowledge-manager.ts",
-      "sourceHash": "sha256:fec50cc6e4517f4dcc40eea0222d28d73d7bc88a8252c3de1b6d820820461257",
+      "sourceHash": "sha256:95b3875c66f378bcd537075ace19c5eb2b7518dba01b4b1cd4be5fb0b7855ce4",
       "storeId": "knowledge-source-snapshots"
     },
     {

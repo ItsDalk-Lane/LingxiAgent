@@ -1,0 +1,25 @@
+name: Knowledge performance
+
+on:
+  workflow_dispatch:
+
+jobs:
+  benchmark:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24.15.0"
+          cache: npm
+      - run: npm ci
+      - name: Run stable-runner performance gates
+        env:
+          LINGXI_ENFORCE_KNOWLEDGE_PERF: "1"
+        run: node scripts/benchmark-knowledge-fast.mjs --output=artifacts/knowledge-fast-benchmark.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: knowledge-fast-benchmark-linux-x64
+          path: artifacts/knowledge-fast-benchmark.json
+          if-no-files-found: error

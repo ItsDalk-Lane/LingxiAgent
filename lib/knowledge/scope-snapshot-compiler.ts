@@ -59,7 +59,9 @@ export class ScopeSnapshotCompiler {
   }>();
   private disposed = false;
 
-  constructor(private readonly deps: CompilerDependencies) {}
+  private readonly deps: CompilerDependencies;
+
+  constructor(deps: CompilerDependencies) { this.deps = deps; }
 
   compile(scope: KnowledgeTurnScope): Promise<CompiledKnowledgeScope> {
     if (this.disposed || scope.status !== "active") {

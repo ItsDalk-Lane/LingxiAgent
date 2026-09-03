@@ -21,7 +21,7 @@ export interface InjectionScanResult {
 
 export const UNTRUSTED_EXTERNAL_CONTENT_MARKER = "<<<UNTRUSTED_EXTERNAL_CONTENT>>>";
 
-const ZERO_WIDTH_RE = /[\u200B\u200C\u200D\uFEFF]/g;
+const ZERO_WIDTH_RE = /[\u200B-\u200D\uFEFF]/g;
 const HTML_COMMENT_RE = /<!--[\s\S]*?-->/g;
 
 const RULES: ReadonlyArray<{

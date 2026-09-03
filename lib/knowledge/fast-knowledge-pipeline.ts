@@ -44,7 +44,9 @@ interface FastKnowledgeDependencies extends FastKnowledgeEvidenceStages {
 
 /** 1200ms 是阶段准入期限；已开始的同步 SQL 不伪装成可中途取消。 */
 export class FastKnowledgePipeline {
-  constructor(private readonly deps: FastKnowledgeDependencies) {}
+  private readonly deps: FastKnowledgeDependencies;
+
+  constructor(deps: FastKnowledgeDependencies) { this.deps = deps; }
 
   async run(input: { question: string; scope: KnowledgeTurnScope; signal?: AbortSignal }) {
     const now = this.deps.now ?? (() => performance.now());
