@@ -1,5 +1,6 @@
 import crypto from "node:crypto";
 import type { CompiledKnowledgeScope } from "./scope-snapshot-compiler.ts";
+import { EvidenceSpanExtractor } from "./evidence-span-extractor.ts";
 
 import {
   buildKnowledgeChunks,
@@ -557,6 +558,10 @@ export class KnowledgeQueryService {
       query: input.query,
       limit: input.limit,
     });
+  }
+
+  extractEvidenceSpans(input: Parameters<EvidenceSpanExtractor["extract"]>[0]) {
+    return new EvidenceSpanExtractor(this.deps.store).extract(input);
   }
 
   /**

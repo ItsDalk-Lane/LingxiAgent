@@ -3801,6 +3801,30 @@ export class KnowledgeStore {
     `).all(parseArtifactId).map(toBlock);
   }
 
+  /** 按产物批量读取命中块；归属过滤在同一条 SQL 中完成，避免逐命中查询。 */
+  getArtifactBlocksByIds(input: {
+    studioId: unknown;
+    parseArtifactId: unknown;
+    blockIds: unknown[];
+  }): KnowledgeBlock[] {
+    const studioId = requiredString(input?.studioId, "studioId", 256);
+    const parseArtifactId = requiredString(input?.parseArtifactId, "parseArtifactId", 128);
+    if (!Array.isArray(input?.blockIds)) {
+      throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "blockIds must be an array");
+    }
+    const blockIds = [...new Set(input.blockIds.map(id => requiredString(id, "blockId", 128)))];
+    if (blockIds.length === 0) return [];
+    return this.db.prepare(`
+      SELECT b.* FROM knowledge_blocks b
+      JOIN parse_artifacts pa ON pa.id = b.parse_artifact_id
+      JOIN content_snapshots cs ON cs.id = pa.content_snapshot_id
+      JOIN sources s ON s.id = cs.source_id
+      WHERE s.studio_id = ? AND b.parse_artifact_id = ?
+        AND b.id IN (SELECT value FROM json_each(?))
+      ORDER BY b.ordinal ASC, b.id ASC
+    `).all(studioId, parseArtifactId, JSON.stringify(blockIds)).map(toBlock);
+  }
+
   createCitation(input: {
     studioId: unknown;
     parseArtifactId: unknown;

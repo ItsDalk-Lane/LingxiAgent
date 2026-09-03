@@ -10,7 +10,7 @@
 - 严格按 P0 → P1 → P2 → P3 及编号顺序；阶段门禁全部通过才进入下一阶段。
 - 每项记录测试原始结果后提交；不删除、跳过或放宽测试，不合并 main。
 - 现有任务书为用户未跟踪文件，既有规划文档与 BLOCKED.md 历史记录保留。
-- 当前断点：P0-03，P0-02 已完成并提交，正在实现本地 FTS 与阶段期限管线。审计封印顺序冲突详见 BLOCKED.md，P0 阶段收口前须解决。
+- 当前断点：P0-04，P0-03 已完成并提交，正在实现精确证据提取。审计封印顺序冲突详见 BLOCKED.md，P0 阶段收口前须解决。
 - 进度、计划与事实集中在本文件和基线文档，避免覆盖既有 task_plan.md / findings.md / PROGRESS.md。
 - 目标工具已确认本任务存在 active goal；重复 create_goal 被拒绝，沿用现有目标。
 - 规划恢复脚本返回其他会话的无关配置记录，经 git diff 为空核对，未采用其内容。
@@ -57,16 +57,16 @@
 - 改动文件：任务书规定 fast pipeline、query service、index store、manager；统一精确证据类型 `shared/knowledge-evidence.ts`；管线测试。
 - 测试命令：`npx vitest run tests/knowledge-fast-pipeline.test.ts tests/knowledge-scope-snapshot-compiler.test.ts tests/knowledge-retrieval-golden.test.ts`；`npm run typecheck`；修改文件定向 ESLint；`git diff --check`
 - 测试结果：3 文件 / 28 测试通过，0 失败 / 0 跳过（2.98s，exit 0）；类型检查三套、定向 ESLint、diff 检查 exit 0。验证真实 SQLite FTS、字面查询、就绪过滤、重复 ID 去重、零结果、过期准入和取消。日志 `/tmp/lingxi-knowledge-p003-tests.log`、`/tmp/lingxi-knowledge-p003-typecheck.log`。证据加工以必填阶段接口连接，具体提取/打包分别按 P0-04/P0-05 实现，生产提交切换保留在 P0-06；本项不冒充已完成生产端到端验证。
-- 对应 commit SHA：本次本地管线提交，提交后立即回填
+- 对应 commit SHA：`5e6871898689357ef716b535e28fcf03b8e6a398`
 - 偏差：none
 
 ## P0-04：实现精确 span 提取
 
-- 状态：pending
-- 改动文件：尚未开始
-- 测试命令：按任务书该项测试执行，尚未执行
-- 测试结果：NOT_EXECUTED
-- 对应 commit SHA：尚未提交
+- 状态：completed
+- 改动文件：`lib/knowledge/evidence-span-extractor.ts`、`lib/knowledge/knowledge-store.ts`、`lib/knowledge/knowledge-query-service.ts`、精确证据测试
+- 测试命令：`npx vitest run tests/knowledge-evidence-span-extractor.test.ts tests/knowledge-fast-pipeline.test.ts tests/knowledge-scope-snapshot-compiler.test.ts`；`npm run typecheck`；修改文件定向 ESLint；`git diff --check`
+- 测试结果：最终 3 文件 / 38 测试全部通过（1.31s，exit 0）；类型检查三套、ESLint、diff 检查 exit 0。首轮 35 通过 / 3 失败，测试建样误让通用文本摄入重新解析已指定的段落/页码；修正为真实索引入口后因 fixture 策略绑定不同出现 28 通过 / 10 失败，已使用仓库真实配置解析器建绑，保留全部原断言。日志 `/tmp/lingxi-knowledge-p004-tests-final.log`、`/tmp/lingxi-knowledge-p004-typecheck.log`。
+- 对应 commit SHA：本次精确证据提交，提交后立即回填
 - 偏差：none
 
 ## P0-05：实现统一 EvidencePacker
