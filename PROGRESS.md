@@ -10,7 +10,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = 275d82c7e420c343f0d79243c80c3f43536149f5  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-09-02 安全双件套+沙盒拒绝分因文案)
+VERIFIED_SOURCE_SHA   = 5c016df183ad207cf1ca33de274abb7a4eb10057  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-09-04 知识重构 P0 阶段源码；仅 P0 验证，后续阶段与最终打包待执行)
 工作分支              = feature/upstream-sync-0.447.4
 ```
 
@@ -166,6 +166,16 @@ AboutTab），因此最终源码树重新执行了 renderer build / package smok
    review（persona 改名 + dream additive stores；agent-manager 回调接线），DATA_EPOCH=1 不变。
 
 ## Seal 推进记录
+
+### 2026-09-04：知识重构 P0 阶段审计
+
+- 用户授权：每阶段完成验证后同步审计记录，并保留任务书最终封印提交；任务范围与顺序不变。
+- 被验证源码：`5c016df183ad207cf1ca33de274abb7a4eb10057`（固定基线 `3eab85891a1747c64064252804f70c0a3773f021`，P0-00 至 P0-08 按序完成）。此审计提交只含既有白名单材料，没有修改测试或扩大白名单。
+- 2026-09-04 全量复验：`npm test` exit 0；1281 文件通过、1 既有跳过；13002 测试通过、7 既有跳过、0 失败；76.42s。日志 `/tmp/lingxi-knowledge-p0-seal-full-20260904.log`。原封印唯一失败已经消除。
+- 同一源码内容的其余 P0 门禁：三套类型检查、全量 lint、开放边界、指定知识测试、三种本机构建、五个生成器两轮无漂移均通过，精确命令、结果及历史失败见 `KNOWLEDGE_REFACTOR_PROGRESS.md` P0-08。提交后未修改运行代码、测试或生成物。
+- 本机真实性能：10k 热 P95 1.624334ms；100k 热 P95 17.814625ms、冷 P95 220.717334ms；远程调用 0、证据最多 8 条、892 tokens。仅 macOS arm64；Linux 手工工作流、后续阶段跨平台验证及最终打包尚未执行，不作全项目交付或正式签名声明。
+- P0 阶段门禁全部通过，允许进入 P1-01。任务进度文件按原白名单限制随下一项源码提交回填；最终封印保留。
+
 
 seal 不是一次性终点，而是"当前被验证树"的游标；每次审计期后的结构性收尾都需复跑验证并推进：
 
