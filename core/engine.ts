@@ -188,6 +188,7 @@ function buildToolCatalogManifestSnapshot(catalog, modelContextWindowTokens) {
 import { filterToolObjectsByAvailability } from "./tool-availability.ts";
 import { TaskRegistry } from "../lib/task-registry.ts";
 import { KnowledgeManager } from "../lib/knowledge/knowledge-manager.ts";
+import { KNOWLEDGE_CANDIDATE_GENERATION_BUDGET } from "../lib/knowledge/knowledge-query-service.ts";
 import { KnowledgeError } from "../lib/knowledge/errors.ts";
 import { KnowledgeEmbeddingProviderGate } from "../lib/knowledge/ingestion-service.ts";
 import {
@@ -2807,12 +2808,7 @@ export class LingxiEngine {
           notebookIds: input.knowledgeRefs.notebookIds,
         })
         : null;
-      const frozenArtifacts = turnScope
-        ? new Map(turnScope.sources.map(source => [source.sourceId, {
-          contentSnapshotId: source.contentSnapshotId,
-          parseArtifactId: source.parseArtifactId,
-        }]))
-        : null;
+      const compiledKnowledgeScope = turnScope ? await knowledge.compileTurnScope(turnScope) : null;
       const policy = resolveKnowledgeExecutionPolicy({
         mode: input.knowledgeRefs.mode,
         question: input.question,
@@ -3118,11 +3114,15 @@ export class LingxiEngine {
             const traceId = `search-${++knowledgeTraceSeq}`;
             emitKnowledgeTrace({ id: traceId, kind: "search", phase: "start", query });
             try {
-              const result = await knowledge.queryService.retrieveForNotebooks({
+              const result = compiledKnowledgeScope
+                ? (await knowledge.searchService.searchWithEvidence({
+                  compiledScope: compiledKnowledgeScope, query, channel: "hybrid", limit: topK ?? KNOWLEDGE_CANDIDATE_GENERATION_BUDGET,
+                  rerank: true, signal: input.signal, ...(sourceIds ? { sourceIds } : {}),
+                }, sectionsBySourceId)).evidence
+                : await knowledge.queryService.retrieveForNotebooks({
                 studioId,
                 notebookIds: input.knowledgeRefs.notebookIds,
                 question: query,
-                ...(frozenArtifacts ? { frozenArtifacts } : {}),
                 ...(sourceIds ? { sourceIds } : {}),
                 ...(sectionsBySourceId ? { sectionsBySourceId } : {}),
                 ...(topK != null ? { topK } : {}),

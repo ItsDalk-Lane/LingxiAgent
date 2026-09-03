@@ -10,7 +10,7 @@
 - 严格按 P0 → P1 → P2 → P3 及编号顺序；阶段门禁全部通过才进入下一阶段。
 - 每项记录测试原始结果后提交；不删除、跳过或放宽测试，不合并 main。
 - 现有任务书为用户未跟踪文件，既有规划文档与 BLOCKED.md 历史记录保留。
-- 当前断点：P1-01 已完成实现及本项验证，随本次提交落地，接着执行 P1-02。P0 源码提交 `5c016df183ad207cf1ca33de274abb7a4eb10057`，阶段审计提交 `f9928d76`；全量 13002 PASS / 0 FAIL / 7 既有 SKIP。用户已授权每阶段验证后同步审计记录，保留最终封印。
+- 当前断点：P1-02 已完成统一入口和本项验证，随本次提交落地，接着执行 P1-03。P0 源码提交 `5c016df183ad207cf1ca33de274abb7a4eb10057`，阶段审计提交 `f9928d76`；全量 13002 PASS / 0 FAIL / 7 既有 SKIP。用户已授权每阶段验证后同步审计记录，保留最终封印。
 - 进度、计划与事实集中在本文件和基线文档，避免覆盖既有 task_plan.md / findings.md / PROGRESS.md。
 - 目标工具已确认本任务存在 active goal；重复 create_goal 被拒绝，沿用现有目标。
 - 规划恢复脚本返回其他会话的无关配置记录，经 git diff 为空核对，未采用其内容。
@@ -20,7 +20,7 @@
 | 阶段 | 状态 | 结果 |
 | --- | --- | --- |
 | P0 | completed | 2026-09-04 全量 13002 PASS / 0 FAIL / 7 既有 SKIP，76.42s；全部 P0 门禁通过，审计提交 f9928d76 |
-| P1 | in_progress | P1-01 本项门禁通过；阶段门禁尚未执行 |
+| P1 | in_progress | P1-01、P1-02 本项验证通过；阶段门禁尚未执行 |
 | P2 | pending | NOT_EXECUTED |
 | P3 | pending | NOT_EXECUTED |
 
@@ -121,16 +121,19 @@
 - 结果：7 文件 / 46 测试全部通过（3.55s）；三套类型检查 exit 0；ESLint exit 0（0 error / 16 warning）；指纹生成与检查 exit 0，`sha256:51dbbd0b965d66c42e9a99d5b7d55d8327f5199c7af0c39c66e923e16aa55a2d`。真实摄入、25 变体分批补齐/幂等、查询零全量读取/零回填、损坏错误、迁移原行/FTS 保留、原子回滚均通过。
 - 修复记录：首轮 11 FAIL 为新样本误用重解析前产物与检索参数名错误，修复后 1 FAIL 为样本重复摄入未携带相同分块配置，显式固定配置后全部通过；未删除、跳过或放宽断言。
 - 日志：`/tmp/lingxi-knowledge-p101-tests-final.log`、`/tmp/lingxi-knowledge-p101-typecheck-r2.log`、`/tmp/lingxi-knowledge-p101-lint.log`、`/tmp/lingxi-knowledge-p101-fingerprint.log`。
-- 对应 commit SHA：本次提交，下项回填。
+- 对应 commit SHA：`d0789cf2`。
 - 偏差：none
 
 ## P1-02：建立 KnowledgeSearchService
 
-- 状态：pending
-- 改动文件：尚未开始
-- 测试命令：按任务书该项测试执行，尚未执行
-- 测试结果：NOT_EXECUTED
-- 对应 commit SHA：尚未提交
+- 状态：completed
+- 改动：新增任务书锁定的搜索请求/命中/响应契约与统一服务；两个缓存文件先定义键契约，缓存实现及接线严格放到 P1-03。快速管线与详细会话自动检索共用入口；底层现有混合检索通过冻结身份执行核复用，分组去重及全局重排按 P1-03/P1-04 接续，未提前改动算法。
+- 范围：先校验宿主落库范围、会话/工作室、冻结来源身份及过滤条件；查询不能扩大范围。本地检索固定 FTS、禁止重排，命中块只做定点定位读取；混合检索按真实远程调用计数，保留两路命中标识及向量变体身份，模型不可用显式留痕。候选摘要不冒充证据。无会话范围的既有兼容调用暂保留，后续详细切换按 P2-07 执行。
+- 测试命令：`npx vitest run tests/knowledge-search-service.test.ts tests/knowledge-rerank-fusion.test.ts tests/knowledge-fast-zero-remote.test.ts tests/knowledge-fast-pipeline.test.ts tests/knowledge-fast-performance-contract.test.ts tests/knowledge-retrieval-golden.test.ts tests/knowledge-context-injector.test.ts tests/knowledge-evidence-manifest.test.ts`；`npm run typecheck`；修改文件 ESLint；`npm run lint:boundary`。
+- 结果：8 文件 / 126 测试通过（7.95s，exit 0）；三套类型检查 exit 0；ESLint 0 error / 144 warning，exit 0；边界检查 exit 0。真实快速/详细会话经过统一服务、非法范围/关闭/取消拒绝、真实混合查询、原文证据清单回归通过。
+- 生成物：导出输入追加三文件，CLI 闭包生成成功（10661 文件，原有 1 条边界债务不变）；持久化指纹 compatible 重钉并检查通过，`sha256:52773eadca7429d5c84f9c91c208c2e48f24dc31b3348018953e07de4afa3b18`；表结构与 DATA_EPOCH 不变。
+- 日志：`/tmp/lingxi-knowledge-p102-tests-final.log`、`/tmp/lingxi-knowledge-p102-typecheck-final.log`、`/tmp/lingxi-knowledge-p102-lint.log`、`/tmp/lingxi-knowledge-p102-boundary.log`、`/tmp/lingxi-knowledge-p102-{closure,fingerprint}.log`。
+- 对应 commit SHA：本次提交，下项回填。
 - 偏差：none
 
 ## P1-03：查询嵌入分组与缓存

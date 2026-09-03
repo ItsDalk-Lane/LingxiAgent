@@ -6452,6 +6452,11 @@
         },
         {
           "root": "server-bootstrap",
+          "from": "lib/knowledge/knowledge-search-service.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
           "from": "lib/knowledge/knowledge-manager.ts",
           "kind": "import-statement"
         },
@@ -6466,7 +6471,7 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by lib/tools/knowledge-scope.ts (import-statement); lib/tools/knowledge-read-tool.ts (import-statement); lib/knowledge/knowledge-coverage-unit.ts (import-statement); +20 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by lib/tools/knowledge-scope.ts (import-statement); lib/tools/knowledge-read-tool.ts (import-statement); lib/knowledge/knowledge-coverage-unit.ts (import-statement); +21 more importer(s)."
     },
     {
       "path": "lib/knowledge/evidence-packer.ts",
@@ -6666,11 +6671,21 @@
         },
         {
           "root": "server-bootstrap",
+          "from": "lib/knowledge/knowledge-search-service.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
           "from": "lib/knowledge/knowledge-manager.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "core/engine.ts",
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by lib/knowledge/knowledge-context-injector.ts (import-statement); lib/knowledge/knowledge-manager.ts (import-statement)."
+      "reason": "Reached via esbuild source module graph, imported by lib/knowledge/knowledge-context-injector.ts (import-statement); lib/knowledge/knowledge-search-service.ts (import-statement); lib/knowledge/knowledge-manager.ts (import-statement); +1 more importer(s)."
     },
     {
       "path": "lib/knowledge/knowledge-rollup.ts",
@@ -6683,6 +6698,18 @@
         }
       ],
       "reason": "Reached via esbuild source module graph, imported by lib/knowledge/knowledge-context-injector.ts (import-statement)."
+    },
+    {
+      "path": "lib/knowledge/knowledge-search-service.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "lib/knowledge/knowledge-manager.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by lib/knowledge/knowledge-manager.ts (import-statement)."
     },
     {
       "path": "lib/knowledge/knowledge-store.ts",
@@ -125151,9 +125178,9 @@
     }
   ],
   "stats": {
-    "totalFiles": 10660,
+    "totalFiles": 10661,
     "byInputType": {
-      "source-graph": 760,
+      "source-graph": 761,
       "runtime-asset": 11,
       "nft-runtime-trace": 9889
     }

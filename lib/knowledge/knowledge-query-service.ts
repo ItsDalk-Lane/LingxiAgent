@@ -1,5 +1,5 @@
 import crypto from "node:crypto";
-import type { CompiledKnowledgeScope } from "./scope-snapshot-compiler.ts";
+import type { CompiledKnowledgeScope, CompiledKnowledgeNotebook } from "./scope-snapshot-compiler.ts";
 import { EvidenceSpanExtractor } from "./evidence-span-extractor.ts";
 
 import {
@@ -240,15 +240,16 @@ function fuseCandidates(
 ): IndexedKnowledgeChunk[] {
   const fusionLimit = Math.min(limit, KNOWLEDGE_FUSION_BUDGET);
   const fused = new Map<string, { chunk: IndexedKnowledgeChunk; score: number }>();
-  const add = (chunks: IndexedKnowledgeChunk[]) => {
+  const add = (chunks: IndexedKnowledgeChunk[], channel: "fts" | "vector") => {
     chunks.forEach((chunk, index) => {
       const current = fused.get(chunk.id) || { chunk, score: 0 };
       current.score += 1 / (KNOWLEDGE_RRF_K + index + 1);
+      current.chunk = { ...current.chunk, channels: [...new Set([...(current.chunk.channels ?? []), channel])] };
       fused.set(chunk.id, current);
     });
   };
-  add(fts);
-  add(vector);
+  add(fts, "fts");
+  add(vector, "vector");
   return [...fused.values()]
     .sort((left, right) => (
       right.score - left.score
@@ -269,7 +270,7 @@ function fuseCandidates(
  * 笔记本的本地分，仅供留痕，不参与跨笔记本比较）。并列按 notebook 序 /
  * parseArtifactId / ordinal 稳定排序，与各检索的完成顺序无关。
  */
-function fuseNotebookRankings(
+export function fuseNotebookRankings(
   rankings: IndexedKnowledgeChunk[][],
 ): Array<{ chunk: IndexedKnowledgeChunk; notebookIndex: number }> {
   const fused = new Map<string, { chunk: IndexedKnowledgeChunk; notebookIndex: number; score: number }>();
@@ -279,6 +280,7 @@ function fuseNotebookRankings(
       const current = fused.get(chunk.id);
       if (current) {
         current.score += contribution;
+        current.chunk = { ...current.chunk, channels: [...new Set([...(current.chunk.channels ?? []), ...(chunk.channels ?? [])])] };
         return;
       }
       fused.set(chunk.id, { chunk, notebookIndex, score: contribution });
@@ -592,6 +594,58 @@ export class KnowledgeQueryService {
     });
   }
 
+  /** 统一服务的兼容执行核：只消费已经冻结的索引身份，不重新读取笔记本配置。 */
+  retrieveCompiledNotebook(input: {
+    compiledScope: CompiledKnowledgeScope;
+    notebook: CompiledKnowledgeNotebook;
+    variantIds: string[];
+    query: string;
+    limit: number;
+    rerank: boolean;
+    signal?: AbortSignal;
+    ordinalRanges?: ReadonlyMap<string, KnowledgeOrdinalRange[]>;
+    onRemoteCall: () => void;
+  }) {
+    const scopes = input.compiledScope.sources.flatMap(source => {
+      if (!source.parseArtifactId || !input.notebook.chunkProfileHash
+        || !source.notebookIds.includes(input.notebook.notebookId)) return [];
+      const variant = this.deps.indexStore.getReadyVariantMetadata({
+        parseArtifactId: source.parseArtifactId, chunkProfileHash: input.notebook.chunkProfileHash,
+      });
+      return variant && input.variantIds.includes(variant.id) ? [{
+        parseArtifactId: variant.parseArtifactId, chunkProfileHash: variant.chunkProfileHash,
+        blockFingerprint: variant.blockFingerprint,
+      }] : [];
+    });
+    const embeddingRef = input.notebook.embeddingModelRef;
+    const rerankRef = input.notebook.rerankModelRef;
+    const result = this.retrieve({
+      studioId: input.compiledScope.studioId, scopes, question: input.query,
+      runId: `knowledge_search_${crypto.randomUUID()}`, topK: input.limit,
+      signal: input.signal, rerank: input.rerank,
+      ordinalRangesByChunkIndexVariantId: input.ordinalRanges,
+      embedTexts: embeddingRef && this.deps.embedTextsForModel ? request => {
+        input.onRemoteCall();
+        return this.deps.embedTextsForModel!({ ...request, modelRef: embeddingRef, inputType: "query" });
+      } : null,
+      reranker: rerankRef && this.deps.rerankForModel ? request => {
+        input.onRemoteCall();
+        return this.deps.rerankForModel!({ ...request, modelRef: rerankRef });
+      } : null,
+    });
+    return result.then(outcome => {
+      if (embeddingRef && !this.deps.embedTextsForModel) {
+        outcome.degraded.push(...scopes.map(scope => ({ ...scope,
+          reason: "KNOWLEDGE_VECTOR_NOT_READY" as const, detail: "configured embedding model is unavailable",
+        })));
+      }
+      if (input.rerank && rerankRef && !this.deps.rerankForModel) {
+        outcome.rerankDegradeReason = "configured rerank model is unavailable; kept retrieval ranking";
+      }
+      return outcome;
+    });
+  }
+
   extractEvidenceSpans(input: Parameters<EvidenceSpanExtractor["extract"]>[0]) {
     return new EvidenceSpanExtractor(this.deps.store).extract(input);
   }
@@ -662,7 +716,7 @@ export class KnowledgeQueryService {
         limit: searchLimit,
         ...(ordinalRangesByChunkIndexVariantId ? { ordinalRangesByChunkIndexVariantId } : {}),
       });
-      return { fts, readyScopes: ready, degraded };
+      return { fts: fts.map(chunk => ({ ...chunk, channels: ["fts"] })), readyScopes: ready, degraded };
     } catch (error) {
       if (isKnowledgeError(error) && error.code === "KNOWLEDGE_INVALID_ARGUMENT") {
         // 查询无可检索词：合法空结果，不算降级。

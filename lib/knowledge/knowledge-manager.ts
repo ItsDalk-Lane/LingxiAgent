@@ -46,6 +46,7 @@ import type { KnowledgeBlockDraft } from "./source-adapters.ts";
 import { ScopeSnapshotCompiler } from "./scope-snapshot-compiler.ts";
 import { FastKnowledgePipeline, type FastKnowledgeEvidenceStages } from "./fast-knowledge-pipeline.ts";
 import { EvidencePacker } from "./evidence-packer.ts";
+import { KnowledgeSearchService } from "./knowledge-search-service.ts";
 import type {
   ContentSnapshot,
   ImportedKnowledgeSource,
@@ -239,6 +240,7 @@ export class KnowledgeManager {
   readonly ingestion: KnowledgeIngestionService;
   readonly watcher: KnowledgeSourceFileWatcher;
   readonly scopeCompiler: ScopeSnapshotCompiler;
+  readonly searchService: KnowledgeSearchService;
   private readonly scopeBuildRequests = new Map<string, ReturnType<typeof setImmediate>>();
   private readonly lingxiHome: string;
   private readonly maxImportBytes: number;
@@ -342,6 +344,7 @@ export class KnowledgeManager {
         }
       },
     });
+    this.searchService = new KnowledgeSearchService({ store: this.store, indexStore: this.indexStore, queryService: this.queryService });
     this.ingestion = new KnowledgeIngestionService({
       store: this.store,
       queryService: this.queryService,
@@ -772,7 +775,7 @@ export class KnowledgeManager {
     return new FastKnowledgePipeline({
       ...stages,
       compile: scope => this.compileTurnScope(scope),
-      search: input => this.queryService.searchCompiledScopeFts(input),
+      search: async input => (await this.searchService.searchWithEvidence({ ...input, channel: "fts", rerank: false })).evidence.candidates,
     });
   }
 

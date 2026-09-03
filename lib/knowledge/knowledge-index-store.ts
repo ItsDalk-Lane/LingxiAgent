@@ -122,6 +122,7 @@ export interface StoredKnowledgeChunk extends KnowledgeChunkDraft {
 
 export interface IndexedKnowledgeChunk extends StoredKnowledgeChunk {
   score: number;
+  channels?: Array<"fts" | "vector">;
 }
 
 /**

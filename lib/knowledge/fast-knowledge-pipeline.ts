@@ -38,7 +38,7 @@ export interface FastKnowledgeEvidenceStages {
 
 interface FastKnowledgeDependencies extends FastKnowledgeEvidenceStages {
   compile(scope: KnowledgeTurnScope): Promise<CompiledKnowledgeScope>;
-  search(input: { compiledScope: CompiledKnowledgeScope; query: string; limit: number }): IndexedKnowledgeChunk[];
+  search(input: { compiledScope: CompiledKnowledgeScope; query: string; limit: number; signal?: AbortSignal }): IndexedKnowledgeChunk[] | Promise<IndexedKnowledgeChunk[]>;
   now?: () => number;
 }
 
@@ -72,8 +72,8 @@ export class FastKnowledgePipeline {
     if (admitted() && compiledScope && compiledScope.readyChunkVariantIds.length > 0) {
       const start = now();
       ftsQueries = 1;
-      hits = this.deps.search({
-        compiledScope, query: input.question, limit: KNOWLEDGE_FAST_FTS_CANDIDATE_LIMIT,
+      hits = await this.deps.search({
+        compiledScope, query: input.question, limit: KNOWLEDGE_FAST_FTS_CANDIDATE_LIMIT, signal: input.signal,
       });
       timings.ftsMs = now() - start;
     }

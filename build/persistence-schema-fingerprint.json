@@ -660,7 +660,7 @@
     ],
     "version": 3
   },
-  "payloadFingerprint": "sha256:51dbbd0b965d66c42e9a99d5b7d55d8327f5199c7af0c39c66e923e16aa55a2d",
+  "payloadFingerprint": "sha256:52773eadca7429d5c84f9c91c208c2e48f24dc31b3348018953e07de4afa3b18",
   "registry": [
     {
       "affectedByEpochMigration": true,
@@ -3287,8 +3287,8 @@
   ],
   "review": {
     "classification": "compatible",
-    "compatibilityReason": "知识检索 P1-01：knowledge-fts.db 从 v2 升级 v3，仅新增可重建的变体目录元数据表和索引；v1 顺序迁移到 v3，原变体、块及 FTS 数据保留。事实库与 DATA_EPOCH 不变。",
-    "payloadFingerprint": "sha256:51dbbd0b965d66c42e9a99d5b7d55d8327f5199c7af0c39c66e923e16aa55a2d"
+    "compatibilityReason": "知识检索 P1-02：统一搜索入口与冻结范围校验接线，新增只读搜索模块；事实库和索引表结构、DATA_EPOCH 均不变。",
+    "payloadFingerprint": "sha256:52773eadca7429d5c84f9c91c208c2e48f24dc31b3348018953e07de4afa3b18"
   },
   "schemas": [
     {
@@ -3849,28 +3849,28 @@
           "sourceHash": "sha256:485d5e8070cc05b2db6821e02b179b08607c0cf15885c30aa45ea2bcfdaf70a6"
         }
       ],
-      "sourceHash": "sha256:392f903918175cad441c4b0d1d1fc288fefb4f80bab3aa08e65fc140862b6129",
+      "sourceHash": "sha256:6a5c54340e0c2ac01a00ca8796ee38174990a0f09c7ac24e4a6a4f484489d004",
       "storeId": "knowledge-indexes"
     },
     {
       "contract": "ParseArtifact generation directories referenced by knowledge.db and never treated as source content versions",
       "kind": "directory-contract",
       "module": "lib/knowledge/knowledge-manager.ts",
-      "sourceHash": "sha256:57e45f17952401cfc427aeb15e5825a8ddd828d691d31ead5cba55d247a60fd5",
+      "sourceHash": "sha256:7a0c78999f014775915dd15e7236b48aedd1b7438d2fa46ce4de4fa27948346d",
       "storeId": "knowledge-parse-artifacts"
     },
     {
       "contract": "ProcessingArtifact output files (binary office formats converted to structured text) referenced by knowledge.db processing_artifacts rows, with locatorMap held in the database",
       "kind": "directory-contract",
       "module": "lib/knowledge/knowledge-manager.ts",
-      "sourceHash": "sha256:57e45f17952401cfc427aeb15e5825a8ddd828d691d31ead5cba55d247a60fd5",
+      "sourceHash": "sha256:7a0c78999f014775915dd15e7236b48aedd1b7438d2fa46ce4de4fa27948346d",
       "storeId": "knowledge-processing-artifacts"
     },
     {
       "contract": "ContentSnapshot relative locator, immutable byte publication, SHA-256 verification, and rollback protocol",
       "kind": "directory-contract",
       "module": "lib/knowledge/knowledge-manager.ts",
-      "sourceHash": "sha256:57e45f17952401cfc427aeb15e5825a8ddd828d691d31ead5cba55d247a60fd5",
+      "sourceHash": "sha256:7a0c78999f014775915dd15e7236b48aedd1b7438d2fa46ce4de4fa27948346d",
       "storeId": "knowledge-source-snapshots"
     },
     {
