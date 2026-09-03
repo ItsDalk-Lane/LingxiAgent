@@ -124877,9 +124877,14 @@
           "root": "server-bootstrap",
           "from": "core/model-sync.ts",
           "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "core/provider-auth-migration.ts",
+          "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by core/model-sync.ts (import-statement)."
+      "reason": "Reached via esbuild source module graph, imported by core/model-sync.ts (import-statement); core/provider-auth-migration.ts (import-statement)."
     },
     {
       "path": "shared/safe-fs.ts",

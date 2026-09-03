@@ -600,18 +600,33 @@ describe("ModelManager AuthStorage ownership", () => {
     await manager.init();
     await manager.syncAndRefresh();
 
-    // TEMP-DEBUG(win): 迁移在 Windows 上拿到 undefined，打印现场（修完移除）
-    const catalogFile = path.join(tmpDir, "provider-catalog.json");
-    console.log("[TEMP-DEBUG] provider-catalog.json exists:", fs.existsSync(catalogFile));
-    if (fs.existsSync(catalogFile)) console.log("[TEMP-DEBUG] catalog:", fs.readFileSync(catalogFile, "utf-8").slice(0, 800));
-    console.log("[TEMP-DEBUG] auth.json after sync:", fs.existsSync(path.join(tmpDir, "auth.json")) ? fs.readFileSync(path.join(tmpDir, "auth.json"), "utf-8").slice(0, 400) : "(gone)");
-    console.log("[TEMP-DEBUG] models.json providers:", JSON.stringify(JSON.parse(fs.readFileSync(path.join(tmpDir, "models.json"), "utf-8")).providers ?? {}, null, 0).slice(0, 400));
-    console.log("[TEMP-DEBUG] registry deepseek entry:", JSON.stringify(manager.providerRegistry?.get?.("deepseek") ?? null));
     await expect(getDeepseekApiKey(manager)).resolves.toBe("sk-legacy-4d2a");
     const persistedProviders = readPersistedProviders();
     expect(persistedProviders.deepseek.api_key).toBe("sk-legacy-4d2a");
     const persistedAuth = JSON.parse(fs.readFileSync(path.join(tmpDir, "auth.json"), "utf-8"));
     expect(persistedAuth.deepseek).toBeUndefined();
+  });
+
+  it("does not rescue the runtime api-key sentinel over a legacy auth.json key", async () => {
+    // Windows CI 实测：投影哨兵 hana-runtime-api-key:<id> 一度被迁移当作
+    // models.json 投影真 key，以更高优先级压过 auth.json legacy key，
+    // 真随 auth.json 清理而丢失。哨兵必须视为合成值并回落到 legacy 抢救。
+    writeAuth({
+      deepseek: { type: "api_key", key: "sk-legacy-4d2a" },
+    });
+    writeModelsJson({
+      providers: {
+        deepseek: { ...deepseekProvider(undefined), apiKey: "hana-runtime-api-key:deepseek" },
+      },
+    });
+
+    const manager = new ModelManager({ lingxiHome: tmpDir });
+    await manager.init();
+    await manager.syncAndRefresh();
+
+    await expect(getDeepseekApiKey(manager)).resolves.toBe("sk-legacy-4d2a");
+    const persistedProviders = readPersistedProviders();
+    expect(persistedProviders.deepseek.api_key).toBe("sk-legacy-4d2a");
   });
 
   it("recovers a legacy API key from models.json when auth.json was already cleaned", async () => {
