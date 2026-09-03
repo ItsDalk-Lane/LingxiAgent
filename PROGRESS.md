@@ -10,7 +10,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = 485fd70d2eb971ef3116d8ad82df80a91658dd22  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-09-03 本地推理全链路批量收口)
+VERIFIED_SOURCE_SHA   = 93118b98323165bd395a202f30ecbba080f33957  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-09-03 本地推理全链路批量收口)
 工作分支              = feature/upstream-sync-0.447.4
 ```
 
@@ -170,6 +170,14 @@ AboutTab），因此最终源码树重新执行了 renderer build / package smok
 seal 不是一次性终点，而是"当前被验证树"的游标；每次审计期后的结构性收尾都需复跑验证并推进：
 
 - **2026-09-03 本地推理链路批量收口**（seal 275d82c7 → 33543b8c）：本地模型分发/
+- **2026-09-03 Windows 凭证迁移数据丢失修复**（seal 485fd70d → ）：PR #39 CI
+  windows runner 抓到 legacy API key 迁移在 Windows 上失效（本机 mac 不复现）。
+  TEMP-DEBUG 现场定位：model-sync 投影哨兵 hana-runtime-api-key:<id> 被迁移
+  当作 models.json 投影真 key，优先级压过 auth.json legacy key——catalog 存
+  哨兵、auth.json 清理后用户 key 丢失。修复 isRuntimeApiKeyRef 前缀识别回落
+  legacy 抢救；回归用例钉死场景；移除 TEMP-DEBUG。复跑
+  model-manager-auth-storage 32 用例 + model-sync + 全量 npm test（exit 0）+
+  typecheck x3 + compute-cli-closure + lint:boundary 后推进。
 - **2026-09-03 CI 首跑修复**（seal 33543b8c → 66a14155）：PR #39 首轮 CI 四平台
   test 矩阵全红。两根因：①injection-scan 零宽正则字符类含 ZWJ 触发 eslint
   no-misleading-character-class error（本地未跑 eslint 漏网）→ 改语义等价交替
