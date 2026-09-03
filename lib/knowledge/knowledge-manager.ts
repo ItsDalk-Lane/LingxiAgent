@@ -45,6 +45,7 @@ import {
 import type { KnowledgeBlockDraft } from "./source-adapters.ts";
 import { ScopeSnapshotCompiler } from "./scope-snapshot-compiler.ts";
 import { FastKnowledgePipeline, type FastKnowledgeEvidenceStages } from "./fast-knowledge-pipeline.ts";
+import { EvidencePacker } from "./evidence-packer.ts";
 import type {
   ContentSnapshot,
   ImportedKnowledgeSource,
@@ -747,6 +748,14 @@ export class KnowledgeManager {
       compile: scope => this.compileTurnScope(scope),
       search: input => this.queryService.searchCompiledScopeFts(input),
     });
+  }
+
+  runFastKnowledgePipeline(input: Parameters<FastKnowledgePipeline["run"]>[0]) {
+    const packer = new EvidencePacker();
+    return this.createFastKnowledgePipeline({
+      extractSpans: request => this.queryService.extractEvidenceSpans(request),
+      packEvidence: request => packer.pack(request),
+    }).run(input);
   }
 
   getTurnScope(input: Parameters<KnowledgeStore["getTurnScope"]>[0]) {

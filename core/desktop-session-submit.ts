@@ -38,6 +38,7 @@ import { serializeSessionFile } from "../lib/session-files/session-file-response
 import { BrowserManager } from "../lib/browser/browser-manager.ts";
 import { normalizeKnowledgeRefs, type KnowledgeRefs, type KnowledgeRetrievalStats } from "../shared/knowledge-refs.ts";
 import { resolveKnowledgeExecutionPolicy } from "../shared/knowledge-execution.ts";
+import { KNOWLEDGE_FAST_RENDER_BUDGET_TOKENS, KNOWLEDGE_FAST_TOTAL_DEADLINE_MS } from "../lib/knowledge/fast-knowledge-pipeline.ts";
 import {
   resolveKnowledgeInjectionBudgetTokens,
   type KnowledgeInjectionEvidence,
@@ -143,34 +144,33 @@ async function resolveKnowledgeInjectionBlock(
   turnId?: string | null,
   signal?: AbortSignal | null,
 ): Promise<{ block: string; stats: KnowledgeRetrievalStats; evidence: KnowledgeInjectionEvidence }> {
-  if (typeof engine?.buildKnowledgeContextInjection !== "function") {
-    throw new Error("desktop-session-submit: knowledge injection unavailable (engine lacks buildKnowledgeContextInjection)");
+  const policy = resolveKnowledgeExecutionPolicy({
+    mode: refs.mode,
+    question,
+    selectedNotebookCount: refs.notebookIds.length,
+    // 此处尚未冻结来源；P0–P2 策略不依赖来源数量。
+    selectedSourceCount: 0,
+  });
+  const method = policy.path === "fast_local" ? "buildFastKnowledgeContext" : "buildKnowledgeContextInjection";
+  if (typeof engine?.[method] !== "function") {
+    throw new Error(`desktop-session-submit: knowledge injection unavailable (engine lacks ${method})`);
   }
   try {
-    const policy = resolveKnowledgeExecutionPolicy({
-      mode: refs.mode,
-      question,
-      selectedNotebookCount: refs.notebookIds.length,
-      // 此处尚未冻结来源；P0–P2 策略不依赖来源数量，知识入口再填真实数量。
-      selectedSourceCount: 0,
-    });
     const request = {
       question,
       knowledgeRefs: refs,
-      budgetTokens,
-      ...(sessionPath ? { sessionPath } : {}),
+      sessionPath,
       // 轮标识随行（clientMessageId）：TurnScope 的 turn_id 列；缺省由 store 生成。
       ...(turnId ? { turnId } : {}),
-      // 检索期取消信号（Phase 9 第二波）：exhaustive coverage run 中止通道。
+      // 两种执行路径共用检索期取消信号。
       ...(signal ? { signal } : {}),
     };
     switch (policy.path) {
       case "fast_local":
-        // P0-06 接入本地管线前，保留现有快速路径。
-        return await engine.buildKnowledgeContextInjection(request);
+        return await engine.buildFastKnowledgeContext(request);
       case "detailed_research":
         // P0 保留详细模式现有行为，P2 再切换调查运行时。
-        return await engine.buildKnowledgeContextInjection(request);
+        return await engine.buildKnowledgeContextInjection({ ...request, budgetTokens });
     }
   } catch (err) {
     const reason = err instanceof Error ? err.message : String(err);
@@ -188,6 +188,16 @@ async function resolveKnowledgeInjectionBlock(
         truncated: false,
         usedTokens: 0,
         budgetTokens,
+        ...(policy.path === "fast_local" ? {
+          executionPath: "fast_local" as const,
+          remoteModelCalls: 0,
+          vectorQueries: 0,
+          rerankCalls: 0,
+          ftsQueries: 0,
+          vectorBackend: "none" as const,
+          deadlineMs: KNOWLEDGE_FAST_TOTAL_DEADLINE_MS,
+          budgetTokens: KNOWLEDGE_FAST_RENDER_BUDGET_TOKENS,
+        } : {}),
         unavailableReason: reason,
       },
       // 降级路径无证据进入模型上下文：身份链为空（不伪造）。
@@ -879,18 +889,41 @@ export async function submitDesktopSessionInterjection(engine: any, opts: {
   promptText = addAttachedVideoMarkers(promptText, promptVideoAttachmentPaths);
   promptText = addAttachedAudioMarkers(promptText, promptAudioAttachmentPaths);
   promptText = addSessionFileRefMarkers(promptText, promptSessionFileRefs);
-  // Phase 8：interject 同样按 knowledgeRefs 注入（与 prompt 路径同一 injector）。
+  // 追加消息与普通发送共用执行策略和取消通道。
   if (promptKnowledgeRefs) {
     // 与 prompt 路径同一即时反馈：steer 前先广播检索开始（见 prompt 路径注释）。
     engine.emitEvent?.({ type: "knowledge_retrieval_started", sessionPath }, sessionPath);
-    const injection = await resolveKnowledgeInjectionBlock(
-      engine,
-      promptKnowledgeRefs,
-      text || "",
-      resolveKnowledgeInjectionBudgetTokens((session as any)?.model ?? null),
-      sessionPath,
-      clientMessageId || null,
-    );
+    const knowledgeAbort = new AbortController();
+    const aborterKeys = [sessionId, sessionPath]
+      .filter((key): key is string => typeof key === "string" && !!key.trim());
+    const ownedKeys = aborterKeys.filter(key => !pendingDesktopSessionSubmissions.has(key));
+    for (const key of ownedKeys) pendingDesktopSessionSubmissions.add(key);
+    for (const key of aborterKeys) pendingKnowledgeInjectionAborters.set(key, knowledgeAbort);
+    let injection: { block: string; stats: KnowledgeRetrievalStats; evidence: KnowledgeInjectionEvidence };
+    try {
+      injection = await resolveKnowledgeInjectionBlock(
+        engine,
+        promptKnowledgeRefs,
+        text || "",
+        resolveKnowledgeInjectionBudgetTokens((session as any)?.model ?? null),
+        sessionPath,
+        clientMessageId || null,
+        knowledgeAbort.signal,
+      );
+    } finally {
+      for (const key of aborterKeys) {
+        if (pendingKnowledgeInjectionAborters.get(key) === knowledgeAbort) pendingKnowledgeInjectionAborters.delete(key);
+      }
+      // 只清理本次追加消息登记的键，保留仍在运行的普通发送状态。
+      for (const key of ownedKeys) {
+        pendingDesktopSessionSubmissions.delete(key);
+        abortedDesktopSessionSubmissions.delete(key);
+      }
+    }
+    if (knowledgeAbort.signal.aborted) {
+      engine.emitEvent?.({ type: "session_status", isStreaming: false, aborted: true, reason: "user_abort" }, sessionPath);
+      return { text: null, toolMedia: [], steered: false };
+    }
     knowledgeInjectionBlock = injection.block;
     knowledgeRetrievalStats = injection.stats;
     knowledgeInjectionEvidence = injection.evidence;

@@ -2708,6 +2708,32 @@ export class LingxiEngine {
     return this._knowledge.compileTurnScope(scope);
   }
 
+  /** 冻结本轮资料范围后，只走本机检索与原文证据加工。 */
+  async buildFastKnowledgeContext(input: {
+    question: string;
+    knowledgeRefs: { notebookIds: string[]; mode: "fast" };
+    sessionPath: string;
+    turnId?: string | null;
+    signal?: AbortSignal;
+  }): Promise<{ block: string; stats: KnowledgeRetrievalStats; evidence: KnowledgeInjectionEvidence }> {
+    input.signal?.throwIfAborted();
+    const knowledge = this._knowledge;
+    const studioId = this._runtimeContext?.studioId;
+    if (!knowledge || !studioId) {
+      throw new Error("Knowledge is not accessible in this runtime");
+    }
+    const scope = knowledge.createTurnScope({
+      studioId,
+      sessionPath: input.sessionPath,
+      turnId: input.turnId ?? null,
+      notebookIds: input.knowledgeRefs.notebookIds,
+    });
+    const { block, stats, evidence } = await knowledge.runFastKnowledgePipeline({
+      question: input.question, scope, signal: input.signal,
+    });
+    return { block, stats, evidence };
+  }
+
   /**
    * Phase 8 知识库引用注入门面：覆盖规划（Phase 7 CoveragePlanner，规则层 +
    * knowledge 槽位语义分类，2026-08-31 两档化）+ 拆解（knowledge 槽位，

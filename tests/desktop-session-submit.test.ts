@@ -1708,7 +1708,7 @@ describe("knowledgeRefs passthrough (Phase 7)", () => {
       promptSession: vi.fn(async (sessionPath, text, opts) => session.prompt(text, opts)),
       emitEvent: vi.fn(),
       setUiContext: vi.fn(),
-      buildKnowledgeContextInjection: vi.fn(async () => ({
+      buildFastKnowledgeContext: vi.fn(async () => ({
         block: "[KnowledgeContext]\nevidence\n[/KnowledgeContext]",
         stats: retrievalStats,
       })),
@@ -1853,6 +1853,7 @@ describe("knowledge context injection (Phase 8)", () => {
       promptSession: vi.fn(async (sessionPath, text, opts) => session.prompt(text, opts)),
       emitEvent: vi.fn(),
       setUiContext: vi.fn(),
+      buildFastKnowledgeContext: vi.fn(async () => ({ block: INJECTION_BLOCK, stats: RETRIEVAL_STATS })),
       buildKnowledgeContextInjection: vi.fn(async () => ({ block: INJECTION_BLOCK, stats: RETRIEVAL_STATS })),
       ...overrides,
     };
@@ -1869,12 +1870,10 @@ describe("knowledge context injection (Phase 8)", () => {
       knowledgeRefs: { notebookIds: ["nb-1"], mode: "fast" },
     });
 
-    expect(engine.buildKnowledgeContextInjection).toHaveBeenCalledWith({
+    expect(engine.buildFastKnowledgeContext).toHaveBeenCalledWith({
       question: "苹果什么时候交付",
       knowledgeRefs: { notebookIds: ["nb-1"], mode: "fast" },
-      // mock 会话无 model.contextWindow → 动态预算回退固定兜底值。
-      budgetTokens: 6000,
-      // 会话路径随行：蒸馏进度事件按 session 广播（knowledge_distill_progress）。
+      // 本地快速路径使用固定预算，会话路径用于冻结资料范围。
       sessionPath: "/tmp/desk.jsonl",
       // Phase 9 第二波：检索期取消信号（exhaustive coverage run 中止通道）。
       signal: expect.any(AbortSignal),
@@ -1918,7 +1917,7 @@ describe("knowledge context injection (Phase 8)", () => {
 
   it("keeps the chat flowing with an explicit unavailable annotation when the injector throws", async () => {
     const { engine } = injectionEngine({
-      buildKnowledgeContextInjection: vi.fn(async () => {
+      buildFastKnowledgeContext: vi.fn(async () => {
         throw new Error("embedding provider down");
       }),
     });
@@ -1947,14 +1946,16 @@ describe("knowledge context injection (Phase 8)", () => {
       injectedChunks: 0,
       truncated: false,
       usedTokens: 0,
-      budgetTokens: 6000,
+      budgetTokens: 2400,
+      executionPath: "fast_local",
+      remoteModelCalls: 0,
       unavailableReason: "embedding provider down",
     });
   });
 
   it("rejects explicitly when the engine lacks the injection facade while refs are present", async () => {
     const { engine } = injectionEngine();
-    delete (engine as any).buildKnowledgeContextInjection;
+    delete (engine as any).buildFastKnowledgeContext;
 
     await expect(submitDesktopSessionMessage(engine, {
       sessionPath: "/tmp/desk.jsonl",
@@ -1979,7 +1980,7 @@ describe("knowledge context injection (Phase 8)", () => {
       knowledgeRefs: { notebookIds: [], mode: "fast" },
     });
 
-    expect(engine.buildKnowledgeContextInjection).not.toHaveBeenCalled();
+    expect(engine.buildFastKnowledgeContext).not.toHaveBeenCalled();
     expect(engine.promptSession).toHaveBeenLastCalledWith("/tmp/desk.jsonl", "空引用", undefined);
   });
 
@@ -1993,7 +1994,7 @@ describe("knowledge context injection (Phase 8)", () => {
       preservePromptEnvelope: true,
     } as any);
 
-    expect(engine.buildKnowledgeContextInjection).not.toHaveBeenCalled();
+    expect(engine.buildFastKnowledgeContext).not.toHaveBeenCalled();
     expect(engine.promptSession).toHaveBeenCalledWith(
       "/tmp/desk.jsonl",
       `${INJECTION_BLOCK}\n\nenvelope text`,
@@ -2008,7 +2009,7 @@ describe("knowledge context injection (Phase 8)", () => {
   it("emits knowledge_retrieval_started before the blocking injection resolves", async () => {
     const { engine } = injectionEngine();
     let resolveInjection!: (value: { block: string; stats: typeof RETRIEVAL_STATS }) => void;
-    engine.buildKnowledgeContextInjection = vi.fn(() => new Promise((resolve) => {
+    engine.buildFastKnowledgeContext = vi.fn(() => new Promise((resolve) => {
       resolveInjection = resolve;
     }));
     const submitted = submitDesktopSessionMessage(engine, {
@@ -2037,7 +2038,7 @@ describe("knowledge context injection (Phase 8)", () => {
   it("检索期间 abort：跳过 promptSession 与用户投影，补发 isStreaming:false 收回提前忙态", async () => {
     const { engine, appendCustomEntry } = injectionEngine();
     let resolveInjection!: (value: { block: string; stats: typeof RETRIEVAL_STATS }) => void;
-    engine.buildKnowledgeContextInjection = vi.fn(() => new Promise((resolve) => {
+    engine.buildFastKnowledgeContext = vi.fn(() => new Promise((resolve) => {
       resolveInjection = resolve;
     }));
     const submitted = submitDesktopSessionMessage(engine, {
@@ -2079,7 +2080,7 @@ describe("knowledge context injection (Phase 8)", () => {
     const { engine } = injectionEngine();
     let capturedSignal: AbortSignal | undefined;
     let rejectInjection!: (reason: Error) => void;
-    (engine as any).buildKnowledgeContextInjection = vi.fn((input: any) => {
+    (engine as any).buildFastKnowledgeContext = vi.fn((input: any) => {
       capturedSignal = input?.signal;
       return new Promise((_resolve, reject) => {
         rejectInjection = reject;
@@ -2106,14 +2107,14 @@ describe("knowledge context injection (Phase 8)", () => {
     expect(result).toEqual({ text: null, toolMedia: [] });
     expect(engine.promptSession).not.toHaveBeenCalled();
     // controller 注册表已清理：同 session 再提交拿到的是新的未中止 signal。
-    (engine as any).buildKnowledgeContextInjection = vi.fn(async () => ({ block: null, stats: RETRIEVAL_STATS }));
+    (engine as any).buildFastKnowledgeContext = vi.fn(async () => ({ block: null, stats: RETRIEVAL_STATS }));
     await submitDesktopSessionMessage(engine, {
       sessionPath: "/tmp/desk.jsonl",
       text: "下一条",
       displayMessage: { text: "下一条" },
       knowledgeRefs: { notebookIds: ["nb-1"], mode: "fast" },
     });
-    const secondCall = (engine.buildKnowledgeContextInjection as unknown as ReturnType<typeof vi.fn>).mock.calls[0][0];
+    const secondCall = (engine.buildFastKnowledgeContext as unknown as ReturnType<typeof vi.fn>).mock.calls[0][0];
     expect(secondCall.signal.aborted).toBe(false);
     expect(secondCall.signal).not.toBe(capturedSignal);
   });
@@ -2134,7 +2135,7 @@ describe("knowledge context injection (Phase 8)", () => {
   it("emits knowledge_retrieval_started on the interjection path before steering", async () => {
     const { engine } = injectionEngine();
     let resolveInjection!: (value: { block: string; stats: typeof RETRIEVAL_STATS }) => void;
-    engine.buildKnowledgeContextInjection = vi.fn(() => new Promise((resolve) => {
+    engine.buildFastKnowledgeContext = vi.fn(() => new Promise((resolve) => {
       resolveInjection = resolve;
     }));
     const steerSession = vi.fn(() => true);
