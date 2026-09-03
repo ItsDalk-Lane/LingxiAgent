@@ -1,4 +1,5 @@
 import crypto from "node:crypto";
+import type { CompiledKnowledgeScope } from "./scope-snapshot-compiler.ts";
 
 import {
   buildKnowledgeChunks,
@@ -543,6 +544,19 @@ export class KnowledgeQueryService {
       this.deps.indexStore.reset();
       return run();
     }
+  }
+
+  /** 本地检索入口只接收冻结编译结果，不触发嵌入、向量、重排或索引恢复。 */
+  searchCompiledScopeFts(input: {
+    compiledScope: CompiledKnowledgeScope;
+    query: string;
+    limit: number;
+  }): IndexedKnowledgeChunk[] {
+    return this.deps.indexStore.searchReadyVariantIds({
+      chunkIndexVariantIds: input.compiledScope.readyChunkVariantIds,
+      query: input.query,
+      limit: input.limit,
+    });
   }
 
   /**

@@ -707,6 +707,49 @@ export class KnowledgeIndexStore {
     }
   }
 
+  /** 编译后的范围直接进 SQL，排名、去重和条数限制都由数据库完成。 */
+  searchReadyVariantIds(input: {
+    chunkIndexVariantIds: string[];
+    query: string;
+    limit: number;
+  }): IndexedKnowledgeChunk[] {
+    const ids = [...new Set(input.chunkIndexVariantIds.map(id => requiredId(id, "chunkIndexVariantId")))];
+    if (ids.length === 0) return [];
+    if (typeof input.query !== "string" || !input.query.trim() || input.query.length > 4000) {
+      throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "Knowledge search query is invalid");
+    }
+    if (!Number.isSafeInteger(input.limit) || input.limit < 1 || input.limit > 1000) {
+      throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "Knowledge search limit is invalid");
+    }
+    const query = buildFtsLiteralQuery(input.query);
+    if (!query) return [];
+    try {
+      // JSON 表值避免来源数量增长触及 SQLite 绑定参数上限。
+      return this.db.prepare(`
+        SELECT c.*, bm25(knowledge_chunks_fts, 1.0, 0.35) AS score
+        FROM knowledge_chunks_fts
+        JOIN knowledge_chunks c ON c.row_id = knowledge_chunks_fts.rowid
+        JOIN chunk_index_variants v ON v.id = c.chunk_index_variant_id AND v.status = 'ready'
+        WHERE knowledge_chunks_fts MATCH ?
+          AND c.chunk_index_variant_id IN (SELECT value FROM json_each(?))
+        ORDER BY score ASC, c.parse_artifact_id ASC, c.ordinal ASC, c.id ASC
+        LIMIT ?
+      `).all(query, JSON.stringify(ids), input.limit).map((row: any) => ({
+        id: row.id,
+        parseArtifactId: row.parse_artifact_id,
+        chunkIndexVariantId: row.chunk_index_variant_id,
+        ordinal: Number(row.ordinal),
+        text: row.text,
+        tokenCount: Number(row.token_count),
+        spans: parseSpans(row.spans_json),
+        score: Number(row.score),
+      }));
+    } catch (error) {
+      if (error instanceof KnowledgeError) throw error;
+      throw new KnowledgeError("KNOWLEDGE_INDEX_INVALID", "Knowledge search index query failed");
+    }
+  }
+
   health() {
     const result = this.db.pragma("quick_check", { simple: true });
     return { status: result === "ok" ? "ready" as const : "corrupt" as const };
