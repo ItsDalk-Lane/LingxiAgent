@@ -29,6 +29,8 @@
  * 不悄悄退回无注入的普通聊天。
  */
 import { createModuleLogger } from "../debug-log.ts";
+// 精确证据入口与历史渲染共存；旧消息压缩和旧详细路径保持兼容。
+export { EvidencePacker } from "./evidence-packer.ts";
 import { estimateTextTokens } from "../llm/estimate-text-tokens.ts";
 import {
   buildWarningLine,
