@@ -250,6 +250,7 @@ export class KnowledgeManager {
   private readonly lifecycleGcIntervalMs: number;
   private readonly lifecycleLog: (message: string) => void;
   private lifecycleGcTimer: ReturnType<typeof setInterval> | null = null;
+  private metadataBackfill: ReturnType<typeof setImmediate> | null = null;
 
   constructor(options: KnowledgeManagerOptions) {
     this.options = options;
@@ -387,6 +388,31 @@ export class KnowledgeManager {
       now: options.now,
       ...options.fileWatcher,
     });
+    this.scheduleMetadataBackfill();
+  }
+
+  /** 启动完成后再逐批补齐目录；失败留痕并继续其他变体，关闭时取消未执行批次。 */
+  private scheduleMetadataBackfill(afterId = ""): void {
+    this.metadataBackfill = setImmediate(() => {
+      this.metadataBackfill = null;
+      try {
+        const variants = this.indexStore.listReadyVariantsMissingMetadata(afterId);
+        for (const variant of variants) {
+          try {
+            const sourceId = this.queryService.backfillVariantMetadata(variant);
+            this.scopeCompiler.invalidateSource(sourceId);
+          } catch (error) {
+            this.lifecycleLog(`knowledge metadata: background backfill failed for ${variant.id}: ${
+              error instanceof Error ? error.message : String(error)
+            }`);
+          }
+        }
+        if (variants.length === 20) this.scheduleMetadataBackfill(variants.at(-1)!.id);
+      } catch (error) {
+        this.lifecycleLog(`knowledge metadata: background scan failed: ${error instanceof Error ? error.message : String(error)}`);
+      }
+    });
+    this.metadataBackfill.unref();
   }
 
   createNotebook(input: Parameters<KnowledgeStore["createNotebook"]>[0]) {
@@ -1789,6 +1815,8 @@ export class KnowledgeManager {
   }
 
   close() {
+    if (this.metadataBackfill) clearImmediate(this.metadataBackfill);
+    this.metadataBackfill = null;
     this.scopeCompiler.dispose();
     for (const pending of this.scopeBuildRequests.values()) clearImmediate(pending);
     this.scopeBuildRequests.clear();

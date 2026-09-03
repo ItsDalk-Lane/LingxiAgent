@@ -10,7 +10,7 @@
 - 严格按 P0 → P1 → P2 → P3 及编号顺序；阶段门禁全部通过才进入下一阶段。
 - 每项记录测试原始结果后提交；不删除、跳过或放宽测试，不合并 main。
 - 现有任务书为用户未跟踪文件，既有规划文档与 BLOCKED.md 历史记录保留。
-- 当前断点：P0-08，P0-00 至 P0-07 已完成并提交；P0-08 实现、性能、三种本机构建和生成物已验证，此前阶段全量仅审计封印门禁失败。2026-09-04 用户已授权每阶段验证后同步审计记录，并保留最终封印；现在提交已验证源码，再同步坐标复跑全量门禁。
+- 当前断点：P1-01 已完成实现及本项验证，随本次提交落地，接着执行 P1-02。P0 源码提交 `5c016df183ad207cf1ca33de274abb7a4eb10057`，阶段审计提交 `f9928d76`；全量 13002 PASS / 0 FAIL / 7 既有 SKIP。用户已授权每阶段验证后同步审计记录，保留最终封印。
 - 进度、计划与事实集中在本文件和基线文档，避免覆盖既有 task_plan.md / findings.md / PROGRESS.md。
 - 目标工具已确认本任务存在 active goal；重复 create_goal 被拒绝，沿用现有目标。
 - 规划恢复脚本返回其他会话的无关配置记录，经 git diff 为空核对，未采用其内容。
@@ -19,8 +19,8 @@
 
 | 阶段 | 状态 | 结果 |
 | --- | --- | --- |
-| P0 | verifying | 用户已解除封印顺序阻塞；前轮 13001 PASS / 1 FAIL / 7 既有 SKIP，待新源码坐标下复跑全量；结果记录于 PROGRESS.md 阶段审计提交，全绿才进入 P1 |
-| P1 | pending | NOT_EXECUTED |
+| P0 | completed | 2026-09-04 全量 13002 PASS / 0 FAIL / 7 既有 SKIP，76.42s；全部 P0 门禁通过，审计提交 f9928d76 |
+| P1 | in_progress | P1-01 本项门禁通过；阶段门禁尚未执行 |
 | P2 | pending | NOT_EXECUTED |
 | P3 | pending | NOT_EXECUTED |
 
@@ -98,7 +98,7 @@
 
 ## P0-08：性能基准
 
-- 状态：verifying（实现、本地性能与三种构建通过；用户授权后进行阶段审计）
+- 状态：completed（用户授权后全量复验与阶段审计通过）
 - 改动文件：任务书规定的 benchmark、性能契约测试、手工 Linux 工作流；生成器输入 export-manifest 追加 6 个新增公共模块，生成 CLI 闭包与持久化指纹。
 - 门禁修复：真实 Node 直接启动测试发现新增三个类的构造参数属性不受 strip-only 支持，改为同义字段赋值，未改变行为；全量 ESLint 发现基线零宽字符集合触发 no-misleading-character-class，将连续的三个码位改写为等价范围，既有零宽混淆测试通过，没有放宽规则。
 - 性能测试：`LINGXI_ENFORCE_KNOWLEDGE_PERF=1 node scripts/benchmark-knowledge-fast.mjs --output=/tmp/lingxi-knowledge-p008-production-benchmark.json`，exit 0；真实管理器、两库、冻结范围编译、FTS、原文回读与打包全部经过生产代码。固定种子包含中文、英文、数字、文件名、标题、低频名词及干扰块；冷启动包含新建管理器、打开库和首问，不清操作系统页缓存。新增 `--million` 仅供手工百万块运行，本次未执行。
@@ -109,16 +109,19 @@
 - 最终类型检查三套 exit 0；全量 ESLint exit 0（0 error / 9160 warning）；边界检查 exit 0（保留原有 1 条已登记债务，无新增）。开放服务构建 exit 0；客户端构建 exit 0。正式服务首次因未设置签名输入 exit 1，按仓库支持的一次性测试签名流程复跑 exit 0；11 个 Mach-O 签名、Node 启动 smoke、server/renderer seed 打包通过。测试私钥已删除，仓库发布公钥未变。该结果只证明本机工作区构建，不是正式发布签名或跨平台验证。
 - 生成物：五个规定生成器成功执行两轮，第二轮全部 exit 0；测试清单内容哈希不变，暂存首轮预期变更后第二轮 `git diff --exit-code` exit 0。导出目标 `/tmp/lingxi-p0-open-export-20260903` 共 857 文件，未清理用户既有导出目录。持久化指纹 `sha256:9d2a2751a11ad11c01fa759f8ca4ff65527f71166f64d849d13534cc3ed0a7ee`，compatible 理由由生成器记录，表结构和 DATA_EPOCH 不变。
 - 证据日志：`/tmp/lingxi-knowledge-p0-final-{typecheck,lint,full}.log`、`/tmp/lingxi-knowledge-p0-gate-boundary-final.log`、`/tmp/lingxi-knowledge-p0-failure-recheck.log`、`/tmp/lingxi-knowledge-p0-build-{server,server-signed,server-open,client}.log`、`/tmp/lingxi-knowledge-p0-generator-second-*.log`、`/tmp/lingxi-knowledge-p0-test-inventory.json`。
-- 对应 commit SHA：本次 P0-08 源码提交；随后审计提交记录此 SHA 与全量复验结果，下一任务回填。
+- 对应 commit SHA：`5c016df183ad207cf1ca33de274abb7a4eb10057`；审计提交 `f9928d76`。复验 `npm test` 13002 PASS / 0 FAIL / 7 既有 SKIP，76.42s，exit 0；日志 `/tmp/lingxi-knowledge-p0-seal-full-20260904.log`。
 - 偏差：无范围/技术方案变更。2026-09-04 用户授权每阶段验证后同步审计记录，并保留最终封印提交；不放宽审计白名单。P1/P2/P3 保持未开始，P0 全绿才进入 P1。
 
 ## P1-01：为索引增加查询元数据
 
-- 状态：pending
-- 改动文件：尚未开始
-- 测试命令：按任务书该项测试执行，尚未执行
-- 测试结果：NOT_EXECUTED
-- 对应 commit SHA：尚未提交
+- 状态：completed
+- 改动文件：索引库、摄入与查询服务、管理器、冻结范围编译器；新增任务书三份测试及共享建样辅助；旧迁移断言版本从 2 更新为 3（迁移数据断言全部保留），生成持久化指纹。
+- 实现：索引库 v2→v3 严格增加规定表及索引，v1 顺序迁移；摄入在块/FTS 同事务完成目录、块数与时间写入；启动后每批最多 20 个缺失目录变体，游标继续、失败留痕、关闭取消；查询优先读取目录，缺失只做 SQL 计数与 warning，损坏显式错误，不扫描原文恢复。
+- 测试命令：`npx vitest run tests/knowledge-index-metadata-migration.test.ts tests/knowledge-index-metadata-backfill.test.ts tests/knowledge-scope-metadata-query.test.ts tests/knowledge-scope-snapshot-compiler.test.ts tests/knowledge-index-variants.test.ts tests/knowledge-fast-zero-remote.test.ts tests/knowledge-fast-pipeline.test.ts`；`npm run typecheck`；修改文件 ESLint；持久化指纹生成与检查。
+- 结果：7 文件 / 46 测试全部通过（3.55s）；三套类型检查 exit 0；ESLint exit 0（0 error / 16 warning）；指纹生成与检查 exit 0，`sha256:51dbbd0b965d66c42e9a99d5b7d55d8327f5199c7af0c39c66e923e16aa55a2d`。真实摄入、25 变体分批补齐/幂等、查询零全量读取/零回填、损坏错误、迁移原行/FTS 保留、原子回滚均通过。
+- 修复记录：首轮 11 FAIL 为新样本误用重解析前产物与检索参数名错误，修复后 1 FAIL 为样本重复摄入未携带相同分块配置，显式固定配置后全部通过；未删除、跳过或放宽断言。
+- 日志：`/tmp/lingxi-knowledge-p101-tests-final.log`、`/tmp/lingxi-knowledge-p101-typecheck-r2.log`、`/tmp/lingxi-knowledge-p101-lint.log`、`/tmp/lingxi-knowledge-p101-fingerprint.log`。
+- 对应 commit SHA：本次提交，下项回填。
 - 偏差：none
 
 ## P1-02：建立 KnowledgeSearchService

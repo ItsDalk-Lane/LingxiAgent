@@ -8,7 +8,7 @@ import { KnowledgeError } from "./errors.ts";
 import type { KnowledgeChunkDraft, KnowledgeChunkSpanDraft } from "./chunker.ts";
 
 const require = createRequire(import.meta.url);
-const KNOWLEDGE_INDEX_SCHEMA_VERSION = 2;
+const KNOWLEDGE_INDEX_SCHEMA_VERSION = 3;
 let BetterSqliteDatabase: any = null;
 
 function loadDatabase() {
@@ -87,6 +87,22 @@ export interface KnowledgeChunkIndexVariant {
   updatedAt: string;
 }
 
+export interface KnowledgeChunkVariantMetadata {
+  firstHeadingPath: string[] | null;
+  sectionKeys: string[];
+}
+
+function validateVariantMetadata(value: KnowledgeChunkVariantMetadata): KnowledgeChunkVariantMetadata {
+  const validStrings = (items: unknown): items is string[] => Array.isArray(items)
+    && items.every(item => typeof item === "string" && item.trim().length > 0);
+  if (!value || (value.firstHeadingPath !== null
+    && (!validStrings(value.firstHeadingPath) || value.firstHeadingPath.length === 0))
+    || !validStrings(value.sectionKeys) || new Set(value.sectionKeys).size !== value.sectionKeys.length) {
+    throw new KnowledgeError("KNOWLEDGE_INDEX_INVALID", "Knowledge variant metadata is corrupt");
+  }
+  return value;
+}
+
 /** search 的 scope 单元：检索范围精确到 (parseArtifactId, chunkProfileHash) 一个索引变体。 */
 export interface KnowledgeChunkSearchScope {
   parseArtifactId: string;
@@ -144,6 +160,20 @@ const CHUNK_INDEX_VARIANTS_DDL = `
     updated_at TEXT NOT NULL,
     UNIQUE(parse_artifact_id, chunk_profile_hash)
   );
+`;
+
+const CHUNK_VARIANT_METADATA_DDL = `
+  CREATE TABLE chunk_index_variant_metadata (
+    chunk_index_variant_id TEXT PRIMARY KEY,
+    parse_artifact_id TEXT NOT NULL,
+    chunk_count INTEGER NOT NULL,
+    first_heading_path_json TEXT,
+    section_keys_json TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+  );
+  CREATE INDEX idx_chunk_variant_metadata_artifact
+    ON chunk_index_variant_metadata(parse_artifact_id);
 `;
 
 function knowledgeChunksDdl(tableName: string): string {
@@ -272,6 +302,12 @@ export class KnowledgeIndexStore {
     } else if (version === 1) {
       this.migrateV1ToV2();
     }
+    if (version === 1 || version === 2) {
+      this.db.transaction(() => {
+        this.db.exec(CHUNK_VARIANT_METADATA_DDL);
+        this.db.pragma("user_version = 3");
+      })();
+    }
     const check = this.db.pragma("quick_check", { simple: true });
     if (check !== "ok") throw new Error("index_quick_check_failed");
   }
@@ -280,6 +316,7 @@ export class KnowledgeIndexStore {
     this.db.exec(CHUNK_INDEX_VARIANTS_DDL);
     this.db.exec(knowledgeChunksDdl("knowledge_chunks"));
     this.db.exec(CHUNK_SEARCH_OBJECTS_DDL);
+    this.db.exec(CHUNK_VARIANT_METADATA_DDL);
   }
 
   /**
@@ -332,7 +369,7 @@ export class KnowledgeIndexStore {
       // 外联 FTS 表随新表重建为空，用 rebuild 从内容表整体回填，无需逐行重插。
       this.db.exec(`INSERT INTO knowledge_chunks_fts(knowledge_chunks_fts) VALUES('rebuild');`);
       this.db.exec(`DROP TABLE artifact_indexes;`);
-      this.db.pragma(`user_version = ${KNOWLEDGE_INDEX_SCHEMA_VERSION}`);
+      this.db.pragma("user_version = 2");
     })();
   }
 
@@ -347,7 +384,7 @@ export class KnowledgeIndexStore {
     return row ? mapVariantRow(row) : null;
   }
 
-  /** 只读变体身份和 SQL 计数，避免把全部 chunk 搬进查询进程。 */
+  /** 优先读预存目录；缺失时仅计数，查询线程不扫描全文或现场回填。 */
   getReadyVariantMetadata(input: {
     parseArtifactId: unknown;
     chunkProfileHash: unknown;
@@ -357,22 +394,75 @@ export class KnowledgeIndexStore {
     chunkProfileHash: string;
     blockFingerprint: string;
     chunkCount: number;
+    firstHeadingPath: string[] | null;
+    sectionKeys: string[];
+    metadataMissing: boolean;
   } | null {
     const artifactId = requiredId(input?.parseArtifactId, "parseArtifactId");
     const profileHash = requiredChunkProfileHash(input?.chunkProfileHash);
     const row = this.db.prepare(`
       SELECT v.id, v.parse_artifact_id, v.chunk_profile_hash, v.block_fingerprint,
-        (SELECT COUNT(*) FROM knowledge_chunks c WHERE c.chunk_index_variant_id = v.id) AS chunk_count
+        CASE WHEN m.chunk_index_variant_id IS NULL THEN
+          (SELECT COUNT(*) FROM knowledge_chunks c WHERE c.chunk_index_variant_id = v.id)
+          ELSE m.chunk_count END AS chunk_count,
+        m.chunk_index_variant_id AS metadata_id, m.parse_artifact_id AS metadata_artifact_id,
+        m.first_heading_path_json, m.section_keys_json
       FROM chunk_index_variants v
+      LEFT JOIN chunk_index_variant_metadata m ON m.chunk_index_variant_id = v.id
       WHERE v.parse_artifact_id = ? AND v.chunk_profile_hash = ? AND v.status = 'ready'
     `).get(artifactId, profileHash);
-    return row ? {
+    if (!row) return null;
+    let metadata: KnowledgeChunkVariantMetadata = { firstHeadingPath: null, sectionKeys: [] };
+    if (row.metadata_id != null) {
+      try {
+        if (row.metadata_artifact_id !== artifactId
+          || !Number.isSafeInteger(row.chunk_count) || row.chunk_count < 0) throw new Error("invalid_identity_or_count");
+        metadata = validateVariantMetadata({
+          firstHeadingPath: row.first_heading_path_json === null ? null : JSON.parse(row.first_heading_path_json),
+          sectionKeys: JSON.parse(row.section_keys_json),
+        });
+      } catch {
+        throw new KnowledgeError("KNOWLEDGE_INDEX_INVALID", "Knowledge variant metadata is corrupt");
+      }
+    }
+    return {
       id: row.id,
       parseArtifactId: row.parse_artifact_id,
       chunkProfileHash: row.chunk_profile_hash,
       blockFingerprint: row.block_fingerprint,
       chunkCount: Number(row.chunk_count),
-    } : null;
+      ...metadata,
+      metadataMissing: row.metadata_id == null,
+    };
+  }
+
+  /** 后台游标扫描，单批最多 20 个；不从查询入口调用。 */
+  listReadyVariantsMissingMetadata(afterId = ""): KnowledgeChunkIndexVariant[] {
+    return this.db.prepare(`
+      SELECT v.* FROM chunk_index_variants v
+      LEFT JOIN chunk_index_variant_metadata m ON m.chunk_index_variant_id = v.id
+      WHERE v.status = 'ready' AND m.chunk_index_variant_id IS NULL AND v.id > ?
+      ORDER BY v.id LIMIT 20
+    `).all(afterId).map(mapVariantRow);
+  }
+
+  writeVariantMetadata(variantId: string, metadata: KnowledgeChunkVariantMetadata): void {
+    validateVariantMetadata(metadata);
+    const now = this.now();
+    const result = this.db.prepare(`
+      INSERT INTO chunk_index_variant_metadata (
+        chunk_index_variant_id, parse_artifact_id, chunk_count,
+        first_heading_path_json, section_keys_json, created_at, updated_at
+      ) SELECT v.id, v.parse_artifact_id,
+          (SELECT COUNT(*) FROM knowledge_chunks c WHERE c.chunk_index_variant_id = v.id), ?, ?, ?, ?
+        FROM chunk_index_variants v WHERE v.id = ? AND v.status = 'ready'
+      ON CONFLICT(chunk_index_variant_id) DO UPDATE SET
+        parse_artifact_id = excluded.parse_artifact_id, chunk_count = excluded.chunk_count,
+        first_heading_path_json = excluded.first_heading_path_json,
+        section_keys_json = excluded.section_keys_json, updated_at = excluded.updated_at
+    `).run(metadata.firstHeadingPath === null ? null : JSON.stringify(metadata.firstHeadingPath),
+      JSON.stringify(metadata.sectionKeys), now, now, requiredId(variantId, "chunkIndexVariantId"));
+    if (result.changes !== 1) throw new KnowledgeError("KNOWLEDGE_INDEX_INVALID", "Ready variant metadata cannot be written");
   }
 
   /** 幂等建立 building 状态的变体行；已存在（任意状态）则原样返回，不回退状态。 */
@@ -426,6 +516,7 @@ export class KnowledgeIndexStore {
     chunkProfileHash: unknown;
     blockFingerprint: unknown;
     chunks: KnowledgeChunkDraft[];
+    metadata?: KnowledgeChunkVariantMetadata;
   }) {
     const parseArtifactId = requiredId(input?.parseArtifactId, "parseArtifactId");
     const chunkProfileHash = requiredChunkProfileHash(input?.chunkProfileHash);
@@ -451,6 +542,7 @@ export class KnowledgeIndexStore {
           updated_at = excluded.updated_at
       `).run(variantId, parseArtifactId, chunkProfileHash, blockFingerprint, now, now);
       this.db.prepare(`DELETE FROM knowledge_chunks WHERE chunk_index_variant_id = ?`).run(variantId);
+      this.db.prepare(`DELETE FROM chunk_index_variant_metadata WHERE chunk_index_variant_id = ?`).run(variantId);
       for (const [index, chunk] of input.chunks.entries()) {
         if (chunk.parseArtifactId !== parseArtifactId || chunk.ordinal !== index || !chunk.text) {
           throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "Knowledge chunk identity is invalid");
@@ -466,6 +558,7 @@ export class KnowledgeIndexStore {
           serializeSpans(chunk.spans),
         );
       }
+      if (input.metadata) this.writeVariantMetadata(variantId, input.metadata);
     })();
   }
 
@@ -476,6 +569,7 @@ export class KnowledgeIndexStore {
     const artifactId = requiredId(parseArtifactId, "parseArtifactId");
     this.db.transaction(() => {
       this.db.prepare(`DELETE FROM knowledge_chunks WHERE parse_artifact_id = ?`).run(artifactId);
+      this.db.prepare(`DELETE FROM chunk_index_variant_metadata WHERE parse_artifact_id = ?`).run(artifactId);
     })();
   }
 

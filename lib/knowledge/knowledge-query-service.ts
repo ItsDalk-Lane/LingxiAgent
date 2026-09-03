@@ -15,6 +15,7 @@ import {
   type IndexedKnowledgeChunk,
   type KnowledgeOrdinalRange,
   type StoredKnowledgeChunk,
+  type KnowledgeChunkVariantMetadata,
 } from "./knowledge-index-store.ts";
 import { KnowledgeStore } from "./knowledge-store.ts";
 import {
@@ -332,6 +333,22 @@ export function buildKnowledgeBlockLocatorIndex(blocks: KnowledgeBlock[]): Map<s
   return index;
 }
 
+/** 摄入与后台回填共用，按块在变体中首次出现的顺序记录目录。 */
+function buildVariantMetadata(chunks: KnowledgeChunkDraft[], blocks: KnowledgeBlock[]): KnowledgeChunkVariantMetadata {
+  const locators = buildKnowledgeBlockLocatorIndex(blocks);
+  let firstHeadingPath: string[] | null = null;
+  const sections = new Set<string>();
+  for (const chunk of chunks) {
+    for (const span of chunk.spans) {
+      const heading = locators.get(span.blockId)?.headingPath ?? null;
+      firstHeadingPath ??= heading;
+      const key = knowledgeSectionKeyOf(heading);
+      if (key != null) sections.add(key);
+    }
+  }
+  return { firstHeadingPath, sectionKeys: [...sections] };
+}
+
 /**
  * "无上限"召回的物理边界：与笔记本 retrieval_top_k 的 sanity 上限一致
  * （knowledge-store MAX_RETRIEVAL_TOP_K=1000），防病态全表膨胀。
@@ -524,6 +541,7 @@ export class KnowledgeQueryService {
           chunkProfileHash: config.configId,
           blockFingerprint: fingerprint,
           chunks,
+          metadata: buildVariantMetadata(chunks, blocks),
         });
       } catch (error) {
         // 显式终态：构建失败的变体落 failed（查询侧只读 ready 变体，读不到半写状态）。
@@ -545,6 +563,20 @@ export class KnowledgeQueryService {
       this.deps.indexStore.reset();
       return run();
     }
+  }
+
+  /** 仅由启动后的后台批次调用；归属从宿主事实库读取，不接收用户指定的工作室。 */
+  backfillVariantMetadata(variant: { id: string; parseArtifactId: string }): string {
+    const owner = this.deps.store.db.prepare(`
+      SELECT s.studio_id, s.id AS source_id FROM parse_artifacts pa
+      JOIN content_snapshots cs ON cs.id = pa.content_snapshot_id
+      JOIN sources s ON s.id = cs.source_id WHERE pa.id = ?
+    `).get(variant.parseArtifactId);
+    if (!owner) throw new KnowledgeError("KNOWLEDGE_INDEX_INVALID", "Metadata source artifact is missing");
+    const blocks = this.deps.store.listArtifactBlocks({ studioId: owner.studio_id, parseArtifactId: variant.parseArtifactId });
+    const chunks = this.deps.indexStore.listVariantChunks(variant.id);
+    this.deps.indexStore.writeVariantMetadata(variant.id, buildVariantMetadata(chunks, blocks));
+    return owner.source_id;
   }
 
   /** 本地检索入口只接收冻结编译结果，不触发嵌入、向量、重排或索引恢复。 */

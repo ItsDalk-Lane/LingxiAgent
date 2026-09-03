@@ -760,7 +760,7 @@ export class KnowledgeIngestionService {
           artifactId: artifact.id,
         });
       }
-      // chunk 与 fts_index 在同一次幂等替换中原子完成（replaceArtifactChunks 单事务），
+      // chunk、fts_index 和查询目录元数据在同一次幂等替换中原子完成（replaceArtifactChunks 单事务），
       // 因此 phase 从 chunk/fts_index 一步推进到 embed。chunkProfileHash（= chunker_config_id
       // 同源值）在各相位按同一解析链重算（blocks → chunker 配置），贯穿 chunk/embed 相位，
       // 保证 embed 锚定的 ChunkIndexVariant 与 chunk 相位建出的是同一个。

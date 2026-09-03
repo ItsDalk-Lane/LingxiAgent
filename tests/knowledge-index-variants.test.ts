@@ -260,7 +260,7 @@ describe("knowledge-fts.db v1 → v2 迁移", () => {
     createV1Database(dbPath);
 
     const store = openIndex(dbPath);
-    expect(store.db.pragma("user_version", { simple: true })).toBe(2);
+    expect(store.db.pragma("user_version", { simple: true })).toBe(3);
     expect(store.health()).toEqual({ status: "ready" });
 
     const profile = knowledgeChunkerConfigId("fixed", 1200);

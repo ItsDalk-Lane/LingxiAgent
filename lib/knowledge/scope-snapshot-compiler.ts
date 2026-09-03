@@ -186,9 +186,10 @@ export class ScopeSnapshotCompiler {
             row.chunkProfileHash = hash;
             row.chunkIndexVariantId = metadata.id;
             row.chunkCount = metadata.chunkCount;
+            row.firstHeadingPath = metadata.firstHeadingPath;
+            row.sectionKeys = metadata.sectionKeys;
           }
-          // P1 才加入章节元数据，P0 不在查询时读全文恢复目录。
-          warnings.push(`${row.sourceId}:${metadata.id}:section_metadata_missing`);
+          if (metadata.metadataMissing) warnings.push(`${row.sourceId}:${metadata.id}:section_metadata_missing`);
         } else if (artifact?.status === "ready") {
           const variant = hash ? this.deps.indexStore.resolveChunkIndexVariant(artifact.id, hash) : null;
           const status = variant?.status === "building" ? "index_building"
