@@ -137,3 +137,15 @@ C 任务要求注册 voyageai(完成条件①的 resolver 新用例亦依赖)⇒
 - 待执行命令(任一会话主人跑均可,跑完全量即归绿):
   node scripts/generate-persistence-schema-fingerprint.mjs --classification compatible --compatibility-reason "knowledge v8->v9 加可空列 vector_retention_days,幂等迁移,向后兼容"
 - 回滚方式:git checkout build/persistence-schema-fingerprint.json
+
+
+## 2026-09-03 知识 P0–P3：阶段门禁与最终封印顺序冲突（待协调）
+
+- 类型：执行纪律/仓库治理冲突，不是环境故障，不是产品代码失败。
+- 固定基线：`3eab85891a1747c64064252804f70c0a3773f021`；基线全量 12929 通过、7 既有跳过、0 失败。
+- P0-00 提交：`eef41dd6be1035547410d23859ec64490e0adf2b`，只增加任务书要求的基线与进度文档。
+- 实测命令：`node .sync-audit/verify-post-verification-diff.mjs`，exit 1。
+- 拒绝文件：`KNOWLEDGE_REFACTOR_BASELINE.md`、`KNOWLEDGE_REFACTOR_PROGRESS.md`。
+- 原因：现有封印门禁比较已验证提交到 HEAD 的差异；任务书要求逐项提交、每阶段全量通过，却只在最终第 32 个提交安排封印。后续正常代码提交也必然被该门禁拒绝。
+- 已询问是否允许各阶段完成规定验证后同步更新审计坐标，并保留最终封印提交。没有修改测试、放宽白名单或假造验证坐标。
+- 当前可继续 P0 当前任务定向实施与验证；P0 阶段全量门禁必须实际解决后才能进入 P1。

@@ -10,7 +10,7 @@
 - 严格按 P0 → P1 → P2 → P3 及编号顺序；阶段门禁全部通过才进入下一阶段。
 - 每项记录测试原始结果后提交；不删除、跳过或放宽测试，不合并 main。
 - 现有任务书为用户未跟踪文件，既有规划文档与 BLOCKED.md 历史记录保留。
-- 当前断点：P0-00，已核对基线并创建指定分支，npm ci 已成功；类型检查与指定知识测试已通过，全量基线已通过，P0-00 准备提交。
+- 当前断点：P0-01，P0-00 已完成并提交；执行策略验证完成，准备提交。审计封印顺序冲突详见 BLOCKED.md，P0 阶段收口前须解决。
 - 进度、计划与事实集中在本文件和基线文档，避免覆盖既有 task_plan.md / findings.md / PROGRESS.md。
 - 目标工具已确认本任务存在 active goal；重复 create_goal 被拒绝，沿用现有目标。
 - 规划恢复脚本返回其他会话的无关配置记录，经 git diff 为空核对，未采用其内容。
@@ -30,16 +30,16 @@
 - 改动文件：`KNOWLEDGE_REFACTOR_PROGRESS.md`、`KNOWLEDGE_REFACTOR_BASELINE.md`
 - 测试命令：`npm run typecheck`；任务书指定 5 个 knowledge 测试；`npm test`
 - 测试结果：类型检查 exit 0；指定知识测试 5 文件 / 110 测试通过、0 失败 / 0 跳过；全量 1273 文件通过 / 1 跳过，12929 测试通过 / 7 跳过 / 0 失败，exit 0；本地旧快速路径 60 次分段计时已记录。
-- 对应 commit SHA：本次基线提交，提交生成后立即回填 SHA
+- 对应 commit SHA：`eef41dd6be1035547410d23859ec64490e0adf2b`
 - 偏差：none
 
 ## P0-01：增加执行策略契约
 
-- 状态：pending
-- 改动文件：尚未开始
-- 测试命令：按任务书该项测试执行，尚未执行
-- 测试结果：NOT_EXECUTED
-- 对应 commit SHA：尚未提交
+- 状态：completed
+- 改动文件：`shared/knowledge-execution.ts`、`shared/knowledge-refs.ts`、`core/desktop-session-submit.ts`、`core/engine.ts`、`tests/knowledge-execution-policy.test.ts`
+- 测试命令：`npx vitest run tests/knowledge-execution-policy.test.ts tests/chat-route-knowledge-refs.test.ts tests/desktop-session-submit.test.ts tests/knowledge-retrieval-golden.test.ts`；`npm run typecheck`；修改文件定向 ESLint
+- 测试结果：首轮 4 文件，74 通过 / 2 失败；新测试错误地期待旧模式生产输入返回 null，实际既有契约为抛出 TypeError。已按基线修正为精确错误断言，未改生产兼容行为；重跑 4 文件 / 76 测试全部通过（3.05s，exit 0）；类型检查三套 exit 0；定向 ESLint exit 0。
+- 对应 commit SHA：本次策略提交，提交后立即回填
 - 偏差：none
 
 ## P0-02：实现 ScopeSnapshotCompiler

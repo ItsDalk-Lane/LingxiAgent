@@ -37,6 +37,7 @@ import { materializeBridgeInboundFiles } from "../lib/session-files/bridge-inbou
 import { serializeSessionFile } from "../lib/session-files/session-file-response.ts";
 import { BrowserManager } from "../lib/browser/browser-manager.ts";
 import { normalizeKnowledgeRefs, type KnowledgeRefs, type KnowledgeRetrievalStats } from "../shared/knowledge-refs.ts";
+import { resolveKnowledgeExecutionPolicy } from "../shared/knowledge-execution.ts";
 import {
   resolveKnowledgeInjectionBudgetTokens,
   type KnowledgeInjectionEvidence,
@@ -146,7 +147,14 @@ async function resolveKnowledgeInjectionBlock(
     throw new Error("desktop-session-submit: knowledge injection unavailable (engine lacks buildKnowledgeContextInjection)");
   }
   try {
-    return await engine.buildKnowledgeContextInjection({
+    const policy = resolveKnowledgeExecutionPolicy({
+      mode: refs.mode,
+      question,
+      selectedNotebookCount: refs.notebookIds.length,
+      // 此处尚未冻结来源；P0–P2 策略不依赖来源数量，知识入口再填真实数量。
+      selectedSourceCount: 0,
+    });
+    const request = {
       question,
       knowledgeRefs: refs,
       budgetTokens,
@@ -155,7 +163,15 @@ async function resolveKnowledgeInjectionBlock(
       ...(turnId ? { turnId } : {}),
       // 检索期取消信号（Phase 9 第二波）：exhaustive coverage run 中止通道。
       ...(signal ? { signal } : {}),
-    });
+    };
+    switch (policy.path) {
+      case "fast_local":
+        // P0-06 接入本地管线前，保留现有快速路径。
+        return await engine.buildKnowledgeContextInjection(request);
+      case "detailed_research":
+        // P0 保留详细模式现有行为，P2 再切换调查运行时。
+        return await engine.buildKnowledgeContextInjection(request);
+    }
   } catch (err) {
     const reason = err instanceof Error ? err.message : String(err);
     return {

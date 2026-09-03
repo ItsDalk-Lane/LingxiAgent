@@ -194,6 +194,7 @@ import {
   serializeVector,
 } from "../lib/memory/fact-embeddings.ts";
 import type { KnowledgeRetrievalStats } from "../shared/knowledge-refs.ts";
+import { resolveKnowledgeExecutionPolicy } from "../shared/knowledge-execution.ts";
 import {
   assembleKnowledgeEvidenceManifestEntries,
   buildKnowledgeContextInjection,
@@ -2775,6 +2776,12 @@ export class LingxiEngine {
           parseArtifactId: source.parseArtifactId,
         }]))
         : null;
+      const policy = resolveKnowledgeExecutionPolicy({
+        mode: input.knowledgeRefs.mode,
+        question: input.question,
+        selectedNotebookCount: input.knowledgeRefs.notebookIds.length,
+        selectedSourceCount: turnScope?.sources.length ?? 0,
+      });
       // 槽位未配置（knowledge 偏好未设）→ 拆解模型为 null，injector 直接单查询并显式标注。
       // 模型解析放在闭包内：槽位配置错误只降级拆解（单查询 + 留痕），检索照常进行。
       const slotConfigured = !!this.getSharedModels()?.knowledge;
@@ -3000,7 +3007,7 @@ export class LingxiEngine {
       // 是总函数（模型失败在 plan 内降级留痕），promise 不会 reject。
       // 快速档（2026-08-31 两档化）整体跳过 planner——零辅助 LLM 轮的一部分，
       // injector 收 coveragePlan: null（无 plan 可消费，stats 不带 coverage 字段）。
-      const coveragePlanPromise = input.knowledgeRefs.mode === "fast"
+      const coveragePlanPromise = policy.path === "fast_local"
         ? null
         : (async () => {
           const plan = await planKnowledgeCoverage({

@@ -10,6 +10,7 @@
  */
 
 import type { KnowledgeDegradeReason } from "./knowledge-reason-codes.ts";
+import type { KnowledgeCompletenessPolicy } from "./knowledge-execution.ts";
 
 /**
  * 答案模式两档（2026-08-31 两档化，取代旧 qa/assist）：
@@ -84,6 +85,34 @@ export interface KnowledgeDegradedScope {
  */
 export interface KnowledgeRetrievalStats {
   mode: KnowledgeReferenceMode;
+  executionPath?: "fast_local" | "detailed_research";
+  deadlineMs?: number;
+  deadlineExceeded?: boolean;
+  remoteModelCalls?: number;
+  ftsQueries?: number;
+  vectorQueries?: number;
+  rerankCalls?: number;
+  scopeCompileMs?: number;
+  timeToFirstEvidenceMs?: number;
+  vectorBackend?: "hnsw" | "portable" | "none";
+  searchCalls?: number;
+  readCalls?: number;
+  grepCalls?: number;
+  /** 只保存结构化研究状态，不保存模型原始思考。 */
+  research?: {
+    runId: string;
+    status: "planning" | "running" | "synthesizing" | "completed" | "partial" | "failed" | "cancelled";
+    completenessPolicy: KnowledgeCompletenessPolicy;
+    rounds: number;
+    toolCalls: number;
+    delegatedAgents: number;
+    needsTotal: number;
+    needsSupported: number;
+    needsPartial: number;
+    needsConflicted: number;
+    unresolvedNeedIds: string[];
+    stopReason: string;
+  };
   /**
    * KnowledgeTurnScope id（Phase 4）：本轮知识权限天花板的服务端实体 id，
    * 随注入块头一起产出；模型调 knowledge_read 必须回传。仅会话注入路径携带。
