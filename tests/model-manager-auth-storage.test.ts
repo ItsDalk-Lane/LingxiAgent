@@ -607,6 +607,28 @@ describe("ModelManager AuthStorage ownership", () => {
     expect(persistedAuth.deepseek).toBeUndefined();
   });
 
+  it("does not rescue the runtime api-key sentinel over a legacy auth.json key", async () => {
+    // Windows CI 实测：投影哨兵 hana-runtime-api-key:<id> 一度被迁移当作
+    // models.json 投影真 key，以更高优先级压过 auth.json legacy key，
+    // 真随 auth.json 清理而丢失。哨兵必须视为合成值并回落到 legacy 抢救。
+    writeAuth({
+      deepseek: { type: "api_key", key: "sk-legacy-4d2a" },
+    });
+    writeModelsJson({
+      providers: {
+        deepseek: { ...deepseekProvider(undefined), apiKey: "hana-runtime-api-key:deepseek" },
+      },
+    });
+
+    const manager = new ModelManager({ lingxiHome: tmpDir });
+    await manager.init();
+    await manager.syncAndRefresh();
+
+    await expect(getDeepseekApiKey(manager)).resolves.toBe("sk-legacy-4d2a");
+    const persistedProviders = readPersistedProviders();
+    expect(persistedProviders.deepseek.api_key).toBe("sk-legacy-4d2a");
+  });
+
   it("recovers a legacy API key from models.json when auth.json was already cleaned", async () => {
     writeAuth({});
     writeAddedModels({

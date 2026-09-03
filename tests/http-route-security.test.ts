@@ -115,6 +115,29 @@ describe("HTTP route security policy", () => {
     }
   });
 
+  it("keeps every local model file and process route local-owner only", async () => {
+    const { authorizeHttpRoute, classifyHttpRoute } = await import("../server/http/route-security.ts");
+    const remote = desktopOwnerPrincipal(["settings.read", "settings.write"]);
+    for (const [method, path] of [
+      ["GET", "/api/local-models"],
+      ["PUT", "/api/local-models/config"],
+      ["POST", "/api/local-models/manifest/refresh"],
+      ["POST", "/api/local-models/install"],
+      ["POST", "/api/local-models/import"],
+      ["POST", "/api/local-models/import/inspect"],
+      ["POST", `/api/local-models/downloads/${"a".repeat(64)}/pause`],
+      ["DELETE", `/api/local-models/downloads/${"a".repeat(64)}`],
+      ["DELETE", "/api/local-models/models/stt/sensevoice-small/int8"],
+      ["GET", "/api/local-models/models/stt/sensevoice-small/int8/license"],
+    ]) {
+      expect(classifyHttpRoute({ method, path })).toMatchObject({ kind: "local_only" });
+      expect(authorizeHttpRoute({ method, path, principal: remote }))
+        .toMatchObject({ allowed: false, status: 403, error: "local_only_route" });
+      expect(authorizeHttpRoute({ method, path, principal: localPrincipal }))
+        .toMatchObject({ allowed: true });
+    }
+  });
+
   it("keeps legacy GPU preference cleanup local-owner only", async () => {
     const { authorizeHttpRoute, classifyHttpRoute } = await import("../server/http/route-security.ts");
     const path = "/api/preferences/legacy-gpu-safe-mode/hardware-acceleration";
@@ -447,10 +470,12 @@ describe("HTTP route security policy", () => {
       ["GET", "/api/plugins/diagnostics"],
       ["GET", "/api/media/image/providers"],
       ["GET", "/api/media/providers"],
+      ["GET", "/api/media/tts/providers"],
       ["POST", "/api/media/generate"],
       ["POST", "/api/media/image/generate"],
       ["POST", "/api/media/video/generate"],
       ["POST", "/api/media/asr/transcribe"],
+      ["POST", "/api/media/tts/synthesize"],
       ["PUT", "/api/media/image/config"],
       ["POST", "/api/media/image/providers/dashscope/models"],
       ["DELETE", "/api/media/image/providers/dashscope/models/wanx"],

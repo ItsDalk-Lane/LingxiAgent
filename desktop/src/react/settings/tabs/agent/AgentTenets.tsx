@@ -24,7 +24,7 @@ interface Tenet {
 const PRIORITY_KEYS: TenetPriority[] = ['critical', 'high', 'medium', 'low'];
 
 function priorityLabel(priority: TenetPriority): string {
-  const key = `settings.tenetsPriority${priority[0].toUpperCase()}${priority.slice(1)}`;
+  const key = `settings.memory.tenetsPriority${priority[0].toUpperCase()}${priority.slice(1)}`;
   const label = t(key);
   return label === key ? priority : label;
 }
@@ -119,14 +119,14 @@ export function AgentTenets({ agentId }: { agentId: string }) {
   return (
     <div className={styles['settings-subsection']}>
       <div className={styles['settings-subsection-header']}>
-        <h3 className={styles['settings-subsection-title']}>{t('settings.tenetsTitle')}</h3>
-        <span className={styles['settings-subsection-hint']}>{t('settings.tenetsHint')}</span>
+        <h3 className={styles['settings-subsection-title']}>{t('settings.memory.tenetsTitle')}</h3>
+        <span className={styles['settings-subsection-hint']}>{t('settings.memory.tenetsHint')}</span>
       </div>
 
       {error && <p className={`${styles['settings-inline-note']} ${styles['tenets-error']}`}>{error}</p>}
-      {tenets === null && !error && <p className={styles['settings-inline-note']}>{t('settings.tenetsLoading')}</p>}
+      {tenets === null && !error && <p className={styles['settings-inline-note']}>{t('settings.memory.tenetsLoading')}</p>}
       {tenets !== null && tenets.length === 0 && (
-        <p className={styles['settings-inline-note']}>{t('settings.tenetsEmpty')}</p>
+        <p className={styles['settings-inline-note']}>{t('settings.memory.tenetsEmpty')}</p>
       )}
 
       {pending.length > 0 && (
@@ -139,10 +139,10 @@ export function AgentTenets({ agentId }: { agentId: string }) {
               <span className={styles['tenets-content']}>{tenet.content}</span>
               <span className={styles['tenets-actions']}>
                 <button className={styles['memory-action-btn']} onClick={() => { void decide(tenet.id, true); }}>
-                  {t('settings.tenetsApprove')}
+                  {t('settings.memory.tenetsApprove')}
                 </button>
                 <button className={styles['memory-action-btn']} onClick={() => { void decide(tenet.id, false); }}>
-                  {t('settings.tenetsReject')}
+                  {t('settings.memory.tenetsReject')}
                 </button>
               </span>
             </div>
@@ -159,7 +159,7 @@ export function AgentTenets({ agentId }: { agentId: string }) {
               </span>
               <span className={styles['tenets-content']}>{tenet.content}</span>
               <button className={`${styles['memory-action-btn']} ${styles['danger']}`} onClick={() => { void remove(tenet.id); }}>
-                {t('settings.tenetsDelete')}
+                {t('settings.memory.tenetsDelete')}
               </button>
             </div>
           ))}
@@ -174,10 +174,10 @@ export function AgentTenets({ agentId }: { agentId: string }) {
           maxLength={300}
           onChange={(e) => setContent(e.target.value)}
           onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); void add(); } }}
-          placeholder={t('settings.tenetsAddPlaceholder')}
+          placeholder={t('settings.memory.tenetsAddPlaceholder')}
         />
         <select
-          className={styles['settings-input']}
+          className={`${styles['settings-input']} ${styles['tenets-priority-select']}`}
           value={priority}
           onChange={(e) => setPriority(e.target.value as TenetPriority)}
         >

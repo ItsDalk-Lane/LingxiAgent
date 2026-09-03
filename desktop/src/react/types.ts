@@ -592,6 +592,7 @@ export interface PlatformApi {
   /** 主窗口监听任意 viewer 关闭，payload 是 windowId（用于清理 pinnedViewers store）。 */
   onViewerClosed?(callback: (windowId: number) => void): void;
   openFolder(path: string): void;
+  openLocalModelsFolder?(): void;
   openFile(path: string): void;
   openExternal(url: string): void;
   showInFinder(path: string): void;

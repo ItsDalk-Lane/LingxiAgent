@@ -291,6 +291,28 @@ export const NFT_TRACE_ROOTS = CLOSURE_ROOTS.filter((root) => root.inputType ===
 
 export const DYNAMIC_CALL_ALLOWLIST = Object.freeze([
   {
+    file: "lib/local-models/sidecar-manager.ts",
+    callee: "spawn",
+    argText: "executable",
+    reason:
+      "The local-model sidecar executable is a platform runtime asset selected from a "
+      + "strict HTTPS manifest, downloaded with SHA-256 verification, extracted from a "
+      + "declared-file archive, and revalidated from runtime.json immediately before "
+      + "launch. It is external runtime content under LINGXI_HOME/runtime/local-inference, "
+      + "not a hidden reference to repository source, so it adds no static source edge.",
+  },
+  {
+    file: "lib/local-models/in-process-factory.ts",
+    callee: "import",
+    argText: "pathToFileURL(entrypoint).href",
+    reason:
+      "The in-process local-model module is the entrypoint of the same manifest-declared, "
+      + "SHA-256-verified platform runtime asset. Its runtime.json identity and every "
+      + "declared file hash are checked again before import. The module lives under "
+      + "LINGXI_HOME/runtime/local-inference rather than this repository, so it cannot be "
+      + "represented as another static source-closure path.",
+  },
+  {
     file: "server/bootstrap.ts",
     callee: "import",
     argText: "pathToFileURL(serverEntry).href",

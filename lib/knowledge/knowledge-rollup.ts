@@ -19,9 +19,16 @@
  *   留痕（rollup degradedReason），绝不悄悄丢部分证据；
  * - 用户取消（signal）逐轮检查，向上抛 AbortError 与检索期同一通道。
  *
- * 纯函数化可测：模型调用 / 检索门面全部依赖注入，本模块不做 IO。
+ * 可测边界：模型调用 / 检索门面全部依赖注入；安全扫描只记录分级计数。
  */
+import { createModuleLogger } from "../debug-log.ts";
 import { estimateTextTokens, trimTextToTokenBudget } from "../llm/estimate-text-tokens.ts";
+import {
+  buildWarningLine,
+  markUntrusted,
+  scan as scanInjection,
+  type InjectionDecision,
+} from "../security/injection-scan.ts";
 import type { NotebookRetrievalChunk, RetrieveForNotebooksResult } from "./knowledge-query-service.ts";
 
 /** 滚动轮上限（防护）：超限后剩余证据并入最后一轮（预算截断在渲染层兜底）。 */
@@ -33,6 +40,25 @@ export const KNOWLEDGE_ROLLUP_MAX_ROUNDS = 8;
  * 大窗口模型下每份约 20-30s 预填充，轮数换时延。
  */
 export const KNOWLEDGE_ROLLUP_PART_MAX_TOKENS = 64_000;
+
+const injectionScanLog = createModuleLogger("knowledge-rollup-injection-scan");
+
+type InjectionScanCounts = Record<InjectionDecision, number>;
+
+function createInjectionScanCounts(): InjectionScanCounts {
+  return { clean: 0, warn: 0, block: 0 };
+}
+
+function markScannedEvidence(text: string, counts: InjectionScanCounts): string {
+  const result = scanInjection(text);
+  counts[result.decision] += 1;
+  const warning = buildWarningLine(result.decision);
+  return markUntrusted(warning ? `${warning}\n${text}` : text);
+}
+
+function logInjectionScanCounts(stage: string, counts: InjectionScanCounts): void {
+  injectionScanLog.log(`${stage}: clean=${counts.clean} warn=${counts.warn} block=${counts.block}`);
+}
 /** 每部分中间笔记的 token 上限（紧凑笔记纪律；超限硬截断并留痕）。 */
 export const KNOWLEDGE_ROLLUP_NOTES_MAX_TOKENS = 3000;
 /** 补充检索轮数上限（模型自主再查询的硬上限，一切有界）。 */
@@ -218,7 +244,12 @@ export async function runKnowledgeRollup(input: {
   let supplementalRounds = 0;
 
   // 待消化队列（初始全量；补充检索的新块追加到队尾）。allEntries 按全局序累积。
-  const queue: KnowledgeRollupEntry[] = [...input.entries];
+  const initialScanCounts = createInjectionScanCounts();
+  const queue: KnowledgeRollupEntry[] = input.entries.map(entry => ({
+    ...entry,
+    text: markScannedEvidence(entry.text, initialScanCounts),
+  }));
+  logInjectionScanCounts("initial", initialScanCounts);
   const seenChunkIds = new Set(queue.map(entry => entry.chunk.id));
   const allEntries: KnowledgeRollupEntry[] = [...queue];
   // 全局 [KN] 计数器：补充检索的新块延续编号。
@@ -359,25 +390,30 @@ export async function runKnowledgeRollup(input: {
         supplemental.queries.map(query =>
           deps.retrieve({ query, topK: KNOWLEDGE_ROLLUP_RETRIEVAL_TOPK })),
       );
+      const supplementalScanCounts = createInjectionScanCounts();
       for (const outcome of settled) {
         if (outcome.status !== "fulfilled") continue;
         for (const chunk of outcome.value.candidates) {
           if (seenChunkIds.has(chunk.id)) continue;
           seenChunkIds.add(chunk.id);
           nextLabelIndex += 1;
+          const rawText = `[K${nextLabelIndex}] notebook "${chunk.notebookName}" / source "${chunk.sourceName}" `
+            + `(sourceId: ${chunk.sourceId}) / chunk ordinal ${chunk.ordinal + 1}`
+            + `${chunk.headingPath && chunk.headingPath.length > 0 ? ` / heading: ${chunk.headingPath.join(" > ")}` : chunk.pageNumber != null ? ` / page: ${chunk.pageNumber}` : ""}\n`
+            + `${chunk.text.replace(/^\s+|\s+$/g, "")}`;
           const entry: KnowledgeRollupEntry = {
             chunk,
             contextOnly: false,
             labelIndex: nextLabelIndex,
             anchorLabelIndex: nextLabelIndex,
-            text: `[K${nextLabelIndex}] notebook "${chunk.notebookName}" / source "${chunk.sourceName}" `
-              + `(sourceId: ${chunk.sourceId}) / chunk ordinal ${chunk.ordinal + 1}`
-              + `${chunk.headingPath && chunk.headingPath.length > 0 ? ` / heading: ${chunk.headingPath.join(" > ")}` : chunk.pageNumber != null ? ` / page: ${chunk.pageNumber}` : ""}\n`
-              + `${chunk.text.replace(/^\s+|\s+$/g, "")}`,
+            text: markScannedEvidence(rawText, supplementalScanCounts),
           };
           queue.push(entry);
           allEntries.push(entry);
         }
+      }
+      if (supplementalScanCounts.clean + supplementalScanCounts.warn + supplementalScanCounts.block > 0) {
+        logInjectionScanCounts("supplemental", supplementalScanCounts);
       }
     }
   }

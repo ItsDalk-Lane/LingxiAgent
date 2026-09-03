@@ -120,6 +120,10 @@ export function classifyHttpRoute({ method = "GET", path = "" } = {}) {
   if (routePath === "/api/knowledge" || routePath.startsWith("/api/knowledge/")) {
     return STUDIO_OWNER;
   }
+  // 本地模型管理会读取/写入本机文件并控制原生进程，所有端点只允许本机所有者。
+  if (routePath === "/api/local-models" || routePath.startsWith("/api/local-models/")) {
+    return LOCAL_ONLY;
+  }
   // ── Model Observatory（Phase 8；显式登记，不吃 /api/* STUDIO_OWNER fallback）──
   if (isModelObservatoryRoute(verb, routePath)) return modelObservabilityRoutePolicy(verb, routePath);
   if (routePath === "/api/session-projects" || routePath.startsWith("/api/session-projects/")) {
@@ -622,6 +626,7 @@ function isImageGenerationReadRoute(verb, routePath) {
   if (verb !== "GET" && verb !== "HEAD") return false;
   return routePath === "/api/media/providers"
     || routePath === "/api/media/image/providers"
+    || routePath === "/api/media/tts/providers"
     || routePath === "/api/media/tasks"
     || /^\/api\/media\/generated\/[^/]+$/.test(routePath)
     || /^\/api\/media\/tasks\/batch\/[^/]+$/.test(routePath)
@@ -633,7 +638,8 @@ function isMediaSubmitRoute(verb, routePath) {
   return routePath === "/api/media/generate"
     || routePath === "/api/media/image/generate"
     || routePath === "/api/media/video/generate"
-    || routePath === "/api/media/asr/transcribe";
+    || routePath === "/api/media/asr/transcribe"
+    || routePath === "/api/media/tts/synthesize";
 }
 
 function isImageGenerationWriteRoute(verb, routePath) {

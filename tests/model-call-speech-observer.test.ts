@@ -1,7 +1,7 @@
 /**
  * MC-09 Speech Recognition × ModelCallObserver（§三十六～§四十二/§六十三）。
  *
- * 全部 4 个 active adapter（OpenAI/MiMo/DashScope/Volcengine BigASR）经真实
+ * 全部 4 个远端 adapter（OpenAI/MiMo/DashScope/Volcengine BigASR）经真实
  * 业务链路 SpeechRecognitionService.transcribeAudio → adapter.transcribe →
  * fake fetch → Observer。毒钉：音频字节、base64、transcription 正文、apiKey
  * 都不得进入事件；fileId/audioFormat/languageSpecified/inputSizeBucket 允许。
@@ -92,7 +92,7 @@ describe("MC-09 speech recognition × ModelCallObserver", () => {
     for (const root of roots.splice(0)) fs.rmSync(root, { recursive: true, force: true });
   });
 
-  for (const adapter of builtinSpeechRecognitionAdapters) {
+  for (const adapter of builtinSpeechRecognitionAdapters.filter((entry) => entry.id !== "local")) {
     it(`coverage: ${adapter.id} transcribe → observer 完整生命周期 + ledger 关联`, async () => {
       const file = makeVoiceFile();
       const ledger = createUsageLedger({});

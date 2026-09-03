@@ -5779,6 +5779,13 @@ wrapIpcBestEffortHandler("open-folder", (_event, folderPath) => {
   shell.openPath(folderPath);
 });
 
+// 只打开产品自己的本地模型目录，不接受渲染进程传入任意路径。
+wrapIpcBestEffortHandler("open-local-models-folder", () => {
+  const modelsPath = path.join(lingxiHome, "models");
+  fs.mkdirSync(modelsPath, { recursive: true, mode: 0o700 });
+  shell.openPath(modelsPath);
+});
+
 // 原生拖拽：书桌文件拖到 Finder / 聊天区
 wrapIpcOn("start-drag", async (event, filePaths) => {
   const paths = Array.isArray(filePaths) ? filePaths : [filePaths];

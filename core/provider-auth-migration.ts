@@ -3,6 +3,7 @@ import path from "path";
 import { getInvalidProviderModelIds } from "../shared/provider-model-validation.ts";
 import { providerCredentialAllowsMissingApiKey } from "../shared/provider-auth.ts";
 import { ProviderCatalogStore } from "./provider-catalog.ts";
+import { RUNTIME_API_KEY_PREFIX } from "../shared/runtime-api-key-ref.ts";
 
 function isPlainObject(value) {
   return value && typeof value === "object" && !Array.isArray(value);
@@ -49,6 +50,16 @@ function isSyntheticLocalApiKey(apiKey, entry, providerConfig) {
     authType: entry?.authType,
     baseUrl: providerConfig?.baseUrl || entry?.baseUrl || "",
   });
+}
+
+/**
+ * models.json 投影里的哨兵值（`hana-runtime-api-key:<id>`）不是真 key：
+ * 运行时拿它回查 provider catalog。迁移若把它当成投影出来的真 key 抢救进
+ * catalog，会以优先级压过 auth.json 里的 legacy 真 key——真 key 随后被
+ * auth.json 清理删除，用户凭据丢失（Windows 首轮 CI 实测）。
+ */
+function isRuntimeApiKeyRef(apiKey) {
+  return typeof apiKey === "string" && apiKey.startsWith(RUNTIME_API_KEY_PREFIX);
 }
 
 function getLegacyApiKey(auth, providerId, providerKey, authJsonKey) {
@@ -171,7 +182,9 @@ export function migrateLegacyApiKeyAuthToProviders({ lingxiHome, providerRegistr
     const hasExplicitCatalogApiKey = hasOwn(current, "api_key");
     const projectedApiKey = extractProjectedApiKey(modelsJsonProvider);
     const rescuedApiKey = (
-      projectedApiKey && !isSyntheticLocalApiKey(projectedApiKey, entry, modelsJsonProvider)
+      projectedApiKey
+      && !isSyntheticLocalApiKey(projectedApiKey, entry, modelsJsonProvider)
+      && !isRuntimeApiKeyRef(projectedApiKey)
         ? projectedApiKey
         : ""
     ) || getLegacyApiKey(auth, providerId, providerKey, entry?.authJsonKey);

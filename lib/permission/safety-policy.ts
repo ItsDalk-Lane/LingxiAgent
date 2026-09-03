@@ -9,12 +9,19 @@ function stagePathsFromRequest(request: any = {}) {
   return normalized.ok ? normalized.value.filepaths : [];
 }
 
+// stage 拒绝必须同时携带边界原因与补救出路；PathGuard 的 reason 只描述路径级别，
+// 不解释「为什么切了完整权限还是被拒」，两者拼接而非互相覆盖。
+const STAGE_BOUNDARY_REMEDY =
+  "Files can only be delivered from the current workspace or an authorized folder; " +
+  "this boundary is independent of the session permission mode. Ask the user to authorize " +
+  "the folder (session_folders), or copy the file into the workspace — do not retry the same path.";
+
 function stageBoundaryBlock(reason?: string) {
   return {
     action: "block",
     code: "ACTION_BLOCKED_BY_WORKSPACE_BOUNDARY",
     reviewer: "safety_policy",
-    reason: reason || "Files can only be delivered from the current workspace or an authorized folder.",
+    reason: reason ? `${reason}\n${STAGE_BOUNDARY_REMEDY}` : STAGE_BOUNDARY_REMEDY,
     risk: "high",
     ruleIds: ["stage-files-workspace-boundary"],
   };

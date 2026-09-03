@@ -1355,6 +1355,38 @@ export class BridgeSessionManager {
           };
         }
         displayAttachments = materialized.displayAttachments || [];
+        const speechConfig = this._deps.getSpeechRecognitionConfig?.();
+        if (speechConfig?.enabled && speechConfig.defaultModel && typeof this._deps.transcribeAudio === "function") {
+          const speechNotes = [];
+          for (const attachment of displayAttachments) {
+            if (!String(attachment?.mimeType || "").toLowerCase().startsWith("audio/")) continue;
+            try {
+              const result = await this._deps.transcribeAudio({
+                sessionId: sessionRefRef.current.sessionId,
+                sessionPath: activeSessionPath,
+                fileId: attachment.fileId,
+              });
+              const transcript = typeof result?.text === "string" ? result.text.trim().slice(0, 20_000) : "";
+              speechNotes.push(result?.status === "failed"
+                ? "[语音转写失败，原语音附件已保留]"
+                : transcript ? `[语音转写]\n${transcript}` : "[语音转写未得到文字]");
+            } catch (error) {
+              log.warn(`bridge inbound speech transcription failed (${sessionKey}): ${error?.message || error}`);
+              speechNotes.push("[语音转写失败，原语音附件已保留]");
+            }
+          }
+          if (speechNotes.length) {
+            const note = speechNotes.join("\n");
+            promptText = `${promptText}\n${note}`.trim();
+            opts = {
+              ...opts,
+              displayMessage: {
+                ...(opts.displayMessage || {}),
+                text: `${opts.displayMessage?.text ?? ""}\n${note}`.trim(),
+              },
+            };
+          }
+        }
       }
 
       this._emitSessionEvent({ type: "session_status", isStreaming: true }, activeSessionPath);

@@ -1261,6 +1261,163 @@
       "exemption": null
     },
     {
+      "id": "local-model-artifacts",
+      "ownerModule": "lib/local-models/subsystem.ts",
+      "pathPattern": "models/embedding/{idAtQuant}/**",
+      "pathPatterns": [
+        "models/embedding/{idAtQuant}/**",
+        "models/ocr/{idAtQuant}/**",
+        "models/stt/{idAtQuant}/**",
+        "models/tts/{idAtQuant}/**",
+        "models/.install-work/**",
+        "runtime/local-inference/{runtimeId}/{version}/{platform}/**"
+      ],
+      "pathExclusions": [],
+      "pathKind": "tree",
+      "format": "mixed-directory",
+      "schemaSource": {
+        "kind": "directory-contract",
+        "module": "lib/local-models/registry.ts",
+        "contract": "strict model.json plus per-file size/SHA-256 contract; installer.ts owns runtime.json and atomic staging"
+      },
+      "schemaContract": {
+        "kind": "protocol",
+        "source": "lib/local-models/registry.ts",
+        "compatibility": "The named runtime reader is canonical; this inventory does not imply stricter validation than runtime currently performs."
+      },
+      "openEntry": [
+        "LocalModelsSubsystem.initialize",
+        "LocalModelInstaller.install",
+        "LocalModelRegistry.importDirectory"
+      ],
+      "migrationEntry": [],
+      "protocolModules": [
+        "lib/local-models/registry.ts",
+        "lib/local-models/installer.ts",
+        "lib/local-models/secure-archive.ts"
+      ],
+      "firstPossibleOpenPhase": "runtime_ready",
+      "firstPossibleWritePhase": "runtime_ready",
+      "epochPolicy": "compatible",
+      "checkpointPolicy": "Excluded from automatic data-epoch checkpoints because model/runtime assets can be many gigabytes and are independently integrity-addressed.",
+      "restorePolicy": "Remote assets are redownloaded and reverified from a valid manifest; manual assets are restored only by explicit user re-import or external backup.",
+      "affectedByEpochMigration": false,
+      "bootstrapSafety": null,
+      "preCoordinatorReadProjection": null,
+      "identityContract": "category/id@quant identifies one model variant generation via model.json version; runtimeId/version/platform identifies one verified runtime generation; .staging-* and .install-work are unpublished transaction state.",
+      "exemption": null
+    },
+    {
+      "id": "local-model-downloads",
+      "ownerModule": "lib/local-models/downloader.ts",
+      "pathPattern": "models/.downloads/{taskId}/**",
+      "pathPatterns": [
+        "models/.downloads/{taskId}/**"
+      ],
+      "pathExclusions": [],
+      "pathKind": "tree",
+      "format": "mixed-directory",
+      "schemaSource": {
+        "kind": "runtime-contract",
+        "module": "lib/local-models/downloader.ts",
+        "contract": "schemaVersion 1 state.json, deterministic part layout, and verified artifact.bin lifecycle"
+      },
+      "schemaContract": {
+        "kind": "runtime-source",
+        "source": "lib/local-models/downloader.ts",
+        "compatibility": "The named runtime reader is canonical; this inventory does not imply stricter validation than runtime currently performs."
+      },
+      "openEntry": [
+        "ResumableDownloader.download",
+        "ResumableDownloader.listTasks"
+      ],
+      "migrationEntry": [],
+      "protocolModules": [],
+      "firstPossibleOpenPhase": "runtime_ready",
+      "firstPossibleWritePhase": "runtime_ready",
+      "epochPolicy": "regenerable",
+      "checkpointPolicy": "Excluded; incomplete parts can resume from the source asset and completed artifacts are deleted after publication.",
+      "restorePolicy": "Resume only when URI, byte count, SHA-256, and deterministic taskId still match; otherwise cancel and redownload.",
+      "affectedByEpochMigration": false,
+      "bootstrapSafety": null,
+      "preCoordinatorReadProjection": null,
+      "identityContract": "taskId is SHA-256(uri, bytes, expected SHA-256) and owns exactly one state file, part set, and optional verified artifact.",
+      "exemption": null
+    },
+    {
+      "id": "local-model-manifest-cache",
+      "ownerModule": "lib/local-models/manifest-client.ts",
+      "pathPattern": "models/.manifest-cache/manifest-cache.json",
+      "pathPatterns": [
+        "models/.manifest-cache/manifest-cache.json"
+      ],
+      "pathExclusions": [],
+      "pathKind": "file",
+      "format": "json",
+      "schemaSource": {
+        "kind": "runtime-contract",
+        "module": "lib/local-models/manifest-client.ts",
+        "contract": "schemaVersion 1 URL/ETag/fetchedAt/raw-body parser with strict manifest revalidation"
+      },
+      "schemaContract": {
+        "kind": "runtime-source",
+        "source": "lib/local-models/manifest-client.ts",
+        "compatibility": "The named runtime reader is canonical; this inventory does not imply stricter validation than runtime currently performs."
+      },
+      "openEntry": [
+        "LocalModelsManifestClient.loadCached",
+        "LocalModelsManifestClient.refresh"
+      ],
+      "migrationEntry": [],
+      "protocolModules": [],
+      "firstPossibleOpenPhase": "runtime_ready",
+      "firstPossibleWritePhase": "runtime_ready",
+      "epochPolicy": "regenerable",
+      "checkpointPolicy": "Excluded; it is an HTTPS/ETag cache and never the authority for installed bytes.",
+      "restorePolicy": "Re-parse before use; discard invalid cache and refresh, falling back to the built-in catalog while offline.",
+      "affectedByEpochMigration": false,
+      "bootstrapSafety": null,
+      "preCoordinatorReadProjection": null,
+      "identityContract": "One cache record belongs to one configured manifest URL for one LINGXI_HOME.",
+      "exemption": null
+    },
+    {
+      "id": "local-model-sidecar-logs",
+      "ownerModule": "lib/local-models/sidecar-manager.ts",
+      "pathPattern": "logs/local-models/{idAtQuant}/sidecar.log*",
+      "pathPatterns": [
+        "logs/local-models/{idAtQuant}/sidecar.log*"
+      ],
+      "pathExclusions": [],
+      "pathKind": "tree",
+      "format": "append-only-log",
+      "schemaSource": {
+        "kind": "directory-contract",
+        "module": "lib/local-models/sidecar-manager.ts",
+        "contract": "redacted bounded rotating stderr log family"
+      },
+      "schemaContract": {
+        "kind": "protocol",
+        "source": "lib/local-models/sidecar-manager.ts",
+        "compatibility": "The named runtime reader is canonical; this inventory does not imply stricter validation than runtime currently performs."
+      },
+      "openEntry": [
+        "SidecarManager.start"
+      ],
+      "migrationEntry": [],
+      "protocolModules": [],
+      "firstPossibleOpenPhase": "runtime_ready",
+      "firstPossibleWritePhase": "runtime_ready",
+      "epochPolicy": "regenerable",
+      "checkpointPolicy": "Excluded; logs are bounded diagnostics and contain no model output payload by host design.",
+      "restorePolicy": "Never restore; create a new bounded log generation after restart.",
+      "affectedByEpochMigration": false,
+      "bootstrapSafety": null,
+      "preCoordinatorReadProjection": null,
+      "identityContract": "id@quant owns one active redacted log and at most maxLogFiles rotated generations.",
+      "exemption": null
+    },
+    {
       "id": "local-user-auth",
       "ownerModule": "core/local-user-account.ts",
       "pathPattern": "local-user-auth.json",
@@ -4788,6 +4945,15 @@
     {
       "sourceFile": "desktop/main.cjs",
       "kind": "mkdir",
+      "excerpt": "fs.mkdirSync(modelsPath, { recursive: true, mode: 0o700 })",
+      "reason": "Creates the fixed local-model root before opening it in the system file manager.",
+      "storeId": "local-model-artifacts",
+      "exemptionId": null,
+      "ordinal": 0
+    },
+    {
+      "sourceFile": "desktop/main.cjs",
+      "kind": "mkdir",
       "excerpt": "fs.mkdirSync(path.dirname(destinationPath), { recursive: true })",
       "reason": "Writes an absolute path selected by the renderer or a screenshot directory selected by the user; no LINGXI_HOME store is implied.",
       "storeId": null,
@@ -6600,6 +6766,366 @@
       "excerpt": "fs.mkdirSync(path.dirname(storagePath), { recursive: true })",
       "reason": "Writes the usage ledger.",
       "storeId": "usage-ledger",
+      "exemptionId": null,
+      "ordinal": 0
+    },
+    {
+      "sourceFile": "lib/local-models/backend-probe.ts",
+      "kind": "mkdir",
+      "excerpt": "fsp.mkdir(path.dirname(filePath), { recursive: true })",
+      "reason": "Writes the backend probe cache (probe-cache.json) under LINGXI_HOME runtime root; a per-runtime startup捷径 cache that is rebuilt from live probing on any mismatch.",
+      "storeId": "local-model-artifacts",
+      "exemptionId": null,
+      "ordinal": 0
+    },
+    {
+      "sourceFile": "lib/local-models/backend-probe.ts",
+      "kind": "write-file",
+      "excerpt": "fsp.writeFile(filePath, JSON.stringify({ schemaVersion: 1, entries }, null, 2))",
+      "reason": "Writes the backend probe cache (probe-cache.json) under LINGXI_HOME runtime root; a per-runtime startup捷径 cache that is rebuilt from live probing on any mismatch.",
+      "storeId": "local-model-artifacts",
+      "exemptionId": null,
+      "ordinal": 0
+    },
+    {
+      "sourceFile": "lib/local-models/downloader.ts",
+      "kind": "mkdir",
+      "excerpt": "fsp.mkdir(taskDir, { recursive: true, mode: 0o700 })",
+      "reason": "Persists resumable download state, bounded parts, assembly output, and exact-task cleanup.",
+      "storeId": "local-model-downloads",
+      "exemptionId": null,
+      "ordinal": 0
+    },
+    {
+      "sourceFile": "lib/local-models/downloader.ts",
+      "kind": "mkdir",
+      "excerpt": "fsp.mkdir(this.rootDir, { recursive: true, mode: 0o700 })",
+      "reason": "Persists resumable download state, bounded parts, assembly output, and exact-task cleanup.",
+      "storeId": "local-model-downloads",
+      "exemptionId": null,
+      "ordinal": 0
+    },
+    {
+      "sourceFile": "lib/local-models/downloader.ts",
+      "kind": "remove-path",
+      "excerpt": "fs.rmSync(path.join(taskDir, entry.name))",
+      "reason": "Persists resumable download state, bounded parts, assembly output, and exact-task cleanup.",
+      "storeId": "local-model-downloads",
+      "exemptionId": null,
+      "ordinal": 0
+    },
+    {
+      "sourceFile": "lib/local-models/downloader.ts",
+      "kind": "remove-path",
+      "excerpt": "fsp.rm(assembled, { force: true })",
+      "reason": "Persists resumable download state, bounded parts, assembly output, and exact-task cleanup.",
+      "storeId": "local-model-downloads",
+      "exemptionId": null,
+      "ordinal": 0
+    },
+    {
+      "sourceFile": "lib/local-models/downloader.ts",
+      "kind": "remove-path",
+      "excerpt": "fsp.rm(finalPath, { force: true })",
+      "reason": "Persists resumable download state, bounded parts, assembly output, and exact-task cleanup.",
+      "storeId": "local-model-downloads",
+      "exemptionId": null,
+      "ordinal": 0
+    },
+    {
+      "sourceFile": "lib/local-models/downloader.ts",
+      "kind": "remove-path",
+      "excerpt": "fsp.rm(finalPath, { force: true })",
+      "reason": "Persists resumable download state, bounded parts, assembly output, and exact-task cleanup.",
+      "storeId": "local-model-downloads",
+      "exemptionId": null,
+      "ordinal": 1
+    },
+    {
+      "sourceFile": "lib/local-models/downloader.ts",
+      "kind": "remove-path",
+      "excerpt": "fsp.rm(path.join(taskDir, entry.name), { force: true })",
+      "reason": "Persists resumable download state, bounded parts, assembly output, and exact-task cleanup.",
+      "storeId": "local-model-downloads",
+      "exemptionId": null,
+      "ordinal": 0
+    },
+    {
+      "sourceFile": "lib/local-models/downloader.ts",
+      "kind": "remove-path",
+      "excerpt": "fsp.rm(taskDir, { recursive: true, force: true })",
+      "reason": "Persists resumable download state, bounded parts, assembly output, and exact-task cleanup.",
+      "storeId": "local-model-downloads",
+      "exemptionId": null,
+      "ordinal": 0
+    },
+    {
+      "sourceFile": "lib/local-models/downloader.ts",
+      "kind": "remove-path",
+      "excerpt": "fsp.rm(taskDir, { recursive: true, force: true })",
+      "reason": "Persists resumable download state, bounded parts, assembly output, and exact-task cleanup.",
+      "storeId": "local-model-downloads",
+      "exemptionId": null,
+      "ordinal": 1
+    },
+    {
+      "sourceFile": "lib/local-models/downloader.ts",
+      "kind": "rename",
+      "excerpt": "fsp.rename(assembled, finalPath)",
+      "reason": "Persists resumable download state, bounded parts, assembly output, and exact-task cleanup.",
+      "storeId": "local-model-downloads",
+      "exemptionId": null,
+      "ordinal": 0
+    },
+    {
+      "sourceFile": "lib/local-models/downloader.ts",
+      "kind": "rename",
+      "excerpt": "fsp.rename(temporary, target)",
+      "reason": "Persists resumable download state, bounded parts, assembly output, and exact-task cleanup.",
+      "storeId": "local-model-downloads",
+      "exemptionId": null,
+      "ordinal": 0
+    },
+    {
+      "sourceFile": "lib/local-models/downloader.ts",
+      "kind": "write-file",
+      "excerpt": "fsp.open(destination, \"w\", 0o600)",
+      "reason": "Persists resumable download state, bounded parts, assembly output, and exact-task cleanup.",
+      "storeId": "local-model-downloads",
+      "exemptionId": null,
+      "ordinal": 0
+    },
+    {
+      "sourceFile": "lib/local-models/downloader.ts",
+      "kind": "write-file",
+      "excerpt": "fsp.writeFile(temporary, `${JSON.stringify(state, null, 2)}\\n`, { mode: 0o600 })",
+      "reason": "Persists resumable download state, bounded parts, assembly output, and exact-task cleanup.",
+      "storeId": "local-model-downloads",
+      "exemptionId": null,
+      "ordinal": 0
+    },
+    {
+      "sourceFile": "lib/local-models/installer.ts",
+      "kind": "mkdir",
+      "excerpt": "fsp.mkdir(directory, { recursive: true, mode: 0o700 })",
+      "reason": "Stages and atomically publishes manifest-verified model and platform runtime assets.",
+      "storeId": "local-model-artifacts",
+      "exemptionId": null,
+      "ordinal": 0
+    },
+    {
+      "sourceFile": "lib/local-models/installer.ts",
+      "kind": "remove-path",
+      "excerpt": "fsp.rm(staging, { recursive: true, force: true })",
+      "reason": "Stages and atomically publishes manifest-verified model and platform runtime assets.",
+      "storeId": "local-model-artifacts",
+      "exemptionId": null,
+      "ordinal": 0
+    },
+    {
+      "sourceFile": "lib/local-models/installer.ts",
+      "kind": "remove-path",
+      "excerpt": "fsp.rm(staging, { recursive: true, force: true })",
+      "reason": "Stages and atomically publishes manifest-verified model and platform runtime assets.",
+      "storeId": "local-model-artifacts",
+      "exemptionId": null,
+      "ordinal": 1
+    },
+    {
+      "sourceFile": "lib/local-models/installer.ts",
+      "kind": "rename",
+      "excerpt": "fsp.rename(staging, target)",
+      "reason": "Stages and atomically publishes manifest-verified model and platform runtime assets.",
+      "storeId": "local-model-artifacts",
+      "exemptionId": null,
+      "ordinal": 0
+    },
+    {
+      "sourceFile": "lib/local-models/installer.ts",
+      "kind": "write-file",
+      "excerpt": "fsp.writeFile(path.join(staging, \"runtime.json\"), `${JSON.stringify(metadata, null, 2)}\\n`, { flag: \"wx\", mode: 0o600, })",
+      "reason": "Stages and atomically publishes manifest-verified model and platform runtime assets.",
+      "storeId": "local-model-artifacts",
+      "exemptionId": null,
+      "ordinal": 0
+    },
+    {
+      "sourceFile": "lib/local-models/manifest-client.ts",
+      "kind": "mkdir",
+      "excerpt": "fsp.mkdir(directory, { recursive: true, mode: 0o700 })",
+      "reason": "Creates the cache directory and atomically replaces the last strictly parsed manifest response.",
+      "storeId": "local-model-manifest-cache",
+      "exemptionId": null,
+      "ordinal": 0
+    },
+    {
+      "sourceFile": "lib/local-models/manifest-client.ts",
+      "kind": "rename",
+      "excerpt": "fsp.rename(temporary, target)",
+      "reason": "Creates the cache directory and atomically replaces the last strictly parsed manifest response.",
+      "storeId": "local-model-manifest-cache",
+      "exemptionId": null,
+      "ordinal": 0
+    },
+    {
+      "sourceFile": "lib/local-models/manifest-client.ts",
+      "kind": "write-file",
+      "excerpt": "fsp.writeFile(temporary, `${JSON.stringify(cache)}\\n`, { mode: 0o600 })",
+      "reason": "Creates the cache directory and atomically replaces the last strictly parsed manifest response.",
+      "storeId": "local-model-manifest-cache",
+      "exemptionId": null,
+      "ordinal": 0
+    },
+    {
+      "sourceFile": "lib/local-models/registry.ts",
+      "kind": "mkdir",
+      "excerpt": "fsp.mkdir(directory, { recursive: true, mode: 0o700 })",
+      "reason": "Scans, atomically imports, verifies, or removes one exact local model variant directory.",
+      "storeId": "local-model-artifacts",
+      "exemptionId": null,
+      "ordinal": 0
+    },
+    {
+      "sourceFile": "lib/local-models/registry.ts",
+      "kind": "mkdir",
+      "excerpt": "fsp.mkdir(path.dirname(to), { recursive: true, mode: 0o700 })",
+      "reason": "Scans, atomically imports, verifies, or removes one exact local model variant directory.",
+      "storeId": "local-model-artifacts",
+      "exemptionId": null,
+      "ordinal": 0
+    },
+    {
+      "sourceFile": "lib/local-models/registry.ts",
+      "kind": "mkdir",
+      "excerpt": "fsp.mkdir(staging, { recursive: false, mode: 0o700 })",
+      "reason": "Scans, atomically imports, verifies, or removes one exact local model variant directory.",
+      "storeId": "local-model-artifacts",
+      "exemptionId": null,
+      "ordinal": 0
+    },
+    {
+      "sourceFile": "lib/local-models/registry.ts",
+      "kind": "remove-path",
+      "excerpt": "fsp.rm(staging, { recursive: true, force: true })",
+      "reason": "Scans, atomically imports, verifies, or removes one exact local model variant directory.",
+      "storeId": "local-model-artifacts",
+      "exemptionId": null,
+      "ordinal": 0
+    },
+    {
+      "sourceFile": "lib/local-models/registry.ts",
+      "kind": "remove-path",
+      "excerpt": "fsp.rm(target, { recursive: true, force: false })",
+      "reason": "Scans, atomically imports, verifies, or removes one exact local model variant directory.",
+      "storeId": "local-model-artifacts",
+      "exemptionId": null,
+      "ordinal": 0
+    },
+    {
+      "sourceFile": "lib/local-models/registry.ts",
+      "kind": "rename",
+      "excerpt": "fsp.rename(staging, target)",
+      "reason": "Scans, atomically imports, verifies, or removes one exact local model variant directory.",
+      "storeId": "local-model-artifacts",
+      "exemptionId": null,
+      "ordinal": 0
+    },
+    {
+      "sourceFile": "lib/local-models/registry.ts",
+      "kind": "rename",
+      "excerpt": "fsp.rename(temporary, target)",
+      "reason": "Scans, atomically imports, verifies, or removes one exact local model variant directory.",
+      "storeId": "local-model-artifacts",
+      "exemptionId": null,
+      "ordinal": 0
+    },
+    {
+      "sourceFile": "lib/local-models/registry.ts",
+      "kind": "write-file",
+      "excerpt": "fs.createWriteStream(to, { flags: \"wx\", mode: 0o600 })",
+      "reason": "Scans, atomically imports, verifies, or removes one exact local model variant directory.",
+      "storeId": "local-model-artifacts",
+      "exemptionId": null,
+      "ordinal": 0
+    },
+    {
+      "sourceFile": "lib/local-models/registry.ts",
+      "kind": "write-file",
+      "excerpt": "fsp.writeFile(temporary, `${JSON.stringify(metadata, null, 2)}\\n`, { flag: \"wx\", mode: 0o600 })",
+      "reason": "Scans, atomically imports, verifies, or removes one exact local model variant directory.",
+      "storeId": "local-model-artifacts",
+      "exemptionId": null,
+      "ordinal": 0
+    },
+    {
+      "sourceFile": "lib/local-models/secure-archive.ts",
+      "kind": "mkdir",
+      "excerpt": "fsp.mkdir(resolved, { recursive: true, mode: 0o755 })",
+      "reason": "Streams declared archive entries only into an installer-owned staging directory and removes it on failure.",
+      "storeId": "local-model-artifacts",
+      "exemptionId": null,
+      "ordinal": 0
+    },
+    {
+      "sourceFile": "lib/local-models/secure-archive.ts",
+      "kind": "mkdir",
+      "excerpt": "fsp.mkdir(root, { recursive: true, mode: 0o700 })",
+      "reason": "Streams declared archive entries only into an installer-owned staging directory and removes it on failure.",
+      "storeId": "local-model-artifacts",
+      "exemptionId": null,
+      "ordinal": 0
+    },
+    {
+      "sourceFile": "lib/local-models/secure-archive.ts",
+      "kind": "remove-path",
+      "excerpt": "fsp.rm(root, { recursive: true, force: true })",
+      "reason": "Streams declared archive entries only into an installer-owned staging directory and removes it on failure.",
+      "storeId": "local-model-artifacts",
+      "exemptionId": null,
+      "ordinal": 0
+    },
+    {
+      "sourceFile": "lib/local-models/secure-archive.ts",
+      "kind": "write-file",
+      "excerpt": "fs.createWriteStream(target, { flags: \"wx\", mode: ((mode || 0o644) & 0o777) & ~0o6000, })",
+      "reason": "Streams declared archive entries only into an installer-owned staging directory and removes it on failure.",
+      "storeId": "local-model-artifacts",
+      "exemptionId": null,
+      "ordinal": 0
+    },
+    {
+      "sourceFile": "lib/local-models/sidecar-manager.ts",
+      "kind": "append-file",
+      "excerpt": "fsp.appendFile(active, text, { mode: 0o600 })",
+      "reason": "Creates sidecar log directories and appends/rotates token-redacted stderr diagnostics.",
+      "storeId": "local-model-sidecar-logs",
+      "exemptionId": null,
+      "ordinal": 0
+    },
+    {
+      "sourceFile": "lib/local-models/sidecar-manager.ts",
+      "kind": "mkdir",
+      "excerpt": "fsp.mkdir(directory, { recursive: true, mode: 0o700 })",
+      "reason": "Creates sidecar log directories and appends/rotates token-redacted stderr diagnostics.",
+      "storeId": "local-model-sidecar-logs",
+      "exemptionId": null,
+      "ordinal": 0
+    },
+    {
+      "sourceFile": "lib/local-models/sidecar-manager.ts",
+      "kind": "remove-path",
+      "excerpt": "fsp.rm(to, { force: true })",
+      "reason": "Creates sidecar log directories and appends/rotates token-redacted stderr diagnostics.",
+      "storeId": "local-model-sidecar-logs",
+      "exemptionId": null,
+      "ordinal": 0
+    },
+    {
+      "sourceFile": "lib/local-models/sidecar-manager.ts",
+      "kind": "rename",
+      "excerpt": "fsp.rename(from, to)",
+      "reason": "Creates sidecar log directories and appends/rotates token-redacted stderr diagnostics.",
+      "storeId": "local-model-sidecar-logs",
       "exemptionId": null,
       "ordinal": 0
     },

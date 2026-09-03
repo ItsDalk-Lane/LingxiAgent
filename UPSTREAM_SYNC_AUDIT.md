@@ -14,7 +14,7 @@
 | U1：上游目标 | `c6d0405294be67cb134c2758f6472748ee73e2be` | openhanako `v0.447.4` |
 | L0：Lingxi 同步基线 | `97595264ead8735a04559507ddaade25db8a4e15` | chore: sync upstream 0.444.1 and pi SDK 0.84.1 (PR #2) |
 | L1：同步开始 Lingxi | `ca0b417e36a6a1f80947458aaed328a25718e41b` | 2026-08-20 main HEAD |
-| VERIFIED_SOURCE_SHA | `61099bcdfdb110b9210e3b4381f00af539c5f57f` | 最终验证（typecheck/lint/测试/构建/打包）所针对的 feature commit（其 tree 即被验证源码树）；2026-09-02 AtomGit 镜像旧 release 清理降级 best-effort |
+| VERIFIED_SOURCE_SHA | `93118b98323165bd395a202f30ecbba080f33957` | 最终验证（typecheck/lint/测试/构建/打包）所针对的 feature commit（其 tree 即被验证源码树）；2026-09-02 安全双件套（注入扫描+跑飞守卫）与沙盒拒绝分因文案 |
 
 ## Audit seal model
 

@@ -1,4 +1,4 @@
-export type ExtractFailureReason = "unsupported" | "parse-failed" | "scanned-pdf" | "too-large";
+export type ExtractFailureReason = "unsupported" | "parse-failed" | "scanned-pdf" | "ocr-unavailable" | "too-large";
 
 export interface ExtractSuccess {
   ok: true;

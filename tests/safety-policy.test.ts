@@ -74,6 +74,28 @@ describe("SafetyPolicy", () => {
     });
   });
 
+  it("appends the boundary remedy after the PathGuard reason instead of replacing it", () => {
+    const decision = evaluateToolSafetyPolicy({
+      toolName: "stage_files",
+      params: { filepaths: ["/Downloads/clip.mp4"] },
+    }, {
+      checkStagePath: () => ({
+        allowed: false,
+        reason: "「stage」被拒绝：/Downloads/clip.mp4 在沙盒可写范围之外",
+      }),
+    });
+
+    expect(decision).toMatchObject({
+      action: "block",
+      code: "ACTION_BLOCKED_BY_WORKSPACE_BOUNDARY",
+    });
+    const guardReason = "在沙盒可写范围之外";
+    expect(decision.reason).toContain(guardReason);
+    expect(decision.reason).toContain("workspace or an authorized folder");
+    expect(decision.reason.indexOf(guardReason))
+      .toBeLessThan(decision.reason.indexOf("workspace or an authorized folder"));
+  });
+
   it("does not block unrelated commands that happen to use --force", () => {
     const marker = vi.fn();
     const decision = evaluateToolSafetyPolicy(request({

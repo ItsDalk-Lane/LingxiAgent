@@ -58,11 +58,36 @@ export function createMediaRoute(engine) {
     }
   });
 
+  route.post("/media/tts/synthesize", async (c) => {
+    try {
+      const body = await safeJson(c);
+      const result = await requireTextToSpeechService(engine).synthesize(body);
+      return c.json({
+        ...result,
+        audio: Buffer.from(result.audio).toString("base64"),
+        encoding: "base64",
+      });
+    } catch (err) {
+      return c.json({ error: err.message }, 400);
+    }
+  });
+
+  route.get("/media/tts/providers", (c) => {
+    try {
+      return c.json(requireTextToSpeechService(engine).listProviders());
+    } catch (err) {
+      return c.json({ error: err.message }, 500);
+    }
+  });
+
   route.get("/media/providers", async (c) => {
     try {
       const capability = c.req.query("capability") || "image_generation";
       if (capability === "speech_recognition" || capability === "asr" || capability === "transcription") {
         return c.json(requireSpeechRecognitionService(engine).listProviders());
+      }
+      if (capability === "speech_generation" || capability === "speech_synthesis" || capability === "tts") {
+        return c.json(requireTextToSpeechService(engine).listProviders());
       }
       if (capability === "video_generation" || capability === "video" || capability === "videoGeneration") {
         return c.json(await requireMediaManager(engine).listVideoProviders());
@@ -291,6 +316,11 @@ function requireMediaManager(engine) {
 function requireSpeechRecognitionService(engine) {
   if (!engine?.speechRecognition) throw new Error("speech recognition service unavailable");
   return engine.speechRecognition;
+}
+
+function requireTextToSpeechService(engine) {
+  if (!engine?.textToSpeech) throw new Error("text-to-speech service unavailable");
+  return engine.textToSpeech;
 }
 
 function decodeConfigValues(values: any = {}) {

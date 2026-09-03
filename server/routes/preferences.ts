@@ -56,6 +56,35 @@ import { collectSecretPatchPaths, isMaskedSecretValue, maskSecretValue, resolveS
 import { denySecretMutationWithoutScope, denyWithoutScope } from "../http/capability-guard.ts";
 import { recordSecurityAuditEvent } from "../http/security-audit.ts";
 import { BrowserManager } from "../../lib/browser/browser-manager.ts";
+import { localModelKey } from "../../lib/local-models/contracts.ts";
+
+export function listPreferenceOperationModels(engine: any) {
+  const remote = engine.listModelOperationModels?.() || [];
+  const installed = engine.localModels?.registry?.snapshot?.().models || [];
+  const local = installed
+    .filter((entry: any) => entry?.category === "embedding")
+    .map((entry: any) => {
+      const id = localModelKey({ id: entry.id, quant: entry.quant, manifestVersion: entry.version });
+      const memory = Number.isFinite(entry.estimatedPeakRssMb) ? ` · ${entry.estimatedPeakRssMb} MB` : "";
+      return {
+        id,
+        provider: "local",
+        label: `${entry.id} (${entry.quant}) · 本地 · 离线${memory}`,
+        displayName: `${entry.id} (${entry.quant})`,
+        operations: ["embedding"],
+        operationProtocol: "local-offline-embedding",
+        offline: true,
+        estimatedPeakRssMb: Number.isFinite(entry.estimatedPeakRssMb) ? entry.estimatedPeakRssMb : null,
+      };
+    });
+  const seen = new Set<string>();
+  return [...remote, ...local].filter((entry: any) => {
+    const key = `${entry?.provider || ""}\u0000${entry?.id || ""}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
 
 export function selectedComputerProviderIdFromSettings(settings: any, platform = process.platform) {
   return selectedComputerProviderId(settings, { platform });
@@ -169,7 +198,7 @@ export function createPreferencesRoute(engine: any, options: Record<string, any>
 
       return c.json({
         models,
-        operation_models: engine.listModelOperationModels?.() || [],
+        operation_models: listPreferenceOperationModels(engine),
         thinking_level: engine.getThinkingLevel?.() || "medium",
         search: {
           provider: search.provider || "",

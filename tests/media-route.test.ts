@@ -295,6 +295,27 @@ describe("native media route", () => {
     });
   });
 
+  it("synthesizes local speech as an explicit base64 payload", async () => {
+    const app = new Hono();
+    const synthesize = vi.fn(async () => ({
+      modelId: "local:kokoro-82m@int8@1",
+      backend: "cpu",
+      durationMs: 5,
+      sampleRate: 24000,
+      format: "wav",
+      audio: new Uint8Array([1, 2, 3]),
+    }));
+    app.route("/api", createMediaRoute({ textToSpeech: { synthesize } }));
+    const res = await app.request("/api/media/tts/synthesize", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text: "你好" }),
+    });
+    expect(res.status).toBe(200);
+    expect(synthesize).toHaveBeenCalledWith({ text: "你好" });
+    expect(await res.json()).toMatchObject({ audio: "AQID", encoding: "base64", format: "wav" });
+  });
+
   it("retries the exact child-owned media task id supplied by a forked card", async () => {
     const app = new Hono();
     const retryImageTask = vi.fn(async (taskId) => ({

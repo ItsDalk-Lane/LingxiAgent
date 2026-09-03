@@ -102,6 +102,9 @@ import { ModelManager } from "./model-manager.ts";
 import { AuxiliaryModelResolver } from "./auxiliary-model-resolver.ts";
 import { ModelOperationConfigurationError, ModelOperationResolver } from "./model-operation-resolver.ts";
 import { EmbeddingClient, RerankClient } from "./model-operation-client.ts";
+import { localModelKey, parseLocalModelKey, type LocalModelRef } from "../lib/local-models/contracts.ts";
+import type { LocalModelsSubsystem } from "../lib/local-models/subsystem.ts";
+import { extractDocument as extractDocumentBase } from "../lib/document-extract/index.ts";
 import type { ModelOperation } from "../shared/model-operations.ts";
 import { isAuxiliaryConfigError } from "./auxiliary-slots.ts";
 import { SessionProjectCatalogStore } from "./session-project-catalog-store.ts";
@@ -231,6 +234,7 @@ import { AutomationSuggestionStore } from "../lib/tools/automation-suggestion-st
 import { SessionCollabDraftStore } from "../lib/session-collab/draft-store.ts";
 import { NotificationService } from "../lib/notifications/notification-service.ts";
 import { SpeechRecognitionService } from "./speech-recognition-service.ts";
+import { TextToSpeechService } from "./text-to-speech-service.ts";
 import { UniversalMediaManager } from "./media/universal-media-manager.ts";
 import { McpManager } from "./mcp/manager.ts";
 import { createCurrentTurnNativeMediaStore } from "./current-turn-native-media.ts";
@@ -401,6 +405,8 @@ export class LingxiEngine {
   declare _skills: any;
   declare _slashSystem: any;
   declare _speechRecognition: any;
+  declare _textToSpeech: TextToSpeechService;
+  declare localModels: LocalModelsSubsystem | null;
   declare _studioCronService: any;
   declare _subagentControllers: any;
   declare _subagentRunStore: any;
@@ -525,6 +531,11 @@ export class LingxiEngine {
       // 嵌入模型上下文窗口（自动分块 ×80% 口径）：目录条目归一化的
       // contextWindow/context 优先，known-models 静态目录兜底。
       getEmbeddingModelContextWindow: (ref) => {
+        const local = this._resolveInstalledLocalModelRef(ref, "embedding");
+        if (local) {
+          const candidate = local.installed.capabilities?.contextWindow;
+          return typeof candidate === "number" && Number.isFinite(candidate) && candidate > 0 ? candidate : null;
+        }
         const entry = this._models.providerRegistry.getOperationModel("embedding", ref);
         for (const candidate of [entry?.contextWindow, entry?.context]) {
           if (typeof candidate === "number" && Number.isFinite(candidate) && candidate > 0) return candidate;
@@ -542,6 +553,10 @@ export class LingxiEngine {
       sessionFiles: this._sessionFiles,
       emitEvent: (event, sessionPath) => this._emitEvent(event, sessionPath),
       getUsageLedger: () => this._usageLedger,
+      getLocalModels: () => this.localModels,
+    });
+    this._textToSpeech = new TextToSpeechService({
+      getLocalModels: () => this.localModels,
     });
     this._media = new UniversalMediaManager({
       lingxiHome: this.lingxiHome,
@@ -785,6 +800,8 @@ export class LingxiEngine {
       getVisionBridge: () => this._visionBridge,
       isVisionAuxiliaryEnabled: () => this.isVisionAuxiliaryEnabled(),
       getLingxiHome: () => this.lingxiHome,
+      getSpeechRecognitionConfig: () => this._speechRecognition?.getConfig?.() || { enabled: false },
+      transcribeAudio: (input) => this._speechRecognition?.transcribeAudio?.(input),
       registerSessionFile: (entry) => this.registerSessionFile(entry),
       getSessionFile: (fileId, options) => this.getSessionFile(fileId, options),
       getSessionFileByPath: (filePath, options) => this.getSessionFileByPath(filePath, options),
@@ -1732,7 +1749,25 @@ export class LingxiEngine {
     }
     return true;
   }
+  attachLocalModels(localModels: LocalModelsSubsystem) {
+    this.localModels = localModels;
+    this._knowledge?.onModelConfigMayHaveChanged?.();
+    return localModels;
+  }
+  async extractDocument(input) {
+    const localModels = this.localModels;
+    if (!localModels) return extractDocumentBase(input);
+    const config = localModels.getConfig();
+    return extractDocumentBase({
+      ...input,
+      ocrMaxPages: input?.ocrMaxPages ?? config.ocr.maxPages,
+      ocrMaxPixelsPerPage: input?.ocrMaxPixelsPerPage ?? config.ocr.maxPixelsPerPage,
+    }, {
+      ocr: (request) => localModels.ocr(request),
+    });
+  }
   get speechRecognition() { return this._speechRecognition; }
+  get textToSpeech() { return this._textToSpeech; }
   get media() { return this._media; }
   get mcp() { return this._mcp; }
   get resources() { return this._resources; }
@@ -2443,9 +2478,55 @@ export class LingxiEngine {
     };
   }
 
+  _resolveInstalledLocalModelRef(ref, category) {
+    if (ref?.provider !== "local") return null;
+    const localRef = parseLocalModelKey(ref?.id);
+    if (!localRef || !this.localModels) return null;
+    const installed = this.localModels.registry.snapshot().models.find((entry) => (
+      entry.category === category
+      && entry.id === localRef.id
+      && entry.quant === localRef.quant
+      && entry.version === localRef.manifestVersion
+    ));
+    return installed ? { ref: localRef, installed } : null;
+  }
+
+  async _embedLocalTexts(
+    localRef: LocalModelRef,
+    texts,
+    inputType,
+    signal,
+    priority: "interactive" | "normal" | "batch" = "normal",
+  ) {
+    if (!this.localModels) return null;
+    const expectedKey = localModelKey(localRef);
+    const result = await this.localModels.runtime.embed({
+      model: localRef,
+      texts,
+      inputType,
+      signal: signal ?? new AbortController().signal,
+      priority,
+    });
+    if (result.output.modelKey !== expectedKey) {
+      throw new Error(`local embedding runtime returned a mismatched model identity`);
+    }
+    return {
+      vectors: result.output.vectors,
+      dimensions: result.output.dimensions,
+      modelKey: expectedKey,
+      model: {
+        provider: "local",
+        id: expectedKey,
+        api: String(result.diagnostics?.protocolId || "local-sidecar-embed"),
+        dimensions: result.output.dimensions,
+      },
+    };
+  }
+
   /** 摄入管线用：同步判定显式嵌入模型引用当前是否可解析（模型存在/支持嵌入/凭证就绪）。 */
   _canResolveKnowledgeEmbeddingRef(ref) {
     if (!ref?.id || !ref?.provider) return false;
+    if (ref.provider === "local") return Boolean(this._resolveInstalledLocalModelRef(ref, "embedding"));
     try {
       const resolver = new ModelOperationResolver(this._modelOperationResolverDeps(() => ref));
       return !!resolver.resolveSync("embedding");
@@ -2461,6 +2542,17 @@ export class LingxiEngine {
    * （HTTP 4xx/5xx、超时）照常抛出，走 job 退避重试。
    */
   async _embedKnowledgeTextsForModel(request) {
+    const local = this._resolveInstalledLocalModelRef(request?.modelRef, "embedding");
+    if (request?.modelRef?.provider === "local") {
+      if (!local) return null;
+      return this._embedLocalTexts(
+        local.ref,
+        request.texts,
+        request.inputType,
+        request.signal,
+        request.inputType === "query" ? "interactive" : "batch",
+      );
+    }
     const resolver = new ModelOperationResolver(
       this._modelOperationResolverDeps(() => request?.modelRef || null),
     );
@@ -2535,6 +2627,17 @@ export class LingxiEngine {
     const agent = this._memoryEmbeddingAgent(agentId);
     const ref = agent?.memoryEmbeddingModelRef || null;
     if (!ref) return { status: "unavailable", reason: "no_model" };
+    if (ref.provider === "local") {
+      const local = this._resolveInstalledLocalModelRef(ref, "embedding");
+      if (!local) return { status: "unavailable", reason: "unresolvable" };
+      return {
+        status: "ok",
+        ref,
+        localRef: local.ref,
+        execution: null,
+        modelKey: localModelKey(local.ref),
+      };
+    }
     const resolver = new ModelOperationResolver(this._modelOperationResolverDeps(() => ref));
     let execution = null;
     try {
@@ -2549,9 +2652,28 @@ export class LingxiEngine {
     return {
       status: "ok",
       ref,
+      localRef: null,
       execution,
       modelKey: factEmbeddingModelKey(ref, execution.model?.operationProtocol || ""),
     };
+  }
+
+  async _embedMemoryTexts(resolved, texts, inputType, signal = undefined) {
+    if (resolved.localRef) {
+      return this._embedLocalTexts(resolved.localRef, texts, inputType, signal, inputType === "query" ? "interactive" : "batch");
+    }
+    const client = new EmbeddingClient({
+      resolveOperationFresh: async () => resolved.execution,
+      getUsageLedger: () => this._usageLedger,
+    });
+    return client.embed({
+      texts,
+      timeoutMs: inputType === "query" ? 15_000 : 300_000,
+      dimensions: resolved.execution.model?.dimensions ?? undefined,
+      inputType,
+      signal,
+      usageContext: this._memoryOperationUsageContext(inputType === "query" ? "search_memory" : "fact_backfill", resolved.agentId),
+    });
   }
 
   /**
@@ -2566,25 +2688,16 @@ export class LingxiEngine {
     }
     let response;
     try {
-      const client = new EmbeddingClient({
-        resolveOperationFresh: async () => resolved.execution,
-        getUsageLedger: () => this._usageLedger,
-      });
-      response = await client.embed({
-        texts: [String(query || "")],
-        timeoutMs: 15_000,
-        dimensions: resolved.execution.model?.dimensions ?? undefined,
-        inputType: "query",
-        usageContext: this._memoryOperationUsageContext("search_memory", agentId),
-      });
+      response = await this._embedMemoryTexts({ ...resolved, agentId }, [String(query || "")], "query");
     } catch (error) {
       if (error?.name === "TimeoutError" || error?.name === "AbortError" || /timeout/i.test(String(error?.message || ""))) {
         return { status: "timeout" };
       }
       throw error;
     }
-    const vector = Array.isArray(response?.embeddings?.[0])
-      ? response.embeddings[0]
+    const vector = Array.isArray(response?.vectors?.[0])
+      ? response.vectors[0]
+      : Array.isArray(response?.embeddings?.[0]) ? response.embeddings[0]
       : Array.isArray(response?.[0]) ? response[0] : null;
     if (!vector) return { status: "timeout" };
     return { status: "ok", vector, modelKey: resolved.modelKey };
@@ -2605,17 +2718,13 @@ export class LingxiEngine {
     try {
       const resolved = await this._resolveMemoryEmbeddingExecution(agentId);
       if (resolved.status !== "ok") return { skipped: true, reason: resolved.reason };
-      const { modelKey, execution, ref } = resolved;
+      const { modelKey, ref } = resolved;
       const pendingFacts = factStore.factsNeedingEmbedding(modelKey, limit);
       if (pendingFacts.length === 0) {
         const coverage0 = factStore.embeddingCoverage(modelKey);
         return { done: true, embedded: 0, remaining: coverage0.total - coverage0.embedded };
       }
 
-      const client = new EmbeddingClient({
-        resolveOperationFresh: async () => execution,
-        getUsageLedger: () => this._usageLedger,
-      });
       const gateKey = `${ref.provider}/${ref.id}`;
       const gate = this._memoryEmbeddingGate
         || (this._memoryEmbeddingGate = new KnowledgeEmbeddingProviderGate());
@@ -2623,16 +2732,16 @@ export class LingxiEngine {
       for (let i = 0; i < pendingFacts.length; i += 32) {
         const batch = pendingFacts.slice(i, i + 32);
         const vectors = await gate.run(gateKey, async () => {
-          const response = await client.embed({
-            texts: batch.map((f) => (
+          const response = await this._embedMemoryTexts(
+            { ...resolved, agentId },
+            batch.map((f) => (
               `${f.fact}${f.tags && f.tags.length ? ` ${f.tags.join(" ")}` : ""}`
             )),
-            timeoutMs: 300_000,
-            dimensions: execution.model?.dimensions ?? undefined,
-            inputType: "document",
-            usageContext: this._memoryOperationUsageContext("fact_backfill", agentId),
-          });
-          return Array.isArray(response?.embeddings) ? response.embeddings : response;
+            "document",
+          );
+          return Array.isArray(response?.embeddings)
+            ? response.embeddings
+            : Array.isArray(response?.vectors) ? response.vectors : response;
         });
         const entries = batch
           .map((f, idx) => ({ f, vector: vectors?.[idx] }))
@@ -4061,6 +4170,7 @@ export class LingxiEngine {
       lifecycleTimeoutMs: undefined,
       logSink: (entry) => this._pluginDevService?.recordLog(entry),
       runtimeContext: this.getRuntimeContext(),
+      documentExtract: (input) => this.extractDocument(input),
     });
     const allowedPluginDevSourceRoots = [
       pluginDevSourcesDir,

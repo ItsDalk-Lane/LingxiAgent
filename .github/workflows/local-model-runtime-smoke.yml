@@ -1,0 +1,54 @@
+name: local-model-runtime-smoke
+# 组装各平台本地推理运行时并真实冒烟（拉起 sidecar 各跑一次推理）。
+# 手动触发或每周一凌晨跑一次；GPU 后端包（cuda 等）只组装不冒烟（CI 无 GPU，
+# 真实可用性由应用内的后端探测在用户机器上按需验证）。
+on:
+  workflow_dispatch:
+    inputs:
+      skip_tts:
+        description: '跳过 TTS 冒烟（3.5GB 模型下载，较快验证时勾选）'
+        type: boolean
+        default: false
+  schedule:
+    - cron: '0 19 * * 0' # 每周一 03:00 UTC
+
+concurrency:
+  group: local-model-runtime-smoke-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  smoke:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            skip_tts: false
+          - os: windows-latest
+            skip_tts: false
+          - os: macos-14
+            skip_tts: true # darwin 已在本机完成 metal 全链验证，CI 只跑 embed 省 3.5GB 下载
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - name: npm ci
+        run: npm ci
+      - name: assemble runtimes
+        run: node scripts/local-models/build-runtimes.mjs --out dist/local-runtimes
+      - name: smoke embed
+        run: node scripts/local-models/smoke-runtimes.mjs --runtime-root dist/local-runtimes --gguf-embed https://huggingface.co/Qwen/Qwen3-Embedding-0.6B-GGUF/resolve/main/Qwen3-Embedding-0.6B-Q8_0.gguf --skip-tts
+      - name: smoke tts
+        if: ${{ matrix.skip_tts == false && inputs.skip_tts != true }}
+        run: node scripts/local-models/smoke-runtimes.mjs --runtime-root dist/local-runtimes --gguf-embed https://huggingface.co/Qwen/Qwen3-Embedding-0.6B-GGUF/resolve/main/Qwen3-Embedding-0.6B-Q8_0.gguf --gguf-tts https://huggingface.co/audio-cpp/audio.cpp-gguf/resolve/main/IndexTTS2.5-GGUF/index-tts2_5-q8_0.gguf
+      - name: upload runtime manifests
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: local-runtimes-${{ matrix.os }}
+          path: dist/local-runtimes/**/runtime.json
+          if-no-files-found: warn

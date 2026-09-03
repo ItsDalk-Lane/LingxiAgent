@@ -6039,6 +6039,10 @@ a.about-link:hover {
     background: rgba(var(--accent-rgb), 0.12);
 }
 
+.pin-add-btn:disabled {
+    opacity: 0.45;
+}
+
 /* ========================================
    Experience 经验分类列表
    ======================================== */
@@ -9671,4 +9675,12 @@ a.about-link:hover {
 
 .tenets-input-full {
     max-width: 100%;
+}
+
+/* 优先级下拉自带 settings-input 的 width:100%，会把同行 flex:1 的
+   输入框基准空间吃光（输入框塌成一条缝）；改回内容宽度并锁死不缩。 */
+.tenets-priority-select {
+    width: auto;
+    flex: 0 0 auto;
+    min-width: 96px;
 }

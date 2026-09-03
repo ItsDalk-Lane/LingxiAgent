@@ -7,6 +7,7 @@ const TEXT_EXTS = new Set([".txt", ".md", ".markdown", ".csv", ".tsv", ".html", 
 const DOCX_EXTS = new Set([".docx"]);
 const XLSX_EXTS = new Set([".xlsx", ".xlsm"]);
 const PDF_EXTS = new Set([".pdf"]);
+const IMAGE_EXTS = new Set([".png", ".jpg", ".jpeg", ".webp", ".tif", ".tiff"]);
 const DEFAULT_MAX_CHARS = 20000;
 const DEFAULT_SHEET_LIMIT = 8;
 const DEFAULT_ROW_LIMIT = 200;
@@ -187,7 +188,33 @@ export async function readOfficeDocument(input: any = {}, options: any = {}) {
     if (outputFormat === "html" || outputFormat === "json") {
       throw new Error("pdf HTML/JSON output is not supported; use markdown or text");
     }
-    result = await readPdfDocument(filePath, { ...input, outputFormat, maxChars });
+    try {
+      result = await readPdfDocument(filePath, { ...input, outputFormat, maxChars });
+    } catch (error) {
+      if (input.ocr === false || typeof options.documentExtract !== "function" || !/scan|image[- ]only|ocr|no extractable text/i.test(String((error as Error)?.message || error))) {
+        throw error;
+      }
+      result = officeResultFromExtract(await options.documentExtract({
+        filePath,
+        filename: path.basename(filePath),
+        ocrModelId: input.ocrModelId,
+        ocrLanguage: input.ocrLanguage,
+        ocrMaxPages: input.maxPages,
+        ocrMaxPixelsPerPage: input.ocrMaxPixelsPerPage,
+        signal: options.signal,
+      }));
+    }
+  } else if (IMAGE_EXTS.has(ext)) {
+    if (input.ocr === false || typeof options.documentExtract !== "function") {
+      throw new Error("image OCR is unavailable; enable OCR with an installed local OCR model");
+    }
+    result = officeResultFromExtract(await options.documentExtract({
+      filePath,
+      filename: path.basename(filePath),
+      ocrModelId: input.ocrModelId,
+      ocrLanguage: input.ocrLanguage,
+      signal: options.signal,
+    }));
   } else if (TEXT_EXTS.has(ext) || !ext) {
     if (outputFormat === "html" || outputFormat === "json" || outputFormat === "markdown") {
       throw new Error(`${ext || "text"} HTML/JSON/Markdown output is not supported; use text`);
@@ -210,5 +237,18 @@ export async function readOfficeDocument(input: any = {}, options: any = {}) {
     filename: path.basename(filePath),
     ext,
     ...result,
+  };
+}
+
+function officeResultFromExtract(extracted) {
+  if (!extracted?.ok) {
+    throw new Error(`local OCR failed (${extracted?.reason || "unknown"}): ${extracted?.message || "no detail"}`);
+  }
+  return {
+    kind: "ocr",
+    format: "markdown",
+    content: extracted.markdown,
+    warnings: extracted.warnings || [],
+    truncated: false,
   };
 }

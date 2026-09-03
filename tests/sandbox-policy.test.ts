@@ -48,6 +48,41 @@ describe("sandbox workspace roots", () => {
     expect(guard.check(path.join(sibling, "secret.md"), "stage").allowed).toBe(false);
   });
 
+  it("denials distinguish sandbox write scope from the session permission mode and name a cause", () => {
+    const agentDir = path.join(tempRoot, "agents", "hana");
+    const lingxiHome = path.join(tempRoot, "home");
+    const workspace = path.join(tempRoot, "project");
+    const external = path.join(tempRoot, "private");
+    for (const dir of [agentDir, lingxiHome, workspace, external]) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+    const externalFile = path.join(external, "clip.mp4");
+    fs.writeFileSync(externalFile, "x", "utf-8");
+    const blockedAuth = path.join(lingxiHome, "auth.json");
+    fs.writeFileSync(blockedAuth, "{}", "utf-8");
+
+    const guard = new PathGuard(deriveSandboxPolicy({
+      agentDir,
+      lingxiHome,
+      workspace,
+      workspaceFolders: [],
+      mode: "standard",
+    }));
+
+    const staged = guard.check(externalFile, "stage");
+    expect(staged.allowed).toBe(false);
+    expect(staged.level).toBe(AccessLevel.READ_ONLY);
+    expect(staged.cause).toBe("outside_write_scope");
+    expect(staged.reason).toContain(externalFile);
+    expect(staged.reason).toContain("沙盒可写范围");
+    expect(staged.reason).toContain("会话权限模式无关");
+
+    const blockedRead = guard.check(blockedAuth, "read");
+    expect(blockedRead.allowed).toBe(false);
+    expect(blockedRead.cause).toBe("blocked");
+    expect(blockedRead.reason).toContain("禁止访问");
+  });
+
   it("lets agents read session files but blocks writing runtime copies", () => {
     const agentDir = path.join(tempRoot, "agents", "hana");
     const lingxiHome = path.join(tempRoot, "home");

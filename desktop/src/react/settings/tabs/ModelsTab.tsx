@@ -5,6 +5,7 @@ import { SettingsSection } from '../components/SettingsSection';
 import { AuxiliaryModelsSection } from './providers/AuxiliaryModelsSection';
 import { MediaGlobalDefaultsSection } from './models/MediaGlobalDefaultsSection';
 import styles from '../Settings.module.css';
+import { LocalModelsSection } from './local-models/LocalModelsSection';
 
 export function ModelsTab() {
   const settingsConfig = useSettingsStore(s => s.settingsConfig);
@@ -19,6 +20,9 @@ export function ModelsTab() {
         <AuxiliaryModelsSection providers={providers as Record<string, { models?: string[]; base_url?: string }>} />
       </SettingsSection>
       <MediaGlobalDefaultsSection />
+      <SettingsSection title={t('settings.localModels.title')} description={t('settings.localModels.description')}>
+        <LocalModelsSection />
+      </SettingsSection>
     </div>
   );
 }

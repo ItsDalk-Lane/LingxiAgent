@@ -66,6 +66,8 @@ const PRE_REFACTOR_MOUNT_CALLS = Object.freeze([
   '"/api" :: createInputDraftsRoute',
   // Added after the split: the Notebook-first Knowledge owner surface.
   '"/api" :: createKnowledgeRoute',
+  // Added after the split: local-owner-only model files and runtime management.
+  '"/api" :: createLocalModelsRoute',
   // Added after the split: the MCP surface used to reach the app through the
   // generic plugin route proxy, so it had no factory of its own here.
   '"/api" :: createMcpRoute',

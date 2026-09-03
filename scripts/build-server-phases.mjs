@@ -24,6 +24,7 @@ import { pathToFileURL } from "url";
 import ts from "typescript";
 import {
   buildAnydocRuntimeSmokeScript,
+  buildCanvasRuntimeSmokeScript,
   buildBetterSqliteRuntimeSmokeScript,
   buildJiebaRuntimeSmokeScript,
   buildExternalPackage,
@@ -632,6 +633,18 @@ export async function pruneServerNodeModulesViaNft({
   if (externalPackageNames.includes("@firecrawl/anydoc")) {
     const smokeScript = path.join(outDir, ".anydoc-smoke.mjs");
     fs.writeFileSync(smokeScript, buildAnydocRuntimeSmokeScript());
+    try {
+      runWithTargetNode(path.basename(smokeScript));
+    } finally {
+      fs.rmSync(smokeScript, { force: true });
+    }
+  }
+
+  // 扫描 PDF 的 OCR 页面渲染依赖原生画布；只验证包存在还不够，必须在目标 Node 下
+  // 真正创建画布并编码一张 PNG，缺原生绑定时让生产构建直接失败。
+  if (externalPackageNames.includes("@napi-rs/canvas")) {
+    const smokeScript = path.join(outDir, ".canvas-smoke.mjs");
+    fs.writeFileSync(smokeScript, buildCanvasRuntimeSmokeScript());
     try {
       runWithTargetNode(path.basename(smokeScript));
     } finally {

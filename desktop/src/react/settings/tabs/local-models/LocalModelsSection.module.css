@@ -1,0 +1,358 @@
+.root {
+    display: grid;
+    gap: var(--space-16);
+}
+
+/* ── 工具行：操作按钮 + 安装计数 ── */
+.toolbar {
+    display: flex;
+    align-items: center;
+    gap: var(--space-8);
+    flex-wrap: wrap;
+    padding: var(--space-4) var(--space-16) 0;
+}
+
+.toolbarCount {
+    margin-left: auto;
+    font-size: var(--fs-caption);
+    color: var(--text-muted);
+}
+
+/* ── 提示 / 错误 ── */
+.notice {
+    margin: 0 var(--space-16);
+    padding: var(--space-8) var(--space-12);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    color: var(--text-muted);
+    font-size: var(--fs-caption);
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+}
+
+.root > .error {
+    margin: 0 var(--space-16);
+}
+
+.error {
+    color: var(--danger, #b56b66);
+    font-size: var(--fs-caption);
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+}
+
+.errorLine {
+    margin: 0 var(--space-16);
+    color: var(--danger, #b56b66);
+    font-size: var(--fs-caption);
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+}
+
+.metaLine {
+    margin: 0 var(--space-16);
+    font-family: var(--font-mono, monospace);
+    font-size: var(--fs-caption);
+    color: var(--text-muted);
+    overflow-wrap: anywhere;
+}
+
+.noteLine {
+    margin: 0 var(--space-16);
+    color: var(--text-muted);
+    font-size: var(--fs-hint);
+    line-height: 1.5;
+}
+
+/* ── 配置分组：组标题 + SettingsRow 行 ── */
+.config {
+    display: block;
+}
+
+.groupTitle {
+    margin: var(--space-16) 0 0;
+    padding: var(--space-4) var(--space-16) var(--space-8);
+    font-size: var(--fs-hint);
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+}
+
+.config > .groupTitle:first-child {
+    margin-top: 0;
+    padding-top: 0;
+}
+
+.groups {
+    display: grid;
+    gap: var(--space-16);
+}
+
+.group {
+    display: grid;
+}
+
+.group > .groupTitle {
+    margin: 0;
+}
+
+/* ── 行内控件：select / input 套用 settings-input 皮肤 ── */
+.selectWrap {
+    position: relative;
+    display: inline-flex;
+    width: 160px;
+}
+
+.select {
+    width: 100%;
+    appearance: none;
+    padding-right: var(--space-24);
+}
+
+.selectWrap > .select {
+    min-width: 0;
+}
+
+.selectChevron {
+    position: absolute;
+    right: var(--space-10);
+    width: 14px;
+    height: 14px;
+    color: var(--text-muted);
+    pointer-events: none;
+}
+
+.selectBackend {
+    width: 150px;
+}
+
+.selectWide {
+    width: 240px;
+}
+
+.selectQuant {
+    width: 150px;
+}
+
+.selectFull {
+    width: 100%;
+}
+
+.input {
+    width: 130px;
+}
+
+.inputWide {
+    width: 240px;
+}
+
+/* ── 拖入导入区 ── */
+.dropZone {
+    margin: 0 var(--space-16);
+    padding: var(--space-24);
+    border: 1px dashed var(--border);
+    border-radius: var(--radius-md);
+    text-align: center;
+    color: var(--text-muted);
+    font-size: var(--fs-ui);
+    transition: border-color var(--duration-fast) var(--ease-out), background-color var(--duration-fast) var(--ease-out);
+}
+
+.dropZoneActive {
+    border-color: var(--accent);
+    background-color: var(--overlay-subtle, rgba(127, 127, 127, 0.08));
+    color: var(--accent);
+}
+
+/* ── 资源状态瓦片 ── */
+.statGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: var(--space-8);
+    margin: 0 var(--space-16);
+}
+
+.statTile {
+    padding: var(--space-10) var(--space-12);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: var(--overlay-subtle, rgba(127, 127, 127, 0.04));
+    font-size: var(--fs-ui);
+    overflow-wrap: anywhere;
+}
+
+/* ── 下载任务 ── */
+.download {
+    display: grid;
+    gap: var(--space-8);
+    margin: 0 var(--space-16);
+    padding: var(--space-10) var(--space-12);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+}
+
+.downloadHead {
+    display: flex;
+    align-items: center;
+    gap: var(--space-8);
+}
+
+.downloadName {
+    font-size: var(--fs-ui);
+    font-weight: 500;
+    overflow-wrap: anywhere;
+}
+
+.downloadActions {
+    display: flex;
+    gap: var(--space-8);
+    margin-left: auto;
+    flex-shrink: 0;
+}
+
+.downloadMeta {
+    display: flex;
+    gap: var(--space-12);
+    align-items: center;
+    flex-wrap: wrap;
+    font-size: var(--fs-caption);
+    color: var(--text-muted);
+}
+
+.progress {
+    width: 100%;
+    height: 6px;
+    appearance: none;
+    border: none;
+    overflow: hidden;
+}
+
+.progress::-webkit-progress-bar {
+    background: var(--overlay-subtle, rgba(127, 127, 127, 0.15));
+    border-radius: 999px;
+}
+
+.progress::-webkit-progress-value {
+    background: var(--accent, #6b8afd);
+    border-radius: 999px;
+}
+
+/* ── 模型目录 ── */
+.model {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-16);
+    padding: var(--space-10) var(--space-16);
+}
+
+.model + .model {
+    border-top: 1px solid var(--border);
+}
+
+.modelInfo {
+    display: grid;
+    gap: var(--space-4);
+    min-width: 0;
+}
+
+.modelName {
+    font-size: var(--fs-ui);
+    font-weight: 600;
+    overflow-wrap: anywhere;
+}
+
+.modelMeta {
+    font-size: var(--fs-caption);
+    color: var(--text-muted);
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+}
+
+.status {
+    display: inline-flex;
+    align-items: center;
+    padding: var(--space-2) var(--space-8);
+    border-radius: 999px;
+    background: var(--overlay-subtle, rgba(127, 127, 127, 0.14));
+    color: var(--text-muted);
+    font-size: var(--fs-caption);
+}
+
+.statusReady {
+    color: var(--accent, #6b8afd);
+}
+
+.modelActions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-8);
+    flex-shrink: 0;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+/* ── 对话卡（手动导入确认 / 许可证） ── */
+.dialog {
+    display: grid;
+    gap: var(--space-8);
+    margin: 0 var(--space-16);
+    padding: var(--space-16);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: var(--overlay-subtle, rgba(127, 127, 127, 0.04));
+}
+
+.dialog .error {
+    margin: 0;
+}
+
+.dialogTitle {
+    font-size: var(--fs-ui);
+    font-weight: 600;
+    color: var(--text);
+}
+
+.dialogHint {
+    font-size: var(--fs-caption);
+    color: var(--text-muted);
+    line-height: 1.5;
+}
+
+.dialogActions {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--space-8);
+    margin-top: var(--space-4);
+}
+
+.licenseText {
+    max-height: 320px;
+    margin: 0;
+    padding: var(--space-10);
+    overflow: auto;
+    white-space: pre-wrap;
+    word-break: break-word;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    font-family: var(--font-mono, monospace);
+    font-size: var(--fs-caption);
+    line-height: 1.5;
+}
+
+@media (max-width: 620px) {
+    .model {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .modelActions {
+        justify-content: flex-start;
+    }
+
+    .selectWide,
+    .inputWide {
+        width: 100%;
+    }
+}
