@@ -10,7 +10,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = 33543b8c159d4d9f53d40a6f7cdb74692f4c3c36  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-09-03 本地推理全链路批量收口)
+VERIFIED_SOURCE_SHA   = 66a141557311b694f98c81ae5ef12bf9909e5d75  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-09-03 本地推理全链路批量收口)
 工作分支              = feature/upstream-sync-0.447.4
 ```
 
