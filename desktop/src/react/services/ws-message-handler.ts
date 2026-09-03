@@ -1387,7 +1387,19 @@ export function handleServerMessage(msg: any): void {
       const id = nonEmptyString(msg.id);
       if (!id) { console.warn('[ws] knowledge_trace missing id, skipping'); break; }
       const phaseRaw = msg.phase === 'done' || msg.phase === 'failed' ? msg.phase : 'start';
-      if (msg.kind === 'think') {
+      if (msg.detail === 'fast_local') {
+        const t = translatorT();
+        feedKnowledgeToolCard(sp, phaseRaw === 'start'
+          ? { type: 'tool_start', id: `kt-${id}`, name: 'knowledge_local_search' }
+          : { type: 'tool_end', id: `kt-${id}`, success: phaseRaw !== 'failed',
+            resultNote: phaseRaw === 'failed' ? t('chat.knowledgeTraceFailed')
+              : t('chat.knowledgeLocalEvidenceFound', {
+                n: String(msg.hits ?? 0),
+                ms: typeof msg.elapsedMs === 'number' && Number.isFinite(msg.elapsedMs)
+                  ? String(Math.round(msg.elapsedMs)) : '—',
+              }),
+          });
+      } else if (msg.kind === 'think') {
         feedKnowledgeThinkCard(sp, `kt-${id}`, phaseRaw);
       } else if (msg.detail === 'answer') {
         // 检索收口：阅读卡收尾 + 「正在生成回答」卡盖住主模型预填充等待。

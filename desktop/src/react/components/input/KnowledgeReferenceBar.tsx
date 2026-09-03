@@ -70,6 +70,7 @@ export const KnowledgeReferenceBar = memo(function KnowledgeReferenceBar({ sessi
             type="button"
             className={`${styles['knowledge-ref-mode-btn']}${refs.mode === mode ? ` ${styles.active}` : ''}`}
             title={t(mode === 'fast' ? 'input.knowledgeModeFastHint' : 'input.knowledgeModeDetailedHint')}
+            aria-description={t(mode === 'fast' ? 'input.knowledgeModeFastHint' : 'input.knowledgeModeDetailedHint')}
             aria-pressed={refs.mode === mode}
             onClick={() => setKnowledgeReferenceMode(sessionKey, mode)}
           >

@@ -168,7 +168,8 @@ const StandardToolIndicator = memo(function StandardToolIndicator({ tool, agentN
   const detailTitle = detail.title || detail.href;
   const status = tool.status || (tool.done ? (tool.success ? 'succeeded' : 'failed') : 'running');
   // 失败的工具要说失败：此前这里只传 done/running，失败的读文件会显示"翻完了 ✗"
-  const label = getToolLabel(tool.name, phaseForStatus(status), agentName, tool.args);
+  const localResultLabel = tool.name === 'knowledge_local_search' && status === 'succeeded' ? tool.resultNote : null;
+  const label = localResultLabel || getToolLabel(tool.name, phaseForStatus(status), agentName, tool.args);
 
   // 如果 args 里有 tag 类型信息（如 agent 名）
   const tag = tool.args?.agentId as string | undefined;
@@ -212,7 +213,7 @@ const StandardToolIndicator = memo(function StandardToolIndicator({ tool, agentN
             <span className={styles.toolDetail} title={detailTitle}>{detail.text}</span>
           )
         )}
-        {tool.resultNote && (
+        {tool.resultNote && !localResultLabel && (
           <span className={styles.toolDetail}>{tool.resultNote}</span>
         )}
         {tool.error && (

@@ -167,7 +167,19 @@ async function resolveKnowledgeInjectionBlock(
     };
     switch (policy.path) {
       case "fast_local":
-        return await engine.buildFastKnowledgeContext(request);
+        engine.emitEvent?.({ type: "knowledge_trace", sessionPath, id: "fast-local", kind: "search",
+          phase: "start", detail: "fast_local" }, sessionPath);
+        try {
+          const result = await engine.buildFastKnowledgeContext(request);
+          engine.emitEvent?.({ type: "knowledge_trace", sessionPath, id: "fast-local", kind: "search",
+            phase: "done", detail: "fast_local", hits: result.stats.injectedChunks,
+            elapsedMs: result.stats.stageTimings?.totalMs }, sessionPath);
+          return result;
+        } catch (error) {
+          engine.emitEvent?.({ type: "knowledge_trace", sessionPath, id: "fast-local", kind: "search",
+            phase: "failed", detail: "fast_local" }, sessionPath);
+          throw error;
+        }
       case "detailed_research":
         // P0 保留详细模式现有行为，P2 再切换调查运行时。
         return await engine.buildKnowledgeContextInjection({ ...request, budgetTokens });

@@ -85,6 +85,7 @@ export interface KnowledgeDegradedScope {
  */
 export interface KnowledgeRetrievalStats {
   mode: KnowledgeReferenceMode;
+  /** 缺省表示旧消息；展示层不得把旧快速模式统计冒充纯本地检索。 */
   executionPath?: "fast_local" | "detailed_research";
   deadlineMs?: number;
   deadlineExceeded?: boolean;

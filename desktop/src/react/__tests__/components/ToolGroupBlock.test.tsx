@@ -40,6 +40,13 @@ describe('ToolGroupBlock', () => {
     expect(screen.queryByText('✓')).not.toBeInTheDocument();
   });
 
+  it('本地检索完成后只显示一份证据数量与耗时', () => {
+    render(<ToolGroupBlock collapsed={false} tools={[{ id: 'local', name: 'knowledge_local_search',
+      done: true, success: true, status: 'succeeded', resultNote: '已找到 3 条证据 · 28ms' }]} />);
+    expect(screen.getAllByText('已找到 3 条证据 · 28ms')).toHaveLength(1);
+    expect(screen.queryByText('tool.knowledge_local_search.done')).not.toBeInTheDocument();
+  });
+
   it('shows the full bash command in the hover title when the visible detail is truncated', () => {
     const command = 'rm -rf /Users/jason/.claude/plugins/marketplaces/temp_*';
 

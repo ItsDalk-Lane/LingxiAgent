@@ -187,6 +187,18 @@ describe("chat route knowledgeRefs handling", () => {
     });
   });
 
+  it("本地检索证据数和耗时完整广播，缺少耗时不补零", () => {
+    const { hub, ws } = setup();
+    const listener = hub.subscribe.mock.calls[0][0];
+    listener({ type: "knowledge_trace", id: "fast-local", kind: "search", phase: "done",
+      detail: "fast_local", hits: 3, elapsedMs: 28.4 }, "/sessions/test.jsonl");
+    listener({ type: "knowledge_trace", id: "fast-local-failed", phase: "failed", detail: "fast_local" }, "/sessions/test.jsonl");
+    const sent = ws.send.mock.calls.map(call => JSON.parse(call[0] as string));
+    expect(sent).toContainEqual({ type: "knowledge_trace", sessionPath: "/sessions/test.jsonl", id: "fast-local",
+      kind: "search", phase: "done", detail: "fast_local", hits: 3, elapsedMs: 28.4 });
+    expect(sent.find(event => event.id === "fast-local-failed")).not.toHaveProperty("elapsedMs");
+  });
+
   it("knowledge_supplement_search 引擎事件广播为同名 WS 消息（查询行 + 轮序）", async () => {
     const { hub, ws } = setup();
     const listener = hub.subscribe.mock.calls[0][0];

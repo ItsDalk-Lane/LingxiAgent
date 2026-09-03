@@ -464,6 +464,9 @@
     "knowledgeRetrievalSupplementTitle": "Supplemental searches issued by the model during the rolling read",
     "knowledgeTraceResults": "{n} search results",
     "knowledgeTraceFailed": "Search failed",
+    "knowledgeLocalEvidenceFound": "Found {n} evidence spans · {ms}ms",
+    "knowledgeFastSummary": "Fast search · {n} evidence spans · {ms}ms",
+    "knowledgeFastDeadlineExceeded": "Target time exceeded",
     "knowledgeMetaModeFast": "Fast mode",
     "knowledgeMetaModeDetailed": "Detailed mode",
     "feedbackUp": "Helpful (saved to experience)",
@@ -603,8 +606,8 @@
     },
     "knowledgeModeFast": "Fast",
     "knowledgeModeDetailed": "Detailed",
-    "knowledgeModeFastHint": "Answer as fast as possible: top high-confidence evidence only, no decomposition or rolling read",
-    "knowledgeModeDetailedHint": "Answer as thoroughly as possible: question decomposition and multi-way recall, with batched reading when evidence overflows"
+    "knowledgeModeFastHint": "Fast local-only search; does not wait for remote embeddings, reranking, or multi-round research.",
+    "knowledgeModeDetailedHint": "Generates a detailed answer after multiple rounds of search, reading, and evidence checks."
   },
   "agentReview": {
     "running": "Reviewing this Session",
@@ -1197,6 +1200,11 @@
       "running": "🧠 Decomposing the question",
       "done": "🧠 Decomposed the question",
       "failed": "🧠 Failed to decompose"
+    },
+    "knowledge_local_search": {
+      "running": "Searching the knowledge base locally",
+      "done": "Local search completed",
+      "failed": "Local search failed"
     },
     "knowledge_search": {
       "running": "🔍 Searching the knowledge base",

@@ -1821,6 +1821,8 @@ export function createChatRoute(engine: any, hub: any, {
         ...(typeof event.query === "string" && event.query ? { query: event.query } : {}),
         ...(Number.isFinite(Number(event.hits)) ? { hits: Number(event.hits) } : {}),
         ...(typeof event.detail === "string" && event.detail ? { detail: event.detail } : {}),
+        ...(typeof event.elapsedMs === "number" && Number.isFinite(event.elapsedMs) && event.elapsedMs >= 0
+          ? { elapsedMs: event.elapsedMs } : {}),
       });
     } else if (event.type === "session_status") {
       // session_status 只回答「Session 忙不忙」（任务书 §九/§十：status 与 Run 正交）。

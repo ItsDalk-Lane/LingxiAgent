@@ -39,7 +39,7 @@ const LABELED_TOOL_NAMES = [
   'session_folders', 'subagent', 'subagent_reply', 'subagent_close', 'workflow',
   'check_pending_tasks', 'loop_control', 'current_status', 'session', 'knowledge_read',
   'knowledge_think', 'knowledge_search', 'knowledge_read_part', 'knowledge_supplement',
-  'knowledge_answer',
+  'knowledge_answer', 'knowledge_local_search',
   'knowledge_outline', 'knowledge_grep', 'knowledge_manage',
   'hana_card_guide', 'show_card',
   // Hub 频道
@@ -102,6 +102,18 @@ function scanRegisteredToolNames(): Set<string> {
 
 describe('工具行文案对账', () => {
   for (const locale of locales) {
+    it(`${locale}.json 本地快速检索提示、结果与时限文案完整`, () => {
+      const data = loadLocale(locale);
+      for (const key of ['knowledgeModeFastHint', 'knowledgeModeDetailedHint']) {
+        expect(data.input[key]).toBeTypeOf('string');
+        expect(data.input[key].trim()).not.toBe('');
+      }
+      for (const key of ['knowledgeLocalEvidenceFound', 'knowledgeFastSummary']) {
+        expect(data.chat[key]).toContain('{n}');
+        expect(data.chat[key]).toContain('{ms}');
+      }
+      expect(data.chat.knowledgeFastDeadlineExceeded.trim()).not.toBe('');
+    });
     it(`${locale}.json 为每个已登记工具提供三相位文案`, () => {
       const tool = loadLocale(locale).tool ?? {};
       const missing: string[] = [];

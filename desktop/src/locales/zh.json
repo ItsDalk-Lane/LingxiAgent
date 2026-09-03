@@ -464,6 +464,9 @@
     "knowledgeRetrievalSupplementTitle": "滚动注入循环中模型自主发起的补充检索",
     "knowledgeTraceResults": "{n} 个搜索结果",
     "knowledgeTraceFailed": "检索失败",
+    "knowledgeLocalEvidenceFound": "已找到 {n} 条证据 · {ms}ms",
+    "knowledgeFastSummary": "快速检索 · {n} 条证据 · {ms}ms",
+    "knowledgeFastDeadlineExceeded": "已超出目标时限",
     "knowledgeMetaModeFast": "快速模式",
     "knowledgeMetaModeDetailed": "详细模式",
     "feedbackUp": "有帮助（记入经验库）",
@@ -604,8 +607,8 @@
     },
     "knowledgeModeFast": "快速",
     "knowledgeModeDetailed": "详细",
-    "knowledgeModeFastHint": "以最快速度回答：只取最相关的高命中证据，不做全量拆解与滚动阅读",
-    "knowledgeModeDetailedHint": "尽量详尽：拆解问题、多路召回，证据过多时分批阅读后综合回答"
+    "knowledgeModeFastHint": "纯本地快速检索；不等待远程嵌入、重排或多轮调查。",
+    "knowledgeModeDetailedHint": "进行多轮检索、阅读和证据核对后生成详细回答。"
   },
   "agentReview": {
     "running": "正在审阅当前对话",
@@ -1198,6 +1201,11 @@
       "running": "🧠 正在拆解问题",
       "done": "🧠 拆解了问题",
       "failed": "🧠 问题没拆解出来"
+    },
+    "knowledge_local_search": {
+      "running": "正在本地检索知识库",
+      "done": "已完成本地检索",
+      "failed": "本地检索失败"
     },
     "knowledge_search": {
       "running": "🔍 正在检索知识库",

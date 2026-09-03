@@ -56,7 +56,7 @@ export const BUILTIN_TOOL_NAMES: ReadonlySet<string> = new Set([
   'check_pending_tasks', 'loop_control', 'current_status', 'session', 'knowledge_read',
   'knowledge_outline', 'knowledge_grep', 'knowledge_manage',
   'knowledge_think', 'knowledge_search', 'knowledge_read_part', 'knowledge_supplement',
-  'knowledge_answer',
+  'knowledge_answer', 'knowledge_local_search',
   'hana_card_guide', 'show_card',
   'channel_read_context', 'channel_reply', 'channel_pass',
   'create_artifact', 'dm',

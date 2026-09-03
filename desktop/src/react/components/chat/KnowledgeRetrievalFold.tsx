@@ -42,6 +42,7 @@ export const KnowledgeRetrievalFold = memo(function KnowledgeRetrievalFold({ ret
   const showMore = useCallback(() => setShowAll(true), []);
 
   const unavailable = !!retrieval.unavailableReason;
+  const localFast = retrieval.executionPath === 'fast_local';
   const results = Array.isArray(retrieval.results)
     ? retrieval.results.filter(isRetrievalResult)
     : [];
@@ -50,7 +51,11 @@ export const KnowledgeRetrievalFold = memo(function KnowledgeRetrievalFold({ ret
   const expandable = !unavailable && (results.length > 0 || supplementalQueries.length > 0);
   const summary = unavailable
     ? t('chat.knowledgeRetrievalUnavailable')
-    : t('chat.knowledgeRetrievalSearched', { n: retrieval.injectedChunks });
+    : localFast
+      ? t('chat.knowledgeFastSummary', { n: retrieval.injectedChunks,
+        ms: typeof retrieval.stageTimings?.totalMs === 'number' && Number.isFinite(retrieval.stageTimings.totalMs)
+          ? Math.round(retrieval.stageTimings.totalMs) : '—' })
+      : t('chat.knowledgeRetrievalSearched', { n: retrieval.injectedChunks });
   const preview = showAll ? results : results.slice(0, KNOWLEDGE_RESULTS_PREVIEW_COUNT);
   const hiddenCount = results.length - preview.length;
 
@@ -62,6 +67,9 @@ export const KnowledgeRetrievalFold = memo(function KnowledgeRetrievalFold({ ret
       >
         <span className={styles.knowledgeRetrievalIcon} aria-hidden="true">📚</span>
         <span className={styles.toolGroupTitle}>{summary}</span>
+        {localFast && retrieval.deadlineExceeded && !unavailable && (
+          <span className={styles.knowledgeRetrievalBadge}>{t('chat.knowledgeFastDeadlineExceeded')}</span>
+        )}
         {rollup && !unavailable && (
           <span className={styles.knowledgeRetrievalBadge}>
             {t('chat.knowledgeRetrievalRolled', { parts: rollup.parts, rounds: rollup.rounds })}
@@ -72,7 +80,7 @@ export const KnowledgeRetrievalFold = memo(function KnowledgeRetrievalFold({ ret
             {t('chat.knowledgeRetrievalDistilled', { n: retrieval.distillBatches ?? 0 })}
           </span>
         )}
-        {retrieval.truncated && !unavailable && (
+        {retrieval.truncated && !localFast && !unavailable && (
           <span className={styles.knowledgeRetrievalBadge}>
             {t('chat.knowledgeRetrievalTruncated')}
           </span>

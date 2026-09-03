@@ -14,6 +14,8 @@ const sessionPath = '/session/knowledge-retrieval.jsonl';
 function t(key: string, vars?: Record<string, string | number>): string {
   const table: Record<string, string> = {
     'chat.knowledgeRetrievalSearched': '已搜索 {n} 个结果',
+    'chat.knowledgeFastSummary': '快速检索 · {n} 条证据 · {ms}ms',
+    'chat.knowledgeFastDeadlineExceeded': '已超出目标时限',
     'chat.knowledgeRetrievalTruncated': '超预算分片',
     'chat.knowledgeRetrievalUnavailable': '知识检索不可用',
     'chat.knowledgeRetrievalRowTitle': '{source} · 块 {chunk}',
@@ -112,6 +114,25 @@ describe('KnowledgeRetrievalFold（工具条样式检索步骤）', () => {
     render(<KnowledgeRetrievalFold retrieval={makeStats()} />);
     expect(screen.getByText('已搜索 2 个结果')).toBeInTheDocument();
     expect(screen.queryByText(/第一段内容/)).not.toBeInTheDocument();
+  });
+
+  it('纯本地快速结果显示证据数和耗时，超过目标时限时明确标注', () => {
+    render(<KnowledgeRetrievalFold retrieval={makeStats({ mode: 'fast', executionPath: 'fast_local',
+      deadlineExceeded: true, truncated: true, stageTimings: { totalMs: 1201.2 } })} />);
+    expect(screen.getByText('快速检索 · 2 条证据 · 1201ms')).toBeInTheDocument();
+    expect(screen.getByText('已超出目标时限')).toBeInTheDocument();
+    expect(screen.queryByText('超预算分片')).not.toBeInTheDocument();
+  });
+
+  it('旧快速消息没有新统计时保持原展示，不补造耗时', () => {
+    render(<KnowledgeRetrievalFold retrieval={makeStats({ mode: 'fast' })} />);
+    expect(screen.getByText('已搜索 2 个结果')).toBeInTheDocument();
+    expect(screen.queryByText(/快速检索/)).not.toBeInTheDocument();
+  });
+
+  it('新快速消息缺失耗时时明确留空，不冒充零耗时', () => {
+    render(<KnowledgeRetrievalFold retrieval={makeStats({ mode: 'fast', executionPath: 'fast_local' })} />);
+    expect(screen.getByText('快速检索 · 2 条证据 · —ms')).toBeInTheDocument();
   });
 
   it('点击展开后逐行显示 #编号 + 首行，行 title 悬浮 source · 块序号', async () => {

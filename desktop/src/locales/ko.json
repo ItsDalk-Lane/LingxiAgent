@@ -464,6 +464,9 @@
     "knowledgeRetrievalSupplementTitle": "롤링 읽기 중 모델이 자발적으로 실행한 보충 검색",
     "knowledgeTraceResults": "검색 결과 {n}건",
     "knowledgeTraceFailed": "검색 실패",
+    "knowledgeLocalEvidenceFound": "근거 {n}개 발견 · {ms}ms",
+    "knowledgeFastSummary": "빠른 검색 · 근거 {n}개 · {ms}ms",
+    "knowledgeFastDeadlineExceeded": "목표 시간 초과",
     "knowledgeMetaModeFast": "빠른 모드",
     "knowledgeMetaModeDetailed": "상세 모드",
     "feedbackUp": "도움이 됐어요(경험에 기록)",
@@ -604,8 +607,8 @@
     },
     "knowledgeModeFast": "빠름",
     "knowledgeModeDetailed": "상세",
-    "knowledgeModeFastHint": "가장 빠르게 답변: 관련도 높은 증거만 사용하며 분해나 순차 읽기를 하지 않습니다",
-    "knowledgeModeDetailedHint": "가능한 한 상세히 답변: 질문을 분해해 여러 방향에서 검색하고, 증거가 많으면 나눠 읽습니다"
+    "knowledgeModeFastHint": "로컬에서만 빠르게 검색하며 원격 임베딩, 재정렬 또는 여러 차례 조사를 기다리지 않습니다.",
+    "knowledgeModeDetailedHint": "여러 차례 검색, 읽기 및 근거 확인을 거쳐 상세한 답변을 생성합니다."
   },
   "agentReview": {
     "running": "이 Session을 검토하는 중",
@@ -1198,6 +1201,11 @@
       "running": "🧠 질문 분해 중",
       "done": "🧠 질문을 분해했습니다",
       "failed": "🧠 분해 실패"
+    },
+    "knowledge_local_search": {
+      "running": "지식 베이스를 로컬에서 검색 중",
+      "done": "로컬 검색 완료",
+      "failed": "로컬 검색 실패"
     },
     "knowledge_search": {
       "running": "🔍 지식 베이스 검색 중",
