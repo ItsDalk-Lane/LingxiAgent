@@ -10,7 +10,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = 93118b98323165bd395a202f30ecbba080f33957  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-09-03 本地推理全链路批量收口)
+VERIFIED_SOURCE_SHA   = e68f78fd259b25c93d5aaead267a4b805475aae3  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-09-03 本地推理全链路批量收口)
 工作分支              = feature/upstream-sync-0.447.4
 ```
 
@@ -171,6 +171,13 @@ seal 不是一次性终点，而是"当前被验证树"的游标；每次审计�
 
 - **2026-09-03 本地推理链路批量收口**（seal 275d82c7 → 33543b8c）：本地模型分发/
 - **2026-09-03 Windows 凭证迁移数据丢失修复**（seal 485fd70d → ）：PR #39 CI
+- **2026-09-03 运行时分发冒烟两连修**（seal  → ）：①冒烟工作流
+  补传全量运行时产物（此前仅 runtime.json 清单，分发需要二进制；PR #40）；②
+  windows 冒烟 TTS 超时——SidecarManager requestTimeoutMs 默认 2min，无 GPU
+  runner 首次合成（含惰性加载）必超，冒烟脚本经 createManager 放宽至 30min
+  上限（windows embed 已 PASS：载入 2760ms/infer 78ms；ubuntu 连续两轮全绿）。
+  seal 门禁红为 yml/脚本变更后的预期推进。复跑 node --check + 闭包（未触生产
+  源码图变化，基线字节一致）后推进。
   windows runner 抓到 legacy API key 迁移在 Windows 上失效（本机 mac 不复现）。
   TEMP-DEBUG 现场定位：model-sync 投影哨兵 hana-runtime-api-key:<id> 被迁移
   当作 models.json 投影真 key，优先级压过 auth.json legacy key——catalog 存
