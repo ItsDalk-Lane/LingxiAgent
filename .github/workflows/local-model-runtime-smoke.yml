@@ -52,3 +52,11 @@ jobs:
           name: local-runtimes-${{ matrix.os }}
           path: dist/local-runtimes/**/runtime.json
           if-no-files-found: warn
+      - name: upload full runtime packages
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: local-runtimes-full-${{ matrix.os }}
+          path: dist/local-runtimes/**
+          if-no-files-found: warn
+          retention-days: 7
