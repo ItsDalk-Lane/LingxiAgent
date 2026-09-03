@@ -76,6 +76,9 @@ jobs:
 
       - name: Typecheck
         run: npm run typecheck
+        # 新增 local-models 测试面后 tsc 在 CI runner 默认堆上 OOM（本机 96GB 不复现）。
+        env:
+          NODE_OPTIONS: --max-old-space-size=6144
 
       - name: Lint
         run: npm run lint

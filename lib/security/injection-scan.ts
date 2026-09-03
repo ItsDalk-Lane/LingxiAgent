@@ -21,7 +21,8 @@ export interface InjectionScanResult {
 
 export const UNTRUSTED_EXTERNAL_CONTENT_MARKER = "<<<UNTRUSTED_EXTERNAL_CONTENT>>>";
 
-const ZERO_WIDTH_RE = /[\u200B\u200C\u200D\uFEFF]/g;
+// ZWJ 在字符类里会触发 no-misleading-character-class，交替写法语义等价
+const ZERO_WIDTH_RE = /\u200B|\u200C|\u200D|\uFEFF/g;
 const HTML_COMMENT_RE = /<!--[\s\S]*?-->/g;
 
 const RULES: ReadonlyArray<{
