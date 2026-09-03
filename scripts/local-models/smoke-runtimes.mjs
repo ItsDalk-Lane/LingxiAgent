@@ -42,6 +42,7 @@ const { LargeSlot } = await jiti.import(path.join(repoRoot, 'lib/local-models/la
 const { DEFAULT_LOCAL_MODELS_CONFIG, resolveLargeResidentCapacity } = await jiti.import(path.join(repoRoot, 'lib/local-models/config.ts'));
 const { getAvailableMemoryMb } = await jiti.import(path.join(repoRoot, 'lib/local-models/runtime-service.ts'));
 const { LocalModelRegistry } = await jiti.import(path.join(repoRoot, 'lib/local-models/registry.ts'));
+const { SidecarManager } = await jiti.import(path.join(repoRoot, 'lib/local-models/sidecar-manager.ts'));
 const { localModelKey } = await jiti.import(path.join(repoRoot, 'lib/local-models/contracts.ts'));
 
 const work = keep ? await fsp.mkdtemp('smoke-') : await fsp.mkdtemp(path.join(path.resolve('dist'), 'smoke-'));
@@ -119,6 +120,8 @@ async function main() {
     logRoot: path.join(work, 'logs'),
     config,
     probeCache: createFileProbeCache(path.join(runtimeRoot, 'probe-cache.json')),
+    // 无 GPU 的 CI runner 上 TTS 首次合成（含惰性加载）可达数分钟，默认 2min 必超时。
+    createManager: (options) => new SidecarManager({ ...options, requestTimeoutMs: 30 * 60_000 }),
   });
   const capacity = resolveLargeResidentCapacity(config().maxLargeResident, 32 * 1024 * 1024 * 1024);
   const manager = new InstanceManager({
