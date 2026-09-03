@@ -170,6 +170,12 @@ AboutTab），因此最终源码树重新执行了 renderer build / package smok
 seal 不是一次性终点，而是"当前被验证树"的游标；每次审计期后的结构性收尾都需复跑验证并推进：
 
 - **2026-09-03 本地推理链路批量收口**（seal 275d82c7 → 33543b8c）：本地模型分发/
+- **2026-09-03 CI 首跑修复**（seal 33543b8c → 66a14155）：PR #39 首轮 CI 四平台
+  test 矩阵全红。两根因：①injection-scan 零宽正则字符类含 ZWJ 触发 eslint
+  no-misleading-character-class error（本地未跑 eslint 漏网）→ 改语义等价交替
+  写法；②新增 local-models 测试面后 tsc 在 CI runner 默认堆 OOM（exit 134）→
+  ci.yml/build.yml Typecheck 步骤 NODE_OPTIONS --max-old-space-size=6144。
+  复跑 injection-scan 16 用例 + 全量 npm test（exit 0）后推进。
   三平台运行时基建/治理增强批量提交（90 files，含 lib/local-models 子系统、HF 分发
   对接、build-runtimes/smoke/CI 工作流、语音链路前序累积）。复跑 typecheck x3（绿）+
   全量 npm test（exit 0，13073 passed / 7 skipped，82.75s）+ compute-cli-closure
