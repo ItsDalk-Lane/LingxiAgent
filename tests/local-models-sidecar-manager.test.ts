@@ -3,7 +3,7 @@ import os from "node:os";
 import path from "node:path";
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   buildSidecarEnvironment,
   SidecarManager,
@@ -167,7 +167,10 @@ describe("SidecarManager", () => {
     expect(ready.backend).toBe("cpu");
     expect(events.filter((event) => event.kind === "starting")).toHaveLength(2);
     expect(events.filter((event) => event.kind === "restart")).toHaveLength(1);
-    expect(fs.existsSync(path.join(root, "logs", "sidecar.log"))).toBe(true);
+    // 日志流落盘与重启事件是并发的：有界等待，不锁死实现时序。
+    await vi.waitFor(() => {
+      expect(fs.existsSync(path.join(root, "logs", "sidecar.log"))).toBe(true);
+    }, { timeout: 2_000 });
     await manager.stop();
   });
 
