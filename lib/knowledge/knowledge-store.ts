@@ -1944,6 +1944,36 @@ export class KnowledgeStore {
     return this.activeNotebook(studioId, notebookId);
   }
 
+  /** 查询只读当前绑定，一次关联读取，不扫描正文或重新计算分块配置。 */
+  getNotebookRetrievalProfileSnapshot(input: {
+    studioId: unknown;
+    notebookId: unknown;
+  }): {
+    notebookId: string;
+    notebookName: string;
+    chunkProfileHash: string | null;
+    embeddingModelRef: KnowledgeModelRef | null;
+    rerankModelRef: KnowledgeModelRef | null;
+  } {
+    const studioId = requiredString(input?.studioId, "studioId", 256);
+    const notebookId = requiredString(input?.notebookId, "notebookId", 128);
+    const row = this.db.prepare(`
+      SELECT n.id, n.name, cp.profile_hash, rp.embedding_model_ref, rp.rerank_model_ref
+      FROM notebooks n
+      LEFT JOIN retrieval_profiles rp ON rp.id = n.retrieval_profile_id
+      LEFT JOIN chunk_profiles cp ON cp.id = rp.chunk_profile_id
+      WHERE n.id = ? AND n.studio_id = ? AND n.deleted_at IS NULL
+    `).get(notebookId, studioId);
+    if (!row) throw new KnowledgeError("KNOWLEDGE_NOT_FOUND", "Notebook not found");
+    return {
+      notebookId: row.id,
+      notebookName: row.name,
+      chunkProfileHash: row.profile_hash ?? null,
+      embeddingModelRef: parseModelRefJson(row.embedding_model_ref, "retrieval profile embedding model ref"),
+      rerankModelRef: parseModelRefJson(row.rerank_model_ref, "retrieval profile rerank model ref"),
+    };
+  }
+
   renameNotebook(input: { studioId: unknown; notebookId: unknown; name: unknown }): KnowledgeNotebook {
     const studioId = requiredString(input?.studioId, "studioId", 256);
     const notebookId = requiredString(input?.notebookId, "notebookId", 128);

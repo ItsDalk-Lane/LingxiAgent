@@ -347,6 +347,34 @@ export class KnowledgeIndexStore {
     return row ? mapVariantRow(row) : null;
   }
 
+  /** 只读变体身份和 SQL 计数，避免把全部 chunk 搬进查询进程。 */
+  getReadyVariantMetadata(input: {
+    parseArtifactId: unknown;
+    chunkProfileHash: unknown;
+  }): {
+    id: string;
+    parseArtifactId: string;
+    chunkProfileHash: string;
+    blockFingerprint: string;
+    chunkCount: number;
+  } | null {
+    const artifactId = requiredId(input?.parseArtifactId, "parseArtifactId");
+    const profileHash = requiredChunkProfileHash(input?.chunkProfileHash);
+    const row = this.db.prepare(`
+      SELECT v.id, v.parse_artifact_id, v.chunk_profile_hash, v.block_fingerprint,
+        (SELECT COUNT(*) FROM knowledge_chunks c WHERE c.chunk_index_variant_id = v.id) AS chunk_count
+      FROM chunk_index_variants v
+      WHERE v.parse_artifact_id = ? AND v.chunk_profile_hash = ? AND v.status = 'ready'
+    `).get(artifactId, profileHash);
+    return row ? {
+      id: row.id,
+      parseArtifactId: row.parse_artifact_id,
+      chunkProfileHash: row.chunk_profile_hash,
+      blockFingerprint: row.block_fingerprint,
+      chunkCount: Number(row.chunk_count),
+    } : null;
+  }
+
   /** 幂等建立 building 状态的变体行；已存在（任意状态）则原样返回，不回退状态。 */
   ensureChunkIndexVariant(input: {
     parseArtifactId: unknown;

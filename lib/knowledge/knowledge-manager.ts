@@ -43,6 +43,7 @@ import {
   type KnowledgeProcessorPlan,
 } from "./source-processors.ts";
 import type { KnowledgeBlockDraft } from "./source-adapters.ts";
+import { ScopeSnapshotCompiler } from "./scope-snapshot-compiler.ts";
 import type {
   ContentSnapshot,
   ImportedKnowledgeSource,
@@ -235,6 +236,8 @@ export class KnowledgeManager {
   readonly queryService: KnowledgeQueryService;
   readonly ingestion: KnowledgeIngestionService;
   readonly watcher: KnowledgeSourceFileWatcher;
+  readonly scopeCompiler: ScopeSnapshotCompiler;
+  private readonly scopeBuildRequests = new Map<string, ReturnType<typeof setImmediate>>();
   private readonly lingxiHome: string;
   private readonly maxImportBytes: number;
   private readonly options: KnowledgeManagerOptions;
@@ -348,6 +351,33 @@ export class KnowledgeManager {
       now: options.now,
       log: options.ingestionLog,
     });
+    this.scopeCompiler = new ScopeSnapshotCompiler({
+      store: this.store,
+      indexStore: this.indexStore,
+      requestVariantBuild: (input) => {
+        const key = `${input.notebookId}:${input.sourceId}:${input.parseArtifactId}`;
+        if (this.scopeBuildRequests.has(key)) return;
+        // 既有入队接口会读正文解析配置；推到后台，编译关键路径只读元信息。
+        const pending = setImmediate(() => {
+          this.scopeBuildRequests.delete(key);
+          try {
+            this.ingestion.requestVariantBuild({
+              studioId: input.studioId,
+              notebookId: input.notebookId,
+              sourceId: input.sourceId,
+              artifactId: input.parseArtifactId,
+            });
+            this.scopeCompiler.invalidateNotebook(input.notebookId);
+          } catch (error) {
+            this.lifecycleLog(`knowledge scope: background variant enqueue failed: ${
+              error instanceof Error ? error.message : String(error)
+            }`);
+          }
+        });
+        pending.unref();
+        this.scopeBuildRequests.set(key, pending);
+      },
+    });
     this.watcher = new KnowledgeSourceFileWatcher({
       refresh: (input) => this.refreshFileSource(input),
       enqueueForNotebook: (input) => this.ingestion.enqueueSourceIngestion(input),
@@ -374,6 +404,7 @@ export class KnowledgeManager {
   }
 
   deleteNotebook(input: Parameters<KnowledgeStore["deleteNotebook"]>[0]) {
+    this.scopeCompiler.invalidateNotebook(String(input.notebookId));
     // 删除前记录该笔记本的全部源（删除后 orphan 判定要用；listNotebookSources 要求活跃笔记本）。
     const affectedSourceIds = this.store.listNotebookSources({
       studioId: input?.studioId,
@@ -398,6 +429,7 @@ export class KnowledgeManager {
 
   addSourceToNotebook(input: Parameters<KnowledgeStore["addSourceToNotebook"]>[0]) {
     const membership = this.store.addSourceToNotebook(input);
+    this.scopeCompiler.invalidateSource(membership.sourceId);
     // 复活语义（§十八）：orphan 源重新获得 membership 即清 orphan 标记（保留期内
     // 物理行都还在，恢复零成本；过保留期但尚未被 GC 扫到的同样复活）。
     const source = this.store.getSource({ studioId: input?.studioId, sourceId: input?.sourceId });
@@ -422,6 +454,7 @@ export class KnowledgeManager {
 
   removeSourceFromNotebook(input: Parameters<KnowledgeStore["removeSourceFromNotebook"]>[0]) {
     const membership = this.store.removeSourceFromNotebook(input);
+    this.scopeCompiler.invalidateSource(membership.sourceId);
     this.watcher.untrackSourceMembership({
       sourceId: membership.sourceId,
       notebookId: membership.notebookId,
@@ -511,6 +544,7 @@ export class KnowledgeManager {
    *   失败留痕；DB 行已删，残留文件不可达）。
    */
   private purgeSource(input: { studioId: string; sourceId: string }): KnowledgeSourcePurgeResult {
+    this.scopeCompiler.invalidateSource(input.sourceId);
     const purge = this.store.purgeSourceRows({ studioId: input.studioId, sourceId: input.sourceId });
     let removedChunkVariants = 0;
     let removedVectorArtifacts = 0;
@@ -697,7 +731,13 @@ export class KnowledgeManager {
    * 同会话旧 scope）。
    */
   createTurnScope(input: Parameters<KnowledgeStore["createTurnScope"]>[0]) {
-    return this.store.createTurnScope(input);
+    const scope = this.store.createTurnScope(input);
+    this.scopeCompiler.invalidateSession(scope.sessionPath);
+    return scope;
+  }
+
+  compileTurnScope(scope: Parameters<ScopeSnapshotCompiler["compile"]>[0]) {
+    return this.scopeCompiler.compile(scope);
   }
 
   getTurnScope(input: Parameters<KnowledgeStore["getTurnScope"]>[0]) {
@@ -705,6 +745,7 @@ export class KnowledgeManager {
   }
 
   closeTurnScope(input: Parameters<KnowledgeStore["closeTurnScope"]>[0]) {
+    this.scopeCompiler.invalidateScope(String(input.scopeId));
     return this.store.closeTurnScope(input);
   }
 
@@ -1206,6 +1247,7 @@ export class KnowledgeManager {
 
   async parseSource(input: { studioId: unknown; sourceId: unknown }): Promise<KnowledgeParseArtifact> {
     const source = this.store.getSource(input);
+    this.scopeCompiler.invalidateSource(source.id);
     const snapshot = this.store.getLatestContentSnapshotForSource(input);
     // §五十八：processor 管理的格式（DOCX/XLSX/CSV）把 processor 身份并入解析
     // 配置指纹——processor 版本/配置变化会得到新身份，自然触发重解析。
@@ -1351,6 +1393,8 @@ export class KnowledgeManager {
         "Knowledge source parsing failed",
         { reason: failureReason },
       );
+    } finally {
+      this.scopeCompiler.invalidateSource(source.id);
     }
   }
 
@@ -1677,6 +1721,7 @@ export class KnowledgeManager {
       notebookId: input?.notebookId,
     });
     const after = this.store.updateNotebookConfig(input);
+    this.scopeCompiler.invalidateNotebook(String(input.notebookId));
     const embeddingChanged = JSON.stringify(before.embeddingModelRef ?? null)
       !== JSON.stringify(after.embeddingModelRef ?? null);
     const chunkChanged = (before.chunkTargetChars ?? null) !== (after.chunkTargetChars ?? null);
@@ -1726,6 +1771,9 @@ export class KnowledgeManager {
   }
 
   close() {
+    this.scopeCompiler.dispose();
+    for (const pending of this.scopeBuildRequests.values()) clearImmediate(pending);
+    this.scopeBuildRequests.clear();
     // 先停生命周期维护（不再触发 GC 扫描），再停 watcher（不再产生 refresh/enqueue），
     // 再停摄入池（abort 进行中的嵌入、被中断 job 留给启动恢复），最后关库。
     if (this.lifecycleGcTimer) {

@@ -188,6 +188,7 @@ function buildToolCatalogManifestSnapshot(catalog, modelContextWindowTokens) {
 import { filterToolObjectsByAvailability } from "./tool-availability.ts";
 import { TaskRegistry } from "../lib/task-registry.ts";
 import { KnowledgeManager } from "../lib/knowledge/knowledge-manager.ts";
+import { KnowledgeError } from "../lib/knowledge/errors.ts";
 import { KnowledgeEmbeddingProviderGate } from "../lib/knowledge/ingestion-service.ts";
 import {
   factEmbeddingModelKey,
@@ -2695,6 +2696,16 @@ export class LingxiEngine {
       timeoutMs: 120_000,
       usageContext: this._knowledgeOperationUsageContext("rerank", request.runId),
     });
+  }
+
+  /** 只编译当前会话已经冻结的范围，不接受调用方自造来源列表。 */
+  async compileKnowledgeTurnScope(input: { scopeId: string; sessionPath: string }) {
+    const scope = this._knowledge?.getTurnScope({ scopeId: input.scopeId });
+    if (!scope || scope.status !== "active" || scope.studioId !== this._runtimeContext?.studioId
+      || scope.sessionPath !== input.sessionPath) {
+      throw new KnowledgeError("KNOWLEDGE_SCOPE_VIOLATION", "Knowledge scope is unavailable in this session");
+    }
+    return this._knowledge.compileTurnScope(scope);
   }
 
   /**
