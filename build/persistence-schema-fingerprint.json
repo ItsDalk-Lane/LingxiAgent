@@ -660,7 +660,7 @@
     ],
     "version": 3
   },
-  "payloadFingerprint": "sha256:a4fa19b26cc549cbbb08b7acd435292db9354fc9d80e715a9c9d641d5a467a91",
+  "payloadFingerprint": "sha256:8e8d4219d971582c186cdb036538eaf5bc398007ace614de290e4802e7da0077",
   "registry": [
     {
       "affectedByEpochMigration": true,
@@ -1689,7 +1689,7 @@
     {
       "affectedByEpochMigration": false,
       "bootstrapSafety": null,
-      "checkpointPolicy": "Excluded; indexes are performance projections and must be completely rebuildable from knowledge.db plus validated parse artifacts.",
+      "checkpointPolicy": "Portable vector BLOBs retain ingestion batch checkpoints and remain the recovery input for ANN; regenerable ANN files are not a checkpoint authority. Epoch checkpoint exclusion for this projection store remains unchanged.",
       "epochPolicy": "regenerable",
       "exemption": null,
       "firstPossibleOpenPhase": "engine_construct",
@@ -1699,12 +1699,14 @@
       "identityContract": "Index generation IDs are disposable projection identities; ChunkIndexVariant (parseArtifactId, chunkProfileHash) and VectorIndexVariant (chunkIndexVariantId, modelKey) are deterministic derived identities, while Notebook, Source, Snapshot, Artifact, Evidence, and Claim facts never originate here.",
       "migrationEntry": [
         "KnowledgeIndexStore runtime DDL",
-        "PortableVectorIndexAdapter runtime DDL"
+        "PortableVectorIndexAdapter runtime DDL",
+        "AnnIndexStore runtime DDL"
       ],
       "openEntry": [
         "new KnowledgeManager",
         "new KnowledgeIndexStore",
-        "new PortableVectorIndexAdapter"
+        "new PortableVectorIndexAdapter",
+        "new AnnIndexStore"
       ],
       "ownerModule": "lib/knowledge/knowledge-index-store.ts",
       "pathExclusions": [],
@@ -1715,16 +1717,19 @@
       ],
       "preCoordinatorReadProjection": null,
       "protocolModules": [
-        "lib/knowledge/vector-index-adapter.ts"
+        "lib/knowledge/vector-index-adapter.ts",
+        "lib/knowledge/ann-index-store.ts",
+        "lib/knowledge/usearch-vector-backend.ts",
+        "lib/knowledge/vector-search-backend-factory.ts"
       ],
-      "restorePolicy": "Delete incompatible or corrupt index generations and rebuild them; never use an index as the source of Knowledge truth.",
+      "restorePolicy": "ANN corruption rebuilds only knowledge-ann.db and knowledge-ann files from retained portable vector BLOBs. Lexical projections rebuild from parse artifacts; never use an ANN file as the sole vector recovery source.",
       "schemaContract": {
-        "compatibility": "knowledge-fts.db schema v2 and knowledge-vector.db schema v2 (P0 index identity) migrate v1 in a single transaction each: chunk identity moves from (parse_artifact_id, ordinal) to ChunkIndexVariant (parse_artifact_id, chunk_profile_hash) + ordinal via chunk_index_variants backfill (artifact_indexes is retired after backfill), and vector identity moves from (parse_artifact_id, model_key) to VectorIndexVariant (chunk_index_variant_id, model_key) via vector_index_variants backfill (vector_artifacts is retired after backfill). Rows whose chunk profile cannot be resolved are filed under the explicit legacy_unknown identity instead of being dropped; migrations only establish identities and remap existing rows, never re-chunk or re-embed.",
+        "compatibility": "P1 adds chunk_index_variant_metadata (FTS v3) and a separate ann_variants catalog (ANN v1); portable vector schema stays v3 and retains BLOBs for exact fallback and ANN rebuild. Historical knowledge-fts.db schema v2 and knowledge-vector.db schema v2 (P0 index identity) migrate v1 in a single transaction each: chunk identity moves from (parse_artifact_id, ordinal) to ChunkIndexVariant (parse_artifact_id, chunk_profile_hash) + ordinal via chunk_index_variants backfill (artifact_indexes is retired after backfill), and vector identity moves from (parse_artifact_id, model_key) to VectorIndexVariant (chunk_index_variant_id, model_key) via vector_index_variants backfill (vector_artifacts is retired after backfill). Rows whose chunk profile cannot be resolved are filed under the explicit legacy_unknown identity instead of being dropped; migrations only establish identities and remap existing rows, never re-chunk or re-embed.",
         "kind": "protocol",
         "source": "lib/knowledge/knowledge-index-store.ts"
       },
       "schemaSource": {
-        "contract": "Regenerable lexical SQLite schema together with the vector cache schema in lib/knowledge/vector-index-adapter.ts; both derive only from durable Knowledge facts and artifacts",
+        "contract": "Lexical SQLite schema v3, portable vector SQLite schema v3, and rebuildable ANN catalog schema v1. ANN files derive from retained portable vector BLOBs; ANN failure never deletes those BLOBs",
         "kind": "directory-contract",
         "module": "lib/knowledge/knowledge-index-store.ts"
       }
@@ -3287,8 +3292,8 @@
   ],
   "review": {
     "classification": "compatible",
-    "compatibilityReason": "知识检索 P1-04：全范围 FTS 一次召回、按引用分组重排及检索统计透传；表结构、证据持久化字段和 DATA_EPOCH 不变。",
-    "payloadFingerprint": "sha256:a4fa19b26cc549cbbb08b7acd435292db9354fc9d80e715a9c9d641d5a467a91"
+    "compatibilityReason": "P1-05 adds a separate rebuildable ANN v1 catalog and HNSW files; portable vector v3 BLOBs and all existing Knowledge facts remain intact, ANN failures fall back to exact search and rebuild only ANN projections.",
+    "payloadFingerprint": "sha256:8e8d4219d971582c186cdb036538eaf5bc398007ace614de290e4802e7da0077"
   },
   "schemas": [
     {
@@ -3840,13 +3845,25 @@
       "storeId": "knowledge-database"
     },
     {
-      "contract": "Regenerable lexical SQLite schema together with the vector cache schema in lib/knowledge/vector-index-adapter.ts; both derive only from durable Knowledge facts and artifacts",
+      "contract": "Lexical SQLite schema v3, portable vector SQLite schema v3, and rebuildable ANN catalog schema v1. ANN files derive from retained portable vector BLOBs; ANN failure never deletes those BLOBs",
       "kind": "directory-contract",
       "module": "lib/knowledge/knowledge-index-store.ts",
       "protocolModules": [
         {
+          "module": "lib/knowledge/ann-index-store.ts",
+          "sourceHash": "sha256:8583fbdcbff0ad0a40a578c929d93f2aa3d0f5909f2052a4852c8511862880a9"
+        },
+        {
+          "module": "lib/knowledge/usearch-vector-backend.ts",
+          "sourceHash": "sha256:711c713ec573842b11096fb5c7240055a7472d2cae487bb8eb8deee1a2c591ea"
+        },
+        {
           "module": "lib/knowledge/vector-index-adapter.ts",
-          "sourceHash": "sha256:485d5e8070cc05b2db6821e02b179b08607c0cf15885c30aa45ea2bcfdaf70a6"
+          "sourceHash": "sha256:b07a39dc93aead7b0d60f647f6e2ef2803703be7c898dc8c8ee1cba31a59ccec"
+        },
+        {
+          "module": "lib/knowledge/vector-search-backend-factory.ts",
+          "sourceHash": "sha256:977e9e13b68de1d1ac0b734f312387d7235b94496bcb909e0445c24275d0e722"
         }
       ],
       "sourceHash": "sha256:6a5c54340e0c2ac01a00ca8796ee38174990a0f09c7ac24e4a6a4f484489d004",
@@ -3856,21 +3873,21 @@
       "contract": "ParseArtifact generation directories referenced by knowledge.db and never treated as source content versions",
       "kind": "directory-contract",
       "module": "lib/knowledge/knowledge-manager.ts",
-      "sourceHash": "sha256:8b311ab2e9a44707b8f1a7dedf1b0a4a37560bcc99359e362ed233116fc875cf",
+      "sourceHash": "sha256:83faa36d34e8aa88e36e2f16965d76b0cc2f1c270861b2862062cb40d928c90f",
       "storeId": "knowledge-parse-artifacts"
     },
     {
       "contract": "ProcessingArtifact output files (binary office formats converted to structured text) referenced by knowledge.db processing_artifacts rows, with locatorMap held in the database",
       "kind": "directory-contract",
       "module": "lib/knowledge/knowledge-manager.ts",
-      "sourceHash": "sha256:8b311ab2e9a44707b8f1a7dedf1b0a4a37560bcc99359e362ed233116fc875cf",
+      "sourceHash": "sha256:83faa36d34e8aa88e36e2f16965d76b0cc2f1c270861b2862062cb40d928c90f",
       "storeId": "knowledge-processing-artifacts"
     },
     {
       "contract": "ContentSnapshot relative locator, immutable byte publication, SHA-256 verification, and rollback protocol",
       "kind": "directory-contract",
       "module": "lib/knowledge/knowledge-manager.ts",
-      "sourceHash": "sha256:8b311ab2e9a44707b8f1a7dedf1b0a4a37560bcc99359e362ed233116fc875cf",
+      "sourceHash": "sha256:83faa36d34e8aa88e36e2f16965d76b0cc2f1c270861b2862062cb40d928c90f",
       "storeId": "knowledge-source-snapshots"
     },
     {
@@ -7405,6 +7422,22 @@
     },
     {
       "exemptionId": null,
+      "kind": "database-open",
+      "ordinal": 0,
+      "reason": "Creates and replaces only ANN catalog and derived index files; never deletes portable vector BLOBs.",
+      "sourceFile": "lib/knowledge/ann-index-store.ts",
+      "storeId": "knowledge-indexes"
+    },
+    {
+      "exemptionId": null,
+      "kind": "mkdir",
+      "ordinal": 0,
+      "reason": "Creates and replaces only ANN catalog and derived index files; never deletes portable vector BLOBs.",
+      "sourceFile": "lib/knowledge/ann-index-store.ts",
+      "storeId": "knowledge-indexes"
+    },
+    {
+      "exemptionId": null,
       "kind": "mkdir",
       "ordinal": 0,
       "reason": "Creates and removes only the regenerable lexical SQLite index files.",
@@ -7751,6 +7784,54 @@
       "exemptionId": null,
       "kind": "mkdir",
       "ordinal": 0,
+      "reason": "Creates and replaces only ANN catalog and derived index files; never deletes portable vector BLOBs.",
+      "sourceFile": "lib/knowledge/usearch-vector-backend.ts",
+      "storeId": "knowledge-indexes"
+    },
+    {
+      "exemptionId": null,
+      "kind": "mkdir",
+      "ordinal": 0,
+      "reason": "Creates and replaces only ANN catalog and derived index files; never deletes portable vector BLOBs.",
+      "sourceFile": "lib/knowledge/usearch-vector-backend.ts",
+      "storeId": "knowledge-indexes"
+    },
+    {
+      "exemptionId": null,
+      "kind": "remove-path",
+      "ordinal": 0,
+      "reason": "Creates and replaces only ANN catalog and derived index files; never deletes portable vector BLOBs.",
+      "sourceFile": "lib/knowledge/usearch-vector-backend.ts",
+      "storeId": "knowledge-indexes"
+    },
+    {
+      "exemptionId": null,
+      "kind": "remove-path",
+      "ordinal": 0,
+      "reason": "Creates and replaces only ANN catalog and derived index files; never deletes portable vector BLOBs.",
+      "sourceFile": "lib/knowledge/usearch-vector-backend.ts",
+      "storeId": "knowledge-indexes"
+    },
+    {
+      "exemptionId": null,
+      "kind": "remove-path",
+      "ordinal": 0,
+      "reason": "Creates and replaces only ANN catalog and derived index files; never deletes portable vector BLOBs.",
+      "sourceFile": "lib/knowledge/usearch-vector-backend.ts",
+      "storeId": "knowledge-indexes"
+    },
+    {
+      "exemptionId": null,
+      "kind": "rename",
+      "ordinal": 0,
+      "reason": "Creates and replaces only ANN catalog and derived index files; never deletes portable vector BLOBs.",
+      "sourceFile": "lib/knowledge/usearch-vector-backend.ts",
+      "storeId": "knowledge-indexes"
+    },
+    {
+      "exemptionId": null,
+      "kind": "mkdir",
+      "ordinal": 0,
       "reason": "Creates and removes only the regenerable vector SQLite cache files.",
       "sourceFile": "lib/knowledge/vector-index-adapter.ts",
       "storeId": "knowledge-indexes"
@@ -7761,6 +7842,14 @@
       "ordinal": 0,
       "reason": "Creates and removes only the regenerable vector SQLite cache files.",
       "sourceFile": "lib/knowledge/vector-index-adapter.ts",
+      "storeId": "knowledge-indexes"
+    },
+    {
+      "exemptionId": null,
+      "kind": "remove-path",
+      "ordinal": 0,
+      "reason": "Creates and replaces only ANN catalog and derived index files; never deletes portable vector BLOBs.",
+      "sourceFile": "lib/knowledge/vector-search-backend-factory.ts",
       "storeId": "knowledge-indexes"
     },
     {

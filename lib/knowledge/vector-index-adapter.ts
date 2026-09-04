@@ -297,6 +297,8 @@ export interface PortableVectorIndexAdapterOptions {
   dbPath: string;
   Database?: any;
   now?: () => string;
+  onReadyVariant?: (vectorIndexVariantId: string) => void;
+  onInvalidateVariant?: (vectorIndexVariantId: string) => void;
   /**
    * 迁移 v1→v2 回填用：parseArtifactId → chunkProfileHash（FTS 库
    * chunk_index_variants.chunk_profile_hash）。由 KnowledgeManager 打开两库后注入；
@@ -312,6 +314,8 @@ export class PortableVectorIndexAdapter implements VectorIndexAdapter {
   private readonly Database: any;
   private readonly now: () => string;
   private readonly profileHashResolver: ((parseArtifactId: string) => string | null) | null;
+  private readonly onReadyVariant: ((id: string) => void) | undefined;
+  private readonly onInvalidateVariant: ((id: string) => void) | undefined;
 
   constructor(options: PortableVectorIndexAdapterOptions) {
     if (!options?.dbPath || !path.isAbsolute(options.dbPath)) {
@@ -320,6 +324,8 @@ export class PortableVectorIndexAdapter implements VectorIndexAdapter {
     this.dbPath = options.dbPath;
     this.Database = options.Database || loadDatabase();
     this.now = options.now || (() => new Date().toISOString());
+    this.onReadyVariant = options.onReadyVariant;
+    this.onInvalidateVariant = options.onInvalidateVariant;
     this.profileHashResolver = typeof options.profileHashResolver === "function"
       ? options.profileHashResolver
       : null;
@@ -727,15 +733,19 @@ export class PortableVectorIndexAdapter implements VectorIndexAdapter {
         this.now(),
       );
     })();
+    this.onInvalidateVariant?.(anchor.vectorIndexVariantId);
+    this.onReadyVariant?.(anchor.vectorIndexVariantId);
     return { vectorIndexVariantId: anchor.vectorIndexVariantId };
   }
 
   removeArtifact(parseArtifactId: unknown): void {
     const artifactId = requiredId(parseArtifactId, "parseArtifactId");
+    const ids = this.db.prepare("SELECT id FROM vector_index_variants WHERE parse_artifact_id = ?").all(artifactId).map((row: any) => row.id);
     this.db.transaction(() => {
       this.db.prepare(`DELETE FROM chunk_vectors WHERE parse_artifact_id = ?`).run(artifactId);
       this.db.prepare(`DELETE FROM vector_index_variants WHERE parse_artifact_id = ?`).run(artifactId);
     })();
+    for (const id of ids) this.onInvalidateVariant?.(id);
   }
 
   removeVariant(vectorIndexVariantId: unknown): void {
@@ -744,12 +754,47 @@ export class PortableVectorIndexAdapter implements VectorIndexAdapter {
       this.db.prepare(`DELETE FROM chunk_vectors WHERE vector_index_variant_id = ?`).run(id);
       this.db.prepare(`DELETE FROM vector_index_variants WHERE id = ?`).run(id);
     })();
+    this.onInvalidateVariant?.(id);
   }
 
   getVariant(vectorIndexVariantId: unknown): VectorIndexVariantRecord | null {
     const id = requiredId(vectorIndexVariantId, "vectorIndexVariantId", 64);
     const row = this.db.prepare(`SELECT * FROM vector_index_variants WHERE id = ?`).get(id);
     return row ? this.mapVariantRow(row) : null;
+  }
+
+  /** ANN 只读数量和身份；不把向量正文搬进热查询。 */
+  getReadyVectorCount(vectorIndexVariantId: string): number {
+    const variant = this.getVariant(vectorIndexVariantId);
+    if (!variant || variant.status !== "ready") throw new KnowledgeError("KNOWLEDGE_INDEX_INVALID", "Portable vector variant is not ready");
+    return Number(this.db.prepare("SELECT COUNT(*) AS count FROM chunk_vectors WHERE vector_index_variant_id = ?").get(vectorIndexVariantId).count);
+  }
+
+  listReadyVectorVariantIds(afterId = ""): string[] {
+    return this.db.prepare("SELECT id FROM vector_index_variants WHERE status = 'ready' AND id > ? ORDER BY id LIMIT 20")
+      .all(afterId).map((row: any) => row.id);
+  }
+
+  /** 后台构建每批读取 512 行，查询路径不调用该方法。 */
+  readReadyVectorBatch(vectorIndexVariantId: string, afterOrdinal = -1): VectorIndexEntry[] {
+    const variant = this.getVariant(vectorIndexVariantId);
+    if (!variant || variant.status !== "ready") throw new KnowledgeError("KNOWLEDGE_INDEX_INVALID", "Portable vector variant is not ready");
+    return this.db.prepare(`SELECT chunk_id, parse_artifact_id, ordinal, vector FROM chunk_vectors
+      WHERE vector_index_variant_id = ? AND ordinal > ? ORDER BY ordinal LIMIT 512`)
+      .all(vectorIndexVariantId, afterOrdinal).map((row: any) => ({ chunkId: row.chunk_id,
+        parseArtifactId: row.parse_artifact_id, ordinal: Number(row.ordinal), vector: readVector(row.vector, variant.dimensions) }));
+  }
+
+  resolveVectorOrdinals(vectorIndexVariantId: string, ordinals: number[]): Array<Omit<VectorSearchResult, "score">> {
+    return this.db.prepare(`SELECT chunk_id, parse_artifact_id, ordinal FROM chunk_vectors
+      WHERE vector_index_variant_id = ? AND ordinal IN (SELECT value FROM json_each(?))`)
+      .all(vectorIndexVariantId, JSON.stringify(ordinals)).map((row: any) => ({ chunkId: row.chunk_id,
+        parseArtifactId: row.parse_artifact_id, vectorIndexVariantId, ordinal: Number(row.ordinal) }));
+  }
+
+  touchVectorVariants(variantIds: string[]): void {
+    this.db.prepare("UPDATE vector_index_variants SET last_used_at = ? WHERE id IN (SELECT value FROM json_each(?))")
+      .run(this.now(), JSON.stringify(variantIds));
   }
 
   setVariantStatus(vectorIndexVariantId: unknown, status: VectorIndexVariantStatus): void {
@@ -763,6 +808,8 @@ export class PortableVectorIndexAdapter implements VectorIndexAdapter {
     if (result.changes === 0) {
       throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "Vector index variant does not exist");
     }
+    if (status === "ready") this.onReadyVariant?.(id);
+    else this.onInvalidateVariant?.(id);
   }
 
   listVariantsByChunkIndexVariant(chunkIndexVariantId: unknown): VectorIndexVariantRecord[] {
@@ -934,6 +981,7 @@ export class PortableVectorIndexAdapter implements VectorIndexAdapter {
         UPDATE vector_index_variants SET status = 'ready', updated_at = ? WHERE id = ?
       `).run(this.now(), variant.id);
     })();
+    this.onReadyVariant?.(String(input.vectorIndexVariantId));
   }
 
   failVectorVariantBuild(vectorIndexVariantId: unknown): void {
@@ -1045,6 +1093,8 @@ export class PortableVectorIndexAdapter implements VectorIndexAdapter {
   removeArtifactModel(input: { parseArtifactId: unknown; modelKey: unknown }): void {
     const artifactId = requiredId(input?.parseArtifactId, "parseArtifactId");
     const modelKey = requiredId(input?.modelKey, "modelKey");
+    const ids = this.db.prepare("SELECT id FROM vector_index_variants WHERE parse_artifact_id = ? AND model_key = ?")
+      .all(artifactId, modelKey).map((row: any) => row.id);
     this.db.transaction(() => {
       this.db.prepare(
         `DELETE FROM chunk_vectors WHERE parse_artifact_id = ? AND model_key = ?`,
@@ -1053,6 +1103,7 @@ export class PortableVectorIndexAdapter implements VectorIndexAdapter {
         `DELETE FROM vector_index_variants WHERE parse_artifact_id = ? AND model_key = ?`,
       ).run(artifactId, modelKey);
     })();
+    for (const id of ids) this.onInvalidateVariant?.(id);
   }
 
   health() {

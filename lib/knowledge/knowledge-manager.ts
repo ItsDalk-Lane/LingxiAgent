@@ -21,6 +21,8 @@ import {
   type KnowledgeEmbeddingResult,
   type KnowledgeReranker,
 } from "./knowledge-query-service.ts";
+import { createKnowledgeVectorSearchBackend } from "./vector-search-backend-factory.ts";
+import type { KnowledgeVectorSearchBackend } from "./vector-search-backend.ts";
 import { PortableVectorIndexAdapter } from "./vector-index-adapter.ts";
 import {
   KnowledgeSourceFileWatcher,
@@ -237,6 +239,7 @@ export class KnowledgeManager {
   readonly store: KnowledgeStore;
   readonly indexStore: KnowledgeIndexStore;
   readonly vectorIndex: PortableVectorIndexAdapter;
+  readonly vectorSearchBackend: KnowledgeVectorSearchBackend;
   readonly queryService: KnowledgeQueryService;
   readonly ingestion: KnowledgeIngestionService;
   readonly watcher: KnowledgeSourceFileWatcher;
@@ -296,6 +299,8 @@ export class KnowledgeManager {
     });
     this.vectorIndex = new PortableVectorIndexAdapter({
       dbPath: path.join(this.indexesRoot, "knowledge-vector.db"),
+      onReadyVariant: id => this.vectorSearchBackend?.scheduleBuild(id),
+      onInvalidateVariant: id => this.vectorSearchBackend?.invalidate(id),
       Database: options.Database,
       now: options.now,
       // 向量库 v1→v2 迁移回填：从 FTS 库读该 artifact 当前 variant 的
@@ -315,10 +320,15 @@ export class KnowledgeManager {
         }
       },
     });
+    this.vectorSearchBackend = createKnowledgeVectorSearchBackend({
+      indexesRoot: this.indexesRoot, portable: this.vectorIndex, Database: options.Database,
+      now: options.now, log: options.ingestionLog,
+    });
     this.queryService = new KnowledgeQueryService({
       store: this.store,
       indexStore: this.indexStore,
       vectorIndex: this.vectorIndex,
+      vectorSearchBackend: this.vectorSearchBackend,
       getModelConfigurationRevision: options.getModelConfigurationRevision,
       embedTextsForModel: options.embedTextsForModel ?? null,
       rerank: options.rerank,
@@ -1846,8 +1856,11 @@ export class KnowledgeManager {
     }
     this.watcher.stop();
     this.ingestion.stop();
+    // 先同步停下后台调度，再关事实库；异步退出阶段不再访问这些库。
+    const backendClosed = this.vectorSearchBackend.close();
     this.vectorIndex.close();
     this.indexStore.close();
     this.store.close();
+    return backendClosed;
   }
 }

@@ -96,6 +96,7 @@ export interface KnowledgeRetrievalStats {
   scopeCompileMs?: number;
   timeToFirstEvidenceMs?: number;
   vectorBackend?: "hnsw" | "portable" | "none";
+  vectorDegradedReasons?: string[];
   searchCalls?: number;
   readCalls?: number;
   grepCalls?: number;

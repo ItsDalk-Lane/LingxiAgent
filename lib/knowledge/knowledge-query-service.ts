@@ -1,3 +1,4 @@
+import { searchVectorBackend, type KnowledgeVectorSearchBackend } from "./vector-search-backend.ts";
 import crypto from "node:crypto";
 import { QueryEmbeddingCache, normalizeKnowledgeQuery } from "./query-embedding-cache.ts";
 import type { CompiledKnowledgeScope, CompiledKnowledgeNotebook } from "./scope-snapshot-compiler.ts";
@@ -102,6 +103,8 @@ export interface SearchedVectorVariantIdentity {
 }
 
 export interface RetrieveForNotebooksResult {
+  vectorBackend?: "hnsw" | "portable" | "none";
+  vectorDegradedReasons?: string[];
   embeddingGroups?: number;
   rerankGroups?: number;
   queryEmbeddingCacheHit?: boolean;
@@ -418,6 +421,7 @@ export class KnowledgeQueryService {
     indexStore: KnowledgeIndexStore;
     getModelConfigurationRevision?: (ref: KnowledgeModelRef) => string;
     vectorIndex?: VectorIndexAdapter | null;
+    vectorSearchBackend?: KnowledgeVectorSearchBackend;
     /**
      * 按显式嵌入模型引用执行嵌入（engine 的 _embedKnowledgeTextsForModel 同根，
      * 与摄入侧共用）。查询侧由 retrieveForNotebooks 按笔记本配置构造闭包传入
@@ -1091,6 +1095,8 @@ export class KnowledgeQueryService {
      */
     ordinalRangesByChunkIndexVariantId?: ReadonlyMap<string, KnowledgeOrdinalRange[]>;
   }): Promise<{
+    vectorBackend?: "hnsw" | "portable";
+    vectorDegradedReasons?: string[];
     candidates: IndexedKnowledgeChunk[];
     retrievalMode: "fts" | "hybrid";
     retrievalModeRequested: "fts" | "hybrid";
@@ -1210,6 +1216,18 @@ export class KnowledgeQueryService {
     if (vectorIndex) {
       for (const scope of readyScopes) {
         const chunkIndexVariantId = knowledgeChunkIndexVariantId(scope.parseArtifactId, scope.chunkProfileHash);
+        if (this.deps.vectorSearchBackend) {
+          // 冻结的块变体由不可变原文和分块配置确定；热查询只读目录，命中后再取块正文。
+          const id = knowledgeVectorIndexVariantId(chunkIndexVariantId, embeddedQuestion.model.key);
+          const variant = vectorIndex.getVariant(id);
+          if (variant?.status === "ready" && variant.parseArtifactId === scope.parseArtifactId
+            && variant.chunkIndexVariantId === chunkIndexVariantId && variant.modelKey === embeddedQuestion.model.key
+            && variant.dimensions === embeddedQuestion.model.dimensions) {
+            vectorVariantIds.push(id);
+            searchedVectorVariants.push({ ...scope, chunkIndexVariantId, vectorIndexVariantId: id });
+          } else vectorDegraded.push({ ...scope, reason: "KNOWLEDGE_VECTOR_NOT_READY" });
+          continue;
+        }
         let chunks: StoredKnowledgeChunk[];
         try {
           chunks = this.deps.indexStore.listVariantChunks(chunkIndexVariantId);
@@ -1275,15 +1293,27 @@ export class KnowledgeQueryService {
     }
 
     let vectorRows;
+    let vectorBackend: "hnsw" | "portable" = "portable";
+    let vectorDegradedReasons: string[] = [];
     try {
-      vectorRows = vectorIndex!.search({
+      const searchInput = {
         vectorIndexVariantIds: vectorVariantIds,
         model: embeddedQuestion.model,
         queryVector: embeddedQuestion.result.vectors[0],
         limit: Math.max(1, Math.min(generationLimit, KNOWLEDGE_UNCAPPED_RETRIEVAL_LIMIT)),
-      });
+      };
+      if (this.deps.vectorSearchBackend) {
+        const result = await searchVectorBackend(this.deps.vectorSearchBackend, searchInput);
+        signal?.throwIfAborted();
+        vectorRows = result.results; vectorBackend = result.vectorBackend; vectorDegradedReasons = result.degradedReasons;
+        for (const variant of searchedVectorVariants) {
+          const ordinals = vectorRows.filter(row => row.vectorIndexVariantId === variant.vectorIndexVariantId).map(row => row.ordinal);
+          if (ordinals.length) for (const chunk of this.deps.indexStore.readVariantChunks(variant.chunkIndexVariantId, ordinals)) chunksById.set(chunk.id, chunk);
+        }
+      } else vectorRows = vectorIndex!.search(searchInput);
     } catch (error) {
-      if (!isKnowledgeError(error) || error.code !== "KNOWLEDGE_INDEX_INVALID") {
+      signal?.throwIfAborted();
+      if (this.deps.vectorSearchBackend || !isKnowledgeError(error) || error.code !== "KNOWLEDGE_INDEX_INVALID") {
         // 向量库检索的意外错误（非损坏自愈路径）：向量通道本轮不可用——降级
         // 纯 FTS + VECTOR_NOT_READY 留痕，不炸检索（与查询嵌入失败降级同纪律）。
         const cause = error instanceof Error ? `${error.name}: ${error.message}` : String(error);
@@ -1357,6 +1387,7 @@ export class KnowledgeQueryService {
     return {
       candidates,
       retrievalMode: "hybrid",
+      vectorBackend, vectorDegradedReasons,
       retrievalModeRequested,
       degraded: allDegraded,
       searchedVectorVariants,

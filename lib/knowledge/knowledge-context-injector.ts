@@ -1735,6 +1735,7 @@ export function renderKnowledgeContextBlock(input: {
   const allSources = mergeSources(input.retrievalResults);
   const degraded = mergeDegradedScopes(input.retrievalResults);
   // rerank 期限/传输降级留痕（候选保持 RRF 名次，禁静默）：注入块与 stats 同源。
+  const vectorDegradedReasons = input.retrievalResults.flatMap(result => result.vectorDegradedReasons ?? []);
   const rerankDegradeReasons = input.retrievalResults
     .flatMap(result => result.rerankDegradeReasons ?? []);
   // rerank 门控主动跳过留痕（2026-08-31 快速档）：非降级，只进 stats 不进块。
@@ -1918,6 +1919,7 @@ export function renderKnowledgeContextBlock(input: {
     lines.push(...noEvidenceLines);
     lines.push(...sectionNoEvidenceLines);
     // rerank 期限/传输降级留痕（候选保持 RRF 名次，禁静默）：模型不得声称做过精排。
+    for (const reason of vectorDegradedReasons) lines.push(`[vector backend degraded: ${reason}]`);
     for (const reason of rerankDegradeReasons) {
       lines.push(`[rerank degraded: ${reason}]`);
     }
@@ -2007,6 +2009,11 @@ export function renderKnowledgeContextBlock(input: {
       ...(rerankSkippedReasons.length > 0
         ? { rerankSkippedReason: rerankSkippedReasons.join("; ") }
         : {}),
+      ...(input.retrievalResults.some(result => result.vectorBackend) ? {
+        vectorBackend: input.retrievalResults.some(result => result.vectorBackend === "portable") ? "portable" as const
+          : input.retrievalResults.some(result => result.vectorBackend === "hnsw") ? "hnsw" as const : "none" as const,
+        ...(vectorDegradedReasons.length ? { vectorDegradedReasons: [...new Set(vectorDegradedReasons)] } : {}),
+      } : {}),
       ...(input.retrievalResults.some(result => result.embeddingGroups !== undefined) ? {
         embeddingGroups: input.retrievalResults.reduce((sum, result) => sum + (result.embeddingGroups ?? 0), 0),
         rerankGroups: input.retrievalResults.reduce((sum, result) => sum + (result.rerankGroups ?? 0), 0),

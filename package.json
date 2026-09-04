@@ -270,5 +270,8 @@
       "icon": "desktop/src/icon.png",
       "artifactName": "${productName}-${version}-Linux-${arch}.${ext}"
     }
+  },
+  "optionalDependencies": {
+    "usearch": "2.26.0"
   }
 }

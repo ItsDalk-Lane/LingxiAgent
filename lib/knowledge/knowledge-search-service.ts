@@ -192,6 +192,8 @@ export class KnowledgeSearchService {
       let queryEmbeddingCacheHit = false;
       let candidates: IndexedKnowledgeChunk[];
       let retrievalMode: "fts" | "hybrid" = "fts";
+      let vectorBackend: KnowledgeSearchResponse["vectorBackend"] = "none";
+      const vectorDegradedReasons: string[] = [];
       let searchedVectorVariants: NonNullable<RetrieveForNotebooksResult["searchedVectorVariants"]> = [];
       const degraded: RetrieveForNotebooksResult["degraded"] = [];
       const degradedReasons = [...scope.warnings];
@@ -224,6 +226,8 @@ export class KnowledgeSearchService {
         })));
         for (const outcome of outcomes) {
           if (outcome.retrievalMode === "hybrid") retrievalMode = "hybrid";
+          if (outcome.vectorBackend && vectorBackend !== "portable") vectorBackend = outcome.vectorBackend;
+          vectorDegradedReasons.push(...outcome.vectorDegradedReasons ?? []);
           degraded.push(...outcome.degraded);
           searchedVectorVariants.push(...outcome.searchedVectorVariants);
           if (outcome.rerankDegradeReason) rerankDegradeReasons.push(outcome.rerankDegradeReason);
@@ -271,7 +275,7 @@ export class KnowledgeSearchService {
           }
         }
         searchedVectorVariants = [...new Map(searchedVectorVariants.map(variant => [variant.vectorIndexVariantId, variant])).values()];
-        degradedReasons.push(...degraded.map(item => `${item.reason}:${item.parseArtifactId}`), ...rerankDegradeReasons);
+        degradedReasons.push(...vectorDegradedReasons, ...degraded.map(item => `${item.reason}:${item.parseArtifactId}`), ...rerankDegradeReasons);
       }
       request.signal?.throwIfAborted();
       const locators = new Map<string, KnowledgeBlockLocator>();
@@ -307,11 +311,12 @@ export class KnowledgeSearchService {
       });
       timings.totalMs = performance.now() - started;
       return {
-        response: { hits, retrievalMode, vectorBackend: searchedVectorVariants.length ? "portable" : "none",
+        response: { hits, retrievalMode, vectorBackend,
           timings, remoteModelCalls, embeddingGroups, rerankGroups, queryEmbeddingCacheHit, retrievalResultCacheHit: false,
           degradedReasons: [...new Set(degradedReasons)] },
         evidence: {
           embeddingGroups, rerankGroups, queryEmbeddingCacheHit, retrievalResultCacheHit: false,
+          vectorBackend, vectorDegradedReasons,
           candidates: annotated,
           sources: notebooks.flatMap(notebook => sources.flatMap(source => {
             const variant = [...variants.values()].find(item => item.parseArtifactId === source.parseArtifactId
