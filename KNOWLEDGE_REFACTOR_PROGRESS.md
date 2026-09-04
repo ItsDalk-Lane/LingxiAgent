@@ -10,7 +10,7 @@
 - 严格按 P0 → P1 → P2 → P3 及编号顺序；阶段门禁全部通过才进入下一阶段。
 - 每项记录测试原始结果后提交；不删除、跳过或放宽测试，不合并 main。
 - 现有任务书为用户未跟踪文件，既有规划文档与 BLOCKED.md 历史记录保留。
-- 当前断点：P1-01 至 P1-08 已完成，本地及第三轮四平台门禁全部通过；正在完成阶段审计提交，随后进入 P2-01。P0 源码提交 `5c016df183ad207cf1ca33de274abb7a4eb10057`，阶段审计提交 `f9928d76`；全量 13002 PASS / 0 FAIL / 7 既有 SKIP。用户已授权每阶段验证后同步审计记录，保留最终封印。
+- 当前断点：P1-01 至 P1-08 已完成，阶段收口 `23873985`、审计 `333c5112`，本地与四平台门禁全部通过；P2-01 已完成本项验证并随本次提交落地，接着执行 P2-02。P0 源码提交 `5c016df183ad207cf1ca33de274abb7a4eb10057`，阶段审计提交 `f9928d76`；全量 13002 PASS / 0 FAIL / 7 既有 SKIP。用户已授权每阶段验证后同步审计记录，保留最终封印。
 - 进度、计划与事实集中在本文件和基线文档，避免覆盖既有 task_plan.md / findings.md / PROGRESS.md。
 - 目标工具已确认本任务存在 active goal；重复 create_goal 被拒绝，沿用现有目标。
 - 规划恢复脚本返回其他会话的无关配置记录，经 git diff 为空核对，未采用其内容。
@@ -20,8 +20,8 @@
 | 阶段 | 状态 | 结果 |
 | --- | --- | --- |
 | P0 | completed | 2026-09-04 全量 13002 PASS / 0 FAIL / 7 既有 SKIP，76.42s；全部 P0 门禁通过，审计提交 f9928d76 |
-| P1 | completed | P1-01 至 P1-08 完成；本地全量和第三轮四平台 Build 33829055797 全部通过，阶段审计收口中 |
-| P2 | pending | NOT_EXECUTED |
+| P1 | completed | P1-01 至 P1-08 完成；本地全量和第三轮四平台 Build 33829055797 全部通过，阶段审计 333c5112 |
+| P2 | in_progress | P2-01 完成；P2-02 及后续任务、阶段门禁待执行 |
 | P3 | pending | NOT_EXECUTED |
 
 ## P0-00：建立基线与回归门禁
@@ -257,15 +257,16 @@
 - Intel macOS x64 完整构建也已 PASS：平台测试 8 文件 / 94 PASS，包内日志明确 native=hnsw、removed-native=portable，签名归档解包、安装、解析、重启和快照读回通过；`/tmp/lingxi-knowledge-p1-third-mac-intel.log`。四套 installer 产物均已上传且未过期，清单与摘要保留 `/tmp/lingxi-knowledge-p1-third-artifact-inventory.json`；当前只剩工作流的产物启动/历史升级回归。
 - 最后门禁：产物启动与历史升级回归 8 文件 / 304 PASS，1.88s；日志 `/tmp/lingxi-knowledge-p1-third-release-smoke.log`。分支运行中的发布、镜像和发布列车按既有标签条件未触发，没有合并 main。
 - 阶段末五生成器再连续两轮全部 exit 0；第二轮完整 `git diff --exit-code` 为 0，测试清单逐字节一致，日志 `/tmp/lingxi-knowledge-p1-close-generator*`。此前测试与参数均保留，所有失败均已修复并复验。
-- 阶段收口提交：`chore(knowledge): close P1 unified retrieval verification`（本次提交）；源实现与四平台运行证据对应上述三个源码/审计提交对。随后执行阶段审计坐标同步与全量复验，P2/P3 当前尚未开始。
+- 阶段收口提交 `2387398589ec5494e1adb28b014dc84ebcf15a64`，阶段审计 `333c5112`；收口后的本地全量再次 13087 PASS / 7 既有 SKIP / 0 FAIL，80.46s，exit 0。源实现与四平台运行证据对应上述三个源码/审计提交对。P1 全部门禁通过，后续按序进入 P2。
 
 ## P2-01：增加 Research 共享契约
 
-- 状态：pending
-- 改动文件：尚未开始
-- 测试命令：按任务书该项测试执行，尚未执行
-- 测试结果：NOT_EXECUTED
-- 对应 commit SHA：尚未提交
+- 状态：completed
+- 改动文件：`shared/knowledge-research.ts`、`export-manifest.json`、`KNOWLEDGE_REFACTOR_PROGRESS.md`
+- 改动：按任务书逐项增加运行状态、证据需求类型/状态、证据关系、需求对象和预算契约；固定预算严格为 4 轮、4 并发、32 工具调用、180 秒、每轮 8 搜索/12 阅读、32 最终证据、16000 token。
+- 测试命令：三套 `npm run typecheck`；`npx vitest run tests/knowledge-execution-policy.test.ts tests/chat-route-knowledge-refs.test.ts`；新增文件 ESLint；开放导出登记按现有规则核查。
+- 测试结果：三套类型检查 exit 0；2 文件 / 16 PASS，1.30s，exit 0；新增文件 ESLint exit 0，开放边界通过（保留原 1 条债务）。任务书全部字段与八个预算值经只读逐项核对一致；开放导出 868 文件，新共享契约与源文件逐字节一致。没有数据库或运行时闭包变化。日志 `/tmp/lingxi-knowledge-p201-{typecheck,tests,lint,boundary,export}.log`。
+- 对应 commit SHA：本次提交 `feat(knowledge): define evidence-ledger research contracts`
 - 偏差：none
 
 ## P2-02：Knowledge 数据库升级到 v18
