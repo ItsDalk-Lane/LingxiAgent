@@ -36,6 +36,21 @@ describe("知识执行策略", () => {
     });
   });
 
+  it.each([
+    ["阅读全文，列出所有例外", "scope_complete"],
+    ["逐章核对实施时间", "relevant_sections_complete"],
+    ["Review every relevant section", "relevant_sections_complete"],
+    ["Check all relevant sections and whether anything is missing.", "scope_complete"],
+    ["Is there any exception in this book?", "scope_complete"],
+  ])("正式唯一策略入口按用户范围要求设置最低策略：%s", (question, completenessPolicy) => {
+    expect(resolveKnowledgeExecutionPolicy({ mode: "detailed", question, selectedNotebookCount: 1, selectedSourceCount: 3 }))
+      .toEqual({ mode: "detailed", path: "detailed_research", completenessPolicy,
+        responseDetail: "detailed", retrievalDeadlineMs: null });
+    expect(resolveKnowledgeExecutionPolicy({ mode: "fast", question, selectedNotebookCount: 1, selectedSourceCount: 3 }))
+      .toEqual({ mode: "fast", path: "fast_local", completenessPolicy: "best_effort",
+        responseDetail: "normal", retrievalDeadlineMs: 1200 });
+  });
+
   it.each(["qa", "assist"])("历史 %s 读取仍归一为详细，生产输入仍拒绝旧值", (mode) => {
     const normalized = normalizeLegacyKnowledgeReferenceMode(mode);
     expect(normalized).toBe("detailed");

@@ -345,6 +345,7 @@
     "lib/knowledge/retrieval-result-cache.ts",
     "lib/knowledge/knowledge-rollup.ts",
     "lib/knowledge/knowledge-store.ts",
+    "lib/knowledge/research/completeness-policy.ts",
     "lib/knowledge/research/evidence-ledger.ts",
     "lib/knowledge/research/research-store.ts",
     "lib/knowledge/research/research-stop-policy.ts",

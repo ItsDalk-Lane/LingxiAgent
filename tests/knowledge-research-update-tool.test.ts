@@ -3,14 +3,20 @@ import { EvidenceLedger } from "../lib/knowledge/research/evidence-ledger.ts";
 import { ResearchToolBudget, type KnowledgeResearchActorContext } from "../lib/knowledge/research/research-tool-budget.ts";
 import { createKnowledgeResearchUpdateTool } from "../lib/tools/knowledge-research-update-tool.ts";
 import { createKnowledgeResearchFixture } from "./helpers/knowledge-research-fixture.ts";
+import type { KnowledgeCompletenessPolicy } from "../shared/knowledge-execution.ts";
 
 const fixtures: ReturnType<typeof createKnowledgeResearchFixture>[] = [];
 afterEach(() => { vi.restoreAllMocks(); for (const fixture of fixtures.splice(0)) fixture.close(); });
 const needInput = { claim: "核对项目事实", kind: "fact" as const, required: true,
   minIndependentSources: 1, requireCounterEvidence: false, requireAllRelevantUnits: false };
 
-function setup() {
+function setup(initialPolicy?: KnowledgeCompletenessPolicy) {
   const fixture = createKnowledgeResearchFixture(); fixtures.push(fixture);
+  // 用宿主建库入口设置起点，不通过改写数据库绕过策略只能提高的约束。
+  if (initialPolicy !== undefined) fixture.run = fixture.research.createRun({
+    turnScopeId: fixture.scope.id, turnId: fixture.scope.turnId, parentSessionPath: fixture.scope.sessionPath,
+    question: "验证完整性策略升级", completenessPolicy: initialPolicy,
+  });
   const ledger = new EvidenceLedger(fixture.research), budget = new ResearchToolBudget(fixture.research);
   const context: KnowledgeResearchActorContext = { runId: fixture.run.id, scopeId: fixture.scope.id,
     actorSessionId: "research-root-session", actorAgentId: "research-root", role: "root" };
@@ -119,6 +125,75 @@ describe("研究更新工具", () => {
     expect(f.research.listEvidence(f.run.id)).toEqual([]);
     expect(f.research.getReceipt(f.run.id, receipt.id).consumedAt).toBeNull();
   });
+
+  it("从best_effort起点经真实工具逐级升级至scope_complete，返回和存储策略始终一致", async () => {
+    const f = setup("best_effort");
+    expect(f.research.requireRun(f.run.id).completenessPolicy).toBe("best_effort");
+    for (const policy of ["source_diverse", "relevant_sections_complete", "scope_complete"] as const) {
+      const result = await f.call({ requestCompletenessPolicy: policy });
+      expect(result.isError).toBeUndefined();
+      expect(JSON.parse(result.content[0].text)).toMatchObject({ runId: f.run.id, completenessPolicy: policy });
+      expect(f.research.requireRun(f.run.id).completenessPolicy).toBe(policy);
+    }
+    expect(f.research.requireRun(f.run.id).toolCallsUsed).toBe(3);
+    expect(f.research.listActions(f.run.id).map(action => action.status)).toEqual(["completed", "completed", "completed"]);
+  });
+
+  it.each([
+    ["source_diverse", "best_effort", "KNOWLEDGE_INVALID_ARGUMENT"],
+    ["relevant_sections_complete", "best_effort", "KNOWLEDGE_INVALID_ARGUMENT"],
+    ["relevant_sections_complete", "source_diverse", "KNOWLEDGE_CONFLICT"],
+    ["scope_complete", "best_effort", "KNOWLEDGE_INVALID_ARGUMENT"],
+    ["scope_complete", "source_diverse", "KNOWLEDGE_CONFLICT"],
+    ["scope_complete", "relevant_sections_complete", "KNOWLEDGE_CONFLICT"],
+  ] as const)("从%s请求低档%s被拒绝，整批写入不污染现有台账", async (current, requested, errorCode) => {
+    const f = setup();
+    const need = f.research.createNeed(f.run.id, needInput), receipt = f.receipt();
+    expect((await f.call({ requestCompletenessPolicy: current,
+      unresolvedGaps: [{ needId: need.id, gaps: ["既有缺口"] }] })).isError).toBeUndefined();
+    const previousNeeds = f.research.listNeeds(f.run.id);
+    const result = await f.call({ requestCompletenessPolicy: requested,
+      createNeeds: [{ ...needInput, claim: "不应留下的新需求" }],
+      linkEvidence: [{ needId: need.id, receiptId: receipt.id, quote: "九月十五日",
+        relation: "supports", rationale: "原文明确给出日期" }],
+      unresolvedGaps: [{ needId: need.id, gaps: ["不应留下的新缺口"] }],
+    });
+    expect(result.isError).toBe(true);
+    expect(result.details).toMatchObject({ errorCode });
+    expect(f.research.requireRun(f.run.id)).toMatchObject({ completenessPolicy: current, toolCallsUsed: 2 });
+    expect(f.research.listNeeds(f.run.id)).toEqual(previousNeeds);
+    expect(f.research.listEvidence(f.run.id)).toEqual([]);
+    expect(f.research.listRelations(f.run.id)).toEqual([]);
+    expect(f.research.getReceipt(f.run.id, receipt.id).consumedAt).toBeNull();
+    expect(f.research.listActions(f.run.id).at(-1)).toMatchObject({ status: "failed", errorCode });
+  });
+
+  it.each(["best_effort", "source_diverse", "relevant_sections_complete", "scope_complete"] as const)(
+    "Worker在%s下请求任何合法策略都被拒绝，同批已分配需求也不受污染", async current => {
+      const f = setup(current);
+      const need = f.research.createNeed(f.run.id, needInput), receipt = f.receipt();
+      const context: KnowledgeResearchActorContext = { ...f.context, role: "worker", actorSessionId: "policy-worker",
+        allowedNeedIds: [need.id], allowedSourceIds: [f.sources[0].sourceId] };
+      const previousNeed = f.research.getNeed(f.run.id, need.id);
+      for (const requested of ["source_diverse", "relevant_sections_complete", "scope_complete"] as const) {
+        const result = await f.call({ requestCompletenessPolicy: requested,
+          linkEvidence: [{ needId: need.id, receiptId: receipt.id, quote: "九月十五日",
+            relation: "supports", rationale: "属于分配范围的原文" }],
+          unresolvedGaps: [{ needId: need.id, gaps: ["本次不可写入"] }],
+        }, context);
+        expect(result.isError).toBe(true);
+        expect(result.details).toMatchObject({ errorCode: "KNOWLEDGE_SCOPE_VIOLATION" });
+        expect(f.research.requireRun(f.run.id).completenessPolicy).toBe(current);
+        expect(f.research.getNeed(f.run.id, need.id)).toEqual(previousNeed);
+        expect(f.research.listEvidence(f.run.id)).toEqual([]);
+        expect(f.research.listRelations(f.run.id)).toEqual([]);
+        expect(f.research.getReceipt(f.run.id, receipt.id).consumedAt).toBeNull();
+      }
+      expect(f.research.requireRun(f.run.id).toolCallsUsed).toBe(3);
+      expect(f.research.listActions(f.run.id)).toHaveLength(3);
+      expect(f.research.listActions(f.run.id).every(action => action.status === "failed")).toBe(true);
+    },
+  );
 
   it("所有越限、错误类型及未知字段明确拒绝，已授权失败仍消耗工具预算", async () => {
     const f = setup(); const need = f.research.createNeed(f.run.id, needInput); const receipt = f.receipt();

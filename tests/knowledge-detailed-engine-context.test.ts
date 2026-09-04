@@ -9,8 +9,8 @@ import { createResearchAgentFixture, recordSourceEvidence, researchNeed, request
 const fixtures: Awaited<ReturnType<typeof createResearchAgentFixture>>[] = [];
 afterEach(async () => { vi.restoreAllMocks(); for (const fixture of fixtures.splice(0).reverse()) await fixture.close(); });
 
-async function setup(driver: (turn: ResearchModelTurn) => Promise<unknown>) {
-  const f = await createResearchAgentFixture(driver, "请核对项目资料中的事实。"); fixtures.push(f);
+async function setup(driver: (turn: ResearchModelTurn) => Promise<unknown>, question = "请核对项目资料中的事实。") {
+  const f = await createResearchAgentFixture(driver, question); fixtures.push(f);
   const executeIsolated = vi.fn(f.executeIsolated);
   const oldEntry = vi.fn(async () => { throw new Error("新的详细入口不得使用旧调查编排"); });
   const auxiliary = vi.fn(async () => { throw new Error("新的详细入口不得使用旧辅助模型"); });
@@ -48,6 +48,25 @@ async function grepEvidence(turn: ResearchModelTurn, needId: string, sourceId: s
 }
 
 describe("Engine 真实详细研究上下文", () => {
+  it("全文意图进入真实研究账本和最终材料，仅找到一条事实不能冒称完成范围核查", async () => {
+    let round = 0;
+    const f = await setup(async turn => {
+      if (++round === 1) {
+        const needId = await startNeed(turn);
+        await recordSourceEvidence(turn, needId, f.sources[0].sourceId, "九月十五日");
+      }
+      expect(f.research.requireRun(turn.runId).completenessPolicy).toBe("scope_complete");
+      expect((await requestFinish(turn)).accepted).toBe(false);
+    }, "检查全文，是否存在任何与交付日期相矛盾的记录？");
+    const result = await f.engine.buildDetailedKnowledgeResearchContext(f.input);
+    expect(result.stats.research).toMatchObject({ status: "partial", completenessPolicy: "scope_complete" });
+    expect(f.research.requireRun(result.stats.research!.runId).completenessPolicy).toBe("scope_complete");
+    expect(result.block).toContain("Completeness policy: scope_complete");
+    expect(result.block).toContain("Research status: partial");
+    expect(result.evidence.entries).toHaveLength(1);
+    expect(f.oldEntry).not.toHaveBeenCalled();
+  });
+
   it("只执行隔离研究，真实阅读后同分块的多个精确引文都进入最终持久化清单", async () => {
     const quotes = ["苹果项目", "九月十五日"];
     const f = await setup(async turn => {

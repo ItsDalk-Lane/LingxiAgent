@@ -1,4 +1,5 @@
 import type { KnowledgeReferenceMode } from "./knowledge-refs.ts";
+import { deriveKnowledgeCompletenessPolicy } from "../lib/knowledge/research/completeness-policy.ts";
 
 export type KnowledgeExecutionPath = "fast_local" | "detailed_research";
 
@@ -18,7 +19,7 @@ export interface KnowledgeExecutionPolicy {
   retrievalDeadlineMs: number | null;
 }
 
-/** 执行策略统一在此解析；问题驱动的完整性升级在 P3 接入。 */
+/** 执行路径和用户要求的最低完整性统一解析，快速模式始终只做尽力检索。 */
 export function resolveKnowledgeExecutionPolicy(input: {
   mode: KnowledgeReferenceMode;
   question: string;
@@ -37,7 +38,7 @@ export function resolveKnowledgeExecutionPolicy(input: {
   return {
     mode: input.mode,
     path: "detailed_research",
-    completenessPolicy: "source_diverse",
+    completenessPolicy: deriveKnowledgeCompletenessPolicy(input),
     responseDetail: "detailed",
     retrievalDeadlineMs: null,
   };

@@ -6907,6 +6907,18 @@
       "reason": "Reached via esbuild source module graph, imported by lib/knowledge/knowledge-query-service.ts (import-statement); lib/knowledge/retrieval-result-cache.ts (import-statement); lib/knowledge/knowledge-search-service.ts (import-statement)."
     },
     {
+      "path": "lib/knowledge/research/completeness-policy.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "shared/knowledge-execution.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by shared/knowledge-execution.ts (import-statement)."
+    },
+    {
       "path": "lib/knowledge/research/evidence-ledger.ts",
       "inputType": "source-graph",
       "provenance": [
@@ -125790,9 +125802,9 @@
     }
   ],
   "stats": {
-    "totalFiles": 10687,
+    "totalFiles": 10688,
     "byInputType": {
-      "source-graph": 782,
+      "source-graph": 783,
       "runtime-asset": 11,
       "nft-runtime-trace": 9894
     }
