@@ -10,7 +10,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = 75dd47d126490b85157f336c7969303bcddc3b95  (2026-09-04 P3 平台启动与下载清理修复；全量 13739 PASS / 0 FAIL / 7 既有 SKIP，84.87s；四平台复验待执行)
+VERIFIED_SOURCE_SHA   = aba59a5caf355053b91cf757c4088c2d44af2f55  (2026-09-04 P3 启动画面时序修复及兼容指纹；全量 13742 PASS / 0 FAIL / 7 既有 SKIP，81.09s；第三轮四平台待执行)
 历史上游同步工作分支  = feature/upstream-sync-0.447.4
 当前知识重构执行分支  = feat/knowledge-retrieval-research-p0-p3
 ```
@@ -1078,3 +1078,7 @@ Windows NSIS 已在 windows-latest 构建成功；尚未在真实 Windows 桌面
 - 全量发现下载写入尚未关闭即删除的竞态，确定性红测后修为等待关闭再清理，106 项下载回归通过。当前待验证源码 `75dd47d126490b85157f336c7969303bcddc3b95` 包含该修复和平台启动诊断；最终封印仍待四平台实际通过。
 
 - 当前源码 `75dd47d1` 的阶段全量复验已通过：13739 PASS / 0 FAIL / 7 既有 SKIP，84.87s；lint exit 0，两轮完整生成器差异不变，测试清单 960 项（SHA-256 4c0b1fa2097818b9c7d5e44cd22a05c611b2b0ff4981a2991d9a76b55c763065），开放树 885 文件一致。第二轮四平台待执行，最终封印未建立。
+
+- 第二轮真实平台确认 Linux 沙箱权限修复有效；macOS arm64/Windows 都是 splash 初始加载被 preparing 重复导航中止（ERR_ABORTED）。当前源码 `4ec98d0e185e3785f18cd40a7274c32ec9bff7e4` 等待初始文档完成后只切换一次，三个确定性红测修后通过，原启动失败断言不变；本机完整打包与真实桌面启动通过，阶段全量和第三轮四平台待执行。
+
+- 当前源码 `aba59a5c`（运行时修复 `4ec98d0e` 加兼容指纹）全量 13742 PASS / 0 FAIL / 7 既有 SKIP，81.09s，lint exit 0。两轮 14 条生成器全部通过，960 项测试清单 SHA-256 `8c16cc006d9055e0e53e1b87179e938af7c3ee200fa41f81903057a227cde5b9`，885 开放树文件一致。第二轮 macOS 双架构和 Windows 均确认 splash -3 重复导航，第三轮验证当前修复；最终封印未建立。
