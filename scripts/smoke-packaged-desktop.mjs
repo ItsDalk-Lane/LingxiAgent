@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import { spawn } from "node:child_process";
+import { execFileSync, spawn } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { buildRuntimeEnvironment } from "./smoke-packaged-knowledge.mjs";
 import { redactLogText, redactLogValue } from "../shared/log-redactor.ts";
@@ -72,7 +72,20 @@ async function inspectRenderer() {
 
 async function stopPid(pid) {
   if (!Number.isSafeInteger(pid) || pid <= 0) return;
-  try { process.kill(pid, "SIGTERM"); } catch { return; }
+  try { process.kill(pid, 0); } catch { return; }
+  if (platform === "win32") {
+    // 必须在父进程仍存在时结束整棵测试进程树，否则子进程会继续占用资料目录。
+    try {
+      execFileSync("taskkill", ["/PID", String(pid), "/T", "/F"], {
+        stdio: "pipe", windowsHide: true, timeout: 15_000,
+      });
+    } catch (error) {
+      try { process.kill(pid, 0); } catch { return; }
+      throw error;
+    }
+  } else {
+    try { process.kill(pid, "SIGTERM"); } catch { return; }
+  }
   for (let attempt = 0; attempt < 100; attempt++) {
     try { process.kill(pid, 0); } catch { return; }
     await sleep(100);
@@ -119,11 +132,21 @@ try {
   report.finishedAt = new Date().toISOString();
   // 只处理本次随机资料目录记录的子服务与本次启动的桌面进程。
   const serverPid = readJson(path.join(home, "server-info.json"))?.pid;
-  await stopPid(child.pid);
-  if (serverPid !== child.pid) await stopPid(serverPid);
+  try {
+    await stopPid(child.pid);
+    if (serverPid !== child.pid) await stopPid(serverPid);
+    fs.rmSync(home, { recursive: true, force: true, maxRetries: 10, retryDelay: 100 });
+    fs.rmSync(userData, { recursive: true, force: true, maxRetries: 10, retryDelay: 100 });
+    report.cleanupPassed = true;
+  } catch (error) {
+    report.status = "failed";
+    report.cleanupPassed = false;
+    report.cleanupError = redactLogText(error instanceof Error ? error.message : String(error), {
+      homeDir: os.homedir(), extraPaths: [home, userData],
+    });
+    process.exitCode = 1;
+  }
   fs.mkdirSync(path.dirname(reportPath), { recursive: true });
   fs.writeFileSync(reportPath, JSON.stringify(report, null, 2) + "\n");
-  fs.rmSync(home, { recursive: true, force: true, maxRetries: 10, retryDelay: 100 });
-  fs.rmSync(userData, { recursive: true, force: true, maxRetries: 10, retryDelay: 100 });
   console.log(JSON.stringify(report));
 }

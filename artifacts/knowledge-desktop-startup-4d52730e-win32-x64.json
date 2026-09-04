@@ -1,0 +1,17 @@
+{
+  "platform": "win32",
+  "arch": "x64",
+  "startedAt": "2026-09-04T09:14:00.414Z",
+  "status": "passed",
+  "packaged": true,
+  "rendererReady": true,
+  "serverReady": true,
+  "renderer": {
+    "ready": "complete",
+    "textLength": 93,
+    "controls": 7,
+    "entryScreen": "onboarding"
+  },
+  "durationMs": 75831.2448,
+  "finishedAt": "2026-09-04T09:15:16.246Z"
+}

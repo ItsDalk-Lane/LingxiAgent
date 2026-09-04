@@ -21693,6 +21693,41 @@
     ]
   },
   {
+    "file": "tests/packaged-desktop-cleanup.test.ts",
+    "describeCount": 1,
+    "itCount": 4,
+    "testCount": 0,
+    "issueRefs": [],
+    "category": "build",
+    "decision": "KEEP",
+    "ownerArea": "build/package",
+    "keepReason": "protects build/package/runtime boundary; protects cross-platform path/shell/sandbox behavior; protects keyed frontend/session state",
+    "deleteOrMergeCandidate": "none in first-pass inventory",
+    "flags": {
+      "hasSnapshot": false,
+      "hasFsTmp": false,
+      "hasRoute": false,
+      "hasSecurity": false,
+      "hasBuild": true,
+      "hasBridge": false,
+      "hasResource": false,
+      "hasProvider": false,
+      "hasPlatform": true,
+      "hasPersistence": true,
+      "hasUiState": true,
+      "hasIssueRef": false,
+      "isIssueNamed": false,
+      "isAcceptance": false,
+      "touchesPrivateMock": false,
+      "hardcodesLingxiHome": false
+    },
+    "imports": [
+      "node:fs",
+      "node:vm",
+      "vitest"
+    ]
+  },
+  {
     "file": "tests/paper-texture-contract.test.ts",
     "describeCount": 1,
     "itCount": 3,

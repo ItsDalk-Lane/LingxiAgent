@@ -22,7 +22,7 @@
 | P0 | completed | 2026-09-04 全量 13002 PASS / 0 FAIL / 7 既有 SKIP，76.42s；全部 P0 门禁通过，审计提交 f9928d76 |
 | P1 | completed | P1-01 至 P1-08 完成；本地全量和第三轮四平台 Build 33829055797 全部通过，阶段审计 333c5112 |
 | P2 | completed | P2-01 至 P2-08 及阶段故障修复全部完成；全量 13434 PASS / 0 FAIL / 7 既有 SKIP，构建/包内烟测/两轮生成器均通过 |
-| P3 | in_progress | P3-01 至 P3-07 实现已提交；本机全量 13738 PASS / 0 FAIL / 7 既有 SKIP，四平台 Build 33850016811 验证中 |
+| P3 | in_progress | P3-01 至 P3-07 实现及门禁修复已提交；本机全量 13742 PASS / 0 FAIL / 7 既有 SKIP；第三轮四平台 Build 33855890039 验证中 |
 
 ## P0-00：建立基线与回归门禁
 
@@ -481,3 +481,7 @@
 - 第二轮 CI macOS arm64 诊断确认：首个 splash 页面尚在加载，解包进度立即改导航为 preparing，触发 ERR_ABORTED（-3）；随后 preparing 页面实际加载成功。未删除/过滤该启动失败断言。生产修复为等待当前主文档加载完成后再切换，同一次拆箱对同一窗口只切换一次，等待期间窗口关闭则不再导航。三项确定性红测先 3 FAIL/11 PASS，修后含旧通道与准备文案/CI 接线共 33 PASS，169ms；三组类型、定向 ESLint exit 0。Linux 第二轮含真实桌面启动已完整成功，权限修复已获实机证据。其余平台与新时序修复继续验证。
 
 - 启动画面时序修复的第一轮生成器在指纹门禁处停止（exit 1），后续全量未执行。候选逐字段比较确认只变更 desktop-window-version-state 的 desktop/main.cjs 代码哈希，数据契约、66 stores/779 sites、v19/v4/v1 和向量 BLOB 不变；显式 compatible review 后由生成器重钉 `sha256:5260947940c35b5db4f8dbe69b82fed4345c51ac7a37d62546bbef2fcee9d794`。持久化门禁 15 PASS，1.74s；原失败和候选差异保留 `/tmp/lingxi-knowledge-p307-splash-fingerprint-diff.json`。
+
+- 第三轮验证前的当前状态：运行时导航修复 `4ec98d0e`、兼容指纹 `aba59a5c`；本机完整打包、种子验签、归档重启检索、真实桌面和开放服务端全部 exit 0。阶段全量 13742 PASS / 0 FAIL / 7 既有 SKIP，81.09s；两轮生成器和 lint 通过；阶段审计 `4d52730e` 已推送，第三轮 Build `33855890039` 执行中，最终封印未建立。
+
+- 第三轮 Build `33855890039`：macOS 双架构、Linux 和质量门禁完整通过；Windows 的打包应用、引导页和后台已就绪（75.831s），随后临时目录清理因子进程仍占用文件报 EPERM，整个 Windows 步骤仍记失败。修复仅测试脚本：Windows 在父进程退出前按本次 PID 结束进程树，再清理独立后台；清理失败也写入失败结果。新增确定性红测 2 FAIL/2 PASS（124ms），修后相关 3 文件 26 PASS（142ms）；三组类型与定向 lint exit 0。未放宽启动、清理、时限或平台门禁，最终封印继续保留。
