@@ -660,7 +660,7 @@
     ],
     "version": 3
   },
-  "payloadFingerprint": "sha256:a385729c34ac35cda0d6eafbfe98061dc2eb6c88519e409179f5f00005e42569",
+  "payloadFingerprint": "sha256:5260947940c35b5db4f8dbe69b82fed4345c51ac7a37d62546bbef2fcee9d794",
   "registry": [
     {
       "affectedByEpochMigration": true,
@@ -3292,8 +3292,8 @@
   ],
   "review": {
     "classification": "compatible",
-    "compatibilityReason": "P3-07 移除生产未用的旧知识编排、旧查询和旧预算，保留历史读取与迁移；数据库 v19、FTS v4 和向量 BLOB 结构不变。",
-    "payloadFingerprint": "sha256:a385729c34ac35cda0d6eafbfe98061dc2eb6c88519e409179f5f00005e42569"
+    "compatibilityReason": "P3-07 启动页时序修复只改变 desktop/main.cjs 的代码指纹；窗口边界、公告书签和更新版本标记读写契约未变，knowledge v19、FTS v4、ANN v1 与付费向量 BLOB 不变。",
+    "payloadFingerprint": "sha256:5260947940c35b5db4f8dbe69b82fed4345c51ac7a37d62546bbef2fcee9d794"
   },
   "schemas": [
     {
@@ -3502,7 +3502,7 @@
       "contract": "desktop window bounds, release announcement bookmark, and update cache version marker readers",
       "kind": "directory-contract",
       "module": "desktop/main.cjs",
-      "sourceHash": "sha256:b9d44f3f2940b563371ab0a7d92edf9b4b9a94fe3abf347019f0826dc0e66fca",
+      "sourceHash": "sha256:0ee2eeca269ef41c4ea85a86e464bb6034320b7399b29143e9f1281f4aeeed90",
       "storeId": "desktop-window-version-state"
     },
     {

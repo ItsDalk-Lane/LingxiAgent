@@ -479,3 +479,5 @@
 - 启动与下载清理修复源码 `75dd47d1` 全量通过后，阶段审计 `4984e6fd` 已提交推送，第二轮四平台 Build `33853266640` 执行中。本机类型 25.255s、完整打包 137.210s、种子验签 3.666s、包内检索/原生回退 11.432s、桌面启动 11.880s、开放服务端 39.246s，全 exit 0；明细见 `artifacts/knowledge-source75-package-verification.json`。本机通过不替代远程启动失败，继续当前 P3-07。
 
 - 第二轮 CI macOS arm64 诊断确认：首个 splash 页面尚在加载，解包进度立即改导航为 preparing，触发 ERR_ABORTED（-3）；随后 preparing 页面实际加载成功。未删除/过滤该启动失败断言。生产修复为等待当前主文档加载完成后再切换，同一次拆箱对同一窗口只切换一次，等待期间窗口关闭则不再导航。三项确定性红测先 3 FAIL/11 PASS，修后含旧通道与准备文案/CI 接线共 33 PASS，169ms；三组类型、定向 ESLint exit 0。Linux 第二轮含真实桌面启动已完整成功，权限修复已获实机证据。其余平台与新时序修复继续验证。
+
+- 启动画面时序修复的第一轮生成器在指纹门禁处停止（exit 1），后续全量未执行。候选逐字段比较确认只变更 desktop-window-version-state 的 desktop/main.cjs 代码哈希，数据契约、66 stores/779 sites、v19/v4/v1 和向量 BLOB 不变；显式 compatible review 后由生成器重钉 `sha256:5260947940c35b5db4f8dbe69b82fed4345c51ac7a37d62546bbef2fcee9d794`。持久化门禁 15 PASS，1.74s；原失败和候选差异保留 `/tmp/lingxi-knowledge-p307-splash-fingerprint-diff.json`。
