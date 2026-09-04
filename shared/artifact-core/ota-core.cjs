@@ -347,6 +347,7 @@ async function downloadToFile(url, destPath, opts = {}) {
   }
   await fsp.mkdir(path.dirname(destPath), { recursive: true });
   const writeStream = fs.createWriteStream(destPath);
+  const writeClosed = new Promise((resolve) => writeStream.once("close", resolve));
   let total = 0;
   let bytesAtWindowStart = 0;
   let stallTimer = null;
@@ -397,6 +398,9 @@ async function downloadToFile(url, destPath, opts = {}) {
       bodyStream.pipe(writeStream);
     });
   } catch (err) {
+    // 打开文件本身也是异步的；先等写入端彻底关闭，避免删除后又创建出残留文件。
+    writeStream.destroy();
+    await writeClosed;
     await fsp.rm(destPath, { force: true }).catch(() => {});
     throw err;
   } finally {

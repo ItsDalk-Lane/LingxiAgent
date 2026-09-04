@@ -6,7 +6,7 @@ import path from "path";
 import zlib from "zlib";
 import { Readable } from "stream";
 import { createRequire } from "module";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 const require = createRequire(import.meta.url);
 
@@ -362,6 +362,34 @@ describe("artifact-ota: downloadToFile", () => {
     const fetchOnce = async () => fakeStreamResponse(500, {});
     await expect(downloadToFile("https://mirror.example/archive.tar.gz", destPath, { fetchOnce })).rejects.toThrow(/500/);
     expect(fs.existsSync(destPath)).toBe(false);
+  });
+
+  it("waits for a delayed file open to close before removing an oversized download", async () => {
+    const root = makeTempDir("hana-ota-delayed-open-");
+    const destPath = path.join(root, "archive.tar.gz");
+    const createWriteStream = fs.createWriteStream;
+    let closed = false;
+    let closeFinished: Promise<void> | undefined;
+    const spy = vi.spyOn(fs, "createWriteStream").mockImplementationOnce(() => {
+      const stream = createWriteStream(destPath, { fs: {
+        open: (...args) => { setTimeout(() => Reflect.apply(fs.open, fs, args), 25); },
+        close: fs.close,
+        write: fs.write,
+        writev: fs.writev,
+      } });
+      closeFinished = new Promise(resolve => stream.once("close", () => { closed = true; resolve(); }));
+      return stream;
+    });
+    try {
+      const fetchOnce = async () => fakeStreamResponse(200, {}, [Buffer.alloc(1000, 7)]);
+      await expect(downloadToFile("https://mirror.example/archive.tar.gz", destPath, { fetchOnce, maxBytes: 100 }))
+        .rejects.toThrow(/exceeded 100 bytes/);
+      expect(closed).toBe(true);
+      expect(fs.existsSync(destPath)).toBe(false);
+    } finally {
+      await closeFinished;
+      spy.mockRestore();
+    }
   });
 });
 
