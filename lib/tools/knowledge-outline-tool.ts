@@ -1,31 +1,10 @@
-/**
- * knowledge_outline 工具 —— 列当前 KnowledgeTurnScope 冻结集合的结构
- * （Phase 11，任务书 §二十三 Agent Knowledge 工具体系）。
- *
- * 消费方是主模型：拿到 [KnowledgeContext] 注入块（或分片清单）后，先看本轮
- * 知识里有哪些 notebook / source、各自规模（coverage 单元数）与首层 heading
- * 摘要，再决定读哪片（knowledge_read）或检索什么（knowledge_grep）。
- *
- * 权限边界（与 knowledge_read 同链，任务书 §二十~§二十二，校验链在
- * lib/tools/knowledge-scope.ts）：
- * - 只读；studio 隔离（所有 store 查询都带 studioId）；
- * - scopeId 必填且服务端逐次复核：scope 存在、active、属于当前会话（subagent
- *   子会话经 manifest provenance 继承父会话 scope）；
- * - 绝不列出 scope 冻结集合之外的 notebook/source（枚举以 scope 为唯一来源，
- *   不做全 studio 扫描）；
- * - 结构数据锚定 scope 冻结的 parseArtifact（§四十三），从 blocks/headingPath
- *   元数据派生；未解析/未就绪的源按 fidelity 摘要单列（对齐 coverage manifest
- *   语义），不整单失败也不静默省略；
- * - 输出量级有界截断，截断处显式标注（truncated 字段）。
- */
+/** 列出冻结范围的已编译目录；普通目录查询不计算完整性覆盖单元。 */
 import { Type } from "../pi-sdk/index.ts";
 import { fidelityFromLocatorTypes, type CoverageSourceFidelity } from "../knowledge/knowledge-coverage-manifest.ts";
-import { buildCoverageUnits } from "../knowledge/knowledge-coverage-unit.ts";
 import { isKnowledgeError, KnowledgeError } from "../knowledge/errors.ts";
 import type { KnowledgeManager } from "../knowledge/knowledge-manager.ts";
-import type { KnowledgeBlock } from "../knowledge/types.ts";
+import type { CompiledKnowledgeSource } from "../knowledge/scope-snapshot-compiler.ts";
 import {
-  knowledgeBlockHeadingPath,
   knowledgeScopeViolation,
   resolveKnowledgeTurnScope,
   type KnowledgeToolSessionContext,
@@ -50,80 +29,34 @@ export interface KnowledgeOutlineToolDeps {
   resolveSessionContext?: (ctx: unknown) => KnowledgeToolSessionContext;
 }
 
-/** 冻结 artifact 的结构摘要：fidelity + coverage 单元数 + 首层 heading 列表。 */
-function summarizeFrozenArtifact(input: {
-  knowledge: KnowledgeManager;
-  studioId: string;
-  sourceId: string;
-  parseArtifactId: string | null;
-}): {
-  fidelity: CoverageSourceFidelity;
-  blockCount: number;
-  coverageUnits: number;
-  headings: string[];
-  totalHeadings: number;
-  headingsTruncated: boolean;
-} {
-  if (input.parseArtifactId == null) {
-    return { fidelity: "unavailable", blockCount: 0, coverageUnits: 0, headings: [], totalHeadings: 0, headingsTruncated: false };
-  }
-  const artifact = input.knowledge.store.getParseArtifact({
-    studioId: input.studioId,
-    parseArtifactId: input.parseArtifactId,
-  });
-  if (artifact.status === "needs_ocr") {
-    return { fidelity: "needs_ocr", blockCount: 0, coverageUnits: 0, headings: [], totalHeadings: 0, headingsTruncated: false };
-  }
-  if (artifact.status !== "ready") {
-    // 冻结时刻解析未完 / 失败：无可处理文本，fidelity 单列。
-    return { fidelity: "unavailable", blockCount: 0, coverageUnits: 0, headings: [], totalHeadings: 0, headingsTruncated: false };
-  }
-  const blocks: KnowledgeBlock[] = input.knowledge.listArtifactBlocks({
-    studioId: input.studioId,
-    parseArtifactId: input.parseArtifactId,
-  });
-  // §五十九：经 ProcessingArtifact 管线的 artifact 以持久化的 fidelity 为准。
-  const fidelity = artifact.processingArtifactId
-    ? artifact.fidelity
-    : fidelityFromLocatorTypes(blocks.map(block => block.locatorType));
-  // coverage 单元数是 exhaustive 分母口径（与 coverage manifest 同一切分纯函数），
-  // 不依赖检索索引是否已建。
-  const coverageUnits = buildCoverageUnits({
-    sourceId: input.sourceId,
-    parseArtifactId: input.parseArtifactId,
-    blocks,
-  }).length;
-  // 首层 heading 摘要：headingPath[0] 按块序去重。
-  const seen = new Set<string>();
-  const headings: string[] = [];
-  let totalHeadings = 0;
-  for (const block of blocks) {
-    const first = knowledgeBlockHeadingPath(block)[0];
-    if (first == null || seen.has(first)) continue;
-    seen.add(first);
-    totalHeadings += 1;
-    if (headings.length < MAX_HEADINGS_PER_SOURCE) {
-      headings.push(first.length > MAX_HEADING_CHARS ? `${first.slice(0, MAX_HEADING_CHARS)}…` : first);
-    }
-  }
-  return {
-    fidelity,
-    blockCount: blocks.length,
-    coverageUnits,
-    headings,
-    totalHeadings,
-    headingsTruncated: totalHeadings > headings.length,
-  };
+/** 保留冻结原文的可信度；目录大小与标题来自索引元数据，不重新拆覆盖单元。 */
+function summarizeFrozenArtifact(knowledge: KnowledgeManager, studioId: string, source: CompiledKnowledgeSource, chunkProfileHash: string | null) {
+  const artifact = source.parseArtifactId ? knowledge.store.getParseArtifact({ studioId, parseArtifactId: source.parseArtifactId }) : null;
+  const blockMetadata = artifact?.status === "ready"
+    ? knowledge.store.getArtifactBlockMetadata({ studioId, parseArtifactId: artifact.id }) : { blockCount: 0, locatorTypes: [] };
+  const fidelity: CoverageSourceFidelity = !artifact || artifact.status === "failed" || artifact.status === "parsing" ? "unavailable"
+    : artifact.status === "needs_ocr" ? "needs_ocr" : artifact.processingArtifactId ? artifact.fidelity : fidelityFromLocatorTypes(blockMetadata.locatorTypes);
+  const metadata = artifact?.status === "ready" && chunkProfileHash
+    ? knowledge.indexStore.getReadyVariantMetadata({ parseArtifactId: artifact.id, chunkProfileHash }) : null;
+  const sectionKeys = metadata?.sectionKeys ?? [];
+  const allHeadings = [...new Set(sectionKeys.map(key => key.split(" > ")[0]))];
+  const headings = allHeadings.slice(0, MAX_HEADINGS_PER_SOURCE).map(heading => heading.length > MAX_HEADING_CHARS
+    ? `${heading.slice(0, MAX_HEADING_CHARS)}…` : heading);
+  return { fidelity, status: metadata ? "ready" : source.status === "ready" ? "index_missing" : source.status,
+    blockCount: blockMetadata.blockCount, chunkCount: metadata?.chunkCount ?? 0,
+    chunkIndexVariantId: metadata?.id ?? null, firstHeadingPath: metadata?.firstHeadingPath ?? null,
+    sectionKeys: sectionKeys.slice(0, MAX_HEADINGS_PER_SOURCE),
+    totalSections: sectionKeys.length, sectionsTruncated: sectionKeys.length > MAX_HEADINGS_PER_SOURCE,
+    headings, totalHeadings: allHeadings.length, headingsTruncated: allHeadings.length > headings.length,
+    metadataMissing: metadata?.metadataMissing ?? true };
 }
 
 export function createKnowledgeOutlineTool(deps: KnowledgeOutlineToolDeps) {
   return {
     name: "knowledge_outline",
     label: "Knowledge Outline",
-    description: "List the structure of the current turn's knowledge scope: selected notebooks, their frozen sources "
-      + "(name/type/fidelity/coverage unit count) and each source's first-level heading summary. "
-      + "Use it after a [KnowledgeContext] block to see what knowledge is available this turn before reading shards "
-      + "(knowledge_read) or searching text (knowledge_grep). Only sources inside the scope are ever listed. Read-only.",
+    description: "List the frozen knowledge scope's notebooks and sources, indexed chunk counts, heading summaries, section keys and fidelity/status. "
+      + "Read-only metadata lookup. This outline does not prove complete coverage. Use knowledge_search, knowledge_read or knowledge_grep to inspect the original evidence.",
     parameters: Type.Object({
       scopeId: Type.String({
         description: "Knowledge turn scope id from the [KnowledgeContext] block header (the Scope line). Required.",
@@ -160,23 +93,15 @@ export function createKnowledgeOutlineTool(deps: KnowledgeOutlineToolDeps) {
           parentSessionPath: null,
         };
         const scope = resolveKnowledgeTurnScope({ knowledge, studioId, scopeId, sessionContext });
+        const compiled = await knowledge.compileTurnScope(scope);
 
-        // 枚举以 scope 为唯一来源：选中 notebooks（按选择顺序）→ 每本引用的冻结源。
-        // notebook/source 行在 scope 创建后被并发删除的窗口：逐条标注 error，
-        // 不静默省略也不让整单失败（显式降级并标注）。
+        // 枚举只使用已编译的冻结目录，不扫描范围外来源。
+        // 编译完成后来源被并发删除时，逐条标注错误，不静默省略。
         const notebooks: Array<Record<string, unknown>> = [];
-        for (const notebookId of scope.notebookIds) {
+        for (const notebook of compiled.notebooks) {
+          const notebookId = notebook.notebookId;
           if (notebooks.length >= MAX_NOTEBOOKS) break;
-          let notebookName: string | null = null;
-          let notebookError: string | null = null;
-          try {
-            notebookName = knowledge.getNotebook({ studioId, notebookId }).name;
-          } catch (error) {
-            notebookError = error instanceof Error ? error.message : String(error);
-          }
-          const frozenForNotebook = scope.sources.filter(
-            frozen => frozen.notebookIds.includes(notebookId),
-          );
+          const frozenForNotebook = compiled.sources.filter(source => source.notebookIds.includes(notebookId));
           const sources: Array<Record<string, unknown>> = [];
           for (const frozen of frozenForNotebook) {
             if (sources.length >= MAX_SOURCES_PER_NOTEBOOK) break;
@@ -191,12 +116,7 @@ export function createKnowledgeOutlineTool(deps: KnowledgeOutlineToolDeps) {
                 ...entry,
                 sourceName: source.displayName,
                 sourceType: source.sourceType,
-                ...summarizeFrozenArtifact({
-                  knowledge,
-                  studioId,
-                  sourceId: frozen.sourceId,
-                  parseArtifactId: frozen.parseArtifactId,
-                }),
+                ...summarizeFrozenArtifact(knowledge, studioId, frozen, notebook.chunkProfileHash),
               };
             } catch (error) {
               entry = {
@@ -210,8 +130,7 @@ export function createKnowledgeOutlineTool(deps: KnowledgeOutlineToolDeps) {
           }
           notebooks.push({
             notebookId,
-            ...(notebookName != null ? { notebookName } : {}),
-            ...(notebookError != null ? { error: notebookError } : {}),
+            notebookName: notebook.notebookName,
             sources,
             sourcesTruncated: frozenForNotebook.length > sources.length,
           });
@@ -221,7 +140,8 @@ export function createKnowledgeOutlineTool(deps: KnowledgeOutlineToolDeps) {
           turnId: scope.turnId,
           notebooks,
           notebooksTruncated: scope.notebookIds.length > notebooks.length,
-          totalSources: scope.sources.length,
+          totalSources: compiled.sources.length,
+          warnings: compiled.warnings,
         }, null, 2), { scopeId });
       } catch (error) {
         if (isKnowledgeError(error)) {

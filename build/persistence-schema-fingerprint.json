@@ -660,7 +660,7 @@
     ],
     "version": 3
   },
-  "payloadFingerprint": "sha256:8e8d4219d971582c186cdb036538eaf5bc398007ace614de290e4802e7da0077",
+  "payloadFingerprint": "sha256:62fb7022d119927f45f160a0ebe7bdffc673bcb1dfefd3be23cf31e1d729b40d",
   "registry": [
     {
       "affectedByEpochMigration": true,
@@ -3292,8 +3292,8 @@
   ],
   "review": {
     "classification": "compatible",
-    "compatibilityReason": "P1-06 registers the bounded read-only knowledge_search tool and reuses frozen scope validation; no persistent schema or existing data identity changes.",
-    "payloadFingerprint": "sha256:8e8d4219d971582c186cdb036538eaf5bc398007ace614de290e4802e7da0077"
+    "compatibilityReason": "P1-07 adds a read-only block metadata accessor and shares compiled scope/search across tools; existing tables, frozen identities and ordinal reads remain compatible. Grep adds exact read span details without new durable state.",
+    "payloadFingerprint": "sha256:62fb7022d119927f45f160a0ebe7bdffc673bcb1dfefd3be23cf31e1d729b40d"
   },
   "schemas": [
     {
@@ -3841,7 +3841,7 @@
         ],
         "userVersion": 17
       },
-      "sourceHash": "sha256:0e13adef3b6388af0372a0579b2b64f8a8c8f6522166d32dd073cfd998efbcf1",
+      "sourceHash": "sha256:31985a1ecc780b3a4b17d1645c9fe4800ef5c12bafa66a63d9ef08988ea6768a",
       "storeId": "knowledge-database"
     },
     {

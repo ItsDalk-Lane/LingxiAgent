@@ -10,7 +10,7 @@
 - 严格按 P0 → P1 → P2 → P3 及编号顺序；阶段门禁全部通过才进入下一阶段。
 - 每项记录测试原始结果后提交；不删除、跳过或放宽测试，不合并 main。
 - 现有任务书为用户未跟踪文件，既有规划文档与 BLOCKED.md 历史记录保留。
-- 当前断点：P1-06 已完成只读知识搜索工具和本项验证，随本次提交落地，接着执行 P1-07。P0 源码提交 `5c016df183ad207cf1ca33de274abb7a4eb10057`，阶段审计提交 `f9928d76`；全量 13002 PASS / 0 FAIL / 7 既有 SKIP。用户已授权每阶段验证后同步审计记录，保留最终封印。
+- 当前断点：P1-07 已完成现有工具统一数据面和本项验证，随本次提交落地，接着执行 P1-08 打包与性能验证。P0 源码提交 `5c016df183ad207cf1ca33de274abb7a4eb10057`，阶段审计提交 `f9928d76`；全量 13002 PASS / 0 FAIL / 7 既有 SKIP。用户已授权每阶段验证后同步审计记录，保留最终封印。
 - 进度、计划与事实集中在本文件和基线文档，避免覆盖既有 task_plan.md / findings.md / PROGRESS.md。
 - 目标工具已确认本任务存在 active goal；重复 create_goal 被拒绝，沿用现有目标。
 - 规划恢复脚本返回其他会话的无关配置记录，经 git diff 为空核对，未采用其内容。
@@ -20,7 +20,7 @@
 | 阶段 | 状态 | 结果 |
 | --- | --- | --- |
 | P0 | completed | 2026-09-04 全量 13002 PASS / 0 FAIL / 7 既有 SKIP，76.42s；全部 P0 门禁通过，审计提交 f9928d76 |
-| P1 | in_progress | P1-01 至 P1-06 本项验证通过；阶段门禁尚未执行 |
+| P1 | in_progress | P1-01 至 P1-07 本项验证通过；阶段门禁尚未执行 |
 | P2 | pending | NOT_EXECUTED |
 | P3 | pending | NOT_EXECUTED |
 
@@ -183,16 +183,21 @@
 - 结果：9 文件 / 92 测试通过（2.17s，exit 0）；类型检查 exit 0；ESLint 0 error / 88 warning，exit 0；边界检查 exit 0。未知/关闭/跨工作室/跨会话范围拒绝、真实父范围继承、混合越权过滤整单拒绝、模型归属伪造拒绝、各权限档只读放行、长问题和非法数量拒绝、默认 12/最大 24 候选及既有 1200 字符摘要上限全部通过。
 - 生成物：CLI 闭包 10668 文件，原 1 条边界债务不变；持久化指纹保持 `sha256:8e8d4219d971582c186cdb036538eaf5bc398007ace614de290e4802e7da0077`，检查通过；没有数据表变化。
 - 日志：`/tmp/lingxi-knowledge-p106-tests-{first,final}.log`、`/tmp/lingxi-knowledge-p106-typecheck.log`、`/tmp/lingxi-knowledge-p106-lint.log`、`/tmp/lingxi-knowledge-p106-{boundary,closure,fingerprint,fingerprint-check}.log`。
-- 对应 commit SHA：本次提交，下项回填。
+- 对应 commit SHA：`08bfd20d`。
 - 偏差：none
 
-## P1-07：让现有工具复用统一数据面
+## P1-07：现有工具复用统一数据面
 
-- 状态：pending
-- 改动文件：尚未开始
-- 测试命令：按任务书该项测试执行，尚未执行
-- 测试结果：NOT_EXECUTED
-- 对应 commit SHA：尚未提交
+- 状态：completed
+- 改动：knowledge_read.query 使用编译范围和统一搜索服务，固定 sourceId/所属 notebook、limit=12；原 ordinal 范围读取保持原行为。knowledge_outline 使用编译目录和索引 metadata，返回 chunk count、章节、标题、状态与可信度；取消普通目录中的 CoverageUnit 重算和相应覆盖数量输出，保留事实库只读数量/定位类型查询。章节列表沿用已有 40 项摘要上限并显式标记截断。
+- 原文匹配：增加 scannedChars、matchedSourceCount、精确起止偏移和长匹配截断标记；保留原文空白，宿主 details 携带冻结身份与实际返回原文位置，作为 P2 receipt 扩展点。本项不提前建 P2 表或生成 receipt。扫描预算只计真正扫描过的字符，中断来源已扫描的计数和结果继续保留。
+- 测试更新：按任务书更换目录的旧覆盖单位断言，新增实际数据库 chunk 数精确断言，以及 CoverageUnit/全量 blocks/全量 chunks 均零调用断言；原来源归属、标题、可信度、父会话继承与越权拒绝断言保留。读取查询新增统一入口调用参数断言，旧 retrieveForArtifacts 必须零调用；原文匹配与宿主读取位置逐字符对照。
+- 测试命令：knowledge-read-tool / knowledge-agent-tools / knowledge-search-tool / knowledge-search-tool-scope / knowledge-scope-metadata-query / knowledge-scope-snapshot-compiler / knowledge-store；另跑 knowledge-source-processors；三套类型检查、修改文件 ESLint、边界检查、CLI 闭包和持久化指纹生成检查。
+- 结果：7 文件 / 70 测试通过（2.20s，exit 0）；处理器 1 文件 / 6 测试通过（806ms，exit 0）；类型检查 exit 0；ESLint 0 error / 164 warning，exit 0；边界检查 exit 0。
+- 修复记录：首轮 2 FAIL / 33 PASS：旧工具样本只建立块索引而未登记笔记本分块身份，统一目录如实判未就绪。样本补齐摄入侧已有的身份登记后通过，未在查询侧增加写入或惰性建索引，未放宽命中/范围断言。一次扩展测试命令误写不存在的处理器文件名（Vitest 只执行其余 7 文件）；已用真实 knowledge-source-processors 文件单独执行并记录。
+- 生成物：CLI 闭包 10667 文件，普通目录不再引入覆盖单位构建模块，原 1 条边界债务不变；持久化指纹兼容更新并检查通过，`sha256:62fb7022d119927f45f160a0ebe7bdffc673bcb1dfefd3be23cf31e1d729b40d`，表版本不变。
+- 日志：`/tmp/lingxi-knowledge-p107-tests-{first,r2,final}.log`、`/tmp/lingxi-knowledge-p107-processors.log`、`/tmp/lingxi-knowledge-p107-typecheck-final.log`、`/tmp/lingxi-knowledge-p107-lint.log`、`/tmp/lingxi-knowledge-p107-{boundary,closure,fingerprint,fingerprint-check}.log`。
+- 对应 commit SHA：本次提交，下项回填。
 - 偏差：none
 
 ## P1-08：HNSW 打包与性能验证

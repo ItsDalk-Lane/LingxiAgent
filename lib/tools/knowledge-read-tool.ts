@@ -19,7 +19,7 @@ import { Type } from "../pi-sdk/index.ts";
 import { resolveKnowledgeChunkerConfig } from "../knowledge/chunker.ts";
 import { isKnowledgeError, KnowledgeError } from "../knowledge/errors.ts";
 import type { KnowledgeManager } from "../knowledge/knowledge-manager.ts";
-import type { KnowledgeModelRef } from "../knowledge/types.ts";
+import type { KnowledgeTurnScope } from "../knowledge/types.ts";
 import {
   knowledgeScopeViolation,
   requireKnowledgeScopeSource,
@@ -85,9 +85,8 @@ function resolveScopedArtifact(
   contentSnapshotId: string;
   notebookId: string;
   sourceName: string;
-  embeddingModelRef: KnowledgeModelRef | null;
+  scope: KnowledgeTurnScope;
   chunkTargetChars: number;
-  rerankModelRef: KnowledgeModelRef | null;
 } {
   // 无会话上下文的 surface（如独立 CLI 调用）：显式不可用，不静默放行。
   requireKnowledgeSessionContext(sessionContext);
@@ -107,14 +106,9 @@ function resolveScopedArtifact(
     contentSnapshotId: frozen.contentSnapshotId,
     notebookId: owningNotebookId,
     sourceName: source.displayName,
-    // owning notebook 的嵌入引用：源内检索按同一模型路由（与索引侧一致）。
-    embeddingModelRef: knowledge.getNotebookConfig?.({ studioId, notebookId: owningNotebookId })
-      .embeddingModelRef ?? null,
+    scope,
     // owning notebook 的生效分块尺寸：ensure 链与摄入侧同 configId 判定指纹。
     chunkTargetChars: knowledge.getNotebookEffectiveChunkTargetChars({ studioId, notebookId: owningNotebookId }),
-    // owning notebook 的重排引用：按引用路由（不可解析 → 回调侧 null → RRF 降级）。
-    rerankModelRef: knowledge.getNotebookConfig?.({ studioId, notebookId: owningNotebookId })
-      .rerankModelRef ?? null,
   };
 }
 
@@ -147,15 +141,14 @@ export function createKnowledgeReadTool(deps: KnowledgeReadToolDeps) {
       })),
     }),
     sessionPermission: {
-      // 只读、无副作用：读片/检索不产生任何写入或外部请求（检索侧模型调用
-      // 走注入链路自己的操作客户端，与本工具无关）。
+      // 只读原文；查询复用统一服务，可按知识配置调用嵌入和重排。
       resolveInvocation: () => ({
         action: "read",
         kind: "read",
         capability: "knowledge_read.read",
       }),
     },
-    execute: async (_toolCallId: any, params: Record<string, any> = {}, _signal?: any, _onUpdate?: any, ctx?: any) => {
+    execute: async (_toolCallId: any, params: Record<string, any> = {}, signal?: AbortSignal, _onUpdate?: any, ctx?: any) => {
       const knowledge = deps.getKnowledge();
       const studioId = deps.getStudioId();
       if (!knowledge || !studioId) {
@@ -185,15 +178,10 @@ export function createKnowledgeReadTool(deps: KnowledgeReadToolDeps) {
         const resolved = resolveScopedArtifact(knowledge, studioId, scopeId, sourceId, notebookId, sessionContext);
 
         if (query) {
-          const result = await knowledge.queryService.retrieveForArtifacts({
-            studioId,
-            artifactIds: [resolved.artifactId],
-            question: query,
-            topK: 12,
-            notebookId: resolved.notebookId,
-            embeddingModelRef: resolved.embeddingModelRef,
-            chunkTargetChars: resolved.chunkTargetChars,
-            rerankModelRef: resolved.rerankModelRef,
+          const compiledScope = await knowledge.compileTurnScope(resolved.scope);
+          const { response, evidence: result } = await knowledge.searchService.searchWithEvidence({
+            compiledScope, query, channel: "hybrid", limit: 12, sourceIds: [sourceId],
+            notebookIds: [resolved.notebookId], rerank: true, signal,
           });
           // 降级显式标注（§十二）：向量变体未就绪/索引缺失时结果仍是合法 FTS
           // 答案，但 payload 携带 reason code；同时幂等入队后台补齐（去重由
@@ -219,6 +207,8 @@ export function createKnowledgeReadTool(deps: KnowledgeReadToolDeps) {
             contentSnapshotId: resolved.contentSnapshotId,
             mode: "search",
             retrievalMode: result.retrievalMode,
+            vectorBackend: response.vectorBackend,
+            degradedReasons: response.degradedReasons,
             retrievalModeRequested: result.retrievalModeRequested,
             ...(result.degraded.length > 0
               ? { degraded: result.degraded.map(({ reason, detail }) => ({ reason, ...(detail ? { detail } : {}) })) }

@@ -657,7 +657,7 @@ export class Agent {
       getBridgeContext: (sessionPath) => this._cb?.getEngine?.()?.getBridgeContextForSessionPath?.(sessionPath, { agentId: this.id }) || null,
       listOpenSubagentThreads: (sessionPath) => this._cb?.getSubagentThreadStore?.()?.listOpenDirectBySession?.(sessionPath) || [],
     });
-    // knowledge_read / knowledge_outline / knowledge_grep 共用的 scope 归属解析：
+    // 四个知识只读工具共用范围归属：搜索和读取共用检索服务，目录读元数据，原文匹配保留精确位置。
     // scope 归属按工具执行会话判定——主会话直接匹配 scope.session_path；subagent
     // 子会话经 manifest provenance.parentSessionId 继承父会话 scope（scope 只能
     // 缩小，子会话不得访问父 scope 之外的源）。manifest 解析失败按无父会话处理
@@ -697,8 +697,7 @@ export class Agent {
       getStudioId: () => this._cb?.getEngine?.()?.runtimeContext?.studioId || null,
       resolveSessionContext: resolveKnowledgeSessionContext,
     });
-    // knowledge_outline / knowledge_grep（Phase 11，任务书 §二十三）：本轮 scope
-    // 冻结集合的结构枚举与确定性原文扫描；只读 + 与 knowledge_read 同一校验链。
+    // 目录使用编译后的冻结范围，原文扫描为后续读取凭据保留宿主定位信息。
     this._knowledgeOutlineTool = createKnowledgeOutlineTool({
       getKnowledge: () => this._cb?.getEngine?.()?.knowledge || null,
       getStudioId: () => this._cb?.getEngine?.()?.runtimeContext?.studioId || null,

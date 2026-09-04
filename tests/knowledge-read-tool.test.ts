@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { createKnowledgeReadTool } from "../lib/tools/knowledge-read-tool.ts";
 import { KnowledgeManager } from "../lib/knowledge/knowledge-manager.ts";
@@ -18,6 +18,7 @@ function tempHome() {
 }
 
 afterEach(() => {
+  vi.restoreAllMocks();
   for (const manager of managers.splice(0)) manager.close();
   for (const dir of tempDirs.splice(0)) fs.rmSync(dir, { recursive: true, force: true });
 });
@@ -73,6 +74,8 @@ async function setupReadySource(options: {
     manager.queryService.indexArtifactForIngestion(studioId, artifact.id, {
       targetChars: manager.getNotebookEffectiveChunkTargetChars({ studioId, notebookId: notebook.id }),
     });
+    // 统一目录使用摄入阶段登记的笔记本分块身份，样本也完成同一步。
+    listProfileChunks(manager, studioId, notebook.id, artifact.id);
   }
   return { manager, studioId, notebook, imported, artifact };
 }
@@ -147,11 +150,15 @@ describe("knowledge_read 工具（KnowledgeTurnScope 契约）", () => {
     const { manager, studioId, imported, notebook } = await setupReadySource();
     const scope = createScope(manager, studioId, [notebook.id]);
     const tool = makeTool(manager, studioId);
+    const unified = vi.spyOn(manager.searchService, "searchWithEvidence");
+    const legacy = vi.spyOn(manager.queryService, "retrieveForArtifacts");
     const payload = parseResult(await tool.execute("call-1", {
       scopeId: scope.id,
       sourceId: imported.source.id,
       query: "火星 预算",
     }));
+    expect(unified.mock.calls[0][0]).toMatchObject({ sourceIds: [imported.source.id], notebookIds: [notebook.id], limit: 12, channel: "hybrid" });
+    expect(legacy).not.toHaveBeenCalled();
     expect(payload.mode).toBe("search");
     expect(payload.retrievalMode).toBe("fts");
     expect(payload.matches.length).toBeGreaterThan(0);

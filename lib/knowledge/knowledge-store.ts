@@ -3790,6 +3790,17 @@ export class KnowledgeStore {
     return artifact;
   }
 
+  /** 目录工具只需数量与定位类型，不读取正文或重建覆盖单元。 */
+  getArtifactBlockMetadata(input: { studioId: unknown; parseArtifactId: unknown }): { blockCount: number; locatorTypes: string[] } {
+    const studioId = requiredString(input?.studioId, "studioId", 256);
+    const parseArtifactId = requiredString(input?.parseArtifactId, "parseArtifactId", 128);
+    this.getParseArtifact({ studioId, parseArtifactId });
+    const rows = this.db.prepare(`SELECT locator_type, COUNT(*) AS count FROM knowledge_blocks
+      WHERE parse_artifact_id = ? GROUP BY locator_type`).all(parseArtifactId);
+    return { blockCount: rows.reduce((sum: number, row: any) => sum + Number(row.count), 0),
+      locatorTypes: rows.map((row: any) => row.locator_type) };
+  }
+
   listArtifactBlocks(input: { studioId: unknown; parseArtifactId: unknown }): KnowledgeBlock[] {
     const studioId = requiredString(input?.studioId, "studioId", 256);
     const parseArtifactId = requiredString(input?.parseArtifactId, "parseArtifactId", 128);

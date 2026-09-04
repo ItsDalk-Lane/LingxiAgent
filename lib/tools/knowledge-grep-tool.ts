@@ -48,6 +48,17 @@ const MAX_SCAN_CHARS = 4_000_000;
 /** headingFilter 长度上限。 */
 const MAX_HEADING_FILTER_CHARS = 256;
 
+/** 宿主可在研究会话中据此生成读取凭据；字段不由模型提供。 */
+export interface KnowledgeGrepReadSpan {
+  sourceId: string;
+  contentSnapshotId: string;
+  parseArtifactId: string;
+  blockId: string;
+  startOffset: number;
+  endOffset: number;
+  canonicalText: string;
+}
+
 export interface KnowledgeGrepToolDeps {
   /** engine 级 KnowledgeManager（跨会话）；null = Knowledge 不可用。 */
   getKnowledge: () => KnowledgeManager | null;
@@ -89,6 +100,8 @@ interface GrepMatchRecord {
   blockOrdinal: number;
   /** 命中起点在 block.text 内的 0-based 字符偏移。 */
   offset: number;
+  endOffset: number;
+  matchTruncated: boolean;
   /** 命中起点在 block 内的 1-based 行号。 */
   lineNumber: number;
   /** 命中的原文子串（封顶截断）。 */
@@ -98,13 +111,13 @@ interface GrepMatchRecord {
   headingPath: string[];
 }
 
-function buildSnippet(text: string, offset: number, matchLength: number): string {
+function buildSnippet(text: string, offset: number, matchLength: number) {
   const start = Math.max(0, offset - SNIPPET_CONTEXT_CHARS);
-  const end = Math.min(text.length, offset + matchLength + SNIPPET_CONTEXT_CHARS);
+  const requestedEnd = Math.min(text.length, offset + matchLength + SNIPPET_CONTEXT_CHARS);
   const prefix = start > 0 ? "…" : "";
-  const suffix = end < text.length ? "…" : "";
-  const snippet = `${prefix}${text.slice(start, end).replace(/\s+/gu, " ")}${suffix}`;
-  return snippet.length > SNIPPET_MAX_CHARS ? `${snippet.slice(0, SNIPPET_MAX_CHARS)}…` : snippet;
+  const end = Math.min(requestedEnd, start + SNIPPET_MAX_CHARS - prefix.length);
+  const canonicalText = text.slice(start, end);
+  return { snippet: `${prefix}${canonicalText}${end < text.length ? "…" : ""}`, start, end, canonicalText };
 }
 
 export function createKnowledgeGrepTool(deps: KnowledgeGrepToolDeps) {
@@ -230,6 +243,8 @@ export function createKnowledgeGrepTool(deps: KnowledgeGrepToolDeps) {
           : scope.sources;
 
         const matches: GrepMatchRecord[] = [];
+        const readSpans: KnowledgeGrepReadSpan[] = [];
+        const matchedSources = new Set<string>();
         const unavailableSources: Array<{ sourceId: string; reason: string }> = [];
         const scannedSources: Array<{ sourceId: string; sourceName: string; scannedChars: number; matchCount: number }> = [];
         let totalMatches = 0;
@@ -262,28 +277,34 @@ export function createKnowledgeGrepTool(deps: KnowledgeGrepToolDeps) {
           let sourceScannedChars = 0;
           for (const block of blocks) {
             if (headingFilter && !headingPathMatches(knowledgeBlockHeadingPath(block), headingFilter)) continue;
-            sourceScannedChars += block.text.length;
-            scannedChars += block.text.length;
-            if (scannedChars > MAX_SCAN_CHARS) {
+            if (scannedChars + block.text.length > MAX_SCAN_CHARS) {
               // 显式降级并标注：停在预算边界，不静默丢结果。
               scanTruncated = true;
               stoppedAtSourceId = frozen.sourceId;
+              scannedSources.push({ sourceId: frozen.sourceId, sourceName, scannedChars: sourceScannedChars, matchCount: sourceMatchCount });
               break outer;
             }
+            sourceScannedChars += block.text.length;
+            scannedChars += block.text.length;
             const recordHits = (offset: number, matchLength: number) => {
+              matchedSources.add(frozen.sourceId);
               totalMatches += 1;
               sourceMatchCount += 1;
               if (matches.length < maxResults) {
+                const snippet = buildSnippet(block.text, offset, matchLength);
+                readSpans.push({ sourceId: frozen.sourceId, contentSnapshotId: frozen.contentSnapshotId,
+                  parseArtifactId: frozen.parseArtifactId!, blockId: block.id,
+                  startOffset: snippet.start, endOffset: snippet.end, canonicalText: snippet.canonicalText });
                 matches.push({
                   sourceId: frozen.sourceId,
                   sourceName,
                   parseArtifactId: frozen.parseArtifactId!,
                   blockId: block.id,
                   blockOrdinal: block.ordinal,
-                  offset,
+                  offset, endOffset: offset + matchLength, matchTruncated: matchLength > 200,
                   lineNumber: 1 + (block.text.slice(0, offset).match(/\n/gu)?.length ?? 0),
                   match: block.text.slice(offset, offset + matchLength).slice(0, 200),
-                  snippet: buildSnippet(block.text, offset, matchLength),
+                  snippet: snippet.snippet,
                   headingPath: knowledgeBlockHeadingPath(block),
                 });
               }
@@ -315,6 +336,7 @@ export function createKnowledgeGrepTool(deps: KnowledgeGrepToolDeps) {
           ...(truncated
             ? { truncated: true, notice: `result list capped at maxResults=${maxResults}; totalMatches=${totalMatches}. Narrow the pattern or raise maxResults (<= ${MAX_RESULTS_LIMIT}).` }
             : {}),
+          scannedChars, matchedSourceCount: matchedSources.size,
           scannedSources,
           ...(unavailableSources.length > 0 ? { unavailableSources } : {}),
           ...(scanTruncated
@@ -324,7 +346,7 @@ export function createKnowledgeGrepTool(deps: KnowledgeGrepToolDeps) {
               notice: `scan stopped at the ${MAX_SCAN_CHARS} character budget while processing source ${stoppedAtSourceId}; results are partial for that source — re-run with sourceIds to narrow the scan.`,
             }
             : {}),
-        }, null, 2), { scopeId, mode: useRegexp ? "regexp" : "literal", totalMatches });
+        }, null, 2), { scopeId, mode: useRegexp ? "regexp" : "literal", totalMatches, readSpans });
       } catch (error) {
         if (isKnowledgeError(error)) {
           return toolError(`knowledge_grep failed: ${error.code}: ${error.message}`, {

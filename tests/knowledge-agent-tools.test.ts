@@ -1,8 +1,10 @@
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
+import { resolveKnowledgeChunkerConfig } from "../lib/knowledge/chunker.ts";
+import * as coverageUnits from "../lib/knowledge/knowledge-coverage-unit.ts";
 import { createKnowledgeOutlineTool } from "../lib/tools/knowledge-outline-tool.ts";
 import { createKnowledgeGrepTool } from "../lib/tools/knowledge-grep-tool.ts";
 import { createKnowledgeManageTool } from "../lib/tools/knowledge-manage-tool.ts";
@@ -20,6 +22,7 @@ function tempHome() {
 }
 
 afterEach(() => {
+  vi.restoreAllMocks();
   for (const manager of managers.splice(0)) manager.close();
   for (const dir of tempDirs.splice(0)) fs.rmSync(dir, { recursive: true, force: true });
 });
@@ -52,6 +55,13 @@ async function setupMarkdownSource(options: { parse?: boolean } = {}) {
   const artifact = options.parse === false
     ? null
     : await manager.parseSource({ studioId, sourceId: imported.source.id });
+  if (artifact) {
+    const targetChars = manager.getNotebookEffectiveChunkTargetChars({ studioId, notebookId: notebook.id });
+    manager.queryService.indexArtifactForIngestion(studioId, artifact.id, { targetChars });
+    const blocks = manager.listArtifactBlocks({ studioId, parseArtifactId: artifact.id });
+    manager.store.resolveNotebookRetrievalProfile({ studioId, notebookId: notebook.id,
+      strategy: resolveKnowledgeChunkerConfig(blocks, { targetChars }).strategy });
+  }
   return { manager, studioId, notebook, imported, artifact };
 }
 
@@ -111,7 +121,7 @@ function expectScopeViolation(result: any) {
 // ─────────────────────────── knowledge_outline ───────────────────────────
 
 describe("knowledge_outline 工具（scope 冻结集合结构枚举）", () => {
-  it("列出选中 notebook 的冻结源结构（名称/类型/fidelity/coverage 单元/首层 heading），不列 scope 外内容", async () => {
+  it("列出选中 notebook 的冻结源结构（名称/类型/fidelity/chunk 数/首层 heading），不列 scope 外内容", async () => {
     const { manager, studioId, notebook, imported } = await setupMarkdownSource();
     // 同 studio 的未选中笔记本 C（独有源）：outline 不得出现。
     const notebookC = manager.createNotebook({ studioId, name: "未选中" });
@@ -122,6 +132,10 @@ describe("knowledge_outline 工具（scope 冻结集合结构枚举）", () => {
       displayName: "C.txt",
     });
     const scope = createScope(manager, studioId, [notebook.id]);
+    const units = vi.spyOn(coverageUnits, "buildCoverageUnits");
+    const fullBlocks = vi.spyOn(manager.store, "listArtifactBlocks");
+    const fullChunks = vi.spyOn(manager.indexStore, "listVariantChunks");
+    const expectedChunkCount = Number(manager.indexStore.db.prepare("SELECT COUNT(*) AS count FROM knowledge_chunks WHERE parse_artifact_id = ?").get(scope.sources[0].parseArtifactId).count);
     const payload = parseResult(await makeOutlineTool(manager, studioId).execute("call-1", { scopeId: scope.id }));
 
     expect(payload.scopeId).toBe(scope.id);
@@ -134,9 +148,16 @@ describe("knowledge_outline 工具（scope 冻结集合结构枚举）", () => {
     expect(source.sourceId).toBe(imported.source.id);
     expect(source.sourceName).toBe("项目.md");
     expect(source.sourceType).toBe("file");
-    // markdown locator → citation_grade；coverage 单元与 heading 摘要来自冻结 artifact。
+    // 目录改用持久化块数与章节元数据；不能把索引数量冒充完整性覆盖单位。
     expect(source.fidelity).toBe("citation_grade");
-    expect(source.coverageUnits).toBeGreaterThan(0);
+    expect(source).not.toHaveProperty("coverageUnits");
+    expect(source.chunkCount).toBe(expectedChunkCount);
+    expect(source.chunkCount).toBeGreaterThan(0);
+    expect(source.status).toBe("ready");
+    expect(source.sectionKeys).toEqual(["交付计划", "风险登记"]);
+    expect(units).not.toHaveBeenCalled();
+    expect(fullBlocks).not.toHaveBeenCalled();
+    expect(fullChunks).not.toHaveBeenCalled();
     expect(source.blockCount).toBeGreaterThan(0);
     expect(source.parseArtifactId).toBe(scope.sources[0].parseArtifactId);
     expect(source.contentSnapshotId).toBe(scope.sources[0].contentSnapshotId);
@@ -207,7 +228,9 @@ describe("knowledge_outline 工具（scope 冻结集合结构枚举）", () => {
     const source = payload.notebooks[0].sources[0];
     expect(source.sourceId).toBe(imported.source.id);
     expect(source.fidelity).toBe("unavailable");
-    expect(source.coverageUnits).toBe(0);
+    expect(source).not.toHaveProperty("coverageUnits");
+    expect(source.chunkCount).toBe(0);
+    expect(source.status).toBe("parse_pending");
     expect(source.headings).toEqual([]);
   });
 });
@@ -235,6 +258,11 @@ describe("knowledge_grep 工具（冻结原文确定性扫描）", () => {
     expect(match.snippet).toContain("八百万元");
     expect(match.offset).toBeGreaterThanOrEqual(0);
     expect(match.lineNumber).toBeGreaterThanOrEqual(1);
+    const blocks = manager.listArtifactBlocks({ studioId, parseArtifactId: artifact!.id });
+    const block = blocks.find(item => item.id === match.blockId)!;
+    expect(block.text.slice(match.offset, match.endOffset)).toBe(match.match);
+    expect(payload.scannedChars).toBe(blocks.reduce((sum, item) => sum + item.text.length, 0));
+    expect(payload.matchedSourceCount).toBe(1);
   });
 
   it("regexp 匹配与 headingFilter 前缀过滤", async () => {
@@ -352,6 +380,38 @@ describe("knowledge_grep 工具（冻结原文确定性扫描）", () => {
     expect(payload.unavailableSources).toHaveLength(1);
     expect(payload.unavailableSources[0].reason).toContain("KNOWLEDGE_PARSE_NOT_READY");
   });
+});
+
+it("grep 为宿主提供精确可回读位置；保留空白、长匹配截断如实标记", async () => {
+  const { manager, studioId, notebook, imported, artifact } = await setupMarkdownSource();
+  const scope = createScope(manager, studioId, [notebook.id]);
+  const result = await makeGrepTool(manager, studioId).execute("receipt-hook", { scopeId: scope.id, pattern: "预算" });
+  const readSpans = (result.details as any).readSpans;
+  expect(readSpans).toHaveLength(1);
+  const blocks = manager.listArtifactBlocks({ studioId, parseArtifactId: artifact!.id });
+  for (const span of readSpans) {
+    expect(span).toMatchObject({ sourceId: imported.source.id, contentSnapshotId: scope.sources[0].contentSnapshotId, parseArtifactId: artifact!.id });
+    expect(blocks.find(block => block.id === span.blockId)!.text.slice(span.startOffset, span.endOffset)).toBe(span.canonicalText);
+    expect(result.content[0].text).toContain(span.canonicalText);
+  }
+  vi.spyOn(manager, "listArtifactBlocks").mockReturnValue([{ ...blocks[0], text: "前缀  空白\n" + "x".repeat(300) }]);
+  const long = parseResult(await makeGrepTool(manager, studioId).execute("long", { scopeId: scope.id, pattern: "x+", regexp: true }));
+  expect(long.matches[0].endOffset - long.matches[0].offset).toBe(300);
+  expect(long.matches[0].matchTruncated).toBe(true); expect(long.matches[0].match).toHaveLength(200);
+  expect(long.matches[0].snippet).toContain("前缀  空白\n");
+});
+
+it("grep 扫描预算只计实际扫描的字符，保留中断来源已有结果及匹配来源数", async () => {
+  const { manager, studioId, notebook, artifact } = await setupMarkdownSource();
+  const scope = createScope(manager, studioId, [notebook.id]);
+  const blocks = manager.listArtifactBlocks({ studioId, parseArtifactId: artifact!.id });
+  vi.spyOn(manager, "listArtifactBlocks").mockReturnValue([
+    { ...blocks[0], text: "预算" }, { ...blocks[1], text: "x".repeat(4_000_001) },
+  ]);
+  const payload = parseResult(await makeGrepTool(manager, studioId).execute("bounded", { scopeId: scope.id, pattern: "预算" }));
+  expect(payload.scanTruncated).toBe(true); expect(payload.scannedChars).toBe(2);
+  expect(payload.scannedSources).toHaveLength(1); expect(payload.scannedSources[0]).toMatchObject({ scannedChars: 2, matchCount: 1 });
+  expect(payload.totalMatches).toBe(1); expect(payload.matchedSourceCount).toBe(1);
 });
 
 // ─────────────────────────── knowledge_manage ───────────────────────────
