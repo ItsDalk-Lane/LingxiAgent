@@ -4,8 +4,8 @@ import path from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { PortableVectorIndexAdapter } from "../lib/knowledge/vector-index-adapter.ts";
 import { createHierarchicalFixture } from "./helpers/knowledge-hierarchical-fixture.ts";
-const cleanups: Array<() => void> = [];
-afterEach(() => { vi.restoreAllMocks(); cleanups.splice(0).forEach(cleanup => cleanup()); });
+const cleanups: Array<() => void | Promise<void>> = [];
+afterEach(async () => { vi.restoreAllMocks(); for (const cleanup of cleanups.splice(0)) await cleanup(); });
 
 describe("选中章节的小集合向量补查", () => {
   it("portable只解码指定片段且同时受模型和产物限制；其他片段损坏不能污染补查", () => {
@@ -21,7 +21,7 @@ describe("选中章节的小集合向量补查", () => {
     const request = { parseArtifactIds: ["selected"], model, queryVector: [1, 0], limit: 10 };
     const result = adapter.search({ ...request, chunkIds: ["selected-0", "outside-0", "selected-0"] });
     expect(result.map(row => row.chunkId)).toEqual(["selected-0"]); expect(result[0].score).toBe(1);
-    expect(prepare.mock.calls.some(([sql]) => /chunk_id IN \(SELECT value FROM json_each/u.test(sql))).toBe(true);
+    expect(prepare.mock.calls.some(([sql]) => typeof sql === "string" && /chunk_id IN \(SELECT value FROM json_each/u.test(sql))).toBe(true);
     prepare.mockClear(); expect(adapter.search({ ...request, chunkIds: [] })).toEqual([]); expect(prepare).not.toHaveBeenCalled();
     expect(() => adapter.search(request)).toThrow(/corrupt/u);
   });

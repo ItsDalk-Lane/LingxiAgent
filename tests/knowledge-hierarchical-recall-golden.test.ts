@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { EvidenceSpanExtractor } from "../lib/knowledge/evidence-span-extractor.ts";
 import { createHierarchicalFixture } from "./helpers/knowledge-hierarchical-fixture.ts";
 const fixtures: Array<Awaited<ReturnType<typeof createHierarchicalFixture>>> = [];
-afterEach(() => { vi.restoreAllMocks(); fixtures.splice(0).forEach(f => f.close()); });
+afterEach(async () => { vi.restoreAllMocks(); for (const f of fixtures.splice(0)) await f.close(); });
 
 describe("分层召回固定资料集", () => {
   it("只有来源标题或章节标题命中时仍返回可读线索，但原文证据候选保持为空", async () => {

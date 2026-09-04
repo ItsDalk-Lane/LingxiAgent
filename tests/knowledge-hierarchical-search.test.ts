@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { createHierarchicalFixture } from "./helpers/knowledge-hierarchical-fixture.ts";
 const fixtures: Array<Awaited<ReturnType<typeof createHierarchicalFixture>>> = [];
 async function fixture(...args: Parameters<typeof createHierarchicalFixture>) { const f = await createHierarchicalFixture(...args); fixtures.push(f); return f; }
-afterEach(() => { vi.restoreAllMocks(); fixtures.splice(0).forEach(f => f.close()); });
+afterEach(async () => { vi.restoreAllMocks(); for (const f of fixtures.splice(0)) await f.close(); });
 
 describe("来源、章节、片段分层检索", () => {
   it("快速仍只做片段FTS，不增加来源/章节查询或元数据扫描", async () => {
@@ -41,7 +41,8 @@ describe("来源、章节、片段分层检索", () => {
     const result = await f.manager.searchService.search({ ...f.request, channel: "fts", sectionKeys: ["第二章"], limit: 1 });
     expect(result.hits).toHaveLength(1); expect(result.hits[0].snippet).toContain("目标条款");
     expect(result.hits[0].sectionId).toBe(f.sources[0].sections[1].id);
-    expect(sql.mock.calls.some(([statement]) => /knowledge_chunks_fts MATCH[\s\S]+c\.section_id IN[\s\S]+LIMIT/u.test(statement))).toBe(true);
+    expect(sql.mock.calls.some(([statement]) => typeof statement === "string"
+      && /knowledge_chunks_fts MATCH[\s\S]+c\.section_id IN[\s\S]+LIMIT/u.test(statement))).toBe(true);
     expect(fullChunks).not.toHaveBeenCalled();
     expect((await f.manager.searchService.search({ ...f.request, sectionKeys: [] })).hits).toEqual([]);
   });

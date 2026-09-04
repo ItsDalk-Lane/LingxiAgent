@@ -422,10 +422,16 @@
 - 改动：详细默认先来源/章节 FTS，章节取前 12 并保留命中来源至少一节；选中章节的片段直接在 SQL 中按 section_id 过滤后排序取限。相关来源执行语义召回，同一查询嵌入再用于所选章节小集合的精确余弦补查；portable SQL 同时限定模型、冻结变体和 chunk IDs，空集合不读向量。两通道融合后保持原全局重排/模型分组/缓存机制。快速仍只做片段 FTS，不读章节目录、不加串行搜索或远程调用。
 - 读取：支持 sectionId 与 aroundChunkId/neighborWindow 0～3，旧序号/查询参数兼容；相邻读取只取有界片段。父章节由冻结原文重新物化并核对缓存，巨块子节只返回该节精确区间；研究读取逐段颁发可重读凭据。来源/章节标题命中保留带真实锚点的 source/section 线索，不加入原文证据候选；直接将非 span 搜索线索转换证据会拒绝。三种结果携带粒度、父节身份和标题。
 - 失败与修复：旧回归首轮 40 PASS/1 FAIL，正文推断章标题盖过解析器既有定位，修为已有定位优先并保留原章节断言。首次全联测 1169 PASS/12 FAIL：8 项是详细新增章节补查及来源收窄后旧调用链断言，按任务书改为分别验证来源召回与小集合补查次数，仍保留嵌入次数/共享去重/真实身份/范围检查；4 项为尚未生成的指纹。随后局部复核 39 PASS/3 FAIL，补齐各通道分别统计及每次研究只回传该问题真实相关来源的验证；没有跳过或放宽约束。
-- 测试结果：最终 `npx vitest run tests/knowledge*.test.ts tests/persistence-schema-tripwire.test.ts tests/builtin-tool-permission-coverage.test.ts tests/desktop-session-submit*.test.ts` **114 文件 / 1182 PASS / 0 FAIL / 0 SKIP，20.36s，exit 0**；最后将来源/章节搜索时间计入 FTS 段后，指定四文件与搜索服务五文件 28 PASS 复核通过。三套类型、18 个改动代码文件 ESLint、Node 24 真实源码导入、差异检查均 exit 0。日志 `/tmp/lingxi-knowledge-p305-tests-final.log`、`/tmp/lingxi-knowledge-p305-timings-tests.log`、`/tmp/lingxi-knowledge-p305-typecheck-final.log`、`/tmp/lingxi-knowledge-p305-lint-final.log`、`/tmp/lingxi-knowledge-p305-node-source.log`；首轮日志保留。
+- 测试结果：最终 `npx vitest run tests/knowledge*.test.ts tests/persistence-schema-tripwire.test.ts tests/builtin-tool-permission-coverage.test.ts tests/desktop-session-submit*.test.ts` **114 文件 / 1182 PASS / 0 FAIL / 0 SKIP，20.36s，exit 0**；最后将来源/章节搜索时间计入 FTS 段后，指定四文件与搜索服务五文件 28 PASS 复核通过。18 个改动代码文件 ESLint、Node 24 真实源码导入、差异检查均 exit 0。三套类型末次进程实际 exit 2，两处新增测试监听参数被推断为 unknown；原记录在进程结束前误报，通过下述专项修正补齐。日志 `/tmp/lingxi-knowledge-p305-tests-final.log`、`/tmp/lingxi-knowledge-p305-timings-tests.log`、`/tmp/lingxi-knowledge-p305-typecheck-final.log`、`/tmp/lingxi-knowledge-p305-lint-final.log`、`/tmp/lingxi-knowledge-p305-node-source.log`；首轮日志保留。
 - 生成物：66 stores / 779 sites，事实库 v19、FTS v4、原向量结构和 BLOB 不变；兼容指纹 `sha256:a385729c34ac35cda0d6eafbfe98061dc2eb6c88519e409179f5f00005e42569`，运行闭包 10693 文件，开放树 887 文件；五生成器均 exit 0。P3 阶段门禁和最终封印仍待 P3-06、P3-07。
-- 对应 commit SHA：本项提交（下项回填）
+- 对应 commit SHA：`e0966fd3`
 - 偏差：none
+
+### P3-05 类型检查记录修正
+
+- 原日志 `/tmp/lingxi-knowledge-p305-typecheck-final.log` 最终 exit 2，两处 SQL 监听参数 unknown 直接传给正则匹配；此前读取未完成日志误报类型通过，现明确撤回该结论。
+- 修复增加 typeof string 收窄，保留 SQL 过滤断言。复跑出现一次原生线程未结束而测试进程退出的崩溃（5 PASS、1 unhandled error、exit 1）；夹具原先未等待异步 close，已改为等待线程退出后再删除目录。生产逻辑未改。
+- 最终三套类型 exit 0（已等待进程实际结束），六文件 22 PASS/0 FAIL/0 SKIP/0 errors，1.75s；独立子进程包含 30 次原生初始化/建图期间关闭并逐次核对原向量 BLOB。ESLint 和差异检查 exit 0。日志 `/tmp/lingxi-knowledge-p305-correction-types-final.log`、`/tmp/lingxi-knowledge-p305-shutdown-reviewed.log`；原崩溃日志 `/tmp/lingxi-knowledge-p305-type-fix-tests.log` 保留。`-shutdown-red.log` 只是初始命名，实际该独立探针首次已通过，不作为红测证据。
 
 ## P3-06：完整性与详细回答质量门禁
 

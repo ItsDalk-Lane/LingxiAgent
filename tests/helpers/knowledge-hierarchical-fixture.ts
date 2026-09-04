@@ -43,5 +43,5 @@ export async function createHierarchicalFixture(documents: Array<{ name: string;
   embed.mockClear();
   return { manager, notebook, sources, sessionPath, scope, compiledScope, embed,
     request: { compiledScope, query: "needle", channel: "hybrid" as const, rerank: false, limit: 24 },
-    close() { manager.close(); fs.rmSync(home, { recursive: true, force: true }); } };
+    async close() { await manager.close(); fs.rmSync(home, { recursive: true, force: true }); } };
 }
