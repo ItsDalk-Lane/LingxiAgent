@@ -1,4 +1,5 @@
 import crypto from "node:crypto";
+import { QueryEmbeddingCache, normalizeKnowledgeQuery } from "./query-embedding-cache.ts";
 import type { CompiledKnowledgeScope, CompiledKnowledgeNotebook } from "./scope-snapshot-compiler.ts";
 import { EvidenceSpanExtractor } from "./evidence-span-extractor.ts";
 
@@ -405,9 +406,12 @@ export const KNOWLEDGE_FUSION_BUDGET = 60;
 export const KNOWLEDGE_EVIDENCE_BUDGET = 40;
 
 export class KnowledgeQueryService {
+  readonly queryEmbeddingCache = new QueryEmbeddingCache();
+  private configurationRevision = 0;
   private readonly deps: {
     store: KnowledgeStore;
     indexStore: KnowledgeIndexStore;
+    getModelConfigurationRevision?: (ref: KnowledgeModelRef) => string;
     vectorIndex?: VectorIndexAdapter | null;
     /**
      * 按显式嵌入模型引用执行嵌入（engine 的 _embedKnowledgeTextsForModel 同根，
@@ -594,55 +598,75 @@ export class KnowledgeQueryService {
     });
   }
 
-  /** 统一服务的兼容执行核：只消费已经冻结的索引身份，不重新读取笔记本配置。 */
-  retrieveCompiledNotebook(input: {
+  getModelConfigurationRevision(ref: KnowledgeModelRef): string {
+    return this.deps.getModelConfigurationRevision?.(ref) ?? String(this.configurationRevision);
+  }
+
+  onModelConfigMayHaveChanged(): void { this.configurationRevision += 1; }
+
+  /** 同一嵌入引用的一组笔记本共用查询向量，全部变体一次搜索；重排另由宿主安排。 */
+  retrieveCompiledGroup(input: {
     compiledScope: CompiledKnowledgeScope;
-    notebook: CompiledKnowledgeNotebook;
+    notebooks: CompiledKnowledgeNotebook[];
     variantIds: string[];
     query: string;
     limit: number;
-    rerank: boolean;
     signal?: AbortSignal;
     ordinalRanges?: ReadonlyMap<string, KnowledgeOrdinalRange[]>;
     onRemoteCall: () => void;
   }) {
-    const scopes = input.compiledScope.sources.flatMap(source => {
-      if (!source.parseArtifactId || !input.notebook.chunkProfileHash
-        || !source.notebookIds.includes(input.notebook.notebookId)) return [];
-      const variant = this.deps.indexStore.getReadyVariantMetadata({
-        parseArtifactId: source.parseArtifactId, chunkProfileHash: input.notebook.chunkProfileHash,
-      });
-      return variant && input.variantIds.includes(variant.id) ? [{
-        parseArtifactId: variant.parseArtifactId, chunkProfileHash: variant.chunkProfileHash,
-        blockFingerprint: variant.blockFingerprint,
-      }] : [];
-    });
-    const embeddingRef = input.notebook.embeddingModelRef;
-    const rerankRef = input.notebook.rerankModelRef;
-    const result = this.retrieve({
-      studioId: input.compiledScope.studioId, scopes, question: input.query,
+    const scopes = new Map<string, KnowledgeRetrievalScope>();
+    for (const notebook of input.notebooks) {
+      for (const source of input.compiledScope.sources) {
+        if (!source.parseArtifactId || !notebook.chunkProfileHash || !source.notebookIds.includes(notebook.notebookId)) continue;
+        const variant = this.deps.indexStore.getReadyVariantMetadata({
+          parseArtifactId: source.parseArtifactId, chunkProfileHash: notebook.chunkProfileHash,
+        });
+        if (variant && input.variantIds.includes(variant.id)) scopes.set(variant.id, {
+          parseArtifactId: variant.parseArtifactId, chunkProfileHash: variant.chunkProfileHash,
+          blockFingerprint: variant.blockFingerprint,
+        });
+      }
+    }
+    const embeddingRef = input.notebooks[0]?.embeddingModelRef;
+    return this.retrieve({
+      studioId: input.compiledScope.studioId, scopes: [...scopes.values()], question: input.query,
       runId: `knowledge_search_${crypto.randomUUID()}`, topK: input.limit,
-      signal: input.signal, rerank: input.rerank,
+      signal: input.signal, rerank: false, reranker: null,
       ordinalRangesByChunkIndexVariantId: input.ordinalRanges,
-      embedTexts: embeddingRef && this.deps.embedTextsForModel ? request => {
-        input.onRemoteCall();
-        return this.deps.embedTextsForModel!({ ...request, modelRef: embeddingRef, inputType: "query" });
+      embedTexts: embeddingRef && this.deps.embedTextsForModel ? async request => {
+        const cached = await this.queryEmbeddingCache.getOrCreate({
+          normalizedQuery: normalizeKnowledgeQuery(input.query), provider: embeddingRef.provider,
+          modelId: embeddingRef.id, modelConfigurationRevision: this.getModelConfigurationRevision(embeddingRef), inputType: "query",
+        }, async signal => {
+          input.onRemoteCall();
+          const result = await this.deps.embedTextsForModel!({ ...request, signal,
+            texts: [normalizeKnowledgeQuery(input.query)], modelRef: embeddingRef, inputType: "query" });
+          return assertEmbeddingBatch(result, 1).result;
+        }, request.signal);
+        return cached.value;
       } : null,
-      reranker: rerankRef && this.deps.rerankForModel ? request => {
-        input.onRemoteCall();
-        return this.deps.rerankForModel!({ ...request, modelRef: rerankRef });
-      } : null,
-    });
-    return result.then(outcome => {
+    }).then(outcome => {
       if (embeddingRef && !this.deps.embedTextsForModel) {
-        outcome.degraded.push(...scopes.map(scope => ({ ...scope,
+        outcome.degraded.push(...[...scopes.values()].map(scope => ({ ...scope,
           reason: "KNOWLEDGE_VECTOR_NOT_READY" as const, detail: "configured embedding model is unavailable",
         })));
       }
-      if (input.rerank && rerankRef && !this.deps.rerankForModel) {
-        outcome.rerankDegradeReason = "configured rerank model is unavailable; kept retrieval ranking";
-      }
       return outcome;
+    });
+  }
+
+  async rerankCompiledCandidates(input: {
+    candidates: IndexedKnowledgeChunk[]; modelRef: KnowledgeModelRef | null; query: string;
+    signal?: AbortSignal; onRemoteCall: () => void;
+  }) {
+    if (!input.modelRef) return { candidates: input.candidates, rerankMs: 0 };
+    if (!this.deps.rerankForModel) return { candidates: input.candidates, rerankMs: 0,
+      rerankDegradeReason: "configured rerank model is unavailable; kept retrieval ranking" };
+    return this.rankCandidates({
+      candidates: input.candidates, question: input.query, signal: input.signal,
+      runId: `knowledge_rerank_${crypto.randomUUID()}`, rerank: true,
+      reranker: request => { input.onRemoteCall(); return this.deps.rerankForModel!({ ...request, modelRef: input.modelRef! }); },
     });
   }
 
@@ -1303,6 +1327,35 @@ export class KnowledgeQueryService {
       candidates = fuseCandidates(fts, vector, topK);
       fuseMs = Date.now() - fuseStart;
     }
+    const ranked = await this.rankCandidates({ ...input, candidates });
+    candidates = ranked.candidates;
+    rerankMs = ranked.rerankMs;
+    const { rerankDegradeReason, rerankSkippedReason } = ranked;
+    return {
+      candidates,
+      retrievalMode: "hybrid",
+      retrievalModeRequested,
+      degraded: allDegraded,
+      searchedVectorVariants,
+      ...(rerankDegradeReason ? { rerankDegradeReason } : {}),
+      ...(rerankSkippedReason ? { rerankSkippedReason } : {}),
+      stageTimings: {
+        ftsMs,
+        ...(embedMs != null ? { embedMs } : {}),
+        ...(vectorMs != null ? { vectorMs } : {}),
+        ...(fuseMs != null ? { fuseMs } : {}),
+        ...(rerankMs != null ? { rerankMs } : {}),
+      },
+    };
+  }
+
+  private async rankCandidates(input: {
+    candidates: IndexedKnowledgeChunk[]; question: string; runId: string; signal?: AbortSignal;
+    rerank?: boolean; reranker?: KnowledgeReranker | null;
+    rerankPolicy?: { marginGate: boolean; deadlineMs?: number };
+  }) {
+    let candidates = input.candidates;
+    const { question, runId, signal } = input;
     // rerank 输入防护：超出 KNOWLEDGE_RERANK_MAX_DOCS 的尾部保持 RRF 名次。
     const rerankCandidates = candidates.length > KNOWLEDGE_RERANK_MAX_DOCS
       ? candidates.slice(0, KNOWLEDGE_RERANK_MAX_DOCS)
@@ -1366,23 +1419,8 @@ export class KnowledgeQueryService {
         ];
       }
     }
-    rerankMs = Date.now() - rerankStart;
-    return {
-      candidates,
-      retrievalMode: "hybrid",
-      retrievalModeRequested,
-      degraded: allDegraded,
-      searchedVectorVariants,
-      ...(rerankDegradeReason ? { rerankDegradeReason } : {}),
-      ...(rerankSkippedReason ? { rerankSkippedReason } : {}),
-      stageTimings: {
-        ftsMs,
-        ...(embedMs != null ? { embedMs } : {}),
-        ...(vectorMs != null ? { vectorMs } : {}),
-        ...(fuseMs != null ? { fuseMs } : {}),
-        ...(rerankMs != null ? { rerankMs } : {}),
-      },
-    };
+    const rerankMs = Date.now() - rerankStart;
+    return { candidates, rerankDegradeReason, rerankSkippedReason, rerankMs };
   }
 
   /**

@@ -26,7 +26,7 @@ describe("统一知识搜索", () => {
   it("快速搜索由统一入口一次 FTS，只有命中块定点回读，候选携带冻结身份", async () => {
     const { manager, request, variant, imported } = await fixture();
     const legacy = vi.spyOn(manager.queryService, "retrieveForNotebooks").mockRejectedValue(new Error("禁止旧检索"));
-    const hybrid = vi.spyOn(manager.queryService, "retrieveCompiledNotebook").mockRejectedValue(new Error("禁止远程"));
+    const hybrid = vi.spyOn(manager.queryService, "retrieveCompiledGroup").mockRejectedValue(new Error("禁止远程"));
     const fullRead = vi.spyOn(manager.store, "listArtifactBlocks").mockImplementation(() => { throw new Error("禁止全量读取"); });
     const fts = vi.spyOn(manager.indexStore, "searchReadyVariantIds");
     const result = await manager.searchService.search(request);
@@ -46,7 +46,7 @@ describe("统一知识搜索", () => {
   ])("范围外过滤 %j 在检索前拒绝", async filter => {
     const { manager, request } = await fixture();
     const fts = vi.spyOn(manager.indexStore, "searchReadyVariantIds");
-    const hybrid = vi.spyOn(manager.queryService, "retrieveCompiledNotebook");
+    const hybrid = vi.spyOn(manager.queryService, "retrieveCompiledGroup");
     await expect(manager.searchService.search({ ...request, channel: "hybrid", ...filter })).rejects.toMatchObject({ code: "KNOWLEDGE_SCOPE_VIOLATION" });
     expect(fts).not.toHaveBeenCalled(); expect(hybrid).not.toHaveBeenCalled();
   });

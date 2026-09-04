@@ -660,7 +660,7 @@
     ],
     "version": 3
   },
-  "payloadFingerprint": "sha256:52773eadca7429d5c84f9c91c208c2e48f24dc31b3348018953e07de4afa3b18",
+  "payloadFingerprint": "sha256:4fcf36fe237df434f30d142fe0a4d5d1660bb6e4aafb71ddf7fa936fd5522b53",
   "registry": [
     {
       "affectedByEpochMigration": true,
@@ -3287,8 +3287,8 @@
   ],
   "review": {
     "classification": "compatible",
-    "compatibilityReason": "知识检索 P1-02：统一搜索入口与冻结范围校验接线，新增只读搜索模块；事实库和索引表结构、DATA_EPOCH 均不变。",
-    "payloadFingerprint": "sha256:52773eadca7429d5c84f9c91c208c2e48f24dc31b3348018953e07de4afa3b18"
+    "compatibilityReason": "知识检索 P1-03：按配置引用及配置修订分组，增加有界内存缓存和在途去重；查询与摄入表结构及 DATA_EPOCH 不变，缓存不写磁盘。",
+    "payloadFingerprint": "sha256:4fcf36fe237df434f30d142fe0a4d5d1660bb6e4aafb71ddf7fa936fd5522b53"
   },
   "schemas": [
     {
@@ -3856,21 +3856,21 @@
       "contract": "ParseArtifact generation directories referenced by knowledge.db and never treated as source content versions",
       "kind": "directory-contract",
       "module": "lib/knowledge/knowledge-manager.ts",
-      "sourceHash": "sha256:7a0c78999f014775915dd15e7236b48aedd1b7438d2fa46ce4de4fa27948346d",
+      "sourceHash": "sha256:0767cfc7ed5ff73d712440e1421ba39d0638986a2e815365a7fdb586115250b5",
       "storeId": "knowledge-parse-artifacts"
     },
     {
       "contract": "ProcessingArtifact output files (binary office formats converted to structured text) referenced by knowledge.db processing_artifacts rows, with locatorMap held in the database",
       "kind": "directory-contract",
       "module": "lib/knowledge/knowledge-manager.ts",
-      "sourceHash": "sha256:7a0c78999f014775915dd15e7236b48aedd1b7438d2fa46ce4de4fa27948346d",
+      "sourceHash": "sha256:0767cfc7ed5ff73d712440e1421ba39d0638986a2e815365a7fdb586115250b5",
       "storeId": "knowledge-processing-artifacts"
     },
     {
       "contract": "ContentSnapshot relative locator, immutable byte publication, SHA-256 verification, and rollback protocol",
       "kind": "directory-contract",
       "module": "lib/knowledge/knowledge-manager.ts",
-      "sourceHash": "sha256:7a0c78999f014775915dd15e7236b48aedd1b7438d2fa46ce4de4fa27948346d",
+      "sourceHash": "sha256:0767cfc7ed5ff73d712440e1421ba39d0638986a2e815365a7fdb586115250b5",
       "storeId": "knowledge-source-snapshots"
     },
     {

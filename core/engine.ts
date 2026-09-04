@@ -13,6 +13,7 @@
  *   - SkillManager        — 技能注册 / 同步
  */
 import fs from "fs";
+import { createHash } from "node:crypto";
 import os from "os";
 import path from "path";
 import { runMigrations } from "./migrations.ts";
@@ -525,6 +526,12 @@ export class LingxiEngine {
       // 与查询侧懒构建共用同一套 ModelOperationResolver/EmbeddingClient 基础设施。
       embedTextsForModel: (request) => this._embedKnowledgeTextsForModel(request),
       canEmbedWithModel: (ref) => this._canResolveKnowledgeEmbeddingRef(ref),
+      // 修订只在内存中作为缓存身份使用；凭证原文不进入缓存键、日志或持久化。
+      getModelConfigurationRevision: (ref) => createHash("sha256").update(JSON.stringify({
+        embedding: this._models.providerRegistry.getOperationModel("embedding", ref),
+        rerank: this._models.providerRegistry.getOperationModel("rerank", ref),
+        credentials: this._models.providerRegistry.getCredentials(ref.provider),
+      })).digest("hex"),
       // 嵌入模型上下文窗口（自动分块 ×80% 口径）：目录条目归一化的
       // contextWindow/context 优先，known-models 静态目录兜底。
       getEmbeddingModelContextWindow: (ref) => {

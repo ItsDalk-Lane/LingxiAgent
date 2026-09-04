@@ -6734,6 +6734,40 @@
       "reason": "Reached via esbuild source module graph, imported by lib/knowledge/knowledge-query-service.ts (import-statement); lib/knowledge/ingestion-service.ts (import-statement); lib/knowledge/knowledge-manager.ts (import-statement)."
     },
     {
+      "path": "lib/knowledge/query-embedding-cache.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "lib/knowledge/knowledge-query-service.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/knowledge/retrieval-result-cache.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/knowledge/knowledge-search-service.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by lib/knowledge/knowledge-query-service.ts (import-statement); lib/knowledge/retrieval-result-cache.ts (import-statement); lib/knowledge/knowledge-search-service.ts (import-statement)."
+    },
+    {
+      "path": "lib/knowledge/retrieval-result-cache.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "lib/knowledge/knowledge-search-service.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by lib/knowledge/knowledge-search-service.ts (import-statement)."
+    },
+    {
       "path": "lib/knowledge/scope-snapshot-compiler.ts",
       "inputType": "source-graph",
       "provenance": [
@@ -125178,9 +125212,9 @@
     }
   ],
   "stats": {
-    "totalFiles": 10661,
+    "totalFiles": 10663,
     "byInputType": {
-      "source-graph": 761,
+      "source-graph": 763,
       "runtime-asset": 11,
       "nft-runtime-trace": 9889
     }

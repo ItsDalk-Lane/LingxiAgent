@@ -1,5 +1,8 @@
 import crypto from "node:crypto";
 import { performance } from "node:perf_hooks";
+import { RetrievalResultCache } from "./retrieval-result-cache.ts";
+import { normalizeKnowledgeQuery } from "./query-embedding-cache.ts";
+import type { KnowledgeModelRef } from "./types.ts";
 import { KnowledgeError } from "./errors.ts";
 import type { CompiledKnowledgeScope } from "./scope-snapshot-compiler.ts";
 import type { KnowledgeStore } from "./knowledge-store.ts";
@@ -64,6 +67,27 @@ interface SearchDependencies {
 /** 自动注入和工具的共同入口；范围检查先于任何检索与远程调用。 */
 export class KnowledgeSearchService {
   private readonly deps: SearchDependencies;
+  private readonly resultCache = new RetrievalResultCache<{ response: KnowledgeSearchResponse; evidence: RetrieveForNotebooksResult }>();
+  private readonly modelRevisions = new Map<string, { ref: KnowledgeModelRef; revision: string }>();
+
+  clearResults(): void { this.resultCache.clear(); }
+
+  refreshModelConfigurations(): void {
+    for (const [key, previous] of this.modelRevisions) {
+      const revision = this.deps.queryService.getModelConfigurationRevision(previous.ref);
+      if (revision !== previous.revision) {
+        this.deps.queryService.queryEmbeddingCache.invalidateModel(previous.ref.provider, previous.ref.id);
+        this.resultCache.clear();
+        this.modelRevisions.set(key, { ref: previous.ref, revision });
+      }
+    }
+  }
+
+  close(): void {
+    this.resultCache.clear(); this.modelRevisions.clear();
+    this.deps.queryService.queryEmbeddingCache.clear();
+  }
+
   constructor(deps: SearchDependencies) { this.deps = deps; }
 
   async search(request: KnowledgeSearchRequest): Promise<KnowledgeSearchResponse> {
@@ -77,6 +101,7 @@ export class KnowledgeSearchService {
   }> {
     const started = performance.now();
     request.signal?.throwIfAborted();
+    const callerSignal = request.signal;
     const { compiledScope: scope } = request;
     if (typeof request.query !== "string" || !request.query.trim() || request.query.length > 4000
       || !Number.isSafeInteger(request.limit) || request.limit < 1 || request.limit > 1000
@@ -127,113 +152,157 @@ export class KnowledgeSearchService {
       }
     }
     const variantIds = [...variants.keys()];
-    let ordinalRanges: Map<string, KnowledgeOrdinalRange[]> | undefined;
-    if (request.sectionKeys || sectionsBySourceId) {
-      ordinalRanges = new Map();
-      for (const variant of variants.values()) {
-        const sourceId = sources.find(source => source.parseArtifactId === variant.parseArtifactId)!.sourceId;
-        const keys = sectionsBySourceId?.get(sourceId) ?? request.sectionKeys;
-        if (!keys) continue;
-        const blocks = this.deps.store.listArtifactBlocks({ studioId: scope.studioId, parseArtifactId: variant.parseArtifactId });
-        const locators = buildKnowledgeBlockLocatorIndex(blocks);
-        const ranges: KnowledgeOrdinalRange[] = this.deps.indexStore.listVariantChunks(variant.id)
-          .filter(chunk => chunk.spans.some(span => keys.includes(knowledgeSectionKeyOf(locators.get(span.blockId)?.headingPath) ?? "")))
-          .map(chunk => [chunk.ordinal, chunk.ordinal]);
-        ordinalRanges.set(variant.id, ranges);
+    this.refreshModelConfigurations();
+    for (const notebook of notebooks) {
+      for (const ref of [notebook.embeddingModelRef, notebook.rerankModelRef]) {
+        if (ref) this.modelRevisions.set(JSON.stringify([ref.provider, ref.id]), {
+          ref, revision: this.deps.queryService.getModelConfigurationRevision(ref),
+        });
       }
     }
-    const timings: KnowledgeSearchResponse["timings"] = { scopeMs: performance.now() - started, ftsMs: 0, fuseMs: 0, totalMs: 0 };
-    let remoteModelCalls = 0;
-    let candidates: IndexedKnowledgeChunk[];
-    let retrievalMode: "fts" | "hybrid" = "fts";
-    let searchedVectorVariants: NonNullable<RetrieveForNotebooksResult["searchedVectorVariants"]> = [];
-    const degraded: RetrieveForNotebooksResult["degraded"] = [];
-    const degradedReasons = [...scope.warnings];
-    const rerankDegradeReasons: string[] = [];
-    if (request.channel === "fts") {
-      const ftsStart = performance.now();
-      candidates = variantIds.length === 0 ? [] : ordinalRanges ? this.deps.indexStore.search({
-        scopes: [...variants.values()].map(variant => ({ parseArtifactId: variant.parseArtifactId, chunkProfileHash: variant.chunkProfileHash })),
-        query: request.query, limit: request.limit, ordinalRangesByChunkIndexVariantId: ordinalRanges,
-      }) : this.deps.queryService.searchCompiledScopeFts({
-        compiledScope: { ...scope, readyChunkVariantIds: variantIds }, query: request.query, limit: request.limit,
-      });
-      candidates = candidates.map(candidate => ({ ...candidate, channels: ["fts"] }));
-      timings.ftsMs = performance.now() - ftsStart;
-    } else {
-      const outcomes = await Promise.all(notebooks.map(notebook => this.deps.queryService.retrieveCompiledNotebook({
-        compiledScope: scope, notebook, variantIds, query: request.query, limit: request.limit,
-        rerank: request.rerank, signal: request.signal, ordinalRanges,
-        onRemoteCall: () => { remoteModelCalls += 1; },
-      })));
-      for (const outcome of outcomes) {
-        if (outcome.retrievalMode === "hybrid") retrievalMode = "hybrid";
-        degraded.push(...outcome.degraded);
-        searchedVectorVariants.push(...outcome.searchedVectorVariants);
-        if (outcome.rerankDegradeReason) rerankDegradeReasons.push(outcome.rerankDegradeReason);
-        for (const [key, value] of Object.entries(outcome.stageTimings ?? {})) {
-          if (value != null) {
-            const timingKey = key as keyof typeof timings;
-            timings[timingKey] = Math.max(timings[timingKey] ?? 0, value);
-          }
+    const cached = await this.resultCache.getOrCreate({
+      scopeSnapshotHash: scope.snapshotHash, normalizedQuery: normalizeKnowledgeQuery(request.query),
+      channel: request.channel, filters: { notebookIds: request.notebookIds, sourceIds: request.sourceIds,
+        sectionKeys: request.sectionKeys, sectionsBySourceId: sectionsBySourceId ? [...sectionsBySourceId] : undefined },
+      limit: request.limit, rerank: request.rerank, retrievalImplementationVersion: "knowledge-search-v1",
+    }, async signal => {
+      request = { ...request, query: normalizeKnowledgeQuery(request.query), signal };
+      let ordinalRanges: Map<string, KnowledgeOrdinalRange[]> | undefined;
+      if (request.sectionKeys || sectionsBySourceId) {
+        ordinalRanges = new Map();
+        for (const variant of variants.values()) {
+          const sourceId = sources.find(source => source.parseArtifactId === variant.parseArtifactId)!.sourceId;
+          const keys = sectionsBySourceId?.get(sourceId) ?? request.sectionKeys;
+          if (!keys) continue;
+          const blocks = this.deps.store.listArtifactBlocks({ studioId: scope.studioId, parseArtifactId: variant.parseArtifactId });
+          const locators = buildKnowledgeBlockLocatorIndex(blocks);
+          const ranges: KnowledgeOrdinalRange[] = this.deps.indexStore.listVariantChunks(variant.id)
+            .filter(chunk => chunk.spans.some(span => keys.includes(knowledgeSectionKeyOf(locators.get(span.blockId)?.headingPath) ?? "")))
+            .map(chunk => [chunk.ordinal, chunk.ordinal]);
+          ordinalRanges.set(variant.id, ranges);
         }
       }
-      const fuseStart = performance.now();
-      candidates = fuseNotebookRankings(outcomes.map(outcome => outcome.candidates)).map(entry => entry.chunk).slice(0, request.limit);
-      timings.fuseMs += performance.now() - fuseStart;
-      searchedVectorVariants = [...new Map(searchedVectorVariants.map(variant => [variant.vectorIndexVariantId, variant])).values()];
-      degradedReasons.push(...degraded.map(item => `${item.reason}:${item.parseArtifactId}`), ...rerankDegradeReasons);
-    }
-    request.signal?.throwIfAborted();
-    const locators = new Map<string, KnowledgeBlockLocator>();
-    for (const parseArtifactId of new Set(candidates.map(candidate => candidate.parseArtifactId))) {
-      const blockIds = candidates.filter(candidate => candidate.parseArtifactId === parseArtifactId).flatMap(candidate => candidate.spans.map(span => span.blockId));
-      for (const [id, locator] of buildKnowledgeBlockLocatorIndex(this.deps.store.getArtifactBlocksByIds({
-        studioId: scope.studioId, parseArtifactId, blockIds,
-      }))) locators.set(id, locator);
-    }
-    const annotated = candidates.map(candidate => {
-      const source = sources.find(source => source.parseArtifactId === candidate.parseArtifactId);
-      if (!source || !variants.has(candidate.chunkIndexVariantId)) this.violation();
-      const notebook = notebooks.find(notebook => source!.notebookIds.includes(notebook.notebookId)
-        && notebook.chunkProfileHash === variants.get(candidate.chunkIndexVariantId)!.chunkProfileHash);
-      if (!notebook) this.violation();
-      const locator = locators.get(candidate.spans[0]?.blockId);
-      return { ...candidate, sourceId: source!.sourceId, sourceName: source!.sourceName,
-        notebookId: notebook!.notebookId, notebookName: notebook!.notebookName,
-        headingPath: locator?.headingPath ?? null, pageNumber: locator?.pageNumber ?? null };
-    });
-    const hits: KnowledgeSearchHit[] = annotated.map(candidate => {
-      const source = sources.find(source => source.sourceId === candidate.sourceId)!;
+      const timings: KnowledgeSearchResponse["timings"] = { scopeMs: performance.now() - started, ftsMs: 0, fuseMs: 0, totalMs: 0 };
+      let remoteModelCalls = 0;
+      let candidates: IndexedKnowledgeChunk[];
+      let retrievalMode: "fts" | "hybrid" = "fts";
+      let searchedVectorVariants: NonNullable<RetrieveForNotebooksResult["searchedVectorVariants"]> = [];
+      const degraded: RetrieveForNotebooksResult["degraded"] = [];
+      const degradedReasons = [...scope.warnings];
+      const rerankDegradeReasons: string[] = [];
+      if (request.channel === "fts") {
+        const ftsStart = performance.now();
+        candidates = variantIds.length === 0 ? [] : ordinalRanges ? this.deps.indexStore.search({
+          scopes: [...variants.values()].map(variant => ({ parseArtifactId: variant.parseArtifactId, chunkProfileHash: variant.chunkProfileHash })),
+          query: request.query, limit: request.limit, ordinalRangesByChunkIndexVariantId: ordinalRanges,
+        }) : this.deps.queryService.searchCompiledScopeFts({
+          compiledScope: { ...scope, readyChunkVariantIds: variantIds }, query: request.query, limit: request.limit,
+        });
+        candidates = candidates.map(candidate => ({ ...candidate, channels: ["fts"] }));
+        timings.ftsMs = performance.now() - ftsStart;
+      } else {
+        const groups = new Map<string, typeof notebooks>();
+        for (const notebook of notebooks) {
+          const ref = notebook.embeddingModelRef;
+          const key = ref ? JSON.stringify([ref.provider, ref.id, this.deps.queryService.getModelConfigurationRevision(ref)]) : "none";
+          groups.set(key, [...(groups.get(key) ?? []), notebook]);
+        }
+        const groupNotebooks = [...groups.values()];
+        const outcomes = await Promise.all(groupNotebooks.map(members => this.deps.queryService.retrieveCompiledGroup({
+          compiledScope: scope, notebooks: members, variantIds, query: request.query, limit: request.limit,
+          signal: request.signal, ordinalRanges, onRemoteCall: () => { remoteModelCalls += 1; },
+        })));
+        for (const outcome of outcomes) {
+          if (outcome.retrievalMode === "hybrid") retrievalMode = "hybrid";
+          degraded.push(...outcome.degraded);
+          searchedVectorVariants.push(...outcome.searchedVectorVariants);
+          if (outcome.rerankDegradeReason) rerankDegradeReasons.push(outcome.rerankDegradeReason);
+          for (const [key, value] of Object.entries(outcome.stageTimings ?? {})) {
+            if (value != null) {
+              const timingKey = key as keyof typeof timings;
+              timings[timingKey] = Math.max(timings[timingKey] ?? 0, value);
+            }
+          }
+        }
+        const notebookRankings = await Promise.all(notebooks.map(async notebook => {
+          const outcome = outcomes[groupNotebooks.findIndex(members => members.includes(notebook))];
+          const local = outcome.candidates.filter(candidate => sources.some(source => source.parseArtifactId === candidate.parseArtifactId
+            && source.notebookIds.includes(notebook.notebookId))
+            && variants.get(candidate.chunkIndexVariantId)?.chunkProfileHash === notebook.chunkProfileHash);
+          if (!request.rerank) return local;
+          const ranked = await this.deps.queryService.rerankCompiledCandidates({ candidates: local,
+            modelRef: notebook.rerankModelRef, query: request.query, signal: request.signal,
+            onRemoteCall: () => { remoteModelCalls += 1; },
+          });
+          timings.rerankMs = Math.max(timings.rerankMs ?? 0, ranked.rerankMs);
+          if (ranked.rerankDegradeReason) rerankDegradeReasons.push(ranked.rerankDegradeReason);
+          return ranked.candidates;
+        }));
+        const fuseStart = performance.now();
+        candidates = fuseNotebookRankings(notebookRankings).map(entry => entry.chunk).slice(0, request.limit);
+        timings.fuseMs += performance.now() - fuseStart;
+        searchedVectorVariants = [...new Map(searchedVectorVariants.map(variant => [variant.vectorIndexVariantId, variant])).values()];
+        degradedReasons.push(...degraded.map(item => `${item.reason}:${item.parseArtifactId}`), ...rerankDegradeReasons);
+      }
+      request.signal?.throwIfAborted();
+      const locators = new Map<string, KnowledgeBlockLocator>();
+      for (const parseArtifactId of new Set(candidates.map(candidate => candidate.parseArtifactId))) {
+        const blockIds = candidates.filter(candidate => candidate.parseArtifactId === parseArtifactId).flatMap(candidate => candidate.spans.map(span => span.blockId));
+        for (const [id, locator] of buildKnowledgeBlockLocatorIndex(this.deps.store.getArtifactBlocksByIds({
+          studioId: scope.studioId, parseArtifactId, blockIds,
+        }))) locators.set(id, locator);
+      }
+      const annotated = candidates.map(candidate => {
+        const source = sources.find(source => source.parseArtifactId === candidate.parseArtifactId);
+        if (!source || !variants.has(candidate.chunkIndexVariantId)) this.violation();
+        const notebook = notebooks.find(notebook => source!.notebookIds.includes(notebook.notebookId)
+          && notebook.chunkProfileHash === variants.get(candidate.chunkIndexVariantId)!.chunkProfileHash);
+        if (!notebook) this.violation();
+        const locator = locators.get(candidate.spans[0]?.blockId);
+        return { ...candidate, sourceId: source!.sourceId, sourceName: source!.sourceName,
+          notebookId: notebook!.notebookId, notebookName: notebook!.notebookName,
+          headingPath: locator?.headingPath ?? null, pageNumber: locator?.pageNumber ?? null };
+      });
+      const hits: KnowledgeSearchHit[] = annotated.map(candidate => {
+        const source = sources.find(source => source.sourceId === candidate.sourceId)!;
+        return {
+          candidateId: `kc_${crypto.createHash("sha256").update(`${scope.scopeId}\0${candidate.chunkIndexVariantId}\0${candidate.id}`).digest("hex").slice(0, 32)}`,
+          sourceId: source.sourceId, sourceName: source.sourceName,
+          notebookIds: source.notebookIds.filter(id => notebooks.some(notebook => notebook.notebookId === id)),
+          contentSnapshotId: source.contentSnapshotId, parseArtifactId: candidate.parseArtifactId,
+          chunkIndexVariantId: candidate.chunkIndexVariantId, chunkId: candidate.id, chunkOrdinal: candidate.ordinal,
+          headingPath: candidate.headingPath, pageNumber: candidate.pageNumber,
+          snippet: candidate.text.slice(0, 1200), score: candidate.score, channels: candidate.channels ?? [],
+        };
+      });
+      timings.totalMs = performance.now() - started;
       return {
-        candidateId: `kc_${crypto.createHash("sha256").update(`${scope.scopeId}\0${candidate.chunkIndexVariantId}\0${candidate.id}`).digest("hex").slice(0, 32)}`,
-        sourceId: source.sourceId, sourceName: source.sourceName,
-        notebookIds: source.notebookIds.filter(id => notebooks.some(notebook => notebook.notebookId === id)),
-        contentSnapshotId: source.contentSnapshotId, parseArtifactId: candidate.parseArtifactId,
-        chunkIndexVariantId: candidate.chunkIndexVariantId, chunkId: candidate.id, chunkOrdinal: candidate.ordinal,
-        headingPath: candidate.headingPath, pageNumber: candidate.pageNumber,
-        snippet: candidate.text.slice(0, 1200), score: candidate.score, channels: candidate.channels ?? [],
+        response: { hits, retrievalMode, vectorBackend: searchedVectorVariants.length ? "portable" : "none",
+          timings, remoteModelCalls, degradedReasons: [...new Set(degradedReasons)] },
+        evidence: {
+          candidates: annotated,
+          sources: notebooks.flatMap(notebook => sources.flatMap(source => {
+            const variant = [...variants.values()].find(item => item.parseArtifactId === source.parseArtifactId
+              && item.chunkProfileHash === notebook.chunkProfileHash);
+            return source.notebookIds.includes(notebook.notebookId) && variant ? [{
+              notebookId: notebook.notebookId, notebookName: notebook.notebookName, sourceId: source.sourceId,
+              sourceName: source.sourceName, parseArtifactId: variant.parseArtifactId, chunkCount: variant.chunkCount,
+              firstHeadingPath: variant.firstHeadingPath, sections: variant.sectionKeys, chunkProfileHash: variant.chunkProfileHash,
+            }] : [];
+          })),
+          retrievalMode, retrievalModeRequested: request.channel, degraded,
+          searchedVectorVariants, rerankDegradeReasons, stageTimings: timings,
+        },
       };
-    });
-    timings.totalMs = performance.now() - started;
-    return {
-      response: { hits, retrievalMode, vectorBackend: searchedVectorVariants.length ? "portable" : "none",
-        timings, remoteModelCalls, degradedReasons: [...new Set(degradedReasons)] },
-      evidence: {
-        candidates: annotated,
-        sources: notebooks.flatMap(notebook => sources.flatMap(source => {
-          const variant = [...variants.values()].find(item => item.parseArtifactId === source.parseArtifactId
-            && item.chunkProfileHash === notebook.chunkProfileHash);
-          return source.notebookIds.includes(notebook.notebookId) && variant ? [{
-            notebookId: notebook.notebookId, notebookName: notebook.notebookName, sourceId: source.sourceId,
-            sourceName: source.sourceName, parseArtifactId: variant.parseArtifactId, chunkCount: variant.chunkCount,
-            firstHeadingPath: variant.firstHeadingPath, sections: variant.sectionKeys, chunkProfileHash: variant.chunkProfileHash,
-          }] : [];
-        })),
-        retrievalMode, retrievalModeRequested: request.channel, degraded,
-        searchedVectorVariants, rerankDegradeReasons, stageTimings: timings,
-      },
-    };
+    }, callerSignal);
+    callerSignal?.throwIfAborted();
+    if (this.deps.store.getTurnScope({ scopeId: scope.scopeId })?.status !== "active") this.violation();
+    if (cached.hit) {
+      cached.value.response.remoteModelCalls = 0;
+      cached.value.response.timings = { scopeMs: performance.now() - started, ftsMs: 0, fuseMs: 0, totalMs: performance.now() - started };
+      cached.value.evidence.stageTimings = { ftsMs: 0, fuseMs: 0 };
+    }
+    return cached.value;
   }
 
   private violation(): never {

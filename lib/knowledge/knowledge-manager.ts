@@ -156,6 +156,7 @@ export interface KnowledgeManagerOptions {
    */
   embedTextsForModel?: ((request: KnowledgeIngestionEmbedRequest) => Promise<KnowledgeEmbeddingResult | null>) | null;
   canEmbedWithModel?: ((modelRef: KnowledgeModelRef) => boolean) | null;
+  getModelConfigurationRevision?: (ref: KnowledgeModelRef) => string;
   /**
    * 查询侧 rerank 执行回调（v8：按笔记本显式引用路由）。配置类不可解析由
    * engine 侧记日志并返回 null，检索显式降级 RRF 名次；请求级错误照常抛出。
@@ -318,6 +319,7 @@ export class KnowledgeManager {
       store: this.store,
       indexStore: this.indexStore,
       vectorIndex: this.vectorIndex,
+      getModelConfigurationRevision: options.getModelConfigurationRevision,
       embedTextsForModel: options.embedTextsForModel ?? null,
       rerank: options.rerank,
       rerankForModel: options.rerankForModel ?? null,
@@ -404,6 +406,7 @@ export class KnowledgeManager {
           try {
             const sourceId = this.queryService.backfillVariantMetadata(variant);
             this.scopeCompiler.invalidateSource(sourceId);
+            this.searchService.clearResults();
           } catch (error) {
             this.lifecycleLog(`knowledge metadata: background backfill failed for ${variant.id}: ${
               error instanceof Error ? error.message : String(error)
@@ -436,6 +439,7 @@ export class KnowledgeManager {
 
   deleteNotebook(input: Parameters<KnowledgeStore["deleteNotebook"]>[0]) {
     this.scopeCompiler.invalidateNotebook(String(input.notebookId));
+    this.searchService.clearResults();
     // 删除前记录该笔记本的全部源（删除后 orphan 判定要用；listNotebookSources 要求活跃笔记本）。
     const affectedSourceIds = this.store.listNotebookSources({
       studioId: input?.studioId,
@@ -1714,6 +1718,8 @@ export class KnowledgeManager {
    * 嵌入可解析时把 pending_embedding 批量置回 queued 补跑。
    */
   onModelConfigMayHaveChanged() {
+    this.queryService.onModelConfigMayHaveChanged();
+    this.searchService.refreshModelConfigurations();
     return this.ingestion.onModelConfigMayHaveChanged();
   }
 
@@ -1769,6 +1775,7 @@ export class KnowledgeManager {
     });
     const after = this.store.updateNotebookConfig(input);
     this.scopeCompiler.invalidateNotebook(String(input.notebookId));
+    this.searchService.clearResults();
     const embeddingChanged = JSON.stringify(before.embeddingModelRef ?? null)
       !== JSON.stringify(after.embeddingModelRef ?? null);
     const chunkChanged = (before.chunkTargetChars ?? null) !== (after.chunkTargetChars ?? null);
@@ -1818,6 +1825,7 @@ export class KnowledgeManager {
   }
 
   close() {
+    this.searchService.close();
     if (this.metadataBackfill) clearImmediate(this.metadataBackfill);
     this.metadataBackfill = null;
     this.scopeCompiler.dispose();
