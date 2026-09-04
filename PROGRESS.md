@@ -10,7 +10,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = eb5e13d8f567dc05ae2888c71122c838e4a4c9e6  (知识 P0-P3 最终交付；四平台与产物门禁全部通过；封印前全量 13751 PASS / 0 FAIL / 7 既有 SKIP，79.33s)
+VERIFIED_SOURCE_SHA   = c9353fc6b2e2f6b90ed125fc28cf47ad36e4a7d0  (详细研究会话组装修复；本机全量 13756 PASS / 0 FAIL / 7 既有 SKIP，82.74s；本机未公证目录包通过)
 历史上游同步工作分支  = feature/upstream-sync-0.447.4
 当前知识重构执行分支  = feat/knowledge-retrieval-research-p0-p3
 ```
@@ -1095,3 +1095,13 @@ Windows NSIS 已在 windows-latest 构建成功；尚未在真实 Windows 桌面
 - 此最终封印只修改既有六份审计文件；封印前全量已针对交付提交通过，实际结果见下一条。
 
 - 最终封印前 `npm test` 已实际 exit 0：13751 PASS / 0 FAIL / 7 既有 SKIP；1357 测试文件通过 / 1 既有跳过，79.33s（命令总耗时 79.776s）。UTC 2026-09-04T11:22:01.945189+00:00 → 2026-09-04T11:23:21.722008+00:00。原始日志 `/tmp/lingxi-knowledge-p307-final-seal-full.log`；矩阵一致性、独立差异门禁及 Git 差异检查通过。所有任务已完成；最终封印采用任务书固定标题 `chore(audit): advance verified source for knowledge P0-P3 refactor`，仅六份审计文件，不合并 main。
+
+## 2026-09-04 详细研究会话组装修复与独立封印
+
+- 用户反馈截图后独立核实：研究空扩展结果缺少 SDK 必需运行载体，会话还未调用模型就失败。修复源码提交 `c9353fc6b2e2f6b90ed125fc28cf47ad36e4a7d0`；原任务最终封印 `b4fbcb07f4207f5afe57baf5a8779ba6b7ff341b` 保留在历史中。
+- 真实组装红测三个研究入口全部重现相同错误，普通隔离会话通过；修复后五项真实 SDK 回归通过。原参数单测的整段会话替身是此前漏测原因，现已补齐，不修改用户知识库、失败记录或预算。
+- 修复后工作树全量 13756 PASS / 0 FAIL / 7 既有 SKIP，1358 文件通过 / 1 既有跳过，82.74s，exit 0；三套类型、全仓 lint（0 错误、9190 既有警告）、持久化与开放边界门禁通过。提交后核心代码、测试与生成物和受测工作树一致；原始日志与各步结果见 `artifacts/knowledge-research-runtime-fix/progress.md`。
+- 本机客户端/服务端构建、原生依赖检查、一次性签名种子验签通过；macOS arm64 目录包使用已安装的同版本 Electron 42.8.1，最终打包 exit 0 且签名校验通过。未配置正式 Apple 公证，因此本次不声明公证或新的四平台发布通过；原下载/凭证错误及退出码保留。验证临时私钥已清理，正式公钥与依赖版本未变。
+- 兼容指纹 `sha256:01923b378ab07195c438fed0cb0fc356da0c4061c7d2e270a8946c97e4875cc0`；只更新会话协调器源码摘要，无数据格式或迁移变化。运行闭包重生成无差异。
+- 本次独立封印只同步既有六份审计文件，保持原差异白名单与门禁；不合并 main。
+- 封印前矩阵与审计门禁 10/10 通过，exit 0，148ms；独立差异检查通过。封印后的六文件差异由同一独立检查再次确认，日志 `/tmp/lingxi-research-runtime-audit.log`。
