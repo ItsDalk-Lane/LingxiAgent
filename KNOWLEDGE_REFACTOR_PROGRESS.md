@@ -10,7 +10,7 @@
 - 严格按 P0 → P1 → P2 → P3 及编号顺序；阶段门禁全部通过才进入下一阶段。
 - 每项记录测试原始结果后提交；不删除、跳过或放宽测试，不合并 main。
 - 现有任务书为用户未跟踪文件，既有规划文档与 BLOCKED.md 历史记录保留。
-- 当前断点：P1-01 至 P1-07 已完成；P1-08 正在修复跨平台门禁发现的问题，尚未进入 P2。P0 源码提交 `5c016df183ad207cf1ca33de274abb7a4eb10057`，阶段审计提交 `f9928d76`；全量 13002 PASS / 0 FAIL / 7 既有 SKIP。用户已授权每阶段验证后同步审计记录，保留最终封印。
+- 当前断点：P1-01 至 P1-08 已完成，本地及第三轮四平台门禁全部通过；正在完成阶段审计提交，随后进入 P2-01。P0 源码提交 `5c016df183ad207cf1ca33de274abb7a4eb10057`，阶段审计提交 `f9928d76`；全量 13002 PASS / 0 FAIL / 7 既有 SKIP。用户已授权每阶段验证后同步审计记录，保留最终封印。
 - 进度、计划与事实集中在本文件和基线文档，避免覆盖既有 task_plan.md / findings.md / PROGRESS.md。
 - 目标工具已确认本任务存在 active goal；重复 create_goal 被拒绝，沿用现有目标。
 - 规划恢复脚本返回其他会话的无关配置记录，经 git diff 为空核对，未采用其内容。
@@ -20,7 +20,7 @@
 | 阶段 | 状态 | 结果 |
 | --- | --- | --- |
 | P0 | completed | 2026-09-04 全量 13002 PASS / 0 FAIL / 7 既有 SKIP，76.42s；全部 P0 门禁通过，审计提交 f9928d76 |
-| P1 | in_progress | P1-01 至 P1-07 本项验证通过；P1-08 本地门禁已执行，四平台第二轮仍有失败，正在修复 |
+| P1 | completed | P1-01 至 P1-08 完成；本地全量和第三轮四平台 Build 33829055797 全部通过，阶段审计收口中 |
 | P2 | pending | NOT_EXECUTED |
 | P3 | pending | NOT_EXECUTED |
 
@@ -127,6 +127,7 @@
 ## P1-02：建立 KnowledgeSearchService
 
 - 状态：completed
+- 改动文件：`KNOWLEDGE_REFACTOR_PROGRESS.md`、`build/cli-runtime-closure.json`、`build/persistence-schema-fingerprint.json`、`core/engine.ts`、`export-manifest.json`、`lib/knowledge/fast-knowledge-pipeline.ts`、`lib/knowledge/knowledge-index-store.ts`、`lib/knowledge/knowledge-manager.ts`、`lib/knowledge/knowledge-query-service.ts`、`lib/knowledge/knowledge-search-service.ts`、`lib/knowledge/query-embedding-cache.ts`、`lib/knowledge/retrieval-result-cache.ts`、`tests/knowledge-search-service.test.ts`。
 - 改动：新增任务书锁定的搜索请求/命中/响应契约与统一服务；两个缓存文件先定义键契约，缓存实现及接线严格放到 P1-03。快速管线与详细会话自动检索共用入口；底层现有混合检索通过冻结身份执行核复用，分组去重及全局重排按 P1-03/P1-04 接续，未提前改动算法。
 - 范围：先校验宿主落库范围、会话/工作室、冻结来源身份及过滤条件；查询不能扩大范围。本地检索固定 FTS、禁止重排，命中块只做定点定位读取；混合检索按真实远程调用计数，保留两路命中标识及向量变体身份，模型不可用显式留痕。候选摘要不冒充证据。无会话范围的既有兼容调用暂保留，后续详细切换按 P2-07 执行。
 - 测试命令：`npx vitest run tests/knowledge-search-service.test.ts tests/knowledge-rerank-fusion.test.ts tests/knowledge-fast-zero-remote.test.ts tests/knowledge-fast-pipeline.test.ts tests/knowledge-fast-performance-contract.test.ts tests/knowledge-retrieval-golden.test.ts tests/knowledge-context-injector.test.ts tests/knowledge-evidence-manifest.test.ts`；`npm run typecheck`；修改文件 ESLint；`npm run lint:boundary`。
@@ -139,6 +140,7 @@
 ## P1-03：查询嵌入分组与缓存
 
 - 状态：completed
+- 改动文件：`KNOWLEDGE_REFACTOR_PROGRESS.md`、`build/cli-runtime-closure.json`、`build/persistence-schema-fingerprint.json`、`core/engine.ts`、`lib/knowledge/knowledge-manager.ts`、`lib/knowledge/knowledge-query-service.ts`、`lib/knowledge/knowledge-search-service.ts`、`lib/knowledge/query-embedding-cache.ts`、`lib/knowledge/retrieval-result-cache.ts`、`tests/knowledge-query-embedding-cache.test.ts`、`tests/knowledge-retrieval-result-cache.test.ts`、`tests/knowledge-search-model-grouping.test.ts`、`tests/knowledge-search-service.test.ts`。
 - 改动：查询嵌入缓存固定 512 条、10 分钟，检索结果缓存固定 256 条、2 分钟；均采用 LRU、并发同键一次执行、失败不缓存、各等待者独立取消，返回副本防调用方污染缓存。结果缓存命中前仍校验冻结范围，返回前复核范围仍处于活动状态。
 - 接线：按配置的供应商/模型/配置修订分组，同组全部向量变体一次搜索；查询嵌入键固定 query 用途。配置修订由模型配置和凭证的内存摘要识别，不保存或输出原文；模型变化只使对应嵌入条目失效，结果缓存同步清除；管理器关闭清理缓存。P1-04 的全局融合及按重排引用分组尚未执行，本项保留各笔记本重排并复用抽出的原有期限与响应校验。
 - 测试命令：`npx vitest run tests/knowledge-query-embedding-cache.test.ts tests/knowledge-retrieval-result-cache.test.ts tests/knowledge-search-model-grouping.test.ts tests/knowledge-search-service.test.ts tests/knowledge-rerank-fusion.test.ts tests/knowledge-fast-zero-remote.test.ts tests/knowledge-fast-pipeline.test.ts tests/knowledge-engine-persistence.test.ts tests/knowledge-fast-performance-contract.test.ts`；`npm run typecheck`；修改文件 ESLint；`npm run lint:boundary`。
@@ -152,6 +154,7 @@
 ## P1-04：全局融合和分组 rerank
 
 - 状态：completed
+- 改动文件：`KNOWLEDGE_REFACTOR_PROGRESS.md`、`build/persistence-schema-fingerprint.json`、`lib/knowledge/fast-knowledge-pipeline.ts`、`lib/knowledge/knowledge-context-injector.ts`、`lib/knowledge/knowledge-manager.ts`、`lib/knowledge/knowledge-query-service.ts`、`lib/knowledge/knowledge-search-service.ts`、`shared/knowledge-refs.ts`、`tests/helpers/knowledge-rerank-fixture.ts`、`tests/knowledge-cross-notebook-fusion.test.ts`、`tests/knowledge-global-rerank.test.ts`、`tests/knowledge-mixed-rerank-groups.test.ts`、`tests/knowledge-search-model-grouping.test.ts`、`tests/knowledge-search-service.test.ts`。
 - 改动：统一入口先对全范围一次 FTS，再按嵌入组只搜向量；全部序列使用现有 k=60 名次融合并去重，共享资料不因多挂笔记本重复加分。重排按不同供应商/模型引用分组，每组最多一次，输入前 50 条，尾部保留；多个模型结果只比较名次，不比较原始分数。任一重排组失败则保留整个全局融合顺序并明确留痕，取消信号照常抛出。
 - 统计：增加 embeddingGroups、rerankGroups、queryEmbeddingCacheHit、retrievalResultCacheHit，服务→注入→会话统计贯通；结果缓存命中时本次模型组数/远程调用数为 0。快速路径缓存命中时 FTS 实际执行数为 0，但检索模式与已有结果仍如实保留。
 - 测试命令：`npx vitest run tests/knowledge-global-rerank.test.ts tests/knowledge-mixed-rerank-groups.test.ts tests/knowledge-cross-notebook-fusion.test.ts tests/knowledge-search-model-grouping.test.ts tests/knowledge-search-service.test.ts tests/knowledge-rerank-fusion.test.ts tests/knowledge-fast-zero-remote.test.ts tests/knowledge-fast-pipeline.test.ts tests/knowledge-context-injector.test.ts tests/knowledge-evidence-manifest.test.ts tests/knowledge-fast-performance-contract.test.ts`；`npm run typecheck`；修改文件 ESLint；`npm run lint:boundary`。
@@ -164,6 +167,7 @@
 ## P1-05：新增 HNSW 向量后端
 
 - 状态：completed
+- 改动文件：`KNOWLEDGE_REFACTOR_PROGRESS.md`、`build/cli-runtime-closure.json`、`build/persistence-schema-fingerprint.json`、`build/persistence-store-inventory.json`、`export-manifest.json`、`lib/knowledge/ann-index-store.ts`、`lib/knowledge/knowledge-context-injector.ts`、`lib/knowledge/knowledge-manager.ts`、`lib/knowledge/knowledge-query-service.ts`、`lib/knowledge/knowledge-search-service.ts`、`lib/knowledge/usearch-vector-backend.ts`、`lib/knowledge/vector-index-adapter.ts`、`lib/knowledge/vector-search-backend-factory.ts`、`lib/knowledge/vector-search-backend.ts`、`package-lock.json`、`package.json`、`shared/knowledge-refs.ts`、`shared/persistence/store-registry.ts`、`tests/helpers/knowledge-ann-fixture.ts`、`tests/knowledge-ann-crash-recovery.test.ts`、`tests/knowledge-ann-index-store.test.ts`、`tests/knowledge-ann-rebuild.test.ts`、`tests/knowledge-usearch-backend.test.ts`、`tests/knowledge-vector-backend-fallback.test.ts`、`tests/knowledge-vector-backend-parity.test.ts`。
 - 改动：optionalDependencies 精确锁定 usearch 2.26.0；新增任务书指定四个后端模块、ANN 独立 v1 目录及每变体文件。原始向量库仍为 v3，BLOB 不变；ready 后异步启动独立工作线程，每批 512 行建图，临时文件 fsync → 原子改名 → 最后目录 ready。重启清理本模块临时文件，恢复中断构建；失效、替换和删除同步清掉旧内存索引。
 - 查询：参数固定 cosine/f32/16/128/64；key=ordinal+1；各变体候选合并后按余弦分数稳定排序；加载缓存最多 32 个，估算达到 512MB 淘汰最旧引用（不是进程 RSS 的硬上限）。统一查询只读取目录与命中块；原生依赖、文件缺失/损坏、指纹/数量及查询失败均显式 portable exact 回退并安排重建。每请求独立记录实际后端和原因，服务→证据加工→会话统计透传。
 - 测试命令：任务书六个 ANN 测试文件，加 knowledge-search-model-grouping / knowledge-search-service / knowledge-vector-index / knowledge-retrieval-golden / knowledge-context-injector / knowledge-fast-zero-remote / knowledge-engine-persistence；另跑 persistence-store-registry / persistence-schema-tripwire；三套类型检查、修改文件 ESLint、边界检查、持久化扫描/指纹生成检查、CLI 闭包生成。
@@ -177,6 +181,7 @@
 ## P1-06：新增第一等 knowledge_search 工具
 
 - 状态：completed
+- 改动文件：`KNOWLEDGE_REFACTOR_PROGRESS.md`、`build/cli-runtime-closure.json`、`build/persistence-schema-fingerprint.json`、`core/agent.ts`、`desktop/src/locales/en.json`、`desktop/src/locales/ja.json`、`desktop/src/locales/ko.json`、`desktop/src/locales/zh-TW.json`、`desktop/src/locales/zh.json`、`desktop/src/react/utils/tool-label.ts`、`export-manifest.json`、`lib/tools/knowledge-search-tool.ts`、`shared/tool-categories.ts`、`tests/helpers/knowledge-search-tool-fixture.ts`、`tests/knowledge-search-tool-output-budget.test.ts`、`tests/knowledge-search-tool-scope.test.ts`、`tests/knowledge-search-tool.test.ts`、`tests/tool-label-coverage.test.ts`。
 - 改动：新增任务书固定参数的只读搜索工具；query 1～4000 字符、limit 默认 12/上限 24、channel 默认 hybrid。运行时取得 studioId；拒绝模型传入归属参数；复用 knowledge-scope 校验会话和父会话，过滤条件全部经统一搜索服务复核。结果只有候选与定位摘要，明确要求必须经过 knowledge_read/knowledge_grep 才能引用，candidateId 不是证据 ID。
 - 接线：加入 Agent 共用工具快照和 STANDARD 分类（后续 P2 研究会话从该工具面选取只读集合）；复用既有同名合成检索卡的三相位文案，调整名单归类并补齐五语言知识库失败表述，不重复注册工具名。FTS 禁止重排，取消信号沿统一服务传递。
 - 测试命令：任务书三个 search-tool 文件，加 tool-label-coverage / knowledge-agent-tools / tool-categories / tool-categorization-smoke / agent-tools-conditional-injection / subagent-tool-policy；三套类型检查、修改文件 ESLint、边界检查、CLI 闭包及持久化指纹生成检查。
@@ -189,6 +194,7 @@
 ## P1-07：现有工具复用统一数据面
 
 - 状态：completed
+- 改动文件：`KNOWLEDGE_REFACTOR_PROGRESS.md`、`build/cli-runtime-closure.json`、`build/persistence-schema-fingerprint.json`、`core/agent.ts`、`lib/knowledge/knowledge-store.ts`、`lib/tools/knowledge-grep-tool.ts`、`lib/tools/knowledge-outline-tool.ts`、`lib/tools/knowledge-read-tool.ts`、`tests/knowledge-agent-tools.test.ts`、`tests/knowledge-read-tool.test.ts`。
 - 改动：knowledge_read.query 使用编译范围和统一搜索服务，固定 sourceId/所属 notebook、limit=12；原 ordinal 范围读取保持原行为。knowledge_outline 使用编译目录和索引 metadata，返回 chunk count、章节、标题、状态与可信度；取消普通目录中的 CoverageUnit 重算和相应覆盖数量输出，保留事实库只读数量/定位类型查询。章节列表沿用已有 40 项摘要上限并显式标记截断。
 - 原文匹配：增加 scannedChars、matchedSourceCount、精确起止偏移和长匹配截断标记；保留原文空白，宿主 details 携带冻结身份与实际返回原文位置，作为 P2 receipt 扩展点。本项不提前建 P2 表或生成 receipt。扫描预算只计真正扫描过的字符，中断来源已扫描的计数和结果继续保留。
 - 测试更新：按任务书更换目录的旧覆盖单位断言，新增实际数据库 chunk 数精确断言，以及 CoverageUnit/全量 blocks/全量 chunks 均零调用断言；原来源归属、标题、可信度、父会话继承与越权拒绝断言保留。读取查询新增统一入口调用参数断言，旧 retrieveForArtifacts 必须零调用；原文匹配与宿主读取位置逐字符对照。
@@ -202,17 +208,19 @@
 
 ## P1-08：HNSW 打包与性能验证
 
-- 状态：in_progress（本机实现验证完成，待源码提交后的审计复验与远程四平台门禁；尚未进入 P2）
+- 状态：completed（本地及第三轮四平台验证全部通过，P2 尚未开始）
+- 测试命令：`npm run typecheck`、`npm run lint`、`npm run lint:boundary`、任务书 P1 门禁指定的八文件 `npx vitest run`、`npm test`、`npm run build:server`、`npm run build:server:open`、`npm run build:client`、`npm run test:knowledge-platform-smoke`、`node scripts/smoke-packaged-knowledge.mjs`；另执行种子与 standalone 验证、`node scripts/benchmark-knowledge-vector.mjs`、`node scripts/benchmark-knowledge-fast.mjs`，以及下文逐轮记录的修复定向测试和五生成器两轮。Linux 性能运行设置 `LINGXI_ENFORCE_KNOWLEDGE_PERF=1`。
+- 改动文件（含同项修复、生成物与阶段审计）：`.github/workflows/build.yml`、`.github/workflows/knowledge-performance.yml`、`.sync-audit/build-sync-matrix.mjs`、`.sync-audit/upstream-sync-matrix.json`、`.sync-audit/verified-source-sha.txt`、`KNOWLEDGE_REFACTOR_PROGRESS.md`、`PROGRESS.md`、`UPSTREAM_SYNC_AUDIT.md`、`UPSTREAM_SYNC_MATRIX.md`、`artifacts/knowledge-fast-benchmark-linux-x64-9bee41dc.json`、`artifacts/knowledge-fast-benchmark-linux-x64-f86da543.json`、`artifacts/knowledge-vector-benchmark-linux-x64-9bee41dc.json`、`artifacts/knowledge-vector-benchmark-linux-x64-f86da543.json`、`artifacts/knowledge-vector-benchmark.json`、`build/cli-runtime-closure.json`、`build/persistence-schema-fingerprint.json`、`core/engine.ts`、`lib/knowledge/ingestion-service.ts`、`lib/knowledge/usearch-vector-backend.ts`、`package.json`、`scripts/benchmark-knowledge-vector.mjs`、`scripts/build-server-artifact.mjs`、`scripts/build-server-deps.mjs`、`scripts/build-server-phases.mjs`、`scripts/build-server-runtime-assets.mjs`、`scripts/build-standalone-server-artifact.mjs`、`scripts/compute-cli-closure.mjs`、`scripts/export-open-tree.mjs`、`scripts/prepare-usearch-native.mjs`、`scripts/smoke-packaged-knowledge.mjs`、`scripts/verify-seed-kit.mjs`、`scripts/verify-standalone-server-artifact.mjs`、`tests/build-server-artifact.test.ts`、`tests/build-server-runtime-assets.test.ts`、`tests/build-standalone-server-artifact.test.ts`、`tests/helpers/knowledge-vector-package-fixture.ts`、`tests/knowledge-ann-rebuild.test.ts`、`tests/knowledge-embedding-provider-gate.test.ts`、`tests/knowledge-native-build.test.ts`、`tests/smoke-packaged-knowledge.test.ts`、`tests/verify-seed-kit.test.ts`。
 - 改动：正式/开放服务共用安装流程纳入可选原生包，发布包强制安装锁定版本及加载依赖；按目标保留原生扩展，Electron 配置显式解包原生文件，standalone 与种子验证检查对应文件。独立包内构建入口来自真实生产后端；子进程真实建图/查询，移走解包副本全部原生扩展后以原数据库回退，最后恢复文件。完整包内烟测还验证缺扩展时服务器重启读回快照。
 - 性能：固定种子 10k/100k，64 维（16 维合成投影），40 次独立查询、3 次新后端冷加载；真实 portable 数据库与 HNSW，无远程模型。100k exact P95 152.127166ms，HNSW P95 3.726334ms，40.8249 倍，top-10 overlap 99.75%；建图 13194.276459ms，文件 40466728 字节，冷加载 P95 108.440333ms。10k exact P95 12.914583ms、HNSW 0.55425ms、重合率 100%。本机 macOS arm64，墙钟 gate 未启用，不能代表真实供应商嵌入召回率或其他平台。
-- 已验证：P1 指定 8 文件 / 44 PASS；打包与导出 8 文件 / 123 PASS；平台烟测本机 8 文件 / 94 PASS；类型检查三套 PASS，lint 0 error / 9176 warning，boundary PASS。首次全量 1298 文件 PASS / 2 FAIL / 1 既有 SKIP，13079 测试 PASS / 2 FAIL / 7 既有 SKIP，86.65s，exit 1。
+- 首轮验证记录：P1 指定 8 文件 / 44 PASS；打包与导出 8 文件 / 123 PASS；平台烟测本机 8 文件 / 94 PASS；类型检查三套 PASS，lint 0 error / 9176 warning，boundary PASS。首次全量 1298 文件 PASS / 2 FAIL / 1 既有 SKIP，13079 测试 PASS / 2 FAIL / 7 既有 SKIP，86.65s，exit 1。
 - 首轮问题：服务器不存在时新检查遮盖原错误，恢复原检查顺序；真实原生余弦舍入按 2 个机器精度单位校验；降级原因包含 variant 后缀，按完整原因核对。全量发现可选扩展误列静态必需依赖，改为显式安装后台线程运行包，原质量门禁不变并复测通过；另一全量失败是待同步的审计坐标。
-- 当前生成物：CLI 闭包 10672 文件，开放树增加共享构建工具依赖；持久化指纹保持 `sha256:62fb7022d119927f45f160a0ebe7bdffc673bcb1dfefd3be23cf31e1d729b40d`。性能 JSON 在 `artifacts/knowledge-vector-benchmark.json`。五个生成器连续两轮通过：第二轮派生文件零差异、测试清单内容完全相同，开放树 866 文件。
-- 最终本地构建：正式服务、开放服务、客户端均 exit 0；正式服务采用一次性本地测试签名，12 个 Mach-O 签名与种子复核通过，私钥随后删除，未改发布公钥。完整包内烟测 exit 0，含移除扩展后服务器启动、检索和快照读回。第二次 lint 曾与闭包生成器重叠，扫入生成器临时文件而失败；生成器退出后原命令复跑 0 error / 9176 warning、boundary 通过，未新增忽略项。
+- 首轮生成物：CLI 闭包 10672 文件，开放树增加共享构建工具依赖；持久化指纹保持 `sha256:62fb7022d119927f45f160a0ebe7bdffc673bcb1dfefd3be23cf31e1d729b40d`。性能 JSON 在 `artifacts/knowledge-vector-benchmark.json`。五个生成器连续两轮通过：第二轮派生文件零差异、测试清单内容完全相同，开放树 866 文件。
+- 首轮本地构建：正式服务、开放服务、客户端均 exit 0；正式服务采用一次性本地测试签名，12 个 Mach-O 签名与种子复核通过，私钥随后删除，未改发布公钥。完整包内烟测 exit 0，含移除扩展后服务器启动、检索和快照读回。第二次 lint 曾与闭包生成器重叠，扫入生成器临时文件而失败；生成器退出后原命令复跑 0 error / 9176 warning、boundary 通过，未新增忽略项。
 - 远程：独立性能工作流尚未在默认分支登记（查询返回 404）；保留该手工流程，并把同一性能脚本接入现有 Build 的固定 Linux runner。四平台 Build 的包内与 standalone 烟测继续沿用既有门禁，分支运行不触发标签发布。
-- 日志：`/tmp/lingxi-knowledge-p108-*`。审计全量复验与远程平台/稳定 runner 状态待回填。
-- 对应 commit SHA：首轮源码 `9bee41dc`、审计 `c742a423`；首轮跨平台修复源码 `c452a705`、审计 `f0e52055`；第二轮修复待提交。
-- 偏差：无任务范围/锁定参数变化。四平台真实验证未通过前不标全平台完成。
+- 日志：`/tmp/lingxi-knowledge-p108-*`。最终全量复验、四平台及稳定 runner 结果见下文第三轮记录。
+- 对应 commit SHA：首轮源码 `9bee41dc`、审计 `c742a423`；首轮跨平台修复源码 `c452a705`、审计 `f0e52055`；第二轮修复源码 `f86da543`、审计 `8295e5ff`。
+- 偏差：none
 
 ### P1-08 跨平台首轮与修复（仍属当前任务）
 
@@ -222,7 +230,7 @@
 - Intel 失败：原生烟测在创建索引时 SIGSEGV。本机 x64 Node/Rosetta 同样复现；`nm -arch x86_64 -u` 发现发行包缺失 `_nk_*` 链接符号，arm64 切片无此问题。用锁定 2.26.0 源码让主扩展与计算库按同一 x64 架构编译，保留原 arm64 切片后重新组装签名；同一修复产物通过 arm64/x64 两次真实创建/添加/查询，重复准备返回 ready。仅调整构建架构，不改 C++ 算法、版本、HNSW 参数或文件格式。
 - 安装/打包接线：安装时对已知缺链接的 Intel 扩展进行修复，坏扩展先隔离；修复不可用时明确报告 portable 回退，正式打包则失败。完整包内原生烟测保持必过。构建工具进入开放导出清单。
 - 修复测试：8 文件 / 57 PASS；之前关闭专项 6 文件 / 21 PASS。类型检查发现新增测试对文件名重载推断不完整，按字符串处理后复跑；无测试删除、跳过、超时扩张。
-- 指纹兼容重钉 `sha256:03658759d1b349c11b6ae7e7daba2ce169488a052e97b65b5a424c9cb7fd2d9e`；所有表与 DATA_EPOCH 不变。修复后两轮生成器均通过且零漂移；闭包仍 10672 文件，开放树 867 文件。类型检查、全量 lint（0 error / 9176 warning）、boundary、本机三种构建与包内正常/回退烟测通过。修复后的全量测试及第二轮远程结果待回填。
+- 指纹兼容重钉 `sha256:03658759d1b349c11b6ae7e7daba2ce169488a052e97b65b5a424c9cb7fd2d9e`；所有表与 DATA_EPOCH 不变。修复后两轮生成器均通过且零漂移；闭包仍 10672 文件，开放树 867 文件。类型检查、全量 lint（0 error / 9176 warning）、boundary、本机三种构建与包内正常/回退烟测通过。修复后的全量测试及第二、三轮远程结果见下文。
 
 
 ### P1-08 跨平台第二轮与修复（仍属当前任务）
@@ -233,8 +241,23 @@
 - 质量门禁：原 `knowledge-lifecycle` 最小间隔测试配置 80ms、断言至少 70ms，实测 16ms。远程 13074 PASS / 1 FAIL / 17 既有 SKIP，466.48s。原限流器先记录放行时刻、等待 Promise 续段后才实际调用；主线程延迟时请求会挤在一起。新增确定性回归在旧代码记录间隔 0ms、明确失败；修复为同步派发调用后用单调时钟计时，并保留并发上限、关闭拒绝语义。原测试与超时值不变。
 - 回归修复过程：首次采用模块导入的单调时钟，测试虚拟时钟未控制它，新增测试原 60s 超时（1 FAIL / 46 PASS）；改用 Node 全局单调时钟后原命令 4 文件 / 47 PASS，4.87s，未放宽测试。最终连同 ANN 构建与安装回归 6 文件 / 53 PASS，4.84s；P1 指定 8 文件 / 44 PASS，1.82s。
 - Windows 包内失败：期望 hnsw，实际 portable。保存线程刷盘前使用只读句柄，而 Windows 刷盘要求可写权限（微软 FlushFileBuffers 文档）；改用 r+ 保留已有内容，fsync 与原生后端断言均保留，失败断言增加后端和降级原因便于定位。此修复仍需下一轮真实 Windows runner 确认，不把本机测试当作 Windows PASS。
-- 类型检查三套、lint（0 error / 9176 warning）、boundary 已通过；兼容指纹重钉 `sha256:3a430fbfb39226c044f96d3723f9c014eab8c01d94805af1a2c2d5f0c4266c46`，数据表、版本、paid vectors 不变。正式服务、开放服务、桌面端三种构建与种子验签、包内原生/移除扩展回退烟测均 exit 0；本机平台烟测 8 文件 / 94 PASS，7.62s。五生成器连续两轮通过、第二轮派生物零漂移，闭包 10672 文件、开放树 867 文件、测试清单一致。全量复验及第三轮远程状态待审计提交回填。
+- 类型检查三套、lint（0 error / 9176 warning）、boundary 已通过；兼容指纹重钉 `sha256:3a430fbfb39226c044f96d3723f9c014eab8c01d94805af1a2c2d5f0c4266c46`，数据表、版本、paid vectors 不变。正式服务、开放服务、桌面端三种构建与种子验签、包内原生/移除扩展回退烟测均 exit 0；本机平台烟测 8 文件 / 94 PASS，7.62s。五生成器连续两轮通过、第二轮派生物零漂移，闭包 10672 文件、开放树 867 文件、测试清单一致。全量复验及第三轮远程状态见下文。
 - 日志：`/tmp/lingxi-knowledge-p1-second-quality.log`、`/tmp/lingxi-knowledge-p1-second-windows.log`、`/tmp/lingxi-knowledge-p108-dispatch-*`、`/tmp/lingxi-knowledge-p108-third-*`。
+
+
+### P1-08 第三轮验证（全部通过）
+
+- 本机全量复验 `npm test` exit 0：1302 文件 PASS / 1 既有 SKIP，13087 测试 PASS / 7 既有 SKIP / 0 FAIL，78.60s。源码 `f86da54313e35a5868c6f045c9495717d61ba1bb`，纯审计提交 `8295e5ff937cf9d3e49c082231188a01bd56122b`。
+- 第三轮远程 Build `33829055797` 在同一审计提交上运行，最终整体 SUCCESS：前置检查、界面构建、质量门禁、四平台完整构建与产物启动/历史升级回归全部 PASS。一次状态观察因网络 EOF 结束，随后查询确认远程原任务继续运行，没有重复触发构建。
+- 本轮两项修复另经只读复核：并发占位、实际调用后的间隔、同步异常释放、停机排队拒绝、刷盘后原子落盘、包内原生与移除扩展回退断言均保留；未发现新增阻断问题。此复核不替代四平台门禁。
+- 本轮 Linux 稳定 runner 性能门禁 PASS（墙钟限制启用）：100k HNSW P95 6.041646ms、exact P95 416.031149ms、68.86056 倍、top-10 overlap 99.75%；建图 17452.363762ms、文件 40448776 字节、冷加载 P95 251.593555ms。快速模式 100k 热 P95 68.219216ms、冷 P95 391.315210ms、远程模型调用 0。原始生成报告保留在 `artifacts/knowledge-{fast,vector}-benchmark-linux-x64-f86da543.json`，来源 Build `33829055797`。
+- 第三轮远程质量门禁 PASS：1302 文件 PASS / 1 既有 SKIP，13077 测试 PASS / 17 既有 SKIP / 0 FAIL，410.55s。原生命周期 16 测试与新增请求派发 2 测试均 PASS；类型检查、lint、包构建一并通过。日志 `/tmp/lingxi-knowledge-p1-third-quality.log`。Linux 的既有平台跳过数单独保留，不与 macOS 的 7 项混写。
+- 三个平台已取得终态与日志实证：Windows x64、Linux x64、macOS arm64 全构建 PASS；各自平台测试 8 文件 / 94 PASS，包内输出均为 native=hnsw、removed-native=portable，签名归档解包、安装、解析、重启与不可变快照读回通过；Windows standalone 压缩包还独立再次通过原生/回退检索。安装包已上传，Intel 完整构建与既有产物启动/历史升级回归继续等待。
+- P1 六项收口核查：查询模型分组对应 `knowledge-search-model-grouping`（1/2 模型调用数与五来源命中）；全局重排对应 `knowledge-global-rerank`（五来源一次重排）；已选范围内跨笔记本工具对应 `knowledge-search-tool` 与 `knowledge-search-tool-scope`；优先原生对应 `knowledge-usearch-backend`；失败保原向量回退对应 `knowledge-vector-backend-fallback` 与本轮真实移除扩展烟测；快速档无向量路径对应 `knowledge-search-service` 与 `knowledge-fast-zero-remote`。均在本轮全量套件内通过，生产入口只读核查无缺口。
+- Intel macOS x64 完整构建也已 PASS：平台测试 8 文件 / 94 PASS，包内日志明确 native=hnsw、removed-native=portable，签名归档解包、安装、解析、重启和快照读回通过；`/tmp/lingxi-knowledge-p1-third-mac-intel.log`。四套 installer 产物均已上传且未过期，清单与摘要保留 `/tmp/lingxi-knowledge-p1-third-artifact-inventory.json`；当前只剩工作流的产物启动/历史升级回归。
+- 最后门禁：产物启动与历史升级回归 8 文件 / 304 PASS，1.88s；日志 `/tmp/lingxi-knowledge-p1-third-release-smoke.log`。分支运行中的发布、镜像和发布列车按既有标签条件未触发，没有合并 main。
+- 阶段末五生成器再连续两轮全部 exit 0；第二轮完整 `git diff --exit-code` 为 0，测试清单逐字节一致，日志 `/tmp/lingxi-knowledge-p1-close-generator*`。此前测试与参数均保留，所有失败均已修复并复验。
+- 阶段收口提交：`chore(knowledge): close P1 unified retrieval verification`（本次提交）；源实现与四平台运行证据对应上述三个源码/审计提交对。随后执行阶段审计坐标同步与全量复验，P2/P3 当前尚未开始。
 
 ## P2-01：增加 Research 共享契约
 
