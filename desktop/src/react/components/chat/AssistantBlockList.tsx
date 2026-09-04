@@ -104,6 +104,7 @@ export const AssistantBlockList = memo(function AssistantBlockList({
             isStreaming,
             readOnly,
             skillPrompt,
+            knowledgeResearch: knowledgeRetrieval?.research,
           })}
         </BlockErrorBoundary>
       ))}

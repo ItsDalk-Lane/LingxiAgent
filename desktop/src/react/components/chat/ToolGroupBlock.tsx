@@ -24,6 +24,8 @@ import {
 } from '../../hooks/use-deferred-history-content';
 
 import type { ToolCall } from '../../stores/chat-types';
+import type { KnowledgeRetrievalStats } from '../../../../../shared/knowledge-refs.ts';
+import { knowledgeResearchStopNote } from '../../utils/knowledge-research-status';
 
 interface Props {
   tools: ToolCall[];
@@ -31,6 +33,7 @@ interface Props {
   agentName?: string;
   skillPrompt?: string | null;
   sessionPath?: string;
+  knowledgeResearch?: KnowledgeRetrievalStats['research'];
 }
 
 export const ToolGroupBlock = memo(function ToolGroupBlock({
@@ -39,9 +42,23 @@ export const ToolGroupBlock = memo(function ToolGroupBlock({
   agentName = 'Lingxi',
   skillPrompt = null,
   sessionPath = '',
+  knowledgeResearch,
 }: Props) {
   // 独立卡片或产物块承接状态的工具，不在工具组里重复显示。
-  const tools = rawTools.filter(t => !isToolCallHiddenFromProcessUi(t));
+  const translate = window.t ?? ((key: string) => key);
+  const tools = rawTools.filter(t => !isToolCallHiddenFromProcessUi(t)).map(tool => {
+    if (!knowledgeResearch || !tool.done) return tool;
+    if (tool.name === 'knowledge_research_worker'
+      && (tool.args?.workerStatus === 'cancelled' || tool.resultNote === translate('chat.knowledgeResearchCancelled'))) {
+      const note = knowledgeResearchStopNote(tool.args?.stopReason ?? knowledgeResearch.stopReason, translate);
+      return note ? { ...tool, resultNote: note } : tool;
+    }
+    // 旧卡没有携带轮次终态，整轮未完成时只能显示已结束，不能猜测轮次成功。
+    if (tool.name === 'knowledge_research_round' && !tool.args?.roundStatus
+      && tool.args?.round === knowledgeResearch.rounds && knowledgeResearch.status !== 'completed'
+      && tool.success) return { ...tool, status: 'unknown' as const, success: false };
+    return tool;
+  });
   const [collapsed, setCollapsed] = useState(initialCollapsed);
   useEffect(() => {
     setCollapsed(initialCollapsed);
@@ -60,19 +77,25 @@ export const ToolGroupBlock = memo(function ToolGroupBlock({
     tool.name !== 'exec_command' && !skillInvocationName({ toolName: tool.name, args: tool.args })
   ));
 
+  const researchCount = tools.filter(tool => KNOWLEDGE_RESEARCH_TOOL_NAMES.has(tool.name)).length;
+  const researchOnly = researchCount === tools.length;
+
   // 摘要标题
   const _t = window.t ?? ((p: string) => p);
   let summaryText = '';
   if (allDone) {
     if (failCount > 0) {
-      summaryText = _t('toolGroup.countWithFail', { total: tools.length, fail: failCount });
+      summaryText = _t(researchOnly ? 'toolGroup.researchCountWithFail' : 'toolGroup.countWithFail', { total: tools.length, fail: failCount });
     } else {
-      summaryText = _t('toolGroup.count', { n: tools.length });
+      summaryText = _t(researchOnly ? 'toolGroup.researchCount' : 'toolGroup.count', { n: tools.length });
     }
   } else {
     const running = tools.filter(t => !t.done).length;
-    summaryText = _t('toolGroup.running', { n: running });
+    summaryText = _t(researchOnly ? 'toolGroup.researchRunning' : 'toolGroup.running', { n: running });
   }
+
+  if (researchCount > 0 && !researchOnly) summaryText = _t('toolGroup.mixedCount',
+    { tools: tools.length - researchCount, steps: researchCount });
 
   return (
     <div className={`${styles.toolGroup}${isSingle ? ` ${styles.toolGroupSingle}` : ''}`}>
@@ -224,7 +247,7 @@ const StandardToolIndicator = memo(function StandardToolIndicator({ tool, agentN
         )}
         {tag && <span className={styles.toolTag}>{tag}</span>}
         {status !== 'running' ? (
-          <span className={`${styles.toolStatus} ${status === 'succeeded' ? styles.toolStatusDone : styles.toolStatusFailed}`}>
+          <span className={`${styles.toolStatus} ${status === 'succeeded' ? styles.toolStatusDone : status === 'failed' ? styles.toolStatusFailed : ''}`}>
             {status === 'succeeded' ? '✓' : status === 'failed' ? '✗' : '?'}
           </span>
         ) : (

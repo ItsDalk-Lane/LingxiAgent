@@ -43,6 +43,7 @@ import { bumpMessageLiveVersion } from '../stores/message-live-version';
 import { terminalOutputStream } from './terminal-output-stream';
 import { handleBackgroundProcessControlResult } from './background-process-control';
 import type { KnowledgeResearchProgress } from '../../../../shared/knowledge-research.ts';
+import { knowledgeResearchStopNote } from '../utils/knowledge-research-status';
 
 declare function t(key: string, vars?: Record<string, string>): any;
 
@@ -640,11 +641,11 @@ function upsertResearchCard(sp: string, state: ResearchProgressCards, id: string
   if (resultNote !== undefined) streamBufferManager.updateKnowledgeResearchToolProgress(sp, id, args, resultNote);
 }
 
-function finishResearchCard(sp: string, state: ResearchProgressCards, id: string, success: boolean, resultNote?: string): void {
+function finishResearchCard(sp: string, state: ResearchProgressCards, id: string, success: boolean | null, resultNote?: string): void {
   const card = state.cards.get(id);
   if (!card || card.done) return;
   card.done = true;
-  streamBufferManager.updateKnowledgeResearchToolProgress(sp, id, card.args, resultNote ?? card.resultNote, success ? 'succeeded' : 'failed');
+  streamBufferManager.updateKnowledgeResearchToolProgress(sp, id, card.args, resultNote ?? card.resultNote, success === null ? 'unknown' : success ? 'succeeded' : 'failed');
 }
 
 function settleResearchCards(sp: string, success: boolean, resultNote?: string): void {
@@ -707,10 +708,12 @@ function handleKnowledgeResearchProgress(msg: KnowledgeResearchProgress, sp: str
       if (!nonEmptyString(msg.taskId) || typeof msg.label !== 'string' || msg.label.length > 100) return;
       if (msg.type === 'knowledge_research_worker_completed' && !['completed', 'failed', 'cancelled'].includes(msg.status)) return;
       const id = researchCardId(state, 'worker', msg.taskId);
-      upsertResearchCard(sp, state, id, 'knowledge_research_worker', { count: 1, label: msg.label });
+      upsertResearchCard(sp, state, id, 'knowledge_research_worker', { count: 1, label: msg.label,
+        ...(msg.type === 'knowledge_research_worker_completed' ? { workerStatus: msg.status, stopReason: msg.stopReason } : {}) });
       if (msg.type === 'knowledge_research_worker_completed') {
-        finishResearchCard(sp, state, id, msg.status === 'completed', msg.status === 'cancelled'
-          ? t('chat.knowledgeResearchCancelled') : msg.status === 'failed' ? t('chat.knowledgeResearchFailed') : undefined);
+        finishResearchCard(sp, state, id, msg.status === 'completed', knowledgeResearchStopNote(msg.stopReason, t)
+          ?? (msg.status === 'cancelled' ? t('chat.knowledgeResearchInterrupted')
+            : msg.status === 'failed' ? t('chat.knowledgeResearchFailed') : undefined));
       }
       break;
     }
@@ -721,7 +724,14 @@ function handleKnowledgeResearchProgress(msg: KnowledgeResearchProgress, sp: str
       upsertResearchCard(sp, state, id, 'knowledge_research_progress', progressArgs);
       if (msg.phase === 'reviewing') {
         finishResearchCard(sp, state, id, true);
-        if (state.roundId) finishResearchCard(sp, state, researchCardId(state, 'round', state.roundId), true);
+        if (state.roundId) {
+          const roundId = researchCardId(state, 'round', state.roundId);
+          const roundCard = state.cards.get(roundId);
+          if (roundCard && msg.roundStatus) upsertResearchCard(sp, state, roundId, roundCard.name,
+            { ...roundCard.args, roundStatus: msg.roundStatus });
+          finishResearchCard(sp, state, roundId, msg.roundStatus ? msg.roundStatus === 'completed' : null,
+            knowledgeResearchStopNote(msg.roundStopReason, t));
+        }
         upsertResearchCard(sp, state, researchCardId(state, 'review', roundKey), 'knowledge_research_review', {},
           t('chat.knowledgeResearchReviewCounts', { conflicts: String(msg.needsConflicted), pending: String(pending) }));
       }
@@ -734,13 +744,28 @@ function handleKnowledgeResearchProgress(msg: KnowledgeResearchProgress, sp: str
       const success = msg.status === 'completed' || msg.status === 'partial';
       const terminalNote = msg.status === 'cancelled' ? t('chat.knowledgeResearchCancelled')
         : msg.status === 'failed' ? t('chat.knowledgeResearchFailed') : undefined;
-      settleResearchCards(sp, success, terminalNote);
+      const stopNote = knowledgeResearchStopNote(msg.stopReason, t);
+      for (const [id, card] of state.cards) {
+        if (card.name === 'knowledge_research_worker' && card.args.workerStatus === 'cancelled' && stopNote) {
+          // 总体停止原因到齐后，补齐先到达的任务中断卡；不把预算耗尽说成用户取消。
+          const note = knowledgeResearchStopNote(card.args.stopReason ?? msg.stopReason, t) ?? stopNote;
+          card.resultNote = note;
+          card.args = { ...card.args, stopReason: card.args.stopReason ?? msg.stopReason };
+          streamBufferManager.updateKnowledgeResearchToolProgress(sp, id, card.args, note, 'failed');
+        }
+        if (!card.done) finishResearchCard(sp, state, id,
+          card.name === 'knowledge_research_worker' ? false
+            : card.name === 'knowledge_research_round' && msg.status === 'partial' ? null : success,
+          card.name === 'knowledge_research_worker' || card.name === 'knowledge_research_round'
+            ? stopNote ?? terminalNote : terminalNote);
+      }
       if (success) {
         const summary = msg.status === 'partial'
           ? t('chat.knowledgeResearchPartialSummary', { rounds: String(msg.rounds), pending: String(pending) })
           : t('chat.knowledgeResearchSummary', { rounds: String(msg.rounds), searches: String(msg.searchCalls),
             reads: String(msg.readCalls), completed: String(progressArgs.completed), total: String(progressArgs.total) });
-        upsertResearchCard(sp, state, researchCardId(state, 'synthesis'), 'knowledge_research_synthesis', {}, summary);
+        upsertResearchCard(sp, state, researchCardId(state, 'synthesis'), 'knowledge_research_synthesis', {},
+          stopNote ? `${summary} · ${stopNote}` : summary);
       }
       break;
     }

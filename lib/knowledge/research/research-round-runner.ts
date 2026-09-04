@@ -86,6 +86,10 @@ export class ResearchRoundRunner {
         return { finishAccepted: false, errorCode: "KNOWLEDGE_RESEARCH_EXECUTION_FAILED" };
       }
       const outcome = result as { error?: unknown; stopReason?: unknown };
+      // 保留已知连接失败的分类，不把供应商原始错误或敏感内容写入研究记录。
+      if (outcome.error === "Connection error.") {
+        return { finishAccepted: false, errorCode: "KNOWLEDGE_MODEL_UNAVAILABLE" };
+      }
       if (outcome.error || (outcome.stopReason != null && outcome.stopReason !== "stop")) {
         return { finishAccepted: false, errorCode: "KNOWLEDGE_RESEARCH_EXECUTION_FAILED" };
       }

@@ -6,6 +6,7 @@
  */
 import { createElement, type ComponentType, type ReactNode } from 'react';
 import type { ContentBlock } from '../../stores/chat-types';
+import type { KnowledgeRetrievalStats } from '../../../../../shared/knowledge-refs.ts';
 
 export type ContentBlockType = ContentBlock['type'];
 export type ContentBlockOf<Type extends ContentBlockType> = Extract<ContentBlock, { type: Type }>;
@@ -20,6 +21,7 @@ export interface BlockRendererContext {
   isStreaming: boolean;
   readOnly: boolean;
   skillPrompt: string | null;
+  knowledgeResearch?: KnowledgeRetrievalStats['research'];
 }
 
 export type BlockRendererProps<Type extends ContentBlockType> = BlockRendererContext & {

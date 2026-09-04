@@ -74,14 +74,20 @@ export class EvidenceLedger {
         occurrences.push(offset);
       }
       if (occurrences.length === 0) {
-        throw new KnowledgeError("KNOWLEDGE_MODEL_OUTPUT_INVALID", "Quote does not occur in the receipt text");
+        throw new KnowledgeError("KNOWLEDGE_MODEL_OUTPUT_INVALID", "Quote does not occur in the receipt text", {
+          reason: "quote_not_in_receipt", receiptTextLength: text.length,
+        });
       }
       if (input.occurrenceIndex == null && occurrences.length > 1) {
-        throw new KnowledgeError("KNOWLEDGE_MODEL_OUTPUT_INVALID", "Repeated quote requires occurrenceIndex");
+        throw new KnowledgeError("KNOWLEDGE_MODEL_OUTPUT_INVALID", "Repeated quote requires occurrenceIndex", {
+          reason: "quote_occurrence_required", occurrenceCount: occurrences.length,
+        });
       }
       const occurrence = input.occurrenceIndex ?? 0;
       if (!Number.isSafeInteger(occurrence) || occurrence < 0 || occurrence >= occurrences.length) {
-        throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "occurrenceIndex is outside the receipt text");
+        throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "occurrenceIndex is outside the receipt text", {
+          reason: "quote_occurrence_out_of_range", occurrenceCount: occurrences.length,
+        });
       }
       const startOffset = receipt.startOffset + occurrences[occurrence];
       const heading = block.locator.headingPath;

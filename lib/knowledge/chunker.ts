@@ -3,8 +3,12 @@ import crypto from "node:crypto";
 import type { KnowledgeBlock } from "./types.ts";
 import { CJK_TOKENS_PER_CHAR, NON_CJK_CHARS_PER_TOKEN, estimateTextTokens } from "../llm/estimate-text-tokens.ts";
 
-export const KNOWLEDGE_CHUNKER_VERSION = "3";
+export const KNOWLEDGE_CHUNKER_VERSION = "4";
+/** 章节划分未变；切片配置升级不能改变已有章节及原文读取的身份。 */
+const KNOWLEDGE_SECTION_VERSION = "3";
+/** @deprecated 仅描述 v3 历史片段；当前片段按生效字符配置切分。 */
 export const KNOWLEDGE_SPAN_TARGET_TOKENS = 512;
+/** @deprecated 仅描述 v3 历史重叠；当前重叠为目标字符数的八分之一。 */
 export const KNOWLEDGE_SPAN_OVERLAP_TOKENS = 64;
 export const KNOWLEDGE_SECTION_SOFT_MAX_TOKENS = 8192;
 export const KNOWLEDGE_CHUNK_TARGET_CHARS = 2048;
@@ -13,12 +17,9 @@ const LEGACY_CHUNK_TARGET_CHARS = 1200;
 export type KnowledgeChunkerStrategy = "fixed" | "markdown" | "text" | "pdf" | "html";
 
 export interface KnowledgeChunkerOptions {
-  /**
-   * 历史字符配置继续进入变体身份；v3 的实际正文固定按512词元切片，不随此值放大。
-   * 只有明确选择旧版时，此值仍控制旧字符分块算法。
-   */
+  /** 正文目标字符数；在目标范围内优先沿句段边界切分，并参与索引变体身份。 */
   targetChars?: number;
-  /** 历史算法测试和明确的旧版重建入口；新生产调用缺省使用v3。 */
+  /** 历史算法测试和明确的旧版重建入口；新生产调用缺省使用当前版本。 */
   legacyVersion?: "2";
 }
 
@@ -52,7 +53,7 @@ export interface KnowledgeChunkDraft {
   ordinal: number;
   text: string;
   tokenCount: number;
-  /** v3始终写入；旧版草稿和迁移前索引没有章节归属。 */
+  /** 自 v3 起始终写入；旧版草稿和迁移前索引没有章节归属。 */
   sectionId?: string | null;
   spans: KnowledgeChunkSpanDraft[];
 }
@@ -85,7 +86,7 @@ export interface KnowledgeSectionDraft {
 export const MIN_KNOWLEDGE_CHUNK_TARGET_CHARS = 100;
 export const MAX_KNOWLEDGE_CHUNK_TARGET_CHARS = 100_000;
 
-/** @deprecated 仅旧版显式兼容使用；v3不以嵌入窗口改变分块粒度。 */
+/** @deprecated 仅旧版显式兼容使用；当前版本不以嵌入窗口改变分块粒度。 */
 export const KNOWLEDGE_CHUNK_CONTEXT_FRACTION = 0.8;
 /** 嵌入模型上下文查不到时的兜底窗口（token 数）。 */
 export const KNOWLEDGE_CHUNK_FALLBACK_CONTEXT_TOKENS = 8192;
@@ -503,6 +504,38 @@ function tokenBoundary(text: string, start: number, limit: number, backwards = f
   return cursor;
 }
 
+/** 字符数按完整码点计数，返回值仍为原文的 UTF-16 偏移。 */
+function characterBoundary(text: string, start: number, limit: number, backwards = false, floor = 0): number {
+  let cursor = start;
+  for (let count = 0; count < limit && (backwards ? cursor > floor : cursor < text.length); count += 1) {
+    if (backwards) {
+      cursor -= 1;
+      const low = text.charCodeAt(cursor), high = text.charCodeAt(cursor - 1);
+      if (cursor > floor && low >= 0xdc00 && low <= 0xdfff && high >= 0xd800 && high <= 0xdbff) cursor -= 1;
+    } else cursor += text.codePointAt(cursor)! > 0xffff ? 2 : 1;
+  }
+  return cursor;
+}
+
+/** 在目标片段后四成内依次找段落、换行、句末和词间边界，避免产生过小片段。 */
+function preferredChunkEnd(text: string, start: number, end: number): number {
+  if (end === text.length) return end;
+  const floor = start + Math.floor((end - start) * 0.6);
+  const tail = text.slice(floor, end);
+  const boundaries = [
+    /\n[\t ]*\n/gu,
+    /[\r\n]/gu,
+    /[。！？；][”’"'」』】）》]*|[.!?;][”’"'」』】）》]*(?=\s|$)/gu,
+    /\s+/gu,
+  ];
+  for (const pattern of boundaries) {
+    let lastEnd = 0;
+    for (const match of tail.matchAll(pattern)) lastEnd = match.index! + match[0].length;
+    if (lastEnd > 0) return floor + lastEnd;
+  }
+  return end;
+}
+
 interface PrimarySectionGroup { headingPath: string[]; blocks: KnowledgeBlock[] }
 
 function primarySectionGroups(blocks: readonly KnowledgeBlock[]): PrimarySectionGroup[] {
@@ -570,7 +603,7 @@ export function buildKnowledgeSections(parseArtifactId: string, blocks: readonly
       const sectionOrdinal = sections.length, sectionText = text.slice(start, end);
       // 分隔符本身不是原文块；极端空行片只按相邻原块保留位置，不能伪造引用跨度。
       const fallbackOrdinal = positions.find(position => position.end >= start)?.block.ordinal ?? group.blocks[group.blocks.length - 1].ordinal;
-      const id = "section_" + crypto.createHash("sha256").update(JSON.stringify([KNOWLEDGE_CHUNKER_VERSION, parseArtifactId, sectionOrdinal])).digest("hex").slice(0, 32);
+      const id = "section_" + crypto.createHash("sha256").update(JSON.stringify([KNOWLEDGE_SECTION_VERSION, parseArtifactId, sectionOrdinal])).digest("hex").slice(0, 32);
       sections.push({ id, parseArtifactId, sectionOrdinal, headingPath: [...group.headingPath],
         startBlockOrdinal: coveredOrdinals[0] ?? fallbackOrdinal, endBlockOrdinal: coveredOrdinals.at(-1) ?? fallbackOrdinal,
         text: sectionText, tokenCount: estimateTextTokens(sectionText), primaryBlockIds, blockSpans });
@@ -580,14 +613,15 @@ export function buildKnowledgeSections(parseArtifactId: string, blocks: readonly
   return sections;
 }
 
-/** v3片段只在节内滑动，约512词元正文与64词元重叠；引用跨度逐层回到原始块。 */
+/** 片段只在节内滑动，正文和重叠均随字符配置变化；引用跨度逐层回到原始块。 */
 export function buildKnowledgeChunks(parseArtifactId: string, blocks: readonly KnowledgeBlock[], options?: KnowledgeChunkerOptions): KnowledgeChunkDraft[] {
   if (options?.legacyVersion === "2") return buildLegacyKnowledgeChunks(parseArtifactId, blocks, options);
   const config = resolveKnowledgeChunkerConfig(blocks, options), chunks: KnowledgeChunkDraft[] = [];
+  const overlapChars = Math.floor(config.targetChars / 8);
   for (const section of buildKnowledgeSections(parseArtifactId, blocks)) {
     let start = 0;
     while (start < section.text.length) {
-      const end = tokenBoundary(section.text, start, KNOWLEDGE_SPAN_TARGET_TOKENS);
+      const end = preferredChunkEnd(section.text, start, characterBoundary(section.text, start, config.targetChars));
       const spans: KnowledgeChunkSpanDraft[] = [];
       for (const span of section.blockSpans ?? []) {
         const from = Math.max(start, span.sectionStartOffset), to = Math.min(end, span.sectionEndOffset);
@@ -602,14 +636,14 @@ export function buildKnowledgeChunks(parseArtifactId: string, blocks: readonly K
           sectionId: section.id, text, tokenCount: estimateTextTokens(text), spans });
       }
       if (end === section.text.length) break;
-      const next = tokenBoundary(section.text, end, KNOWLEDGE_SPAN_OVERLAP_TOKENS, true, start);
+      const next = characterBoundary(section.text, end, overlapChars, true, start);
       start = next > start ? next : end;
     }
   }
   return chunks;
 }
 
-/** 旧测试与显式历史生成使用这些门面，不影响新生产入口的v3默认。 */
+/** 旧测试与显式历史生成使用这些门面，不影响新生产入口的当前默认。 */
 export function resolveLegacyKnowledgeChunkerConfig(blocks: readonly KnowledgeBlock[], options?: KnowledgeChunkerOptions): KnowledgeChunkerConfig {
   return resolveKnowledgeChunkerConfig(blocks, { ...options, legacyVersion: "2" });
 }

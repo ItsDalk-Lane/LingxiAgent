@@ -88,7 +88,7 @@ export function createKnowledgeResearchFinishTool(deps: KnowledgeResearchFinishT
           return { value, summary: { count: needs.length, status: value.accepted ? "accepted" : "rejected" } };
         });
         if (decision.accepted) deps.onFinishAccepted?.(decision, context);
-        return toolOk(JSON.stringify(decision), decision);
+        return toolOk(JSON.stringify({ ...decision, remainingBudget: deps.budget.remainingBudget(runId) }), decision);
       } catch (error) {
         if (signal?.aborted) throw error;
         if (isKnowledgeError(error)) return toolError(`knowledge_research_finish failed: ${error.code}: ${error.message}`, {

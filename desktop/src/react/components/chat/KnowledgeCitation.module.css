@@ -1,0 +1,116 @@
+:global(.md-content) a.badge {
+  position: relative;
+  top: -0.45em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  min-width: 1.55em;
+  height: 1.55em;
+  padding: 0 0.25em;
+  margin: 0 0.12em;
+  border: 0;
+  border-radius: 999px;
+  background: color-mix(in srgb, #69a9ec 22%, var(--bg-card));
+  color: color-mix(in srgb, #438bd4 80%, var(--text));
+  font-size: 75%;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  text-decoration: none;
+  vertical-align: baseline;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+:global(.md-content) a.badge:hover,
+:global(.md-content) a.badge:focus-visible {
+  background: color-mix(in srgb, #69a9ec 34%, var(--bg-card));
+  text-decoration: none;
+}
+
+:global(.md-content) a.badge:focus-visible {
+  outline: 2px solid #69a9ec;
+  outline-offset: 2px;
+}
+
+.preview {
+  position: fixed;
+  z-index: 2147483001;
+  box-sizing: border-box;
+  width: 20rem;
+  max-width: calc(100vw - 16px);
+  max-height: calc(100vh - 16px);
+  overflow: auto;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-card);
+  color: var(--text);
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.16);
+  font-family: inherit;
+  -webkit-app-region: no-drag;
+  user-select: text;
+}
+
+.preview:focus-visible {
+  outline: 2px solid #69a9ec;
+  outline-offset: 2px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  margin-bottom: 7px;
+}
+
+.fileIcon {
+  flex: none;
+  color: var(--text-muted);
+}
+
+.title {
+  min-width: 0;
+  overflow: hidden;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.4;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.excerpt {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 13px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.status {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.status p {
+  margin: 0 0 8px;
+}
+
+.retry {
+  border: 0;
+  border-radius: 4px;
+  padding: 3px 7px;
+  background: var(--bg);
+  color: var(--text);
+  font: inherit;
+  cursor: pointer;
+}

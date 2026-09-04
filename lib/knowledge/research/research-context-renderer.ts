@@ -80,6 +80,36 @@ export class ResearchContextRenderer {
       const needs = [...input.needs].sort((left, right) => left.ordinal - right.ordinal);
       const relations = this.research.listRelations(run.id);
       const evidence = new Map(this.research.listEvidence(run.id).map(item => [item.id, item]));
+      const actions = this.research.listActions(run.id);
+      const successfulSearches = actions.filter(action => action.actionType === "knowledge_search"
+        && action.status === "completed" && action.errorCode === null);
+      const searchHitCount = successfulSearches.reduce((count, action) => count + Number(action.responseSummary?.count ?? 0), 0);
+      const successfulReads = actions.filter(action => ["knowledge_read", "knowledge_grep", "knowledge_coverage_read"].includes(action.actionType)
+        && action.status === "completed" && action.errorCode === null
+        && Array.isArray(action.responseSummary?.receiptIds) && action.responseSummary.receiptIds.length > 0);
+      const rejectedUpdates = actions.filter(action => action.actionType === "knowledge_research_update"
+        && (action.errorCode === "KNOWLEDGE_MODEL_OUTPUT_INVALID"
+          || action.responseSummary?.errorCode === "KNOWLEDGE_MODEL_OUTPUT_INVALID"));
+      const stopDescriptions: Record<string, string> = {
+        complete: "必要问题已通过核验",
+        tool_budget_exhausted: "本轮调查的调用次数已达到上限",
+        wall_clock_exhausted: "本轮调查时间已达到上限",
+        round_budget_exhausted: "本轮调查轮数已达到上限",
+        no_progress: "连续两轮没有新增有效证据",
+        cancelled: "调查已被取消",
+        critical_tools_unavailable: "调查所需工具持续执行失败",
+        research_execution_failed: "调查执行失败",
+      };
+      // 限制说明来自实际动作，不能从空证据清单推断从未读原文或资料中没有答案。
+      const processFacts = [
+        `成功完成 ${successfulSearches.length} 次检索，累计命中 ${searchHitCount} 条线索（未去重）；${successfulReads.length} 次读取或原文匹配实际取得了原文凭据。`,
+        `已登记 ${evidence.size} 条不同的原文证据；${rejectedUpdates.length} 次证据提交出现引文核验失败或部分拒收。`,
+        `实际停止情况：${stopDescriptions[run.stopReason ?? ""] ?? "尚未完成全部核验"}。`,
+        successfulReads.length > 0
+          ? "本次确实已经读取原文，不得描述为尚未触及原文、无法打开资料或没有找到原文章节。证据登记失败与原文不存在是不同情况。"
+          : "本次尚未取得可用于核验的原文阅读凭据，不能推断资料中不存在相关内容。",
+        "不得自行推测资料过长、模型连接异常或需要扩大来源池作为失败原因；只说明这里已经确认的阶段和限制。",
+      ].join("\n");
       const receipts = store.db.prepare("SELECT id FROM knowledge_research_read_receipts WHERE run_id = ? AND consumed_at IS NOT NULL ORDER BY created_at, id")
         .all(run.id).map((row: { id: string }) => this.research.getReceipt(run.id, row.id));
       const linkedIds = new Set(relations.map(relation => relation.evidenceId));
@@ -170,10 +200,17 @@ export class ResearchContextRenderer {
           "Unresolved gaps:", boundedData(gaps.join("\n") || "None recorded."),
           `Omitted evidence: ${packet.omittedEvidenceCount}; truncated: ${packet.truncated}; metadata truncated: ${packet.metadataTruncated}`,
           "Validated evidence:", ...cards,
+          "本次调查的客观记录（只用于准确说明限制，不是问题答案）：", processFacts,
           "Answer contract:", ...packet.answerContract.map((item, index) => `${index + 1}. ${item}`),
           "只根据本包实际包含的原文证据回答；用 {{cite:N}} 引用对应的 [KN]，不得引用搜索摘要或不存在的编号。",
           "仅在 Research status=completed、Stop reason=complete、全部必要需求获宿主确认且本包未截断时陈述研究已完成；完整覆盖还必须满足记录的完整性策略和检查结果。",
           "预算、无进展、取消、工具失败或遗漏证据均须明确说明限制；缺少证据不能推导全局否定结论。",
+          "本轮调查已结束；最终回答阶段不得再次调用工具补查，也不得用调查账本之外的材料补作证据。",
+          "英文标题、需求状态、停止原因、内部编号和统计字段只供内部判断，不得原样复述到用户答案。用用户所用语言自然说明哪些部分已查清、哪些尚未核实，以及调查达到时间或调用次数上限等实际限制。",
+          "回答以用户提出的问题为主，不要把内部调查统计、状态表或调试字段作为正文主体。需要解释限制时，使用上方客观记录中的自然语言，简短说明实际停在哪一步。不得原样输出 validated evidence、uncovered、source_diverse、wall_clock_exhausted 或 tool_budget_exhausted 等内部标记。",
+          packet.canonicalEvidenceSpans.length === 0
+            ? "本包没有可用于回答的已核验原文证据。只需简短说明目前无法核实的主要问题及已确认的调查限制；原文是否读取过以客观记录为准。不得编造实质性结论、输出空引用，或把没有证据说成资料中不存在相关内容。"
+            : "逐项回答已有原文支持的问题；尚未得到证据支持的部分明确标注未核实，不要复述内部状态名。",
           completeness?.exact
             ? "宿主已证明所选核查范围被逐单元完整检查。只有原文证据也支持否定结论时，才允许说“在所选完整范围中不存在……”；相关章节核查不能扩写为未选章节或整本资料的结论。"
             : `完整性尚未证明，只能说“在已检查的范围内未发现……”。由于 ${completeness?.unavailableUnits ?? 0} 个单元/来源不可用或检查尚未完成，无法证明完整不存在；不得使用全局不存在、从未发生等完整否定措辞。`,

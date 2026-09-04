@@ -44,6 +44,12 @@
     "sendFailed": "傳送失敗"
   },
   "knowledge": {
+    "citationRetry": "重新載入",
+    "citationNumber": "引用 {number}，懸停查看原文，按 Enter 開啟",
+    "citationLoading": "正在載入原文…",
+    "citationFailed": "暫時無法載入原文，資料可能已移除或連線無法使用。",
+    "citationSource": "知識資料",
+    "citationTitle": "引用原文",
     "tab": "知識",
     "title": "知識庫",
     "newNotebook": "新增筆記本",
@@ -114,7 +120,7 @@
     "settingsRerankHint": "本筆記本專屬；僅影響查詢排序，不觸發重建",
     "settingsGlobalNotConfigured": "未設定",
     "settingsChunkTargetChars": "分塊大小（字元）",
-    "settingsChunkHint": "按嵌入模型上下文視窗 ×80% 自動計算（1 token = 1 字元口徑）；換嵌入模型後自動重建",
+    "settingsChunkHint": "按字元數設定片段目標，優先保留句段和章節邊界。留空使用預設 2048 字元。儲存後於背景重建，保留既有回答的引用。",
     "settingsInvalidNumber": "請輸入 {min}–{max} 之間的整數",
     "selectSource": "選擇一個來源查看解析內容",
     "ingestionQueued": "排隊中",
@@ -130,7 +136,7 @@
     "readinessProcessing": "{count} 攝入中",
     "readinessPendingEmbedding": "{count} 待嵌入",
     "readinessFailed": "{count} 失敗",
-    "settingsChunkAutoFallback": "自動（約 6553）",
+    "settingsChunkAutoFallback": "預設（2048 字元）",
     "settingsVectorRetention": "向量保留策略",
     "settingsRetentionKeepForever": "永久保留（預設）",
     "settingsRetentionDaysMode": "天數後清理",
@@ -390,6 +396,13 @@
     "back": "返回"
   },
   "chat": {
+    "knowledgeResearchInterrupted": "調查已中斷",
+    "knowledgeResearchStopIncomplete": "調查流程未正常結束",
+    "knowledgeResearchStopUnavailable": "調查所需工具無法使用",
+    "knowledgeResearchStopNoProgress": "繼續調查未取得新證據",
+    "knowledgeResearchStopRounds": "已達到調查輪數上限",
+    "knowledgeResearchStopTime": "調查時間已用完",
+    "knowledgeResearchStopTools": "共享工具呼叫次數已用完",
     "find": {
       "locateFailed": "未能定位到該訊息",
       "placeholder": "在會話中查找"
@@ -834,6 +847,10 @@
     "active": "思考中"
   },
   "toolGroup": {
+    "mixedCount": "{tools} 次工具呼叫 · {steps} 個調查步驟",
+    "researchRunning": "{n} 個調查步驟進行中",
+    "researchCountWithFail": "{total} 個調查步驟（{fail} 個未完成）",
+    "researchCount": "{n} 個調查步驟",
     "success": "✿ {name} 忙完了，小事一樁～ · {n} 步",
     "failed": "⚠ 好像出了點問題 · {n} 步",
     "countWithFail": "{total} 個工具（{fail} 個失敗）",
@@ -852,9 +869,10 @@
     }
   },
   "processFold": {
+    "research": "{n} 個調查步驟",
     "summary": "✨ {name}忙活了一陣子",
     "tools": "{n} 個工具",
-    "knowledge": "{n} 次檢索",
+    "knowledge": "{n} 份知識資料",
     "thinking": "{n} 次思考",
     "unsuccessful": "{n} 次嘗試未成功"
   },

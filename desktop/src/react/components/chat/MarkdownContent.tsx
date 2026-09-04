@@ -8,13 +8,18 @@
  * 在渲染前补齐代码块工具栏，并用根事件代理处理工具栏交互。
  */
 
-import { memo, useCallback, useMemo, useRef, useLayoutEffect, useState, type MouseEvent } from 'react';
+import { memo, useCallback, useMemo, useRef, useLayoutEffect, useEffect, useId, useState, type MouseEvent } from 'react';
 import { renderCodeBlockToolbarHtml, type CodeBlockToolbarLabels } from '../../utils/format';
 import { useMermaidDiagrams } from '../../hooks/use-mermaid-diagrams';
 import { splitGraphemes } from '../../utils/grapheme';
 import { openInternalLink, resolveLinkTarget, type LinkOpenContext } from '../../utils/link-open';
 import { LinkContextMenu, type LinkContextMenuState } from '../shared/LinkContextMenu';
 import styles from './Chat.module.css';
+import { KnowledgeCitationDialog } from './KnowledgeCitationDialog';
+import { KnowledgeCitationPreview } from './KnowledgeCitationPreview';
+import { knowledgeCitationId, useKnowledgeCitationNumbers } from './knowledge-citation-scope';
+import { useWindowSurface } from '../../ui/window-surface';
+import citationStyles from './KnowledgeCitation.module.css';
 
 interface Props {
   html: string;
@@ -22,11 +27,12 @@ interface Props {
   tailFadeCount?: number;
   linkContext?: LinkOpenContext;
   enhanceMermaid?: boolean;
+  numberKnowledgeCitations?: boolean;
 }
 
 function shouldSkipTailFadeNode(node: Text): boolean {
   const parent = node.parentElement;
-  return !parent || !!parent.closest('pre, code, table, .katex, .mermaid, svg, button');
+  return !parent || !!parent.closest('pre, code, table, .katex, .mermaid, svg, button, [data-knowledge-citation-id]');
 }
 
 function clearTailFade(root: HTMLElement): void {
@@ -152,24 +158,81 @@ export const MarkdownContent = memo(function MarkdownContent({
   tailFadeCount = 0,
   linkContext,
   enhanceMermaid = true,
+  numberKnowledgeCitations = false,
 }: Props) {
   const ref = useRef<HTMLDivElement>(null);
   const [linkMenu, setLinkMenu] = useState<LinkContextMenuState | null>(null);
+  const [citationId, setCitationId] = useState<string | null>(null);
+  const [preview, setPreview] = useState<{ id: string; anchor: HTMLAnchorElement } | null>(null);
+  const previewId = useId();
+  const closeTimer = useRef<number | null>(null);
+  const surface = useWindowSurface();
+  const numberForCitation = useKnowledgeCitationNumbers(linkContext?.messageId);
+  const t = window.t ?? ((key: string) => key);
   const classes = className ? `md-content ${className}` : 'md-content';
   const toolbarLabels = useMemo(() => codeBlockToolbarLabels(), []);
-  const renderedHtml = useMemo(() => renderCodeBlockToolbarHtml(html, toolbarLabels), [
-    html,
-    toolbarLabels,
-  ]);
+  const renderedHtml = useMemo(() => {
+    const rendered = renderCodeBlockToolbarHtml(html, toolbarLabels);
+    if (!numberKnowledgeCitations || !rendered.includes('#knowledge-citation-')) return rendered;
+    // 只改已渲染成真实链接的正文引用，代码示例和缺少身份的文字不参与编号。
+    // eslint-disable-next-line no-restricted-syntax -- 在脱离页面的容器中装饰已有安全链接
+    const template = surface.document.createElement('template');
+    template.innerHTML = rendered;
+    for (const anchor of template.content.querySelectorAll<HTMLAnchorElement>('a[href]')) {
+      const id = knowledgeCitationId(anchor.getAttribute('href') || '');
+      if (!id || anchor.closest('pre, code')) continue;
+      const number = numberForCitation(id);
+      anchor.classList.add(citationStyles.badge);
+      anchor.dataset.knowledgeCitationId = id;
+      anchor.textContent = String(number);
+      anchor.setAttribute('role', 'button');
+      anchor.setAttribute('tabindex', '0');
+      anchor.setAttribute('aria-label', t('knowledge.citationNumber', { number }));
+      anchor.setAttribute('aria-haspopup', 'dialog');
+      anchor.removeAttribute('title');
+    }
+    return template.innerHTML;
+  }, [html, toolbarLabels, numberKnowledgeCitations, numberForCitation, surface.document, t]);
 
-  const findAnchor = useCallback((event: MouseEvent): HTMLAnchorElement | null => {
+  const keepPreviewOpen = useCallback(() => {
+    if (closeTimer.current !== null) {
+      surface.window.clearTimeout(closeTimer.current);
+      closeTimer.current = null;
+    }
+  }, [surface]);
+  const closePreview = useCallback(() => {
+    keepPreviewOpen();
+    setPreview(null);
+  }, [keepPreviewOpen]);
+  const schedulePreviewClose = useCallback(() => {
+    keepPreviewOpen();
+    closeTimer.current = surface.window.setTimeout(() => {
+      closeTimer.current = null;
+      setPreview(current => {
+        const focused = surface.document.activeElement;
+        const panel = surface.document.getElementById(previewId);
+        return focused && (current?.anchor.contains(focused) || panel?.contains(focused)) ? current : null;
+      });
+    }, 180);
+  }, [keepPreviewOpen, surface, previewId]);
+  useEffect(() => () => keepPreviewOpen(), [keepPreviewOpen]);
+
+  const findAnchor = useCallback((event: { target: EventTarget | null }): HTMLAnchorElement | null => {
     const root = ref.current;
     const target = event.target;
-    if (!root || !(target instanceof Element)) return null;
-    const anchor = target.closest<HTMLAnchorElement>('a[href]');
+    if (!root || !target || (target as Node).nodeType !== 1) return null;
+    const anchor = (target as Element).closest<HTMLAnchorElement>('a[href]');
     if (!anchor || !root.contains(anchor)) return null;
     return anchor;
   }, []);
+
+  const showPreview = useCallback((event: { target: EventTarget | null }) => {
+    const anchor = findAnchor(event);
+    const id = anchor && knowledgeCitationId(anchor.getAttribute('href') || '');
+    if (!id || !anchor) return;
+    keepPreviewOpen();
+    setPreview(current => current?.anchor === anchor && current.id === id ? current : { id, anchor });
+  }, [findAnchor, keepPreviewOpen]);
 
   const handleCodeBlockToolbarClick = useCallback((event: MouseEvent): boolean => {
     const root = ref.current;
@@ -219,6 +282,13 @@ export const MarkdownContent = memo(function MarkdownContent({
     const anchor = findAnchor(event);
     if (!anchor) return;
     const href = anchor.getAttribute('href') || '';
+    if (href.startsWith('#knowledge-citation-')) {
+      event.preventDefault();
+      event.stopPropagation();
+      closePreview();
+      setCitationId(href.slice('#knowledge-citation-'.length));
+      return;
+    }
     const context = {
       ...linkContext,
       label: anchor.textContent?.trim() || linkContext?.label,
@@ -227,22 +297,28 @@ export const MarkdownContent = memo(function MarkdownContent({
     event.preventDefault();
     event.stopPropagation();
     void openInternalLink(href, context);
-  }, [findAnchor, handleCodeBlockToolbarClick, linkContext]);
+  }, [findAnchor, handleCodeBlockToolbarClick, linkContext, closePreview]);
 
   const handleContextMenu = useCallback((event: MouseEvent) => {
     const anchor = findAnchor(event);
     if (!anchor) return;
     event.preventDefault();
     event.stopPropagation();
+    const href = anchor.getAttribute('href') || '';
+    if (href.startsWith('#knowledge-citation-')) {
+      closePreview();
+      setCitationId(href.slice('#knowledge-citation-'.length));
+      return;
+    }
     setLinkMenu({
-      href: anchor.getAttribute('href') || '',
+      href,
       context: {
         ...linkContext,
         label: anchor.textContent?.trim() || linkContext?.label,
       },
       position: { x: event.clientX, y: event.clientY },
     });
-  }, [findAnchor, linkContext]);
+  }, [findAnchor, linkContext, closePreview]);
 
   useLayoutEffect(() => {
     const root = ref.current;
@@ -268,7 +344,26 @@ export const MarkdownContent = memo(function MarkdownContent({
         data-find-markable=""
         onClick={handleClick}
         onContextMenu={handleContextMenu}
+        onMouseOver={showPreview}
+        onMouseOut={schedulePreviewClose}
+        onFocus={showPreview}
+        onBlur={schedulePreviewClose}
+        onKeyDown={event => {
+          const anchor = findAnchor(event);
+          const id = anchor && knowledgeCitationId(anchor.getAttribute('href') || '');
+          if (event.key === 'Escape' && preview) {
+            event.stopPropagation();
+            closePreview();
+          } else if (event.key === ' ' && id) {
+            event.preventDefault();
+            closePreview();
+            setCitationId(id);
+          }
+        }}
       />
+      {preview && <KnowledgeCitationPreview key={preview.id} citationId={preview.id} anchor={preview.anchor}
+        id={previewId} onEnter={keepPreviewOpen} onLeave={schedulePreviewClose} onClose={closePreview} />}
+      {citationId !== null && <KnowledgeCitationDialog key={citationId} citationId={citationId} onClose={() => setCitationId(null)} />}
       {linkMenu && (
         <LinkContextMenu
           state={linkMenu}

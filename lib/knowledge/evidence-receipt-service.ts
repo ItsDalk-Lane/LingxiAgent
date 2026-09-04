@@ -36,12 +36,19 @@ export class EvidenceReceiptService {
   constructor(researchStore: ResearchStore) { this.researchStore = researchStore; }
 
   issue(input: IssueKnowledgeReadReceipt): KnowledgeResearchReadReceipt {
+    return this.issueWithText(input).receipt;
+  }
+
+  /** 工具直接交付本次事务刚核验的原文，不再为立即读回凭据重复查询同一段。 */
+  issueWithText(input: IssueKnowledgeReadReceipt): {
+    receipt: KnowledgeResearchReadReceipt; block: KnowledgeBlock; text: string;
+  } {
     return this.researchStore.transaction(() => {
       if (!["knowledge_read", "knowledge_grep"].includes(input.channel)) {
         throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "Only raw knowledge reads can issue receipts");
       }
-      const { text } = this.resolveFrozenText(input);
-      return this.researchStore.insertReceipt({
+      const { block, text } = this.resolveFrozenText(input);
+      const receipt = this.researchStore.insertReceipt({
         id: this.researchStore.newId("krr"),
         runId: input.runId,
         actorSessionId: input.actorSessionId,
@@ -58,6 +65,7 @@ export class EvidenceReceiptService {
         createdAt: this.researchStore.now(),
         consumedAt: null,
       });
+      return { receipt, block, text };
     });
   }
 

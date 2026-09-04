@@ -70,8 +70,9 @@ export type KnowledgeResearchProgressUpdate =
   | { type: "knowledge_research_started" | "knowledge_research_plan_updated" }
   | { type: "knowledge_research_round_started"; roundId: string; round: number }
   | { type: "knowledge_research_worker_started"; taskId: string; label: string }
-  | { type: "knowledge_research_worker_completed"; taskId: string; label: string; status: "completed" | "failed" | "cancelled" }
-  | { type: "knowledge_research_ledger_updated"; phase: "investigating" | "reviewing" }
+  | { type: "knowledge_research_worker_completed"; taskId: string; label: string; status: "completed" | "failed" | "cancelled"; stopReason?: string | null }
+  | { type: "knowledge_research_ledger_updated"; phase: "investigating" | "reviewing";
+      roundStatus?: "completed" | "failed" | "cancelled"; roundStopReason?: string | null }
   | { type: "knowledge_research_completed"; status: "completed" | "partial" | "failed" | "cancelled"; stopReason: string | null };
 
 export type KnowledgeResearchProgress = KnowledgeResearchProgressUpdate & {

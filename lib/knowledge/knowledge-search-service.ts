@@ -246,9 +246,10 @@ export class KnowledgeSearchService {
           }
         }
       }
-      const semanticVariantIds = variantIds.filter(id => narrowedArtifacts.size === 0 && !requiredSectionIds
-        || narrowedArtifacts.has(variants.get(id)!.parseArtifactId)
-        || !this.deps.store.isCurrentChunkProfile(variants.get(id)!.chunkProfileHash));
+      // 粗目录命中只增加查阅线索，不能把其它资料从语义检索中排除。
+      // 只有模型明确指定的章节范围才收窄这次检索。
+      const semanticVariantIds = requiredSectionIds ? variantIds.filter(id =>
+        narrowedArtifacts.has(variants.get(id)!.parseArtifactId)) : variantIds;
       const timings: KnowledgeSearchResponse["timings"] = { scopeMs: ftsStart - started, ftsMs: 0, fuseMs: 0, totalMs: 0 };
       let remoteModelCalls = 0;
       let embeddingGroups = 0, rerankGroups = 0;
@@ -261,14 +262,22 @@ export class KnowledgeSearchService {
       const degraded: RetrieveForNotebooksResult["degraded"] = [];
       const degradedReasons = [...scope.warnings];
       const rerankDegradeReasons: string[] = [];
-      const generationLimit = request.limit;
-      const fts = variantIds.length === 0 ? [] : ordinalRanges || sectionIds ? this.deps.indexStore.search({
+      // 先保留较宽的候选，再重排并限制交付数量；避免相关原文在重排前就被淘汰。
+      const generationLimit = request.channel === "hybrid" ? Math.max(request.limit, Math.min(200, request.limit * 5)) : request.limit;
+      let fts = variantIds.length === 0 ? [] : ordinalRanges || requiredSectionIds ? this.deps.indexStore.search({
         scopes: [...variants.values()].map(variant => ({ parseArtifactId: variant.parseArtifactId, chunkProfileHash: variant.chunkProfileHash })),
         query: request.query, limit: generationLimit, ordinalRangesByChunkIndexVariantId: ordinalRanges,
-        sectionIdsByChunkIndexVariantId: sectionIds,
+        sectionIdsByChunkIndexVariantId: requiredSectionIds,
       }) : this.deps.queryService.searchCompiledScopeFts({
         compiledScope: { ...scope, readyChunkVariantIds: variantIds }, query: request.query, limit: generationLimit,
       });
+      if (!requiredSectionIds && sectionIds && [...sectionIds.values()].some(ids => ids.length)) {
+        const focused = this.deps.indexStore.search({
+          scopes: [...variants.values()].map(variant => ({ parseArtifactId: variant.parseArtifactId, chunkProfileHash: variant.chunkProfileHash })),
+          query: request.query, limit: generationLimit, sectionIdsByChunkIndexVariantId: sectionIds,
+        });
+        fts = fuseNotebookRankings([fts, focused], true).map(entry => entry.chunk).slice(0, generationLimit);
+      }
       candidates = fts.map(candidate => ({ ...candidate, channels: ["fts"] }));
       timings.ftsMs = performance.now() - ftsStart;
       if (request.channel === "hybrid") {
@@ -283,7 +292,7 @@ export class KnowledgeSearchService {
             variant.parseArtifactId === source.parseArtifactId && variantIdsByNotebook.get(notebook.notebookId)?.has(variant.id)))));
         embeddingGroups = groupNotebooks.filter(members => members[0].embeddingModelRef).length;
         const outcomes = await Promise.all(groupNotebooks.map(members => this.deps.queryService.retrieveCompiledGroup({
-          compiledScope: scope, notebooks: members, variantIds: semanticVariantIds, query: request.query, limit: request.limit,
+          compiledScope: scope, notebooks: members, variantIds: semanticVariantIds, query: request.query, limit: generationLimit,
           signal: request.signal, ordinalRanges, sectionIds, requiredSectionIds, onRemoteCall: () => { remoteModelCalls += 1; },
           onEmbeddingCacheHit: () => { queryEmbeddingCacheHit = true; },
         })));
@@ -303,7 +312,7 @@ export class KnowledgeSearchService {
         }
         const fuseStart = performance.now();
         candidates = fuseNotebookRankings([candidates, ...outcomes.map(outcome => outcome.candidates)], true)
-          .map(entry => entry.chunk).slice(0, request.limit);
+          .map(entry => entry.chunk).slice(0, generationLimit);
         timings.fuseMs += performance.now() - fuseStart;
         if (request.rerank && candidates.length > 0) {
           const rerankByRef = new Map<string, { ref: KnowledgeModelRef | null; candidates: IndexedKnowledgeChunk[] }>();
@@ -341,6 +350,7 @@ export class KnowledgeSearchService {
         degradedReasons.push(...vectorDegradedReasons, ...degraded.map(item => `${item.reason}:${item.parseArtifactId}`), ...rerankDegradeReasons);
       }
       request.signal?.throwIfAborted();
+      candidates = candidates.slice(0, request.limit);
       const locators = new Map<string, KnowledgeBlockLocator>();
       for (const parseArtifactId of new Set(candidates.map(candidate => candidate.parseArtifactId))) {
         const blockIds = candidates.filter(candidate => candidate.parseArtifactId === parseArtifactId).flatMap(candidate => candidate.spans.map(span => span.blockId));
@@ -355,9 +365,12 @@ export class KnowledgeSearchService {
           && variantIdsByNotebook.get(notebook.notebookId)?.has(candidate.chunkIndexVariantId));
         if (!notebook) this.violation();
         const locator = locators.get(candidate.spans[0]?.blockId);
+        const sectionHeading = candidate.sectionId
+          ? sectionMetadata.get(candidate.parseArtifactId)?.find(section => section.id === candidate.sectionId)?.headingPath : null;
         return { ...candidate, sourceId: source!.sourceId, sourceName: source!.sourceName,
           notebookId: notebook!.notebookId, notebookName: notebook!.notebookName,
-          headingPath: locator?.headingPath ?? null, pageNumber: locator?.pageNumber ?? null };
+          headingPath: locator?.headingPath?.length ? locator.headingPath : sectionHeading ?? null,
+          pageNumber: locator?.pageNumber ?? null };
       });
       const hits: KnowledgeSearchHit[] = annotated.map(candidate => {
         const source = sources.find(source => source.sourceId === candidate.sourceId)!;

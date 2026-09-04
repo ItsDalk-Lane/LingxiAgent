@@ -35,9 +35,6 @@ export const KNOWLEDGE_INGESTION_DEFAULT_CONCURRENCY = 3;
 export const KNOWLEDGE_EMBEDDING_GATE_DEFAULT_MAX_CONCURRENT = 2;
 export const KNOWLEDGE_EMBEDDING_GATE_DEFAULT_MIN_INTERVAL_MS = 250;
 
-/** 取消 running job 后等待其收尾的上限（嵌入 abort 立即失败；上限仅防意外挂死）。 */
-const CANCEL_SETTLE_TIMEOUT_MS = 10_000;
-
 /**
  * 永久性错误（重试无意义，直接 failed 不消耗退避）：解析失败/源或笔记本被删/
  * 参数与存储校验/索引重建后仍 invalid。其余错误（嵌入 HTTP 4xx/5xx、网络、超时等
@@ -63,10 +60,6 @@ function describeIngestionError(error: unknown): string {
   return prefixed.slice(0, 512);
 }
 
-function sleep(ms: number): Promise<void> {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
 export interface KnowledgeIngestionEmbedRequest {
   modelRef: KnowledgeModelRef;
   runId: string;
@@ -89,9 +82,14 @@ export interface KnowledgeEmbeddingGateLimits {
   providerMinIntervals?: Record<string, number> | null;
 }
 
+interface EmbeddingGateWaiter {
+  start: () => void;
+  cancel: (reason: unknown) => void;
+}
+
 interface EmbeddingGateSlot {
   active: number;
-  queue: Array<() => void>;
+  queue: EmbeddingGateWaiter[];
   lastDispatchAt: number;
   dispatchTimer: ReturnType<typeof setTimeout> | null;
   dispatching: boolean;
@@ -132,28 +130,49 @@ export class KnowledgeEmbeddingProviderGate {
   }
 
   /** 放行和调用处于同一段同步执行中，不能把尚未开始的 Promise 续段算作已发出请求。 */
-  run<T>(key: string, task: () => Promise<T>): Promise<T> {
+  run<T>(key: string, task: () => Promise<T>, signal?: AbortSignal): Promise<T> {
     if (this.disposed) return Promise.reject(new KnowledgeError(
       "KNOWLEDGE_RETRIEVAL_UNAVAILABLE", "Knowledge embedding provider gate is closed",
     ));
+    if (signal?.aborted) return Promise.reject(signal.reason);
     let slot = this.slots.get(key);
     if (!slot) {
       slot = { active: 0, queue: [], lastDispatchAt: -Infinity, dispatchTimer: null, dispatching: false };
       this.slots.set(key, slot);
     }
     return new Promise<T>((resolve, reject) => {
-      slot.queue.push(() => {
-        if (this.disposed) {
-          reject(new KnowledgeError("KNOWLEDGE_RETRIEVAL_UNAVAILABLE", "Knowledge embedding provider gate is closed"));
-          return;
-        }
-        try {
-          Promise.resolve(task()).then(
-            value => { this.release(key); resolve(value); },
-            error => { this.release(key); reject(error); },
-          );
-        } catch (error) { this.release(key); reject(error); }
-      });
+      let queued = true;
+      const waiter: EmbeddingGateWaiter = {
+        start: () => {
+          queued = false;
+          signal?.removeEventListener("abort", onAbort);
+          if (this.disposed || signal?.aborted) {
+            this.release(key);
+            reject(signal?.aborted ? signal.reason : new KnowledgeError(
+              "KNOWLEDGE_RETRIEVAL_UNAVAILABLE", "Knowledge embedding provider gate is closed",
+            ));
+            return;
+          }
+          try {
+            Promise.resolve(task()).then(
+              value => { this.release(key); resolve(value); },
+              error => { this.release(key); reject(error); },
+            );
+          } catch (error) { this.release(key); reject(error); }
+        },
+        cancel: (reason) => {
+          if (!queued) return;
+          queued = false;
+          signal?.removeEventListener("abort", onAbort);
+          const index = slot.queue.indexOf(waiter);
+          if (index >= 0) slot.queue.splice(index, 1);
+          reject(reason);
+          this.scheduleDispatch(slot, key);
+        },
+      };
+      const onAbort = () => waiter.cancel(signal!.reason);
+      signal?.addEventListener("abort", onAbort, { once: true });
+      slot.queue.push(waiter);
       this.dispatch(slot, key);
     });
   }
@@ -167,7 +186,9 @@ export class KnowledgeEmbeddingProviderGate {
         slot.dispatchTimer = null;
       }
       const waiters = slot.queue.splice(0);
-      for (const waiter of waiters) waiter();
+      for (const waiter of waiters) waiter.cancel(new KnowledgeError(
+        "KNOWLEDGE_RETRIEVAL_UNAVAILABLE", "Knowledge embedding provider gate is closed",
+      ));
     }
   }
 
@@ -207,7 +228,7 @@ export class KnowledgeEmbeddingProviderGate {
     const next = slot.queue.shift();
     slot.active += 1;
     slot.dispatching = true;
-    try { next?.(); }
+    try { next?.start(); }
     finally {
       // 以调用真正开始后的单调时钟计时；同步前缀阻塞或重入也不能挤占下一次间隔。
       slot.lastDispatchAt = performance.now();
@@ -221,7 +242,7 @@ export interface KnowledgeIngestionServiceDeps {
   store: KnowledgeStore;
   queryService: KnowledgeQueryService;
   /** 绑定到 KnowledgeManager.parseSource（幂等：已有 ready/needs_ocr 产物直接返回）。 */
-  parseSource: (input: { studioId: unknown; sourceId: unknown }) => Promise<KnowledgeParseArtifact>;
+  parseSource: (input: { studioId: unknown; sourceId: unknown; signal?: AbortSignal }) => Promise<KnowledgeParseArtifact>;
   /** 只查索引和配置登记；后台补建认领前复验，避免重复构建已就绪的新版本。 */
   hasReadyCurrentChunkVariant?: (parseArtifactId: string) => boolean;
   /**
@@ -245,6 +266,7 @@ export interface KnowledgeIngestionServiceDeps {
 
 interface ActiveIngestionJob {
   jobId: string;
+  notebookId: string;
   sourceId: string;
   lockKeys: ReadonlySet<string>;
   abort: AbortController;
@@ -299,6 +321,7 @@ export class KnowledgeIngestionService {
   private stopped = false;
   private loopPromise: Promise<void> | null = null;
   private drainPromise: Promise<number> | null = null;
+  private stopPromise: Promise<void> | null = null;
   /** 在跑 job 的锁键登记：key → 持有该键的 job id 集合（同键互斥的判据）。 */
   private readonly keyOwners = new Map<string, Set<string>>();
   private readonly activeJobs = new Map<string, ActiveIngestionJob>();
@@ -340,7 +363,7 @@ export class KnowledgeIngestionService {
 
   /** 启动后台 worker 池循环（engine init 调用一次）。重复调用是 no-op。 */
   start() {
-    if (this.loopPromise) return;
+    if (this.loopPromise || this.stopPromise) return;
     this.stopped = false;
     this.recoverInterruptedJobs();
     this.loopPromise = this.loop().catch((error) => {
@@ -356,14 +379,21 @@ export class KnowledgeIngestionService {
    * _processJob 的停止路径 best-effort 置回 queued；若库已随 close() 关闭则留
    * running 残留，由下次 start() 的恢复接管。
    */
-  stop() {
+  stop(): Promise<void> {
+    if (this.stopPromise) return this.stopPromise;
     this.stopped = true;
     this.backgroundReindex.clear();
     for (const entry of this.activeJobs.values()) entry.abort.abort();
     this.embeddingGate.dispose();
     this.notifyJobSettled();
     this.wake();
-    this.loopPromise = null; // 已 catch 包裹，分离即可；close() 保持同步语义。
+    // 只有后台续段真正退出才算停止，调用方在此 Promise 完成后才可关闭数据库。
+    this.stopPromise = Promise.allSettled([
+      ...(this.loopPromise ? [this.loopPromise] : []),
+      ...(this.drainPromise ? [this.drainPromise] : []),
+      ...[...this.activeJobs.values()].map(entry => entry.settled),
+    ]).then(() => { this.loopPromise = null; });
+    return this.stopPromise;
   }
 
   /** 唤醒队列（enqueue/模型就绪后置回 queued 时调用）。无等待者时记下唤醒位，避免丢失唤醒。 */
@@ -418,6 +448,9 @@ export class KnowledgeIngestionService {
     sourceId: unknown;
     artifactId?: unknown;
   }): IngestionJob {
+    if (this.stopped) {
+      throw new KnowledgeError("KNOWLEDGE_RETRIEVAL_UNAVAILABLE", "Knowledge ingestion is stopped");
+    }
     const config = this.resolveConfig(input.studioId, input.notebookId);
     const artifactId = input.artifactId ?? null;
     let configId: string;
@@ -437,7 +470,8 @@ export class KnowledgeIngestionService {
       chunkerConfigId: configId,
     });
     if (typeof artifactId === "string" && ["queued", "pending_embedding"].includes(job.status)
-      && (job.chunkerConfigId !== configId || job.artifactId !== artifactId)) {
+      && (job.phase === "parse" || job.chunkerConfigId !== configId || job.artifactId !== artifactId)) {
+      // 已有解析产物的重建直接使用该冻结原文，不再次进入解析阶段改取其他快照。
       job = this.deps.store.restartIngestionJobForChunking({ studioId: input.studioId, jobId: job.id,
         artifactId, chunkerConfigId: configId });
     }
@@ -469,7 +503,7 @@ export class KnowledgeIngestionService {
         }
         return true;
       } catch (error) {
-        this.log(`knowledge ingestion: background v3 rebuild enqueue failed for ${sourceId}: ${describeIngestionError(error)}`);
+        this.log(`knowledge ingestion: background rebuild enqueue failed for ${sourceId}: ${describeIngestionError(error)}`);
       }
     }
     return false;
@@ -508,12 +542,12 @@ export class KnowledgeIngestionService {
   /**
    * 显式取消一个源的全部活跃 job（Phase 5 §十九 delete wins 载体）：
    * queued/pending_embedding → failed + cancelled_at（store 事务）；
-   * running job 由本进程 abort 其嵌入调用并等待收尾（上限 CANCEL_SETTLE_TIMEOUT_MS，
-   * 超时显式留痕后继续——相位边界检查保证 straggler 不会再推进）。
+   * running job 由本进程 abort 后等待解析、请求及写入续段真正退出，才允许物理清理。
    * 调用方须已将源标记 deleted（标记后一切新 ensure 显式失败，取消与清理不会复活）。
    */
   async cancelSourceJobs(input: { studioId: unknown; sourceId: unknown }): Promise<{ cancelledJobIds: string[] }> {
     const sourceId = String(input.sourceId);
+    this.backgroundReindex.delete(sourceId);
     const cancelledJobIds = this.deps.store.cancelSourceIngestionJobs({
       sourceId,
       reason: "KNOWLEDGE_SOURCE_DELETED: ingestion cancelled because the source was deleted",
@@ -524,17 +558,28 @@ export class KnowledgeIngestionService {
     const inFlight = [...this.activeJobs.values()].filter(entry => entry.sourceId === sourceId);
     if (inFlight.length > 0) {
       for (const entry of inFlight) entry.abort.abort();
-      await Promise.race([
-        Promise.allSettled(inFlight.map(entry => entry.settled)),
-        sleep(CANCEL_SETTLE_TIMEOUT_MS).then(() => {
-          this.log(
-            `knowledge ingestion: timed out waiting for ${inFlight.length} cancelled job(s) of source ${sourceId} to settle; proceeding (phase checks will stop them)`,
-          );
-        }),
-      ]);
+      await Promise.allSettled(inFlight.map(entry => entry.settled));
     }
     this.wake();
     return { cancelledJobIds };
+  }
+
+  /** 删除笔记本只停止该本任务；共享来源在其他笔记本中的任务不受影响。 */
+  async cancelNotebookJobs(input: { studioId: unknown; notebookId: unknown }): Promise<void> {
+    const notebookId = String(input.notebookId);
+    this.deps.store.cancelNotebookIngestionJobs(input);
+    for (const [sourceId, candidate] of this.backgroundReindex) {
+      if (candidate.notebookId === notebookId) this.backgroundReindex.delete(sourceId);
+    }
+    const inFlight = [...this.activeJobs.values()].filter(entry => entry.notebookId === notebookId);
+    for (const entry of inFlight) entry.abort.abort();
+    this.wake();
+    await Promise.allSettled(inFlight.map(entry => entry.settled));
+  }
+
+  /** 任务持久化为取消后仍可能正在收尾，清理派生索引必须等待这个实际运行状态。 */
+  hasInFlightSourceJobs(sourceId: string): boolean {
+    return [...this.activeJobs.values()].some(entry => entry.sourceId === sourceId);
   }
 
   /** Notebook → RetrievalProfile 惰性建绑（Phase 2 起由摄入侧承担；查询只读）。 */
@@ -579,6 +624,7 @@ export class KnowledgeIngestionService {
    * 代价是一次空转，换来不引入按笔记本部分置回的额外 store 方法。返回置回数量。
    */
   onModelConfigMayHaveChanged(): number {
+    if (this.stopped) return 0;
     const pending = this.deps.store.listPendingEmbeddingIngestionJobs();
     if (pending.length === 0) return 0;
     const anyResolvable = pending.some((job) => {
@@ -769,6 +815,7 @@ export class KnowledgeIngestionService {
     let resolveSettled: () => void = () => {};
     const entry: ActiveIngestionJob = {
       jobId: job.id,
+      notebookId: job.notebookId,
       sourceId: job.sourceId,
       lockKeys: new Set(lockKeys),
       abort,
@@ -784,6 +831,8 @@ export class KnowledgeIngestionService {
       owners.add(job.id);
     }
     try {
+      abort.signal.throwIfAborted();
+      if (this.jobLeftRunning(studioId, job.id, "start")) return;
       let current = job;
       // 重启后旧版本可能停在嵌入相位；先补当前分块，旧 FTS 和付费向量保留。
       if (current.phase === "embed" && current.artifactId) {
@@ -794,7 +843,9 @@ export class KnowledgeIngestionService {
         }
       }
       if (current.phase === "parse") {
-        const artifact = await this.deps.parseSource({ studioId, sourceId: current.sourceId });
+        const artifact = await this.deps.parseSource({ studioId, sourceId: current.sourceId, signal: abort.signal });
+        abort.signal.throwIfAborted();
+        if (this.jobLeftRunning(studioId, current.id, "parsed")) return;
         if (artifact.status !== "ready") {
           // needs_ocr：解析成功但无可检索文本，重试无意义 → 显式失败终态。
           throw new KnowledgeError(
@@ -850,11 +901,15 @@ export class KnowledgeIngestionService {
         // Provider Semaphore（§十六）：per (provider, model) 并发上限 + 最小请求间隔；
         // 超限排队等待（不丢弃），job 内批次保持串行。
         const gateKey = `${modelRef!.provider}/${modelRef!.id}`;
-        const embedTexts: KnowledgeEmbedder = (request) => this.embeddingGate.run(gateKey, () =>
-          this.deps.embedTextsForModel!({
+        const embedTexts: KnowledgeEmbedder = (request) => this.embeddingGate.run(gateKey, () => {
+          abort.signal.throwIfAborted();
+          this.deps.store.getRunningIngestionJob({ studioId, jobId: current.id });
+          return this.deps.embedTextsForModel!({
             ...request,
             modelRef: modelRef!,
-          }));
+            signal: abort.signal,
+          });
+        }, abort.signal);
         const outcome = await this.deps.queryService.embedArtifactForIngestion({
           runId: current.id,
           parseArtifactId: current.artifactId,
@@ -868,6 +923,8 @@ export class KnowledgeIngestionService {
             this.deps.store.updateIngestionJobProgress({ studioId, jobId: current.id, done, total });
           },
         });
+        abort.signal.throwIfAborted();
+        if (this.jobLeftRunning(studioId, current.id, "completion")) return;
         // 成本观测（§七十四）：chunk 级账目落 ingestion_jobs.embedding_stats
         // （后端可查询）+ 运行日志一行；请求级 token/次数由 usageContext 台账承担。
         this.deps.store.recordIngestionJobEmbeddingStats({
@@ -892,12 +949,20 @@ export class KnowledgeIngestionService {
             + `marked failed (embedding model changed while interrupted; vectors preserved)`,
           );
         }
+        // 设置修改可能发生在嵌入等待期间；运行中任务被去重后仍须补建最新配置。
+        const latestConfig = this.resolveConfig(studioId, current.notebookId);
+        const configChanged = latestConfig.chunkTargetChars !== config.chunkTargetChars
+          || JSON.stringify(latestConfig.embeddingModelRef) !== JSON.stringify(config.embeddingModelRef);
         if (outcome.status === "unavailable") {
           // 可解析性检查与执行之间模型被摘除的竞态：仍落显式 pending_embedding。
           this.deps.store.markIngestionJobPendingEmbedding({ studioId, jobId: current.id });
+          if (configChanged) this.requestVariantBuild({ studioId, notebookId: current.notebookId,
+            sourceId: current.sourceId, artifactId: current.artifactId });
           return;
         }
         this.deps.store.completeIngestionJob({ studioId, jobId: current.id });
+        if (configChanged) this.enqueueSourceIngestion({ studioId, notebookId: current.notebookId,
+          sourceId: current.sourceId, artifactId: current.artifactId });
       }
     } catch (error) {
       this.handleJobFailure(studioId, job, error);
@@ -922,23 +987,22 @@ export class KnowledgeIngestionService {
    */
   private jobLeftRunning(studioId: string, jobId: string, phase: string): boolean {
     try {
-      const current = this.deps.store.getIngestionJob({ studioId, jobId });
-      if (current.status !== "running") {
-        this.log(
-          `knowledge ingestion: job ${jobId} left running before ${phase} phase `
-          + `(status=${current.status}${current.cancelledAt ? " cancelled" : ""}); stopping`,
-        );
-        return true;
-      }
+      this.deps.store.getRunningIngestionJob({ studioId, jobId });
       return false;
     } catch {
-      // 行已随源清理删除：同样停步。
-      this.log(`knowledge ingestion: job ${jobId} row vanished before ${phase} phase; stopping`);
+      this.log(`knowledge ingestion: job ${jobId} is cancelled, inactive or unavailable before ${phase}; stopping`);
       return true;
     }
   }
 
   private handleJobFailure(studioId: string, job: IngestionJob, error: unknown) {
+    // 用户取消和删除先于停机恢复判定，不能借 shutdown 路径把终态改回排队。
+    try {
+      this.deps.store.getRunningIngestionJob({ studioId, jobId: job.id });
+    } catch {
+      this.log(`knowledge ingestion: job ${job.id} is cancelled or inactive; suppressed failure: ${describeIngestionError(error)}`);
+      return;
+    }
     if (this.stopped) {
       // stop() 中断：不消耗 attempt、不写失败状态；best-effort 置回 queued，
       // embed 相位由 requeueIngestionJobById 显式留痕 KNOWLEDGE_EMBEDDING_INTERRUPTED
@@ -950,21 +1014,6 @@ export class KnowledgeIngestionService {
       } catch {
         // 库已随 close() 关闭：由下次启动恢复接管。
       }
-      return;
-    }
-    // delete wins（§十九）：job 被显式取消（failed+cancelled_at）或已以其他方式
-    // 离开 running 时，终态保持不动，仅留痕本次失败原因。
-    try {
-      const current = this.deps.store.getIngestionJob({ studioId, jobId: job.id });
-      if (current.status !== "running") {
-        this.log(
-          `knowledge ingestion: job ${job.id} already terminal (${current.status}${current.cancelledAt ? ", cancelled" : ""}); `
-          + `suppressed failure: ${describeIngestionError(error)}`,
-        );
-        return;
-      }
-    } catch {
-      this.log(`knowledge ingestion: job ${job.id} row unavailable after failure: ${describeIngestionError(error)}`);
       return;
     }
     const message = describeIngestionError(error);

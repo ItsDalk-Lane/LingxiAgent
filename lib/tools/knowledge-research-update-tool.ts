@@ -53,19 +53,23 @@ function validate(params: unknown): UpdateInput {
   return params as unknown as UpdateInput;
 }
 
-/** 模型只提出待核查的需求、凭据和缺口；整批更新由宿主取证后原子落库。 */
+/** 身份、权限和存储错误仍整批回滚；可纠正的单条引文错误明确拒收，其余真实证据保留。 */
 export function createKnowledgeResearchUpdateTool(deps: KnowledgeResearchToolDeps) {
   return {
     name: "knowledge_research_update",
     label: "Knowledge Research Update",
-    description: "更新本轮研究的证据需求、原文凭据和未解决缺口。需求状态由宿主核验计算；完整性要求只能提高。",
+    description: "更新本轮研究的证据需求、原文凭据和未解决缺口。需求状态由宿主核验计算；完整性要求只能提高。"
+      + "读到原文后立即登记相关引文。引文逐条核验，返回已接受和被拒条目；只纠正被拒项，不必重复提交已接受项。"
+      + "quote 必须逐字位于同一 receiptId 对应的 text 中；跨段落分开登记。本批材料无关时记录真实缺口，没有新增缺口可提交空更新。",
     parameters: Type.Object({
       runId: Type.String(),
       createNeeds: Type.Optional(Type.Array(Type.Object({
         claim: Type.String(),
         kind: Type.Union([Type.Literal("fact"), Type.Literal("comparison"), Type.Literal("cause"),
           Type.Literal("timeline"), Type.Literal("counterexample"), Type.Literal("completeness")]),
-        required: Type.Boolean(), minIndependentSources: Type.Number(),
+        required: Type.Boolean(), minIndependentSources: Type.Number({
+          description: "按不同资料计数，不能超过本轮冻结范围中的来源数量。同一小说的不同章节、不同时间点仍是一个来源。",
+        }),
         requireCounterEvidence: Type.Boolean(), requireAllRelevantUnits: Type.Boolean(),
       }, { additionalProperties: false }))),
       linkEvidence: Type.Optional(Type.Array(Type.Object({
@@ -98,14 +102,50 @@ export function createKnowledgeResearchUpdateTool(deps: KnowledgeResearchToolDep
               if (!context.allowedNeedIds.includes(target.needId)) scopeViolation();
             }
           }
-          return deps.research.transaction(() => {
-            for (const need of input.createNeeds ?? []) { activeSignal.throwIfAborted(); deps.research.createNeed(context.runId, need); }
-            for (const link of input.linkEvidence ?? []) {
-              activeSignal.throwIfAborted();
-              deps.ledger.linkEvidence({ ...link, runId: context.runId }, {
-                allowedSourceIds: context.allowedSourceIds, allowedNeedIds: context.allowedNeedIds,
+          const scope = deps.research.knowledgeStore.getTurnScope({ scopeId: context.scopeId })!;
+          const availableSourceCount = new Set(scope.sources.filter(source => context.allowedSourceIds === undefined
+            || context.allowedSourceIds.includes(source.sourceId)).map(source => source.sourceId)).size;
+          for (const [index, need] of (input.createNeeds ?? []).entries()) {
+            if (need.minIndependentSources > availableSourceCount) {
+              throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "Requested independent sources exceed the frozen scope", {
+                reason: "min_independent_sources_exceeds_scope", needIndex: index + 1,
+                requestedSourceCount: need.minIndependentSources, availableSourceCount,
               });
+            }
+          }
+          return deps.research.transaction(() => {
+            const accepted: Array<{ submissionIndex: number; needId: string; receiptId: string; evidenceId: string }> = [];
+            const rejected: Array<{ submissionIndex: number; needId: string; receiptId: string;
+              errorCode: string; correction: string }> = [];
+            for (const need of input.createNeeds ?? []) { activeSignal.throwIfAborted(); deps.research.createNeed(context.runId, need); }
+            for (const [index, link] of (input.linkEvidence ?? []).entries()) {
               activeSignal.throwIfAborted();
+              try {
+                const linked = deps.ledger.linkEvidence({ ...link, runId: context.runId }, {
+                  allowedSourceIds: context.allowedSourceIds, allowedNeedIds: context.allowedNeedIds,
+                });
+                accepted.push({ submissionIndex: index + 1, needId: link.needId, receiptId: link.receiptId, evidenceId: linked.evidence.id });
+              } catch (error) {
+                // 只识别核验器生成的三种局部引文诊断；越权、损坏、未知异常仍让整个事务回滚。
+                if (!isKnowledgeError(error)) throw error;
+                const reason = error.details.reason;
+                let correction: string;
+                if (error.code === "KNOWLEDGE_MODEL_OUTPUT_INVALID" && reason === "quote_not_in_receipt") {
+                  correction = `该凭据覆盖 ${error.details.receiptTextLength} 个字符，提交的引文没有完整、逐字出现在其中。请从该凭据的 text 复制连续原文；需要完整句段时先改用覆盖它的凭据，不得自行补字。`;
+                } else if (error.code === "KNOWLEDGE_MODEL_OUTPUT_INVALID" && reason === "quote_occurrence_required") {
+                  correction = `该引文在凭据中出现 ${error.details.occurrenceCount} 次，请提供从 0 开始的 occurrenceIndex，明确引用哪一次。`;
+                } else if (error.code === "KNOWLEDGE_INVALID_ARGUMENT" && reason === "quote_occurrence_out_of_range") {
+                  correction = `该引文在凭据中出现 ${error.details.occurrenceCount} 次，occurrenceIndex 超出范围，请使用从 0 开始的有效序号。`;
+                } else throw error;
+                rejected.push({ submissionIndex: index + 1, needId: link.needId, receiptId: link.receiptId,
+                  errorCode: error.code, correction });
+              }
+              activeSignal.throwIfAborted();
+            }
+            if (rejected.length > 0 && accepted.length === 0) {
+              throw new KnowledgeError("KNOWLEDGE_MODEL_OUTPUT_INVALID", "No submitted quote passed validation", {
+                reason: "evidence_quotes_rejected", rejectedEvidence: rejected,
+              });
             }
             for (const gap of input.unresolvedGaps ?? []) {
               activeSignal.throwIfAborted();
@@ -117,9 +157,17 @@ export function createKnowledgeResearchUpdateTool(deps: KnowledgeResearchToolDep
               .filter(need => context.role === "root" || context.allowedNeedIds!.includes(need.id))
               .map(need => deps.ledger.recomputeNeed(context.runId, need.id));
             activeSignal.throwIfAborted();
-            return { value: toolOk(JSON.stringify({ runId: context.runId, needs,
+            const evidenceUpdate = {
+              status: rejected.length > 0 ? "partially_accepted" : accepted.length > 0 ? "accepted" : "not_requested",
+              submittedCount: input.linkEvidence?.length ?? 0, acceptedCount: accepted.length, rejectedCount: rejected.length,
+              accepted, rejected,
+            };
+            return { value: toolOk(JSON.stringify({ runId: context.runId, needs, evidenceUpdate,
+              remainingBudget: deps.budget.remainingBudget(context.runId),
+              ...(rejected.length > 0 ? { notice: "已接受条目已经保存。请只纠正被拒项；若确实无法形成引用，用缺口更新说明限制，不能声称资料不存在。" } : {}),
               completenessPolicy: deps.research.requireRun(context.runId).completenessPolicy }), { runId: context.runId }),
-            summary: { count: needs.length, status: "completed" } };
+            summary: { count: needs.length, status: rejected.length > 0 ? "partial" : "completed",
+              ...(rejected.length > 0 ? { errorCode: "KNOWLEDGE_MODEL_OUTPUT_INVALID" } : {}) } };
           });
         });
         // 事务和工具动作均已成功提交，才发布可见计划及进度。
@@ -129,6 +177,14 @@ export function createKnowledgeResearchUpdateTool(deps: KnowledgeResearchToolDep
       } catch (error) {
         signal?.throwIfAborted();
         if (error instanceof Error && error.name === "AbortError") throw error;
+        if (isKnowledgeError(error) && error.details.reason === "min_independent_sources_exceeds_scope") {
+          return toolError(`第 ${error.details.needIndex} 个待核查问题要求 ${error.details.requestedSourceCount} 个独立来源，但本轮只有 ${error.details.availableSourceCount} 个资料来源。请按实际来源数重新创建需求；同一资料的不同章节不增加来源数。`,
+            { errorCode: error.code });
+        }
+        if (isKnowledgeError(error) && error.details.reason === "evidence_quotes_rejected") {
+          return toolError(JSON.stringify({ errorCode: error.code, notice: "本次提交的引文均未通过核验，没有保存新证据。请按逐条反馈纠正，不要重复提交原错误内容。",
+            rejectedEvidence: error.details.rejectedEvidence }), { errorCode: error.code });
+        }
         if (isKnowledgeError(error)) return toolError(`knowledge_research_update failed: ${error.code}`, { errorCode: error.code });
         return toolError("knowledge_research_update failed: retrieval unavailable", { errorCode: "KNOWLEDGE_RETRIEVAL_UNAVAILABLE" });
       }

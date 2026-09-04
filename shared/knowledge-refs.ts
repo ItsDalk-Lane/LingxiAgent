@@ -3,7 +3,7 @@
  *
  * 引用在会话内持续生效直到手动取消；前端每条消息显式携带（服务端无状态，
  * 与 sessionFileRefs 同模式）：
- *   wsMsg.knowledgeRefs = { notebookIds: string[], mode: "fast" | "detailed" }
+ *   wsMsg.knowledgeRefs = { notebookIds: string[], mode: "auto" }
  *
  * Phase 7 只做透传 + 严格校验；Phase 8 的 knowledge-context-injector 在
  * core/desktop-session-submit.ts 的 prompt 组装区消费它做拆解与检索注入。
@@ -12,14 +12,8 @@
 import type { KnowledgeDegradeReason } from "./knowledge-reason-codes.ts";
 import type { KnowledgeCompletenessPolicy } from "./knowledge-execution.ts";
 
-/**
- * 答案模式两档（2026-08-31 两档化，取代旧 qa/assist）：
- * - fast：零辅助 LLM 轮（不拆解）、rerank 动态门控、证据注入硬封顶、不触发
- *   滚动消化——以最快速度给出高命中回答；
- * - detailed：自适应拆解 + coverage 两档 + 超预算滚动消化的全量召回路径
- *   （两档化前的既有行为，作为回归锚）。
- */
-export type KnowledgeReferenceMode = "fast" | "detailed";
+/** 新提问统一按需查阅；旧档位只保留历史与旧客户端兼容。 */
+export type KnowledgeReferenceMode = "auto" | "fast" | "detailed";
 
 /**
  * 存量答案模式（两档化前的 qa/assist）：生产写入侧不再产出。读取侧（历史
@@ -30,11 +24,11 @@ export type KnowledgeReferenceMode = "fast" | "detailed";
 export type LegacyKnowledgeReferenceMode = "qa" | "assist";
 
 /**
- * 存量值读取侧归一：fast/detailed 原样返回；qa/assist → detailed；非法值 →
+ * 存量值读取侧归一：auto/fast/detailed 原样返回；qa/assist → detailed；非法值 →
  * null（调用方显式处理，禁静默）。
  */
 export function normalizeLegacyKnowledgeReferenceMode(mode: string): KnowledgeReferenceMode | null {
-  if (mode === "fast" || mode === "detailed") return mode;
+  if (mode === "auto" || mode === "fast" || mode === "detailed") return mode;
   if (mode === "qa" || mode === "assist") return "detailed";
   return null;
 }
@@ -86,7 +80,7 @@ export interface KnowledgeDegradedScope {
 export interface KnowledgeRetrievalStats {
   mode: KnowledgeReferenceMode;
   /** 缺省表示旧消息；展示层不得把旧快速模式统计冒充纯本地检索。 */
-  executionPath?: "fast_local" | "detailed_research";
+  executionPath?: "conversation" | "fast_local" | "detailed_research";
   deadlineMs?: number;
   deadlineExceeded?: boolean;
   remoteModelCalls?: number;
@@ -318,7 +312,7 @@ export interface KnowledgeRetrievalStats {
 /**
  * 归一化 + 严格校验（禁静默降级红线）：
  * - value == null → null（本条消息未引用知识库）
- * - 形状非法（notebookIds 非字符串数组、空串、mode 非 qa|assist）→ 抛 TypeError，
+ * - 形状非法（notebookIds 非字符串数组、空串、mode 非受支持值）→ 抛 TypeError，
  *   由调用方转成显式拒绝（WS error / HTTP 400），不允许悄悄丢掉引用。
  * 合法输入返回去重后的新对象；空 notebookIds 归一为 null（等价于未引用）。
  */
@@ -332,10 +326,11 @@ export function normalizeKnowledgeRefs(value: unknown): KnowledgeRefs | null {
   if (!Array.isArray(ids) || ids.some((id) => typeof id !== "string" || !id.trim())) {
     throw new TypeError("knowledgeRefs.notebookIds must be an array of non-empty strings");
   }
-  if (raw.mode !== "fast" && raw.mode !== "detailed") {
-    throw new TypeError('knowledgeRefs.mode must be "fast" or "detailed"');
+  if (raw.mode !== undefined && raw.mode !== "auto" && raw.mode !== "fast" && raw.mode !== "detailed") {
+    throw new TypeError('knowledgeRefs.mode must be "auto", "fast" or "detailed"');
   }
   const notebookIds = [...new Set((ids as string[]).map((id) => id.trim()))];
   if (notebookIds.length === 0) return null;
-  return { notebookIds, mode: raw.mode };
+  // 新发送和旧客户端重发都进入同一查阅流程；历史展示读取保留原档位。
+  return { notebookIds, mode: "auto" };
 }

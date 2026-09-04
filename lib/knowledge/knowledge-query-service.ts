@@ -863,6 +863,7 @@ export class KnowledgeQueryService {
     chunkCount: number;
     embeddingStats: KnowledgeIngestionEmbeddingStats;
   }> {
+    input.signal?.throwIfAborted();
     const vectorIndex = this.deps.vectorIndex;
     if (!vectorIndex) {
       throw new KnowledgeError("KNOWLEDGE_RETRIEVAL_UNAVAILABLE", "Knowledge vector index is unavailable");
@@ -919,12 +920,15 @@ export class KnowledgeQueryService {
       }
       const remaining = () => chunks.filter(chunk => !persisted.has(chunk.id) && !embedded.has(chunk.id));
       while (remaining().length > 0) {
+        input.signal?.throwIfAborted();
         const batch = remaining().slice(0, 64);
         const response = await this.invokeEmbedding({
           runId: input.runId,
           texts: batch.map(chunk => chunk.text),
           signal: input.signal,
         }, input.embedTexts);
+        // 请求可能在取消后才返回；停止后不再写入本批，也不派发后续批次。
+        input.signal?.throwIfAborted();
         if (!response) return { status: "unavailable", stats };
         stats.requestCount += 1;
         const checked = assertEmbeddingBatch(response, batch.length, model ?? undefined);
@@ -980,6 +984,7 @@ export class KnowledgeQueryService {
         stats.chunksNewlyEmbedded += batch.length;
         input.onProgress?.(chunks.length - remaining().length, chunks.length);
       }
+      input.signal?.throwIfAborted();
       // 免探测恢复且零缺失时 model 为 null：complete 以 variant 行记录的身份校验。
       vectorIndex.completeVectorVariantBuild({
         vectorIndexVariantId: variantId!,
@@ -993,6 +998,7 @@ export class KnowledgeQueryService {
       const outcome = await build();
       return { status: outcome.status, chunkCount: chunks.length, embeddingStats: outcome.stats };
     } catch (error) {
+      input.signal?.throwIfAborted();
       // 向量库损坏：重建后重试一次（§十三 exception recovery，仅限摄入相位）。
       // 重建清空全部变体，第二趟 build 从头嵌入——stats 只报第二趟的真实开销。
       if (!isKnowledgeError(error) || error.code !== "KNOWLEDGE_INDEX_INVALID") throw error;

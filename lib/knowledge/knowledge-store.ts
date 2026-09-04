@@ -59,6 +59,15 @@ const SOURCE_TYPES = new Set<KnowledgeSourceType>(["file", "pasted_text", "web_s
 const PARSE_STATUSES = new Set<KnowledgeParseStatus>(["parsing", "ready", "needs_ocr", "failed"]);
 const INGESTION_PHASES = new Set<IngestionPhase>(["parse", "chunk", "fts_index", "embed", "done"]);
 const INGESTION_STATUSES = new Set<IngestionJobStatus>(["queued", "running", "pending_embedding", "failed", "done"]);
+/** 任务只能属于仍活跃的笔记本、来源及二者关系；所有恢复和派发入口共用此条件。 */
+const ACTIVE_INGESTION_JOB_IDS_SQL = `
+  SELECT j.id FROM ingestion_jobs j
+  JOIN notebooks n ON n.id = j.notebook_id AND n.deleted_at IS NULL
+  JOIN sources s ON s.id = j.source_id AND s.deleted_at IS NULL AND s.studio_id = n.studio_id
+  JOIN notebook_sources ns ON ns.notebook_id = j.notebook_id AND ns.source_id = j.source_id
+    AND ns.removed_at IS NULL
+  WHERE j.cancelled_at IS NULL
+`;
 const PROCESSING_STATUSES = new Set<KnowledgeProcessingArtifact["status"]>([
   "processing", "ready", "failed",
 ]);
@@ -691,7 +700,7 @@ export function resolveNotebookConfig(config: NotebookConfig): ResolvedNotebookC
   };
 }
 
-/** 新分块使用固定粒度；旧显式配置只保留配置身份，模型窗口仅在嵌入派发前校验。 */
+/** 显式字符目标参与实际切分；未指定时使用默认大小，模型窗口在嵌入派发前校验。 */
 export function resolveEffectiveChunkTargetChars(
   resolved: Pick<ResolvedNotebookConfig, "chunkTargetChars" | "embeddingModelRef">,
   _getEmbeddingModelContextWindow?: ((modelRef: KnowledgeModelRef) => number | null) | null,
@@ -2180,7 +2189,7 @@ export class KnowledgeStore {
     };
   }
 
-  /** 读取同一配置的就绪候选顺序：新 v3 优先，旧 v2 在后台重建期间仍可查询。 */
+  /** 当前配置优先；旧版本在按冻结原文后台重建期间仍可查询并明确标注。 */
   getQueryChunkProfileCandidates(profileHash: string): string[] {
     const row = this.db.prepare("SELECT * FROM chunk_profiles WHERE profile_hash=?").get(profileHash);
     if (!row || row.profile_type !== "standard" || !row.strategy || row.target_chars == null) return [profileHash];
@@ -2189,14 +2198,14 @@ export class KnowledgeStore {
     const strategies = [chunkProfileStrategy(row.strategy), ...CHUNK_PROFILE_STRATEGIES];
     const preferred = [...new Set(strategies)].map(strategy => knowledgeChunkerConfigId(strategy, target));
     const legacy = this.db.prepare(`SELECT profile_hash FROM chunk_profiles
-      WHERE chunker_version='2' AND profile_type='standard'
+      WHERE chunker_version IN ('2', '3') AND profile_type='standard'
         AND ((?='auto' AND target_chars_source='auto') OR (?<>'auto' AND target_chars=?))
       ORDER BY CASE WHEN profile_hash=? THEN 0 ELSE 1 END, created_at DESC, profile_hash ASC`)
       .all(row.target_chars_source, row.target_chars_source, target, profileHash);
     return [...new Set<string>([...preferred, ...legacy.map((item: { profile_hash: string }) => item.profile_hash), profileHash])];
   }
 
-  /** 仅查配置版本元数据，用于区分旧索引回退与当前格式自己的 v3 索引。 */
+  /** 仅查配置版本元数据，用于区分旧索引回退与当前版本。 */
   isCurrentChunkProfile(profileHash: string): boolean {
     return this.db.prepare("SELECT chunker_version FROM chunk_profiles WHERE profile_hash=?").get(profileHash)?.chunker_version
       === KNOWLEDGE_CHUNKER_VERSION;
@@ -2249,6 +2258,8 @@ export class KnowledgeStore {
         UPDATE notebook_sources SET removed_at = ?
         WHERE notebook_id = ? AND removed_at IS NULL
       `).run(deletedAt, notebookId);
+      // 删除与取消同事务提交，运行中的请求不能在二者之间继续推进任务。
+      this.cancelNotebookIngestionJobs({ studioId, notebookId });
     })();
     return { ...notebook, updatedAt: deletedAt, deletedAt };
   }
@@ -3120,12 +3131,48 @@ export class KnowledgeStore {
       if (ids.length === 0) return [];
       const cancel = this.db.prepare(`
         UPDATE ingestion_jobs
-        SET status = 'failed', error = ?, cancelled_at = ?, updated_at = ?
+        SET status = 'failed', error = ?, cancelled_at = ?, retry_after = NULL, updated_at = ?
         WHERE id = ? AND status IN ('queued', 'running', 'pending_embedding')
       `);
       for (const id of ids) cancel.run(reason, now, now, id);
       return ids;
     })();
+  }
+
+  /** 只取消指定笔记本的任务，同一来源在其他笔记本中的任务继续保留。 */
+  cancelNotebookIngestionJobs(input: { studioId: unknown; notebookId: unknown }): string[] {
+    const studioId = requiredString(input?.studioId, "studioId", 256);
+    const notebookId = requiredString(input?.notebookId, "notebookId", 128);
+    const now = this.now();
+    return this.db.transaction(() => {
+      const ids = (this.db.prepare(`
+        SELECT j.id FROM ingestion_jobs j JOIN notebooks n ON n.id = j.notebook_id
+        WHERE j.notebook_id = ? AND n.studio_id = ?
+          AND j.status IN ('queued', 'running', 'pending_embedding')
+        ORDER BY j.created_at, j.id
+      `).all(notebookId, studioId) as any[]).map(row => row.id);
+      const cancel = this.db.prepare(`
+        UPDATE ingestion_jobs SET status = 'failed', cancelled_at = ?, retry_after = NULL,
+          error = 'KNOWLEDGE_NOTEBOOK_DELETED: ingestion cancelled because the notebook was deleted', updated_at = ?
+        WHERE id = ? AND status IN ('queued', 'running', 'pending_embedding')
+      `);
+      for (const id of ids) cancel.run(now, now, id);
+      return ids;
+    })();
+  }
+
+  /** 收拢旧版本遗留的失效任务，防止启动恢复或模型就绪信号把它们重新激活。 */
+  private cancelInactiveIngestionJobs(jobId?: string): void {
+    const now = this.now();
+    this.db.prepare(`
+      UPDATE ingestion_jobs SET status = 'failed', retry_after = NULL,
+        error = CASE WHEN cancelled_at IS NOT NULL AND error IS NOT NULL THEN error
+          ELSE 'KNOWLEDGE_INGESTION_CANCELLED: notebook or source membership is no longer active' END,
+        cancelled_at = COALESCE(cancelled_at, ?), updated_at = ?
+      WHERE status IN ('queued', 'running', 'pending_embedding')
+        AND id NOT IN (${ACTIVE_INGESTION_JOB_IDS_SQL})
+        ${jobId == null ? "" : "AND id = ?"}
+    `).run(now, now, ...(jobId == null ? [] : [jobId]));
   }
 
   /**
@@ -4078,7 +4125,7 @@ export class KnowledgeStore {
     `).all(parseArtifactId).map(toBlock);
   }
 
-  /** 按产物批量读取命中块；归属过滤在同一条 SQL 中完成，避免逐命中查询。 */
+  /** 先按块主键取小范围候选，再核对归属，避免逐条凭据查询扫描整个产物。 */
   getArtifactBlocksByIds(input: {
     studioId: unknown;
     parseArtifactId: unknown;
@@ -4092,14 +4139,17 @@ export class KnowledgeStore {
     const blockIds = [...new Set(input.blockIds.map(id => requiredString(id, "blockId", 128)))];
     if (blockIds.length === 0) return [];
     return this.db.prepare(`
-      SELECT b.* FROM knowledge_blocks b
+      WITH requested_blocks AS MATERIALIZED (
+        SELECT * FROM knowledge_blocks
+        WHERE id IN (SELECT value FROM json_each(?))
+      )
+      SELECT b.* FROM requested_blocks b
       JOIN parse_artifacts pa ON pa.id = b.parse_artifact_id
       JOIN content_snapshots cs ON cs.id = pa.content_snapshot_id
       JOIN sources s ON s.id = cs.source_id
       WHERE s.studio_id = ? AND b.parse_artifact_id = ?
-        AND b.id IN (SELECT value FROM json_each(?))
       ORDER BY b.ordinal ASC, b.id ASC
-    `).all(studioId, parseArtifactId, JSON.stringify(blockIds)).map(toBlock);
+    `).all(JSON.stringify(blockIds), studioId, parseArtifactId).map(toBlock);
   }
 
   createCitation(input: {
@@ -4368,6 +4418,7 @@ export class KnowledgeStore {
       const row = this.db.prepare(`
         SELECT * FROM ingestion_jobs
         WHERE status = 'queued' AND (retry_after IS NULL OR retry_after <= ?)
+          AND id IN (${ACTIVE_INGESTION_JOB_IDS_SQL})
         ORDER BY created_at ASC, id ASC
         LIMIT 1
       `).get(now);
@@ -4392,6 +4443,7 @@ export class KnowledgeStore {
       FROM ingestion_jobs j
       JOIN notebooks nb ON nb.id = j.notebook_id
       WHERE j.status = 'queued' AND (j.retry_after IS NULL OR j.retry_after <= ?)
+        AND j.id IN (${ACTIVE_INGESTION_JOB_IDS_SQL})
       ORDER BY j.created_at ASC, j.id ASC
       LIMIT ?
     `).all(this.now(), limit).map((row: any) => ({
@@ -4406,26 +4458,35 @@ export class KnowledgeStore {
     const now = this.now();
     return this.db.transaction(() => {
       const row = this.db.prepare(`
-        SELECT * FROM ingestion_jobs WHERE id = ?
+        SELECT * FROM ingestion_jobs WHERE id = ? AND id IN (${ACTIVE_INGESTION_JOB_IDS_SQL})
       `).get(jobId);
       if (!row || row.status !== "queued" || (row.retry_after != null && row.retry_after > now)) {
         return null;
       }
       const result = this.db.prepare(`
         UPDATE ingestion_jobs SET status = 'running', updated_at = ?
-        WHERE id = ? AND status = 'queued'
+        WHERE id = ? AND status = 'queued' AND id IN (${ACTIVE_INGESTION_JOB_IDS_SQL})
       `).run(now, jobId);
       if (Number(result.changes) !== 1) return null;
       return toIngestionJob(this.db.prepare(`SELECT * FROM ingestion_jobs WHERE id = ?`).get(jobId));
     })();
   }
 
-  private runningIngestionJob(studioId: unknown, jobId: unknown): IngestionJob {
-    const job = this.getIngestionJob({ studioId, jobId });
-    if (job.status !== "running") {
+  /** 派发模型请求和写入进度前共用的运行检查，归属已失效时持久化取消结果。 */
+  getRunningIngestionJob(input: { studioId: unknown; jobId: unknown }): IngestionJob {
+    const job = this.getIngestionJob(input);
+    if (job.status !== "running" || job.cancelledAt != null) {
       throw new KnowledgeError("KNOWLEDGE_CONFLICT", "Ingestion job is not running");
     }
+    if (!this.getIngestionJobOwner({ jobId: job.id })) {
+      this.cancelInactiveIngestionJobs(job.id);
+      throw new KnowledgeError("KNOWLEDGE_CONFLICT", "Ingestion job ownership is no longer active");
+    }
     return job;
+  }
+
+  private runningIngestionJob(studioId: unknown, jobId: unknown): IngestionJob {
+    return this.getRunningIngestionJob({ studioId, jobId });
   }
 
   /** 推进到下一个待执行 phase；parse 完成时顺带绑定产生的 parse artifact。 */
@@ -4539,8 +4600,11 @@ export class KnowledgeStore {
     if (job.cancelledAt != null) {
       throw new KnowledgeError(
         "KNOWLEDGE_CONFLICT",
-        "Cancelled ingestion jobs cannot be retried (source deleted)",
+        "Cancelled ingestion jobs cannot be retried",
       );
+    }
+    if (!this.getIngestionJobOwner({ jobId: job.id })) {
+      throw new KnowledgeError("KNOWLEDGE_CONFLICT", "Ingestion job ownership is no longer active");
     }
     this.db.prepare(`
       UPDATE ingestion_jobs
@@ -4561,6 +4625,9 @@ export class KnowledgeStore {
       const job = this.getIngestionJob({ studioId, jobId: input.jobId });
       this.activeSource(studioId, job.sourceId);
       this.activeNotebook(studioId, job.notebookId);
+      if (!this.getIngestionJobOwner({ jobId: job.id })) {
+        throw new KnowledgeError("KNOWLEDGE_CONFLICT", "Ingestion job ownership is no longer active");
+      }
       const artifact = this.getParseArtifact({ studioId, parseArtifactId: input.artifactId });
       const snapshot = this.getContentSnapshot({ studioId, snapshotId: artifact.contentSnapshotId });
       if (snapshot.sourceId !== job.sourceId || artifact.status !== "ready" || job.cancelledAt != null
@@ -4576,9 +4643,10 @@ export class KnowledgeStore {
 
   /** 模型就绪信号：全部 pending_embedding 一次性置回 queued 补跑嵌入。返回置回数量。 */
   requeuePendingEmbeddingIngestionJobs(): number {
+    this.cancelInactiveIngestionJobs();
     const result = this.db.prepare(`
       UPDATE ingestion_jobs SET status = 'queued', updated_at = ?
-      WHERE status = 'pending_embedding'
+      WHERE status = 'pending_embedding' AND id IN (${ACTIVE_INGESTION_JOB_IDS_SQL})
     `).run(this.now());
     return Number(result.changes);
   }
@@ -4591,9 +4659,11 @@ export class KnowledgeStore {
   requeuePendingEmbeddingIngestionJob(input: { studioId: unknown; jobId: unknown }): boolean {
     const studioId = requiredString(input?.studioId, "studioId", 256);
     const jobId = requiredString(input?.jobId, "jobId", 128);
+    this.cancelInactiveIngestionJobs(jobId);
     const result = this.db.prepare(`
       UPDATE ingestion_jobs SET status = 'queued', updated_at = ?
       WHERE id = ? AND status = 'pending_embedding'
+        AND id IN (${ACTIVE_INGESTION_JOB_IDS_SQL})
         AND notebook_id IN (SELECT id FROM notebooks WHERE studio_id = ?)
     `).run(this.now(), jobId, studioId);
     return Number(result.changes) === 1;
@@ -4606,12 +4676,13 @@ export class KnowledgeStore {
    * 已落库的批级 checkpoint 向量保留，续跑只补缺失 chunk，不静默重新消费 API。
    */
   requeueRunningIngestionJobs(): number {
+    this.cancelInactiveIngestionJobs();
     const result = this.db.prepare(`
       UPDATE ingestion_jobs
       SET status = 'queued',
         error = CASE WHEN phase = 'embed' THEN ? ELSE error END,
         updated_at = ?
-      WHERE status = 'running'
+      WHERE status = 'running' AND id IN (${ACTIVE_INGESTION_JOB_IDS_SQL})
     `).run(
       `${KNOWLEDGE_EMBEDDING_INTERRUPTED}: embedding interrupted; checkpointed vectors are reused on resume`,
       this.now(),
@@ -4626,12 +4697,13 @@ export class KnowledgeStore {
    */
   requeueRunningIngestionJobById(input: { jobId: unknown }): boolean {
     const jobId = requiredString(input?.jobId, "jobId", 128);
+    this.cancelInactiveIngestionJobs(jobId);
     const result = this.db.prepare(`
       UPDATE ingestion_jobs
       SET status = 'queued',
         error = CASE WHEN phase = 'embed' THEN ? ELSE error END,
         updated_at = ?
-      WHERE id = ? AND status = 'running'
+      WHERE id = ? AND status = 'running' AND id IN (${ACTIVE_INGESTION_JOB_IDS_SQL})
     `).run(
       `${KNOWLEDGE_EMBEDDING_INTERRUPTED}: embedding interrupted; checkpointed vectors are reused on resume`,
       this.now(),
@@ -4679,7 +4751,7 @@ export class KnowledgeStore {
       SELECT nb.studio_id AS studio_id, j.notebook_id AS notebook_id, j.source_id AS source_id
       FROM ingestion_jobs j
       JOIN notebooks nb ON nb.id = j.notebook_id
-      WHERE j.id = ?
+      WHERE j.id = ? AND j.id IN (${ACTIVE_INGESTION_JOB_IDS_SQL})
     `).get(jobId);
     if (!row) return null;
     return {
@@ -4696,6 +4768,7 @@ export class KnowledgeStore {
       FROM ingestion_jobs j
       JOIN notebooks nb ON nb.id = j.notebook_id
       WHERE j.status = 'pending_embedding'
+        AND j.id IN (${ACTIVE_INGESTION_JOB_IDS_SQL})
       ORDER BY j.created_at ASC, j.id ASC
     `).all().map((row: any) => ({ ...(toIngestionJob(row) as IngestionJob), studioId: row.studio_id }));
   }

@@ -87,6 +87,7 @@ import {
   createSessionTurnContextExtension,
   normalizeSessionTurnContext,
 } from "./session-turn-context.ts";
+import { isSessionTurnInputEntry } from "../lib/turn-input-presentation.ts";
 import {
   isOfficialDeepSeekEndpoint,
   modelSupportsDirectAudioInput,
@@ -1055,6 +1056,7 @@ export class SessionCoordinator {
   declare _contextUsageEstimatePersistTimers: Map<string, any>;
   declare _memoryPressure: any;
   declare _headlessOps: Set<string>;
+  declare _researchModelsBySession: Map<string, { id: string; provider: string }>;
   declare _titlesCache: Map<string, any>;
   declare _metaCache: Map<string, any>;
   declare _sessionListProjectionCache: SessionListProjectionCache;
@@ -1105,6 +1107,7 @@ export class SessionCoordinator {
     this._runtimePressureTimers = new Map();
     this._memoryPressure = normalizeMemoryPressureOptions(deps.memoryPressure);
     this._headlessOps = new Set();
+    this._researchModelsBySession = new Map();
     this._titlesCache = new Map(); // sessionDir → { titles, ts }
     this._metaCache = new Map();   // metaPath → { data, ts }
     this._sessionListProjectionCache = deps.sessionListProjectionCache || new SessionListProjectionCache();
@@ -7853,6 +7856,7 @@ export class SessionCoordinator {
   async executeIsolated(prompt: any, opts: any = {}) {
     const researchSurface = isKnowledgeResearchSurface(opts.surface) ? opts.surface : null;
     let researchContext = null;
+    let researchModelRef: { id: string; provider: string } | null = null;
     if (opts.surface != null && !researchSurface) {
       throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "Unknown isolated research surface");
     }
@@ -7886,6 +7890,17 @@ export class SessionCoordinator {
           || parentResearch.runId !== input.runId || parentResearch.scopeId !== input.scopeId
           || parent.provenance?.studioId !== input.studioId || !input.allowedNeedIds?.length))) {
         throw new KnowledgeError("KNOWLEDGE_SCOPE_VIOLATION", "Research parent or assignment is outside the frozen scope");
+      }
+      if ((opts.agentId || parent.ownerAgentId) === parent.ownerAgentId) {
+        // 同一助手的研究沿用父会话实际选中的聊天模型，不能重新读旧默认值。
+        // 隔离研究不在普通会话缓存中，工作会话从宿主保存的父研究模型身份继承。
+        const parentModel = role === "root"
+          ? this._getSessionEntryByPath(parent.currentLocator.path)?.session?.model
+          : this._researchModelsBySession.get(parent.sessionId);
+        if (!parentModel?.id || !parentModel.provider) {
+          throw new KnowledgeError("KNOWLEDGE_MODEL_UNAVAILABLE", "Research parent chat model is unavailable");
+        }
+        researchModelRef = { id: parentModel.id, provider: parentModel.provider };
       }
       researchContext = {
         runId: input.runId, scopeId: input.scopeId, role,
@@ -8017,7 +8032,7 @@ export class SessionCoordinator {
         : [];
       const models = this._d.getModels();
       // migration #5 之后 models.chat 必为 {id, provider}；旧裸字符串/缺 provider 对象视为未配置
-      const agentPreferredRef = targetAgent.config?.models?.chat;
+      const agentPreferredRef = researchModelRef ?? targetAgent.config?.models?.chat;
       const preferredRef = opts.model ? null
         : ((typeof agentPreferredRef === "object" && agentPreferredRef?.id && agentPreferredRef?.provider)
             ? agentPreferredRef : null);
@@ -8309,6 +8324,9 @@ export class SessionCoordinator {
         );
       }
       isolatedInitializationReady = true;
+      if (researchSurface) {
+        this._researchModelsBySession.set(isolatedSessionRef.sessionId, { id: execModel.id, provider: execModel.provider });
+      }
       if (!researchSurface && !isResumedSession && childSessionPath && this._isPromotableActivitySession(targetAgent, childSessionPath)) {
         const promotedSessionPath = path.join(targetAgent.sessionDir, path.basename(childSessionPath));
         const isolatedSkillsResult = targetAgent !== agent && skills?.getSkillsForAgent
@@ -8590,6 +8608,9 @@ export class SessionCoordinator {
       }
       return { sessionPath: null, replyText: "", error: err.message };
     } finally {
+      if (researchSurface && isolatedSessionRef?.sessionId) {
+        this._researchModelsBySession.delete(isolatedSessionRef.sessionId);
+      }
       if (childSessionPath && bm.isRunning(childSessionPath)) {
         try { await bm.closeBrowserForSession(childSessionPath); }
         catch (err) { log.warn(`executeIsolated browser cleanup failed for ${path.basename(childSessionPath)}: ${err.message}`); }

@@ -258,6 +258,7 @@ export class KnowledgeManager {
   private lifecycleGcTimer: ReturnType<typeof setInterval> | null = null;
   private metadataBackfill: ReturnType<typeof setImmediate> | null = null;
   private backgroundReindexScan: ReturnType<typeof setImmediate> | null = null;
+  private closePromise: Promise<void> | null = null;
 
   constructor(options: KnowledgeManagerOptions) {
     this.options = options;
@@ -461,7 +462,7 @@ export class KnowledgeManager {
     return this.store.renameNotebook(input);
   }
 
-  deleteNotebook(input: Parameters<KnowledgeStore["deleteNotebook"]>[0]) {
+  async deleteNotebook(input: Parameters<KnowledgeStore["deleteNotebook"]>[0]) {
     this.scopeCompiler.invalidateNotebook(String(input.notebookId));
     this.searchService.clearResults();
     // 删除前记录该笔记本的全部源（删除后 orphan 判定要用；listNotebookSources 要求活跃笔记本）。
@@ -472,6 +473,8 @@ export class KnowledgeManager {
     const notebook = this.store.deleteNotebook(input);
     // 笔记本删除后摘掉其全部 watch membership（最后一个 membership 消失即摘 watcher）。
     this.watcher.untrackNotebook(notebook.id);
+    // 等待该笔记本的请求与解析续段退出，再清理孤儿索引；不取消共享源的其他任务。
+    await this.ingestion.cancelNotebookJobs({ studioId: input.studioId, notebookId: notebook.id });
     for (const sourceId of affectedSourceIds) {
       // 各源重算 orphan 状态（§十八：最后 membership 消失 → orphan 标记，保留期后 GC）。
       this.recomputeSourceOrphanState(String(input?.studioId), sourceId);
@@ -776,6 +779,7 @@ export class KnowledgeManager {
   private pruneOrphanSourceIndexes(sourceId: string) {
     try {
       if (this.store.listActiveNotebookIdsForSource({ sourceId }).length > 0) return;
+      if (this.ingestion.hasInFlightSourceJobs(sourceId) || this.store.hasActiveIngestionJobsForSource({ sourceId })) return;
       if (this.store.countActiveTurnScopesForSource({ sourceId }) > 0) return;
       if (this.store.countEvidenceManifestsForSource({ sourceId }) > 0) return;
       if (this.store.hasResearchReferencesForSource({ sourceId })) {
@@ -1339,7 +1343,8 @@ export class KnowledgeManager {
     return bytes;
   }
 
-  async parseSource(input: { studioId: unknown; sourceId: unknown }): Promise<KnowledgeParseArtifact> {
+  async parseSource(input: { studioId: unknown; sourceId: unknown; signal?: AbortSignal }): Promise<KnowledgeParseArtifact> {
+    input.signal?.throwIfAborted();
     const source = this.store.getSource(input);
     this.scopeCompiler.invalidateSource(source.id);
     const snapshot = this.store.getLatestContentSnapshotForSource(input);
@@ -1420,6 +1425,7 @@ export class KnowledgeManager {
       } else {
         parsed = await parseCitationGradeSnapshot({ mimeType: snapshot.mimeType, bytes });
       }
+      input.signal?.throwIfAborted();
       if (parsed.status === "ready" && parsed.blocks.length === 0) {
         throw new Error("empty_document");
       }
@@ -1442,16 +1448,19 @@ export class KnowledgeManager {
       fs.mkdirSync(artifactDirectory, { recursive: true, mode: 0o700 });
       const artifactHandle = await fs.promises.open(artifactTemporaryPath, "wx", 0o600);
       try {
+        input.signal?.throwIfAborted();
         await artifactHandle.writeFile(serialized);
         await artifactHandle.sync();
       } finally {
         await artifactHandle.close();
       }
+      input.signal?.throwIfAborted();
       // 仅替换处于 parsing/failed 的同一解析身份留下的未提交文件。
       await fs.promises.rm(artifactPath, { force: true });
+      input.signal?.throwIfAborted();
       await fs.promises.rename(artifactTemporaryPath, artifactPath);
       published = true;
-
+      input.signal?.throwIfAborted();
       return this.store.completeParseArtifact({
         studioId: input.studioId,
         parseArtifactId: artifact.id,
@@ -1481,6 +1490,7 @@ export class KnowledgeManager {
       } catch {
         // 保留原始失败；下一次启动会从 parsing/failed 身份重试。
       }
+      if (input.signal?.aborted) throw input.signal.reason;
       if (isKnowledgeError(error)) throw error;
       throw new KnowledgeError(
         "KNOWLEDGE_PARSE_FAILED",
@@ -1859,13 +1869,13 @@ export class KnowledgeManager {
     return { job, retried: true };
   }
 
-  close() {
+  close(): Promise<void> {
+    if (this.closePromise) return this.closePromise;
     this.searchService.close();
     if (this.metadataBackfill) clearImmediate(this.metadataBackfill);
     this.metadataBackfill = null;
     if (this.backgroundReindexScan) clearImmediate(this.backgroundReindexScan);
     this.backgroundReindexScan = null;
-    this.scopeCompiler.dispose();
     for (const pending of this.scopeBuildRequests.values()) clearImmediate(pending);
     this.scopeBuildRequests.clear();
     // 先停生命周期维护（不再触发 GC 扫描），再停 watcher（不再产生 refresh/enqueue），
@@ -1875,12 +1885,16 @@ export class KnowledgeManager {
       this.lifecycleGcTimer = null;
     }
     this.watcher.stop();
-    this.ingestion.stop();
-    // 先同步停下后台调度，再关事实库；异步退出阶段不再访问这些库。
-    const backendClosed = this.vectorSearchBackend.close();
-    this.vectorIndex.close();
-    this.indexStore.close();
-    this.store.close();
-    return backendClosed;
+    const stopped = this.ingestion.stop();
+    this.closePromise = (async () => {
+      // 解析、向量写入和任务状态收尾全部退出后再关库，保留真实的断点结果。
+      await stopped;
+      this.scopeCompiler.dispose();
+      await this.vectorSearchBackend.close();
+      this.vectorIndex.close();
+      this.indexStore.close();
+      this.store.close();
+    })();
+    return this.closePromise;
   }
 }

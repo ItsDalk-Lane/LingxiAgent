@@ -106,6 +106,11 @@ export function createAgentLoopGuardExtension() {
       resetState();
     });
 
+    // 用户的新提问应有独立的重试机会，不继承上一轮的重复或失败计数。
+    pi.on("agent_start", () => {
+      resetState();
+    });
+
     pi.on("session_shutdown", () => {
       resetState();
     });

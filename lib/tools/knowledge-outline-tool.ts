@@ -5,7 +5,7 @@ import { isKnowledgeError, KnowledgeError } from "../knowledge/errors.ts";
 import type { KnowledgeResearchToolContext } from "../knowledge/evidence-receipt-service.ts";
 import type { KnowledgeManager } from "../knowledge/knowledge-manager.ts";
 import { ResearchStore } from "../knowledge/research/research-store.ts";
-import type { CompiledKnowledgeSource } from "../knowledge/scope-snapshot-compiler.ts";
+import { resolveReadyKnowledgeQueryVariant, type CompiledKnowledgeSource } from "../knowledge/scope-snapshot-compiler.ts";
 import {
   knowledgeScopeViolation,
   resolveKnowledgeTurnScope,
@@ -33,24 +33,33 @@ export interface KnowledgeOutlineToolDeps {
 }
 
 /** 保留冻结原文的可信度；目录大小与标题来自索引元数据，不重新拆覆盖单元。 */
-function summarizeFrozenArtifact(knowledge: KnowledgeManager, studioId: string, source: CompiledKnowledgeSource, chunkProfileHash: string | null) {
+function summarizeFrozenArtifact(knowledge: KnowledgeManager, studioId: string, source: CompiledKnowledgeSource,
+  chunkProfileHash: string | null, readyChunkVariantIds: string[], sectionOffset: number, limit: number) {
   const artifact = source.parseArtifactId ? knowledge.store.getParseArtifact({ studioId, parseArtifactId: source.parseArtifactId }) : null;
   const blockMetadata = artifact?.status === "ready"
     ? knowledge.store.getArtifactBlockMetadata({ studioId, parseArtifactId: artifact.id }) : { blockCount: 0, locatorTypes: [] };
   const fidelity: CoverageSourceFidelity = !artifact || artifact.status === "failed" || artifact.status === "parsing" ? "unavailable"
     : artifact.status === "needs_ocr" ? "needs_ocr" : artifact.processingArtifactId ? artifact.fidelity : fidelityFromLocatorTypes(blockMetadata.locatorTypes);
   const metadata = artifact?.status === "ready" && chunkProfileHash
-    ? knowledge.indexStore.getReadyVariantMetadata({ parseArtifactId: artifact.id, chunkProfileHash }) : null;
+    ? resolveReadyKnowledgeQueryVariant({ store: knowledge.store, indexStore: knowledge.indexStore,
+      parseArtifactId: artifact.id, chunkProfileHash, readyChunkVariantIds }) : null;
   const sectionKeys = metadata?.sectionKeys ?? [];
-  const allHeadings = [...new Set(sectionKeys.map(key => key.split(" > ")[0]))];
-  const headings = allHeadings.slice(0, MAX_HEADINGS_PER_SOURCE).map(heading => heading.length > MAX_HEADING_CHARS
+  const sections = metadata && artifact ? knowledge.indexStore.listArtifactSectionMetadata(artifact.id) : [];
+  const page = sections.slice(sectionOffset, sectionOffset + limit);
+  const totalSections = sections.length || sectionKeys.length;
+  const pageKeys = sections.length ? page.map(section => section.headingPath.join(" > "))
+    : sectionKeys.slice(sectionOffset, sectionOffset + limit);
+  const headings = [...new Set(pageKeys)].map(heading => heading.length > MAX_HEADING_CHARS
     ? `${heading.slice(0, MAX_HEADING_CHARS)}…` : heading);
   return { fidelity, status: metadata ? "ready" : source.status === "ready" ? "index_missing" : source.status,
     blockCount: blockMetadata.blockCount, chunkCount: metadata?.chunkCount ?? 0,
     chunkIndexVariantId: metadata?.id ?? null, firstHeadingPath: metadata?.firstHeadingPath ?? null,
-    sectionKeys: sectionKeys.slice(0, MAX_HEADINGS_PER_SOURCE),
-    totalSections: sectionKeys.length, sectionsTruncated: sectionKeys.length > MAX_HEADINGS_PER_SOURCE,
-    headings, totalHeadings: allHeadings.length, headingsTruncated: allHeadings.length > headings.length,
+    sections: page.map(section => ({ sectionId: section.id, ordinal: section.sectionOrdinal + 1,
+      headingPath: section.headingPath, startBlockOrdinal: section.startBlockOrdinal, endBlockOrdinal: section.endBlockOrdinal })),
+    sectionKeys: pageKeys, sectionOffset, totalSections,
+    sectionsTruncated: sectionOffset + limit < totalSections,
+    nextSectionOffset: sectionOffset + limit < totalSections ? sectionOffset + limit : null,
+    headings, totalHeadings: totalSections, headingsTruncated: sectionOffset + limit < totalSections,
     metadataMissing: metadata?.metadataMissing ?? true };
 }
 
@@ -59,11 +68,18 @@ export function createKnowledgeOutlineTool(deps: KnowledgeOutlineToolDeps) {
     name: "knowledge_outline",
     label: "Knowledge Outline",
     description: "List the frozen knowledge scope's notebooks and sources, indexed chunk counts, heading summaries, section keys and fidelity/status. "
-      + "Read-only metadata lookup. This outline does not prove complete coverage. Use knowledge_search, knowledge_read or knowledge_grep to inspect the original evidence.",
+      + "Read-only metadata lookup. This outline does not prove complete coverage. Use knowledge_search, knowledge_read or knowledge_grep to inspect the original evidence."
+      + "目录支持翻页：指定 sourceId 和返回的 nextSectionOffset 继续查看后续章节；每页 sections 中的 sectionId 可以直接阅读。资料列表用 notebookId 和 nextSourceOffset 续查。",
     parameters: Type.Object({
       scopeId: Type.String({
         description: "Knowledge turn scope id from the [KnowledgeContext] block header (the Scope line). Required.",
       }),
+      notebookId: Type.Optional(Type.String()),
+      sourceId: Type.Optional(Type.String()),
+      notebookOffset: Type.Optional(Type.Integer({ minimum: 0 })),
+      sourceOffset: Type.Optional(Type.Integer({ minimum: 0 })),
+      sectionOffset: Type.Optional(Type.Integer({ minimum: 0 })),
+      limit: Type.Optional(Type.Integer({ minimum: 1, maximum: 100 })),
     }),
     sessionPermission: {
       // 只读、无副作用：枚举 scope 冻结集合的结构元数据，不做任何写入或外部请求。
@@ -96,6 +112,16 @@ export function createKnowledgeOutlineTool(deps: KnowledgeOutlineToolDeps) {
           scopeOwnerSessionPath: null,
         };
         const scope = resolveKnowledgeTurnScope({ knowledge, studioId, scopeId, sessionContext });
+        const notebookOffset = params.notebookOffset ?? 0, sourceOffset = params.sourceOffset ?? 0;
+        const sectionOffset = params.sectionOffset ?? 0, limit = params.limit ?? MAX_HEADINGS_PER_SOURCE;
+        if (![notebookOffset, sourceOffset, sectionOffset].every(value => Number.isSafeInteger(value) && value >= 0)
+          || !Number.isSafeInteger(limit) || limit < 1 || limit > 100) {
+          throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "目录位置必须是非负整数，每页数量为 1 到 100。");
+        }
+        if ((params.notebookId != null && !scope.notebookIds.includes(params.notebookId))
+          || (params.sourceId != null && !scope.sources.some(source => source.sourceId === params.sourceId))) {
+          throw knowledgeScopeViolation("目录筛选超出本轮资料范围。");
+        }
         const researchContext = deps.resolveResearchContext?.(ctx) ?? null;
         if (researchContext) {
           const run = new ResearchStore(knowledge.store).requireRun(researchContext.runId);
@@ -110,19 +136,25 @@ export function createKnowledgeOutlineTool(deps: KnowledgeOutlineToolDeps) {
         const allowedSources = researchContext?.allowedSourceIds === undefined
           ? null : new Set(researchContext.allowedSourceIds);
         const visibleSources = allowedSources ? compiled.sources.filter(source => allowedSources.has(source.sourceId)) : compiled.sources;
+        if (params.sourceId != null && !visibleSources.some(source => source.sourceId === params.sourceId)) {
+          throw knowledgeScopeViolation("目录筛选超出当前分配的资料范围。");
+        }
         // 编译警告以来源编号开头，不能借警告暴露未分配的来源。
         const visibleWarnings = allowedSources ? compiled.warnings.filter(warning => allowedSources.has(warning.split(":", 1)[0])) : compiled.warnings;
 
         // 枚举只使用已编译的冻结目录，不扫描范围外来源。
         // 编译完成后来源被并发删除时，逐条标注错误，不静默省略。
         const notebooks: Array<Record<string, unknown>> = [];
-        for (const notebook of compiled.notebooks) {
+        let returnedBytes = 0;
+        const selectedNotebooks = compiled.notebooks.filter(notebook => !params.notebookId || notebook.notebookId === params.notebookId);
+        for (const notebook of selectedNotebooks.slice(notebookOffset, notebookOffset + MAX_NOTEBOOKS)) {
           const notebookId = notebook.notebookId;
-          if (notebooks.length >= MAX_NOTEBOOKS) break;
-          const frozenForNotebook = visibleSources.filter(source => source.notebookIds.includes(notebookId));
+          if (notebooks.length >= MAX_NOTEBOOKS || returnedBytes >= 20_000) break;
+          const frozenForNotebook = visibleSources.filter(source => source.notebookIds.includes(notebookId)
+            && (!params.sourceId || source.sourceId === params.sourceId));
           const sources: Array<Record<string, unknown>> = [];
-          for (const frozen of frozenForNotebook) {
-            if (sources.length >= MAX_SOURCES_PER_NOTEBOOK) break;
+          for (const frozen of frozenForNotebook.slice(sourceOffset, sourceOffset + MAX_SOURCES_PER_NOTEBOOK)) {
+            if (sources.length >= MAX_SOURCES_PER_NOTEBOOK || returnedBytes >= 20_000) break;
             let entry: Record<string, unknown> = {
               sourceId: frozen.sourceId,
               contentSnapshotId: frozen.contentSnapshotId,
@@ -134,7 +166,8 @@ export function createKnowledgeOutlineTool(deps: KnowledgeOutlineToolDeps) {
                 ...entry,
                 sourceName: source.displayName,
                 sourceType: source.sourceType,
-                ...summarizeFrozenArtifact(knowledge, studioId, frozen, notebook.chunkProfileHash),
+                ...summarizeFrozenArtifact(knowledge, studioId, frozen, notebook.chunkProfileHash,
+                  compiled.readyChunkVariantIds, sectionOffset, params.sourceId ? limit : Math.min(limit, 3)),
               };
             } catch (error) {
               entry = {
@@ -144,23 +177,29 @@ export function createKnowledgeOutlineTool(deps: KnowledgeOutlineToolDeps) {
                   : error instanceof Error ? error.message : String(error),
               };
             }
+            const entryBytes = Buffer.byteLength(JSON.stringify(entry), "utf8");
+            if (returnedBytes > 0 && returnedBytes + entryBytes > 24_000) break;
             sources.push(entry);
+            returnedBytes += entryBytes;
           }
           notebooks.push({
             notebookId,
             notebookName: notebook.notebookName,
             sources,
-            sourcesTruncated: frozenForNotebook.length > sources.length,
+            totalSources: frozenForNotebook.length, sourceOffset,
+            sourcesTruncated: sourceOffset + sources.length < frozenForNotebook.length,
+            nextSourceOffset: sourceOffset + sources.length < frozenForNotebook.length ? sourceOffset + sources.length : null,
           });
         }
         return toolOk(JSON.stringify({
           scopeId,
           turnId: scope.turnId,
           notebooks,
-          notebooksTruncated: scope.notebookIds.length > notebooks.length,
+          notebooksTruncated: notebookOffset + notebooks.length < selectedNotebooks.length,
+          nextNotebookOffset: notebookOffset + notebooks.length < selectedNotebooks.length ? notebookOffset + notebooks.length : null,
           totalSources: visibleSources.length,
           warnings: visibleWarnings,
-        }, null, 2), { scopeId });
+        }), { scopeId });
       } catch (error) {
         if (isKnowledgeError(error)) {
           return toolError(`knowledge_outline failed: ${error.code}: ${error.message}`, {

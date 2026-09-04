@@ -19,7 +19,7 @@
  * @param {(delta: string, accumulated: string) => void} [opts.onDelta]
  * @param {object} [opts.displayMessage]
  * @param {Array<{fileId?:string, sessionId?:string, sessionPath?:string, label?:string, kind?:string}>} [opts.sessionFileRefs]
- * @param {{notebookIds:string[], mode:'fast'|'detailed'}} [opts.knowledgeRefs] - 知识库笔记本引用（材料块不进用户可见投影）
+ * @param {{notebookIds:string[], mode:'auto'|'fast'|'detailed'}} [opts.knowledgeRefs] - 知识库笔记本引用（材料块不进用户可见投影）
  * @param {object|null|undefined} [opts.uiContext]
  * @param {object|null|undefined} [opts.context]
  * @param {boolean} [opts.preservePromptEnvelope] - prompt text already contains its persisted media/SessionFile/reminder envelope
@@ -38,8 +38,6 @@ import { materializeBridgeInboundFiles } from "../lib/session-files/bridge-inbou
 import { serializeSessionFile } from "../lib/session-files/session-file-response.ts";
 import { BrowserManager } from "../lib/browser/browser-manager.ts";
 import { normalizeKnowledgeRefs, type KnowledgeRefs, type KnowledgeRetrievalStats } from "../shared/knowledge-refs.ts";
-import { resolveKnowledgeExecutionPolicy } from "../shared/knowledge-execution.ts";
-import { KNOWLEDGE_FAST_RENDER_BUDGET_TOKENS, KNOWLEDGE_FAST_TOTAL_DEADLINE_MS } from "../lib/knowledge/fast-knowledge-pipeline.ts";
 import type { KnowledgeInjectionEvidence } from "../lib/knowledge/knowledge-context-injector.ts";
 import { KnowledgeError } from "../lib/knowledge/errors.ts";
 import { compressHistoricalKnowledgeContextMessages } from "./knowledge-history-compressor.ts";
@@ -123,104 +121,28 @@ function consumeRenderedReminderBlock(engine: any, sessionPath: string, rendered
   engine.consumeRenderedSessionReminderBlock?.(sessionPath, rendered.receipt);
 }
 
-/**
- * 快速模式保留本地检索的显式降级；详细模式必须等调查完成或部分完成。
- * 调查失败原样抛出，不能用空材料继续生成回答。
- */
+/** 同一轮聊天按需查阅；发送时仅冻结范围，不预先搜索或执行独立调查。 */
 async function resolveKnowledgeInjectionBlock(
   engine: any,
   refs: KnowledgeRefs,
-  question: string,
+  _question: string,
   sessionPath: string,
   sessionId: string | null,
   turnId?: string | null,
   signal?: AbortSignal | null,
 ): Promise<{ block: string; stats: KnowledgeRetrievalStats; evidence: KnowledgeInjectionEvidence }> {
-  const policy = resolveKnowledgeExecutionPolicy({
-    mode: refs.mode,
-    question,
-    selectedNotebookCount: refs.notebookIds.length,
-    // 此处尚未冻结来源；P0–P2 策略不依赖来源数量。
-    selectedSourceCount: 0,
+  signal?.throwIfAborted();
+  const resolvedSessionId = resolveSessionIdForPath(engine, sessionPath);
+  if (!resolvedSessionId || (sessionId && sessionId !== resolvedSessionId)) {
+    throw new KnowledgeError("KNOWLEDGE_SCOPE_VIOLATION", "当前会话的知识库范围不可用。");
+  }
+  if (typeof engine?.buildConversationKnowledgeContext !== "function") {
+    throw new Error("知识库连续查阅入口未就绪，请重新启动应用后再试。");
+  }
+  return engine.buildConversationKnowledgeContext({
+    knowledgeRefs: refs, sessionPath, sessionId: resolvedSessionId,
+    turnId: turnId || randomUUID(), ...(signal ? { signal } : {}),
   });
-  const method = policy.path === "fast_local" ? "buildFastKnowledgeContext" : "buildDetailedKnowledgeResearchContext";
-  if (typeof engine?.[method] !== "function") {
-    throw new Error(`desktop-session-submit: knowledge injection unavailable (engine lacks ${method})`);
-  }
-  if (policy.path === "detailed_research") {
-    signal?.throwIfAborted();
-    // 会话加载后才读取登记身份，兼容刚完成旧会话回填的情况。
-    const resolvedSessionId = resolveSessionIdForPath(engine, sessionPath);
-    const manifest = resolvedSessionId ? engine.getSessionManifest?.(resolvedSessionId) : null;
-    if (!resolvedSessionId || (sessionId && sessionId !== resolvedSessionId)
-      || manifest?.sessionId !== resolvedSessionId || manifest.lifecycle !== "active"
-      || manifest.currentLocator?.path !== sessionPath || !manifest.ownerAgentId?.trim()) {
-      throw new KnowledgeError("KNOWLEDGE_SCOPE_VIOLATION", "Knowledge research session identity is unavailable");
-    }
-    const result = await engine.buildDetailedKnowledgeResearchContext({
-      question, knowledgeRefs: { notebookIds: refs.notebookIds, mode: "detailed" },
-      sessionId: resolvedSessionId, sessionPath, agentId: manifest.ownerAgentId,
-      // 客户消息号标识本次提交；未提供时由宿主生成，模型不能指定研究身份。
-      turnId: turnId || randomUUID(), ...(signal ? { signal } : {}),
-    });
-    const status = result.stats?.research?.status;
-    if (status !== "completed" && status !== "partial") {
-      throw new KnowledgeError("KNOWLEDGE_RETRIEVAL_UNAVAILABLE", "Knowledge research has no completed context", { status });
-    }
-    return result;
-  }
-  try {
-    const request = {
-      question,
-      knowledgeRefs: refs,
-      sessionPath,
-      // 轮标识随行（clientMessageId）：TurnScope 的 turn_id 列；缺省由 store 生成。
-      ...(turnId ? { turnId } : {}),
-      // 两种执行路径共用检索期取消信号。
-      ...(signal ? { signal } : {}),
-    };
-    engine.emitEvent?.({ type: "knowledge_trace", sessionPath, id: "fast-local", kind: "search",
-      phase: "start", detail: "fast_local" }, sessionPath);
-    try {
-      const result = await engine.buildFastKnowledgeContext(request);
-      engine.emitEvent?.({ type: "knowledge_trace", sessionPath, id: "fast-local", kind: "search",
-        phase: "done", detail: "fast_local", hits: result.stats.injectedChunks,
-        elapsedMs: result.stats.stageTimings?.totalMs }, sessionPath);
-      return result;
-    } catch (error) {
-      engine.emitEvent?.({ type: "knowledge_trace", sessionPath, id: "fast-local", kind: "search",
-        phase: "failed", detail: "fast_local" }, sessionPath);
-      throw error;
-    }
-  } catch (err) {
-    const reason = err instanceof Error ? err.message : String(err);
-    return {
-      block: `[KnowledgeContext]\n[knowledge injection unavailable: ${reason}]\n`
-        + "Guidance: Knowledge notebook evidence could not be retrieved for this question.\n[/KnowledgeContext]",
-      stats: {
-        mode: refs.mode,
-        retrievalMode: "none",
-        subQueries: [],
-        subQueryHits: [],
-        degraded: false,
-        fusedChunks: 0,
-        injectedChunks: 0,
-        truncated: false,
-        usedTokens: 0,
-        executionPath: "fast_local",
-        remoteModelCalls: 0,
-        vectorQueries: 0,
-        rerankCalls: 0,
-        ftsQueries: 0,
-        vectorBackend: "none",
-        deadlineMs: KNOWLEDGE_FAST_TOTAL_DEADLINE_MS,
-        budgetTokens: KNOWLEDGE_FAST_RENDER_BUDGET_TOKENS,
-        unavailableReason: reason,
-      },
-      // 降级路径无证据进入模型上下文：身份链为空（不伪造）。
-      evidence: { entries: [], searchedVectorVariants: [] },
-    };
-  }
 }
 
 /**
@@ -525,7 +447,7 @@ export async function submitDesktopSessionMessage(engine: any, opts: {
           .filter((key): key is string => typeof key === "string" && !!key.trim());
         for (const key of aborterKeys) pendingKnowledgeInjectionAborters.set(key, knowledgeAbort);
         // 加载会话期间的停止发生在信号登记前，也必须阻止新调查启动。
-        if (promptKnowledgeRefs.mode === "detailed" && aborterKeys.some(key => abortedDesktopSessionSubmissions.has(key))) {
+        if (aborterKeys.some(key => abortedDesktopSessionSubmissions.has(key))) {
           knowledgeAbort.abort();
         }
         let injection: { block: string; stats: KnowledgeRetrievalStats; evidence: KnowledgeInjectionEvidence };
@@ -566,19 +488,6 @@ export async function submitDesktopSessionMessage(engine: any, opts: {
       engine.emitEvent?.({ type: "session_status", isStreaming: false, aborted: true, reason: "user_abort" }, sessionPath);
       earlyBusyEmitted = false;
       return { text: null, toolMedia: [] };
-    }
-    if (promptKnowledgeRefs) {
-      // 检索阶段收口（2026-08-31 三轮）：过程行堆补一条「正在生成回答」，盖住
-      // 主模型预填充+生成这段无流式输出的等待（此前该阶段裸露为三个点）。
-      // 前端在答案正文首个 text_delta 到达时整堆收起。
-      engine.emitEvent?.({
-        type: "knowledge_trace",
-        sessionPath,
-        id: "answer",
-        kind: "note",
-        phase: "start",
-        detail: "answer",
-      }, sessionPath);
     }
 
     const reminderBlock = preservePromptEnvelope ? null : renderPendingReminderBlock(engine, sessionPath);
@@ -959,15 +868,7 @@ export async function submitDesktopSessionInterjection(engine: any, opts: {
     if (knowledgeInjectionBlock) {
       promptText = `${knowledgeInjectionBlock}\n\n${promptText}`;
     }
-    // 与 prompt 路径同一收口：主模型等待期的「正在生成回答」过程行。
-    engine.emitEvent?.({
-      type: "knowledge_trace",
-      sessionPath,
-      id: "answer",
-      kind: "note",
-      phase: "start",
-      detail: "answer",
-    }, sessionPath);
+
   }
   if (context?.beforeUser) {
     promptText = `${context.beforeUser}\n\n${promptText}`;

@@ -203,7 +203,7 @@ export class ScopeSnapshotCompiler {
           }
           if (metadata.metadataMissing) warnings.push(`${row.sourceId}:${metadata.id}:section_metadata_missing`);
           if (hash && !this.deps.store.isCurrentChunkProfile(metadata.chunkProfileHash)) {
-            warnings.push(`${row.sourceId}:${metadata.id}:v2_fallback_rebuild_pending`);
+            warnings.push(`${row.sourceId}:${metadata.id}:previous_chunk_version_rebuild_pending`);
             for (const notebookId of members) this.deps.requestVariantBuild({ studioId: scope.studioId,
               notebookId, sourceId: row.sourceId, parseArtifactId: artifact!.id });
           }

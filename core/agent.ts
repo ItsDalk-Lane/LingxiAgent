@@ -1210,6 +1210,9 @@ export class Agent {
     };
     const base = { getKnowledge: () => knowledge, getStudioId: () => input.studioId,
       resolveSessionContext, resolveResearchContext: resolveContext };
+    const actionableErrorCodes = new Set<KnowledgeErrorCode>([
+      "KNOWLEDGE_INVALID_ARGUMENT", "KNOWLEDGE_SCOPE_VIOLATION", "KNOWLEDGE_CONFLICT",
+    ]);
     const readTools = [createKnowledgeOutlineTool(base), createKnowledgeSearchTool({ ...base,
       onSearchCompleted: summary => input.onSearchCompleted?.(summary),
     }),
@@ -1218,6 +1221,11 @@ export class Agent {
       execute: async (id: string, params: Record<string, unknown> = {}, signal?: AbortSignal, onUpdate?: unknown, ctx?: unknown) => {
         try {
           const actor = resolveContext(ctx);
+          // 与搜索工具保持同一口径，先归一化再记录动作、判断重复和关联反证。
+          if (tool.name === "knowledge_search" && Array.isArray(params.sectionKeys) && params.sectionKeys.length === 0) {
+            params = { ...params };
+            delete params.sectionKeys;
+          }
           const requestSummary: Record<string, unknown> = {};
           if (typeof params.query === "string" && params.query.trim() && params.query.length <= 4000) requestSummary.query = params.query;
           const query = typeof requestSummary.query === "string" ? normalizeQuery(requestSummary.query) : null;
@@ -1270,8 +1278,12 @@ export class Agent {
             const result = await tool.execute(id, scopedParams, activeSignal, onUpdate, ctx);
             if (result.isError) {
               const code = "errorCode" in result.details ? result.details.errorCode : undefined;
-              throw new KnowledgeError(typeof code === "string" && allowedErrorCodes.has(code as KnowledgeErrorCode)
-                ? code as KnowledgeErrorCode : "KNOWLEDGE_RETRIEVAL_UNAVAILABLE", "Research knowledge tool failed");
+              const errorCode = typeof code === "string" && allowedErrorCodes.has(code as KnowledgeErrorCode)
+                ? code as KnowledgeErrorCode : "KNOWLEDGE_RETRIEVAL_UNAVAILABLE";
+              // 只保留可纠正的安全参数诊断，内部异常和供应商错误仍使用通用提示。
+              const message = actionableErrorCodes.has(errorCode)
+                ? result.content[0]?.text || "Research knowledge tool failed" : "Research knowledge tool failed";
+              throw new KnowledgeError(errorCode, message);
             }
             const response = JSON.parse(result.content[0].text);
             const summary: Record<string, unknown> = { status: "completed" };
@@ -1286,11 +1298,16 @@ export class Agent {
               summary.receiptIds = (response.matches ?? []).map((match: { receiptId: string }) => match.receiptId);
               summary.count = response.matches?.length ?? 0;
             } else summary.count = response.totalSources ?? 0;
-            return { value: result, summary };
+            const hasReadEvidence = Array.isArray(summary.receiptIds) && summary.receiptIds.length > 0;
+            return { value: { ...result, content: [{ type: "text" as const, text: JSON.stringify({
+              ...response, remainingBudget: budget.remainingBudget(actor.runId),
+              ...(hasReadEvidence ? { nextAction: "先调用 knowledge_research_update 登记本批相关原文，再继续采集。若材料无关，说明真实缺口；没有新增缺口可提交空更新。只使用同一凭据 text 中逐字出现的引文。" } : {}),
+            }) }] }, summary };
           });
         } catch (error) {
           if (signal?.aborted) throw error;
-          return toolError("Research knowledge tool was rejected or unavailable", {
+          return toolError(isKnowledgeError(error) && actionableErrorCodes.has(error.code)
+            ? error.message : "Research knowledge tool was rejected or unavailable", {
             errorCode: isKnowledgeError(error) ? error.code : "KNOWLEDGE_RETRIEVAL_UNAVAILABLE",
           });
         }

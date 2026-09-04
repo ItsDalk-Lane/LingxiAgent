@@ -44,6 +44,12 @@
     "sendFailed": "送信に失敗しました"
   },
   "knowledge": {
+    "citationRetry": "再読み込み",
+    "citationNumber": "引用 {number}。ホバーで本文を確認、Enter で開きます。",
+    "citationLoading": "本文を読み込み中…",
+    "citationFailed": "本文を読み込めません。資料が削除されたか、接続できない可能性があります。",
+    "citationSource": "知識資料",
+    "citationTitle": "引用元の本文",
     "tab": "ナレッジ",
     "title": "ナレッジライブラリ",
     "newNotebook": "ノートブックを作成",
@@ -114,7 +120,7 @@
     "settingsRerankHint": "このノートブック専用。クエリの並べ替えのみに影響し、再構築は行わない",
     "settingsGlobalNotConfigured": "未設定",
     "settingsChunkTargetChars": "チャンクサイズ（文字）",
-    "settingsChunkHint": "埋め込みモデルのコンテキストウィンドウ ×80% で自動計算（1 token = 1 文字）；埋め込みモデル変更時に自動再構築",
+    "settingsChunkHint": "文字数で目標を設定し、文・段落・章の境界を優先します。空欄の場合は 2048 文字です。保存後にバックグラウンドで再構築し、過去の回答の引用は保持します。",
     "settingsInvalidNumber": "{min}〜{max} の整数を入力してください",
     "selectSource": "ソースを選択して解析内容を表示",
     "ingestionQueued": "待機中",
@@ -130,7 +136,7 @@
     "readinessProcessing": "{count} 件取り込み中",
     "readinessPendingEmbedding": "{count} 件埋め込み待ち",
     "readinessFailed": "{count} 件失敗",
-    "settingsChunkAutoFallback": "自動（約 6553）",
+    "settingsChunkAutoFallback": "既定（2048 文字）",
     "settingsVectorRetention": "ベクトル保持ポリシー",
     "settingsRetentionKeepForever": "永久保持（デフォルト）",
     "settingsRetentionDaysMode": "日数経過後に削除",
@@ -390,6 +396,13 @@
     "back": "戻る"
   },
   "chat": {
+    "knowledgeResearchInterrupted": "調査が中断されました",
+    "knowledgeResearchStopIncomplete": "調査の処理が正常に完了しませんでした",
+    "knowledgeResearchStopUnavailable": "調査に必要なツールを利用できません",
+    "knowledgeResearchStopNoProgress": "追加調査で新しい根拠が見つかりませんでした",
+    "knowledgeResearchStopRounds": "調査回数の上限に達しました",
+    "knowledgeResearchStopTime": "調査の制限時間に達しました",
+    "knowledgeResearchStopTools": "共有のツール呼び出し上限に達しました",
     "find": {
       "locateFailed": "メッセージを特定できませんでした",
       "placeholder": "会話内を検索"
@@ -834,6 +847,10 @@
     "active": "思考中"
   },
   "toolGroup": {
+    "mixedCount": "{tools} 回のツール呼び出し · {steps} 件の調査手順",
+    "researchRunning": "{n} 件の調査手順が進行中",
+    "researchCountWithFail": "{total} 件の調査手順（{fail} 件未完了）",
+    "researchCount": "{n} 件の調査手順",
     "success": "✿ {name} 完了です、お茶の子さいさい～ · {n} ステップ",
     "failed": "⚠ 何かおかしいようです · {n} ステップ",
     "countWithFail": "{total} 個のツール（{fail} 個失敗）",
@@ -852,9 +869,10 @@
     }
   },
   "processFold": {
+    "research": "{n} 件の調査手順",
     "summary": "✨ {name} がしばらく動き回りました",
     "tools": "{n} 個のツール",
-    "knowledge": "{n} 回の検索",
+    "knowledge": "{n} 件の知識資料",
     "thinking": "{n} 回の思考",
     "unsuccessful": "{n} 回の試行が未成功"
   },

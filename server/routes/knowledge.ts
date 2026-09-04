@@ -172,10 +172,10 @@ function validateExactBody(body: unknown, allowedKeys: string[], label: string):
 }
 
 /**
- * 笔记本设置 PUT 的键校验：omitted=不变，至少给一个键。chunkTargetChars 已
- * 随"按嵌入模型上下文自动分块"退役（遗留显式列值仍生效，只是不再接受写入）。
+ * 笔记本设置 PUT 的键校验：omitted=不变，至少给一个键。
+ * 正文目标字符数沿用存储层范围校验，修改后从已有原文快照后台重建派生索引。
  */
-const NOTEBOOK_SETTINGS_KEYS = ["embeddingModelRef", "rerankModelRef", "retrievalTopK", "vectorRetentionDays"];
+const NOTEBOOK_SETTINGS_KEYS = ["embeddingModelRef", "rerankModelRef", "chunkTargetChars", "retrievalTopK", "vectorRetentionDays"];
 
 function validateSettingsBody(body: unknown): Record<string, any> {
   if (!body || typeof body !== "object" || Array.isArray(body)) {
@@ -285,11 +285,11 @@ export function createKnowledgeRoute(engine: any) {
     }
   });
 
-  route.delete("/knowledge/notebooks/:id", (c) => {
+  route.delete("/knowledge/notebooks/:id", async (c) => {
     const scope = bindKnowledgeScope(c, engine);
     if (scope.error) return scope.error;
     try {
-      const notebook = scope.knowledge.deleteNotebook({
+      const notebook = await scope.knowledge.deleteNotebook({
         studioId: scope.studioId,
         notebookId: c.req.param("id"),
       });
@@ -603,6 +603,13 @@ export function createKnowledgeRoute(engine: any) {
         studioId: scope.studioId,
         citationId: c.req.param("citationId"),
       });
+      // 旧纯文本块可能没有章标题；从同一原文的章节位置补齐展示，不改引用内容。
+      const locator = { ...resolved.block.locator };
+      if (!Array.isArray(locator.headingPath) || locator.headingPath.length === 0) {
+        const section = scope.knowledge.indexStore.listArtifactSectionMetadata(resolved.artifact.id)
+          .find(section => section.startBlockOrdinal <= resolved.block.ordinal && section.endBlockOrdinal >= resolved.block.ordinal);
+        if (section?.headingPath.length) locator.headingPath = section.headingPath;
+      }
       return c.json({
         citation: resolved.citation,
         block: resolved.block,
@@ -611,7 +618,7 @@ export function createKnowledgeRoute(engine: any) {
         source: serializeSource(resolved.source),
         viewer: {
           contentUrl: `/api/knowledge/snapshots/${encodeURIComponent(resolved.snapshot.id)}/content`,
-          locator: resolved.block.locator,
+          locator,
         },
       });
     } catch (error) {

@@ -236,9 +236,10 @@ export class KnowledgeResearchOrchestrator {
       const protocolValid = outlineFirst && finishAttempted && investigationValid;
       protocolFailures = fallback ? 0 : protocolValid ? 0 : protocolFailures + 1;
       const roundError = result.errorCode ?? (!protocolValid && !fallback ? "KNOWLEDGE_RESEARCH_PROTOCOL_FAILED" : null);
-      research.finishRound(runId, round.id, { status: run.status === "cancelled" ? "cancelled"
-        : roundError ? "failed" : "completed", newEvidenceCount, errorCode: roundError });
-      this.publish(runId, { type: "knowledge_research_ledger_updated", phase: "reviewing" });
+      const roundStatus = run.status === "cancelled" ? "cancelled" : roundError ? "failed" : "completed";
+      research.finishRound(runId, round.id, { status: roundStatus, newEvidenceCount, errorCode: roundError });
+      this.publish(runId, { type: "knowledge_research_ledger_updated", phase: "reviewing",
+        roundStatus, roundStopReason: run.stopReason ?? roundError });
       run = research.requireRun(runId);
       if (!activeStatuses.has(run.status)) {
         finalStatus = run.status === "cancelled" ? "cancelled" : run.status === "failed" ? "failed" : "partial";

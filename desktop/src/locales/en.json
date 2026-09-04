@@ -44,6 +44,12 @@
     "sendFailed": "Send failed"
   },
   "knowledge": {
+    "citationRetry": "Retry",
+    "citationNumber": "Citation {number}. Hover to preview; press Enter to open.",
+    "citationLoading": "Loading source passage…",
+    "citationFailed": "The passage could not be loaded. The source may have been removed or the connection is unavailable.",
+    "citationSource": "Knowledge source",
+    "citationTitle": "Source passage",
     "tab": "Knowledge",
     "title": "Knowledge Library",
     "newNotebook": "New notebook",
@@ -114,7 +120,7 @@
     "settingsRerankHint": "Per-notebook; affects query ranking only, no rebuild",
     "settingsGlobalNotConfigured": "Not configured",
     "settingsChunkTargetChars": "Chunk size (chars)",
-    "settingsChunkHint": "Computed automatically as the embedding model's context window ×80% (1 token = 1 char); switching the embedding model rebuilds chunks",
+    "settingsChunkHint": "Set the target number of characters, preserving sentence, paragraph, and chapter boundaries where possible. Leave empty for 2048 characters. Saving rebuilds chunks in the background and preserves citations in existing answers.",
     "settingsInvalidNumber": "Enter an integer between {min} and {max}",
     "selectSource": "Select a source to view its parsed content",
     "ingestionQueued": "Queued",
@@ -130,7 +136,7 @@
     "readinessProcessing": "{count} ingesting",
     "readinessPendingEmbedding": "{count} pending embedding",
     "readinessFailed": "{count} failed",
-    "settingsChunkAutoFallback": "Auto (~6553)",
+    "settingsChunkAutoFallback": "Default (2048 characters)",
     "settingsVectorRetention": "Vector retention",
     "settingsRetentionKeepForever": "Keep forever (default)",
     "settingsRetentionDaysMode": "Clean up after days",
@@ -390,6 +396,13 @@
     "back": "Back"
   },
   "chat": {
+    "knowledgeResearchInterrupted": "Research was interrupted",
+    "knowledgeResearchStopIncomplete": "Research did not finish its workflow",
+    "knowledgeResearchStopUnavailable": "Required research tools are unavailable",
+    "knowledgeResearchStopNoProgress": "Further research found no new evidence",
+    "knowledgeResearchStopRounds": "Research round limit reached",
+    "knowledgeResearchStopTime": "Research time limit reached",
+    "knowledgeResearchStopTools": "Shared tool call limit reached",
     "find": {
       "locateFailed": "Could not locate that message",
       "placeholder": "Find in conversation"
@@ -833,6 +846,10 @@
     "active": "Thinking"
   },
   "toolGroup": {
+    "mixedCount": "{tools} tool calls · {steps} research steps",
+    "researchRunning": "{n} research steps in progress",
+    "researchCountWithFail": "{total} research steps ({fail} incomplete)",
+    "researchCount": "{n} research steps",
     "success": "✿ {name} all done, piece of cake ~ · {n} steps",
     "failed": "⚠ Something seems off · {n} steps",
     "countWithFail": "{total} tools ({fail} failed)",
@@ -851,9 +868,10 @@
     }
   },
   "processFold": {
+    "research": "{n} research steps",
     "summary": "✨ {name} worked for a while",
     "tools": "{n} tools",
-    "knowledge": "{n} retrievals",
+    "knowledge": "{n} knowledge summaries",
     "thinking": "{n} thoughts",
     "unsuccessful": "{n} attempts not successful"
   },

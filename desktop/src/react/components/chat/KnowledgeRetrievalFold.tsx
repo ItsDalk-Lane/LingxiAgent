@@ -19,6 +19,7 @@ import { memo, useCallback, useState } from 'react';
 import { Collapse } from '@/ui';
 import type { KnowledgeRetrievalStats } from '../../../../../shared/knowledge-refs.ts';
 import styles from './Chat.module.css';
+import { knowledgeResearchStopNote } from '../../utils/knowledge-research-status';
 
 interface Props {
   retrieval: KnowledgeRetrievalStats;
@@ -78,6 +79,10 @@ export const KnowledgeRetrievalFold = memo(function KnowledgeRetrievalFold({ ret
           : t('chat.knowledgeRetrievalSearched', { n: retrieval.injectedChunks });
   const preview = showAll ? results : results.slice(0, KNOWLEDGE_RESULTS_PREVIEW_COUNT);
   const hiddenCount = results.length - preview.length;
+  const stopNote = knowledgeResearchStopNote(research?.stopReason, t);
+
+  // 统一聊天的初始统计只表示资料范围已准备，实际检索由真实工具卡展示。
+  if (retrieval.executionPath === 'conversation' && !unavailable) return null;
 
   return (
     <div className={styles.toolGroup} data-testid="knowledge-retrieval-fold">
@@ -86,7 +91,7 @@ export const KnowledgeRetrievalFold = memo(function KnowledgeRetrievalFold({ ret
         onClick={expandable ? toggle : undefined}
       >
         <span className={styles.knowledgeRetrievalIcon} aria-hidden="true">📚</span>
-        <span className={styles.toolGroupTitle}>{summary}</span>
+        <span className={styles.toolGroupTitle}>{summary}{stopNote ? ` · ${stopNote}` : ''}</span>
         {localFast && retrieval.deadlineExceeded && !unavailable && (
           <span className={styles.knowledgeRetrievalBadge}>{t('chat.knowledgeFastDeadlineExceeded')}</span>
         )}

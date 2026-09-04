@@ -44,6 +44,12 @@
     "sendFailed": "보내기 실패"
   },
   "knowledge": {
+    "citationRetry": "다시 불러오기",
+    "citationNumber": "인용 {number}. 마우스를 올려 미리 보고 Enter로 엽니다.",
+    "citationLoading": "원문을 불러오는 중…",
+    "citationFailed": "원문을 불러올 수 없습니다. 자료가 삭제되었거나 연결을 사용할 수 없습니다.",
+    "citationSource": "지식 자료",
+    "citationTitle": "인용 원문",
     "tab": "지식",
     "title": "지식 라이브러리",
     "newNotebook": "새 노트북",
@@ -114,7 +120,7 @@
     "settingsRerankHint": "이 노트북 전용. 쿼리 정렬에만 영향하며 재구축하지 않습니다",
     "settingsGlobalNotConfigured": "구성되지 않음",
     "settingsChunkTargetChars": "청크 크기(문자)",
-    "settingsChunkHint": "임베딩 모델 컨텍스트 창 ×80%로 자동 계산(1 token = 1 문자). 임베딩 모델 변경 시 자동 재구축",
+    "settingsChunkHint": "문자 수로 목표를 설정하며 문장, 문단, 장의 경계를 우선합니다. 비워 두면 2048자입니다. 저장하면 백그라운드에서 재구축하며 기존 답변의 인용은 유지됩니다.",
     "settingsInvalidNumber": "{min}–{max} 사이의 정수를 입력하세요",
     "selectSource": "소스를 선택해 파싱된 내용을 확인하세요",
     "ingestionQueued": "대기 중",
@@ -130,7 +136,7 @@
     "readinessProcessing": "{count}개 수집 중",
     "readinessPendingEmbedding": "{count}개 임베딩 대기",
     "readinessFailed": "{count}개 실패",
-    "settingsChunkAutoFallback": "자동(약 6553)",
+    "settingsChunkAutoFallback": "기본값 (2048자)",
     "settingsVectorRetention": "벡터 보존 정책",
     "settingsRetentionKeepForever": "영구 보존(기본)",
     "settingsRetentionDaysMode": "일수 후 정리",
@@ -390,6 +396,13 @@
     "back": "뒤로"
   },
   "chat": {
+    "knowledgeResearchInterrupted": "조사가 중단되었습니다",
+    "knowledgeResearchStopIncomplete": "조사 절차가 정상적으로 완료되지 않았습니다",
+    "knowledgeResearchStopUnavailable": "조사에 필요한 도구를 사용할 수 없습니다",
+    "knowledgeResearchStopNoProgress": "추가 조사에서 새 근거를 찾지 못했습니다",
+    "knowledgeResearchStopRounds": "조사 횟수 한도에 도달했습니다",
+    "knowledgeResearchStopTime": "조사 시간 한도에 도달했습니다",
+    "knowledgeResearchStopTools": "공유 도구 호출 한도에 도달했습니다",
     "find": {
       "locateFailed": "해당 메시지를 찾지 못했습니다",
       "placeholder": "대화에서 찾기"
@@ -834,6 +847,10 @@
     "active": "생각하는 중"
   },
   "toolGroup": {
+    "mixedCount": "도구 호출 {tools}회 · 조사 단계 {steps}개",
+    "researchRunning": "조사 단계 {n}개 진행 중",
+    "researchCountWithFail": "조사 단계 {total}개 ({fail}개 미완료)",
+    "researchCount": "조사 단계 {n}개",
     "success": "✿ {name} 다 끝났어요, 식은 죽 먹기 ~ · {n}단계",
     "failed": "⚠ 뭔가 이상한 것 같아요 · {n}단계",
     "countWithFail": "{total}개 도구 ({fail}개 실패)",
@@ -852,9 +869,10 @@
     }
   },
   "processFold": {
+    "research": "조사 단계 {n}개",
     "summary": "✨ {name}이(가) 한동안 바쁘게 움직였어요",
     "tools": "{n}개 도구",
-    "knowledge": "{n}회 검색",
+    "knowledge": "지식 자료 {n}개",
     "thinking": "{n}번 생각",
     "unsuccessful": "{n}번 시도 미성공"
   },
