@@ -14,7 +14,7 @@
 | U1：上游目标 | `c6d0405294be67cb134c2758f6472748ee73e2be` | openhanako `v0.447.4` |
 | L0：Lingxi 同步基线 | `97595264ead8735a04559507ddaade25db8a4e15` | chore: sync upstream 0.444.1 and pi SDK 0.84.1 (PR #2) |
 | L1：同步开始 Lingxi | `ca0b417e36a6a1f80947458aaed328a25718e41b` | 2026-08-20 main HEAD |
-| VERIFIED_SOURCE_SHA | `5c016df183ad207cf1ca33de274abb7a4eb10057` | 2026-09-04 知识重构 P0 阶段验证源码；类型检查、测试、三种本机构建与生成物验证，后续阶段与最终打包尚未执行 |
+| VERIFIED_SOURCE_SHA | `9bee41dcfade7baad689d6979bbb3f8ede0b48ee` | 2026-09-04 知识重构 P1 源码；本地定向测试、类型检查、构建、包内烟测、生成物通过，全量 13081 PASS / 0 FAIL；远程四平台验证中，尚未进入 P2 |
 
 ## Audit seal model
 

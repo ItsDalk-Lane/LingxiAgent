@@ -167,6 +167,15 @@ AboutTab），因此最终源码树重新执行了 renderer build / package smok
 
 ## Seal 推进记录
 
+### 2026-09-04：知识重构 P1 阶段审计（本机已通过，远程验证中）
+
+- 用户授权沿用 P0：每阶段验证后同步审计记录，保留最终封印，不改审计白名单。
+- 被验证源码：`9bee41dcfade7baad689d6979bbb3f8ede0b48ee`，P1-01 至 P1-08 按序提交；固定基线仍为 `3eab85891a1747c64064252804f70c0a3773f021`。
+- 本机构建、指定测试、三套类型检查、lint/boundary、五生成器两轮、完整包内正常/缺原生扩展两种启动检索均已通过，详见源提交中的 KNOWLEDGE_REFACTOR_PROGRESS.md。
+- 全量复验：`npm test` exit 0，1300 文件 PASS / 1 既有 SKIP，13081 测试 PASS / 7 既有 SKIP / 0 FAIL，78.99s；日志 `/tmp/lingxi-knowledge-p1-audit-full.log`。原审计测试与质量依赖测试均通过，未删除、跳过或放宽测试。
+- 四平台 Build 与固定 Linux runner 性能结果待回填；尚未进入 P2，不声明整个任务完成。
+
+
 ### 2026-09-04：知识重构 P0 阶段审计
 
 - 用户授权：每阶段完成验证后同步审计记录，并保留任务书最终封印提交；任务范围与顺序不变。
