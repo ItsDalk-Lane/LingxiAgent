@@ -117,11 +117,28 @@ export class ResearchStore {
     return run;
   }
 
+  /** 完整性要求只能保持或提高；检查和更新处于同一事务，批量工具可共用外层事务。 */
+  upgradeCompletenessPolicy(runId: string, requested: KnowledgeCompletenessPolicy): KnowledgeResearchRun {
+    const order: KnowledgeCompletenessPolicy[] = ["best_effort", "source_diverse", "relevant_sections_complete", "scope_complete"];
+    if (!order.includes(requested)) invalid();
+    return this.transaction(() => {
+      const run = this.requireActive(runId);
+      if (order.indexOf(requested) < order.indexOf(run.completenessPolicy)) {
+        throw new KnowledgeError("KNOWLEDGE_CONFLICT", "Research completeness policy cannot be downgraded");
+      }
+      this.knowledgeStore.db.prepare("UPDATE knowledge_research_runs SET completeness_policy = ?, updated_at = ? WHERE id = ?")
+        .run(requested, this.now(), runId);
+      return this.requireRun(runId);
+    });
+  }
+
   createNeed(runId: string, input: NeedInput): KnowledgeEvidenceNeedRecord {
     keys(input, NEED_KEYS); text(input.claim, 1000);
     for (const key of ["required", "requireCounterEvidence", "requireAllRelevantUnits"] as const) if (typeof input[key] !== "boolean") invalid();
     return this.transaction(() => {
       this.requireActive(runId);
+      const count = this.knowledgeStore.db.prepare("SELECT COUNT(*) AS count FROM knowledge_evidence_needs WHERE run_id = ?").get(runId).count;
+      if (count >= 8) throw new KnowledgeError("KNOWLEDGE_CONFLICT", "Research run allows at most eight evidence needs");
       const id = this.newId("kneed"), now = this.now();
       const ordinal = this.knowledgeStore.db.prepare("SELECT COALESCE(MAX(ordinal), -1) + 1 AS ordinal FROM knowledge_evidence_needs WHERE run_id = ?").get(runId).ordinal;
       this.insert("knowledge_evidence_needs", { id, run_id: runId, ordinal, claim: input.claim, kind: input.kind,
@@ -254,6 +271,33 @@ export class ResearchStore {
       request_summary_json: JSON.stringify(input.requestSummary), response_summary_json: input.responseSummary === null ? null : JSON.stringify(input.responseSummary),
       status: input.status, started_at: input.startedAt, completed_at: input.completedAt, error_code: input.errorCode });
     return record(this.knowledgeStore.db.prepare("SELECT * FROM knowledge_research_actions WHERE id = ?").get(input.id));
+  }
+
+  /** 已经开始的动作必须能在取消或运行结束后收尾，不能借此新增动作或重写已有终态。 */
+  finishAction(runId: string, actionId: string, input: {
+    status: "completed" | "failed" | "cancelled"; responseSummary: Record<string, unknown> | null; errorCode: string | null;
+  }): KnowledgeResearchAction {
+    keys(input, ["status", "responseSummary", "errorCode"]);
+    if (!["completed", "failed", "cancelled"].includes(input.status)) invalid();
+    if (input.errorCode !== null) text(input.errorCode);
+    return this.transaction(() => {
+      const run = this.requireRun(runId);
+      const row = this.knowledgeStore.db.prepare("SELECT * FROM knowledge_research_actions WHERE run_id = ? AND id = ?").get(runId, actionId);
+      if (!row) throw new KnowledgeError("KNOWLEDGE_NOT_FOUND", "Research action was not found in this run");
+      const action = record<KnowledgeResearchAction>(row);
+      this.actionMetadata(run, { ...action, responseSummary: input.responseSummary });
+      if (action.status !== "running") {
+        const normalized = (value: Record<string, unknown> | null) => JSON.stringify(value === null ? null
+          : Object.fromEntries(Object.entries(value).sort(([left], [right]) => left.localeCompare(right))));
+        if (action.status === input.status && action.errorCode === input.errorCode
+          && normalized(action.responseSummary) === normalized(input.responseSummary)) return action;
+        throw new KnowledgeError("KNOWLEDGE_CONFLICT", "Research action already has a different terminal result");
+      }
+      this.knowledgeStore.db.prepare(`UPDATE knowledge_research_actions
+        SET status = ?, response_summary_json = ?, error_code = ?, completed_at = ? WHERE run_id = ? AND id = ?`)
+        .run(input.status, input.responseSummary === null ? null : JSON.stringify(input.responseSummary), input.errorCode, this.now(), runId, actionId);
+      return record(this.knowledgeStore.db.prepare("SELECT * FROM knowledge_research_actions WHERE id = ?").get(actionId));
+    });
   }
   listActions(runId: string): KnowledgeResearchAction[] {
     const run = this.requireRun(runId);

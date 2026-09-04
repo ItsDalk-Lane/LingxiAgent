@@ -10,7 +10,7 @@
 - 严格按 P0 → P1 → P2 → P3 及编号顺序；阶段门禁全部通过才进入下一阶段。
 - 每项记录测试原始结果后提交；不删除、跳过或放宽测试，不合并 main。
 - 现有任务书为用户未跟踪文件，既有规划文档与 BLOCKED.md 历史记录保留。
-- 当前断点：P1-01 至 P1-08 已完成，阶段收口 `23873985`、审计 `333c5112`，本地与四平台门禁全部通过；P2-01 已完成并提交 `c3033b05`；P2-02 已提交 `c729f68a`；P2-03 已通过本项验证，正在提交；下一项 P2-04。P0 源码提交 `5c016df183ad207cf1ca33de274abb7a4eb10057`，阶段审计提交 `f9928d76`；全量 13002 PASS / 0 FAIL / 7 既有 SKIP。用户已授权每阶段验证后同步审计记录，保留最终封印。
+- 当前断点：P1-01 至 P1-08 已完成，阶段收口 `23873985`、审计 `333c5112`，本地与四平台门禁全部通过；P2-01 已完成并提交 `c3033b05`；P2-02 已提交 `c729f68a`；P2-03 已提交 `4a95317c`；P2-04 已通过本项验证，正在提交；下一项为 P2-05 隔离研究会话。P0 源码提交 `5c016df183ad207cf1ca33de274abb7a4eb10057`，阶段审计提交 `f9928d76`；全量 13002 PASS / 0 FAIL / 7 既有 SKIP。用户已授权每阶段验证后同步审计记录，保留最终封印。
 - 进度、计划与事实集中在本文件和基线文档，避免覆盖既有 task_plan.md / findings.md / PROGRESS.md。
 - 目标工具已确认本任务存在 active goal；重复 create_goal 被拒绝，沿用现有目标。
 - 规划恢复脚本返回其他会话的无关配置记录，经 git diff 为空核对，未采用其内容。
@@ -21,7 +21,7 @@
 | --- | --- | --- |
 | P0 | completed | 2026-09-04 全量 13002 PASS / 0 FAIL / 7 既有 SKIP，76.42s；全部 P0 门禁通过，审计提交 f9928d76 |
 | P1 | completed | P1-01 至 P1-08 完成；本地全量和第三轮四平台 Build 33829055797 全部通过，阶段审计 333c5112 |
-| P2 | in_progress | P2-01 至 P2-03 已完成；P2-04 及后续任务、阶段门禁待执行 |
+| P2 | in_progress | P2-01 至 P2-04 已完成；P2-05 及后续任务、阶段门禁待执行 |
 | P3 | pending | NOT_EXECUTED |
 
 ## P0-00：建立基线与回归门禁
@@ -289,16 +289,19 @@
 - 测试结果：最终 7 文件 / 106 PASS / 0 FAIL / 0 SKIP，2.54s，exit 0。三套类型检查及最终测试类型检查 exit 0；ESLint 0 error，保留原工具 9 条 warning，新增测试的 4 处 any 已改为精确参数类型后复验零 warning。开放边界保留原 1 条债务，闭包 10675 文件、开放导出 872 文件均通过；v18 指纹仍为 `sha256:cd0feeaaa9caa4800620293e2f2a5a3b52d1f22d3eec6d21efccc0d2b036066b`，没有数据库结构改动。
 - 失败与修复：最初 Ledger/quote 联测 18 PASS / 1 FAIL 是测试误假定随机 ID 的关系排序等于插入顺序，改为同一确定排序后仍逐项核对全部来源；只读复核发现带检索错误的零命中会被误算反证完成，增加真实数据库用例得到 10 PASS / 1 FAIL，再修生产逻辑排除错误/失败/未完成动作。预算触顶优先部分停止以及四种研究终态拒绝全部后续写入均有新增验证。没有删除、跳过或放宽测试。
 - 证据：`/tmp/lingxi-knowledge-p203-{quote-first,ledger-first,ledger-counter-red,tests-first,tests-final,typecheck,test-typecheck-final,lint,test-lint-final,closure,inventory,fingerprint-final,boundary,export}.log`；新 research 目录被既有通用忽略规则命中，提交时仅精确纳入任务书规定的三个文件，未改忽略规则。
-- 对应 commit SHA：待本项提交后回填
+- 对应 commit SHA：`4a95317c31484368ffbed948139142b7b106359d`
 - 偏差：none
 
 ## P2-04：新增 Research 专用工具
 
-- 状态：pending
-- 改动文件：尚未开始
-- 测试命令：按任务书该项测试执行，尚未执行
-- 测试结果：NOT_EXECUTED
-- 对应 commit SHA：尚未提交
+- 状态：completed
+- 改动文件：`lib/tools/knowledge-research-update-tool.ts`、`lib/tools/knowledge-research-finish-tool.ts`、`lib/tools/knowledge-delegate-tool.ts`、`lib/knowledge/research/research-tool-budget.ts`、`lib/knowledge/research/research-store.ts`、`tests/knowledge-research-update-tool.test.ts`、`tests/knowledge-research-finish-tool.test.ts`、`tests/knowledge-delegate-tool.test.ts`、`tests/knowledge-research-tool-budget.test.ts`、`export-manifest.json`、本进度文件。
+- 改动：三工具逐字段遵守任务书，更新只允许最多 8 个需求与限定长度、凭据精确入账、整批回滚、完整性只升级；结束重新核验宿主状态和真实预算，结论摘要不入库/不回显；委派每次最多 4 个任务，先校验完整批次再并行启动、等待全部清理结束，只报告结构化结果，Worker 不得委派或结束。共享预算累计 Root/Worker 的全部已授权调用和绝对创建时限；第 32 次之后研究部分结束并拒绝新调用，搜索/阅读另限每轮 8/12。所有实例共享并发名额，动作只保留有限元数据；实际隔离执行器的研究 surface 接线按下一项 P2-05 实施。
+- 测试命令：`npx vitest run tests/knowledge-research-tool-budget.test.ts tests/knowledge-research-update-tool.test.ts tests/knowledge-research-finish-tool.test.ts tests/knowledge-delegate-tool.test.ts tests/knowledge-research-store.test.ts tests/knowledge-evidence-ledger.test.ts tests/knowledge-read-receipts.test.ts tests/knowledge-evidence-quote-validation.test.ts tests/persistence-schema-tripwire.test.ts`；三套类型检查；全部修改代码 ESLint；持久化清单/指纹、开放导出与闭包生成器；开放边界检查。
+- 测试结果：最终 9 文件 / 125 PASS / 0 FAIL / 0 SKIP，2.12s，exit 0；三套类型检查 exit 0，定向 ESLint 0 error / 0 warning。开放边界仍为原 1 条债务，开放导出 876 文件；持久化指纹保持 P2-02 的 v18 值不变。闭包生成 10675 文件，与前项相同，exit 0。
+- 失败与修复：结束工具最早因预算文件尚未完成而导入失败（未执行用例），文件落盘后使用真实预算器验证；更新工具首轮 11 PASS / 1 FAIL，补查同步事务取消导致终态一起回滚，修复为事务回滚后再次落实取消并保留原断言；共享名额故障用例先 8 PASS / 1 FAIL，修复委派计数写库失败时也必须释放名额。测试类型检查发现 TypeBox 断言访问类型不符，改为结构化类型后全部通过；委派顶层权限/状态等未知字段新增明确拒绝验证。无测试删除、跳过或放宽。
+- 证据：`/tmp/lingxi-knowledge-p204-{budget-first,budget-slots-red,tests-first,tests-second,tests-final,typecheck,lint,inventory,fingerprint,boundary,export,closure}.log`。对应子项细证 `/tmp/lingxi-knowledge-p204-finish-tests-final.log`、`/tmp/lingxi-p204-delegate-top-level.log`。
+- 对应 commit SHA：待本项验证完成后提交
 - 偏差：none
 
 ## P2-05：增加 Knowledge Research Surface
