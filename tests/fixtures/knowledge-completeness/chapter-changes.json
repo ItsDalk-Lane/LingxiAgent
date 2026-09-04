@@ -1,0 +1,24 @@
+{
+  "question": "核对全文每章的核心变化。",
+  "query": "变化",
+  "expectedText": [
+    "一人改为两人",
+    "纸质改为电子"
+  ],
+  "expectedConflict": false,
+  "expectedUnavailable": 0,
+  "notebooks": [
+    {
+      "key": "selected",
+      "name": "完整性资料",
+      "selected": true,
+      "sources": [
+        {
+          "key": "main",
+          "name": "核查原文",
+          "text": "# 第一章\n变化：审批由一人改为两人。\n\n# 第二章\n变化：归档由纸质改为电子。"
+        }
+      ]
+    }
+  ]
+}

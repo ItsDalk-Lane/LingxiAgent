@@ -1,0 +1,29 @@
+{
+  "question": "检查全文所有交付人员，列明失败资料。",
+  "query": "交付",
+  "expectedText": [
+    "李四"
+  ],
+  "expectedConflict": false,
+  "expectedUnavailable": 1,
+  "notebooks": [
+    {
+      "key": "selected",
+      "name": "完整性资料",
+      "selected": true,
+      "sources": [
+        {
+          "key": "main",
+          "name": "核查原文",
+          "text": "# 可读记录\n交付人员为李四。"
+        },
+        {
+          "key": "unavailable",
+          "name": "损坏资料",
+          "text": "# 未能解析\n隐藏人员未完成原文提取。",
+          "status": "failed"
+        }
+      ]
+    }
+  ]
+}

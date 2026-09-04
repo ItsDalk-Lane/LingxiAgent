@@ -1,0 +1,25 @@
+{
+  "question": "列出全文所有人名。",
+  "query": "成员",
+  "expectedText": [
+    "张三",
+    "李四",
+    "王五"
+  ],
+  "expectedConflict": false,
+  "expectedUnavailable": 0,
+  "notebooks": [
+    {
+      "key": "selected",
+      "name": "完整性资料",
+      "selected": true,
+      "sources": [
+        {
+          "key": "main",
+          "name": "核查原文",
+          "text": "# 第一章\n成员张三负责研发，李四负责交付。\n\n# 第二章\n成员王五负责验收。"
+        }
+      ]
+    }
+  ]
+}

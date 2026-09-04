@@ -30,7 +30,8 @@ function vectorGenerator(seed) {
 }
 function percentiles(samples) {
   const ordered = [...samples].sort((a, b) => a - b);
-  return { P50: ordered[Math.ceil(ordered.length * .5) - 1], P95: ordered[Math.ceil(ordered.length * .95) - 1] };
+  return { P50: ordered[Math.ceil(ordered.length * .5) - 1], P95: ordered[Math.ceil(ordered.length * .95) - 1],
+    P99: ordered[Math.ceil(ordered.length * .99) - 1] };
 }
 function filesSize(root) {
   return fs.readdirSync(root, { recursive: true }).filter(name => name.endsWith(".usearch"))
@@ -84,17 +85,25 @@ export async function runKnowledgeVectorBenchmark({ sizes = [10_000, 100_000], r
           assert.equal(approximate.vectorBackend, "hnsw", `warm search fell back: ${approximate.degradedReasons}`);
           assert.equal(exact.length, TOP_K); assert.equal(approximate.results.length, TOP_K);
           const ids = new Set(exact.map(result => result.chunkId));
+          // 固定小章节只允许读取这组片段，记录补查耗时并复核返回身份没有越界。
+          const sectionChunkIds = Array.from({ length: Math.min(size, 64) }, (_, index) => `chunk-${index}`);
+          const sectionStart = performance.now();
+          const sectionResults = portable.search({ ...input(query), chunkIds: sectionChunkIds });
+          const sectionExactMs = performance.now() - sectionStart;
+          assert.ok(sectionResults.every(result => sectionChunkIds.includes(result.chunkId)));
           const overlap = approximate.results.filter(result => ids.has(result.chunkId)).length / TOP_K;
-          samples.push({ exactMs, hnswMs, overlap });
+          samples.push({ exactMs, hnswMs, overlap, sectionExactMs });
         }
         const exactMs = percentiles(samples.map(sample => sample.exactMs));
         const hnswMs = percentiles(samples.map(sample => sample.hnswMs));
         results.push({ size, indexBuildMs, indexFileBytes, coldLoadMs: percentiles(cold), coldSamplesMs: cold,
-          exactMs, hnswMs, warmSearchMs: hnswMs, speedupP95: exactMs.P95 / hnswMs.P95,
+          exactMs, hnswMs, sectionExactMs: percentiles(samples.map(sample => sample.sectionExactMs)), sectionChunkCount: Math.min(size, 64),
+          warmSearchMs: hnswMs, speedupP95: exactMs.P95 / hnswMs.P95,
           topKOverlap: samples.reduce((total, sample) => total + sample.overlap, 0) / samples.length, samples });
       } finally { if (backend) await backend.close(); portable.close(); }
     }
-    const report = { schemaVersion: 1, seed: SEED, dimensions: DIMENSIONS, latentDimensions: LATENT_DIMENSIONS, topK: TOP_K,
+    const report = { schemaVersion: 2, seed: SEED, dimensions: DIMENSIONS, latentDimensions: LATENT_DIMENSIONS, topK: TOP_K,
+      cpu: os.cpus()[0]?.model ?? null, memoryBytes: os.totalmem(), osRelease: os.release(),
       dataset: "fixed uniform latent vectors projected and normalized; independent queries; synthetic, not provider embeddings",
       coldDefinition: "new backend and first native graph load plus query; portable DB stays open; OS cache is not flushed",
       platform: process.platform, arch: process.arch, node: process.version, generatedAt: new Date().toISOString(),

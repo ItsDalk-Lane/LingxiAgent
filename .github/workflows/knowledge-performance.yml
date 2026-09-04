@@ -13,6 +13,7 @@ jobs:
           node-version: "24.15.0"
           cache: npm
       - run: npm ci
+      - run: npm run build:packages
       - name: Run stable-runner performance gates
         env:
           LINGXI_ENFORCE_KNOWLEDGE_PERF: "1"
@@ -21,6 +22,8 @@ jobs:
         env:
           LINGXI_ENFORCE_KNOWLEDGE_PERF: "1"
         run: node scripts/benchmark-knowledge-vector.mjs --output=artifacts/knowledge-vector-benchmark.json
+      - name: Run research quality and observable synthesis benchmark
+        run: node scripts/benchmark-knowledge-research.mjs --output=artifacts/knowledge-research-benchmark.json
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -28,4 +31,5 @@ jobs:
           path: |
             artifacts/knowledge-fast-benchmark.json
             artifacts/knowledge-vector-benchmark.json
+            artifacts/knowledge-research-benchmark.json
           if-no-files-found: error

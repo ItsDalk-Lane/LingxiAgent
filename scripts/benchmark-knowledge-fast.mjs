@@ -5,7 +5,7 @@ import { performance } from "node:perf_hooks";
 import crypto from "node:crypto";
 import { pathToFileURL } from "node:url";
 import { KnowledgeManager } from "../lib/knowledge/knowledge-manager.ts";
-import { estimateTextTokens } from "../lib/llm/estimate-text-tokens.ts";
+import { resolveKnowledgeChunkerConfig } from "../lib/knowledge/chunker.ts";
 
 const STUDIO = "benchmark-studio";
 const QUERIES = ["发布审批", "release.config.json", "20260903", "AuroraQuokka", "Risk Controls", "第七章"];
@@ -31,14 +31,14 @@ async function seed(manager, size) {
   manager.store.completeParseArtifact({ studioId: STUDIO, parseArtifactId: artifact.id, status: "ready", warnings: [],
     semanticArtifactPath: `artifacts/${artifact.id}.json`, blocks: texts.map((text, ordinal) => ({ ordinal, text,
       locatorType: "text", locator: { headingPath: [`章节 ${ordinal % 97}`] } })) });
-  // 固定种子用一段原文对应一个索引块，保证精确的规模；查询全程使用真实数据库和生产管线。
+  // 每段独立章节，真实 v3 分块仍恰好一段一片；同时建立实际来源/章节投影。
   const blocks = manager.store.listArtifactBlocks({ studioId: STUDIO, parseArtifactId: artifact.id });
-  const { chunkProfile } = manager.store.resolveNotebookRetrievalProfile({ studioId: STUDIO, notebookId: notebook.id, strategy: "text" });
-  manager.indexStore.replaceArtifactChunks({ parseArtifactId: artifact.id, chunkProfileHash: chunkProfile.profileHash,
-    blockFingerprint: crypto.createHash("sha256").update(texts.join("\n")).digest("hex"),
-    chunks: blocks.map(block => ({ id: `bench_chunk_${block.ordinal}`, parseArtifactId: artifact.id, ordinal: block.ordinal,
-      text: block.text, tokenCount: estimateTextTokens(block.text), spans: [{ blockId: block.id, blockStartOffset: 0,
-        blockEndOffset: block.text.length, chunkStartOffset: 0, chunkEndOffset: block.text.length }] })) });
+  const config = resolveKnowledgeChunkerConfig(blocks);
+  manager.store.resolveNotebookRetrievalProfile({ studioId: STUDIO, notebookId: notebook.id, strategy: config.strategy });
+  const indexed = manager.queryService.indexArtifactForIngestion(STUDIO, artifact.id);
+  if (manager.indexStore.getReadyVariantMetadata({ parseArtifactId: artifact.id, chunkProfileHash: indexed.chunkerConfigId })?.chunkCount !== size) {
+    throw new Error("基准生产索引片段数量与固定规模不符");
+  }
   return notebook.id;
 }
 
@@ -63,7 +63,8 @@ async function measure(manager, frozenScope, runs) {
   for (let index = 0; index < runs; index++) {
     const result = await manager.runFastKnowledgePipeline({ question: QUERIES[index % QUERIES.length], scope: frozenScope });
     samples.push({ ...result.timings, remoteModelCalls: result.stats.remoteModelCalls,
-      returnedSpans: result.stats.injectedChunks, usedTokens: result.stats.usedTokens });
+      returnedSpans: result.stats.injectedChunks, usedTokens: result.stats.usedTokens,
+      retrievalResultCacheHit: result.stats.retrievalResultCacheHit === true });
   }
   return { samples, percentiles: summarize(samples), remoteModelCalls: Math.max(...samples.map(x => x.remoteModelCalls)),
     returnedSpans: Math.max(...samples.map(x => x.returnedSpans)), usedTokens: Math.max(...samples.map(x => x.usedTokens)) };
@@ -100,7 +101,8 @@ export async function runKnowledgeFastBenchmark({ sizes = [10_000, 100_000], hot
         returnedSpans: Math.max(...coldSamples.map(x => x.returnedSpans)), usedTokens: Math.max(...coldSamples.map(x => x.usedTokens)) };
       results.push({ size, hot, cold });
     }
-    const report = { schemaVersion: 1, seed: "lingxi-knowledge-fast-v1", platform: process.platform,
+    const report = { schemaVersion: 2, seed: "lingxi-knowledge-fast-v2-real-three-grain-index", platform: process.platform,
+      cpu: os.cpus()[0]?.model ?? null, memoryBytes: os.totalmem(), osRelease: os.release(),
       arch: process.arch, node: process.version, generatedAt: new Date().toISOString(), coldDefinition: "fresh manager, databases, frozen scope and first query; OS page cache is not flushed", results };
     // 即使门禁失败也保留原始测量，供远程工作流上传核查。
     if (outputPath) { fs.mkdirSync(path.dirname(outputPath), { recursive: true }); fs.writeFileSync(outputPath, `${JSON.stringify(report, null, 2)}\n`); }
