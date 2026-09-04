@@ -441,6 +441,14 @@ jobs:
         if: runner.os != 'Linux'
         run: node scripts/smoke-packaged-desktop.mjs
 
+      # 解包目录尚未经过系统安装器，启动前补齐 Chromium 沙箱辅助程序所需的属主和权限。
+      - name: Prepare Linux packaged desktop sandbox
+        if: runner.os == 'Linux'
+        run: |
+          sudo chown root:root dist/linux-unpacked/chrome-sandbox
+          sudo chmod 4755 dist/linux-unpacked/chrome-sandbox
+          test "$(stat -c '%u:%g:%a' dist/linux-unpacked/chrome-sandbox)" = '0:0:4755'
+
       - name: Smoke packaged desktop startup (Linux virtual display)
         if: runner.os == 'Linux'
         run: xvfb-run -a node scripts/smoke-packaged-desktop.mjs

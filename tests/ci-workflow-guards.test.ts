@@ -316,6 +316,13 @@ describe('打包桌面真实启动接线', () => {
     expect(launch).toHaveLength(2);
     expect(launch.find(step => step.if === "runner.os != 'Linux'")?.run).toBe('node scripts/smoke-packaged-desktop.mjs');
     expect(launch.find(step => step.if === "runner.os == 'Linux'")?.run).toBe('xvfb-run -a node scripts/smoke-packaged-desktop.mjs');
+    const sandbox = steps.find(step => step.name === 'Prepare Linux packaged desktop sandbox');
+    expect(sandbox?.if).toBe("runner.os == 'Linux'");
+    expect(stepRun(sandbox!)).toContain('sudo chown root:root dist/linux-unpacked/chrome-sandbox');
+    expect(stepRun(sandbox!)).toContain('sudo chmod 4755 dist/linux-unpacked/chrome-sandbox');
+    expect(stepRun(sandbox!)).toContain("= '0:0:4755'");
+    expect(steps.indexOf(sandbox!)).toBeLessThan(steps.indexOf(launch.find(step => step.if === "runner.os == 'Linux'")!));
+    expect(launch.every(step => !stepRun(step).includes('--no-sandbox'))).toBe(true);
     const upload = steps.find(step => step.name === 'Upload packaged desktop startup evidence');
     expect(upload?.if).toBe('always()');
     expect(upload?.with).toMatchObject({ 'if-no-files-found': 'error' });

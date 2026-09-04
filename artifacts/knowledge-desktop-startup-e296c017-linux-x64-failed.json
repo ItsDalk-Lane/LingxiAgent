@@ -1,0 +1,12 @@
+{
+  "platform": "linux",
+  "arch": "x64",
+  "startedAt": "2026-09-04T08:01:54.197Z",
+  "status": "failed",
+  "packaged": false,
+  "rendererReady": false,
+  "serverReady": false,
+  "error": "Packaged desktop terminated before readiness: [3725:0904/080154.543632:FATAL:sandbox/linux/suid/client/setuid_sandbox_host.cc:166] The SUID sandbox helper binary was found, but is not configured correctly. Rather than run without sandboxing I'm aborting now. You need to make sure that /home/runner/work/LingxiAgent/LingxiAgent/dist/linux-unpacked/chrome-sandbox is owned by root and has mode 4755.\n\n\n'SIGTRAP' !== null\n",
+  "durationMs": 605.867743,
+  "finishedAt": "2026-09-04T08:01:54.805Z"
+}
