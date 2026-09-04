@@ -21694,8 +21694,8 @@
   },
   {
     "file": "tests/packaged-desktop-cleanup.test.ts",
-    "describeCount": 1,
-    "itCount": 4,
+    "describeCount": 2,
+    "itCount": 9,
     "testCount": 0,
     "issueRefs": [],
     "category": "build",
@@ -21724,6 +21724,8 @@
     "imports": [
       "node:fs",
       "node:vm",
+      "node:path",
+      "node:assert/strict",
       "vitest"
     ]
   },

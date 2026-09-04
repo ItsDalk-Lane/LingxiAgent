@@ -48,7 +48,16 @@ async function inspectRenderer() {
   if (!fs.existsSync(active)) return null;
   const port = Number(fs.readFileSync(active, "utf8").split("\n")[0]);
   if (!Number.isSafeInteger(port) || port <= 0) return null;
-  const pages = await (await fetch(`http://127.0.0.1:${port}/json/list`, { signal: AbortSignal.timeout(2000) })).json();
+  let response;
+  try {
+    response = await fetch(`http://127.0.0.1:${port}/json/list`, { signal: AbortSignal.timeout(2000) });
+  } catch (error) {
+    // 调试端口文件可能先于 HTTP 服务就绪；单次探测超时继续受外层原有启动期限约束。
+    if (error?.name !== "TimeoutError") throw error;
+    report.rendererProbeTimeouts = (report.rendererProbeTimeouts ?? 0) + 1;
+    return null;
+  }
+  const pages = await response.json();
   const page = pages.find(page => page.type === "page" && /\/(onboarding|index)\.html/.test(page.url));
   if (!page) return null;
   const socket = new globalThis.WebSocket(page.webSocketDebuggerUrl);
