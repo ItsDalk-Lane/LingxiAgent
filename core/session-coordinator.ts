@@ -8,7 +8,7 @@
 import fs from "fs";
 import fsp from "fs/promises";
 import path from "path";
-import { createAgentSession, SessionManager, estimateTokens, refreshSessionModelFromRegistry } from "../lib/pi-sdk/index.ts";
+import { createAgentSession, createExtensionRuntime, SessionManager, estimateTokens, refreshSessionModelFromRegistry, type LoadExtensionsResult } from "../lib/pi-sdk/index.ts";
 import { registerSessionModelCallContext } from "../lib/pi-sdk/model-call-stream-observer.ts";
 import { runWithModelTraceRoot } from "../lib/llm/model-trace-scope.ts";
 import {
@@ -8243,7 +8243,9 @@ export class SessionCoordinator {
       };
       if (researchSurface) {
         // 研究只使用固定知识工具，扩展和技能不能在运行时重新塞入文件、网络或记忆工具。
-        execResourceLoaderProps.getExtensions = { value: () => ({ extensions: [], errors: [] }) };
+        // 即使没有扩展也要绑定运行接口；每个会话独立创建，多次读取保留同一个载体。
+        const extensionsResult: LoadExtensionsResult = { extensions: [], errors: [], runtime: createExtensionRuntime() };
+        execResourceLoaderProps.getExtensions = { value: () => extensionsResult };
         execResourceLoaderProps.getSkills = { value: () => ({ skills: [], diagnostics: [] }) };
         execResourceLoaderProps.getAgentsFiles = { value: () => ({ agentsFiles: [] }) };
       } else if (targetAgent !== agent) {

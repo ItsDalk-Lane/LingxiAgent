@@ -4,7 +4,7 @@ import path from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 const { createAgentSessionMock } = vi.hoisted(() => ({ createAgentSessionMock: vi.fn() }));
-// 只替换模型运行边界；会话文件、登记库、隔离装配与释放流程都走生产实现。
+// 本文件替换 SDK 会话，验证装配参数与生命周期；真实组装见 knowledge-research-runtime-assembly.test.ts。
 vi.mock("../lib/pi-sdk/index.ts", async importOriginal => ({
   ...await importOriginal<Record<string, unknown>>(), createAgentSession: createAgentSessionMock,
 }));
@@ -99,7 +99,7 @@ function setup() {
   fixtures.push(fixture); return fixture;
 }
 
-describe("研究隔离会话真实装配与生命周期", () => {
+describe("研究隔离会话装配参数与生命周期", () => {
   it("完整性Worker仅装配两个专用工具，真实Root父身份和分片写入登记库，权限被固定为只读", async () => {
     const f = setup(), parent = f.rootParent();
     const completeness = { internalText: "禁止写入登记库的宿主正文" };
@@ -107,7 +107,8 @@ describe("研究隔离会话真实装配与生命周期", () => {
       expect(options.tools).toEqual([]);
       expect(options.customTools.map(tool => tool.name)).toEqual(["knowledge_coverage_read", "knowledge_completeness_mark"]);
       await options.customTools[0].execute();
-      expect(options.resourceLoader.getExtensions()).toEqual({ extensions: [], errors: [] });
+      expect(options.resourceLoader.getExtensions()).toEqual({ extensions: [], errors: [],
+        runtime: expect.objectContaining({ sendMessage: expect.any(Function) }) });
       expect(options.resourceLoader.getSkills()).toEqual({ skills: [], diagnostics: [] });
       expect(options.resourceLoader.getAgentsFiles()).toEqual({ agentsFiles: [] });
     };
@@ -179,7 +180,8 @@ describe("研究隔离会话真实装配与生命周期", () => {
       await options.customTools.find(tool => tool.name === "knowledge_search").execute();
       expect(options.resourceLoader.getSystemPrompt()).toBe("研究系统提示");
       expect(options.resourceLoader.getAppendSystemPrompt()).toEqual([]);
-      expect(options.resourceLoader.getExtensions()).toEqual({ extensions: [], errors: [] });
+      expect(options.resourceLoader.getExtensions()).toEqual({ extensions: [], errors: [],
+        runtime: expect.objectContaining({ sendMessage: expect.any(Function) }) });
       expect(options.resourceLoader.getSkills()).toEqual({ skills: [], diagnostics: [] });
       expect(options.resourceLoader.getAgentsFiles()).toEqual({ agentsFiles: [] });
     };

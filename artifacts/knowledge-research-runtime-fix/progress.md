@@ -1,0 +1,23 @@
+# 验证进度
+
+- 已确认当前分支、干净的已跟踪工作区与问题代码位置。
+- 已启动两个独立只读核验：真实依赖契约、原测试覆盖缺口。
+- 旧测试对照：未修复的代码上，`npx vitest run tests/knowledge-research-surface.test.ts --reporter=dot` 仍然 18/18 通过，exit 0，1.72s；日志 `/tmp/lingxi-research-runtime-old-surface.log`。
+- 真实组装红测：三个研究入口均失败，普通隔离会话通过（3 FAIL / 1 PASS），exit 1，1.35s；日志 `/tmp/lingxi-research-runtime-red.log`。错误均为 `Cannot set properties of undefined (setting 'sendMessage')`。
+- 已修复门面导出与生产组装，并纠正旧测试错误预期。每会话独立创建载体、重复读取稳定返回；额外加入跨会话载体独立性测试。
+- 修复后 `npx vitest run tests/knowledge-research-runtime-assembly.test.ts tests/knowledge-research-surface.test.ts --reporter=dot`：23 PASS / 0 FAIL，exit 0，1.40s；日志 `/tmp/lingxi-research-runtime-green.log`。
+- 新回归经过真实协调器、SDK、临时登记库、模型提示和释放；只替换模型返回流，未访问真实模型。普通隔离会话、扩展/技能隔离、固定只读工具和临时文件清理均通过。
+- 兼容性审查：只改变进程内会话组装，没有修改数据库、会话文件字段、数据代际或迁移策略。会话协调器属于持久化指纹受保护源，按原规则生成兼容指纹，不能免除门禁。
+- 前两次类型检查均 exit 2：新回归夹具的扩展返回值缺 `details`，技能夹具沿用旧 `source` 字段，随后补齐当前依赖要求的 `sourceInfo`。已按真实依赖类型修正，最终重跑通过；未放宽类型规则或测试。
+- 相关回归 9 文件 / 119 项通过，exit 0，3.74s；覆盖隔离中止、工具名单、门面适配、详细模式入口、多轮研究和持久化指纹。日志 `/tmp/lingxi-research-runtime-regression.log`。
+- 持久化扫描与兼容指纹生成通过；新指纹 `sha256:01923b378ab07195c438fed0cb0fc356da0c4061c7d2e270a8946c97e4875cc0`，除审查说明和总摘要外，只有会话协调器源码摘要改变。持久化检查、开放边界检查通过，运行闭包重新生成后没有差异。
+- 全仓 lint exit 0；新增测试的三处宽泛类型已移除，新增测试单文件 lint 0 错误、0 警告。
+- 最终三套类型检查 `npm run typecheck` exit 0，日志 `/tmp/lingxi-research-runtime-typecheck-final.log`。
+- 全量 `npm test -- --reporter=dot --reporter=json --outputFile=/tmp/lingxi-research-runtime-full.json` exit 0：1358 文件通过、1 既有文件跳过；13756 PASS / 0 FAIL / 7 既有 SKIP，82.74s。日志 `/tmp/lingxi-research-runtime-full.log`；没有删除、跳过或放宽测试。
+- 首次 `npm run pack` exit 1：所有客户端与服务端编译完成，打包种子阶段发现当前环境未配置 `LINGXI_SIGN_KEY`。原错误保留 `/tmp/lingxi-research-runtime-pack.log`。按项目工具明确支持的本机验证方式生成一次性密钥对及匹配公钥集，再运行同一打包门禁；不生成无签名包、不修改正式公钥或发布配置。
+- 第二次打包已完成签名种子、验签与应用组装，但在 Apple 公证处因未配置账号密码 exit 1；日志 `/tmp/lingxi-research-runtime-pack-signed.log`。一次性私钥已随临时目录清理。继续使用项目已有的本机打包开关完成目录包，明确不将其计为正式公证或跨平台发布验证。
+- `SKIP_NOTARIZE=true npx electron-builder --dir` 在下载 Electron 时发生 TLS 连接中断，exit 1（`/tmp/lingxi-research-runtime-pack-local.log`）。本机已安装同版本 Electron 42.8.1，改用打包工具正式支持的 `--config.electronDist=node_modules/electron/dist` 完成目录包，未改变依赖版本或修改仓库打包逻辑。
+- 最终全仓 lint exit 0：0 错误、9190 既有警告，日志 `/tmp/lingxi-research-runtime-lint-final.log`。
+- 本机目录包完成：`SKIP_NOTARIZE=true npx electron-builder --dir --config.electronDist=node_modules/electron/dist` exit 0，签名校验通过，日志 `/tmp/lingxi-research-runtime-pack-cached.log`。产物 `dist/mac-arm64/Lingxi.app`。客户端与服务端编译、原生依赖检查、一次性签名种子和种子验签已在前一步通过，原失败退出码完整保留。
+- 本次是 macOS arm64 本机验证，不是正式公证或新的四平台发布验证；此前四平台报告仍对应其原提交。源码、依赖版本、正式公钥和发布设置未因环境排障而改变。
+- 结论：用户分析的核心根因成立，真实组装红绿回归与全量通过。没有修改用户知识库或已失败的研究记录；正在运行的开发应用需重启才能加载新的服务端代码，之后重新发起一轮详细提问。

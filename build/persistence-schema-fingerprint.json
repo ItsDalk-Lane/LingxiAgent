@@ -660,7 +660,7 @@
     ],
     "version": 3
   },
-  "payloadFingerprint": "sha256:5260947940c35b5db4f8dbe69b82fed4345c51ac7a37d62546bbef2fcee9d794",
+  "payloadFingerprint": "sha256:01923b378ab07195c438fed0cb0fc356da0c4061c7d2e270a8946c97e4875cc0",
   "registry": [
     {
       "affectedByEpochMigration": true,
@@ -3292,8 +3292,8 @@
   ],
   "review": {
     "classification": "compatible",
-    "compatibilityReason": "P3-07 启动页时序修复只改变 desktop/main.cjs 的代码指纹；窗口边界、公告书签和更新版本标记读写契约未变，knowledge v19、FTS v4、ANN v1 与付费向量 BLOB 不变。",
-    "payloadFingerprint": "sha256:5260947940c35b5db4f8dbe69b82fed4345c51ac7a37d62546bbef2fcee9d794"
+    "compatibilityReason": "研究隔离会话通过公开工厂补齐独立的空扩展运行载体；只改变内存组装，不改变会话文件字段、数据库结构、数据代际或迁移策略。",
+    "payloadFingerprint": "sha256:01923b378ab07195c438fed0cb0fc356da0c4061c7d2e270a8946c97e4875cc0"
   },
   "schemas": [
     {
@@ -4306,7 +4306,7 @@
         {
           "contract": "core/session-coordinator.ts Hana metadata extensions",
           "module": "core/session-coordinator.ts",
-          "sourceHash": "sha256:66a202d4991c68cb78b4e693be4111ac82d2b16b154f828a46eabcec83aa8323"
+          "sourceHash": "sha256:55e9a77a3b348c75a637cdec2cf7fb24c057807ac619d326d960ba8f4593d24c"
         },
         {
           "contract": "core/session-jsonl-file.ts repair contract",
