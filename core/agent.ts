@@ -45,6 +45,7 @@ import { createCheckDeferredTool } from "../lib/tools/check-deferred-tool.ts";
 import { createLoopControlTool } from "../lib/tools/loop-control-tool.ts";
 import { createStopTaskTool } from "../lib/tools/stop-task-tool.ts";
 import { createCurrentStatusTool } from "../lib/tools/current-status-tool.ts";
+import { createKnowledgeSearchTool } from "../lib/tools/knowledge-search-tool.ts";
 import { createKnowledgeReadTool } from "../lib/tools/knowledge-read-tool.ts";
 import { createKnowledgeOutlineTool } from "../lib/tools/knowledge-outline-tool.ts";
 import { createKnowledgeGrepTool } from "../lib/tools/knowledge-grep-tool.ts";
@@ -115,6 +116,7 @@ export class Agent {
   declare _config: any;
   declare _cronStore: any;
   declare _currentStatusTool: any;
+  declare _knowledgeSearchTool: any;
   declare _knowledgeReadTool: any;
   declare _knowledgeOutlineTool: any;
   declare _knowledgeGrepTool: any;
@@ -255,6 +257,7 @@ export class Agent {
     this._sessionTool = null;
     this._workflowTool = null;
     this._currentStatusTool = null;
+    this._knowledgeSearchTool = null;
     this._knowledgeReadTool = null;
     this._knowledgeOutlineTool = null;
     this._knowledgeGrepTool = null;
@@ -684,6 +687,11 @@ export class Agent {
     // knowledge_read：读知识库源分片。直连 engine 级 KnowledgeManager（跨会话），
     // 供 [KnowledgeContext] 超预算时模型派出的子 Agent 并行读片；只读 + studio 隔离。
     // Phase 4（KnowledgeTurnScope，任务书 §二十~§二十二）。
+    this._knowledgeSearchTool = createKnowledgeSearchTool({
+      getKnowledge: () => this._cb?.getEngine?.()?.knowledge || null,
+      getStudioId: () => this._cb?.getEngine?.()?.runtimeContext?.studioId || null,
+      resolveSessionContext: resolveKnowledgeSessionContext,
+    });
     this._knowledgeReadTool = createKnowledgeReadTool({
       getKnowledge: () => this._cb?.getEngine?.()?.knowledge || null,
       getStudioId: () => this._cb?.getEngine?.()?.runtimeContext?.studioId || null,
@@ -1096,6 +1104,7 @@ export class Agent {
       this._checkDeferredTool,
       this._loopControlTool,
       this._currentStatusTool,
+      this._knowledgeSearchTool,
       this._knowledgeReadTool,
       this._knowledgeOutlineTool,
       this._knowledgeGrepTool,

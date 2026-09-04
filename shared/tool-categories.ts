@@ -48,6 +48,7 @@ export const STANDARD_TOOL_NAMES = [
   "hana_card_guide",
   "show_card",
   "loop_control",
+  "knowledge_search",
   "knowledge_read",
   "knowledge_outline",
   "knowledge_grep",

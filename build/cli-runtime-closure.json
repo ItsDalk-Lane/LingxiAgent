@@ -6374,6 +6374,11 @@
         },
         {
           "root": "server-bootstrap",
+          "from": "lib/tools/knowledge-search-tool.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
           "from": "lib/tools/knowledge-read-tool.ts",
           "kind": "import-statement"
         },
@@ -6498,7 +6503,7 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by lib/tools/knowledge-scope.ts (import-statement); lib/tools/knowledge-read-tool.ts (import-statement); lib/knowledge/knowledge-coverage-unit.ts (import-statement); +23 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by lib/tools/knowledge-scope.ts (import-statement); lib/tools/knowledge-search-tool.ts (import-statement); lib/tools/knowledge-read-tool.ts (import-statement); +24 more importer(s)."
     },
     {
       "path": "lib/knowledge/evidence-packer.ts",
@@ -8906,6 +8911,11 @@
         },
         {
           "root": "server-bootstrap",
+          "from": "lib/tools/knowledge-search-tool.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
           "from": "lib/tools/knowledge-read-tool.ts",
           "kind": "import-statement"
         },
@@ -9030,7 +9040,7 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by core/compaction-utils.ts (import-statement); lib/llm/cache-preserving-compaction-agent-run.ts (import-statement); core/session-compactor.ts (import-statement); +56 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by core/compaction-utils.ts (import-statement); lib/llm/cache-preserving-compaction-agent-run.ts (import-statement); core/session-compactor.ts (import-statement); +57 more importer(s)."
     },
     {
       "path": "lib/pi-sdk/model-call-stream-observer.ts",
@@ -11432,6 +11442,11 @@
       "provenance": [
         {
           "root": "server-bootstrap",
+          "from": "lib/tools/knowledge-search-tool.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
           "from": "lib/tools/knowledge-read-tool.ts",
           "kind": "import-statement"
         },
@@ -11446,7 +11461,19 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by lib/tools/knowledge-read-tool.ts (import-statement); lib/tools/knowledge-outline-tool.ts (import-statement); lib/tools/knowledge-grep-tool.ts (import-statement)."
+      "reason": "Reached via esbuild source module graph, imported by lib/tools/knowledge-search-tool.ts (import-statement); lib/tools/knowledge-read-tool.ts (import-statement); lib/tools/knowledge-outline-tool.ts (import-statement); +1 more importer(s)."
+    },
+    {
+      "path": "lib/tools/knowledge-search-tool.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "core/agent.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by core/agent.ts (import-statement)."
     },
     {
       "path": "lib/tools/loop-control-tool.ts",
@@ -11745,6 +11772,11 @@
         },
         {
           "root": "server-bootstrap",
+          "from": "lib/tools/knowledge-search-tool.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
           "from": "lib/tools/knowledge-read-tool.ts",
           "kind": "import-statement"
         },
@@ -11789,7 +11821,7 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by lib/tools/browser-tool.ts (import-statement); lib/tools/computer-use-tool.ts (import-statement); lib/tools/session-folders-tool.ts (import-statement); +10 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by lib/tools/browser-tool.ts (import-statement); lib/tools/computer-use-tool.ts (import-statement); lib/tools/session-folders-tool.ts (import-statement); +11 more importer(s)."
     },
     {
       "path": "lib/tools/tool-session.ts",
@@ -125285,9 +125317,9 @@
     }
   ],
   "stats": {
-    "totalFiles": 10667,
+    "totalFiles": 10668,
     "byInputType": {
-      "source-graph": 767,
+      "source-graph": 768,
       "runtime-asset": 11,
       "nft-runtime-trace": 9889
     }

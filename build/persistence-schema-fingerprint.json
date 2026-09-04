@@ -3292,7 +3292,7 @@
   ],
   "review": {
     "classification": "compatible",
-    "compatibilityReason": "P1-05 adds a separate rebuildable ANN v1 catalog and HNSW files; portable vector v3 BLOBs and all existing Knowledge facts remain intact, ANN failures fall back to exact search and rebuild only ANN projections.",
+    "compatibilityReason": "P1-06 registers the bounded read-only knowledge_search tool and reuses frozen scope validation; no persistent schema or existing data identity changes.",
     "payloadFingerprint": "sha256:8e8d4219d971582c186cdb036538eaf5bc398007ace614de290e4802e7da0077"
   },
   "schemas": [

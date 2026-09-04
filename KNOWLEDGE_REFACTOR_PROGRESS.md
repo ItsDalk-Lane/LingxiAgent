@@ -10,7 +10,7 @@
 - 严格按 P0 → P1 → P2 → P3 及编号顺序；阶段门禁全部通过才进入下一阶段。
 - 每项记录测试原始结果后提交；不删除、跳过或放宽测试，不合并 main。
 - 现有任务书为用户未跟踪文件，既有规划文档与 BLOCKED.md 历史记录保留。
-- 当前断点：P1-05 已完成 HNSW 后端、故障回退和本项验证，随本次提交落地，接着执行 P1-06。P0 源码提交 `5c016df183ad207cf1ca33de274abb7a4eb10057`，阶段审计提交 `f9928d76`；全量 13002 PASS / 0 FAIL / 7 既有 SKIP。用户已授权每阶段验证后同步审计记录，保留最终封印。
+- 当前断点：P1-06 已完成只读知识搜索工具和本项验证，随本次提交落地，接着执行 P1-07。P0 源码提交 `5c016df183ad207cf1ca33de274abb7a4eb10057`，阶段审计提交 `f9928d76`；全量 13002 PASS / 0 FAIL / 7 既有 SKIP。用户已授权每阶段验证后同步审计记录，保留最终封印。
 - 进度、计划与事实集中在本文件和基线文档，避免覆盖既有 task_plan.md / findings.md / PROGRESS.md。
 - 目标工具已确认本任务存在 active goal；重复 create_goal 被拒绝，沿用现有目标。
 - 规划恢复脚本返回其他会话的无关配置记录，经 git diff 为空核对，未采用其内容。
@@ -20,7 +20,7 @@
 | 阶段 | 状态 | 结果 |
 | --- | --- | --- |
 | P0 | completed | 2026-09-04 全量 13002 PASS / 0 FAIL / 7 既有 SKIP，76.42s；全部 P0 门禁通过，审计提交 f9928d76 |
-| P1 | in_progress | P1-01 至 P1-05 本项验证通过；阶段门禁尚未执行 |
+| P1 | in_progress | P1-01 至 P1-06 本项验证通过；阶段门禁尚未执行 |
 | P2 | pending | NOT_EXECUTED |
 | P3 | pending | NOT_EXECUTED |
 
@@ -171,16 +171,19 @@
 - 修复记录：首轮损坏文件触发原生读取器进程异常退出（5 文件/8 测试通过，1 unhandled error，不能视为通过）；依据锁定版本源码补齐加载前尺寸、文件头、图层、键及邻居边界校验，保留原测试并新增深层结构损坏样本，重跑全部通过。初次持久化扫描发现新增目录库 database-open 未登记，补齐具体模块所有权后通过；未改门禁或放宽断言。
 - 生成物：66 个持久化存储/779 个写入点登记；CLI 闭包 10667 文件，原 1 条边界债务不变；兼容指纹 `sha256:8e8d4219d971582c186cdb036538eaf5bc398007ace614de290e4802e7da0077`。本项只确认本机原生扩展，四平台原生打包/运行与 100k 性能门禁按 P1-08 执行，当前不得标成已通过。
 - 日志：`/tmp/lingxi-knowledge-p105-tests-{first,second,regression,final}.log`、`/tmp/lingxi-knowledge-p105-persistence-tests.log`、`/tmp/lingxi-knowledge-p105-typecheck-final.log`、`/tmp/lingxi-knowledge-p105-lint-final.log`、`/tmp/lingxi-knowledge-p105-{boundary,inventory-r2,closure,fingerprint,fingerprint-check}.log`。
-- 对应 commit SHA：本次提交，下项回填。
+- 对应 commit SHA：`4c6189e4`。
 - 偏差：none
 
-## P1-06：新增第一等 `knowledge_search` 工具
+## P1-06：新增第一等 knowledge_search 工具
 
-- 状态：pending
-- 改动文件：尚未开始
-- 测试命令：按任务书该项测试执行，尚未执行
-- 测试结果：NOT_EXECUTED
-- 对应 commit SHA：尚未提交
+- 状态：completed
+- 改动：新增任务书固定参数的只读搜索工具；query 1～4000 字符、limit 默认 12/上限 24、channel 默认 hybrid。运行时取得 studioId；拒绝模型传入归属参数；复用 knowledge-scope 校验会话和父会话，过滤条件全部经统一搜索服务复核。结果只有候选与定位摘要，明确要求必须经过 knowledge_read/knowledge_grep 才能引用，candidateId 不是证据 ID。
+- 接线：加入 Agent 共用工具快照和 STANDARD 分类（后续 P2 研究会话从该工具面选取只读集合）；复用既有同名合成检索卡的三相位文案，调整名单归类并补齐五语言知识库失败表述，不重复注册工具名。FTS 禁止重排，取消信号沿统一服务传递。
+- 测试命令：任务书三个 search-tool 文件，加 tool-label-coverage / knowledge-agent-tools / tool-categories / tool-categorization-smoke / agent-tools-conditional-injection / subagent-tool-policy；三套类型检查、修改文件 ESLint、边界检查、CLI 闭包及持久化指纹生成检查。
+- 结果：9 文件 / 92 测试通过（2.17s，exit 0）；类型检查 exit 0；ESLint 0 error / 88 warning，exit 0；边界检查 exit 0。未知/关闭/跨工作室/跨会话范围拒绝、真实父范围继承、混合越权过滤整单拒绝、模型归属伪造拒绝、各权限档只读放行、长问题和非法数量拒绝、默认 12/最大 24 候选及既有 1200 字符摘要上限全部通过。
+- 生成物：CLI 闭包 10668 文件，原 1 条边界债务不变；持久化指纹保持 `sha256:8e8d4219d971582c186cdb036538eaf5bc398007ace614de290e4802e7da0077`，检查通过；没有数据表变化。
+- 日志：`/tmp/lingxi-knowledge-p106-tests-{first,final}.log`、`/tmp/lingxi-knowledge-p106-typecheck.log`、`/tmp/lingxi-knowledge-p106-lint.log`、`/tmp/lingxi-knowledge-p106-{boundary,closure,fingerprint,fingerprint-check}.log`。
+- 对应 commit SHA：本次提交，下项回填。
 - 偏差：none
 
 ## P1-07：让现有工具复用统一数据面
