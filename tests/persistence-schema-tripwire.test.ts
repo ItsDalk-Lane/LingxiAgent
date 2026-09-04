@@ -88,7 +88,7 @@ describe("persistence schema tripwire", () => {
     expect(knowledge).toMatchObject({
       kind: "sqlite-runtime",
       module: "lib/knowledge/knowledge-store.ts",
-      runtimeSchema: { userVersion: 17 },
+      runtimeSchema: { userVersion: 18 },
     });
     expect(knowledge.runtimeSchema.objects.some((entry) => entry.name === "notebooks")).toBe(true);
     expect(knowledge.runtimeSchema.objects.some((entry) => entry.name === "ingestion_jobs")).toBe(true);
@@ -96,6 +96,13 @@ describe("persistence schema tripwire", () => {
     expect(knowledge.runtimeSchema.objects.some((entry) => entry.name === "retrieval_profiles")).toBe(true);
     expect(knowledge.runtimeSchema.objects.some((entry) => entry.name === "knowledge_turn_scopes")).toBe(true);
     expect(knowledge.runtimeSchema.objects.some((entry) => entry.name === "knowledge_turn_scope_sources")).toBe(true);
+    for (const table of [
+      "knowledge_research_runs", "knowledge_evidence_needs", "knowledge_research_rounds",
+      "knowledge_research_read_receipts", "knowledge_evidence_items", "knowledge_need_evidence",
+      "knowledge_research_actions",
+    ]) {
+      expect(knowledge.runtimeSchema.objects.some((entry) => entry.name === table), table).toBe(true);
+    }
     expect(knowledge.runtimeSchema.objects.some((entry) => entry.name === "research_reports")).toBe(false);
     expect(knowledge.runtimeSchema.objects.some((entry) => entry.name === "knowledge_runs")).toBe(false);
     // v13（Phase 7 覆盖规划）：只存结构化分类结果的覆盖计划表。

@@ -52,7 +52,7 @@ import {
   type KnowledgeCoveragePlanRecord,
 } from "./knowledge-coverage-planner.ts";
 
-export const KNOWLEDGE_SCHEMA_VERSION = 17;
+export const KNOWLEDGE_SCHEMA_VERSION = 18;
 
 const SOURCE_TYPES = new Set<KnowledgeSourceType>(["file", "pasted_text", "web_snapshot"]);
 const PARSE_STATUSES = new Set<KnowledgeParseStatus>(["parsing", "ready", "needs_ocr", "failed"]);
@@ -789,6 +789,7 @@ export class KnowledgeStore {
         if (version === 14) this.createSchemaV15();
         if (version === 15) this.createSchemaV16();
         if (version === 16) this.createSchemaV17();
+        if (version === 17) this.createSchemaV18();
         // main 线（PR #30）曾独立把版本推进到自己的 v9（只加 vector_retention_days，
         // 无 chunk_profiles）：这类库进合并链会跳过 version===8 的 v9 步。v9 体幂等
         // （IF NOT EXISTS + 列存在检查），缺表时补跑一次即可对齐。
@@ -1888,6 +1889,156 @@ export class KnowledgeStore {
     if (columns.some((col) => col.name === "vector_retention_days")) return;
     this.db.exec(`
       ALTER TABLE notebooks ADD COLUMN vector_retention_days INTEGER;
+    `);
+  }
+
+  /** v18 只新增研究台账；建表和版本号由同一个迁移事务提交，旧资料不改写。 */
+  private createSchemaV18() {
+    this.db.exec(`
+      CREATE TABLE IF NOT EXISTS knowledge_research_runs (
+        id TEXT PRIMARY KEY NOT NULL CHECK(length(trim(id)) > 0),
+        turn_scope_id TEXT NOT NULL,
+        turn_id TEXT NOT NULL CHECK(length(trim(turn_id)) > 0),
+        parent_session_path TEXT NOT NULL CHECK(length(trim(parent_session_path)) > 0),
+        question TEXT NOT NULL CHECK(length(trim(question)) > 0),
+        status TEXT NOT NULL CHECK(status IN ('planning', 'running', 'synthesizing', 'completed', 'partial', 'failed', 'cancelled')),
+        completeness_policy TEXT NOT NULL CHECK(completeness_policy IN ('best_effort', 'source_diverse', 'relevant_sections_complete', 'scope_complete')),
+        budget_json TEXT NOT NULL CHECK(CASE WHEN json_valid(budget_json) THEN
+          json_type(budget_json) = 'object' AND COALESCE(
+            json_type(budget_json, '$.maxRounds') = 'integer' AND json_extract(budget_json, '$.maxRounds') > 0 AND
+            json_type(budget_json, '$.maxParallelAgents') = 'integer' AND json_extract(budget_json, '$.maxParallelAgents') > 0 AND
+            json_type(budget_json, '$.maxToolCalls') = 'integer' AND json_extract(budget_json, '$.maxToolCalls') > 0 AND
+            json_type(budget_json, '$.maxWallClockMs') = 'integer' AND json_extract(budget_json, '$.maxWallClockMs') > 0 AND
+            json_type(budget_json, '$.maxSearchesPerRound') = 'integer' AND json_extract(budget_json, '$.maxSearchesPerRound') > 0 AND
+            json_type(budget_json, '$.maxReadsPerRound') = 'integer' AND json_extract(budget_json, '$.maxReadsPerRound') > 0 AND
+            json_type(budget_json, '$.maxFinalEvidenceSpans') = 'integer' AND json_extract(budget_json, '$.maxFinalEvidenceSpans') > 0 AND
+            json_type(budget_json, '$.finalEvidenceBudgetTokens') = 'integer' AND json_extract(budget_json, '$.finalEvidenceBudgetTokens') > 0,
+            0
+          ) ELSE 0 END),
+        rounds_completed INTEGER NOT NULL DEFAULT 0 CHECK(typeof(rounds_completed) = 'integer' AND rounds_completed >= 0),
+        tool_calls_used INTEGER NOT NULL DEFAULT 0 CHECK(typeof(tool_calls_used) = 'integer' AND tool_calls_used >= 0),
+        search_calls INTEGER NOT NULL DEFAULT 0 CHECK(typeof(search_calls) = 'integer' AND search_calls >= 0),
+        read_calls INTEGER NOT NULL DEFAULT 0 CHECK(typeof(read_calls) = 'integer' AND read_calls >= 0),
+        grep_calls INTEGER NOT NULL DEFAULT 0 CHECK(typeof(grep_calls) = 'integer' AND grep_calls >= 0),
+        delegated_agents INTEGER NOT NULL DEFAULT 0 CHECK(typeof(delegated_agents) = 'integer' AND delegated_agents >= 0),
+        stop_reason TEXT,
+        degraded_reason TEXT,
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL,
+        completed_at TEXT,
+        FOREIGN KEY(turn_scope_id) REFERENCES knowledge_turn_scopes(id) ON DELETE RESTRICT
+      );
+
+      CREATE TABLE IF NOT EXISTS knowledge_evidence_needs (
+        id TEXT PRIMARY KEY NOT NULL CHECK(length(trim(id)) > 0),
+        run_id TEXT NOT NULL,
+        ordinal INTEGER NOT NULL CHECK(typeof(ordinal) = 'integer' AND ordinal >= 0),
+        claim TEXT NOT NULL CHECK(length(trim(claim)) > 0),
+        kind TEXT NOT NULL CHECK(kind IN ('fact', 'comparison', 'cause', 'timeline', 'counterexample', 'completeness')),
+        required INTEGER NOT NULL CHECK(required IN (0, 1)),
+        min_independent_sources INTEGER NOT NULL CHECK(typeof(min_independent_sources) = 'integer' AND min_independent_sources > 0),
+        require_counter_evidence INTEGER NOT NULL CHECK(require_counter_evidence IN (0, 1)),
+        require_all_relevant_units INTEGER NOT NULL CHECK(require_all_relevant_units IN (0, 1)),
+        status TEXT NOT NULL CHECK(status IN ('uncovered', 'partial', 'supported', 'conflicted', 'not_applicable')),
+        unresolved_gaps_json TEXT NOT NULL CHECK(CASE WHEN json_valid(unresolved_gaps_json) THEN json_type(unresolved_gaps_json) = 'array' ELSE 0 END),
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL,
+        UNIQUE(run_id, ordinal),
+        FOREIGN KEY(run_id) REFERENCES knowledge_research_runs(id) ON DELETE RESTRICT
+      );
+
+      CREATE TABLE IF NOT EXISTS knowledge_research_rounds (
+        id TEXT PRIMARY KEY NOT NULL CHECK(length(trim(id)) > 0),
+        run_id TEXT NOT NULL,
+        ordinal INTEGER NOT NULL CHECK(typeof(ordinal) = 'integer' AND ordinal >= 0),
+        focus_json TEXT NOT NULL CHECK(CASE WHEN json_valid(focus_json) THEN json_type(focus_json) = 'array' ELSE 0 END),
+        status TEXT NOT NULL CHECK(status IN ('running', 'completed', 'failed', 'cancelled')),
+        new_evidence_count INTEGER NOT NULL DEFAULT 0 CHECK(typeof(new_evidence_count) = 'integer' AND new_evidence_count >= 0),
+        started_at TEXT NOT NULL,
+        completed_at TEXT,
+        error_code TEXT,
+        UNIQUE(run_id, ordinal),
+        FOREIGN KEY(run_id) REFERENCES knowledge_research_runs(id) ON DELETE RESTRICT
+      );
+
+      CREATE TABLE IF NOT EXISTS knowledge_research_read_receipts (
+        id TEXT PRIMARY KEY NOT NULL CHECK(length(trim(id)) > 0),
+        run_id TEXT NOT NULL,
+        actor_session_id TEXT,
+        source_id TEXT NOT NULL,
+        content_snapshot_id TEXT NOT NULL,
+        parse_artifact_id TEXT NOT NULL,
+        chunk_index_variant_id TEXT,
+        chunk_id TEXT,
+        block_id TEXT NOT NULL,
+        start_offset INTEGER NOT NULL CHECK(typeof(start_offset) = 'integer' AND start_offset >= 0),
+        end_offset INTEGER NOT NULL CHECK(typeof(end_offset) = 'integer' AND end_offset > start_offset),
+        canonical_text_sha256 TEXT NOT NULL CHECK(length(canonical_text_sha256) = 64 AND length(CAST(canonical_text_sha256 AS BLOB)) = 64 AND canonical_text_sha256 NOT GLOB '*[^0-9a-f]*'),
+        channel TEXT NOT NULL CHECK(channel IN ('knowledge_read', 'knowledge_grep')),
+        created_at TEXT NOT NULL,
+        consumed_at TEXT,
+        FOREIGN KEY(run_id) REFERENCES knowledge_research_runs(id) ON DELETE RESTRICT,
+        FOREIGN KEY(source_id) REFERENCES sources(id) ON DELETE RESTRICT,
+        FOREIGN KEY(content_snapshot_id) REFERENCES content_snapshots(id) ON DELETE RESTRICT,
+        FOREIGN KEY(parse_artifact_id) REFERENCES parse_artifacts(id) ON DELETE RESTRICT,
+        FOREIGN KEY(block_id) REFERENCES knowledge_blocks(id) ON DELETE RESTRICT
+      );
+
+      CREATE TABLE IF NOT EXISTS knowledge_evidence_items (
+        id TEXT PRIMARY KEY NOT NULL CHECK(length(trim(id)) > 0),
+        run_id TEXT NOT NULL,
+        source_id TEXT NOT NULL,
+        content_snapshot_id TEXT NOT NULL,
+        parse_artifact_id TEXT NOT NULL,
+        chunk_index_variant_id TEXT,
+        chunk_id TEXT,
+        block_id TEXT NOT NULL,
+        start_offset INTEGER NOT NULL CHECK(typeof(start_offset) = 'integer' AND start_offset >= 0),
+        end_offset INTEGER NOT NULL CHECK(typeof(end_offset) = 'integer' AND end_offset > start_offset),
+        canonical_text TEXT NOT NULL CHECK(length(canonical_text) > 0),
+        canonical_text_sha256 TEXT NOT NULL CHECK(length(canonical_text_sha256) = 64 AND length(CAST(canonical_text_sha256 AS BLOB)) = 64 AND canonical_text_sha256 NOT GLOB '*[^0-9a-f]*'),
+        heading_path_json TEXT CHECK(heading_path_json IS NULL OR CASE WHEN json_valid(heading_path_json) THEN json_type(heading_path_json) = 'array' ELSE 0 END),
+        page_number INTEGER CHECK(page_number IS NULL OR (typeof(page_number) = 'integer' AND page_number > 0)),
+        created_at TEXT NOT NULL,
+        UNIQUE(run_id, parse_artifact_id, block_id, start_offset, end_offset),
+        FOREIGN KEY(run_id) REFERENCES knowledge_research_runs(id) ON DELETE RESTRICT,
+        FOREIGN KEY(source_id) REFERENCES sources(id) ON DELETE RESTRICT,
+        FOREIGN KEY(content_snapshot_id) REFERENCES content_snapshots(id) ON DELETE RESTRICT,
+        FOREIGN KEY(parse_artifact_id) REFERENCES parse_artifacts(id) ON DELETE RESTRICT,
+        FOREIGN KEY(block_id) REFERENCES knowledge_blocks(id) ON DELETE RESTRICT
+      );
+
+      CREATE TABLE IF NOT EXISTS knowledge_need_evidence (
+        need_id TEXT NOT NULL,
+        evidence_id TEXT NOT NULL,
+        relation TEXT NOT NULL CHECK(relation IN ('supports', 'contradicts', 'context')),
+        rationale TEXT NOT NULL CHECK(length(trim(rationale)) > 0),
+        source_independence_key TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        PRIMARY KEY(need_id, evidence_id, relation),
+        FOREIGN KEY(need_id) REFERENCES knowledge_evidence_needs(id) ON DELETE RESTRICT,
+        FOREIGN KEY(evidence_id) REFERENCES knowledge_evidence_items(id) ON DELETE RESTRICT,
+        FOREIGN KEY(source_independence_key) REFERENCES sources(id) ON DELETE RESTRICT
+      );
+
+      CREATE TABLE IF NOT EXISTS knowledge_research_actions (
+        id TEXT PRIMARY KEY NOT NULL CHECK(length(trim(id)) > 0),
+        run_id TEXT NOT NULL,
+        round_id TEXT,
+        ordinal INTEGER NOT NULL CHECK(typeof(ordinal) = 'integer' AND ordinal >= 0),
+        actor_session_id TEXT,
+        actor_agent_id TEXT,
+        action_type TEXT NOT NULL CHECK(length(trim(action_type)) > 0),
+        request_summary_json TEXT NOT NULL CHECK(CASE WHEN json_valid(request_summary_json) THEN json_type(request_summary_json) = 'object' ELSE 0 END),
+        response_summary_json TEXT CHECK(response_summary_json IS NULL OR CASE WHEN json_valid(response_summary_json) THEN json_type(response_summary_json) = 'object' ELSE 0 END),
+        status TEXT NOT NULL CHECK(status IN ('running', 'completed', 'failed', 'cancelled')),
+        started_at TEXT NOT NULL,
+        completed_at TEXT,
+        error_code TEXT,
+        UNIQUE(run_id, ordinal),
+        FOREIGN KEY(run_id) REFERENCES knowledge_research_runs(id) ON DELETE RESTRICT,
+        FOREIGN KEY(round_id) REFERENCES knowledge_research_rounds(id) ON DELETE RESTRICT
+      );
     `);
   }
 

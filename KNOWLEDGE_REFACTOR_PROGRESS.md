@@ -10,7 +10,7 @@
 - 严格按 P0 → P1 → P2 → P3 及编号顺序；阶段门禁全部通过才进入下一阶段。
 - 每项记录测试原始结果后提交；不删除、跳过或放宽测试，不合并 main。
 - 现有任务书为用户未跟踪文件，既有规划文档与 BLOCKED.md 历史记录保留。
-- 当前断点：P1-01 至 P1-08 已完成，阶段收口 `23873985`、审计 `333c5112`，本地与四平台门禁全部通过；P2-01 已完成本项验证并随本次提交落地，接着执行 P2-02。P0 源码提交 `5c016df183ad207cf1ca33de274abb7a4eb10057`，阶段审计提交 `f9928d76`；全量 13002 PASS / 0 FAIL / 7 既有 SKIP。用户已授权每阶段验证后同步审计记录，保留最终封印。
+- 当前断点：P1-01 至 P1-08 已完成，阶段收口 `23873985`、审计 `333c5112`，本地与四平台门禁全部通过；P2-01 已完成并提交 `c3033b05`；P2-02 数据库迁移及约束验证已通过，正在提交；下一项为 P2-03。P0 源码提交 `5c016df183ad207cf1ca33de274abb7a4eb10057`，阶段审计提交 `f9928d76`；全量 13002 PASS / 0 FAIL / 7 既有 SKIP。用户已授权每阶段验证后同步审计记录，保留最终封印。
 - 进度、计划与事实集中在本文件和基线文档，避免覆盖既有 task_plan.md / findings.md / PROGRESS.md。
 - 目标工具已确认本任务存在 active goal；重复 create_goal 被拒绝，沿用现有目标。
 - 规划恢复脚本返回其他会话的无关配置记录，经 git diff 为空核对，未采用其内容。
@@ -21,7 +21,7 @@
 | --- | --- | --- |
 | P0 | completed | 2026-09-04 全量 13002 PASS / 0 FAIL / 7 既有 SKIP，76.42s；全部 P0 门禁通过，审计提交 f9928d76 |
 | P1 | completed | P1-01 至 P1-08 完成；本地全量和第三轮四平台 Build 33829055797 全部通过，阶段审计 333c5112 |
-| P2 | in_progress | P2-01 完成；P2-02 及后续任务、阶段门禁待执行 |
+| P2 | in_progress | P2-01、P2-02 已完成；P2-03 及后续任务、阶段门禁待执行 |
 | P3 | pending | NOT_EXECUTED |
 
 ## P0-00：建立基线与回归门禁
@@ -266,16 +266,18 @@
 - 改动：按任务书逐项增加运行状态、证据需求类型/状态、证据关系、需求对象和预算契约；固定预算严格为 4 轮、4 并发、32 工具调用、180 秒、每轮 8 搜索/12 阅读、32 最终证据、16000 token。
 - 测试命令：三套 `npm run typecheck`；`npx vitest run tests/knowledge-execution-policy.test.ts tests/chat-route-knowledge-refs.test.ts`；新增文件 ESLint；开放导出登记按现有规则核查。
 - 测试结果：三套类型检查 exit 0；2 文件 / 16 PASS，1.30s，exit 0；新增文件 ESLint exit 0，开放边界通过（保留原 1 条债务）。任务书全部字段与八个预算值经只读逐项核对一致；开放导出 868 文件，新共享契约与源文件逐字节一致。没有数据库或运行时闭包变化。日志 `/tmp/lingxi-knowledge-p201-{typecheck,tests,lint,boundary,export}.log`。
-- 对应 commit SHA：本次提交 `feat(knowledge): define evidence-ledger research contracts`
+- 对应 commit SHA：`c3033b05e09877bf425b3fd0e5ea9cf9b065c8da`
 - 偏差：none
 
 ## P2-02：Knowledge 数据库升级到 v18
 
-- 状态：pending
-- 改动文件：尚未开始
-- 测试命令：按任务书该项测试执行，尚未执行
-- 测试结果：NOT_EXECUTED
-- 对应 commit SHA：尚未提交
+- 状态：completed
+- 改动文件：`lib/knowledge/knowledge-store.ts`、`lib/knowledge/types.ts`、`shared/persistence/store-registry.ts`、`tests/knowledge-store-v18-migration.test.ts`、`tests/knowledge-research-store.test.ts`、`tests/fixtures/knowledge-store-v17.sql`、`tests/knowledge-chunk-profiles.test.ts`、`tests/persistence-schema-tripwire.test.ts`、`build/persistence-schema-fingerprint.json`、`build/persistence-store-inventory.json`、`KNOWLEDGE_REFACTOR_PROGRESS.md`
+- 改动：按固定七表及列顺序新增 v18 建表，沿用既有外层迁移事务统一提交版本。添加状态/关系/完整性策略、整数/布尔/偏移/页码、摘要格式、JSON 形状、非空身份、外键及唯一约束；阅读凭据只保存位置和 hash。对应持久化记录类型复用 P2-01 契约，台账读写与证据宿主核验按后续 P2-03 实施，不提前合并任务。
+- 测试命令：任务书指定 `knowledge-store-v18-migration`、`knowledge-research-store`、`persistence-schema-tripwire`，既有知识存储与生命周期回归；三套类型检查、修改文件 ESLint、持久化指纹生成检查及开放边界/闭包。
+- 已验证：真实 v17 fixture 来自 `c3033b05` 存储类，与该提交源码逐字节确认；18 张旧表、19 行合成数据，导出后独立恢复全表逐行一致。迁移首轮旧代码 3 FAIL / 2 PASS，v18 后 5 PASS，235ms，实际执行前三张新表后触发 SQLite DDL 错误，证实版本与全部旧表/数据回滚并可正常重试。数据库约束旧代码 16 FAIL；v18 首轮 15 PASS / 1 FAIL，发现摘要可附 NUL 隐藏尾巴；增加字符/字节双长度检查后扩展 17 PASS，398ms。未修改或放宽失败用例。
+- 生成物与整体复验：原 8 文件首轮 85 PASS / 4 FAIL（3.99s），四败均为指纹测试读到未同步的旧持久化清单；先按生成器更新清单，再重新生成指纹，并将现有精确版本断言更新到 18、增加七表断言。原 8 文件复跑 89 PASS / 0 FAIL / 0 SKIP，4.11s，exit 0；三套类型检查 exit 0；修改文件 ESLint 0 error / 76 既有 warning，新增版本测试单独 ESLint 0；开放边界保留原 1 条债务，闭包 10672 文件，开放导出 868 文件，均 exit 0。兼容迁移指纹 `sha256:cd0feeaaa9caa4800620293e2f2a5a3b52d1f22d3eec6d21efccc0d2b036066b`。日志 `/tmp/lingxi-knowledge-p202-{tests,tests-final,typecheck-final,lint,tripwire-lint,inventory,fingerprint-final,closure,boundary,export}.log`。未删、跳过或放宽测试。
+- 对应 commit SHA：待本项全部验证通过后提交
 - 偏差：none
 
 ## P2-03：实现 Evidence Ledger
