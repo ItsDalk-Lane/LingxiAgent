@@ -660,7 +660,7 @@
     ],
     "version": 3
   },
-  "payloadFingerprint": "sha256:5ea5991e78a826a99f33de0c44e770b14b0813bf95be73fe648d7248196fe079",
+  "payloadFingerprint": "sha256:9613b8c490320b7d1d13448e67237edca1027ef446599da053cd562a2eb40691",
   "registry": [
     {
       "affectedByEpochMigration": true,
@@ -1724,7 +1724,7 @@
       ],
       "restorePolicy": "ANN corruption rebuilds only knowledge-ann.db and knowledge-ann files from retained portable vector BLOBs. Lexical projections rebuild from parse artifacts; never use an ANN file as the sole vector recovery source.",
       "schemaContract": {
-        "compatibility": "P1 adds chunk_index_variant_metadata (FTS v3) and a separate ann_variants catalog (ANN v1); portable vector schema stays v3 and retains BLOBs for exact fallback and ANN rebuild. Historical knowledge-fts.db schema v2 and knowledge-vector.db schema v2 (P0 index identity) migrate v1 in a single transaction each: chunk identity moves from (parse_artifact_id, ordinal) to ChunkIndexVariant (parse_artifact_id, chunk_profile_hash) + ordinal via chunk_index_variants backfill (artifact_indexes is retired after backfill), and vector identity moves from (parse_artifact_id, model_key) to VectorIndexVariant (chunk_index_variant_id, model_key) via vector_index_variants backfill (vector_artifacts is retired after backfill). Rows whose chunk profile cannot be resolved are filed under the explicit legacy_unknown identity instead of being dropped; migrations only establish identities and remap existing rows, never re-chunk or re-embed.",
+        "compatibility": "P3-04 将 FTS v3 增量升级为 v4：新增来源/章节与对应全文索引、片段追加可空 section_id；旧行、旧 v2 分块配置和向量保留，后台分批建立 v3 512-token 片段，未就绪时继续读旧索引。迁移失败整笔回滚且保留旧库。P1 adds chunk_index_variant_metadata (FTS v3) and a separate ann_variants catalog (ANN v1); portable vector schema stays v3 and retains BLOBs for exact fallback and ANN rebuild. Historical knowledge-fts.db schema v2 and knowledge-vector.db schema v2 (P0 index identity) migrate v1 in a single transaction each: chunk identity moves from (parse_artifact_id, ordinal) to ChunkIndexVariant (parse_artifact_id, chunk_profile_hash) + ordinal via chunk_index_variants backfill (artifact_indexes is retired after backfill), and vector identity moves from (parse_artifact_id, model_key) to VectorIndexVariant (chunk_index_variant_id, model_key) via vector_index_variants backfill (vector_artifacts is retired after backfill). Rows whose chunk profile cannot be resolved are filed under the explicit legacy_unknown identity instead of being dropped; migrations only establish identities and remap existing rows, never re-chunk or re-embed.",
         "kind": "protocol",
         "source": "lib/knowledge/knowledge-index-store.ts"
       },
@@ -3292,8 +3292,8 @@
   ],
   "review": {
     "classification": "compatible",
-    "compatibilityReason": "P3-03 在既有 v19 四表和 coverage_runs/shards 上记录原文单元核查；新增完整性工作会话的宿主分片身份，旧资料、旧会话与数据库字段保持兼容，未增加正文或模型思考持久化。",
-    "payloadFingerprint": "sha256:5ea5991e78a826a99f33de0c44e770b14b0813bf95be73fe648d7248196fe079"
+    "compatibilityReason": "P3-04 的 FTS v3→v4 仅新增来源和章节两表及其全文索引，旧片段追加可空 section_id。旧 v2 配置、FTS、向量与原文保留；迁移失败事务回滚且不删旧库。新 v3 分块后台分批建立；冻结范围只读同配置各格式的就绪变体，新 v3 优先、缺失时沿用真实 v2，最终清单保存实际身份。知识事实库仍 v19，没有改写原文或历史身份。",
+    "payloadFingerprint": "sha256:9613b8c490320b7d1d13448e67237edca1027ef446599da053cd562a2eb40691"
   },
   "schemas": [
     {
@@ -3907,7 +3907,7 @@
         ],
         "userVersion": 19
       },
-      "sourceHash": "sha256:e0b101a2ee83a35fc6e1a935ee36fd6cf3065f2cd154b93cbe69349bcc16e64d",
+      "sourceHash": "sha256:cdbc32afac4299145dcc7543104257331203f54835ec3a5f8ad3d3ddb8fce074",
       "storeId": "knowledge-database"
     },
     {
@@ -3932,28 +3932,28 @@
           "sourceHash": "sha256:977e9e13b68de1d1ac0b734f312387d7235b94496bcb909e0445c24275d0e722"
         }
       ],
-      "sourceHash": "sha256:6a5c54340e0c2ac01a00ca8796ee38174990a0f09c7ac24e4a6a4f484489d004",
+      "sourceHash": "sha256:658af937c541d0db74be360ade355ce9a4e5cf0729e2ae81671a70e2398be879",
       "storeId": "knowledge-indexes"
     },
     {
       "contract": "ParseArtifact generation directories referenced by knowledge.db and never treated as source content versions",
       "kind": "directory-contract",
       "module": "lib/knowledge/knowledge-manager.ts",
-      "sourceHash": "sha256:14cb9f799fb268ad839c4b8610a517a1aa32ca80ffa491de73feca8c2c0408d9",
+      "sourceHash": "sha256:0a277c8691a1cf899a3cf4de4e5c8ece615c74bfdc1e4472c772dd8005539142",
       "storeId": "knowledge-parse-artifacts"
     },
     {
       "contract": "ProcessingArtifact output files (binary office formats converted to structured text) referenced by knowledge.db processing_artifacts rows, with locatorMap held in the database",
       "kind": "directory-contract",
       "module": "lib/knowledge/knowledge-manager.ts",
-      "sourceHash": "sha256:14cb9f799fb268ad839c4b8610a517a1aa32ca80ffa491de73feca8c2c0408d9",
+      "sourceHash": "sha256:0a277c8691a1cf899a3cf4de4e5c8ece615c74bfdc1e4472c772dd8005539142",
       "storeId": "knowledge-processing-artifacts"
     },
     {
       "contract": "ContentSnapshot relative locator, immutable byte publication, SHA-256 verification, and rollback protocol",
       "kind": "directory-contract",
       "module": "lib/knowledge/knowledge-manager.ts",
-      "sourceHash": "sha256:14cb9f799fb268ad839c4b8610a517a1aa32ca80ffa491de73feca8c2c0408d9",
+      "sourceHash": "sha256:0a277c8691a1cf899a3cf4de4e5c8ece615c74bfdc1e4472c772dd8005539142",
       "storeId": "knowledge-source-snapshots"
     },
     {

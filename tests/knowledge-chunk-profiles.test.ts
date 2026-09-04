@@ -4,7 +4,7 @@ import path from "node:path";
 import { createRequire } from "node:module";
 import { afterEach, describe, expect, it } from "vitest";
 
-import { computeAutoChunkTargetChars, knowledgeChunkerConfigId } from "../lib/knowledge/chunker.ts";
+import { KNOWLEDGE_CHUNK_TARGET_CHARS, computeAutoChunkTargetChars, knowledgeChunkerConfigId, legacyKnowledgeChunkerConfigId } from "../lib/knowledge/chunker.ts";
 import {
   KNOWLEDGE_SCHEMA_VERSION,
   KnowledgeStore,
@@ -161,7 +161,7 @@ describe("KnowledgeStore v9：ChunkProfile / RetrievalProfile", () => {
     expect(first.id).toBe(`cp_${knowledgeChunkerConfigId("markdown", 1500)}`);
     expect(first.profileHash).toBe(knowledgeChunkerConfigId("markdown", 1500));
     expect(first.profileType).toBe("standard");
-    expect(first.chunkerVersion).toBe("2");
+    expect(first.chunkerVersion).toBe("3");
     expect(first.targetCharsSource).toBe("explicit");
 
     const again = store.findOrCreateChunkProfile({
@@ -289,7 +289,7 @@ describe("KnowledgeStore v9：ChunkProfile / RetrievalProfile", () => {
     store.close();
   });
 
-  it("resolveNotebookRetrievalProfile：自动分块经上下文窗口解析链求真值并记 auto", () => {
+  it("resolveNotebookRetrievalProfile：新默认分块使用固定粒度并记 auto，模型窗口不改变配置", () => {
     const store = openStore(path.join(tempDir(), "knowledge.db"));
     const studioId = "studio-a";
     const nb = store.createNotebook({ studioId, name: "自动" });
@@ -305,17 +305,17 @@ describe("KnowledgeStore v9：ChunkProfile / RetrievalProfile", () => {
       strategy: "text",
       getEmbeddingModelContextWindow: () => 32768,
     });
-    expect(resolved.chunkProfile.targetChars).toBe(Math.floor(32768 * 0.8));
+    expect(resolved.chunkProfile.targetChars).toBe(KNOWLEDGE_CHUNK_TARGET_CHARS);
     expect(resolved.chunkProfile.targetCharsSource).toBe("auto");
 
-    // 窗口未知时与 resolveEffectiveChunkTargetChars 同一兜底（内置 8192×0.8），非伪造。
+    // 窗口未知时仍保持同一固定默认，与摄入和查询的身份一致。
     const fallback = store.resolveNotebookRetrievalProfile({
       studioId,
       notebookId: nb.id,
       strategy: "fixed",
       getEmbeddingModelContextWindow: () => null,
     });
-    expect(fallback.chunkProfile.targetChars).toBe(computeAutoChunkTargetChars(null));
+    expect(fallback.chunkProfile.targetChars).toBe(KNOWLEDGE_CHUNK_TARGET_CHARS);
     expect(fallback.chunkProfile.targetCharsSource).toBe("auto");
     store.close();
   });
@@ -371,7 +371,7 @@ describe("KnowledgeStore v9：ChunkProfile / RetrievalProfile", () => {
     // 显式配置笔记本 + 一条与当前配置匹配的摄入历史。
     const explicit = seedNotebookWithSource(store, studioId, "explicit");
     store.updateNotebookConfig({ studioId, notebookId: explicit.notebook.id, chunkTargetChars: 1500 });
-    const matchedHash = knowledgeChunkerConfigId("markdown", 1500);
+    const matchedHash = legacyKnowledgeChunkerConfigId("markdown", 1500);
     store.enqueueIngestionJob({
       studioId,
       notebookId: explicit.notebook.id,
@@ -381,7 +381,7 @@ describe("KnowledgeStore v9：ChunkProfile / RetrievalProfile", () => {
 
     // 自动配置笔记本（无嵌入引用 → 内置兜底窗口）+ 匹配的摄入历史。
     const auto = seedNotebookWithSource(store, studioId, "auto");
-    const autoHash = knowledgeChunkerConfigId("fixed", computeAutoChunkTargetChars(null));
+    const autoHash = legacyKnowledgeChunkerConfigId("fixed", computeAutoChunkTargetChars(null));
     store.enqueueIngestionJob({
       studioId,
       notebookId: auto.notebook.id,

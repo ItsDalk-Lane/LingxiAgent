@@ -5,10 +5,10 @@ import { createRequire } from "node:module";
 
 import { buildFtsLiteralQuery, buildSearchDocumentText } from "../search/search-text.ts";
 import { KnowledgeError } from "./errors.ts";
-import type { KnowledgeChunkDraft, KnowledgeChunkSpanDraft } from "./chunker.ts";
+import type { KnowledgeChunkDraft, KnowledgeChunkSpanDraft, KnowledgeSectionDraft } from "./chunker.ts";
 
 const require = createRequire(import.meta.url);
-const KNOWLEDGE_INDEX_SCHEMA_VERSION = 3;
+const KNOWLEDGE_INDEX_SCHEMA_VERSION = 4;
 let BetterSqliteDatabase: any = null;
 
 function loadDatabase() {
@@ -73,6 +73,49 @@ function serializeSpans(spans: KnowledgeChunkSpanDraft[]): string {
     throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "Knowledge chunk span map is too large");
   }
   return serialized;
+}
+
+export interface KnowledgeSourceDocumentDraft {
+  parseArtifactId: string;
+  title: string;
+  outlineText: string;
+  searchText: string;
+}
+
+export interface StoredKnowledgeSourceDocument extends KnowledgeSourceDocumentDraft {
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface StoredKnowledgeSection extends KnowledgeSectionDraft {
+  searchText: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface KnowledgeGrainSearchInput {
+  parseArtifactIds: string[];
+  query: string;
+  limit?: number;
+}
+
+export type { KnowledgeSectionDraft } from "./chunker.ts";
+
+function mapSourceDocument(row: any): StoredKnowledgeSourceDocument {
+  return { parseArtifactId: row.parse_artifact_id, title: row.title, outlineText: row.outline_text,
+    searchText: row.search_text, createdAt: row.created_at, updatedAt: row.updated_at };
+}
+
+function mapSection(row: any): StoredKnowledgeSection {
+  let headingPath: string[];
+  try {
+    headingPath = JSON.parse(row.heading_path_json);
+    if (!Array.isArray(headingPath) || headingPath.some(part => typeof part !== "string")) throw new Error("invalid_heading");
+  } catch { throw new KnowledgeError("KNOWLEDGE_INDEX_INVALID", "Knowledge section heading is corrupt"); }
+  return { id: row.id, parseArtifactId: row.parse_artifact_id, sectionOrdinal: row.section_ordinal,
+    headingPath, startBlockOrdinal: row.start_block_ordinal, endBlockOrdinal: row.end_block_ordinal,
+    text: row.text, tokenCount: row.token_count, searchText: row.search_text,
+    createdAt: row.created_at, updatedAt: row.updated_at };
 }
 
 export type KnowledgeChunkIndexVariantStatus = "building" | "ready" | "failed" | "retiring";
@@ -222,6 +265,72 @@ const CHUNK_SEARCH_OBJECTS_DDL = `
   END;
 `;
 
+const KNOWLEDGE_MULTIGRAIN_DDL = `
+  CREATE TABLE knowledge_source_documents (
+    parse_artifact_id TEXT PRIMARY KEY,
+    title TEXT NOT NULL,
+    outline_text TEXT NOT NULL,
+    search_text TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+  );
+  CREATE VIRTUAL TABLE knowledge_source_documents_fts USING fts5(
+    title, outline_text, search_text,
+    content=knowledge_source_documents, content_rowid=rowid, tokenize='unicode61'
+  );
+  CREATE TRIGGER knowledge_source_documents_ai AFTER INSERT ON knowledge_source_documents BEGIN
+    INSERT INTO knowledge_source_documents_fts(rowid, title, outline_text, search_text)
+    VALUES (new.rowid, new.title, new.outline_text, new.search_text);
+  END;
+  CREATE TRIGGER knowledge_source_documents_ad AFTER DELETE ON knowledge_source_documents BEGIN
+    INSERT INTO knowledge_source_documents_fts(knowledge_source_documents_fts, rowid, title, outline_text, search_text)
+    VALUES ('delete', old.rowid, old.title, old.outline_text, old.search_text);
+  END;
+  CREATE TRIGGER knowledge_source_documents_au AFTER UPDATE ON knowledge_source_documents BEGIN
+    INSERT INTO knowledge_source_documents_fts(knowledge_source_documents_fts, rowid, title, outline_text, search_text)
+    VALUES ('delete', old.rowid, old.title, old.outline_text, old.search_text);
+    INSERT INTO knowledge_source_documents_fts(rowid, title, outline_text, search_text)
+    VALUES (new.rowid, new.title, new.outline_text, new.search_text);
+  END;
+  CREATE TABLE knowledge_sections (
+    id TEXT PRIMARY KEY,
+    parse_artifact_id TEXT NOT NULL,
+    section_ordinal INTEGER NOT NULL,
+    heading_path_json TEXT NOT NULL,
+    start_block_ordinal INTEGER NOT NULL,
+    end_block_ordinal INTEGER NOT NULL,
+    text TEXT NOT NULL,
+    token_count INTEGER NOT NULL,
+    search_text TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL,
+    UNIQUE(parse_artifact_id, section_ordinal)
+  );
+  CREATE VIRTUAL TABLE knowledge_sections_fts USING fts5(
+    text, search_text,
+    content=knowledge_sections, content_rowid=rowid, tokenize='unicode61'
+  );
+  CREATE TRIGGER knowledge_sections_ai AFTER INSERT ON knowledge_sections BEGIN
+    INSERT INTO knowledge_sections_fts(rowid, text, search_text)
+    VALUES (new.rowid, new.text, new.search_text);
+  END;
+  CREATE TRIGGER knowledge_sections_ad AFTER DELETE ON knowledge_sections BEGIN
+    INSERT INTO knowledge_sections_fts(knowledge_sections_fts, rowid, text, search_text)
+    VALUES ('delete', old.rowid, old.text, old.search_text);
+  END;
+  CREATE TRIGGER knowledge_sections_au AFTER UPDATE ON knowledge_sections BEGIN
+    INSERT INTO knowledge_sections_fts(knowledge_sections_fts, rowid, text, search_text)
+    VALUES ('delete', old.rowid, old.text, old.search_text);
+    INSERT INTO knowledge_sections_fts(rowid, text, search_text)
+    VALUES (new.rowid, new.text, new.search_text);
+  END;
+  ALTER TABLE knowledge_chunks ADD COLUMN section_id TEXT;
+  CREATE INDEX idx_knowledge_chunks_variant_section
+    ON knowledge_chunks(chunk_index_variant_id, section_id, ordinal);
+  CREATE INDEX idx_knowledge_chunks_artifact_section
+    ON knowledge_chunks(parse_artifact_id, section_id);
+`;
+
 export interface KnowledgeIndexStoreOptions {
   dbPath: string;
   Database?: any;
@@ -265,10 +374,14 @@ export class KnowledgeIndexStore {
   private openWithRecovery() {
     try {
       this.open();
-    } catch {
+    } catch (error: any) {
       try { this.db?.close?.(); } catch { /* 丢弃可重建缓存时保留原始处理路径。 */ }
       this.db = null;
-      // 索引不是事实；打开或迁移失败时只删除精确的索引文件，再从 Block 重建。
+      // 迁移失败不能删除仍可读的旧索引；只有确认数据库损坏才重建精确缓存文件。
+      if (error?.code !== "SQLITE_CORRUPT" && error?.code !== "SQLITE_NOTADB"
+        && error?.message !== "index_quick_check_failed") {
+        throw new KnowledgeError("KNOWLEDGE_INDEX_INVALID", "Knowledge search index migration or open failed");
+      }
       for (const suffix of ["", "-wal", "-shm"]) {
         try { fs.unlinkSync(`${this.dbPath}${suffix}`); } catch (error: any) {
           if (error?.code !== "ENOENT") {
@@ -309,6 +422,12 @@ export class KnowledgeIndexStore {
         this.db.pragma("user_version = 3");
       })();
     }
+    if (version > 0 && version < 4) {
+      this.db.transaction(() => {
+        this.db.exec(KNOWLEDGE_MULTIGRAIN_DDL);
+        this.db.pragma("user_version = 4");
+      })();
+    }
     const check = this.db.pragma("quick_check", { simple: true });
     if (check !== "ok") throw new Error("index_quick_check_failed");
   }
@@ -318,6 +437,7 @@ export class KnowledgeIndexStore {
     this.db.exec(knowledgeChunksDdl("knowledge_chunks"));
     this.db.exec(CHUNK_SEARCH_OBJECTS_DDL);
     this.db.exec(CHUNK_VARIANT_METADATA_DDL);
+    this.db.exec(KNOWLEDGE_MULTIGRAIN_DDL);
   }
 
   /**
@@ -518,6 +638,8 @@ export class KnowledgeIndexStore {
     blockFingerprint: unknown;
     chunks: KnowledgeChunkDraft[];
     metadata?: KnowledgeChunkVariantMetadata;
+    sourceDocument?: KnowledgeSourceDocumentDraft;
+    sections?: KnowledgeSectionDraft[];
   }) {
     const parseArtifactId = requiredId(input?.parseArtifactId, "parseArtifactId");
     const chunkProfileHash = requiredChunkProfileHash(input?.chunkProfileHash);
@@ -525,11 +647,15 @@ export class KnowledgeIndexStore {
     if (!Array.isArray(input?.chunks) || input.chunks.length === 0) {
       throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "Knowledge chunks must not be empty");
     }
+    if ((input.sourceDocument == null) !== (input.sections == null)
+      || (input.sourceDocument && input.sourceDocument.parseArtifactId !== parseArtifactId)) {
+      throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "Knowledge source document and sections must share the artifact");
+    }
     const variantId = knowledgeChunkIndexVariantId(parseArtifactId, chunkProfileHash);
     const insert = this.db.prepare(`
       INSERT INTO knowledge_chunks (
-        id, parse_artifact_id, chunk_index_variant_id, ordinal, text, token_count, search_text, spans_json
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        id, parse_artifact_id, chunk_index_variant_id, ordinal, text, token_count, search_text, spans_json, section_id
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
     this.db.transaction(() => {
       const now = this.now();
@@ -542,11 +668,22 @@ export class KnowledgeIndexStore {
           block_fingerprint = excluded.block_fingerprint,
           updated_at = excluded.updated_at
       `).run(variantId, parseArtifactId, chunkProfileHash, blockFingerprint, now, now);
+      if (input.sourceDocument && input.sections) {
+        this.upsertSourceDocument(input.sourceDocument);
+        this.upsertSections(parseArtifactId, input.sections);
+      }
       this.db.prepare(`DELETE FROM knowledge_chunks WHERE chunk_index_variant_id = ?`).run(variantId);
       this.db.prepare(`DELETE FROM chunk_index_variant_metadata WHERE chunk_index_variant_id = ?`).run(variantId);
       for (const [index, chunk] of input.chunks.entries()) {
         if (chunk.parseArtifactId !== parseArtifactId || chunk.ordinal !== index || !chunk.text) {
           throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "Knowledge chunk identity is invalid");
+        }
+        const sectionId = chunk.sectionId == null ? null : requiredId(chunk.sectionId, "sectionId");
+        if (sectionId !== null && !this.db.prepare(`SELECT id FROM knowledge_sections WHERE id = ? AND parse_artifact_id = ?`).get(sectionId, parseArtifactId)) {
+          throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "Knowledge chunk section is outside its artifact");
+        }
+        if (input.sections && sectionId === null) {
+          throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "Knowledge multigrain chunk requires a section");
         }
         insert.run(
           requiredId(chunk.id, "chunkId"),
@@ -557,10 +694,135 @@ export class KnowledgeIndexStore {
           chunk.tokenCount,
           buildSearchDocumentText(chunk.text),
           serializeSpans(chunk.spans),
+          sectionId,
         );
       }
       if (input.metadata) this.writeVariantMetadata(variantId, input.metadata);
     })();
+  }
+
+  /** 来源摘要完全由宿主派生；同一解析产物更新时保持创建时间和 FTS 同步。 */
+  upsertSourceDocument(input: KnowledgeSourceDocumentDraft): void {
+    const artifactId = requiredId(input?.parseArtifactId, "parseArtifactId");
+    if (typeof input.title !== "string" || typeof input.outlineText !== "string" || typeof input.searchText !== "string") {
+      throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "Knowledge source document is invalid");
+    }
+    const now = this.now();
+    this.db.prepare(`
+      INSERT INTO knowledge_source_documents (parse_artifact_id, title, outline_text, search_text, created_at, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?)
+      ON CONFLICT(parse_artifact_id) DO UPDATE SET title = excluded.title, outline_text = excluded.outline_text,
+        search_text = excluded.search_text, updated_at = excluded.updated_at
+    `).run(artifactId, input.title, input.outlineText, buildSearchDocumentText(input.searchText), now, now);
+  }
+
+  /** 章节按解析产物确定；只更新同一身份，不删除其他变体仍引用的章节。 */
+  upsertSections(parseArtifactId: string, sections: KnowledgeSectionDraft[]): void {
+    const artifactId = requiredId(parseArtifactId, "parseArtifactId");
+    if (!Array.isArray(sections) || sections.length === 0) {
+      throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "Knowledge sections must not be empty");
+    }
+    const seen = new Set<string>();
+    let previousEnd = -1;
+    for (const [index, section] of sections.entries()) {
+      if (!section || section.parseArtifactId !== artifactId || section.sectionOrdinal !== index
+        || !Array.isArray(section.headingPath) || section.headingPath.some(part => typeof part !== "string")
+        || !Number.isSafeInteger(section.startBlockOrdinal) || section.startBlockOrdinal < 0
+        || !Number.isSafeInteger(section.endBlockOrdinal) || section.endBlockOrdinal < section.startBlockOrdinal
+        || section.startBlockOrdinal < previousEnd || typeof section.text !== "string" || !section.text
+        || !Number.isSafeInteger(section.tokenCount) || section.tokenCount < 1) {
+        throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "Knowledge section identity or primary block range is invalid");
+      }
+      const id = requiredId(section.id, "sectionId");
+      if (seen.has(id)) throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "Knowledge section identity is duplicated");
+      seen.add(id);
+      previousEnd = section.endBlockOrdinal;
+    }
+    this.db.transaction(() => {
+      const now = this.now();
+      const insert = this.db.prepare(`
+        INSERT INTO knowledge_sections (id, parse_artifact_id, section_ordinal, heading_path_json,
+          start_block_ordinal, end_block_ordinal, text, token_count, search_text, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ON CONFLICT(id) DO UPDATE SET heading_path_json = excluded.heading_path_json,
+          start_block_ordinal = excluded.start_block_ordinal, end_block_ordinal = excluded.end_block_ordinal,
+          text = excluded.text, token_count = excluded.token_count, search_text = excluded.search_text,
+          updated_at = excluded.updated_at
+      `);
+      for (const section of sections) {
+        const existing = this.db.prepare(`SELECT parse_artifact_id, section_ordinal FROM knowledge_sections WHERE id = ?`).get(section.id);
+        if (existing && (existing.parse_artifact_id !== artifactId || existing.section_ordinal !== section.sectionOrdinal)) {
+          throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "Knowledge section identity cannot be reassigned");
+        }
+        insert.run(section.id, artifactId, section.sectionOrdinal, JSON.stringify(section.headingPath),
+          section.startBlockOrdinal, section.endBlockOrdinal, section.text, section.tokenCount,
+          buildSearchDocumentText(`${section.headingPath.join(" > ")}\n${section.text}`), now, now);
+      }
+    })();
+  }
+
+  getSourceDocument(parseArtifactId: string): StoredKnowledgeSourceDocument | null {
+    const row = this.db.prepare(`SELECT * FROM knowledge_source_documents WHERE parse_artifact_id = ?`)
+      .get(requiredId(parseArtifactId, "parseArtifactId"));
+    return row ? mapSourceDocument(row) : null;
+  }
+
+  listSourceDocuments(parseArtifactIds: string[]): StoredKnowledgeSourceDocument[] {
+    if (!Array.isArray(parseArtifactIds)) throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "Knowledge artifact scope is invalid");
+    const ids = [...new Set(parseArtifactIds.map(id => requiredId(id, "parseArtifactId")))];
+    return this.db.prepare(`SELECT * FROM knowledge_source_documents
+      WHERE parse_artifact_id IN (SELECT value FROM json_each(?)) ORDER BY parse_artifact_id`)
+      .all(JSON.stringify(ids)).map(mapSourceDocument);
+  }
+
+  listArtifactSections(parseArtifactId: string): StoredKnowledgeSection[] {
+    return this.db.prepare(`SELECT * FROM knowledge_sections WHERE parse_artifact_id = ? ORDER BY section_ordinal`)
+      .all(requiredId(parseArtifactId, "parseArtifactId")).map(mapSection);
+  }
+
+  private grainSearchArgs(input: KnowledgeGrainSearchInput): { ids: string[]; query: string; limit: number } {
+    if (!Array.isArray(input?.parseArtifactIds)) {
+      throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "Knowledge artifact scope is invalid");
+    }
+    const ids = [...new Set(input.parseArtifactIds.map(id => requiredId(id, "parseArtifactId")))];
+    if (typeof input.query !== "string" || !input.query.trim() || input.query.length > 4000) {
+      throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "Knowledge search query is invalid");
+    }
+    const limit = input.limit ?? 12;
+    if (!Number.isSafeInteger(limit) || limit < 1 || limit > 1000) {
+      throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "Knowledge search limit is invalid");
+    }
+    return { ids, query: buildFtsLiteralQuery(input.query), limit };
+  }
+
+  searchSourceDocuments(input: KnowledgeGrainSearchInput): Array<StoredKnowledgeSourceDocument & { score: number }> {
+    const { ids, query, limit } = this.grainSearchArgs(input);
+    if (ids.length === 0 || !query) return [];
+    try {
+      return this.db.prepare(`
+        SELECT d.*, bm25(knowledge_source_documents_fts, 1.0, 0.7, 0.35) AS score
+        FROM knowledge_source_documents_fts
+        JOIN knowledge_source_documents d ON d.rowid = knowledge_source_documents_fts.rowid
+        WHERE knowledge_source_documents_fts MATCH ?
+          AND d.parse_artifact_id IN (SELECT value FROM json_each(?))
+        ORDER BY score ASC, d.parse_artifact_id ASC LIMIT ?
+      `).all(query, JSON.stringify(ids), limit).map((row: any) => ({ ...mapSourceDocument(row), score: Number(row.score) }));
+    } catch { throw new KnowledgeError("KNOWLEDGE_INDEX_INVALID", "Knowledge source index query failed"); }
+  }
+
+  searchSections(input: KnowledgeGrainSearchInput): Array<StoredKnowledgeSection & { score: number }> {
+    const { ids, query, limit } = this.grainSearchArgs(input);
+    if (ids.length === 0 || !query) return [];
+    try {
+      return this.db.prepare(`
+        SELECT s.*, bm25(knowledge_sections_fts, 1.0, 0.35) AS score
+        FROM knowledge_sections_fts
+        JOIN knowledge_sections s ON s.rowid = knowledge_sections_fts.rowid
+        WHERE knowledge_sections_fts MATCH ?
+          AND s.parse_artifact_id IN (SELECT value FROM json_each(?))
+        ORDER BY score ASC, s.parse_artifact_id ASC, s.section_ordinal ASC, s.id ASC LIMIT ?
+      `).all(query, JSON.stringify(ids), limit).map((row: any) => ({ ...mapSection(row), score: Number(row.score) }));
+    } catch { throw new KnowledgeError("KNOWLEDGE_INDEX_INVALID", "Knowledge section index query failed"); }
   }
 
   /** 删除某解析产物的全部 FTS chunk 行（源被移除/孤儿清理时调用）。
@@ -571,6 +833,8 @@ export class KnowledgeIndexStore {
     this.db.transaction(() => {
       this.db.prepare(`DELETE FROM knowledge_chunks WHERE parse_artifact_id = ?`).run(artifactId);
       this.db.prepare(`DELETE FROM chunk_index_variant_metadata WHERE parse_artifact_id = ?`).run(artifactId);
+      this.db.prepare(`DELETE FROM knowledge_sections WHERE parse_artifact_id = ?`).run(artifactId);
+      this.db.prepare(`DELETE FROM knowledge_source_documents WHERE parse_artifact_id = ?`).run(artifactId);
     })();
   }
 
@@ -586,6 +850,7 @@ export class KnowledgeIndexStore {
       ordinal: Number(row.ordinal),
       text: row.text,
       tokenCount: Number(row.token_count),
+      ...(row.section_id == null ? {} : { sectionId: row.section_id }),
       spans: parseSpans(row.spans_json),
     }));
   }
@@ -603,6 +868,7 @@ export class KnowledgeIndexStore {
       ordinal: Number(row.ordinal),
       text: row.text,
       tokenCount: Number(row.token_count),
+      ...(row.section_id == null ? {} : { sectionId: row.section_id }),
       spans: parseSpans(row.spans_json),
     }));
   }
@@ -633,6 +899,7 @@ export class KnowledgeIndexStore {
       ordinal: Number(row.ordinal),
       text: row.text,
       tokenCount: Number(row.token_count),
+      ...(row.section_id == null ? {} : { sectionId: row.section_id }),
       spans: parseSpans(row.spans_json),
     }));
   }
@@ -674,6 +941,9 @@ export class KnowledgeIndexStore {
         deleteChunks.run(variant.id);
         deleteVariant.run(variant.id);
       }
+      this.db.prepare(`DELETE FROM chunk_index_variant_metadata WHERE parse_artifact_id = ?`).run(artifactId);
+      this.db.prepare(`DELETE FROM knowledge_sections WHERE parse_artifact_id = ?`).run(artifactId);
+      this.db.prepare(`DELETE FROM knowledge_source_documents WHERE parse_artifact_id = ?`).run(artifactId);
       return variants.length;
     })());
   }
@@ -793,6 +1063,7 @@ export class KnowledgeIndexStore {
         ordinal: Number(row.ordinal),
         text: row.text,
         tokenCount: Number(row.token_count),
+        ...(row.section_id == null ? {} : { sectionId: row.section_id }),
         spans: parseSpans(row.spans_json),
         score: Number(row.score),
       }));
@@ -836,6 +1107,7 @@ export class KnowledgeIndexStore {
         ordinal: Number(row.ordinal),
         text: row.text,
         tokenCount: Number(row.token_count),
+        ...(row.section_id == null ? {} : { sectionId: row.section_id }),
         spans: parseSpans(row.spans_json),
         score: Number(row.score),
       }));

@@ -6506,6 +6506,11 @@
         },
         {
           "root": "server-bootstrap",
+          "from": "lib/knowledge/scope-snapshot-compiler.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
           "from": "lib/knowledge/evidence-span-extractor.ts",
           "kind": "import-statement"
         },
@@ -6542,11 +6547,6 @@
         {
           "root": "server-bootstrap",
           "from": "lib/knowledge/source-processors.ts",
-          "kind": "import-statement"
-        },
-        {
-          "root": "server-bootstrap",
-          "from": "lib/knowledge/scope-snapshot-compiler.ts",
           "kind": "import-statement"
         },
         {
@@ -7188,11 +7188,31 @@
       "provenance": [
         {
           "root": "server-bootstrap",
+          "from": "lib/knowledge/knowledge-query-service.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/knowledge/evidence-packer.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/knowledge/knowledge-search-service.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
           "from": "lib/knowledge/knowledge-manager.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "core/engine.ts",
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by lib/knowledge/knowledge-manager.ts (import-statement)."
+      "reason": "Reached via esbuild source module graph, imported by lib/knowledge/knowledge-query-service.ts (import-statement); lib/knowledge/evidence-packer.ts (import-statement); lib/knowledge/knowledge-search-service.ts (import-statement); +2 more importer(s)."
     },
     {
       "path": "lib/knowledge/source-adapters.ts",
@@ -7426,6 +7446,11 @@
         },
         {
           "root": "server-bootstrap",
+          "from": "lib/knowledge/chunker.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
           "from": "core/session-reminders.ts",
           "kind": "import-statement"
         },
@@ -7442,6 +7467,11 @@
         {
           "root": "server-bootstrap",
           "from": "lib/knowledge/evidence-span-extractor.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/knowledge/knowledge-query-service.ts",
           "kind": "import-statement"
         },
         {
@@ -7485,7 +7515,7 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by core/session-compactor.ts (import-statement); core/session-reminders.ts (import-statement); core/tool-catalog.ts (import-statement); +10 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by core/session-compactor.ts (import-statement); lib/knowledge/chunker.ts (import-statement); core/session-reminders.ts (import-statement); +12 more importer(s)."
     },
     {
       "path": "lib/llm/model-call-correlation.ts",

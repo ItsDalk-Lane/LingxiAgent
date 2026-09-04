@@ -14,7 +14,7 @@ export async function createRerankFixture(refs: Array<KnowledgeModelRef | null>,
       const notebook = manager.createNotebook({ studioId: "rerank", name: `资料 ${index}` }); notebooks.push(notebook);
       manager.updateNotebookSettings({ studioId: "rerank", notebookId: notebook.id, chunkTargetChars: 200, rerankModelRef: ref });
       const imported = await manager.importPastedText({ studioId: "rerank", notebookId: notebook.id, displayName: `${index}.txt`,
-        text: manyChunks ? Array.from({ length: 80 }, (_, i) => "needle ".repeat(40) + `章节 ${i}`).join("\n\n") : `needle 对应资料 ${index}。` });
+        text: manyChunks ? Array.from({ length: 80 }, (_, i) => "needle ".repeat(240) + `章节 ${i}`).join("\n\n") : `needle 对应资料 ${index}。` });
       sourceIds.push(imported.source.id);
       manager.enqueueSourceIngestion({ studioId: "rerank", notebookId: notebook.id, sourceId: imported.source.id });
       await manager.ingestion.drainQueue();

@@ -1,3 +1,4 @@
+import { KNOWLEDGE_CHUNK_TARGET_CHARS } from "../lib/knowledge/chunker.ts";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
@@ -373,7 +374,7 @@ describe("Knowledge route", () => {
         chunkTargetChars: null,
         retrievalTopK: null,
       },
-      chunkTargetCharsEffective: 6553,
+      chunkTargetCharsEffective: KNOWLEDGE_CHUNK_TARGET_CHARS,
       sourceCount: 1,
       ingestion: { done: 0, pendingEmbedding: 0, processing: 1, failed: 0, untracked: 0 },
     });

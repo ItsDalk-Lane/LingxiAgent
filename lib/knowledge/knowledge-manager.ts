@@ -7,8 +7,8 @@ import {
   DEFAULT_KNOWLEDGE_IMPORT_MAX_BYTES,
   readSecureKnowledgeImportFile,
 } from "./file-import-security.ts";
-import { KnowledgeStore, resolveNotebookConfig } from "./knowledge-store.ts";
-import { computeAutoChunkTargetChars, resolveKnowledgeChunkerConfig } from "./chunker.ts";
+import { KnowledgeStore, resolveEffectiveChunkTargetChars, resolveNotebookConfig } from "./knowledge-store.ts";
+import { KNOWLEDGE_CHUNKER_VERSION, resolveKnowledgeChunkerConfig } from "./chunker.ts";
 import { KnowledgeIndexStore } from "./knowledge-index-store.ts";
 import {
   KnowledgeIngestionService,
@@ -171,7 +171,7 @@ export interface KnowledgeManagerOptions {
     signal?: AbortSignal;
     modelRef: KnowledgeModelRef;
   }) => Promise<{ results: Array<{ index: number; score: number }> } | null>) | null;
-  /** 查嵌入模型上下文窗口（token 数）：自动分块与生效值展示共用。 */
+  /** 查嵌入模型硬输入上限；v3 分块粒度固定，发送前才按该上限验证。 */
   getEmbeddingModelContextWindow?: ((modelRef: KnowledgeModelRef) => number | null) | null;
   ingestionLog?: (message: string) => void;
   /** 测试注入：file 源 watcher 的计时器/IO 参数（防抖/退避/轮询时长、watch/stat 工厂）。 */
@@ -257,6 +257,7 @@ export class KnowledgeManager {
   private readonly lifecycleLog: (message: string) => void;
   private lifecycleGcTimer: ReturnType<typeof setInterval> | null = null;
   private metadataBackfill: ReturnType<typeof setImmediate> | null = null;
+  private backgroundReindexScan: ReturnType<typeof setImmediate> | null = null;
 
   constructor(options: KnowledgeManagerOptions) {
     this.options = options;
@@ -289,7 +290,7 @@ export class KnowledgeManager {
       Database: options.Database,
       now: options.now,
       idGenerator: this.idGenerator,
-      // 自动分块尺寸/Profile 解析与 engine 的模型目录同一口径（core/engine.ts 接线）。
+      // 保留模型目录查询供旧配置兼容；新版本默认粒度不随模型窗口变化。
       getEmbeddingModelContextWindow: options.getEmbeddingModelContextWindow ?? null,
     });
     this.indexStore = new KnowledgeIndexStore({
@@ -338,22 +339,7 @@ export class KnowledgeManager {
       // 查询线程不等待构建。入队失败（如笔记本被并发删除）不阻断本轮查询——
       // 降级已显式留痕，下一次查询会再次幂等尝试入队。
       requestVariantBuild: (input) => {
-        try {
-          // 字段映射：查询侧锚名 parseArtifactId → 摄入侧 artifactId（漏映射会走
-          // 占位 configId 路径，丢失入队时的真实分块配置记录与 profile 建绑）。
-          this.ingestion.requestVariantBuild({
-            studioId: input.studioId,
-            notebookId: input.notebookId,
-            sourceId: input.sourceId,
-            artifactId: input.parseArtifactId,
-          });
-        } catch (error) {
-          options.ingestionLog?.(
-            `knowledge query: background variant build enqueue failed: ${
-              error instanceof Error ? error.message : String(error)
-            }`,
-          );
-        }
+        this.scheduleVariantBuild(input);
       },
     });
     this.searchService = new KnowledgeSearchService({ store: this.store, indexStore: this.indexStore, queryService: this.queryService });
@@ -361,6 +347,7 @@ export class KnowledgeManager {
       store: this.store,
       queryService: this.queryService,
       parseSource: (input) => this.parseSource(input),
+      hasReadyCurrentChunkVariant: artifactId => this.hasReadyCurrentChunkVariant(artifactId),
       embedTextsForModel: options.embedTextsForModel ?? null,
       canEmbedWithModel: options.canEmbedWithModel ?? null,
       getEmbeddingModelContextWindow: options.getEmbeddingModelContextWindow ?? null,
@@ -373,27 +360,7 @@ export class KnowledgeManager {
       store: this.store,
       indexStore: this.indexStore,
       requestVariantBuild: (input) => {
-        const key = `${input.notebookId}:${input.sourceId}:${input.parseArtifactId}`;
-        if (this.scopeBuildRequests.has(key)) return;
-        // 既有入队接口会读正文解析配置；推到后台，编译关键路径只读元信息。
-        const pending = setImmediate(() => {
-          this.scopeBuildRequests.delete(key);
-          try {
-            this.ingestion.requestVariantBuild({
-              studioId: input.studioId,
-              notebookId: input.notebookId,
-              sourceId: input.sourceId,
-              artifactId: input.parseArtifactId,
-            });
-            this.scopeCompiler.invalidateNotebook(input.notebookId);
-          } catch (error) {
-            this.lifecycleLog(`knowledge scope: background variant enqueue failed: ${
-              error instanceof Error ? error.message : String(error)
-            }`);
-          }
-        });
-        pending.unref();
-        this.scopeBuildRequests.set(key, pending);
+        this.scheduleVariantBuild(input);
       },
     });
     this.watcher = new KnowledgeSourceFileWatcher({
@@ -404,6 +371,53 @@ export class KnowledgeManager {
       ...options.fileWatcher,
     });
     this.scheduleMetadataBackfill();
+    this.scheduleBackgroundReindex();
+  }
+
+  private hasReadyCurrentChunkVariant(parseArtifactId: string): boolean {
+    return this.indexStore.listChunkIndexVariantsByArtifact(parseArtifactId).some(variant => {
+      if (variant.status !== "ready") return false;
+      try { return this.store.getChunkProfile({ profileHash: variant.chunkProfileHash }).chunkerVersion === KNOWLEDGE_CHUNKER_VERSION; }
+      catch (error) { if (isKnowledgeError(error) && error.code === "KNOWLEDGE_NOT_FOUND") return false; throw error; }
+    });
+  }
+
+  /** 启动返回后再按来源分页；每批只读身份，不在启动或查询关键路径读取正文、构建索引。 */
+  private scheduleBackgroundReindex(afterSourceId = ""): void {
+    this.backgroundReindexScan = setImmediate(() => {
+      this.backgroundReindexScan = null;
+      try {
+        const sources = this.store.listActiveLatestArtifactsForReindex({ afterSourceId, limit: 20 });
+        for (const source of sources) {
+          try {
+            if (!source.parseArtifactId || !this.hasReadyCurrentChunkVariant(source.parseArtifactId)) this.ingestion.enqueueBackgroundReindex(source);
+          } catch (error) {
+            this.lifecycleLog(`knowledge ingestion: background v3 source scan failed for ${source.sourceId}: ${error instanceof Error ? error.message : String(error)}`);
+          }
+        }
+        if (sources.length === 20) this.scheduleBackgroundReindex(sources.at(-1)!.sourceId);
+      } catch (error) {
+        this.lifecycleLog(`knowledge ingestion: background v3 scan failed: ${error instanceof Error ? error.message : String(error)}`);
+      }
+    });
+    this.backgroundReindexScan.unref();
+  }
+
+  private scheduleVariantBuild(input: { studioId: string; notebookId: string; sourceId: string; parseArtifactId: string }): void {
+    const key = `${input.notebookId}:${input.sourceId}:${input.parseArtifactId}`;
+    if (this.scopeBuildRequests.has(key)) return;
+    const pending = setImmediate(() => {
+      this.scopeBuildRequests.delete(key);
+      try {
+        this.ingestion.requestVariantBuild({ studioId: input.studioId, notebookId: input.notebookId,
+          sourceId: input.sourceId, artifactId: input.parseArtifactId });
+        this.scopeCompiler.invalidateNotebook(input.notebookId);
+      } catch (error) {
+        this.lifecycleLog(`knowledge query: background variant enqueue failed: ${error instanceof Error ? error.message : String(error)}`);
+      }
+    });
+    pending.unref();
+    this.scopeBuildRequests.set(key, pending);
   }
 
   /** 启动完成后再逐批补齐目录；失败留痕并继续其他变体，关闭时取消未执行批次。 */
@@ -813,7 +827,7 @@ export class KnowledgeManager {
   }
 
   runFastKnowledgePipeline(input: Parameters<FastKnowledgePipeline["run"]>[0]) {
-    const packer = new EvidencePacker();
+    const packer = new EvidencePacker({ store: this.store, indexStore: this.indexStore });
     return this.createFastKnowledgePipeline({
       extractSpans: request => this.queryService.extractEvidenceSpans(request),
       packEvidence: request => packer.pack(request),
@@ -1752,20 +1766,12 @@ export class KnowledgeManager {
     return this.ingestion.onModelConfigMayHaveChanged();
   }
 
-    /**
-   * 生效分块尺寸（只读展示用）：笔记本遗留显式列 > 嵌入模型上下文 ×80%
-   * 自动值（窗口查不到回退 8192）。与摄入侧 resolveConfig 同一派生口径。
-   */
+  /** 生效配置的只读展示，与摄入侧共用固定 v3 默认解析。 */
   getNotebookEffectiveChunkTargetChars(input: { studioId: unknown; notebookId: unknown }): number {
     const resolved = resolveNotebookConfig(
       this.store.getNotebookConfig({ studioId: input?.studioId, notebookId: input?.notebookId }),
     );
-    if (resolved.chunkTargetChars != null) return resolved.chunkTargetChars;
-    return computeAutoChunkTargetChars(
-      resolved.embeddingModelRef
-        ? this.options.getEmbeddingModelContextWindow?.(resolved.embeddingModelRef) ?? null
-        : null,
-    );
+    return resolveEffectiveChunkTargetChars(resolved, this.options.getEmbeddingModelContextWindow);
   }
 
   /**
@@ -1857,6 +1863,8 @@ export class KnowledgeManager {
     this.searchService.close();
     if (this.metadataBackfill) clearImmediate(this.metadataBackfill);
     this.metadataBackfill = null;
+    if (this.backgroundReindexScan) clearImmediate(this.backgroundReindexScan);
+    this.backgroundReindexScan = null;
     this.scopeCompiler.dispose();
     for (const pending of this.scopeBuildRequests.values()) clearImmediate(pending);
     this.scopeBuildRequests.clear();

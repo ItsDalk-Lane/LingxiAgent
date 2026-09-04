@@ -11,6 +11,7 @@ import {
   MIN_KNOWLEDGE_CHUNK_TARGET_CHARS,
   computeAutoChunkTargetChars,
   knowledgeChunkerConfigId,
+  legacyKnowledgeChunkerConfigId,
 } from "./chunker.ts";
 import type { KnowledgeChunkerStrategy } from "./chunker.ts";
 import type {
@@ -690,21 +691,12 @@ export function resolveNotebookConfig(config: NotebookConfig): ResolvedNotebookC
   };
 }
 
-/**
- * 生效分块尺寸：显式列 > 嵌入模型上下文 ×80% 自动值（computeAutoChunkTargetChars）。
- * 摄入侧与查询侧懒构建必须经同一函数解析——两侧各自解析曾是查询侧按默认 1200
- * 重建索引、与摄入侧指纹互相打架的根因（configId 进 chunk id，尺寸不同即全量重建+重嵌）。
- */
+/** 新分块使用固定粒度；旧显式配置只保留配置身份，模型窗口仅在嵌入派发前校验。 */
 export function resolveEffectiveChunkTargetChars(
   resolved: Pick<ResolvedNotebookConfig, "chunkTargetChars" | "embeddingModelRef">,
-  getEmbeddingModelContextWindow?: ((modelRef: KnowledgeModelRef) => number | null) | null,
+  _getEmbeddingModelContextWindow?: ((modelRef: KnowledgeModelRef) => number | null) | null,
 ): number {
-  return resolved.chunkTargetChars
-    ?? computeAutoChunkTargetChars(
-      resolved.embeddingModelRef
-        ? getEmbeddingModelContextWindow?.(resolved.embeddingModelRef) ?? null
-        : null,
-    );
+  return resolved.chunkTargetChars ?? KNOWLEDGE_CHUNK_TARGET_CHARS;
 }
 
 export interface KnowledgeStoreOptions {
@@ -1843,10 +1835,11 @@ export class KnowledgeStore {
     `).all();
     for (const row of notebooks) {
       const resolved = resolveNotebookConfig(toNotebookConfig(row));
-      const targetChars = resolveEffectiveChunkTargetChars(resolved, this.getEmbeddingModelContextWindow);
+      const targetChars = resolved.chunkTargetChars ?? computeAutoChunkTargetChars(resolved.embeddingModelRef
+        ? this.getEmbeddingModelContextWindow?.(resolved.embeddingModelRef) : null);
       const source: KnowledgeChunkTargetCharsSource = resolved.chunkTargetChars != null ? "explicit" : "auto";
       for (const strategy of CHUNK_PROFILE_STRATEGIES) {
-        const hash = knowledgeChunkerConfigId(strategy, targetChars);
+        const hash = legacyKnowledgeChunkerConfigId(strategy, targetChars);
         const existing = candidates.get(hash);
         // 同一指纹被多本笔记本推导出来时，explicit 来源比 auto 更具体，优先保留。
         if (!existing || (existing.source === "auto" && source === "explicit")) {
@@ -1871,7 +1864,7 @@ export class KnowledgeStore {
       if (candidate) {
         insert.run(
           `cp_${hash}`, hash, candidate.strategy, candidate.targetChars, candidate.source,
-          KNOWLEDGE_CHUNKER_VERSION, "standard", now,
+          "2", "standard", now,
         );
       } else {
         insert.run(`cp_${hash}`, hash, null, null, null, null, "legacy", now);
@@ -2185,6 +2178,49 @@ export class KnowledgeStore {
       embeddingModelRef: parseModelRefJson(row.embedding_model_ref, "retrieval profile embedding model ref"),
       rerankModelRef: parseModelRefJson(row.rerank_model_ref, "retrieval profile rerank model ref"),
     };
+  }
+
+  /** 读取同一配置的就绪候选顺序：新 v3 优先，旧 v2 在后台重建期间仍可查询。 */
+  getQueryChunkProfileCandidates(profileHash: string): string[] {
+    const row = this.db.prepare("SELECT * FROM chunk_profiles WHERE profile_hash=?").get(profileHash);
+    if (!row || row.profile_type !== "standard" || !row.strategy || row.target_chars == null) return [profileHash];
+    const target = row.target_chars_source === "auto" ? KNOWLEDGE_CHUNK_TARGET_CHARS : Number(row.target_chars);
+    // 同一笔记本的不同格式由各自解析产物决定策略，不能把最后处理资料的策略套给所有来源。
+    const strategies = [chunkProfileStrategy(row.strategy), ...CHUNK_PROFILE_STRATEGIES];
+    const preferred = [...new Set(strategies)].map(strategy => knowledgeChunkerConfigId(strategy, target));
+    const legacy = this.db.prepare(`SELECT profile_hash FROM chunk_profiles
+      WHERE chunker_version='2' AND profile_type='standard'
+        AND ((?='auto' AND target_chars_source='auto') OR (?<>'auto' AND target_chars=?))
+      ORDER BY CASE WHEN profile_hash=? THEN 0 ELSE 1 END, created_at DESC, profile_hash ASC`)
+      .all(row.target_chars_source, row.target_chars_source, target, profileHash);
+    return [...new Set<string>([...preferred, ...legacy.map((item: { profile_hash: string }) => item.profile_hash), profileHash])];
+  }
+
+  /** 仅查配置版本元数据，用于区分旧索引回退与当前格式自己的 v3 索引。 */
+  isCurrentChunkProfile(profileHash: string): boolean {
+    return this.db.prepare("SELECT chunker_version FROM chunk_profiles WHERE profile_hash=?").get(profileHash)?.chunker_version
+      === KNOWLEDGE_CHUNKER_VERSION;
+  }
+
+  /** 启动后逐页扫描活跃资料身份，不在启动线程读取或重建原文。 */
+  listActiveLatestArtifactsForReindex(input: { afterSourceId?: string; limit?: number } = {}): Array<{
+    studioId: string; sourceId: string; notebookId: string; parseArtifactId: string | null;
+  }> {
+    const limit = input.limit ?? 20;
+    if (!Number.isSafeInteger(limit) || limit < 1 || limit > 100) {
+      throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "Reindex page size is invalid");
+    }
+    return this.db.prepare(`SELECT s.studio_id AS studioId,s.id AS sourceId,
+      (SELECT n.id FROM notebook_sources ns JOIN notebooks n ON n.id=ns.notebook_id
+        WHERE ns.source_id=s.id AND ns.removed_at IS NULL AND n.deleted_at IS NULL AND n.studio_id=s.studio_id
+        ORDER BY n.id LIMIT 1) AS notebookId,
+      (SELECT pa.id FROM parse_artifacts pa WHERE pa.content_snapshot_id=(SELECT cs.id FROM content_snapshots cs
+        WHERE cs.source_id=s.id ORDER BY cs.captured_at DESC,cs.id DESC LIMIT 1)
+        ORDER BY pa.created_at DESC,pa.id DESC LIMIT 1) AS parseArtifactId
+      FROM sources s WHERE s.deleted_at IS NULL AND s.id>?
+        AND EXISTS(SELECT 1 FROM notebook_sources ns JOIN notebooks n ON n.id=ns.notebook_id
+          WHERE ns.source_id=s.id AND ns.removed_at IS NULL AND n.deleted_at IS NULL AND n.studio_id=s.studio_id)
+      ORDER BY s.id LIMIT ?`).all(input.afterSourceId ?? "", limit);
   }
 
   renameNotebook(input: { studioId: unknown; notebookId: unknown; name: unknown }): KnowledgeNotebook {
@@ -4513,6 +4549,29 @@ export class KnowledgeStore {
       WHERE id = ?
     `).run(this.now(), job.id);
     return this.getIngestionJob({ studioId, jobId: job.id });
+  }
+
+  /** 旧配置的排队任务先补新分块；不碰运行中的任务、旧索引或已付费向量。 */
+  restartIngestionJobForChunking(input: {
+    studioId: unknown; jobId: unknown; artifactId: unknown; chunkerConfigId: unknown;
+  }): IngestionJob {
+    const studioId = requiredString(input.studioId, "studioId", 256);
+    const configId = chunkerConfigId(input.chunkerConfigId);
+    return this.db.transaction(() => {
+      const job = this.getIngestionJob({ studioId, jobId: input.jobId });
+      this.activeSource(studioId, job.sourceId);
+      this.activeNotebook(studioId, job.notebookId);
+      const artifact = this.getParseArtifact({ studioId, parseArtifactId: input.artifactId });
+      const snapshot = this.getContentSnapshot({ studioId, snapshotId: artifact.contentSnapshotId });
+      if (snapshot.sourceId !== job.sourceId || artifact.status !== "ready" || job.cancelledAt != null
+        || !["queued", "pending_embedding"].includes(job.status)) {
+        throw new KnowledgeError("KNOWLEDGE_CONFLICT", "Ingestion job cannot restart chunking");
+      }
+      this.db.prepare(`UPDATE ingestion_jobs SET status='queued',phase='chunk',artifact_id=?,chunker_config_id=?,
+        attempt=0,error=NULL,retry_after=NULL,progress_done=0,progress_total=NULL,updated_at=? WHERE id=?`)
+        .run(artifact.id, configId, this.now(), job.id);
+      return this.getIngestionJob({ studioId, jobId: job.id });
+    })();
   }
 
   /** 模型就绪信号：全部 pending_embedding 一次性置回 queued 补跑嵌入。返回置回数量。 */

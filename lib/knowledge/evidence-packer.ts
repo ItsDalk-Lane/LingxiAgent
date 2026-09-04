@@ -11,6 +11,9 @@ import {
   type FastKnowledgeEvidenceStages,
   type FastKnowledgePackedEvidence,
 } from "./fast-knowledge-pipeline.ts";
+import { resolveReadyKnowledgeQueryVariant } from "./scope-snapshot-compiler.ts";
+import type { KnowledgeStore } from "./knowledge-store.ts";
+import type { KnowledgeIndexStore } from "./knowledge-index-store.ts";
 import { knowledgeChunkIndexVariantId } from "./knowledge-index-store.ts";
 import type { KnowledgeEvidenceIdentityEntry } from "./knowledge-context-injector.ts";
 
@@ -29,6 +32,8 @@ function renderEvidence(span: KnowledgeEvidenceSpan, ordinal: number): string {
 
 /** 同一组已验证范围决定注入正文、连续引用编号和持久化身份清单。 */
 export class EvidencePacker {
+  private readonly deps?: { store: KnowledgeStore; indexStore: KnowledgeIndexStore };
+  constructor(deps?: { store: KnowledgeStore; indexStore: KnowledgeIndexStore }) { this.deps = deps; }
   pack(input: PackingInput): FastKnowledgePackedEvidence {
     const scope = input.compiledScope;
     const header = ["[KnowledgeContext]", "Mode: fast", "Execution path: local FTS", `Scope: ${scope.scopeId}`,
@@ -83,14 +88,21 @@ export class EvidencePacker {
       const location = hit.spans.find(item => item.blockId === span.blockId
         && item.blockStartOffset <= span.startOffset && item.blockEndOffset >= span.endOffset);
       if (!location) throw new KnowledgeError("KNOWLEDGE_INDEX_INVALID", "Evidence offsets are outside their chunk span");
-      const notebook = scope.notebooks.find(item => item.sourceIds.includes(span.sourceId) && item.chunkProfileHash
-        && knowledgeChunkIndexVariantId(span.parseArtifactId, item.chunkProfileHash) === hit.chunkIndexVariantId);
+      let actualProfileHash: string | null = null;
+      const notebook = scope.notebooks.find(item => {
+        if (!item.sourceIds.includes(span.sourceId) || !item.chunkProfileHash) return false;
+        const variant = this.deps ? resolveReadyKnowledgeQueryVariant({ ...this.deps, parseArtifactId: span.parseArtifactId,
+          chunkProfileHash: item.chunkProfileHash, readyChunkVariantIds: scope.readyChunkVariantIds }) : null;
+        const hash = variant?.chunkProfileHash ?? item.chunkProfileHash;
+        if (knowledgeChunkIndexVariantId(span.parseArtifactId, hash) !== hit.chunkIndexVariantId) return false;
+        actualProfileHash = hash; return true;
+      });
       if (!notebook) throw new KnowledgeError("KNOWLEDGE_SCOPE_VIOLATION", "Evidence profile is outside the frozen scope");
       let entry = entries.get(hit.id);
       if (!entry) {
         entry = {
           chunkId: hit.id, ordinal: hit.ordinal, parseArtifactId: hit.parseArtifactId,
-          chunkIndexVariantId: hit.chunkIndexVariantId, chunkProfileHash: notebook.chunkProfileHash,
+          chunkIndexVariantId: hit.chunkIndexVariantId, chunkProfileHash: actualProfileHash,
           sourceId: span.sourceId, notebookId: notebook.notebookId, contextOnly: false,
           citationLabels: [], blockSpans: [],
         };

@@ -4,11 +4,12 @@ import os from "node:os";
 import path from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 
+// 本文件固定验证v2字符分块行为；明确走历史入口，保留原有算法与缓存身份断言。
 import {
-  buildKnowledgeChunks,
-  knowledgeBlockFingerprint,
-  knowledgeChunkerConfigId,
-  resolveKnowledgeChunkerConfig,
+  buildLegacyKnowledgeChunks as buildKnowledgeChunks,
+  legacyKnowledgeBlockFingerprint as knowledgeBlockFingerprint,
+  legacyKnowledgeChunkerConfigId as knowledgeChunkerConfigId,
+  resolveLegacyKnowledgeChunkerConfig as resolveKnowledgeChunkerConfig,
   type KnowledgeChunkDraft,
 } from "../lib/knowledge/chunker.ts";
 import { KnowledgeIndexStore } from "../lib/knowledge/knowledge-index-store.ts";

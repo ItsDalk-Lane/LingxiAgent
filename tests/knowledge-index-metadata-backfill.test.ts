@@ -3,6 +3,7 @@ import os from "node:os";
 import path from "node:path";
 import { setImmediate as nextTurn } from "node:timers/promises";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { buildLegacyKnowledgeChunks } from "../lib/knowledge/chunker.ts";
 import { KnowledgeManager } from "../lib/knowledge/knowledge-manager.ts";
 import { KnowledgeQueryService } from "../lib/knowledge/knowledge-query-service.ts";
 import { KnowledgeIndexStore } from "../lib/knowledge/knowledge-index-store.ts";
@@ -66,10 +67,12 @@ describe("查询目录摄入与后台补齐", () => {
   it("后台失败明确留痕且继续其他变体；关闭取消未执行的批次", async () => {
     const { manager, home, artifact, variant } = await fixture();
     manager.indexStore.db.prepare("DELETE FROM chunk_index_variant_metadata").run();
+    // 模拟缺失原始解析产物的旧版索引，不借用另一产物的 v3 章节身份。
+    const missingBlocks = manager.store.listArtifactBlocks({ studioId: metadataStudio, parseArtifactId: artifact.id })
+      .map(block => ({ ...block, parseArtifactId: "missing-artifact" }));
     manager.indexStore.replaceArtifactChunks({ parseArtifactId: "missing-artifact",
       chunkProfileHash: "0".repeat(16), blockFingerprint: "missing",
-      chunks: manager.indexStore.listVariantChunks(variant.id).map((chunk, ordinal) => ({ ...chunk,
-        parseArtifactId: "missing-artifact", id: `missing-${ordinal}` })),
+      chunks: buildLegacyKnowledgeChunks("missing-artifact", missingBlocks),
     });
     close(manager);
     const log = vi.fn();

@@ -51,6 +51,18 @@ interface CompilerDependencies {
   }) => void;
 }
 
+/** 在已冻结变体集合中按新旧配置优先级读取，绝不现场构建或扩大资料范围。 */
+export function resolveReadyKnowledgeQueryVariant(input: {
+  store: KnowledgeStore; indexStore: KnowledgeIndexStore; parseArtifactId: string;
+  chunkProfileHash: string; readyChunkVariantIds?: readonly string[];
+}) {
+  for (const hash of input.store.getQueryChunkProfileCandidates(input.chunkProfileHash)) {
+    const metadata = input.indexStore.getReadyVariantMetadata({ parseArtifactId: input.parseArtifactId, chunkProfileHash: hash });
+    if (metadata && (!input.readyChunkVariantIds || input.readyChunkVariantIds.includes(metadata.id))) return metadata;
+  }
+  return null;
+}
+
 /** 冻结事实只读编译；同一轮的并发读共享一份结果，生命周期变化显式失效。 */
 export class ScopeSnapshotCompiler {
   private readonly cache = new Map<string, {
@@ -169,27 +181,32 @@ export class ScopeSnapshotCompiler {
       }
       for (const [hash, members] of [...profiles].sort(([a], [b]) => (a ?? "").localeCompare(b ?? ""))) {
         const metadata = artifact?.status === "ready" && hash
-          ? this.deps.indexStore.getReadyVariantMetadata({ parseArtifactId: artifact.id, chunkProfileHash: hash })
+          ? resolveReadyKnowledgeQueryVariant({ ...this.deps, parseArtifactId: artifact.id, chunkProfileHash: hash })
           : null;
         identities.push({
           sourceId: row.sourceId,
           contentSnapshotId: row.contentSnapshotId,
           parseArtifactId: row.parseArtifactId,
           notebookIds: members,
-          chunkProfileHash: hash,
+          chunkProfileHash: metadata?.chunkProfileHash ?? hash,
           chunkIndexVariantId: metadata?.id ?? null,
         });
         if (metadata) {
           readyIds.add(metadata.id);
           if (row.status !== "ready") {
             row.status = "ready";
-            row.chunkProfileHash = hash;
+            row.chunkProfileHash = metadata.chunkProfileHash;
             row.chunkIndexVariantId = metadata.id;
             row.chunkCount = metadata.chunkCount;
             row.firstHeadingPath = metadata.firstHeadingPath;
             row.sectionKeys = metadata.sectionKeys;
           }
           if (metadata.metadataMissing) warnings.push(`${row.sourceId}:${metadata.id}:section_metadata_missing`);
+          if (hash && !this.deps.store.isCurrentChunkProfile(metadata.chunkProfileHash)) {
+            warnings.push(`${row.sourceId}:${metadata.id}:v2_fallback_rebuild_pending`);
+            for (const notebookId of members) this.deps.requestVariantBuild({ studioId: scope.studioId,
+              notebookId, sourceId: row.sourceId, parseArtifactId: artifact!.id });
+          }
         } else if (artifact?.status === "ready") {
           const variant = hash ? this.deps.indexStore.resolveChunkIndexVariant(artifact.id, hash) : null;
           const status = variant?.status === "building" ? "index_building"

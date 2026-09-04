@@ -1,11 +1,14 @@
 import { searchVectorBackend, type KnowledgeVectorSearchBackend } from "./vector-search-backend.ts";
 import crypto from "node:crypto";
 import { QueryEmbeddingCache, normalizeKnowledgeQuery } from "./query-embedding-cache.ts";
-import type { CompiledKnowledgeScope, CompiledKnowledgeNotebook } from "./scope-snapshot-compiler.ts";
+import { resolveReadyKnowledgeQueryVariant, type CompiledKnowledgeScope, type CompiledKnowledgeNotebook } from "./scope-snapshot-compiler.ts";
+import { estimateTextTokens } from "../llm/estimate-text-tokens.ts";
 import { EvidenceSpanExtractor } from "./evidence-span-extractor.ts";
 
 import {
   buildKnowledgeChunks,
+  buildKnowledgeSections,
+  legacyKnowledgeBlockFingerprint,
   knowledgeBlockFingerprint,
   resolveKnowledgeChunkerConfig,
   type KnowledgeChunkDraft,
@@ -448,7 +451,7 @@ export class KnowledgeQueryService {
       signal?: AbortSignal;
       modelRef: KnowledgeModelRef;
     }) => Promise<{ results: Array<{ index: number; score: number }> } | null>) | null;
-    /** 查嵌入模型上下文窗口（token 数）：与摄入侧同源，用于自动分块尺寸解析。 */
+    /** 查嵌入模型输入上限；新分块粒度固定，不从窗口推导。 */
     getEmbeddingModelContextWindow?: ((modelRef: KnowledgeModelRef) => number | null) | null;
     /**
      * 后台补齐回调（§十二）：查询发现索引变体缺失/未就绪时幂等入队构建任务
@@ -557,6 +560,8 @@ export class KnowledgeQueryService {
           blockFingerprint: fingerprint,
           chunks,
           metadata: buildVariantMetadata(chunks, blocks),
+          sections: buildKnowledgeSections(parseArtifactId, blocks),
+          sourceDocument: this.buildSourceDocument(studioId, parseArtifactId, blocks),
         });
       } catch (error) {
         // 显式终态：构建失败的变体落 failed（查询侧只读 ready 变体，读不到半写状态）。
@@ -607,6 +612,17 @@ export class KnowledgeQueryService {
     });
   }
 
+  private buildSourceDocument(studioId: string, parseArtifactId: string, blocks: KnowledgeBlock[]) {
+    const artifact = this.deps.store.getParseArtifact({ studioId, parseArtifactId });
+    const snapshot = this.deps.store.getContentSnapshot({ studioId, snapshotId: artifact.contentSnapshotId });
+    const source = this.deps.store.getSource({ studioId, sourceId: snapshot.sourceId });
+    const outlineText = [...new Set(buildKnowledgeSections(parseArtifactId, blocks)
+      .filter(section => section.headingPath.length > 0).map(section => section.headingPath.join(" > ")))].join("\n");
+    return { parseArtifactId, title: source.displayName, outlineText,
+      searchText: [source.displayName, outlineText, blocks[0]?.text.slice(0, 2048) ?? "",
+        blocks.at(-1)?.text.slice(-2048) ?? "", snapshot.mimeType, source.sourceType].join("\n") };
+  }
+
   getModelConfigurationRevision(ref: KnowledgeModelRef): string {
     return this.deps.getModelConfigurationRevision?.(ref) ?? String(this.configurationRevision);
   }
@@ -629,8 +645,8 @@ export class KnowledgeQueryService {
     for (const notebook of input.notebooks) {
       for (const source of input.compiledScope.sources) {
         if (!source.parseArtifactId || !notebook.chunkProfileHash || !source.notebookIds.includes(notebook.notebookId)) continue;
-        const variant = this.deps.indexStore.getReadyVariantMetadata({
-          parseArtifactId: source.parseArtifactId, chunkProfileHash: notebook.chunkProfileHash,
+        const variant = resolveReadyKnowledgeQueryVariant({ ...this.deps,
+          parseArtifactId: source.parseArtifactId, chunkProfileHash: notebook.chunkProfileHash, readyChunkVariantIds: input.variantIds,
         });
         if (variant && input.variantIds.includes(variant.id)) scopes.set(variant.id, {
           parseArtifactId: variant.parseArtifactId, chunkProfileHash: variant.chunkProfileHash,
@@ -871,6 +887,7 @@ export class KnowledgeQueryService {
     signal?: AbortSignal;
     /** 每批嵌入成功并持久化后回调（done/total 均为累计块数，含断点恢复的部分）；抛错按嵌入失败处理。 */
     onProgress?: (done: number, total: number) => void;
+    modelInputMaxTokens?: number | null;
   }): Promise<{
     status: "embedded" | "skipped" | "unavailable";
     chunkCount: number;
@@ -891,6 +908,10 @@ export class KnowledgeQueryService {
     const chunks = this.deps.indexStore.listVariantChunks(chunkIndexVariantId);
     if (chunks.length === 0) {
       throw new KnowledgeError("KNOWLEDGE_INDEX_INVALID", "Indexed Knowledge artifact has no chunks to embed");
+    }
+    if (input.modelInputMaxTokens != null && Number.isFinite(input.modelInputMaxTokens) && input.modelInputMaxTokens > 0
+      && chunks.some(chunk => estimateTextTokens(chunk.text) > input.modelInputMaxTokens!)) {
+      throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "Knowledge span exceeds the embedding model input limit");
     }
     const fingerprint = chunkFingerprint(chunks);
     const build = async (): Promise<{
@@ -1025,6 +1046,7 @@ export class KnowledgeQueryService {
     studioId: string;
     artifactIds: string[];
     chunkTargetChars?: number | null;
+    fallbackProfileHash?: string | null;
   }): KnowledgeRetrievalScope[] {
     const seen = new Set<string>();
     const scopes: KnowledgeRetrievalScope[] = [];
@@ -1033,14 +1055,18 @@ export class KnowledgeQueryService {
       const config = resolveKnowledgeChunkerConfig(blocks, {
         ...(input.chunkTargetChars != null ? { targetChars: input.chunkTargetChars } : {}),
       });
-      const chunkProfileHash = config.configId;
+      const preferred = config.configId;
+      const candidateHashes = [...new Set([preferred, ...this.deps.store.getQueryChunkProfileCandidates(input.fallbackProfileHash ?? preferred)])];
+      const selected = candidateHashes.find(hash => this.deps.indexStore.hasArtifactFingerprint(parseArtifactId, hash,
+        hash === preferred ? knowledgeBlockFingerprint(blocks) : legacyKnowledgeBlockFingerprint(blocks)));
+      const chunkProfileHash = selected ?? preferred;
       const key = `${parseArtifactId}\0${chunkProfileHash}`;
       if (seen.has(key)) continue;
       seen.add(key);
       scopes.push({
         parseArtifactId,
         chunkProfileHash,
-        blockFingerprint: knowledgeBlockFingerprint(blocks),
+        blockFingerprint: chunkProfileHash === preferred ? knowledgeBlockFingerprint(blocks) : legacyKnowledgeBlockFingerprint(blocks),
       });
     }
     return scopes;
@@ -1689,7 +1715,7 @@ export class KnowledgeQueryService {
           })) as KnowledgeReranker
         : null;
       const rerank = input.rerank ?? reranker != null;
-      // 生效分块尺寸与摄入侧同源解析（显式列 > 嵌入模型上下文 ×80%）：检索锚按
+      // 生效分块配置与摄入侧同源解析（显式身份或固定默认）：检索锚按
       // 同一 configId 纯解析，只读命中摄入侧建出的变体。
       const chunkTargetChars = resolveEffectiveChunkTargetChars(
         resolved,
@@ -1736,8 +1762,20 @@ export class KnowledgeQueryService {
           sourceName: entry.source.displayName,
         }));
       // 检索锚逐 artifact 纯解析（策略依赖 artifact 内容；只读，不再惰性建绑）。
-      const scopes = this.resolveRetrievalScopes({ studioId, artifactIds, chunkTargetChars });
+      const scopes = this.resolveRetrievalScopes({ studioId, artifactIds, chunkTargetChars,
+        fallbackProfileHash: this.deps.store.getNotebookRetrievalProfileSnapshot({ studioId, notebookId }).chunkProfileHash });
       const scopeByArtifact = new Map(scopes.map(scope => [scope.parseArtifactId, scope]));
+      for (const selected of scopes) {
+        const owner = sourceByArtifact.get(selected.parseArtifactId)!;
+        const blocks = this.deps.store.listArtifactBlocks({ studioId, parseArtifactId: selected.parseArtifactId });
+        const desired = resolveKnowledgeChunkerConfig(blocks, { targetChars: chunkTargetChars }).configId;
+        if (selected.chunkProfileHash !== desired) {
+          degraded.push({ ...selected, reason: "KNOWLEDGE_INDEX_BUILDING", notebookId, notebookName: notebook.name,
+            ...owner, detail: "v3 rebuild pending; serving ready v2 index" });
+          this.deps.requestVariantBuild?.({ studioId, notebookId, sourceId: owner.sourceId,
+            parseArtifactId: selected.parseArtifactId, reason: "KNOWLEDGE_INDEX_BUILDING" });
+        }
+      }
       // §三十九 section 约束：把选中 section 的 headingPath 分桶解析为各变体的
       // ordinal 区间（SQL 层过滤 FTS、后过滤向量命中），约束后为空 = 该源本轮无果。
       const ordinalRanges = new Map<string, KnowledgeOrdinalRange[]>();

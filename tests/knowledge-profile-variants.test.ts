@@ -8,6 +8,7 @@ import { resolveKnowledgeChunkerConfig } from "../lib/knowledge/chunker.ts";
 import { knowledgeChunkIndexVariantId } from "../lib/knowledge/knowledge-index-store.ts";
 import { KnowledgeManager } from "../lib/knowledge/knowledge-manager.ts";
 import { knowledgeVectorIndexVariantId } from "../lib/knowledge/vector-index-adapter.ts";
+import { estimateTextTokens } from "../lib/llm/estimate-text-tokens.ts";
 
 /**
  * 任务书 §八十九 Profile-aware Index（本阶段场景 ①②③⑦）：
@@ -35,8 +36,10 @@ afterEach(() => {
 /** 8 维确定性伪嵌入；模型身份跟随请求里的 modelRef（支持嵌入模型切换场景）。 */
 function createManager(lingxiHome: string) {
   const embedCalls: Array<{ modelId: string; texts: string[] }> = [];
+  let contextWindowTokens = 8192;
   const manager = new KnowledgeManager({
     lingxiHome,
+    getEmbeddingModelContextWindow: () => contextWindowTokens,
     embedTextsForModel: async (request) => {
       embedCalls.push({ modelId: request.modelRef.id, texts: [...request.texts] });
       return {
@@ -52,7 +55,7 @@ function createManager(lingxiHome: string) {
     canEmbedWithModel: () => true,
   });
   managers.push(manager);
-  return { manager, embedCalls };
+  return { manager, embedCalls, setContextWindowTokens: (tokens: number) => { contextWindowTokens = tokens; } };
 }
 
 function modelKeyOf(provider: string, modelId: string): string {
@@ -61,7 +64,7 @@ function modelKeyOf(provider: string, modelId: string): string {
     .digest("hex");
 }
 
-/** 每章 ~2000 字 × 6 章：不同 targetChars 产出不同块数/不同 chunk id。 */
+/** 六章各四个固定粒度片段；历史配置仍区分变体身份，但不再改变 v3 的片段大小。 */
 function novelText(): string {
   const chapters: string[] = [];
   for (let index = 1; index <= 6; index += 1) {
@@ -135,14 +138,14 @@ describe("Profile-aware Index（任务书 §八十九 ①②③⑦）", () => {
   it("① 同一 Source 属于两个 Notebook、chunk 配置不同 → 两个 ChunkIndexVariant 并存互不覆盖", async () => {
     const { manager } = createManager(tempHome());
     const studioId = "studio-a";
-    const notebookA = manager.createNotebook({ studioId, name: "甲（大块）" });
+    const notebookA = manager.createNotebook({ studioId, name: "甲（历史配置 5000）" });
     manager.updateNotebookSettings({
       studioId,
       notebookId: notebookA.id,
       embeddingModelRef: { id: "emb-1", provider: "fake" },
       chunkTargetChars: 5000,
     });
-    const notebookB = manager.createNotebook({ studioId, name: "乙（小块）" });
+    const notebookB = manager.createNotebook({ studioId, name: "乙（历史配置 300）" });
     manager.updateNotebookSettings({
       studioId,
       notebookId: notebookB.id,
@@ -167,7 +170,32 @@ describe("Profile-aware Index（任务书 §八十九 ①②③⑦）", () => {
 
     // 互不覆盖：B 的变体建立后 A 的 chunk 集原样保留。
     const chunksB = manager.indexStore.listVariantChunks(variantB.variant!.id);
-    expect(chunksB.length).toBeGreaterThan(chunksA.length); // 300 比 5000 分出更多块
+    expect(chunksA).toHaveLength(24);
+    expect(chunksB).toHaveLength(24);
+    expect(chunksB.map(({ text, sectionId, spans }) => ({ text, sectionId, spans })))
+      .toEqual(chunksA.map(({ text, sectionId, spans }) => ({ text, sectionId, spans })));
+    expect(chunksB.every(chunk => !chunksA.some(original => original.id === chunk.id))).toBe(true);
+    const blocks = new Map(manager.store.listArtifactBlocks({ studioId, parseArtifactId: artifactId }).map(block => [block.id, block]));
+    for (const chunks of [chunksA, chunksB]) {
+      const sectionIds = [...new Set(chunks.map(chunk => chunk.sectionId))];
+      expect(sectionIds).toHaveLength(6);
+      expect(sectionIds.every(id => typeof id === "string" && id.length > 0)).toBe(true);
+      for (const sectionId of sectionIds) {
+        const sectionChunks = chunks.filter(chunk => chunk.sectionId === sectionId);
+        expect(sectionChunks).toHaveLength(4);
+        expect(sectionChunks.slice(0, -1).every(chunk => chunk.tokenCount >= 511)).toBe(true);
+      }
+      for (const chunk of chunks) {
+        expect(chunk.tokenCount).toBe(estimateTextTokens(chunk.text));
+        expect(chunk.tokenCount).toBeGreaterThan(0);
+        expect(chunk.tokenCount).toBeLessThanOrEqual(512);
+        expect(chunk.spans.length).toBeGreaterThan(0);
+        for (const span of chunk.spans) {
+          expect(chunk.text.slice(span.chunkStartOffset, span.chunkEndOffset))
+            .toBe(blocks.get(span.blockId)!.text.slice(span.blockStartOffset, span.blockEndOffset));
+        }
+      }
+    }
     expect(manager.indexStore.listVariantChunks(variantA.variant!.id).map(chunk => chunk.id))
       .toEqual(chunksA.map(chunk => chunk.id));
   });
@@ -255,19 +283,22 @@ describe("Profile-aware Index（任务书 §八十九 ①②③⑦）", () => {
   });
 
   it("⑦ embedding model 改变 → 新 VectorIndexVariant 建立、旧 variant 保留不被覆盖", async () => {
-    const { manager } = createManager(tempHome());
+    const { manager, embedCalls, setContextWindowTokens } = createManager(tempHome());
     const studioId = "studio-a";
     const notebook = manager.createNotebook({ studioId, name: "资料" });
     manager.updateNotebookSettings({
       studioId,
       notebookId: notebook.id,
       embeddingModelRef: { id: "emb-1", provider: "fake" },
-      chunkTargetChars: 5000,
+      chunkTargetChars: null,
     });
     const { artifactId } = await ingestInto(manager, studioId, notebook.id, { text: novelText() });
+    expect(manager.getNotebookEffectiveChunkTargetChars({ studioId, notebookId: notebook.id })).toBe(2048);
 
     const { chunkProfile } = resolveVariant(manager, studioId, notebook.id, artifactId);
     const civ = knowledgeChunkIndexVariantId(artifactId, chunkProfile.profileHash);
+    const chunksBefore = manager.indexStore.listVariantChunks(civ);
+    expect(chunksBefore).toHaveLength(24);
     const vivEmb1 = knowledgeVectorIndexVariantId(civ, modelKeyOf("fake", "emb-1"));
     expect(manager.vectorIndex.getVariant(vivEmb1)).toMatchObject({
       chunkIndexVariantId: civ,
@@ -281,13 +312,22 @@ describe("Profile-aware Index（任务书 §八十九 ①②③⑦）", () => {
     });
     expect(hitsEmb1.length).toBeGreaterThan(0);
 
-    // 换嵌入模型 → rebuild：同一 civ 下建立新 model_key 的 VectorIndexVariant。
+    // 换更大窗口的嵌入模型：仅建立新向量变体，固定片段与原引用保持不动。
+    setContextWindowTokens(128_000);
     manager.updateNotebookSettings({
       studioId,
       notebookId: notebook.id,
       embeddingModelRef: { id: "emb-2", provider: "fake" },
     });
     await manager.ingestion.drainQueue();
+
+    expect(manager.getNotebookEffectiveChunkTargetChars({ studioId, notebookId: notebook.id })).toBe(2048);
+    expect(manager.indexStore.listVariantChunks(civ)).toEqual(chunksBefore);
+    expect(resolveVariant(manager, studioId, notebook.id, artifactId).variant!.id).toBe(civ);
+    const secondModelTexts = embedCalls.filter(call => call.modelId === "emb-2").flatMap(call => call.texts);
+    expect(secondModelTexts.length).toBeGreaterThan(0);
+    expect(secondModelTexts.every(text => estimateTextTokens(text) <= 512)).toBe(true);
+    expect(secondModelTexts.every(text => chunksBefore.some(chunk => chunk.text === text))).toBe(true);
 
     const vivEmb2 = knowledgeVectorIndexVariantId(civ, modelKeyOf("fake", "emb-2"));
     expect(vivEmb2).not.toBe(vivEmb1);

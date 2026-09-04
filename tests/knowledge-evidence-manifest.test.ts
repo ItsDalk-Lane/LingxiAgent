@@ -15,7 +15,7 @@ import path from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { isKnowledgeError } from "../lib/knowledge/errors.ts";
-import { resolveKnowledgeChunkerConfig } from "../lib/knowledge/chunker.ts";
+import { KNOWLEDGE_CHUNK_TARGET_CHARS, resolveKnowledgeChunkerConfig } from "../lib/knowledge/chunker.ts";
 import { knowledgeChunkIndexVariantId } from "../lib/knowledge/knowledge-index-store.ts";
 import { knowledgeVectorIndexVariantId } from "../lib/knowledge/vector-index-adapter.ts";
 import { KnowledgeManager, type KnowledgeManagerOptions } from "../lib/knowledge/knowledge-manager.ts";
@@ -123,9 +123,8 @@ async function injectWithManager(manager: KnowledgeManager, input: {
 
 function chunkProfileHashOf(manager: KnowledgeManager, studioId: string, artifactId: string) {
   const blocks = manager.store.listArtifactBlocks({ studioId, parseArtifactId: artifactId });
-  // 与生命周期测试同一口径：嵌入上下文未接线时自动分块回退 8192×0.8=6553
-  // （摄入侧与查询侧同源解析，见 resolveEffectiveChunkTargetChars）。
-  return resolveKnowledgeChunkerConfig(blocks, { targetChars: 6553 }).configId;
+  // 摄入与查询共用固定的新默认配置，不随嵌入窗口变化。
+  return resolveKnowledgeChunkerConfig(blocks, { targetChars: KNOWLEDGE_CHUNK_TARGET_CHARS }).configId;
 }
 
 /** engine 门面方法（只依赖 _knowledge/_runtimeContext）：stub this 直接绑定测试。 */

@@ -5,7 +5,7 @@ import { createRequire } from "node:module";
 import { afterEach, describe, expect, it } from "vitest";
 
 import { isKnowledgeError } from "../lib/knowledge/errors.ts";
-import { resolveKnowledgeChunkerConfig } from "../lib/knowledge/chunker.ts";
+import { KNOWLEDGE_CHUNK_TARGET_CHARS, resolveKnowledgeChunkerConfig } from "../lib/knowledge/chunker.ts";
 import { knowledgeChunkIndexVariantId } from "../lib/knowledge/knowledge-index-store.ts";
 import { KnowledgeManager, type KnowledgeManagerOptions } from "../lib/knowledge/knowledge-manager.ts";
 import { KnowledgeStore } from "../lib/knowledge/knowledge-store.ts";
@@ -293,7 +293,7 @@ describe("Knowledge 生命周期：三层模型（§十八）", () => {
     const snapshotId = manager.store.getLatestContentSnapshotForSource({
       studioId, sourceId: imported.source.id,
     }).id;
-    const profileHash = chunkProfileHashOf(manager, studioId, artifact.id, 6553);
+    const profileHash = chunkProfileHashOf(manager, studioId, artifact.id, KNOWLEDGE_CHUNK_TARGET_CHARS);
     const civId = knowledgeChunkIndexVariantId(artifact.id, profileHash);
     expect(manager.indexStore.listChunkIndexVariantsByArtifact(artifact.id).length).toBeGreaterThan(0);
     expect(manager.vectorIndex.listVariantsByChunkIndexVariant(civId).length).toBeGreaterThan(0);

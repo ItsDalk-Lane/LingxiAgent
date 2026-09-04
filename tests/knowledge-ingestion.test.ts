@@ -5,6 +5,7 @@ import path from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 
 import {
+  KNOWLEDGE_CHUNK_TARGET_CHARS,
   knowledgeBlockFingerprint,
   resolveKnowledgeChunkerConfig,
 } from "../lib/knowledge/chunker.ts";
@@ -116,7 +117,7 @@ describe("Knowledge 摄入管线", () => {
     expect(job).toMatchObject({ status: "queued", phase: "parse", artifactId: artifact.id });
     // 入队即记录触发方笔记本的分块配置指纹（按真实 blocks 计算）。
     const blocks = manager.listArtifactBlocks({ studioId, parseArtifactId: artifact.id });
-    expect(job.chunkerConfigId).toBe(resolveKnowledgeChunkerConfig(blocks, { targetChars: 6553 }).configId);
+    expect(job.chunkerConfigId).toBe(resolveKnowledgeChunkerConfig(blocks, { targetChars: KNOWLEDGE_CHUNK_TARGET_CHARS }).configId);
     // 活跃 job 去重：重复入队返回同一 job。
     expect(manager.enqueueSourceIngestion({
       studioId,
@@ -134,7 +135,7 @@ describe("Knowledge 摄入管线", () => {
     const hits = manager.indexStore.search({
       scopes: [{
         parseArtifactId: artifact.id,
-        chunkProfileHash: resolveKnowledgeChunkerConfig(blocks, { targetChars: 6553 }).configId,
+        chunkProfileHash: resolveKnowledgeChunkerConfig(blocks, { targetChars: KNOWLEDGE_CHUNK_TARGET_CHARS }).configId,
       }],
       query: "交付日期",
       limit: 12,
@@ -167,7 +168,7 @@ describe("Knowledge 摄入管线", () => {
       .digest("hex");
     const chunkProfileHash = resolveKnowledgeChunkerConfig(
       manager.listArtifactBlocks({ studioId, parseArtifactId: artifact.id }),
-      { targetChars: 6553 },
+      { targetChars: KNOWLEDGE_CHUNK_TARGET_CHARS },
     ).configId;
     const vectorHits = manager.vectorIndex.search({
       vectorIndexVariantIds: [

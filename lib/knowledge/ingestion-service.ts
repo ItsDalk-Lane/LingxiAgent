@@ -222,6 +222,8 @@ export interface KnowledgeIngestionServiceDeps {
   queryService: KnowledgeQueryService;
   /** 绑定到 KnowledgeManager.parseSource（幂等：已有 ready/needs_ocr 产物直接返回）。 */
   parseSource: (input: { studioId: unknown; sourceId: unknown }) => Promise<KnowledgeParseArtifact>;
+  /** 只查索引和配置登记；后台补建认领前复验，避免重复构建已就绪的新版本。 */
+  hasReadyCurrentChunkVariant?: (parseArtifactId: string) => boolean;
   /**
    * 按显式模型引用执行嵌入（engine 用现有 ModelOperationResolver/EmbeddingClient 接线，
    * 与查询侧懒构建嵌入共用同一套调用方式）。引用不可解析时返回 null —— 调用方落
@@ -230,7 +232,7 @@ export interface KnowledgeIngestionServiceDeps {
   embedTextsForModel?: ((request: KnowledgeIngestionEmbedRequest) => Promise<KnowledgeEmbeddingResult | null>) | null;
   /** 同步判定某嵌入模型引用当前是否可解析（模型存在/支持 embedding/凭证就绪）。 */
   canEmbedWithModel?: ((modelRef: KnowledgeModelRef) => boolean) | null;
-  /** 查嵌入模型上下文窗口（token 数）；自动分块尺寸 = 窗口 × 80%。查不到回退内置兜底。 */
+  /** 查嵌入模型硬输入上限，只校验 span 是否可送入，不决定检索分块粒度。 */
   getEmbeddingModelContextWindow?: ((modelRef: KnowledgeModelRef) => number | null) | null;
   /** worker 池并发上限（默认 3）；key 冲突的 job 无论如何都会串行。 */
   concurrency?: number;
@@ -247,6 +249,13 @@ interface ActiveIngestionJob {
   lockKeys: ReadonlySet<string>;
   abort: AbortController;
   settled: Promise<void>;
+}
+
+export interface KnowledgeBackgroundReindexInput {
+  studioId: string;
+  notebookId: string;
+  sourceId: string;
+  parseArtifactId: string | null;
 }
 
 /**
@@ -299,6 +308,8 @@ export class KnowledgeIngestionService {
   private waiterTimer: ReturnType<typeof setTimeout> | null = null;
   private wakeRequested = false;
   private lastVectorSweepAt = 0;
+  private readonly backgroundReindex = new Map<string, KnowledgeBackgroundReindexInput>();
+  private readonly backgroundReindexSeen = new Set<string>();
 
   constructor(deps: KnowledgeIngestionServiceDeps) {
     if (!deps?.store || !deps?.queryService || typeof deps?.parseSource !== "function") {
@@ -347,6 +358,7 @@ export class KnowledgeIngestionService {
    */
   stop() {
     this.stopped = true;
+    this.backgroundReindex.clear();
     for (const entry of this.activeJobs.values()) entry.abort.abort();
     this.embeddingGate.dispose();
     this.notifyJobSettled();
@@ -357,6 +369,8 @@ export class KnowledgeIngestionService {
   /** 唤醒队列（enqueue/模型就绪后置回 queued 时调用）。无等待者时记下唤醒位，避免丢失唤醒。 */
   wake() {
     this.wakeRequested = true;
+    // 后台重建占用一席时，新普通任务要唤醒其余空闲 worker，不能等慢嵌入结束。
+    this.notifyJobSettled();
     const waiter = this.waiter;
     this.waiter = null;
     if (this.waiterTimer) {
@@ -415,15 +429,50 @@ export class KnowledgeIngestionService {
     } else {
       configId = knowledgeChunkerConfigId("fixed", config.chunkTargetChars);
     }
-    const job = this.deps.store.enqueueIngestionJob({
+    let job = this.deps.store.enqueueIngestionJob({
       studioId: input.studioId,
       notebookId: input.notebookId,
       sourceId: input.sourceId,
       artifactId,
       chunkerConfigId: configId,
     });
+    if (typeof artifactId === "string" && ["queued", "pending_embedding"].includes(job.status)
+      && (job.chunkerConfigId !== configId || job.artifactId !== artifactId)) {
+      job = this.deps.store.restartIngestionJobForChunking({ studioId: input.studioId, jobId: job.id,
+        artifactId, chunkerConfigId: configId });
+    }
     this.wake();
     return job;
+  }
+
+  /** 启动扫描只登记身份；普通入库排空后才逐个转成持久任务，每个来源只登记一次。 */
+  enqueueBackgroundReindex(input: KnowledgeBackgroundReindexInput): void {
+    if (this.stopped || this.backgroundReindexSeen.has(input.sourceId)) return;
+    this.backgroundReindexSeen.add(input.sourceId);
+    this.backgroundReindex.set(input.sourceId, input);
+    this.wake();
+  }
+
+  private enqueueNextBackgroundReindex(): boolean {
+    if (this.stopped || this.activeJobs.size > 0) return false;
+    for (const [sourceId, candidate] of this.backgroundReindex) {
+      this.backgroundReindex.delete(sourceId);
+      try {
+        if (candidate.parseArtifactId && this.deps.hasReadyCurrentChunkVariant?.(candidate.parseArtifactId)) continue;
+        // 同一来源挂在多个笔记本时优先复用既有任务，避免后台扫描再生一份。
+        const existing = this.deps.store.listIngestionJobs({ studioId: candidate.studioId, sourceId,
+          statuses: ["queued", "running", "pending_embedding"], limit: 1 })[0];
+        const job = this.enqueueSourceIngestion({ studioId: candidate.studioId,
+          notebookId: existing?.notebookId ?? candidate.notebookId, sourceId, artifactId: candidate.parseArtifactId });
+        if (job.status === "pending_embedding" && this.embeddingResolvable(this.resolveConfig(candidate.studioId, job.notebookId).embeddingModelRef)) {
+          this.deps.store.requeuePendingEmbeddingIngestionJob({ studioId: candidate.studioId, jobId: job.id });
+        }
+        return true;
+      } catch (error) {
+        this.log(`knowledge ingestion: background v3 rebuild enqueue failed for ${sourceId}: ${describeIngestionError(error)}`);
+      }
+    }
+    return false;
   }
 
   /**
@@ -548,8 +597,7 @@ export class KnowledgeIngestionService {
 
   /**
    * 笔记本配置解析（v8 起）：仅笔记本列，无全局偏好级。chunkTargetChars 为
-   * NULL（新默认）时按嵌入模型上下文窗口 ×80% 自动派生（1 token = 1 字符的
-   * 最保守口径，任何语言不超嵌入窗口）；遗留显式列值仍生效。
+   * NULL（新默认）时使用固定 v3 配置；遗留显式列值仅保留派生物配置身份。
    */
   private resolveConfig(
     studioId: unknown,
@@ -613,7 +661,10 @@ export class KnowledgeIngestionService {
           break;
         }
       }
-      if (!picked) return null;
+      if (!picked) {
+        if (candidates.length === 0 && this.enqueueNextBackgroundReindex()) continue;
+        return null;
+      }
       const claimed = this.deps.store.claimIngestionJobById({ jobId: picked.job.id });
       if (claimed) {
         return { job: claimed, studioId: picked.job.studioId, lockKeys: picked.lockKeys };
@@ -734,6 +785,14 @@ export class KnowledgeIngestionService {
     }
     try {
       let current = job;
+      // 重启后旧版本可能停在嵌入相位；先补当前分块，旧 FTS 和付费向量保留。
+      if (current.phase === "embed" && current.artifactId) {
+        const config = this.resolveConfig(studioId, current.notebookId);
+        const currentHash = this.resolveChunkProfileHash(studioId, current.artifactId, config.chunkTargetChars);
+        if (currentHash !== current.chunkerConfigId) {
+          current = this.deps.store.updateIngestionJobPhase({ studioId, jobId: current.id, phase: "chunk" });
+        }
+      }
       if (current.phase === "parse") {
         const artifact = await this.deps.parseSource({ studioId, sourceId: current.sourceId });
         if (artifact.status !== "ready") {
@@ -800,6 +859,7 @@ export class KnowledgeIngestionService {
           runId: current.id,
           parseArtifactId: current.artifactId,
           chunkProfileHash,
+          modelInputMaxTokens: this.deps.getEmbeddingModelContextWindow?.(modelRef!) ?? undefined,
           embedTexts,
           signal: abort.signal,
           // 每批嵌入成功并持久化后落进度（64 块/批 ≈ 每 708 块 12 次 UPDATE）。

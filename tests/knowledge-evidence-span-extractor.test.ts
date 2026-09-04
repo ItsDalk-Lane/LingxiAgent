@@ -92,12 +92,34 @@ describe("精确证据范围", () => {
   });
 
   it("长段落退到完整句子边界，保留命中位置", async () => {
-    const text = "背景说明内容很多。".repeat(80) + "批准发布需要两位负责人同意。" + "后续归档要求明确。".repeat(80);
-    const { spans } = await extract([text], "批准发布 两位负责人");
+    // 段落超过证据预算但完整放在一个新片段内，单独检验句子边界选择。
+    const text = "背景说明内容很多。".repeat(20) + "批准发布需要两位负责人同意。" + "后续归档要求明确。".repeat(20);
+    expect(estimateTextTokens(text)).toBeGreaterThan(320);
+    expect(estimateTextTokens(text)).toBeLessThanOrEqual(512);
+    const { spans, hits, blocks } = await extract([text], "批准发布 两位负责人");
+    expect(hits).toHaveLength(1);
     expect(spans[0].text).toContain("批准发布需要两位负责人同意。");
     expect(spans[0].text.endsWith("。")).toBe(true);
     expect(spans[0].startOffset === 0 || text[spans[0].startOffset - 1] === "。").toBe(true);
     expect(estimateTextTokens(spans[0].text)).toBeLessThanOrEqual(320);
+    expect(spans[0].text).toBe(blocks[0].text.slice(spans[0].startOffset, spans[0].endOffset));
+  });
+
+  it("新片段在句中结束时保留精确原文边界，不补标点伪造完整句", async () => {
+    const text = "背景说明内容很多。".repeat(80) + "批准发布需要两位负责人同意。" + "后续归档要求明确。".repeat(80);
+    const { spans, hits, blocks } = await extract([text], "批准发布 两位负责人");
+    expect(hits.some(hit => hit.spans.some(location => location.blockEndOffset < text.length
+      && text[location.blockEndOffset - 1] !== "。"))).toBe(true);
+    expect(spans[0].text).toContain("批准发布需要两位负责人同意。");
+    for (const span of spans) {
+      expect(span.text).toBe(blocks[0].text.slice(span.startOffset, span.endOffset));
+      expect(span.textSha256).toBe(crypto.createHash("sha256").update(span.text).digest("hex"));
+      expect(span.text.isWellFormed()).toBe(true);
+      expect(estimateTextTokens(span.text)).toBeLessThanOrEqual(320);
+      const hit = hits.find(candidate => candidate.id === span.chunkId)!;
+      expect(hit.spans.some(location => location.blockId === span.blockId
+        && location.blockStartOffset <= span.startOffset && location.blockEndOffset >= span.endOffset)).toBe(true);
+    }
   });
 
   it("没有自然边界时仍严格限制 token 并保留精确偏移", async () => {

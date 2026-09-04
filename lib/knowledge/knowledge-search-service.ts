@@ -4,7 +4,7 @@ import { RetrievalResultCache } from "./retrieval-result-cache.ts";
 import { normalizeKnowledgeQuery } from "./query-embedding-cache.ts";
 import type { KnowledgeModelRef } from "./types.ts";
 import { KnowledgeError } from "./errors.ts";
-import type { CompiledKnowledgeScope } from "./scope-snapshot-compiler.ts";
+import { resolveReadyKnowledgeQueryVariant, type CompiledKnowledgeScope } from "./scope-snapshot-compiler.ts";
 import type { KnowledgeStore } from "./knowledge-store.ts";
 import type { KnowledgeIndexStore, IndexedKnowledgeChunk, KnowledgeOrdinalRange } from "./knowledge-index-store.ts";
 import {
@@ -134,16 +134,22 @@ export class KnowledgeSearchService {
     const notebooks = scope.notebooks.filter(notebook => (request.notebookIds ?? scope.notebookIds).includes(notebook.notebookId));
     const sources = scope.sources.filter(source => (request.sourceIds ?? scope.sources.map(item => item.sourceId)).includes(source.sourceId)
       && source.notebookIds.some(id => notebooks.some(notebook => notebook.notebookId === id)));
+    const variantIdsByNotebook = new Map<string, Set<string>>();
     const variants = new Map<string, NonNullable<ReturnType<KnowledgeIndexStore["getReadyVariantMetadata"]>>>();
     for (const notebook of notebooks) {
       if (!scope.notebookIds.includes(notebook.notebookId)) this.violation();
       for (const source of sources) {
         if (source.status !== "ready" || !source.parseArtifactId || !notebook.chunkProfileHash
           || !source.notebookIds.includes(notebook.notebookId)) continue;
-        const metadata = this.deps.indexStore.getReadyVariantMetadata({
+        const metadata = resolveReadyKnowledgeQueryVariant({ ...this.deps,
           parseArtifactId: source.parseArtifactId, chunkProfileHash: notebook.chunkProfileHash,
+          readyChunkVariantIds: scope.readyChunkVariantIds,
         });
-        if (metadata && scope.readyChunkVariantIds.includes(metadata.id)) variants.set(metadata.id, metadata);
+        if (metadata) {
+          variants.set(metadata.id, metadata);
+          const owned = variantIdsByNotebook.get(notebook.notebookId) ?? new Set<string>();
+          owned.add(metadata.id); variantIdsByNotebook.set(notebook.notebookId, owned);
+        }
       }
     }
     validate(request.sectionKeys, [...new Set([...variants.values()].flatMap(variant => variant.sectionKeys))]);
@@ -217,7 +223,7 @@ export class KnowledgeSearchService {
         }
         const groupNotebooks = [...groups.values()].filter(members => members.some(notebook => sources.some(source =>
           source.notebookIds.includes(notebook.notebookId) && [...variants.values()].some(variant =>
-            variant.parseArtifactId === source.parseArtifactId && variant.chunkProfileHash === notebook.chunkProfileHash))));
+            variant.parseArtifactId === source.parseArtifactId && variantIdsByNotebook.get(notebook.notebookId)?.has(variant.id)))));
         embeddingGroups = groupNotebooks.filter(members => members[0].embeddingModelRef).length;
         const outcomes = await Promise.all(groupNotebooks.map(members => this.deps.queryService.retrieveCompiledGroup({
           compiledScope: scope, notebooks: members, variantIds, query: request.query, limit: request.limit,
@@ -247,7 +253,7 @@ export class KnowledgeSearchService {
           for (const candidate of candidates) {
             const source = sources.find(source => source.parseArtifactId === candidate.parseArtifactId)!;
             const owners = notebooks.filter(notebook => source.notebookIds.includes(notebook.notebookId)
-              && notebook.chunkProfileHash === variants.get(candidate.chunkIndexVariantId)!.chunkProfileHash);
+              && variantIdsByNotebook.get(notebook.notebookId)?.has(candidate.chunkIndexVariantId));
             for (const notebook of owners) {
               const ref = notebook.rerankModelRef;
               const key = ref ? JSON.stringify([ref.provider, ref.id]) : "none";
@@ -289,7 +295,7 @@ export class KnowledgeSearchService {
         const source = sources.find(source => source.parseArtifactId === candidate.parseArtifactId);
         if (!source || !variants.has(candidate.chunkIndexVariantId)) this.violation();
         const notebook = notebooks.find(notebook => source!.notebookIds.includes(notebook.notebookId)
-          && notebook.chunkProfileHash === variants.get(candidate.chunkIndexVariantId)!.chunkProfileHash);
+          && variantIdsByNotebook.get(notebook.notebookId)?.has(candidate.chunkIndexVariantId));
         if (!notebook) this.violation();
         const locator = locators.get(candidate.spans[0]?.blockId);
         return { ...candidate, sourceId: source!.sourceId, sourceName: source!.sourceName,
@@ -302,7 +308,7 @@ export class KnowledgeSearchService {
           candidateId: `kc_${crypto.createHash("sha256").update(`${scope.scopeId}\0${candidate.chunkIndexVariantId}\0${candidate.id}`).digest("hex").slice(0, 32)}`,
           sourceId: source.sourceId, sourceName: source.sourceName,
           notebookIds: source.notebookIds.filter(id => notebooks.some(notebook => notebook.notebookId === id
-            && notebook.chunkProfileHash === variants.get(candidate.chunkIndexVariantId)!.chunkProfileHash)),
+            && variantIdsByNotebook.get(notebook.notebookId)?.has(candidate.chunkIndexVariantId))),
           contentSnapshotId: source.contentSnapshotId, parseArtifactId: candidate.parseArtifactId,
           chunkIndexVariantId: candidate.chunkIndexVariantId, chunkId: candidate.id, chunkOrdinal: candidate.ordinal,
           headingPath: candidate.headingPath, pageNumber: candidate.pageNumber,
@@ -320,7 +326,7 @@ export class KnowledgeSearchService {
           candidates: annotated,
           sources: notebooks.flatMap(notebook => sources.flatMap(source => {
             const variant = [...variants.values()].find(item => item.parseArtifactId === source.parseArtifactId
-              && item.chunkProfileHash === notebook.chunkProfileHash);
+              && variantIdsByNotebook.get(notebook.notebookId)?.has(item.id));
             return source.notebookIds.includes(notebook.notebookId) && variant ? [{
               notebookId: notebook.notebookId, notebookName: notebook.notebookName, sourceId: source.sourceId,
               sourceName: source.sourceName, parseArtifactId: variant.parseArtifactId, chunkCount: variant.chunkCount,

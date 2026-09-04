@@ -1,3 +1,4 @@
+import { estimateTextTokens } from "../lib/llm/estimate-text-tokens.ts";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
@@ -133,9 +134,10 @@ describe("查询侧分块配置与摄入侧同源", () => {
     const artifact = await ingestSource(manager, studioId, notebook.id);
 
     const chunksAfterIngestion = listNotebookProfileChunks(manager, studioId, notebook.id, artifact);
-    expect(chunksAfterIngestion.length).toBe(6); // 5000：整章一块
-    expect(embedCalls.length).toBe(1); // 摄入批量嵌入 6 块
-    expect(embedCalls[0].length).toBe(6);
+    expect(chunksAfterIngestion.length).toBe(24); // 显式字符配置不再把整章扩成大块，固定512token片段。
+    expect(embedCalls.length).toBe(1); // 摄入批量嵌入 24 块
+    expect(embedCalls[0].length).toBe(24);
+    expect(chunksAfterIngestion.every(chunk => estimateTextTokens(chunk.text) <= 512)).toBe(true);
 
     await manager.queryService.retrieveForNotebooks({
       studioId,
@@ -145,13 +147,13 @@ describe("查询侧分块配置与摄入侧同源", () => {
 
     // 修复前：查询侧按默认 1200 重建（12 块）并对全部块重嵌；
     // 修复后：索引原样命中，只多出 1 次查询嵌入。
-    expect(listNotebookProfileChunks(manager, studioId, notebook.id, artifact).length).toBe(6);
+    expect(listNotebookProfileChunks(manager, studioId, notebook.id, artifact).length).toBe(24);
     expect(embedCalls.length).toBe(2);
     expect(embedCalls[1].length).toBe(1);
   });
 
-  it("自动分块（null）：查询侧经上下文窗口回调解析出与摄入侧相同的生效值", async () => {
-    // 40960 × 0.8 = 32768 > 7500：整章一块，与显式 5000 同型。
+  it("默认分块（null）：嵌入大窗口不放大片段，查询与摄入保持同一身份", async () => {
+    // 大窗口只影响输入硬上限，片段仍约512tokens。
     const { manager, embedCalls } = createManager(tempHome(), { contextWindow: 40960 });
     const studioId = "studio-a";
     const notebook = manager.createNotebook({ studioId, name: "小说" });
@@ -161,7 +163,7 @@ describe("查询侧分块配置与摄入侧同源", () => {
       embeddingModelRef: FAKE_MODEL_REF,
     });
     const artifact = await ingestSource(manager, studioId, notebook.id);
-    expect(listNotebookProfileChunks(manager, studioId, notebook.id, artifact).length).toBe(6);
+    expect(listNotebookProfileChunks(manager, studioId, notebook.id, artifact).length).toBe(24);
 
     await manager.queryService.retrieveForNotebooks({
       studioId,
@@ -169,7 +171,7 @@ describe("查询侧分块配置与摄入侧同源", () => {
       question: "长夜",
     });
 
-    expect(listNotebookProfileChunks(manager, studioId, notebook.id, artifact).length).toBe(6);
+    expect(listNotebookProfileChunks(manager, studioId, notebook.id, artifact).length).toBe(24);
     expect(embedCalls.length).toBe(2);
     expect(embedCalls[1].length).toBe(1);
   });
@@ -204,7 +206,8 @@ describe("查询侧分块配置与摄入侧同源", () => {
       expect(result.retrievalModeRequested).toBe("hybrid");
       expect(result.degraded.some(entry => entry.reason === "KNOWLEDGE_VECTOR_NOT_READY")).toBe(true);
     }
-    // 幂等入队：并行两次查询共享同一个活跃后台构建 job（活跃 job 去重）。
+    await new Promise<void>(resolve => setImmediate(resolve));
+    // 查询已返回后异步入队，并行两次查询仍共享恰一个活跃任务。
     expect(manager.store.listIngestionJobs({
       studioId,
       notebookId: notebook.id,
@@ -301,9 +304,9 @@ describe("查询侧分块配置与摄入侧同源", () => {
       artifactId: artifact.id,
     });
     await manager.ingestion.drainQueue();
-    expect(listNotebookProfileChunks(manager, studioId, notebook.id, artifact).length).toBe(150);
+    expect(listNotebookProfileChunks(manager, studioId, notebook.id, artifact).length).toBe(300);
 
-    // retrieval_top_k 未配置 = 无上限召回：150 个可匹配 chunk 在融合池处被
+    // retrieval_top_k 未配置 = 无上限召回：300 个可匹配 chunk 在融合池处被
     // fusionBudget 截断（预算链独立于 topK 生效），绝不再冲到物理边界 1000。
     const result = await manager.queryService.retrieveForNotebooks({
       studioId,

@@ -192,7 +192,7 @@ import { KnowledgeManager } from "../lib/knowledge/knowledge-manager.ts";
 import { KnowledgeResearchOrchestrator } from "../lib/knowledge/research/knowledge-research-orchestrator.ts";
 import { ResearchStore } from "../lib/knowledge/research/research-store.ts";
 import type { KnowledgeEvidenceSpan } from "../shared/knowledge-evidence.ts";
-import type { CompiledKnowledgeScope } from "../lib/knowledge/scope-snapshot-compiler.ts";
+import { resolveReadyKnowledgeQueryVariant, type CompiledKnowledgeScope } from "../lib/knowledge/scope-snapshot-compiler.ts";
 import { KNOWLEDGE_CANDIDATE_GENERATION_BUDGET } from "../lib/knowledge/knowledge-query-service.ts";
 import { KnowledgeError } from "../lib/knowledge/errors.ts";
 import { KnowledgeEmbeddingProviderGate } from "../lib/knowledge/ingestion-service.ts";
@@ -2852,8 +2852,9 @@ export class LingxiEngine {
       }
       let mapped = false;
       for (const notebook of scope.notebooks.filter(notebook => source.notebookIds.includes(notebook.notebookId) && notebook.chunkProfileHash)) {
-        const variant = index.resolveChunkIndexVariant(span.parseArtifactId, notebook.chunkProfileHash!);
-        if (!variant || variant.status !== "ready" || !scope.readyChunkVariantIds.includes(variant.id)
+        const variant = resolveReadyKnowledgeQueryVariant({ store: this._knowledge.store, indexStore: index,
+          parseArtifactId: span.parseArtifactId, chunkProfileHash: notebook.chunkProfileHash!, readyChunkVariantIds: scope.readyChunkVariantIds });
+        if (!variant || !scope.readyChunkVariantIds.includes(variant.id)
           || (span.chunkIndexVariantId && span.chunkIndexVariantId !== variant.id)) continue;
         let chunks = cached.get(variant.id);
         if (!chunks) { chunks = index.listVariantChunks(variant.id); cached.set(variant.id, chunks); }
@@ -2878,7 +2879,7 @@ export class LingxiEngine {
           let entry = entries.get(match.chunk.id);
           if (!entry) {
             entry = { chunkId: match.chunk.id, ordinal: match.chunk.ordinal, sourceId: span.sourceId,
-              parseArtifactId: span.parseArtifactId, chunkIndexVariantId: variant.id, chunkProfileHash: notebook.chunkProfileHash,
+              parseArtifactId: span.parseArtifactId, chunkIndexVariantId: variant.id, chunkProfileHash: variant.chunkProfileHash,
               notebookId: notebook.notebookId, contextOnly: false, citationLabels: [], blockSpans: [] };
             entries.set(match.chunk.id, entry);
           }
