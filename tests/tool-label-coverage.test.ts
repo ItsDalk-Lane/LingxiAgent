@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { getKnowledgeResearchToolNames } from '../shared/tool-categories.ts';
 import fs from 'node:fs';
 import path from 'node:path';
 import {
@@ -71,6 +72,8 @@ const UNLABELED_TOOL_NAMES = new Set([
   'knowledge_research_update',     // 隔离调查工具由聚合进度卡承接
   'knowledge_research_finish',
   'knowledge_delegate',
+  'knowledge_coverage_read',       // 仅完整性隔离工作会话内使用，主会话显示聚合研究进度
+  'knowledge_completeness_mark',
   'patrol_update_log',              // desk 巡检
   'hana',                           // MCP client 自我标识，非 agent 工具
   'stop', 'new', 'reset', 'rc', 'exitrc', 'apply', 'confirm', 'reject', 'compact', 'loop',
@@ -106,6 +109,15 @@ function scanRegisteredToolNames(): Set<string> {
 }
 
 describe('工具行文案对账', () => {
+  it('完整性内部工具的文案登记以实际隔离工具边界为依据', () => {
+    const privateTools = getKnowledgeResearchToolNames('knowledge_completeness_worker');
+    expect(privateTools).toEqual(['knowledge_coverage_read', 'knowledge_completeness_mark']);
+    for (const name of privateTools) {
+      expect(UNLABELED_TOOL_NAMES.has(name)).toBe(true);
+      expect(getKnowledgeResearchToolNames('knowledge_research_root')).not.toContain(name);
+      expect(getKnowledgeResearchToolNames('knowledge_research_worker')).not.toContain(name);
+    }
+  });
   for (const locale of locales) {
     it(`${locale}.json 本地快速检索提示、结果与时限文案完整`, () => {
       const data = loadLocale(locale);

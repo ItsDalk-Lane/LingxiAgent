@@ -3292,7 +3292,7 @@
   ],
   "review": {
     "classification": "compatible",
-    "compatibilityReason": "P3-05仅增加既有索引按章节与片段身份读取及原文校验，事实库v19和FTSv4结构不变，旧向量BLOB与历史索引身份保留。",
+    "compatibilityReason": "P3-07 移除生产未用的旧知识编排、旧查询和旧预算，保留历史读取与迁移；数据库 v19、FTS v4 和向量 BLOB 结构不变。",
     "payloadFingerprint": "sha256:a385729c34ac35cda0d6eafbfe98061dc2eb6c88519e409179f5f00005e42569"
   },
   "schemas": [

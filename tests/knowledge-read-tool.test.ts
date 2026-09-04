@@ -151,7 +151,9 @@ describe("knowledge_read 工具（KnowledgeTurnScope 契约）", () => {
     const scope = createScope(manager, studioId, [notebook.id]);
     const tool = makeTool(manager, studioId);
     const unified = vi.spyOn(manager.searchService, "searchWithEvidence");
-    const legacy = vi.spyOn(manager.queryService, "retrieveForArtifacts");
+    expect("retrieveForArtifacts" in manager.queryService).toBe(false);
+    const legacy = vi.fn(() => { throw new Error("不得进入已退役查询"); });
+    Object.assign(manager.queryService, { retrieveForArtifacts: legacy });
     const payload = parseResult(await tool.execute("call-1", {
       scopeId: scope.id,
       sourceId: imported.source.id,

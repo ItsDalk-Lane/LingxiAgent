@@ -173,6 +173,7 @@ jobs:
         run: |
           node scripts/benchmark-knowledge-fast.mjs --output=artifacts/knowledge-fast-benchmark.json
           node scripts/benchmark-knowledge-vector.mjs --output=artifacts/knowledge-vector-benchmark.json
+          node scripts/benchmark-knowledge-research.mjs --output=artifacts/knowledge-research-benchmark.json
 
       - name: Upload Knowledge performance evidence
         if: always() && runner.os == 'Linux'
@@ -182,6 +183,7 @@ jobs:
           path: |
             artifacts/knowledge-fast-benchmark.json
             artifacts/knowledge-vector-benchmark.json
+            artifacts/knowledge-research-benchmark.json
           if-no-files-found: error
 
       # Windows: 下载官方 MinGit（git + sh-compatible shell + coreutils，非交互运行时），打包进安装包
@@ -434,6 +436,22 @@ jobs:
           npx electron-builder --linux AppImage deb --${{ matrix.arch }} --publish never
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Smoke packaged desktop startup (macOS and Windows)
+        if: runner.os != 'Linux'
+        run: node scripts/smoke-packaged-desktop.mjs
+
+      - name: Smoke packaged desktop startup (Linux virtual display)
+        if: runner.os == 'Linux'
+        run: xvfb-run -a node scripts/smoke-packaged-desktop.mjs
+
+      - name: Upload packaged desktop startup evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: knowledge-desktop-startup-${{ matrix.platform }}-${{ matrix.arch }}
+          path: artifacts/knowledge-desktop-startup-${{ matrix.platform }}-${{ matrix.arch }}.json
+          if-no-files-found: error
 
       # dist-server-artifact/*/server-*.tar.gz and dist-renderer-artifact/renderer-*.tar.gz
       # are the hot-update boxes packed by packDualKindSeed (see scripts/build-server-artifact.mjs).

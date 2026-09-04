@@ -8,7 +8,7 @@ import { resolveReadyKnowledgeQueryVariant, type CompiledKnowledgeScope } from "
 import type { KnowledgeStore } from "./knowledge-store.ts";
 import type { KnowledgeIndexStore, IndexedKnowledgeChunk, KnowledgeOrdinalRange } from "./knowledge-index-store.ts";
 import {
-  buildKnowledgeBlockLocatorIndex, knowledgeSectionKeyOf, fuseNotebookRankings, KNOWLEDGE_CANDIDATE_GENERATION_BUDGET,
+  buildKnowledgeBlockLocatorIndex, knowledgeSectionKeyOf, fuseNotebookRankings,
   type KnowledgeQueryService, type RetrieveForNotebooksResult, type KnowledgeBlockLocator,
 } from "./knowledge-query-service.ts";
 
@@ -261,7 +261,7 @@ export class KnowledgeSearchService {
       const degraded: RetrieveForNotebooksResult["degraded"] = [];
       const degradedReasons = [...scope.warnings];
       const rerankDegradeReasons: string[] = [];
-      const generationLimit = request.channel === "hybrid" ? Math.min(request.limit, KNOWLEDGE_CANDIDATE_GENERATION_BUDGET) : request.limit;
+      const generationLimit = request.limit;
       const fts = variantIds.length === 0 ? [] : ordinalRanges || sectionIds ? this.deps.indexStore.search({
         scopes: [...variants.values()].map(variant => ({ parseArtifactId: variant.parseArtifactId, chunkProfileHash: variant.chunkProfileHash })),
         query: request.query, limit: generationLimit, ordinalRangesByChunkIndexVariantId: ordinalRanges,

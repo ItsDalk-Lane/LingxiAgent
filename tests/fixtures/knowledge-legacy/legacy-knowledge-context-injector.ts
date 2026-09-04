@@ -1,3 +1,5 @@
+import { KNOWLEDGE_EVIDENCE_BUDGET } from "./legacy-query-service.ts";
+/** 已退役行为的历史回归夹具，不进入生产导出或运行闭包。 */
 /** 仅供历史测试与显式兼容入口使用；新的详细请求不得进入旧拆解、扩展、补查及滚动编排。 */
 /**
  * knowledge-context-injector —— 主界面笔记本引用的拆解 + 检索 + 注入块生成
@@ -29,17 +31,18 @@
  * （[question decomposition unavailable: ...] / [knowledge retrieval unavailable: ...]），
  * 不悄悄退回无注入的普通聊天。
  */
-import { estimateTextTokens } from "../../llm/estimate-text-tokens.ts";
+import { estimateTextTokens } from "../../../lib/llm/estimate-text-tokens.ts";
 import type { KnowledgeReferenceMode, KnowledgeRetrievalStats } from "../../../shared/knowledge-refs.ts";
-import { KnowledgeError } from "../errors.ts";
-import type { KnowledgeCoveragePlan } from "../knowledge-coverage-planner.ts";
-import { runKnowledgeRollup, type KnowledgeRollupEntry } from "../knowledge-rollup.ts";
-import type { NotebookRetrievalChunk, NotebookRetrievalSource, RetrieveForNotebooksResult } from "../knowledge-query-service.ts";
-import { KNOWLEDGE_CANDIDATE_GENERATION_BUDGET, KNOWLEDGE_EVIDENCE_BUDGET, knowledgeSectionKeyOf } from "../knowledge-query-service.ts";
-import type { QuestionIntent, DecomposeSpecialistKind, DecomposeModel, QuestionComplexity, QuestionExpansion, QueryExpansionModel, QueryExpansionResult, QuestionDecomposition, DecomposeDegradeReason, DecomposeResult, KnowledgeInjectorDeps, KnowledgeEvidenceEntry, KnowledgeCoverageFootprint, BroadProbeOutcome, KnowledgeInjectionEvidence, KnowledgeExecutionStats } from "../knowledge-context-injector.ts";
-import { KNOWLEDGE_INJECTION_FALLBACK_BUDGET_TOKENS, mergeSources, resolveFusionPoolBudget, fuseQueryFamilies, groupFamiliesById, rrfFuseRankings, chunkHeader, quoteText, markScannedEvidence, renderKnowledgeContextBlock } from "../knowledge-context-injector.ts";
-export type { QuestionIntent, DecomposeSpecialistKind, QuestionComplexity, QuestionDecomposition, DecomposeDegradeReason, DecomposeResult, DecomposeModel, QueryExpansionModel, QueryExpansionDegradeReason, QueryExpansionResult, KnowledgeInjectorDeps, KnowledgeEvidenceEntry, KnowledgeEvidenceIdentityEntry, KnowledgeInjectionEvidence, KnowledgeCoverageFootprint, KnowledgeExecutionStats } from "../knowledge-context-injector.ts";
-export { KNOWLEDGE_INJECTION_FALLBACK_BUDGET_TOKENS, KNOWLEDGE_FUSION_POOL_UTILIZATION, KNOWLEDGE_FUSION_POOL_MAX, resolveFusionPoolBudget, resolveKnowledgeInjectionBudgetTokens, fuseSubQueryResults, fuseQueryFamilies, groupFamiliesById, knowledgeModeGuidance, knowledgeRollupGuidance, renderKnowledgeContextBlock, assembleKnowledgeEvidenceManifestEntries, EvidencePacker } from "../knowledge-context-injector.ts";
+import { KnowledgeError } from "../../../lib/knowledge/errors.ts";
+import type { KnowledgeCoveragePlan } from "../../../lib/knowledge/knowledge-coverage-planner.ts";
+import { runKnowledgeRollup, type KnowledgeRollupEntry } from "./knowledge-rollup.ts";
+import type { NotebookRetrievalChunk, NotebookRetrievalSource, RetrieveForNotebooksResult } from "../../../lib/knowledge/knowledge-query-service.ts";
+import { knowledgeSectionKeyOf } from "../../../lib/knowledge/knowledge-query-service.ts";
+import { KNOWLEDGE_CANDIDATE_GENERATION_BUDGET } from "./legacy-query-service.ts";
+import type { QuestionIntent, DecomposeSpecialistKind, DecomposeModel, QuestionComplexity, QuestionExpansion, QueryExpansionModel, QueryExpansionResult, QuestionDecomposition, DecomposeDegradeReason, DecomposeResult, KnowledgeInjectorDeps, KnowledgeEvidenceEntry, KnowledgeCoverageFootprint, BroadProbeOutcome, KnowledgeInjectionEvidence, KnowledgeExecutionStats } from "./legacy-context-renderer.ts";
+import { KNOWLEDGE_INJECTION_FALLBACK_BUDGET_TOKENS, mergeSources, resolveFusionPoolBudget, fuseQueryFamilies, groupFamiliesById, rrfFuseRankings, chunkHeader, quoteText, markScannedEvidence, renderKnowledgeContextBlock } from "./legacy-context-renderer.ts";
+export type { QuestionIntent, DecomposeSpecialistKind, QuestionComplexity, QuestionDecomposition, DecomposeDegradeReason, DecomposeResult, DecomposeModel, QueryExpansionModel, QueryExpansionDegradeReason, QueryExpansionResult, KnowledgeInjectorDeps, KnowledgeEvidenceEntry, KnowledgeEvidenceIdentityEntry, KnowledgeInjectionEvidence, KnowledgeCoverageFootprint, KnowledgeExecutionStats } from "./legacy-context-renderer.ts";
+export { KNOWLEDGE_INJECTION_FALLBACK_BUDGET_TOKENS, KNOWLEDGE_FUSION_POOL_UTILIZATION, KNOWLEDGE_FUSION_POOL_MAX, resolveFusionPoolBudget, resolveKnowledgeInjectionBudgetTokens, fuseSubQueryResults, fuseQueryFamilies, groupFamiliesById, knowledgeModeGuidance, knowledgeRollupGuidance, renderKnowledgeContextBlock, assembleKnowledgeEvidenceManifestEntries, EvidencePacker } from "./legacy-context-renderer.ts";
 
 
 /**

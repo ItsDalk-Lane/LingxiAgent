@@ -186,6 +186,10 @@ export function buildKnowledgeVectorRuntime({ rootDir, bundleOutDir }) {
   ].join("\n"), resolveDir: rootDir, sourcefile: "knowledge-vector-runtime-entry.ts" },
     bundle: true, platform: "node", format: "esm", target: "node24", packages: "external",
     outfile: path.join(bundleOutDir, "knowledge-vector.js"), logLevel: "silent" });
+  buildSync({ stdin: { contents: 'export { KnowledgeManager } from "./lib/knowledge/knowledge-manager.ts";',
+    resolveDir: rootDir, sourcefile: "knowledge-query-runtime-entry.ts" },
+    bundle: true, platform: "node", format: "esm", target: "node24", packages: "external",
+    outfile: path.join(bundleOutDir, "knowledge-query.js"), logLevel: "silent" });
 }
 
 export function knowledgeUseArchNativePath(platform, arch) {
@@ -197,7 +201,7 @@ export function knowledgeUseArchNativePath(platform, arch) {
 }
 
 export function requiredKnowledgeVectorRuntimeFiles(platform, arch) {
-  return ["bundle/knowledge-vector.js", "node_modules/usearch/package.json",
+  return ["bundle/knowledge-vector.js", "bundle/knowledge-query.js", "node_modules/usearch/package.json",
     "node_modules/usearch/javascript/dist/cjs/package.json", "node_modules/usearch/javascript/dist/cjs/usearch.js",
     "node_modules/node-gyp-build/index.js", "node_modules/node-gyp-build/node-gyp-build.js",
     "node_modules/bindings/bindings.js", knowledgeUseArchNativePath(platform, arch)];

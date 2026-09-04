@@ -3,7 +3,7 @@ import crypto from "node:crypto";
 import os from "node:os";
 import path from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { KnowledgeManager, type KnowledgeManagerOptions } from "../lib/knowledge/knowledge-manager.ts";
+import { KnowledgeManager, type KnowledgeManagerOptions } from "./fixtures/knowledge-legacy/legacy-query-service.ts";
 import { buildKnowledgeChunks, knowledgeBlockFingerprint, resolveKnowledgeChunkerConfig } from "../lib/knowledge/chunker.ts";
 import { AnnIndexStore } from "../lib/knowledge/ann-index-store.ts";
 import type { KnowledgeIngestionEmbedRequest } from "../lib/knowledge/ingestion-service.ts";

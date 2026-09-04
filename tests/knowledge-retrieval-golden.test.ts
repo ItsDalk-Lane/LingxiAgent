@@ -3,11 +3,11 @@ import os from "node:os";
 import path from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 
-import { KnowledgeManager } from "../lib/knowledge/knowledge-manager.ts";
+import { KnowledgeManager } from "./fixtures/knowledge-legacy/legacy-query-service.ts";
 import {
   buildKnowledgeContextInjection,
   KNOWLEDGE_FAST_MAX_EVIDENCE_ENTRIES,
-} from "../lib/knowledge/legacy/legacy-knowledge-context-injector.ts";
+} from "./fixtures/knowledge-legacy/legacy-knowledge-context-injector.ts";
 import type { KnowledgeReferenceMode } from "../shared/knowledge-refs.ts";
 
 /**

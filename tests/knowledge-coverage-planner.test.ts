@@ -27,8 +27,8 @@ import {
   planKnowledgeCoverage,
   type CoverageClassifyModel,
   type KnowledgeCoveragePlan,
-} from "../lib/knowledge/knowledge-coverage-planner.ts";
-import { buildKnowledgeContextInjection } from "../lib/knowledge/legacy/legacy-knowledge-context-injector.ts";
+} from "./fixtures/knowledge-legacy/legacy-coverage-planner.ts";
+import { buildKnowledgeContextInjection } from "./fixtures/knowledge-legacy/legacy-knowledge-context-injector.ts";
 import { KnowledgeManager } from "../lib/knowledge/knowledge-manager.ts";
 import { KNOWLEDGE_SCHEMA_VERSION, KnowledgeStore } from "../lib/knowledge/knowledge-store.ts";
 import type { RetrieveForNotebooksResult } from "../lib/knowledge/knowledge-query-service.ts";

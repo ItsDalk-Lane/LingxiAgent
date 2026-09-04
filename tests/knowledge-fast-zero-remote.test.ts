@@ -4,7 +4,7 @@ import path from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { LingxiEngine } from "../core/engine.ts";
 import * as llm from "../core/llm-client.ts";
-import * as coverage from "../lib/knowledge/knowledge-coverage-planner.ts";
+import * as coverage from "./fixtures/knowledge-legacy/legacy-coverage-planner.ts";
 import { KnowledgeManager } from "../lib/knowledge/knowledge-manager.ts";
 import { EvidencePacker } from "../lib/knowledge/evidence-packer.ts";
 import { abortPendingDesktopSubmission, submitDesktopSessionInterjection, submitDesktopSessionMessage } from "../core/desktop-session-submit.ts";
@@ -41,7 +41,9 @@ async function fixture() {
     renderSessionReminderBlock: vi.fn(() => null), preflightSessionInput: vi.fn(),
     isSessionStreaming: vi.fn(() => false),
   });
-  const legacy = vi.spyOn(engine, "buildKnowledgeContextInjection").mockImplementation(fail("旧检索入口"));
+  expect("buildKnowledgeContextInjection" in LingxiEngine.prototype).toBe(false);
+  const legacy = fail("旧检索入口");
+  engine.buildKnowledgeContextInjection = legacy;
   return { engine, manager, session, notebook, prohibited: [embedTextsForModel, rerankForModel, knowledgeModel,
     coveragePlanner, rollupModel, executeIsolated, legacy, engine.resolveAuxiliaryModelFresh, engine.getSessionStreamFn] };
 }

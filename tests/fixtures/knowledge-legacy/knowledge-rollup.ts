@@ -1,3 +1,4 @@
+/** 已退役行为的历史回归夹具，不进入生产导出或运行闭包。 */
 /**
  * knowledge-rollup —— 主模型滚动多轮证据注入（2026-08-31，取代蒸馏压缩路径）。
  *
@@ -21,15 +22,15 @@
  *
  * 可测边界：模型调用 / 检索门面全部依赖注入；安全扫描只记录分级计数。
  */
-import { createModuleLogger } from "../debug-log.ts";
-import { estimateTextTokens, trimTextToTokenBudget } from "../llm/estimate-text-tokens.ts";
+import { createModuleLogger } from "../../../lib/debug-log.ts";
+import { estimateTextTokens, trimTextToTokenBudget } from "../../../lib/llm/estimate-text-tokens.ts";
 import {
   buildWarningLine,
   markUntrusted,
   scan as scanInjection,
   type InjectionDecision,
-} from "../security/injection-scan.ts";
-import type { NotebookRetrievalChunk, RetrieveForNotebooksResult } from "./knowledge-query-service.ts";
+} from "../../../lib/security/injection-scan.ts";
+import type { NotebookRetrievalChunk, RetrieveForNotebooksResult } from "../../../lib/knowledge/knowledge-query-service.ts";
 
 /** 滚动轮上限（防护）：超限后剩余证据并入最后一轮（预算截断在渲染层兜底）。 */
 export const KNOWLEDGE_ROLLUP_MAX_ROUNDS = 8;

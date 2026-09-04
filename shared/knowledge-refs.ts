@@ -198,11 +198,12 @@ export interface KnowledgeRetrievalStats {
    * 读取兼容保留，生产写入侧不再产出。
    */
   distilled?: boolean;
-  /** @deprecated 同上（蒸馏批数）。 */
+  /** @deprecated 蒸馏批数仅用于历史读取，生产写入侧不再生成。 */
   distillBatches?: number;
-  /** @deprecated 同上（蒸馏降级原因）。 */
+  /** @deprecated 蒸馏降级原因仅用于历史读取，生产写入侧不再生成。 */
   distillDegradedReason?: string;
   /**
+   * @deprecated 仅用于历史读取，生产写入侧不再生成。
    * 滚动注入统计（2026-08-31 取代蒸馏）：证据总量超预算时证据被拆成 N 份、
    * 由会话主模型逐部分消化。parts = 拆分总数（最后一部分直接进注入块）；
    * rounds = 实际执行的中间轮数；supplementalQueries = 循环内模型自主发起的
@@ -221,6 +222,7 @@ export interface KnowledgeRetrievalStats {
    */
   rerankDegradeReason?: string;
   /**
+   * @deprecated 仅用于历史读取，生产写入侧不再生成。
    * rerank 动态门控跳过留痕（2026-08-31 快速档）：快速档检索结果头部清晰
    * （top-1 RRF 融合分领先 ≥ 阈值）时主动跳过重排、保持 RRF 名次。多笔记本以
    * "; " 连接保留笔记本归属。与 rerankDegradeReason 的区别：这是主动跳过

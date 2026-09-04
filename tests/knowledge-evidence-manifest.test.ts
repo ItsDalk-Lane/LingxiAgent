@@ -18,12 +18,12 @@ import { isKnowledgeError } from "../lib/knowledge/errors.ts";
 import { KNOWLEDGE_CHUNK_TARGET_CHARS, resolveKnowledgeChunkerConfig } from "../lib/knowledge/chunker.ts";
 import { knowledgeChunkIndexVariantId } from "../lib/knowledge/knowledge-index-store.ts";
 import { knowledgeVectorIndexVariantId } from "../lib/knowledge/vector-index-adapter.ts";
-import { KnowledgeManager, type KnowledgeManagerOptions } from "../lib/knowledge/knowledge-manager.ts";
+import { KnowledgeManager, type KnowledgeManagerOptions } from "./fixtures/knowledge-legacy/legacy-query-service.ts";
 import { KnowledgeStore } from "../lib/knowledge/knowledge-store.ts";
 import {
   buildKnowledgeContextInjection,
   type KnowledgeInjectionEvidence,
-} from "../lib/knowledge/legacy/legacy-knowledge-context-injector.ts";
+} from "./fixtures/knowledge-legacy/legacy-knowledge-context-injector.ts";
 import type { KnowledgeCoveragePlan } from "../lib/knowledge/knowledge-coverage-planner.ts";
 import type { RetrieveForNotebooksResult } from "../lib/knowledge/knowledge-query-service.ts";
 import type { KnowledgeBlockDraft } from "../lib/knowledge/source-adapters.ts";

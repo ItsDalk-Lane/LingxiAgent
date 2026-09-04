@@ -3,14 +3,12 @@ import os from "node:os";
 import path from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { KnowledgeManager } from "../lib/knowledge/knowledge-manager.ts";
+import { KnowledgeManager } from "./fixtures/knowledge-legacy/legacy-query-service.ts";
 import {
   KNOWLEDGE_EMBEDDING_DEADLINE_MS,
-  KNOWLEDGE_RERANK_CLEAR_MARGIN,
   KNOWLEDGE_RERANK_DEADLINE_MS,
   KNOWLEDGE_RRF_K,
 } from "../lib/knowledge/knowledge-query-service.ts";
-import { KNOWLEDGE_FAST_RERANK_DEADLINE_MS } from "../lib/knowledge/legacy/legacy-knowledge-context-injector.ts";
 
 /**
  * 任务书 §二十四/§二十五/§九十二：rerank 按笔记本引用真正路由 + 跨笔记本
@@ -519,28 +517,20 @@ describe("rerank 动态门控与快速档期限", () => {
     return { manager, studioId, nb, rerankCalls };
   }
 
-  it("头部清晰（top-1 双通道领先 ≥ 阈值）：门控跳过重排，保持 RRF 名次并留痕", async () => {
+  it("头部清晰的快速请求仍执行真实本地流程，零重排并保留原文证据", async () => {
     const { manager, studioId, nb, rerankCalls } = await setupMarginNotebook();
-    const result = await manager.queryService.retrieveForNotebooks({
-      studioId,
-      notebookIds: [nb.id],
-      question: Q_CLEAR,
-      rerankPolicy: { marginGate: true },
-    });
-    // 重排零调用（省一次网络往返）——结果直接用 RRF 名次。
+    const scope = manager.createTurnScope({ studioId, sessionPath: "/tmp/fast-clear.jsonl", notebookIds: [nb.id] });
+    const result = await manager.runFastKnowledgePipeline({ scope, question: Q_CLEAR });
     expect(rerankCalls).toHaveLength(0);
-    expect(result.retrievalMode).toBe("hybrid");
-    expect(result.candidates.length).toBeGreaterThan(0);
-    expect(result.candidates[0].text).toContain("甲一");
-    // 主动跳过≠降级：独立留痕字段，带笔记本归属与阈值语义。
-    expect(result.rerankSkippedReasons).toBeDefined();
-    expect(result.rerankSkippedReasons!.join("; ")).toContain("门控本");
-    expect(result.rerankSkippedReasons!.join("; ")).toContain("margin gate");
-    expect(result.rerankSkippedReasons!.join("; ")).toContain(String(KNOWLEDGE_RERANK_CLEAR_MARGIN));
-    expect(result.rerankDegradeReasons).toBeUndefined();
+    expect(result.stats).toMatchObject({ executionPath: "fast_local", retrievalMode: "fts", remoteModelCalls: 0, rerankCalls: 0 });
+    expect(result.stats.injectedChunks).toBeGreaterThan(0);
+    expect(result.block).toContain("甲一");
+    expect(result.evidence.entries.length).toBeGreaterThan(0);
+    expect(result.stats.rerankSkippedReason).toBeUndefined();
+    expect(result.stats.rerankDegradeReason).toBeUndefined();
   });
 
-  it("未开门控（详细档缺省）：即使头部清晰也照常重排（既有行为回归锚）", async () => {
+  it("详细检索即使头部清晰也照常重排，不再受旧快速门控影响", async () => {
     const { manager, studioId, nb, rerankCalls } = await setupMarginNotebook();
     const result = await manager.queryService.retrieveForNotebooks({
       studioId,
@@ -552,20 +542,19 @@ describe("rerank 动态门控与快速档期限", () => {
     expect(result.rerankDegradeReasons).toBeUndefined();
   });
 
-  it("分数扎堆（双通道名次紧贴）：门控放行重排", async () => {
+  it("详细检索分数扎堆时照常重排", async () => {
     const { manager, studioId, nb, rerankCalls } = await setupMarginNotebook();
     const result = await manager.queryService.retrieveForNotebooks({
       studioId,
       notebookIds: [nb.id],
       question: Q_BUNCHED,
-      rerankPolicy: { marginGate: true },
     });
     expect(rerankCalls).toHaveLength(1);
     expect(result.rerankSkippedReasons).toBeUndefined();
     expect(result.candidates.length).toBeGreaterThan(0);
   });
 
-  it("快速档期限收紧：门控放行（扎堆）+ rerank 挂起 → 5s 后降级 RRF 名次并留痕（不等到默认 15s）", async () => {
+  it("详细检索重排挂起，固定期限后保留 RRF 名次并明确留痕", async () => {
     const { manager, studioId, nb } = await setupMarginNotebook({ hangRerank: true });
     vi.useFakeTimers();
     try {
@@ -573,15 +562,14 @@ describe("rerank 动态门控与快速档期限", () => {
         studioId,
         notebookIds: [nb.id],
         question: Q_BUNCHED,
-        rerankPolicy: { marginGate: true, deadlineMs: KNOWLEDGE_FAST_RERANK_DEADLINE_MS },
       });
-      await vi.advanceTimersByTimeAsync(KNOWLEDGE_FAST_RERANK_DEADLINE_MS + 10);
+      await vi.advanceTimersByTimeAsync(KNOWLEDGE_RERANK_DEADLINE_MS + 10);
       const result = await pending;
-      // 5s 期限即降级：候选保持 RRF 名次，检索不失败，留痕带收紧后的期限值。
+      // 固定期限后候选保持原融合名次，检索不失败且留痕带实际期限。
       expect(result.retrievalMode).toBe("hybrid");
       expect(result.candidates.length).toBeGreaterThan(0);
       expect(result.rerankDegradeReasons?.join("; ")).toContain("门控本");
-      expect(result.rerankDegradeReasons?.join("; ")).toContain(`${KNOWLEDGE_FAST_RERANK_DEADLINE_MS}ms`);
+      expect(result.rerankDegradeReasons?.join("; ")).toContain(`${KNOWLEDGE_RERANK_DEADLINE_MS}ms`);
     } finally {
       vi.useRealTimers();
     }

@@ -1,0 +1,36 @@
+{
+  "baseSha": "3eab85891a1747c64064252804f70c0a3773f021",
+  "finalSourceSha": "",
+  "knowledgeSchemaVersion": 19,
+  "knowledgeIndexSchemaVersion": 4,
+  "annSchemaVersion": 1,
+  "fast": {
+    "executionPath": "fast_local",
+    "remoteModelCalls": 0,
+    "deadlineMs": 1200,
+    "maxEvidenceSpans": 8,
+    "renderBudgetTokens": 2400
+  },
+  "detailed": {
+    "executionPath": "detailed_research",
+    "maxRounds": 4,
+    "maxParallelAgents": 4,
+    "maxToolCalls": 32,
+    "maxWallClockMs": 180000
+  },
+  "vector": {
+    "primary": "usearch_hnsw",
+    "fallback": "portable_exact",
+    "usearchVersion": "2.26.0"
+  },
+  "tests": {
+    "typecheck": "passed",
+    "lint": "passed",
+    "boundary": "passed",
+    "vitest": "pending_final_verification",
+    "buildServer": "passed",
+    "buildServerOpen": "passed",
+    "buildClient": "passed",
+    "package": "passed"
+  }
+}

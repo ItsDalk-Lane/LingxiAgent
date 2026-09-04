@@ -1,0 +1,29 @@
+[
+  {
+    "name": "typecheck",
+    "command": "npm run typecheck",
+    "startedAt": "2026-09-04T07:20:11.870Z",
+    "finishedAt": "2026-09-04T07:20:38.276Z",
+    "durationMs": 26403.817042000002,
+    "exitCode": 0,
+    "log": "/tmp/lingxi-knowledge-p307-final-typecheck.log"
+  },
+  {
+    "name": "lint",
+    "command": "npm run lint",
+    "startedAt": "2026-09-04T07:20:38.277Z",
+    "finishedAt": "2026-09-04T07:20:55.774Z",
+    "durationMs": 17497.358249999997,
+    "exitCode": 0,
+    "log": "/tmp/lingxi-knowledge-p307-final-lint.log"
+  },
+  {
+    "name": "boundary",
+    "command": "npm run lint:boundary",
+    "startedAt": "2026-09-04T07:20:55.775Z",
+    "finishedAt": "2026-09-04T07:20:56.672Z",
+    "durationMs": 897.4737499999974,
+    "exitCode": 0,
+    "log": "/tmp/lingxi-knowledge-p307-final-boundary.log"
+  }
+]

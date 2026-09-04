@@ -4,12 +4,12 @@ import os from "node:os";
 import path from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 
-import { KnowledgeManager } from "../lib/knowledge/knowledge-manager.ts";
+import { KnowledgeManager } from "./fixtures/knowledge-legacy/legacy-query-service.ts";
 import { resolveKnowledgeChunkerConfig } from "../lib/knowledge/chunker.ts";
 import {
-  KNOWLEDGE_FUSION_BUDGET,
   KNOWLEDGE_RERANK_MAX_DOCS,
 } from "../lib/knowledge/knowledge-query-service.ts";
+import { KNOWLEDGE_FUSION_BUDGET } from "./fixtures/knowledge-legacy/legacy-query-service.ts";
 import type { KnowledgeParseArtifact } from "../lib/knowledge/types.ts";
 
 /**

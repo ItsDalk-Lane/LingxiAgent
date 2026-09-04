@@ -3,7 +3,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { KnowledgeManager } from "../lib/knowledge/knowledge-manager.ts";
+import { KnowledgeManager } from "./fixtures/knowledge-legacy/legacy-query-service.ts";
 import { buildLegacyKnowledgeChunks, legacyKnowledgeBlockFingerprint, resolveLegacyKnowledgeChunkerConfig,
   KNOWLEDGE_CHUNK_TARGET_CHARS } from "../lib/knowledge/chunker.ts";
 

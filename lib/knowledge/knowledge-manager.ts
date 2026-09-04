@@ -1716,7 +1716,7 @@ export class KnowledgeManager {
   /**
    * 查询侧后台补齐门面（§十二）：knowledge_read 等读路径发现索引变体未就绪时
    * 调用，幂等入队构建（活跃 job 去重；pending_embedding 且嵌入可解析时置回
-   * queued 立即补跑）。查询侧 retrieveForNotebooks 经 queryService 依赖注入
+   * queued 立即补跑）。冻结范围编译器经依赖注入
    * 走同一入口。
    */
   requestVariantBuild(input: {
