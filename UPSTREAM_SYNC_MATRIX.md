@@ -10,7 +10,7 @@ U0 = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0.444.1)
 U1 = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 L0 = 97595264ead8735a04559507ddaade25db8a4e15  (Lingxi v0.444.1 同步完成点, PR #2)
 L1 = ca0b417e36a6a1f80947458aaed328a25718e41b  (本轮同步开始时 main)
-VERIFIED_SOURCE_SHA = 9bee41dcfade7baad689d6979bbb3f8ede0b48ee
+VERIFIED_SOURCE_SHA = c452a705f55286df3cd18373390819cf34d60fc5
 ```
 
 ## 统计（脚本计算，禁止人工填写）

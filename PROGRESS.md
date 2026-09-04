@@ -167,6 +167,14 @@ AboutTab），因此最终源码树重新执行了 renderer build / package smok
 
 ## Seal 推进记录
 
+### 2026-09-04：P1 跨平台修复复验
+
+- 当前源码：`c452a705f55286df3cd18373390819cf34d60fc5`；首轮远程 `33825262170` 已确认质量门禁、macOS arm64、Linux x64 通过，Windows 清理目录与 Intel 原生链接失败。
+- 保留原测试与平台门禁，修复关闭资源占用和锁定 2.26.0 原生包缺失链接；算法、配置、数据表与原文不变。新增关闭回归与构建契约测试。
+- 修复本地定向 8 文件 / 57 PASS，三套类型检查、lint（0 error / 9176 warning）、boundary、三种构建、包内正常与回退烟测、两轮生成器通过。Intel 修复同一二进制分别以 arm64 与 x64 真执行建图/查询通过，x64 本地为 Rosetta，不冒充 Intel 物理 runner。
+- 修复后全量复验：`npm test` exit 0，1301 文件 PASS / 1 既有 SKIP，13085 测试 PASS / 7 既有 SKIP / 0 FAIL，80.13s；日志 `/tmp/lingxi-knowledge-p1-repair-audit-full.log`。第二轮远程门禁待回填；当前仍 P1-08，最终封印保留。
+
+
 ### 2026-09-04：知识重构 P1 阶段审计（本机已通过，远程验证中）
 
 - 用户授权沿用 P0：每阶段验证后同步审计记录，保留最终封印，不改审计白名单。
