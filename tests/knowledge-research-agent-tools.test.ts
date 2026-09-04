@@ -104,7 +104,7 @@ describe("真实 Agent 研究工具快照", () => {
 
   it("非法搜索参数保留参数错误并计数，不能误报为关键检索不可用", async () => {
     const f = await fixture();
-    const query = vi.spyOn(f.manager.searchService, "search");
+    const query = vi.spyOn(f.manager.searchService, "searchWithEvidence");
     const search = f.snapshot().find(tool => tool.name === "knowledge_search")!;
     const result = await search.execute("invalid-limit", { scopeId: f.scope.id, query: "苹果", channel: "fts", limit: 0 },
       undefined, undefined, f.runtime());
@@ -122,7 +122,7 @@ describe("真实 Agent 研究工具快照", () => {
     const f = await fixture();
     const privateCode = "KNOWLEDGE_PRIVATE_error_contains_raw_document";
     const unknown = Object.assign(new KnowledgeError("KNOWLEDGE_INDEX_INVALID", "私有底层错误原文"), { code: privateCode });
-    const query = vi.spyOn(f.manager.searchService, "search")
+    const query = vi.spyOn(f.manager.searchService, "searchWithEvidence")
       .mockRejectedValueOnce(new KnowledgeError("KNOWLEDGE_INDEX_INVALID", "私有底层错误原文"))
       .mockRejectedValueOnce(unknown);
     const search = f.snapshot().find(tool => tool.name === "knowledge_search")!;
@@ -253,7 +253,7 @@ describe("真实 Agent 研究工具快照", () => {
   });
 
   it("规范化等价查询在调用检索服务前拒绝，换快照不能重置成功历史", async () => {
-    const f = await fixture(); const executeSearch = vi.spyOn(f.manager.searchService, "search");
+    const f = await fixture(); const executeSearch = vi.spyOn(f.manager.searchService, "searchWithEvidence");
     const first = f.snapshot().find(tool => tool.name === "knowledge_search")!;
     expect((await first.execute("first", { scopeId: f.scope.id, query: "apple   project", channel: "fts" }, undefined, undefined, f.runtime())).isError).toBeFalsy();
     const second = f.snapshot().find(tool => tool.name === "knowledge_search")!;
@@ -269,7 +269,7 @@ describe("真实 Agent 研究工具快照", () => {
     const compiled = await f.manager.compileTurnScope(f.scope);
     const sections = compiled.sources.find(source => source.sourceId === f.sources[0].sourceId)!.sectionKeys;
     expect(sections).toHaveLength(2);
-    const query = vi.spyOn(f.manager.searchService, "search");
+    const query = vi.spyOn(f.manager.searchService, "searchWithEvidence");
     const params = { scopeId: f.scope.id, query: "苹果", channel: "fts", sourceIds: [f.sources[0].sourceId] };
     const search = f.snapshot().find(tool => tool.name === "knowledge_search")!;
     for (const sectionKeys of [undefined, [sections[0]], [sections[1]], sections]) {
@@ -317,8 +317,8 @@ describe("真实 Agent 研究工具快照", () => {
     const f = await fixture();
     let release!: () => void;
     const pending = new Promise<void>(resolve => { release = resolve; });
-    const actualSearch = f.manager.searchService.search.bind(f.manager.searchService);
-    const query = vi.spyOn(f.manager.searchService, "search").mockImplementationOnce(async request => {
+    const actualSearch = f.manager.searchService.searchWithEvidence.bind(f.manager.searchService);
+    const query = vi.spyOn(f.manager.searchService, "searchWithEvidence").mockImplementationOnce(async request => {
       await pending;
       return actualSearch(request);
     });

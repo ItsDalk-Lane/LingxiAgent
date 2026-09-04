@@ -10,7 +10,7 @@
 - 严格按 P0 → P1 → P2 → P3 及编号顺序；阶段门禁全部通过才进入下一阶段。
 - 每项记录测试原始结果后提交；不删除、跳过或放宽测试，不合并 main。
 - 现有任务书为用户未跟踪文件，既有规划文档与 BLOCKED.md 历史记录保留。
-- 当前断点：P1-01 至 P1-08 已完成，阶段收口 `23873985`、审计 `333c5112`，本地与四平台门禁全部通过；P2-01 已完成并提交 `c3033b05`；P2-02 已提交 `c729f68a`；P2-03 已提交 `4a95317c`；P2-04 已提交 `359aeb77`；P2-05 已提交 `faad0da2`；P2-06 已完成多轮研究编排、共享预算与最终证据包，等待本项提交后进入 P2-07。P0 源码提交 `5c016df183ad207cf1ca33de274abb7a4eb10057`，阶段审计提交 `f9928d76`；全量 13002 PASS / 0 FAIL / 7 既有 SKIP。用户已授权每阶段验证后同步审计记录，保留最终封印。
+- 当前断点：P1-01 至 P1-08 已完成，阶段收口 `23873985`、审计 `333c5112`，本地与四平台门禁全部通过；P2-01 已完成并提交 `c3033b05`；P2-02 已提交 `c729f68a`；P2-03 已提交 `4a95317c`；P2-04 已提交 `359aeb77`；P2-05 已提交 `faad0da2`；P2-06 已提交 `f4340d98`；P2-07 已完成正式详细入口切换、最终证据清单与历史兼容，等待本项提交后进入 P2-08。P0 源码提交 `5c016df183ad207cf1ca33de274abb7a4eb10057`，阶段审计提交 `f9928d76`；全量 13002 PASS / 0 FAIL / 7 既有 SKIP。用户已授权每阶段验证后同步审计记录，保留最终封印。
 - 进度、计划与事实集中在本文件和基线文档，避免覆盖既有 task_plan.md / findings.md / PROGRESS.md。
 - 目标工具已确认本任务存在 active goal；重复 create_goal 被拒绝，沿用现有目标。
 - 规划恢复脚本返回其他会话的无关配置记录，经 git diff 为空核对，未采用其内容。
@@ -21,7 +21,7 @@
 | --- | --- | --- |
 | P0 | completed | 2026-09-04 全量 13002 PASS / 0 FAIL / 7 既有 SKIP，76.42s；全部 P0 门禁通过，审计提交 f9928d76 |
 | P1 | completed | P1-01 至 P1-08 完成；本地全量和第三轮四平台 Build 33829055797 全部通过，阶段审计 333c5112 |
-| P2 | in_progress | P2-01 至 P2-06 已完成；P2-07/P2-08 与阶段门禁待执行 |
+| P2 | in_progress | P2-01 至 P2-07 已完成；P2-08 与阶段门禁待执行 |
 | P3 | pending | NOT_EXECUTED |
 
 ## P0-00：建立基线与回归门禁
@@ -323,16 +323,18 @@
 - 测试命令：任务书六项测试，加 `knowledge-research-recovery`、`knowledge-research-context-renderer`、`knowledge-research-agent-tools`、原有 update/finish/delegate/budget/store/receipt/ledger 与 `persistence-schema-tripwire`，共十七文件；`npm run typecheck`；修改文件 ESLint、`git diff --check`；持久化清单/指纹、运行闭包、边界与开放树生成器。
 - 测试结果：最终 **17 文件 / 194 PASS / 0 FAIL / 0 SKIP，4.78s，exit 0**；三套类型检查、静态检查、差异与开放边界检查均 exit 0。ESLint 为 0 错误/89 警告，包含大文件及测试替身宽类型警告。真实存储、索引、冻结范围、Agent 工具与 Worker 委派贯通，模型执行边界使用确定性替身。首轮六文件 37 PASS；随后独立调查测试 1 FAIL/1 PASS、恢复测试 3 FAIL/1 PASS、合成恢复新增项 1 FAIL/4 PASS、错误保真 2 FAIL/15 PASS、超长问题 1 FAIL/6 PASS，均保留原断言并修复后纳入最终绿测；没有删除、跳过或放宽测试。日志 `/tmp/lingxi-knowledge-p206-tests-final.log`、`/tmp/lingxi-knowledge-p206-typecheck-verified.log`、`/tmp/lingxi-knowledge-p206-lint-final.log`。
 - 生成物：持久化清单 66 stores / 779 sites；v18 与兼容指纹 `sha256:3beb2e79d626d4bc9d7ae2f35a92c1b4a6daab3bccf3e7d701b565138cc43679` 保持不变；运行闭包 10682 文件，依赖图已更新；开放树成功导出 881 文件。P2 阶段完整门禁和审计尚待 P2-07/P2-08 完成，最终封印保留。
-- 对应 commit SHA：本项提交（下一项回填实际 SHA）
+- 对应 commit SHA：`f4340d98`
 - 偏差：none
 
 ## P2-07：详细模式正式切换到 Research Agent
 
-- 状态：pending
-- 改动文件：尚未开始
-- 测试命令：按任务书该项测试执行，尚未执行
-- 测试结果：NOT_EXECUTED
-- 对应 commit SHA：尚未提交
+- 状态：completed
+- 改动文件：新增 Engine 详细入口、普通发送与追加消息路由；旧算法原文搬至 `lib/knowledge/legacy/legacy-knowledge-context-injector.ts`，原 facade 只保留安全/打包/渲染与清单装配；最终研究渲染与历史压缩；研究搜索身份回调、恢复接线及测试；开放清单和运行闭包。
+- 改动：新详细请求经真实隔离执行器调查，只有完成或部分完成后进入主回答；取消等待实际清理、失败不以空材料继续生成。最终上下文逐项列明需求、冲突/缺口及七条回答契约，整块受 16000 token/32 段约束；清单只收已消费凭据验证的精确原文，同分块多引文不丢，扫描凭据按真实冻结索引补齐定位，索引缺失/不完整明确失败。Root/Worker 实查向量身份经宿主回调去重进入最终清单，不改工具公开输出、不保存候选正文。相同轮次重试沿用原范围/预算，已终态直接复用研究；历史检索方式缺失明确标记，不从配置猜测。旧 98 个顶层声明正文保持一致，历史测试只调整导入位置；两种历史材料信封同时压缩和剥离。
+- 测试命令：任务书四项测试，加 Engine 原文清单/恢复、真实搜索身份、研究工具/编排/恢复、快速零远程、两项提交回归、旧 injector/coverage/planner/manifest/rerank/golden 与持久化指纹，共二十文件；三套类型检查；全部修改代码 ESLint；差异、持久化清单/指纹、开放边界、开放树与闭包生成。
+- 测试结果：最终 **20 文件 / 340 PASS / 0 FAIL / 0 SKIP，8.69s，exit 0**；三套类型检查与 ESLint 均 exit 0，ESLint 0 错误/313 警告；差异与开放边界通过。恢复终态用例先 3 PASS/1 FAIL，修复后 4 PASS；旧 manifest 宿主缺新入口先失败，保留原断言、补真实会话登记后通过；五项研究搜索探针随真实入口迁移机械调整，全部原断言保留。混合搜索清单新用例首次运行已为绿态，未倒改生产制造红测。日志 `/tmp/lingxi-knowledge-p207-tests-final.log`、`/tmp/lingxi-knowledge-p207-typecheck-final.log`、`/tmp/lingxi-knowledge-p207-lint-final.log`，恢复红绿日志 `/tmp/lingxi-knowledge-p207-engine-terminal-recovery-{red,green}.log`。
+- 生成物：持久化清单仍 66 stores / 779 sites；v18 与指纹 `sha256:3beb2e79d626d4bc9d7ae2f35a92c1b4a6daab3bccf3e7d701b565138cc43679` 不变；运行闭包 10687 文件，开放树 882 文件。P2 阶段门禁及审计待 P2-08 完成，最终封印保留。
+- 对应 commit SHA：本项提交（下一项回填实际 SHA）
 - 偏差：none
 
 ## P2-08：Research 过程 UI

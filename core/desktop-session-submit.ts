@@ -19,7 +19,7 @@
  * @param {(delta: string, accumulated: string) => void} [opts.onDelta]
  * @param {object} [opts.displayMessage]
  * @param {Array<{fileId?:string, sessionId?:string, sessionPath?:string, label?:string, kind?:string}>} [opts.sessionFileRefs]
- * @param {{notebookIds:string[], mode:'qa'|'assist'}} [opts.knowledgeRefs] - 知识库笔记本引用（拆解 + 检索后注入 [KnowledgeContext] 块，不进用户可见投影）
+ * @param {{notebookIds:string[], mode:'fast'|'detailed'}} [opts.knowledgeRefs] - 知识库笔记本引用（材料块不进用户可见投影）
  * @param {object|null|undefined} [opts.uiContext]
  * @param {object|null|undefined} [opts.context]
  * @param {boolean} [opts.preservePromptEnvelope] - prompt text already contains its persisted media/SessionFile/reminder envelope
@@ -29,6 +29,7 @@
  * @returns {Promise<{ text: string | null, toolMedia: string[] }>}
  */
 import path from "path";
+import { randomUUID } from "node:crypto";
 import { extOfName, inferFileKind } from "../lib/file-metadata.ts";
 import { collectMediaItems } from "../lib/tools/media-details.ts";
 import { formatSettingsUpdateText } from "../lib/tools/settings-update-result.ts";
@@ -39,10 +40,8 @@ import { BrowserManager } from "../lib/browser/browser-manager.ts";
 import { normalizeKnowledgeRefs, type KnowledgeRefs, type KnowledgeRetrievalStats } from "../shared/knowledge-refs.ts";
 import { resolveKnowledgeExecutionPolicy } from "../shared/knowledge-execution.ts";
 import { KNOWLEDGE_FAST_RENDER_BUDGET_TOKENS, KNOWLEDGE_FAST_TOTAL_DEADLINE_MS } from "../lib/knowledge/fast-knowledge-pipeline.ts";
-import {
-  resolveKnowledgeInjectionBudgetTokens,
-  type KnowledgeInjectionEvidence,
-} from "../lib/knowledge/knowledge-context-injector.ts";
+import type { KnowledgeInjectionEvidence } from "../lib/knowledge/knowledge-context-injector.ts";
+import { KnowledgeError } from "../lib/knowledge/errors.ts";
 import { compressHistoricalKnowledgeContextMessages } from "./knowledge-history-compressor.ts";
 
 /**
@@ -73,11 +72,8 @@ const pendingDesktopSessionSubmissions = new Set();
 const abortedDesktopSessionSubmissions = new Set();
 
 /**
- * 检索/排队期间可中止在途知识注入的 AbortController（Phase 9 第二波）：键与
- * abortedDesktopSessionSubmissions 同源（sessionId 与 sessionPath 两种形式）。
- * abortPendingDesktopSubmission 标记 abort 时同步 abort 对应 controller——
- * exhaustive coverage run 据此中止（pending shard → cancelled，stats 如实），
- * 不再等检索完成后才被丢弃。提交结束 finally 兜底清理，防泄漏。
+ * 检索或调查期间，停止请求会沿此处的信号取消正在执行的工作。
+ * 信号按会话身份和路径登记；提交必须等待工作清理完毕后才能返回。
  */
 const pendingKnowledgeInjectionAborters = new Map();
 
@@ -96,7 +92,7 @@ export function abortPendingDesktopSubmission(engine: any, target: { sessionId?:
     if (!keys.some((key) => pendingDesktopSessionSubmissions.has(key))) return false;
     for (const key of keys) {
       abortedDesktopSessionSubmissions.add(key);
-      // 在途知识注入（含 exhaustive coverage run）立即中止；无 controller 的
+      // 在途知识检索或调查立即中止；无 controller 的
       // 提交（未携带知识引用）只走既有的标记-检查通道。
       pendingKnowledgeInjectionAborters.get(key)?.abort();
     }
@@ -128,19 +124,15 @@ function consumeRenderedReminderBlock(engine: any, sessionPath: string, rendered
 }
 
 /**
- * Phase 8 知识注入块解析：engine 门面缺失 = 布线缺陷（显式抛错，不静默跳过
- * 用户显式携带的知识库引用）；门面自身运行期失败已在其内部转为带
- * [knowledge injection unavailable: ...] 标注的降级块——此处再兜一层，
- * 保证聊天不因注入链路中断而阻断（降级留痕，禁静默）。
- * 返回注入块与检索统计：降级路径的 stats 带 unavailableReason（其余字段
- * 置零/none），正常路径原样透传 injector 的统计。
+ * 快速模式保留本地检索的显式降级；详细模式必须等调查完成或部分完成。
+ * 调查失败原样抛出，不能用空材料继续生成回答。
  */
 async function resolveKnowledgeInjectionBlock(
   engine: any,
   refs: KnowledgeRefs,
   question: string,
-  budgetTokens: number,
   sessionPath: string,
+  sessionId: string | null,
   turnId?: string | null,
   signal?: AbortSignal | null,
 ): Promise<{ block: string; stats: KnowledgeRetrievalStats; evidence: KnowledgeInjectionEvidence }> {
@@ -151,9 +143,31 @@ async function resolveKnowledgeInjectionBlock(
     // 此处尚未冻结来源；P0–P2 策略不依赖来源数量。
     selectedSourceCount: 0,
   });
-  const method = policy.path === "fast_local" ? "buildFastKnowledgeContext" : "buildKnowledgeContextInjection";
+  const method = policy.path === "fast_local" ? "buildFastKnowledgeContext" : "buildDetailedKnowledgeResearchContext";
   if (typeof engine?.[method] !== "function") {
     throw new Error(`desktop-session-submit: knowledge injection unavailable (engine lacks ${method})`);
+  }
+  if (policy.path === "detailed_research") {
+    signal?.throwIfAborted();
+    // 会话加载后才读取登记身份，兼容刚完成旧会话回填的情况。
+    const resolvedSessionId = resolveSessionIdForPath(engine, sessionPath);
+    const manifest = resolvedSessionId ? engine.getSessionManifest?.(resolvedSessionId) : null;
+    if (!resolvedSessionId || (sessionId && sessionId !== resolvedSessionId)
+      || manifest?.sessionId !== resolvedSessionId || manifest.lifecycle !== "active"
+      || manifest.currentLocator?.path !== sessionPath || !manifest.ownerAgentId?.trim()) {
+      throw new KnowledgeError("KNOWLEDGE_SCOPE_VIOLATION", "Knowledge research session identity is unavailable");
+    }
+    const result = await engine.buildDetailedKnowledgeResearchContext({
+      question, knowledgeRefs: { notebookIds: refs.notebookIds, mode: "detailed" },
+      sessionId: resolvedSessionId, sessionPath, agentId: manifest.ownerAgentId,
+      // 客户消息号标识本次提交；未提供时由宿主生成，模型不能指定研究身份。
+      turnId: turnId || randomUUID(), ...(signal ? { signal } : {}),
+    });
+    const status = result.stats?.research?.status;
+    if (status !== "completed" && status !== "partial") {
+      throw new KnowledgeError("KNOWLEDGE_RETRIEVAL_UNAVAILABLE", "Knowledge research has no completed context", { status });
+    }
+    return result;
   }
   try {
     const request = {
@@ -165,24 +179,18 @@ async function resolveKnowledgeInjectionBlock(
       // 两种执行路径共用检索期取消信号。
       ...(signal ? { signal } : {}),
     };
-    switch (policy.path) {
-      case "fast_local":
-        engine.emitEvent?.({ type: "knowledge_trace", sessionPath, id: "fast-local", kind: "search",
-          phase: "start", detail: "fast_local" }, sessionPath);
-        try {
-          const result = await engine.buildFastKnowledgeContext(request);
-          engine.emitEvent?.({ type: "knowledge_trace", sessionPath, id: "fast-local", kind: "search",
-            phase: "done", detail: "fast_local", hits: result.stats.injectedChunks,
-            elapsedMs: result.stats.stageTimings?.totalMs }, sessionPath);
-          return result;
-        } catch (error) {
-          engine.emitEvent?.({ type: "knowledge_trace", sessionPath, id: "fast-local", kind: "search",
-            phase: "failed", detail: "fast_local" }, sessionPath);
-          throw error;
-        }
-      case "detailed_research":
-        // P0 保留详细模式现有行为，P2 再切换调查运行时。
-        return await engine.buildKnowledgeContextInjection({ ...request, budgetTokens });
+    engine.emitEvent?.({ type: "knowledge_trace", sessionPath, id: "fast-local", kind: "search",
+      phase: "start", detail: "fast_local" }, sessionPath);
+    try {
+      const result = await engine.buildFastKnowledgeContext(request);
+      engine.emitEvent?.({ type: "knowledge_trace", sessionPath, id: "fast-local", kind: "search",
+        phase: "done", detail: "fast_local", hits: result.stats.injectedChunks,
+        elapsedMs: result.stats.stageTimings?.totalMs }, sessionPath);
+      return result;
+    } catch (error) {
+      engine.emitEvent?.({ type: "knowledge_trace", sessionPath, id: "fast-local", kind: "search",
+        phase: "failed", detail: "fast_local" }, sessionPath);
+      throw error;
     }
   } catch (err) {
     const reason = err instanceof Error ? err.message : String(err);
@@ -199,17 +207,14 @@ async function resolveKnowledgeInjectionBlock(
         injectedChunks: 0,
         truncated: false,
         usedTokens: 0,
-        budgetTokens,
-        ...(policy.path === "fast_local" ? {
-          executionPath: "fast_local" as const,
-          remoteModelCalls: 0,
-          vectorQueries: 0,
-          rerankCalls: 0,
-          ftsQueries: 0,
-          vectorBackend: "none" as const,
-          deadlineMs: KNOWLEDGE_FAST_TOTAL_DEADLINE_MS,
-          budgetTokens: KNOWLEDGE_FAST_RENDER_BUDGET_TOKENS,
-        } : {}),
+        executionPath: "fast_local",
+        remoteModelCalls: 0,
+        vectorQueries: 0,
+        rerankCalls: 0,
+        ftsQueries: 0,
+        vectorBackend: "none",
+        deadlineMs: KNOWLEDGE_FAST_TOTAL_DEADLINE_MS,
+        budgetTokens: KNOWLEDGE_FAST_RENDER_BUDGET_TOKENS,
         unavailableReason: reason,
       },
       // 降级路径无证据进入模型上下文：身份链为空（不伪造）。
@@ -442,7 +447,7 @@ export async function submitDesktopSessionMessage(engine: any, opts: {
     let knowledgeInjectionEvidence: KnowledgeInjectionEvidence | null = null;
     let promptSessionFileRefs = normalizeSessionFileRefs(sessionFileRefs, sessionPath, sessionId);
     // 知识库引用：形状非法直接抛错（显式拒绝，禁静默降级）；下方 marker 注入点
-    // 调 knowledge-context-injector 做拆解 + 检索注入。
+    // 按用户选择执行本地检索或完整调查，再注入最终材料。
     const promptKnowledgeRefs = normalizeKnowledgeRefs(knowledgeRefs);
 
     if (preservePromptEnvelope && inboundFiles?.length) {
@@ -505,9 +510,8 @@ export async function submitDesktopSessionMessage(engine: any, opts: {
       promptText = addAttachedVideoMarkers(promptText, promptVideoAttachmentPaths);
       promptText = addAttachedAudioMarkers(promptText, promptAudioAttachmentPaths);
       promptText = addSessionFileRefMarkers(promptText, promptSessionFileRefs);
-      // Phase 8：knowledge-context-injector 基于 promptKnowledgeRefs 做拆解 + 检索，
-      // 把 [KnowledgeContext] 系统侧注入块拼进发给模型的 prompt。displayComparisonPromptText
-      // 在此之前已捕获（复用 reminderBlock 剥离模式），用户可见投影不被污染；
+      // 检索或调查返回的材料只拼进模型输入。用户可见正文已在此前捕获，
+      // 展示投影不会带入材料块；
       // 注入块存在时 forceDisplayText 强制持久化展示正文（见下方投影条目）。
       if (promptKnowledgeRefs) {
         // 立即反馈：注入链路（拆解 + 检索）可能阻塞数秒到数十秒，而
@@ -515,24 +519,32 @@ export async function submitDesktopSessionMessage(engine: any, opts: {
         // 内部才会发出。先发 knowledge_retrieval_started 让 UI 进入「检索中」态，
         // 再开始阻塞式注入（chat.ts 广播到订阅客户端）。
         engine.emitEvent?.({ type: "knowledge_retrieval_started", sessionPath }, sessionPath);
-        // 检索期取消信号（Phase 9 第二波）：abortPendingDesktopSubmission 标记
-        // abort 时同步触发——exhaustive coverage run 中止（pending shard →
-        // cancelled），不再等注入完成后才被丢弃。两种键形式都注册（与标记集合同源）。
+        // 两种会话键共用取消信号，调查收到停止后先清理再返回。
         const knowledgeAbort = new AbortController();
         const aborterKeys = [sessionId, sessionPath]
           .filter((key): key is string => typeof key === "string" && !!key.trim());
         for (const key of aborterKeys) pendingKnowledgeInjectionAborters.set(key, knowledgeAbort);
+        // 加载会话期间的停止发生在信号登记前，也必须阻止新调查启动。
+        if (promptKnowledgeRefs.mode === "detailed" && aborterKeys.some(key => abortedDesktopSessionSubmissions.has(key))) {
+          knowledgeAbort.abort();
+        }
         let injection: { block: string; stats: KnowledgeRetrievalStats; evidence: KnowledgeInjectionEvidence };
         try {
           injection = await resolveKnowledgeInjectionBlock(
             engine,
             promptKnowledgeRefs,
             text || "",
-            resolveKnowledgeInjectionBudgetTokens((session as any)?.model ?? null),
             sessionPath,
+            sessionId,
             clientMessageId || null,
             knowledgeAbort.signal,
           );
+        } catch (error) {
+          if (!knowledgeAbort.signal.aborted || (error !== knowledgeAbort.signal.reason
+            && !(error instanceof Error && error.name === "AbortError"))) throw error;
+          engine.emitEvent?.({ type: "session_status", isStreaming: false, aborted: true, reason: "user_abort" }, sessionPath);
+          earlyBusyEmitted = false;
+          return { text: null, toolMedia: [] };
         } finally {
           for (const key of aborterKeys) {
             if (pendingKnowledgeInjectionAborters.get(key) === knowledgeAbort) {
@@ -917,11 +929,16 @@ export async function submitDesktopSessionInterjection(engine: any, opts: {
         engine,
         promptKnowledgeRefs,
         text || "",
-        resolveKnowledgeInjectionBudgetTokens((session as any)?.model ?? null),
         sessionPath,
+        sessionId,
         clientMessageId || null,
         knowledgeAbort.signal,
       );
+    } catch (error) {
+      if (!knowledgeAbort.signal.aborted || (error !== knowledgeAbort.signal.reason
+        && !(error instanceof Error && error.name === "AbortError"))) throw error;
+      engine.emitEvent?.({ type: "session_status", isStreaming: false, aborted: true, reason: "user_abort" }, sessionPath);
+      return { text: null, toolMedia: [], steered: false };
     } finally {
       for (const key of aborterKeys) {
         if (pendingKnowledgeInjectionAborters.get(key) === knowledgeAbort) pendingKnowledgeInjectionAborters.delete(key);

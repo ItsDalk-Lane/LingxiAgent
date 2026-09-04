@@ -6,7 +6,7 @@ import type { KnowledgeResearchAction, KnowledgeResearchRun } from "../types.ts"
 import { EvidenceLedger, type EvaluatedEvidenceNeed } from "./evidence-ledger.ts";
 import { ResearchContextRenderer } from "./research-context-renderer.ts";
 import { buildResearchPrompt } from "./research-prompts.ts";
-import { ResearchRoundRunner, type ResearchExecuteIsolated } from "./research-round-runner.ts";
+import { ResearchRoundRunner, type ResearchExecuteIsolated, type ResearchSearchSummary } from "./research-round-runner.ts";
 import { evaluateResearchStopPolicy } from "./research-stop-policy.ts";
 import { ResearchStore } from "./research-store.ts";
 import { hasActiveResearchExecution, ResearchToolBudget } from "./research-tool-budget.ts";
@@ -46,6 +46,7 @@ export class KnowledgeResearchOrchestrator {
     executeIsolated: ResearchExecuteIsolated;
     nowMs?: () => number;
     isCompletenessSatisfied?: (runId: string, needId?: string) => boolean;
+    onSearchCompleted?: (summary: ResearchSearchSummary) => void;
   }) {
     this.budget = new ResearchToolBudget(deps.research, { nowMs: deps.nowMs });
     this.ledger = new EvidenceLedger(deps.research, { isCompletenessSatisfied: deps.isCompletenessSatisfied });
@@ -59,7 +60,7 @@ export class KnowledgeResearchOrchestrator {
     // 同一冻结轮次崩溃后继续原研究，绝对时限与预算不重新发放。
     const existing = research.knowledgeStore.db.prepare(`SELECT id FROM knowledge_research_runs
       WHERE turn_scope_id = ? AND turn_id = ? AND parent_session_path = ? AND question = ?
-      AND status IN ('planning', 'running', 'synthesizing') ORDER BY created_at DESC, id LIMIT 1`)
+      ORDER BY created_at DESC, id LIMIT 1`)
       .get(request.compiledScope.scopeId, request.turnId, request.parentSessionPath, request.question) as { id: string } | undefined;
     const run = existing ? research.requireRun(existing.id) : research.createRun({
       turnScopeId: request.compiledScope.scopeId, turnId: request.turnId, parentSessionPath: request.parentSessionPath,
@@ -72,6 +73,11 @@ export class KnowledgeResearchOrchestrator {
     }
     active.add(run.id);
     try {
+      if (existing && !activeStatuses.has(run.status)) {
+        const rendered = this.renderer.render({ runId: run.id, compiledScope: request.compiledScope,
+          needs: this.needs(run.id), terminalStatus: run.status as "completed" | "partial" | "failed" | "cancelled" });
+        return { ...rendered, run };
+      }
       if (existing && run.status === "synthesizing") {
         const decision = this.stopDecision(run, this.needs(run.id));
         return this.finalize(request, run.id, decision.stopReason === "complete" ? "completed" : "partial",
@@ -166,6 +172,7 @@ export class KnowledgeResearchOrchestrator {
         parentSessionId: request.parentSessionId, parentSessionPath: request.parentSessionPath,
         studioId: request.compiledScope.studioId, scopeId: request.compiledScope.scopeId,
         prompt, signal: request.signal, searchPlan, forbiddenQueries, isCompletenessSatisfied: this.deps.isCompletenessSatisfied,
+        onSearchCompleted: this.deps.onSearchCompleted,
       });
       run = research.requireRun(runId);
       const newEvidenceCount = research.listEvidence(runId).filter(item => !beforeIds.has(item.id)).length;
@@ -222,7 +229,7 @@ export class KnowledgeResearchOrchestrator {
       research.beginSynthesis(runId);
       research.setRunState(runId, { status: "synthesizing", stopReason });
     }
-    const rendered = this.renderer.render({ runId, compiledScope: request.compiledScope, needs: this.needs(runId) });
+    const rendered = this.renderer.render({ runId, compiledScope: request.compiledScope, needs: this.needs(runId), terminalStatus: finalStatus });
     if (finalStatus !== "cancelled" && finalStatus !== "failed") research.setRunState(runId, { status: finalStatus, stopReason });
     return { ...rendered, run: research.requireRun(runId) };
   }

@@ -1196,7 +1196,9 @@ export class Agent {
     };
     const base = { getKnowledge: () => knowledge, getStudioId: () => input.studioId,
       resolveSessionContext, resolveResearchContext: resolveContext };
-    const readTools = [createKnowledgeOutlineTool(base), createKnowledgeSearchTool(base),
+    const readTools = [createKnowledgeOutlineTool(base), createKnowledgeSearchTool({ ...base,
+      onSearchCompleted: summary => input.onSearchCompleted?.(summary),
+    }),
       createKnowledgeReadTool(base), createKnowledgeGrepTool(base)].map(tool => ({
       ...tool,
       execute: async (id: string, params: Record<string, unknown> = {}, signal?: AbortSignal, onUpdate?: unknown, ctx?: unknown) => {
@@ -1295,7 +1297,7 @@ export class Agent {
               workerOptions.researchContext.allowedNeedIds?.includes(needId)) })).filter(entry => entry.needIds.length > 0),
             forbiddenQueries: sourceKey(workerOptions.researchContext.allowedSourceIds ?? defaultSourceIds) === defaultSourceKey
               ? [...forbiddenQueries] : [],
-            isCompletenessSatisfied: input.isCompletenessSatisfied },
+            isCompletenessSatisfied: input.isCompletenessSatisfied, onSearchCompleted: input.onSearchCompleted },
         }),
       })];
     const allowed = new Set(getKnowledgeResearchToolNames(options.surface));

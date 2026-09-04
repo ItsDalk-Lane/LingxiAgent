@@ -7,7 +7,7 @@ import { KnowledgeManager } from "../lib/knowledge/knowledge-manager.ts";
 import {
   buildKnowledgeContextInjection,
   KNOWLEDGE_FAST_MAX_EVIDENCE_ENTRIES,
-} from "../lib/knowledge/knowledge-context-injector.ts";
+} from "../lib/knowledge/legacy/legacy-knowledge-context-injector.ts";
 import type { KnowledgeReferenceMode } from "../shared/knowledge-refs.ts";
 
 /**

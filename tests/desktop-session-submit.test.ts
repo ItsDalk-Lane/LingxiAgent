@@ -1849,12 +1849,15 @@ describe("knowledge context injection (Phase 8)", () => {
     const appendCustomEntry = vi.fn();
     Object.assign(session, { sessionManager: { appendCustomEntry } });
     const engine = {
+      getSessionIdForPath: vi.fn(() => "session"),
+      getSessionManifest: vi.fn(() => ({ sessionId: "session", ownerAgentId: "agent", lifecycle: "active", currentLocator: { path: "/tmp/desk.jsonl" } })),
       ensureSessionLoaded: vi.fn(async () => session),
       promptSession: vi.fn(async (sessionPath, text, opts) => session.prompt(text, opts)),
       emitEvent: vi.fn(),
       setUiContext: vi.fn(),
       buildFastKnowledgeContext: vi.fn(async () => ({ block: INJECTION_BLOCK, stats: RETRIEVAL_STATS })),
-      buildKnowledgeContextInjection: vi.fn(async () => ({ block: INJECTION_BLOCK, stats: RETRIEVAL_STATS })),
+      buildDetailedKnowledgeResearchContext: vi.fn(async () => ({ block: "[KnowledgeResearchContext]\n[K1] evidence\n[/KnowledgeResearchContext]", stats: { ...RETRIEVAL_STATS, mode: "detailed", research: { status: "completed" } } })),
+      buildKnowledgeContextInjection: vi.fn(),
       ...overrides,
     };
     return { engine, session, appendCustomEntry };
@@ -1912,7 +1915,8 @@ describe("knowledge context injection (Phase 8)", () => {
       MESSAGE_PRESENTATION_RECORD_TYPE,
       expect.objectContaining({ displayText: "只问一句" }),
     );
-    expect(engine.promptSession.mock.calls[0][1]).toContain("[KnowledgeContext]");
+    expect(engine.promptSession.mock.calls[0][1]).toContain("[KnowledgeResearchContext]");
+    expect(engine.buildKnowledgeContextInjection).not.toHaveBeenCalled();
   });
 
   it("keeps the chat flowing with an explicit unavailable annotation when the injector throws", async () => {

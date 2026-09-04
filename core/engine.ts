@@ -189,6 +189,10 @@ function buildToolCatalogManifestSnapshot(catalog, modelContextWindowTokens) {
 import { filterToolObjectsByAvailability } from "./tool-availability.ts";
 import { TaskRegistry } from "../lib/task-registry.ts";
 import { KnowledgeManager } from "../lib/knowledge/knowledge-manager.ts";
+import { KnowledgeResearchOrchestrator } from "../lib/knowledge/research/knowledge-research-orchestrator.ts";
+import { ResearchStore } from "../lib/knowledge/research/research-store.ts";
+import type { KnowledgeEvidenceSpan } from "../shared/knowledge-evidence.ts";
+import type { CompiledKnowledgeScope } from "../lib/knowledge/scope-snapshot-compiler.ts";
 import { KNOWLEDGE_CANDIDATE_GENERATION_BUDGET } from "../lib/knowledge/knowledge-query-service.ts";
 import { KnowledgeError } from "../lib/knowledge/errors.ts";
 import { KnowledgeEmbeddingProviderGate } from "../lib/knowledge/ingestion-service.ts";
@@ -200,11 +204,6 @@ import type { KnowledgeRetrievalStats } from "../shared/knowledge-refs.ts";
 import { resolveKnowledgeExecutionPolicy } from "../shared/knowledge-execution.ts";
 import {
   assembleKnowledgeEvidenceManifestEntries,
-  buildKnowledgeContextInjection,
-  KNOWLEDGE_DECOMPOSE_SYSTEM_PROMPT,
-  KNOWLEDGE_DECOMPOSE_SPECIALIST_PROMPTS,
-  KNOWLEDGE_EXPANSION_SYSTEM_PROMPT,
-  KNOWLEDGE_GAP_ANALYSIS_SYSTEM_PROMPT,
   type KnowledgeInjectionEvidence,
 } from "../lib/knowledge/knowledge-context-injector.ts";
 import {
@@ -2742,6 +2741,157 @@ export class LingxiEngine {
     return { block, stats, evidence };
   }
 
+  /** 详细提问先在只读隔离会话中调查，只有完整或部分完成的已验证证据才交给主会话。 */
+  async buildDetailedKnowledgeResearchContext(input: {
+    question: string;
+    knowledgeRefs: { notebookIds: string[]; mode: "detailed" };
+    sessionId: string;
+    sessionPath: string;
+    agentId: string;
+    turnId: string;
+    signal?: AbortSignal;
+  }): Promise<{ block: string; stats: KnowledgeRetrievalStats; evidence: KnowledgeInjectionEvidence }> {
+    input.signal?.throwIfAborted();
+    const started = performance.now(), knowledge = this._knowledge, studioId = this._runtimeContext?.studioId;
+    const manifest = this.getSessionManifest(input.sessionId);
+    if (!knowledge || !studioId || input.knowledgeRefs.mode !== "detailed" || !input.turnId?.trim()
+      || this.getSessionIdForPath(input.sessionPath) !== input.sessionId || manifest?.lifecycle !== "active"
+      || manifest.ownerAgentId !== input.agentId || path.resolve(manifest.currentLocator.path) !== path.resolve(input.sessionPath)) {
+      throw new KnowledgeError("KNOWLEDGE_SCOPE_VIOLATION", "Detailed research requires the active parent session and its Agent");
+    }
+    const previousScope = knowledge.store.db.prepare(`SELECT id FROM knowledge_turn_scopes
+      WHERE studio_id = ? AND session_path = ? AND turn_id = ? ORDER BY created_at DESC, id LIMIT 1`)
+      .get(studioId, input.sessionPath, input.turnId) as { id: string } | undefined;
+    const frozen = previousScope ? knowledge.getTurnScope({ scopeId: previousScope.id }) : null;
+    const notebookKey = (ids: string[]) => JSON.stringify([...new Set(ids)].sort());
+    if (frozen && (frozen.status !== "active" || notebookKey(frozen.notebookIds) !== notebookKey(input.knowledgeRefs.notebookIds))) {
+      throw new KnowledgeError("KNOWLEDGE_SCOPE_VIOLATION", "A repeated turn cannot replace its frozen research scope");
+    }
+    const scope = frozen ?? knowledge.createTurnScope({ studioId, sessionPath: input.sessionPath, turnId: input.turnId,
+      notebookIds: input.knowledgeRefs.notebookIds });
+    const compiledScope = await knowledge.compileTurnScope(scope);
+    const previousRun = knowledge.store.db.prepare("SELECT question FROM knowledge_research_runs WHERE turn_scope_id = ? LIMIT 1")
+      .get(scope.id) as { question: string } | undefined;
+    if (previousRun && previousRun.question !== input.question) {
+      throw new KnowledgeError("KNOWLEDGE_SCOPE_VIOLATION", "A repeated research turn cannot replace its question");
+    }
+    const scopeCompileMs = performance.now() - started;
+    const research = new ResearchStore(knowledge.store);
+    const modes = new Set<"fts" | "hybrid">(), backends = new Set<"hnsw" | "portable" | "none">();
+    const searchedVectorVariants = new Map<string, KnowledgeInjectionEvidence["searchedVectorVariants"][number]>();
+    let observedSearches = 0;
+    const result = await new KnowledgeResearchOrchestrator({ research,
+      executeIsolated: (prompt, options) => this.executeIsolated(prompt, options),
+      onSearchCompleted: summary => {
+        observedSearches++; modes.add(summary.mode); backends.add(summary.vectorBackend);
+        for (const variant of summary.searchedVectorVariants) searchedVectorVariants.set(variant.vectorIndexVariantId, variant);
+      },
+    }).run({ question: input.question, compiledScope,
+      policy: resolveKnowledgeExecutionPolicy({ mode: "detailed", question: input.question,
+        selectedNotebookCount: scope.notebookIds.length, selectedSourceCount: scope.sources.length }),
+      parentSessionId: input.sessionId, parentSessionPath: input.sessionPath, agentId: input.agentId,
+      turnId: input.turnId, signal: input.signal,
+    });
+    input.signal?.throwIfAborted();
+    if (result.run.status === "cancelled") throw new DOMException("Knowledge research was cancelled", "AbortError");
+    if (result.run.status !== "completed" && result.run.status !== "partial") {
+      throw new KnowledgeError("KNOWLEDGE_RETRIEVAL_UNAVAILABLE", "Detailed research could not produce an answer context", {
+        runId: result.run.id, status: result.run.status, stopReason: result.run.stopReason,
+      });
+    }
+    const assembleStarted = performance.now();
+    const evidence = this.buildResearchInjectionEvidence(compiledScope, result.packet.canonicalEvidenceSpans);
+    evidence.searchedVectorVariants = [...searchedVectorVariants.values()];
+    const actions = research.listActions(result.run.id), searches = actions.filter(action => action.actionType === "knowledge_search");
+    const missingHistoricalMode = searches.filter(action => action.status === "completed" && action.errorCode === null).length > observedSearches;
+    const needs = result.packet.needs, run = result.run;
+    const unresolved = needs.filter(need => !["supported", "not_applicable"].includes(need.status));
+    const reasons = [...compiledScope.warnings, ...(run.degradedReason ? [run.degradedReason] : []),
+      ...(run.status === "partial" ? [run.stopReason ?? "partial"] : []),
+      ...(result.packet.truncated ? ["research_evidence_packet_truncated"] : []),
+      // 恢复只合成而没有本次检索记录时，不从模型配置猜历史实际检索方式。
+      ...(missingHistoricalMode ? ["recovered_retrieval_mode_unavailable"] : [])];
+    const stats: KnowledgeRetrievalStats = {
+      mode: "detailed", executionPath: "detailed_research", scopeId: scope.id,
+      retrievalMode: missingHistoricalMode ? "none" : modes.has("hybrid") ? "hybrid" : modes.has("fts") ? "fts" : "none",
+      vectorBackend: missingHistoricalMode ? "none" : backends.has("hnsw") ? "hnsw" : backends.has("portable") ? "portable" : "none",
+      searchCalls: run.searchCalls, readCalls: run.readCalls, grepCalls: run.grepCalls,
+      subQueries: searches.map(action => String(action.requestSummary.query ?? "")),
+      subQueryHits: searches.map(action => Number(action.responseSummary?.count ?? 0)),
+      fusedChunks: new Set(searches.flatMap(action => Array.isArray(action.responseSummary?.hitIds) ? action.responseSummary.hitIds : [])).size,
+      injectedChunks: result.packet.canonicalEvidenceSpans.length,
+      degraded: reasons.length > 0, ...(reasons.length ? { degradeReason: [...new Set(reasons)].join("; ") } : {}),
+      truncated: result.packet.truncated, usedTokens: result.usedTokens, budgetTokens: run.budget.finalEvidenceBudgetTokens,
+      deadlineMs: run.budget.maxWallClockMs, deadlineExceeded: run.stopReason === "wall_clock_exhausted", scopeCompileMs,
+      research: { runId: run.id, status: run.status, completenessPolicy: run.completenessPolicy,
+        rounds: run.roundsCompleted, toolCalls: run.toolCallsUsed, delegatedAgents: run.delegatedAgents,
+        needsTotal: needs.length, needsSupported: needs.filter(need => need.status === "supported").length,
+        needsPartial: needs.filter(need => need.status === "partial").length,
+        needsConflicted: needs.filter(need => need.status === "conflicted").length,
+        unresolvedNeedIds: unresolved.map(need => need.id), stopReason: run.stopReason ?? "partial" },
+      results: result.packet.canonicalEvidenceSpans.map((span, index) => ({ ordinal: index + 1, sourceName: span.sourceName,
+        chunkOrdinal: (evidence.entries.find(entry => entry.citationLabels.includes(`K${index + 1}`))?.ordinal ?? 0) + 1,
+        firstLine: span.text.split("\n")[0].slice(0, 240) })),
+      stageTimings: { assembleMs: performance.now() - assembleStarted, totalMs: performance.now() - started },
+    };
+    return { block: result.block, stats, evidence };
+  }
+
+  /** 扫描凭据可能没有分块编号，只允许映射到冻结解析产物中真实存在且完整覆盖引文的分块。 */
+  private buildResearchInjectionEvidence(scope: CompiledKnowledgeScope, spans: KnowledgeEvidenceSpan[]): KnowledgeInjectionEvidence {
+    const index = this._knowledge.indexStore;
+    const cached = new Map<string, ReturnType<typeof index.listVariantChunks>>();
+    const entries = new Map<string, KnowledgeInjectionEvidence["entries"][number]>();
+    for (const [ordinal, span] of spans.entries()) {
+      const source = scope.sources.find(source => source.sourceId === span.sourceId
+        && source.contentSnapshotId === span.contentSnapshotId && source.parseArtifactId === span.parseArtifactId);
+      if (!source || span.endOffset - span.startOffset !== span.text.length
+        || createHash("sha256").update(span.text).digest("hex") !== span.textSha256) {
+        throw new KnowledgeError("KNOWLEDGE_SCOPE_VIOLATION", "Research evidence differs from its frozen source");
+      }
+      let mapped = false;
+      for (const notebook of scope.notebooks.filter(notebook => source.notebookIds.includes(notebook.notebookId) && notebook.chunkProfileHash)) {
+        const variant = index.resolveChunkIndexVariant(span.parseArtifactId, notebook.chunkProfileHash!);
+        if (!variant || variant.status !== "ready" || !scope.readyChunkVariantIds.includes(variant.id)
+          || (span.chunkIndexVariantId && span.chunkIndexVariantId !== variant.id)) continue;
+        let chunks = cached.get(variant.id);
+        if (!chunks) { chunks = index.listVariantChunks(variant.id); cached.set(variant.id, chunks); }
+        const matches = chunks.flatMap(chunk => chunk.spans.filter(location => location.blockId === span.blockId
+          && location.blockStartOffset < span.endOffset && location.blockEndOffset > span.startOffset).map(location => {
+          const start = Math.max(span.startOffset, location.blockStartOffset), end = Math.min(span.endOffset, location.blockEndOffset);
+          return { chunk, start, end, location: { blockId: span.blockId, blockStartOffset: start, blockEndOffset: end,
+            chunkStartOffset: location.chunkStartOffset + start - location.blockStartOffset,
+            chunkEndOffset: location.chunkStartOffset + end - location.blockStartOffset } };
+        })).sort((a, b) => a.start - b.start || a.end - b.end || a.chunk.ordinal - b.chunk.ordinal);
+        let covered = span.startOffset;
+        for (const match of matches) {
+          if (match.start > covered) break;
+          if (match.chunk.text.slice(match.location.chunkStartOffset, match.location.chunkEndOffset)
+            !== span.text.slice(match.start - span.startOffset, match.end - span.startOffset)) {
+            throw new KnowledgeError("KNOWLEDGE_INDEX_INVALID", "Research quote mapping differs from canonical text");
+          }
+          covered = Math.max(covered, match.end);
+        }
+        if (covered < span.endOffset) continue;
+        for (const match of matches) {
+          let entry = entries.get(match.chunk.id);
+          if (!entry) {
+            entry = { chunkId: match.chunk.id, ordinal: match.chunk.ordinal, sourceId: span.sourceId,
+              parseArtifactId: span.parseArtifactId, chunkIndexVariantId: variant.id, chunkProfileHash: notebook.chunkProfileHash,
+              notebookId: notebook.notebookId, contextOnly: false, citationLabels: [], blockSpans: [] };
+            entries.set(match.chunk.id, entry);
+          }
+          const label = `K${ordinal + 1}`;
+          if (!entry.citationLabels.includes(label)) entry.citationLabels.push(label);
+          if (!entry.blockSpans.some(existing => JSON.stringify(existing) === JSON.stringify(match.location))) entry.blockSpans.push(match.location);
+        }
+        mapped = true; break;
+      }
+      if (!mapped) throw new KnowledgeError("KNOWLEDGE_INDEX_INVALID", "Validated research evidence has no complete frozen index mapping");
+    }
+    return { entries: [...entries.values()], searchedVectorVariants: [] };
+  }
+
   /**
    * Phase 8 知识库引用注入门面：覆盖规划（Phase 7 CoveragePlanner，规则层 +
    * knowledge 槽位语义分类，2026-08-31 两档化）+ 拆解（knowledge 槽位，
@@ -2777,6 +2927,10 @@ export class LingxiEngine {
     /** 证据身份链（§六十七 EvidenceManifest 数据源）：不进 UI stats，供 manifest 持久化。 */
     evidence: KnowledgeInjectionEvidence;
   }> {
+    // 仅供旧历史测试和显式兼容调用；正式详细请求使用研究入口，不加载旧调查编排。
+    const { buildKnowledgeContextInjection, KNOWLEDGE_DECOMPOSE_SYSTEM_PROMPT,
+      KNOWLEDGE_DECOMPOSE_SPECIALIST_PROMPTS, KNOWLEDGE_EXPANSION_SYSTEM_PROMPT,
+      KNOWLEDGE_GAP_ANALYSIS_SYSTEM_PROMPT } = await import("../lib/knowledge/legacy/legacy-knowledge-context-injector.ts");
     const annotateUnavailable = (reason: string) => ({
       block: `[KnowledgeContext]\n[knowledge injection unavailable: ${reason}]\n`
         + `Guidance: Knowledge notebook evidence could not be retrieved for this question.\n[/KnowledgeContext]`,

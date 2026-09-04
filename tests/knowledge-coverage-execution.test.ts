@@ -15,7 +15,7 @@ import {
   parseQueryExpansion,
   type DecomposeModel,
   type QueryExpansionModel,
-} from "../lib/knowledge/knowledge-context-injector.ts";
+} from "../lib/knowledge/legacy/legacy-knowledge-context-injector.ts";
 import type { KnowledgeCoveragePlan } from "../lib/knowledge/knowledge-coverage-planner.ts";
 import {
   KNOWLEDGE_EVIDENCE_BUDGET,

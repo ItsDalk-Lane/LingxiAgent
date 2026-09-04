@@ -10,7 +10,7 @@ import {
   KNOWLEDGE_RERANK_DEADLINE_MS,
   KNOWLEDGE_RRF_K,
 } from "../lib/knowledge/knowledge-query-service.ts";
-import { KNOWLEDGE_FAST_RERANK_DEADLINE_MS } from "../lib/knowledge/knowledge-context-injector.ts";
+import { KNOWLEDGE_FAST_RERANK_DEADLINE_MS } from "../lib/knowledge/legacy/legacy-knowledge-context-injector.ts";
 
 /**
  * 任务书 §二十四/§二十五/§九十二：rerank 按笔记本引用真正路由 + 跨笔记本

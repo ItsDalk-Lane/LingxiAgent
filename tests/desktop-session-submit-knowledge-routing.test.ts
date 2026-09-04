@@ -2,16 +2,20 @@ import { describe, expect, it, vi } from "vitest";
 import { abortPendingDesktopSubmission, submitDesktopSessionInterjection, submitDesktopSessionMessage } from "../core/desktop-session-submit.ts";
 
 function fixture() {
+  let currentSessionPath = "";
   const stats = { mode: "fast", scopeId: "scope", retrievalMode: "fts", subQueries: [], subQueryHits: [],
     degraded: false, fusedChunks: 1, injectedChunks: 1, truncated: false, usedTokens: 32, budgetTokens: 2400 };
   const evidence = { entries: [], searchedVectorVariants: [] };
   const session = { model: null, subscribe: vi.fn(() => () => {}), sessionManager: { appendCustomEntry: vi.fn() } };
   const engine = {
+    getSessionIdForPath: vi.fn((sessionPath: string) => { currentSessionPath = sessionPath; return "session"; }),
+    getSessionManifest: vi.fn(() => ({ sessionId: "session", ownerAgentId: "agent", lifecycle: "active", currentLocator: { path: currentSessionPath } })),
     ensureSessionLoaded: vi.fn(async () => session),
     promptSession: vi.fn(async () => {}), steerSession: vi.fn(() => true),
     isSessionStreaming: vi.fn(() => true), emitEvent: vi.fn(),
     buildFastKnowledgeContext: vi.fn<(...args: any[]) => Promise<{ block: string; stats: typeof stats; evidence: typeof evidence }>>(async () => ({ block: "[KnowledgeContext]\nlocal\n[/KnowledgeContext]", stats, evidence })),
-    buildKnowledgeContextInjection: vi.fn(async () => ({ block: "[KnowledgeContext]\ndetailed\n[/KnowledgeContext]", stats: { ...stats, mode: "detailed" }, evidence })),
+    buildDetailedKnowledgeResearchContext: vi.fn(async () => ({ block: "[KnowledgeResearchContext]\ndetailed\n[/KnowledgeResearchContext]", stats: { ...stats, mode: "detailed", research: { status: "completed" } }, evidence })),
+    buildKnowledgeContextInjection: vi.fn(),
     recordKnowledgeEvidenceManifest: vi.fn(),
   };
   return { engine, session, stats, evidence };
@@ -26,13 +30,14 @@ for (const [name, submit] of [["普通发送", submitDesktopSessionMessage], ["�
         engine.isSessionStreaming.mockReturnValue(name === "追加消息");
         await submit(engine, { sessionPath: `/tmp/route-${name}-${mode}.jsonl`, text: "审批", clientMessageId: "turn",
           knowledgeRefs: { notebookIds: ["notebook"], mode } });
-        const selected = mode === "fast" ? engine.buildFastKnowledgeContext : engine.buildKnowledgeContextInjection;
-        const unused = mode === "fast" ? engine.buildKnowledgeContextInjection : engine.buildFastKnowledgeContext;
+        const selected = mode === "fast" ? engine.buildFastKnowledgeContext : engine.buildDetailedKnowledgeResearchContext;
+        const unused = mode === "fast" ? engine.buildDetailedKnowledgeResearchContext : engine.buildFastKnowledgeContext;
         expect(selected).toHaveBeenCalledOnce();
         expect(unused).not.toHaveBeenCalled();
+        expect(engine.buildKnowledgeContextInjection).not.toHaveBeenCalled();
         expect(selected).toHaveBeenCalledWith({ question: "审批", knowledgeRefs: { notebookIds: ["notebook"], mode },
           sessionPath: `/tmp/route-${name}-${mode}.jsonl`, turnId: "turn", signal: expect.any(AbortSignal),
-          ...(mode === "detailed" ? { budgetTokens: 6000 } : {}),
+          ...(mode === "detailed" ? { sessionId: "session", agentId: "agent" } : {}),
         });
         expect(engine.recordKnowledgeEvidenceManifest).toHaveBeenCalledOnce();
         expect(session.sessionManager.appendCustomEntry.mock.invocationCallOrder[0])

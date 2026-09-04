@@ -26,7 +26,7 @@ import {
   groupFamiliesById,
   parseQuestionDecomposition,
   type DecomposeModel,
-} from "../lib/knowledge/knowledge-context-injector.ts";
+} from "../lib/knowledge/legacy/legacy-knowledge-context-injector.ts";
 import { KNOWLEDGE_EVIDENCE_BUDGET, KNOWLEDGE_FUSION_BUDGET } from "../lib/knowledge/knowledge-query-service.ts";
 import { KnowledgeManager } from "../lib/knowledge/knowledge-manager.ts";
 import type { RetrieveForNotebooksResult } from "../lib/knowledge/knowledge-query-service.ts";

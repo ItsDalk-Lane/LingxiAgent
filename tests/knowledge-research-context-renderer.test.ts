@@ -33,12 +33,40 @@ async function setup(texts?: string[]) {
       relation, rationale: "原文说明事实" });
     return { ...result, receipt };
   };
-  const render = () => renderer.render({ runId: f.run.id, compiledScope,
+  const render = (terminalStatus: "completed" | "partial" | "failed" | "cancelled" = "partial") => renderer.render({ runId: f.run.id, compiledScope, terminalStatus,
     needs: f.research.listNeeds(f.run.id).map(item => ledger.evaluateNeed(f.run.id, item.id)) });
   return { ...f, index, compiler, compiledScope, ledger, renderer, need, link, render };
 }
 
 describe("Research 最终证据包", () => {
+  it.each(["completed", "partial"] as const)("合成期间呈现宿主决定的 %s 终态、计数和任务书七条回答契约", async terminalStatus => {
+    const f = await setup();
+    const first = f.need("确认日期"), second = f.need("确认预算");
+    f.link(first.id, 0); f.link(second.id, 1);
+    const stopReason = terminalStatus === "completed" ? "complete" : "round_budget_exhausted";
+    f.research.setRunState(f.run.id, { status: "synthesizing", stopReason });
+    f.store.db.prepare("UPDATE knowledge_research_runs SET rounds_completed = 2, search_calls = 3, read_calls = 4, delegated_agents = 2 WHERE id = ?")
+      .run(f.run.id);
+    const result = f.render(terminalStatus);
+    expect(result.block.startsWith("[KnowledgeResearchContext]\n")).toBe(true);
+    expect(result.block.endsWith("[/KnowledgeResearchContext]")).toBe(true);
+    for (const line of ["Mode: detailed", `Research run: ${f.run.id}`, `Research status: ${terminalStatus}`,
+      "Completeness policy: source_diverse", "Rounds: 2", "Searches: 3", "Reads: 4", "Delegated agents: 2",
+      `Stop reason: ${stopReason}`, `Scope: ${f.scope.id}`, "Evidence needs:", "[N1] supported 确认日期",
+      "[N2] supported 确认预算", "Unresolved gaps:", "Validated evidence:", "Answer contract:"]) expect(result.block).toContain(line);
+    expect(result.block.indexOf("[N1]")).toBeLessThan(result.block.indexOf("[N2]"));
+    const contract = ["Answer every required evidence need in order.", "Give a detailed explanation rather than a short summary.",
+      "Distinguish source facts, synthesis, and inference.", "Explain conflicts instead of silently choosing one side.",
+      "Disclose unresolved gaps.", "Cite the supplied evidence ids.", "Do not claim completeness beyond the recorded policy."];
+    expect(result.packet.answerContract).toEqual(contract);
+    for (const [index, rule] of contract.entries()) expect(result.block).toContain(`${index + 1}. ${rule}`);
+    expect(result.block).not.toContain("synthesizing");
+    expect(result.block).not.toContain('"supportingEvidenceIds":');
+    expect(f.research.requireRun(f.run.id).status).toBe("synthesizing");
+    expect(result.usedTokens).toBe(estimateTextTokens(result.block));
+    expect(result.usedTokens).toBeLessThanOrEqual(16000);
+  });
+
   it("最终包仅输出已消费原文片段，完整保留身份、支持、矛盾、缺口和引用契约", async () => {
     const f = await setup(["未引用的开头。交付日期九月十五日。未引用的尾部。", "交付日期九月二十日。", "未消费原文不能出现在答案包"]);
     const need = f.need("确认交付日期", { requireCounterEvidence: true });
@@ -93,10 +121,11 @@ describe("Research 最终证据包", () => {
     const needs = [f.ledger.evaluateNeed(f.run.id, need.id)];
     for (const compiledScope of [{ ...f.compiledScope, studioId: "other" }, { ...f.compiledScope, scopeId: "other" },
       { ...f.compiledScope, sources: f.compiledScope.sources.filter(source => source.sourceId !== f.sources[0].sourceId) }]) {
-      expect(() => f.renderer.render({ runId: f.run.id, compiledScope, needs })).toThrow(/scope/);
+      expect(() => f.renderer.render({ runId: f.run.id, compiledScope, needs, terminalStatus: "partial" })).toThrow(/scope/);
     }
-    expect(() => f.renderer.render({ runId: f.run.id, compiledScope: f.compiledScope, needs: [] })).toThrow(/scope/);
-    expect(() => f.renderer.render({ runId: f.run.id, compiledScope: f.compiledScope, needs: [{ ...needs[0], runId: "another-run" }] })).toThrow(/scope/);
+    expect(() => f.renderer.render({ runId: f.run.id, compiledScope: f.compiledScope, needs: [], terminalStatus: "partial" })).toThrow(/scope/);
+    expect(() => f.renderer.render({ runId: f.run.id, compiledScope: f.compiledScope,
+      needs: [{ ...needs[0], runId: "another-run" }], terminalStatus: "partial" })).toThrow(/scope/);
     f.store.db.prepare("UPDATE knowledge_turn_scopes SET status = 'closed' WHERE id = ?").run(f.scope.id);
     expect(() => f.render()).toThrow(/scope/);
   });
