@@ -5,6 +5,7 @@ import path from "node:path";
 import { spawn } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { buildRuntimeEnvironment } from "./smoke-packaged-knowledge.mjs";
+import { redactLogText, redactLogValue } from "../shared/log-redactor.ts";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const platform = process.platform, arch = process.arch;
@@ -31,7 +32,8 @@ let spawnError;
 child.on("error", error => { spawnError = error; });
 let stderr = "";
 child.stderr.on("data", data => { stderr = (stderr + data).slice(-8000); });
-child.stdout.resume();
+let stdout = "";
+child.stdout.on("data", data => { stdout = (stdout + data).slice(-8000); });
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 function readJson(file) { try { return JSON.parse(fs.readFileSync(file, "utf8")); } catch { return null; } }
 function launchEvents() {
@@ -106,7 +108,11 @@ try {
   report.status = "passed";
 } catch (error) {
   report.status = "failed";
-  report.error = error instanceof Error ? error.message : String(error);
+  const redaction = { homeDir: os.homedir(), extraPaths: [home, userData] };
+  report.error = redactLogText(error instanceof Error ? error.message : String(error), redaction);
+  // 失败时保留有界、脱敏的实际启动诊断，清理临时资料后仍能定位失败阶段。
+  report.launchEvents = redactLogValue(launchEvents().slice(-30), redaction);
+  report.processOutput = redactLogText(stdout + "\n" + stderr, redaction);
   process.exitCode = 1;
 } finally {
   report.durationMs = performance.now() - start;
