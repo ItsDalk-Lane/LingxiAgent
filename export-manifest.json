@@ -164,6 +164,7 @@
     "core/session-manifest/checkpoint.ts",
     "core/session-manifest/db-files.ts",
     "core/session-manifest/id.ts",
+    "core/session-manifest/knowledge-ancestry.ts",
     "core/session-manifest/path-normalizer.ts",
     "core/session-manifest/ref.ts",
     "core/session-manifest/resolver.ts",

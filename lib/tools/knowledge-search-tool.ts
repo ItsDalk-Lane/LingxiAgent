@@ -59,7 +59,7 @@ export function createKnowledgeSearchTool(deps: KnowledgeSearchToolDeps) {
           filters[key] = params[key] as string[];
         }
         const scope = resolveKnowledgeTurnScope({ knowledge, studioId, scopeId,
-          sessionContext: deps.resolveSessionContext?.(ctx) ?? { sessionPath: null, parentSessionPath: null },
+          sessionContext: deps.resolveSessionContext?.(ctx) ?? { sessionPath: null, scopeOwnerSessionPath: null },
         });
         const compiledScope = await knowledge.compileTurnScope(scope);
         const result = await knowledge.searchService.search({ compiledScope, query: params.query, channel, limit,

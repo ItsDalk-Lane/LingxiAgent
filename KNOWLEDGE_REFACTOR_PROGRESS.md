@@ -10,7 +10,7 @@
 - 严格按 P0 → P1 → P2 → P3 及编号顺序；阶段门禁全部通过才进入下一阶段。
 - 每项记录测试原始结果后提交；不删除、跳过或放宽测试，不合并 main。
 - 现有任务书为用户未跟踪文件，既有规划文档与 BLOCKED.md 历史记录保留。
-- 当前断点：P1-01 至 P1-08 已完成，阶段收口 `23873985`、审计 `333c5112`，本地与四平台门禁全部通过；P2-01 已完成并提交 `c3033b05`；P2-02 已提交 `c729f68a`；P2-03 已提交 `4a95317c`；P2-04 已通过本项验证，正在提交；下一项为 P2-05 隔离研究会话。P0 源码提交 `5c016df183ad207cf1ca33de274abb7a4eb10057`，阶段审计提交 `f9928d76`；全量 13002 PASS / 0 FAIL / 7 既有 SKIP。用户已授权每阶段验证后同步审计记录，保留最终封印。
+- 当前断点：P1-01 至 P1-08 已完成，阶段收口 `23873985`、审计 `333c5112`，本地与四平台门禁全部通过；P2-01 已完成并提交 `c3033b05`；P2-02 已提交 `c729f68a`；P2-03 已提交 `4a95317c`；P2-04 已提交 `359aeb77`；P2-05 已完成隔离研究会话、祖先范围继承和严格工具名单，等待本项提交后进入 P2-06。P0 源码提交 `5c016df183ad207cf1ca33de274abb7a4eb10057`，阶段审计提交 `f9928d76`；全量 13002 PASS / 0 FAIL / 7 既有 SKIP。用户已授权每阶段验证后同步审计记录，保留最终封印。
 - 进度、计划与事实集中在本文件和基线文档，避免覆盖既有 task_plan.md / findings.md / PROGRESS.md。
 - 目标工具已确认本任务存在 active goal；重复 create_goal 被拒绝，沿用现有目标。
 - 规划恢复脚本返回其他会话的无关配置记录，经 git diff 为空核对，未采用其内容。
@@ -21,7 +21,7 @@
 | --- | --- | --- |
 | P0 | completed | 2026-09-04 全量 13002 PASS / 0 FAIL / 7 既有 SKIP，76.42s；全部 P0 门禁通过，审计提交 f9928d76 |
 | P1 | completed | P1-01 至 P1-08 完成；本地全量和第三轮四平台 Build 33829055797 全部通过，阶段审计 333c5112 |
-| P2 | in_progress | P2-01 至 P2-04 已完成；P2-05 及后续任务、阶段门禁待执行 |
+| P2 | in_progress | P2-01 至 P2-05 已完成；P2-06 及后续任务、阶段门禁待执行 |
 | P3 | pending | NOT_EXECUTED |
 
 ## P0-00：建立基线与回归门禁
@@ -301,16 +301,18 @@
 - 测试结果：最终 9 文件 / 125 PASS / 0 FAIL / 0 SKIP，2.12s，exit 0；三套类型检查 exit 0，定向 ESLint 0 error / 0 warning。开放边界仍为原 1 条债务，开放导出 876 文件；持久化指纹保持 P2-02 的 v18 值不变。闭包生成 10675 文件，与前项相同，exit 0。
 - 失败与修复：结束工具最早因预算文件尚未完成而导入失败（未执行用例），文件落盘后使用真实预算器验证；更新工具首轮 11 PASS / 1 FAIL，补查同步事务取消导致终态一起回滚，修复为事务回滚后再次落实取消并保留原断言；共享名额故障用例先 8 PASS / 1 FAIL，修复委派计数写库失败时也必须释放名额。测试类型检查发现 TypeBox 断言访问类型不符，改为结构化类型后全部通过；委派顶层权限/状态等未知字段新增明确拒绝验证。无测试删除、跳过或放宽。
 - 证据：`/tmp/lingxi-knowledge-p204-{budget-first,budget-slots-red,tests-first,tests-second,tests-final,typecheck,lint,inventory,fingerprint,boundary,export,closure}.log`。对应子项细证 `/tmp/lingxi-knowledge-p204-finish-tests-final.log`、`/tmp/lingxi-p204-delegate-top-level.log`。
-- 对应 commit SHA：待本项验证完成后提交
+- 对应 commit SHA：`359aeb77bbe8cbeaddd4499c19f50d9e3412d867`
 - 偏差：none
 
 ## P2-05：增加 Knowledge Research Surface
 
-- 状态：pending
-- 改动文件：尚未开始
-- 测试命令：按任务书该项测试执行，尚未执行
-- 测试结果：NOT_EXECUTED
-- 对应 commit SHA：尚未提交
+- 状态：completed
+- 改动文件：`core/agent.ts`、`core/session-coordinator.ts`、新增 `core/session-manifest/knowledge-ancestry.ts`，四个只读知识工具及 `knowledge-scope.ts`、权限包装器、工具分类；新增五个研究/祖先测试及真实 Agent 工具快照联调测试，原知识工具 fixture 仅适配范围拥有者字段；出口清单、运行闭包与持久化指纹生成物。
+- 改动：Root 七工具、Worker 五工具，宿主入口强制只读、拒绝审批、无记忆与扩展、无工作区写范围；按真实清单追溯主会话，最多八层，循环/缺失/跨工作室拒绝。研究绑定在装配和每次调用时复核；Worker 目录/搜索/读取都限定分配来源，所有调用共用预算。主研究使用父 Agent 的聊天模型，委派使用当前或显式活跃 Agent 的聊天模型；工作会话真实父级为 Root。执行结束及初始化失败都先等待资源清理，再删除临时会话和作废清单；删除或清单写入失败明确抛出。`core/agent-manager.ts` 复用原有活跃 Agent 与隔离执行回调，无需无行为差异的改动。
+- 测试命令：任务书四项测试，加 `knowledge-research-agent-tools`、`session-permission-wrapper`、`session-coordinator-isolated-abort`、`session-teardown`、原有 read/agent-tools/search-scope/receipt/conditional-injection 与 `persistence-schema-tripwire` 共十四文件；`npm run typecheck`；定向 ESLint；`git diff --check`；持久化清单/指纹、运行闭包、开放边界与导出生成器。
+- 测试结果：最终 **14 文件 / 192 PASS / 0 FAIL / 0 SKIP，3.15s，exit 0**；三套类型检查、ESLint、diff、开放边界全部 exit 0。定向 ESLint 有 643 项警告，包含现有大文件及测试替身的宽类型警告，未当作零警告报告。先后保留并修复来源目录总数泄漏、更新/结束工具祖先归属漏检；完整回归第一次 175 PASS / 2 FAIL，正好复现初始化清理失败被吞掉，两项故障注入测试保留并修复后全部通过。最终日志 `/tmp/lingxi-knowledge-p205-tests-final.log`、`/tmp/lingxi-knowledge-p205-typecheck-final.log`、`/tmp/lingxi-knowledge-p205-lint.log`。
+- 生成物：持久化清单 66 stores / 779 sites；兼容指纹 `sha256:3beb2e79d626d4bc9d7ae2f35a92c1b4a6daab3bccf3e7d701b565138cc43679`，仅登记研究隔离生命周期改变，知识库仍为 v18；运行闭包 10682 文件；开放树成功导出 877 文件。阶段审计按用户授权在 P2 全部任务和门禁完成后同步，最终封印仍保留。
+- 对应 commit SHA：本项提交（下一项回填实际 SHA）
 - 偏差：none
 
 ## P2-06：实现 KnowledgeResearchOrchestrator

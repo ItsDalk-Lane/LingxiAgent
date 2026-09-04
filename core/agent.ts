@@ -50,6 +50,16 @@ import { createKnowledgeReadTool } from "../lib/tools/knowledge-read-tool.ts";
 import { createKnowledgeOutlineTool } from "../lib/tools/knowledge-outline-tool.ts";
 import { createKnowledgeGrepTool } from "../lib/tools/knowledge-grep-tool.ts";
 import { createKnowledgeManageTool } from "../lib/tools/knowledge-manage-tool.ts";
+import { createKnowledgeResearchUpdateTool } from "../lib/tools/knowledge-research-update-tool.ts";
+import { createKnowledgeResearchFinishTool } from "../lib/tools/knowledge-research-finish-tool.ts";
+import { createKnowledgeDelegateTool } from "../lib/tools/knowledge-delegate-tool.ts";
+import { KnowledgeError, isKnowledgeError } from "../lib/knowledge/errors.ts";
+import { ResearchStore } from "../lib/knowledge/research/research-store.ts";
+import { EvidenceLedger } from "../lib/knowledge/research/evidence-ledger.ts";
+import { ResearchToolBudget, type KnowledgeResearchActorContext } from "../lib/knowledge/research/research-tool-budget.ts";
+import { resolveKnowledgeScopeSessionContext } from "./session-manifest/knowledge-ancestry.ts";
+import { isKnowledgeResearchSurface, getKnowledgeResearchToolNames } from "../shared/tool-categories.ts";
+import { toolError } from "../lib/tools/tool-result.ts";
 import { getToolSessionPath } from "../lib/tools/tool-session.ts";
 import { createWorkflowTool } from "../lib/tools/workflow-tool.ts";
 import { createCardGuideTool } from "../lib/tools/card-guide-tool.ts";
@@ -657,32 +667,14 @@ export class Agent {
       getBridgeContext: (sessionPath) => this._cb?.getEngine?.()?.getBridgeContextForSessionPath?.(sessionPath, { agentId: this.id }) || null,
       listOpenSubagentThreads: (sessionPath) => this._cb?.getSubagentThreadStore?.()?.listOpenDirectBySession?.(sessionPath) || [],
     });
-    // 四个知识只读工具共用范围归属：搜索和读取共用检索服务，目录读元数据，原文匹配保留精确位置。
-    // scope 归属按工具执行会话判定——主会话直接匹配 scope.session_path；subagent
-    // 子会话经 manifest provenance.parentSessionId 继承父会话 scope（scope 只能
-    // 缩小，子会话不得访问父 scope 之外的源）。manifest 解析失败按无父会话处理
-    // （fail-closed：子会话匹配不上即 KNOWLEDGE_SCOPE_VIOLATION，不放行）。
-    const resolveKnowledgeSessionContext = (ctx: any) => {
+    // 范围继承只沿宿主保存的会话清单追溯，缺失或循环一律拒绝。
+    const resolveKnowledgeSessionContext = (ctx: unknown) => {
       const engine = this._cb?.getEngine?.();
-      const sessionPath = getToolSessionPath(ctx);
-      if (!engine || !sessionPath) return { sessionPath: sessionPath ?? null, parentSessionPath: null };
-      let parentSessionPath: string | null = null;
-      try {
-        const sessionId = engine.getSessionIdForPath?.(sessionPath) || null;
-        const manifest = sessionId ? engine.getSessionManifest?.(sessionId) : null;
-        if (manifest && (manifest.kind === "subagent_child" || manifest.domain === "subagent")) {
-          const parentId = typeof manifest.provenance?.parentSessionId === "string"
-            ? manifest.provenance.parentSessionId
-            : null;
-          const parentManifest = parentId ? engine.getSessionManifest?.(parentId) : null;
-          parentSessionPath = typeof parentManifest?.currentLocator?.path === "string"
-            ? parentManifest.currentLocator.path
-            : null;
-        }
-      } catch {
-        parentSessionPath = null;
-      }
-      return { sessionPath, parentSessionPath };
+      return resolveKnowledgeScopeSessionContext({
+        sessionPath: getToolSessionPath(ctx), studioId: engine?.runtimeContext?.studioId,
+        getSessionIdForPath: sessionPath => engine?.getSessionIdForPath?.(sessionPath) ?? null,
+        getSessionManifest: sessionId => engine?.getSessionManifest?.(sessionId) ?? null,
+      });
     };
     // knowledge_read：读知识库源分片。直连 engine 级 KnowledgeManager（跨会话），
     // 供 [KnowledgeContext] 超预算时模型派出的子 Agent 并行读片；只读 + studio 隔离。
@@ -1050,6 +1042,7 @@ export class Agent {
     return provider && id ? { provider, id } : null;
   }
   getToolsSnapshot( options: any = {}) {
+    if (isKnowledgeResearchSurface(options.surface)) return this.getResearchToolsSnapshot(options);
     const surface = options.surface === "bridge" ? "bridge" : "desktop";
     const forceMemoryEnabled = Object.prototype.hasOwnProperty.call(options, "forceMemoryEnabled")
       ? options.forceMemoryEnabled
@@ -1112,6 +1105,121 @@ export class Agent {
       this._cardGuideTool,
       this._showCardTool,
     ].filter(Boolean);
+  }
+  /** 研究工具按临时会话独立装配，不能把宿主研究身份放进普通 Agent 的共享工具对象。 */
+  private getResearchToolsSnapshot(options: any) {
+    const engine = this._cb?.getEngine?.();
+    const knowledge = engine?.knowledge;
+    const input = options.research;
+    if (!knowledge || !input?.actorContext || typeof input.sessionPath !== "string"
+      || input.studioId !== engine.runtimeContext?.studioId) {
+      throw new KnowledgeError("KNOWLEDGE_SCOPE_VIOLATION", "Research tools require a bound isolated session");
+    }
+    const context: KnowledgeResearchActorContext = Object.freeze({ ...input.actorContext,
+      ...(input.actorContext.allowedNeedIds ? { allowedNeedIds: [...input.actorContext.allowedNeedIds] } : {}),
+      ...(input.actorContext.allowedSourceIds ? { allowedSourceIds: [...input.actorContext.allowedSourceIds] } : {}),
+    });
+    if (context.role !== (options.surface === "knowledge_research_root" ? "root" : "worker")) {
+      throw new KnowledgeError("KNOWLEDGE_SCOPE_VIOLATION", "Research tool role differs from its surface");
+    }
+    const research = new ResearchStore(knowledge.store);
+    const ledger = new EvidenceLedger(research, { isCompletenessSatisfied: input.isCompletenessSatisfied });
+    const budget = new ResearchToolBudget(research);
+    const resolveContext = (ctx: unknown): KnowledgeResearchActorContext => {
+      const sessionPath = getToolSessionPath(ctx);
+      const sessionId = sessionPath ? engine.getSessionIdForPath?.(sessionPath) : null;
+      const manifest = sessionId ? engine.getSessionManifest?.(sessionId) : null;
+      const recorded = manifest?.provenance?.researchContext;
+      const sameIds = (left: string[] | undefined, right: string[] | undefined) => JSON.stringify([...(left ?? [])].sort()) === JSON.stringify([...(right ?? [])].sort());
+      if (!sessionPath || path.resolve(sessionPath) !== path.resolve(input.sessionPath)
+        || sessionId !== context.actorSessionId || manifest?.lifecycle !== "active"
+        || manifest.ownerAgentId !== context.actorAgentId
+        || recorded?.runId !== context.runId || recorded?.scopeId !== context.scopeId || recorded?.role !== context.role
+        || !sameIds(recorded.allowedNeedIds, context.allowedNeedIds) || !sameIds(recorded.allowedSourceIds, context.allowedSourceIds)) {
+        throw new KnowledgeError("KNOWLEDGE_SCOPE_VIOLATION", "Research tool session identity changed");
+      }
+      const owner = resolveKnowledgeScopeSessionContext({ sessionPath, studioId: input.studioId,
+        getSessionIdForPath: currentPath => engine.getSessionIdForPath?.(currentPath) ?? null,
+        getSessionManifest: currentId => engine.getSessionManifest?.(currentId) ?? null,
+      });
+      const run = research.requireRun(context.runId);
+      if (!["planning", "running", "synthesizing"].includes(run.status)
+        || run.turnScopeId !== context.scopeId || !owner.scopeOwnerSessionPath
+        || path.resolve(owner.scopeOwnerSessionPath) !== path.resolve(run.parentSessionPath)) {
+        throw new KnowledgeError("KNOWLEDGE_SCOPE_VIOLATION", "Research run does not belong to this session ancestry");
+      }
+      return context;
+    };
+    // 装配阶段就拒绝错误归属，不能等模型已经运行后才在首次工具调用时发现。
+    resolveContext({ sessionManager: { getSessionFile: () => input.sessionPath } });
+    const resolveSessionContext = (ctx: unknown) => {
+      resolveContext(ctx);
+      return resolveKnowledgeScopeSessionContext({ sessionPath: getToolSessionPath(ctx), studioId: input.studioId,
+        getSessionIdForPath: sessionPath => engine.getSessionIdForPath?.(sessionPath) ?? null,
+        getSessionManifest: sessionId => engine.getSessionManifest?.(sessionId) ?? null,
+      });
+    };
+    const base = { getKnowledge: () => knowledge, getStudioId: () => input.studioId,
+      resolveSessionContext, resolveResearchContext: resolveContext };
+    const readTools = [createKnowledgeOutlineTool(base), createKnowledgeSearchTool(base),
+      createKnowledgeReadTool(base), createKnowledgeGrepTool(base)].map(tool => ({
+      ...tool,
+      execute: async (id: string, params: Record<string, unknown> = {}, signal?: AbortSignal, onUpdate?: unknown, ctx?: unknown) => {
+        try {
+          const actor = resolveContext(ctx);
+          const requestSummary: Record<string, unknown> = {};
+          if (typeof params.query === "string" && params.query.trim() && params.query.length <= 4000) requestSummary.query = params.query;
+          return await budget.execute({ context: actor, toolName: tool.name, requestSummary, signal }, async activeSignal => {
+            if (params.scopeId !== actor.scopeId) throw new KnowledgeError("KNOWLEDGE_SCOPE_VIOLATION", "Research tool scope differs from its bound scope");
+            const scopedParams = { ...params };
+            if (tool.name === "knowledge_search" && actor.allowedSourceIds !== undefined) {
+              if (params.sourceIds !== undefined && (!Array.isArray(params.sourceIds)
+                || params.sourceIds.some(sourceId => !actor.allowedSourceIds!.includes(sourceId)))) {
+                throw new KnowledgeError("KNOWLEDGE_SCOPE_VIOLATION", "Research search exceeds the worker scope");
+              }
+              scopedParams.sourceIds = params.sourceIds ?? [...actor.allowedSourceIds];
+            }
+            const result = await tool.execute(id, scopedParams, activeSignal, onUpdate, ctx);
+            if (result.isError) throw new KnowledgeError("KNOWLEDGE_RETRIEVAL_UNAVAILABLE", "Research knowledge tool failed");
+            const response = JSON.parse(result.content[0].text);
+            const summary: Record<string, unknown> = { status: "completed" };
+            if (Array.isArray(response.hits)) {
+              summary.hitIds = response.hits.map((hit: { candidateId: string }) => hit.candidateId);
+              summary.count = response.hits.length;
+            } else if (tool.name === "knowledge_read") {
+              const chunks = response.chunks ?? response.matches ?? [];
+              summary.receiptIds = chunks.flatMap((chunk: { spans?: Array<{ receiptId: string }> }) => (chunk.spans ?? []).map(span => span.receiptId));
+              summary.count = chunks.length;
+            } else if (tool.name === "knowledge_grep") {
+              summary.receiptIds = (response.matches ?? []).map((match: { receiptId: string }) => match.receiptId);
+              summary.count = response.matches?.length ?? 0;
+            } else summary.count = response.totalSources ?? 0;
+            return { value: result, summary };
+          });
+        } catch (error) {
+          if (signal?.aborted) throw error;
+          return toolError("Research knowledge tool was rejected or unavailable", {
+            errorCode: isKnowledgeError(error) ? error.code : "KNOWLEDGE_RETRIEVAL_UNAVAILABLE",
+          });
+        }
+      },
+    }));
+    const deps = { research, ledger, budget, resolveContext };
+    const tools = [...readTools, createKnowledgeResearchUpdateTool(deps),
+      createKnowledgeResearchFinishTool({ ...deps, isCompletenessSatisfied: input.isCompletenessSatisfied,
+        onFinishAccepted: input.onFinishAccepted }),
+      createKnowledgeDelegateTool({ ...deps,
+        listAgents: () => this._cb?.listActiveAgents?.() ?? [],
+        executeIsolated: (prompt, workerOptions) => this._cb.executeIsolated(prompt, { ...workerOptions,
+          parentSessionPath: input.sessionPath, parentSessionId: context.actorSessionId,
+          research: { runId: context.runId, scopeId: context.scopeId, studioId: input.studioId,
+            allowedNeedIds: workerOptions.researchContext.allowedNeedIds,
+            allowedSourceIds: workerOptions.researchContext.allowedSourceIds,
+            isCompletenessSatisfied: input.isCompletenessSatisfied },
+        }),
+      })];
+    const allowed = new Set(getKnowledgeResearchToolNames(options.surface));
+    return tools.filter(tool => allowed.has(tool.name));
   }
   get tools() {
     return this.getToolsSnapshot();

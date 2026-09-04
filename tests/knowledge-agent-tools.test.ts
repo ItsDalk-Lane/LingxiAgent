@@ -29,7 +29,7 @@ afterEach(() => {
 
 /** 主会话身份：scope 绑定该 sessionPath，工具执行上下文与之匹配才允许读取。 */
 const MAIN_SESSION_PATH = "/tmp/lingxi-knowledge-agent-tools/main-session.jsonl";
-const MAIN_SESSION = { sessionPath: MAIN_SESSION_PATH, parentSessionPath: null };
+const MAIN_SESSION = { sessionPath: MAIN_SESSION_PATH, scopeOwnerSessionPath: MAIN_SESSION_PATH };
 
 const MARKDOWN_TEXT = [
   "# 交付计划",
@@ -80,7 +80,7 @@ function createScope(
 function makeOutlineTool(
   manager: KnowledgeManager,
   studioId: string,
-  sessionContext: { sessionPath: string | null; parentSessionPath: string | null } = MAIN_SESSION,
+  sessionContext: { sessionPath: string | null; scopeOwnerSessionPath: string | null } = MAIN_SESSION,
 ) {
   return createKnowledgeOutlineTool({
     getKnowledge: () => manager,
@@ -92,7 +92,7 @@ function makeOutlineTool(
 function makeGrepTool(
   manager: KnowledgeManager,
   studioId: string,
-  sessionContext: { sessionPath: string | null; parentSessionPath: string | null } = MAIN_SESSION,
+  sessionContext: { sessionPath: string | null; scopeOwnerSessionPath: string | null } = MAIN_SESSION,
 ) {
   return createKnowledgeGrepTool({
     getKnowledge: () => manager,
@@ -187,7 +187,7 @@ describe("knowledge_outline 工具（scope 冻结集合结构枚举）", () => {
 
     const otherSession = makeOutlineTool(manager, studioId, {
       sessionPath: "/tmp/lingxi-knowledge-agent-tools/other-session.jsonl",
-      parentSessionPath: null,
+      scopeOwnerSessionPath: "/tmp/lingxi-knowledge-agent-tools/other-session.jsonl",
     });
     expectScopeViolation(await otherSession.execute("call-1", { scopeId: scope.id }));
 
@@ -208,14 +208,14 @@ describe("knowledge_outline 工具（scope 冻结集合结构枚举）", () => {
     const scope = createScope(manager, studioId, [notebook.id]);
     const childSession = makeOutlineTool(manager, studioId, {
       sessionPath: "/tmp/lingxi-knowledge-agent-tools/subagent-child.jsonl",
-      parentSessionPath: MAIN_SESSION_PATH,
+      scopeOwnerSessionPath: MAIN_SESSION_PATH,
     });
     const ok = await childSession.execute("call-1", { scopeId: scope.id });
     expect(ok.isError).toBeFalsy();
 
     const stranger = makeOutlineTool(manager, studioId, {
       sessionPath: "/tmp/lingxi-knowledge-agent-tools/subagent-child.jsonl",
-      parentSessionPath: "/tmp/lingxi-knowledge-agent-tools/stranger.jsonl",
+      scopeOwnerSessionPath: "/tmp/lingxi-knowledge-agent-tools/stranger.jsonl",
     });
     expectScopeViolation(await stranger.execute("call-2", { scopeId: scope.id }));
   });
@@ -364,7 +364,7 @@ describe("knowledge_grep 工具（冻结原文确定性扫描）", () => {
 
     const otherSession = makeGrepTool(manager, studioId, {
       sessionPath: "/tmp/lingxi-knowledge-agent-tools/other-session.jsonl",
-      parentSessionPath: null,
+      scopeOwnerSessionPath: "/tmp/lingxi-knowledge-agent-tools/other-session.jsonl",
     });
     expectScopeViolation(await otherSession.execute("call-5", { scopeId: scope.id, pattern: "预算" }));
   });

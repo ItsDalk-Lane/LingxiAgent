@@ -25,7 +25,7 @@ afterEach(() => {
 
 /** 主会话身份：scope 绑定该 sessionPath，工具执行上下文与之匹配才允许读取。 */
 const MAIN_SESSION_PATH = "/tmp/lingxi-knowledge-read-test/main-session.jsonl";
-const MAIN_SESSION = { sessionPath: MAIN_SESSION_PATH, parentSessionPath: null };
+const MAIN_SESSION = { sessionPath: MAIN_SESSION_PATH, scopeOwnerSessionPath: MAIN_SESSION_PATH };
 
 /**
  * 按 owning notebook 的 RetrievalProfile 锚定列出索引 chunk（schema v2：
@@ -96,7 +96,7 @@ function createScope(
 function makeTool(
   manager: KnowledgeManager,
   studioId: string,
-  sessionContext: { sessionPath: string | null; parentSessionPath: string | null } = MAIN_SESSION,
+  sessionContext: { sessionPath: string | null; scopeOwnerSessionPath: string | null } = MAIN_SESSION,
 ) {
   return createKnowledgeReadTool({
     getKnowledge: () => manager,
@@ -313,7 +313,7 @@ describe("knowledge_read 工具（KnowledgeTurnScope 契约）", () => {
     // 其他会话持有该 scopeId：会话归属不匹配。
     const otherSession = makeTool(manager, studioId, {
       sessionPath: "/tmp/lingxi-knowledge-read-test/other-session.jsonl",
-      parentSessionPath: null,
+      scopeOwnerSessionPath: "/tmp/lingxi-knowledge-read-test/other-session.jsonl",
     });
     const crossSession = await otherSession.execute("call-1", {
       scopeId: scope.id,
@@ -342,7 +342,7 @@ describe("knowledge_read 工具（KnowledgeTurnScope 契约）", () => {
     // 这里以 resolveSessionContext 闭包模拟该解析结果（同 agent.ts 接线契约）。
     const subagent = makeTool(manager, studioId, {
       sessionPath: childSessionPath,
-      parentSessionPath: MAIN_SESSION_PATH,
+      scopeOwnerSessionPath: MAIN_SESSION_PATH,
     });
     const ok = await subagent.execute("call-1", {
       scopeId: scope.id,
@@ -354,7 +354,7 @@ describe("knowledge_read 工具（KnowledgeTurnScope 契约）", () => {
     // 父会话不是 scope 持有会话：拒绝（子会话不得读父 scope 之外的源）。
     const stranger = makeTool(manager, studioId, {
       sessionPath: childSessionPath,
-      parentSessionPath: "/tmp/lingxi-knowledge-read-test/stranger.jsonl",
+      scopeOwnerSessionPath: "/tmp/lingxi-knowledge-read-test/stranger.jsonl",
     });
     const denied = await stranger.execute("call-2", {
       scopeId: scope.id,

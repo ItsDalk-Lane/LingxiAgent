@@ -2,7 +2,9 @@
 import { Type } from "../pi-sdk/index.ts";
 import { fidelityFromLocatorTypes, type CoverageSourceFidelity } from "../knowledge/knowledge-coverage-manifest.ts";
 import { isKnowledgeError, KnowledgeError } from "../knowledge/errors.ts";
+import type { KnowledgeResearchToolContext } from "../knowledge/evidence-receipt-service.ts";
 import type { KnowledgeManager } from "../knowledge/knowledge-manager.ts";
+import { ResearchStore } from "../knowledge/research/research-store.ts";
 import type { CompiledKnowledgeSource } from "../knowledge/scope-snapshot-compiler.ts";
 import {
   knowledgeScopeViolation,
@@ -27,6 +29,7 @@ export interface KnowledgeOutlineToolDeps {
   getStudioId: () => string | null;
   /** 工具执行会话的 scope 归属上下文（与 knowledge_read 同一接线契约）。 */
   resolveSessionContext?: (ctx: unknown) => KnowledgeToolSessionContext;
+  resolveResearchContext?: (ctx: unknown) => KnowledgeResearchToolContext | null;
 }
 
 /** 保留冻结原文的可信度；目录大小与标题来自索引元数据，不重新拆覆盖单元。 */
@@ -90,10 +93,25 @@ export function createKnowledgeOutlineTool(deps: KnowledgeOutlineToolDeps) {
         }
         const sessionContext = deps.resolveSessionContext?.(ctx) ?? {
           sessionPath: null,
-          parentSessionPath: null,
+          scopeOwnerSessionPath: null,
         };
         const scope = resolveKnowledgeTurnScope({ knowledge, studioId, scopeId, sessionContext });
+        const researchContext = deps.resolveResearchContext?.(ctx) ?? null;
+        if (researchContext) {
+          const run = new ResearchStore(knowledge.store).requireRun(researchContext.runId);
+          if (run.turnScopeId !== scopeId || !["planning", "running", "synthesizing"].includes(run.status)
+            || (researchContext.allowedSourceIds !== undefined
+              && (!Array.isArray(researchContext.allowedSourceIds)
+                || researchContext.allowedSourceIds.some(id => !scope.sources.some(source => source.sourceId === id))))) {
+            throw knowledgeScopeViolation("Knowledge outline is outside the research scope");
+          }
+        }
         const compiled = await knowledge.compileTurnScope(scope);
+        const allowedSources = researchContext?.allowedSourceIds === undefined
+          ? null : new Set(researchContext.allowedSourceIds);
+        const visibleSources = allowedSources ? compiled.sources.filter(source => allowedSources.has(source.sourceId)) : compiled.sources;
+        // 编译警告以来源编号开头，不能借警告暴露未分配的来源。
+        const visibleWarnings = allowedSources ? compiled.warnings.filter(warning => allowedSources.has(warning.split(":", 1)[0])) : compiled.warnings;
 
         // 枚举只使用已编译的冻结目录，不扫描范围外来源。
         // 编译完成后来源被并发删除时，逐条标注错误，不静默省略。
@@ -101,7 +119,7 @@ export function createKnowledgeOutlineTool(deps: KnowledgeOutlineToolDeps) {
         for (const notebook of compiled.notebooks) {
           const notebookId = notebook.notebookId;
           if (notebooks.length >= MAX_NOTEBOOKS) break;
-          const frozenForNotebook = compiled.sources.filter(source => source.notebookIds.includes(notebookId));
+          const frozenForNotebook = visibleSources.filter(source => source.notebookIds.includes(notebookId));
           const sources: Array<Record<string, unknown>> = [];
           for (const frozen of frozenForNotebook) {
             if (sources.length >= MAX_SOURCES_PER_NOTEBOOK) break;
@@ -140,8 +158,8 @@ export function createKnowledgeOutlineTool(deps: KnowledgeOutlineToolDeps) {
           turnId: scope.turnId,
           notebooks,
           notebooksTruncated: scope.notebookIds.length > notebooks.length,
-          totalSources: compiled.sources.length,
-          warnings: compiled.warnings,
+          totalSources: visibleSources.length,
+          warnings: visibleWarnings,
         }, null, 2), { scopeId });
       } catch (error) {
         if (isKnowledgeError(error)) {

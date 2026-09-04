@@ -8,7 +8,7 @@ import type { KnowledgeToolSessionContext } from "../../lib/tools/knowledge-scop
 export async function searchToolFixture(large = false) {
   const home = fs.mkdtempSync(path.join(os.tmpdir(), "knowledge-search-tool-"));
   const manager = new KnowledgeManager({ lingxiHome: home });
-  const studioId = "search-tool", session = { sessionPath: "/tmp/knowledge-search-tool/main.jsonl", parentSessionPath: null };
+  const studioId = "search-tool", session = { sessionPath: "/tmp/knowledge-search-tool/main.jsonl", scopeOwnerSessionPath: "/tmp/knowledge-search-tool/main.jsonl" };
   try {
     const notebook = manager.createNotebook({ studioId, name: "资料本" });
     manager.updateNotebookSettings({ studioId, notebookId: notebook.id, chunkTargetChars: 2000 });

@@ -29,6 +29,7 @@ import {
   requireKnowledgeSessionContext,
   resolveKnowledgeOwningNotebookId,
   resolveKnowledgeTurnScope,
+  type KnowledgeToolSessionContext,
 } from "./knowledge-scope.ts";
 import { toolError, toolOk } from "./tool-result.ts";
 
@@ -42,14 +43,11 @@ export interface KnowledgeReadToolDeps {
   getStudioId: () => string | null;
   /**
    * 工具执行会话的 scope 归属上下文（Pi SDK execute 第 5 参 ctx 解析）：
-   * sessionPath = 当前执行会话的 JSONL 路径；parentSessionPath = subagent
-   * 子会话的父会话路径（主会话为 null）。缺失 → 无 scope 上下文的 surface
+   * sessionPath 是当前执行会话路径；scopeOwnerSessionPath 是沿宿主会话登记
+   * 核验的原始主会话路径（主会话自身即拥有者）。缺失 → 无范围上下文的入口
    * （显式 KNOWLEDGE_MODEL_UNAVAILABLE，不静默放行）。
    */
-  resolveSessionContext?: (ctx: unknown) => {
-    sessionPath: string | null;
-    parentSessionPath: string | null;
-  };
+  resolveSessionContext?: (ctx: unknown) => KnowledgeToolSessionContext;
   /** 可选研究上下文由宿主提供；普通工具调用不创建研究凭据。 */
   resolveResearchContext?: (ctx: unknown) => KnowledgeResearchToolContext | null;
 }
@@ -84,7 +82,7 @@ function resolveScopedArtifact(
   scopeId: string,
   sourceId: string,
   notebookId: string | null,
-  sessionContext: { sessionPath: string | null; parentSessionPath: string | null },
+  sessionContext: KnowledgeToolSessionContext,
 ): {
   artifactId: string;
   contentSnapshotId: string;
@@ -178,7 +176,7 @@ export function createKnowledgeReadTool(deps: KnowledgeReadToolDeps) {
         const query = typeof params.query === "string" && params.query.trim() ? params.query.trim() : null;
         const sessionContext = deps.resolveSessionContext?.(ctx) ?? {
           sessionPath: null,
-          parentSessionPath: null,
+          scopeOwnerSessionPath: null,
         };
         const resolved = resolveScopedArtifact(knowledge, studioId, scopeId, sourceId, notebookId, sessionContext);
         const researchContext = deps.resolveResearchContext?.(ctx) ?? null;

@@ -660,7 +660,7 @@
     ],
     "version": 3
   },
-  "payloadFingerprint": "sha256:cd0feeaaa9caa4800620293e2f2a5a3b52d1f22d3eec6d21efccc0d2b036066b",
+  "payloadFingerprint": "sha256:3beb2e79d626d4bc9d7ae2f35a92c1b4a6daab3bccf3e7d701b565138cc43679",
   "registry": [
     {
       "affectedByEpochMigration": true,
@@ -3292,8 +3292,8 @@
   ],
   "review": {
     "classification": "compatible",
-    "compatibilityReason": "P2-02 单事务新增 v18 七张研究台账表，已有 v17 表和行全部保留，阅读凭据仅存定位和摘要，不改变 DATA_EPOCH 或 paid vectors",
-    "payloadFingerprint": "sha256:cd0feeaaa9caa4800620293e2f2a5a3b52d1f22d3eec6d21efccc0d2b036066b"
+    "compatibilityReason": "P2-05 新增只读研究隔离会话与宿主祖先校验，复用既有会话清单JSON与知识v18表；临时会话执行后删除，不改变旧会话或数据纪元",
+    "payloadFingerprint": "sha256:3beb2e79d626d4bc9d7ae2f35a92c1b4a6daab3bccf3e7d701b565138cc43679"
   },
   "schemas": [
     {
@@ -4282,7 +4282,7 @@
         {
           "contract": "core/session-coordinator.ts Hana metadata extensions",
           "module": "core/session-coordinator.ts",
-          "sourceHash": "sha256:ba0e917497712b45c04c392161595e9a40f152a8dcb2c150113359ed5e8440ac"
+          "sourceHash": "sha256:e112e4a0cb62557f5d3399906039462116193e5808f60b018e0ae4656918d672"
         },
         {
           "contract": "core/session-jsonl-file.ts repair contract",

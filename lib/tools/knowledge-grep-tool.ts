@@ -226,7 +226,7 @@ export function createKnowledgeGrepTool(deps: KnowledgeGrepToolDeps) {
         }
         const sessionContext = deps.resolveSessionContext?.(ctx) ?? {
           sessionPath: null,
-          parentSessionPath: null,
+          scopeOwnerSessionPath: null,
         };
         const scope = resolveKnowledgeTurnScope({ knowledge, studioId, scopeId, sessionContext });
         const researchContext = deps.resolveResearchContext?.(ctx) ?? null;

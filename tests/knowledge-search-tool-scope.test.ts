@@ -8,10 +8,10 @@ it("未知、关闭、跨工作室、跨会话范围全部拒绝；普通子会�
     for (const [tool, params] of [
       [f.makeTool(), { ...f.params, scopeId: "missing" }],
       [f.makeTool("other-studio"), f.params],
-      [f.makeTool(f.studioId, { sessionPath: "/tmp/other.jsonl", parentSessionPath: null }), f.params],
+      [f.makeTool(f.studioId, { sessionPath: "/tmp/other.jsonl", scopeOwnerSessionPath: "/tmp/other.jsonl" }), f.params],
     ] as const) expect((await tool.execute("invalid", params)).details).toMatchObject({ errorCode: "KNOWLEDGE_SCOPE_VIOLATION" });
     expect(search).not.toHaveBeenCalled();
-    const child = f.makeTool(f.studioId, { sessionPath: "/tmp/child.jsonl", parentSessionPath: f.session.sessionPath });
+    const child = f.makeTool(f.studioId, { sessionPath: "/tmp/child.jsonl", scopeOwnerSessionPath: f.session.sessionPath });
     expect((await child.execute("child", f.params)).isError).toBeUndefined();
     f.manager.closeTurnScope({ scopeId: f.scope.id });
     expect((await child.execute("closed", f.params)).details).toMatchObject({ errorCode: "KNOWLEDGE_SCOPE_VIOLATION" });

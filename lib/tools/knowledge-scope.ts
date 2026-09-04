@@ -18,7 +18,7 @@ import type { KnowledgeBlock, KnowledgeTurnScope, KnowledgeTurnScopeSource } fro
 /** 工具执行会话的 scope 归属上下文（Pi SDK execute 第 5 参 ctx 的解析结果）。 */
 export interface KnowledgeToolSessionContext {
   sessionPath: string | null;
-  parentSessionPath: string | null;
+  scopeOwnerSessionPath: string | null;
 }
 
 export function knowledgeScopeViolation(message: string): KnowledgeError {
@@ -42,12 +42,15 @@ export function requireKnowledgeSessionContext(
       "this knowledge tool requires a session-bound KnowledgeTurnScope context",
     );
   }
+  if (!sessionContext.scopeOwnerSessionPath) {
+    throw knowledgeScopeViolation("Knowledge scope owner must be resolved from session manifests");
+  }
   return sessionContext.sessionPath;
 }
 
 /**
  * scope 归属校验（服务端复核，不信任模型传入的 scopeId）：
- * 存在、active、属于当前 studio、属于当前会话（或其 subagent 父会话）。
+ * 存在、active、属于当前 studio、属于当前会话或经真实祖先链核验的范围拥有者。
  * 通过返回完整 scope（含冻结源集合）。
  */
 export function resolveKnowledgeTurnScope(input: {
@@ -66,8 +69,7 @@ export function resolveKnowledgeTurnScope(input: {
     throw knowledgeScopeViolation("Knowledge turn scope is closed (superseded by a newer turn)");
   }
   const ownsScope = sameKnowledgeSessionPath(scope.sessionPath, input.sessionContext.sessionPath!)
-    || (input.sessionContext.parentSessionPath != null
-      && sameKnowledgeSessionPath(scope.sessionPath, input.sessionContext.parentSessionPath));
+    || sameKnowledgeSessionPath(scope.sessionPath, input.sessionContext.scopeOwnerSessionPath!);
   if (!ownsScope) {
     throw knowledgeScopeViolation("Knowledge turn scope does not belong to this session");
   }
