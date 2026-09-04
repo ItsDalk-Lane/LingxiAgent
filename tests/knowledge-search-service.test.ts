@@ -118,6 +118,8 @@ describe("统一知识搜索", () => {
     expect(search).toHaveBeenCalledWith(expect.objectContaining({ channel: "fts", rerank: false }));
     expect(output.stats.remoteModelCalls).toBe(0);
     expect(output.stats.injectedChunks).toBeGreaterThan(0);
+    const again = await manager.runFastKnowledgePipeline({ scope, question: "后台" });
+    expect(again.stats).toMatchObject({ retrievalResultCacheHit: true, ftsQueries: 0, retrievalMode: "fts", remoteModelCalls: 0 });
   });
 
   it("详细会话注入也通过统一服务，保留真实证据身份", async () => {
@@ -136,6 +138,7 @@ describe("统一知识搜索", () => {
     expect(legacy).not.toHaveBeenCalled();
     expect(result.stats.injectedChunks).toBeGreaterThan(0);
     expect(result.evidence.entries.length).toBeGreaterThan(0);
+    expect(result.stats).toMatchObject({ embeddingGroups: 0, rerankGroups: 0, queryEmbeddingCacheHit: false, retrievalResultCacheHit: false });
   });
 
 });

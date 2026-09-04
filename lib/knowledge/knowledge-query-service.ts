@@ -102,6 +102,10 @@ export interface SearchedVectorVariantIdentity {
 }
 
 export interface RetrieveForNotebooksResult {
+  embeddingGroups?: number;
+  rerankGroups?: number;
+  queryEmbeddingCacheHit?: boolean;
+  retrievalResultCacheHit?: boolean;
   candidates: NotebookRetrievalChunk[];
   sources: NotebookRetrievalSource[];
   retrievalMode: "fts" | "hybrid";
@@ -273,6 +277,7 @@ function fuseCandidates(
  */
 export function fuseNotebookRankings(
   rankings: IndexedKnowledgeChunk[][],
+  useFusedScores = false,
 ): Array<{ chunk: IndexedKnowledgeChunk; notebookIndex: number }> {
   const fused = new Map<string, { chunk: IndexedKnowledgeChunk; notebookIndex: number; score: number }>();
   rankings.forEach((ranking, notebookIndex) => {
@@ -296,7 +301,7 @@ export function fuseNotebookRankings(
     ))
     // §二十六 fusionBudget：跨笔记本融合池同样封顶（预算链独立于 topK 生效）。
     .slice(0, KNOWLEDGE_FUSION_BUDGET)
-    .map(entry => ({ chunk: entry.chunk, notebookIndex: entry.notebookIndex }));
+    .map(entry => ({ chunk: useFusedScores ? { ...entry.chunk, score: entry.score } : entry.chunk, notebookIndex: entry.notebookIndex }));
 }
 
 export interface KnowledgeBlockLocator {
@@ -614,6 +619,7 @@ export class KnowledgeQueryService {
     signal?: AbortSignal;
     ordinalRanges?: ReadonlyMap<string, KnowledgeOrdinalRange[]>;
     onRemoteCall: () => void;
+    onEmbeddingCacheHit: () => void;
   }) {
     const scopes = new Map<string, KnowledgeRetrievalScope>();
     for (const notebook of input.notebooks) {
@@ -632,7 +638,7 @@ export class KnowledgeQueryService {
     return this.retrieve({
       studioId: input.compiledScope.studioId, scopes: [...scopes.values()], question: input.query,
       runId: `knowledge_search_${crypto.randomUUID()}`, topK: input.limit,
-      signal: input.signal, rerank: false, reranker: null,
+      signal: input.signal, rerank: false, reranker: null, ftsCandidates: [],
       ordinalRangesByChunkIndexVariantId: input.ordinalRanges,
       embedTexts: embeddingRef && this.deps.embedTextsForModel ? async request => {
         const cached = await this.queryEmbeddingCache.getOrCreate({
@@ -644,6 +650,7 @@ export class KnowledgeQueryService {
             texts: [normalizeKnowledgeQuery(input.query)], modelRef: embeddingRef, inputType: "query" });
           return assertEmbeddingBatch(result, 1).result;
         }, request.signal);
+        if (cached.hit) input.onEmbeddingCacheHit();
         return cached.value;
       } : null,
     }).then(outcome => {
@@ -663,11 +670,22 @@ export class KnowledgeQueryService {
     if (!input.modelRef) return { candidates: input.candidates, rerankMs: 0 };
     if (!this.deps.rerankForModel) return { candidates: input.candidates, rerankMs: 0,
       rerankDegradeReason: "configured rerank model is unavailable; kept retrieval ranking" };
-    return this.rankCandidates({
-      candidates: input.candidates, question: input.query, signal: input.signal,
-      runId: `knowledge_rerank_${crypto.randomUUID()}`, rerank: true,
-      reranker: request => { input.onRemoteCall(); return this.deps.rerankForModel!({ ...request, modelRef: input.modelRef! }); },
-    });
+    try {
+      return await this.rankCandidates({
+        candidates: input.candidates, question: input.query, signal: input.signal,
+        runId: `knowledge_rerank_${crypto.randomUUID()}`, rerank: true,
+        reranker: async request => {
+          input.onRemoteCall();
+          const result = await this.deps.rerankForModel!({ ...request, modelRef: input.modelRef! });
+          if (!result) throw new Error("configured rerank model returned no result");
+          return result;
+        },
+      });
+    } catch (error) {
+      input.signal?.throwIfAborted();
+      return { candidates: input.candidates, rerankMs: 0,
+        rerankDegradeReason: `rerank failed: ${error instanceof Error ? error.message : String(error)}; kept RRF ranking` };
+    }
   }
 
   extractEvidenceSpans(input: Parameters<EvidenceSpanExtractor["extract"]>[0]) {
@@ -1036,6 +1054,8 @@ export class KnowledgeQueryService {
   // 留痕；缺失变体由调用方幂等入队后台构建（查询不等待）。仅存的写路径是
   // KNOWLEDGE_INDEX_INVALID 损坏自愈（reset/rebuild，§十三 exception recovery）。
   protected async retrieve(input: {
+    /** 统一服务已完成全范围 FTS，向量分组传空列表避免重复执行。 */
+    ftsCandidates?: IndexedKnowledgeChunk[];
     studioId: string;
     scopes: KnowledgeRetrievalScope[];
     question: string;
@@ -1098,12 +1118,16 @@ export class KnowledgeQueryService {
     const ordinalRanges = input.ordinalRangesByChunkIndexVariantId ?? null;
     // 分段计时（2026-08-31 观测补齐）：各段墙钟随结果携带，纯增量可选。
     const ftsStart = Date.now();
-    const ftsResult = this.retrieveFts(scopes, question, generationLimit, ordinalRanges ?? undefined);
+    const ftsResult = input.ftsCandidates === undefined
+      ? this.retrieveFts(scopes, question, generationLimit, ordinalRanges ?? undefined)
+      : (() => {
+        const ready = this.splitScopesByReadiness(scopes);
+        return { fts: input.ftsCandidates, readyScopes: ready.ready, degraded: ready.degraded };
+      })();
     const ftsMs = Date.now() - ftsStart;
     let embedMs: number | undefined;
     let vectorMs: number | undefined;
     let fuseMs: number | undefined;
-    let rerankMs: number | undefined;
     const { fts, readyScopes, degraded } = ftsResult;
     if (!input.embedTexts || readyScopes.length === 0) {
       return {
@@ -1329,8 +1353,7 @@ export class KnowledgeQueryService {
     }
     const ranked = await this.rankCandidates({ ...input, candidates });
     candidates = ranked.candidates;
-    rerankMs = ranked.rerankMs;
-    const { rerankDegradeReason, rerankSkippedReason } = ranked;
+    const { rerankMs, rerankDegradeReason, rerankSkippedReason } = ranked;
     return {
       candidates,
       retrievalMode: "hybrid",

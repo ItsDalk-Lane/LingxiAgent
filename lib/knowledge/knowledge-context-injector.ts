@@ -2007,6 +2007,12 @@ export function renderKnowledgeContextBlock(input: {
       ...(rerankSkippedReasons.length > 0
         ? { rerankSkippedReason: rerankSkippedReasons.join("; ") }
         : {}),
+      ...(input.retrievalResults.some(result => result.embeddingGroups !== undefined) ? {
+        embeddingGroups: input.retrievalResults.reduce((sum, result) => sum + (result.embeddingGroups ?? 0), 0),
+        rerankGroups: input.retrievalResults.reduce((sum, result) => sum + (result.rerankGroups ?? 0), 0),
+        queryEmbeddingCacheHit: input.retrievalResults.some(result => result.queryEmbeddingCacheHit === true),
+        retrievalResultCacheHit: input.retrievalResults.some(result => result.retrievalResultCacheHit === true),
+      } : {}),
       ...(input.stageTimings ? { stageTimings: input.stageTimings } : {}),
       ...(input.coveragePlan
         ? {

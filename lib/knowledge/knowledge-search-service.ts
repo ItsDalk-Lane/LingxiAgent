@@ -8,7 +8,7 @@ import type { CompiledKnowledgeScope } from "./scope-snapshot-compiler.ts";
 import type { KnowledgeStore } from "./knowledge-store.ts";
 import type { KnowledgeIndexStore, IndexedKnowledgeChunk, KnowledgeOrdinalRange } from "./knowledge-index-store.ts";
 import {
-  buildKnowledgeBlockLocatorIndex, knowledgeSectionKeyOf, fuseNotebookRankings,
+  buildKnowledgeBlockLocatorIndex, knowledgeSectionKeyOf, fuseNotebookRankings, KNOWLEDGE_CANDIDATE_GENERATION_BUDGET,
   type KnowledgeQueryService, type RetrieveForNotebooksResult, type KnowledgeBlockLocator,
 } from "./knowledge-query-service.ts";
 
@@ -55,6 +55,10 @@ export interface KnowledgeSearchResponse {
     totalMs: number;
   };
   remoteModelCalls: number;
+  embeddingGroups: number;
+  rerankGroups: number;
+  queryEmbeddingCacheHit: boolean;
+  retrievalResultCacheHit: boolean;
   degradedReasons: string[];
 }
 
@@ -164,7 +168,7 @@ export class KnowledgeSearchService {
       scopeSnapshotHash: scope.snapshotHash, normalizedQuery: normalizeKnowledgeQuery(request.query),
       channel: request.channel, filters: { notebookIds: request.notebookIds, sourceIds: request.sourceIds,
         sectionKeys: request.sectionKeys, sectionsBySourceId: sectionsBySourceId ? [...sectionsBySourceId] : undefined },
-      limit: request.limit, rerank: request.rerank, retrievalImplementationVersion: "knowledge-search-v1",
+      limit: request.limit, rerank: request.rerank, retrievalImplementationVersion: "knowledge-search-v2",
     }, async signal => {
       request = { ...request, query: normalizeKnowledgeQuery(request.query), signal };
       let ordinalRanges: Map<string, KnowledgeOrdinalRange[]> | undefined;
@@ -184,33 +188,39 @@ export class KnowledgeSearchService {
       }
       const timings: KnowledgeSearchResponse["timings"] = { scopeMs: performance.now() - started, ftsMs: 0, fuseMs: 0, totalMs: 0 };
       let remoteModelCalls = 0;
+      let embeddingGroups = 0, rerankGroups = 0;
+      let queryEmbeddingCacheHit = false;
       let candidates: IndexedKnowledgeChunk[];
       let retrievalMode: "fts" | "hybrid" = "fts";
       let searchedVectorVariants: NonNullable<RetrieveForNotebooksResult["searchedVectorVariants"]> = [];
       const degraded: RetrieveForNotebooksResult["degraded"] = [];
       const degradedReasons = [...scope.warnings];
       const rerankDegradeReasons: string[] = [];
-      if (request.channel === "fts") {
-        const ftsStart = performance.now();
-        candidates = variantIds.length === 0 ? [] : ordinalRanges ? this.deps.indexStore.search({
-          scopes: [...variants.values()].map(variant => ({ parseArtifactId: variant.parseArtifactId, chunkProfileHash: variant.chunkProfileHash })),
-          query: request.query, limit: request.limit, ordinalRangesByChunkIndexVariantId: ordinalRanges,
-        }) : this.deps.queryService.searchCompiledScopeFts({
-          compiledScope: { ...scope, readyChunkVariantIds: variantIds }, query: request.query, limit: request.limit,
-        });
-        candidates = candidates.map(candidate => ({ ...candidate, channels: ["fts"] }));
-        timings.ftsMs = performance.now() - ftsStart;
-      } else {
+      const ftsStart = performance.now();
+      const generationLimit = request.channel === "hybrid" ? Math.min(request.limit, KNOWLEDGE_CANDIDATE_GENERATION_BUDGET) : request.limit;
+      const fts = variantIds.length === 0 ? [] : ordinalRanges ? this.deps.indexStore.search({
+        scopes: [...variants.values()].map(variant => ({ parseArtifactId: variant.parseArtifactId, chunkProfileHash: variant.chunkProfileHash })),
+        query: request.query, limit: generationLimit, ordinalRangesByChunkIndexVariantId: ordinalRanges,
+      }) : this.deps.queryService.searchCompiledScopeFts({
+        compiledScope: { ...scope, readyChunkVariantIds: variantIds }, query: request.query, limit: generationLimit,
+      });
+      candidates = fts.map(candidate => ({ ...candidate, channels: ["fts"] }));
+      timings.ftsMs = performance.now() - ftsStart;
+      if (request.channel === "hybrid") {
         const groups = new Map<string, typeof notebooks>();
         for (const notebook of notebooks) {
           const ref = notebook.embeddingModelRef;
           const key = ref ? JSON.stringify([ref.provider, ref.id, this.deps.queryService.getModelConfigurationRevision(ref)]) : "none";
           groups.set(key, [...(groups.get(key) ?? []), notebook]);
         }
-        const groupNotebooks = [...groups.values()];
+        const groupNotebooks = [...groups.values()].filter(members => members.some(notebook => sources.some(source =>
+          source.notebookIds.includes(notebook.notebookId) && [...variants.values()].some(variant =>
+            variant.parseArtifactId === source.parseArtifactId && variant.chunkProfileHash === notebook.chunkProfileHash))));
+        embeddingGroups = groupNotebooks.filter(members => members[0].embeddingModelRef).length;
         const outcomes = await Promise.all(groupNotebooks.map(members => this.deps.queryService.retrieveCompiledGroup({
           compiledScope: scope, notebooks: members, variantIds, query: request.query, limit: request.limit,
           signal: request.signal, ordinalRanges, onRemoteCall: () => { remoteModelCalls += 1; },
+          onEmbeddingCacheHit: () => { queryEmbeddingCacheHit = true; },
         })));
         for (const outcome of outcomes) {
           if (outcome.retrievalMode === "hybrid") retrievalMode = "hybrid";
@@ -224,23 +234,42 @@ export class KnowledgeSearchService {
             }
           }
         }
-        const notebookRankings = await Promise.all(notebooks.map(async notebook => {
-          const outcome = outcomes[groupNotebooks.findIndex(members => members.includes(notebook))];
-          const local = outcome.candidates.filter(candidate => sources.some(source => source.parseArtifactId === candidate.parseArtifactId
-            && source.notebookIds.includes(notebook.notebookId))
-            && variants.get(candidate.chunkIndexVariantId)?.chunkProfileHash === notebook.chunkProfileHash);
-          if (!request.rerank) return local;
-          const ranked = await this.deps.queryService.rerankCompiledCandidates({ candidates: local,
-            modelRef: notebook.rerankModelRef, query: request.query, signal: request.signal,
-            onRemoteCall: () => { remoteModelCalls += 1; },
-          });
-          timings.rerankMs = Math.max(timings.rerankMs ?? 0, ranked.rerankMs);
-          if (ranked.rerankDegradeReason) rerankDegradeReasons.push(ranked.rerankDegradeReason);
-          return ranked.candidates;
-        }));
         const fuseStart = performance.now();
-        candidates = fuseNotebookRankings(notebookRankings).map(entry => entry.chunk).slice(0, request.limit);
+        candidates = fuseNotebookRankings([candidates, ...outcomes.map(outcome => outcome.candidates)], true)
+          .map(entry => entry.chunk).slice(0, request.limit);
         timings.fuseMs += performance.now() - fuseStart;
+        if (request.rerank && candidates.length > 0) {
+          const rerankByRef = new Map<string, { ref: KnowledgeModelRef | null; candidates: IndexedKnowledgeChunk[] }>();
+          for (const candidate of candidates) {
+            const source = sources.find(source => source.parseArtifactId === candidate.parseArtifactId)!;
+            const owners = notebooks.filter(notebook => source.notebookIds.includes(notebook.notebookId)
+              && notebook.chunkProfileHash === variants.get(candidate.chunkIndexVariantId)!.chunkProfileHash);
+            for (const notebook of owners) {
+              const ref = notebook.rerankModelRef;
+              const key = ref ? JSON.stringify([ref.provider, ref.id]) : "none";
+              const group = rerankByRef.get(key) ?? { ref, candidates: [] };
+              if (!group.candidates.some(item => item.id === candidate.id)) group.candidates.push(candidate);
+              rerankByRef.set(key, group);
+            }
+          }
+          const rerankGroupsList = [...rerankByRef.values()];
+          rerankGroups = rerankGroupsList.filter(group => group.ref).length;
+          if (rerankGroups > 0) {
+            const ranked = await Promise.all(rerankGroupsList.map(group => this.deps.queryService.rerankCompiledCandidates({
+              candidates: group.candidates, modelRef: group.ref, query: request.query, signal: request.signal,
+              onRemoteCall: () => { remoteModelCalls += 1; },
+            })));
+            timings.rerankMs = Math.max(...ranked.map(group => group.rerankMs));
+            rerankDegradeReasons.push(...ranked.flatMap(group => group.rerankDegradeReason ? [group.rerankDegradeReason] : []));
+            // 任一组失败时保留整个融合序列，不能把半份重排结果伪装成全局成功。
+            if (rerankDegradeReasons.length === 0) {
+              const mergeStart = performance.now();
+              candidates = ranked.length === 1 ? ranked[0].candidates
+                : fuseNotebookRankings(ranked.map(group => group.candidates), true).map(entry => entry.chunk);
+              timings.fuseMs += performance.now() - mergeStart;
+            }
+          }
+        }
         searchedVectorVariants = [...new Map(searchedVectorVariants.map(variant => [variant.vectorIndexVariantId, variant])).values()];
         degradedReasons.push(...degraded.map(item => `${item.reason}:${item.parseArtifactId}`), ...rerankDegradeReasons);
       }
@@ -268,7 +297,8 @@ export class KnowledgeSearchService {
         return {
           candidateId: `kc_${crypto.createHash("sha256").update(`${scope.scopeId}\0${candidate.chunkIndexVariantId}\0${candidate.id}`).digest("hex").slice(0, 32)}`,
           sourceId: source.sourceId, sourceName: source.sourceName,
-          notebookIds: source.notebookIds.filter(id => notebooks.some(notebook => notebook.notebookId === id)),
+          notebookIds: source.notebookIds.filter(id => notebooks.some(notebook => notebook.notebookId === id
+            && notebook.chunkProfileHash === variants.get(candidate.chunkIndexVariantId)!.chunkProfileHash)),
           contentSnapshotId: source.contentSnapshotId, parseArtifactId: candidate.parseArtifactId,
           chunkIndexVariantId: candidate.chunkIndexVariantId, chunkId: candidate.id, chunkOrdinal: candidate.ordinal,
           headingPath: candidate.headingPath, pageNumber: candidate.pageNumber,
@@ -278,8 +308,10 @@ export class KnowledgeSearchService {
       timings.totalMs = performance.now() - started;
       return {
         response: { hits, retrievalMode, vectorBackend: searchedVectorVariants.length ? "portable" : "none",
-          timings, remoteModelCalls, degradedReasons: [...new Set(degradedReasons)] },
+          timings, remoteModelCalls, embeddingGroups, rerankGroups, queryEmbeddingCacheHit, retrievalResultCacheHit: false,
+          degradedReasons: [...new Set(degradedReasons)] },
         evidence: {
+          embeddingGroups, rerankGroups, queryEmbeddingCacheHit, retrievalResultCacheHit: false,
           candidates: annotated,
           sources: notebooks.flatMap(notebook => sources.flatMap(source => {
             const variant = [...variants.values()].find(item => item.parseArtifactId === source.parseArtifactId
@@ -299,6 +331,8 @@ export class KnowledgeSearchService {
     if (this.deps.store.getTurnScope({ scopeId: scope.scopeId })?.status !== "active") this.violation();
     if (cached.hit) {
       cached.value.response.remoteModelCalls = 0;
+      Object.assign(cached.value.response, { embeddingGroups: 0, rerankGroups: 0, queryEmbeddingCacheHit: false, retrievalResultCacheHit: true });
+      Object.assign(cached.value.evidence, { embeddingGroups: 0, rerankGroups: 0, queryEmbeddingCacheHit: false, retrievalResultCacheHit: true });
       cached.value.response.timings = { scopeMs: performance.now() - started, ftsMs: 0, fuseMs: 0, totalMs: performance.now() - started };
       cached.value.evidence.stageTimings = { ftsMs: 0, fuseMs: 0 };
     }

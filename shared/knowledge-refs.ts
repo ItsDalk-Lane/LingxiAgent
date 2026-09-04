@@ -227,6 +227,11 @@ export interface KnowledgeRetrievalStats {
    * 非快速档）。
    */
   rerankSkippedReason?: string;
+  /** 实际执行的模型组数；缓存命中表示至少一个对应缓存读取命中。 */
+  embeddingGroups?: number;
+  rerankGroups?: number;
+  queryEmbeddingCacheHit?: boolean;
+  retrievalResultCacheHit?: boolean;
   /**
    * 检索分段计时（2026-08-31）：各阶段墙钟毫秒（单笔记本取该段合计，多笔记本
    * 取最大值——反映对关键路径的贡献）。纯增量可选字段，旧调用方/旧会话不携带。

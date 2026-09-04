@@ -776,10 +776,17 @@ export class KnowledgeManager {
   }
 
   createFastKnowledgePipeline(stages: FastKnowledgeEvidenceStages) {
+    let searchStats = { embeddingGroups: 0, rerankGroups: 0, queryEmbeddingCacheHit: false, retrievalResultCacheHit: false };
     return new FastKnowledgePipeline({
       ...stages,
       compile: scope => this.compileTurnScope(scope),
-      search: async input => (await this.searchService.searchWithEvidence({ ...input, channel: "fts", rerank: false })).evidence.candidates,
+      search: async input => {
+        const result = await this.searchService.searchWithEvidence({ ...input, channel: "fts", rerank: false });
+        const { embeddingGroups, rerankGroups, queryEmbeddingCacheHit, retrievalResultCacheHit } = result.response;
+        searchStats = { embeddingGroups, rerankGroups, queryEmbeddingCacheHit, retrievalResultCacheHit };
+        return result.evidence.candidates;
+      },
+      searchStats: () => searchStats,
     });
   }
 

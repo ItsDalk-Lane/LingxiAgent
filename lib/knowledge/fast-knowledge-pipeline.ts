@@ -39,6 +39,7 @@ export interface FastKnowledgeEvidenceStages {
 interface FastKnowledgeDependencies extends FastKnowledgeEvidenceStages {
   compile(scope: KnowledgeTurnScope): Promise<CompiledKnowledgeScope>;
   search(input: { compiledScope: CompiledKnowledgeScope; query: string; limit: number; signal?: AbortSignal }): IndexedKnowledgeChunk[] | Promise<IndexedKnowledgeChunk[]>;
+  searchStats?: () => Pick<KnowledgeRetrievalStats, "embeddingGroups" | "rerankGroups" | "queryEmbeddingCacheHit" | "retrievalResultCacheHit">;
   now?: () => number;
 }
 
@@ -58,6 +59,7 @@ export class FastKnowledgePipeline {
     let spans: KnowledgeEvidenceSpan[] = [];
     let packed: FastKnowledgePackedEvidence | null = null;
     let ftsQueries = 0;
+    let searched = false;
     let firstEvidenceMs: number | undefined;
     const admitted = () => {
       input.signal?.throwIfAborted();
@@ -72,9 +74,11 @@ export class FastKnowledgePipeline {
     if (admitted() && compiledScope && compiledScope.readyChunkVariantIds.length > 0) {
       const start = now();
       ftsQueries = 1;
+      searched = true;
       hits = await this.deps.search({
         compiledScope, query: input.question, limit: KNOWLEDGE_FAST_FTS_CANDIDATE_LIMIT, signal: input.signal,
       });
+      if (this.deps.searchStats?.().retrievalResultCacheHit) ftsQueries = 0;
       timings.ftsMs = now() - start;
     }
     if (admitted() && compiledScope && hits.length > 0) {
@@ -96,6 +100,7 @@ export class FastKnowledgePipeline {
     const selected = packed?.spans ?? [];
     const warnings = compiledScope?.warnings ?? [];
     const stats: KnowledgeRetrievalStats = {
+      ...this.deps.searchStats?.(),
       mode: "fast",
       scopeId: input.scope.id,
       executionPath: "fast_local",
@@ -107,10 +112,10 @@ export class FastKnowledgePipeline {
       rerankCalls: 0,
       vectorBackend: "none",
       ftsQueries,
-      retrievalMode: ftsQueries ? "fts" : "none",
+      retrievalMode: searched ? "fts" : "none",
       retrievalModeRequested: "fts",
-      subQueries: ftsQueries ? [input.question] : [],
-      subQueryHits: ftsQueries ? [hits.length] : [],
+      subQueries: searched ? [input.question] : [],
+      subQueryHits: searched ? [hits.length] : [],
       degraded: warnings.length > 0,
       ...(warnings.length > 0 ? { degradeReason: warnings.join("; ") } : {}),
       fusedChunks: hits.length,

@@ -10,7 +10,7 @@
 - 严格按 P0 → P1 → P2 → P3 及编号顺序；阶段门禁全部通过才进入下一阶段。
 - 每项记录测试原始结果后提交；不删除、跳过或放宽测试，不合并 main。
 - 现有任务书为用户未跟踪文件，既有规划文档与 BLOCKED.md 历史记录保留。
-- 当前断点：P1-03 已完成分组、缓存和本项验证，随本次提交落地，接着执行 P1-04。P0 源码提交 `5c016df183ad207cf1ca33de274abb7a4eb10057`，阶段审计提交 `f9928d76`；全量 13002 PASS / 0 FAIL / 7 既有 SKIP。用户已授权每阶段验证后同步审计记录，保留最终封印。
+- 当前断点：P1-04 已完成全局融合、分组重排和本项验证，随本次提交落地，接着执行 P1-05。P0 源码提交 `5c016df183ad207cf1ca33de274abb7a4eb10057`，阶段审计提交 `f9928d76`；全量 13002 PASS / 0 FAIL / 7 既有 SKIP。用户已授权每阶段验证后同步审计记录，保留最终封印。
 - 进度、计划与事实集中在本文件和基线文档，避免覆盖既有 task_plan.md / findings.md / PROGRESS.md。
 - 目标工具已确认本任务存在 active goal；重复 create_goal 被拒绝，沿用现有目标。
 - 规划恢复脚本返回其他会话的无关配置记录，经 git diff 为空核对，未采用其内容。
@@ -20,7 +20,7 @@
 | 阶段 | 状态 | 结果 |
 | --- | --- | --- |
 | P0 | completed | 2026-09-04 全量 13002 PASS / 0 FAIL / 7 既有 SKIP，76.42s；全部 P0 门禁通过，审计提交 f9928d76 |
-| P1 | in_progress | P1-01 至 P1-03 本项验证通过；阶段门禁尚未执行 |
+| P1 | in_progress | P1-01 至 P1-04 本项验证通过；阶段门禁尚未执行 |
 | P2 | pending | NOT_EXECUTED |
 | P3 | pending | NOT_EXECUTED |
 
@@ -146,16 +146,19 @@
 - 修复记录：类型检查发现新增摘要计算误引用浏览器全局 crypto，显式导入 Node createHash 后修复；测试统计向量参数为 unknown，按该实测数组接口补齐类型后通过。未修改或放宽断言。
 - 生成物：CLI 闭包生成成功（10663 文件，原 1 条边界债务不变）；持久化指纹 compatible 重钉并检查通过，`sha256:4fcf36fe237df434f30d142fe0a4d5d1660bb6e4aafb71ddf7fa936fd5522b53`；表结构与 DATA_EPOCH 不变。
 - 日志：`/tmp/lingxi-knowledge-p103-tests-final.log`、`/tmp/lingxi-knowledge-p103-typecheck-r3.log`、`/tmp/lingxi-knowledge-p103-lint-final.log`、`/tmp/lingxi-knowledge-p103-boundary.log`、`/tmp/lingxi-knowledge-p103-{closure,fingerprint}.log`。
-- 对应 commit SHA：本次提交，下项回填。
+- 对应 commit SHA：`42520c06`。
 - 偏差：none
 
 ## P1-04：全局融合和分组 rerank
 
-- 状态：pending
-- 改动文件：尚未开始
-- 测试命令：按任务书该项测试执行，尚未执行
-- 测试结果：NOT_EXECUTED
-- 对应 commit SHA：尚未提交
+- 状态：completed
+- 改动：统一入口先对全范围一次 FTS，再按嵌入组只搜向量；全部序列使用现有 k=60 名次融合并去重，共享资料不因多挂笔记本重复加分。重排按不同供应商/模型引用分组，每组最多一次，输入前 50 条，尾部保留；多个模型结果只比较名次，不比较原始分数。任一重排组失败则保留整个全局融合顺序并明确留痕，取消信号照常抛出。
+- 统计：增加 embeddingGroups、rerankGroups、queryEmbeddingCacheHit、retrievalResultCacheHit，服务→注入→会话统计贯通；结果缓存命中时本次模型组数/远程调用数为 0。快速路径缓存命中时 FTS 实际执行数为 0，但检索模式与已有结果仍如实保留。
+- 测试命令：`npx vitest run tests/knowledge-global-rerank.test.ts tests/knowledge-mixed-rerank-groups.test.ts tests/knowledge-cross-notebook-fusion.test.ts tests/knowledge-search-model-grouping.test.ts tests/knowledge-search-service.test.ts tests/knowledge-rerank-fusion.test.ts tests/knowledge-fast-zero-remote.test.ts tests/knowledge-fast-pipeline.test.ts tests/knowledge-context-injector.test.ts tests/knowledge-evidence-manifest.test.ts tests/knowledge-fast-performance-contract.test.ts`；`npm run typecheck`；修改文件 ESLint；`npm run lint:boundary`。
+- 结果：11 文件 / 138 测试通过（8.30s，exit 0）；三套类型检查 exit 0；ESLint exit 0（0 error / 6 warning）；边界检查 exit 0。覆盖同引用五本只重排一次、50 条输入封顶/尾部十条保留、多个引用各一次、跨模型分数变百万倍仍同序、无引用零调用、网络/非法响应/空结果/固定期限超时恢复原序与留痕、缓存统计透传。
+- 生成物：持久化指纹 compatible 重钉及检查通过，`sha256:a4fa19b26cc549cbbb08b7acd435292db9354fc9d80e715a9c9d641d5a467a91`；无新增运行模块，CLI 文件闭包不变；表结构与 DATA_EPOCH 不变。
+- 日志：`/tmp/lingxi-knowledge-p104-tests-final.log`、`/tmp/lingxi-knowledge-p104-typecheck-final.log`、`/tmp/lingxi-knowledge-p104-lint-final.log`、`/tmp/lingxi-knowledge-p104-boundary.log`、`/tmp/lingxi-knowledge-p104-fingerprint-final.log`。
+- 对应 commit SHA：本次提交，下项回填。
 - 偏差：none
 
 ## P1-05：新增 HNSW 向量后端

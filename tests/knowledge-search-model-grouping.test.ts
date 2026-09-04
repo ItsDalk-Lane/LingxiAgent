@@ -78,7 +78,8 @@ describe("搜索按嵌入模型分组", () => {
   it("不同结果键仍共享查询向量；改一个模型配置只失效该模型", async () => {
     const { search, request, embed, revisions } = await fixture(2);
     await search.search(request);
-    await search.search({ ...request, limit: 9 });
+    const reused = await search.search({ ...request, limit: 9 });
+    expect(reused).toMatchObject({ queryEmbeddingCacheHit: true, retrievalResultCacheHit: false, embeddingGroups: 2, remoteModelCalls: 0 });
     expect(embed).toHaveBeenCalledTimes(2);
     revisions.set("embed-0", "2");
     search.refreshModelConfigurations();
