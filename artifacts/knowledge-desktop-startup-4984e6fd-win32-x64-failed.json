@@ -1,0 +1,90 @@
+{
+  "platform": "win32",
+  "arch": "x64",
+  "startedAt": "2026-09-04T08:46:20.661Z",
+  "status": "failed",
+  "packaged": true,
+  "rendererReady": false,
+  "serverReady": false,
+  "error": "Packaged desktop startup reported a failed renderer phase",
+  "launchEvents": [
+    {
+      "ts": "2026-09-04T08:46:20.989Z",
+      "event": "desktop-launch-start",
+      "startupId": "1788511580988-8432",
+      "appVersion": "0.1.33",
+      "platform": "win32",
+      "arch": "x64",
+      "details": {
+        "pid": 8432,
+        "argv": [
+          "D:\\a\\LingxiAgent\\LingxiAgent\\dist\\win-unpacked\\Lingxi.exe",
+          "--remote-debugging-address=127.0.0.1",
+          "--remote-debugging-port=0"
+        ],
+        "packaged": true
+      }
+    },
+    {
+      "ts": "2026-09-04T08:46:21.078Z",
+      "event": "window-created",
+      "startupId": "1788511580988-8432",
+      "appVersion": "0.1.33",
+      "platform": "win32",
+      "arch": "x64",
+      "details": {
+        "label": "splash",
+        "id": 1
+      }
+    },
+    {
+      "ts": "2026-09-04T08:46:21.234Z",
+      "event": "did-fail-load",
+      "startupId": "1788511580988-8432",
+      "appVersion": "0.1.33",
+      "platform": "win32",
+      "arch": "x64",
+      "details": {
+        "label": "splash",
+        "id": 1,
+        "url": "file:///D:/a/LingxiAgent/LingxiAgent/dist/win-unpacked/resources/app.asar/desktop/dist-splash/splash.html",
+        "visible": false,
+        "errorCode": -3,
+        "errorDescription": "",
+        "validatedURL": "file:///D:/a/LingxiAgent/LingxiAgent/dist/win-unpacked/resources/app.asar/desktop/dist-splash/splash.html",
+        "isMainFrame": true
+      }
+    },
+    {
+      "ts": "2026-09-04T08:46:21.287Z",
+      "event": "dom-ready",
+      "startupId": "1788511580988-8432",
+      "appVersion": "0.1.33",
+      "platform": "win32",
+      "arch": "x64",
+      "details": {
+        "label": "splash",
+        "id": 1,
+        "url": "file:///D:/a/LingxiAgent/LingxiAgent/dist/win-unpacked/resources/app.asar/desktop/dist-splash/splash.html?mode=preparing",
+        "visible": false
+      }
+    },
+    {
+      "ts": "2026-09-04T08:46:21.288Z",
+      "event": "did-finish-load",
+      "startupId": "1788511580988-8432",
+      "appVersion": "0.1.33",
+      "platform": "win32",
+      "arch": "x64",
+      "details": {
+        "label": "splash",
+        "id": 1,
+        "url": "file:///D:/a/LingxiAgent/LingxiAgent/dist/win-unpacked/resources/app.asar/desktop/dist-splash/splash.html?mode=preparing",
+        "visible": false
+      }
+    }
+  ],
+  "processOutput": "\r\n[desktop] install-dir sandbox ACE granted\n[desktop] network proxy applied (startup): system\n[desktop] 启动 LingxiAgent Server...\n[artifact-boot] activating seed train 0 (0.1.33) from D:\\a\\LingxiAgent\\LingxiAgent\\dist\\win-unpacked\\resources\\seed\\server-0.1.33-win32-x64.tar.gz\n\n\r\nDevTools listening on ws://127.0.0.1:[token]\r\n[safeReadJSON] C:\\Users\\[user]\\AppData\\Local\\Temp\\lingxi-desktop-startup-RyaFUM\\user\\preferences.json: ENOENT: no such file or directory, open 'C:\\Users\\[user]\\AppData\\Local\\Temp\\lingxi-desktop-startup-RyaFUM\\user\\preferences.json'\n[safeReadJSON] C:\\Users\\[user]\\AppData\\Local\\Temp\\lingxi-desktop-startup-RyaFUM\\user\\preferences.json: ENOENT: no such file or directory, open 'C:\\Users\\[user]\\AppData\\Local\\Temp\\lingxi-desktop-startup-RyaFUM\\user\\preferences.json'\n[safeReadJSON] C:\\Users\\[user]\\AppData\\Local\\Temp\\lingxi-desktop-startup-RyaFUM\\user\\preferences.json: ENOENT: no such file or directory, open 'C:\\Users\\[user]\\AppData\\Local\\Temp\\lingxi-desktop-startup-RyaFUM\\user\\preferences.json'\n",
+  "durationMs": 741.576,
+  "finishedAt": "2026-09-04T08:46:21.404Z"
+}

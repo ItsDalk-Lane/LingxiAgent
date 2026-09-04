@@ -1,0 +1,1801 @@
+{
+  "sourceSha": "61ae60d1afe4f878ae638ff4de96d7e4f30bfefe",
+  "ciHeadSha": "790b496d88d8af6ad4a621085b93d802cc2553f9",
+  "runId": 33864141539,
+  "runAttempt": 1,
+  "url": "https://github.com/ItsDalk-Lane/LingxiAgent/actions/runs/33864141539",
+  "conclusion": "success",
+  "tests": {
+    "quality-gate": {
+      "filesPassed": 1357,
+      "passed": 13741,
+      "failed": 0,
+      "skipped": 17,
+      "durationSeconds": 643.87
+    },
+    "build (macos-15-intel, darwin, dmg, x64)": {
+      "filesPassed": 19,
+      "passed": 151,
+      "failed": 0,
+      "skipped": 0,
+      "durationSeconds": 74.81
+    },
+    "build (ubuntu-24.04, linux, AppImage, x64)": {
+      "filesPassed": 19,
+      "passed": 151,
+      "failed": 0,
+      "skipped": 0,
+      "durationSeconds": 40.88
+    },
+    "build (windows-2025, win32, nsis, x64)": {
+      "filesPassed": 19,
+      "passed": 151,
+      "failed": 0,
+      "skipped": 0,
+      "durationSeconds": 114.23
+    },
+    "build (macos-15, darwin, dmg, arm64)": {
+      "filesPassed": 19,
+      "passed": 151,
+      "failed": 0,
+      "skipped": 0,
+      "durationSeconds": 43.77
+    },
+    "artifact-release-smoke": {
+      "filesPassed": 8,
+      "passed": 305,
+      "failed": 0,
+      "skipped": 0,
+      "durationSeconds": 1.63
+    }
+  },
+  "platforms": [
+    {
+      "platform": "darwin",
+      "arch": "arm64",
+      "jobName": "build (macos-15, darwin, dmg, arm64)",
+      "jobUrl": "https://github.com/ItsDalk-Lane/LingxiAgent/actions/runs/33864141539/job/100997285196",
+      "knowledgeSmoke": {
+        "filesPassed": 19,
+        "passed": 151,
+        "failed": 0,
+        "skipped": 0,
+        "durationSeconds": 43.77
+      },
+      "desktop": {
+        "platform": "darwin",
+        "arch": "arm64",
+        "startedAt": "2026-09-04T10:56:02.622Z",
+        "status": "passed",
+        "packaged": true,
+        "rendererReady": true,
+        "serverReady": true,
+        "renderer": {
+          "ready": "complete",
+          "textLength": 93,
+          "controls": 7,
+          "entryScreen": "onboarding"
+        },
+        "durationMs": 19629.529124999997,
+        "finishedAt": "2026-09-04T10:56:22.254Z",
+        "cleanupPassed": true
+      },
+      "desktopEvidence": "artifacts/knowledge-desktop-startup-790b496d-darwin-arm64.json"
+    },
+    {
+      "platform": "darwin",
+      "arch": "x64",
+      "jobName": "build (macos-15-intel, darwin, dmg, x64)",
+      "jobUrl": "https://github.com/ItsDalk-Lane/LingxiAgent/actions/runs/33864141539/job/100997285018",
+      "knowledgeSmoke": {
+        "filesPassed": 19,
+        "passed": 151,
+        "failed": 0,
+        "skipped": 0,
+        "durationSeconds": 74.81
+      },
+      "desktop": {
+        "platform": "darwin",
+        "arch": "x64",
+        "startedAt": "2026-09-04T11:10:57.533Z",
+        "status": "passed",
+        "packaged": true,
+        "rendererReady": true,
+        "serverReady": true,
+        "rendererProbeTimeouts": 1,
+        "renderer": {
+          "ready": "complete",
+          "textLength": 93,
+          "controls": 7,
+          "entryScreen": "onboarding"
+        },
+        "durationMs": 48795.778992,
+        "finishedAt": "2026-09-04T11:11:46.333Z",
+        "cleanupPassed": true
+      },
+      "desktopEvidence": "artifacts/knowledge-desktop-startup-790b496d-darwin-x64.json"
+    },
+    {
+      "platform": "win32",
+      "arch": "x64",
+      "jobName": "build (windows-2025, win32, nsis, x64)",
+      "jobUrl": "https://github.com/ItsDalk-Lane/LingxiAgent/actions/runs/33864141539/job/100997285114",
+      "knowledgeSmoke": {
+        "filesPassed": 19,
+        "passed": 151,
+        "failed": 0,
+        "skipped": 0,
+        "durationSeconds": 114.23
+      },
+      "desktop": {
+        "platform": "win32",
+        "arch": "x64",
+        "startedAt": "2026-09-04T11:05:50.567Z",
+        "status": "passed",
+        "packaged": true,
+        "rendererReady": true,
+        "serverReady": true,
+        "renderer": {
+          "ready": "complete",
+          "textLength": 93,
+          "controls": 7,
+          "entryScreen": "onboarding"
+        },
+        "durationMs": 77238.514,
+        "finishedAt": "2026-09-04T11:07:07.808Z",
+        "cleanupPassed": true
+      },
+      "desktopEvidence": "artifacts/knowledge-desktop-startup-790b496d-win32-x64.json"
+    },
+    {
+      "platform": "linux",
+      "arch": "x64",
+      "jobName": "build (ubuntu-24.04, linux, AppImage, x64)",
+      "jobUrl": "https://github.com/ItsDalk-Lane/LingxiAgent/actions/runs/33864141539/job/100997285052",
+      "knowledgeSmoke": {
+        "filesPassed": 19,
+        "passed": 151,
+        "failed": 0,
+        "skipped": 0,
+        "durationSeconds": 40.88
+      },
+      "desktop": {
+        "platform": "linux",
+        "arch": "x64",
+        "startedAt": "2026-09-04T10:56:07.604Z",
+        "status": "passed",
+        "packaged": true,
+        "rendererReady": true,
+        "serverReady": true,
+        "renderer": {
+          "ready": "complete",
+          "textLength": 93,
+          "controls": 7,
+          "entryScreen": "onboarding"
+        },
+        "durationMs": 16459.398312999998,
+        "finishedAt": "2026-09-04T10:56:24.065Z",
+        "cleanupPassed": true
+      },
+      "desktopEvidence": "artifacts/knowledge-desktop-startup-790b496d-linux-x64.json"
+    }
+  ],
+  "jobs": [
+    {
+      "completedAt": "2026-09-04T10:41:21Z",
+      "conclusion": "success",
+      "databaseId": 100995026645,
+      "name": "release-preflight",
+      "startedAt": "2026-09-04T10:38:35Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-09-04T10:38:36Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-09-04T10:38:35Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:38:40Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@v4",
+          "number": 2,
+          "startedAt": "2026-09-04T10:38:36Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:38:46Z",
+          "conclusion": "success",
+          "name": "Setup Node.js",
+          "number": 3,
+          "startedAt": "2026-09-04T10:38:40Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:41:19Z",
+          "conclusion": "success",
+          "name": "Install release preflight dependencies",
+          "number": 4,
+          "startedAt": "2026-09-04T10:38:46Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:41:19Z",
+          "conclusion": "success",
+          "name": "Reject non-monotonic release metadata",
+          "number": 5,
+          "startedAt": "2026-09-04T10:41:19Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:41:19Z",
+          "conclusion": "skipped",
+          "name": "Validate committed release digests",
+          "number": 6,
+          "startedAt": "2026-09-04T10:41:19Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:41:19Z",
+          "conclusion": "success",
+          "name": "Post Setup Node.js",
+          "number": 11,
+          "startedAt": "2026-09-04T10:41:19Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:41:19Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@v4",
+          "number": 12,
+          "startedAt": "2026-09-04T10:41:19Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:41:19Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 13,
+          "startedAt": "2026-09-04T10:41:19Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/ItsDalk-Lane/LingxiAgent/actions/runs/33864141539/job/100995026645"
+    },
+    {
+      "completedAt": "2026-09-04T10:47:06Z",
+      "conclusion": "success",
+      "databaseId": 100995860236,
+      "name": "renderer-box",
+      "startedAt": "2026-09-04T10:41:25Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-09-04T10:41:26Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-09-04T10:41:25Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:41:30Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@v4",
+          "number": 2,
+          "startedAt": "2026-09-04T10:41:26Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:41:38Z",
+          "conclusion": "success",
+          "name": "Setup Node.js",
+          "number": 3,
+          "startedAt": "2026-09-04T10:41:30Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:46:40Z",
+          "conclusion": "success",
+          "name": "Install dependencies",
+          "number": 4,
+          "startedAt": "2026-09-04T10:41:38Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:46:56Z",
+          "conclusion": "success",
+          "name": "Build renderer bundle",
+          "number": 5,
+          "startedAt": "2026-09-04T10:46:40Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:46:56Z",
+          "conclusion": "success",
+          "name": "Build theme bundle (writes into dist-renderer/lib, must run after build:renderer)",
+          "number": 6,
+          "startedAt": "2026-09-04T10:46:56Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:46:58Z",
+          "conclusion": "success",
+          "name": "Pack renderer hot-update box",
+          "number": 7,
+          "startedAt": "2026-09-04T10:46:56Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:47:03Z",
+          "conclusion": "success",
+          "name": "Upload renderer box",
+          "number": 8,
+          "startedAt": "2026-09-04T10:46:58Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:47:03Z",
+          "conclusion": "success",
+          "name": "Post Setup Node.js",
+          "number": 15,
+          "startedAt": "2026-09-04T10:47:03Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:47:03Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@v4",
+          "number": 16,
+          "startedAt": "2026-09-04T10:47:03Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:47:03Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 17,
+          "startedAt": "2026-09-04T10:47:03Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/ItsDalk-Lane/LingxiAgent/actions/runs/33864141539/job/100995860236"
+    },
+    {
+      "completedAt": "2026-09-04T10:56:14Z",
+      "conclusion": "success",
+      "databaseId": 100995860244,
+      "name": "quality-gate",
+      "startedAt": "2026-09-04T10:41:25Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-09-04T10:41:26Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-09-04T10:41:26Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:41:31Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@v4",
+          "number": 2,
+          "startedAt": "2026-09-04T10:41:26Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:41:39Z",
+          "conclusion": "success",
+          "name": "Setup Node.js",
+          "number": 3,
+          "startedAt": "2026-09-04T10:41:31Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:43:44Z",
+          "conclusion": "success",
+          "name": "Install dependencies",
+          "number": 4,
+          "startedAt": "2026-09-04T10:41:39Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:44:41Z",
+          "conclusion": "success",
+          "name": "Typecheck",
+          "number": 5,
+          "startedAt": "2026-09-04T10:43:44Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:45:20Z",
+          "conclusion": "success",
+          "name": "Lint",
+          "number": 6,
+          "startedAt": "2026-09-04T10:44:41Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:45:26Z",
+          "conclusion": "success",
+          "name": "Build packages",
+          "number": 7,
+          "startedAt": "2026-09-04T10:45:20Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:56:10Z",
+          "conclusion": "success",
+          "name": "Run full test suite",
+          "number": 8,
+          "startedAt": "2026-09-04T10:45:26Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:56:10Z",
+          "conclusion": "success",
+          "name": "Post Setup Node.js",
+          "number": 15,
+          "startedAt": "2026-09-04T10:56:10Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:56:11Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@v4",
+          "number": 16,
+          "startedAt": "2026-09-04T10:56:10Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:56:11Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 17,
+          "startedAt": "2026-09-04T10:56:11Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/ItsDalk-Lane/LingxiAgent/actions/runs/33864141539/job/100995860244"
+    },
+    {
+      "completedAt": "2026-09-04T11:13:14Z",
+      "conclusion": "success",
+      "databaseId": 100997285018,
+      "name": "build (macos-15-intel, darwin, dmg, x64)",
+      "startedAt": "2026-09-04T10:47:10Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-09-04T10:47:16Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-09-04T10:47:12Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:47:25Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@v4",
+          "number": 2,
+          "startedAt": "2026-09-04T10:47:16Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:47:58Z",
+          "conclusion": "success",
+          "name": "Setup Node.js",
+          "number": 3,
+          "startedAt": "2026-09-04T10:47:25Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:47:58Z",
+          "conclusion": "success",
+          "name": "Assert runner platform and architecture",
+          "number": 4,
+          "startedAt": "2026-09-04T10:47:58Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:50:56Z",
+          "conclusion": "success",
+          "name": "Install dependencies",
+          "number": 5,
+          "startedAt": "2026-09-04T10:47:58Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:51:09Z",
+          "conclusion": "success",
+          "name": "Build packages for Knowledge platform smoke",
+          "number": 6,
+          "startedAt": "2026-09-04T10:50:56Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:52:25Z",
+          "conclusion": "success",
+          "name": "Run Knowledge platform smoke",
+          "number": 7,
+          "startedAt": "2026-09-04T10:51:09Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:52:25Z",
+          "conclusion": "skipped",
+          "name": "Run Knowledge stable-runner performance gates",
+          "number": 8,
+          "startedAt": "2026-09-04T10:52:25Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:52:25Z",
+          "conclusion": "skipped",
+          "name": "Upload Knowledge performance evidence",
+          "number": 9,
+          "startedAt": "2026-09-04T10:52:25Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:52:25Z",
+          "conclusion": "skipped",
+          "name": "Download MinGit",
+          "number": 10,
+          "startedAt": "2026-09-04T10:52:25Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:52:25Z",
+          "conclusion": "skipped",
+          "name": "Smoke-test MinGit",
+          "number": 11,
+          "startedAt": "2026-09-04T10:52:25Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:53:13Z",
+          "conclusion": "success",
+          "name": "Build client bundles (main + preload + renderer)",
+          "number": 12,
+          "startedAt": "2026-09-04T10:52:25Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:53:13Z",
+          "conclusion": "success",
+          "name": "Materialize seed signing key",
+          "number": 13,
+          "startedAt": "2026-09-04T10:53:13Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:53:13Z",
+          "conclusion": "success",
+          "name": "Setup macOS signing keychain",
+          "number": 14,
+          "startedAt": "2026-09-04T10:53:13Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:53:13Z",
+          "conclusion": "success",
+          "name": "Mask signing identity in logs",
+          "number": 15,
+          "startedAt": "2026-09-04T10:53:13Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:53:20Z",
+          "conclusion": "success",
+          "name": "Download shared renderer box",
+          "number": 16,
+          "startedAt": "2026-09-04T10:53:13Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:53:20Z",
+          "conclusion": "success",
+          "name": "Point seed packer at the shared renderer box",
+          "number": 17,
+          "startedAt": "2026-09-04T10:53:20Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:59:12Z",
+          "conclusion": "success",
+          "name": "Build server bundle",
+          "number": 18,
+          "startedAt": "2026-09-04T10:53:20Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:59:43Z",
+          "conclusion": "success",
+          "name": "Verify seed kit before packaged Knowledge smoke",
+          "number": 19,
+          "startedAt": "2026-09-04T10:59:12Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T11:00:14Z",
+          "conclusion": "success",
+          "name": "Smoke-test packaged Knowledge persistence",
+          "number": 20,
+          "startedAt": "2026-09-04T10:59:43Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T11:06:51Z",
+          "conclusion": "success",
+          "name": "Build Computer Use helper",
+          "number": 21,
+          "startedAt": "2026-09-04T11:00:14Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T11:06:52Z",
+          "conclusion": "skipped",
+          "name": "Build Windows sandbox helper",
+          "number": 22,
+          "startedAt": "2026-09-04T11:06:52Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T11:06:52Z",
+          "conclusion": "skipped",
+          "name": "Build Windows standalone server archive",
+          "number": 23,
+          "startedAt": "2026-09-04T11:06:52Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T11:06:52Z",
+          "conclusion": "skipped",
+          "name": "Verify Windows standalone server archive",
+          "number": 24,
+          "startedAt": "2026-09-04T11:06:52Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T11:07:24Z",
+          "conclusion": "success",
+          "name": "Verify seed kit (macOS)",
+          "number": 25,
+          "startedAt": "2026-09-04T11:06:52Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T11:10:57Z",
+          "conclusion": "success",
+          "name": "Build macOS (DMG + ZIP)",
+          "number": 26,
+          "startedAt": "2026-09-04T11:07:24Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T11:10:57Z",
+          "conclusion": "skipped",
+          "name": "Verify seed kit (Windows)",
+          "number": 27,
+          "startedAt": "2026-09-04T11:10:57Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T11:10:57Z",
+          "conclusion": "skipped",
+          "name": "Build Windows installer",
+          "number": 28,
+          "startedAt": "2026-09-04T11:10:57Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T11:10:57Z",
+          "conclusion": "skipped",
+          "name": "Verify seed kit (Linux)",
+          "number": 29,
+          "startedAt": "2026-09-04T11:10:57Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T11:10:57Z",
+          "conclusion": "skipped",
+          "name": "Build Linux preview packages",
+          "number": 30,
+          "startedAt": "2026-09-04T11:10:57Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T11:11:48Z",
+          "conclusion": "success",
+          "name": "Smoke packaged desktop startup (macOS and Windows)",
+          "number": 31,
+          "startedAt": "2026-09-04T11:10:57Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T11:11:48Z",
+          "conclusion": "skipped",
+          "name": "Prepare Linux packaged desktop sandbox",
+          "number": 32,
+          "startedAt": "2026-09-04T11:11:48Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T11:11:48Z",
+          "conclusion": "skipped",
+          "name": "Smoke packaged desktop startup (Linux virtual display)",
+          "number": 33,
+          "startedAt": "2026-09-04T11:11:48Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T11:11:51Z",
+          "conclusion": "success",
+          "name": "Upload packaged desktop startup evidence",
+          "number": 34,
+          "startedAt": "2026-09-04T11:11:48Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T11:13:07Z",
+          "conclusion": "success",
+          "name": "Upload artifacts",
+          "number": 35,
+          "startedAt": "2026-09-04T11:11:51Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T11:13:07Z",
+          "conclusion": "success",
+          "name": "Post Setup Node.js",
+          "number": 69,
+          "startedAt": "2026-09-04T11:13:07Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T11:13:08Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@v4",
+          "number": 70,
+          "startedAt": "2026-09-04T11:13:07Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T11:13:09Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 71,
+          "startedAt": "2026-09-04T11:13:08Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/ItsDalk-Lane/LingxiAgent/actions/runs/33864141539/job/100997285018"
+    },
+    {
+      "completedAt": "2026-09-04T10:57:01Z",
+      "conclusion": "success",
+      "databaseId": 100997285052,
+      "name": "build (ubuntu-24.04, linux, AppImage, x64)",
+      "startedAt": "2026-09-04T10:47:09Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-09-04T10:47:11Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-09-04T10:47:10Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:47:16Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@v4",
+          "number": 2,
+          "startedAt": "2026-09-04T10:47:11Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:47:23Z",
+          "conclusion": "success",
+          "name": "Setup Node.js",
+          "number": 3,
+          "startedAt": "2026-09-04T10:47:16Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:47:23Z",
+          "conclusion": "success",
+          "name": "Assert runner platform and architecture",
+          "number": 4,
+          "startedAt": "2026-09-04T10:47:23Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:47:54Z",
+          "conclusion": "success",
+          "name": "Install dependencies",
+          "number": 5,
+          "startedAt": "2026-09-04T10:47:23Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:47:59Z",
+          "conclusion": "success",
+          "name": "Build packages for Knowledge platform smoke",
+          "number": 6,
+          "startedAt": "2026-09-04T10:47:54Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:48:41Z",
+          "conclusion": "success",
+          "name": "Run Knowledge platform smoke",
+          "number": 7,
+          "startedAt": "2026-09-04T10:47:59Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:50:11Z",
+          "conclusion": "success",
+          "name": "Run Knowledge stable-runner performance gates",
+          "number": 8,
+          "startedAt": "2026-09-04T10:48:41Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:50:12Z",
+          "conclusion": "success",
+          "name": "Upload Knowledge performance evidence",
+          "number": 9,
+          "startedAt": "2026-09-04T10:50:11Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:50:12Z",
+          "conclusion": "skipped",
+          "name": "Download MinGit",
+          "number": 10,
+          "startedAt": "2026-09-04T10:50:12Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:50:12Z",
+          "conclusion": "skipped",
+          "name": "Smoke-test MinGit",
+          "number": 11,
+          "startedAt": "2026-09-04T10:50:12Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:50:36Z",
+          "conclusion": "success",
+          "name": "Build client bundles (main + preload + renderer)",
+          "number": 12,
+          "startedAt": "2026-09-04T10:50:12Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:50:36Z",
+          "conclusion": "success",
+          "name": "Materialize seed signing key",
+          "number": 13,
+          "startedAt": "2026-09-04T10:50:36Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:50:36Z",
+          "conclusion": "skipped",
+          "name": "Setup macOS signing keychain",
+          "number": 14,
+          "startedAt": "2026-09-04T10:50:36Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:50:36Z",
+          "conclusion": "skipped",
+          "name": "Mask signing identity in logs",
+          "number": 15,
+          "startedAt": "2026-09-04T10:50:36Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:50:38Z",
+          "conclusion": "success",
+          "name": "Download shared renderer box",
+          "number": 16,
+          "startedAt": "2026-09-04T10:50:36Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:50:38Z",
+          "conclusion": "success",
+          "name": "Point seed packer at the shared renderer box",
+          "number": 17,
+          "startedAt": "2026-09-04T10:50:38Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:52:17Z",
+          "conclusion": "success",
+          "name": "Build server bundle",
+          "number": 18,
+          "startedAt": "2026-09-04T10:50:38Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:52:24Z",
+          "conclusion": "success",
+          "name": "Verify seed kit before packaged Knowledge smoke",
+          "number": 19,
+          "startedAt": "2026-09-04T10:52:17Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:52:37Z",
+          "conclusion": "success",
+          "name": "Smoke-test packaged Knowledge persistence",
+          "number": 20,
+          "startedAt": "2026-09-04T10:52:24Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:52:37Z",
+          "conclusion": "skipped",
+          "name": "Build Computer Use helper",
+          "number": 21,
+          "startedAt": "2026-09-04T10:52:37Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:52:37Z",
+          "conclusion": "skipped",
+          "name": "Build Windows sandbox helper",
+          "number": 22,
+          "startedAt": "2026-09-04T10:52:37Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:52:37Z",
+          "conclusion": "skipped",
+          "name": "Build Windows standalone server archive",
+          "number": 23,
+          "startedAt": "2026-09-04T10:52:37Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:52:37Z",
+          "conclusion": "skipped",
+          "name": "Verify Windows standalone server archive",
+          "number": 24,
+          "startedAt": "2026-09-04T10:52:37Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:52:37Z",
+          "conclusion": "skipped",
+          "name": "Verify seed kit (macOS)",
+          "number": 25,
+          "startedAt": "2026-09-04T10:52:37Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:52:37Z",
+          "conclusion": "skipped",
+          "name": "Build macOS (DMG + ZIP)",
+          "number": 26,
+          "startedAt": "2026-09-04T10:52:37Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:52:37Z",
+          "conclusion": "skipped",
+          "name": "Verify seed kit (Windows)",
+          "number": 27,
+          "startedAt": "2026-09-04T10:52:37Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:52:37Z",
+          "conclusion": "skipped",
+          "name": "Build Windows installer",
+          "number": 28,
+          "startedAt": "2026-09-04T10:52:37Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:52:44Z",
+          "conclusion": "success",
+          "name": "Verify seed kit (Linux)",
+          "number": 29,
+          "startedAt": "2026-09-04T10:52:37Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:56:06Z",
+          "conclusion": "success",
+          "name": "Build Linux preview packages",
+          "number": 30,
+          "startedAt": "2026-09-04T10:52:44Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:56:06Z",
+          "conclusion": "skipped",
+          "name": "Smoke packaged desktop startup (macOS and Windows)",
+          "number": 31,
+          "startedAt": "2026-09-04T10:56:06Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:56:06Z",
+          "conclusion": "success",
+          "name": "Prepare Linux packaged desktop sandbox",
+          "number": 32,
+          "startedAt": "2026-09-04T10:56:06Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:56:24Z",
+          "conclusion": "success",
+          "name": "Smoke packaged desktop startup (Linux virtual display)",
+          "number": 33,
+          "startedAt": "2026-09-04T10:56:06Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:56:25Z",
+          "conclusion": "success",
+          "name": "Upload packaged desktop startup evidence",
+          "number": 34,
+          "startedAt": "2026-09-04T10:56:24Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:56:59Z",
+          "conclusion": "success",
+          "name": "Upload artifacts",
+          "number": 35,
+          "startedAt": "2026-09-04T10:56:25Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:56:59Z",
+          "conclusion": "success",
+          "name": "Post Setup Node.js",
+          "number": 69,
+          "startedAt": "2026-09-04T10:56:59Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:56:59Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@v4",
+          "number": 70,
+          "startedAt": "2026-09-04T10:56:59Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:56:59Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 71,
+          "startedAt": "2026-09-04T10:56:59Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/ItsDalk-Lane/LingxiAgent/actions/runs/33864141539/job/100997285052"
+    },
+    {
+      "completedAt": "2026-09-04T11:07:54Z",
+      "conclusion": "success",
+      "databaseId": 100997285114,
+      "name": "build (windows-2025, win32, nsis, x64)",
+      "startedAt": "2026-09-04T10:47:10Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-09-04T10:47:12Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-09-04T10:47:10Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:47:21Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@v4",
+          "number": 2,
+          "startedAt": "2026-09-04T10:47:12Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:47:47Z",
+          "conclusion": "success",
+          "name": "Setup Node.js",
+          "number": 3,
+          "startedAt": "2026-09-04T10:47:21Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:47:48Z",
+          "conclusion": "success",
+          "name": "Assert runner platform and architecture",
+          "number": 4,
+          "startedAt": "2026-09-04T10:47:47Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:53:00Z",
+          "conclusion": "success",
+          "name": "Install dependencies",
+          "number": 5,
+          "startedAt": "2026-09-04T10:47:48Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:53:08Z",
+          "conclusion": "success",
+          "name": "Build packages for Knowledge platform smoke",
+          "number": 6,
+          "startedAt": "2026-09-04T10:53:00Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:55:07Z",
+          "conclusion": "success",
+          "name": "Run Knowledge platform smoke",
+          "number": 7,
+          "startedAt": "2026-09-04T10:53:08Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:55:07Z",
+          "conclusion": "skipped",
+          "name": "Run Knowledge stable-runner performance gates",
+          "number": 8,
+          "startedAt": "2026-09-04T10:55:07Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:55:07Z",
+          "conclusion": "skipped",
+          "name": "Upload Knowledge performance evidence",
+          "number": 9,
+          "startedAt": "2026-09-04T10:55:07Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:55:09Z",
+          "conclusion": "success",
+          "name": "Download MinGit",
+          "number": 10,
+          "startedAt": "2026-09-04T10:55:07Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:55:10Z",
+          "conclusion": "success",
+          "name": "Smoke-test MinGit",
+          "number": 11,
+          "startedAt": "2026-09-04T10:55:09Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:55:43Z",
+          "conclusion": "success",
+          "name": "Build client bundles (main + preload + renderer)",
+          "number": 12,
+          "startedAt": "2026-09-04T10:55:10Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:55:43Z",
+          "conclusion": "success",
+          "name": "Materialize seed signing key",
+          "number": 13,
+          "startedAt": "2026-09-04T10:55:43Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:55:43Z",
+          "conclusion": "skipped",
+          "name": "Setup macOS signing keychain",
+          "number": 14,
+          "startedAt": "2026-09-04T10:55:43Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:55:43Z",
+          "conclusion": "skipped",
+          "name": "Mask signing identity in logs",
+          "number": 15,
+          "startedAt": "2026-09-04T10:55:43Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:55:46Z",
+          "conclusion": "success",
+          "name": "Download shared renderer box",
+          "number": 16,
+          "startedAt": "2026-09-04T10:55:43Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:55:46Z",
+          "conclusion": "success",
+          "name": "Point seed packer at the shared renderer box",
+          "number": 17,
+          "startedAt": "2026-09-04T10:55:46Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:59:37Z",
+          "conclusion": "success",
+          "name": "Build server bundle",
+          "number": 18,
+          "startedAt": "2026-09-04T10:55:46Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:59:38Z",
+          "conclusion": "success",
+          "name": "Verify seed kit before packaged Knowledge smoke",
+          "number": 19,
+          "startedAt": "2026-09-04T10:59:37Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T11:00:50Z",
+          "conclusion": "success",
+          "name": "Smoke-test packaged Knowledge persistence",
+          "number": 20,
+          "startedAt": "2026-09-04T10:59:38Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T11:00:50Z",
+          "conclusion": "skipped",
+          "name": "Build Computer Use helper",
+          "number": 21,
+          "startedAt": "2026-09-04T11:00:50Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T11:01:28Z",
+          "conclusion": "success",
+          "name": "Build Windows sandbox helper",
+          "number": 22,
+          "startedAt": "2026-09-04T11:00:50Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T11:02:49Z",
+          "conclusion": "success",
+          "name": "Build Windows standalone server archive",
+          "number": 23,
+          "startedAt": "2026-09-04T11:01:28Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T11:03:53Z",
+          "conclusion": "success",
+          "name": "Verify Windows standalone server archive",
+          "number": 24,
+          "startedAt": "2026-09-04T11:02:49Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T11:03:53Z",
+          "conclusion": "skipped",
+          "name": "Verify seed kit (macOS)",
+          "number": 25,
+          "startedAt": "2026-09-04T11:03:53Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T11:03:53Z",
+          "conclusion": "skipped",
+          "name": "Build macOS (DMG + ZIP)",
+          "number": 26,
+          "startedAt": "2026-09-04T11:03:53Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T11:03:53Z",
+          "conclusion": "success",
+          "name": "Verify seed kit (Windows)",
+          "number": 27,
+          "startedAt": "2026-09-04T11:03:53Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T11:05:50Z",
+          "conclusion": "success",
+          "name": "Build Windows installer",
+          "number": 28,
+          "startedAt": "2026-09-04T11:03:53Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T11:05:50Z",
+          "conclusion": "skipped",
+          "name": "Verify seed kit (Linux)",
+          "number": 29,
+          "startedAt": "2026-09-04T11:05:50Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T11:05:50Z",
+          "conclusion": "skipped",
+          "name": "Build Linux preview packages",
+          "number": 30,
+          "startedAt": "2026-09-04T11:05:50Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T11:07:17Z",
+          "conclusion": "success",
+          "name": "Smoke packaged desktop startup (macOS and Windows)",
+          "number": 31,
+          "startedAt": "2026-09-04T11:05:50Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T11:07:17Z",
+          "conclusion": "skipped",
+          "name": "Prepare Linux packaged desktop sandbox",
+          "number": 32,
+          "startedAt": "2026-09-04T11:07:17Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T11:07:17Z",
+          "conclusion": "skipped",
+          "name": "Smoke packaged desktop startup (Linux virtual display)",
+          "number": 33,
+          "startedAt": "2026-09-04T11:07:17Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T11:07:18Z",
+          "conclusion": "success",
+          "name": "Upload packaged desktop startup evidence",
+          "number": 34,
+          "startedAt": "2026-09-04T11:07:17Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T11:07:50Z",
+          "conclusion": "success",
+          "name": "Upload artifacts",
+          "number": 35,
+          "startedAt": "2026-09-04T11:07:18Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T11:07:50Z",
+          "conclusion": "success",
+          "name": "Post Setup Node.js",
+          "number": 69,
+          "startedAt": "2026-09-04T11:07:50Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T11:07:52Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@v4",
+          "number": 70,
+          "startedAt": "2026-09-04T11:07:50Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T11:07:52Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 71,
+          "startedAt": "2026-09-04T11:07:52Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/ItsDalk-Lane/LingxiAgent/actions/runs/33864141539/job/100997285114"
+    },
+    {
+      "completedAt": "2026-09-04T10:56:59Z",
+      "conclusion": "success",
+      "databaseId": 100997285196,
+      "name": "build (macos-15, darwin, dmg, arm64)",
+      "startedAt": "2026-09-04T10:47:16Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-09-04T10:47:18Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-09-04T10:47:17Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:47:23Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@v4",
+          "number": 2,
+          "startedAt": "2026-09-04T10:47:18Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:47:37Z",
+          "conclusion": "success",
+          "name": "Setup Node.js",
+          "number": 3,
+          "startedAt": "2026-09-04T10:47:23Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:47:37Z",
+          "conclusion": "success",
+          "name": "Assert runner platform and architecture",
+          "number": 4,
+          "startedAt": "2026-09-04T10:47:37Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:48:06Z",
+          "conclusion": "success",
+          "name": "Install dependencies",
+          "number": 5,
+          "startedAt": "2026-09-04T10:47:37Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:48:13Z",
+          "conclusion": "success",
+          "name": "Build packages for Knowledge platform smoke",
+          "number": 6,
+          "startedAt": "2026-09-04T10:48:06Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:48:57Z",
+          "conclusion": "success",
+          "name": "Run Knowledge platform smoke",
+          "number": 7,
+          "startedAt": "2026-09-04T10:48:13Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:48:57Z",
+          "conclusion": "skipped",
+          "name": "Run Knowledge stable-runner performance gates",
+          "number": 8,
+          "startedAt": "2026-09-04T10:48:57Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:48:57Z",
+          "conclusion": "skipped",
+          "name": "Upload Knowledge performance evidence",
+          "number": 9,
+          "startedAt": "2026-09-04T10:48:57Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:48:57Z",
+          "conclusion": "skipped",
+          "name": "Download MinGit",
+          "number": 10,
+          "startedAt": "2026-09-04T10:48:57Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:48:57Z",
+          "conclusion": "skipped",
+          "name": "Smoke-test MinGit",
+          "number": 11,
+          "startedAt": "2026-09-04T10:48:57Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:49:31Z",
+          "conclusion": "success",
+          "name": "Build client bundles (main + preload + renderer)",
+          "number": 12,
+          "startedAt": "2026-09-04T10:48:57Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:49:31Z",
+          "conclusion": "success",
+          "name": "Materialize seed signing key",
+          "number": 13,
+          "startedAt": "2026-09-04T10:49:31Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:49:31Z",
+          "conclusion": "success",
+          "name": "Setup macOS signing keychain",
+          "number": 14,
+          "startedAt": "2026-09-04T10:49:31Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:49:31Z",
+          "conclusion": "success",
+          "name": "Mask signing identity in logs",
+          "number": 15,
+          "startedAt": "2026-09-04T10:49:31Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:49:39Z",
+          "conclusion": "success",
+          "name": "Download shared renderer box",
+          "number": 16,
+          "startedAt": "2026-09-04T10:49:31Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:49:39Z",
+          "conclusion": "success",
+          "name": "Point seed packer at the shared renderer box",
+          "number": 17,
+          "startedAt": "2026-09-04T10:49:39Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:51:39Z",
+          "conclusion": "success",
+          "name": "Build server bundle",
+          "number": 18,
+          "startedAt": "2026-09-04T10:49:39Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:51:47Z",
+          "conclusion": "success",
+          "name": "Verify seed kit before packaged Knowledge smoke",
+          "number": 19,
+          "startedAt": "2026-09-04T10:51:39Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:52:03Z",
+          "conclusion": "success",
+          "name": "Smoke-test packaged Knowledge persistence",
+          "number": 20,
+          "startedAt": "2026-09-04T10:51:47Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:54:18Z",
+          "conclusion": "success",
+          "name": "Build Computer Use helper",
+          "number": 21,
+          "startedAt": "2026-09-04T10:52:03Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:54:18Z",
+          "conclusion": "skipped",
+          "name": "Build Windows sandbox helper",
+          "number": 22,
+          "startedAt": "2026-09-04T10:54:18Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:54:18Z",
+          "conclusion": "skipped",
+          "name": "Build Windows standalone server archive",
+          "number": 23,
+          "startedAt": "2026-09-04T10:54:18Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:54:18Z",
+          "conclusion": "skipped",
+          "name": "Verify Windows standalone server archive",
+          "number": 24,
+          "startedAt": "2026-09-04T10:54:18Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:54:27Z",
+          "conclusion": "success",
+          "name": "Verify seed kit (macOS)",
+          "number": 25,
+          "startedAt": "2026-09-04T10:54:18Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:56:02Z",
+          "conclusion": "success",
+          "name": "Build macOS (DMG + ZIP)",
+          "number": 26,
+          "startedAt": "2026-09-04T10:54:27Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:56:02Z",
+          "conclusion": "skipped",
+          "name": "Verify seed kit (Windows)",
+          "number": 27,
+          "startedAt": "2026-09-04T10:56:02Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:56:02Z",
+          "conclusion": "skipped",
+          "name": "Build Windows installer",
+          "number": 28,
+          "startedAt": "2026-09-04T10:56:02Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:56:02Z",
+          "conclusion": "skipped",
+          "name": "Verify seed kit (Linux)",
+          "number": 29,
+          "startedAt": "2026-09-04T10:56:02Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:56:02Z",
+          "conclusion": "skipped",
+          "name": "Build Linux preview packages",
+          "number": 30,
+          "startedAt": "2026-09-04T10:56:02Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:56:24Z",
+          "conclusion": "success",
+          "name": "Smoke packaged desktop startup (macOS and Windows)",
+          "number": 31,
+          "startedAt": "2026-09-04T10:56:02Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:56:24Z",
+          "conclusion": "skipped",
+          "name": "Prepare Linux packaged desktop sandbox",
+          "number": 32,
+          "startedAt": "2026-09-04T10:56:24Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:56:24Z",
+          "conclusion": "skipped",
+          "name": "Smoke packaged desktop startup (Linux virtual display)",
+          "number": 33,
+          "startedAt": "2026-09-04T10:56:24Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:56:25Z",
+          "conclusion": "success",
+          "name": "Upload packaged desktop startup evidence",
+          "number": 34,
+          "startedAt": "2026-09-04T10:56:24Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:56:54Z",
+          "conclusion": "success",
+          "name": "Upload artifacts",
+          "number": 35,
+          "startedAt": "2026-09-04T10:56:25Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:56:55Z",
+          "conclusion": "success",
+          "name": "Post Setup Node.js",
+          "number": 69,
+          "startedAt": "2026-09-04T10:56:54Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:56:55Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@v4",
+          "number": 70,
+          "startedAt": "2026-09-04T10:56:55Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T10:56:56Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 71,
+          "startedAt": "2026-09-04T10:56:55Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/ItsDalk-Lane/LingxiAgent/actions/runs/33864141539/job/100997285196"
+    },
+    {
+      "completedAt": "2026-09-04T11:18:38Z",
+      "conclusion": "success",
+      "databaseId": 101003704061,
+      "name": "artifact-release-smoke",
+      "startedAt": "2026-09-04T11:13:17Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-09-04T11:13:19Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-09-04T11:13:18Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T11:13:24Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@v4",
+          "number": 2,
+          "startedAt": "2026-09-04T11:13:19Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T11:13:31Z",
+          "conclusion": "success",
+          "name": "Setup Node.js",
+          "number": 3,
+          "startedAt": "2026-09-04T11:13:24Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T11:18:33Z",
+          "conclusion": "success",
+          "name": "Install dependencies",
+          "number": 4,
+          "startedAt": "2026-09-04T11:13:31Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T11:18:35Z",
+          "conclusion": "success",
+          "name": "Run Artifact bootstrap and historical-upgrade smoke",
+          "number": 5,
+          "startedAt": "2026-09-04T11:18:33Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T11:18:36Z",
+          "conclusion": "success",
+          "name": "Post Setup Node.js",
+          "number": 9,
+          "startedAt": "2026-09-04T11:18:35Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T11:18:36Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@v4",
+          "number": 10,
+          "startedAt": "2026-09-04T11:18:36Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-04T11:18:36Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 11,
+          "startedAt": "2026-09-04T11:18:36Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/ItsDalk-Lane/LingxiAgent/actions/runs/33864141539/job/101003704061"
+    }
+  ]
+}

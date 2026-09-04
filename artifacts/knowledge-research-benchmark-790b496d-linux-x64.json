@@ -1,0 +1,813 @@
+{
+  "schemaVersion": 1,
+  "platform": "linux",
+  "arch": "x64",
+  "node": "v24.15.0",
+  "cpu": "AMD EPYC 7763 64-Core Processor",
+  "memoryBytes": 16766414848,
+  "osRelease": "6.17.0-1022-azure",
+  "generatedAt": "2026-09-04T10:50:11.122Z",
+  "boundary": "deterministic model actions; real local research runtime; final synthesis uses real AgentSession/HTTP against a local scripted provider; timing and declared usage do not represent paid provider performance",
+  "results": [
+    {
+      "name": "all-person-names",
+      "status": "completed",
+      "metrics": {
+        "requiredNeedCompletionRate": 1,
+        "citationValidityRate": 1,
+        "conflictDetectionRate": null,
+        "counterEvidenceCheckRate": 1,
+        "coverageRatio": 1,
+        "unavailableUnitCount": 0,
+        "researchRounds": 1,
+        "searchCalls": 1,
+        "readCalls": 1,
+        "delegatedAgents": 1
+      },
+      "telemetry": {
+        "timeToFirstResearchAction": 3.9606860000003508,
+        "totalMs": 133.43408799999997,
+        "roundDurationsMs": [
+          {
+            "round": 0,
+            "durationMs": 105
+          }
+        ],
+        "modelTurns": [
+          {
+            "role": "worker",
+            "surface": "knowledge_completeness_worker",
+            "durationMs": 39.62365499999987,
+            "estimatedInputTokens": 264
+          },
+          {
+            "role": "root",
+            "surface": "knowledge_research_root",
+            "durationMs": 91.33765499999981,
+            "estimatedInputTokens": 1170
+          }
+        ],
+        "workerDurationsMs": [
+          39.62365499999987
+        ],
+        "searches": [
+          {
+            "durationMs": 10.087264999999661,
+            "query": "成员"
+          }
+        ],
+        "reads": [
+          {
+            "name": "knowledge_coverage_read",
+            "durationMs": 10.408003000000008
+          }
+        ],
+        "finalContextAssemblyMs": 2.278624000000036,
+        "finalSynthesisMs": 97.3431300000002,
+        "finalSynthesisStatus": "measured_loopback_provider",
+        "finalSynthesis": {
+          "durationMs": 97.3431300000002,
+          "modelCalls": 1,
+          "observedCalls": 1,
+          "citations": [
+            1
+          ],
+          "usage": {
+            "input": 1195,
+            "output": 16,
+            "totalTokens": 1211
+          },
+          "boundary": "real AgentSession and HTTP/stream observer; local scripted provider; usage declared from fixture token estimates, not billed provider usage"
+        },
+        "modelCalls": 3,
+        "researchModelCalls": 2,
+        "externalModelCalls": 0,
+        "toolCalls": 6,
+        "tokens": {
+          "measuredProviderUsage": {
+            "input": 1195,
+            "output": 16,
+            "totalTokens": 1211
+          },
+          "usageBoundary": "real AgentSession and HTTP/stream observer; local scripted provider; usage declared from fixture token estimates, not billed provider usage",
+          "estimatedPromptTokens": 1434,
+          "finalContextTokens": 1195
+        },
+        "modelBoundary": "deterministic scripted model; real Engine, Agent tools, SQLite, receipts, manifests and cleanup"
+      },
+      "exact": true,
+      "citationCount": 4,
+      "validCitations": 4
+    },
+    {
+      "name": "absolute-absence",
+      "status": "completed",
+      "metrics": {
+        "requiredNeedCompletionRate": 1,
+        "citationValidityRate": 1,
+        "conflictDetectionRate": null,
+        "counterEvidenceCheckRate": 1,
+        "coverageRatio": 1,
+        "unavailableUnitCount": 0,
+        "researchRounds": 1,
+        "searchCalls": 1,
+        "readCalls": 1,
+        "delegatedAgents": 1
+      },
+      "telemetry": {
+        "timeToFirstResearchAction": 1.948366999999962,
+        "totalMs": 92.86964699999999,
+        "roundDurationsMs": [
+          {
+            "round": 0,
+            "durationMs": 72
+          }
+        ],
+        "modelTurns": [
+          {
+            "role": "worker",
+            "surface": "knowledge_completeness_worker",
+            "durationMs": 30.91435300000012,
+            "estimatedInputTokens": 283
+          },
+          {
+            "role": "root",
+            "surface": "knowledge_research_root",
+            "durationMs": 64.52151499999991,
+            "estimatedInputTokens": 1180
+          }
+        ],
+        "workerDurationsMs": [
+          30.91435300000012
+        ],
+        "searches": [
+          {
+            "durationMs": 4.887024999999994,
+            "query": "超导协议"
+          }
+        ],
+        "reads": [
+          {
+            "name": "knowledge_coverage_read",
+            "durationMs": 7.885202999999819
+          }
+        ],
+        "finalContextAssemblyMs": 1.4240099999997256,
+        "finalSynthesisMs": 12.159825000000183,
+        "finalSynthesisStatus": "measured_loopback_provider",
+        "finalSynthesis": {
+          "durationMs": 12.159825000000183,
+          "modelCalls": 1,
+          "observedCalls": 1,
+          "citations": [
+            1
+          ],
+          "usage": {
+            "input": 1202,
+            "output": 16,
+            "totalTokens": 1218
+          },
+          "boundary": "real AgentSession and HTTP/stream observer; local scripted provider; usage declared from fixture token estimates, not billed provider usage"
+        },
+        "modelCalls": 3,
+        "researchModelCalls": 2,
+        "externalModelCalls": 0,
+        "toolCalls": 6,
+        "tokens": {
+          "measuredProviderUsage": {
+            "input": 1202,
+            "output": 16,
+            "totalTokens": 1218
+          },
+          "usageBoundary": "real AgentSession and HTTP/stream observer; local scripted provider; usage declared from fixture token estimates, not billed provider usage",
+          "estimatedPromptTokens": 1463,
+          "finalContextTokens": 1202
+        },
+        "modelBoundary": "deterministic scripted model; real Engine, Agent tools, SQLite, receipts, manifests and cleanup"
+      },
+      "exact": true,
+      "citationCount": 4,
+      "validCitations": 4
+    },
+    {
+      "name": "chapter-changes",
+      "status": "completed",
+      "metrics": {
+        "requiredNeedCompletionRate": 1,
+        "citationValidityRate": 1,
+        "conflictDetectionRate": null,
+        "counterEvidenceCheckRate": 1,
+        "coverageRatio": 1,
+        "unavailableUnitCount": 0,
+        "researchRounds": 1,
+        "searchCalls": 1,
+        "readCalls": 1,
+        "delegatedAgents": 1
+      },
+      "telemetry": {
+        "timeToFirstResearchAction": 1.8921830000003865,
+        "totalMs": 88.28705900000023,
+        "roundDurationsMs": [
+          {
+            "round": 0,
+            "durationMs": 69
+          }
+        ],
+        "modelTurns": [
+          {
+            "role": "worker",
+            "surface": "knowledge_completeness_worker",
+            "durationMs": 30.571533000000272,
+            "estimatedInputTokens": 270
+          },
+          {
+            "role": "root",
+            "surface": "knowledge_research_root",
+            "durationMs": 62.45255099999986,
+            "estimatedInputTokens": 1173
+          }
+        ],
+        "workerDurationsMs": [
+          30.571533000000272
+        ],
+        "searches": [
+          {
+            "durationMs": 4.580112000000099,
+            "query": "变化"
+          }
+        ],
+        "reads": [
+          {
+            "name": "knowledge_coverage_read",
+            "durationMs": 8.08154999999988
+          }
+        ],
+        "finalContextAssemblyMs": 1.284708000000137,
+        "finalSynthesisMs": 11.717379000000165,
+        "finalSynthesisStatus": "measured_loopback_provider",
+        "finalSynthesis": {
+          "durationMs": 11.717379000000165,
+          "modelCalls": 1,
+          "observedCalls": 1,
+          "citations": [
+            1
+          ],
+          "usage": {
+            "input": 1203,
+            "output": 16,
+            "totalTokens": 1219
+          },
+          "boundary": "real AgentSession and HTTP/stream observer; local scripted provider; usage declared from fixture token estimates, not billed provider usage"
+        },
+        "modelCalls": 3,
+        "researchModelCalls": 2,
+        "externalModelCalls": 0,
+        "toolCalls": 6,
+        "tokens": {
+          "measuredProviderUsage": {
+            "input": 1203,
+            "output": 16,
+            "totalTokens": 1219
+          },
+          "usageBoundary": "real AgentSession and HTTP/stream observer; local scripted provider; usage declared from fixture token estimates, not billed provider usage",
+          "estimatedPromptTokens": 1443,
+          "finalContextTokens": 1203
+        },
+        "modelBoundary": "deterministic scripted model; real Engine, Agent tools, SQLite, receipts, manifests and cleanup"
+      },
+      "exact": true,
+      "citationCount": 4,
+      "validCitations": 4
+    },
+    {
+      "name": "all-counterexamples",
+      "status": "partial",
+      "metrics": {
+        "requiredNeedCompletionRate": 0,
+        "citationValidityRate": 1,
+        "conflictDetectionRate": 1,
+        "counterEvidenceCheckRate": 1,
+        "coverageRatio": 1,
+        "unavailableUnitCount": 0,
+        "researchRounds": 3,
+        "searchCalls": 1,
+        "readCalls": 1,
+        "delegatedAgents": 1
+      },
+      "telemetry": {
+        "timeToFirstResearchAction": 2.2052779999999075,
+        "totalMs": 178.43399199999976,
+        "roundDurationsMs": [
+          {
+            "round": 0,
+            "durationMs": 85
+          },
+          {
+            "round": 1,
+            "durationMs": 25
+          },
+          {
+            "round": 2,
+            "durationMs": 23
+          }
+        ],
+        "modelTurns": [
+          {
+            "role": "worker",
+            "surface": "knowledge_completeness_worker",
+            "durationMs": 43.523146,
+            "estimatedInputTokens": 270
+          },
+          {
+            "role": "root",
+            "surface": "knowledge_research_root",
+            "durationMs": 77.42282399999976,
+            "estimatedInputTokens": 1173
+          },
+          {
+            "role": "root",
+            "surface": "knowledge_research_root",
+            "durationMs": 12.391297000000122,
+            "estimatedInputTokens": 2227
+          },
+          {
+            "role": "root",
+            "surface": "knowledge_research_root",
+            "durationMs": 11.656474999999773,
+            "estimatedInputTokens": 2227
+          }
+        ],
+        "workerDurationsMs": [
+          43.523146
+        ],
+        "searches": [
+          {
+            "durationMs": 4.827663999999913,
+            "query": "采购"
+          }
+        ],
+        "reads": [
+          {
+            "name": "knowledge_coverage_read",
+            "durationMs": 9.264858999999888
+          }
+        ],
+        "finalContextAssemblyMs": 1.7516799999998511,
+        "finalSynthesisMs": 32.09163200000012,
+        "finalSynthesisStatus": "measured_loopback_provider",
+        "finalSynthesis": {
+          "durationMs": 32.09163200000012,
+          "modelCalls": 1,
+          "observedCalls": 1,
+          "citations": [
+            1
+          ],
+          "usage": {
+            "input": 1465,
+            "output": 32,
+            "totalTokens": 1497
+          },
+          "boundary": "real AgentSession and HTTP/stream observer; local scripted provider; usage declared from fixture token estimates, not billed provider usage"
+        },
+        "modelCalls": 5,
+        "researchModelCalls": 4,
+        "externalModelCalls": 0,
+        "toolCalls": 8,
+        "tokens": {
+          "measuredProviderUsage": {
+            "input": 1465,
+            "output": 32,
+            "totalTokens": 1497
+          },
+          "usageBoundary": "real AgentSession and HTTP/stream observer; local scripted provider; usage declared from fixture token estimates, not billed provider usage",
+          "estimatedPromptTokens": 5897,
+          "finalContextTokens": 1465
+        },
+        "modelBoundary": "deterministic scripted model; real Engine, Agent tools, SQLite, receipts, manifests and cleanup"
+      },
+      "exact": true,
+      "citationCount": 6,
+      "validCitations": 6
+    },
+    {
+      "name": "needs-ocr",
+      "status": "partial",
+      "metrics": {
+        "requiredNeedCompletionRate": 0,
+        "citationValidityRate": 1,
+        "conflictDetectionRate": null,
+        "counterEvidenceCheckRate": 0,
+        "coverageRatio": 0.6666666666666666,
+        "unavailableUnitCount": 1,
+        "researchRounds": 3,
+        "searchCalls": 1,
+        "readCalls": 1,
+        "delegatedAgents": 1
+      },
+      "telemetry": {
+        "timeToFirstResearchAction": 1.9546989999998914,
+        "totalMs": 114.7867299999998,
+        "roundDurationsMs": [
+          {
+            "round": 0,
+            "durationMs": 53
+          },
+          {
+            "round": 1,
+            "durationMs": 16
+          },
+          {
+            "round": 2,
+            "durationMs": 17
+          }
+        ],
+        "modelTurns": [
+          {
+            "role": "worker",
+            "surface": "knowledge_completeness_worker",
+            "durationMs": 17.170942000000196,
+            "estimatedInputTokens": 286
+          },
+          {
+            "role": "root",
+            "surface": "knowledge_research_root",
+            "durationMs": 46.67467099999976,
+            "estimatedInputTokens": 1246
+          },
+          {
+            "role": "root",
+            "surface": "knowledge_research_root",
+            "durationMs": 8.008974999999737,
+            "estimatedInputTokens": 1770
+          },
+          {
+            "role": "root",
+            "surface": "knowledge_research_root",
+            "durationMs": 7.884651999999733,
+            "estimatedInputTokens": 1770
+          }
+        ],
+        "workerDurationsMs": [
+          17.170942000000196
+        ],
+        "searches": [
+          {
+            "durationMs": 5.063224999999875,
+            "query": "交付"
+          }
+        ],
+        "reads": [
+          {
+            "name": "knowledge_coverage_read",
+            "durationMs": 5.009935000000041
+          }
+        ],
+        "finalContextAssemblyMs": 1.045712999999978,
+        "finalSynthesisMs": 9.71214400000008,
+        "finalSynthesisStatus": "measured_loopback_provider",
+        "finalSynthesis": {
+          "durationMs": 9.71214400000008,
+          "modelCalls": 1,
+          "observedCalls": 1,
+          "citations": [
+            1
+          ],
+          "usage": {
+            "input": 1012,
+            "output": 32,
+            "totalTokens": 1044
+          },
+          "boundary": "real AgentSession and HTTP/stream observer; local scripted provider; usage declared from fixture token estimates, not billed provider usage"
+        },
+        "modelCalls": 5,
+        "researchModelCalls": 4,
+        "externalModelCalls": 0,
+        "toolCalls": 8,
+        "tokens": {
+          "measuredProviderUsage": {
+            "input": 1012,
+            "output": 32,
+            "totalTokens": 1044
+          },
+          "usageBoundary": "real AgentSession and HTTP/stream observer; local scripted provider; usage declared from fixture token estimates, not billed provider usage",
+          "estimatedPromptTokens": 5072,
+          "finalContextTokens": 1012
+        },
+        "modelBoundary": "deterministic scripted model; real Engine, Agent tools, SQLite, receipts, manifests and cleanup"
+      },
+      "exact": false,
+      "citationCount": 2,
+      "validCitations": 2
+    },
+    {
+      "name": "parse-failed",
+      "status": "partial",
+      "metrics": {
+        "requiredNeedCompletionRate": 0,
+        "citationValidityRate": 1,
+        "conflictDetectionRate": null,
+        "counterEvidenceCheckRate": 0,
+        "coverageRatio": 0.6666666666666666,
+        "unavailableUnitCount": 1,
+        "researchRounds": 3,
+        "searchCalls": 1,
+        "readCalls": 1,
+        "delegatedAgents": 1
+      },
+      "telemetry": {
+        "timeToFirstResearchAction": 1.9391709999999875,
+        "totalMs": 116.1125549999997,
+        "roundDurationsMs": [
+          {
+            "round": 0,
+            "durationMs": 54
+          },
+          {
+            "round": 1,
+            "durationMs": 16
+          },
+          {
+            "round": 2,
+            "durationMs": 16
+          }
+        ],
+        "modelTurns": [
+          {
+            "role": "worker",
+            "surface": "knowledge_completeness_worker",
+            "durationMs": 17.430295000000115,
+            "estimatedInputTokens": 283
+          },
+          {
+            "role": "root",
+            "surface": "knowledge_research_root",
+            "durationMs": 47.21023100000002,
+            "estimatedInputTokens": 1246
+          },
+          {
+            "role": "root",
+            "surface": "knowledge_research_root",
+            "durationMs": 7.836060999999972,
+            "estimatedInputTokens": 1767
+          },
+          {
+            "role": "root",
+            "surface": "knowledge_research_root",
+            "durationMs": 7.785436999999547,
+            "estimatedInputTokens": 1767
+          }
+        ],
+        "workerDurationsMs": [
+          17.430295000000115
+        ],
+        "searches": [
+          {
+            "durationMs": 4.94498300000032,
+            "query": "交付"
+          }
+        ],
+        "reads": [
+          {
+            "name": "knowledge_coverage_read",
+            "durationMs": 5.040431000000353
+          }
+        ],
+        "finalContextAssemblyMs": 1.0069989999992686,
+        "finalSynthesisMs": 9.725910999999542,
+        "finalSynthesisStatus": "measured_loopback_provider",
+        "finalSynthesis": {
+          "durationMs": 9.725910999999542,
+          "modelCalls": 1,
+          "observedCalls": 1,
+          "citations": [
+            1
+          ],
+          "usage": {
+            "input": 1009,
+            "output": 32,
+            "totalTokens": 1041
+          },
+          "boundary": "real AgentSession and HTTP/stream observer; local scripted provider; usage declared from fixture token estimates, not billed provider usage"
+        },
+        "modelCalls": 5,
+        "researchModelCalls": 4,
+        "externalModelCalls": 0,
+        "toolCalls": 8,
+        "tokens": {
+          "measuredProviderUsage": {
+            "input": 1009,
+            "output": 32,
+            "totalTokens": 1041
+          },
+          "usageBoundary": "real AgentSession and HTTP/stream observer; local scripted provider; usage declared from fixture token estimates, not billed provider usage",
+          "estimatedPromptTokens": 5063,
+          "finalContextTokens": 1009
+        },
+        "modelBoundary": "deterministic scripted model; real Engine, Agent tools, SQLite, receipts, manifests and cleanup"
+      },
+      "exact": false,
+      "citationCount": 2,
+      "validCitations": 2
+    },
+    {
+      "name": "repeated-fact",
+      "status": "completed",
+      "metrics": {
+        "requiredNeedCompletionRate": 1,
+        "citationValidityRate": 1,
+        "conflictDetectionRate": null,
+        "counterEvidenceCheckRate": 1,
+        "coverageRatio": 1,
+        "unavailableUnitCount": 0,
+        "researchRounds": 1,
+        "searchCalls": 1,
+        "readCalls": 1,
+        "delegatedAgents": 1
+      },
+      "telemetry": {
+        "timeToFirstResearchAction": 1.8584899999996196,
+        "totalMs": 89.24864499999967,
+        "roundDurationsMs": [
+          {
+            "round": 0,
+            "durationMs": 69
+          }
+        ],
+        "modelTurns": [
+          {
+            "role": "worker",
+            "surface": "knowledge_completeness_worker",
+            "durationMs": 30.37189000000035,
+            "estimatedInputTokens": 270
+          },
+          {
+            "role": "root",
+            "surface": "knowledge_research_root",
+            "durationMs": 62.24221900000066,
+            "estimatedInputTokens": 1173
+          }
+        ],
+        "workerDurationsMs": [
+          30.37189000000035
+        ],
+        "searches": [
+          {
+            "durationMs": 4.532462999999552,
+            "query": "登记"
+          }
+        ],
+        "reads": [
+          {
+            "name": "knowledge_coverage_read",
+            "durationMs": 7.175458000000617
+          }
+        ],
+        "finalContextAssemblyMs": 1.2848299999996016,
+        "finalSynthesisMs": 26.033339000000524,
+        "finalSynthesisStatus": "measured_loopback_provider",
+        "finalSynthesis": {
+          "durationMs": 26.033339000000524,
+          "modelCalls": 1,
+          "observedCalls": 1,
+          "citations": [
+            1
+          ],
+          "usage": {
+            "input": 1193,
+            "output": 16,
+            "totalTokens": 1209
+          },
+          "boundary": "real AgentSession and HTTP/stream observer; local scripted provider; usage declared from fixture token estimates, not billed provider usage"
+        },
+        "modelCalls": 3,
+        "researchModelCalls": 2,
+        "externalModelCalls": 0,
+        "toolCalls": 6,
+        "tokens": {
+          "measuredProviderUsage": {
+            "input": 1193,
+            "output": 16,
+            "totalTokens": 1209
+          },
+          "usageBoundary": "real AgentSession and HTTP/stream observer; local scripted provider; usage declared from fixture token estimates, not billed provider usage",
+          "estimatedPromptTokens": 1443,
+          "finalContextTokens": 1193
+        },
+        "modelBoundary": "deterministic scripted model; real Engine, Agent tools, SQLite, receipts, manifests and cleanup"
+      },
+      "exact": true,
+      "citationCount": 4,
+      "validCitations": 4
+    },
+    {
+      "name": "within-source-conflict",
+      "status": "partial",
+      "metrics": {
+        "requiredNeedCompletionRate": 0,
+        "citationValidityRate": 1,
+        "conflictDetectionRate": 1,
+        "counterEvidenceCheckRate": 1,
+        "coverageRatio": 1,
+        "unavailableUnitCount": 0,
+        "researchRounds": 3,
+        "searchCalls": 1,
+        "readCalls": 1,
+        "delegatedAgents": 1
+      },
+      "telemetry": {
+        "timeToFirstResearchAction": 1.7595060000003286,
+        "totalMs": 135.30071400000088,
+        "roundDurationsMs": [
+          {
+            "round": 0,
+            "durationMs": 65
+          },
+          {
+            "round": 1,
+            "durationMs": 18
+          },
+          {
+            "round": 2,
+            "durationMs": 18
+          }
+        ],
+        "modelTurns": [
+          {
+            "role": "worker",
+            "surface": "knowledge_completeness_worker",
+            "durationMs": 28.253004000000146,
+            "estimatedInputTokens": 281
+          },
+          {
+            "role": "root",
+            "surface": "knowledge_research_root",
+            "durationMs": 58.75061899999946,
+            "estimatedInputTokens": 1178
+          },
+          {
+            "role": "root",
+            "surface": "knowledge_research_root",
+            "durationMs": 8.97196200000053,
+            "estimatedInputTokens": 1952
+          },
+          {
+            "role": "root",
+            "surface": "knowledge_research_root",
+            "durationMs": 8.789491999999882,
+            "estimatedInputTokens": 1952
+          }
+        ],
+        "workerDurationsMs": [
+          28.253004000000146
+        ],
+        "searches": [
+          {
+            "durationMs": 4.53197100000034,
+            "query": "预算"
+          }
+        ],
+        "reads": [
+          {
+            "name": "knowledge_coverage_read",
+            "durationMs": 6.952672000000348
+          }
+        ],
+        "finalContextAssemblyMs": 1.2362980000007155,
+        "finalSynthesisMs": 8.943579999999201,
+        "finalSynthesisStatus": "measured_loopback_provider",
+        "finalSynthesis": {
+          "durationMs": 8.943579999999201,
+          "modelCalls": 1,
+          "observedCalls": 1,
+          "citations": [
+            1
+          ],
+          "usage": {
+            "input": 1216,
+            "output": 32,
+            "totalTokens": 1248
+          },
+          "boundary": "real AgentSession and HTTP/stream observer; local scripted provider; usage declared from fixture token estimates, not billed provider usage"
+        },
+        "modelCalls": 5,
+        "researchModelCalls": 4,
+        "externalModelCalls": 0,
+        "toolCalls": 8,
+        "tokens": {
+          "measuredProviderUsage": {
+            "input": 1216,
+            "output": 32,
+            "totalTokens": 1248
+          },
+          "usageBoundary": "real AgentSession and HTTP/stream observer; local scripted provider; usage declared from fixture token estimates, not billed provider usage",
+          "estimatedPromptTokens": 5363,
+          "finalContextTokens": 1216
+        },
+        "modelBoundary": "deterministic scripted model; real Engine, Agent tools, SQLite, receipts, manifests and cleanup"
+      },
+      "exact": true,
+      "citationCount": 4,
+      "validCitations": 4
+    }
+  ]
+}

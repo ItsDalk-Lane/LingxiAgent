@@ -2,28 +2,31 @@
   {
     "name": "typecheck",
     "command": "npm run typecheck",
-    "startedAt": "2026-09-04T07:20:11.870Z",
-    "finishedAt": "2026-09-04T07:20:38.276Z",
-    "durationMs": 26403.817042000002,
+    "startedAt": "2026-09-04T10:33:52.211976+00:00",
+    "finishedAt": "2026-09-04T10:34:14.295314+00:00",
+    "durationMs": 22083.04970897734,
     "exitCode": 0,
-    "log": "/tmp/lingxi-knowledge-p307-final-typecheck.log"
+    "log": "/tmp/lingxi-knowledge-p307-probe-typecheck.log",
+    "sourceSha": "61ae60d1afe4f878ae638ff4de96d7e4f30bfefe"
   },
   {
     "name": "lint",
+    "sourceSha": "61ae60d1afe4f878ae638ff4de96d7e4f30bfefe",
     "command": "npm run lint",
-    "startedAt": "2026-09-04T07:20:38.277Z",
-    "finishedAt": "2026-09-04T07:20:55.774Z",
-    "durationMs": 17497.358249999997,
+    "startedAt": "2026-09-04T10:35:42.769950+00:00",
+    "finishedAt": "2026-09-04T10:35:57.364344+00:00",
+    "durationMs": 14594.147958909161,
     "exitCode": 0,
-    "log": "/tmp/lingxi-knowledge-p307-final-lint.log"
+    "log": "/tmp/lingxi-knowledge-p307-source61a-lint.log"
   },
   {
+    "round": 2,
     "name": "boundary",
     "command": "npm run lint:boundary",
-    "startedAt": "2026-09-04T07:20:55.775Z",
-    "finishedAt": "2026-09-04T07:20:56.672Z",
-    "durationMs": 897.4737499999974,
+    "startedAt": "2026-09-04T10:35:31.438Z",
+    "durationMs": 786.1437500000029,
     "exitCode": 0,
-    "log": "/tmp/lingxi-knowledge-p307-final-boundary.log"
+    "log": "/tmp/lingxi-knowledge-p307-source61a-generator-2-boundary.log",
+    "sourceSha": "61ae60d1afe4f878ae638ff4de96d7e4f30bfefe"
   }
 ]

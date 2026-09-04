@@ -1,0 +1,579 @@
+{
+  "schemaVersion": 2,
+  "seed": 439041101,
+  "dimensions": 64,
+  "latentDimensions": 16,
+  "topK": 10,
+  "cpu": "AMD EPYC 7763 64-Core Processor",
+  "memoryBytes": 16766414848,
+  "osRelease": "6.17.0-1022-azure",
+  "dataset": "fixed uniform latent vectors projected and normalized; independent queries; synthetic, not provider embeddings",
+  "coldDefinition": "new backend and first native graph load plus query; portable DB stays open; OS cache is not flushed",
+  "platform": "linux",
+  "arch": "x64",
+  "node": "v24.15.0",
+  "generatedAt": "2026-09-04T10:50:06.299Z",
+  "wallClockGatesEnforced": true,
+  "results": [
+    {
+      "size": 10000,
+      "indexBuildMs": 1153.5782,
+      "indexFileBytes": 4045332,
+      "coldLoadMs": {
+        "P50": 24.627568999999994,
+        "P95": 34.81657199999995,
+        "P99": 34.81657199999995
+      },
+      "coldSamplesMs": [
+        34.81657199999995,
+        24.627568999999994,
+        24.211483000000044
+      ],
+      "exactMs": {
+        "P50": 30.239458000000013,
+        "P95": 40.36890799999992,
+        "P99": 57.27826699999969
+      },
+      "hnswMs": {
+        "P50": 0.9802400000003217,
+        "P95": 1.5883050000002186,
+        "P99": 1.771436999999878
+      },
+      "sectionExactMs": {
+        "P50": 0.4078909999998359,
+        "P95": 0.6791680000001179,
+        "P99": 2.5328689999998915
+      },
+      "sectionChunkCount": 64,
+      "warmSearchMs": {
+        "P50": 0.9802400000003217,
+        "P95": 1.5883050000002186,
+        "P99": 1.771436999999878
+      },
+      "speedupP95": 25.416345097443102,
+      "topKOverlap": 1,
+      "samples": [
+        {
+          "exactMs": 45.90909099999999,
+          "hnswMs": 1.1196199999999408,
+          "overlap": 1,
+          "sectionExactMs": 0.502819000000045
+        },
+        {
+          "exactMs": 31.942747000000054,
+          "hnswMs": 1.11659399999985,
+          "overlap": 1,
+          "sectionExactMs": 0.5043719999998757
+        },
+        {
+          "exactMs": 38.43053899999995,
+          "hnswMs": 1.1418109999999615,
+          "overlap": 1,
+          "sectionExactMs": 0.40431499999999687
+        },
+        {
+          "exactMs": 35.08279900000002,
+          "hnswMs": 1.0609000000001743,
+          "overlap": 1,
+          "sectionExactMs": 0.47318300000006275
+        },
+        {
+          "exactMs": 35.5621450000001,
+          "hnswMs": 1.2480599999998958,
+          "overlap": 1,
+          "sectionExactMs": 0.4243229999999585
+        },
+        {
+          "exactMs": 29.0099909999999,
+          "hnswMs": 1.0683939999998984,
+          "overlap": 1,
+          "sectionExactMs": 2.5328689999998915
+        },
+        {
+          "exactMs": 31.978183000000172,
+          "hnswMs": 1.027569000000085,
+          "overlap": 1,
+          "sectionExactMs": 0.5469009999999344
+        },
+        {
+          "exactMs": 32.97298999999998,
+          "hnswMs": 1.1553069999999934,
+          "overlap": 1,
+          "sectionExactMs": 0.42986199999995733
+        },
+        {
+          "exactMs": 28.73161099999993,
+          "hnswMs": 1.156158000000005,
+          "overlap": 1,
+          "sectionExactMs": 0.37288600000010774
+        },
+        {
+          "exactMs": 40.36890799999992,
+          "hnswMs": 1.0453319999999167,
+          "overlap": 1,
+          "sectionExactMs": 0.3917710000000625
+        },
+        {
+          "exactMs": 28.58999700000004,
+          "hnswMs": 0.8339169999999285,
+          "overlap": 1,
+          "sectionExactMs": 0.44487099999992097
+        },
+        {
+          "exactMs": 37.03311000000008,
+          "hnswMs": 0.9592610000001969,
+          "overlap": 1,
+          "sectionExactMs": 0.4201639999998861
+        },
+        {
+          "exactMs": 38.574908999999934,
+          "hnswMs": 0.9620560000000751,
+          "overlap": 1,
+          "sectionExactMs": 0.4141730000001189
+        },
+        {
+          "exactMs": 37.731330999999955,
+          "hnswMs": 1.0482469999997193,
+          "overlap": 1,
+          "sectionExactMs": 0.4473950000001423
+        },
+        {
+          "exactMs": 30.288117000000057,
+          "hnswMs": 0.9794879999999466,
+          "overlap": 1,
+          "sectionExactMs": 0.43086399999992864
+        },
+        {
+          "exactMs": 36.30431899999985,
+          "hnswMs": 0.980569999999716,
+          "overlap": 1,
+          "sectionExactMs": 0.4265970000001289
+        },
+        {
+          "exactMs": 57.27826699999969,
+          "hnswMs": 1.771436999999878,
+          "overlap": 1,
+          "sectionExactMs": 0.4420549999999821
+        },
+        {
+          "exactMs": 28.82393400000001,
+          "hnswMs": 0.9791680000002998,
+          "overlap": 1,
+          "sectionExactMs": 0.3818630000000667
+        },
+        {
+          "exactMs": 28.36003800000026,
+          "hnswMs": 0.9283030000001418,
+          "overlap": 1,
+          "sectionExactMs": 0.39983600000005026
+        },
+        {
+          "exactMs": 28.524295000000166,
+          "hnswMs": 0.9962800000002972,
+          "overlap": 1,
+          "sectionExactMs": 0.42254800000000614
+        },
+        {
+          "exactMs": 28.495540999999776,
+          "hnswMs": 0.9056510000000344,
+          "overlap": 1,
+          "sectionExactMs": 0.3638900000000831
+        },
+        {
+          "exactMs": 36.29142499999989,
+          "hnswMs": 1.0758179999997992,
+          "overlap": 1,
+          "sectionExactMs": 0.39885499999991225
+        },
+        {
+          "exactMs": 28.688664000000244,
+          "hnswMs": 0.8787309999997888,
+          "overlap": 1,
+          "sectionExactMs": 0.3600219999998444
+        },
+        {
+          "exactMs": 28.179831000000377,
+          "hnswMs": 0.8509079999998903,
+          "overlap": 1,
+          "sectionExactMs": 0.3824640000002546
+        },
+        {
+          "exactMs": 36.28386099999989,
+          "hnswMs": 1.4787610000003042,
+          "overlap": 1,
+          "sectionExactMs": 0.4046250000001237
+        },
+        {
+          "exactMs": 28.49915800000008,
+          "hnswMs": 1.169213000000127,
+          "overlap": 1,
+          "sectionExactMs": 0.5411810000000514
+        },
+        {
+          "exactMs": 29.521795999999995,
+          "hnswMs": 0.9663840000002892,
+          "overlap": 1,
+          "sectionExactMs": 0.3746399999999994
+        },
+        {
+          "exactMs": 28.543901000000005,
+          "hnswMs": 0.9476989999998295,
+          "overlap": 1,
+          "sectionExactMs": 0.3599020000001474
+        },
+        {
+          "exactMs": 37.96963100000039,
+          "hnswMs": 0.9802400000003217,
+          "overlap": 1,
+          "sectionExactMs": 0.40754100000003746
+        },
+        {
+          "exactMs": 29.136339000000135,
+          "hnswMs": 0.8880779999999504,
+          "overlap": 1,
+          "sectionExactMs": 0.3884250000000975
+        },
+        {
+          "exactMs": 28.359097999999904,
+          "hnswMs": 0.8387760000000526,
+          "overlap": 1,
+          "sectionExactMs": 0.36499200000025667
+        },
+        {
+          "exactMs": 33.89597599999979,
+          "hnswMs": 1.5883050000002186,
+          "overlap": 1,
+          "sectionExactMs": 0.6984240000001591
+        },
+        {
+          "exactMs": 29.3419829999998,
+          "hnswMs": 0.9675959999999577,
+          "overlap": 1,
+          "sectionExactMs": 0.3822840000002543
+        },
+        {
+          "exactMs": 28.38171999999986,
+          "hnswMs": 0.884972000000289,
+          "overlap": 1,
+          "sectionExactMs": 0.3522280000001956
+        },
+        {
+          "exactMs": 28.25259899999992,
+          "hnswMs": 0.8799320000002808,
+          "overlap": 1,
+          "sectionExactMs": 0.3785560000001169
+        },
+        {
+          "exactMs": 38.675608999999895,
+          "hnswMs": 1.0741060000000289,
+          "overlap": 1,
+          "sectionExactMs": 0.428990999999769
+        },
+        {
+          "exactMs": 29.28389399999969,
+          "hnswMs": 0.9470179999998436,
+          "overlap": 1,
+          "sectionExactMs": 0.4086230000002615
+        },
+        {
+          "exactMs": 28.601509999999962,
+          "hnswMs": 0.9323599999997896,
+          "overlap": 1,
+          "sectionExactMs": 0.4078909999998359
+        },
+        {
+          "exactMs": 35.42587299999968,
+          "hnswMs": 1.6375279999997474,
+          "overlap": 1,
+          "sectionExactMs": 0.6791680000001179
+        },
+        {
+          "exactMs": 30.239458000000013,
+          "hnswMs": 0.9790789999997287,
+          "overlap": 1,
+          "sectionExactMs": 0.3869119999999384
+        }
+      ]
+    },
+    {
+      "size": 100000,
+      "indexBuildMs": 16964.356694000002,
+      "indexFileBytes": 40448776,
+      "coldLoadMs": {
+        "P50": 238.23906100000022,
+        "P95": 255.4943400000011,
+        "P99": 255.4943400000011
+      },
+      "coldSamplesMs": [
+        238.23906100000022,
+        225.13800899999842,
+        255.4943400000011
+      ],
+      "exactMs": {
+        "P50": 354.90545199999906,
+        "P95": 404.39248399999633,
+        "P99": 431.174665999999
+      },
+      "hnswMs": {
+        "P50": 5.9423360000000685,
+        "P95": 6.053622999999789,
+        "P99": 6.265257999999449
+      },
+      "sectionExactMs": {
+        "P50": 0.5419110000002547,
+        "P95": 0.8706860000020242,
+        "P99": 1.008352000000741
+      },
+      "sectionChunkCount": 64,
+      "warmSearchMs": {
+        "P50": 5.9423360000000685,
+        "P95": 6.053622999999789,
+        "P99": 6.265257999999449
+      },
+      "speedupP95": 66.80172914633278,
+      "topKOverlap": 0.9974999999999999,
+      "samples": [
+        {
+          "exactMs": 430.9031739999991,
+          "hnswMs": 6.037193000000116,
+          "overlap": 1,
+          "sectionExactMs": 0.5979670000015176
+        },
+        {
+          "exactMs": 382.60758599999826,
+          "hnswMs": 5.962413000001106,
+          "overlap": 1,
+          "sectionExactMs": 0.5514299999995274
+        },
+        {
+          "exactMs": 394.53400500000134,
+          "hnswMs": 5.967713000001822,
+          "overlap": 1,
+          "sectionExactMs": 0.5419110000002547
+        },
+        {
+          "exactMs": 431.174665999999,
+          "hnswMs": 6.010933000001387,
+          "overlap": 1,
+          "sectionExactMs": 0.6292859999994107
+        },
+        {
+          "exactMs": 347.6252339999992,
+          "hnswMs": 5.890058000000863,
+          "overlap": 1,
+          "sectionExactMs": 0.5384349999985716
+        },
+        {
+          "exactMs": 378.949945999997,
+          "hnswMs": 6.265257999999449,
+          "overlap": 1,
+          "sectionExactMs": 0.6265610000009474
+        },
+        {
+          "exactMs": 347.77481700000135,
+          "hnswMs": 5.940392000000429,
+          "overlap": 1,
+          "sectionExactMs": 0.5346279999976105
+        },
+        {
+          "exactMs": 351.1498879999999,
+          "hnswMs": 5.947165000001405,
+          "overlap": 1,
+          "sectionExactMs": 0.49900199999683537
+        },
+        {
+          "exactMs": 404.17812299999787,
+          "hnswMs": 6.053622999999789,
+          "overlap": 1,
+          "sectionExactMs": 0.5919859999994515
+        },
+        {
+          "exactMs": 351.55804999999964,
+          "hnswMs": 5.942425999997795,
+          "overlap": 1,
+          "sectionExactMs": 0.4920289999972738
+        },
+        {
+          "exactMs": 379.8070570000018,
+          "hnswMs": 5.976749000001291,
+          "overlap": 1,
+          "sectionExactMs": 0.7072709999993094
+        },
+        {
+          "exactMs": 345.5932439999997,
+          "hnswMs": 6.0156129999995755,
+          "overlap": 1,
+          "sectionExactMs": 0.5279859999973269
+        },
+        {
+          "exactMs": 354.90545199999906,
+          "hnswMs": 5.908233000001928,
+          "overlap": 1,
+          "sectionExactMs": 0.5319319999980507
+        },
+        {
+          "exactMs": 400.2277650000033,
+          "hnswMs": 5.852447999997821,
+          "overlap": 1,
+          "sectionExactMs": 0.5690209999993385
+        },
+        {
+          "exactMs": 352.9783239999997,
+          "hnswMs": 5.860203000000183,
+          "overlap": 1,
+          "sectionExactMs": 0.5285760000006121
+        },
+        {
+          "exactMs": 380.44241200000033,
+          "hnswMs": 6.00052499999947,
+          "overlap": 1,
+          "sectionExactMs": 0.6793980000002193
+        },
+        {
+          "exactMs": 348.5742680000003,
+          "hnswMs": 5.723387999998522,
+          "overlap": 1,
+          "sectionExactMs": 0.5423219999975117
+        },
+        {
+          "exactMs": 350.5527890000012,
+          "hnswMs": 5.836929000000964,
+          "overlap": 1,
+          "sectionExactMs": 0.5292980000012903
+        },
+        {
+          "exactMs": 401.0140309999988,
+          "hnswMs": 5.928219999997964,
+          "overlap": 1,
+          "sectionExactMs": 0.8505660000009811
+        },
+        {
+          "exactMs": 357.1493359999986,
+          "hnswMs": 5.9423360000000685,
+          "overlap": 1,
+          "sectionExactMs": 0.4853259999981674
+        },
+        {
+          "exactMs": 382.1602979999989,
+          "hnswMs": 6.000184000000445,
+          "overlap": 1,
+          "sectionExactMs": 0.8597440000012284
+        },
+        {
+          "exactMs": 346.8495600000024,
+          "hnswMs": 5.889717999998538,
+          "overlap": 1,
+          "sectionExactMs": 0.5287570000000414
+        },
+        {
+          "exactMs": 353.8227189999998,
+          "hnswMs": 5.943407999999181,
+          "overlap": 1,
+          "sectionExactMs": 0.5228060000008554
+        },
+        {
+          "exactMs": 398.457359,
+          "hnswMs": 5.98718000000008,
+          "overlap": 0.9,
+          "sectionExactMs": 0.6375890000017534
+        },
+        {
+          "exactMs": 354.3903859999991,
+          "hnswMs": 5.830035999999382,
+          "overlap": 1,
+          "sectionExactMs": 0.5206819999984873
+        },
+        {
+          "exactMs": 383.53616500000135,
+          "hnswMs": 6.101622000001953,
+          "overlap": 1,
+          "sectionExactMs": 1.008352000000741
+        },
+        {
+          "exactMs": 347.5348809999996,
+          "hnswMs": 5.981158000002324,
+          "overlap": 1,
+          "sectionExactMs": 0.5157130000006873
+        },
+        {
+          "exactMs": 350.25185799999963,
+          "hnswMs": 5.789178999999422,
+          "overlap": 1,
+          "sectionExactMs": 0.48332299999674433
+        },
+        {
+          "exactMs": 403.91052899999704,
+          "hnswMs": 5.855673999998544,
+          "overlap": 1,
+          "sectionExactMs": 0.6425600000002305
+        },
+        {
+          "exactMs": 355.9290570000012,
+          "hnswMs": 5.898833999999624,
+          "overlap": 1,
+          "sectionExactMs": 0.5159730000013951
+        },
+        {
+          "exactMs": 380.93615000000136,
+          "hnswMs": 6.024789999995846,
+          "overlap": 1,
+          "sectionExactMs": 0.8706860000020242
+        },
+        {
+          "exactMs": 347.116571999999,
+          "hnswMs": 5.9779819999967,
+          "overlap": 1,
+          "sectionExactMs": 0.5439059999989695
+        },
+        {
+          "exactMs": 350.36207999999897,
+          "hnswMs": 5.8469780000014,
+          "overlap": 1,
+          "sectionExactMs": 0.47446599999966566
+        },
+        {
+          "exactMs": 399.88656400000036,
+          "hnswMs": 5.8891660000008414,
+          "overlap": 1,
+          "sectionExactMs": 0.8727690000014263
+        },
+        {
+          "exactMs": 351.80044199999975,
+          "hnswMs": 5.876774000003934,
+          "overlap": 1,
+          "sectionExactMs": 0.4837630000038189
+        },
+        {
+          "exactMs": 392.06444300000294,
+          "hnswMs": 6.0147109999961685,
+          "overlap": 1,
+          "sectionExactMs": 0.6466569999975036
+        },
+        {
+          "exactMs": 347.19161399999575,
+          "hnswMs": 5.905928000000131,
+          "overlap": 1,
+          "sectionExactMs": 0.5427730000010342
+        },
+        {
+          "exactMs": 349.4497730000003,
+          "hnswMs": 5.82882399999653,
+          "overlap": 1,
+          "sectionExactMs": 0.4862780000039493
+        },
+        {
+          "exactMs": 404.39248399999633,
+          "hnswMs": 5.957944000001589,
+          "overlap": 1,
+          "sectionExactMs": 0.6168820000020787
+        },
+        {
+          "exactMs": 354.155749000005,
+          "hnswMs": 5.798376000006101,
+          "overlap": 1,
+          "sectionExactMs": 0.5201909999959753
+        }
+      ]
+    }
+  ]
+}

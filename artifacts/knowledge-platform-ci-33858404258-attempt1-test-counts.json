@@ -1,0 +1,22 @@
+{
+  "runId": 33858404258,
+  "headSha": "842477183a4a295291d808497a564141642d7d13",
+  "source": "gh run view 33858404258 --log",
+  "lines": [
+    "quality-gate\tRun full test suite\t2026-09-04T09:46:39.3519561Z  Test Files  1357 passed | 1 skipped (1358)",
+    "quality-gate\tRun full test suite\t2026-09-04T09:46:39.3587050Z       Tests  13736 passed | 17 skipped (13753)",
+    "quality-gate\tRun full test suite\t2026-09-04T09:46:39.3603488Z    Duration  634.18s (transform 45.99s, setup 18.42s, import 636.94s, tests 771.00s, environment 236.25s)",
+    "build (windows-2025, win32, nsis, x64)\tRun Knowledge platform smoke\t2026-09-04T09:45:21.3447841Z  Test Files  19 passed (19)",
+    "build (windows-2025, win32, nsis, x64)\tRun Knowledge platform smoke\t2026-09-04T09:45:21.3449068Z       Tests  151 passed (151)",
+    "build (windows-2025, win32, nsis, x64)\tRun Knowledge platform smoke\t2026-09-04T09:45:21.3452442Z    Duration  83.40s (transform 6.02s, setup 263ms, import 28.49s, tests 51.42s, environment 2ms)",
+    "build (macos-15, darwin, dmg, arm64)\tRun Knowledge platform smoke\t2026-09-04T09:44:30.0769000Z  Test Files  19 passed (19)",
+    "build (macos-15, darwin, dmg, arm64)\tRun Knowledge platform smoke\t2026-09-04T09:44:30.0782530Z       Tests  151 passed (151)",
+    "build (macos-15, darwin, dmg, arm64)\tRun Knowledge platform smoke\t2026-09-04T09:44:30.0785670Z    Duration  45.75s (transform 5.26s, setup 189ms, import 24.19s, tests 19.11s, environment 1ms)",
+    "build (ubuntu-24.04, linux, AppImage, x64)\tRun Knowledge platform smoke\t2026-09-04T09:44:11.6626849Z  Test Files  19 passed (19)",
+    "build (ubuntu-24.04, linux, AppImage, x64)\tRun Knowledge platform smoke\t2026-09-04T09:44:11.6627494Z       Tests  151 passed (151)",
+    "build (ubuntu-24.04, linux, AppImage, x64)\tRun Knowledge platform smoke\t2026-09-04T09:44:11.6628680Z    Duration  43.93s (transform 2.54s, setup 118ms, import 10.80s, tests 31.59s, environment 1ms)",
+    "build (macos-15-intel, darwin, dmg, x64)\tRun Knowledge platform smoke\t2026-09-04T09:46:57.1448060Z  Test Files  19 passed (19)",
+    "build (macos-15-intel, darwin, dmg, x64)\tRun Knowledge platform smoke\t2026-09-04T09:46:57.1477940Z       Tests  151 passed (151)",
+    "build (macos-15-intel, darwin, dmg, x64)\tRun Knowledge platform smoke\t2026-09-04T09:46:57.1583280Z    Duration  90.17s (transform 8.67s, setup 423ms, import 45.88s, tests 38.87s, environment 3ms)"
+  ]
+}

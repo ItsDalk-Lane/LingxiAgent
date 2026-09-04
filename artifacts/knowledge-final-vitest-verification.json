@@ -1,0 +1,14 @@
+{
+  "name": "full",
+  "sourceSha": "61ae60d1afe4f878ae638ff4de96d7e4f30bfefe",
+  "command": "npm test",
+  "startedAt": "2026-09-04T10:35:57.364722+00:00",
+  "finishedAt": "2026-09-04T10:37:16.597060+00:00",
+  "durationMs": 79231.71804205049,
+  "exitCode": 0,
+  "log": "/tmp/lingxi-knowledge-p307-source61a-full.log",
+  "passed": 13751,
+  "failed": 0,
+  "skipped": 7,
+  "vitestDurationSeconds": 78.81
+}

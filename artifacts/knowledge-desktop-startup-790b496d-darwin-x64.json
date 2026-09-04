@@ -1,18 +1,19 @@
 {
   "platform": "darwin",
-  "arch": "arm64",
-  "startedAt": "2026-09-04T10:34:14.855Z",
+  "arch": "x64",
+  "startedAt": "2026-09-04T11:10:57.533Z",
   "status": "passed",
   "packaged": true,
   "rendererReady": true,
   "serverReady": true,
+  "rendererProbeTimeouts": 1,
   "renderer": {
     "ready": "complete",
     "textLength": 93,
     "controls": 7,
     "entryScreen": "onboarding"
   },
-  "durationMs": 8594.501917,
-  "finishedAt": "2026-09-04T10:34:23.450Z",
+  "durationMs": 48795.778992,
+  "finishedAt": "2026-09-04T11:11:46.333Z",
   "cleanupPassed": true
 }

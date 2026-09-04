@@ -1,7 +1,7 @@
 {
-  "platform": "darwin",
-  "arch": "arm64",
-  "startedAt": "2026-09-04T10:34:14.855Z",
+  "platform": "linux",
+  "arch": "x64",
+  "startedAt": "2026-09-04T10:56:07.604Z",
   "status": "passed",
   "packaged": true,
   "rendererReady": true,
@@ -12,7 +12,7 @@
     "controls": 7,
     "entryScreen": "onboarding"
   },
-  "durationMs": 8594.501917,
-  "finishedAt": "2026-09-04T10:34:23.450Z",
+  "durationMs": 16459.398312999998,
+  "finishedAt": "2026-09-04T10:56:24.065Z",
   "cleanupPassed": true
 }
