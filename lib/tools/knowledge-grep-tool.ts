@@ -22,6 +22,8 @@
  */
 import { Type } from "../pi-sdk/index.ts";
 import { isKnowledgeError, KnowledgeError } from "../knowledge/errors.ts";
+import { EvidenceReceiptService, type KnowledgeResearchToolContext } from "../knowledge/evidence-receipt-service.ts";
+import { ResearchStore } from "../knowledge/research/research-store.ts";
 import type { KnowledgeManager } from "../knowledge/knowledge-manager.ts";
 import type { KnowledgeBlock } from "../knowledge/types.ts";
 import {
@@ -66,6 +68,8 @@ export interface KnowledgeGrepToolDeps {
   getStudioId: () => string | null;
   /** 工具执行会话的 scope 归属上下文（与 knowledge_read 同一接线契约）。 */
   resolveSessionContext?: (ctx: unknown) => KnowledgeToolSessionContext;
+  /** 研究身份来自宿主；普通调用仍只返回原有扫描结果。 */
+  resolveResearchContext?: (ctx: unknown) => KnowledgeResearchToolContext | null;
 }
 
 function optionalTrimmedString(value: unknown, label: string, maxChars: number): string | null {
@@ -109,6 +113,9 @@ interface GrepMatchRecord {
   /** 命中点上下文片段（封顶截断）。 */
   snippet: string;
   headingPath: string[];
+  receiptId?: string;
+  receiptStartOffset?: number;
+  receiptEndOffset?: number;
 }
 
 function buildSnippet(text: string, offset: number, matchLength: number) {
@@ -152,7 +159,7 @@ export function createKnowledgeGrepTool(deps: KnowledgeGrepToolDeps) {
       })),
     }),
     sessionPermission: {
-      // 只读、无副作用：纯内存文本扫描，不产生写入、检索模型调用或外部请求。
+      // 只读原文；研究调用额外登记位置凭据，不修改资料、不调用检索模型或外部请求。
       resolveInvocation: () => ({
         action: "read",
         kind: "read",
@@ -222,6 +229,17 @@ export function createKnowledgeGrepTool(deps: KnowledgeGrepToolDeps) {
           parentSessionPath: null,
         };
         const scope = resolveKnowledgeTurnScope({ knowledge, studioId, scopeId, sessionContext });
+        const researchContext = deps.resolveResearchContext?.(ctx) ?? null;
+        const research = researchContext ? new ResearchStore(knowledge.store) : null;
+        if (research && researchContext) {
+          const run = research.requireRun(researchContext.runId);
+          if (run.turnScopeId !== scopeId || !["planning", "running", "synthesizing"].includes(run.status)
+            || (researchContext.allowedSourceIds !== undefined
+              && (!Array.isArray(researchContext.allowedSourceIds)
+                || researchContext.allowedSourceIds.some(id => !scope.sources.some(source => source.sourceId === id))))) {
+            throw knowledgeScopeViolation("Knowledge grep is outside the research scope");
+          }
+        }
 
         // sourceIds 全量在 scope 冻结集合内才放行；任一越权整单拒绝（§二十二）。
         let requestedSourceIds: string[] | null = null;
@@ -234,13 +252,17 @@ export function createKnowledgeGrepTool(deps: KnowledgeGrepToolDeps) {
           for (const sourceId of requestedSourceIds) {
             // 越权即抛 KNOWLEDGE_SCOPE_VIOLATION（服务端复核冻结集合）。
             requireKnowledgeScopeSource(scope, sourceId);
+            if (researchContext?.allowedSourceIds !== undefined && !researchContext.allowedSourceIds.includes(sourceId)) {
+              throw knowledgeScopeViolation("Knowledge grep source is outside the research worker scope");
+            }
           }
         }
         const frozenSources = requestedSourceIds
           ? requestedSourceIds
             .map(sourceId => scope.sources.find(frozen => frozen.sourceId === sourceId)!)
             .filter(frozen => frozen != null)
-          : scope.sources;
+          : scope.sources.filter(source => researchContext?.allowedSourceIds === undefined
+            || researchContext.allowedSourceIds.includes(source.sourceId));
 
         const matches: GrepMatchRecord[] = [];
         const readSpans: KnowledgeGrepReadSpan[] = [];
@@ -325,6 +347,23 @@ export function createKnowledgeGrepTool(deps: KnowledgeGrepToolDeps) {
         }
 
         const truncated = totalMatches > matches.length;
+        if (research && researchContext) {
+          _signal?.throwIfAborted();
+          const receipts = new EvidenceReceiptService(research);
+          research.transaction(() => {
+            for (const [index, span] of readSpans.entries()) {
+              const receipt = receipts.issue({ ...researchContext, ...span, channel: "knowledge_grep" });
+              const { text } = receipts.read({ runId: researchContext.runId, receiptId: receipt.id,
+                allowedSourceIds: researchContext.allowedSourceIds, actorSessionId: researchContext.actorSessionId });
+              if (text !== span.canonicalText) {
+                throw new KnowledgeError("KNOWLEDGE_STORAGE_INVALID", "Research grep result no longer matches frozen text");
+              }
+              matches[index].receiptId = receipt.id;
+              matches[index].receiptStartOffset = receipt.startOffset;
+              matches[index].receiptEndOffset = receipt.endOffset;
+            }
+          });
+        }
         return toolOk(JSON.stringify({
           scopeId,
           mode: useRegexp ? "regexp" : "literal",

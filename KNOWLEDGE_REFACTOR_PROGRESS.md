@@ -10,7 +10,7 @@
 - 严格按 P0 → P1 → P2 → P3 及编号顺序；阶段门禁全部通过才进入下一阶段。
 - 每项记录测试原始结果后提交；不删除、跳过或放宽测试，不合并 main。
 - 现有任务书为用户未跟踪文件，既有规划文档与 BLOCKED.md 历史记录保留。
-- 当前断点：P1-01 至 P1-08 已完成，阶段收口 `23873985`、审计 `333c5112`，本地与四平台门禁全部通过；P2-01 已完成并提交 `c3033b05`；P2-02 数据库迁移及约束验证已通过，正在提交；下一项为 P2-03。P0 源码提交 `5c016df183ad207cf1ca33de274abb7a4eb10057`，阶段审计提交 `f9928d76`；全量 13002 PASS / 0 FAIL / 7 既有 SKIP。用户已授权每阶段验证后同步审计记录，保留最终封印。
+- 当前断点：P1-01 至 P1-08 已完成，阶段收口 `23873985`、审计 `333c5112`，本地与四平台门禁全部通过；P2-01 已完成并提交 `c3033b05`；P2-02 已提交 `c729f68a`；P2-03 已通过本项验证，正在提交；下一项 P2-04。P0 源码提交 `5c016df183ad207cf1ca33de274abb7a4eb10057`，阶段审计提交 `f9928d76`；全量 13002 PASS / 0 FAIL / 7 既有 SKIP。用户已授权每阶段验证后同步审计记录，保留最终封印。
 - 进度、计划与事实集中在本文件和基线文档，避免覆盖既有 task_plan.md / findings.md / PROGRESS.md。
 - 目标工具已确认本任务存在 active goal；重复 create_goal 被拒绝，沿用现有目标。
 - 规划恢复脚本返回其他会话的无关配置记录，经 git diff 为空核对，未采用其内容。
@@ -21,7 +21,7 @@
 | --- | --- | --- |
 | P0 | completed | 2026-09-04 全量 13002 PASS / 0 FAIL / 7 既有 SKIP，76.42s；全部 P0 门禁通过，审计提交 f9928d76 |
 | P1 | completed | P1-01 至 P1-08 完成；本地全量和第三轮四平台 Build 33829055797 全部通过，阶段审计 333c5112 |
-| P2 | in_progress | P2-01、P2-02 已完成；P2-03 及后续任务、阶段门禁待执行 |
+| P2 | in_progress | P2-01 至 P2-03 已完成；P2-04 及后续任务、阶段门禁待执行 |
 | P3 | pending | NOT_EXECUTED |
 
 ## P0-00：建立基线与回归门禁
@@ -277,16 +277,19 @@
 - 测试命令：任务书指定 `knowledge-store-v18-migration`、`knowledge-research-store`、`persistence-schema-tripwire`，既有知识存储与生命周期回归；三套类型检查、修改文件 ESLint、持久化指纹生成检查及开放边界/闭包。
 - 已验证：真实 v17 fixture 来自 `c3033b05` 存储类，与该提交源码逐字节确认；18 张旧表、19 行合成数据，导出后独立恢复全表逐行一致。迁移首轮旧代码 3 FAIL / 2 PASS，v18 后 5 PASS，235ms，实际执行前三张新表后触发 SQLite DDL 错误，证实版本与全部旧表/数据回滚并可正常重试。数据库约束旧代码 16 FAIL；v18 首轮 15 PASS / 1 FAIL，发现摘要可附 NUL 隐藏尾巴；增加字符/字节双长度检查后扩展 17 PASS，398ms。未修改或放宽失败用例。
 - 生成物与整体复验：原 8 文件首轮 85 PASS / 4 FAIL（3.99s），四败均为指纹测试读到未同步的旧持久化清单；先按生成器更新清单，再重新生成指纹，并将现有精确版本断言更新到 18、增加七表断言。原 8 文件复跑 89 PASS / 0 FAIL / 0 SKIP，4.11s，exit 0；三套类型检查 exit 0；修改文件 ESLint 0 error / 76 既有 warning，新增版本测试单独 ESLint 0；开放边界保留原 1 条债务，闭包 10672 文件，开放导出 868 文件，均 exit 0。兼容迁移指纹 `sha256:cd0feeaaa9caa4800620293e2f2a5a3b52d1f22d3eec6d21efccc0d2b036066b`。日志 `/tmp/lingxi-knowledge-p202-{tests,tests-final,typecheck-final,lint,tripwire-lint,inventory,fingerprint-final,closure,boundary,export}.log`。未删、跳过或放宽测试。
-- 对应 commit SHA：待本项全部验证通过后提交
+- 对应 commit SHA：`c729f68aecced285138e98377748a3b77a6926e7`
 - 偏差：none
 
 ## P2-03：实现 Evidence Ledger
 
-- 状态：pending
-- 改动文件：尚未开始
-- 测试命令：按任务书该项测试执行，尚未执行
-- 测试结果：NOT_EXECUTED
-- 对应 commit SHA：尚未提交
+- 状态：completed
+- 改动文件：`lib/knowledge/research/evidence-ledger.ts`、`lib/knowledge/research/research-store.ts`、`lib/knowledge/research/research-stop-policy.ts`、`lib/knowledge/evidence-receipt-service.ts`、`lib/tools/knowledge-read-tool.ts`、`lib/tools/knowledge-grep-tool.ts`、`tests/knowledge-evidence-ledger.test.ts`、`tests/knowledge-evidence-quote-validation.test.ts`、`tests/knowledge-read-receipts.test.ts`、`tests/knowledge-research-store.test.ts`、`tests/helpers/knowledge-research-fixture.ts`、`export-manifest.json`、`build/cli-runtime-closure.json`、本进度文件。
+- 改动：实际阅读/扫描返回冻结原文时发位置与摘要凭据；入账复核身份链、摘要和精确引文，重复文字必须指定零基次数，最多 2000 字符。取证、关联、凭据消费和需求重算同事务；同一来源不同段落不增加独立来源数。支持、矛盾、不适用、反证检查与完整性均由宿主核算；显式新需求解释保留原反证；完整性执行器未提供证明时不能冒充完成。动作只保留白名单元数据；终态研究拒绝后续写入但可读历史；停止策略优先执行真实硬预算。普通工具调用保持兼容，生产研究会话接线按后续 P2-05 实施。
+- 测试命令：`npx vitest run tests/knowledge-evidence-ledger.test.ts tests/knowledge-evidence-quote-validation.test.ts tests/knowledge-read-receipts.test.ts tests/knowledge-research-store.test.ts tests/knowledge-read-tool.test.ts tests/knowledge-agent-tools.test.ts tests/persistence-schema-tripwire.test.ts`；三套 `npm run typecheck`；修改文件 ESLint；闭包、持久化清单/指纹和开放导出生成器；开放边界检查。
+- 测试结果：最终 7 文件 / 106 PASS / 0 FAIL / 0 SKIP，2.54s，exit 0。三套类型检查及最终测试类型检查 exit 0；ESLint 0 error，保留原工具 9 条 warning，新增测试的 4 处 any 已改为精确参数类型后复验零 warning。开放边界保留原 1 条债务，闭包 10675 文件、开放导出 872 文件均通过；v18 指纹仍为 `sha256:cd0feeaaa9caa4800620293e2f2a5a3b52d1f22d3eec6d21efccc0d2b036066b`，没有数据库结构改动。
+- 失败与修复：最初 Ledger/quote 联测 18 PASS / 1 FAIL 是测试误假定随机 ID 的关系排序等于插入顺序，改为同一确定排序后仍逐项核对全部来源；只读复核发现带检索错误的零命中会被误算反证完成，增加真实数据库用例得到 10 PASS / 1 FAIL，再修生产逻辑排除错误/失败/未完成动作。预算触顶优先部分停止以及四种研究终态拒绝全部后续写入均有新增验证。没有删除、跳过或放宽测试。
+- 证据：`/tmp/lingxi-knowledge-p203-{quote-first,ledger-first,ledger-counter-red,tests-first,tests-final,typecheck,test-typecheck-final,lint,test-lint-final,closure,inventory,fingerprint-final,boundary,export}.log`；新 research 目录被既有通用忽略规则命中，提交时仅精确纳入任务书规定的三个文件，未改忽略规则。
+- 对应 commit SHA：待本项提交后回填
 - 偏差：none
 
 ## P2-04：新增 Research 专用工具

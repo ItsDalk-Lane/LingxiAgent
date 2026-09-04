@@ -5,6 +5,7 @@ import path from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 
 import { KnowledgeStore } from "../lib/knowledge/knowledge-store.ts";
+import { ResearchStore } from "../lib/knowledge/research/research-store.ts";
 import { DEFAULT_KNOWLEDGE_RESEARCH_BUDGET } from "../shared/knowledge-research.ts";
 
 const TABLES = {
@@ -38,6 +39,160 @@ afterEach(() => {
   for (const root of roots.splice(0)) {
     fs.rmSync(root, { recursive: true, force: true, maxRetries: 10, retryDelay: 100 });
   }
+});
+
+describe("研究持久化门面与元数据纪律", () => {
+  function researchFixture() {
+    const data = fixture();
+    let clock = NOW, sequence = 0;
+    const research = new ResearchStore(data.store, { now: () => clock, idGenerator: prefix => `${prefix}-api-${++sequence}` });
+    const runInput = { turnScopeId: data.scope.id, turnId: data.scope.turnId,
+      parentSessionPath: data.scope.sessionPath, question: "什么时候交付？" };
+    const needInput = { claim: "确认交付时间", kind: "fact" as const, required: true,
+      minIndependentSources: 2, requireCounterEvidence: true, requireAllRelevantUnits: false };
+    return { ...data, research, runInput, needInput, advance: () => { clock = "2026-09-04T00:01:00.000Z"; } };
+  }
+
+  it("新运行持久化固定默认预算与身份，计数为零；拒绝额外提示字段和伪造范围身份", () => {
+    const { research, runInput } = researchFixture();
+    const run = research.createRun(runInput);
+    expect(run).toMatchObject({ ...runInput, status: "planning", completenessPolicy: "source_diverse",
+      budget: DEFAULT_KNOWLEDGE_RESEARCH_BUDGET, roundsCompleted: 0, toolCallsUsed: 0, searchCalls: 0,
+      readCalls: 0, grepCalls: 0, delegatedAgents: 0, stopReason: null, degradedReason: null, createdAt: NOW, completedAt: null });
+    expect(research.getRun(run.id)).toEqual(run);
+    expect(research.getRun("missing")).toBeNull();
+    expect(() => research.requireRun("missing")).toThrow(/not found/);
+    for (const extra of [{ turnId: "another-turn" }, { parentSessionPath: "/another-session" }, { turnScopeId: "missing" }]) {
+      expect(() => research.createRun({ ...runInput, ...extra })).toThrow(/frozen scope/);
+    }
+    expect(() => research.createRun({ ...runInput, systemPrompt: "不能存入提示" } as Parameters<ResearchStore["createRun"]>[0])).toThrow(/metadata is invalid/);
+    expect(() => research.createRun({ ...runInput, budget: { ...DEFAULT_KNOWLEDGE_RESEARCH_BUDGET, prompt: "不能存入提示" } as typeof DEFAULT_KNOWLEDGE_RESEARCH_BUDGET }))
+      .toThrow(/metadata is invalid/);
+  });
+
+  it("需求编号和初态由宿主生成，状态更新与外层事务保持原子性", () => {
+    const { research, needInput, advance } = researchFixture();
+    const need = research.createNeed("run-1", needInput);
+    expect(need).toMatchObject({ ...needInput, runId: "run-1", ordinal: 1, status: "uncovered", unresolvedGaps: [], createdAt: NOW });
+    expect(research.listNeeds("run-1").map(item => item.ordinal)).toEqual([0, 1]);
+    expect(() => research.createNeed("run-1", { ...needInput, status: "supported" } as Parameters<ResearchStore["createNeed"]>[1])).toThrow(/metadata is invalid/);
+    advance();
+    expect(research.setNeedState("run-1", need.id, { status: "partial", unresolvedGaps: ["仍需独立来源"] }))
+      .toMatchObject({ status: "partial", unresolvedGaps: ["仍需独立来源"], updatedAt: "2026-09-04T00:01:00.000Z" });
+    expect(() => research.transaction(() => {
+      research.createNeed("run-1", needInput);
+      research.setNeedState("run-1", need.id, { status: "supported", unresolvedGaps: [] });
+      throw new Error("验证宿主事务回滚");
+    })).toThrow("验证宿主事务回滚");
+    expect(research.listNeeds("run-1")).toHaveLength(2);
+    expect(research.getNeed("run-1", need.id).status).toBe("partial");
+    expect(() => research.getNeed("run-1", "missing")).toThrow(/not found/);
+  });
+
+  it("凭据写入核对冻结原文，消费保留首次时间且可反复复用", () => {
+    const { research, runInput, advance } = researchFixture();
+    const original = research.getReceipt("run-1", "receipt-1");
+    const receipt = research.insertReceipt({ ...original, id: "receipt-api" });
+    expect(receipt).toEqual({ ...original, id: "receipt-api" });
+    expect(JSON.stringify(receipt)).not.toContain(TEXT);
+    expect(research.consumeReceipt("run-1", receipt.id).consumedAt).toBe(NOW);
+    advance();
+    expect(research.consumeReceipt("run-1", receipt.id).consumedAt).toBe(NOW);
+    expect(() => research.insertReceipt({ ...original, id: "receipt-bad-hash", canonicalTextSha256: "b".repeat(64) })).toThrow(/metadata is invalid/);
+    expect(() => research.insertReceipt({ ...original, id: "receipt-body", canonicalText: TEXT } as Parameters<ResearchStore["insertReceipt"]>[0])).toThrow(/metadata is invalid/);
+    expect(() => research.insertReceipt({ ...original, id: "receipt-outside", sourceId: "outside" })).toThrow(/frozen scope/);
+    const another = research.createRun(runInput);
+    expect(() => research.getReceipt(another.id, receipt.id)).toThrow(/not found/);
+    expect(() => research.consumeReceipt(another.id, receipt.id)).toThrow(/not found/);
+  });
+
+  it("同位置证据复用旧编号，关联幂等且独立来源固定为原始 sourceId", () => {
+    const { research, runInput, needInput, source } = researchFixture();
+    const original = research.listEvidence("run-1")[0];
+    expect(research.putEvidence({ ...original, id: "same-span-new-id" })).toEqual(original);
+    expect(research.listEvidence("run-1")).toHaveLength(1);
+    const need = research.createNeed("run-1", needInput);
+    const relation = { needId: need.id, evidenceId: original.id, relation: "supports" as const,
+      rationale: "原文直接说明日期", sourceIndependenceKey: source.source.id, createdAt: NOW };
+    expect(research.linkEvidence(relation)).toEqual(relation);
+    expect(research.linkEvidence({ ...relation, rationale: "第二次调用仍复用首次记录" })).toEqual(relation);
+    expect(research.listRelations("run-1", need.id)).toEqual([relation]);
+    expect(() => research.linkEvidence({ ...relation, sourceIndependenceKey: "another-source" })).toThrow(/frozen scope/);
+    const otherNeed = research.createNeed(research.createRun(runInput).id, needInput);
+    expect(() => research.linkEvidence({ ...relation, needId: otherNeed.id })).toThrow(/frozen scope/);
+    expect(() => research.putEvidence({ ...original, id: "forged-text", canonicalText: "资料没有说过的话" })).toThrow(/metadata is invalid/);
+  });
+
+  it("动作只保存固定元数据，专门反证零结果与宿主判断能持久化", () => {
+    const { research, source } = researchFixture();
+    const original = research.listActions("run-1")[0];
+    const counterexample = { ...original, id: "counterexample-action", ordinal: 1, actionType: "knowledge_search",
+      requestSummary: { query: "交付推迟", sourceIds: [source.source.id], needIds: ["need-1"], purpose: "counterexample" },
+      responseSummary: { hitIds: [], count: 0, status: "completed" } };
+    expect(research.insertAction(counterexample)).toEqual(counterexample);
+    for (const [index, actionType] of ["host_not_applicable", "host_resolve_conflict"].entries()) {
+      research.insertAction({ ...original, id: actionType, ordinal: index + 2, actionType,
+        requestSummary: { needIds: ["need-1"] }, responseSummary: { status: "accepted" } });
+    }
+    expect(research.listActions("run-1").map(action => action.ordinal)).toEqual([0, 1, 2, 3]);
+    expect(research.listRounds("run-1")).toMatchObject([{ id: "round-1", focus: ["need-1"], ordinal: 0, newEvidenceCount: 0 }]);
+    const before = research.listActions("run-1");
+    const inheritedSerialization = Object.assign(Object.create({ toJSON: () => ({ systemPrompt: "不能借序列化改写字段" }) }), { query: "交付" });
+    for (const requestSummary of [{ query: "交付", systemPrompt: "完整提示" }, { needIds: ["need-1"], toolResult: TEXT },
+      { query: { text: TEXT } }, { purpose: "arbitrary" }, { needIds: [{ prompt: TEXT }] }, inheritedSerialization]) {
+      expect(() => research.insertAction({ ...original, id: "forbidden-request", ordinal: 4, requestSummary })).toThrow(/metadata is invalid/);
+    }
+    for (const responseSummary of [{ hitIds: [], rawAnswer: TEXT }, { receiptIds: [], reasoning: TEXT },
+      { count: -1 }, { count: 1.5 }, { status: { text: TEXT } }, { hitIds: [{ text: TEXT }] }]) {
+      expect(() => research.insertAction({ ...original, id: "forbidden-response", ordinal: 4, responseSummary })).toThrow(/metadata is invalid/);
+    }
+    expect(research.listActions("run-1")).toEqual(before);
+    expect(() => research.insertAction({ ...original, id: "outside-source", ordinal: 4, requestSummary: { sourceIds: ["outside"] } })).toThrow(/frozen scope/);
+    expect(() => research.insertAction({ ...original, id: "outside-need", ordinal: 4, requestSummary: { needIds: ["missing"] } })).toThrow(/not found/);
+  });
+
+  it.each(["completed", "partial", "failed", "cancelled"])("范围仍活跃时，%s 运行只允许读历史，全部后续写入拒绝", status => {
+    const { research, store, needInput } = researchFixture();
+    const receipt = research.getReceipt("run-1", "receipt-1"), evidence = research.listEvidence("run-1")[0];
+    const action = research.listActions("run-1")[0], relation = research.listRelations("run-1")[0];
+    store.db.prepare("UPDATE knowledge_research_runs SET status = ? WHERE id = 'run-1'").run(status);
+    expect(research.requireRun("run-1").status).toBe(status);
+    expect(research.getNeed("run-1", "need-1").id).toBe("need-1");
+    expect(research.getReceipt("run-1", receipt.id)).toEqual(receipt);
+    expect(research.listEvidence("run-1")).toEqual([evidence]);
+    expect(research.listRelations("run-1")).toEqual([relation]);
+    expect(research.listActions("run-1")).toEqual([action]);
+    expect(research.listRounds("run-1")).toHaveLength(1);
+    for (const write of [
+      () => research.createNeed("run-1", needInput),
+      () => research.setNeedState("run-1", "need-1", { status: "supported", unresolvedGaps: [] }),
+      () => research.insertReceipt({ ...receipt, id: "after-end" }), () => research.consumeReceipt("run-1", receipt.id),
+      () => research.putEvidence(evidence), () => research.linkEvidence(relation),
+      () => research.insertAction({ ...action, id: "after-end", ordinal: 1 }),
+    ]) expect(write).toThrow(/frozen scope/);
+    expect(research.getReceipt("run-1", receipt.id).consumedAt).toBeNull();
+    expect(research.listNeeds("run-1")).toHaveLength(1);
+  });
+
+  it("读取运行复核原归属；已关闭范围可读历史但拒绝任何后续写入", () => {
+    const { research, store, scope, runInput, needInput } = researchFixture();
+    const receipt = research.getReceipt("run-1", "receipt-1"), evidence = research.listEvidence("run-1")[0];
+    const action = research.listActions("run-1")[0], relation = research.listRelations("run-1")[0];
+    store.db.prepare("UPDATE knowledge_research_runs SET parent_session_path = ? WHERE id = 'run-1'").run("/forged-session");
+    expect(() => research.getRun("run-1")).toThrow(/frozen scope/);
+    store.db.prepare("UPDATE knowledge_research_runs SET parent_session_path = ? WHERE id = 'run-1'").run(scope.sessionPath);
+    store.closeTurnScope({ scopeId: scope.id });
+    expect(research.requireRun("run-1").turnScopeId).toBe(scope.id);
+    expect(research.getReceipt("run-1", receipt.id)).toEqual(receipt);
+    expect(research.listNeeds("run-1")).toHaveLength(1);
+    for (const write of [
+      () => research.createRun(runInput), () => research.createNeed("run-1", needInput),
+      () => research.setNeedState("run-1", "need-1", { status: "supported", unresolvedGaps: [] }),
+      () => research.insertReceipt({ ...receipt, id: "after-close" }), () => research.consumeReceipt("run-1", receipt.id),
+      () => research.putEvidence(evidence), () => research.linkEvidence(relation),
+      () => research.insertAction({ ...action, id: "after-close", ordinal: 1 }),
+    ]) expect(write).toThrow(/frozen scope/);
+  });
 });
 
 function openStore(dbPath: string) {

@@ -18,6 +18,9 @@
 import { Type } from "../pi-sdk/index.ts";
 import { resolveKnowledgeChunkerConfig } from "../knowledge/chunker.ts";
 import { isKnowledgeError, KnowledgeError } from "../knowledge/errors.ts";
+import { EvidenceReceiptService, type KnowledgeResearchToolContext } from "../knowledge/evidence-receipt-service.ts";
+import { ResearchStore } from "../knowledge/research/research-store.ts";
+import type { StoredKnowledgeChunk } from "../knowledge/knowledge-index-store.ts";
 import type { KnowledgeManager } from "../knowledge/knowledge-manager.ts";
 import type { KnowledgeTurnScope } from "../knowledge/types.ts";
 import {
@@ -47,6 +50,8 @@ export interface KnowledgeReadToolDeps {
     sessionPath: string | null;
     parentSessionPath: string | null;
   };
+  /** 可选研究上下文由宿主提供；普通工具调用不创建研究凭据。 */
+  resolveResearchContext?: (ctx: unknown) => KnowledgeResearchToolContext | null;
 }
 
 function requireNonEmptyString(value: unknown, label: string): string {
@@ -176,6 +181,39 @@ export function createKnowledgeReadTool(deps: KnowledgeReadToolDeps) {
           parentSessionPath: null,
         };
         const resolved = resolveScopedArtifact(knowledge, studioId, scopeId, sourceId, notebookId, sessionContext);
+        const researchContext = deps.resolveResearchContext?.(ctx) ?? null;
+        const research = researchContext ? new ResearchStore(knowledge.store) : null;
+        if (research && researchContext) {
+          const run = research.requireRun(researchContext.runId);
+          if (run.turnScopeId !== scopeId || !["planning", "running", "synthesizing"].includes(run.status)
+            || (researchContext.allowedSourceIds !== undefined
+              && (!Array.isArray(researchContext.allowedSourceIds)
+                || researchContext.allowedSourceIds.some(id => !resolved.scope.sources.some(source => source.sourceId === id))
+                || !researchContext.allowedSourceIds.includes(sourceId)))) {
+            throw knowledgeScopeViolation("Knowledge read is outside the research scope");
+          }
+        }
+        const prepareChunks = (selected: StoredKnowledgeChunk[]) => {
+          if (!research || !researchContext) return selected.map(chunk => ({ ordinal: chunk.ordinal + 1, text: chunk.text }));
+          const receipts = new EvidenceReceiptService(research);
+          return research.transaction(() => selected.map(chunk => {
+            if (chunk.parseArtifactId !== resolved.artifactId || chunk.spans.length === 0) {
+              throw new KnowledgeError("KNOWLEDGE_INDEX_INVALID", "Research read requires frozen raw block positions");
+            }
+            // 检索摘要和索引正文不能直接成为凭据：逐段回到冻结原文读取，再把这段原文交给模型。
+            const spans = chunk.spans.map(span => {
+              const receipt = receipts.issue({
+                ...researchContext, sourceId, contentSnapshotId: resolved.contentSnapshotId,
+                parseArtifactId: resolved.artifactId, chunkIndexVariantId: chunk.chunkIndexVariantId, chunkId: chunk.id,
+                blockId: span.blockId, startOffset: span.blockStartOffset, endOffset: span.blockEndOffset, channel: "knowledge_read",
+              });
+              const { text } = receipts.read({ runId: researchContext.runId, receiptId: receipt.id,
+                allowedSourceIds: researchContext.allowedSourceIds, actorSessionId: researchContext.actorSessionId });
+              return { receiptId: receipt.id, blockId: receipt.blockId, startOffset: receipt.startOffset, endOffset: receipt.endOffset, text };
+            });
+            return { ordinal: chunk.ordinal + 1, text: spans.map(span => span.text).join("\n"), spans };
+          }));
+        };
 
         if (query) {
           const compiledScope = await knowledge.compileTurnScope(resolved.scope);
@@ -194,10 +232,8 @@ export function createKnowledgeReadTool(deps: KnowledgeReadToolDeps) {
               artifactId: resolved.artifactId,
             });
           }
-          const chunks = result.candidates.map(chunk => ({
-            ordinal: chunk.ordinal + 1,
-            text: chunk.text,
-          }));
+          if (research) signal?.throwIfAborted();
+          const chunks = prepareChunks(result.candidates);
           return toolOk(JSON.stringify({
             source: resolved.sourceName,
             sourceId,
@@ -265,10 +301,11 @@ export function createKnowledgeReadTool(deps: KnowledgeReadToolDeps) {
             { errorCode: "KNOWLEDGE_INVALID_ARGUMENT", sourceId, totalChunks: total },
           );
         }
-        const chunks = indexedChunks
+        const selected = indexedChunks
           .filter(chunk => chunk.ordinal >= from && chunk.ordinal < toExclusive)
-          .sort((left, right) => left.ordinal - right.ordinal)
-          .map(chunk => ({ ordinal: chunk.ordinal + 1, text: chunk.text }));
+          .sort((left, right) => left.ordinal - right.ordinal);
+        if (research) signal?.throwIfAborted();
+        const chunks = prepareChunks(selected);
         return toolOk(JSON.stringify({
           source: resolved.sourceName,
           sourceId,
