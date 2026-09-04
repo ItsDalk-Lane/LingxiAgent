@@ -33,6 +33,7 @@ vi.mock("../lib/memory/memory-ticker.js", () => ({
 
 import { Agent } from "../core/agent.ts";
 import { createResearchAgentFixture, researchNeed } from "./helpers/knowledge-research-agent-fixture.ts";
+import { KnowledgeCompletenessExecutor } from "../lib/knowledge/research/knowledge-completeness-executor.ts";
 import {
   assertAllBuiltInToolsPermissionCovered,
   assertAllToolsCategorized,
@@ -137,23 +138,32 @@ describe("built-in tool permission/category coverage (full snapshot)", () => {
         tasks: [{ label: "权限覆盖", task: "保留本次隔离工作会话供宿主检查工具声明", needIds: [update.needs[0].id] }],
       });
       expect(delegated.isError).toBeUndefined();
+      const finished = await turn.call("knowledge_research_finish", { runId: turn.runId,
+        conclusionSummary: "只用于真实工具覆盖检查", requestedStopReason: "complete" });
+      expect(finished.isError).toBeUndefined();
     });
     researchFixtures.push(research);
     const run = research.research.createRun({ turnScopeId: research.request.compiledScope.scopeId,
       turnId: research.request.turnId, parentSessionPath: research.request.parentSessionPath,
-      question: research.request.question });
+      question: research.request.question, completenessPolicy: "scope_complete" });
+    const completeness = new KnowledgeCompletenessExecutor({ research: research.research, executeIsolated: research.executeIsolated });
     // 透传采集真正装配的工具对象；真实登记的主研究会话通过委派产生工作会话。
     const capture = vi.spyOn(Agent.prototype, "getToolsSnapshot");
     try {
       await research.executeIsolated("采集研究工具权限快照", {
         agentId: research.request.agentId, parentSessionId: research.request.parentSessionId,
         parentSessionPath: research.request.parentSessionPath, surface: "knowledge_research_root",
-        research: { runId: run.id, scopeId: run.turnScopeId, studioId: research.request.compiledScope.studioId },
+        research: { runId: run.id, scopeId: run.turnScopeId, studioId: research.request.compiledScope.studioId,
+          completeness, isCompletenessSatisfied: id => completeness.isSatisfied(id),
+          ensureCompleteness: (context, sessionPath, signal) => completeness.ensure({ runId: run.id,
+            compiledScope: research.request.compiledScope, parentSessionId: context.actorSessionId,
+            parentSessionPath: sessionPath, agentId: context.actorAgentId, signal }),
+        },
       });
       const collected = capture.mock.calls.map(([options], index) => ({
         surface: options.surface, snapshot: capture.mock.results[index].value as ReturnType<Agent["getToolsSnapshot"]>,
       }));
-      expect(collected.map(item => item.surface)).toEqual(["knowledge_research_root", "knowledge_research_worker"]);
+      expect(collected.map(item => item.surface)).toEqual(["knowledge_research_root", "knowledge_research_worker", "knowledge_completeness_worker"]);
       const surfaces = [desktop, ...collected.map(item => item.snapshot)];
       return { agent, snapshot: surfaces.flat(), surfaces };
     } finally { capture.mockRestore(); }
@@ -196,7 +206,13 @@ describe("built-in tool permission/category coverage (full snapshot)", () => {
 
       expect(missing).toEqual([]);
       expect(actualNames.has("computer")).toBe(true);
-      const [desktop, researchRoot, worker] = surfaces.map(tools => new Set(tools.map(tool => tool.name)));
+      const [desktop, researchRoot, worker, completenessWorker] = surfaces.map(tools => new Set(tools.map(tool => tool.name)));
+      expect([...completenessWorker]).toEqual(["knowledge_coverage_read", "knowledge_completeness_mark"]);
+      for (const name of completenessWorker) {
+        expect(desktop.has(name)).toBe(false);
+        expect(researchRoot.has(name)).toBe(false);
+        expect(worker.has(name)).toBe(false);
+      }
       for (const name of ["knowledge_research_update", "knowledge_research_finish", "knowledge_delegate"]) {
         expect(desktop.has(name)).toBe(false);
         expect(researchRoot.has(name)).toBe(true);

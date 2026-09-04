@@ -27,6 +27,31 @@ function researchDeps(surface: unknown, overrides: Record<string, unknown> = {})
 }
 
 describe("研究执行时再次按宿主白名单限制工具", () => {
+  it.each(["knowledge_coverage_read", "knowledge_completeness_mark"])("完整性专属工具 %s 只允许在完整性工作会话中执行", async name => {
+    for (const surface of ["knowledge_research_root", "knowledge_research_worker", "knowledge_completeness_worker"]) {
+      const tool = readTool(name), deps = researchDeps(surface);
+      const [wrapped] = wrapWithSessionPermission([tool], deps);
+      const result = await wrapped.execute("coverage-call", {}, undefined, undefined, RUNTIME_CONTEXT);
+      if (surface === "knowledge_completeness_worker") {
+        expect(result.details.executed).toBe(true);
+        expect(tool.execute).toHaveBeenCalledOnce();
+      } else {
+        expect(result.details.errorCode).toBe("ACTION_BLOCKED_IN_KNOWLEDGE_RESEARCH");
+        expect(tool.execute).not.toHaveBeenCalled();
+      }
+      expect(deps.approvalGateway.review).not.toHaveBeenCalled();
+    }
+  });
+
+  it("完整性工作会话不能调用普通调查、委派、写入、网络或其他内置工具", async () => {
+    for (const name of [...ROOT_TOOLS, ...BLOCKED_TOOLS]) {
+      const tool = readTool(name);
+      const [wrapped] = wrapWithSessionPermission([tool], researchDeps("knowledge_completeness_worker"));
+      expect((await wrapped.execute("coverage-forbidden", {}, undefined, undefined, RUNTIME_CONTEXT)).details.errorCode)
+        .toBe("ACTION_BLOCKED_IN_KNOWLEDGE_RESEARCH");
+      expect(tool.execute).not.toHaveBeenCalled();
+    }
+  });
   it.each(ROOT_TOOLS)("主研究允许规定的 %s，只读声明仍经过原权限检查", async name => {
     const tool = readTool(name);
     const deps = researchDeps("knowledge_research_root");

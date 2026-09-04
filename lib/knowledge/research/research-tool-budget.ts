@@ -24,6 +24,8 @@ export interface KnowledgeResearchActorContext {
   role: "root" | "worker";
   allowedNeedIds?: string[];
   allowedSourceIds?: string[];
+  completenessCheckId?: string;
+  completenessShardId?: string;
 }
 
 export interface KnowledgeResearchToolDeps {
@@ -51,6 +53,10 @@ export function requireResearchToolContext(
   }
   if (context.role === "worker" && (!context.allowedNeedIds || context.allowedNeedIds.length === 0)) {
     throw new KnowledgeError("KNOWLEDGE_SCOPE_VIOLATION", "Research worker requires assigned needs");
+  }
+  if ((context.completenessCheckId !== undefined || context.completenessShardId !== undefined)
+    && (context.role !== "worker" || !context.completenessCheckId?.trim() || !context.completenessShardId?.trim())) {
+    throw new KnowledgeError("KNOWLEDGE_SCOPE_VIOLATION", "Completeness worker requires its host-bound check and shard");
   }
   for (const id of context.allowedNeedIds ?? []) deps.research.getNeed(run.id, id);
   if (context.allowedSourceIds?.some(id => !scope.sources.some(source => source.sourceId === id))) {
@@ -216,9 +222,11 @@ export class ResearchToolBudget {
       if (reason) return { run, reason, action: null };
       const round = this.research.listRounds(run.id).filter(item => item.status === "running").at(-1);
       const actions = this.research.listActions(run.id);
-      const perRound = actions.filter(action => action.roundId === (round?.id ?? null) && action.actionType === toolName).length;
+      const isRead = toolName === "knowledge_read" || toolName === "knowledge_coverage_read";
+      const perRound = actions.filter(action => action.roundId === (round?.id ?? null)
+        && (isRead ? ["knowledge_read", "knowledge_coverage_read"].includes(action.actionType) : action.actionType === toolName)).length;
       const perRoundReason = toolName === "knowledge_search" && perRound >= run.budget.maxSearchesPerRound ? "round_search_limit"
-        : toolName === "knowledge_read" && perRound >= run.budget.maxReadsPerRound ? "round_read_limit" : null;
+        : isRead && perRound >= run.budget.maxReadsPerRound ? "round_read_limit" : null;
       const action = this.research.insertAction({
         id: this.research.newId("kra"), runId: run.id, roundId: round?.id ?? null,
         ordinal: Math.max(-1, ...actions.map(item => item.ordinal)) + 1,
@@ -228,7 +236,7 @@ export class ResearchToolBudget {
       });
       this.research.knowledgeStore.db.prepare(`UPDATE knowledge_research_runs SET tool_calls_used = tool_calls_used + 1,
         search_calls = search_calls + ?, read_calls = read_calls + ?, grep_calls = grep_calls + ?, updated_at = ? WHERE id = ?`)
-        .run(Number(toolName === "knowledge_search"), Number(toolName === "knowledge_read"), Number(toolName === "knowledge_grep"), this.research.now(), run.id);
+        .run(Number(toolName === "knowledge_search"), Number(isRead), Number(toolName === "knowledge_grep"), this.research.now(), run.id);
       return { run, reason: perRoundReason, action };
     });
     if (admitted.reason) {

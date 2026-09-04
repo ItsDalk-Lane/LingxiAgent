@@ -53,6 +53,8 @@ import { createKnowledgeManageTool } from "../lib/tools/knowledge-manage-tool.ts
 import { createKnowledgeResearchUpdateTool } from "../lib/tools/knowledge-research-update-tool.ts";
 import { createKnowledgeResearchFinishTool } from "../lib/tools/knowledge-research-finish-tool.ts";
 import { createKnowledgeDelegateTool } from "../lib/tools/knowledge-delegate-tool.ts";
+import { createKnowledgeCoverageReadTool } from "../lib/tools/knowledge-coverage-read-tool.ts";
+import { createKnowledgeCompletenessMarkTool } from "../lib/tools/knowledge-completeness-mark-tool.ts";
 import { KnowledgeError, isKnowledgeError, type KnowledgeErrorCode } from "../lib/knowledge/errors.ts";
 import { ResearchStore } from "../lib/knowledge/research/research-store.ts";
 import { EvidenceLedger } from "../lib/knowledge/research/evidence-ledger.ts";
@@ -1122,6 +1124,12 @@ export class Agent {
     if (context.role !== (options.surface === "knowledge_research_root" ? "root" : "worker")) {
       throw new KnowledgeError("KNOWLEDGE_SCOPE_VIOLATION", "Research tool role differs from its surface");
     }
+    const completenessWorker = options.surface === "knowledge_completeness_worker";
+    if (completenessWorker !== Boolean(context.completenessCheckId && context.completenessShardId)
+      || (!completenessWorker && (context.completenessCheckId !== undefined || context.completenessShardId !== undefined))
+      || (completenessWorker && !input.completeness)) {
+      throw new KnowledgeError("KNOWLEDGE_SCOPE_VIOLATION", "Completeness tool surface requires its host check and shard");
+    }
     const research = new ResearchStore(knowledge.store);
     const ledger = new EvidenceLedger(research, { isCompletenessSatisfied: input.isCompletenessSatisfied });
     const budget = new ResearchToolBudget(research);
@@ -1166,6 +1174,8 @@ export class Agent {
         || sessionId !== context.actorSessionId || manifest?.lifecycle !== "active"
         || manifest.ownerAgentId !== context.actorAgentId
         || recorded?.runId !== context.runId || recorded?.scopeId !== context.scopeId || recorded?.role !== context.role
+        || recorded.completenessCheckId !== context.completenessCheckId
+        || recorded.completenessShardId !== context.completenessShardId
         || !sameIds(recorded.allowedNeedIds, context.allowedNeedIds) || !sameIds(recorded.allowedSourceIds, context.allowedSourceIds)) {
         throw new KnowledgeError("KNOWLEDGE_SCOPE_VIOLATION", "Research tool session identity changed");
       }
@@ -1183,6 +1193,10 @@ export class Agent {
     };
     // 装配阶段就拒绝错误归属，不能等模型已经运行后才在首次工具调用时发现。
     resolveContext({ sessionManager: { getSessionFile: () => input.sessionPath } });
+    if (completenessWorker) {
+      const deps = { research, ledger, budget, resolveContext, completeness: input.completeness, onProgress: input.onProgress };
+      return [createKnowledgeCoverageReadTool(deps), createKnowledgeCompletenessMarkTool(deps)];
+    }
     const frozenScope = knowledge.store.getTurnScope({ scopeId: context.scopeId })!;
     const defaultSourceIds = frozenScope.sources.filter(source => context.allowedSourceIds === undefined
       || context.allowedSourceIds.includes(source.sourceId)).map(source => source.sourceId);
@@ -1285,6 +1299,8 @@ export class Agent {
     const deps = { research, ledger, budget, resolveContext, onProgress: input.onProgress };
     const tools = [...readTools, createKnowledgeResearchUpdateTool(deps),
       createKnowledgeResearchFinishTool({ ...deps, isCompletenessSatisfied: input.isCompletenessSatisfied,
+        ensureCompleteness: input.ensureCompleteness
+          ? (actor, signal) => input.ensureCompleteness(actor, input.sessionPath, signal) : undefined,
         onFinishAccepted: input.onFinishAccepted }),
       createKnowledgeDelegateTool({ ...deps,
         listAgents: () => this._cb?.listActiveAgents?.() ?? [],

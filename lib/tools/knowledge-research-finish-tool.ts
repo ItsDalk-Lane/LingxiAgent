@@ -22,6 +22,8 @@ export interface KnowledgeResearchFinishDecision {
 export interface KnowledgeResearchFinishToolDeps extends KnowledgeResearchToolDeps {
   /** 完整性证明只能由宿主提供，模型的结论摘要不作为证明。 */
   isCompletenessSatisfied?: (runId: string) => boolean;
+  /** 在根会话仍存活时完成逐单元核查，等待工作会话实际清理后才判断停止资格。 */
+  ensureCompleteness?: (context: ReturnType<typeof requireResearchToolContext>, signal: AbortSignal) => Promise<unknown>;
   /** 只传递已获准的结构化结果，最终材料合成和运行收口由控制器完成。 */
   onFinishAccepted?: (decision: KnowledgeResearchFinishDecision,
     context: ReturnType<typeof requireResearchToolContext>) => void;
@@ -59,7 +61,7 @@ export function createKnowledgeResearchFinishTool(deps: KnowledgeResearchFinishT
         }
         const decision = await deps.budget.execute({
           context, toolName: "knowledge_research_finish", requestSummary: {}, signal,
-        }, () => {
+        }, async activeSignal => {
           if (Object.keys(params).some(key => !["runId", "conclusionSummary", "requestedStopReason"].includes(key))
             || typeof params.conclusionSummary !== "string"
             || typeof params.requestedStopReason !== "string"
@@ -67,6 +69,8 @@ export function createKnowledgeResearchFinishTool(deps: KnowledgeResearchFinishT
             throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "Invalid research finish parameters");
           }
           const requestedStopReason = params.requestedStopReason as KnowledgeResearchRequestedStopReason;
+          if (requestedStopReason === "complete") await deps.ensureCompleteness?.(context, activeSignal);
+          activeSignal.throwIfAborted();
           const needs = deps.ledger.recompute(runId);
           const run = deps.research.requireRun(runId);
           const rounds = deps.research.listRounds(runId).filter(round => round.status === "completed");

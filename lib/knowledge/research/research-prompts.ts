@@ -83,6 +83,7 @@ export function buildResearchPrompt(input: ResearchPromptInput): string {
       : "本轮只补查 focusNeedIds 对应的未覆盖、部分支持、冲突或尚未完成反证检查的需求。不得无条件重复首轮全部查询。",
     "required need 数量达到 2 个时，必须调用 knowledge_delegate 分派独立 Worker，或者为每个 need 分别进行独立 knowledge_search 和 knowledge_read。",
     "knowledge_search 只提供线索。每个准备用作证据的命中都必须进一步 knowledge_read；knowledge_grep 只可使用实际返回的原文凭据。不得凭 snippet、candidateId 或普通文本直接引用或入账。",
+    "当完整性要求为 relevant_sections_complete 时，先根据目录确定相关章节，并在 knowledge_search 中显式传入相关 sectionKeys 和 sourceIds；不能用搜索命中代替整章范围。未确定相关章节时继续调查或报告范围缺口。申请 complete 时，宿主会在你当前根会话下派出完整性工作会话，逐一核查冻结原文单元；不要用普通回复声明已检查全文。",
     "使用 knowledge_research_update 的 linkEvidence 把已读凭据中的精确原文关联到当前 need。同源不同段不增加独立来源数。反证检查使用宿主 searchPlan 中 purpose=counterexample 条目的原样 query；needIds 与 purpose 由宿主关联，不是 knowledge_search 的额外参数。",
     "仅禁止重复已成功或仍在进行中的等价查询：大小写、空白、全半角差别不算新查询，但来源范围不同不算重复。按 executedQueries 中的 sourceIds 对照来源范围；失败查询允许修正原因后重试。围绕缺口并按 searchPlan 与 focusNeedIds 定向调查。",
     "Root 与 Worker 共享剩余预算和同一绝对截止时间，不能在新一轮重置预算。Worker 不得调用 knowledge_delegate 或 knowledge_research_finish。",

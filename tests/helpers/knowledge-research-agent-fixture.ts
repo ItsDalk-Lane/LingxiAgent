@@ -44,12 +44,15 @@ export async function createResearchAgentFixture(driver: (turn: ResearchModelTur
   const calls: ResearchModelTurn[] = [];
   const sessionPaths: string[] = [];
   const executeIsolated = async (prompt: string, options: Record<string, any>) => {
-    const role = options.surface === "knowledge_research_worker" ? "worker" : "root";
+    const role = options.surface === "knowledge_research_root" ? "root" : "worker";
     const sessionPath = path.join(root, `${role}-${sessionPaths.length}.jsonl`);
     fs.writeFileSync(sessionPath, ""); sessionPaths.push(sessionPath);
     const actor = { runId: options.research.runId, scopeId: options.research.scopeId, role,
       ...(options.research.allowedNeedIds ? { allowedNeedIds: options.research.allowedNeedIds } : {}),
       ...(options.research.allowedSourceIds ? { allowedSourceIds: options.research.allowedSourceIds } : {}) };
+    if (options.surface === "knowledge_completeness_worker") Object.assign(actor, {
+      completenessCheckId: options.research.completenessCheckId, completenessShardId: options.research.completenessShardId,
+    });
     const manifest = manifests.createForPath({ sessionPath, ownerAgentId: options.agentId, domain: "subagent", kind: options.surface,
       provenance: { studioId, parentSessionId: options.parentSessionId, researchContext: actor } });
     try {
@@ -62,7 +65,8 @@ export async function createResearchAgentFixture(driver: (turn: ResearchModelTur
           const result = await tool.execute(`call-${calls.length}`, params, options.signal, undefined,
             { sessionManager: { getSessionFile: () => sessionPath } });
           if (result.isError) return { isError: true, ...result.details };
-          return JSON.parse(result.content[0].text);
+          return name === "knowledge_coverage_read" ? { ...result.details, text: result.content[0].text }
+            : JSON.parse(result.content[0].text);
         },
       };
       calls.push(turn);

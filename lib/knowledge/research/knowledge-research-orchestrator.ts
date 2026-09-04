@@ -10,6 +10,7 @@ import { ResearchRoundRunner, type ResearchExecuteIsolated, type ResearchSearchS
 import { evaluateResearchStopPolicy } from "./research-stop-policy.ts";
 import { ResearchStore } from "./research-store.ts";
 import { hasActiveResearchExecution, notifyResearchProgress, ResearchToolBudget } from "./research-tool-budget.ts";
+import { KnowledgeCompletenessExecutor } from "./knowledge-completeness-executor.ts";
 
 export interface KnowledgeResearchRequest {
   question: string;
@@ -50,13 +51,20 @@ export class KnowledgeResearchOrchestrator {
   private readonly runner: ResearchRoundRunner;
   private readonly renderer: ResearchContextRenderer;
   private readonly deps: KnowledgeResearchDependencies;
+  private readonly completeness: KnowledgeCompletenessExecutor;
 
   constructor(deps: KnowledgeResearchDependencies) {
     this.deps = deps;
     this.budget = new ResearchToolBudget(deps.research, { nowMs: deps.nowMs });
-    this.ledger = new EvidenceLedger(deps.research, { isCompletenessSatisfied: deps.isCompletenessSatisfied });
+    this.completeness = new KnowledgeCompletenessExecutor({ research: deps.research, budget: this.budget,
+      executeIsolated: deps.executeIsolated });
+    this.ledger = new EvidenceLedger(deps.research, { isCompletenessSatisfied: (runId, needId) => this.isCompletenessSatisfied(runId, needId) });
     this.runner = new ResearchRoundRunner({ ...deps, budget: this.budget });
     this.renderer = new ResearchContextRenderer({ research: deps.research });
+  }
+
+  private isCompletenessSatisfied(runId: string, needId?: string): boolean {
+    return this.deps.isCompletenessSatisfied?.(runId, needId) ?? this.completeness.isSatisfied(runId, needId);
   }
 
   async run(request: KnowledgeResearchRequest) {
@@ -196,7 +204,13 @@ export class KnowledgeResearchOrchestrator {
       const result = await this.runner.run({ runId, roundId: round.id, agentId: request.agentId,
         parentSessionId: request.parentSessionId, parentSessionPath: request.parentSessionPath,
         studioId: request.compiledScope.studioId, scopeId: request.compiledScope.scopeId,
-        prompt, signal: request.signal, searchPlan, forbiddenQueries, isCompletenessSatisfied: this.deps.isCompletenessSatisfied,
+        prompt, signal: request.signal, searchPlan, forbiddenQueries,
+        isCompletenessSatisfied: id => this.isCompletenessSatisfied(id), completeness: this.completeness,
+        ensureCompleteness: (context, sessionPath, signal) => this.completeness.ensure({
+          runId, compiledScope: request.compiledScope, parentSessionId: context.actorSessionId!,
+          parentSessionPath: sessionPath, agentId: context.actorAgentId, signal,
+          onProgress: update => this.publish(runId, update),
+        }),
         onSearchCompleted: this.deps.onSearchCompleted,
         onProgress: update => this.publish(runId, update),
       });
@@ -266,7 +280,7 @@ export class KnowledgeResearchOrchestrator {
   private stopDecision(run: KnowledgeResearchRun, needs: EvaluatedEvidenceNeed[]) {
     return evaluateResearchStopPolicy({ needs, run, elapsedMs: this.budget.elapsedMs(run.id),
       recentRoundEvidenceCounts: this.deps.research.listRounds(run.id).filter(round => round.status !== "running").map(round => round.newEvidenceCount),
-      completenessSatisfied: this.deps.isCompletenessSatisfied?.(run.id) === true,
+      completenessSatisfied: this.isCompletenessSatisfied(run.id),
     });
   }
 

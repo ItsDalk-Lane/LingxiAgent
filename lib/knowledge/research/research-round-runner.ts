@@ -4,6 +4,8 @@ import type { ResearchStore } from "./research-store.ts";
 import { ResearchToolBudget } from "./research-tool-budget.ts";
 import type { SearchedVectorVariantIdentity } from "../knowledge-query-service.ts";
 import type { KnowledgeResearchProgressUpdate } from "../../../shared/knowledge-research.ts";
+import type { KnowledgeResearchActorContext } from "./research-tool-budget.ts";
+import type { KnowledgeCompletenessExecutor } from "./knowledge-completeness-executor.ts";
 
 export type ResearchExecuteIsolated = (prompt: string, options: Record<string, unknown>) => Promise<unknown>;
 
@@ -26,6 +28,8 @@ export interface ResearchRoundInput {
   searchPlan?: Array<{ query: string; needIds: string[]; purpose?: "counterexample" }>;
   forbiddenQueries?: string[];
   isCompletenessSatisfied?: (runId: string) => boolean;
+  completeness?: KnowledgeCompletenessExecutor;
+  ensureCompleteness?: (context: KnowledgeResearchActorContext, sessionPath: string, signal: AbortSignal) => Promise<unknown>;
   onSearchCompleted?: (summary: ResearchSearchSummary) => void;
   onProgress?: (update: KnowledgeResearchProgressUpdate) => void;
 }
@@ -68,6 +72,8 @@ export class ResearchRoundRunner {
           ...(input.searchPlan ? { searchPlan: input.searchPlan } : {}),
           ...(input.forbiddenQueries ? { forbiddenQueries: input.forbiddenQueries } : {}),
           ...(input.isCompletenessSatisfied ? { isCompletenessSatisfied: input.isCompletenessSatisfied } : {}),
+          ...(input.completeness ? { completeness: input.completeness } : {}),
+          ...(input.ensureCompleteness ? { ensureCompleteness: input.ensureCompleteness } : {}),
           ...(input.onSearchCompleted ? { onSearchCompleted: input.onSearchCompleted } : {}),
           ...(input.onProgress ? { onProgress: input.onProgress } : {}),
           onFinishAccepted: (decision: unknown) => {

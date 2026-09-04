@@ -73,6 +73,16 @@ describe("研究工具共用宿主预算", () => {
     expect(f.research.requireRun(f.run.id)).toMatchObject({ status: "partial", stopReason: "wall_clock_exhausted", toolCallsUsed: 9 });
   });
 
+  it("完整性阅读与普通阅读共享每轮12次额度和真实阅读计数", async () => {
+    const f = setup();
+    for (let index = 0; index < 12; index++) await f.execute(index % 2 ? "knowledge_coverage_read" : "knowledge_read");
+    let entered = false;
+    await expect(f.execute("knowledge_coverage_read", () => { entered = true; return { value: true, summary: { count: 1 } }; })).rejects.toThrow();
+    expect(entered).toBe(false);
+    expect(f.research.requireRun(f.run.id)).toMatchObject({ toolCallsUsed: 13, readCalls: 13 });
+    expect(f.research.listActions(f.run.id).at(-1)).toMatchObject({ actionType: "knowledge_coverage_read", status: "failed", errorCode: "round_read_limit" });
+  });
+
   it("调用结束才越过总时限也必须拒绝结果，不能把超时返回当成功", async () => {
     const f = setup();
     await expect(f.execute("knowledge_outline", () => { f.advance(180_000); return { value: true, summary: { count: 1 } }; })).rejects.toThrow();

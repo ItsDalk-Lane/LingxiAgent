@@ -56,7 +56,8 @@ export function resolveKnowledgeScopeSessionContext(input: KnowledgeScopeSession
         throw knowledgeScopeViolation("Knowledge session kind cannot be resolved");
       }
       const isChild = manifest.domain === "subagent" || manifest.kind === "subagent_child"
-        || manifest.kind === "knowledge_research_root" || manifest.kind === "knowledge_research_worker";
+        || manifest.kind === "knowledge_research_root" || manifest.kind === "knowledge_research_worker"
+        || manifest.kind === "knowledge_completeness_worker";
       if (!isChild) {
         return { sessionPath: input.sessionPath, scopeOwnerSessionPath: manifest.currentLocator.path };
       }

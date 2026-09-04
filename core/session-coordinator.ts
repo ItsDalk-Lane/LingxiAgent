@@ -7868,6 +7868,11 @@ export class SessionCoordinator {
           throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "Invalid research assignment");
         }
       }
+      const completenessWorker = researchSurface === "knowledge_completeness_worker";
+      if ((completenessWorker && (!validId(input.completenessCheckId) || !validId(input.completenessShardId) || !input.completeness))
+        || (!completenessWorker && (input.completenessCheckId !== undefined || input.completenessShardId !== undefined))) {
+        throw new KnowledgeError("KNOWLEDGE_SCOPE_VIOLATION", "Completeness assignment differs from the isolated surface");
+      }
       const parent = typeof opts.parentSessionPath === "string"
         ? this._resolveSessionManifestForPath(opts.parentSessionPath) : null;
       const role = researchSurface === "knowledge_research_root" ? "root" : "worker";
@@ -7886,6 +7891,7 @@ export class SessionCoordinator {
         runId: input.runId, scopeId: input.scopeId, role,
         ...(input.allowedNeedIds !== undefined ? { allowedNeedIds: [...new Set(input.allowedNeedIds)] } : {}),
         ...(input.allowedSourceIds !== undefined ? { allowedSourceIds: [...new Set(input.allowedSourceIds)] } : {}),
+        ...(completenessWorker ? { completenessCheckId: input.completenessCheckId, completenessShardId: input.completenessShardId } : {}),
       };
       // 研究会话的权限由宿主固定，调用方不能靠隔离执行的通用选项扩展工具或写入范围。
       opts = { ...opts, agentId: opts.agentId || parent.ownerAgentId, parentSessionId: parent.sessionId,

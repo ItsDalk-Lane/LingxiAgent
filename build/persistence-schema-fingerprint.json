@@ -660,7 +660,7 @@
     ],
     "version": 3
   },
-  "payloadFingerprint": "sha256:e114419efdf0b857a97635ed2cbffcb41b8c880b5405a55d5996e08213d0fabb",
+  "payloadFingerprint": "sha256:5ea5991e78a826a99f33de0c44e770b14b0813bf95be73fe648d7248196fe079",
   "registry": [
     {
       "affectedByEpochMigration": true,
@@ -3292,8 +3292,8 @@
   ],
   "review": {
     "classification": "compatible",
-    "compatibilityReason": "P3-02 knowledge.db v18 到 v19 只在单事务中新建四张完整性核查表，旧表结构与原始资料及研究证据均不改写；关联与计数约束只作用于新表。",
-    "payloadFingerprint": "sha256:e114419efdf0b857a97635ed2cbffcb41b8c880b5405a55d5996e08213d0fabb"
+    "compatibilityReason": "P3-03 在既有 v19 四表和 coverage_runs/shards 上记录原文单元核查；新增完整性工作会话的宿主分片身份，旧资料、旧会话与数据库字段保持兼容，未增加正文或模型思考持久化。",
+    "payloadFingerprint": "sha256:5ea5991e78a826a99f33de0c44e770b14b0813bf95be73fe648d7248196fe079"
   },
   "schemas": [
     {
@@ -3907,7 +3907,7 @@
         ],
         "userVersion": 19
       },
-      "sourceHash": "sha256:46a0c8e6922a555ad03d281872178bbd0542d4c20b9b2e315d4e85d1fcb7084c",
+      "sourceHash": "sha256:e0b101a2ee83a35fc6e1a935ee36fd6cf3065f2cd154b93cbe69349bcc16e64d",
       "storeId": "knowledge-database"
     },
     {
@@ -3939,21 +3939,21 @@
       "contract": "ParseArtifact generation directories referenced by knowledge.db and never treated as source content versions",
       "kind": "directory-contract",
       "module": "lib/knowledge/knowledge-manager.ts",
-      "sourceHash": "sha256:83faa36d34e8aa88e36e2f16965d76b0cc2f1c270861b2862062cb40d928c90f",
+      "sourceHash": "sha256:14cb9f799fb268ad839c4b8610a517a1aa32ca80ffa491de73feca8c2c0408d9",
       "storeId": "knowledge-parse-artifacts"
     },
     {
       "contract": "ProcessingArtifact output files (binary office formats converted to structured text) referenced by knowledge.db processing_artifacts rows, with locatorMap held in the database",
       "kind": "directory-contract",
       "module": "lib/knowledge/knowledge-manager.ts",
-      "sourceHash": "sha256:83faa36d34e8aa88e36e2f16965d76b0cc2f1c270861b2862062cb40d928c90f",
+      "sourceHash": "sha256:14cb9f799fb268ad839c4b8610a517a1aa32ca80ffa491de73feca8c2c0408d9",
       "storeId": "knowledge-processing-artifacts"
     },
     {
       "contract": "ContentSnapshot relative locator, immutable byte publication, SHA-256 verification, and rollback protocol",
       "kind": "directory-contract",
       "module": "lib/knowledge/knowledge-manager.ts",
-      "sourceHash": "sha256:83faa36d34e8aa88e36e2f16965d76b0cc2f1c270861b2862062cb40d928c90f",
+      "sourceHash": "sha256:14cb9f799fb268ad839c4b8610a517a1aa32ca80ffa491de73feca8c2c0408d9",
       "storeId": "knowledge-source-snapshots"
     },
     {
@@ -4306,7 +4306,7 @@
         {
           "contract": "core/session-coordinator.ts Hana metadata extensions",
           "module": "core/session-coordinator.ts",
-          "sourceHash": "sha256:e112e4a0cb62557f5d3399906039462116193e5808f60b018e0ae4656918d672"
+          "sourceHash": "sha256:66a202d4991c68cb78b4e693be4111ac82d2b16b154f828a46eabcec83aa8323"
         },
         {
           "contract": "core/session-jsonl-file.ts repair contract",

@@ -19,7 +19,7 @@ afterEach(() => { vi.restoreAllMocks(); createAgentSessionMock.mockReset(); for 
 function setup() {
   const directory = fs.mkdtempSync(path.join(os.tmpdir(), "knowledge-research-surface-"));
   const manifests = new SessionManifestStore({ dbPath: path.join(directory, "manifests.db") });
-  const tools = [...getKnowledgeResearchToolNames("knowledge_research_root"), "knowledge_manage", "write", "edit",
+  const tools = [...getKnowledgeResearchToolNames("knowledge_research_root"), ...getKnowledgeResearchToolNames("knowledge_completeness_worker"), "knowledge_manage", "write", "edit",
     "exec_command", "browser", "web_search", "subagent", "search_memory", "workflow", "session"].map(name => ({
     name, execute: vi.fn(async () => ({ content: [{ type: "text", text: name }] })),
   }));
@@ -100,6 +100,77 @@ function setup() {
 }
 
 describe("研究隔离会话真实装配与生命周期", () => {
+  it("完整性Worker仅装配两个专用工具，真实Root父身份和分片写入登记库，权限被固定为只读", async () => {
+    const f = setup(), parent = f.rootParent();
+    const completeness = { internalText: "禁止写入登记库的宿主正文" };
+    f.behavior.prompt = async options => {
+      expect(options.tools).toEqual([]);
+      expect(options.customTools.map(tool => tool.name)).toEqual(["knowledge_coverage_read", "knowledge_completeness_mark"]);
+      await options.customTools[0].execute();
+      expect(options.resourceLoader.getExtensions()).toEqual({ extensions: [], errors: [] });
+      expect(options.resourceLoader.getSkills()).toEqual({ skills: [], diagnostics: [] });
+      expect(options.resourceLoader.getAgentsFiles()).toEqual({ agentsFiles: [] });
+    };
+    const result = await f.coordinator.executeIsolated("检查全部原文", { ...f.rootOptions, surface: "knowledge_completeness_worker",
+      parentSessionPath: parent.sessionPath, parentSessionId: parent.manifest.sessionId,
+      research: { ...f.research, completenessCheckId: "check-a", completenessShardId: "shard-a", completeness,
+        allowedNeedIds: ["need-a"], allowedSourceIds: ["source-a"] },
+      permissionMode: "operate", approvalPolicy: "interactive", allowHumanApproval: true,
+      toolFilter: "*", builtinFilter: ["write"], extraCustomTools: [{ name: "knowledge_delegate" }],
+      workspaceFolders: ["/write"], authorizedFolders: ["/outside"], fileReadSessionPaths: [f.mainPath] });
+    expect(result).toMatchObject({ sessionPath: null, error: null });
+    const assembled = createAgentSessionMock.mock.calls[0][0], snapshot = f.owner.getToolsSnapshot.mock.calls[0][0] as any;
+    const manifest = f.manifests.resolveByLocatorPath(assembled.sessionManager.getSessionFile());
+    expect(snapshot.research.completeness).toBe(completeness);
+    expect(snapshot.research.actorContext).toMatchObject({ role: "worker", completenessCheckId: "check-a", completenessShardId: "shard-a",
+      actorSessionId: manifest.sessionId, actorAgentId: "owner" });
+    expect(manifest).toMatchObject({ kind: "knowledge_completeness_worker", lifecycle: "deleted",
+      permissionModeSnapshot: { mode: "read_only" }, memoryPolicy: { mode: "disabled" },
+      provenance: { parentSessionId: parent.manifest.sessionId, researchContext: { runId: "run-a", scopeId: "scope-a", role: "worker",
+        completenessCheckId: "check-a", completenessShardId: "shard-a", allowedNeedIds: ["need-a"], allowedSourceIds: ["source-a"] } } });
+    expect(JSON.stringify(manifest)).not.toContain(completeness.internalText);
+    const built = f.buildTools.mock.calls[0][2];
+    expect(built).toMatchObject({ approvalPolicy: "deny_on_prompt", allowHumanApproval: false, workspaceFolders: [], authorizedFolders: [],
+      fileReadSessionPaths: [], extraCustomTools: [], permissionContext: { knowledgeResearchSurface: "knowledge_completeness_worker" } });
+    expect(built.getPermissionMode()).toBe("read_only");
+    expect(f.lifecycle.map(item => item.phase)).toEqual(["shutdown_start", "shutdown_end", "unsubscribe", "dispose"]);
+    expect(f.lifecycle.every(item => item.exists)).toBe(true);
+    expect(fs.existsSync(assembled.sessionManager.getSessionFile())).toBe(false);
+  });
+
+  it("完整性分配缺字段、直挂main、跨研究和普通会话夹带分片均在模型装配前拒绝", async () => {
+    const f = setup(), parent = f.rootParent();
+    const research = { ...f.research, completenessCheckId: "check-a", completenessShardId: "shard-a", completeness: {},
+      allowedNeedIds: ["need-a"], allowedSourceIds: ["source-a"] };
+    const worker = { ...f.rootOptions, surface: "knowledge_completeness_worker", research,
+      parentSessionPath: parent.sessionPath, parentSessionId: parent.manifest.sessionId };
+    for (const options of [
+      ...["completenessCheckId", "completenessShardId", "completeness"].map(key => ({ ...worker, research: { ...research, [key]: undefined } })),
+      { ...worker, parentSessionPath: f.mainPath, parentSessionId: f.main.sessionId },
+      { ...worker, research: { ...research, runId: "another-run" } },
+      { ...worker, research: { ...research, scopeId: "another-scope" } },
+      { ...worker, research: { ...research, studioId: "another-studio" } },
+      { ...worker, surface: "knowledge_research_worker" },
+      { ...f.rootOptions, research },
+    ]) await expect(f.coordinator.executeIsolated("检查原文", options)).rejects.toMatchObject({ code: "KNOWLEDGE_SCOPE_VIOLATION" });
+    expect(createAgentSessionMock).not.toHaveBeenCalled();
+    expect(f.owner.getToolsSnapshot).not.toHaveBeenCalled();
+  });
+
+  it.each(["knowledge_research_worker", "knowledge_completeness_worker"])("%s不能作为新完整性Worker的父会话", async kind => {
+    const f = setup(), parent = f.rootParent();
+    f.manifests.db.prepare("UPDATE session_manifests SET kind=?,provenance_json=? WHERE session_id=?").run(kind,
+      JSON.stringify({ ...parent.manifest.provenance, researchContext: { runId: "run-a", scopeId: "scope-a", role: "worker",
+        allowedNeedIds: ["need-a"], ...(kind === "knowledge_completeness_worker" ? { completenessCheckId: "check-a", completenessShardId: "shard-a" } : {}) } }),
+      parent.manifest.sessionId);
+    await expect(f.coordinator.executeIsolated("不得再次委派", { ...f.rootOptions, surface: "knowledge_completeness_worker",
+      parentSessionPath: parent.sessionPath, parentSessionId: parent.manifest.sessionId,
+      research: { ...f.research, allowedNeedIds: ["need-a"], allowedSourceIds: ["source-a"],
+        completenessCheckId: "check-a", completenessShardId: "shard-b", completeness: {} } }))
+      .rejects.toMatchObject({ code: "KNOWLEDGE_SCOPE_VIOLATION" });
+    expect(createAgentSessionMock).not.toHaveBeenCalled();
+  });
+
   it("Root固定七工具、只读权限与无记忆，使用父Agent聊天模型并绑定真实会话身份", async () => {
     const f = setup(), onFinishAccepted = vi.fn(), isCompletenessSatisfied = vi.fn();
     f.behavior.prompt = async options => {

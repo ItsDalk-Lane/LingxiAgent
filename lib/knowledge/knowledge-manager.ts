@@ -566,6 +566,10 @@ export class KnowledgeManager {
         "Knowledge source is referenced by persisted evidence manifests; historical answers still trace to this source version",
       );
     }
+    if (this.store.hasResearchReferencesForSource({ sourceId: source.id })) {
+      throw new KnowledgeError("KNOWLEDGE_CONFLICT",
+        "Knowledge source is referenced by persisted research evidence or completeness checks");
+    }
     const deleted = this.store.markSourceDeleted({ studioId: input?.studioId, sourceId: source.id });
     this.watcher.untrackSource(source.id);
     const { cancelledJobIds } = await this.ingestion.cancelSourceJobs({
@@ -668,6 +672,10 @@ export class KnowledgeManager {
         report.skipped.push({ sourceId: candidate.sourceId, reason: "evidence-manifest-referenced" });
         continue;
       }
+      if (this.store.hasResearchReferencesForSource({ sourceId: candidate.sourceId })) {
+        report.skipped.push({ sourceId: candidate.sourceId, reason: "research-referenced" });
+        continue;
+      }
       if (this.store.hasActiveIngestionJobsForSource({ sourceId: candidate.sourceId })) {
         report.skipped.push({ sourceId: candidate.sourceId, reason: "active-ingestion-job" });
         continue;
@@ -756,6 +764,10 @@ export class KnowledgeManager {
       if (this.store.listActiveNotebookIdsForSource({ sourceId }).length > 0) return;
       if (this.store.countActiveTurnScopesForSource({ sourceId }) > 0) return;
       if (this.store.countEvidenceManifestsForSource({ sourceId }) > 0) return;
+      if (this.store.hasResearchReferencesForSource({ sourceId })) {
+        this.lifecycleLog(`knowledge lifecycle: orphan index prune skipped for ${sourceId}: research-referenced`);
+        return;
+      }
       for (const artifactId of this.store.listSourceArtifactIds({ sourceId })) {
         this.vectorIndex.removeArtifact(artifactId);
         this.indexStore.removeArtifact(artifactId);

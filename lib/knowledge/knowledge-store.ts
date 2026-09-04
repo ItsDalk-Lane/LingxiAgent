@@ -3601,6 +3601,23 @@ export class KnowledgeStore {
     `).get(sourceId, sourceId).count);
   }
 
+  /** 研究原文凭据、证据及完整性分母持续保护来源；检查关联的冻结范围也保留没有原文块的不可用源。 */
+  hasResearchReferencesForSource(input: { sourceId: unknown }): boolean {
+    const sourceId = requiredString(input?.sourceId, "sourceId", 128);
+    return !!this.db.prepare(`
+      SELECT 1 WHERE
+        EXISTS (SELECT 1 FROM knowledge_research_read_receipts WHERE source_id = ?)
+        OR EXISTS (SELECT 1 FROM knowledge_evidence_items WHERE source_id = ?)
+        OR EXISTS (SELECT 1 FROM knowledge_completeness_units WHERE source_id = ?)
+        OR EXISTS (
+          SELECT 1 FROM knowledge_completeness_checks checks
+          JOIN knowledge_research_runs runs ON runs.id = checks.research_run_id
+          JOIN knowledge_turn_scope_sources sources ON sources.scope_id = runs.turn_scope_id
+          WHERE sources.source_id = ?
+        )
+    `).get(sourceId, sourceId, sourceId, sourceId);
+  }
+
   private evidenceManifestById(id: string): KnowledgeEvidenceManifest {
     const row = this.db.prepare(`
       SELECT * FROM evidence_manifests WHERE id = ?
