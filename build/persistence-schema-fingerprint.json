@@ -660,7 +660,7 @@
     ],
     "version": 3
   },
-  "payloadFingerprint": "sha256:9613b8c490320b7d1d13448e67237edca1027ef446599da053cd562a2eb40691",
+  "payloadFingerprint": "sha256:a385729c34ac35cda0d6eafbfe98061dc2eb6c88519e409179f5f00005e42569",
   "registry": [
     {
       "affectedByEpochMigration": true,
@@ -3292,8 +3292,8 @@
   ],
   "review": {
     "classification": "compatible",
-    "compatibilityReason": "P3-04 的 FTS v3→v4 仅新增来源和章节两表及其全文索引，旧片段追加可空 section_id。旧 v2 配置、FTS、向量与原文保留；迁移失败事务回滚且不删旧库。新 v3 分块后台分批建立；冻结范围只读同配置各格式的就绪变体，新 v3 优先、缺失时沿用真实 v2，最终清单保存实际身份。知识事实库仍 v19，没有改写原文或历史身份。",
-    "payloadFingerprint": "sha256:9613b8c490320b7d1d13448e67237edca1027ef446599da053cd562a2eb40691"
+    "compatibilityReason": "P3-05仅增加既有索引按章节与片段身份读取及原文校验，事实库v19和FTSv4结构不变，旧向量BLOB与历史索引身份保留。",
+    "payloadFingerprint": "sha256:a385729c34ac35cda0d6eafbfe98061dc2eb6c88519e409179f5f00005e42569"
   },
   "schemas": [
     {
@@ -3925,14 +3925,14 @@
         },
         {
           "module": "lib/knowledge/vector-index-adapter.ts",
-          "sourceHash": "sha256:b07a39dc93aead7b0d60f647f6e2ef2803703be7c898dc8c8ee1cba31a59ccec"
+          "sourceHash": "sha256:7915941d09ec0c6a1a19703b604250efef289830d6dd41b7089a469911132d2f"
         },
         {
           "module": "lib/knowledge/vector-search-backend-factory.ts",
           "sourceHash": "sha256:977e9e13b68de1d1ac0b734f312387d7235b94496bcb909e0445c24275d0e722"
         }
       ],
-      "sourceHash": "sha256:658af937c541d0db74be360ade355ce9a4e5cf0729e2ae81671a70e2398be879",
+      "sourceHash": "sha256:637e59a13e61b868279de1da5fca7380558dae117f0f004502968a339efc533f",
       "storeId": "knowledge-indexes"
     },
     {

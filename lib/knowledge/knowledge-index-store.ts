@@ -780,6 +780,19 @@ export class KnowledgeIndexStore {
       .all(requiredId(parseArtifactId, "parseArtifactId")).map(mapSection);
   }
 
+  /** 规划章节只读取目录和位置，选中后再按需读取正文。 */
+  listArtifactSectionMetadata(parseArtifactId: string): Array<Pick<StoredKnowledgeSection,
+    "id" | "parseArtifactId" | "sectionOrdinal" | "headingPath" | "startBlockOrdinal" | "endBlockOrdinal" | "tokenCount">> {
+    return this.db.prepare(`SELECT id,parse_artifact_id,section_ordinal,heading_path_json,
+      start_block_ordinal,end_block_ordinal,token_count FROM knowledge_sections WHERE parse_artifact_id=? ORDER BY section_ordinal`)
+      .all(requiredId(parseArtifactId, "parseArtifactId")).map((row: any) => {
+        const section = mapSection(row);
+        return { id: section.id, parseArtifactId: section.parseArtifactId, sectionOrdinal: section.sectionOrdinal,
+          headingPath: section.headingPath, startBlockOrdinal: section.startBlockOrdinal, endBlockOrdinal: section.endBlockOrdinal,
+          tokenCount: section.tokenCount };
+      });
+  }
+
   private grainSearchArgs(input: KnowledgeGrainSearchInput): { ids: string[]; query: string; limit: number } {
     if (!Array.isArray(input?.parseArtifactIds)) {
       throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "Knowledge artifact scope is invalid");
@@ -853,6 +866,27 @@ export class KnowledgeIndexStore {
       ...(row.section_id == null ? {} : { sectionId: row.section_id }),
       spans: parseSpans(row.spans_json),
     }));
+  }
+
+  getChunkLocation(chunkId: string): { id: string; parseArtifactId: string; chunkIndexVariantId: string; ordinal: number; sectionId: string | null } | null {
+    return this.db.prepare(`SELECT id,parse_artifact_id AS parseArtifactId,chunk_index_variant_id AS chunkIndexVariantId,
+      ordinal,section_id AS sectionId FROM knowledge_chunks WHERE id=?`).get(requiredId(chunkId, "chunkId")) ?? null;
+  }
+
+  getSection(input: { parseArtifactId: string; sectionId: string }): StoredKnowledgeSection | null {
+    const row = this.db.prepare("SELECT * FROM knowledge_sections WHERE id=? AND parse_artifact_id=?")
+      .get(requiredId(input.sectionId, "sectionId"), requiredId(input.parseArtifactId, "parseArtifactId"));
+    return row ? mapSection(row) : null;
+  }
+
+  /** 小范围补查先取位置标识，不为章节查询读取其他章节正文。 */
+  listSectionChunkIds(input: { chunkIndexVariantId: string; sectionIds: readonly string[] }): string[] {
+    const variantId = requiredId(input.chunkIndexVariantId, "chunkIndexVariantId");
+    const ids = [...new Set(input.sectionIds.map(id => requiredId(id, "sectionId")))];
+    if (!ids.length) return [];
+    return this.db.prepare(`SELECT id FROM knowledge_chunks WHERE chunk_index_variant_id=?
+      AND section_id IN (${ids.map(() => "?").join(",")}) ORDER BY ordinal`).all(variantId, ...ids)
+      .map((row: { id: string }) => row.id);
   }
 
   listVariantChunks(chunkIndexVariantId: unknown): StoredKnowledgeChunk[] {
@@ -961,6 +995,7 @@ export class KnowledgeIndexStore {
     query: unknown;
     limit?: unknown;
     ordinalRangesByChunkIndexVariantId?: ReadonlyMap<string, KnowledgeOrdinalRange[]>;
+    sectionIdsByChunkIndexVariantId?: ReadonlyMap<string, readonly string[]>;
   }): IndexedKnowledgeChunk[] {
     if (!Array.isArray(input?.scopes) || input.scopes.length === 0) {
       throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "Knowledge search scope must not be empty");
@@ -1046,6 +1081,18 @@ export class KnowledgeIndexStore {
       }
       if (!variantFilterSql) return [];
     }
+    const sectionConditions: string[] = [], sectionParams: string[] = [];
+    if (input.sectionIdsByChunkIndexVariantId) {
+      for (const variantId of variantIds) {
+        const sections = input.sectionIdsByChunkIndexVariantId.get(variantId);
+        if (sections === undefined) { sectionConditions.push("c.chunk_index_variant_id = ?"); sectionParams.push(variantId); continue; }
+        const ids = [...new Set(sections.map(id => requiredId(id, "sectionId")))];
+        if (!ids.length) continue;
+        sectionConditions.push(`(c.chunk_index_variant_id = ? AND c.section_id IN (${ids.map(() => "?").join(",")}))`);
+        sectionParams.push(variantId, ...ids);
+      }
+      if (!sectionConditions.length) return [];
+    }
     const placeholders = variantIds.map(() => "?").join(", ");
     try {
       return this.db.prepare(`
@@ -1054,9 +1101,10 @@ export class KnowledgeIndexStore {
         JOIN knowledge_chunks c ON c.row_id = knowledge_chunks_fts.rowid
         WHERE knowledge_chunks_fts MATCH ?
           AND (${variantFilterSql || `c.chunk_index_variant_id IN (${placeholders})`})
+          ${sectionConditions.length ? `AND (${sectionConditions.join(" OR ")})` : ""}
         ORDER BY score ASC, c.parse_artifact_id ASC, c.ordinal ASC
         LIMIT ?
-      `).all(ftsQuery, ...(variantFilterSql ? variantFilterParams : variantIds), limit).map((row: any) => ({
+      `).all(ftsQuery, ...(variantFilterSql ? variantFilterParams : variantIds), ...sectionParams, limit).map((row: any) => ({
         id: row.id,
         parseArtifactId: row.parse_artifact_id,
         chunkIndexVariantId: row.chunk_index_variant_id,

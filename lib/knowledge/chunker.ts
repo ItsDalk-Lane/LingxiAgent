@@ -513,7 +513,10 @@ function primarySectionGroups(blocks: readonly KnowledgeBlock[]): PrimarySection
     if (block.locatorType === "markdown" || block.locatorType === "html") {
       headingPath = headingPathOf(block); key = JSON.stringify(["heading", headingPath]);
     } else if (block.locatorType === "text") {
-      if (isTextChapterHeading(block.text)) activeHeading = [block.text.trim()];
+      const path = headingPathOf(block);
+      // 解析阶段已有的章节定位优先；只有缺少定位时才从正文识别章标题。
+      if (path.length > 0) activeHeading = path;
+      else if (isTextChapterHeading(block.text)) activeHeading = [block.text.trim()];
       headingPath = activeHeading; key = JSON.stringify(["chapter", headingPath]);
     } else if (block.locatorType === "pdf") {
       const path = headingPathOf(block);

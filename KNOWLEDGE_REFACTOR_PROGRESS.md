@@ -412,16 +412,19 @@
 - 最后复核：同一笔记本不同格式来源曾错误共用最后绑定策略，真实文本/Markdown 三测试全部红；修为按同一配置枚举各格式的新旧候选，仍受冻结产物和 ready 变体集合限制。保留全部来源/FTS/快速清单/一次混合查询嵌入/两实际向量身份/旧编译集合不暗换断言，修后五文件 36 PASS。日志 `/tmp/lingxi-knowledge-p304-mixed-formats-{red,green}.log`。原断言未放宽，修复后完整联测通过。
 - 最终测试：`npx vitest run tests/knowledge*.test.ts tests/persistence-schema-tripwire.test.ts tests/builtin-tool-permission-coverage.test.ts tests/desktop-session-submit*.test.ts` **110 文件 / 1165 PASS / 0 FAIL / 0 SKIP，19.79s，exit 0**；三套类型 exit 0；全部 32 个修改代码文件 ESLint exit 0（0 错误/252 警告）；Node 24 真实源码导入、差异检查通过。日志 `/tmp/lingxi-knowledge-p304-tests-final.log`、`/tmp/lingxi-knowledge-p304-typecheck-reviewed.log`、`/tmp/lingxi-knowledge-p304-lint-all-final.log`、`/tmp/lingxi-knowledge-p304-node-source.log`。
 - 生成物：持久化清单 66 stores / 779 sites；事实库 v19、FTS v4、向量库保持原版本；兼容指纹 `sha256:9613b8c490320b7d1d13448e67237edca1027ef446599da053cd562a2eb40691`；运行闭包 10693 文件、开放树 887 文件。清单、指纹、闭包、开放边界、开放树最终均 exit 0；首次开放树调用参数拼错 exit 1 后按脚本实际位置参数纠正，未改生成器。P3 阶段门禁和最终封印仍待 P3-05 至 P3-07。
-- 对应 commit SHA：本项提交（下项回填）
+- 对应 commit SHA：`50bc1ac0`
 - 偏差：none
 
 ## P3-05：实现分层检索
 
-- 状态：pending
-- 改动文件：尚未开始
-- 测试命令：按任务书该项测试执行，尚未执行
-- 测试结果：NOT_EXECUTED
-- 对应 commit SHA：尚未提交
+- 状态：completed
+- 改动文件：统一搜索、FTS 索引、portable 向量读取、查询融合、原文提取、搜索/读取工具；四项指定测试及共享真实资料 fixture；旧分组/融合/观测测试适配；指纹与闭包生成物。
+- 改动：详细默认先来源/章节 FTS，章节取前 12 并保留命中来源至少一节；选中章节的片段直接在 SQL 中按 section_id 过滤后排序取限。相关来源执行语义召回，同一查询嵌入再用于所选章节小集合的精确余弦补查；portable SQL 同时限定模型、冻结变体和 chunk IDs，空集合不读向量。两通道融合后保持原全局重排/模型分组/缓存机制。快速仍只做片段 FTS，不读章节目录、不加串行搜索或远程调用。
+- 读取：支持 sectionId 与 aroundChunkId/neighborWindow 0～3，旧序号/查询参数兼容；相邻读取只取有界片段。父章节由冻结原文重新物化并核对缓存，巨块子节只返回该节精确区间；研究读取逐段颁发可重读凭据。来源/章节标题命中保留带真实锚点的 source/section 线索，不加入原文证据候选；直接将非 span 搜索线索转换证据会拒绝。三种结果携带粒度、父节身份和标题。
+- 失败与修复：旧回归首轮 40 PASS/1 FAIL，正文推断章标题盖过解析器既有定位，修为已有定位优先并保留原章节断言。首次全联测 1169 PASS/12 FAIL：8 项是详细新增章节补查及来源收窄后旧调用链断言，按任务书改为分别验证来源召回与小集合补查次数，仍保留嵌入次数/共享去重/真实身份/范围检查；4 项为尚未生成的指纹。随后局部复核 39 PASS/3 FAIL，补齐各通道分别统计及每次研究只回传该问题真实相关来源的验证；没有跳过或放宽约束。
+- 测试结果：最终 `npx vitest run tests/knowledge*.test.ts tests/persistence-schema-tripwire.test.ts tests/builtin-tool-permission-coverage.test.ts tests/desktop-session-submit*.test.ts` **114 文件 / 1182 PASS / 0 FAIL / 0 SKIP，20.36s，exit 0**；最后将来源/章节搜索时间计入 FTS 段后，指定四文件与搜索服务五文件 28 PASS 复核通过。三套类型、18 个改动代码文件 ESLint、Node 24 真实源码导入、差异检查均 exit 0。日志 `/tmp/lingxi-knowledge-p305-tests-final.log`、`/tmp/lingxi-knowledge-p305-timings-tests.log`、`/tmp/lingxi-knowledge-p305-typecheck-final.log`、`/tmp/lingxi-knowledge-p305-lint-final.log`、`/tmp/lingxi-knowledge-p305-node-source.log`；首轮日志保留。
+- 生成物：66 stores / 779 sites，事实库 v19、FTS v4、原向量结构和 BLOB 不变；兼容指纹 `sha256:a385729c34ac35cda0d6eafbfe98061dc2eb6c88519e409179f5f00005e42569`，运行闭包 10693 文件，开放树 887 文件；五生成器均 exit 0。P3 阶段门禁和最终封印仍待 P3-06、P3-07。
+- 对应 commit SHA：本项提交（下项回填）
 - 偏差：none
 
 ## P3-06：完整性与详细回答质量门禁

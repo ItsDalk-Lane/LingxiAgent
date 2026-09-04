@@ -287,6 +287,7 @@ export interface VectorIndexAdapter {
     model: VectorIndexModelIdentity;
     queryVector: number[];
     limit?: unknown;
+    chunkIds?: readonly string[];
   }): VectorSearchResult[];
   health(): { status: "ready" | "corrupt" };
   rebuild(): void;
@@ -995,6 +996,7 @@ export class PortableVectorIndexAdapter implements VectorIndexAdapter {
     model: VectorIndexModelIdentity;
     queryVector: number[];
     limit?: unknown;
+    chunkIds?: readonly string[];
   }): VectorSearchResult[] {
     const normalizeScope = (value: unknown, field: string): string[] | null => {
       if (value == null) return null;
@@ -1015,6 +1017,9 @@ export class PortableVectorIndexAdapter implements VectorIndexAdapter {
     if (!Number.isSafeInteger(limit) || limit < 1 || limit > 1000) {
       throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "Vector search limit is invalid");
     }
+    const chunkIds = input.chunkIds === undefined ? undefined
+      : [...new Set(input.chunkIds.map(id => requiredId(id, "chunkId", 64)))];
+    if (chunkIds?.length === 0) return [];
     const conditions = ["model_key = ?"];
     const params: unknown[] = [model.key];
     if (variantIds) {
@@ -1024,6 +1029,10 @@ export class PortableVectorIndexAdapter implements VectorIndexAdapter {
     if (artifactIds) {
       conditions.push(`parse_artifact_id IN (${artifactIds.map(() => "?").join(", ")})`);
       params.push(...artifactIds);
+    }
+    if (chunkIds) {
+      conditions.push("chunk_id IN (SELECT value FROM json_each(?))");
+      params.push(JSON.stringify(chunkIds));
     }
     try {
       const rows = this.db.prepare(`

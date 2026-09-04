@@ -17,7 +17,7 @@ describe("全文检索跨笔记本一次融合", () => {
     await data.manager.ingestion.drainQueue();
     const scope = data.manager.createTurnScope({ studioId: "rerank", sessionPath: "/tmp/shared-fusion.jsonl", notebookIds: ids });
     const compiledScope = await data.manager.compileTurnScope(scope);
-    const fts = vi.spyOn(data.manager.indexStore, "searchReadyVariantIds");
+    const fts = vi.spyOn(data.manager.indexStore, "search");
     const result = await data.manager.searchService.search({ ...data.request, compiledScope });
     expect(fts).toHaveBeenCalledTimes(1);
     expect(result.hits).toHaveLength(1);

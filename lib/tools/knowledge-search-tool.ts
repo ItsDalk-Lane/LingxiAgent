@@ -23,7 +23,8 @@ export function createKnowledgeSearchTool(deps: KnowledgeSearchToolDeps) {
     name: "knowledge_search",
     label: "Knowledge Search",
     description: "在本轮冻结的知识范围中搜索候选线索。snippet 仅作定位，candidateId 不是证据 ID。"
-      + "必须调用 knowledge_read 或 knowledge_grep 后才能引用。只读；默认 hybrid，可选仅本地 fts。",
+      + "必须调用 knowledge_read 或 knowledge_grep 后才能引用。只读；默认 hybrid 按来源、章节、片段分层检索，可用 sectionKeys 缩小章节，可选仅本地 fts。"
+      + "grain 表示线索粒度，sectionId 可交给 knowledge_read 读取父章节，chunkId 可用作 aroundChunkId 读取相邻片段。",
     parameters: Type.Object({
       scopeId: Type.String(), query: Type.String(),
       channel: Type.Optional(Type.Union([Type.Literal("fts"), Type.Literal("hybrid")])),

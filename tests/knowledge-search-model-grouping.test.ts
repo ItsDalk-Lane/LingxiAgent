@@ -50,26 +50,32 @@ async function fixture(modelCount = 1) {
 }
 
 describe("搜索按嵌入模型分组", () => {
-  it.each([1, 2])("五个独立来源使用 %i 种模型，每组一次嵌入及一次向量搜索", async modelCount => {
+  it.each([1, 2])("五个独立来源使用 %i 种模型，每组一次嵌入、一次来源召回及一次章节补查", async modelCount => {
     const { manager, search, request, embed } = await fixture(modelCount);
     const vector = vi.spyOn(manager.vectorIndex, "search");
     const result = await search.search(request);
     expect(embed).toHaveBeenCalledTimes(modelCount);
-    expect(vector).toHaveBeenCalledTimes(modelCount);
+    expect(vector.mock.calls.filter(([input]) => input.chunkIds === undefined)).toHaveLength(modelCount);
+    expect(vector.mock.calls.filter(([input]) => input.chunkIds !== undefined)).toHaveLength(modelCount);
     expect(result.remoteModelCalls).toBe(modelCount);
     expect(new Set(result.hits.map(hit => hit.sourceId)).size).toBe(5);
-    expect(vector.mock.calls.reduce((count, [input]) => count + (input.vectorIndexVariantIds as string[]).length, 0)).toBe(5);
+    for (const exact of [false, true]) {
+      expect(vector.mock.calls.filter(([input]) => (input.chunkIds !== undefined) === exact)
+        .reduce((count, [input]) => count + (input.vectorIndexVariantIds as string[]).length, 0)).toBe(5);
+    }
     const again = await search.search(request);
     expect(again.remoteModelCalls).toBe(0);
     expect(embed).toHaveBeenCalledTimes(modelCount);
-    expect(vector).toHaveBeenCalledTimes(modelCount);
+    expect(vector.mock.calls.filter(([input]) => input.chunkIds === undefined)).toHaveLength(modelCount);
+    expect(vector.mock.calls.filter(([input]) => input.chunkIds !== undefined)).toHaveLength(modelCount);
   });
 
   it("并发相同搜索仅一次底层执行，命中缓存仍校验范围关闭", async () => {
     const { manager, search, request, embed } = await fixture();
     const vector = vi.spyOn(manager.vectorIndex, "search");
     const results = await Promise.all(Array.from({ length: 5 }, () => search.search(request)));
-    expect(embed).toHaveBeenCalledTimes(1); expect(vector).toHaveBeenCalledTimes(1);
+    expect(embed).toHaveBeenCalledTimes(1); expect(vector.mock.calls.filter(([input]) => input.chunkIds === undefined)).toHaveLength(1);
+    expect(vector.mock.calls.filter(([input]) => input.chunkIds !== undefined)).toHaveLength(1);
     expect(results.map(result => result.hits)).toEqual(Array.from({ length: 5 }, () => results[0].hits));
     manager.closeTurnScope({ scopeId: request.compiledScope.scopeId });
     await expect(search.search(request)).rejects.toMatchObject({ code: "KNOWLEDGE_SCOPE_VIOLATION" });

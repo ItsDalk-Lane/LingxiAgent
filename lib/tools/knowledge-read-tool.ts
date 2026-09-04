@@ -16,7 +16,8 @@
  *   不回落到旧的全 studio 扫描行为。
  */
 import { Type } from "../pi-sdk/index.ts";
-import { resolveKnowledgeChunkerConfig } from "../knowledge/chunker.ts";
+import { materializeKnowledgeSection } from "../knowledge/evidence-span-extractor.ts";
+import { resolveReadyKnowledgeQueryVariant } from "../knowledge/scope-snapshot-compiler.ts";
 import { isKnowledgeError, KnowledgeError } from "../knowledge/errors.ts";
 import { EvidenceReceiptService, type KnowledgeResearchToolContext } from "../knowledge/evidence-receipt-service.ts";
 import { ResearchStore } from "../knowledge/research/research-store.ts";
@@ -89,7 +90,6 @@ function resolveScopedArtifact(
   notebookId: string;
   sourceName: string;
   scope: KnowledgeTurnScope;
-  chunkTargetChars: number;
 } {
   // 无会话上下文的 surface（如独立 CLI 调用）：显式不可用，不静默放行。
   requireKnowledgeSessionContext(sessionContext);
@@ -110,8 +110,6 @@ function resolveScopedArtifact(
     notebookId: owningNotebookId,
     sourceName: source.displayName,
     scope,
-    // owning notebook 的生效分块尺寸：ensure 链与摄入侧同 configId 判定指纹。
-    chunkTargetChars: knowledge.getNotebookEffectiveChunkTargetChars({ studioId, notebookId: owningNotebookId }),
   };
 }
 
@@ -122,7 +120,7 @@ export function createKnowledgeReadTool(deps: KnowledgeReadToolDeps) {
     description: "Read chunks of a Knowledge notebook source by ordinal range, or search within one source by query. "
       + "Use when a [KnowledgeContext] shard manifest lists more content than was injected: read shards with "
       + "the scopeId from the block's Scope line, plus sourceId and fromOrdinal/toOrdinal (1-based, both inclusive), "
-      + "or narrow with query. The scopeId is this turn's knowledge permission ceiling: reads outside it are rejected. Read-only.",
+      + "or narrow with query. Use sectionId for the canonical parent section, or aroundChunkId with neighborWindow (0-3) to read neighboring spans. The scopeId is this turn's knowledge permission ceiling: reads outside it are rejected. Read-only.",
     parameters: Type.Object({
       scopeId: Type.String({
         description: "Knowledge turn scope id from the [KnowledgeContext] block header (the Scope line). Required.",
@@ -139,6 +137,9 @@ export function createKnowledgeReadTool(deps: KnowledgeReadToolDeps) {
       toOrdinal: Type.Optional(Type.Number({
         description: "Last chunk ordinal to read (inclusive). Defaults to fromOrdinal. At most 40 chunks per call.",
       })),
+      sectionId: Type.Optional(Type.String({ description: "Read this parent section within the frozen source." })),
+      aroundChunkId: Type.Optional(Type.String({ description: "Read this hit and its nearby spans in the same frozen index variant." })),
+      neighborWindow: Type.Optional(Type.Integer({ minimum: 0, maximum: 3, description: "Neighbor count on each side; default 1, only with aroundChunkId." })),
       query: Type.Optional(Type.String({
         description: "Search within this source instead of reading an ordinal range.",
       })),
@@ -174,6 +175,14 @@ export function createKnowledgeReadTool(deps: KnowledgeReadToolDeps) {
           ? params.notebookId.trim()
           : null;
         const query = typeof params.query === "string" && params.query.trim() ? params.query.trim() : null;
+        const sectionId = params.sectionId === undefined ? null : requireNonEmptyString(params.sectionId, "sectionId");
+        const aroundChunkId = params.aroundChunkId === undefined ? null : requireNonEmptyString(params.aroundChunkId, "aroundChunkId");
+        const neighborWindow = params.neighborWindow === undefined ? 1 : params.neighborWindow;
+        if (!Number.isSafeInteger(neighborWindow) || neighborWindow < 0 || neighborWindow > 3
+          || (params.neighborWindow !== undefined && !aroundChunkId)
+          || (sectionId && aroundChunkId) || ((sectionId || aroundChunkId) && (query || params.fromOrdinal !== undefined || params.toOrdinal !== undefined))) {
+          throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "Knowledge parent read selectors are invalid or conflicting");
+        }
         const sessionContext = deps.resolveSessionContext?.(ctx) ?? {
           sessionPath: null,
           scopeOwnerSessionPath: null,
@@ -251,19 +260,12 @@ export function createKnowledgeReadTool(deps: KnowledgeReadToolDeps) {
           }, null, 2), { sourceId, mode: "search" });
         }
 
-        // 索引身份锚（Phase 2 起纯解析、只读）：chunkProfileHash = 生效分块配置的
-        // chunkerConfigId（与摄入侧同一解析链，查询不再惰性建绑/建索引）。
-        // 变体缺失/未 ready → 幂等入队后台构建 + 显式报 KNOWLEDGE_PARSE_NOT_READY
-        // （提示等摄入完成重试），不得静默当空。
-        const blocks = knowledge.listArtifactBlocks({ studioId, parseArtifactId: resolved.artifactId });
-        const chunkProfileHash = resolveKnowledgeChunkerConfig(blocks, {
-          targetChars: resolved.chunkTargetChars,
-        }).configId;
-        const variant = knowledge.indexStore.resolveChunkIndexVariant(
-          resolved.artifactId,
-          chunkProfileHash,
-        );
-        if (!variant || variant.status !== "ready") {
+        const compiledScope = await knowledge.compileTurnScope(resolved.scope);
+        const notebook = compiledScope.notebooks.find(item => item.notebookId === resolved.notebookId);
+        const variant = notebook?.chunkProfileHash ? resolveReadyKnowledgeQueryVariant({ store: knowledge.store,
+          indexStore: knowledge.indexStore, parseArtifactId: resolved.artifactId, chunkProfileHash: notebook.chunkProfileHash,
+          readyChunkVariantIds: compiledScope.readyChunkVariantIds }) : null;
+        if (!variant) {
           knowledge.requestVariantBuild({
             studioId,
             notebookId: resolved.notebookId,
@@ -271,21 +273,47 @@ export function createKnowledgeReadTool(deps: KnowledgeReadToolDeps) {
             artifactId: resolved.artifactId,
           });
           return toolError(
-            `Knowledge source index is not ready yet (sourceId: ${sourceId}, variant status: ${variant?.status ?? "missing"}); `
+            `Knowledge source index is not ready yet (sourceId: ${sourceId}, variant status: missing); `
             + "background build enqueued, retry after ingestion completes.",
             { errorCode: "KNOWLEDGE_PARSE_NOT_READY", sourceId },
           );
         }
-        const indexedChunks = knowledge.indexStore.listVariantChunks(variant.id);
-        const total = indexedChunks.length;
+        if (sectionId) {
+          const stored = knowledge.indexStore.getSection({ parseArtifactId: resolved.artifactId, sectionId });
+          if (!stored || !knowledge.indexStore.listSectionChunkIds({ chunkIndexVariantId: variant.id, sectionIds: [sectionId] }).length) {
+            throw knowledgeScopeViolation("Section is outside the frozen source and index variant");
+          }
+          const materialized = materializeKnowledgeSection({ parseArtifactId: resolved.artifactId, section: stored,
+            blocks: knowledge.listArtifactBlocks({ studioId, parseArtifactId: resolved.artifactId }) });
+          signal?.throwIfAborted();
+          const issue = () => materialized.spans.map(span => {
+            if (!research || !researchContext) return span;
+            const receipts = new EvidenceReceiptService(research);
+            const receipt = receipts.issue({ ...researchContext, sourceId, contentSnapshotId: resolved.contentSnapshotId,
+              parseArtifactId: resolved.artifactId, chunkIndexVariantId: variant.id, blockId: span.blockId,
+              startOffset: span.startOffset, endOffset: span.endOffset, channel: "knowledge_read" });
+            const raw = receipts.read({ runId: researchContext.runId, receiptId: receipt.id,
+              allowedSourceIds: researchContext.allowedSourceIds, actorSessionId: researchContext.actorSessionId });
+            return { ...span, text: raw.text, receiptId: receipt.id };
+          });
+          const spans = research ? research.transaction(issue) : issue();
+          return toolOk(JSON.stringify({ source: resolved.sourceName, sourceId, notebookId: resolved.notebookId, scopeId,
+            parseArtifactId: resolved.artifactId, contentSnapshotId: resolved.contentSnapshotId, mode: "section", sectionId,
+            parentSectionHeading: materialized.headingPath, chunks: [{ sectionId, text: materialized.text, spans }] }), { sourceId, mode: "section" });
+        }
+        const total = variant.chunkCount;
         if (total === 0) {
           return toolError(`Knowledge source has no indexed chunks (sourceId: ${sourceId}).`, {
             errorCode: "KNOWLEDGE_INDEX_INVALID",
             sourceId,
           });
         }
-        const from = (optionalOrdinal(params.fromOrdinal, "fromOrdinal") ?? 1) - 1;
-        const toExclusive = (optionalOrdinal(params.toOrdinal, "toOrdinal") ?? from + 1);
+        const around = aroundChunkId ? knowledge.indexStore.getChunkLocation(aroundChunkId) : null;
+        if (aroundChunkId && (!around || around.parseArtifactId !== resolved.artifactId || around.chunkIndexVariantId !== variant.id)) {
+          throw knowledgeScopeViolation("Neighbor hit is outside the frozen source and index variant");
+        }
+        const from = around ? Math.max(0, around.ordinal - neighborWindow) : (optionalOrdinal(params.fromOrdinal, "fromOrdinal") ?? 1) - 1;
+        const toExclusive = around ? Math.min(total, around.ordinal + neighborWindow + 1) : (optionalOrdinal(params.toOrdinal, "toOrdinal") ?? from + 1);
         if (toExclusive <= from) {
           return toolError(
             `toOrdinal must be >= fromOrdinal (received from=${from + 1}, to=${toExclusive}).`,
@@ -299,9 +327,8 @@ export function createKnowledgeReadTool(deps: KnowledgeReadToolDeps) {
             { errorCode: "KNOWLEDGE_INVALID_ARGUMENT", sourceId, totalChunks: total },
           );
         }
-        const selected = indexedChunks
-          .filter(chunk => chunk.ordinal >= from && chunk.ordinal < toExclusive)
-          .sort((left, right) => left.ordinal - right.ordinal);
+        const selected = knowledge.indexStore.readVariantChunks(variant.id,
+          Array.from({ length: Math.min(toExclusive, total) - from }, (_, index) => from + index));
         if (research) signal?.throwIfAborted();
         const chunks = prepareChunks(selected);
         return toolOk(JSON.stringify({
@@ -311,11 +338,12 @@ export function createKnowledgeReadTool(deps: KnowledgeReadToolDeps) {
           scopeId,
           parseArtifactId: resolved.artifactId,
           contentSnapshotId: resolved.contentSnapshotId,
-          mode: "ordinal-range",
+          mode: around ? "around-chunk" : "ordinal-range",
+          ...(around ? { aroundChunkId, neighborWindow } : {}),
           requestedRange: [from + 1, Math.min(toExclusive, total)],
           totalChunks: total,
           chunks,
-        }, null, 2), { sourceId, mode: "ordinal-range" });
+        }, null, 2), { sourceId, mode: around ? "around-chunk" : "ordinal-range" });
       } catch (error) {
         if (isKnowledgeError(error)) {
           return toolError(`knowledge_read failed: ${error.code}: ${error.message}`, {

@@ -1,4 +1,6 @@
 import crypto from "node:crypto";
+import { buildKnowledgeSections, type KnowledgeSectionDraft } from "./chunker.ts";
+import type { KnowledgeBlock } from "./types.ts";
 import { estimateTextTokens } from "../llm/estimate-text-tokens.ts";
 import { tokenizeSearchText } from "../search/search-text.ts";
 import type { KnowledgeEvidenceSpan } from "../../shared/knowledge-evidence.ts";
@@ -110,6 +112,28 @@ function selectWindow(text: string, start: number, end: number, terms: string[])
   return [from, to];
 }
 
+/** 章节索引只是定位信息；重新从冻结原文分区，核对后才返回可签发凭据的连续原文。 */
+export function materializeKnowledgeSection(input: {
+  parseArtifactId: string; section: KnowledgeSectionDraft; blocks: KnowledgeBlock[];
+}) {
+  const section = buildKnowledgeSections(input.parseArtifactId, input.blocks).find(candidate => candidate.id === input.section.id);
+  if (!section || section.parseArtifactId !== input.section.parseArtifactId || section.tokenCount !== input.section.tokenCount
+    || section.text !== input.section.text || section.startBlockOrdinal !== input.section.startBlockOrdinal
+    || section.endBlockOrdinal !== input.section.endBlockOrdinal || JSON.stringify(section.headingPath) !== JSON.stringify(input.section.headingPath)) {
+    throw new KnowledgeError("KNOWLEDGE_INDEX_INVALID", "Section index differs from frozen canonical text");
+  }
+  const blocks = new Map(input.blocks.map(block => [block.id, block]));
+  const spans = (section.blockSpans ?? []).map(span => {
+    const block = blocks.get(span.blockId)!;
+    if (crypto.createHash("sha256").update(block.text).digest("hex") !== block.textSha256) {
+      throw new KnowledgeError("KNOWLEDGE_STORAGE_INVALID", "Frozen section block text hash differs");
+    }
+    return { blockId: block.id, startOffset: span.blockStartOffset, endOffset: span.blockEndOffset,
+      text: block.text.slice(span.blockStartOffset, span.blockEndOffset) };
+  });
+  return { sectionId: section.id, text: section.text, headingPath: section.headingPath, spans };
+}
+
 /** 搜索正文只作线索；引用必须回到同一冻结解析块，再按原文切片。 */
 export class EvidenceSpanExtractor {
   private readonly store: Pick<KnowledgeStore, "getArtifactBlocksByIds">;
@@ -123,6 +147,10 @@ export class EvidenceSpanExtractor {
     const allowedVariants = new Set(input.compiledScope.readyChunkVariantIds);
     const requestedBlocks = new Map<string, Set<string>>();
     for (const hit of input.hits) {
+      const grain = (hit as typeof hit & { grain?: string }).grain;
+      if (grain !== undefined && grain !== "span") {
+        throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "Source and section search hints must be read before becoming evidence");
+      }
       if (!sourceByArtifact.has(hit.parseArtifactId) || !allowedVariants.has(hit.chunkIndexVariantId)) {
         throw new KnowledgeError("KNOWLEDGE_SCOPE_VIOLATION", "Evidence candidate is outside the frozen scope");
       }

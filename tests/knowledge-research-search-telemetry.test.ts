@@ -60,7 +60,8 @@ describe("研究搜索的真实内部检索身份", () => {
     expect(payload).toMatchObject({ mode: "hybrid", vectorBackend: "portable" });
     expect(payload.hits.some((hit: { channels: string[] }) => hit.channels.includes("vector"))).toBe(true);
     expect(search).not.toHaveBeenCalled(); expect(withEvidence).toHaveBeenCalledTimes(1);
-    expect(embed).toHaveBeenCalledTimes(1); expect(vector).toHaveBeenCalledTimes(1);
+    expect(embed).toHaveBeenCalledTimes(1); expect(vector.mock.calls.filter(([input]) => input.chunkIds === undefined)).toHaveLength(1);
+    expect(vector.mock.calls.filter(([input]) => input.chunkIds !== undefined)).toHaveLength(1);
     const actual = await withEvidence.mock.results[0].value;
     expect(completed).toHaveBeenCalledExactlyOnceWith({ mode: "hybrid", vectorBackend: "portable",
       searchedVectorVariants: actual.evidence.searchedVectorVariants });
@@ -133,12 +134,17 @@ describe("研究搜索的真实内部检索身份", () => {
     expect(f.calls.filter(turn => turn.role === "worker")).toHaveLength(2);
     expect(completed).toHaveBeenCalledTimes(3);
     expect(completed.mock.calls[0][0]).toEqual({ mode: "fts", vectorBackend: "none", searchedVectorVariants: [] });
-    expect(embed).toHaveBeenCalledTimes(2); expect(vector).toHaveBeenCalledTimes(2);
+    expect(embed).toHaveBeenCalledTimes(2); expect(vector.mock.calls.filter(([input]) => input.chunkIds === undefined)).toHaveLength(2);
+    expect(vector.mock.calls.filter(([input]) => input.chunkIds !== undefined)).toHaveLength(2);
     const actualIds = [...new Set(vector.mock.calls.flatMap(([input]) => input.vectorIndexVariantIds as string[]))].sort();
-    expect(actualIds).toHaveLength(3);
+    // 分层检索只查询各问题实际命中的来源，第三份无关资料不参与向量召回。
+    expect(actualIds).toHaveLength(2);
     for (const [summary] of completed.mock.calls.slice(1)) {
       expect(summary.mode).toBe("hybrid"); expect(summary.vectorBackend).toBe("portable");
-      expect(summary.searchedVectorVariants.map(item => item.vectorIndexVariantId).sort()).toEqual(actualIds);
+      expect(summary.searchedVectorVariants).toHaveLength(1);
+      expect(actualIds).toContain(summary.searchedVectorVariants[0].vectorIndexVariantId);
+      expect(f.request.compiledScope.sources.filter(source => f.sources.slice(0, 2).some(item => item.sourceId === source.sourceId)).map(source => source.parseArtifactId)).toContain(summary.searchedVectorVariants[0].parseArtifactId);
+      expect(summary.searchedVectorVariants[0].parseArtifactId).not.toBe(f.request.compiledScope.sources.find(source => source.sourceId === f.sources[2].sourceId)!.parseArtifactId);
       expect(JSON.stringify(summary)).not.toContain("苹果项目");
     }
     const actions = f.research.listActions(result.run.id).filter(action => action.actionType === "knowledge_search");

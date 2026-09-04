@@ -638,6 +638,8 @@ export class KnowledgeQueryService {
     limit: number;
     signal?: AbortSignal;
     ordinalRanges?: ReadonlyMap<string, KnowledgeOrdinalRange[]>;
+    sectionIds?: ReadonlyMap<string, readonly string[]>;
+    requiredSectionIds?: ReadonlyMap<string, readonly string[]>;
     onRemoteCall: () => void;
     onEmbeddingCacheHit: () => void;
   }) {
@@ -660,6 +662,8 @@ export class KnowledgeQueryService {
       runId: `knowledge_search_${crypto.randomUUID()}`, topK: input.limit,
       signal: input.signal, rerank: false, reranker: null, ftsCandidates: [],
       ordinalRangesByChunkIndexVariantId: input.ordinalRanges,
+      sectionIdsByChunkIndexVariantId: input.sectionIds,
+      requiredSectionIdsByChunkIndexVariantId: input.requiredSectionIds,
       embedTexts: embeddingRef && this.deps.embedTextsForModel ? async request => {
         const cached = await this.queryEmbeddingCache.getOrCreate({
           normalizedQuery: normalizeKnowledgeQuery(input.query), provider: embeddingRef.provider,
@@ -1120,6 +1124,8 @@ export class KnowledgeQueryService {
      * 向量通道按同一约束后过滤（约束后为空的变体两通道都不产生结果）。
      */
     ordinalRangesByChunkIndexVariantId?: ReadonlyMap<string, KnowledgeOrdinalRange[]>;
+    sectionIdsByChunkIndexVariantId?: ReadonlyMap<string, readonly string[]>;
+    requiredSectionIdsByChunkIndexVariantId?: ReadonlyMap<string, readonly string[]>;
   }): Promise<{
     vectorBackend?: "hnsw" | "portable";
     vectorDegradedReasons?: string[];
@@ -1319,6 +1325,7 @@ export class KnowledgeQueryService {
     }
 
     let vectorRows;
+    let exactVectorRows: ReturnType<VectorIndexAdapter["search"]> = [];
     let vectorBackend: "hnsw" | "portable" = "portable";
     let vectorDegradedReasons: string[] = [];
     try {
@@ -1337,6 +1344,20 @@ export class KnowledgeQueryService {
           if (ordinals.length) for (const chunk of this.deps.indexStore.readVariantChunks(variant.chunkIndexVariantId, ordinals)) chunksById.set(chunk.id, chunk);
         }
       } else vectorRows = vectorIndex!.search(searchInput);
+      if (input.sectionIdsByChunkIndexVariantId) {
+        const chunkIds = searchedVectorVariants.flatMap(variant => {
+          const sectionIds = input.sectionIdsByChunkIndexVariantId!.get(variant.chunkIndexVariantId);
+          return sectionIds?.length ? this.deps.indexStore.listSectionChunkIds({ chunkIndexVariantId: variant.chunkIndexVariantId, sectionIds }) : [];
+        });
+        if (chunkIds.length) {
+          // 章节补查只按已选片段标识读向量，不读取整份资料或整个工作室的向量。
+          exactVectorRows = vectorIndex!.search({ ...searchInput, chunkIds: [...new Set(chunkIds)] });
+          for (const variant of searchedVectorVariants) {
+            const ordinals = exactVectorRows.filter(row => row.vectorIndexVariantId === variant.vectorIndexVariantId).map(row => row.ordinal);
+            if (ordinals.length) for (const chunk of this.deps.indexStore.readVariantChunks(variant.chunkIndexVariantId, ordinals)) chunksById.set(chunk.id, chunk);
+          }
+        }
+      }
     } catch (error) {
       signal?.throwIfAborted();
       if (this.deps.vectorSearchBackend || !isKnowledgeError(error) || error.code !== "KNOWLEDGE_INDEX_INVALID") {
@@ -1382,12 +1403,14 @@ export class KnowledgeQueryService {
         searchedVectorVariants: [],
       };
     }
-    const vector = vectorRows
+    const materialize = (rows: ReturnType<VectorIndexAdapter["search"]>) => rows
       // §三十九 section 约束对向量通道同样生效：约束了区间集合的变体只保留
       // 落在区间内的命中（未约束的变体不受影响）。
       .filter(row => {
-        if (!ordinalRanges) return true;
         const chunk = chunksById.get(row.chunkId);
+        const required = chunk && input.requiredSectionIdsByChunkIndexVariantId?.get(chunk.chunkIndexVariantId);
+        if (required && (!chunk.sectionId || !required.includes(chunk.sectionId))) return false;
+        if (!ordinalRanges) return true;
         if (!chunk) return true;
         const ranges = ordinalRanges.get(chunk.chunkIndexVariantId);
         if (!ranges) return true;
@@ -1398,8 +1421,10 @@ export class KnowledgeQueryService {
         if (!chunk || chunk.parseArtifactId !== row.parseArtifactId) {
           throw new KnowledgeError("KNOWLEDGE_INDEX_INVALID", "Knowledge vector index references an unknown chunk");
         }
-        return { ...chunk, score: row.score };
+        return { ...chunk, score: row.score, channels: ["vector"] as Array<"vector"> };
       });
+    const semantic = materialize(vectorRows);
+    const vector = exactVectorRows.length ? fuseNotebookRankings([semantic, materialize(exactVectorRows)], true).map(row => row.chunk) : semantic;
     let candidates;
     {
       vectorMs = Date.now() - vectorStart;

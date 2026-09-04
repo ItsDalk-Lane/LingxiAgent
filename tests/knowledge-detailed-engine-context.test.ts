@@ -165,7 +165,8 @@ describe("Engine 真实详细研究上下文", () => {
     embed.mockClear();
     const vector = vi.spyOn(f.manager.vectorIndex, "search");
     const result = await f.engine.buildDetailedKnowledgeResearchContext(f.input);
-    expect(embed).toHaveBeenCalledTimes(2); expect(vector).toHaveBeenCalledTimes(2);
+    expect(embed).toHaveBeenCalledTimes(2); expect(vector.mock.calls.filter(([input]) => input.chunkIds === undefined)).toHaveLength(2);
+    expect(vector.mock.calls.filter(([input]) => input.chunkIds !== undefined)).toHaveLength(2);
     const actualIds = [...new Set(vector.mock.calls.flatMap(([input]) => input.vectorIndexVariantIds as string[]))];
     expect(actualIds).toHaveLength(1);
     expect(result.stats).toMatchObject({ retrievalMode: "hybrid", vectorBackend: "portable", searchCalls: 2,

@@ -25,6 +25,9 @@ export interface KnowledgeSearchRequest {
 }
 
 export interface KnowledgeSearchHit {
+  grain: "source" | "section" | "span";
+  sectionId: string | null;
+  parentSectionHeading: string[] | null;
   candidateId: string;
   sourceId: string;
   sourceName: string;
@@ -152,13 +155,23 @@ export class KnowledgeSearchService {
         }
       }
     }
-    validate(request.sectionKeys, [...new Set([...variants.values()].flatMap(variant => variant.sectionKeys))]);
+    const hierarchical = request.channel === "hybrid";
+    const sectionMetadata = new Map<string, ReturnType<KnowledgeIndexStore["listArtifactSectionMetadata"]>>();
+    if (hierarchical || request.sectionKeys || sectionsBySourceId) {
+      for (const artifactId of new Set([...variants.values()].map(variant => variant.parseArtifactId))) {
+        sectionMetadata.set(artifactId, this.deps.indexStore.listArtifactSectionMetadata(artifactId));
+      }
+    }
+    const sectionKeysFor = (artifactId: string) => [...new Set([
+      ...[...variants.values()].filter(variant => variant.parseArtifactId === artifactId).flatMap(variant => variant.sectionKeys),
+      ...(sectionMetadata.get(artifactId) ?? []).map(section => knowledgeSectionKeyOf(section.headingPath)).filter((key): key is string => key !== null),
+    ])];
+    validate(request.sectionKeys, [...new Set([...variants.values()].flatMap(variant => sectionKeysFor(variant.parseArtifactId)))]);
     if (sectionsBySourceId) {
       validate([...sectionsBySourceId.keys()], sources.map(source => source.sourceId));
       for (const [sourceId, keys] of sectionsBySourceId) {
         const source = sources.find(source => source.sourceId === sourceId)!;
-        validate(keys, [...variants.values()].filter(variant => variant.parseArtifactId === source.parseArtifactId)
-          .flatMap(variant => variant.sectionKeys));
+        validate(keys, sectionKeysFor(source.parseArtifactId!));
       }
     }
     const variantIds = [...variants.keys()];
@@ -174,25 +187,69 @@ export class KnowledgeSearchService {
       scopeSnapshotHash: scope.snapshotHash, normalizedQuery: normalizeKnowledgeQuery(request.query),
       channel: request.channel, filters: { notebookIds: request.notebookIds, sourceIds: request.sourceIds,
         sectionKeys: request.sectionKeys, sectionsBySourceId: sectionsBySourceId ? [...sectionsBySourceId] : undefined },
-      limit: request.limit, rerank: request.rerank, retrievalImplementationVersion: "knowledge-search-v2",
+      limit: request.limit, rerank: request.rerank, retrievalImplementationVersion: "knowledge-search-v3-hierarchical",
     }, async signal => {
       request = { ...request, query: normalizeKnowledgeQuery(request.query), signal };
+      const ftsStart = performance.now();
       let ordinalRanges: Map<string, KnowledgeOrdinalRange[]> | undefined;
+      let sectionIds: Map<string, readonly string[]> | undefined;
+      let requiredSectionIds: Map<string, readonly string[]> | undefined;
+      const narrowedArtifacts = new Set<string>();
+      const coarseHints: Array<{ grain: "source" | "section"; parseArtifactId: string; sectionId: string; snippet: string; score: number }> = [];
+      if (hierarchical) {
+        const artifactIds = [...sectionMetadata.keys()].filter(id => sectionMetadata.get(id)!.length > 0);
+        const sourceHits = this.deps.indexStore.searchSourceDocuments({ parseArtifactIds: artifactIds, query: request.query, limit: 12 });
+        const sectionHits = this.deps.indexStore.searchSections({ parseArtifactIds: artifactIds, query: request.query, limit: 12 });
+        const selected = new Map<string, { id: string; parseArtifactId: string }>(sectionHits.map(section => [section.id, section]));
+        for (const section of sectionHits) coarseHints.push({ grain: "section", parseArtifactId: section.parseArtifactId,
+          sectionId: section.id, snippet: section.text.slice(0, 1200), score: section.score });
+        for (const source of sourceHits) {
+          narrowedArtifacts.add(source.parseArtifactId);
+          if (![...selected.values()].some(section => section.parseArtifactId === source.parseArtifactId)) {
+            const first = sectionMetadata.get(source.parseArtifactId)?.[0];
+            if (first) {
+              selected.set(first.id, first);
+              coarseHints.push({ grain: "source", parseArtifactId: first.parseArtifactId, sectionId: first.id,
+                snippet: `${source.title}\n${source.outlineText}`.slice(0, 1200), score: source.score });
+            }
+          }
+        }
+        for (const section of selected.values()) narrowedArtifacts.add(section.parseArtifactId);
+        sectionIds = new Map();
+        for (const variant of variants.values()) {
+          // 旧 v2 无章节投影，继续旧片段全文检索并沿用已冻结身份。
+          if (!this.deps.store.isCurrentChunkProfile(variant.chunkProfileHash)) continue;
+          sectionIds.set(variant.id, [...selected.values()].filter(section => section.parseArtifactId === variant.parseArtifactId).map(section => section.id));
+        }
+      }
       if (request.sectionKeys || sectionsBySourceId) {
-        ordinalRanges = new Map();
+        ordinalRanges = new Map(); sectionIds ??= new Map(); requiredSectionIds = new Map();
+        narrowedArtifacts.clear();
         for (const variant of variants.values()) {
           const sourceId = sources.find(source => source.parseArtifactId === variant.parseArtifactId)!.sourceId;
           const keys = sectionsBySourceId?.get(sourceId) ?? request.sectionKeys;
-          if (!keys) continue;
-          const blocks = this.deps.store.listArtifactBlocks({ studioId: scope.studioId, parseArtifactId: variant.parseArtifactId });
-          const locators = buildKnowledgeBlockLocatorIndex(blocks);
-          const ranges: KnowledgeOrdinalRange[] = this.deps.indexStore.listVariantChunks(variant.id)
-            .filter(chunk => chunk.spans.some(span => keys.includes(knowledgeSectionKeyOf(locators.get(span.blockId)?.headingPath) ?? "")))
-            .map(chunk => [chunk.ordinal, chunk.ordinal]);
-          ordinalRanges.set(variant.id, ranges);
+          if (!keys) { narrowedArtifacts.add(variant.parseArtifactId); continue; }
+          if (this.deps.store.isCurrentChunkProfile(variant.chunkProfileHash)) {
+            const selected = (sectionMetadata.get(variant.parseArtifactId) ?? [])
+              .filter(section => keys.includes(knowledgeSectionKeyOf(section.headingPath) ?? ""));
+            sectionIds.set(variant.id, selected.map(section => section.id));
+            requiredSectionIds.set(variant.id, selected.map(section => section.id));
+            if (selected.length) narrowedArtifacts.add(variant.parseArtifactId);
+          } else {
+            const blocks = this.deps.store.listArtifactBlocks({ studioId: scope.studioId, parseArtifactId: variant.parseArtifactId });
+            const locators = buildKnowledgeBlockLocatorIndex(blocks);
+            const ranges: KnowledgeOrdinalRange[] = this.deps.indexStore.listVariantChunks(variant.id)
+              .filter(chunk => chunk.spans.some(span => keys.includes(knowledgeSectionKeyOf(locators.get(span.blockId)?.headingPath) ?? "")))
+              .map(chunk => [chunk.ordinal, chunk.ordinal]);
+            ordinalRanges.set(variant.id, ranges);
+            if (ranges.length) narrowedArtifacts.add(variant.parseArtifactId);
+          }
         }
       }
-      const timings: KnowledgeSearchResponse["timings"] = { scopeMs: performance.now() - started, ftsMs: 0, fuseMs: 0, totalMs: 0 };
+      const semanticVariantIds = variantIds.filter(id => narrowedArtifacts.size === 0 && !requiredSectionIds
+        || narrowedArtifacts.has(variants.get(id)!.parseArtifactId)
+        || !this.deps.store.isCurrentChunkProfile(variants.get(id)!.chunkProfileHash));
+      const timings: KnowledgeSearchResponse["timings"] = { scopeMs: ftsStart - started, ftsMs: 0, fuseMs: 0, totalMs: 0 };
       let remoteModelCalls = 0;
       let embeddingGroups = 0, rerankGroups = 0;
       let queryEmbeddingCacheHit = false;
@@ -204,11 +261,11 @@ export class KnowledgeSearchService {
       const degraded: RetrieveForNotebooksResult["degraded"] = [];
       const degradedReasons = [...scope.warnings];
       const rerankDegradeReasons: string[] = [];
-      const ftsStart = performance.now();
       const generationLimit = request.channel === "hybrid" ? Math.min(request.limit, KNOWLEDGE_CANDIDATE_GENERATION_BUDGET) : request.limit;
-      const fts = variantIds.length === 0 ? [] : ordinalRanges ? this.deps.indexStore.search({
+      const fts = variantIds.length === 0 ? [] : ordinalRanges || sectionIds ? this.deps.indexStore.search({
         scopes: [...variants.values()].map(variant => ({ parseArtifactId: variant.parseArtifactId, chunkProfileHash: variant.chunkProfileHash })),
         query: request.query, limit: generationLimit, ordinalRangesByChunkIndexVariantId: ordinalRanges,
+        sectionIdsByChunkIndexVariantId: sectionIds,
       }) : this.deps.queryService.searchCompiledScopeFts({
         compiledScope: { ...scope, readyChunkVariantIds: variantIds }, query: request.query, limit: generationLimit,
       });
@@ -226,8 +283,8 @@ export class KnowledgeSearchService {
             variant.parseArtifactId === source.parseArtifactId && variantIdsByNotebook.get(notebook.notebookId)?.has(variant.id)))));
         embeddingGroups = groupNotebooks.filter(members => members[0].embeddingModelRef).length;
         const outcomes = await Promise.all(groupNotebooks.map(members => this.deps.queryService.retrieveCompiledGroup({
-          compiledScope: scope, notebooks: members, variantIds, query: request.query, limit: request.limit,
-          signal: request.signal, ordinalRanges, onRemoteCall: () => { remoteModelCalls += 1; },
+          compiledScope: scope, notebooks: members, variantIds: semanticVariantIds, query: request.query, limit: request.limit,
+          signal: request.signal, ordinalRanges, sectionIds, requiredSectionIds, onRemoteCall: () => { remoteModelCalls += 1; },
           onEmbeddingCacheHit: () => { queryEmbeddingCacheHit = true; },
         })));
         for (const outcome of outcomes) {
@@ -305,6 +362,10 @@ export class KnowledgeSearchService {
       const hits: KnowledgeSearchHit[] = annotated.map(candidate => {
         const source = sources.find(source => source.sourceId === candidate.sourceId)!;
         return {
+          grain: "span",
+          sectionId: candidate.sectionId ?? null,
+          parentSectionHeading: candidate.sectionId
+            ? sectionMetadata.get(candidate.parseArtifactId)?.find(section => section.id === candidate.sectionId)?.headingPath ?? candidate.headingPath : null,
           candidateId: `kc_${crypto.createHash("sha256").update(`${scope.scopeId}\0${candidate.chunkIndexVariantId}\0${candidate.id}`).digest("hex").slice(0, 32)}`,
           sourceId: source.sourceId, sourceName: source.sourceName,
           notebookIds: source.notebookIds.filter(id => notebooks.some(notebook => notebook.notebookId === id
@@ -315,6 +376,26 @@ export class KnowledgeSearchService {
           snippet: candidate.text.slice(0, 1200), score: candidate.score, channels: candidate.channels ?? [],
         };
       });
+      // 标题或章节命中但片段未命中时保留可读取的线索；不将其加入原文证据候选。
+      for (const hint of coarseHints) {
+        if (hits.length >= request.limit) break;
+        if (hits.some(hit => hit.sectionId === hint.sectionId)) continue;
+        const variant = [...variants.values()].find(item => item.parseArtifactId === hint.parseArtifactId
+          && sectionIds?.get(item.id)?.includes(hint.sectionId));
+        if (!variant) continue;
+        const chunkId = this.deps.indexStore.listSectionChunkIds({ chunkIndexVariantId: variant.id, sectionIds: [hint.sectionId] })[0];
+        const location = chunkId ? this.deps.indexStore.getChunkLocation(chunkId) : null;
+        if (!location) continue;
+        const source = sources.find(item => item.parseArtifactId === hint.parseArtifactId)!;
+        const heading = sectionMetadata.get(hint.parseArtifactId)?.find(section => section.id === hint.sectionId)?.headingPath ?? null;
+        hits.push({ grain: hint.grain, sectionId: hint.sectionId, parentSectionHeading: heading,
+          candidateId: `kc_${crypto.createHash("sha256").update(JSON.stringify([scope.scopeId, hint.grain, hint.sectionId, variant.id])).digest("hex").slice(0, 32)}`,
+          sourceId: source.sourceId, sourceName: source.sourceName,
+          notebookIds: source.notebookIds.filter(id => variantIdsByNotebook.get(id)?.has(variant.id)),
+          contentSnapshotId: source.contentSnapshotId, parseArtifactId: hint.parseArtifactId,
+          chunkIndexVariantId: variant.id, chunkId, chunkOrdinal: location.ordinal,
+          headingPath: heading, pageNumber: null, snippet: hint.snippet, score: hint.score, channels: ["fts"] });
+      }
       timings.totalMs = performance.now() - started;
       return {
         response: { hits, retrievalMode, vectorBackend,
