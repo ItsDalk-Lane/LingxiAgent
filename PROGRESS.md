@@ -3,15 +3,16 @@
 上游同步已于 2026-08-20 经 PR #20 合入 main（merge 0f941e5b）并随 v0.1.29 发布；
 本文件自那以后作为 seal 推进台账延续，「Seal 推进记录」一节是现行工作流。
 
-## 审计坐标（固定，执行期间从未移动）
+## 审计坐标（上游坐标固定，源码验证坐标按阶段推进）
 
 ```
 UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0.444.1)
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = 5c016df183ad207cf1ca33de274abb7a4eb10057  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-09-04 知识重构 P0 阶段源码；仅 P0 验证，后续阶段与最终打包待执行)
-工作分支              = feature/upstream-sync-0.447.4
+VERIFIED_SOURCE_SHA   = 56dc1086aa06d0592c12e8a53eef9b8ea8546812  (2026-09-04 知识重构 P2 阶段全部验证通过；与已验证 d4292b2d 仅进度记录不同)
+历史上游同步工作分支  = feature/upstream-sync-0.447.4
+当前知识重构执行分支  = feat/knowledge-retrieval-research-p0-p3
 ```
 
 `VERIFIED_SOURCE_SHA` 是最终 typecheck、lint、tests、build、package 所验证的源码树；
@@ -166,6 +167,16 @@ AboutTab），因此最终源码树重新执行了 renderer build / package smok
    review（persona 改名 + dream additive stores；agent-manager 回调接线），DATA_EPOCH=1 不变。
 
 ## Seal 推进记录
+
+### 2026-09-04：P2 阶段全部门禁与审计收口
+
+- 被验证源码：`d4292b2d0ba5029e7c4b1d1e2969b031f5c7b903`，固定基线仍为 `3eab85891a1747c64064252804f70c0a3773f021`，执行分支 `feat/knowledge-retrieval-research-p0-p3`。P2-01 至 P2-08 按序提交完成；每阶段同步审计已获用户授权，最终封印保留。
+- 首轮全量 13415 PASS / 19 FAIL / 7 既有 SKIP，84.79s：17 项真实源码启动不支持参数属性、1 项工具目录只采普通入口、1 项旧 P1 审计坐标。先修实现与真实快照采样，保留测试和全部豁免表不变；真实启动回归 48 PASS、原目录 3 PASS。
+- 修复后指定测试与目录覆盖 86 PASS、本机平台 smoke 94 PASS；三套类型、全量 ESLint（0 error / 9188 warning）、开放边界通过。完整服务端/开放服务端/客户端五入口构建通过，种子验签与真实归档解包/安装/解析/重启/不可变原文读取通过；当前仅 macOS arm64 证据，原生 HNSW 与移除扩展 portable 均通过。日志 `/tmp/lingxi-knowledge-p2-fixed-{build-server,verify-seed,packaged-smoke,build-open,build-client}.log`。
+- 修复后五生成器两轮全部通过，完整 git diff 两轮均为 0；测试清单 937 文件，第二轮逐字一致；开放树各 882 文件且逐文件一致；清单 66 stores / 779 sites、知识库 v18、指纹 3beb2e79…、运行闭包 10687 文件。详见 `/tmp/lingxi-knowledge-p2-fixed-generator-results.json`。
+- 全量审计复验 `npm test` exit 0：1333 文件 PASS / 1 既有 SKIP，13434 测试 PASS / 0 FAIL / 7 既有 SKIP，86.98s；日志 `/tmp/lingxi-knowledge-p2-audit-full.log`。阶段收口 `56dc1086aa06d0592c12e8a53eef9b8ea8546812` 相对已验证源码 d4292b2d 仅更新 KNOWLEDGE_REFACTOR_PROGRESS.md；生产、测试、构建逻辑与生成物无差异，已用 git diff 验证。
+- 当前源码坐标推进到上述阶段收口，审计矩阵与差异守卫另行复验；阶段审计提交只包含原有白名单六文件，P2 全部门禁满足后按序进入 P3-01。没有修改白名单、没有合并 main，P3 最终封印仍保留。
+
 
 ### 2026-09-04：P1 完整阶段门禁收口
 
