@@ -9,7 +9,7 @@ import { extractToolDetail } from '../../utils/message-parser';
 import type { ToolDetail } from '../../utils/message-parser';
 import { openInternalLink } from '../../utils/link-open';
 import { isToolCallHiddenFromProcessUi } from '../../utils/tool-call-visibility';
-import { getToolLabel, phaseForStatus, sessionToolTargetName, sessionToolTargetPath } from '../../utils/tool-label';
+import { getToolLabel, phaseForStatus, sessionToolTargetName, sessionToolTargetPath, KNOWLEDGE_RESEARCH_TOOL_NAMES } from '../../utils/tool-label';
 import { useStore } from '../../stores';
 import { switchSession } from '../../stores/session-actions';
 import { LinkContextMenu, type LinkContextMenuState } from '../shared/LinkContextMenu';
@@ -163,7 +163,10 @@ const StandardToolIndicator = memo(function StandardToolIndicator({ tool, agentN
   const sessionTargetName = useStore(s => (isSessionTool ? sessionToolTargetName(s, tool.args) : null));
   const sessionTargetPath = useStore(s => (isSessionTool ? sessionToolTargetPath(s, tool.args) : null));
 
-  const rawDetail = extractToolDetail(tool.name, tool.args);
+  // 研究卡只展示任务短标签；内部身份和计数不能落入通用参数预览。
+  const rawDetail: ToolDetail = KNOWLEDGE_RESEARCH_TOOL_NAMES.has(tool.name)
+    ? { text: tool.name === 'knowledge_research_worker' && typeof tool.args?.label === 'string' ? tool.args.label.slice(0, 100) : '' }
+    : extractToolDetail(tool.name, tool.args);
   const detail = sessionTargetName ? { ...rawDetail, text: sessionTargetName } : rawDetail;
   const detailTitle = detail.title || detail.href;
   const status = tool.status || (tool.done ? (tool.success ? 'succeeded' : 'failed') : 'running');

@@ -12,7 +12,7 @@ async function setup(driver: (turn: ResearchModelTurn) => Promise<unknown>) {
     _knowledge: fixture.manager, _runtimeContext: { studioId: fixture.request.compiledScope.studioId },
     getSessionIdForPath: (sessionPath: string) => fixture.manifests.resolveByLocatorPath(sessionPath)?.sessionId ?? null,
     getSessionManifest: (sessionId: string) => fixture.manifests.getBySessionId(sessionId),
-    executeIsolated: fixture.executeIsolated,
+    executeIsolated: fixture.executeIsolated, emitEvent: vi.fn(),
   });
   const input = { question: fixture.request.question,
     knowledgeRefs: { notebookIds: fixture.request.compiledScope.notebookIds, mode: "detailed" as const },

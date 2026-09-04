@@ -64,3 +64,27 @@ export const DEFAULT_KNOWLEDGE_RESEARCH_BUDGET = {
   maxFinalEvidenceSpans: 32,
   finalEvidenceBudgetTokens: 16_000,
 } as const;
+
+/** 实时过程只传宿主计数和任务身份，不包含模型思考、工具正文或数据库语句。 */
+export type KnowledgeResearchProgressUpdate =
+  | { type: "knowledge_research_started" | "knowledge_research_plan_updated" }
+  | { type: "knowledge_research_round_started"; roundId: string; round: number }
+  | { type: "knowledge_research_worker_started"; taskId: string; label: string }
+  | { type: "knowledge_research_worker_completed"; taskId: string; label: string; status: "completed" | "failed" | "cancelled" }
+  | { type: "knowledge_research_ledger_updated"; phase: "investigating" | "reviewing" }
+  | { type: "knowledge_research_completed"; status: "completed" | "partial" | "failed" | "cancelled"; stopReason: string | null };
+
+export type KnowledgeResearchProgress = KnowledgeResearchProgressUpdate & {
+  runId: string;
+  scopeId: string;
+  rounds: number;
+  maxRounds: number;
+  searchCalls: number;
+  readCalls: number;
+  delegatedAgents: number;
+  needsTotal: number;
+  needsSupported: number;
+  needsPartial: number;
+  needsConflicted: number;
+  unresolvedNeedIds: string[];
+};

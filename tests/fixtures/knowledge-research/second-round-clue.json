@@ -1,0 +1,7 @@
+{
+  "question": "红桥迁移的交付日期是什么？",
+  "notebooks": [{ "key": "selected", "name": "项目归档", "selected": true, "sources": [
+    { "key": "clue", "name": "交接记录", "text": "# 交接记录\n红桥迁移使用唯一结算代号「云杉钥匙」。本记录不包含交付日期。" },
+    { "key": "answer", "name": "验收档案", "text": "# 验收档案\n云杉钥匙的交付日期为2026年10月18日。" }
+  ] }]
+}

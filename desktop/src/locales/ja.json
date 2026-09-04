@@ -467,6 +467,13 @@
     "knowledgeLocalEvidenceFound": "根拠 {n} 件を取得 · {ms}ms",
     "knowledgeFastSummary": "高速検索 · 根拠 {n} 件 · {ms}ms",
     "knowledgeFastDeadlineExceeded": "目標時間を超過",
+    "knowledgeResearchSummary": "詳細調査 · {rounds} ラウンド · 検索 {searches} 回 · 閲読 {reads} 回 · {completed}/{total} 項目完了",
+    "knowledgeResearchPartialSummary": "詳細調査は一部未完了 · {rounds} ラウンド · 未確認 {pending} 項目",
+    "knowledgeResearchProgress": "根拠に関する質問 {completed}/{total} 件が完了",
+    "knowledgeResearchCancelled": "詳細調査をキャンセルしました",
+    "knowledgeResearchTruncated": "一部の根拠は未収録",
+    "knowledgeResearchFailed": "詳細調査に失敗しました",
+    "knowledgeResearchReviewCounts": "矛盾 {conflicts} 件 · 未確認 {pending} 項目",
     "knowledgeMetaModeFast": "高速モード",
     "knowledgeMetaModeDetailed": "詳細モード",
     "feedbackUp": "役に立った（経験に記録）",
@@ -1221,6 +1228,36 @@
       "running": "↻ モデルが補足検索を要求",
       "done": "↻ モデルが補足検索を要求しました",
       "failed": "↻ 補足検索に失敗"
+    },
+    "knowledge_research_plan": {
+      "running": "調査を計画中",
+      "done": "調査を計画しました",
+      "failed": "調査計画は未完了"
+    },
+    "knowledge_research_round": {
+      "running": "第 {round}/{maxRounds} ラウンド：検索・閲読中",
+      "done": "第 {round}/{maxRounds} ラウンドの調査が終了",
+      "failed": "第 {round}/{maxRounds} ラウンドの調査は未完了"
+    },
+    "knowledge_research_worker": {
+      "running": "調査エージェント {count} 体に依頼しました",
+      "done": "調査エージェント {count} 体のタスクが終了",
+      "failed": "調査エージェント {count} 体のタスクは未完了"
+    },
+    "knowledge_research_progress": {
+      "running": "根拠に関する質問 {completed}/{total} 件が完了",
+      "done": "根拠に関する質問 {completed}/{total} 件が完了",
+      "failed": "根拠に関する質問 {completed}/{total} 件が完了（更新は未完了）"
+    },
+    "knowledge_research_review": {
+      "running": "矛盾と不足を確認中",
+      "done": "矛盾と不足を確認しました",
+      "failed": "矛盾と不足の確認は未完了"
+    },
+    "knowledge_research_synthesis": {
+      "running": "詳細な回答を準備中",
+      "done": "回答の根拠を整理しました",
+      "failed": "回答の根拠の整理は未完了"
     },
     "knowledge_answer": {
       "running": "✻ 回答を生成中",

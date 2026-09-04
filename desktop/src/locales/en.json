@@ -467,6 +467,13 @@
     "knowledgeLocalEvidenceFound": "Found {n} evidence spans · {ms}ms",
     "knowledgeFastSummary": "Fast search · {n} evidence spans · {ms}ms",
     "knowledgeFastDeadlineExceeded": "Target time exceeded",
+    "knowledgeResearchSummary": "Detailed research · {rounds} rounds · {searches} searches · {reads} reads · {completed}/{total} items complete",
+    "knowledgeResearchPartialSummary": "Detailed research partially complete · {rounds} rounds · {pending} items still unconfirmed",
+    "knowledgeResearchProgress": "{completed}/{total} evidence questions complete",
+    "knowledgeResearchCancelled": "Detailed research cancelled",
+    "knowledgeResearchTruncated": "Some evidence was not included",
+    "knowledgeResearchFailed": "Detailed research failed",
+    "knowledgeResearchReviewCounts": "{conflicts} conflicts · {pending} items unconfirmed",
     "knowledgeMetaModeFast": "Fast mode",
     "knowledgeMetaModeDetailed": "Detailed mode",
     "feedbackUp": "Helpful (saved to experience)",
@@ -1220,6 +1227,36 @@
       "running": "↻ Model requests more searches",
       "done": "↻ Model requested more searches",
       "failed": "↻ Supplement failed"
+    },
+    "knowledge_research_plan": {
+      "running": "Planning the research",
+      "done": "Research planned",
+      "failed": "Research planning incomplete"
+    },
+    "knowledge_research_round": {
+      "running": "Round {round}/{maxRounds}: searching and reading",
+      "done": "Research round {round}/{maxRounds} ended",
+      "failed": "Research round {round}/{maxRounds} incomplete"
+    },
+    "knowledge_research_worker": {
+      "running": "Dispatched {count} research agents",
+      "done": "{count} research agents finished their tasks",
+      "failed": "{count} research agents did not finish their tasks"
+    },
+    "knowledge_research_progress": {
+      "running": "{completed}/{total} evidence questions complete",
+      "done": "{completed}/{total} evidence questions complete",
+      "failed": "{completed}/{total} evidence questions complete (update incomplete)"
+    },
+    "knowledge_research_review": {
+      "running": "Checking conflicts and gaps",
+      "done": "Conflicts and gaps checked",
+      "failed": "Conflict and gap check incomplete"
+    },
+    "knowledge_research_synthesis": {
+      "running": "Preparing the detailed answer",
+      "done": "Answer evidence prepared",
+      "failed": "Answer evidence preparation incomplete"
     },
     "knowledge_answer": {
       "running": "✻ Composing the answer",

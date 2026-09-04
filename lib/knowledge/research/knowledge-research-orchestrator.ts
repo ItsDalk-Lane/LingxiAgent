@@ -1,5 +1,5 @@
 import type { KnowledgeExecutionPolicy } from "../../../shared/knowledge-execution.ts";
-import type { KnowledgeResearchRunStatus } from "../../../shared/knowledge-research.ts";
+import type { KnowledgeResearchRunStatus, KnowledgeResearchProgress, KnowledgeResearchProgressUpdate } from "../../../shared/knowledge-research.ts";
 import { KnowledgeError } from "../errors.ts";
 import type { CompiledKnowledgeScope } from "../scope-snapshot-compiler.ts";
 import type { KnowledgeResearchAction, KnowledgeResearchRun } from "../types.ts";
@@ -9,7 +9,7 @@ import { buildResearchPrompt } from "./research-prompts.ts";
 import { ResearchRoundRunner, type ResearchExecuteIsolated, type ResearchSearchSummary } from "./research-round-runner.ts";
 import { evaluateResearchStopPolicy } from "./research-stop-policy.ts";
 import { ResearchStore } from "./research-store.ts";
-import { hasActiveResearchExecution, ResearchToolBudget } from "./research-tool-budget.ts";
+import { hasActiveResearchExecution, notifyResearchProgress, ResearchToolBudget } from "./research-tool-budget.ts";
 
 export interface KnowledgeResearchRequest {
   question: string;
@@ -47,6 +47,7 @@ export class KnowledgeResearchOrchestrator {
     nowMs?: () => number;
     isCompletenessSatisfied?: (runId: string, needId?: string) => boolean;
     onSearchCompleted?: (summary: ResearchSearchSummary) => void;
+    onProgress?: (event: KnowledgeResearchProgress) => void;
   }) {
     this.budget = new ResearchToolBudget(deps.research, { nowMs: deps.nowMs });
     this.ledger = new EvidenceLedger(deps.research, { isCompletenessSatisfied: deps.isCompletenessSatisfied });
@@ -73,9 +74,12 @@ export class KnowledgeResearchOrchestrator {
     }
     active.add(run.id);
     try {
+      this.publish(run.id, { type: "knowledge_research_started" });
       if (existing && !activeStatuses.has(run.status)) {
         const rendered = this.renderer.render({ runId: run.id, compiledScope: request.compiledScope,
           needs: this.needs(run.id), terminalStatus: run.status as "completed" | "partial" | "failed" | "cancelled" });
+        this.publish(run.id, { type: "knowledge_research_completed", status: run.status as "completed" | "partial" | "failed" | "cancelled",
+          stopReason: run.stopReason });
         return { ...rendered, run };
       }
       if (existing && run.status === "synthesizing") {
@@ -91,11 +95,27 @@ export class KnowledgeResearchOrchestrator {
         this.closeInterruptedRounds(run.id, "research_execution_failed");
         research.setRunState(run.id, { status: "failed", stopReason: "research_execution_failed" });
       }
+      const stopped = research.requireRun(run.id);
+      this.publish(run.id, { type: "knowledge_research_completed",
+        status: stopped.status as "completed" | "partial" | "failed" | "cancelled", stopReason: stopped.stopReason });
       throw error;
     } finally {
       active.delete(run.id);
       if (active.size === 0) activeRuns.delete(research.knowledgeStore);
     }
+  }
+
+  private publish(runId: string, update: KnowledgeResearchProgressUpdate): void {
+    if (!this.deps.onProgress) return;
+    const run = this.deps.research.requireRun(runId), needs = this.needs(runId);
+    notifyResearchProgress(this.deps.onProgress, { ...update, runId, scopeId: run.turnScopeId,
+      rounds: run.roundsCompleted, maxRounds: run.budget.maxRounds,
+      searchCalls: run.searchCalls, readCalls: run.readCalls, delegatedAgents: run.delegatedAgents,
+      needsTotal: needs.length, needsSupported: needs.filter(need => need.status === "supported").length,
+      needsPartial: needs.filter(need => need.status === "partial").length,
+      needsConflicted: needs.filter(need => need.status === "conflicted").length,
+      unresolvedNeedIds: needs.filter(need => !["supported", "not_applicable"].includes(need.status)).map(need => need.id),
+    });
   }
 
   private validateRequest(request: KnowledgeResearchRequest): void {
@@ -162,6 +182,7 @@ export class KnowledgeResearchOrchestrator {
         .flatMap(action => typeof action.requestSummary.query === "string" ? [action.requestSummary.query] : []);
       const rounds = research.listRounds(runId);
       const round = rounds.find(round => round.status === "running") ?? research.beginRound(runId, { focus: focus.map(need => need.id) });
+      this.publish(runId, { type: "knowledge_research_round_started", roundId: round.id, round: round.ordinal + 1 });
       const beforeIds = new Set(research.listEvidence(runId).map(item => item.id));
       const prompt = buildResearchPrompt({ question: request.question, compiledScope: request.compiledScope,
         run: research.requireRun(runId), needs: beforeNeeds, evidence: research.listEvidence(runId), relations: research.listRelations(runId),
@@ -173,6 +194,7 @@ export class KnowledgeResearchOrchestrator {
         studioId: request.compiledScope.studioId, scopeId: request.compiledScope.scopeId,
         prompt, signal: request.signal, searchPlan, forbiddenQueries, isCompletenessSatisfied: this.deps.isCompletenessSatisfied,
         onSearchCompleted: this.deps.onSearchCompleted,
+        onProgress: update => this.publish(runId, update),
       });
       run = research.requireRun(runId);
       const newEvidenceCount = research.listEvidence(runId).filter(item => !beforeIds.has(item.id)).length;
@@ -187,6 +209,7 @@ export class KnowledgeResearchOrchestrator {
       let fallback = false;
       if (round.ordinal === 0 && research.listNeeds(runId).length === 0 && activeStatuses.has(run.status)) {
         research.createFallbackNeed(runId); fallback = true;
+        this.publish(runId, { type: "knowledge_research_plan_updated" });
       }
       const needs = this.needs(runId);
       const outlineFirst = round.ordinal !== 0 || (roundActions[0]?.actionType === "knowledge_outline" && successful(roundActions[0]));
@@ -197,6 +220,7 @@ export class KnowledgeResearchOrchestrator {
       const roundError = result.errorCode ?? (!protocolValid && !fallback ? "KNOWLEDGE_RESEARCH_PROTOCOL_FAILED" : null);
       research.finishRound(runId, round.id, { status: run.status === "cancelled" ? "cancelled"
         : roundError ? "failed" : "completed", newEvidenceCount, errorCode: roundError });
+      this.publish(runId, { type: "knowledge_research_ledger_updated", phase: "reviewing" });
       run = research.requireRun(runId);
       if (!activeStatuses.has(run.status)) {
         finalStatus = run.status === "cancelled" ? "cancelled" : run.status === "failed" ? "failed" : "partial";
@@ -231,6 +255,7 @@ export class KnowledgeResearchOrchestrator {
     }
     const rendered = this.renderer.render({ runId, compiledScope: request.compiledScope, needs: this.needs(runId), terminalStatus: finalStatus });
     if (finalStatus !== "cancelled" && finalStatus !== "failed") research.setRunState(runId, { status: finalStatus, stopReason });
+    this.publish(runId, { type: "knowledge_research_completed", status: finalStatus, stopReason });
     return { ...rendered, run: research.requireRun(runId) };
   }
 

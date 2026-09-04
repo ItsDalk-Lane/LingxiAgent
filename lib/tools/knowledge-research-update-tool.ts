@@ -1,6 +1,6 @@
 import { Type } from "../pi-sdk/index.ts";
 import { isKnowledgeError, KnowledgeError } from "../knowledge/errors.ts";
-import { requireResearchToolContext, type KnowledgeResearchToolDeps } from "../knowledge/research/research-tool-budget.ts";
+import { notifyResearchProgress, requireResearchToolContext, type KnowledgeResearchToolDeps } from "../knowledge/research/research-tool-budget.ts";
 import type { LinkResearchEvidenceInput } from "../knowledge/research/evidence-ledger.ts";
 import type { ResearchStore } from "../knowledge/research/research-store.ts";
 import { toolError, toolOk } from "./tool-result.ts";
@@ -89,7 +89,7 @@ export function createKnowledgeResearchUpdateTool(deps: KnowledgeResearchToolDep
         const requested = [params.linkEvidence, params.unresolvedGaps].flatMap(items => Array.isArray(items) ? items : []);
         const needIds = [...new Set(requested.map(item => item && typeof item === "object" ? item.needId : undefined)
           .filter((id): id is string => typeof id === "string" && knownIds.has(id)))];
-        return await deps.budget.execute({ context, toolName: "knowledge_research_update", requestSummary: { needIds }, signal }, activeSignal => {
+        const result = await deps.budget.execute({ context, toolName: "knowledge_research_update", requestSummary: { needIds }, signal }, activeSignal => {
           activeSignal.throwIfAborted();
           const input = validate(params);
           if (context.role === "worker") {
@@ -122,6 +122,10 @@ export function createKnowledgeResearchUpdateTool(deps: KnowledgeResearchToolDep
             summary: { count: needs.length, status: "completed" } };
           });
         });
+        // 事务和工具动作均已成功提交，才发布可见计划及进度。
+        if (Array.isArray(params.createNeeds) && params.createNeeds.length > 0) notifyResearchProgress(deps.onProgress, { type: "knowledge_research_plan_updated" });
+        notifyResearchProgress(deps.onProgress, { type: "knowledge_research_ledger_updated", phase: "investigating" });
+        return result;
       } catch (error) {
         signal?.throwIfAborted();
         if (error instanceof Error && error.name === "AbortError") throw error;

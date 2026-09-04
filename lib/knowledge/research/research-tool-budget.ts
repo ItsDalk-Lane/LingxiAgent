@@ -2,6 +2,18 @@ import { KnowledgeError, isKnowledgeError } from "../errors.ts";
 import type { KnowledgeResearchAction, KnowledgeResearchRun } from "../types.ts";
 import type { EvidenceLedger } from "./evidence-ledger.ts";
 import type { ResearchStore } from "./research-store.ts";
+import type { KnowledgeResearchProgressUpdate } from "../../../shared/knowledge-research.ts";
+import { createModuleLogger } from "../../debug-log.ts";
+
+const progressLog = createModuleLogger("knowledge-research-progress");
+
+/** 进度发送失败必须留痕，但不能取消真实调查或提前释放工作会话的共享额度。 */
+export function notifyResearchProgress<T extends KnowledgeResearchProgressUpdate>(
+  notify: ((event: T) => void) | undefined, event: T,
+): void {
+  if (!notify) return;
+  try { notify(event); } catch { progressLog.warn(`Research progress listener failed: ${event.type}`); }
+}
 
 /** 来自隔离会话的宿主身份，不接受工具参数自行声明。 */
 export interface KnowledgeResearchActorContext {
@@ -19,6 +31,7 @@ export interface KnowledgeResearchToolDeps {
   ledger: EvidenceLedger;
   budget: ResearchToolBudget;
   resolveContext: (ctx: unknown) => KnowledgeResearchActorContext | null;
+  onProgress?: (update: KnowledgeResearchProgressUpdate) => void;
 }
 
 export function requireResearchToolContext(

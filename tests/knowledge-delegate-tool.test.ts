@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { createKnowledgeDelegateTool, type KnowledgeResearchWorkerOptions } from "../lib/tools/knowledge-delegate-tool.ts";
 import { EvidenceLedger } from "../lib/knowledge/research/evidence-ledger.ts";
-import { ResearchToolBudget, type KnowledgeResearchActorContext } from "../lib/knowledge/research/research-tool-budget.ts";
+import { ResearchToolBudget, hasActiveResearchExecution, type KnowledgeResearchActorContext } from "../lib/knowledge/research/research-tool-budget.ts";
 import { createKnowledgeResearchFixture } from "./helpers/knowledge-research-fixture.ts";
 
 const fixtures: ReturnType<typeof createKnowledgeResearchFixture>[] = [];
@@ -89,6 +89,52 @@ describe("knowledge_delegate 有界同步委派", () => {
     const result = parse(await pending);
     expect(result.tasks.map((task: { agentId: string }) => task.agentId)).toEqual(["agent-current", "agent-other"]);
     expect(data.research.requireRun(data.run.id).delegatedAgents).toBe(2);
+  });
+
+  it("完成进度通知抛错仍等待所有真实Worker收尾，不能提前释放预算或改变成功结果", async () => {
+    const data = setup();
+    const first = deferred<unknown>(), second = deferred<unknown>();
+    data.executeIsolated.mockImplementationOnce(() => first.promise).mockImplementationOnce(() => second.promise);
+    const onProgress = vi.fn((event: { type: string }) => {
+      if (event.type === "knowledge_research_worker_completed") throw new Error("通知失败中的私密原文");
+    });
+    const tool = createKnowledgeDelegateTool({ ...data.deps, onProgress });
+    let settled = false;
+    const pending = tool.execute("progress-completion-failure", { runId: data.run.id, tasks: [data.task("甲"), data.task("乙")] })
+      .finally(() => { settled = true; });
+    try {
+      await vi.waitFor(() => expect(data.executeIsolated).toHaveBeenCalledTimes(2));
+      first.resolve({ stopReason: "stop" });
+      await vi.waitFor(() => expect(onProgress.mock.calls.filter(([event]) => event.type === "knowledge_research_worker_completed")).toHaveLength(1));
+      expect(settled).toBe(false);
+      expect(hasActiveResearchExecution(data.store, data.run.id)).toBe(true);
+      expect(data.research.listActions(data.run.id)[0].status).toBe("running");
+      expect(data.research.requireRun(data.run.id)).toMatchObject({ delegatedAgents: 2, toolCallsUsed: 1 });
+      second.resolve({ stopReason: "stop" });
+      const result = parse(await pending);
+      expect(result.status).toBe("completed");
+      expect(result.tasks.map((task: { status: string }) => task.status)).toEqual(["completed", "completed"]);
+      expect(hasActiveResearchExecution(data.store, data.run.id)).toBe(false);
+      expect(data.research.listActions(data.run.id)[0]).toMatchObject({ status: "completed", responseSummary: { count: 2, status: "completed" } });
+      expect(JSON.stringify(result)).not.toContain("通知失败中的私密原文");
+    } finally {
+      first.resolve({ stopReason: "stop" }); second.resolve({ stopReason: "stop" });
+      await pending;
+    }
+  });
+
+  it("开始进度通知抛错也要真正执行Worker，不能把成功任务改报失败", async () => {
+    const data = setup();
+    const tool = createKnowledgeDelegateTool({ ...data.deps, onProgress: event => {
+      if (event.type === "knowledge_research_worker_started") throw new Error("通知失败中的私密原文");
+    } });
+    const result = parse(await tool.execute("progress-start-failure", { runId: data.run.id, tasks: [data.task()] }));
+    expect(data.executeIsolated).toHaveBeenCalledTimes(1);
+    expect(result.status).toBe("completed");
+    expect(result.tasks[0].status).toBe("completed");
+    expect(data.research.requireRun(data.run.id)).toMatchObject({ delegatedAgents: 1, toolCallsUsed: 1 });
+    expect(hasActiveResearchExecution(data.store, data.run.id)).toBe(false);
+    expect(data.research.listActions(data.run.id)[0]).toMatchObject({ status: "completed", responseSummary: { count: 1, status: "completed" } });
   });
 
   it("一个会话失败仍等待其它会话结束，返回固定错误码并剥离原始回答和异常文本", async () => {

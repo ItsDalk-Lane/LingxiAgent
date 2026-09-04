@@ -3,6 +3,7 @@ import { getKnowledgeResearchToolNames } from "../../../shared/tool-categories.t
 import type { ResearchStore } from "./research-store.ts";
 import { ResearchToolBudget } from "./research-tool-budget.ts";
 import type { SearchedVectorVariantIdentity } from "../knowledge-query-service.ts";
+import type { KnowledgeResearchProgressUpdate } from "../../../shared/knowledge-research.ts";
 
 export type ResearchExecuteIsolated = (prompt: string, options: Record<string, unknown>) => Promise<unknown>;
 
@@ -26,6 +27,7 @@ export interface ResearchRoundInput {
   forbiddenQueries?: string[];
   isCompletenessSatisfied?: (runId: string) => boolean;
   onSearchCompleted?: (summary: ResearchSearchSummary) => void;
+  onProgress?: (update: KnowledgeResearchProgressUpdate) => void;
 }
 
 /** 每轮只启动新的研究根会话，消费宿主结构化完成信号，不把会话回复或隐藏思考带入下一轮。 */
@@ -59,6 +61,7 @@ export class ResearchRoundRunner {
           ...(input.forbiddenQueries ? { forbiddenQueries: input.forbiddenQueries } : {}),
           ...(input.isCompletenessSatisfied ? { isCompletenessSatisfied: input.isCompletenessSatisfied } : {}),
           ...(input.onSearchCompleted ? { onSearchCompleted: input.onSearchCompleted } : {}),
+          ...(input.onProgress ? { onProgress: input.onProgress } : {}),
           onFinishAccepted: (decision: unknown) => {
             if (decision && typeof decision === "object" && "runId" in decision && decision.runId === run.id
               && "accepted" in decision && decision.accepted === true) finishAccepted = true;

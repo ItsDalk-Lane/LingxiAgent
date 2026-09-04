@@ -1,7 +1,9 @@
 import { Type } from "../pi-sdk/index.ts";
+import { randomUUID } from "node:crypto";
 import { isKnowledgeError, KnowledgeError } from "../knowledge/errors.ts";
 import {
   requireResearchToolContext,
+  notifyResearchProgress,
   type KnowledgeResearchActorContext,
   type KnowledgeResearchToolDeps,
 } from "../knowledge/research/research-tool-budget.ts";
@@ -120,8 +122,13 @@ export function createKnowledgeDelegateTool(deps: KnowledgeDelegateToolDeps) {
             // 先完成整批验证再并行启动；某个工作会话失败也要等待其它会话清理结束。
             return Promise.all(tasks.map(async task => {
               const identity = { label: task.label, needIds: task.needIds, agentId: task.agentId };
+              const progress = { taskId: randomUUID(), label: task.label.replace(/[\r\n\t]/g, " ").slice(0, 100) };
+              let status: DelegatedTaskResult["status"] = "failed";
+              let started = false;
               try {
                 workerSignal.throwIfAborted();
+                started = true;
+                notifyResearchProgress(deps.onProgress, { type: "knowledge_research_worker_started", ...progress });
                 const needs = task.needIds.map(needId => deps.ledger.evaluateNeed(run.id, needId));
                 const prompt = "你是知识研究工作会话。只能读取分配范围的知识资料，并通过知识研究更新工具登记已核验的证据。"
                   + "不得修改资料、访问外部网络、再次委派任务或调用研究完成工具。检索摘要不是证据，必须先读取原文取得凭据。\n"
@@ -139,10 +146,16 @@ export function createKnowledgeDelegateTool(deps: KnowledgeDelegateToolDeps) {
                     ...(context.allowedSourceIds !== undefined ? { allowedSourceIds: [...context.allowedSourceIds] } : {}) },
                   signal: workerSignal,
                 });
-                return { ...identity, ...workerStatus(outcome, workerSignal) };
+                const completed = workerStatus(outcome, workerSignal);
+                status = completed.status;
+                return { ...identity, ...completed };
               } catch {
-                return { ...identity, status: workerSignal.aborted ? "cancelled" : "failed",
+                status = workerSignal.aborted ? "cancelled" : "failed";
+                return { ...identity, status,
                   errorCode: workerSignal.aborted ? "KNOWLEDGE_RESEARCH_CANCELLED" : "KNOWLEDGE_RESEARCH_WORKER_FAILED" } as DelegatedTaskResult;
+              } finally {
+                // 隔离执行器返回前已等待工作会话清理，完成事件不提前报到。
+                if (started) notifyResearchProgress(deps.onProgress, { type: "knowledge_research_worker_completed", ...progress, status });
               }
             }));
           });

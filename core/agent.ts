@@ -1282,7 +1282,7 @@ export class Agent {
         }
       },
     }));
-    const deps = { research, ledger, budget, resolveContext };
+    const deps = { research, ledger, budget, resolveContext, onProgress: input.onProgress };
     const tools = [...readTools, createKnowledgeResearchUpdateTool(deps),
       createKnowledgeResearchFinishTool({ ...deps, isCompletenessSatisfied: input.isCompletenessSatisfied,
         onFinishAccepted: input.onFinishAccepted }),
@@ -1297,7 +1297,8 @@ export class Agent {
               workerOptions.researchContext.allowedNeedIds?.includes(needId)) })).filter(entry => entry.needIds.length > 0),
             forbiddenQueries: sourceKey(workerOptions.researchContext.allowedSourceIds ?? defaultSourceIds) === defaultSourceKey
               ? [...forbiddenQueries] : [],
-            isCompletenessSatisfied: input.isCompletenessSatisfied, onSearchCompleted: input.onSearchCompleted },
+            isCompletenessSatisfied: input.isCompletenessSatisfied, onSearchCompleted: input.onSearchCompleted,
+            onProgress: input.onProgress },
         }),
       })];
     const allowed = new Set(getKnowledgeResearchToolNames(options.surface));

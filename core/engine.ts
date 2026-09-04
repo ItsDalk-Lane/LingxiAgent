@@ -2782,6 +2782,7 @@ export class LingxiEngine {
     let observedSearches = 0;
     const result = await new KnowledgeResearchOrchestrator({ research,
       executeIsolated: (prompt, options) => this.executeIsolated(prompt, options),
+      onProgress: event => this.emitEvent(event, input.sessionPath),
       onSearchCompleted: summary => {
         observedSearches++; modes.add(summary.mode); backends.add(summary.vectorBackend);
         for (const variant of summary.searchedVectorVariants) searchedVectorVariants.set(variant.vectorIndexVariantId, variant);

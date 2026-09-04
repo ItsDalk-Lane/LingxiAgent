@@ -18,7 +18,7 @@ async function setup(driver: (turn: ResearchModelTurn) => Promise<unknown>) {
     _knowledge: f.manager, _runtimeContext: { studioId: f.request.compiledScope.studioId },
     getSessionIdForPath: (sessionPath: string) => f.manifests.resolveByLocatorPath(sessionPath)?.sessionId ?? null,
     getSessionManifest: (sessionId: string) => f.manifests.getBySessionId(sessionId),
-    executeIsolated, buildKnowledgeContextInjection: oldEntry,
+    executeIsolated, buildKnowledgeContextInjection: oldEntry, emitEvent: vi.fn(),
     resolveAuxiliaryExecution: auxiliary, resolveAuxiliaryExecutionFresh: auxiliary,
     resolveAuxiliaryModel: auxiliary, resolveAuxiliaryModelFresh: auxiliary,
   });

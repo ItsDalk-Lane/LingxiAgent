@@ -27,6 +27,11 @@ export const SESSION_ACTION_LABEL_KEYS: Record<string, string> = {
   create: 'session_create',
 };
 
+export const KNOWLEDGE_RESEARCH_TOOL_NAMES: ReadonlySet<string> = new Set([
+  'knowledge_research_plan', 'knowledge_research_round', 'knowledge_research_worker',
+  'knowledge_research_progress', 'knowledge_research_review', 'knowledge_research_synthesis',
+]);
+
 function labelKeyFor(name: string, args?: Record<string, unknown>): string {
   const aliased = TOOL_LABEL_ALIASES[name];
   if (aliased) return aliased;
@@ -57,6 +62,7 @@ export const BUILTIN_TOOL_NAMES: ReadonlySet<string> = new Set([
   'knowledge_outline', 'knowledge_grep', 'knowledge_manage',
   'knowledge_think', 'knowledge_read_part', 'knowledge_supplement',
   'knowledge_answer', 'knowledge_local_search',
+  ...KNOWLEDGE_RESEARCH_TOOL_NAMES,
   'hana_card_guide', 'show_card',
   'channel_read_context', 'channel_reply', 'channel_pass',
   'create_artifact', 'dm',
@@ -78,7 +84,13 @@ export function getToolLabel(
   agentName: string,
   args?: Record<string, unknown>,
 ): string {
-  const vars = { name: agentName };
+  const vars: Record<string, string> = { name: agentName };
+  if (KNOWLEDGE_RESEARCH_TOOL_NAMES.has(name)) {
+    for (const field of ['round', 'maxRounds', 'count', 'completed', 'total']) {
+      const value = args?.[field];
+      vars[field] = typeof value === 'number' && Number.isSafeInteger(value) && value >= 0 ? String(value) : '?';
+    }
+  }
   const key = labelKeyFor(name, args);
   return resolveToolCopy(key, phase, vars)
     ?? (isExternalTool(name) ? resolveToolCopy('_plugin', phase, vars) : null)

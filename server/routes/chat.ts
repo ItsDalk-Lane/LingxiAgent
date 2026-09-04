@@ -1788,6 +1788,42 @@ export function createChatRoute(engine: any, hub: any, {
       // 知识注入链路开始检索的即时反馈（desktop-session-submit 在阻塞式注入前发出）：
       // 早于 session_status isStreaming，前端用它显示「正在检索知识库」占位。
       broadcast({ type: "knowledge_retrieval_started", sessionPath });
+    } else if (["knowledge_research_started", "knowledge_research_plan_updated", "knowledge_research_round_started",
+      "knowledge_research_worker_started", "knowledge_research_worker_completed", "knowledge_research_ledger_updated",
+      "knowledge_research_completed"].includes(event.type)) {
+      // 逐字段转发调查进度，模型正文、工具输出和任意附加字段不能进入聊天消息。
+      const identity = (value: unknown): value is string => typeof value === "string" && value.length > 0
+        && value.length <= 128 && !value.includes("\0") && !/\s/.test(value);
+      const counts = ["rounds", "maxRounds", "searchCalls", "readCalls", "delegatedAgents", "needsTotal",
+        "needsSupported", "needsPartial", "needsConflicted"];
+      if (!identity(event.runId) || !identity(event.scopeId)
+        || counts.some(key => !Number.isSafeInteger(event[key]) || event[key] < 0)
+        || !Array.isArray(event.unresolvedNeedIds) || event.unresolvedNeedIds.length > 8
+        || !event.unresolvedNeedIds.every(identity)) return;
+      const progress: Record<string, unknown> = { type: event.type, sessionPath, runId: event.runId, scopeId: event.scopeId,
+        ...Object.fromEntries(counts.map(key => [key, event[key]])), unresolvedNeedIds: [...new Set(event.unresolvedNeedIds)] };
+      if (event.type === "knowledge_research_round_started") {
+        if (!identity(event.roundId) || !Number.isSafeInteger(event.round) || event.round < 1 || event.round > event.maxRounds) return;
+        Object.assign(progress, { roundId: event.roundId, round: event.round });
+      }
+      if (event.type === "knowledge_research_worker_started" || event.type === "knowledge_research_worker_completed") {
+        if (!identity(event.taskId) || typeof event.label !== "string" || !event.label.trim() || event.label.length > 100) return;
+        Object.assign(progress, { taskId: event.taskId, label: event.label.replace(/[\r\n\t]/g, " ") });
+        if (event.type === "knowledge_research_worker_completed") {
+          if (!["completed", "failed", "cancelled"].includes(event.status)) return;
+          progress.status = event.status;
+        }
+      }
+      if (event.type === "knowledge_research_ledger_updated") {
+        if (!["investigating", "reviewing"].includes(event.phase)) return;
+        progress.phase = event.phase;
+      }
+      if (event.type === "knowledge_research_completed") {
+        if (!["completed", "partial", "failed", "cancelled"].includes(event.status)
+          || (event.stopReason !== null && (typeof event.stopReason !== "string" || !/^[a-z_]{1,128}$/.test(event.stopReason)))) return;
+        Object.assign(progress, { status: event.status, stopReason: event.stopReason });
+      }
+      broadcast(progress);
     } else if (event.type === "knowledge_rollup_progress") {
       // 滚动注入中间轮进度（超预算证据分部分喂给主模型消化）：驱动前端
       // 「正在阅读第 X/N 部分」胶囊，结束由该 session 任意后续事件

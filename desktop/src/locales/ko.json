@@ -467,6 +467,13 @@
     "knowledgeLocalEvidenceFound": "근거 {n}개 발견 · {ms}ms",
     "knowledgeFastSummary": "빠른 검색 · 근거 {n}개 · {ms}ms",
     "knowledgeFastDeadlineExceeded": "목표 시간 초과",
+    "knowledgeResearchSummary": "상세 조사 · {rounds}라운드 · 검색 {searches}회 · 읽기 {reads}회 · {completed}/{total}개 항목 완료",
+    "knowledgeResearchPartialSummary": "상세 조사 일부 미완료 · {rounds}라운드 · {pending}개 항목 확인 필요",
+    "knowledgeResearchProgress": "근거 질문 {completed}/{total}개 완료",
+    "knowledgeResearchCancelled": "상세 조사가 취소되었습니다",
+    "knowledgeResearchTruncated": "일부 근거가 포함되지 않음",
+    "knowledgeResearchFailed": "상세 조사에 실패했습니다",
+    "knowledgeResearchReviewCounts": "상충 {conflicts}개 · 확인 필요 {pending}개",
     "knowledgeMetaModeFast": "빠른 모드",
     "knowledgeMetaModeDetailed": "상세 모드",
     "feedbackUp": "도움이 됐어요(경험에 기록)",
@@ -1221,6 +1228,36 @@
       "running": "↻ 모델이 보충 검색 요청",
       "done": "↻ 모델이 보충 검색을 요청했습니다",
       "failed": "↻ 보충 검색 실패"
+    },
+    "knowledge_research_plan": {
+      "running": "조사 계획 중",
+      "done": "조사 계획 완료",
+      "failed": "조사 계획 미완료"
+    },
+    "knowledge_research_round": {
+      "running": "{round}/{maxRounds}라운드: 검색 및 읽기 진행 중",
+      "done": "{round}/{maxRounds}라운드 조사 종료",
+      "failed": "{round}/{maxRounds}라운드 조사 미완료"
+    },
+    "knowledge_research_worker": {
+      "running": "조사 에이전트 {count}개에 작업을 맡겼습니다",
+      "done": "조사 에이전트 {count}개가 작업을 마쳤습니다",
+      "failed": "조사 에이전트 {count}개가 작업을 마치지 못했습니다"
+    },
+    "knowledge_research_progress": {
+      "running": "근거 질문 {completed}/{total}개 완료",
+      "done": "근거 질문 {completed}/{total}개 완료",
+      "failed": "근거 질문 {completed}/{total}개 완료 (업데이트 미완료)"
+    },
+    "knowledge_research_review": {
+      "running": "상충 내용과 누락 확인 중",
+      "done": "상충 내용과 누락 확인 완료",
+      "failed": "상충 내용과 누락 확인 미완료"
+    },
+    "knowledge_research_synthesis": {
+      "running": "상세 답변 준비 중",
+      "done": "답변 근거 정리 완료",
+      "failed": "답변 근거 정리 미완료"
     },
     "knowledge_answer": {
       "running": "✻ 답변 생성 중",

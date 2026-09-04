@@ -4996,6 +4996,11 @@
         },
         {
           "root": "server-bootstrap",
+          "from": "lib/knowledge/research/research-tool-budget.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
           "from": "lib/compat/checks/facts-db.ts",
           "kind": "import-statement"
         },
@@ -5310,7 +5315,7 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by core/migrations.ts (import-statement); core/plugin-config.ts (import-statement); lib/desk/cron-store.ts (import-statement); +89 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by core/migrations.ts (import-statement); core/plugin-config.ts (import-statement); lib/desk/cron-store.ts (import-statement); +90 more importer(s)."
     },
     {
       "path": "lib/default-models.json",

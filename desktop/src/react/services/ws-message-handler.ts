@@ -42,6 +42,7 @@ import { renderMarkdown } from '../utils/markdown';
 import { bumpMessageLiveVersion } from '../stores/message-live-version';
 import { terminalOutputStream } from './terminal-output-stream';
 import { handleBackgroundProcessControlResult } from './background-process-control';
+import type { KnowledgeResearchProgress } from '../../../../shared/knowledge-research.ts';
 
 declare function t(key: string, vars?: Record<string, string>): any;
 
@@ -601,6 +602,151 @@ function settleKnowledgeReadCard(sp: string): void {
   }
 }
 
+const KNOWLEDGE_RESEARCH_EVENTS = new Set([
+  'knowledge_research_started', 'knowledge_research_plan_updated', 'knowledge_research_round_started',
+  'knowledge_research_worker_started', 'knowledge_research_worker_completed',
+  'knowledge_research_ledger_updated', 'knowledge_research_completed',
+]);
+
+interface ResearchProgressCards {
+  runId: string;
+  scopeId: string;
+  roundId: string | null;
+  round: number;
+  closed: boolean;
+  previousMainRunning: boolean;
+  cards: Map<string, { name: string; args: Record<string, unknown>; resultNote?: string; done: boolean }>;
+}
+
+// 每个会话只保留当前调查的卡片身份，重复或迟到事件不能重新打开已结束的任务。
+const knowledgeResearchCardsBySession = new Map<string, ResearchProgressCards>();
+
+function researchCardId(state: ResearchProgressCards, kind: string, taskId = ''): string {
+  return `kt-research-${state.runId}-${kind}${taskId ? `-${taskId}` : ''}`;
+}
+
+function upsertResearchCard(sp: string, state: ResearchProgressCards, id: string, name: string,
+  args: Record<string, unknown> = {}, resultNote?: string): void {
+  const existing = state.cards.get(id);
+  if (existing) {
+    if ((existing.done && name !== 'knowledge_research_plan')
+      || (sameJsonish(existing.args, args) && existing.resultNote === resultNote)) return;
+    existing.args = args; existing.resultNote = resultNote;
+    streamBufferManager.updateKnowledgeResearchToolProgress(sp, id, args, resultNote);
+    return;
+  }
+  state.cards.set(id, { name, args, resultNote, done: false });
+  feedKnowledgeToolCard(sp, { type: 'tool_start', id, name, args });
+  if (resultNote !== undefined) streamBufferManager.updateKnowledgeResearchToolProgress(sp, id, args, resultNote);
+}
+
+function finishResearchCard(sp: string, state: ResearchProgressCards, id: string, success: boolean, resultNote?: string): void {
+  const card = state.cards.get(id);
+  if (!card || card.done) return;
+  card.done = true;
+  streamBufferManager.updateKnowledgeResearchToolProgress(sp, id, card.args, resultNote ?? card.resultNote, success ? 'succeeded' : 'failed');
+}
+
+function settleResearchCards(sp: string, success: boolean, resultNote?: string): void {
+  const state = knowledgeResearchCardsBySession.get(sp);
+  if (!state) return;
+  for (const id of state.cards.keys()) finishResearchCard(sp, state, id, success, resultNote);
+}
+
+function retainPendingResearchCards(sp: string): void {
+  const state = knowledgeResearchCardsBySession.get(sp);
+  if (!state) return;
+  for (const [id, card] of state.cards) {
+    if (!card.done) streamBufferManager.updateKnowledgeResearchToolProgress(sp, id, card.args, card.resultNote, 'running');
+  }
+}
+
+function handleKnowledgeResearchProgress(msg: KnowledgeResearchProgress, sp: string): void {
+  // 只接受完整计数；缺失数据不能被补成零，未知正文也不进入卡片。
+  if (!nonEmptyString(msg.runId) || !nonEmptyString(msg.scopeId)
+    || !(['rounds', 'maxRounds', 'searchCalls', 'readCalls', 'delegatedAgents', 'needsTotal', 'needsSupported', 'needsPartial', 'needsConflicted'] as const)
+      .every(key => Number.isSafeInteger(msg[key]) && msg[key] >= 0)
+    || msg.maxRounds < 1 || !Array.isArray(msg.unresolvedNeedIds) || !msg.unresolvedNeedIds.every(id => nonEmptyString(id))) return;
+  const pending = new Set(msg.unresolvedNeedIds).size;
+  if (pending > msg.needsTotal) return;
+  let state = knowledgeResearchCardsBySession.get(sp);
+  if (msg.type === 'knowledge_research_started') {
+    if (state?.runId === msg.runId) return;
+    settleResearchCards(sp, false, translatorT()('chat.knowledgeResearchCancelled'));
+    state = { runId: msg.runId, scopeId: msg.scopeId, roundId: null, round: 0, closed: false,
+      previousMainRunning: streamBufferManager.isRunActive(sp), cards: new Map() };
+    knowledgeResearchCardsBySession.set(sp, state);
+    useStore.getState().beginKnowledgeRetrieval?.(sp);
+    upsertResearchCard(sp, state, researchCardId(state, 'plan'), 'knowledge_research_plan');
+    return;
+  }
+  if (!state || state.runId !== msg.runId || state.scopeId !== msg.scopeId || state.closed) return;
+  const t = translatorT();
+  const progressArgs = { completed: msg.needsTotal - pending, total: msg.needsTotal };
+  const progressNote = t('chat.knowledgeResearchProgress', { completed: String(progressArgs.completed), total: String(progressArgs.total) });
+  switch (msg.type) {
+    case 'knowledge_research_plan_updated':
+      upsertResearchCard(sp, state, researchCardId(state, 'plan'), 'knowledge_research_plan', {}, progressNote);
+      finishResearchCard(sp, state, researchCardId(state, 'plan'), true);
+      break;
+    case 'knowledge_research_round_started': {
+      if (!nonEmptyString(msg.roundId) || !Number.isSafeInteger(msg.round) || msg.round < 1 || msg.round > msg.maxRounds
+        || msg.round < state.round || (msg.round === state.round && state.roundId !== msg.roundId)) return;
+      if (state.roundId !== msg.roundId) {
+        for (const [id, card] of state.cards) {
+          if (card.name !== 'knowledge_research_worker' && card.name !== 'knowledge_research_plan') finishResearchCard(sp, state, id, true);
+        }
+      }
+      state.roundId = msg.roundId; state.round = msg.round;
+      upsertResearchCard(sp, state, researchCardId(state, 'round', msg.roundId), 'knowledge_research_round',
+        { round: msg.round, maxRounds: msg.maxRounds });
+      break;
+    }
+    case 'knowledge_research_worker_started':
+    case 'knowledge_research_worker_completed': {
+      if (!nonEmptyString(msg.taskId) || typeof msg.label !== 'string' || msg.label.length > 100) return;
+      if (msg.type === 'knowledge_research_worker_completed' && !['completed', 'failed', 'cancelled'].includes(msg.status)) return;
+      const id = researchCardId(state, 'worker', msg.taskId);
+      upsertResearchCard(sp, state, id, 'knowledge_research_worker', { count: 1, label: msg.label });
+      if (msg.type === 'knowledge_research_worker_completed') {
+        finishResearchCard(sp, state, id, msg.status === 'completed', msg.status === 'cancelled'
+          ? t('chat.knowledgeResearchCancelled') : msg.status === 'failed' ? t('chat.knowledgeResearchFailed') : undefined);
+      }
+      break;
+    }
+    case 'knowledge_research_ledger_updated': {
+      if (msg.phase !== 'investigating' && msg.phase !== 'reviewing') return;
+      const roundKey = state.roundId || 'plan';
+      const id = researchCardId(state, 'progress', roundKey);
+      upsertResearchCard(sp, state, id, 'knowledge_research_progress', progressArgs);
+      if (msg.phase === 'reviewing') {
+        finishResearchCard(sp, state, id, true);
+        if (state.roundId) finishResearchCard(sp, state, researchCardId(state, 'round', state.roundId), true);
+        upsertResearchCard(sp, state, researchCardId(state, 'review', roundKey), 'knowledge_research_review', {},
+          t('chat.knowledgeResearchReviewCounts', { conflicts: String(msg.needsConflicted), pending: String(pending) }));
+      }
+      break;
+    }
+    case 'knowledge_research_completed': {
+      if (!['completed', 'partial', 'failed', 'cancelled'].includes(msg.status)) return;
+      state.closed = true;
+      useStore.getState().endKnowledgeRetrieval?.(sp);
+      const success = msg.status === 'completed' || msg.status === 'partial';
+      const terminalNote = msg.status === 'cancelled' ? t('chat.knowledgeResearchCancelled')
+        : msg.status === 'failed' ? t('chat.knowledgeResearchFailed') : undefined;
+      settleResearchCards(sp, success, terminalNote);
+      if (success) {
+        const summary = msg.status === 'partial'
+          ? t('chat.knowledgeResearchPartialSummary', { rounds: String(msg.rounds), pending: String(pending) })
+          : t('chat.knowledgeResearchSummary', { rounds: String(msg.rounds), searches: String(msg.searchCalls),
+            reads: String(msg.readCalls), completed: String(progressArgs.completed), total: String(progressArgs.total) });
+        upsertResearchCard(sp, state, researchCardId(state, 'synthesis'), 'knowledge_research_synthesis', {}, summary);
+      }
+      break;
+    }
+  }
+}
+
 // ── 消息分发（大 switch） ──
 
 export function handleServerMessage(msg: any): void {
@@ -618,7 +764,8 @@ export function handleServerMessage(msg: any): void {
   if (msg?.type !== 'knowledge_retrieval_started'
     && msg?.type !== 'knowledge_trace'
     && msg?.type !== 'knowledge_rollup_progress'
-    && msg?.type !== 'knowledge_supplement_search') {
+    && msg?.type !== 'knowledge_supplement_search'
+    && !KNOWLEDGE_RESEARCH_EVENTS.has(msg?.type)) {
     const { sessionPath: retrievalDonePath } = sessionIdentityFromMessage(msg);
     // 与 markSessionOutputUnread? 同策略：部分测试 store / 旧 slice 组合缺 action 时不炸。
     if (retrievalDonePath) {
@@ -661,11 +808,25 @@ export function handleServerMessage(msg: any): void {
 
   applyInputSessionConfirmationBlock(msg);
 
+  if (msg.type === 'session_user_message') {
+    const { sessionPath } = sessionIdentityFromMessage(msg);
+    const research = sessionPath ? knowledgeResearchCardsBySession.get(sessionPath) : null;
+    if (research?.closed) research.previousMainRunning = false;
+  }
+
   // 知识过程卡的收口（2026-08-31 四轮）：答案正文开始流式输出时收尾阅读卡与
   // 「正在生成回答」卡（正文与卡片同在一条助手消息里）；run 结束兜底（中止/
   // 空回包）。卡片由流缓冲随消息渲染，无需额外清除。
   if (msg.type === 'text_delta' || msg.type === 'assistant_run_end') {
     const { sessionPath: traceDonePath } = sessionIdentityFromMessage(msg);
+    if (traceDonePath) {
+      const research = knowledgeResearchCardsBySession.get(traceDonePath);
+      if (research?.closed && !research.previousMainRunning) {
+        const success = !msg.aborted && !msg.failed && !msg.error && msg.stopReason !== 'aborted' && msg.stopReason !== 'error';
+        settleResearchCards(traceDonePath, success, success ? undefined : translatorT()('chat.knowledgeResearchCancelled'));
+      }
+      if (research && msg.type === 'assistant_run_end') research.previousMainRunning = false;
+    }
     if (traceDonePath && knowledgeAnswerCardSessions.has(traceDonePath)) {
       settleKnowledgeReadCard(traceDonePath);
       feedKnowledgeToolCard(traceDonePath, { type: 'tool_end', id: 'kt-answer', success: true });
@@ -683,6 +844,7 @@ export function handleServerMessage(msg: any): void {
       streamBufferManager.handle(msg);
     }
     if (msg.type === 'assistant_run_end') {
+      retainPendingResearchCards(msg.sessionPath);
       applyRunEndSideEffects(msg);
     }
     dispatchStreamKey(msg.sessionPath, msg);
@@ -697,6 +859,7 @@ export function handleServerMessage(msg: any): void {
     streamBufferManager.handle(msg);
     // assistant_run_end 后仍需执行部分通用逻辑（loadSessions、context_usage）
     if (msg.type === 'assistant_run_end') {
+      if (msg.sessionPath) retainPendingResearchCards(msg.sessionPath);
       applyRunEndSideEffects(msg);
     }
     // tool_end 后更新 todo（兼容新旧工具名 + 新旧格式）
@@ -1329,6 +1492,20 @@ export function handleServerMessage(msg: any): void {
       useStore.getState().beginKnowledgeRetrieval?.(sp);
       // 新一轮检索：收尾上一轮可能残留的阅读卡（跨轮 Map 泄漏防护）。
       settleKnowledgeReadCard(sp);
+      settleResearchCards(sp, false, translatorT()('chat.knowledgeResearchCancelled'));
+      knowledgeResearchCardsBySession.delete(sp);
+      break;
+    }
+
+    case 'knowledge_research_started':
+    case 'knowledge_research_plan_updated':
+    case 'knowledge_research_round_started':
+    case 'knowledge_research_worker_started':
+    case 'knowledge_research_worker_completed':
+    case 'knowledge_research_ledger_updated':
+    case 'knowledge_research_completed': {
+      const sp = nonEmptyString(msg.sessionPath) || nonEmptyString(msg.path);
+      if (sp) handleKnowledgeResearchProgress(msg, sp);
       break;
     }
 
@@ -1402,6 +1579,8 @@ export function handleServerMessage(msg: any): void {
       } else if (msg.kind === 'think') {
         feedKnowledgeThinkCard(sp, `kt-${id}`, phaseRaw);
       } else if (msg.detail === 'answer') {
+        // 详细调查已有整理卡，不能再被旧回答事件重复开卡；快速模式沿用旧路径。
+        if (knowledgeResearchCardsBySession.has(sp)) break;
         // 检索收口：阅读卡收尾 + 「正在生成回答」卡盖住主模型预填充等待。
         settleKnowledgeReadCard(sp);
         feedKnowledgeToolCard(sp, { type: 'tool_start', id: 'kt-answer', name: 'knowledge_answer' });

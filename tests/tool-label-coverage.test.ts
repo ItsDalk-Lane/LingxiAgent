@@ -40,6 +40,8 @@ const LABELED_TOOL_NAMES = [
   'check_pending_tasks', 'loop_control', 'current_status', 'session', 'knowledge_search', 'knowledge_read',
   'knowledge_think', 'knowledge_read_part', 'knowledge_supplement',
   'knowledge_answer', 'knowledge_local_search',
+  'knowledge_research_plan', 'knowledge_research_round', 'knowledge_research_worker',
+  'knowledge_research_progress', 'knowledge_research_review', 'knowledge_research_synthesis',
   'knowledge_outline', 'knowledge_grep', 'knowledge_manage',
   'hana_card_guide', 'show_card',
   // Hub 频道
@@ -66,6 +68,9 @@ const ACTION_LABEL_KEYS = ['session_send', 'session_create'];
 const UNLABELED_TOOL_NAMES = new Set([
   'structured_output',              // workflow 内部结构化输出
   'jian_update_status',             // desk 心跳
+  'knowledge_research_update',     // 隔离调查工具由聚合进度卡承接
+  'knowledge_research_finish',
+  'knowledge_delegate',
   'patrol_update_log',              // desk 巡检
   'hana',                           // MCP client 自我标识，非 agent 工具
   'stop', 'new', 'reset', 'rc', 'exitrc', 'apply', 'confirm', 'reject', 'compact', 'loop',

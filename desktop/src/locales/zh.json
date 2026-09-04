@@ -467,6 +467,13 @@
     "knowledgeLocalEvidenceFound": "已找到 {n} 条证据 · {ms}ms",
     "knowledgeFastSummary": "快速检索 · {n} 条证据 · {ms}ms",
     "knowledgeFastDeadlineExceeded": "已超出目标时限",
+    "knowledgeResearchSummary": "详细调查 · {rounds} 轮 · {searches} 次检索 · {reads} 次阅读 · {completed}/{total} 项完成",
+    "knowledgeResearchPartialSummary": "详细调查未完全完成 · {rounds} 轮 · 仍有 {pending} 项待确认",
+    "knowledgeResearchProgress": "已完成 {completed}/{total} 个证据问题",
+    "knowledgeResearchCancelled": "详细调查已取消",
+    "knowledgeResearchTruncated": "部分证据未纳入",
+    "knowledgeResearchFailed": "详细调查失败",
+    "knowledgeResearchReviewCounts": "{conflicts} 项矛盾 · {pending} 项待确认",
     "knowledgeMetaModeFast": "快速模式",
     "knowledgeMetaModeDetailed": "详细模式",
     "feedbackUp": "有帮助（记入经验库）",
@@ -1221,6 +1228,36 @@
       "running": "↻ 模型发起补充检索",
       "done": "↻ 模型发起了补充检索",
       "failed": "↻ 补充检索失败"
+    },
+    "knowledge_research_plan": {
+      "running": "正在规划调查",
+      "done": "已规划调查",
+      "failed": "调查规划未完成"
+    },
+    "knowledge_research_round": {
+      "running": "第 {round}/{maxRounds} 轮：正在检索和阅读",
+      "done": "第 {round}/{maxRounds} 轮调查已结束",
+      "failed": "第 {round}/{maxRounds} 轮调查未完成"
+    },
+    "knowledge_research_worker": {
+      "running": "已派出 {count} 个调查 Agent",
+      "done": "{count} 个调查 Agent 已结束任务",
+      "failed": "{count} 个调查 Agent 未完成任务"
+    },
+    "knowledge_research_progress": {
+      "running": "已完成 {completed}/{total} 个证据问题",
+      "done": "已完成 {completed}/{total} 个证据问题",
+      "failed": "已完成 {completed}/{total} 个证据问题（本次更新未完成）"
+    },
+    "knowledge_research_review": {
+      "running": "正在核对矛盾和缺口",
+      "done": "已核对矛盾和缺口",
+      "failed": "矛盾与缺口核对未完成"
+    },
+    "knowledge_research_synthesis": {
+      "running": "正在整理详细回答",
+      "done": "已整理回答依据",
+      "failed": "回答依据整理未完成"
     },
     "knowledge_answer": {
       "running": "✻ 正在生成回答",
