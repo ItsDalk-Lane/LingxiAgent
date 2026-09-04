@@ -4054,7 +4054,7 @@ export class LingxiEngine {
           }
         } finally {
           try {
-            this._knowledge?.close?.();
+            await this._knowledge?.close?.();
           } finally {
             this._sessionManifestStore?.close?.();
           }

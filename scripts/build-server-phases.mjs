@@ -33,6 +33,7 @@ import {
   verifyExternalEntrypoints,
 } from "./build-server-deps.mjs";
 import { buildKnowledgeVectorRuntime, assertKnowledgeVectorRuntime, knowledgeUseArchNativePath } from "./build-server-runtime-assets.mjs";
+import { repairUseArchNative } from "./prepare-usearch-native.mjs";
 import { pruneRuntimeDeadFiles } from "./build-server-prune.mjs";
 
 // ── Node.js runtime ──────────────────────────────────────────────────────
@@ -438,6 +439,7 @@ export async function resolveAndInstallExternalServerDeps({
 
   log("[build-server] installing external dependencies...");
   runWithTargetNode(`"${cachedNpmCli}" install --omit=dev --no-audit --no-fund --ignore-scripts=false`);
+  repairUseArchNative({ rootDir: outDir, platform, arch, required: true, log });
   ensureNodePtySpawnHelperExecutable({ baseDir: outDir, platform, arch, isWin });
 
   // Verify every string Vite external actually resolved into node_modules.

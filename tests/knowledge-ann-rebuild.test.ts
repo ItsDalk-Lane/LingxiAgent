@@ -31,3 +31,40 @@ it("构建分批且在独立线程进行，关闭等待线程退出并保留 pai
     expect(fs.existsSync(path.join(f.root, f.model.key.slice(0, 16), `${id}.usearch.tmp`))).toBe(false);
   } finally { await f.close(); }
 });
+
+it("立即关闭同步释放目录库，不发起恢复读取；重复关闭等待同一次退出", async () => {
+  const f = annFixture();
+  const readDirectory = vi.spyOn(fs.promises, "readdir");
+  const closeStore = vi.spyOn(f.store, "close");
+  try {
+    const backend = f.start();
+    const closing = backend.close();
+    expect(closeStore).toHaveBeenCalledTimes(1);
+    expect(backend.close()).toBe(closing);
+    await closing;
+    expect(readDirectory).not.toHaveBeenCalled();
+    expect(closeStore).toHaveBeenCalledTimes(1);
+  } finally { vi.restoreAllMocks(); await f.close(); }
+});
+
+it("在原生构建线程运行时关闭，等待退出后才能删除目录", async () => {
+  const f = annFixture();
+  try {
+    f.add("closing", Array.from({ length: 1300 }, (_, index) => [1, index / 1300, 0]));
+    const original = f.portable.readReadyVectorBatch.bind(f.portable);
+    let began!: () => void;
+    const building = new Promise<void>(resolve => { began = resolve; });
+    vi.spyOn(f.portable, "readReadyVectorBatch").mockImplementation((...args) => {
+      const batch = original(...args); began(); return batch;
+    });
+    const backend = f.start();
+    await building;
+    const before = f.blobs();
+    const closing = backend.close();
+    expect(backend.close()).toBe(closing);
+    await closing;
+    expect(f.blobs()).toEqual(before);
+    expect(fs.readdirSync(f.root, { recursive: true }).filter(file => String(file).endsWith(".tmp"))).toEqual([]);
+    fs.rmSync(f.root, { recursive: true });
+  } finally { vi.restoreAllMocks(); await f.close(); }
+});

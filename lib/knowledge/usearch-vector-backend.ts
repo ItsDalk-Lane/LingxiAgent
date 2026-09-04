@@ -125,6 +125,7 @@ export class UseArchVectorBackend implements KnowledgeVectorSearchBackend {
   private active: BuildJob | null = null;
   private activePromise: Promise<void> | null = null;
   private closed = false;
+  private closing: Promise<void> | null = null;
   private readonly recovery: Promise<void>;
 
   constructor(options: { portable: PortableVectorIndexAdapter; store: AnnIndexStore; root: string;
@@ -133,7 +134,9 @@ export class UseArchVectorBackend implements KnowledgeVectorSearchBackend {
     this.portable = options.portable; this.store = options.store; this.root = options.root;
     this.loadNative = options.loadNative ?? loadKnowledgeUseArch; this.log = options.log ?? (() => {});
     fs.mkdirSync(this.root, { recursive: true, mode: 0o700 });
-    this.recovery = this.recover().catch(() => { this.log("knowledge ANN: startup recovery failed"); });
+    // 刚打开就关闭时不发起目录读取，避免 Windows 上尚未结束的读取占用目录。
+    this.recovery = Promise.resolve().then(() => { if (!this.closed) return this.recover(); })
+      .catch(() => { this.log("knowledge ANN: startup recovery failed"); });
     void this.recovery.then(() => this.queuePump());
   }
 
@@ -360,13 +363,17 @@ export class UseArchVectorBackend implements KnowledgeVectorSearchBackend {
     await new Promise<void>(resolve => this.idleWaiters.push(resolve));
   }
 
-  async close(): Promise<void> {
-    if (this.closed) return;
+  close(): Promise<void> {
+    if (this.closing) return this.closing;
     this.closed = true; this.pending.clear(); this.loaded.clear(); this.failedBuilds.clear();
     if (this.wake) clearImmediate(this.wake); this.wake = null;
     if (this.active) { this.active.cancelled = true; if (this.active.worker) void this.active.worker.terminate(); }
-    await this.recovery; await this.activePromise;
+    // 所有恢复/构建的异步续段都先检查 closed；先同步释放数据库句柄，维持原有关闭语义。
     this.store.close();
-    for (const resolve of this.idleWaiters.splice(0)) resolve();
+    this.closing = (async () => {
+      await this.recovery; await this.activePromise;
+      for (const resolve of this.idleWaiters.splice(0)) resolve();
+    })();
+    return this.closing;
   }
 }

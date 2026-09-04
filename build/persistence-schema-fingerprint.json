@@ -660,7 +660,7 @@
     ],
     "version": 3
   },
-  "payloadFingerprint": "sha256:62fb7022d119927f45f160a0ebe7bdffc673bcb1dfefd3be23cf31e1d729b40d",
+  "payloadFingerprint": "sha256:03658759d1b349c11b6ae7e7daba2ce169488a052e97b65b5a424c9cb7fd2d9e",
   "registry": [
     {
       "affectedByEpochMigration": true,
@@ -3292,8 +3292,8 @@
   ],
   "review": {
     "classification": "compatible",
-    "compatibilityReason": "P1-07 adds a read-only block metadata accessor and shares compiled scope/search across tools; existing tables, frozen identities and ordinal reads remain compatible. Grep adds exact read span details without new durable state.",
-    "payloadFingerprint": "sha256:62fb7022d119927f45f160a0ebe7bdffc673bcb1dfefd3be23cf31e1d729b40d"
+    "compatibilityReason": "P1-08 Windows 关闭修复：同步释放 ANN 派生库，启动恢复可取消，引擎等待后台退出；持久化表与 DATA_EPOCH 不变",
+    "payloadFingerprint": "sha256:03658759d1b349c11b6ae7e7daba2ce169488a052e97b65b5a424c9cb7fd2d9e"
   },
   "schemas": [
     {
@@ -3855,7 +3855,7 @@
         },
         {
           "module": "lib/knowledge/usearch-vector-backend.ts",
-          "sourceHash": "sha256:711c713ec573842b11096fb5c7240055a7472d2cae487bb8eb8deee1a2c591ea"
+          "sourceHash": "sha256:2722d1dbecf39f13b43fac263ed87e03727727dfbc6bdbe5dc0a246cdbc549d5"
         },
         {
           "module": "lib/knowledge/vector-index-adapter.ts",

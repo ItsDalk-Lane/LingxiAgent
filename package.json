@@ -72,7 +72,7 @@
     "lint": "eslint .",
     "lint:boundary": "node scripts/lint-open-boundary.mjs",
     "test:watch": "vitest --exclude '**/.claude/**' --exclude '**/.cache/**' --exclude '**/dist/**' --exclude '**/dist-server/**' --exclude '**/dist-computer-use/**' --exclude '**/dist-sandbox/**'",
-    "postinstall": "node scripts/patch-pi-sdk.cjs"
+    "postinstall": "node scripts/patch-pi-sdk.cjs && node scripts/prepare-usearch-native.mjs"
   },
   "dependencies": {
     "@codemirror/lang-markdown": "^6.5.0",

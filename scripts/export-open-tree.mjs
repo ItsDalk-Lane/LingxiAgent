@@ -115,6 +115,10 @@ export const EXPORT_SKELETON = [
     reason: "imported by scripts/build-server-phases.mjs for external-dependency package.json derivation and native-addon runtime smoke-test source generation.",
   },
   {
+    path: "scripts/prepare-usearch-native.mjs",
+    reason: "安装与开放构建共同修复锁定原生包的 x64 链接，保证真实原生烟测通过。",
+  },
+  {
     path: "scripts/build-server-runtime-assets.mjs",
     reason: "开放服务构建需要同一份向量后端构建入口、目标原生扩展路径及完整性检查。",
   },
