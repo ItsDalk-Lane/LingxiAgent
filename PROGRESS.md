@@ -10,7 +10,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = 93764185d30f75048a5611c7b6854858448bd915  (P3 Windows 测试进程树清理修复；全量 13746 PASS / 0 FAIL / 7 既有 SKIP，83.65s；第四轮四平台待执行，最终封印未建立)
+VERIFIED_SOURCE_SHA   = 61ae60d1afe4f878ae638ff4de96d7e4f30bfefe  (P3 桌面探测就绪修复；全量 13751 PASS / 0 FAIL / 7 既有 SKIP，78.81s；第五轮四平台待执行，最终封印未建立)
 历史上游同步工作分支  = feature/upstream-sync-0.447.4
 当前知识重构执行分支  = feat/knowledge-retrieval-research-p0-p3
 ```
@@ -1084,3 +1084,5 @@ Windows NSIS 已在 windows-latest 构建成功；尚未在真实 Windows 桌面
 - 当前源码 `aba59a5c`（运行时修复 `4ec98d0e` 加兼容指纹）全量 13742 PASS / 0 FAIL / 7 既有 SKIP，81.09s，lint exit 0。两轮 14 条生成器全部通过，960 项测试清单 SHA-256 `8c16cc006d9055e0e53e1b87179e938af7c3ee200fa41f81903057a227cde5b9`，885 开放树文件一致。第二轮 macOS 双架构和 Windows 均确认 splash -3 重复导航，第三轮验证当前修复；最终封印未建立。
 
 - 当前源码 `93764185d30f75048a5611c7b6854858448bd915`：Windows 只结束本次测试进程树并如实记录清理结果，确定性回归及本机实际启动/清理通过；阶段全量 13746 PASS / 0 FAIL / 7 既有 SKIP，83.65s，lint exit 0。两轮 14 条生成器均通过，961 项测试清单 SHA-256 `7386b9ccb52a904b88d9f66ef12de0d413266bdd65b71bfe506af603269ea7b3`，885 开放文件逐字节相同；数据契约不变。第三轮其余平台与质量已通过，第四轮验证清理修复；最终封印未建立。
+
+- 当前源码 `61ae60d1afe4f878ae638ff4de96d7e4f30bfefe` 修复启动早期调试列表的单次探测超时，仍保留原 90s 总期限、真实页面/后台与崩溃检查。全量 13751 PASS / 0 FAIL / 7 既有 SKIP，78.81s；类型、lint、本机实际启动及清理均通过。两轮 14 条生成器通过，961 项测试清单 SHA-256 `43df0f0f503484a22fc2d1e0c532db9d01fe820ea3e8b1ae1839bac40d6a46fd`，885 开放文件相同。第四轮 Intel 临时磁盘阻塞已解除，新的探测失败另有红测与修复，原记录均保留；第五轮待验证，最终封印未建立。
