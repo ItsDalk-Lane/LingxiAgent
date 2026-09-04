@@ -30,18 +30,24 @@ function requiredText(value: unknown, limit: number, field: string): asserts val
   }
 }
 
+interface EvidenceLedgerOptions {
+  receipts?: EvidenceReceiptService;
+  /** 由完整性执行器提供已核验结果；尚未接入时不视为完成。 */
+  isCompletenessSatisfied?: (runId: string, needId: string) => boolean;
+}
+
 /** 只接收阅读凭据；模型不能直接提交证据位置、来源数量或最终需求状态。 */
 export class EvidenceLedger {
   private readonly receipts: EvidenceReceiptService;
+  private readonly store: ResearchStore;
+  private readonly options: EvidenceLedgerOptions;
 
   constructor(
-    private readonly store: ResearchStore,
-    private readonly options: {
-      receipts?: EvidenceReceiptService;
-      /** 由完整性执行器提供已核验结果；尚未接入时不视为完成。 */
-      isCompletenessSatisfied?: (runId: string, needId: string) => boolean;
-    } = {},
+    store: ResearchStore,
+    options: EvidenceLedgerOptions = {},
   ) {
+    this.store = store;
+    this.options = options;
     this.receipts = options.receipts ?? new EvidenceReceiptService(store);
   }
 

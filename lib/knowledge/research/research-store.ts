@@ -50,9 +50,12 @@ function record<T>(row: Record<string, unknown>): T {
 
 /** 研究持久化只保存冻结身份、证据和有限元数据；模型不能通过额外字段夹带整段提示或工具输出。 */
 export class ResearchStore {
-  constructor(readonly knowledgeStore: KnowledgeStore, private readonly options: {
-    now?: () => string; idGenerator?: (prefix: string) => string;
-  } = {}) {}
+  readonly knowledgeStore: KnowledgeStore;
+  private readonly options: { now?: () => string; idGenerator?: (prefix: string) => string };
+  constructor(knowledgeStore: KnowledgeStore, options: { now?: () => string; idGenerator?: (prefix: string) => string } = {}) {
+    this.knowledgeStore = knowledgeStore;
+    this.options = options;
+  }
 
   now(): string { return this.options.now?.() ?? new Date().toISOString(); }
   newId(prefix: string): string {

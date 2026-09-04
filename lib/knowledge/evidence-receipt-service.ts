@@ -32,7 +32,8 @@ function violation(): never {
 
 /** 凭据只记录真正读过的原文位置；写入与读回都复核冻结身份链和原文摘要。 */
 export class EvidenceReceiptService {
-  constructor(private readonly researchStore: ResearchStore) {}
+  private readonly researchStore: ResearchStore;
+  constructor(researchStore: ResearchStore) { this.researchStore = researchStore; }
 
   issue(input: IssueKnowledgeReadReceipt): KnowledgeResearchReadReceipt {
     return this.researchStore.transaction(() => {

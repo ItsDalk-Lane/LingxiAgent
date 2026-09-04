@@ -30,12 +30,20 @@ export interface ResearchRoundInput {
   onProgress?: (update: KnowledgeResearchProgressUpdate) => void;
 }
 
+interface ResearchRoundDependencies {
+  research: ResearchStore;
+  executeIsolated: ResearchExecuteIsolated;
+  budget?: ResearchToolBudget;
+  nowMs?: () => number;
+}
+
 /** 每轮只启动新的研究根会话，消费宿主结构化完成信号，不把会话回复或隐藏思考带入下一轮。 */
 export class ResearchRoundRunner {
   private readonly budget: ResearchToolBudget;
+  private readonly deps: ResearchRoundDependencies;
 
-  constructor(private readonly deps: { research: ResearchStore; executeIsolated: ResearchExecuteIsolated;
-    budget?: ResearchToolBudget; nowMs?: () => number }) {
+  constructor(deps: ResearchRoundDependencies) {
+    this.deps = deps;
     this.budget = deps.budget ?? new ResearchToolBudget(deps.research, { nowMs: deps.nowMs });
   }
 

@@ -7,7 +7,7 @@
  * （比如经验能力）在 CI 里默认关闭，从未被组装出来过，断言自然从未被
  * 真正跑到过 recall_experience 身上。
  *
- * 这份测试把"全部开关都打开"的真实 Agent 工具快照送进两条启动断言，
+ * 这份测试把普通会话"全部开关都打开"以及主研究、工作会话的真实工具快照送进两条启动断言，
  * 确保任何一个内置工具漏声明权限、或漏归类，都会在这里先报红，
  * 而不是等到某个用户打开某个开关才第一次触发。
  */
@@ -32,6 +32,7 @@ vi.mock("../lib/memory/memory-ticker.js", () => ({
 }));
 
 import { Agent } from "../core/agent.ts";
+import { createResearchAgentFixture, researchNeed } from "./helpers/knowledge-research-agent-fixture.ts";
 import {
   assertAllBuiltInToolsPermissionCovered,
   assertAllToolsCategorized,
@@ -99,8 +100,10 @@ const SNAPSHOT_EXEMPT_TOOL_NAMES = [
 
 describe("built-in tool permission/category coverage (full snapshot)", () => {
   const roots: string[] = [];
+  const researchFixtures: Awaited<ReturnType<typeof createResearchAgentFixture>>[] = [];
 
   afterEach(async () => {
+    for (const fixture of researchFixtures.splice(0)) await fixture.close();
     while (roots.length) {
       fs.rmSync(roots.pop()!, { recursive: true, force: true });
     }
@@ -118,18 +121,48 @@ describe("built-in tool permission/category coverage (full snapshot)", () => {
 
     await agent.init(() => {});
 
-    const snapshot = agent.getToolsSnapshot({
+    const desktop = agent.getToolsSnapshot({
       forceMemoryEnabled: true,
       forceExperienceEnabled: true,
       surface: "desktop",
     });
 
-    return { agent, snapshot };
+    const research = await createResearchAgentFixture(async turn => {
+      if (turn.role === "worker") return;
+      const update = await turn.call("knowledge_research_update", {
+        runId: turn.runId, createNeeds: [researchNeed("检查工具权限声明")],
+      });
+      expect(update.isError).toBeUndefined();
+      const delegated = await turn.call("knowledge_delegate", { runId: turn.runId,
+        tasks: [{ label: "权限覆盖", task: "保留本次隔离工作会话供宿主检查工具声明", needIds: [update.needs[0].id] }],
+      });
+      expect(delegated.isError).toBeUndefined();
+    });
+    researchFixtures.push(research);
+    const run = research.research.createRun({ turnScopeId: research.request.compiledScope.scopeId,
+      turnId: research.request.turnId, parentSessionPath: research.request.parentSessionPath,
+      question: research.request.question });
+    // 透传采集真正装配的工具对象；真实登记的主研究会话通过委派产生工作会话。
+    const capture = vi.spyOn(Agent.prototype, "getToolsSnapshot");
+    try {
+      await research.executeIsolated("采集研究工具权限快照", {
+        agentId: research.request.agentId, parentSessionId: research.request.parentSessionId,
+        parentSessionPath: research.request.parentSessionPath, surface: "knowledge_research_root",
+        research: { runId: run.id, scopeId: run.turnScopeId, studioId: research.request.compiledScope.studioId },
+      });
+      const collected = capture.mock.calls.map(([options], index) => ({
+        surface: options.surface, snapshot: capture.mock.results[index].value as ReturnType<Agent["getToolsSnapshot"]>,
+      }));
+      expect(collected.map(item => item.surface)).toEqual(["knowledge_research_root", "knowledge_research_worker"]);
+      const surfaces = [desktop, ...collected.map(item => item.snapshot)];
+      return { agent, snapshot: surfaces.flat(), surfaces };
+    } finally { capture.mockRestore(); }
   }
 
   it("covers invocation permission for every built-in tool in the fully-enabled snapshot", async () => {
-    const { agent, snapshot } = await buildFullSnapshot();
+    const { agent, snapshot, surfaces } = await buildFullSnapshot();
     try {
+      for (const surface of surfaces) expect(() => assertAllBuiltInToolsPermissionCovered(surface)).not.toThrow();
       expect(() => assertAllBuiltInToolsPermissionCovered(snapshot)).not.toThrow();
     } finally {
       await agent.dispose();
@@ -137,8 +170,9 @@ describe("built-in tool permission/category coverage (full snapshot)", () => {
   });
 
   it("categorizes every tool in the fully-enabled snapshot", async () => {
-    const { agent, snapshot } = await buildFullSnapshot();
+    const { agent, snapshot, surfaces } = await buildFullSnapshot();
     try {
+      for (const surface of surfaces) expect(() => assertAllToolsCategorized(surface.map(tool => tool.name))).not.toThrow();
       expect(() => assertAllToolsCategorized(snapshot.map((t) => t.name))).not.toThrow();
     } finally {
       await agent.dispose();
@@ -146,7 +180,7 @@ describe("built-in tool permission/category coverage (full snapshot)", () => {
   });
 
   it("assembles every non-exempt catalogued built-in into the snapshot", async () => {
-    const { agent, snapshot } = await buildFullSnapshot();
+    const { agent, snapshot, surfaces } = await buildFullSnapshot();
     try {
       const universe = new Set([
         ...CORE_TOOL_NAMES,
@@ -162,6 +196,14 @@ describe("built-in tool permission/category coverage (full snapshot)", () => {
 
       expect(missing).toEqual([]);
       expect(actualNames.has("computer")).toBe(true);
+      const [desktop, researchRoot, worker] = surfaces.map(tools => new Set(tools.map(tool => tool.name)));
+      for (const name of ["knowledge_research_update", "knowledge_research_finish", "knowledge_delegate"]) {
+        expect(desktop.has(name)).toBe(false);
+        expect(researchRoot.has(name)).toBe(true);
+      }
+      expect(worker.has("knowledge_research_update")).toBe(true);
+      expect(worker.has("knowledge_research_finish")).toBe(false);
+      expect(worker.has("knowledge_delegate")).toBe(false);
     } finally {
       await agent.dispose();
     }

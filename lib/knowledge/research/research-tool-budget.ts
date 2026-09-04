@@ -80,8 +80,10 @@ function budgetError(reason: string): KnowledgeError {
 export class ResearchToolBudget {
   private readonly nowMs: () => number;
   private readonly active: Map<string, ActiveRun>;
+  private readonly research: ResearchStore;
 
-  constructor(private readonly research: ResearchStore, options: { nowMs?: () => number } = {}) {
+  constructor(research: ResearchStore, options: { nowMs?: () => number } = {}) {
+    this.research = research;
     this.nowMs = options.nowMs ?? Date.now;
     let active = activeByStore.get(research.knowledgeStore);
     if (!active) activeByStore.set(research.knowledgeStore, active = new Map());

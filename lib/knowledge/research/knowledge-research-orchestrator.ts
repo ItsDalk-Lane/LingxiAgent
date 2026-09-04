@@ -34,21 +34,25 @@ const normalizeQuery = (query: string) => query.normalize("NFKC").trim().replace
 const successful = (action: KnowledgeResearchAction) => action.status === "completed" && action.errorCode === null
   && action.responseSummary?.errorCode == null;
 
+interface KnowledgeResearchDependencies {
+  research: ResearchStore;
+  executeIsolated: ResearchExecuteIsolated;
+  nowMs?: () => number;
+  isCompletenessSatisfied?: (runId: string, needId?: string) => boolean;
+  onSearchCompleted?: (summary: ResearchSearchSummary) => void;
+  onProgress?: (event: KnowledgeResearchProgress) => void;
+}
+
 /** 每轮都从宿主账本决定下一步；隔离模型的普通回复不参与完整性判断或最终回答。 */
 export class KnowledgeResearchOrchestrator {
   private readonly budget: ResearchToolBudget;
   private readonly ledger: EvidenceLedger;
   private readonly runner: ResearchRoundRunner;
   private readonly renderer: ResearchContextRenderer;
+  private readonly deps: KnowledgeResearchDependencies;
 
-  constructor(private readonly deps: {
-    research: ResearchStore;
-    executeIsolated: ResearchExecuteIsolated;
-    nowMs?: () => number;
-    isCompletenessSatisfied?: (runId: string, needId?: string) => boolean;
-    onSearchCompleted?: (summary: ResearchSearchSummary) => void;
-    onProgress?: (event: KnowledgeResearchProgress) => void;
-  }) {
+  constructor(deps: KnowledgeResearchDependencies) {
+    this.deps = deps;
     this.budget = new ResearchToolBudget(deps.research, { nowMs: deps.nowMs });
     this.ledger = new EvidenceLedger(deps.research, { isCompletenessSatisfied: deps.isCompletenessSatisfied });
     this.runner = new ResearchRoundRunner({ ...deps, budget: this.budget });
