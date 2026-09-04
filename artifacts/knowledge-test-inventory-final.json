@@ -1436,8 +1436,8 @@
   },
   {
     "file": "tests/artifact-boot-channel-consistency.test.ts",
-    "describeCount": 3,
-    "itCount": 11,
+    "describeCount": 4,
+    "itCount": 14,
     "testCount": 0,
     "issueRefs": [],
     "category": "security",
@@ -1467,7 +1467,8 @@
       "vitest",
       "fs",
       "path",
-      "vm"
+      "vm",
+      "node:events"
     ]
   },
   {

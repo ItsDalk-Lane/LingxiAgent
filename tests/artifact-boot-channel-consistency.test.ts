@@ -31,6 +31,7 @@ import { describe, expect, it } from "vitest";
 import fs from "fs";
 import path from "path";
 import vm from "vm";
+import { EventEmitter } from "node:events";
 
 const root = process.cwd();
 
@@ -115,7 +116,12 @@ function bootResultStub(overrides: Partial<BootResultStub> = {}): BootResultStub
  */
 async function runResolvePackagedArtifactBoot(
   updateChannelPreference: "stable" | "beta",
-  opts: { serverBoot?: Partial<BootResultStub>; rendererBoot?: Partial<BootResultStub> } = {},
+  opts: {
+    serverBoot?: Partial<BootResultStub>;
+    rendererBoot?: Partial<BootResultStub>;
+    splashWindow?: { isDestroyed: () => boolean; webContents: EventEmitter & { isLoadingMainFrame: () => boolean } };
+    loadSplashWindowURL?: (window: unknown, options: unknown) => void;
+  } = {},
 ): Promise<RunResult> {
   const mainSource = fs.readFileSync(path.join(root, "desktop", "main.cjs"), "utf-8");
   const readPrefSource = extractFunctionSource(mainSource, "readUpdateChannelPreference");
@@ -131,8 +137,12 @@ async function runResolvePackagedArtifactBoot(
     SEED_CHANNEL: "stable",
     hasSeed: () => true,
     rendererPointerChannel: (channel: string) => `${channel}.renderer`,
-    prepareArtifactBoot: async (bootOpts: { channel: string }) => {
+    prepareArtifactBoot: async (bootOpts: { channel: string; onProgress: () => void }) => {
       prepareArtifactBootChannels.push(bootOpts.channel);
+      if (opts.splashWindow) {
+        bootOpts.onProgress();
+        bootOpts.onProgress();
+      }
       return {
         seed: { productVersion: "0.446.14", releaseGeneration: 1 },
         server: bootResultStub({ versionDir: `/artifacts/server/0.446.14-darwin-arm64`, ...opts.serverBoot }),
@@ -155,8 +165,8 @@ async function runResolvePackagedArtifactBoot(
     path,
     artifactBoot,
     artifactGc,
-    splashWindow: null,
-    loadSplashWindowURL: () => {},
+    splashWindow: opts.splashWindow ?? null,
+    loadSplashWindowURL: opts.loadSplashWindowURL ?? (() => {}),
     loadPinnedKeyset: () => [],
     redactMainLogText: (msg: string) => msg,
     notifyComponentQuarantined: () => {},
@@ -322,5 +332,47 @@ describe("crash-fallback user notice (silent auto-recovery must surface to the u
 
     expect(run.crashFallbackNotice).toBe(null);
     expect(run.broadcastCalls).toEqual([]);
+  });
+});
+
+// 实际首启回调不能中断正在加载的启动页，也不能被两只归档重复触发导航。
+describe("首启解包启动页加载顺序", () => {
+  it("等待首个页面完成后只切换一次准备模式", async () => {
+    let loading = true;
+    const webContents = Object.assign(new EventEmitter(), { isLoadingMainFrame: () => loading });
+    const splashWindow = { isDestroyed: () => false, webContents };
+    const loads: unknown[] = [];
+    await runResolvePackagedArtifactBoot("stable", { splashWindow,
+      loadSplashWindowURL: (_window, options) => { loads.push(options); loading = true; } });
+    expect(loads).toEqual([]);
+    expect(webContents.listenerCount("did-finish-load")).toBe(1);
+    loading = false;
+    webContents.emit("did-finish-load");
+    expect(loads).toEqual([{ query: { mode: "preparing" } }]);
+    loading = false;
+    webContents.emit("did-finish-load");
+    expect(loads).toHaveLength(1);
+  });
+
+  it("已经加载完成的启动页直接切换一次", async () => {
+    const webContents = Object.assign(new EventEmitter(), { isLoadingMainFrame: () => false });
+    const splashWindow = { isDestroyed: () => false, webContents };
+    const loads: unknown[] = [];
+    await runResolvePackagedArtifactBoot("stable", { splashWindow,
+      loadSplashWindowURL: (_window, options) => { loads.push(options); } });
+    expect(loads).toEqual([{ query: { mode: "preparing" } }]);
+    expect(webContents.listenerCount("did-finish-load")).toBe(0);
+  });
+
+  it("等待期间关闭的启动页不会再次导航", async () => {
+    let destroyed = false;
+    const webContents = Object.assign(new EventEmitter(), { isLoadingMainFrame: () => true });
+    const splashWindow = { isDestroyed: () => destroyed, webContents };
+    const loads: unknown[] = [];
+    await runResolvePackagedArtifactBoot("stable", { splashWindow,
+      loadSplashWindowURL: (_window, options) => { loads.push(options); } });
+    destroyed = true;
+    webContents.emit("did-finish-load");
+    expect(loads).toEqual([]);
   });
 });
