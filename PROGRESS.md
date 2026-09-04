@@ -10,7 +10,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = 56dc1086aa06d0592c12e8a53eef9b8ea8546812  (2026-09-04 知识重构 P2 阶段全部验证通过；与已验证 d4292b2d 仅进度记录不同)
+VERIFIED_SOURCE_SHA   = c860054b9ee7f961abbb0cfebc2bbd9428ab6bd3  (2026-09-04 P3 实现含桌面启动验证；本机验证通过，全量 13738 PASS / 0 FAIL / 7 既有 SKIP；四平台及最终封印待完成)
 历史上游同步工作分支  = feature/upstream-sync-0.447.4
 当前知识重构执行分支  = feat/knowledge-retrieval-research-p0-p3
 ```
@@ -1068,3 +1068,7 @@ Windows NSIS 已在 windows-latest 构建成功；尚未在真实 Windows 桌面
 - 清单/生成物：`export-manifest.json`、`build/cli-runtime-closure.json`、`build/persistence-schema-fingerprint.json`；开放边界基线已重生成且字节未变。
 - 记录：`PROGRESS.md`、`task_plan.md`、`findings.md`。实施期间另有用户改动出现在五个 locale、`TenetApprovalBanner.tsx`、`AgentTenets.tsx`、`Settings.module.css`，本任务未修改或回滚它们。
 - 未触碰 `engine.ts`、`session-coordinator.ts`、`node_modules`、审批档、工具分类、白名单或执行权限；未建分支、未提交、未推送。
+
+- P3 含桌面启动检查的实现源码固定为 `c860054b9ee7f961abbb0cfebc2bbd9428ab6bd3`；两轮 14 条生成/校验命令全部 exit 0，每轮完整工作区 diff 为 0；960 个测试文件清单逐字节一致（SHA-256 78836634483cb524c7f52167b44a275bc7623a4f34d27d81b12c9e78bd3ecfd0），两个开放树 885 文件逐个一致。新桌面检查实际验证首启引导页内容与服务端；本条按用户授权同步审计坐标用于全量复验，四平台与最终封印仍待完成。
+
+- 当前源码 `c860054b9ee7f961abbb0cfebc2bbd9428ab6bd3` 的全量审计复验已 exit 0：全量 13738 PASS / 0 FAIL / 7 既有 SKIP，命令总耗时 87.507s；日志 `/tmp/lingxi-knowledge-p307-audit-full.log`。仅同步六个既有审计文件用于当前源码四平台 CI，最终封印仍保留；没有扩大审计白名单。
