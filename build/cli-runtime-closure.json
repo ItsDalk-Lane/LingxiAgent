@@ -6396,6 +6396,11 @@
         },
         {
           "root": "server-bootstrap",
+          "from": "lib/knowledge/research/research-tool-budget.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
           "from": "lib/knowledge/research/research-store.ts",
           "kind": "import-statement"
         },
@@ -6417,11 +6422,6 @@
         {
           "root": "server-bootstrap",
           "from": "lib/tools/knowledge-manage-tool.ts",
-          "kind": "import-statement"
-        },
-        {
-          "root": "server-bootstrap",
-          "from": "lib/knowledge/research/research-tool-budget.ts",
           "kind": "import-statement"
         },
         {
@@ -6911,6 +6911,11 @@
       "provenance": [
         {
           "root": "server-bootstrap",
+          "from": "lib/knowledge/research/research-store.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
           "from": "lib/tools/knowledge-research-update-tool.ts",
           "kind": "import-statement"
         },
@@ -6930,7 +6935,7 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by lib/tools/knowledge-research-update-tool.ts (import-statement); lib/tools/knowledge-research-finish-tool.ts (import-statement); lib/tools/knowledge-delegate-tool.ts (import-statement); +1 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by lib/knowledge/research/research-store.ts (import-statement); lib/tools/knowledge-research-update-tool.ts (import-statement); lib/tools/knowledge-research-finish-tool.ts (import-statement); +2 more importer(s)."
     },
     {
       "path": "lib/knowledge/retrieval-result-cache.ts",

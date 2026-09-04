@@ -10,7 +10,7 @@
 - 严格按 P0 → P1 → P2 → P3 及编号顺序；阶段门禁全部通过才进入下一阶段。
 - 每项记录测试原始结果后提交；不删除、跳过或放宽测试，不合并 main。
 - 现有任务书为用户未跟踪文件，既有规划文档与 BLOCKED.md 历史记录保留。
-- 当前断点：P1-01 至 P1-08 已完成，阶段收口 `23873985`、审计 `333c5112`，本地与四平台门禁全部通过；P2-01 已完成并提交 `c3033b05`；P2-02 已提交 `c729f68a`；P2-03 已提交 `4a95317c`；P2-04 已提交 `359aeb77`；P2-05 已完成隔离研究会话、祖先范围继承和严格工具名单，等待本项提交后进入 P2-06。P0 源码提交 `5c016df183ad207cf1ca33de274abb7a4eb10057`，阶段审计提交 `f9928d76`；全量 13002 PASS / 0 FAIL / 7 既有 SKIP。用户已授权每阶段验证后同步审计记录，保留最终封印。
+- 当前断点：P1-01 至 P1-08 已完成，阶段收口 `23873985`、审计 `333c5112`，本地与四平台门禁全部通过；P2-01 已完成并提交 `c3033b05`；P2-02 已提交 `c729f68a`；P2-03 已提交 `4a95317c`；P2-04 已提交 `359aeb77`；P2-05 已提交 `faad0da2`；P2-06 已完成多轮研究编排、共享预算与最终证据包，等待本项提交后进入 P2-07。P0 源码提交 `5c016df183ad207cf1ca33de274abb7a4eb10057`，阶段审计提交 `f9928d76`；全量 13002 PASS / 0 FAIL / 7 既有 SKIP。用户已授权每阶段验证后同步审计记录，保留最终封印。
 - 进度、计划与事实集中在本文件和基线文档，避免覆盖既有 task_plan.md / findings.md / PROGRESS.md。
 - 目标工具已确认本任务存在 active goal；重复 create_goal 被拒绝，沿用现有目标。
 - 规划恢复脚本返回其他会话的无关配置记录，经 git diff 为空核对，未采用其内容。
@@ -21,7 +21,7 @@
 | --- | --- | --- |
 | P0 | completed | 2026-09-04 全量 13002 PASS / 0 FAIL / 7 既有 SKIP，76.42s；全部 P0 门禁通过，审计提交 f9928d76 |
 | P1 | completed | P1-01 至 P1-08 完成；本地全量和第三轮四平台 Build 33829055797 全部通过，阶段审计 333c5112 |
-| P2 | in_progress | P2-01 至 P2-05 已完成；P2-06 及后续任务、阶段门禁待执行 |
+| P2 | in_progress | P2-01 至 P2-06 已完成；P2-07/P2-08 与阶段门禁待执行 |
 | P3 | pending | NOT_EXECUTED |
 
 ## P0-00：建立基线与回归门禁
@@ -312,16 +312,18 @@
 - 测试命令：任务书四项测试，加 `knowledge-research-agent-tools`、`session-permission-wrapper`、`session-coordinator-isolated-abort`、`session-teardown`、原有 read/agent-tools/search-scope/receipt/conditional-injection 与 `persistence-schema-tripwire` 共十四文件；`npm run typecheck`；定向 ESLint；`git diff --check`；持久化清单/指纹、运行闭包、开放边界与导出生成器。
 - 测试结果：最终 **14 文件 / 192 PASS / 0 FAIL / 0 SKIP，3.15s，exit 0**；三套类型检查、ESLint、diff、开放边界全部 exit 0。定向 ESLint 有 643 项警告，包含现有大文件及测试替身的宽类型警告，未当作零警告报告。先后保留并修复来源目录总数泄漏、更新/结束工具祖先归属漏检；完整回归第一次 175 PASS / 2 FAIL，正好复现初始化清理失败被吞掉，两项故障注入测试保留并修复后全部通过。最终日志 `/tmp/lingxi-knowledge-p205-tests-final.log`、`/tmp/lingxi-knowledge-p205-typecheck-final.log`、`/tmp/lingxi-knowledge-p205-lint.log`。
 - 生成物：持久化清单 66 stores / 779 sites；兼容指纹 `sha256:3beb2e79d626d4bc9d7ae2f35a92c1b4a6daab3bccf3e7d701b565138cc43679`，仅登记研究隔离生命周期改变，知识库仍为 v18；运行闭包 10682 文件；开放树成功导出 877 文件。阶段审计按用户授权在 P2 全部任务和门禁完成后同步，最终封印仍保留。
-- 对应 commit SHA：本项提交（下一项回填实际 SHA）
+- 对应 commit SHA：`faad0da2`
 - 偏差：none
 
 ## P2-06：实现 KnowledgeResearchOrchestrator
 
-- 状态：pending
-- 改动文件：尚未开始
-- 测试命令：按任务书该项测试执行，尚未执行
-- 测试结果：NOT_EXECUTED
-- 对应 commit SHA：尚未提交
+- 状态：completed
+- 改动文件：任务书锁定的 `knowledge-research-orchestrator.ts`、`research-prompts.ts`、`research-round-runner.ts`、`research-context-renderer.ts` 四模块；研究存储/共享预算、`core/agent.ts` 的查询计划与错误保真；指定六项测试、材料渲染/恢复/真实 Agent 工具联调及夹具；出口清单、运行闭包生成物。
+- 改动：首轮列目录并建立 1～8 个需求，没有需求时按完整原问题补建并继续第二轮；每轮只按宿主账本中的未解决项、冲突和反证缺口调查，多维 fixture 实际启动 Worker 并通过共享台账交回原文。搜索计划由宿主关联需求/反证用途，查询按文字与实际来源、章节范围判等；参数错误保留稳定错误码，未知错误与模型原文不入动作记录。根会话、工作会话和工具共用 32 次/4 轮/180 秒绝对预算，取消与额度耗尽都等待全部清理。最终包重新核冻结原文及已消费凭据，最多 32 段/16000 token，保留矛盾、缺口和截断提示；模型普通回复不决定完整性、不进入下轮和最终上下文。崩溃恢复沿用原 run/round/预算，取消旧在途动作、不读取旧会话推理；合成阶段崩溃直接完成原研究收口，正文损坏明确进入失败终态。
+- 测试命令：任务书六项测试，加 `knowledge-research-recovery`、`knowledge-research-context-renderer`、`knowledge-research-agent-tools`、原有 update/finish/delegate/budget/store/receipt/ledger 与 `persistence-schema-tripwire`，共十七文件；`npm run typecheck`；修改文件 ESLint、`git diff --check`；持久化清单/指纹、运行闭包、边界与开放树生成器。
+- 测试结果：最终 **17 文件 / 194 PASS / 0 FAIL / 0 SKIP，4.78s，exit 0**；三套类型检查、静态检查、差异与开放边界检查均 exit 0。ESLint 为 0 错误/89 警告，包含大文件及测试替身宽类型警告。真实存储、索引、冻结范围、Agent 工具与 Worker 委派贯通，模型执行边界使用确定性替身。首轮六文件 37 PASS；随后独立调查测试 1 FAIL/1 PASS、恢复测试 3 FAIL/1 PASS、合成恢复新增项 1 FAIL/4 PASS、错误保真 2 FAIL/15 PASS、超长问题 1 FAIL/6 PASS，均保留原断言并修复后纳入最终绿测；没有删除、跳过或放宽测试。日志 `/tmp/lingxi-knowledge-p206-tests-final.log`、`/tmp/lingxi-knowledge-p206-typecheck-verified.log`、`/tmp/lingxi-knowledge-p206-lint-final.log`。
+- 生成物：持久化清单 66 stores / 779 sites；v18 与兼容指纹 `sha256:3beb2e79d626d4bc9d7ae2f35a92c1b4a6daab3bccf3e7d701b565138cc43679` 保持不变；运行闭包 10682 文件，依赖图已更新；开放树成功导出 881 文件。P2 阶段完整门禁和审计尚待 P2-07/P2-08 完成，最终封印保留。
+- 对应 commit SHA：本项提交（下一项回填实际 SHA）
 - 偏差：none
 
 ## P2-07：详细模式正式切换到 Research Agent

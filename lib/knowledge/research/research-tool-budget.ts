@@ -49,9 +49,16 @@ export function requireResearchToolContext(
 interface ActiveRun {
   workers: number;
   controllers: Set<AbortController>;
+  pending: Set<Promise<void>>;
 }
 // 同一个宿主存储的所有预算器共享活动调用，避免不同工作会话各获一份并发额度。
 const activeByStore = new WeakMap<object, Map<string, ActiveRun>>();
+
+/** 只有运行中的调查、工具与资源清理全部退出后，宿主才能进入最终材料合成。 */
+export function hasActiveResearchExecution(knowledgeStore: object, runId: string): boolean {
+  const state = activeByStore.get(knowledgeStore)?.get(runId);
+  return !!state && (state.workers > 0 || state.controllers.size > 0 || state.pending.size > 0);
+}
 
 function budgetError(reason: string): KnowledgeError {
   return new KnowledgeError("KNOWLEDGE_CONFLICT", "Research budget does not allow another operation", { stopReason: reason });
@@ -72,15 +79,31 @@ export class ResearchToolBudget {
     return Math.max(0, this.nowMs() - Date.parse(this.research.requireRun(runId).createdAt));
   }
 
+  deadlineMs(runId: string): number {
+    const run = this.research.requireRun(runId);
+    return Date.parse(run.createdAt) + run.budget.maxWallClockMs;
+  }
+
   private state(runId: string): ActiveRun {
     let state = this.active.get(runId);
-    if (!state) this.active.set(runId, state = { workers: 0, controllers: new Set() });
+    if (!state) this.active.set(runId, state = { workers: 0, controllers: new Set(), pending: new Set() });
     return state;
   }
 
   private releaseState(runId: string): void {
     const state = this.active.get(runId);
-    if (state?.workers === 0 && state.controllers.size === 0) this.active.delete(runId);
+    if (state?.workers === 0 && state.controllers.size === 0 && state.pending.size === 0) this.active.delete(runId);
+  }
+
+  private trackPending(state: ActiveRun): () => void {
+    let resolve!: () => void;
+    const pending = new Promise<void>(done => { resolve = done; });
+    state.pending.add(pending);
+    return () => { state.pending.delete(pending); resolve(); };
+  }
+
+  private async drain(state: ActiveRun): Promise<void> {
+    while (state.pending.size > 0) await Promise.allSettled([...state.pending]);
   }
 
   private requireActive(runId: string): KnowledgeResearchRun {
@@ -105,17 +128,60 @@ export class ResearchToolBudget {
   /** 取消和超时传递给正在等待的每一个调查，不重新发放轮次时间。 */
   cancel(runId: string): void { this.stop(runId, "cancelled", "cancelled"); }
 
+  private stopFromSignal(runId: string, signal: AbortSignal): void {
+    const reason = signal.reason;
+    const stopReason = isKnowledgeError(reason) ? reason.details.stopReason : undefined;
+    if (stopReason === "tool_budget_exhausted" || stopReason === "wall_clock_exhausted") this.stop(runId, stopReason);
+    else this.cancel(runId);
+  }
+
+  /** 整轮根会话也使用创建研究时确定的截止时间，并等待所有工具与工作会话真正清理完毕。 */
+  async withRunController<T>(runId: string, signal: AbortSignal | undefined, work: (signal: AbortSignal) => Promise<T>): Promise<T> {
+    if (signal?.aborted) { this.stopFromSignal(runId, signal); signal.throwIfAborted(); }
+    const run = this.requireActive(runId);
+    const remaining = this.deadlineMs(runId) - this.nowMs();
+    const reason = remaining <= 0 ? "wall_clock_exhausted"
+      : run.toolCallsUsed >= run.budget.maxToolCalls ? "tool_budget_exhausted" : null;
+    if (reason) { this.stop(runId, reason); throw budgetError(reason); }
+    const controller = new AbortController(), state = this.state(runId);
+    state.controllers.add(controller);
+    const onAbort = () => this.stopFromSignal(runId, signal!);
+    signal?.addEventListener("abort", onAbort, { once: true });
+    const timer = setTimeout(() => this.stop(runId, "wall_clock_exhausted"), remaining);
+    timer.unref?.();
+    try {
+      const result = await work(controller.signal);
+      await this.drain(state);
+      if (this.nowMs() >= this.deadlineMs(runId)) this.stop(runId, "wall_clock_exhausted");
+      controller.signal.throwIfAborted();
+      return result;
+    } catch (error) {
+      if (controller.signal.aborted) {
+        this.stopFromSignal(runId, controller.signal);
+        throw controller.signal.reason;
+      }
+      throw error;
+    } finally {
+      await this.drain(state);
+      clearTimeout(timer);
+      signal?.removeEventListener("abort", onAbort);
+      state.controllers.delete(controller);
+      this.releaseState(runId);
+    }
+  }
+
   async withWorkerSlots<T>(runId: string, count: number, work: () => Promise<T>): Promise<T> {
     const run = this.requireActive(runId);
     if (!Number.isSafeInteger(count) || count < 1) throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "Worker count is invalid");
     const state = this.state(runId);
     if (state.workers + count > run.budget.maxParallelAgents) throw budgetError("parallel_agent_limit");
     state.workers += count;
+    const finishPending = this.trackPending(state);
     try {
       this.research.knowledgeStore.db.prepare("UPDATE knowledge_research_runs SET delegated_agents = delegated_agents + ?, updated_at = ? WHERE id = ?")
         .run(count, this.research.now(), runId);
       return await work();
-    } finally { state.workers -= count; this.releaseState(runId); }
+    } finally { state.workers -= count; finishPending(); this.releaseState(runId); }
   }
 
   async execute<T>(input: {
@@ -127,7 +193,7 @@ export class ResearchToolBudget {
     | { value: T; summary: Record<string, unknown> }): Promise<T> {
     const { context, toolName } = input;
     requireResearchToolContext({ research: this.research, resolveContext: () => context }, undefined, context.runId);
-    if (input.signal?.aborted) { this.cancel(context.runId); input.signal.throwIfAborted(); }
+    if (input.signal?.aborted) { this.stopFromSignal(context.runId, input.signal); input.signal.throwIfAborted(); }
     const admitted = this.research.transaction(() => {
       const run = this.requireActive(context.runId);
       const reason = run.toolCallsUsed >= run.budget.maxToolCalls ? "tool_budget_exhausted"
@@ -160,7 +226,8 @@ export class ResearchToolBudget {
     const controller = new AbortController();
     const state = this.state(context.runId);
     state.controllers.add(controller);
-    const onAbort = () => this.cancel(context.runId);
+    const finishPending = this.trackPending(state);
+    const onAbort = () => this.stopFromSignal(context.runId, input.signal!);
     input.signal?.addEventListener("abort", onAbort, { once: true });
     const remaining = Math.max(0, admitted.run.budget.maxWallClockMs - this.elapsedMs(context.runId));
     const timer = setTimeout(() => this.stop(context.runId, "wall_clock_exhausted"), remaining);
@@ -194,6 +261,7 @@ export class ResearchToolBudget {
       clearTimeout(timer);
       input.signal?.removeEventListener("abort", onAbort);
       state.controllers.delete(controller);
+      finishPending();
       this.releaseState(context.runId);
     }
   }
