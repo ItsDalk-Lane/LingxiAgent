@@ -167,6 +167,15 @@ AboutTab），因此最终源码树重新执行了 renderer build / package smok
 
 ## Seal 推进记录
 
+### 2026-09-04：P1 完整阶段门禁收口
+
+- 被验证提交：`2387398589ec5494e1adb28b014dc84ebcf15a64`，任务书固定基线保持 `3eab85891a1747c64064252804f70c0a3773f021`。P1-01 至 P1-08 按序完成，用户授权的阶段审计与最终封印继续分开执行。
+- 第三轮远程 Build `33829055797` 在 `8295e5ff937cf9d3e49c082231188a01bd56122b` 上整体 SUCCESS：质量门禁 13077 PASS / 17 既有 SKIP / 0 FAIL（410.55s），四平台完整构建均 PASS，各平台知识测试 94 PASS、真实包内 native=hnsw 与 removed-native=portable 均通过；Windows standalone 再次独立验证通过。最终产物启动/历史升级回归 304 PASS（1.88s）。
+- 稳定 Linux runner：100k HNSW P95 6.041646ms，exact P95 416.031149ms，68.86056 倍，top-10 overlap 99.75%，墙钟门禁已启用并通过；原始生成报告已提交，不改原始测量数据。
+- 当前收口提交相对上述远程验证提交只增加任务进度和两份生成性能报告；生产代码、测试和构建逻辑相同。六项 P1 期末行为均核实真实入口与已通过测试，详见 KNOWLEDGE_REFACTOR_PROGRESS.md。
+- 阶段末五生成器两轮全部通过，第二轮完整 git diff --exit-code 为 0，测试清单逐字节一致；三种本地构建、包内与平台烟测、类型/lint/boundary 已通过。当前源码全量审计复验 exit 0：1302 文件 PASS / 1 既有 SKIP，13087 测试 PASS / 7 既有 SKIP / 0 FAIL，80.46s，日志 `/tmp/lingxi-knowledge-p1-close-audit-full.log`。P1 阶段门禁全部通过；审计提交后按序进入 P2-01，未合并 main。
+
+
 ### 2026-09-04：P1 第二轮跨平台修复复验
 
 - 当前源码：`f86da54313e35a5868c6f045c9495717d61ba1bb`；仍属 P1-08，保留最终封印，不改审计白名单。
