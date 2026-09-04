@@ -167,6 +167,15 @@ AboutTab），因此最终源码树重新执行了 renderer build / package smok
 
 ## Seal 推进记录
 
+### 2026-09-04：P1 第二轮跨平台修复复验
+
+- 当前源码：`f86da54313e35a5868c6f045c9495717d61ba1bb`；仍属 P1-08，保留最终封印，不改审计白名单。
+- 第二轮远程 `33826852985`：两种 Mac 与 Linux 全构建 PASS，Windows 原导入清理 PASS、包内原生检索 FAIL；质量门禁原请求间隔用例 FAIL（13074 PASS / 1 FAIL / 17 既有 SKIP，466.48s）。记录失败不删改测试。
+- 计时修复新增回归证明旧代码实际间隔 0ms；保持并发与间隔配置，用同步调用后的单调时钟计时。Windows 索引刷盘改用可写句柄，仍执行 fsync，原生和回退断言不变。
+- 本机修复专项 6 文件 / 53 PASS，P1 指定 8 文件 / 44 PASS，平台烟测 8 文件 / 94 PASS；类型检查三套、lint（0 error / 9176 warning）、boundary、三种构建、种子验签、包内原生与缺扩展回退烟测均通过。五生成器两轮通过且零漂移；数据库版本和 paid vectors 不变。
+- 全量复验 `npm test` exit 0：1302 文件 PASS / 1 既有 SKIP，13087 测试 PASS / 7 既有 SKIP / 0 FAIL，78.60s；日志 `/tmp/lingxi-knowledge-p108-third-audit-full.log`。第三轮四平台待提交后运行；仍属 P1-08，不进入 P2。
+
+
 ### 2026-09-04：P1 跨平台修复复验
 
 - 当前源码：`c452a705f55286df3cd18373390819cf34d60fc5`；首轮远程 `33825262170` 已确认质量门禁、macOS arm64、Linux x64 通过，Windows 清理目录与 Intel 原生链接失败。
