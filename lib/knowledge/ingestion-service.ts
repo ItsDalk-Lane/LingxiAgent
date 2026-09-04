@@ -94,6 +94,7 @@ interface EmbeddingGateSlot {
   queue: Array<() => void>;
   lastDispatchAt: number;
   dispatchTimer: ReturnType<typeof setTimeout> | null;
+  dispatching: boolean;
 }
 
 /**
@@ -130,14 +131,31 @@ export class KnowledgeEmbeddingProviderGate {
     }));
   }
 
-  /** 在限流窗口内执行一次嵌入调用；排队等待不设静默上限。 */
-  async run<T>(key: string, task: () => Promise<T>): Promise<T> {
-    await this.acquire(key);
-    try {
-      return await task();
-    } finally {
-      this.release(key);
+  /** 放行和调用处于同一段同步执行中，不能把尚未开始的 Promise 续段算作已发出请求。 */
+  run<T>(key: string, task: () => Promise<T>): Promise<T> {
+    if (this.disposed) return Promise.reject(new KnowledgeError(
+      "KNOWLEDGE_RETRIEVAL_UNAVAILABLE", "Knowledge embedding provider gate is closed",
+    ));
+    let slot = this.slots.get(key);
+    if (!slot) {
+      slot = { active: 0, queue: [], lastDispatchAt: -Infinity, dispatchTimer: null, dispatching: false };
+      this.slots.set(key, slot);
     }
+    return new Promise<T>((resolve, reject) => {
+      slot.queue.push(() => {
+        if (this.disposed) {
+          reject(new KnowledgeError("KNOWLEDGE_RETRIEVAL_UNAVAILABLE", "Knowledge embedding provider gate is closed"));
+          return;
+        }
+        try {
+          Promise.resolve(task()).then(
+            value => { this.release(key); resolve(value); },
+            error => { this.release(key); reject(error); },
+          );
+        } catch (error) { this.release(key); reject(error); }
+      });
+      this.dispatch(slot, key);
+    });
   }
 
   /** 停机路径：拒绝全部排队等待者并清空节流计时器（已派发的调用自然完成）。 */
@@ -158,39 +176,6 @@ export class KnowledgeEmbeddingProviderGate {
     return this.providerMinIntervals[provider] ?? this.minIntervalMs;
   }
 
-  private acquire(key: string): Promise<void> {
-    if (this.disposed) {
-      return Promise.reject(new KnowledgeError(
-        "KNOWLEDGE_RETRIEVAL_UNAVAILABLE",
-        "Knowledge embedding provider gate is closed",
-      ));
-    }
-    let slot = this.slots.get(key);
-    if (!slot) {
-      slot = { active: 0, queue: [], lastDispatchAt: 0, dispatchTimer: null };
-      this.slots.set(key, slot);
-    }
-    if (slot.active < this.maxConcurrent && this.intervalElapsed(slot, key)) {
-      // 快路径：有空位且已过节流间隔，直接占位放行（dispatch 只服务排队者）。
-      slot.active += 1;
-      slot.lastDispatchAt = Date.now();
-      return Promise.resolve();
-    }
-    return new Promise<void>((resolve, reject) => {
-      slot!.queue.push(() => {
-        if (this.disposed) {
-          reject(new KnowledgeError(
-            "KNOWLEDGE_RETRIEVAL_UNAVAILABLE",
-            "Knowledge embedding provider gate is closed",
-          ));
-          return;
-        }
-        resolve();
-      });
-      this.scheduleDispatch(slot!, key);
-    });
-  }
-
   private release(key: string) {
     const slot = this.slots.get(key);
     if (!slot) return;
@@ -199,12 +184,12 @@ export class KnowledgeEmbeddingProviderGate {
   }
 
   private intervalElapsed(slot: EmbeddingGateSlot, key: string): boolean {
-    return Date.now() - slot.lastDispatchAt >= this.intervalFor(key);
+    return performance.now() - slot.lastDispatchAt >= this.intervalFor(key);
   }
 
   private scheduleDispatch(slot: EmbeddingGateSlot, key: string) {
-    if (slot.dispatchTimer || slot.queue.length === 0 || slot.active >= this.maxConcurrent) return;
-    const wait = Math.max(0, slot.lastDispatchAt + this.intervalFor(key) - Date.now());
+    if (this.disposed || slot.dispatching || slot.dispatchTimer || slot.queue.length === 0 || slot.active >= this.maxConcurrent) return;
+    const wait = Math.max(0, slot.lastDispatchAt + this.intervalFor(key) - performance.now());
     slot.dispatchTimer = setTimeout(() => {
       slot.dispatchTimer = null;
       this.dispatch(slot, key);
@@ -212,7 +197,7 @@ export class KnowledgeEmbeddingProviderGate {
   }
 
   private dispatch(slot: EmbeddingGateSlot, key: string) {
-    if (this.disposed || slot.active >= this.maxConcurrent || slot.queue.length === 0) return;
+    if (this.disposed || slot.dispatching || slot.active >= this.maxConcurrent || slot.queue.length === 0) return;
     // Windows 计时器粒度（~15.6ms）会让 setTimeout 提前醒：派发前复验节流窗口，
     // 没过节流就续等剩余时间，保证「至少间隔 minRequestIntervalMs」在所有平台成立。
     if (!this.intervalElapsed(slot, key)) {
@@ -221,8 +206,14 @@ export class KnowledgeEmbeddingProviderGate {
     }
     const next = slot.queue.shift();
     slot.active += 1;
-    slot.lastDispatchAt = Date.now();
-    next?.();
+    slot.dispatching = true;
+    try { next?.(); }
+    finally {
+      // 以调用真正开始后的单调时钟计时；同步前缀阻塞或重入也不能挤占下一次间隔。
+      slot.lastDispatchAt = performance.now();
+      slot.dispatching = false;
+      this.scheduleDispatch(slot, key);
+    }
   }
 }
 

@@ -660,7 +660,7 @@
     ],
     "version": 3
   },
-  "payloadFingerprint": "sha256:03658759d1b349c11b6ae7e7daba2ce169488a052e97b65b5a424c9cb7fd2d9e",
+  "payloadFingerprint": "sha256:3a430fbfb39226c044f96d3723f9c014eab8c01d94805af1a2c2d5f0c4266c46",
   "registry": [
     {
       "affectedByEpochMigration": true,
@@ -3292,8 +3292,8 @@
   ],
   "review": {
     "classification": "compatible",
-    "compatibilityReason": "P1-08 Windows 关闭修复：同步释放 ANN 派生库，启动恢复可取消，引擎等待后台退出；持久化表与 DATA_EPOCH 不变",
-    "payloadFingerprint": "sha256:03658759d1b349c11b6ae7e7daba2ce169488a052e97b65b5a424c9cb7fd2d9e"
+    "compatibilityReason": "P1-08 修正嵌入请求实际派发间隔与 Windows 索引刷盘句柄；数据库结构、版本与 paid vectors 保持不变",
+    "payloadFingerprint": "sha256:3a430fbfb39226c044f96d3723f9c014eab8c01d94805af1a2c2d5f0c4266c46"
   },
   "schemas": [
     {
@@ -3855,7 +3855,7 @@
         },
         {
           "module": "lib/knowledge/usearch-vector-backend.ts",
-          "sourceHash": "sha256:2722d1dbecf39f13b43fac263ed87e03727727dfbc6bdbe5dc0a246cdbc549d5"
+          "sourceHash": "sha256:1ae5a4e32535908f4c3d02fd83b31c16340df7416e9a0f94342996a241f84d63"
         },
         {
           "module": "lib/knowledge/vector-index-adapter.ts",

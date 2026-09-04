@@ -42,7 +42,8 @@ parentPort.on('message', message => {
       parentPort.postMessage({ type: 'added' });
     } else if (message.type === 'save') {
       index.save(workerData.temporaryFile);
-      const fd = fs.openSync(workerData.temporaryFile, 'r');
+      // Windows 刷盘要求可写句柄；r+ 保留刚保存的索引内容。
+      const fd = fs.openSync(workerData.temporaryFile, 'r+');
       try { fs.fsyncSync(fd); } finally { fs.closeSync(fd); }
       parentPort.postMessage({ type: 'saved', count: index.size() });
       index = null;

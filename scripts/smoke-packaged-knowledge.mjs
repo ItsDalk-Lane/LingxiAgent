@@ -237,7 +237,7 @@ const backend = createKnowledgeVectorSearchBackend({ indexesRoot: home, portable
 try {
   if (backend.whenIdle) await backend.whenIdle();
   const result = await searchVectorBackend(backend, { vectorIndexVariantIds: [variant], model, queryVector: [1,0,0], limit: 1 });
-  assert.equal(result.vectorBackend, expected);
+  assert.equal(result.vectorBackend, expected, JSON.stringify({ vectorBackend: result.vectorBackend, degradedReasons: result.degradedReasons }));
   assert.equal(result.results[0]?.chunkId, "chunk-0");
   // 余弦实现存在浮点舍入，单位向量只允许两个机器精度单位的误差。
   assert.ok(Math.abs(result.results[0]?.score - 1) <= 2 * Number.EPSILON);
