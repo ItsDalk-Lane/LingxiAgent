@@ -10,7 +10,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = c860054b9ee7f961abbb0cfebc2bbd9428ab6bd3  (2026-09-04 P3 实现含桌面启动验证；本机验证通过，全量 13738 PASS / 0 FAIL / 7 既有 SKIP；四平台及最终封印待完成)
+VERIFIED_SOURCE_SHA   = 75dd47d126490b85157f336c7969303bcddc3b95  (2026-09-04 P3 平台启动与下载清理修复；全量 13739 PASS / 0 FAIL / 7 既有 SKIP，84.87s；四平台复验待执行)
 历史上游同步工作分支  = feature/upstream-sync-0.447.4
 当前知识重构执行分支  = feat/knowledge-retrieval-research-p0-p3
 ```
@@ -1072,3 +1072,9 @@ Windows NSIS 已在 windows-latest 构建成功；尚未在真实 Windows 桌面
 - P3 含桌面启动检查的实现源码固定为 `c860054b9ee7f961abbb0cfebc2bbd9428ab6bd3`；两轮 14 条生成/校验命令全部 exit 0，每轮完整工作区 diff 为 0；960 个测试文件清单逐字节一致（SHA-256 78836634483cb524c7f52167b44a275bc7623a4f34d27d81b12c9e78bd3ecfd0），两个开放树 885 文件逐个一致。新桌面检查实际验证首启引导页内容与服务端；本条按用户授权同步审计坐标用于全量复验，四平台与最终封印仍待完成。
 
 - 当前源码 `c860054b9ee7f961abbb0cfebc2bbd9428ab6bd3` 的全量审计复验已 exit 0：全量 13738 PASS / 0 FAIL / 7 既有 SKIP，命令总耗时 87.507s；日志 `/tmp/lingxi-knowledge-p307-audit-full.log`。仅同步六个既有审计文件用于当前源码四平台 CI，最终封印仍保留；没有扩大审计白名单。
+
+- P3 四平台首轮知识专项、Linux 性能、质量全量均通过；Linux 桌面因解包沙箱权限失败，macOS arm64/Windows 桌面失败阶段待诊断。本次源码 `9c1373917c66c630b30e24d294e58ff5458df237` 补 Linux 正确沙箱权限和脱敏失败诊断，原启动断言不变；本机 CI 界面归档重打包启动通过。按用户授权推进阶段审计用于复验，不建立最终封印。
+
+- 全量发现下载写入尚未关闭即删除的竞态，确定性红测后修为等待关闭再清理，106 项下载回归通过。当前待验证源码 `75dd47d126490b85157f336c7969303bcddc3b95` 包含该修复和平台启动诊断；最终封印仍待四平台实际通过。
+
+- 当前源码 `75dd47d1` 的阶段全量复验已通过：13739 PASS / 0 FAIL / 7 既有 SKIP，84.87s；lint exit 0，两轮完整生成器差异不变，测试清单 960 项（SHA-256 4c0b1fa2097818b9c7d5e44cd22a05c611b2b0ff4981a2991d9a76b55c763065），开放树 885 文件一致。第二轮四平台待执行，最终封印未建立。
