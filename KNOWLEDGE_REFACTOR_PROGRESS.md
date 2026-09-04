@@ -197,17 +197,22 @@
 - 修复记录：首轮 2 FAIL / 33 PASS：旧工具样本只建立块索引而未登记笔记本分块身份，统一目录如实判未就绪。样本补齐摄入侧已有的身份登记后通过，未在查询侧增加写入或惰性建索引，未放宽命中/范围断言。一次扩展测试命令误写不存在的处理器文件名（Vitest 只执行其余 7 文件）；已用真实 knowledge-source-processors 文件单独执行并记录。
 - 生成物：CLI 闭包 10667 文件，普通目录不再引入覆盖单位构建模块，原 1 条边界债务不变；持久化指纹兼容更新并检查通过，`sha256:62fb7022d119927f45f160a0ebe7bdffc673bcb1dfefd3be23cf31e1d729b40d`，表版本不变。
 - 日志：`/tmp/lingxi-knowledge-p107-tests-{first,r2,final}.log`、`/tmp/lingxi-knowledge-p107-processors.log`、`/tmp/lingxi-knowledge-p107-typecheck-final.log`、`/tmp/lingxi-knowledge-p107-lint.log`、`/tmp/lingxi-knowledge-p107-{boundary,closure,fingerprint,fingerprint-check}.log`。
-- 对应 commit SHA：本次提交，下项回填。
+- 对应 commit SHA：`d3235253`。
 - 偏差：none
 
 ## P1-08：HNSW 打包与性能验证
 
-- 状态：pending
-- 改动文件：尚未开始
-- 测试命令：按任务书该项测试执行，尚未执行
-- 测试结果：NOT_EXECUTED
-- 对应 commit SHA：尚未提交
-- 偏差：none
+- 状态：in_progress（本机实现验证完成，待源码提交后的审计复验与远程四平台门禁；尚未进入 P2）
+- 改动：正式/开放服务共用安装流程纳入可选原生包，发布包强制安装锁定版本及加载依赖；按目标保留原生扩展，Electron 配置显式解包原生文件，standalone 与种子验证检查对应文件。独立包内构建入口来自真实生产后端；子进程真实建图/查询，移走解包副本全部原生扩展后以原数据库回退，最后恢复文件。完整包内烟测还验证缺扩展时服务器重启读回快照。
+- 性能：固定种子 10k/100k，64 维（16 维合成投影），40 次独立查询、3 次新后端冷加载；真实 portable 数据库与 HNSW，无远程模型。100k exact P95 152.127166ms，HNSW P95 3.726334ms，40.8249 倍，top-10 overlap 99.75%；建图 13194.276459ms，文件 40466728 字节，冷加载 P95 108.440333ms。10k exact P95 12.914583ms、HNSW 0.55425ms、重合率 100%。本机 macOS arm64，墙钟 gate 未启用，不能代表真实供应商嵌入召回率或其他平台。
+- 已验证：P1 指定 8 文件 / 44 PASS；打包与导出 8 文件 / 123 PASS；平台烟测本机 8 文件 / 94 PASS；类型检查三套 PASS，lint 0 error / 9176 warning，boundary PASS。首次全量 1298 文件 PASS / 2 FAIL / 1 既有 SKIP，13079 测试 PASS / 2 FAIL / 7 既有 SKIP，86.65s，exit 1。
+- 首轮问题：服务器不存在时新检查遮盖原错误，恢复原检查顺序；真实原生余弦舍入按 2 个机器精度单位校验；降级原因包含 variant 后缀，按完整原因核对。全量发现可选扩展误列静态必需依赖，改为显式安装后台线程运行包，原质量门禁不变并复测通过；另一全量失败是待同步的审计坐标。
+- 当前生成物：CLI 闭包 10672 文件，开放树增加共享构建工具依赖；持久化指纹保持 `sha256:62fb7022d119927f45f160a0ebe7bdffc673bcb1dfefd3be23cf31e1d729b40d`。性能 JSON 在 `artifacts/knowledge-vector-benchmark.json`。五个生成器连续两轮通过：第二轮派生文件零差异、测试清单内容完全相同，开放树 866 文件。
+- 最终本地构建：正式服务、开放服务、客户端均 exit 0；正式服务采用一次性本地测试签名，12 个 Mach-O 签名与种子复核通过，私钥随后删除，未改发布公钥。完整包内烟测 exit 0，含移除扩展后服务器启动、检索和快照读回。第二次 lint 曾与闭包生成器重叠，扫入生成器临时文件而失败；生成器退出后原命令复跑 0 error / 9176 warning、boundary 通过，未新增忽略项。
+- 远程：独立性能工作流尚未在默认分支登记（查询返回 404）；保留该手工流程，并把同一性能脚本接入现有 Build 的固定 Linux runner。四平台 Build 的包内与 standalone 烟测继续沿用既有门禁，分支运行不触发标签发布。
+- 日志：`/tmp/lingxi-knowledge-p108-*`。审计全量复验与远程平台/稳定 runner 状态待回填。
+- 对应 commit SHA：尚未提交。
+- 偏差：无任务范围/锁定参数变化。四平台真实验证未通过前不标全平台完成。
 
 ## P2-01：增加 Research 共享契约
 

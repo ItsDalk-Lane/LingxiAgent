@@ -166,6 +166,24 @@ jobs:
       - name: Run Knowledge platform smoke
         run: npm run test:knowledge-platform-smoke
 
+      - name: Run Knowledge stable-runner performance gates
+        if: runner.os == 'Linux'
+        env:
+          LINGXI_ENFORCE_KNOWLEDGE_PERF: "1"
+        run: |
+          node scripts/benchmark-knowledge-fast.mjs --output=artifacts/knowledge-fast-benchmark.json
+          node scripts/benchmark-knowledge-vector.mjs --output=artifacts/knowledge-vector-benchmark.json
+
+      - name: Upload Knowledge performance evidence
+        if: always() && runner.os == 'Linux'
+        uses: actions/upload-artifact@v4
+        with:
+          name: knowledge-benchmarks-linux-x64
+          path: |
+            artifacts/knowledge-fast-benchmark.json
+            artifacts/knowledge-vector-benchmark.json
+          if-no-files-found: error
+
       # Windows: 下载官方 MinGit（git + sh-compatible shell + coreutils，非交互运行时），打包进安装包
       - name: Download MinGit
         if: runner.os == 'Windows'

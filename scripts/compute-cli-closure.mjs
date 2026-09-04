@@ -96,6 +96,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { createRequire } from "node:module";
 import ts from "typescript";
 import { build as esbuildBuild } from "esbuild";
 
@@ -958,7 +959,10 @@ export async function traceNftRoot({ rootDir, root }) {
       // 缺失依赖会由追踪器按原有路径报告，不在这里吞掉错误。
     }
     const traceBase = commonAncestor([rootDir, linkedNodeModules]);
-    const { fileList, warnings } = await nodeFileTrace([scratchPath], {
+    // 后台线程经运行时路径加载可选原生包，显式追踪 require 入口，不能依赖静态 import 猜测。
+    const runtimeRequire = createRequire(path.join(rootDir, "package.json"));
+    const usearchEntry = runtimeRequire.resolve("usearch");
+    const { fileList, warnings } = await nodeFileTrace([scratchPath, usearchEntry], {
       base: traceBase,
       conditions: ["node", "import"],
       analysis: { emitGlobs: false },

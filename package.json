@@ -155,6 +155,7 @@
     "appId": "com.lingxi.app",
     "productName": "Lingxi",
     "asar": true,
+    "asarUnpack": ["**/node_modules/usearch/**/*.node"],
     "npmRebuild": false,
     "afterPack": "./scripts/fix-modules.cjs",
     "extraMetadata": {

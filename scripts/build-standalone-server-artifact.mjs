@@ -15,6 +15,7 @@ import path from "path";
 import { createRequire } from "module";
 import { fileURLToPath } from "url";
 
+import { requiredKnowledgeVectorRuntimeFiles, assertKnowledgeVectorRuntime } from "./build-server-runtime-assets.mjs";
 import { assertRuntimeComplete, MINGIT_VERSION } from "./mingit-runtime.js";
 
 const require = createRequire(import.meta.url);
@@ -35,6 +36,7 @@ export const REQUIRED_STANDALONE_SERVER_FILES = [
   "bootstrap.js",
   "bundle/index.js",
   "bundle/cli.js",
+  ...requiredKnowledgeVectorRuntimeFiles(STANDALONE_PLATFORM, STANDALONE_ARCH),
 ];
 
 function assertSafeVersion(version) {
@@ -107,6 +109,7 @@ export function standaloneWrapperContents() {
 
 function assertServerTree(serverDir) {
   assertDirectory(serverDir, "packaged server");
+  assertKnowledgeVectorRuntime(serverDir, STANDALONE_PLATFORM, STANDALONE_ARCH);
   for (const relative of REQUIRED_STANDALONE_SERVER_FILES) {
     assertFile(path.join(serverDir, ...relative.split("/")), `packaged server file ${relative}`);
   }

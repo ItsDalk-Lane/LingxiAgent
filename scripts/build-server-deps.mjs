@@ -286,3 +286,17 @@ export function verifyExternalEntrypoints(outDir, packageNames, { readRetries, r
     ].join("\n"));
   }
 }
+
+/** 构建阶段必须证明目标原生扩展可加载，并能真实建图和查询。 */
+export function buildUseArchRuntimeSmokeScript() {
+  return [
+    "import { createRequire } from 'node:module';",
+    "const require = createRequire(new URL('./package.json', import.meta.url));",
+    "const { Index } = require('usearch');",
+    "const index = new Index({ dimensions: 3, metric: 'cos', quantization: 'f32', connectivity: 16, expansion_add: 128, expansion_search: 64, multi: false });",
+    "index.add(new BigUint64Array([1n, 2n]), new Float32Array([1, 0, 0, 0, 1, 0]), 1);",
+    "const matches = index.search(new Float32Array([1, 0, 0]), 1, 1);",
+    "if (index.size() !== 2 || matches.keys[0] !== 1n) throw new Error('usearch native query failed');",
+    "console.log('[build-server] usearch runtime smoke passed: backend=hnsw');",
+  ].join("\n");
+}

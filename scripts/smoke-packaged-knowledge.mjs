@@ -14,6 +14,7 @@ import os from "node:os";
 import path from "node:path";
 import { spawn, spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
+import { assertKnowledgeVectorRuntime } from "./build-server-runtime-assets.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const SMOKE_TEXT = "Knowledge packaged runtime smoke text. 跨平台冻结正文。";
@@ -215,6 +216,78 @@ async function startServer(input) {
   }
 }
 
+/** 子进程只导入解包目录内的真实后端和依赖。 */
+export function packagedKnowledgeVectorScript() {
+  return `import assert from "node:assert/strict";
+import path from "node:path";
+import crypto from "node:crypto";
+import { createKnowledgeVectorSearchBackend, PortableVectorIndexAdapter, knowledgeChunkIndexVariantId,
+  searchVectorBackend } from "./bundle/knowledge-vector.js";
+const [home, expected] = process.argv.slice(2);
+const portable = new PortableVectorIndexAdapter({ dbPath: path.join(home, "knowledge-vector.db") });
+const model = { provider: "packaged-smoke", modelId: "fixed", protocol: "openai", dimensions: 3,
+  key: crypto.createHash("sha256").update("packaged-smoke").digest("hex") };
+const input = { parseArtifactId: "packaged-smoke", chunkIndexVariantId: knowledgeChunkIndexVariantId("packaged-smoke", "fixed"),
+  model, chunkFingerprint: "fixed-three-vectors", entries: [[1,0,0],[0,1,0],[0,0,1]].map((vector, ordinal) => ({
+    parseArtifactId: "packaged-smoke", chunkId: "chunk-" + ordinal, ordinal, vector })) };
+const variant = expected === "hnsw" ? portable.buildOrReplaceArtifact(input).vectorIndexVariantId
+  : portable.listReadyVectorVariantIds()[0];
+assert.ok(variant);
+const backend = createKnowledgeVectorSearchBackend({ indexesRoot: home, portable });
+try {
+  if (backend.whenIdle) await backend.whenIdle();
+  const result = await searchVectorBackend(backend, { vectorIndexVariantIds: [variant], model, queryVector: [1,0,0], limit: 1 });
+  assert.equal(result.vectorBackend, expected);
+  assert.equal(result.results[0]?.chunkId, "chunk-0");
+  // 余弦实现存在浮点舍入，单位向量只允许两个机器精度单位的误差。
+  assert.ok(Math.abs(result.results[0]?.score - 1) <= 2 * Number.EPSILON);
+  if (expected === "portable") assert.ok(result.degradedReasons.includes("ANN_NATIVE_UNAVAILABLE:" + variant));
+  assert.deepEqual(portable.readReadyVectorBatch(variant, -1).map(entry => entry.vector), input.entries.map(entry => entry.vector));
+  console.log(JSON.stringify({ vectorBackend: result.vectorBackend, degradedReasons: result.degradedReasons, hits: result.results.length }));
+} finally { await backend.close(); portable.close(); }
+`;
+}
+
+export async function runPackagedKnowledgeVectorSmoke({ serverDir, platform = process.platform, arch = process.arch,
+  onNativeRemoved } = {}) {
+  assertNativeTarget({ platform, arch });
+  assertKnowledgeVectorRuntime(serverDir, platform, arch);
+  const temporary = fs.mkdtempSync(path.join(os.tmpdir(), "lingxi-package-vector-"));
+  const script = path.join(serverDir, ".knowledge-vector-smoke.mjs");
+  const moved = [];
+  const home = path.join(temporary, "indexes");
+  fs.mkdirSync(home);
+  function run(expected) {
+    const result = spawnSync(runtimePath(serverDir, platform), [script, home, expected], {
+      cwd: serverDir, env: buildRuntimeEnvironment(), encoding: "utf8", timeout: 60_000,
+      maxBuffer: 2 * 1024 * 1024,
+    });
+    if (result.error || result.status !== 0) throw new Error(
+      `packaged vector ${expected} smoke failed: ${result.error?.message || result.stderr || result.status}`);
+    return JSON.parse(result.stdout.trim().split("\n").at(-1));
+  }
+  try {
+    fs.writeFileSync(script, packagedKnowledgeVectorScript(), { flag: "wx" });
+    const native = run("hnsw");
+    // 真正移走解包副本中的全部原生扩展，再启动一个全新进程，避免模块缓存掩盖缺包问题。
+    const packageRoot = path.join(serverDir, "node_modules/usearch");
+    for (const relative of fs.readdirSync(packageRoot, { recursive: true })) {
+      if (!relative.endsWith(".node")) continue;
+      const original = path.join(packageRoot, relative), backup = path.join(temporary, `native-${moved.length}`);
+      fs.renameSync(original, backup); moved.push({ original, backup });
+    }
+    if (!moved.length) throw new Error("packaged native-removal smoke removed no extension");
+    const fallback = run("portable");
+    if (onNativeRemoved) await onNativeRemoved();
+    console.log(`packaged knowledge vector smoke: native=${native.vectorBackend}, removed-native=${fallback.vectorBackend}`);
+    return { native, fallback };
+  } finally {
+    for (const { original, backup } of moved) fs.renameSync(backup, original);
+    fs.rmSync(script, { force: true });
+    fs.rmSync(temporary, { recursive: true, force: true });
+  }
+}
+
 export async function runPackagedKnowledgeSmoke({
   rootDir = ROOT,
   platform = process.platform,
@@ -291,7 +364,17 @@ export async function runPackagedKnowledgeSmoke({
     ) {
       throw new Error("frozen Knowledge snapshot is missing required security headers");
     }
-    return { ok: true, platform, arch };
+    await stopServer(second.child); second = null;
+    const vector = await runPackagedKnowledgeVectorSmoke({ serverDir, platform, arch, onNativeRemoved: async () => {
+      second = await startServer({ serverDir, platform, lingxiHome });
+      const fallbackContent = await request({ baseUrl: second.baseUrl, token: second.info.token,
+        pathname: `/api/knowledge/snapshots/${encodeURIComponent(snapshotId)}/content` });
+      if (fallbackContent.status !== 200 || await fallbackContent.text() !== SMOKE_TEXT) {
+        throw new Error("packaged server cannot read Knowledge after native extension removal");
+      }
+      await stopServer(second.child); second = null;
+    } });
+    return { ok: true, platform, arch, vector };
   } finally {
     if (first) await stopServer(first.child);
     if (second) await stopServer(second.child);

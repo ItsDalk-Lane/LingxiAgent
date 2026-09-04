@@ -16,7 +16,7 @@
  * - artifacts.*.sha256/size 记录的是构建当时的归档字节，跟 electron-builder
  *   即将打进安装包的、此刻磁盘上的归档字节不是同一份
  *
- * 只做只读校验，不写入任何文件；任一不符收集进 errors 数组、一次性列出，
+ * 不修改种子归档，只在临时目录解包检查原生扩展；任一不符收集进 errors 数组、一次性列出，
  * 不在第一个问题上就 fail-fast（构建机上一次运行看到全部问题，不用重复
  * 触发再等一轮构建）。
  *
@@ -26,11 +26,13 @@
  * 都是给当前宿主机平台打包，不做交叉编译）。
  */
 import fs from "fs";
+import os from "os";
 import path from "path";
 import { createRequire } from "module";
 import { fileURLToPath } from "url";
 
 import { resolveBuildKeyset, seedManifestFileName } from "./build-server-artifact.mjs";
+import { assertKnowledgeVectorRuntime } from "./build-server-runtime-assets.mjs";
 import { readReleaseMetadata } from "./release-metadata.mjs";
 
 const require = createRequire(import.meta.url);
@@ -155,6 +157,15 @@ export async function verifySeedKit({ artifactOutDir, platformArch, keyset, expe
     errors.push(...(await checkArchiveEntry({ artifactOutDir, label: "artifacts.renderer", entry: rendererEntry })));
   }
 
+  if (errors.length === 0) {
+    const temporary = fs.mkdtempSync(path.join(os.tmpdir(), "knowledge-seed-verify-"));
+    try {
+      await require("../shared/artifact-core/ustar.cjs").extract(path.join(artifactOutDir, serverEntry.path), temporary);
+      const [platform, arch] = platformArch.split("-");
+      assertKnowledgeVectorRuntime(temporary, platform, arch);
+    } catch (error) { errors.push(`knowledge native runtime: ${error.message}`); }
+    finally { fs.rmSync(temporary, { recursive: true, force: true }); }
+  }
   return { ok: errors.length === 0, errors };
 }
 

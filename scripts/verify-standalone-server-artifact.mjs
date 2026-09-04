@@ -10,6 +10,8 @@ import path from "path";
 import { createRequire } from "module";
 import { fileURLToPath } from "url";
 
+import { assertKnowledgeVectorRuntime } from "./build-server-runtime-assets.mjs";
+import { runPackagedKnowledgeVectorSmoke } from "./smoke-packaged-knowledge.mjs";
 import { assertRuntimeComplete, MINGIT_VERSION } from "./mingit-runtime.js";
 import { createHermeticMinGitSmokeEnv } from "./smoke-mingit.mjs";
 import {
@@ -49,6 +51,7 @@ function expectEqual(actual, expected, label) {
 }
 
 function assertExtractedLayout(layoutRoot) {
+  assertKnowledgeVectorRuntime(path.join(layoutRoot, "server"), STANDALONE_PLATFORM, STANDALONE_ARCH);
   const expectedRootEntries = ["git", "hana-server.cmd", "hana.cmd", "sandbox", "server"];
   const actualRootEntries = fs.readdirSync(layoutRoot).sort();
   expectEqual(JSON.stringify(actualRootEntries), JSON.stringify(expectedRootEntries), "archive root entries");
@@ -415,7 +418,10 @@ export async function verifyWindowsStandaloneArtifact(opts = {}) {
       throw new Error(`[verify-standalone] archive layout root must be a directory: ${layoutRoot}`);
     }
     assertExtractedLayout(layoutRoot);
-    if (opts.smoke) smokeExtractedRuntime({ rootDir, layoutRoot });
+    if (opts.smoke) {
+      smokeExtractedRuntime({ rootDir, layoutRoot });
+      await runPackagedKnowledgeVectorSmoke({ serverDir: path.join(layoutRoot, "server"), platform: STANDALONE_PLATFORM, arch });
+    }
   } finally {
     fs.rmSync(extractDir, { recursive: true, force: true });
   }

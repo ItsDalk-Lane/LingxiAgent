@@ -123,3 +123,31 @@ describe("server runtime assets", () => {
     expect(fs.existsSync(path.join(outDir, "desktop", "dist-renderer", "modules", "legacy.js"))).toBe(false);
   });
 });
+
+it.each([["darwin", "arm64", "darwin-arm64+x64"], ["darwin", "x64", "darwin-arm64+x64"],
+  ["win32", "x64", "win32-x64"], ["linux", "x64", "linux-x64"]])("%s-%s 只保留对应扩展并拒绝缺包", async (platform, arch, target) => {
+  const { writeKnowledgeVectorPackageFixture } = await import("./helpers/knowledge-vector-package-fixture.ts");
+  const { applyPlatformPackageTrim } = await import("../scripts/build-server-phases.mjs");
+  const { assertKnowledgeVectorRuntime } = await import("../scripts/build-server-runtime-assets.mjs");
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "knowledge-native-layout-"));
+  try {
+    writeKnowledgeVectorPackageFixture(root);
+    applyPlatformPackageTrim({ outDir: root, platform, arch, log: () => {} });
+    expect(fs.readdirSync(path.join(root, "node_modules/usearch/prebuilds"))).toEqual([target]);
+    expect(() => assertKnowledgeVectorRuntime(root, platform, arch)).not.toThrow();
+    fs.unlinkSync(path.join(root, "node_modules/usearch/prebuilds", target, "usearch.node"));
+    expect(() => assertKnowledgeVectorRuntime(root, platform, arch)).toThrow(/runtime missing/);
+  } finally { fs.rmSync(root, { recursive: true, force: true }); }
+});
+
+it("拒绝无对应目标或版本漂移的原生包", async () => {
+  const { writeKnowledgeVectorPackageFixture } = await import("./helpers/knowledge-vector-package-fixture.ts");
+  const { assertKnowledgeVectorRuntime, knowledgeUseArchNativePath } = await import("../scripts/build-server-runtime-assets.mjs");
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "knowledge-native-version-"));
+  try {
+    writeKnowledgeVectorPackageFixture(root);
+    fs.writeFileSync(path.join(root, "node_modules/usearch/package.json"), JSON.stringify({ version: "2.27.0" }));
+    expect(() => assertKnowledgeVectorRuntime(root, "linux", "x64")).toThrow(/exactly 2.26.0/);
+    expect(() => knowledgeUseArchNativePath("win32", "arm64")).toThrow(/unsupported/);
+  } finally { fs.rmSync(root, { recursive: true, force: true }); }
+});

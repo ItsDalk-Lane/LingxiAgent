@@ -103716,6 +103716,51 @@
       "reason": "nft-runtime-trace via nft-server-bundle (see roots[] for the full explanation)"
     },
     {
+      "path": "node_modules/node-gyp-build/index.js",
+      "inputType": "nft-runtime-trace",
+      "provenance": [
+        {
+          "root": "nft-cli-bundle",
+          "kind": "nft-trace"
+        },
+        {
+          "root": "nft-server-bundle",
+          "kind": "nft-trace"
+        }
+      ],
+      "reason": "nft-runtime-trace via nft-cli-bundle (see roots[] for the full explanation)"
+    },
+    {
+      "path": "node_modules/node-gyp-build/node-gyp-build.js",
+      "inputType": "nft-runtime-trace",
+      "provenance": [
+        {
+          "root": "nft-cli-bundle",
+          "kind": "nft-trace"
+        },
+        {
+          "root": "nft-server-bundle",
+          "kind": "nft-trace"
+        }
+      ],
+      "reason": "nft-runtime-trace via nft-cli-bundle (see roots[] for the full explanation)"
+    },
+    {
+      "path": "node_modules/node-gyp-build/package.json",
+      "inputType": "nft-runtime-trace",
+      "provenance": [
+        {
+          "root": "nft-cli-bundle",
+          "kind": "nft-trace"
+        },
+        {
+          "root": "nft-server-bundle",
+          "kind": "nft-trace"
+        }
+      ],
+      "reason": "nft-runtime-trace via nft-cli-bundle (see roots[] for the full explanation)"
+    },
+    {
       "path": "node_modules/node-pty/lib/eventEmitter2.js",
       "inputType": "nft-runtime-trace",
       "provenance": [
@@ -116652,6 +116697,36 @@
       "reason": "nft-runtime-trace via nft-server-bundle (see roots[] for the full explanation)"
     },
     {
+      "path": "node_modules/usearch/javascript/dist/cjs/package.json",
+      "inputType": "nft-runtime-trace",
+      "provenance": [
+        {
+          "root": "nft-cli-bundle",
+          "kind": "nft-trace"
+        },
+        {
+          "root": "nft-server-bundle",
+          "kind": "nft-trace"
+        }
+      ],
+      "reason": "nft-runtime-trace via nft-cli-bundle (see roots[] for the full explanation)"
+    },
+    {
+      "path": "node_modules/usearch/javascript/dist/cjs/usearch.js",
+      "inputType": "nft-runtime-trace",
+      "provenance": [
+        {
+          "root": "nft-cli-bundle",
+          "kind": "nft-trace"
+        },
+        {
+          "root": "nft-server-bundle",
+          "kind": "nft-trace"
+        }
+      ],
+      "reason": "nft-runtime-trace via nft-cli-bundle (see roots[] for the full explanation)"
+    },
+    {
       "path": "node_modules/util-deprecate/node.js",
       "inputType": "nft-runtime-trace",
       "provenance": [
@@ -125295,11 +125370,11 @@
     }
   ],
   "stats": {
-    "totalFiles": 10667,
+    "totalFiles": 10672,
     "byInputType": {
       "source-graph": 767,
       "runtime-asset": 11,
-      "nft-runtime-trace": 9889
+      "nft-runtime-trace": 9894
     }
   }
 }
