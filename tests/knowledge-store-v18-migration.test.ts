@@ -51,6 +51,25 @@ const columns = {
   ],
 };
 const researchTables = Object.keys(columns).sort();
+// P3-02 只在原有七张研究表后增加这四张表，旧契约仍逐列验证。
+const completenessColumns = {
+  knowledge_completeness_checks: [
+    "id TEXT PK", "research_run_id TEXT NN", "policy TEXT NN", "status TEXT NN", "total_units INTEGER NN 0",
+    "checked_units INTEGER NN 0", "relevant_units INTEGER NN 0", "unavailable_units INTEGER NN 0",
+    "coverage_ratio REAL NN 0", "exact INTEGER NN 0", "created_at TEXT NN", "updated_at TEXT NN", "completed_at TEXT",
+  ],
+  knowledge_completeness_units: [
+    "check_id TEXT NN PK1", "coverage_unit_id TEXT NN PK2", "source_id TEXT NN", "parse_artifact_id TEXT NN",
+    "block_id TEXT NN", "start_offset INTEGER NN", "end_offset INTEGER NN", "section_key TEXT", "status TEXT NN",
+    "worker_session_id TEXT", "updated_at TEXT NN",
+  ],
+  knowledge_completeness_unit_evidence: [
+    "check_id TEXT NN PK1", "coverage_unit_id TEXT NN PK2", "evidence_id TEXT NN PK3",
+  ],
+  knowledge_completeness_coverage_runs: ["check_id TEXT NN PK1", "coverage_run_id TEXT NN PK2"],
+};
+const completenessTables = Object.keys(completenessColumns).sort();
+const addedTables = [...researchTables, ...completenessTables].sort();
 
 function identifier(name: string) { return `"${name.replaceAll('"', '""')}"`; }
 function tableNames(db: any): string[] {
@@ -77,12 +96,12 @@ function restoreV17() {
     expect(db.pragma("foreign_key_check")).toEqual([]);
     const tables = tableNames(db);
     expect(tables).toHaveLength(18);
-    expect(tables.filter(table => researchTables.includes(table))).toEqual([]);
+    expect(tables.filter(table => addedTables.includes(table))).toEqual([]);
     return { dbPath, tables, beforeRows: rows(db, tables), beforeSchema: schema(db) };
   } finally { db.close(); }
 }
 function assertResearchColumns(db: any) {
-  for (const [table, definitions] of Object.entries(columns)) {
+  for (const [table, definitions] of Object.entries({ ...columns, ...completenessColumns })) {
     const expected = definitions.map(definition => {
       const [name, type, ...flags] = definition.split(" ");
       const primary = flags.find(flag => flag.startsWith("PK"));
@@ -101,7 +120,7 @@ afterEach(() => {
   }
 });
 
-describe("Knowledge v17 → v18 真实旧库迁移", () => {
+describe("Knowledge v17 → v18 → v19 真实旧库完整迁移链", () => {
   it("fixture 固定来自 c3033b05 的真实 v17 建库，不以新库降低版本代替", () => {
     expect(fixture).toContain("c3033b05e09877bf425b3fd0e5ea9cf9b065c8da");
     expect(crypto.createHash("sha256").update(fixture).digest("hex"))
@@ -114,13 +133,14 @@ describe("Knowledge v17 → v18 真实旧库迁移", () => {
     }
   });
 
-  it("全部旧表逐行及原结构不变，只新增七张指定表，重开幂等", () => {
+  it("全部旧表逐行及原结构不变，v18 七表外只追加 v19 四表，重开幂等", () => {
     const { dbPath, tables, beforeRows, beforeSchema } = restoreV17();
     const store = new KnowledgeStore({ dbPath });
     let afterRows: ReturnType<typeof rows>, afterSchema: ReturnType<typeof schema>;
     try {
-      expect(store.db.pragma("user_version", { simple: true })).toBe(18);
-      expect(tableNames(store.db).filter(table => !tables.includes(table))).toEqual(researchTables);
+      expect(store.db.pragma("user_version", { simple: true })).toBe(19);
+      expect(tableNames(store.db).filter(table => !tables.includes(table))).toEqual(addedTables);
+      expect(tableNames(store.db)).toHaveLength(29);
       expect(rows(store.db, tables)).toEqual(beforeRows);
       expect(schema(store.db).filter((entry: any) => tables.includes(entry.tbl_name))).toEqual(beforeSchema);
       assertResearchColumns(store.db);
@@ -129,23 +149,25 @@ describe("Knowledge v17 → v18 真实旧库迁移", () => {
     } finally { store.close(); }
     const reopened = new KnowledgeStore({ dbPath });
     try {
-      expect(reopened.db.pragma("user_version", { simple: true })).toBe(18);
+      expect(reopened.db.pragma("user_version", { simple: true })).toBe(19);
       expect(rows(reopened.db, tableNames(reopened.db))).toEqual(afterRows);
       expect(schema(reopened.db)).toEqual(afterSchema);
     } finally { reopened.close(); }
   });
 
-  it("空目录直接建成 v18，七张新表字段与升级路径完全一致", () => {
+  it("空目录直接建成 v19，原七张研究表与新增四张完整性表字段都与升级路径一致", () => {
+    const { tables } = restoreV17();
     const store = new KnowledgeStore({ dbPath: databasePath() });
     try {
-      expect(store.db.pragma("user_version", { simple: true })).toBe(18);
+      expect(store.db.pragma("user_version", { simple: true })).toBe(19);
+      expect(tableNames(store.db)).toEqual([...tables, ...addedTables].sort());
       assertResearchColumns(store.db);
-      for (const table of researchTables) expect(store.db.prepare(`SELECT * FROM ${identifier(table)}`).all()).toEqual([]);
+      for (const table of addedTables) expect(store.db.prepare(`SELECT * FROM ${identifier(table)}`).all()).toEqual([]);
       expect(store.db.pragma("foreign_key_check")).toEqual([]);
     } finally { store.close(); }
   });
 
-  it("真实执行前三张新表后让中段 DDL 报错，整个迁移回滚且重试可成功", () => {
+  it("真实执行 v18 前三张新表后让中段 DDL 报错，整个迁移回滚且重试可升级至 v19", () => {
     const { dbPath, tables, beforeRows, beforeSchema } = restoreV17();
     let partialTables: string[] = [], insideTransaction = false;
     class FailingDatabase extends Database {
@@ -179,9 +201,56 @@ describe("Knowledge v17 → v18 真实旧库迁移", () => {
     } finally { raw.close(); }
     const retried = new KnowledgeStore({ dbPath });
     try {
-      expect(retried.db.pragma("user_version", { simple: true })).toBe(18);
+      expect(retried.db.pragma("user_version", { simple: true })).toBe(19);
+      expect(tableNames(retried.db)).toEqual([...tables, ...addedTables].sort());
       assertResearchColumns(retried.db);
       expect(rows(retried.db, tables)).toEqual(beforeRows);
+      expect(schema(retried.db).filter((entry: any) => tables.includes(entry.tbl_name))).toEqual(beforeSchema);
+      expect(retried.db.pragma("foreign_key_check")).toEqual([]);
+    } finally { retried.close(); }
+  });
+
+  it("v18 七表实际执行完成后再于 v19 中段失败，整条迁移链回滚到原始 v17", () => {
+    const { dbPath, tables, beforeRows, beforeSchema } = restoreV17();
+    let partialTables: string[] = [], insideTransaction = false;
+    class FailingDatabase extends Database {
+      exec(sql: string) {
+        const match = /CREATE\s+TABLE\s+(?:IF\s+NOT\s+EXISTS\s+)?knowledge_completeness_unit_evidence\b/i.exec(sql);
+        if (match) {
+          // 前一步七张研究表与本步骤前两张表都必须真实建成，再触发 SQLite 本身的 DDL 错误。
+          const preceding = sql.slice(0, match.index);
+          if (preceding.trim()) super.exec(preceding);
+          partialTables = tableNames(this).filter(table => addedTables.includes(table));
+          insideTransaction = this.inTransaction;
+          return super.exec("CREATE TABLE knowledge_migration_fault (id TEXT, id TEXT)");
+        }
+        return super.exec(sql);
+      }
+    }
+    expect(() => {
+      const unexpectedlyOpened = new KnowledgeStore({ dbPath, Database: FailingDatabase });
+      unexpectedlyOpened.close();
+    }).toThrow(/duplicate column name: id/i);
+    expect(insideTransaction).toBe(true);
+    expect(partialTables).toEqual([
+      ...researchTables, "knowledge_completeness_checks", "knowledge_completeness_units",
+    ].sort());
+    const raw = new Database(dbPath);
+    try {
+      expect(raw.pragma("user_version", { simple: true })).toBe(17);
+      expect(tableNames(raw)).toEqual(tables);
+      expect(schema(raw)).toEqual(beforeSchema);
+      expect(rows(raw, tables)).toEqual(beforeRows);
+      expect(raw.pragma("foreign_key_check")).toEqual([]);
+    } finally { raw.close(); }
+    const retried = new KnowledgeStore({ dbPath });
+    try {
+      expect(retried.db.pragma("user_version", { simple: true })).toBe(19);
+      expect(tableNames(retried.db)).toEqual([...tables, ...addedTables].sort());
+      assertResearchColumns(retried.db);
+      expect(rows(retried.db, tables)).toEqual(beforeRows);
+      expect(schema(retried.db).filter((entry: any) => tables.includes(entry.tbl_name))).toEqual(beforeSchema);
+      expect(retried.db.pragma("foreign_key_check")).toEqual([]);
     } finally { retried.close(); }
   });
 

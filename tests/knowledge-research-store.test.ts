@@ -565,7 +565,7 @@ describe("知识研究 v18 数据库约束", () => {
     stores.splice(stores.indexOf(store), 1);
     store.close();
     const reopened = openStore(dbPath);
-    expect(reopened.db.pragma("user_version", { simple: true })).toBe(18);
+    expect(reopened.db.pragma("user_version", { simple: true })).toBe(19);
     for (const table of Object.keys(TABLES) as TableKey[]) {
       expect(reopened.db.prepare(`SELECT * FROM ${TABLES[table]} ORDER BY ${table === "relations" ? "need_id" : "id"}`).all()).toEqual(before[table]);
     }

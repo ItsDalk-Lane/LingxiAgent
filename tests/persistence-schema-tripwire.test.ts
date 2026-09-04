@@ -88,7 +88,7 @@ describe("persistence schema tripwire", () => {
     expect(knowledge).toMatchObject({
       kind: "sqlite-runtime",
       module: "lib/knowledge/knowledge-store.ts",
-      runtimeSchema: { userVersion: 18 },
+      runtimeSchema: { userVersion: 19 },
     });
     expect(knowledge.runtimeSchema.objects.some((entry) => entry.name === "notebooks")).toBe(true);
     expect(knowledge.runtimeSchema.objects.some((entry) => entry.name === "ingestion_jobs")).toBe(true);
@@ -99,7 +99,8 @@ describe("persistence schema tripwire", () => {
     for (const table of [
       "knowledge_research_runs", "knowledge_evidence_needs", "knowledge_research_rounds",
       "knowledge_research_read_receipts", "knowledge_evidence_items", "knowledge_need_evidence",
-      "knowledge_research_actions",
+      "knowledge_research_actions", "knowledge_completeness_checks", "knowledge_completeness_units",
+      "knowledge_completeness_unit_evidence", "knowledge_completeness_coverage_runs",
     ]) {
       expect(knowledge.runtimeSchema.objects.some((entry) => entry.name === table), table).toBe(true);
     }

@@ -52,7 +52,7 @@ import {
   type KnowledgeCoveragePlanRecord,
 } from "./knowledge-coverage-planner.ts";
 
-export const KNOWLEDGE_SCHEMA_VERSION = 18;
+export const KNOWLEDGE_SCHEMA_VERSION = 19;
 
 const SOURCE_TYPES = new Set<KnowledgeSourceType>(["file", "pasted_text", "web_snapshot"]);
 const PARSE_STATUSES = new Set<KnowledgeParseStatus>(["parsing", "ready", "needs_ocr", "failed"]);
@@ -790,6 +790,7 @@ export class KnowledgeStore {
         if (version === 15) this.createSchemaV16();
         if (version === 16) this.createSchemaV17();
         if (version === 17) this.createSchemaV18();
+        if (version === 18) this.createSchemaV19();
         // main 线（PR #30）曾独立把版本推进到自己的 v9（只加 vector_retention_days，
         // 无 chunk_profiles）：这类库进合并链会跳过 version===8 的 v9 步。v9 体幂等
         // （IF NOT EXISTS + 列存在检查），缺表时补跑一次即可对齐。
@@ -2038,6 +2039,67 @@ export class KnowledgeStore {
         UNIQUE(run_id, ordinal),
         FOREIGN KEY(run_id) REFERENCES knowledge_research_runs(id) ON DELETE RESTRICT,
         FOREIGN KEY(round_id) REFERENCES knowledge_research_rounds(id) ON DELETE RESTRICT
+      );
+    `);
+  }
+
+  /** v19 只新增完整性核查记录；与版本号一起提交，旧资料和研究证据均保持原样。 */
+  private createSchemaV19() {
+    this.db.exec(`
+      CREATE TABLE IF NOT EXISTS knowledge_completeness_checks (
+        id TEXT PRIMARY KEY NOT NULL CHECK(length(trim(id)) > 0),
+        research_run_id TEXT NOT NULL UNIQUE,
+        policy TEXT NOT NULL CHECK(policy IN ('best_effort', 'source_diverse', 'relevant_sections_complete', 'scope_complete')),
+        status TEXT NOT NULL CHECK(length(trim(status)) > 0),
+        total_units INTEGER NOT NULL DEFAULT 0 CHECK(typeof(total_units) = 'integer' AND total_units >= 0),
+        checked_units INTEGER NOT NULL DEFAULT 0 CHECK(typeof(checked_units) = 'integer' AND checked_units >= 0),
+        relevant_units INTEGER NOT NULL DEFAULT 0 CHECK(typeof(relevant_units) = 'integer' AND relevant_units >= 0),
+        unavailable_units INTEGER NOT NULL DEFAULT 0 CHECK(typeof(unavailable_units) = 'integer' AND unavailable_units >= 0),
+        coverage_ratio REAL NOT NULL DEFAULT 0 CHECK(coverage_ratio >= 0 AND coverage_ratio <= 1),
+        exact INTEGER NOT NULL DEFAULT 0 CHECK(exact IN (0, 1)),
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL,
+        completed_at TEXT,
+        CHECK(checked_units + unavailable_units <= total_units),
+        CHECK(relevant_units <= checked_units),
+        CHECK(exact = 0 OR (checked_units = total_units AND unavailable_units = 0 AND coverage_ratio = 1)),
+        FOREIGN KEY(research_run_id) REFERENCES knowledge_research_runs(id) ON DELETE RESTRICT
+      );
+
+      CREATE TABLE IF NOT EXISTS knowledge_completeness_units (
+        check_id TEXT NOT NULL,
+        coverage_unit_id TEXT NOT NULL CHECK(length(trim(coverage_unit_id)) > 0),
+        source_id TEXT NOT NULL,
+        parse_artifact_id TEXT NOT NULL,
+        block_id TEXT NOT NULL,
+        start_offset INTEGER NOT NULL CHECK(typeof(start_offset) = 'integer' AND start_offset >= 0),
+        end_offset INTEGER NOT NULL CHECK(typeof(end_offset) = 'integer' AND end_offset > start_offset),
+        section_key TEXT,
+        status TEXT NOT NULL CHECK(status IN ('pending', 'checked_relevant', 'checked_irrelevant', 'unavailable', 'failed')),
+        worker_session_id TEXT,
+        updated_at TEXT NOT NULL,
+        PRIMARY KEY(check_id, coverage_unit_id),
+        FOREIGN KEY(check_id) REFERENCES knowledge_completeness_checks(id) ON DELETE RESTRICT,
+        FOREIGN KEY(source_id) REFERENCES sources(id) ON DELETE RESTRICT,
+        FOREIGN KEY(parse_artifact_id) REFERENCES parse_artifacts(id) ON DELETE RESTRICT,
+        FOREIGN KEY(block_id) REFERENCES knowledge_blocks(id) ON DELETE RESTRICT
+      );
+
+      CREATE TABLE IF NOT EXISTS knowledge_completeness_unit_evidence (
+        check_id TEXT NOT NULL,
+        coverage_unit_id TEXT NOT NULL,
+        evidence_id TEXT NOT NULL,
+        PRIMARY KEY(check_id, coverage_unit_id, evidence_id),
+        FOREIGN KEY(check_id, coverage_unit_id) REFERENCES knowledge_completeness_units(check_id, coverage_unit_id) ON DELETE RESTRICT,
+        FOREIGN KEY(evidence_id) REFERENCES knowledge_evidence_items(id) ON DELETE RESTRICT
+      );
+
+      CREATE TABLE IF NOT EXISTS knowledge_completeness_coverage_runs (
+        check_id TEXT NOT NULL,
+        coverage_run_id TEXT NOT NULL,
+        PRIMARY KEY(check_id, coverage_run_id),
+        FOREIGN KEY(check_id) REFERENCES knowledge_completeness_checks(id) ON DELETE RESTRICT,
+        FOREIGN KEY(coverage_run_id) REFERENCES coverage_runs(id) ON DELETE RESTRICT
       );
     `);
   }

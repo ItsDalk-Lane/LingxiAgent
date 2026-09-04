@@ -10,7 +10,7 @@
 - 严格按 P0 → P1 → P2 → P3 及编号顺序；阶段门禁全部通过才进入下一阶段。
 - 每项记录测试原始结果后提交；不删除、跳过或放宽测试，不合并 main。
 - 现有任务书为用户未跟踪文件，既有规划文档与 BLOCKED.md 历史记录保留。
-- 当前断点：P1-01 至 P1-08 已完成，阶段收口 `23873985`、审计 `333c5112`，本地与四平台门禁全部通过；P2-01 已完成并提交 `c3033b05`；P2-02 已提交 `c729f68a`；P2-03 已提交 `4a95317c`；P2-04 已提交 `359aeb77`；P2-05 已提交 `faad0da2`；P2-06 已提交 `f4340d98`；P2-07 已提交 `06cc6179`；P2-08 已提交 `725cf4a0`；P2 阶段故障修复已提交 `d4292b2d`，修复后全部阶段门禁通过：全量 13434 PASS / 0 FAIL / 7 既有 SKIP；阶段收口 `56dc1086`、审计 `4fefe66e` 已完成并推送；P3-01 已完成单项验证，本项提交后按序进入 P3-02。P0 源码提交 `5c016df183ad207cf1ca33de274abb7a4eb10057`，阶段审计提交 `f9928d76`；全量 13002 PASS / 0 FAIL / 7 既有 SKIP。用户已授权每阶段验证后同步审计记录，保留最终封印。
+- 当前断点：P1-01 至 P1-08 已完成，阶段收口 `23873985`、审计 `333c5112`，本地与四平台门禁全部通过；P2-01 已完成并提交 `c3033b05`；P2-02 已提交 `c729f68a`；P2-03 已提交 `4a95317c`；P2-04 已提交 `359aeb77`；P2-05 已提交 `faad0da2`；P2-06 已提交 `f4340d98`；P2-07 已提交 `06cc6179`；P2-08 已提交 `725cf4a0`；P2 阶段故障修复已提交 `d4292b2d`，修复后全部阶段门禁通过：全量 13434 PASS / 0 FAIL / 7 既有 SKIP；阶段收口 `56dc1086`、审计 `4fefe66e` 已完成并推送；P3-01 已提交 `d1781134`；P3-02 单项验证完成，本项提交后按序进入 P3-03。P0 源码提交 `5c016df183ad207cf1ca33de274abb7a4eb10057`，阶段审计提交 `f9928d76`；全量 13002 PASS / 0 FAIL / 7 既有 SKIP。用户已授权每阶段验证后同步审计记录，保留最终封印。
 - 进度、计划与事实集中在本文件和基线文档，避免覆盖既有 task_plan.md / findings.md / PROGRESS.md。
 - 目标工具已确认本任务存在 active goal；重复 create_goal 被拒绝，沿用现有目标。
 - 规划恢复脚本返回其他会话的无关配置记录，经 git diff 为空核对，未采用其内容。
@@ -22,7 +22,7 @@
 | P0 | completed | 2026-09-04 全量 13002 PASS / 0 FAIL / 7 既有 SKIP，76.42s；全部 P0 门禁通过，审计提交 f9928d76 |
 | P1 | completed | P1-01 至 P1-08 完成；本地全量和第三轮四平台 Build 33829055797 全部通过，阶段审计 333c5112 |
 | P2 | completed | P2-01 至 P2-08 及阶段故障修复全部完成；全量 13434 PASS / 0 FAIL / 7 既有 SKIP，构建/包内烟测/两轮生成器均通过 |
-| P3 | in_progress | P3-01 单项通过；阶段门禁尚未执行 |
+| P3 | in_progress | P3-01、P3-02 单项通过；阶段门禁尚未执行 |
 
 ## P0-00：建立基线与回归门禁
 
@@ -370,16 +370,19 @@
 - 测试命令：`npx vitest run tests/knowledge-completeness-policy.test.ts tests/knowledge-execution-policy.test.ts tests/knowledge-research-update-tool.test.ts tests/knowledge-detailed-engine-context.test.ts tests/knowledge-research-quality-fixtures.test.ts tests/knowledge-research-stop-policy.test.ts tests/knowledge-fast-zero-remote.test.ts`；`npm run typecheck`；六修改文件 ESLint；Node 24 直接导入正式策略入口；差异、持久化清单/指纹、运行闭包、开放边界及开放树生成。
 - 测试结果：最终 **7 文件 / 173 PASS / 0 FAIL / 0 SKIP，4.40s，exit 0**；三套类型、ESLint（0 错误/0 警告）、Node 源码运行、差异与边界检查均 exit 0。首轮 152 PASS/1 FAIL，英文 every relevant section 被泛范围词误升；保留断言，补完整章节短语和量词单复数 12 组合后通过；独立审查又发现 anything is missing / has been omitted 从句遗漏，新增测试真实 97 PASS/7 FAIL，补可选助动词后 104/104 PASS，正式入口与最终联测全部通过。没有删除或放宽断言。红绿日志 `/tmp/lingxi-p301-completeness-omission-{red,green}.log`；最终日志 `/tmp/lingxi-knowledge-p301-tests-reviewed.log`、`/tmp/lingxi-knowledge-p301-typecheck-reviewed.log`、`/tmp/lingxi-knowledge-p301-lint-reviewed.log`、`/tmp/lingxi-knowledge-p301-node-source.log`。
 - 生成物：持久化清单仍 66 stores / 779 sites，v18 与指纹 `sha256:3beb2e79d626d4bc9d7ae2f35a92c1b4a6daab3bccf3e7d701b565138cc43679` 不变；运行闭包 10688 文件，开放树 883 文件。P3 阶段门禁和最终封印尚未执行。
-- 对应 commit SHA：本项提交（下项回填）
+- 对应 commit SHA：`d1781134`
 - 偏差：none
 
 ## P3-02：Knowledge 数据库升级到 v19
 
-- 状态：pending
-- 改动文件：尚未开始
-- 测试命令：按任务书该项测试执行，尚未执行
-- 测试结果：NOT_EXECUTED
-- 对应 commit SHA：尚未提交
+- 状态：completed
+- 改动文件：`knowledge-store.ts` 的 v19 建表与顺序迁移、持久化登记说明；真实 v18 数据快照、v19 迁移和四表存储测试，旧版本断言与指纹门禁；持久化清单/指纹生成物。
+- 改动：严格新增任务书四表，字段/默认值/主键保持锁定；研究运行唯一检查，单元/证据与覆盖运行使用复合关联，外键保留既有原文身份。约束五种单元状态、非负整数计数、偏移、覆盖率、exact 布尔及完整计数条件；检查总状态未被任务书锁定，因此不另创受限枚举。建表与版本号仍在同一迁移事务中，旧表/旧行不改写；本项只建立存储结构，执行器在 P3-03 接线。
+- 测试命令：指定两项新测试，加旧迁移链、store、research store、chunk profiles、持久化指纹、真实详细入口/质量资料、生命周期和证据清单，共十一文件；三套类型检查及最终测试配置复核；八文件 ESLint；差异/持久化清单/指纹/运行闭包/开放边界/开放树生成。
+- 测试结果：最终 **11 文件 / 139 PASS / 0 FAIL / 0 SKIP，4.55s，exit 0**；三套类型、最终测试配置、ESLint（0 错误/78 警告）、差异与边界检查均 exit 0。真实 v18 快照来自 `d17811341e0782d0f9190533dde366acb447a482`，25 表/26 行、七张研究表各有数据，SHA256 `017111b0ff49c2da4eb1f91a6d4a300dfa1762b7b6211c4dbe5c935ce34ab823`；未以新库降低版本伪造旧库。升级前后全部旧行与表结构逐项相等；真实建成前两张新表后触发 SQLite 中段 DDL 错误，整笔回滚到 v18，重试成功；原 v17→当前链也验证经过 v18 后在 v19 失败整体退回 v17。原断言保留并增加四表要求，没有删测、跳测或放宽。新存储测试开发中曾因 fixture 多传字段和重复主键遮住外键失败而报错，已修正测试数据、保留约束断言；最终 23/23 通过，初次日志已由末次运行覆盖，不伪造其精确计数。日志 `/tmp/lingxi-knowledge-p302-tests-final.log`、`/tmp/lingxi-knowledge-p302-typecheck-first.log`、`/tmp/lingxi-knowledge-p302-completeness-store-typecheck.log`、`/tmp/lingxi-knowledge-p302-lint-final.log`。
+- 生成物：持久化清单 66 stores / 779 sites；知识库 v19，兼容指纹 `sha256:e114419efdf0b857a97635ed2cbffcb41b8c880b5405a55d5996e08213d0fabb`；运行闭包仍 10688 文件、开放树 883 文件。指纹由生成器按仅新增四表的兼容理由更新，没有手改派生结果。
+- 后续接线约束：P3-03 开始实际写入核查记录时，现有删除/回收预检须识别新引用，不能在外键拒绝物理删除之前先标记源已删除；本项不提前增加执行器或治理行为。P3 阶段门禁与最终封印仍待剩余任务完成。
+- 对应 commit SHA：本项提交（下项回填）
 - 偏差：none
 
 ## P3-03：实现 Completeness Executor
