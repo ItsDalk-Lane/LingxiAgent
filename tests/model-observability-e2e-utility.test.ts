@@ -302,6 +302,16 @@ describe("E2E truth — MC-07 CLI（S15）", () => {
     const root = makeRoot();
     const ledger = createUsageLedger({});
     const POISON_STDOUT = "E2E_CLI_STDOUT_POISON_x9";
+    const resolveMediaExecutionTarget = (input: any) => ({
+      modelId: input.modelId,
+      modality: input.modality,
+      runtimeProviderId: input.runtimeProviderId,
+      credentialProviderId: input.runtimeProviderId,
+      credentialLaneId: null,
+      credentialSource: "external",
+      adapterId: input.adapterId,
+      resolutionReason: "runtime_provider_credentials",
+    });
     const adapter = createJimengImageAdapter({
       resolveCommand: () => "/fake/bin/dreamina",
       runCommand: vi.fn(async (_cmd: string, args: any[]) => {
@@ -337,6 +347,7 @@ describe("E2E truth — MC-07 CLI（S15）", () => {
         sessionId: "sess-cli-e2e",
         sessionPath: "/sessions/cli.jsonl",
         generatedDir: path.join(root, "generated"),
+        resolveMediaExecutionTarget,
       },
       store: { get: vi.fn(() => ({})), update: vi.fn() },
       poller: { checkNow: vi.fn() },
@@ -385,6 +396,16 @@ describe("E2E truth — MC-08 video（S16）", () => {
       usageLedger: ledger,
       sessionId: "sess-video-e2e",
       sessionPath: "/sessions/video.jsonl",
+      mediaExecutionTarget: {
+        modelId: "agnes-video-v2.0",
+        modality: "video",
+        runtimeProviderId: "agnes",
+        credentialProviderId: "agnes",
+        credentialLaneId: null,
+        credentialSource: "provider-registry",
+        adapterId: "agnes-videos",
+        resolutionReason: "runtime_provider_credentials",
+      },
     };
     const result = await agnesVideoAdapter.submit(
       { prompt: "E2E_VIDEO_PROMPT", duration: 5, modelId: "agnes-video-v2.0", providerId: "agnes" },

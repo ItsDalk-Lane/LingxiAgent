@@ -660,7 +660,7 @@
     ],
     "version": 3
   },
-  "payloadFingerprint": "sha256:3beb2e79d626d4bc9d7ae2f35a92c1b4a6daab3bccf3e7d701b565138cc43679",
+  "payloadFingerprint": "sha256:ddddb826c8a2d9675dab6d16ef7ff9dcf87312af639741db2274795d8f5485d6",
   "registry": [
     {
       "affectedByEpochMigration": true,
@@ -3292,8 +3292,8 @@
   ],
   "review": {
     "classification": "compatible",
-    "compatibilityReason": "P2-05 新增只读研究隔离会话与宿主祖先校验，复用既有会话清单JSON与知识v18表；临时会话执行后删除，不改变旧会话或数据纪元",
-    "payloadFingerprint": "sha256:3beb2e79d626d4bc9d7ae2f35a92c1b4a6daab3bccf3e7d701b565138cc43679"
+    "compatibilityReason": "契约执行路径修复只统一工具、媒体凭证和知识重排选路；既有持久化格式、数据纪元和旧数据读取语义均未改变",
+    "payloadFingerprint": "sha256:ddddb826c8a2d9675dab6d16ef7ff9dcf87312af639741db2274795d8f5485d6"
   },
   "schemas": [
     {
@@ -3565,7 +3565,7 @@
       "contract": "installed manifest, install receipt, backup, and source-package directory protocols",
       "kind": "directory-contract",
       "module": "core/plugin-manager.ts",
-      "sourceHash": "sha256:78098ac67519299dd169da7eab6abef5f960141551fb63a5266c3d36210d9497",
+      "sourceHash": "sha256:54df6ad0719346d8976878e65314d2d4b241f6d1ae4c390f31c6edc1307c65b3",
       "storeId": "installed-plugins"
     },
     {
@@ -3915,21 +3915,21 @@
       "contract": "ParseArtifact generation directories referenced by knowledge.db and never treated as source content versions",
       "kind": "directory-contract",
       "module": "lib/knowledge/knowledge-manager.ts",
-      "sourceHash": "sha256:83faa36d34e8aa88e36e2f16965d76b0cc2f1c270861b2862062cb40d928c90f",
+      "sourceHash": "sha256:4c000a982f738a74e06b936b981490fd627a06023af29b70674f5dc47fad9fb3",
       "storeId": "knowledge-parse-artifacts"
     },
     {
       "contract": "ProcessingArtifact output files (binary office formats converted to structured text) referenced by knowledge.db processing_artifacts rows, with locatorMap held in the database",
       "kind": "directory-contract",
       "module": "lib/knowledge/knowledge-manager.ts",
-      "sourceHash": "sha256:83faa36d34e8aa88e36e2f16965d76b0cc2f1c270861b2862062cb40d928c90f",
+      "sourceHash": "sha256:4c000a982f738a74e06b936b981490fd627a06023af29b70674f5dc47fad9fb3",
       "storeId": "knowledge-processing-artifacts"
     },
     {
       "contract": "ContentSnapshot relative locator, immutable byte publication, SHA-256 verification, and rollback protocol",
       "kind": "directory-contract",
       "module": "lib/knowledge/knowledge-manager.ts",
-      "sourceHash": "sha256:83faa36d34e8aa88e36e2f16965d76b0cc2f1c270861b2862062cb40d928c90f",
+      "sourceHash": "sha256:4c000a982f738a74e06b936b981490fd627a06023af29b70674f5dc47fad9fb3",
       "storeId": "knowledge-source-snapshots"
     },
     {
@@ -3964,7 +3964,7 @@
       "contract": "normalizeMcpConfig read-time normalization (servers/connectors alias, auth and OAuth field defaults, per-connector permission policy defaults, deferred-loading defaults)",
       "kind": "runtime-contract",
       "module": "core/mcp/manager.ts",
-      "sourceHash": "sha256:cbd5857f080b687f62e61aa43f046cc9d2b8122e40f1d9711237738ec237304c",
+      "sourceHash": "sha256:0d36be8d8d547af33706b8f2024b81c396782abc500df88f8977e390cd8d51bf",
       "storeId": "mcp-config"
     },
     {
@@ -4184,14 +4184,14 @@
       "contract": "dev plugin source promotion and run receipt protocol",
       "kind": "directory-contract",
       "module": "core/plugin-dev-service.ts",
-      "sourceHash": "sha256:58532d2b19b7a798ae23a33375a4f38bb05a1868cc47c3fdf45d710d233ebe9e",
+      "sourceHash": "sha256:98206d0064a5b5f64183df7b51d739a781baf58868817573a23cdafbdac5335f",
       "storeId": "plugin-development-state"
     },
     {
       "contract": "verified plugin release ZIP naming by pluginId/version and expected sha256",
       "kind": "directory-contract",
       "module": "server/routes/plugins.ts",
-      "sourceHash": "sha256:d4807cf0631c39e6578691ed31e9763c30031425c53c385f6052e6162f1e3780",
+      "sourceHash": "sha256:cb4d2b3b01f3a52ff567a5d7d79c867dbd434a16c59d952cb968642c333fe84f",
       "storeId": "plugin-download-cache"
     },
     {
