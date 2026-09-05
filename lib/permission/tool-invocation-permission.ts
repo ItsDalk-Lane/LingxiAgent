@@ -653,11 +653,13 @@ export function invocationTargetKey(target: Pick<ToolInvocationTarget, "type" | 
   return JSON.stringify([target.type, target.id]);
 }
 
-type LegacyPermissionNormalization =
+export type LegacyToolPermissionNormalization =
   | { ok: true; value: Record<string, unknown> }
   | { ok: false };
 
-function normalizeLegacyPermission(permission: unknown): LegacyPermissionNormalization {
+export function normalizeLegacyToolPermissionMetadata(
+  permission: unknown,
+): LegacyToolPermissionNormalization {
   const snapshot = snapshotPlainOwnDataRecord(permission);
   if (!snapshot.ok) return { ok: false };
   const raw = snapshot.value;
@@ -762,7 +764,7 @@ export function resolveToolInvocationPermission(
     });
   }
   if (!resolverProperty.present) {
-    const legacyPermission = normalizeLegacyPermission(permission);
+    const legacyPermission = normalizeLegacyToolPermissionMetadata(permission);
     if (!legacyPermission.ok) {
       return failure({
         toolName,

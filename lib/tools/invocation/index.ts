@@ -17,6 +17,8 @@ export type {
   ToolInvocationErrorCode,
   ToolInvocationErrorInput,
 } from "./errors.ts";
+export { normalizeToolPermissionContract } from "./permission-adapter.ts";
+export type { NormalizedToolPermissionContract } from "./permission-adapter.ts";
 export type {
   ToolInvocationRoute,
   ToolOrigin,
