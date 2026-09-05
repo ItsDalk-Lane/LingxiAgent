@@ -635,7 +635,7 @@ describe('MobileApp', () => {
     expect(screen.getByLabelText('titlebar.currentChatTitle')).toHaveTextContent('sidebar.newChat');
   });
 
-  it('resets mobile global new chat to the primary agent effective default workspace', async () => {
+  it('keeps the currently displayed workspace for mobile global new chat while the agent resets to primary', async () => {
     fetchMock.mockImplementation((input: RequestInfo | URL, options?: RequestInit) => {
       const url = String(input);
       if (url.includes('/api/web-auth/session')) {
@@ -672,8 +672,11 @@ describe('MobileApp', () => {
     await waitForMobileChatReady();
     fireEvent.click(titlebarNewSessionButton());
 
+    // 规则 B（2026-09-05 用户拍板，随 createNewSession 继承源重排）：新建聊天跟随
+    // 当前显示的工作台——mobile 引导在 Mio 的工作台上，全局新建后目录保持不变；
+    // 仅 Agent 身份重置回 Primary（与桌面端 session-actions 用例同一语义孪生）。
     expect(useStore.getState().selectedAgentId).toBe('hana');
-    expect(useStore.getState().selectedFolder).toBe('/home/test/Desktop/OH-WorkSpace');
+    expect(useStore.getState().selectedFolder).toBe('/workspace/mio');
   });
 
   it('leaves mobile keyboard viewport handling to the browser', async () => {
