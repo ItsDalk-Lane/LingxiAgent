@@ -56,6 +56,16 @@ function makeService({ adapterId, file, ledger, fetchImpl }: {
   const protocolId = PROTOCOLS[adapterId];
   return new SpeechRecognitionService({
     providerRegistry: {
+      resolveMediaExecutionTarget: (input: any) => ({
+        modelId: input.modelId,
+        modality: input.modality,
+        runtimeProviderId: input.runtimeProviderId,
+        credentialProviderId: input.runtimeProviderId,
+        credentialLaneId: null,
+        credentialSource: "provider-registry",
+        adapterId: input.adapterId,
+        resolutionReason: "runtime_provider_credentials",
+      }),
       resolveMediaModel: () => ({
         providerId: adapterId,
         provider: { providerId: adapterId },

@@ -87,6 +87,8 @@ export function createSubmitContext(ctx) {
     usageLedger: ctx.usageLedger,
     sessionId: ctx.sessionId,
     sessionPath: ctx.sessionPath,
+    mediaAdapterRegistry: ctx?._mediaGen?.registry || null,
+    resolveMediaExecutionTarget: ctx?._mediaGen?.resolveMediaExecutionTarget || null,
   };
 }
 
@@ -178,14 +180,23 @@ async function adapterIsAvailable(adapter, submitCtx, registry = null) {
 
 function targetFromAdapter(adapter, input, media: any = {}) {
   if (!adapter) return null;
+  if (!media.executionTarget) {
+    const err: any = new Error("No canonical media execution target is available.");
+    err.code = "CREDENTIAL_PROVIDER_UNRESOLVED";
+    throw err;
+  }
   return {
     adapter,
-    providerId: media.providerId || input.provider || adapter.id,
-    modelId: media.modelId || input.model || null,
+    providerId: media.providerId,
+    modelId: media.modelId,
     model: media.model || null,
     protocolId: media.protocolId || adapter.protocolId || null,
-    credentialLaneId: media.credentialLaneId || null,
-    credentialProviderId: media.credentialProviderId || media.providerId || input.provider || adapter.id,
+    credentialLaneId: media.executionTarget.credentialLaneId,
+    credentialProviderId: media.executionTarget.credentialProviderId,
+    credentialSource: media.executionTarget.credentialSource,
+    resolutionReason: media.executionTarget.resolutionReason,
+    modelCredentialLane: media.modelCredentialLane || null,
+    executionTarget: media.executionTarget,
   };
 }
 
@@ -198,20 +209,63 @@ async function listMediaProviders(submitCtx) {
   }
 }
 
-async function resolveMediaModel(submitCtx, ref) {
+async function resolveMediaExecutionTarget(submitCtx, ref) {
   try {
+    if (ref.direct === true && typeof submitCtx.resolveMediaExecutionTarget === "function") {
+      const executionTarget = submitCtx.resolveMediaExecutionTarget({
+        modelId: ref.modelId,
+        modality: "image",
+        runtimeProviderId: ref.providerId,
+        credentialLane: ref.credentialLane || null,
+        adapterId: ref.adapterId,
+      });
+      return {
+        media: {
+          providerId: executionTarget.runtimeProviderId,
+          modelId: executionTarget.modelId,
+          model: ref.model || null,
+          protocolId: ref.protocolId || null,
+          credentialLaneId: executionTarget.credentialLaneId,
+          credentialProviderId: executionTarget.credentialProviderId,
+          modelCredentialLane: ref.credentialLane || null,
+          executionTarget,
+        },
+      };
+    }
     const result = await submitCtx.bus?.request?.("provider:resolve-media-model", {
       providerId: ref.providerId,
       modelId: ref.modelId,
       capability: "image_generation",
       ...(ref.credentialLaneId ? { credentialLaneId: ref.credentialLaneId } : {}),
+      ...(ref.adapterId ? { adapterId: ref.adapterId } : {}),
     });
-    if (result?.error) return { error: result.error };
-    if (!result?.protocolId) return { error: `media model "${ref.providerId}/${ref.modelId}" missing protocolId` };
+    if (result?.error) {
+      const err: any = new Error(result.error);
+      if (result.code) err.code = result.code;
+      if (result.resolutionReason) err.resolutionReason = result.resolutionReason;
+      return { error: err };
+    }
+    if (!result?.protocolId) return { error: new Error(`media model "${ref.providerId}/${ref.modelId}" missing protocolId`) };
     return { media: result };
   } catch (err) {
-    return { error: errorMessage(err) };
+    return { error: err };
   }
+}
+
+async function targetFromCanonicalAdapter(adapter, input, submitCtx, media: any = {}) {
+  const providerId = media.providerId || input.provider || adapter?.id;
+  const modelId = media.modelId || input.model || adapter?.defaultModel || adapter?.id;
+  const resolved = await resolveMediaExecutionTarget(submitCtx, {
+    direct: true,
+    providerId,
+    modelId,
+    model: media.model || null,
+    protocolId: media.protocolId || adapter?.protocolId || null,
+    credentialLane: media.modelCredentialLane || media.credentialLane || null,
+    adapterId: adapter?.id,
+  });
+  if (!resolved.media) throw resolved.error;
+  return targetFromAdapter(adapter, input, resolved.media);
 }
 
 function explicitProviderError(providerId, detail = "") {
@@ -263,9 +317,9 @@ async function targetFromMediaRef(input, registry, submitCtx, ref, { strict = fa
     }
   }
 
-  const { media, error } = await resolveMediaModel(submitCtx, { providerId: ref.providerId, modelId });
+  const { media, error } = await resolveMediaExecutionTarget(submitCtx, { providerId: ref.providerId, modelId });
   if (!media) {
-    if (strict) throw new Error(explicitProviderError(ref.providerId, error || t("plugin.imageGen.modelNotFound", { modelId })));
+    if (strict) throw new Error(explicitProviderError(ref.providerId, errorMessage(error) || t("plugin.imageGen.modelNotFound", { modelId })));
     return null;
   }
   const adapter = registry.getProtocol?.(media.protocolId) || registry.get(media.providerId);
@@ -273,7 +327,17 @@ async function targetFromMediaRef(input, registry, submitCtx, ref, { strict = fa
     if (strict) throw new Error(explicitProviderError(ref.providerId, t("plugin.imageGen.noRegisteredProtocol", { protocolId: media.protocolId })));
     return null;
   }
-  return targetFromAdapter(adapter, input, media);
+  const executable = await resolveMediaExecutionTarget(submitCtx, {
+    providerId: media.providerId,
+    modelId: media.modelId,
+    credentialLaneId: media.modelCredentialLane?.id || null,
+    adapterId: adapter.id,
+  });
+  if (!executable.media) {
+    if (strict) throw executable.error;
+    return null;
+  }
+  return targetFromAdapter(adapter, input, executable.media);
 }
 
 export async function validateImageModelRef(ref, registry, submitCtx) {
@@ -288,7 +352,7 @@ export async function validateImageModelRef(ref, registry, submitCtx) {
     protocolId: target.protocolId,
     adapterId: target.adapter?.id || null,
     credentialLaneId: target.credentialLaneId || null,
-    credentialProviderId: target.credentialProviderId || null,
+    credentialProviderId: target.credentialProviderId ?? null,
   };
 }
 
@@ -298,12 +362,10 @@ async function targetFromExplicitProvider(input, registry, submitCtx) {
     modelId: input.model || null,
   }, { strict: !!input.model });
   if (mediaTarget) return mediaTarget;
-
   const adapter = await availableAdapterOrThrow(registry.get(input.provider), submitCtx, input.provider, registry);
-  return targetFromAdapter(adapter, input, {
+  return targetFromCanonicalAdapter(adapter, input, submitCtx, {
     providerId: input.provider,
     modelId: input.model || null,
-    credentialProviderId: input.provider,
   });
 }
 
@@ -349,20 +411,22 @@ async function targetFromFirstAvailableProvider(input, registry, submitCtx) {
 }
 
 async function legacyAdapterTarget(input, registry, submitCtx) {
-  if (input.provider) return targetFromAdapter(registry.get(input.provider), input);
-
   const defaultProvider = submitCtx.config?.get?.("defaultImageModel")?.provider;
   if (defaultProvider) {
     const adapter = registry.get(defaultProvider);
-    if (adapter && await adapterIsAvailable(adapter, submitCtx, registry)) return targetFromAdapter(adapter, input);
+    if (adapter && await adapterIsAvailable(adapter, submitCtx, registry)) {
+      return targetFromCanonicalAdapter(adapter, input, submitCtx, { providerId: defaultProvider });
+    }
   }
 
   const adapters = registry.getByType("image");
   for (let i = adapters.length - 1; i >= 0; i--) {
     const adapter = adapters[i];
-    if (await adapterIsAvailable(adapter, submitCtx, registry)) return targetFromAdapter(adapter, input);
+    if (await adapterIsAvailable(adapter, submitCtx, registry)) {
+      return targetFromCanonicalAdapter(adapter, input, submitCtx);
+    }
   }
-  return targetFromAdapter(adapters.at(-1), input);
+  return null;
 }
 
 export async function resolveImageTarget(input, registry, submitCtx) {
@@ -391,10 +455,18 @@ export async function resolveImageAdapter(input, registry, submitCtx) {
 
 export function markSubmitFailed({ taskId, err, store, ctx }) {
   const message = errorMessage(err);
+  const failureCode = typeof err?.code === "string" ? err.code : null;
+  const resolutionReason = typeof err?.resolutionReason === "string"
+    ? err.resolutionReason
+    : typeof err?.details?.resolutionReason === "string"
+      ? err.details.resolutionReason
+      : null;
   const task = store.get?.(taskId);
   store.update(taskId, {
     status: "failed",
     failReason: message,
+    ...(failureCode ? { failCode: failureCode } : {}),
+    ...(resolutionReason ? { resolutionReason } : {}),
     submitState: "failed",
     completedAt: new Date().toISOString(),
   });
@@ -439,16 +511,35 @@ export function buildImageTaskProvenanceForTest({ prompt, image, adapterId }) {
 }
 
 export async function runSubmitInBackground({ taskId, adapter, params, submitCtx, store, poller, ctx }) {
+  const refreshed = await resolveMediaExecutionTarget(submitCtx, {
+    direct: true,
+    providerId: params?.providerId || adapter?.id,
+    modelId: params?.modelId || params?.model || adapter?.defaultModel || adapter?.id,
+    credentialLaneId: params?.modelCredentialLane?.id || null,
+    credentialLane: params?.modelCredentialLane || null,
+    protocolId: params?.protocolId || adapter?.protocolId || null,
+    adapterId: adapter?.id,
+  });
+  if (!refreshed.media?.executionTarget) {
+    markSubmitFailed({ taskId, err: refreshed.error, store, ctx });
+    return;
+  }
+  const executionTarget = refreshed.media.executionTarget;
+  const executionParams = {
+    ...params,
+    credentialLaneId: executionTarget.credentialLaneId,
+    credentialProviderId: executionTarget.credentialProviderId,
+  };
   // MC-06 逻辑调用边界（§二十三）：一次 image generation submit = 一个 logical
   // call；poll / 资产下载不是。callId 在 adapter 网络请求之前铸好，同时写进
   // ledger metadata（observer.callId ↔ ledger.metadata.modelCallId）。
   const sessionTarget = normalizeSessionRef(ctx);
   const modelIdentity = {
-    provider: params?.providerId || adapter?.id || null,
-    modelId: params?.modelId || params?.model || null,
-    api: params?.protocolId || adapter?.protocolId || null,
+    provider: executionParams.providerId,
+    modelId: executionParams.modelId || executionParams.model,
+    api: executionParams.protocolId || adapter?.protocolId || null,
   };
-  const referenceCount = countReferenceImages(params?.image);
+  const referenceCount = countReferenceImages(executionParams.image);
   // Phase 5（§七十二）：图片生成的语义输入 = prompt + 参考图。locator 只指向
   // 参数位置（parameters.prompt / parameters.image[i]），绝不携带值（URL/路径
   // 禁入 provenance，§二十二）。CLI adapter（jimeng-cli-*）用 external_cli_media
@@ -469,12 +560,15 @@ export async function runSubmitInBackground({ taskId, adapter, params, submitCtx
       taskId,
     },
     semanticInputProvenance: buildImageTaskProvenanceForTest({
-      prompt: params?.prompt,
-      image: params?.image,
+      prompt: executionParams.prompt,
+      image: executionParams.image,
       adapterId: adapter?.id,
     }),
   });
-  const observedSubmitCtx = { ...submitCtx, modelCall: recorder };
+  const canonicalSubmitCtx = submitCtx.mediaAdapterRegistry
+    ?.createSubmitContextForExecutionTarget?.(executionTarget, submitCtx)
+    || { ...submitCtx, mediaExecutionTarget: executionTarget };
+  const observedSubmitCtx = { ...canonicalSubmitCtx, modelCall: recorder };
   // Phase 6 Semantic Request Capture（§八十七）：prompt 文本允许捕获；参考图
   // 是本地路径/data URL/URL——统一 Redactor 转 local_file_reference /
   // external_blob / external_reference descriptor，不保存字节。
@@ -484,9 +578,9 @@ export async function runSubmitInBackground({ taskId, adapter, params, submitCtx
     payloadCapture.captureSemanticRequest({
       inputShape: isCliAdapter ? "external_cli_media" : "media_image",
       parameters: {
-        ...(typeof params?.prompt === "string" ? { prompt: params.prompt } : {}),
-        ...(params?.image !== undefined && params?.image !== null ? { image: params.image } : {}),
-        ...(typeof params?.modelId === "string" ? { modelId: params.modelId } : {}),
+        ...(typeof executionParams.prompt === "string" ? { prompt: executionParams.prompt } : {}),
+        ...(executionParams.image !== undefined && executionParams.image !== null ? { image: executionParams.image } : {}),
+        ...(typeof executionParams.modelId === "string" ? { modelId: executionParams.modelId } : {}),
       },
       provenance: recorder.semanticInputProvenance,
     });
@@ -518,7 +612,7 @@ export async function runSubmitInBackground({ taskId, adapter, params, submitCtx
         },
       },
       metadata: { taskId, mediaType: "image", ...observedModelCallLedgerMetadata(recorder) },
-    }, () => adapter.submit(params, observedSubmitCtx));
+    }, () => adapter.submit(executionParams, observedSubmitCtx));
     const hasProviderTaskId = typeof result?.taskId === "string" && result.taskId.trim();
     const adapterTaskId = hasProviderTaskId ? result.taskId : taskId;
     const files = Array.isArray(result?.files) ? result.files.filter(Boolean) : [];

@@ -29,8 +29,8 @@
 | P5-03 | `completed` | `b8840f18b58d631e8d602d17af66ff5dccff2763` | 旧会话撤销与联合漂移清单，1 项红灯转绿 |
 | P6-01 | `completed` | `30f51d558a4271953f3cb890f150d1f4a4ded20d` | plugin-dev 聊天身份与真实权限，6 项红灯转绿 |
 | P6-02 | `completed` | `e367c51f4894da81abdc55c3603c800fe591c6f9` | 本地开发者身份与 Gateway 路由，13 项红灯转绿 |
-| P7-01 | `completed_pending_commit` | 待提交 | 统一媒体执行目标解析器，缺模块红灯转绿 |
-| P7-02 | `pending_migration` | — | 优先复用原实现 |
+| P7-01 | `completed` | `5f62fd5ba9506a99bc559fa13ca3dd60950907c9` | 统一媒体执行目标解析器，缺模块红灯转绿 |
+| P7-02 | `completed_pending_commit` | 待提交 | 四类媒体入口统一，5 项红灯转绿 |
 | P8 | `pending_v0134_adaptation` | — | 知识正式架构发生变化，需重点适配 |
 | P9–P11 | `pending_migration` | — | 迁移错误、边界、组合测试与文档 |
 | P12 | `pending` | — | 最终验证、构建和封印 |
@@ -230,12 +230,23 @@
 
 ## P7-01 统一媒体执行目标解析器
 
-- 状态：`completed_pending_commit`。
+- 状态：`completed`。
+- 提交：`5f62fd5ba9506a99bc559fa13ca3dd60950907c9`，远端分支已核对同 SHA。
 - 复用来源：原分支提交 `2ff451d74157678f733a2eeff111acb715d59ebd`；三个新文件原样迁移。
 - RED：exit `1`；1 failed suite，0 tests；任务书要求的统一解析模块不存在。
 - GREEN：exit `0`；1 file / 5 tests 全部通过。
 - typecheck exit `0`；三个新增文件定向 ESLint exit `0`，0 问题；`git diff --check` exit `0`。
 - 日志：`/tmp/lingxi-tool-contract-v0134-p701-red.log`、`/tmp/lingxi-tool-contract-v0134-p701-green.log`、`/tmp/lingxi-tool-contract-v0134-p701-typecheck.log`、`/tmp/lingxi-tool-contract-v0134-p701-eslint.log`。
+
+## P7-02 统一全部媒体入口
+
+- 状态：`completed_pending_commit`。
+- 复用来源：原分支提交 `7581da5ffaeb47554df2a5ebcfcf91be2b6b9944`；14 个生产文件和 13 个测试文件在本项前均与原提交父节点同哈希，原样迁移。
+- RED：exit `1`；`1 failed / 1 passed` files，`5 failed / 10 passed` tests；四入口未统一、后台未重解、下游仍有凭证回退。
+- GREEN：P7 定向 2 files / 15 tests；含 Hub 3 files / 23 tests；全媒体 57 files / 482 tests，均 exit `0`。
+- typecheck exit `0`；全仓 lint exit `0`，`0 errors / 9228 warnings`；定向 ESLint exit `0`，`0 errors / 317 warnings`；`git diff --check` exit `0`。
+- 静态边界：`credential_refresh_failed` 搜索 exit `1`（0 命中）；入口与适配器清单均指向统一执行目标和其凭证供应商字段。
+- 日志：`/tmp/lingxi-tool-contract-v0134-p702-red.log`、`/tmp/lingxi-tool-contract-v0134-p702-targeted-final.log`、`/tmp/lingxi-tool-contract-v0134-p702-stage-final.log`、`/tmp/lingxi-tool-contract-v0134-p702-media-all-final.log`、`/tmp/lingxi-tool-contract-v0134-p702-typecheck-final.log`、`/tmp/lingxi-tool-contract-v0134-p702-lint-final.log`、`/tmp/lingxi-tool-contract-v0134-p702-focused-eslint-final.log`、`/tmp/lingxi-tool-contract-v0134-p702-credential-refresh-scan.log`、`/tmp/lingxi-tool-contract-v0134-p702-credential-inventory-final.log`。
 
 ## 错误记录
 
@@ -244,3 +255,4 @@
 | 2026-09-05 | 基线审计 | 原任务固定在 v0.1.34 发布前阶段提交 | 保留旧分支，以正式发布提交建立校正版分支 |
 | 2026-09-05 | `P12_SEQUENCE_SEAL_GATE_CYCLE` | P0 新增任务记录使全量套件中的旧封印测试失败 | 保留 fail-closed 与原始失败；P12 按任务书固定新源码坐标 |
 | 2026-09-05 | `BUILD_SIGN_KEY_MISSING` | 原始 `build:server` 缺少签名密钥，exit `1` | 抛弃式匹配密钥诊断复跑 exit `0`；临时材料已删除 |
+| 2026-09-05 | P7-02 提交整理 | 首次提交暂存漏含 `core/media-adapters/` 下 7 个本项文件，提交尚未推送 | 推送前回读工作树发现并补入同一提交；未拆项、未丢改动 |

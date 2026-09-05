@@ -15,6 +15,7 @@ function makeTmpDir() {
 function makeCtx(overrides = {}) {
   return {
     dataDir: makeTmpDir(),
+    mediaExecutionTarget: { credentialProviderId: "openai" },
     bus: {
       request: vi.fn(async () => ({ apiKey: "test-key", baseUrl: "https://api.openai.test/v1" })),
     },

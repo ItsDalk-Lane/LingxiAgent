@@ -165,9 +165,14 @@ function resolveCodexToolSize(params, providerDefaults) {
   });
 }
 
-async function getCredentials(ctx, opts: { forceRefresh?: boolean, staleApiKey?: string } = {}) {
+async function getCredentials(ctx, opts: {
+  providerId?: string;
+  forceRefresh?: boolean;
+  staleApiKey?: string;
+} = {}) {
+  const providerId = opts.providerId || PROVIDER_ID;
   const creds = await ctx.bus.request("provider:credentials", {
-    providerId: PROVIDER_ID,
+    providerId,
     ...(opts.forceRefresh ? { forceRefresh: true, staleApiKey: opts.staleApiKey } : {}),
   });
   if (creds.error || !creds.apiKey) {
@@ -200,7 +205,10 @@ export const openaiCodexImageAdapter = {
   },
 
   async submit(params, ctx) {
-    let creds = await getCredentials(ctx);
+    const credentialProviderId = params.credentialProviderId
+      ?? ctx.mediaExecutionTarget?.credentialProviderId;
+    if (!credentialProviderId) throw new Error("CREDENTIAL_PROVIDER_UNRESOLVED");
+    let creds = await getCredentials(ctx, { providerId: credentialProviderId });
     const allDefaults = ctx.config?.get?.("providerDefaults") || {};
     const providerDefaults = allDefaults[PROVIDER_ID] || {};
     const outputFormat = params.format || providerDefaults?.format || "png";
@@ -279,7 +287,11 @@ export const openaiCodexImageAdapter = {
       // expiry, so rotate the credential once and retry with the new token.
       // 401 的 attempt_error 已由 observedProviderFetch 投递；credential refresh
       // 本身是控制面，不是新的 logical call（§二十六）。attempt 2 = 新 attemptId。
-      creds = await getCredentials(ctx, { forceRefresh: true, staleApiKey: creds.apiKey });
+      creds = await getCredentials(ctx, {
+        providerId: credentialProviderId,
+        forceRefresh: true,
+        staleApiKey: creds.apiKey,
+      });
       res = await performRequest(creds);
     }
 
